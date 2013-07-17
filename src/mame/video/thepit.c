@@ -307,3 +307,40 @@ UINT32 thepit_state::screen_update_thepit(screen_device &screen, bitmap_ind16 &b
 
 	return 0;
 }
+
+UINT32 thepit_state::screen_update_desertdan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	offs_t offs;
+
+
+	for (offs = 0; offs < 32; offs++)
+	{
+		int xshift = m_flip_screen_x ? 128 : 0;
+		int yshift = m_flip_screen_y ? -8 : 0;
+
+		m_tilemap->set_scrollx(offs, xshift);
+		m_solid_tilemap->set_scrollx(offs, xshift);
+
+		m_tilemap->set_scrolly(offs, yshift + m_attributesram[offs << 1]);
+		m_solid_tilemap->set_scrolly(offs, yshift + m_attributesram[offs << 1]);
+	}
+
+	/* low priority tiles */
+	m_graphics_bank = 0;
+	m_solid_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_tilemap->draw(bitmap, cliprect, 0, 0);
+
+	/* low priority sprites */
+	m_graphics_bank = 1;
+	draw_sprites(machine(), bitmap, cliprect, 0);
+
+	/* high priority tiles */
+	m_graphics_bank = 0;
+	m_solid_tilemap->draw(bitmap, cliprect, 1, 1);
+
+	/* high priority sprites */
+	m_graphics_bank = 1;
+	draw_sprites(machine(), bitmap, cliprect, 1);
+
+	return 0;
+}

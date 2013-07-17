@@ -171,6 +171,26 @@ static ADDRESS_MAP_START( thepit_main_map, AS_PROGRAM, 8, thepit_state )
 	AM_RANGE(0xb800, 0xb800) AM_READWRITE(watchdog_reset_r, soundlatch_byte_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( desertdan_main_map, AS_PROGRAM, 8, thepit_state )
+	AM_RANGE(0x0000, 0x6fff) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM
+	AM_RANGE(0x8800, 0x8bff) AM_MIRROR(0x0400) AM_RAM_WRITE(thepit_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x0400) AM_RAM_WRITE(thepit_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x9800, 0x983f) AM_MIRROR(0x0700) AM_RAM AM_SHARE("attributesram")
+	AM_RANGE(0x9840, 0x985f) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x9860, 0x98ff) AM_RAM
+	AM_RANGE(0xa000, 0xa000) AM_READ(thepit_input_port_0_r) AM_WRITENOP // Not hooked up according to the schematics
+	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("IN1")
+	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW") AM_WRITE(nmi_mask_w)
+	AM_RANGE(0xb001, 0xb001) AM_WRITENOP // Unused, but initialized
+	AM_RANGE(0xb002, 0xb002) AM_WRITENOP // coin_lockout_w
+	AM_RANGE(0xb003, 0xb003) AM_WRITE(thepit_sound_enable_w)
+	AM_RANGE(0xb004, 0xb005) AM_WRITENOP // Unused, but initialized
+	AM_RANGE(0xb006, 0xb006) AM_WRITE(thepit_flip_screen_x_w)
+	AM_RANGE(0xb007, 0xb007) AM_WRITE(thepit_flip_screen_y_w)
+	AM_RANGE(0xb800, 0xb800) AM_READWRITE(watchdog_reset_r, soundlatch_byte_w)
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( intrepid_main_map, AS_PROGRAM, 8, thepit_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
@@ -672,6 +692,17 @@ static MACHINE_CONFIG_START( thepit, thepit_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( desertdn, thepit )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(desertdan_main_map)
+
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(thepit_state, screen_update_desertdan)
+
+	MCFG_GFXDECODE(intrepid)
+MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( intrepid, thepit )
 
@@ -1075,6 +1106,28 @@ ROM_START( rtriv )
 	ROM_LOAD( "rtriv.ic3",    0x0000, 0x0020, CRC(927ff40a) SHA1(3d699d981851989e9190505b0dede5202d688f2b) )
 ROM_END
 
+ROM_START( desertdn )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "rs5.bin",  0x0000, 0x1000, CRC(3a48f53e) SHA1(e568442e47c116982c40555368f6432f609b54e6) )
+	ROM_LOAD( "rs6.bin",  0x1000, 0x1000, CRC(3b6125e9) SHA1(5cbfdc2b84b89d0ab9edcc9cefbf5caab237f197) )
+	ROM_LOAD( "rs7.bin",  0x2000, 0x1000, CRC(2f793ca4) SHA1(8e489a61860d52a37e4e22b12ca647f1866648a7) )
+	ROM_LOAD( "rs8.bin",  0x3000, 0x1000, CRC(52674db3) SHA1(47c8c358205b0b8dde52eb684ffa08294d622f7d) )
+	ROM_LOAD( "rs3.bin",  0x4000, 0x1000, CRC(54a0d133) SHA1(119769b2c6c9c4b368a3146456c7392bf045840e) )
+	ROM_LOAD( "rs4.bin",  0x5000, 0x1000, CRC(72d79d62) SHA1(0d35053ad7c0f3942dfac6175e96cadf629c802f) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "rs9.bin",  0x0000, 0x1000, CRC(6daf40ca) SHA1(968faf09bdbb2c55c9164b665ad1e091d5eca2fc) )
+	ROM_LOAD( "rs10.bin", 0x1000, 0x1000, CRC(f4fc2c53) SHA1(2eb3991db30083ac942e19bf545aa11476535a91) )
+
+	ROM_REGION( 0x3000, "gfx1", 0 ) /* chars and sprites */
+	ROM_LOAD( "rs0.bin",  0x0000, 0x1000, CRC(8eb856e8) SHA1(8d94b21662855a1cbd94fa6a3c14ec89ac0128fa) )
+	ROM_LOAD( "rs1.bin",  0x1000, 0x1000, CRC(c051b090) SHA1(7280831c99a3f5a1d4af707bddf5b25a5000cabd) )
+	ROM_LOAD( "rs2.bin",  0x2000, 0x1000, CRC(d0b78243) SHA1(9080f9c93b33057587863672715f64e0e6b36d5f) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "82s123.ic4",   0x0000, 0x0020, NO_DUMP CRC(a758b567) SHA1(d188c90dba10fe3abaae92488786b555b35218c5) ) /* Color prom was a MMI6331 and is compatible with the 82s123 prom type */
+ROM_END
+
 /*
     Romar Triv questions read handler
 */
@@ -1127,6 +1180,7 @@ GAME( 1982, portman,  dockman,  intrepid, dockman, driver_device,  0,     ROT90,
 GAME( 1982, suprmous, 0,        suprmous, suprmous, driver_device, 0,     ROT90, "Taito Corporation", "Super Mouse", 0 )
 GAME( 1982, funnymou, suprmous, suprmous, suprmous, driver_device, 0,     ROT90, "bootleg? (Chuo Co. Ltd)", "Funny Mouse", 0 )
 GAME( 1982, machomou, 0,        suprmous, suprmous, driver_device, 0,     ROT90, "Techstar", "Macho Mouse", 0 )
+GAME( 1982, desertdn, 0,        desertdn, thepit, driver_device,   0,     ROT0,  "Video Optics", "Desert Dan", GAME_NOT_WORKING )
 GAME( 1983, intrepid, 0,        intrepid, intrepid, driver_device, 0,     ROT90, "Nova Games Ltd.", "Intrepid (set 1)", 0 )
 GAME( 1983, intrepid2,intrepid, intrepid, intrepid, driver_device, 0,     ROT90, "Nova Games Ltd.", "Intrepid (set 2)", 0 )
 GAME( 1984, intrepidb,intrepid, intrepid, intrepid, driver_device, 0,     ROT90, "bootleg (Elsys)", "Intrepid (bootleg)", 0 )
