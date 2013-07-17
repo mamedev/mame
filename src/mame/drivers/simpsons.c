@@ -243,7 +243,6 @@ void simpsons_state::simpsons_objdma(  )
 	UINT16 *src, *dst;
 
 	m_k053246->k053247_get_ram(&dst);
-	counter = m_k053246->k053247_get_dy();
 
 	src = m_spriteram;
 	num_inactive = counter = 256;
