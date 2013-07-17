@@ -9,7 +9,6 @@
 #ifndef COCOVHD_H
 #define COCOVHD_H
 
-#include "image.h"
 
 /***************************************************************************
     TYPE DEFINITIONS

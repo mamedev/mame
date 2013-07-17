@@ -7,7 +7,6 @@
 #ifndef __SNES_SPC_H__
 #define __SNES_SPC_H__
 
-#include "devcb.h"
 
 #define SNES_SPCRAM_SIZE      0x10000
 

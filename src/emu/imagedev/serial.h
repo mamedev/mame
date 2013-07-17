@@ -9,8 +9,6 @@
 #ifndef __SERIAL_H__
 #define __SERIAL_H__
 
-#include "diimage.h"
-
 
 /***************************************************************************
     TYPE DEFINITIONS

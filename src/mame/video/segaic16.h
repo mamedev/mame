@@ -9,8 +9,6 @@
 #define __SEGAIC16VID_H__
 
 
-#include "devcb.h"
-
 
 /* tilemap systems */
 #define SEGAIC16_MAX_TILEMAPS       1

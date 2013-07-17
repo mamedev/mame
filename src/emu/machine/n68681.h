@@ -1,7 +1,6 @@
 #ifndef _N68681_H
 #define _N68681_H
 
-#include "diserial.h"
 
 #define MCFG_DUARTN68681_ADD(_tag, _clock, _config) \
 	MCFG_DEVICE_ADD(_tag, DUARTN68681, _clock) \

@@ -1,7 +1,6 @@
 #ifndef __VR0VIDEO_H__
 #define __VR0VIDEO_H__
 
-#include "devcb.h"
 
 /***************************************************************************
  TYPE DEFINITIONS

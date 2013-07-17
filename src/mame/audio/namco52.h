@@ -2,7 +2,6 @@
 #define NAMCO52_H
 
 #include "sound/discrete.h"
-#include "devcb.h"
 
 
 struct namco_52xx_interface

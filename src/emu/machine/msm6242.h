@@ -13,7 +13,6 @@
 #define __MSM6242DEV_H__
 
 #include "emu.h"
-#include "dirtc.h"
 
 
 #define MCFG_MSM6242_ADD(_tag, _config) \

@@ -16,7 +16,6 @@
 #include "emu.h"
 #include "ti99defs.h"
 #include "peribox.h"
-#include "dinvram.h"
 
 extern const device_type TI99_EVPC;
 

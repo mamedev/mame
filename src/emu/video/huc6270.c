@@ -50,7 +50,6 @@ TODO
 **********************************************************************/
 
 #include "emu.h"
-#include "profiler.h"
 #include "huc6270.h"
 
 #define LOG 0

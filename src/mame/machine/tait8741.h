@@ -1,7 +1,6 @@
 #ifndef __TAITO8741__
 #define __TAITO8741__
 
-#include "devcb.h"
 
 /****************************************************************************
   gladiatr and Great Swordsman set.

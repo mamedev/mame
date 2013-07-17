@@ -9,8 +9,6 @@
 #ifndef __PRINTER_H__
 #define __PRINTER_H__
 
-#include "diimage.h"
-
 
 /***************************************************************************
     TYPE DEFINITIONS

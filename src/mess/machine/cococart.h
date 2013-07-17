@@ -9,7 +9,6 @@
 #ifndef __COCOCART_H__
 #define __COCOCART_H__
 
-#include "image.h"
 
 /***************************************************************************
     CONSTANTS

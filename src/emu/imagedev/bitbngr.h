@@ -9,8 +9,6 @@
 #ifndef __BITBNGR_H__
 #define __BITBNGR_H__
 
-#include "image.h"
-
 
 enum
 {

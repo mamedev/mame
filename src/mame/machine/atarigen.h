@@ -40,7 +40,6 @@
 #ifndef __MACHINE_ATARIGEN__
 #define __MACHINE_ATARIGEN__
 
-#include "devcb2.h"
 #include "machine/nvram.h"
 #include "machine/er2055.h"
 #include "cpu/m6502/m6502.h"

@@ -4,8 +4,6 @@
 #ifndef __FLOPDRV_H__
 #define __FLOPDRV_H__
 
-#include "devcb.h"
-#include "image.h"
 #include "formats/flopimg.h"
 
 #define FLOPPY_TYPE_REGULAR 0

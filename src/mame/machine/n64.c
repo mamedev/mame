@@ -6,7 +6,6 @@
 #include "cpu/mips/mips3com.h"
 #include "includes/n64.h"
 #include "video/n64.h"
-#include "profiler.h"
 
 UINT32 *n64_sram;
 UINT32 *rdram;

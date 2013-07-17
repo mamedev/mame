@@ -23,7 +23,6 @@
 #ifndef __PIT8253_H__
 #define __PIT8253_H__
 
-#include "devcb.h"
 
 #define PIT8253_MAX_TIMER       3
 

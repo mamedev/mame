@@ -9,7 +9,6 @@
 #ifndef __MIDIIN_H__
 #define __MIDIIN_H__
 
-#include "image.h"
 
 /***************************************************************************
     CONSTANTS

@@ -9,7 +9,6 @@
 #ifndef HARDDRIV_H
 #define HARDDRIV_H
 
-#include "image.h"
 #include "harddisk.h"
 
 /***************************************************************************

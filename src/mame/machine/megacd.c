@@ -1,4 +1,4 @@
-
+#include "emu.h"
 #include "includes/megadriv.h"
 #include "megacd.lh"
 #include "sound/rf5c68.h"

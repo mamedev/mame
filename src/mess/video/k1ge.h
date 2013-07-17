@@ -2,8 +2,6 @@
 #ifndef __K2GE_H_
 #define __K2GE_H_
 
-#include "devcb.h"
-
 
 #define MCFG_K1GE_ADD(_tag, _clock, _screen, _vblank, _hblank ) \
 	MCFG_DEVICE_ADD( _tag, K1GE, _clock ) \

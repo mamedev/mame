@@ -15,7 +15,6 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "profiler.h"
 #include "huc6260.h"
 
 #define LOG 0

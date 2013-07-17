@@ -9,7 +9,6 @@
 #ifndef SONYDRIV_H
 #define SONYDRIV_H
 
-#include "image.h"
 #include "imagedev/flopdrv.h"
 
 #if 0

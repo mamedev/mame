@@ -11,7 +11,6 @@
 
 #include "osdcore.h"
 #include "ioprocs.h"
-#include "opresolv.h"
 
 #ifndef LOG_FORMATS
 #define LOG_FORMATS if (0) printf

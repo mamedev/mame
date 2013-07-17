@@ -25,8 +25,6 @@
 #ifndef __PIC8259_H__
 #define __PIC8259_H__
 
-#include "devcb.h"
-
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS

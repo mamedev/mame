@@ -9,7 +9,6 @@
 #ifndef __MIDIOUT_H__
 #define __MIDIOUT_H__
 
-#include "image.h"
 
 /***************************************************************************
     CONSTANTS

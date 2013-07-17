@@ -9,7 +9,6 @@
 #ifndef CASSETTE_H
 #define CASSETTE_H
 
-#include "image.h"
 #include "formats/cassimg.h"
 
 

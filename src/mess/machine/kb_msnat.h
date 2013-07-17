@@ -7,7 +7,6 @@
 #ifndef __KB_MSNAT_H__
 #define __KB_MSNAT_H__
 
-#include "devcb.h"
 #include "machine/pc_kbdc.h"
 
 //**************************************************************************
