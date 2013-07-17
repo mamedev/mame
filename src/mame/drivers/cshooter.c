@@ -150,10 +150,9 @@ TILE_GET_INFO_MEMBER(cshooter_state::get_cstx_tile_info)
 {
 	int code = (m_txram[tile_index*2]);
 	int attr = (m_txram[tile_index*2+1]);
-	int rg = (attr & 0x20) ? 1 : 0;
 	int color = attr & 0xf;
 
-	SET_TILE_INFO_MEMBER(rg, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, (code << 1) | ((attr & 0x20) >> 5), color, 0);
 }
 
 WRITE8_MEMBER(cshooter_state::cshooter_txram_w)
@@ -182,10 +181,10 @@ void cshooter_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		tile_low += (tile_low > 0x9) ? 0x37 : 0x30;
 		tile_high += (tile_high > 0x9) ? 0x37 : 0x30;
 
-		drawgfx_transpen(bitmap,cliprect,machine().gfx[0], tile_high, m_spriteram[i+1], 0, 0, m_spriteram[i+3],m_spriteram[i+2],0);
-		drawgfx_transpen(bitmap,cliprect,machine().gfx[0], tile_high, m_spriteram[i+1], 0, 0, m_spriteram[i+3]+8,m_spriteram[i+2],0);
-		drawgfx_transpen(bitmap,cliprect,machine().gfx[0], tile_low, m_spriteram[i+1], 0, 0, m_spriteram[i+3]+8,m_spriteram[i+2]+8,0);
-		drawgfx_transpen(bitmap,cliprect,machine().gfx[0], tile_low, m_spriteram[i+1], 0, 0, m_spriteram[i+3],m_spriteram[i+2]+8,0);
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[0], tile_high << 1, m_spriteram[i+1], 0, 0, m_spriteram[i+3],m_spriteram[i+2],0);
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[0], tile_high << 1, m_spriteram[i+1], 0, 0, m_spriteram[i+3]+8,m_spriteram[i+2],0);
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[0], tile_low << 1, m_spriteram[i+1], 0, 0, m_spriteram[i+3]+8,m_spriteram[i+2]+8,0);
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[0], tile_low << 1, m_spriteram[i+1], 0, 0, m_spriteram[i+3],m_spriteram[i+2]+8,0);
 	}
 }
 
@@ -448,13 +447,12 @@ static const gfx_layout cshooter_charlayout =
 	{ 0,4 },
 	{ 8,9,10,11,0,1,2,3 },
 	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
-	128*2
+	128*1
 };
 
 
 static GFXDECODE_START( cshooter )
 	GFXDECODE_ENTRY( "gfx1", 0,     cshooter_charlayout, 0, 16  )
-	GFXDECODE_ENTRY( "gfx1", 128/8, cshooter_charlayout, 0, 16  )
 GFXDECODE_END
 
 #if 0
@@ -687,3 +685,4 @@ DRIVER_INIT_MEMBER(cshooter_state,cshootere)
 
 GAME( 1987, cshootere, cshooter,  airraid,  airraid,  cshooter_state, cshootere, ROT270, "Seibu Kaihatsu (J.K.H. license)", "Cross Shooter (encrypted)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
 GAME( 1987, airraid,   cshooter,  airraid,  airraid,  cshooter_state, cshootere, ROT270, "Seibu Kaihatsu", "Air Raid (encrypted)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
+// There's also an undumped International Games version

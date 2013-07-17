@@ -258,7 +258,7 @@ static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8, stfight_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cshooter_cpu1_map, AS_PROGRAM, 8, stfight_state )
-/*	TODO: Main to MCU ports reads at 0x0004 - 0x0007 (yeah, in ROM area!) */
+	/* wants 0xff at PC=0x9a otherwise it won't boot, MCU related? */
 	AM_RANGE(0x0007, 0x0007) AM_READ(cshooter_mcu_unk1_r)
 	AM_RANGE(0xc203, 0xc203) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc204, 0xc204) AM_READ_PORT("DSW0")
