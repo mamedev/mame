@@ -109,8 +109,17 @@ void stfight_state::machine_reset()
 WRITE8_MEMBER(stfight_state::stfight_bank_w)
 {
 	UINT8   *ROM2 = memregion("maincpu")->base() + 0x10000;
+	UINT16 bank_num;
 
-	membank("bank1")->set_base(&ROM2[0x4000*((data>>4)&3)] );
+	bank_num = 0;
+
+	if(data & 0x80)
+		bank_num |= 0x8000;
+
+	if(data & 0x04)
+		bank_num |= 0x4000;
+
+	membank("bank1")->set_base(&ROM2[bank_num] );
 }
 
 /*
@@ -267,7 +276,7 @@ READ8_MEMBER(stfight_state::stfight_fm_r)
 /*
  * Cross Shooter MCU communications
  *
- * TODO: everything, especially MCU to main comms
+ * TODO: everything, especially MCU to main comms (tied with coinage ports?)
  */
 
 WRITE8_MEMBER(stfight_state::cshooter_68705_ddr_a_w)

@@ -218,6 +218,8 @@ conventional RAM. See the memory map for sprite data format.
  ****************************************************************************
 
 TODO:
+- MCU is identical between Empire City and Cross Shooter, I guess it's coinage
+  related.
 - palette is incorporated - fix!!!
 - handle transparency in text layer properly (how?)
 - second bank of sf02 is this used? (probably NOT)
@@ -262,9 +264,10 @@ static ADDRESS_MAP_START( cshooter_cpu1_map, AS_PROGRAM, 8, stfight_state )
 	AM_RANGE(0x0007, 0x0007) AM_READ(cshooter_mcu_unk1_r)
 	AM_RANGE(0xc203, 0xc203) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc204, 0xc204) AM_READ_PORT("DSW0")
+	AM_RANGE(0xc801, 0xc801) AM_WRITE(stfight_bank_w)
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(cshooter_text_w) AM_SHARE("tx_vram")
-	AM_RANGE(0xd809, 0xd809) AM_WRITE(stfight_bank_w)
-	AM_RANGE(0xd818, 0xd818) AM_WRITE(cshooter_mcu_w)
+	AM_RANGE(0xe000, 0xfdff) AM_RAM
+	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("sprite_ram")
 	AM_IMPORT_FROM(cpu1_map)
 ADDRESS_MAP_END
 
@@ -971,8 +974,8 @@ ROM_START( cshooter )
 
 	ROM_REGION( 0x20000, "gfx3", ROMREGION_ERASEFF ) // background tiles
 
-	ROM_REGION( 0x20000, "gfx4", ROMREGION_ERASEFF ) // sprites
-	ROM_LOAD( "graphics.1a", 0x00000, 0x10000, NO_DUMP )
+	ROM_REGION( 0x20000, "gfx4", 0 ) // sprites
+	ROM_LOAD( "graphics.1a", 0x00000, 0x20000, NO_DUMP )
 
 	ROM_REGION( 0x10000, "gfx5", ROMREGION_ERASEFF )    /* foreground map data */
 
