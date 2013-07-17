@@ -201,7 +201,7 @@ UINT32 cshooter_state::screen_update_cshooter(screen_device &screen, bitmap_ind1
 		rgb_t color = MAKE_RGB(pal4bit(r), pal4bit(g), pal4bit(b));
 		colortable_palette_set_color(machine().colortable, i, color);
 	}
-	
+
 	bitmap.fill(0x80, cliprect); // temp
 
 	//draw_sprites(bitmap, cliprect);
@@ -222,7 +222,7 @@ UINT32 cshooter_state::screen_update_airraid(screen_device &screen, bitmap_ind16
 		rgb_t color = MAKE_RGB(pal4bit(r), pal4bit(g), pal4bit(b));
 		colortable_palette_set_color(machine().colortable, i, color);
 	}
-	
+
 	bitmap.fill(0x80, cliprect); // temp
 
 	draw_sprites(bitmap, cliprect);
@@ -278,6 +278,17 @@ WRITE8_MEMBER(cshooter_state::bank_w)
 }
 
 
+READ8_MEMBER(cshooter_state::seibu_sound_comms_r)
+{
+	return seibu_main_word_r(space,offset,0x00ff);
+}
+
+WRITE8_MEMBER(cshooter_state::seibu_sound_comms_w)
+{
+	seibu_main_word_w(space,offset,data,0x00ff);
+}
+
+#if 0
 static ADDRESS_MAP_START( cshooter_map, AS_PROGRAM, 8, cshooter_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xafff) AM_READ_BANK("bank1") AM_WRITEONLY
@@ -299,15 +310,7 @@ static ADDRESS_MAP_START( cshooter_map, AS_PROGRAM, 8, cshooter_state )
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-READ8_MEMBER(cshooter_state::seibu_sound_comms_r)
-{
-	return seibu_main_word_r(space,offset,0x00ff);
-}
-
-WRITE8_MEMBER(cshooter_state::seibu_sound_comms_w)
-{
-	seibu_main_word_w(space,offset,data,0x00ff);
-}
+#endif
 
 static ADDRESS_MAP_START( airraid_map, AS_PROGRAM, 8, cshooter_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
@@ -331,7 +334,7 @@ static ADDRESS_MAP_START( airraid_map, AS_PROGRAM, 8, cshooter_state )
 	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
-
+#if 0
 /* Sound CPU */
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, cshooter_state )
@@ -340,7 +343,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, cshooter_state )
 	AM_RANGE(0xc800, 0xc801) AM_WRITENOP // AM_DEVWRITE("ym2", ym2203_device, write) ?
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
-
+#endif
 
 static INPUT_PORTS_START( cshooter )
 	PORT_START("IN0")   /* IN0  (0xc200) */
@@ -454,6 +457,7 @@ static GFXDECODE_START( cshooter )
 	GFXDECODE_ENTRY( "gfx1", 128/8, cshooter_charlayout, 0, 16  )
 GFXDECODE_END
 
+#if 0
 static MACHINE_CONFIG_START( cshooter, cshooter_state )
 
 	/* basic machine hardware */
@@ -482,6 +486,7 @@ static MACHINE_CONFIG_START( cshooter, cshooter_state )
 	/* sound hardware */
 	/* YM2151 and ym3931 seibu custom cpu running at XTAL_14_31818MHz/4 */
 MACHINE_CONFIG_END
+#endif
 
 static MACHINE_CONFIG_START( airraid, cshooter_state )
 
@@ -513,89 +518,7 @@ MACHINE_CONFIG_END
 
 
 
-/*
 
------------------------------
-Cross Shooter by TAITO (1987)
------------------------------
-malcor
-
-
-Location    Type     File ID   Checksum
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-LB 4U       27256      R1        C2F0   [  main program  ]
-LB 2U       27512      R2        74EA   [    tilemaps    ]
-TB 11A      2764       R3        DFA7   [      fix       ]
-LB 5C       27256      R4        D7B8   [ sound program  ]
-LB 7A       82S123     0.BPR     00A1   [  foregrounds   ]
-LB 9S       82S129     1.BPR     0194   [ motion objects ]
-TB 4E       82S129     2.BPR     00DC   [ motion objects ]
-TB 16A      63S281     x         x      [     clut       ] NOTE: dumped much later
-LB 3J       68705
-
-
-Notes:   LB - CPU board        S-0086-002-0B
-         TB - GFX board        S-0087-807
-
-         The PCB looks like a prototype, due to the modifications
-         to the PCB. The game is probably licensed from Seibu.
-
-         The 0/1/2 bipolar PROMs are not used for colour.
-
-         However, this contradicts Guru's findings: "If I short some of the pins(of 0.bpr at 7A)
-         the sprite colors change, and the chip is connected to the color RAM."
-
-
-Brief hardware overview:
-------------------------
-
-Main processor  - Z80 6MHz
-                - 68705
-
-GFX             - custom TC15G008AP-0048  SEI0040BU    - Toshiba CMOS Gate Array
-            3 x - custom TC17G008AN-0015  SEI0020BU    - Toshiba CMOS Gate Array
-                - custom TC17G005AN-0028  SEI0030BU    - Toshiba CMOS Gate Array
-            3 x - custom SIPs. No ID, unusually large. - covered in epoxy, probably sprite/tile gfx data is in here
-
-Sound processor - Z80 6MHz (5.897MHz)
-            2 x - YM2203C
-
-
-The game data seems to be small. There may be graphics
-data in the custom SIPs. I am not sure though.
-
-*/
-
-ROM_START( cshooter )
-	ROM_REGION( 0x10000, "maincpu", 0 ) // Main CPU
-	ROM_LOAD( "r1.4u",   0x00000, 0x08000, CRC(fbe8c518) SHA1(bff8319f4892e6d06f1c7a679f67dc8407279cfa) )
-
-	ROM_REGION( 0x10000, "audiocpu", 0 ) // Sub/Sound CPU
-	ROM_LOAD( "r4.5c",   0x00000, 0x08000, CRC(84fed017) SHA1(9a564c9379eb48569cfba48562889277991864d8) )
-
-	// not hooked up yet (Taito version has this instead of encryption!
-	ROM_REGION( 0x0800, "mcu", 0 ) /* 2k for the microcontroller */
-	ROM_LOAD( "crshooter.3j", 0x0000, 0x0800, CRC(aae61ce7) SHA1(bb2b9887ec73a5b82604b9b64c533c2242d20d0f) )
-
-	ROM_REGION( 0x02000, "gfx1", 0 ) // TX Layer
-	ROM_LOAD( "r3.11a",  0x00000, 0x02000, CRC(67b50a47) SHA1(b1f4aefc9437edbeefba5371149cc08c0b55c741) )
-
-	ROM_REGION( 0x20000, "gfx2", 0 ) // tiles
-	ROM_LOAD( "graphics.14c", 0x00000, 0x10000, NO_DUMP )
-	ROM_LOAD( "graphics.16c", 0x10000, 0x10000, NO_DUMP )
-
-	ROM_REGION( 0x10000, "gfx3", 0 ) // sprites
-	ROM_LOAD( "graphics.1a", 0x00000, 0x10000, NO_DUMP )
-
-	ROM_REGION( 0x10000, "user1", 0 ) // Tilemaps
-	ROM_LOAD( "r2.2u",   0x00000, 0x10000, CRC(5ddf9f4e) SHA1(69e4d422ca272bf2e9f00edbe7d23760485fdfe6) )
-
-	ROM_REGION( 0x320, "proms", 0 )
-	ROM_LOAD( "63s281.16a", 0x0000, 0x0100, CRC(0b8b914b) SHA1(8cf4910b846de79661cc187887171ed8ebfd6719) ) // clut
-	ROM_LOAD( "82s123.7a",  0x0100, 0x0020, CRC(93e2d292) SHA1(af8edd0cfe85f28ede9604cfaf4516d54e5277c9) ) // sprite color related? (not used)
-	ROM_LOAD( "82s129.9s",  0x0120, 0x0100, CRC(cf14ba30) SHA1(3284b6809075756b3c8e07d9705fc7eacb7556f1) ) // timing? (not used)
-	ROM_LOAD( "82s129.4e",  0x0220, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) ) // timing? (not used)
-ROM_END
 
 
 /*
@@ -709,6 +632,7 @@ ROM_START( airraid )
 ROM_END
 
 
+#if 0
 DRIVER_INIT_MEMBER(cshooter_state,cshooter)
 {
 	/* temp so it boots */
@@ -719,6 +643,7 @@ DRIVER_INIT_MEMBER(cshooter_state,cshooter)
 	rom[0xa4] = 0x00;
 	membank("bank1")->set_base(&memregion("user1")->base()[0]);
 }
+#endif
 
 DRIVER_INIT_MEMBER(cshooter_state,cshootere)
 {
@@ -760,6 +685,5 @@ DRIVER_INIT_MEMBER(cshooter_state,cshootere)
 
 
 
-GAME( 1987, cshooter,  0,         cshooter, cshooter, cshooter_state, cshooter,  ROT270, "Seibu Kaihatsu (Taito license)",  "Cross Shooter (not encrypted)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 1987, cshootere, cshooter,  airraid,  airraid,  cshooter_state, cshootere, ROT270, "Seibu Kaihatsu (J.K.H. license)", "Cross Shooter (encrypted)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
 GAME( 1987, airraid,   cshooter,  airraid,  airraid,  cshooter_state, cshootere, ROT270, "Seibu Kaihatsu", "Air Raid (encrypted)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )

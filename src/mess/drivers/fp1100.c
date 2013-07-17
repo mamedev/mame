@@ -160,7 +160,7 @@ static ADDRESS_MAP_START(fp1100_io, AS_IO, 8, fp1100_state )
 	AM_RANGE(0xff00, 0xff00) AM_READ(slot_id_r) AM_WRITE(slot_bank_w)
 	AM_RANGE(0xff80, 0xff80) AM_READ(sub_to_main_r) AM_WRITE(irq_mask_w)
 	AM_RANGE(0xffa0, 0xffa0) AM_WRITE(main_bank_w)
-	AM_RANGE(0xffc0, 0xffc0) AM_READ(sub_to_main_r) AM_WRITE(main_to_sub_w)
+	AM_RANGE(0xffc0, 0xffc0) AM_READ(unk_r) AM_WRITE(main_to_sub_w)
 ADDRESS_MAP_END
 
 READ8_MEMBER( fp1100_state::fp1100_vram_r )
@@ -217,9 +217,9 @@ ADDRESS_MAP_END
 /* Input ports */
 static INPUT_PORTS_START( fp1100 )
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x00, "Text width" ) PORT_DIPLOCATION("SW1:1")
-	PORT_DIPSETTING(    0x01, "40 chars/line" )
-	PORT_DIPSETTING(    0x00, "80 chars/line" )
+	PORT_DIPNAME( 0x01, 0x01, "Text width" ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, "80 chars/line" )
+	PORT_DIPSETTING(    0x00, "40 chars/line" )
 	PORT_DIPNAME( 0x02, 0x02, "Screen Mode" ) PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x02, "Screen 0" )
 	PORT_DIPSETTING(    0x00, "Screen 1" )

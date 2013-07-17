@@ -12,13 +12,15 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_text_char_ram(*this, "text_char_ram"),
 		m_text_attr_ram(*this, "text_attr_ram"),
+		m_tx_vram(*this, "tx_vram"),
 		m_vh_latch_ram(*this, "vh_latch_ram"),
 		m_sprite_ram(*this, "sprite_ram"),
 		m_maincpu(*this, "maincpu"),
 		m_msm(*this, "msm") { }
 
-	required_shared_ptr<UINT8> m_text_char_ram;
-	required_shared_ptr<UINT8> m_text_attr_ram;
+	optional_shared_ptr<UINT8> m_text_char_ram;
+	optional_shared_ptr<UINT8> m_text_attr_ram;
+	optional_shared_ptr<UINT8> m_tx_vram;
 	required_shared_ptr<UINT8> m_vh_latch_ram;
 	required_shared_ptr<UINT8> m_sprite_ram;
 	UINT8 *m_decrypt;
@@ -44,15 +46,19 @@ public:
 	DECLARE_WRITE8_MEMBER(stfight_text_attr_w);
 	DECLARE_WRITE8_MEMBER(stfight_sprite_bank_w);
 	DECLARE_WRITE8_MEMBER(stfight_vh_latch_w);
+	DECLARE_WRITE8_MEMBER(cshooter_text_w);
 	DECLARE_DRIVER_INIT(stfight);
 	DECLARE_DRIVER_INIT(empcity);
+	DECLARE_DRIVER_INIT(cshooter);
 	TILEMAP_MAPPER_MEMBER(fg_scan);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILEMAP_MAPPER_MEMBER(bg_scan);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
+	TILE_GET_INFO_MEMBER(get_cshooter_tx_tile_info);
+	DECLARE_VIDEO_START(stfight);
+	DECLARE_VIDEO_START(cshooter);
 	virtual void machine_reset();
-	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_stfight(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(stfight_vb_interrupt);

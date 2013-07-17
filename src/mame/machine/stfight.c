@@ -80,6 +80,11 @@ DRIVER_INIT_MEMBER(stfight_state,stfight)
 	m_decrypt[0xb5] = 0x00;
 }
 
+DRIVER_INIT_MEMBER(stfight_state,cshooter)
+{
+	// ...
+}
+
 void stfight_state::machine_reset()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);

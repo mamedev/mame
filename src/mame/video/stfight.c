@@ -147,6 +147,21 @@ TILE_GET_INFO_MEMBER(stfight_state::get_tx_tile_info)
 			TILE_FLIPYX((attr & 0x60) >> 5));
 }
 
+TILE_GET_INFO_MEMBER(stfight_state::get_cshooter_tx_tile_info)
+{
+	UINT8 tile = m_tx_vram[tile_index*2];
+	UINT8 attr = m_tx_vram[tile_index*2+1];
+	int color = attr & 0x0f;
+
+	tileinfo.group = color;
+
+	SET_TILE_INFO_MEMBER(
+			0,
+			(tile << 1) | ((attr & 0x20) >> 5),
+			attr & 0x0f,
+			/*TILE_FLIPYX((attr & 0x60) >> 5)*/0);
+}
+
 
 /***************************************************************************
 
@@ -154,11 +169,21 @@ TILE_GET_INFO_MEMBER(stfight_state::get_tx_tile_info)
 
 ***************************************************************************/
 
-void stfight_state::video_start()
+VIDEO_START_MEMBER(stfight_state,stfight)
 {
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(stfight_state::get_bg_tile_info),this),tilemap_mapper_delegate(FUNC(stfight_state::bg_scan),this),16,16,128,256);
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(stfight_state::get_fg_tile_info),this),tilemap_mapper_delegate(FUNC(stfight_state::fg_scan),this),16,16,128,256);
 	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(stfight_state::get_tx_tile_info),this),TILEMAP_SCAN_ROWS, 8,8,32,32);
+
+	m_fg_tilemap->set_transparent_pen(0x0f);
+	colortable_configure_tilemap_groups(machine().colortable, m_tx_tilemap, machine().gfx[0], 0xcf);
+}
+
+VIDEO_START_MEMBER(stfight_state,cshooter)
+{
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(stfight_state::get_bg_tile_info),this),tilemap_mapper_delegate(FUNC(stfight_state::bg_scan),this),16,16,128,256);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(stfight_state::get_fg_tile_info),this),tilemap_mapper_delegate(FUNC(stfight_state::fg_scan),this),16,16,128,256);
+	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(stfight_state::get_cshooter_tx_tile_info),this),TILEMAP_SCAN_ROWS, 8,8,32,32);
 
 	m_fg_tilemap->set_transparent_pen(0x0f);
 	colortable_configure_tilemap_groups(machine().colortable, m_tx_tilemap, machine().gfx[0], 0xcf);
@@ -183,6 +208,13 @@ WRITE8_MEMBER(stfight_state::stfight_text_attr_w)
 	m_text_attr_ram[offset] = data;
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
+
+WRITE8_MEMBER(stfight_state::cshooter_text_w)
+{
+	m_tx_vram[offset] = data;
+	m_tx_tilemap->mark_tile_dirty(offset/2);
+}
+
 
 WRITE8_MEMBER(stfight_state::stfight_sprite_bank_w)
 {
