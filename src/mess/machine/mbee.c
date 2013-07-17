@@ -136,8 +136,11 @@ WRITE8_MEMBER( mbee_state::mbee_fdc_motor_w )
 	m_fdc->set_floppy(floppy);
 	m_fdc->dden_w(!BIT(data, 3)); // /Q output of ic29
 
-	floppy->mon_w(0); // motor on
-	floppy->ss_w(BIT(data, 2)); // inverted on the board
+	if (floppy)
+	{
+		floppy->mon_w(0); // motor on
+		floppy->ss_w(BIT(data, 2)); // inverted on the board
+	}
 }
 
 /***********************************************************
