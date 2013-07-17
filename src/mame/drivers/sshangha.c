@@ -51,6 +51,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
 #include "sound/2203intf.h"
 #include "sound/okim6295.h"
 #include "includes/sshangha.h"
+#include "machine/deco146.h"
 
 #define SSHANGHA_HACK   0
 
@@ -416,7 +417,7 @@ static MACHINE_CONFIG_START( sshangha, sshangha_state )
 	MCFG_DEVICE_ADD("spritegen2", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 2);
 
-
+	MCFG_DECO146_ADD("ioprot")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker") /* sure it's stereo? */
