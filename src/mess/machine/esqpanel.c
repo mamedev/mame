@@ -42,6 +42,7 @@ void esqpanel_device::device_config_complete()
 	else
 	{
 		memset(&m_out_tx_cb, 0, sizeof(m_out_tx_cb));
+		memset(&m_analog_value_cb, 0, sizeof(m_analog_value_cb));
 	}
 }
 
@@ -52,6 +53,7 @@ void esqpanel_device::device_config_complete()
 void esqpanel_device::device_start()
 {
 	m_out_tx_func.resolve(m_out_tx_cb, *this);
+	m_analog_value_func.resolve(m_analog_value_cb, *this);
 }
 
 
@@ -199,6 +201,14 @@ void esqpanel_device::xmit_char(UINT8 data)
 		{
 			m_xmit_write = 0;
 		}
+	}
+}
+
+void esqpanel_device::set_analog_value(offs_t offset, UINT16 value)
+{
+	if (!m_analog_value_func.isnull())
+	{
+		m_analog_value_func(offset, value);
 	}
 }
 

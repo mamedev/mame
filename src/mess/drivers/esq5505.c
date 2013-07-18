@@ -97,6 +97,16 @@
     62 = DATA INCREMENT
     63 = DATA DECREMENT
 
+    VFX / VFX-SD / SD-1 analog values:
+    0 = Pitch Bend
+    1 = Patch Select
+    2 = Mod Wheel
+    3 = Value, aka Data Entry Slider
+    4 = Pedal / CV
+    5 = Volume Slider
+    6 = Battery
+    7 = Voltage Reference
+
 ***************************************************************************/
 
 #include <cstdio>
@@ -374,6 +384,9 @@ public:
 	DECLARE_READ16_MEMBER(lower_r);
 	DECLARE_WRITE16_MEMBER(lower_w);
 
+	DECLARE_READ16_MEMBER(analog_r);
+	DECLARE_WRITE16_MEMBER(analog_w);
+
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(duart_tx_a);
 	DECLARE_WRITE_LINE_MEMBER(duart_tx_b);
@@ -394,6 +407,7 @@ public:
 
 private:
 	UINT16  *m_rom, *m_ram;
+	UINT16 m_analog_values[8];
 
 public:
 	DECLARE_DRIVER_INIT(eps);
@@ -452,6 +466,16 @@ void esq5505_state::machine_reset()
 	m_rom = (UINT16 *)(void *)memregion("osrom")->base();
 	m_ram = (UINT16 *)(void *)memshare("osram")->ptr();
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(esq5505_state::maincpu_irq_acknowledge_callback),this));
+
+	// Default analog values:
+	m_analog_values[0] = 0x7fff; // pitch mod: start in the center
+	m_analog_values[1] = 0x0000; // patch select: nothing pressed.
+	m_analog_values[2] = 0x0000; // mod wheel: at the bottom, no modulation
+	m_analog_values[3] = 0xcccc; // data entry: somewhere in the middle
+	m_analog_values[4] = 0xffff; // control voltage / pedal: full on.
+	m_analog_values[5] = 0xffff; // Volume control: full on.
+	m_analog_values[6] = 0x7fc0; // Battery voltage: something reasonable.
+	m_analog_values[7] = 0x5540; // vRef to check battery.
 }
 
 void esq5505_state::update_irq_to_maincpu() {
@@ -565,48 +589,15 @@ WRITE_LINE_MEMBER(esq5505_state::esq5505_otis_irq)
 	update_irq_to_maincpu();
 }
 
-static READ16_DEVICE_HANDLER(esq5505_read_adc)
+WRITE16_MEMBER(esq5505_state::analog_w)
 {
-	esq5505_state *state = device->machine().driver_data<esq5505_state>();
+	offset &= 0x7;
+	m_analog_values[offset] = data;
+}
 
-	// bit 0 controls reading the battery; other bits likely
-	// control other analog sources
-	// VFX & SD-1 32 voice schematics agree:
-	// bit 0: reference
-	// bit 1: battery
-	// bit 2: vol (volume)
-	// bit 3: pedal
-	// bit 4: val (data entry slider)
-	// bit 5: mod wheel
-	// bit 6: psel
-	// bit 7: pitch wheel
-	switch ((state->m_duart_io & 7) ^ 7)
-	{
-		case 0: // vRef to check battery
-			return 0x5555;
-
-		case 1: // battery voltage
-			return 0x7fff;
-
-		case 2: // volume control
-				return 0xffff;
-
-		case 3: // pedal
-				return 0xffff;
-
-		case 5: // mod wheel
-			return 0xffff;
-
-		case 7: // pitch wheel
-			return 0x7fff;
-
-		case 4: // val, aka data entry slider
-			return 0xffff;
-
-		case 6: // psel, patch select buttons
-			return 0x0000;
-	}
-	return 0x0000;
+READ16_MEMBER(esq5505_state::analog_r)
+{
+	return m_analog_values[m_duart_io & 7];
 }
 
 WRITE_LINE_MEMBER(esq5505_state::duart_irq_handler)
@@ -840,13 +831,14 @@ static const es5505_interface es5505_config =
 	"waverom",  /* Bank 0 */
 	"waverom2", /* Bank 1 */
 	4,          /* channels */
-	DEVCB_DRIVER_LINE_MEMBER(esq5505_state,esq5505_otis_irq), /* irq */
-	DEVCB_DEVICE_HANDLER(DEVICE_SELF, esq5505_read_adc)
+	DEVCB_DRIVER_LINE_MEMBER(esq5505_state, esq5505_otis_irq), /* irq */
+	DEVCB_DRIVER_MEMBER16(esq5505_state, analog_r) /* ADC */
 };
 
 static const esqpanel_interface esqpanel_config =
 {
-	DEVCB_DEVICE_LINE_MEMBER("duart", duartn68681_device, rx_b_w)
+	DEVCB_DEVICE_LINE_MEMBER("duart", duartn68681_device, rx_b_w),
+    DEVCB_DRIVER_MEMBER16(esq5505_state, analog_w)
 };
 
 static SLOT_INTERFACE_START(midiin_slot)
