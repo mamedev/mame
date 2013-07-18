@@ -7150,6 +7150,18 @@ ROM_START( ngdup23e )
 	ROM_LOAD("317-unk-jpn.pic", 0x00, 0x4000, NO_DUMP )
 ROM_END
 
+ROM_START( ndcfboxa )
+	NAOMIGD_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0042a", 0, SHA1(619fd9ebd52fb418526f741ddacbd3edf7dcb4f5) )
+
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	// PIC and sticker unknown
+	ROM_LOAD("317-unk-jpn.pic", 0x00, 0x4000, NO_DUMP ) 
+ROM_END
+
 /*
 0C03F492: MOV     R5,R0
 0C03F494: MOV     R0,R5
@@ -8260,7 +8272,7 @@ ROM_END
 // 0041  Dragon Treasure 3
 // 0041A Dragon Treasure 3 (Rev A)
 // 0042  NAOMI DIMM Firm Update for CF-BOX
-// 0042A NAOMI DIMM Firm Update for CF-BOX (Rev A)
+/* 0042A */ GAME( 2001, ndcfboxa, naomigd, naomigd,  naomi,   naomi_state, naomigd, ROT0, "Sega", "Naomi DIMM Firmware Update for CF-BOX (Rev A) (GDS-0042A)", GAME_FLAGS )
 // 00??  Dragon Treasure
 // 00??  Dragon Treasure 2
 // 00??  Get Bass 2
