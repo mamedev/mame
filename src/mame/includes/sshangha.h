@@ -1,11 +1,13 @@
 #include "video/deco16ic.h"
 #include "video/decospr.h"
+#include "machine/deco146.h"
 
 class sshangha_state : public driver_device
 {
 public:
 	sshangha_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+		: driver_device(mconfig, type, tag),	
+			m_deco146(*this, "ioprot"),
 			m_deco_tilegen1(*this, "tilegen1"),
 			m_spriteram(*this, "spriteram"),
 			m_spriteram2(*this, "spriteram2"),
@@ -22,6 +24,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu")  { }
 
+	optional_device<deco146_device> m_deco146;
 	required_device<deco16ic_device> m_deco_tilegen1;
 	required_shared_ptr<UINT16> m_spriteram;
 	optional_shared_ptr<UINT16> m_spriteram2;
@@ -42,6 +45,10 @@ public:
 
 	int m_video_control;
 
+	DECLARE_READ16_MEMBER( sshangha_protection_region_8_146_r );
+	DECLARE_WRITE16_MEMBER( sshangha_protection_region_8_146_w );
+	DECLARE_READ16_MEMBER( sshangha_protection_region_d_146_r );
+	DECLARE_WRITE16_MEMBER( sshangha_protection_region_d_146_w );
 
 
 	DECLARE_WRITE16_MEMBER(sshangha_protection16_w);

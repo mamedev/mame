@@ -1,4 +1,4 @@
-/* Data East 146 protection chip & I/O interface */
+/* Data East 146 protection chip / memory-mapper & I/O interface */
 
 #include "emu.h"
 #include "deco146.h"
@@ -25,7 +25,7 @@ struct nibselect
 struct deco146port
 {
     UINT16 read_offset;
-    UINT16 write_offset;
+    int write_offset;
  // char bit_mapping[16];
     UINT16 nibble_rotate;
  // UINT16 blank_mask;
@@ -1082,33 +1082,280 @@ struct deco146port
 { 0x7FE, 0x4C/*, "FEDC3210BA987654"*/, 0/*, 0xFFFF*/, { 3,0,2,1 }, 2}, // .N.
 };
 
-static ADDRESS_MAP_START( deco146_map, AS_0, 16, deco146_device )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x17ff) AM_RAM
-	AM_RANGE(0x1800, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x27ff) AM_RAM
-	AM_RANGE(0x2800, 0x2fff) AM_RAM
-	AM_RANGE(0x3000, 0x37ff) AM_RAM
-	AM_RANGE(0x3800, 0x3fff) AM_RAM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x4800, 0x4fff) AM_RAM
-	AM_RANGE(0x5000, 0x57ff) AM_RAM
-	AM_RANGE(0x5800, 0x5fff) AM_RAM
-	AM_RANGE(0x6000, 0x67ff) AM_RAM
-	AM_RANGE(0x6800, 0x6fff) AM_RAM
-	AM_RANGE(0x7000, 0x77ff) AM_RAM
-	AM_RANGE(0x7800, 0x7fff) AM_RAM
-ADDRESS_MAP_END
+/* there are probably less dumb ways of doing the CS logic, it could be hooked up
+   more like the system16 mapper chips */
+
+void deco146_device::write_data(UINT16 address, UINT16 data, UINT16 mem_mask, UINT8 &csflags)
+{
+	csflags = 0;
+	int upper_addr_bits = (address & 0x7800) >> 11;
+
+	if (upper_addr_bits == 0x8) // configuration registers are hardcoded to this area
+	{
+		int real_address = address & 0xf;
+		printf("write to config regs %04x %04x %04x\n", real_address, data, mem_mask);
+
+		if ((real_address>=0x2) && (real_address<=0x0c))
+		{
+			region_selects[(real_address-2)/2] = data &0xf;
+			return;
+		}
+		else
+		{
+			// unknown
+		}
+
+		return; // or fall through?
+	} 
+	
+	for (int i=0;i<6;i++)
+	{
+		int cs = region_selects[i];
+
+		if (cs==upper_addr_bits)
+		{
+			int real_address = address & 0x7ff;
+			csflags |= (1 << i);
+
+			if (i==0) // the first cs is our internal protection area
+			{
+				printf("write matches cs table (protection) %01x %04x %04x %04x\n", i, real_address, data, mem_mask);
+				write_protport(real_address, data, mem_mask);
+			}
+			else
+			{
+				printf("write matches cs table (external connection) %01x %04x %04x %04x\n", i, real_address, data, mem_mask);
+			}
+		}
+	}
+
+	if (csflags==0)
+	{
+		printf("write not in cs table\n");
+	}
+}
+
+UINT16 deco146_device::read_input_a_callback(void)
+{
+	return ioport(":INPUTS")->read();
+}
+
+UINT16 deco146_device::read_input_b_callback(void)
+{
+	return ioport(":SYSTEM")->read();
+}
+
+UINT16 deco146_device::read_input_c_callback(void)
+{
+	return ioport(":DSW")->read();
+}
+
+
+
+
+UINT16 deco146_device::read_protport(UINT16 address, UINT16 mem_mask)
+{
+	UINT16 retdata = 0;
+
+	// if we read the last written address immediately after then ignore all other logic and just return what was written unmodified
+	if ((address==m_latchaddr) && (m_latchflag==1))
+	{
+		printf("returning latched data %04x\n", m_latchdata);
+		m_latchflag = 0;
+		return m_latchdata;
+	}
+
+	m_latchflag = 0;
+
+	// otherwise process the data..
+
+	int location = port_info[address>>1].write_offset;
+
+	if (location==INPUT_PORT_A)
+	{
+		retdata = read_input_a_callback();
+	}
+	else if (location==INPUT_PORT_B)
+	{
+		retdata = read_input_b_callback();
+	}
+	else if (location==INPUT_PORT_C)
+	{
+		retdata = read_input_c_callback();
+	}
+	else
+	{
+		retdata = m_current_rambank[location>>1];
+	}
+
+	int flags = (port_info[address>>1].flags);
+
+	if (location>=0)
+	{
+		printf("read_protport (real ram addres %02x) | %04x %04x | ", location, address, mem_mask);
+		
+		printf("nibble order %d %d %d %d | ", (port_info[address>>1].nibbles.nib0), (port_info[address>>1].nibbles.nib1),(port_info[address>>1].nibbles.nib2),(port_info[address>>1].nibbles.nib3) );
+		printf("lowest nibble rotate %d | ",(port_info[address>>1].nibble_rotate) );	
+
+		if (flags&1) printf("read is affected by XOR | ");
+		if (flags&2) printf("read is affected by NAND | ");
+		//if (flags&4) printf("read has nibbles blanked out\n");
+
+
+		printf("would return %04x | ", retdata);
+
+	}
+
+	int nib;
+
+
+	UINT16 realret = 0;
+
+	nib = port_info[address>>1].nibbles.nib0;
+	if (nib==0) realret |= ((retdata & 0x000f)<<12);
+	if (nib==1) realret |= ((retdata & 0x00f0)<<8);
+	if (nib==2) realret |= ((retdata & 0x0f00)<<4);
+	if (nib==3) realret |= ((retdata & 0xf000)<<0);
+
+	nib = port_info[address>>1].nibbles.nib1;
+	if (nib==0) realret |= ((retdata & 0x000f)<<8);
+	if (nib==1) realret |= ((retdata & 0x00f0)<<4);
+	if (nib==2) realret |= ((retdata & 0x0f00)<<0);
+	if (nib==3) realret |= ((retdata & 0xf000)>>4);
+
+	nib = port_info[address>>1].nibbles.nib2;
+	if (nib==0) realret |= ((retdata & 0x000f)<<4);
+	if (nib==1) realret |= ((retdata & 0x00f0)<<0);
+	if (nib==2) realret |= ((retdata & 0x0f00)>>4);
+	if (nib==3) realret |= ((retdata & 0xf000)>>8);
+
+	nib = port_info[address>>1].nibbles.nib3;
+	UINT16 lownib = 0;
+	if (nib==0) lownib = ((retdata & 0x000f)<<0);
+	if (nib==1) lownib = ((retdata & 0x00f0)>>4);
+	if (nib==2) lownib = ((retdata & 0x0f00)>>8);
+	if (nib==3) lownib = ((retdata & 0xf000)>>12);
+
+	int rotate = (port_info[address>>1].nibble_rotate);
+
+	if (rotate==0)
+	{
+	}
+	else if (rotate==1)
+	{
+		lownib = ((lownib&0x7) << 1) | ((lownib&0x8) >> 3);
+	}
+	else if (rotate==2)
+	{
+		lownib = ((lownib&0x3) << 2) | ((lownib&0xc) >> 2);
+	}
+	else if (rotate==3)
+	{
+		lownib = ((lownib&0x1) << 3) | ((lownib&0xe) >> 1);
+	}
+
+	realret |= lownib;
+
+	if (flags&1) realret ^= m_xor;
+	if (flags&2) realret = (realret & m_nand)^0xffff;
+
+	if (location>=0)
+	{
+		printf("actual return %04x \n", realret);
+	}
+
+	if (location == 0x78) // this has a special meaning
+	{
+		printf("(bankswitch) %04x %04x\n", address, mem_mask);
+	
+		if (m_current_rambank==m_rambank0)
+			m_current_rambank = m_rambank1;
+		else
+			m_current_rambank = m_rambank0;
+	}
+
+
+	return realret;
+}
+
+void deco146_device::write_protport(UINT16 address, UINT16 data, UINT16 mem_mask)
+{
+	m_latchaddr = address;
+	m_latchdata = data;
+	m_latchflag = 1;
+
+	if ((address&0xff) == 0x2c)
+	{
+		 printf("LOAD XOR REGISTER %04x %04x\n", data, mem_mask);
+		 COMBINE_DATA(&m_xor);
+	}
+	else if ((address&0xff) == 0x36)
+	{
+		 printf("LOAD NAND REGISTER %04x %04x\n", data, mem_mask);
+		 COMBINE_DATA(&m_nand);
+	}
+	else if ((address&0xff) == 0x64)
+	{
+		 printf("LOAD SOUND LATCH %04x %04x\n", data, mem_mask);
+		 COMBINE_DATA(&m_soundlatch);
+	}
+
+	// always store
+	COMBINE_DATA(&m_current_rambank[address>>1]);
+
+}
+
+
+UINT16 deco146_device::read_data(UINT16 address, UINT16 mem_mask, UINT8 &csflags)
+{
+	UINT16 retdata = 0;
+	csflags = 0;
+	int upper_addr_bits = (address & 0x7800) >> 11;
+
+	if (upper_addr_bits == 0x8) // configuration registers are hardcoded to this area
+	{
+		int real_address = address & 0xf;
+		printf("read config regs? %04x %04x\n", real_address, mem_mask);
+		return 0x0000;
+	} 
+	
+	// what gets priority?
+	for (int i=0;i<6;i++)
+	{
+		int cs = region_selects[i];
+
+		if (cs==upper_addr_bits)
+		{
+			int real_address = address & 0x7ff;
+			csflags |= (1 << i);
+
+			if (i==0) // the first cs is our internal protection area
+			{
+				//printf("read matches cs table (protection) %01x %04x %04x\n", i, real_address, mem_mask);
+				retdata = read_protport( real_address, mem_mask);
+			}
+			else
+			{
+				printf("read matches cs table (external connection) %01x %04x %04x\n", i, real_address, mem_mask);
+			}
+		}
+	}
+
+	if (csflags==0)
+	{
+		printf("read not in cs table\n");
+	}
+
+	return retdata;
+}
+
 
 const device_type DECO146PROT = &device_creator<deco146_device>;
 
 
 
 deco146_device::deco146_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, DECO146PROT, "DECO146PROT", tag, owner, clock, "deco146", __FILE__),
-		device_memory_interface(mconfig, *this),
-		m_space_config("deco146_space", ENDIANNESS_BIG, 16,15, 0, NULL, *ADDRESS_MAP_NAME(deco146_map))
+	: device_t(mconfig, DECO146PROT, "DECO146PROT", tag, owner, clock, "deco146", __FILE__)
 {
 }
 
@@ -1127,13 +1374,32 @@ void deco146_device::device_start()
 		if (read_address != i*2)
 			printf("%04x %02x\n", port_info[i].read_offset, port_info[i].write_offset);
 	}
+
 }
 
 void deco146_device::device_reset()
 {
+	region_selects[0] = 0;
+	region_selects[1] = 0;
+	region_selects[2] = 0;
+	region_selects[3] = 0;
+	region_selects[4] = 0;
+	region_selects[5] = 0;
+
+	for (int i=0;i<0x80;i++)
+	{
+		m_rambank0[i] = 0x0000;
+		m_rambank1[i] = 0xffff;
+	}
+
+	m_current_rambank = m_rambank0;
+
+	m_nand = 0x0000;
+	m_xor = 0x0000;
+	m_soundlatch = 0x0000;
+
+	m_latchaddr = 0xffff;
+	m_latchdata = 0x0000;
+	m_latchflag = 0;
 }
 
-const address_space_config *deco146_device::memory_space_config(address_spacenum spacenum) const
-{
-	return (spacenum == 0) ? &m_space_config : NULL;
-}

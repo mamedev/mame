@@ -151,7 +151,43 @@ WRITE16_MEMBER(sshangha_state::paletteram16_xbgr_word_be_tilehigh_w)
 	sshangha_set_color_888((offset/2)+0x300, 0, 8, 16, m_tile_paletteram2[(offset) | 1] | (m_tile_paletteram2[(offset) & ~1] << 16) );
 }
 
+READ16_MEMBER( sshangha_state::sshangha_protection_region_d_146_r )
+{
+	int real_address = 0x3f4000 + (offset *2);
+	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	UINT8 cs = 0;
+	UINT16 data = m_deco146->read_data( deco146_addr, mem_mask, cs );
+	return data;
+}
+
+WRITE16_MEMBER( sshangha_state::sshangha_protection_region_d_146_w )
+{
+	int real_address = 0x3f4000 + (offset *2);
+	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	UINT8 cs = 0;
+	m_deco146->write_data( deco146_addr, data, mem_mask, cs );
+}
+
+READ16_MEMBER( sshangha_state::sshangha_protection_region_8_146_r )
+{
+	int real_address = 0x3e0000 + (offset *2);
+	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	UINT8 cs = 0;
+	UINT16 data = m_deco146->read_data( deco146_addr, mem_mask, cs );
+	return data;
+}
+
+WRITE16_MEMBER( sshangha_state::sshangha_protection_region_8_146_w )
+{
+	int real_address = 0x3e0000 + (offset *2);
+	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	UINT8 cs = 0;
+	m_deco146->write_data( deco146_addr, data, mem_mask, cs );
+}
+
+
 static ADDRESS_MAP_START( sshangha_map, AS_PROGRAM, 16, sshangha_state )
+	ADDRESS_MAP_GLOBAL_MASK(0x3fffff)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10000f) AM_RAM AM_SHARE("sound_shared")
 
@@ -177,9 +213,9 @@ static ADDRESS_MAP_START( sshangha_map, AS_PROGRAM, 16, sshangha_state )
 	AM_RANGE(0x380800, 0x380bff) AM_RAM_WRITE(paletteram16_xbgr_word_be_sprites2_w) AM_SHARE("sprite_palram2")
 	AM_RANGE(0x380c00, 0x380fff) AM_RAM_WRITE(paletteram16_xbgr_word_be_tilelow_w) AM_SHARE("tile_palram1")
 	AM_RANGE(0x381000, 0x383fff) AM_RAM // unused palette area
-
-	AM_RANGE(0xfec000, 0xff3fff) AM_RAM
-	AM_RANGE(0xff4000, 0xff47ff) AM_READWRITE(sshangha_protection16_r,sshangha_protection16_w) AM_SHARE("prot_data")
+	AM_RANGE(0x3e0000, 0x3e3fff) AM_READWRITE(sshangha_protection_region_8_146_r,sshangha_protection_region_8_146_w)
+	AM_RANGE(0x3ec000, 0x3f3fff) AM_RAM
+	AM_RANGE(0x3f4000, 0x3f7fff) AM_READWRITE(sshangha_protection_region_d_146_r,sshangha_protection_region_d_146_w) AM_SHARE("prot_data")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sshanghb_map, AS_PROGRAM, 16, sshangha_state )
