@@ -50,6 +50,9 @@ public:
 		MP_ACC3,
 	};
 
+	DECLARE_READ32_MEMBER(mp_param_r);
+	DECLARE_WRITE32_MEMBER(mp_param_w);
+
 
 protected:
 	// device level overrides
@@ -82,6 +85,9 @@ protected:
 
 	address_space_config m_program_config;
 
+	static const UINT32 SHIFT_MASK[33];
+
+
 	UINT32 m_pc;
 	UINT32 m_fetchpc;
 	UINT32 m_reg[32];
@@ -97,6 +103,8 @@ protected:
 	void execute();
 	void execute_short_imm();
 	void execute_reg_long_imm();
+	UINT32 read_creg(int reg);
+	void write_creg(int reg, UINT32 data);
 };
 
 extern const device_type TMS32082_MP;

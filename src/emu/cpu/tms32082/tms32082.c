@@ -13,11 +13,28 @@ extern CPU_DISASSEMBLE(tms32082_mp);
 
 const device_type TMS32082_MP = &device_creator<tms32082_mp_device>;
 
+// internal memory map
+static ADDRESS_MAP_START(internal_map, AS_PROGRAM, 32, tms32082_mp_device)
+	AM_RANGE(0x01010000, 0x010107ff) AM_READWRITE(mp_param_r, mp_param_w)
+ADDRESS_MAP_END
+
+
+
+const UINT32 tms32082_mp_device::SHIFT_MASK[] =
+{
+	0x00000000, 0x00000001, 0x00000003, 0x00000007, 0x0000000f, 0x0000001f, 0x0000003f, 0x0000007f,
+	0x000000ff, 0x000001ff, 0x000003ff, 0x000007ff, 0x00000fff, 0x00001fff, 0x00003fff, 0x00007fff,
+	0x0000ffff, 0x0001ffff, 0x0003ffff, 0x0007ffff, 0x000fffff, 0x001fffff, 0x003fffff, 0x007fffff,
+	0x00ffffff, 0x01ffffff, 0x03ffffff, 0x07ffffff, 0x0fffffff, 0x1fffffff, 0x3fffffff, 0x7fffffff,
+	0xffffffff
+};
+
+
 
 
 tms32082_mp_device::tms32082_mp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, TMS32082_MP, "TMS32082 MP", tag, owner, clock, "tms32082_mp", __FILE__)
-	, m_program_config("program", ENDIANNESS_BIG, 32, 32, 0)
+	, m_program_config("program", ENDIANNESS_BIG, 32, 32, 0, ADDRESS_MAP_NAME(internal_map))
 {
 }
 
@@ -25,6 +42,19 @@ tms32082_mp_device::tms32082_mp_device(const machine_config &mconfig, const char
 offs_t tms32082_mp_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
 {
 	return CPU_DISASSEMBLE_NAME(tms32082_mp)(this, buffer, pc, oprom, opram, options);
+}
+
+
+
+READ32_MEMBER(tms32082_mp_device::mp_param_r)
+{
+	printf("mp_param_w: %08X, %08X\n", offset, mem_mask);
+	return 0;
+}
+
+WRITE32_MEMBER(tms32082_mp_device::mp_param_w)
+{
+	printf("mp_param_w: %08X, %08X, %08X\n", offset, data, mem_mask);
 }
 
 
@@ -111,6 +141,17 @@ void tms32082_mp_device::device_reset()
 	m_acc[1] = 0;
 	m_acc[2] = 0;
 	m_acc[3] = 0;
+}
+
+UINT32 tms32082_mp_device::read_creg(int reg)
+{
+	printf("read_creg(): %08X\n", reg);
+	return 0;
+}
+
+void tms32082_mp_device::write_creg(int reg, UINT32 data)
+{
+	printf("write_creg(): %08X, %08X\n", reg, data);
 }
 
 UINT32 tms32082_mp_device::fetch()
