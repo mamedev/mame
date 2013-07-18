@@ -106,10 +106,6 @@ TIMER_CALLBACK_MEMBER( m72_audio_device::setvector_callback )
 {
 	switch(param)
 	{
-		case VECTOR_INIT:
-			m_irqvector = 0xff;
-			break;
-
 		case YM2151_ASSERT:
 			m_irqvector &= 0xef;
 			break;
@@ -126,9 +122,6 @@ TIMER_CALLBACK_MEMBER( m72_audio_device::setvector_callback )
 			m_irqvector |= 0x20;
 			break;
 	}
-
-	if (m_irqvector == 0)
-		logerror("You didn't call m72_init_sound()\n");
 
 	machine().device("soundcpu")->execute().set_input_line_and_vector(0, (m_irqvector == 0xff) ? CLEAR_LINE : ASSERT_LINE, m_irqvector);
 }

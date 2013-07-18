@@ -16,7 +16,6 @@ public:
 
 	enum
 	{
-		VECTOR_INIT,
 		YM2151_ASSERT,
 		YM2151_CLEAR,
 		Z80_ASSERT,
