@@ -113,13 +113,13 @@ void esqpanel_device::rcv_complete()    // Rx completed receiving byte
 		// d		Sounds
 		// e		0
 		// f		Cart
-		int lightNumber = data & 0x3f;
+//		int lightNumber = data & 0x3f;
 
 		// Light states:
 		// 0 = Off
 		// 2 = On
 		// 3 = Blinking
-		int lightState = (data & 0xc0) >> 6;
+//		int lightState = (data & 0xc0) >> 6;
 
 		// TODO: do something with the button information!
 		// printf("Setting light %d to %s\n", lightNumber, lightState == 3 ? "Blink" : lightState == 2 ? "On" : "Off");
