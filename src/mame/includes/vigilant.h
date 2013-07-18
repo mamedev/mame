@@ -1,3 +1,5 @@
+#include "audio/m72.h"
+
 class vigilant_state : public driver_device
 {
 public:
@@ -5,10 +7,15 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
 		m_videoram(*this, "videoram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_audio(*this, "m72") { }
 
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_videoram;
+	
+	required_device<cpu_device> m_maincpu;
+	required_device<m72_audio_device> m_audio;
+	
 	int m_horiz_scroll_low;
 	int m_horiz_scroll_high;
 	int m_rear_horiz_scroll_low;
@@ -33,5 +40,4 @@ public:
 	void draw_foreground(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, int opaque );
 	void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
 };

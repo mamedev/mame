@@ -21,7 +21,6 @@
 #include "cpu/nec/nec.h"
 #include "includes/iremipt.h"
 #include "machine/irem_cpu.h"
-#include "audio/m72.h"
 #include "sound/dac.h"
 #include "sound/2151intf.h"
 #include "includes/m90.h"
@@ -31,7 +30,6 @@
 
 void m90_state::machine_start()
 {
-	m_audio = machine().device("m72");
 }
 
 /***************************************************************************/
@@ -99,7 +97,7 @@ static ADDRESS_MAP_START( bomblord_main_cpu_map, AS_PROGRAM, 16, m90_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( m90_main_cpu_io_map, AS_IO, 16, m90_state )
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("m72", m72_sound_command_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE("m72", m72_audio_device, sound_command_w)
 	AM_RANGE(0x00, 0x01) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x02, 0x03) AM_WRITE(m90_coincounter_w)
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("SYSTEM")
@@ -131,10 +129,10 @@ static ADDRESS_MAP_START( m90_sound_cpu_io_map, AS_IO, 8, m90_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x80, 0x80) AM_READ(soundlatch_byte_r)
-	AM_RANGE(0x80, 0x81) AM_DEVWRITE_LEGACY("m72", rtype2_sample_addr_w)
-	AM_RANGE(0x82, 0x82) AM_DEVWRITE_LEGACY("m72", m72_sample_w)
-	AM_RANGE(0x83, 0x83) AM_DEVWRITE_LEGACY("m72", m72_sound_irq_ack_w)
-	AM_RANGE(0x84, 0x84) AM_DEVREAD_LEGACY("m72", m72_sample_r)
+	AM_RANGE(0x80, 0x81) AM_DEVWRITE("m72", m72_audio_device, rtype2_sample_addr_w)
+	AM_RANGE(0x82, 0x82) AM_DEVWRITE("m72", m72_audio_device, sample_w)
+	AM_RANGE(0x83, 0x83) AM_DEVWRITE("m72", m72_audio_device, sound_irq_ack_w)
+	AM_RANGE(0x84, 0x84) AM_DEVREAD("m72", m72_audio_device, sample_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dynablsb_sound_cpu_io_map, AS_IO, 8, m90_state )
@@ -146,10 +144,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( m99_sound_cpu_io_map, AS_IO, 8, m90_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("m72", poundfor_sample_addr_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE("m72", m72_audio_device, poundfor_sample_addr_w)
 	AM_RANGE(0x40, 0x41) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x42, 0x42) AM_READ(soundlatch_byte_r)
-	AM_RANGE(0x42, 0x42) AM_DEVWRITE_LEGACY("m72", m72_sound_irq_ack_w)
+	AM_RANGE(0x42, 0x42) AM_DEVWRITE("m72", m72_audio_device, sound_irq_ack_w)
 ADDRESS_MAP_END
 
 /*****************************************************************************/
@@ -669,17 +667,17 @@ GFXDECODE_END
 INTERRUPT_GEN_MEMBER(m90_state::fake_nmi)
 {
 	address_space &space = machine().firstcpu->space(AS_PROGRAM);
-	int sample = m72_sample_r(m_audio,space,0);
+	int sample = m_audio->sample_r(space,0);
 	if (sample)
-		m72_sample_w(m_audio,space,0,sample);
+		m_audio->sample_w(space,0,sample);
 }
 
 INTERRUPT_GEN_MEMBER(m90_state::bomblord_fake_nmi)
 {
 	address_space &space = machine().firstcpu->space(AS_PROGRAM);
-	int sample = m72_sample_r(m_audio,space,0);
+	int sample = m_audio->sample_r(space,0);
 	if (sample != 0x80)
-		m72_sample_w(m_audio,space,0,sample);
+		m_audio->sample_w(space,0,sample);
 }
 
 INTERRUPT_GEN_MEMBER(m90_state::m90_interrupt)
@@ -731,7 +729,7 @@ static MACHINE_CONFIG_START( m90, m90_state )
 	MCFG_SOUND_ADD("m72", M72, 0)
 
 	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz) /* verified on pcb */
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(driver_device, member_wrapper_line<m72_ym2151_irq_handler>))
+	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("m72", m72_audio_device, ym2151_irq_handler))
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 

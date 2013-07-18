@@ -85,8 +85,6 @@ other supported games as well.
 #include "cpu/z80/z80.h"
 #include "cpu/nec/nec.h"
 #include "machine/irem_cpu.h"
-#include "audio/m72.h"
-#include "sound/dac.h"
 #include "sound/2151intf.h"
 #include "includes/iremipt.h"
 #include "includes/m72.h"
@@ -104,7 +102,6 @@ other supported games as well.
 
 MACHINE_START_MEMBER(m72_state,m72)
 {
-	m_audio = machine().device("m72");
 	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m72_state::m72_scanline_interrupt),this));
 
 	save_item(NAME(m_mcu_sample_addr));
@@ -433,46 +430,46 @@ int m72_state::find_sample(int num)
 INTERRUPT_GEN_MEMBER(m72_state::fake_nmi)
 {
 	address_space &space = generic_space();
-	int sample = m72_sample_r(m_audio,space,0);
+	int sample = m_audio->sample_r(space,0);
 	if (sample)
-		m72_sample_w(m_audio,space,0,sample);
+		m_audio->sample_w(space,0,sample);
 }
 
 
 WRITE16_MEMBER(m72_state::bchopper_sample_trigger_w)
 {
 	static const int a[6] = { 0x0000, 0x0010, 0x2510, 0x6510, 0x8510, 0x9310 };
-	if (ACCESSING_BITS_0_7 && (data & 0xff) < 6) m72_set_sample_start(m_audio, a[data & 0xff]);
+	if (ACCESSING_BITS_0_7 && (data & 0xff) < 6) m_audio->set_sample_start(a[data & 0xff]);
 }
 
 WRITE16_MEMBER(m72_state::nspirit_sample_trigger_w)
 {
 	static const int a[9] = { 0x0000, 0x0020, 0x2020, 0, 0x5720, 0, 0x7b60, 0x9b60, 0xc360 };
-	if (ACCESSING_BITS_0_7 && (data & 0xff) < 9) m72_set_sample_start(m_audio, a[data & 0xff]);
+	if (ACCESSING_BITS_0_7 && (data & 0xff) < 9) m_audio->set_sample_start(a[data & 0xff]);
 }
 
 WRITE16_MEMBER(m72_state::imgfight_sample_trigger_w)
 {
 	static const int a[7] = { 0x0000, 0x0020, 0x44e0, 0x98a0, 0xc820, 0xf7a0, 0x108c0 };
-	if (ACCESSING_BITS_0_7 && (data & 0xff) < 7) m72_set_sample_start(m_audio, a[data & 0xff]);
+	if (ACCESSING_BITS_0_7 && (data & 0xff) < 7) m_audio->set_sample_start(a[data & 0xff]);
 }
 
 WRITE16_MEMBER(m72_state::loht_sample_trigger_w)
 {
 	static const int a[7] = { 0x0000, 0x0020, 0, 0x2c40, 0x4320, 0x7120, 0xb200 };
-	if (ACCESSING_BITS_0_7 && (data & 0xff) < 7) m72_set_sample_start(m_audio, a[data & 0xff]);
+	if (ACCESSING_BITS_0_7 && (data & 0xff) < 7) m_audio->set_sample_start(a[data & 0xff]);
 }
 
 WRITE16_MEMBER(m72_state::xmultiplm72_sample_trigger_w)
 {
 	static const int a[3] = { 0x0000, 0x0020, 0x1a40 };
-	if (ACCESSING_BITS_0_7 && (data & 0xff) < 3) m72_set_sample_start(m_audio, a[data & 0xff]);
+	if (ACCESSING_BITS_0_7 && (data & 0xff) < 3) m_audio->set_sample_start(a[data & 0xff]);
 }
 
 WRITE16_MEMBER(m72_state::dbreedm72_sample_trigger_w)
 {
 	static const int a[9] = { 0x00000, 0x00020, 0x02c40, 0x08160, 0x0c8c0, 0x0ffe0, 0x13000, 0x15820, 0x15f40 };
-	if (ACCESSING_BITS_0_7 && (data & 0xff) < 9) m72_set_sample_start(m_audio, a[data & 0xff]);
+	if (ACCESSING_BITS_0_7 && (data & 0xff) < 9) m_audio->set_sample_start(a[data & 0xff]);
 }
 
 WRITE16_MEMBER(m72_state::airduel_sample_trigger_w)
@@ -480,7 +477,7 @@ WRITE16_MEMBER(m72_state::airduel_sample_trigger_w)
 	static const int a[16] = {
 		0x00000, 0x00020, 0x03ec0, 0x05640, 0x06dc0, 0x083a0, 0x0c000, 0x0eb60,
 		0x112e0, 0x13dc0, 0x16520, 0x16d60, 0x18ae0, 0x1a5a0, 0x1bf00, 0x1c340 };
-	if (ACCESSING_BITS_0_7 && (data & 0xff) < 16) m72_set_sample_start(m_audio, a[data & 0xff]);
+	if (ACCESSING_BITS_0_7 && (data & 0xff) < 16) m_audio->set_sample_start(a[data & 0xff]);
 }
 
 WRITE16_MEMBER(m72_state::dkgenm72_sample_trigger_w)
@@ -491,7 +488,7 @@ WRITE16_MEMBER(m72_state::dkgenm72_sample_trigger_w)
 		0x10fa0, 0x10fc0, 0x10fe0, 0x11f40, 0x12b20, 0x130a0, 0x13c60, 0x14740,
 		0x153c0, 0x197e0, 0x1af40, 0x1c080 };
 
-	if (ACCESSING_BITS_0_7 && (data & 0xff) < 28) m72_set_sample_start(m_audio, a[data & 0xff]);
+	if (ACCESSING_BITS_0_7 && (data & 0xff) < 28) m_audio->set_sample_start(a[data & 0xff]);
 }
 
 WRITE16_MEMBER(m72_state::gallop_sample_trigger_w)
@@ -502,7 +499,7 @@ WRITE16_MEMBER(m72_state::gallop_sample_trigger_w)
 		0x10200, 0x10220, 0x10240, 0x11380, 0x12760, 0x12780, 0x127a0, 0x13c40,
 		0x140a0, 0x16760, 0x17e40, 0x18ee0, 0x19f60, 0x1bbc0, 0x1cee0 };
 
-	if (ACCESSING_BITS_0_7 && (data & 0xff) < 31) m72_set_sample_start(m_audio, a[data & 0xff]);
+	if (ACCESSING_BITS_0_7 && (data & 0xff) < 31) m_audio->set_sample_start(a[data & 0xff]);
 }
 
 
@@ -948,7 +945,7 @@ static ADDRESS_MAP_START( m72_portmap, AS_IO, 16, m72_state )
 	AM_RANGE(0x00, 0x01) AM_READ_PORT("IN0")
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("IN1")
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("m72", m72_sound_command_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE("m72", m72_audio_device, sound_command_w)
 	AM_RANGE(0x02, 0x03) AM_WRITE(m72_port02_w) /* coin counters, reset sound cpu, other stuff? */
 	AM_RANGE(0x04, 0x05) AM_WRITE(m72_dmaon_w)
 	AM_RANGE(0x06, 0x07) AM_WRITE(m72_irq_line_w)
@@ -964,7 +961,7 @@ static ADDRESS_MAP_START( rtype2_portmap, AS_IO, 16, m72_state )
 	AM_RANGE(0x00, 0x01) AM_READ_PORT("IN0")
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("IN1")
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("m72", m72_sound_command_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE("m72", m72_audio_device, sound_command_w)
 	AM_RANGE(0x02, 0x03) AM_WRITE(rtype2_port02_w)
 	AM_RANGE(0x40, 0x43) AM_WRITENOP /* Interrupt controller, only written to at bootup */
 	AM_RANGE(0x80, 0x81) AM_WRITE(m72_scrolly1_w)
@@ -977,7 +974,7 @@ static ADDRESS_MAP_START( poundfor_portmap, AS_IO, 16, m72_state )
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("IN1")
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
 	AM_RANGE(0x08, 0x0f) AM_READ(poundfor_trackball_r)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("m72", m72_sound_command_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE("m72", m72_audio_device, sound_command_w)
 	AM_RANGE(0x02, 0x03) AM_WRITE(rtype2_port02_w)
 	AM_RANGE(0x40, 0x43) AM_WRITENOP /* Interrupt controller, only written to at bootup */
 	AM_RANGE(0x80, 0x81) AM_WRITE(m72_scrolly1_w)
@@ -990,7 +987,7 @@ static ADDRESS_MAP_START( majtitle_portmap, AS_IO, 16, m72_state )
 	AM_RANGE(0x00, 0x01) AM_READ_PORT("IN0")
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("IN1")
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("m72", m72_sound_command_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE("m72", m72_audio_device, sound_command_w)
 	AM_RANGE(0x02, 0x03) AM_WRITE(rtype2_port02_w)
 	AM_RANGE(0x40, 0x43) AM_WRITENOP /* Interrupt controller, only written to at bootup */
 	AM_RANGE(0x80, 0x81) AM_WRITE(m72_scrolly1_w)
@@ -1004,7 +1001,7 @@ static ADDRESS_MAP_START( hharry_portmap, AS_IO, 16, m72_state )
 	AM_RANGE(0x00, 0x01) AM_READ_PORT("IN0")
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("IN1")
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("m72", m72_sound_command_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE("m72", m72_audio_device, sound_command_w)
 	AM_RANGE(0x02, 0x03) AM_WRITE(rtype2_port02_w)  /* coin counters, reset sound cpu, other stuff? */
 	AM_RANGE(0x04, 0x05) AM_WRITE(m72_dmaon_w)
 	AM_RANGE(0x06, 0x07) AM_WRITE(m72_irq_line_w)
@@ -1019,7 +1016,7 @@ static ADDRESS_MAP_START( kengo_portmap, AS_IO, 16, m72_state )
 	AM_RANGE(0x00, 0x01) AM_READ_PORT("IN0")
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("IN1")
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("m72", m72_sound_command_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE("m72", m72_audio_device, sound_command_w)
 	AM_RANGE(0x02, 0x03) AM_WRITE(rtype2_port02_w)
 	AM_RANGE(0x80, 0x81) AM_WRITE(m72_scrolly1_w)
 	AM_RANGE(0x82, 0x83) AM_WRITE(m72_scrollx1_w)
@@ -1042,36 +1039,36 @@ static ADDRESS_MAP_START( rtype_sound_portmap, AS_IO, 8, m72_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x02, 0x02) AM_READ(soundlatch_byte_r)
-	AM_RANGE(0x06, 0x06) AM_DEVWRITE_LEGACY("m72", m72_sound_irq_ack_w)
-	AM_RANGE(0x84, 0x84) AM_DEVREAD_LEGACY("m72", m72_sample_r)
+	AM_RANGE(0x06, 0x06) AM_DEVWRITE("m72", m72_audio_device, sound_irq_ack_w)
+	AM_RANGE(0x84, 0x84) AM_DEVREAD("m72", m72_audio_device, sample_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, m72_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x02, 0x02) AM_READ(soundlatch_byte_r)
-	AM_RANGE(0x06, 0x06) AM_DEVWRITE_LEGACY("m72", m72_sound_irq_ack_w)
-	AM_RANGE(0x82, 0x82) AM_DEVWRITE_LEGACY("m72", m72_sample_w)
-	AM_RANGE(0x84, 0x84) AM_DEVREAD_LEGACY("m72", m72_sample_r)
+	AM_RANGE(0x06, 0x06) AM_DEVWRITE("m72", m72_audio_device, sound_irq_ack_w)
+	AM_RANGE(0x82, 0x82) AM_DEVWRITE("m72", m72_audio_device, sample_w)
+	AM_RANGE(0x84, 0x84) AM_DEVREAD("m72", m72_audio_device, sample_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rtype2_sound_portmap, AS_IO, 8, m72_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x80, 0x80) AM_READ(soundlatch_byte_r)
-	AM_RANGE(0x80, 0x81) AM_DEVWRITE_LEGACY("m72", rtype2_sample_addr_w)
-	AM_RANGE(0x82, 0x82) AM_DEVWRITE_LEGACY("m72", m72_sample_w)
-	AM_RANGE(0x83, 0x83) AM_DEVWRITE_LEGACY("m72", m72_sound_irq_ack_w)
-	AM_RANGE(0x84, 0x84) AM_DEVREAD_LEGACY("m72", m72_sample_r)
+	AM_RANGE(0x80, 0x81) AM_DEVWRITE("m72", m72_audio_device, rtype2_sample_addr_w)
+	AM_RANGE(0x82, 0x82) AM_DEVWRITE("m72", m72_audio_device, sample_w)
+	AM_RANGE(0x83, 0x83) AM_DEVWRITE("m72", m72_audio_device, sound_irq_ack_w)
+	AM_RANGE(0x84, 0x84) AM_DEVREAD("m72", m72_audio_device, sample_r)
 //  AM_RANGE(0x87, 0x87) AM_WRITENOP    /* ??? */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( poundfor_sound_portmap, AS_IO, 8, m72_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVWRITE_LEGACY("m72", poundfor_sample_addr_w)
+	AM_RANGE(0x10, 0x13) AM_DEVWRITE("m72", m72_audio_device, poundfor_sample_addr_w)
 	AM_RANGE(0x40, 0x41) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x42, 0x42) AM_READ(soundlatch_byte_r)
-	AM_RANGE(0x42, 0x42) AM_DEVWRITE_LEGACY("m72", m72_sound_irq_ack_w)
+	AM_RANGE(0x42, 0x42) AM_DEVWRITE("m72", m72_audio_device, sound_irq_ack_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8, m72_state )
@@ -1818,7 +1815,7 @@ static MACHINE_CONFIG_START( m72_base, m72_state )
 	MCFG_SOUND_ADD("m72", M72, 0);
 
 	MCFG_YM2151_ADD("ymsnd", SOUND_CLOCK)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(driver_device, member_wrapper_line<m72_ym2151_irq_handler>))
+	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("m72", m72_audio_device, ym2151_irq_handler))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -1873,7 +1870,7 @@ static MACHINE_CONFIG_START( rtype, m72_state )
 	MCFG_SOUND_ADD("m72", M72, 0);
 
 	MCFG_YM2151_ADD("ymsnd", SOUND_CLOCK)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(driver_device, member_wrapper_line<m72_ym2151_irq_handler>))
+	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("m72", m72_audio_device, ym2151_irq_handler))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -1910,7 +1907,7 @@ static MACHINE_CONFIG_START( xmultipl, m72_state )
 	MCFG_SOUND_ADD("m72", M72, 0);
 
 	MCFG_YM2151_ADD("ymsnd", SOUND_CLOCK)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(driver_device, member_wrapper_line<m72_ym2151_irq_handler>))
+	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("m72", m72_audio_device, ym2151_irq_handler))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -1951,7 +1948,7 @@ static MACHINE_CONFIG_START( xmultiplm72, m72_state )
 	MCFG_SOUND_ADD("m72", M72, 0);
 
 	MCFG_YM2151_ADD("ymsnd", SOUND_CLOCK)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(driver_device, member_wrapper_line<m72_ym2151_irq_handler>))
+	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("m72", m72_audio_device, ym2151_irq_handler))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -1992,7 +1989,7 @@ static MACHINE_CONFIG_START( dbreed, m72_state )
 	MCFG_SOUND_ADD("m72", M72, 0);
 
 	MCFG_YM2151_ADD("ymsnd", SOUND_CLOCK)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(driver_device, member_wrapper_line<m72_ym2151_irq_handler>))
+	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("m72", m72_audio_device, ym2151_irq_handler))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -2033,7 +2030,7 @@ static MACHINE_CONFIG_START( dbreedm72, m72_state )
 	MCFG_SOUND_ADD("m72", M72, 0);
 
 	MCFG_YM2151_ADD("ymsnd", SOUND_CLOCK)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(driver_device, member_wrapper_line<m72_ym2151_irq_handler>))
+	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("m72", m72_audio_device, ym2151_irq_handler))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -2074,7 +2071,7 @@ static MACHINE_CONFIG_START( rtype2, m72_state )
 	MCFG_SOUND_ADD("m72", M72, 0);
 
 	MCFG_YM2151_ADD("ymsnd", SOUND_CLOCK)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(driver_device, member_wrapper_line<m72_ym2151_irq_handler>))
+	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("m72", m72_audio_device, ym2151_irq_handler))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -2115,7 +2112,7 @@ static MACHINE_CONFIG_START( majtitle, m72_state )
 	MCFG_SOUND_ADD("m72", M72, 0);
 
 	MCFG_YM2151_ADD("ymsnd", SOUND_CLOCK)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(driver_device, member_wrapper_line<m72_ym2151_irq_handler>))
+	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("m72", m72_audio_device, ym2151_irq_handler))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -2156,7 +2153,7 @@ static MACHINE_CONFIG_START( hharry, m72_state )
 	MCFG_SOUND_ADD("m72", M72, 0);
 
 	MCFG_YM2151_ADD("ymsnd", SOUND_CLOCK)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(driver_device, member_wrapper_line<m72_ym2151_irq_handler>))
+	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("m72", m72_audio_device, ym2151_irq_handler))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -2197,7 +2194,7 @@ static MACHINE_CONFIG_START( hharryu, m72_state )
 	MCFG_SOUND_ADD("m72", M72, 0);
 
 	MCFG_YM2151_ADD("ymsnd", SOUND_CLOCK)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(driver_device, member_wrapper_line<m72_ym2151_irq_handler>))
+	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("m72", m72_audio_device, ym2151_irq_handler))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -2238,7 +2235,7 @@ static MACHINE_CONFIG_START( dkgenm72, m72_state )
 	MCFG_SOUND_ADD("m72", M72, 0);
 
 	MCFG_YM2151_ADD("ymsnd", SOUND_CLOCK)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(driver_device, member_wrapper_line<m72_ym2151_irq_handler>))
+	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("m72", m72_audio_device, ym2151_irq_handler))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -2279,7 +2276,7 @@ static MACHINE_CONFIG_START( poundfor, m72_state )
 	MCFG_SOUND_ADD("m72", M72, 0);
 
 	MCFG_YM2151_ADD("ymsnd", SOUND_CLOCK)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(driver_device, member_wrapper_line<m72_ym2151_irq_handler>))
+	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("m72", m72_audio_device, ym2151_irq_handler))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -2320,7 +2317,7 @@ static MACHINE_CONFIG_START( cosmccop, m72_state )
 	MCFG_SOUND_ADD("m72", M72, 0);
 
 	MCFG_YM2151_ADD("ymsnd", SOUND_CLOCK)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(driver_device, member_wrapper_line<m72_ym2151_irq_handler>))
+	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("m72", m72_audio_device, ym2151_irq_handler))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 

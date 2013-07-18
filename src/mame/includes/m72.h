@@ -3,6 +3,7 @@
     Irem M72 hardware
 
 *************************************************************************/
+#include "audio/m72.h"
 #include "sound/dac.h"
 
 class m72_state : public driver_device
@@ -19,7 +20,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_mcu(*this, "mcu"),
-		m_dac(*this, "dac") { }
+		m_dac(*this, "dac"),
+		m_audio(*this, "m72") { }
 
 	required_shared_ptr<UINT16> m_spriteram;
 	required_shared_ptr<UINT16> m_videoram1;
@@ -27,6 +29,12 @@ public:
 	optional_shared_ptr<UINT16> m_majtitle_rowscrollram;
 	optional_shared_ptr<UINT16> m_spriteram2;
 	optional_shared_ptr<UINT8> m_soundram;
+	
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_soundcpu;
+	optional_device<cpu_device> m_mcu;
+	optional_device<dac_device> m_dac;
+	optional_device<m72_audio_device> m_audio;
 
 	UINT16 *m_protection_ram;
 	emu_timer *m_scanline_timer;
@@ -48,7 +56,6 @@ public:
 	INT32 m_scrolly2;
 	INT32 m_video_off;
 	int m_majtitle_rowscroll;
-	device_t *m_audio;
 	DECLARE_WRITE16_MEMBER(m72_main_mcu_sound_w);
 	DECLARE_WRITE16_MEMBER(m72_main_mcu_w);
 	DECLARE_WRITE8_MEMBER(m72_mcu_data_w);
@@ -137,8 +144,4 @@ public:
 	int find_sample(int num);
 	void copy_le(UINT16 *dest, const UINT8 *src, UINT8 bytes);
 	void install_protection_handler(const UINT8 *code,const UINT8 *crc);
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_soundcpu;
-	optional_device<cpu_device> m_mcu;
-	optional_device<dac_device> m_dac;
 };

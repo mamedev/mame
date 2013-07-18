@@ -16,7 +16,6 @@ Buccaneers has a 5.6888 Mhz and a 18.432 Mhz OSC
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "audio/m72.h"
 #include "sound/dac.h"
 #include "sound/2203intf.h"
 #include "sound/2151intf.h"
@@ -72,7 +71,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vigilant_io_map, AS_IO, 8, vigilant_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_DEVWRITE_LEGACY("m72", m72_sound_command_byte_w)    /* SD */
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_DEVWRITE("m72", m72_audio_device, sound_command_byte_w)    /* SD */
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1") AM_WRITE(vigilant_out2_w)          /* OUT2 */
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2")
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1")
@@ -98,7 +97,7 @@ static ADDRESS_MAP_START( kikcubic_io_map, AS_IO, 8, vigilant_state )
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN0")
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("IN1")
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("IN2") AM_WRITE(vigilant_bank_select_w)
-	AM_RANGE(0x06, 0x06) AM_DEVWRITE_LEGACY("m72", m72_sound_command_byte_w)
+	AM_RANGE(0x06, 0x06) AM_DEVWRITE("m72", m72_audio_device, sound_command_byte_w)
 //  AM_RANGE(0x07, 0x07) AM_WRITENOP /* ?? */
 ADDRESS_MAP_END
 
@@ -110,10 +109,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, vigilant_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x80, 0x81) AM_READ(soundlatch_byte_r) AM_DEVWRITE_LEGACY("m72", vigilant_sample_addr_w)   /* STL / STH */
-	AM_RANGE(0x82, 0x82) AM_DEVWRITE_LEGACY("m72", m72_sample_w)            /* COUNT UP */
-	AM_RANGE(0x83, 0x83) AM_DEVWRITE_LEGACY("m72", m72_sound_irq_ack_w) /* IRQ clear */
-	AM_RANGE(0x84, 0x84) AM_DEVREAD_LEGACY("m72", m72_sample_r) /* S ROM C */
+	AM_RANGE(0x80, 0x81) AM_READ(soundlatch_byte_r) AM_DEVWRITE("m72", m72_audio_device, vigilant_sample_addr_w)   /* STL / STH */
+	AM_RANGE(0x82, 0x82) AM_DEVWRITE("m72", m72_audio_device, sample_w)            /* COUNT UP */
+	AM_RANGE(0x83, 0x83) AM_DEVWRITE("m72", m72_audio_device, sound_irq_ack_w) /* IRQ clear */
+	AM_RANGE(0x84, 0x84) AM_DEVREAD("m72", m72_audio_device, sample_r) /* S ROM C */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( buccanrs_sound_io_map, AS_IO, 8, vigilant_state )
@@ -121,10 +120,10 @@ static ADDRESS_MAP_START( buccanrs_sound_io_map, AS_IO, 8, vigilant_state )
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
 	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
 	AM_RANGE(0x80, 0x80) AM_READ(soundlatch_byte_r)             /* SDRE */
-	AM_RANGE(0x80, 0x81) AM_DEVWRITE_LEGACY("m72", vigilant_sample_addr_w)  /* STL / STH */
-	AM_RANGE(0x82, 0x82) AM_DEVWRITE_LEGACY("m72", m72_sample_w)                /* COUNT UP */
-	AM_RANGE(0x83, 0x83) AM_DEVWRITE_LEGACY("m72", m72_sound_irq_ack_w)     /* IRQ clear */
-	AM_RANGE(0x84, 0x84) AM_DEVREAD_LEGACY("m72", m72_sample_r)             /* S ROM C */
+	AM_RANGE(0x80, 0x81) AM_DEVWRITE("m72", m72_audio_device, vigilant_sample_addr_w)  /* STL / STH */
+	AM_RANGE(0x82, 0x82) AM_DEVWRITE("m72", m72_audio_device, sample_w)                /* COUNT UP */
+	AM_RANGE(0x83, 0x83) AM_DEVWRITE("m72", m72_audio_device, sound_irq_ack_w)     /* IRQ clear */
+	AM_RANGE(0x84, 0x84) AM_DEVREAD("m72", m72_audio_device, sample_r)             /* S ROM C */
 ADDRESS_MAP_END
 
 
@@ -500,7 +499,7 @@ static MACHINE_CONFIG_START( vigilant, vigilant_state )
 	MCFG_SOUND_ADD("m72", M72, 0)
 
 	MCFG_YM2151_ADD("ymsnd", 3579645)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(driver_device, member_wrapper_line<m72_ym2151_irq_handler>))
+	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("m72", m72_audio_device, ym2151_irq_handler))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.55)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.55)
 
@@ -540,7 +539,7 @@ static MACHINE_CONFIG_START( buccanrs, vigilant_state )
 	MCFG_SOUND_ADD("m72", M72, 0)
 
 	MCFG_SOUND_ADD("ym1", YM2203, 18432000/6)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(driver_device, member_wrapper_line<m72_ym2151_irq_handler>))
+	MCFG_YM2203_IRQ_HANDLER(DEVWRITELINE("m72", m72_audio_device, ym2151_irq_handler))
 	MCFG_YM2203_AY8910_INTF(&ay8910_config)
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.35)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.35)
@@ -597,7 +596,7 @@ static MACHINE_CONFIG_START( kikcubic, vigilant_state )
 	MCFG_SOUND_ADD("m72", M72, 0)
 
 	MCFG_YM2151_ADD("ymsnd", 3579645)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(driver_device, member_wrapper_line<m72_ym2151_irq_handler>))
+	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("m72", m72_audio_device, ym2151_irq_handler))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.55)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.55)
 

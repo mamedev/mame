@@ -8,7 +8,6 @@ driver by Nicola Salmoria
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "audio/m72.h"
 #include "sound/dac.h"
 #include "sound/2151intf.h"
 #include "includes/shisen.h"
@@ -53,7 +52,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( shisen_io_map, AS_IO, 8, shisen_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(sichuan2_dsw1_r, sichuan2_coin_w)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("DSW2") AM_DEVWRITE_LEGACY("m72", m72_sound_command_byte_w)
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("DSW2") AM_DEVWRITE("m72", m72_audio_device, sound_command_byte_w)
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("P1") AM_WRITE(sichuan2_bankswitch_w)
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("P2")
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("COIN")
@@ -68,10 +67,10 @@ static ADDRESS_MAP_START( shisen_sound_io_map, AS_IO, 8, shisen_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x80, 0x80) AM_READ(soundlatch_byte_r)
-	AM_RANGE(0x80, 0x81) AM_DEVWRITE_LEGACY("m72", shisen_sample_addr_w)
-	AM_RANGE(0x82, 0x82) AM_DEVWRITE_LEGACY("m72", m72_sample_w)
-	AM_RANGE(0x83, 0x83) AM_DEVWRITE_LEGACY("m72", m72_sound_irq_ack_w)
-	AM_RANGE(0x84, 0x84) AM_DEVREAD_LEGACY("m72", m72_sample_r)
+	AM_RANGE(0x80, 0x81) AM_DEVWRITE("m72", m72_audio_device, shisen_sample_addr_w)
+	AM_RANGE(0x82, 0x82) AM_DEVWRITE("m72", m72_audio_device, sample_w)
+	AM_RANGE(0x83, 0x83) AM_DEVWRITE("m72", m72_audio_device, sound_irq_ack_w)
+	AM_RANGE(0x84, 0x84) AM_DEVREAD("m72", m72_audio_device, sample_r)
 ADDRESS_MAP_END
 
 
@@ -233,7 +232,7 @@ static MACHINE_CONFIG_START( shisen, shisen_state )
 	MCFG_SOUND_ADD("m72", M72, 0)
 
 	MCFG_YM2151_ADD("ymsnd", 3579545)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(driver_device, member_wrapper_line<m72_ym2151_irq_handler>))
+	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("m72", m72_audio_device, ym2151_irq_handler))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.5)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.5)
 
