@@ -60,8 +60,6 @@ public:
 	// construction/destruction
 	esqpanel_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
-	DECLARE_WRITE_LINE_MEMBER( rx_w ) { device_serial_interface::rx_w(state); }
-
 	virtual void send_to_display(UINT8 data) = 0;
 
 	void xmit_char(UINT8 data);
@@ -84,6 +82,7 @@ private:
 	static const int XMIT_RING_SIZE = 16;
 
 	bool  m_bCalibSecondByte;
+	bool  m_bButtonLightSecondByte;
 
 	devcb_resolved_write_line m_out_tx_func;
 	UINT8 m_xmitring[XMIT_RING_SIZE];

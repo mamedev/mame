@@ -69,6 +69,7 @@ void esqpanel_device::device_reset()
 	m_tx_busy = false;
 	m_xmit_read = m_xmit_write = 0;
 	m_bCalibSecondByte = false;
+	m_bButtonLightSecondByte = false;
 }
 
 void esqpanel_device::rcv_complete()    // Rx completed receiving byte
@@ -90,9 +91,45 @@ void esqpanel_device::rcv_complete()    // Rx completed receiving byte
 		}
 		m_bCalibSecondByte = false;
 	}
+	else if (m_bButtonLightSecondByte) 
+	{
+		// Lights on the Buttons, on the VFX-SD:
+		// Number	Button
+		// 0		1-6
+		// 1		8
+		// 2		6
+		// 3		4
+		// 4		2
+		// 5		Compare
+		// 6		1
+		// 7		Presets
+		// 8		7-12
+		// 9		9
+		// a		7
+		// b		5
+		// c		3
+		// d		Sounds
+		// e		0
+		// f		Cart
+		int lightNumber = data & 0x3f;
+
+		// Light states:
+		// 0 = Off
+		// 2 = On
+		// 3 = Blinking
+		int lightState = (data & 0xc0) >> 6;
+
+		// TODO: do something with the button information!
+		// printf("Setting light %d to %s\n", lightNumber, lightState == 3 ? "Blink" : lightState == 2 ? "On" : "Off");
+		m_bButtonLightSecondByte = false;
+	}
 	else if (data == 0xfb)   // request calibration
 	{
 		m_bCalibSecondByte = true;
+	}
+	else if (data == 0xff)  // button light state command
+	{
+		m_bButtonLightSecondByte = true;
 	}
 	else
 	{

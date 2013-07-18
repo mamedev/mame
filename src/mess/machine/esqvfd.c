@@ -124,6 +124,7 @@ void esqvfd_t::device_start()
 void esqvfd_t::device_reset()
 {
 	m_cursx = m_cursy = 0;
+	m_savedx = m_savedy = 0;
 	m_curattr = AT_NORMAL;
 	m_lastchar = 0;
 	memset(m_chars, 0, sizeof(m_chars));
@@ -239,6 +240,17 @@ void esq2x40_t::write_char(int data)
 				memset(m_chars, 0, sizeof(m_chars));
 				memset(m_attrs, 0, sizeof(m_attrs));
 				memset(m_dirty, 1, sizeof(m_dirty));
+				break;
+
+			case 0xf5:  // save cursor position
+				m_savedx = m_cursx;
+				m_savedy = m_cursy;
+				break;
+
+			case 0xf6:  // restore cursor position
+				m_cursx = m_savedx;
+				m_cursy = m_savedy;
+				m_curattr = m_attrs[m_cursy][m_cursx];
 				break;
 
 			default:

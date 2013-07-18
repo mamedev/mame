@@ -46,6 +46,7 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	int m_cursx, m_cursy;
+	int m_savedx, m_savedy;
 	int m_rows, m_cols;
 	UINT8 m_curattr;
 	UINT8 m_lastchar;
