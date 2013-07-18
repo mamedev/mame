@@ -597,6 +597,13 @@ static MACHINE_CONFIG_DERIVED( tekken, coh100 )
 	MCFG_DEVICE_ADD( "keycus", KEYCUS_C406, 0 )
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( tekken2o, coh100 )
+	MCFG_CPU_MODIFY( "maincpu" )
+	MCFG_CPU_PROGRAM_MAP( rom8_map )
+
+	MCFG_DEVICE_ADD( "keycus", KEYCUS_C406, 0 )
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_DERIVED( tekken2, coh110 )
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( rom8_map )
@@ -1527,9 +1534,9 @@ GAME( 1994, tekkenac,   tekken,   tekken,     tekken,     driver_device, 0, ROT0
 GAME( 1994, tekkenab,   tekken,   tekken,     tekken,     driver_device, 0, ROT0, "Namco", "Tekken (Asia, TE2/VER.B)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1994, tekkenjb,   tekken,   tekken,     tekken,     driver_device, 0, ROT0, "Namco", "Tekken (Japan, TE1/VER.B)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1996, tekken2,    0,        tekken2,    tekken,     driver_device, 0, ROT0, "Namco", "Tekken 2 Ver.B (US, TES3/VER.D)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1995, tekken2ub,  tekken2,  tekken2,    tekken,     driver_device, 0, ROT0, "Namco", "Tekken 2 Ver.B (US, TES3/VER.B)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1995, tekken2ab,  tekken2,  tekken2,    tekken,     driver_device, 0, ROT0, "Namco", "Tekken 2 Ver.B (Asia, TES2/VER.B)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1995, tekken2aa,  tekken2,  tekken2,    tekken,     driver_device, 0, ROT0, "Namco", "Tekken 2 (Asia, TES2/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1995, tekken2ub,  tekken2,  tekken2o,   tekken,     driver_device, 0, ROT0, "Namco", "Tekken 2 Ver.B (US, TES3/VER.B)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1995, tekken2ab,  tekken2,  tekken2o,   tekken,     driver_device, 0, ROT0, "Namco", "Tekken 2 Ver.B (Asia, TES2/VER.B)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1995, tekken2aa,  tekken2,  tekken2o,   tekken,     driver_device, 0, ROT0, "Namco", "Tekken 2 (Asia, TES2/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1996, souledge,   0,        souledge,   souledge,   driver_device, 0, ROT0, "Namco", "Soul Edge Ver. II (World, SO4/VER.C)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1995, souledgeuc, souledge, souledge,   souledge,   driver_device, 0, ROT0, "Namco", "Soul Edge Ver. II (US, SO3/VER.C)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1995, souledgeua, souledge, souledge,   souledge,   driver_device, 0, ROT0, "Namco", "Soul Edge (US, SO3/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
