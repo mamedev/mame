@@ -69,7 +69,7 @@ Added Dip locations according to manual.
 void copsnrob_state::palette_init()
 {
 	palette_set_color(machine(),0,MAKE_RGB(0x00,0x00,0x00)); /* black */
-	palette_set_color(machine(),1,MAKE_RGB(0xff,0xff,0xff));  /* white */
+	palette_set_color(machine(),1,MAKE_RGB(0xff,0xff,0xff)); /* white */
 }
 
 
@@ -81,7 +81,7 @@ void copsnrob_state::palette_init()
 
 READ8_MEMBER(copsnrob_state::copsnrob_misc_r)
 {
-	return ioport("IN0")->read() & 0x80;
+	return machine().primary_screen->vblank() ? 0x00 : 0x80;
 }
 
 WRITE8_MEMBER(copsnrob_state::copsnrob_misc2_w)
@@ -110,8 +110,6 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, copsnrob_state )
 	AM_RANGE(0x0a00, 0x0a03) AM_WRITEONLY AM_SHARE("cary")
 	AM_RANGE(0x0b00, 0x0bff) AM_RAM
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM AM_SHARE("videoram")
-//  AM_RANGE(0x1000, 0x1003) AM_WRITENOP
-//  AM_RANGE(0x1000, 0x1000) AM_READ_PORT("IN0")
 	AM_RANGE(0x1000, 0x1000) AM_READ(copsnrob_misc_r)
 	AM_RANGE(0x1000, 0x1000) AM_WRITE(copsnrob_misc2_w)
 	AM_RANGE(0x1002, 0x1002) AM_READ_PORT("CTRL1")
@@ -135,9 +133,6 @@ ADDRESS_MAP_END
 static const ioport_value gun_table[] = {0x3f, 0x5f, 0x6f, 0x77, 0x7b, 0x7d, 0x7e};
 
 static INPUT_PORTS_START( copsnrob )
-	PORT_START("IN0")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
-
 	PORT_START("IN1")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -266,7 +261,6 @@ static MACHINE_CONFIG_START( copsnrob, copsnrob_state )
 	MCFG_CPU_ADD("maincpu", M6502,14318180/16)      /* 894886.25 kHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -277,7 +271,6 @@ static MACHINE_CONFIG_START( copsnrob, copsnrob_state )
 
 	MCFG_GFXDECODE(copsnrob)
 	MCFG_PALETTE_LENGTH(2)
-
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

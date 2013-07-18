@@ -1007,4 +1007,4 @@ GAME( 1986, empcityi, empcity, stfight, stfight, stfight_state, stfight, ROT0,  
 GAME( 1986, stfight,  empcity, stfight, stfight, stfight_state, stfight, ROT0,   "Seibu Kaihatsu (Tuning license)",          "Street Fight (Germany)", 0 )
 GAME( 1986, stfighta, empcity, stfight, stfight, stfight_state, stfight, ROT0,   "Seibu Kaihatsu",                           "Street Fight (bootleg?)", 0 )
 /* Cross Shooter runs on a slightly modified version of Empire City, with M68705 MCU, a different text tilemap and gfx blobs (see also airraid.c) */
-GAME( 1987, cshooter,  0,      cshooter,cshooter, stfight_state, cshooter,ROT270,"Seibu Kaihatsu (Taito license)",           "Cross Shooter (not encrypted)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1987, cshooter,  0,      cshooter,cshooter, stfight_state, cshooter,ROT270,"Seibu Kaihatsu (Taito license)",           "Cross Shooter (not encrypted)", GAME_NOT_WORKING )

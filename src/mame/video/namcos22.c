@@ -2826,7 +2826,7 @@ UINT32 namcos22_state::screen_update_namcos22(screen_device &screen, bitmap_rgb3
 	UpdateVideoMixer(machine());
 	UpdatePalette(machine());
 	machine().priority_bitmap.fill(0, cliprect);
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(0, cliprect);
 	DrawPolygons(machine(), bitmap);
 	RenderScene(machine(), bitmap);
 	DrawCharacterLayer(machine(), bitmap, cliprect);
