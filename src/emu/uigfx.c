@@ -381,7 +381,7 @@ static void palette_handle_keys(running_machine &machine, ui_gfx_state *state)
 
 	/* clamp within range */
 	if (state->palette.which < 0)
-		state->palette.which = 1;
+		state->palette.which = 0;
 	if (state->palette.which > (int)(machine.colortable != NULL))
 		state->palette.which = (int)(machine.colortable != NULL);
 
