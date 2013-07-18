@@ -261,6 +261,20 @@ ROM_START( iteagle )
 	DISK_REGION( "ata:0:hdd:image" )
 ROM_END
 
+ROM_START( gtfore02 )
+	EAGLE_BIOS
+
+	DISK_REGION( "ata:0:hdd:image" )
+	DISK_IMAGE( "gt2002", 0, SHA1(e902b91bd739daee0b95b10e5cf33700dd63a76b) )
+ROM_END
+
+ROM_START( gtfore02o )
+	EAGLE_BIOS
+
+	DISK_REGION( "ata:0:hdd:image" )
+	DISK_IMAGE( "gt2002o", 0, SHA1(d789ef86837a5012beb224c487537dd563d93886) )
+ROM_END
+
 ROM_START( gtfore04 )
 	EAGLE_BIOS
 
@@ -285,6 +299,8 @@ DRIVER_INIT_MEMBER(iteagle_state, iteagle)
  *
  *************************************/
 
-GAME( 2000, iteagle,        0, gtfore, gtfore, iteagle_state, iteagle, ROT0, "Incredible Technologies", "Eagle BIOS", GAME_IS_BIOS_ROOT )
-GAME( 2003, gtfore04, iteagle, gtfore, gtfore, iteagle_state, iteagle, ROT0, "Incredible Technologies", "Golden Tee Fore! 2004", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2004, gtfore05, iteagle, gtfore, gtfore, iteagle_state, iteagle, ROT0, "Incredible Technologies", "Golden Tee Fore! 2005", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2000, iteagle,          0, gtfore, gtfore, iteagle_state, iteagle, ROT0, "Incredible Technologies", "Eagle BIOS", GAME_IS_BIOS_ROOT )
+GAME( 2003, gtfore02,   iteagle, gtfore, gtfore, iteagle_state, iteagle, ROT0, "Incredible Technologies", "Golden Tee Fore! 2002 (v2.01.04 UMV)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2003, gtfore02o, gtfore02, gtfore, gtfore, iteagle_state, iteagle, ROT0, "Incredible Technologies", "Golden Tee Fore! 2002 (v2.00.00)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2003, gtfore04,   iteagle, gtfore, gtfore, iteagle_state, iteagle, ROT0, "Incredible Technologies", "Golden Tee Fore! 2004", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2004, gtfore05,   iteagle, gtfore, gtfore, iteagle_state, iteagle, ROT0, "Incredible Technologies", "Golden Tee Fore! 2005", GAME_NOT_WORKING | GAME_NO_SOUND )
