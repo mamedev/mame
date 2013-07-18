@@ -374,7 +374,7 @@ void nbmj8891_state::nbmj8891_gfxdraw()
 			color = GFX[gfxaddr++];
 
 			// for hanamomo font type
-			if (nb1413m3_type == NB1413M3_HANAMOMO)
+			if (m_nb1413m3->m_nb1413m3_type == NB1413M3_HANAMOMO)
 			{
 				if ((ioport("FONTTYPE")->read()) == 0x00)
 				{
@@ -492,7 +492,7 @@ VIDEO_START_MEMBER(nbmj8891_state,nbmj8891_1layer)
 	memset(m_videoram0, 0xff, (width * height * sizeof(char)));
 	m_gfxdraw_mode = 0;
 
-	if (nb1413m3_type == NB1413M3_TAIWANMB)
+	if (m_nb1413m3->m_nb1413m3_type == NB1413M3_TAIWANMB)
 		for (i = 0; i < 0x0800; i++) m_clut[i] = CLUT[i];
 }
 

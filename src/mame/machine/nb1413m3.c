@@ -60,7 +60,6 @@ void nb1413m3_device::device_start()
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(nb1413m3_device::timer_callback), this));
 	
-	save_item(NAME(nb1413m3_type));
 	save_item(NAME(m_nb1413m3_type));
 	save_item(NAME(m_sndrombank1));
 	save_item(NAME(m_sndrombank2));
@@ -106,8 +105,6 @@ void nb1413m3_device::device_reset()
     DEVICE HANDLERS
 *****************************************************************************/
 
-int nb1413m3_type;
-
 /* TODO: is all of this actually programmable? */
 TIMER_CALLBACK_MEMBER( nb1413m3_device::timer_callback )
 {
@@ -124,7 +121,7 @@ TIMER_CALLBACK_MEMBER( nb1413m3_device::timer_callback )
 			m_nmi_count++;
 		}
 
-		switch (nb1413m3_type)
+		switch (m_nb1413m3_type)
 		{
 			case NB1413M3_TAIWANMB:
 				m_74ls193_counter = 0x05;
@@ -148,7 +145,7 @@ WRITE8_MEMBER( nb1413m3_device::nmi_clock_w )
 {
 	m_nmi_clock = data;
 
-	switch (nb1413m3_type)
+	switch (m_nb1413m3_type)
 	{
 		case NB1413M3_APPAREL:
 		case NB1413M3_CITYLOVE:
@@ -198,7 +195,7 @@ READ8_MEMBER( nb1413m3_device::sndrom_r )
 	/* get top 8 bits of the I/O port address */
 	offset = (offset << 8) | (space.device().state().state_int(Z80_BC) >> 8);
 
-	switch (nb1413m3_type)
+	switch (m_nb1413m3_type)
 	{
 		case NB1413M3_IEMOTO:
 		case NB1413M3_IEMOTOM:
@@ -342,7 +339,7 @@ READ8_MEMBER( nb1413m3_device::inputport0_r )
 READ8_MEMBER( nb1413m3_device::inputport1_r )
 {
 	device_t &root = space.machine().root_device();
-	switch (nb1413m3_type)
+	switch (m_nb1413m3_type)
 	{
 		case NB1413M3_HYHOO:
 		case NB1413M3_HYHOO2:
@@ -394,7 +391,7 @@ READ8_MEMBER( nb1413m3_device::inputport1_r )
 READ8_MEMBER( nb1413m3_device::inputport2_r )
 {
 	device_t &root = space.machine().root_device();
-	switch (nb1413m3_type)
+	switch (m_nb1413m3_type)
 	{
 		case NB1413M3_HYHOO:
 		case NB1413M3_HYHOO2:
@@ -445,7 +442,7 @@ READ8_MEMBER( nb1413m3_device::inputport2_r )
 
 READ8_MEMBER( nb1413m3_device::inputport3_r )
 {
-	switch (nb1413m3_type)
+	switch (m_nb1413m3_type)
 	{
 		case NB1413M3_TAIWANMB:
 		case NB1413M3_IEMOTOM:
@@ -469,7 +466,7 @@ READ8_MEMBER( nb1413m3_device::inputport3_r )
 READ8_MEMBER( nb1413m3_device::dipsw1_r )
 {
 	device_t &root = space.machine().root_device();
-	switch (nb1413m3_type)
+	switch (m_nb1413m3_type)
 	{
 		case NB1413M3_KANATUEN:
 		case NB1413M3_KYUHITO:
@@ -513,7 +510,7 @@ READ8_MEMBER( nb1413m3_device::dipsw1_r )
 READ8_MEMBER( nb1413m3_device::dipsw2_r )
 {
 	device_t &root = space.machine().root_device();
-	switch (nb1413m3_type)
+	switch (m_nb1413m3_type)
 	{
 		case NB1413M3_KANATUEN:
 		case NB1413M3_KYUHITO:
@@ -570,7 +567,7 @@ WRITE8_MEMBER( nb1413m3_device::outcoin_w )
 
 	m_outcoin_enable = (data & 0x04) >> 2;
 
-	switch (nb1413m3_type)
+	switch (m_nb1413m3_type)
 	{
 		case NB1413M3_TAIWANMB:
 		case NB1413M3_IEMOTOM:

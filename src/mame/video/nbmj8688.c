@@ -135,14 +135,14 @@ WRITE8_MEMBER(nbmj8688_state::mjsikaku_gfxflag2_w)
 {
 	m_mjsikaku_gfxflag2 = data;
 
-	if (nb1413m3_type == NB1413M3_SEIHAM
-			|| nb1413m3_type == NB1413M3_KORINAI
-			|| nb1413m3_type == NB1413M3_KORINAIM
-			|| nb1413m3_type == NB1413M3_LIVEGAL)
+	if (m_nb1413m3->m_nb1413m3_type == NB1413M3_SEIHAM
+			|| m_nb1413m3->m_nb1413m3_type == NB1413M3_KORINAI
+			|| m_nb1413m3->m_nb1413m3_type == NB1413M3_KORINAIM
+			|| m_nb1413m3->m_nb1413m3_type == NB1413M3_LIVEGAL)
 		m_mjsikaku_gfxflag2 ^= 0x20;
 
-	if (nb1413m3_type == NB1413M3_OJOUSANM
-			|| nb1413m3_type == NB1413M3_RYUUHA)
+	if (m_nb1413m3->m_nb1413m3_type == NB1413M3_OJOUSANM
+			|| m_nb1413m3->m_nb1413m3_type == NB1413M3_RYUUHA)
 		m_mjsikaku_gfxflag2 |= 0x20;
 }
 

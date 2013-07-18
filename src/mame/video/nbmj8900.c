@@ -264,7 +264,7 @@ void nbmj8900_state::nbmj8900_gfxdraw()
 			color = GFX[gfxaddr++];
 
 			// for hanamomo
-			if ((nb1413m3_type == NB1413M3_HANAMOMO) && ((gfxaddr >= 0x20000) && (gfxaddr < 0x28000)))
+			if ((m_nb1413m3->m_nb1413m3_type == NB1413M3_HANAMOMO) && ((gfxaddr >= 0x20000) && (gfxaddr < 0x28000)))
 			{
 				color |= ((color & 0x0f) << 4);
 			}

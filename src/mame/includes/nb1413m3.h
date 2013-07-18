@@ -121,9 +121,6 @@ enum {
 #define MCFG_NB1413M3_TYPE(_type) \
 	nb1413m3_device::set_type(*device, _type);
 
-// TODO: Move this to m_nb1413m3_type
-extern int nb1413m3_type;
-
 class nb1413m3_device : public device_t
 {
 public:
@@ -131,7 +128,7 @@ public:
 	~nb1413m3_device() {}
 
 	// (static) configuration helpers
-	static void set_type(device_t &device, int type) { downcast<nb1413m3_device &>(device).m_nb1413m3_type = type; nb1413m3_type = type; }
+	static void set_type(device_t &device, int type) { downcast<nb1413m3_device &>(device).m_nb1413m3_type = type; }
 
 	DECLARE_WRITE8_MEMBER( nmi_clock_w );
 	DECLARE_READ8_MEMBER( sndrom_r );
@@ -160,6 +157,7 @@ public:
 	int m_busyflag;
 	int m_outcoin_flag;
 	int m_inputport;
+	int m_nb1413m3_type;
 	
 protected:
 	// device-level overrides
@@ -178,7 +176,6 @@ private:
 	int m_gfxradr_h;
 	int m_gfxrombank;
 	int m_outcoin_enable;
-	int m_nb1413m3_type;
 
 	TIMER_CALLBACK_MEMBER( timer_callback );
 
