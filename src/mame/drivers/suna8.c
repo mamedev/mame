@@ -2265,21 +2265,21 @@ Super Ranger by SUNA (1988)
 
 Location   Type    File ID  Checksum
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-E2        27C256     R1      28C0    [ main program ]
-F2        27C256     R2      73AD    [ main program ]
-H2        27C256     R3      8B7A    [ main program ]
-I2        27C512     R4      77BE    [ main program ]
-J2        27C512     R5      6121    [ main program ]
-P5        27C256     R6      BE0E    [  background  ]
-P6        27C256     R7      BD5A    [  background  ]
-P7        27C256     R8      4605    [ motion obj.  ]
-P8        27C256     R9      7097    [ motion obj.  ]
-P9        27C256     R10     3B9F    [  background  ]
-P10       27C256     R11     2AE8    [  background  ]
-P11       27C256     R12     8B6D    [ motion obj.  ]
-P12       27C256     R13     927E    [ motion obj.  ]
-J13       27C256     R14     E817    [ snd program  ]
-E13       27C256     R15     54EE    [ sound data   ]
+E2        27C256      1      28C0    [ main program ]
+F2        27C256      2      73AD    [ main program ]
+H2        27C256      3      8B7A    [ main program ]
+I2        27C512      4      77BE    [ main program ]
+J2        27C512      5      6121    [ main program ]
+P5        27C256      6      BE0E    [  background  ]
+P6        27C256      7      BD5A    [  background  ]
+P7        27C256      8      4605    [ motion obj.  ]
+P8        27C256      9      7097    [ motion obj.  ]
+P9        27C256      10     3B9F    [  background  ]
+P10       27C256      11     2AE8    [  background  ]
+P11       27C256      12     8B6D    [ motion obj.  ]
+P12       27C256      13     927E    [ motion obj.  ]
+J13       27C256      14     E817    [ snd program  ]
+E13       27C256      15     54EE    [ sound data   ]
 
 Note:  Game model number K030087
 
