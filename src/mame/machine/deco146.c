@@ -1211,6 +1211,9 @@ UINT16 deco146_device::read_protport(UINT16 address, UINT16 mem_mask)
 
 	UINT16 realret = 0;
 
+
+
+
 	nib = port_info[address>>1].nibbles.nib0;
 	if (nib==0) realret |= ((retdata & 0x000f)<<12);
 	if (nib==1) realret |= ((retdata & 0x00f0)<<8);
@@ -1230,13 +1233,15 @@ UINT16 deco146_device::read_protport(UINT16 address, UINT16 mem_mask)
 	if (nib==3) realret |= ((retdata & 0xf000)>>8);
 
 	nib = port_info[address>>1].nibbles.nib3;
-	UINT16 lownib = 0;
-	if (nib==0) lownib = ((retdata & 0x000f)<<0);
-	if (nib==1) lownib = ((retdata & 0x00f0)>>4);
-	if (nib==2) lownib = ((retdata & 0x0f00)>>8);
-	if (nib==3) lownib = ((retdata & 0xf000)>>12);
+
+	if (nib==0) realret |= ((retdata & 0x000f)<<0);
+	if (nib==1) realret |= ((retdata & 0x00f0)>>4);
+	if (nib==2) realret |= ((retdata & 0x0f00)>>8);
+	if (nib==3) realret |= ((retdata & 0xf000)>>12);
 
 	int rotate = (port_info[address>>1].nibble_rotate);
+
+	UINT16 lownib =  realret & 0x000f;
 
 	if (rotate==0)
 	{
@@ -1254,10 +1259,20 @@ UINT16 deco146_device::read_protport(UINT16 address, UINT16 mem_mask)
 		lownib = ((lownib&0x1) << 3) | ((lownib&0xe) >> 1);
 	}
 
-	realret |= lownib;
+	realret = (realret&0xfff0) | lownib;
+
+
+// if the nibble was -1 it will be left as 0 above anyway, only need this if we want to blank AFTER the xor
+//	if ((port_info[address>>1].nibbles.nib0 ) == -1) realret &=0x0fff;
+//	if ((port_info[address>>1].nibbles.nib1 ) == -1) realret &=0xf0ff;
+//	if ((port_info[address>>1].nibbles.nib2 ) == -1) realret &=0xff0f;
+//	if ((port_info[address>>1].nibbles.nib3 ) == -1) realret &=0xfff0;
+
 
 	if (flags&1) realret ^= m_xor;
-	if (flags&2) realret = (realret & m_nand)^0xffff;
+	if (flags&2) realret = (realret & ~m_nand);
+
+
 
 	if (location>=0)
 	{
@@ -1284,6 +1299,8 @@ void deco146_device::write_protport(UINT16 address, UINT16 data, UINT16 mem_mask
 	m_latchdata = data;
 	m_latchflag = 1;
 
+	printf("BLAH %04x %04x\n", data, mem_mask);
+
 	if ((address&0xff) == 0x2c)
 	{
 		 printf("LOAD XOR REGISTER %04x %04x\n", data, mem_mask);
@@ -1301,7 +1318,7 @@ void deco146_device::write_protport(UINT16 address, UINT16 data, UINT16 mem_mask
 	}
 
 	// always store
-	COMBINE_DATA(&m_current_rambank[address>>1]);
+	COMBINE_DATA(&m_current_rambank[(address&0xff)>>1]);
 
 }
 
@@ -1388,7 +1405,7 @@ void deco146_device::device_reset()
 
 	for (int i=0;i<0x80;i++)
 	{
-		m_rambank0[i] = 0x0000;
+		m_rambank0[i] = 0xffff;
 		m_rambank1[i] = 0xffff;
 	}
 
