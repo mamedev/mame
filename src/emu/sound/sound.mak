@@ -820,7 +820,7 @@ SOUNDOBJS += $(SOUNDOBJ)/3812intf.o $(SOUNDOBJ)/fmopl.o $(SOUNDOBJ)/ymdeltat.o
 endif
 
 ifneq ($(filter YM3526,$(SOUNDS)),)
-SOUNDOBJS += $(SOUNDOBJ)/3526intf.o $(SOUNDOBJ)/fmopl.o
+SOUNDOBJS += $(SOUNDOBJ)/3526intf.o $(SOUNDOBJ)/fmopl.o $(SOUNDOBJ)/ymdeltat.o
 endif
 
 ifneq ($(filter Y8950,$(SOUNDS)),)

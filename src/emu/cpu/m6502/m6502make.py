@@ -236,7 +236,7 @@ def save(fname, device, opcodes, states):
 
 
 def main(argv):
-    debug = True
+    debug = False
     logformat=("%(levelname)s:"
                "%(module)s:"
                "%(lineno)d:"
