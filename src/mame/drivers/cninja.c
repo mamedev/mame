@@ -214,6 +214,53 @@ static ADDRESS_MAP_START( cninjabl_map, AS_PROGRAM, 16, cninja_state )
 	AM_RANGE(0x1b4000, 0x1b4001) AM_DEVWRITE("spriteram", buffered_spriteram16_device, write) /* DMA flag */
 ADDRESS_MAP_END
 
+READ16_MEMBER( cninja_state::sshangha_protection_region_8_146_r )
+{
+	int real_address = 0x1a0000 + (offset *2);
+	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	UINT8 cs = 0;
+	UINT16 data = m_deco146->read_data( deco146_addr, mem_mask, cs );
+	return data;
+}
+
+WRITE16_MEMBER( cninja_state::sshangha_protection_region_8_146_w )
+{
+	int real_address = 0x1a0000 + (offset *2);
+	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	UINT8 cs = 0;
+	m_deco146->write_data( deco146_addr, data, mem_mask, cs );
+}
+
+READ16_MEMBER( cninja_state::sshangha_protection_region_6_146_r )
+{
+	UINT16 realdat = deco16_60_prot_r(space,offset&0x3ff,mem_mask);
+	
+	int real_address = 0x198000 + (offset *2);
+	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	UINT8 cs = 0;
+	UINT16 data = m_deco146->read_data( deco146_addr, mem_mask, cs );
+	
+
+	if (realdat != data)
+		printf("returned %04x instead of %04x (real address %08x)\n", data, realdat, real_address);
+	
+	return data;
+}
+
+WRITE16_MEMBER( cninja_state::sshangha_protection_region_6_146_w )
+{
+
+	
+		
+	deco16_60_prot_w(space,offset&0x3ff,data,mem_mask);
+
+
+	int real_address = 0x198000 + (offset *2);
+	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	UINT8 cs = 0;
+	m_deco146->write_data( deco146_addr, data, mem_mask, cs );
+}
+
 static ADDRESS_MAP_START( edrandy_map, AS_PROGRAM, 16, cninja_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 
@@ -231,9 +278,13 @@ static ADDRESS_MAP_START( edrandy_map, AS_PROGRAM, 16, cninja_state )
 
 	AM_RANGE(0x188000, 0x189fff) AM_RAM_DEVWRITE("deco_common", decocomn_device, nonbuffered_palette_w) AM_SHARE("paletteram")
 	AM_RANGE(0x194000, 0x197fff) AM_RAM AM_SHARE("ram") /* Main ram */
-	AM_RANGE(0x198000, 0x1987ff) AM_READWRITE_LEGACY(deco16_60_prot_r, deco16_60_prot_w) AM_SHARE("prot16ram") /* Protection device */
-	AM_RANGE(0x199550, 0x199551) AM_WRITENOP /* Looks like a bug in game code, a protection write is referenced off a5 instead of a6 and ends up here */
-	AM_RANGE(0x199750, 0x199751) AM_WRITENOP /* Looks like a bug in game code, a protection write is referenced off a5 instead of a6 and ends up here */
+//	AM_RANGE(0x198000, 0x1987ff) AM_READWRITE_LEGACY(deco16_60_prot_r, deco16_60_prot_w) AM_SHARE("prot16ram") /* Protection device */
+//	AM_RANGE(0x199550, 0x199551) AM_WRITENOP /* Looks like a bug in game code, a protection write is referenced off a5 instead of a6 and ends up here */
+//	AM_RANGE(0x199750, 0x199751) AM_WRITENOP /* Looks like a bug in game code, a protection write is referenced off a5 instead of a6 and ends up here */
+	AM_RANGE(0x198000, 0x19bfff) AM_READWRITE(sshangha_protection_region_6_146_r,sshangha_protection_region_6_146_w) AM_SHARE("prot16ram") /* Protection device */
+//	AM_RANGE(0x198000, 0x1987ff) AM_READWRITE(sshangha_protection_region_6_146_r,sshangha_protection_region_6_146_w) AM_SHARE("prot16ram") /* Protection device */
+
+	AM_RANGE(0x1a0000, 0x1a3fff) AM_READWRITE(sshangha_protection_region_8_146_r,sshangha_protection_region_8_146_w)
 
 	AM_RANGE(0x1a4000, 0x1a4007) AM_READWRITE(cninja_irq_r, cninja_irq_w)
 	AM_RANGE(0x1ac000, 0x1ac001) AM_DEVWRITE("spriteram", buffered_spriteram16_device, write) /* DMA flag */
@@ -376,10 +427,10 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( edrandy )
 
-	PORT_START("IN0")
+	PORT_START("INPUTS")
 	DATAEAST_2BUTTON
 
-	PORT_START("IN1")
+	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -1054,6 +1105,8 @@ static MACHINE_CONFIG_START( edrandy, cninja_state )
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 3);
 	decospr_device::set_pri_callback(*device, cninja_pri_callback);
+
+	MCFG_DECO146_ADD("ioprot")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

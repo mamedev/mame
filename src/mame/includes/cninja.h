@@ -9,6 +9,7 @@
 #include "video/decocomn.h"
 #include "video/bufsprite.h"
 #include "video/decospr.h"
+#include "machine/deco146.h"
 
 class cninja_state : public driver_device
 {
@@ -17,6 +18,7 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_audiocpu(*this, "audiocpu"),
+			m_deco146(*this, "ioprot"),
 			m_decocomn(*this, "deco_common"),
 			m_deco_tilegen1(*this, "tilegen1"),
 			m_deco_tilegen2(*this, "tilegen2"),
@@ -37,6 +39,7 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	optional_device<deco146_device> m_deco146;
 	required_device<decocomn_device> m_decocomn;
 	required_device<deco16ic_device> m_deco_tilegen1;
 	required_device<deco16ic_device> m_deco_tilegen2;
@@ -80,4 +83,9 @@ public:
 	UINT32 screen_update_mutantf(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt_gen);
 	void cninjabl_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+
+	DECLARE_READ16_MEMBER( sshangha_protection_region_6_146_r );
+	DECLARE_WRITE16_MEMBER( sshangha_protection_region_6_146_w );
+	DECLARE_READ16_MEMBER( sshangha_protection_region_8_146_r );
+	DECLARE_WRITE16_MEMBER( sshangha_protection_region_8_146_w );
 };

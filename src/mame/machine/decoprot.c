@@ -367,9 +367,9 @@ READ16_HANDLER( deco16_60_prot_r ) /* Edward Randy */
 
 		/* Player 1 & 2 controls, read in IRQ then written *back* to protection device */
 		case 0x50: /* written to 9e byte */
-			return space.machine().root_device().ioport("IN0")->read();
+			return space.machine().root_device().ioport("INPUTS")->read();
 		case 0x6f8: /* written to 76 byte */
-			return (space.machine().root_device().ioport("IN0")->read()>>8)|(space.machine().root_device().ioport("IN0")->read()<<8); /* byte swap IN0 */
+			return (space.machine().root_device().ioport("INPUTS")->read()>>8)|(space.machine().root_device().ioport("INPUTS")->read()<<8); /* byte swap IN0 */
 
 		case 0x5c: /* After coin insert, high 0x8000 bit set starts game */
 			return deco16_prot_ram[0x3b];
@@ -393,7 +393,7 @@ READ16_HANDLER( deco16_60_prot_r ) /* Edward Randy */
 			return (((deco16_prot_ram[0]&0xfff0)>>0) | ((deco16_prot_ram[0]&0x000c)>>2) | ((deco16_prot_ram[0]&0x0003)<<2)) & (~deco16_prot_ram[0x36/2]);
 
 		case 0x76a: /* Coins */
-			return space.machine().root_device().ioport("IN1")->read();
+			return space.machine().root_device().ioport("SYSTEM")->read();
 
 		case 0x284: /* Bit shifting with inverted mask register */
 			return (((deco16_prot_ram[0x40/2]&0xfff0)>>0) | ((deco16_prot_ram[0x40/2]&0x0007)<<1) | ((deco16_prot_ram[0x40/2]&0x0008)>>3)) & (~deco16_prot_ram[0x36/2]);
@@ -407,7 +407,7 @@ READ16_HANDLER( deco16_60_prot_r ) /* Edward Randy */
 			return (((deco16_prot_ram[0x6a/2]&0x00f0)<<4) | ((deco16_prot_ram[0x6a/2]&0x0f00)<<4) | ((deco16_prot_ram[0x6a/2]&0x0007)<<5) | ((deco16_prot_ram[0x6a/2]&0x0008)<<1)) & (~deco16_prot_ram[0x36/2]);
 
 		case 0x7d6: /* XOR IN0 */
-			return space.machine().root_device().ioport("IN0")->read() ^ deco16_prot_ram[0x2c/2];
+			return space.machine().root_device().ioport("INPUTS")->read() ^ deco16_prot_ram[0x2c/2];
 		case 0x4b4:
 			return ((deco16_prot_ram[0x32/2]&0x00f0)<<8) | ((deco16_prot_ram[0x32/2]&0x000e)<<7) | ((deco16_prot_ram[0x32/2]&0x0001)<<11);
 	}
