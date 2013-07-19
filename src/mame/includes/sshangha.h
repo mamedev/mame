@@ -51,8 +51,6 @@ public:
 	DECLARE_WRITE16_MEMBER( sshangha_protection_region_d_146_w );
 
 
-	DECLARE_WRITE16_MEMBER(sshangha_protection16_w);
-	DECLARE_READ16_MEMBER(sshangha_protection16_r);
 	DECLARE_READ16_MEMBER(sshanghb_protection16_r);
 	DECLARE_READ16_MEMBER(deco_71_r);
 	DECLARE_READ8_MEMBER(sshangha_sound_shared_r);

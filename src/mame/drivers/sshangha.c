@@ -58,33 +58,10 @@ Stephh's notes (based on the games M68000 code and some tests) :
 
 /******************************************************************************/
 
-WRITE16_MEMBER(sshangha_state::sshangha_protection16_w)
-{
-	COMBINE_DATA(&m_prot_data[offset]);
 
-	logerror("CPU #0 PC %06x: warning - write unmapped control address %06x %04x\n",space.device().safe_pc(),offset<<1,data);
-}
 
-/* Protection/IO chip 146 */
-READ16_MEMBER(sshangha_state::sshangha_protection16_r)
-{
-	switch (offset)
-	{
-		case 0x050 >> 1:
-			return ioport("INPUTS")->read();
-		case 0x76a >> 1:
-			return ioport("SYSTEM")->read();
-		case 0x0ac >> 1:
-			return ioport("DSW")->read();
 
-		// Protection TODO
-	}
-
-	logerror("CPU #0 PC %06x: warning - read unmapped control address %06x\n",space.device().safe_pc(),offset<<1);
-	return m_prot_data[offset];
-}
-
-READ16_MEMBER(sshangha_state::sshanghb_protection16_r)
+READ16_MEMBER(sshangha_state::sshanghb_protection16_r) // bootleg inputs
 {
 	switch (offset)
 	{
