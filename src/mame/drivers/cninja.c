@@ -241,7 +241,7 @@ READ16_MEMBER( cninja_state::sshangha_protection_region_6_146_r )
 	UINT16 data = m_deco146->read_data( deco146_addr, mem_mask, cs );
 	
 
-	if (realdat != data)
+	if ((realdat & mem_mask) != (data & mem_mask))
 		printf("returned %04x instead of %04x (real address %08x)\n", data, realdat, real_address);
 	
 	return data;
@@ -320,6 +320,37 @@ static ADDRESS_MAP_START( robocop2_map, AS_PROGRAM, 16, cninja_state )
 	AM_RANGE(0x1f8000, 0x1f8001) AM_READ_PORT("DSW3") /* Dipswitch #3 */
 ADDRESS_MAP_END
 
+
+
+
+READ16_MEMBER( cninja_state::mutantf_protection_region_0_146_r )
+{
+	UINT16 realdat = deco16_66_prot_r(space,offset&0x3ff,mem_mask);
+	
+	int real_address = 0 + (offset *2);
+	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	UINT8 cs = 0;
+	UINT16 data = m_deco146->read_data( deco146_addr, mem_mask, cs );
+	
+
+	if ((realdat & mem_mask) != (data & mem_mask))
+		logerror("returned %04x instead of %04x (real address %08x)\n", data, realdat, real_address);
+	
+	return data;
+}
+
+WRITE16_MEMBER( cninja_state::mutantf_protection_region_0_146_w )
+{		
+	deco16_66_prot_w(space,offset&0x3ff,data,mem_mask);
+
+
+	int real_address = 0 + (offset *2);
+	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	UINT8 cs = 0;
+	m_deco146->write_data( deco146_addr, data, mem_mask, cs );
+}
+
+
 static ADDRESS_MAP_START( mutantf_map, AS_PROGRAM, 16, cninja_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
@@ -328,7 +359,8 @@ static ADDRESS_MAP_START( mutantf_map, AS_PROGRAM, 16, cninja_state )
 	AM_RANGE(0x160000, 0x161fff) AM_RAM_DEVWRITE("deco_common", decocomn_device, nonbuffered_palette_w) AM_SHARE("paletteram")
 	AM_RANGE(0x180000, 0x180001) AM_DEVWRITE("deco_common", decocomn_device, priority_w)
 	AM_RANGE(0x180002, 0x180003) AM_WRITENOP /* VBL irq ack */
-	AM_RANGE(0x1a0000, 0x1a07ff) AM_READWRITE_LEGACY(deco16_66_prot_r, deco16_66_prot_w) AM_SHARE("prot16ram") /* Protection device */
+//	AM_RANGE(0x1a0000, 0x1a07ff) AM_READWRITE_LEGACY(deco16_66_prot_r, deco16_66_prot_w) AM_SHARE("prot16ram") /* Protection device */
+	AM_RANGE(0x1a0000, 0x1a3fff) AM_READWRITE(mutantf_protection_region_0_146_r,mutantf_protection_region_0_146_w)AM_SHARE("prot16ram") /* Protection device */
 	AM_RANGE(0x1c0000, 0x1c0001) AM_DEVWRITE("spriteram", buffered_spriteram16_device, write) AM_DEVREAD("deco_common", decocomn_device, d_71_r)
 	AM_RANGE(0x1e0000, 0x1e0001) AM_DEVWRITE("spriteram2", buffered_spriteram16_device, write)
 
@@ -618,10 +650,10 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( mutantf )
 
-	PORT_START("IN0")
+	PORT_START("INPUTS")
 	DATAEAST_2BUTTON
 
-	PORT_START("IN1")
+	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -1222,6 +1254,7 @@ static MACHINE_CONFIG_START( mutantf, cninja_state )
 	MCFG_DEVICE_ADD("spritegen2", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 4);
 
+	MCFG_DECO146_ADD("ioprot")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

@@ -88,4 +88,7 @@ public:
 	DECLARE_WRITE16_MEMBER( sshangha_protection_region_6_146_w );
 	DECLARE_READ16_MEMBER( sshangha_protection_region_8_146_r );
 	DECLARE_WRITE16_MEMBER( sshangha_protection_region_8_146_w );
+
+	DECLARE_READ16_MEMBER( mutantf_protection_region_0_146_r );
+	DECLARE_WRITE16_MEMBER( mutantf_protection_region_0_146_w );
 };

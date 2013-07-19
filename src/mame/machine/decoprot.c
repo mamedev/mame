@@ -474,11 +474,11 @@ READ16_HANDLER( deco16_66_prot_r ) /* Mutant Fighter */
 		case 0xc2: /* Dip switches */
 			return space.machine().root_device().ioport("DSW")->read() ^ deco16_prot_ram[0x2c/2];
 		case 0x46: /* Coins */
-			return space.machine().root_device().ioport("IN1")->read() ^ deco16_prot_ram[0x2c/2];
+			return space.machine().root_device().ioport("SYSTEM")->read() ^ deco16_prot_ram[0x2c/2];
 		case 0x50: /* Player 1 & 2 input ports */
-			return space.machine().root_device().ioport("IN0")->read();
+			return space.machine().root_device().ioport("INPUTS")->read();
 		case 0x63c: /* Player 1 & 2 input ports */
-			return space.machine().root_device().ioport("IN0")->read() ^ deco16_prot_ram[0x2c/2];
+			return space.machine().root_device().ioport("INPUTS")->read() ^ deco16_prot_ram[0x2c/2];
 
 		case 0x5f4:
 			return deco16_prot_ram[0x18/2];
