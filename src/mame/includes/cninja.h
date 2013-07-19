@@ -65,7 +65,6 @@ public:
 	DECLARE_WRITE16_MEMBER(stoneage_sound_w);
 	DECLARE_READ16_MEMBER(cninja_irq_r);
 	DECLARE_WRITE16_MEMBER(cninja_irq_w);
-	DECLARE_READ16_MEMBER(robocop2_prot_r);
 	DECLARE_WRITE16_MEMBER(cninja_pf12_control_w);
 	DECLARE_WRITE16_MEMBER(cninja_pf34_control_w);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);

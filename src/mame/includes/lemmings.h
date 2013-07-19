@@ -1,5 +1,6 @@
 #include "video/bufsprite.h"
 #include "video/decospr.h"
+#include "machine/deco146.h"
 
 class lemmings_state : public driver_device
 {
@@ -8,6 +9,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_bitmap0(2048, 256),
 		m_audiocpu(*this, "audiocpu"),
+		m_deco146(*this, "ioprot"),
 		m_spriteram(*this, "spriteram"),
 		m_spriteram2(*this, "spriteram2") ,
 		m_paletteram(*this, "paletteram"),
@@ -27,6 +29,7 @@ public:
 	UINT8 m_vram_buffer[2048 * 64]; // 64 bytes per VRAM character
 	/* devices */
 	required_device<cpu_device> m_audiocpu;
+	optional_device<deco146_device> m_deco146;
 	required_device<buffered_spriteram16_device> m_spriteram;
 	required_device<buffered_spriteram16_device> m_spriteram2;
 	/* memory pointers */
@@ -40,7 +43,6 @@ public:
 
 	DECLARE_WRITE16_MEMBER(lemmings_control_w);
 	DECLARE_READ16_MEMBER(lemmings_trackball_r);
-	DECLARE_READ16_MEMBER(lemmings_prot_r);
 	DECLARE_WRITE16_MEMBER(lemmings_palette_24bit_w);
 	DECLARE_WRITE16_MEMBER(lemmings_sound_w);
 	DECLARE_WRITE8_MEMBER(lemmings_sound_ack_w);

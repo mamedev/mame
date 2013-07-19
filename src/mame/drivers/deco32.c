@@ -353,18 +353,6 @@ READ32_MEMBER(deco32_state::deco32_71_r)
 	return 0xffffffff;
 }
 
-READ32_MEMBER(deco32_state::captaven_prot_r)
-{
-	/* Protection/IO chip 75, same as Lemmings & Robocop 2 */
-	switch (offset<<2) {
-	case 0x0a0: return ioport("IN0")->read(); /* Player 1 & 2 controls */
-	case 0x158: return ioport("IN1")->read(); /* Player 3 & 4 controls */
-	case 0xed4: return ioport("IN2")->read(); /* Misc */
-	}
-
-	logerror("%08x: Unmapped protection read %04x\n",space.device().safe_pc(),offset<<2);
-	return 0xffffffff;
-}
 
 READ32_MEMBER(deco32_state::captaven_soundcpu_r)
 {
@@ -413,23 +401,6 @@ READ32_MEMBER(deco32_state::lockload_gun_mirror_r)
 	if (offset) /* Mirror of player 1 and player 2 fire buttons */
 		return ioport("IN4")->read() | ((machine().rand()%0xff)<<16);
 	return ioport("IN3")->read() | ioport("LIGHT0_X")->read() | (ioport("LIGHT0_X")->read()<<16) | (ioport("LIGHT0_X")->read()<<24); //((machine().rand()%0xff)<<16);
-}
-
-READ32_MEMBER(deco32_state::dragngun_prot_r)
-{
-//  logerror("%08x:Read prot %08x (%08x)\n",space.device().safe_pc(),offset<<1,mem_mask);
-
-	if (!m_strobe) m_strobe=8;
-	else m_strobe=0;
-
-//definitely vblank in locked load
-
-	switch (offset<<1) {
-	case 0x140/2: return 0xffff0000 | ioport("IN0")->read(); /* IN0 */
-	case 0xadc/2: return 0xffff0000 | ioport("IN1")->read() | m_strobe; /* IN1 */
-	case 0x6a0/2: return 0xffff0000 | ioport("DSW")->read(); /* IN2 (Dip switch) */
-	}
-	return 0xffffffff;
 }
 
 
@@ -720,7 +691,7 @@ static ADDRESS_MAP_START( captaven_map, AS_PROGRAM, 32, deco32_state )
 	AM_RANGE(0x110000, 0x111fff) AM_READWRITE(deco32_spriteram_r, deco32_spriteram_w)
 	AM_RANGE(0x120000, 0x127fff) AM_RAM AM_SHARE("ram") /* Main RAM */
 
-	AM_RANGE(0x128000, 0x128fff) AM_READ(captaven_prot_r)
+	AM_RANGE(0x128000, 0x128fff) AM_DEVREAD("ioprot", deco146_device,captaven_prot_r)
 	AM_RANGE(0x1280c8, 0x1280cb) AM_WRITE(deco32_sound_w)
 	AM_RANGE(0x130000, 0x131fff) AM_RAM_WRITE(deco32_nonbuffered_palette_w) AM_SHARE("paletteram") /* Palette RAM */
 	AM_RANGE(0x148000, 0x14800f) AM_READWRITE(deco32_irq_controller_r, deco32_irq_controller_w)
@@ -813,7 +784,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dragngun_map, AS_PROGRAM, 32, dragngun_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x11ffff) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0x120000, 0x120fff) AM_READ(dragngun_prot_r)
+	AM_RANGE(0x120000, 0x120fff) AM_DEVREAD("ioprot", deco146_device, dragngun_prot_r)
 	AM_RANGE(0x1204c0, 0x1204c3) AM_WRITE(deco32_sound_w)
 	AM_RANGE(0x128000, 0x12800f) AM_READWRITE(deco32_irq_controller_r, deco32_irq_controller_w)
 	AM_RANGE(0x130000, 0x131fff) AM_RAM_WRITE(deco32_buffered_palette_w) AM_SHARE("paletteram")
@@ -860,7 +831,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( lockload_map, AS_PROGRAM, 32, dragngun_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x11ffff) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0x120000, 0x120fff) AM_READ(dragngun_prot_r)
+	AM_RANGE(0x120000, 0x120fff) AM_DEVREAD("ioprot", deco146_device, dragngun_prot_r)
 	AM_RANGE(0x1204c0, 0x1204c3) AM_WRITE(deco32_sound_w)
 	AM_RANGE(0x128000, 0x12800f) AM_READWRITE(deco32_irq_controller_r, deco32_irq_controller_w)
 
@@ -1732,6 +1703,7 @@ static MACHINE_CONFIG_START( captaven, deco32_state )
 	decospr_device::set_gfx_region(*device, 3);
 	decospr_device::set_pri_callback(*device, captaven_pri_callback);
 
+	MCFG_DECO146_ADD("ioprot")
 
 	MCFG_VIDEO_START_OVERRIDE(deco32_state,captaven)
 
@@ -1782,6 +1754,8 @@ static MACHINE_CONFIG_START( fghthist, deco32_state ) /* DE-0380-2 PCB */
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 3);
 
+	MCFG_DECO146_ADD("ioprot")
+
 	MCFG_VIDEO_START_OVERRIDE(deco32_state,fghthist)
 
 	/* sound hardware */
@@ -1828,6 +1802,8 @@ static MACHINE_CONFIG_START( fghthsta, deco32_state ) /* DE-0395-1 PCB */
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 3);
+
+	MCFG_DECO146_ADD("ioprot")
 
 	MCFG_VIDEO_START_OVERRIDE(deco32_state,fghthist)
 
@@ -1945,6 +1921,8 @@ static MACHINE_CONFIG_START( dragngun, dragngun_state )
 
 	MCFG_VIDEO_START_OVERRIDE(dragngun_state,dragngun)
 
+	MCFG_DECO146_ADD("ioprot")
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -2020,6 +1998,8 @@ static MACHINE_CONFIG_START( lockload, dragngun_state )
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_VIDEO_START_OVERRIDE(dragngun_state,lockload)
+
+	MCFG_DECO146_ADD("ioprot")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

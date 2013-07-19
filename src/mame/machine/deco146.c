@@ -1439,6 +1439,96 @@ void deco146_device::device_reset()
 *****************************************************************************************************
 *****************************************************************************************************
 *****************************************************************************************************
+ Old style minimal handlers (where games only really use the I/O)
+
+  currently used by
+  
+  Robocop 2
+  Lemmings
+  Dragon Gun
+  Captain America
+*****************************************************************************************************
+*****************************************************************************************************
+*****************************************************************************************************
+****************************************************************************************************/
+
+
+// alt read addresses (same as nitroball if you reverse lnes)
+READ16_MEMBER(deco146_device::robocop2_prot_r)
+{
+	switch (offset << 1)
+	{
+		case 0x41a: /* Player 1 & 2 input ports */
+			return ioport(":IN0")->read();
+		case 0x320: /* Coins */
+			return ioport(":IN1")->read();
+		case 0x4e6: /* Dip switches */
+			return ioport(":DSW")->read();
+		case 0x504: /* PC: 6b6.  b4, 2c, 36 written before read */
+			logerror("Protection PC %06x: warning - read unmapped memory address %04x\n", space.device().safe_pc(), offset);
+			return 0x84;
+	}
+	logerror("Protection PC %06x: warning - read unmapped memory address %04x\n", space.device().safe_pc(), offset);
+	return 0;
+}
+
+// alt read addresses (same as nitroball if you reverse lnes)
+/* Same as Robocop 2 protection chip */
+READ16_MEMBER(deco146_device::lemmings_prot_r)
+{
+	switch (offset << 1)
+	{
+		case 0x41a:
+			return ioport(":BUTTONS")->read();
+
+		case 0x320:
+			return ioport(":SYSTEM")->read();
+
+		case 0x4e6:
+			return ioport(":DSW")->read();
+	}
+
+	return 0;
+}
+
+// standard read addresses
+READ32_MEMBER(deco146_device::captaven_prot_r)
+{
+	/* Protection/IO chip 75, same as Lemmings & Robocop 2 */
+	switch (offset<<2) {
+	case 0x0a0: return ioport(":IN0")->read(); /* Player 1 & 2 controls */
+	case 0x158: return ioport(":IN1")->read(); /* Player 3 & 4 controls */
+	case 0xed4: return ioport(":IN2")->read(); /* Misc */
+	}
+
+	logerror("%08x: Unmapped protection read %04x\n",space.device().safe_pc(),offset<<2);
+	return 0xffffffff;
+}
+
+
+// alt read addresses? make sure this isn't 104
+READ32_MEMBER(deco146_device::dragngun_prot_r)
+{
+//  logerror("%08x:Read prot %08x (%08x)\n",space.device().safe_pc(),offset<<1,mem_mask);
+
+	// this should be vblank in the port!
+	if (!m_strobe) m_strobe=8;
+	else m_strobe=0;
+
+
+	switch (offset<<1) {
+	case 0x140/2: return 0xffff0000 | ioport(":IN0")->read(); /* IN0 */
+	case 0xadc/2: return 0xffff0000 | ioport(":IN1")->read() | m_strobe; /* IN1 */
+	case 0x6a0/2: return 0xffff0000 | ioport(":DSW")->read(); /* IN2 (Dip switch) */
+	}
+	return 0xffffffff;
+}
+
+
+/****************************************************************************************************
+*****************************************************************************************************
+*****************************************************************************************************
+*****************************************************************************************************
  Old style protection handlers for 146 cases not yet understood
 
   currently used by

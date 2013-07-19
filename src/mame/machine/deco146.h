@@ -13,6 +13,12 @@ public:
 	void write_data(address_space &space, UINT16 address, UINT16 data, UINT16 mem_mask, UINT8 &csflags);
 	UINT16 read_data(UINT16 address, UINT16 mem_mask, UINT8 &csflags);
 
+
+	// legacy stuff
+	DECLARE_READ32_MEMBER(dragngun_prot_r);
+	DECLARE_READ32_MEMBER(captaven_prot_r);
+	DECLARE_READ16_MEMBER(lemmings_prot_r);
+	DECLARE_READ16_MEMBER(robocop2_prot_r);
 protected:
 	virtual void device_config_complete();
 	virtual void device_start();
@@ -40,6 +46,8 @@ protected:
 	UINT16 m_latchdata;
 	int m_latchflag;
 
+
+	int m_strobe;
 
 private:
 	UINT8 region_selects[6];

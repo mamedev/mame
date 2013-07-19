@@ -123,23 +123,6 @@ WRITE16_MEMBER(cninja_state::cninja_irq_w)
 	logerror("%08x:  Unmapped IRQ write %d %04x\n", space.device().safe_pc(), offset, data);
 }
 
-READ16_MEMBER(cninja_state::robocop2_prot_r)
-{
-	switch (offset << 1)
-	{
-		case 0x41a: /* Player 1 & 2 input ports */
-			return ioport("IN0")->read();
-		case 0x320: /* Coins */
-			return ioport("IN1")->read();
-		case 0x4e6: /* Dip switches */
-			return ioport("DSW")->read();
-		case 0x504: /* PC: 6b6.  b4, 2c, 36 written before read */
-			logerror("Protection PC %06x: warning - read unmapped memory address %04x\n", space.device().safe_pc(), offset);
-			return 0x84;
-	}
-	logerror("Protection PC %06x: warning - read unmapped memory address %04x\n", space.device().safe_pc(), offset);
-	return 0;
-}
 
 /**********************************************************************************/
 
@@ -310,7 +293,7 @@ static ADDRESS_MAP_START( robocop2_map, AS_PROGRAM, 16, cninja_state )
 
 	AM_RANGE(0x180000, 0x1807ff) AM_RAM AM_SHARE("spriteram")
 //  AM_RANGE(0x18c000, 0x18c0ff) AM_WRITE(cninja_loopback_w) /* Protection writes */
-	AM_RANGE(0x18c000, 0x18c7ff) AM_READ(robocop2_prot_r) /* Protection device */
+	AM_RANGE(0x18c000, 0x18c7ff) AM_DEVREAD("ioprot", deco146_device,robocop2_prot_r) /* Protection device */
 	AM_RANGE(0x18c064, 0x18c065) AM_WRITE(cninja_sound_w)
 	AM_RANGE(0x198000, 0x198001) AM_DEVWRITE("spriteram", buffered_spriteram16_device, write) /* DMA flag */
 	AM_RANGE(0x1a8000, 0x1a9fff) AM_RAM_DEVWRITE("deco_common", decocomn_device, nonbuffered_palette_w) AM_SHARE("paletteram")
@@ -1195,6 +1178,8 @@ static MACHINE_CONFIG_START( robocop2, cninja_state )
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 3);
 	decospr_device::set_pri_callback(*device, cninja_pri_callback);
+
+	MCFG_DECO146_ADD("ioprot")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

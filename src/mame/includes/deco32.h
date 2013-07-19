@@ -13,6 +13,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_deco146(*this, "ioprot"),
 		m_decobsmt(*this, "decobsmt"),
 		m_spriteram(*this, "spriteram"),
 		m_ram(*this, "ram"),
@@ -33,6 +34,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
+	optional_device<deco146_device> m_deco146;
 	optional_device<decobsmt_device> m_decobsmt;
 	optional_device<buffered_spriteram32_device> m_spriteram;
 	required_shared_ptr<UINT32> m_ram;
@@ -54,7 +56,7 @@ public:
 	int m_raster_enable;
 	timer_device *m_raster_irq_timer;
 	UINT8 m_nslasher_sound_irq;
-	int m_strobe;
+
 	int m_tattass_eprom_bit;
 	int m_lastClock;
 	char m_buffer[32];
@@ -89,13 +91,11 @@ public:
 	DECLARE_WRITE32_MEMBER(deco32_irq_controller_w);
 	DECLARE_WRITE32_MEMBER(deco32_sound_w);
 	DECLARE_READ32_MEMBER(deco32_71_r);
-	DECLARE_READ32_MEMBER(captaven_prot_r);
 	DECLARE_READ32_MEMBER(captaven_soundcpu_r);
 	DECLARE_READ32_MEMBER(fghthist_control_r);
 	DECLARE_WRITE32_MEMBER(fghthist_eeprom_w);
 	DECLARE_READ32_MEMBER(dragngun_service_r);
 	DECLARE_READ32_MEMBER(lockload_gun_mirror_r);
-	DECLARE_READ32_MEMBER(dragngun_prot_r);
 	DECLARE_READ32_MEMBER(tattass_prot_r);
 	DECLARE_WRITE32_MEMBER(tattass_prot_w);
 	DECLARE_WRITE32_MEMBER(tattass_control_w);
