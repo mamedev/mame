@@ -355,47 +355,6 @@ static INPUT_PORTS_START( roundup )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x0c, 0x04, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x00, "2" )
-	PORT_DIPSETTING(    0x04, "3" )
-	PORT_DIPSETTING(    0x08, "4" )
-	PORT_DIPSETTING(    0x0c, "5" )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x00, "10000" )
-	PORT_DIPSETTING(    0x20, "30000" )
-	PORT_DIPNAME( 0x40, 0x40, "Gly Boys Wake Up" )
-	PORT_DIPSETTING(    0x40, "Slow" )
-	PORT_DIPSETTING(    0x00, "Fast" )
-	PORT_SERVICE( 0x80, IP_ACTIVE_HIGH )
-
-	/* Since the real inputs are multiplexed, we used this fake port
-	   to read the 2nd player controls when the screen is flipped */
-	IN2_FAKE
-INPUT_PORTS_END
-
-
-static INPUT_PORTS_START( fitter )
-	IN0_REAL
-
-	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
-	PORT_START("DSW")
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:!1,!2")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )
@@ -415,13 +374,23 @@ static INPUT_PORTS_START( fitter )
 	PORT_DIPNAME( 0x40, 0x40, "Gly Boys Wake Up" )		PORT_DIPLOCATION("SW1:!7")
 	PORT_DIPSETTING(    0x40, "Slow" )
 	PORT_DIPSETTING(    0x00, "Fast" )
-	PORT_DIPNAME( 0x80, 0x00, "Invulnerability (Cheat)")	PORT_DIPLOCATION("SW1:!8")
+	PORT_DIPNAME( 0x80, 0x00, "Push Switch Check")		PORT_DIPLOCATION("SW1:!8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	/* Since the real inputs are multiplexed, we used this fake port
 	   to read the 2nd player controls when the screen is flipped */
 	IN2_FAKE
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( fitter )
+	PORT_INCLUDE(roundup)
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x80, 0x00, "Invulnerability (Cheat)")	PORT_DIPLOCATION("SW1:!8")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
