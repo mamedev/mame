@@ -690,7 +690,7 @@ void intv_state::machine_start()
 	{
 		for (int i = 0; i < 10; i++)
 		{
-			char str[4];
+			char str[5];
 			sprintf(str, "ROW%i", i);
 			m_intv_keyboard[i] = ioport(str);
 		}
