@@ -1091,7 +1091,7 @@ UINT16 reorder(UINT16 input, UINT8 *weights)
 /* there are probably less dumb ways of doing the CS logic, it could be hooked up
    more like the system16 mapper chips */
 
-void deco146_device::write_data(UINT16 address, UINT16 data, UINT16 mem_mask, UINT8 &csflags)
+void deco146_device::write_data(address_space &space, UINT16 address, UINT16 data, UINT16 mem_mask, UINT8 &csflags)
 {
 	csflags = 0;
 	int upper_addr_bits = (address & 0x7800) >> 11;
@@ -1126,7 +1126,7 @@ void deco146_device::write_data(UINT16 address, UINT16 data, UINT16 mem_mask, UI
 			if (i==0) // the first cs is our internal protection area
 			{
 				logerror("write matches cs table (protection) %01x %04x %04x %04x\n", i, real_address, data, mem_mask);
-				write_protport(real_address, data, mem_mask);
+				write_protport(space, real_address, data, mem_mask);
 			}
 			else
 			{
@@ -1156,6 +1156,13 @@ UINT16 deco146_device::read_input_c_callback(void)
 	return ioport(":DSW")->read();
 }
 
+void deco146_device::soundlatch_write_callback(address_space &space, UINT16 data, UINT16 mem_mask)
+{
+	driver_device *drvstate = machine().driver_data<driver_device>();
+	drvstate->soundlatch_byte_w(space, 0, data & 0xff);
+	cpu_device* cpudev = (cpu_device*)machine().device(":audiocpu");
+	if (cpudev) cpudev->set_input_line(0, HOLD_LINE);
+}
 
 
 
@@ -1252,7 +1259,7 @@ UINT16 deco146_device::read_protport(UINT16 address, UINT16 mem_mask)
 	return realret;
 }
 
-void deco146_device::write_protport(UINT16 address, UINT16 data, UINT16 mem_mask)
+void deco146_device::write_protport(address_space &space, UINT16 address, UINT16 data, UINT16 mem_mask)
 {
 	m_latchaddr = address;
 	m_latchdata = data;
@@ -1272,6 +1279,7 @@ void deco146_device::write_protport(UINT16 address, UINT16 data, UINT16 mem_mask
 	{
 		 logerror("LOAD SOUND LATCH %04x %04x\n", data, mem_mask);
 		 COMBINE_DATA(&m_soundlatch);
+		 soundlatch_write_callback(space, data, mem_mask);
 	}
 
 	// always store

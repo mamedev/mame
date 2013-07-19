@@ -10,7 +10,7 @@ class deco146_device : public device_t
 public:
 	deco146_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	void write_data(UINT16 address, UINT16 data, UINT16 mem_mask, UINT8 &csflags);
+	void write_data(address_space &space, UINT16 address, UINT16 data, UINT16 mem_mask, UINT8 &csflags);
 	UINT16 read_data(UINT16 address, UINT16 mem_mask, UINT8 &csflags);
 
 protected:
@@ -19,16 +19,18 @@ protected:
 	virtual void device_reset();
 
 	UINT16 read_protport(UINT16 address, UINT16 mem_mask);
-	void write_protport(UINT16 address, UINT16 data, UINT16 mem_mask);
+	void write_protport(address_space &space, UINT16 address, UINT16 data, UINT16 mem_mask);
 
 	UINT16 m_rambank0[0x80];
 	UINT16 m_rambank1[0x80];
 
 	UINT16* m_current_rambank;
 
+	// set these up as actual callbacks!
 	UINT16 read_input_a_callback(void);
 	UINT16 read_input_b_callback(void);
 	UINT16 read_input_c_callback(void);
+	void soundlatch_write_callback(address_space &space, UINT16 data, UINT16 mem_mask);
 
 	UINT16 m_nand;
 	UINT16 m_xor;
