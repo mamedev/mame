@@ -314,39 +314,39 @@ WRITE_LINE_MEMBER(gticlub_state::voodoo_vblank_1)
 
 READ32_MEMBER(gticlub_state::gticlub_k001604_tile_r)
 {
-	device_t *k001604 = machine().device(get_cgboard_id() ? "k001604_2" : "k001604_1");
-	return k001604_tile_r(k001604, space, offset, mem_mask);
+	k001604_device *k001604 = machine().device<k001604_device>(get_cgboard_id() ? "k001604_2" : "k001604_1");
+	return k001604->tile_r(space, offset, mem_mask);
 }
 
 WRITE32_MEMBER(gticlub_state::gticlub_k001604_tile_w)
 {
-	device_t *k001604 = machine().device(get_cgboard_id() ? "k001604_2" : "k001604_1");
-	k001604_tile_w(k001604, space, offset, data, mem_mask);
+	k001604_device *k001604 = machine().device<k001604_device>(get_cgboard_id() ? "k001604_2" : "k001604_1");
+	k001604->tile_w(space, offset, data, mem_mask);
 }
 
 
 READ32_MEMBER(gticlub_state::gticlub_k001604_char_r)
 {
-	device_t *k001604 = machine().device(get_cgboard_id() ? "k001604_2" : "k001604_1");
-	return k001604_char_r(k001604, space, offset, mem_mask);
+	k001604_device *k001604 = machine().device<k001604_device>(get_cgboard_id() ? "k001604_2" : "k001604_1");
+	return k001604->char_r(space, offset, mem_mask);
 }
 
 WRITE32_MEMBER(gticlub_state::gticlub_k001604_char_w)
 {
-	device_t *k001604 = machine().device(get_cgboard_id() ? "k001604_2" : "k001604_1");
-	k001604_char_w(k001604, space, offset, data, mem_mask);
+	k001604_device *k001604 = machine().device<k001604_device>(get_cgboard_id() ? "k001604_2" : "k001604_1");
+	k001604->char_w(space, offset, data, mem_mask);
 }
 
 READ32_MEMBER(gticlub_state::gticlub_k001604_reg_r)
 {
-	device_t *k001604 = machine().device(get_cgboard_id() ? "k001604_2" : "k001604_1");
-	return k001604_reg_r(k001604, space, offset, mem_mask);
+	k001604_device *k001604 = machine().device<k001604_device>(get_cgboard_id() ? "k001604_2" : "k001604_1");
+	return k001604->reg_r(space, offset, mem_mask);
 }
 
 WRITE32_MEMBER(gticlub_state::gticlub_k001604_reg_w)
 {
-	device_t *k001604 = machine().device(get_cgboard_id() ? "k001604_2" : "k001604_1");
-	k001604_reg_w(k001604, space, offset, data, mem_mask);
+	k001604_device *k001604 = machine().device<k001604_device>(get_cgboard_id() ? "k001604_2" : "k001604_1");
+	k001604->reg_w(space, offset, data, mem_mask);
 }
 
 

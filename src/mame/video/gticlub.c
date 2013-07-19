@@ -1613,13 +1613,13 @@ VIDEO_START( gticlub )
 
 SCREEN_UPDATE_RGB32( gticlub )
 {
-	device_t *k001604 = screen.machine().device("k001604_1");
+	k001604_device *k001604 = screen.machine().device<k001604_device>("k001604_1");
 
-	k001604_draw_back_layer(k001604, bitmap, cliprect);
+	k001604->draw_back_layer(bitmap, cliprect);
 
 	K001005_draw(bitmap, cliprect);
 
-	k001604_draw_front_layer(k001604, bitmap, cliprect);
+	k001604->draw_front_layer(bitmap, cliprect);
 
 #if 0
 	tick++;
@@ -1685,25 +1685,25 @@ SCREEN_UPDATE_RGB32( hangplt )
 
 	if (strcmp(screen.tag(), ":lscreen") == 0)
 	{
-		device_t *k001604 = screen.machine().device("k001604_1");
+		k001604_device *k001604 = screen.machine().device<k001604_device>("k001604_1");
 		device_t *voodoo = screen.machine().device("voodoo0");
 
-	//  k001604_draw_back_layer(k001604, bitmap, cliprect);
+	//  k001604->draw_back_layer(bitmap, cliprect);
 
 		voodoo_update(voodoo, bitmap, cliprect);
 
-		k001604_draw_front_layer(k001604, bitmap, cliprect);
+		k001604->draw_front_layer(bitmap, cliprect);
 	}
 	else if (strcmp(screen.tag(), ":rscreen") == 0)
 	{
-		device_t *k001604 = screen.machine().device("k001604_2");
+		k001604_device *k001604 = screen.machine().device<k001604_device>("k001604_2");
 		device_t *voodoo = screen.machine().device("voodoo1");
 
-	//  k001604_draw_back_layer(k001604, bitmap, cliprect);
+	//  k001604->draw_back_layer(bitmap, cliprect);
 
 		voodoo_update(voodoo, bitmap, cliprect);
 
-		k001604_draw_front_layer(k001604, bitmap, cliprect);
+		k001604->draw_front_layer(bitmap, cliprect);
 	}
 
 	draw_7segment_led(bitmap, 3, 3, gticlub_led_reg[0]);
