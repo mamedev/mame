@@ -6,13 +6,14 @@
   using a Super Shanghai board
 
  however the behavior seems to be identical to that of Edward Randy (custom chip 60)
- and not the other '146' games, unless the only difference is linescrambles?
+ and not the other '146' games, unless the only difference is line scrambles?
 
  Mutant Fighter '66' also seems to be the same (although there are some mismatches
  in the return data vs the old simulation, but I've not noticed any effect?)
 
- the chips are often have stickers on them, so maybe some were reprogrammed and the
- stickers fell off?
+ Captain America has chip '75' but the mappings look the same (only uses the I/O tho)
+
+ Funky Jet is 146 and works with this (scrambled lines like Fighters History code!)
 
  */
 

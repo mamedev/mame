@@ -99,12 +99,42 @@ Notes:
 
 /******************************************************************************/
 
+
+READ16_MEMBER( funkyjet_state::funkyjet_protection_region_0_146_r )
+{
+	UINT16 realdat = deco16_146_funkyjet_prot_r(space,offset&0x3ff,mem_mask);
+	
+	int real_address = 0 + (offset *2);
+	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14, /* note, reverse operation of fghthist ( 10, 1, 9, 2, 8, 3, 7, 4, 6, 5 ,  0 ) */  	 5,  6,  4,  7,  3,   8,  2,  9,  1,  10,    0) & 0x7fff;
+	UINT8 cs = 0;
+	UINT16 data = m_deco146->read_data( deco146_addr, mem_mask, cs );
+	
+
+	if ((realdat & mem_mask) != (data & mem_mask))
+		printf("returned %04x instead of %04x (real address %08x swapped addr %08x)\n", data, realdat, real_address, deco146_addr);
+	
+	return data;
+}
+
+WRITE16_MEMBER( funkyjet_state::funkyjet_protection_region_0_146_w )
+{		
+	deco16_146_funkyjet_prot_w(space,offset&0x3ff,data,mem_mask);
+
+
+	int real_address = 0 + (offset *2);                                                                                                                          
+	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14, /* note, reverse operation of fghthist (10, 1, 9, 2, 8, 3, 7, 4, 6, 5,  0) */   	 5,  6,  4,  7,  3,   8,  2,  9,  1,  10,    0) & 0x7fff;
+	UINT8 cs = 0;
+	m_deco146->write_data( space, deco146_addr, data, mem_mask, cs );
+}
+
+
 static ADDRESS_MAP_START( funkyjet_map, AS_PROGRAM, 16, funkyjet_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x140000, 0x143fff) AM_RAM
 	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x180000, 0x1807ff) AM_READWRITE_LEGACY(deco16_146_funkyjet_prot_r, deco16_146_funkyjet_prot_w) AM_SHARE("prot16ram")
+//	AM_RANGE(0x180000, 0x1807ff) AM_READWRITE_LEGACY(deco16_146_funkyjet_prot_r, deco16_146_funkyjet_prot_w) AM_SHARE("prot16ram")
+	AM_RANGE(0x180000, 0x183fff) AM_READWRITE(funkyjet_protection_region_0_146_r,funkyjet_protection_region_0_146_w) AM_SHARE("prot16ram") /* Protection device */ // unlikely to be cs0 region
 	AM_RANGE(0x184000, 0x184001) AM_WRITENOP
 	AM_RANGE(0x188000, 0x188001) AM_WRITENOP
 	AM_RANGE(0x300000, 0x30000f) AM_DEVWRITE("tilegen1", deco16ic_device, pf_control_w)
@@ -308,6 +338,8 @@ static MACHINE_CONFIG_START( funkyjet, funkyjet_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(funkyjet_state, screen_update_funkyjet)
+
+	MCFG_DECO146_ADD("ioprot")
 
 	MCFG_GFXDECODE(funkyjet)
 	MCFG_PALETTE_LENGTH(1024)
