@@ -319,7 +319,7 @@ PALETTE_INIT_MEMBER(amstrad_state,amstrad_plus)
 {
 	int i;
 
-	palette_set_colors(machine(), 0, amstrad_palette, sizeof(amstrad_palette) / 3);
+	palette_set_colors(machine(), 0, amstrad_palette, ARRAY_LENGTH(amstrad_palette) / 3);
 	for ( i = 0; i < 0x1000; i++ )
 	{
 		int r, g, b;
