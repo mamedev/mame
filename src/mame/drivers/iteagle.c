@@ -275,6 +275,13 @@ ROM_START( gtfore02o )
 	DISK_IMAGE( "gt2002o", 0, SHA1(d789ef86837a5012beb224c487537dd563d93886) )
 ROM_END
 
+ROM_START( carnking )
+	EAGLE_BIOS
+
+	DISK_REGION( "ata:0:hdd:image" )
+	DISK_IMAGE( "carnking", 0, SHA1(c819af66d36df173ab17bf42f4045c7cca3203d8) )
+ROM_END
+
 ROM_START( gtfore04 )
 	EAGLE_BIOS
 
@@ -300,7 +307,8 @@ DRIVER_INIT_MEMBER(iteagle_state, iteagle)
  *************************************/
 
 GAME( 2000, iteagle,          0, gtfore, gtfore, iteagle_state, iteagle, ROT0, "Incredible Technologies", "Eagle BIOS", GAME_IS_BIOS_ROOT )
-GAME( 2003, gtfore02,   iteagle, gtfore, gtfore, iteagle_state, iteagle, ROT0, "Incredible Technologies", "Golden Tee Fore! 2002 (v2.01.04 UMV)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2003, gtfore02o, gtfore02, gtfore, gtfore, iteagle_state, iteagle, ROT0, "Incredible Technologies", "Golden Tee Fore! 2002 (v2.00.00)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2001, gtfore02,   iteagle, gtfore, gtfore, iteagle_state, iteagle, ROT0, "Incredible Technologies", "Golden Tee Fore! 2002 (v2.01.04 UMV)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2001, gtfore02o, gtfore02, gtfore, gtfore, iteagle_state, iteagle, ROT0, "Incredible Technologies", "Golden Tee Fore! 2002 (v2.00.00)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2002, carnking,   iteagle, gtfore, gtfore, iteagle_state, iteagle, ROT0, "Incredible Technologies", "Carnival King (v1.00.11)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2003, gtfore04,   iteagle, gtfore, gtfore, iteagle_state, iteagle, ROT0, "Incredible Technologies", "Golden Tee Fore! 2004", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2004, gtfore05,   iteagle, gtfore, gtfore, iteagle_state, iteagle, ROT0, "Incredible Technologies", "Golden Tee Fore! 2005", GAME_NOT_WORKING | GAME_NO_SOUND )
