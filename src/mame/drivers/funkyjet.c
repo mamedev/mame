@@ -104,7 +104,7 @@ READ16_MEMBER( funkyjet_state::funkyjet_protection_region_0_146_r )
 	UINT16 realdat = deco16_146_funkyjet_prot_r(space,offset&0x3ff,mem_mask);
 	
 	int real_address = 0 + (offset *2);
-	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14, /* note, reverse operation of fghthist ( 10, 1, 9, 2, 8, 3, 7, 4, 6, 5 ,  0 ) */  	 5,  6,  4,  7,  3,   8,  2,  9,  1,  10,    0) & 0x7fff;
+	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,  /* note, same bitswap as fghthist */  	 5,  6,  4,  7,  3,   8,  2,  9,  1,  10,    0) & 0x7fff;
 	UINT8 cs = 0;
 	UINT16 data = m_deco146->read_data( deco146_addr, mem_mask, cs );
 	
@@ -121,7 +121,7 @@ WRITE16_MEMBER( funkyjet_state::funkyjet_protection_region_0_146_w )
 
 
 	int real_address = 0 + (offset *2);                                                                                                                          
-	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14, /* note, reverse operation of fghthist (10, 1, 9, 2, 8, 3, 7, 4, 6, 5,  0) */   	 5,  6,  4,  7,  3,   8,  2,  9,  1,  10,    0) & 0x7fff;
+	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14, /* note, same bitswap as fghthist */  	 5,  6,  4,  7,  3,   8,  2,  9,  1,  10,    0) & 0x7fff;
 	UINT8 cs = 0;
 	m_deco146->write_data( space, deco146_addr, data, mem_mask, cs );
 }
