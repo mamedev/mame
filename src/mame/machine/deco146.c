@@ -1414,11 +1414,6 @@ void deco146_device::device_start()
 		m_rambank0[i] = 0xffff;
 		m_rambank1[i] = 0xffff;
 	}
-
-
-
-
-
 }
 
 void deco146_device::device_reset()
@@ -1588,7 +1583,7 @@ static WRITE16_HANDLER( deco16_146_core_prot_w )
 	int writeport;
 
 	// reverse the address bit order for the 10 bits of the port, this keeps all writes in the 0-127 (after right shift) ram range and fixed write ports (xor/mask/snd) consistent with shanghai and other 146 games
-	writeport = BITSWAP16(offset,15,14,13,12,11, 1,2,3,4,5,6,7,8,9,10, 0);
+	writeport = offset;
 	
 	const int sndport=0x64;
 	const int xorport=0x2c;
@@ -1621,7 +1616,6 @@ static READ16_HANDLER( deco16_146_core_prot_r )
 	const UINT16* prot_ram=deco146prot_buffer_ram_selected ? deco146prot_buffer_ram2 : deco146prot_buffer_ram;
 
 	// see above comment, this keeps reads consistent with io ports for robocop2 and lemmings, although I can't find how it relates to shanghai etc. seems like an alt mode / configuration?
-	offset = BITSWAP16(offset,15,14,13,12,11, 1,2,3,4,5,6,7,8,9,10, 0);
 
 	switch (offset)
 	{
@@ -2021,7 +2015,8 @@ static READ16_HANDLER( deco16_146_core_prot_r )
 
 WRITE32_HANDLER( deco16_146_fghthist_prot_w )
 {
-	UINT16 addr = BITSWAP16(offset << 1, 0, 0, 0, 0, 0, 10, 1, 9, 2, 8, 3, 7, 4, 6, 5, 0);
+	UINT16 addr = BITSWAP16(offset << 1, 0, 0, 0, 0, 0,     10, 1, 9, 2, 8, 3, 7, 4, 6, 5, 0);
+	addr =        BITSWAP16(addr,        15,14,13,12,11,    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 0);
 
 	deco146prot_last_write = addr;
 	deco146prot_last_write_val = data >> 16;
@@ -2031,16 +2026,22 @@ WRITE32_HANDLER( deco16_146_fghthist_prot_w )
 
 READ32_HANDLER( deco16_146_fghthist_prot_r )
 {
-	UINT16 addr=BITSWAP16(offset<<1, 0, 0, 0, 0, 0, 10, 1, 9, 2, 8, 3, 7, 4, 6, 5, 0);
+	UINT16 oldaddr=BITSWAP16(offset<<1, 0, 0, 0, 0, 0,     10, 1, 9, 2, 8, 3, 7, 4, 6, 5, 0);
+	UINT16 addr =  BITSWAP16(oldaddr,   15,14,13,12,11,    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 0);
+
 	UINT16 val;
 
 	/* Special case inputs, because this is the only game with an eprom */
 	switch (addr)
 	{
-	case 0x582: return (space.machine().root_device().ioport("IN0")->read()<<16) | 0xffff; /* IN0 */
-	case 0x672: return (space.machine().root_device().ioport("IN1")->read()<<16) | 0xffff; /* IN1 */
-	case 0x04c: return (space.machine().device<eeprom_device>("eeprom")->read_bit()<<16) | 0xffff;
+	case 0x41a: /* was 0x582 */ return (space.machine().root_device().ioport("IN0")->read()<<16) | 0xffff; /* IN0 */
+	case 0x4e6: /* was 0x672 */ return (space.machine().root_device().ioport("IN1")->read()<<16) | 0xffff; /* IN1 */
+	case 0x320: /* was 0x04c */ return (space.machine().device<eeprom_device>("eeprom")->read_bit()<<16) | 0xffff;
 	}
+
+	
+
+
 
 	/* Handle 'one shots' - writing data to an address, then immediately reading it back */
 	if (deco146prot_last_write==addr)
@@ -2053,57 +2054,62 @@ READ32_HANDLER( deco16_146_fghthist_prot_r )
 
 	val=deco16_146_core_prot_r(space, addr, mem_mask>>16);
 
-	if (addr!=0x7b6 && addr!=0x1c && addr!=0x1e0 && addr!=0x1d4
-		&& addr!=0x2c4 && addr!=0x7a4 && addr!=0x30 // confirmed
-		&& addr!=0x49a && addr!=0x49c && addr!=0x584 // confirmed
-		&& addr!=0x162 // confirmed
-		&& addr!=0x1a0 && addr!=0x7f6 && addr!=0x18 // confirmed
-		&& addr!=0x422 && addr!=0x794 // confirmed
-		&& addr!=0xc0 && addr!=0x280 && addr!=0x1c0 && addr!=0xe2 // confirmed
-		&& addr!=0x6c0  // not confirmed butnot read
-		&& addr!=0x1ae && addr!=0x1d6 && addr!=0x4f8 && addr!=0x614 // cnofirmed
-		&& addr!=0x5ae && addr!=0x50a && addr!=0x476 && addr!=0x328 && addr!=0x3e && addr!=0x558 // dbl check these later
-		&& addr!=0x444 && addr!=0x46a // confirmed
+	// this debug code is based on the wrong address line setup (oldaddr)
+	if (oldaddr!=0x7b6 && oldaddr!=0x1c && oldaddr!=0x1e0 && oldaddr!=0x1d4
+		&& oldaddr!=0x2c4 && oldaddr!=0x7a4 && oldaddr!=0x30 // confirmed
+		&& oldaddr!=0x49a && oldaddr!=0x49c && oldaddr!=0x584 // confirmed
+		&& oldaddr!=0x162 // confirmed
+		&& oldaddr!=0x1a0 && oldaddr!=0x7f6 && oldaddr!=0x18 // confirmed
+		&& oldaddr!=0x422 && oldaddr!=0x794 // confirmed
+		&& oldaddr!=0xc0 && oldaddr!=0x280 && oldaddr!=0x1c0 && oldaddr!=0xe2 // confirmed
+		&& oldaddr!=0x6c0  // not confirmed butnot read
+		&& oldaddr!=0x1ae && oldaddr!=0x1d6 && oldaddr!=0x4f8 && oldaddr!=0x614 // cnofirmed
+		&& oldaddr!=0x5ae && oldaddr!=0x50a && oldaddr!=0x476 && oldaddr!=0x328 && oldaddr!=0x3e && oldaddr!=0x558 // dbl check these later
+		&& oldaddr!=0x444 && oldaddr!=0x46a // confirmed
 		&& space.device().safe_pc()!=0x16448 // hmm
-		&& addr!=0x67a
-		&& addr!=0x6c2 && addr!=0xac && addr!=0x416 && addr!=0x2c2 // confirmed
-		&& addr!=0x3d8
-		&& addr!=0x250 && addr!=0x306 && addr!=0x608 && addr!=0x52e // confirmed
-		&& addr!=0x21e && addr!=0x7b0 && addr!=0x7da
-		&& addr!=0xfe && addr!=0x504 && addr!=0x450  && addr!=0x276 // confirmed
-		&& addr!=0x76 && addr!=0x714 && addr!=0x642 && addr!=0x7e8 && addr!=0x244 // confirmed
-		&& addr!=0x2ea && addr!=0x254
-		&& addr!=0x540 && addr!=0x5c2 // confirmed
-		&& addr!=0x15c // confirmed
-		&& addr!=0x80 && addr!=0xb2
-		&& addr!=0x2c
+		&& oldaddr!=0x67a
+		&& oldaddr!=0x6c2 && oldaddr!=0xac && oldaddr!=0x416 && oldaddr!=0x2c2 // confirmed
+		&& oldaddr!=0x3d8
+		&& oldaddr!=0x250 && oldaddr!=0x306 && oldaddr!=0x608 && oldaddr!=0x52e // confirmed
+		&& oldaddr!=0x21e && oldaddr!=0x7b0 && oldaddr!=0x7da
+		&& oldaddr!=0xfe && oldaddr!=0x504 && oldaddr!=0x450  && oldaddr!=0x276 // confirmed
+		&& oldaddr!=0x76 && oldaddr!=0x714 && oldaddr!=0x642 && oldaddr!=0x7e8 && oldaddr!=0x244 // confirmed
+		&& oldaddr!=0x2ea && oldaddr!=0x254
+		&& oldaddr!=0x540 && oldaddr!=0x5c2 // confirmed
+		&& oldaddr!=0x15c // confirmed
+		&& oldaddr!=0x80 && oldaddr!=0xb2
+		&& oldaddr!=0x2c
 
-		&& addr!=0x2e0  && addr!=0x350  && addr!=0x244  && addr!=0x2c4  && addr!=0xac  && addr!=0x416 // not handled at all
+		&& oldaddr!=0x2e0  && oldaddr!=0x350  && oldaddr!=0x244  && oldaddr!=0x2c4  && oldaddr!=0xac  && oldaddr!=0x416 // not handled at all
 
-		// These addresses are read but the value is never used, and there are no side effects from reading
-		// these addresses - seems to purely be some code obfustication
-		&& addr!=0x400 && addr!=0x640 && addr!= 0x4c0 && addr!= 0x660 && addr!=0x4e0 && addr!=0x6e0 && addr!=0x448 && addr!=0x648 && addr!=0x4c8 && addr!=0x6c8 && addr!=0x468 && addr!=0x668 && addr!=0x4e8 && addr!=0x6e8 && addr!=0x442 && addr!=0x4c2 && addr!=0x462 && addr!=0x662
-		&& addr!=0x4e2 && addr!=0x6e2 && addr!=0x44a && addr!=0x64a && addr!=0x4ca && addr!=0x6ca && addr!=0x66a && addr!=0x4ea && addr!=0x6ea
-		&& addr!=0x440 && addr!=0x460
+		// These oldaddresses are read but the value is never used, and there are no side effects from reading
+		// these oldaddresses - seems to purely be some code obfustication
+		&& oldaddr!=0x400 && oldaddr!=0x640 && oldaddr!= 0x4c0 && oldaddr!= 0x660 && oldaddr!=0x4e0 && oldaddr!=0x6e0 && oldaddr!=0x448 && oldaddr!=0x648 && oldaddr!=0x4c8 && oldaddr!=0x6c8 && oldaddr!=0x468 && oldaddr!=0x668 && oldaddr!=0x4e8 && oldaddr!=0x6e8 && oldaddr!=0x442 && oldaddr!=0x4c2 && oldaddr!=0x462 && oldaddr!=0x662
+		&& oldaddr!=0x4e2 && oldaddr!=0x6e2 && oldaddr!=0x44a && oldaddr!=0x64a && oldaddr!=0x4ca && oldaddr!=0x6ca && oldaddr!=0x66a && oldaddr!=0x4ea && oldaddr!=0x6ea
+		&& oldaddr!=0x440 && oldaddr!=0x460
 		)
 	{
-		logerror("Protection PC %06x: warning - read unmapped protection address %04x (ret %04x)\n", space.device().safe_pc(), addr, val);
-		popmessage("Read protection port %04x", addr);
+		logerror("Protection PC %06x: warning - read unmapped protection oldaddr %04x addr %04x (ret %04x)\n", space.device().safe_pc(), oldaddr, addr, val);
+		popmessage("Read protection port oldaddr %04x addr %04x", oldaddr, addr);
 	}
-	//  logerror("Protection PC %06x: warning - read unmapped protection address %04x (ret %04x)\n", space.device().safe_pc(), addr, val);
+	//  logerror("Protection PC %06x: warning - read unmapped protection oldaddr %04x addr %04x (ret %04x)\n", space.device().safe_pc(), oldaddr, addr, val);
 
 	return (val<<16)|0xffff;
 }
 
 WRITE16_HANDLER( deco16_146_nitroball_prot_w )
 {
-	UINT16 addr = BITSWAP16(offset << 1, 0, 0, 0, 0, 0, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
+	UINT16 addr = BITSWAP16(offset << 1, 0, 0, 0, 0, 0,     10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
+	addr =        BITSWAP16(addr,        15,14,13,12,11,    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 0);
+
 	deco16_146_core_prot_w(space, addr, data, mem_mask);
 }
 
 READ16_HANDLER( deco16_146_nitroball_prot_r )
 {
-	UINT16 addr = BITSWAP16(offset << 1, 0, 0, 0, 0, 0, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
+	UINT16 addr = BITSWAP16(offset << 1, 0, 0, 0, 0, 0,     10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
+	addr =        BITSWAP16(addr,        15,14,13,12,11,    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 0);
+
 	return deco16_146_core_prot_r(space, addr, mem_mask);
 }
 
