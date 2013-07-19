@@ -328,9 +328,7 @@ static INPUT_PORTS_START( thedeep )
 	PORT_DIPSETTING(    0x30, "50k 70k" )
 	PORT_DIPSETTING(    0x20, "60k 80k" )
 	PORT_DIPSETTING(    0x10, "80k 100k" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )		PORT_DIPLOCATION("SW2:7") /* Listed as "Unused" in the manual */
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:7" ) /* Listed as "Unused" in the manual */
 	PORT_SERVICE_DIPLOC(  0x80, IP_ACTIVE_LOW, "SW2:8" )
 
 	PORT_START("MCU")   // Read by the mcu
