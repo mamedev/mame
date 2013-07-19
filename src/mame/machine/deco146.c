@@ -1225,7 +1225,7 @@ void deco146_device::soundlatch_write_callback(address_space &space, UINT16 data
 
 
 
-UINT16 deco146_device::read_protport(UINT16 address, UINT16 mem_mask)
+UINT16 deco146_device::read_protport(UINT16 address, UINT16 mem_mask, int extra_read_address_xor)
 {
 	UINT16 retdata = 0;
 
@@ -1238,6 +1238,8 @@ UINT16 deco146_device::read_protport(UINT16 address, UINT16 mem_mask)
 	}
 
 	m_latchflag = 0;
+
+	if (extra_read_address_xor) address ^= 0x44a;
 
 	// otherwise process the data..
 
@@ -1347,7 +1349,7 @@ void deco146_device::write_protport(address_space &space, UINT16 address, UINT16
 }
 
 
-UINT16 deco146_device::read_data(UINT16 address, UINT16 mem_mask, UINT8 &csflags)
+UINT16 deco146_device::read_data(UINT16 address, UINT16 mem_mask, UINT8 &csflags, int extra_read_address_xor)
 {
 	UINT16 retdata = 0;
 	csflags = 0;
@@ -1373,7 +1375,7 @@ UINT16 deco146_device::read_data(UINT16 address, UINT16 mem_mask, UINT8 &csflags
 			if (i==0) // the first cs is our internal protection area
 			{
 				//logerror("read matches cs table (protection) %01x %04x %04x\n", i, real_address, mem_mask);
-				return read_protport( real_address, mem_mask);
+				return read_protport( real_address, mem_mask, extra_read_address_xor);
 			}
 			else
 			{
@@ -1617,9 +1619,9 @@ static READ16_HANDLER( deco16_146_core_prot_r )
 
 	switch (offset)
 	{
-	case 0x41a: /* was 0x582 */ /* Player 1 & Player 2 */	return space.machine().root_device().ioport("IN0")->read();
-	case 0x320: /* was 0x4c */ /* Coins/VBL */				return space.machine().root_device().ioport("IN1")->read();
-	case 0x4e6: /* was 0x672 */ /* Dip switches */			return space.machine().root_device().ioport("DSW1_2")->read();
+	case 0x41a: /* was 0x582 */ /* Player 1 & Player 2 */	return space.machine().root_device().ioport("INPUTS")->read();
+	case 0x320: /* was 0x4c */ /* Coins/VBL */				return space.machine().root_device().ioport("SYSTEM")->read();
+	case 0x4e6: /* was 0x672 */ /* Dip switches */			return space.machine().root_device().ioport("DSW")->read();
 	case 0x5c8: /* was 0x13a */								return ((DECO_PORT(0x98)&0x00f0)<<8) | ((DECO_PORT(0x98)&0x0003)<<10) | ((DECO_PORT(0x98)&0x000c)<<6);
 	case 0x3ca: /* was 0x53c */								return ((DECO_PORT(0xc0)&0x0ff0)<<4) | ((DECO_PORT(0xc0)&0xf000)>>8);
 	case 0x360: /* was 0x6c */								return ((DECO_PORT(0xec)&0x00ff)<<8);

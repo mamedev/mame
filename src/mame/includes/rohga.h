@@ -71,6 +71,9 @@ public:
 	UINT32 screen_update_wizdfire(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_nitrobal(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void mixwizdfirelayer(bitmap_rgb32 &bitmap, const rectangle &cliprect, int gfxregion, UINT16 pri, UINT16 primask);
+
+	READ16_MEMBER( nb_protection_region_0_146_r );
+	WRITE16_MEMBER( nb_protection_region_0_146_w );
 };
 /*----------- defined in video/rohga.c -----------*/
 UINT16 rohga_pri_callback(UINT16 x);

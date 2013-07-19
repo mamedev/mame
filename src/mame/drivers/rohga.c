@@ -191,6 +191,34 @@ static ADDRESS_MAP_START( wizdfire_map, AS_PROGRAM, 16, rohga_state )
 	AM_RANGE(0xfdc000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
+
+READ16_MEMBER( rohga_state::nb_protection_region_0_146_r )
+{
+	UINT16 realdat = deco16_146_nitroball_prot_r(space,offset&0x3ff,mem_mask);
+	
+	int real_address = 0 + (offset *2);
+	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    1,2,3, 4,5,6,7, 8,9,10,0) & 0x7fff;
+	UINT8 cs = 0;
+	UINT16 data = m_deco146->read_data( deco146_addr, mem_mask, cs, 1 );
+	
+
+	if ((realdat & mem_mask) != (data & mem_mask))
+		printf("returned %04x instead of %04x (real address %08x)\n", data, realdat, real_address);
+	
+	return data;
+}
+
+WRITE16_MEMBER( rohga_state::nb_protection_region_0_146_w )
+{		
+	deco16_146_nitroball_prot_w(space,offset&0x3ff,data,mem_mask);
+
+	int real_address = 0 + (offset *2);
+	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    1,2,3, 4,5,6,7, 8,9,10,0) & 0x7fff;
+	UINT8 cs = 0;
+	m_deco146->write_data( space, deco146_addr, data, mem_mask, cs );
+}
+
+
 static ADDRESS_MAP_START( nitrobal_map, AS_PROGRAM, 16, rohga_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 
@@ -220,8 +248,10 @@ static ADDRESS_MAP_START( nitrobal_map, AS_PROGRAM, 16, rohga_state )
 	AM_RANGE(0x390008, 0x390009) AM_DEVWRITE("deco_common", decocomn_device, palette_dma_w)
 
 	AM_RANGE(0xfec000, 0xff3fff) AM_RAM
-	AM_RANGE(0xff4000, 0xff47ff) AM_MIRROR(0x800) AM_READWRITE_LEGACY(deco16_146_nitroball_prot_r,deco16_146_nitroball_prot_w) AM_SHARE("prot16ram") /* Protection device */
-	AM_RANGE(0xff8000, 0xffffff) AM_RAM
+//	AM_RANGE(0xff4000, 0xff47ff) AM_MIRROR(0x800) AM_READWRITE_LEGACY(deco16_146_nitroball_prot_r,deco16_146_nitroball_prot_w) AM_SHARE("prot16ram") /* Protection device */
+	AM_RANGE(0xff4000, 0xff7fff) AM_READWRITE(nb_protection_region_0_146_r,nb_protection_region_0_146_w) AM_SHARE("prot16ram") /* Protection device */
+
+AM_RANGE(0xff8000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( schmeisr_map, AS_PROGRAM, 16, rohga_state )
@@ -443,7 +473,7 @@ static INPUT_PORTS_START( wizdfire )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( nitrobal )
-	PORT_START("IN0")
+	PORT_START("INPUTS")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
@@ -461,13 +491,13 @@ static INPUT_PORTS_START( nitrobal )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START("IN1")
+	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
-	PORT_START("DSW1_2")
+	PORT_START("DSW")
 	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( 2C_1C ) )
@@ -921,6 +951,8 @@ static MACHINE_CONFIG_START( nitrobal, rohga_state )
 	decospr_device::set_gfx_region(*device, 4);
 
 	MCFG_VIDEO_START_OVERRIDE(rohga_state,wizdfire)
+
+	MCFG_DECO146_ADD("ioprot")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

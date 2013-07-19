@@ -11,7 +11,7 @@ public:
 	deco146_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	void write_data(address_space &space, UINT16 address, UINT16 data, UINT16 mem_mask, UINT8 &csflags);
-	UINT16 read_data(UINT16 address, UINT16 mem_mask, UINT8 &csflags);
+	UINT16 read_data(UINT16 address, UINT16 mem_mask, UINT8 &csflags, int extra_read_address_xor);
 
 
 	// legacy stuff
@@ -26,7 +26,7 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 
-	UINT16 read_protport(UINT16 address, UINT16 mem_mask);
+	UINT16 read_protport(UINT16 address, UINT16 mem_mask, int extra_read_address_xor);
 	void write_protport(address_space &space, UINT16 address, UINT16 data, UINT16 mem_mask);
 
 	UINT16 m_rambank0[0x80];
