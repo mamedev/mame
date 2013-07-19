@@ -1,10 +1,12 @@
 #include "machine/eeprom.h"
+#include "machine/deco146.h"
 
 class deco_mlc_state : public driver_device
 {
 public:
 	deco_mlc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_deco146(*this, "ioprot"),
 		m_mlc_ram(*this, "mlc_ram"),
 		m_irq_ram(*this, "irq_ram"),
 		m_mlc_clip_ram(*this, "mlc_clip_ram"),
@@ -12,6 +14,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_eeprom(*this, "eeprom") { }
 
+	optional_device<deco146_device> m_deco146;
 	required_shared_ptr<UINT32> m_mlc_ram;
 	required_shared_ptr<UINT32> m_irq_ram;
 	required_shared_ptr<UINT32> m_mlc_clip_ram;
@@ -43,8 +46,6 @@ public:
 	DECLARE_READ32_MEMBER(mlc_scanline_r);
 	DECLARE_WRITE32_MEMBER(mlc_irq_w);
 	DECLARE_READ32_MEMBER(mlc_vram_r);
-	DECLARE_READ32_MEMBER(stadhr96_prot_146_r);
-	DECLARE_WRITE32_MEMBER(stadhr96_prot_146_w);
 	DECLARE_READ32_MEMBER(avengrgs_speedup_r);
 	DECLARE_WRITE32_MEMBER(avengrs_eprom_w);
 	DECLARE_READ32_MEMBER(mlc_spriteram_r);

@@ -19,6 +19,8 @@ public:
 	DECLARE_READ32_MEMBER(captaven_prot_r);
 	DECLARE_READ16_MEMBER(lemmings_prot_r);
 	DECLARE_READ16_MEMBER(robocop2_prot_r);
+	DECLARE_READ32_MEMBER(stadhr96_prot_146_r);
+	DECLARE_WRITE32_MEMBER(stadhr96_prot_146_w);
 protected:
 	virtual void device_config_complete();
 	virtual void device_start();
@@ -68,6 +70,7 @@ DECLARE_READ32_HANDLER( deco16_146_fghthist_prot_r );
 DECLARE_READ16_HANDLER( deco16_146_nitroball_prot_r );
 DECLARE_WRITE32_HANDLER( deco16_146_fghthist_prot_w );
 DECLARE_WRITE16_HANDLER( deco16_146_nitroball_prot_w );
+
 
 // legacy stuff
 DECLARE_READ16_HANDLER( deco16_60_prot_r );
