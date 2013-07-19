@@ -51,7 +51,7 @@
 
     Sotsugyo Shousho                    59      52              74              146?
     Lemmings                    ---     59      52,52,71,71     None            75
-    Tattoo Assassins            ---     101     52,52,71,71     141, 141?       ?           99, ?
+    Tattoo Assassins            ---     101     52,52,71,71     141, 141?       104? (same as Night Slashers)           99, ?
 
 Note 1: Mitchell game on DECO PCB board number DEC-22V0 (S-NK-3220)
 Note 2: Mitchell games on DECO PCB board number MT5601-0

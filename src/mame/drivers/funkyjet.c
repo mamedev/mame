@@ -317,7 +317,7 @@ static const deco16ic_interface funkyjet_deco16ic_tilegen1_intf =
 
 void funkyjet_state::machine_start()
 {
-	decoprot_reset(machine());
+	decoprot146_reset(machine());
 }
 
 static MACHINE_CONFIG_START( funkyjet, funkyjet_state )

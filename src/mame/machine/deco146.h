@@ -52,6 +52,24 @@ extern const device_type DECO146PROT;
 #define MCFG_DECO146_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, DECO146PROT, 0)
 
+// old
+void decoprot146_reset(running_machine &machine);
+
+// old implementations still in use
+DECLARE_READ32_HANDLER( deco16_146_fghthist_prot_r );
+DECLARE_READ16_HANDLER( deco16_146_nitroball_prot_r );
+DECLARE_WRITE32_HANDLER( deco16_146_fghthist_prot_w );
+DECLARE_WRITE16_HANDLER( deco16_146_nitroball_prot_w );
+
+// legacy stuff
+DECLARE_READ16_HANDLER( deco16_60_prot_r );
+DECLARE_READ16_HANDLER( deco16_66_prot_r );
+DECLARE_READ16_HANDLER( deco16_146_funkyjet_prot_r );
+DECLARE_WRITE16_HANDLER( deco16_60_prot_w );
+DECLARE_WRITE16_HANDLER( deco16_66_prot_w );
+DECLARE_WRITE16_HANDLER( deco16_146_funkyjet_prot_w );
+
+
 
 
 #endif

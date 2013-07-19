@@ -930,7 +930,9 @@ void cninja_state::machine_start()
 	save_item(NAME(m_scanline));
 	save_item(NAME(m_irq_mask));
 
-	decoprot_reset(machine());
+	decoprot104_reset(machine());
+	decoprot146_reset(machine());
+
 }
 
 void cninja_state::machine_reset()

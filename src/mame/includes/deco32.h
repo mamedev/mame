@@ -4,6 +4,7 @@
 #include "video/deco16ic.h"
 #include "machine/eeprom.h"
 #include "sound/okim6295.h"
+#include "machine/deco146.h"
 
 class deco32_state : public driver_device
 {

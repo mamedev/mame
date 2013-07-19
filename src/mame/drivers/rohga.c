@@ -1525,7 +1525,7 @@ DRIVER_INIT_MEMBER(rohga_state,rohga)
 	deco56_decrypt_gfx(machine(), "gfx1");
 	deco56_decrypt_gfx(machine(), "gfx2");
 
-	decoprot_reset(machine());
+	decoprot104_reset(machine());
 }
 
 DRIVER_INIT_MEMBER(rohga_state,wizdfire)
@@ -1534,7 +1534,7 @@ DRIVER_INIT_MEMBER(rohga_state,wizdfire)
 	deco74_decrypt_gfx(machine(), "gfx2");
 	deco74_decrypt_gfx(machine(), "gfx3");
 
-	decoprot_reset(machine());
+	decoprot104_reset(machine());
 }
 
 DRIVER_INIT_MEMBER(rohga_state,nitrobal)
@@ -1543,7 +1543,7 @@ DRIVER_INIT_MEMBER(rohga_state,nitrobal)
 	deco56_decrypt_gfx(machine(), "gfx2");
 	deco74_decrypt_gfx(machine(), "gfx3");
 
-	decoprot_reset(machine());
+	decoprot146_reset(machine());
 }
 
 DRIVER_INIT_MEMBER(rohga_state,schmeisr)
@@ -1557,7 +1557,7 @@ DRIVER_INIT_MEMBER(rohga_state,schmeisr)
 	deco74_decrypt_gfx(machine(), "gfx1");
 	deco74_decrypt_gfx(machine(), "gfx2");
 
-	decoprot_reset(machine());
+	decoprot104_reset(machine());
 }
 
 GAME( 1991, rohga,     0,        rohga,    rohga, rohga_state,    rohga,    ROT0,   "Data East Corporation", "Rohga Armor Force (Asia/Europe v5.0)", GAME_SUPPORTS_SAVE )

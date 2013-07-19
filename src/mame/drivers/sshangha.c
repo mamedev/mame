@@ -12,15 +12,14 @@
   Sound: Z80B YM2203 Y3014 M6295
   OSC  : 28.0000MHz 16.0000MHz
 
-  The original uses a protection chip which isn't fully worked out yet.
-  Sound doesn't work for the original set, probably the sound ports are inside
-  the protection area.
 
   Emulation by Bryan McPhail, mish@tendril.co.uk
+  + Charles MacDonald, David Haywood
 
   ToDo:
 
   Palette handling is somewhat hacked, see paletteram16_xbgr_word_be_sprites_w
+   - check this on the original set
 
   ----
 
@@ -535,5 +534,5 @@ DRIVER_INIT_MEMBER(sshangha_state,sshangha)
 }
 
 
-GAME( 1992, sshangha, 0,        sshangha, sshangha, sshangha_state, sshangha, ROT0, "Hot-B",   "Super Shanghai Dragon's Eye (Japan)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1992, sshangha, 0,        sshangha, sshangha, sshangha_state, sshangha, ROT0, "Hot-B",   "Super Shanghai Dragon's Eye (Japan)", 0 )
 GAME( 1992, sshanghab,sshangha, sshanghb, sshangha, sshangha_state, sshangha, ROT0, "bootleg", "Super Shanghai Dragon's Eye (World, bootleg)", 0 )

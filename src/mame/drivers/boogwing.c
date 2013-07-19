@@ -568,7 +568,7 @@ DRIVER_INIT_MEMBER(boogwing_state,boogwing)
 	deco102_decrypt_cpu(machine(), "maincpu", 0x42ba, 0x00, 0x18);
 	memcpy(dst, src, 0x100000);
 
-	decoprot_reset(machine());
+	decoprot104_reset(machine());
 }
 
 GAME( 1992, boogwing, 0,        boogwing, boogwing, boogwing_state,  boogwing,  ROT0, "Data East Corporation", "Boogie Wings (Euro v1.5, 92.12.07)", GAME_SUPPORTS_SAVE )

@@ -1637,7 +1637,9 @@ static const eeprom_interface eeprom_interface_tattass =
 MACHINE_RESET_MEMBER(deco32_state,deco32)
 {
 	m_raster_irq_timer = machine().device<timer_device>("int_timer");
-	decoprot_reset(machine());
+	decoprot104_reset(machine());
+	decoprot146_reset(machine());
+
 }
 
 INTERRUPT_GEN_MEMBER(deco32_state::deco32_vbl_interrupt)
@@ -3398,7 +3400,7 @@ DRIVER_INIT_MEMBER(deco32_state,fghthist)
 	deco56_decrypt_gfx(machine(), "gfx1");
 	deco74_decrypt_gfx(machine(), "gfx2");
 
-	decoprot_reset(machine());
+	decoprot146_reset(machine());
 }
 
 DRIVER_INIT_MEMBER(dragngun_state,lockload)
