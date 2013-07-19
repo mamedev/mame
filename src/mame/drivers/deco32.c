@@ -714,6 +714,41 @@ static ADDRESS_MAP_START( captaven_map, AS_PROGRAM, 32, deco32_state )
 ADDRESS_MAP_END
 
 
+READ32_MEMBER( deco32_state::fghthist_protection_region_0_146_r )
+{
+	UINT32 retdata = 0x0000ffff;
+
+	if (mem_mask & 0xffff0000)
+	{
+		mem_mask >>=16;
+	
+		int real_address = 0 + (offset *2);
+		int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,   5,  6,  4,  7,  3,   8,  2,  9,  1,  10,   0) & 0x7fff;
+		UINT8 cs = 0;
+		UINT16 data = m_deco146->read_data( deco146_addr, mem_mask, cs, 1 );
+	
+
+	
+		retdata |= data << 16;
+	}
+	return retdata;
+}
+
+WRITE32_MEMBER( deco32_state::fghthist_protection_region_0_146_w )
+{		
+	if (mem_mask & 0xffff0000)
+	{
+		data >>=16;
+		mem_mask >>=16;
+
+		int real_address = 0 + (offset *2);
+		int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    5,  6,  4,  7,  3,   8,  2,  9,  1,  10,   0) & 0x7fff;
+		UINT8 cs = 0;
+		m_deco146->write_data( space, deco146_addr, data, mem_mask, cs );
+	}
+}
+
+
 static ADDRESS_MAP_START( fghthist_map, AS_PROGRAM, 32, deco32_state )
 //  AM_RANGE(0x000000, 0x001fff) AM_ROM AM_WRITE(deco32_pf1_data_w) // wtf??
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
@@ -745,7 +780,8 @@ static ADDRESS_MAP_START( fghthist_map, AS_PROGRAM, 32, deco32_state )
 	AM_RANGE(0x16c000, 0x16c01f) AM_READNOP
 	AM_RANGE(0x17c000, 0x17c03f) AM_READNOP
 
-	AM_RANGE(0x200000, 0x200fff) AM_READWRITE_LEGACY(deco16_146_fghthist_prot_r, deco16_146_fghthist_prot_w) AM_SHARE("prot32ram")
+//	AM_RANGE(0x200000, 0x200fff) AM_READWRITE_LEGACY(deco16_146_fghthist_prot_r, deco16_146_fghthist_prot_w) AM_SHARE("prot32ram")
+	AM_RANGE(0x200000, 0x207fff) AM_READWRITE(fghthist_protection_region_0_146_r, fghthist_protection_region_0_146_w) AM_SHARE("prot32ram") // only maps on 16-bits
 	AM_RANGE(0x208800, 0x208803) AM_WRITENOP /* ? */
 ADDRESS_MAP_END
 
@@ -775,7 +811,9 @@ static ADDRESS_MAP_START( fghthsta_memmap, AS_PROGRAM, 32, deco32_state )
 	AM_RANGE(0x1d4000, 0x1d5fff)  AM_RAM_WRITE(deco32_pf4_rowscroll_w) AM_SHARE("pf4_rowscroll32")
 	AM_RANGE(0x1e0000, 0x1e001f) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf_control_dword_r, pf_control_dword_w)
 
-	AM_RANGE(0x200000, 0x200fff) AM_READWRITE_LEGACY(deco16_146_fghthist_prot_r, deco16_146_fghthist_prot_w) AM_SHARE("prot32ram")
+//	AM_RANGE(0x200000, 0x200fff) AM_READWRITE_LEGACY(deco16_146_fghthist_prot_r, deco16_146_fghthist_prot_w) AM_SHARE("prot32ram")
+	AM_RANGE(0x200000, 0x207fff) AM_READWRITE(fghthist_protection_region_0_146_r, fghthist_protection_region_0_146_w) AM_SHARE("prot32ram") // only maps on 16-bits
+
 ADDRESS_MAP_END
 
 // the video drawing (especially sprite) code on this is too slow to cope with proper partial updates
@@ -1725,6 +1763,21 @@ static MACHINE_CONFIG_START( captaven, deco32_state )
 MACHINE_CONFIG_END
 
 
+UINT16 deco32_state::port_a_fghthist(int unused)
+{
+	return machine().root_device().ioport(":IN0")->read();
+}
+
+UINT16 deco32_state::port_b_fghthist(int unused)
+{
+	return machine().device<eeprom_device>(":eeprom")->read_bit();
+}
+
+UINT16 deco32_state::port_c_fghthist(int unused)
+{
+	return machine().root_device().ioport(":IN1")->read();
+}
+
 static MACHINE_CONFIG_START( fghthist, deco32_state ) /* DE-0380-2 PCB */
 
 	/* basic machine hardware */
@@ -1754,6 +1807,10 @@ static MACHINE_CONFIG_START( fghthist, deco32_state ) /* DE-0380-2 PCB */
 	decospr_device::set_gfx_region(*device, 3);
 
 	MCFG_DECO146_ADD("ioprot")
+	MCFG_DECO146_SET_PORTA_CALLBACK( deco32_state, port_a_fghthist )
+	MCFG_DECO146_SET_PORTB_CALLBACK( deco32_state, port_b_fghthist )
+	MCFG_DECO146_SET_PORTC_CALLBACK( deco32_state, port_c_fghthist )
+
 
 	MCFG_VIDEO_START_OVERRIDE(deco32_state,fghthist)
 
@@ -1803,6 +1860,9 @@ static MACHINE_CONFIG_START( fghthsta, deco32_state ) /* DE-0395-1 PCB */
 	decospr_device::set_gfx_region(*device, 3);
 
 	MCFG_DECO146_ADD("ioprot")
+	MCFG_DECO146_SET_PORTA_CALLBACK( deco32_state, port_a_fghthist )
+	MCFG_DECO146_SET_PORTB_CALLBACK( deco32_state, port_b_fghthist )
+	MCFG_DECO146_SET_PORTC_CALLBACK( deco32_state, port_c_fghthist )
 
 	MCFG_VIDEO_START_OVERRIDE(deco32_state,fghthist)
 

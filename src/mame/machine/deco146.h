@@ -2,6 +2,18 @@
 #ifndef __DECO146_H__
 #define __DECO146_H__
 
+typedef device_delegate<UINT16 (int unused)> deco146_port_read_cb;
+
+
+#define MCFG_DECO146_SET_PORTA_CALLBACK( _class, _method) \
+	deco146_device::set_port_a_cb(*device, deco146_port_read_cb(&_class::_method, #_class "::" #_method, NULL, (_class *)0));
+
+#define MCFG_DECO146_SET_PORTB_CALLBACK( _class, _method) \
+	deco146_device::set_port_b_cb(*device, deco146_port_read_cb(&_class::_method, #_class "::" #_method, NULL, (_class *)0));
+
+#define MCFG_DECO146_SET_PORTC_CALLBACK( _class, _method) \
+	deco146_device::set_port_c_cb(*device, deco146_port_read_cb(&_class::_method, #_class "::" #_method, NULL, (_class *)0));
+
 
 /* Data East 146 protection chip */
 
@@ -13,6 +25,9 @@ public:
 	void write_data(address_space &space, UINT16 address, UINT16 data, UINT16 mem_mask, UINT8 &csflags);
 	UINT16 read_data(UINT16 address, UINT16 mem_mask, UINT8 &csflags, int extra_read_address_xor);
 
+	static void set_port_a_cb(device_t &device,deco146_port_read_cb port_cb);
+	static void set_port_b_cb(device_t &device,deco146_port_read_cb port_cb);
+	static void set_port_c_cb(device_t &device,deco146_port_read_cb port_cb);
 
 	// legacy stuff
 	DECLARE_READ32_MEMBER(dragngun_prot_r);
@@ -21,6 +36,16 @@ public:
 	DECLARE_READ16_MEMBER(robocop2_prot_r);
 	DECLARE_READ32_MEMBER(stadhr96_prot_146_r);
 	DECLARE_WRITE32_MEMBER(stadhr96_prot_146_w);
+
+	deco146_port_read_cb m_port_a_r;
+	deco146_port_read_cb m_port_b_r;
+	deco146_port_read_cb m_port_c_r;
+
+	UINT16 port_a_default(int unused);
+	UINT16 port_b_default(int unused);
+	UINT16 port_c_default(int unused);
+
+
 protected:
 	virtual void device_config_complete();
 	virtual void device_start();
@@ -34,10 +59,6 @@ protected:
 
 	UINT16* m_current_rambank;
 
-	// set these up as actual callbacks!
-	UINT16 read_input_a_callback(void);
-	UINT16 read_input_b_callback(void);
-	UINT16 read_input_c_callback(void);
 	void soundlatch_write_callback(address_space &space, UINT16 data, UINT16 mem_mask);
 
 	UINT16 m_nand;
@@ -65,20 +86,6 @@ extern const device_type DECO146PROT;
 // old
 void decoprot146_reset(running_machine &machine);
 
-// old implementations still in use
-DECLARE_READ32_HANDLER( deco16_146_fghthist_prot_r );
-DECLARE_READ16_HANDLER( deco16_146_nitroball_prot_r );
-DECLARE_WRITE32_HANDLER( deco16_146_fghthist_prot_w );
-DECLARE_WRITE16_HANDLER( deco16_146_nitroball_prot_w );
-
-
-// legacy stuff
-DECLARE_READ16_HANDLER( deco16_60_prot_r );
-DECLARE_READ16_HANDLER( deco16_66_prot_r );
-DECLARE_READ16_HANDLER( deco16_146_funkyjet_prot_r );
-DECLARE_WRITE16_HANDLER( deco16_60_prot_w );
-DECLARE_WRITE16_HANDLER( deco16_66_prot_w );
-DECLARE_WRITE16_HANDLER( deco16_146_funkyjet_prot_w );
 
 
 

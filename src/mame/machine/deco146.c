@@ -675,7 +675,7 @@ struct deco146port_xx
 /* 0x472 */ { 0x078,           {  0xc, 0xd, 0xe, 0xf, BLK, BLK, BLK, BLK, BLK, BLK, BLK, BLK, BLK, BLK, BLK, BLK },  0, 0 },
 /* 0x474 */ { 0x066,           {  0x8, 0x9, 0xa, 0xb, 0x4, 0x5, 0x6, 0x7, BLK, BLK, BLK, BLK, 0xc, 0xd, 0xe, 0xf },  1, 1 },
 /* 0x476 */ { 0x05a,           {  0x8, 0x9, 0xa, 0xb, 0x4, 0x5, 0x6, 0x7, 0xc, 0xd, 0xe, 0xf, 0x0, 0x1, 0x2, 0x3 },  1, 0 },
-/* 0x478 */ { INPUT_PORT_C_NV, {  BLK, BLK, BLK, BLK, BLK, BLK, BLK, BLK, BLK, BLK, BLK, BLK, BLK, BLK, BLK, BLK },  0, 0 },
+/* 0x478 */ { INPUT_PORT_C_NV, {  BLK, BLK, BLK, BLK, BLK, BLK, BLK, BLK, BLK, BLK, BLK, BLK, BLK, BLK, BLK, BLK },  0, 0 },  //  $4478   $FFFF   CDAB    ...     0   (fghthist) - verify
 /* 0x47a */ { 0x014,           {  0x4, 0x5, 0x6, 0x7, 0x0, 0x1, 0x2, 0x3, 0xc, 0xd, 0xe, 0xf, 0x8, 0x9, 0xa, 0xb },  1, 0 },
 /* 0x47c */ { 0x0e8,           {  0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, BLK, BLK, BLK, BLK, BLK, BLK, BLK, BLK },  0, 0 },
 /* 0x47e */ { 0x0b8,           {  0x5, 0x6, 0x7, 0x4, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0x0, 0x1, 0x2, 0x3 },  1, 1 },
@@ -1200,20 +1200,9 @@ void deco146_device::write_data(address_space &space, UINT16 address, UINT16 dat
 	}
 }
 
-UINT16 deco146_device::read_input_a_callback(void)
-{
-	return ioport(":INPUTS")->read();
-}
 
-UINT16 deco146_device::read_input_b_callback(void)
-{
-	return ioport(":SYSTEM")->read();
-}
 
-UINT16 deco146_device::read_input_c_callback(void)
-{
-	return ioport(":DSW")->read();
-}
+
 
 void deco146_device::soundlatch_write_callback(address_space &space, UINT16 data, UINT16 mem_mask)
 {
@@ -1253,15 +1242,15 @@ UINT16 deco146_device::read_protport(UINT16 address, UINT16 mem_mask, int extra_
 
 	if (location==INPUT_PORT_A)
 	{
-		retdata = read_input_a_callback();
+		retdata = m_port_a_r(0);
 	}
 	else if (location==INPUT_PORT_B)
 	{
-		retdata = read_input_b_callback();
+		retdata = m_port_b_r(0);
 	}
 	else if (location==INPUT_PORT_C)
 	{
-		retdata = read_input_c_callback();
+		retdata = m_port_c_r(0);
 	}
 	else
 	{
@@ -1400,12 +1389,42 @@ const device_type DECO146PROT = &device_creator<deco146_device>;
 deco146_device::deco146_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, DECO146PROT, "DECO146PROT", tag, owner, clock, "deco146", __FILE__)
 {
+	m_port_a_r =  deco146_port_read_cb(FUNC(deco146_device::port_a_default), this);
+	m_port_b_r =  deco146_port_read_cb(FUNC(deco146_device::port_b_default), this);
+	m_port_c_r =  deco146_port_read_cb(FUNC(deco146_device::port_c_default), this);
 }
 
 
 void deco146_device::device_config_complete()
 {
 }
+
+
+
+
+
+UINT16 deco146_device::port_a_default(int unused)
+{
+	return ioport(":INPUTS")->read();
+}
+
+UINT16 deco146_device::port_b_default(int unused)
+{
+	return ioport(":SYSTEM")->read();
+}
+
+UINT16 deco146_device::port_c_default(int unused)
+{
+	return ioport(":DSW")->read();
+}
+
+
+
+
+
+void deco146_device::set_port_a_cb(device_t &device,deco146_port_read_cb port_cb) { deco146_device &dev = downcast<deco146_device &>(device); dev.m_port_a_r = port_cb; }
+void deco146_device::set_port_b_cb(device_t &device,deco146_port_read_cb port_cb) { deco146_device &dev = downcast<deco146_device &>(device); dev.m_port_b_r = port_cb; }
+void deco146_device::set_port_c_cb(device_t &device,deco146_port_read_cb port_cb) { deco146_device &dev = downcast<deco146_device &>(device); dev.m_port_c_r = port_cb; }
 
 void deco146_device::device_start()
 {
@@ -1416,6 +1435,12 @@ void deco146_device::device_start()
 		m_rambank0[i] = 0xffff;
 		m_rambank1[i] = 0xffff;
 	}
+
+
+	// bind our handler
+	m_port_a_r.bind_relative_to(*owner());
+	m_port_b_r.bind_relative_to(*owner());
+	m_port_c_r.bind_relative_to(*owner());
 }
 
 void deco146_device::device_reset()
@@ -1562,250 +1587,3 @@ WRITE32_MEMBER(deco146_device::stadhr96_prot_146_w)
 	printf("%08x:  Write prot %04x %08x\n", space.device().safe_pc(), offset, data);
 }
 
-
-/****************************************************************************************************
-*****************************************************************************************************
-*****************************************************************************************************
-*****************************************************************************************************
- Old style protection handlers for 146 cases not yet understood
-
-  currently used by
-  
-  Fighters History
-  Nitro Ball
-*****************************************************************************************************
-*****************************************************************************************************
-*****************************************************************************************************
-****************************************************************************************************/
-
-
-static WRITE16_HANDLER( deco16_146_core_prot_w )
-{
-	driver_device *state = space.machine().driver_data<driver_device>();
-	int writeport;
-
-	writeport = offset;
-	
-	const int sndport=0x64;
-	const int xorport=0x2c;
-	const int maskport=0x36;
-	if (writeport == sndport)
-	{
-		state->soundlatch_byte_w(space, 0, data & 0xff);
-		space.machine().device("audiocpu")->execute().set_input_line(0, HOLD_LINE);
-		return;
-	}
-
-	if (writeport==xorport)
-		COMBINE_DATA(&deco146_xor);
-	if (writeport==maskport)
-		COMBINE_DATA(&deco146_mask);
-
-	if (deco146prot_buffer_ram_selected)
-		COMBINE_DATA(&deco146prot_buffer_ram2[writeport>>1]);
-	else
-		COMBINE_DATA(&deco146prot_buffer_ram[writeport>>1]);
-
-//  if (offset!=0x5e0 && offset!=0x340 && offset!=0 && offset!=0x3d0 && offset!=0x280)
-//      logerror("%08x:  Write protection port %04x, data %04x (%08x)\n", space.device().safe_pc(), offset, data, mem_mask);
-}
-
-static READ16_HANDLER( deco16_146_core_prot_r )
-{
-//  const UINT16* prot_ram=deco146prot_buffer_ram;
-	UINT16 val;
-	const UINT16* prot_ram=deco146prot_buffer_ram_selected ? deco146prot_buffer_ram2 : deco146prot_buffer_ram;
-
-
-	switch (offset)
-	{
-	case 0x41a: /* was 0x582 */ /* Player 1 & Player 2 */	return space.machine().root_device().ioport("INPUTS")->read();
-	case 0x320: /* was 0x4c */ /* Coins/VBL */				return space.machine().root_device().ioport("SYSTEM")->read();
-	case 0x4e6: /* was 0x672 */ /* Dip switches */			return space.machine().root_device().ioport("DSW")->read();
-	case 0x5c8: /* was 0x13a */								return ((DECO_PORT(0x98)&0x00f0)<<8) | ((DECO_PORT(0x98)&0x0003)<<10) | ((DECO_PORT(0x98)&0x000c)<<6);
-	case 0x3ca: /* was 0x53c */								return ((DECO_PORT(0xc0)&0x0ff0)<<4) | ((DECO_PORT(0xc0)&0xf000)>>8);
-	case 0x360: /* was 0x6c */								return ((DECO_PORT(0xec)&0x00ff)<<8);
-	case 0x500: /* was 0x0a */								return ((DECO_PORT(0x8c)&0x0fff)<<4);
-	case 0x6f2: /* was 0x4f6 */								return ((DECO_PORT(0x40)&0x00f0)<<8) | ((DECO_PORT(0x40)&0x0007)<<9) | ((DECO_PORT(0x40)&0x0008)<<5);
-	case 0x570: /* was 0xea */								return ((DECO_PORT(0x38)&0xf000)<<0) | ((DECO_PORT(0x38)&0x00ff)<<4);
-	case 0x748: /* was 0x12e */								return ((DECO_PORT(0xf8)&0xf000)>>4) | ((DECO_PORT(0xf8)&0x0f00)<<4) | ((DECO_PORT(0xf8)&0x00f0)>>4) | ((DECO_PORT(0xf8)&0x000f)<<4);
-	case 0x68c: /* was 0x316 */								return ((DECO_PORT(0x94)&0xf000)>>4) | ((DECO_PORT(0x94)&0x0f00)<<4) | ((DECO_PORT(0x94)&0x00ff)<<0);
-	case 0x63c: /* was 0x3c6 */								return ((DECO_PORT(0xe8)&0xfff0)<<0) | ((DECO_PORT(0xe8)&0x000e)>>1) | ((DECO_PORT(0xe8)&0x0001)<<3);
-	case 0x0b2: /* was 0x4d0 */								return ((DECO_PORT(0x40)&0x00f0)<<8) | ((DECO_PORT(0x40)&0x0007)<<9) | ((DECO_PORT(0x40)&0x0008)<<5);
-	case 0x5ca: /* was 0x53a */								return ((DECO_PORT(0xec)&0xffff)<<0);
-	case 0x4aa: /* was 0x552 */								return ((DECO_PORT(0x24)&0xfff0)<<0) | ((DECO_PORT(0x24)&0x0007)<<1) | ((DECO_PORT(0x24)&0x0008)>>3);
-	case 0x32a: /* was 0x54c */								return ((DECO_PORT(0xf4)&0x00ff)<<8);
-	case 0x5ba: /* was 0x5da */								return ((DECO_PORT(0xc8)&0x00f0)<<8) | ((DECO_PORT(0xc8)&0x000e)<<7) | ((DECO_PORT(0xc8)&0x0001)<<11);
-	case 0x7d6: /* was 0x6be */								return ((DECO_PORT(0xa8)&0xf000)>>12) | ((DECO_PORT(0xa8)&0x0ff0)<<0) | ((DECO_PORT(0xa8)&0x000f)<<12);
-	case 0x50e: /* was 0x70a */								return ((DECO_PORT(0xb8)&0x0ff0)<<4) | ((DECO_PORT(0xb8)&0x0003)<<6) | ((DECO_PORT(0xb8)&0x000c)<<2);
-	case 0x07e: /* was 0x7e0 */								return ((DECO_PORT(0xd4)&0xfff0)<<0) | ((DECO_PORT(0xd4)&0x0003)<<2) | ((DECO_PORT(0xd4)&0x000c)>>2);
-	case 0x7b8: /* was 0x1de */								return ((DECO_PORT(0xd8)&0x0ff0)<<4) | ((DECO_PORT(0xd8)&0x000e)<<3) | ((DECO_PORT(0xd8)&0x0001)<<7);
-	case 0x162: /* was 0x468 */			val=DECO_PORT(0xea);val=((val&0x0003)<<6) | ((val&0x000c)<<2) | ((val&0x00f0)<<4) | ((val&0x0f00)<<4) | ((val&0xf000)>>12); return (val ^ deco146_xor) & (~deco146_mask);
-	case 0x578: /* was 0x1ea */ 		val=DECO_PORT(0xea);val=((val&0x0003)<<10) | ((val&0x000c)<<6) | ((val&0x00f0)<<8) | ((val&0x0f00)>>8) | ((val&0xf000)>>8); return val ^ deco146_xor;
-	case 0x6de: /* was 0x7b6 */ 		val=((DECO_PORT(0x00))&0xffff);	val=((val&0x000c)>>2) | ((val&0x0003)<<2) | ((val&0xfff0)<<0);	return (val ^ deco146_xor) & (~deco146_mask);
-	case 0x380: /* was 0x1c */ 	 		val=((DECO_PORT(0x00))&0xffff);	val=((val&0x000f)<<12) | ((val&0x00f0)<<4) | ((val&0x0f00)>>8) | ((val&0xf000)>>8); return val ^ deco146_xor;
-	case 0x078: /* was 0x1e0 */ 		val=((DECO_PORT(0x00))&0xffff);	val=((val&0x000e)<<3) | ((val&0x0001)<<7) | ((val&0x00f0)<<4) | ((val&0x0f00)<<4) | ((val&0xf000)>>12); return val ^ deco146_xor;
-	case 0x2b8: /* was 0x1d4 */	  		val=((DECO_PORT(0x00))&0xffff);	val=((val&0x000f)<<0) | ((val&0x00f0)<<4) | ((val&0x0f00)<<4) | ((val&0xf000)>>8); return val;
-	case 0x030: /* was 0xc0 */			val=((DECO_PORT(0x14))&0xffff);	val=((val&0x000f)<<4) | ((val&0x00f0)>>4) | ((val&0x0f00)<<4) | ((val&0xf000)>>4); return val ^ deco146_xor;
-	case 0x29e: /* was 0x794 */			val=((DECO_PORT(0x14))&0xffff);	val=((val&0x0007)<<1) | ((val&0xfff0)>>0) | ((val&0x0008)>>3); return val ^ deco146_xor;
-	case 0x0c0: /* was 0x30 */			val=DECO_PORT(0x7a);val=((val&0x0007)<<13) | ((val&0x0008)<<9); /* Bottom bits are masked out before XOR */return val ^ deco146_xor;
-	case 0x442: /* was 0x422 */			val=((DECO_PORT(0xbc))&0xffff);val=((val&0x0007)<<1) | ((val&0xfff0)>>0) | ((val&0x0008)>>3);return (val ^ deco146_xor) & (~deco146_mask);
-	case 0x1aa: /* was 0x558 */			val=((DECO_PORT(0x84))&0xffff);val=((val&0x000f)<<0) | ((val&0x00f0)<<8) | ((val&0x0f00)>>0) | ((val&0xf000)>>8);return val;
-	case 0x7c0: /* was 0x3e */			val=((DECO_PORT(0x84))&0xffff);val=((val&0x000f)<<4) | ((val&0x00f0)>>4) | ((val&0x0f00)<<4) | ((val&0xf000)>>4);return val & (~deco146_mask);
-	case 0x14c: /* was 0x328 */			val=((DECO_PORT(0x84))&0xffff);val=((val&0x000e)<<3) | ((val&0x0001)<<7) | ((val&0x00f0)<<4) | ((val&0xf000)>>12) | ((val&0x0f00)<<4);return val ^ deco146_xor;
-	case 0x6e2: /* was 0x476 */			val=((DECO_PORT(0x84))&0xffff);val=((val&0x000f)<<0) | ((val&0x00f0)<<8) | ((val&0xff00)>>4);return val;
-	case 0x50a: /* was 0x50a */			val=((DECO_PORT(0x84))&0xffff);val=((val&0x000f)<<12) | ((val&0x00f0)>>4) | ((val&0x0f00)<<0) | ((val&0xf000)>>8);return val;
-	case 0x75a: /* was 0x5ae */			val=((DECO_PORT(0x84))&0xffff);val=((val&0x000f)<<12) | ((val&0x00f0)>>4) | ((val&0x0f00)>>0) | ((val&0xf000)>>8);return (val ^ deco146_xor) & (~deco146_mask);
-	case 0x758: /* was 0x1ae */			val=((DECO_PORT(0xbc))&0xffff);val=((val&0x000f)<<12) | ((val&0x00f0)<<4);return (val ^ deco146_xor) & (~deco146_mask);
-	case 0x25e: /* was 0x7a4 */			val=((DECO_PORT(0x46))&0xffff);val=((val&0x000f)<<4) | ((val&0x00f0)<<4) | ((val&0x0f00)>>8) | ((val&0xf000)>>0);return val;
-	case 0x234: /* was 0x2c4 */			val=((DECO_PORT(0x82))&0xffff);val=((val&0x00ff)<<8) | ((val&0xff00)>>8);return val ^ deco146_xor;
-	case 0x6e0: /* was 0x76 */			val=((DECO_PORT(0x54))&0xffff);val=((val&0x000f)<<12) | ((val&0x00f0)<<4) | ((val&0x0f00)>>8) | ((val&0xf000)>>8);return (val ^ deco146_xor) & (~deco146_mask); /* Bitshifted XOR, with additional inverse mask on final output */
-	case 0x28e: /* was 0x714 */			val=((DECO_PORT(0x54))&0xffff);val=((val&0x0003)<<14) | ((val&0x000c)<<10) | ((val&0xfff0)>>4);return val & (~deco146_mask); /* Bitshifting with inverse mask on final output */
-	case 0x426: /* was 0x642 */			val=((DECO_PORT(0x54))&0xffff);val=((val&0xf000)>>4) | ((val&0x0f00)>>8)| ((val&0x00f0)<<8) | ((val&0x000f)<<4);return (val ^ deco146_xor) & (~deco146_mask);
-	case 0x592: /* was 0x49a */			val=((DECO_PORT(0x1a))&0xffff);val=((val&0x000f)<<4) | ((val&0x00f0)>>4) | ((val&0xff00)>>0);return val & (~deco146_mask);  /* Bitshifting with inverse mask on final output */
-	case 0x392: /* was 0x49c */			val=((DECO_PORT(0x1a))&0xffff);val=((val&0x000e)<<7) | ((val&0x00f0)<<8) | ((val&0x0001)<<11);return (val ^ deco146_xor) & (~deco146_mask); /* Bitshifting with inverse mask on final output */
-	case 0x21a: /* was 0x584 */			val=((DECO_PORT(0x1a))&0xffff);val=((val&0xff00)>>8) | ((val&0x00f0)<<8) | ((val&0x0008)<<5) | ((val&0x0007)<<9);return val & (~deco146_mask); /* Bitshifting with inverse mask on final output */
-	case 0x286: /* was 0x614 */			val=((DECO_PORT(0x1a))&0xffff);val=((val&0x000f)<<12) | ((val&0x00f0)<<4) | ((val&0x0f00)>>4) | ((val&0xf000)>>12);return val & (~deco146_mask); /* Bitshifting with inverse mask on final output */
-	case 0x468: /* was 0x162 */			val=((DECO_PORT(0x70))&0xffff);val=((val&0x0fff)<<4);return (val ^ deco146_xor) & (~deco146_mask); /* Bitshifting with inverse mask on final output */
-	case 0x180: /* was 0x18 */			val=((DECO_PORT(0xc4))&0xffff);val=((val&0xfff0)>>4) | ((val&0x0007)<<13) | ((val&0x0008)<<9);return val ^ deco146_xor;
-	case 0x6fe: /* was 0x7f6 */			val=((DECO_PORT(0xc4))&0xffff);val=((val&0x000f)<<12) | ((val&0x00f0)<<4);return (val ^ deco146_xor) & (~deco146_mask);/* Bitshifting with inverse mask on final output */
-	case 0x058: /* was 0x1a0 */			val=((DECO_PORT(0xc4))&0xffff);val=((val&0xff00)>>8) | ((val&0x00f0)<<8) | ((val&0x0003)<<10) | ((val&0x000c)<<6);return val & (~deco146_mask);/* Bitshifting with inverse mask on final output */
-	case 0x1f2: /* was 0x4f8 */			val=((DECO_PORT(0xb4))&0xffff);val=((val&0x0fff)<<4);return val;
-	case 0x6b8: /* was 0x1d6 */			val=((DECO_PORT(0x50))&0xffff);val=((val&0x0fff)<<4);return val ^ deco146_xor;
-	case 0x2a4: /* was 0x254 */			val=((DECO_PORT(0x4c))&0xffff);	val=((val&0x0f00)<<4) | ((val&0x00f0)<<0) | ((val&0x000f)<<8);return val & (~deco146_mask);
-	case 0x574: /* was 0x2ea */			val=((DECO_PORT(0x4c))&0xffff);	val=((val&0x00ff)<<8);	return (val ^ deco146_xor) & (~deco146_mask);
-	case 0x784: /* was 0x21e */			val=((DECO_PORT(0xf4))&0xffff); val=((val&0xfff0)<<0) | ((val&0x0007)<<1) | ((val&0x0008)>>3);return (val ^ deco146_xor) & (~deco146_mask);
-	case 0x0de: /* was 0x7b0 */			val=((DECO_PORT(0xf4))&0xffff);	val=((val&0xfff0)>>4) | ((val&0x0007)<<13) | ((val&0x0008)<<9);return val ^ deco146_xor;
-	case 0x5be: /* was 0x7da */			val=((DECO_PORT(0xf4))&0xffff);val=((val&0xff00)>>8) | ((val&0x000f)<<12) | ((val&0x00f0)<<4);return (val ^ deco146_xor) & (~deco146_mask);
-	case 0x014: /* was 0x280 */			val=((DECO_PORT(0xb4))&0xffff);val=((val&0x000f)<<8) | ((val&0x00f0)<<8) | ((val&0xf000)>>12) | ((val&0x0f00)>>4);return val ^ deco146_xor;
-	case 0x682: /* was 0x416 */			val=((DECO_PORT(0x74))&0xffff);val=((val&0x000f)<<8) | ((val&0x00f0)>>4) | ((val&0xf000)>>0) | ((val&0x0f00)>>4);return val;
-	case 0x350: /* was 0xac */			val=((DECO_PORT(0xac))&0xffff);val=((val&0x000f)<<4) | ((val&0x00f0)<<4) | ((val&0xf000)>>0) | ((val&0x0f00)>>8);return (val ^ deco146_xor) & (~deco146_mask);
-	case 0x434: /* was 0x2c2 */			val=((DECO_PORT(0x74))&0xffff);	val=((val&0xf000)<<0) | ((val&0x0ff0)>>4) | ((val&0x000f)<<8);return val;
-	case 0x0a2: /* was 0x450 */			val=((DECO_PORT(0x22))&0xffff);	val=((val&0xff00)>>8) | ((val&0x00f0)<<4) | ((val&0x000f)<<12);return val;
-	case 0x20a: /* was 0x504 */			val=((DECO_PORT(0x22))&0xffff);	val=((val&0x000c)<<2) | ((val&0x0003)<<6)| ((val&0x0ff0)<<4);return val ^ deco146_xor;
-	case 0x7f0: /* was 0xfe */			val=((DECO_PORT(0x22))&0xffff);	val=((val&0x0fff)<<4);	return val;
-	case 0x038: /* was 0x1c0 */			deco146prot_buffer_ram_selected^=1;	return 0;  // 1c0 swap address
-	case 0x470: /* was 0xe2 */			deco146prot_buffer_ram_selected^=1;	val=((DECO_PORT(0x36))&0xffff);	return val ^ deco146_xor;
-	case 0x222: /* was 0x444 */			val=((DECO_PORT(0x50))&0xffff);	val=((val&0xfff0)>>4) | ((val&0x0007)<<13) | ((val&0x0008)<<9);	return val & (~deco146_mask);
-	case 0x562: /* was 0x46a */			val=((DECO_PORT(0x80))&0xffff);	val=((val&0xff00)>>8) | ((val&0x00f0)<<8)| ((val&0x0007)<<9) | ((val&0x0008)<<5);	return val;
-	case 0x010: /* was 0x80 */			return DECO_PORT(0x70);
-	case 0x4d0: /* was 0xb2 */			val=((DECO_PORT(0x14))&0xffff);val=((val&0x00f0)<<8);return (val ^ deco146_xor) & (~deco146_mask);
-	case 0x0a4: /* was 0x250 */			val=((DECO_PORT(0x68))&0xffff);	val=((val&0xf000)>>12) | ((val&0x0f00)<<4)| ((val&0x00f0)<<4) | ((val&0x000e)<<3) | ((val&0x0001)<<7);return (val ^ deco146_xor) & (~deco146_mask);
-	case 0x60c: /* was 0x306 */			val=((DECO_PORT(0x68))&0xffff);val=((val&0x00f0)<<8) | ((val&0xf000)>>4);return (val ^ deco146_xor);
-	case 0x106: /* was 0x608 */			val=((DECO_PORT(0x68))&0xffff);val=((val&0xf000)>>4) | ((val&0x0f00)>>4)| ((val&0x00f0)<<8) | ((val&0x000f)<<0);return val & (~deco146_mask);
-	case 0x74a: /* was 0x52e */			val=((DECO_PORT(0x68))&0xffff);val=((val&0xf000)>>4) | ((val&0x0f00)<<4)| ((val&0x00f0)<<0) | ((val&0x000f)<<0);return (val ^ deco146_xor) & (~deco146_mask);
-	case 0x5e6: /* was 0x67a */			val=((DECO_PORT(0x9c))&0xffff);val=((val&0xf000)>>8) | ((val&0x0ff0)<<4)| ((val&0x000f)<<0);return val;
-	case 0x436: /* was 0x6c2 */			val=((DECO_PORT(0x9c))&0xffff);val=((val&0x00f0)<<8) | ((val&0x000c)<<6)| ((val&0x0003)<<10);return (val ^ deco146_xor) & (~deco146_mask);
-	case 0x1bc: /* was 0x3d8 */			val=((DECO_PORT(0x7e))&0xffff);val=((val&0xf000)>>8) | ((val&0x0ff0)<<4)| ((val&0x000f)<<0);return val & (~deco146_mask);
-	case 0x224: /* was 0x244 */			val=((DECO_PORT(0x6e))&0xffff);val=((val&0x0f00)<<4) | ((val&0x00f0)>>0)| ((val&0x000f)<<8);return (val ^ deco146_xor) & (~deco146_mask);
-	case 0x17e: /* was 0x7e8 */			val=((DECO_PORT(0x9c))&0xffff);val=((val&0x0f00)<<4) | ((val&0xf000)>>4)| ((val&0x00ff)>>0);return (val ^ deco146_xor);
-	case 0x6e4: /* was 0x276 */			val=((DECO_PORT(0x7e))&0xffff);val=((val&0x00ff)<<8);return (val ^ deco146_xor) & (~deco146_mask);
-	case 0x02a: /* was 0x540 */			val=((DECO_PORT(0xca))&0xffff);val=((val&0x00f0)<<8) | ((val&0x0007)<<9) | ((val&0x0008)<<5);return val & (~deco146_mask);
-	case 0x43a: /* was 0x5c2 */			val=((DECO_PORT(0x7e))&0xffff);val=((val&0xf000)>>12) | ((val&0x0ff0)<<4)| ((val&0x000c)<<2)| ((val&0x0003)<<6);return val;
-	case 0x3a8: /* was 0x15c */			val=((DECO_PORT(0xc4))&0xffff);val=((val&0xff00)<<0) | ((val&0x000f)<<4) | ((val&0x00f0)>>4);return (val ^ deco146_xor);
-	case 0x340: /* was 0x2c */			val=((DECO_PORT(0x9c))&0xffff);val=((val&0x00ff)<<8);return val & (~deco146_mask);
-	}
-
-	//logerror("Protection PC %06x: warning - read fully unmapped protection address %04x\n", space.device().safe_pc(), offset);
-
-	return 0;
-}
-
-/**********************************************************************************/
-
-WRITE32_HANDLER( deco16_146_fghthist_prot_w )
-{
-	UINT16 addr = BITSWAP16(offset << 1, 0, 0, 0, 0, 0,     5,  6,  4,  7,  3,   8,  2,  9,  1,  10,   0);
-
-	deco146prot_last_write = addr;
-	deco146prot_last_write_val = data >> 16;
-
-	deco16_146_core_prot_w(space, addr, data >> 16, mem_mask >> 16);
-}
-
-READ32_HANDLER( deco16_146_fghthist_prot_r )
-{
-	UINT16 addr =  BITSWAP16(offset<<1,   15,14,13,12,11,    5,  6,  4,  7,  3,   8,  2,  9,  1,  10,   0);
-
-	UINT16 val;
-
-	/* Special case inputs, because this is the only game with an eprom */
-	switch (addr)
-	{
-	case 0x41a: /* was 0x582 */ return (space.machine().root_device().ioport("IN0")->read()<<16) | 0xffff; /* IN0 */
-	case 0x4e6: /* was 0x672 */ return (space.machine().root_device().ioport("IN1")->read()<<16) | 0xffff; /* IN1 */
-	case 0x320: /* was 0x04c */ return (space.machine().device<eeprom_device>("eeprom")->read_bit()<<16) | 0xffff;
-	}
-
-	
-
-
-
-	/* Handle 'one shots' - writing data to an address, then immediately reading it back */
-	if (deco146prot_last_write==addr)
-	{
-		//logerror("Hit one shot for %04x (return %04x)\n", addr, deco146prot_last_write_val);
-		deco146prot_last_write=-1;
-		return (deco146prot_last_write_val<<16)|0xffff;
-	}
-	deco146prot_last_write=-1;
-
-	val=deco16_146_core_prot_r(space, addr, mem_mask>>16);
-
-	// this debug code is based on the wrong address line setup (oldaddr)
-	UINT16 oldaddr=BITSWAP16(offset<<1, 0, 0, 0, 0, 0,     10, 1, 9, 2, 8, 3, 7, 4, 6, 5, 0); // debug only
-	if (oldaddr!=0x7b6 && oldaddr!=0x1c && oldaddr!=0x1e0 && oldaddr!=0x1d4
-		&& oldaddr!=0x2c4 && oldaddr!=0x7a4 && oldaddr!=0x30 // confirmed
-		&& oldaddr!=0x49a && oldaddr!=0x49c && oldaddr!=0x584 // confirmed
-		&& oldaddr!=0x162 // confirmed
-		&& oldaddr!=0x1a0 && oldaddr!=0x7f6 && oldaddr!=0x18 // confirmed
-		&& oldaddr!=0x422 && oldaddr!=0x794 // confirmed
-		&& oldaddr!=0xc0 && oldaddr!=0x280 && oldaddr!=0x1c0 && oldaddr!=0xe2 // confirmed
-		&& oldaddr!=0x6c0  // not confirmed butnot read
-		&& oldaddr!=0x1ae && oldaddr!=0x1d6 && oldaddr!=0x4f8 && oldaddr!=0x614 // cnofirmed
-		&& oldaddr!=0x5ae && oldaddr!=0x50a && oldaddr!=0x476 && oldaddr!=0x328 && oldaddr!=0x3e && oldaddr!=0x558 // dbl check these later
-		&& oldaddr!=0x444 && oldaddr!=0x46a // confirmed
-		&& space.device().safe_pc()!=0x16448 // hmm
-		&& oldaddr!=0x67a
-		&& oldaddr!=0x6c2 && oldaddr!=0xac && oldaddr!=0x416 && oldaddr!=0x2c2 // confirmed
-		&& oldaddr!=0x3d8
-		&& oldaddr!=0x250 && oldaddr!=0x306 && oldaddr!=0x608 && oldaddr!=0x52e // confirmed
-		&& oldaddr!=0x21e && oldaddr!=0x7b0 && oldaddr!=0x7da
-		&& oldaddr!=0xfe && oldaddr!=0x504 && oldaddr!=0x450  && oldaddr!=0x276 // confirmed
-		&& oldaddr!=0x76 && oldaddr!=0x714 && oldaddr!=0x642 && oldaddr!=0x7e8 && oldaddr!=0x244 // confirmed
-		&& oldaddr!=0x2ea && oldaddr!=0x254
-		&& oldaddr!=0x540 && oldaddr!=0x5c2 // confirmed
-		&& oldaddr!=0x15c // confirmed
-		&& oldaddr!=0x80 && oldaddr!=0xb2
-		&& oldaddr!=0x2c
-
-		&& oldaddr!=0x2e0  && oldaddr!=0x350  && oldaddr!=0x244  && oldaddr!=0x2c4  && oldaddr!=0xac  && oldaddr!=0x416 // not handled at all
-
-		// These oldaddresses are read but the value is never used, and there are no side effects from reading
-		// these oldaddresses - seems to purely be some code obfustication
-		&& oldaddr!=0x400 && oldaddr!=0x640 && oldaddr!= 0x4c0 && oldaddr!= 0x660 && oldaddr!=0x4e0 && oldaddr!=0x6e0 && oldaddr!=0x448 && oldaddr!=0x648 && oldaddr!=0x4c8 && oldaddr!=0x6c8 && oldaddr!=0x468 && oldaddr!=0x668 && oldaddr!=0x4e8 && oldaddr!=0x6e8 && oldaddr!=0x442 && oldaddr!=0x4c2 && oldaddr!=0x462 && oldaddr!=0x662
-		&& oldaddr!=0x4e2 && oldaddr!=0x6e2 && oldaddr!=0x44a && oldaddr!=0x64a && oldaddr!=0x4ca && oldaddr!=0x6ca && oldaddr!=0x66a && oldaddr!=0x4ea && oldaddr!=0x6ea
-		&& oldaddr!=0x440 && oldaddr!=0x460
-		)
-	{
-		logerror("Protection PC %06x: warning - read unmapped protection oldaddr %04x addr %04x (ret %04x)\n", space.device().safe_pc(), oldaddr, addr, val);
-		popmessage("Read protection port oldaddr %04x addr %04x", oldaddr, addr);
-	}
-	//  logerror("Protection PC %06x: warning - read unmapped protection oldaddr %04x addr %04x (ret %04x)\n", space.device().safe_pc(), oldaddr, addr, val);
-
-	return (val<<16)|0xffff;
-}
-
-WRITE16_HANDLER( deco16_146_nitroball_prot_w )
-{
-	UINT16 addr = BITSWAP16(offset << 1, 0, 0, 0, 0, 0,     1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 0);
-
-	deco16_146_core_prot_w(space, addr, data, mem_mask);
-}
-
-READ16_HANDLER( deco16_146_nitroball_prot_r )
-{
-	UINT16 addr = BITSWAP16(offset << 1, 0, 0, 0, 0, 0,     1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 0);
-
-	return deco16_146_core_prot_r(space, addr, mem_mask);
-}

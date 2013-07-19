@@ -139,6 +139,13 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(lockload_vbl_irq);
 	void updateAceRam();
 	void mixDualAlphaSprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx0, gfx_element *gfx1, int mixAlphaTilemap);
+
+	UINT16 port_a_fghthist(int unused);
+	UINT16 port_b_fghthist(int unused);
+	UINT16 port_c_fghthist(int unused);
+	READ32_MEMBER( fghthist_protection_region_0_146_r );
+	WRITE32_MEMBER( fghthist_protection_region_0_146_w );
+
 };
 
 class dragngun_state : public deco32_state
