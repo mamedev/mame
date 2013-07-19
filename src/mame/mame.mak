@@ -906,7 +906,7 @@ $(MAMEOBJ)/dataeast.a: \
 	$(DRIVERS)/vaportra.o $(VIDEO)/vaportra.o \
 	$(MACHINE)/deco102.o \
 	$(MACHINE)/decocrpt.o \
-	$(MACHINE)/decoprot.o \
+	$(MACHINE)/deco104.o \
 	$(MACHINE)/deco146.o \
 	$(VIDEO)/decbac06.o \
 	$(VIDEO)/deco16ic.o \

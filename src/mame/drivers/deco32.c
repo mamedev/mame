@@ -230,7 +230,6 @@ Notes:
 #include "cpu/m6809/m6809.h"
 #include "cpu/z80/z80.h"
 #include "includes/decocrpt.h"
-#include "includes/decoprot.h"
 #include "machine/eeprom.h"
 #include "includes/deco32.h"
 #include "sound/2151intf.h"

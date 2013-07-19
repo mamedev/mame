@@ -7,6 +7,7 @@
 #include "video/decospr.h"
 #include "video/deco16ic.h"
 #include "video/decocomn.h"
+#include "machine/deco104.h"
 
 class dietgo_state : public driver_device
 {

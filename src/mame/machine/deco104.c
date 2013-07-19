@@ -68,7 +68,7 @@
 
 #include "emu.h"
 #include "machine/eeprom.h"
-#include "includes/decoprot.h"
+#include "deco104.h"
 
 #define DECO_PORT(p) (prot_ram[p/2])
 
@@ -81,6 +81,34 @@ static UINT16 decoprot_buffer_ram2[0x800];
 
 static UINT16 *deco16_prot_ram;
 static UINT32 *deco32_prot_ram;
+
+
+
+
+const device_type DECO104PROT = &device_creator<deco104_device>;
+
+
+
+deco104_device::deco104_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, DECO104PROT, "DECO104PROT", tag, owner, clock, "deco104", __FILE__)
+{
+}
+
+
+void deco104_device::device_config_complete()
+{
+}
+
+void deco104_device::device_start()
+{
+
+}
+
+void deco104_device::device_reset()
+{
+
+}
+
 
 /***************************************************************************/
 

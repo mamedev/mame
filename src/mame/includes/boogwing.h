@@ -10,6 +10,7 @@
 #include "video/bufsprite.h"
 #include "video/decocomn.h"
 #include "video/decospr.h"
+#include "machine/deco104.h"
 
 class boogwing_state : public driver_device
 {

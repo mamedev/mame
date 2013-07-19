@@ -24,7 +24,6 @@ PAL16R6A 11H
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
 #include "includes/decocrpt.h"
-#include "includes/decoprot.h"
 #include "includes/dietgo.h"
 
 static ADDRESS_MAP_START( dietgo_map, AS_PROGRAM, 16, dietgo_state )

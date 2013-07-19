@@ -101,7 +101,6 @@
 #include "includes/decocrpt.h"
 #include "machine/eeprom.h"
 #include "sound/ymz280b.h"
-#include "includes/decoprot.h"
 #include "cpu/arm/arm.h"
 #include "cpu/sh2/sh2.h"
 #include "includes/deco_mlc.h"

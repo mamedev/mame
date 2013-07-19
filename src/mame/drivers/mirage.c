@@ -35,7 +35,6 @@ MR_01-.3A    [a0b758aa]
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "includes/decocrpt.h"
-#include "includes/decoprot.h"
 #include "video/deco16ic.h"
 #include "sound/okim6295.h"
 #include "video/bufsprite.h"
