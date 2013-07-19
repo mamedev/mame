@@ -101,12 +101,68 @@ void deco104_device::device_config_complete()
 
 void deco104_device::device_start()
 {
+	// double wing
+	save_item(NAME(m_008_data));
+	save_item(NAME(m_104_data));
+	save_item(NAME(m_406_data));
+	save_item(NAME(m_608_data));
+	save_item(NAME(m_70c_data));
+	save_item(NAME(m_78a_data));
+	save_item(NAME(m_088_data));
+	save_item(NAME(m_58c_data));
+	save_item(NAME(m_408_data));
+	save_item(NAME(m_40e_data));
+	save_item(NAME(m_080_data));
+	save_item(NAME(m_788_data));
+	save_item(NAME(m_38e_data));
+	save_item(NAME(m_580_data));
+	save_item(NAME(m_60a_data));
+	save_item(NAME(m_200_data));
+	save_item(NAME(m_28c_data));
+	save_item(NAME(m_18a_data));
+	save_item(NAME(m_280_data));
+	save_item(NAME(m_384_data));
 
+	save_item(NAME(m_boss_move));
+	save_item(NAME(m_boss_shoot_type));
+	save_item(NAME(m_boss_3_data));
+	save_item(NAME(m_boss_4_data));
+	save_item(NAME(m_boss_5_data));
+	save_item(NAME(m_boss_5sx_data));
+	save_item(NAME(m_boss_6_data));
 }
 
 void deco104_device::device_reset()
 {
+	// double wing
+	m_008_data = 0;
+	m_104_data = 0;
+	m_406_data = 0;
+	m_608_data = 0;
+	m_70c_data = 0;
+	m_78a_data = 0;
+	m_088_data = 0;
+	m_58c_data = 0;
+	m_408_data = 0;
+	m_40e_data = 0;
+	m_080_data = 0;
+	m_788_data = 0;
+	m_38e_data = 0;
+	m_580_data = 0;
+	m_60a_data = 0;
+	m_200_data = 0;
+	m_28c_data = 0;
+	m_18a_data = 0;
+	m_280_data = 0;
+	m_384_data = 0;
 
+	m_boss_move = 0;
+	m_boss_shoot_type = 0;
+	m_boss_3_data = 0;
+	m_boss_4_data = 0;
+	m_boss_5_data = 0;
+	m_boss_5sx_data = 0;
+	m_boss_6_data = 0;
 }
 
 
@@ -890,3 +946,211 @@ WRITE16_HANDLER( deco16_104_pktgaldx_prot_w )
 }
 
 /**********************************************************************************/
+
+
+
+/* protection.. involves more addresses than this .. */
+/* this is going to be typical deco '104' protection...
+ writes one place, reads back data shifted in another
+ the addresses below are the ones seen accessed by the
+ game so far...
+
+ we need to log the PC of each read/write and check to
+ see if the code makes any of them move obvious
+
+ 
+ 	// protection 
+//  AM_RANGE(0x280104, 0x280105) AM_WRITENOP              // ??
+//  AM_RANGE(0x2800ac, 0x2800ad) AM_READ_PORT("DSW")            // dips
+//  AM_RANGE(0x280298, 0x280299) AM_READ_PORT("SYSTEM")         // vbl
+//  AM_RANGE(0x280506, 0x280507) AM_READ_PORT("UNK")
+//  AM_RANGE(0x2802b4, 0x2802b5) AM_READ_PORT("P1_P2")          // inverted?
+//  AM_RANGE(0x280330, 0x280331) AM_READNOP               // sound?
+//  AM_RANGE(0x280380, 0x280381) AM_WRITENOP              // sound
+ */
+READ16_MEMBER(deco104_device::dblewing_prot_r)
+{
+	switch (offset * 2)
+	{
+		case 0x16a: return m_boss_move;          // boss 1 movement
+		case 0x6d6: return m_boss_move;          // boss 1 2nd pilot
+		case 0x748: return m_boss_move;          // boss 1 3rd pilot
+
+		case 0x566: return 0x0009;             // boss BGM,might be a variable one (read->write to the sound latch)
+		case 0x1ea: return m_boss_shoot_type;    // boss 1 shoot type
+		case 0x596: return m_boss_3_data;          // boss 3 appearing
+		case 0x692: return m_boss_4_data;
+		case 0x6b0: return m_boss_5_data;
+		case 0x51e: return m_boss_5sx_data;
+		case 0x784: return m_boss_6_data;
+
+		case 0x330: return 0; // controls bonuses such as shoot type,bombs etc.
+		case 0x1d4: return m_70c_data;  //controls restart points
+
+		case 0x0ac: return (ioport(":DSW")->read() & 0x40) << 4;//flip screen
+		case 0x4b0: return m_608_data;//coinage
+		case 0x068:
+		{
+			switch (ioport(":DSW")->read() & 0x0300) //I don't know how to relationate this...
+			{
+				case 0x0000: return 0x000;//0
+				case 0x0100: return 0x060;//3
+				case 0x0200: return 0x0d0;//6
+				case 0x0300: return 0x160;//b
+			}
+		}
+		case 0x094: return m_104_data;// p1 inputs select screen  OK
+		case 0x24c: return m_008_data;//read DSW (mirror for coinage/territory)
+		case 0x298: return ioport(":SYSTEM")->read();//vblank
+		case 0x476: return ioport(":SYSTEM")->read();//mirror for coins
+		case 0x506: return ioport(":DSW")->read();
+		case 0x5d8: return m_406_data;
+		case 0x2b4: return ioport(":P1_P2")->read();
+		case 0x1a8: return (ioport(":DSW")->read() & 0x4000) >> 12;//allow continue
+		case 0x3ec: return m_70c_data; //score entry
+		case 0x246: return m_580_data; // these three controls "perfect bonus" I suppose...
+		case 0x52e: return m_580_data;
+		case 0x532: return m_580_data;
+	}
+
+//  printf("dblewing prot r %08x, %04x, %04x\n", space.device().safe_pc(), offset * 2, mem_mask);
+
+	if ((offset*2) == 0x0f8) return 0; // m_080_data;
+	if ((offset*2) == 0x104) return 0;
+	if ((offset*2) == 0x10e) return 0;
+	if ((offset*2) == 0x206) return 0; // m_70c_data;
+	if ((offset*2) == 0x25c) return 0;
+	if ((offset*2) == 0x284) return 0; // 3rd player 2nd boss
+	if ((offset*2) == 0x432) return 0; // boss on water level?
+	if ((offset*2) == 0x54a) return 0; // 3rd player 2nd boss
+	if ((offset*2) == 0x786) return 0;
+
+	mame_printf_debug("dblewing prot r %08x, %04x, %04x\n", space.device().safe_pc(), offset * 2, mem_mask);
+
+	return 0;//machine().rand();
+}
+
+WRITE16_MEMBER(deco104_device::dblewing_prot_w)
+{
+//  if (offset * 2 != 0x380)
+//  printf("dblewing prot w %08x, %04x, %04x %04x\n", space.device().safe_pc(), offset * 2, mem_mask, data);
+	driver_device *drvstate = machine().driver_data<driver_device>();
+	cpu_device* cpudev = 0;
+
+	switch (offset * 2)
+	{
+		case 0x088:
+			m_088_data = data;
+			if(m_088_data == 0)          { m_boss_4_data = 0;    }
+			else if(m_088_data & 0x8000) { m_boss_4_data = 0x50; }
+			else                                { m_boss_4_data = 0x40; }
+
+			return;
+
+		case 0x104:
+			m_104_data = data;
+			return; // p1 inputs select screen  OK
+
+		case 0x18a:
+			m_18a_data = data;
+			switch (m_18a_data)
+			{
+				case 0x6b94: m_boss_5_data = 0x10; break; //initialize
+				case 0x7c68: m_boss_5_data = 0x60; break; //go up
+				case 0xfb1d: m_boss_5_data = 0x50; break;
+				case 0x977c: m_boss_5_data = 0x50; break;
+				case 0x8a49: m_boss_5_data = 0x60; break;
+			}
+			return;
+		case 0x200:
+			m_200_data = data;
+			switch (m_200_data)
+			{
+				case 0x5a19: m_boss_move = 1; break;
+				case 0x3b28: m_boss_move = 2; break;
+				case 0x1d4d: m_boss_move = 1; break;
+			}
+			//popmessage("%04x",m_200_data);
+			return;
+		case 0x280:
+			m_280_data = data;
+			switch (m_280_data)
+			{
+				case 0x6b94: m_boss_5sx_data = 0x10; break;
+				case 0x7519: m_boss_5sx_data = 0x60; break;
+				case 0xfc68: m_boss_5sx_data = 0x50; break;
+				case 0x02dd: m_boss_5sx_data = 0x50; break;
+				case 0x613c: m_boss_5sx_data = 0x50; break;
+			}
+			//printf("%04x\n",m_280_data);
+			return;
+		case 0x380: // sound write
+			drvstate->soundlatch_byte_w(space, 0, data & 0xff);
+			cpudev = (cpu_device*)machine().device(":audiocpu");
+			if (cpudev) cpudev->set_input_line(0, HOLD_LINE);
+
+
+		//	m_sound_irq |= 0x02;
+		//	m_audiocpu->set_input_line(0, (m_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
+			return;
+		case 0x384:
+			m_384_data = data;
+			switch(m_384_data)
+			{
+				case 0xaa41: m_boss_6_data = 1; break;
+				case 0x5a97: m_boss_6_data = 2; break;
+				case 0xbac5: m_boss_6_data = 3; break;
+				case 0x0afb: m_boss_6_data = 4; break;
+				case 0x6a99: m_boss_6_data = 5; break;
+				case 0xda8f: m_boss_6_data = 6; break;
+			}
+			return;
+		case 0x38e:
+			m_38e_data = data;
+			switch(m_38e_data)
+			{
+				case 0x6c13: m_boss_shoot_type = 3; break;
+				case 0xc311: m_boss_shoot_type = 0; break;
+				case 0x1593: m_boss_shoot_type = 1; break;
+				case 0xf9db: m_boss_shoot_type = 2; break;
+				case 0xf742: m_boss_shoot_type = 3; break;
+
+				case 0xeff5: m_boss_move = 1; break;
+				case 0xd2f1: m_boss_move = 2; break;
+				//default:   printf("%04x\n",m_38e_data); break;
+				//case 0xe65a: m_boss_shoot_type = 0; break;
+			}
+			return;
+		case 0x58c: // 3rd player 1st level
+			m_58c_data = data;
+			if(m_58c_data == 0)     { m_boss_move = 5; }
+			else                           { m_boss_move = 2; }
+
+			return;
+		case 0x60a:
+			m_60a_data = data;
+			if(m_60a_data & 0x8000) { m_boss_3_data = 2; }
+			else                           { m_boss_3_data = 9; }
+
+			return;
+		case 0x580:
+			m_580_data = data;
+			return;
+		case 0x406:
+			m_406_data = data;
+			return;  // p2 inputs select screen  OK
+	}
+
+//  printf("dblewing prot w %08x, %04x, %04x %04x\n", space.device().safe_pc(), offset * 2, mem_mask, data);
+
+	if ((offset * 2) == 0x008) { m_008_data = data; return; }
+	if ((offset * 2) == 0x080) { m_080_data = data; return; } // p3 3rd boss?
+	if ((offset * 2) == 0x28c) { m_28c_data = data; return; }
+	if ((offset * 2) == 0x408) { m_408_data = data; return; } // 3rd player 1st level?
+	if ((offset * 2) == 0x40e) { m_40e_data = data; return; } // 3rd player 2nd level?
+	if ((offset * 2) == 0x608) { m_608_data = data; return; }
+	if ((offset * 2) == 0x70c) { m_70c_data = data; return; }
+	if ((offset * 2) == 0x78a) { m_78a_data = data; return; }
+	if ((offset * 2) == 0x788) { m_788_data = data; return; }
+}
+
