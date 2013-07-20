@@ -292,6 +292,12 @@ void upd1771c_device::device_reset()
 	m_index = 0;
 	m_expected_bytes = 0;
 	m_pc3 = 0;
+	m_t_tpos = 0;
+	m_t_ppos = 0;
+	m_state = 0;
+	m_nw_tpos = 0;
+	memset(m_n_value, 0x00, sizeof(m_n_value));
+	memset(m_n_ppos, 0x00, sizeof(m_n_ppos));
 }
 
 
