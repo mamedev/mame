@@ -5,10 +5,14 @@
 
 *************************************************************************/
 
-#include "machine/taitoio.h"
 #include "audio/taitosnd.h"
 #include "machine/eeprom.h"
-#include "video/taitoic.h"
+#include "machine/taitoio.h"
+#include "video/tc0100scn.h"
+#include "video/tc0110pcr.h"
+#include "video/tc0150rod.h"
+#include "video/tc0480scp.h"
+
 
 class taitoz_state : public driver_device
 {

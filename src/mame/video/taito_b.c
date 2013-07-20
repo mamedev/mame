@@ -1,6 +1,5 @@
 #include "emu.h"
 #include "video/hd63484.h"
-#include "video/taitoic.h"
 #include "includes/taito_b.h"
 
 WRITE16_MEMBER(taitob_state::hitice_pixelram_w)

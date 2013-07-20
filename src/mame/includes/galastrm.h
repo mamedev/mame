@@ -1,6 +1,7 @@
-#include "video/taitoic.h"
-#include "video/poly.h"
 #include "machine/eeprom.h"
+#include "video/poly.h"
+#include "video/tc0100scn.h"
+#include "video/tc0480scp.h"
 
 struct tempsprite
 {

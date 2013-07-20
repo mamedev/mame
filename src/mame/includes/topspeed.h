@@ -3,8 +3,10 @@
     Top Speed / Full Throttle
 
 *************************************************************************/
+
 #include "sound/msm5205.h"
 #include "machine/taitoio.h"
+#include "video/pc080sn.h"
 
 class topspeed_state : public driver_device
 {

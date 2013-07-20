@@ -1,5 +1,6 @@
 #include "machine/eeprom.h"
-#include "video/taitoic.h"
+#include "video/tc0480scp.h"
+
 
 struct tempsprite
 {

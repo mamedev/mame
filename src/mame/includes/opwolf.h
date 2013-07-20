@@ -4,7 +4,8 @@
 
 *************************************************************************/
 #include "sound/msm5205.h"
-#include "video/taitoic.h"
+#include "video/pc080sn.h"
+#include "video/pc090oj.h"
 
 class opwolf_state : public driver_device
 {

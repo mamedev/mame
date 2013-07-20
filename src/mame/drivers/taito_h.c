@@ -144,7 +144,6 @@ some kind of zoom table?
 #include "cpu/m68000/m68000.h"
 #include "includes/taitoipt.h"
 #include "audio/taitosnd.h"
-#include "video/taitoic.h"
 #include "sound/2610intf.h"
 #include "includes/taito_h.h"
 

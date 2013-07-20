@@ -4,7 +4,7 @@
 
 *************************************************************************/
 
-#include "video/taitoic.h"
+#include "video/tc0080vco.h"
 
 class taitoo_state : public driver_device
 {

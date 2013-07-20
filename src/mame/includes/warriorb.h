@@ -4,10 +4,12 @@
 
 *************************************************************************/
 
-#include "sound/flt_vol.h"
 #include "audio/taitosnd.h"
 #include "machine/taitoio.h"
-#include "video/taitoic.h"
+#include "sound/flt_vol.h"
+#include "video/tc0100scn.h"
+#include "video/tc0110pcr.h"
+
 
 class warriorb_state : public driver_device
 {

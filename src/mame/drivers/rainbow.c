@@ -321,7 +321,6 @@ Stephh's notes (based on the game M68000 code and some tests) :
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "includes/taitoipt.h"
-#include "video/taitoic.h"
 #include "audio/taitosnd.h"
 #include "sound/2203intf.h"
 #include "sound/2151intf.h"

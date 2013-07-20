@@ -3,7 +3,8 @@
     Volfied
 
 *************************************************************************/
-#include "video/taitoic.h"
+
+#include "video/pc090oj.h"
 
 class volfied_state : public driver_device
 {

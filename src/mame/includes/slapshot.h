@@ -5,8 +5,9 @@
 *************************************************************************/
 
 #include "audio/taitosnd.h"
-#include "video/taitoic.h"
 #include "machine/taitoio.h"
+#include "video/tc0360pri.h"
+#include "video/tc0480scp.h"
 
 struct slapshot_tempsprite
 {

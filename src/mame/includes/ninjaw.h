@@ -4,10 +4,12 @@
 
 *************************************************************************/
 
+#include "audio/taitosnd.h"
 #include "machine/taitoio.h"
 #include "sound/flt_vol.h"
-#include "audio/taitosnd.h"
-#include "video/taitoic.h"
+#include "video/tc0100scn.h"
+#include "video/tc0110pcr.h"
+
 
 class ninjaw_state : public driver_device
 {

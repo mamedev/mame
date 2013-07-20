@@ -5,8 +5,10 @@
 *************************************************************************/
 
 #include "machine/taitoio.h"
-#include "video/taitoic.h"
 #include "sound/msm5205.h"
+#include "video/pc090oj.h"
+#include "video/tc0100scn.h"
+#include "video/tc0110pcr.h"
 
 class asuka_state : public driver_device
 {

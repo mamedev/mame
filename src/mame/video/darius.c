@@ -1,5 +1,4 @@
 #include "emu.h"
-#include "video/taitoic.h"
 #include "includes/darius.h"
 
 /***************************************************************************/

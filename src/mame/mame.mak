@@ -1762,7 +1762,17 @@ $(MAMEOBJ)/taito.a: \
 	$(AUDIO)/taitosnd.o \
 	$(AUDIO)/t5182.o \
 	$(MACHINE)/taitoio.o \
-	$(VIDEO)/taitoic.o \
+	$(VIDEO)/taito_helper.o \
+	$(VIDEO)/pc080sn.o \
+	$(VIDEO)/pc090oj.o \
+	$(VIDEO)/tc0080vco.o \
+	$(VIDEO)/tc0100scn.o \
+	$(VIDEO)/tc0150rod.o \
+	$(VIDEO)/tc0280grd.o \
+	$(VIDEO)/tc0360pri.o \
+	$(VIDEO)/tc0480scp.o \
+	$(VIDEO)/tc0110pcr.o \
+	$(VIDEO)/tc0180vcu.o \
 	$(AUDIO)/taito_zm.o \
 
 $(MAMEOBJ)/tatsumi.a: \

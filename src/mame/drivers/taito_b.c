@@ -187,7 +187,6 @@ TODO!
 #include "sound/2610intf.h"
 #include "sound/okim6295.h"
 #include "video/hd63484.h"
-#include "video/taitoic.h"
 #include "includes/taito_b.h"
 
 WRITE8_MEMBER(taitob_state::bankswitch_w)

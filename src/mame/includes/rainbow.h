@@ -3,7 +3,9 @@
     Rainbow Islands
 
 *************************************************************************/
-#include "video/taitoic.h"
+
+#include "video/pc080sn.h"
+#include "video/pc090oj.h"
 
 class rbisland_state : public driver_device
 {

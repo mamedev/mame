@@ -1,6 +1,10 @@
 #include "machine/taitoio.h"
 #include "sound/okim6295.h"
-#include "video/taitoic.h"
+#include "video/tc0100scn.h"
+#include "video/tc0110pcr.h"
+#include "video/tc0280grd.h"
+#include "video/tc0360pri.h"
+#include "video/tc0480scp.h"
 
 struct f2_tempsprite
 {

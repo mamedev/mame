@@ -1,5 +1,5 @@
-#include "video/taitoic.h"
 #include "machine/taitoio.h"
+#include "video/tc0180vcu.h"
 
 class taitob_state : public driver_device
 {

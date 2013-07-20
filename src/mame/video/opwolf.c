@@ -6,7 +6,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/taitoic.h"
 #include "includes/opwolf.h"
 
 

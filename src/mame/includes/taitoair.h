@@ -3,8 +3,9 @@
     Taito Air System
 
 *************************************************************************/
-#include "video/taitoic.h"
+
 #include "machine/taitoio.h"
+#include "video/tc0080vco.h"
 
 enum { TAITOAIR_FRAC_SHIFT = 16, TAITOAIR_POLY_MAX_PT = 16 };
 
