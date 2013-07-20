@@ -1962,8 +1962,10 @@ void i8086_common_cpu_device::execute_set_input( int inptnum, int state )
 			m_pending_irq |= NMI_IRQ;
 		}
 	}
-	else if(inptnum == INPUT_LINE_TEST)
+	else if (inptnum == INPUT_LINE_TEST)
+	{
 		m_test_state = state;
+	}
 	else
 	{
 		m_irq_state = state;
@@ -2891,10 +2893,11 @@ bool i8086_common_cpu_device::common_op(UINT8 op)
 			break;
 
 		case 0x9b: // i_wait
-			if(m_test_state)
+			// Wait for assertion of /TEST
+			if (m_test_state == 0)
 			{
 				m_icount = 0;
-				m_pc--;
+				m_ip--;
 			}
 			else
 				CLK(WAIT);
@@ -2934,8 +2937,7 @@ bool i8086_common_cpu_device::common_op(UINT8 op)
 		case 0xa1: // i_mov_axdisp
 			{
 				UINT32 addr = fetch_word();
-				m_regs.b[AL] = GetMemB(DS, addr);
-				m_regs.b[AH] = GetMemB(DS, addr+1);
+				m_regs.w[AX] = GetMemW(DS, addr);
 				CLK(MOV_AM16);
 			}
 			break;
@@ -2951,8 +2953,7 @@ bool i8086_common_cpu_device::common_op(UINT8 op)
 		case 0xa3: // i_mov_dispax
 			{
 				UINT32 addr = fetch_word();
-				PutMemB(DS, addr, m_regs.b[AL]);
-				PutMemB(DS, addr+1, m_regs.b[AH]);
+				PutMemW(DS, addr, m_regs.w[AX]);
 				CLK(MOV_MA16);
 			}
 			break;
