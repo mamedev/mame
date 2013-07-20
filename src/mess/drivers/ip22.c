@@ -871,6 +871,7 @@ WRITE32_MEMBER(ip22_state::rtc_w)
 			RTC_RAMMSB = data;
 			break;
 		case 0x0053:
+			assert(((RTC_RAMMSB << 8) | RTC_RAMLSB) >= 0 && ((RTC_RAMMSB << 8) | RTC_RAMLSB) < 0x800);
 			m_RTC.nRAM[ ( RTC_RAMMSB << 8 ) | RTC_RAMLSB ] = data;
 			break;
 		default:
