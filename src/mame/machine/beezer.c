@@ -124,7 +124,7 @@ READ8_MEMBER(beezer_state::b_via_1_pa_r)
 
 READ8_MEMBER(beezer_state::b_via_1_pb_r)
 {
-	return 0x1F | (beezer_noise_r(machine().device("custom"), space, 0)?0x40:0);
+	return 0x1F | (m_custom->noise_r(space, 0)?0x40:0);
 }
 
 WRITE8_MEMBER(beezer_state::b_via_1_pa_w)
@@ -134,7 +134,7 @@ WRITE8_MEMBER(beezer_state::b_via_1_pa_w)
 
 WRITE8_MEMBER(beezer_state::b_via_1_pb_w)
 {
-	beezer_timer1_w(machine().device("custom"), space, 0, data&0x80);
+	m_custom->timer1_w(space, 0, data&0x80);
 	//if ((data&0x1f) != 0x01)
 	//  popmessage("via1 pb low write of 0x%02x is not supported! contact mamedev!", data&0x1f);
 }
