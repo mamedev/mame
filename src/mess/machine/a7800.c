@@ -136,7 +136,7 @@ void a7800_state::machine_reset()
 	/* pokey cartridge */
 	if (m_cart_type & 0x01)
 	{
-		space.install_readwrite_handler(0x4000, 0x7FFF, read8_delegate(FUNC(pokey_device::read),(pokey_device*)m_pokey), write8_delegate(FUNC(pokey_device::write),(pokey_device*)m_pokey));
+		space.install_readwrite_handler(0x0450, 0x045F, read8_delegate(FUNC(pokey_device::read),(pokey_device*)m_pokey), write8_delegate(FUNC(pokey_device::write),(pokey_device*)m_pokey));
 	}
 }
 
