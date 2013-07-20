@@ -150,12 +150,6 @@ INTERRUPT_GEN_MEMBER(stfight_state::stfight_vb_interrupt)
  *      Hardware handlers
  */
 
-// Perhaps define dipswitches as active low?
-READ8_MEMBER(stfight_state::stfight_dsw_r)
-{
-	return( ~ioport(offset ? "DSW1" : "DSW0")->read() );
-}
-
 READ8_MEMBER(stfight_state::stfight_coin_r)
 {
 	int coin_mech_data;

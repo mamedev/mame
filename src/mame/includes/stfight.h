@@ -39,7 +39,6 @@ public:
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_tx_tilemap;
 	int m_sprite_base;
-	DECLARE_READ8_MEMBER(stfight_dsw_r);
 	DECLARE_READ8_MEMBER(stfight_coin_r);
 	DECLARE_WRITE8_MEMBER(stfight_coin_w);
 	DECLARE_WRITE8_MEMBER(stfight_e800_w);
@@ -75,7 +74,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(stfight_adpcm_int);
 
 	/*
-		Cross Shooter MCU specifics
+		MCU specifics
 	*/
 
 	DECLARE_READ8_MEMBER(cshooter_68705_port_a_r);
