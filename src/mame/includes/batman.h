@@ -12,9 +12,12 @@ class batman_state : public atarigen_state
 public:
 	batman_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atarigen_state(mconfig, type, tag),
-			m_jsa(*this, "jsa") { }
+			m_jsa(*this, "jsa"),
+			m_alpha_tilemap(*this, "alpha") { }
 
 	required_device<atari_jsa_iii_device> m_jsa;
+	
+	required_device<tilemap_device> m_alpha_tilemap;
 
 	UINT16          m_latch_data;
 

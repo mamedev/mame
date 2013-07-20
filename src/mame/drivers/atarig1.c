@@ -213,8 +213,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, atarig1_state )
 	AM_RANGE(0xfe8000, 0xfe89ff) AM_RAM_WRITE(paletteram_666_w) AM_SHARE("paletteram")
 	AM_RANGE(0xff0000, 0xff0fff) AM_DEVREADWRITE_LEGACY("rle", atarirle_spriteram_r, atarirle_spriteram_w)
 	AM_RANGE(0xff2000, 0xff2001) AM_WRITE(mo_command_w) AM_SHARE("mo_command")
-	AM_RANGE(0xff4000, 0xff5fff) AM_WRITE(playfield_w) AM_SHARE("playfield")
-	AM_RANGE(0xff6000, 0xff6fff) AM_WRITE(alpha_w) AM_SHARE("alpha")
+	AM_RANGE(0xff4000, 0xff5fff) AM_DEVWRITE("playfield", tilemap_device, write) AM_SHARE("playfield")
+	AM_RANGE(0xff6000, 0xff6fff) AM_DEVWRITE("alpha", tilemap_device, write) AM_SHARE("alpha")
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -451,6 +451,10 @@ static MACHINE_CONFIG_START( atarig1, atarig1_state )
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_GFXDECODE(atarig1)
 	MCFG_PALETTE_LENGTH(1280)
+
+	/* initialize the playfield */
+	MCFG_TILEMAP_ADD_STANDARD("playfield", 2, atarig1_state, get_playfield_tile_info, 8,8, SCAN_ROWS, 64,64)
+	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", 2, atarig1_state, get_alpha_tile_info, 8,8, SCAN_ROWS, 64,32, 0)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	/* note: these parameters are from published specs, not derived */

@@ -203,7 +203,7 @@ WRITE16_MEMBER(dooyong_state::rshark_ctrl_w)
    when the x scroll moves out of range (trying to decode the whole lot
    at once uses hundreds of megabytes of RAM). */
 
-INLINE void lastday_get_tile_info(running_machine &machine, tile_data &tileinfo, int tile_index,
+inline void dooyong_state::lastday_get_tile_info(tile_data &tileinfo, int tile_index,
 		const UINT8 *tilerom, UINT8 *scroll, int graphics)
 {
 	int offs = (tile_index + ((int)scroll[1] << 6)) * 2;
@@ -238,10 +238,10 @@ INLINE void lastday_get_tile_info(running_machine &machine, tile_data &tileinfo,
 		flags = ((attr & 0x40) ? TILE_FLIPX : 0) | ((attr & 0x80) ? TILE_FLIPY : 0);
 	}
 
-	SET_TILE_INFO(graphics, code, color, flags);
+	SET_TILE_INFO_MEMBER(graphics, code, color, flags);
 }
 
-INLINE void rshark_get_tile_info(running_machine &machine, tile_data &tileinfo, int tile_index,
+inline void dooyong_state::rshark_get_tile_info(tile_data &tileinfo, int tile_index,
 		const UINT8 *tilerom1, const UINT8 *tilerom2, UINT8 *scroll, int graphics)
 {
 		/* Tiles take two bytes in tile ROM 1:
@@ -258,39 +258,39 @@ INLINE void rshark_get_tile_info(running_machine &machine, tile_data &tileinfo, 
 	int color = tilerom2[offs] & 0x0f;
 	int flags = ((attr & 0x40) ? TILE_FLIPX : 0) | ((attr & 0x80) ? TILE_FLIPY : 0);
 
-	SET_TILE_INFO(graphics, code, color, flags);
+	SET_TILE_INFO_MEMBER(graphics, code, color, flags);
 }
 
 TILE_GET_INFO_MEMBER(dooyong_state::get_bg_tile_info)
 {
 	if (m_bg_tilerom2 != NULL)
-		rshark_get_tile_info(machine(), tileinfo, tile_index, m_bg_tilerom, m_bg_tilerom2, m_bgscroll8, m_bg_gfx);
+		rshark_get_tile_info(tileinfo, tile_index, m_bg_tilerom, m_bg_tilerom2, m_bgscroll8, m_bg_gfx);
 	else
-		lastday_get_tile_info(machine(), tileinfo, tile_index, m_bg_tilerom, m_bgscroll8, m_bg_gfx);
+		lastday_get_tile_info(tileinfo, tile_index, m_bg_tilerom, m_bgscroll8, m_bg_gfx);
 }
 
 TILE_GET_INFO_MEMBER(dooyong_state::get_bg2_tile_info)
 {
 	if (m_bg2_tilerom2 != NULL)
-		rshark_get_tile_info(machine(), tileinfo, tile_index, m_bg2_tilerom, m_bg2_tilerom2, m_bg2scroll8, m_bg2_gfx);
+		rshark_get_tile_info(tileinfo, tile_index, m_bg2_tilerom, m_bg2_tilerom2, m_bg2scroll8, m_bg2_gfx);
 	else
-		lastday_get_tile_info(machine(), tileinfo, tile_index, m_bg2_tilerom, m_bg2scroll8, m_bg2_gfx);
+		lastday_get_tile_info(tileinfo, tile_index, m_bg2_tilerom, m_bg2scroll8, m_bg2_gfx);
 }
 
 TILE_GET_INFO_MEMBER(dooyong_state::get_fg_tile_info)
 {
 	if (m_fg_tilerom2 != NULL)
-		rshark_get_tile_info(machine(), tileinfo, tile_index, m_fg_tilerom, m_fg_tilerom2, m_fgscroll8, m_fg_gfx);
+		rshark_get_tile_info(tileinfo, tile_index, m_fg_tilerom, m_fg_tilerom2, m_fgscroll8, m_fg_gfx);
 	else
-		lastday_get_tile_info(machine(), tileinfo, tile_index, m_fg_tilerom, m_fgscroll8, m_fg_gfx);
+		lastday_get_tile_info(tileinfo, tile_index, m_fg_tilerom, m_fgscroll8, m_fg_gfx);
 }
 
 TILE_GET_INFO_MEMBER(dooyong_state::get_fg2_tile_info)
 {
 	if (m_fg2_tilerom2 != NULL)
-		rshark_get_tile_info(machine(), tileinfo, tile_index, m_fg2_tilerom, m_fg2_tilerom2, m_fg2scroll8, m_fg2_gfx);
+		rshark_get_tile_info(tileinfo, tile_index, m_fg2_tilerom, m_fg2_tilerom2, m_fg2scroll8, m_fg2_gfx);
 	else
-		lastday_get_tile_info(machine(), tileinfo, tile_index, m_fg2_tilerom, m_fg2scroll8, m_fg2_gfx);
+		lastday_get_tile_info(tileinfo, tile_index, m_fg2_tilerom, m_fg2scroll8, m_fg2_gfx);
 }
 
 /* flytiger uses some palette banking technique or something maybe a trash protection */

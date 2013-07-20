@@ -172,6 +172,9 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(h8_timer_irq);
 	required_device<cpu_device> m_maincpu;
 	optional_device<okim6295_device> m_oki;
+
+private:
+	inline void ss9601_get_tile_info(layer_t *l, tile_data &tileinfo, tilemap_memory_index tile_index);
 };
 
 
@@ -180,7 +183,7 @@ public:
                               Tilemaps Access
 ***************************************************************************/
 
-INLINE void ss9601_get_tile_info(layer_t *l, running_machine &machine, tile_data &tileinfo, tilemap_memory_index tile_index, void *param)
+inline void subsino2_state::ss9601_get_tile_info(layer_t *l, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int addr;
 	UINT16 offs;
@@ -191,19 +194,19 @@ INLINE void ss9601_get_tile_info(layer_t *l, running_machine &machine, tile_data
 		case TILE_8x32:     addr = tile_index & (~0x180);   offs = (tile_index/0x80) & 3;                           break;
 		case TILE_64x32:    addr = tile_index & (~0x187);   offs = ((tile_index/0x80) & 3) + (tile_index & 7) * 4;  break;
 	}
-	SET_TILE_INFO(0, (l->videorams[VRAM_HI][addr] << 8) + l->videorams[VRAM_LO][addr] + offs, 0, 0);
+	SET_TILE_INFO_MEMBER(0, (l->videorams[VRAM_HI][addr] << 8) + l->videorams[VRAM_LO][addr] + offs, 0, 0);
 }
 
 // Layer 0
 TILE_GET_INFO_MEMBER(subsino2_state::ss9601_get_tile_info_0)
 {
-	ss9601_get_tile_info(&m_layers[0], machine(), tileinfo, tile_index, param);
+	ss9601_get_tile_info(&m_layers[0], tileinfo, tile_index);
 }
 
 // Layer 1
 TILE_GET_INFO_MEMBER(subsino2_state::ss9601_get_tile_info_1)
 {
-	ss9601_get_tile_info(&m_layers[1], machine(), tileinfo, tile_index, param);
+	ss9601_get_tile_info(&m_layers[1], tileinfo, tile_index);
 }
 
 

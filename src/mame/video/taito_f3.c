@@ -402,7 +402,7 @@ static void print_debug_info(running_machine &machine, bitmap_rgb32 &bitmap)
 
 /******************************************************************************/
 
-INLINE void get_tile_info(running_machine &machine, tile_data &tileinfo, int tile_index, UINT16 *gfx_base)
+inline void taito_f3_state::get_tile_info(tile_data &tileinfo, int tile_index, UINT16 *gfx_base)
 {
 	UINT32 tile=(gfx_base[tile_index*2+0]<<16)|(gfx_base[tile_index*2+1]&0xffff);
 	UINT8 abtype=(tile>>(16+9)) & 1;
@@ -411,7 +411,7 @@ INLINE void get_tile_info(running_machine &machine, tile_data &tileinfo, int til
 	// This fixes (at least) the rain in round 6 of Arabian Magic.
 	UINT8 extra_planes = ((tile>>(16+10)) & 3); // 0 = 4bpp, 1 = 5bpp, 2 = unused?, 3 = 6bpp
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			1,
 			tile&0xffff,
 			(tile>>16) & 0x1ff & (~extra_planes),
@@ -422,42 +422,42 @@ INLINE void get_tile_info(running_machine &machine, tile_data &tileinfo, int til
 
 TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info1)
 {
-	get_tile_info(machine(),tileinfo,tile_index,m_f3_pf_data_1);
+	get_tile_info(tileinfo,tile_index,m_f3_pf_data_1);
 }
 
 TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info2)
 {
-	get_tile_info(machine(),tileinfo,tile_index,m_f3_pf_data_2);
+	get_tile_info(tileinfo,tile_index,m_f3_pf_data_2);
 }
 
 TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info3)
 {
-	get_tile_info(machine(),tileinfo,tile_index,m_f3_pf_data_3);
+	get_tile_info(tileinfo,tile_index,m_f3_pf_data_3);
 }
 
 TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info4)
 {
-	get_tile_info(machine(),tileinfo,tile_index,m_f3_pf_data_4);
+	get_tile_info(tileinfo,tile_index,m_f3_pf_data_4);
 }
 
 TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info5)
 {
-	get_tile_info(machine(),tileinfo,tile_index,m_f3_pf_data_5);
+	get_tile_info(tileinfo,tile_index,m_f3_pf_data_5);
 }
 
 TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info6)
 {
-	get_tile_info(machine(),tileinfo,tile_index,m_f3_pf_data_6);
+	get_tile_info(tileinfo,tile_index,m_f3_pf_data_6);
 }
 
 TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info7)
 {
-	get_tile_info(machine(),tileinfo,tile_index,m_f3_pf_data_7);
+	get_tile_info(tileinfo,tile_index,m_f3_pf_data_7);
 }
 
 TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info8)
 {
-	get_tile_info(machine(),tileinfo,tile_index,m_f3_pf_data_8);
+	get_tile_info(tileinfo,tile_index,m_f3_pf_data_8);
 }
 
 

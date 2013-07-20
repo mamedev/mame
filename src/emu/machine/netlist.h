@@ -1165,7 +1165,7 @@ public:
 
 // device finder template
 template<bool _Required, class _NETClass>
-class netlist_mame_device::output_finder : public device_t::object_finder_base<_NETClass>,
+class netlist_mame_device::output_finder : public object_finder_base<_NETClass>,
 		netlist_mame_device::on_device_start
 {
 public:

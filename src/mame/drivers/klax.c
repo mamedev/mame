@@ -83,9 +83,9 @@ static ADDRESS_MAP_START( klax_map, AS_PROGRAM, 16, klax_state )
 	AM_RANGE(0x2e0000, 0x2e0001) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x360000, 0x360001) AM_WRITE(interrupt_ack_w)
 	AM_RANGE(0x3e0000, 0x3e07ff) AM_RAM_WRITE(expanded_paletteram_666_w) AM_SHARE("paletteram")
-	AM_RANGE(0x3f0000, 0x3f0f7f) AM_RAM_WRITE(playfield_w) AM_SHARE("playfield")
+	AM_RANGE(0x3f0000, 0x3f0f7f) AM_RAM_DEVWRITE("playfield", tilemap_device, write) AM_SHARE("playfield")
 	AM_RANGE(0x3f0f80, 0x3f0fff) AM_READWRITE_LEGACY(atarimo_0_slipram_r, atarimo_0_slipram_w)
-	AM_RANGE(0x3f1000, 0x3f1fff) AM_RAM_WRITE(playfield_upper_w) AM_SHARE("playfield_up")
+	AM_RANGE(0x3f1000, 0x3f1fff) AM_RAM_DEVWRITE("playfield", tilemap_device, write_ext) AM_SHARE("playfield_ext")
 	AM_RANGE(0x3f2000, 0x3f27ff) AM_READWRITE_LEGACY(atarimo_0_spriteram_r, atarimo_0_spriteram_w)
 	AM_RANGE(0x3f2800, 0x3f3fff) AM_RAM
 ADDRESS_MAP_END
@@ -169,6 +169,8 @@ static MACHINE_CONFIG_START( klax, klax_state )
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_GFXDECODE(klax)
 	MCFG_PALETTE_LENGTH(512)
+
+	MCFG_TILEMAP_ADD_STANDARD("playfield", 2, klax_state, get_playfield_tile_info, 8,8, SCAN_COLS, 64,32)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	/* note: these parameters are from published specs, not derived */

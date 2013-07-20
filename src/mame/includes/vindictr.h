@@ -12,8 +12,12 @@ class vindictr_state : public atarigen_state
 public:
 	vindictr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atarigen_state(mconfig, type, tag),
+			m_playfield_tilemap(*this, "playfield"),
+			m_alpha_tilemap(*this, "alpha"),
 			m_jsa(*this, "jsa") { }
 
+	required_device<tilemap_device> m_playfield_tilemap;
+	required_device<tilemap_device> m_alpha_tilemap;
 	required_device<atari_jsa_i_device> m_jsa;
 	UINT8           m_playfield_tile_bank;
 	UINT16          m_playfield_xscroll;

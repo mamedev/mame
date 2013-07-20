@@ -19,7 +19,7 @@
 
 TILE_GET_INFO_MEMBER(atarisy2_state::get_alpha_tile_info)
 {
-	UINT16 data = m_alpha[tile_index];
+	UINT16 data = tilemap.basemem_read(tile_index);
 	int code = data & 0x3ff;
 	int color = (data >> 13) & 0x07;
 	SET_TILE_INFO_MEMBER(2, code, color, 0);
@@ -28,7 +28,7 @@ TILE_GET_INFO_MEMBER(atarisy2_state::get_alpha_tile_info)
 
 TILE_GET_INFO_MEMBER(atarisy2_state::get_playfield_tile_info)
 {
-	UINT16 data = m_playfield[tile_index];
+	UINT16 data = tilemap.basemem_read(tile_index);
 	int code = m_playfield_tile_bank[(data >> 10) & 1] + (data & 0x3ff);
 	int color = (data >> 11) & 7;
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
@@ -83,18 +83,11 @@ VIDEO_START_MEMBER(atarisy2_state,atarisy2)
 	};
 
 	/* initialize banked memory */
-	m_alpha.set_target(&m_vram[0x0000], 0x2000);
-	m_playfield.set_target(&m_vram[0x2000], 0x2000);
-
-	/* initialize the playfield */
-	m_playfield_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(atarisy2_state::get_playfield_tile_info),this), TILEMAP_SCAN_ROWS,  8,8, 128,64);
+	m_alpha_tilemap->basemem().set(&m_vram[0x0000], 0x2000, 16, ENDIANNESS_NATIVE, 2);
+	m_playfield_tilemap->basemem().set(&m_vram[0x2000], 0x2000, 16, ENDIANNESS_NATIVE, 2);
 
 	/* initialize the motion objects */
 	atarimo_init(machine(), 0, &modesc);
-
-	/* initialize the alphanumerics */
-	m_alpha_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(atarisy2_state::get_alpha_tile_info),this), TILEMAP_SCAN_ROWS,  8,8, 64,48);
-	m_alpha_tilemap->set_transparent_pen(0);
 
 	/* reset the statics */
 	m_yscroll_reset_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(atarisy2_state::reset_yscroll_callback),this));
@@ -260,10 +253,7 @@ WRITE16_MEMBER( atarisy2_state::videoram_w )
 
 	/* alpharam? */
 	if (offs < 0x0c00)
-	{
-		COMBINE_DATA(&m_alpha[offs]);
-		m_alpha_tilemap->mark_tile_dirty(offs);
-	}
+		m_alpha_tilemap->write(space, offs, data, mem_mask);
 
 	/* spriteram? */
 	else if (offs < 0x1000)
@@ -276,11 +266,7 @@ WRITE16_MEMBER( atarisy2_state::videoram_w )
 
 	/* playfieldram? */
 	else if (offs >= 0x2000)
-	{
-		offs -= 0x2000;
-		COMBINE_DATA(&m_playfield[offs]);
-		m_playfield_tilemap->mark_tile_dirty(offs);
-	}
+		m_playfield_tilemap->write(space, offs - 0x2000, data, mem_mask);
 
 	/* generic case */
 	else

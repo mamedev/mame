@@ -217,11 +217,10 @@ static void set_pens( running_machine &machine )
 
 ***************************************************************************/
 
-INLINE void get_tile_info( running_machine &machine, tile_data &tileinfo, int tile_index, int GFX )
+inline void cave_state::get_tile_info( tile_data &tileinfo, int tile_index, int GFX )
 {
-	cave_state *state = machine.driver_data<cave_state>();
-	UINT16 *VRAM = state->m_vram[GFX];
-	int TDIM = state->m_tiledim[GFX];
+	UINT16 *VRAM = m_vram[GFX];
+	int TDIM = m_tiledim[GFX];
 	UINT32 code, color, pri, tile;
 
 	if (TDIM)
@@ -245,7 +244,7 @@ INLINE void get_tile_info( running_machine &machine, tile_data &tileinfo, int ti
 		code  = (code & 0x00ffffff);
 	}
 
-	SET_TILE_INFO( GFX, code, color, 0 );
+	SET_TILE_INFO_MEMBER( GFX, code, color, 0 );
 	tileinfo.category = pri;
 }
 
@@ -338,10 +337,10 @@ INLINE void vram_8x8_w( address_space &space, ATTR_UNUSED offs_t offset, ATTR_UN
 }
 
 
-TILE_GET_INFO_MEMBER(cave_state::get_tile_info_0){ get_tile_info(machine(), tileinfo, tile_index, 0); }
-TILE_GET_INFO_MEMBER(cave_state::get_tile_info_1){ get_tile_info(machine(), tileinfo, tile_index, 1); }
-TILE_GET_INFO_MEMBER(cave_state::get_tile_info_2){ get_tile_info(machine(), tileinfo, tile_index, 2); }
-TILE_GET_INFO_MEMBER(cave_state::get_tile_info_3){ get_tile_info(machine(), tileinfo, tile_index, 3); }
+TILE_GET_INFO_MEMBER(cave_state::get_tile_info_0){ get_tile_info(tileinfo, tile_index, 0); }
+TILE_GET_INFO_MEMBER(cave_state::get_tile_info_1){ get_tile_info(tileinfo, tile_index, 1); }
+TILE_GET_INFO_MEMBER(cave_state::get_tile_info_2){ get_tile_info(tileinfo, tile_index, 2); }
+TILE_GET_INFO_MEMBER(cave_state::get_tile_info_3){ get_tile_info(tileinfo, tile_index, 3); }
 
 WRITE16_MEMBER(cave_state::cave_vram_0_w){ vram_w(space, offset, data, mem_mask, 0); }
 WRITE16_MEMBER(cave_state::cave_vram_1_w){ vram_w(space, offset, data, mem_mask, 1); }

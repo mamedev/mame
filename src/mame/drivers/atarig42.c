@@ -348,8 +348,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, atarig42_state )
 	AM_RANGE(0xfa0000, 0xfa0fff) AM_READWRITE(eeprom_r, eeprom_w) AM_SHARE("eeprom")
 	AM_RANGE(0xfc0000, 0xfc0fff) AM_RAM_WRITE(paletteram_666_w) AM_SHARE("paletteram")
 	AM_RANGE(0xff0000, 0xff0fff) AM_DEVREADWRITE_LEGACY("rle", atarirle_spriteram_r, atarirle_spriteram_w)
-	AM_RANGE(0xff2000, 0xff5fff) AM_WRITE(playfield_w) AM_SHARE("playfield")
-	AM_RANGE(0xff6000, 0xff6fff) AM_WRITE(alpha_w) AM_SHARE("alpha")
+	AM_RANGE(0xff2000, 0xff5fff) AM_DEVWRITE("playfield", tilemap_device, write) AM_SHARE("playfield")
+	AM_RANGE(0xff6000, 0xff6fff) AM_DEVWRITE("alpha", tilemap_device, write) AM_SHARE("alpha")
 	AM_RANGE(0xff7000, 0xff7001) AM_WRITE(mo_command_w) AM_SHARE("mo_command")
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
@@ -557,6 +557,9 @@ static MACHINE_CONFIG_START( atarig42, atarig42_state )
 	MCFG_GFXDECODE(atarig42)
 	MCFG_PALETTE_LENGTH(2048)
 
+	MCFG_TILEMAP_ADD_CUSTOM("playfield", 2, atarig42_state, get_playfield_tile_info, 8,8, atarig42_playfield_scan, 128,64)
+	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", 2, atarig42_state, get_alpha_tile_info, 8,8, SCAN_ROWS, 64,32, 0)
+
 	MCFG_SCREEN_ADD("screen", RASTER)
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses an SOS chip to generate video signals */
@@ -590,7 +593,6 @@ MACHINE_CONFIG_END
  *  ROM definition(s)
  *
  *************************************/
-
 
 ROM_START( roadriot )
 	ROM_REGION( 0x80004, "maincpu", 0 ) /* 68000 code */

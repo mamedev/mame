@@ -92,6 +92,7 @@ typedef device_t * (*machine_config_constructor)(machine_config &config, device_
 
 // devices and callbacks
 #include "device.h"
+#include "devfind.h"
 #include "distate.h"
 #include "dimemory.h"
 #include "diexec.h"

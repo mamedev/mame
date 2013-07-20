@@ -18,7 +18,7 @@
 
 TILE_GET_INFO_MEMBER(batman_state::get_alpha_tile_info)
 {
-	UINT16 data = m_alpha[tile_index];
+	UINT16 data = tilemap.basemem_read(tile_index);
 	int code = ((data & 0x400) ? (m_alpha_tile_bank * 0x400) : 0) + (data & 0x3ff);
 	int color = (data >> 11) & 0x0f;
 	int opaque = data & 0x8000;
@@ -28,8 +28,8 @@ TILE_GET_INFO_MEMBER(batman_state::get_alpha_tile_info)
 
 TILE_GET_INFO_MEMBER(batman_state::get_playfield_tile_info)
 {
-	UINT16 data1 = m_playfield[tile_index];
-	UINT16 data2 = m_playfield_upper[tile_index] & 0xff;
+	UINT16 data1 = tilemap.basemem_read(tile_index);
+	UINT16 data2 = tilemap.extmem_read(tile_index) & 0xff;
 	int code = data1 & 0x7fff;
 	int color = 0x10 + (data2 & 0x0f);
 	SET_TILE_INFO_MEMBER(0, code, color, (data1 >> 15) & 1);
@@ -39,8 +39,8 @@ TILE_GET_INFO_MEMBER(batman_state::get_playfield_tile_info)
 
 TILE_GET_INFO_MEMBER(batman_state::get_playfield2_tile_info)
 {
-	UINT16 data1 = m_playfield2[tile_index];
-	UINT16 data2 = m_playfield_upper[tile_index] >> 8;
+	UINT16 data1 = tilemap.basemem_read(tile_index);
+	UINT16 data2 = tilemap.extmem_read(tile_index) >> 8;
 	int code = data1 & 0x7fff;
 	int color = data2 & 0x0f;
 	SET_TILE_INFO_MEMBER(0, code, color, (data1 >> 15) & 1);
@@ -94,19 +94,8 @@ VIDEO_START_MEMBER(batman_state,batman)
 		NULL                /* callback routine for special entries */
 	};
 
-	/* initialize the playfield */
-	m_playfield_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(batman_state::get_playfield_tile_info),this), TILEMAP_SCAN_COLS,  8,8, 64,64);
-
-	/* initialize the second playfield */
-	m_playfield2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(batman_state::get_playfield2_tile_info),this), TILEMAP_SCAN_COLS,  8,8, 64,64);
-	m_playfield2_tilemap->set_transparent_pen(0);
-
 	/* initialize the motion objects */
 	atarimo_init(machine(), 0, &modesc);
-
-	/* initialize the alphanumerics */
-	m_alpha_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(batman_state::get_alpha_tile_info),this), TILEMAP_SCAN_ROWS,  8,8, 64,32);
-	m_alpha_tilemap->set_transparent_pen(0);
 }
 
 
@@ -122,13 +111,13 @@ void batman_state::scanline_update(screen_device &screen, int scanline)
 	/* update the scanline parameters */
 	if (scanline <= screen.visible_area().max_y && m_atarivc_state.rowscroll_enable)
 	{
-		UINT16 *base = &m_alpha[scanline / 8 * 64 + 48];
+		int offset = scanline / 8 * 64 + 48;
 		int scan, i;
 
 		for (scan = 0; scan < 8; scan++, scanline++)
 			for (i = 0; i < 2; i++)
 			{
-				int data = *base++;
+				int data = m_alpha_tilemap->basemem_read(offset++);
 				switch (data & 15)
 				{
 					case 9:
@@ -143,8 +132,8 @@ void batman_state::scanline_update(screen_device &screen, int scanline)
 							screen.update_partial(scanline - 1);
 						m_atarivc_state.pf1_xscroll_raw = (data >> 7) & 0x1ff;
 						atarivc_update_pf_xscrolls();
-						m_playfield_tilemap->set_scrollx(0, m_atarivc_state.pf0_xscroll);
-						m_playfield2_tilemap->set_scrollx(0, m_atarivc_state.pf1_xscroll);
+						m_atarivc_playfield_tilemap->set_scrollx(0, m_atarivc_state.pf0_xscroll);
+						m_atarivc_playfield2_tilemap->set_scrollx(0, m_atarivc_state.pf1_xscroll);
 						break;
 
 					case 11:
@@ -152,7 +141,7 @@ void batman_state::scanline_update(screen_device &screen, int scanline)
 							screen.update_partial(scanline - 1);
 						m_atarivc_state.pf0_xscroll_raw = (data >> 7) & 0x1ff;
 						atarivc_update_pf_xscrolls();
-						m_playfield_tilemap->set_scrollx(0, m_atarivc_state.pf0_xscroll);
+						m_atarivc_playfield_tilemap->set_scrollx(0, m_atarivc_state.pf0_xscroll);
 						break;
 
 					case 13:
@@ -166,14 +155,14 @@ void batman_state::scanline_update(screen_device &screen, int scanline)
 						if (scanline > 0)
 							screen.update_partial(scanline - 1);
 						m_atarivc_state.pf1_yscroll = (data >> 7) & 0x1ff;
-						m_playfield2_tilemap->set_scrolly(0, m_atarivc_state.pf1_yscroll);
+						m_atarivc_playfield2_tilemap->set_scrolly(0, m_atarivc_state.pf1_yscroll);
 						break;
 
 					case 15:
 						if (scanline > 0)
 							screen.update_partial(scanline - 1);
 						m_atarivc_state.pf0_yscroll = (data >> 7) & 0x1ff;
-						m_playfield_tilemap->set_scrolly(0, m_atarivc_state.pf0_yscroll);
+						m_atarivc_playfield_tilemap->set_scrolly(0, m_atarivc_state.pf0_yscroll);
 						break;
 				}
 			}
@@ -197,14 +186,14 @@ UINT32 batman_state::screen_update_batman(screen_device &screen, bitmap_ind16 &b
 
 	/* draw the playfield */
 	priority_bitmap.fill(0, cliprect);
-	m_playfield_tilemap->draw(bitmap, cliprect, 0, 0x00);
-	m_playfield_tilemap->draw(bitmap, cliprect, 1, 0x01);
-	m_playfield_tilemap->draw(bitmap, cliprect, 2, 0x02);
-	m_playfield_tilemap->draw(bitmap, cliprect, 3, 0x03);
-	m_playfield2_tilemap->draw(bitmap, cliprect, 0, 0x80);
-	m_playfield2_tilemap->draw(bitmap, cliprect, 1, 0x84);
-	m_playfield2_tilemap->draw(bitmap, cliprect, 2, 0x88);
-	m_playfield2_tilemap->draw(bitmap, cliprect, 3, 0x8c);
+	m_atarivc_playfield_tilemap->draw(bitmap, cliprect, 0, 0x00);
+	m_atarivc_playfield_tilemap->draw(bitmap, cliprect, 1, 0x01);
+	m_atarivc_playfield_tilemap->draw(bitmap, cliprect, 2, 0x02);
+	m_atarivc_playfield_tilemap->draw(bitmap, cliprect, 3, 0x03);
+	m_atarivc_playfield2_tilemap->draw(bitmap, cliprect, 0, 0x80);
+	m_atarivc_playfield2_tilemap->draw(bitmap, cliprect, 1, 0x84);
+	m_atarivc_playfield2_tilemap->draw(bitmap, cliprect, 2, 0x88);
+	m_atarivc_playfield2_tilemap->draw(bitmap, cliprect, 3, 0x8c);
 
 	/* draw and merge the MO */
 	mobitmap = atarimo_render(0, cliprect, &rectlist);

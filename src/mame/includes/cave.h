@@ -216,4 +216,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	DECLARE_WRITE_LINE_MEMBER(sound_irq_gen);
 	optional_device<eeprom_device> m_eeprom;
+
+private:
+	inline void get_tile_info( tile_data &tileinfo, int tile_index, int GFX );
 };

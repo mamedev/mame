@@ -98,7 +98,7 @@
 
 TILE_GET_INFO_MEMBER(system1_state::tile_get_info)
 {
-	const UINT8 *rambase = (const UINT8 *)param;
+	const UINT8 *rambase = (const UINT8 *)tilemap.user_data();
 	UINT32 tiledata = rambase[tile_index*2+0] | (rambase[tile_index*2+1] << 8);
 	UINT32 code = ((tiledata >> 4) & 0x800) | (tiledata & 0x7ff);
 	UINT32 color = (tiledata >> 5) & 0xff;

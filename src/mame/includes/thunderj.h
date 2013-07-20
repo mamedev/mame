@@ -13,9 +13,11 @@ public:
 	thunderj_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atarigen_state(mconfig, type, tag),
 			m_jsa(*this, "jsa"),
+			m_alpha_tilemap(*this, "alpha"),
 			m_extra(*this, "extra") { }
 
 	required_device<atari_jsa_ii_device> m_jsa;
+	required_device<tilemap_device>	m_alpha_tilemap;
 	UINT8           m_alpha_tile_bank;
 	virtual void update_interrupts();
 	DECLARE_READ16_MEMBER(special_port2_r);

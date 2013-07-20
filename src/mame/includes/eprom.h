@@ -12,9 +12,13 @@ class eprom_state : public atarigen_state
 public:
 	eprom_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atarigen_state(mconfig, type, tag),
+			m_playfield_tilemap(*this, "playfield"),
+			m_alpha_tilemap(*this, "alpha"),
 			m_jsa(*this, "jsa"),
 			m_extra(*this, "extra") { }
 
+	required_device<tilemap_device> m_playfield_tilemap;
+	required_device<tilemap_device> m_alpha_tilemap;
 	required_device<atari_jsa_base_device> m_jsa;
 	int             m_screen_intensity;
 	int             m_video_disable;

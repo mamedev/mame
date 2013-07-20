@@ -17,6 +17,8 @@ public:
 			m_audiocpu(*this, "audiocpu"),
 			m_slapstic_base(*this, "slapstic_base"),
 			m_bankselect(*this, "bankselect"),
+			m_playfield_tilemap(*this, "playfield"),
+			m_alpha_tilemap(*this, "alpha"),
 			m_rombank1(*this, "rombank1"),
 			m_rombank2(*this, "rombank2") { }
 
@@ -26,6 +28,9 @@ public:
 
 	UINT8           m_interrupt_enable;
 	required_shared_ptr<UINT16> m_bankselect;
+	
+	required_device<tilemap_device> m_playfield_tilemap;
+	required_device<tilemap_device> m_alpha_tilemap;
 
 	INT8            m_pedal_count;
 

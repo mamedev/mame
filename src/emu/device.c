@@ -852,7 +852,7 @@ void device_t::remove_subdevice(device_t &device)
 //  list of stuff to find after we go live
 //-------------------------------------------------
 
-device_t::finder_base *device_t::register_auto_finder(finder_base &autodev)
+finder_base *device_t::register_auto_finder(finder_base &autodev)
 {
 	// add to this list
 	finder_base *old = m_auto_finder_list;
@@ -860,71 +860,6 @@ device_t::finder_base *device_t::register_auto_finder(finder_base &autodev)
 	return old;
 }
 
-
-//-------------------------------------------------
-//  finder_base - constructor
-//-------------------------------------------------
-
-device_t::finder_base::finder_base(device_t &base, const char *tag)
-	: m_next(base.register_auto_finder(*this)),
-		m_base(base),
-		m_tag(tag)
-{
-}
-
-
-//-------------------------------------------------
-//  ~finder_base - destructor
-//-------------------------------------------------
-
-device_t::finder_base::~finder_base()
-{
-}
-
-
-//-------------------------------------------------
-//  find_memory - find memory
-//-------------------------------------------------
-
-void *device_t::finder_base::find_memory(UINT8 width, size_t &bytes, bool required)
-{
-	// look up the share and return NULL if not found
-	memory_share *share = m_base.memshare(m_tag);
-	if (share == NULL)
-		return NULL;
-
-	// check the width and warn if not correct
-	if (width != 0 && share->width() != width)
-	{
-		if (required)
-			mame_printf_warning("Shared ptr '%s' found but is width %d, not %d as requested\n", m_tag, share->width(), width);
-		return NULL;
-	}
-
-	// return results
-	bytes = share->bytes();
-	return share->ptr();
-}
-
-
-//-------------------------------------------------
-//  report_missing - report missing objects and
-//  return true if it's ok
-//-------------------------------------------------
-
-bool device_t::finder_base::report_missing(bool found, const char *objname, bool required)
-{
-	// just pass through in the found case
-	if (found)
-		return true;
-
-	// otherwise, report
-	if (required)
-		mame_printf_error("Required %s '%s' not found\n", objname, m_tag);
-	else
-		mame_printf_verbose("Optional %s '%s' not found\n", objname, m_tag);
-	return !required;
-}
 
 
 //**************************************************************************

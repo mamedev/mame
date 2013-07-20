@@ -18,8 +18,8 @@
 
 TILE_GET_INFO_MEMBER(shuuz_state::get_playfield_tile_info)
 {
-	UINT16 data1 = m_playfield[tile_index];
-	UINT16 data2 = m_playfield_upper[tile_index] >> 8;
+	UINT16 data1 = tilemap.basemem_read(tile_index);
+	UINT16 data2 = tilemap.extmem_read(tile_index) >> 8;
 	int code = data1 & 0x3fff;
 	int color = data2 & 0x0f;
 	SET_TILE_INFO_MEMBER(0, code, color, (data1 >> 15) & 1);
@@ -72,9 +72,6 @@ VIDEO_START_MEMBER(shuuz_state,shuuz)
 		0                   /* callback routine for special entries */
 	};
 
-	/* initialize the playfield */
-	m_playfield_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(shuuz_state::get_playfield_tile_info),this), TILEMAP_SCAN_COLS,  8,8, 64,64);
-
 	/* initialize the motion objects */
 	atarimo_init(machine(), 0, &modesc);
 }
@@ -94,7 +91,7 @@ UINT32 shuuz_state::screen_update_shuuz(screen_device &screen, bitmap_ind16 &bit
 	int x, y, r;
 
 	/* draw the playfield */
-	m_playfield_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_atarivc_playfield_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* draw and merge the MO */
 	mobitmap = atarimo_render(0, cliprect, &rectlist);

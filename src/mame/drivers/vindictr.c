@@ -82,9 +82,9 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, vindictr_state )
 	AM_RANGE(0x360020, 0x360021) AM_DEVWRITE("jsa", atari_jsa_i_device, sound_reset_w)
 	AM_RANGE(0x360030, 0x360031) AM_DEVWRITE8("jsa", atari_jsa_i_device, main_command_w, 0x00ff)
 	AM_RANGE(0x3e0000, 0x3e0fff) AM_RAM_WRITE(vindictr_paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0x3f0000, 0x3f1fff) AM_MIRROR(0x8000) AM_RAM_WRITE(playfield_w) AM_SHARE("playfield")
+	AM_RANGE(0x3f0000, 0x3f1fff) AM_MIRROR(0x8000) AM_RAM_DEVWRITE("playfield", tilemap_device, write) AM_SHARE("playfield")
 	AM_RANGE(0x3f2000, 0x3f3fff) AM_MIRROR(0x8000) AM_READWRITE_LEGACY(atarimo_0_spriteram_r, atarimo_0_spriteram_w)
-	AM_RANGE(0x3f4000, 0x3f4f7f) AM_MIRROR(0x8000) AM_RAM_WRITE(alpha_w) AM_SHARE("alpha")
+	AM_RANGE(0x3f4000, 0x3f4f7f) AM_MIRROR(0x8000) AM_RAM_DEVWRITE("alpha", tilemap_device, write) AM_SHARE("alpha")
 	AM_RANGE(0x3f4f80, 0x3f4fff) AM_MIRROR(0x8000) AM_READWRITE_LEGACY(atarimo_0_slipram_r, atarimo_0_slipram_w)
 	AM_RANGE(0x3f5000, 0x3f7fff) AM_MIRROR(0x8000) AM_RAM
 ADDRESS_MAP_END
@@ -191,6 +191,9 @@ static MACHINE_CONFIG_START( vindictr, vindictr_state )
 	MCFG_GFXDECODE(vindictr)
 	MCFG_PALETTE_LENGTH(2048*8)
 
+	MCFG_TILEMAP_ADD_STANDARD("playfield", 2, vindictr_state, get_playfield_tile_info, 8,8, SCAN_COLS, 64,64)
+	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", 2, vindictr_state, get_alpha_tile_info, 8,8, SCAN_ROWS, 64,32, 0)
+	
 	MCFG_SCREEN_ADD("screen", RASTER)
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses a SYNGEN chip to generate video signals */

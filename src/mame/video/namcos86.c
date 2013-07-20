@@ -87,17 +87,16 @@ void namcos86_state::palette_init()
 
 ***************************************************************************/
 
-INLINE void get_tile_info(running_machine &machine,tile_data &tileinfo,int tile_index,int layer,UINT8 *vram)
+inline void namcos86_state::get_tile_info(tile_data &tileinfo,int tile_index,int layer,UINT8 *vram)
 {
-	namcos86_state *state = machine.driver_data<namcos86_state>();
 	int attr = vram[2*tile_index + 1];
 	int tile_offs;
 	if (layer & 2)
-		tile_offs = ((state->m_tile_address_prom[((layer & 1) << 4) + (attr & 0x03)] & 0xe0) >> 5) * 0x100;
+		tile_offs = ((m_tile_address_prom[((layer & 1) << 4) + (attr & 0x03)] & 0xe0) >> 5) * 0x100;
 	else
-		tile_offs = ((state->m_tile_address_prom[((layer & 1) << 4) + ((attr & 0x03) << 2)] & 0x0e) >> 1) * 0x100 + state->m_tilebank * 0x800;
+		tile_offs = ((m_tile_address_prom[((layer & 1) << 4) + ((attr & 0x03) << 2)] & 0x0e) >> 1) * 0x100 + m_tilebank * 0x800;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			(layer & 2) ? 1 : 0,
 			vram[2*tile_index] + tile_offs,
 			attr,
@@ -106,22 +105,22 @@ INLINE void get_tile_info(running_machine &machine,tile_data &tileinfo,int tile_
 
 TILE_GET_INFO_MEMBER(namcos86_state::get_tile_info0)
 {
-	get_tile_info(machine(),tileinfo,tile_index,0,&m_rthunder_videoram1[0x0000]);
+	get_tile_info(tileinfo,tile_index,0,&m_rthunder_videoram1[0x0000]);
 }
 
 TILE_GET_INFO_MEMBER(namcos86_state::get_tile_info1)
 {
-	get_tile_info(machine(),tileinfo,tile_index,1,&m_rthunder_videoram1[0x1000]);
+	get_tile_info(tileinfo,tile_index,1,&m_rthunder_videoram1[0x1000]);
 }
 
 TILE_GET_INFO_MEMBER(namcos86_state::get_tile_info2)
 {
-	get_tile_info(machine(),tileinfo,tile_index,2,&m_rthunder_videoram2[0x0000]);
+	get_tile_info(tileinfo,tile_index,2,&m_rthunder_videoram2[0x0000]);
 }
 
 TILE_GET_INFO_MEMBER(namcos86_state::get_tile_info3)
 {
-	get_tile_info(machine(),tileinfo,tile_index,3,&m_rthunder_videoram2[0x1000]);
+	get_tile_info(tileinfo,tile_index,3,&m_rthunder_videoram2[0x1000]);
 }
 
 

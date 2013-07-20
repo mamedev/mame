@@ -18,9 +18,11 @@ public:
 
 	blstroid_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atarigen_state(mconfig, type, tag),
+			m_playfield_tilemap(*this, "playfield"),
 			m_jsa(*this, "jsa"),
 			m_priorityram(*this, "priorityram") { }
 
+	required_device<tilemap_device> m_playfield_tilemap;
 	required_device<atari_jsa_i_device> m_jsa;
 	required_shared_ptr<UINT16> m_priorityram;
 	virtual void update_interrupts();
@@ -37,7 +39,3 @@ public:
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
-
-
-/*----------- defined in video/blstroid.c -----------*/
-void blstroid_scanline_update(screen_device &screen, int scanline);

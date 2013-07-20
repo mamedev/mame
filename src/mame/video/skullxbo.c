@@ -18,7 +18,7 @@
 
 TILE_GET_INFO_MEMBER(skullxbo_state::get_alpha_tile_info)
 {
-	UINT16 data = m_alpha[tile_index];
+	UINT16 data = tilemap.basemem_read(tile_index);
 	int code = (data ^ 0x400) & 0x7ff;
 	int color = (data >> 11) & 0x0f;
 	int opaque = data & 0x8000;
@@ -28,8 +28,8 @@ TILE_GET_INFO_MEMBER(skullxbo_state::get_alpha_tile_info)
 
 TILE_GET_INFO_MEMBER(skullxbo_state::get_playfield_tile_info)
 {
-	UINT16 data1 = m_playfield[tile_index];
-	UINT16 data2 = m_playfield_upper[tile_index] & 0xff;
+	UINT16 data1 = tilemap.basemem_read(tile_index);
+	UINT16 data2 = tilemap.extmem_read(tile_index) & 0xff;
 	int code = data1 & 0x7fff;
 	int color = data2 & 0x0f;
 	SET_TILE_INFO_MEMBER(1, code, color, (data1 >> 15) & 1);
@@ -82,15 +82,8 @@ VIDEO_START_MEMBER(skullxbo_state,skullxbo)
 		0,                  /* callback routine for special entries */
 	};
 
-	/* initialize the playfield */
-	m_playfield_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(skullxbo_state::get_playfield_tile_info),this), TILEMAP_SCAN_COLS,  16,8, 64,64);
-
 	/* initialize the motion objects */
 	atarimo_init(machine(), 0, &modesc);
-
-	/* initialize the alphanumerics */
-	m_alpha_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(skullxbo_state::get_alpha_tile_info),this), TILEMAP_SCAN_ROWS,  16,8, 64,32);
-	m_alpha_tilemap->set_transparent_pen(0);
 }
 
 
@@ -169,9 +162,20 @@ WRITE16_MEMBER( skullxbo_state::skullxbo_mobmsb_w )
  *
  *************************************/
 
-WRITE16_MEMBER( skullxbo_state::skullxbo_playfieldlatch_w )
+WRITE16_MEMBER( skullxbo_state::playfield_latch_w )
 {
-	set_playfield_latch(data);
+	m_playfield_latch = data;
+}
+
+WRITE16_MEMBER(skullxbo_state::playfield_latched_w)
+{
+	m_playfield_tilemap->write(space, offset, data, mem_mask);
+	if (m_playfield_latch != -1)
+	{
+		UINT16 oldval = m_playfield_tilemap->extmem_read(offset);
+		UINT16 newval = (oldval & ~0x00ff) | (m_playfield_latch & 0x00ff);
+		m_playfield_tilemap->extmem_write(offset, newval);
+	}
 }
 
 
@@ -184,11 +188,11 @@ WRITE16_MEMBER( skullxbo_state::skullxbo_playfieldlatch_w )
 
 void skullxbo_state::skullxbo_scanline_update(int scanline)
 {
-	UINT16 *base = &m_alpha[(scanline / 8) * 64 + 42];
 	int x;
 
 	/* keep in range */
-	if (base >= &m_alpha[0x7c0])
+	int offset = (scanline / 8) * 64 + 42;
+	if (offset >= 0x7c0)
 		return;
 
 	/* special case: scanline 0 should re-latch the previous raw scroll */
@@ -202,7 +206,7 @@ void skullxbo_state::skullxbo_scanline_update(int scanline)
 	/* update the current parameters */
 	for (x = 42; x < 64; x++)
 	{
-		UINT16 data = *base++;
+		UINT16 data = m_alpha_tilemap->basemem_read(offset++);
 		UINT16 command = data & 0x000f;
 
 		/* only command I've ever seen */

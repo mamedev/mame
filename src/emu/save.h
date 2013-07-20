@@ -307,6 +307,12 @@ inline void save_manager::save_item(const char *module, const char *tag, int ind
 }
 
 template<>
+inline void save_manager::save_item(const char *module, const char *tag, int index, dynamic_array<INT32> &value, const char *name)
+{
+	save_memory(module, tag, index, name, &value[0], sizeof(INT32), value.count());
+}
+
+template<>
 inline void save_manager::save_item(const char *module, const char *tag, int index, dynamic_array<UINT32> &value, const char *name)
 {
 	save_memory(module, tag, index, name, &value[0], sizeof(UINT32), value.count());

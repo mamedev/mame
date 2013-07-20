@@ -145,7 +145,7 @@ WRITE16_MEMBER(m92_state::m92_paletteram_w)
 
 TILE_GET_INFO_MEMBER(m92_state::get_pf_tile_info)
 {
-	pf_layer_info *layer = (pf_layer_info *)param;
+	pf_layer_info *layer = (pf_layer_info *)tilemap.user_data();
 	int tile, attrib;
 	tile_index = 2 * tile_index + layer->vram_base;
 

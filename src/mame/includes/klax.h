@@ -10,7 +10,11 @@ class klax_state : public atarigen_state
 {
 public:
 	klax_state(const machine_config &mconfig, device_type type, const char *tag)
-		: atarigen_state(mconfig, type, tag) { }
+		: atarigen_state(mconfig, type, tag),
+			m_playfield_tilemap(*this, "playfield") { }
+	
+	required_device<tilemap_device> m_playfield_tilemap;
+	
 	virtual void update_interrupts();
 	virtual void scanline_update(screen_device &screen, int scanline);
 	DECLARE_WRITE16_MEMBER(interrupt_ack_w);

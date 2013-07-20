@@ -80,8 +80,8 @@ WRITE16_MEMBER(toobin_state::interrupt_scan_w)
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, toobin_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xc7ffff)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0xc00000, 0xc07fff) AM_RAM_WRITE(playfield_large_w) AM_SHARE("playfield")
-	AM_RANGE(0xc08000, 0xc097ff) AM_MIRROR(0x046000) AM_RAM_WRITE(alpha_w) AM_SHARE("alpha")
+	AM_RANGE(0xc00000, 0xc07fff) AM_RAM_DEVWRITE("playfield", tilemap_device, write) AM_SHARE("playfield")
+	AM_RANGE(0xc08000, 0xc097ff) AM_MIRROR(0x046000) AM_RAM_DEVWRITE("alpha", tilemap_device, write) AM_SHARE("alpha")
 	AM_RANGE(0xc09800, 0xc09fff) AM_MIRROR(0x046000) AM_READWRITE_LEGACY(atarimo_0_spriteram_r, atarimo_0_spriteram_w)
 	AM_RANGE(0xc10000, 0xc107ff) AM_MIRROR(0x047800) AM_RAM_WRITE(toobin_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0xff6000, 0xff6001) AM_READNOP     /* who knows? read at controls time */
@@ -204,6 +204,9 @@ static MACHINE_CONFIG_START( toobin, toobin_state )
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+
+	MCFG_TILEMAP_ADD_STANDARD("playfield", 4, toobin_state, get_playfield_tile_info, 8,8, SCAN_ROWS, 128,64)
+	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", 2, toobin_state, get_alpha_tile_info, 8,8, SCAN_ROWS, 64,48, 0)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 640, 0, 512, 416, 0, 384)

@@ -106,6 +106,10 @@ public:
 	required_device<cpu_device> m_subcpu;
 	required_device<cpu_device> m_mcu;
 	required_device<dac_device> m_dac;
+
+private:
+	inline void bg_get_info(tile_data &tileinfo,int tile_index,UINT8 *info_vram);
+	inline void fg_get_info(tile_data &tileinfo,int tile_index,UINT8 *info_vram);
 };
 
 /*----------- defined in drivers/namcos1.c -----------*/

@@ -730,17 +730,19 @@ class memory_share
 
 public:
 	// construction/destruction
-	memory_share(UINT8 width, size_t bytes, void *ptr = NULL)
+	memory_share(UINT8 width, size_t bytes, endianness_t endianness, void *ptr = NULL)
 		: m_next(NULL),
 			m_ptr(ptr),
 			m_bytes(bytes),
-			m_width(width) { }
+			m_width(width),
+			m_endianness(endianness) { }
 
 	// getters
 	memory_share *next() const { return m_next; }
 	void *ptr() const { if (this == NULL) return NULL; return m_ptr; }
 	size_t bytes() const { return m_bytes; }
 	UINT8 width() const { return m_width; }
+	endianness_t endianness() const { return m_endianness; }
 
 	// setters
 	void set_ptr(void *ptr) { m_ptr = ptr; }
@@ -751,6 +753,7 @@ private:
 	void *                  m_ptr;                  // pointer to the memory backing the region
 	size_t                  m_bytes;                // size of the shared region in bytes
 	UINT8                   m_width;                // width of the shared region
+	endianness_t			m_endianness;			// endianness of the memory
 };
 
 

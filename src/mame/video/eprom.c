@@ -52,7 +52,7 @@ void eprom_state::update_palette()
 
 TILE_GET_INFO_MEMBER(eprom_state::get_alpha_tile_info)
 {
-	UINT16 data = m_alpha[tile_index];
+	UINT16 data = tilemap.basemem_read(tile_index);
 	int code = data & 0x3ff;
 	int color = ((data >> 10) & 0x0f) | ((data >> 9) & 0x20);
 	int opaque = data & 0x8000;
@@ -62,8 +62,8 @@ TILE_GET_INFO_MEMBER(eprom_state::get_alpha_tile_info)
 
 TILE_GET_INFO_MEMBER(eprom_state::get_playfield_tile_info)
 {
-	UINT16 data1 = m_playfield[tile_index];
-	UINT16 data2 = m_playfield_upper[tile_index] >> 8;
+	UINT16 data1 = tilemap.basemem_read(tile_index);
+	UINT16 data2 = tilemap.extmem_read(tile_index) >> 8;
 	int code = data1 & 0x7fff;
 	int color = 0x10 + (data2 & 0x0f);
 	SET_TILE_INFO_MEMBER(0, code, color, (data1 >> 15) & 1);
@@ -72,8 +72,8 @@ TILE_GET_INFO_MEMBER(eprom_state::get_playfield_tile_info)
 
 TILE_GET_INFO_MEMBER(eprom_state::guts_get_playfield_tile_info)
 {
-	UINT16 data1 = m_playfield[tile_index];
-	UINT16 data2 = m_playfield_upper[tile_index] >> 8;
+	UINT16 data1 = tilemap.basemem_read(tile_index);
+	UINT16 data2 = tilemap.extmem_read(tile_index) >> 8;
 	int code = data1 & 0x7fff;
 	int color = 0x10 + (data2 & 0x0f);
 	SET_TILE_INFO_MEMBER(2, code, color, (data1 >> 15) & 1);
@@ -126,15 +126,8 @@ VIDEO_START_MEMBER(eprom_state,eprom)
 		0                   /* callback routine for special entries */
 	};
 
-	/* initialize the playfield */
-	m_playfield_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(eprom_state::get_playfield_tile_info),this), TILEMAP_SCAN_COLS,  8,8, 64,64);
-
 	/* initialize the motion objects */
 	atarimo_init(machine(), 0, &modesc);
-
-	/* initialize the alphanumerics */
-	m_alpha_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(eprom_state::get_alpha_tile_info),this), TILEMAP_SCAN_ROWS,  8,8, 64,32);
-	m_alpha_tilemap->set_transparent_pen(0);
 
 	/* save states */
 	save_item(NAME(m_screen_intensity));
@@ -181,15 +174,8 @@ VIDEO_START_MEMBER(eprom_state,guts)
 		0                   /* callback routine for special entries */
 	};
 
-	/* initialize the playfield */
-	m_playfield_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(eprom_state::guts_get_playfield_tile_info),this), TILEMAP_SCAN_COLS,  8,8, 64,64);
-
 	/* initialize the motion objects */
 	atarimo_init(machine(), 0, &modesc);
-
-	/* initialize the alphanumerics */
-	m_alpha_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(eprom_state::get_alpha_tile_info),this), TILEMAP_SCAN_ROWS,  8,8, 64,32);
-	m_alpha_tilemap->set_transparent_pen(0);
 
 	/* save states */
 	save_item(NAME(m_screen_intensity));
@@ -209,8 +195,8 @@ void eprom_state::scanline_update(screen_device &screen, int scanline)
 	/* update the playfield */
 	if (scanline == 0)
 	{
-		int xscroll = (m_alpha[0x780] >> 7) & 0x1ff;
-		int yscroll = (m_alpha[0x781] >> 7) & 0x1ff;
+		int xscroll = (m_alpha_tilemap->basemem_read(0x780) >> 7) & 0x1ff;
+		int yscroll = (m_alpha_tilemap->basemem_read(0x781) >> 7) & 0x1ff;
 		m_playfield_tilemap->set_scrollx(0, xscroll);
 		m_playfield_tilemap->set_scrolly(0, yscroll);
 		atarimo_set_xscroll(0, xscroll);

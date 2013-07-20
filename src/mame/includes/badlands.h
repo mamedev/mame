@@ -10,7 +10,10 @@ class badlands_state : public atarigen_state
 {
 public:
 	badlands_state(const machine_config &mconfig, device_type type, const char *tag)
-		: atarigen_state(mconfig, type, tag) { }
+		: atarigen_state(mconfig, type, tag),
+			m_playfield_tilemap(*this, "playfield") { }
+
+	required_device<tilemap_device> m_playfield_tilemap;
 
 	UINT8           m_pedal_value[2];
 

@@ -127,16 +127,16 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, cyberbal_state )
 	AM_RANGE(0xfe1000, 0xfe1fff) AM_READ_PORT("IN1")
 	AM_RANGE(0xfe8000, 0xfe8fff) AM_RAM_WRITE(paletteram_1_w) AM_SHARE("paletteram_1")
 	AM_RANGE(0xfec000, 0xfecfff) AM_RAM_WRITE(paletteram_0_w) AM_SHARE("paletteram_0")
-	AM_RANGE(0xff0000, 0xff1fff) AM_RAM_WRITE(playfield2_w)   AM_SHARE("playfield2")
-	AM_RANGE(0xff2000, 0xff2fff) AM_RAM_WRITE(alpha2_w)       AM_SHARE("alpha2")
+	AM_RANGE(0xff0000, 0xff1fff) AM_RAM_DEVWRITE("playfield2", tilemap_device, write) AM_SHARE("playfield2")
+	AM_RANGE(0xff2000, 0xff2fff) AM_RAM_DEVWRITE("alpha2", tilemap_device, write) AM_SHARE("alpha2")
 	AM_RANGE(0xff3000, 0xff37ff) AM_READWRITE_LEGACY(atarimo_1_spriteram_r, atarimo_1_spriteram_w)
-	AM_RANGE(0xff3800, 0xff3fff) AM_RAM                                           AM_SHARE("share6")
-	AM_RANGE(0xff4000, 0xff5fff) AM_RAM_WRITE(playfield_w)    AM_SHARE("playfield")
-	AM_RANGE(0xff6000, 0xff6fff) AM_RAM_WRITE(alpha_w)        AM_SHARE("alpha")
+	AM_RANGE(0xff3800, 0xff3fff) AM_RAM AM_SHARE("ff3800")
+	AM_RANGE(0xff4000, 0xff5fff) AM_RAM_DEVWRITE("playfield", tilemap_device, write) AM_SHARE("playfield")
+	AM_RANGE(0xff6000, 0xff6fff) AM_RAM_DEVWRITE("alpha", tilemap_device, write) AM_SHARE("alpha")
 	AM_RANGE(0xff7000, 0xff77ff) AM_READWRITE_LEGACY(atarimo_0_spriteram_r, atarimo_0_spriteram_w)
-	AM_RANGE(0xff7800, 0xff9fff) AM_RAM                                           AM_SHARE("share10")
-	AM_RANGE(0xffa000, 0xffbfff) AM_READONLY AM_WRITENOP               AM_SHARE("share11")
-	AM_RANGE(0xffc000, 0xffffff) AM_RAM                                           AM_SHARE("share12")
+	AM_RANGE(0xff7800, 0xff9fff) AM_RAM AM_SHARE("sharedram")
+	AM_RANGE(0xffa000, 0xffbfff) AM_READONLY AM_WRITENOP AM_SHARE("extraram")
+	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_SHARE("mainram")
 ADDRESS_MAP_END
 
 
@@ -154,16 +154,16 @@ static ADDRESS_MAP_START( extra_map, AS_PROGRAM, 16, cyberbal_state )
 	AM_RANGE(0xfe1000, 0xfe1fff) AM_READ_PORT("IN1")
 	AM_RANGE(0xfe8000, 0xfe8fff) AM_RAM_WRITE(paletteram_1_w) AM_SHARE("paletteram_1")
 	AM_RANGE(0xfec000, 0xfecfff) AM_RAM_WRITE(paletteram_0_w) AM_SHARE("paletteram_0")
-	AM_RANGE(0xff0000, 0xff1fff) AM_RAM_WRITE(playfield2_w)   AM_SHARE("playfield2")
-	AM_RANGE(0xff2000, 0xff2fff) AM_RAM_WRITE(alpha2_w)       AM_SHARE("alpha2")
+	AM_RANGE(0xff0000, 0xff1fff) AM_RAM_DEVWRITE("playfield2", tilemap_device, write) AM_SHARE("playfield2")
+	AM_RANGE(0xff2000, 0xff2fff) AM_RAM_DEVWRITE("alpha2", tilemap_device, write) AM_SHARE("alpha2")
 	AM_RANGE(0xff3000, 0xff37ff) AM_READWRITE_LEGACY(atarimo_1_spriteram_r, atarimo_1_spriteram_w)
-	AM_RANGE(0xff3800, 0xff3fff) AM_RAM                                           AM_SHARE("share6")
-	AM_RANGE(0xff4000, 0xff5fff) AM_RAM_WRITE(playfield_w)    AM_SHARE("playfield")
-	AM_RANGE(0xff6000, 0xff6fff) AM_RAM_WRITE(alpha_w)        AM_SHARE("alpha")
+	AM_RANGE(0xff3800, 0xff3fff) AM_RAM AM_SHARE("ff3800")
+	AM_RANGE(0xff4000, 0xff5fff) AM_RAM_DEVWRITE("playfield", tilemap_device, write) AM_SHARE("playfield")
+	AM_RANGE(0xff6000, 0xff6fff) AM_RAM_DEVWRITE("alpha", tilemap_device, write) AM_SHARE("alpha")
 	AM_RANGE(0xff7000, 0xff77ff) AM_READWRITE_LEGACY(atarimo_0_spriteram_r, atarimo_0_spriteram_w)
-	AM_RANGE(0xff7800, 0xff9fff) AM_RAM                                           AM_SHARE("share10")
-	AM_RANGE(0xffa000, 0xffbfff) AM_RAM                                           AM_SHARE("share11")
-	AM_RANGE(0xffc000, 0xffffff) AM_READONLY AM_WRITENOP               AM_SHARE("share12")
+	AM_RANGE(0xff7800, 0xff9fff) AM_RAM AM_SHARE("sharedram")
+	AM_RANGE(0xffa000, 0xffbfff) AM_RAM AM_SHARE("extraram")
+	AM_RANGE(0xffc000, 0xffffff) AM_READONLY AM_WRITENOP AM_SHARE("mainram")
 ADDRESS_MAP_END
 
 
@@ -228,8 +228,8 @@ static ADDRESS_MAP_START( cyberbal2p_map, AS_PROGRAM, 16, cyberbal_state )
 	AM_RANGE(0xfd6000, 0xfd6003) AM_WRITE(video_int_ack_w)
 	AM_RANGE(0xfd8000, 0xfd8003) AM_DEVWRITE8("jsa", atari_jsa_ii_device, main_command_w, 0xff00)
 	AM_RANGE(0xfe0000, 0xfe0003) AM_READ(sound_state_r)
-	AM_RANGE(0xff0000, 0xff1fff) AM_RAM_WRITE(playfield_w) AM_SHARE("playfield")
-	AM_RANGE(0xff2000, 0xff2fff) AM_RAM_WRITE(alpha_w) AM_SHARE("alpha")
+	AM_RANGE(0xff0000, 0xff1fff) AM_RAM_DEVWRITE("playfield", tilemap_device, write) AM_SHARE("playfield")
+	AM_RANGE(0xff2000, 0xff2fff) AM_RAM_DEVWRITE("alpha", tilemap_device, write) AM_SHARE("alpha")
 	AM_RANGE(0xff3000, 0xff37ff) AM_READWRITE_LEGACY(atarimo_0_spriteram_r, atarimo_0_spriteram_w)
 	AM_RANGE(0xff3800, 0xffffff) AM_RAM
 ADDRESS_MAP_END
@@ -411,6 +411,12 @@ static MACHINE_CONFIG_START( cyberbal, cyberbal_state )
 	MCFG_GFXDECODE(interleaved)
 	MCFG_PALETTE_LENGTH(4096)
 
+	MCFG_TILEMAP_ADD_STANDARD("playfield", 2, cyberbal_state, get_playfield_tile_info, 16,8, SCAN_ROWS, 64,64)
+	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", 2, cyberbal_state, get_alpha_tile_info, 16,8, SCAN_ROWS, 64,32, 0)
+
+	MCFG_TILEMAP_ADD_STANDARD("playfield2", 2, cyberbal_state, get_playfield_tile_info, 16,8, SCAN_ROWS, 64,64)
+	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha2", 2, cyberbal_state, get_alpha_tile_info, 16,8, SCAN_ROWS, 64,32, 0)
+
 	MCFG_SCREEN_ADD("lscreen", RASTER)
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses an SOS-2 chip to generate video signals */
@@ -457,6 +463,9 @@ static MACHINE_CONFIG_START( cyberbal2p, cyberbal_state )
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_GFXDECODE(cyberbal)
 	MCFG_PALETTE_LENGTH(2048)
+
+	MCFG_TILEMAP_ADD_STANDARD("playfield", 2, cyberbal_state, get_playfield_tile_info, 16,8, SCAN_ROWS, 64,64)
+	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", 2, cyberbal_state, get_alpha_tile_info, 16,8, SCAN_ROWS, 64,32, 0)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	/* note: these parameters are from published specs, not derived */

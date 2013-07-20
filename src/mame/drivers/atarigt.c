@@ -618,8 +618,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, atarigt_state )
 	AM_RANGE(0xd0001c, 0xd0001f) AM_READ(analog_port1_r)
 	AM_RANGE(0xd20000, 0xd20fff) AM_READWRITE(eeprom_upper32_r, eeprom32_w) AM_SHARE("eeprom")
 	AM_RANGE(0xd40000, 0xd4ffff) AM_WRITE16(eeprom_enable_w, 0xffffffff)
-	AM_RANGE(0xd72000, 0xd75fff) AM_WRITE(playfield32_w) AM_SHARE("playfield32")
-	AM_RANGE(0xd76000, 0xd76fff) AM_WRITE(alpha32_w) AM_SHARE("alpha32")
+	AM_RANGE(0xd72000, 0xd75fff) AM_DEVWRITE("playfield", tilemap_device, write) AM_SHARE("playfield")
+	AM_RANGE(0xd76000, 0xd76fff) AM_DEVWRITE("alpha", tilemap_device, write) AM_SHARE("alpha")
 	AM_RANGE(0xd78000, 0xd78fff) AM_DEVREADWRITE_LEGACY("rle", atarirle_spriteram32_r, atarirle_spriteram32_w)
 	AM_RANGE(0xd7a200, 0xd7a203) AM_WRITE(mo_command_w) AM_SHARE("mo_command")
 	AM_RANGE(0xd70000, 0xd7ffff) AM_RAM
@@ -834,6 +834,9 @@ static MACHINE_CONFIG_START( atarigt, atarigt_state )
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_GFXDECODE(atarigt)
 	MCFG_PALETTE_LENGTH(32768)
+
+	MCFG_TILEMAP_ADD_CUSTOM("playfield", 2, atarigt_state, get_playfield_tile_info, 8,8, atarigt_playfield_scan, 128,64)
+	MCFG_TILEMAP_ADD_STANDARD("alpha", 2, atarigt_state, get_alpha_tile_info, 8,8, SCAN_ROWS, 64, 32)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	/* note: these parameters are from published specs, not derived */
@@ -1299,7 +1302,7 @@ WRITE32_MEMBER(atarigt_state::tmek_pf_w)
 	if (pc == 0x25834 || pc == 0x25860)
 		logerror("%06X:PFW@%06X = %08X & %08X (src=%06X)\n", space.device().safe_pc(), 0xd72000 + offset*4, data, mem_mask, (UINT32)space.device().state().state_int(M68K_A3) - 2);
 
-	playfield32_w(space, offset, data, mem_mask);
+	m_playfield_tilemap->write(space, offset, data, mem_mask);
 }
 
 DRIVER_INIT_MEMBER(atarigt_state,tmek)

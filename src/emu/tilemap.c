@@ -359,47 +359,73 @@ inline void tilemap_t::scanline_draw_masked_rgb32_alpha(UINT32 *dest, const UINT
 //**************************************************************************
 
 //-------------------------------------------------
-//  tilemap_create_common - shared creation
-//  function
+//  tilemap_t - constructor
 //-------------------------------------------------
 
-tilemap_t::tilemap_t(tilemap_manager &manager, tilemap_get_info_delegate tile_get_info, tilemap_mapper_delegate mapper, int tilewidth, int tileheight, int cols, int rows)
-	: m_next(NULL),
-		m_rows(rows),
-		m_cols(cols),
-		m_tilewidth(tilewidth),
-		m_tileheight(tileheight),
-		m_width(cols * tilewidth),
-		m_height(rows * tileheight),
-		m_mapper(mapper),
-		m_memory_to_logical(NULL),
-		m_max_logical_index(0),
-		m_logical_to_memory(NULL),
-		m_max_memory_index(0),
-		m_tile_get_info(tile_get_info),
-		m_user_data(NULL),
-		m_enable(true),
-		m_attributes(0),
-		m_all_tiles_dirty(true),
-		m_all_tiles_clean(false),
-		m_palette_offset(0),
-		m_pen_data_offset(0),
-		m_gfx_used(0),
-		m_scrollrows(1),
-		m_scrollcols(1),
-		m_rowscroll(auto_alloc_array_clear(manager.machine(), INT32, m_height)),
-		m_colscroll(auto_alloc_array_clear(manager.machine(), INT32, m_width)),
-		m_dx(0),
-		m_dx_flipped(0),
-		m_dy(0),
-		m_dy_flipped(0),
-		m_pixmap(m_width, m_height),
-		m_flagsmap(m_width, m_height),
-		m_tileflags(NULL),
-		m_manager(manager)
+tilemap_t::tilemap_t()
 {
-	// reset internal arrays
+	// until init() is called, data is floating; this is deliberate
+}
+
+
+//-------------------------------------------------
+//  init - initialize the tilemap
+//-------------------------------------------------
+
+tilemap_t &tilemap_t::init(tilemap_manager &manager, tilemap_get_info_delegate tile_get_info, tilemap_mapper_delegate mapper, int tilewidth, int tileheight, int cols, int rows)
+{
+	// populate managers and devices
+	m_manager = &manager;
+	m_device = dynamic_cast<tilemap_device *>(this);
+	m_next = NULL;
+	m_user_data = NULL;
+	
+	// populate tilemap metrics
+	m_rows = rows;
+	m_cols = cols;
+	m_tilewidth = tilewidth;
+	m_tileheight = tileheight;
+	m_width = cols * tilewidth;
+	m_height = rows * tileheight;
+	
+	// populate logical <-> memory mappings
+	m_mapper = mapper;
+	m_memory_to_logical = NULL;
+	m_max_logical_index = 0;
+	m_logical_to_memory = NULL;
+	m_max_memory_index = 0;
+	
+	// initialize tile information geters
+	m_tile_get_info = tile_get_info;
+
+	// reset global states
+	m_enable = true;
+	m_attributes = 0;
+	m_all_tiles_dirty = true;
+	m_all_tiles_clean = false;
+	m_palette_offset = 0;
+	m_pen_data_offset = 0;
+	m_gfx_used = 0;
 	memset(m_gfx_dirtyseq, 0, sizeof(m_gfx_dirtyseq));
+
+	// reset scroll information
+	m_scrollrows = 1;
+	m_scrollcols = 1;
+	m_rowscroll.resize(m_height);
+	memset(&m_rowscroll[0], 0, m_height * sizeof(m_rowscroll[0]));
+	m_colscroll.resize(m_width);
+	memset(&m_colscroll[0], 0, m_width * sizeof(m_rowscroll[0]));
+	m_dx = 0;
+	m_dx_flipped = 0;
+	m_dy = 0;
+	m_dy_flipped = 0;
+
+	// allocate pixmap
+	m_pixmap.allocate(m_width, m_height);
+	
+	// allocate transparency mapping
+	m_flagsmap.allocate(m_width, m_height);
+	m_tileflags = NULL;
 	memset(m_pen_to_flags, 0, sizeof(m_pen_to_flags));
 
 	// create the initial mappings
@@ -423,8 +449,8 @@ tilemap_t::tilemap_t(tilemap_manager &manager, tilemap_get_info_delegate tile_ge
 	machine().save().save_item("tilemap", NULL, instance, NAME(m_pen_data_offset));
 	machine().save().save_item("tilemap", NULL, instance, NAME(m_scrollrows));
 	machine().save().save_item("tilemap", NULL, instance, NAME(m_scrollcols));
-	machine().save().save_pointer("tilemap", NULL, instance, NAME(m_rowscroll), rows * tileheight);
-	machine().save().save_pointer("tilemap", NULL, instance, NAME(m_colscroll), cols * tilewidth);
+	machine().save().save_item("tilemap", NULL, instance, NAME(m_rowscroll));
+	machine().save().save_item("tilemap", NULL, instance, NAME(m_colscroll));
 	machine().save().save_item("tilemap", NULL, instance, NAME(m_dx));
 	machine().save().save_item("tilemap", NULL, instance, NAME(m_dx_flipped));
 	machine().save().save_item("tilemap", NULL, instance, NAME(m_dy));
@@ -432,6 +458,7 @@ tilemap_t::tilemap_t(tilemap_manager &manager, tilemap_get_info_delegate tile_ge
 
 	// reset everything after a load
 	machine().save().register_postload(save_prepost_delegate(FUNC(tilemap_t::postload), this));
+	return *this;
 }
 
 
@@ -548,22 +575,22 @@ void tilemap_t::set_transmask(int group, UINT32 fgmask, UINT32 bgmask)
 //  order with optional flipping
 //-------------------------------------------------
 
-tilemap_memory_index tilemap_t::scan_rows(running_machine &machine, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
+tilemap_memory_index tilemap_t::scan_rows(driver_device &device, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
 {
 	return row * num_cols + col;
 }
 
-tilemap_memory_index tilemap_t::scan_rows_flip_x(running_machine &machine, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
+tilemap_memory_index tilemap_t::scan_rows_flip_x(driver_device &device, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
 {
 	return row * num_cols + (num_cols - 1 - col);
 }
 
-tilemap_memory_index tilemap_t::scan_rows_flip_y(running_machine &machine, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
+tilemap_memory_index tilemap_t::scan_rows_flip_y(driver_device &device, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
 {
 	return (num_rows - 1 - row) * num_cols + col;
 }
 
-tilemap_memory_index tilemap_t::scan_rows_flip_xy(running_machine &machine, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
+tilemap_memory_index tilemap_t::scan_rows_flip_xy(driver_device &device, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
 {
 	return (num_rows - 1 - row) * num_cols + (num_cols - 1 - col);
 }
@@ -577,22 +604,22 @@ tilemap_memory_index tilemap_t::scan_rows_flip_xy(running_machine &machine, UINT
 //  major order with optional flipping
 //-------------------------------------------------
 
-tilemap_memory_index tilemap_t::scan_cols(running_machine &machine, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
+tilemap_memory_index tilemap_t::scan_cols(driver_device &device, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
 {
 	return col * num_rows + row;
 }
 
-tilemap_memory_index tilemap_t::scan_cols_flip_x(running_machine &machine, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
+tilemap_memory_index tilemap_t::scan_cols_flip_x(driver_device &device, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
 {
 	return (num_cols - 1 - col) * num_rows + row;
 }
 
-tilemap_memory_index tilemap_t::scan_cols_flip_y(running_machine &machine, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
+tilemap_memory_index tilemap_t::scan_cols_flip_y(driver_device &device, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
 {
 	return col * num_rows + (num_rows - 1 - row);
 }
 
-tilemap_memory_index tilemap_t::scan_cols_flip_xy(running_machine &machine, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
+tilemap_memory_index tilemap_t::scan_cols_flip_xy(driver_device &device, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
 {
 	return (num_cols - 1 - col) * num_rows + (num_rows - 1 - row);
 }
@@ -737,7 +764,7 @@ g_profiler.start(PROFILER_TILEMAP_UPDATE);
 
 	// call the get info callback for the associated memory index
 	tilemap_memory_index memindex = m_logical_to_memory[logindex];
-	m_tile_get_info(m_tileinfo, memindex, m_user_data);
+	m_tile_get_info(*this, m_tileinfo, memindex);
 
 	// apply the global tilemap flip to the returned flip flags
 	UINT32 flags = m_tileinfo.flags ^ (m_attributes & 0x03);
@@ -1462,6 +1489,170 @@ void tilemap_t::draw_debug(bitmap_rgb32 &dest, UINT32 scrollx, UINT32 scrolly)
 
 
 //**************************************************************************
+//  TILEMAP MEMORY HELPER
+//**************************************************************************
+
+//-------------------------------------------------
+//  tilemap_memory - constructor
+//-------------------------------------------------
+
+tilemap_memory::tilemap_memory()
+	: m_base(NULL),
+	  m_bytes(0),
+	  m_membits(0),
+	  m_bytes_per_entry(0)
+{
+}
+
+
+//-------------------------------------------------
+//  set - configure the parameters
+//-------------------------------------------------
+
+void tilemap_memory::set(void *base, UINT32 bytes, int membits, endianness_t endianness, int bpe)
+{
+	// validate inputs
+	assert(base != NULL);
+	assert(bytes > 0);
+	assert(membits == 8 || membits == 16 || membits == 32 || membits == 64);
+	assert(bpe == 1 || bpe == 2 || bpe == 4);
+	
+	// populate direct data
+	m_base = base;
+	m_bytes = bytes;
+	m_membits = membits;
+	m_endianness = endianness;
+	m_bytes_per_entry = bpe;
+	
+	// derive data
+	switch (bpe*1000 + membits*10 + endianness)
+	{
+		case 1*1000 + 8*10 + ENDIANNESS_LITTLE:		m_reader = &tilemap_memory::read8_from_8;		m_writer = &tilemap_memory::write8_to_8;		break;
+		case 1*1000 + 8*10 + ENDIANNESS_BIG:		m_reader = &tilemap_memory::read8_from_8;		m_writer = &tilemap_memory::write8_to_8;		break;
+		case 1*1000 + 16*10 + ENDIANNESS_LITTLE:	m_reader = &tilemap_memory::read8_from_16le;	m_writer = &tilemap_memory::write8_to_16le;		break;
+		case 1*1000 + 16*10 + ENDIANNESS_BIG:		m_reader = &tilemap_memory::read8_from_16be;	m_writer = &tilemap_memory::write8_to_16be;		break;
+		case 1*1000 + 32*10 + ENDIANNESS_LITTLE:	m_reader = &tilemap_memory::read8_from_32le;	m_writer = &tilemap_memory::write8_to_32le;		break;
+		case 1*1000 + 32*10 + ENDIANNESS_BIG:		m_reader = &tilemap_memory::read8_from_32be;	m_writer = &tilemap_memory::write8_to_32be;		break;
+		case 1*1000 + 64*10 + ENDIANNESS_LITTLE:	m_reader = &tilemap_memory::read8_from_64le;	m_writer = &tilemap_memory::write8_to_64le;		break;
+		case 1*1000 + 64*10 + ENDIANNESS_BIG:		m_reader = &tilemap_memory::read8_from_64be;	m_writer = &tilemap_memory::write8_to_64be;		break;
+
+		case 2*1000 + 8*10 + ENDIANNESS_LITTLE:		m_reader = &tilemap_memory::read16_from_8le;	m_writer = &tilemap_memory::write16_to_8le;		break;
+		case 2*1000 + 8*10 + ENDIANNESS_BIG:		m_reader = &tilemap_memory::read16_from_8be;	m_writer = &tilemap_memory::write16_to_8be;		break;
+		case 2*1000 + 16*10 + ENDIANNESS_LITTLE:	m_reader = &tilemap_memory::read16_from_16;		m_writer = &tilemap_memory::write16_to_16;		break;
+		case 2*1000 + 16*10 + ENDIANNESS_BIG:		m_reader = &tilemap_memory::read16_from_16;		m_writer = &tilemap_memory::write16_to_16;		break;
+		case 2*1000 + 32*10 + ENDIANNESS_LITTLE:	m_reader = &tilemap_memory::read16_from_32le;	m_writer = &tilemap_memory::write16_to_32le;	break;
+		case 2*1000 + 32*10 + ENDIANNESS_BIG:		m_reader = &tilemap_memory::read16_from_32be;	m_writer = &tilemap_memory::write16_to_32be;	break;
+		case 2*1000 + 64*10 + ENDIANNESS_LITTLE:	m_reader = &tilemap_memory::read16_from_64le;	m_writer = &tilemap_memory::write16_to_64le;	break;
+		case 2*1000 + 64*10 + ENDIANNESS_BIG:		m_reader = &tilemap_memory::read16_from_64be;	m_writer = &tilemap_memory::write16_to_64be;	break;
+
+		case 4*1000 + 8*10 + ENDIANNESS_LITTLE:		m_reader = &tilemap_memory::read32_from_8le;	m_writer = &tilemap_memory::write32_to_8le;		break;
+		case 4*1000 + 8*10 + ENDIANNESS_BIG:		m_reader = &tilemap_memory::read32_from_8be;	m_writer = &tilemap_memory::write32_to_8be;		break;
+		case 4*1000 + 16*10 + ENDIANNESS_LITTLE:	m_reader = &tilemap_memory::read32_from_16le;	m_writer = &tilemap_memory::write32_to_16le;	break;
+		case 4*1000 + 16*10 + ENDIANNESS_BIG:		m_reader = &tilemap_memory::read32_from_16be;	m_writer = &tilemap_memory::write32_to_16be;	break;
+		case 4*1000 + 32*10 + ENDIANNESS_LITTLE:	m_reader = &tilemap_memory::read32_from_32;		m_writer = &tilemap_memory::write32_to_32;		break;
+		case 4*1000 + 32*10 + ENDIANNESS_BIG:		m_reader = &tilemap_memory::read32_from_32;		m_writer = &tilemap_memory::write32_to_32;		break;
+		case 4*1000 + 64*10 + ENDIANNESS_LITTLE:	m_reader = &tilemap_memory::read32_from_64le;	m_writer = &tilemap_memory::write32_to_64le;	break;
+		case 4*1000 + 64*10 + ENDIANNESS_BIG:		m_reader = &tilemap_memory::read32_from_64be;	m_writer = &tilemap_memory::write32_to_64be;	break;
+
+		default:	throw emu_fatalerror("Illegal memory bits/bus width combo in tilemap_memory");
+	}
+}
+
+
+//-------------------------------------------------
+//  set - additional setter variants
+//-------------------------------------------------
+
+void tilemap_memory::set(const address_space &space, void *base, UINT32 bytes, int bpe)
+{
+	set(base, bytes, space.data_width(), space.endianness(), bpe);
+}
+
+void tilemap_memory::set(const memory_share &share, int bpe)
+{
+	set(share.ptr(), share.bytes(), share.width(), share.endianness(), bpe);
+}
+
+void tilemap_memory::set(const tilemap_memory &helper)
+{
+	set(helper.base(), helper.bytes(), helper.membits(), helper.endianness(), helper.bytes_per_entry());
+}
+
+
+//-------------------------------------------------
+//  read8_from_*/write8_to_* - entry read/write
+//	heleprs for 1 byte-per-entry
+//-------------------------------------------------
+
+UINT32 tilemap_memory::read8_from_8(int index) { return reinterpret_cast<UINT8 *>(m_base)[index]; }
+void tilemap_memory::write8_to_8(int index, UINT32 data) { reinterpret_cast<UINT8 *>(m_base)[index] = data; }
+
+UINT32 tilemap_memory::read8_from_16le(int index) { return reinterpret_cast<UINT8 *>(m_base)[BYTE_XOR_LE(index)]; }
+void tilemap_memory::write8_to_16le(int index, UINT32 data) { reinterpret_cast<UINT8 *>(m_base)[BYTE_XOR_LE(index)] = data; }
+UINT32 tilemap_memory::read8_from_16be(int index) { return reinterpret_cast<UINT8 *>(m_base)[BYTE_XOR_BE(index)]; }
+void tilemap_memory::write8_to_16be(int index, UINT32 data) { reinterpret_cast<UINT8 *>(m_base)[BYTE_XOR_BE(index)] = data; }
+
+UINT32 tilemap_memory::read8_from_32le(int index) { return reinterpret_cast<UINT8 *>(m_base)[BYTE4_XOR_BE(index)]; }
+void tilemap_memory::write8_to_32le(int index, UINT32 data) { reinterpret_cast<UINT8 *>(m_base)[BYTE4_XOR_BE(index)] = data; }
+UINT32 tilemap_memory::read8_from_32be(int index) { return reinterpret_cast<UINT8 *>(m_base)[BYTE4_XOR_BE(index)]; }
+void tilemap_memory::write8_to_32be(int index, UINT32 data) { reinterpret_cast<UINT8 *>(m_base)[BYTE4_XOR_BE(index)] = data; }
+
+UINT32 tilemap_memory::read8_from_64le(int index) { return reinterpret_cast<UINT8 *>(m_base)[BYTE8_XOR_BE(index)]; }
+void tilemap_memory::write8_to_64le(int index, UINT32 data) { reinterpret_cast<UINT8 *>(m_base)[BYTE8_XOR_BE(index)] = data; }
+UINT32 tilemap_memory::read8_from_64be(int index) { return reinterpret_cast<UINT8 *>(m_base)[BYTE8_XOR_BE(index)]; }
+void tilemap_memory::write8_to_64be(int index, UINT32 data) { reinterpret_cast<UINT8 *>(m_base)[BYTE8_XOR_BE(index)] = data; }
+
+
+//-------------------------------------------------
+//  read16_from_*/write16_to_* - entry read/write
+//	heleprs for 2 bytes-per-entry
+//-------------------------------------------------
+
+UINT32 tilemap_memory::read16_from_8le(int index) { return read8_from_8(index*2) | (read8_from_8(index*2+1) << 8); }
+void tilemap_memory::write16_to_8le(int index, UINT32 data) { write8_to_8(index*2, data); write8_to_8(index*2+1, data >> 8); }
+UINT32 tilemap_memory::read16_from_8be(int index) { return (read8_from_8(index*2) << 8) | read8_from_8(index*2+1); }
+void tilemap_memory::write16_to_8be(int index, UINT32 data) { write8_to_8(index*2, data >> 8); write8_to_8(index*2+1, data); }
+
+UINT32 tilemap_memory::read16_from_16(int index) { return reinterpret_cast<UINT16 *>(m_base)[index]; }
+void tilemap_memory::write16_to_16(int index, UINT32 data) { reinterpret_cast<UINT16 *>(m_base)[index] = data; }
+
+UINT32 tilemap_memory::read16_from_32le(int index) { return reinterpret_cast<UINT16 *>(m_base)[BYTE_XOR_LE(index)]; }
+void tilemap_memory::write16_to_32le(int index, UINT32 data) { reinterpret_cast<UINT16 *>(m_base)[BYTE_XOR_LE(index)] = data; }
+UINT32 tilemap_memory::read16_from_32be(int index) { return reinterpret_cast<UINT16 *>(m_base)[BYTE_XOR_BE(index)]; }
+void tilemap_memory::write16_to_32be(int index, UINT32 data) { reinterpret_cast<UINT16 *>(m_base)[BYTE_XOR_BE(index)] = data; }
+
+UINT32 tilemap_memory::read16_from_64le(int index) { return reinterpret_cast<UINT16 *>(m_base)[BYTE4_XOR_LE(index)]; }
+void tilemap_memory::write16_to_64le(int index, UINT32 data) { reinterpret_cast<UINT16 *>(m_base)[BYTE4_XOR_LE(index)] = data; }
+UINT32 tilemap_memory::read16_from_64be(int index) { return reinterpret_cast<UINT16 *>(m_base)[BYTE4_XOR_BE(index)]; }
+void tilemap_memory::write16_to_64be(int index, UINT32 data) { reinterpret_cast<UINT16 *>(m_base)[BYTE4_XOR_BE(index)] = data; }
+
+
+//-------------------------------------------------
+//  read32_from_*/write32_to_* - entry read/write
+//	heleprs for 4 bytes-per-entry
+//-------------------------------------------------
+
+UINT32 tilemap_memory::read32_from_8le(int index) { return read16_from_8le(index*2) | (read16_from_8le(index*2+1) << 16); }
+void tilemap_memory::write32_to_8le(int index, UINT32 data) { write16_to_8le(index*2, data); write16_to_8le(index*2+1, data >> 16); }
+UINT32 tilemap_memory::read32_from_8be(int index) { return (read16_from_8be(index*2) << 16) | read16_from_8be(index*2+1); }
+void tilemap_memory::write32_to_8be(int index, UINT32 data) { write16_to_8be(index*2, data >> 16); write16_to_8be(index*2+1, data); }
+
+UINT32 tilemap_memory::read32_from_16le(int index) { return read16_from_16(index*2) | (read16_from_16(index*2+1) << 16); }
+void tilemap_memory::write32_to_16le(int index, UINT32 data) { write16_to_16(index*2, data); write16_to_16(index*2+1, data >> 16); }
+UINT32 tilemap_memory::read32_from_16be(int index) { return (read16_from_16(index*2) << 16) | read16_from_16(index*2+1); }
+void tilemap_memory::write32_to_16be(int index, UINT32 data) { write16_to_16(index*2, data >> 16); write16_to_16(index*2+1, data); }
+
+UINT32 tilemap_memory::read32_from_32(int index) { return reinterpret_cast<UINT32 *>(m_base)[index]; }
+void tilemap_memory::write32_to_32(int index, UINT32 data) { reinterpret_cast<UINT32 *>(m_base)[index] = data; }
+
+UINT32 tilemap_memory::read32_from_64le(int index) { return reinterpret_cast<UINT32 *>(m_base)[BYTE_XOR_LE(index)]; }
+void tilemap_memory::write32_to_64le(int index, UINT32 data) { reinterpret_cast<UINT32 *>(m_base)[BYTE_XOR_LE(index)] = data; }
+UINT32 tilemap_memory::read32_from_64be(int index) { return reinterpret_cast<UINT32 *>(m_base)[BYTE_XOR_BE(index)]; }
+void tilemap_memory::write32_to_64be(int index, UINT32 data) { reinterpret_cast<UINT32 *>(m_base)[BYTE_XOR_BE(index)] = data; }
+
+
+
+//**************************************************************************
 //  TILEMAP MANAGER
 //**************************************************************************
 
@@ -1486,7 +1677,7 @@ tilemap_manager::tilemap_manager(running_machine &machine)
 
 static const struct
 {
-	tilemap_memory_index (*func)(running_machine &, UINT32, UINT32, UINT32, UINT32);
+	tilemap_memory_index (*func)(driver_device &, UINT32, UINT32, UINT32, UINT32);
 	const char *name;
 } s_standard_mappers[TILEMAP_STANDARD_COUNT] =
 {
@@ -1500,24 +1691,18 @@ static const struct
 	{ FUNC(tilemap_t::scan_cols_flip_xy) }
 };
 
-tilemap_t &tilemap_manager::create(tilemap_get_info_delegate tile_get_info, tilemap_mapper_delegate mapper, int tilewidth, int tileheight, int cols, int rows)
+tilemap_t &tilemap_manager::create(tilemap_get_info_delegate tile_get_info, tilemap_mapper_delegate mapper, int tilewidth, int tileheight, int cols, int rows, tilemap_t *allocated)
 {
-	return m_tilemap_list.append(*auto_alloc(machine(), tilemap_t(*this, tile_get_info, mapper, tilewidth, tileheight, cols, rows)));
+	if (allocated == NULL)
+		allocated = auto_alloc(machine(), tilemap_t);
+	return m_tilemap_list.append(allocated->init(*this, tile_get_info, mapper, tilewidth, tileheight, cols, rows));
 }
 
-tilemap_t &tilemap_manager::create(tilemap_get_info_delegate tile_get_info, tilemap_standard_mapper mapper, int tilewidth, int tileheight, int cols, int rows)
+tilemap_t &tilemap_manager::create(tilemap_get_info_delegate tile_get_info, tilemap_standard_mapper mapper, int tilewidth, int tileheight, int cols, int rows, tilemap_t *allocated)
 {
-	return m_tilemap_list.append(*auto_alloc(machine(), tilemap_t(*this, tile_get_info, tilemap_mapper_delegate(s_standard_mappers[mapper].func, s_standard_mappers[mapper].name, &machine()), tilewidth, tileheight, cols, rows)));
-}
-
-tilemap_t &tilemap_manager::create(tile_get_info_func tile_get_info, tilemap_mapper_func mapper, int tilewidth, int tileheight, int cols, int rows)
-{
-	return m_tilemap_list.append(*auto_alloc(machine(), tilemap_t(*this, tilemap_get_info_delegate(tile_get_info, "", &machine()), tilemap_mapper_delegate(mapper, "", &machine()), tilewidth, tileheight, cols, rows)));
-}
-
-tilemap_t &tilemap_manager::create(tile_get_info_func tile_get_info, tilemap_standard_mapper mapper, int tilewidth, int tileheight, int cols, int rows)
-{
-	return m_tilemap_list.append(*auto_alloc(machine(), tilemap_t(*this, tilemap_get_info_delegate(tile_get_info, "", &machine()), tilemap_mapper_delegate(s_standard_mappers[mapper].func, s_standard_mappers[mapper].name, &machine()), tilewidth, tileheight, cols, rows)));
+	if (allocated == NULL)
+		allocated = auto_alloc(machine(), tilemap_t);
+	return m_tilemap_list.append(allocated->init(*this, tile_get_info, tilemap_mapper_delegate(s_standard_mappers[mapper].func, s_standard_mappers[mapper].name, machine().driver_data()), tilewidth, tileheight, cols, rows));
 }
 
 
@@ -1542,4 +1727,214 @@ void tilemap_manager::mark_all_dirty()
 {
 	for (tilemap_t *tmap = m_tilemap_list.first(); tmap != NULL; tmap = tmap->next())
 		tmap->mark_all_dirty();
+}
+
+
+
+//**************************************************************************
+//  TILEMAP DEVICE
+//**************************************************************************
+
+// device type definition
+const device_type TILEMAP = &device_creator<tilemap_device>;
+
+//-------------------------------------------------
+//  tilemap_device - constructor
+//-------------------------------------------------
+
+tilemap_device::tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, TILEMAP, "Tilemap", tag, owner, clock, "tilemap", __FILE__),
+		m_standard_mapper(TILEMAP_STANDARD_COUNT),
+		m_tile_width(8),
+		m_tile_height(8),
+		m_num_columns(64),
+		m_num_rows(64),
+		m_transparent_pen_set(false),
+		m_transparent_pen(0)
+{
+}
+
+
+//-------------------------------------------------
+//  static_set_bytes_per_entry: Set the 
+//	transparent pen
+//-------------------------------------------------
+
+void tilemap_device::static_set_bytes_per_entry(device_t &device, int bpe)
+{
+	downcast<tilemap_device &>(device).m_bytes_per_entry = bpe;
+}
+
+
+//-------------------------------------------------
+//  static_set_info_callback: Set the get info
+//	callback delegate
+//-------------------------------------------------
+
+void tilemap_device::static_set_info_callback(device_t &device, tilemap_get_info_delegate get_info)
+{
+	downcast<tilemap_device &>(device).m_get_info = get_info;
+}
+
+
+//-------------------------------------------------
+//  static_set_layout: Set the tilemap size and
+//	layout
+//-------------------------------------------------
+
+void tilemap_device::static_set_layout(device_t &device, tilemap_standard_mapper mapper, int columns, int rows)
+{
+	tilemap_device &target = downcast<tilemap_device &>(device);
+	target.m_standard_mapper = mapper;
+	target.m_num_columns = columns;
+	target.m_num_rows = rows;
+}
+
+void tilemap_device::static_set_layout(device_t &device, tilemap_mapper_delegate mapper, int columns, int rows)
+{
+	tilemap_device &target = downcast<tilemap_device &>(device);
+	target.m_standard_mapper = TILEMAP_STANDARD_COUNT;
+	target.m_mapper = mapper;
+	target.m_num_columns = columns;
+	target.m_num_rows = rows;
+}
+
+
+//-------------------------------------------------
+//  static_set_tile_size: Set the tile size
+//-------------------------------------------------
+
+void tilemap_device::static_set_tile_size(device_t &device, int width, int height)
+{
+	tilemap_device &target = downcast<tilemap_device &>(device);
+	target.m_tile_width = width;
+	target.m_tile_height = height;
+}
+
+
+//-------------------------------------------------
+//  static_set_transparent_pen: Set the 
+//	transparent pen
+//-------------------------------------------------
+
+void tilemap_device::static_set_transparent_pen(device_t &device, pen_t pen)
+{
+	tilemap_device &target = downcast<tilemap_device &>(device);
+	target.m_transparent_pen_set = true;
+	target.m_transparent_pen = pen;
+}
+
+
+//-------------------------------------------------
+//  write: Main memory writes
+//-------------------------------------------------
+
+WRITE8_HANDLER(tilemap_device::write)
+{
+	reinterpret_cast<UINT8 *>(m_basemem.base())[offset] = data;
+	offset /= m_bytes_per_entry;
+	mark_tile_dirty(offset);
+}
+
+WRITE16_HANDLER(tilemap_device::write)
+{
+	COMBINE_DATA(&reinterpret_cast<UINT16 *>(m_basemem.base())[offset]);
+	offset = offset * 2 / m_bytes_per_entry;
+	mark_tile_dirty(offset);
+	if (m_bytes_per_entry < 2)
+		mark_tile_dirty(offset + 1);
+}
+
+WRITE32_HANDLER(tilemap_device::write)
+{
+	COMBINE_DATA(&reinterpret_cast<UINT32 *>(m_basemem.base())[offset]);
+	offset = offset * 4 / m_bytes_per_entry;
+	mark_tile_dirty(offset);
+	if (m_bytes_per_entry < 4)
+	{
+		mark_tile_dirty(offset + 1);
+		if (m_bytes_per_entry < 2)
+		{
+			mark_tile_dirty(offset + 2);
+			mark_tile_dirty(offset + 3);
+		}
+	}
+}
+
+
+//-------------------------------------------------
+//  write_entry_ext: Extension memory writes
+//-------------------------------------------------
+
+WRITE8_HANDLER(tilemap_device::write_ext)
+{
+	reinterpret_cast<UINT8 *>(m_extmem.base())[offset] = data;
+	offset /= m_bytes_per_entry;
+	mark_tile_dirty(offset);
+}
+
+WRITE16_HANDLER(tilemap_device::write_ext)
+{
+	COMBINE_DATA(&reinterpret_cast<UINT16 *>(m_extmem.base())[offset]);
+	offset = offset * 2 / m_bytes_per_entry;
+	mark_tile_dirty(offset);
+	if (m_bytes_per_entry < 2)
+		mark_tile_dirty(offset + 1);
+}
+
+WRITE32_HANDLER(tilemap_device::write_ext)
+{
+	COMBINE_DATA(&reinterpret_cast<UINT32 *>(m_extmem.base())[offset]);
+	offset = offset * 4 / m_bytes_per_entry;
+	mark_tile_dirty(offset);
+	if (m_bytes_per_entry < 4)
+	{
+		mark_tile_dirty(offset + 1);
+		if (m_bytes_per_entry < 2)
+		{
+			mark_tile_dirty(offset + 2);
+			mark_tile_dirty(offset + 3);
+		}
+	}
+}
+
+
+//-------------------------------------------------
+//  device_start: Start up the device
+//-------------------------------------------------
+
+void tilemap_device::device_start()
+{
+	// check configuration
+	if (m_get_info.isnull())
+		throw emu_fatalerror("Tilemap device '%s' has no get info callback!");
+	if (m_standard_mapper == TILEMAP_STANDARD_COUNT && m_mapper.isnull())
+		throw emu_fatalerror("Tilemap device '%s' has no mapper callback!");
+
+	// bind our callbacks
+	m_get_info.bind_relative_to(*owner());
+	m_mapper.bind_relative_to(*owner());
+	
+	// allocate the tilemap
+	if (m_standard_mapper == TILEMAP_STANDARD_COUNT)
+		machine().tilemap().create(m_get_info, m_mapper, m_tile_width, m_tile_height, m_num_columns, m_num_rows, this);
+	else
+		machine().tilemap().create(m_get_info, m_standard_mapper, m_tile_width, m_tile_height, m_num_columns, m_num_rows, this);
+
+	// find the memory, if present
+	const memory_share *share = memshare(tag());
+	if (share != NULL)
+	{
+		m_basemem.set(*share, m_bytes_per_entry);
+
+		// look for an extension entry
+		astring tag_ext(tag(), "_ext");
+		share = memshare(tag_ext.cstr());
+		if (share != NULL)
+			m_extmem.set(*share, m_bytes_per_entry);
+	}
+	
+	// configure the device and set the pen
+	if (m_transparent_pen_set)
+		set_transparent_pen(m_transparent_pen);
 }

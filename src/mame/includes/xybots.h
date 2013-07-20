@@ -12,9 +12,14 @@ class xybots_state : public atarigen_state
 public:
 	xybots_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atarigen_state(mconfig, type, tag),
-			m_jsa(*this, "jsa") { }
+			m_jsa(*this, "jsa"),
+			m_playfield_tilemap(*this, "playfield"),
+			m_alpha_tilemap(*this, "alpha") { }
 
 	required_device<atari_jsa_i_device> m_jsa;
+	required_device<tilemap_device>	m_playfield_tilemap;
+	required_device<tilemap_device>	m_alpha_tilemap;
+	
 	UINT16          m_h256;
 	virtual void update_interrupts();
 	DECLARE_READ16_MEMBER(special_port1_r);

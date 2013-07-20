@@ -13,6 +13,8 @@ public:
 		: atarigen_state(mconfig, type, tag),
 			m_bankselect(*this, "bankselect"),
 			m_joystick_timer(*this, "joystick_timer"),
+			m_playfield_tilemap(*this, "playfield"),
+			m_alpha_tilemap(*this, "alpha"),
 			m_yscroll_reset_timer(*this, "yreset_timer"),
 			m_scanline_timer(*this, "scan_timer"),
 			m_int3off_timer(*this, "int3off_timer") { }
@@ -28,6 +30,8 @@ public:
 	UINT8           m_joystick_value;
 
 	/* playfield parameters */
+	required_device<tilemap_device> m_playfield_tilemap;
+	required_device<tilemap_device> m_alpha_tilemap;
 	UINT16          m_playfield_lookup[256];
 	UINT8           m_playfield_tile_bank;
 	UINT16          m_playfield_priority_pens;

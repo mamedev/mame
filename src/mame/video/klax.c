@@ -18,8 +18,8 @@
 
 TILE_GET_INFO_MEMBER(klax_state::get_playfield_tile_info)
 {
-	UINT16 data1 = m_playfield[tile_index];
-	UINT16 data2 = m_playfield_upper[tile_index] >> 8;
+	UINT16 data1 = tilemap.basemem_read(tile_index);
+	UINT16 data2 = tilemap.extmem_read(tile_index) >> 8;
 	int code = data1 & 0x1fff;
 	int color = data2 & 0x0f;
 	SET_TILE_INFO_MEMBER(0, code, color, (data1 >> 15) & 1);
@@ -71,9 +71,6 @@ VIDEO_START_MEMBER(klax_state,klax)
 		0,                  /* resulting value to indicate "special" */
 		0                   /* callback routine for special entries */
 	};
-
-	/* initialize the playfield */
-	m_playfield_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(klax_state::get_playfield_tile_info),this), TILEMAP_SCAN_COLS,  8,8, 64,32);
 
 	/* initialize the motion objects */
 	atarimo_init(machine(), 0, &modesc);

@@ -18,7 +18,7 @@
 
 TILE_GET_INFO_MEMBER(badlands_state::get_playfield_tile_info)
 {
-	UINT16 data = m_playfield[tile_index];
+	UINT16 data = tilemap.basemem_read(tile_index);
 	int code = (data & 0x1fff) + ((data & 0x1000) ? (m_playfield_tile_bank << 12) : 0);
 	int color = (data >> 13) & 0x07;
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
@@ -70,9 +70,6 @@ VIDEO_START_MEMBER(badlands_state,badlands)
 		0,                  /* resulting value to indicate "special" */
 		0                   /* callback routine for special entries */
 	};
-
-	/* initialize the playfield */
-	m_playfield_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(badlands_state::get_playfield_tile_info),this), TILEMAP_SCAN_ROWS,  8,8, 64,32);
 
 	/* initialize the motion objects */
 	atarimo_init(machine(), 0, &modesc);

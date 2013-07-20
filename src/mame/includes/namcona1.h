@@ -113,4 +113,7 @@ public:
 	UINT32 screen_update_namcona1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(namcona1_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_interrupt);
+
+private:
+	void tilemap_get_info(tile_data &tileinfo, int tile_index, const UINT16 *tilemap_videoram, int tilemap_color, bool use_4bpp_gfx);
 };

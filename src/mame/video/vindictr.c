@@ -18,7 +18,7 @@
 
 TILE_GET_INFO_MEMBER(vindictr_state::get_alpha_tile_info)
 {
-	UINT16 data = m_alpha[tile_index];
+	UINT16 data = tilemap.basemem_read(tile_index);
 	int code = data & 0x3ff;
 	int color = ((data >> 10) & 0x0f) | ((data >> 9) & 0x20);
 	int opaque = data & 0x8000;
@@ -28,7 +28,7 @@ TILE_GET_INFO_MEMBER(vindictr_state::get_alpha_tile_info)
 
 TILE_GET_INFO_MEMBER(vindictr_state::get_playfield_tile_info)
 {
-	UINT16 data = m_playfield[tile_index];
+	UINT16 data = tilemap.basemem_read(tile_index);
 	int code = (m_playfield_tile_bank * 0x1000) + (data & 0xfff);
 	int color = 0x10 + 2 * ((data >> 12) & 7);
 	SET_TILE_INFO_MEMBER(0, code, color, (data >> 15) & 1);
@@ -81,15 +81,8 @@ VIDEO_START_MEMBER(vindictr_state,vindictr)
 		NULL                /* callback routine for special entries */
 	};
 
-	/* initialize the playfield */
-	m_playfield_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(vindictr_state::get_playfield_tile_info),this), TILEMAP_SCAN_COLS,  8,8, 64,64);
-
 	/* initialize the motion objects */
 	atarimo_init(machine(), 0, &modesc);
-
-	/* initialize the alphanumerics */
-	m_alpha_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(vindictr_state::get_alpha_tile_info),this), TILEMAP_SCAN_ROWS,  8,8, 64,32);
-	m_alpha_tilemap->set_transparent_pen(0);
 
 	/* save states */
 	save_item(NAME(m_playfield_tile_bank));
@@ -137,19 +130,19 @@ WRITE16_MEMBER( vindictr_state::vindictr_paletteram_w )
 
 void vindictr_state::scanline_update(screen_device &screen, int scanline)
 {
-	UINT16 *base = &m_alpha[((scanline - 8) / 8) * 64 + 42];
 	int x;
 
 	/* keep in range */
-	if (base < m_alpha)
-		base += 0x7c0;
-	else if (base >= &m_alpha[0x7c0])
+	int offset = ((scanline - 8) / 8) * 64 + 42;
+	if (offset < 0)
+		offset += 0x7c0;
+	else if (offset >= 0x7c0)
 		return;
 
 	/* update the current parameters */
 	for (x = 42; x < 64; x++)
 	{
-		UINT16 data = *base++;
+		UINT16 data = m_alpha_tilemap->basemem_read(offset++);
 
 		switch ((data >> 9) & 7)
 		{

@@ -72,10 +72,10 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, xybots_state )
 	AM_RANGE(0x000000, 0x007fff) AM_MIRROR(0x7c0000) AM_ROM
 	AM_RANGE(0x008000, 0x00ffff) AM_MIRROR(0x7c0000) AM_ROM /* slapstic maps here */
 	AM_RANGE(0x010000, 0x03ffff) AM_MIRROR(0x7c0000) AM_ROM
-	AM_RANGE(0xff8000, 0xff8fff) AM_MIRROR(0x7f8000) AM_RAM_WRITE(alpha_w) AM_SHARE("alpha")
+	AM_RANGE(0xff8000, 0xff8fff) AM_MIRROR(0x7f8000) AM_RAM_DEVWRITE("alpha", tilemap_device, write) AM_SHARE("alpha")
 	AM_RANGE(0xff9000, 0xffadff) AM_MIRROR(0x7f8000) AM_RAM
 	AM_RANGE(0xffae00, 0xffafff) AM_MIRROR(0x7f8000) AM_READWRITE_LEGACY(atarimo_0_spriteram_r, atarimo_0_spriteram_w)
-	AM_RANGE(0xffb000, 0xffbfff) AM_MIRROR(0x7f8000) AM_RAM_WRITE(playfield_w) AM_SHARE("playfield")
+	AM_RANGE(0xffb000, 0xffbfff) AM_MIRROR(0x7f8000) AM_RAM_DEVWRITE("playfield", tilemap_device, write) AM_SHARE("playfield")
 	AM_RANGE(0xffc000, 0xffc7ff) AM_MIRROR(0x7f8800) AM_RAM_WRITE(paletteram_IIIIRRRRGGGGBBBB_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0xffd000, 0xffdfff) AM_MIRROR(0x7f8000) AM_READWRITE(eeprom_r, eeprom_w) AM_SHARE("eeprom")
 	AM_RANGE(0xffe000, 0xffe0ff) AM_MIRROR(0x7f8000) AM_DEVREAD8("jsa", atari_jsa_i_device, main_response_r, 0x00ff)
@@ -190,6 +190,9 @@ static MACHINE_CONFIG_START( xybots, xybots_state )
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_GFXDECODE(xybots)
 	MCFG_PALETTE_LENGTH(1024)
+
+	MCFG_TILEMAP_ADD_STANDARD("playfield", 2, xybots_state, get_playfield_tile_info, 8,8, SCAN_ROWS, 64,32)
+	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", 2, xybots_state, get_alpha_tile_info, 8,8, SCAN_ROWS, 64,32, 0)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	/* note: these parameters are from published specs, not derived */

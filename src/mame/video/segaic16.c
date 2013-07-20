@@ -630,7 +630,7 @@ void segaic16_draw_virtual_tilemap(running_machine &machine, struct tilemap_info
 
 TILE_GET_INFO_MEMBER( segaic16_video_device::segaic16_tilemap_16a_tile_info )
 {
-	const struct tilemap_callback_info *info = (const struct tilemap_callback_info *)param;
+	const struct tilemap_callback_info *info = (const struct tilemap_callback_info *)tilemap.user_data();
 	UINT16 data = info->rambase[tile_index];
 	int code = ((data >> 1) & 0x1000) | (data & 0xfff);
 	int color = (data >> 5) & 0x7f;
@@ -642,7 +642,7 @@ TILE_GET_INFO_MEMBER( segaic16_video_device::segaic16_tilemap_16a_tile_info )
 
 TILE_GET_INFO_MEMBER( segaic16_video_device::segaic16_tilemap_16a_text_info )
 {
-	const struct tilemap_callback_info *info = (const struct tilemap_callback_info *)param;
+	const struct tilemap_callback_info *info = (const struct tilemap_callback_info *)tilemap.user_data();
 	UINT16 data = info->rambase[tile_index];
 	int color = (data >> 8) & 0x07;
 	int code = data & 0xff;
@@ -842,7 +842,7 @@ void segaic16_tilemap_16a_draw_layer(running_machine &machine, struct tilemap_in
 
 TILE_GET_INFO_MEMBER( segaic16_video_device::segaic16_tilemap_16b_tile_info )
 {
-	const struct tilemap_callback_info *info = (const struct tilemap_callback_info *)param;
+	const struct tilemap_callback_info *info = (const struct tilemap_callback_info *)tilemap.user_data();
 	UINT16 data = info->rambase[tile_index];
 	int color = (data >> 6) & 0x7f;
 	int code = data & 0x1fff;
@@ -856,7 +856,7 @@ TILE_GET_INFO_MEMBER( segaic16_video_device::segaic16_tilemap_16b_tile_info )
 
 TILE_GET_INFO_MEMBER( segaic16_video_device::segaic16_tilemap_16b_text_info )
 {
-	const struct tilemap_callback_info *info = (const struct tilemap_callback_info *)param;
+	const struct tilemap_callback_info *info = (const struct tilemap_callback_info *)tilemap.user_data();
 	UINT16 data = info->rambase[tile_index];
 	int bank = info->bank[0];
 	int color = (data >> 9) & 0x07;
@@ -869,7 +869,7 @@ TILE_GET_INFO_MEMBER( segaic16_video_device::segaic16_tilemap_16b_text_info )
 
 TILE_GET_INFO_MEMBER( segaic16_video_device::segaic16_tilemap_16b_alt_tile_info )
 {
-	const struct tilemap_callback_info *info = (const struct tilemap_callback_info *)param;
+	const struct tilemap_callback_info *info = (const struct tilemap_callback_info *)tilemap.user_data();
 	UINT16 data = info->rambase[tile_index];
 	int color = (data >> 5) & 0x7f;
 	int code = data & 0x1fff;
@@ -883,7 +883,7 @@ TILE_GET_INFO_MEMBER( segaic16_video_device::segaic16_tilemap_16b_alt_tile_info 
 
 TILE_GET_INFO_MEMBER( segaic16_video_device::segaic16_tilemap_16b_alt_text_info )
 {
-	const struct tilemap_callback_info *info = (const struct tilemap_callback_info *)param;
+	const struct tilemap_callback_info *info = (const struct tilemap_callback_info *)tilemap.user_data();
 	UINT16 data = info->rambase[tile_index];
 	int bank = info->bank[0];
 	int color = (data >> 8) & 0x07;

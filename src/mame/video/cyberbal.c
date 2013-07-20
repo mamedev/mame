@@ -22,37 +22,19 @@
 
 TILE_GET_INFO_MEMBER(cyberbal_state::get_alpha_tile_info)
 {
-	UINT16 data = m_alpha[tile_index];
+	UINT16 data = tilemap.basemem_read(tile_index);
 	int code = data & 0xfff;
 	int color = (data >> 12) & 0x07;
 	SET_TILE_INFO_MEMBER(2, code, color, (data >> 15) & 1);
 }
 
 
-TILE_GET_INFO_MEMBER(cyberbal_state::get_alpha2_tile_info)
-{
-	UINT16 data = m_alpha2[tile_index];
-	int code = data & 0xfff;
-	int color = (data >> 12) & 0x07;
-	SET_TILE_INFO_MEMBER(2, code, 0x80 | color, (data >> 15) & 1);
-}
-
-
 TILE_GET_INFO_MEMBER(cyberbal_state::get_playfield_tile_info)
 {
-	UINT16 data = m_playfield[tile_index];
+	UINT16 data = tilemap.basemem_read(tile_index);
 	int code = data & 0x1fff;
 	int color = (data >> 11) & 0x0f;
 	SET_TILE_INFO_MEMBER(0, code, color, (data >> 15) & 1);
-}
-
-
-TILE_GET_INFO_MEMBER(cyberbal_state::get_playfield2_tile_info)
-{
-	UINT16 data = m_playfield2[tile_index];
-	int code = data & 0x1fff;
-	int color = (data >> 11) & 0x0f;
-	SET_TILE_INFO_MEMBER(0, code, 0x80 | color, (data >> 15) & 1);
 }
 
 
@@ -65,7 +47,7 @@ TILE_GET_INFO_MEMBER(cyberbal_state::get_playfield2_tile_info)
 
 void cyberbal_state::video_start_common(int screens)
 {
-	static const atarimo_desc mo0desc =
+	static const atarimo_desc modesc =
 	{
 		1,                  /* index to which gfx system */
 		1,                  /* number of motion object banks */
@@ -102,69 +84,22 @@ void cyberbal_state::video_start_common(int screens)
 		0                   /* callback routine for special entries */
 	};
 
-	static const atarimo_desc mo1desc =
-	{
-		1,                  /* index to which gfx system */
-		1,                  /* number of motion object banks */
-		1,                  /* are the entries linked? */
-		0,                  /* are the entries split? */
-		0,                  /* render in reverse order? */
-		0,                  /* render in swapped X/Y order? */
-		1,                  /* does the neighbor bit affect the next object? */
-		1024,               /* pixels per SLIP entry (0 for no-slip) */
-		0,                  /* pixel offset for SLIPs */
-		0,                  /* maximum number of links to visit/scanline (0=all) */
-
-		0xe00,              /* base palette entry */
-		0x100,              /* maximum number of colors */
-		0,                  /* transparent pen index */
-
-		{{ 0,0,0x07f8,0 }}, /* mask for the link */
-		{{ 0 }},            /* mask for the graphics bank */
-		{{ 0x7fff,0,0,0 }}, /* mask for the code index */
-		{{ 0 }},            /* mask for the upper code index */
-		{{ 0,0,0,0x000f }}, /* mask for the color */
-		{{ 0,0,0,0xffc0 }}, /* mask for the X position */
-		{{ 0,0xff80,0,0 }}, /* mask for the Y position */
-		{{ 0 }},            /* mask for the width, in tiles*/
-		{{ 0,0x000f,0,0 }}, /* mask for the height, in tiles */
-		{{ 0x8000,0,0,0 }}, /* mask for the horizontal flip */
-		{{ 0 }},            /* mask for the vertical flip */
-		{{ 0 }},            /* mask for the priority */
-		{{ 0,0,0,0x0010 }}, /* mask for the neighbor */
-		{{ 0 }},            /* mask for absolute coordinates */
-
-		{{ 0 }},            /* mask for the special value */
-		0,                  /* resulting value to indicate "special" */
-		0                   /* callback routine for special entries */
-	};
-
-	/* initialize the playfield */
-	m_playfield_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(cyberbal_state::get_playfield_tile_info),this), TILEMAP_SCAN_ROWS,  16,8, 64,64);
-
 	/* initialize the motion objects */
-	atarimo_init(machine(), 0, &mo0desc);
+	atarimo_init(machine(), 0, &modesc);
 	atarimo_set_slipram(0, &m_current_slip[0]);
-
-	/* initialize the alphanumerics */
-	m_alpha_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(cyberbal_state::get_alpha_tile_info),this), TILEMAP_SCAN_ROWS,  16,8, 64,32);
-	m_alpha_tilemap->set_transparent_pen(0);
 
 	/* allocate the second screen if necessary */
 	if (screens == 2)
 	{
-		/* initialize the playfield */
-		m_playfield2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(cyberbal_state::get_playfield2_tile_info),this), TILEMAP_SCAN_ROWS,  16,8, 64,64);
+		/* initialize the tilemaps */
 		m_playfield2_tilemap->set_scrollx(0, 0);
+		m_playfield2_tilemap->set_palette_offset(0x800);
+		m_alpha2_tilemap->set_scrollx(0, 0);
+		m_alpha2_tilemap->set_palette_offset(0x800);
 
 		/* initialize the motion objects */
-		atarimo_init(machine(), 1, &mo1desc);
+		atarimo_init(machine(), 1, &modesc);
 		atarimo_set_slipram(1, &m_current_slip[1]);
-
-		/* initialize the alphanumerics */
-		m_alpha2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(cyberbal_state::get_alpha2_tile_info),this), TILEMAP_SCAN_ROWS,  16,8, 64,32);
-		m_alpha2_tilemap->set_scrollx(0, 0);
-		m_alpha2_tilemap->set_transparent_pen(0);
 	}
 
 	/* save states */
@@ -260,56 +195,61 @@ void cyberbal_state::scanline_update(screen_device &screen, int scanline)
 	screen_device_iterator iter(*this);
 	for (i = 0, update_screen = iter.first(); update_screen != NULL; i++, update_screen = iter.next())
 	{
-		UINT16 *vram = i ? m_alpha2 : m_alpha;
-		UINT16 *base = &vram[((scanline - 8) / 8) * 64 + 47];
+		tilemap_t &curplayfield = i ? static_cast<tilemap_t &>(m_playfield2_tilemap) : static_cast<tilemap_t &>(m_playfield_tilemap);
+		tilemap_t &curalpha = i ? static_cast<tilemap_t &>(m_alpha2_tilemap) : static_cast<tilemap_t &>(m_alpha_tilemap);
 
 		/* keep in range */
-		if (base < vram)
-			base += 0x800;
-		else if (base >= &vram[0x800])
+		int offset = ((scanline - 8) / 8) * 64 + 47;
+		if (offset < 0)
+			offset += 0x800;
+		else if (offset >= 0x800)
 			return;
 
 		/* update the current parameters */
-		if (!(base[3] & 1))
+		UINT16 word = curalpha.device()->basemem_read(offset + 3);
+		if (!(word & 1))
 		{
-			if (((base[3] >> 1) & 7) != m_playfield_palette_bank[i])
+			if (((word >> 1) & 7) != m_playfield_palette_bank[i])
 			{
 				if (scanline > 0)
 					update_screen->update_partial(scanline - 1);
-				m_playfield_palette_bank[i] = (base[3] >> 1) & 7;
-				(i ? m_playfield2_tilemap : m_playfield_tilemap)->set_palette_offset(m_playfield_palette_bank[i] << 8);
+				m_playfield_palette_bank[i] = (word >> 1) & 7;
+				curplayfield.set_palette_offset(i * 0x800 + (m_playfield_palette_bank[i] << 8));
 			}
 		}
-		if (!(base[4] & 1))
+		word = curalpha.device()->basemem_read(offset + 4);
+		if (!(word & 1))
 		{
-			int newscroll = 2 * (((base[4] >> 7) + 4) & 0x1ff);
+			int newscroll = 2 * (((word >> 7) + 4) & 0x1ff);
 			if (newscroll != m_playfield_xscroll[i])
 			{
 				if (scanline > 0)
 					update_screen->update_partial(scanline - 1);
-				(i ? m_playfield2_tilemap : m_playfield_tilemap)->set_scrollx(0, newscroll);
+				curplayfield.set_scrollx(0, newscroll);
 				m_playfield_xscroll[i] = newscroll;
 			}
 		}
-		if (!(base[5] & 1))
+		word = curalpha.device()->basemem_read(offset + 5);
+		if (!(word & 1))
 		{
 			/* a new vscroll latches the offset into a counter; we must adjust for this */
-			int newscroll = ((base[5] >> 7) - (scanline)) & 0x1ff;
+			int newscroll = ((word >> 7) - (scanline)) & 0x1ff;
 			if (newscroll != m_playfield_yscroll[i])
 			{
 				if (scanline > 0)
 					update_screen->update_partial(scanline - 1);
-				(i ? m_playfield2_tilemap : m_playfield_tilemap)->set_scrolly(0, newscroll);
+				curplayfield.set_scrolly(0, newscroll);
 				m_playfield_yscroll[i] = newscroll;
 			}
 		}
-		if (!(base[7] & 1))
+		word = curalpha.device()->basemem_read(offset + 7);
+		if (!(word & 1))
 		{
-			if (m_current_slip[i] != base[7])
+			if (m_current_slip[i] != word)
 			{
 				if (scanline > 0)
 					update_screen->update_partial(scanline - 1);
-				m_current_slip[i] = base[7];
+				m_current_slip[i] = word;
 			}
 		}
 	}
@@ -332,7 +272,8 @@ UINT32 cyberbal_state::update_one_screen(screen_device &screen, bitmap_ind16 &bi
 	rectangle visarea = screen.visible_area();
 
 	/* draw the playfield */
-	((index == 0) ? m_playfield_tilemap : m_playfield2_tilemap)->draw(bitmap, cliprect, 0, 0);
+	tilemap_t &curplayfield = index ? static_cast<tilemap_t &>(m_playfield2_tilemap) : static_cast<tilemap_t &>(m_playfield_tilemap);
+	curplayfield.draw(bitmap, cliprect, 0, 0);
 
 	/* draw the MOs -- note some kludging to get this to work correctly for 2 screens */
 	mooffset = 0;
@@ -347,6 +288,7 @@ UINT32 cyberbal_state::update_one_screen(screen_device &screen, bitmap_ind16 &bi
 	visarea.max_x = temp;
 
 	/* draw and merge the MO */
+	int palbase = index * 0x800;
 	for (r = 0; r < rectlist.numrects; r++, rectlist.rect++)
 		for (y = rectlist.rect->min_y; y <= rectlist.rect->max_y; y++)
 		{
@@ -357,7 +299,7 @@ UINT32 cyberbal_state::update_one_screen(screen_device &screen, bitmap_ind16 &bi
 				{
 					/* not verified: logic is all controlled in a PAL
 					*/
-					pf[x] = mo[x];
+					pf[x] = palbase + mo[x];
 
 					/* erase behind ourselves */
 					mo[x] = 0;
@@ -365,7 +307,8 @@ UINT32 cyberbal_state::update_one_screen(screen_device &screen, bitmap_ind16 &bi
 		}
 
 	/* add the alpha on top */
-	((index == 0) ? m_alpha_tilemap : m_alpha2_tilemap)->draw(bitmap, cliprect, 0, 0);
+	tilemap_t &curalpha = index ? static_cast<tilemap_t &>(m_alpha2_tilemap) : static_cast<tilemap_t &>(m_alpha_tilemap);
+	curalpha.draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 

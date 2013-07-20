@@ -19,7 +19,7 @@
 
 TILE_GET_INFO_MEMBER(gauntlet_state::get_alpha_tile_info)
 {
-	UINT16 data = m_alpha[tile_index];
+	UINT16 data = tilemap.basemem_read(tile_index);
 	int code = data & 0x3ff;
 	int color = ((data >> 10) & 0x0f) | ((data >> 9) & 0x20);
 	int opaque = data & 0x8000;
@@ -29,7 +29,7 @@ TILE_GET_INFO_MEMBER(gauntlet_state::get_alpha_tile_info)
 
 TILE_GET_INFO_MEMBER(gauntlet_state::get_playfield_tile_info)
 {
-	UINT16 data = m_playfield[tile_index];
+	UINT16 data = tilemap.basemem_read(tile_index);
 	int code = ((m_playfield_tile_bank * 0x1000) + (data & 0xfff)) ^ 0x800;
 	int color = 0x10 + (m_playfield_color_bank * 8) + ((data >> 12) & 7);
 	SET_TILE_INFO_MEMBER(0, code, color, (data >> 15) & 1);
@@ -85,15 +85,8 @@ VIDEO_START_MEMBER(gauntlet_state,gauntlet)
 	UINT16 *codelookup;
 	int i, size;
 
-	/* initialize the playfield */
-	m_playfield_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(gauntlet_state::get_playfield_tile_info),this), TILEMAP_SCAN_COLS,  8,8, 64,64);
-
 	/* initialize the motion objects */
 	atarimo_init(machine(), 0, &modesc);
-
-	/* initialize the alphanumerics */
-	m_alpha_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(gauntlet_state::get_alpha_tile_info),this), TILEMAP_SCAN_ROWS,  8,8, 64,32);
-	m_alpha_tilemap->set_transparent_pen(0);
 
 	/* modify the motion object code lookup table to account for the code XOR */
 	codelookup = atarimo_get_code_lookup(0, &size);

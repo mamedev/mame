@@ -289,4 +289,7 @@ public:
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+
+private:
+	inline void get_tile_info(tile_data &tileinfo, int tile_index, UINT16 *gfx_base);
 };

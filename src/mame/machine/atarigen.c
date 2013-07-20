@@ -389,21 +389,17 @@ atarigen_state::atarigen_state(const machine_config &mconfig, device_type type, 
 		m_sound_int_state(0),
 		m_video_int_state(0),
 		m_eeprom_default(NULL),
-		m_playfield(*this, "playfield"),
-		m_playfield2(*this, "playfield2"),
-		m_playfield_upper(*this, "playfield_up"),
-		m_alpha(*this, "alpha"),
-		m_alpha2(*this, "alpha2"),
 		m_xscroll(*this, "xscroll"),
 		m_yscroll(*this, "yscroll"),
-		m_playfield32(*this, "playfield32"),
-		m_alpha32(*this, "alpha32"),
-		m_playfield_tilemap(NULL),
-		m_playfield2_tilemap(NULL),
-		m_alpha_tilemap(NULL),
-		m_alpha2_tilemap(NULL),
-		m_atarivc_data(*this, "atarivc_data"),
-		m_atarivc_eof_data(*this, "atarivc_eof"),
+			m_atarivc_playfield_tilemap(*this, "playfield"),
+			m_atarivc_playfield2_tilemap(*this, "playfield2"),
+			m_atarivc_data(*this, "atarivc_data"),
+			m_atarivc_eof_data(*this, "atarivc_eof"),
+			m_actual_vc_latch0(0),
+			m_actual_vc_latch1(0),
+			m_atarivc_playfields(0),
+			m_atarivc_playfield_latch(0),
+			m_atarivc_playfield2_latch(0),
 		m_eeprom_unlocked(false),
 		m_slapstic_num(0),
 		m_slapstic(NULL),
@@ -413,11 +409,6 @@ atarigen_state::atarigen_state(const machine_config &mconfig, device_type type, 
 		m_slapstic_base(0),
 		m_slapstic_mirror(0),
 		m_scanlines_per_callback(0),
-		m_actual_vc_latch0(0),
-		m_actual_vc_latch1(0),
-		m_atarivc_playfields(0),
-		m_playfield_latch(0),
-		m_playfield2_latch(0),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_oki(*this, "oki"),
@@ -457,6 +448,10 @@ void atarigen_state::machine_start()
 	save_item(NAME(m_atarivc_state.pf1_yscroll));           // playfield 2 yscroll
 	save_item(NAME(m_atarivc_state.mo_xscroll));            // sprite xscroll
 	save_item(NAME(m_atarivc_state.mo_yscroll));            // sprite xscroll
+	save_item(NAME(m_actual_vc_latch0));
+	save_item(NAME(m_actual_vc_latch1));
+	save_item(NAME(m_atarivc_playfield_latch));
+	save_item(NAME(m_atarivc_playfield2_latch));
 
 	save_item(NAME(m_eeprom_unlocked));
 
@@ -466,12 +461,6 @@ void atarigen_state::machine_start()
 	save_item(NAME(m_slapstic_last_address));
 
 	save_item(NAME(m_scanlines_per_callback));
-
-	save_item(NAME(m_actual_vc_latch0));
-	save_item(NAME(m_actual_vc_latch1));
-
-	save_item(NAME(m_playfield_latch));
-	save_item(NAME(m_playfield2_latch));
 
 	save_item(NAME(m_earom_data));
 	save_item(NAME(m_earom_control));
@@ -920,13 +909,13 @@ void atarigen_state::atarivc_eof_update(emu_timer &timer, screen_device &screen)
 	atarimo_set_xscroll(0, m_atarivc_state.mo_xscroll);
 	atarimo_set_yscroll(0, m_atarivc_state.mo_yscroll);
 
-	m_playfield_tilemap->set_scrollx(0, m_atarivc_state.pf0_xscroll);
-	m_playfield_tilemap->set_scrolly(0, m_atarivc_state.pf0_yscroll);
+	m_atarivc_playfield_tilemap->set_scrollx(0, m_atarivc_state.pf0_xscroll);
+	m_atarivc_playfield_tilemap->set_scrolly(0, m_atarivc_state.pf0_yscroll);
 
 	if (m_atarivc_playfields > 1)
 	{
-		m_playfield2_tilemap->set_scrollx(0, m_atarivc_state.pf1_xscroll);
-		m_playfield2_tilemap->set_scrolly(0, m_atarivc_state.pf1_yscroll);
+		m_atarivc_playfield2_tilemap->set_scrollx(0, m_atarivc_state.pf1_xscroll);
+		m_atarivc_playfield2_tilemap->set_scrolly(0, m_atarivc_state.pf1_yscroll);
 	}
 	timer.adjust(screen.time_until_pos(0));
 
@@ -956,6 +945,9 @@ void atarigen_state::atarivc_reset(screen_device &screen, UINT16 *eof_data, int 
 	// this allows us to manually reset eof_data to NULL if it's not used
 	m_atarivc_eof_data.set_target(eof_data, 0x100);
 	m_atarivc_playfields = playfields;
+	
+	if (playfields == 2 && m_atarivc_playfield2_tilemap != NULL)
+		m_atarivc_playfield2_tilemap->extmem().set(m_atarivc_playfield_tilemap->extmem());
 
 	// clear the RAM we use
 	memset(m_atarivc_data, 0, 0x40);
@@ -1016,8 +1008,8 @@ void atarigen_state::atarivc_common_w(screen_device &screen, offs_t offset, UINT
 		case 0x0a:
 
 			// reset the latches when disabled
-			set_playfield_latch((newword & 0x0080) ? m_actual_vc_latch0 : -1);
-			set_playfield2_latch((newword & 0x0080) ? m_actual_vc_latch1 : -1);
+			m_atarivc_playfield_latch = (newword & 0x0080) ? m_actual_vc_latch0 : -1;
+			m_atarivc_playfield2_latch = (newword & 0x0080) ? m_actual_vc_latch1 : -1;
 
 			// check for rowscroll enable
 			m_atarivc_state.rowscroll_enable = (newword & 0x2000) >> 13;
@@ -1068,16 +1060,16 @@ void atarigen_state::atarivc_common_w(screen_device &screen, offs_t offset, UINT
 		case 0x1c:
 			m_actual_vc_latch0 = -1;
 			m_actual_vc_latch1 = newword;
-			set_playfield_latch((m_atarivc_data[0x0a] & 0x80) ? m_actual_vc_latch0 : -1);
-			set_playfield2_latch((m_atarivc_data[0x0a] & 0x80) ? m_actual_vc_latch1 : -1);
+			m_atarivc_playfield_latch = (m_atarivc_data[0x0a] & 0x80) ? m_actual_vc_latch0 : -1;
+			m_atarivc_playfield2_latch = (m_atarivc_data[0x0a] & 0x80) ? m_actual_vc_latch1 : -1;
 			break;
 
 		// latch 2 value
 		case 0x1d:
 			m_actual_vc_latch0 = newword;
 			m_actual_vc_latch1 = -1;
-			set_playfield_latch((m_atarivc_data[0x0a] & 0x80) ? m_actual_vc_latch0 : -1);
-			set_playfield2_latch((m_atarivc_data[0x0a] & 0x80) ? m_actual_vc_latch1 : -1);
+			m_atarivc_playfield_latch = (m_atarivc_data[0x0a] & 0x80) ? m_actual_vc_latch0 : -1;
+			m_atarivc_playfield2_latch = (m_atarivc_data[0x0a] & 0x80) ? m_actual_vc_latch1 : -1;
 			break;
 
 		// scanline IRQ ack here
@@ -1128,100 +1120,13 @@ UINT16 atarigen_state::atarivc_r(screen_device &screen, offs_t offset)
 ***************************************************************************/
 
 //-------------------------------------------------
-//  alpha_w: Generic write handler for alpha RAM.
-//-------------------------------------------------
-
-WRITE16_MEMBER(atarigen_state::alpha_w)
-{
-	COMBINE_DATA(&m_alpha[offset]);
-	m_alpha_tilemap->mark_tile_dirty(offset);
-}
-
-WRITE32_MEMBER(atarigen_state::alpha32_w)
-{
-	COMBINE_DATA(&m_alpha32[offset]);
-	if (ACCESSING_BITS_16_31)
-		m_alpha_tilemap->mark_tile_dirty(offset * 2);
-	if (ACCESSING_BITS_0_15)
-		m_alpha_tilemap->mark_tile_dirty(offset * 2 + 1);
-}
-
-WRITE16_MEMBER(atarigen_state::alpha2_w)
-{
-	COMBINE_DATA(&m_alpha2[offset]);
-	m_alpha2_tilemap->mark_tile_dirty(offset);
-}
-
-
-
-//-------------------------------------------------
-//  set_playfield_latch: Sets the latch for the latched
-//  playfield handlers below.
-//-------------------------------------------------
-
-void atarigen_state::set_playfield_latch(int data)
-{
-	m_playfield_latch = data;
-}
-
-void atarigen_state::set_playfield2_latch(int data)
-{
-	m_playfield2_latch = data;
-}
-
-
-
-//-------------------------------------------------
-//  playfield_w: Generic write handler for PF RAM.
-//-------------------------------------------------
-
-WRITE16_MEMBER(atarigen_state::playfield_w)
-{
-	COMBINE_DATA(&m_playfield[offset]);
-	m_playfield_tilemap->mark_tile_dirty(offset);
-}
-
-WRITE32_MEMBER(atarigen_state::playfield32_w)
-{
-	COMBINE_DATA(&m_playfield32[offset]);
-	if (ACCESSING_BITS_16_31)
-		m_playfield_tilemap->mark_tile_dirty(offset * 2);
-	if (ACCESSING_BITS_0_15)
-		m_playfield_tilemap->mark_tile_dirty(offset * 2 + 1);
-}
-
-WRITE16_MEMBER(atarigen_state::playfield2_w)
-{
-	COMBINE_DATA(&m_playfield2[offset]);
-	m_playfield2_tilemap->mark_tile_dirty(offset);
-}
-
-
-
-//-------------------------------------------------
-//  playfield_large_w: Generic write handler for
-//  large (2-word) playfield RAM.
-//-------------------------------------------------
-
-WRITE16_MEMBER(atarigen_state::playfield_large_w)
-{
-	atarigen_state *state = space.machine().driver_data<atarigen_state>();
-	COMBINE_DATA(&state->m_playfield[offset]);
-	state->m_playfield_tilemap->mark_tile_dirty(offset / 2);
-}
-
-
-
-//-------------------------------------------------
 //  playfield_upper_w: Generic write handler for
 //  upper word of split playfield RAM.
 //-------------------------------------------------
 
-WRITE16_MEMBER(atarigen_state::playfield_upper_w)
+WRITE16_MEMBER(atarigen_state::atarivc_playfield_upper_w)
 {
-	atarigen_state *state = space.machine().driver_data<atarigen_state>();
-	COMBINE_DATA(&state->m_playfield_upper[offset]);
-	state->m_playfield_tilemap->mark_tile_dirty(offset);
+	m_atarivc_playfield_tilemap->write_ext(space, offset, data, mem_mask);
 }
 
 
@@ -1231,12 +1136,10 @@ WRITE16_MEMBER(atarigen_state::playfield_upper_w)
 //  upper word of split dual playfield RAM.
 //-------------------------------------------------
 
-WRITE16_MEMBER(atarigen_state::playfield_dual_upper_w)
+WRITE16_MEMBER(atarigen_state::atarivc_playfield_dual_upper_w)
 {
-	atarigen_state *state = space.machine().driver_data<atarigen_state>();
-	COMBINE_DATA(&state->m_playfield_upper[offset]);
-	state->m_playfield_tilemap->mark_tile_dirty(offset);
-	state->m_playfield2_tilemap->mark_tile_dirty(offset);
+	m_atarivc_playfield_tilemap->write_ext(space, offset, data, mem_mask);
+	m_atarivc_playfield2_tilemap->write_ext(space, offset, data, mem_mask);
 }
 
 
@@ -1247,15 +1150,11 @@ WRITE16_MEMBER(atarigen_state::playfield_dual_upper_w)
 //  upper word.
 //-------------------------------------------------
 
-WRITE16_MEMBER(atarigen_state::playfield_latched_lsb_w)
+WRITE16_MEMBER(atarigen_state::atarivc_playfield_latched_lsb_w)
 {
-	atarigen_state *state = space.machine().driver_data<atarigen_state>();
-
-	COMBINE_DATA(&state->m_playfield[offset]);
-	state->m_playfield_tilemap->mark_tile_dirty(offset);
-
-	if (state->m_playfield_latch != -1)
-		state->m_playfield_upper[offset] = (state->m_playfield_upper[offset] & ~0x00ff) | (state->m_playfield_latch & 0x00ff);
+	m_atarivc_playfield_tilemap->write(space, offset, data, mem_mask);
+	if (m_atarivc_playfield_latch != -1)
+		m_atarivc_playfield_tilemap->write_ext(space, offset, UINT16(m_atarivc_playfield_latch), UINT16(0x00ff));
 }
 
 
@@ -1266,15 +1165,11 @@ WRITE16_MEMBER(atarigen_state::playfield_latched_lsb_w)
 //  upper word.
 //-------------------------------------------------
 
-WRITE16_MEMBER(atarigen_state::playfield_latched_msb_w)
+WRITE16_MEMBER(atarigen_state::atarivc_playfield_latched_msb_w)
 {
-	atarigen_state *state = space.machine().driver_data<atarigen_state>();
-
-	COMBINE_DATA(&state->m_playfield[offset]);
-	state->m_playfield_tilemap->mark_tile_dirty(offset);
-
-	if (state->m_playfield_latch != -1)
-		state->m_playfield_upper[offset] = (state->m_playfield_upper[offset] & ~0xff00) | (state->m_playfield_latch & 0xff00);
+	m_atarivc_playfield_tilemap->write(space, offset, data, mem_mask);
+	if (m_atarivc_playfield_latch != -1)
+		m_atarivc_playfield_tilemap->write_ext(space, offset, UINT16(m_atarivc_playfield_latch), UINT16(0xff00));
 }
 
 
@@ -1285,15 +1180,11 @@ WRITE16_MEMBER(atarigen_state::playfield_latched_msb_w)
 //  of the upper word.
 //-------------------------------------------------
 
-WRITE16_MEMBER(atarigen_state::playfield2_latched_msb_w)
+WRITE16_MEMBER(atarigen_state::atarivc_playfield2_latched_msb_w)
 {
-	atarigen_state *state = space.machine().driver_data<atarigen_state>();
-
-	COMBINE_DATA(&state->m_playfield2[offset]);
-	state->m_playfield2_tilemap->mark_tile_dirty(offset);
-
-	if (state->m_playfield2_latch != -1)
-		state->m_playfield_upper[offset] = (state->m_playfield_upper[offset] & ~0xff00) | (state->m_playfield2_latch & 0xff00);
+	m_atarivc_playfield2_tilemap->write(space, offset, data, mem_mask);
+	if (m_atarivc_playfield2_latch != -1)
+		m_atarivc_playfield2_tilemap->write_ext(space, offset, UINT16(m_atarivc_playfield2_latch), UINT16(0xff00));
 }
 
 

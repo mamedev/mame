@@ -715,7 +715,7 @@ tilemap_t *segas32_state::find_cache_entry(int page, int bank)
 
 TILE_GET_INFO_MEMBER(segas32_state::get_tile_info)
 {
-	struct segas32_state::cache_entry *entry = (struct segas32_state::cache_entry *)param;
+	struct segas32_state::cache_entry *entry = (struct segas32_state::cache_entry *)tilemap.user_data();
 	UINT16 data = m_system32_videoram[(entry->page & 0x7f) * 0x200 + tile_index];
 	SET_TILE_INFO_MEMBER(0, (entry->bank << 13) + (data & 0x1fff), (data >> 4) & 0x1ff, (data >> 14) & 3);
 }

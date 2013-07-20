@@ -346,14 +346,14 @@ TILEMAP_MAPPER_MEMBER(megasys1_state::megasys1_scan_16x16)
 
 TILE_GET_INFO_MEMBER(megasys1_state::megasys1_get_scroll_tile_info_8x8)
 {
-	int tmap = (FPTR)param;
+	int tmap = (FPTR)tilemap.user_data();
 	UINT16 code = m_scrollram[tmap][tile_index];
 	SET_TILE_INFO_MEMBER(tmap, (code & 0xfff) * m_8x8_scroll_factor[tmap], code >> (16 - m_bits_per_color_code), 0);
 }
 
 TILE_GET_INFO_MEMBER(megasys1_state::megasys1_get_scroll_tile_info_16x16)
 {
-	int tmap = (FPTR)param;
+	int tmap = (FPTR)tilemap.user_data();
 	UINT16 code = m_scrollram[tmap][tile_index/4];
 	SET_TILE_INFO_MEMBER(tmap, (code & 0xfff) * m_16x16_scroll_factor[tmap] + (tile_index & 3), code >> (16 - m_bits_per_color_code), 0);
 }

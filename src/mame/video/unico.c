@@ -90,7 +90,7 @@ WRITE32_MEMBER(unico_state::unico_palette32_w)
 
 TILE_GET_INFO_MEMBER(unico_state::get_tile_info)
 {
-	UINT16 *vram = (UINT16 *)param;
+	UINT16 *vram = (UINT16 *)tilemap.user_data();
 	UINT16 code = vram[2 * tile_index + 0 ];
 	UINT16 attr = vram[2 * tile_index + 1 ];
 	SET_TILE_INFO_MEMBER(1, code, attr & 0x1f, TILE_FLIPYX( attr >> 5 ));
@@ -98,7 +98,7 @@ TILE_GET_INFO_MEMBER(unico_state::get_tile_info)
 
 TILE_GET_INFO_MEMBER(unico_state::get_tile_info32)
 {
-	UINT32 *vram = (UINT32 *)param;
+	UINT32 *vram = (UINT32 *)tilemap.user_data();
 	UINT16 code = vram[tile_index] >> 16;
 	UINT16 attr = vram[tile_index] & 0xff;
 	SET_TILE_INFO_MEMBER(1, code, attr & 0x1f, TILE_FLIPYX( attr >> 5 ));

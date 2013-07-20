@@ -13,9 +13,11 @@ public:
 	foodf_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atarigen_state(mconfig, type, tag),
 			m_nvram(*this, "nvram"),
+			m_playfield_tilemap(*this, "playfield"),
 			m_spriteram(*this, "spriteram") { }
 
 	required_device<x2212_device> m_nvram;
+	required_device<tilemap_device> m_playfield_tilemap;
 
 	double          m_rweights[3];
 	double          m_gweights[3];

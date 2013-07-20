@@ -186,6 +186,7 @@ protected:
 	UINT16 m_c355_obj_ram[0x20000/2];
 
 	UINT8 m_player_mux;
+	inline void namcoic_get_tile_info(tile_data &tileinfo,int tile_index,UINT16 *vram);
 
 public:
 	// general

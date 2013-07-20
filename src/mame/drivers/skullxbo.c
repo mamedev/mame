@@ -46,11 +46,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(skullxbo_state::scanline_timer)
 
 void skullxbo_state::scanline_update(screen_device &screen, int scanline)
 {
-	UINT16 *check = &m_alpha[(scanline / 8) * 64 + 42];
-
 	/* check for interrupts in the alpha ram */
 	/* the interrupt occurs on the HBLANK of the 6th scanline following */
-	if (check < &m_alpha[0x7c0] && (*check & 0x8000))
+	int offset = (scanline / 8) * 64 + 42;
+	if (offset < 0x7c0 && (m_alpha_tilemap->basemem_read(offset) & 0x8000))
 	{
 		int width = screen.width();
 		attotime period = screen.time_until_pos(screen.vpos() + 6, width * 0.9);
@@ -103,11 +102,11 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, skullxbo_state )
 	AM_RANGE(0xff1000, 0xff13ff) AM_WRITE(video_int_ack_w)
 	AM_RANGE(0xff1400, 0xff17ff) AM_DEVWRITE8("jsa", atari_jsa_ii_device, main_command_w, 0x00ff)
 	AM_RANGE(0xff1800, 0xff1bff) AM_DEVWRITE("jsa", atari_jsa_ii_device, sound_reset_w)
-	AM_RANGE(0xff1c00, 0xff1c7f) AM_WRITE(skullxbo_playfieldlatch_w)
+	AM_RANGE(0xff1c00, 0xff1c7f) AM_WRITE(playfield_latch_w)
 	AM_RANGE(0xff1c80, 0xff1cff) AM_WRITE(skullxbo_xscroll_w) AM_SHARE("xscroll")
 	AM_RANGE(0xff1d00, 0xff1d7f) AM_WRITE(scanline_int_ack_w)
 	AM_RANGE(0xff1d80, 0xff1dff) AM_WRITE(watchdog_reset16_w)
-	AM_RANGE(0xff1e00, 0xff1e7f) AM_WRITE(skullxbo_playfieldlatch_w)
+	AM_RANGE(0xff1e00, 0xff1e7f) AM_WRITE(playfield_latch_w)
 	AM_RANGE(0xff1e80, 0xff1eff) AM_WRITE(skullxbo_xscroll_w)
 	AM_RANGE(0xff1f00, 0xff1f7f) AM_WRITE(scanline_int_ack_w)
 	AM_RANGE(0xff1f80, 0xff1fff) AM_WRITE(watchdog_reset16_w)
@@ -119,9 +118,9 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, skullxbo_state )
 	AM_RANGE(0xff5800, 0xff5801) AM_READ_PORT("FF5800")
 	AM_RANGE(0xff5802, 0xff5803) AM_READ_PORT("FF5802")
 	AM_RANGE(0xff6000, 0xff6fff) AM_READ(eeprom_r)
-	AM_RANGE(0xff8000, 0xff9fff) AM_RAM_WRITE(playfield_latched_lsb_w) AM_SHARE("playfield")
-	AM_RANGE(0xffa000, 0xffbfff) AM_RAM_WRITE(playfield_upper_w) AM_SHARE("playfield_up")
-	AM_RANGE(0xffc000, 0xffcf7f) AM_RAM_WRITE(alpha_w) AM_SHARE("alpha")
+	AM_RANGE(0xff8000, 0xff9fff) AM_RAM_WRITE(playfield_latched_w) AM_SHARE("playfield")
+	AM_RANGE(0xffa000, 0xffbfff) AM_RAM_DEVWRITE("playfield", tilemap_device, write_ext) AM_SHARE("playfield_ext")
+	AM_RANGE(0xffc000, 0xffcf7f) AM_RAM_DEVWRITE("alpha", tilemap_device, write) AM_SHARE("alpha")
 	AM_RANGE(0xffcf80, 0xffcfff) AM_READWRITE_LEGACY(atarimo_0_slipram_r, atarimo_0_slipram_w)
 	AM_RANGE(0xffd000, 0xffdfff) AM_READWRITE_LEGACY(atarimo_0_spriteram_r, atarimo_0_spriteram_w)
 	AM_RANGE(0xffe000, 0xffffff) AM_RAM
@@ -237,6 +236,9 @@ static MACHINE_CONFIG_START( skullxbo, skullxbo_state )
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_GFXDECODE(skullxbo)
 	MCFG_PALETTE_LENGTH(2048)
+
+	MCFG_TILEMAP_ADD_STANDARD("playfield", 2, skullxbo_state, get_playfield_tile_info, 16,8, SCAN_COLS, 64,64)
+	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", 2, skullxbo_state, get_alpha_tile_info, 16,8, SCAN_ROWS, 64,32, 0)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	/* note: these parameters are from published specs, not derived */

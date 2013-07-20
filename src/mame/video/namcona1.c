@@ -10,15 +10,13 @@ TODO:
 #include "includes/namcona1.h"
 
 
-static void tilemap_get_info(
-	running_machine &machine,
+void namcona1_state::tilemap_get_info(
 	tile_data &tileinfo,
 	int tile_index,
 	const UINT16 *tilemap_videoram,
 	int tilemap_color,
-	int use_4bpp_gfx )
+	bool use_4bpp_gfx )
 {
-	namcona1_state *state = machine.driver_data<namcona1_state>();
 	UINT16 *source;
 
 	int data = tilemap_videoram[tile_index];
@@ -38,17 +36,17 @@ static void tilemap_get_info(
 
 	if( data & 0x8000 )
 	{
-		SET_TILE_INFO( gfx,tile,tilemap_color,TILE_FORCE_LAYER0 );
+		SET_TILE_INFO_MEMBER( gfx,tile,tilemap_color,TILE_FORCE_LAYER0 );
 	}
 	else
 	{
-		SET_TILE_INFO( gfx,tile,tilemap_color,0 );
+		SET_TILE_INFO_MEMBER( gfx,tile,tilemap_color,0 );
 		if (ENDIANNESS_NATIVE == ENDIANNESS_BIG)
-			tileinfo.mask_data = (UINT8 *)(state->m_shaperam+4*tile);
+			tileinfo.mask_data = (UINT8 *)(m_shaperam+4*tile);
 		else
 		{
-			UINT8 *mask_data = state->m_mask_data;
-			source = state->m_shaperam+4*tile;
+			UINT8 *mask_data = m_mask_data;
+			source = m_shaperam+4*tile;
 			mask_data[0] = source[0]>>8;
 			mask_data[1] = source[0]&0xff;
 			mask_data[2] = source[1]>>8;
@@ -65,25 +63,25 @@ static void tilemap_get_info(
 TILE_GET_INFO_MEMBER(namcona1_state::tilemap_get_info0)
 {
 	UINT16 *videoram = m_videoram;
-	tilemap_get_info(machine(),tileinfo,tile_index,0*0x1000+videoram,m_tilemap_palette_bank[0],m_vreg[0xbc/2]&1);
+	tilemap_get_info(tileinfo,tile_index,0*0x1000+videoram,m_tilemap_palette_bank[0],m_vreg[0xbc/2]&1);
 }
 
 TILE_GET_INFO_MEMBER(namcona1_state::tilemap_get_info1)
 {
 	UINT16 *videoram = m_videoram;
-	tilemap_get_info(machine(),tileinfo,tile_index,1*0x1000+videoram,m_tilemap_palette_bank[1],m_vreg[0xbc/2]&2);
+	tilemap_get_info(tileinfo,tile_index,1*0x1000+videoram,m_tilemap_palette_bank[1],m_vreg[0xbc/2]&2);
 }
 
 TILE_GET_INFO_MEMBER(namcona1_state::tilemap_get_info2)
 {
 	UINT16 *videoram = m_videoram;
-	tilemap_get_info(machine(),tileinfo,tile_index,2*0x1000+videoram,m_tilemap_palette_bank[2],m_vreg[0xbc/2]&4);
+	tilemap_get_info(tileinfo,tile_index,2*0x1000+videoram,m_tilemap_palette_bank[2],m_vreg[0xbc/2]&4);
 }
 
 TILE_GET_INFO_MEMBER(namcona1_state::tilemap_get_info3)
 {
 	UINT16 *videoram = m_videoram;
-	tilemap_get_info(machine(),tileinfo,tile_index,3*0x1000+videoram,m_tilemap_palette_bank[3],m_vreg[0xbc/2]&8);
+	tilemap_get_info(tileinfo,tile_index,3*0x1000+videoram,m_tilemap_palette_bank[3],m_vreg[0xbc/2]&8);
 }
 
 TILE_GET_INFO_MEMBER(namcona1_state::roz_get_info)

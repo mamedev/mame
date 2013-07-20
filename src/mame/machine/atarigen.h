@@ -251,20 +251,11 @@ public:
 	void atarivc_common_w(screen_device &screen, offs_t offset, UINT16 newword);
 
 	// playfield/alpha tilemap helpers
-	DECLARE_WRITE16_MEMBER( alpha_w );
-	DECLARE_WRITE32_MEMBER( alpha32_w );
-	DECLARE_WRITE16_MEMBER( alpha2_w );
-	void set_playfield_latch(int data);
-	void set_playfield2_latch(int data);
-	DECLARE_WRITE16_MEMBER( playfield_w );
-	DECLARE_WRITE32_MEMBER( playfield32_w );
-	DECLARE_WRITE16_MEMBER( playfield_large_w );
-	DECLARE_WRITE16_MEMBER( playfield_upper_w );
-	DECLARE_WRITE16_MEMBER( playfield_dual_upper_w );
-	DECLARE_WRITE16_MEMBER( playfield_latched_lsb_w );
-	DECLARE_WRITE16_MEMBER( playfield_latched_msb_w );
-	DECLARE_WRITE16_MEMBER( playfield2_w );
-	DECLARE_WRITE16_MEMBER( playfield2_latched_msb_w );
+	DECLARE_WRITE16_MEMBER( atarivc_playfield_upper_w );
+	DECLARE_WRITE16_MEMBER( atarivc_playfield_dual_upper_w );
+	DECLARE_WRITE16_MEMBER( atarivc_playfield_latched_lsb_w );
+	DECLARE_WRITE16_MEMBER( atarivc_playfield_latched_msb_w );
+	DECLARE_WRITE16_MEMBER( atarivc_playfield2_latched_msb_w );
 
 	// video helpers
 	int get_hblank(screen_device &screen) const { return (screen.hpos() > (screen.width() * 9 / 10)); }
@@ -308,25 +299,21 @@ public:
 
 	const UINT16 *      m_eeprom_default;
 
-	optional_shared_ptr<UINT16> m_playfield;
-	optional_shared_ptr<UINT16> m_playfield2;
-	optional_shared_ptr<UINT16> m_playfield_upper;
-	optional_shared_ptr<UINT16> m_alpha;
-	optional_shared_ptr<UINT16> m_alpha2;
 	optional_shared_ptr<UINT16> m_xscroll;
 	optional_shared_ptr<UINT16> m_yscroll;
 
-	optional_shared_ptr<UINT32> m_playfield32;
-	optional_shared_ptr<UINT32> m_alpha32;
+			optional_device<tilemap_device>	m_atarivc_playfield_tilemap;
+			optional_device<tilemap_device> m_atarivc_playfield2_tilemap;
 
-	tilemap_t *             m_playfield_tilemap;
-	tilemap_t *             m_playfield2_tilemap;
-	tilemap_t *             m_alpha_tilemap;
-	tilemap_t *             m_alpha2_tilemap;
+			optional_shared_ptr<UINT16> m_atarivc_data;
+			optional_shared_ptr<UINT16> m_atarivc_eof_data;
+			atarivc_state_desc      m_atarivc_state;
 
-	optional_shared_ptr<UINT16> m_atarivc_data;
-	optional_shared_ptr<UINT16> m_atarivc_eof_data;
-	atarivc_state_desc      m_atarivc_state;
+			UINT32                  m_actual_vc_latch0;
+			UINT32                  m_actual_vc_latch1;
+			UINT8                   m_atarivc_playfields;
+			UINT32                  m_atarivc_playfield_latch;
+			UINT32                  m_atarivc_playfield2_latch;
 
 	/* internal state */
 	bool                    m_eeprom_unlocked;
@@ -342,12 +329,6 @@ public:
 
 	UINT32                  m_scanlines_per_callback;
 
-	UINT32                  m_actual_vc_latch0;
-	UINT32                  m_actual_vc_latch1;
-	UINT8                   m_atarivc_playfields;
-
-	UINT32                  m_playfield_latch;
-	UINT32                  m_playfield2_latch;
 
 	atarigen_screen_timer   m_screen_timer[2];
 	required_device<cpu_device> m_maincpu;

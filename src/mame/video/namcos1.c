@@ -50,56 +50,54 @@ Namco System 1 Video Hardware
 
 ***************************************************************************/
 
-INLINE void bg_get_info(running_machine &machine,tile_data &tileinfo,int tile_index,UINT8 *info_vram)
+inline void namcos1_state::bg_get_info(tile_data &tileinfo,int tile_index,UINT8 *info_vram)
 {
-	namcos1_state *state = machine.driver_data<namcos1_state>();
 	int code;
 
 	tile_index <<= 1;
 	code = info_vram[tile_index + 1] + ((info_vram[tile_index] & 0x3f) << 8);
-	SET_TILE_INFO(0,code,0,0);
-	tileinfo.mask_data = &state->m_tilemap_maskdata[code << 3];
+	SET_TILE_INFO_MEMBER(0,code,0,0);
+	tileinfo.mask_data = &m_tilemap_maskdata[code << 3];
 }
 
-INLINE void fg_get_info(running_machine &machine,tile_data &tileinfo,int tile_index,UINT8 *info_vram)
+inline void namcos1_state::fg_get_info(tile_data &tileinfo,int tile_index,UINT8 *info_vram)
 {
-	namcos1_state *state = machine.driver_data<namcos1_state>();
 	int code;
 
 	tile_index <<= 1;
 	code = info_vram[tile_index + 1] + ((info_vram[tile_index] & 0x3f) << 8);
-	SET_TILE_INFO(0,code,0,0);
-	tileinfo.mask_data = &state->m_tilemap_maskdata[code << 3];
+	SET_TILE_INFO_MEMBER(0,code,0,0);
+	tileinfo.mask_data = &m_tilemap_maskdata[code << 3];
 }
 
 TILE_GET_INFO_MEMBER(namcos1_state::bg_get_info0)
 {
-	bg_get_info(machine(),tileinfo,tile_index,&m_videoram[0x0000]);
+	bg_get_info(tileinfo,tile_index,&m_videoram[0x0000]);
 }
 
 TILE_GET_INFO_MEMBER(namcos1_state::bg_get_info1)
 {
-	bg_get_info(machine(),tileinfo,tile_index,&m_videoram[0x2000]);
+	bg_get_info(tileinfo,tile_index,&m_videoram[0x2000]);
 }
 
 TILE_GET_INFO_MEMBER(namcos1_state::bg_get_info2)
 {
-	bg_get_info(machine(),tileinfo,tile_index,&m_videoram[0x4000]);
+	bg_get_info(tileinfo,tile_index,&m_videoram[0x4000]);
 }
 
 TILE_GET_INFO_MEMBER(namcos1_state::bg_get_info3)
 {
-	bg_get_info(machine(),tileinfo,tile_index,&m_videoram[0x6000]);
+	bg_get_info(tileinfo,tile_index,&m_videoram[0x6000]);
 }
 
 TILE_GET_INFO_MEMBER(namcos1_state::fg_get_info4)
 {
-	fg_get_info(machine(),tileinfo,tile_index,&m_videoram[0x7010]);
+	fg_get_info(tileinfo,tile_index,&m_videoram[0x7010]);
 }
 
 TILE_GET_INFO_MEMBER(namcos1_state::fg_get_info5)
 {
-	fg_get_info(machine(),tileinfo,tile_index,&m_videoram[0x7810]);
+	fg_get_info(tileinfo,tile_index,&m_videoram[0x7810]);
 }
 
 

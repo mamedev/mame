@@ -71,6 +71,8 @@ public:
 	TILE_GET_INFO_MEMBER(get_fg2_tile_info);
 	TILE_GET_INFO_MEMBER(flytiger_get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
+	inline void lastday_get_tile_info(tile_data &tileinfo, int tile_index, const UINT8 *tilerom, UINT8 *scroll, int graphics);
+	inline void rshark_get_tile_info(tile_data &tileinfo, int tile_index, const UINT8 *tilerom1, const UINT8 *tilerom2, UINT8 *scroll, int graphics);
 	DECLARE_MACHINE_START(lastday);
 	DECLARE_MACHINE_RESET(sound_ym2203);
 	DECLARE_VIDEO_START(lastday);

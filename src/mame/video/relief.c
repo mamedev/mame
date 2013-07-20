@@ -19,8 +19,8 @@
 
 TILE_GET_INFO_MEMBER(relief_state::get_playfield_tile_info)
 {
-	UINT16 data1 = m_playfield[tile_index];
-	UINT16 data2 = m_playfield_upper[tile_index] & 0xff;
+	UINT16 data1 = tilemap.basemem_read(tile_index);
+	UINT16 data2 = tilemap.extmem_read(tile_index) & 0xff;
 	int code = data1 & 0x7fff;
 	int color = 0x20 + (data2 & 0x0f);
 	SET_TILE_INFO_MEMBER(0, code, color, (data1 >> 15) & 1);
@@ -29,8 +29,8 @@ TILE_GET_INFO_MEMBER(relief_state::get_playfield_tile_info)
 
 TILE_GET_INFO_MEMBER(relief_state::get_playfield2_tile_info)
 {
-	UINT16 data1 = m_playfield2[tile_index];
-	UINT16 data2 = m_playfield_upper[tile_index] >> 8;
+	UINT16 data1 = tilemap.basemem_read(tile_index);
+	UINT16 data2 = tilemap.extmem_read(tile_index) >> 8;
 	int code = data1 & 0x7fff;
 	int color = data2 & 0x0f;
 	SET_TILE_INFO_MEMBER(0, code, color, (data1 >> 15) & 1);
@@ -86,13 +86,6 @@ VIDEO_START_MEMBER(relief_state,relief)
 	/* MOs are 5bpp but with a 4-bit color granularity */
 	machine().gfx[1]->set_granularity(16);
 
-	/* initialize the playfield */
-	m_playfield_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(relief_state::get_playfield_tile_info),this), TILEMAP_SCAN_COLS,  8,8, 64,64);
-
-	/* initialize the second playfield */
-	m_playfield2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(relief_state::get_playfield2_tile_info),this), TILEMAP_SCAN_COLS,  8,8, 64,64);
-	m_playfield2_tilemap->set_transparent_pen(0);
-
 	/* initialize the motion objects */
 	atarimo_init(machine(), 0, &modesc);
 }
@@ -114,8 +107,8 @@ UINT32 relief_state::screen_update_relief(screen_device &screen, bitmap_ind16 &b
 
 	/* draw the playfield */
 	priority_bitmap.fill(0, cliprect);
-	m_playfield_tilemap->draw(bitmap, cliprect, 0, 0);
-	m_playfield2_tilemap->draw(bitmap, cliprect, 0, 1);
+	m_atarivc_playfield_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_atarivc_playfield2_tilemap->draw(bitmap, cliprect, 0, 1);
 
 	/* draw and merge the MO */
 	mobitmap = atarimo_render(0, cliprect, &rectlist);

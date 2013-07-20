@@ -80,7 +80,7 @@ static const gfx_layout objlayout_6bpp =
 
 TILE_GET_INFO_MEMBER(atarisy1_state::get_alpha_tile_info)
 {
-	UINT16 data = m_alpha[tile_index];
+	UINT16 data = tilemap.basemem_read(tile_index);
 	int code = data & 0x3ff;
 	int color = (data >> 10) & 0x07;
 	int opaque = data & 0x2000;
@@ -90,7 +90,7 @@ TILE_GET_INFO_MEMBER(atarisy1_state::get_alpha_tile_info)
 
 TILE_GET_INFO_MEMBER(atarisy1_state::get_playfield_tile_info)
 {
-	UINT16 data = m_playfield[tile_index];
+	UINT16 data = tilemap.basemem_read(tile_index);
 	UINT16 lookup = m_playfield_lookup[((data >> 8) & 0x7f) | (m_playfield_tile_bank << 7)];
 	int gfxindex = (lookup >> 8) & 15;
 	int code = ((lookup & 0xff) << 8) | (data & 0xff);
@@ -153,15 +153,8 @@ VIDEO_START_MEMBER(atarisy1_state,atarisy1)
 	/* first decode the graphics */
 	decode_gfx(m_playfield_lookup, motable);
 
-	/* initialize the playfield */
-	m_playfield_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(atarisy1_state::get_playfield_tile_info),this), TILEMAP_SCAN_ROWS,  8,8, 64,64);
-
 	/* initialize the motion objects */
 	atarimo_init(machine(), 0, &modesc);
-
-	/* initialize the alphanumerics */
-	m_alpha_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(atarisy1_state::get_alpha_tile_info),this), TILEMAP_SCAN_ROWS,  8,8, 64,32);
-	m_alpha_tilemap->set_transparent_pen(0);
 
 	/* modify the motion object code lookup */
 	codelookup = atarimo_get_code_lookup(0, &size);

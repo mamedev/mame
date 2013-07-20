@@ -148,9 +148,9 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, relief_state )
 	AM_RANGE(0x2a0000, 0x2a0001) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x3e0000, 0x3e0fff) AM_RAM_WRITE(paletteram_666_w) AM_SHARE("paletteram")
 	AM_RANGE(0x3effc0, 0x3effff) AM_READWRITE(relief_atarivc_r, relief_atarivc_w) AM_SHARE("atarivc_data")
-	AM_RANGE(0x3f0000, 0x3f1fff) AM_RAM_WRITE(playfield2_latched_msb_w) AM_SHARE("playfield2")
-	AM_RANGE(0x3f2000, 0x3f3fff) AM_RAM_WRITE(playfield_latched_lsb_w) AM_SHARE("playfield")
-	AM_RANGE(0x3f4000, 0x3f5fff) AM_RAM_WRITE(playfield_dual_upper_w) AM_SHARE("playfield_up")
+	AM_RANGE(0x3f0000, 0x3f1fff) AM_RAM_WRITE(atarivc_playfield2_latched_msb_w) AM_SHARE("playfield2")
+	AM_RANGE(0x3f2000, 0x3f3fff) AM_RAM_WRITE(atarivc_playfield_latched_lsb_w) AM_SHARE("playfield")
+	AM_RANGE(0x3f4000, 0x3f5fff) AM_RAM_WRITE(atarivc_playfield_dual_upper_w) AM_SHARE("playfield_ext")
 	AM_RANGE(0x3f6000, 0x3f67ff) AM_READWRITE_LEGACY(atarimo_0_spriteram_r, atarimo_0_spriteram_w)
 	AM_RANGE(0x3f6800, 0x3f8eff) AM_RAM
 	AM_RANGE(0x3f8f00, 0x3f8f7f) AM_RAM AM_SHARE("atarivc_eof")
@@ -292,6 +292,9 @@ static MACHINE_CONFIG_START( relief, relief_state )
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_GFXDECODE(relief)
 	MCFG_PALETTE_LENGTH(2048)
+
+	MCFG_TILEMAP_ADD_STANDARD("playfield", 2, relief_state, get_playfield_tile_info, 8,8, SCAN_COLS, 64,64)
+	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("playfield2", 2, relief_state, get_playfield2_tile_info, 8,8, SCAN_COLS, 64,64, 0)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	/* note: these parameters are from published specs, not derived */

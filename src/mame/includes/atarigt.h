@@ -19,10 +19,15 @@ public:
 	atarigt_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atarigen_state(mconfig, type, tag),
 			m_colorram(*this, "colorram", 32),
+			m_playfield_tilemap(*this, "playfield"),
+			m_alpha_tilemap(*this, "alpha"),
 			m_mo_command(*this, "mo_command") { }
 
 	UINT8           m_is_primrage;
 	required_shared_ptr<UINT16> m_colorram;
+	
+	required_device<tilemap_device>	m_playfield_tilemap;
+	required_device<tilemap_device>	m_alpha_tilemap;
 
 	bitmap_ind16 *      m_pf_bitmap;
 	bitmap_ind16 *      m_an_bitmap;

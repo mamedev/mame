@@ -19,7 +19,7 @@
 
 TILE_GET_INFO_MEMBER(blstroid_state::get_playfield_tile_info)
 {
-	UINT16 data = m_playfield[tile_index];
+	UINT16 data = tilemap.basemem_read(tile_index);
 	int code = data & 0x1fff;
 	int color = (data >> 13) & 0x07;
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
@@ -72,9 +72,6 @@ VIDEO_START_MEMBER(blstroid_state,blstroid)
 		0                   /* callback routine for special entries */
 	};
 
-	/* initialize the playfield */
-	m_playfield_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(blstroid_state::get_playfield_tile_info),this), TILEMAP_SCAN_ROWS,  16,8, 64,64);
-
 	/* initialize the motion objects */
 	atarimo_init(machine(), 0, &modesc);
 }
@@ -93,18 +90,18 @@ void blstroid_state::device_timer(emu_timer &timer, device_timer_id id, int para
 
 	switch (id)
 	{
-	case TIMER_IRQ_OFF:
-		/* clear the interrupt */
-		scanline_int_ack_w(space, 0, 0);
-		break;
-	case TIMER_IRQ_ON:
-		/* generate the interrupt */
-		scanline_int_gen(m_maincpu);
-		update_interrupts();
-		break;
-	default:
-		atarigen_state::device_timer(timer, id, param, ptr);
-		break;
+		case TIMER_IRQ_OFF:
+			/* clear the interrupt */
+			scanline_int_ack_w(space, 0, 0);
+			break;
+		case TIMER_IRQ_ON:
+			/* generate the interrupt */
+			scanline_int_gen(m_maincpu);
+			update_interrupts();
+			break;
+		default:
+			atarigen_state::device_timer(timer, id, param, ptr);
+			break;
 	}
 }
 
@@ -115,12 +112,8 @@ void blstroid_state::scanline_update(screen_device &screen, int scanline)
 
 	/* check for interrupts */
 	if (offset < 0x1000)
-		if (m_playfield[offset] & 0x8000)
+		if (m_playfield_tilemap->basemem_read(offset) & 0x8000)
 		{
-			int width, vpos;
-			attotime period_on;
-			attotime period_off;
-
 			/* FIXME: - the only thing this IRQ does it tweak the starting MO link */
 			/* unfortunately, it does it too early for the given MOs! */
 			/* perhaps it is not actually hooked up on the real PCB... */
@@ -128,10 +121,10 @@ void blstroid_state::scanline_update(screen_device &screen, int scanline)
 
 			/* set a timer to turn the interrupt on at HBLANK of the 7th scanline */
 			/* and another to turn it off one scanline later */
-			width = screen.width();
-			vpos  = screen.vpos();
-			period_on  = screen.time_until_pos(vpos + 7, width * 0.9);
-			period_off = screen.time_until_pos(vpos + 8, width * 0.9);
+			int width = screen.width();
+			int vpos  = screen.vpos();
+			attotime period_on  = screen.time_until_pos(vpos + 7, width * 0.9);
+			attotime period_off = screen.time_until_pos(vpos + 8, width * 0.9);
 
 			timer_set(period_on, TIMER_IRQ_ON);
 			timer_set(period_off, TIMER_IRQ_OFF);
