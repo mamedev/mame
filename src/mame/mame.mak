@@ -1920,6 +1920,7 @@ $(MAMEOBJ)/pinball.a: \
 	$(DRIVERS)/capcom.o  \
 	$(DRIVERS)/de_2.o  \
 	$(DRIVERS)/de_3.o  \
+	$(MACHINE)/decopincpu.o \
 	$(VIDEO)/decodmd1.o \
 	$(VIDEO)/decodmd2.o \
 	$(DRIVERS)/de_3b.o  \
