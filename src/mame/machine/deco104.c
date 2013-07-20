@@ -193,7 +193,26 @@ WRITE16_HANDLER( deco16_104_prot_w ) /* Wizard Fire */
 {
 	int deco146_addr = BITSWAP32(offset*2, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    1,2,3, 4,5,6,7, 8,9,10,0) & 0x7fff;
 
+#if 0
+	UINT16 ports[37] = {
+	0x110,0x36c,0x334,0x0dc,0x494,0x244,0x7cc,0x0c0,
+	0x188,0x65e,0x5ce,0x61a,0x496,0x40a,0x1e8,0x4bc,
+    0x46e,0x264,0x172,0x214,0x52e,0x07a,0x360,0x4dc,
+    0x3a8,0x2f6,0x7e4,0x536,0x0be,0x490,0x710,0x22a,
+    0x626,0x444,0x5ac,0x650,0x4ac
+	};
 
+	for (int i=0;i<37;i++)
+	{
+		int xx = ports[i];
+
+		int deco146_addrxx = BITSWAP32(xx,  31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,      17,16,15,14,    1,2,3, 4,5,6,7, 8,9,10,0) & 0x7fff;
+
+
+		printf("case 0x%03x: /* was 0x%03x*/\n",deco146_addrxx, xx);
+	}
+	printf("\n");
+#endif
 
 	driver_device *state = space.machine().driver_data<driver_device>();
 	if (deco146_addr == (0xa8))
@@ -232,47 +251,49 @@ WRITE16_HANDLER( deco16_104_prot_w ) /* Wizard Fire */
 
 READ16_HANDLER( deco16_104_prot_r ) /* Wizard Fire */
 {
-	switch (offset<<1) {
-		case 0x110: /* Player input */			return space.machine().root_device().ioport("IN0")->read();
-		case 0x36c:								return space.machine().root_device().ioport("IN1")->read();
-		case 0x334:								return space.machine().root_device().ioport("IN1")->read();
-		case 0x0dc:								return space.machine().root_device().ioport("IN1")->read()<<4;
-		case 0x494: /* Dips */					return space.machine().root_device().ioport("DSW1_2")->read();
-		case 0x244:								return DECO_NEW_PORT(0x00);
-		case 0x7cc:								return ((DECO_NEW_PORT(0x00)&0x000f)<<12) | ((DECO_NEW_PORT(0x00)&0x00f0)<<4) | ((DECO_NEW_PORT(0x00)&0x0f00)>>4) | ((DECO_NEW_PORT(0x00)&0xf000)>>12);
-		case 0x0c0:								return (((DECO_NEW_PORT(0x00)&0x000e)>>1) | ((DECO_NEW_PORT(0x00)&0x0001)<<3))<<12;
-		case 0x188:								return (((DECO_NEW_PORT(0x00)&0x000e)>>1) | ((DECO_NEW_PORT(0x00)&0x0001)<<3))<<12;
-		case 0x65e:								return (((DECO_NEW_PORT(0x00)&0x000c)>>2) | ((DECO_NEW_PORT(0x00)&0x0003)<<2))<<12;
-		case 0x5ce:								return ((DECO_NEW_PORT(0x00)<<8)&0xf000) | ((DECO_NEW_PORT(0x00)&0xe)<<7) | ((DECO_NEW_PORT(0x00)&0x1)<<11);
-		case 0x61a:								return (DECO_NEW_PORT(0x00)<<8)&0xff00;
-		case 0x496:								return DECO_NEW_PORT(0x88);
-		case 0x40a:								return ((DECO_NEW_PORT(0x88)&0x000f)<<12) | ((DECO_NEW_PORT(0x88)&0x00f0)>>4) | ((DECO_NEW_PORT(0x88)&0x0f00)<<0) | ((DECO_NEW_PORT(0x88)&0xf000)>>8);
-		case 0x1e8:								return ((DECO_NEW_PORT(0x88)&0x00ff)<<8) | ((DECO_NEW_PORT(0x88)&0xff00)>>8);
-		case 0x4bc:								return ((DECO_NEW_PORT(0x88)&0x0ff0)<<4) | ((DECO_NEW_PORT(0x88)&0x0003)<<6) | ((DECO_NEW_PORT(0x88)&0x000c)<<2);
-		case 0x46e:								return ((DECO_NEW_PORT(0x88)&0xfff0)<<0) | ((DECO_NEW_PORT(0x88)&0x0007)<<1) | ((DECO_NEW_PORT(0x88)&0x0008)>>3);
-		case 0x264:								return ((DECO_NEW_PORT(0x88)&0x000f)<<8) | ((DECO_NEW_PORT(0x88)&0x00f0)>>0) | ((DECO_NEW_PORT(0x88)&0x0f00)<<4);
-		case 0x172:								return ((DECO_NEW_PORT(0x88)&0x000f)<<4) | ((DECO_NEW_PORT(0x88)&0x00f0)<<4) | ((DECO_NEW_PORT(0x88)&0xf000)<<0);
-		case 0x214:								return DECO_NEW_PORT(0x14);
-		case 0x52e:								return ((DECO_NEW_PORT(0x14)&0x000f)<<8) | ((DECO_NEW_PORT(0x14)&0x00f0)>>0) | ((DECO_NEW_PORT(0x14)&0x0f00)>>8) | ((DECO_NEW_PORT(0x14)&0xf000)>>0);
-		case 0x07a:								return ((DECO_NEW_PORT(0x14)&0x000f)<<8) | ((DECO_NEW_PORT(0x14)&0x00f0)>>0) | ((DECO_NEW_PORT(0x14)&0x0f00)>>8) | ((DECO_NEW_PORT(0x14)&0xf000)>>0);
-		case 0x360:								return ((DECO_NEW_PORT(0x14)&0x000f)<<8) | ((DECO_NEW_PORT(0x14)&0x00f0)>>0) | ((DECO_NEW_PORT(0x14)&0x0f00)>>8) | ((DECO_NEW_PORT(0x14)&0xf000)>>0);
-		case 0x4dc:								return ((DECO_NEW_PORT(0x14)&0x0ff0)<<4) | ((DECO_NEW_PORT(0x14)&0x0007)<<5) | ((DECO_NEW_PORT(0x14)&0x0008)<<1);
-		case 0x3a8:								return ((DECO_NEW_PORT(0x14)&0x000e)<<3) | ((DECO_NEW_PORT(0x14)&0x0001)<<7) | ((DECO_NEW_PORT(0x14)&0x0ff0)<<4) | ((DECO_NEW_PORT(0x14)&0xf000)>>12);
-		case 0x2f6:								return ((DECO_NEW_PORT(0x14)&0xff00)>>8) | ((DECO_NEW_PORT(0x14)&0x00f0)<<8) | ((DECO_NEW_PORT(0x14)&0x000c)<<6) | ((DECO_NEW_PORT(0x14)&0x0003)<<10);
-		case 0x7e4:								return (DECO_NEW_PORT(0x94)&0x00f0)<<8;
-		case 0x536:								return ((DECO_NEW_PORT(0xd4)&0x000f)<<8) | ((DECO_NEW_PORT(0xd4)&0x00f0)<<0) | ((DECO_NEW_PORT(0xd4)&0x0f00)<<4) | ((DECO_NEW_PORT(0xd4)&0xf000)>>12);
-		case 0x0be:								return ((DECO_NEW_PORT(0xec)&0x000f)<<4) | ((DECO_NEW_PORT(0xec)&0x00f0)<<4) | ((DECO_NEW_PORT(0xec)&0x0f00)>>8) | ((DECO_NEW_PORT(0xec)&0xf000)>>0);
-		case 0x490:								return (DECO_NEW_PORT(0x3c)&0xfff0) | ((DECO_NEW_PORT(0x3c)&0x0007)<<1) | ((DECO_NEW_PORT(0x3c)&0x0008)>>3);
-		case 0x710:								return (DECO_NEW_PORT(0xc2)&0xfff0) | ((DECO_NEW_PORT(0xc2)&0x0007)<<1) | ((DECO_NEW_PORT(0xc2)&0x0008)>>3);
-		case 0x22a:								return ((DECO_NEW_PORT(0x5a)&0xff00)>>8) | ((DECO_NEW_PORT(0x5a)&0x00f0)<<8) | ((DECO_NEW_PORT(0x5a)&0x0001)<<11) | ((DECO_NEW_PORT(0x5a)&0x000e)<<7);
-		case 0x626:								return ((DECO_NEW_PORT(0xda)&0x000f)<<8) | ((DECO_NEW_PORT(0xda)&0x00f0)<<8) | ((DECO_NEW_PORT(0xda)&0x0f00)>>4) | ((DECO_NEW_PORT(0xda)&0xf000)>>12);
-		case 0x444:								return DECO_NEW_PORT(0x206); //rohga /* this CAN'T be right, is it even used by this game or some c+p error? */
-		case 0x5ac:								return ((DECO_NEW_PORT(0x76)&0xfff0)>>4) | ((DECO_NEW_PORT(0x76)&0x0007)<<13) | ((DECO_NEW_PORT(0x76)&0x0008)<<9);
-		case 0x650:								return ((DECO_NEW_PORT(0xbe)&0xfff0)>>4) | ((DECO_NEW_PORT(0xbe)&0x000f)<<12);
-		case 0x4ac:								return ((DECO_NEW_PORT(0x62)&0x0007)<<13) | ((DECO_NEW_PORT(0x62)&0x0008)<<9);
+	int deco146_addr = BITSWAP32(offset*2, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    1,2,3, 4,5,6,7, 8,9,10,0) & 0x7fff;
+
+	switch (deco146_addr) {
+		case 0x088: /* was 0x110*/ /* Player input */		return space.machine().root_device().ioport("IN0")->read(); // also used in rohga sim
+		case 0x36c: /* was 0x36c*/							return space.machine().root_device().ioport("IN1")->read(); // also used in rohga sim
+		case 0x2cc: /* was 0x334*/							return space.machine().root_device().ioport("IN1")->read();
+		case 0x3b0: /* was 0x0dc*/							return space.machine().root_device().ioport("IN1")->read()<<4;
+		case 0x292: /* was 0x494*/ /* Dips */				return space.machine().root_device().ioport("DSW1_2")->read(); // also used in rohga sim
+		case 0x224: /* was 0x244*/							return DECO_NEW_PORT(0x00);
+		case 0x33e: /* was 0x7cc*/							return ((DECO_NEW_PORT(0x00)&0x000f)<<12) | ((DECO_NEW_PORT(0x00)&0x00f0)<<4) | ((DECO_NEW_PORT(0x00)&0x0f00)>>4) | ((DECO_NEW_PORT(0x00)&0xf000)>>12); // also used in rohga sim
+		case 0x030: /* was 0x0c0*/							return (((DECO_NEW_PORT(0x00)&0x000e)>>1) | ((DECO_NEW_PORT(0x00)&0x0001)<<3))<<12;
+		case 0x118: /* was 0x188*/							return (((DECO_NEW_PORT(0x00)&0x000e)>>1) | ((DECO_NEW_PORT(0x00)&0x0001)<<3))<<12;
+		case 0x7a6: /* was 0x65e*/							return (((DECO_NEW_PORT(0x00)&0x000c)>>2) | ((DECO_NEW_PORT(0x00)&0x0003)<<2))<<12;
+		case 0x73a: /* was 0x5ce*/							return ((DECO_NEW_PORT(0x00)<<8)&0xf000) | ((DECO_NEW_PORT(0x00)&0xe)<<7) | ((DECO_NEW_PORT(0x00)&0x1)<<11);
+		case 0x586: /* was 0x61a*/							return (DECO_NEW_PORT(0x00)<<8)&0xff00;
+		case 0x692: /* was 0x496*/							return DECO_NEW_PORT(0x88);
+		case 0x502: /* was 0x40a*/							return ((DECO_NEW_PORT(0x88)&0x000f)<<12) | ((DECO_NEW_PORT(0x88)&0x00f0)>>4) | ((DECO_NEW_PORT(0x88)&0x0f00)<<0) | ((DECO_NEW_PORT(0x88)&0xf000)>>8);
+		case 0x178: /* was 0x1e8*/							return ((DECO_NEW_PORT(0x88)&0x00ff)<<8) | ((DECO_NEW_PORT(0x88)&0xff00)>>8); // also used in rohga sim
+		case 0x3d2: /* was 0x4bc*/							return ((DECO_NEW_PORT(0x88)&0x0ff0)<<4) | ((DECO_NEW_PORT(0x88)&0x0003)<<6) | ((DECO_NEW_PORT(0x88)&0x000c)<<2);
+		case 0x762: /* was 0x46e*/							return ((DECO_NEW_PORT(0x88)&0xfff0)<<0) | ((DECO_NEW_PORT(0x88)&0x0007)<<1) | ((DECO_NEW_PORT(0x88)&0x0008)>>3);
+		case 0x264: /* was 0x264*/							return ((DECO_NEW_PORT(0x88)&0x000f)<<8) | ((DECO_NEW_PORT(0x88)&0x00f0)>>0) | ((DECO_NEW_PORT(0x88)&0x0f00)<<4);
+		case 0x4e8: /* was 0x172*/							return ((DECO_NEW_PORT(0x88)&0x000f)<<4) | ((DECO_NEW_PORT(0x88)&0x00f0)<<4) | ((DECO_NEW_PORT(0x88)&0xf000)<<0);
+		case 0x284: /* was 0x214*/							return DECO_NEW_PORT(0x14);
+		case 0x74a: /* was 0x52e*/							return ((DECO_NEW_PORT(0x14)&0x000f)<<8) | ((DECO_NEW_PORT(0x14)&0x00f0)>>0) | ((DECO_NEW_PORT(0x14)&0x0f00)>>8) | ((DECO_NEW_PORT(0x14)&0xf000)>>0);
+		case 0x5e0: /* was 0x07a*/							return ((DECO_NEW_PORT(0x14)&0x000f)<<8) | ((DECO_NEW_PORT(0x14)&0x00f0)>>0) | ((DECO_NEW_PORT(0x14)&0x0f00)>>8) | ((DECO_NEW_PORT(0x14)&0xf000)>>0);
+		case 0x06c: /* was 0x360*/							return ((DECO_NEW_PORT(0x14)&0x000f)<<8) | ((DECO_NEW_PORT(0x14)&0x00f0)>>0) | ((DECO_NEW_PORT(0x14)&0x0f00)>>8) | ((DECO_NEW_PORT(0x14)&0xf000)>>0);
+		case 0x3b2: /* was 0x4dc*/							return ((DECO_NEW_PORT(0x14)&0x0ff0)<<4) | ((DECO_NEW_PORT(0x14)&0x0007)<<5) | ((DECO_NEW_PORT(0x14)&0x0008)<<1);
+		case 0x15c: /* was 0x3a8*/							return ((DECO_NEW_PORT(0x14)&0x000e)<<3) | ((DECO_NEW_PORT(0x14)&0x0001)<<7) | ((DECO_NEW_PORT(0x14)&0x0ff0)<<4) | ((DECO_NEW_PORT(0x14)&0xf000)>>12);
+		case 0x6f4: /* was 0x2f6*/							return ((DECO_NEW_PORT(0x14)&0xff00)>>8) | ((DECO_NEW_PORT(0x14)&0x00f0)<<8) | ((DECO_NEW_PORT(0x14)&0x000c)<<6) | ((DECO_NEW_PORT(0x14)&0x0003)<<10);
+		case 0x27e: /* was 0x7e4*/							return (DECO_NEW_PORT(0x94)&0x00f0)<<8; // also used in rohga sim
+		case 0x6ca: /* was 0x536*/							return ((DECO_NEW_PORT(0xd4)&0x000f)<<8) | ((DECO_NEW_PORT(0xd4)&0x00f0)<<0) | ((DECO_NEW_PORT(0xd4)&0x0f00)<<4) | ((DECO_NEW_PORT(0xd4)&0xf000)>>12);
+		case 0x7d0: /* was 0x0be*/							return ((DECO_NEW_PORT(0xec)&0x000f)<<4) | ((DECO_NEW_PORT(0xec)&0x00f0)<<4) | ((DECO_NEW_PORT(0xec)&0x0f00)>>8) | ((DECO_NEW_PORT(0xec)&0xf000)>>0);
+		case 0x092: /* was 0x490*/							return (DECO_NEW_PORT(0x3c)&0xfff0) | ((DECO_NEW_PORT(0x3c)&0x0007)<<1) | ((DECO_NEW_PORT(0x3c)&0x0008)>>3); // also used in rohga sim
+		case 0x08e: /* was 0x710*/							return (DECO_NEW_PORT(0xc2)&0xfff0) | ((DECO_NEW_PORT(0xc2)&0x0007)<<1) | ((DECO_NEW_PORT(0xc2)&0x0008)>>3); // also used in rohga sim
+		case 0x544: /* was 0x22a*/							return ((DECO_NEW_PORT(0x5a)&0xff00)>>8) | ((DECO_NEW_PORT(0x5a)&0x00f0)<<8) | ((DECO_NEW_PORT(0x5a)&0x0001)<<11) | ((DECO_NEW_PORT(0x5a)&0x000e)<<7);
+		case 0x646: /* was 0x626*/							return ((DECO_NEW_PORT(0xda)&0x000f)<<8) | ((DECO_NEW_PORT(0xda)&0x00f0)<<8) | ((DECO_NEW_PORT(0xda)&0x0f00)>>4) | ((DECO_NEW_PORT(0xda)&0xf000)>>12);
+		case 0x222: /* was 0x444*/							return DECO_NEW_PORT(0x206); // (old comment was 'rohga') /* this CAN'T be right (port addr > 0x100), is it even used by this game or some c+p error? */
+		case 0x35a: /* was 0x5ac*/							return ((DECO_NEW_PORT(0x76)&0xfff0)>>4) | ((DECO_NEW_PORT(0x76)&0x0007)<<13) | ((DECO_NEW_PORT(0x76)&0x0008)<<9);
+		case 0x0a6: /* was 0x650*/							return ((DECO_NEW_PORT(0xbe)&0xfff0)>>4) | ((DECO_NEW_PORT(0xbe)&0x000f)<<12); // also used in rohga sim
+		case 0x352: /* was 0x4ac*/							return ((DECO_NEW_PORT(0x62)&0x0007)<<13) | ((DECO_NEW_PORT(0x62)&0x0008)<<9);
 	}
 
-	logerror("Deco Protection PC %06x: warning - read unmapped memory address %04x\n",space.device().safe_pc(),offset<<1);
+	logerror("Deco Protection PC %06x: warning - read unmapped memory address %04x\n",space.device().safe_pc(),deco146_addr);
 	return 0;
 }
 
@@ -510,346 +531,155 @@ READ16_HANDLER( deco16_104_rohga_prot_r )
 //      logerror("Protection PC %06x: warning - read prot address %04x\n",space.device().safe_pc(),offset<<1);
 
 	switch (offset) {
-		case 0x88/2: /* Player 1 & 2 input ports */
-			return space.machine().root_device().ioport("IN0")->read();
-		case 0x36c/2:
-			return space.machine().root_device().ioport("IN1")->read();
-		case 0x44c/2:
-			return ((space.machine().root_device().ioport("IN1")->read() & 0x7)<<13)|((space.machine().root_device().ioport("IN1")->read() & 0x8)<<9);
-		case 0x292/2: /* Dips */
-			return space.machine().root_device().ioport("DSW1_2")->read();
-
-		case 0x44/2:
-			return ((((DECO_PORT(0x2c)&0x000f)<<12)) ^ deco16_xor) & (~deco16_mask);
-		case 0x282/2:
-			return ((DECO_PORT(0x26)&0x000f)<<12) & (~deco16_mask);
-		case 0xd4/2:
-			return ((DECO_PORT(0x6e)&0x0ff0)<<4) | ((DECO_PORT(0x6e)&0x000e)<<3) | ((DECO_PORT(0x6e)&0x0001)<<7);
-		case 0x5a2/2:
-			return (((DECO_PORT(0x24)&0xff00)>>4) | ((DECO_PORT(0x24)&0x000f)<<0) | ((DECO_PORT(0x24)&0x00f0)<<8)) & (~deco16_mask);
-		case 0x570/2:
-			return (((DECO_PORT(0x24)&0xf0f0)>>0) | ((DECO_PORT(0x24)&0x000f)<<8)) ^ deco16_xor;
-		case 0x32e/2:
-			return (((DECO_PORT(0x46)&0xf000)>>0) | ((DECO_PORT(0x46)&0x00ff)<<4)) & (~deco16_mask);
-		case 0x4dc/2:
-			return ((DECO_PORT(0x62)&0x00ff)<<8);
-		case 0x1be/2:
-			return ((((DECO_PORT(0xc2)&0x0ff0)<<4) | ((DECO_PORT(0xc2)&0x0003)<<6) | ((DECO_PORT(0xc2)&0x000c)<<2)) ^ deco16_xor) & (~deco16_mask);
-
-		case 0x420/2:
-			return ((DECO_PORT(0x2e)&0xf000)>>4) | ((DECO_PORT(0x2e)&0x0f00)<<4) | ((DECO_PORT(0x2e)&0x00f0)>>4) | ((DECO_PORT(0x2e)&0x000f)<<4);
-
-		case 0x390/2:
-			return DECO_PORT(0x2c);
-
-		case 0x756/2:
-			return ((DECO_PORT(0x60)&0xfff0)>>4) | ((DECO_PORT(0x60)&0x0007)<<13) | ((DECO_PORT(0x60)&0x0008)<<9);
-		case 0x424/2:
-			return ((DECO_PORT(0x60)&0xf000)>>4) | ((DECO_PORT(0x60)&0x0f00)<<4) | ((DECO_PORT(0x60)&0x00f0)>>0) | ((DECO_PORT(0x60)&0x000f)<<0);
-
-		case 0x156/2:
-			return (((DECO_PORT(0xde)&0xff00)<<0) | ((DECO_PORT(0xde)&0x000f)<<4) | ((DECO_PORT(0xde)&0x00f0)>>4)) & (~deco16_mask);
-		case 0xa8/2:
-			return (((DECO_PORT(0xde)&0xff00)>>4) | ((DECO_PORT(0xde)&0x000f)<<0) | ((DECO_PORT(0xde)&0x00f0)<<8)) & (~deco16_mask);
-		case 0x64a/2:
-			return (((DECO_PORT(0xde)&0xfff0)>>4) | ((DECO_PORT(0xde)&0x000c)<<10) | ((DECO_PORT(0xde)&0x0003)<<14)) & (~deco16_mask);
-
-		case 0x16e/2:
-			return DECO_PORT(0x6a);
-
-		case 0x39c/2:
-			return (DECO_PORT(0x6a)&0x00ff) | ((DECO_PORT(0x6a)&0xf000)>>4) | ((DECO_PORT(0x6a)&0x0f00)<<4);
-		case 0x212/2:
-			return (((DECO_PORT(0x6e)&0xff00)>>4) | ((DECO_PORT(0x6e)&0x00f0)<<8) | ((DECO_PORT(0x6e)&0x000f)<<0)) ^ deco16_xor;
-
-		case 0x70a/2:
-			return (((DECO_PORT(0xde)&0x00f0)<<8) | ((DECO_PORT(0xde)&0x0007)<<9) | ((DECO_PORT(0xde)&0x0008)<<5)) ^ deco16_xor;
-
-		case 0x7a0/2:
-			return (DECO_PORT(0x6e)&0x00ff) | ((DECO_PORT(0x6e)&0xf000)>>4) | ((DECO_PORT(0x6e)&0x0f00)<<4);
-		case 0x162/2:
-			return DECO_PORT(0x6e);
-
-		case 0x384/2:
-			return ((DECO_PORT(0xdc)&0xf000)>>12) | ((DECO_PORT(0xdc)&0x0ff0)<<4) | ((DECO_PORT(0xdc)&0x000c)<<2) | ((DECO_PORT(0xdc)&0x0003)<<6);
-
-		case 0x302/2:
-			return DECO_PORT(0x24);
-		case 0x334/2:
-			return DECO_PORT(0x30);
-		case 0x34c/2:
-			return DECO_PORT(0x3c);
-
-		case 0x514/2:
-			return (((DECO_PORT(0x32)&0x0ff0)<<4) | ((DECO_PORT(0x32)&0x000c)<<2) | ((DECO_PORT(0x32)&0x0003)<<6)) & (~deco16_mask);
-
-		case 0x34e/2:
-			return ((DECO_PORT(0xde)&0x0ff0)<<4) | ((DECO_PORT(0xde)&0xf000)>>8) | ((DECO_PORT(0xde)&0x000f)<<0);
-		case 0x722/2:
-			return (((DECO_PORT(0xdc)&0x0fff)<<4) ^ deco16_xor) & (~deco16_mask);
-		case 0x574/2:
-			return ((((DECO_PORT(0xdc)&0xfff0)>>0) | ((DECO_PORT(0xdc)&0x0003)<<2) | ((DECO_PORT(0xdc)&0x000c)>>2)) ^ deco16_xor) & (~deco16_mask);
-
-		case 0x5ae/2:
-			return DECO_PORT(0xdc);
-		case 0x410/2:
-			return DECO_PORT(0xde);
-		case 0x340/2:
-			return ((DECO_PORT(0x90)&0xfff0) | ((DECO_PORT(0x90)&0x7)<<1) | ((DECO_PORT(0x90)&0x8)>>3)) ^ deco16_xor;
-		case 0x4a4/2:
-			return (((DECO_PORT(0xce)&0x0ff0) | ((DECO_PORT(0xce)&0xf000)>>12) | ((DECO_PORT(0xce)&0x000f)<<12)) ^ deco16_xor) & (~deco16_mask);
-		case 0x256/2:
-			return ((((DECO_PORT(0xce)&0xf000)>>12) | ((DECO_PORT(0xce)&0x0fff)<<4))) & (~deco16_mask);
-		case 0x79a/2:
-			return (((DECO_PORT(0xc8)&0xfff0)>>4) | ((DECO_PORT(0xc8)&0x0008)<<9) | ((DECO_PORT(0xc8)&0x0007)<<13)) ^ deco16_xor;
-
-		case 0x65e/2:
-			return DECO_PORT(0x9c);
-		case 0x79c/2:
-			return ((DECO_PORT(0xc6)&0xf000) | ((DECO_PORT(0xc6)&0x00ff)<<4) | ((DECO_PORT(0xc6)&0x0f00)>>8)) & (~deco16_mask);
-		case 0x15e/2:
-			return (((DECO_PORT(0x98)&0x0ff0)<<4) | ((DECO_PORT(0x98)&0xf000)>>12) | ((DECO_PORT(0x98)&0x0003)<<6) | ((DECO_PORT(0x98)&0x000c)<<2)) ^ deco16_xor;
-		case 0x6e4/2:
-			return DECO_PORT(0x98);
-		case 0x1e/2:
-			return ((((DECO_PORT(0xc4)&0xf000)>>4) | ((DECO_PORT(0xc4)&0x0f00)<<4) | ((DECO_PORT(0xc4)&0x00ff)<<0)) ^ deco16_xor) & (~deco16_mask);
-		case 0x23a/2:
-			return ((((DECO_PORT(0x86)&0xfff0)>>0) | ((DECO_PORT(0x86)&0x0003)<<2) | ((DECO_PORT(0x86)&0x000c)>>2)) ^ deco16_xor);
-		case 0x6e/2:
-			return ((((DECO_PORT(0x96)&0xf000)>>8) | ((DECO_PORT(0x96)&0x0f0f)<<0) | ((DECO_PORT(0x96)&0x00f0)<<8)) ^ deco16_xor);
-		case 0x3a2/2:
-			return ((((DECO_PORT(0x94)&0xf000)>>8) | ((DECO_PORT(0x94)&0x0f00)>>8) | ((DECO_PORT(0x94)&0x00f0)<<8) | ((DECO_PORT(0x94)&0x000e)<<7) | ((DECO_PORT(0x94)&0x0001)<<11)) ^ deco16_xor);// & (~deco16_mask);
-		case 0x4a6/2:
-			return ((DECO_PORT(0x8c)&0xff00)>>0) | ((DECO_PORT(0x8c)&0x00f0)>>4) | ((DECO_PORT(0x8c)&0x000f)<<4);
-		case 0x7b0/2:
-			return DECO_PORT(0x80);
-		case 0x5aa/2:
-			return ((((DECO_PORT(0x98)&0x0f00)>>8) | ((DECO_PORT(0x98)&0xf000)>>8) | ((DECO_PORT(0x98)&0x00f0)<<8) | ((DECO_PORT(0x98)&0x000e)<<7) | ((DECO_PORT(0x98)&0x0001)<<11)) ^ deco16_xor) & (~deco16_mask);
-		case 0x662/2:
-			return DECO_PORT(0x8c);
-		case 0x624/2:
-			return DECO_PORT(0x9a);
-		case 0x2c/2:
-			return (((DECO_PORT(0x82)&0x0f0f)>>0) | ((DECO_PORT(0x82)&0xf000)>>8) | ((DECO_PORT(0x82)&0x00f0)<<8)) & (~deco16_mask);
-
-		case 0x1b4/2:
-			return ((DECO_PORT(0xcc)&0x00f0)<<4) | ((DECO_PORT(0xcc)&0x000f)<<12);
-
-		case 0x7ce/2:
-			return ((DECO_PORT(0x80)&0x000e)<<11) | ((DECO_PORT(0x80)&0x0001)<<15);
-		case 0x41a/2:
-			return ((((DECO_PORT(0x84)&0x00f0)<<8) | ((DECO_PORT(0x84)&0xf000)>>8) | ((DECO_PORT(0x84)&0x0f00)>>8) | ((DECO_PORT(0x84)&0x0003)<<10) | ((DECO_PORT(0x84)&0x000c)<<6)) ^ deco16_xor);
-		case 0x168/2:
-			return ((((DECO_PORT(0x84)&0x0ff0)<<4) | ((DECO_PORT(0x84)&0x000e)<<3) | ((DECO_PORT(0x84)&0x0001)<<5))) & (~deco16_mask);
-		case 0x314/2:
-			return ((((DECO_PORT(0x84)&0x0ff0)<<4) | ((DECO_PORT(0x84)&0x000e)<<3) | ((DECO_PORT(0x84)&0x0001)<<5)));
-		case 0x5e2/2:
-			return ((((DECO_PORT(0x84)&0x00f0)<<8) | ((DECO_PORT(0x84)&0x000e)<<7) | ((DECO_PORT(0x84)&0x0001)<<9)));
-		case 0x72a/2:
-			return ((((DECO_PORT(0x86)&0xfff0)>>4) | ((DECO_PORT(0x86)&0x0003)<<14) | ((DECO_PORT(0x86)&0x000c)<<10)) ^ deco16_xor) & (~deco16_mask);
-		case 0x178/2:
-			return (((DECO_PORT(0x88)&0x00ff)<<8) | ((DECO_PORT(0x88)&0xff00)>>8)) & (~deco16_mask);
-		case 0x40e/2:
-			return ((((DECO_PORT(0x8a)&0xf000)>>0) | ((DECO_PORT(0x8a)&0x00ff)<<4)) ^ deco16_xor) & (~deco16_mask);
-		case 0x248/2:
-			return ((((DECO_PORT(0x8c)&0xff00)>>8) | ((DECO_PORT(0x8c)&0x00f0)<<4) | ((DECO_PORT(0x8c)&0x000f)<<12)) ^ deco16_xor) & (~deco16_mask);
-
-		case 0x27e/2:
-			return ((((DECO_PORT(0x94)&0x00f0)<<8)) ^ deco16_xor) & (~deco16_mask);
-
-		case 0x22c/2:
-			return ((DECO_PORT(0xc4)&0x00f0)<<8);
-		case 0x77e/2:
-			return ((DECO_PORT(0x62)&0xf000)>>12) | ((DECO_PORT(0x62)&0x0ff0)<<0) | ((DECO_PORT(0x62)&0x000f)<<12);
-		case 0xc/2:
-			return ((DECO_PORT(0xd6)&0xf000)>>12) | ((DECO_PORT(0xd6)&0x0fff)<<4);
-
-		case 0x90/2:
-			return DECO_PORT(0x44);
-		case 0x246/2:
-			return ((((DECO_PORT(0x48)&0xff00)>>8) | ((DECO_PORT(0x48)&0x00f0)<<8) | ((DECO_PORT(0x48)&0x0f00)>>8) | ((DECO_PORT(0x48)&0x0003)<<10) | ((DECO_PORT(0x48)&0x000c)<<6)) ^ deco16_xor);
-		case 0x546/2:
-			return (((DECO_PORT(0x62)&0xf0f0)>>0) | ((DECO_PORT(0x62)&0x000f)<<8)) & (~deco16_mask);
-		case 0x2e2/2:
-			return ((DECO_PORT(0xc6)&0x000e)<<11) | ((DECO_PORT(0xc6)&0x0001)<<15);
-		case 0x3c0/2:
-			return DECO_PORT(0x22);
-		case 0x4b8/2:
-			return (((DECO_PORT(0x46)&0xf000)>>12) | ((DECO_PORT(0x46)&0x0f00)>>4) | ((DECO_PORT(0x46)&0x00ff)<<8)) ^ deco16_xor;
-		case 0x65c/2:
-			return ((((DECO_PORT(0x44)&0xf000)>>12) | ((DECO_PORT(0x44)&0x0fff)<<4)) ^ deco16_xor) & (~deco16_mask);
-
-		case 0x32a/2:
-			return ((((DECO_PORT(0xc0)&0x0ff0)<<4) | ((DECO_PORT(0xc0)&0x000e)<<3) | ((DECO_PORT(0xc0)&0x0001)<<7))) & (~deco16_mask);// ^ deco16_xor;
-		case 0x8/2:
-			return ((((DECO_PORT(0x94)&0xfff0)<<0) | ((DECO_PORT(0x94)&0x000e)>>1) | ((DECO_PORT(0x94)&0x0001)<<3))) & (~deco16_mask);// ^ deco16_xor;
-		case 0x456/2:
-			return (((DECO_PORT(0x26)&0xfff0)<<0) | ((DECO_PORT(0x26)&0x0007)<<1) | ((DECO_PORT(0x26)&0x0008)>>3));// ^ deco16_xor;
-		case 0x190/2:
-			return ((((DECO_PORT(0x44)&0xf000)<<0) | ((DECO_PORT(0x44)&0x00ff)<<4))) & (~deco16_mask);// ^ deco16_xor;
-		case 0x3f2/2:
-			return ((((DECO_PORT(0x48)&0x000f)<<12) | ((DECO_PORT(0x48)&0x00f0)<<4))) & (~deco16_mask);// ^ deco16_xor;
-		case 0x2be/2:
-			return ((DECO_PORT(0x40)&0x00ff)<<8);
-
-		case 0x19e/2:
-			return ((((DECO_PORT(0x3c)&0xf000)>>12) | ((DECO_PORT(0x3c)&0x0f00)<<4) | ((DECO_PORT(0x3c)&0x00f0)>>0) | ((DECO_PORT(0x3c)&0x000f)<<8)) ^ deco16_xor) & (~deco16_mask);
-		case 0x2a2/2:
-			return ((((DECO_PORT(0x44)&0xff00)>>8) | ((DECO_PORT(0x44)&0x00f0)<<8) | ((DECO_PORT(0x44)&0x000e)<<7) | ((DECO_PORT(0x44)&0x0001)<<11)) ^ deco16_xor) & (~deco16_mask);
-		case 0x748/2:
-			return (((DECO_PORT(0x44)&0xfff0)<<0) | ((DECO_PORT(0x44)&0x000e)>>1) | ((DECO_PORT(0x44)&0x0001)<<3));// & (~deco16_mask);
-		case 0x686/2:
-			return (((DECO_PORT(0x46)&0xf000)>>4) | ((DECO_PORT(0x46)&0x0f00)>>8) | ((DECO_PORT(0x46)&0x00f0)<<8) | ((DECO_PORT(0x46)&0x000f)<<4));// & (~deco16_mask);
-		case 0x4c4/2:
-			return ((DECO_PORT(0x3c)&0x000f)<<12) & (~deco16_mask);
-		case 0x538/2:
-			return ((DECO_PORT(0x3c)&0x000f)<<12);
-		case 0x63a/2:
-			return ((DECO_PORT(0x3c)&0x000f)<<12);
-		case 0x348/2:
-			return ((((DECO_PORT(0x44)&0xf000)>>12) | ((DECO_PORT(0x44)&0x0ff0)<<4) | ((DECO_PORT(0x44)&0x000e)<<3) | ((DECO_PORT(0x44)&0x0001)<<7))) ^ deco16_xor;// & (~deco16_mask);
-		case 0x200/2:
-			return (((DECO_PORT(0xa0)&0xfff0)>>4) | ((DECO_PORT(0xa0)&0x0007)<<13) | ((DECO_PORT(0xa0)&0x0008)<<9));// & (~deco16_mask);
-		case 0x254/2:
-			return ((((DECO_PORT(0x7e)&0x0ff0)<<4) | ((DECO_PORT(0x7e)&0x000c)<<2) | ((DECO_PORT(0x7e)&0x0003)<<6))) ^ deco16_xor;// & (~deco16_mask);
-		case 0x182/2:
-			return ((DECO_PORT(0x46)&0xf000)<<0) | ((DECO_PORT(0x46)&0x0f00)>>8) | ((DECO_PORT(0x46)&0x00f0)>>0) | ((DECO_PORT(0x46)&0x000f)<<8);
-		case 0x58/2:
-			return DECO_PORT(0x46);
-		case 0x48e/2:
-			return ((((DECO_PORT(0x46)&0xf000)>>12) | ((DECO_PORT(0x46)&0x0f00)>>4) | ((DECO_PORT(0x46)&0x00f0)<<4) | ((DECO_PORT(0x46)&0x000f)<<12)));// /*^ deco16_xor*/) & (~deco16_mask);
-
-		case 0x4ba/2:
-			return (((DECO_PORT(0x24)&0xf000)>>12) | ((DECO_PORT(0x24)&0x0ff0)<<4) | ((DECO_PORT(0x24)&0x000c)<<2) | ((DECO_PORT(0x24)&0x0003)<<6)) & (~deco16_mask);
-		case 0x92/2:
-			return (((DECO_PORT(0x3c)&0xfff0)>>0) | ((DECO_PORT(0x3c)&0x0007)<<1) | ((DECO_PORT(0x3c)&0x0008)>>3));
-		case 0x1f0/2:
-			return ((((DECO_PORT(0xa2)&0xf000)>>12) | ((DECO_PORT(0xa2)&0x0f00)>>4) | ((DECO_PORT(0xa2)&0x00ff)<<8)) ^ deco16_xor) & (~deco16_mask);
-		case 0x24e/2:
-			return ((((DECO_PORT(0x46)&0xf000)>>8) | ((DECO_PORT(0x46)&0x0f00)>>0) | ((DECO_PORT(0x46)&0x00f0)>>4) | ((DECO_PORT(0x46)&0x000f)<<12)) ^ deco16_xor);// & (~deco16_mask);
-		case 0x594/2:
-			return ((((DECO_PORT(0x40)&0x00f0)<<8) | ((DECO_PORT(0x40)&0x000c)<<6) | ((DECO_PORT(0x40)&0x0003)<<10)) ^ deco16_xor);// & (~deco16_mask);
-
-		case 0x7e2/2:
-			return ((((DECO_PORT(0x96)&0xf000)<<0) | ((DECO_PORT(0x96)&0x00f0)<<4) | ((DECO_PORT(0x96)&0x000f)<<4))) ^ deco16_xor;// | ((DECO_PORT(0x96)&0x0001)<<7));// ^ deco16_xor);// & (~deco16_mask);
-		case 0x18c/2:
-			return (((DECO_PORT(0x22)&0xfff0)>>4) | ((DECO_PORT(0x22)&0x000e)<<11) | ((DECO_PORT(0x22)&0x0001)<<15));// ^ deco16_xor);// & (~deco16_mask);
-		case 0x1fa/2:
-			return ((((DECO_PORT(0x26)&0xf000)>>8) | ((DECO_PORT(0x26)&0x0f00)<<0) | ((DECO_PORT(0x26)&0x00f0)>>4) | ((DECO_PORT(0x26)&0x000f)<<12))) ^ deco16_xor;// & (~deco16_mask);
-		case 0x70e/2:
-			return ((((DECO_PORT(0x26)&0x0ff0)<<4) | ((DECO_PORT(0x26)&0x000c)<<2) | ((DECO_PORT(0x26)&0x0003)<<6))) ^ deco16_xor;// & (~deco16_mask);
-		case 0x33a/2:
-			return DECO_PORT(0x60) & (~deco16_mask);
-		case 0x1e2/2:
-			return ((DECO_PORT(0xd0)&0xf000)>>12) | ((DECO_PORT(0xd0)&0x0f00)>>4) | ((DECO_PORT(0xd0)&0x00ff)<<8);
-		case 0x3f4/2:
-			return DECO_PORT(0x6e)<<4;
-
-		case 0x2ae/2:
-			return ((DECO_PORT(0x9c)&0xf000)<<0) | ((DECO_PORT(0x9c)&0x0ff0)>>4) | ((DECO_PORT(0x9c)&0x000f)<<8);// & (~deco16_mask);
-		case 0x96/2:
-			return ((((DECO_PORT(0x22)&0xff00)>>8) | ((DECO_PORT(0x22)&0x00f0)<<8) | ((DECO_PORT(0x22)&0x000e)<<7) | ((DECO_PORT(0x22)&0x0001)<<11)) ^ deco16_xor) & (~deco16_mask);
-
-		case 0x33e/2:
-			return (((DECO_PORT(0x0)&0xf000)>>12) | ((DECO_PORT(0x0)&0x0f00)>>4) | ((DECO_PORT(0x0)&0x00f0)<<4) | ((DECO_PORT(0x0)&0x000f)<<12)) & (~deco16_mask);
-
-		case 0x6c4/2: /* Reads from here flip buffers */
-			decoprot_buffer_ram_selected^=1;
-			// Flip occurs AFTER this data has been calculated
-			return ((DECO_PORT(0x66)&0xf0f0) | ((DECO_PORT(0x66)&0x000f)<<8)) & (~deco16_mask);
-		case 0x700/2: /* Reads from here flip buffers */
-			decoprot_buffer_ram_selected^=1;
-			return (((DECO_PORT(0x66)&0xf000)>>4) | ((DECO_PORT(0x66)&0x00f0)<<8)) ^ deco16_xor;
-		case 0x444/2:
-			decoprot_buffer_ram_selected^=1;
-			return ((DECO_PORT(0x66)&0x00f0)<<8) | ((DECO_PORT(0x66)&0x0007)<<9)  | ((DECO_PORT(0x66)&0x0008)<<5);
-		case 0x2d0/2:
-			decoprot_buffer_ram_selected^=1;
-			return (((DECO_PORT(0x66)&0xf000)>>4) | ((DECO_PORT(0x66)&0x00f0)<<8)) ^ deco16_xor;
-		case 0x2b8/2:
-			decoprot_buffer_ram_selected^=1;
-			return ((DECO_PORT(0x66)&0x00f0)<<8) ^ deco16_xor;
-		case 0x294/2:
-			decoprot_buffer_ram_selected^=1;
-			return ((DECO_PORT(0x66)&0x000f)<<12);
-		case 0x1e8/2:
-			decoprot_buffer_ram_selected^=1;
-			return 0; // todo
-
-		case 0x49c/2:
-			return (((DECO_PORT(0x6c)&0x00f0)<<8) ^ deco16_xor) & (~deco16_mask);
-
-		case 0x44e/2:
-			return (((DECO_PORT(0x44)&0x00f0)<<4) | ((DECO_PORT(0x44)&0x000f)<<12)) ^ deco16_xor;
-		case 0x3ca/2:
-			return (((DECO_PORT(0x1e)&0xfff0)>>4) | ((DECO_PORT(0x1e)&0x0003)<<14) | ((DECO_PORT(0x1e)&0x000c)<<10)) ^ deco16_xor;
-		case 0x2ac/2:
-			return DECO_PORT(0x1e);
-		case 0x3c/2:
-			return (((DECO_PORT(0x1e)&0x0003)<<14) | ((DECO_PORT(0x1e)&0x000c)<<10)) & (~deco16_mask);
-		case 0x174/2:
-			return (((DECO_PORT(0x1e)&0xff00)>>8) | ((DECO_PORT(0x1e)&0x00f0)<<8) | ((DECO_PORT(0x1e)&0x0007)<<9) | ((DECO_PORT(0x1e)&0x0008)<<5)) & (~deco16_mask);
-		case 0x34a/2:
-			return (((DECO_PORT(0x4)&0xff00)>>0) | ((DECO_PORT(0x4)&0x00f0)>>4) | ((DECO_PORT(0x4)&0x000f)<<4)) & (~deco16_mask);
-		case 0x324/2:
-			return (((DECO_PORT(0x6)&0xf000)>>12) | ((DECO_PORT(0x6)&0x0ff0)<<4) | ((DECO_PORT(0x6)&0x0007)<<5) | ((DECO_PORT(0x6)&0x0008)<<1));
-		case 0x344/2:
-			return (((DECO_PORT(0x8)&0xf000)>>8) | ((DECO_PORT(0x8)&0x0f00)>>8) | ((DECO_PORT(0x8)&0x00f0)<<4) | ((DECO_PORT(0x8)&0x000f)<<12));
-		case 0x72/2:
-			return ((((DECO_PORT(0xa)&0xf000)>>8) | ((DECO_PORT(0xa)&0x0ff0)<<4) | ((DECO_PORT(0xa)&0x000f)>>0))) & (~deco16_mask);
-		case 0x36e/2:
-			return ((((DECO_PORT(0xc)&0xf000)>>0) | ((DECO_PORT(0xc)&0x0ff0)>>4) | ((DECO_PORT(0xc)&0x000f)<<8))) & (~deco16_mask);
-
-		case 0x590/2:
-			return ((((DECO_PORT(0xe)&0xfff0)>>4) | ((DECO_PORT(0xe)&0x000e)<<11) | ((DECO_PORT(0xe)&0x0001)<<15))) ^ deco16_xor;
-		case 0x7b6/2:
-			return ((((DECO_PORT(0x2)&0xf000)>>8) | ((DECO_PORT(0x2)&0x0ff0)<<4) | ((DECO_PORT(0x2)&0x000f)<<0)) ^ deco16_xor) & (~deco16_mask);
-		case 0x588/2:
-			return ((((DECO_PORT(0x4)&0xff00)>>4) | ((DECO_PORT(0x4)&0x00f0)<<8) | ((DECO_PORT(0x4)&0x000f)<<0)) ^ deco16_xor) & (~deco16_mask);
-		case 0x1f6/2:
-			return (((DECO_PORT(0x6)&0xf000)>>12) | ((DECO_PORT(0x6)&0x0ff0)<<4) | ((DECO_PORT(0x6)&0x0007)<<5) | ((DECO_PORT(0x6)&0x0008)<<1)) ^ deco16_xor;
-		case 0x4c0/2:
-			return (((DECO_PORT(0x8)&0xf000)>>4) | ((DECO_PORT(0x8)&0x0f00)<<4) | ((DECO_PORT(0x8)&0x00f0)>>4) | ((DECO_PORT(0x8)&0x000f)<<4)) & (~deco16_mask);
-		case 0x63e/2:
-			return ((((DECO_PORT(0xa)&0x0ff0)<<4) | ((DECO_PORT(0xa)&0xf000)>>12) | ((DECO_PORT(0xa)&0x0003)<<6) | ((DECO_PORT(0xa)&0x000c)<<2)));
-		case 0x7cc/2:
-			return ((((DECO_PORT(0xc)&0xfff0)>>4) | ((DECO_PORT(0xc)&0x000e)<<11) | ((DECO_PORT(0xc)&0x0001)<<15)) ^ deco16_xor) & (~deco16_mask);
-		case 0x1bc/2:
-			return (((DECO_PORT(0xe)&0xf000)>>12) | ((DECO_PORT(0xe)&0x0f00)>>4) | ((DECO_PORT(0xe)&0x00ff)<<8)) & (~deco16_mask);
-
-		case 0x780/2:
-			return DECO_PORT(0xb8);
-
-		case 0x454/2:
-			return (((DECO_PORT(0x82)&0xf000)>>8) | ((DECO_PORT(0x82)&0x0f00)>>0) | ((DECO_PORT(0x82)&0x00f0)>>4) | ((DECO_PORT(0x82)&0x000f)<<12)) ^ deco16_xor;
-		case 0x53e/2:
-			return ((DECO_PORT(0x9e)&0x0003)<<14) | ((DECO_PORT(0x9e)&0x000c)<<10);
-		case 0x250/2:
-			return (((DECO_PORT(0x62)&0xf0f0)<<0) | ((DECO_PORT(0x62)&0x0f00)>>8)  | ((DECO_PORT(0x62)&0x000f)<<8)) & (~deco16_mask);
-
-
-		case 0x150/2: /* Shared */
-			return DECO_PORT(0x7e);
-		case 0x10e/2: /* Schmeizr Robo only */
-			return DECO_PORT(0x7c);
-		case 0x56a/2: /* Schmeizr Robo only */
-			return (((DECO_PORT(0x7c)&0xfff0)>>4) | ((DECO_PORT(0x7c)&0x000e)<<11) | ((DECO_PORT(0x7c)&0x0001)<<15)) & (~deco16_mask);
-		case 0x39a/2: /* Schmeizr Robo only */
-			return ((((DECO_PORT(0x7e)&0xfff0)>>4) | ((DECO_PORT(0x7e)&0x000e)<<11) | ((DECO_PORT(0x7e)&0x0001)<<15)) ^ deco16_xor) & (~deco16_mask);
-		case 0x188/2: /* Schmeizr Robo only */
-			return (((deco16_mask&0x0003)<<6) | ((deco16_mask&0x000c)<<2) | ((deco16_mask&0x00f0)<<4) | ((deco16_mask&0x0f00)<<4)) & (~deco16_mask);
-		case 0x3cc/2: /* Schmeizr Robo only */
-			return deco16_mask;
-		case 0x4a/2: /* Schmeizr Robo only */
-			return DECO_PORT(0x9e) & (~deco16_mask);
-		case 0x7e8/2: /* Schmeizr Robo only */
-			return DECO_PORT(0x4a) ^ deco16_xor;
-		case 0xfc/2: /* Schmeizr Robo only */
-			return DECO_PORT(0x4a);
-		case 0x38c/2: /* Schmeizr Robo only */
-			return DECO_PORT(0x28);
-		case 0x28/2: /* Schmeizr Robo only  */
-			return DECO_PORT(0x58);
+		case 0x088/2: /* Player 1 & 2 input ports */		return space.machine().root_device().ioport("IN0")->read();
+		case 0x36c/2:									return space.machine().root_device().ioport("IN1")->read();
+		case 0x44c/2:									return ((space.machine().root_device().ioport("IN1")->read() & 0x7)<<13)|((space.machine().root_device().ioport("IN1")->read() & 0x8)<<9);
+		case 0x292/2: /* Dips */						return space.machine().root_device().ioport("DSW1_2")->read();
+		case 0x044/2:									return ((((DECO_PORT(0x2c)&0x000f)<<12)) ^ deco16_xor) & (~deco16_mask);
+		case 0x282/2:									return ((DECO_PORT(0x26)&0x000f)<<12) & (~deco16_mask);
+		case 0x0d4/2:									return ((DECO_PORT(0x6e)&0x0ff0)<<4) | ((DECO_PORT(0x6e)&0x000e)<<3) | ((DECO_PORT(0x6e)&0x0001)<<7);
+		case 0x5a2/2:									return (((DECO_PORT(0x24)&0xff00)>>4) | ((DECO_PORT(0x24)&0x000f)<<0) | ((DECO_PORT(0x24)&0x00f0)<<8)) & (~deco16_mask);
+		case 0x570/2:									return (((DECO_PORT(0x24)&0xf0f0)>>0) | ((DECO_PORT(0x24)&0x000f)<<8)) ^ deco16_xor;
+		case 0x32e/2:									return (((DECO_PORT(0x46)&0xf000)>>0) | ((DECO_PORT(0x46)&0x00ff)<<4)) & (~deco16_mask);
+		case 0x4dc/2:									return ((DECO_PORT(0x62)&0x00ff)<<8);
+		case 0x1be/2:									return ((((DECO_PORT(0xc2)&0x0ff0)<<4) | ((DECO_PORT(0xc2)&0x0003)<<6) | ((DECO_PORT(0xc2)&0x000c)<<2)) ^ deco16_xor) & (~deco16_mask);
+		case 0x420/2:									return ((DECO_PORT(0x2e)&0xf000)>>4) | ((DECO_PORT(0x2e)&0x0f00)<<4) | ((DECO_PORT(0x2e)&0x00f0)>>4) | ((DECO_PORT(0x2e)&0x000f)<<4);
+		case 0x390/2:									return DECO_PORT(0x2c);
+		case 0x756/2:									return ((DECO_PORT(0x60)&0xfff0)>>4) | ((DECO_PORT(0x60)&0x0007)<<13) | ((DECO_PORT(0x60)&0x0008)<<9);
+		case 0x424/2:									return ((DECO_PORT(0x60)&0xf000)>>4) | ((DECO_PORT(0x60)&0x0f00)<<4) | ((DECO_PORT(0x60)&0x00f0)>>0) | ((DECO_PORT(0x60)&0x000f)<<0);
+		case 0x156/2:									return (((DECO_PORT(0xde)&0xff00)<<0) | ((DECO_PORT(0xde)&0x000f)<<4) | ((DECO_PORT(0xde)&0x00f0)>>4)) & (~deco16_mask);
+		case 0x0a8/2:									return (((DECO_PORT(0xde)&0xff00)>>4) | ((DECO_PORT(0xde)&0x000f)<<0) | ((DECO_PORT(0xde)&0x00f0)<<8)) & (~deco16_mask);
+		case 0x64a/2:									return (((DECO_PORT(0xde)&0xfff0)>>4) | ((DECO_PORT(0xde)&0x000c)<<10) | ((DECO_PORT(0xde)&0x0003)<<14)) & (~deco16_mask);
+		case 0x16e/2:									return DECO_PORT(0x6a);
+		case 0x39c/2:									return (DECO_PORT(0x6a)&0x00ff) | ((DECO_PORT(0x6a)&0xf000)>>4) | ((DECO_PORT(0x6a)&0x0f00)<<4);
+		case 0x212/2:									return (((DECO_PORT(0x6e)&0xff00)>>4) | ((DECO_PORT(0x6e)&0x00f0)<<8) | ((DECO_PORT(0x6e)&0x000f)<<0)) ^ deco16_xor;
+		case 0x70a/2:									return (((DECO_PORT(0xde)&0x00f0)<<8) | ((DECO_PORT(0xde)&0x0007)<<9) | ((DECO_PORT(0xde)&0x0008)<<5)) ^ deco16_xor;
+		case 0x7a0/2:									return (DECO_PORT(0x6e)&0x00ff) | ((DECO_PORT(0x6e)&0xf000)>>4) | ((DECO_PORT(0x6e)&0x0f00)<<4);
+		case 0x162/2:									return DECO_PORT(0x6e);
+		case 0x384/2:									return ((DECO_PORT(0xdc)&0xf000)>>12) | ((DECO_PORT(0xdc)&0x0ff0)<<4) | ((DECO_PORT(0xdc)&0x000c)<<2) | ((DECO_PORT(0xdc)&0x0003)<<6);
+		case 0x302/2:									return DECO_PORT(0x24);
+		case 0x334/2:									return DECO_PORT(0x30);
+		case 0x34c/2:									return DECO_PORT(0x3c);
+		case 0x514/2:									return (((DECO_PORT(0x32)&0x0ff0)<<4) | ((DECO_PORT(0x32)&0x000c)<<2) | ((DECO_PORT(0x32)&0x0003)<<6)) & (~deco16_mask);
+		case 0x34e/2:									return ((DECO_PORT(0xde)&0x0ff0)<<4) | ((DECO_PORT(0xde)&0xf000)>>8) | ((DECO_PORT(0xde)&0x000f)<<0);
+		case 0x722/2:									return (((DECO_PORT(0xdc)&0x0fff)<<4) ^ deco16_xor) & (~deco16_mask);
+		case 0x574/2:									return ((((DECO_PORT(0xdc)&0xfff0)>>0) | ((DECO_PORT(0xdc)&0x0003)<<2) | ((DECO_PORT(0xdc)&0x000c)>>2)) ^ deco16_xor) & (~deco16_mask);
+		case 0x5ae/2:									return DECO_PORT(0xdc);
+		case 0x410/2:									return DECO_PORT(0xde);
+		case 0x340/2:									return ((DECO_PORT(0x90)&0xfff0) | ((DECO_PORT(0x90)&0x7)<<1) | ((DECO_PORT(0x90)&0x8)>>3)) ^ deco16_xor;
+		case 0x4a4/2:									return (((DECO_PORT(0xce)&0x0ff0) | ((DECO_PORT(0xce)&0xf000)>>12) | ((DECO_PORT(0xce)&0x000f)<<12)) ^ deco16_xor) & (~deco16_mask);
+		case 0x256/2:									return ((((DECO_PORT(0xce)&0xf000)>>12) | ((DECO_PORT(0xce)&0x0fff)<<4))) & (~deco16_mask);
+		case 0x79a/2:									return (((DECO_PORT(0xc8)&0xfff0)>>4) | ((DECO_PORT(0xc8)&0x0008)<<9) | ((DECO_PORT(0xc8)&0x0007)<<13)) ^ deco16_xor;
+		case 0x65e/2:									return DECO_PORT(0x9c);
+		case 0x79c/2:									return ((DECO_PORT(0xc6)&0xf000) | ((DECO_PORT(0xc6)&0x00ff)<<4) | ((DECO_PORT(0xc6)&0x0f00)>>8)) & (~deco16_mask);
+		case 0x15e/2:									return (((DECO_PORT(0x98)&0x0ff0)<<4) | ((DECO_PORT(0x98)&0xf000)>>12) | ((DECO_PORT(0x98)&0x0003)<<6) | ((DECO_PORT(0x98)&0x000c)<<2)) ^ deco16_xor;
+		case 0x6e4/2:									return DECO_PORT(0x98);
+		case 0x01e/2:									return ((((DECO_PORT(0xc4)&0xf000)>>4) | ((DECO_PORT(0xc4)&0x0f00)<<4) | ((DECO_PORT(0xc4)&0x00ff)<<0)) ^ deco16_xor) & (~deco16_mask);
+		case 0x23a/2:									return ((((DECO_PORT(0x86)&0xfff0)>>0) | ((DECO_PORT(0x86)&0x0003)<<2) | ((DECO_PORT(0x86)&0x000c)>>2)) ^ deco16_xor);
+		case 0x06e/2:									return ((((DECO_PORT(0x96)&0xf000)>>8) | ((DECO_PORT(0x96)&0x0f0f)<<0) | ((DECO_PORT(0x96)&0x00f0)<<8)) ^ deco16_xor);
+		case 0x3a2/2:									return ((((DECO_PORT(0x94)&0xf000)>>8) | ((DECO_PORT(0x94)&0x0f00)>>8) | ((DECO_PORT(0x94)&0x00f0)<<8) | ((DECO_PORT(0x94)&0x000e)<<7) | ((DECO_PORT(0x94)&0x0001)<<11)) ^ deco16_xor);// & (~deco16_mask);
+		case 0x4a6/2:									return ((DECO_PORT(0x8c)&0xff00)>>0) | ((DECO_PORT(0x8c)&0x00f0)>>4) | ((DECO_PORT(0x8c)&0x000f)<<4);
+		case 0x7b0/2:									return DECO_PORT(0x80);
+		case 0x5aa/2:									return ((((DECO_PORT(0x98)&0x0f00)>>8) | ((DECO_PORT(0x98)&0xf000)>>8) | ((DECO_PORT(0x98)&0x00f0)<<8) | ((DECO_PORT(0x98)&0x000e)<<7) | ((DECO_PORT(0x98)&0x0001)<<11)) ^ deco16_xor) & (~deco16_mask);
+		case 0x662/2:									return DECO_PORT(0x8c);
+		case 0x624/2:									return DECO_PORT(0x9a);
+		case 0x02c/2:									return (((DECO_PORT(0x82)&0x0f0f)>>0) | ((DECO_PORT(0x82)&0xf000)>>8) | ((DECO_PORT(0x82)&0x00f0)<<8)) & (~deco16_mask);
+		case 0x1b4/2:									return ((DECO_PORT(0xcc)&0x00f0)<<4) | ((DECO_PORT(0xcc)&0x000f)<<12);
+		case 0x7ce/2:									return ((DECO_PORT(0x80)&0x000e)<<11) | ((DECO_PORT(0x80)&0x0001)<<15);
+		case 0x41a/2:									return ((((DECO_PORT(0x84)&0x00f0)<<8) | ((DECO_PORT(0x84)&0xf000)>>8) | ((DECO_PORT(0x84)&0x0f00)>>8) | ((DECO_PORT(0x84)&0x0003)<<10) | ((DECO_PORT(0x84)&0x000c)<<6)) ^ deco16_xor);
+		case 0x168/2:									return ((((DECO_PORT(0x84)&0x0ff0)<<4) | ((DECO_PORT(0x84)&0x000e)<<3) | ((DECO_PORT(0x84)&0x0001)<<5))) & (~deco16_mask);
+		case 0x314/2:									return ((((DECO_PORT(0x84)&0x0ff0)<<4) | ((DECO_PORT(0x84)&0x000e)<<3) | ((DECO_PORT(0x84)&0x0001)<<5)));
+		case 0x5e2/2:									return ((((DECO_PORT(0x84)&0x00f0)<<8) | ((DECO_PORT(0x84)&0x000e)<<7) | ((DECO_PORT(0x84)&0x0001)<<9)));
+		case 0x72a/2:									return ((((DECO_PORT(0x86)&0xfff0)>>4) | ((DECO_PORT(0x86)&0x0003)<<14) | ((DECO_PORT(0x86)&0x000c)<<10)) ^ deco16_xor) & (~deco16_mask);
+		case 0x178/2:									return (((DECO_PORT(0x88)&0x00ff)<<8) | ((DECO_PORT(0x88)&0xff00)>>8)) & (~deco16_mask);
+		case 0x40e/2:									return ((((DECO_PORT(0x8a)&0xf000)>>0) | ((DECO_PORT(0x8a)&0x00ff)<<4)) ^ deco16_xor) & (~deco16_mask);
+		case 0x248/2:									return ((((DECO_PORT(0x8c)&0xff00)>>8) | ((DECO_PORT(0x8c)&0x00f0)<<4) | ((DECO_PORT(0x8c)&0x000f)<<12)) ^ deco16_xor) & (~deco16_mask);
+		case 0x27e/2:									return ((((DECO_PORT(0x94)&0x00f0)<<8)) ^ deco16_xor) & (~deco16_mask);
+		case 0x22c/2:									return ((DECO_PORT(0xc4)&0x00f0)<<8);
+		case 0x77e/2:									return ((DECO_PORT(0x62)&0xf000)>>12) | ((DECO_PORT(0x62)&0x0ff0)<<0) | ((DECO_PORT(0x62)&0x000f)<<12);
+		case 0x00c/2:										return ((DECO_PORT(0xd6)&0xf000)>>12) | ((DECO_PORT(0xd6)&0x0fff)<<4);
+		case 0x090/2:									return DECO_PORT(0x44);
+		case 0x246/2:									return ((((DECO_PORT(0x48)&0xff00)>>8) | ((DECO_PORT(0x48)&0x00f0)<<8) | ((DECO_PORT(0x48)&0x0f00)>>8) | ((DECO_PORT(0x48)&0x0003)<<10) | ((DECO_PORT(0x48)&0x000c)<<6)) ^ deco16_xor);
+		case 0x546/2:									return (((DECO_PORT(0x62)&0xf0f0)>>0) | ((DECO_PORT(0x62)&0x000f)<<8)) & (~deco16_mask);
+		case 0x2e2/2:									return ((DECO_PORT(0xc6)&0x000e)<<11) | ((DECO_PORT(0xc6)&0x0001)<<15);
+		case 0x3c0/2:									return DECO_PORT(0x22);
+		case 0x4b8/2:									return (((DECO_PORT(0x46)&0xf000)>>12) | ((DECO_PORT(0x46)&0x0f00)>>4) | ((DECO_PORT(0x46)&0x00ff)<<8)) ^ deco16_xor;
+		case 0x65c/2:									return ((((DECO_PORT(0x44)&0xf000)>>12) | ((DECO_PORT(0x44)&0x0fff)<<4)) ^ deco16_xor) & (~deco16_mask);
+		case 0x32a/2:									return ((((DECO_PORT(0xc0)&0x0ff0)<<4) | ((DECO_PORT(0xc0)&0x000e)<<3) | ((DECO_PORT(0xc0)&0x0001)<<7))) & (~deco16_mask);// ^ deco16_xor;
+		case 0x008/2:										return ((((DECO_PORT(0x94)&0xfff0)<<0) | ((DECO_PORT(0x94)&0x000e)>>1) | ((DECO_PORT(0x94)&0x0001)<<3))) & (~deco16_mask);// ^ deco16_xor;
+		case 0x456/2:									return (((DECO_PORT(0x26)&0xfff0)<<0) | ((DECO_PORT(0x26)&0x0007)<<1) | ((DECO_PORT(0x26)&0x0008)>>3));// ^ deco16_xor;
+		case 0x190/2:									return ((((DECO_PORT(0x44)&0xf000)<<0) | ((DECO_PORT(0x44)&0x00ff)<<4))) & (~deco16_mask);// ^ deco16_xor;
+		case 0x3f2/2:									return ((((DECO_PORT(0x48)&0x000f)<<12) | ((DECO_PORT(0x48)&0x00f0)<<4))) & (~deco16_mask);// ^ deco16_xor;
+		case 0x2be/2:									return ((DECO_PORT(0x40)&0x00ff)<<8);
+		case 0x19e/2:									return ((((DECO_PORT(0x3c)&0xf000)>>12) | ((DECO_PORT(0x3c)&0x0f00)<<4) | ((DECO_PORT(0x3c)&0x00f0)>>0) | ((DECO_PORT(0x3c)&0x000f)<<8)) ^ deco16_xor) & (~deco16_mask);
+		case 0x2a2/2:									return ((((DECO_PORT(0x44)&0xff00)>>8) | ((DECO_PORT(0x44)&0x00f0)<<8) | ((DECO_PORT(0x44)&0x000e)<<7) | ((DECO_PORT(0x44)&0x0001)<<11)) ^ deco16_xor) & (~deco16_mask);
+		case 0x748/2:									return (((DECO_PORT(0x44)&0xfff0)<<0) | ((DECO_PORT(0x44)&0x000e)>>1) | ((DECO_PORT(0x44)&0x0001)<<3));// & (~deco16_mask);
+		case 0x686/2:									return (((DECO_PORT(0x46)&0xf000)>>4) | ((DECO_PORT(0x46)&0x0f00)>>8) | ((DECO_PORT(0x46)&0x00f0)<<8) | ((DECO_PORT(0x46)&0x000f)<<4));// & (~deco16_mask);
+		case 0x4c4/2:									return ((DECO_PORT(0x3c)&0x000f)<<12) & (~deco16_mask);
+		case 0x538/2:									return ((DECO_PORT(0x3c)&0x000f)<<12);
+		case 0x63a/2:									return ((DECO_PORT(0x3c)&0x000f)<<12);
+		case 0x348/2:									return ((((DECO_PORT(0x44)&0xf000)>>12) | ((DECO_PORT(0x44)&0x0ff0)<<4) | ((DECO_PORT(0x44)&0x000e)<<3) | ((DECO_PORT(0x44)&0x0001)<<7))) ^ deco16_xor;// & (~deco16_mask);
+		case 0x200/2:									return (((DECO_PORT(0xa0)&0xfff0)>>4) | ((DECO_PORT(0xa0)&0x0007)<<13) | ((DECO_PORT(0xa0)&0x0008)<<9));// & (~deco16_mask);
+		case 0x254/2:									return ((((DECO_PORT(0x7e)&0x0ff0)<<4) | ((DECO_PORT(0x7e)&0x000c)<<2) | ((DECO_PORT(0x7e)&0x0003)<<6))) ^ deco16_xor;// & (~deco16_mask);
+		case 0x182/2:									return ((DECO_PORT(0x46)&0xf000)<<0) | ((DECO_PORT(0x46)&0x0f00)>>8) | ((DECO_PORT(0x46)&0x00f0)>>0) | ((DECO_PORT(0x46)&0x000f)<<8);
+		case 0x058/2:									return DECO_PORT(0x46);
+		case 0x48e/2:									return ((((DECO_PORT(0x46)&0xf000)>>12) | ((DECO_PORT(0x46)&0x0f00)>>4) | ((DECO_PORT(0x46)&0x00f0)<<4) | ((DECO_PORT(0x46)&0x000f)<<12)));// /*^ deco16_xor*/) & (~deco16_mask);
+		case 0x4ba/2:									return (((DECO_PORT(0x24)&0xf000)>>12) | ((DECO_PORT(0x24)&0x0ff0)<<4) | ((DECO_PORT(0x24)&0x000c)<<2) | ((DECO_PORT(0x24)&0x0003)<<6)) & (~deco16_mask);
+		case 0x092/2:									return (((DECO_PORT(0x3c)&0xfff0)>>0) | ((DECO_PORT(0x3c)&0x0007)<<1) | ((DECO_PORT(0x3c)&0x0008)>>3));
+		case 0x1f0/2:									return ((((DECO_PORT(0xa2)&0xf000)>>12) | ((DECO_PORT(0xa2)&0x0f00)>>4) | ((DECO_PORT(0xa2)&0x00ff)<<8)) ^ deco16_xor) & (~deco16_mask);
+		case 0x24e/2:									return ((((DECO_PORT(0x46)&0xf000)>>8) | ((DECO_PORT(0x46)&0x0f00)>>0) | ((DECO_PORT(0x46)&0x00f0)>>4) | ((DECO_PORT(0x46)&0x000f)<<12)) ^ deco16_xor);// & (~deco16_mask);
+		case 0x594/2:									return ((((DECO_PORT(0x40)&0x00f0)<<8) | ((DECO_PORT(0x40)&0x000c)<<6) | ((DECO_PORT(0x40)&0x0003)<<10)) ^ deco16_xor);// & (~deco16_mask);
+		case 0x7e2/2:									return ((((DECO_PORT(0x96)&0xf000)<<0) | ((DECO_PORT(0x96)&0x00f0)<<4) | ((DECO_PORT(0x96)&0x000f)<<4))) ^ deco16_xor;// | ((DECO_PORT(0x96)&0x0001)<<7));// ^ deco16_xor);// & (~deco16_mask);
+		case 0x18c/2:									return (((DECO_PORT(0x22)&0xfff0)>>4) | ((DECO_PORT(0x22)&0x000e)<<11) | ((DECO_PORT(0x22)&0x0001)<<15));// ^ deco16_xor);// & (~deco16_mask);
+		case 0x1fa/2:									return ((((DECO_PORT(0x26)&0xf000)>>8) | ((DECO_PORT(0x26)&0x0f00)<<0) | ((DECO_PORT(0x26)&0x00f0)>>4) | ((DECO_PORT(0x26)&0x000f)<<12))) ^ deco16_xor;// & (~deco16_mask);
+		case 0x70e/2:									return ((((DECO_PORT(0x26)&0x0ff0)<<4) | ((DECO_PORT(0x26)&0x000c)<<2) | ((DECO_PORT(0x26)&0x0003)<<6))) ^ deco16_xor;// & (~deco16_mask);
+		case 0x33a/2:									return DECO_PORT(0x60) & (~deco16_mask);
+		case 0x1e2/2:									return ((DECO_PORT(0xd0)&0xf000)>>12) | ((DECO_PORT(0xd0)&0x0f00)>>4) | ((DECO_PORT(0xd0)&0x00ff)<<8);
+		case 0x3f4/2:									return DECO_PORT(0x6e)<<4;
+		case 0x2ae/2:									return ((DECO_PORT(0x9c)&0xf000)<<0) | ((DECO_PORT(0x9c)&0x0ff0)>>4) | ((DECO_PORT(0x9c)&0x000f)<<8);// & (~deco16_mask);
+		case 0x096/2:									return ((((DECO_PORT(0x22)&0xff00)>>8) | ((DECO_PORT(0x22)&0x00f0)<<8) | ((DECO_PORT(0x22)&0x000e)<<7) | ((DECO_PORT(0x22)&0x0001)<<11)) ^ deco16_xor) & (~deco16_mask);
+		case 0x33e/2:									return (((DECO_PORT(0x0)&0xf000)>>12) | ((DECO_PORT(0x0)&0x0f00)>>4) | ((DECO_PORT(0x0)&0x00f0)<<4) | ((DECO_PORT(0x0)&0x000f)<<12)) & (~deco16_mask);
+		case 0x6c4/2: /* Reads from here flip buffers */decoprot_buffer_ram_selected^=1;/* Flip occurs AFTER this data has been calculated*/return ((DECO_PORT(0x66)&0xf0f0) | ((DECO_PORT(0x66)&0x000f)<<8)) & (~deco16_mask);
+		case 0x700/2: /* Reads from here flip buffers */decoprot_buffer_ram_selected^=1;return (((DECO_PORT(0x66)&0xf000)>>4) | ((DECO_PORT(0x66)&0x00f0)<<8)) ^ deco16_xor;
+		case 0x444/2:									decoprot_buffer_ram_selected^=1;return ((DECO_PORT(0x66)&0x00f0)<<8) | ((DECO_PORT(0x66)&0x0007)<<9)  | ((DECO_PORT(0x66)&0x0008)<<5);
+		case 0x2d0/2:									decoprot_buffer_ram_selected^=1;return (((DECO_PORT(0x66)&0xf000)>>4) | ((DECO_PORT(0x66)&0x00f0)<<8)) ^ deco16_xor;
+		case 0x2b8/2:									decoprot_buffer_ram_selected^=1;return ((DECO_PORT(0x66)&0x00f0)<<8) ^ deco16_xor;
+		case 0x294/2:									decoprot_buffer_ram_selected^=1;return ((DECO_PORT(0x66)&0x000f)<<12);
+		case 0x1e8/2:									decoprot_buffer_ram_selected^=1;return 0; // todo
+		case 0x49c/2:									return (((DECO_PORT(0x6c)&0x00f0)<<8) ^ deco16_xor) & (~deco16_mask);
+		case 0x44e/2:									return (((DECO_PORT(0x44)&0x00f0)<<4) | ((DECO_PORT(0x44)&0x000f)<<12)) ^ deco16_xor;
+		case 0x3ca/2:									return (((DECO_PORT(0x1e)&0xfff0)>>4) | ((DECO_PORT(0x1e)&0x0003)<<14) | ((DECO_PORT(0x1e)&0x000c)<<10)) ^ deco16_xor;
+		case 0x2ac/2:									return DECO_PORT(0x1e);
+		case 0x03c/2:									return (((DECO_PORT(0x1e)&0x0003)<<14) | ((DECO_PORT(0x1e)&0x000c)<<10)) & (~deco16_mask);
+		case 0x174/2:									return (((DECO_PORT(0x1e)&0xff00)>>8) | ((DECO_PORT(0x1e)&0x00f0)<<8) | ((DECO_PORT(0x1e)&0x0007)<<9) | ((DECO_PORT(0x1e)&0x0008)<<5)) & (~deco16_mask);
+		case 0x34a/2:									return (((DECO_PORT(0x4)&0xff00)>>0) | ((DECO_PORT(0x4)&0x00f0)>>4) | ((DECO_PORT(0x4)&0x000f)<<4)) & (~deco16_mask);
+		case 0x324/2:									return (((DECO_PORT(0x6)&0xf000)>>12) | ((DECO_PORT(0x6)&0x0ff0)<<4) | ((DECO_PORT(0x6)&0x0007)<<5) | ((DECO_PORT(0x6)&0x0008)<<1));
+		case 0x344/2:									return (((DECO_PORT(0x8)&0xf000)>>8) | ((DECO_PORT(0x8)&0x0f00)>>8) | ((DECO_PORT(0x8)&0x00f0)<<4) | ((DECO_PORT(0x8)&0x000f)<<12));
+		case 0x072/2:									return ((((DECO_PORT(0xa)&0xf000)>>8) | ((DECO_PORT(0xa)&0x0ff0)<<4) | ((DECO_PORT(0xa)&0x000f)>>0))) & (~deco16_mask);
+		case 0x36e/2:									return ((((DECO_PORT(0xc)&0xf000)>>0) | ((DECO_PORT(0xc)&0x0ff0)>>4) | ((DECO_PORT(0xc)&0x000f)<<8))) & (~deco16_mask);
+		case 0x590/2:									return ((((DECO_PORT(0xe)&0xfff0)>>4) | ((DECO_PORT(0xe)&0x000e)<<11) | ((DECO_PORT(0xe)&0x0001)<<15))) ^ deco16_xor;
+		case 0x7b6/2:									return ((((DECO_PORT(0x2)&0xf000)>>8) | ((DECO_PORT(0x2)&0x0ff0)<<4) | ((DECO_PORT(0x2)&0x000f)<<0)) ^ deco16_xor) & (~deco16_mask);
+		case 0x588/2:									return ((((DECO_PORT(0x4)&0xff00)>>4) | ((DECO_PORT(0x4)&0x00f0)<<8) | ((DECO_PORT(0x4)&0x000f)<<0)) ^ deco16_xor) & (~deco16_mask);
+		case 0x1f6/2:									return (((DECO_PORT(0x6)&0xf000)>>12) | ((DECO_PORT(0x6)&0x0ff0)<<4) | ((DECO_PORT(0x6)&0x0007)<<5) | ((DECO_PORT(0x6)&0x0008)<<1)) ^ deco16_xor;
+		case 0x4c0/2:									return (((DECO_PORT(0x8)&0xf000)>>4) | ((DECO_PORT(0x8)&0x0f00)<<4) | ((DECO_PORT(0x8)&0x00f0)>>4) | ((DECO_PORT(0x8)&0x000f)<<4)) & (~deco16_mask);
+		case 0x63e/2:									return ((((DECO_PORT(0xa)&0x0ff0)<<4) | ((DECO_PORT(0xa)&0xf000)>>12) | ((DECO_PORT(0xa)&0x0003)<<6) | ((DECO_PORT(0xa)&0x000c)<<2)));
+		case 0x7cc/2:									return ((((DECO_PORT(0xc)&0xfff0)>>4) | ((DECO_PORT(0xc)&0x000e)<<11) | ((DECO_PORT(0xc)&0x0001)<<15)) ^ deco16_xor) & (~deco16_mask);
+		case 0x1bc/2:									return (((DECO_PORT(0xe)&0xf000)>>12) | ((DECO_PORT(0xe)&0x0f00)>>4) | ((DECO_PORT(0xe)&0x00ff)<<8)) & (~deco16_mask);
+		case 0x780/2:									return DECO_PORT(0xb8);
+		case 0x454/2:									return (((DECO_PORT(0x82)&0xf000)>>8) | ((DECO_PORT(0x82)&0x0f00)>>0) | ((DECO_PORT(0x82)&0x00f0)>>4) | ((DECO_PORT(0x82)&0x000f)<<12)) ^ deco16_xor;
+		case 0x53e/2:									return ((DECO_PORT(0x9e)&0x0003)<<14) | ((DECO_PORT(0x9e)&0x000c)<<10);
+		case 0x250/2:									return (((DECO_PORT(0x62)&0xf0f0)<<0) | ((DECO_PORT(0x62)&0x0f00)>>8)  | ((DECO_PORT(0x62)&0x000f)<<8)) & (~deco16_mask);
+		case 0x150/2: /* Shared */						return DECO_PORT(0x7e);
+		case 0x10e/2: /* Schmeizr Robo only */			return DECO_PORT(0x7c);
+		case 0x56a/2: /* Schmeizr Robo only */			return (((DECO_PORT(0x7c)&0xfff0)>>4) | ((DECO_PORT(0x7c)&0x000e)<<11) | ((DECO_PORT(0x7c)&0x0001)<<15)) & (~deco16_mask);
+		case 0x39a/2: /* Schmeizr Robo only */			return ((((DECO_PORT(0x7e)&0xfff0)>>4) | ((DECO_PORT(0x7e)&0x000e)<<11) | ((DECO_PORT(0x7e)&0x0001)<<15)) ^ deco16_xor) & (~deco16_mask);
+		case 0x188/2: /* Schmeizr Robo only */			return (((deco16_mask&0x0003)<<6) | ((deco16_mask&0x000c)<<2) | ((deco16_mask&0x00f0)<<4) | ((deco16_mask&0x0f00)<<4)) & (~deco16_mask);
+		case 0x3cc/2: /* Schmeizr Robo only */			return deco16_mask;
+		case 0x04a/2: /* Schmeizr Robo only */			return DECO_PORT(0x9e) & (~deco16_mask);
+		case 0x7e8/2: /* Schmeizr Robo only */			return DECO_PORT(0x4a) ^ deco16_xor;
+		case 0x0fc/2: /* Schmeizr Robo only */			return DECO_PORT(0x4a);
+		case 0x38c/2: /* Schmeizr Robo only */			return DECO_PORT(0x28);
+		case 0x028/2: /* Schmeizr Robo only  */			return DECO_PORT(0x58);
 	}
 
 	logerror("Protection PC %06x: warning - read unmapped protection address %04x\n",space.device().safe_pc(),offset<<1);
