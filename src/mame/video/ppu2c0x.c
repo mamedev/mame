@@ -861,12 +861,12 @@ void ppu2c0x_device::draw_sprites( UINT8 *line_priority )
 				{
 					if (pixel_data)
 					{
-						/* has another sprite been drawn here? */
-						if (!(line_priority[sprite_xpos + pixel] & 0x01))
+						if ((sprite_xpos + pixel) < VISIBLE_SCREEN_WIDTH)
 						{
-							/* no, draw */
-							if ((sprite_xpos + pixel) < VISIBLE_SCREEN_WIDTH)
+							/* has another sprite been drawn here? */
+							if (!(line_priority[sprite_xpos + pixel] & 0x01))
 							{
+								/* no, draw */
 								bitmap.pix16(m_scanline, sprite_xpos + pixel) = paldata[pixel_data];
 								line_priority[sprite_xpos + pixel] |= 0x01;
 							}
