@@ -30,10 +30,11 @@ General:
       - 18kb system GROMs, with monitor and TI-extended basic II (no dump,
         but source code is available and has been compiled)
       - 4(???)kb DSR ROM for hexbus (no dump)
-      - 32(?)kb speech ROM: contents are slightly different from the 99/4(a)
-        speech ROMs, due to the use of a tms5220 speech synthesizer instead of
-        the older tms0285 (no dump, but 99/4(a) speech ROMs should work mostly
-        OK)
+
+      32 KiB speech ROM: Contents are the same as used in the TI-99/4A speech
+         synthesizer, although the speech chip is slightly newer (MZ: verified
+         on a real system 07-2013)
+
       - 12(???)kb ROM with PCode interpreter (no dump)
       - 2(3???)*48kb of GROMs with PCode data files (no dump)
     * 2kb SRAM (16 bytes of which are hidden), 64kb DRAM (expandable to almost
