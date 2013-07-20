@@ -470,9 +470,9 @@ endif
 #@src/emu/sound/qs1000.h,SOUNDS += QS1000
 #-------------------------------------------------
 
-#ifneq ($(filter QS1000,$(SOUNDS)),)
+ifneq ($(filter QS1000,$(SOUNDS)),)
 SOUNDOBJS += $(SOUNDOBJ)/qs1000.o
-#endif
+endif
 
 
 
