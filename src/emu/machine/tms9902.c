@@ -72,8 +72,9 @@ void tms9902_device::field_interrupts()
 							|| (m_RBRL && m_RIENB)
 							|| (m_XBRE && m_XBIENB)
 							|| (m_TIMELP && m_TIMENB);
-// if (VERBOSE>3) LOG("TMS9902: interrupt flags (DSCH = %02x, DSCENB = %02x), (RBRL = %02x, RIENB = %02x), (XBRE = %02x, XBIENB = %02x), (TIMELP = %02x, TIMENB = %02x)\n",
-//  m_DSCH, m_DSCENB, m_RBRL, m_RIENB, m_XBRE, m_XBIENB, m_TIMELP, m_TIMENB);
+	if (VERBOSE>8) LOG("TMS9902: interrupt flags (DSCH = %02x, DSCENB = %02x), (RBRL = %02x, RIENB = %02x), (XBRE = %02x, XBIENB = %02x), (TIMELP = %02x, TIMENB = %02x)\n",
+		m_DSCH, m_DSCENB, m_RBRL, m_RIENB, m_XBRE, m_XBIENB, m_TIMELP, m_TIMENB);
+
 	if (new_int != m_INT)
 	{
 		// Only consider edges
@@ -549,7 +550,6 @@ void tms9902_device::reset_uart()
 
 	m_DSCH = false;
 	m_TIMELP = false;
-	m_INT = false;
 
 	m_TMR = 0;
 	m_STOPB = 0;
@@ -560,6 +560,7 @@ void tms9902_device::reset_uart()
 	m_XBR = 0;
 	m_XSR = 0;
 
+	// m_INT will be cleared in field_interrupts
 	field_interrupts();
 }
 
