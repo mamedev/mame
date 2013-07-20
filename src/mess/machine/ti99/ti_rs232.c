@@ -284,7 +284,7 @@ void ti_rs232_pio_device::crureadz(offs_t offset, UINT8 *value)
 		}
 		if ((offset & 0x00c0)==0x0080)
 		{
-			*value = m_uart[1]->cruread(*m_space, offset>>1, 0xff);
+			*value = m_uart[1]->cruread(*m_space, offset>>4, 0xff);
 			return;
 		}
 	}
