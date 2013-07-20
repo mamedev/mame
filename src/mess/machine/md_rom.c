@@ -273,12 +273,12 @@ void md_rom_mcpirate_device::device_reset()
 
 void md_rom_chinf3_device::device_start()
 {
+	m_bank = 0;
 	save_item(NAME(m_bank));
 }
 
 void md_rom_chinf3_device::device_reset()
 {
-	m_bank = 0;
 }
 
 void md_rom_lion2_device::device_start()
