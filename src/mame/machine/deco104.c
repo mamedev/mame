@@ -595,6 +595,8 @@ WRITE16_HANDLER( deco16_104_rohga_prot_w )
 	    There doesn't appear to be any way to detect what bank is currently selected - it
 	    seems game code must maintain this state (if it matters).
 	*/
+	offset &=0x7f;
+
 	if (decoprot_buffer_ram_selected)
 		COMBINE_DATA(&decoprot_buffer_ram[offset]);
 	else
@@ -715,16 +717,16 @@ READ16_MEMBER(deco104_device::dblewing_prot_r)
 
 	switch (deco104_addrxx)
 	{
-		case 0x4c0: /* was 0x664 */ /* was 0x16a*/ return m_boss_move;          // boss 1 movement
+		//case 0x4c0: /* was 0x664 */ /* was 0x16a*/ return m_boss_move;          // boss 1 movement  // in shared sim
 		case 0x13a: /* was 0x39e */ /* was 0x6d6*/ return m_boss_move;          // boss 1 2nd pilot
 		case 0x0ce: /* was 0x26a */ /* was 0x748*/ return m_boss_move;          // boss 1 3rd pilot
 
 		case 0x492: /* was 0x636 */ /* was 0x566*/ return 0x0009;             // boss BGM,might be a variable one (read->write to the sound latch)
 		case 0x440: /* was 0x6e4 */ /* was 0x1ea*/ return m_boss_shoot_type;    // boss 1 shoot type
 		case 0x312: /* was 0x1b6 */ /* was 0x596*/ return m_boss_3_data;          // boss 3 appearing
-		case 0x32a: /* was 0x18e */ /* was 0x692*/ return m_boss_4_data;
+		//case 0x32a: /* was 0x18e */ /* was 0x692*/ return m_boss_4_data; // in shared sim
 		case 0x72e: /* was 0x58a */ /* was 0x6b0*/ return m_boss_5_data;
-		case 0x3d2: /* was 0x176 */ /* was 0x51e*/ return m_boss_5sx_data;
+		//case 0x3d2: /* was 0x176 */ /* was 0x51e*/ return m_boss_5sx_data;  // in shared sim
 		case 0x21e: /* was 0x0ba */ /* was 0x784*/ return m_boss_6_data;
 
 		case 0x78c: /* was 0x528 */ /* was 0x330*/ return 0; // controls bonuses such as shoot type,bombs etc.
@@ -742,24 +744,24 @@ READ16_MEMBER(deco104_device::dblewing_prot_r)
 				case 0x0300: return 0x160;//b
 			}
 		}
-		case 0x334: /* was 0x190 */ /* was 0x094*/ return m_104_data;// p1 inputs select screen  OK
-		case 0x0fc: /* was 0x258 */ /* was 0x24c*/return m_008_data;//read DSW (mirror for coinage/territory)
-		case 0x36c: /* was 0x1c8 */ /* was 0x298*/return ioport(":SYSTEM")->read();//vblank
-		case 0x5b2: /* was 0x716 */ /* was 0x476*/return ioport(":SYSTEM")->read();//mirror for coins
-		case 0x292: /* was 0x036 */ /* was 0x506*/return ioport(":DSW")->read();
+		//case 0x334: /* was 0x190 */ /* was 0x094*/ return m_104_data;// p1 inputs select screen  OK // in shared sim
+		//case 0x0fc: /* was 0x258 */ /* was 0x24c*/return m_008_data;//read DSW (mirror for coinage/territory) // in shared sim
+		//case 0x36c: /* was 0x1c8 */ /* was 0x298*/return ioport(":IN1")->read();//vblank // in shared sim
+		case 0x5b2: /* was 0x716 */ /* was 0x476*/return ioport(":IN1")->read();//mirror for coins
+		//case 0x292: /* was 0x036 */ /* was 0x506*/return ioport(":DSW")->read(); // in shared sim
 		case 0x146: /* was 0x3e2 */ /* was 0x5d8*/return m_406_data;
-		case 0x73c: /* was 0x598 */ /* was 0x2b4*/return ioport(":P1_P2")->read();
+		case 0x73c: /* was 0x598 */ /* was 0x2b4*/return ioport(":IN0")->read();
 		case 0x644: /* was 0x4e0 */ /* was 0x1a8*/return (ioport(":DSW")->read() & 0x4000) >> 12;//allow continue
-		case 0x45c: /* was 0x6f8 */ /* was 0x3ec*/return m_70c_data; //score entry
+		// case 0x45c: /* was 0x6f8 */ /* was 0x3ec*/return m_70c_data; //score entry // in shared sim
 		case 0x0b8: /* was 0x21c */ /* was 0x246*/return m_580_data; // these three controls "perfect bonus" I suppose...
 		case 0x6d2: /* was 0x476 */ /* was 0x52e*/return m_580_data;
-		case 0x782: /* was 0x526 */ /* was 0x532*/return m_580_data;
+		//case 0x782: /* was 0x526 */ /* was 0x532*/return m_580_data; // in shared sim
 
 
 		case 0x564: /* was 0x7c0 */ /* was 0x0f8*/ return 0; // m_080_data;
-		case 0x294: /* was 0x030 */ /* was 0x104*/ return 0;
-		case 0x2d0: /* was 0x074 */ /* was 0x10e*/ return 0;
-		case 0x2b8: /* was 0x01c */ /* was 0x206*/ return 0; // m_70c_data;
+		//case 0x294: /* was 0x030 */ /* was 0x104*/ return 0; // in shared sim (ram buffer change!)
+		//case 0x2d0: /* was 0x074 */ /* was 0x10e*/ return 0;// in shared sim (ram buffer change!)
+		//case 0x2b8: /* was 0x01c */ /* was 0x206*/ return 0; // m_70c_data;// in shared sim (ram buffer change!)
 		case 0x1fc: /* was 0x358 */ /* was 0x25c*/return 0;
 		case 0x23c: /* was 0x098 */ /* was 0x284*/ return 0; // 3rd player 2nd boss
 		case 0x7a2: /* was 0x506 */ /* was 0x432*/return 0; // boss on water level?
@@ -771,6 +773,8 @@ READ16_MEMBER(deco104_device::dblewing_prot_r)
 //  printf("dblewing prot r %08x, %04x, %04x\n", space.device().safe_pc(), offset * 2, mem_mask);
 
 	mame_printf_debug("dblewing prot r %08x, %04x, %04x\n", space.device().safe_pc(), offset * 2, mem_mask);
+
+	return deco104_read_core(space, deco104_addrxx/2, mem_mask);
 
 	return 0;//machine().rand();
 }
@@ -793,6 +797,26 @@ WRITE16_MEMBER(deco104_device::dblewing_prot_w)
 	cpu_device* cpudev = 0;
 
 	int deco104_addrxx = BITSWAP32(offset *2,  31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,      17,16,15,14,  5,  6,  4,  7,  3,   8,  2,  9,  1,  10,    0) & 0x7fff;
+
+	deco104_addrxx &=0xff;
+
+	if (decoprot_buffer_ram_selected)
+		COMBINE_DATA(&decoprot_buffer_ram[deco104_addrxx/2]);
+	else
+		COMBINE_DATA(&deco16_prot_ram[deco104_addrxx/2]);
+	driver_device *state = space.machine().driver_data<driver_device>();
+	if (deco104_addrxx == (0xa8))
+	{
+		state->soundlatch_byte_w(space, 0, data & 0xff);
+		space.machine().device("audiocpu")->execute().set_input_line(0, HOLD_LINE);
+	}
+
+	// These are set regardless of bank
+	if (deco104_addrxx==0x42)
+		COMBINE_DATA(&deco16_xor);
+	if (deco104_addrxx==0xee)
+		COMBINE_DATA(&deco16_mask);
+
 
 	switch (deco104_addrxx)
 	{

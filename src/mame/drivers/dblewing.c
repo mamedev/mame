@@ -108,7 +108,7 @@ static ADDRESS_MAP_START( dblewing_map, AS_PROGRAM, 16, dblewing_state )
 	AM_RANGE(0x104000, 0x104fff) AM_RAM AM_SHARE("pf1_rowscroll")
 	AM_RANGE(0x106000, 0x106fff) AM_RAM AM_SHARE("pf2_rowscroll")
 
-	AM_RANGE(0x280000, 0x2807ff) AM_DEVREADWRITE("ioprot104", deco104_device, dblewing_prot_r, dblewing_prot_w)
+	AM_RANGE(0x280000, 0x2807ff) AM_DEVREADWRITE("ioprot104", deco104_device, dblewing_prot_r, dblewing_prot_w) AM_SHARE("prot16ram")
 
 
 	AM_RANGE(0x284000, 0x284001) AM_RAM
@@ -185,7 +185,7 @@ static GFXDECODE_START( dblewing )
 GFXDECODE_END
 
 static INPUT_PORTS_START( dblewing )
-	PORT_START("P1_P2")
+	PORT_START("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -203,7 +203,7 @@ static INPUT_PORTS_START( dblewing )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START("SYSTEM")
+	PORT_START("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -466,6 +466,8 @@ DRIVER_INIT_MEMBER(dblewing_state,dblewing)
 {
 	deco56_decrypt_gfx(machine(), "gfx1");
 	deco102_decrypt_cpu(machine(), "maincpu", 0x399d, 0x25, 0x3d);
+
+	decoprot104_reset(machine());
 }
 
 
