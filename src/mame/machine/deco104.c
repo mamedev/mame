@@ -191,55 +191,36 @@ void decoprot104_reset(running_machine &machine)
 
 WRITE16_HANDLER( deco16_104_prot_w ) /* Wizard Fire */
 {
-	int deco146_addr = BITSWAP32(offset*2, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    1,2,3, 4,5,6,7, 8,9,10,0) & 0x7fff;
-
-#if 0
-	UINT16 ports[37] = {
-	0x110,0x36c,0x334,0x0dc,0x494,0x244,0x7cc,0x0c0,
-	0x188,0x65e,0x5ce,0x61a,0x496,0x40a,0x1e8,0x4bc,
-    0x46e,0x264,0x172,0x214,0x52e,0x07a,0x360,0x4dc,
-    0x3a8,0x2f6,0x7e4,0x536,0x0be,0x490,0x710,0x22a,
-    0x626,0x444,0x5ac,0x650,0x4ac
-	};
-
-	for (int i=0;i<37;i++)
-	{
-		int xx = ports[i];
-
-		int deco146_addrxx = BITSWAP32(xx,  31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,      17,16,15,14,    1,2,3, 4,5,6,7, 8,9,10,0) & 0x7fff;
+	int deco104_addr = BITSWAP32(offset*2, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    1,2,3, 4,5,6,7, 8,9,10,0) & 0x7fff;
 
 
-		printf("case 0x%03x: /* was 0x%03x*/\n",deco146_addrxx, xx);
-	}
-	printf("\n");
-#endif
 
 	driver_device *state = space.machine().driver_data<driver_device>();
-	if (deco146_addr == (0xa8))
+	if (deco104_addr == (0xa8))
 	{
 		state->soundlatch_byte_w(space, 0, data & 0xff);
 		space.machine().device("audiocpu")->execute().set_input_line(0, HOLD_LINE);
 		return;
 	}
 
-	if (deco146_addr != (0x00))
-	if (deco146_addr != (0x88))
-	if (deco146_addr != (0xa8))
-	if (deco146_addr != (0x14))
-	if (deco146_addr != (0x94))
-	if (deco146_addr != (0xd4))
-	if (deco146_addr != (0xec))
-	if (deco146_addr != (0x3c))
-	if (deco146_addr != (0xc2))
-	if (deco146_addr != (0x5a))
-	if (deco146_addr != (0xda))
-	//if (deco146_addr != (0x206))
-	if (deco146_addr != (0x76))
-	if (deco146_addr != (0xbe))
-	if (deco146_addr != (0x62))
-		printf("CONTROL PC %06x: warning - write protection memory address %04x %04x\n", space.device().safe_pc(), deco146_addr, data);
+	if (deco104_addr != (0x00))
+	if (deco104_addr != (0x88))
+	if (deco104_addr != (0xa8))
+	if (deco104_addr != (0x14))
+	if (deco104_addr != (0x94))
+	if (deco104_addr != (0xd4))
+	if (deco104_addr != (0xec))
+	if (deco104_addr != (0x3c))
+	if (deco104_addr != (0xc2))
+	if (deco104_addr != (0x5a))
+	if (deco104_addr != (0xda))
+	//if (deco104_addr != (0x206))
+	if (deco104_addr != (0x76))
+	if (deco104_addr != (0xbe))
+	if (deco104_addr != (0x62))
+		printf("CONTROL PC %06x: warning - write protection memory address %04x %04x\n", space.device().safe_pc(), deco104_addr, data);
 
-	COMBINE_DATA(&deco16_prot_ram[deco146_addr>>1]);
+	COMBINE_DATA(&deco16_prot_ram[deco104_addr>>1]);
 }
 
 #define DECO_RV_PORT(p) (deco16_prot_ram[ BITSWAP32(p, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18,17, 12,11,10,/**/      16,15,14,13,    0,1,2,3,4,5,6,7,8,9)])
@@ -251,9 +232,9 @@ WRITE16_HANDLER( deco16_104_prot_w ) /* Wizard Fire */
 
 READ16_HANDLER( deco16_104_prot_r ) /* Wizard Fire */
 {
-	int deco146_addr = BITSWAP32(offset*2, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    1,2,3, 4,5,6,7, 8,9,10,0) & 0x7fff;
+	int deco104_addr = BITSWAP32(offset*2, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    1,2,3, 4,5,6,7, 8,9,10,0) & 0x7fff;
 
-	switch (deco146_addr) {
+	switch (deco104_addr) {
 		case 0x088: /* was 0x110*/ /* Player input */		return space.machine().root_device().ioport("IN0")->read(); // also used in rohga sim
 		case 0x36c: /* was 0x36c*/							return space.machine().root_device().ioport("IN1")->read(); // also used in rohga sim
 		case 0x2cc: /* was 0x334*/							return space.machine().root_device().ioport("IN1")->read();
@@ -293,7 +274,7 @@ READ16_HANDLER( deco16_104_prot_r ) /* Wizard Fire */
 		case 0x352: /* was 0x4ac*/							return ((DECO_NEW_PORT(0x62)&0x0007)<<13) | ((DECO_NEW_PORT(0x62)&0x0008)<<9);
 	}
 
-	logerror("Deco Protection PC %06x: warning - read unmapped memory address %04x\n",space.device().safe_pc(),deco146_addr);
+	logerror("Deco Protection PC %06x: warning - read unmapped memory address %04x\n",space.device().safe_pc(),deco104_addr);
 	return 0;
 }
 
@@ -748,6 +729,8 @@ WRITE16_HANDLER( deco16_104_pktgaldx_prot_w )
 
 
 
+
+
 /* protection.. involves more addresses than this .. */
 /* this is going to be typical deco '104' protection...
  writes one place, reads back data shifted in another
@@ -756,6 +739,9 @@ WRITE16_HANDLER( deco16_104_pktgaldx_prot_w )
 
  we need to log the PC of each read/write and check to
  see if the code makes any of them move obvious
+
+
+
 
  
  	// protection 
@@ -769,26 +755,29 @@ WRITE16_HANDLER( deco16_104_pktgaldx_prot_w )
  */
 READ16_MEMBER(deco104_device::dblewing_prot_r)
 {
-	switch (offset * 2)
+	int deco104_addrxx = BITSWAP32(offset*2,  31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,      17,16,15,14,   5,  6,  4,  7,  3,   8,  2,  9,  1,  10,  0) & 0x7fff;
+
+
+	switch (deco104_addrxx)
 	{
-		case 0x16a: return m_boss_move;          // boss 1 movement
-		case 0x6d6: return m_boss_move;          // boss 1 2nd pilot
-		case 0x748: return m_boss_move;          // boss 1 3rd pilot
+		case 0x664: /* was 0x16a*/ return m_boss_move;          // boss 1 movement
+		case 0x39e: /* was 0x6d6*/ return m_boss_move;          // boss 1 2nd pilot
+		case 0x26a: /* was 0x748*/ return m_boss_move;          // boss 1 3rd pilot
 
-		case 0x566: return 0x0009;             // boss BGM,might be a variable one (read->write to the sound latch)
-		case 0x1ea: return m_boss_shoot_type;    // boss 1 shoot type
-		case 0x596: return m_boss_3_data;          // boss 3 appearing
-		case 0x692: return m_boss_4_data;
-		case 0x6b0: return m_boss_5_data;
-		case 0x51e: return m_boss_5sx_data;
-		case 0x784: return m_boss_6_data;
+		case 0x636: /* was 0x566*/ return 0x0009;             // boss BGM,might be a variable one (read->write to the sound latch)
+		case 0x6e4: /* was 0x1ea*/ return m_boss_shoot_type;    // boss 1 shoot type
+		case 0x1b6: /* was 0x596*/ return m_boss_3_data;          // boss 3 appearing
+		case 0x18e: /* was 0x692*/ return m_boss_4_data;
+		case 0x58a: /* was 0x6b0*/ return m_boss_5_data;
+		case 0x176: /* was 0x51e*/ return m_boss_5sx_data;
+		case 0x0ba: /* was 0x784*/ return m_boss_6_data;
 
-		case 0x330: return 0; // controls bonuses such as shoot type,bombs etc.
-		case 0x1d4: return m_70c_data;  //controls restart points
+		case 0x528: /* was 0x330*/ return 0; // controls bonuses such as shoot type,bombs etc.
+		case 0x3b0: /* was 0x1d4*/ return m_70c_data;  //controls restart points
 
-		case 0x0ac: return (ioport(":DSW")->read() & 0x40) << 4;//flip screen
-		case 0x4b0: return m_608_data;//coinage
-		case 0x068:
+		case 0x4d0: /* was 0x0ac*/ return (ioport(":DSW")->read() & 0x40) << 4;//flip screen
+		case 0x582: /* was 0x4b0*/return m_608_data;//coinage
+		case 0x640: /* was 0x068*/
 		{
 			switch (ioport(":DSW")->read() & 0x0300) //I don't know how to relationate this...
 			{
@@ -798,36 +787,48 @@ READ16_MEMBER(deco104_device::dblewing_prot_r)
 				case 0x0300: return 0x160;//b
 			}
 		}
-		case 0x094: return m_104_data;// p1 inputs select screen  OK
-		case 0x24c: return m_008_data;//read DSW (mirror for coinage/territory)
-		case 0x298: return ioport(":SYSTEM")->read();//vblank
-		case 0x476: return ioport(":SYSTEM")->read();//mirror for coins
-		case 0x506: return ioport(":DSW")->read();
-		case 0x5d8: return m_406_data;
-		case 0x2b4: return ioport(":P1_P2")->read();
-		case 0x1a8: return (ioport(":DSW")->read() & 0x4000) >> 12;//allow continue
-		case 0x3ec: return m_70c_data; //score entry
-		case 0x246: return m_580_data; // these three controls "perfect bonus" I suppose...
-		case 0x52e: return m_580_data;
-		case 0x532: return m_580_data;
+		case 0x190: /* was 0x094*/ return m_104_data;// p1 inputs select screen  OK
+		case 0x258: /* was 0x24c*/return m_008_data;//read DSW (mirror for coinage/territory)
+		case 0x1c8: /* was 0x298*/return ioport(":SYSTEM")->read();//vblank
+		case 0x716: /* was 0x476*/return ioport(":SYSTEM")->read();//mirror for coins
+		case 0x036: /* was 0x506*/return ioport(":DSW")->read();
+		case 0x3e2: /* was 0x5d8*/return m_406_data;
+		case 0x598: /* was 0x2b4*/return ioport(":P1_P2")->read();
+		case 0x4e0: /* was 0x1a8*/return (ioport(":DSW")->read() & 0x4000) >> 12;//allow continue
+		case 0x6f8: /* was 0x3ec*/return m_70c_data; //score entry
+		case 0x21c: /* was 0x246*/return m_580_data; // these three controls "perfect bonus" I suppose...
+		case 0x476: /* was 0x52e*/return m_580_data;
+		case 0x526: /* was 0x532*/return m_580_data;
+
+
+		case 0x7c0: /* was 0x0f8*/ return 0; // m_080_data;
+		case 0x030: /* was 0x104*/ return 0;
+		case 0x074: /* was 0x10e*/ return 0;
+		case 0x01c: /* was 0x206*/ return 0; // m_70c_data;
+		case 0x358: /* was 0x25c*/return 0;
+		case 0x098: /* was 0x284*/ return 0; // 3rd player 2nd boss
+		case 0x506: /* was 0x432*/return 0; // boss on water level?
+		case 0x266: /* was 0x54a*/ return 0; // 3rd player 2nd boss
+		case 0x0be: /* was 0x786*/return 0;
+
 	}
 
 //  printf("dblewing prot r %08x, %04x, %04x\n", space.device().safe_pc(), offset * 2, mem_mask);
-
-	if ((offset*2) == 0x0f8) return 0; // m_080_data;
-	if ((offset*2) == 0x104) return 0;
-	if ((offset*2) == 0x10e) return 0;
-	if ((offset*2) == 0x206) return 0; // m_70c_data;
-	if ((offset*2) == 0x25c) return 0;
-	if ((offset*2) == 0x284) return 0; // 3rd player 2nd boss
-	if ((offset*2) == 0x432) return 0; // boss on water level?
-	if ((offset*2) == 0x54a) return 0; // 3rd player 2nd boss
-	if ((offset*2) == 0x786) return 0;
 
 	mame_printf_debug("dblewing prot r %08x, %04x, %04x\n", space.device().safe_pc(), offset * 2, mem_mask);
 
 	return 0;//machine().rand();
 }
+
+
+ 
+
+
+
+
+
+
+
 
 WRITE16_MEMBER(deco104_device::dblewing_prot_w)
 {
@@ -836,9 +837,11 @@ WRITE16_MEMBER(deco104_device::dblewing_prot_w)
 	driver_device *drvstate = machine().driver_data<driver_device>();
 	cpu_device* cpudev = 0;
 
-	switch (offset * 2)
+	int deco104_addrxx = BITSWAP32(offset *2,  31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,      17,16,15,14,  5,  6,  4,  7,  3,   8,  2,  9,  1,  10,    0) & 0x7fff;
+
+	switch (deco104_addrxx)
 	{
-		case 0x088:
+		case 0x0c0: /* was 0x088*/
 			m_088_data = data;
 			if(m_088_data == 0)          { m_boss_4_data = 0;    }
 			else if(m_088_data & 0x8000) { m_boss_4_data = 0x50; }
@@ -846,11 +849,11 @@ WRITE16_MEMBER(deco104_device::dblewing_prot_w)
 
 			return;
 
-		case 0x104:
+		case 0x030: /* was 0x104*/
 			m_104_data = data;
 			return; // p1 inputs select screen  OK
 
-		case 0x18a:
+		case 0x0e4: /* was 0x18a*/
 			m_18a_data = data;
 			switch (m_18a_data)
 			{
@@ -861,7 +864,7 @@ WRITE16_MEMBER(deco104_device::dblewing_prot_w)
 				case 0x8a49: m_boss_5_data = 0x60; break;
 			}
 			return;
-		case 0x200:
+		case 0x008: /* was 0x200*/
 			m_200_data = data;
 			switch (m_200_data)
 			{
@@ -871,7 +874,7 @@ WRITE16_MEMBER(deco104_device::dblewing_prot_w)
 			}
 			//popmessage("%04x",m_200_data);
 			return;
-		case 0x280:
+		case 0x088: /* was 0x280*/
 			m_280_data = data;
 			switch (m_280_data)
 			{
@@ -883,7 +886,7 @@ WRITE16_MEMBER(deco104_device::dblewing_prot_w)
 			}
 			//printf("%04x\n",m_280_data);
 			return;
-		case 0x380: // sound write
+		case 0x0a8: /* was 0x380*/
 			drvstate->soundlatch_byte_w(space, 0, data & 0xff);
 			cpudev = (cpu_device*)machine().device(":audiocpu");
 			if (cpudev) cpudev->set_input_line(0, HOLD_LINE);
@@ -892,7 +895,7 @@ WRITE16_MEMBER(deco104_device::dblewing_prot_w)
 		//	m_sound_irq |= 0x02;
 		//	m_audiocpu->set_input_line(0, (m_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
 			return;
-		case 0x384:
+		case 0x0b8: /* was 0x384*/
 			m_384_data = data;
 			switch(m_384_data)
 			{
@@ -904,7 +907,7 @@ WRITE16_MEMBER(deco104_device::dblewing_prot_w)
 				case 0xda8f: m_boss_6_data = 6; break;
 			}
 			return;
-		case 0x38e:
+		case 0x0fc: /* was 0x38e*/
 			m_38e_data = data;
 			switch(m_38e_data)
 			{
@@ -920,36 +923,38 @@ WRITE16_MEMBER(deco104_device::dblewing_prot_w)
 				//case 0xe65a: m_boss_shoot_type = 0; break;
 			}
 			return;
-		case 0x58c: // 3rd player 1st level
+		case 0x0f2: /* was 0x58c*/ // 3rd player 1st level
 			m_58c_data = data;
 			if(m_58c_data == 0)     { m_boss_move = 5; }
 			else                           { m_boss_move = 2; }
 
 			return;
-		case 0x60a:
+		case 0x04e: /* was 0x60a*/
 			m_60a_data = data;
 			if(m_60a_data & 0x8000) { m_boss_3_data = 2; }
 			else                           { m_boss_3_data = 9; }
 
 			return;
-		case 0x580:
+		case 0x0a2: /* was 0x580*/
 			m_580_data = data;
 			return;
-		case 0x406:
+		case 0x016: /* was 0x406*/
 			m_406_data = data;
 			return;  // p2 inputs select screen  OK
+
+		case 0x040: /* was 0x008*/ { m_008_data = data; return; }
+		case 0x080: /* was 0x080*/ { m_080_data = data; return; } // p3 3rd boss?
+		case 0x0d8: /* was 0x28c*/ { m_28c_data = data; return; }
+		case 0x042: /* was 0x408*/ { m_408_data = data; return; } // 3rd player 1st level?
+		case 0x056: /* was 0x40e*/ { m_40e_data = data; return; } // 3rd player 2nd level?
+		case 0x04a: /* was 0x608*/ { m_608_data = data; return; }
+		case 0x07a: /* was 0x70c*/ { m_70c_data = data; return; }
+		case 0x0ee: /* was 0x78a*/ { m_78a_data = data; return; }
+		case 0x0ea: /* was 0x788*/ { m_788_data = data; return; }
 	}
 
 //  printf("dblewing prot w %08x, %04x, %04x %04x\n", space.device().safe_pc(), offset * 2, mem_mask, data);
 
-	if ((offset * 2) == 0x008) { m_008_data = data; return; }
-	if ((offset * 2) == 0x080) { m_080_data = data; return; } // p3 3rd boss?
-	if ((offset * 2) == 0x28c) { m_28c_data = data; return; }
-	if ((offset * 2) == 0x408) { m_408_data = data; return; } // 3rd player 1st level?
-	if ((offset * 2) == 0x40e) { m_40e_data = data; return; } // 3rd player 2nd level?
-	if ((offset * 2) == 0x608) { m_608_data = data; return; }
-	if ((offset * 2) == 0x70c) { m_70c_data = data; return; }
-	if ((offset * 2) == 0x78a) { m_78a_data = data; return; }
-	if ((offset * 2) == 0x788) { m_788_data = data; return; }
+
 }
 
