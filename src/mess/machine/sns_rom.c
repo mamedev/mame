@@ -436,7 +436,6 @@ READ8_MEMBER(sns_rom_mcpirate2_device::read_l)
 READ8_MEMBER(sns_rom_mcpirate2_device::read_h)
 {
 	int bank = (offset / 0x10000) + (m_base_bank * 8);
-	assert(bank >= 0 && bank < 512);
 	return m_rom[rom_bank_map[bank] * 0x8000 + (offset & 0x7fff)];
 }
 
