@@ -314,6 +314,8 @@ READ16_HANDLER( deco16_104_cninja_prot_r )
 	// see note at top
 	real_offset ^= DECO104_MAGIC_XOR;
 
+	// what if we xor with 0x224 and use that (readback of port 0) as the base.. and bitswap the address further?
+	// could be interesting....
 	switch (real_offset)
 	{
 		case 0x224: /* was 0x080 */ /* Master level control */			return deco16_prot_ram[0x0/2];
@@ -752,27 +754,28 @@ READ16_MEMBER(deco104_device::dblewing_prot_r)
 {
 	int deco104_addrxx = BITSWAP32(offset*2,  31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,      17,16,15,14,   5,  6,  4,  7,  3,   8,  2,  9,  1,  10,  0) & 0x7fff;
 
+	deco104_addrxx ^= DECO104_MAGIC_XOR;
 
 	switch (deco104_addrxx)
 	{
-		case 0x664: /* was 0x16a*/ return m_boss_move;          // boss 1 movement
-		case 0x39e: /* was 0x6d6*/ return m_boss_move;          // boss 1 2nd pilot
-		case 0x26a: /* was 0x748*/ return m_boss_move;          // boss 1 3rd pilot
+		case 0x4c0: /* was 0x664 */ /* was 0x16a*/ return m_boss_move;          // boss 1 movement
+		case 0x13a: /* was 0x39e */ /* was 0x6d6*/ return m_boss_move;          // boss 1 2nd pilot
+		case 0x0ce: /* was 0x26a */ /* was 0x748*/ return m_boss_move;          // boss 1 3rd pilot
 
-		case 0x636: /* was 0x566*/ return 0x0009;             // boss BGM,might be a variable one (read->write to the sound latch)
-		case 0x6e4: /* was 0x1ea*/ return m_boss_shoot_type;    // boss 1 shoot type
-		case 0x1b6: /* was 0x596*/ return m_boss_3_data;          // boss 3 appearing
-		case 0x18e: /* was 0x692*/ return m_boss_4_data;
-		case 0x58a: /* was 0x6b0*/ return m_boss_5_data;
-		case 0x176: /* was 0x51e*/ return m_boss_5sx_data;
-		case 0x0ba: /* was 0x784*/ return m_boss_6_data;
+		case 0x492: /* was 0x636 */ /* was 0x566*/ return 0x0009;             // boss BGM,might be a variable one (read->write to the sound latch)
+		case 0x440: /* was 0x6e4 */ /* was 0x1ea*/ return m_boss_shoot_type;    // boss 1 shoot type
+		case 0x312: /* was 0x1b6 */ /* was 0x596*/ return m_boss_3_data;          // boss 3 appearing
+		case 0x32a: /* was 0x18e */ /* was 0x692*/ return m_boss_4_data;
+		case 0x72e: /* was 0x58a */ /* was 0x6b0*/ return m_boss_5_data;
+		case 0x3d2: /* was 0x176 */ /* was 0x51e*/ return m_boss_5sx_data;
+		case 0x21e: /* was 0x0ba */ /* was 0x784*/ return m_boss_6_data;
 
-		case 0x528: /* was 0x330*/ return 0; // controls bonuses such as shoot type,bombs etc.
-		case 0x3b0: /* was 0x1d4*/ return m_70c_data;  //controls restart points
+		case 0x78c: /* was 0x528 */ /* was 0x330*/ return 0; // controls bonuses such as shoot type,bombs etc.
+		case 0x114: /* was 0x3b0 */ /* was 0x1d4*/ return m_70c_data;  //controls restart points
 
-		case 0x4d0: /* was 0x0ac*/ return (ioport(":DSW")->read() & 0x40) << 4;//flip screen
-		case 0x582: /* was 0x4b0*/return m_608_data;//coinage
-		case 0x640: /* was 0x068*/
+		case 0x674: /* was 0x4d0 */ /* was 0x0ac*/ return (ioport(":DSW")->read() & 0x40) << 4;//flip screen
+		case 0x726: /* was 0x582 */ /* was 0x4b0*/return m_608_data;//coinage
+		case 0x4e4: /* was 0x640 */ /* was 0x068*/
 		{
 			switch (ioport(":DSW")->read() & 0x0300) //I don't know how to relationate this...
 			{
@@ -782,29 +785,29 @@ READ16_MEMBER(deco104_device::dblewing_prot_r)
 				case 0x0300: return 0x160;//b
 			}
 		}
-		case 0x190: /* was 0x094*/ return m_104_data;// p1 inputs select screen  OK
-		case 0x258: /* was 0x24c*/return m_008_data;//read DSW (mirror for coinage/territory)
-		case 0x1c8: /* was 0x298*/return ioport(":SYSTEM")->read();//vblank
-		case 0x716: /* was 0x476*/return ioport(":SYSTEM")->read();//mirror for coins
-		case 0x036: /* was 0x506*/return ioport(":DSW")->read();
-		case 0x3e2: /* was 0x5d8*/return m_406_data;
-		case 0x598: /* was 0x2b4*/return ioport(":P1_P2")->read();
-		case 0x4e0: /* was 0x1a8*/return (ioport(":DSW")->read() & 0x4000) >> 12;//allow continue
-		case 0x6f8: /* was 0x3ec*/return m_70c_data; //score entry
-		case 0x21c: /* was 0x246*/return m_580_data; // these three controls "perfect bonus" I suppose...
-		case 0x476: /* was 0x52e*/return m_580_data;
-		case 0x526: /* was 0x532*/return m_580_data;
+		case 0x334: /* was 0x190 */ /* was 0x094*/ return m_104_data;// p1 inputs select screen  OK
+		case 0x0fc: /* was 0x258 */ /* was 0x24c*/return m_008_data;//read DSW (mirror for coinage/territory)
+		case 0x36c: /* was 0x1c8 */ /* was 0x298*/return ioport(":SYSTEM")->read();//vblank
+		case 0x5b2: /* was 0x716 */ /* was 0x476*/return ioport(":SYSTEM")->read();//mirror for coins
+		case 0x292: /* was 0x036 */ /* was 0x506*/return ioport(":DSW")->read();
+		case 0x146: /* was 0x3e2 */ /* was 0x5d8*/return m_406_data;
+		case 0x73c: /* was 0x598 */ /* was 0x2b4*/return ioport(":P1_P2")->read();
+		case 0x644: /* was 0x4e0 */ /* was 0x1a8*/return (ioport(":DSW")->read() & 0x4000) >> 12;//allow continue
+		case 0x45c: /* was 0x6f8 */ /* was 0x3ec*/return m_70c_data; //score entry
+		case 0x0b8: /* was 0x21c */ /* was 0x246*/return m_580_data; // these three controls "perfect bonus" I suppose...
+		case 0x6d2: /* was 0x476 */ /* was 0x52e*/return m_580_data;
+		case 0x782: /* was 0x526 */ /* was 0x532*/return m_580_data;
 
 
-		case 0x7c0: /* was 0x0f8*/ return 0; // m_080_data;
-		case 0x030: /* was 0x104*/ return 0;
-		case 0x074: /* was 0x10e*/ return 0;
-		case 0x01c: /* was 0x206*/ return 0; // m_70c_data;
-		case 0x358: /* was 0x25c*/return 0;
-		case 0x098: /* was 0x284*/ return 0; // 3rd player 2nd boss
-		case 0x506: /* was 0x432*/return 0; // boss on water level?
-		case 0x266: /* was 0x54a*/ return 0; // 3rd player 2nd boss
-		case 0x0be: /* was 0x786*/return 0;
+		case 0x564: /* was 0x7c0 */ /* was 0x0f8*/ return 0; // m_080_data;
+		case 0x294: /* was 0x030 */ /* was 0x104*/ return 0;
+		case 0x2d0: /* was 0x074 */ /* was 0x10e*/ return 0;
+		case 0x2b8: /* was 0x01c */ /* was 0x206*/ return 0; // m_70c_data;
+		case 0x1fc: /* was 0x358 */ /* was 0x25c*/return 0;
+		case 0x23c: /* was 0x098 */ /* was 0x284*/ return 0; // 3rd player 2nd boss
+		case 0x7a2: /* was 0x506 */ /* was 0x432*/return 0; // boss on water level?
+		case 0x0c2: /* was 0x266 */ /* was 0x54a*/ return 0; // 3rd player 2nd boss
+		case 0x21a: /* was 0x0be */ /* was 0x786*/return 0;
 
 	}
 
