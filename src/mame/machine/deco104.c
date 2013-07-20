@@ -191,116 +191,85 @@ void decoprot104_reset(running_machine &machine)
 
 WRITE16_HANDLER( deco16_104_prot_w ) /* Wizard Fire */
 {
+	int deco146_addr = BITSWAP32(offset*2, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    1,2,3, 4,5,6,7, 8,9,10,0) & 0x7fff;
+
+
+
 	driver_device *state = space.machine().driver_data<driver_device>();
-	if (offset == (0x150 / 2))
+	if (deco146_addr == (0xa8))
 	{
 		state->soundlatch_byte_w(space, 0, data & 0xff);
 		space.machine().device("audiocpu")->execute().set_input_line(0, HOLD_LINE);
 		return;
 	}
 
-	if (offset != (0x150 >> 1) && offset != (0x0 >> 1) && offset != (0x110 >> 1) && offset != (0x280 >> 1)
-		&& offset != (0x290 >> 1) && offset != (0x2b0 >> 1) && offset != (0x370 >> 1) && offset != (0x3c0 >> 1)
-		&& offset != (0x370 >> 1) && offset != (0x3c0 >> 1) && offset != (0x430 >> 1) && offset != (0x460 >> 1)
-		&& offset != (0x5a0 >> 1) && offset != (0x5b0 >> 1) && offset != (0x6e0 >> 1) && offset != (0x7d0 >> 1)
-		)
-		logerror("CONTROL PC %06x: warning - write protection memory address %04x %04x\n", space.device().safe_pc(), offset << 1, data);
+	if (deco146_addr != (0x00))
+	if (deco146_addr != (0x88))
+	if (deco146_addr != (0xa8))
+	if (deco146_addr != (0x14))
+	if (deco146_addr != (0x94))
+	if (deco146_addr != (0xd4))
+	if (deco146_addr != (0xec))
+	if (deco146_addr != (0x3c))
+	if (deco146_addr != (0xc2))
+	if (deco146_addr != (0x5a))
+	if (deco146_addr != (0xda))
+	//if (deco146_addr != (0x206))
+	if (deco146_addr != (0x76))
+	if (deco146_addr != (0xbe))
+	if (deco146_addr != (0x62))
+		printf("CONTROL PC %06x: warning - write protection memory address %04x %04x\n", space.device().safe_pc(), deco146_addr, data);
 
-	COMBINE_DATA(&deco16_prot_ram[offset]);
+	COMBINE_DATA(&deco16_prot_ram[deco146_addr>>1]);
 }
+
+#define DECO_RV_PORT(p) (deco16_prot_ram[ BITSWAP32(p, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18,17, 12,11,10,/**/      16,15,14,13,    0,1,2,3,4,5,6,7,8,9)])
+#define DECO_NEW_PORT(p) (deco16_prot_ram[p/2])
+
+/*
+
+*/
 
 READ16_HANDLER( deco16_104_prot_r ) /* Wizard Fire */
 {
 	switch (offset<<1) {
-		case 0x110: /* Player input */
-			return space.machine().root_device().ioport("IN0")->read();
-
-		case 0x36c: /* Coins */
-		case 0x334: /* Probably also, c6, 2c0, 2e0, 4b2, 46a, 4da, rohga is 44c */
-			return space.machine().root_device().ioport("IN1")->read();
-		case 0x0dc:
-			return space.machine().root_device().ioport("IN1")->read()<<4;
-
-		case 0x494: /* Dips */
-			return space.machine().root_device().ioport("DSW1_2")->read();
-
-		case 0x244:
-			return deco16_prot_ram[0];
-		case 0x7cc:
-			return ((deco16_prot_ram[0]&0x000f)<<12) | ((deco16_prot_ram[0]&0x00f0)<<4) | ((deco16_prot_ram[0]&0x0f00)>>4) | ((deco16_prot_ram[0]&0xf000)>>12);
-		case 0x0c0:
-			return (((deco16_prot_ram[0]&0x000e)>>1) | ((deco16_prot_ram[0]&0x0001)<<3))<<12;
-		case 0x188:
-			return (((deco16_prot_ram[0]&0x000e)>>1) | ((deco16_prot_ram[0]&0x0001)<<3))<<12;
-		case 0x65e:
-			return (((deco16_prot_ram[0]&0x000c)>>2) | ((deco16_prot_ram[0]&0x0003)<<2))<<12;
-		case 0x5ce:
-			return ((deco16_prot_ram[0]<<8)&0xf000) | ((deco16_prot_ram[0]&0xe)<<7) | ((deco16_prot_ram[0]&0x1)<<11);
-		case 0x61a:
-			return (deco16_prot_ram[0]<<8)&0xff00;
-
-		case 0x496:
-			return deco16_prot_ram[0x110/2];
-		case 0x40a:
-			return ((deco16_prot_ram[0x110/2]&0x000f)<<12) | ((deco16_prot_ram[0x110/2]&0x00f0)>>4) | ((deco16_prot_ram[0x110/2]&0x0f00)<<0) | ((deco16_prot_ram[0x110/2]&0xf000)>>8);
-		case 0x1e8:
-			return ((deco16_prot_ram[0x110/2]&0x00ff)<<8) | ((deco16_prot_ram[0x110/2]&0xff00)>>8);
-		case 0x4bc:
-			return ((deco16_prot_ram[0x110/2]&0x0ff0)<<4) | ((deco16_prot_ram[0x110/2]&0x0003)<<6) | ((deco16_prot_ram[0x110/2]&0x000c)<<2);
-		case 0x46e:
-			return ((deco16_prot_ram[0x110/2]&0xfff0)<<0) | ((deco16_prot_ram[0x110/2]&0x0007)<<1) | ((deco16_prot_ram[0x110/2]&0x0008)>>3);
-		case 0x264:
-			return ((deco16_prot_ram[0x110/2]&0x000f)<<8) | ((deco16_prot_ram[0x110/2]&0x00f0)>>0) | ((deco16_prot_ram[0x110/2]&0x0f00)<<4);
-		case 0x172:
-			return ((deco16_prot_ram[0x110/2]&0x000f)<<4) | ((deco16_prot_ram[0x110/2]&0x00f0)<<4) | ((deco16_prot_ram[0x110/2]&0xf000)<<0);
-
-		case 0x214:
-			return deco16_prot_ram[0x280/2];
-		case 0x52e:
-			return ((deco16_prot_ram[0x280/2]&0x000f)<<8) | ((deco16_prot_ram[0x280/2]&0x00f0)>>0) | ((deco16_prot_ram[0x280/2]&0x0f00)>>8) | ((deco16_prot_ram[0x280/2]&0xf000)>>0);
-		case 0x07a:
-			return ((deco16_prot_ram[0x280/2]&0x000f)<<8) | ((deco16_prot_ram[0x280/2]&0x00f0)>>0) | ((deco16_prot_ram[0x280/2]&0x0f00)>>8) | ((deco16_prot_ram[0x280/2]&0xf000)>>0);
-		case 0x360:
-			return ((deco16_prot_ram[0x280/2]&0x000f)<<8) | ((deco16_prot_ram[0x280/2]&0x00f0)>>0) | ((deco16_prot_ram[0x280/2]&0x0f00)>>8) | ((deco16_prot_ram[0x280/2]&0xf000)>>0);
-		case 0x4dc:
-			return ((deco16_prot_ram[0x280/2]&0x0ff0)<<4) | ((deco16_prot_ram[0x280/2]&0x0007)<<5) | ((deco16_prot_ram[0x280/2]&0x0008)<<1);
-		case 0x3a8:
-			return ((deco16_prot_ram[0x280/2]&0x000e)<<3) | ((deco16_prot_ram[0x280/2]&0x0001)<<7) | ((deco16_prot_ram[0x280/2]&0x0ff0)<<4) | ((deco16_prot_ram[0x280/2]&0xf000)>>12);
-		case 0x2f6:
-			return ((deco16_prot_ram[0x280/2]&0xff00)>>8) | ((deco16_prot_ram[0x280/2]&0x00f0)<<8) | ((deco16_prot_ram[0x280/2]&0x000c)<<6) | ((deco16_prot_ram[0x280/2]&0x0003)<<10);
-
-		case 0x7e4:
-			return (deco16_prot_ram[0x290/2]&0x00f0)<<8;
-
-		case 0x536:
-			return ((deco16_prot_ram[0x2b0/2]&0x000f)<<8) | ((deco16_prot_ram[0x2b0/2]&0x00f0)<<0) | ((deco16_prot_ram[0x2b0/2]&0x0f00)<<4) | ((deco16_prot_ram[0x2b0/2]&0xf000)>>12);
-
-		case 0x0be:
-			return ((deco16_prot_ram[0x370/2]&0x000f)<<4) | ((deco16_prot_ram[0x370/2]&0x00f0)<<4) | ((deco16_prot_ram[0x370/2]&0x0f00)>>8) | ((deco16_prot_ram[0x370/2]&0xf000)>>0);
-
-		case 0x490:
-			return (deco16_prot_ram[0x3c0/2]&0xfff0) | ((deco16_prot_ram[0x3c0/2]&0x0007)<<1) | ((deco16_prot_ram[0x3c0/2]&0x0008)>>3);
-
-		case 0x710:
-			return (deco16_prot_ram[0x430/2]&0xfff0) | ((deco16_prot_ram[0x430/2]&0x0007)<<1) | ((deco16_prot_ram[0x430/2]&0x0008)>>3);
-
-		case 0x22a:
-			return ((deco16_prot_ram[0x5a0/2]&0xff00)>>8) | ((deco16_prot_ram[0x5a0/2]&0x00f0)<<8) | ((deco16_prot_ram[0x5a0/2]&0x0001)<<11) | ((deco16_prot_ram[0x5a0/2]&0x000e)<<7);
-
-		case 0x626:
-			return ((deco16_prot_ram[0x5b0/2]&0x000f)<<8) | ((deco16_prot_ram[0x5b0/2]&0x00f0)<<8) | ((deco16_prot_ram[0x5b0/2]&0x0f00)>>4) | ((deco16_prot_ram[0x5b0/2]&0xf000)>>12);
-
-		case 0x444:
-			return deco16_prot_ram[0x604/2]; //rohga
-
-		case 0x5ac:
-			return ((deco16_prot_ram[0x6e0/2]&0xfff0)>>4) | ((deco16_prot_ram[0x6e0/2]&0x0007)<<13) | ((deco16_prot_ram[0x6e0/2]&0x0008)<<9);
-
-		case 0x650:
-			return ((deco16_prot_ram[0x7d0/2]&0xfff0)>>4) | ((deco16_prot_ram[0x7d0/2]&0x000f)<<12);
-
-		case 0x4ac:
-			return ((deco16_prot_ram[0x460/2]&0x0007)<<13) | ((deco16_prot_ram[0x460/2]&0x0008)<<9);
+		case 0x110: /* Player input */			return space.machine().root_device().ioport("IN0")->read();
+		case 0x36c:								return space.machine().root_device().ioport("IN1")->read();
+		case 0x334:								return space.machine().root_device().ioport("IN1")->read();
+		case 0x0dc:								return space.machine().root_device().ioport("IN1")->read()<<4;
+		case 0x494: /* Dips */					return space.machine().root_device().ioport("DSW1_2")->read();
+		case 0x244:								return DECO_NEW_PORT(0x00);
+		case 0x7cc:								return ((DECO_NEW_PORT(0x00)&0x000f)<<12) | ((DECO_NEW_PORT(0x00)&0x00f0)<<4) | ((DECO_NEW_PORT(0x00)&0x0f00)>>4) | ((DECO_NEW_PORT(0x00)&0xf000)>>12);
+		case 0x0c0:								return (((DECO_NEW_PORT(0x00)&0x000e)>>1) | ((DECO_NEW_PORT(0x00)&0x0001)<<3))<<12;
+		case 0x188:								return (((DECO_NEW_PORT(0x00)&0x000e)>>1) | ((DECO_NEW_PORT(0x00)&0x0001)<<3))<<12;
+		case 0x65e:								return (((DECO_NEW_PORT(0x00)&0x000c)>>2) | ((DECO_NEW_PORT(0x00)&0x0003)<<2))<<12;
+		case 0x5ce:								return ((DECO_NEW_PORT(0x00)<<8)&0xf000) | ((DECO_NEW_PORT(0x00)&0xe)<<7) | ((DECO_NEW_PORT(0x00)&0x1)<<11);
+		case 0x61a:								return (DECO_NEW_PORT(0x00)<<8)&0xff00;
+		case 0x496:								return DECO_NEW_PORT(0x88);
+		case 0x40a:								return ((DECO_NEW_PORT(0x88)&0x000f)<<12) | ((DECO_NEW_PORT(0x88)&0x00f0)>>4) | ((DECO_NEW_PORT(0x88)&0x0f00)<<0) | ((DECO_NEW_PORT(0x88)&0xf000)>>8);
+		case 0x1e8:								return ((DECO_NEW_PORT(0x88)&0x00ff)<<8) | ((DECO_NEW_PORT(0x88)&0xff00)>>8);
+		case 0x4bc:								return ((DECO_NEW_PORT(0x88)&0x0ff0)<<4) | ((DECO_NEW_PORT(0x88)&0x0003)<<6) | ((DECO_NEW_PORT(0x88)&0x000c)<<2);
+		case 0x46e:								return ((DECO_NEW_PORT(0x88)&0xfff0)<<0) | ((DECO_NEW_PORT(0x88)&0x0007)<<1) | ((DECO_NEW_PORT(0x88)&0x0008)>>3);
+		case 0x264:								return ((DECO_NEW_PORT(0x88)&0x000f)<<8) | ((DECO_NEW_PORT(0x88)&0x00f0)>>0) | ((DECO_NEW_PORT(0x88)&0x0f00)<<4);
+		case 0x172:								return ((DECO_NEW_PORT(0x88)&0x000f)<<4) | ((DECO_NEW_PORT(0x88)&0x00f0)<<4) | ((DECO_NEW_PORT(0x88)&0xf000)<<0);
+		case 0x214:								return DECO_NEW_PORT(0x14);
+		case 0x52e:								return ((DECO_NEW_PORT(0x14)&0x000f)<<8) | ((DECO_NEW_PORT(0x14)&0x00f0)>>0) | ((DECO_NEW_PORT(0x14)&0x0f00)>>8) | ((DECO_NEW_PORT(0x14)&0xf000)>>0);
+		case 0x07a:								return ((DECO_NEW_PORT(0x14)&0x000f)<<8) | ((DECO_NEW_PORT(0x14)&0x00f0)>>0) | ((DECO_NEW_PORT(0x14)&0x0f00)>>8) | ((DECO_NEW_PORT(0x14)&0xf000)>>0);
+		case 0x360:								return ((DECO_NEW_PORT(0x14)&0x000f)<<8) | ((DECO_NEW_PORT(0x14)&0x00f0)>>0) | ((DECO_NEW_PORT(0x14)&0x0f00)>>8) | ((DECO_NEW_PORT(0x14)&0xf000)>>0);
+		case 0x4dc:								return ((DECO_NEW_PORT(0x14)&0x0ff0)<<4) | ((DECO_NEW_PORT(0x14)&0x0007)<<5) | ((DECO_NEW_PORT(0x14)&0x0008)<<1);
+		case 0x3a8:								return ((DECO_NEW_PORT(0x14)&0x000e)<<3) | ((DECO_NEW_PORT(0x14)&0x0001)<<7) | ((DECO_NEW_PORT(0x14)&0x0ff0)<<4) | ((DECO_NEW_PORT(0x14)&0xf000)>>12);
+		case 0x2f6:								return ((DECO_NEW_PORT(0x14)&0xff00)>>8) | ((DECO_NEW_PORT(0x14)&0x00f0)<<8) | ((DECO_NEW_PORT(0x14)&0x000c)<<6) | ((DECO_NEW_PORT(0x14)&0x0003)<<10);
+		case 0x7e4:								return (DECO_NEW_PORT(0x94)&0x00f0)<<8;
+		case 0x536:								return ((DECO_NEW_PORT(0xd4)&0x000f)<<8) | ((DECO_NEW_PORT(0xd4)&0x00f0)<<0) | ((DECO_NEW_PORT(0xd4)&0x0f00)<<4) | ((DECO_NEW_PORT(0xd4)&0xf000)>>12);
+		case 0x0be:								return ((DECO_NEW_PORT(0xec)&0x000f)<<4) | ((DECO_NEW_PORT(0xec)&0x00f0)<<4) | ((DECO_NEW_PORT(0xec)&0x0f00)>>8) | ((DECO_NEW_PORT(0xec)&0xf000)>>0);
+		case 0x490:								return (DECO_NEW_PORT(0x3c)&0xfff0) | ((DECO_NEW_PORT(0x3c)&0x0007)<<1) | ((DECO_NEW_PORT(0x3c)&0x0008)>>3);
+		case 0x710:								return (DECO_NEW_PORT(0xc2)&0xfff0) | ((DECO_NEW_PORT(0xc2)&0x0007)<<1) | ((DECO_NEW_PORT(0xc2)&0x0008)>>3);
+		case 0x22a:								return ((DECO_NEW_PORT(0x5a)&0xff00)>>8) | ((DECO_NEW_PORT(0x5a)&0x00f0)<<8) | ((DECO_NEW_PORT(0x5a)&0x0001)<<11) | ((DECO_NEW_PORT(0x5a)&0x000e)<<7);
+		case 0x626:								return ((DECO_NEW_PORT(0xda)&0x000f)<<8) | ((DECO_NEW_PORT(0xda)&0x00f0)<<8) | ((DECO_NEW_PORT(0xda)&0x0f00)>>4) | ((DECO_NEW_PORT(0xda)&0xf000)>>12);
+		case 0x444:								return DECO_NEW_PORT(0x206); //rohga /* this CAN'T be right, is it even used by this game or some c+p error? */
+		case 0x5ac:								return ((DECO_NEW_PORT(0x76)&0xfff0)>>4) | ((DECO_NEW_PORT(0x76)&0x0007)<<13) | ((DECO_NEW_PORT(0x76)&0x0008)<<9);
+		case 0x650:								return ((DECO_NEW_PORT(0xbe)&0xfff0)>>4) | ((DECO_NEW_PORT(0xbe)&0x000f)<<12);
+		case 0x4ac:								return ((DECO_NEW_PORT(0x62)&0x0007)<<13) | ((DECO_NEW_PORT(0x62)&0x0008)<<9);
 	}
 
 	logerror("Deco Protection PC %06x: warning - read unmapped memory address %04x\n",space.device().safe_pc(),offset<<1);
