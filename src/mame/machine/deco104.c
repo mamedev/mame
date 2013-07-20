@@ -70,6 +70,10 @@
 #include "machine/eeprom.h"
 #include "deco104.h"
 
+// the same way some 146 games require an address XOR of 0x44a at some point during the read chain
+// there are 104 games requiring a xor of 0x2a4
+#define DECO104_MAGIC_XOR 0x2a4
+
 #define DECO_PORT(p) (prot_ram[p/2])
 
 static UINT8 decoprot_buffer_ram_selected=0;
@@ -295,111 +299,100 @@ WRITE16_HANDLER( deco16_104_cninja_prot_w )
 	COMBINE_DATA(&deco16_prot_ram[offset]);
 }
 
+
+
+
+
+
 READ16_HANDLER( deco16_104_cninja_prot_r )
 {
-	switch (offset<<1)
+
+
+	int real_offset = offset << 1;
+
+	// keep read ports consistent with rohga / wizard fire etc.
+	// see note at top
+	real_offset ^= DECO104_MAGIC_XOR;
+
+	switch (real_offset)
 	{
-		case 0x80: /* Master level control */
-			return deco16_prot_ram[0];
-
-		case 0xde: /* Restart position control */
-			return deco16_prot_ram[1];
-
-		case 0xe6: /* The number of credits in the system. */
-			return deco16_prot_ram[2];
-
-		case 0x86: /* End of game check.  See 0x1814 */
-			return deco16_prot_ram[3];
-
-		/* Video registers */
-		case 0x5a: /* Moved to 0x140000 on int */
-			return deco16_prot_ram[8];
-		case 0x84: /* Moved to 0x14000a on int */
-			return deco16_prot_ram[9];
-		case 0x20: /* Moved to 0x14000c on int */
-			return deco16_prot_ram[10];
-		case 0x72: /* Moved to 0x14000e on int */
-			return deco16_prot_ram[11];
-		case 0xdc: /* Moved to 0x150000 on int */
-			return deco16_prot_ram[12];
-		case 0x6e: /* Moved to 0x15000a on int */
-			return deco16_prot_ram[13]; /* Not used on bootleg */
-		case 0x6c: /* Moved to 0x15000c on int */
-			return deco16_prot_ram[14];
-		case 0x08: /* Moved to 0x15000e on int */
-			return deco16_prot_ram[15];
-
-		case 0x36: /* Dip switches */
-			return space.machine().root_device().ioport("DSW")->read();
-
-		case 0x1c8: /* Coins */
-			return space.machine().root_device().ioport("IN1")->read();
-
-		case 0x22c: /* Player 1 & 2 input ports */
-			return space.machine().root_device().ioport("IN0")->read();
-
-		case 0x2b2: return deco16_prot_ram[0x0fc/2]; // 0xad65
-		case 0x42a: return deco16_prot_ram[0x092/2]; // 0xb2b7
-		case 0x436: return deco16_prot_ram[0x088/2]; // 0xea5a
-		case 0x440: return deco16_prot_ram[0x098/2]; // 0x7aa0
-		case 0x446: return deco16_prot_ram[0x090/2]; // 0x5fdf
-		case 0x458: return deco16_prot_ram[0x082/2]; // 0x108d
-		case 0x480: return deco16_prot_ram[0x09a/2]; // 0xfbe4
-		case 0x48e: return deco16_prot_ram[0x08a/2]; // 0x67a2
-		case 0x49c: return deco16_prot_ram[0x094/2]; // 0xb62a
-		case 0x4b0: return deco16_prot_ram[0x096/2]; // 0x3555
-		case 0x4c0: return deco16_prot_ram[0x09e/2]; // 0x6a34
-		case 0x4c6: return deco16_prot_ram[0x08c/2]; // 0xc6ef
-		case 0x4ea: return deco16_prot_ram[0x086/2]; // 0x9feb
-		case 0x4fa: return deco16_prot_ram[0x09c/2]; // 0x1dcb
-		case 0x508: return deco16_prot_ram[0x08e/2]; // 0xed9c
-		case 0x514: return deco16_prot_ram[0x080/2]; // 0xf6e2
-		case 0x51c: return deco16_prot_ram[0x084/2]; // 0xbdb9
-		case 0x524: return deco16_prot_ram[0x0b8/2]; // 0x5d26
-		case 0x526: return deco16_prot_ram[0x0a2/2]; // 0x4770
-		case 0x552: return deco16_prot_ram[0x0ac/2]; // 0x0843
-		case 0x554: return deco16_prot_ram[0x0ba/2]; // 0x9b79
-		case 0x56e: return deco16_prot_ram[0x0a0/2]; // 0xd1be
-		case 0x570: return deco16_prot_ram[0x0b4/2]; // 0xc950
-		case 0x580: return deco16_prot_ram[0x0b2/2]; // 0xa600
-		case 0x59a: return deco16_prot_ram[0x0ae/2]; // 0x2b24
-		case 0x5d8: return deco16_prot_ram[0x0b6/2]; // 0x17c1
-		case 0x5f4: return deco16_prot_ram[0x0aa/2]; // 0xf152
-		case 0x5f6: return deco16_prot_ram[0x0be/2]; // 0x97ce
-		case 0x5f8: return deco16_prot_ram[0x0bc/2]; // 0xa485
-		case 0x604: return deco16_prot_ram[0x0a4/2]; // 0x0e88
-		case 0x60c: return deco16_prot_ram[0x0b0/2]; // 0xab89
-		case 0x61a: return deco16_prot_ram[0x0a6/2]; // 0x64ba
-		case 0x64a: return deco16_prot_ram[0x0cc/2]; // 0x0ae9
-		case 0x670: return deco16_prot_ram[0x0d4/2]; // 0x4ec2
-		case 0x67e: return deco16_prot_ram[0x0ca/2]; // 0x61c3
-		case 0x694: return deco16_prot_ram[0x0d2/2]; // 0x3b4f
-		case 0x6a8: return deco16_prot_ram[0x0d6/2]; // 0x0c27
-		case 0x6ae: return deco16_prot_ram[0x0da/2]; // 0x3a72
-		case 0x6b4: return deco16_prot_ram[0x0de/2]; // 0x15d2
-		case 0x6c4: return deco16_prot_ram[0x0c8/2]; // 0x5849
-		case 0x6c8: return deco16_prot_ram[0x0d0/2]; // 0x186c
-		case 0x6cc: return deco16_prot_ram[0x0c0/2]; // 0x713e
-		case 0x6de: return deco16_prot_ram[0x0c2/2]; // 0xa87e
-		case 0x6f8: return deco16_prot_ram[0x0d8/2]; // 0x9a31
-		case 0x6fe: return deco16_prot_ram[0x0c6/2]; // 0xec69
-		case 0x700: return deco16_prot_ram[0x0ce/2]; // 0x82d9
-		case 0x70a: return deco16_prot_ram[0x0dc/2]; // 0x628c
-		case 0x714: return deco16_prot_ram[0x0c4/2]; // 0xda45
-		case 0x74c: return deco16_prot_ram[0x0e4/2]; // 0x8e3d
-		case 0x764: return deco16_prot_ram[0x0fe/2]; // 0xdef7
-		case 0x770: return deco16_prot_ram[0x0f4/2]; // 0xe7fe
-		case 0x772: return deco16_prot_ram[0x0ec/2]; // 0x23ca
-		case 0x774: return deco16_prot_ram[0x0e2/2]; // 0xe62c
-		case 0x77e: return deco16_prot_ram[0x0e8/2]; // 0x6683
-		case 0x788: return deco16_prot_ram[0x0e0/2]; // 0xd60b
-		case 0x798: return deco16_prot_ram[0x0fa/2]; // 0x9e1a
-		case 0x7a4: return deco16_prot_ram[0x0f0/2]; // 0x578f
-		case 0x7c2: return deco16_prot_ram[0x0f8/2]; // 0x0503
-		case 0x7ea: return deco16_prot_ram[0x0e6/2]; // 0x8654
-		case 0x7ec: return deco16_prot_ram[0x0f6/2]; // 0xa1e1
-		case 0x7fa: return deco16_prot_ram[0x0ea/2]; // 0x5146
-		case 0x7fe: return deco16_prot_ram[0x0f2/2]; // 0x91d4
+		case 0x224: /* was 0x080 */ /* Master level control */			return deco16_prot_ram[0x0/2];
+		case 0x27a: /* was 0x0de */ /* Restart position control */			return deco16_prot_ram[0x2/2];
+		case 0x242: /* was 0x0e6 */ /* The number of credits in the system. */			return deco16_prot_ram[0x4/2];
+		case 0x222: /* was 0x086 */ /* End of game check.  See 0x1814 */			return deco16_prot_ram[0x6/2];
+		case 0x2fe: /* was 0x05a */ /* Moved to 0x140000 on int */			return deco16_prot_ram[0x10/2];
+		case 0x220: /* was 0x084 */ /* Moved to 0x14000a on int */			return deco16_prot_ram[0x12/2];
+		case 0x284: /* was 0x020 */ /* Moved to 0x14000c on int */			return deco16_prot_ram[0x14/2];
+		case 0x2d6: /* was 0x072 */ /* Moved to 0x14000e on int */			return deco16_prot_ram[0x16/2];
+		case 0x278: /* was 0x0dc */ /* Moved to 0x150000 on int */			return deco16_prot_ram[0x18/2];
+		case 0x2ca: /* was 0x06e */ /* Moved to 0x15000a on int */			return deco16_prot_ram[0x1a/2]; /* Not used on bootleg */
+		case 0x2c8: /* was 0x06c */ /* Moved to 0x15000c on int */			return deco16_prot_ram[0x1c/2];
+		case 0x2ac: /* was 0x008 */ /* Moved to 0x15000e on int */			return deco16_prot_ram[0x1e/2];
+		case 0x292: /* was 0x036 */ /* Dip switches */			return space.machine().root_device().ioport("DSW")->read();
+		case 0x36c: /* was 0x1c8 */ /* Coins */			return space.machine().root_device().ioport("IN1")->read();
+		case 0x088: /* was 0x22c */ /* Player 1 & 2 input ports */			return space.machine().root_device().ioport("IN0")->read();
+		case 0x016: /* was 0x2b2 */ return deco16_prot_ram[0x0fc/2]; // 0xad65
+		case 0x68e: /* was 0x42a */ return deco16_prot_ram[0x092/2]; // 0xb2b7
+		case 0x692: /* was 0x436 */ return deco16_prot_ram[0x088/2]; // 0xea5a
+		case 0x6e4: /* was 0x440 */ return deco16_prot_ram[0x098/2]; // 0x7aa0
+		case 0x6e2: /* was 0x446 */ return deco16_prot_ram[0x090/2]; // 0x5fdf
+		case 0x6fc: /* was 0x458 */ return deco16_prot_ram[0x082/2]; // 0x108d
+		case 0x624: /* was 0x480 */ return deco16_prot_ram[0x09a/2]; // 0xfbe4
+		case 0x62a: /* was 0x48e */ return deco16_prot_ram[0x08a/2]; // 0x67a2
+		case 0x638: /* was 0x49c */ return deco16_prot_ram[0x094/2]; // 0xb62a
+		case 0x614: /* was 0x4b0 */ return deco16_prot_ram[0x096/2]; // 0x3555
+		case 0x664: /* was 0x4c0 */ return deco16_prot_ram[0x09e/2]; // 0x6a34
+		case 0x662: /* was 0x4c6 */ return deco16_prot_ram[0x08c/2]; // 0xc6ef
+		case 0x64e: /* was 0x4ea */ return deco16_prot_ram[0x086/2]; // 0x9feb
+		case 0x65e: /* was 0x4fa */ return deco16_prot_ram[0x09c/2]; // 0x1dcb
+		case 0x7ac: /* was 0x508 */ return deco16_prot_ram[0x08e/2]; // 0xed9c
+		case 0x7b0: /* was 0x514 */ return deco16_prot_ram[0x080/2]; // 0xf6e2
+		case 0x7b8: /* was 0x51c */ return deco16_prot_ram[0x084/2]; // 0xbdb9
+		case 0x780: /* was 0x524 */ return deco16_prot_ram[0x0b8/2]; // 0x5d26
+		case 0x782: /* was 0x526 */ return deco16_prot_ram[0x0a2/2]; // 0x4770
+		case 0x7f6: /* was 0x552 */ return deco16_prot_ram[0x0ac/2]; // 0x0843
+		case 0x7f0: /* was 0x554 */ return deco16_prot_ram[0x0ba/2]; // 0x9b79
+		case 0x7ca: /* was 0x56e */ return deco16_prot_ram[0x0a0/2]; // 0xd1be
+		case 0x7d4: /* was 0x570 */ return deco16_prot_ram[0x0b4/2]; // 0xc950
+		case 0x724: /* was 0x580 */ return deco16_prot_ram[0x0b2/2]; // 0xa600
+		case 0x73e: /* was 0x59a */ return deco16_prot_ram[0x0ae/2]; // 0x2b24
+		case 0x77c: /* was 0x5d8 */ return deco16_prot_ram[0x0b6/2]; // 0x17c1
+		case 0x750: /* was 0x5f4 */ return deco16_prot_ram[0x0aa/2]; // 0xf152
+		case 0x752: /* was 0x5f6 */ return deco16_prot_ram[0x0be/2]; // 0x97ce
+		case 0x75c: /* was 0x5f8 */ return deco16_prot_ram[0x0bc/2]; // 0xa485
+		case 0x4a0: /* was 0x604 */ return deco16_prot_ram[0x0a4/2]; // 0x0e88
+		case 0x4a8: /* was 0x60c */ return deco16_prot_ram[0x0b0/2]; // 0xab89
+		case 0x4be: /* was 0x61a */ return deco16_prot_ram[0x0a6/2]; // 0x64ba
+		case 0x4ee: /* was 0x64a */ return deco16_prot_ram[0x0cc/2]; // 0x0ae9
+		case 0x4d4: /* was 0x670 */ return deco16_prot_ram[0x0d4/2]; // 0x4ec2
+		case 0x4da: /* was 0x67e */ return deco16_prot_ram[0x0ca/2]; // 0x61c3
+		case 0x430: /* was 0x694 */ return deco16_prot_ram[0x0d2/2]; // 0x3b4f
+		case 0x40c: /* was 0x6a8 */ return deco16_prot_ram[0x0d6/2]; // 0x0c27
+		case 0x40a: /* was 0x6ae */ return deco16_prot_ram[0x0da/2]; // 0x3a72
+		case 0x410: /* was 0x6b4 */ return deco16_prot_ram[0x0de/2]; // 0x15d2
+		case 0x460: /* was 0x6c4 */ return deco16_prot_ram[0x0c8/2]; // 0x5849
+		case 0x46c: /* was 0x6c8 */ return deco16_prot_ram[0x0d0/2]; // 0x186c
+		case 0x468: /* was 0x6cc */ return deco16_prot_ram[0x0c0/2]; // 0x713e
+		case 0x47a: /* was 0x6de */ return deco16_prot_ram[0x0c2/2]; // 0xa87e
+		case 0x45c: /* was 0x6f8 */ return deco16_prot_ram[0x0d8/2]; // 0x9a31
+		case 0x45a: /* was 0x6fe */ return deco16_prot_ram[0x0c6/2]; // 0xec69
+		case 0x5a4: /* was 0x700 */ return deco16_prot_ram[0x0ce/2]; // 0x82d9
+		case 0x5ae: /* was 0x70a */ return deco16_prot_ram[0x0dc/2]; // 0x628c
+		case 0x5b0: /* was 0x714 */ return deco16_prot_ram[0x0c4/2]; // 0xda45
+		case 0x5e8: /* was 0x74c */ return deco16_prot_ram[0x0e4/2]; // 0x8e3d
+		case 0x5c0: /* was 0x764 */ return deco16_prot_ram[0x0fe/2]; // 0xdef7
+		case 0x5d4: /* was 0x770 */ return deco16_prot_ram[0x0f4/2]; // 0xe7fe
+		case 0x5d6: /* was 0x772 */ return deco16_prot_ram[0x0ec/2]; // 0x23ca
+		case 0x5d0: /* was 0x774 */ return deco16_prot_ram[0x0e2/2]; // 0xe62c
+		case 0x5da: /* was 0x77e */ return deco16_prot_ram[0x0e8/2]; // 0x6683
+		case 0x52c: /* was 0x788 */ return deco16_prot_ram[0x0e0/2]; // 0xd60b
+		case 0x53c: /* was 0x798 */ return deco16_prot_ram[0x0fa/2]; // 0x9e1a
+		case 0x500: /* was 0x7a4 */ return deco16_prot_ram[0x0f0/2]; // 0x578f
+		case 0x566: /* was 0x7c2 */ return deco16_prot_ram[0x0f8/2]; // 0x0503
+		case 0x54e: /* was 0x7ea */ return deco16_prot_ram[0x0e6/2]; // 0x8654
+		case 0x548: /* was 0x7ec */ return deco16_prot_ram[0x0f6/2]; // 0xa1e1
+		case 0x55e: /* was 0x7fa */ return deco16_prot_ram[0x0ea/2]; // 0x5146
+		case 0x55a: /* was 0x7fe */	return deco16_prot_ram[0x0f2/2]; // 0x91d4
 	}
 
 	logerror("Protection PC %06x: warning - read unmapped memory address %04x\n",space.device().safe_pc(),offset);
@@ -503,6 +496,8 @@ WRITE16_HANDLER( deco16_104_rohga_prot_w )
 
 	logerror("CONTROL PC %06x: warning - write unmapped protection memory address %04x %04x\n",space.device().safe_pc(),offset,data);
 }
+
+
 
 READ16_HANDLER( deco16_104_rohga_prot_r )
 {
