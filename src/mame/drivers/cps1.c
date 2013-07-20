@@ -3970,7 +3970,7 @@ ROM_START( striderj )
 ROM_END
 
 /* B-Board 91634B-2, Japan Resale Ver. */
-	ROM_START( striderjr )
+ROM_START( striderjr )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "sthj_23.8f", 0x00000, 0x80000, CRC(046e7b12) SHA1(a5761f730f6844a7e93556a6aeae76240a99540c) )
 	ROM_LOAD16_WORD_SWAP( "sthj_22.7f", 0x80000, 0x80000, CRC(9b3cfc08) SHA1(a7d7f270a097437affa845d80bed82a1fa874878) )    // == st-14.8h
@@ -4185,7 +4185,7 @@ ROM_START( dynwarj )
 ROM_END
 
 /* B-Board 91634B-2, Japan Resale Ver. */
-	ROM_START( dynwarjr )
+ROM_START( dynwarjr )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "tk1j_23.8f", 0x00000, 0x80000, CRC(088a3009) SHA1(d4c8273d19291d278d2ff895712dfbd8dfda6c84) )
 	ROM_LOAD16_WORD_SWAP( "tk1j_22.7f", 0x80000, 0x80000, CRC(93654bcf) SHA1(c72daeb2a98d350568555059a3225343c219a1d2) )    // == tkm-9.8h
@@ -5332,7 +5332,7 @@ ROM_START( chikij )
 	ROM_LOAD( "sou1",         0x0000, 0x0117, CRC(84f4b2fe) SHA1(dcc9e86cc36316fe42eace02d6df75d08bc8bb6d) )
 
 	ROM_REGION( 0x0200, "bboardplds", 0 )
-	ROM_LOAD( "ck22b.1a",     0x0000, 0x0117, NO_DUMP )
+	ROM_LOAD( "ck22b.1a",     0x0000, 0x0117, CRC(24fdfdeb) SHA1(850b760de694dc5455e63c89983266ecda836400) )
 	ROM_LOAD( "iob1.12e",     0x0000, 0x0117, CRC(3abc0700) SHA1(973043aa46ec6d5d1db20dc9d5937005a0f9f6ae) )    // pal verification required
 ROM_END
 
@@ -9076,9 +9076,11 @@ ROM_START( wof )
 ROM_END
 
 /* B-Board 91635B-2 */
+/* FIXME Probably this set uses a patched program ROM coming from a desuicided board, or simply the original C-Board
+   is not a 92641C-1. A verification and a new fresh dump are needed to confirm if it's genuine or not. */
 ROM_START( wofr1 )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
-	ROM_LOAD16_WORD_SWAP( "tk2e_23b.8f", 0x000000, 0x80000, CRC(11fb2ed1) SHA1(19e09ad6f9edc7997b030cddfe1d9c96d88135f2) )
+	ROM_LOAD16_WORD_SWAP( "tk2e_23b.8f", 0x000000, 0x80000, CRC(11fb2ed1) SHA1(19e09ad6f9edc7997b030cddfe1d9c96d88135f2) )	// patched?
 	ROM_LOAD16_WORD_SWAP( "tk2e_22b.7f", 0x080000, 0x80000, CRC(479b3f24) SHA1(9fb8ae06856fe115addfb6794c28978a4f6716ec) )
 
 	ROM_REGION( 0x400000, "gfx", 0 )
@@ -9171,9 +9173,11 @@ ROM_END
 
 /* B-Board 91634B-2 */
 /* Note that this Asia set seems to be the only one where GFX are stored into MASK ROMs instead of the usual EPROMs. */
+/* FIXME Probably this set uses a patched program ROM coming from a desuicided board, or simply the original C-Board
+   is not a 92641C-1. A verification and a new fresh dump are needed to confirm if it's genuine or not. */
 ROM_START( wofa )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
-	ROM_LOAD16_WORD_SWAP( "tk2a_23c.8f", 0x000000, 0x80000, CRC(2e024628) SHA1(647f8700fe3b410d798a823bac2e4a89cc9ad8d5) )
+	ROM_LOAD16_WORD_SWAP( "tk2a_23c.8f", 0x000000, 0x80000, CRC(2e024628) SHA1(647f8700fe3b410d798a823bac2e4a89cc9ad8d5) )	// patched?
 	ROM_LOAD16_WORD_SWAP( "tk2a_22c.7f", 0x080000, 0x80000, CRC(900ad4cd) SHA1(988007447f93f3467029b9c29fd9670a7ecadaa3) )
 
 	ROM_REGION( 0x400000, "gfx", 0 )
@@ -9523,7 +9527,7 @@ ROM_START( dinou )
 	ROM_LOAD( "d10f1.10f",    0x0000, 0x0117, CRC(6619c494) SHA1(3aef656c07182a2186f810f30e0d854dd5bd8d18) )
 ROM_END
 
-/* FIXME B-Board uncertain but should be 91634B from the program ROM names */
+/* B-Board 91634B-2 */
 ROM_START( dinoj )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "cdj_23a.8f", 0x000000, 0x80000, CRC(5f3ece96) SHA1(33ffb08ff8c5d3bfb2fa17fa00f254da2fc61f44) )
@@ -9567,10 +9571,9 @@ ROM_START( dinoj )
 	ROM_REGION( 0x0200, "dboardplds", 0 )
 	ROM_LOAD( "d7l1.7l",      0x0000, 0x0117, CRC(27b7410d) SHA1(06d0cba0226850f100ff1f539bd7d5db0f90c730) )
 	ROM_LOAD( "d8l1.8l",      0x0000, 0x0117, CRC(539fc7da) SHA1(cad5c91629c6247e49ccbbcbfe6b08229eafae07) )
-	ROM_LOAD( "d9k2.9k",      0x0000, 0x0117, CRC(cd85a156) SHA1(a88f8939c5d93e65d7bcc0eb3ee5b6f4f1114e3a) )    // pal verification required
+	ROM_LOAD( "d9k2.9k",      0x0000, 0x0117, CRC(cd85a156) SHA1(a88f8939c5d93e65d7bcc0eb3ee5b6f4f1114e3a) )
 	ROM_LOAD( "d10f1.10f",    0x0000, 0x0117, CRC(6619c494) SHA1(3aef656c07182a2186f810f30e0d854dd5bd8d18) )
 ROM_END
-
 
 /* Chinese bootleg board */
 ROM_START( dinohunt )
