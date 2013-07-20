@@ -1664,13 +1664,13 @@ ATTR_COLD void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, a
 template<int (*_FunctionPointer)(device_t *)>
 ioport_value ioport_read_line_wrapper(device_t &device, ioport_field &field, void *param)
 {
-	return (*_FunctionPointer)(&device);
+	return ((*_FunctionPointer)(&device) & 1) ? ~ioport_value(0) : 0;
 }
 
 template<class _FunctionClass, int (_FunctionClass::*_FunctionPointer)()>
 ioport_value ioport_read_line_wrapper(_FunctionClass &device, ioport_field &field, void *param)
 {
-	return (device.*_FunctionPointer)();
+	return ((device.*_FunctionPointer)() & 1) ? ~ioport_value(0) : 0;
 }
 
 template<void (*_FunctionPointer)(device_t *, int)>
