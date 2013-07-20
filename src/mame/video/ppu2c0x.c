@@ -819,15 +819,16 @@ void ppu2c0x_device::draw_sprites( UINT8 *line_priority )
 					if (pixel_data)
 					{
 						/* has the background (or another sprite) already been drawn here? */
-						if (!line_priority[sprite_xpos + pixel])
-						{
-							/* no, draw */
-							if ((sprite_xpos + pixel) < VISIBLE_SCREEN_WIDTH)
-								bitmap.pix16(m_scanline, sprite_xpos + pixel) = paldata[pixel_data];
-						}
-						/* indicate that a sprite was drawn at this location, even if it's not seen */
 						if ((sprite_xpos + pixel) < VISIBLE_SCREEN_WIDTH)
+						{
+							if (!line_priority[sprite_xpos + pixel])
+							{
+								/* no, draw */
+								bitmap.pix16(m_scanline, sprite_xpos + pixel) = paldata[pixel_data];
+							}
+							/* indicate that a sprite was drawn at this location, even if it's not seen */						
 							line_priority[sprite_xpos + pixel] |= 0x01;
+						}
 					}
 
 					/* set the "sprite 0 hit" flag if appropriate */
