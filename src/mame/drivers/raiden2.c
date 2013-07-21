@@ -1,9 +1,20 @@
-/* Seibu Protected 1993-94 era hardware, V30 based (sequel to the 68k based hardware)
+/********************************************************************************************************
+
+	Seibu Protected 1993-94 era hardware, V30 based (sequel to the 68k based hardware)
     TODO: figure out the rest of the protection
     TODO: Zero Team presumably needs additive blending on the character screen
-*/
 
-/* raiden 2 board test note 17/04/08 (based on test by dox)
+    TODO:
+    - Zero Team currently crashes due of an unknown check with collision detection.
+    Additionally:
+    8E377: C7 06 00 05 80 A9         mov     word ptr [500h],0A980h
+	8E37D: C7 06 00 05 00 B9         mov     word ptr [500h],0B900h
+	8E383: F7 06 88 05 FF FF         test    word ptr [588h],0FFFFh ;checks unknown collision detection port with 0xffff?
+	8E389: 75 0A                     bne     8E395h
+
+===========================================================================================================
+
+raiden 2 board test note 17/04/08 (based on test by dox)
 
  rom banking is at 6c9, bit 0x80
   -- the game only writes this directly at startup, must be written indirectly by
@@ -11,9 +22,9 @@
   value of 0x80 puts 0x00000-0x1ffff at 0x20000 - 0x3ffff
   value of 0x00 puts 0x20000-0x3ffff at 0x20000 - 0x3ffff
 
-*/
 
-/*
+===========================================================================================================
+
 Raiden DX
 Seibu Kaihatsu, 1994
 
@@ -131,7 +142,7 @@ Current Problem(s) - in order of priority
 
  Low Priority
 
-*/
+********************************************************************************************************/
 
 #include "emu.h"
 #include "cpu/nec/nec.h"
@@ -521,7 +532,6 @@ UINT8 raiden2_state::cop_calculate_collsion_detection(running_machine &machine)
 	cop_hit_val_z = 1;
 	cop_hit_val_unk = res; // TODO: there's also bit 2 and 3 triggered in the tests, no known meaning
 
-
 	return res;
 }
 
@@ -532,7 +542,7 @@ WRITE16_MEMBER(raiden2_state::cop_cmd_w)
 	switch(data) {
 	case 0x0205:   // 0205 0006 ffeb 0000 - 0188 0282 0082 0b8e 098e 0000 0000 0000
 		space.write_dword(cop_regs[0] + 4 + offset*4, space.read_dword(cop_regs[0] + 4 + offset*4) + space.read_dword(cop_regs[0] + 0x10 + offset*4));
-		/* TODO: check the following, makes Zero Team to crash as soon as this command is triggered. */
+		/* TODO: check the following, makes Zero Team to crash as soon as this command is triggered (see above). */
 		space.write_dword(cop_regs[0] + 0x1c + offset*4, space.read_dword(cop_regs[0] + 0x1c + offset*4) + space.read_dword(cop_regs[0] + 0x10 + offset*4));
 		break;
 
