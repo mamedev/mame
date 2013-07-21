@@ -11,8 +11,7 @@
         * Chicken Farm
         * Crazzy Clownz
 
-    Known bugs:
-        * some DIP switches not understood (updated 7/7/13-Bad A. Billy)
+    Note: I.C.E. is Innovative Concepts in Entertainment
 
 ****************************************************************************
 
