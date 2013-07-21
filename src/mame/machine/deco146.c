@@ -1,43 +1,87 @@
 /* Data East 146 protection chip / memory-mapper & I/O interface */
 
 /*
- this was based on the analysis of a 146 chip by Charles MacDonald
-  http://cgfm2.emuviews.com/new/detech.txt
-  using a Super Shanghai board
+  The 146 emulation was based on the analysis of a 146 chip by
+  Charles MacDonald  http://cgfm2.emuviews.com/new/detech.txt
+  using a Super Shanghai board and comparisons with the old protection
+  simulations.
 
-  Currently used for
-  146 Super Shanghai
-  146 Funky Jet / Sotsugyo Shousho
-  60  Edward Randy
-  66  Mutant Fighter
-  75  Captain America
+  The 104 emulation (deco104.c) currently only has per-game cases and
+  is incomplete.
 
-  60,66,75 appear to operate in the same way as 146, possibly the same chip rebadged?
+  The Deco 146 and 104 chips act as I/O chips and as protection devices
+  by using 2 banks of 0x80 words of RAM built into the chips.
 
-  the lower 10 address lines are often rearranged when the chip is hooked up
+  The chip has 0x400 read addresses each of which is mapped to one of
+  the RAM addresses (scrambled) as well as logic for shifting, xoring
+  and masking the bits returned.
 
-  The following games use 146 compatible chips, but appear to use some kind of different
-  read mode (legacy implementations included)
+  In addition there is the aformentioned bankswitch behavior triggered
+  by causing a read related to a specific write address.
 
-  146? Fighters History*
-  146  Nitro Ball*
-  75   Robocop 2**
-  75   Lemmings**
+  The chip also provides takes an additional 4 address lines and uses
+  them to map Chip Select outputs meaning depending on some
+  configuration registers meaning it can potentially be used as a
+  memory mapping device similar to the Sega System 16 ones, however
+  nothing makes proper use of this functionality.
 
-  *Address lines are connected backwards compared to Robocop 2, reverse them to get
-  the sound / xor / mask write ports at the expected addresses, but the input port
-  addresses are still different to our implementation (the same as Robocop 2)
+  There seems to be a way to select an alt read mode too, causing
+  the port read lines to be xored.
 
-  ** need to move here
+  Many games only use the basic I/O functions!
 
-  The following are also 146 style chips and need moving
-  146  Stadium Hero 96
-  146  Dragon Gun / Lock 'n' Loaded
+  Data East Customs
+  60,66,75 and 146 all appear to have identical functionality
+
+  Custom chip 104 appears to work in the same way but with different
+  internal tables and different special ports.
+
+  Chip                      146         104
+  XOR register port         0x2c        0x42
+  MASK register port        0x36        0xee
+  Soundlatch port           0x64        0xa8
+  Bankswitch port           0x78        0x66
+  Extra addr Xor(if used)   0x44a       0x2a4
+
+  Both chips are often connected with the lower 10 address lines
+  scrambled or reversed.
+
+  Game                                     Chip                                    Address Scramble       Extra Read Address Xor?
+  
+  --- 146 compatible games ---
+  
+  Edward Randy                             60                                      None                   No
+  Mutant Fighter                           66                                      None                   No
+  Captain America                          75                                      None                   No
+  Lemmings                                 75                                      None                   Yes
+  Robocop 2                                75                                      None                   Yes
+  Super Shanghai Dragon's Eye              146                                     None                   No
+  Funky Jet                                146                                     Interleave             No
+  Sotsugyo Shousho                         (same board / config as Funky Jet)      
+  Nitro Ball                               146                                     Reversed               Yes
+  Fighters History                         146? (surface scratched)                Interleave             Yes
+  Stadium Hero 96                          146                                     None                   Yes
+  Dragon Gun                               146                                     Reversed               No
+  Lock 'n' Loaded                          (same board / config as Dragon Gun)
+
+  --- 104 games ---
+
+  Caveman Ninja                            104                                     None                   Yes
+  Wizard Fire                              104                                     Reversed               No
+  Pocket Gal DX                            104                                     None*                  No*
+  Boogie Wings                             104                                     Reversed               Yes
+  Rohga                                    104                                     None                   No
+  Diet GoGo                                104                                     Interleave             Yes
+  Tattoo Assassins                         104                                     Interleave             No
+  Dream Ball                               104                                     None                   No
+  Night Slashers                           104                                     Interleave             No
+  Double Wings                             104                                     Interleave**           Yes**
+  Schmeiser Robo                           104                                     None                   No
 
 
+  * not currently hooked up, conflicts on an input port with Rohga, needs more investigation
+  ** simulation massively incomplete
 
-  Chip 104 seems to be a similar thing but almost certainly has different internal
-  tables, see decoprot.c
 
   */
 

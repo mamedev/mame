@@ -1,68 +1,9 @@
 /****************************************************************************
 
     Data East 104 based protection/IO chips
+	(a variation on the Deco 146 protection, see deco146.c for notes)
 
-
-    Game                        Custom chip number
-    ------------------------------------------------
-    Caveman Ninja                   104
-    Wizard Fire                     104
-    Pocket Gal DX                   104
-    Boogie Wings                    104
-    Rohga                           104
-    Diet GoGo                       104
-    Tattoo Assassins                104?
-	Dream Ball                      104
-	Night Slashers                  104
-	Double Wings                    104
-	Schmeiser Robo                  104
-
-	for more modern 60/66/75/146 knowledge see deco146.c
-
-
-    This series of chips is used for I/O and copy protection.  They are all
-    16 bit word based chips, with 0x400 write addresses, and 0x400 read
-    addresses.  The basic idea of the protection is that read & write
-    addresses don't match.  So if you write to write address 0, you might
-    read that data back at read address 10, and something else will be at 0.
-    In addition, the data read back may be bit shifted in various ways.
-    Games can be very well protected by writing variables to the chip, and
-    expecting certain values back from certain read addresses.  With care,
-    it can be impossible to tell from the game code what values go where,
-    and what shifting goes on.  Eg, writing 10 values to the chip, of which
-    7 are dummy values, then reading back 3 particular values, and using them
-    in a multiplication and add calculation to get a jump address for the
-    program.  Even if you can guess one of many possible legal jump addresses
-    it's hard to tell what values should be bit shifted in what way.
-
-    It's also been found some chips contain a hardwired XOR port and hardwired
-    NAND port which affects only certain read values.
-
-    The chips also handle the interface to the sound cpu via a write address,
-    and game inputs via several read addresses.  The I/O input data is also
-    mirrored to several locations, some with bit shifting.
-
-    Although several games use chip 104, each seems to be different, the
-    address lines leading to the chip on each game are probably arranged
-    differently, to further scramble reads/writes.  From hardware tests
-    chips 60 && 66 appear to be identical.
-
-    Update January - April 2006:
-        Further work on examining the 146 chip has revealed that if you
-        read an address immediately after writing it, you always get
-        the written value returned.  This behaviour is confirmed
-        to only exist for one read/write 'tick' - any other read will
-        return that location to its usual state - ie, bit shifter
-        or input port.  This has been emulated for the 146 chip in
-        Nitroball and Fighters History but the behaviour probably
-        also exists in earlier chips as it explains the 'one-shot'
-        ports in Mutant Fighter.
-
-        The 'double buffer' feature seen in the 104 chip is also
-        confirmed to exist in the 146 chip.  Again, this may well
-        be present in the earlier chip too.
-
-    Emulation by Bryan McPhail, mish@tendril.co.uk
+	original protection simulations by Bryan McPhail, mish@tendril.co.uk
 
 ***************************************************************************/
 
