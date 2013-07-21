@@ -125,11 +125,6 @@ INTERRUPT_GEN_MEMBER(whitestar_state::whitestar_firq_interrupt)
 	device.execute().set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 }
 
-static const decodmd_type2_intf decodmd_interface =
-{
-	":dmdcpu"  // region containing DMD ROM data
-};
-
 static MACHINE_CONFIG_START( whitestar, whitestar_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 2000000)
@@ -139,7 +134,7 @@ static MACHINE_CONFIG_START( whitestar, whitestar_state )
 	/* sound hardware */
 	MCFG_DECOBSMT_ADD(DECOBSMT_TAG)
 
-	MCFG_DECODMD_TYPE2_ADD("decodmd",decodmd_interface)
+	MCFG_DECODMD_TYPE2_ADD("decodmd",":dmdcpu")
 MACHINE_CONFIG_END
 
 // 8Mbit ROMs are mapped oddly: the first 4Mbit of each of the ROMs goes in order u17, u21, u36, u37
