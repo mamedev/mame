@@ -18,6 +18,7 @@ typedef device_delegate<void (address_space &space, UINT16 data, UINT16 mem_mask
 #define MCFG_DECO146_SET_SOUNDLATCH_CALLBACK( _class, _method) \
 	deco_146_base_device::set_soundlatch_cb(*device, deco146_port_write_cb(&_class::_method, #_class "::" #_method, NULL, (_class *)0));
 
+
 // there are some standard ways the chip gets hooked up, so have them here ready to use
 #define MCFG_DECO146_SET_INTERFACE_SCRAMBLE( a9,a8,a7,a6,a5,a4,a3,a2,a1,a0 ) \
 	deco_146_base_device::set_interface_scramble(*device, a9,a8,a7,a6,a5,a4,a3,a2,a1,a0);
@@ -57,8 +58,7 @@ public:
 	DECLARE_READ32_MEMBER(captaven_prot_r);
 	DECLARE_READ16_MEMBER(lemmings_prot_r);
 	DECLARE_READ16_MEMBER(robocop2_prot_r);
-	DECLARE_READ32_MEMBER(stadhr96_prot_146_r);
-	DECLARE_WRITE32_MEMBER(stadhr96_prot_146_w);
+
 
 	deco146_port_read_cb m_port_a_r;
 	deco146_port_read_cb m_port_b_r;
@@ -68,8 +68,9 @@ public:
 	UINT16 port_a_default(int unused);
 	UINT16 port_b_default(int unused);
 	UINT16 port_c_default(int unused);
+	UINT16 port_dummy_cb(int unused);
 	void soundlatch_default(address_space &space, UINT16 data, UINT16 mem_mask);
-
+	void soundlatch_dummy(address_space &space, UINT16 data, UINT16 mem_mask);
 
 	UINT8 m_bankswitch_swap_read_address;
 	UINT16 m_magic_read_address_xor;

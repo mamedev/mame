@@ -1314,7 +1314,14 @@ void deco_146_base_device::device_config_complete()
 
 
 
+UINT16 deco_146_base_device::port_dummy_cb(int unused)
+{
+	return 0x00;
+}
 
+void deco_146_base_device::soundlatch_dummy(address_space &space, UINT16 data, UINT16 mem_mask)
+{
+}
 
 UINT16 deco_146_base_device::port_a_default(int unused)
 {
@@ -1506,39 +1513,6 @@ READ32_MEMBER(deco_146_base_device::dragngun_prot_r)
 	}
 	return 0xffffffff;
 }
-
-
-READ32_MEMBER(deco_146_base_device::stadhr96_prot_146_r)
-{
-	/*
-	    cpu #0 (PC=00041BD0): unmapped program memory dword write to 00708004 = 000F0000 & FFFFFFFF
-	    cpu #0 (PC=00041BFC): unmapped program memory dword write to 0070F0C8 = 00028800 & FFFFFFFF
-	    cpu #0 (PC=00041C08): unmapped program memory dword write to 0070F010 = 00081920 & FFFFFFFF
-	    cpu #0 (PC=00041C14): unmapped program memory dword write to 0070F020 = 00040960 & FFFFFFFF
-	    cpu #0 (PC=00041C20): unmapped program memory dword write to 0070F03C = 5A5A5A5A & FFFFFFFF
-	*/
-	offset<<=1;
-
-
-	if (offset==0x5c4)
-		return 0xaa55 << 16;
-	if (offset==0x7a4)
-		return 0x0001 << 16; // "2" makes OUT count to add by 2.
-	if (offset==0x53c)
-		return 0x0008 << 16;
-	if (offset==0x304)
-		return 0x0001 << 16; // Unknown, is either 0,1,2,3
-
-	printf("%08x:  Read prot %08x\n", space.device().safe_pc(), offset);
-
-	return 0;
-}
-
-WRITE32_MEMBER(deco_146_base_device::stadhr96_prot_146_w)
-{
-	printf("%08x:  Write prot %04x %08x\n", space.device().safe_pc(), offset, data);
-}
-
 
 
 const device_type DECO146PROT = &device_creator<deco146_device>;
