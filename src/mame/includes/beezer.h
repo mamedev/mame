@@ -89,7 +89,7 @@ private:
 	cpu_device *m_maincpu;
 
 	/* IRQ variable */
-	UINT8 m_ptm_irq_state;
+	//UINT8 m_ptm_irq_state;
 
 	struct sh6840_timer_channel m_sh6840_timer[3];
 	UINT8 m_sh6840_volume[4];
@@ -107,7 +107,7 @@ private:
 
 	/* sound streaming variables */
 	sound_stream *m_stream;
-	double m_freq_to_step;
+	//double m_freq_to_step;
 	
 	int sh6840_update_noise(int clocks);
 };

@@ -37,7 +37,7 @@ protected:
 	virtual void device_reset();
 private:
 	// internal state
-	screen_device *m_screen;
+	//screen_device *m_screen;
 	tilemap_t        *m_layer_8x8[2];
 	tilemap_t        *m_layer_roz;
 	int            m_gfx_index[2];

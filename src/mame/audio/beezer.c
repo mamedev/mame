@@ -70,7 +70,7 @@ const device_type BEEZER = &device_creator<beezer_sound_device>;
 beezer_sound_device::beezer_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, BEEZER, "beezer SFX", tag, owner, clock, "beezer_sound", __FILE__),
 		device_sound_interface(mconfig, *this),
-		m_ptm_irq_state(0),
+		//m_ptm_irq_state(0),
 		m_sh6840_MSB_latch(0),
 		m_sh6840_LSB_latch(0),
 		m_sh6840_LFSR(0),
@@ -81,8 +81,8 @@ beezer_sound_device::beezer_sound_device(const machine_config &mconfig, const ch
 		m_sh6840_latchwriteold(0),
 		m_sh6840_noiselatch1(0),
 		m_sh6840_noiselatch3(0),
-		m_stream(NULL),
-		m_freq_to_step(0)
+		m_stream(NULL)/*,
+		m_freq_to_step(0)*/
 {
 	memset(m_sh6840_timer, 0, sizeof(m_sh6840_timer));
 	m_sh6840_volume[0] = 0;
