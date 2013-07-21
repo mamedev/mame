@@ -13,17 +13,15 @@ public:
 	thunderj_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atarigen_state(mconfig, type, tag),
 			m_jsa(*this, "jsa"),
-			m_alpha_tilemap(*this, "alpha"),
+			m_vad(*this, "vad"),
 			m_extra(*this, "extra") { }
 
 	required_device<atari_jsa_ii_device> m_jsa;
-	required_device<tilemap_device>	m_alpha_tilemap;
+	required_device<atari_vad_device> m_vad;
 	UINT8           m_alpha_tile_bank;
 	virtual void update_interrupts();
 	DECLARE_READ16_MEMBER(special_port2_r);
 	DECLARE_WRITE16_MEMBER(latch_w);
-	DECLARE_READ16_MEMBER(thunderj_atarivc_r);
-	DECLARE_WRITE16_MEMBER(thunderj_atarivc_w);
 	DECLARE_DRIVER_INIT(thunderj);
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);

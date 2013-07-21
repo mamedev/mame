@@ -13,19 +13,15 @@ public:
 	batman_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atarigen_state(mconfig, type, tag),
 			m_jsa(*this, "jsa"),
-			m_alpha_tilemap(*this, "alpha") { }
+			m_vad(*this, "vad") { }
 
 	required_device<atari_jsa_iii_device> m_jsa;
-	
-	required_device<tilemap_device> m_alpha_tilemap;
+	required_device<atari_vad_device> m_vad;
 
 	UINT16          m_latch_data;
-
 	UINT8           m_alpha_tile_bank;
+
 	virtual void update_interrupts();
-	virtual void scanline_update(screen_device &screen, int scanline);
-	DECLARE_READ16_MEMBER(batman_atarivc_r);
-	DECLARE_WRITE16_MEMBER(batman_atarivc_w);
 	DECLARE_WRITE16_MEMBER(latch_w);
 	DECLARE_DRIVER_INIT(batman);
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);

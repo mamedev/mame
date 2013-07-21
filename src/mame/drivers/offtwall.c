@@ -47,26 +47,6 @@ void offtwall_state::update_interrupts()
 MACHINE_RESET_MEMBER(offtwall_state,offtwall)
 {
 	atarigen_state::machine_reset();
-	atarivc_reset(*machine().primary_screen, m_atarivc_eof_data, 1);
-}
-
-
-
-/*************************************
- *
- *  Video controller access
- *
- *************************************/
-
-READ16_MEMBER(offtwall_state::offtwall_atarivc_r)
-{
-	return atarivc_r(*machine().primary_screen, offset);
-}
-
-
-WRITE16_MEMBER(offtwall_state::offtwall_atarivc_w)
-{
-	atarivc_w(*machine().primary_screen, offset, data, mem_mask);
 }
 
 
@@ -267,11 +247,11 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, offtwall_state )
 	AM_RANGE(0x260060, 0x260061) AM_WRITE(eeprom_enable_w)
 	AM_RANGE(0x2a0000, 0x2a0001) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x3e0000, 0x3e0fff) AM_RAM_WRITE(paletteram_666_w) AM_SHARE("paletteram")
-	AM_RANGE(0x3effc0, 0x3effff) AM_READWRITE(offtwall_atarivc_r, offtwall_atarivc_w) AM_SHARE("atarivc_data")
-	AM_RANGE(0x3f4000, 0x3f5eff) AM_RAM_WRITE(atarivc_playfield_latched_msb_w) AM_SHARE("playfield")
-	AM_RANGE(0x3f5f00, 0x3f5f7f) AM_RAM AM_SHARE("atarivc_eof")
+	AM_RANGE(0x3effc0, 0x3effff) AM_DEVREADWRITE("vad", atari_vad_device, control_read, control_write)
+	AM_RANGE(0x3f4000, 0x3f5eff) AM_RAM_DEVWRITE("vad", atari_vad_device, playfield_latched_msb_w) AM_SHARE("vad:playfield")
+	AM_RANGE(0x3f5f00, 0x3f5f7f) AM_RAM AM_SHARE("vad:eof")
 	AM_RANGE(0x3f5f80, 0x3f5fff) AM_READWRITE_LEGACY(atarimo_0_slipram_r, atarimo_0_slipram_w)
-	AM_RANGE(0x3f6000, 0x3f7fff) AM_RAM_WRITE(atarivc_playfield_upper_w) AM_SHARE("playfield_ext")
+	AM_RANGE(0x3f6000, 0x3f7fff) AM_RAM_DEVWRITE("vad", atari_vad_device, playfield_upper_w) AM_SHARE("vad:playfield_ext")
 	AM_RANGE(0x3f8000, 0x3fcfff) AM_RAM
 	AM_RANGE(0x3fd000, 0x3fd7ff) AM_READWRITE_LEGACY(atarimo_0_spriteram_r, atarimo_0_spriteram_w)
 	AM_RANGE(0x3fd800, 0x3fffff) AM_RAM
@@ -390,7 +370,8 @@ static MACHINE_CONFIG_START( offtwall, offtwall_state )
 	MCFG_GFXDECODE(offtwall)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_TILEMAP_ADD_STANDARD("playfield", 2, offtwall_state, get_playfield_tile_info, 8,8, SCAN_COLS, 64, 64)
+	MCFG_ATARI_VAD_ADD("vad", "screen", WRITELINE(atarigen_state, scanline_int_write_line))
+	MCFG_ATARI_VAD_PLAYFIELD(offtwall_state, get_playfield_tile_info)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	/* note: these parameters are from published specs, not derived */

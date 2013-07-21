@@ -91,7 +91,7 @@ UINT32 shuuz_state::screen_update_shuuz(screen_device &screen, bitmap_ind16 &bit
 	int x, y, r;
 
 	/* draw the playfield */
-	m_atarivc_playfield_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_vad->playfield()->draw(bitmap, cliprect, 0, 0);
 
 	/* draw and merge the MO */
 	mobitmap = atarimo_render(0, cliprect, &rectlist);

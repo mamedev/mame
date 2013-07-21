@@ -40,35 +40,9 @@ void shuuz_state::update_interrupts()
 
 /*************************************
  *
- *  Video controller access
- *
- *************************************/
-
-READ16_MEMBER(shuuz_state::shuuz_atarivc_r)
-{
-	return atarivc_r(*machine().primary_screen, offset);
-}
-
-
-WRITE16_MEMBER(shuuz_state::shuuz_atarivc_w)
-{
-	atarivc_w(*machine().primary_screen, offset, data, mem_mask);
-}
-
-
-
-/*************************************
- *
  *  Initialization
  *
  *************************************/
-
-MACHINE_RESET_MEMBER(shuuz_state,shuuz)
-{
-	atarigen_state::machine_reset();
-	atarivc_reset(*machine().primary_screen, m_atarivc_eof_data, 1);
-}
-
 
 WRITE16_MEMBER(shuuz_state::latch_w)
 {
@@ -138,11 +112,11 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, shuuz_state )
 	AM_RANGE(0x106000, 0x106001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x107000, 0x107007) AM_NOP
 	AM_RANGE(0x3e0000, 0x3e087f) AM_RAM_WRITE(paletteram_666_w) AM_SHARE("paletteram")
-	AM_RANGE(0x3effc0, 0x3effff) AM_READWRITE(shuuz_atarivc_r, shuuz_atarivc_w) AM_SHARE("atarivc_data")
-	AM_RANGE(0x3f4000, 0x3f5eff) AM_RAM_WRITE(atarivc_playfield_latched_msb_w) AM_SHARE("playfield")
-	AM_RANGE(0x3f5f00, 0x3f5f7f) AM_RAM AM_SHARE("atarivc_eof")
+	AM_RANGE(0x3effc0, 0x3effff) AM_DEVREADWRITE("vad", atari_vad_device, control_read, control_write)
+	AM_RANGE(0x3f4000, 0x3f5eff) AM_RAM_DEVWRITE("vad", atari_vad_device, playfield_latched_msb_w) AM_SHARE("vad:playfield")
+	AM_RANGE(0x3f5f00, 0x3f5f7f) AM_RAM AM_SHARE("vad:eof")
 	AM_RANGE(0x3f5f80, 0x3f5fff) AM_READWRITE_LEGACY(atarimo_0_slipram_r, atarimo_0_slipram_w)
-	AM_RANGE(0x3f6000, 0x3f7fff) AM_RAM_WRITE(atarivc_playfield_upper_w) AM_SHARE("playfield_ext")
+	AM_RANGE(0x3f6000, 0x3f7fff) AM_RAM_DEVWRITE("vad", atari_vad_device, playfield_upper_w) AM_SHARE("vad:playfield_ext")
 	AM_RANGE(0x3f8000, 0x3fcfff) AM_RAM
 	AM_RANGE(0x3fd000, 0x3fd3ff) AM_READWRITE_LEGACY(atarimo_0_spriteram_r, atarimo_0_spriteram_w)
 	AM_RANGE(0x3fd400, 0x3fffff) AM_RAM
@@ -254,7 +228,6 @@ static MACHINE_CONFIG_START( shuuz, shuuz_state )
 	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
-	MCFG_MACHINE_RESET_OVERRIDE(shuuz_state,shuuz)
 	MCFG_NVRAM_ADD_1FILL("eeprom")
 
 	/* video hardware */
@@ -262,7 +235,8 @@ static MACHINE_CONFIG_START( shuuz, shuuz_state )
 	MCFG_GFXDECODE(shuuz)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_TILEMAP_ADD_STANDARD("playfield", 2, shuuz_state, get_playfield_tile_info, 8,8, SCAN_COLS, 64,64)
+	MCFG_ATARI_VAD_ADD("vad", "screen", WRITELINE(atarigen_state, scanline_int_write_line))
+	MCFG_ATARI_VAD_PLAYFIELD(shuuz_state, get_playfield_tile_info)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	/* note: these parameters are from published specs, not derived */

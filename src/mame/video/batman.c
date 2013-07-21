@@ -102,108 +102,34 @@ VIDEO_START_MEMBER(batman_state,batman)
 
 /*************************************
  *
- *  Periodic scanline updater
- *
- *************************************/
-
-void batman_state::scanline_update(screen_device &screen, int scanline)
-{
-	/* update the scanline parameters */
-	if (scanline <= screen.visible_area().max_y && m_atarivc_state.rowscroll_enable)
-	{
-		int offset = scanline / 8 * 64 + 48;
-		int scan, i;
-
-		for (scan = 0; scan < 8; scan++, scanline++)
-			for (i = 0; i < 2; i++)
-			{
-				int data = m_alpha_tilemap->basemem_read(offset++);
-				switch (data & 15)
-				{
-					case 9:
-						if (scanline > 0)
-							screen.update_partial(scanline - 1);
-						m_atarivc_state.mo_xscroll = (data >> 7) & 0x1ff;
-						atarimo_set_xscroll(0, m_atarivc_state.mo_xscroll);
-						break;
-
-					case 10:
-						if (scanline > 0)
-							screen.update_partial(scanline - 1);
-						m_atarivc_state.pf1_xscroll_raw = (data >> 7) & 0x1ff;
-						atarivc_update_pf_xscrolls();
-						m_atarivc_playfield_tilemap->set_scrollx(0, m_atarivc_state.pf0_xscroll);
-						m_atarivc_playfield2_tilemap->set_scrollx(0, m_atarivc_state.pf1_xscroll);
-						break;
-
-					case 11:
-						if (scanline > 0)
-							screen.update_partial(scanline - 1);
-						m_atarivc_state.pf0_xscroll_raw = (data >> 7) & 0x1ff;
-						atarivc_update_pf_xscrolls();
-						m_atarivc_playfield_tilemap->set_scrollx(0, m_atarivc_state.pf0_xscroll);
-						break;
-
-					case 13:
-						if (scanline > 0)
-							screen.update_partial(scanline - 1);
-						m_atarivc_state.mo_yscroll = (data >> 7) & 0x1ff;
-						atarimo_set_yscroll(0, m_atarivc_state.mo_yscroll);
-						break;
-
-					case 14:
-						if (scanline > 0)
-							screen.update_partial(scanline - 1);
-						m_atarivc_state.pf1_yscroll = (data >> 7) & 0x1ff;
-						m_atarivc_playfield2_tilemap->set_scrolly(0, m_atarivc_state.pf1_yscroll);
-						break;
-
-					case 15:
-						if (scanline > 0)
-							screen.update_partial(scanline - 1);
-						m_atarivc_state.pf0_yscroll = (data >> 7) & 0x1ff;
-						m_atarivc_playfield_tilemap->set_scrolly(0, m_atarivc_state.pf0_yscroll);
-						break;
-				}
-			}
-	}
-}
-
-
-
-/*************************************
- *
  *  Main refresh
  *
  *************************************/
 
 UINT32 batman_state::screen_update_batman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap_ind8 &priority_bitmap = machine().priority_bitmap;
-	atarimo_rect_list rectlist;
-	bitmap_ind16 *mobitmap;
-	int x, y, r;
-
 	/* draw the playfield */
+	bitmap_ind8 &priority_bitmap = machine().priority_bitmap;
 	priority_bitmap.fill(0, cliprect);
-	m_atarivc_playfield_tilemap->draw(bitmap, cliprect, 0, 0x00);
-	m_atarivc_playfield_tilemap->draw(bitmap, cliprect, 1, 0x01);
-	m_atarivc_playfield_tilemap->draw(bitmap, cliprect, 2, 0x02);
-	m_atarivc_playfield_tilemap->draw(bitmap, cliprect, 3, 0x03);
-	m_atarivc_playfield2_tilemap->draw(bitmap, cliprect, 0, 0x80);
-	m_atarivc_playfield2_tilemap->draw(bitmap, cliprect, 1, 0x84);
-	m_atarivc_playfield2_tilemap->draw(bitmap, cliprect, 2, 0x88);
-	m_atarivc_playfield2_tilemap->draw(bitmap, cliprect, 3, 0x8c);
+	m_vad->playfield()->draw(bitmap, cliprect, 0, 0x00);
+	m_vad->playfield()->draw(bitmap, cliprect, 1, 0x01);
+	m_vad->playfield()->draw(bitmap, cliprect, 2, 0x02);
+	m_vad->playfield()->draw(bitmap, cliprect, 3, 0x03);
+	m_vad->playfield2()->draw(bitmap, cliprect, 0, 0x80);
+	m_vad->playfield2()->draw(bitmap, cliprect, 1, 0x84);
+	m_vad->playfield2()->draw(bitmap, cliprect, 2, 0x88);
+	m_vad->playfield2()->draw(bitmap, cliprect, 3, 0x8c);
 
 	/* draw and merge the MO */
-	mobitmap = atarimo_render(0, cliprect, &rectlist);
-	for (r = 0; r < rectlist.numrects; r++, rectlist.rect++)
-		for (y = rectlist.rect->min_y; y <= rectlist.rect->max_y; y++)
+	atarimo_rect_list rectlist;
+	bitmap_ind16 *mobitmap = atarimo_render(0, cliprect, &rectlist);
+	for (int r = 0; r < rectlist.numrects; r++, rectlist.rect++)
+		for (int y = rectlist.rect->min_y; y <= rectlist.rect->max_y; y++)
 		{
 			UINT16 *mo = &mobitmap->pix16(y);
 			UINT16 *pf = &bitmap.pix16(y);
 			UINT8 *pri = &priority_bitmap.pix8(y);
-			for (x = rectlist.rect->min_x; x <= rectlist.rect->max_x; x++)
+			for (int x = rectlist.rect->min_x; x <= rectlist.rect->max_x; x++)
 				if (mo[x])
 				{
 					/* verified on real hardware:
@@ -266,16 +192,16 @@ UINT32 batman_state::screen_update_batman(screen_device &screen, bitmap_ind16 &b
 		}
 
 	/* add the alpha on top */
-	m_alpha_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_vad->alpha()->draw(bitmap, cliprect, 0, 0);
 
 	/* now go back and process the upper bit of MO priority */
 	rectlist.rect -= rectlist.numrects;
-	for (r = 0; r < rectlist.numrects; r++, rectlist.rect++)
-		for (y = rectlist.rect->min_y; y <= rectlist.rect->max_y; y++)
+	for (int r = 0; r < rectlist.numrects; r++, rectlist.rect++)
+		for (int y = rectlist.rect->min_y; y <= rectlist.rect->max_y; y++)
 		{
 			UINT16 *mo = &mobitmap->pix16(y);
 			UINT16 *pf = &bitmap.pix16(y);
-			for (x = rectlist.rect->min_x; x <= rectlist.rect->max_x; x++)
+			for (int x = rectlist.rect->min_x; x <= rectlist.rect->max_x; x++)
 				if (mo[x])
 				{
 					int mopriority = mo[x] >> ATARIMO_PRIORITY_SHIFT;

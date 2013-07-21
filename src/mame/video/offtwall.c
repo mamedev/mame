@@ -86,21 +86,18 @@ VIDEO_START_MEMBER(offtwall_state,offtwall)
 
 UINT32 offtwall_state::screen_update_offtwall(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	atarimo_rect_list rectlist;
-	bitmap_ind16 *mobitmap;
-	int x, y, r;
-
 	/* draw the playfield */
-	m_atarivc_playfield_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_vad->playfield()->draw(bitmap, cliprect, 0, 0);
 
 	/* draw and merge the MO */
-	mobitmap = atarimo_render(0, cliprect, &rectlist);
-	for (r = 0; r < rectlist.numrects; r++, rectlist.rect++)
-		for (y = rectlist.rect->min_y; y <= rectlist.rect->max_y; y++)
+	atarimo_rect_list rectlist;
+	bitmap_ind16 *mobitmap = atarimo_render(0, cliprect, &rectlist);
+	for (int r = 0; r < rectlist.numrects; r++, rectlist.rect++)
+		for (int y = rectlist.rect->min_y; y <= rectlist.rect->max_y; y++)
 		{
 			UINT16 *mo = &mobitmap->pix16(y);
 			UINT16 *pf = &bitmap.pix16(y);
-			for (x = rectlist.rect->min_x; x <= rectlist.rect->max_x; x++)
+			for (int x = rectlist.rect->min_x; x <= rectlist.rect->max_x; x++)
 				if (mo[x])
 				{
 					/* not yet verified

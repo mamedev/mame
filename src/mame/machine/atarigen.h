@@ -64,11 +64,39 @@
 #define MCFG_ATARI_SOUND_COMM_ADD(_tag, _soundcpu, _intcb) \
 	MCFG_DEVICE_ADD(_tag, ATARI_SOUND_COMM, 0) \
 	atari_sound_comm_device::static_set_sound_cpu(*device, _soundcpu); \
-	devcb = &atari_sound_comm_device::set_main_int_cb(*device, DEVCB2_##_intcb); \
+	devcb = &atari_sound_comm_device::static_set_main_int_cb(*device, DEVCB2_##_intcb); \
 
 
-#define MCFG_ATARI_VIDEO_CONTROLLER_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, ATARI_VIDEO_CONTROLLER, 0) \
+#define MCFG_ATARI_VAD_ADD(_tag, _screen, _intcb) \
+	MCFG_DEVICE_ADD(_tag, ATARI_VAD, 0) \
+	atari_vad_device::static_set_screen(*device, _screen); \
+	devcb = &atari_vad_device::static_set_scanline_int_cb(*device, DEVCB2_##_intcb); \
+
+#define MCFG_ATARI_VAD_PLAYFIELD(_class, _getinfo) \
+	{ astring fulltag(device->tag(), ":playfield"); device_t *device; \
+	MCFG_TILEMAP_ADD(fulltag) \
+	MCFG_TILEMAP_BYTES_PER_ENTRY(2) \
+	MCFG_TILEMAP_INFO_CB_DEVICE(DEVICE_SELF_OWNER, _class, _getinfo) \
+	MCFG_TILEMAP_TILE_SIZE(8,8) \
+	MCFG_TILEMAP_LAYOUT_STANDARD(SCAN_COLS, 64,64) }
+
+#define MCFG_ATARI_VAD_PLAYFIELD2(_class, _getinfo) \
+	{ astring fulltag(device->tag(), ":playfield2"); device_t *device; \
+	MCFG_TILEMAP_ADD(fulltag) \
+	MCFG_TILEMAP_BYTES_PER_ENTRY(2) \
+	MCFG_TILEMAP_INFO_CB_DEVICE(DEVICE_SELF_OWNER, _class, _getinfo) \
+	MCFG_TILEMAP_TILE_SIZE(8,8) \
+	MCFG_TILEMAP_LAYOUT_STANDARD(SCAN_COLS, 64,64) \
+	MCFG_TILEMAP_TRANSPARENT_PEN(0) }
+
+#define MCFG_ATARI_VAD_ALPHA(_class, _getinfo) \
+	{ astring fulltag(device->tag(), ":alpha"); device_t *device; \
+	MCFG_TILEMAP_ADD(fulltag) \
+	MCFG_TILEMAP_BYTES_PER_ENTRY(2) \
+	MCFG_TILEMAP_INFO_CB_DEVICE(DEVICE_SELF_OWNER, _class, _getinfo) \
+	MCFG_TILEMAP_TILE_SIZE(8,8) \
+	MCFG_TILEMAP_LAYOUT_STANDARD(SCAN_ROWS, 64,32) \
+	MCFG_TILEMAP_TRANSPARENT_PEN(0) }
 
 
 
@@ -85,6 +113,9 @@
 
 // ======================> atari_sound_comm_device
 
+// device type definition
+extern const device_type ATARI_SOUND_COMM;
+
 class atari_sound_comm_device :  public device_t
 {
 public:
@@ -93,7 +124,7 @@ public:
 
 	// static configuration helpers
 	static void static_set_sound_cpu(device_t &device, const char *cputag);
-	template<class _Object> static devcb2_base &set_main_int_cb(device_t &device, _Object object) { return downcast<atari_sound_comm_device &>(device).m_main_int_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &static_set_main_int_cb(device_t &device, _Object object) { return downcast<atari_sound_comm_device &>(device).m_main_int_cb.set_callback(object); }
 	
 	// getters
 	DECLARE_READ_LINE_MEMBER(main_to_sound_ready) { return m_main_to_sound_ready ? ASSERT_LINE : CLEAR_LINE; }
@@ -151,8 +182,86 @@ private:
 };
 
 
+
+// ======================> atari_vad_device
+
 // device type definition
-extern const device_type ATARI_SOUND_COMM;
+extern const device_type ATARI_VAD;
+
+class atari_vad_device :  public device_t
+{
+public:
+	// construction/destruction
+	atari_vad_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// static configuration helpers
+	static void static_set_screen(device_t &device, const char *screentag);
+	template<class _Object> static devcb2_base &static_set_scanline_int_cb(device_t &device, _Object object) { return downcast<atari_vad_device &>(device).m_scanline_int_cb.set_callback(object); }
+
+	// getters
+	tilemap_device *alpha() const { return m_alpha_tilemap; }
+	tilemap_device *playfield() const { return m_playfield_tilemap; }
+	tilemap_device *playfield2() const { return m_playfield2_tilemap; }
+
+	// read/write handlers
+	DECLARE_READ16_MEMBER(control_read);
+	DECLARE_WRITE16_MEMBER(control_write);
+
+	// playfield/alpha tilemap helpers
+	DECLARE_WRITE16_MEMBER(alpha_w);
+	DECLARE_WRITE16_MEMBER(playfield_upper_w);
+	DECLARE_WRITE16_MEMBER(playfield_latched_lsb_w);
+	DECLARE_WRITE16_MEMBER(playfield_latched_msb_w);
+	DECLARE_WRITE16_MEMBER(playfield2_latched_msb_w);
+
+protected:
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+
+private:
+	// timer IDs
+	enum
+	{
+		TID_SCANLINE_INT,
+		TID_TILEROW_UPDATE,
+		TID_EOF,
+	};
+
+	// internal helpers
+	void internal_control_write(offs_t offset, UINT16 newword);
+	void update_pf_xscrolls();
+	void update_parameter(UINT16 newword);
+	void update_tilerow(emu_timer &timer, int scanline);
+	void eof_update(emu_timer &timer);
+
+	// configuration state
+	const char *		m_screen_tag;
+	devcb2_write_line	m_scanline_int_cb;
+
+	// internal state
+	optional_device<tilemap_device> m_alpha_tilemap;
+	required_device<tilemap_device>	m_playfield_tilemap;
+	optional_device<tilemap_device> m_playfield2_tilemap;
+	optional_shared_ptr<UINT16> m_eof_data;
+
+	screen_device *		m_screen;
+	emu_timer *			m_scanline_int_timer;
+	emu_timer *			m_tilerow_update_timer;
+	emu_timer *			m_eof_timer;
+
+	UINT32 				m_palette_bank;            // which palette bank is enabled
+	UINT32 				m_pf0_xscroll;             // playfield 1 xscroll
+	UINT32 				m_pf0_xscroll_raw;         // playfield 1 xscroll raw value
+	UINT32 				m_pf0_yscroll;             // playfield 1 yscroll
+	UINT32 				m_pf1_xscroll_raw;         // playfield 2 xscroll raw value
+	UINT32 				m_pf1_yscroll;             // playfield 2 yscroll
+	UINT32 				m_mo_xscroll;              // sprite xscroll
+	UINT32 				m_mo_yscroll;              // sprite xscroll
+	
+	UINT16				m_control[0x40/2];			// control data
+};
 
 
 
@@ -160,29 +269,11 @@ extern const device_type ATARI_SOUND_COMM;
     TYPES & STRUCTURES
 ***************************************************************************/
 
-struct atarivc_state_desc
-{
-	UINT32 latch1;                          /* latch #1 value (-1 means disabled) */
-	UINT32 latch2;                          /* latch #2 value (-1 means disabled) */
-	UINT32 rowscroll_enable;                /* true if row-scrolling is enabled */
-	UINT32 palette_bank;                    /* which palette bank is enabled */
-	UINT32 pf0_xscroll;                     /* playfield 1 xscroll */
-	UINT32 pf0_xscroll_raw;                 /* playfield 1 xscroll raw value */
-	UINT32 pf0_yscroll;                     /* playfield 1 yscroll */
-	UINT32 pf1_xscroll;                     /* playfield 2 xscroll */
-	UINT32 pf1_xscroll_raw;                 /* playfield 2 xscroll raw value */
-	UINT32 pf1_yscroll;                     /* playfield 2 yscroll */
-	UINT32 mo_xscroll;                      /* sprite xscroll */
-	UINT32 mo_yscroll;                      /* sprite xscroll */
-};
-
-
 struct atarigen_screen_timer
 {
 	screen_device *screen;
 	emu_timer *         scanline_interrupt_timer;
 	emu_timer *         scanline_timer;
-	emu_timer *         atarivc_eof_update_timer;
 };
 
 
@@ -204,11 +295,14 @@ public:
 
 	// interrupt handling
 	void scanline_int_set(screen_device &screen, int scanline);
+	DECLARE_WRITE_LINE_MEMBER(scanline_int_write_line);
 	INTERRUPT_GEN_MEMBER(scanline_int_gen);
 	DECLARE_WRITE16_MEMBER(scanline_int_ack_w);
+
 	DECLARE_WRITE_LINE_MEMBER(sound_int_write_line);
 	INTERRUPT_GEN_MEMBER(sound_int_gen);
 	DECLARE_WRITE16_MEMBER(sound_int_ack_w);
+
 	INTERRUPT_GEN_MEMBER(video_int_gen);
 	DECLARE_WRITE16_MEMBER(video_int_ack_w);
 
@@ -238,25 +332,6 @@ public:
 	void scanline_timer_reset(screen_device &screen, int frequency);
 	void scanline_timer(emu_timer &timer, screen_device &screen, int scanline);
 
-	// video controller
-	void atarivc_eof_update(emu_timer &timer, screen_device &screen);
-	void atarivc_reset(screen_device &screen, UINT16 *eof_data, int playfields);
-	void atarivc_w(screen_device &screen, offs_t offset, UINT16 data, UINT16 mem_mask);
-	UINT16 atarivc_r(screen_device &screen, offs_t offset);
-	inline void atarivc_update_pf_xscrolls()
-	{
-		m_atarivc_state.pf0_xscroll = m_atarivc_state.pf0_xscroll_raw + ((m_atarivc_state.pf1_xscroll_raw) & 7);
-		m_atarivc_state.pf1_xscroll = m_atarivc_state.pf1_xscroll_raw + 4;
-	}
-	void atarivc_common_w(screen_device &screen, offs_t offset, UINT16 newword);
-
-	// playfield/alpha tilemap helpers
-	DECLARE_WRITE16_MEMBER( atarivc_playfield_upper_w );
-	DECLARE_WRITE16_MEMBER( atarivc_playfield_dual_upper_w );
-	DECLARE_WRITE16_MEMBER( atarivc_playfield_latched_lsb_w );
-	DECLARE_WRITE16_MEMBER( atarivc_playfield_latched_msb_w );
-	DECLARE_WRITE16_MEMBER( atarivc_playfield2_latched_msb_w );
-
 	// video helpers
 	int get_hblank(screen_device &screen) const { return (screen.hpos() > (screen.width() * 9 / 10)); }
 	void halt_until_hblank_0(device_t &device, screen_device &screen);
@@ -276,11 +351,7 @@ public:
 	enum
 	{
 		TID_SCANLINE_INTERRUPT,
-		TID_SOUND_RESET,
-		TID_SOUND_WRITE,
-		TID_6502_WRITE,
 		TID_SCANLINE_TIMER,
-		TID_ATARIVC_EOF,
 		TID_UNHALT_CPU,
 		TID_ATARIGEN_LAST
 	};
@@ -301,19 +372,6 @@ public:
 
 	optional_shared_ptr<UINT16> m_xscroll;
 	optional_shared_ptr<UINT16> m_yscroll;
-
-			optional_device<tilemap_device>	m_atarivc_playfield_tilemap;
-			optional_device<tilemap_device> m_atarivc_playfield2_tilemap;
-
-			optional_shared_ptr<UINT16> m_atarivc_data;
-			optional_shared_ptr<UINT16> m_atarivc_eof_data;
-			atarivc_state_desc      m_atarivc_state;
-
-			UINT32                  m_actual_vc_latch0;
-			UINT32                  m_actual_vc_latch1;
-			UINT8                   m_atarivc_playfields;
-			UINT32                  m_atarivc_playfield_latch;
-			UINT32                  m_atarivc_playfield2_latch;
 
 	/* internal state */
 	bool                    m_eeprom_unlocked;

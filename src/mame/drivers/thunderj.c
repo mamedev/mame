@@ -12,6 +12,23 @@
 
 ****************************************************************************
 
+	Video controller interface woes:
+
+	Sigh. CPU #1 reads the video controller register twice per frame, once at
+	the beginning of interrupt and once near the end. It stores these values in a
+	table starting at $163484. CPU #2 periodically looks at this table to make
+	sure that it is getting interrupts at the appropriate times, and that the
+	VBLANK bit is set appropriately. Unfortunately, due to all the device_yield(&space.device())
+	calls we make to synchronize the two CPUs, we occasionally get out of time
+	and generate the interrupt outside of the tight tolerances CPU #2 expects.
+
+	So we fake it. Returning scanlines $f5 and $f7 alternately provides the
+	correct answer that causes CPU #2 to be happy and not aggressively trash
+	memory (which is what it does if this interrupt test fails -- see the code
+	at $1E56 to see!)
+
+****************************************************************************
+
     Memory map (TBA)
 
 ***************************************************************************/
@@ -49,7 +66,6 @@ MACHINE_START_MEMBER(thunderj_state,thunderj)
 MACHINE_RESET_MEMBER(thunderj_state,thunderj)
 {
 	atarigen_state::machine_reset();
-	atarivc_reset(*machine().primary_screen, m_atarivc_eof_data, 2);
 }
 
 
@@ -83,49 +99,10 @@ WRITE16_MEMBER(thunderj_state::latch_w)
 		if (m_alpha_tile_bank != ((data >> 2) & 7))
 		{
 			machine().primary_screen->update_partial(machine().primary_screen->vpos());
-			m_alpha_tilemap->mark_all_dirty();
+			m_vad->alpha()->mark_all_dirty();
 			m_alpha_tile_bank = (data >> 2) & 7;
 		}
 	}
-}
-
-
-
-/*************************************
- *
- *  Video Controller Hack
- *
- *************************************/
-
-READ16_MEMBER(thunderj_state::thunderj_atarivc_r)
-{
-	/* Sigh. CPU #1 reads the video controller register twice per frame, once at
-	   the beginning of interrupt and once near the end. It stores these values in a
-	   table starting at $163484. CPU #2 periodically looks at this table to make
-	   sure that it is getting interrupts at the appropriate times, and that the
-	   VBLANK bit is set appropriately. Unfortunately, due to all the device_yield(&space.device())
-	   calls we make to synchronize the two CPUs, we occasionally get out of time
-	   and generate the interrupt outside of the tight tolerances CPU #2 expects.
-
-	   So we fake it. Returning scanlines $f5 and $f7 alternately provides the
-	   correct answer that causes CPU #2 to be happy and not aggressively trash
-	   memory (which is what it does if this interrupt test fails -- see the code
-	   at $1E56 to see!) */
-
-	/* Use these lines to detect when things go south: */
-
-#if 0
-	if (read_word(0x163482) > 0xfff)
-		mame_printf_debug("You're screwed!");
-#endif
-
-	return atarivc_r(*machine().primary_screen, offset);
-}
-
-
-WRITE16_MEMBER(thunderj_state::thunderj_atarivc_w)
-{
-	atarivc_w(*machine().primary_screen, offset, data, mem_mask);
 }
 
 
@@ -150,13 +127,13 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, thunderj_state )
 	AM_RANGE(0x360020, 0x360021) AM_DEVWRITE("jsa", atari_jsa_ii_device, sound_reset_w)
 	AM_RANGE(0x360030, 0x360031) AM_DEVWRITE8("jsa", atari_jsa_ii_device, main_command_w, 0x00ff)
 	AM_RANGE(0x3e0000, 0x3e0fff) AM_RAM_WRITE(paletteram_666_w) AM_SHARE("paletteram")
-	AM_RANGE(0x3effc0, 0x3effff) AM_READWRITE(thunderj_atarivc_r, thunderj_atarivc_w) AM_SHARE("atarivc_data")
-	AM_RANGE(0x3f0000, 0x3f1fff) AM_RAM_WRITE(atarivc_playfield2_latched_msb_w) AM_SHARE("playfield2")
-	AM_RANGE(0x3f2000, 0x3f3fff) AM_RAM_WRITE(atarivc_playfield_latched_lsb_w) AM_SHARE("playfield")
-	AM_RANGE(0x3f4000, 0x3f5fff) AM_RAM_WRITE(atarivc_playfield_dual_upper_w) AM_SHARE("playfield_ext")
+	AM_RANGE(0x3effc0, 0x3effff) AM_DEVREADWRITE("vad", atari_vad_device, control_read, control_write)
+	AM_RANGE(0x3f0000, 0x3f1fff) AM_RAM_DEVWRITE("vad", atari_vad_device, playfield2_latched_msb_w) AM_SHARE("vad:playfield2")
+	AM_RANGE(0x3f2000, 0x3f3fff) AM_RAM_DEVWRITE("vad", atari_vad_device, playfield_latched_lsb_w) AM_SHARE("vad:playfield")
+	AM_RANGE(0x3f4000, 0x3f5fff) AM_RAM_DEVWRITE("vad", atari_vad_device, playfield_upper_w) AM_SHARE("vad:playfield_ext")
 	AM_RANGE(0x3f6000, 0x3f7fff) AM_READWRITE_LEGACY(atarimo_0_spriteram_r, atarimo_0_spriteram_w)
-	AM_RANGE(0x3f8000, 0x3f8eff) AM_RAM_DEVWRITE("alpha", tilemap_device, write) AM_SHARE("alpha")
-	AM_RANGE(0x3f8f00, 0x3f8f7f) AM_RAM AM_SHARE("atarivc_eof")
+	AM_RANGE(0x3f8000, 0x3f8eff) AM_RAM_DEVWRITE("vad", atari_vad_device, alpha_w) AM_SHARE("vad:alpha")
+	AM_RANGE(0x3f8f00, 0x3f8f7f) AM_RAM AM_SHARE("vad:eof")
 	AM_RANGE(0x3f8f80, 0x3f8fff) AM_READWRITE_LEGACY(atarimo_0_slipram_r, atarimo_0_slipram_w)
 	AM_RANGE(0x3f9000, 0x3fffff) AM_RAM
 ADDRESS_MAP_END
@@ -288,9 +265,10 @@ static MACHINE_CONFIG_START( thunderj, thunderj_state )
 	MCFG_GFXDECODE(thunderj)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_TILEMAP_ADD_STANDARD("playfield", 2, thunderj_state, get_playfield_tile_info, 8,8, SCAN_COLS, 64,64)
-	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("playfield2", 2, thunderj_state, get_playfield2_tile_info, 8,8, SCAN_COLS, 64,64, 0)
-	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", 2, thunderj_state, get_alpha_tile_info, 8,8, SCAN_ROWS, 64,32, 0)
+	MCFG_ATARI_VAD_ADD("vad", "screen", WRITELINE(atarigen_state, scanline_int_write_line))
+	MCFG_ATARI_VAD_PLAYFIELD(thunderj_state, get_playfield_tile_info)
+	MCFG_ATARI_VAD_PLAYFIELD2(thunderj_state, get_playfield2_tile_info)
+	MCFG_ATARI_VAD_ALPHA(thunderj_state, get_alpha_tile_info)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	/* note: these parameters are from published specs, not derived */

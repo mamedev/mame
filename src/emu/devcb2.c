@@ -175,6 +175,7 @@ void devcb2_read_base::resolve()
 		m_space = &downcast<driver_device &>(m_device.machine().root_device()).generic_space();
 
 	// then handle the various types
+	const char *name = "unknown";
 	try
 	{
 		switch (m_type)
@@ -183,30 +184,35 @@ void devcb2_read_base::resolve()
 				break;
 
 			case CALLBACK_LINE:
+				name = m_readline.name();
 				m_readline.bind_relative_to(*m_device.owner());
 				m_target_int = 0;
 				m_adapter = m_readline.isnull() ? &devcb2_read_base::read_constant_adapter : &devcb2_read_base::read_line_adapter;
 				break;
 
 			case CALLBACK_8:
+				name = m_read8.name();
 				m_read8.bind_relative_to(*m_device.owner());
 				m_target_int = 0;
 				m_adapter = m_read8.isnull() ? &devcb2_read_base::read_constant_adapter : &devcb2_read_base::read8_adapter;
 				break;
 
 			case CALLBACK_16:
+				name = m_read16.name();
 				m_read16.bind_relative_to(*m_device.owner());
 				m_target_int = 0;
 				m_adapter = m_read16.isnull() ? &devcb2_read_base::read_constant_adapter : &devcb2_read_base::read16_adapter;
 				break;
 
 			case CALLBACK_32:
+				name = m_read32.name();
 				m_read32.bind_relative_to(*m_device.owner());
 				m_target_int = 0;
 				m_adapter = m_read32.isnull() ? &devcb2_read_base::read_constant_adapter : &devcb2_read_base::read32_adapter;
 				break;
 
 			case CALLBACK_64:
+				name = m_read64.name();
 				m_read64.bind_relative_to(*m_device.owner());
 				m_target_int = 0;
 				m_adapter = m_read64.isnull() ? &devcb2_read_base::read_constant_adapter : &devcb2_read_base::read64_adapter;
@@ -232,7 +238,7 @@ void devcb2_read_base::resolve()
 	}
 	catch (binding_type_exception &binderr)
 	{
-		throw emu_fatalerror("Error performing a late bind of type %s to %s\n", binderr.m_actual_type.name(), binderr.m_target_type.name());
+		throw emu_fatalerror("devcb2_read: Error performing a late bind of type %s to %s (name=%s)\n", binderr.m_actual_type.name(), binderr.m_target_type.name(), name);
 	}
 }
 
@@ -396,6 +402,7 @@ void devcb2_write_base::resolve()
 		m_space = &downcast<driver_device &>(m_device.machine().root_device()).generic_space();
 
 	// then handle the various types
+	const char *name = "unknown";
 	try
 	{
 		switch (m_type)
@@ -404,26 +411,31 @@ void devcb2_write_base::resolve()
 				break;
 
 			case CALLBACK_LINE:
+				name = m_writeline.name();
 				m_writeline.bind_relative_to(*m_device.owner());
 				m_adapter = m_writeline.isnull() ? &devcb2_write_base::write_noop_adapter : &devcb2_write_base::write_line_adapter;
 				break;
 
 			case CALLBACK_8:
+				name = m_write8.name();
 				m_write8.bind_relative_to(*m_device.owner());
 				m_adapter = m_write8.isnull() ? &devcb2_write_base::write_noop_adapter : &devcb2_write_base::write8_adapter;
 				break;
 
 			case CALLBACK_16:
+				name = m_write16.name();
 				m_write16.bind_relative_to(*m_device.owner());
 				m_adapter = m_write16.isnull() ? &devcb2_write_base::write_noop_adapter : &devcb2_write_base::write16_adapter;
 				break;
 
 			case CALLBACK_32:
+				name = m_write32.name();
 				m_write32.bind_relative_to(*m_device.owner());
 				m_adapter = m_write32.isnull() ? &devcb2_write_base::write_noop_adapter : &devcb2_write_base::write32_adapter;
 				break;
 
 			case CALLBACK_64:
+				name = m_write64.name();
 				m_write64.bind_relative_to(*m_device.owner());
 				m_adapter = m_write64.isnull() ? &devcb2_write_base::write_noop_adapter : &devcb2_write_base::write64_adapter;
 				break;
@@ -449,7 +461,7 @@ void devcb2_write_base::resolve()
 	}
 	catch (binding_type_exception &binderr)
 	{
-		throw emu_fatalerror("Error performing a late bind of type %s to %s\n", binderr.m_actual_type.name(), binderr.m_target_type.name());
+		throw emu_fatalerror("devcb2_write: Error performing a late bind of type %s to %s (name=%s)\n", binderr.m_actual_type.name(), binderr.m_target_type.name(), name);
 	}
 }
 
