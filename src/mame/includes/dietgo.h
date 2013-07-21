@@ -14,6 +14,7 @@ class dietgo_state : public driver_device
 public:
 	dietgo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_deco104(*this, "ioprot104"),
 		m_pf1_rowscroll(*this, "pf1_rowscroll"),
 		m_pf2_rowscroll(*this, "pf2_rowscroll"),
 		m_spriteram(*this, "spriteram"),
@@ -24,6 +25,7 @@ public:
 		m_decocomn(*this, "deco_common")
 	{ }
 
+	optional_device<deco104_device> m_deco104;
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_pf1_rowscroll;
 	required_shared_ptr<UINT16> m_pf2_rowscroll;
@@ -39,4 +41,7 @@ public:
 	DECLARE_DRIVER_INIT(dietgo);
 	virtual void machine_start();
 	UINT32 screen_update_dietgo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	DECLARE_READ16_MEMBER( dietgo_protection_region_0_104_r );
+	DECLARE_WRITE16_MEMBER( dietgo_protection_region_0_104_w );
 };
