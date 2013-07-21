@@ -448,29 +448,6 @@ WRITE32_MEMBER(deco32_state::dragngun_eeprom_w)
 /**********************************************************************************/
 
 
-READ32_MEMBER(deco32_state::tattass_prot_r)
-{
-	switch (offset<<1) {
-	case 0x280: return ioport("IN0")->read() << 16;
-	case 0x4c4: return ioport("IN1")->read() << 16;
-	case 0x35a: return m_tattass_eprom_bit << 16;
-	}
-
-	logerror("%08x:Read prot %08x (%08x)\n",space.device().safe_pc(),offset<<1,mem_mask);
-
-	return 0xffffffff;
-}
-
-WRITE32_MEMBER(deco32_state::tattass_prot_w)
-{
-	/* Only sound port of chip is used - no protection */
-	if (offset==0x700/4) {
-		/* 'Swap bits 0 and 3 to correct for design error from BSMT schematic' */
-		int soundcommand = (data>>16)&0xff;
-		soundcommand = BITSWAP8(soundcommand,7,6,5,4,0,2,1,3);
-		m_decobsmt->bsmt_comms_w(space, 0, soundcommand);
-	}
-}
 
 WRITE32_MEMBER(deco32_state::tattass_control_w)
 {
@@ -617,6 +594,20 @@ void deco32_state::nslasher_sound_cb( address_space &space, UINT16 data, UINT16 
 	m_nslasher_sound_irq |= 0x02;
 	m_audiocpu->set_input_line(0, (m_nslasher_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
 }
+
+UINT16 deco32_state::port_b_tattass(int unused)
+{
+	return m_tattass_eprom_bit;
+}
+
+void deco32_state::tattass_sound_cb( address_space &space, UINT16 data, UINT16 mem_mask )
+{
+	/* 'Swap bits 0 and 3 to correct for design error from BSMT schematic' */
+	int soundcommand = (data)&0xff;
+	soundcommand = BITSWAP8(soundcommand,7,6,5,4,0,2,1,3);
+	m_decobsmt->bsmt_comms_w(space, 0, soundcommand);
+}
+
 
 
 
@@ -976,7 +967,9 @@ static ADDRESS_MAP_START( tattass_map, AS_PROGRAM, 32, deco32_state )
 	AM_RANGE(0x1d4000, 0x1d5fff) AM_RAM_WRITE(deco32_pf4_rowscroll_w) AM_SHARE("pf4_rowscroll32")
 	AM_RANGE(0x1e0000, 0x1e001f) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf_control_dword_r, pf_control_dword_w)
 
-	AM_RANGE(0x200000, 0x200fff) AM_READWRITE(tattass_prot_r, tattass_prot_w) AM_SHARE("prot32ram")
+//	AM_RANGE(0x200000, 0x200fff) AM_READWRITE(tattass_prot_r, tattass_prot_w) AM_SHARE("prot32ram")
+	AM_RANGE(0x200000, 0x207fff) AM_READWRITE16(nslasher_protection_region_0_104_r, nslasher_protection_region_0_104_w, 0xffff0000)
+	AM_RANGE(0x200000, 0x207fff) AM_READ16(nslasher_debug_r, 0x0000ffff)
 ADDRESS_MAP_END
 
 READ16_MEMBER( deco32_state::nslasher_protection_region_0_104_r )
@@ -1424,7 +1417,7 @@ static INPUT_PORTS_START( lockload )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( tattass )
-	PORT_START("IN0")
+	PORT_START("INPUTS")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -1442,12 +1435,12 @@ static INPUT_PORTS_START( tattass )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START("IN1")
+	PORT_START("DSW")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x0008, IP_ACTIVE_LOW )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED ) /* 'soundmask' */
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -2156,7 +2149,7 @@ static const deco16ic_interface tattass_deco16ic_tilegen2_intf =
 static MACHINE_CONFIG_START( tattass, deco32_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ARM, 28000000/*/4*/) /* Unconfirmed - the divider makes it far too slow, due to inaccurate core timings? */
+	MCFG_CPU_ADD("maincpu", ARM, 28000000/4) // unconfirmed
 	MCFG_CPU_PROGRAM_MAP(tattass_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", deco32_state,  deco32_vbl_interrupt)
 
@@ -2182,6 +2175,9 @@ static MACHINE_CONFIG_START( tattass, deco32_state )
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_DECO104_ADD("ioprot104")
+	MCFG_DECO146_SET_PORTB_CALLBACK( deco32_state, port_b_tattass )
+	MCFG_DECO146_SET_SOUNDLATCH_CALLBACK(deco32_state, tattass_sound_cb)
+	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_INTERLEAVE
 
 	MCFG_VIDEO_START_OVERRIDE(deco32_state,nslasher)
 
@@ -2228,7 +2224,6 @@ static MACHINE_CONFIG_START( nslasher, deco32_state )
 	MCFG_DECO146_SET_PORTB_CALLBACK( deco32_state, port_b_nslasher )
 	MCFG_DECO146_SET_SOUNDLATCH_CALLBACK(deco32_state, nslasher_sound_cb)
 	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_INTERLEAVE
-//	MCFG_DECO146_SET_USE_MAGIC_ADDRESS_XOR
 
 
 	/* sound hardware */
@@ -3232,7 +3227,7 @@ ROM_START( tattass )
 	ROM_LOAD32_BYTE( "ob2_c2.b3",  0x600000, 0x80000,  CRC(90fe5f4f) SHA1(2149e9eae152556c632ebd4d0b2de49e40916a77) )
 	ROM_LOAD32_BYTE( "ob2_c3.b3",  0x600002, 0x80000,  CRC(e3517e6e) SHA1(68ac60570423d8f0d7cff3db1901c9c050d0be91) )
 
-	ROM_REGION(0x1000000, "bsmt", 0 )
+	ROM_REGION(0x1000000, "bsmt", 0 ) // are the sample roms 100% confirmed as good? some sounds cause everything to cut out followed by a loud static pop? (did the same before the bsmt decap)
 	ROM_LOAD( "u17.snd",  0x000000, 0x80000,  CRC(b945c18d) SHA1(6556bbb4a7057df3680132f24687fa944006c784) )
 	ROM_LOAD( "u21.snd",  0x080000, 0x80000,  CRC(10b2110c) SHA1(83e5938ed22da2874022e1dc8df76c72d95c448d) )
 	ROM_LOAD( "u36.snd",  0x100000, 0x80000,  CRC(3b73abe2) SHA1(195096e2302e84123b23b4ccd982fb3ab9afe42c) )

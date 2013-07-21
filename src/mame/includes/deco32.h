@@ -157,6 +157,9 @@ public:
 
 	UINT16 port_b_nslasher(int unused);
 	void nslasher_sound_cb( address_space &space, UINT16 data, UINT16 mem_mask );
+	UINT16 port_b_tattass(int unused);
+	void tattass_sound_cb( address_space &space, UINT16 data, UINT16 mem_mask );
+
 };
 
 class dragngun_state : public deco32_state
