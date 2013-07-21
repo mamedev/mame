@@ -15,6 +15,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_deco146(*this, "ioprot"),
+		m_deco104(*this, "ioprot104"),
 		m_decobsmt(*this, "decobsmt"),
 		m_spriteram(*this, "spriteram"),
 		m_ram(*this, "ram"),
@@ -36,6 +37,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<deco146_device> m_deco146;
+	optional_device<deco104_device> m_deco104;
 	optional_device<decobsmt_device> m_decobsmt;
 	optional_device<buffered_spriteram32_device> m_spriteram;
 	required_shared_ptr<UINT32> m_ram;
@@ -100,9 +102,13 @@ public:
 	DECLARE_READ32_MEMBER(tattass_prot_r);
 	DECLARE_WRITE32_MEMBER(tattass_prot_w);
 	DECLARE_WRITE32_MEMBER(tattass_control_w);
-	DECLARE_READ32_MEMBER(nslasher_prot_r);
+	//DECLARE_READ32_MEMBER(nslasher_prot_r);
+	DECLARE_READ16_MEMBER( nslasher_protection_region_0_104_r );
+	DECLARE_WRITE16_MEMBER( nslasher_protection_region_0_104_w );
+	DECLARE_READ16_MEMBER( nslasher_debug_r );
+
 	DECLARE_WRITE32_MEMBER(nslasher_eeprom_w);
-	DECLARE_WRITE32_MEMBER(nslasher_prot_w);
+	//DECLARE_WRITE32_MEMBER(nslasher_prot_w);
 	DECLARE_READ32_MEMBER(deco32_spriteram_r);
 	DECLARE_WRITE32_MEMBER(deco32_spriteram_w);
 	DECLARE_WRITE32_MEMBER(deco32_buffer_spriteram_w);
@@ -149,6 +155,8 @@ public:
 	WRITE16_MEMBER( dg_protection_region_0_146_w );
 	void deco32_sound_cb( address_space &space, UINT16 data, UINT16 mem_mask );
 
+	UINT16 port_b_nslasher(int unused);
+	void nslasher_sound_cb( address_space &space, UINT16 data, UINT16 mem_mask );
 };
 
 class dragngun_state : public deco32_state

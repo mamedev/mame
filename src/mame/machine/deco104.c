@@ -189,6 +189,7 @@ UINT16 deco104_device::read_data_getloc(UINT16 offset, int& location)
 	const UINT16* prot_ram=m_current_rambank;
 
 	location = 0x00;
+	int tempinput = 0;
 
 	if (m_use_dblewings_hacks==1)
 	{
@@ -209,11 +210,13 @@ UINT16 deco104_device::read_data_getloc(UINT16 offset, int& location)
 			case 0x78c: /* was 0x528 */ /* was 0x330*/ return 0; // controls bonuses such as shoot type,bombs etc.
 			case 0x114: /* was 0x3b0 */ /* was 0x1d4*/ return m_70c_data;  //controls restart points
 
-			case 0x674: /* was 0x4d0 */ /* was 0x0ac*/ return (ioport(":DSW")->read() & 0x40) << 4;//flip screen
+			case 0x674: /* was 0x4d0 */ /* was 0x0ac*/tempinput = m_port_c_r(0); return (tempinput & 0x40) << 4;//flip screen
 			case 0x726: /* was 0x582 */ /* was 0x4b0*/return m_608_data;//coinage
 			case 0x4e4: /* was 0x640 */ /* was 0x068*/
 			{
-				switch (ioport(":DSW")->read() & 0x0300) //I don't know how to relationate this...
+				tempinput = m_port_c_r(0);
+
+				switch (tempinput & 0x0300) //I don't know how to relationate this...
 				{
 					case 0x0000: return 0x000;//0
 					case 0x0100: return 0x060;//3
@@ -224,11 +227,11 @@ UINT16 deco104_device::read_data_getloc(UINT16 offset, int& location)
 			//case 0x334: /* was 0x190 */ /* was 0x094*/ return m_104_data;// p1 inputs select screen  OK // in shared sim
 			//case 0x0fc: /* was 0x258 */ /* was 0x24c*/return m_008_data;//read DSW (mirror for coinage/territory) // in shared sim
 			//case 0x36c: /* was 0x1c8 */ /* was 0x298*/return ioport(":IN1")->read();//vblank // in shared sim
-			case 0x5b2: /* was 0x716 */ /* was 0x476*/return ioport(":IN1")->read();//mirror for coins
+			case 0x5b2: /* was 0x716 */ /* was 0x476*/tempinput = m_port_b_r(0); return tempinput;//mirror for coins
 			//case 0x292: /* was 0x036 */ /* was 0x506*/return ioport(":DSW")->read(); // in shared sim
 			case 0x146: /* was 0x3e2 */ /* was 0x5d8*/return m_406_data;
-			case 0x73c: /* was 0x598 */ /* was 0x2b4*/return ioport(":IN0")->read();
-			case 0x644: /* was 0x4e0 */ /* was 0x1a8*/return (ioport(":DSW")->read() & 0x4000) >> 12;//allow continue
+			case 0x73c: /* was 0x598 */ /* was 0x2b4*/tempinput = m_port_a_r(0); return tempinput;
+			case 0x644: /* was 0x4e0 */ /* was 0x1a8*/tempinput = m_port_c_r(0); return (tempinput & 0x4000) >> 12;//allow continue
 			// case 0x45c: /* was 0x6f8 */ /* was 0x3ec*/return m_70c_data; //score entry // in shared sim
 			case 0x0b8: /* was 0x21c */ /* was 0x246*/return m_580_data; // these three controls "perfect bonus" I suppose...
 			case 0x6d2: /* was 0x476 */ /* was 0x52e*/return m_580_data;
@@ -251,10 +254,10 @@ UINT16 deco104_device::read_data_getloc(UINT16 offset, int& location)
 
 	switch (offset>>1)
 	{
-		case 0x088/2: /* Player 1 & 2 input ports */		return machine().root_device().ioport(":IN0")->read(); // also caveman ninja + wizard fire
-		case 0x36c/2:									return machine().root_device().ioport(":IN1")->read(); // also caveman ninja + wizard fire
-		case 0x44c/2:									return ((machine().root_device().ioport(":IN1")->read() & 0x7)<<13)|((machine().root_device().ioport(":IN1")->read() & 0x8)<<9);
-		case 0x292/2: /* Dips */						return machine().root_device().ioport(":DSW")->read(); // also wizard fire
+		case 0x088/2: /* Player 1 & 2 input ports */	tempinput = m_port_a_r(0);	return tempinput; // also caveman ninja + wizard fire
+		case 0x36c/2:									tempinput = m_port_b_r(0); return tempinput; // also caveman ninja + wizard fire
+		case 0x44c/2:									tempinput = m_port_b_r(0);  return ((tempinput & 0x7)<<13)|((tempinput & 0x8)<<9);
+		case 0x292/2: /* Dips */						tempinput = m_port_c_r(0); return tempinput; // also wizard fire
 		case 0x044/2:									location = 0x2c; return ((((DECO_PORT(location)&0x000f)<<12)) ^ m_xor) & (~m_nand);
 		case 0x282/2:									location = 0x26; return ((DECO_PORT(location)&0x000f)<<12) & (~m_nand);
 		case 0x0d4/2:									location = 0x6e; return ((DECO_PORT(location)&0x0ff0)<<4) | ((DECO_PORT(location)&0x000e)<<3) | ((DECO_PORT(location)&0x0001)<<7);
@@ -483,8 +486,8 @@ UINT16 deco104_device::read_data_getloc(UINT16 offset, int& location)
 		// wizard fire cases
 		//case 0x088/2: /* was 0x110*/ /* Player input */		return space.machine().root_device().ioport("IN0")->read(); // also used in rohga sim
 		//case 0x36c/2: /* was 0x36c*/							return space.machine().root_device().ioport("IN1")->read(); // also used in rohga sim
-		case 0x2cc/2: /* was 0x334*/							return machine().root_device().ioport(":IN1")->read();
-		case 0x3b0/2: /* was 0x0dc*/							return machine().root_device().ioport(":IN1")->read()<<4;
+		case 0x2cc/2: /* was 0x334*/							tempinput = m_port_b_r(0);  return tempinput;
+		case 0x3b0/2: /* was 0x0dc*/							tempinput = m_port_b_r(0);  return tempinput<<4;
 		//case 0x292/2: /* was 0x494*/ /* Dips */				return space.machine().root_device().ioport("DSW1_2")->read(); // also used in rohga sim // also caveman ninja
 		//case 0x224/2: /* was 0x244*/							return DECO_NEW_PORT(0x00); // also caveman ninja
 		//case 0x33e/2: /* was 0x7cc*/							return ((DECO_NEW_PORT(0x00)&0x000f)<<12) | ((DECO_NEW_PORT(0x00)&0x00f0)<<4) | ((DECO_NEW_PORT(0x00)&0x0f00)>>4) | ((DECO_NEW_PORT(0x00)&0xf000)>>12); // also used in rohga sim (NOTE, ROHGA APPLIES MASK, CHECK!)

@@ -604,18 +604,21 @@ WRITE32_MEMBER(deco32_state::tattass_control_w)
 
 /**********************************************************************************/
 
-READ32_MEMBER(deco32_state::nslasher_prot_r)
+UINT16 deco32_state::port_b_nslasher(int unused)
 {
-	switch (offset<<1) {
-	case 0x280: return ioport("IN0")->read() << 16| 0xffff; /* IN0 */
-	case 0x4c4: return ioport("IN1")->read() << 16| 0xffff; /* IN1 */
-	case 0x35a: return (m_eeprom->read_bit()<< 16) | 0xffff; // Debug switch in low word??
-	}
-
-	//logerror("%08x: Read unmapped prot %08x (%08x)\n",space.device().safe_pc(),offset<<1,mem_mask);
-
-	return 0xffffffff;
+	return (m_eeprom->read_bit());
 }
+
+
+void deco32_state::nslasher_sound_cb( address_space &space, UINT16 data, UINT16 mem_mask )
+{
+	/* bit 1 of nslasher_sound_irq specifies IRQ command writes */
+	soundlatch_byte_w(space,0,(data)&0xff);
+	m_nslasher_sound_irq |= 0x02;
+	m_audiocpu->set_input_line(0, (m_nslasher_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+
 
 WRITE32_MEMBER(deco32_state::nslasher_eeprom_w)
 {
@@ -630,18 +633,7 @@ WRITE32_MEMBER(deco32_state::nslasher_eeprom_w)
 }
 
 
-WRITE32_MEMBER(deco32_state::nslasher_prot_w)
-{
-	//logerror("%08x:write prot %08x (%08x) %08x\n",space.device().safe_pc(),offset<<1,mem_mask,data);
 
-	/* Only sound port of chip is used - no protection */
-	if (offset==0x700/4) {
-		/* bit 1 of nslasher_sound_irq specifies IRQ command writes */
-		soundlatch_byte_w(space,0,(data>>16)&0xff);
-		m_nslasher_sound_irq |= 0x02;
-		m_audiocpu->set_input_line(0, (m_nslasher_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
-	}
-}
 
 /**********************************************************************************/
 
@@ -987,6 +979,29 @@ static ADDRESS_MAP_START( tattass_map, AS_PROGRAM, 32, deco32_state )
 	AM_RANGE(0x200000, 0x200fff) AM_READWRITE(tattass_prot_r, tattass_prot_w) AM_SHARE("prot32ram")
 ADDRESS_MAP_END
 
+READ16_MEMBER( deco32_state::nslasher_protection_region_0_104_r )
+{
+	int real_address = 0 + (offset *2);
+	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	UINT8 cs = 0;
+	UINT16 data = m_deco104->read_data( deco146_addr, mem_mask, cs );
+	return data;
+}
+
+WRITE16_MEMBER( deco32_state::nslasher_protection_region_0_104_w )
+{		
+	int real_address = 0 + (offset *2);
+	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	UINT8 cs = 0;
+	m_deco104->write_data( space, deco146_addr, data, mem_mask, cs );
+}
+
+READ16_MEMBER( deco32_state::nslasher_debug_r )
+{
+	return 0xffff;
+}
+
+
 static ADDRESS_MAP_START( nslasher_map, AS_PROGRAM, 32, deco32_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x11ffff) AM_RAM AM_SHARE("ram")
@@ -1025,7 +1040,10 @@ static ADDRESS_MAP_START( nslasher_map, AS_PROGRAM, 32, deco32_state )
 	AM_RANGE(0x1d4000, 0x1d5fff) AM_RAM_WRITE(deco32_pf4_rowscroll_w) AM_SHARE("pf4_rowscroll32")
 	AM_RANGE(0x1e0000, 0x1e001f) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf_control_dword_r, pf_control_dword_w)
 
-	AM_RANGE(0x200000, 0x200fff) AM_READWRITE(nslasher_prot_r, nslasher_prot_w) AM_SHARE("prot32ram")
+//	AM_RANGE(0x200000, 0x200fff) AM_READWRITE(nslasher_prot_r, nslasher_prot_w) AM_SHARE("prot32ram")
+	AM_RANGE(0x200000, 0x207fff) AM_READWRITE16(nslasher_protection_region_0_104_r, nslasher_protection_region_0_104_w, 0xffff0000)
+	AM_RANGE(0x200000, 0x207fff) AM_READ16(nslasher_debug_r, 0x0000ffff) // seems to be debug switches / code activated by this?
+
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -1444,7 +1462,7 @@ static INPUT_PORTS_START( tattass )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( nslasher )
-	PORT_START("IN0")
+	PORT_START("INPUTS")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -1462,7 +1480,7 @@ static INPUT_PORTS_START( nslasher )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START("IN1")
+	PORT_START("DSW")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -2207,6 +2225,11 @@ static MACHINE_CONFIG_START( nslasher, deco32_state )
 	MCFG_VIDEO_START_OVERRIDE(deco32_state,nslasher)
 
 	MCFG_DECO104_ADD("ioprot104")
+	MCFG_DECO146_SET_PORTB_CALLBACK( deco32_state, port_b_nslasher )
+	MCFG_DECO146_SET_SOUNDLATCH_CALLBACK(deco32_state, nslasher_sound_cb)
+	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_INTERLEAVE
+//	MCFG_DECO146_SET_USE_MAGIC_ADDRESS_XOR
+
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
