@@ -520,16 +520,6 @@ static const pia6821_interface pia34_intf =
 	DEVCB_DRIVER_LINE_MEMBER(de_3_state, pia_irq)        /* IRQB */
 };
 
-static const decodmd_type1_intf decodmd1_interface =
-{
-	":gfx3"  // region containing DMD ROM data
-};
-
-static const decodmd_type2_intf decodmd2_interface =
-{
-	":gfx3"  // region containing DMD ROM data
-};
-
 void de_3_state::machine_reset()
 {
 }
@@ -570,11 +560,11 @@ static MACHINE_CONFIG_START( de_3, de_3_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( de_3_dmd2, de_3 )
-	MCFG_DECODMD_TYPE2_ADD("decodmd2",decodmd2_interface)
+	MCFG_DECODMD_TYPE2_ADD("decodmd2",":gfx3")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( de_3_dmd1, de_3 )
-	MCFG_DECODMD_TYPE1_ADD("decodmd1",decodmd1_interface)
+	MCFG_DECODMD_TYPE1_ADD("decodmd1",":gfx3")
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------

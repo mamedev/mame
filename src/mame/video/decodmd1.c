@@ -245,7 +245,7 @@ void decodmd_type1_device::device_reset()
 {
 	UINT8* ROM;
 	UINT8* RAM = m_ram->pointer();
-	m_rom = memregion(m_romregion);
+	m_rom = memregion(m_gfxtag);
 
 	memset(RAM,0,0x2000);
 	memset(m_pixels,0,0x200);
@@ -264,18 +264,10 @@ void decodmd_type1_device::device_reset()
 	m_frameswap = false;
 }
 
-void decodmd_type1_device::device_config_complete()
+void decodmd_type1_device::static_set_gfxregion(device_t &device, const char *tag)
 {
-	// inherit a copy of the static data
-	const decodmd_type1_intf *intf = reinterpret_cast<const decodmd_type1_intf *>(static_config());
-	if (intf != NULL)
-		*static_cast<decodmd_type1_intf *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		m_romregion = NULL;
-	}
+	decodmd_type1_device &cpuboard = downcast<decodmd_type1_device &>(device);
+	cpuboard.m_gfxtag = tag;
 }
 
 UINT32 decodmd_type1_device::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )

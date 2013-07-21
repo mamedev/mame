@@ -10,19 +10,13 @@
 #include "video/mc6845.h"
 #include "machine/ram.h"
 
-#define MCFG_DECODMD_TYPE2_ADD(_tag, _intrf) \
+#define MCFG_DECODMD_TYPE2_ADD(_tag, _region) \
 	MCFG_DEVICE_ADD(_tag, DECODMD2, 0) \
-	MCFG_DEVICE_CONFIG(_intrf)
+	decodmd_type2_device::static_set_gfxregion(*device, _region);
 
 #define START_ADDRESS       (((m_crtc_reg[0x0c]<<8) & 0x3f00) | (m_crtc_reg[0x0d] & 0xff))
 
-struct decodmd_type2_intf
-{
-	const char* m_romregion;  // region containing display ROM
-};
-
-class decodmd_type2_device : public device_t,
-							 public decodmd_type2_intf
+class decodmd_type2_device : public device_t
 {
 public:
 	decodmd_type2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -49,11 +43,12 @@ public:
 	DECLARE_WRITE8_MEMBER(status_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(dmd_firq);
 
+	static void static_set_gfxregion(device_t &device, const char *tag);
+
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete();
 
 private:
 	UINT8 m_crtc_index;
@@ -63,6 +58,7 @@ private:
 	UINT8 m_ctrl;
 	UINT8 m_busy;
 	UINT8 m_command;
+	const char* m_gfxtag;
 };
 
 extern const device_type DECODMD2;

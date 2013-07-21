@@ -9,21 +9,15 @@
 #include "cpu/z80/z80.h"
 #include "machine/ram.h"
 
-#define MCFG_DECODMD_TYPE1_ADD(_tag, _intrf) \
+#define MCFG_DECODMD_TYPE1_ADD(_tag, _region) \
 	MCFG_DEVICE_ADD(_tag, DECODMD1, 0) \
-	MCFG_DEVICE_CONFIG(_intrf)
+	decodmd_type1_device::static_set_gfxregion(*device, _region);
 
 #define B_CLR 0x01
 #define B_SET 0x02
 #define B_CLK 0x04
 
-struct decodmd_type1_intf
-{
-	const char* m_romregion;  // region containing display ROM
-};
-
-class decodmd_type1_device : public device_t,
-							 public decodmd_type1_intf
+class decodmd_type1_device : public device_t
 {
 public:
 	decodmd_type1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -47,11 +41,12 @@ public:
 	DECLARE_WRITE8_MEMBER(dmd_port_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(dmd_nmi);
 
+	static void static_set_gfxregion(device_t &device, const char *tag);
+
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete();
 
 private:
 	UINT8 m_latch;
@@ -72,6 +67,7 @@ private:
 	UINT32 m_pixels[0x200];
 	UINT8 m_busy_lines;
 	UINT32 m_prevrow;
+	const char* m_gfxtag;
 
 	void output_data();
 	void set_busy(UINT8 input, UINT8 val);
