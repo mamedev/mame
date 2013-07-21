@@ -64,6 +64,9 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	UINT32 screen_update_dblewing(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	READ16_MEMBER( wf_protection_region_0_104_r );
+	WRITE16_MEMBER( wf_protection_region_0_104_w );
 };
 
 UINT16 dblwings_pri_callback(UINT16 x)
@@ -99,6 +102,23 @@ UINT32 dblewing_state::screen_update_dblewing(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
+READ16_MEMBER( dblewing_state::wf_protection_region_0_104_r )
+{
+	int real_address = 0 + (offset *2);
+	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	UINT8 cs = 0;
+	UINT16 data = m_deco104->read_data( deco146_addr, mem_mask, cs );
+	return data;
+}
+
+WRITE16_MEMBER( dblewing_state::wf_protection_region_0_104_w )
+{		
+	int real_address = 0 + (offset *2);
+	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	UINT8 cs = 0;
+	m_deco104->write_data( space, deco146_addr, data, mem_mask, cs );
+}
+
 
 static ADDRESS_MAP_START( dblewing_map, AS_PROGRAM, 16, dblewing_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
@@ -108,7 +128,8 @@ static ADDRESS_MAP_START( dblewing_map, AS_PROGRAM, 16, dblewing_state )
 	AM_RANGE(0x104000, 0x104fff) AM_RAM AM_SHARE("pf1_rowscroll")
 	AM_RANGE(0x106000, 0x106fff) AM_RAM AM_SHARE("pf2_rowscroll")
 
-	AM_RANGE(0x280000, 0x2807ff) AM_DEVREADWRITE("ioprot104", deco104_device, dblewing_prot_r, dblewing_prot_w) AM_SHARE("prot16ram")
+//	AM_RANGE(0x280000, 0x2807ff) AM_DEVREADWRITE("ioprot104", deco104_device, dblewing_prot_r, dblewing_prot_w) AM_SHARE("prot16ram")
+	AM_RANGE(0x280000, 0x283fff) AM_READWRITE(wf_protection_region_0_104_r,wf_protection_region_0_104_w) AM_SHARE("prot16ram") /* Protection device */
 
 
 	AM_RANGE(0x284000, 0x284001) AM_RAM
@@ -379,6 +400,9 @@ static MACHINE_CONFIG_START( dblewing, dblewing_state )
 	decospr_device::set_pri_callback(*device, dblwings_pri_callback);
 
 	MCFG_DECO104_ADD("ioprot104")
+	MCFG_DECO104_SET_USE_DOUBLEWINGS_HACK
+	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_INTERLEAVE
+	MCFG_DECO146_SET_USE_MAGIC_ADDRESS_XOR
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -466,8 +490,6 @@ DRIVER_INIT_MEMBER(dblewing_state,dblewing)
 {
 	deco56_decrypt_gfx(machine(), "gfx1");
 	deco102_decrypt_cpu(machine(), "maincpu", 0x399d, 0x25, 0x3d);
-
-	decoprot104_reset(machine());
 }
 
 

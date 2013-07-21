@@ -41,46 +41,12 @@
 
   */
 
-
 #include "emu.h"
 #include "deco146.h"
 #include "machine/eeprom.h"
 
-// for older handlers
-#define DECO_PORT(p) (prot_ram[p/2])
-
-//#define DECO_REVERSE(p) (prot_ram[BITSWAP16(p,   15,14,13,12,11  ,1,2,3,4,5,6,7,8,9,10, 0) /2])
 
 
-static UINT8 deco146prot_buffer_ram_selected=0;
-static UINT16 deco146_xor=0;
-static UINT16 deco146_mask;
-static int deco146prot_last_write=0, deco146prot_last_write_val=0;
-static UINT16 deco146prot_buffer_ram[0x800];
-static UINT16 deco146prot_buffer_ram2[0x800];
-
-static UINT16 *deco16_prot_ram;
-static UINT32 *deco32_prot_ram;
-
-
-void decoprot146_reset(running_machine &machine)
-{
-	deco146_xor=0;
-	deco146_mask=0xffff;
-	deco146prot_last_write=deco146prot_last_write_val=0;
-	deco146prot_buffer_ram_selected=0;
-
-	deco16_prot_ram = reinterpret_cast<UINT16 *>(machine.root_device().memshare("prot16ram")->ptr());
-	deco32_prot_ram = reinterpret_cast<UINT32 *>(machine.root_device().memshare("prot32ram")->ptr());
-
-	machine.save().save_item(NAME(deco146_xor));
-	machine.save().save_item(NAME(deco146_mask));
-	machine.save().save_item(NAME(deco146prot_last_write));
-	machine.save().save_item(NAME(deco146prot_last_write_val));
-	machine.save().save_item(NAME(deco146prot_buffer_ram_selected));
-	machine.save().save_item(NAME(deco146prot_buffer_ram));
-	machine.save().save_item(NAME(deco146prot_buffer_ram2));
-}
 
 
        
@@ -1129,18 +1095,18 @@ struct deco146port_xx
 
 UINT16 reorder(UINT16 input, UINT8 *weights)
 {
-        UINT16 temp = 0;
-        for(int i = 0; i < 16; i++)
-           {
-                if(input & (1 << i)) // if input bit is set
-                   {
-                        if(weights[i] != 0xFF) // and weight exists for output bit
-                           {
-                                temp |= 1 << weights[i]; // set that bit
-                        }
-                }
-        }
-        return temp;
+	UINT16 temp = 0;
+	for(int i = 0; i < 16; i++)
+	{
+		if(input & (1 << i)) // if input bit is set
+		{
+			if(weights[i] != 0xFF) // and weight exists for output bit
+			{
+				temp |= 1 << weights[i]; // set that bit
+			}
+		}
+	}
+	return temp;
 }
 
 
@@ -1148,8 +1114,10 @@ UINT16 reorder(UINT16 input, UINT8 *weights)
 /* there are probably less dumb ways of doing the CS logic, it could be hooked up
    more like the system16 mapper chips */
 
-void deco146_device::write_data(address_space &space, UINT16 address, UINT16 data, UINT16 mem_mask, UINT8 &csflags)
+void deco_146_base_device::write_data(address_space &space, UINT16 address, UINT16 data, UINT16 mem_mask, UINT8 &csflags)
 {
+	address = BITSWAP16(address>>1, 15,14,13,12,11,10, m_external_addrswap[9],m_external_addrswap[8] ,m_external_addrswap[7],m_external_addrswap[6],m_external_addrswap[5],m_external_addrswap[4],m_external_addrswap[3],m_external_addrswap[2],m_external_addrswap[1],m_external_addrswap[0]) << 1;
+
 	csflags = 0;
 	int upper_addr_bits = (address & 0x7800) >> 11;
 
@@ -1202,19 +1170,9 @@ void deco146_device::write_data(address_space &space, UINT16 address, UINT16 dat
 
 
 
-void deco146_device::soundlatch_write_callback(address_space &space, UINT16 data, UINT16 mem_mask)
+
+UINT16 deco_146_base_device::read_protport(UINT16 address, UINT16 mem_mask)
 {
-	driver_device *drvstate = machine().driver_data<driver_device>();
-	drvstate->soundlatch_byte_w(space, 0, data & 0xff);
-	cpu_device* cpudev = (cpu_device*)machine().device(":audiocpu");
-	if (cpudev) cpudev->set_input_line(0, HOLD_LINE);
-}
-
-
-
-UINT16 deco146_device::read_protport(UINT16 address, UINT16 mem_mask, int extra_read_address_xor)
-{
-	UINT16 retdata = 0;
 
 	// if we read the last written address immediately after then ignore all other logic and just return what was written unmodified
 	if ((address==m_latchaddr) && (m_latchflag==1))
@@ -1226,76 +1184,19 @@ UINT16 deco146_device::read_protport(UINT16 address, UINT16 mem_mask, int extra_
 
 	m_latchflag = 0;
 
-	if (extra_read_address_xor) address ^= 0x44a;
+	if (m_magic_read_address_xor_enabled) address ^= m_magic_read_address_xor;
 
-	// otherwise process the data..
-
-	int location = port_table[address>>1].write_offset;
-
-	// I haven't completed the input remap ports yet
-//	if (location==INPUT_PORT_A_NV) fatalerror("read unverified port INPUT_PORT_A_NV (%04x)", address);
-//	if (location==INPUT_PORT_B_NV) fatalerror("read unverified port INPUT_PORT_B_NV (%04x)", address);
-//	if (location==INPUT_PORT_C_NV) fatalerror("read unverified port INPUT_PORT_C_NV (%04x)", address);
+	int location = 0;
+	UINT16 realret = read_data_getloc(address, location);
 
 
-	if (location==INPUT_PORT_A)
+
+
+
+
+	if (location == m_bankswitch_swap_read_address) // this has a special meaning
 	{
-		retdata = m_port_a_r(0);
-	}
-	else if (location==INPUT_PORT_B)
-	{
-		retdata = m_port_b_r(0);
-	}
-	else if (location==INPUT_PORT_C)
-	{
-		retdata = m_port_c_r(0);
-	}
-	else
-	{
-		retdata = m_current_rambank[location>>1];
-	}
-
-
-
-	if (location>=0)
-	{
-		logerror("read_protport (real ram addres %02x) | %04x %04x | ", location, address, mem_mask);
-		
-		logerror("remap { ");
-		for (int i=0;i<16;i++)
-		{
-			//logerror(" %02x, ", remapdata[((address>>1)*16)+i]);
-		}
-		logerror(" }");
-
-		if ((port_table[address>>1].use_xor))  logerror("read is affected by XOR | ");
-		if ((port_table[address>>1].use_nand)) logerror("read is affected by NAND | ");
-
-
-		logerror("would return %04x | ", retdata);
-
-	}
-
-
-	UINT16 realret;
-	
-	/*if (location>=0)*/ realret = reorder(retdata, &port_table[address>>1].mapping[0] );
-	//else realret = retdata; // todo reordering on the input port mirrors too!
-
-
-	if (port_table[address>>1].use_xor) realret ^= m_xor;
-	if (port_table[address>>1].use_nand) realret = (realret & ~m_nand);
-
-
-
-	if (location>=0)
-	{
-		logerror("actual return %04x \n", realret);
-	}
-
-	if (location == 0x78) // this has a special meaning
-	{
-		logerror("(bankswitch) %04x %04x\n", address, mem_mask);
+	//	logerror("(bankswitch) %04x %04x\n", address, mem_mask);
 	
 		if (m_current_rambank==m_rambank0)
 			m_current_rambank = m_rambank1;
@@ -1307,27 +1208,27 @@ UINT16 deco146_device::read_protport(UINT16 address, UINT16 mem_mask, int extra_
 	return realret;
 }
 
-void deco146_device::write_protport(address_space &space, UINT16 address, UINT16 data, UINT16 mem_mask)
+void deco_146_base_device::write_protport(address_space &space, UINT16 address, UINT16 data, UINT16 mem_mask)
 {
 	m_latchaddr = address;
 	m_latchdata = data;
 	m_latchflag = 1;
 
-	if ((address&0xff) == 0x2c)
+	if ((address&0xff) == m_xor_port)
 	{
 		 logerror("LOAD XOR REGISTER %04x %04x\n", data, mem_mask);
 		 COMBINE_DATA(&m_xor);
 	}
-	else if ((address&0xff) == 0x36)
+	else if ((address&0xff) == m_mask_port)
 	{
 		 logerror("LOAD NAND REGISTER %04x %04x\n", data, mem_mask);
 		 COMBINE_DATA(&m_nand);
 	}
-	else if ((address&0xff) == 0x64)
+	else if ((address&0xff) == m_soundlatch_port)
 	{
 		 logerror("LOAD SOUND LATCH %04x %04x\n", data, mem_mask);
 		 COMBINE_DATA(&m_soundlatch);
-		 soundlatch_write_callback(space, data, mem_mask);
+		 m_soundlatch_w(space, data, mem_mask);
 	}
 
 	// always store
@@ -1336,8 +1237,11 @@ void deco146_device::write_protport(address_space &space, UINT16 address, UINT16
 }
 
 
-UINT16 deco146_device::read_data(UINT16 address, UINT16 mem_mask, UINT8 &csflags, int extra_read_address_xor)
+
+UINT16 deco_146_base_device::read_data(UINT16 address, UINT16 mem_mask, UINT8 &csflags)
 {
+	address = BITSWAP16(address>>1, 15,14,13,12,11,10, m_external_addrswap[9],m_external_addrswap[8] ,m_external_addrswap[7],m_external_addrswap[6],m_external_addrswap[5],m_external_addrswap[4],m_external_addrswap[3],m_external_addrswap[2],m_external_addrswap[1],m_external_addrswap[0]) << 1;
+
 	UINT16 retdata = 0;
 	csflags = 0;
 	int upper_addr_bits = (address & 0x7800) >> 11;
@@ -1362,7 +1266,7 @@ UINT16 deco146_device::read_data(UINT16 address, UINT16 mem_mask, UINT8 &csflags
 			if (i==0) // the first cs is our internal protection area
 			{
 				//logerror("read matches cs table (protection) %01x %04x %04x\n", i, real_address, mem_mask);
-				return read_protport( real_address, mem_mask, extra_read_address_xor);
+				return read_protport( real_address, mem_mask);
 			}
 			else
 			{
@@ -1380,51 +1284,89 @@ UINT16 deco146_device::read_data(UINT16 address, UINT16 mem_mask, UINT8 &csflags
 }
 
 
-const device_type DECO146PROT = &device_creator<deco146_device>;
+//const device_type DECO146BASE = &device_creator<deco_146_base_device>;
 
 
 
-deco146_device::deco146_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, DECO146PROT, "DECO146PROT", tag, owner, clock, "deco146", __FILE__)
+deco_146_base_device::deco_146_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 {
-	m_port_a_r =  deco146_port_read_cb(FUNC(deco146_device::port_a_default), this);
-	m_port_b_r =  deco146_port_read_cb(FUNC(deco146_device::port_b_default), this);
-	m_port_c_r =  deco146_port_read_cb(FUNC(deco146_device::port_c_default), this);
+	m_port_a_r =  deco146_port_read_cb(FUNC(deco_146_base_device::port_a_default), this);
+	m_port_b_r =  deco146_port_read_cb(FUNC(deco_146_base_device::port_b_default), this);
+	m_port_c_r =  deco146_port_read_cb(FUNC(deco_146_base_device::port_c_default), this);
+	m_soundlatch_w =  deco146_port_write_cb(FUNC(deco_146_base_device::soundlatch_default), this);
+	
+	m_external_addrswap[0] = 0;
+	m_external_addrswap[1] = 1;
+	m_external_addrswap[2] = 2;
+	m_external_addrswap[3] = 3;
+	m_external_addrswap[4] = 4;
+	m_external_addrswap[5] = 5;
+	m_external_addrswap[6] = 6;
+	m_external_addrswap[7] = 7;
+	m_external_addrswap[8] = 8;
+	m_external_addrswap[9] = 9;
+}
+
+void deco_146_base_device::device_config_complete()
+{
 }
 
 
-void deco146_device::device_config_complete()
-{
-}
 
 
 
-
-
-UINT16 deco146_device::port_a_default(int unused)
+UINT16 deco_146_base_device::port_a_default(int unused)
 {
 	return ioport(":INPUTS")->read();
 }
 
-UINT16 deco146_device::port_b_default(int unused)
+UINT16 deco_146_base_device::port_b_default(int unused)
 {
 	return ioport(":SYSTEM")->read();
 }
 
-UINT16 deco146_device::port_c_default(int unused)
+UINT16 deco_146_base_device::port_c_default(int unused)
 {
 	return ioport(":DSW")->read();
+}
+
+void deco_146_base_device::soundlatch_default(address_space &space, UINT16 data, UINT16 mem_mask)
+{
+	driver_device *drvstate = machine().driver_data<driver_device>();
+	drvstate->soundlatch_byte_w(space, 0, data & 0xff);
+	cpu_device* cpudev = (cpu_device*)machine().device(":audiocpu");
+	if (cpudev) cpudev->set_input_line(0, HOLD_LINE);
 }
 
 
 
 
+void deco_146_base_device::set_port_a_cb(device_t &device,deco146_port_read_cb port_cb) { deco_146_base_device &dev = downcast<deco_146_base_device &>(device); dev.m_port_a_r = port_cb; }
+void deco_146_base_device::set_port_b_cb(device_t &device,deco146_port_read_cb port_cb) { deco_146_base_device &dev = downcast<deco_146_base_device &>(device); dev.m_port_b_r = port_cb; }
+void deco_146_base_device::set_port_c_cb(device_t &device,deco146_port_read_cb port_cb) { deco_146_base_device &dev = downcast<deco_146_base_device &>(device); dev.m_port_c_r = port_cb; }
+void deco_146_base_device::set_soundlatch_cb(device_t &device,deco146_port_write_cb port_cb) { deco_146_base_device &dev = downcast<deco_146_base_device &>(device); dev.m_soundlatch_w = port_cb; }
+void deco_146_base_device::set_interface_scramble(device_t &device,UINT8 a9, UINT8 a8, UINT8 a7, UINT8 a6, UINT8 a5, UINT8 a4, UINT8 a3,UINT8 a2,UINT8 a1,UINT8 a0)
+{
+	deco_146_base_device &dev = downcast<deco_146_base_device &>(device);
+	dev.m_external_addrswap[9] = a9;
+	dev.m_external_addrswap[8] = a8;
+	dev.m_external_addrswap[7] = a7;
+	dev.m_external_addrswap[6] = a6;
+	dev.m_external_addrswap[5] = a5;
+	dev.m_external_addrswap[4] = a4;
+	dev.m_external_addrswap[3] = a3;
+	dev.m_external_addrswap[2] = a2;
+	dev.m_external_addrswap[1] = a1;
+	dev.m_external_addrswap[0] = a0;
+}
+void deco_146_base_device::set_use_magic_read_address_xor(device_t &device, int use_xor)
+{
+	deco_146_base_device &dev = downcast<deco_146_base_device &>(device);
+	dev.m_magic_read_address_xor_enabled = use_xor;
+}
 
-void deco146_device::set_port_a_cb(device_t &device,deco146_port_read_cb port_cb) { deco146_device &dev = downcast<deco146_device &>(device); dev.m_port_a_r = port_cb; }
-void deco146_device::set_port_b_cb(device_t &device,deco146_port_read_cb port_cb) { deco146_device &dev = downcast<deco146_device &>(device); dev.m_port_b_r = port_cb; }
-void deco146_device::set_port_c_cb(device_t &device,deco146_port_read_cb port_cb) { deco146_device &dev = downcast<deco146_device &>(device); dev.m_port_c_r = port_cb; }
-
-void deco146_device::device_start()
+void deco_146_base_device::device_start()
 {
 
 	for (int i=0;i<0x80;i++)
@@ -1439,9 +1381,14 @@ void deco146_device::device_start()
 	m_port_a_r.bind_relative_to(*owner());
 	m_port_b_r.bind_relative_to(*owner());
 	m_port_c_r.bind_relative_to(*owner());
+	m_soundlatch_w.bind_relative_to(*owner());
+
+
+	save_item(NAME(m_xor));
+	save_item(NAME(m_nand));
 }
 
-void deco146_device::device_reset()
+void deco_146_base_device::device_reset()
 {
 	region_selects[0] = 0;
 	region_selects[1] = 0;
@@ -1461,6 +1408,13 @@ void deco146_device::device_reset()
 	m_latchaddr = 0xffff;
 	m_latchdata = 0x0000;
 	m_latchflag = 0;
+
+	m_xor=0;
+//	m_nand=0xffff;
+	m_nand=0x0; // wizard fire doesn't initialize it, but accesses addresses rohga needs the mask applied on
+
+
+
 }
 
 /****************************************************************************************************
@@ -1483,7 +1437,7 @@ void deco146_device::device_reset()
 
 
 // alt read addresses (same as nitroball if you reverse lnes)
-READ16_MEMBER(deco146_device::robocop2_prot_r)
+READ16_MEMBER(deco_146_base_device::robocop2_prot_r)
 {
 	switch (offset << 1)
 	{
@@ -1503,7 +1457,7 @@ READ16_MEMBER(deco146_device::robocop2_prot_r)
 
 // alt read addresses (same as nitroball if you reverse lnes)
 /* Same as Robocop 2 protection chip */
-READ16_MEMBER(deco146_device::lemmings_prot_r)
+READ16_MEMBER(deco_146_base_device::lemmings_prot_r)
 {
 	switch (offset << 1)
 	{
@@ -1521,7 +1475,7 @@ READ16_MEMBER(deco146_device::lemmings_prot_r)
 }
 
 // standard read addresses
-READ32_MEMBER(deco146_device::captaven_prot_r)
+READ32_MEMBER(deco_146_base_device::captaven_prot_r)
 {
 	/* Protection/IO chip 75, same as Lemmings & Robocop 2 */
 	switch (offset<<2) {
@@ -1536,7 +1490,7 @@ READ32_MEMBER(deco146_device::captaven_prot_r)
 
 
 // alt read addresses? make sure this isn't 104
-READ32_MEMBER(deco146_device::dragngun_prot_r)
+READ32_MEMBER(deco_146_base_device::dragngun_prot_r)
 {
 //  logerror("%08x:Read prot %08x (%08x)\n",space.device().safe_pc(),offset<<1,mem_mask);
 
@@ -1554,7 +1508,7 @@ READ32_MEMBER(deco146_device::dragngun_prot_r)
 }
 
 
-READ32_MEMBER(deco146_device::stadhr96_prot_146_r)
+READ32_MEMBER(deco_146_base_device::stadhr96_prot_146_r)
 {
 	/*
 	    cpu #0 (PC=00041BD0): unmapped program memory dword write to 00708004 = 000F0000 & FFFFFFFF
@@ -1580,8 +1534,56 @@ READ32_MEMBER(deco146_device::stadhr96_prot_146_r)
 	return 0;
 }
 
-WRITE32_MEMBER(deco146_device::stadhr96_prot_146_w)
+WRITE32_MEMBER(deco_146_base_device::stadhr96_prot_146_w)
 {
 	printf("%08x:  Write prot %04x %08x\n", space.device().safe_pc(), offset, data);
+}
+
+
+
+const device_type DECO146PROT = &device_creator<deco146_device>;
+
+// 104 will probably use this too, once we have real tables for it!
+UINT16 deco146_device::read_data_getloc(UINT16 address, int& location)
+{
+	UINT16 retdata = 0;
+
+	location = port_table[address>>1].write_offset;
+
+	if (location==INPUT_PORT_A)
+	{
+		retdata = m_port_a_r(0);
+	}
+	else if (location==INPUT_PORT_B)
+	{
+		retdata = m_port_b_r(0);
+	}
+	else if (location==INPUT_PORT_C)
+	{
+		retdata = m_port_c_r(0);
+	}
+	else
+	{
+		retdata = m_current_rambank[location>>1];
+	}
+
+	UINT16 realret = reorder(retdata, &port_table[address>>1].mapping[0] );
+
+	if (port_table[address>>1].use_xor) realret ^= m_xor;
+	if (port_table[address>>1].use_nand) realret = (realret & ~m_nand);
+
+	return realret;
+}
+
+
+deco146_device::deco146_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: deco_146_base_device(mconfig, DECO146PROT, "DECO146PROT", tag, owner, clock, "deco146", __FILE__)
+{
+	m_bankswitch_swap_read_address = 0x78;
+	m_magic_read_address_xor = 0x44a;
+	m_magic_read_address_xor_enabled = 0;
+	m_xor_port = 0x2c;
+	m_mask_port = 0x36;
+	m_soundlatch_port = 0x64;
 }
 

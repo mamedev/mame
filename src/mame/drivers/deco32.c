@@ -723,9 +723,9 @@ READ32_MEMBER( deco32_state::fghthist_protection_region_0_146_r )
 		mem_mask >>=16;
 	
 		int real_address = 0 + (offset *2);
-		int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,   5,  6,  4,  7,  3,   8,  2,  9,  1,  10,   0) & 0x7fff;
+		int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,   10,9,8,7,6,5,4,3,2,1,   0) & 0x7fff;
 		UINT8 cs = 0;
-		UINT16 data = m_deco146->read_data( deco146_addr, mem_mask, cs, 1 );
+		UINT16 data = m_deco146->read_data( deco146_addr, mem_mask, cs );
 	
 
 	
@@ -742,7 +742,7 @@ WRITE32_MEMBER( deco32_state::fghthist_protection_region_0_146_w )
 		mem_mask >>=16;
 
 		int real_address = 0 + (offset *2);
-		int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    5,  6,  4,  7,  3,   8,  2,  9,  1,  10,   0) & 0x7fff;
+		int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8,7,6,5,4,3,2,1,   0) & 0x7fff;
 		UINT8 cs = 0;
 		m_deco146->write_data( space, deco146_addr, data, mem_mask, cs );
 	}
@@ -1645,9 +1645,6 @@ static const eeprom_interface eeprom_interface_tattass =
 MACHINE_RESET_MEMBER(deco32_state,deco32)
 {
 	m_raster_irq_timer = machine().device<timer_device>("int_timer");
-	decoprot104_reset(machine());
-	decoprot146_reset(machine());
-
 }
 
 INTERRUPT_GEN_MEMBER(deco32_state::deco32_vbl_interrupt)
@@ -1810,6 +1807,8 @@ static MACHINE_CONFIG_START( fghthist, deco32_state ) /* DE-0380-2 PCB */
 	MCFG_DECO146_SET_PORTA_CALLBACK( deco32_state, port_a_fghthist )
 	MCFG_DECO146_SET_PORTB_CALLBACK( deco32_state, port_b_fghthist )
 	MCFG_DECO146_SET_PORTC_CALLBACK( deco32_state, port_c_fghthist )
+	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_INTERLEAVE
+	MCFG_DECO146_SET_USE_MAGIC_ADDRESS_XOR
 
 
 	MCFG_VIDEO_START_OVERRIDE(deco32_state,fghthist)
@@ -1863,6 +1862,7 @@ static MACHINE_CONFIG_START( fghthsta, deco32_state ) /* DE-0395-1 PCB */
 	MCFG_DECO146_SET_PORTA_CALLBACK( deco32_state, port_a_fghthist )
 	MCFG_DECO146_SET_PORTB_CALLBACK( deco32_state, port_b_fghthist )
 	MCFG_DECO146_SET_PORTC_CALLBACK( deco32_state, port_c_fghthist )
+	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_INTERLEAVE
 
 	MCFG_VIDEO_START_OVERRIDE(deco32_state,fghthist)
 
@@ -3438,8 +3438,6 @@ DRIVER_INIT_MEMBER(deco32_state,fghthist)
 {
 	deco56_decrypt_gfx(machine(), "gfx1");
 	deco74_decrypt_gfx(machine(), "gfx2");
-
-	decoprot146_reset(machine());
 }
 
 DRIVER_INIT_MEMBER(dragngun_state,lockload)

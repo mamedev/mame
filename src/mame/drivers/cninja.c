@@ -139,6 +139,24 @@ WRITE16_MEMBER(cninja_state::cninja_pf34_control_w)
 }
 
 
+READ16_MEMBER( cninja_state::cninja_protection_region_0_104_r )
+{
+	int real_address = 0 + (offset *2);
+	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	UINT8 cs = 0;
+	UINT16 data = m_deco104->read_data( deco146_addr, mem_mask, cs );
+	return data;
+}
+
+WRITE16_MEMBER( cninja_state::cninja_protection_region_0_104_w )
+{		
+	int real_address = 0 + (offset *2);
+	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	UINT8 cs = 0;
+	m_deco104->write_data( space, deco146_addr, data, mem_mask, cs );
+}
+
+
 static ADDRESS_MAP_START( cninja_map, AS_PROGRAM, 16, cninja_state )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 
@@ -160,8 +178,11 @@ static ADDRESS_MAP_START( cninja_map, AS_PROGRAM, 16, cninja_state )
 
 	AM_RANGE(0x1a4000, 0x1a47ff) AM_RAM AM_SHARE("spriteram")           /* Sprites */
 	AM_RANGE(0x1b4000, 0x1b4001) AM_DEVWRITE("spriteram", buffered_spriteram16_device, write) /* DMA flag */
-	AM_RANGE(0x1bc000, 0x1bc0ff) AM_WRITE_LEGACY(deco16_104_cninja_prot_w) AM_SHARE("prot16ram")        /* Protection writes */
-	AM_RANGE(0x1bc000, 0x1bcfff) AM_READ_LEGACY(deco16_104_cninja_prot_r) AM_SHARE("prot16ram")     /* Protection device */
+//	AM_RANGE(0x1bc000, 0x1bc0ff) AM_WRITE_LEGACY(deco16_104_cninja_prot_w) AM_SHARE("prot16ram")        /* Protection writes */
+//	AM_RANGE(0x1bc000, 0x1bcfff) AM_READ_LEGACY(deco16_104_cninja_prot_r) AM_SHARE("prot16ram")     /* Protection device */
+	AM_RANGE(0x1bc000, 0x1bffff) AM_READWRITE(cninja_protection_region_0_104_r,cninja_protection_region_0_104_w) AM_SHARE("prot16ram") /* Protection device */
+
+
 
 	AM_RANGE(0x308000, 0x308fff) AM_WRITENOP /* Bootleg only */
 ADDRESS_MAP_END
@@ -201,7 +222,7 @@ READ16_MEMBER( cninja_state::sshangha_protection_region_8_146_r )
 	int real_address = 0x1a0000 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	UINT8 cs = 0;
-	UINT16 data = m_deco146->read_data( deco146_addr, mem_mask, cs, 0 );
+	UINT16 data = m_deco146->read_data( deco146_addr, mem_mask, cs );
 	return data;
 }
 
@@ -220,7 +241,7 @@ READ16_MEMBER( cninja_state::sshangha_protection_region_6_146_r )
 	int real_address = 0x198000 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	UINT8 cs = 0;
-	UINT16 data = m_deco146->read_data( deco146_addr, mem_mask, cs, 0 );
+	UINT16 data = m_deco146->read_data( deco146_addr, mem_mask, cs );
 	
 
 //	if ((realdat & mem_mask) != (data & mem_mask))
@@ -304,29 +325,21 @@ ADDRESS_MAP_END
 
 READ16_MEMBER( cninja_state::mutantf_protection_region_0_146_r )
 {
-//	UINT16 realdat = deco16_66_prot_r(space,offset&0x3ff,mem_mask);
-	
 	int real_address = 0 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	UINT8 cs = 0;
-	UINT16 data = m_deco146->read_data( deco146_addr, mem_mask, cs, 0 );
-	
-
-//	if ((realdat & mem_mask) != (data & mem_mask))
-//		logerror("returned %04x instead of %04x (real address %08x)\n", data, realdat, real_address);
-	
+	UINT16 data = m_deco146->read_data( deco146_addr, mem_mask, cs );
 	return data;
 }
 
 WRITE16_MEMBER( cninja_state::mutantf_protection_region_0_146_w )
 {		
-//	deco16_66_prot_w(space,offset&0x3ff,data,mem_mask);
-
 	int real_address = 0 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	UINT8 cs = 0;
 	m_deco146->write_data( space, deco146_addr, data, mem_mask, cs );
 }
+
 
 
 static ADDRESS_MAP_START( mutantf_map, AS_PROGRAM, 16, cninja_state )
@@ -907,10 +920,6 @@ void cninja_state::machine_start()
 {
 	save_item(NAME(m_scanline));
 	save_item(NAME(m_irq_mask));
-
-	decoprot104_reset(machine());
-	decoprot146_reset(machine());
-
 }
 
 void cninja_state::machine_reset()
@@ -969,6 +978,9 @@ static MACHINE_CONFIG_START( cninja, cninja_state )
 	decospr_device::set_gfx_region(*device, 3);
 	decospr_device::set_pri_callback(*device, cninja_pri_callback);
 
+	MCFG_DECO104_ADD("ioprot104")
+	MCFG_DECO146_SET_USE_MAGIC_ADDRESS_XOR
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -1024,6 +1036,10 @@ static MACHINE_CONFIG_START( stoneage, cninja_state )
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 3);
 	decospr_device::set_pri_callback(*device, cninja_pri_callback);
+
+	MCFG_DECO104_ADD("ioprot104")
+	MCFG_DECO146_SET_USE_MAGIC_ADDRESS_XOR
+
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

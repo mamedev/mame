@@ -106,7 +106,7 @@ READ16_MEMBER( funkyjet_state::funkyjet_protection_region_0_146_r )
 	int real_address = 0 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,  /* note, same bitswap as fghthist */  	 5,  6,  4,  7,  3,   8,  2,  9,  1,  10,    0) & 0x7fff;
 	UINT8 cs = 0;
-	UINT16 data = m_deco146->read_data( deco146_addr, mem_mask, cs, 0 );
+	UINT16 data = m_deco146->read_data( deco146_addr, mem_mask, cs );
 	
 //	if ((realdat & mem_mask) != (data & mem_mask))
 //		printf("returned %04x instead of %04x (real address %08x swapped addr %08x)\n", data, realdat, real_address, deco146_addr);
@@ -314,7 +314,7 @@ static const deco16ic_interface funkyjet_deco16ic_tilegen1_intf =
 
 void funkyjet_state::machine_start()
 {
-	decoprot146_reset(machine());
+
 }
 
 static MACHINE_CONFIG_START( funkyjet, funkyjet_state )
