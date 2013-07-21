@@ -19,6 +19,7 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_audiocpu(*this, "audiocpu"),
+			m_deco104(*this, "ioprot104"),
 			m_decocomn(*this, "deco_common"),
 			m_deco_tilegen1(*this, "tilegen1"),
 			m_deco_tilegen2(*this, "tilegen2"),
@@ -37,6 +38,7 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	optional_device<deco104_device> m_deco104;
 	required_device<decocomn_device> m_decocomn;
 	required_device<deco16ic_device> m_deco_tilegen1;
 	required_device<deco16ic_device> m_deco_tilegen2;
@@ -57,4 +59,7 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_boogwing(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void mix_boogwing(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	DECLARE_READ16_MEMBER( boogwing_protection_region_0_104_r );
+	DECLARE_WRITE16_MEMBER( boogwing_protection_region_0_104_w );
+	
 };

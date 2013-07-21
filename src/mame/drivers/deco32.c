@@ -2163,6 +2163,8 @@ static MACHINE_CONFIG_START( tattass, deco32_state )
 	MCFG_GFXDECODE(tattass)
 	MCFG_PALETTE_LENGTH(2048)
 
+	MCFG_DECO104_ADD("ioprot104")
+
 	MCFG_VIDEO_START_OVERRIDE(deco32_state,nslasher)
 
 	/* sound hardware */
@@ -2203,6 +2205,8 @@ static MACHINE_CONFIG_START( nslasher, deco32_state )
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_VIDEO_START_OVERRIDE(deco32_state,nslasher)
+
+	MCFG_DECO104_ADD("ioprot104")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

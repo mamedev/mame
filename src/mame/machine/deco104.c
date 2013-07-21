@@ -532,31 +532,6 @@ UINT16 deco104_device::read_data_getloc(UINT16 offset, int& location)
 
 /**********************************************************************************/
 
-READ16_HANDLER( dietgo_104_prot_r )
-{
-	switch (offset * 2)
-	{
-	case 0x298: return space.machine().root_device().ioport("IN0")->read();
-	case 0x342: return space.machine().root_device().ioport("IN1")->read();
-	case 0x506: return space.machine().root_device().ioport("DSW")->read();
-	}
-
-	logerror("Protection PC %06x: warning - read unmapped memory address %04x\n", space.device().safe_pc(), offset<<1);
-
-	return 0;
-}
-
-WRITE16_HANDLER( dietgo_104_prot_w )
-{
-	driver_device *state = space.machine().driver_data<driver_device>();
-	if (offset == (0x380 / 2))
-	{
-		state->soundlatch_byte_w(space, 0, data & 0xff);
-		space.machine().device("audiocpu")->execute().set_input_line(0, HOLD_LINE);
-		return;
-	}
-	logerror("Protection PC %06x: warning - write unmapped memory address %04x %04x\n", space.device().safe_pc(), offset << 1, data);
-}
 
 /**********************************************************************************/
 

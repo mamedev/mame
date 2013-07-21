@@ -340,6 +340,8 @@ static MACHINE_CONFIG_START( pktgaldx, pktgaldx_state )
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 2);
 
+	MCFG_DECO104_ADD("ioprot104")
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

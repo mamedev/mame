@@ -26,6 +26,7 @@ lamps?
 #include "video/deco16ic.h"
 #include "video/decospr.h"
 #include "machine/eeprom.h"
+#include "machine/deco104.h"
 
 class dreambal_state : public driver_device
 {
@@ -34,6 +35,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_eeprom(*this, "eeprom"),
 		m_maincpu(*this, "maincpu"),
+		m_deco104(*this, "ioprot104"),
 		m_deco_tilegen1(*this, "tilegen1")
 	{ }
 
@@ -41,6 +43,7 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
+	optional_device<deco104_device> m_deco104;
 	required_device<deco16ic_device> m_deco_tilegen1;
 
 	DECLARE_DRIVER_INIT(dreambal);
@@ -310,6 +313,8 @@ static MACHINE_CONFIG_START( dreambal, dreambal_state )
 	MCFG_GFXDECODE(dreambal)
 
 	MCFG_EEPROM_93C46_ADD("eeprom")  // 93lc46b
+
+	MCFG_DECO104_ADD("ioprot104")
 
 	MCFG_DECO16IC_ADD("tilegen1", dreambal_deco16ic_tilegen1_intf)
 

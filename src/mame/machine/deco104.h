@@ -80,8 +80,6 @@ extern const device_type DECO104PROT;
 
 DECLARE_READ16_HANDLER( deco16_104_pktgaldx_prot_r );
 DECLARE_WRITE16_HANDLER( deco16_104_pktgaldx_prot_w );
-DECLARE_READ16_HANDLER( dietgo_104_prot_r );
-DECLARE_WRITE16_HANDLER( dietgo_104_prot_w );
 
 
 #endif
