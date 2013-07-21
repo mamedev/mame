@@ -29,7 +29,10 @@ Supported games:
     samesame    TP-O17      Same! Same! Same! (Japan)    [1989] (1 Player version)
     samesam2    TP-O17      Same! Same! Same! (Japan)    [1989] (2 Player version)
     outzone     TP-O18      Out Zone
-    outzonea    TP-O18      Out Zone (From board serial number 2122)
+    outzoneh    TP-018      Out Zone (harder version)
+    outzonea    TP-018      Out Zone (old version)
+    outzoneb    TP-018      Out Zone (older version)
+    outzonec    TP-O18      Out Zone (oldest version, from board serial number 2122)
     vimana      TP-O19      Vimana (From board serial number 1547.04 [July '94])
     vimanaj     TP-O19      Vimana (Japan version)
     vimanan     TP-O19      Vimana (Nova Apparate GMBH & Co  license)
@@ -39,16 +42,6 @@ Notes:
     Fire Shark and Same! Same! Same! have a hidden function for the
     service input. When invulnerability is enabled, pressing the
     service input makes the screen scroll faster.
-
-    OutZone (set 2) has a bug in the 68K code. An Jump instruction at $3E6
-    goes to to an invalid instruction at $13DA4. It should really jump to
-    $13DAA. This bad jump is executed by flicking the 'Service DSW' while
-    after the game has booted. The other Outzone set correctly goes to
-    service mode, but this set just loses the plot.
-
-    OutZone (set 2) uses different enemies in some stages and has extra
-    bonuses compared to set 1. The music sequences are also in different
-    orders between the sets. So which is the newest version ?
 
     Demonwld (Toaplan copyright) is a newer version, and has a different game
     level sequence compared to the Taito licensed version.
@@ -347,7 +340,161 @@ Stephh's and AWJ's notes (based on the games M68000 and Z80 code and some tests)
 
 7) 'outzone' and "clones"
 
-    TO DO !
+  - The "TEST" switch has the same effect as the "Invulnerability" Dip Switch (DSWB bit 6).
+
+7a) 'outzone'
+
+  - Region read from Territory Jumper (port 0x1c in CPU1) then stored at 0x8005 (CPU1 shared RAM) =
+    0x14000a.w (CPU0 shared RAM) then 0x2401ca.w is set based on bits 0 to 3 of the region
+    (code at 0x013b68):
+      * ....0000 : 0x2401ca.w = 0000 (display Japanese story demo, etc.)
+      * ....0001 : 0x2401ca.w = 0001 (display FBI logo)
+      * ....0010 : 0x2401ca.w = 0002
+      * ....0011 : 0x2401ca.w = 0003
+      * ....0100 : 0x2401ca.w = 0004
+      * ....0101 : 0x2401ca.w = 0005
+      * ....0110 : 0x2401ca.w = 0006
+      * ....0111 : 0x2401ca.w = 0007 (display FBI logo)
+      * ....1000 : 0x2401ca.w = 0008
+      *     else : 0x2401ca.w = 0000 (display Japanese story demo, etc.)
+    This RAM address is also checked in many other places in the M68000 code.
+  - Coinage relies on bits 0 to 3 of the region (code at 0x0e77 in CPU1) :
+      * ....0001 : TOAPLAN_COINAGE_JAPAN (table at 0x0f04 (COIN1 AND COIN2) in CPU1)
+      * ....0010 : TOAPLAN_COINAGE_WORLD (tables at 0x0f0c (COIN1) and 0x0f14 (COIN2) in CPU1)
+      *     else : TOAPLAN_COINAGE_JAPAN (table at 0x0efc (COIN1 AND COIN2) in CPU1)
+  - Notice screen relies on region stored at 0x2401ca.w (code at 0x013bbc) :
+      * 0000 : "JAPAN ONLY"
+      * 0001 : "U.S.A. ONLY"
+      * 0002 : "EUROPE ONLY"
+      * 0003 : "HONG KONG ONLY"
+      * 0004 : "KOREA ONLY"
+      * 0005 : "TAIWAN ONLY"
+      * 0006 : "TAIWAN ONLY"
+      * 0007 : "U.S.A. ONLY"
+      * 0008 : "HONG KONG & CHINA"
+  - Copyright relies on region stored at 0x2401ca.w (code at 0x0050b4 - table at 0x0050e8) :
+      * 0000 : "@ TOAPLAN CO.,LTD. 1990" / "ALL RIGHTS RESERVED" / "" / ""
+      * 0001 : "@1990 TOAPLAN CO.,LTD." / "ALL RIGHTS RESERVED" / "" / ""
+      * 0002 : "@1990 TOAPLAN CO.,LTD." / "ALL RIGHTS RESERVED" / "" / ""
+      * 0003 : "@1990 TOAPLAN CO.,LTD." / "ALL RIGHTS RESERVED" / "" / ""
+      * 0004 : "@1990 TOAPLAN CO.,LTD." / "ALL RIGHTS RESERVED" / "" / ""
+      * 0005 : "@1990 TOAPLAN CO.,LTD." / "ALL RIGHTS RESERVED" / "" / ""
+      * 0006 : "@1990 TOAPLAN CO.,LTD." / "LICENSED TO" / "SPACY CO.,LTD." / "FOR TAIWAN"
+      * 0007 : "@1990 TOAPLAN CO.,LTD." / "LICENSED TO" / "ROMSTAR, INC." / "FOR U.S.A."
+      * 0008 : "@1990 TOAPLAN CO.,LTD." / "LICENSED TO" / "HONEST TRADING CO." / "FOR HONG KONG & CHINA"
+    If 0x2401ca.w >= 0006, the Toaplan logo is moved up to make room for the additional lines of text.
+
+7b) 'outzoneh'
+
+  - Same sound CPU as in 'outzone', so same coinage infos.
+  - Same notice screen and copyright infos as 'outzone'.
+  - This set is very similar to 'outzone'. I have found the following differences:
+  - Table at 0x000f70 contains data related to the "Difficulty" Dip Switches:
+       DSWB & 0x3  'outzoneh'  'outzone' and others
+       ----------  ----------  --------------------
+      * ......00       04          02
+      * ......01       00          00
+      * ......10       08          04
+      * ......11       0C          08
+    So "Normal" difficulty in 'outzoneh' is equivalent to "Hard" in the other sets,
+    "Hard" is equivalent to "Very Hard" in the other sets, and "Very Hard" is even
+    more difficult!
+  - Code in these routines is different from 'outzone' and the other sets:
+       'outzoneh'  'outzone'  When executed?
+       ----------  ---------  --------------
+      * 0x005570   0x005570   once per spawn of first enemy type in game (brown with red 'gun' and blue 'eyes')
+      * 0x005800   0x005810   once per spawn of another enemy type (near end of stage 1, not sure which one)
+      * 0x00c140   0x00c160   once per spawn of many enemy types
+      * 0x00c1e0   0x00c214   once per frame while fighting stage bosses
+  - In the first three routines, the code in 'outzoneh' is shorter than the code in 'outzone'
+    and the other sets. It looks like the other sets check some conditions (stage number,
+    play time, etc.) to decide whether to spawn a weaker or stronger version of the enemy,
+    while 'outzoneh' skips some of those checks and spawns the stronger version more often.
+  - For the fourth routine, all sets except 'outzoneh' have 'rts' as the first instruction,
+    so 'outzoneh' is the only set where this routine actually does anything.
+    However, other than somehow relating to bosses, I don't yet know what it does :(
+  - Because the player input data for the demonstrations isn't changed to compensate
+    for the higher difficulty, the player dies almost immediately in the second demo.
+  - Due to the shorter code in 'outzoneh', all code and data between 0x005578 and 0x0142a0
+    is shifted, so there may be other differences I have overlooked. In particular, the
+    special item the player picks up in the first demo is different, and I haven't found
+    exactly why. Special items seem to be affected by a pseudorandom number generator,
+    so the different item could merely be due to different execution timing between sets.
+
+7c) 'outzonea'
+
+  - Same sound CPU as in 'outzone', so same coinage infos.
+  - This set is almost identical to 'outzone', with only two differences :
+  - The 'jmp' instruction at 0x0003e6 goes to an invalid instruction, causing a crash
+    if you set the "Service Mode" Dip Switch to ON while the game is running.
+    'outzonea' is the only set with this bug, the other four sets all correctly
+    go to service mode.
+  - Notice and copyright for region 0008 say "HONG KONG" instead of "HONG KONG & CHINA".
+    Because of the shorter text, data between 0x015dd1 and 0x016f73 is shifted.
+
+7d) 'outzoneb'
+
+  - Different sound CPU program from 'outzone', but same coinage infos.
+  - Sound data in the sound CPU ROM is different. Because the data in 'outzoneb' is shorter,
+    all data and code after 0x1ac3 is shifted. It looks like the actual changes are in data
+    used by sounds 2, 8, and 19. However, I can't hear any obvious differences :(
+  - This set's sound CPU ROM lacks a checksum. However, because of the 'xor a' instruction
+    at 0x50e6, the ROM checksum test always "passes".
+  - Same notice screen and copyright infos as 'outzonea'.
+  - This set has many M68000 code and data differences from the other sets, too many
+    to list one by one as with 'outzoneh'. Many RAM addresses used are also different.
+  - Spelling error on the Sound Check screen: "BUTTAN" instead of "BUTTON".
+  - This set and 'outzonec' have a hidden use for the two "Unused" Dip Switches.
+    If DSWA bit 0 ("Unused") and DSWB bit 7 (also "Unused") are both set to ON and
+    P2 joystick is held DOWN during startup, video registers 0x300008 and 0x340000
+    are loaded with different values than usual (code at 0x013868 and 0x013904).
+    Unfortunately, whatever difference this is supposed to make to the display is
+    not currently known nor emulated by MAME :(
+  - Likewise, if DSWA bit 0 is ON and DSWB bit 7 is OFF, the game never starts up
+    (it seems to infinitely repeat one of the RAM tests)
+
+7e) 'outzonec'
+
+  - Region read from Territory Jumper (port 0x1c in CPU1) then stored at 0x8005 (CPU1 shared RAM) =
+    0x14000a.w (CPU0 shared RAM), then 0x2401ca.w is set based on bits 0 to 2 of the region
+    (code at 0x012742) :
+      * .....000 : 0x2401ca.w = 0000 (display Japanese story demo, etc.)
+      * .....001 : 0x2401ca.w = 0001 (display FBI logo)
+      * .....002 : 0x2401ca.w = 0002
+      *     else : 0x2401ca.w = 0003
+    This RAM address is also checked in many other places in the M68000 code.
+  - Same coinage infos as 'outzone', but see below about the sound CPU.
+  - Notice screen relies directly on bits 0 to 2 of the region stored at 0x14000a.w,
+    NOT on 0x2401ca.w (code at 0x01277a):
+      * .....000 : "JAPAN ONLY"
+      * .....001 : "U.S.A. ONLY"
+      * .....010 : "EUROPE ONLY"
+      * .....011 : "HONG KONG ONLY"
+      * .....100 : "KOREA ONLY"
+      * .....101 : "TAIWAN ONLY"
+      *     else : no notice screen
+  - Copyright does NOT rely on the region, it is hard-coded in the M68000 ROMS.
+  - This set has by far the most code and data differences from any of the other sets.
+    However, it is slightly more similar to 'outzoneb' than to the other three.
+  - Same "BUTTAN" spelling error on the Sound Check screen as 'outzoneb'.
+  - Same use for the "unused" Dip Switches as 'outzoneb'.
+  - Many of the sound commands the M68000 sends to the Z80 are shifted by 2
+    compared to the other sets, e.g.:
+        Sound effect         'outzonec'  'outzone' and others
+        ------------         ----------  --------------------
+      * Japanese story text   no sound      0x26
+      * player 8-way shot       0x26        0x28
+      * player 3-way shot       0x27        0x29
+      * title logo letters      0x2a        0x2c
+    For this reason this set plays many different (and strange/inappropriate)
+    sound effects from the other sets. This is probably not intentional, but rather
+    this set probably should have a different sound CPU ROM, like 'hellfire1a' does.
+    The M68000 code in this set is definitely older than 'outzoneb', but the Z80 code
+    is newer than 'outzoneb', which seems very unlikely to be correct.
+    Most likely the board it came from was either bootlegged or repaired by someone
+    who used the wrong Z80 ROM and didn't notice or care that the sounds were wrong.
+    Because of this I've tagged the Z80 ROM as a BAD_DUMP and tagged this set with
+    GAME_IMPERFECT_SOUND until the correct Z80 ROM is found and dumped.
 
 
 8) 'vimana' and "clones"
@@ -820,7 +967,6 @@ static INPUT_PORTS_START( toaplan1_2b )
 	PORT_BIT( 0xfffe, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-#ifdef UNREFERENCED_CODE
 static INPUT_PORTS_START( toaplan1_3b )
 	PORT_INCLUDE( toaplan1_2b )
 
@@ -830,7 +976,6 @@ static INPUT_PORTS_START( toaplan1_3b )
 	PORT_MODIFY("P2")
 	TOAPLAN_JOY_UDLR_3_BUTTONS( 2 )
 INPUT_PORTS_END
-#endif
 
 #define  TOAPLAN1_PLAYER_INPUT( player, button3, options )                                      \
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(player) options PORT_8WAY     \
@@ -974,7 +1119,7 @@ static INPUT_PORTS_START( hellfire )
 	PORT_DIPUNUSED( 0x80, IP_ACTIVE_HIGH )
 
 	/* in 0x20 (CPU1) -> 0x8005 (CPU1 shared RAM) = 0x0c000a.w (CPU0 shared RAM) -> 0x042414.w */
-	PORT_START("TJUMP")       /* Territory Jumper block - see notes */
+	PORT_START("TJUMP")       /* Territory Jumper Block - see notes */
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Region ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Europe ) )
 //  PORT_DIPSETTING(    0x03, DEF_STR( Europe ) )
@@ -1118,7 +1263,7 @@ static INPUT_PORTS_START( zerowing2 )
 	PORT_DIPUNUSED( 0x80, IP_ACTIVE_HIGH )
 
 	/* in 0x88 (CPU1) -> 0x8005 (CPU1 shared RAM) = 0x44000a.w (CPU0 shared RAM) -> 0x081ae2.w */
-	PORT_MODIFY("TJUMP")      /* Territory Jumper block - see notes */
+	PORT_MODIFY("TJUMP")      /* Territory Jumper Block - see notes */
 	PORT_DIPUNUSED( 0x01, IP_ACTIVE_HIGH )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Region ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( USA ) )
@@ -1355,48 +1500,22 @@ static INPUT_PORTS_START( samesame2 )
 	PORT_BIT( 0xf2, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* Mask bit 2 aswell */
 INPUT_PORTS_END
 
-
+/* verified from M68000 and Z80 code */
 static INPUT_PORTS_START( outzone )
-	TOAPLAN1_VBLANK_INPUT
+	PORT_INCLUDE( toaplan1_3b )
 
-	PORT_START("P1")
-	TOAPLAN1_PLAYER_INPUT( 1, IPT_BUTTON3, )
+	/* in 0x08 (CPU1) -> 0x8003 (CPU1 shared RAM) = 0x140006.w (CPU0 shared RAM) -> 0x240b44.w */
+	PORT_START("DSWA")
+	TOAPLAN_MACHINE_NO_COCKTAIL
+	TOAPLAN_COINAGE_DUAL(TJUMP, 0x0f, 0x02)                 /* see notes */
 
-	PORT_START("P2")
-	TOAPLAN1_PLAYER_INPUT( 2, IPT_BUTTON3, )
-
-	PORT_START("DSWA")      /* DSW A */
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_SERVICE( 0x04, IP_ACTIVE_HIGH )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_6C ) )
-
-	PORT_START("DSWB")      /* DSW B */
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Medium ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x00, "Every 300K" )
-	PORT_DIPSETTING(    0x04, "200K and 500K" )
-	PORT_DIPSETTING(    0x08, "300K only" )
+	/* in 0x0c (CPU1) -> 0x8004 (CPU1 shared RAM) = 0x140008.w (CPU0 shared RAM) -> 0x240b46.w */
+	PORT_START("DSWB")
+	TOAPLAN_DIFFICULTY
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) )       /* table at 0x001cc8 ('outzone' 'outzoneh' 'outzonea') */
+	PORT_DIPSETTING(    0x00, "Every 300k" )                /*        / 0x001c22 ('outzoneb') */
+	PORT_DIPSETTING(    0x04, "200k and 500k" )             /*        / 0x001c2e ('outzonec') */
+	PORT_DIPSETTING(    0x08, "300k Only" )
 	PORT_DIPSETTING(    0x0c, DEF_STR( None ) )
 	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x30, "1" )
@@ -1406,13 +1525,10 @@ static INPUT_PORTS_START( outzone )
 	PORT_DIPNAME( 0x40, 0x00, "Invulnerability" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPUNUSED( 0x80, IP_ACTIVE_HIGH )
 
-	TOAPLAN1_SYSTEM_INPUTS
-
-	PORT_START("TJUMP")     /* Territory Jumper Block */
+	/* in 0x1c (CPU1) -> 0x8005 (CPU1 shared RAM) = 0x14000a.w (CPU0 shared RAM) */
+	PORT_START("TJUMP")     /* Territory Jumper Block - see notes */
 	PORT_DIPNAME( 0x0f, 0x02, DEF_STR( Region ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Japan ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( USA ) )
@@ -1420,9 +1536,9 @@ static INPUT_PORTS_START( outzone )
 	PORT_DIPSETTING(    0x03, DEF_STR( Hong_Kong ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Korea ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( Taiwan ) )
-	PORT_DIPSETTING(    0x06, "Taiwan (Spacy Co License)" )
-	PORT_DIPSETTING(    0x07, "US (Romstar License)" )
-	PORT_DIPSETTING(    0x08, "Hong Kong (Honest Trading License)" )
+	PORT_DIPSETTING(    0x06, "Taiwan (Spacy Co., Ltd.)" )
+	PORT_DIPSETTING(    0x07, "USA (Romstar, Inc.)" )
+	PORT_DIPSETTING(    0x08, "Hong Kong & China (Honest Trading Co.)" )
 //  PORT_DIPSETTING(    0x09, DEF_STR( Japan ) )
 //  PORT_DIPSETTING(    0x0a, DEF_STR( Japan ) )
 //  PORT_DIPSETTING(    0x0b, DEF_STR( Japan ) )
@@ -1431,30 +1547,22 @@ static INPUT_PORTS_START( outzone )
 //  PORT_DIPSETTING(    0x0e, DEF_STR( Japan ) )
 //  PORT_DIPSETTING(    0x0f, DEF_STR( Japan ) )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	/* P1 : in 0x14 (CPU1) -> 0x8007 (CPU1 shared RAM) = 0x14000e.w (CPU0 shared RAM) */
+	/* P2 : in 0x18 (CPU1) -> 0x8008 (CPU1 shared RAM) = 0x140010.w (CPU0 shared RAM) */
+	/* SYSTEM : in 0x10 (CPU1) -> 0x8006 (CPU1 shared RAM) = 0x14000c.w (CPU0 shared RAM) -> 0x240b48.w */
+	/* VBLANK : 0x300000.w */
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( outzoneb )
+/* verified from M68000 and Z80 code */
+static INPUT_PORTS_START( outzonea )
 	PORT_INCLUDE( outzone )
 
-	PORT_MODIFY("TJUMP")        /* Territory Jumper Block */
-	PORT_DIPNAME( 0x07, 0x02, DEF_STR( Region ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Japan ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( USA ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Europe ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( Hong_Kong ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Korea ) )
-	PORT_DIPSETTING(    0x05, DEF_STR( Taiwan ) )
-	PORT_DIPSETTING(    0x06, "No Warning Screen" )
-	PORT_DIPSETTING(    0x07, "No Warning Screen" )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unused ) ) // doesn't seem to matter on this set
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-INPUT_PORTS_END
+	/* DSWA : in 0x08 (CPU1) -> 0x8003 (CPU1 shared RAM) = 0x140006.w (CPU0 shared RAM) -> 0x240b44.w */
+	/* DSWB : in 0x0c (CPU1) -> 0x8004 (CPU1 shared RAM) = 0x140008.w (CPU0 shared RAM) -> 0x240b46.w */
 
-static INPUT_PORTS_START( outzonec )
-	PORT_INCLUDE( outzone )
-
-	PORT_MODIFY("TJUMP")        /* Territory Jumper Block */
+	/* in 0x1c (CPU1) -> 0x8005 (CPU1 shared RAM) = 0x14000a.w (CPU0 shared RAM) */
+	PORT_MODIFY("TJUMP")        /* Territory Jumper Block - see notes */
 	PORT_DIPNAME( 0x0f, 0x02, DEF_STR( Region ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Japan ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( USA ) )
@@ -1462,9 +1570,9 @@ static INPUT_PORTS_START( outzonec )
 	PORT_DIPSETTING(    0x03, DEF_STR( Hong_Kong ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Korea ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( Taiwan ) )
-	PORT_DIPSETTING(    0x06, "Taiwan (Spacy Co License)" )
-	PORT_DIPSETTING(    0x07, "US (Romstar License)" )
-	PORT_DIPSETTING(    0x08, "Hong Kong & China (Honest Trading License)" )
+	PORT_DIPSETTING(    0x06, "Taiwan (Spacy Co., Ltd.)" )
+	PORT_DIPSETTING(    0x07, "USA (Romstar, Inc.)" )
+	PORT_DIPSETTING(    0x08, "Hong Kong (Honest Trading Co.)" )
 //  PORT_DIPSETTING(    0x09, DEF_STR( Japan ) )
 //  PORT_DIPSETTING(    0x0a, DEF_STR( Japan ) )
 //  PORT_DIPSETTING(    0x0b, DEF_STR( Japan ) )
@@ -1472,6 +1580,37 @@ static INPUT_PORTS_START( outzonec )
 //  PORT_DIPSETTING(    0x0d, DEF_STR( Japan ) )
 //  PORT_DIPSETTING(    0x0e, DEF_STR( Japan ) )
 //  PORT_DIPSETTING(    0x0f, DEF_STR( Japan ) )
+
+	/* P1 : in 0x14 (CPU1) -> 0x8007 (CPU1 shared RAM) = 0x14000e.w (CPU0 shared RAM) */
+	/* P2 : in 0x18 (CPU1) -> 0x8008 (CPU1 shared RAM) = 0x140010.w (CPU0 shared RAM) */
+	/* SYSTEM : in 0x10 (CPU1) -> 0x8006 (CPU1 shared RAM) = 0x14000c.w (CPU0 shared RAM) -> 0x240b48.w */
+	/* VBLANK : 0x300000.w */
+INPUT_PORTS_END
+
+/* verified from M68000 and Z80 code */
+static INPUT_PORTS_START( outzonec )
+	PORT_INCLUDE( outzone )
+
+	/* DSWA : in 0x08 (CPU1) -> 0x8003 (CPU1 shared RAM) = 0x140006.w (CPU0 shared RAM) -> 0x240b44.w */
+	/* DSWB : in 0x0c (CPU1) -> 0x8004 (CPU1 shared RAM) = 0x140008.w (CPU0 shared RAM) -> 0x240b46.w */
+
+	/* in 0x1c (CPU1) -> 0x8005 (CPU1 shared RAM) = 0x14000a.w (CPU0 shared RAM) */
+	PORT_MODIFY("TJUMP")        /* Territory Jumper Block - see notes */
+	PORT_DIPNAME( 0x07, 0x06, DEF_STR( Region ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Japan ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( USA ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Europe ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( Hong_Kong ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Korea ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( Taiwan ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( World ) )
+//  PORT_DIPSETTING(    0x07, DEF_STR( World ) )
+	PORT_DIPUNUSED( 0x08, IP_ACTIVE_HIGH )
+
+	/* P1 : in 0x14 (CPU1) -> 0x8007 (CPU1 shared RAM) = 0x14000e.w (CPU0 shared RAM) */
+	/* P2 : in 0x18 (CPU1) -> 0x8008 (CPU1 shared RAM) = 0x140010.w (CPU0 shared RAM) */
+	/* SYSTEM : in 0x10 (CPU1) -> 0x8006 (CPU1 shared RAM) = 0x14000c.w (CPU0 shared RAM) -> 0x240b48.w */
+	/* VBLANK : 0x300000.w */
 INPUT_PORTS_END
 
 
@@ -2435,17 +2574,30 @@ ROM_START( fireshrkdh )
 	ROM_LOAD( "prom15.20c",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) ) /* ??? */
 ROM_END
 
-
-/*
-Out Zone - Seems to be a later version, Differences:
-
-. This version is a lot harder.
-. Attract mode differs, player 1 dies early in "Demonstration 2"
-. Special pick up is Super Ball instead of Shield in attract mode.
-. Test mode can be entered and exited without any crash.
-*/
-
 ROM_START( outzone )
+	ROM_REGION( 0x040000, "maincpu", 0 )    /* Main 68K code */
+	ROM_LOAD16_BYTE( "prg2.bin",  0x000001, 0x20000, CRC(9704db16) SHA1(12b43a6961a7f63f29563eb77aaacb70d3c368dd) )
+	ROM_LOAD16_BYTE( "prg1.bin",  0x000000, 0x20000, CRC(127a38d7) SHA1(d7f1ed91ff7d4de9e8215aa3b5cb65693145e433) )
+
+	ROM_REGION( 0x8000, "audiocpu", 0 )    /* Sound Z80 code */
+	ROM_LOAD( "rom9.bin",  0x0000, 0x8000, CRC(73d8e235) SHA1(f37ad497259a467cdf2ec8b3e6e7d3e873087e6c) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD( "rom5.bin",  0x00000, 0x80000, CRC(c64ec7b6) SHA1(e73b51c3713c2ea7a572a02531c15d1261ddeaa0) )
+	ROM_LOAD( "rom6.bin",  0x80000, 0x80000, CRC(64b6c5ac) SHA1(07fa20115f603445c0d51af3465c0471c09d76b1) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD( "rom2.bin",  0x00000, 0x20000, CRC(6bb72d16) SHA1(a127b10d9c255542bd09fcb5df057c12fd28c0d1) )
+	ROM_LOAD( "rom1.bin",  0x20000, 0x20000, CRC(0934782d) SHA1(e4a775ead23227d7d6e76aea23aa3103b511d031) )
+	ROM_LOAD( "rom3.bin",  0x40000, 0x20000, CRC(ec903c07) SHA1(75906f31200877fc8f6e78c2606ad5be49778165) )
+	ROM_LOAD( "rom4.bin",  0x60000, 0x20000, CRC(50cbf1a8) SHA1(cfab1504746654b4a61912155e9aeca746c65321) )
+
+	ROM_REGION( 0x40, "proms", 0 )      /* nibble bproms, lo/hi order to be determined */
+	ROM_LOAD( "tp018_10.bpr",  0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )   /* sprite attribute (flip/position) ?? */
+	ROM_LOAD( "tp018_11.bpr",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )   /* ??? */
+ROM_END
+
+ROM_START( outzoneh )
 	ROM_REGION( 0x040000, "maincpu", 0 )    /* Main 68K code */
 	ROM_LOAD16_BYTE( "tp018_7.bin",  0x000000, 0x20000, CRC(0c2ac02d) SHA1(78fda906ef7e0bb8e4ad44f34a8ac934b75d4bd8) )
 	ROM_LOAD16_BYTE( "tp018_8.bin",  0x000001, 0x20000, CRC(ca7e48aa) SHA1(c5073e6c124d74f16d01e67949965fdca929a886) )
@@ -2509,61 +2661,37 @@ ROM_START( outzonea )
 	ROM_LOAD( "tp018_11.bpr",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )   /* ??? */
 ROM_END
 
-/* is this a prototype? */
-ROM_START( outzoneb )                   /* From board serial number 2122 */
-	ROM_REGION( 0x040000, "maincpu", 0 )    /* Main 68K code */
-	ROM_LOAD16_BYTE( "rom7.bin",  0x000000, 0x20000, CRC(936e25d8) SHA1(ffb7990ea1539d868a9ad2fb711b0febd90f098d) )
-	ROM_LOAD16_BYTE( "rom8.bin",  0x000001, 0x20000, CRC(d19b3ecf) SHA1(b406999b9f1e2104d958b42cc745bf79dbfe50b3) )
-
-	ROM_REGION( 0x8000, "audiocpu", 0 )    /* Sound Z80 code */
-	ROM_LOAD( "rom9.bin",  0x0000, 0x8000, CRC(73d8e235) SHA1(f37ad497259a467cdf2ec8b3e6e7d3e873087e6c) )
-
-	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD( "rom5.bin",  0x00000, 0x80000, CRC(c64ec7b6) SHA1(e73b51c3713c2ea7a572a02531c15d1261ddeaa0) )
-	ROM_LOAD( "rom6.bin",  0x80000, 0x80000, CRC(64b6c5ac) SHA1(07fa20115f603445c0d51af3465c0471c09d76b1) )
-
-	ROM_REGION( 0x80000, "gfx2", 0 )
-	ROM_LOAD( "rom2.bin",  0x00000, 0x20000, CRC(6bb72d16) SHA1(a127b10d9c255542bd09fcb5df057c12fd28c0d1) )
-	ROM_LOAD( "rom1.bin",  0x20000, 0x20000, CRC(0934782d) SHA1(e4a775ead23227d7d6e76aea23aa3103b511d031) )
-	ROM_LOAD( "rom3.bin",  0x40000, 0x20000, CRC(ec903c07) SHA1(75906f31200877fc8f6e78c2606ad5be49778165) )
-	ROM_LOAD( "rom4.bin",  0x60000, 0x20000, CRC(50cbf1a8) SHA1(cfab1504746654b4a61912155e9aeca746c65321) )
-
-	ROM_REGION( 0x40, "proms", 0 )      /* nibble bproms, lo/hi order to be determined */
-	ROM_LOAD( "tp018_10.bpr",  0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )   /* sprite attribute (flip/position) ?? */
-	ROM_LOAD( "tp018_11.bpr",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )   /* ??? */
-ROM_END
-
-/* from a bootleg board, but probably an alt original set with different licenses */
-ROM_START( outzonec )
-	ROM_REGION( 0x040000, "maincpu", 0 )    /* Main 68K code */
-	ROM_LOAD16_BYTE( "prg2.bin",  0x000001, 0x20000, CRC(9704db16) SHA1(12b43a6961a7f63f29563eb77aaacb70d3c368dd) )
-	ROM_LOAD16_BYTE( "prg1.bin",  0x000000, 0x20000, CRC(127a38d7) SHA1(d7f1ed91ff7d4de9e8215aa3b5cb65693145e433) )
-
-	ROM_REGION( 0x8000, "audiocpu", 0 )    /* Sound Z80 code */
-	ROM_LOAD( "rom9.bin",  0x0000, 0x8000, CRC(73d8e235) SHA1(f37ad497259a467cdf2ec8b3e6e7d3e873087e6c) )
-
-	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD( "rom5.bin",  0x00000, 0x80000, CRC(c64ec7b6) SHA1(e73b51c3713c2ea7a572a02531c15d1261ddeaa0) )
-	ROM_LOAD( "rom6.bin",  0x80000, 0x80000, CRC(64b6c5ac) SHA1(07fa20115f603445c0d51af3465c0471c09d76b1) )
-
-	ROM_REGION( 0x80000, "gfx2", 0 )
-	ROM_LOAD( "rom2.bin",  0x00000, 0x20000, CRC(6bb72d16) SHA1(a127b10d9c255542bd09fcb5df057c12fd28c0d1) )
-	ROM_LOAD( "rom1.bin",  0x20000, 0x20000, CRC(0934782d) SHA1(e4a775ead23227d7d6e76aea23aa3103b511d031) )
-	ROM_LOAD( "rom3.bin",  0x40000, 0x20000, CRC(ec903c07) SHA1(75906f31200877fc8f6e78c2606ad5be49778165) )
-	ROM_LOAD( "rom4.bin",  0x60000, 0x20000, CRC(50cbf1a8) SHA1(cfab1504746654b4a61912155e9aeca746c65321) )
-
-	ROM_REGION( 0x40, "proms", 0 )      /* nibble bproms, lo/hi order to be determined */
-	ROM_LOAD( "tp018_10.bpr",  0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )   /* sprite attribute (flip/position) ?? */
-	ROM_LOAD( "tp018_11.bpr",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )   /* ??? */
-ROM_END
-
-ROM_START( outzoned )
+ROM_START( outzoneb )
 	ROM_REGION( 0x040000, "maincpu", 0 )    /* Main 68K code */
 	ROM_LOAD16_BYTE( "tp07.bin",  0x000000, 0x20000, CRC(a85a1d48) SHA1(74f16ef5126f0ce3d94a66849ccd7c28338e3974) )
 	ROM_LOAD16_BYTE( "tp08.bin",  0x000001, 0x20000, CRC(d8cc44af) SHA1(da9c07e3670e5c7a2c1f9bc433e604a2a13b8a54) )
 
 	ROM_REGION( 0x8000, "audiocpu", 0 )    /* Sound Z80 code */
 	ROM_LOAD( "tp09.bin",  0x0000, 0x8000, CRC(dd56041f) SHA1(a481b8959b349761624166906175f8efcbebb7e7) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD( "rom5.bin",  0x00000, 0x80000, CRC(c64ec7b6) SHA1(e73b51c3713c2ea7a572a02531c15d1261ddeaa0) )
+	ROM_LOAD( "rom6.bin",  0x80000, 0x80000, CRC(64b6c5ac) SHA1(07fa20115f603445c0d51af3465c0471c09d76b1) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD( "rom2.bin",  0x00000, 0x20000, CRC(6bb72d16) SHA1(a127b10d9c255542bd09fcb5df057c12fd28c0d1) )
+	ROM_LOAD( "rom1.bin",  0x20000, 0x20000, CRC(0934782d) SHA1(e4a775ead23227d7d6e76aea23aa3103b511d031) )
+	ROM_LOAD( "rom3.bin",  0x40000, 0x20000, CRC(ec903c07) SHA1(75906f31200877fc8f6e78c2606ad5be49778165) )
+	ROM_LOAD( "rom4.bin",  0x60000, 0x20000, CRC(50cbf1a8) SHA1(cfab1504746654b4a61912155e9aeca746c65321) )
+
+	ROM_REGION( 0x40, "proms", 0 )      /* nibble bproms, lo/hi order to be determined */
+	ROM_LOAD( "tp018_10.bpr",  0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )   /* sprite attribute (flip/position) ?? */
+	ROM_LOAD( "tp018_11.bpr",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )   /* ??? */
+ROM_END
+
+/* is this a prototype? */
+ROM_START( outzonec )                   /* From board serial number 2122 */
+	ROM_REGION( 0x040000, "maincpu", 0 )    /* Main 68K code */
+	ROM_LOAD16_BYTE( "rom7.bin",  0x000000, 0x20000, CRC(936e25d8) SHA1(ffb7990ea1539d868a9ad2fb711b0febd90f098d) )
+	ROM_LOAD16_BYTE( "rom8.bin",  0x000001, 0x20000, CRC(d19b3ecf) SHA1(b406999b9f1e2104d958b42cc745bf79dbfe50b3) )
+
+	ROM_REGION( 0x8000, "audiocpu", 0 )    /* Sound Z80 code */
+	ROM_LOAD( "rom9.bin",  0x0000, 0x8000, BAD_DUMP CRC(73d8e235) SHA1(f37ad497259a467cdf2ec8b3e6e7d3e873087e6c) ) // see notes
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD( "rom5.bin",  0x00000, 0x80000, CRC(c64ec7b6) SHA1(e73b51c3713c2ea7a572a02531c15d1261ddeaa0) )
@@ -2689,11 +2817,11 @@ GAME( 1990, fireshrkd,  fireshrk, samesame, samesame2, toaplan1_state, toaplan1,
 GAME( 1990, fireshrkdh, fireshrk, samesame, samesame2, toaplan1_state, toaplan1, ROT270, "Toaplan (Dooyong license)", "Fire Shark (Korea, set 2, harder)", GAME_NO_SOUND )
 GAME( 1989, samesame,   fireshrk, samesame, samesame, toaplan1_state,  toaplan1, ROT270, "Toaplan", "Same! Same! Same! (1P set)", GAME_NO_SOUND )
 GAME( 1989, samesame2,  fireshrk, samesame, samesame2, toaplan1_state, toaplan1, ROT270, "Toaplan", "Same! Same! Same! (2P set)", GAME_NO_SOUND )
-GAME( 1990, outzone,    0,        outzone,  outzone, toaplan1_state,   toaplan1, ROT270, "Toaplan", "Out Zone (set 1)", 0 ) // later fixed version
-GAME( 1990, outzonea,   outzone,  outzone,  outzone, toaplan1_state,   toaplan1, ROT270, "Toaplan", "Out Zone (set 2)", 0 )
-GAME( 1990, outzoneb,   outzone,  outzone,  outzoneb, toaplan1_state,  toaplan1, ROT270, "Toaplan", "Out Zone (set 3, prototype?)", 0 ) // early revision at least
-GAME( 1990, outzonec,   outzone,  outzone,  outzonec, toaplan1_state,  toaplan1, ROT270, "Toaplan", "Out Zone (set 4)", 0 )
-GAME( 1990, outzoned,   outzone,  outzone,  outzonec, toaplan1_state,  toaplan1, ROT270, "Toaplan", "Out Zone (set 5)", 0 )
+GAME( 1990, outzone,    0,        outzone,  outzone, toaplan1_state,   toaplan1, ROT270, "Toaplan", "Out Zone", 0 )
+GAME( 1990, outzoneh,   outzone,  outzone,  outzone, toaplan1_state,   toaplan1, ROT270, "Toaplan", "Out Zone (harder)", 0 )
+GAME( 1990, outzonea,   outzone,  outzone,  outzonea, toaplan1_state,  toaplan1, ROT270, "Toaplan", "Out Zone (old set)", 0 )
+GAME( 1990, outzoneb,   outzone,  outzone,  outzonea, toaplan1_state,  toaplan1, ROT270, "Toaplan", "Out Zone (older set)", 0 )
+GAME( 1990, outzonec,   outzone,  outzone,  outzonec, toaplan1_state,  toaplan1, ROT270, "Toaplan", "Out Zone (oldest set)", GAME_IMPERFECT_SOUND ) // prototype?
 GAME( 1991, vimana,     0,        vimana,   vimana, toaplan1_state,    vimana,   ROT270, "Toaplan", "Vimana (World, set 1)", GAME_NO_SOUND )
 GAME( 1991, vimanan,    vimana,   vimana,   vimanan, toaplan1_state,   vimana,   ROT270, "Toaplan", "Vimana (World, set 2)", GAME_NO_SOUND )
 GAME( 1991, vimanaj,    vimana,   vimana,   vimanaj, toaplan1_state,   vimana,   ROT270, "Toaplan", "Vimana (Japan)", GAME_NO_SOUND )
