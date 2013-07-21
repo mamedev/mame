@@ -114,7 +114,7 @@ static INPUT_PORTS_START( volfied )
 	PORT_DIPSETTING(    0x20, "4" )
 	PORT_DIPSETTING(    0x10, "5" )
 	PORT_DIPSETTING(    0x00, "6" )
-	PORT_DIPNAME( 0x40, 0x40, "Cheat - 32768 Lives" )	PORT_DIPLOCATION("SW2:7")	/* code at 0x0015cc - Manual shows unused and OFF */
+	PORT_DIPNAME( 0x40, 0x40, "32768 Lives (Cheat)" )	PORT_DIPLOCATION("SW2:7")	/* code at 0x0015cc - Manual shows unused and OFF */
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Language ) )		PORT_DIPLOCATION("SW2:8")
