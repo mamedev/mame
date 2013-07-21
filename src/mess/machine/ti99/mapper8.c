@@ -42,17 +42,8 @@
 
 #include "mapper8.h"
 
-#define VERBOSE 0
+#define VERBOSE 1
 #define LOG logerror
-
-// Pseudo devices which are not implemented by a proper device. We use these
-// constants in the read/write functions.
-#define MAP8_SRAM (void*)1L
-#define MAP8_ROM0 (void*)2L
-#define MAP8_ROM1 (void*)3L
-#define MAP8_ROM1A (void*)4L
-#define MAP8_DRAM (void*)5L
-#define MAP8_INTS (void*)6L
 
 ti998_mapper_device::ti998_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 : bus8z_device(mconfig, MAPPER8, "TI-99/8 Memory mapper", tag, owner, clock, "ti99_mapper8", __FILE__)
@@ -122,7 +113,7 @@ READ8_MEMBER( ti998_mapper_device::readm )
 	UINT8 value = 0;
 	bool found = false;
 	if (VERBOSE>5) LOG("mapper8: read from %04x\n", offset);
-	found = search_logically_addressed_r(space, offset, &value, mem_mask);
+	found = access_logical_r(space, offset, &value, mem_mask);
 	m_waitcount = 2;
 
 	if (!found)
@@ -133,7 +124,7 @@ READ8_MEMBER( ti998_mapper_device::readm )
 		UINT32  pas_address = m_pas_offset[(offset & 0xf000)>>12] + (offset & 0xfff);
 
 		// So now let's do the same as above with physical addresses
-		search_physically_addressed_r(space, pas_address, &value, mem_mask);
+		access_physical_r(space, pas_address, &value, mem_mask);
 
 		// The PAS area requires one more wait state, as the address bus
 		// is multiplexed
@@ -151,7 +142,7 @@ WRITE8_MEMBER( ti998_mapper_device::writem )
 	bool found = false;
 
 	// Look for components responding to the logical address
-	found = search_logically_addressed_w(space, offset, data, mem_mask);
+	found = access_logical_w(space, offset, data, mem_mask);
 	m_waitcount = 2;
 
 	if (!found)
@@ -162,7 +153,7 @@ WRITE8_MEMBER( ti998_mapper_device::writem )
 		UINT32 pas_address = m_pas_offset[(offset & 0xf000)>>12] + (offset & 0xfff);
 
 		// So now let's do the same as above with physical addresses
-		search_physically_addressed_w(space, pas_address, data, mem_mask);
+		access_physical_w(space, pas_address, data, mem_mask);
 
 		// The PAS area requires one more wait state, as the address bus
 		// is multiplexed
@@ -265,185 +256,174 @@ void ti998_mapper_device::mapwrite(int offset, UINT8 data)
     Lookup methods.
 ***************************************************************************/
 
-bool ti998_mapper_device::search_logically_addressed_r(address_space& space, offs_t offset, UINT8 *value, UINT8 mem_mask )
+bool ti998_mapper_device::access_logical_r(address_space& space, offs_t offset, UINT8 *value, UINT8 mem_mask )
 {
 	bool found = false;
-	log_addressed_device *dev = m_logcomp.first();
+	logically_addressed_device *ldev = m_logcomp.first();
+	bus8z_device *bdev = NULL;
 
 	if (VERBOSE>8) LOG("mapper8: offset=%04x; CRUS=%d, PTGEN=%d\n", offset, m_CRUS? 1:0, m_PTGE? 0:1);
-	while (dev != NULL)
+	while (ldev != NULL)
 	{
-		if (VERBOSE>5) LOG("mapper8: checking node=%s\n", dev->m_config->name);
+		if (VERBOSE>5) LOG("mapper8: checking node=%s\n", ldev->m_config->name);
 		// Check the mode
-		if (((dev->m_config->mode == NATIVE) && (m_CRUS==false))
-			|| ((dev->m_config->mode == TI99EM) && (m_CRUS==true))
-			|| ((dev->m_config->mode == PATGEN) && (m_PTGE==true)))
+		if (((ldev->m_config->mode == NATIVE) && (m_CRUS==false))
+			|| ((ldev->m_config->mode == TI99EM) && (m_CRUS==true))
+			|| ((ldev->m_config->mode == PATGEN) && (m_PTGE==true)))
 		{
-			if ((offset & dev->m_config->address_mask)==dev->m_config->select_pattern)
+			if ((offset & ldev->m_config->address_mask)==ldev->m_config->select_pattern)
 			{
-				if (dev->m_device == MAP8_SRAM)
+				switch (ldev->m_kind)
 				{
-					*value = m_sram[offset & ~dev->m_config->address_mask];
+				case MAP8_SRAM:
+					*value = m_sram[offset & ~ldev->m_config->address_mask];
 					if (VERBOSE>7) LOG("mapper8: (SRAM) %04x -> %02x\n", offset, *value);
-				}
-				else
-				{
-					if (dev->m_device == MAP8_ROM0)
-					{
-						// Starts at 0000
-						*value = m_rom[offset & ~dev->m_config->address_mask];
-						if (VERBOSE>7) LOG("mapper8: (ROM)  %04x -> %02x\n", offset, *value);
-					}
-					else
-					{
-						// device
-						bus8z_device *bdev = static_cast<bus8z_device*>(dev->m_device);
-						bdev->readz(space, offset, value, mem_mask);
-						if (VERBOSE>7) LOG("mapper8: (dev %s)  %04x -> %02x\n", dev->m_config->name, offset, *value);
-					}
+					break;
+				case MAP8_ROM0:
+					// Starts at 0000
+					*value = m_rom[offset & ~ldev->m_config->address_mask];
+					if (VERBOSE>7) LOG("mapper8: (ROM)  %04x -> %02x\n", offset, *value);
+					break;
+				case MAP8_DEV:
+					// device
+					bdev = static_cast<bus8z_device*>(ldev->m_device);
+					bdev->readz(space, offset, value, mem_mask);
+					if (VERBOSE>7) LOG("mapper8: (dev %s)  %04x -> %02x\n", ldev->m_config->name, offset, *value);
+					break;
+				default:
+					if (VERBOSE>1) LOG("mapper8: Invalid kind for read access: %d\n", ldev->m_kind);
 				}
 				found = true;
-				if (dev->m_config->stop==STOP) break;
+				if (ldev->m_config->stop==STOP) break;
 			}
 		}
-		dev = dev->m_next;
+		ldev = ldev->m_next;
 	}
 	return found;
 }
 
-bool ti998_mapper_device::search_logically_addressed_w(address_space& space, offs_t offset, UINT8 data, UINT8 mem_mask )
+bool ti998_mapper_device::access_logical_w(address_space& space, offs_t offset, UINT8 data, UINT8 mem_mask )
 {
 	bool found = false;
-	log_addressed_device *dev = m_logcomp.first();
+	logically_addressed_device *ldev = m_logcomp.first();
+	bus8z_device *bdev = NULL;
 
-	while (dev != NULL)
+	while (ldev != NULL)
 	{
 		// Check the mode
-		if (((dev->m_config->mode == NATIVE) && (m_CRUS==false))
-			|| ((dev->m_config->mode == TI99EM) && (m_CRUS==true))
-			|| ((dev->m_config->mode == PATGEN) && (m_PTGE==true)))
+		if (((ldev->m_config->mode == NATIVE) && (m_CRUS==false))
+			|| ((ldev->m_config->mode == TI99EM) && (m_CRUS==true))
+			|| ((ldev->m_config->mode == PATGEN) && (m_PTGE==true)))
 		{
-			if ((offset & dev->m_config->address_mask)==(dev->m_config->select_pattern | dev->m_config->write_select))
+			if ((offset & ldev->m_config->address_mask)==(ldev->m_config->select_pattern | ldev->m_config->write_select))
 			{
-				if (dev->m_device == MAP8_SRAM)
+				switch (ldev->m_kind)
 				{
-					m_sram[offset & ~dev->m_config->address_mask] = data;
+				case MAP8_SRAM:
+					m_sram[offset & ~ldev->m_config->address_mask] = data;
 					if (VERBOSE>7) LOG("mapper8: (SRAM) %04x <- %02x\n", offset, data);
-				}
-				else
-				{
-					if (dev->m_device == MAP8_ROM0)
-					{
-						if (VERBOSE>7) LOG("mapper8: (ROM)  %04x <- %02x (ignored)\n", offset, data);
-					}
-					else
-					{
-						// device
-						bus8z_device *bdev = static_cast<bus8z_device*>(dev->m_device);
-						bdev->write(space, offset, data, mem_mask);
-						if (VERBOSE>7) LOG("mapper8: (dev %s)  %04x <- %02x\n", dev->m_config->name, offset, data);
-					}
+					break;
+				case MAP8_ROM0:
+					if (VERBOSE>7) LOG("mapper8: (ROM)  %04x <- %02x (ignored)\n", offset, data);
+					break;
+				case MAP8_DEV:
+					// device
+					bdev = static_cast<bus8z_device*>(ldev->m_device);
+					bdev->write(space, offset, data, mem_mask);
+					if (VERBOSE>7) LOG("mapper8: (dev %s)  %04x <- %02x\n", ldev->m_config->name, offset, data);
+					break;
+				default:
+					if (VERBOSE>1) LOG("mapper8: Invalid kind for write access: %d\n", ldev->m_kind);
 				}
 				found = true;
-				if (dev->m_config->stop==STOP) break;
+				if (ldev->m_config->stop==STOP) break;
 			}
 		}
-		dev = dev->m_next;
+		ldev = ldev->m_next;
 	}
 	return found;
 }
 
 
-void ti998_mapper_device::search_physically_addressed_r( address_space& space, offs_t pas_address, UINT8 *value, UINT8 mem_mask )
+void ti998_mapper_device::access_physical_r( address_space& space, offs_t pas_address, UINT8 *value, UINT8 mem_mask )
 {
-	phys_addressed_device *dev = m_physcomp.first();
+	physically_addressed_device *pdev = m_physcomp.first();
+	bus8z_device *bdev = NULL;
 
-	while (dev != NULL)
+	while (pdev != NULL)
 	{
-		if ((pas_address & dev->m_config->address_mask)==dev->m_config->select_pattern)
+		if ((pas_address & pdev->m_config->address_mask)==pdev->m_config->select_pattern)
 		{
-			if (dev->m_device == MAP8_DRAM)
+			switch (pdev->m_kind)
 			{
-				*value = m_dram[pas_address & ~dev->m_config->address_mask];
+			case MAP8_DRAM:
+				*value = m_dram[pas_address & ~pdev->m_config->address_mask];
 				if (VERBOSE>3) LOG("mapper8: (DRAM) %06x -> %02x\n", pas_address, *value);
+				break;
+			case MAP8_ROM1:
+				// Starts at 2000 in the image, 8K
+				*value = m_rom[0x2000 | (pas_address & 0x1fff)];
+				if (VERBOSE>3) LOG("mapper8: (ROM) %06x -> %02x\n", pas_address, *value);
+				break;
+			case MAP8_ROM1A:
+				// Starts at 6000 in the image, 8K
+				*value = m_rom[0x6000 | (pas_address & 0x1fff)];
+				if (VERBOSE>3) LOG("mapper8: (ROM)  %06x -> %02x\n", pas_address, *value);
+				break;
+			case MAP8_INTS:
+				// Interrupt sense
+				if (VERBOSE>1) LOG("ti99_8: ILSENSE not implemented.\n");
+				break;
+			case MAP8_DEV:
+				// devices
+				bdev = static_cast<bus8z_device*>(pdev->m_device);
+				bdev->readz(space, pas_address, value, mem_mask);
+				if (VERBOSE>7) LOG("mapper8: (dev %s)  %06x -> %02x\n", pdev->m_config->name, pas_address, *value);
+				break;
+			default:
+				if (VERBOSE>1) LOG("mapper8: Invalid kind for physical read access: %d\n", pdev->m_kind);
 			}
-			else
-			{
-				if (dev->m_device == MAP8_ROM1)
-				{
-					// Starts at 2000 in the image, 8K
-					*value = m_rom[0x2000 | (pas_address & 0x1fff)];
-					if (VERBOSE>3) LOG("mapper8: (ROM) %06x -> %02x\n", pas_address, *value);
-				}
-				else
-				{
-					if (dev->m_device == MAP8_ROM1A)
-					{
-						// Starts at 6000 in the image, 8K
-						*value = m_rom[0x6000 | (pas_address & 0x1fff)];
-						if (VERBOSE>3) LOG("mapper8: (ROM)  %06x -> %02x\n", pas_address, *value);
-					}
-					else
-					{
-						if (dev->m_device == MAP8_INTS)
-						{
-							// Interrupt sense
-							if (VERBOSE>1) LOG("ti99_8: ILSENSE not implemented.\n");
-						}
-						else
-						{
-							// devices
-							bus8z_device *bdev = static_cast<bus8z_device*>(dev->m_device);
-							bdev->readz(space, pas_address, value, mem_mask);
-							if (VERBOSE>7) LOG("mapper8: (dev %s)  %06x -> %02x\n", dev->m_config->name, pas_address, *value);
-						}
-					}
-				}
-			}
-			if (dev->m_config->stop==STOP) break;
+			if (pdev->m_config->stop==STOP) break;
 		}
-		dev = dev->m_next;
+		pdev = pdev->m_next;
 	}
 }
 
-void ti998_mapper_device::search_physically_addressed_w( address_space& space, offs_t pas_address, UINT8 data, UINT8 mem_mask )
+void ti998_mapper_device::access_physical_w( address_space& space, offs_t pas_address, UINT8 data, UINT8 mem_mask )
 {
-	phys_addressed_device *dev = m_physcomp.first();
+	physically_addressed_device *pdev = m_physcomp.first();
+	bus8z_device *bdev = NULL;
 
-	while (dev != NULL)
+	while (pdev != NULL)
 	{
-		if ((pas_address & dev->m_config->address_mask)==(dev->m_config->select_pattern | dev->m_config->write_select))
+		if ((pas_address & pdev->m_config->address_mask)==(pdev->m_config->select_pattern | pdev->m_config->write_select))
 		{
-			if (dev->m_device == MAP8_DRAM)
+			switch (pdev->m_kind)
 			{
-				m_dram[pas_address & ~dev->m_config->address_mask] = data;
+			case MAP8_DRAM:
+				m_dram[pas_address & ~pdev->m_config->address_mask] = data;
 				if (VERBOSE>3) LOG("mapper8: (DRAM) %06x <- %02x\n", pas_address, data);
+				break;
+			case MAP8_ROM1:
+			case MAP8_ROM1A:
+				if (VERBOSE>7) LOG("mapper8: (ROM)  %06x <- %02x (ignored)\n", pas_address, data);
+				break;
+			case MAP8_INTS:
+				// Interrupt sense
+				if (VERBOSE>1) LOG("ti99_8: write to ilsense ignored\n");
+				break;
+			case MAP8_DEV:
+				// devices
+				bdev = static_cast<bus8z_device*>(pdev->m_device);
+				if (VERBOSE>7) LOG("mapper8: (dev %s)  %06x <- %02x\n", pdev->m_config->name, pas_address, data);
+				bdev->write(space, pas_address, data, mem_mask);
+				break;
+			default:
+				if (VERBOSE>1) LOG("mapper8: Invalid kind for physical write access: %d\n", pdev->m_kind);
 			}
-			else
-			{
-				if (dev->m_device == MAP8_ROM1 || dev->m_device == MAP8_ROM1A)
-				{
-					if (VERBOSE>7) LOG("mapper8: (ROM)  %06x <- %02x (ignored)\n", pas_address, data);
-				}
-				else
-				{
-					if (dev->m_device == MAP8_INTS)
-					{
-						// Interrupt sense
-						if (VERBOSE>1) LOG("ti99_8: write to ilsense ignored\n");
-					}
-					else
-					{
-						// devices
-						bus8z_device *bdev = static_cast<bus8z_device*>(dev->m_device);
-						if (VERBOSE>7) LOG("mapper8: (dev %s)  %06x <- %02x\n", dev->m_config->name, pas_address, data);
-						bdev->write(space, pas_address, data, mem_mask);
-					}
-				}
-			}
-			if (dev->m_config->stop==STOP) break;
+			if (pdev->m_config->stop==STOP) break;
 		}
-		dev = dev->m_next;
+		pdev = pdev->m_next;
 	}
 }
 
@@ -464,9 +444,6 @@ void ti998_mapper_device::clock_in(int clock)
 /***************************************************************************
     DEVICE LIFECYCLE FUNCTIONS
 ***************************************************************************/
-// String values of the pseudo constants, used in the configuration.
-static const char *const pseudodev[6] = { SRAMNAME, ROM0NAME, ROM1NAME, ROM1ANAME, DRAMNAME, INTSNAME };
-
 /*
     We need to do all of the configuration in device_start since we don't have all
     required links earlier.
@@ -476,6 +453,9 @@ static const char *const pseudodev[6] = { SRAMNAME, ROM0NAME, ROM1NAME, ROM1ANAM
 void ti998_mapper_device::device_start()
 {
 	if (VERBOSE>5) LOG("ti99_8: Starting mapper\n");
+
+	// String values of the pseudo constants, used in the configuration.
+	const char *const pseudodev[6] = { SRAMNAME, ROM0NAME, ROM1NAME, ROM1ANAME, DRAMNAME, INTSNAME };
 
 	const mapper8_config *conf = reinterpret_cast<const mapper8_config *>(static_config());
 
@@ -503,35 +483,31 @@ void ti998_mapper_device::device_start()
 			}
 			else
 			{
-				// Here we replace the device names by their pointers and the pseudo device
-				// names by their constants MAP8_SRAM ... MAP8_INTS. */
+				device_t *dev = NULL;
+				mapper8_device_kind kind = MAP8_UNDEF;
 
-				// To make thing efficient, we abuse the pointers with special
-				// values for the ROM and RAM. (Otherwise we would have to
-				// build complete devices for ROM and RAM.)
-				void *dev = NULL;
-				for (long long j=1; (j < 7) && (dev == NULL); j++)
+				for (int j=1; (j < 7) && (kind == MAP8_UNDEF); j++)
 				{
 					// Pseudo devices are enumerated as 1 ... 6 (see MAP8_SRAM etc.)
-					if (strcmp(entry[i].name, pseudodev[j-1])==0)
-						dev = (void *)j;
+					if (strcmp(entry[i].name, pseudodev[j-1])==0) kind = (mapper8_device_kind)j;
 				}
-				if (dev==NULL)
+				if (kind==MAP8_UNDEF)
 				{
 					// This entry points to a "real" device, not to a special constant
+					kind = MAP8_DEV;
 					dev = machine().device(entry[i].name);
 				}
-				if (dev != NULL)
+				if (kind != MAP8_DEV || dev != NULL)
 				{
 					if (entry[i].mode != PHYSIC)
 					{
-						log_addressed_device *ad = new log_addressed_device((device_t*)dev, entry[i]);
+						logically_addressed_device *ad = new logically_addressed_device(kind, (device_t*)dev, entry[i]);
 						m_logcomp.append(*ad);
 						if (VERBOSE>6) LOG("mapper8: Device %s mounted into logical address space.\n", entry[i].name);
 					}
 					else
 					{
-						phys_addressed_device *ad = new phys_addressed_device((device_t*)dev, entry[i]);
+						physically_addressed_device *ad = new physically_addressed_device(kind, (device_t*)dev, entry[i]);
 						m_physcomp.append(*ad);
 						if (VERBOSE>6) LOG("mapper8: Device %s mounted into physical address space.\n", entry[i].name);
 					}

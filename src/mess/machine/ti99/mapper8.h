@@ -36,6 +36,20 @@ extern const device_type MAPPER8;
 #define SRAM_SIZE 2048
 #define DRAM_SIZE 65536
 
+// Pseudo devices which are not implemented by a proper device. We use these
+// constants in the read/write functions.
+enum mapper8_device_kind
+{
+	MAP8_UNDEF = 0,
+	MAP8_SRAM,
+	MAP8_ROM0,
+	MAP8_ROM1,
+	MAP8_ROM1A,
+	MAP8_DRAM,
+	MAP8_INTS,
+	MAP8_DEV        // device by name
+};
+
 struct mapper8_list_entry
 {
 	const char* name;               // Name of the device (used for looking up the device)
@@ -58,35 +72,37 @@ struct mapper8_config
 /*
     Device list of the mapper.
 */
-class log_addressed_device
+class logically_addressed_device
 {
-	friend class simple_list<log_addressed_device>;
+	friend class simple_list<logically_addressed_device>;
 	friend class ti998_mapper_device;
 
 public:
-	log_addressed_device(device_t *busdevice, const mapper8_list_entry &entry)
-	:   m_device(busdevice), m_config(&entry) { };
+	logically_addressed_device(mapper8_device_kind kind, device_t *busdevice, const mapper8_list_entry &entry)
+	:   m_kind(kind), m_device(busdevice), m_config(&entry) { };
 
 private:
-	log_addressed_device        *m_next;        // needed for simple_list
-	device_t                    *m_device;      // the actual device
-	const mapper8_list_entry    *m_config;
+	logically_addressed_device     *m_next;        // needed for simple_list
+	mapper8_device_kind       m_kind;         // named device or predefined
+	device_t                 *m_device;      // the actual device
+	const mapper8_list_entry *m_config;
 };
 
 /*
     Device list of the mapper.
 */
-class phys_addressed_device
+class physically_addressed_device
 {
-	friend class simple_list<phys_addressed_device>;
+	friend class simple_list<physically_addressed_device>;
 	friend class ti998_mapper_device;
 
 public:
-	phys_addressed_device(device_t *busdevice, const mapper8_list_entry &entry)
-	:   m_device(busdevice), m_config(&entry) { };
+	physically_addressed_device(mapper8_device_kind kind, device_t *busdevice, const mapper8_list_entry &entry)
+	:   m_kind(kind), m_device(busdevice), m_config(&entry) { };
 
 private:
-	phys_addressed_device       *m_next;        // needed for simple_list
+	physically_addressed_device       *m_next;        // needed for simple_list
+	mapper8_device_kind          m_kind;          // named device or predefined
 	device_t                    *m_device;      // the actual device
 	const mapper8_list_entry    *m_config;
 };
@@ -117,20 +133,20 @@ protected:
 	virtual void device_reset(void);
 
 private:
-	bool search_logically_addressed_r(address_space& space, offs_t offset, UINT8 *value, UINT8 mem_mask );
-	bool search_logically_addressed_w(address_space& space, offs_t offset, UINT8 data, UINT8 mem_mask );
-	void search_physically_addressed_r(address_space& space, offs_t offset, UINT8 *value, UINT8 mem_mask );
-	void search_physically_addressed_w(address_space& space, offs_t offset, UINT8 data, UINT8 mem_mask );
+	bool access_logical_r(address_space& space, offs_t offset, UINT8 *value, UINT8 mem_mask );
+	bool access_logical_w(address_space& space, offs_t offset, UINT8 data, UINT8 mem_mask );
+	void access_physical_r(address_space& space, offs_t offset, UINT8 *value, UINT8 mem_mask );
+	void access_physical_w(address_space& space, offs_t offset, UINT8 data, UINT8 mem_mask );
 	void mapwrite(int offset, UINT8 data);
 
 	// Ready line to the CPU
 	devcb_resolved_write_line m_ready;
 
 	// All devices that are attached to the 16-bit address bus.
-	simple_list<log_addressed_device> m_logcomp;
+	simple_list<logically_addressed_device> m_logcomp;
 
 	// All devices that are attached to the 24-bit mapped address bus.
-	simple_list<phys_addressed_device> m_physcomp;
+	simple_list<physically_addressed_device> m_physcomp;
 
 	// Select bit for the internal DSR.
 	bool    m_dsr_selected;
