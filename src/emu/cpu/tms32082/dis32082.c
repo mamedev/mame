@@ -34,6 +34,44 @@ static UINT32 fetch(void)
 	return d;
 }
 
+static char* get_creg_name(UINT32 reg)
+{
+	static char buffer[64];
+
+	switch (reg)
+	{
+		case 0x0000:	sprintf(buffer, "EPC"); break;
+		case 0x0001:	sprintf(buffer, "EIP"); break;
+		case 0x0002:	sprintf(buffer, "CONFIG"); break;
+		case 0x0004:	sprintf(buffer, "INTPEN"); break;
+		case 0x0006:	sprintf(buffer, "IE"); break;
+		case 0x0008:	sprintf(buffer, "FPST"); break;
+		case 0x000a:	sprintf(buffer, "PPERROR"); break;
+		case 0x000d:	sprintf(buffer, "PKTREQ"); break;
+		case 0x000e:	sprintf(buffer, "TCOUNT"); break;
+		case 0x000f:	sprintf(buffer, "TSCALE"); break;
+		case 0x0010:	sprintf(buffer, "FLTOP"); break;
+		case 0x0011:	sprintf(buffer, "FLTADR"); break;
+		case 0x0012:	sprintf(buffer, "FLTTAG"); break;
+		case 0x0013:	sprintf(buffer, "FLTDTL"); break;
+		case 0x0014:	sprintf(buffer, "FLTDTH"); break;
+		case 0x0020:	sprintf(buffer, "SYSSTK"); break;
+		case 0x0021:	sprintf(buffer, "SYSTMP"); break;
+		case 0x0030:	sprintf(buffer, "MPC"); break;
+		case 0x0031:	sprintf(buffer, "MIP"); break;
+		case 0x0033:	sprintf(buffer, "ECOMCNTL"); break;
+		case 0x0034:	sprintf(buffer, "ANASTAT"); break;
+		case 0x0039:	sprintf(buffer, "BRK1"); break;
+		case 0x003a:	sprintf(buffer, "BRK2"); break;
+		case 0x4000:	sprintf(buffer, "IN0P"); break;
+		case 0x4001:	sprintf(buffer, "IN1P"); break;
+		case 0x4002:	sprintf(buffer, "OUTP"); break;
+		default:		sprintf(buffer, "CR %04X\n", reg);
+	}
+
+	return buffer;
+}
+
 static offs_t tms32082_disasm_mp(char *buffer, offs_t pc, const UINT8 *oprom)
 {
 	output = buffer;
@@ -63,18 +101,18 @@ static offs_t tms32082_disasm_mp(char *buffer, offs_t pc, const UINT8 *oprom)
 				case 0x00:	print("illop0      "); break;
 				case 0x01:	print("trap        %d", UIMM15(uimm15)); break;
 				case 0x02:	print("cmnd        0x%04X", UIMM15(uimm15)); break;
-				case 0x04:	print("rdcr        R%d, CR 0x%04X", rd, UIMM15(uimm15)); break;
-				case 0x05:	print("swcr        CR 0x%04X, R%d, R%d", UIMM15(uimm15), rs, rd); break;
+				case 0x04:	print("rdcr        R%d, %s", rd, get_creg_name(UIMM15(uimm15))); break;
+				case 0x05:	print("swcr        %s, R%d, R%d", get_creg_name(UIMM15(uimm15)), rs, rd); break;
 				case 0x06:	print("brcr        0x%04X", UIMM15(uimm15)); break;
-				case 0x08:	print("shift.dz    %d, %d, R%d, R%d", rotate, endmask, rs, rd); break;
-				case 0x09:	print("shift.dm    %d, %d, R%d, R%d", rotate, endmask, rs, rd); break;
-				case 0x0a:	print("shift.ds    %d, %d, R%d, R%d", rotate, endmask, rs, rd); break;
-				case 0x0b:	print("shift.ez    %d, %d, R%d, R%d", rotate, endmask, rs, rd); break;
-				case 0x0c:	print("shift.em    %d, %d, R%d, R%d", rotate, endmask, rs, rd); break;
-				case 0x0d:	print("shift.es    %d, %d, R%d, R%d", rotate, endmask, rs, rd); break;
-				case 0x0e:	print("shift.iz    %d, %d, R%d, R%d", rotate, endmask, rs, rd); break;
-				case 0x0f:	print("shift.im    %d, %d, R%d, R%d", rotate, endmask, rs, rd); break;
-				case 0x10:	print("and         0x%04X, R%d, R%d", UIMM15(uimm15), rs, rd); break;
+				case 0x08:	print("shift%s.dz   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
+				case 0x09:	print("shift%s.dm   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
+				case 0x0a:	print("shift%s.ds   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
+				case 0x0b:	print("shift%s.ez   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
+				case 0x0c:	print("shift%s.em   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
+				case 0x0d:	print("shift%s.es   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
+				case 0x0e:	print("shift%s.iz   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
+				case 0x0f:	print("shift%s.im   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
+				case 0x11:	print("and         0x%04X, R%d, R%d", UIMM15(uimm15), rs, rd); break;
 				case 0x12:	print("and.tf      0x%04X, R%d, R%d", UIMM15(uimm15), rs, rd); break;
 				case 0x14:	print("and.ft      0x%04X, R%d, R%d", UIMM15(uimm15), rs, rd); break;
 				case 0x16:	print("xor         0x%04X, R%d, R%d", UIMM15(uimm15), rs, rd); break;
@@ -152,20 +190,20 @@ static offs_t tms32082_disasm_mp(char *buffer, offs_t pc, const UINT8 *oprom)
 				case 0x04:	print("cmnd        R%d", src1); break;
 				case 0x05:	print("cmnd        0x%08X", imm32); break;
 				case 0x08:	print("rdcr        R%d, R%d", rd, src1); break;
-				case 0x09:	print("rdcr        R%d, 0x%08X", rd, imm32); break;
+				case 0x09:	print("rdcr        R%d, %s", rd, get_creg_name(imm32)); break;
 				case 0x0a:	print("swcr        R%d, R%d, R%d", src1, rs, rd); break;
-				case 0x0b:	print("swcr        0x%08X, R%d, R%d", imm32, rs, rd); break;
+				case 0x0b:	print("swcr        %s, R%d, R%d", get_creg_name(imm32), rs, rd); break;
 				case 0x0c:	print("brcr        R%d", src1); break;
 				case 0x0d:	print("brcr        0x%08X", imm32); break;
 
-				case 0x10:	print("shift.dz    %d, %d, R%d, R%d", rotate, endmask, rs, rd); break;
-				case 0x12:	print("shift.dm    %d, %d, R%d, R%d", rotate, endmask, rs, rd); break;
-				case 0x14:	print("shift.ds    %d, %d, R%d, R%d", rotate, endmask, rs, rd); break;
-				case 0x16:	print("shift.ez    %d, %d, R%d, R%d", rotate, endmask, rs, rd); break;
-				case 0x18:	print("shift.em    %d, %d, R%d, R%d", rotate, endmask, rs, rd); break;
-				case 0x1a:	print("shift.es    %d, %d, R%d, R%d", rotate, endmask, rs, rd); break;
-				case 0x1c:	print("shift.iz    %d, %d, R%d, R%d", rotate, endmask, rs, rd); break;
-				case 0x1e:	print("shift.im    %d, %d, R%d, R%d", rotate, endmask, rs, rd); break;
+				case 0x10:	print("shift%s.dz   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
+				case 0x12:	print("shift%s.dm   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
+				case 0x14:	print("shift%s.ds   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
+				case 0x16:	print("shift%s.ez   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
+				case 0x18:	print("shift%s.em   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
+				case 0x1a:	print("shift%s.es   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
+				case 0x1c:	print("shift%s.iz   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
+				case 0x1e:	print("shift%s.im   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
 
 				case 0x22:	print("and         R%d, R%d, R%d", src1, rs, rd); break;
 				case 0x23:	print("and         0x%08X, R%d, R%d", imm32, rs, rd); break;

@@ -48,13 +48,77 @@ offs_t tms32082_mp_device::disasm_disassemble(char *buffer, offs_t pc, const UIN
 
 READ32_MEMBER(tms32082_mp_device::mp_param_r)
 {
-	printf("mp_param_w: %08X, %08X\n", offset, mem_mask);
-	return 0;
+	//printf("mp_param_w: %08X, %08X\n", offset, mem_mask);
+	return m_param_ram[offset];
 }
 
 WRITE32_MEMBER(tms32082_mp_device::mp_param_w)
 {
-	printf("mp_param_w: %08X, %08X, %08X\n", offset, data, mem_mask);
+	//printf("mp_param_w: %08X, %08X, %08X\n", offset, data, mem_mask);
+
+	COMBINE_DATA(&m_param_ram[offset]);
+
+	if (offset == 0x3f)
+	{
+		// initiate Transfer Controller operation
+		// TODO: move TC functionality to separate device
+		UINT32 address = data;
+
+		UINT32 next_entry = m_program->read_dword(address + 0);
+		UINT32 pt_options = m_program->read_dword(address + 4);
+		UINT32 src_addr = m_program->read_dword(address + 8);
+		UINT32 dst_addr = m_program->read_dword(address + 12);
+		UINT32 src_b_count = m_program->read_word(address + 16);
+		UINT32 src_a_count = m_program->read_word(address + 18);
+		UINT32 dst_b_count = m_program->read_word(address + 20);
+		UINT32 dst_a_count = m_program->read_word(address + 22);
+		UINT32 src_c_count = m_program->read_dword(address + 24);
+		UINT32 dst_c_count = m_program->read_dword(address + 28);
+		UINT32 src_b_pitch = m_program->read_dword(address + 32);
+		UINT32 dst_b_pitch = m_program->read_dword(address + 36);
+		UINT32 src_c_pitch = m_program->read_dword(address + 40);
+		UINT32 dst_c_pitch = m_program->read_dword(address + 44);
+
+		printf("TC operation:\n");
+		printf("   Next entry: %08X\n", next_entry);
+		printf("   PT options: %08X\n", pt_options);
+		printf("   SRC addr:   %08X\n", src_addr);
+		printf("   DST addr:   %08X\n", dst_addr);
+		printf("   SRC count A: %04X, B: %04X\n", src_a_count, src_b_count);
+		printf("   DST count A: %04X, B: %04X\n", dst_a_count, dst_b_count);
+		printf("   SRC count C: %08X\n", src_c_count);
+		printf("   DST count C: %08X\n", dst_c_count);
+		printf("   SRC B pitch: %08X\n", src_b_pitch);
+		printf("   DST B pitch: %08X\n", dst_b_pitch);
+		printf("   SRC C pitch: %08X\n", src_c_pitch);
+		printf("   DST C pitch: %08X\n", dst_c_pitch);
+
+		if (pt_options != 0x80000000)
+			fatalerror("TC transfer, options = %08X\n", pt_options);
+
+		for (int ic = 0; ic <= src_c_count; ic++)
+		{
+			UINT32 c_src_offset = ic * src_c_pitch;
+			UINT32 c_dst_offset = ic * dst_c_pitch;
+
+			for (int ib = 0; ib <= src_b_count; ib++)
+			{
+				UINT32 b_src_offset = ib * src_b_pitch;
+				UINT32 b_dst_offset = ib * dst_b_pitch;
+
+				for (int ia = 0; ia < src_a_count; ia++)
+				{
+					UINT32 src = src_addr + c_src_offset + b_src_offset + ia;
+					UINT32 dst = dst_addr + c_dst_offset + b_dst_offset + ia;
+
+					UINT32 data = m_program->read_byte(src);
+					m_program->write_byte(dst, data);
+
+					//printf("%08X: %02X -> %08X\n", src, data, dst);
+				}
+			}
+		}
+	}
 }
 
 
@@ -111,6 +175,8 @@ void tms32082_mp_device::device_start()
 
 	state_add(STATE_GENPC, "curpc", m_pc).noshow();
 
+	m_param_ram = auto_alloc_array(machine(), UINT32, 0x800);
+
 	m_program = &space(AS_PROGRAM);
 	m_direct = &m_program->direct();
 
@@ -145,7 +211,15 @@ void tms32082_mp_device::device_reset()
 
 UINT32 tms32082_mp_device::read_creg(int reg)
 {
-	printf("read_creg(): %08X\n", reg);
+	switch (reg)
+	{
+		case 0xa:			// PPERROR
+			return 0;
+
+		default:
+			printf("read_creg(): %08X\n", reg);
+			break;
+	}
 	return 0;
 }
 
@@ -159,6 +233,15 @@ UINT32 tms32082_mp_device::fetch()
 	UINT32 w = m_direct->read_decrypted_dword(m_fetchpc);
 	m_fetchpc += 4;
 	return w;
+}
+
+void tms32082_mp_device::delay_slot()
+{
+	debugger_instruction_hook(this, m_pc);
+	m_ir = fetch();
+	execute();
+
+	m_icount--;
 }
 
 void tms32082_mp_device::execute_run()

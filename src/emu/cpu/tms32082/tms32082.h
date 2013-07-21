@@ -94,17 +94,21 @@ protected:
 	UINT64 m_acc[4];
 	UINT32 m_ir;
 
+	UINT32 *m_param_ram;
+
 	int m_icount;
 
 	address_space *m_program;
 	direct_read_data* m_direct;
 
 	UINT32 fetch();
+	void delay_slot();
 	void execute();
 	void execute_short_imm();
 	void execute_reg_long_imm();
 	UINT32 read_creg(int reg);
 	void write_creg(int reg, UINT32 data);
+	bool test_condition(int condition, UINT32 value);
 };
 
 extern const device_type TMS32082_MP;
