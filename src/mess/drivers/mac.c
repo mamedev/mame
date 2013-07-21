@@ -76,6 +76,7 @@
 #include "video/pds30_sigmalview.h"
 #include "video/pds30_30hr.h"
 #include "video/pds30_mc30.h"
+#include "video/pds_tpdfpd.h"
 #include "includes/mac.h"
 #include "mac.lh"
 
@@ -578,6 +579,15 @@ static ADDRESS_MAP_START(macplus_map, AS_PROGRAM, 16, mac_state )
 	AM_RANGE(0xfffff0, 0xffffff) AM_READWRITE(mac_autovector_r, mac_autovector_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START(macse_map, AS_PROGRAM, 16, mac_state )
+	AM_RANGE(0x580000, 0x5fffff) AM_READWRITE(macplus_scsi_r, macplus_scsi_w)
+	AM_RANGE(0x900000, 0x9fffff) AM_READ(mac_scc_r)
+	AM_RANGE(0xb00000, 0xbfffff) AM_WRITE(mac_scc_w)
+	AM_RANGE(0xd00000, 0xdfffff) AM_READWRITE(mac_iwm_r, mac_iwm_w)
+	AM_RANGE(0xe80000, 0xefffff) AM_READWRITE(mac_via_r, mac_via_w)
+	AM_RANGE(0xfffff0, 0xffffff) AM_READWRITE(mac_autovector_r, mac_autovector_w)
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START(macprtb_map, AS_PROGRAM, 16, mac_state )
 	AM_RANGE(0x900000, 0x93ffff) AM_ROM AM_REGION("bootrom", 0) AM_MIRROR(0x0c0000)
 	AM_RANGE(0xf60000, 0xf6ffff) AM_READWRITE(mac_iwm_r, mac_iwm_w)
@@ -849,6 +859,11 @@ static const struct nbbus_interface nubus_intf =
 	DEVCB_DRIVER_LINE_MEMBER(mac_state, nubus_irq_e_w)
 };
 
+static const struct macpds_interface macpds_intf =
+{
+	0
+};
+
 static SLOT_INTERFACE_START(mac_nubus_cards)
 	SLOT_INTERFACE("m2video", NUBUS_M2VIDEO)    /* Apple Macintosh II Video Card */
 	SLOT_INTERFACE("48gc", NUBUS_48GC)      /* Apple 4*8 Graphics Card */
@@ -872,6 +887,10 @@ static SLOT_INTERFACE_START(mac_pds030_cards)
 	SLOT_INTERFACE("lview", PDS030_LVIEW)       // Sigma Designs L-View
 	SLOT_INTERFACE("30hr",  PDS030_XCEED30HR)   // Micron/XCEED Technology Color 30HR
 	SLOT_INTERFACE("mc30",  PDS030_XCEEDMC30)   // Micron/XCEED Technology MacroColor 30
+SLOT_INTERFACE_END
+
+static SLOT_INTERFACE_START(mac_sepds_cards)
+	SLOT_INTERFACE("radiusfpd", PDS_SEDISPLAY)	// Radius Full Page Display card for SE
 SLOT_INTERFACE_END
 
 static SLOT_INTERFACE_START(mac_lcpds_cards)
@@ -977,6 +996,8 @@ static MACHINE_CONFIG_DERIVED( macplus, mac512ke )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( macse, macplus )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(macse_map)
 
 	MCFG_DEVICE_REMOVE("via6522_0")
 	MCFG_VIA6522_ADD("via6522_0", 1000000, mac_via6522_adb_intf)
@@ -985,6 +1006,26 @@ static MACHINE_CONFIG_DERIVED( macse, macplus )
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4M")
 	MCFG_RAM_EXTRA_OPTIONS("2M,2560K,4M")
+
+	MCFG_MACKBD_REMOVE()
+
+	MCFG_MACPDS_BUS_ADD("sepds", "maincpu", macpds_intf)
+	MCFG_MACPDS_SLOT_ADD("sepds", "pds", mac_sepds_cards, NULL)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( macclasc, macplus )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(macse_map)
+
+	MCFG_DEVICE_REMOVE("via6522_0")
+	MCFG_VIA6522_ADD("via6522_0", 1000000, mac_via6522_adb_intf)
+
+	/* internal ram */
+	MCFG_RAM_MODIFY(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("4M")
+	MCFG_RAM_EXTRA_OPTIONS("2M,2560K,4M")
+
+	MCFG_MACKBD_REMOVE()
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( macprtb, mac_state )
@@ -2160,7 +2201,7 @@ COMP( 1989, macse30,  mac2fdhd, 0,  macse30,  macadb, mac_state,   macse30,   "A
 COMP( 1989, maciicx,  mac2fdhd, 0,  maciicx,  macadb, mac_state,   maciicx,   "Apple Computer", "Macintosh IIcx",  0 )
 COMP( 1989, maciici,  0,        0,  maciici,  maciici, mac_state,  maciici,   "Apple Computer", "Macintosh IIci", 0 )
 COMP( 1990, maciifx,  0,        0,  maciifx,  macadb, mac_state,   maciifx,      "Apple Computer", "Macintosh IIfx",  GAME_NOT_WORKING )
-COMP( 1990, macclasc, 0,        0,  macse,    macadb, mac_state,   macclassic,    "Apple Computer", "Macintosh Classic",  0 )
+COMP( 1990, macclasc, 0,        0,  macclasc, macadb, mac_state,   macclassic,    "Apple Computer", "Macintosh Classic",  0 )
 COMP( 1990, maclc,    0,        0,  maclc,    maciici, mac_state,  maclc,         "Apple Computer", "Macintosh LC", GAME_IMPERFECT_SOUND )
 COMP( 1990, maciisi,  0,        0,  maciisi,  maciici, mac_state,  maciisi,   "Apple Computer", "Macintosh IIsi", 0 )
 COMP( 1991, macpb100, 0,        0,  macprtb,  macadb, mac_state,   macprtb,   "Apple Computer", "Macintosh PowerBook 100", GAME_NOT_WORKING )
