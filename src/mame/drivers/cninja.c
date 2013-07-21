@@ -310,9 +310,12 @@ static ADDRESS_MAP_START( robocop2_map, AS_PROGRAM, 16, cninja_state )
 
 	AM_RANGE(0x180000, 0x1807ff) AM_RAM AM_SHARE("spriteram")
 //  AM_RANGE(0x18c000, 0x18c0ff) AM_WRITE(cninja_loopback_w) /* Protection writes */
-	AM_RANGE(0x18c000, 0x18c7ff) AM_DEVREAD("ioprot", deco146_device,robocop2_prot_r) /* Protection device */
-	AM_RANGE(0x18c064, 0x18c065) AM_WRITE(cninja_sound_w)
-	AM_RANGE(0x198000, 0x198001) AM_DEVWRITE("spriteram", buffered_spriteram16_device, write) /* DMA flag */
+//	AM_RANGE(0x18c000, 0x18c7ff) AM_DEVREAD("ioprot", deco146_device,robocop2_prot_r) /* Protection device */
+//	AM_RANGE(0x18c064, 0x18c065) AM_WRITE(cninja_sound_w)
+	AM_RANGE(0x18c000, 0x18ffff) AM_READWRITE(mutantf_protection_region_0_146_r,mutantf_protection_region_0_146_w)AM_SHARE("prot16ram") /* Protection device */
+
+
+AM_RANGE(0x198000, 0x198001) AM_DEVWRITE("spriteram", buffered_spriteram16_device, write) /* DMA flag */
 	AM_RANGE(0x1a8000, 0x1a9fff) AM_RAM_DEVWRITE("deco_common", decocomn_device, nonbuffered_palette_w) AM_SHARE("paletteram")
 	AM_RANGE(0x1b0000, 0x1b0007) AM_READWRITE(cninja_irq_r, cninja_irq_w)
 	AM_RANGE(0x1b8000, 0x1bbfff) AM_RAM AM_SHARE("ram") /* Main ram */
@@ -558,7 +561,7 @@ static INPUT_PORTS_START( cninjau )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( robocop2 )
-	PORT_START("IN0")
+	PORT_START("INPUTS")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -576,7 +579,7 @@ static INPUT_PORTS_START( robocop2 )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START("IN1")
+	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -1191,6 +1194,8 @@ static MACHINE_CONFIG_START( robocop2, cninja_state )
 	decospr_device::set_pri_callback(*device, cninja_pri_callback);
 
 	MCFG_DECO146_ADD("ioprot")
+	MCFG_DECO146_SET_USE_MAGIC_ADDRESS_XOR
+
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

@@ -1432,35 +1432,15 @@ void deco_146_base_device::device_reset()
 
   currently used by
   
-  Robocop 2
   Lemmings
-  Dragon Gun* is this really 146?
   Captain America
-  Stadium Hero 96* not used for inputs, just some fixed return data based on the writes!
 *****************************************************************************************************
 *****************************************************************************************************
 *****************************************************************************************************
 ****************************************************************************************************/
 
 
-// alt read addresses (same as nitroball if you reverse lnes)
-READ16_MEMBER(deco_146_base_device::robocop2_prot_r)
-{
-	switch (offset << 1)
-	{
-		case 0x41a: /* Player 1 & 2 input ports */
-			return ioport(":IN0")->read();
-		case 0x320: /* Coins */
-			return ioport(":IN1")->read();
-		case 0x4e6: /* Dip switches */
-			return ioport(":DSW")->read();
-		case 0x504: /* PC: 6b6.  b4, 2c, 36 written before read */
-			logerror("Protection PC %06x: warning - read unmapped memory address %04x\n", space.device().safe_pc(), offset);
-			return 0x84;
-	}
-	logerror("Protection PC %06x: warning - read unmapped memory address %04x\n", space.device().safe_pc(), offset);
-	return 0;
-}
+
 
 // alt read addresses (same as nitroball if you reverse lnes)
 /* Same as Robocop 2 protection chip */

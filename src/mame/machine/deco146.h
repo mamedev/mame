@@ -56,7 +56,7 @@ public:
 	// legacy stuff
 	DECLARE_READ32_MEMBER(captaven_prot_r);
 	DECLARE_READ16_MEMBER(lemmings_prot_r);
-	DECLARE_READ16_MEMBER(robocop2_prot_r);
+
 
 
 	deco146_port_read_cb m_port_a_r;
