@@ -1496,24 +1496,6 @@ READ32_MEMBER(deco_146_base_device::captaven_prot_r)
 }
 
 
-// alt read addresses? make sure this isn't 104
-READ32_MEMBER(deco_146_base_device::dragngun_prot_r)
-{
-//  logerror("%08x:Read prot %08x (%08x)\n",space.device().safe_pc(),offset<<1,mem_mask);
-
-	// this should be vblank in the port!
-	if (!m_strobe) m_strobe=8;
-	else m_strobe=0;
-
-
-	switch (offset<<1) {
-	case 0x140/2: return 0xffff0000 | ioport(":IN0")->read(); /* IN0 */
-	case 0xadc/2: return 0xffff0000 | ioport(":IN1")->read() | m_strobe; /* IN1 */
-	case 0x6a0/2: return 0xffff0000 | ioport(":DSW")->read(); /* IN2 (Dip switch) */
-	}
-	return 0xffffffff;
-}
-
 
 const device_type DECO146PROT = &device_creator<deco146_device>;
 

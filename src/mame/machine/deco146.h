@@ -54,7 +54,6 @@ public:
 	static void set_use_magic_read_address_xor(device_t &device, int use_xor);
 
 	// legacy stuff
-	DECLARE_READ32_MEMBER(dragngun_prot_r);
 	DECLARE_READ32_MEMBER(captaven_prot_r);
 	DECLARE_READ16_MEMBER(lemmings_prot_r);
 	DECLARE_READ16_MEMBER(robocop2_prot_r);

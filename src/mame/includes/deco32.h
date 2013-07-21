@@ -145,6 +145,9 @@ public:
 	UINT16 port_c_fghthist(int unused);
 	READ32_MEMBER( fghthist_protection_region_0_146_r );
 	WRITE32_MEMBER( fghthist_protection_region_0_146_w );
+	READ16_MEMBER( dg_protection_region_0_146_r );
+	WRITE16_MEMBER( dg_protection_region_0_146_w );
+	void deco32_sound_cb( address_space &space, UINT16 data, UINT16 mem_mask );
 
 };
 
