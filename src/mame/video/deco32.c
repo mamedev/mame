@@ -637,7 +637,7 @@ UINT32 dragngun_state::screen_update_dragngun(screen_device &screen, bitmap_rgb3
 UINT32 deco32_state::screen_update_fghthist(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	machine().priority_bitmap.fill(0, cliprect);
-	bitmap.fill(machine().pens[0x000], cliprect); // Palette index not confirmed
+	bitmap.fill(machine().pens[0x300], cliprect); // Palette index not confirmed
 
 	m_deco_tilegen1->pf_update(m_pf1_rowscroll, m_pf2_rowscroll);
 	m_deco_tilegen2->pf_update(m_pf3_rowscroll, m_pf4_rowscroll);
