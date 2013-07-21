@@ -964,6 +964,8 @@ $(MESSOBJ)/apple.a:             \
 	$(MESS_VIDEO)/pds30_sigmalview.o \
 	$(MESS_VIDEO)/pds30_30hr.o  \
 	$(MESS_VIDEO)/pds30_mc30.o  \
+	$(MESS_MACHINE)/macpds.o \
+	$(MESS_VIDEO)/pds_tpdfpd.o \
 
 $(MESSOBJ)/applied.a:           \
 	$(MESS_VIDEO)/mbee.o        \
