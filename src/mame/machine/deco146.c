@@ -1424,56 +1424,10 @@ void deco_146_base_device::device_reset()
 
 }
 
-/****************************************************************************************************
-*****************************************************************************************************
-*****************************************************************************************************
-*****************************************************************************************************
- Old style minimal handlers (where games only really use the I/O)
-
-  currently used by
-  
-  Lemmings
-  Captain America
-*****************************************************************************************************
-*****************************************************************************************************
-*****************************************************************************************************
-****************************************************************************************************/
 
 
 
 
-// alt read addresses (same as nitroball if you reverse lnes)
-/* Same as Robocop 2 protection chip */
-READ16_MEMBER(deco_146_base_device::lemmings_prot_r)
-{
-	switch (offset << 1)
-	{
-		case 0x41a:
-			return ioport(":BUTTONS")->read();
-
-		case 0x320:
-			return ioport(":SYSTEM")->read();
-
-		case 0x4e6:
-			return ioport(":DSW")->read();
-	}
-
-	return 0;
-}
-
-// standard read addresses
-READ32_MEMBER(deco_146_base_device::captaven_prot_r)
-{
-	/* Protection/IO chip 75, same as Lemmings & Robocop 2 */
-	switch (offset<<2) {
-	case 0x0a0: return ioport(":IN0")->read(); /* Player 1 & 2 controls */
-	case 0x158: return ioport(":IN1")->read(); /* Player 3 & 4 controls */
-	case 0xed4: return ioport(":IN2")->read(); /* Misc */
-	}
-
-	logerror("%08x: Unmapped protection read %04x\n",space.device().safe_pc(),offset<<2);
-	return 0xffffffff;
-}
 
 
 

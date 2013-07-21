@@ -53,9 +53,7 @@ public:
 	static void set_interface_scramble(device_t &device,UINT8 a9, UINT8 a8, UINT8 a7, UINT8 a6, UINT8 a5, UINT8 a4, UINT8 a3,UINT8 a2,UINT8 a1,UINT8 a0);
 	static void set_use_magic_read_address_xor(device_t &device, int use_xor);
 
-	// legacy stuff
-	DECLARE_READ32_MEMBER(captaven_prot_r);
-	DECLARE_READ16_MEMBER(lemmings_prot_r);
+
 
 
 

@@ -70,6 +70,24 @@ WRITE8_MEMBER(lemmings_state::lemmings_sound_ack_w)
 	m_audiocpu->set_input_line(1, CLEAR_LINE);
 }
 
+READ16_MEMBER( lemmings_state::lem_protection_region_0_146_r )
+{
+	int real_address = 0 + (offset *2);
+	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	UINT8 cs = 0;
+	UINT16 data = m_deco146->read_data( deco146_addr, mem_mask, cs );
+	return data;
+}
+
+WRITE16_MEMBER( lemmings_state::lem_protection_region_0_146_w )
+{		
+	int real_address = 0 + (offset *2);
+	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	UINT8 cs = 0;
+	m_deco146->write_data( space, deco146_addr, data, mem_mask, cs );
+}
+
+
 /******************************************************************************/
 
 static ADDRESS_MAP_START( lemmings_map, AS_PROGRAM, 16, lemmings_state )
@@ -80,7 +98,8 @@ static ADDRESS_MAP_START( lemmings_map, AS_PROGRAM, 16, lemmings_state )
 	AM_RANGE(0x160000, 0x160fff) AM_RAM_WRITE(lemmings_palette_24bit_w) AM_SHARE("paletteram")
 	AM_RANGE(0x170000, 0x17000f) AM_RAM_WRITE(lemmings_control_w) AM_SHARE("control_data")
 	AM_RANGE(0x190000, 0x19000f) AM_READ(lemmings_trackball_r)
-	AM_RANGE(0x1a0000, 0x1a07ff) AM_DEVREAD("ioprot", deco146_device,lemmings_prot_r)
+//	AM_RANGE(0x1a0000, 0x1a07ff) AM_DEVREAD("ioprot", deco146_device,lemmings_prot_r)
+	AM_RANGE(0x1a0000, 0x1a3fff) AM_READWRITE(lem_protection_region_0_146_r,lem_protection_region_0_146_w)AM_SHARE("prot16ram") /* Protection device */
 	AM_RANGE(0x1a0064, 0x1a0065) AM_WRITE(lemmings_sound_w)
 	AM_RANGE(0x1c0000, 0x1c0001) AM_DEVWRITE("spriteram", buffered_spriteram16_device, write) /* 1 written once a frame */
 	AM_RANGE(0x1e0000, 0x1e0001) AM_DEVWRITE("spriteram2", buffered_spriteram16_device, write) /* 1 written once a frame */
@@ -103,7 +122,7 @@ ADDRESS_MAP_END
 /******************************************************************************/
 
 static INPUT_PORTS_START( lemmings )
-	PORT_START("BUTTONS")
+	PORT_START("INPUTS")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Select")
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Hurry")
@@ -126,11 +145,7 @@ static INPUT_PORTS_START( lemmings )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_SERVICE_NO_TOGGLE(0x0004, IP_ACTIVE_LOW)
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x0003, 0x0003, "Credits for 1 Player" )
@@ -261,6 +276,7 @@ static MACHINE_CONFIG_START( lemmings, lemmings_state )
 	decospr_device::set_gfx_region(*device, 0);
 
 	MCFG_DECO146_ADD("ioprot")
+	MCFG_DECO146_SET_USE_MAGIC_ADDRESS_XOR
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
