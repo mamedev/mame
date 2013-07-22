@@ -382,6 +382,20 @@ void softbox_state::device_reset_after_children()
 }
 
 
+//-------------------------------------------------
+//  ieee488_ifc - interface clear (reset)
+//-------------------------------------------------
+
+void softbox_state::ieee488_ifc(int state)
+{
+	if (!m_ifc && state)
+	{
+		device_reset();
+	}
+
+	m_ifc = state;
+}
+
 
 //**************************************************************************
 //  MACHINE CONFIGURATION

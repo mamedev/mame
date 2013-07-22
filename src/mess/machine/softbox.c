@@ -376,6 +376,21 @@ void softbox_device::device_reset_after_children()
 
 
 //-------------------------------------------------
+//  ieee488_ifc - interface clear (reset)
+//-------------------------------------------------
+
+void softbox_device::ieee488_ifc(int state)
+{
+	if (!m_ifc && state)
+	{
+		device_reset();
+	}
+
+	m_ifc = state;
+}
+
+
+//-------------------------------------------------
 //  dbrg_w - baud rate selection
 //-------------------------------------------------
 

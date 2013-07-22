@@ -39,6 +39,9 @@ public:
 	virtual void machine_start();
 	virtual void device_reset_after_children();
 
+    // device_ieee488_interface overrides
+    virtual void ieee488_ifc(int state);
+
 	DECLARE_WRITE8_MEMBER( dbrg_w );
 
 	DECLARE_READ8_MEMBER( ppi0_pa_r );
@@ -55,6 +58,8 @@ public:
 		LED_B,
 		LED_READY
 	};
+
+	int m_ifc;  // Tracks previous state of IEEE-488 IFC line
 };
 
 #endif
