@@ -98,7 +98,7 @@ READ16_MEMBER( dreambal_state::dreambal_protection_region_0_104_r )
 }
 
 WRITE16_MEMBER( dreambal_state::dreambal_protection_region_0_104_w )
-{		
+{
 	int real_address = 0 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	UINT8 cs = 0;
@@ -129,8 +129,7 @@ static ADDRESS_MAP_START( dreambal_map, AS_PROGRAM, 16, dreambal_state )
 	AM_RANGE(0x165000, 0x165001) AM_WRITE( dreambal_eeprom_w ) // EEP Write?
 
 	AM_RANGE(0x16c002, 0x16c00d) AM_WRITENOP // writes 0000 to 0005 on startup
-	AM_RANGE(0x1a0000, 0x1a0001) AM_WRITENOP // writes 33 and 1a on startup
-
+	AM_RANGE(0x1a0000, 0x1a0003) AM_WRITENOP // RS-232C status / data ports (byte access)
 ADDRESS_MAP_END
 
 
