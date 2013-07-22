@@ -338,6 +338,7 @@ void seibuspi_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
 	int x1, y1;
 	gfx_element *gfx = machine().gfx[2];
 	const int has_tile_high = (gfx->elements() > 0x10000) ? 1 : 0;
+	const int colormask = (m_sprite_bpp == 6) ? 0x3f : 0x1f;
 
 	static const int sprite_xtable[2][8] =
 	{
@@ -363,7 +364,7 @@ void seibuspi_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
 			-------- -------- ----x--- --------  flip_x
 			-------- -------- -----xxx --------  width
 			-------- -------- -------- xx------  priority
-			-------- -------- -------- --xxxxxx  color
+			-------- -------- -------- --xxxxxx  color (highest bit not used on SYS386F)
 			
 			Word 1, unmarked bits have no function
 			-------x xxxxxxxx -------- --------  ypos
@@ -387,8 +388,8 @@ void seibuspi_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
 		ypos = m_sprite_ram[a + 1] >> 16 & 0x1ff;
 		if (ypos & 0x100)
 			ypos |= 0xfe00;
-		color = m_sprite_ram[a + 0] & 0x3f;
-
+		color = m_sprite_ram[a + 0] & colormask;
+		
 		width = (m_sprite_ram[a + 0] >> 8 & 0x7) + 1;
 		height = (m_sprite_ram[a + 0] >> 12 & 0x7) + 1;
 		flip_x = m_sprite_ram[a + 0] >> 11 & 0x1;
