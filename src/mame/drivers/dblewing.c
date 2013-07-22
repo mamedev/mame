@@ -10,7 +10,6 @@ Protection TODO:
 - Check the remaining unmapped read/writes effect;
 - Boss BGM might be wrong / variable;
 - Haven't yet checked if bonus life and difficulty DIP-SW are rightly tested;
-- Demo Sounds DIP-SW doesn't work?
 - Clean-up the whole routine;
 
 
