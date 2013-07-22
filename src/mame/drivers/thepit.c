@@ -322,9 +322,9 @@ static INPUT_PORTS_START( desertdn )
 	PORT_DIPSETTING(    0x04, "4" )
 	PORT_DIPSETTING(    0x08, "5" )
 	PORT_DIPSETTING(    0x0c, "6" )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) ) /* Cabinet Type or Bonus ?? */
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Cocktail ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) ) /* Cabinet Type or Bonus ?? */
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
