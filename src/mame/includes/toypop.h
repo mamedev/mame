@@ -1,4 +1,5 @@
 #include "machine/namcoio.h"
+#include "sound/namco.h"
 
 class toypop_state : public driver_device
 {
@@ -17,6 +18,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_subcpu(*this, "sub"),
+		m_namco15xx(*this, "namco"),
 		m_namco58xx(*this, "58xx"),
 		m_namco56xx_1(*this, "56xx_1"),
 		m_namco56xx_2(*this, "56xx_2") { }
@@ -29,6 +31,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_subcpu;
+	required_device<namco_15xx_device> m_namco15xx;
 	required_device<namco58xx_device> m_namco58xx;
 	required_device<namco56xx_device> m_namco56xx_1;
 	required_device<namco56xx_device> m_namco56xx_2;

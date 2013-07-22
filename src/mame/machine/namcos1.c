@@ -1,6 +1,5 @@
 #include "emu.h"
 #include "sound/ym2151.h"
-#include "sound/namco.h"
 #include "includes/namcos1.h"
 
 
@@ -611,7 +610,8 @@ static READ8_HANDLER( soundram_r )
 		offset &= 0x3ff;
 
 		/* CUS 30 */
-		return namcos1_cus30_r(space.machine().device("namco"),space,offset);
+			
+		return space.machine().device<namco_cus30_device>("namco")->namcos1_cus30_r(space,offset);
 	}
 	else
 	{
@@ -630,7 +630,8 @@ static WRITE8_HANDLER( soundram_w )
 		offset &= 0x3ff;
 
 		/* CUS 30 */
-		namcos1_cus30_w(space.machine().device("namco"),space,offset,data);
+		
+		space.machine().device<namco_cus30_device>("namco")->namcos1_cus30_w(space,offset,data);
 	}
 	else
 	{

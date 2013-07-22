@@ -1,3 +1,4 @@
+#include "sound/namco.h"
 #include "sound/samples.h"
 #include "machine/namcoio.h"
 
@@ -29,6 +30,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
 		m_subcpu2(*this, "sub2"),
+		m_namco_15xx(*this, "namco"),
 		m_samples(*this, "samples") ,
 		m_customio_3(*this,"customio_3"),
 		m_videoram(*this,"videoram"),
@@ -37,6 +39,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<cpu_device> m_subcpu2;
+	required_device<namco_15xx_device> m_namco_15xx;
 	required_device<samples_device> m_samples;
 	required_shared_ptr<UINT8> m_customio_3;
 	required_shared_ptr<UINT8> m_videoram;

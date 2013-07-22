@@ -152,7 +152,6 @@ TODO:
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/namco62.h"
-#include "sound/namco.h"
 #include "sound/samples.h"
 #include "includes/gaplus.h"
 
@@ -196,7 +195,7 @@ WRITE8_MEMBER(gaplus_state::gaplus_sreset_w)
 	int bit = !BIT(offset, 11);
 	m_subcpu->set_input_line(INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 	m_subcpu2->set_input_line(INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
-	mappy_sound_enable(machine().device("namco"), bit);
+	m_namco_15xx->mappy_sound_enable(bit);
 }
 
 WRITE8_MEMBER(gaplus_state::gaplus_freset_w)
@@ -296,7 +295,7 @@ INTERRUPT_GEN_MEMBER(gaplus_state::gaplus_vblank_sub2_irq)
 static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8, gaplus_state )
 	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(gaplus_videoram_r, gaplus_videoram_w) AM_SHARE("videoram")        /* tilemap RAM (shared with CPU #2) */
 	AM_RANGE(0x0800, 0x1fff) AM_READWRITE(gaplus_spriteram_r, gaplus_spriteram_w) AM_SHARE("spriteram") /* shared RAM with CPU #2 (includes sprite RAM) */
-	AM_RANGE(0x6000, 0x63ff) AM_DEVREADWRITE_LEGACY("namco", namco_snd_sharedram_r, namco_snd_sharedram_w)                                      /* shared RAM with CPU #3 */
+	AM_RANGE(0x6000, 0x63ff) AM_DEVREADWRITE("namco", namco_15xx_device, sharedram_r, sharedram_w)                                      /* shared RAM with CPU #3 */
 	AM_RANGE(0x6800, 0x680f) AM_DEVREADWRITE("namcoio_1", namcoio_device, read, write)                                                   /* custom I/O chips interface */
 	AM_RANGE(0x6810, 0x681f) AM_DEVREADWRITE("namcoio_2", namcoio_device, read, write)                                                   /* custom I/O chips interface */
 	AM_RANGE(0x6820, 0x682f) AM_READWRITE(gaplus_customio_3_r, gaplus_customio_3_w) AM_SHARE("customio_3")  /* custom I/O chip #3 interface */
@@ -317,7 +316,7 @@ static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8, gaplus_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu3_map, AS_PROGRAM, 8, gaplus_state )
-	AM_RANGE(0x0000, 0x03ff) AM_DEVREADWRITE_LEGACY("namco", namco_snd_sharedram_r, namco_snd_sharedram_w)  /* shared RAM with the main CPU + sound registers */
+	AM_RANGE(0x0000, 0x03ff) AM_DEVREADWRITE("namco", namco_15xx_device, sharedram_r, sharedram_w)  /* shared RAM with the main CPU + sound registers */
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(watchdog_reset_r, watchdog_reset_w)                       /* watchdog? */
 	AM_RANGE(0x4000, 0x7fff) AM_WRITE(gaplus_irq_3_ctrl_w)                                          /* interrupt enable/disable */
 	AM_RANGE(0xe000, 0xffff) AM_ROM                                                                 /* ROM */

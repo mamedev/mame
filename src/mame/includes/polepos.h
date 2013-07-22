@@ -5,6 +5,7 @@
 *************************************************************************/
 
 #include "sound/filter.h"
+#include "sound/namco.h"
 #include "sound/tms5220.h"
 #include "sound/discrete.h"
 
@@ -14,15 +15,20 @@ class polepos_state : public driver_device
 public:
 	polepos_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_subcpu(*this, "sub"),
+		m_subcpu2(*this, "sub2"),
+		m_namco_sound(*this, "namco"),
 		m_tms(*this, "tms"),
 		m_sprite16_memory(*this, "sprite16_memory"),
 		m_road16_memory(*this, "road16_memory"),
 		m_alpha16_memory(*this, "alpha16_memory"),
-		m_view16_memory(*this, "view16_memory"),
-		m_maincpu(*this, "maincpu"),
-		m_subcpu(*this, "sub"),
-		m_subcpu2(*this, "sub2") { }
+		m_view16_memory(*this, "view16_memory")	{ }
 
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_subcpu;
+	required_device<cpu_device> m_subcpu2;
+	optional_device<namco_device> m_namco_sound;
 	optional_device<tms5220_device> m_tms;
 	UINT8 m_steer_last;
 	UINT8 m_steer_delta;
@@ -90,9 +96,6 @@ public:
 	void draw_road(bitmap_ind16 &bitmap);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void zoom_sprite(bitmap_ind16 &bitmap,int big,UINT32 code,UINT32 color,int flipx,int sx,int sy,int sizex,int sizey);
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_subcpu;
-	required_device<cpu_device> m_subcpu2;
 };
 
 

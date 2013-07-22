@@ -190,7 +190,6 @@ TODO:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "sound/namco.h"
 #include "sound/samples.h"
 #include "includes/rallyx.h"
 
@@ -236,7 +235,7 @@ WRITE8_MEMBER(rallyx_state::rallyx_latch_w)
 
 		case 0x02:  /* SOUND ON */
 			/* this doesn't work in New Rally X so I'm not supporting it */
-//          pacman_sound_enable_w(machine().device("namco"), bit);
+//          m_namco_sound->pacman_sound_enable_w(bit);
 			break;
 
 		case 0x03:  /* FLIP */
@@ -319,7 +318,7 @@ static ADDRESS_MAP_START( rallyx_map, AS_PROGRAM, 8, rallyx_state )
 	AM_RANGE(0xa100, 0xa100) AM_READ_PORT("DSW")
 	AM_RANGE(0xa000, 0xa00f) AM_WRITEONLY AM_SHARE("radarattr")
 	AM_RANGE(0xa080, 0xa080) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0xa100, 0xa11f) AM_DEVWRITE_LEGACY("namco", pacman_sound_w)
+	AM_RANGE(0xa100, 0xa11f) AM_DEVWRITE("namco", namco_device, pacman_sound_w)
 	AM_RANGE(0xa130, 0xa130) AM_WRITE(rallyx_scrollx_w)
 	AM_RANGE(0xa140, 0xa140) AM_WRITE(rallyx_scrolly_w)
 	AM_RANGE(0xa170, 0xa170) AM_WRITENOP            /* ? */

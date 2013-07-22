@@ -178,7 +178,6 @@ TODO:
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6800/m6800.h"
 #include "sound/2151intf.h"
-#include "sound/namco.h"
 #include "sound/n63701x.h"
 #include "includes/namcos86.h"
 
@@ -335,7 +334,7 @@ static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8, namcos86_state )
 	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(rthunder_videoram1_r,rthunder_videoram1_w) AM_SHARE("videoram1")
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(rthunder_videoram2_r,rthunder_videoram2_w) AM_SHARE("videoram2")
 
-	AM_RANGE(0x4000, 0x43ff) AM_DEVREADWRITE_LEGACY("namco", namcos1_cus30_r, namcos1_cus30_w) /* PSG device, shared RAM */
+	AM_RANGE(0x4000, 0x43ff) AM_DEVREADWRITE("namco", namco_cus30_device, namcos1_cus30_r, namcos1_cus30_w) /* PSG device, shared RAM */
 
 	AM_RANGE(0x4000, 0x5fff) AM_READWRITE(rthunder_spriteram_r,rthunder_spriteram_w)
 
@@ -390,7 +389,7 @@ CPU2_MEMORY( wndrmomo, 0x2000, 0x4000, 0x6000, UNUSED, UNUSED, 0xc000, 0xc800 )
 static ADDRESS_MAP_START( NAME##_mcu_map, AS_PROGRAM, 8, namcos86_state )   \
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE_LEGACY(m6801_io_r,m6801_io_w) \
 	AM_RANGE(0x0080, 0x00ff) AM_RAM                                                     \
-	AM_RANGE(0x1000, 0x13ff) AM_DEVREADWRITE_LEGACY("namco", namcos1_cus30_r, namcos1_cus30_w) /* PSG device, shared RAM */ \
+	AM_RANGE(0x1000, 0x13ff) AM_DEVREADWRITE("namco", namco_cus30_device, namcos1_cus30_r, namcos1_cus30_w) /* PSG device, shared RAM */ \
 	AM_RANGE(0x1400, 0x1fff) AM_RAM                                                     \
 	AM_RANGE(ADDR_INPUT+0x00, ADDR_INPUT+0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write) \
 	AM_RANGE(ADDR_INPUT+0x20, ADDR_INPUT+0x20) AM_READ_PORT("IN0")                      \

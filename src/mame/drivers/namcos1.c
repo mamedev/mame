@@ -342,7 +342,6 @@ C - uses sub board with support for player 3 and 4 controls
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6800/m6800.h"
 #include "sound/2151intf.h"
-#include "sound/namco.h"
 #include "sound/dac.h"
 #include "machine/nvram.h"
 #include "includes/namcos1.h"
@@ -467,7 +466,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, namcos1_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank17")   /* Banked ROMs */
 	AM_RANGE(0x4000, 0x4001) AM_DEVREAD("ymsnd", ym2151_device, status_r)
 	AM_RANGE(0x4000, 0x4001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x5000, 0x53ff) AM_DEVREADWRITE_LEGACY("namco", namcos1_cus30_r, namcos1_cus30_w) AM_MIRROR(0x400) /* PSG ( Shared ) */
+	AM_RANGE(0x5000, 0x53ff) AM_DEVREADWRITE("namco", namco_cus30_device, namcos1_cus30_r, namcos1_cus30_w) AM_MIRROR(0x400) /* PSG ( Shared ) */
 	AM_RANGE(0x7000, 0x77ff) AM_RAMBANK("bank18")   /* TRIRAM (shared) */
 	AM_RANGE(0x8000, 0x9fff) AM_RAM /* Sound RAM 3 */
 	AM_RANGE(0xc000, 0xc001) AM_WRITE(namcos1_sound_bankswitch_w) /* ROM bank selector */

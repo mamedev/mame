@@ -1,4 +1,5 @@
 #include "sound/discrete.h"
+#include "sound/namco.h"
 #include "sound/samples.h"
 
 class galaga_state : public driver_device
@@ -13,7 +14,8 @@ public:
 		m_galaga_starcontrol(*this, "starcontrol"),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
-		m_subcpu2(*this, "sub2") { }
+		m_subcpu2(*this, "sub2"),
+		m_namco_sound(*this, "namco") { }
 
 	/* memory pointers */
 	optional_shared_ptr<UINT8> m_videoram;
@@ -21,6 +23,10 @@ public:
 	optional_shared_ptr<UINT8> m_galaga_ram2;
 	optional_shared_ptr<UINT8> m_galaga_ram3;
 	optional_shared_ptr<UINT8> m_galaga_starcontrol;    // 6 addresses
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_subcpu;
+	required_device<cpu_device> m_subcpu2;
+	required_device<namco_device> m_namco_sound;
 	emu_timer *m_cpu3_interrupt_timer;
 	UINT8 m_custom_mod;
 
@@ -74,9 +80,6 @@ public:
 	};
 
 	static struct star m_star_seed_tab[];
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_subcpu;
-	required_device<cpu_device> m_subcpu2;
 };
 
 class xevious_state : public galaga_state

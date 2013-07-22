@@ -6,6 +6,7 @@
 
 ***************************************************************************/
 #include "machine/eeprom.h"
+#include "sound/namco.h"
 
 class _20pacgal_state : public driver_device
 {

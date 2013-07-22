@@ -1,4 +1,6 @@
 #include "sound/dac.h"
+#include "sound/namco.h"
+
 #define NAMCOS1_MAX_BANK 0x400
 
 /* Bank handler definitions */
@@ -19,8 +21,15 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_subcpu(*this, "sub"),
 		m_mcu(*this, "mcu"),
+		m_cus30(*this, "namco"),
 		m_dac(*this, "dac") { }
 
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<cpu_device> m_subcpu;
+	required_device<cpu_device> m_mcu;
+	required_device<namco_cus30_device> m_cus30;
+	required_device<dac_device> m_dac;
 	int m_dac0_value;
 	int m_dac1_value;
 	int m_dac0_gain;
@@ -101,11 +110,6 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_namcos1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_namcos1(screen_device &screen, bool state);
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
-	required_device<cpu_device> m_subcpu;
-	required_device<cpu_device> m_mcu;
-	required_device<dac_device> m_dac;
 
 private:
 	inline void bg_get_info(tile_data &tileinfo,int tile_index,UINT8 *info_vram);

@@ -1,23 +1,28 @@
 #include "namcos2.h"
 #include "sound/dac.h"
+#include "sound/namco.h"
 
 class tceptor_state : public driver_device
 {
 public:
 	tceptor_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_cus30(*this, "namco"),
+		m_dac(*this, "dac"),
 		m_tile_ram(*this, "tile_ram"),
 		m_tile_attr(*this, "tile_attr"),
 		m_bg_ram(*this, "bg_ram"),
 		m_m68k_shared_ram(*this, "m68k_shared_ram"),
 		m_sprite_ram(*this, "sprite_ram"),
-		m_c45_road(*this, "c45_road") ,
-		m_maincpu(*this, "maincpu"),
-		m_dac(*this, "dac")  { }
+		m_c45_road(*this, "c45_road") { }
 
 	UINT8 m_m6809_irq_enable;
 	UINT8 m_m68k_irq_enable;
 	UINT8 m_mcu_irq_enable;
+	required_device<cpu_device> m_maincpu;
+	required_device<namco_cus30_device> m_cus30;
+	required_device<dac_device> m_dac;
 	required_shared_ptr<UINT8> m_tile_ram;
 	required_shared_ptr<UINT8> m_tile_attr;
 	required_shared_ptr<UINT8> m_bg_ram;
@@ -78,6 +83,4 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int sprite_priority);
 	inline UINT8 fix_input0(UINT8 in1, UINT8 in2);
 	inline UINT8 fix_input1(UINT8 in1, UINT8 in2);
-	required_device<cpu_device> m_maincpu;
-	required_device<dac_device> m_dac;
 };

@@ -101,7 +101,6 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "includes/pacman.h"
-#include "sound/namco.h"
 
 
 class jrpacman_state : public pacman_state
@@ -141,10 +140,10 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, jrpacman_state )
 	AM_RANGE(0x4ff0, 0x4fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x5000, 0x503f) AM_READ_PORT("P1")
 	AM_RANGE(0x5000, 0x5000) AM_WRITE(irq_mask_w)
-	AM_RANGE(0x5001, 0x5001) AM_DEVWRITE_LEGACY("namco", pacman_sound_enable_w)
+	AM_RANGE(0x5001, 0x5001) AM_DEVWRITE("namco", namco_device, pacman_sound_enable_w)
 	AM_RANGE(0x5003, 0x5003) AM_WRITE(pacman_flipscreen_w)
 	AM_RANGE(0x5040, 0x507f) AM_READ_PORT("P2")
-	AM_RANGE(0x5040, 0x505f) AM_DEVWRITE_LEGACY("namco", pacman_sound_w)
+	AM_RANGE(0x5040, 0x505f) AM_DEVWRITE("namco", namco_device, pacman_sound_w)
 	AM_RANGE(0x5060, 0x506f) AM_WRITEONLY AM_SHARE("spriteram2")
 	AM_RANGE(0x5070, 0x5070) AM_WRITE(pengo_palettebank_w)
 	AM_RANGE(0x5071, 0x5071) AM_WRITE(pengo_colortablebank_w)

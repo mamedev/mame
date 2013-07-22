@@ -337,7 +337,6 @@ Boards:
 #include "includes/pacman.h"
 #include "cpu/s2650/s2650.h"
 #include "machine/nvram.h"
-#include "sound/namco.h"
 #include "sound/ay8910.h"
 #include "sound/sn76496.h"
 
@@ -527,11 +526,11 @@ WRITE8_MEMBER(pacman_state::alibaba_sound_w)
 	/* since the sound region in Ali Baba is not contiguous, translate the
 	   offset into the 0-0x1f range */
 	if (offset < 0x10)
-		pacman_sound_w(machine().device("namco"), space, offset, data);
+		m_namco_sound->pacman_sound_w(space, offset, data);
 	else if (offset < 0x20)
 		m_spriteram2[offset - 0x10] = data;
 	else
-		pacman_sound_w(machine().device("namco"), space, offset - 0x10, data);
+		m_namco_sound->pacman_sound_w(space, offset - 0x10, data);
 }
 
 READ8_MEMBER(pacman_state::alibaba_mystery_1_r)
@@ -962,13 +961,13 @@ static ADDRESS_MAP_START( pacman_map, AS_PROGRAM, 8, pacman_state )
 	AM_RANGE(0x4c00, 0x4fef) AM_MIRROR(0xa000) AM_RAM
 	AM_RANGE(0x4ff0, 0x4fff) AM_MIRROR(0xa000) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0xaf38) AM_WRITE(irq_mask_w)
-	AM_RANGE(0x5001, 0x5001) AM_MIRROR(0xaf38) AM_DEVWRITE_LEGACY("namco", pacman_sound_enable_w)
+	AM_RANGE(0x5001, 0x5001) AM_MIRROR(0xaf38) AM_DEVWRITE("namco", namco_device, pacman_sound_enable_w)
 	AM_RANGE(0x5002, 0x5002) AM_MIRROR(0xaf38) AM_WRITENOP
 	AM_RANGE(0x5003, 0x5003) AM_MIRROR(0xaf38) AM_WRITE(pacman_flipscreen_w)
 	AM_RANGE(0x5004, 0x5005) AM_MIRROR(0xaf38) AM_WRITENOP // AM_WRITE(pacman_leds_w)
 	AM_RANGE(0x5006, 0x5006) AM_MIRROR(0xaf38) AM_WRITENOP // AM_WRITE(pacman_coin_lockout_global_w)
 	AM_RANGE(0x5007, 0x5007) AM_MIRROR(0xaf38) AM_WRITE(pacman_coin_counter_w)
-	AM_RANGE(0x5040, 0x505f) AM_MIRROR(0xaf00) AM_DEVWRITE_LEGACY("namco", pacman_sound_w)
+	AM_RANGE(0x5040, 0x505f) AM_MIRROR(0xaf00) AM_DEVWRITE("namco", namco_device, pacman_sound_w)
 	AM_RANGE(0x5060, 0x506f) AM_MIRROR(0xaf00) AM_WRITEONLY AM_SHARE("spriteram2")
 	AM_RANGE(0x5070, 0x507f) AM_MIRROR(0xaf00) AM_WRITENOP
 	AM_RANGE(0x5080, 0x5080) AM_MIRROR(0xaf3f) AM_WRITENOP
@@ -990,13 +989,13 @@ static ADDRESS_MAP_START( birdiy_map, AS_PROGRAM, 8, pacman_state )
 	AM_RANGE(0x4c00, 0x4fef) AM_MIRROR(0xa000) AM_RAM
 	AM_RANGE(0x4ff0, 0x4fff) AM_MIRROR(0xa000) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x5001, 0x5001) AM_MIRROR(0xaf38) AM_WRITE(irq_mask_w)
-//  AM_RANGE(0x5001, 0x5001) AM_MIRROR(0xaf38) AM_DEVWRITE_LEGACY("namco", pacman_sound_enable_w)
+//  AM_RANGE(0x5001, 0x5001) AM_MIRROR(0xaf38) AM_DEVWRITE("namco", namco_device, pacman_sound_enable_w)
 //  AM_RANGE(0x5002, 0x5002) AM_MIRROR(0xaf38) AM_WRITENOP
 	AM_RANGE(0x5003, 0x5003) AM_MIRROR(0xaf38) AM_WRITE(pacman_flipscreen_w)
 //  AM_RANGE(0x5004, 0x5005) AM_MIRROR(0xaf38) AM_WRITENOP // AM_WRITE(pacman_leds_w)
 //  AM_RANGE(0x5006, 0x5006) AM_MIRROR(0xaf38) AM_WRITENOP // AM_WRITE(pacman_coin_lockout_global_w)
 	AM_RANGE(0x5007, 0x5007) AM_MIRROR(0xaf38) AM_WRITE(pacman_coin_counter_w)
-	AM_RANGE(0x5080, 0x509f) AM_MIRROR(0xaf00) AM_DEVWRITE_LEGACY("namco", pacman_sound_w)
+	AM_RANGE(0x5080, 0x509f) AM_MIRROR(0xaf00) AM_DEVWRITE("namco", namco_device, pacman_sound_w)
 	AM_RANGE(0x50a0, 0x50af) AM_MIRROR(0xaf00) AM_WRITEONLY AM_SHARE("spriteram2")
 //  AM_RANGE(0x5070, 0x507f) AM_MIRROR(0xaf00) AM_WRITENOP
 //  AM_RANGE(0x5080, 0x5080) AM_MIRROR(0xaf3f) AM_WRITENOP
@@ -1015,13 +1014,13 @@ static ADDRESS_MAP_START( mspacman_map, AS_PROGRAM, 8, pacman_state )
 	AM_RANGE(0x4c00, 0x4fef) AM_MIRROR(0xa000) AM_RAM
 	AM_RANGE(0x4ff0, 0x4fff) AM_MIRROR(0xa000) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0xaf38) AM_WRITE(irq_mask_w)
-	AM_RANGE(0x5001, 0x5001) AM_MIRROR(0xaf38) AM_DEVWRITE_LEGACY("namco", pacman_sound_enable_w)
+	AM_RANGE(0x5001, 0x5001) AM_MIRROR(0xaf38) AM_DEVWRITE("namco", namco_device, pacman_sound_enable_w)
 	AM_RANGE(0x5002, 0x5002) AM_MIRROR(0xaf38) AM_WRITENOP
 	AM_RANGE(0x5003, 0x5003) AM_MIRROR(0xaf38) AM_WRITE(pacman_flipscreen_w)
 	AM_RANGE(0x5004, 0x5005) AM_MIRROR(0xaf38) AM_WRITENOP // AM_WRITE(pacman_leds_w)
 	AM_RANGE(0x5006, 0x5006) AM_MIRROR(0xaf38) AM_WRITE(pacman_coin_lockout_global_w)
 	AM_RANGE(0x5007, 0x5007) AM_MIRROR(0xaf38) AM_WRITE(pacman_coin_counter_w)
-	AM_RANGE(0x5040, 0x505f) AM_MIRROR(0xaf00) AM_DEVWRITE_LEGACY("namco", pacman_sound_w)
+	AM_RANGE(0x5040, 0x505f) AM_MIRROR(0xaf00) AM_DEVWRITE("namco", namco_device, pacman_sound_w)
 	AM_RANGE(0x5060, 0x506f) AM_MIRROR(0xaf00) AM_WRITEONLY AM_SHARE("spriteram2")
 	AM_RANGE(0x5070, 0x507f) AM_MIRROR(0xaf00) AM_WRITENOP
 	AM_RANGE(0x5080, 0x5080) AM_MIRROR(0xaf3f) AM_WRITENOP
@@ -1055,13 +1054,13 @@ static ADDRESS_MAP_START( woodpek_map, AS_PROGRAM, 8, pacman_state )
 	AM_RANGE(0x4c00, 0x4fef) AM_MIRROR(0xa000) AM_RAM
 	AM_RANGE(0x4ff0, 0x4fff) AM_MIRROR(0xa000) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0xaf38) AM_WRITE(irq_mask_w)
-	AM_RANGE(0x5001, 0x5001) AM_MIRROR(0xaf38) AM_DEVWRITE_LEGACY("namco", pacman_sound_enable_w)
+	AM_RANGE(0x5001, 0x5001) AM_MIRROR(0xaf38) AM_DEVWRITE("namco", namco_device, pacman_sound_enable_w)
 	AM_RANGE(0x5002, 0x5002) AM_MIRROR(0xaf38) AM_WRITENOP
 	AM_RANGE(0x5003, 0x5003) AM_MIRROR(0xaf38) AM_WRITE(pacman_flipscreen_w)
 	AM_RANGE(0x5004, 0x5005) AM_MIRROR(0xaf38) AM_WRITENOP // AM_WRITE(pacman_leds_w)
 	AM_RANGE(0x5006, 0x5006) AM_MIRROR(0xaf38) AM_WRITENOP // AM_WRITE(pacman_coin_lockout_global_w)
 	AM_RANGE(0x5007, 0x5007) AM_MIRROR(0xaf38) AM_WRITE(pacman_coin_counter_w)
-	AM_RANGE(0x5040, 0x505f) AM_MIRROR(0xaf00) AM_DEVWRITE_LEGACY("namco", pacman_sound_w)
+	AM_RANGE(0x5040, 0x505f) AM_MIRROR(0xaf00) AM_DEVWRITE("namco", namco_device, pacman_sound_w)
 	AM_RANGE(0x5060, 0x506f) AM_MIRROR(0xaf00) AM_WRITEONLY AM_SHARE("spriteram2")
 	AM_RANGE(0x5070, 0x507f) AM_MIRROR(0xaf00) AM_WRITENOP
 	AM_RANGE(0x5080, 0x5080) AM_MIRROR(0xaf3f) AM_WRITENOP
@@ -1090,7 +1089,7 @@ static ADDRESS_MAP_START( alibaba_map, AS_PROGRAM, 8, pacman_state )
 	AM_RANGE(0x5060, 0x506f) AM_MIRROR(0xaf00) AM_WRITEONLY AM_SHARE("spriteram2") /* actually at 5050-505f, here to point to free RAM */
 	AM_RANGE(0x5070, 0x507f) AM_MIRROR(0xaf00) AM_WRITENOP
 	AM_RANGE(0x5080, 0x5080) AM_MIRROR(0xaf3f) AM_WRITENOP
-	AM_RANGE(0x50c0, 0x50c0) AM_MIRROR(0xaf00) AM_DEVWRITE_LEGACY("namco", pacman_sound_enable_w)
+	AM_RANGE(0x50c0, 0x50c0) AM_MIRROR(0xaf00) AM_DEVWRITE("namco", namco_device, pacman_sound_enable_w)
 	AM_RANGE(0x50c1, 0x50c1) AM_MIRROR(0xaf00) AM_WRITE(pacman_flipscreen_w)
 	AM_RANGE(0x50c2, 0x50c2) AM_MIRROR(0xaf00) AM_WRITE(irq_mask_w)
 	AM_RANGE(0x50c3, 0x50ff) AM_MIRROR(0xaf00) AM_WRITENOP
@@ -1113,13 +1112,13 @@ static ADDRESS_MAP_START( dremshpr_map, AS_PROGRAM, 8, pacman_state )
 	AM_RANGE(0x4800, 0x4fef) AM_MIRROR(0xa000) AM_RAM
 	AM_RANGE(0x4ff0, 0x4fff) AM_MIRROR(0xa000) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0xaf38) AM_WRITE(irq_mask_w)
-//  AM_RANGE(0x5001, 0x5001) AM_MIRROR(0xaf38) AM_DEVWRITE_LEGACY("namco", pacman_sound_enable_w)
+//  AM_RANGE(0x5001, 0x5001) AM_MIRROR(0xaf38) AM_DEVWRITE("namco", namco_device, pacman_sound_enable_w)
 	AM_RANGE(0x5002, 0x5002) AM_MIRROR(0xaf38) AM_WRITENOP /* unknown */
 	AM_RANGE(0x5003, 0x5003) AM_MIRROR(0xaf38) AM_WRITE(pacman_flipscreen_w)
 	AM_RANGE(0x5004, 0x5005) AM_MIRROR(0xaf38) AM_WRITENOP // AM_WRITE(pacman_leds_w)
 	AM_RANGE(0x5006, 0x5006) AM_MIRROR(0xaf38) AM_WRITENOP // AM_WRITE(pacman_coin_lockout_global_w)
 	AM_RANGE(0x5007, 0x5007) AM_MIRROR(0xaf38) AM_WRITE(pacman_coin_counter_w)
-//  AM_RANGE(0x5040, 0x505f) AM_MIRROR(0xaf00) AM_DEVWRITE_LEGACY("namco", pacman_sound_w)
+//  AM_RANGE(0x5040, 0x505f) AM_MIRROR(0xaf00) AM_DEVWRITE("namco", namco_device, pacman_sound_w)
 	AM_RANGE(0x5060, 0x506f) AM_MIRROR(0xaf00) AM_WRITEONLY AM_SHARE("spriteram2")
 	AM_RANGE(0x5070, 0x507f) AM_MIRROR(0xaf00) AM_WRITENOP
 	AM_RANGE(0x5080, 0x5080) AM_MIRROR(0xaf3f) AM_WRITENOP
@@ -1144,13 +1143,13 @@ static ADDRESS_MAP_START( epos_map, AS_PROGRAM, 8, pacman_state )
 	AM_RANGE(0x4c00, 0x4fef) AM_MIRROR(0xa000) AM_RAM
 	AM_RANGE(0x4ff0, 0x4fff) AM_MIRROR(0xa000) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0xaf38) AM_WRITE(irq_mask_w)
-	AM_RANGE(0x5001, 0x5001) AM_MIRROR(0xaf38) AM_DEVWRITE_LEGACY("namco", pacman_sound_enable_w)
+	AM_RANGE(0x5001, 0x5001) AM_MIRROR(0xaf38) AM_DEVWRITE("namco", namco_device, pacman_sound_enable_w)
 	AM_RANGE(0x5002, 0x5002) AM_MIRROR(0xaf38) AM_WRITENOP
 	AM_RANGE(0x5003, 0x5003) AM_MIRROR(0xaf38) AM_WRITE(pacman_flipscreen_w)
 	AM_RANGE(0x5004, 0x5005) AM_MIRROR(0xaf38) AM_WRITENOP // AM_WRITE(pacman_leds_w)
 	AM_RANGE(0x5006, 0x5006) AM_MIRROR(0xaf38) AM_WRITENOP // AM_WRITE(pacman_coin_lockout_global_w)
 	AM_RANGE(0x5007, 0x5007) AM_MIRROR(0xaf38) AM_WRITE(pacman_coin_counter_w)
-	AM_RANGE(0x5040, 0x505f) AM_MIRROR(0xaf00) AM_DEVWRITE_LEGACY("namco", pacman_sound_w)
+	AM_RANGE(0x5040, 0x505f) AM_MIRROR(0xaf00) AM_DEVWRITE("namco", namco_device, pacman_sound_w)
 	AM_RANGE(0x5060, 0x506f) AM_MIRROR(0xaf00) AM_WRITEONLY AM_SHARE("spriteram2")
 	AM_RANGE(0x5070, 0x507f) AM_MIRROR(0xaf00) AM_WRITENOP
 	AM_RANGE(0x5080, 0x5080) AM_MIRROR(0xaf3f) AM_WRITENOP
@@ -1198,10 +1197,10 @@ static ADDRESS_MAP_START( rocktrv2_map, AS_PROGRAM, 8, pacman_state )
 	AM_RANGE(0x4400, 0x47ff) AM_RAM_WRITE(pacman_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x4c00, 0x4fff) AM_RAM
 	AM_RANGE(0x5000, 0x5000) AM_WRITE(irq_mask_w)
-	AM_RANGE(0x5001, 0x5001) AM_DEVWRITE_LEGACY("namco", pacman_sound_enable_w)
+	AM_RANGE(0x5001, 0x5001) AM_DEVWRITE("namco", namco_device, pacman_sound_enable_w)
 	AM_RANGE(0x5003, 0x5003) AM_WRITE(pacman_flipscreen_w)
 	AM_RANGE(0x5007, 0x5007) AM_WRITE(pacman_coin_counter_w)
-	AM_RANGE(0x5040, 0x505f) AM_DEVWRITE_LEGACY("namco", pacman_sound_w)
+	AM_RANGE(0x5040, 0x505f) AM_DEVWRITE("namco", namco_device, pacman_sound_w)
 	AM_RANGE(0x50c0, 0x50c0) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x5fe0, 0x5fe3) AM_WRITE(rocktrv2_prot_data_w) AM_SHARE("rocktrv2_prot")
 	AM_RANGE(0x5ff0, 0x5ff0) AM_WRITE(rocktrv2_question_bank_w)
@@ -1225,10 +1224,10 @@ static ADDRESS_MAP_START( bigbucks_map, AS_PROGRAM, 8, pacman_state )
 	AM_RANGE(0x4400, 0x47ff) AM_RAM_WRITE(pacman_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x4c00, 0x4fff) AM_RAM
 	AM_RANGE(0x5000, 0x5000) AM_WRITE(irq_mask_w)
-	AM_RANGE(0x5001, 0x5001) AM_DEVWRITE_LEGACY("namco", pacman_sound_enable_w)
+	AM_RANGE(0x5001, 0x5001) AM_DEVWRITE("namco", namco_device, pacman_sound_enable_w)
 	AM_RANGE(0x5003, 0x5003) AM_WRITE(pacman_flipscreen_w)
 	AM_RANGE(0x5007, 0x5007) AM_WRITENOP /*?*/
-	AM_RANGE(0x5040, 0x505f) AM_DEVWRITE_LEGACY("namco", pacman_sound_w)
+	AM_RANGE(0x5040, 0x505f) AM_DEVWRITE("namco", namco_device, pacman_sound_w)
 	AM_RANGE(0x50c0, 0x50c0) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x5000, 0x503f) AM_READ_PORT("IN0")
 	AM_RANGE(0x5040, 0x507f) AM_READ_PORT("IN1")
@@ -1248,13 +1247,13 @@ static ADDRESS_MAP_START( mschamp_map, AS_PROGRAM, 8, pacman_state )
 	AM_RANGE(0x4c00, 0x4fef) AM_MIRROR(0xa000) AM_RAM
 	AM_RANGE(0x4ff0, 0x4fff) AM_MIRROR(0xa000) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0xaf38) AM_WRITE(irq_mask_w)
-	AM_RANGE(0x5001, 0x5001) AM_MIRROR(0xaf38) AM_DEVWRITE_LEGACY("namco", pacman_sound_enable_w)
+	AM_RANGE(0x5001, 0x5001) AM_MIRROR(0xaf38) AM_DEVWRITE("namco", namco_device, pacman_sound_enable_w)
 	AM_RANGE(0x5002, 0x5002) AM_MIRROR(0xaf38) AM_WRITENOP
 	AM_RANGE(0x5003, 0x5003) AM_MIRROR(0xaf38) AM_WRITE(pacman_flipscreen_w)
 	AM_RANGE(0x5004, 0x5005) AM_MIRROR(0xaf38) AM_WRITENOP // AM_WRITE(pacman_leds_w)
 	AM_RANGE(0x5006, 0x5006) AM_MIRROR(0xaf38) AM_WRITENOP // AM_WRITE(pacman_coin_lockout_global_w)
 	AM_RANGE(0x5007, 0x5007) AM_MIRROR(0xaf38) AM_WRITE(pacman_coin_counter_w)
-	AM_RANGE(0x5040, 0x505f) AM_MIRROR(0xaf00) AM_DEVWRITE_LEGACY("namco", pacman_sound_w)
+	AM_RANGE(0x5040, 0x505f) AM_MIRROR(0xaf00) AM_DEVWRITE("namco", namco_device, pacman_sound_w)
 	AM_RANGE(0x5060, 0x506f) AM_MIRROR(0xaf00) AM_WRITEONLY AM_SHARE("spriteram2")
 	AM_RANGE(0x5070, 0x507f) AM_MIRROR(0xaf00) AM_WRITENOP
 	AM_RANGE(0x5080, 0x5080) AM_MIRROR(0xaf3f) AM_WRITENOP
@@ -1274,12 +1273,12 @@ static ADDRESS_MAP_START( superabc_map, AS_PROGRAM, 8, pacman_state )
 	AM_RANGE(0x4800, 0x4fff) AM_MIRROR(0xa000) AM_RAM AM_SHARE("28c16.u17") // nvram
 	AM_RANGE(0x4ff0, 0x4fff) AM_MIRROR(0xa000) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0xaf38) AM_WRITE(irq_mask_w)
-	AM_RANGE(0x5001, 0x5001) AM_MIRROR(0xaf38) AM_DEVWRITE_LEGACY("namco", pacman_sound_enable_w)
+	AM_RANGE(0x5001, 0x5001) AM_MIRROR(0xaf38) AM_DEVWRITE("namco", namco_device, pacman_sound_enable_w)
 	AM_RANGE(0x5002, 0x5002) AM_MIRROR(0xaf3c) AM_WRITE(superabc_bank_w)
 	AM_RANGE(0x5003, 0x5003) AM_MIRROR(0xaf38) AM_WRITE(pacman_flipscreen_w)
 	AM_RANGE(0x5004, 0x5005) AM_MIRROR(0xaf38) AM_WRITE(pacman_leds_w)
 	AM_RANGE(0x5007, 0x5007) AM_MIRROR(0xaf38) AM_WRITE(pacman_coin_counter_w)
-	AM_RANGE(0x5040, 0x505f) AM_MIRROR(0xaf00) AM_DEVWRITE_LEGACY("namco", pacman_sound_w)
+	AM_RANGE(0x5040, 0x505f) AM_MIRROR(0xaf00) AM_DEVWRITE("namco", namco_device, pacman_sound_w)
 	AM_RANGE(0x5060, 0x506f) AM_MIRROR(0xaf00) AM_WRITEONLY AM_SHARE("spriteram2")
 	AM_RANGE(0x5070, 0x507f) AM_MIRROR(0xaf00) AM_WRITENOP
 	AM_RANGE(0x5080, 0x5080) AM_MIRROR(0xaf3f) AM_WRITENOP
@@ -1301,7 +1300,7 @@ static ADDRESS_MAP_START( crushs_map, AS_PROGRAM, 8, pacman_state )
 	AM_RANGE(0x4c00, 0x4fef) AM_MIRROR(0xa000) AM_RAM
 	AM_RANGE(0x4ff0, 0x4fff) AM_MIRROR(0xa000) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0xaf38) AM_WRITE(irq_mask_w)
-	AM_RANGE(0x5001, 0x5001) AM_MIRROR(0xaf38) AM_DEVWRITE_LEGACY("namco", pacman_sound_enable_w)
+	AM_RANGE(0x5001, 0x5001) AM_MIRROR(0xaf38) AM_DEVWRITE("namco", namco_device, pacman_sound_enable_w)
 	AM_RANGE(0x5002, 0x5002) AM_MIRROR(0xaf38) AM_WRITENOP
 	AM_RANGE(0x5003, 0x5003) AM_MIRROR(0xaf38) AM_WRITE(pacman_flipscreen_w)
 	AM_RANGE(0x5004, 0x5005) AM_MIRROR(0xaf38) AM_WRITENOP // AM_WRITE(pacman_leds_w)
@@ -1331,13 +1330,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vanvan_portmap, AS_IO, 8, pacman_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01, 0x01) AM_DEVWRITE("namco", sn76496_device, write)
+	AM_RANGE(0x01, 0x01) AM_DEVWRITE("sn1", sn76496_device, write)
 	AM_RANGE(0x02, 0x02) AM_DEVWRITE("sn2", sn76496_device, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dremshpr_portmap, AS_IO, 8, pacman_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x06, 0x07) AM_DEVWRITE("namco", ay8910_device, data_address_w)
+	AM_RANGE(0x06, 0x07) AM_DEVWRITE("ay8910", ay8910_device, data_address_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( piranha_portmap, AS_IO, 8, pacman_state )
@@ -1370,7 +1369,7 @@ static ADDRESS_MAP_START( bigbucks_portmap, AS_IO, 8, pacman_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( s2650games_writeport, AS_IO, 8, pacman_state )
-	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_DEVWRITE("namco", sn76496_device, write)
+	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_DEVWRITE("sn1", sn76496_device, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( drivfrcp_portmap, AS_IO, 8, pacman_state )
@@ -1396,7 +1395,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( crushs_portmap, AS_IO, 8, pacman_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("namco", ay8910_device, data_address_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay8912", ay8912_device, data_address_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("DSW2")
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSW1")
 ADDRESS_MAP_END
@@ -3419,7 +3418,8 @@ static MACHINE_CONFIG_DERIVED( dremshpr, pacman )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pacman_state,  vblank_nmi)
 
 	/* sound hardware */
-	MCFG_SOUND_REPLACE("namco", AY8910, 14318000/8)
+	MCFG_DEVICE_REMOVE("namco")
+	MCFG_SOUND_ADD("ay8910", AY8910, 14318000/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -3461,7 +3461,8 @@ static MACHINE_CONFIG_DERIVED( vanvan, pacman )
 	MCFG_SCREEN_VISIBLE_AREA(2*8, 34*8-1, 0*8, 28*8-1)
 
 	/* sound hardware */
-	MCFG_SOUND_REPLACE("namco", SN76496, 1789750)
+	MCFG_DEVICE_REMOVE("namco")
+	MCFG_SOUND_ADD("sn1", SN76496, 1789750)
 	MCFG_SOUND_CONFIG(psg_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 	MCFG_SOUND_ADD("sn2", SN76496, 1789750)
@@ -3502,7 +3503,8 @@ static MACHINE_CONFIG_DERIVED( s2650games, pacman )
 	MCFG_VIDEO_START_OVERRIDE(pacman_state,s2650games)
 
 	/* sound hardware */
-	MCFG_SOUND_REPLACE("namco", SN76496, MASTER_CLOCK/6)    /* 1H */
+	MCFG_DEVICE_REMOVE("namco")
+	MCFG_SOUND_ADD("sn1", SN76496, MASTER_CLOCK/6)    /* 1H */
 	MCFG_SOUND_CONFIG(psg_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
@@ -3595,7 +3597,7 @@ static MACHINE_CONFIG_DERIVED( crushs, pacman )
 	MCFG_CPU_IO_MAP(crushs_portmap)
 
 	/* sound hardware */
-	MCFG_SOUND_REPLACE("namco", AY8912, 1789750)
+	MCFG_SOUND_ADD("ay8912", AY8912, 1789750)
 	MCFG_SOUND_CONFIG(crushs_ay8910_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END

@@ -1,3 +1,5 @@
+#include "sound/namco.h"
+
 /*************************************************************************
 
     Namco PuckMan
@@ -10,6 +12,7 @@ public:
 	pacman_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_namco_sound(*this, "namco"),
 		m_spriteram(*this, "spriteram"),
 		m_spriteram2(*this, "spriteram2"),
 		m_s2650_spriteram(*this, "s2650_spriteram"),
@@ -20,6 +23,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
+	optional_device<namco_device> m_namco_sound;
 	optional_shared_ptr<UINT8> m_spriteram;
 	optional_shared_ptr<UINT8> m_spriteram2;
 	optional_shared_ptr<UINT8> m_s2650_spriteram;

@@ -1,3 +1,5 @@
+#include "sound/namco.h"
+
 class pacland_state : public driver_device
 {
 public:
@@ -7,11 +9,15 @@ public:
 		m_videoram2(*this, "videoram2"),
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
-		m_mcu(*this, "mcu") { }
+		m_mcu(*this, "mcu"),
+		m_cus30(*this, "namco")	{ }
 
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_videoram2;
 	required_shared_ptr<UINT8> m_spriteram;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_mcu;
+	required_device<namco_cus30_device> m_cus30;
 	UINT8 m_palette_bank;
 	const UINT8 *m_color_prom;
 	tilemap_t *m_bg_tilemap;
@@ -45,6 +51,4 @@ public:
 	void switch_palette();
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int whichmask);
 	void draw_fg(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_mcu;
 };

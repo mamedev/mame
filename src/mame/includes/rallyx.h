@@ -1,4 +1,5 @@
 #include "audio/timeplt.h"
+#include "sound/namco.h"
 #include "sound/samples.h"
 
 struct jungler_star
@@ -16,6 +17,7 @@ public:
 		m_videoram(*this, "videoram"),
 		m_radarattr(*this, "radarattr"),
 		m_maincpu(*this, "maincpu"),
+		m_namco_sound(*this, "namco"),
 		m_samples(*this, "samples"),
 		m_timeplt_audio(*this, "timeplt_audio") { }
 
@@ -41,6 +43,7 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
+	optional_device<namco_device> m_namco_sound;
 	optional_device<samples_device> m_samples;
 	optional_device<timeplt_audio_device> m_timeplt_audio;
 

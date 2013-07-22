@@ -1,3 +1,5 @@
+#include "sound/namco.h"
+
 class skykid_state : public driver_device
 {
 public:
@@ -7,12 +9,16 @@ public:
 		m_textram(*this, "textram"),
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
-		m_mcu(*this, "mcu") { }
+		m_mcu(*this, "mcu"),
+		m_cus30(*this, "namco") { }
 
 	UINT8 m_inputport_selected;
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_textram;
 	required_shared_ptr<UINT8> m_spriteram;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_mcu;
+	required_device<namco_cus30_device> m_cus30;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_tx_tilemap;
 	UINT8 m_priority;
@@ -46,6 +52,4 @@ public:
 	INTERRUPT_GEN_MEMBER(main_vblank_irq);
 	INTERRUPT_GEN_MEMBER(mcu_vblank_irq);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_mcu;
 };

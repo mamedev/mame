@@ -14,7 +14,6 @@
 #include "includes/namcoic.h"
 #include "sound/dac.h"
 #include "sound/2151intf.h"
-#include "sound/namco.h"
 #include "rendlay.h"
 #include "tceptor2.lh"
 #include "includes/tceptor.h"
@@ -158,7 +157,7 @@ static ADDRESS_MAP_START( m6809_map, AS_PROGRAM, 8, tceptor_state )
 	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(tceptor_tile_ram_w) AM_SHARE("tile_ram")
 	AM_RANGE(0x1c00, 0x1fff) AM_RAM_WRITE(tceptor_tile_attr_w) AM_SHARE("tile_attr")
 	AM_RANGE(0x2000, 0x3fff) AM_RAM_WRITE(tceptor_bg_ram_w) AM_SHARE("bg_ram")  // background (VIEW RAM)
-	AM_RANGE(0x4000, 0x43ff) AM_DEVREADWRITE_LEGACY("namco", namcos1_cus30_r, namcos1_cus30_w)
+	AM_RANGE(0x4000, 0x43ff) AM_DEVREADWRITE("namco", namco_cus30_device, namcos1_cus30_r, namcos1_cus30_w)
 	AM_RANGE(0x4800, 0x4800) AM_WRITENOP                // 3D scope left/right?
 	AM_RANGE(0x4f00, 0x4f00) AM_READNOP             // unknown
 	AM_RANGE(0x4f01, 0x4f01) AM_READ_PORT("PEDAL")          // analog input (accel)
@@ -209,7 +208,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, tceptor_state )
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE_LEGACY(m6801_io_r, m6801_io_w)
 	AM_RANGE(0x0080, 0x00ff) AM_RAM
-	AM_RANGE(0x1000, 0x13ff) AM_DEVREADWRITE_LEGACY("namco", namcos1_cus30_r, namcos1_cus30_w)
+	AM_RANGE(0x1000, 0x13ff) AM_DEVREADWRITE("namco", namco_cus30_device, namcos1_cus30_r, namcos1_cus30_w)
 	AM_RANGE(0x1400, 0x154d) AM_RAM
 	AM_RANGE(0x17c0, 0x17ff) AM_RAM
 	AM_RANGE(0x2000, 0x20ff) AM_RAM AM_SHARE("share3")

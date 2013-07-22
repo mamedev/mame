@@ -84,7 +84,6 @@ Graphics: CY37256P160-83AC x 2 (Ultra37000 CPLD family - 160 pin TQFP, 256 Macro
 #include "emu.h"
 #include "cpu/z180/z180.h"
 #include "machine/eeprom.h"
-#include "sound/namco.h"
 #include "sound/dac.h"
 #include "includes/20pacgal.h"
 
@@ -227,9 +226,9 @@ static ADDRESS_MAP_START( 20pacgal_map, AS_PROGRAM, 8, _20pacgal_state )
 	AM_RANGE(0x0a000, 0x0ffff) AM_MIRROR(0x40000) AM_ROM
 	AM_RANGE(0x10000, 0x3ffff) AM_ROM
 	AM_RANGE(0x44000, 0x447ff) AM_RAM AM_SHARE("video_ram")
-	AM_RANGE(0x45040, 0x4505f) AM_DEVWRITE_LEGACY("namco", pacman_sound_w)
+	AM_RANGE(0x45040, 0x4505f) AM_DEVWRITE("namco", namco_cus30_device, pacman_sound_w)
 	AM_RANGE(0x44800, 0x45eff) AM_RAM
-	AM_RANGE(0x45f00, 0x45fff) AM_DEVWRITE_LEGACY("namco", namcos1_cus30_w)
+	AM_RANGE(0x45f00, 0x45fff) AM_DEVWRITE("namco", namco_cus30_device, namcos1_cus30_w)
 	AM_RANGE(0x46000, 0x46fff) AM_WRITEONLY AM_SHARE("char_gfx_ram")
 	AM_RANGE(0x47100, 0x47100) AM_RAM   /* leftover from original Galaga code */
 	AM_RANGE(0x48000, 0x49fff) AM_READ_BANK("bank1") AM_WRITE(ram_48000_w)  /* this should be a mirror of 08000-09ffff */
@@ -377,7 +376,7 @@ static MACHINE_CONFIG_START( 20pacgal, _20pacgal_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("namco", NAMCO, NAMCO_AUDIO_CLOCK)
+	MCFG_SOUND_ADD("namco", NAMCO_CUS30, NAMCO_AUDIO_CLOCK)
 	MCFG_SOUND_CONFIG(namco_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 

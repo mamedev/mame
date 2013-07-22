@@ -222,7 +222,6 @@ Todo:
 #include "machine/namco06.h"
 #include "machine/namco51.h"
 #include "machine/namco53.h"
-#include "sound/namco.h"
 #include "audio/namco52.h"
 #include "audio/namco54.h"
 #include "includes/polepos.h"
@@ -300,7 +299,7 @@ WRITE8_MEMBER(polepos_state::polepos_latch_w)
 			break;
 
 		case 0x02:  /* CLSON */
-			polepos_sound_enable(machine().device("namco"),bit);
+			m_namco_sound->polepos_sound_enable(bit);
 			if (!bit)
 			{
 				machine().device<polepos_sound_device>("polepos")->polepos_engine_sound_lsb_w(space, 0, 0);
@@ -489,7 +488,7 @@ static ADDRESS_MAP_START( z80_map, AS_PROGRAM, 8, polepos_state )
 	AM_RANGE(0x5000, 0x57ff) AM_READWRITE(polepos_view_r, polepos_view_w)               /* Background Memory */
 
 	AM_RANGE(0x8000, 0x83bf) AM_MIRROR(0x0c00) AM_RAM                                   /* Sound Memory */
-	AM_RANGE(0x83c0, 0x83ff) AM_MIRROR(0x0c00) AM_DEVREADWRITE_LEGACY("namco", polepos_sound_r, polepos_sound_w)    /* Sound data */
+	AM_RANGE(0x83c0, 0x83ff) AM_MIRROR(0x0c00) AM_DEVREADWRITE("namco", namco_device, polepos_sound_r, polepos_sound_w)    /* Sound data */
 
 	AM_RANGE(0x9000, 0x9000) AM_MIRROR(0x0eff) AM_DEVREADWRITE_LEGACY("06xx", namco_06xx_data_r, namco_06xx_data_w)
 	AM_RANGE(0x9100, 0x9100) AM_MIRROR(0x0eff) AM_DEVREADWRITE_LEGACY("06xx", namco_06xx_ctrl_r, namco_06xx_ctrl_w)
