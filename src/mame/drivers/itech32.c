@@ -28,6 +28,10 @@
         * Driver's Edge accesses many uninitialized RAM locations;
             requires hack to make steering in attract mode work
 
+    NOTE: The Japanese World Class Bowling v1.3 set reads the trackball
+          at a 45 degree offset from standard orientation. This is NOT a
+          bug and is not controlled via dipswitches like some GT3D sets
+
 ****************************************************************************
 
     There are at least 4 types of Golden Tee PCBs
@@ -1325,6 +1329,16 @@ static INPUT_PORTS_START( wcbowl )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( wcbowlj )
+	PORT_INCLUDE( wcbowl )
+
+	PORT_MODIFY("DIPS")
+	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Controls ) ) PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(      0x0000, "One Trackball" )
+	PORT_DIPSETTING(      0x0040, "Two Trackballs" )	/* Two Trackballs will work for Upright for "side by side" controls */
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( itech32_base_32bit )
 	PORT_START("P1")    /* 080000 */
 	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -1540,7 +1554,7 @@ static INPUT_PORTS_START( gt3d )
 	PORT_DIPSETTING(          0x00200000, "45 Degree Angle" )
 	PORT_DIPNAME( 0x00400000, 0x00000000, DEF_STR( Controls ) ) PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(          0x00000000, "One Trackball" )
-	PORT_DIPSETTING(          0x00400000, "Two Trackballs" )
+	PORT_DIPSETTING(          0x00400000, "Two Trackballs" )                    /* Two Trackballs will work for Upright for "side by side" controls */
 
 	PORT_START("TRACKX1")
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_REVERSE PORT_PLAYER(1)
@@ -1647,9 +1661,6 @@ static INPUT_PORTS_START( aama )
 	PORT_DIPNAME( 0x00200000, 0x00000000, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(          0x00000000, DEF_STR( Upright ) )
 	PORT_DIPSETTING(          0x00200000, DEF_STR( Cocktail ) )                 /* Cocktail mode REQUIRES "Controls" to be set to "Two Trackballs" */
-	PORT_DIPNAME( 0x00400000, 0x00000000, DEF_STR( Controls ) ) PORT_DIPLOCATION("SW1:2")
-	PORT_DIPSETTING(          0x00000000, "One Trackball" )
-	PORT_DIPSETTING(          0x00400000, "Two Trackballs" )                    /* Two Trackballs will work for Upright for "side by side" controls */
 INPUT_PORTS_END
 
 
@@ -4465,7 +4476,7 @@ GAME( 1995, wcbowl16,    wcbowl,   sftm,     wcbowlo,  itech32_state, wcbowln,  
 GAME( 1995, wcbowl15,    wcbowl,   bloodstm, wcbowl,   itech32_state, wcbowl,   ROT0, "Incredible Technologies",          "World Class Bowling (v1.5)" , 0) /* PIC 16C54 labeled as ITBWL-1 */
 GAME( 1995, wcbowl14,    wcbowl,   bloodstm, wcbowl,   itech32_state, wcbowl,   ROT0, "Incredible Technologies",          "World Class Bowling (v1.4)" , 0) /* PIC 16C54 labeled as ITBWL-1 */
 GAME( 1995, wcbowl13,    wcbowl,   bloodstm, wcbowl,   itech32_state, wcbowl,   ROT0, "Incredible Technologies",          "World Class Bowling (v1.3)" , 0) /* PIC 16C54 labeled as ITBWL-1 */
-GAME( 1995, wcbowl13j,   wcbowl,   bloodstm, wcbowl,   itech32_state, wcbowlj,  ROT0, "Incredible Technologies",          "World Class Bowling (v1.3J, Japan)" , GAME_NOT_WORKING) /* PIC 16C54 labeled as ITBWL-1 */
+GAME( 1995, wcbowl13j,   wcbowl,   bloodstm, wcbowlj,  itech32_state, wcbowlj,  ROT0, "Incredible Technologies",          "World Class Bowling (v1.3J, Japan)" , 0) /* PIC 16C54 labeled as ITBWL-1 */
 GAME( 1995, wcbowl12,    wcbowl,   bloodstm, wcbowl,   itech32_state, wcbowl,   ROT0, "Incredible Technologies",          "World Class Bowling (v1.2)" , 0) /* PIC 16C54 labeled as ITBWL-1 */
 GAME( 1995, wcbowl11,    wcbowl,   bloodstm, wcbowl,   itech32_state, wcbowl,   ROT0, "Incredible Technologies",          "World Class Bowling (v1.1)" , 0) /* PIC 16C54 labeled as ITBWL-1 */
 GAME( 1995, sftm,        0,        sftm,     sftm,     itech32_state, sftm,     ROT0, "Capcom / Incredible Technologies", "Street Fighter: The Movie (v1.12)" , 0) /* PIC 16C54 labeled as ITSF-1 */
