@@ -689,6 +689,7 @@ static ADDRESS_MAP_START( captaven_map, AS_PROGRAM, 32, deco32_state )
 	AM_RANGE(0x168000, 0x168003) AM_READ(captaven_soundcpu_r)
 
 	AM_RANGE(0x178000, 0x178003) AM_WRITE(deco32_pri_w)
+	
 
 	AM_RANGE(0x180000, 0x18001f) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf_control_dword_r, pf_control_dword_w)
 	AM_RANGE(0x190000, 0x191fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_dword_r, pf1_data_dword_w)
@@ -825,56 +826,72 @@ WRITE16_MEMBER( deco32_state::dg_protection_region_0_146_w )
 	m_deco146->write_data( space, deco146_addr, data, mem_mask, cs );
 }
 
+READ32_MEMBER( dragngun_state::dragngun_unk_video_r)
+{
+	return machine().rand();
+}
 
 // the video drawing (especially sprite) code on this is too slow to cope with proper partial updates
 // raster effects appear to need some work on it anyway?
 static ADDRESS_MAP_START( dragngun_map, AS_PROGRAM, 32, dragngun_state )
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x11ffff) AM_RAM AM_SHARE("ram")
-//	AM_RANGE(0x120000, 0x120fff) AM_DEVREAD("ioprot", deco146_device, dragngun_prot_r)
-	AM_RANGE(0x120000, 0x127fff) AM_READWRITE16(dg_protection_region_0_146_r, dg_protection_region_0_146_w, 0x0000ffff)
+	AM_RANGE(0x0000000, 0x00fffff) AM_ROM
+	AM_RANGE(0x0100000, 0x011ffff) AM_RAM AM_SHARE("ram")
+//	AM_RANGE(0x0120000, 0x0120fff) AM_DEVREAD("ioprot", deco146_device, dragngun_prot_r)
+	AM_RANGE(0x0120000, 0x0127fff) AM_READWRITE16(dg_protection_region_0_146_r, dg_protection_region_0_146_w, 0x0000ffff)
 
-//	AM_RANGE(0x1204c0, 0x1204c3) AM_WRITE(deco32_sound_w)
-	AM_RANGE(0x128000, 0x12800f) AM_READWRITE(deco32_irq_controller_r, deco32_irq_controller_w)
-	AM_RANGE(0x130000, 0x131fff) AM_RAM_WRITE(deco32_buffered_palette_w) AM_SHARE("paletteram")
-	AM_RANGE(0x138000, 0x138003) AM_NOP /* Palette dma complete in bit 0x8? ack?  return 0 else tight loop */
-	AM_RANGE(0x138008, 0x13800b) AM_WRITE(deco32_palette_dma_w)
+//	AM_RANGE(0x01204c0, 0x01204c3) AM_WRITE(deco32_sound_w)
+	AM_RANGE(0x0128000, 0x012800f) AM_READWRITE(deco32_irq_controller_r, deco32_irq_controller_w)
+	AM_RANGE(0x0130000, 0x0131fff) AM_RAM_WRITE(deco32_buffered_palette_w) AM_SHARE("paletteram")
+	AM_RANGE(0x0138000, 0x0138003) AM_NOP /* Palette dma complete in bit 0x8? ack?  return 0 else tight loop */
+	AM_RANGE(0x0138008, 0x013800b) AM_WRITE(deco32_palette_dma_w)
 
-	AM_RANGE(0x180000, 0x18001f) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf_control_dword_r, pf_control_dword_w)
-	AM_RANGE(0x190000, 0x191fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_dword_r, pf1_data_dword_w)
-	AM_RANGE(0x194000, 0x195fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf2_data_dword_r, pf2_data_dword_w)
-	AM_RANGE(0x1a0000, 0x1a3fff) AM_RAM_WRITE(deco32_pf1_rowscroll_w) AM_SHARE("pf1_rowscroll32")
-	AM_RANGE(0x1a4000, 0x1a5fff) AM_RAM_WRITE(deco32_pf2_rowscroll_w) AM_SHARE("pf2_rowscroll32")
+	AM_RANGE(0x0170100, 0x0170103) AM_WRITENOP
+	AM_RANGE(0x0170038, 0x017003b) AM_WRITENOP
+	AM_RANGE(0x017002C, 0x017002f) AM_WRITENOP
+	AM_RANGE(0x0170224, 0x0170227) AM_WRITENOP
 
-	AM_RANGE(0x1c0000, 0x1c001f) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf_control_dword_r, pf_control_dword_w)
-	AM_RANGE(0x1d0000, 0x1d1fff) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf1_data_dword_r, pf1_data_dword_w)
-	AM_RANGE(0x1d4000, 0x1d5fff) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf2_data_dword_r, pf2_data_dword_w) // unused
-	AM_RANGE(0x1e0000, 0x1e3fff) AM_RAM_WRITE(deco32_pf3_rowscroll_w) AM_SHARE("pf3_rowscroll32")
-	AM_RANGE(0x1e4000, 0x1e5fff) AM_RAM_WRITE(deco32_pf4_rowscroll_w) AM_SHARE("pf4_rowscroll32") // unused
+	AM_RANGE(0x0180000, 0x018001f) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf_control_dword_r, pf_control_dword_w)
+	AM_RANGE(0x0190000, 0x0191fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_dword_r, pf1_data_dword_w)
+	AM_RANGE(0x0194000, 0x0195fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf2_data_dword_r, pf2_data_dword_w)
+	AM_RANGE(0x01a0000, 0x01a3fff) AM_RAM_WRITE(deco32_pf1_rowscroll_w) AM_SHARE("pf1_rowscroll32")
+	AM_RANGE(0x01a4000, 0x01a5fff) AM_RAM_WRITE(deco32_pf2_rowscroll_w) AM_SHARE("pf2_rowscroll32")
 
-	AM_RANGE(0x204800, 0x204fff) AM_RAM // ace? 0x10 byte increments only  // 13f ff stuff
+	AM_RANGE(0x01c0000, 0x01c001f) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf_control_dword_r, pf_control_dword_w)
+	AM_RANGE(0x01d0000, 0x01d1fff) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf1_data_dword_r, pf1_data_dword_w)
+	AM_RANGE(0x01d4000, 0x01d5fff) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf2_data_dword_r, pf2_data_dword_w) // unused
+	AM_RANGE(0x01e0000, 0x01e3fff) AM_RAM_WRITE(deco32_pf3_rowscroll_w) AM_SHARE("pf3_rowscroll32")
+	AM_RANGE(0x01e4000, 0x01e5fff) AM_RAM_WRITE(deco32_pf4_rowscroll_w) AM_SHARE("pf4_rowscroll32") // unused
+
+	AM_RANGE(0x0204800, 0x0204fff) AM_RAM // ace? 0x10 byte increments only  // 13f ff stuff
 
 
-	AM_RANGE(0x208000, 0x208fff) AM_RAM AM_SHARE("dragngun_lay0")
-	AM_RANGE(0x20c000, 0x20cfff) AM_RAM AM_SHARE("dragngun_lay1")
-	AM_RANGE(0x210000, 0x217fff) AM_RAM AM_SHARE("dragngun_look0")
-	AM_RANGE(0x218000, 0x21ffff) AM_RAM AM_SHARE("dragngun_look1")
-	AM_RANGE(0x220000, 0x221fff) AM_RAM AM_SHARE("spriteram") /* Main spriteram */
+	AM_RANGE(0x0208000, 0x0208fff) AM_RAM AM_SHARE("dragngun_lay0")
+	AM_RANGE(0x020c000, 0x020cfff) AM_RAM AM_SHARE("dragngun_lay1")
+	AM_RANGE(0x0210000, 0x0217fff) AM_RAM AM_SHARE("dragngun_look0")
+	AM_RANGE(0x0218000, 0x021ffff) AM_RAM AM_SHARE("dragngun_look1")
+	AM_RANGE(0x0220000, 0x0221fff) AM_RAM AM_SHARE("spriteram") /* Main spriteram */
 
-	AM_RANGE(0x228000, 0x2283ff) AM_RAM //0x10 byte increments only
+	AM_RANGE(0x0228000, 0x02283ff) AM_RAM //0x10 byte increments only
 
-	AM_RANGE(0x230000, 0x230003) AM_WRITE(dragngun_spriteram_dma_w)
+	AM_RANGE(0x0230000, 0x0230003) AM_WRITE(dragngun_spriteram_dma_w)
 
-	AM_RANGE(0x300000, 0x3fffff) AM_ROM
+	AM_RANGE(0x0300000, 0x03fffff) AM_ROM
 
-	AM_RANGE(0x400000, 0x400003) AM_DEVREADWRITE8("oki3", okim6295_device, read, write, 0x000000ff)
-	AM_RANGE(0x410000, 0x410003) AM_WRITENOP /* Some kind of serial bit-stream - digital volume control? */
-	AM_RANGE(0x420000, 0x420003) AM_READWRITE(dragngun_eeprom_r, dragngun_eeprom_w)
-	AM_RANGE(0x438000, 0x438003) AM_READ(dragngun_lightgun_r)
-	AM_RANGE(0x430000, 0x43001f) AM_WRITE(dragngun_lightgun_w)
-	AM_RANGE(0x440000, 0x440003) AM_READ(dragngun_service_r)
+	AM_RANGE(0x0400000, 0x0400003) AM_DEVREADWRITE8("oki3", okim6295_device, read, write, 0x000000ff)
+	AM_RANGE(0x0410000, 0x0410003) AM_WRITENOP /* Some kind of serial bit-stream - digital volume control? */
+	AM_RANGE(0x0420000, 0x0420003) AM_READWRITE(dragngun_eeprom_r, dragngun_eeprom_w)
+	AM_RANGE(0x0438000, 0x0438003) AM_READ(dragngun_lightgun_r)
+	AM_RANGE(0x0430000, 0x043001f) AM_WRITE(dragngun_lightgun_w)
+	AM_RANGE(0x0440000, 0x0440003) AM_READ(dragngun_service_r)
 
-	AM_RANGE(0x500000, 0x500003) AM_WRITE(dragngun_sprite_control_w)
+	AM_RANGE(0x0500000, 0x0500003) AM_WRITE(dragngun_sprite_control_w) 
+
+	// this is clearly the dvi video related area
+	AM_RANGE(0x1000000, 0x1000007) AM_READ(dragngun_unk_video_r)
+	AM_RANGE(0x1000100, 0x1007fff) AM_RAM
+	AM_RANGE(0x10b0000, 0x10b01ff) AM_RAM
+	AM_RANGE(0x1400000, 0x1ffffff) AM_ROM AM_REGION("dvi", 0x00000) // reads from here during boss battles when the videos should be displayed at the offsets where the DVI headers are.. however if we have the data in what looks like the right endian it crashes the game so I'm loading it wrong intentionally
+
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lockload_map, AS_PROGRAM, 32, dragngun_state )
@@ -2668,7 +2685,7 @@ ROM_START( dragngun )
 
 	// this is standard DVI data, see http://www.fileformat.info/format/dvi/egff.htm
 	// there are DVI headers at 0x000000, 0x580000, 0x800000, 0xB10000, 0xB80000
-	ROM_REGION( 0x1000000, "dvi", 0 ) /* Video data - unused for now */
+	ROM_REGION32_BE( 0x1000000, "dvi", 0 ) /* Video data - unused for now */
 	ROM_LOAD32_BYTE( "mar-17.bin",  0x000000,  0x100000,  CRC(7799ed23) SHA1(ae28ad4fa6033a3695fa83356701b3774b26e6b0) ) // 56 V / 41 A
 	ROM_LOAD32_BYTE( "mar-20.bin",  0x000001,  0x100000,  CRC(fa0462f0) SHA1(1a52617ad4d7abebc0f273dd979f4cf2d6a0306b) ) // 44 D / 56 V
 	ROM_LOAD32_BYTE( "mar-28.bin",  0x000002,  0x100000,  CRC(5a2ec71d) SHA1(447c404e6bb696f7eb7c61992a99b9be56f5d6b0) ) // 56 V / 53 S
@@ -2681,7 +2698,7 @@ ROM_START( dragngun )
 	ROM_LOAD32_BYTE( "mar-22.bin",  0x800001,  0x100000,  CRC(c85f3559) SHA1(a5d5cf9b18c9ef6a92d7643ca1ec9052de0d4a01) ) // 44 D / 56 V
 	ROM_LOAD32_BYTE( "mar-26.bin",  0x800002,  0x100000,  CRC(246a06c5) SHA1(447252be976a5059925f4ad98df8564b70198f62) ) // 56 V / 53 S
 	ROM_LOAD32_BYTE( "mar-23.bin",  0x800003,  0x100000,  CRC(ba907d6a) SHA1(1fd99b66e6297c8d927c1cf723a613b4ee2e2f90) ) // 49 I / 53 S
-
+	                                 
 	ROM_REGION(0x80000, "oki1", 0 )
 	ROM_LOAD( "mar-06.n17", 0x000000, 0x80000,  CRC(3e006c6e) SHA1(55786e0fde2bf6ba9802f3f4fa8d4c21625b976a) )
 
@@ -2742,7 +2759,7 @@ ROM_START( dragngunj )
 	ROM_LOAD32_BYTE( "mar-15.bin", 0x000003, 0x100000,  CRC(ec976b20) SHA1(c120b3c56d5e02162e41dc7f726c260d0f8d2f1a) )
 	ROM_LOAD32_BYTE( "mar-16.bin", 0x400003, 0x100000,  CRC(8b329bc8) SHA1(6e34eb6e2628a01a699d20a5155afb2febc31255) )
 
-	ROM_REGION( 0x1000000, "dvi", 0 ) /* Video data - unused for now */
+	ROM_REGION32_BE( 0x1000000, "dvi", 0 ) /* Video data - unused for now */
 	ROM_LOAD32_BYTE( "mar-17.bin",  0x000000,  0x100000,  CRC(7799ed23) SHA1(ae28ad4fa6033a3695fa83356701b3774b26e6b0) ) // 56 V / 41 A
 	ROM_LOAD32_BYTE( "mar-20.bin",  0x000001,  0x100000,  CRC(fa0462f0) SHA1(1a52617ad4d7abebc0f273dd979f4cf2d6a0306b) ) // 44 D / 56 V
 	ROM_LOAD32_BYTE( "mar-28.bin",  0x000002,  0x100000,  CRC(5a2ec71d) SHA1(447c404e6bb696f7eb7c61992a99b9be56f5d6b0) ) // 56 V / 53 S
@@ -3448,11 +3465,11 @@ void dragngun_state::init_dragngun_common()
 #endif
 
 	// there are DVI headers at 0x000000, 0x580000, 0x800000, 0xB10000, 0xB80000
-	process_dvi_data(memregion("dvi")->base(),0x000000, 0x1000000);
-	process_dvi_data(memregion("dvi")->base(),0x580000, 0x1000000);
-	process_dvi_data(memregion("dvi")->base(),0x800000, 0x1000000);
-	process_dvi_data(memregion("dvi")->base(),0xB10000, 0x1000000);
-	process_dvi_data(memregion("dvi")->base(),0xB80000, 0x1000000);
+//	process_dvi_data(memregion("dvi")->base(),0x000000, 0x1000000);
+//	process_dvi_data(memregion("dvi")->base(),0x580000, 0x1000000);
+//	process_dvi_data(memregion("dvi")->base(),0x800000, 0x1000000);
+//	process_dvi_data(memregion("dvi")->base(),0xB10000, 0x1000000);
+//	process_dvi_data(memregion("dvi")->base(),0xB80000, 0x1000000);
 }
 
 DRIVER_INIT_MEMBER(dragngun_state,dragngun)
