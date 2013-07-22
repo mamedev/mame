@@ -1501,9 +1501,15 @@ void tms5220_device::device_reset()
 	memset(m_x, 0, sizeof(m_x));
 
 	if (m_speechrom)
+	{
 		m_speechrom->load_address(0);
-
-	m_schedule_dummy_read = TRUE;
+		// MZ: Do the dummy read immediately. The previous line will cause a
+		// shift in the address pointer in the VSM. When the next command is a
+		// load_address, no dummy read will occur, hence the address will be
+		// falsely shifted.
+		m_speechrom->read(1);
+		m_schedule_dummy_read = FALSE;
+	}
 }
 
 /**********************************************************************************************
