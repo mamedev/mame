@@ -41,13 +41,10 @@ ti998_spsyn_device::ti998_spsyn_device(const machine_config &mconfig, const char
 // ======  This is the version with real timing =======
 READ8Z_MEMBER( ti998_spsyn_device::readz )
 {
-	if ((offset & m_select_mask)==m_select_value)
-	{
-		m_vsp->wsq_w(TRUE);
-		m_vsp->rsq_w(FALSE);
-		*value = m_vsp->read(offset) & 0xff;
-		if (VERBOSE>4) LOG("speech8: read value = %02x\n", *value);
-	}
+	m_vsp->wsq_w(TRUE);
+	m_vsp->rsq_w(FALSE);
+	*value = m_vsp->read(offset) & 0xff;
+	if (VERBOSE>4) LOG("speech8: read value = %02x\n", *value);
 }
 
 /*
@@ -55,13 +52,10 @@ READ8Z_MEMBER( ti998_spsyn_device::readz )
 */
 WRITE8_MEMBER( ti998_spsyn_device::write )
 {
-	if ((offset & m_select_mask)==(m_select_value | 0x0400))
-	{
-		m_vsp->rsq_w(m_vsp, TRUE);
-		m_vsp->wsq_w(m_vsp, FALSE);
-		if (VERBOSE>4) LOG("speech8: write value = %02x\n", data);
-		m_vsp->write(offset, data);
-	}
+	m_vsp->rsq_w(m_vsp, TRUE);
+	m_vsp->wsq_w(m_vsp, FALSE);
+	if (VERBOSE>4) LOG("speech8: write value = %02x\n", data);
+	m_vsp->write(offset, data);
 }
 
 #else
@@ -69,12 +63,9 @@ WRITE8_MEMBER( ti998_spsyn_device::write )
 
 READ8Z_MEMBER( ti998_spsyn_device::readz )
 {
-	if ((offset & m_select_mask)==m_select_value)
-	{
-		machine().device("maincpu")->execute().adjust_icount(-(18+3));      /* this is just a minimum, it can be more */
-		*value = m_vsp->status_r(space, offset, 0xff) & 0xff;
-		if (VERBOSE>4) LOG("speech8: read value = %02x\n", *value);
-	}
+	machine().device("maincpu")->execute().adjust_icount(-(18+3));      /* this is just a minimum, it can be more */
+	*value = m_vsp->status_r(space, offset, 0xff) & 0xff;
+	if (VERBOSE>4) LOG("speech8: read value = %02x\n", *value);
 }
 
 /*
@@ -82,26 +73,23 @@ READ8Z_MEMBER( ti998_spsyn_device::readz )
 */
 WRITE8_MEMBER( ti998_spsyn_device::write )
 {
-	if ((offset & m_select_mask)==(m_select_value | 0x0400))
+	machine().device("maincpu")->execute().adjust_icount(-(54+3));      /* this is just an approx. minimum, it can be much more */
+
+	/* RN: the stupid design of the tms5220 core means that ready is cleared */
+	/* when there are 15 bytes in FIFO.  It should be 16.  Of course, if */
+	/* it were the case, we would need to store the value on the bus, */
+	/* which would be more complex. */
+	if (!m_vsp->readyq_r())
 	{
-		machine().device("maincpu")->execute().adjust_icount(-(54+3));      /* this is just an approx. minimum, it can be much more */
+		attotime time_to_ready = attotime::from_double(m_vsp->time_to_ready());
+		int cycles_to_ready = machine().device<cpu_device>("maincpu")->attotime_to_cycles(time_to_ready);
+		if (VERBOSE>8) LOG("speech8: time to ready: %f -> %d\n", time_to_ready.as_double(), (int) cycles_to_ready);
 
-		/* RN: the stupid design of the tms5220 core means that ready is cleared */
-		/* when there are 15 bytes in FIFO.  It should be 16.  Of course, if */
-		/* it were the case, we would need to store the value on the bus, */
-		/* which would be more complex. */
-		if (!m_vsp->readyq_r())
-		{
-			attotime time_to_ready = attotime::from_double(m_vsp->time_to_ready());
-			int cycles_to_ready = machine().device<cpu_device>("maincpu")->attotime_to_cycles(time_to_ready);
-			if (VERBOSE>8) LOG("speech8: time to ready: %f -> %d\n", time_to_ready.as_double(), (int) cycles_to_ready);
-
-			machine().device("maincpu")->execute().adjust_icount(-cycles_to_ready);
-			machine().scheduler().timer_set(attotime::zero, FUNC_NULL);
-		}
-		if (VERBOSE>4) LOG("speech8: write value = %02x\n", data);
-		m_vsp->data_w(space, offset, data);
+		machine().device("maincpu")->execute().adjust_icount(-cycles_to_ready);
+		machine().scheduler().timer_set(attotime::zero, FUNC_NULL);
 	}
+	if (VERBOSE>4) LOG("speech8: write value = %02x\n", data);
+	m_vsp->data_w(space, offset, data);
 }
 #endif
 
@@ -132,8 +120,6 @@ void ti998_spsyn_device::device_start()
 
 void ti998_spsyn_device::device_reset()
 {
-	m_select_mask = 0xfc01;
-	m_select_value = 0x9000;
 	if (VERBOSE>4) LOG("speech8: reset\n");
 }
 

@@ -43,9 +43,6 @@ public:
 	DECLARE_WRITE8_MEMBER( spchrom_load_address );
 	DECLARE_WRITE8_MEMBER( spchrom_read_and_branch );
 
-	int             m_select_mask;
-	int             m_select_value;
-
 protected:
 	virtual void    device_start();
 	virtual void    device_reset(void);
