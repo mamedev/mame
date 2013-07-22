@@ -135,7 +135,7 @@ void system1_state::video_start_common(int pagecount)
 	}
 
 	/* allocate a temporary bitmap for sprite rendering */
-	m_sprite_bitmap = auto_bitmap_ind16_alloc(machine(), 512, 256);
+	m_sprite_bitmap = auto_bitmap_ind16_alloc(machine(), 640, 260);
 
 	/* register for save stats */
 	save_item(NAME(m_video_mode));
