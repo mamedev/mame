@@ -19,8 +19,9 @@
     - timer register 0x11
     - ch2/ch3 (4 speakers)
     - PFM (FM using external PCM waveform)
-    - detune
-    - Acc On bit (some sound effects in viprp1?)
+    - detune (should be same as on other Yamaha chips)
+    - Acc On bit (some sound effects in viprp1?). The documentation says
+      "determines if slot output is accumulated(1), or output directly(0)"
     - Is memory handling 100% correct? At the moment, seibuspi.c is the only
       hardware currently emulated that uses external handlers.
 */
@@ -48,6 +49,9 @@
 #define ENV_DECAY1      1
 #define ENV_DECAY2      2
 #define ENV_RELEASE     3
+
+#define OP_INPUT_FEEDBACK   -1
+#define OP_INPUT_NONE       -2
 
 #define ENV_VOLUME_SHIFT    16
 
@@ -499,126 +503,39 @@ void ymf271_device::update_pcm(int slotnum, INT32 *mixp, int length)
 	}
 }
 
-// calculates 2 operator FM using algorithm 0
-// <--------|
-// +--[S1]--+--[S3]-->
-INT64 ymf271_device::calculate_2op_fm_0(int slotnum1, int slotnum2)
-{
-	YMF271Slot *slot1 = &m_slots[slotnum1];
-	YMF271Slot *slot2 = &m_slots[slotnum2];
-	INT64 env1, env2;
-	INT64 slot1_output, slot2_output;
-	INT64 phase_mod;
-	INT64 feedback;
-
-	update_envelope(slot1);
-	update_lfo(slot1);
-	env1 = calculate_slot_volume(slot1);
-	update_envelope(slot2);
-	update_lfo(slot2);
-	env2 = calculate_slot_volume(slot2);
-
-	feedback = (slot1->feedback_modulation0 + slot1->feedback_modulation1) / 2;
-	slot1->feedback_modulation0 = slot1->feedback_modulation1;
-
-	slot1_output = m_lut_waves[slot1->waveform][((slot1->stepptr + feedback) >> 16) & SIN_MASK];
-	slot1_output = (slot1_output * env1) >> 16;
-
-	phase_mod = ((slot1_output << (SIN_BITS-2)) * modulation_level[slot2->feedback]);
-	slot2_output = m_lut_waves[slot2->waveform][((slot2->stepptr + phase_mod) >> 16) & SIN_MASK];
-	slot2_output = (slot2_output * env2) >> 16;
-
-	slot1->feedback_modulation1 = (((slot1_output << (SIN_BITS-2)) * feedback_level[slot1->feedback]) / 16);
-
-	slot1->stepptr += slot1->step;
-	slot2->stepptr += slot2->step;
-
-	return slot2_output;
-}
-
-// calculates 2 operator FM using algorithm 1
-// <-----------------|
-// +--[S1]--+--[S3]--|-->
-INT64 ymf271_device::calculate_2op_fm_1(int slotnum1, int slotnum2)
-{
-	YMF271Slot *slot1 = &m_slots[slotnum1];
-	YMF271Slot *slot2 = &m_slots[slotnum2];
-	INT64 env1, env2;
-	INT64 slot1_output, slot2_output;
-	INT64 phase_mod;
-	INT64 feedback;
-
-	update_envelope(slot1);
-	update_lfo(slot1);
-	env1 = calculate_slot_volume(slot1);
-	update_envelope(slot2);
-	update_lfo(slot2);
-	env2 = calculate_slot_volume(slot2);
-
-	feedback = (slot1->feedback_modulation0 + slot1->feedback_modulation1) / 2;
-	slot1->feedback_modulation0 = slot1->feedback_modulation1;
-
-	slot1_output = m_lut_waves[slot1->waveform][((slot1->stepptr + feedback) >> 16) & SIN_MASK];
-	slot1_output = (slot1_output * env1) >> 16;
-
-	phase_mod = ((slot1_output << (SIN_BITS-2)) * modulation_level[slot2->feedback]);
-	slot2_output = m_lut_waves[slot2->waveform][((slot2->stepptr + phase_mod) >> 16) & SIN_MASK];
-	slot2_output = (slot2_output * env2) >> 16;
-
-	slot1->feedback_modulation1 = (((slot2_output << (SIN_BITS-2)) * feedback_level[slot1->feedback]) / 16);
-
-	slot1->stepptr += slot1->step;
-	slot2->stepptr += slot2->step;
-
-	return slot2_output;
-}
-
 // calculates the output of one FM operator
-INT64 ymf271_device::calculate_1op_fm_0(int slotnum, INT64 phase_modulation)
+INT64 ymf271_device::calculate_op(int slotnum, INT64 inp)
 {
 	YMF271Slot *slot = &m_slots[slotnum];
-	INT64 env;
-	INT64 slot_output;
-	INT64 phase_mod = phase_modulation;
-
+	INT64 env, slot_output, slot_input = 0;
+	
 	update_envelope(slot);
 	update_lfo(slot);
 	env = calculate_slot_volume(slot);
-
-	phase_mod = ((phase_mod << (SIN_BITS-2)) * modulation_level[slot->feedback]);
-
-	slot_output = m_lut_waves[slot->waveform][((slot->stepptr + phase_mod) >> 16) & SIN_MASK];
-	slot->stepptr += slot->step;
-
+	
+	if (inp == OP_INPUT_FEEDBACK)
+	{
+		// from own feedback
+		slot_input = (slot->feedback_modulation0 + slot->feedback_modulation1) / 2;
+		slot->feedback_modulation0 = slot->feedback_modulation1;
+	}
+	else if (inp != OP_INPUT_NONE)
+	{
+		// from previous slot output
+		slot_input = ((inp << (SIN_BITS-2)) * modulation_level[slot->feedback]);
+	}
+	
+	slot_output = m_lut_waves[slot->waveform][((slot->stepptr + slot_input) >> 16) & SIN_MASK];
 	slot_output = (slot_output * env) >> 16;
-
+	slot->stepptr += slot->step;
+	
 	return slot_output;
 }
 
-// calculates the output of one FM operator with feedback modulation
-// <--------|
-// +--[S1]--|
-INT64 ymf271_device::calculate_1op_fm_1(int slotnum)
+void ymf271_device::set_feedback(int slotnum, INT64 inp)
 {
 	YMF271Slot *slot = &m_slots[slotnum];
-	INT64 env;
-	INT64 slot_output;
-	INT64 feedback;
-
-	update_envelope(slot);
-	update_lfo(slot);
-	env = calculate_slot_volume(slot);
-
-	feedback = slot->feedback_modulation0 + slot->feedback_modulation1;
-	slot->feedback_modulation0 = slot->feedback_modulation1;
-
-	slot_output = m_lut_waves[slot->waveform][((slot->stepptr + feedback) >> 16) & SIN_MASK];
-	slot_output = (slot_output * env) >> 16;
-
-	slot->feedback_modulation1 = (((slot_output << (SIN_BITS-2)) * feedback_level[slot->feedback]) / 16);
-	slot->stepptr += slot->step;
-
-	return slot_output;
+	slot->feedback_modulation1 = (((inp << (SIN_BITS-2)) * feedback_level[slot->feedback]) / 16);
 }
 
 //-------------------------------------------------
@@ -660,164 +577,203 @@ void ymf271_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 				{
 					for (i = 0; i < samples; i++)
 					{
-						INT64 output1 = 0, output2 = 0, output3 = 0, output4 = 0, phase_mod1 = 0, phase_mod2 = 0;
+						INT64 output1 = 0, output2 = 0, output3 = 0, output4 = 0;
+						INT64 phase_mod1 = 0, phase_mod2 = 0, phase_mod3 = 0;
 						switch (m_slots[slot1].algorithm)
 						{
 							// <--------|
-							// +--[S1]--+--[S3]--+--[S2]--+--[S4]-->
+							// +--[S1]--|--+--[S3]--+--[S2]--+--[S4]-->
 							case 0:
-								phase_mod1 = calculate_2op_fm_0(slot1, slot3);
-								phase_mod2 = calculate_1op_fm_0(slot2, phase_mod1);
-								output4 = calculate_1op_fm_0(slot4, phase_mod2);
+								phase_mod1 = calculate_op(slot1, OP_INPUT_FEEDBACK);
+								set_feedback(slot1, phase_mod1);
+								phase_mod3 = calculate_op(slot3, phase_mod1);
+								phase_mod2 = calculate_op(slot2, phase_mod3);
+								output4 = calculate_op(slot4, phase_mod2);
 								break;
 
 							// <-----------------|
-							// +--[S1]--+--[S3]--+--[S2]--+--[S4]-->
+							// +--[S1]--+--[S3]--|--+--[S2]--+--[S4]-->
 							case 1:
-								phase_mod1 = calculate_2op_fm_1(slot1, slot3);
-								phase_mod2 = calculate_1op_fm_0(slot2, phase_mod1);
-								output4 = calculate_1op_fm_0(slot4, phase_mod2);
+								phase_mod1 = calculate_op(slot1, OP_INPUT_FEEDBACK);
+								phase_mod3 = calculate_op(slot3, phase_mod1);
+								set_feedback(slot1, phase_mod3);
+								phase_mod2 = calculate_op(slot2, phase_mod3);
+								output4 = calculate_op(slot4, phase_mod2);
 								break;
 
 							// <--------|
 							// +--[S1]--|
-							// ---[S3]--+--[S2]--+--[S4]-->
+							//          |
+							//  --[S3]--+--[S2]--+--[S4]-->
 							case 2:
-								phase_mod1 = (calculate_1op_fm_1(slot1) + calculate_1op_fm_0(slot3, 0)) / 2;
-								phase_mod2 = calculate_1op_fm_0(slot2, phase_mod1);
-								output4 = calculate_1op_fm_0(slot4, phase_mod2);
+								phase_mod1 = calculate_op(slot1, OP_INPUT_FEEDBACK);
+								set_feedback(slot1, phase_mod1);
+								phase_mod3 = calculate_op(slot3, OP_INPUT_NONE);
+								phase_mod2 = calculate_op(slot2, (phase_mod1 + phase_mod3) / 1);
+								output4 = calculate_op(slot4, phase_mod2);
 								break;
 
 							//          <--------|
 							//          +--[S1]--|
-							// ---[S3]--+--[S2]--+--[S4]-->
+							//                   |
+							//  --[S3]--+--[S2]--+--[S4]-->
 							case 3:
-								phase_mod1 = calculate_1op_fm_0(slot3, 0);
-								phase_mod2 = (calculate_1op_fm_0(slot2, phase_mod1) + calculate_1op_fm_1(slot1)) / 2;
-								output4 = calculate_1op_fm_0(slot4, phase_mod2);
+								phase_mod1 = calculate_op(slot1, OP_INPUT_FEEDBACK);
+								set_feedback(slot1, phase_mod1);
+								phase_mod3 = calculate_op(slot3, OP_INPUT_NONE);
+								phase_mod2 = calculate_op(slot2, phase_mod3);
+								output4 = calculate_op(slot4, (phase_mod1 + phase_mod2) / 1);
 								break;
 
-							// <--------|  --[S2]--|
-							// ---[S1]--|-+--[S3]--+--[S4]-->
+							//              --[S2]--|
+							// <--------|           |
+							// +--[S1]--|--+--[S3]--+--[S4]-->
 							case 4:
-								phase_mod1 = (calculate_2op_fm_0(slot1, slot3) + calculate_1op_fm_0(slot2, 0)) / 2;
-								output4 = calculate_1op_fm_0(slot4, phase_mod1);
+								phase_mod1 = calculate_op(slot1, OP_INPUT_FEEDBACK);
+								set_feedback(slot1, phase_mod1);
+								phase_mod3 = calculate_op(slot3, phase_mod1);
+								phase_mod2 = calculate_op(slot2, OP_INPUT_NONE);
+								output4 = calculate_op(slot4, (phase_mod3 + phase_mod2) / 1);
 								break;
 
 							//           --[S2]-----|
 							// <-----------------|  |
-							// ---[S1]--+--[S3]--|--+--[S4]-->
+							// +--[S1]--+--[S3]--|--+--[S4]-->
 							case 5:
-								phase_mod1 = (calculate_2op_fm_1(slot1, slot3) + calculate_1op_fm_0(slot2, 0)) / 2;
-								output4 = calculate_1op_fm_0(slot4, phase_mod1);
+								phase_mod1 = calculate_op(slot1, OP_INPUT_FEEDBACK);
+								phase_mod3 = calculate_op(slot3, phase_mod1);
+								set_feedback(slot1, phase_mod3);
+								phase_mod2 = calculate_op(slot2, OP_INPUT_NONE);
+								output4 = calculate_op(slot4, (phase_mod3 + phase_mod2) / 1);
 								break;
 
-							// ---[S2]-----+--[S4]--|
+							//  --[S2]-----+--[S4]--|
 							//                      |
 							// <--------|           |
 							// +--[S1]--|--+--[S3]--+-->
 							case 6:
-								output3 = calculate_2op_fm_0(slot1, slot3);
-								phase_mod1 = calculate_1op_fm_0(slot2, 0);
-								output4 = calculate_1op_fm_0(slot4, phase_mod1);
+								phase_mod1 = calculate_op(slot1, OP_INPUT_FEEDBACK);
+								set_feedback(slot1, phase_mod1);
+								output3 = calculate_op(slot3, phase_mod1);
+								phase_mod2 = calculate_op(slot2, OP_INPUT_NONE);
+								output4 = calculate_op(slot4, phase_mod2);
 								break;
 
-							// ---[S2]--+--[S4]-----|
+							//  --[S2]--+--[S4]-----|
 							//                      |
 							// <-----------------|  |
 							// +--[S1]--+--[S3]--|--+-->
 							case 7:
-								output3 = calculate_2op_fm_1(slot1, slot3);
-								phase_mod1 = calculate_1op_fm_0(slot2, 0);
-								output4 = calculate_1op_fm_0(slot4, phase_mod1);
+								phase_mod1 = calculate_op(slot1, OP_INPUT_FEEDBACK);
+								phase_mod3 = calculate_op(slot3, phase_mod1);
+								set_feedback(slot1, phase_mod3);
+								output3 = phase_mod3;
+								phase_mod2 = calculate_op(slot2, OP_INPUT_NONE);
+								output4 = calculate_op(slot4, phase_mod2);
 								break;
 
-							// ---[S3]--+--[S2]--+--[S4]--|
+							//  --[S3]--+--[S2]--+--[S4]--|
 							//                            |
 							// <--------|                 |
 							// +--[S1]--|-----------------+-->
 							case 8:
-								output1 = calculate_1op_fm_1(slot1);
-								phase_mod1 = calculate_1op_fm_0(slot3, 0);
-								phase_mod2 = calculate_1op_fm_0(slot2, phase_mod1);
-								output4 = calculate_1op_fm_0(slot4, phase_mod2);
+								phase_mod1 = calculate_op(slot1, OP_INPUT_FEEDBACK);
+								set_feedback(slot1, phase_mod1);
+								output1 = phase_mod1;
+								phase_mod3 = calculate_op(slot3, OP_INPUT_NONE);
+								phase_mod2 = calculate_op(slot2, phase_mod3);
+								output4 = calculate_op(slot4, phase_mod2);
 								break;
 
-							//         <--------|
-							// -----------[S1]--|
-							//                  |
-							// --[S3]--|        |
-							// --[S2]--+--[S4]--+-->
+							//          <--------|
+							//          +--[S1]--|
+							//                   |
+							//  --[S3]--|        |
+							//  --[S2]--+--[S4]--+-->
 							case 9:
-								phase_mod1 = (calculate_1op_fm_0(slot2, 0) + calculate_1op_fm_0(slot3, 0)) / 2;
-								output4 = calculate_1op_fm_0(slot4, phase_mod1);
-								output1 = calculate_1op_fm_1(slot1);
+								phase_mod1 = calculate_op(slot1, OP_INPUT_FEEDBACK);
+								set_feedback(slot1, phase_mod1);
+								output1 = phase_mod1;
+								phase_mod3 = calculate_op(slot3, OP_INPUT_NONE);
+								phase_mod2 = calculate_op(slot2, OP_INPUT_NONE);
+								output4 = calculate_op(slot4, (phase_mod3 + phase_mod2) / 1);
 								break;
 
-							//           --[S4]--|
-							//           --[S2]--+
-							// <--------|        |
-							// +--[S1]--+--[S3]--+-->
+							//              --[S4]--|
+							//              --[S2]--|
+							// <--------|           |
+							// +--[S1]--|--+--[S3]--+-->   
 							case 10:
-								output3 = calculate_2op_fm_0(slot1, slot3);
-								output2 = calculate_1op_fm_0(slot2, 0);
-								output4 = calculate_1op_fm_0(slot4, 0);
+								phase_mod1 = calculate_op(slot1, OP_INPUT_FEEDBACK);
+								set_feedback(slot1, phase_mod1);
+								output3 = calculate_op(slot3, phase_mod1);
+								output2 = calculate_op(slot2, OP_INPUT_NONE);
+								output4 = calculate_op(slot4, OP_INPUT_NONE);
 								break;
 
 							//           --[S4]-----|
-							//           --[S2]-----+
+							//           --[S2]-----|
 							// <-----------------|  |
-							// +--[S1]--+--[S3]--|--+-->
+							// +--[S1]--+--[S3]--|--+-->   
 							case 11:
-								output3 = calculate_2op_fm_1(slot1, slot3);
-								output2 = calculate_1op_fm_0(slot2, 0);
-								output4 = calculate_1op_fm_0(slot4, 0);
+								phase_mod1 = calculate_op(slot1, OP_INPUT_FEEDBACK);
+								phase_mod3 = calculate_op(slot3, phase_mod1);
+								set_feedback(slot1, phase_mod3);
+								output3 = phase_mod3;
+								output2 = calculate_op(slot2, OP_INPUT_NONE);
+								output4 = calculate_op(slot4, OP_INPUT_NONE);
 								break;
 
-							//            |--+--[S4]--+
-							// <--------| |--+--[S3]--+
-							// +--[S1]--+-|--+--[S2]--+-->
+							//             |--+--[S4]--|
+							// <--------|  |--+--[S3]--|
+							// +--[S1]--|--|--+--[S2]--+-->
 							case 12:
-								phase_mod1 = calculate_1op_fm_1(slot1);
-								output2 = calculate_1op_fm_0(slot2, phase_mod1);
-								output3 = calculate_1op_fm_0(slot3, phase_mod1);
-								output4 = calculate_1op_fm_0(slot4, phase_mod1);
+								phase_mod1 = calculate_op(slot1, OP_INPUT_FEEDBACK);
+								set_feedback(slot1, phase_mod1);
+								output3 = calculate_op(slot3, phase_mod1);
+								output2 = calculate_op(slot2, phase_mod1);
+								output4 = calculate_op(slot4, phase_mod1);
 								break;
 
-							// ---[S3]--+--[S2]--+
+							//  --[S3]--+--[S2]--|
 							//                   |
-							// ---[S4]-----------+
+							//  --[S4]-----------|
 							// <--------|        |
 							// +--[S1]--|--------+-->
 							case 13:
-								output1 = calculate_1op_fm_1(slot1);
-								phase_mod1 = calculate_1op_fm_0(slot3, 0);
-								output2 = calculate_1op_fm_0(slot2, phase_mod1);
-								output4 = calculate_1op_fm_0(slot4, 0);
+								phase_mod1 = calculate_op(slot1, OP_INPUT_FEEDBACK);
+								set_feedback(slot1, phase_mod1);
+								output1 = phase_mod1;
+								phase_mod3 = calculate_op(slot3, OP_INPUT_NONE);
+								output2 = calculate_op(slot2, phase_mod3);
+								output4 = calculate_op(slot4, OP_INPUT_NONE);
 								break;
 
-							// ---[S2]----+--[S4]--+
-							//                     |
-							// <--------| +--[S3]--|
-							// +--[S1]--+-|--------+-->
+							//  --[S2]-----+--[S4]--|
+							//                      |
+							// <--------|  +--[S3]--|
+							// +--[S1]--|--|--------+-->
 							case 14:
-								output1 = calculate_1op_fm_1(slot1);
-								phase_mod1 = output1;
-								output3 = calculate_1op_fm_0(slot3, phase_mod1);
-								phase_mod2 = calculate_1op_fm_0(slot2, 0);
-								output4 = calculate_1op_fm_0(slot4, phase_mod2);
+								phase_mod1 = calculate_op(slot1, OP_INPUT_FEEDBACK);
+								set_feedback(slot1, phase_mod1);
+								output1 = phase_mod1;
+								output3 = calculate_op(slot3, phase_mod1);
+								phase_mod2 = calculate_op(slot2, OP_INPUT_NONE);
+								output4 = calculate_op(slot4, phase_mod2);
 								break;
 
-							//  --[S4]-----+
-							//  --[S2]-----+
-							//  --[S3]-----+
+							//  --[S4]-----|
+							//  --[S2]-----|
+							//  --[S3]-----|
 							// <--------|  |
 							// +--[S1]--|--+-->
 							case 15:
-								output1 = calculate_1op_fm_1(slot1);
-								output2 = calculate_1op_fm_0(slot2, 0);
-								output3 = calculate_1op_fm_0(slot3, 0);
-								output4 = calculate_1op_fm_0(slot4, 0);
+								phase_mod1 = calculate_op(slot1, OP_INPUT_FEEDBACK);
+								set_feedback(slot1, phase_mod1);
+								output1 = phase_mod1;
+								output3 = calculate_op(slot3, OP_INPUT_NONE);
+								output2 = calculate_op(slot2, OP_INPUT_NONE);
+								output4 = calculate_op(slot4, OP_INPUT_NONE);
 								break;
 						}
 
@@ -840,49 +796,58 @@ void ymf271_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 				for (op = 0; op < 2; op++)
 				{
 					int slot1 = j + ((op + 0) * 12);
-					int slot2 = j + ((op + 2) * 12);
+					int slot3 = j + ((op + 2) * 12);
 
 					mixp = m_mix_buffer;
 					if (m_slots[slot1].active)
 					{
 						for (i = 0; i < samples; i++)
 						{
-							INT64 output1 = 0, output2 = 0, phase_mod = 0;
+							INT64 output1 = 0, output3 = 0;
+							INT64 phase_mod1, phase_mod3 = 0;
 							switch (m_slots[slot1].algorithm & 3)
 							{
 								// <--------|
-								// +--[S1]--+--[S3]-->
+								// +--[S1]--|--+--[S3]-->
 								case 0:
-									output2 = calculate_2op_fm_0(slot1, slot2);
+									phase_mod1 = calculate_op(slot1, OP_INPUT_FEEDBACK);
+									set_feedback(slot1, phase_mod1);
+									output3 = calculate_op(slot3, phase_mod1);
 									break;
 
 								// <-----------------|
 								// +--[S1]--+--[S3]--|-->
 								case 1:
-									output2 = calculate_2op_fm_1(slot1, slot2);
+									phase_mod1 = calculate_op(slot1, OP_INPUT_FEEDBACK);
+									phase_mod3 = calculate_op(slot3, phase_mod1);
+									set_feedback(slot1, phase_mod3);
+									output3 = phase_mod3;
 									break;
 
-								// ---[S3]-----|
+								//  --[S3]-----|
 								// <--------|  |
 								// +--[S1]--|--+-->
 								case 2:
-									output1 = calculate_1op_fm_1(slot1);
-									output2 = calculate_1op_fm_0(slot2, 0);
+									phase_mod1 = calculate_op(slot1, OP_INPUT_FEEDBACK);
+									set_feedback(slot1, phase_mod1);
+									output1 = phase_mod1;
+									output3 = calculate_op(slot3, OP_INPUT_NONE);
 									break;
 								//
-								// <--------| +--[S3]--|
-								// +--[S1]--|-|--------+-->
+								// <--------|  +--[S3]--|
+								// +--[S1]--|--|--------+-->
 								case 3:
-									output1 = calculate_1op_fm_1(slot1);
-									phase_mod = output1;
-									output2 = calculate_1op_fm_0(slot2, phase_mod);
+									phase_mod1 = calculate_op(slot1, OP_INPUT_FEEDBACK);
+									set_feedback(slot1, phase_mod1);
+									output1 = phase_mod1;
+									output3 = calculate_op(slot3, phase_mod1);
 									break;
 							}
 
 							*mixp++ += ((output1 * m_lut_attenuation[m_slots[slot1].ch0_level]) +
-										(output2 * m_lut_attenuation[m_slots[slot2].ch0_level])) >> 16;
+										(output3 * m_lut_attenuation[m_slots[slot3].ch0_level])) >> 16;
 							*mixp++ += ((output1 * m_lut_attenuation[m_slots[slot1].ch1_level]) +
-										(output2 * m_lut_attenuation[m_slots[slot2].ch1_level])) >> 16;
+										(output3 * m_lut_attenuation[m_slots[slot3].ch1_level])) >> 16;
 						}
 					}
 				}
@@ -901,74 +866,91 @@ void ymf271_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 				{
 					for (i = 0; i < samples; i++)
 					{
-						INT64 output1 = 0, output2 = 0, output3 = 0, phase_mod = 0;
+						INT64 output1 = 0, output2 = 0, output3 = 0;
+						INT64 phase_mod1 = 0, phase_mod3 = 0;
 						switch (m_slots[slot1].algorithm & 7)
 						{
 							// <--------|
-							// +--[S1]--+--[S3]--+--[S2]-->
+							// +--[S1]--|--+--[S3]--+--[S2]-->
 							case 0:
-								phase_mod = calculate_2op_fm_0(slot1, slot3);
-								output2 = calculate_1op_fm_0(slot2, phase_mod);
+								phase_mod1 = calculate_op(slot1, OP_INPUT_FEEDBACK);
+								set_feedback(slot1, phase_mod1);
+								phase_mod3 = calculate_op(slot3, phase_mod1);
+								output2 = calculate_op(slot2, phase_mod3);
 								break;
 
 							// <-----------------|
-							// +--[S1]--+--[S3]--+--[S2]-->
+							// +--[S1]--+--[S3]--|--+--[S2]-->
 							case 1:
-								phase_mod = calculate_2op_fm_1(slot1, slot3);
-								output2 = calculate_1op_fm_0(slot2, phase_mod);
+								phase_mod1 = calculate_op(slot1, OP_INPUT_FEEDBACK);
+								phase_mod3 = calculate_op(slot3, phase_mod1);
+								set_feedback(slot1, phase_mod3);
+								output2 = calculate_op(slot2, phase_mod3);
 								break;
 
-							// ---[S3]-----|
+							//  --[S3]-----|
 							// <--------|  |
-							// +--[S1]--+--+--[S2]-->
+							// +--[S1]--|--+--[S2]-->
 							case 2:
-								phase_mod = (calculate_1op_fm_1(slot1) + calculate_1op_fm_0(slot3, 0)) / 2;
-								output2 = calculate_1op_fm_0(slot2, phase_mod);
+								phase_mod1 = calculate_op(slot1, OP_INPUT_FEEDBACK);
+								set_feedback(slot1, phase_mod1);
+								phase_mod3 = calculate_op(slot3, OP_INPUT_NONE);
+								output2 = calculate_op(slot2, (phase_mod1 + phase_mod3) / 1);
 								break;
 
-							// ---[S3]--+--[S2]--|
+							//  --[S3]--+--[S2]--|
 							// <--------|        |
 							// +--[S1]--|--------+-->
 							case 3:
-								phase_mod = calculate_1op_fm_0(slot3, 0);
-								output2 = calculate_1op_fm_0(slot2, phase_mod);
-								output1 = calculate_1op_fm_1(slot1);
+								phase_mod1 = calculate_op(slot1, OP_INPUT_FEEDBACK);
+								set_feedback(slot1, phase_mod1);
+								output1 = phase_mod1;
+								phase_mod3 = calculate_op(slot3, OP_INPUT_NONE);
+								output2 = calculate_op(slot2, phase_mod3);
 								break;
 
-							// ------------[S2]--|
-							// <--------|        |
-							// +--[S1]--+--[S3]--+-->
+							//              --[S2]--|
+							// <--------|           |
+							// +--[S1]--|--+--[S3]--+-->
 							case 4:
-								output3 = calculate_2op_fm_0(slot1, slot3);
-								output2 = calculate_1op_fm_0(slot2, 0);
+								phase_mod1 = calculate_op(slot1, OP_INPUT_FEEDBACK);
+								set_feedback(slot1, phase_mod1);
+								output3 = calculate_op(slot3, phase_mod1);
+								output2 = calculate_op(slot2, OP_INPUT_NONE);
 								break;
 
-							// ------------[S2]--|
-							// <-----------------|
-							// +--[S1]--+--[S3]--+-->
+							//              --[S2]--|
+							// <-----------------|  |
+							// +--[S1]--+--[S3]--|--+-->
 							case 5:
-								output3 = calculate_2op_fm_1(slot1, slot3);
-								output2 = calculate_1op_fm_0(slot2, 0);
+								phase_mod1 = calculate_op(slot1, OP_INPUT_FEEDBACK);
+								phase_mod3 = calculate_op(slot3, phase_mod1);
+								set_feedback(slot1, phase_mod3);
+								output3 = phase_mod3;
+								output2 = calculate_op(slot2, OP_INPUT_NONE);
 								break;
 
-							// ---[S2]-----|
-							// ---[S3]-----+
+							//  --[S2]-----|
+							//  --[S3]-----|
 							// <--------|  |
-							// +--[S1]--+--+-->
+							// +--[S1]--|--+-->
 							case 6:
-								output1 = calculate_1op_fm_1(slot1);
-								output3 = calculate_1op_fm_0(slot3, 0);
-								output2 = calculate_1op_fm_0(slot2, 0);
+								phase_mod1 = calculate_op(slot1, OP_INPUT_FEEDBACK);
+								set_feedback(slot1, phase_mod1);
+								output1 = phase_mod1;
+								output3 = calculate_op(slot3, OP_INPUT_NONE);
+								output2 = calculate_op(slot2, OP_INPUT_NONE);
 								break;
 
-							// --------------[S2]--+
-							// <--------| +--[S3]--|
-							// +--[S1]--+-|--------+-->
+							//              --[S2]--|
+							// <--------|  +--[S3]--|
+							// +--[S1]--|--|--------+-->
 							case 7:
-								output1 = calculate_1op_fm_1(slot1);
-								phase_mod = output1;
-								output3 = calculate_1op_fm_0(slot3, phase_mod);
-								output2 = calculate_1op_fm_0(slot2, 0);
+								phase_mod1 = calculate_op(slot1, OP_INPUT_FEEDBACK);
+								set_feedback(slot1, phase_mod1);
+								output1 = phase_mod1;
+								output3 = calculate_op(slot3, phase_mod1);
+								output2 = calculate_op(slot2, OP_INPUT_NONE);
 								break;
 						}
 
