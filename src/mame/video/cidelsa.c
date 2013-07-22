@@ -164,7 +164,9 @@ void cidelsa_state::video_start()
 {
 	// allocate memory
 	m_pcbram = auto_alloc_array(machine(), UINT8, CIDELSA_CHARRAM_SIZE);
+	memset(m_pcbram, 0x00, CIDELSA_CHARRAM_SIZE * sizeof(UINT8));
 	m_charram = auto_alloc_array(machine(), UINT8, CIDELSA_CHARRAM_SIZE);
+	memset(m_charram, 0x00, CIDELSA_CHARRAM_SIZE * sizeof(UINT8));
 
 	// register for state saving
 	save_item(NAME(m_cdp1869_pcb));
