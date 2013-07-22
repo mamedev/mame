@@ -373,7 +373,7 @@ void info_xml_creator::output_one_device(device_t &device, const char *devtag)
 	fprintf(m_output, "\t\t<description>%s</description>\n", xml_normalize_string(device.name()));
 
 	output_rom(device);
-	output_sample(device);
+	//output_sample(device);
 	output_chips(device, devtag);
 	output_display(device, devtag);
 	if (has_speaker)
