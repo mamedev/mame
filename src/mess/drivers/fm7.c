@@ -366,18 +366,19 @@ READ8_MEMBER(fm7_state::fm7_fd04_r)
  */
 READ8_MEMBER(fm7_state::fm7_rom_en_r)
 {
-	UINT8* RAM = memregion("maincpu")->base();
-
-	m_basic_rom_en = 1;
-	if(m_type == SYS_FM7)
+	if(!space.debugger_access())
 	{
-		space.install_read_bank(0x8000,0xfbff,"bank1");
-		space.nop_write(0x8000,0xfbff);
-		membank("bank1")->set_base(RAM+0x38000);
+		UINT8* RAM = memregion("maincpu")->base();
+
+		m_basic_rom_en = 1;
+		if(m_type == SYS_FM7)
+		{
+			membank("bank1")->set_base(RAM+0x38000);
+		}
+		else
+			fm7_mmr_refresh(space);
+		logerror("BASIC ROM enabled\n");
 	}
-	else
-		fm7_mmr_refresh(space);
-	logerror("BASIC ROM enabled\n");
 	return 0x00;
 }
 
@@ -388,7 +389,6 @@ WRITE8_MEMBER(fm7_state::fm7_rom_en_w)
 	m_basic_rom_en = 0;
 	if(m_type == SYS_FM7)
 	{
-		space.install_readwrite_bank(0x8000,0xfbff,"bank1");
 		membank("bank1")->set_base(RAM+0x8000);
 	}
 	else
@@ -1398,7 +1398,7 @@ WRITE_LINE_MEMBER(fm7_state::fm77av_fmirq)
 // The FM-7 has only 64kB RAM, so we'll worry about banking when we do the later models
 static ADDRESS_MAP_START( fm7_mem, AS_PROGRAM, 8, fm7_state )
 	AM_RANGE(0x0000,0x7fff) AM_RAM
-	AM_RANGE(0x8000,0xfbff) AM_ROMBANK("bank1") // also F-BASIC ROM, when enabled
+	AM_RANGE(0x8000,0xfbff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank2") // also F-BASIC ROM, when enabled
 	AM_RANGE(0xfc00,0xfc7f) AM_RAM
 	AM_RANGE(0xfc80,0xfcff) AM_READWRITE(fm7_main_shared_r,fm7_main_shared_w)
 	// I/O space (FD00-FDFF)
@@ -1426,7 +1426,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fm8_mem, AS_PROGRAM, 8, fm7_state )
 	AM_RANGE(0x0000,0x7fff) AM_RAM
-	AM_RANGE(0x8000,0xfbff) AM_ROMBANK("bank1") // also F-BASIC ROM, when enabled
+	AM_RANGE(0x8000,0xfbff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank2") // also F-BASIC ROM, when enabled
 	AM_RANGE(0xfc00,0xfc7f) AM_RAM
 	AM_RANGE(0xfc80,0xfcff) AM_READWRITE(fm7_main_shared_r,fm7_main_shared_w)
 	// I/O space (FD00-FDFF)
@@ -1927,10 +1927,9 @@ void fm7_state::machine_reset()
 	m_irq_flags = 0x00;
 	m_video.attn_irq = 0;
 	m_video.sub_busy = 0x80;  // busy at reset
+	m_basic_rom_en = 1;  // enabled at reset, if in BASIC mode
 	if(m_type == SYS_FM11 || m_type == SYS_FM16)
 		m_basic_rom_en = 0;  // all FM11/16 systems have no BASIC ROM except for the FM-11 ST
-	else
-		m_basic_rom_en = 1;  // enabled at reset
 	if(m_type == SYS_FM77AV || m_type == SYS_FM77AV40EX)
 	{
 		m_init_rom_en = 1;
@@ -1946,7 +1945,16 @@ void fm7_state::machine_reset()
 	else
 		m_init_rom_en = 0;
 	if(m_type == SYS_FM7)
-		membank("bank1")->set_base(RAM+0x38000);
+	{
+		if(!(ioport("DSW")->read() & 0x02))
+		{
+			m_basic_rom_en = 0;  // disabled for DOS mode
+			membank("bank1")->set_base(RAM+0x08000);
+		}
+		else
+			membank("bank1")->set_base(RAM+0x38000);
+		membank("bank2")->set_base(RAM+0x08000);
+	}
 	m_key_delay = 700;  // 700ms on FM-7
 	m_key_repeat = 70;  // 70ms on FM-7
 	m_break_flag = 0;
