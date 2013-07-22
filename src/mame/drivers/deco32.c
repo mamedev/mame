@@ -890,7 +890,8 @@ static ADDRESS_MAP_START( dragngun_map, AS_PROGRAM, 32, dragngun_state )
 	AM_RANGE(0x1000000, 0x1000007) AM_READ(dragngun_unk_video_r)
 	AM_RANGE(0x1000100, 0x1007fff) AM_RAM
 	AM_RANGE(0x10b0000, 0x10b01ff) AM_RAM
-	AM_RANGE(0x1400000, 0x1ffffff) AM_ROM AM_REGION("dvi", 0x00000) // reads from here during boss battles when the videos should be displayed at the offsets where the DVI headers are.. however if we have the data in what looks like the right endian it crashes the game so I'm loading it wrong intentionally
+	AM_RANGE(0x1400000, 0x1ffffff) AM_ROM AM_REGION("dvi", 0x00000) // reads from here during boss battles when the videos should be displayed at the offsets where the DVI headers are
+	                                                                // as a result it ends up writing what looks like pointers to the frame data in the ram area above
 
 ADDRESS_MAP_END
 
