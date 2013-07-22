@@ -34,7 +34,6 @@ static const char copyright_notice[] =
 
 #include "emu.h"
 #include "debugger.h"
-#include <setjmp.h>
 #include "m68kcpu.h"
 #include "m68kops.h"
 
@@ -773,7 +772,20 @@ inline void m68000_base_device::cpu_execute(void)
 		if (m_address_error==1)
 		{
 			m_address_error = 0;
-			m68ki_exception_address_error(this);
+			try {
+				m68ki_exception_address_error(this);
+			} 
+			catch(int error)
+			{
+				if (error==10)
+				{
+					m_address_error = 1;
+					REG_PPC(this) = REG_PC(this);
+					goto check_address_error;
+				}
+				else
+					throw;
+			}
 			if(stopped)
 			{
 				if (remaining_cycles > 0)
