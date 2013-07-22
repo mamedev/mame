@@ -514,8 +514,7 @@ void system1_state::video_update_common(screen_device &screen, bitmap_ind16 &bit
 		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			int bgx = ((x - bgxscroll) / 2) & 0x1ff;
-			assert((x / 2) >= 0 && (x / 2) < 256);
-			UINT16 fgpix = fgbase[x / 2];
+			UINT16 fgpix = fgbase[(x / 2) & 0xff];
 			UINT16 bgpix = bgbase[bgx >> 8][bgx & 0xff];
 			UINT16 sprpix = sprbase[x];
 			UINT8 lookup_index;
