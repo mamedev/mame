@@ -1116,7 +1116,7 @@ MACHINE_CONFIG_END
 ROM_START( 5clown )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "4.u2",       0x2000, 0x8000, CRC(96e3e8ab) SHA1(fec20b9a8bde5306162f8288cdc9580f445cadf5) )
-	ROM_COPY( "maincpu",    0x2000, 0x8000, 0x8000 )
+	ROM_COPY( "maincpu",    0x8000, 0xe000, 0x2000 )
 
 
 	ROM_REGION( 0x8000,  "gfxbanks", 0 )
@@ -1179,7 +1179,7 @@ ROM_END
 ROM_START( 5clownsp )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "five_clown_sp.u2",   0x2000, 0x8000, CRC(fa18090d) SHA1(47feb5dbc77ae8621fc35b707c24d64a95227a39) )
-	ROM_COPY( "maincpu",            0x2000, 0x8000, 0x8000 )
+	ROM_COPY( "maincpu",    0x8000, 0xe000, 0x2000 )
 
 
 	ROM_REGION( 0x8000,  "gfxbanks", 0 )
