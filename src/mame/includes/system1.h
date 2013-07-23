@@ -32,7 +32,7 @@ public:
 	UINT8 m_mix_collide_summary;
 	UINT8 *m_sprite_collide;
 	UINT8 m_sprite_collide_summary;
-	bitmap_ind16 *m_sprite_bitmap;
+	bitmap_ind16 m_sprite_bitmap;
 	UINT8 m_video_mode;
 	UINT8 m_videoram_bank;
 	tilemap_t *m_tilemap_page[8];

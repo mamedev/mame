@@ -135,7 +135,7 @@ void system1_state::video_start_common(int pagecount)
 	}
 
 	/* allocate a temporary bitmap for sprite rendering */
-	m_sprite_bitmap = auto_bitmap_ind16_alloc(machine(), 640, 260);
+	machine().primary_screen->register_screen_bitmap(m_sprite_bitmap);
 
 	/* register for save stats */
 	save_item(NAME(m_video_mode));
@@ -493,14 +493,14 @@ void system1_state::video_update_common(screen_device &screen, bitmap_ind16 &bit
 	int x, y;
 
 	/* first clear the sprite bitmap and draw sprites within this area */
-	m_sprite_bitmap->fill(0, cliprect);
-	draw_sprites(*m_sprite_bitmap, cliprect, spritexoffs);
+	m_sprite_bitmap.fill(0, cliprect);
+	draw_sprites(m_sprite_bitmap, cliprect, spritexoffs);
 
 	/* iterate over rows */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		UINT16 *fgbase = &fgpixmap.pix16(y & 0xff);
-		UINT16 *sprbase = &m_sprite_bitmap->pix16(y & 0xff);
+		UINT16 *sprbase = &m_sprite_bitmap.pix16(y & 0xff);
 		UINT16 *dstbase = &bitmap.pix16(y);
 		int bgy = (y + bgyscroll) & 0x1ff;
 		int bgxscroll = bgrowscroll[y >> 3 & 0x1f];
