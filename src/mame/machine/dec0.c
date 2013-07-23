@@ -106,27 +106,15 @@ WRITE8_MEMBER(dec0_state::hippodrm_prot_w)
 //logerror("6280 PC %06x - Wrote %06x to %04x\n",cpu_getpc(),data,offset+0x1d0000);
 }
 
-READ8_MEMBER(dec0_state::hippodrm_shared_r)
-{
-	return m_share[offset];
-}
-
-WRITE8_MEMBER(dec0_state::hippodrm_shared_w)
-{
-	m_share[offset]=data;
-}
-
 READ16_MEMBER(dec0_state::hippodrm_68000_share_r)
 {
 	if (offset==0) space.device().execute().yield(); /* A wee helper */
-	assert(offset >= 0 && offset < 0xff);
-	return m_share[offset]&0xff;
+	return m_hippodrm_shared_ram[offset]&0xff;
 }
 
 WRITE16_MEMBER(dec0_state::hippodrm_68000_share_w)
 {
-	assert(offset >= 0 && offset < 0xff);
-	m_share[offset]=data&0xff;
+	m_hippodrm_shared_ram[offset]=data&0xff;
 }
 
 /******************************************************************************/
@@ -359,7 +347,7 @@ void dec0_state::h6280_decrypt(const char *cputag)
 DRIVER_INIT_MEMBER(dec0_state,hippodrm)
 {
 	UINT8 *RAM = memregion("sub")->base();
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x180000, 0x180fff, read16_delegate(FUNC(dec0_state::hippodrm_68000_share_r),this), write16_delegate(FUNC(dec0_state::hippodrm_68000_share_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x180000, 0x18003f, read16_delegate(FUNC(dec0_state::hippodrm_68000_share_r),this), write16_delegate(FUNC(dec0_state::hippodrm_68000_share_w),this));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xffc800, 0xffcfff, write16_delegate(FUNC(dec0_state::sprite_mirror_w),this));
 
 	h6280_decrypt("sub");
@@ -374,7 +362,6 @@ DRIVER_INIT_MEMBER(dec0_state,hippodrm)
 DRIVER_INIT_MEMBER(dec0_state,slyspy)
 {
 	UINT8 *RAM = memregion("audiocpu")->base();
-
 	h6280_decrypt("audiocpu");
 
 	/* Slyspy sound cpu has some protection */

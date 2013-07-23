@@ -10,6 +10,7 @@ public:
 		m_ram(*this, "ram"),
 		m_spriteram(*this, "spriteram"),
 		m_robocop_shared_ram(*this, "robocop_shared"),
+		m_hippodrm_shared_ram(*this, "hippodrm_shared"),
 		m_tilegen1(*this, "tilegen1"),
 		m_tilegen2(*this, "tilegen2"),
 		m_tilegen3(*this, "tilegen3"),
@@ -23,18 +24,17 @@ public:
 	required_shared_ptr<UINT16> m_ram;
 	required_shared_ptr<UINT16> m_spriteram;
 	optional_shared_ptr<UINT8> m_robocop_shared_ram;
+	optional_shared_ptr<UINT8> m_hippodrm_shared_ram;
 
 	optional_device<deco_bac06_device> m_tilegen1;
 	optional_device<deco_bac06_device> m_tilegen2;
 	optional_device<deco_bac06_device> m_tilegen3;
 	optional_device<deco_mxc06_device> m_spritegen;
 
-
 	int m_GAME;
 	int m_i8751_return;
 	int m_i8751_command;
 	int m_slyspy_state;
-	int m_share[0xff];
 	int m_hippodrm_msb;
 	int m_hippodrm_lsb;
 	UINT8 m_i8751_ports[4];
@@ -54,8 +54,6 @@ public:
 	DECLARE_READ16_MEMBER(midres_controls_r);
 	DECLARE_READ8_MEMBER(hippodrm_prot_r);
 	DECLARE_WRITE8_MEMBER(hippodrm_prot_w);
-	DECLARE_READ8_MEMBER(hippodrm_shared_r);
-	DECLARE_WRITE8_MEMBER(hippodrm_shared_w);
 	DECLARE_READ8_MEMBER(dec0_mcu_port_r);
 	DECLARE_WRITE8_MEMBER(dec0_mcu_port_w);
 	DECLARE_READ16_MEMBER(hippodrm_68000_share_r);

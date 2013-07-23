@@ -318,7 +318,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hippodrm_sub_map, AS_PROGRAM, 8, dec0_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
-	AM_RANGE(0x180000, 0x1800ff) AM_READWRITE(hippodrm_shared_r, hippodrm_shared_w)
+	AM_RANGE(0x180000, 0x18001f) AM_RAM AM_SHARE("hippodrm_shared")
 	AM_RANGE(0x1a0000, 0x1a0007) AM_DEVWRITE("tilegen3", deco_bac06_device, pf_control0_8bit_packed_w)
 	AM_RANGE(0x1a0010, 0x1a001f) AM_DEVWRITE("tilegen3", deco_bac06_device, pf_control1_8bit_swap_w)
 	AM_RANGE(0x1a1000, 0x1a17ff) AM_DEVREADWRITE("tilegen3", deco_bac06_device, pf_data_8bit_swap_r, pf_data_8bit_swap_w)
