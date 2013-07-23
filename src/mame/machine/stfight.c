@@ -258,16 +258,15 @@ WRITE8_MEMBER(stfight_state::stfight_e800_w)
 
 WRITE8_MEMBER(stfight_state::stfight_fm_w)
 {
-	// the sound cpu ignores any fm data without bit 7 set
-	m_fm_data = 0x80 | data;
+	// the sound cpu ignores any fm data without bit 7 set, it's very likely to be xor'ed and both CPUs can write to it.
+	m_fm_data = 0x80 ^ data;
 }
 
 READ8_MEMBER(stfight_state::stfight_fm_r)
 {
 	int data = m_fm_data;
 
-	// clear the latch?!?
-	m_fm_data &= 0x7f;
+	//m_fm_data &= 0x7f;
 
 	return( data );
 }

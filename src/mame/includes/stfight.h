@@ -16,6 +16,7 @@ public:
 		m_vh_latch_ram(*this, "vh_latch_ram"),
 		m_sprite_ram(*this, "sprite_ram"),
 		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
 		m_mcu(*this, "mcu"),
 		m_msm(*this, "msm") { }
 
@@ -25,6 +26,7 @@ public:
 	required_shared_ptr<UINT8> m_vh_latch_ram;
 	required_shared_ptr<UINT8> m_sprite_ram;
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 	optional_device<cpu_device> m_mcu;
 	required_device<msm5205_device> m_msm;
 	UINT8 *m_decrypt;

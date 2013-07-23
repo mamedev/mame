@@ -261,7 +261,7 @@ void cyberbal_state::scanline_update(screen_device &screen, int scanline)
 UINT32 cyberbal_state::update_one_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int index)
 {
 	// start drawing
-	atari_motion_objects_device *curmob = index ? m_mob2 : m_mob;
+	atari_motion_objects_device *curmob = index ? m_mob2.target() : m_mob.target();
 	curmob->draw_async(cliprect);
 
 	/* draw the playfield */
