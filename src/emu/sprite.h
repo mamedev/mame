@@ -113,8 +113,8 @@ class sprite_device : public device_t
 
 protected:
 	// construction/destruction - only for subclasses
-	sprite_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, int dirty_granularity = 3)
-		: device_t(mconfig, type, name, tag, owner, 0, "sprite", __FILE__),
+	sprite_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, const char *shortname, const char *file, int dirty_granularity = 3)
+		: device_t(mconfig, type, name, tag, owner, 0, shortname, file),
 			m_xorigin(0),
 			m_yorigin(0),
 			m_spriteram(NULL),
@@ -142,7 +142,10 @@ public:
 	static void static_set_origin(device_t &device, int xorigin, int yorigin) { static_set_xorigin(device, xorigin); static_set_yorigin(device, yorigin); }
 
 	// configuration
+	void set_spriteram(_SpriteRAMType *base, UINT32 bytes) { m_spriteram = base; m_spriteram_bytes = bytes; m_buffer.resize(m_spriteram_bytes / sizeof(_SpriteRAMType)); }
 	void set_origin(INT32 xorigin = 0, INT32 yorigin = 0) { m_xorigin = xorigin; m_yorigin = yorigin; }
+	void set_xorigin(INT32 xorigin) { m_xorigin = xorigin; }
+	void set_yorigin(INT32 yorigin) { m_yorigin = yorigin; }
 
 	// buffering
 	void copy_to_buffer() { memcpy(m_buffer, m_spriteram, m_spriteram_bytes); }
@@ -196,15 +199,8 @@ protected:
 	{
 		// find spriteram
 		memory_share *spriteram = owner()->memshare(tag());
-		if (spriteram == NULL)
-			throw emu_fatalerror("Unable to find shared spriteram with tag '%s'\n", tag());
-
-		// set up pointers
-		m_spriteram = reinterpret_cast<_SpriteRAMType *>(spriteram->ptr());
-		m_spriteram_bytes = spriteram->bytes();
-
-		// allocate the double buffer to match the RAM size
-		m_buffer.resize(m_spriteram_bytes / sizeof(_SpriteRAMType));
+		if (spriteram != NULL)
+			set_spriteram(reinterpret_cast<_SpriteRAMType *>(spriteram->ptr()), spriteram->bytes());
 
 		// save states
 		save_item(NAME(m_buffer));

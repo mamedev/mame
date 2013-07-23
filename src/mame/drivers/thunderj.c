@@ -37,7 +37,6 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/atarigen.h"
-#include "video/atarimo.h"
 #include "includes/thunderj.h"
 
 
@@ -131,10 +130,10 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, thunderj_state )
 	AM_RANGE(0x3f0000, 0x3f1fff) AM_RAM_DEVWRITE("vad", atari_vad_device, playfield2_latched_msb_w) AM_SHARE("vad:playfield2")
 	AM_RANGE(0x3f2000, 0x3f3fff) AM_RAM_DEVWRITE("vad", atari_vad_device, playfield_latched_lsb_w) AM_SHARE("vad:playfield")
 	AM_RANGE(0x3f4000, 0x3f5fff) AM_RAM_DEVWRITE("vad", atari_vad_device, playfield_upper_w) AM_SHARE("vad:playfield_ext")
-	AM_RANGE(0x3f6000, 0x3f7fff) AM_READWRITE_LEGACY(atarimo_0_spriteram_r, atarimo_0_spriteram_w)
+	AM_RANGE(0x3f6000, 0x3f7fff) AM_RAM AM_SHARE("vad:mob")
 	AM_RANGE(0x3f8000, 0x3f8eff) AM_RAM_DEVWRITE("vad", atari_vad_device, alpha_w) AM_SHARE("vad:alpha")
 	AM_RANGE(0x3f8f00, 0x3f8f7f) AM_RAM AM_SHARE("vad:eof")
-	AM_RANGE(0x3f8f80, 0x3f8fff) AM_READWRITE_LEGACY(atarimo_0_slipram_r, atarimo_0_slipram_w)
+	AM_RANGE(0x3f8f80, 0x3f8fff) AM_RAM AM_SHARE("vad:mob:slip")
 	AM_RANGE(0x3f9000, 0x3fffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -269,6 +268,7 @@ static MACHINE_CONFIG_START( thunderj, thunderj_state )
 	MCFG_ATARI_VAD_PLAYFIELD(thunderj_state, get_playfield_tile_info)
 	MCFG_ATARI_VAD_PLAYFIELD2(thunderj_state, get_playfield2_tile_info)
 	MCFG_ATARI_VAD_ALPHA(thunderj_state, get_alpha_tile_info)
+	MCFG_ATARI_VAD_MOB(thunderj_state::s_mob_config)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	/* note: these parameters are from published specs, not derived */

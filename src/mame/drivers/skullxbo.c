@@ -19,7 +19,6 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "video/atarimo.h"
 #include "includes/skullxbo.h"
 
 
@@ -121,8 +120,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, skullxbo_state )
 	AM_RANGE(0xff8000, 0xff9fff) AM_RAM_WRITE(playfield_latched_w) AM_SHARE("playfield")
 	AM_RANGE(0xffa000, 0xffbfff) AM_RAM_DEVWRITE("playfield", tilemap_device, write_ext) AM_SHARE("playfield_ext")
 	AM_RANGE(0xffc000, 0xffcf7f) AM_RAM_DEVWRITE("alpha", tilemap_device, write) AM_SHARE("alpha")
-	AM_RANGE(0xffcf80, 0xffcfff) AM_READWRITE_LEGACY(atarimo_0_slipram_r, atarimo_0_slipram_w)
-	AM_RANGE(0xffd000, 0xffdfff) AM_READWRITE_LEGACY(atarimo_0_spriteram_r, atarimo_0_spriteram_w)
+	AM_RANGE(0xffcf80, 0xffcfff) AM_RAM AM_SHARE("mob:slip")
+	AM_RANGE(0xffd000, 0xffdfff) AM_RAM AM_SHARE("mob")
 	AM_RANGE(0xffe000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -239,6 +238,7 @@ static MACHINE_CONFIG_START( skullxbo, skullxbo_state )
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield", 2, skullxbo_state, get_playfield_tile_info, 16,8, SCAN_COLS, 64,64)
 	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", 2, skullxbo_state, get_alpha_tile_info, 16,8, SCAN_ROWS, 64,32, 0)
+	MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "screen", skullxbo_state::s_mob_config)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	/* note: these parameters are from published specs, not derived */

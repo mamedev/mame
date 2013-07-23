@@ -6,6 +6,7 @@
 
 #include "machine/atarigen.h"
 #include "audio/atarijsa.h"
+#include "video/atarimo.h"
 
 class skullxbo_state : public atarigen_state
 {
@@ -16,12 +17,14 @@ public:
 			m_scanline_timer(*this, "scan_timer"),
 			m_playfield_tilemap(*this, "playfield"),
 			m_alpha_tilemap(*this, "alpha"),
+			m_mob(*this, "mob"),
 			m_playfield_latch(-1) { }
 
 	required_device<atari_jsa_ii_device> m_jsa;
 	required_device<timer_device> m_scanline_timer;
 	required_device<tilemap_device> m_playfield_tilemap;
 	required_device<tilemap_device> m_alpha_tilemap;
+	required_device<atari_motion_objects_device> m_mob;
 	int m_playfield_latch;
 
 	virtual void update_interrupts();
@@ -42,4 +45,6 @@ public:
 	DECLARE_WRITE16_MEMBER( skullxbo_xscroll_w );
 	DECLARE_WRITE16_MEMBER( skullxbo_yscroll_w );
 	DECLARE_WRITE16_MEMBER( skullxbo_mobmsb_w );
+
+	static const atari_motion_objects_config s_mob_config;
 };

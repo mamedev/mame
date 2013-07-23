@@ -5,6 +5,7 @@
 *************************************************************************/
 
 #include "machine/atarigen.h"
+#include "video/atarimo.h"
 
 class shuuz_state : public atarigen_state
 {
@@ -24,4 +25,6 @@ public:
 	DECLARE_MACHINE_START(shuuz);
 	DECLARE_VIDEO_START(shuuz);
 	UINT32 screen_update_shuuz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	static const atari_motion_objects_config s_mob_config;
 };

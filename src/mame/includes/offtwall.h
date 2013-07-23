@@ -6,6 +6,7 @@
 
 #include "machine/atarigen.h"
 #include "audio/atarijsa.h"
+#include "video/atarimo.h"
 
 class offtwall_state : public atarigen_state
 {
@@ -38,4 +39,6 @@ public:
 	DECLARE_MACHINE_RESET(offtwall);
 	DECLARE_VIDEO_START(offtwall);
 	UINT32 screen_update_offtwall(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	static const atari_motion_objects_config s_mob_config;
 };

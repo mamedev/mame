@@ -5,7 +5,6 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "video/atarimo.h"
 #include "includes/batman.h"
 
 
@@ -55,47 +54,42 @@ TILE_GET_INFO_MEMBER(batman_state::get_playfield2_tile_info)
  *
  *************************************/
 
+const atari_motion_objects_config batman_state::s_mob_config =
+{
+	1,                  /* index to which gfx system */
+	1,                  /* number of motion object banks */
+	1,                  /* are the entries linked? */
+	0,                  /* are the entries split? */
+	1,                  /* render in reverse order? */
+	0,                  /* render in swapped X/Y order? */
+	0,                  /* does the neighbor bit affect the next object? */
+	8,                  /* pixels per SLIP entry (0 for no-slip) */
+	0,                  /* pixel offset for SLIPs */
+	0,                  /* maximum number of links to visit/scanline (0=all) */
+
+	0x100,              /* base palette entry */
+	0x100,              /* maximum number of colors */
+	0,                  /* transparent pen index */
+
+	{{ 0x03ff,0,0,0 }}, /* mask for the link */
+	{{ 0,0x7fff,0,0 }}, /* mask for the code index */
+	{{ 0,0,0x000f,0 }}, /* mask for the color */
+	{{ 0,0,0xff80,0 }}, /* mask for the X position */
+	{{ 0,0,0,0xff80 }}, /* mask for the Y position */
+	{{ 0,0,0,0x0070 }}, /* mask for the width, in tiles*/
+	{{ 0,0,0,0x0007 }}, /* mask for the height, in tiles */
+	{{ 0,0x8000,0,0 }}, /* mask for the horizontal flip */
+	{{ 0 }},            /* mask for the vertical flip */
+	{{ 0,0,0x0070,0 }}, /* mask for the priority */
+	{{ 0 }},            /* mask for the neighbor */
+	{{ 0 }},            /* mask for absolute coordinates */
+
+	{{ 0 }},            /* mask for the special value */
+	0,                  /* resulting value to indicate "special" */
+};
+
 VIDEO_START_MEMBER(batman_state,batman)
 {
-	static const atarimo_desc modesc =
-	{
-		1,                  /* index to which gfx system */
-		1,                  /* number of motion object banks */
-		1,                  /* are the entries linked? */
-		0,                  /* are the entries split? */
-		1,                  /* render in reverse order? */
-		0,                  /* render in swapped X/Y order? */
-		0,                  /* does the neighbor bit affect the next object? */
-		8,                  /* pixels per SLIP entry (0 for no-slip) */
-		0,                  /* pixel offset for SLIPs */
-		0,                  /* maximum number of links to visit/scanline (0=all) */
-
-		0x100,              /* base palette entry */
-		0x100,              /* maximum number of colors */
-		0,                  /* transparent pen index */
-
-		{{ 0x03ff,0,0,0 }}, /* mask for the link */
-		{{ 0 }},            /* mask for the graphics bank */
-		{{ 0,0x7fff,0,0 }}, /* mask for the code index */
-		{{ 0 }},            /* mask for the upper code index */
-		{{ 0,0,0x000f,0 }}, /* mask for the color */
-		{{ 0,0,0xff80,0 }}, /* mask for the X position */
-		{{ 0,0,0,0xff80 }}, /* mask for the Y position */
-		{{ 0,0,0,0x0070 }}, /* mask for the width, in tiles*/
-		{{ 0,0,0,0x0007 }}, /* mask for the height, in tiles */
-		{{ 0,0x8000,0,0 }}, /* mask for the horizontal flip */
-		{{ 0 }},            /* mask for the vertical flip */
-		{{ 0,0,0x0070,0 }}, /* mask for the priority */
-		{{ 0 }},            /* mask for the neighbor */
-		{{ 0 }},            /* mask for absolute coordinates */
-
-		{{ 0 }},            /* mask for the special value */
-		0,                  /* resulting value to indicate "special" */
-		NULL                /* callback routine for special entries */
-	};
-
-	/* initialize the motion objects */
-	atarimo_init(machine(), 0, &modesc);
 }
 
 
@@ -108,6 +102,9 @@ VIDEO_START_MEMBER(batman_state,batman)
 
 UINT32 batman_state::screen_update_batman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	// start drawing
+	m_vad->mob()->draw_async(cliprect);
+
 	/* draw the playfield */
 	bitmap_ind8 &priority_bitmap = machine().priority_bitmap;
 	priority_bitmap.fill(0, cliprect);
@@ -120,17 +117,16 @@ UINT32 batman_state::screen_update_batman(screen_device &screen, bitmap_ind16 &b
 	m_vad->playfield2()->draw(bitmap, cliprect, 2, 0x88);
 	m_vad->playfield2()->draw(bitmap, cliprect, 3, 0x8c);
 
-	/* draw and merge the MO */
-	atarimo_rect_list rectlist;
-	bitmap_ind16 *mobitmap = atarimo_render(0, cliprect, &rectlist);
-	for (int r = 0; r < rectlist.numrects; r++, rectlist.rect++)
-		for (int y = rectlist.rect->min_y; y <= rectlist.rect->max_y; y++)
+	// draw and merge the MO
+	bitmap_ind16 &mobitmap = m_vad->mob()->bitmap();
+	for (const sparse_dirty_rect *rect = m_vad->mob()->first_dirty_rect(cliprect); rect != NULL; rect = rect->next())
+		for (int y = rect->min_y; y <= rect->max_y; y++)
 		{
-			UINT16 *mo = &mobitmap->pix16(y);
+			UINT16 *mo = &mobitmap.pix16(y);
 			UINT16 *pf = &bitmap.pix16(y);
 			UINT8 *pri = &priority_bitmap.pix8(y);
-			for (int x = rectlist.rect->min_x; x <= rectlist.rect->max_x; x++)
-				if (mo[x])
+			for (int x = rect->min_x; x <= rect->max_x; x++)
+				if (mo[x] != 0xffff)
 				{
 					/* verified on real hardware:
 
@@ -149,7 +145,7 @@ UINT32 batman_state::screen_update_batman(screen_device &screen, bitmap_ind16 &b
 					        obscured by high fg playfield pens priority 3 only
 					        obscured by bg playfield priority 3 only
 					*/
-					int mopriority = mo[x] >> ATARIMO_PRIORITY_SHIFT;
+					int mopriority = mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT;
 
 					/* upper bit of MO priority signals special rendering and doesn't draw anything */
 					if (mopriority & 4)
@@ -166,11 +162,11 @@ UINT32 batman_state::screen_update_batman(screen_device &screen, bitmap_ind16 &b
 
 						/* priority is consistent for upper pens in playfield */
 						else if (pf[x] & 0x08)
-							pf[x] = mo[x] & ATARIMO_DATA_MASK;
+							pf[x] = mo[x] & atari_motion_objects_device::DATA_MASK;
 
 						/* otherwise, we need to compare */
 						else if (mopriority >= pfpriority)
-							pf[x] = mo[x] & ATARIMO_DATA_MASK;
+							pf[x] = mo[x] & atari_motion_objects_device::DATA_MASK;
 					}
 
 					/* background playfield case */
@@ -184,7 +180,7 @@ UINT32 batman_state::screen_update_batman(screen_device &screen, bitmap_ind16 &b
 
 						/* otherwise, MOs get shown */
 						else
-							pf[x] = mo[x] & ATARIMO_DATA_MASK;
+							pf[x] = mo[x] & atari_motion_objects_device::DATA_MASK;
 					}
 
 					/* don't erase yet -- we need to make another pass later */
@@ -195,27 +191,23 @@ UINT32 batman_state::screen_update_batman(screen_device &screen, bitmap_ind16 &b
 	m_vad->alpha()->draw(bitmap, cliprect, 0, 0);
 
 	/* now go back and process the upper bit of MO priority */
-	rectlist.rect -= rectlist.numrects;
-	for (int r = 0; r < rectlist.numrects; r++, rectlist.rect++)
-		for (int y = rectlist.rect->min_y; y <= rectlist.rect->max_y; y++)
+	for (const sparse_dirty_rect *rect = m_vad->mob()->first_dirty_rect(cliprect); rect != NULL; rect = rect->next())
+		for (int y = rect->min_y; y <= rect->max_y; y++)
 		{
-			UINT16 *mo = &mobitmap->pix16(y);
+			UINT16 *mo = &mobitmap.pix16(y);
 			UINT16 *pf = &bitmap.pix16(y);
-			for (int x = rectlist.rect->min_x; x <= rectlist.rect->max_x; x++)
-				if (mo[x])
+			for (int x = rect->min_x; x <= rect->max_x; x++)
+				if (mo[x] != 0xffff)
 				{
-					int mopriority = mo[x] >> ATARIMO_PRIORITY_SHIFT;
+					int mopriority = mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT;
 
 					/* upper bit of MO priority might mean palette kludges */
 					if (mopriority & 4)
 					{
 						/* if bit 2 is set, start setting high palette bits */
 						if (mo[x] & 2)
-							atarimo_mark_high_palette(bitmap, pf, mo, x, y);
+							m_vad->mob()->apply_stain(bitmap, pf, mo, x, y);
 					}
-
-					/* erase behind ourselves */
-					mo[x] = 0;
 				}
 		}
 	return 0;

@@ -6,6 +6,7 @@
 
 #include "machine/atarigen.h"
 #include "audio/atarijsa.h"
+#include "video/atarimo.h"
 
 class batman_state : public atarigen_state
 {
@@ -31,7 +32,6 @@ public:
 	DECLARE_MACHINE_RESET(batman);
 	DECLARE_VIDEO_START(batman);
 	UINT32 screen_update_batman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-};
 
-/*----------- defined in video/batman.c -----------*/
-void batman_scanline_update(screen_device &screen, int scanline);
+	static const atari_motion_objects_config s_mob_config;
+};

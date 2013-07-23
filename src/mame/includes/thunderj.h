@@ -6,6 +6,7 @@
 
 #include "machine/atarigen.h"
 #include "audio/atarijsa.h"
+#include "video/atarimo.h"
 
 class thunderj_state : public atarigen_state
 {
@@ -18,6 +19,8 @@ public:
 
 	required_device<atari_jsa_ii_device> m_jsa;
 	required_device<atari_vad_device> m_vad;
+	required_device<cpu_device> m_extra;
+
 	UINT8           m_alpha_tile_bank;
 	virtual void update_interrupts();
 	DECLARE_READ16_MEMBER(special_port2_r);
@@ -30,5 +33,6 @@ public:
 	DECLARE_MACHINE_RESET(thunderj);
 	DECLARE_VIDEO_START(thunderj);
 	UINT32 screen_update_thunderj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_extra;
+
+	static const atari_motion_objects_config s_mob_config;
 };

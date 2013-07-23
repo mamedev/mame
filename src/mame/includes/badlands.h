@@ -5,15 +5,18 @@
 *************************************************************************/
 
 #include "machine/atarigen.h"
+#include "video/atarimo.h"
 
 class badlands_state : public atarigen_state
 {
 public:
 	badlands_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atarigen_state(mconfig, type, tag),
-			m_playfield_tilemap(*this, "playfield") { }
+			m_playfield_tilemap(*this, "playfield"),
+			m_mob(*this, "mob") { }
 
 	required_device<tilemap_device> m_playfield_tilemap;
+	required_device<atari_motion_objects_device> m_mob;
 
 	UINT8           m_pedal_value[2];
 
@@ -38,4 +41,6 @@ public:
 	UINT32 screen_update_badlands(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_int);
 	DECLARE_WRITE16_MEMBER( badlands_pf_bank_w );
+
+	static const atari_motion_objects_config s_mob_config;
 };

@@ -124,7 +124,6 @@
 #include "sound/tms5220.h"
 #include "sound/2151intf.h"
 #include "sound/pokey.h"
-#include "video/atarimo.h"
 #include "includes/gauntlet.h"
 
 
@@ -301,11 +300,11 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, gauntlet_state )
 
 	/* VBUS */
 	AM_RANGE(0x900000, 0x901fff) AM_MIRROR(0x2c8000) AM_RAM_DEVWRITE("playfield", tilemap_device, write) AM_SHARE("playfield")
-	AM_RANGE(0x902000, 0x903fff) AM_MIRROR(0x2c8000) AM_READWRITE_LEGACY(atarimo_0_spriteram_r, atarimo_0_spriteram_w)
+	AM_RANGE(0x902000, 0x903fff) AM_MIRROR(0x2c8000) AM_RAM AM_SHARE("mob")
 	AM_RANGE(0x904000, 0x904fff) AM_MIRROR(0x2c8000) AM_RAM
 	AM_RANGE(0x905f6e, 0x905f6f) AM_MIRROR(0x2c8000) AM_RAM_WRITE(gauntlet_yscroll_w) AM_SHARE("yscroll")
 	AM_RANGE(0x905000, 0x905f7f) AM_MIRROR(0x2c8000) AM_RAM_DEVWRITE("alpha", tilemap_device, write) AM_SHARE("alpha")
-	AM_RANGE(0x905f80, 0x905fff) AM_MIRROR(0x2c8000) AM_READWRITE_LEGACY(atarimo_0_slipram_r, atarimo_0_slipram_w)
+	AM_RANGE(0x905f80, 0x905fff) AM_MIRROR(0x2c8000) AM_RAM AM_SHARE("mob:slip")
 	AM_RANGE(0x910000, 0x9107ff) AM_MIRROR(0x2cf800) AM_RAM_WRITE(paletteram_IIIIRRRRGGGGBBBB_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x930000, 0x930001) AM_MIRROR(0x2cfffe) AM_WRITE(gauntlet_xscroll_w) AM_SHARE("xscroll")
 ADDRESS_MAP_END
@@ -512,6 +511,7 @@ static MACHINE_CONFIG_START( gauntlet, gauntlet_state )
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield", 2, gauntlet_state, get_playfield_tile_info, 8,8, SCAN_COLS, 64,64)
 	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", 2, gauntlet_state, get_alpha_tile_info, 8,8, SCAN_ROWS, 64,32, 0)
+	MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "screen", gauntlet_state::s_mob_config)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	/* note: these parameters are from published specs, not derived */

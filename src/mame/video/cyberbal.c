@@ -6,7 +6,6 @@
 
 #include "emu.h"
 #include "machine/atarigen.h"
-#include "video/atarimo.h"
 #include "includes/cyberbal.h"
 
 
@@ -45,62 +44,58 @@ TILE_GET_INFO_MEMBER(cyberbal_state::get_playfield_tile_info)
  *
  *************************************/
 
+const atari_motion_objects_config cyberbal_state::s_mob_config =
+{
+	1,                  /* index to which gfx system */
+	1,                  /* number of motion object banks */
+	1,                  /* are the entries linked? */
+	0,                  /* are the entries split? */
+	0,                  /* render in reverse order? */
+	0,                  /* render in swapped X/Y order? */
+	1,                  /* does the neighbor bit affect the next object? */
+	1024,               /* pixels per SLIP entry (0 for no-slip) */
+	0,                  /* pixel offset for SLIPs */
+	0,                  /* maximum number of links to visit/scanline (0=all) */
+
+	0x600,              /* base palette entry */
+	0x100,              /* maximum number of colors */
+	0,                  /* transparent pen index */
+
+	{{ 0,0,0x07f8,0 }}, /* mask for the link */
+	{{ 0x7fff,0,0,0 }}, /* mask for the code index */
+	{{ 0,0,0,0x000f }}, /* mask for the color */
+	{{ 0,0,0,0xffc0 }}, /* mask for the X position */
+	{{ 0,0xff80,0,0 }}, /* mask for the Y position */
+	{{ 0 }},            /* mask for the width, in tiles*/
+	{{ 0,0x000f,0,0 }}, /* mask for the height, in tiles */
+	{{ 0x8000,0,0,0 }}, /* mask for the horizontal flip */
+	{{ 0 }},            /* mask for the vertical flip */
+	{{ 0 }},            /* mask for the priority */
+	{{ 0,0,0,0x0010 }}, /* mask for the neighbor */
+	{{ 0 }},            /* mask for absolute coordinates */
+
+	{{ 0 }},            /* mask for the special value */
+	0,                  /* resulting value to indicate "special" */
+};
+
 void cyberbal_state::video_start_common(int screens)
 {
-	static const atarimo_desc modesc =
+	/* initialize the tilemaps */
+	if (m_playfield2_tilemap != NULL)
 	{
-		1,                  /* index to which gfx system */
-		1,                  /* number of motion object banks */
-		1,                  /* are the entries linked? */
-		0,                  /* are the entries split? */
-		0,                  /* render in reverse order? */
-		0,                  /* render in swapped X/Y order? */
-		1,                  /* does the neighbor bit affect the next object? */
-		1024,               /* pixels per SLIP entry (0 for no-slip) */
-		0,                  /* pixel offset for SLIPs */
-		0,                  /* maximum number of links to visit/scanline (0=all) */
-
-		0x600,              /* base palette entry */
-		0x100,              /* maximum number of colors */
-		0,                  /* transparent pen index */
-
-		{{ 0,0,0x07f8,0 }}, /* mask for the link */
-		{{ 0 }},            /* mask for the graphics bank */
-		{{ 0x7fff,0,0,0 }}, /* mask for the code index */
-		{{ 0 }},            /* mask for the upper code index */
-		{{ 0,0,0,0x000f }}, /* mask for the color */
-		{{ 0,0,0,0xffc0 }}, /* mask for the X position */
-		{{ 0,0xff80,0,0 }}, /* mask for the Y position */
-		{{ 0 }},            /* mask for the width, in tiles*/
-		{{ 0,0x000f,0,0 }}, /* mask for the height, in tiles */
-		{{ 0x8000,0,0,0 }}, /* mask for the horizontal flip */
-		{{ 0 }},            /* mask for the vertical flip */
-		{{ 0 }},            /* mask for the priority */
-		{{ 0,0,0,0x0010 }}, /* mask for the neighbor */
-		{{ 0 }},            /* mask for absolute coordinates */
-
-		{{ 0 }},            /* mask for the special value */
-		0,                  /* resulting value to indicate "special" */
-		0                   /* callback routine for special entries */
-	};
-
-	/* initialize the motion objects */
-	atarimo_init(machine(), 0, &modesc);
-	atarimo_set_slipram(0, &m_current_slip[0]);
-
-	/* allocate the second screen if necessary */
-	if (screens == 2)
-	{
-		/* initialize the tilemaps */
 		m_playfield2_tilemap->set_scrollx(0, 0);
 		m_playfield2_tilemap->set_palette_offset(0x800);
+	}
+	if (m_alpha2_tilemap != NULL)
+	{
 		m_alpha2_tilemap->set_scrollx(0, 0);
 		m_alpha2_tilemap->set_palette_offset(0x800);
-
-		/* initialize the motion objects */
-		atarimo_init(machine(), 1, &modesc);
-		atarimo_set_slipram(1, &m_current_slip[1]);
 	}
+
+	/* initialize the motion objects */
+	m_mob->set_slipram(&m_current_slip[0]);
+	if (m_mob2 != NULL)
+		m_mob2->set_slipram(&m_current_slip[1]);
 
 	/* save states */
 	save_item(NAME(m_current_slip));
@@ -115,8 +110,8 @@ VIDEO_START_MEMBER(cyberbal_state,cyberbal)
 	video_start_common(2);
 
 	/* adjust the sprite positions */
-	atarimo_set_xscroll(0, 4);
-	atarimo_set_xscroll(1, 4);
+	m_mob->set_xscroll(4);
+	m_mob2->set_xscroll(4);
 }
 
 
@@ -125,7 +120,7 @@ VIDEO_START_MEMBER(cyberbal_state,cyberbal2p)
 	video_start_common(1);
 
 	/* adjust the sprite positions */
-	atarimo_set_xscroll(0, 5);
+	m_mob->set_xscroll(5);
 }
 
 
@@ -265,44 +260,28 @@ void cyberbal_state::scanline_update(screen_device &screen, int scanline)
 
 UINT32 cyberbal_state::update_one_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int index)
 {
-	atarimo_rect_list rectlist;
-	rectangle tempclip = cliprect;
-	bitmap_ind16 *mobitmap;
-	int x, y, r, mooffset, temp;
-	rectangle visarea = screen.visible_area();
+	// start drawing
+	atari_motion_objects_device *curmob = index ? m_mob2 : m_mob;
+	curmob->draw_async(cliprect);
 
 	/* draw the playfield */
 	tilemap_t &curplayfield = index ? static_cast<tilemap_t &>(m_playfield2_tilemap) : static_cast<tilemap_t &>(m_playfield_tilemap);
 	curplayfield.draw(bitmap, cliprect, 0, 0);
 
-	/* draw the MOs -- note some kludging to get this to work correctly for 2 screens */
-	mooffset = 0;
-	tempclip.min_x -= mooffset;
-	tempclip.max_x -= mooffset;
-	temp = visarea.max_x;
-	if (temp > SCREEN_WIDTH)
-		visarea.max_x /= 2;
-	mobitmap = atarimo_render((index == 0) ? 0 : 1, cliprect, &rectlist);
-	tempclip.min_x += mooffset;
-	tempclip.max_x += mooffset;
-	visarea.max_x = temp;
-
 	/* draw and merge the MO */
+	bitmap_ind16 &mobitmap = curmob->bitmap();
 	int palbase = index * 0x800;
-	for (r = 0; r < rectlist.numrects; r++, rectlist.rect++)
-		for (y = rectlist.rect->min_y; y <= rectlist.rect->max_y; y++)
+	for (const sparse_dirty_rect *rect = curmob->first_dirty_rect(cliprect); rect != NULL; rect = rect->next())
+		for (int y = rect->min_y; y <= rect->max_y; y++)
 		{
-			UINT16 *mo = &mobitmap->pix16(y);
-			UINT16 *pf = &bitmap.pix16(y) + mooffset;
-			for (x = rectlist.rect->min_x; x <= rectlist.rect->max_x; x++)
-				if (mo[x])
+			UINT16 *mo = &mobitmap.pix16(y);
+			UINT16 *pf = &bitmap.pix16(y);
+			for (int x = rect->min_x; x <= rect->max_x; x++)
+				if (mo[x] != 0xffff)
 				{
 					/* not verified: logic is all controlled in a PAL
 					*/
 					pf[x] = palbase + mo[x];
-
-					/* erase behind ourselves */
-					mo[x] = 0;
 				}
 		}
 

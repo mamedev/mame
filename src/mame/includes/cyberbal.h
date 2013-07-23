@@ -6,6 +6,7 @@
 
 #include "machine/atarigen.h"
 #include "audio/atarijsa.h"
+#include "video/atarimo.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/dac.h"
@@ -24,8 +25,10 @@ public:
 			m_jsa(*this, "jsa"),
 			m_playfield_tilemap(*this, "playfield"),
 			m_alpha_tilemap(*this, "alpha"),
+			m_mob(*this, "mob"),
 			m_playfield2_tilemap(*this, "playfield2"),
 			m_alpha2_tilemap(*this, "alpha2"),
+			m_mob2(*this, "mob2"),
 			m_paletteram_0(*this, "paletteram_0"),
 			m_paletteram_1(*this, "paletteram_1") { }
 
@@ -38,8 +41,10 @@ public:
 	optional_device<atari_jsa_ii_device> m_jsa;
 	required_device<tilemap_device> m_playfield_tilemap;
 	required_device<tilemap_device> m_alpha_tilemap;
+	required_device<atari_motion_objects_device> m_mob;
 	optional_device<tilemap_device> m_playfield2_tilemap;
 	optional_device<tilemap_device> m_alpha2_tilemap;
+	optional_device<atari_motion_objects_device> m_mob2;
 	optional_shared_ptr<UINT16> m_paletteram_0;
 	optional_shared_ptr<UINT16> m_paletteram_1;
 	UINT16          m_current_slip[2];
@@ -87,6 +92,9 @@ public:
 	DECLARE_READ16_MEMBER(paletteram_1_r);
 	DECLARE_WRITE16_MEMBER(paletteram_0_w);
 	DECLARE_WRITE16_MEMBER(paletteram_1_w);
+
+	static const atari_motion_objects_config s_mob_config;
+
 private:
 	void video_start_common(int screens);
 	void cyberbal_sound_reset();

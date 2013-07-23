@@ -19,7 +19,6 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "video/atarimo.h"
 #include "includes/offtwall.h"
 
 
@@ -250,10 +249,10 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, offtwall_state )
 	AM_RANGE(0x3effc0, 0x3effff) AM_DEVREADWRITE("vad", atari_vad_device, control_read, control_write)
 	AM_RANGE(0x3f4000, 0x3f5eff) AM_RAM_DEVWRITE("vad", atari_vad_device, playfield_latched_msb_w) AM_SHARE("vad:playfield")
 	AM_RANGE(0x3f5f00, 0x3f5f7f) AM_RAM AM_SHARE("vad:eof")
-	AM_RANGE(0x3f5f80, 0x3f5fff) AM_READWRITE_LEGACY(atarimo_0_slipram_r, atarimo_0_slipram_w)
+	AM_RANGE(0x3f5f80, 0x3f5fff) AM_RAM AM_SHARE("vad:mob:slip")
 	AM_RANGE(0x3f6000, 0x3f7fff) AM_RAM_DEVWRITE("vad", atari_vad_device, playfield_upper_w) AM_SHARE("vad:playfield_ext")
 	AM_RANGE(0x3f8000, 0x3fcfff) AM_RAM
-	AM_RANGE(0x3fd000, 0x3fd7ff) AM_READWRITE_LEGACY(atarimo_0_spriteram_r, atarimo_0_spriteram_w)
+	AM_RANGE(0x3fd000, 0x3fd7ff) AM_RAM AM_SHARE("vad:mob")
 	AM_RANGE(0x3fd800, 0x3fffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -372,6 +371,7 @@ static MACHINE_CONFIG_START( offtwall, offtwall_state )
 
 	MCFG_ATARI_VAD_ADD("vad", "screen", WRITELINE(atarigen_state, scanline_int_write_line))
 	MCFG_ATARI_VAD_PLAYFIELD(offtwall_state, get_playfield_tile_info)
+	MCFG_ATARI_VAD_MOB(offtwall_state::s_mob_config)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	/* note: these parameters are from published specs, not derived */

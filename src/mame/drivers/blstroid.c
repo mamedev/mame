@@ -20,7 +20,6 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/atarigen.h"
-#include "video/atarimo.h"
 #include "includes/blstroid.h"
 
 
@@ -79,7 +78,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, blstroid_state )
 	AM_RANGE(0xffa000, 0xffa3ff) AM_MIRROR(0x7f8c00) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0xffb000, 0xffb3ff) AM_MIRROR(0x7f8c00) AM_READWRITE(eeprom_r, eeprom_w) AM_SHARE("eeprom")
 	AM_RANGE(0xffc000, 0xffcfff) AM_MIRROR(0x7f8000) AM_RAM_DEVWRITE("playfield", tilemap_device, write) AM_SHARE("playfield")
-	AM_RANGE(0xffd000, 0xffdfff) AM_MIRROR(0x7f8000) AM_READWRITE_LEGACY(atarimo_0_spriteram_r, atarimo_0_spriteram_w)
+	AM_RANGE(0xffd000, 0xffdfff) AM_MIRROR(0x7f8000) AM_RAM AM_SHARE("mob")
 	AM_RANGE(0xffe000, 0xffffff) AM_MIRROR(0x7f8000) AM_RAM
 ADDRESS_MAP_END
 
@@ -185,6 +184,7 @@ static MACHINE_CONFIG_START( blstroid, blstroid_state )
 	MCFG_PALETTE_LENGTH(512)
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield", 2, blstroid_state, get_playfield_tile_info, 16,8, SCAN_ROWS, 64,64)
+	MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "screen", blstroid_state::s_mob_config)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	/* note: these parameters are from published specs, not derived */

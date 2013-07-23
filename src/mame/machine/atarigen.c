@@ -390,6 +390,7 @@ atari_vad_device::atari_vad_device(const machine_config &mconfig, const char *ta
 		m_alpha_tilemap(*this, "alpha"),
 		m_playfield_tilemap(*this, "playfield"),
 		m_playfield2_tilemap(*this, "playfield2"),
+		m_mob(*this, "mob"),
 		m_eof_data(*this, "eof"),
 		m_screen(NULL),
 		m_scanline_int_timer(NULL),
@@ -407,8 +408,7 @@ atari_vad_device::atari_vad_device(const machine_config &mconfig, const char *ta
 
 
 //-------------------------------------------------
-//  static_set_sound_cpu: Set the tag of the
-//  sound CPU
+//  static_set_screen: Set the tag of the screen
 //-------------------------------------------------
 
 void atari_vad_device::static_set_screen(device_t &device, const char *screentag)
@@ -756,7 +756,8 @@ void atari_vad_device::update_parameter(UINT16 newword)
 	{
 		case 9:
 			m_mo_xscroll = (newword >> 7) & 0x1ff;
-			atarimo_set_xscroll(0, m_mo_xscroll);
+			if (m_mob != NULL)
+				m_mob->set_xscroll(m_mo_xscroll);
 			break;
 
 		case 10:
@@ -771,7 +772,8 @@ void atari_vad_device::update_parameter(UINT16 newword)
 
 		case 13:
 			m_mo_yscroll = (newword >> 7) & 0x1ff;
-			atarimo_set_yscroll(0, m_mo_yscroll);
+			if (m_mob != NULL)
+				m_mob->set_yscroll(m_mo_yscroll);
 			break;
 
 		case 14:

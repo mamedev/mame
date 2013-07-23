@@ -5,6 +5,7 @@
 *************************************************************************/
 
 #include "machine/atarigen.h"
+#include "video/atarimo.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/t11/t11.h"
 
@@ -15,6 +16,7 @@ public:
 		: atarigen_state(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_audiocpu(*this, "audiocpu"),
+			m_mob(*this, "mob"),
 			m_slapstic_base(*this, "slapstic_base"),
 			m_bankselect(*this, "bankselect"),
 			m_playfield_tilemap(*this, "playfield"),
@@ -24,6 +26,7 @@ public:
 
 	required_device<t11_device> m_maincpu;
 	required_device<m6502_device> m_audiocpu;
+	required_device<atari_motion_objects_device> m_mob;
 	required_shared_ptr<UINT16> m_slapstic_base;
 
 	UINT8           m_interrupt_enable;
@@ -105,4 +108,6 @@ public:
 	DECLARE_WRITE16_MEMBER(xscroll_w);
 	DECLARE_WRITE16_MEMBER(videoram_w);
 	DECLARE_WRITE16_MEMBER(paletteram_w);
+
+	static const atari_motion_objects_config s_mob_config;
 };

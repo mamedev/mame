@@ -26,7 +26,6 @@
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 #include "sound/2413intf.h"
-#include "video/atarimo.h"
 #include "includes/rampart.h"
 
 
@@ -129,9 +128,9 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, rampart_state )
 	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_SHARE("bitmap")
 	AM_RANGE(0x220000, 0x3bffff) AM_WRITENOP    /* the code blasts right through this when initializing */
 	AM_RANGE(0x3c0000, 0x3c07ff) AM_MIRROR(0x019800) AM_RAM_WRITE(expanded_paletteram_666_w) AM_SHARE("paletteram")
-	AM_RANGE(0x3e0000, 0x3e07ff) AM_MIRROR(0x010000) AM_READWRITE_LEGACY(atarimo_0_spriteram_r, atarimo_0_spriteram_w)
+	AM_RANGE(0x3e0000, 0x3e07ff) AM_MIRROR(0x010000) AM_RAM AM_SHARE("mob")
 	AM_RANGE(0x3e0800, 0x3e3f3f) AM_MIRROR(0x010000) AM_RAM
-	AM_RANGE(0x3e3f40, 0x3e3f7f) AM_MIRROR(0x010000) AM_READWRITE_LEGACY(atarimo_0_slipram_r, atarimo_0_slipram_w)
+	AM_RANGE(0x3e3f40, 0x3e3f7f) AM_MIRROR(0x010000) AM_RAM AM_SHARE("mob:slip")
 	AM_RANGE(0x3e3f80, 0x3effff) AM_MIRROR(0x010000) AM_RAM
 	AM_RANGE(0x460000, 0x460001) AM_MIRROR(0x019ffe) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0xff00)
 	AM_RANGE(0x480000, 0x480003) AM_MIRROR(0x019ffc) AM_DEVWRITE8("ymsnd", ym2413_device, write, 0xff00)
@@ -346,6 +345,8 @@ static MACHINE_CONFIG_START( rampart, rampart_state )
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_GFXDECODE(rampart)
 	MCFG_PALETTE_LENGTH(512)
+
+	MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "screen", rampart_state::s_mob_config)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	/* note: these parameters are from published specs, not derived */

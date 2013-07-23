@@ -22,7 +22,6 @@
 #include "machine/atarigen.h"
 #include "sound/okim6295.h"
 #include "sound/2413intf.h"
-#include "video/atarimo.h"
 #include "includes/relief.h"
 
 
@@ -131,10 +130,10 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, relief_state )
 	AM_RANGE(0x3f0000, 0x3f1fff) AM_RAM_DEVWRITE("vad", atari_vad_device, playfield2_latched_msb_w) AM_SHARE("vad:playfield2")
 	AM_RANGE(0x3f2000, 0x3f3fff) AM_RAM_DEVWRITE("vad", atari_vad_device, playfield_latched_lsb_w) AM_SHARE("vad:playfield")
 	AM_RANGE(0x3f4000, 0x3f5fff) AM_RAM_DEVWRITE("vad", atari_vad_device, playfield_upper_w) AM_SHARE("vad:playfield_ext")
-	AM_RANGE(0x3f6000, 0x3f67ff) AM_READWRITE_LEGACY(atarimo_0_spriteram_r, atarimo_0_spriteram_w)
+	AM_RANGE(0x3f6000, 0x3f67ff) AM_RAM AM_SHARE("vad:mob")
 	AM_RANGE(0x3f6800, 0x3f8eff) AM_RAM
 	AM_RANGE(0x3f8f00, 0x3f8f7f) AM_RAM AM_SHARE("vad:eof")
-	AM_RANGE(0x3f8f80, 0x3f8fff) AM_READWRITE_LEGACY(atarimo_0_slipram_r, atarimo_0_slipram_w)
+	AM_RANGE(0x3f8f80, 0x3f8fff) AM_SHARE("vad:mob:slip")
 	AM_RANGE(0x3f9000, 0x3fffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -276,6 +275,7 @@ static MACHINE_CONFIG_START( relief, relief_state )
 	MCFG_ATARI_VAD_ADD("vad", "screen", WRITELINE(atarigen_state, scanline_int_write_line))
 	MCFG_ATARI_VAD_PLAYFIELD(relief_state, get_playfield_tile_info)
 	MCFG_ATARI_VAD_PLAYFIELD2(relief_state, get_playfield2_tile_info)
+	MCFG_ATARI_VAD_MOB(relief_state::s_mob_config)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	/* note: these parameters are from published specs, not derived */

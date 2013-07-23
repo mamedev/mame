@@ -166,7 +166,6 @@ Measurements -
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/2151intf.h"
-#include "video/atarimo.h"
 #include "includes/badlands.h"
 
 
@@ -383,7 +382,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, badlands_state )
 	AM_RANGE(0xfee000, 0xfeffff) AM_WRITE(eeprom_enable_w)
 	AM_RANGE(0xffc000, 0xffc3ff) AM_RAM_WRITE(expanded_paletteram_666_w) AM_SHARE("paletteram")
 	AM_RANGE(0xffe000, 0xffefff) AM_RAM_DEVWRITE("playfield", tilemap_device, write) AM_SHARE("playfield")
-	AM_RANGE(0xfff000, 0xfff1ff) AM_READWRITE_LEGACY(atarimo_0_spriteram_r, atarimo_0_spriteram_expanded_w)
+	AM_RANGE(0xfff000, 0xfff1ff) AM_RAM AM_SHARE("mob")
 	AM_RANGE(0xfff200, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -508,6 +507,7 @@ static MACHINE_CONFIG_START( badlands, badlands_state )
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield", 2, badlands_state, get_playfield_tile_info, 8,8, SCAN_ROWS, 64,32)
+	MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "screen", badlands_state::s_mob_config)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	/* note: these parameters are from published specs, not derived */
@@ -646,7 +646,7 @@ static ADDRESS_MAP_START( bootleg_map, AS_PROGRAM, 16, badlands_state )
 	AM_RANGE(0xfee000, 0xfeffff) AM_WRITE(eeprom_enable_w)
 	AM_RANGE(0xffc000, 0xffc3ff) AM_RAM_WRITE(expanded_paletteram_666_w) AM_SHARE("paletteram")
 	AM_RANGE(0xffe000, 0xffefff) AM_RAM_DEVWRITE("playfield", tilemap_device, write) AM_SHARE("playfield")
-	AM_RANGE(0xfff000, 0xfff1ff) AM_READWRITE_LEGACY(atarimo_0_spriteram_r, atarimo_0_spriteram_expanded_w)
+	AM_RANGE(0xfff000, 0xfff1ff) AM_RAM AM_SHARE("mob")
 	AM_RANGE(0xfff200, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -698,6 +698,7 @@ static MACHINE_CONFIG_START( badlandsb, badlands_state )
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield", 2, badlands_state, get_playfield_tile_info, 8,8, SCAN_ROWS, 64,32)
+	MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "screen", badlands_state::s_mob_config)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	/* note: these parameters are from published specs, not derived */

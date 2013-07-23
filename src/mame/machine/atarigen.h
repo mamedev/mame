@@ -96,6 +96,9 @@
 	MCFG_TILEMAP_LAYOUT_STANDARD(SCAN_ROWS, 64,32) \
 	MCFG_TILEMAP_TRANSPARENT_PEN(0) }
 
+#define MCFG_ATARI_VAD_MOB(_config) \
+	{ astring fulltag(device->tag(), ":mob"); device_t *device; \
+	MCFG_ATARI_MOTION_OBJECTS_ADD(fulltag, "^^screen", _config) } \
 
 
 /***************************************************************************
@@ -183,6 +186,8 @@ private:
 
 // ======================> atari_vad_device
 
+class atari_motion_objects_device;
+
 // device type definition
 extern const device_type ATARI_VAD;
 
@@ -200,6 +205,7 @@ public:
 	tilemap_device *alpha() const { return m_alpha_tilemap; }
 	tilemap_device *playfield() const { return m_playfield_tilemap; }
 	tilemap_device *playfield2() const { return m_playfield2_tilemap; }
+	atari_motion_objects_device *mob() const { return m_mob; }
 
 	// read/write handlers
 	DECLARE_READ16_MEMBER(control_read);
@@ -242,6 +248,7 @@ private:
 	optional_device<tilemap_device> m_alpha_tilemap;
 	required_device<tilemap_device> m_playfield_tilemap;
 	optional_device<tilemap_device> m_playfield2_tilemap;
+	optional_device<atari_motion_objects_device> m_mob;
 	optional_shared_ptr<UINT16> m_eof_data;
 
 	screen_device *     m_screen;

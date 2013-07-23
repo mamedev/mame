@@ -6,6 +6,7 @@
 
 #include "machine/atarigen.h"
 #include "audio/atarijsa.h"
+#include "video/atarimo.h"
 
 class toobin_state : public atarigen_state
 {
@@ -15,12 +16,14 @@ public:
 			m_jsa(*this, "jsa"),
 			m_playfield_tilemap(*this, "playfield"),
 			m_alpha_tilemap(*this, "alpha"),
+			m_mob(*this, "mob"),
 			m_interrupt_scan(*this, "interrupt_scan") { }
 
 	required_device<atari_jsa_i_device> m_jsa;
 
 	required_device<tilemap_device> m_playfield_tilemap;
 	required_device<tilemap_device> m_alpha_tilemap;
+	required_device<atari_motion_objects_device> m_mob;
 
 	required_shared_ptr<UINT16> m_interrupt_scan;
 
@@ -40,4 +43,6 @@ public:
 	DECLARE_WRITE16_MEMBER( toobin_xscroll_w );
 	DECLARE_WRITE16_MEMBER( toobin_yscroll_w );
 	DECLARE_WRITE16_MEMBER( toobin_slip_w );
+
+	static const atari_motion_objects_config s_mob_config;
 };

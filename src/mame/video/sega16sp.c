@@ -66,7 +66,7 @@ const device_type SEGA_YBOARD_SPRITES = &device_creator<sega_yboard_sprite_devic
 //-------------------------------------------------
 
 sega_16bit_sprite_device::sega_16bit_sprite_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner)
-	: sprite16_device_ind16(mconfig, type, name, tag, owner),
+	: sprite16_device_ind16(mconfig, type, name, tag, owner, "sega16sp", __FILE__),
 		m_flip(false)
 {
 	// default to 1:1 bank mapping

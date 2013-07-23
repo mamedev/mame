@@ -149,7 +149,7 @@ sparse_dirty_rect *sparse_dirty_bitmap::first_dirty_rect(const rectangle &clipre
 		for (int x = sx; x <= ex; x++)
 		{
 			// if this tile is not dirty, end our current run and continue
-			if (!*dirtybase++)
+			if (!dirtybase[x])
 			{
 				if (currect != NULL)
 					*currect &= cliprect;

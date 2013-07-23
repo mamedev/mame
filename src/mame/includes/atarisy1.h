@@ -5,6 +5,7 @@
 *************************************************************************/
 
 #include "machine/atarigen.h"
+#include "video/atarimo.h"
 
 class atarisy1_state : public atarigen_state
 {
@@ -12,6 +13,7 @@ public:
 	atarisy1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atarigen_state(mconfig, type, tag),
 			m_bankselect(*this, "bankselect"),
+			m_mob(*this, "mob"),
 			m_joystick_timer(*this, "joystick_timer"),
 			m_playfield_tilemap(*this, "playfield"),
 			m_alpha_tilemap(*this, "alpha"),
@@ -20,6 +22,7 @@ public:
 			m_int3off_timer(*this, "int3off_timer") { }
 
 	required_shared_ptr<UINT16> m_bankselect;
+	required_device<atari_motion_objects_device> m_mob;
 
 	UINT8           m_joystick_type;
 	UINT8           m_trackball_type;
@@ -83,4 +86,6 @@ public:
 	DECLARE_WRITE16_MEMBER( atarisy1_xscroll_w );
 	DECLARE_WRITE16_MEMBER( atarisy1_yscroll_w );
 	DECLARE_WRITE16_MEMBER( atarisy1_priority_w );
+	
+	static const atari_motion_objects_config s_mob_config;
 };

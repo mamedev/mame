@@ -5,6 +5,7 @@
 *************************************************************************/
 
 #include "machine/atarigen.h"
+#include "video/atarimo.h"
 
 class relief_state : public atarigen_state
 {
@@ -29,4 +30,6 @@ public:
 	DECLARE_MACHINE_RESET(relief);
 	DECLARE_VIDEO_START(relief);
 	UINT32 screen_update_relief(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	static const atari_motion_objects_config s_mob_config;
 };

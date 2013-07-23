@@ -43,51 +43,46 @@ TILE_GET_INFO_MEMBER(atarisy2_state::get_playfield_tile_info)
  *
  *************************************/
 
+const atari_motion_objects_config atarisy2_state::s_mob_config =
+{
+	1,                  /* index to which gfx system */
+	1,                  /* number of motion object banks */
+	1,                  /* are the entries linked? */
+	0,                  /* are the entries split? */
+	0,                  /* render in reverse order? */
+	0,                  /* render in swapped X/Y order? */
+	0,                  /* does the neighbor bit affect the next object? */
+	0,                  /* pixels per SLIP entry (0 for no-slip) */
+	0,                  /* pixel offset for SLIPs */
+	0,                  /* maximum number of links to visit/scanline (0=all) */
+
+	0x00,               /* base palette entry */
+	0x40,               /* maximum number of colors */
+	15,                 /* transparent pen index */
+
+	{{ 0,0,0,0x07f8 }}, /* mask for the link */
+	{{ 0,0x07ff,0,0 }, { 0x0007,0,0,0 }}, /* mask for the code index */
+	{{ 0,0,0,0x3000 }}, /* mask for the color */
+	{{ 0,0,0xffc0,0 }}, /* mask for the X position */
+	{{ 0x7fc0,0,0,0 }}, /* mask for the Y position */
+	{{ 0 }},            /* mask for the width, in tiles*/
+	{{ 0,0x3800,0,0 }}, /* mask for the height, in tiles */
+	{{ 0,0x4000,0,0 }}, /* mask for the horizontal flip */
+	{{ 0 }},            /* mask for the vertical flip */
+	{{ 0,0,0,0xc000 }}, /* mask for the priority */
+	{{ 0,0x8000,0,0 }}, /* mask for the neighbor */
+	{{ 0 }},            /* mask for absolute coordinates */
+
+	{{ 0 }},            /* mask for the special value */
+	0                  /* resulting value to indicate "special" */
+};
+
 VIDEO_START_MEMBER(atarisy2_state,atarisy2)
 {
-	static const atarimo_desc modesc =
-	{
-		1,                  /* index to which gfx system */
-		1,                  /* number of motion object banks */
-		1,                  /* are the entries linked? */
-		0,                  /* are the entries split? */
-		0,                  /* render in reverse order? */
-		0,                  /* render in swapped X/Y order? */
-		0,                  /* does the neighbor bit affect the next object? */
-		0,                  /* pixels per SLIP entry (0 for no-slip) */
-		0,                  /* pixel offset for SLIPs */
-		0,                  /* maximum number of links to visit/scanline (0=all) */
-
-		0x00,               /* base palette entry */
-		0x40,               /* maximum number of colors */
-		15,                 /* transparent pen index */
-
-		{{ 0,0,0,0x07f8 }}, /* mask for the link */
-		{{ 0 }},            /* mask for the graphics bank */
-		{{ 0,0x07ff,0,0 }}, /* mask for the code index */
-		{{ 0x0007,0,0,0 }}, /* mask for the upper code index */
-		{{ 0,0,0,0x3000 }}, /* mask for the color */
-		{{ 0,0,0xffc0,0 }}, /* mask for the X position */
-		{{ 0x7fc0,0,0,0 }}, /* mask for the Y position */
-		{{ 0 }},            /* mask for the width, in tiles*/
-		{{ 0,0x3800,0,0 }}, /* mask for the height, in tiles */
-		{{ 0,0x4000,0,0 }}, /* mask for the horizontal flip */
-		{{ 0 }},            /* mask for the vertical flip */
-		{{ 0,0,0,0xc000 }}, /* mask for the priority */
-		{{ 0,0x8000,0,0 }}, /* mask for the neighbor */
-		{{ 0 }},            /* mask for absolute coordinates */
-
-		{{ 0 }},            /* mask for the special value */
-		0,                  /* resulting value to indicate "special" */
-		0                   /* callback routine for special entries */
-	};
-
 	/* initialize banked memory */
 	m_alpha_tilemap->basemem().set(&m_vram[0x0000], 0x2000, 16, ENDIANNESS_NATIVE, 2);
 	m_playfield_tilemap->basemem().set(&m_vram[0x2000], 0x2000, 16, ENDIANNESS_NATIVE, 2);
-
-	/* initialize the motion objects */
-	atarimo_init(machine(), 0, &modesc);
+	m_mob->set_spriteram(&m_vram[0x0c00], 0x0400);
 
 	/* reset the statics */
 	m_yscroll_reset_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(atarisy2_state::reset_yscroll_callback),this));
@@ -238,11 +233,6 @@ WRITE16_MEMBER( atarisy2_state::slapstic_w )
 READ16_MEMBER( atarisy2_state::videoram_r )
 {
 	int offs = offset | m_videobank;
-	if (offs >= 0xc00 && offs < 0x1000)
-	{
-		return atarimo_0_spriteram_r(space, offs - 0x0c00, mem_mask);
-	}
-
 	return m_vram[offs];
 }
 
@@ -261,7 +251,7 @@ WRITE16_MEMBER( atarisy2_state::videoram_w )
 		/* force an update if the link of object 0 is about to change */
 		if (offs == 0x0c03)
 			space.machine().primary_screen->update_partial(machine().primary_screen->vpos());
-		atarimo_0_spriteram_w(space, offs - 0x0c00, data, mem_mask);
+		COMBINE_DATA(&m_mob->spriteram()[offs - 0x0c00]);
 	}
 
 	/* playfieldram? */
@@ -285,45 +275,43 @@ WRITE16_MEMBER( atarisy2_state::videoram_w )
 
 UINT32 atarisy2_state::screen_update_atarisy2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	// start drawing
+	m_mob->draw_async(cliprect);
+
+	// reset priorities
 	bitmap_ind8 &priority_bitmap = machine().priority_bitmap;
-	atarimo_rect_list rectlist;
-	bitmap_ind16 *mobitmap;
-	int x, y, r;
+	priority_bitmap.fill(0, cliprect);
 
 	/* draw the playfield */
-	priority_bitmap.fill(0, cliprect);
 	m_playfield_tilemap->draw(bitmap, cliprect, 0, 0);
 	m_playfield_tilemap->draw(bitmap, cliprect, 1, 1);
 	m_playfield_tilemap->draw(bitmap, cliprect, 2, 2);
 	m_playfield_tilemap->draw(bitmap, cliprect, 3, 3);
 
 	/* draw and merge the MO */
-	mobitmap = atarimo_render(0, cliprect, &rectlist);
-	for (r = 0; r < rectlist.numrects; r++, rectlist.rect++)
-		for (y = rectlist.rect->min_y; y <= rectlist.rect->max_y; y++)
+	bitmap_ind16 &mobitmap = m_mob->bitmap();
+	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != NULL; rect = rect->next())
+		for (int y = rect->min_y; y <= rect->max_y; y++)
 		{
-			UINT16 *mo = &mobitmap->pix16(y);
+			UINT16 *mo = &mobitmap.pix16(y);
 			UINT16 *pf = &bitmap.pix16(y);
 			UINT8 *pri = &priority_bitmap.pix8(y);
-			for (x = rectlist.rect->min_x; x <= rectlist.rect->max_x; x++)
-				if (mo[x] != 0x0f)
+			for (int x = rect->min_x; x <= rect->max_x; x++)
+				if (mo[x] != 0xffff)
 				{
-					int mopriority = mo[x] >> ATARIMO_PRIORITY_SHIFT;
+					int mopriority = mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT;
 
 					/* high priority PF? */
 					if ((mopriority + pri[x]) & 2)
 					{
 						/* only gets priority if PF pen is less than 8 */
 						if (!(pf[x] & 0x08))
-							pf[x] = mo[x] & ATARIMO_DATA_MASK;
+							pf[x] = mo[x] & atari_motion_objects_device::DATA_MASK;
 					}
 
 					/* low priority */
 					else
-						pf[x] = mo[x] & ATARIMO_DATA_MASK;
-
-					/* erase behind ourselves */
-					mo[x] = 0x0f;
+						pf[x] = mo[x] & atari_motion_objects_device::DATA_MASK;
 				}
 		}
 

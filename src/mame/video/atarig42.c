@@ -188,7 +188,7 @@ UINT32 atarig42_state::screen_update_atarig42(screen_device &screen, bitmap_ind1
 			UINT16 *mo = &mo_bitmap->pix16(y);
 			UINT8 *pri = &priority_bitmap.pix8(y);
 			for (x = left; x < right; x++)
-				if (mo[x])
+				if (mo[x] != 0xffff)
 				{
 					int pfpri = pri[x];
 					int mopri = mo[x] >> ATARIRLE_PRIORITY_SHIFT;
