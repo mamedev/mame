@@ -119,11 +119,13 @@ WRITE8_MEMBER(dec0_state::hippodrm_shared_w)
 READ16_MEMBER(dec0_state::hippodrm_68000_share_r)
 {
 	if (offset==0) space.device().execute().yield(); /* A wee helper */
+	assert(offset >= 0 && offset < 0xff);
 	return m_share[offset]&0xff;
 }
 
 WRITE16_MEMBER(dec0_state::hippodrm_68000_share_w)
 {
+	assert(offset >= 0 && offset < 0xff);
 	m_share[offset]=data&0xff;
 }
 
