@@ -24,8 +24,4 @@ private:
 extern const device_type TOAPLAN_SCU;
 
 #define MCFG_TOAPLAN_SCU_ADD(_tag ) \
-	MCFG_DEVICE_ADD(_tag, TOAPLAN_SCU, 0) \
-
-
-
-
+	MCFG_DEVICE_ADD(_tag, TOAPLAN_SCU, 0)

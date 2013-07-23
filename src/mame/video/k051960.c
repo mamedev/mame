@@ -91,7 +91,7 @@ void k051960_device::device_config_complete()
 	const k051960_interface *intf = reinterpret_cast<const k051960_interface *>(static_config());
 	if (intf != NULL)
 	*static_cast<k051960_interface *>(this) = *intf;
-	
+
 	// or initialize to defaults if none provided
 	else
 	{
@@ -197,7 +197,6 @@ void k051960_device::device_start()
 
 void k051960_device::device_reset()
 {
-	
 	m_dx = m_dy = 0;
 	m_k051937_counter = 0;
 

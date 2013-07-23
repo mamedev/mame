@@ -2,7 +2,7 @@
 
     dvpoints.c
 
-	Breakpoint debugger view.
+    Breakpoint debugger view.
 
 ****************************************************************************
 
@@ -52,7 +52,7 @@
 
 debug_view_breakpoints::debug_view_breakpoints(running_machine &machine, debug_view_osd_update_func osdupdate, void *osdprivate)
 	: debug_view(machine, DVT_BREAK_POINTS, osdupdate, osdprivate),
-	  m_sortType(SORT_INDEX_ASCENDING)
+		m_sortType(SORT_INDEX_ASCENDING)
 {
 	// fail if no available sources
 	enumerate_sources();
@@ -126,7 +126,7 @@ void debug_view_breakpoints::view_char(int chval)
 void debug_view_breakpoints::view_click(const int button, const debug_view_xy& pos)
 {
 	bool clickedTopRow = (m_topleft.y == pos.y);
-	
+
 	if (clickedTopRow)
 	{
 		if (pos.x < 5 && m_sortType == SORT_INDEX_ASCENDING)
@@ -163,13 +163,13 @@ void debug_view_breakpoints::view_click(const int button, const debug_view_xy& p
 		const int bpIndex = pos.y-1;
 		if (bpIndex > numBPs || bpIndex < 0)
 			return;
-		
+
 		// Enable / disable
 		if (bpList[bpIndex]->enabled())
 			bpList[bpIndex]->setEnabled(false);
 		else
 			bpList[bpIndex]->setEnabled(true);
-		
+
 		delete[] bpList;
 	}
 
@@ -295,7 +295,7 @@ int debug_view_breakpoints::breakpoints(SortMode sort, device_debug::breakpoint*
 			numBPs++;
 		bpList = new device_debug::breakpoint*[numBPs];
 	}
-	
+
 	int bpAddIndex = 1;
 	for (const debug_view_source *source = m_source_list.head(); source != NULL; source = source->next())
 	{
@@ -310,7 +310,7 @@ int debug_view_breakpoints::breakpoints(SortMode sort, device_debug::breakpoint*
 			}
 		}
 	}
-	
+
 	// And now for the sort
 	switch (m_sortType)
 	{
@@ -353,7 +353,7 @@ int debug_view_breakpoints::breakpoints(SortMode sort, device_debug::breakpoint*
 			qsort(bpList, numBPs, sizeof(device_debug::breakpoint*), cActionDescending);
 			break;
 	}
-	
+
 	return numBPs;
 }
 
@@ -368,7 +368,7 @@ void debug_view_breakpoints::view_update()
 	// Gather a list of all the breakpoints for all the CPUs
 	device_debug::breakpoint** bpList = NULL;
 	const int numBPs = breakpoints(SORT_NONE, bpList);
-	
+
 	// Set the view region so the scroll bars update
 	m_total.y = numBPs+1;
 
@@ -377,7 +377,7 @@ void debug_view_breakpoints::view_update()
 	for (int row = 0; row < m_visible.y; row++)
 	{
 		UINT32 effrow = m_topleft.y + row;
-		
+
 		// Header
 		if (row == 0)
 		{
@@ -406,7 +406,7 @@ void debug_view_breakpoints::view_update()
 			if (m_sortType == SORT_ACTION_ASCENDING) header.catprintf("\\");
 			else if (m_sortType == SORT_ACTION_DESCENDING) header.catprintf("/");
 			pad_astring_to_length(header, 80);
-			
+
 			for (int i = 0; i < m_visible.x; i++)
 			{
 				dest->byte = (i < header.len()) ? header[i] : ' ';
@@ -421,8 +421,8 @@ void debug_view_breakpoints::view_update()
 		if (bpi < numBPs && bpi >= 0)
 		{
 			device_debug::breakpoint* bp = bpList[bpi];
-			
- 			astring buffer;
+
+			astring buffer;
 			buffer.printf("%x", bp->index());
 			pad_astring_to_length(buffer, 5);
 			buffer.catprintf("%c", bp->enabled() ? 'X' : 'O');
@@ -441,21 +441,21 @@ void debug_view_breakpoints::view_update()
 				buffer.catprintf("%s", bp->action());
 				pad_astring_to_length(buffer, 80);
 			}
-			
+
 			for (int i = 0; i < m_visible.x; i++)
 			{
 				dest->byte = (i < buffer.len()) ? buffer[i] : ' ';
 				dest->attrib = DCA_NORMAL;
-				
+
 				// Color disabled breakpoints red
 				if (i == 5 && dest->byte == 'O')
 					dest->attrib = DCA_CHANGED;
-				
+
 				dest++;
 			}
 			continue;
 		}
-		
+
 		// Fill the remaining vertical space
 		for (int i = 0; i < m_visible.x; i++)
 		{
@@ -464,6 +464,6 @@ void debug_view_breakpoints::view_update()
 			dest++;
 		}
 	}
-	
+
 	delete[] bpList;
 }

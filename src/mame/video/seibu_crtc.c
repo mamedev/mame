@@ -236,7 +236,7 @@ void seibu_crtc_device::device_config_complete()
 	else
 	{
 		m_screen_tag = "";
-//		memset(&m_layer_en, 0, sizeof(m_layer_en));
+//      memset(&m_layer_en, 0, sizeof(m_layer_en));
 	}
 }
 
@@ -330,4 +330,3 @@ WRITE16_MEMBER( seibu_crtc_device::write_xor )
 {
 	write_word(offset ^ 0x20,data);
 }
-

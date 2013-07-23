@@ -7,7 +7,7 @@ struct tc0110pcr_interface
 };
 
 class tc0110pcr_device : public device_t,
-										  public tc0110pcr_interface
+											public tc0110pcr_interface
 {
 public:
 	tc0110pcr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -20,13 +20,13 @@ public:
 	DECLARE_WRITE16_MEMBER( step1_4bpg_word_w );  /* only 4 bits per color gun */
 
 	void restore_colors();
-	
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 private:
 	UINT16 *     m_ram;
 	int          m_type;

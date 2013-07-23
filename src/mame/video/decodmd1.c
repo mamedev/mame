@@ -230,10 +230,10 @@ machine_config_constructor decodmd_type1_device::device_mconfig_additions() cons
 
 decodmd_type1_device::decodmd_type1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, DECODMD1, "Data East Pinball Dot Matrix Display Type 1", tag, owner, clock, "decodmd1", __FILE__),
-	  m_cpu(*this,"dmdcpu"),
-	  m_rombank1(*this,"dmdbank1"),
-	  m_rombank2(*this,"dmdbank2"),
-	  m_ram(*this,RAM_TAG)
+		m_cpu(*this,"dmdcpu"),
+		m_rombank1(*this,"dmdbank1"),
+		m_rombank2(*this,"dmdbank2"),
+		m_ram(*this,RAM_TAG)
 {}
 
 void decodmd_type1_device::device_start()

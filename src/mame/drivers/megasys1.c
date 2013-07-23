@@ -2923,7 +2923,7 @@ ROM_START( p47 )
 	ROM_LOAD( "p47j_12.bin", 0x040000, 0x020000, CRC(5268395f) SHA1(de0cba1e7a7d4acc27467d1b553e8f39bea7282e) )
 
 	ROM_REGION( 0x020000, "gfx3", 0 ) /* Scroll 2 */
-	ROM_LOAD( "p47us16.bin", 0x000000, 0x010000, CRC(5a682c8f) SHA1(0910025e2ee068e5a1fe7f2daae64c9112ab1de6) )	// "phantom" instead of "freedom" in the logo
+	ROM_LOAD( "p47us16.bin", 0x000000, 0x010000, CRC(5a682c8f) SHA1(0910025e2ee068e5a1fe7f2daae64c9112ab1de6) ) // "phantom" instead of "freedom" in the logo
 
 	ROM_REGION( 0x080000, "gfx4", 0 ) /* Sprites */
 	ROM_LOAD( "p47j_27.bin", 0x000000, 0x020000, CRC(9e2bde8e) SHA1(8cac74c8177a6953b78c6fbf734dfee5da8fc961) )
@@ -3021,7 +3021,7 @@ ROM_START( p47je )
 	ROM_REGION( 0x080000, "gfx4", 0 ) /* Sprites */
 	ROM_LOAD( "p47j_27.bin",     0x000000, 0x020000, CRC(9e2bde8e) SHA1(8cac74c8177a6953b78c6fbf734dfee5da8fc961) )
 	ROM_LOAD( "p47j_18.bin",     0x020000, 0x020000, CRC(29d8f676) SHA1(6af5ec9aa96ea67c2c95bcca2164afc128e84a31) )
-	ROM_LOAD( "export_17.rom15", 0x040000, 0x020000, CRC(b6c2e241) SHA1(54c9cc9e858a3060117acc0128ea7e759d255a67) )	// German "Iron Cross" emblem removed from enemies
+	ROM_LOAD( "export_17.rom15", 0x040000, 0x020000, CRC(b6c2e241) SHA1(54c9cc9e858a3060117acc0128ea7e759d255a67) ) // German "Iron Cross" emblem removed from enemies
 	ROM_LOAD( "p47j_26.bin",     0x060000, 0x020000, CRC(4d07581a) SHA1(768693e1fcb822b8284ba14c9a5c3d6b00f73383) )
 
 	ROM_REGION( 0x040000, "oki1", 0 )       /* Samples */

@@ -14,7 +14,7 @@ class tc0180vcu_device : public device_t,
 public:
 	tc0180vcu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~tc0180vcu_device() {}
-	
+
 	DECLARE_READ8_MEMBER( get_fb_page );
 	DECLARE_WRITE8_MEMBER( set_fb_page );
 	DECLARE_READ8_MEMBER( get_videoctrl );
@@ -48,7 +48,7 @@ protected:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
-	
+
 	void video_control( UINT8 data );
 };
 

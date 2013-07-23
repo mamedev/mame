@@ -64,7 +64,7 @@ protected:
 	virtual UINT32 execute_max_cycles() const { return 1; }
 	virtual UINT32 execute_input_lines() const { return 0; }
 	virtual void execute_run();
-	
+
 	// device_memory_interface overrides
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const
 	{

@@ -44,10 +44,10 @@ public:
 	DECLARE_READ8_MEMBER( m6844_r );
 	DECLARE_WRITE8_MEMBER( m6844_w );
 	DECLARE_WRITE8_MEMBER( sound_banks_w );
-	
+
 	void exidy440_sound_command(UINT8 param);
 	UINT8 exidy440_sound_command_ack();
-	
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -86,7 +86,7 @@ private:
 
 	/* channel frequency is configurable */
 	int m_channel_frequency[4];
-	
+
 	void m6844_update();
 	void m6844_finished(m6844_channel_data *channel);
 	void play_cvsd(int ch);
@@ -98,7 +98,7 @@ private:
 
 	void decode_and_filter_cvsd(UINT8 *data, int bytes, int maskbits, int frequency, INT16 *dest);
 	void fir_filter(INT32 *input, INT16 *output, int count);
-	
+
 	void add_and_scale_samples(int ch, INT32 *dest, int samples, int volume);
 	void mix_to_16(int length, stream_sample_t *dest_left, stream_sample_t *dest_right);
 };

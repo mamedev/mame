@@ -22,7 +22,7 @@ class tc0100scn_device : public device_t,
 public:
 	tc0100scn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~tc0100scn_device() {}
-	
+
 	#define TC0100SCN_SINGLE_VDU    1024
 
 	/* Function to set separate color banks for the three tilemapped layers.
@@ -56,7 +56,7 @@ public:
 	/* returns 0 or 1 depending on the lowest priority tilemap set in the internal
 	register. Use this function to draw tilemaps in the correct order. */
 	int bottomlayer();
-	
+
 	void postload();
 
 protected:
@@ -94,11 +94,11 @@ private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
-	
+
 	void common_get_bg0_tile_info(tile_data &tileinfo, int tile_index, UINT16 *ram, int gfxnum, int colbank, int dblwidth);
 	void common_get_bg1_tile_info(tile_data &tileinfo, int tile_index, UINT16 *ram, int gfxnum, int colbank, int dblwidth);
 	void common_get_tx_tile_info(tile_data &tileinfo, int tile_index, UINT16 *ram, int gfxnum, int colbank, int dblwidth);
-	
+
 	void tilemap_draw_fg(bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t* tmap, int flags, UINT32 priority);
 	void set_layer_ptrs();
 	void dirty_tilemaps();

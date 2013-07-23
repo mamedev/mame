@@ -501,8 +501,8 @@ void i4004_cpu_device::state_export(const device_state_entry &entry)
 	{
 		case STATE_GENFLAGS:
 			m_flags = ((m_A == 0) ? 0x04 : 0x00) |
-			           (m_C ? 0x02 : 0x00) |
-			           (m_TEST ? 0x01 : 0x00);
+						(m_C ? 0x02 : 0x00) |
+						(m_TEST ? 0x01 : 0x00);
 			break;
 	}
 }
@@ -526,4 +526,4 @@ offs_t i4004_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8
 	return CPU_DISASSEMBLE_NAME(i4004)(this, buffer, pc, oprom, opram, options);
 }
 
-//		case CPUINFO_IS_OCTAL:                      info->i = true;                         break;
+//      case CPUINFO_IS_OCTAL:                      info->i = true;                         break;

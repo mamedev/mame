@@ -37,7 +37,7 @@ public:
 static ADDRESS_MAP_START( cupidon_map, AS_PROGRAM, 32, cupidon_state )
 	AM_RANGE(0x0000000, 0x07fffff) AM_ROM
 	AM_RANGE(0x1000000, 0x100ffff) AM_RAM
-	AM_RANGE(0x1800000,	0x1800003) AM_READ(cupidon_return_ffffffff)
+	AM_RANGE(0x1800000, 0x1800003) AM_READ(cupidon_return_ffffffff)
 	AM_RANGE(0x2000074, 0x2000077) AM_RAM // port
 ADDRESS_MAP_END
 

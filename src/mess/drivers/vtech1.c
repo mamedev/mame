@@ -300,7 +300,7 @@ void vtech1_state::vtech1_get_track()
 		size = TRKSIZE_VZ;
 		offs = TRKSIZE_VZ * m_fdc_track_x2[m_drive]/2;
 		image->fseek(offs, SEEK_SET);
-		 // some disks have slightly larger header, make sure we capture the checksum at the end of the track
+			// some disks have slightly larger header, make sure we capture the checksum at the end of the track
 		size = image->fread(m_fdc_data, size+4);
 		if (LOG_VTECH1_FDC)
 			logerror("get track @$%05x $%04x bytes\n", offs, size);

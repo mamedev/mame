@@ -51,23 +51,23 @@
 
 #define MCFG_MACHINE_RESET(_func) \
 	driver_device::static_set_callback(*owner, driver_device::CB_MACHINE_RESET, MACHINE_RESET_NAME(_func));
-	
+
 #define MCFG_SOUND_START(_func) \
 	driver_device::static_set_callback(*owner, driver_device::CB_SOUND_START, SOUND_START_NAME(_func));
-	
+
 #define MCFG_SOUND_RESET(_func) \
 	driver_device::static_set_callback(*owner, driver_device::CB_SOUND_RESET, SOUND_RESET_NAME(_func));
-	
+
 #define MCFG_PALETTE_INIT(_func) \
 	driver_device::static_set_callback(*owner, driver_device::CB_PALETTE_INIT, PALETTE_INIT_NAME(_func));
-	
+
 #define MCFG_VIDEO_START(_func) \
 	driver_device::static_set_callback(*owner, driver_device::CB_VIDEO_START, VIDEO_START_NAME(_func));
-	
+
 #define MCFG_VIDEO_RESET(_func) \
 	driver_device::static_set_callback(*owner, driver_device::CB_VIDEO_RESET, VIDEO_RESET_NAME(_func));
 
-	
+
 #define MACHINE_START_CALL(name)    MACHINE_START_NAME(name)(machine)
 
 #define MACHINE_RESET_CALL(name)    MACHINE_RESET_NAME(name)(machine)

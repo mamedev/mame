@@ -12,7 +12,7 @@ class tc0280grd_device : public device_t,
 public:
 	tc0280grd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~tc0280grd_device() {}
-	
+
 	DECLARE_READ16_MEMBER( tc0280grd_word_r );
 	DECLARE_WRITE16_MEMBER( tc0280grd_word_w );
 	DECLARE_WRITE16_MEMBER( tc0280grd_ctrl_word_w );
@@ -30,7 +30,7 @@ protected:
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 private:
 	// internal state
 	UINT16 *       m_ram;
@@ -51,7 +51,7 @@ extern const device_type TC0280GRD;
 #define MCFG_TC0280GRD_ADD(_tag, _interface) \
 	MCFG_DEVICE_ADD(_tag, TC0280GRD, 0) \
 	MCFG_DEVICE_CONFIG(_interface)
-	
+
 #define MCFG_TC0430GRW_ADD(_tag, _interface) \
 	MCFG_DEVICE_ADD(_tag, TC0430GRW, 0) \
 	MCFG_DEVICE_CONFIG(_interface)

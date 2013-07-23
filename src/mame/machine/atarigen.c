@@ -107,7 +107,7 @@ atari_sound_comm_device::atari_sound_comm_device(const machine_config &mconfig, 
 
 //-------------------------------------------------
 //  static_set_sound_cpu: Set the tag of the
-//	sound CPU
+//  sound CPU
 //-------------------------------------------------
 
 void atari_sound_comm_device::static_set_sound_cpu(device_t &device, const char *cputag)
@@ -143,8 +143,8 @@ void atari_sound_comm_device::device_start()
 
 
 //-------------------------------------------------
-//  device_reset: Handle a device reset by 
-//	clearing the interrupt lines and states
+//  device_reset: Handle a device reset by
+//  clearing the interrupt lines and states
 //-------------------------------------------------
 
 void atari_sound_comm_device::device_reset()
@@ -160,7 +160,7 @@ void atari_sound_comm_device::device_reset()
 
 //-------------------------------------------------
 //  device_timer: Handle device-specific timer
-//	calbacks
+//  calbacks
 //-------------------------------------------------
 
 void atari_sound_comm_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -195,8 +195,8 @@ INTERRUPT_GEN_MEMBER(atari_sound_comm_device::sound_irq_gen)
 
 
 //-------------------------------------------------
-//  sound_irq_ack_r: Resets the IRQ signal to the 
-//  6502 sound processor. Both reads and writes 
+//  sound_irq_ack_r: Resets the IRQ signal to the
+//  6502 sound processor. Both reads and writes
 //  can be used.
 //-------------------------------------------------
 
@@ -215,7 +215,7 @@ WRITE8_MEMBER(atari_sound_comm_device::sound_irq_ack_w)
 
 
 //-------------------------------------------------
-//  atarigen_ym2151_irq_gen: Sets the state of the 
+//  atarigen_ym2151_irq_gen: Sets the state of the
 //  YM2151's IRQ line.
 //-------------------------------------------------
 
@@ -291,10 +291,10 @@ READ8_MEMBER(atari_sound_comm_device::sound_command_r)
 
 
 //-------------------------------------------------
-//  update_sound_irq: Called whenever the IRQ state 
-//  changes. An interrupt is generated if either 
-//	sound_irq_gen() was called, or if the YM2151 
-//  generated an interrupt via the 
+//  update_sound_irq: Called whenever the IRQ state
+//  changes. An interrupt is generated if either
+//  sound_irq_gen() was called, or if the YM2151
+//  generated an interrupt via the
 //  ym2151_irq_gen() callback.
 //-------------------------------------------------
 
@@ -308,8 +308,8 @@ void atari_sound_comm_device::update_sound_irq()
 
 
 //-------------------------------------------------
-//  delayed_sound_reset: Synchronizes the sound 
-//	reset command between the two CPUs.
+//  delayed_sound_reset: Synchronizes the sound
+//  reset command between the two CPUs.
 //-------------------------------------------------
 
 void atari_sound_comm_device::delayed_sound_reset(int param)
@@ -408,7 +408,7 @@ atari_vad_device::atari_vad_device(const machine_config &mconfig, const char *ta
 
 //-------------------------------------------------
 //  static_set_sound_cpu: Set the tag of the
-//	sound CPU
+//  sound CPU
 //-------------------------------------------------
 
 void atari_vad_device::static_set_screen(device_t &device, const char *screentag)
@@ -537,7 +537,7 @@ void atari_vad_device::device_start()
 	m_screen = siblingdevice<screen_device>(m_screen_tag);
 	if (m_screen == NULL)
 		throw emu_fatalerror("Screen '%s' not found!", m_screen_tag);
-	
+
 	// resolve callbacks
 	m_scanline_int_cb.resolve_safe();
 
@@ -558,8 +558,8 @@ void atari_vad_device::device_start()
 
 
 //-------------------------------------------------
-//  device_reset: Handle a device reset by 
-//	clearing the interrupt lines and states
+//  device_reset: Handle a device reset by
+//  clearing the interrupt lines and states
 //-------------------------------------------------
 
 void atari_vad_device::device_reset()
@@ -583,7 +583,7 @@ void atari_vad_device::device_reset()
 
 //-------------------------------------------------
 //  device_timer: Handle device-specific timer
-//	calbacks
+//  calbacks
 //-------------------------------------------------
 
 void atari_vad_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -593,7 +593,7 @@ void atari_vad_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 		case TID_SCANLINE_INT:
 			m_scanline_int_cb(ASSERT_LINE);
 			break;
-		
+
 		case TID_TILEROW_UPDATE:
 			update_tilerow(timer, param);
 			break;
@@ -607,7 +607,7 @@ void atari_vad_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 
 //-------------------------------------------------
 //  internal_control_write: Handle writes to the
-//	control registers and EOF updates
+//  control registers and EOF updates
 //-------------------------------------------------
 
 void atari_vad_device::internal_control_write(offs_t offset, UINT16 newword)
@@ -618,77 +618,77 @@ void atari_vad_device::internal_control_write(offs_t offset, UINT16 newword)
 	switch (offset)
 	{
 		//
-		//	VAD register map:
+		//  VAD register map:
 		//
-		//		00 = HDW_ENABLE
-		//				A000 = enable other VAD params
-		//				E000 = enable other VAD params but disable update from ALPHA RAM
-		//		01 = HDW_VSY_LD (standard = 0x795)
-		//				0FF8 = V_SY_S
-		//				0007 = V_SY_E
-		//		02 = HDW_VBL_LD (standard = 0xAEF)
-		//				FE00 = VLAST
-		//				01FF = V_BL_S
-		//		03 = HDW_VINT
-		//		04 = HDW_HSY_LD (standard = 0x5EEF)
-		//				FC00 = H_SY_E/2
-		//				03FF = H_SY_S
-		//		05 = HDW_HBL_LD (relief = 0x72AC, batman/thunderj = 0xBEB1, shuuz/offtwall = 0xCEB1)
-		//				F000 = LB_CLR
-		//				0800 = H_BL_E/16
-		//				0400 = H_BL_E/1
-		//				03FF = H_BL_S
-		//		06 = HDW_SLIP_LD (relief/batman/shuuz = 0x6F05, shuuz/offtwall = 0x0F05)
-		//				7F00 = SLIP_S
-		//				0080 = SLIP_E_SE1
-		//				007F = SLIP_E
-		//		07 = HDW_APDMA_LD (relief/batman/shuuz = 0xBE84, shuuz = 0xB90E, offtwall = 0xB90D)
-		//				C000 = OPFPIC
-		//				3800 = PF_HRESET/16
-		//				0780 = PFAT
-		//				0070 = AL_HRESET (depending on ALHSIZ)
-		//				000F = ALPHA_DMA
-		//		08 = HDW_PMBASE_LD (relief/batman/shuuz = 0x0519, shuuz/offtwall = 0x49B4)
-		//				E000 = P1BASE/0x2000
-		//				1C00 = P2BASE/0x2000
-		//				0380 = PABASE/0x2000
-		//				0040 = PMASK
-		//				003E = MOBASE/0x800
-		//				0001 = MOMASK
-		//		09 = HDW_ALBASE_LD (relief/batman/shuuz = 0x061F, shuuz/offtwall = 0x017F)
-		//				0400 = OPMINUS1
-		//				03C0 = ALBASE/0x1000
-		//				003F = SLIPBASE/0x80
-		//		0A = HDW_OPT_LD (relief/batman/shuuz = 0x4410, shuuz = 0x0250, offtwall = 0x0A10)
-		//				8000 = OPFHSIZ - subtract 1 from PF2 attribute horizontal stamp address
-		//				4000 = OPIUM - playfield 2 enable
-		//				2000 = OLS_EN - linescroll enable
-		//				1000 = OSLPINK - split links enable
-		//				0800 = OSLORAM - slow MO DMA cycles
-		//				0400 = O_DCDMA - enable double time color RAM DMA cycles
-		//				0200 = O_DVDMA - enable double time video RAM DMA cycles
-		//				0100 = OADROEN - tristate address bus
-		//				0080 = OAS_EN - enable autostore of playfield attributes
-		//				0040 = OCRDWE - enable 8-bit color RAM
-		//				0020 = OVRDTACK - wait for VRAM DMA on writes
-		//				0010 = OCRDTACK - wait for CRAM DMA on writes
-		//				0008 = OALHSIZ - alpha horiz stamp size (0=8)
-		//				0004 = OPFHSIZ - PF horiz stamp size (0=8)
-		//				0002 = OPFVSIZ - PF vertical stamp size (0=8)
-		//				0001 = OMOVSIZ - MO vertical stamp size (0=8)
-		//		10 = HDW_MOCON (MOB chip MOB code)
-		//		11 = HDW_PCON (MOB chip PF code)
-		//		12 = HDW_GRCON (MOB chip GR code)
-		//		13 = MO_hscroll (9)
-		//		14 = PF1_hscroll (A)
-		//		15 = PF2_hscroll (B)
-		//		16 = MO_vscroll (D)
-		//		17 = PF1_vscroll (E)
-		//		18 = PF2_vscroll (F)
+		//      00 = HDW_ENABLE
+		//              A000 = enable other VAD params
+		//              E000 = enable other VAD params but disable update from ALPHA RAM
+		//      01 = HDW_VSY_LD (standard = 0x795)
+		//              0FF8 = V_SY_S
+		//              0007 = V_SY_E
+		//      02 = HDW_VBL_LD (standard = 0xAEF)
+		//              FE00 = VLAST
+		//              01FF = V_BL_S
+		//      03 = HDW_VINT
+		//      04 = HDW_HSY_LD (standard = 0x5EEF)
+		//              FC00 = H_SY_E/2
+		//              03FF = H_SY_S
+		//      05 = HDW_HBL_LD (relief = 0x72AC, batman/thunderj = 0xBEB1, shuuz/offtwall = 0xCEB1)
+		//              F000 = LB_CLR
+		//              0800 = H_BL_E/16
+		//              0400 = H_BL_E/1
+		//              03FF = H_BL_S
+		//      06 = HDW_SLIP_LD (relief/batman/shuuz = 0x6F05, shuuz/offtwall = 0x0F05)
+		//              7F00 = SLIP_S
+		//              0080 = SLIP_E_SE1
+		//              007F = SLIP_E
+		//      07 = HDW_APDMA_LD (relief/batman/shuuz = 0xBE84, shuuz = 0xB90E, offtwall = 0xB90D)
+		//              C000 = OPFPIC
+		//              3800 = PF_HRESET/16
+		//              0780 = PFAT
+		//              0070 = AL_HRESET (depending on ALHSIZ)
+		//              000F = ALPHA_DMA
+		//      08 = HDW_PMBASE_LD (relief/batman/shuuz = 0x0519, shuuz/offtwall = 0x49B4)
+		//              E000 = P1BASE/0x2000
+		//              1C00 = P2BASE/0x2000
+		//              0380 = PABASE/0x2000
+		//              0040 = PMASK
+		//              003E = MOBASE/0x800
+		//              0001 = MOMASK
+		//      09 = HDW_ALBASE_LD (relief/batman/shuuz = 0x061F, shuuz/offtwall = 0x017F)
+		//              0400 = OPMINUS1
+		//              03C0 = ALBASE/0x1000
+		//              003F = SLIPBASE/0x80
+		//      0A = HDW_OPT_LD (relief/batman/shuuz = 0x4410, shuuz = 0x0250, offtwall = 0x0A10)
+		//              8000 = OPFHSIZ - subtract 1 from PF2 attribute horizontal stamp address
+		//              4000 = OPIUM - playfield 2 enable
+		//              2000 = OLS_EN - linescroll enable
+		//              1000 = OSLPINK - split links enable
+		//              0800 = OSLORAM - slow MO DMA cycles
+		//              0400 = O_DCDMA - enable double time color RAM DMA cycles
+		//              0200 = O_DVDMA - enable double time video RAM DMA cycles
+		//              0100 = OADROEN - tristate address bus
+		//              0080 = OAS_EN - enable autostore of playfield attributes
+		//              0040 = OCRDWE - enable 8-bit color RAM
+		//              0020 = OVRDTACK - wait for VRAM DMA on writes
+		//              0010 = OCRDTACK - wait for CRAM DMA on writes
+		//              0008 = OALHSIZ - alpha horiz stamp size (0=8)
+		//              0004 = OPFHSIZ - PF horiz stamp size (0=8)
+		//              0002 = OPFVSIZ - PF vertical stamp size (0=8)
+		//              0001 = OMOVSIZ - MO vertical stamp size (0=8)
+		//      10 = HDW_MOCON (MOB chip MOB code)
+		//      11 = HDW_PCON (MOB chip PF code)
+		//      12 = HDW_GRCON (MOB chip GR code)
+		//      13 = MO_hscroll (9)
+		//      14 = PF1_hscroll (A)
+		//      15 = PF2_hscroll (B)
+		//      16 = MO_vscroll (D)
+		//      17 = PF1_vscroll (E)
+		//      18 = PF2_vscroll (F)
 		//
-		//	3efffe = reset to wrong configuration?
+		//  3efffe = reset to wrong configuration?
 		//
-		
+
 		case 0:
 //if (oldword != newword) printf("Word 0 = %04X\n", newword);
 			break;
@@ -716,7 +716,7 @@ void atari_vad_device::internal_control_write(offs_t offset, UINT16 newword)
 		case 0x18: case 0x19: case 0x1a: case 0x1b:
 			update_parameter(newword);
 			break;
-			
+
 		// scanline IRQ ack here
 		case 0x1e:
 			m_scanline_int_cb(CLEAR_LINE);
@@ -733,7 +733,7 @@ void atari_vad_device::internal_control_write(offs_t offset, UINT16 newword)
 
 //-------------------------------------------------
 //  update_pf_xscrolls: Update the playfield
-//	scroll values.
+//  scroll values.
 //-------------------------------------------------
 
 inline void atari_vad_device::update_pf_xscrolls()
@@ -746,8 +746,8 @@ inline void atari_vad_device::update_pf_xscrolls()
 
 //-------------------------------------------------
 //  update_parameter: Update parameters, shared
-//	between end-of-frame, tilerow updates, and
-//	direct control writes.
+//  between end-of-frame, tilerow updates, and
+//  direct control writes.
 //-------------------------------------------------
 
 void atari_vad_device::update_parameter(UINT16 newword)
@@ -790,8 +790,8 @@ void atari_vad_device::update_parameter(UINT16 newword)
 
 //-------------------------------------------------
 //  update_tilerow: Fetch parameters stored at
-//	the end of the current tilerow, which affect
-//	rowscrolling.
+//  the end of the current tilerow, which affect
+//  rowscrolling.
 //-------------------------------------------------
 
 void atari_vad_device::update_tilerow(emu_timer &timer, int scanline)
@@ -803,11 +803,11 @@ void atari_vad_device::update_tilerow(emu_timer &timer, int scanline)
 		int offset = scanline / 8 * 64 + 48 + 2 * (scanline % 8);
 		int data0 = m_alpha_tilemap->basemem_read(offset++);
 		int data1 = m_alpha_tilemap->basemem_read(offset++);
-		
+
 		// force an update if we have data
 		if (scanline > 0 && ((data0 | data1) & 15) != 0)
 			m_screen->update_partial(scanline - 1);
-		
+
 		// write the data
 		if ((data0 & 15) != 0)
 			update_parameter(data0);
@@ -824,8 +824,8 @@ void atari_vad_device::update_tilerow(emu_timer &timer, int scanline)
 
 
 //-------------------------------------------------
-//  eof_update: Callback that slurps up data and 
-//	feeds it into the video controller registers 
+//  eof_update: Callback that slurps up data and
+//  feeds it into the video controller registers
 //  every refresh.
 //-------------------------------------------------
 
@@ -837,14 +837,14 @@ void atari_vad_device::eof_update(emu_timer &timer)
 			internal_control_write(i, m_eof_data[i]);
 
 	// update the scroll positions
-/*	atarimo_set_xscroll(0, m_mo_xscroll);
-	atarimo_set_yscroll(0, m_mo_yscroll);
+/*  atarimo_set_xscroll(0, m_mo_xscroll);
+    atarimo_set_yscroll(0, m_mo_yscroll);
 
-	update_pf_xscrolls();
+    update_pf_xscrolls();
 
-	m_playfield_tilemap->set_scrolly(0, m_pf0_yscroll);
-	if (m_playfield2_tilemap != NULL)
-		m_playfield2_tilemap->set_scrolly(0, m_pf1_yscroll);*/
+    m_playfield_tilemap->set_scrolly(0, m_pf0_yscroll);
+    if (m_playfield2_tilemap != NULL)
+        m_playfield2_tilemap->set_scrolly(0, m_pf1_yscroll);*/
 	timer.adjust(m_screen->time_until_pos(0));
 
 	// use this for debugging the video controller values

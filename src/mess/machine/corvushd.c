@@ -1562,7 +1562,7 @@ UINT8 corvus_hdc_init( device_t *device )
 
 	c->root_device = device;
 
-	return corvus_hdc_init(device->machine());	
+	return corvus_hdc_init(device->machine());
 }
 
 

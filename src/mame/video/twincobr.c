@@ -405,7 +405,7 @@ UINT32 twincobr_state::screen_update_toaplan0(screen_device &screen, bitmap_ind1
 
 	bitmap.fill(0, cliprect);
 
-	 
+
 	if (m_display_on) m_spritegen->draw_sprites_to_tempbitmap(cliprect, buffered_spriteram16, bytes);
 
 

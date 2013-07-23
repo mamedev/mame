@@ -225,7 +225,7 @@ void vlm5030_device::device_config_complete()
 void vlm5030_device::device_start()
 {
 	m_coeff = &vlm5030_coeff;
-	
+
 	/* reset input pins */
 	m_pin_RST = m_pin_ST = m_pin_VCU= 0;
 	m_latch_data = 0;

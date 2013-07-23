@@ -34,7 +34,7 @@ void tc0180vcu_device::device_config_complete()
 	const tc0180vcu_interface *intf = reinterpret_cast<const tc0180vcu_interface *>(static_config());
 	if (intf != NULL)
 	*static_cast<tc0180vcu_interface *>(this) = *intf;
-	
+
 	// or initialize to defaults if none provided
 	else
 	{

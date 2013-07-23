@@ -228,4 +228,3 @@ void arm7_cpu_device::arm7_check_irq_state()
 		return;
 	}
 }
-

@@ -53,7 +53,7 @@ PCB Layout
 
 Note an original Taito Arkanoid PCB is approximately 10" square and is
 painted white. The copper traces are not visible. The part type and
-location of each component is printed in green on the PCB on top of the 
+location of each component is printed in green on the PCB on top of the
 white paint.
 
 The following MCU images were tested on an original Arkanoid PCB using sets
@@ -61,13 +61,13 @@ The following MCU images were tested on an original Arkanoid PCB using sets
 (1) MCU image with CRC 0x389a8cfb
 (2) MCU image with CRC 0x515d77b6
 
-An MCU found on a Tournament Arkanoid PCB was an unprotected type MC68705P3 
-and when read the CRC matched (1). So we can assume the MCUs for Arkanoid and 
+An MCU found on a Tournament Arkanoid PCB was an unprotected type MC68705P3
+and when read the CRC matched (1). So we can assume the MCUs for Arkanoid and
 Tournament Arkanoid are the same.... or are at least interchangeable and work.
 
-"Tetris (D.R. Korea)" in MAME is a hack on an original Arkanoid PCB. 
-The hack can be undone and returned to Arkanoid simply by removing the mod 
-wires on the YM2149, replacing the ROMs with Arkanoid ROMs and replacing 
+"Tetris (D.R. Korea)" in MAME is a hack on an original Arkanoid PCB.
+The hack can be undone and returned to Arkanoid simply by removing the mod
+wires on the YM2149, replacing the ROMs with Arkanoid ROMs and replacing
 the PC030CM which was removed. A working Arkanoid 68705 MCU is also required.
 The above 'tested' images can be used.
 
@@ -110,7 +110,7 @@ K1100181A (ROMSTAR version added sticker)
 Notes:
       Z80         - Zilog Z0840006 CPU. Clock input 6.000MHz (12/2)
       YM2149F     - Yamaha YM2149F software-controlled sound generator (SSG). Clock input 1.5MHz (12/8)
-      A75_06.IC14 - Motorola MC68705P5 micro-controller. Clock input 3.000MHz (12/4). Labelled 'A75 06' for 
+      A75_06.IC14 - Motorola MC68705P5 micro-controller. Clock input 3.000MHz (12/4). Labelled 'A75 06' for
                     ROMSTAR version. Note original Taito version 68705 and Tournament Arkanoid MCUs work fine.
       A75_*       - 27C256 EPROMs labelled 'A75 xx'. xx = 01, 03, 04, 05 etc. See ROM loading in the src for exact ROM usage.
       A75-0*      - MMI 63S241 bipolar PROMs. Compatible with MB7116, 7621, DM74S571N etc
@@ -126,8 +126,8 @@ Notes:
                     Note the G connector is the 22-way edge connector.
                     The Japanese manual states (translated to English).....
                     ********
-                    The coin-SW of this Main PC Board does not work without wiring coin meter to 
-                    coin meter pins of the G-connector. 
+                    The coin-SW of this Main PC Board does not work without wiring coin meter to
+                    coin meter pins of the G-connector.
                     You need to modify as follows in case coin meter is not connected to Main PC Board.
                     Coin System A ..... Wire jumper JP4 on Main PC Board. Coin meter not used.
                     Coin System B ..... Wire jumper JP3 on Main PC Board. Coin meter used.
@@ -137,8 +137,8 @@ Notes:
       --------------
       HSync       - 15.625kHz
       VSync       - 59.185Hz
-      
-      
+
+
       POWER connector H
       -----------------
       1    Ground
@@ -153,8 +153,8 @@ Notes:
       10   Post
       11   NC
       12   NC
-      
-      
+
+
       22-way edge connector G
       -----------------------
 
@@ -188,9 +188,9 @@ COIN LOCKOUT (A) |10 L | COIN LOCKOUT (B)
 Note about spinner controller
 -----------------------------
 
-This game requires a geared spinner to operate correctly. A trackball or other optical 
+This game requires a geared spinner to operate correctly. A trackball or other optical
 controller or home-made spinner built from a PC mouse will work but the player moves too
-slowly and the game is unplayable. The Taito geared spinner moves the optical wheel *very* 
+slowly and the game is unplayable. The Taito geared spinner moves the optical wheel *very*
 fast to ensure the player moves fast enough to follow and return the ball easily. The ratio of
 the control knob rotation to the optical wheel rotation is 1:20 so for one rotation of the
 control knob the optical wheel rotates 20 times.
@@ -202,14 +202,14 @@ Pin 2 - +5V
 Pin 3 - Ground
 Pin 4 - Right
 
-These pins are listed from the Japanese Taito manual and have been tested to be correct with 
+These pins are listed from the Japanese Taito manual and have been tested to be correct with
 the real Taito Arkanoid spinner.
 The US ROMSTAR manual lists pin 4 as left and pin 1 as right. This information is probably
 incorrect. Pins 2 and 3 are the same.
 
 Spinner PCB Layout
 ------------------
-J9000024A 
+J9000024A
 K9000060A
 |-----------|
 |   OPTO    |
@@ -224,7 +224,7 @@ Notes:
       POWER - Power input connector. Pin 1 is on the right.
       S     - Screw positions to show orientation of the PCB with reference to the power connector pin 1
 
-      
+
 DIP Switches
 +-----------------------------+--------------------------------+
 |FACTORY DEFAULT = *          |  1   2   3   4   5   6   7   8 |

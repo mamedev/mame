@@ -260,7 +260,7 @@ READ16_MEMBER(guab_state::ef9369_r)
 UINT32 guab_state::screen_update_guab(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x, y;
-	
+
 	m_tms34061->get_display_state();
 
 	/* If blanked, fill with black */
@@ -824,7 +824,7 @@ static MACHINE_CONFIG_START( guab, guab_state )
 	MCFG_SCREEN_UPDATE_DRIVER(guab_state, screen_update_guab)
 
 	MCFG_PALETTE_LENGTH(16)
-	
+
 	MCFG_TMS34061_ADD("tms34061", tms34061intf)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

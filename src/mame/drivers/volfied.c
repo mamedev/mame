@@ -99,25 +99,25 @@ static INPUT_PORTS_START( volfied )
 
 	/* Z80 CPU -> 0x10002e ($2e,A5) */
 	PORT_START("DSWB")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:1,2")	/* table at 0x003140 - 4 * 6 words - LSB first */
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:1,2") /* table at 0x003140 - 4 * 6 words - LSB first */
 	PORT_DIPSETTING(    0x02, "20k 40k 120k 480k 2400k" )
 	PORT_DIPSETTING(    0x03, "50k 150k 600k 3000k" )
 	PORT_DIPSETTING(    0x01, "70k 280k 1400k" )
 	PORT_DIPSETTING(    0x00, "100k 500k" )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x20, "4" )
 	PORT_DIPSETTING(    0x10, "5" )
 	PORT_DIPSETTING(    0x00, "6" )
-	PORT_DIPNAME( 0x40, 0x40, "32768 Lives (Cheat)" )	PORT_DIPLOCATION("SW2:7")	/* code at 0x0015cc - Manual shows unused and OFF */
+	PORT_DIPNAME( 0x40, 0x40, "32768 Lives (Cheat)" )   PORT_DIPLOCATION("SW2:7")   /* code at 0x0015cc - Manual shows unused and OFF */
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Language ) )		PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Language ) )     PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Japanese ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
 
@@ -166,9 +166,9 @@ static INPUT_PORTS_START( volfiedu )
 	PORT_INCLUDE(volfied)
 
 	PORT_MODIFY("DSWA")
-	TAITO_COINAGE_US_COIN_START_LOC(SW1)		/* see notes */
-	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW1:7" )	/* see notes */
-	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW1:8" )	/* see notes */
+	TAITO_COINAGE_US_COIN_START_LOC(SW1)        /* see notes */
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW1:7" )    /* see notes */
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW1:8" )    /* see notes */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( volfiedj )

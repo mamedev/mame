@@ -149,7 +149,7 @@ public:
 	DECLARE_READ8_MEMBER( dipsw3_h_r );
 	DECLARE_WRITE8_MEMBER( outcoin_w );
 	DECLARE_WRITE8_MEMBER( vcrctrl_w );
-	
+
 	const char * m_sndromrgntag;
 	int m_sndrombank1;
 	int m_sndrombank2;
@@ -158,13 +158,13 @@ public:
 	int m_outcoin_flag;
 	int m_inputport;
 	int m_nb1413m3_type;
-	
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 private:
 
 	int m_74ls193_counter;

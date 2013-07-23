@@ -254,7 +254,7 @@ void k054338_device::device_config_complete()
 	const k054338_interface *intf = reinterpret_cast<const k054338_interface *>(static_config());
 	if (intf != NULL)
 	*static_cast<k054338_interface *>(this) = *intf;
-	
+
 	// or initialize to defaults if none provided
 	else
 	{
@@ -521,8 +521,3 @@ READ16_MEMBER( k054338_device::word_r )
 {
 	return(m_regs[offset]);
 }       // CLTC
-
-
-
-
-

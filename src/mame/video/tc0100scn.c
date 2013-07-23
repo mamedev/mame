@@ -129,7 +129,7 @@ tc0100scn_device::tc0100scn_device(const machine_config &mconfig, const char *ta
 	m_bgscroll_ram(NULL),
 	m_fgscroll_ram(NULL),
 	m_colscroll_ram(NULL),
-	m_bgscrollx(0),	
+	m_bgscrollx(0),
 	m_bgscrolly(0),
 	m_fgscrollx(0),
 	m_fgscrolly(0),
@@ -158,7 +158,7 @@ void tc0100scn_device::device_config_complete()
 	const tc0100scn_interface *intf = reinterpret_cast<const tc0100scn_interface *>(static_config());
 	if (intf != NULL)
 	*static_cast<tc0100scn_interface *>(this) = *intf;
-	
+
 	// or initialize to defaults if none provided
 	else
 	{
@@ -181,7 +181,7 @@ void tc0100scn_device::device_start()
 	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
 	16*8    /* every sprite takes 16 consecutive bytes */
 	};
-	
+
 	int xd, yd;
 
 	m_screen = machine().device<screen_device>(m_screen_tag);

@@ -13,11 +13,11 @@ public:
 
 	required_shared_ptr<UINT16> m_video_data;
 	optional_shared_ptr<UINT16> m_spriteram;
-	
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
-	optional_device<m72_audio_device> m_audio;	
-	
+	optional_device<m72_audio_device> m_audio;
+
 	UINT16 m_video_control_data[8];
 	tilemap_t *m_pf1_layer;
 	tilemap_t *m_pf2_layer;

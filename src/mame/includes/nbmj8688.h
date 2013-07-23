@@ -11,11 +11,11 @@ public:
 	nbmj8688_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu"),
-		m_nb1413m3(*this, "nb1413m3")	{ }
+		m_nb1413m3(*this, "nb1413m3")   { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<nb1413m3_device> m_nb1413m3;
-	
+
 	int m_mjsikaku_scrolly;
 	int m_blitter_destx;
 	int m_blitter_desty;
@@ -83,7 +83,7 @@ public:
 	void common_video_start();
 	void nbmj8688_HD61830B_instr_w(address_space &space,int offset,int data,int chip);
 	void nbmj8688_HD61830B_data_w(address_space &space,int offset,int data,int chip);
-	
+
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };

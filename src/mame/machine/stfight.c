@@ -338,7 +338,7 @@ WRITE8_MEMBER(stfight_state::cshooter_68705_port_b_w)
 		m_portA_in = m_from_main;
 
 		//if (m_main_sent)
-		//	m_mcu->set_input_line(0, CLEAR_LINE);
+		//  m_mcu->set_input_line(0, CLEAR_LINE);
 
 		m_main_sent = 0;
 	}

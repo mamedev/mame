@@ -49,7 +49,7 @@ public:
 	required_device<cpu_device> m_mcu;
 	required_device<buggychl_mcu_device> m_bmcu;
 	required_device<msm5232_device> m_msm;
-		
+
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
 	DECLARE_WRITE8_MEMBER(sound_command_w);
 	DECLARE_WRITE8_MEMBER(nmi_disable_w);

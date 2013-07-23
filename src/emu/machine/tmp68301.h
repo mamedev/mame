@@ -21,7 +21,7 @@ protected:
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 private:
 	// internal state
 	UINT16 m_regs[0x400];
@@ -30,7 +30,7 @@ private:
 	emu_timer *m_tmp68301_timer[3];        // 3 Timers
 
 	int m_irq_vector[8];
-	
+
 	TIMER_CALLBACK_MEMBER( timer_callback );
 	void update_timer( int i );
 	IRQ_CALLBACK_MEMBER(irq_callback);

@@ -109,7 +109,7 @@ void x1_010_device::device_config_complete()
 	const x1_010_interface *intf = reinterpret_cast<const x1_010_interface *>(static_config());
 	if (intf != NULL)
 	*static_cast<x1_010_interface *>(this) = *intf;
-	
+
 	// or initialize to defaults if none provided
 	else
 	{
@@ -128,7 +128,7 @@ void x1_010_device::device_start()
 	m_region        = *region();
 	m_base_clock    = clock();
 	m_rate          = clock() / 1024;
-	
+
 	for( i = 0; i < SETA_NUM_CHANNELS; i++ ) {
 		m_smp_offset[i] = 0;
 		m_env_offset[i] = 0;
@@ -138,7 +138,7 @@ void x1_010_device::device_start()
 
 	/* get stream channels */
 	m_stream = machine().sound().stream_alloc(*this, 0, 2, m_rate, this);
-	
+
 	save_item(NAME(m_rate));
 	save_item(NAME(m_sound_enable));
 	save_item(NAME(m_reg));

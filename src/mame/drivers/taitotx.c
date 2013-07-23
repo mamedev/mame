@@ -25,68 +25,68 @@
 
  - Prelim game lists (system16.com)
 
-	Taito Type X games
+    Taito Type X games
 
-	Chaos Breaker / Dark Awake
-	Datacarddass Dragon Ball Z
-	Dinoking III
-	Dinomax
-	Dragon Quest Monster: Battle Road
-	Gigawing Generations
-	Harakari Professional Baseball
-	Homura
-	King Of Jurassic
-	Raiden III
-	Raiden IV
-	Shikigami No Shiro III / The Castle of Shikigami III
-	Spica Adventure
-	Taisen Hot Gimmick 5
-	Taisen Hot Gimmick Mix Party
-	Tetris The Grand Master 3 : Terror Instinct
-	The King of Fighters 98 Ultimate Match
-	Trouble Witches
-	Usagi Online
-	Zoids Card Colosseum 
+    Chaos Breaker / Dark Awake
+    Datacarddass Dragon Ball Z
+    Dinoking III
+    Dinomax
+    Dragon Quest Monster: Battle Road
+    Gigawing Generations
+    Harakari Professional Baseball
+    Homura
+    King Of Jurassic
+    Raiden III
+    Raiden IV
+    Shikigami No Shiro III / The Castle of Shikigami III
+    Spica Adventure
+    Taisen Hot Gimmick 5
+    Taisen Hot Gimmick Mix Party
+    Tetris The Grand Master 3 : Terror Instinct
+    The King of Fighters 98 Ultimate Match
+    Trouble Witches
+    Usagi Online
+    Zoids Card Colosseum
 
-	Taito Type X+ games
-	Battle Gear 4
-	Battle Gear 4 Tuned
-	Half Life 2 Survivor
-	War Of The Grail 
-
-
-	Taito Type X2 games
-
-	Battle Fantasia
-	BlazBlue: Calamity Trigger
-	BlazBlue: Continuum Shift
-	BlazBlue: Continuum Shift Extend
-	BlazBlue: Continuum Shift II
-	Chase H.Q. 2 / Chase H. Q. : Nancy Yori Kinkyuu Renraku
-	D1GP Arcade
-	Dariusburst AC
-	Elevator Action Death Parade
-	Half Life 2: Survivor Ver. 2.0
-	KOF Maximum Impact: Regulation A
-	KOF Maximum Impact: Regulation A2
-	Matrimelee Matsuri / Power Instinct V
-	Samurai Spirits Sen / Samurai Shodown: Edge of Destiny
-	Street Fighter IV
-	Super Street Fighter IV Arcade Edition
-	The King of Fighters XII
-	The King of Fighters XIII
-	Wacky Races
-
-	Taito Type X2 satellite terminal games
-
-	Aquarian Age Alternative
-	Eternal Wheel
-	Lord of Vermilion
+    Taito Type X+ games
+    Battle Gear 4
+    Battle Gear 4 Tuned
+    Half Life 2 Survivor
+    War Of The Grail
 
 
-	Taito Type X Zero games
+    Taito Type X2 games
 
-	Spin Gear
+    Battle Fantasia
+    BlazBlue: Calamity Trigger
+    BlazBlue: Continuum Shift
+    BlazBlue: Continuum Shift Extend
+    BlazBlue: Continuum Shift II
+    Chase H.Q. 2 / Chase H. Q. : Nancy Yori Kinkyuu Renraku
+    D1GP Arcade
+    Dariusburst AC
+    Elevator Action Death Parade
+    Half Life 2: Survivor Ver. 2.0
+    KOF Maximum Impact: Regulation A
+    KOF Maximum Impact: Regulation A2
+    Matrimelee Matsuri / Power Instinct V
+    Samurai Spirits Sen / Samurai Shodown: Edge of Destiny
+    Street Fighter IV
+    Super Street Fighter IV Arcade Edition
+    The King of Fighters XII
+    The King of Fighters XIII
+    Wacky Races
+
+    Taito Type X2 satellite terminal games
+
+    Aquarian Age Alternative
+    Eternal Wheel
+    Lord of Vermilion
+
+
+    Taito Type X Zero games
+
+    Spin Gear
 
 */
 

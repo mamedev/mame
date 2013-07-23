@@ -1435,7 +1435,7 @@ static MACHINE_CONFIG_START( atarigx2, atarigx2_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	
+
 	MCFG_ATARI_JSA_IIIS_ADD("jsa", WRITELINE(atarigen_state, sound_int_write_line))
 	MCFG_ATARI_JSA_TEST_PORT("SERVICE", 6)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)

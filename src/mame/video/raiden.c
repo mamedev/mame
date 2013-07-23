@@ -87,25 +87,25 @@ void raiden_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect,
 	for (int offs = 0x1000/2-4; offs >= 0; offs -= 4)
 	{
 		/*
-			Word #0
-			x------- --------  active
-			-x------ --------  flipy
-			--x----- --------  flipx
-			---x---- --------  unused
-			----xxxx --------  color
-			-------- xxxxxxxx  y
+		    Word #0
+		    x------- --------  active
+		    -x------ --------  flipy
+		    --x----- --------  flipx
+		    ---x---- --------  unused
+		    ----xxxx --------  color
+		    -------- xxxxxxxx  y
 
-			Word #1
-			x------- --------  ? (set when groundboss explodes)
-			-xxx---- --------  unused
-			----xxxx xxxxxxxx  code
+		    Word #1
+		    x------- --------  ? (set when groundboss explodes)
+		    -xxx---- --------  unused
+		    ----xxxx xxxxxxxx  code
 
-			Word #2
-			xx------ --------  priority
-			--xxxxx- --------  unused
-			-------x xxxxxxxx  x (signed)
+		    Word #2
+		    xx------ --------  priority
+		    --xxxxx- --------  unused
+		    -------x xxxxxxxx  x (signed)
 
-			Word #3 unused
+		    Word #3 unused
 		*/
 
 		if (!(sprites[offs + 0] & 0x8000))

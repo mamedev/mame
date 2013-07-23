@@ -17,11 +17,11 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define Z80_TAG			"u70"
-#define Z80CTC_TAG		"u45"
-#define Z80PIO_0_TAG	"u25"
-#define Z80PIO_2_TAG	"u64"
-#define Z80PIO_3_TAG	"u73"
+#define Z80_TAG         "u70"
+#define Z80CTC_TAG      "u45"
+#define Z80PIO_0_TAG    "u25"
+#define Z80PIO_2_TAG    "u64"
+#define Z80PIO_3_TAG    "u73"
 
 
 
@@ -139,9 +139,9 @@ static Z80CTC_INTERFACE( ctc_intf )
 READ8_MEMBER( imi5000h_device::pio0_pa_r )
 {
 	/*
-	
+
 	    bit     description
-	
+
 	    0       -SEEK COMPLETE
 	    1       -SECTOR SIZE 2 (UB4:4)
 	    2       -SECTOR SIZE 1 (UB4:1)
@@ -149,8 +149,8 @@ READ8_MEMBER( imi5000h_device::pio0_pa_r )
 	    4       CRC ERROR
 	    5       WRITE FAULT
 	    6       -INDEX SEL
-	    7       
-	
+	    7
+
 	*/
 
 	return 0;
@@ -159,36 +159,36 @@ READ8_MEMBER( imi5000h_device::pio0_pa_r )
 WRITE8_MEMBER( imi5000h_device::pio0_pa_w )
 {
 	/*
-	
+
 	    bit     description
-	
-	    0       
-	    1       
-	    2       
-	    3       
-	    4       
-	    5       
-	    6       
+
+	    0
+	    1
+	    2
+	    3
+	    4
+	    5
+	    6
 	    7       ACTIVITY LED
-	
+
 	*/
 }
 
 READ8_MEMBER( imi5000h_device::pio0_pb_r )
 {
 	/*
-	
+
 	    bit     description
-	
+
 	    0       -READY
-	    1       
-	    2       
-	    3       
-	    4       
-	    5       
-	    6       
-	    7       
-	
+	    1
+	    2
+	    3
+	    4
+	    5
+	    6
+	    7
+
 	*/
 
 	return 0;
@@ -197,10 +197,10 @@ READ8_MEMBER( imi5000h_device::pio0_pb_r )
 WRITE8_MEMBER( imi5000h_device::pio0_pb_w )
 {
 	/*
-	
+
 	    bit     description
-	
-	    0       
+
+	    0
 	    1       DIRECTION IN
 	    2       -HSXSTB
 	    3       STEP
@@ -208,7 +208,7 @@ WRITE8_MEMBER( imi5000h_device::pio0_pb_w )
 	    5       HEAD SEL 2^1
 	    6       HEAD SEL 2^2
 	    7       REDUCE WR CURRENT
-	
+
 	*/
 }
 
@@ -231,18 +231,18 @@ static Z80PIO_INTERFACE( pio0_intf )
 READ8_MEMBER( imi5000h_device::pio2_pa_r )
 {
 	/*
-	
+
 	    bit     description
-	
-	    0       
-	    1       
-	    2       
-	    3       
-	    4       
-	    5       
+
+	    0
+	    1
+	    2
+	    3
+	    4
+	    5
 	    6       -SYNC
 	    7       -DRV.ACK
-	
+
 	*/
 
 	return 0;
@@ -251,18 +251,18 @@ READ8_MEMBER( imi5000h_device::pio2_pa_r )
 WRITE8_MEMBER( imi5000h_device::pio2_pa_w )
 {
 	/*
-	
+
 	    bit     description
-	
+
 	    0       BUS DIR
 	    1       -DRV.ACK
 	    2       -ALT SEL
 	    3       -HSXFER
 	    4       PIO RDY
 	    5       -COMPL
-	    6       
-	    7       
-	
+	    6
+	    7
+
 	*/
 }
 
@@ -296,18 +296,18 @@ static Z80PIO_INTERFACE( pio2_intf )
 READ8_MEMBER( imi5000h_device::pio3_pa_r )
 {
 	/*
-	
+
 	    bit     description
-	
+
 	    0       -TIMEOUT DISABLE (UB4:8)
 	    1       -UNIT SELECT 1 (UB4:7)
 	    2       -UNIT SELECT 2 (UB4:6)
 	    3       SYSTEM/-DIAG (UB4:5)
 	    4       -RXD
-	    5       
+	    5
 	    6       -TRACK 00
-	    7       
-	
+	    7
+
 	*/
 
 	return 0;
@@ -316,36 +316,36 @@ READ8_MEMBER( imi5000h_device::pio3_pa_r )
 WRITE8_MEMBER( imi5000h_device::pio3_pa_w )
 {
 	/*
-	
+
 	    bit     description
-	
-	    0       
-	    1       
-	    2       
-	    3       
-	    4       
+
+	    0
+	    1
+	    2
+	    3
+	    4
 	    5       TXD
-	    6       
+	    6
 	    7       -WRITE DISABLE
-	
+
 	*/
 }
 
 READ8_MEMBER( imi5000h_device::pio3_pb_r )
 {
 	/*
-	
+
 	    bit     description
-	
-	    0       
-	    1       
+
+	    0
+	    1
 	    2       6MB1
 	    3       -WRITE PROTECT (W2)
 	    4       -FORMAT ENABLE
 	    5       6MB2
 	    6       12MB1
 	    7       12MB2
-	
+
 	*/
 
 	return 0;
@@ -354,18 +354,18 @@ READ8_MEMBER( imi5000h_device::pio3_pb_r )
 WRITE8_MEMBER( imi5000h_device::pio3_pb_w )
 {
 	/*
-	
+
 	    bit     description
-	
+
 	    0       -DRV 1 SEL
 	    1       -DRV 2 SEL
-	    2       
-	    3       
-	    4       
-	    5       
-	    6       
-	    7       
-	
+	    2
+	    3
+	    4
+	    5
+	    6
+	    7
+
 	*/
 }
 

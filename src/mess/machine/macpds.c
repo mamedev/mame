@@ -216,5 +216,3 @@ void device_macpds_card_interface::install_rom(device_t *dev, const char *romreg
 
 	m_macpds->install_bank(addr, addr+romlen-1, 0, 0, bankname, rom);
 }
-
-

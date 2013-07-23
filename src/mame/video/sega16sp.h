@@ -227,9 +227,9 @@ protected:
 	// subclass overrides
 	virtual void draw(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	rotate_info*						m_segaic16_rotate;
+	rotate_info*                        m_segaic16_rotate;
 };
- 
+
 
 // device type definition
 extern const device_type SEGA_HANGON_SPRITES;

@@ -167,4 +167,3 @@ void konami_sortlayers5( int *layer, int *pri )
 	SWAP(3, 4)
 #undef  SWAP
 }
-

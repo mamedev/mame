@@ -4,35 +4,35 @@
 #define __VLM5030_H__
 
 
-  struct vlm5030_interface
-  {
- 	int m_memory_size;    /* memory size of speech rom (0=memory region length) */
-  };
-  
-  class vlm5030_device : public device_t,
- 									public device_sound_interface,
- 									public vlm5030_interface
-  {
-  public:
-  	vlm5030_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
- 	~vlm5030_device() {}
- 
- 	/* set speech rom address */
- 	void set_rom(void *speech_rom);
- 	
- 	/* get BSY pin level */
- 	int bsy();
-	
- 	/* latch contoll data */
- 	DECLARE_WRITE8_MEMBER( data_w );
-	
- 	/* set RST pin level : reset / set table address A8-A15 */
- 	void rst (int pin );
-	
- 	/* set VCU pin level : ?? unknown */
- 	void vcu( int pin );
-	
- 	/* set ST pin level  : set table address A0-A7 / start speech */
+	struct vlm5030_interface
+	{
+	int m_memory_size;    /* memory size of speech rom (0=memory region length) */
+	};
+
+	class vlm5030_device : public device_t,
+									public device_sound_interface,
+									public vlm5030_interface
+	{
+	public:
+	vlm5030_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~vlm5030_device() {}
+
+	/* set speech rom address */
+	void set_rom(void *speech_rom);
+
+	/* get BSY pin level */
+	int bsy();
+
+	/* latch contoll data */
+	DECLARE_WRITE8_MEMBER( data_w );
+
+	/* set RST pin level : reset / set table address A8-A15 */
+	void rst (int pin );
+
+	/* set VCU pin level : ?? unknown */
+	void vcu( int pin );
+
+	/* set ST pin level  : set table address A0-A7 / start speech */
 	void st( int pin );
 
 protected:
@@ -92,7 +92,7 @@ private:
 	int m_current_k[10];
 
 	INT32 m_x[10];
-	
+
 	int get_bits(int sbit,int bits);
 	int parse_frame();
 	void update();

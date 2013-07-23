@@ -11,11 +11,11 @@ public:
 	pastelg_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu"),
-		m_nb1413m3(*this, "nb1413m3")	{ }
+		m_nb1413m3(*this, "nb1413m3")   { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<nb1413m3_device> m_nb1413m3;
-		
+
 	UINT8 m_mux_data;
 	int m_blitter_destx;
 	int m_blitter_desty;
@@ -50,7 +50,7 @@ public:
 	int pastelg_blitter_src_addr_r(address_space &space);
 	void pastelg_vramflip();
 	void pastelg_gfxdraw();
-	
+
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };

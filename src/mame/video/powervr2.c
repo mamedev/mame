@@ -927,7 +927,7 @@ WRITE32_MEMBER( powervr2_device::startrender_w )
 				if (sizera == 6) {
 					st[5] = space.read_dword((0x05000014+offsetra)); // Punch Through List Pointer
 					offsetra+=0x18;
-				} else	{
+				} else  {
 					st[5] = 0;
 					offsetra+=0x14;
 				}
@@ -1324,7 +1324,7 @@ WRITE32_MEMBER( powervr2_device::ta_list_init_w )
 		tafifo_listtype= -1;
 #if DEBUG_PVRTA
 		logerror("%s: list init ol=(%08x, %08x) isp=(%08x, %08x), alloc=%08x obp=%08x\n",
-				 tag(), ta_ol_base, ta_ol_limit, ta_isp_base, ta_isp_limit, ta_alloc_ctrl, ta_next_opb_init);
+					tag(), ta_ol_base, ta_ol_limit, ta_isp_base, ta_isp_limit, ta_alloc_ctrl, ta_next_opb_init);
 #endif
 		ta_next_opb = ta_next_opb_init;
 		ta_itp_current = ta_isp_base;
@@ -1910,7 +1910,7 @@ WRITE64_MEMBER( powervr2_device::ta_fifo_yuv_w )
 WRITE64_MEMBER(powervr2_device::ta_texture_directpath0_w )
 {
 	// That's not in the pvr control address space, it's in g2's
-	//	int mode = pvrctrl_regs[SB_LMMODE0]&1;
+	//  int mode = pvrctrl_regs[SB_LMMODE0]&1;
 	int mode = 0;
 	if (mode&1)
 	{
@@ -1927,7 +1927,7 @@ WRITE64_MEMBER(powervr2_device::ta_texture_directpath0_w )
 WRITE64_MEMBER(powervr2_device::ta_texture_directpath1_w )
 {
 	// That's not in the pvr control address space, it's in g2's
-	//	int mode = pvrctrl_regs[SB_LMMODE1]&1;
+	//  int mode = pvrctrl_regs[SB_LMMODE1]&1;
 	int mode = 0;
 	if (mode&1)
 	{
@@ -2853,9 +2853,9 @@ UINT32 powervr2_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 #endif
 
 	bitmap.fill(MAKE_ARGB(0xff,
-						  (vo_border_col >> 16) & 0xff,
-						  (vo_border_col >> 8 ) & 0xff,
-						  (vo_border_col      ) & 0xff), cliprect); //FIXME: Chroma bit?
+							(vo_border_col >> 16) & 0xff,
+							(vo_border_col >> 8 ) & 0xff,
+							(vo_border_col      ) & 0xff), cliprect); //FIXME: Chroma bit?
 
 	if(!(vo_control & 8))
 		pvr_drawframebuffer(bitmap, cliprect);
@@ -2932,8 +2932,8 @@ WRITE32_MEMBER( powervr2_device::elan_regs_w )
 
 WRITE32_MEMBER( powervr2_device::pvrs_ta_w )
 {
-	//	pvr_ta_w(space,offset,data,mem_mask);
-	//	pvr2_ta_w(space,offset,data,mem_mask);
+	//  pvr_ta_w(space,offset,data,mem_mask);
+	//  pvr2_ta_w(space,offset,data,mem_mask);
 	//printf("PVR2 %08x %08x\n",reg,dat);
 }
 

@@ -9,12 +9,12 @@ public:
 
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ8_MEMBER( busy_r );
-	
+
 	WRITE8_MEMBER( msm_data_w );
 	READ8_MEMBER( msm_vck_r );
 	READ8_MEMBER( ready_r );
 	READ8_MEMBER( data_r );
-	
+
 	void vck_callback( int st );
 
 protected:

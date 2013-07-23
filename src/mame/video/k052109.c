@@ -167,7 +167,7 @@ void k052109_device::device_config_complete()
 	const k052109_interface *intf = reinterpret_cast<const k052109_interface *>(static_config());
 	if (intf != NULL)
 	*static_cast<k052109_interface *>(this) = *intf;
-	
+
 	// or initialize to defaults if none provided
 	else
 	{

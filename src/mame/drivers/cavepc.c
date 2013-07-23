@@ -1,22 +1,22 @@
 /***************************************************************************
 
     CAVE PC hardware
-	placeholder file for information
+    placeholder file for information
 
 ***************************************************************************
 
  Cave used a one-off PC platform for
- 
+
  Deathsmiles II (c)2009
 
- According to 
+ According to
  http://forum.arcadeotaku.com/viewtopic.php?f=26&t=9851
  It uses a ASUS M3A78-EM motherboard (boot screen is shown)
  http://www.asus.com/Motherboards/M3A78EM/
 
  fitted with
  AMD Athlon 64 X2 5050e Brisbane 2.60GHz, 1024KB L2 Cache
- 2048MB (2GB) 800MHz DDR 
+ 2048MB (2GB) 800MHz DDR
 
  and a custom JVS I/O board providing security etc.
  'CV2000XP Rev 2.0'
@@ -46,4 +46,3 @@
  http://forum.arcadeotaku.com/viewtopic.php?f=26&t=14850&start=60
 
 */
-

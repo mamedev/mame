@@ -8,7 +8,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_k053252(*this, "k053252")
 		{ }
-	
+
 	required_device<cpu_device> m_maincpu;
 	required_device<k053252_device> m_k053252;
 	UINT8 *m_vram[2];

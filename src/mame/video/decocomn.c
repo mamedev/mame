@@ -76,7 +76,7 @@ only updated on a DMA call */
 WRITE16_MEMBER( decocomn_device::nonbuffered_palette_w )
 {
 	driver_device *state = space.machine().driver_data();
-	
+
 	int r,g,b;
 
 	COMBINE_DATA(&state->m_generic_paletteram_16[offset]);
@@ -92,7 +92,7 @@ WRITE16_MEMBER( decocomn_device::nonbuffered_palette_w )
 WRITE16_MEMBER( decocomn_device::buffered_palette_w )
 {
 	driver_device *state = space.machine().driver_data();
-	
+
 	COMBINE_DATA(&state->m_generic_paletteram_16[offset]);
 
 	m_dirty_palette[offset / 2] = 1;
@@ -101,7 +101,7 @@ WRITE16_MEMBER( decocomn_device::buffered_palette_w )
 WRITE16_MEMBER( decocomn_device::palette_dma_w )
 {
 	driver_device *state = space.machine().driver_data();
-	
+
 	const int m = space.machine().total_colors();
 	int r, g, b, i;
 

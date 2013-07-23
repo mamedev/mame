@@ -1467,17 +1467,17 @@ static void MMXOP(pmaddwd_r64_rm64)(i386_state *cpustate)  // Opcode 0f f5
 	UINT8 modrm = FETCH(cpustate);
 	if( modrm >= 0xc0 ) {
 		MMX((modrm >> 3) & 0x7).i[0]=(INT32)MMX((modrm >> 3) & 0x7).s[0]*(INT32)MMX(modrm & 7).s[0]+
-									 (INT32)MMX((modrm >> 3) & 0x7).s[1]*(INT32)MMX(modrm & 7).s[1];
+										(INT32)MMX((modrm >> 3) & 0x7).s[1]*(INT32)MMX(modrm & 7).s[1];
 		MMX((modrm >> 3) & 0x7).i[1]=(INT32)MMX((modrm >> 3) & 0x7).s[2]*(INT32)MMX(modrm & 7).s[2]+
-									 (INT32)MMX((modrm >> 3) & 0x7).s[3]*(INT32)MMX(modrm & 7).s[3];
+										(INT32)MMX((modrm >> 3) & 0x7).s[3]*(INT32)MMX(modrm & 7).s[3];
 	} else {
 		MMX_REG s;
 		UINT32 ea = GetEA(cpustate, modrm, 0);
 		READMMX(cpustate, ea, s);
 		MMX((modrm >> 3) & 0x7).i[0]=(INT32)MMX((modrm >> 3) & 0x7).s[0]*(INT32)s.s[0]+
-									 (INT32)MMX((modrm >> 3) & 0x7).s[1]*(INT32)s.s[1];
+										(INT32)MMX((modrm >> 3) & 0x7).s[1]*(INT32)s.s[1];
 		MMX((modrm >> 3) & 0x7).i[1]=(INT32)MMX((modrm >> 3) & 0x7).s[2]*(INT32)s.s[2]+
-									 (INT32)MMX((modrm >> 3) & 0x7).s[3]*(INT32)s.s[3];
+										(INT32)MMX((modrm >> 3) & 0x7).s[3]*(INT32)s.s[3];
 	}
 	CYCLES(cpustate,1);     // TODO: correct cycle count
 }
@@ -2772,11 +2772,11 @@ static void SSEOP(subps)(i386_state *cpustate) // Opcode 0f 5c
 INLINE float sse_min_single(float src1, float src2)
 {
 	/*if ((src1 == 0) && (src2 == 0))
-		return src2;
+	    return src2;
 	if (src1 = SNaN)
-		return src2;
+	    return src2;
 	if (src2 = SNaN)
-		return src2;*/
+	    return src2;*/
 	if (src1 < src2)
 		return src1;
 	return src2;
@@ -2825,11 +2825,11 @@ static void SSEOP(divps)(i386_state *cpustate) // Opcode 0f 5e
 INLINE float sse_max_single(float src1, float src2)
 {
 	/*if ((src1 == 0) && (src2 == 0))
-		return src2;
+	    return src2;
 	if (src1 = SNaN)
-		return src2;
+	    return src2;
 	if (src2 = SNaN)
-		return src2;*/
+	    return src2;*/
 	if (src1 > src2)
 		return src1;
 	return src2;

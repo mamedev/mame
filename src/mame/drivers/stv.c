@@ -983,8 +983,8 @@ static MACHINE_CONFIG_START( stv, stv_state )
 MACHINE_CONFIG_END
 
 /*
-	Batman Forever has an extra ADSP, used for sound.
-	Similar if not the same as Magic the Gathering, probably needs merging.
+    Batman Forever has an extra ADSP, used for sound.
+    Similar if not the same as Magic the Gathering, probably needs merging.
 */
 
 WRITE32_MEMBER( stv_state::batmanfr_sound_comms_w )
@@ -2999,7 +2999,7 @@ GAME( 1996, stvbios,   0,       stv_slot, stv, stv_state,      stv,         ROT0
 /* Playable */
 GAME( 1998, astrass,   stvbios, stv,      stv6b, stv_state,     astrass,    ROT0,   "Sunsoft",                      "Astra SuperStars (J 980514 V1.002)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1995, bakubaku,  stvbios, stv,      stv, stv_state,        stv,        ROT0,   "Sega",                         "Baku Baku Animal (J 950407 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1996, batmanfr,  stvbios, batmanfr, stv, stv_state, 		 batmanfr,   ROT0,   "Acclaim",                      "Batman Forever (JUE 960507 V1.000)", GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, batmanfr,  stvbios, batmanfr, stv, stv_state,        batmanfr,   ROT0,   "Acclaim",                      "Batman Forever (JUE 960507 V1.000)", GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, colmns97,  stvbios, stv,      stv, stv_state,        colmns97,   ROT0,   "Sega",                         "Columns '97 (JET 961209 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, cotton2,   stvbios, stv,      stv, stv_state,        cotton2,    ROT0,   "Success",                      "Cotton 2 (JUET 970902 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1998, cottonbm,  stvbios, stv,      stv, stv_state,        cottonbm,   ROT0,   "Success",                      "Cotton Boomerang (JUET 980709 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )

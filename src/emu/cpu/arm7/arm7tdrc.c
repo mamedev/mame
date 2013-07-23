@@ -1589,4 +1589,3 @@ void arm7_cpu_device::drctg0f_1(drcuml_block *block, compiler_state *compiler, c
 	UML_OR(block, DRC_REG(14), DRC_REG(14), 1);
 	UML_MOV(block, DRC_PC, uml::I0);
 }
-

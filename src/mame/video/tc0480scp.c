@@ -168,7 +168,7 @@ void tc0480scp_device::device_config_complete()
 	const tc0480scp_interface *intf = reinterpret_cast<const tc0480scp_interface *>(static_config());
 	if (intf != NULL)
 	*static_cast<tc0480scp_interface *>(this) = *intf;
-	
+
 	// or initialize to defaults if none provided
 	else
 	{
@@ -184,8 +184,8 @@ void tc0480scp_device::device_start()
 	int i, xd, yd;
 
 	m_x_offs = m_x_offset + m_pixels;
-	
-	
+
+
 	static const gfx_layout tc0480scp_charlayout =
 	{
 		8,8,    /* 8*8 characters */
@@ -196,8 +196,8 @@ void tc0480scp_device::device_start()
 		{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
 		32*8    /* every sprite takes 32 consecutive bytes */
 	};
-	
-	
+
+
 	/* Single width versions */
 	m_tilemap[0][0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tc0480scp_device::get_bg0_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 	m_tilemap[1][0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tc0480scp_device::get_bg1_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);

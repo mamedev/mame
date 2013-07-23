@@ -64,22 +64,22 @@
 
         23/02/2009 Skeleton driver.
 
-		Memory Map (converted from the annoying octal format from the manuals):
-		0x0000 - 0x00ff: irq vectors
-		0xe000: ROM
-		0xff68: "high speed reader and punch device status and buffer register"
-		0xff70 - 0xff7e: "teletype keyboard and punch device status and buffer register"
-		PDP-11 internal registers:
-		0xff80 - 0xffbf: "reserved for expansion of processor registers"
-		0xffc0: R0
-		0xffc2: R1
-		0xffc4: R2
-		0xffc6: R3
-		0xffc8: R4
-		0xffca: R5
-		0xffcc: R6 / SP
-		0xffce: R7 / PC
-		0xfffe: PSW
+        Memory Map (converted from the annoying octal format from the manuals):
+        0x0000 - 0x00ff: irq vectors
+        0xe000: ROM
+        0xff68: "high speed reader and punch device status and buffer register"
+        0xff70 - 0xff7e: "teletype keyboard and punch device status and buffer register"
+        PDP-11 internal registers:
+        0xff80 - 0xffbf: "reserved for expansion of processor registers"
+        0xffc0: R0
+        0xffc2: R1
+        0xffc4: R2
+        0xffc6: R3
+        0xffc8: R4
+        0xffca: R5
+        0xffcc: R6 / SP
+        0xffce: R7 / PC
+        0xfffe: PSW
 
 ****************************************************************************/
 
@@ -117,19 +117,19 @@ READ16_MEMBER(pdp11_state::teletype_ctrl_r)
 	switch(offset)
 	{
 		/*
-			keyboard
-			---- x--- ---- ---- busy bit
-			---- ---- x--- ---- ready bit (set on character receive, clear on buffer read)
-			---- ---- -x-- ---- irq enable
-			---- ---- ---- ---x reader enable (?)
+		    keyboard
+		    ---- x--- ---- ---- busy bit
+		    ---- ---- x--- ---- ready bit (set on character receive, clear on buffer read)
+		    ---- ---- -x-- ---- irq enable
+		    ---- ---- ---- ---x reader enable (?)
 		*/
 		case 0: res = m_teletype_status; break; // reader status register (tks)
 		case 1: m_teletype_status &= ~0x80; res = m_teletype_data; break;// reader buffer register (tkb)
 		/*
-			printer
-			---- ---- x--- ---- ready bit
-			---- ---- -x-- ---- irq enable
-			---- ---- ---- -x-- maintenance
+		    printer
+		    ---- ---- x--- ---- ready bit
+		    ---- ---- -x-- ---- irq enable
+		    ---- ---- ---- -x-- maintenance
 		*/
 		case 2: res = 0x80; break; // punch status register (tps)
 		case 3: res = 0; break; // punch buffer register (tpb)

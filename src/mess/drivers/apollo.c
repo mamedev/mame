@@ -149,7 +149,6 @@ void apollo_set_cpu_has_fpu(m68000_base_device *device, int onoff)
 	}
 	else
 	{
-		
 		device->has_fpu = onoff;
 		DLOG1(("apollo_set_cpu_has_fpu: FPU has been %s", onoff ? "enabled" : "disabled"));
 	}

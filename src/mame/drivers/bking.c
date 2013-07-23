@@ -65,8 +65,8 @@ READ8_MEMBER(bking_state::bking3_extrarom_r)
 
 WRITE8_MEMBER(bking_state::unk_w)
 {
-    // 0 = finished reading extra rom
-    // 1 = started reading extra rom
+	// 0 = finished reading extra rom
+	// 1 = started reading extra rom
 }
 
 READ8_MEMBER(bking_state::bking3_ext_check_r)

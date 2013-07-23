@@ -1042,7 +1042,7 @@ void tms1100_cpu_device::state_string_export(const device_state_entry &entry, as
 
 tms0980_cpu_device::tms0980_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: tms1xxx_cpu_device( mconfig, TMS0980, "TMS0980", tag, owner, clock, tms0980_decode, 0x00ff, 0x07ff, 7, 9, 4
-	                    , 12, ADDRESS_MAP_NAME( tms0980_internal_rom ), 7, ADDRESS_MAP_NAME( tms0980_internal_ram ), "tms0980", __FILE__)
+						, 12, ADDRESS_MAP_NAME( tms0980_internal_rom ), 7, ADDRESS_MAP_NAME( tms0980_internal_ram ), "tms0980", __FILE__)
 {
 }
 
@@ -1056,14 +1056,14 @@ offs_t tms0980_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UIN
 
 tms1000_cpu_device::tms1000_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: tms1xxx_cpu_device( mconfig, TMS1000, "TMS1000", tag, owner, clock, tms1000_default_decode, 0x00ff, 0x07ff, 6, 8, 2
-	                    , 11, ADDRESS_MAP_NAME( program_11bit_8 ), 7, ADDRESS_MAP_NAME( data_7bit ), "tms1000", __FILE__)
+						, 11, ADDRESS_MAP_NAME( program_11bit_8 ), 7, ADDRESS_MAP_NAME( data_7bit ), "tms1000", __FILE__)
 {
 }
 
 
 tms1000_cpu_device::tms1000_cpu_device(const machine_config &mconfig, device_type type, const char*name, const char *tag, device_t *owner, UINT32 clock, UINT16 o_mask, UINT16 r_mask, const char *shortname, const char *source)
 	: tms1xxx_cpu_device( mconfig, type, name, tag, owner, clock, tms1000_default_decode, o_mask, r_mask, 6, 8, 2
-	                    , 10, ADDRESS_MAP_NAME( program_10bit_8 ), 6, ADDRESS_MAP_NAME( data_6bit ), shortname, source )
+						, 10, ADDRESS_MAP_NAME( program_10bit_8 ), 6, ADDRESS_MAP_NAME( data_6bit ), shortname, source )
 {
 }
 
@@ -1095,14 +1095,14 @@ tms1270_cpu_device::tms1270_cpu_device(const machine_config &mconfig, const char
 
 tms1100_cpu_device::tms1100_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: tms1xxx_cpu_device( mconfig, TMS1100, "TMS1100", tag, owner, clock, tms1100_default_decode, 0x00ff, 0x07ff, 6, 8, 3
-	                    , 11, ADDRESS_MAP_NAME( program_11bit_8 ), 7, ADDRESS_MAP_NAME( data_7bit ), "tms1100", __FILE__ )
+						, 11, ADDRESS_MAP_NAME( program_11bit_8 ), 7, ADDRESS_MAP_NAME( data_7bit ), "tms1100", __FILE__ )
 {
 }
 
 
 tms1100_cpu_device::tms1100_cpu_device(const machine_config &mconfig, device_type type, const char*name, const char *tag, device_t *owner, UINT32 clock, UINT16 o_mask, UINT16 r_mask, const char *shortname, const char *source)
 	: tms1xxx_cpu_device( mconfig, type, name, tag, owner, clock, tms1100_default_decode, o_mask, r_mask, 6, 8, 3
-	                    , 11, ADDRESS_MAP_NAME( program_11bit_8 ), 7, ADDRESS_MAP_NAME( data_7bit ), shortname, source )
+						, 11, ADDRESS_MAP_NAME( program_11bit_8 ), 7, ADDRESS_MAP_NAME( data_7bit ), shortname, source )
 {
 }
 
@@ -1118,4 +1118,3 @@ tms1300_cpu_device::tms1300_cpu_device(const machine_config &mconfig, const char
 	: tms1100_cpu_device( mconfig, TMS1300, "TMS1300", tag, owner, clock, 0x00ff, 0xffff, "tms1300", __FILE__ )
 {
 }
-

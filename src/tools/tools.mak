@@ -206,4 +206,4 @@ PNGCMPOBJS = \
 pngcmp$(EXE): $(PNGCMPOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
-	
+

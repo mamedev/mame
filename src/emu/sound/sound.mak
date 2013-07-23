@@ -157,7 +157,7 @@ endif
 
 #-------------------------------------------------
 # Excellent Systems ADPCM sound chip
-#@src/emu/sound/es8712.h,SOUNDS += ES8712 
+#@src/emu/sound/es8712.h,SOUNDS += ES8712
 #-------------------------------------------------
 
 ifneq ($(filter ES8712,$(SOUNDS)),)

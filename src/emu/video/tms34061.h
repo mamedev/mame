@@ -76,7 +76,7 @@ public:
 
 	/* video update handling */
 	void get_display_state();
-	
+
 	struct tms34061_display m_display;
 
 protected:
@@ -84,7 +84,7 @@ protected:
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 private:
 	UINT16              m_regs[TMS34061_REGCOUNT];
 	UINT16              m_xmask;
@@ -96,7 +96,7 @@ private:
 	UINT8 *             m_shiftreg;
 	emu_timer *         m_timer;
 	screen_device *m_screen;
-	
+
 	void update_interrupts(void);
 	TIMER_CALLBACK_MEMBER( interrupt );
 	void register_w(address_space &space, offs_t offset, UINT8 data);

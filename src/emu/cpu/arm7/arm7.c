@@ -132,7 +132,7 @@ sa1110_cpu_device::sa1110_cpu_device(const machine_config &mconfig, const char *
 }
 
 
-void arm7_cpu_device::set_cpsr(UINT32 val) 
+void arm7_cpu_device::set_cpsr(UINT32 val)
 {
 	if (m_archFlags & eARM_ARCHFLAGS_MODE26)
 	{
@@ -558,7 +558,7 @@ void arm7_cpu_device::device_start()
 	state_add( ARM7_UR14,  "UR14", m_r[eR14_UND] ).formatstr("%08X");
 	state_add( ARM7_USPSR, "UR16", m_r[eSPSR_UND]).formatstr("%08X");
 
-    state_add(STATE_GENFLAGS, "GENFLAGS", m_r[eCPSR]).formatstr("%13s").noshow();
+	state_add(STATE_GENFLAGS, "GENFLAGS", m_r[eCPSR]).formatstr("%13s").noshow();
 }
 
 
@@ -579,15 +579,15 @@ void arm7_cpu_device::state_string_export(const device_state_entry &entry, astri
 	{
 		case STATE_GENFLAGS:
 			string.printf("%c%c%c%c%c%c%c%c %s",
-			    (ARM7REG(eCPSR) & N_MASK) ? 'N' : '-',
-			    (ARM7REG(eCPSR) & Z_MASK) ? 'Z' : '-',
-			    (ARM7REG(eCPSR) & C_MASK) ? 'C' : '-',
-			    (ARM7REG(eCPSR) & V_MASK) ? 'V' : '-',
-			    (ARM7REG(eCPSR) & Q_MASK) ? 'Q' : '-',
-			    (ARM7REG(eCPSR) & I_MASK) ? 'I' : '-',
-			    (ARM7REG(eCPSR) & F_MASK) ? 'F' : '-',
-			    (ARM7REG(eCPSR) & T_MASK) ? 'T' : '-',
-			    GetModeText(ARM7REG(eCPSR)) );
+				(ARM7REG(eCPSR) & N_MASK) ? 'N' : '-',
+				(ARM7REG(eCPSR) & Z_MASK) ? 'Z' : '-',
+				(ARM7REG(eCPSR) & C_MASK) ? 'C' : '-',
+				(ARM7REG(eCPSR) & V_MASK) ? 'V' : '-',
+				(ARM7REG(eCPSR) & Q_MASK) ? 'Q' : '-',
+				(ARM7REG(eCPSR) & I_MASK) ? 'I' : '-',
+				(ARM7REG(eCPSR) & F_MASK) ? 'F' : '-',
+				(ARM7REG(eCPSR) & T_MASK) ? 'T' : '-',
+				GetModeText(ARM7REG(eCPSR)) );
 		break;
 	}
 }
@@ -1219,4 +1219,3 @@ UINT8 arm7_cpu_device::arm7_cpu_read8(UINT32 addr)
 }
 
 #include "arm7drc.c"
-

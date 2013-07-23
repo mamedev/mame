@@ -411,31 +411,27 @@ enum tilemap_standard_mapper
 	MCFG_TILEMAP_BYTES_PER_ENTRY(_bytes_per_entry) \
 	MCFG_TILEMAP_INFO_CB_DRIVER(_class, _method) \
 	MCFG_TILEMAP_LAYOUT_STANDARD(_mapper, _columns, _rows) \
-	MCFG_TILEMAP_TILE_SIZE(_tilewidth, _tileheight) \
-	
+	MCFG_TILEMAP_TILE_SIZE(_tilewidth, _tileheight)
 #define MCFG_TILEMAP_ADD_CUSTOM(_tag, _bytes_per_entry, _class, _method, _tilewidth, _tileheight, _mapper, _columns, _rows) \
 	MCFG_TILEMAP_ADD(_tag) \
 	MCFG_TILEMAP_BYTES_PER_ENTRY(_bytes_per_entry) \
 	MCFG_TILEMAP_INFO_CB_DRIVER(_class, _method) \
 	MCFG_TILEMAP_LAYOUT_CB_DRIVER(_class, _mapper, _columns, _rows) \
-	MCFG_TILEMAP_TILE_SIZE(_tilewidth, _tileheight) \
-	
+	MCFG_TILEMAP_TILE_SIZE(_tilewidth, _tileheight)
 #define MCFG_TILEMAP_ADD_STANDARD_TRANSPEN(_tag, _bytes_per_entry, _class, _method, _tilewidth, _tileheight, _mapper, _columns, _rows, _transpen) \
 	MCFG_TILEMAP_ADD(_tag) \
 	MCFG_TILEMAP_BYTES_PER_ENTRY(_bytes_per_entry) \
 	MCFG_TILEMAP_INFO_CB_DRIVER(_class, _method) \
 	MCFG_TILEMAP_LAYOUT_STANDARD(_mapper, _columns, _rows) \
 	MCFG_TILEMAP_TILE_SIZE(_tilewidth, _tileheight) \
-	MCFG_TILEMAP_TRANSPARENT_PEN(_transpen) \
-	
+	MCFG_TILEMAP_TRANSPARENT_PEN(_transpen)
 #define MCFG_TILEMAP_ADD_CUSTOM_TRANSPEN(_tag, _bytes_per_entry, _class, _method, _tilewidth, _tileheight, _mapper, _columns, _rows, _transpen) \
 	MCFG_TILEMAP_ADD(_tag) \
 	MCFG_TILEMAP_BYTES_PER_ENTRY(_bytes_per_entry) \
 	MCFG_TILEMAP_INFO_CB_DRIVER(_class, _method) \
 	MCFG_TILEMAP_LAYOUT_CB_DRIVER(_columns, _mapper, _rows, _class) \
 	MCFG_TILEMAP_TILE_SIZE(_tilewidth, _tileheight) \
-	MCFG_TILEMAP_TRANSPARENT_PEN(_transpen) \
-
+	MCFG_TILEMAP_TRANSPARENT_PEN(_transpen)
 
 
 //**************************************************************************
@@ -498,59 +494,59 @@ class tilemap_memory
 
 	// construction/destruction
 	tilemap_memory();
-	
+
 public:
 	// configuration
 	void set(void *base, UINT32 bytes, int membits, endianness_t endianness, int bpe);
 	void set(const address_space &space, void *base, UINT32 bytes, int bpe);
 	void set(const memory_share &share, int bpe);
 	void set(const tilemap_memory &helper);
-	
+
 	// getters
 	void *base() const { return m_base; }
 	UINT32 bytes() const { return m_bytes; }
 	int membits() const { return m_membits; }
 	endianness_t endianness() const { return m_endianness; }
 	int bytes_per_entry() const { return m_bytes_per_entry; }
-	
+
 private:
 	// readers and writers
 	UINT32 read(int index) { return (this->*m_reader)(index); }
 	void write(int index, UINT32 data) { (this->*m_writer)(index, data); }
 
 	// internal read/write helpers for 1 byte entries
-	UINT32 read8_from_8(int index);		void write8_to_8(int index, UINT32 data);
-	UINT32 read8_from_16le(int index);	void write8_to_16le(int index, UINT32 data);
-	UINT32 read8_from_16be(int index);	void write8_to_16be(int index, UINT32 data);
-	UINT32 read8_from_32le(int index);	void write8_to_32le(int index, UINT32 data);
-	UINT32 read8_from_32be(int index);	void write8_to_32be(int index, UINT32 data);
-	UINT32 read8_from_64le(int index);	void write8_to_64le(int index, UINT32 data);
-	UINT32 read8_from_64be(int index);	void write8_to_64be(int index, UINT32 data);
+	UINT32 read8_from_8(int index);     void write8_to_8(int index, UINT32 data);
+	UINT32 read8_from_16le(int index);  void write8_to_16le(int index, UINT32 data);
+	UINT32 read8_from_16be(int index);  void write8_to_16be(int index, UINT32 data);
+	UINT32 read8_from_32le(int index);  void write8_to_32le(int index, UINT32 data);
+	UINT32 read8_from_32be(int index);  void write8_to_32be(int index, UINT32 data);
+	UINT32 read8_from_64le(int index);  void write8_to_64le(int index, UINT32 data);
+	UINT32 read8_from_64be(int index);  void write8_to_64be(int index, UINT32 data);
 
 	// internal read/write helpers for 2 byte entries
-	UINT32 read16_from_8le(int index);	void write16_to_8le(int index, UINT32 data);
-	UINT32 read16_from_8be(int index);	void write16_to_8be(int index, UINT32 data);
-	UINT32 read16_from_16(int index);	void write16_to_16(int index, UINT32 data);
-	UINT32 read16_from_32le(int index);	void write16_to_32le(int index, UINT32 data);
-	UINT32 read16_from_32be(int index);	void write16_to_32be(int index, UINT32 data);
-	UINT32 read16_from_64le(int index);	void write16_to_64le(int index, UINT32 data);
-	UINT32 read16_from_64be(int index);	void write16_to_64be(int index, UINT32 data);
+	UINT32 read16_from_8le(int index);  void write16_to_8le(int index, UINT32 data);
+	UINT32 read16_from_8be(int index);  void write16_to_8be(int index, UINT32 data);
+	UINT32 read16_from_16(int index);   void write16_to_16(int index, UINT32 data);
+	UINT32 read16_from_32le(int index); void write16_to_32le(int index, UINT32 data);
+	UINT32 read16_from_32be(int index); void write16_to_32be(int index, UINT32 data);
+	UINT32 read16_from_64le(int index); void write16_to_64le(int index, UINT32 data);
+	UINT32 read16_from_64be(int index); void write16_to_64be(int index, UINT32 data);
 
 	// internal read/write helpers for 4 byte entries
-	UINT32 read32_from_8le(int index);	void write32_to_8le(int index, UINT32 data);
-	UINT32 read32_from_8be(int index);	void write32_to_8be(int index, UINT32 data);
-	UINT32 read32_from_16le(int index);	void write32_to_16le(int index, UINT32 data);
-	UINT32 read32_from_16be(int index);	void write32_to_16be(int index, UINT32 data);
-	UINT32 read32_from_32(int index);	void write32_to_32(int index, UINT32 data);
-	UINT32 read32_from_64le(int index);	void write32_to_64le(int index, UINT32 data);
-	UINT32 read32_from_64be(int index);	void write32_to_64be(int index, UINT32 data);
+	UINT32 read32_from_8le(int index);  void write32_to_8le(int index, UINT32 data);
+	UINT32 read32_from_8be(int index);  void write32_to_8be(int index, UINT32 data);
+	UINT32 read32_from_16le(int index); void write32_to_16le(int index, UINT32 data);
+	UINT32 read32_from_16be(int index); void write32_to_16be(int index, UINT32 data);
+	UINT32 read32_from_32(int index);   void write32_to_32(int index, UINT32 data);
+	UINT32 read32_from_64le(int index); void write32_to_64le(int index, UINT32 data);
+	UINT32 read32_from_64be(int index); void write32_to_64be(int index, UINT32 data);
 
 	// internal state
-	void *				m_base;
-	UINT32				m_bytes;
-	int					m_membits;
-	endianness_t		m_endianness;
-	int					m_bytes_per_entry;
+	void *              m_base;
+	UINT32              m_bytes;
+	int                 m_membits;
+	endianness_t        m_endianness;
+	int                 m_bytes_per_entry;
 	UINT32 (tilemap_memory::*m_reader)(int);
 	void (tilemap_memory::*m_writer)(int, UINT32);
 };
@@ -675,7 +671,7 @@ private:
 		UINT8               value;
 		UINT8               alpha;
 	};
-	
+
 	// inline helpers
 	INT32 effective_rowscroll(int index, UINT32 screen_width);
 	INT32 effective_colscroll(int index, UINT32 screen_height);
@@ -710,13 +706,13 @@ private:
 
 	// managers and devices
 	tilemap_manager *           m_manager;              // reference to the owning manager
-	tilemap_device *			m_device;				// pointer to our owning device
+	tilemap_device *            m_device;               // pointer to our owning device
 	tilemap_t *                 m_next;                 // pointer to next tilemap
 	void *                      m_user_data;            // user data value
 
 	// optional memory info
-	tilemap_memory				m_basemem;				// info about base memory
-	tilemap_memory				m_extmem;				// info about extension memory
+	tilemap_memory              m_basemem;              // info about base memory
+	tilemap_memory              m_extmem;               // info about extension memory
 
 	// basic tilemap metrics
 	UINT32                      m_rows;                 // number of tile rows
@@ -815,7 +811,7 @@ class tilemap_device :  public device_t,
 public:
 	// construction/destruction
 	tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// static configuration
 	static void static_set_bytes_per_entry(device_t &device, int bpe);
 	static void static_set_info_callback(device_t &device, tilemap_get_info_delegate tile_get_info);
@@ -823,7 +819,7 @@ public:
 	static void static_set_layout(device_t &device, tilemap_mapper_delegate mapper, int columns, int rows);
 	static void static_set_tile_size(device_t &device, int width, int height);
 	static void static_set_transparent_pen(device_t &device, pen_t pen);
-	
+
 	// write handlers
 	DECLARE_WRITE8_HANDLER(write);
 	DECLARE_WRITE16_HANDLER(write);
@@ -831,10 +827,10 @@ public:
 	DECLARE_WRITE8_HANDLER(write_ext);
 	DECLARE_WRITE16_HANDLER(write_ext);
 	DECLARE_WRITE32_HANDLER(write_ext);
-	
+
 	// pick one to use to avoid ambiguity errors
 	using device_t::machine;
-	
+
 protected:
 	// device-level overrides
 	virtual void device_start();
@@ -844,13 +840,13 @@ private:
 	tilemap_get_info_delegate m_get_info;
 	tilemap_standard_mapper m_standard_mapper;
 	tilemap_mapper_delegate m_mapper;
-	int 			m_bytes_per_entry;
-	int 			m_tile_width;
-	int 			m_tile_height;
-	int 			m_num_columns;
-	int 			m_num_rows;
-	bool			m_transparent_pen_set;
-	pen_t 			m_transparent_pen;
+	int             m_bytes_per_entry;
+	int             m_tile_width;
+	int             m_tile_height;
+	int             m_num_columns;
+	int             m_num_rows;
+	bool            m_transparent_pen_set;
+	pen_t           m_transparent_pen;
 };
 
 

@@ -99,39 +99,39 @@ WRITE8_MEMBER(polygonet_state::polygonet_sys_w)
 	{
 		case 0:
 		/*
-			D28 = /FIXKILL     - Disable 'FIX' layer?
-			D27 = MUTE
-			D26 = EEPROM CLK
-			D25 = EEPROM CS
-			D24 = EEPROM DATA
-    	*/
+		    D28 = /FIXKILL     - Disable 'FIX' layer?
+		    D27 = MUTE
+		    D26 = EEPROM CLK
+		    D25 = EEPROM CS
+		    D24 = EEPROM DATA
+		*/
 			m_eeprom->write_bit(data & 1);
 			m_eeprom->set_cs_line((data & 2) ? CLEAR_LINE : ASSERT_LINE);
 			m_eeprom->set_clock_line((data & 4) ? ASSERT_LINE : CLEAR_LINE);
-			
+
 			m_sys0 = data;
 			break;
-		
+
 		case 1:
 		/*
-			D23 = BRMAS        - 68k bus error mask
-			D22 = L7MAS        - L7 interrupt mask (unused - should always be '1')
-			D21 = /L5MAS       - L5 interrupt mask/acknowledge (vblank)
-			D20 = L3MAS        - L3 interrupt mask (network)
-			D19 = VFLIP        - Flip video vertically
-			D18 = HFLIP        - Flip video horizontally
-			D17 = COIN2        - Coin counter 2
-			D16 = COIN1        - Coin counter 1
+		    D23 = BRMAS        - 68k bus error mask
+		    D22 = L7MAS        - L7 interrupt mask (unused - should always be '1')
+		    D21 = /L5MAS       - L5 interrupt mask/acknowledge (vblank)
+		    D20 = L3MAS        - L3 interrupt mask (network)
+		    D19 = VFLIP        - Flip video vertically
+		    D18 = HFLIP        - Flip video horizontally
+		    D17 = COIN2        - Coin counter 2
+		    D16 = COIN1        - Coin counter 1
 		*/
 			coin_counter_w(machine(), 0, data & 1);
 			coin_counter_w(machine(), 1, data & 2);
-			
+
 			if (~data & 0x20)
 				m_maincpu->set_input_line(M68K_IRQ_5, CLEAR_LINE);
-			
+
 			m_sys1 = data;
 			break;
-		
+
 		default:
 			break;
 	}
@@ -156,14 +156,14 @@ READ8_MEMBER(polygonet_state::sound_comms_r)
 		case 0:
 			// unknown
 			return 0;
-		
+
 		case 2:
 			return soundlatch_byte_r(space, 0);
-		
+
 		default:
 			break;
 	}
-	
+
 	return 0;
 }
 
@@ -174,27 +174,27 @@ WRITE8_MEMBER(polygonet_state::sound_comms_w)
 		case 0:
 			// unknown, writes once at boot
 			break;
-		
+
 		case 2:
 			// TODO: reset global volume
 			break;
-		
+
 		case 3:
 			// TODO: increase global volume
 			break;
-		
+
 		case 4:
 			// unknown
 			break;
-		
+
 		case 6:
 			soundlatch2_byte_w(space, 0, data);
 			break;
-		
+
 		case 7:
 			soundlatch3_byte_w(space, 0, data);
 			break;
-		
+
 		default:
 			break;
 	}
@@ -564,7 +564,7 @@ WRITE8_MEMBER(polygonet_state::sound_bankswitch_w)
 	// higher bits: ? (only used in plygonet)
 	if ((m_sound_bank & 7) != (data & 7))
 		membank("bank1")->set_entry(data & 7);
-	
+
 	m_sound_bank = data;
 }
 
@@ -623,7 +623,7 @@ void polygonet_state::machine_reset()
 {
 	membank("bank1")->set_entry(0);
 	m_sound_bank = 0;
-	
+
 	m_sys0 = 0;
 	m_sys1 = 0;
 
@@ -668,7 +668,7 @@ static MACHINE_CONFIG_START( plygonet, polygonet_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80, 8000000)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	
+
 	MCFG_QUANTUM_PERFECT_CPU("maincpu") /* TODO: TEMPORARY!  UNTIL A MORE LOCALIZED SYNC CAN BE MADE */
 
 	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
@@ -714,7 +714,7 @@ static INPUT_PORTS_START( polygonet )
 	PORT_DIPSETTING(    0x30, "Blue" )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	
+
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN )
@@ -783,16 +783,16 @@ ROM_START( plygonet )
 	ROM_LOAD32_BYTE( "305uaa02.2k", 0x000002, 512*1024, CRC(4d7e32b3) SHA1(25731526535036972577637d186f02ae467296bd) )
 	ROM_LOAD32_BYTE( "305uaa03.2h", 0x000001, 512*1024, CRC(36e4e3fe) SHA1(e8fcad4f196c9b225a0fbe70791493ff07c648a9) )
 	ROM_LOAD32_BYTE( "305uaa04.4h", 0x000000, 512*1024, CRC(d8394e72) SHA1(eb6bcf8aedb9ba5843204ab8aacb735cbaafb74d) )
-	
+
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Z80 sound program */
 	ROM_LOAD("305b05.7b", 0x000000, 0x20000, CRC(2d3d9654) SHA1(784a409df47cee877e507b8bbd3610d161d63753) )
-	
+
 	ROM_REGION( 0x20000, "gfx1", 0 ) /* TTL text plane tiles */
 	ROM_LOAD( "305b06.18g", 0x000000, 0x20000, CRC(decd6e42) SHA1(4c23dcb1d68132d3381007096e014ee4b6007086) )
-	
+
 	ROM_REGION( 0x40000, "gfx2", 0 ) /* '936 tiles */
 	ROM_LOAD( "305b07.20d", 0x000000, 0x40000, CRC(e4320bc3) SHA1(b0bb2dac40d42f97da94516d4ebe29b1c3d77c37) )
-	
+
 	ROM_REGION( 0x200000, "shared", 0 ) /* sound data */
 	ROM_LOAD( "305b08.2e", 0x000000, 0x200000, CRC(874607df) SHA1(763b44a80abfbc355bcb9be8bf44373254976019) )
 
@@ -806,16 +806,16 @@ ROM_START( polynetw )
 	ROM_LOAD32_BYTE( "305jaa02.2k", 0x000002, 0x080000, CRC(d0710379) SHA1(cf0970d63e8d021edf2d404838c658a5b7cb8fb8) )
 	ROM_LOAD32_BYTE( "305jaa03.2h", 0x000001, 0x080000, CRC(278b5928) SHA1(2ea96054e2ef637731cd64f2bef0b5b2bbe7e24f) )
 	ROM_LOAD32_BYTE( "305jaa04.4h", 0x000000, 0x080000, CRC(b069353b) SHA1(12fbe2df09328bb7193e89a49d84a61eab5bfdcb) )
-	
+
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Z80 sound program */
 	ROM_LOAD( "305jaa05.7b", 0x000000, 0x020000, CRC(06053db6) SHA1(c7d43c2650d949ee552a49db93dece842c17e68d) )
-	
+
 	ROM_REGION( 0x20000, "gfx1", 0 ) /* TTL text plane tiles */
 	ROM_LOAD( "305a06.18g", 0x000000, 0x020000, CRC(4b9b7e9c) SHA1(8c3c0f1ec7e26fd9552f6da1e6bdd7ff4453ba57) )
-	
+
 	ROM_REGION( 0x40000, "gfx2", 0 ) /* '936 tiles */
 	ROM_LOAD( "305a07.20d", 0x000000, 0x020000, CRC(0959283b) SHA1(482caf96e8e430b87810508b1a1420cd3b58f203) )
-	
+
 	ROM_REGION( 0x400000, "shared", 0 ) /* sound data */
 	ROM_LOAD( "305a08.2e", 0x000000, 0x200000, CRC(7ddb8a52) SHA1(3199b347fc433ffe0de8521001df77672d40771e) )
 	ROM_LOAD( "305a09.3e", 0x200000, 0x200000, CRC(6da1be58) SHA1(d63ac16ac551193ff8a6036724fb59e1d702e06b) )

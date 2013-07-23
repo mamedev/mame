@@ -65,7 +65,7 @@ void k051316_device::device_config_complete()
 	const k051316_interface *intf = reinterpret_cast<const k051316_interface *>(static_config());
 	if (intf != NULL)
 	*static_cast<k051316_interface *>(this) = *intf;
-	
+
 	// or initialize to defaults if none provided
 	else
 	{
@@ -171,7 +171,7 @@ void k051316_device::device_start()
 	}
 
 	m_bpp = is_tail2nos ? 4 : m_bpp; // tail2nos is passed with bpp = -4 to setup the custom charlayout!
-	
+
 	m_tmap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k051316_device::get_tile_info0),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	m_ram = auto_alloc_array_clear(machine(), UINT8, 0x800);

@@ -237,8 +237,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(cshooter_state::cshooter_scanline)
 {
 	int scanline = param;
 
-//	if(scanline == 240) // presumably a SW trap, not an irq
-//		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xd7); /* RST 10h */
+//  if(scanline == 240) // presumably a SW trap, not an irq
+//      m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xd7); /* RST 10h */
 
 	if(scanline == 240) // vblank-out irq
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xcf); /* RST 08h */

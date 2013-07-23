@@ -49,7 +49,7 @@ private:
 	UINT8    *m_ram;
 	tilemap_t  *m_tmap;
 	UINT8    m_ctrlram[16];
-		
+
 	TILE_GET_INFO_MEMBER(get_tile_info0);
 	void get_tile_info( tile_data &tileinfo, int tile_index );
 };

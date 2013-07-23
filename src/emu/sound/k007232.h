@@ -24,19 +24,19 @@ public:
 
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ8_MEMBER( read );
-	
+
 	/*
-  The 007232 has two channels and produces two outputs. The volume control
-  is external, however to make it easier to use we handle that inside the
-  emulation. You can control volume and panning: for each of the two channels
-  you can set the volume of the two outputs. If panning is not required,
-  then volumeB will be 0 for channel 0, and volumeA will be 0 for channel 1.
-  Volume is in the range 0-255.
+	The 007232 has two channels and produces two outputs. The volume control
+	is external, however to make it easier to use we handle that inside the
+	emulation. You can control volume and panning: for each of the two channels
+	you can set the volume of the two outputs. If panning is not required,
+	then volumeB will be 0 for channel 0, and volumeA will be 0 for channel 1.
+	Volume is in the range 0-255.
 	*/
 	void set_volume(int channel,int volumeA,int volumeB);
-	
+
 	void set_bank( int chABank, int chBBank );
-	
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -44,7 +44,7 @@ protected:
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
-	
+
 	void KDAC_A_make_fncode();
 
 private:

@@ -22,7 +22,7 @@ public:
 	void set_sprite_ctrl(UINT16 sprctrl);
 	void eof_callback();
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri_type);
-	
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -32,11 +32,11 @@ protected:
 private:
 	/* NB: pc090oj_ctrl is the internal register controlling flipping
 
-   pc090oj_sprite_ctrl is a representation of the hardware OUTSIDE the pc090oj
-   which impacts on sprite plotting, and which varies between games. It
-   includes color banking and (optionally) priority. It allows each game to
-   control these aspects of the sprites in different ways, while keeping the
-   routines here modular.
+	pc090oj_sprite_ctrl is a representation of the hardware OUTSIDE the pc090oj
+	which impacts on sprite plotting, and which varies between games. It
+	includes color banking and (optionally) priority. It allows each game to
+	control these aspects of the sprites in different ways, while keeping the
+	routines here modular.
 
 */
 

@@ -60,7 +60,7 @@ protected:
 	UINT16 m_pt;
 	UINT16 m_pr;
 	UINT16 m_pi;
-    
+
 	// RAM Address Arithmetic Unit (YAAU)  (page 2-6)
 	UINT16 m_j;     // Signed
 	UINT16 m_k;     // Signed
@@ -70,8 +70,8 @@ protected:
 	UINT16 m_r1;
 	UINT16 m_r2;
 	UINT16 m_r3;
-	
-    // Data Arithmetic Unit (DAU)  (page 2-6)
+
+	// Data Arithmetic Unit (DAU)  (page 2-6)
 	UINT16 m_x;
 	UINT32 m_y;
 	UINT32 m_p;
@@ -82,8 +82,8 @@ protected:
 	UINT8 m_c0;
 	UINT8 m_c1;
 	UINT8 m_c2;
-	
-    // Serial and parallel interfaces (TODO: More here  (page 2-13))
+
+	// Serial and parallel interfaces (TODO: More here  (page 2-13))
 	UINT16 m_sioc;
 	UINT16 m_srta;
 	UINT16 m_sdx;
@@ -133,12 +133,12 @@ protected:
 	void* addressYL();
 	void writeRegister(void* reg, const UINT16& value);
 	bool conditionTest(const UINT8& CON);
-    
+
 	// flags
 	bool lmi();
 	bool leq();
-    bool llv();
-    bool lmv();
+	bool llv();
+	bool lmv();
 };
 
 

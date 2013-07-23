@@ -238,9 +238,9 @@ static void log_add_disasm_comment(rsp_state *rsp, drcuml_block *block, UINT32 p
 	}
 
 
-#define VREG_B(reg, offset)     	rsp->v[(reg)].b[(offset)^1]
-#define W_VREG_S(reg, offset)   	rsp->v[(reg)].s[(offset)]
-#define VREG_S(reg, offset)     	(INT16)rsp->v[(reg)].s[(offset)]
+#define VREG_B(reg, offset)         rsp->v[(reg)].b[(offset)^1]
+#define W_VREG_S(reg, offset)       rsp->v[(reg)].s[(offset)]
+#define VREG_S(reg, offset)         (INT16)rsp->v[(reg)].s[(offset)]
 
 #define VEC_EL_2(x,z)               (vector_elements_2[(x)][(z)])
 
@@ -1192,7 +1192,7 @@ static void cfunc_rsp_lwv(void *param)
 
 #if USE_SIMD
 	rsp->xv[dest] = _mm_set_epi8(val[15], val[14], val[13], val[12], val[11], val[10], val[ 9], val[ 8],
-								 val[ 7], val[ 6], val[ 5], val[ 4], val[ 3], val[ 2], val[ 1], val[ 0]);
+									val[ 7], val[ 6], val[ 5], val[ 4], val[ 3], val[ 2], val[ 1], val[ 0]);
 #endif
 }
 
@@ -2850,67 +2850,67 @@ INLINE void cfunc_rsp_vmadh(void *param)
 
 		vres[i] = C_SATURATE_ACCUM1(caccumh, caccumm, i, 0x8000, 0x7fff);*/
 	}
-/*	printf("%08x\n", rsp->pc);
-	for (int i = 0; i < 8; i++)
-	{
-		if ((UINT16)vres[i] != vresult[i])
-		{
-			printf("Result mismatch:\n");
-			printf("   C: %04x %04x %04x %04x %04x %04x %04x %04x\n", vres[0], vres[1], vres[2], vres[3], vres[4], vres[5], vres[6], vres[7]);
-			printf("SIMD: %04x %04x %04x %04x %04x %04x %04x %04x\n", vresult[0], vresult[1], vresult[2], vresult[3], vresult[4], vresult[5], vresult[6], vresult[7]);
-			printf("High accumulator:\n");
-			printf("   C: %04x %04x %04x %04x %04x %04x %04x %04x\n", caccumh[0], caccumh[1], caccumh[2], caccumh[3], caccumh[4], caccumh[5], caccumh[6], caccumh[7]);
-			printf("SIMD: %04x %04x %04x %04x %04x %04x %04x %04x\n", ACCUM_H(0), ACCUM_H(1), ACCUM_H(2), ACCUM_H(3), ACCUM_H(4), ACCUM_H(5), ACCUM_H(6), ACCUM_H(7));
-			printf("Mid accumulator:\n");
-			printf("   C: %04x %04x %04x %04x %04x %04x %04x %04x\n", caccumm[0], caccumm[1], caccumm[2], caccumm[3], caccumm[4], caccumm[5], caccumm[6], caccumm[7]);
-			printf("SIMD: %04x %04x %04x %04x %04x %04x %04x %04x\n", ACCUM_M(0), ACCUM_M(1), ACCUM_M(2), ACCUM_M(3), ACCUM_M(4), ACCUM_M(5), ACCUM_M(6), ACCUM_M(7));
-			printf("VS1:\n");
-			printf("   C: %04x %04x %04x %04x %04x %04x %04x %04x\n", vs1[0], vs1[1], vs1[2], vs1[3], vs1[4], vs1[5], vs1[6], vs1[7]);
-			printf("SIMD: %04x %04x %04x %04x %04x %04x %04x %04x\n", svs1[0], svs1[1], svs1[2], svs1[3], svs1[4], svs1[5], svs1[6], svs1[7]);
-			printf("VS2:\n");
-			printf("   C: %04x %04x %04x %04x %04x %04x %04x %04x\n", vs2[0], vs2[1], vs2[2], vs2[3], vs2[4], vs2[5], vs2[6], vs2[7]);
-			printf("SIMD: %04x %04x %04x %04x %04x %04x %04x %04x\n", svs2[0], svs2[1], svs2[2], svs2[3], svs2[4], svs2[5], svs2[6], svs2[7]);
-			fatalerror("asdf");
-		}
-		if (caccumh[i] != (UINT16)ACCUM_H(i))
-		{
-			printf("Result:\n");
-			printf("   C: %04x %04x %04x %04x %04x %04x %04x %04x\n", vres[0], vres[1], vres[2], vres[3], vres[4], vres[5], vres[6], vres[7]);
-			printf("SIMD: %04x %04x %04x %04x %04x %04x %04x %04x\n", vresult[0], vresult[1], vresult[2], vresult[3], vresult[4], vresult[5], vresult[6], vresult[7]);
-			printf("High accumulator mismatch:\n");
-			printf("   C: %04x %04x %04x %04x %04x %04x %04x %04x\n", caccumh[0], caccumh[1], caccumh[2], caccumh[3], caccumh[4], caccumh[5], caccumh[6], caccumh[7]);
-			printf("SIMD: %04x %04x %04x %04x %04x %04x %04x %04x\n", ACCUM_H(0), ACCUM_H(1), ACCUM_H(2), ACCUM_H(3), ACCUM_H(4), ACCUM_H(5), ACCUM_H(6), ACCUM_H(7));
-			printf("Mid accumulator:\n");
-			printf("   C: %04x %04x %04x %04x %04x %04x %04x %04x\n", caccumm[0], caccumm[1], caccumm[2], caccumm[3], caccumm[4], caccumm[5], caccumm[6], caccumm[7]);
-			printf("SIMD: %04x %04x %04x %04x %04x %04x %04x %04x\n", ACCUM_M(0), ACCUM_M(1), ACCUM_M(2), ACCUM_M(3), ACCUM_M(4), ACCUM_M(5), ACCUM_M(6), ACCUM_M(7));
-			printf("VS1:\n");
-			printf("   C: %04x %04x %04x %04x %04x %04x %04x %04x\n", vs1[0], vs1[1], vs1[2], vs1[3], vs1[4], vs1[5], vs1[6], vs1[7]);
-			printf("SIMD: %04x %04x %04x %04x %04x %04x %04x %04x\n", svs1[0], svs1[1], svs1[2], svs1[3], svs1[4], svs1[5], svs1[6], svs1[7]);
-			printf("VS2:\n");
-			printf("   C: %04x %04x %04x %04x %04x %04x %04x %04x\n", vs2[0], vs2[1], vs2[2], vs2[3], vs2[4], vs2[5], vs2[6], vs2[7]);
-			printf("SIMD: %04x %04x %04x %04x %04x %04x %04x %04x\n", svs2[0], svs2[1], svs2[2], svs2[3], svs2[4], svs2[5], svs2[6], svs2[7]);
-			fatalerror("asdf");
-		}
-		if (caccumm[i] != (UINT16)ACCUM_M(i))
-		{
-			printf("Result:\n");
-			printf("   C: %04x %04x %04x %04x %04x %04x %04x %04x\n", vres[0], vres[1], vres[2], vres[3], vres[4], vres[5], vres[6], vres[7]);
-			printf("SIMD: %04x %04x %04x %04x %04x %04x %04x %04x\n", vresult[0], vresult[1], vresult[2], vresult[3], vresult[4], vresult[5], vresult[6], vresult[7]);
-			printf("High accumulator:\n");
-			printf("   C: %04x %04x %04x %04x %04x %04x %04x %04x\n", caccumh[0], caccumh[1], caccumh[2], caccumh[3], caccumh[4], caccumh[5], caccumh[6], caccumh[7]);
-			printf("SIMD: %04x %04x %04x %04x %04x %04x %04x %04x\n", ACCUM_H(0), ACCUM_H(1), ACCUM_H(2), ACCUM_H(3), ACCUM_H(4), ACCUM_H(5), ACCUM_H(6), ACCUM_H(7));
-			printf("Mid accumulator mismatch:\n");
-			printf("   C: %04x %04x %04x %04x %04x %04x %04x %04x\n", caccumm[0], caccumm[1], caccumm[2], caccumm[3], caccumm[4], caccumm[5], caccumm[6], caccumm[7]);
-			printf("SIMD: %04x %04x %04x %04x %04x %04x %04x %04x\n", ACCUM_M(0), ACCUM_M(1), ACCUM_M(2), ACCUM_M(3), ACCUM_M(4), ACCUM_M(5), ACCUM_M(6), ACCUM_M(7));
-			printf("VS1:\n");
-			printf("   C: %04x %04x %04x %04x %04x %04x %04x %04x\n", vs1[0], vs1[1], vs1[2], vs1[3], vs1[4], vs1[5], vs1[6], vs1[7]);
-			printf("SIMD: %04x %04x %04x %04x %04x %04x %04x %04x\n", svs1[0], svs1[1], svs1[2], svs1[3], svs1[4], svs1[5], svs1[6], svs1[7]);
-			printf("VS2:\n");
-			printf("   C: %04x %04x %04x %04x %04x %04x %04x %04x\n", vs2[0], vs2[1], vs2[2], vs2[3], vs2[4], vs2[5], vs2[6], vs2[7]);
-			printf("SIMD: %04x %04x %04x %04x %04x %04x %04x %04x\n", svs2[0], svs2[1], svs2[2], svs2[3], svs2[4], svs2[5], svs2[6], svs2[7]);
-			fatalerror("asdf");
-		}
-	}*/
+/*  printf("%08x\n", rsp->pc);
+    for (int i = 0; i < 8; i++)
+    {
+        if ((UINT16)vres[i] != vresult[i])
+        {
+            printf("Result mismatch:\n");
+            printf("   C: %04x %04x %04x %04x %04x %04x %04x %04x\n", vres[0], vres[1], vres[2], vres[3], vres[4], vres[5], vres[6], vres[7]);
+            printf("SIMD: %04x %04x %04x %04x %04x %04x %04x %04x\n", vresult[0], vresult[1], vresult[2], vresult[3], vresult[4], vresult[5], vresult[6], vresult[7]);
+            printf("High accumulator:\n");
+            printf("   C: %04x %04x %04x %04x %04x %04x %04x %04x\n", caccumh[0], caccumh[1], caccumh[2], caccumh[3], caccumh[4], caccumh[5], caccumh[6], caccumh[7]);
+            printf("SIMD: %04x %04x %04x %04x %04x %04x %04x %04x\n", ACCUM_H(0), ACCUM_H(1), ACCUM_H(2), ACCUM_H(3), ACCUM_H(4), ACCUM_H(5), ACCUM_H(6), ACCUM_H(7));
+            printf("Mid accumulator:\n");
+            printf("   C: %04x %04x %04x %04x %04x %04x %04x %04x\n", caccumm[0], caccumm[1], caccumm[2], caccumm[3], caccumm[4], caccumm[5], caccumm[6], caccumm[7]);
+            printf("SIMD: %04x %04x %04x %04x %04x %04x %04x %04x\n", ACCUM_M(0), ACCUM_M(1), ACCUM_M(2), ACCUM_M(3), ACCUM_M(4), ACCUM_M(5), ACCUM_M(6), ACCUM_M(7));
+            printf("VS1:\n");
+            printf("   C: %04x %04x %04x %04x %04x %04x %04x %04x\n", vs1[0], vs1[1], vs1[2], vs1[3], vs1[4], vs1[5], vs1[6], vs1[7]);
+            printf("SIMD: %04x %04x %04x %04x %04x %04x %04x %04x\n", svs1[0], svs1[1], svs1[2], svs1[3], svs1[4], svs1[5], svs1[6], svs1[7]);
+            printf("VS2:\n");
+            printf("   C: %04x %04x %04x %04x %04x %04x %04x %04x\n", vs2[0], vs2[1], vs2[2], vs2[3], vs2[4], vs2[5], vs2[6], vs2[7]);
+            printf("SIMD: %04x %04x %04x %04x %04x %04x %04x %04x\n", svs2[0], svs2[1], svs2[2], svs2[3], svs2[4], svs2[5], svs2[6], svs2[7]);
+            fatalerror("asdf");
+        }
+        if (caccumh[i] != (UINT16)ACCUM_H(i))
+        {
+            printf("Result:\n");
+            printf("   C: %04x %04x %04x %04x %04x %04x %04x %04x\n", vres[0], vres[1], vres[2], vres[3], vres[4], vres[5], vres[6], vres[7]);
+            printf("SIMD: %04x %04x %04x %04x %04x %04x %04x %04x\n", vresult[0], vresult[1], vresult[2], vresult[3], vresult[4], vresult[5], vresult[6], vresult[7]);
+            printf("High accumulator mismatch:\n");
+            printf("   C: %04x %04x %04x %04x %04x %04x %04x %04x\n", caccumh[0], caccumh[1], caccumh[2], caccumh[3], caccumh[4], caccumh[5], caccumh[6], caccumh[7]);
+            printf("SIMD: %04x %04x %04x %04x %04x %04x %04x %04x\n", ACCUM_H(0), ACCUM_H(1), ACCUM_H(2), ACCUM_H(3), ACCUM_H(4), ACCUM_H(5), ACCUM_H(6), ACCUM_H(7));
+            printf("Mid accumulator:\n");
+            printf("   C: %04x %04x %04x %04x %04x %04x %04x %04x\n", caccumm[0], caccumm[1], caccumm[2], caccumm[3], caccumm[4], caccumm[5], caccumm[6], caccumm[7]);
+            printf("SIMD: %04x %04x %04x %04x %04x %04x %04x %04x\n", ACCUM_M(0), ACCUM_M(1), ACCUM_M(2), ACCUM_M(3), ACCUM_M(4), ACCUM_M(5), ACCUM_M(6), ACCUM_M(7));
+            printf("VS1:\n");
+            printf("   C: %04x %04x %04x %04x %04x %04x %04x %04x\n", vs1[0], vs1[1], vs1[2], vs1[3], vs1[4], vs1[5], vs1[6], vs1[7]);
+            printf("SIMD: %04x %04x %04x %04x %04x %04x %04x %04x\n", svs1[0], svs1[1], svs1[2], svs1[3], svs1[4], svs1[5], svs1[6], svs1[7]);
+            printf("VS2:\n");
+            printf("   C: %04x %04x %04x %04x %04x %04x %04x %04x\n", vs2[0], vs2[1], vs2[2], vs2[3], vs2[4], vs2[5], vs2[6], vs2[7]);
+            printf("SIMD: %04x %04x %04x %04x %04x %04x %04x %04x\n", svs2[0], svs2[1], svs2[2], svs2[3], svs2[4], svs2[5], svs2[6], svs2[7]);
+            fatalerror("asdf");
+        }
+        if (caccumm[i] != (UINT16)ACCUM_M(i))
+        {
+            printf("Result:\n");
+            printf("   C: %04x %04x %04x %04x %04x %04x %04x %04x\n", vres[0], vres[1], vres[2], vres[3], vres[4], vres[5], vres[6], vres[7]);
+            printf("SIMD: %04x %04x %04x %04x %04x %04x %04x %04x\n", vresult[0], vresult[1], vresult[2], vresult[3], vresult[4], vresult[5], vresult[6], vresult[7]);
+            printf("High accumulator:\n");
+            printf("   C: %04x %04x %04x %04x %04x %04x %04x %04x\n", caccumh[0], caccumh[1], caccumh[2], caccumh[3], caccumh[4], caccumh[5], caccumh[6], caccumh[7]);
+            printf("SIMD: %04x %04x %04x %04x %04x %04x %04x %04x\n", ACCUM_H(0), ACCUM_H(1), ACCUM_H(2), ACCUM_H(3), ACCUM_H(4), ACCUM_H(5), ACCUM_H(6), ACCUM_H(7));
+            printf("Mid accumulator mismatch:\n");
+            printf("   C: %04x %04x %04x %04x %04x %04x %04x %04x\n", caccumm[0], caccumm[1], caccumm[2], caccumm[3], caccumm[4], caccumm[5], caccumm[6], caccumm[7]);
+            printf("SIMD: %04x %04x %04x %04x %04x %04x %04x %04x\n", ACCUM_M(0), ACCUM_M(1), ACCUM_M(2), ACCUM_M(3), ACCUM_M(4), ACCUM_M(5), ACCUM_M(6), ACCUM_M(7));
+            printf("VS1:\n");
+            printf("   C: %04x %04x %04x %04x %04x %04x %04x %04x\n", vs1[0], vs1[1], vs1[2], vs1[3], vs1[4], vs1[5], vs1[6], vs1[7]);
+            printf("SIMD: %04x %04x %04x %04x %04x %04x %04x %04x\n", svs1[0], svs1[1], svs1[2], svs1[3], svs1[4], svs1[5], svs1[6], svs1[7]);
+            printf("VS2:\n");
+            printf("   C: %04x %04x %04x %04x %04x %04x %04x %04x\n", vs2[0], vs2[1], vs2[2], vs2[3], vs2[4], vs2[5], vs2[6], vs2[7]);
+            printf("SIMD: %04x %04x %04x %04x %04x %04x %04x %04x\n", svs2[0], svs2[1], svs2[2], svs2[3], svs2[4], svs2[5], svs2[6], svs2[7]);
+            fatalerror("asdf");
+        }
+    }*/
 	WRITEBACK_RESULT();
 #endif
 }
@@ -2930,7 +2930,7 @@ INLINE void cfunc_rsp_vadd(void *param)
 	__m128i shuffled = _mm_shuffle_epi8(rsp->xv[VS2REG], vec_shuf_inverse[EL]);
 	__m128i unsat = rsp->xv[VS1REG];
 	__m128i carry = _mm_set_epi16(CARRY_FLAG(7), CARRY_FLAG(6), CARRY_FLAG(5), CARRY_FLAG(4),
-								  CARRY_FLAG(3), CARRY_FLAG(2), CARRY_FLAG(1), CARRY_FLAG(0));
+									CARRY_FLAG(3), CARRY_FLAG(2), CARRY_FLAG(1), CARRY_FLAG(0));
 
 	unsat = _mm_add_epi16(unsat, shuffled);
 	unsat = _mm_add_epi16(unsat, carry);
@@ -3011,7 +3011,7 @@ INLINE void cfunc_rsp_vsub(void *param)
 	__m128i shuffled = _mm_shuffle_epi8(rsp->xv[VS2REG], vec_shuf_inverse[EL]);
 	__m128i unsat = rsp->xv[VS1REG];
 	__m128i carry = _mm_set_epi16(CARRY_FLAG(7), CARRY_FLAG(6), CARRY_FLAG(5), CARRY_FLAG(4),
-								  CARRY_FLAG(3), CARRY_FLAG(2), CARRY_FLAG(1), CARRY_FLAG(0));
+									CARRY_FLAG(3), CARRY_FLAG(2), CARRY_FLAG(1), CARRY_FLAG(0));
 
 	unsat = _mm_sub_epi16(unsat, shuffled);
 	unsat = _mm_sub_epi16(unsat, carry);
@@ -3142,7 +3142,7 @@ INLINE void cfunc_rsp_vaddc(void *param)
 
 #if USE_SIMD
 	__m128i shuf2 = _mm_shuffle_epi8(rsp->xv[VS2REG], vec_shuf_inverse[EL]);
-                                              __m128i vec7531 = _mm_and_si128(rsp->xv[VS1REG], vec_lomask);
+												__m128i vec7531 = _mm_and_si128(rsp->xv[VS1REG], vec_lomask);
 	__m128i vec6420 = _mm_srli_epi32(rsp->xv[VS1REG], 16);
 	__m128i shuf7531 = _mm_and_si128(shuf2, vec_lomask);
 	__m128i shuf6420 = _mm_srli_epi32(shuf2, 16);

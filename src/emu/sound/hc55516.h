@@ -19,7 +19,7 @@ public:
 
 	/* returns whether the clock is currently LO or HI */
 	int clock_state_r();
-	
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -28,9 +28,9 @@ protected:
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
-	
+
 	void start_common(UINT8 _shiftreg_mask, int _active_clock_hi);
-	
+
 	// internal state
 	sound_stream *m_channel;
 	int     m_active_clock_hi;
@@ -48,11 +48,11 @@ protected:
 
 	double  m_filter;
 	double  m_integrator;
-	
+
 	double  m_charge;
 	double  m_decay;
 	double  m_leak;
-	
+
 	inline int is_external_oscillator();
 	inline int is_active_clock_transition(int clock_state);
 	inline int current_clock_state();

@@ -7,15 +7,15 @@
 
 **********************************************************************
 
-    This display controller is integrated on the PC1640 motherboard 
+    This display controller is integrated on the PC1640 motherboard
     but wired to the ISA bus, and can be disabled with a DIP switch.
 
     WD Paradise PEGA 1A 38304B 2116-002 8745AAA JAPAN (84 pin PLCC)
 
-    Single chip multimode EGA video controller with 
-	integral 6845 CRTC. Provides 100% IBM EGA, CGA, 
-	MDA, Hercules graphics and Plantronics COLORPLUS* 
-	compatibility
+    Single chip multimode EGA video controller with
+    integral 6845 CRTC. Provides 100% IBM EGA, CGA,
+    MDA, Hercules graphics and Plantronics COLORPLUS*
+    compatibility
 
 **********************************************************************/
 
@@ -27,7 +27,7 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define PEGA1A_TAG    	"ic910"
+#define PEGA1A_TAG      "ic910"
 #define EGA_CRTC_NAME   "crtc_ega_ega"
 
 

@@ -3111,4 +3111,3 @@ void filter_bml3bas_getinfo(UINT32 state, union filterinfo *info)
 		case FILTINFO_PTR_WRITEFILE:    info->write_file = bml3bas_writefile; break;
 	}
 }
-

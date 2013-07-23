@@ -109,7 +109,7 @@ public:
 	DECLARE_WRITE32_MEMBER( unpaged_ram_long_w );
 	DECLARE_WRITE32_MEMBER( long_w );
 	DECLARE_WRITE32_MEMBER( b_long_w );
-	
+
 	DECLARE_READ16_MEMBER( word_r );        // VACSET
 	DECLARE_READ16_MEMBER( b_word_r );      // VSCCS  (board dependent)
 	DECLARE_READ32_MEMBER( long_r );        // VACSET
@@ -119,7 +119,7 @@ protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
-	
+
 private:
 	// internal state
 	tilemap_t   *m_tilemap[K056832_PAGE_COUNT];
@@ -180,7 +180,7 @@ private:
 	k055555_device *m_k055555;  /* used to choose colorbase */
 
 	void get_tile_info(  tile_data &tileinfo, int tile_index, int pageIndex );
-	
+
 	TILE_GET_INFO_MEMBER(get_tile_info0);
 	TILE_GET_INFO_MEMBER(get_tile_info1);
 	TILE_GET_INFO_MEMBER(get_tile_info2);
@@ -197,17 +197,17 @@ private:
 	TILE_GET_INFO_MEMBER(get_tile_infod);
 	TILE_GET_INFO_MEMBER(get_tile_infoe);
 	TILE_GET_INFO_MEMBER(get_tile_infof);
-	
+
 	void mark_page_dirty(int page);
 	void update_page_layout();
 	void change_rambank();
 	void change_rombank();
 	void postload();
 	int rom_read_b(int offset, int blksize, int blksize2, int zerosec);
-	
+
 	template<class _BitmapClass>
 	int update_linemap(_BitmapClass &bitmap, int page, int flags);
-	
+
 	template<class _BitmapClass>
 	void tilemap_draw_common(_BitmapClass &bitmap, const rectangle &cliprect, int layer, UINT32 flags, UINT32 priority);
 
@@ -226,7 +226,7 @@ public:
 
 	void K056832_set_k055555(k055555_device* mode); // k055555 hook
 
-	
+
 	void m_tilemap_draw(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int num, UINT32 flags, UINT32 priority);
 private:
 	int altK056832_update_linemap(running_machine &machine, bitmap_rgb32 &bitmap, int page, int flags);

@@ -54,12 +54,12 @@ struct k053247_interface
 };
 
 class k053247_device : public device_t,
-					   public k053247_interface
+						public k053247_interface
 {
 public:
 	k053247_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	k053247_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	
+
 	~k053247_device() { }
 
 	void clear_all();
@@ -95,7 +95,7 @@ public:
 	void k053246_set_objcha_line( int state);
 	int k053246_is_irq_enabled(void);
 	int k053246_read_register( int regnum);
-	
+
 	DECLARE_READ16_MEMBER( k053246_reg_word_r );    // OBJSET1
 	DECLARE_READ16_MEMBER( k053247_reg_word_r );    // OBJSET2
 	DECLARE_READ32_MEMBER( k053247_reg_long_r );    // OBJSET2
@@ -134,7 +134,7 @@ public:
 	template<class _BitmapClass>
 	inline void k053247_draw_single_sprite_gxcore(_BitmapClass &bitmap , rectangle const &cliprect,
 		unsigned char*gx_objzbuf, unsigned char*gx_shdzbuf, int code, unsigned short*gx_spriteram, int offs,
-		int color, int alpha, int drawmode, int zcode, int pri, 
+		int color, int alpha, int drawmode, int zcode, int pri,
 		int primask, int shadow, unsigned char*drawmode_table, unsigned char*shadowmode_table, int shdmask)
 	{
 		int xa,ya,ox,oy,flipx,flipy,mirrorx,mirrory,zoomx,zoomy,scalex,scaley,nozoom;
@@ -245,10 +245,9 @@ public:
 
 		if (gx_objzbuf && gx_shdzbuf) /* GX  */
 		{
-		
 			k053247_draw_yxloop_gx( bitmap, cliprect,
 				code,
-				color, 
+				color,
 				height, width,
 				zoomx, zoomy, flipx, flipy,
 				ox, oy,
@@ -260,7 +259,7 @@ public:
 				gx_objzbuf, gx_shdzbuf,
 				0,0
 				);
-			
+
 		}
 		else /* non-GX */
 		{
@@ -288,10 +287,10 @@ public:
 			color &= 0xffff; // strip attribute flags
 
 			drawmode_table[m_gfx->granularity() - 1] = shadow ? DRAWMODE_SHADOW : DRAWMODE_SOURCE;
-		
+
 			k053247_draw_yxloop_gx( bitmap, cliprect,
 				code,
-				color, 
+				color,
 				height, width,
 				zoomx, zoomy, flipx, flipy,
 				ox, oy,
@@ -302,9 +301,9 @@ public:
 				0, 0, 0,
 				0, 0,
 				primask,whichtable
-				);	
+				);
 
-			
+
 		}
 	}
 
@@ -322,7 +321,7 @@ public:
 		int nozoom,
 		/* gx specifics */
 		int pri,
-		int zcode, int alpha, int drawmode, 
+		int zcode, int alpha, int drawmode,
 		UINT8* gx_objzbuf, UINT8* gx_shdzbuf,
 		/* non-gx specifics */
 		int primask,
@@ -393,7 +392,7 @@ public:
 					if (nozoom) { zw = zh = 0x10; }
 
 					zdrawgfxzoom32GP(
-							bitmap, cliprect, 
+							bitmap, cliprect,
 							tempcode,
 							color,
 							fx,fy,
@@ -484,9 +483,9 @@ public:
 
 protected:
 	// device-level overrides
-//	virtual void device_config_complete();
+//  virtual void device_config_complete();
 	virtual void device_start();
-//	virtual void device_reset();
+//  virtual void device_reset();
 private:
 
 };
@@ -497,14 +496,13 @@ extern const device_type K055673;
 #define MCFG_K053246_ADD(_tag, _interface) \
 	MCFG_DEVICE_ADD(_tag, K053246, 0) \
 	MCFG_DEVICE_CONFIG(_interface)
-	
+
 #define MCFG_K055673_ADD(_tag, _interface) \
 	MCFG_DEVICE_ADD(_tag, K055673, 0) \
 	MCFG_DEVICE_CONFIG(_interface)
 
 #define MCFG_K055673_ADD_NOINTF(_tag ) \
-	MCFG_DEVICE_ADD(_tag, K055673, 0) \
-
+	MCFG_DEVICE_ADD(_tag, K055673, 0)
 
 
 

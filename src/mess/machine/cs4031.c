@@ -16,13 +16,13 @@
         - 8254 timer
         - MC14818 RTC
 
-	TODO:
-		- The chipset has the ability to intercept the GATEA20 and
-		  RESET commands sent to the 8042 keyboard controller,
-		  this is not emulated yet
-		- No emulation of memory parity checks
-		- Move IPC core to its own file so it can be shared with
-		  other chipsets
+    TODO:
+        - The chipset has the ability to intercept the GATEA20 and
+          RESET commands sent to the 8042 keyboard controller,
+          this is not emulated yet
+        - No emulation of memory parity checks
+        - Move IPC core to its own file so it can be shared with
+          other chipsets
 
 ***************************************************************************/
 
@@ -459,9 +459,9 @@ void cs4031_device::update_dma_clock()
 //**************************************************************************
 
 /*
-	Check NMI sources and generate NMI if needed
+    Check NMI sources and generate NMI if needed
 
-	Not emulated here: Parity check NMI
+    Not emulated here: Parity check NMI
  */
 void cs4031_device::nmi()
 {
@@ -774,10 +774,10 @@ WRITE_LINE_MEMBER( cs4031_device::kbrst_w )
 }
 
 /*
-	Fast CPU reset and Gate A20
+    Fast CPU reset and Gate A20
 
-	0 - Fast CPU reset
-	1 - Fast Gate A20
+    0 - Fast CPU reset
+    1 - Fast Gate A20
 
  */
 WRITE8_MEMBER( cs4031_device::sysctrl_w )
@@ -804,16 +804,16 @@ WRITE8_MEMBER( cs4031_device::sysctrl_w )
 //**************************************************************************
 
 /*
-	"Port B" - AT-compatible port with miscellaneous information
+    "Port B" - AT-compatible port with miscellaneous information
 
-	0 - Timer 2 gate (rw)
-	1 - Speaker data (rw)
-	2 - Enable parity check (rw) [not emulated]
-	3 - Enable IOCHECK (rw)
-	4 - Refresh detect (r)
-	5 - Timer 2 output (r)
-	6 - Channel check latch (r)
-	7 - Parity check latch (r) [not emulated]
+    0 - Timer 2 gate (rw)
+    1 - Speaker data (rw)
+    2 - Enable parity check (rw) [not emulated]
+    3 - Enable IOCHECK (rw)
+    4 - Refresh detect (r)
+    5 - Timer 2 output (r)
+    6 - Channel check latch (r)
+    7 - Parity check latch (r) [not emulated]
 */
 
 READ8_MEMBER( cs4031_device::portb_r )
@@ -845,10 +845,10 @@ WRITE8_MEMBER( cs4031_device::portb_w )
 }
 
 /*
-	NMI mask and RTC address
+    NMI mask and RTC address
 
-	7   - NMI mask
-	6:0 - RTC address
+    7   - NMI mask
+    6:0 - RTC address
  */
 WRITE8_MEMBER( cs4031_device::rtc_w )
 {

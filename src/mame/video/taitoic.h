@@ -104,17 +104,17 @@ class pc080sn_device : public device_t,
 public:
 	pc080sn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~pc080sn_device() {}
-	
+
 	DECLARE_READ16_MEMBER( word_r );
 	DECLARE_WRITE16_MEMBER( word_w );
 	DECLARE_WRITE16_MEMBER( xscroll_word_w );
 	DECLARE_WRITE16_MEMBER( yscroll_word_w );
 	DECLARE_WRITE16_MEMBER( ctrl_word_w );
 	DECLARE_WRITE16_MEMBER( scrollram_w );
-	
+
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	
+
 	void common_get_pc080sn_bg_tile_info( tile_data &tileinfo, int tile_index, UINT16 *ram, int gfxnum );
 	void common_get_pc080sn_fg_tile_info( tile_data &tileinfo, int tile_index, UINT16 *ram, int gfxnum );
 
@@ -127,26 +127,26 @@ public:
 
 	/* For Topspeed */
 	void tilemap_draw_special(bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority, UINT16 *ram);
-	
+
 	void restore_scroll();
 
 	protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
-	
+
 	private:
 	// internal state
 	UINT16         m_ctrl[8];
 
-	UINT16 		   *m_ram;
-	UINT16 		   *m_bg_ram[2];
-	UINT16		   *m_bgscroll_ram[2];
+	UINT16         *m_ram;
+	UINT16         *m_bg_ram[2];
+	UINT16         *m_bgscroll_ram[2];
 
 	int            m_bgscrollx[2], m_bgscrolly[2];
-		
+
 	tilemap_t      *m_tilemap[2];
-			
+
 };
 
 extern const device_type PC080SN;
@@ -164,7 +164,7 @@ public:
 	void set_sprite_ctrl(UINT16 sprctrl);
 	void eof_callback();
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri_type);
-	
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -174,11 +174,11 @@ protected:
 private:
 	/* NB: pc090oj_ctrl is the internal register controlling flipping
 
-   pc090oj_sprite_ctrl is a representation of the hardware OUTSIDE the pc090oj
-   which impacts on sprite plotting, and which varies between games. It
-   includes color banking and (optionally) priority. It allows each game to
-   control these aspects of the sprites in different ways, while keeping the
-   routines here modular.
+	pc090oj_sprite_ctrl is a representation of the hardware OUTSIDE the pc090oj
+	which impacts on sprite plotting, and which varies between games. It
+	includes color banking and (optionally) priority. It allows each game to
+	control these aspects of the sprites in different ways, while keeping the
+	routines here modular.
 
 */
 
@@ -244,7 +244,7 @@ public:
 	tilemap_t        *m_tilemap[3];
 
 	INT32          m_flipscreen;
-	
+
 	TILE_GET_INFO_MEMBER(get_bg0_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
@@ -260,7 +260,7 @@ class tc0100scn_device : public device_t,
 public:
 	tc0100scn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~tc0100scn_device() {}
-	
+
 	#define TC0100SCN_SINGLE_VDU    1024
 
 	/* Function to set separate color banks for the three tilemapped layers.
@@ -294,7 +294,7 @@ public:
 	/* returns 0 or 1 depending on the lowest priority tilemap set in the internal
 	register. Use this function to draw tilemaps in the correct order. */
 	int bottomlayer();
-	
+
 	void postload();
 
 protected:
@@ -332,11 +332,11 @@ private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
-	
+
 	void common_get_bg0_tile_info(tile_data &tileinfo, int tile_index, UINT16 *ram, int gfxnum, int colbank, int dblwidth);
 	void common_get_bg1_tile_info(tile_data &tileinfo, int tile_index, UINT16 *ram, int gfxnum, int colbank, int dblwidth);
 	void common_get_tx_tile_info(tile_data &tileinfo, int tile_index, UINT16 *ram, int gfxnum, int colbank, int dblwidth);
-	
+
 	void tilemap_draw_fg(bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t* tmap, int flags, UINT32 priority);
 	void set_layer_ptrs();
 	void dirty_tilemaps();
@@ -351,7 +351,7 @@ class tc0280grd_device : public device_t,
 public:
 	tc0280grd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~tc0280grd_device() {}
-	
+
 	DECLARE_READ16_MEMBER( tc0280grd_word_r );
 	DECLARE_WRITE16_MEMBER( tc0280grd_word_w );
 	DECLARE_WRITE16_MEMBER( tc0280grd_ctrl_word_w );
@@ -369,7 +369,7 @@ protected:
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 private:
 	// internal state
 	UINT16 *       m_ram;
@@ -395,7 +395,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ8_MEMBER( read );
-	
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -441,15 +441,15 @@ public:
 
 	/* Undrfire needs to read this for a sprite/tile priority hack */
 	DECLARE_READ8_MEMBER( pri_reg_r );
-	
+
 	void postload();
-	
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 private:
 	// internal state
 	UINT16           m_ctrl[0x18];
@@ -472,13 +472,13 @@ private:
 
 	void common_get_tc0480bg_tile_info( tile_data &tileinfo, int tile_index, UINT16 *ram, int gfxnum );
 	void common_get_tc0480tx_tile_info( tile_data &tileinfo, int tile_index, UINT16 *ram, int gfxnum );
-	
+
 	TILE_GET_INFO_MEMBER(get_bg0_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg3_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
-	
+
 	void dirty_tilemaps();
 	void set_layer_ptrs();
 	void bg01_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority );
@@ -488,7 +488,7 @@ private:
 extern const device_type TC0480SCP;
 
 class tc0150rod_device : public device_t,
-										 public tc0150rod_interface
+											public tc0150rod_interface
 {
 public:
 	tc0150rod_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -497,12 +497,12 @@ public:
 	DECLARE_READ16_MEMBER( word_r );
 	DECLARE_WRITE16_MEMBER( word_w );
 	void draw(bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs, int palette_offs, int type, int road_trans, UINT32 low_priority, UINT32 high_priority);
-	
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
-	
+
 private:
 	// internal state
 	UINT16 *        m_ram;
@@ -511,7 +511,7 @@ private:
 extern const device_type TC0150ROD;
 
 class tc0110pcr_device : public device_t,
-										  public tc0110pcr_interface
+											public tc0110pcr_interface
 {
 public:
 	tc0110pcr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -524,13 +524,13 @@ public:
 	DECLARE_WRITE16_MEMBER( step1_4bpg_word_w );  /* only 4 bits per color gun */
 
 	void restore_colors();
-	
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 private:
 	UINT16 *     m_ram;
 	int          m_type;
@@ -545,7 +545,7 @@ class tc0180vcu_device : public device_t,
 public:
 	tc0180vcu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~tc0180vcu_device() {}
-	
+
 	DECLARE_READ8_MEMBER( get_fb_page );
 	DECLARE_WRITE8_MEMBER( set_fb_page );
 	DECLARE_READ8_MEMBER( get_videoctrl );
@@ -579,7 +579,7 @@ protected:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
-	
+
 	void video_control( UINT8 data );
 };
 

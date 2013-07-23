@@ -9,19 +9,19 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- cpu LC timing
-	- 3270PC keys
+    - cpu LC timing
+    - 3270PC keys
 
 */
 
 /*
 
-	Part No		Layout
-	-------------------
-	6450225 	UK 84-key
-	6110344 	UK 122-key
+    Part No     Layout
+    -------------------
+    6450225     UK 84-key
+    6110344     UK 122-key
 
 */
 
@@ -53,7 +53,7 @@ ROM_START( ibm_pc_at_84_keyboard )
 	ROM_REGION( 0x400, I8048_TAG, 0 )
 	/*
 	Keyboard Part No 6450225
-	
+
 	PH 1503099
 	D 878154
 	8441 D H
@@ -80,7 +80,7 @@ ROM_START( ibm_3270pc_122_keyboard )
 	ROM_REGION( 0x400, I8048_TAG, 0 )
 	/*
 	Keyboard Part No 6110344
-	
+
 	PH 1385001
 	D
 	8512 D H
@@ -160,7 +160,7 @@ INPUT_PORTS_START( ibm_pc_at_84_keyboard )
 
 	PORT_START("DR02")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LALT) PORT_CHAR(UCHAR_MAMEKEY(LALT))
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1) 
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_CHAR('q') PORT_CHAR('Q')
@@ -239,7 +239,7 @@ INPUT_PORTS_START( ibm_pc_at_84_keyboard )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DR10")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) 
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR('\'') PORT_CHAR('"')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('[') PORT_CHAR('{')
@@ -356,59 +356,59 @@ ioport_constructor ibm_3270pc_122_keyboard_device::device_input_ports() const
 
 ibm_pc_at_84_keyboard_device::ibm_pc_at_84_keyboard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-	  device_pc_kbd_interface(mconfig, *this),
-	  m_maincpu(*this, I8048_TAG),
-	  m_dr00(*this, "DR00"),
-	  m_dr01(*this, "DR01"),
-	  m_dr02(*this, "DR02"),
-	  m_dr03(*this, "DR03"),
-	  m_dr04(*this, "DR04"),
-	  m_dr05(*this, "DR05"),
-	  m_dr06(*this, "DR06"),
-	  m_dr07(*this, "DR07"),
-	  m_dr08(*this, "DR08"),
-	  m_dr09(*this, "DR09"),
-	  m_dr10(*this, "DR10"),
-	  m_dr11(*this, "DR11"),
-	  m_dr12(*this, "DR12"),
-	  m_dr13(*this, "DR13"),
-	  m_dr14(*this, "DR14"),
-	  m_dr15(*this, "DR15"),
-	  m_kbdida(*this, "KBDIDA"),
-	  m_kbdidb(*this, "KBDIDB"),
-	  m_db(0),
-	  m_cnt(0),
-	  m_sense(0),
-	  m_t1(1)
+		device_pc_kbd_interface(mconfig, *this),
+		m_maincpu(*this, I8048_TAG),
+		m_dr00(*this, "DR00"),
+		m_dr01(*this, "DR01"),
+		m_dr02(*this, "DR02"),
+		m_dr03(*this, "DR03"),
+		m_dr04(*this, "DR04"),
+		m_dr05(*this, "DR05"),
+		m_dr06(*this, "DR06"),
+		m_dr07(*this, "DR07"),
+		m_dr08(*this, "DR08"),
+		m_dr09(*this, "DR09"),
+		m_dr10(*this, "DR10"),
+		m_dr11(*this, "DR11"),
+		m_dr12(*this, "DR12"),
+		m_dr13(*this, "DR13"),
+		m_dr14(*this, "DR14"),
+		m_dr15(*this, "DR15"),
+		m_kbdida(*this, "KBDIDA"),
+		m_kbdidb(*this, "KBDIDB"),
+		m_db(0),
+		m_cnt(0),
+		m_sense(0),
+		m_t1(1)
 {
 }
 
 ibm_pc_at_84_keyboard_device::ibm_pc_at_84_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, PC_KBD_IBM_PC_AT_84, "IBM PC/AT Keyboard", tag, owner, clock, "kb_pcat84", __FILE__),
-	  device_pc_kbd_interface(mconfig, *this),
-	  m_maincpu(*this, I8048_TAG),
-	  m_dr00(*this, "DR00"),
-	  m_dr01(*this, "DR01"),
-	  m_dr02(*this, "DR02"),
-	  m_dr03(*this, "DR03"),
-	  m_dr04(*this, "DR04"),
-	  m_dr05(*this, "DR05"),
-	  m_dr06(*this, "DR06"),
-	  m_dr07(*this, "DR07"),
-	  m_dr08(*this, "DR08"),
-	  m_dr09(*this, "DR09"),
-	  m_dr10(*this, "DR10"),
-	  m_dr11(*this, "DR11"),
-	  m_dr12(*this, "DR12"),
-	  m_dr13(*this, "DR13"),
-	  m_dr14(*this, "DR14"),
-	  m_dr15(*this, "DR15"),
-	  m_kbdida(*this, "KBDIDA"),
-	  m_kbdidb(*this, "KBDIDB"),
-	  m_db(0),
-	  m_cnt(0),
-	  m_sense(0),
-	  m_t1(1)
+		device_pc_kbd_interface(mconfig, *this),
+		m_maincpu(*this, I8048_TAG),
+		m_dr00(*this, "DR00"),
+		m_dr01(*this, "DR01"),
+		m_dr02(*this, "DR02"),
+		m_dr03(*this, "DR03"),
+		m_dr04(*this, "DR04"),
+		m_dr05(*this, "DR05"),
+		m_dr06(*this, "DR06"),
+		m_dr07(*this, "DR07"),
+		m_dr08(*this, "DR08"),
+		m_dr09(*this, "DR09"),
+		m_dr10(*this, "DR10"),
+		m_dr11(*this, "DR11"),
+		m_dr12(*this, "DR12"),
+		m_dr13(*this, "DR13"),
+		m_dr14(*this, "DR14"),
+		m_dr15(*this, "DR15"),
+		m_kbdida(*this, "KBDIDA"),
+		m_kbdidb(*this, "KBDIDB"),
+		m_db(0),
+		m_cnt(0),
+		m_sense(0),
+		m_t1(1)
 {
 }
 
@@ -449,9 +449,9 @@ void ibm_pc_at_84_keyboard_device::device_reset()
 WRITE8_MEMBER( ibm_pc_at_84_keyboard_device::bus_w )
 {
 	/*
-	
+
 	    bit     description
-	
+
 	    0       SENSE 0
 	    1       SENSE 1
 	    2       SENSE 2
@@ -460,7 +460,7 @@ WRITE8_MEMBER( ibm_pc_at_84_keyboard_device::bus_w )
 	    5       CNT 2
 	    6       CNT 3
 	    7       CNT G
-	
+
 	*/
 
 	m_db = data;
@@ -479,18 +479,18 @@ WRITE8_MEMBER( ibm_pc_at_84_keyboard_device::bus_w )
 READ8_MEMBER( ibm_pc_at_84_keyboard_device::p1_r )
 {
 	/*
-	
+
 	    bit     description
-	
-	    0       
-	    1       
+
+	    0
+	    1
 	    2       KBDID A1
 	    3       KBDID A2
 	    4       KBDID A3
 	    5       KBDID A4
 	    6       KBDID A5
 	    7       KBDID A6
-	
+
 	*/
 
 	UINT8 data = 0;
@@ -508,18 +508,18 @@ READ8_MEMBER( ibm_pc_at_84_keyboard_device::p1_r )
 WRITE8_MEMBER( ibm_pc_at_84_keyboard_device::p1_w )
 {
 	/*
-	
+
 	    bit     description
-	
+
 	    0       SENSE G
 	    1       T1
-	    2       
-	    3       
-	    4       
-	    5       
-	    6       
-	    7       
-	
+	    2
+	    3
+	    4
+	    5
+	    6
+	    7
+
 	*/
 
 	if (!BIT(data, 0))
@@ -538,18 +538,18 @@ WRITE8_MEMBER( ibm_pc_at_84_keyboard_device::p1_w )
 READ8_MEMBER( ibm_pc_at_84_keyboard_device::p2_r )
 {
 	/*
-	
+
 	    bit     description
-	
+
 	    0       KBDID B1
 	    1       KBDID B2
 	    2       KBDID B3
 	    3       KBDID B4
 	    4       KBDID B5
 	    5       KBDID B6
-	    6       
-	    7       
-	
+	    6
+	    7
+
 	*/
 
 	UINT8 data = 0xc0;
@@ -567,18 +567,18 @@ READ8_MEMBER( ibm_pc_at_84_keyboard_device::p2_r )
 WRITE8_MEMBER( ibm_pc_at_84_keyboard_device::p2_w )
 {
 	/*
-	
+
 	    bit     description
-	
+
 	    0       SCROLL LED
 	    1       NUM LED
 	    2       CAPS LED
-	    3       
-	    4       
-	    5       
+	    3
+	    4
+	    5
 	    6       CLOCK
 	    7       DATA
-	
+
 	*/
 
 	output_set_led_value(LED_SCROLL, BIT(data, 0));
@@ -638,5 +638,5 @@ int ibm_pc_at_84_keyboard_device::key_depressed()
 	case 15: data = m_dr15->read(); break;
 	}
 
-	return m_t1 && BIT(data, m_sense);	
+	return m_t1 && BIT(data, m_sense);
 }

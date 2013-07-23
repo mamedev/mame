@@ -50,7 +50,7 @@
 struct esqpanel_interface
 {
 	devcb_write_line    m_out_tx_cb;
-	devcb_write16		m_analog_value_cb;
+	devcb_write16       m_analog_value_cb;
 };
 
 // ======================> esqpanel_device

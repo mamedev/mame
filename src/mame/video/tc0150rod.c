@@ -33,7 +33,7 @@ void tc0150rod_device::device_config_complete()
 	const tc0150rod_interface *intf = reinterpret_cast<const tc0150rod_interface *>(static_config());
 	if (intf != NULL)
 	*static_cast<tc0150rod_interface *>(this) = *intf;
-	
+
 	// or initialize to defaults if none provided
 	else
 	{

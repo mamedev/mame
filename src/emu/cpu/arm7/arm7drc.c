@@ -358,8 +358,8 @@ void arm7_cpu_device::code_compile_block(UINT8 mode, offs_t pc)
 	/* get a description of this sequence */
 	// TODO FIXME
 	const opcode_desc *desclist = NULL; //m_impstate.drcfe->describe_code(pc); // TODO
-//	if (LOG_UML || LOG_NATIVE)
-//		log_opcode_desc(drcuml, desclist, 0);
+//  if (LOG_UML || LOG_NATIVE)
+//      log_opcode_desc(drcuml, desclist, 0);
 
 	/* if we get an error back, flush the cache and try again */
 	bool succeeded = false;
@@ -1281,8 +1281,8 @@ void arm7_cpu_device::generate_sequence_instruction(drcuml_block *block, compile
 
 	/* add an entry for the log */
 	// TODO FIXME
-//	if (LOG_UML && !(desc->flags & OPFLAG_VIRTUAL_NOOP))
-//		log_add_disasm_comment(block, desc->pc, desc->opptr.l[0]);
+//  if (LOG_UML && !(desc->flags & OPFLAG_VIRTUAL_NOOP))
+//      log_add_disasm_comment(block, desc->pc, desc->opptr.l[0]);
 
 	/* set the PC map variable */
 	//expc = (desc->flags & OPFLAG_IN_DELAY_SLOT) ? desc->pc - 3 : desc->pc;

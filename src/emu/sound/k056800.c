@@ -106,12 +106,12 @@ void k056800_device::sound_reg_w( int reg, UINT8 data )
 void k056800_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
- 	{
+	{
 		case TIMER_TICK_SOUND_CPU:
 			if (m_sound_cpu_irq1_enable)
 				m_irq_cb_func(machine(), 0);
 			break;
-			
+
 			default:
 			assert_always(FALSE, "Unknown id in k056800_device::device_timer");
 	}

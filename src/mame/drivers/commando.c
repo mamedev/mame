@@ -471,7 +471,7 @@ ROM_START( commandob2 )
 		/* There's a 16L8 PAL (with a 74LS245 and a 74LS08) on a tiny sub-board between the CPU1 ROMs
 		   and the CPU1 (a Z80 compatible NEC D780C-1). This sub-board is plugged on what seems to be
 		   a ROM socket.
-		   
+
 		PAL16L8 (SWELT-019A)
 
 		Pin 1  - Pin 12 of 27256 (D1) and Pin 3 of 74LS245 (A2) (Input)

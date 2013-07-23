@@ -67,7 +67,7 @@ private:
 	int      m_irq_enabled, m_nmi_enabled;
 
 	int      m_k051937_counter;
-	
+
 	int k051960_fetchromdata( int byte );
 };
 

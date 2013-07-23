@@ -49,7 +49,7 @@ public:
 	~msm5232_device() {}
 
 	DECLARE_WRITE8_MEMBER( write );
-	void set_clock(int clock);	
+	void set_clock(int clock);
 
 protected:
 	// device-level overrides
@@ -93,7 +93,7 @@ protected:
 
 	double  m_external_capacity[8]; /* in Farads, eg 0.39e-6 = 0.36 uF (microFarads) */
 	devcb_resolved_write_line m_gate_handler_func;/* callback called when the GATE output pin changes state */
-	
+
 	void init_tables();
 	void init_voice(int i);
 	void gate_update();

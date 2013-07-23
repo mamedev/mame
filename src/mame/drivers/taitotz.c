@@ -397,46 +397,46 @@ Notes:
 
     Word 0:
                     ---x---- -------- -------- --------     1: this is the last polygon of the model
-					------x- -------- -------- --------		?
+                    ------x- -------- -------- --------     ?
                     -------x -------- -------- --------     0: triangle, 1: quad
                     -------- -------- -----xxx xxxxxxxx     Texture number (* 0x4000 to address the texture)
 
     Word 1:
-                    x------- -------- -------- --------		?
-					----xx-- -------- -------- --------		?
-					-------- xxxxxxxx -------- --------		Polygon Normal X (signed 1.7 fixed point)
-					-------- -------- xxxxxxxx --------		Polygon Normal Y (signed 1.7 fixed point)
-					-------- -------- -------- xxxxxxxx		Polygon Normal Z (signed 1.7 fixed point)
+                    x------- -------- -------- --------     ?
+                    ----xx-- -------- -------- --------     ?
+                    -------- xxxxxxxx -------- --------     Polygon Normal X (signed 1.7 fixed point)
+                    -------- -------- xxxxxxxx --------     Polygon Normal Y (signed 1.7 fixed point)
+                    -------- -------- -------- xxxxxxxx     Polygon Normal Z (signed 1.7 fixed point)
 
     Word 2:
-                    x------- -------- -------- --------		?
-					----x--- -------- -------- --------		?
-					-----x-- -------- -------- --------		?
-					------x- -------- -------- --------		Enable environment mapping?
-					-------x -------- -------- --------		?
-					-------- xxxxxxxx -------- --------		Tangent X (signed 1.7 fixed point)
-					-------- -------- xxxxxxxx --------		Tangent Y (signed 1.7 fixed point)
-					-------- -------- -------- xxxxxxxx		Tangent Z (signed 1.7 fixed point)
+                    x------- -------- -------- --------     ?
+                    ----x--- -------- -------- --------     ?
+                    -----x-- -------- -------- --------     ?
+                    ------x- -------- -------- --------     Enable environment mapping?
+                    -------x -------- -------- --------     ?
+                    -------- xxxxxxxx -------- --------     Tangent X (signed 1.7 fixed point)
+                    -------- -------- xxxxxxxx --------     Tangent Y (signed 1.7 fixed point)
+                    -------- -------- -------- xxxxxxxx     Tangent Z (signed 1.7 fixed point)
 
     Word 3:
-                    x------- -------- -------- --------		?
-					----xx-- -------- -------- --------		Tex mode? (more than 2 bits?)
-															00: Tex 0: color, Tex 1: color with pre-lighting (used by BG2 attract mode trackpieces)
-															01: Tex 0: alpha mask?, Tex 1: inverse alpha? (used by car shadow)
-															10: Tex 0: alpha mask, Tex 1: color (additive alpha, used by headlights, etc.)
-															11: Tex 0: color, Tex 1: environment map? (used by cars)
-					-------x -------- -------- --------		?
-					-------- xxxxxxxx -------- --------		Bi-normal X (signed 1.7 fixed point)
-					-------- -------- xxxxxxxx --------		Bi-normal Y (signed 1.7 fixed point)
-					-------- -------- -------- xxxxxxxx		Bi-normal Z (signed 1.7 fixed point)
+                    x------- -------- -------- --------     ?
+                    ----xx-- -------- -------- --------     Tex mode? (more than 2 bits?)
+                                                            00: Tex 0: color, Tex 1: color with pre-lighting (used by BG2 attract mode trackpieces)
+                                                            01: Tex 0: alpha mask?, Tex 1: inverse alpha? (used by car shadow)
+                                                            10: Tex 0: alpha mask, Tex 1: color (additive alpha, used by headlights, etc.)
+                                                            11: Tex 0: color, Tex 1: environment map? (used by cars)
+                    -------x -------- -------- --------     ?
+                    -------- xxxxxxxx -------- --------     Bi-normal X (signed 1.7 fixed point)
+                    -------- -------- xxxxxxxx --------     Bi-normal Y (signed 1.7 fixed point)
+                    -------- -------- -------- xxxxxxxx     Bi-normal Z (signed 1.7 fixed point)
 
-					e1000096 0c43cca2 02000000 0c000000		Car model (with env map?)
-					e100009a 007f0000 000083ea 0c001784		Part with bump-mapping
-					f1000068 0c007f00 0c7f0000 0500007f		Car shadow
-					e100006a 0c00007f 0c000000 08000000		Light
-					e1000127 0c00007f 0c000000 08000000		Fireworks (alpha mask?)
-					e1000185 0cee7d03 0c000000 00000000		Trackpiece
-					f1000068 0c007f00 0c7e0000 0400007f		Car shadow (BG2 0x1f160)
+                    e1000096 0c43cca2 02000000 0c000000     Car model (with env map?)
+                    e100009a 007f0000 000083ea 0c001784     Part with bump-mapping
+                    f1000068 0c007f00 0c7f0000 0500007f     Car shadow
+                    e100006a 0c00007f 0c000000 08000000     Light
+                    e1000127 0c00007f 0c000000 08000000     Fireworks (alpha mask?)
+                    e1000185 0cee7d03 0c000000 00000000     Trackpiece
+                    f1000068 0c007f00 0c7e0000 0400007f     Car shadow (BG2 0x1f160)
 
 
 
@@ -454,22 +454,22 @@ Notes:
                     -------- -------- -------- xxxxxxxx     Texture V coordinate (0..63 with max 4x repeat)
                     -------- -------- xxxxxxxx --------     Texture U coordinate (0..63 with max 4x repeat)
                     -------- xxxxxxxx -------- --------     Usually 0x40. HUD elements set 0xff. Self-illumination?
-					xxxxxxxx -------- -------- --------		? (seen 0x00, 0x83, 0x40)
+                    xxxxxxxx -------- -------- --------     ? (seen 0x00, 0x83, 0x40)
 
     Word 1:
                     -------- -------- xxxxxxxx xxxxxxxx     Vertex X coordinate (signed 8.8 fixed point)
                     -------- xxxxxxxx -------- --------     Normal X (signed 1.7 fixed point)
-					xxxxxxxx -------- -------- --------		? (seen 0x00, 0x83, 0x40)
+                    xxxxxxxx -------- -------- --------     ? (seen 0x00, 0x83, 0x40)
 
     Word 2:
                     -------- -------- xxxxxxxx xxxxxxxx     Vertex Y coordinate (signed 8.8 fixed point)
                     -------- xxxxxxxx -------- --------     Normal Y (signed 1.7 fixed point)
-					xxxxxxxx -------- -------- --------		? (seen 0x00, 0x83, 0x40)
+                    xxxxxxxx -------- -------- --------     ? (seen 0x00, 0x83, 0x40)
 
     Word 3:
                     -------- -------- xxxxxxxx xxxxxxxx     Vertex Z coordinate (signed 8.8 fixed point)
                     -------- xxxxxxxx -------- --------     Normal Z (signed 1.7 fixed point)
-					xxxxxxxx -------- -------- --------		? (seen 0x00, 0x83, 0x40)
+                    xxxxxxxx -------- -------- --------     ? (seen 0x00, 0x83, 0x40)
 
     3D registers
     ------------
@@ -487,19 +487,19 @@ Notes:
 
     0x00000104:
 
-    0x10000100:		-------x xxxxxxxx -------- --------		\ Screen space light vector? (changes during camera movement)
-					-------- -------- -------x xxxxxxxx		/ (int)(N * 127.0f)
+    0x10000100:     -------x xxxxxxxx -------- --------     \ Screen space light vector? (changes during camera movement)
+                    -------- -------- -------x xxxxxxxx     / (int)(N * 127.0f)
 
-    0x10000101:		-------- -------x -------- --------		?
-					-------- -------- -------- -xxxxxxx		? (int)(N * 127.0f)
+    0x10000101:     -------- -------x -------- --------     ?
+                    -------- -------- -------- -xxxxxxx     ? (int)(N * 127.0f)
 
     0x10000102:     xxxxxxxx xxxxxxxx -------- --------     Diffuse light color (ARGB1555)
                     -------- -------- xxxxxxxx xxxxxxxx     Ambient light color (ARGB1555)
 
-    0x10000103:		x------- -------- -------- --------		?
-					-xxxxxxx xxxxxxxx -------- --------		?
-					-------- -------- ---xxxxx --------		\ ? converted from floats to int 0..31
-					-------- -------- -------- ---xxxxx		/
+    0x10000103:     x------- -------- -------- --------     ?
+                    -xxxxxxx xxxxxxxx -------- --------     ?
+                    -------- -------- ---xxxxx --------     \ ? converted from floats to int 0..31
+                    -------- -------- -------- ---xxxxx     /
 
     0x10000104:
 
@@ -510,7 +510,7 @@ Notes:
 #define LOG_TLCS_TO_PPC_COMMANDS        1
 
 #define LOG_DISPLAY_LIST                0
-#define ENABLE_LIGHTING					1
+#define ENABLE_LIGHTING                 1
 
 #define PPC_TLCS_COMM_TRIGGER           12345
 #define TLCS_PPC_COMM_TRIGGER           12346
@@ -1281,7 +1281,7 @@ void taitotz_renderer::draw_object(running_machine &machine, UINT32 address, flo
 		extra.light[0] = light_x;
 		extra.light[1] = light_y;
 		extra.light[2] = -light_z;
-	
+
 		for (int i=2; i < num_verts; i++)
 		{
 			render_triangle(visarea, render_delegate(FUNC(taitotz_renderer::draw_scanline), this), 6, v[0], v[i-1], v[i]);
@@ -1555,21 +1555,21 @@ void taitotz_renderer::render_displaylist(running_machine &machine, const rectan
 
 				setup_viewport(xw, xh, vpw-xw, vph-xh, vpw, vph);
 			}
-			
+
 			/*
 			if (address == 0x10000100)
 			{
-				int in1 = (m_reg_10000100 >> 16) & 0x1ff;
-				if (in1 & 0x100) in1 |= 0xfffffe00;
-				int in2 = m_reg_10000100 & 0x1ff;
-				if (in2 & 0x100) in2 |= 0xfffffe00;
-				int in3 = m_reg_10000101 & 0x7f;
+			    int in1 = (m_reg_10000100 >> 16) & 0x1ff;
+			    if (in1 & 0x100) in1 |= 0xfffffe00;
+			    int in2 = m_reg_10000100 & 0x1ff;
+			    if (in2 & 0x100) in2 |= 0xfffffe00;
+			    int in3 = m_reg_10000101 & 0x7f;
 
-				float n1 = (float)(in1) / 127.0f;
-				float n2 = (float)(in2) / 127.0f;
-				float n3 = (float)(in3) / 127.0f;
+			    float n1 = (float)(in1) / 127.0f;
+			    float n2 = (float)(in2) / 127.0f;
+			    float n3 = (float)(in3) / 127.0f;
 
-				printf("UNK: %f, %f, %f\n", n1, n2, n3);
+			    printf("UNK: %f, %f, %f\n", n1, n2, n3);
 			}
 			*/
 		}
@@ -2125,7 +2125,7 @@ WRITE64_MEMBER(taitotz_state::ppc_common_w)
 		/*
 		if (m_io_share_ram[0xfff] == 0x1010)
 		{
-			printf("PPC -> TLCS cmd 1010:   %04X %04X %04X %04X\n", m_io_share_ram[0x1a02/2], m_io_share_ram[0x1a04/2], m_io_share_ram[0x1a06/2], m_io_share_ram[0x1a08/2]);
+		    printf("PPC -> TLCS cmd 1010:   %04X %04X %04X %04X\n", m_io_share_ram[0x1a02/2], m_io_share_ram[0x1a04/2], m_io_share_ram[0x1a06/2], m_io_share_ram[0x1a08/2]);
 		}
 		*/
 
@@ -2748,7 +2748,7 @@ static INPUT_PORTS_START( styphp )
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON2 )                                  // Shift Down
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_BUTTON1 )                                  // Shift Up
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_BUTTON3 )                                  // View
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON4 )									// Side Brake
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON4 )                                  // Side Brake
 	PORT_BIT( 0x000000e0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("INPUTS4")
@@ -2883,7 +2883,7 @@ static const char BATLGR2A_HDD_SERIAL[] =           // "            05411645"
 static const char RAIZPIN_HDD_SERIAL[] =            // "691934013492        "
 	{ 0x36, 0x39, 0x31, 0x39, 0x33, 0x34, 0x30, 0x31, 0x33, 0x34, 0x39, 0x32, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20 };
 
-static const char STYPHP_HDD_SERIAL[] =				// "            05872160"
+static const char STYPHP_HDD_SERIAL[] =             // "            05872160"
 	{ 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x30, 0x35, 0x38, 0x37, 0x32, 0x31, 0x36, 0x30 };
 
 DRIVER_INIT_MEMBER(taitotz_state,landhigh)

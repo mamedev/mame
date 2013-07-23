@@ -12,10 +12,10 @@ public:
 
 	required_shared_ptr<UINT8> m_paletteram;
 	required_shared_ptr<UINT8> m_videoram;
-		
+
 	required_device<cpu_device> m_maincpu;
 	required_device<m72_audio_device> m_audio;
-		
+
 	int m_gfxbank;
 	tilemap_t *m_bg_tilemap;
 	DECLARE_READ8_MEMBER(sichuan2_dsw1_r);

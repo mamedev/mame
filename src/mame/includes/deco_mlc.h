@@ -69,5 +69,3 @@ public:
 	DECLARE_READ16_MEMBER( sh96_protection_region_0_146_r );
 	DECLARE_WRITE16_MEMBER( sh96_protection_region_0_146_w );
 };
-
-

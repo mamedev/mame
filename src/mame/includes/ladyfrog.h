@@ -15,7 +15,7 @@ public:
 		m_scrlram(*this, "scrlram"),
 		m_audiocpu(*this, "audiocpu"),
 		m_maincpu(*this, "maincpu"),
-		m_msm(*this, "msm")	{ }
+		m_msm(*this, "msm") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;

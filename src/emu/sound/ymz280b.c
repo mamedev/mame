@@ -22,7 +22,7 @@
   - Is memory handling 100% correct? At the moment, Konami firebeat.c is the only
     hardware currently emulated that uses external handlers.
     It also happens to be the only one using 16-bit PCM.
-    
+
     Some other drivers (eg. bishi.c, bfm_sc4/5.c) also use ROM readback.
 
 */

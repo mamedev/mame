@@ -10,7 +10,7 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
 		m_mcu(*this, "mcu"),
-		m_cus30(*this, "namco")	{ }
+		m_cus30(*this, "namco") { }
 
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_videoram2;

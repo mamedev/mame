@@ -189,7 +189,7 @@ upd775x_device::upd775x_device(const machine_config &mconfig, device_type type, 
 		m_rom(NULL),
 		m_rombase(NULL),
 		m_romoffset(0),
-		m_rommask(0)  
+		m_rommask(0)
 {
 }
 
@@ -260,7 +260,7 @@ void upd7759_device::device_start()
 	{
 		assert(type() == UPD7759); // other chips do not support slave mode
 		m_timer = timer_alloc(TIMER_SLAVE_UPDATE);
-		m_rommask = 0;	
+		m_rommask = 0;
 	}
 	else
 	{
@@ -331,7 +331,7 @@ void upd7756_device::device_start()
 	m_rom = m_rombase = *region();
 	if (m_rombase == NULL)
 	{
-		m_rommask = 0;	
+		m_rommask = 0;
 	}
 	else
 	{
@@ -707,11 +707,11 @@ void upd775x_device::advance_state()
 void upd7759_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	UINT8 olddrq = m_drq;
-	
+
 	switch (id)
 	{
 		case TIMER_SLAVE_UPDATE:
-				
+
 		/* update the stream */
 		m_channel->update();
 

@@ -511,7 +511,7 @@ WRITE8_MEMBER(apollo_state::apollo_dma_write_word){
 
 READ8_MEMBER(apollo_state::apollo_dma8237_ctape_dack_r ) {
 	UINT8 data = sc499_dack_r(&space.machine());
-    CLOG2(("dma ctape dack read %02x",data));
+	CLOG2(("dma ctape dack read %02x",data));
 
 	// hack for DN3000: select appropriate DMA channel No.
 	dn3000_dma_channel1 = 1; // 1 = ctape, 2 = floppy dma channel
@@ -520,7 +520,7 @@ READ8_MEMBER(apollo_state::apollo_dma8237_ctape_dack_r ) {
 }
 
 WRITE8_MEMBER(apollo_state::apollo_dma8237_ctape_dack_w ) {
-    CLOG2(("dma ctape dack write %02x", data));
+	CLOG2(("dma ctape dack write %02x", data));
 	sc499_dack_w(&space.machine(), data);
 
 	// hack for DN3000: select appropriate DMA channel No.

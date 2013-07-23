@@ -47,9 +47,9 @@
   scrambled or reversed.
 
   Game                                     Chip                                    Address Scramble       Extra Read Address Xor?
-  
+
   --- 146 compatible games ---
-  
+
   Edward Randy                             60                                      None                   No
   Mutant Fighter                           66                                      None                   No
   Captain America                          75                                      None                   No
@@ -57,7 +57,7 @@
   Robocop 2                                75                                      None                   Yes
   Super Shanghai Dragon's Eye              146                                     None                   No
   Funky Jet                                146                                     Interleave             No
-  Sotsugyo Shousho                         (same board / config as Funky Jet)      
+  Sotsugyo Shousho                         (same board / config as Funky Jet)
   Nitro Ball                               146                                     Reversed               Yes
   Fighters History                         146? (surface scratched)                Interleave             Yes
   Stadium Hero 96                          146                                     None                   Yes
@@ -93,7 +93,7 @@
 
 
 
-       
+
 #define BLK (0xff)
 #define INPUT_PORT_A (-1)
 #define INPUT_PORT_B (-2)
@@ -104,12 +104,11 @@
 
 struct deco146port_xx
 {
-    int write_offset;
-    UINT8 mapping[16];
+	int write_offset;
+	UINT8 mapping[16];
 	int use_xor;
 	int use_nand;
 } port_table[] = {
-     
 #define NIB3__ 0xc, 0xd, 0xe, 0xf
 #define NIB3R1 0xd, 0xe, 0xf, 0xc
 #define NIB3R2 0xe, 0xf, 0xc, 0xd
@@ -935,7 +934,7 @@ struct deco146port_xx
 /* 0x640 */ { 0x022,           {  NIB1R2, NIB2__, NIB3__, BLANK_ },  1, 0 },
 /* 0x642 */ { 0x030,           {  NIB2R1, NIB3__, BLANK_, BLANK_ },  1, 1 },
 /* 0x644 */ { 0x000,           {  NIB1R3, NIB2__, NIB3__, BLANK_ },  1, 1 },
-/* 0x646 */ { INPUT_PORT_A,    {  NIB1__, NIB2__, NIB3__, BLANK_ },  0, 0 },// $4646   $FFF0   CBA-    ..B     0 
+/* 0x646 */ { INPUT_PORT_A,    {  NIB1__, NIB2__, NIB3__, BLANK_ },  0, 0 },// $4646   $FFF0   CBA-    ..B     0
 /* 0x648 */ { 0x00a,           {  NIB1R3, NIB2__, NIB3__, BLANK_ },  0, 0 },
 /* 0x64a */ { 0x074,           {  NIB1R1, NIB2__, NIB3__, NIB0__ },  1, 0 },
 /* 0x64c */ { 0x0ae,           {  NIB1__, NIB2__, BLANK_, NIB3__ },  0, 1 },
@@ -1079,7 +1078,7 @@ struct deco146port_xx
 /* 0x760 */ { 0x0f4,           {  NIB2__, NIB3__, BLANK_, BLANK_ },  0, 0 },
 /* 0x762 */ { 0x082,           {  NIB0__, NIB1__, NIB2__, NIB3__ },  0, 0 },
 /* 0x764 */ { 0x008,           {  NIB2R2, NIB3__, NIB0__, NIB1__ },  0, 1 },
-/* 0x766 */ { INPUT_PORT_A,    {  NIB0__, NIB1__, NIB3__, NIB2__ },  0, 0 }, // $4766   $FFFF   CDBA    ...     0 
+/* 0x766 */ { INPUT_PORT_A,    {  NIB0__, NIB1__, NIB3__, NIB2__ },  0, 0 }, // $4766   $FFFF   CDBA    ...     0
 /* 0x768 */ { 0x0c8,           {  NIB1R2, NIB2__, NIB3__, NIB0__ },  1, 0 },
 /* 0x76a */ { INPUT_PORT_B,    {  NIB0__, BLANK_, BLANK_, BLANK_ },  0, 0 }, //  $476A   $000F   ---A    ...     0    (standard i/o read shanghai)
 /* 0x76c */ { 0x088,           {  NIB3__, NIB2__, NIB0__, NIB1__ },  0, 1 },
@@ -1100,7 +1099,7 @@ struct deco146port_xx
 /* 0x78a */ { 0x05e,           {  NIB1__, NIB2__, NIB3__, BLANK_ },  0, 1 },
 /* 0x78c */ { 0x03a,           {  NIB0__, NIB3__, NIB1__, NIB2__ },  1, 1 },
 /* 0x78e */ { 0x032,           {  NIB1R2, NIB2__, NIB3__, NIB0__ },  1, 1 },
-/* 0x790 */ { INPUT_PORT_A,    {  NIB3__, NIB1__, NIB2__, NIB0__ },  0, 0 }, // $4790   $FFFF   ACBD    ...     0 
+/* 0x790 */ { INPUT_PORT_A,    {  NIB3__, NIB1__, NIB2__, NIB0__ },  0, 0 }, // $4790   $FFFF   ACBD    ...     0
 /* 0x792 */ { 0x0e6,           {  NIB0__, NIB1__, NIB2__, NIB3__ },  1, 0 },
 /* 0x794 */ { 0x096,           {  NIB0__, NIB1__, NIB2__, NIB3__ },  0, 0 },
 /* 0x796 */ { 0x0ee,           {  NIB0R2, NIB1__, NIB2__, NIB3__ },  0, 0 },
@@ -1202,8 +1201,8 @@ void deco_146_base_device::write_data(address_space &space, UINT16 address, UINT
 		}
 
 		return; // or fall through?
-	} 
-	
+	}
+
 	for (int i=0;i<6;i++)
 	{
 		int cs = region_selects[i];
@@ -1238,7 +1237,6 @@ void deco_146_base_device::write_data(address_space &space, UINT16 address, UINT
 
 UINT16 deco_146_base_device::read_protport(UINT16 address, UINT16 mem_mask)
 {
-
 	// if we read the last written address immediately after then ignore all other logic and just return what was written unmodified
 	if ((address==m_latchaddr) && (m_latchflag==1))
 	{
@@ -1261,8 +1259,8 @@ UINT16 deco_146_base_device::read_protport(UINT16 address, UINT16 mem_mask)
 
 	if (location == m_bankswitch_swap_read_address) // this has a special meaning
 	{
-	//	logerror("(bankswitch) %04x %04x\n", address, mem_mask);
-	
+	//  logerror("(bankswitch) %04x %04x\n", address, mem_mask);
+
 		if (m_current_rambank==0)
 			m_current_rambank = 1;
 		else
@@ -1281,19 +1279,19 @@ void deco_146_base_device::write_protport(address_space &space, UINT16 address, 
 
 	if ((address&0xff) == m_xor_port)
 	{
-		 logerror("LOAD XOR REGISTER %04x %04x\n", data, mem_mask);
-		 COMBINE_DATA(&m_xor);
+			logerror("LOAD XOR REGISTER %04x %04x\n", data, mem_mask);
+			COMBINE_DATA(&m_xor);
 	}
 	else if ((address&0xff) == m_mask_port)
 	{
-		 logerror("LOAD NAND REGISTER %04x %04x\n", data, mem_mask);
-		 COMBINE_DATA(&m_nand);
+			logerror("LOAD NAND REGISTER %04x %04x\n", data, mem_mask);
+			COMBINE_DATA(&m_nand);
 	}
 	else if ((address&0xff) == m_soundlatch_port)
 	{
-		 logerror("LOAD SOUND LATCH %04x %04x\n", data, mem_mask);
-		 COMBINE_DATA(&m_soundlatch);
-		 m_soundlatch_w(space, data, mem_mask);
+			logerror("LOAD SOUND LATCH %04x %04x\n", data, mem_mask);
+			COMBINE_DATA(&m_soundlatch);
+			m_soundlatch_w(space, data, mem_mask);
 	}
 
 	// always store
@@ -1319,8 +1317,8 @@ UINT16 deco_146_base_device::read_data(UINT16 address, UINT16 mem_mask, UINT8 &c
 		int real_address = address & 0xf;
 		logerror("read config regs? %04x %04x\n", real_address, mem_mask);
 		return 0x0000;
-	} 
-	
+	}
+
 	// what gets priority?
 	for (int i=0;i<6;i++)
 	{
@@ -1363,7 +1361,7 @@ deco_146_base_device::deco_146_base_device(const machine_config &mconfig, device
 	m_port_b_r =  deco146_port_read_cb(FUNC(deco_146_base_device::port_b_default), this);
 	m_port_c_r =  deco146_port_read_cb(FUNC(deco_146_base_device::port_c_default), this);
 	m_soundlatch_w =  deco146_port_write_cb(FUNC(deco_146_base_device::soundlatch_default), this);
-	
+
 	m_external_addrswap[0] = 0;
 	m_external_addrswap[1] = 1;
 	m_external_addrswap[2] = 2;
@@ -1443,7 +1441,6 @@ void deco_146_base_device::set_use_magic_read_address_xor(device_t &device, int 
 
 void deco_146_base_device::device_start()
 {
-
 	for (int i=0;i<0x80;i++)
 	{
 		// the mutant fighter old sim assumes 0x0000
@@ -1496,7 +1493,7 @@ void deco_146_base_device::device_reset()
 	m_latchflag = 0;
 
 	m_xor=0;
-//	m_nand=0xffff;
+//  m_nand=0xffff;
 	m_nand=0x0; // wizard fire doesn't initialize it, but accesses addresses rohga needs the mask applied on
 
 
@@ -1558,4 +1555,3 @@ deco146_device::deco146_device(const machine_config &mconfig, const char *tag, d
 	m_mask_port = 0x36;
 	m_soundlatch_port = 0x64;
 }
-

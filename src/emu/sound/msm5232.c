@@ -29,7 +29,7 @@ void msm5232_device::device_config_complete()
 	const msm5232_interface *intf = reinterpret_cast<const msm5232_interface *>(static_config());
 	if (intf != NULL)
 	*static_cast<msm5232_interface *>(this) = *intf;
-	
+
 	// or initialize to defaults if none provided
 	else
 	{

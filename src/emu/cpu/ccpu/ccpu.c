@@ -142,7 +142,7 @@ void ccpu_cpu_device::state_string_export(const device_state_entry &entry, astri
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf("%c%c%c%c%c%c", 
+			string.printf("%c%c%c%c%c%c",
 					TEST_A0 ? '0' : 'o',
 					TEST_NC ? 'N' : 'n',
 					TEST_LT ? 'L' : 'l',
@@ -685,5 +685,3 @@ offs_t ccpu_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 
 	extern CPU_DISASSEMBLE( ccpu );
 	return CPU_DISASSEMBLE_NAME(ccpu)(this, buffer, pc, oprom, opram, options);
 }
-
-

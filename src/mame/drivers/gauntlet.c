@@ -509,7 +509,7 @@ static MACHINE_CONFIG_START( gauntlet, gauntlet_state )
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_GFXDECODE(gauntlet)
 	MCFG_PALETTE_LENGTH(1024)
-	
+
 	MCFG_TILEMAP_ADD_STANDARD("playfield", 2, gauntlet_state, get_playfield_tile_info, 8,8, SCAN_COLS, 64,64)
 	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", 2, gauntlet_state, get_alpha_tile_info, 8,8, SCAN_ROWS, 64,32, 0)
 

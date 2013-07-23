@@ -383,7 +383,7 @@ static MACHINE_CONFIG_START( offtwall, offtwall_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	
+
 	MCFG_ATARI_JSA_III_ADD("jsa", WRITELINE(atarigen_state, sound_int_write_line))
 	MCFG_ATARI_JSA_TEST_PORT("260010", 6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

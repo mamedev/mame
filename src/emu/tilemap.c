@@ -379,7 +379,7 @@ tilemap_t &tilemap_t::init(tilemap_manager &manager, tilemap_get_info_delegate t
 	m_device = dynamic_cast<tilemap_device *>(this);
 	m_next = NULL;
 	m_user_data = NULL;
-	
+
 	// populate tilemap metrics
 	m_rows = rows;
 	m_cols = cols;
@@ -387,14 +387,14 @@ tilemap_t &tilemap_t::init(tilemap_manager &manager, tilemap_get_info_delegate t
 	m_tileheight = tileheight;
 	m_width = cols * tilewidth;
 	m_height = rows * tileheight;
-	
+
 	// populate logical <-> memory mappings
 	m_mapper = mapper;
 	m_memory_to_logical = NULL;
 	m_max_logical_index = 0;
 	m_logical_to_memory = NULL;
 	m_max_memory_index = 0;
-	
+
 	// initialize tile information geters
 	m_tile_get_info = tile_get_info;
 
@@ -422,7 +422,7 @@ tilemap_t &tilemap_t::init(tilemap_manager &manager, tilemap_get_info_delegate t
 
 	// allocate pixmap
 	m_pixmap.allocate(m_width, m_height);
-	
+
 	// allocate transparency mapping
 	m_flagsmap.allocate(m_width, m_height);
 	m_tileflags = NULL;
@@ -1498,9 +1498,9 @@ void tilemap_t::draw_debug(bitmap_rgb32 &dest, UINT32 scrollx, UINT32 scrolly)
 
 tilemap_memory::tilemap_memory()
 	: m_base(NULL),
-	  m_bytes(0),
-	  m_membits(0),
-	  m_bytes_per_entry(0)
+		m_bytes(0),
+		m_membits(0),
+		m_bytes_per_entry(0)
 {
 }
 
@@ -1516,45 +1516,45 @@ void tilemap_memory::set(void *base, UINT32 bytes, int membits, endianness_t end
 	assert(bytes > 0);
 	assert(membits == 8 || membits == 16 || membits == 32 || membits == 64);
 	assert(bpe == 1 || bpe == 2 || bpe == 4);
-	
+
 	// populate direct data
 	m_base = base;
 	m_bytes = bytes;
 	m_membits = membits;
 	m_endianness = endianness;
 	m_bytes_per_entry = bpe;
-	
+
 	// derive data
 	switch (bpe*1000 + membits*10 + endianness)
 	{
-		case 1*1000 + 8*10 + ENDIANNESS_LITTLE:		m_reader = &tilemap_memory::read8_from_8;		m_writer = &tilemap_memory::write8_to_8;		break;
-		case 1*1000 + 8*10 + ENDIANNESS_BIG:		m_reader = &tilemap_memory::read8_from_8;		m_writer = &tilemap_memory::write8_to_8;		break;
-		case 1*1000 + 16*10 + ENDIANNESS_LITTLE:	m_reader = &tilemap_memory::read8_from_16le;	m_writer = &tilemap_memory::write8_to_16le;		break;
-		case 1*1000 + 16*10 + ENDIANNESS_BIG:		m_reader = &tilemap_memory::read8_from_16be;	m_writer = &tilemap_memory::write8_to_16be;		break;
-		case 1*1000 + 32*10 + ENDIANNESS_LITTLE:	m_reader = &tilemap_memory::read8_from_32le;	m_writer = &tilemap_memory::write8_to_32le;		break;
-		case 1*1000 + 32*10 + ENDIANNESS_BIG:		m_reader = &tilemap_memory::read8_from_32be;	m_writer = &tilemap_memory::write8_to_32be;		break;
-		case 1*1000 + 64*10 + ENDIANNESS_LITTLE:	m_reader = &tilemap_memory::read8_from_64le;	m_writer = &tilemap_memory::write8_to_64le;		break;
-		case 1*1000 + 64*10 + ENDIANNESS_BIG:		m_reader = &tilemap_memory::read8_from_64be;	m_writer = &tilemap_memory::write8_to_64be;		break;
+		case 1*1000 + 8*10 + ENDIANNESS_LITTLE:     m_reader = &tilemap_memory::read8_from_8;       m_writer = &tilemap_memory::write8_to_8;        break;
+		case 1*1000 + 8*10 + ENDIANNESS_BIG:        m_reader = &tilemap_memory::read8_from_8;       m_writer = &tilemap_memory::write8_to_8;        break;
+		case 1*1000 + 16*10 + ENDIANNESS_LITTLE:    m_reader = &tilemap_memory::read8_from_16le;    m_writer = &tilemap_memory::write8_to_16le;     break;
+		case 1*1000 + 16*10 + ENDIANNESS_BIG:       m_reader = &tilemap_memory::read8_from_16be;    m_writer = &tilemap_memory::write8_to_16be;     break;
+		case 1*1000 + 32*10 + ENDIANNESS_LITTLE:    m_reader = &tilemap_memory::read8_from_32le;    m_writer = &tilemap_memory::write8_to_32le;     break;
+		case 1*1000 + 32*10 + ENDIANNESS_BIG:       m_reader = &tilemap_memory::read8_from_32be;    m_writer = &tilemap_memory::write8_to_32be;     break;
+		case 1*1000 + 64*10 + ENDIANNESS_LITTLE:    m_reader = &tilemap_memory::read8_from_64le;    m_writer = &tilemap_memory::write8_to_64le;     break;
+		case 1*1000 + 64*10 + ENDIANNESS_BIG:       m_reader = &tilemap_memory::read8_from_64be;    m_writer = &tilemap_memory::write8_to_64be;     break;
 
-		case 2*1000 + 8*10 + ENDIANNESS_LITTLE:		m_reader = &tilemap_memory::read16_from_8le;	m_writer = &tilemap_memory::write16_to_8le;		break;
-		case 2*1000 + 8*10 + ENDIANNESS_BIG:		m_reader = &tilemap_memory::read16_from_8be;	m_writer = &tilemap_memory::write16_to_8be;		break;
-		case 2*1000 + 16*10 + ENDIANNESS_LITTLE:	m_reader = &tilemap_memory::read16_from_16;		m_writer = &tilemap_memory::write16_to_16;		break;
-		case 2*1000 + 16*10 + ENDIANNESS_BIG:		m_reader = &tilemap_memory::read16_from_16;		m_writer = &tilemap_memory::write16_to_16;		break;
-		case 2*1000 + 32*10 + ENDIANNESS_LITTLE:	m_reader = &tilemap_memory::read16_from_32le;	m_writer = &tilemap_memory::write16_to_32le;	break;
-		case 2*1000 + 32*10 + ENDIANNESS_BIG:		m_reader = &tilemap_memory::read16_from_32be;	m_writer = &tilemap_memory::write16_to_32be;	break;
-		case 2*1000 + 64*10 + ENDIANNESS_LITTLE:	m_reader = &tilemap_memory::read16_from_64le;	m_writer = &tilemap_memory::write16_to_64le;	break;
-		case 2*1000 + 64*10 + ENDIANNESS_BIG:		m_reader = &tilemap_memory::read16_from_64be;	m_writer = &tilemap_memory::write16_to_64be;	break;
+		case 2*1000 + 8*10 + ENDIANNESS_LITTLE:     m_reader = &tilemap_memory::read16_from_8le;    m_writer = &tilemap_memory::write16_to_8le;     break;
+		case 2*1000 + 8*10 + ENDIANNESS_BIG:        m_reader = &tilemap_memory::read16_from_8be;    m_writer = &tilemap_memory::write16_to_8be;     break;
+		case 2*1000 + 16*10 + ENDIANNESS_LITTLE:    m_reader = &tilemap_memory::read16_from_16;     m_writer = &tilemap_memory::write16_to_16;      break;
+		case 2*1000 + 16*10 + ENDIANNESS_BIG:       m_reader = &tilemap_memory::read16_from_16;     m_writer = &tilemap_memory::write16_to_16;      break;
+		case 2*1000 + 32*10 + ENDIANNESS_LITTLE:    m_reader = &tilemap_memory::read16_from_32le;   m_writer = &tilemap_memory::write16_to_32le;    break;
+		case 2*1000 + 32*10 + ENDIANNESS_BIG:       m_reader = &tilemap_memory::read16_from_32be;   m_writer = &tilemap_memory::write16_to_32be;    break;
+		case 2*1000 + 64*10 + ENDIANNESS_LITTLE:    m_reader = &tilemap_memory::read16_from_64le;   m_writer = &tilemap_memory::write16_to_64le;    break;
+		case 2*1000 + 64*10 + ENDIANNESS_BIG:       m_reader = &tilemap_memory::read16_from_64be;   m_writer = &tilemap_memory::write16_to_64be;    break;
 
-		case 4*1000 + 8*10 + ENDIANNESS_LITTLE:		m_reader = &tilemap_memory::read32_from_8le;	m_writer = &tilemap_memory::write32_to_8le;		break;
-		case 4*1000 + 8*10 + ENDIANNESS_BIG:		m_reader = &tilemap_memory::read32_from_8be;	m_writer = &tilemap_memory::write32_to_8be;		break;
-		case 4*1000 + 16*10 + ENDIANNESS_LITTLE:	m_reader = &tilemap_memory::read32_from_16le;	m_writer = &tilemap_memory::write32_to_16le;	break;
-		case 4*1000 + 16*10 + ENDIANNESS_BIG:		m_reader = &tilemap_memory::read32_from_16be;	m_writer = &tilemap_memory::write32_to_16be;	break;
-		case 4*1000 + 32*10 + ENDIANNESS_LITTLE:	m_reader = &tilemap_memory::read32_from_32;		m_writer = &tilemap_memory::write32_to_32;		break;
-		case 4*1000 + 32*10 + ENDIANNESS_BIG:		m_reader = &tilemap_memory::read32_from_32;		m_writer = &tilemap_memory::write32_to_32;		break;
-		case 4*1000 + 64*10 + ENDIANNESS_LITTLE:	m_reader = &tilemap_memory::read32_from_64le;	m_writer = &tilemap_memory::write32_to_64le;	break;
-		case 4*1000 + 64*10 + ENDIANNESS_BIG:		m_reader = &tilemap_memory::read32_from_64be;	m_writer = &tilemap_memory::write32_to_64be;	break;
+		case 4*1000 + 8*10 + ENDIANNESS_LITTLE:     m_reader = &tilemap_memory::read32_from_8le;    m_writer = &tilemap_memory::write32_to_8le;     break;
+		case 4*1000 + 8*10 + ENDIANNESS_BIG:        m_reader = &tilemap_memory::read32_from_8be;    m_writer = &tilemap_memory::write32_to_8be;     break;
+		case 4*1000 + 16*10 + ENDIANNESS_LITTLE:    m_reader = &tilemap_memory::read32_from_16le;   m_writer = &tilemap_memory::write32_to_16le;    break;
+		case 4*1000 + 16*10 + ENDIANNESS_BIG:       m_reader = &tilemap_memory::read32_from_16be;   m_writer = &tilemap_memory::write32_to_16be;    break;
+		case 4*1000 + 32*10 + ENDIANNESS_LITTLE:    m_reader = &tilemap_memory::read32_from_32;     m_writer = &tilemap_memory::write32_to_32;      break;
+		case 4*1000 + 32*10 + ENDIANNESS_BIG:       m_reader = &tilemap_memory::read32_from_32;     m_writer = &tilemap_memory::write32_to_32;      break;
+		case 4*1000 + 64*10 + ENDIANNESS_LITTLE:    m_reader = &tilemap_memory::read32_from_64le;   m_writer = &tilemap_memory::write32_to_64le;    break;
+		case 4*1000 + 64*10 + ENDIANNESS_BIG:       m_reader = &tilemap_memory::read32_from_64be;   m_writer = &tilemap_memory::write32_to_64be;    break;
 
-		default:	throw emu_fatalerror("Illegal memory bits/bus width combo in tilemap_memory");
+		default:    throw emu_fatalerror("Illegal memory bits/bus width combo in tilemap_memory");
 	}
 }
 
@@ -1581,7 +1581,7 @@ void tilemap_memory::set(const tilemap_memory &helper)
 
 //-------------------------------------------------
 //  read8_from_*/write8_to_* - entry read/write
-//	heleprs for 1 byte-per-entry
+//  heleprs for 1 byte-per-entry
 //-------------------------------------------------
 
 UINT32 tilemap_memory::read8_from_8(int index) { return reinterpret_cast<UINT8 *>(m_base)[index]; }
@@ -1605,7 +1605,7 @@ void tilemap_memory::write8_to_64be(int index, UINT32 data) { reinterpret_cast<U
 
 //-------------------------------------------------
 //  read16_from_*/write16_to_* - entry read/write
-//	heleprs for 2 bytes-per-entry
+//  heleprs for 2 bytes-per-entry
 //-------------------------------------------------
 
 UINT32 tilemap_memory::read16_from_8le(int index) { return read8_from_8(index*2) | (read8_from_8(index*2+1) << 8); }
@@ -1629,7 +1629,7 @@ void tilemap_memory::write16_to_64be(int index, UINT32 data) { reinterpret_cast<
 
 //-------------------------------------------------
 //  read32_from_*/write32_to_* - entry read/write
-//	heleprs for 4 bytes-per-entry
+//  heleprs for 4 bytes-per-entry
 //-------------------------------------------------
 
 UINT32 tilemap_memory::read32_from_8le(int index) { return read16_from_8le(index*2) | (read16_from_8le(index*2+1) << 16); }
@@ -1756,8 +1756,8 @@ tilemap_device::tilemap_device(const machine_config &mconfig, const char *tag, d
 
 
 //-------------------------------------------------
-//  static_set_bytes_per_entry: Set the 
-//	transparent pen
+//  static_set_bytes_per_entry: Set the
+//  transparent pen
 //-------------------------------------------------
 
 void tilemap_device::static_set_bytes_per_entry(device_t &device, int bpe)
@@ -1768,7 +1768,7 @@ void tilemap_device::static_set_bytes_per_entry(device_t &device, int bpe)
 
 //-------------------------------------------------
 //  static_set_info_callback: Set the get info
-//	callback delegate
+//  callback delegate
 //-------------------------------------------------
 
 void tilemap_device::static_set_info_callback(device_t &device, tilemap_get_info_delegate get_info)
@@ -1779,7 +1779,7 @@ void tilemap_device::static_set_info_callback(device_t &device, tilemap_get_info
 
 //-------------------------------------------------
 //  static_set_layout: Set the tilemap size and
-//	layout
+//  layout
 //-------------------------------------------------
 
 void tilemap_device::static_set_layout(device_t &device, tilemap_standard_mapper mapper, int columns, int rows)
@@ -1813,8 +1813,8 @@ void tilemap_device::static_set_tile_size(device_t &device, int width, int heigh
 
 
 //-------------------------------------------------
-//  static_set_transparent_pen: Set the 
-//	transparent pen
+//  static_set_transparent_pen: Set the
+//  transparent pen
 //-------------------------------------------------
 
 void tilemap_device::static_set_transparent_pen(device_t &device, pen_t pen)
@@ -1914,7 +1914,7 @@ void tilemap_device::device_start()
 	// bind our callbacks
 	m_get_info.bind_relative_to(*owner());
 	m_mapper.bind_relative_to(*owner());
-	
+
 	// allocate the tilemap
 	if (m_standard_mapper == TILEMAP_STANDARD_COUNT)
 		machine().tilemap().create(m_get_info, m_mapper, m_tile_width, m_tile_height, m_num_columns, m_num_rows, this);
@@ -1933,7 +1933,7 @@ void tilemap_device::device_start()
 		if (share != NULL)
 			m_extmem.set(*share, m_bytes_per_entry);
 	}
-	
+
 	// configure the device and set the pen
 	if (m_transparent_pen_set)
 		set_transparent_pen(m_transparent_pen);

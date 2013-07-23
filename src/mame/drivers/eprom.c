@@ -411,7 +411,7 @@ static MACHINE_CONFIG_START( eprom, eprom_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	
+
 	MCFG_ATARI_JSA_I_ADD("jsa", WRITELINE(atarigen_state, sound_int_write_line))
 	MCFG_ATARI_JSA_TEST_PORT("260010", 1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -449,7 +449,7 @@ static MACHINE_CONFIG_START( klaxp, eprom_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	
+
 	MCFG_ATARI_JSA_II_ADD("jsa", WRITELINE(atarigen_state, sound_int_write_line))
 	MCFG_ATARI_JSA_TEST_PORT("260010", 1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -486,7 +486,7 @@ static MACHINE_CONFIG_START( guts, eprom_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	
+
 	MCFG_ATARI_JSA_II_ADD("jsa", WRITELINE(atarigen_state, sound_int_write_line))
 	MCFG_ATARI_JSA_TEST_PORT("260010", 1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

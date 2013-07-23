@@ -31,7 +31,7 @@ public:
 	{
 		TIMER_TICK_SOUND_CPU
 	};
-	
+
 	DECLARE_READ32_MEMBER( host_r );
 	DECLARE_WRITE32_MEMBER( host_w );
 	DECLARE_READ16_MEMBER( sound_r );
@@ -42,7 +42,7 @@ protected:
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 private:
@@ -51,13 +51,13 @@ private:
 	UINT8                m_sound_reg[8];
 	emu_timer            *m_sound_cpu_timer;
 	UINT8                m_sound_cpu_irq1_enable;
-	k056800_irq_cb       m_irq_cb_func;	
-	
+	k056800_irq_cb       m_irq_cb_func;
+
 	UINT8 host_reg_r( int reg );
 	void host_reg_w( int reg, UINT8 data );
 	UINT8 sound_reg_r( int reg );
 	void sound_reg_w( int reg, UINT8 data );
-	
+
 };
 
 extern const device_type K056800;

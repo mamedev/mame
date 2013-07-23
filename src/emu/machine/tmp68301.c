@@ -14,7 +14,7 @@
 const device_type TMP68301 = &device_creator<tmp68301_device>;
 
 tmp68301_device::tmp68301_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TMP68301, "TMP68301", tag, owner, clock, "tmp68301", __FILE__)	
+	: device_t(mconfig, TMP68301, "TMP68301", tag, owner, clock, "tmp68301", __FILE__)
 {
 }
 
@@ -50,7 +50,7 @@ void tmp68301_device::device_reset()
 	for (i = 0; i < 3; i++)
 		m_IE[i] = 0;
 
-	machine().firstcpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(tmp68301_device::irq_callback),this));	
+	machine().firstcpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(tmp68301_device::irq_callback),this));
 }
 
 

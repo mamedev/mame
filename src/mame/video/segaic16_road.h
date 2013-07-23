@@ -41,7 +41,7 @@ class segaic16_road_device : public device_t
 public:
 	segaic16_road_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~segaic16_road_device() {}
-	
+
 	UINT16 *segaic16_roadram_0;
 
 	struct road_info segaic16_road[SEGAIC16_MAX_ROADS];
@@ -66,7 +66,6 @@ private:
 extern const device_type SEGAIC16_ROAD;
 
 #define MCFG_SEGAIC16_ROAD_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, SEGAIC16_ROAD, 0) \
-
+	MCFG_DEVICE_ADD(_tag, SEGAIC16_ROAD, 0)
 
 #endif

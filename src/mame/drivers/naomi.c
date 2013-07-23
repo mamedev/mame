@@ -7159,7 +7159,7 @@ ROM_START( ndcfboxa )
 
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
 	// PIC and sticker unknown
-	ROM_LOAD("317-unk-jpn.pic", 0x00, 0x4000, NO_DUMP ) 
+	ROM_LOAD("317-unk-jpn.pic", 0x00, 0x4000, NO_DUMP )
 ROM_END
 
 /*

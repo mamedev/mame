@@ -219,7 +219,7 @@ static MACHINE_CONFIG_START( toobin, toobin_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	
+
 	MCFG_ATARI_JSA_I_ADD("jsa", WRITELINE(atarigen_state, sound_int_write_line))
 	MCFG_ATARI_JSA_TEST_PORT("FF9000", 12)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)

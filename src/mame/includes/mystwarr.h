@@ -36,7 +36,7 @@ public:
 	int m_roz_rombank;
 	tilemap_t *m_ult_936_tilemap;
 	UINT16 m_clip;
-	
+
 	DECLARE_READ16_MEMBER(eeprom_r);
 	DECLARE_WRITE16_MEMBER(mweeprom_w);
 	DECLARE_READ16_MEMBER(dddeeprom_r);

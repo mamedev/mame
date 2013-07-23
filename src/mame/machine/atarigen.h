@@ -64,14 +64,12 @@
 #define MCFG_ATARI_SOUND_COMM_ADD(_tag, _soundcpu, _intcb) \
 	MCFG_DEVICE_ADD(_tag, ATARI_SOUND_COMM, 0) \
 	atari_sound_comm_device::static_set_sound_cpu(*device, _soundcpu); \
-	devcb = &atari_sound_comm_device::static_set_main_int_cb(*device, DEVCB2_##_intcb); \
-
+	devcb = &atari_sound_comm_device::static_set_main_int_cb(*device, DEVCB2_##_intcb);
 
 #define MCFG_ATARI_VAD_ADD(_tag, _screen, _intcb) \
 	MCFG_DEVICE_ADD(_tag, ATARI_VAD, 0) \
 	atari_vad_device::static_set_screen(*device, _screen); \
-	devcb = &atari_vad_device::static_set_scanline_int_cb(*device, DEVCB2_##_intcb); \
-
+	devcb = &atari_vad_device::static_set_scanline_int_cb(*device, DEVCB2_##_intcb);
 #define MCFG_ATARI_VAD_PLAYFIELD(_class, _getinfo) \
 	{ astring fulltag(device->tag(), ":playfield"); device_t *device; \
 	MCFG_TILEMAP_ADD(fulltag) \
@@ -125,7 +123,7 @@ public:
 	// static configuration helpers
 	static void static_set_sound_cpu(device_t &device, const char *cputag);
 	template<class _Object> static devcb2_base &static_set_main_int_cb(device_t &device, _Object object) { return downcast<atari_sound_comm_device &>(device).m_main_int_cb.set_callback(object); }
-	
+
 	// getters
 	DECLARE_READ_LINE_MEMBER(main_to_sound_ready) { return m_main_to_sound_ready ? ASSERT_LINE : CLEAR_LINE; }
 	DECLARE_READ_LINE_MEMBER(sound_to_main_ready) { return m_sound_to_main_ready ? ASSERT_LINE : CLEAR_LINE; }
@@ -168,11 +166,11 @@ private:
 	};
 
 	// configuration state
-	const char *		m_sound_cpu_tag;
-	devcb2_write_line	m_main_int_cb;
+	const char *        m_sound_cpu_tag;
+	devcb2_write_line   m_main_int_cb;
 
 	// internal state
-	m6502_device *		m_sound_cpu;
+	m6502_device *      m_sound_cpu;
 	bool                m_main_to_sound_ready;
 	bool                m_sound_to_main_ready;
 	UINT8               m_main_to_sound_data;
@@ -237,30 +235,30 @@ private:
 	void eof_update(emu_timer &timer);
 
 	// configuration state
-	const char *		m_screen_tag;
-	devcb2_write_line	m_scanline_int_cb;
+	const char *        m_screen_tag;
+	devcb2_write_line   m_scanline_int_cb;
 
 	// internal state
 	optional_device<tilemap_device> m_alpha_tilemap;
-	required_device<tilemap_device>	m_playfield_tilemap;
+	required_device<tilemap_device> m_playfield_tilemap;
 	optional_device<tilemap_device> m_playfield2_tilemap;
 	optional_shared_ptr<UINT16> m_eof_data;
 
-	screen_device *		m_screen;
-	emu_timer *			m_scanline_int_timer;
-	emu_timer *			m_tilerow_update_timer;
-	emu_timer *			m_eof_timer;
+	screen_device *     m_screen;
+	emu_timer *         m_scanline_int_timer;
+	emu_timer *         m_tilerow_update_timer;
+	emu_timer *         m_eof_timer;
 
-	UINT32 				m_palette_bank;            // which palette bank is enabled
-	UINT32 				m_pf0_xscroll;             // playfield 1 xscroll
-	UINT32 				m_pf0_xscroll_raw;         // playfield 1 xscroll raw value
-	UINT32 				m_pf0_yscroll;             // playfield 1 yscroll
-	UINT32 				m_pf1_xscroll_raw;         // playfield 2 xscroll raw value
-	UINT32 				m_pf1_yscroll;             // playfield 2 yscroll
-	UINT32 				m_mo_xscroll;              // sprite xscroll
-	UINT32 				m_mo_yscroll;              // sprite xscroll
-	
-	UINT16				m_control[0x40/2];			// control data
+	UINT32              m_palette_bank;            // which palette bank is enabled
+	UINT32              m_pf0_xscroll;             // playfield 1 xscroll
+	UINT32              m_pf0_xscroll_raw;         // playfield 1 xscroll raw value
+	UINT32              m_pf0_yscroll;             // playfield 1 yscroll
+	UINT32              m_pf1_xscroll_raw;         // playfield 2 xscroll raw value
+	UINT32              m_pf1_yscroll;             // playfield 2 yscroll
+	UINT32              m_mo_xscroll;              // sprite xscroll
+	UINT32              m_mo_yscroll;              // sprite xscroll
+
+	UINT16              m_control[0x40/2];          // control data
 };
 
 
@@ -392,7 +390,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<okim6295_device> m_oki;
-	
+
 	optional_device<atari_sound_comm_device> m_soundcomm;
 };
 

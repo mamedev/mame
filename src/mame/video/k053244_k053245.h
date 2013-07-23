@@ -1,4 +1,4 @@
-/* */ 
+/* */
 
 #pragma once
 #ifndef __K053244_K053245_H__
@@ -63,7 +63,7 @@ private:
 	int      m_rombank;       // 053244
 	int      m_ramsize;
 	int      m_z_rejection;
-	
+
 	DECLARE_READ16_MEMBER( k053244_reg_word_r );    // OBJSET0 debug handler
 };
 

@@ -613,7 +613,7 @@ MACHINE_START_MEMBER(sc4_state,sc4)
 		bfm_sc4_68307_portb_w );
 	m68307_set_duart68681(m_maincpu,machine().device("m68307_68681"));
 
-	
+
 
 	int reels = 6;
 	m_reels=reels;

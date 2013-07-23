@@ -2531,7 +2531,7 @@ static MACHINE_CONFIG_START( gionbana, nbmj8891_state )
 
 	MCFG_NB1413M3_ADD("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_GIONBANA )
-	
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -2559,7 +2559,7 @@ static MACHINE_CONFIG_DERIVED( mgion, gionbana )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mgion_map)
 	MCFG_CPU_IO_MAP(mgion_io_map)
-	
+
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_MGION )
 
@@ -2575,7 +2575,7 @@ static MACHINE_CONFIG_DERIVED( omotesnd, gionbana )
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_OMOTESND )
-	
+
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* sound hardware */
@@ -2585,7 +2585,7 @@ static MACHINE_CONFIG_DERIVED( omotesnd, gionbana )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( abunai, gionbana )
-	
+
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_ABUNAI )
 MACHINE_CONFIG_END
@@ -2596,7 +2596,7 @@ static MACHINE_CONFIG_DERIVED( mjcamerb, gionbana )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(hanamomo_io_map)
-	
+
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_MJCAMERB )
 
@@ -2613,7 +2613,7 @@ static MACHINE_CONFIG_DERIVED( mmcamera, gionbana )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(hanamomo_io_map)
-	
+
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_MMCAMERA )
 
@@ -2631,7 +2631,7 @@ static MACHINE_CONFIG_DERIVED( hanamomo, gionbana )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(hanamomo_map)
 	MCFG_CPU_IO_MAP(hanamomo_io_map)
-	
+
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_HANAMOMO )
 
@@ -2647,7 +2647,7 @@ static MACHINE_CONFIG_DERIVED( msjiken, hanamomo )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(gionbana_map)
 	MCFG_CPU_IO_MAP(msjiken_io_map)
-	
+
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_MSJIKEN )
 MACHINE_CONFIG_END
@@ -2673,10 +2673,10 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( mjfocus, gionbana )
 
 	/* basic machine hardware */
-	
+
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_MJFOCUS )
-	
+
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(nbmj8891_state,nbmj8891_1layer)
 MACHINE_CONFIG_END
@@ -2699,7 +2699,7 @@ static MACHINE_CONFIG_DERIVED( mjnanpas, gionbana )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(club90s_map)
-	
+
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_MJNANPAS )
 MACHINE_CONFIG_END
@@ -2710,7 +2710,7 @@ static MACHINE_CONFIG_DERIVED( maiko, mjnanpas )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(maiko_map)
 	MCFG_CPU_IO_MAP(maiko_io_map)
-	
+
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_MAIKO )
 MACHINE_CONFIG_END
@@ -2720,10 +2720,10 @@ static MACHINE_CONFIG_DERIVED( mmaiko, maiko )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mmaiko_map)
-	
+
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_MMAIKO )
-	
+
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
@@ -2733,7 +2733,7 @@ static MACHINE_CONFIG_DERIVED( lovehous, mjnanpas )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(lovehous_map)
 	MCFG_CPU_IO_MAP(lovehous_io_map)
-	
+
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_LOVEHOUS )
 
@@ -2745,7 +2745,7 @@ static MACHINE_CONFIG_DERIVED( hanaoji, maiko )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(hanaoji_map)
-	
+
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_HANAOJI )
 
@@ -2774,7 +2774,7 @@ static MACHINE_CONFIG_DERIVED( scandal, hanamomo )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(scandalm_map)
 	MCFG_CPU_IO_MAP(scandal_io_map)
-	
+
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_SCANDAL )
 MACHINE_CONFIG_END
@@ -2785,7 +2785,7 @@ static MACHINE_CONFIG_DERIVED( bananadr, mjnanpas )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(scandalm_map)
 	MCFG_CPU_IO_MAP(bananadr_io_map)
-	
+
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_BANANADR )
 
@@ -2817,7 +2817,7 @@ static MACHINE_CONFIG_DERIVED( mjfocusm, gionbana )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(scandalm_map)
 	MCFG_CPU_IO_MAP(scandalm_io_map)
-	
+
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_MJFOCUSM )
 
@@ -3842,7 +3842,7 @@ GAME( 1988, hanamomo,  0,        hanamomo, hanamomo,  driver_device,        0, R
 GAME( 1988, hanamomb,  hanamomo, hanamomo, hanamomo,  driver_device,        0, ROT0,   "Nichibutsu", "Mahjong Hana no Momoko gumi (Japan 881125)", 0 )
 GAME( 1988, telmahjn,  0,        telmahjn, telmahjn, nbmj8891_state, telmahjn, ROT270, "Nichibutsu", "Telephone Mahjong (Japan 890111)", 0 )
 GAME( 1989, gionbana,  0,        gionbana, gionbana, nbmj8891_state, gionbana, ROT0,   "Nichibutsu", "Gionbana (Japan 890120)", 0 )
-GAME( 1989, mgion,     0,        mgion,    mgion, 	  driver_device,        0, ROT0,   "Nichibutsu", "Gionbana [BET] (Japan 890207)", 0 )
+GAME( 1989, mgion,     0,        mgion,    mgion,     driver_device,        0, ROT0,   "Nichibutsu", "Gionbana [BET] (Japan 890207)", 0 )
 GAME( 1989, omotesnd,  0,        omotesnd, omotesnd, nbmj8891_state, omotesnd, ROT0,   "Anime Tec", "Omotesandou (Japan 890215)", 0 )
 GAME( 1989, abunai,    0,        abunai,   abunai,    driver_device,        0, ROT0,   "Green Soft", "Abunai Houkago - Mou Matenai (Japan 890325)", 0 )
 GAME( 1989, mjfocus,   0,        mjfocus,  mjfocus, nbmj8891_state,  mjfocus,  ROT0,   "Nichibutsu", "Mahjong Focus (Japan 890313)", 0 )

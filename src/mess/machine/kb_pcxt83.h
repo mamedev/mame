@@ -26,7 +26,7 @@
 // ======================> ibm_pc_xt_83_keyboard_device
 
 class ibm_pc_xt_83_keyboard_device :  public device_t,
-									  public device_pc_kbd_interface
+										public device_pc_kbd_interface
 {
 public:
 	// construction/destruction

@@ -194,7 +194,7 @@ struct es5506_state
 	UINT16 *    volume_lookup;
 	device_t *device;
 
-	int			channels;				/* the number of output stereo channels: 1..4 for 5505, 1..6 for 5506 */
+	int         channels;               /* the number of output stereo channels: 1..4 for 5505, 1..6 for 5506 */
 
 #if MAKE_WAVS
 	void *      wavraw;                 /* raw waveform */

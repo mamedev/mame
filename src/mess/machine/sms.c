@@ -836,7 +836,7 @@ WRITE8_MEMBER(smssdisp_state::sms_store_cart_select_w)
 	logerror("switching in part of %s slot #%d\n", slottype ? "card" : "cartridge", slot );
 	/* cartridge? slot #0 */
 	//if (slottype == 0)
-	//	m_current_cartridge = slot;
+	//  m_current_cartridge = slot;
 
 	setup_rom();
 }

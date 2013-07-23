@@ -19,7 +19,7 @@ const device_type K007420 = &device_creator<k007420_device>;
 k007420_device::k007420_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K007420, "Konami 007420", tag, owner, clock, "k007420", __FILE__),
 	m_ram(NULL),
-    m_flipscreen(0)
+	m_flipscreen(0)
 	//m_regs[8],
 {
 }
@@ -36,7 +36,7 @@ void k007420_device::device_config_complete()
 	const k007420_interface *intf = reinterpret_cast<const k007420_interface *>(static_config());
 	if (intf != NULL)
 	*static_cast<k007420_interface *>(this) = *intf;
-	
+
 	// or initialize to defaults if none provided
 	else
 	{

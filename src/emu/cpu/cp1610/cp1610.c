@@ -3442,5 +3442,3 @@ offs_t cp1610_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT
 	extern CPU_DISASSEMBLE( cp1610 );
 	return CPU_DISASSEMBLE_NAME(cp1610)(this, buffer, pc, oprom, opram, options);
 }
-
-

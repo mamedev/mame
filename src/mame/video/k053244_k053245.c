@@ -1,4 +1,4 @@
-/* 
+/*
 
 053245/053244
 -------------
@@ -66,7 +66,7 @@ void k05324x_device::device_config_complete()
 	const k05324x_interface *intf = reinterpret_cast<const k05324x_interface *>(static_config());
 	if (intf != NULL)
 	*static_cast<k05324x_interface *>(this) = *intf;
-	
+
 	// or initialize to defaults if none provided
 	else
 	{
@@ -566,7 +566,7 @@ void k05324x_device::k053245_sprites_draw_lethal( bitmap_ind16 &bitmap, const re
 	int sortedlist[NUM_SPRITES];
 	int flipscreenX, flipscreenY, spriteoffsX, spriteoffsY;
 	UINT8 drawmode_table[256];
-	
+
 	memset(drawmode_table, DRAWMODE_SOURCE, sizeof(drawmode_table));
 	drawmode_table[0] = DRAWMODE_NONE;
 
@@ -809,5 +809,3 @@ READ16_MEMBER( k05324x_device::k053244_reg_word_r )
 {
 	return(m_regs[offset * 2] << 8 | m_regs[offset * 2 + 1]);
 }
-
-

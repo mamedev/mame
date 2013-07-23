@@ -1028,9 +1028,9 @@ static INPUT_PORTS_START( stunrun )
 
 	/* stunrun has its own coins */
 // todo
-//	PORT_MODIFY("jsa:JSAII")/
-//	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
-//	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+//  PORT_MODIFY("jsa:JSAII")/
+//  PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+//  PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -1118,9 +1118,9 @@ static INPUT_PORTS_START( steeltal )
 
 	/* steeltal has its own coins */
 // todo
-//	PORT_MODIFY("jsa:JSAIII")
-//	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
-//	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+//  PORT_MODIFY("jsa:JSAIII")
+//  PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+//  PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -1576,7 +1576,7 @@ static MACHINE_CONFIG_DERIVED( stunrun, multisync_nomsp )
 
 	/* sund hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	
+
 	MCFG_ATARI_JSA_II_ADD("jsa", WRITELINE(atarigen_state, sound_int_write_line))
 	MCFG_ATARI_JSA_TEST_PORT("IN0", 5)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -1598,7 +1598,7 @@ static MACHINE_CONFIG_DERIVED( steeltal, multisync_msp )
 
 	/* sund hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	
+
 	MCFG_ATARI_JSA_III_ADD("jsa", WRITELINE(atarigen_state, sound_int_write_line))
 	MCFG_ATARI_JSA_TEST_PORT("IN0", 5)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

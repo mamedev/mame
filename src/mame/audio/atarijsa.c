@@ -1,7 +1,7 @@
 /***************************************************************************
 
-	audio/atarijsa.c
-	
+    audio/atarijsa.c
+
     Functions to emulate the Atari "JSA" audio boards
 
 ****************************************************************************
@@ -37,31 +37,31 @@
 
 ****************************************************************************
 
-	JSA I (stereo): used by:
-		* Blasteroids (YM2151 only)
-		* Toobin' (YM2151 + POKEY)
-		* Vindicators (YM2151 + POKEY)
-		* Escape from the Planets of the Robot Monsters (YM2151 + TMS5220)
+    JSA I (stereo): used by:
+        * Blasteroids (YM2151 only)
+        * Toobin' (YM2151 + POKEY)
+        * Vindicators (YM2151 + POKEY)
+        * Escape from the Planets of the Robot Monsters (YM2151 + TMS5220)
 
-	JSA II (mono), used by:
-		* Cyberball 2072
-		* STUN Runner
-		* Skull & Crossbones
-		* ThunderJaws
-		* Hydra
-		* Pit Fighter
+    JSA II (mono), used by:
+        * Cyberball 2072
+        * STUN Runner
+        * Skull & Crossbones
+        * ThunderJaws
+        * Hydra
+        * Pit Fighter
 
-	JSA III (mono), used by:
-		* Off the Wall (YM2151 only)
-		* Batman
-		* Guardians of the 'Hood
-		* Road Riot 4WD
-		* Steel Talons
+    JSA III (mono), used by:
+        * Off the Wall (YM2151 only)
+        * Batman
+        * Guardians of the 'Hood
+        * Road Riot 4WD
+        * Steel Talons
 
-	JSA IIIs (stereo), used by:
-		* Space Lords
-		* Moto Frenzy
-		* Road Riot's Revenge Rally
+    JSA IIIs (stereo), used by:
+        * Space Lords
+        * Moto Frenzy
+        * Road Riot's Revenge Rally
 
 ****************************************************************************
 
@@ -127,14 +127,14 @@ extern const device_type ATARI_JSA_IIIS = &device_creator<atari_jsa_iiis_device>
 static ADDRESS_MAP_START( atarijsa1_map, AS_PROGRAM, 8, atari_jsa_i_device )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ym2151", ym2151_device, read, write)
-	AM_RANGE(0x2800, 0x2800) AM_MIRROR(0x01f9)																		// N/C
-	AM_RANGE(0x2802, 0x2802) AM_MIRROR(0x01f9) AM_DEVREAD("soundcomm", atari_sound_comm_device, sound_command_r) 	// /RDP
-	AM_RANGE(0x2804, 0x2804) AM_MIRROR(0x01f9) AM_READ(rdio_r)														// /RDIO
-	AM_RANGE(0x2806, 0x2806) AM_MIRROR(0x01f9) AM_DEVREADWRITE("soundcomm", atari_sound_comm_device, sound_irq_ack_r, sound_irq_ack_w)	// R/W=/IRQACK
-	AM_RANGE(0x2a00, 0x2a00) AM_MIRROR(0x01f9) AM_WRITE(tms5220_voice)												// /VOICE
-	AM_RANGE(0x2a02, 0x2a02) AM_MIRROR(0x01f9) AM_DEVWRITE("soundcomm", atari_sound_comm_device, sound_response_w)	// /WRP
-	AM_RANGE(0x2a04, 0x2a04) AM_MIRROR(0x01f9) AM_WRITE(wrio_w)														// /WRIO
-	AM_RANGE(0x2a06, 0x2a06) AM_MIRROR(0x01f9) AM_WRITE(mix_w)														// /MIX
+	AM_RANGE(0x2800, 0x2800) AM_MIRROR(0x01f9)                                                                      // N/C
+	AM_RANGE(0x2802, 0x2802) AM_MIRROR(0x01f9) AM_DEVREAD("soundcomm", atari_sound_comm_device, sound_command_r)    // /RDP
+	AM_RANGE(0x2804, 0x2804) AM_MIRROR(0x01f9) AM_READ(rdio_r)                                                      // /RDIO
+	AM_RANGE(0x2806, 0x2806) AM_MIRROR(0x01f9) AM_DEVREADWRITE("soundcomm", atari_sound_comm_device, sound_irq_ack_r, sound_irq_ack_w)  // R/W=/IRQACK
+	AM_RANGE(0x2a00, 0x2a00) AM_MIRROR(0x01f9) AM_WRITE(tms5220_voice)                                              // /VOICE
+	AM_RANGE(0x2a02, 0x2a02) AM_MIRROR(0x01f9) AM_DEVWRITE("soundcomm", atari_sound_comm_device, sound_response_w)  // /WRP
+	AM_RANGE(0x2a04, 0x2a04) AM_MIRROR(0x01f9) AM_WRITE(wrio_w)                                                     // /WRIO
+	AM_RANGE(0x2a06, 0x2a06) AM_MIRROR(0x01f9) AM_WRITE(mix_w)                                                      // /MIX
 	AM_RANGE(0x2c00, 0x2c0f) AM_MIRROR(0x03f0) AM_READWRITE(pokey_r, pokey_w)
 	AM_RANGE(0x3000, 0x3fff) AM_ROMBANK("cpubank")
 	AM_RANGE(0x4000, 0xffff) AM_ROM
@@ -144,14 +144,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( atarijsa2_map, AS_PROGRAM, 8, atari_jsa_ii_device )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ym2151", ym2151_device, read, write)
-	AM_RANGE(0x2800, 0x2800) AM_MIRROR(0x01f9) AM_READ(oki_r)														// /RDV
-	AM_RANGE(0x2802, 0x2802) AM_MIRROR(0x01f9) AM_DEVREAD("soundcomm", atari_sound_comm_device, sound_command_r) 	// /RDP
-	AM_RANGE(0x2804, 0x2804) AM_MIRROR(0x01f9) AM_READ(rdio_r)														// /RDIO
-	AM_RANGE(0x2806, 0x2806) AM_MIRROR(0x01f9) AM_DEVREADWRITE("soundcomm", atari_sound_comm_device, sound_irq_ack_r, sound_irq_ack_w)	// R/W=/IRQACK
-	AM_RANGE(0x2a00, 0x2a00) AM_MIRROR(0x01f9) AM_WRITE(oki_w)														// /WRV
-	AM_RANGE(0x2a02, 0x2a02) AM_MIRROR(0x01f9) AM_DEVWRITE("soundcomm", atari_sound_comm_device, sound_response_w)	// /WRP
-	AM_RANGE(0x2a04, 0x2a04) AM_MIRROR(0x01f9) AM_WRITE(wrio_w)														// /WRIO
-	AM_RANGE(0x2a06, 0x2a06) AM_MIRROR(0x01f9) AM_WRITE(mix_w)														// /MIX
+	AM_RANGE(0x2800, 0x2800) AM_MIRROR(0x01f9) AM_READ(oki_r)                                                       // /RDV
+	AM_RANGE(0x2802, 0x2802) AM_MIRROR(0x01f9) AM_DEVREAD("soundcomm", atari_sound_comm_device, sound_command_r)    // /RDP
+	AM_RANGE(0x2804, 0x2804) AM_MIRROR(0x01f9) AM_READ(rdio_r)                                                      // /RDIO
+	AM_RANGE(0x2806, 0x2806) AM_MIRROR(0x01f9) AM_DEVREADWRITE("soundcomm", atari_sound_comm_device, sound_irq_ack_r, sound_irq_ack_w)  // R/W=/IRQACK
+	AM_RANGE(0x2a00, 0x2a00) AM_MIRROR(0x01f9) AM_WRITE(oki_w)                                                      // /WRV
+	AM_RANGE(0x2a02, 0x2a02) AM_MIRROR(0x01f9) AM_DEVWRITE("soundcomm", atari_sound_comm_device, sound_response_w)  // /WRP
+	AM_RANGE(0x2a04, 0x2a04) AM_MIRROR(0x01f9) AM_WRITE(wrio_w)                                                     // /WRIO
+	AM_RANGE(0x2a06, 0x2a06) AM_MIRROR(0x01f9) AM_WRITE(mix_w)                                                      // /MIX
 	AM_RANGE(0x3000, 0x3fff) AM_ROMBANK("cpubank")
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -161,14 +161,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( atarijsa3_map, AS_PROGRAM, 8, atari_jsa_iii_device )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x07fe) AM_DEVREADWRITE("ym2151", ym2151_device, read, write)
-	AM_RANGE(0x2800, 0x2801) AM_MIRROR(0x05f8) AM_READWRITE(oki_r, overall_volume_w)								// /RDV
-	AM_RANGE(0x2802, 0x2802) AM_MIRROR(0x05f9) AM_DEVREAD("soundcomm", atari_sound_comm_device, sound_command_r) 	// /RDP
-	AM_RANGE(0x2804, 0x2804) AM_MIRROR(0x05f9) AM_READ(rdio_r)														// /RDIO
-	AM_RANGE(0x2806, 0x2806) AM_MIRROR(0x05f9) AM_DEVREADWRITE("soundcomm", atari_sound_comm_device, sound_irq_ack_r, sound_irq_ack_w)	// R/W=/IRQACK
-	AM_RANGE(0x2a00, 0x2a01) AM_MIRROR(0x05f8) AM_WRITE(oki_w)														// /WRV
-	AM_RANGE(0x2a02, 0x2a02) AM_MIRROR(0x05f9) AM_DEVWRITE("soundcomm", atari_sound_comm_device, sound_response_w)	// /WRP
-	AM_RANGE(0x2a04, 0x2a04) AM_MIRROR(0x05f9) AM_WRITE(wrio_w)														// /WRIO
-	AM_RANGE(0x2a06, 0x2a06) AM_MIRROR(0x05f9) AM_WRITE(mix_w)														// /MIX
+	AM_RANGE(0x2800, 0x2801) AM_MIRROR(0x05f8) AM_READWRITE(oki_r, overall_volume_w)                                // /RDV
+	AM_RANGE(0x2802, 0x2802) AM_MIRROR(0x05f9) AM_DEVREAD("soundcomm", atari_sound_comm_device, sound_command_r)    // /RDP
+	AM_RANGE(0x2804, 0x2804) AM_MIRROR(0x05f9) AM_READ(rdio_r)                                                      // /RDIO
+	AM_RANGE(0x2806, 0x2806) AM_MIRROR(0x05f9) AM_DEVREADWRITE("soundcomm", atari_sound_comm_device, sound_irq_ack_r, sound_irq_ack_w)  // R/W=/IRQACK
+	AM_RANGE(0x2a00, 0x2a01) AM_MIRROR(0x05f8) AM_WRITE(oki_w)                                                      // /WRV
+	AM_RANGE(0x2a02, 0x2a02) AM_MIRROR(0x05f9) AM_DEVWRITE("soundcomm", atari_sound_comm_device, sound_response_w)  // /WRP
+	AM_RANGE(0x2a04, 0x2a04) AM_MIRROR(0x05f9) AM_WRITE(wrio_w)                                                     // /WRIO
+	AM_RANGE(0x2a06, 0x2a06) AM_MIRROR(0x05f9) AM_WRITE(mix_w)                                                      // /MIX
 	AM_RANGE(0x3000, 0x3fff) AM_ROMBANK("cpubank")
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -342,7 +342,7 @@ void atari_jsa_base_device::device_start()
 	// resolve devices
 	m_test_read_cb.resolve_safe(0);
 	m_main_int_cb.resolve_safe();
-	
+
 	// save states
 	save_item(NAME(m_ym2151_volume));
 	save_item(NAME(m_ym2151_ct1));
@@ -398,7 +398,7 @@ WRITE16_MEMBER( atari_jsa_base_device::sound_reset_w )
 
 //-------------------------------------------------
 //  ym2151_port_w: Handle writes from the YM2151
-//	output port
+//  output port
 //-------------------------------------------------
 
 WRITE8_MEMBER( atari_jsa_base_device::ym2151_port_w )
@@ -411,7 +411,7 @@ WRITE8_MEMBER( atari_jsa_base_device::ym2151_port_w )
 
 //-------------------------------------------------
 //  main_test_read_line: Return the state of the
-//	main's test line, provided by a callback
+//  main's test line, provided by a callback
 //-------------------------------------------------
 
 READ_LINE_MEMBER(atari_jsa_base_device::main_test_read_line)
@@ -422,7 +422,7 @@ READ_LINE_MEMBER(atari_jsa_base_device::main_test_read_line)
 
 //-------------------------------------------------
 //  main_int_write_line: Forward interrupt signals
-//	from the comm device to the owning callback
+//  from the comm device to the owning callback
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( atari_jsa_base_device::main_int_write_line )
@@ -456,7 +456,7 @@ atari_jsa_oki_base_device::atari_jsa_oki_base_device(const machine_config &mconf
 
 //-------------------------------------------------
 //  oki_r: Handle reads from the OKI chip(s)
-//	on the JSA II, III, and IIIs boards
+//  on the JSA II, III, and IIIs boards
 //-------------------------------------------------
 
 READ8_MEMBER( atari_jsa_oki_base_device::oki_r )
@@ -465,7 +465,7 @@ READ8_MEMBER( atari_jsa_oki_base_device::oki_r )
 	if (m_oki2 != NULL && offset == 1)
 		return m_oki2->read(space, offset);
 
-	// OKI may not be populated at all 
+	// OKI may not be populated at all
 	else if (m_oki1 != NULL)
 		return m_oki1->read(space, offset);
 
@@ -476,7 +476,7 @@ READ8_MEMBER( atari_jsa_oki_base_device::oki_r )
 
 //-------------------------------------------------
 //  oki_w: Handle writes to the OKI chip(s)
-//	on the JSA II, III, and IIIs boards
+//  on the JSA II, III, and IIIs boards
 //-------------------------------------------------
 
 WRITE8_MEMBER( atari_jsa_oki_base_device::oki_w )
@@ -485,7 +485,7 @@ WRITE8_MEMBER( atari_jsa_oki_base_device::oki_w )
 	if (m_oki2 != NULL && offset == 1)
 		m_oki2->write(space, offset, data);
 
-	// OKI may not be populated at all 
+	// OKI may not be populated at all
 	else if (m_oki1 != NULL)
 		m_oki1->write(space, offset, data);
 }
@@ -493,7 +493,7 @@ WRITE8_MEMBER( atari_jsa_oki_base_device::oki_w )
 
 //-------------------------------------------------
 //  wrio_w: Handle writes to the general
-//	I/O port on JSA II, III, and IIIs boards
+//  I/O port on JSA II, III, and IIIs boards
 //-------------------------------------------------
 
 WRITE8_MEMBER( atari_jsa_oki_base_device::wrio_w )
@@ -522,7 +522,7 @@ WRITE8_MEMBER( atari_jsa_oki_base_device::wrio_w )
 		if ((data & 4) == 0)
 			m_oki1->reset();
 	}
-	
+
 	// same for the 2nd OKI (JSA IIIs only)
 	if (m_oki2 != NULL)
 	{
@@ -530,7 +530,7 @@ WRITE8_MEMBER( atari_jsa_oki_base_device::wrio_w )
 		if ((data & 4) == 0)
 			m_oki2->reset();
 	}
-	
+
 	// update the (left) OKI bank (JSA III/IIIs only)
 	if (m_oki1_banklo != NULL)
 		m_oki1_banklo->set_entry((m_oki1_banklo->entry() & 2) | ((data >> 1) & 1));
@@ -543,7 +543,7 @@ WRITE8_MEMBER( atari_jsa_oki_base_device::wrio_w )
 
 //-------------------------------------------------
 //  mix_w: Handle writes to the mixing
-//	register on JSA II, III, and IIIs boards
+//  register on JSA II, III, and IIIs boards
 //-------------------------------------------------
 
 WRITE8_MEMBER( atari_jsa_oki_base_device::mix_w )
@@ -572,8 +572,8 @@ WRITE8_MEMBER( atari_jsa_oki_base_device::mix_w )
 
 
 //-------------------------------------------------
-//  overall_volume_w: Handle writes to control the 
-//	total sound volume on JSA III/IIIs boards
+//  overall_volume_w: Handle writes to control the
+//  total sound volume on JSA III/IIIs boards
 //-------------------------------------------------
 
 WRITE8_MEMBER( atari_jsa_oki_base_device::overall_volume_w )
@@ -591,7 +591,7 @@ void atari_jsa_oki_base_device::device_start()
 {
 	// call the parent
 	atari_jsa_base_device::device_start();
-	
+
 	// save states
 	save_item(NAME(m_oki6295_volume));
 	save_item(NAME(m_overall_volume));
@@ -622,7 +622,7 @@ void atari_jsa_oki_base_device::device_reset()
 {
 	// call the parent
 	atari_jsa_base_device::device_reset();
-	
+
 	// reset the static states
 	m_oki6295_volume = 1.0;
 	m_overall_volume = 1.0;
@@ -631,8 +631,8 @@ void atari_jsa_oki_base_device::device_reset()
 
 
 //-------------------------------------------------
-//  update_all_volumes: Update volumes for all 
-//	chips
+//  update_all_volumes: Update volumes for all
+//  chips
 //-------------------------------------------------
 
 void atari_jsa_oki_base_device::update_all_volumes()
@@ -666,7 +666,7 @@ atari_jsa_i_device::atari_jsa_i_device(const machine_config &mconfig, const char
 
 //-------------------------------------------------
 //  rdio_r: Handle reads from the general I/O
-//	port on a JSA I board
+//  port on a JSA I board
 //-------------------------------------------------
 
 READ8_MEMBER( atari_jsa_i_device::rdio_r )
@@ -689,14 +689,14 @@ READ8_MEMBER( atari_jsa_i_device::rdio_r )
 		result |= 0x10;
 	else
 		result &= ~0x10;
-	
+
 	return result;
 }
 
 
 //-------------------------------------------------
 //  wrio_w: Handle writes to the general I/O
-//	port on a JSA I board
+//  port on a JSA I board
 //-------------------------------------------------
 
 WRITE8_MEMBER( atari_jsa_i_device::wrio_w )
@@ -734,8 +734,8 @@ WRITE8_MEMBER( atari_jsa_i_device::wrio_w )
 
 
 //-------------------------------------------------
-//  mix_w: Handle writes to the mixing register 
-//	on a JSA I board
+//  mix_w: Handle writes to the mixing register
+//  on a JSA I board
 //-------------------------------------------------
 
 WRITE8_MEMBER( atari_jsa_i_device::mix_w )
@@ -756,7 +756,7 @@ WRITE8_MEMBER( atari_jsa_i_device::mix_w )
 
 //-------------------------------------------------
 //  tms5220_voice: Handle writes to the TMS5220
-//	voice data register
+//  voice data register
 //-------------------------------------------------
 
 WRITE8_MEMBER( atari_jsa_i_device::tms5220_voice )
@@ -768,7 +768,7 @@ WRITE8_MEMBER( atari_jsa_i_device::tms5220_voice )
 
 //-------------------------------------------------
 //  pokey_r: Handle reads from the POKEY if
-//	present
+//  present
 //-------------------------------------------------
 
 READ8_MEMBER( atari_jsa_i_device::pokey_r )
@@ -781,7 +781,7 @@ READ8_MEMBER( atari_jsa_i_device::pokey_r )
 
 //-------------------------------------------------
 //  pokey_w: Handle writes to the POKEY if
-//	present
+//  present
 //-------------------------------------------------
 
 WRITE8_MEMBER( atari_jsa_i_device::pokey_w )
@@ -821,7 +821,7 @@ void atari_jsa_i_device::device_start()
 {
 	// call the parent
 	atari_jsa_base_device::device_start();
-	
+
 	// save states
 	save_item(NAME(m_pokey_volume));
 	save_item(NAME(m_tms5220_volume));
@@ -836,7 +836,7 @@ void atari_jsa_i_device::device_reset()
 {
 	// call the parent
 	atari_jsa_base_device::device_reset();
-	
+
 	// reset the static states
 	m_pokey_volume = 1.0;
 	m_tms5220_volume = 1.0;
@@ -845,8 +845,8 @@ void atari_jsa_i_device::device_reset()
 
 
 //-------------------------------------------------
-//  update_all_volumes: Update volumes for all 
-//	chips
+//  update_all_volumes: Update volumes for all
+//  chips
 //-------------------------------------------------
 
 void atari_jsa_i_device::update_all_volumes()
@@ -876,7 +876,7 @@ atari_jsa_ii_device::atari_jsa_ii_device(const machine_config &mconfig, const ch
 
 //-------------------------------------------------
 //  rdio_r: Handle reads from the general I/O
-//	port on a JSA II board
+//  port on a JSA II board
 //-------------------------------------------------
 
 READ8_MEMBER( atari_jsa_ii_device::rdio_r )
@@ -895,7 +895,7 @@ READ8_MEMBER( atari_jsa_ii_device::rdio_r )
 	UINT8 result = ioport("JSAII")->read();
 	if (!m_test_read_cb())
 		result ^= 0x80;
-	
+
 	return result;
 }
 
@@ -944,7 +944,7 @@ atari_jsa_iii_device::atari_jsa_iii_device(const machine_config &mconfig, device
 
 //-------------------------------------------------
 //  jsa_iii_rdio: Handle reads from the general I/O
-//	port on a JSA III/IIIs board
+//  port on a JSA III/IIIs board
 //-------------------------------------------------
 
 READ8_MEMBER( atari_jsa_iii_device::rdio_r )

@@ -1696,7 +1696,7 @@ static MACHINE_CONFIG_START( itech8_core_lo, itech8_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(512, 263)
-	
+
 	MCFG_TMS34061_ADD("tms34061", tms34061intf)
 
 	/* sound hardware */
@@ -1794,8 +1794,8 @@ static MACHINE_CONFIG_DERIVED( wfortune, itech8_core_hi )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(itech8_state, screen_update_itech8_2layer)
-	
-	
+
+
 MACHINE_CONFIG_END
 
 
@@ -1811,7 +1811,7 @@ static MACHINE_CONFIG_DERIVED( grmatch, itech8_core_hi )
 
 	/* palette updater */
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("palette", itech8_state, grmatch_palette_update, "screen", 0, 0)
-	
+
 MACHINE_CONFIG_END
 
 
@@ -1824,7 +1824,7 @@ static MACHINE_CONFIG_DERIVED( stratab_hi, itech8_core_hi )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(itech8_state, screen_update_itech8_2layer)
-		
+
 MACHINE_CONFIG_END
 
 

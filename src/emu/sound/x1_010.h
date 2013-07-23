@@ -36,7 +36,7 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 private:
 	// internal state
-	
+
 	/* Variables only used here */
 	int m_rate;                               // Output sampling rate (Hz)
 	sound_stream *  m_stream;                 // Stream handle

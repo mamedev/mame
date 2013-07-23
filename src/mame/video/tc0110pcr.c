@@ -39,7 +39,7 @@ void tc0110pcr_device::device_config_complete()
 	const tc0110pcr_interface *intf = reinterpret_cast<const tc0110pcr_interface *>(static_config());
 	if (intf != NULL)
 	*static_cast<tc0110pcr_interface *>(this) = *intf;
-	
+
 	// or initialize to defaults if none provided
 	else
 	{

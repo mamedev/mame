@@ -205,7 +205,7 @@ void m68307cpu_device::device_start()
 	/* basic CS logic, timers, mbus, serial logic
 	   set via remappable register
 	*/
-	
+
 	init16_m68307(*program);
 
 	m68307SIM    = new m68307_sim();

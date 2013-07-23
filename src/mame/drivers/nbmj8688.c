@@ -2828,7 +2828,7 @@ static MACHINE_CONFIG_DERIVED( crystalg, NBMJDRV_256 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(secolove_map)
 	MCFG_CPU_IO_MAP(crystalg_io_map)
-	
+
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_CRYSTALG )
 MACHINE_CONFIG_END
@@ -2851,7 +2851,7 @@ static MACHINE_CONFIG_DERIVED( apparel, NBMJDRV_256 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(secolove_map)
 	MCFG_CPU_IO_MAP(secolove_io_map)
-	
+
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_APPAREL )
 MACHINE_CONFIG_END
@@ -2891,7 +2891,7 @@ static MACHINE_CONFIG_DERIVED( barline, mbmj_h12bit )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(barline_io_map)
-	
+
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_BARLINE )
 
@@ -2966,49 +2966,49 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( bijokkoy, mbmj_p16bit_LCD )
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
-	MCFG_NB1413M3_TYPE( NB1413M3_BIJOKKOY )	
+	MCFG_NB1413M3_TYPE( NB1413M3_BIJOKKOY )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( bijokkog, mbmj_p16bit_LCD )
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
-	MCFG_NB1413M3_TYPE( NB1413M3_BIJOKKOG )	
+	MCFG_NB1413M3_TYPE( NB1413M3_BIJOKKOG )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( housemnq, mbmj_p16bit_LCD )
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
-	MCFG_NB1413M3_TYPE( NB1413M3_HOUSEMNQ )	
+	MCFG_NB1413M3_TYPE( NB1413M3_HOUSEMNQ )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( housemn2, mbmj_p16bit_LCD )
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
-	MCFG_NB1413M3_TYPE( NB1413M3_HOUSEMN2 )	
+	MCFG_NB1413M3_TYPE( NB1413M3_HOUSEMN2 )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( livegal, mbmj_p16bit_LCD )
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
-	MCFG_NB1413M3_TYPE( NB1413M3_LIVEGAL )	
+	MCFG_NB1413M3_TYPE( NB1413M3_LIVEGAL )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( orangec, mbmj_p16bit )
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
-	MCFG_NB1413M3_TYPE( NB1413M3_ORANGEC )	
+	MCFG_NB1413M3_TYPE( NB1413M3_ORANGEC )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( orangeci, mbmj_p16bit )
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
-	MCFG_NB1413M3_TYPE( NB1413M3_ORANGECI )	
+	MCFG_NB1413M3_TYPE( NB1413M3_ORANGECI )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( vipclub, mbmj_p16bit )
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
-	MCFG_NB1413M3_TYPE( NB1413M3_VIPCLUB )	
+	MCFG_NB1413M3_TYPE( NB1413M3_VIPCLUB )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( seiha, NBMJDRV_65536 )
@@ -3017,15 +3017,15 @@ static MACHINE_CONFIG_DERIVED( seiha, NBMJDRV_65536 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(secolove_map)
 	MCFG_CPU_IO_MAP(seiha_io_map)
-	
+
 	MCFG_DEVICE_MODIFY("nb1413m3")
-	MCFG_NB1413M3_TYPE( NB1413M3_SEIHA )	
+	MCFG_NB1413M3_TYPE( NB1413M3_SEIHA )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( seiham, seiha )
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
-	MCFG_NB1413M3_TYPE( NB1413M3_SEIHAM )	
+	MCFG_NB1413M3_TYPE( NB1413M3_SEIHAM )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mjgaiden, NBMJDRV_4096 )
@@ -3035,7 +3035,7 @@ static MACHINE_CONFIG_DERIVED( mjgaiden, NBMJDRV_4096 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(ojousan_map)
 	MCFG_CPU_IO_MAP(mjgaiden_io_map)
-	
+
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_OJOUSAN )
 MACHINE_CONFIG_END
@@ -3046,7 +3046,7 @@ static MACHINE_CONFIG_DERIVED( iemoto, NBMJDRV_65536 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(secolove_map)
 	MCFG_CPU_IO_MAP(iemoto_io_map)
-	
+
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_IEMOTO )
 MACHINE_CONFIG_END
@@ -3057,7 +3057,7 @@ static MACHINE_CONFIG_DERIVED( ojousan, NBMJDRV_65536 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(ojousan_map)
 	MCFG_CPU_IO_MAP(iemoto_io_map)
-	
+
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_OJOUSAN )
 MACHINE_CONFIG_END
@@ -3136,7 +3136,7 @@ static MACHINE_CONFIG_DERIVED( mjsikaku, NBMJDRV_4096 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mjsikaku_map)
 	MCFG_CPU_IO_MAP(mjsikaku_io_map)
-	
+
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_MJSIKAKU )
 
@@ -3151,7 +3151,7 @@ static MACHINE_CONFIG_DERIVED( mmsikaku, NBMJDRV_4096 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(secolove_map)
 	MCFG_CPU_IO_MAP(mmsikaku_io_map)
-	
+
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_MMSIKAKU )
 MACHINE_CONFIG_END
@@ -3161,7 +3161,7 @@ static MACHINE_CONFIG_DERIVED( otonano, mjsikaku )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(otonano_io_map)
-	
+
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_OTONANO )
 MACHINE_CONFIG_END
@@ -4080,12 +4080,12 @@ GAME( 1988, korinaim, korinai,  korinaim,        korinaim, driver_device,  0,   
 /* pure 16-bit palette (+ LCD in some) */
 GAME( 1987, housemnq, 0,        housemnq,        housemnq, driver_device,  0,        ROT0, "Nichibutsu", "House Mannequin (Japan 870217)", 0 )
 GAME( 1987, housemn2, 0,        housemn2,        housemn2, driver_device,  0,        ROT0, "Nichibutsu", "House Mannequin Roppongi Live hen (Japan 870418)", 0 )
-GAME( 1987, livegal,  0,        livegal,		 livegal,  driver_device,  0,        ROT0, "Central Denshi", "Live Gal (Japan 870530)", 0 )
+GAME( 1987, livegal,  0,        livegal,         livegal,  driver_device,  0,        ROT0, "Central Denshi", "Live Gal (Japan 870530)", 0 )
 GAME( 1987, bijokkoy, 0,        bijokkoy,        bijokkoy, driver_device,  0,        ROT0, "Nichibutsu", "Bijokko Yume Monogatari (Japan 870925)", 0 )
 GAME( 1988, bijokkog, 0,        bijokkog,        bijokkog, driver_device,  0,        ROT0, "Nichibutsu", "Bijokko Gakuen (Japan 880116)", 0 )
-GAME( 1988, orangec,  0,        orangec,	     orangec,  driver_device,  0,        ROT0, "Daiichi Denshi", "Orange Club - Maruhi Kagai Jugyou (Japan 880213)", 0 )
-GAME( 1988, orangeci, orangec,  orangeci,	     orangeci, driver_device,  0,        ROT0, "Daiichi Denshi", "Orange Club - Maru-hi Ippatsu Kaihou [BET] (Japan 880221)", 0 )
-GAME( 1988, vipclub,  orangec,  vipclub,	     vipclub,  driver_device,  0,        ROT0, "Daiichi Denshi", "Vip Club - Maru-hi Ippatsu Kaihou [BET] (Japan 880310)", 0 )
+GAME( 1988, orangec,  0,        orangec,         orangec,  driver_device,  0,        ROT0, "Daiichi Denshi", "Orange Club - Maruhi Kagai Jugyou (Japan 880213)", 0 )
+GAME( 1988, orangeci, orangec,  orangeci,        orangeci, driver_device,  0,        ROT0, "Daiichi Denshi", "Orange Club - Maru-hi Ippatsu Kaihou [BET] (Japan 880221)", 0 )
+GAME( 1988, vipclub,  orangec,  vipclub,         vipclub,  driver_device,  0,        ROT0, "Daiichi Denshi", "Vip Club - Maru-hi Ippatsu Kaihou [BET] (Japan 880310)", 0 )
 
 /* pure 12-bit palette */
 GAME( 1988, kaguya,   0,        kaguya,          kaguya,   driver_device,   0,        ROT0, "Miki Syouji", "Mahjong Kaguyahime [BET] (Japan 880521)", 0 )

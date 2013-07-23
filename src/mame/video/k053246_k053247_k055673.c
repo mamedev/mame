@@ -343,7 +343,7 @@ void k053247_device::k053247_sprites_draw_common( _BitmapClass &bitmap, const re
 
 	int sortedlist[NUM_SPRITES];
 	int offs,zcode;
-	 
+
 
 
 
@@ -974,7 +974,6 @@ const device_type K055673 = &device_creator<k055673_device>;
 k055673_device::k055673_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: k053247_device(mconfig, K055673, "Konami 055673", tag, owner, clock, "k055673", __FILE__)
 {
-
 }
 
 
@@ -984,7 +983,6 @@ k055673_device::k055673_device(const machine_config &mconfig, const char *tag, d
 
 void k055673_device::device_start()
 {
-
 	/* early out for the non-interface cases for now */
 	if (m_intf_gfx_num == -1)
 		return;
@@ -1027,7 +1025,7 @@ void k053247_device::device_config_complete()
 	const k053247_interface *intf = reinterpret_cast<const k053247_interface *>(static_config());
 	if (intf != NULL)
 	*static_cast<k053247_interface *>(this) = *intf;
-	
+
 	// or initialize to defaults if none provided
 	else
 	{
@@ -1041,9 +1039,9 @@ void k053247_device::device_config_complete()
 
 void k053247_device::device_start()
 {
-//	bitmap_rgb32* blah;
-//	if (0)
-//		k053247_draw_single_sprite_gxcore(blah, 
+//  bitmap_rgb32* blah;
+//  if (0)
+//      k053247_draw_single_sprite_gxcore(blah,
 
 	UINT32 total;
 	static const gfx_layout spritelayout =
@@ -1316,7 +1314,3 @@ void k053247_device::alt_k055673_vh_start(running_machine &machine, const char *
 	machine.save().save_item(NAME(m_kx47_regs));
 	machine.save().save_item(NAME(m_objcha_line));
 }
-
-
-
-

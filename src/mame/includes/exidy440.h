@@ -23,10 +23,10 @@ public:
 	required_shared_ptr<UINT8> m_imageram;
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_scanline;
-	
+
 	required_device<cpu_device> m_maincpu;
 	required_device<exidy440_sound_device> m_custom;
-	
+
 	UINT8 m_bank;
 	const UINT8 *m_showdown_bank_data[2];
 	INT8 m_showdown_bank_select;

@@ -95,7 +95,7 @@ void pc090oj_device::device_config_complete()
 	const pc090oj_interface *intf = reinterpret_cast<const pc090oj_interface *>(static_config());
 	if (intf != NULL)
 	*static_cast<pc090oj_interface *>(this) = *intf;
-	
+
 	// or initialize to defaults if none provided
 	else
 	{

@@ -12,7 +12,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_clut(*this, "clut"),
 		m_maincpu(*this, "maincpu"),
-		m_nb1413m3(*this, "nb1413m3")	{ }
+		m_nb1413m3(*this, "nb1413m3")   { }
 
 	required_shared_ptr<UINT8> m_clut;
 	required_device<cpu_device> m_maincpu;

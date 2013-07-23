@@ -154,7 +154,7 @@ public:
 
 	void set_otis(es5505_device *otis) { m_otis = otis; }
 	void set_esp(es5510_device *esp) { m_esp = esp; }
-	void set_esp_halted(bool esp_halted) { 
+	void set_esp_halted(bool esp_halted) {
 		m_esp_halted = esp_halted;
 		logerror("ESP-halted -> %d\n", m_esp_halted);
 		if (!esp_halted) {
@@ -264,7 +264,7 @@ void esq_5505_5510_pump::sound_stream_update(sound_stream &stream, stream_sample
 	stream_sample_t *left = outputs[0], *right = outputs[1];
 	for (int i = 0; i < samples; i++)
 	{
-	    // anything for the 'aux' output?
+		// anything for the 'aux' output?
 		INT32 l = inputs[0][i] >> 4;
 		INT32 r = inputs[1][i] >> 4;
 
@@ -318,7 +318,7 @@ void esq_5505_5510_pump::sound_stream_update(sound_stream &stream, stream_sample
 			fprintf(stderr, "*-.\n");
 		}
 		was_silence = silence;
-	} 
+	}
 #endif
 
 #if PUMP_TRACK_SAMPLES
@@ -838,7 +838,7 @@ static const es5505_interface es5505_config =
 static const esqpanel_interface esqpanel_config =
 {
 	DEVCB_DEVICE_LINE_MEMBER("duart", duartn68681_device, rx_b_w),
-    DEVCB_DRIVER_MEMBER16(esq5505_state, analog_w)
+	DEVCB_DRIVER_MEMBER16(esq5505_state, analog_w)
 };
 
 static SLOT_INTERFACE_START(midiin_slot)

@@ -7425,7 +7425,7 @@ GAME( 1998, grdnstrmv,grdnstrm, grdnstrmk,grdnstrk, nmk16_state,   grdnstrm, ROT
 GAME( 1998, grdnstrmk,grdnstrm, grdnstrmk,grdnstrk, nmk16_state,   grdnstrm, ROT270,             "Afega",                             "Sen Jin - Guardian Storm (Korea)", 0 )
 GAME( 1998, redfoxwp2,grdnstrm, grdnstrmk,grdnstrk, nmk16_state,   grdnstrm, ROT270,             "Afega",                             "Red Fox War Planes II (China, set 1)", 0 )
 GAME( 1998, redfoxwp2a,grdnstrm,grdnstrmk,grdnstrk, nmk16_state,  redfoxwp2a,ROT270,             "Afega",                             "Red Fox War Planes II (China, set 2)", 0 )
-GAME( 1998, grdnstrmg,grdnstrm, grdnstrmk,grdnstrk, nmk16_state,   grdnstrmg,ROT270,             "Afega",							  "Guardian Storm (Germany)", 0 )
+GAME( 1998, grdnstrmg,grdnstrm, grdnstrmk,grdnstrk, nmk16_state,   grdnstrmg,ROT270,             "Afega",                             "Guardian Storm (Germany)", 0 )
 
 GAME( 1998, bubl2000, 0,        popspops, bubl2000, nmk16_state,   bubl2000, ROT0,               "Tuning",                            "Bubble 2000", 0 ) // on a tuning board (bootleg?)
 GAME( 1998, hotbubl,  bubl2000, popspops, bubl2000, nmk16_state,   bubl2000, ROT0,               "Pandora",                           "Hot Bubble" , 0 ) // on an afega board ..

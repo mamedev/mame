@@ -61,5 +61,5 @@ public:
 	void mix_boogwing(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_READ16_MEMBER( boogwing_protection_region_0_104_r );
 	DECLARE_WRITE16_MEMBER( boogwing_protection_region_0_104_w );
-	
+
 };

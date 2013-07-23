@@ -338,40 +338,40 @@ ioport_constructor decocpu_type1_device::device_input_ports() const
 
 decocpu_type1_device::decocpu_type1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, DECOCPU1, "Data East Pinball CPU Board Type 1", tag, owner, clock, "decocpu1", __FILE__),
-	  m_cpu(*this,"maincpu"),
-	  m_pia21(*this, "pia21"),
-	  m_pia24(*this, "pia24"),
-	  m_pia28(*this, "pia28"),
-	  m_pia2c(*this, "pia2c"),
-	  m_pia30(*this, "pia30"),
-	  m_pia34(*this, "pia34"),
-	  m_read_display(*this),
-	  m_write_display(*this),
-	  m_read_dmdstatus(*this),
-	  m_write_soundlatch(*this),
-	  m_read_switch(*this),
-	  m_write_switch(*this),
-	  m_write_lamp(*this),
-	  m_write_solenoid(*this)
+		m_cpu(*this,"maincpu"),
+		m_pia21(*this, "pia21"),
+		m_pia24(*this, "pia24"),
+		m_pia28(*this, "pia28"),
+		m_pia2c(*this, "pia2c"),
+		m_pia30(*this, "pia30"),
+		m_pia34(*this, "pia34"),
+		m_read_display(*this),
+		m_write_display(*this),
+		m_read_dmdstatus(*this),
+		m_write_soundlatch(*this),
+		m_read_switch(*this),
+		m_write_switch(*this),
+		m_write_lamp(*this),
+		m_write_solenoid(*this)
 {}
 
 decocpu_type1_device::decocpu_type1_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-	  m_cpu(*this,"maincpu"),
-	  m_pia21(*this, "pia21"),
-	  m_pia24(*this, "pia24"),
-	  m_pia28(*this, "pia28"),
-	  m_pia2c(*this, "pia2c"),
-	  m_pia30(*this, "pia30"),
-	  m_pia34(*this, "pia34"),
-	  m_read_display(*this),
-	  m_write_display(*this),
-	  m_read_dmdstatus(*this),
-	  m_write_soundlatch(*this),
-	  m_read_switch(*this),
-	  m_write_switch(*this),
-	  m_write_lamp(*this),
-	  m_write_solenoid(*this)
+		m_cpu(*this,"maincpu"),
+		m_pia21(*this, "pia21"),
+		m_pia24(*this, "pia24"),
+		m_pia28(*this, "pia28"),
+		m_pia2c(*this, "pia2c"),
+		m_pia30(*this, "pia30"),
+		m_pia34(*this, "pia34"),
+		m_read_display(*this),
+		m_write_display(*this),
+		m_read_dmdstatus(*this),
+		m_write_soundlatch(*this),
+		m_read_switch(*this),
+		m_write_switch(*this),
+		m_write_lamp(*this),
+		m_write_solenoid(*this)
 {}
 
 void decocpu_type1_device::device_start()
@@ -427,4 +427,3 @@ void decocpu_type3_device::device_start()
 {
 	decocpu_type1_device::device_start();
 }
-

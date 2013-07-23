@@ -373,10 +373,9 @@ UINT32 stfight_state::screen_update_cshooter(screen_device &screen, bitmap_ind16
 	m_fg_tilemap->draw(bitmap, cliprect, 0,1);
 
 	/* Draw sprites (may be obscured by foreground layer) */
-//	if (m_vh_latch_ram[0x07] & 0x40)
+//  if (m_vh_latch_ram[0x07] & 0x40)
 		cshooter_draw_sprites(bitmap,cliprect);
 
 	m_tx_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }
-

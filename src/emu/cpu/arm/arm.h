@@ -95,8 +95,8 @@ protected:
 class arm_be_cpu_device : public arm_cpu_device
 {
 public:
-    // construction/destruction
-    arm_be_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	arm_be_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);

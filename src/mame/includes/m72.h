@@ -29,7 +29,7 @@ public:
 	optional_shared_ptr<UINT16> m_majtitle_rowscrollram;
 	optional_shared_ptr<UINT16> m_spriteram2;
 	optional_shared_ptr<UINT8> m_soundram;
-	
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	optional_device<cpu_device> m_mcu;

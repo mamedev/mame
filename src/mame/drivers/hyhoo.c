@@ -238,7 +238,7 @@ static MACHINE_CONFIG_START( hyhoo, hyhoo_state )
 	MCFG_CPU_PROGRAM_MAP(hyhoo_map)
 	MCFG_CPU_IO_MAP(hyhoo_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", hyhoo_state, irq0_line_hold)
-	
+
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
@@ -248,7 +248,7 @@ static MACHINE_CONFIG_START( hyhoo, hyhoo_state )
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 16, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(hyhoo_state, screen_update_hyhoo)
-	
+
 	MCFG_NB1413M3_ADD("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_HYHOO )
 

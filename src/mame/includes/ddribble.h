@@ -46,7 +46,7 @@ public:
 	device_t *m_filter3;
 	required_device<cpu_device> m_maincpu;
 	required_device<vlm5030_device> m_vlm;
-	
+
 	DECLARE_WRITE8_MEMBER(ddribble_bankswitch_w);
 	DECLARE_READ8_MEMBER(ddribble_sharedram_r);
 	DECLARE_WRITE8_MEMBER(ddribble_sharedram_w);

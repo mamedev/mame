@@ -620,9 +620,9 @@ public:
 	UINT8                 m_oldjoy1_latch;
 
 	/* input-related */
-	UINT16                m_data1[4];	// JOY1/JOY2 + 3rd & 4th only used by multitap (hacky support)
-	UINT16                m_data2[4];	// JOY3/JOY4 + 3rd & 4th only used by multitap (hacky support)
-	UINT8                 m_read_idx[4];	// 3rd & 4th only used by multitap (hacky support)
+	UINT16                m_data1[4];   // JOY1/JOY2 + 3rd & 4th only used by multitap (hacky support)
+	UINT16                m_data2[4];   // JOY3/JOY4 + 3rd & 4th only used by multitap (hacky support)
+	UINT8                 m_read_idx[4];    // 3rd & 4th only used by multitap (hacky support)
 
 	/* cart related */
 	snes_cart_info m_cart;   // used by NSS/SFCBox only! to be moved in a derived class!

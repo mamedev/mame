@@ -29,7 +29,7 @@ public:
 	required_shared_ptr<UINT8> m_scroll2;
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;
-	
+
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	optional_device<sn76496_device> m_sn;

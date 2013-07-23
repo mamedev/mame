@@ -28,7 +28,7 @@ public:
 
 	UINT8           m_interrupt_enable;
 	required_shared_ptr<UINT16> m_bankselect;
-	
+
 	required_device<tilemap_device> m_playfield_tilemap;
 	required_device<tilemap_device> m_alpha_tilemap;
 

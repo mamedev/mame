@@ -65,7 +65,7 @@ public:
 	tilemap_t        *m_tilemap[3];
 
 	INT32          m_flipscreen;
-	
+
 	TILE_GET_INFO_MEMBER(get_bg0_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);

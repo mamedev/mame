@@ -1084,12 +1084,12 @@ UINT32 toaplan1_rallybik_state::screen_update_rallybik(screen_device &screen, bi
 		m_pf3_tilemap->draw(bitmap, cliprect, priority, 0);
 		m_pf2_tilemap->draw(bitmap, cliprect, priority, 0);
 		m_pf1_tilemap->draw(bitmap, cliprect, priority, 0);
-		
+
 		//if (pririoty==0x00)  m_spritegen->copy_sprites_from_tempbitmap(bitmap,cliprect,0);
 		if (priority==0x04)  m_spritegen->copy_sprites_from_tempbitmap(bitmap,cliprect,1);
 		if (priority==0x08)  m_spritegen->copy_sprites_from_tempbitmap(bitmap,cliprect,2);
 		if (priority==0x0c)  m_spritegen->copy_sprites_from_tempbitmap(bitmap,cliprect,3);
-		
+
 	}
 
 	return 0;

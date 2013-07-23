@@ -43,7 +43,7 @@
     kakinoki: S-CPU crashes after pressing start
     kirby3j, kirby3: uses SA-1 DMA
     kirbysdb, kirbyss, kirbyfun, kirbysd, kirbysda: plays OK
-    marvelou: plays OK, uses SA-1 normal DMA only but has corrupt gfx 
+    marvelou: plays OK, uses SA-1 normal DMA only but has corrupt gfx
     miniyonk: plays OK
     panicbw: plays OK
     pgaeuro, pgaeurou, pga96, pga96u, pga, pgaj: plays OK
@@ -69,15 +69,15 @@
 #include "emu.h"
 #include "machine/sns_sa1.h"
 
-#define SA1_IRQ_SCPU	(0x80)
-#define SA1_IRQ_TIMER	(0x40)
-#define SA1_IRQ_DMA		(0x20)
-#define SA1_NMI_SCPU	(0x10)
+#define SA1_IRQ_SCPU    (0x80)
+#define SA1_IRQ_TIMER   (0x40)
+#define SA1_IRQ_DMA     (0x20)
+#define SA1_NMI_SCPU    (0x10)
 
-#define SCPU_IRQ_SA1	(0x80)
-#define SCPU_IRQV_ALT	(0x40)
+#define SCPU_IRQ_SA1    (0x80)
+#define SCPU_IRQV_ALT   (0x40)
 #define SCPU_IRQ_CHARCONV (0x20)
-#define SCPU_NMIV_ALT	(0x10)
+#define SCPU_NMIV_ALT   (0x10)
 
 //-------------------------------------------------
 //  constructor
@@ -229,21 +229,21 @@ UINT8 sns_sa1_device::var_length_read(address_space &space, UINT32 offset)
 
 void sns_sa1_device::dma_transfer(address_space &space)
 {
-//	printf("DMA src %08x (%d), dst %08x (%d) cnt %d\n", m_src_addr, m_dma_ctrl & 3, m_dst_addr, m_dma_ctrl & 4, m_dma_cnt);
+//  printf("DMA src %08x (%d), dst %08x (%d) cnt %d\n", m_src_addr, m_dma_ctrl & 3, m_dst_addr, m_dma_ctrl & 4, m_dma_cnt);
 
-	while (m_dma_cnt--) 
+	while (m_dma_cnt--)
 	{
 		UINT8 data = 0; // open bus?
 		UINT32 dma_src = m_src_addr++;
 		UINT32 dma_dst = m_dst_addr++;
-		
+
 		// source and destination cannot be the same
 		// source = { 0=ROM, 1=BWRAM, 2=IRAM }
 		// destination = { 0=IRAM, 1=BWRAM }
 		if ((m_dma_ctrl & 0x03) == 1 && (m_dma_ctrl & 0x04) == 0x04) continue;
 		if ((m_dma_ctrl & 0x03) == 2 && (m_dma_ctrl & 0x04) == 0x00) continue;
 
-		switch (m_dma_ctrl & 0x03) 
+		switch (m_dma_ctrl & 0x03)
 		{
 			case 0: // ROM
 				if ((dma_src & 0x408000) == 0x008000 && (dma_src & 0x800000) == 0x000000)
@@ -263,7 +263,7 @@ void sns_sa1_device::dma_transfer(address_space &space)
 			case 1: // BWRAM
 				if ((dma_src & 0x40e000) == 0x006000)
 				{
-					data = read_bwram((m_bwram_sa1 * 0x2000) + (dma_src & 0x1fff));				
+					data = read_bwram((m_bwram_sa1 * 0x2000) + (dma_src & 0x1fff));
 				}
 				if ((dma_src & 0xf00000) == 0x400000)
 				{
@@ -275,17 +275,17 @@ void sns_sa1_device::dma_transfer(address_space &space)
 				data = read_iram(dma_src);
 				break;
 		}
-		
-		switch (m_dma_ctrl & 0x04) 
+
+		switch (m_dma_ctrl & 0x04)
 		{
-			case 0x00:	// IRAM
+			case 0x00:  // IRAM
 				write_iram(dma_dst, data);
 				break;
 
-			case 0x04:	// BWRAM
+			case 0x04:  // BWRAM
 				if ((dma_dst & 0x40e000) == 0x006000)
 				{
-					write_bwram((m_bwram_sa1 * 0x2000) + (dma_dst & 0x1fff), data);				
+					write_bwram((m_bwram_sa1 * 0x2000) + (dma_dst & 0x1fff), data);
 				}
 				if ((dma_dst & 0xf00000) == 0x400000)
 				{
@@ -294,7 +294,7 @@ void sns_sa1_device::dma_transfer(address_space &space)
 				break;
 		}
 	}
-	
+
 	m_sa1_flags |= SA1_IRQ_DMA;
 	recalc_irqs();
 }
@@ -413,15 +413,15 @@ void sns_sa1_device::write_regs(address_space &space, UINT32 offset, UINT8 data)
 	{
 		case 0x000:
 			// SA-1 control flags
-//			printf("%02x to SA-1 control\n", data);
+//          printf("%02x to SA-1 control\n", data);
 			if ((BIT(data, 5)) && !(BIT(m_sa1_ctrl, 5)))
 			{
-//				printf("Engaging SA-1 reset\n");
+//              printf("Engaging SA-1 reset\n");
 				m_sa1->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 			}
 			else if (!(BIT(data, 5)) && (BIT(m_sa1_ctrl, 5)))
 			{
-//				printf("Releasing SA-1 reset\n");
+//              printf("Releasing SA-1 reset\n");
 				m_sa1->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 				m_sa1->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 				m_sa1->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
@@ -446,16 +446,16 @@ void sns_sa1_device::write_regs(address_space &space, UINT32 offset, UINT8 data)
 		case 0x001:
 			// SNES  SIE   00h   SNES CPU Int Enable (W)
 			m_scpu_sie = data;
-//			printf("S-CPU IE = %02x\n", data);
+//          printf("S-CPU IE = %02x\n", data);
 			recalc_irqs();
 			break;
 		case 0x002:
 			// SNES  SIC   00h   SNES CPU Int Clear  (W)
-			if (BIT(data, 7))	// ack IRQ from SA-1
+			if (BIT(data, 7))   // ack IRQ from SA-1
 			{
 				m_scpu_flags &= ~SCPU_IRQ_SA1;
 			}
-			if (BIT(data, 5))	// ack character conversion IRQ
+			if (BIT(data, 5))   // ack character conversion IRQ
 			{
 				m_scpu_flags &= ~SCPU_IRQ_CHARCONV;
 			}
@@ -497,7 +497,7 @@ void sns_sa1_device::write_regs(address_space &space, UINT32 offset, UINT8 data)
 			if (m_scpu_ctrl & 0x80)
 			{
 				m_scpu_flags |= SCPU_IRQ_SA1;
-//				printf("SA-1 cause S-CPU IRQ\n");
+//              printf("SA-1 cause S-CPU IRQ\n");
 			}
 
 			// message to SA-1
@@ -508,14 +508,14 @@ void sns_sa1_device::write_regs(address_space &space, UINT32 offset, UINT8 data)
 			m_scpu_flags &= ~(SCPU_IRQV_ALT|SCPU_NMIV_ALT);
 
 			// and set them
-			m_scpu_flags |= (data & (SCPU_IRQV_ALT|SCPU_NMIV_ALT)); 
+			m_scpu_flags |= (data & (SCPU_IRQV_ALT|SCPU_NMIV_ALT));
 
 			recalc_irqs();
 			break;
 		case 0x00a:
 			// SA-1  CIE   00h   SA-1 CPU Int Enable (W)
 			m_sa1_sie = data;
-//			printf("SA-1 IE = %02x\n", data);
+//          printf("SA-1 IE = %02x\n", data);
 			recalc_irqs();
 			break;
 		case 0x00b:
@@ -627,7 +627,7 @@ void sns_sa1_device::write_regs(address_space &space, UINT32 offset, UINT8 data)
 			break;
 		case 0x030:
 			// SA-1  DCNT  00h   DMA Control (W)
-//			printf("%02x to SA-1 DMA control\n", data);
+//          printf("%02x to SA-1 DMA control\n", data);
 			m_dma_ctrl = data;
 			break;
 		case 0x031:
@@ -658,24 +658,24 @@ void sns_sa1_device::write_regs(address_space &space, UINT32 offset, UINT8 data)
 				if (!(m_dma_ctrl & 0x20) && !(m_dma_ctrl & 0x04)) // Normal DMA to IRAM
 				{
 					dma_transfer(space);
-//					printf("SA-1: normal DMA to IRAM\n");
+//                  printf("SA-1: normal DMA to IRAM\n");
 				}
 
-				if (m_dma_ctrl & 0x20 && m_dma_ctrl & 0x10)	// CC DMA Type 1
+				if (m_dma_ctrl & 0x20 && m_dma_ctrl & 0x10) // CC DMA Type 1
 				{
-//					printf("SA-1: CC DMA type 1\n");
+//                  printf("SA-1: CC DMA type 1\n");
 					dma_cctype1_transfer(space);
 				}
 			}
-			break; 
+			break;
 		case 0x037:
 			// DMA Dest Device Start Address High
 			m_dst_addr = (m_dst_addr & 0xffff00) | (data << 16);
 			if (m_dma_ctrl & 0x80)
 			{
-				if (!(m_dma_ctrl & 0x20) && m_dma_ctrl & 0x04)	// Normal DMA to BWRAM
+				if (!(m_dma_ctrl & 0x20) && m_dma_ctrl & 0x04)  // Normal DMA to BWRAM
 				{
-//					printf("SA-1: normal DMA to BWRAM\n");
+//                  printf("SA-1: normal DMA to BWRAM\n");
 					dma_transfer(space);
 				}
 			}
@@ -714,12 +714,12 @@ void sns_sa1_device::write_regs(address_space &space, UINT32 offset, UINT8 data)
 			m_brf_reg[offset & 0x0f] = data;
 			if ((offset & 0x07) == 7 && m_dma_ctrl & 0x80)
 			{
-				if (m_dma_ctrl & 0x20 && !(m_dma_ctrl & 0x10))	// CC DMA Type 2
+				if (m_dma_ctrl & 0x20 && !(m_dma_ctrl & 0x10))  // CC DMA Type 2
 				{
-//					printf("SA-1: CC DMA type 2\n");
+//                  printf("SA-1: CC DMA type 2\n");
 					dma_cctype2_transfer(space);
 				}
-			}			
+			}
 			break;
 		case 0x050:
 			// Math control

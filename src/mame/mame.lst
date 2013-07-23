@@ -794,7 +794,7 @@ polepos1        // 136014   (c) 1982 Atari
 topracer        // bootleg
 topracera       // bootleg
 topracern       // bootleg
-ppspeed			// bootleg
+ppspeed         // bootleg
 polepos2        // (c) 1983
 polepos2a       // 136014   (c) 1983 + Atari license
 polepos2b       // bootleg
@@ -2473,7 +2473,7 @@ pwrshovl        // E74 (c) 1999 Taito
 landhigh        // E82 (c) 1999 Taito
 batlgr2         // E87 (c) 2000 Taito (2.04J)
 batlgr2a        // E87 (c) 2000 Taito (2.01J)
-styphp			// E98 (c) 2000 Taito
+styphp          // E98 (c) 2000 Taito
 raizpin         // F14 (c) 2002 Taito
 
 invqix          // F34 (c) 2003 Taito Corporation
@@ -2563,7 +2563,7 @@ snowbrosc       // MIN16-02 (c) 1990 Toaplan + Romstar license
 snowbrosj       // MIN16-02 (c) 1990 Toaplan
 snowbrosd       // MIN16-02 (c) 1990 Toaplan + Dooyong license
 wintbob         // bootleg
-snowbroswb		//
+snowbroswb      //
 // modified snowbros 'clone' hardware
 honeydol        // (c) 1995 Barko Corp
 twinadv         // (c) 1995 Barko Corp
@@ -4013,7 +4013,7 @@ gtclasscp       // (c) 2001 Incredible Technologies
 gtclasscs       // (c) 2001 Incredible Technologies
 gtfore02        // (c) 2001 Incredible Technologies
 gtfore02o       // (c) 2001 Incredible Technologies
-carnking		// (c) 2002 Incredible Technologies 
+carnking        // (c) 2002 Incredible Technologies
 gtfore04        // (c) 2003 Incredible Technologies
 gtfore05        // (c) 2004 Incredible Technologies
 
@@ -5235,7 +5235,7 @@ mbaa            // 2008.09 Melty Blood Actress Again
 ngdup23a        // DIMM Firmware Updater (Rev A)
 ngdup23c        // DIMM Firmware Updater (Rev C)
 ngdup23e        // DIMM Firmware Updater (Rev E)
-ndcfboxa		// DIMM Firmware Updater for CF-BOX (Rev A) (GDS-0042A)
+ndcfboxa        // DIMM Firmware Updater for CF-BOX (Rev A) (GDS-0042A)
 
 // NAOMI based (System SP)
 				// 2004.10 Oshare Majo Love and Berry / Fashionable Witch Love and Berry
@@ -7973,7 +7973,7 @@ portman         // (c) 1982 Nova Games Ltd.
 suprmous        // (c) 1982 Taito
 funnymou        // (c) 1982 Chuo Co. Ltd
 machomou        // (c) 1982 Techstar
-desertdn		// (c) 1982 Video Optics
+desertdn        // (c) 1982 Video Optics
 intrepid        // (c) 1983 Nova Games Ltd.
 intrepid2       // (c) 1983 Nova Games Ltd.
 intrepidb       // bootleg
@@ -9080,7 +9080,7 @@ redhawkb        // (c) 1997
 grdnstrm        // (c) 1998 Apples Industries license
 grdnstrmv       //
 grdnstrmk       // (c) 1998 (Korea)
-grdnstrmg		//
+grdnstrmg       //
 redfoxwp2       // (c) 1998 (China)
 redfoxwp2a      // (c) 1998 (China)
 bubl2000        // (c) 1998 Tuning
@@ -9406,7 +9406,7 @@ kov2101         //
 kov2100         //
 kov2p           // (c) 2000 Knights of Valor 2 Nine Dragons
 kov2p204        //
-kov2p202		//
+kov2p202        //
 ddp2            // (c) 2001 DoDonPachi 2 - Bee Storm
 ddp2101         //
 ddp2100         //
@@ -9986,7 +9986,7 @@ stealsee        // (c) 2000 Moov Generation / Eolith
 raccoon         // (c) 1999 Eolith
 fort2b          // (c) 2001 Eolith
 fort2ba         // (c) 2001 Eolith
-hidnc2k			// (c) 2000 Eolith
+hidnc2k         // (c) 2000 Eolith
 klondkp         // (c) 1999 Eolith
 hidctch3        // (c) 2000 Eolith
 crazywar        // (c) 2002 Eolith

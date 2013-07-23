@@ -1446,9 +1446,9 @@ ROM_START( pc1512 )
 	ROMX_LOAD( "40078.ic127", 0x0000, 0x2000, CRC(ae9c0d04) SHA1(bc8dc4dcedeea5bc1c04986b1f105ad93cb2ebcd), ROM_BIOS(3) )
 ROM_END
 
-#define rom_pc1512dd 	rom_pc1512
-#define rom_pc1512hd10 	rom_pc1512
-#define rom_pc1512hd20 	rom_pc1512
+#define rom_pc1512dd    rom_pc1512
+#define rom_pc1512hd10  rom_pc1512
+#define rom_pc1512hd20  rom_pc1512
 
 
 //-------------------------------------------------
@@ -1468,9 +1468,9 @@ ROM_START( pc1640 )
 	ROMX_LOAD( "40043 88xx.ic129", 0x0001, 0x2000, CRC(9219d0aa) SHA1(dde1a46c8f83e413d7070f1356fc91b9f595a8b6), ROM_SKIP(1) | ROM_BIOS(3) )
 ROM_END
 
-#define rom_pc1640dd 	rom_pc1640
-#define rom_pc1640hd20 	rom_pc1640
-#define rom_pc1640hd30 	rom_pc1640
+#define rom_pc1640dd    rom_pc1640
+#define rom_pc1640hd20  rom_pc1640
+#define rom_pc1640hd30  rom_pc1640
 
 
 

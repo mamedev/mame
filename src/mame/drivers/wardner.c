@@ -404,7 +404,7 @@ static MACHINE_CONFIG_START( wardner, wardner_state )
 
 	/* video hardware */
 	MCFG_MC6845_ADD("crtc", HD6845, XTAL_14MHz/4, twincobr_mc6845_intf) /* 3.5MHz measured on CLKin */
-	
+
 	MCFG_TOAPLAN_SCU_ADD("toaplan_scu")
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)

@@ -193,7 +193,7 @@ static MACHINE_CONFIG_START( vindictr, vindictr_state )
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield", 2, vindictr_state, get_playfield_tile_info, 8,8, SCAN_COLS, 64,64)
 	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", 2, vindictr_state, get_alpha_tile_info, 8,8, SCAN_ROWS, 64,32, 0)
-	
+
 	MCFG_SCREEN_ADD("screen", RASTER)
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses a SYNGEN chip to generate video signals */
@@ -204,7 +204,7 @@ static MACHINE_CONFIG_START( vindictr, vindictr_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	
+
 	MCFG_ATARI_JSA_I_ADD("jsa", WRITELINE(atarigen_state, sound_int_write_line))
 	MCFG_ATARI_JSA_TEST_PORT("260010", 1)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)

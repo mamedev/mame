@@ -150,7 +150,7 @@ WRITE16_MEMBER(jpmsys5_state::ramdac_w)
 UINT32 jpmsys5_state::screen_update_jpmsys5v(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int x, y;
-	
+
 	m_tms34061->get_display_state();
 
 	if (m_tms34061->m_display.blanked)
@@ -848,7 +848,7 @@ MACHINE_CONFIG_START( jpmsys5_ym, jpmsys5_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_ROC10937_ADD("vfd",0,RIGHT_TO_LEFT)
-	
+
 	MCFG_MACHINE_START_OVERRIDE(jpmsys5_state,jpmsys5)
 	MCFG_MACHINE_RESET_OVERRIDE(jpmsys5_state,jpmsys5)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -876,7 +876,7 @@ MACHINE_CONFIG_START( jpmsys5, jpmsys5_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_ROC10937_ADD("vfd",0,RIGHT_TO_LEFT)
-	
+
 	MCFG_MACHINE_START_OVERRIDE(jpmsys5_state,jpmsys5)
 	MCFG_MACHINE_RESET_OVERRIDE(jpmsys5_state,jpmsys5)
 	MCFG_SPEAKER_STANDARD_MONO("mono")

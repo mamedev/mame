@@ -94,7 +94,7 @@ class segaic16_video_device : public device_t
 public:
 	segaic16_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~segaic16_video_device() {}
-	
+
 	UINT8 segaic16_display_enable;
 	UINT16 *segaic16_tileram_0;
 	UINT16 *segaic16_textram_0;
@@ -106,10 +106,10 @@ public:
 	void segaic16_tilemap_set_bank(running_machine &machine, int which, int banknum, int offset);
 	void segaic16_tilemap_reset(running_machine &machine, int which);
 	void segaic16_tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int map, int priority, int priority_mark);
-//	void segaic16_tilemap_16b_draw_layer(running_machine &machine, struct tilemap_info *info, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int flags, int priority);
-//	void segaic16_tilemap_16a_draw_layer(running_machine &machine, struct tilemap_info *info, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int flags, int priority);
-//	void segaic16_draw_virtual_tilemap(running_machine &machine, struct tilemap_info *info, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 pages, UINT16 xscroll, UINT16 yscroll, UINT32 flags, UINT32 priority);
-//	void segaic16_tilemap_16b_reset(running_machine &machine, struct tilemap_info *info);
+//  void segaic16_tilemap_16b_draw_layer(running_machine &machine, struct tilemap_info *info, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int flags, int priority);
+//  void segaic16_tilemap_16a_draw_layer(running_machine &machine, struct tilemap_info *info, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int flags, int priority);
+//  void segaic16_draw_virtual_tilemap(running_machine &machine, struct tilemap_info *info, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 pages, UINT16 xscroll, UINT16 yscroll, UINT32 flags, UINT32 priority);
+//  void segaic16_tilemap_16b_reset(running_machine &machine, struct tilemap_info *info);
 
 	TIMER_CALLBACK_MEMBER( segaic16_tilemap_16b_latch_values );
 
@@ -150,7 +150,6 @@ private:
 extern const device_type SEGAIC16VID;
 
 #define MCFG_SEGAIC16VID_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, SEGAIC16VID, 0) \
-
+	MCFG_DEVICE_ADD(_tag, SEGAIC16VID, 0)
 
 #endif

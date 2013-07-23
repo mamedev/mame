@@ -24,7 +24,7 @@ public:
 
 	DECLARE_READ32_MEMBER( read );
 	DECLARE_WRITE32_MEMBER( write );
-	
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();

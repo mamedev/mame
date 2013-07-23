@@ -22,8 +22,8 @@ INT64 arm7_cpu_device::saturate_qbit_overflow(INT64 res)
 
 void arm7_cpu_device::SwitchMode(UINT32 cpsr_mode_val)
 {
-    UINT32 cspr = m_r[eCPSR] & ~MODE_FLAG;
-    set_cpsr(cspr | cpsr_mode_val);
+	UINT32 cspr = m_r[eCPSR] & ~MODE_FLAG;
+	set_cpsr(cspr | cpsr_mode_val);
 }
 
 

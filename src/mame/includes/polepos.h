@@ -23,7 +23,7 @@ public:
 		m_sprite16_memory(*this, "sprite16_memory"),
 		m_road16_memory(*this, "road16_memory"),
 		m_alpha16_memory(*this, "alpha16_memory"),
-		m_view16_memory(*this, "view16_memory")	{ }
+		m_view16_memory(*this, "view16_memory") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;

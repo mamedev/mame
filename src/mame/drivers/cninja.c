@@ -149,7 +149,7 @@ READ16_MEMBER( cninja_state::cninja_protection_region_0_104_r )
 }
 
 WRITE16_MEMBER( cninja_state::cninja_protection_region_0_104_w )
-{		
+{
 	int real_address = 0 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	UINT8 cs = 0;
@@ -178,8 +178,8 @@ static ADDRESS_MAP_START( cninja_map, AS_PROGRAM, 16, cninja_state )
 
 	AM_RANGE(0x1a4000, 0x1a47ff) AM_RAM AM_SHARE("spriteram")           /* Sprites */
 	AM_RANGE(0x1b4000, 0x1b4001) AM_DEVWRITE("spriteram", buffered_spriteram16_device, write) /* DMA flag */
-//	AM_RANGE(0x1bc000, 0x1bc0ff) AM_WRITE_LEGACY(deco16_104_cninja_prot_w) AM_SHARE("prot16ram")        /* Protection writes */
-//	AM_RANGE(0x1bc000, 0x1bcfff) AM_READ_LEGACY(deco16_104_cninja_prot_r) AM_SHARE("prot16ram")     /* Protection device */
+//  AM_RANGE(0x1bc000, 0x1bc0ff) AM_WRITE_LEGACY(deco16_104_cninja_prot_w) AM_SHARE("prot16ram")        /* Protection writes */
+//  AM_RANGE(0x1bc000, 0x1bcfff) AM_READ_LEGACY(deco16_104_cninja_prot_r) AM_SHARE("prot16ram")     /* Protection device */
 	AM_RANGE(0x1bc000, 0x1bffff) AM_READWRITE(cninja_protection_region_0_104_r,cninja_protection_region_0_104_w) AM_SHARE("prot16ram") /* Protection device */
 
 
@@ -236,23 +236,23 @@ WRITE16_MEMBER( cninja_state::sshangha_protection_region_8_146_w )
 
 READ16_MEMBER( cninja_state::sshangha_protection_region_6_146_r )
 {
-//	UINT16 realdat = deco16_60_prot_r(space,offset&0x3ff,mem_mask);
-	
+//  UINT16 realdat = deco16_60_prot_r(space,offset&0x3ff,mem_mask);
+
 	int real_address = 0x198000 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	UINT8 cs = 0;
 	UINT16 data = m_deco146->read_data( deco146_addr, mem_mask, cs );
-	
 
-//	if ((realdat & mem_mask) != (data & mem_mask))
-//		printf("returned %04x instead of %04x (real address %08x)\n", data, realdat, real_address);
-	
+
+//  if ((realdat & mem_mask) != (data & mem_mask))
+//      printf("returned %04x instead of %04x (real address %08x)\n", data, realdat, real_address);
+
 	return data;
 }
 
 WRITE16_MEMBER( cninja_state::sshangha_protection_region_6_146_w )
 {
-//	deco16_60_prot_w(space,offset&0x3ff,data,mem_mask);
+//  deco16_60_prot_w(space,offset&0x3ff,data,mem_mask);
 
 
 	int real_address = 0x198000 + (offset *2);
@@ -278,11 +278,11 @@ static ADDRESS_MAP_START( edrandy_map, AS_PROGRAM, 16, cninja_state )
 
 	AM_RANGE(0x188000, 0x189fff) AM_RAM_DEVWRITE("deco_common", decocomn_device, nonbuffered_palette_w) AM_SHARE("paletteram")
 	AM_RANGE(0x194000, 0x197fff) AM_RAM AM_SHARE("ram") /* Main ram */
-//	AM_RANGE(0x198000, 0x1987ff) AM_READWRITE_LEGACY(deco16_60_prot_r, deco16_60_prot_w) AM_SHARE("prot16ram") /* Protection device */
-//	AM_RANGE(0x199550, 0x199551) AM_WRITENOP /* Looks like a bug in game code, a protection write is referenced off a5 instead of a6 and ends up here */
-//	AM_RANGE(0x199750, 0x199751) AM_WRITENOP /* Looks like a bug in game code, a protection write is referenced off a5 instead of a6 and ends up here */
+//  AM_RANGE(0x198000, 0x1987ff) AM_READWRITE_LEGACY(deco16_60_prot_r, deco16_60_prot_w) AM_SHARE("prot16ram") /* Protection device */
+//  AM_RANGE(0x199550, 0x199551) AM_WRITENOP /* Looks like a bug in game code, a protection write is referenced off a5 instead of a6 and ends up here */
+//  AM_RANGE(0x199750, 0x199751) AM_WRITENOP /* Looks like a bug in game code, a protection write is referenced off a5 instead of a6 and ends up here */
 	AM_RANGE(0x198000, 0x19bfff) AM_READWRITE(sshangha_protection_region_6_146_r,sshangha_protection_region_6_146_w) AM_SHARE("prot16ram") /* Protection device */
-//	AM_RANGE(0x198000, 0x1987ff) AM_READWRITE(sshangha_protection_region_6_146_r,sshangha_protection_region_6_146_w) AM_SHARE("prot16ram") /* Protection device */
+//  AM_RANGE(0x198000, 0x1987ff) AM_READWRITE(sshangha_protection_region_6_146_r,sshangha_protection_region_6_146_w) AM_SHARE("prot16ram") /* Protection device */
 
 	AM_RANGE(0x1a0000, 0x1a3fff) AM_READWRITE(sshangha_protection_region_8_146_r,sshangha_protection_region_8_146_w)
 
@@ -310,8 +310,8 @@ static ADDRESS_MAP_START( robocop2_map, AS_PROGRAM, 16, cninja_state )
 
 	AM_RANGE(0x180000, 0x1807ff) AM_RAM AM_SHARE("spriteram")
 //  AM_RANGE(0x18c000, 0x18c0ff) AM_WRITE(cninja_loopback_w) /* Protection writes */
-//	AM_RANGE(0x18c000, 0x18c7ff) AM_DEVREAD("ioprot", deco146_device,robocop2_prot_r) /* Protection device */
-//	AM_RANGE(0x18c064, 0x18c065) AM_WRITE(cninja_sound_w)
+//  AM_RANGE(0x18c000, 0x18c7ff) AM_DEVREAD("ioprot", deco146_device,robocop2_prot_r) /* Protection device */
+//  AM_RANGE(0x18c064, 0x18c065) AM_WRITE(cninja_sound_w)
 	AM_RANGE(0x18c000, 0x18ffff) AM_READWRITE(mutantf_protection_region_0_146_r,mutantf_protection_region_0_146_w)AM_SHARE("prot16ram") /* Protection device */
 
 
@@ -336,7 +336,7 @@ READ16_MEMBER( cninja_state::mutantf_protection_region_0_146_r )
 }
 
 WRITE16_MEMBER( cninja_state::mutantf_protection_region_0_146_w )
-{		
+{
 	int real_address = 0 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	UINT8 cs = 0;
@@ -353,7 +353,7 @@ static ADDRESS_MAP_START( mutantf_map, AS_PROGRAM, 16, cninja_state )
 	AM_RANGE(0x160000, 0x161fff) AM_RAM_DEVWRITE("deco_common", decocomn_device, nonbuffered_palette_w) AM_SHARE("paletteram")
 	AM_RANGE(0x180000, 0x180001) AM_DEVWRITE("deco_common", decocomn_device, priority_w)
 	AM_RANGE(0x180002, 0x180003) AM_WRITENOP /* VBL irq ack */
-//	AM_RANGE(0x1a0000, 0x1a07ff) AM_READWRITE_LEGACY(deco16_66_prot_r, deco16_66_prot_w) AM_SHARE("prot16ram") /* Protection device */
+//  AM_RANGE(0x1a0000, 0x1a07ff) AM_READWRITE_LEGACY(deco16_66_prot_r, deco16_66_prot_w) AM_SHARE("prot16ram") /* Protection device */
 	AM_RANGE(0x1a0000, 0x1a3fff) AM_READWRITE(mutantf_protection_region_0_146_r,mutantf_protection_region_0_146_w)AM_SHARE("prot16ram") /* Protection device */
 	AM_RANGE(0x1c0000, 0x1c0001) AM_DEVWRITE("spriteram", buffered_spriteram16_device, write) AM_DEVREAD("deco_common", decocomn_device, d_71_r)
 	AM_RANGE(0x1e0000, 0x1e0001) AM_DEVWRITE("spriteram2", buffered_spriteram16_device, write)

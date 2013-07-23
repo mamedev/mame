@@ -679,8 +679,8 @@ static ADDRESS_MAP_START( captaven_map, AS_PROGRAM, 32, deco32_state )
 	AM_RANGE(0x110000, 0x111fff) AM_READWRITE(deco32_spriteram_r, deco32_spriteram_w)
 	AM_RANGE(0x120000, 0x127fff) AM_RAM AM_SHARE("ram") /* Main RAM */
 
-//	AM_RANGE(0x128000, 0x128fff) AM_DEVREAD("ioprot", deco146_device,captaven_prot_r)
-//	AM_RANGE(0x1280c8, 0x1280cb) AM_WRITE(deco32_sound_w)
+//  AM_RANGE(0x128000, 0x128fff) AM_DEVREAD("ioprot", deco146_device,captaven_prot_r)
+//  AM_RANGE(0x1280c8, 0x1280cb) AM_WRITE(deco32_sound_w)
 	AM_RANGE(0x128000, 0x12ffff) AM_READWRITE16(dg_protection_region_0_146_r, dg_protection_region_0_146_w, 0x0000ffff)
 
 	AM_RANGE(0x130000, 0x131fff) AM_RAM_WRITE(deco32_nonbuffered_palette_w) AM_SHARE("paletteram") /* Palette RAM */
@@ -689,7 +689,7 @@ static ADDRESS_MAP_START( captaven_map, AS_PROGRAM, 32, deco32_state )
 	AM_RANGE(0x168000, 0x168003) AM_READ(captaven_soundcpu_r)
 
 	AM_RANGE(0x178000, 0x178003) AM_WRITE(deco32_pri_w)
-	
+
 
 	AM_RANGE(0x180000, 0x18001f) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf_control_dword_r, pf_control_dword_w)
 	AM_RANGE(0x190000, 0x191fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_dword_r, pf1_data_dword_w)
@@ -713,21 +713,21 @@ READ32_MEMBER( deco32_state::fghthist_protection_region_0_146_r )
 	if (mem_mask & 0xffff0000)
 	{
 		mem_mask >>=16;
-	
+
 		int real_address = 0 + (offset *2);
 		int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,   10,9,8,7,6,5,4,3,2,1,   0) & 0x7fff;
 		UINT8 cs = 0;
 		UINT16 data = m_deco146->read_data( deco146_addr, mem_mask, cs );
-	
 
-	
+
+
 		retdata |= data << 16;
 	}
 	return retdata;
 }
 
 WRITE32_MEMBER( deco32_state::fghthist_protection_region_0_146_w )
-{		
+{
 	if (mem_mask & 0xffff0000)
 	{
 		data >>=16;
@@ -772,7 +772,7 @@ static ADDRESS_MAP_START( fghthist_map, AS_PROGRAM, 32, deco32_state )
 	AM_RANGE(0x16c000, 0x16c01f) AM_READNOP
 	AM_RANGE(0x17c000, 0x17c03f) AM_READNOP
 
-//	AM_RANGE(0x200000, 0x200fff) AM_READWRITE_LEGACY(deco16_146_fghthist_prot_r, deco16_146_fghthist_prot_w) AM_SHARE("prot32ram")
+//  AM_RANGE(0x200000, 0x200fff) AM_READWRITE_LEGACY(deco16_146_fghthist_prot_r, deco16_146_fghthist_prot_w) AM_SHARE("prot32ram")
 	AM_RANGE(0x200000, 0x207fff) AM_READWRITE(fghthist_protection_region_0_146_r, fghthist_protection_region_0_146_w) AM_SHARE("prot32ram") // only maps on 16-bits
 	AM_RANGE(0x208800, 0x208803) AM_WRITENOP /* ? */
 ADDRESS_MAP_END
@@ -803,7 +803,7 @@ static ADDRESS_MAP_START( fghthsta_memmap, AS_PROGRAM, 32, deco32_state )
 	AM_RANGE(0x1d4000, 0x1d5fff)  AM_RAM_WRITE(deco32_pf4_rowscroll_w) AM_SHARE("pf4_rowscroll32")
 	AM_RANGE(0x1e0000, 0x1e001f) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf_control_dword_r, pf_control_dword_w)
 
-//	AM_RANGE(0x200000, 0x200fff) AM_READWRITE_LEGACY(deco16_146_fghthist_prot_r, deco16_146_fghthist_prot_w) AM_SHARE("prot32ram")
+//  AM_RANGE(0x200000, 0x200fff) AM_READWRITE_LEGACY(deco16_146_fghthist_prot_r, deco16_146_fghthist_prot_w) AM_SHARE("prot32ram")
 	AM_RANGE(0x200000, 0x207fff) AM_READWRITE(fghthist_protection_region_0_146_r, fghthist_protection_region_0_146_w) AM_SHARE("prot32ram") // only maps on 16-bits
 
 ADDRESS_MAP_END
@@ -819,7 +819,7 @@ READ16_MEMBER( deco32_state::dg_protection_region_0_146_r )
 }
 
 WRITE16_MEMBER( deco32_state::dg_protection_region_0_146_w )
-{		
+{
 	int real_address = 0 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	UINT8 cs = 0;
@@ -836,10 +836,10 @@ READ32_MEMBER( dragngun_state::dragngun_unk_video_r)
 static ADDRESS_MAP_START( dragngun_map, AS_PROGRAM, 32, dragngun_state )
 	AM_RANGE(0x0000000, 0x00fffff) AM_ROM
 	AM_RANGE(0x0100000, 0x011ffff) AM_RAM AM_SHARE("ram")
-//	AM_RANGE(0x0120000, 0x0120fff) AM_DEVREAD("ioprot", deco146_device, dragngun_prot_r)
+//  AM_RANGE(0x0120000, 0x0120fff) AM_DEVREAD("ioprot", deco146_device, dragngun_prot_r)
 	AM_RANGE(0x0120000, 0x0127fff) AM_READWRITE16(dg_protection_region_0_146_r, dg_protection_region_0_146_w, 0x0000ffff)
 
-//	AM_RANGE(0x01204c0, 0x01204c3) AM_WRITE(deco32_sound_w)
+//  AM_RANGE(0x01204c0, 0x01204c3) AM_WRITE(deco32_sound_w)
 	AM_RANGE(0x0128000, 0x012800f) AM_READWRITE(deco32_irq_controller_r, deco32_irq_controller_w)
 	AM_RANGE(0x0130000, 0x0131fff) AM_RAM_WRITE(deco32_buffered_palette_w) AM_SHARE("paletteram")
 	AM_RANGE(0x0138000, 0x0138003) AM_NOP /* Palette dma complete in bit 0x8? ack?  return 0 else tight loop */
@@ -884,22 +884,22 @@ static ADDRESS_MAP_START( dragngun_map, AS_PROGRAM, 32, dragngun_state )
 	AM_RANGE(0x0430000, 0x043001f) AM_WRITE(dragngun_lightgun_w)
 	AM_RANGE(0x0440000, 0x0440003) AM_READ(dragngun_service_r)
 
-	AM_RANGE(0x0500000, 0x0500003) AM_WRITE(dragngun_sprite_control_w) 
+	AM_RANGE(0x0500000, 0x0500003) AM_WRITE(dragngun_sprite_control_w)
 
 	// this is clearly the dvi video related area
 	AM_RANGE(0x1000000, 0x1000007) AM_READ(dragngun_unk_video_r)
 	AM_RANGE(0x1000100, 0x1007fff) AM_RAM
 	AM_RANGE(0x10b0000, 0x10b01ff) AM_RAM
 	AM_RANGE(0x1400000, 0x1ffffff) AM_ROM AM_REGION("dvi", 0x00000) // reads from here during boss battles when the videos should be displayed at the offsets where the DVI headers are
-	                                                                // as a result it ends up writing what looks like pointers to the frame data in the ram area above
+																	// as a result it ends up writing what looks like pointers to the frame data in the ram area above
 
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lockload_map, AS_PROGRAM, 32, dragngun_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x11ffff) AM_RAM AM_SHARE("ram")
-//	AM_RANGE(0x120000, 0x120fff) AM_DEVREAD("ioprot", deco146_device, dragngun_prot_r)
-//	AM_RANGE(0x1204c0, 0x1204c3) AM_WRITE(deco32_sound_w)
+//  AM_RANGE(0x120000, 0x120fff) AM_DEVREAD("ioprot", deco146_device, dragngun_prot_r)
+//  AM_RANGE(0x1204c0, 0x1204c3) AM_WRITE(deco32_sound_w)
 	AM_RANGE(0x120000, 0x127fff) AM_READWRITE16(dg_protection_region_0_146_r, dg_protection_region_0_146_w, 0x0000ffff)
 
 	AM_RANGE(0x128000, 0x12800f) AM_READWRITE(deco32_irq_controller_r, deco32_irq_controller_w)
@@ -985,7 +985,7 @@ static ADDRESS_MAP_START( tattass_map, AS_PROGRAM, 32, deco32_state )
 	AM_RANGE(0x1d4000, 0x1d5fff) AM_RAM_WRITE(deco32_pf4_rowscroll_w) AM_SHARE("pf4_rowscroll32")
 	AM_RANGE(0x1e0000, 0x1e001f) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf_control_dword_r, pf_control_dword_w)
 
-//	AM_RANGE(0x200000, 0x200fff) AM_READWRITE(tattass_prot_r, tattass_prot_w) AM_SHARE("prot32ram")
+//  AM_RANGE(0x200000, 0x200fff) AM_READWRITE(tattass_prot_r, tattass_prot_w) AM_SHARE("prot32ram")
 	AM_RANGE(0x200000, 0x207fff) AM_READWRITE16(nslasher_protection_region_0_104_r, nslasher_protection_region_0_104_w, 0xffff0000)
 	AM_RANGE(0x200000, 0x207fff) AM_READ16(nslasher_debug_r, 0x0000ffff)
 ADDRESS_MAP_END
@@ -1000,7 +1000,7 @@ READ16_MEMBER( deco32_state::nslasher_protection_region_0_104_r )
 }
 
 WRITE16_MEMBER( deco32_state::nslasher_protection_region_0_104_w )
-{		
+{
 	int real_address = 0 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	UINT8 cs = 0;
@@ -1051,7 +1051,7 @@ static ADDRESS_MAP_START( nslasher_map, AS_PROGRAM, 32, deco32_state )
 	AM_RANGE(0x1d4000, 0x1d5fff) AM_RAM_WRITE(deco32_pf4_rowscroll_w) AM_SHARE("pf4_rowscroll32")
 	AM_RANGE(0x1e0000, 0x1e001f) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf_control_dword_r, pf_control_dword_w)
 
-//	AM_RANGE(0x200000, 0x200fff) AM_READWRITE(nslasher_prot_r, nslasher_prot_w) AM_SHARE("prot32ram")
+//  AM_RANGE(0x200000, 0x200fff) AM_READWRITE(nslasher_prot_r, nslasher_prot_w) AM_SHARE("prot32ram")
 	AM_RANGE(0x200000, 0x207fff) AM_READWRITE16(nslasher_protection_region_0_104_r, nslasher_protection_region_0_104_w, 0xffff0000)
 	AM_RANGE(0x200000, 0x207fff) AM_READ16(nslasher_debug_r, 0x0000ffff) // seems to be debug switches / code activated by this?
 
@@ -2699,7 +2699,7 @@ ROM_START( dragngun )
 	ROM_LOAD32_BYTE( "mar-22.bin",  0x800001,  0x100000,  CRC(c85f3559) SHA1(a5d5cf9b18c9ef6a92d7643ca1ec9052de0d4a01) ) // 44 D / 56 V
 	ROM_LOAD32_BYTE( "mar-26.bin",  0x800002,  0x100000,  CRC(246a06c5) SHA1(447252be976a5059925f4ad98df8564b70198f62) ) // 56 V / 53 S
 	ROM_LOAD32_BYTE( "mar-23.bin",  0x800003,  0x100000,  CRC(ba907d6a) SHA1(1fd99b66e6297c8d927c1cf723a613b4ee2e2f90) ) // 49 I / 53 S
-	                                 
+
 	ROM_REGION(0x80000, "oki1", 0 )
 	ROM_LOAD( "mar-06.n17", 0x000000, 0x80000,  CRC(3e006c6e) SHA1(55786e0fde2bf6ba9802f3f4fa8d4c21625b976a) )
 
@@ -3466,17 +3466,17 @@ void dragngun_state::init_dragngun_common()
 #endif
 
 	// there are DVI headers at 0x000000, 0x580000, 0x800000, 0xB10000, 0xB80000
-//	process_dvi_data(memregion("dvi")->base(),0x000000, 0x1000000);
-//	process_dvi_data(memregion("dvi")->base(),0x580000, 0x1000000);
-//	process_dvi_data(memregion("dvi")->base(),0x800000, 0x1000000);
-//	process_dvi_data(memregion("dvi")->base(),0xB10000, 0x1000000);
-//	process_dvi_data(memregion("dvi")->base(),0xB80000, 0x1000000);
+//  process_dvi_data(memregion("dvi")->base(),0x000000, 0x1000000);
+//  process_dvi_data(memregion("dvi")->base(),0x580000, 0x1000000);
+//  process_dvi_data(memregion("dvi")->base(),0x800000, 0x1000000);
+//  process_dvi_data(memregion("dvi")->base(),0xB10000, 0x1000000);
+//  process_dvi_data(memregion("dvi")->base(),0xB80000, 0x1000000);
 }
 
 DRIVER_INIT_MEMBER(dragngun_state,dragngun)
 {
 	init_dragngun_common();
-	
+
 	UINT32 *ROM = (UINT32 *)memregion("maincpu")->base();
 	ROM[0x1b32c/4]=0xe1a00000; // bl $ee000: NOP test switch lock
 }
@@ -3484,7 +3484,7 @@ DRIVER_INIT_MEMBER(dragngun_state,dragngun)
 DRIVER_INIT_MEMBER(dragngun_state,dragngunj)
 {
 	init_dragngun_common();
-	
+
 	UINT32 *ROM = (UINT32 *)memregion("maincpu")->base();
 	ROM[0x1a1b4/4]=0xe1a00000; // bl $ee000: NOP test switch lock
 }

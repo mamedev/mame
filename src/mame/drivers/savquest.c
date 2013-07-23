@@ -5,19 +5,19 @@
     "Savage Quest" (c) 1999 Interactive Light, developed by Angel Studios.
     Skeleton by R. Belmont
 
-	TODO:
-	- currently asserts by selecting a s3 video bank above 1M (register 0x6a)
+    TODO:
+    - currently asserts by selecting a s3 video bank above 1M (register 0x6a)
 
-	PCI list:
-	Bus no. Device No. Func No. Vendor ID Device ID Device Class          IRQ
-	0       7          1        8086      7111      IDE Controller        14
-	0       7          2        8086      7112      Serial Bus Controller 11
-	0       9          0        5333      8901      Display Controller    10
-	0       13         0        121a      0002      Multimedia Device     NA
-	- First two are PIIX4/4E/4M IDE Controller / PIIX4/4E/4M USB Interface
-	  Third is S3 trio64uv+
-	  Fourth is Voodoo 2 3D Accelerator
-	Sound Blaster is ISA/PNP
+    PCI list:
+    Bus no. Device No. Func No. Vendor ID Device ID Device Class          IRQ
+    0       7          1        8086      7111      IDE Controller        14
+    0       7          2        8086      7112      Serial Bus Controller 11
+    0       9          0        5333      8901      Display Controller    10
+    0       13         0        121a      0002      Multimedia Device     NA
+    - First two are PIIX4/4E/4M IDE Controller / PIIX4/4E/4M USB Interface
+      Third is S3 trio64uv+
+      Fourth is Voodoo 2 3D Accelerator
+    Sound Blaster is ISA/PNP
 
 ============================================================================
     H/W is a white-box PC consisting of:

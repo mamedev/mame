@@ -220,10 +220,10 @@ READ8_MEMBER(nes_state::nes_in0_r)
 	// in the unused upper 3 bits, so typically a read from $4016 leaves 0x40 there.
 	UINT8 ret = 0x40;
 	ret |= (m_pad_latch[0] & 0x01);
-	
+
 	// shift
 	m_pad_latch[0] >>= 1;
-	
+
 	// zapper
 	if ((cfg & 0x000f) == 0x0002)
 	{
@@ -265,27 +265,27 @@ READ8_MEMBER(nes_state::nes_in1_r)
 
 	// shift
 	m_pad_latch[1] >>= 1;
-	
+
 	// zapper
 	if ((cfg & 0x00f0) == 0x0020)
 	{
 		int x = m_zapper_latch[1][1];  // x-position
 		int y = m_zapper_latch[1][2];  // y-position
 		UINT32 pix, color_base;
-		
+
 		// get the pixel at the gun position
 		pix = m_ppu->get_pixel(x, y);
-		
+
 		// get the color base from the ppu
 		color_base = m_ppu->get_colorbase();
-		
+
 		// check if the cursor is over a bright pixel
 		if ((pix == color_base + 0x20) || (pix == color_base + 0x30) ||
 			(pix == color_base + 0x33) || (pix == color_base + 0x34))
 			ret &= ~0x08; // sprite hit
 		else
 			ret |= 0x08;  // no sprite hit
-		
+
 		// light gun trigger
 		ret |= (m_zapper_latch[1][0] << 4);
 	}
@@ -293,12 +293,12 @@ READ8_MEMBER(nes_state::nes_in1_r)
 	// arkanoid paddle
 	if ((cfg & 0x00f0) == 0x0040)
 	{
-		ret |= (m_paddle_btn_latch << 3);	// button
-		ret |= ((m_paddle_latch & 0x80) >> 3);		// paddle data
+		ret |= (m_paddle_btn_latch << 3);   // button
+		ret |= ((m_paddle_latch & 0x80) >> 3);      // paddle data
 		m_paddle_latch <<= 1;
 		m_paddle_latch &= 0xff;
 	}
-	
+
 	// powerpad
 	if ((cfg & 0x00f0) == 0x0050 || (cfg & 0x00f0) == 0x0060)
 	{
@@ -307,7 +307,7 @@ READ8_MEMBER(nes_state::nes_in1_r)
 		m_powerpad_latch[0] >>= 1;
 		m_powerpad_latch[1] >>= 1;
 	}
-	
+
 	if (LOG_JOY)
 		logerror("joy 1 read, val: %02x, pc: %04x\n", ret, space.device().safe_pc());
 
@@ -317,10 +317,10 @@ READ8_MEMBER(nes_state::nes_in1_r)
 WRITE8_MEMBER(nes_state::nes_in0_w)
 {
 	int cfg = m_io_ctrlsel->read();
-	
+
 	if (LOG_JOY)
 		logerror("joy write, val: %02x, pc: %04x\n", data, space.device().safe_pc());
-	
+
 	// Check if lightgun has been chosen as input: if so, enable crosshair
 	timer_set(attotime::zero, TIMER_ZAPPER_TICK);
 
@@ -330,49 +330,49 @@ WRITE8_MEMBER(nes_state::nes_in0_w)
 	// Toggling bit 0 high then low resets controllers
 	m_pad_latch[0] = 0;
 	m_pad_latch[1] = 0;
-	m_zapper_latch[0][0] = 0;	
-	m_zapper_latch[0][1] = 0;	
-	m_zapper_latch[0][2] = 0;	
-	m_zapper_latch[1][0] = 0;	
-	m_zapper_latch[1][1] = 0;	
+	m_zapper_latch[0][0] = 0;
+	m_zapper_latch[0][1] = 0;
+	m_zapper_latch[0][2] = 0;
+	m_zapper_latch[1][0] = 0;
+	m_zapper_latch[1][1] = 0;
 	m_zapper_latch[1][2] = 0;
 	m_paddle_btn_latch = 0;
 	m_paddle_latch = 0;
 	m_powerpad_latch[0] = 0;
 	m_powerpad_latch[1] = 0;
-	
+
 	// P1 inputs
 	switch (cfg & 0x000f)
 	{
 		case 0x01:  // pad 1
 			m_pad_latch[0] = m_io_pad[0]->read();
 			break;
-			
+
 		case 0x02:  // zapper (secondary)
 			m_zapper_latch[0][0] = m_io_zapper1_t->read();
 			m_zapper_latch[0][1] = m_io_zapper1_x->read();
 			m_zapper_latch[0][2] = m_io_zapper1_y->read();
 			break;
 	}
-	
+
 	// P2 inputs
 	switch ((cfg & 0x00f0) >> 4)
 	{
 		case 0x01:  // pad 2
 			m_pad_latch[1] = m_io_pad[1]->read();
 			break;
-			
+
 		case 0x02:  // zapper (primary) - most games expect pad in port1 & zapper in port2
 			m_zapper_latch[1][0] = m_io_zapper2_t->read();
 			m_zapper_latch[1][1] = m_io_zapper2_x->read();
 			m_zapper_latch[1][2] = m_io_zapper2_y->read();
 			break;
-			
+
 		case 0x04:  // arkanoid paddle
 			m_paddle_btn_latch = m_io_paddle_btn->read();
 			m_paddle_latch = (UINT8) (m_io_paddle->read() ^ 0xff);
 			break;
-			
+
 		case 0x05:  // power pad
 		case 0x06:  // power pad
 			m_powerpad_latch[0] = m_io_powerpad[0]->read();
@@ -383,11 +383,11 @@ WRITE8_MEMBER(nes_state::nes_in0_w)
 	// P3 & P4 inputs in NES Four Score are read serially with P1 & P2
 	// P3 inputs
 	if ((cfg & 0x0f00))
-		m_pad_latch[0] |= ((m_io_pad[2]->read() << 8) | (0x08 << 16));	  // pad 3 + signature
-	
+		m_pad_latch[0] |= ((m_io_pad[2]->read() << 8) | (0x08 << 16));    // pad 3 + signature
+
 	// P4 inputs
 	if ((cfg & 0xf000))
-		m_pad_latch[1] |= ((m_io_pad[3]->read() << 8) | (0x04 << 16));	  // pad 4 + signature	
+		m_pad_latch[1] |= ((m_io_pad[3]->read() << 8) | (0x04 << 16));    // pad 4 + signature
 }
 
 
@@ -400,23 +400,23 @@ READ8_MEMBER(nes_state::fc_in0_r)
 {
 	int cfg = m_io_ctrlsel->read();
 	int exp = m_io_exp->read();
-	
+
 	// Some games expect bit 6 to be set because the last entry on the data bus shows up
 	// in the unused upper 3 bits, so typically a read from $4016 leaves 0x40 there.
 	UINT8 ret = 0x40;
 	ret |= (m_pad_latch[0] & 0x01);
-	
+
 	// shift
 	m_pad_latch[0] >>= 1;
 
 	// microphone bit
 	if ((cfg & 0x00f0) == 0x00f0)
-		ret |= m_mic_obstruct;	//bit2!
+		ret |= m_mic_obstruct;  //bit2!
 
 	// EXP input
 	switch (exp & 0x0f)
-	{			
-		case 0x02:	// FC Keyboard: tape input
+	{
+		case 0x02:  // FC Keyboard: tape input
 			if ((m_cassette->get_state() & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY)
 			{
 				double level = m_cassette->input();
@@ -426,124 +426,124 @@ READ8_MEMBER(nes_state::fc_in0_r)
 					ret |= 0x02;
 			}
 			break;
-			
+
 		case 0x04:  // Arkanoid paddle
-			ret |= (m_paddle_btn_latch << 1);	// button
+			ret |= (m_paddle_btn_latch << 1);   // button
 			break;
-			
+
 		case 0x07:  // Mahjong Panel
 			ret |= ((m_mjpanel_latch & 0x01) << 1);
 			m_mjpanel_latch >>= 1;
 			break;
-			
+
 		case 0x08:  // 'multitap' p3
 			ret |= ((m_pad_latch[2] & 0x01) << 1);
 			m_pad_latch[2] >>= 1;
 			break;
 	}
-	
+
 	if (LOG_JOY)
 		logerror("joy 0 read, val: %02x, pc: %04x\n", ret, space.device().safe_pc());
-	
+
 	return ret;
 }
 
 READ8_MEMBER(nes_state::fc_in1_r)
 {
 	int exp = m_io_exp->read();
-	
+
 	// Some games expect bit 6 to be set because the last entry on the data bus shows up
 	// in the unused upper 3 bits, so typically a read from $4017 leaves 0x40 there.
 	UINT8 ret = 0x40;
 	ret |= (m_pad_latch[1] & 0x01);
-	
+
 	// shift
 	m_pad_latch[1] >>= 1;
 
-	
+
 	// EXP input
 	switch (exp & 0x0f)
 	{
-		case 0x01:	// Lightgun
+		case 0x01:  // Lightgun
 			{
 				int x = m_zapper_latch[0][1];  // x-position
 				int y = m_zapper_latch[0][2];  // y-position
 				UINT32 pix, color_base;
-				
+
 				// get the pixel at the gun position
 				pix = m_ppu->get_pixel(x, y);
-				
+
 				// get the color base from the ppu
 				color_base = m_ppu->get_colorbase();
-				
+
 				// check if the cursor is over a bright pixel
 				if ((pix == color_base + 0x20) || (pix == color_base + 0x30) ||
 					(pix == color_base + 0x33) || (pix == color_base + 0x34))
 					ret &= ~0x08; // sprite hit
 				else
 					ret |= 0x08;  // no sprite hit
-				
+
 				// light gun trigger
 				ret |= (m_zapper_latch[0][0] << 4);
 			}
 			break;
-			
-		case 0x02:	// FC Keyboard: rows of the keyboard matrix are read 4-bits at time and returned as bit1->bit4
+
+		case 0x02:  // FC Keyboard: rows of the keyboard matrix are read 4-bits at time and returned as bit1->bit4
 			if (m_fck_scan < 9)
 				ret |= ~(((m_io_fckey[m_fck_scan]->read() >> (m_fck_mode * 4)) & 0x0f) << 1) & 0x1e;
 			else
 				ret |= 0x1e;
 			break;
 
-		case 0x03:	// Subor Keyboard: rows of the keyboard matrix are read 4-bits at time and returned as bit1->bit4
+		case 0x03:  // Subor Keyboard: rows of the keyboard matrix are read 4-bits at time and returned as bit1->bit4
 			if (m_fck_scan < 12)
 				ret |= ~(((m_io_subkey[m_fck_scan]->read() >> (m_fck_mode * 4)) & 0x0f) << 1) & 0x1e;
 			else
 				ret |= 0x1e;
 			break;
-			
+
 		case 0x04:  // Arkanoid paddle
-			ret |= ((m_paddle_latch & 0x80) >> 6);		// paddle data
+			ret |= ((m_paddle_latch & 0x80) >> 6);      // paddle data
 			m_paddle_latch <<= 1;
 			m_paddle_latch &= 0xff;
 			break;
-			
+
 		case 0x05:  // family trainer
 		case 0x06:  // family trainer
 			if (!BIT(m_ftrainer_scan, 0))
-			{		
+			{
 				// read low line: buttons 9,10,11,12
 				for (int i = 0; i < 4; i++)
 					ret |= ((m_io_ftrainer[i]->read() & 0x01) << (1 + i));
 			}
 			else if (!BIT(m_ftrainer_scan, 1))
-			{		
+			{
 				// read mid line: buttons 5,6,7,8
 				for (int i = 0; i < 4; i++)
 					ret |= ((m_io_ftrainer[i]->read() & 0x02) << (1 + i));
 			}
 			else if (!BIT(m_ftrainer_scan, 2))
-			{		
+			{
 				// read high line: buttons 1,2,3,4
 				for (int i = 0; i < 4; i++)
 					ret |= ((m_io_ftrainer[i]->read() & 0x04) << (1 + i));
 			}
 			break;
-			
+
 		case 0x07:  // Mahjong Panel
 			ret |= ((m_mjpanel_latch & 0x01) << 1);
 			m_mjpanel_latch >>= 1;
 			break;
-			
+
 		case 0x08:  // 'multitap' p4
 			ret |= ((m_pad_latch[3] & 0x01) << 1);
 			m_pad_latch[3] >>= 1;
 			break;
 	}
-	
+
 	if (LOG_JOY)
 		logerror("joy 1 read, val: %02x, pc: %04x\n", ret, space.device().safe_pc());
-	
+
 	return ret;
 }
 
@@ -551,10 +551,10 @@ WRITE8_MEMBER(nes_state::fc_in0_w)
 {
 	int cfg = m_io_ctrlsel->read();
 	int exp = m_io_exp->read();
-	
+
 	if (LOG_JOY)
 		logerror("joy write, val: %02x, pc: %04x\n", data, space.device().safe_pc());
-	
+
 	// Check if lightgun has been chosen as input: if so, enable crosshair
 	timer_set(attotime::zero, TIMER_LIGHTGUN_TICK);
 
@@ -564,17 +564,17 @@ WRITE8_MEMBER(nes_state::fc_in0_w)
 		// tape output (not fully tested)
 		if ((m_cassette->get_state() & CASSETTE_MASK_UISTATE) == CASSETTE_RECORD)
 			m_cassette->output(((data & 0x07) == 0x07) ? +1.0 : -1.0);
-		
+
 		if (BIT(data, 2))   // keyboard active
 		{
 			int lines = ((exp & 0x0f) == 0x02) ? 9 : 12;
 			UINT8 out = BIT(data, 1);   // scan
-			
+
 			if (m_fck_mode && !out && ++m_fck_scan > lines)
 				m_fck_scan = 0;
-			
+
 			m_fck_mode = out;   // access lower or upper 4 bits
-			
+
 			if (BIT(data, 0))   // reset
 				m_fck_scan = 0;
 		}
@@ -589,32 +589,32 @@ WRITE8_MEMBER(nes_state::fc_in0_w)
 
 	if (data & 0x01)
 		return;
-	
+
 	// Toggling bit 0 high then low resets controllers
 	m_pad_latch[0] = 0;
 	m_pad_latch[1] = 0;
 	m_pad_latch[2] = 0;
 	m_pad_latch[3] = 0;
-	m_zapper_latch[0][0] = 0;	
-	m_zapper_latch[0][1] = 0;	
-	m_zapper_latch[0][2] = 0;	
+	m_zapper_latch[0][0] = 0;
+	m_zapper_latch[0][1] = 0;
+	m_zapper_latch[0][2] = 0;
 	m_paddle_btn_latch = 0;
 	m_paddle_latch = 0;
 	m_mjpanel_latch = 0;
 	m_mic_obstruct = 0;
-	
+
 	// P1 inputs
 	switch (cfg & 0x000f)
 	{
 		case 0x01:  // pad 1
 			m_pad_latch[0] = m_io_pad[0]->read();
 			break;
-			
+
 		case 0x02:  // crazy climber (left stick)
 			m_pad_latch[0] = m_io_cc_left->read();
 			break;
 	}
-	
+
 	// P2 inputs
 	switch ((cfg & 0x00f0) >> 4)
 	{
@@ -632,31 +632,31 @@ WRITE8_MEMBER(nes_state::fc_in0_w)
 			m_pad_latch[1] = (m_io_pad[1]->read() & ~0x04);
 			break;
 	}
-	
-	// P3 & P4 inputs in Famicom (e.g. through Hori Twin Adapter or Hori 4 Players Adapter) 
+
+	// P3 & P4 inputs in Famicom (e.g. through Hori Twin Adapter or Hori 4 Players Adapter)
 	// are read in parallel with P1 & P2 (just using diff bits)
 	// P3 inputs
 	if ((exp & 0x0f) == 8 && (cfg & 0x0f00) == 0x0100)
-		m_pad_latch[2] = m_io_pad[2]->read();	  // pad 3
-	
+		m_pad_latch[2] = m_io_pad[2]->read();     // pad 3
+
 	// P4 inputs
 	if ((exp & 0x0f) == 8 && (cfg & 0xf000) == 0x1000)
-		m_pad_latch[3] = m_io_pad[3]->read();	  // pad 4
+		m_pad_latch[3] = m_io_pad[3]->read();     // pad 4
 
 
 	// EXP input
 	switch (exp & 0x0f)
 	{
-		case 0x01:	// Lightgun
+		case 0x01:  // Lightgun
 			m_zapper_latch[0][0] = m_io_zapper2_t->read();
 			m_zapper_latch[0][1] = m_io_zapper2_x->read();
 			m_zapper_latch[0][2] = m_io_zapper2_y->read();
 			break;
 
-		case 0x02:	// FC Keyboard
-		case 0x03:	// Subor Keyboard
+		case 0x02:  // FC Keyboard
+		case 0x03:  // Subor Keyboard
 			// these are scanned differently than other devices:
-			// writes to $4016 with bit2 set always update the 
+			// writes to $4016 with bit2 set always update the
 			// line counter and writing bit0 set resets the counter
 			break;
 
@@ -668,11 +668,11 @@ WRITE8_MEMBER(nes_state::fc_in0_w)
 		case 0x05:  // family trainer
 		case 0x06:  // family trainer
 			// these are scanned differently than other devices:
-			// bit0-bit2 of writes to $4016 select the row to read 
+			// bit0-bit2 of writes to $4016 select the row to read
 			// from from the mat input "columns"
 			break;
-			
-			
+
+
 		case 0x07:  // Mahjong Panel
 			if (data & 0xf8)
 				logerror("Error: Mahjong panel read with mux data %02x\n", (data & 0xfe));
@@ -680,7 +680,7 @@ WRITE8_MEMBER(nes_state::fc_in0_w)
 				m_mjpanel_latch = m_io_mahjong[(data & 0xfe) >> 1]->read();
 			break;
 	}
-	
+
 }
 
 
@@ -699,7 +699,7 @@ void nes_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 				/* disable lightpen crosshair */
 				crosshair_set_screen(machine(), 0, CROSSHAIR_SCREEN_NONE);
 			}
-			
+
 			if ((m_io_ctrlsel->read() & 0x00f0) == 0x0020)
 			{
 				/* enable lightpen crosshair */

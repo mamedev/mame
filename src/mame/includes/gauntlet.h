@@ -11,9 +11,9 @@ class gauntlet_state : public atarigen_state
 public:
 	gauntlet_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atarigen_state(mconfig, type, tag),
-		  m_playfield_tilemap(*this, "playfield"),
-		  m_alpha_tilemap(*this, "alpha") { }
-	
+			m_playfield_tilemap(*this, "playfield"),
+			m_alpha_tilemap(*this, "alpha") { }
+
 	required_device<tilemap_device> m_playfield_tilemap;
 	required_device<tilemap_device> m_alpha_tilemap;
 

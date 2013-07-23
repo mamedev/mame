@@ -12,20 +12,20 @@
 
 ****************************************************************************
 
-	Video controller interface woes:
+    Video controller interface woes:
 
-	Sigh. CPU #1 reads the video controller register twice per frame, once at
-	the beginning of interrupt and once near the end. It stores these values in a
-	table starting at $163484. CPU #2 periodically looks at this table to make
-	sure that it is getting interrupts at the appropriate times, and that the
-	VBLANK bit is set appropriately. Unfortunately, due to all the device_yield(&space.device())
-	calls we make to synchronize the two CPUs, we occasionally get out of time
-	and generate the interrupt outside of the tight tolerances CPU #2 expects.
+    Sigh. CPU #1 reads the video controller register twice per frame, once at
+    the beginning of interrupt and once near the end. It stores these values in a
+    table starting at $163484. CPU #2 periodically looks at this table to make
+    sure that it is getting interrupts at the appropriate times, and that the
+    VBLANK bit is set appropriately. Unfortunately, due to all the device_yield(&space.device())
+    calls we make to synchronize the two CPUs, we occasionally get out of time
+    and generate the interrupt outside of the tight tolerances CPU #2 expects.
 
-	So we fake it. Returning scanlines $f5 and $f7 alternately provides the
-	correct answer that causes CPU #2 to be happy and not aggressively trash
-	memory (which is what it does if this interrupt test fails -- see the code
-	at $1E56 to see!)
+    So we fake it. Returning scanlines $f5 and $f7 alternately provides the
+    correct answer that causes CPU #2 to be happy and not aggressively trash
+    memory (which is what it does if this interrupt test fails -- see the code
+    at $1E56 to see!)
 
 ****************************************************************************
 
@@ -280,7 +280,7 @@ static MACHINE_CONFIG_START( thunderj, thunderj_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	
+
 	MCFG_ATARI_JSA_II_ADD("jsa", WRITELINE(atarigen_state, sound_int_write_line))
 	MCFG_ATARI_JSA_TEST_PORT("260012", 1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

@@ -14,17 +14,14 @@ segaic16_road_device::segaic16_road_device(const machine_config &mconfig, const 
 
 void segaic16_road_device::device_config_complete()
 {
-
 }
 
 void segaic16_road_device::device_start()
 {
-
 }
 
 void segaic16_road_device::device_reset()
 {
-
 }
 
 
@@ -638,5 +635,3 @@ WRITE16_MEMBER( segaic16_road_device::segaic16_road_control_0_w )
 		info->control = data & ((info->type == SEGAIC16_ROAD_OUTRUN) ? 3 : 7);
 	}
 }
-
-

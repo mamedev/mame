@@ -140,4 +140,3 @@ machine_config_constructor sms_rapid_fire_device::device_mconfig_additions() con
 {
 	return MACHINE_CONFIG_NAME( rfire_slot );
 }
-

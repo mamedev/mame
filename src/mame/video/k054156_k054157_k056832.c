@@ -183,14 +183,14 @@ k056832_device::k056832_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, K056832, "Konami 056832", tag, owner, clock, "k056832", __FILE__),
 	//m_tilemap[K056832_PAGE_COUNT],
 	//*m_pixmap[K056832_PAGE_COUNT],
-    //m_regs[0x20],
+	//m_regs[0x20],
 	//m_regsb[4],
 	m_rombase(NULL),
 	m_videoram(NULL),
 	m_num_gfx_banks(0),
 	m_cur_gfx_banks(0),
 	m_rom_half(0),
-    //m_layer_assoc_with_page[K056832_PAGE_COUNT],
+	//m_layer_assoc_with_page[K056832_PAGE_COUNT],
 	//m_layer_offs[8][2],
 	//m_lsram_page[8][2],
 	//m_x[8],
@@ -215,7 +215,6 @@ k056832_device::k056832_device(const machine_config &mconfig, const char *tag, d
 	m_cur_tile_bank(0),
 	m_k055555(0)
 {
-
 }
 
 
@@ -231,7 +230,7 @@ void k056832_device::device_config_complete()
 	const k056832_interface *intf = reinterpret_cast<const k056832_interface *>(static_config());
 	if (intf != NULL)
 	*static_cast<k056832_interface *>(this) = *intf;
-	
+
 	// or initialize to defaults if none provided
 	else
 	{
@@ -556,7 +555,7 @@ void k056832_device::get_tile_info(  tile_data &tileinfo, int tile_index, int pa
 			flags);
 }
 
-	
+
 
 TILE_GET_INFO_MEMBER( k056832_device::get_tile_info0 ) { get_tile_info(tileinfo,tile_index,0x0); }
 TILE_GET_INFO_MEMBER( k056832_device::get_tile_info1 ) { get_tile_info(tileinfo,tile_index,0x1); }
@@ -2611,5 +2610,3 @@ void k056832_device::K056832_set_k055555(k055555_device * mode)
 {
 	m_k055555 = mode;
 }
-
-

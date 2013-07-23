@@ -1625,4 +1625,3 @@ GAME( 2000, stealsee,  0,        eolith45, stealsee,  eolith_state, eolith,   RO
 GAME( 2000, hidctch3,  0,        eolith50, hidctch3,  eolith_state, hidctch3, ROT0, "Eolith", "Hidden Catch 3 (ver 1.00 / pcb ver 3.05)", GAME_IMPERFECT_SOUND )
 GAME( 2001, fort2b,    0,        eolith50, common,    eolith_state, eolith,   ROT0, "Eolith", "Fortress 2 Blue Arcade (ver 1.01 / pcb ver 3.05)",  GAME_IMPERFECT_SOUND )
 GAME( 2001, fort2ba,   fort2b,   eolith50, common,    eolith_state, eolith,   ROT0, "Eolith", "Fortress 2 Blue Arcade (ver 1.00 / pcb ver 3.05)",  GAME_IMPERFECT_SOUND )
-

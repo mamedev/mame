@@ -33,7 +33,7 @@ public:
 	int busy_r();
 	DECLARE_WRITE8_MEMBER( port_w );
 	void postload();
-	
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -42,7 +42,7 @@ protected:
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
-		
+
 	// internal state
 	sound_stream *m_channel;                  /* stream channel for playback */
 
@@ -53,13 +53,13 @@ protected:
 	UINT32      m_pos;                        /* current output sample position */
 	UINT32      m_step;                       /* step value per output sample */
 	attotime    m_clock_period;               /* clock period */
-	
+
 	/* I/O lines */
 	UINT8       m_fifo_in;                    /* last data written to the sound chip */
 	UINT8       m_reset;                      /* current state of the RESET line */
 	UINT8       m_start;                      /* current state of the START line */
 	UINT8       m_drq;                        /* current state of the DRQ line */
-	
+
 	/* internal state machine */
 	INT8        m_state;                      /* current overall chip state */
 	INT32       m_clocks_left;                /* number of clocks left in this state */
@@ -85,7 +85,7 @@ protected:
 	UINT8 *     m_rombase;                    /* pointer to ROM data or NULL for slave mode */
 	UINT32      m_romoffset;                  /* ROM offset to make save/restore easier */
 	UINT32      m_rommask;                    /* maximum address offset */
-	
+
 	void update_adpcm(int data);
 	void advance_state();
 };
@@ -94,19 +94,19 @@ class upd7759_device : public upd775x_device
 {
 public:
 	upd7759_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	enum
 		{
 			TIMER_SLAVE_UPDATE
 		};
-		
+
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
-	
+
 	emu_timer *m_timer;                       /* timer */
-	
+
 	void start_w(UINT8 data);
 };
 
@@ -118,7 +118,7 @@ public:
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
-	
+
 	void start_w(UINT8 data);
 };
 

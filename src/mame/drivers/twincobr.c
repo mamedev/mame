@@ -62,7 +62,7 @@ TP-011 SUB
  |      2148 2148|
  |      2148 2148|
  |---------------|
-Notes: 
+Notes:
       T.T-2  - Custom chip (DIP40) marked 'TOAPLAN-02 M70H005'
       2016   - 2kx8 SRAM (DIP24)
       6264   - 8kx8 SRAM (DIP28)
@@ -117,21 +117,21 @@ Notes:
       5165   - 8kx8 SRAM (DIP28)
       74LS163- Synchronous 4-Bit Binary Counter logic chip. This chip is used to divide the 28MHz clock.
                28MHz input on pin 2, outputs: pin 11 1.75MHz, pin 12 3.5MHz, pin 13 7MHz, pin 14 14MHz
-      T.T-1  - Custom chip marked 'TOAPLAN GXL-01' (DIP40) 
-      T.T-2  - Custom chip marked 'TOAPLAN-02 M70H005' (DIP40) 
+      T.T-1  - Custom chip marked 'TOAPLAN GXL-01' (DIP40)
+      T.T-2  - Custom chip marked 'TOAPLAN-02 M70H005' (DIP40)
       7135   - Intersil ICL7135 DAC (DIP8)
       MB3730 - Fujitsu MB3730 14W BTL Audio Power Amplifier
       SW1/2  - 8-position DIP switch
       B30-21 - 82S123 bipolar PROM (DIP16)
       B30_05 \
       B30_06 |
-      B30_07 |    
+      B30_07 |
       B30_08 |
       B30_09 | Hitachi HN27256 OTP EPROM (DIP28)
-      B30_10 | 
+      B30_10 |
       B30_11 |
       B30_12 /
-      
+
       B30_02 \
       B30_04 / SGS M27256 EPROM (DIP28)
 

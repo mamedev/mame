@@ -21,7 +21,7 @@ public:
 		Z80_ASSERT,
 		Z80_CLEAR
 	};
-	
+
 	WRITE_LINE_MEMBER( ym2151_irq_handler );
 	DECLARE_WRITE8_MEMBER( sound_command_byte_w );
 	DECLARE_WRITE16_MEMBER( sound_command_w );
@@ -44,7 +44,7 @@ protected:
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
-	
+
 private:
 	// internal state
 	UINT8 m_irqvector;
@@ -53,7 +53,7 @@ private:
 	UINT32 m_samples_size;
 	address_space *m_space;
 	dac_device *m_dac;
-	
+
 	TIMER_CALLBACK_MEMBER( setvector_callback );
 };
 

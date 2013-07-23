@@ -18,7 +18,7 @@ public:
 	DECLARE_WRITE8_MEMBER( sound_irq_ack_w );
 	DECLARE_WRITE8_MEMBER( m52_adpcm_w );
 	DECLARE_WRITE8_MEMBER( m62_adpcm_w );
-	
+
 	void adpcm_int(int st);
 
 protected:
@@ -31,8 +31,8 @@ protected:
 
 private:
 	// internal state
-	UINT8			m_port1;
-	UINT8			m_port2;
+	UINT8           m_port1;
+	UINT8           m_port2;
 
 	ay8910_device *m_ay1;
 	ay8910_device *m_ay2;

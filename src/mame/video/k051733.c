@@ -86,7 +86,7 @@ void k051733_device::device_config_complete()
 void k051733_device::device_start()
 {
 	save_item(NAME(m_ram));
-	save_item(NAME(m_rng));	
+	save_item(NAME(m_rng));
 }
 
 //-------------------------------------------------

@@ -1270,4 +1270,3 @@ offs_t cop400_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT
 
 	return CPU_DISASSEMBLE_NAME(cop410)(this, buffer, pc, oprom, opram, options);
 }
-

@@ -41,7 +41,7 @@ public:
 	void set_bppmultmask( int mult, int mask ) { m_bppmult = mult; m_bppmask = mask; } // stadium hero has 3bpp tiles
 	UINT8 m_gfxcolmask;
 	int m_rambank; // external connection?
-	
+
 	/* 16-bit accessors */
 
 	DECLARE_WRITE16_MEMBER( pf_control_0_w );
@@ -60,7 +60,7 @@ public:
 	/* for dec8.c, pcktgal.c */
 	DECLARE_READ8_MEMBER( pf_data_8bit_r );
 	DECLARE_WRITE8_MEMBER( pf_data_8bit_w );
-	
+
 	DECLARE_WRITE8_MEMBER( pf_control0_8bit_w );
 	DECLARE_READ8_MEMBER( pf_control1_8bit_r );
 	DECLARE_WRITE8_MEMBER( pf_control1_8bit_w );

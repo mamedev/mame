@@ -24,16 +24,16 @@ public:
 
 	UINT8 m_ay8910_latch_1;
 	UINT8 m_ay8910_latch_2;
-	
+
 	required_shared_ptr<UINT8> m_bitmap_videoram;
 	required_shared_ptr<UINT8> m_charmap_videoram;
 	required_shared_ptr<UINT8> m_video_control;
 	required_shared_ptr<UINT8> m_bitmap_color;
-	
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	optional_device<hc55516_device> m_cvsd;
-	
+
 	UINT8 *m_bitmap_colorram;
 	UINT8 m_control_xor;
 	DECLARE_READ8_MEMBER(redalert_interrupt_clear_r);

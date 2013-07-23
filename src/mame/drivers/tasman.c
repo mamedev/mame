@@ -121,7 +121,7 @@ READ32_MEMBER(kongambl_state::eeprom_r)
 		retval |= (ioport("SYSTEM")->read());
 
 
-//	printf("%08x\n",mem_mask);
+//  printf("%08x\n",mem_mask);
 
 	return retval;
 }
@@ -616,9 +616,9 @@ static MACHINE_CONFIG_START( kongambl, kongambl_state )
 	MCFG_K055673_ADD_NOINTF("k055673")
 
 	MCFG_GFXDECODE(tasman)
-	
+
 	MCFG_K056832_ADD("k056832", k056832_intf)
-	
+
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 MACHINE_CONFIG_END

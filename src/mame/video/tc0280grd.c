@@ -29,7 +29,7 @@ const device_type TC0280GRD = &device_creator<tc0280grd_device>;
 tc0280grd_device::tc0280grd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TC0280GRD, "Taito TC0280GRD & TC0430GRW", tag, owner, clock, "tc0280grd", __FILE__),
 	m_ram(NULL),
-    //m_ctrl[8](0),
+	//m_ctrl[8](0),
 	m_base_color(0)
 {
 }
@@ -46,7 +46,7 @@ void tc0280grd_device::device_config_complete()
 	const tc0280grd_interface *intf = reinterpret_cast<const tc0280grd_interface *>(static_config());
 	if (intf != NULL)
 	*static_cast<tc0280grd_interface *>(this) = *intf;
-	
+
 	// or initialize to defaults if none provided
 	else
 	{

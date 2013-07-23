@@ -1,11 +1,11 @@
 /***************************************************************************
 
-	Harriet (c) 1990 Quadtel
+    Harriet (c) 1990 Quadtel
 
-	TODO:
-	- PCB pics would be very useful
-	- "Failed to read NVR" message.
-	- hook-up keyboard/terminal, shouldn't be too hard by studying the code.
+    TODO:
+    - PCB pics would be very useful
+    - "Failed to read NVR" message.
+    - hook-up keyboard/terminal, shouldn't be too hard by studying the code.
 
 ***************************************************************************/
 
@@ -67,10 +67,10 @@ READ8_MEMBER(harriet_state::unk_r)
 
 WRITE8_MEMBER(harriet_state::unk_w)
 {
-/*	if(offset)
-		printf("%02x\n",data);
-	else if(data != 0xcf)
-		printf("$f1001d Control (offset 0) write %02x\n",data);*/
+/*  if(offset)
+        printf("%02x\n",data);
+    else if(data != 0xcf)
+        printf("$f1001d Control (offset 0) write %02x\n",data);*/
 }
 
 /* PC=0x676/0x694 */
@@ -112,8 +112,8 @@ static ADDRESS_MAP_START( harriet_map, AS_PROGRAM, 16, harriet_state )
 	AM_RANGE(0xf20024, 0xf20025) AM_READ8(unk2_r,0x00ff)
 	AM_RANGE(0xf2002c, 0xf2002d) AM_READ8(unk3_r,0x00ff)
 	AM_RANGE(0xf2002e, 0xf2002f) AM_WRITE8(serial_w,0x00ff)
-//	AM_RANGE(0xf4001e, 0xf4001f) AM_READ8(keyboard_status_r,0x00ff)
-//	AM_RANGE(0xf4002e, 0xf4002f) AM_READ8(keyboard_status_r,0x00ff)
+//  AM_RANGE(0xf4001e, 0xf4001f) AM_READ8(keyboard_status_r,0x00ff)
+//  AM_RANGE(0xf4002e, 0xf4002f) AM_READ8(keyboard_status_r,0x00ff)
 	AM_RANGE(0xf4003e, 0xf4003f) AM_READ8(keyboard_status_r,0x00ff)
 ADDRESS_MAP_END
 

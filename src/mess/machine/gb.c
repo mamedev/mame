@@ -455,7 +455,7 @@ WRITE8_MEMBER(gb_state::sgb_io_w)
 								break;
 							default:
 								machine().device<sgb_lcd_device>("lcd")->sgb_io_write_pal(sgb_data[0] >> 3, &sgb_data[0]);
-								break;								
+								break;
 						}
 						m_sgb_start = 0;
 						m_sgb_bytecount = 0;

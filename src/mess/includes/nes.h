@@ -553,7 +553,7 @@ public:
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER(nes_disk);
 
 	void fds_irq(int scanline, int vblank, int blanked);
-	
+
 	// input related
 	UINT32 m_pad_latch[4];
 	UINT8 m_zapper_latch[2][3];

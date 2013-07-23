@@ -45,12 +45,12 @@ public:
 	*/
 
 	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );	
+	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ16_MEMBER( word_r );
 	DECLARE_WRITE16_MEMBER( word_w );
 	DECLARE_READ16_MEMBER( lsb_r );
 	DECLARE_WRITE16_MEMBER( lsb_w );
-	
+
 	void set_rmrd_line(int state);
 	int get_rmrd_line();
 	void tilemap_update();
@@ -90,7 +90,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_tile_info0);
 	TILE_GET_INFO_MEMBER(get_tile_info1);
 	TILE_GET_INFO_MEMBER(get_tile_info2);
-	
+
 	void get_tile_info( tile_data &tileinfo, int tile_index, int layer, UINT8 *cram, UINT8 *vram1, UINT8 *vram2 );
 	void tileflip_reset();
 };

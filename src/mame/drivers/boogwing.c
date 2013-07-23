@@ -96,7 +96,7 @@ READ16_MEMBER( boogwing_state::boogwing_protection_region_0_104_r )
 }
 
 WRITE16_MEMBER( boogwing_state::boogwing_protection_region_0_104_w )
-{		
+{
 	int real_address = 0 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	UINT8 cs = 0;
@@ -116,10 +116,10 @@ static ADDRESS_MAP_START( boogwing_map, AS_PROGRAM, 16, boogwing_state )
 	AM_RANGE(0x244000, 0x244001) AM_DEVWRITE("spriteram2", buffered_spriteram16_device, write)
 	AM_RANGE(0x246000, 0x2467ff) AM_RAM AM_SHARE("spriteram2")
 
-//	AM_RANGE(0x24e6c0, 0x24e6c1) AM_READ_PORT("DSW")
-//	AM_RANGE(0x24e138, 0x24e139) AM_READ_PORT("SYSTEM")
-//	AM_RANGE(0x24e344, 0x24e345) AM_READ_PORT("INPUTS")
-//	/*READD AM_RANGE(0x24e000, 0x24e7ff) AM_WRITE_LEGACY(deco16_104_prot_w) AM_SHARE("prot16ram") */
+//  AM_RANGE(0x24e6c0, 0x24e6c1) AM_READ_PORT("DSW")
+//  AM_RANGE(0x24e138, 0x24e139) AM_READ_PORT("SYSTEM")
+//  AM_RANGE(0x24e344, 0x24e345) AM_READ_PORT("INPUTS")
+//  /*READD AM_RANGE(0x24e000, 0x24e7ff) AM_WRITE_LEGACY(deco16_104_prot_w) AM_SHARE("prot16ram") */
 	AM_RANGE(0x24e000, 0x24efff) AM_READWRITE(boogwing_protection_region_0_104_r,boogwing_protection_region_0_104_w) AM_SHARE("prot16ram") /* Protection device */
 
 	AM_RANGE(0x260000, 0x26000f) AM_DEVWRITE("tilegen1", deco16ic_device, pf_control_w)

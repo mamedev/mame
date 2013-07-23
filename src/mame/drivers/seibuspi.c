@@ -1814,7 +1814,7 @@ void seibuspi_state::machine_start()
 
 	// use this to determine the region code when adding a new SPI cartridge clone set
 	logerror("Game region code: %02X\n", memregion("maincpu")->base()[0x1ffffc]);
-	
+
 	// savestates
 	save_item(NAME(m_z80_prg_transfer_pos));
 	save_item(NAME(m_z80_lastbank));

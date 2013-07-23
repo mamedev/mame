@@ -206,7 +206,7 @@ int phoenix_sound_device::noise(int samplerate)
 	int vc24 = update_c24(samplerate);
 	int vc25 = update_c25(samplerate);
 	int sum = 0, level, frequency;
-	
+
 	/*
 	 * The voltage levels are added and control I(CE) of transistor TR1
 	 * (NPN) which then controls the noise clock frequency (linearily?).

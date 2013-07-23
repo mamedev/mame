@@ -759,7 +759,7 @@ static MACHINE_CONFIG_START( realbrk, realbrk_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", realbrk_state,  realbrk_interrupt)
 
 	MCFG_TMP68301_ADD("tmp68301")
-	
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

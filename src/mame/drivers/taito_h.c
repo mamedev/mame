@@ -841,7 +841,7 @@ ROM_START( gogold )
 	ROM_LOAD( "b56-18.bin", 0x00000, 0x02000, CRC(c88f0bbe) SHA1(18c87c744fbeca35d13033e50f62e5383eb4ec2c) )
 ROM_END
 
-// Sega Tetris on a Taito H-System board, with some roms from ‘Go For The Gold’ still on the board.
+// Sega Tetris on a Taito H-System board, with some roms from ?Go For The Gold? still on the board.
 ROM_START( tetristh )
 	ROM_REGION( 0x40000, "maincpu", 0 )     /* main cpu */
 	ROM_LOAD16_BYTE( "c26-12-1.ic36", 0x00000, 0x20000, CRC(77e80c82) SHA1(840dc5a54a865b8cd2e0d03001a493987d66c23b) )

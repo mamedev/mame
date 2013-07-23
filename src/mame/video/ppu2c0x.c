@@ -826,7 +826,7 @@ void ppu2c0x_device::draw_sprites( UINT8 *line_priority )
 								/* no, draw */
 								bitmap.pix16(m_scanline, sprite_xpos + pixel) = paldata[pixel_data];
 							}
-							/* indicate that a sprite was drawn at this location, even if it's not seen */						
+							/* indicate that a sprite was drawn at this location, even if it's not seen */
 							line_priority[sprite_xpos + pixel] |= 0x01;
 						}
 					}

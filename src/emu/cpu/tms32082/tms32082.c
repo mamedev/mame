@@ -1,7 +1,7 @@
 /*
-	Texas Instruments TMS320C82 DSP Emulator
+    Texas Instruments TMS320C82 DSP Emulator
 
-	Written by Ville Linde
+    Written by Ville Linde
 
 */
 
@@ -213,7 +213,7 @@ UINT32 tms32082_mp_device::read_creg(int reg)
 {
 	switch (reg)
 	{
-		case 0xa:			// PPERROR
+		case 0xa:           // PPERROR
 			return 0;
 
 		default:

@@ -238,7 +238,6 @@ const device_type K055555 = &device_creator<k055555_device>;
 k055555_device::k055555_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K055555, "Konami 055555", tag, owner, clock, "k055555", __FILE__)
 {
-
 }
 
 //-------------------------------------------------
@@ -283,6 +282,3 @@ READ32_MEMBER( k055555_device::k055555_long_r )
 	offset <<= 1;
 	return (k055555_word_r(space, offset + 1, 0xffff) | k055555_word_r(space, offset, 0xffff) << 16);
 }
-
-
-

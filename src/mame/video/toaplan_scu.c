@@ -18,12 +18,10 @@ toaplan_scu_device::toaplan_scu_device(const machine_config &mconfig, const char
 
 void toaplan_scu_device::device_start()
 {
-
 }
 
 void toaplan_scu_device::device_reset()
 {
-
 }
 
 void toaplan_scu_device::alloc_sprite_bitmap()
@@ -71,7 +69,7 @@ void toaplan_scu_device::draw_sprites_to_tempbitmap(const rectangle &cliprect, U
 				color << 4 /* << 4 because using _raw */ ,
 				flipx,flipy,
 				sx-32,sy-16,0);
-				
+
 		}
 	}
 
@@ -107,4 +105,3 @@ void toaplan_scu_device::copy_sprites_from_tempbitmap(bitmap_ind16 &bitmap, cons
 
 	}
 }
-

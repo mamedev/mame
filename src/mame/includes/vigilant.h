@@ -12,10 +12,10 @@ public:
 
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_videoram;
-	
+
 	required_device<cpu_device> m_maincpu;
 	required_device<m72_audio_device> m_audio;
-	
+
 	int m_horiz_scroll_low;
 	int m_horiz_scroll_high;
 	int m_rear_horiz_scroll_low;

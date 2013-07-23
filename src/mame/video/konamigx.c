@@ -396,7 +396,6 @@ void konamigx_state::konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitm
 					tilemap_t *sub2, int sub2flags,
 					int mixerflags, bitmap_ind16 *extra_bitmap, int rushingheroes_hack)
 {
-
 	int objbuf[GX_MAX_OBJECTS];
 	int shadowon[3], shdpri[3], layerid[6], layerpri[6];
 
@@ -558,7 +557,7 @@ void konamigx_state::konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitm
 		}
 	}
 
-//	i = j = 0xff;
+//  i = j = 0xff;
 	int l = 0;
 
 	for (int offs=0; offs<0x800; offs+=8)
@@ -731,7 +730,7 @@ void konamigx_state::gx_draw_basic_tilemaps(running_machine &machine, bitmap_rgb
 	int j = mixerflags>>i & 3;
 	int k = 0;
 
-	int	disp = m_k055555->K055555_read_register(K55_INPUT_ENABLES);
+	int disp = m_k055555->K055555_read_register(K55_INPUT_ENABLES);
 	if (disp & (1<<code))
 	{
 		if (j == GXMIX_BLEND_NONE)  { temp1 = 0xff; temp2 = temp3 = 0; } else
@@ -744,10 +743,10 @@ void konamigx_state::gx_draw_basic_tilemaps(running_machine &machine, bitmap_rgb
 		}
 
 		/* blend layer only when:
-			1) vinmix != 0xff
-			2) its internal mix code is set
-			3) all mix code bits are internal(overriden until tile blending has been implemented)
-			4) 0 > alpha < 255;
+		    1) vinmix != 0xff
+		    2) its internal mix code is set
+		    3) all mix code bits are internal(overriden until tile blending has been implemented)
+		    4) 0 > alpha < 255;
 		*/
 		if (temp1!=0xff && temp2 /*&& temp3==3*/)
 		{
@@ -772,7 +771,7 @@ void konamigx_state::gx_draw_basic_extended_tilemaps_1(running_machine &machine,
 	static int parity = 0;
 	parity ^= 1;
 
-	int	disp = m_k055555->K055555_read_register(K55_INPUT_ENABLES);
+	int disp = m_k055555->K055555_read_register(K55_INPUT_ENABLES);
 	if ((disp & K55_INP_SUB1) || (rushingheroes_hack))
 	{
 		int alpha = 255;
@@ -819,11 +818,11 @@ void konamigx_state::gx_draw_basic_extended_tilemaps_2(running_machine &machine,
 	int temp1,temp2,temp3,temp4;
 	int i = code<<1;
 	int j = mixerflags>>i & 3;
-//	int k = 0;
-//	static int parity = 0;
-//	parity ^= 1;
+//  int k = 0;
+//  static int parity = 0;
+//  parity ^= 1;
 
-	int	disp = m_k055555->K055555_read_register(K55_INPUT_ENABLES);
+	int disp = m_k055555->K055555_read_register(K55_INPUT_ENABLES);
 	if (disp & K55_INP_SUB2)
 	{
 		//int alpha = 255;
@@ -838,7 +837,7 @@ void konamigx_state::gx_draw_basic_extended_tilemaps_2(running_machine &machine,
 
 		if (temp1!=0xff && temp2 /*&& temp3==3*/)
 		{
-			//alpha = 
+			//alpha =
 			temp4 = K054338_set_alpha_level(temp2);
 
 			if (temp4 <= 0) return;
@@ -876,8 +875,8 @@ void konamigx_state::gx_draw_basic_extended_tilemaps_2(running_machine &machine,
 			}
 			else
 			{
-			//	int pixeldouble_output = 0;
-			//	K053936GP_1_zoom_draw(machine, bitmap, cliprect, sub2, l, k, alpha, pixeldouble_output);
+			//  int pixeldouble_output = 0;
+			//  K053936GP_1_zoom_draw(machine, bitmap, cliprect, sub2, l, k, alpha, pixeldouble_output);
 			}
 		}
 		else
@@ -889,19 +888,15 @@ void konamigx_state::konamigx_mixer_draw(running_machine &machine, bitmap_rgb32 
 					tilemap_t *sub1, int sub1flags,
 					tilemap_t *sub2, int sub2flags,
 					int mixerflags, bitmap_ind16 *extra_bitmap, int rushingheroes_hack,
-					
+
 					/* passed from above function */
 					struct GX_OBJ *objpool,
 					int *objbuf,
 					int nobj
 					)
 {
-
-
-
-
 	// traverse draw list
-	int	disp = m_k055555->K055555_read_register(K55_INPUT_ENABLES);
+	int disp = m_k055555->K055555_read_register(K55_INPUT_ENABLES);
 
 	for (int count=0; count<nobj; count++)
 	{
@@ -918,7 +913,7 @@ void konamigx_state::konamigx_mixer_draw(running_machine &machine, bitmap_rgb32 
 
 			int drawmode = order>>4 & 0xf;
 
-			int	alpha = 255;
+			int alpha = 255;
 			int pri = 0;
 			int zcode = -1; // negative zcode values turn off z-buffering
 
@@ -951,7 +946,6 @@ void konamigx_state::konamigx_mixer_draw(running_machine &machine, bitmap_rgb32 
 		/* the rest are tilemaps of various kinda */
 		else
 		{
-	
 			switch (offs)
 			{
 				case -1:
@@ -969,7 +963,7 @@ void konamigx_state::konamigx_mixer_draw(running_machine &machine, bitmap_rgb32 
 			continue;
 		}
 
-	
+
 
 	}
 }

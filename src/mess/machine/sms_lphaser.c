@@ -267,5 +267,3 @@ void sms_light_phaser_device::device_timer(emu_timer &timer, device_timer_id id,
 		assert_always(FALSE, "Unknown id in sms_light_phaser_device::device_timer");
 	}
 }
-
-

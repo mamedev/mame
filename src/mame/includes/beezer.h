@@ -20,7 +20,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<beezer_sound_device> m_custom;
-	
+
 	DECLARE_WRITE8_MEMBER(beezer_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(beezer_map_w);
 	DECLARE_READ8_MEMBER(beezer_line_r);
@@ -73,9 +73,9 @@ public:
 	DECLARE_WRITE8_MEMBER( sfxctrl_w );
 	DECLARE_WRITE8_MEMBER( timer1_w );
 	DECLARE_READ8_MEMBER( noise_r );
-	
+
 	//DECLARE_WRITE_LINE_MEMBER( update_irq_state );
-	
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -108,7 +108,7 @@ private:
 	/* sound streaming variables */
 	sound_stream *m_stream;
 	//double m_freq_to_step;
-	
+
 	int sh6840_update_noise(int clocks);
 };
 
@@ -119,4 +119,3 @@ extern const device_type BEEZER;
 
 extern const via6522_interface b_via_0_interface;
 extern const via6522_interface b_via_1_interface;
-

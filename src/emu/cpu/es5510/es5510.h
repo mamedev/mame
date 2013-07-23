@@ -104,7 +104,7 @@ public:
 		ram_cycle_t cycle; // cycle type
 	};
 
-	// direct access to the 'HALT' pin - not just through the 
+	// direct access to the 'HALT' pin - not just through the
 	void set_HALT(bool halt) { halt_asserted = halt; }
 	bool get_HALT() { return halt_asserted; }
 

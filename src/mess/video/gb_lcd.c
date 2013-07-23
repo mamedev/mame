@@ -81,12 +81,12 @@ enum {
 
 
 /* OAM contents on power up.
- 
+
  The OAM area seems contain some kind of unit fingerprint. On each boot
  the data is almost always the same. Some random bits are flipped between
  different boots. It is currently unknown how much these fingerprints
  differ between different units.
- 
+
  OAM fingerprints taken from Wilbert Pol's own unit.
  */
 
@@ -214,7 +214,7 @@ void gb_lcd_device::common_start()
 {
 	machine().primary_screen->register_screen_bitmap(m_bitmap);
 	m_oam = auto_alloc_array_clear(machine(), UINT8, 0x100);
-	
+
 	m_lcd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gb_lcd_device::lcd_timer_proc),this));
 	machine().save().register_postload(save_prepost_delegate(FUNC(gb_lcd_device::videoptr_restore), this));
 
@@ -225,14 +225,14 @@ void gb_lcd_device::common_start()
 	save_item(NAME(m_window_lines_drawn));
 	save_item(NAME(m_vid_regs));
 	save_item(NAME(m_bg_zbuf));
-	
+
 	save_item(NAME(m_cgb_bpal));
 	save_item(NAME(m_cgb_spal));
-	
+
 	save_item(NAME(m_gb_bpal));
 	save_item(NAME(m_gb_spal0));
 	save_item(NAME(m_gb_spal1));
-	
+
 	save_item(NAME(m_current_line));
 	save_item(NAME(m_cmp_line));
 	save_item(NAME(m_sprCount));
@@ -258,14 +258,14 @@ void gb_lcd_device::common_start()
 	save_item(NAME(m_gbc_mode));
 	save_item(NAME(m_gb_tile_no_mod));
 	save_item(NAME(m_vram_bank));
-	
+
 	save_item(NAME(m_gb_chrgen_offs));
 	save_item(NAME(m_gb_bgdtab_offs));
 	save_item(NAME(m_gb_wndtab_offs));
 	save_item(NAME(m_gbc_chrgen_offs));
 	save_item(NAME(m_gbc_bgdtab_offs));
 	save_item(NAME(m_gbc_wndtab_offs));
-	
+
 	save_item(NAME(m_layer[0].enabled));
 	save_item(NAME(m_layer[0].xindex));
 	save_item(NAME(m_layer[0].xshift));
@@ -304,14 +304,14 @@ void gb_lcd_device::device_start()
 
 	m_vram = auto_alloc_array_clear(machine(), UINT8, 0x2000);
 	save_pointer(NAME(m_vram), 0x2000);
-	
+
 	memcpy(m_oam, dmg_oam_fingerprint, 0x100);
 }
 
 void mgb_lcd_device::device_start()
 {
 	common_start();
-	
+
 	m_vram = auto_alloc_array_clear(machine(), UINT8, 0x2000);
 	save_pointer(NAME(m_vram), 0x2000);
 
@@ -329,13 +329,13 @@ void mgb_lcd_device::device_start()
 void sgb_lcd_device::device_start()
 {
 	common_start();
-	
+
 	m_vram = auto_alloc_array_clear(machine(), UINT8, 0x2000);
 	save_pointer(NAME(m_vram), 0x2000);
 
 	m_sgb_tile_data = auto_alloc_array_clear(machine(), UINT8, 0x2000);
 	save_pointer(NAME(m_sgb_tile_data), 0x2000);
-	
+
 	/* Some default colours for non-SGB games */
 	m_sgb_pal[0] = 32767;
 	m_sgb_pal[1] = 21140;
@@ -357,13 +357,13 @@ void sgb_lcd_device::device_start()
 void cgb_lcd_device::device_start()
 {
 	common_start();
-	
+
 	m_vram = auto_alloc_array_clear(machine(), UINT8, 0x4000);
 	save_pointer(NAME(m_vram), 0x4000);
 
 	memcpy(m_oam, cgb_oam_fingerprint, 0x100);
 
-	
+
 	/* Background is initialised as white */
 	for (int i = 0; i < 32; i++)
 		m_cgb_bpal[i] = 32767;
@@ -378,9 +378,9 @@ void cgb_lcd_device::device_start()
 //-------------------------------------------------
 
 void gb_lcd_device::common_reset()
-{	
+{
 	m_window_lines_drawn = 0;
-	
+
 	m_current_line = 0;
 	m_cmp_line = 0;
 	m_sprCount = 0;
@@ -403,11 +403,11 @@ void gb_lcd_device::common_reset()
 	m_gbc_mode = 0;
 	m_gb_tile_no_mod = 0;
 	m_vram_bank = 0;
-	
+
 	m_gb_chrgen_offs = 0;
 	m_gb_bgdtab_offs = 0x1c00;
 	m_gb_wndtab_offs = 0x1c00;
-	
+
 	memset(&m_vid_regs, 0, sizeof(m_vid_regs));
 	memset(&m_bg_zbuf, 0, sizeof(m_bg_zbuf));
 	memset(&m_cgb_bpal, 0, sizeof(m_cgb_bpal));
@@ -415,24 +415,24 @@ void gb_lcd_device::common_reset()
 	memset(&m_sprite, 0, sizeof(m_sprite));
 	memset(&m_layer[0], 0, sizeof(m_layer[0]));
 	memset(&m_layer[1], 0, sizeof(m_layer[1]));
-	
+
 	// specific reg initialization
 	m_vid_regs[0x06] = 0xff;
-	
+
 	for (int i = 0x0c; i < _NR_GB_VID_REGS; i++)
 		m_vid_regs[i] = 0xff;
-	
+
 	LCDSTAT = 0x80;
 	LCDCONT = 0x00;     /* Video hardware is turned off at boot time */
 	m_current_line = CURLINE = CMPLINE = 0x00;
 	SCROLLX = SCROLLY = 0x00;
 	SPR0PAL = SPR1PAL = 0xFF;
 	WNDPOSX = WNDPOSY = 0x00;
-	
+
 	// Initialize palette arrays
 	for (int i = 0; i < 4; i++)
 		m_gb_bpal[i] = m_gb_spal0[i] = m_gb_spal1[i] = i;
-	
+
 }
 
 
@@ -450,13 +450,13 @@ void mgb_lcd_device::device_reset()
 
 	/* Make sure the VBlank interrupt is set when the first instruction gets executed */
 	machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(1), timer_expired_delegate(FUNC(mgb_lcd_device::video_init_vbl),this));
-	
+
 	/* Initialize some video registers */
 	video_w(space, 0x0, 0x91);    /* LCDCONT */
 	video_w(space, 0x7, 0xFC);    /* BGRDPAL */
 	video_w(space, 0x8, 0xFC);    /* SPR0PAL */
 	video_w(space, 0x9, 0xFC);    /* SPR1PAL */
-	
+
 	CURLINE = m_current_line = 0;
 	LCDSTAT = (LCDSTAT & 0xF8) | 0x05;
 	m_mode = 1;
@@ -472,24 +472,24 @@ void sgb_lcd_device::device_reset()
 
 	m_sgb_window_mask = 0;
 
-	memset(m_sgb_pal_map, 0, sizeof(m_sgb_pal_map));	
+	memset(m_sgb_pal_map, 0, sizeof(m_sgb_pal_map));
 	memset(m_sgb_atf_data, 0, sizeof(m_sgb_atf_data));
 }
 
 void cgb_lcd_device::device_reset()
 {
 	common_reset();
-	
+
 	m_gbc_chrgen_offs = 0x2000;
 	m_gbc_bgdtab_offs = 0x3c00;
 	m_gbc_wndtab_offs = 0x3c00;
-	
+
 	/* HDMA disabled */
 	m_hdma_enabled = 0;
 	m_hdma_possible = 0;
-	
+
 	m_gbc_mode = 1;
-	
+
 }
 
 
@@ -1723,7 +1723,7 @@ void cgb_lcd_device::hdma_trans(UINT16 length)
 {
 	UINT16 src, dst;
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	
+
 	src = ((UINT16)HDMA1 << 8) | (HDMA2 & 0xF0);
 	dst = ((UINT16)(HDMA3 & 0x1F) << 8) | (HDMA4 & 0xF0);
 	dst |= 0x8000;
@@ -2085,7 +2085,7 @@ WRITE8_MEMBER(gb_lcd_device::vram_w)
 {
 	if (m_vram_locked == LOCKED)
 		return;
-	
+
 	m_vram[offset + (m_vram_bank * 0x2000)] = data;
 }
 
@@ -2098,7 +2098,7 @@ WRITE8_MEMBER(gb_lcd_device::oam_w)
 {
 	if (m_oam_locked == LOCKED || offset >= 0xa0)
 		return;
-	
+
 	m_oam[offset] = data;
 }
 
@@ -2644,7 +2644,7 @@ void sgb_lcd_device::sgb_io_write_pal(int offs, UINT8 *data)
 						if( x > 19 )
 							x = 0;
 					}
-					
+
 					m_sgb_pal_map[x][y++] = (data[I] & 0x30) >> 4;
 					if( y > 17 )
 					{
@@ -2653,7 +2653,7 @@ void sgb_lcd_device::sgb_io_write_pal(int offs, UINT8 *data)
 						if( x > 19 )
 							x = 0;
 					}
-					
+
 					m_sgb_pal_map[x][y++] = (data[I] & 0xC) >> 2;
 					if( y > 17 )
 					{
@@ -2662,7 +2662,7 @@ void sgb_lcd_device::sgb_io_write_pal(int offs, UINT8 *data)
 						if( x > 19 )
 							x = 0;
 					}
-					
+
 					m_sgb_pal_map[x][y++] = data[I] & 0x3;
 					if( y > 17 )
 					{
@@ -2685,7 +2685,7 @@ void sgb_lcd_device::sgb_io_write_pal(int offs, UINT8 *data)
 						if( y > 17 )
 							y = 0;
 					}
-					
+
 					m_sgb_pal_map[x++][y] = (data[I] & 0x30) >> 4;
 					if( x > 19 )
 					{
@@ -2694,7 +2694,7 @@ void sgb_lcd_device::sgb_io_write_pal(int offs, UINT8 *data)
 						if( y > 17 )
 							y = 0;
 					}
-					
+
 					m_sgb_pal_map[x++][y] = (data[I] & 0xC) >> 2;
 					if( x > 19 )
 					{
@@ -2703,7 +2703,7 @@ void sgb_lcd_device::sgb_io_write_pal(int offs, UINT8 *data)
 						if( y > 17 )
 							y = 0;
 					}
-					
+
 					m_sgb_pal_map[x++][y] = data[I] & 0x3;
 					if( x > 19 )
 					{
@@ -2728,7 +2728,7 @@ void sgb_lcd_device::sgb_io_write_pal(int offs, UINT8 *data)
 		case 0x0A:  /* PAL_SET */
 		{
 			UINT16 index_;
-			
+
 			/* Palette 0 */
 			index_ = (UINT16)(data[1] | (data[2] << 8)) * 4;
 			m_sgb_pal[0] = m_sgb_pal_data[index_];
@@ -2775,7 +2775,7 @@ void sgb_lcd_device::sgb_io_write_pal(int offs, UINT8 *data)
 		case 0x0B:  /* PAL_TRN */
 		{
 			UINT16 col;
-			
+
 			for (int i = 0; i < 2048; i++ )
 			{
 				col = (m_vram[0x0800 + (i * 2) + 1] << 8) | m_vram[0x0800 + (i * 2)];
@@ -2834,7 +2834,7 @@ void sgb_lcd_device::sgb_io_write_pal(int offs, UINT8 *data)
 			memcpy(m_sgb_atf_data, m_vram + 0x0800, 4050);
 			break;
 		case 0x16:  /* ATTR_SET */
-		{			
+		{
 			/* Attribute File */
 			if (data[1] & 0x40)
 				m_sgb_window_mask = 0;
@@ -2869,7 +2869,5 @@ void sgb_lcd_device::sgb_io_write_pal(int offs, UINT8 *data)
 		default:
 			logerror( "SGB: Unknown Command 0x%02x!\n", data[0] >> 3 );
 	}
-	
+
 }
-
-

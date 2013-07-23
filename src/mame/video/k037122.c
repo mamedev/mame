@@ -58,10 +58,10 @@ void k037122_device::device_start()
 	{ 1*16, 0*16, 3*16, 2*16, 5*16, 4*16, 7*16, 6*16 },
 	{ 0*128, 1*128, 2*128, 3*128, 4*128, 5*128, 6*128, 7*128 },
 	8*128
-	};	
-	
+	};
+
 	m_screen = machine().device<screen_device>(m_screen_tag);
-	
+
 	m_char_ram = auto_alloc_array_clear(machine(), UINT32, 0x200000 / 4);
 	m_tile_ram = auto_alloc_array_clear(machine(), UINT32, 0x20000 / 4);
 	m_reg = auto_alloc_array_clear(machine(), UINT32, 0x400 / 4);

@@ -55,9 +55,9 @@ public:
 
 	DECLARE_WRITE16_MEMBER( word_w ); // "CLCT" registers
 	DECLARE_WRITE32_MEMBER( long_w );
-	
+
 	DECLARE_READ16_MEMBER( word_r );        // CLTC
-	
+
 	int register_r(int reg);
 	void update_all_shadows(int rushingheroes_hack);          // called at the beginning of SCREEN_UPDATE()
 	void fill_solid_bg(bitmap_rgb32 &bitmap);             // solid backcolor fill
@@ -71,12 +71,12 @@ protected:
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 private:
 	// internal state
 	UINT16    m_regs[32];
 	int       m_shd_rgb[9];
-	
+
 	screen_device *m_screen;
 	k055555_device *m_k055555;  /* used to fill BG color */
 };
@@ -84,6 +84,3 @@ private:
 extern const device_type K054338;
 
 #endif
-
-
-

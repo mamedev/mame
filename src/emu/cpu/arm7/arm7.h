@@ -131,7 +131,7 @@ protected:
 	UINT8 m_archFlags;        // architecture flags
 
 //#if ARM7_MMU_ENABLE_HACK
-//	UINT32 mmu_enable_addr; // workaround for "MMU is enabled when PA != VA" problem
+//  UINT32 mmu_enable_addr; // workaround for "MMU is enabled when PA != VA" problem
 //#endif
 
 	UINT32 m_copro_id;

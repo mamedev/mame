@@ -890,7 +890,7 @@ static SLOT_INTERFACE_START(mac_pds030_cards)
 SLOT_INTERFACE_END
 
 static SLOT_INTERFACE_START(mac_sepds_cards)
-	SLOT_INTERFACE("radiusfpd", PDS_SEDISPLAY)	// Radius Full Page Display card for SE
+	SLOT_INTERFACE("radiusfpd", PDS_SEDISPLAY)  // Radius Full Page Display card for SE
 SLOT_INTERFACE_END
 
 static SLOT_INTERFACE_START(mac_lcpds_cards)

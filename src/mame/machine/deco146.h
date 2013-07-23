@@ -32,7 +32,7 @@ typedef device_delegate<void (address_space &space, UINT16 data, UINT16 mem_mask
 #define MCFG_DECO146_SET_USE_MAGIC_ADDRESS_XOR \
 	deco_146_base_device::set_use_magic_read_address_xor(*device, 1 );
 
-                                                                                                                                                                   
+
 
 
 /* Data East 146 protection chip */

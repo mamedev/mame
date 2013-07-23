@@ -4,19 +4,19 @@
 
 // TODO:
 //   * AUC has a CLR field for writing to A0 & A1 + sign extension + psw + zero lower bits
-//     implement as a clean function (page 2-7) 
+//     implement as a clean function (page 2-7)
 //   * Implement saturation overflow (SAT on AUC) (page 2-8)
 //   * Implement p alignment (ALIGN on AUC) (page 2-9)
-//   * When a register is used as a memory pointer. its value is compared with re. If its value is 
-//     equal to the contents of re and the postincrement is +1, then the value in rb is copied into 
+//   * When a register is used as a memory pointer. its value is compared with re. If its value is
+//     equal to the contents of re and the postincrement is +1, then the value in rb is copied into
 //     the register after the memory access is complete. See Section 4.2.3.
 //   * CPU flags go to the PSW & conditionTest() works on that (Page 3-4)
 //   * Some instructions are not interruptible.
-// 
+//
 
 
 // NOTES:
-// When y is used in an assembly-language instruction, the DSPI6/DSPI6A device will read 
+// When y is used in an assembly-language instruction, the DSPI6/DSPI6A device will read
 // or write the high half (bits 16-31) of the y register  (page 2-7)
 
 // The YL register is the lower half of the 32 bit Y register
@@ -34,17 +34,17 @@ bool dsp16_device::lmi()
 
 bool dsp16_device::leq()
 {
-    return m_psw & 0x4000;
+	return m_psw & 0x4000;
 }
 
 bool dsp16_device::llv()
 {
-    return m_psw & 0x2000;
+	return m_psw & 0x2000;
 }
 
 bool dsp16_device::lmv()
 {
-    return m_psw & 0x1000;
+	return m_psw & 0x1000;
 }
 
 
@@ -78,7 +78,7 @@ void dsp16_device::writeRegister(void* reg, const UINT16 &value)
 	}
 	else if (reg == &m_y)
 	{
-		// Y register 
+		// Y register
 		// TODO - Automatic clearing of yl may be selected (according to the CLR field of the auc register)  (page 2-7)
 		m_y = (value << 16) | (m_y & 0x0000ffff);
 	}
@@ -119,9 +119,9 @@ bool dsp16_device::conditionTest(const UINT8& CON)
 		case 0x11: return (lmi()  ||  leq());   // le (result <= 0)
 		default: logerror("Unrecognized condition at PC=0x%04x\n", m_pc); break;
 	}
-	
+
 	// Testing each of these conditions (*) increments the respective counter being tested  (page 3-5)
-	
+
 	return false;
 }
 
@@ -187,7 +187,7 @@ void* dsp16_device::registerFromRTable(const UINT8 &R)
 void dsp16_device::executeF1Field(const UINT8& F1, const UINT8& D, const UINT8& S)
 {
 	// TODO: I'm pretty sure we need to feed X into these as well - Double check
-    
+
 	// Note these instructions read right-to-left, so act accordingly  (page 3-6)
 	// y & p are sign extended  (page 3-9)
 	// implementation details  (page 3-9)
@@ -223,7 +223,7 @@ void dsp16_device::executeF1Field(const UINT8& F1, const UINT8& D, const UINT8& 
 			printf("UNIMPLEMENTED F1 operation @ PC 0x%04x (%d)\n", m_pc, __LINE__);
 			break;
 		}
-		case 0x01: 
+		case 0x01:
 		{
 			// Ad = aS+p   p = x*y
 			printf("UNIMPLEMENTED F1 operation @ PC 0x%04x (%d)\n", m_pc, __LINE__);
@@ -238,112 +238,112 @@ void dsp16_device::executeF1Field(const UINT8& F1, const UINT8& D, const UINT8& 
 			justATest = true;
 			break;
 		}
-		case 0x03: 
+		case 0x03:
 		{
 			// Ad = aS-p   p = x*y
 			printf("UNIMPLEMENTED F1 operation @ PC 0x%04x (%d)\n", m_pc, __LINE__);
 			break;
 		}
-		case 0x04: 
+		case 0x04:
 		{
 			// Ad = p
 			printf("UNIMPLEMENTED F1 operation @ PC 0x%04x (%d)\n", m_pc, __LINE__);
 			break;
 		}
-		case 0x05: 
+		case 0x05:
 		{
 			// Ad = aS+p
 			printf("UNIMPLEMENTED F1 operation @ PC 0x%04x (%d)\n", m_pc, __LINE__);
 			break;
 		}
-		case 0x06: 
+		case 0x06:
 		{
 			// nop
 			justATest = true;
 			break;
 		}
-		case 0x07: 
+		case 0x07:
 		{
 			// Ad = aS-p
 			printf("UNIMPLEMENTED F1 operation @ PC 0x%04x (%d)\n", m_pc, __LINE__);
 			break;
 		}
-		case 0x08: 
+		case 0x08:
 		{
 			// Ad = aS|y
 			printf("UNIMPLEMENTED F1 operation @ PC 0x%04x (%d)\n", m_pc, __LINE__);
 			break;
 		}
-		case 0x09: 
+		case 0x09:
 		{
 			// Ad = aS^y
 			printf("UNIMPLEMENTED F1 operation @ PC 0x%04x (%d)\n", m_pc, __LINE__);
 			break;
 		}
-		case 0x0a: 
+		case 0x0a:
 		{
 			// aS&y
 			printf("UNIMPLEMENTED F1 operation @ PC 0x%04x (%d)\n", m_pc, __LINE__);
 			justATest = true;
 			break;
 		}
-		case 0x0b: 
+		case 0x0b:
 		{
 			// aS-y
 			INT64 aS = *sourceReg;
 			if (aS & U64(0x800000000))
 				aS |= U64(0xfffffff000000000);
-			
+
 			INT64 y  = (m_y & 0xffff0000) >> 16;
 			if (y & 0x8000)
 				y |= U64(0xffffffffffff0000);
-			
+
 			result = aS-y;
 			justATest = true;
 			break;
 		}
-		case 0x0c: 
+		case 0x0c:
 		{
 			// Ad = y
 			printf("UNIMPLEMENTED F1 operation @ PC 0x%04x (%d)\n", m_pc, __LINE__);
 			break;
 		}
-		case 0x0d: 
+		case 0x0d:
 		{
 			// Ad = aS+y
 			INT64 aS = *sourceReg;
-			if (aS & U64(0x800000000)) 
+			if (aS & U64(0x800000000))
 				aS |= U64(0xfffffff000000000);
-			
+
 			INT64 y  = (m_y & 0xffff0000) >> 16;
-			if (y & 0x8000) 
+			if (y & 0x8000)
 				y |= U64(0xffffffffffff0000);
-			
+
 			result = aS+y;
 			break;
 		}
-		case 0x0e: 
+		case 0x0e:
 		{
 			// Ad = aS&y
 			printf("UNIMPLEMENTED F1 operation @ PC 0x%04x (%d)\n", m_pc, __LINE__);
 			break;
 		}
-		case 0x0f: 
+		case 0x0f:
 		{
 			// Ad = aS-y
 			INT64 aS = *sourceReg;
 			if (aS & U64(0x800000000))
 				aS |= U64(0xfffffff000000000);
-			
+
 			INT64 y  = (m_y & 0xffff0000) >> 16;
-			if (y & 0x8000) 
+			if (y & 0x8000)
 				y |= U64(0xffffffffffff0000);
-			
+
 			result = aS-y;
 			break;
 		}
 	}
-	
+
 	// CPU Flags  (page 3-4)
 	// LMI (logical minus)
 	if (result & U64(0x800000000))
@@ -359,7 +359,7 @@ void dsp16_device::executeF1Field(const UINT8& F1, const UINT8& D, const UINT8& 
 
 	// LLV (logical overflow)
 	// TODO
-	
+
 	// LMV (mathematical overflow)
 	if ((result | U64(0xf00000000)) != U64(0xf00000000) &&
 		(result | U64(0xf00000000)) != U64(0x000000000))
@@ -369,7 +369,7 @@ void dsp16_device::executeF1Field(const UINT8& F1, const UINT8& D, const UINT8& 
 
 	// If it was a real operation, make sure the data goes where it should
 	if (!justATest)
-    	*destinationReg = (UINT64)result & U64(0x0000000fffffffff);
+		*destinationReg = (UINT64)result & U64(0x0000000fffffffff);
 }
 
 
@@ -570,7 +570,7 @@ void dsp16_device::execute_one(const UINT16& op, UINT8& cycles, UINT8& pcAdvance
 		case 0x14:
 		{
 			DSP_LINE("3-53")
-			// F1, Y = y[l]  :  (page 3-53) 
+			// F1, Y = y[l]  :  (page 3-53)
 			const UINT8 Y = (op & 0x000f);
 			const UINT8 X = (op & 0x0010) >> 4;
 			const UINT8 S = (op & 0x0200) >> 9;

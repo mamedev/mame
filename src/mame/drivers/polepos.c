@@ -2089,7 +2089,7 @@ GAME( 1982, poleposa,   polepos,  polepos,    poleposa, driver_device, 0,       
 GAME( 1982, polepos1,   polepos,  polepos,    poleposa, driver_device, 0,        ROT0, "Namco (Atari license)", "Pole Position (Atari version 1)", 0 )
 GAME( 1984, topracer,   polepos,  polepos,    polepos, driver_device,  0,        ROT0, "bootleg", "Top Racer (with MB8841 + MB8842, 1984)", 0 ) // the NAMCO customs have been cloned on these bootlegs
 GAME( 1983, topracera,  polepos,  polepos,    polepos, driver_device,  0,        ROT0, "bootleg", "Top Racer (with MB8841 + MB8842, 1983)", 0 ) // the only difference between them is the year displayed on the title screen
-GAME( 1983, ppspeed,    polepos,  polepos,    polepos, driver_device,  0,        ROT0, "bootleg", "Speed Up (Spanish bootleg of Pole Position)", 0 ) // very close to topracer / topracera 
+GAME( 1983, ppspeed,    polepos,  polepos,    polepos, driver_device,  0,        ROT0, "bootleg", "Speed Up (Spanish bootleg of Pole Position)", 0 ) // very close to topracer / topracera
 GAME( 1982, topracern,  polepos,  topracern,  topracern, polepos_state,topracern,ROT0, "bootleg", "Top Racer (no MB8841 + MB8842)", 0 )
 
 GAME( 1983, polepos2,   0,        polepos,    polepos2, polepos_state, polepos2, ROT0, "Namco", "Pole Position II", 0 )

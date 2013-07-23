@@ -549,13 +549,13 @@ WRITE8_MEMBER(williams_state::williams2_blit_window_enable_w)
 inline void williams_state::blit_pixel(address_space &space, int dstaddr, int srcdata, int controlbyte)
 {
 	/* always read from video RAM regardless of the bank setting */
-	int curpix = (dstaddr < 0xc000) ? m_videoram[dstaddr] : space.read_byte(dstaddr);	//current pixel values at dest
+	int curpix = (dstaddr < 0xc000) ? m_videoram[dstaddr] : space.read_byte(dstaddr);   //current pixel values at dest
 
 	int solid = m_blitterram[1];
-	unsigned char keepmask = 0xff;			//what part of original dst byte should be kept, based on NO_EVEN and NO_ODD flags
+	unsigned char keepmask = 0xff;          //what part of original dst byte should be kept, based on NO_EVEN and NO_ODD flags
 
 	//even pixel (D7-D4)
-	if((controlbyte & WMS_BLITTER_CONTROLBYTE_FOREGROUND_ONLY) && !(srcdata & 0xf0))	//FG only and src even pixel=0
+	if((controlbyte & WMS_BLITTER_CONTROLBYTE_FOREGROUND_ONLY) && !(srcdata & 0xf0))    //FG only and src even pixel=0
 	{
 		if(controlbyte & WMS_BLITTER_CONTROLBYTE_NO_EVEN)
 			keepmask &= 0x0f;
@@ -567,7 +567,7 @@ inline void williams_state::blit_pixel(address_space &space, int dstaddr, int sr
 	}
 
 	//odd pixel (D3-D0)
-	if((controlbyte & WMS_BLITTER_CONTROLBYTE_FOREGROUND_ONLY) && !(srcdata & 0x0f))	//FG only and src odd pixel=0
+	if((controlbyte & WMS_BLITTER_CONTROLBYTE_FOREGROUND_ONLY) && !(srcdata & 0x0f))    //FG only and src odd pixel=0
 	{
 		if(controlbyte & WMS_BLITTER_CONTROLBYTE_NO_ODD)
 			keepmask &= 0xf0;
@@ -576,14 +576,14 @@ inline void williams_state::blit_pixel(address_space &space, int dstaddr, int sr
 	{
 		if(!(controlbyte & WMS_BLITTER_CONTROLBYTE_NO_ODD))
 			keepmask &= 0xf0;
-	}		
+	}
 
 	curpix &= keepmask;
 	if(controlbyte & WMS_BLITTER_CONTROLBYTE_SOLID)
 		curpix |= (solid & ~keepmask);
 	else
 		curpix |= (srcdata & ~keepmask);
-	
+
 /* if the window is enabled, only blit to videoram below the clipping address */
 /* note that we have to allow blits to non-video RAM (e.g. tileram, Sinistar $DXXX SRAM) because those */
 /* are not blocked by the window enable */
@@ -612,16 +612,16 @@ int williams_state::blitter_core(address_space &space, int sstart, int dstart, i
 	{
 		source = sstart & 0xffff;
 		dest = dstart & 0xffff;
-			
+
 		/* loop over the width */
-		for (x = 0; x < w; x++) 
+		for (x = 0; x < w; x++)
 		{
-			if (!(controlbyte & WMS_BLITTER_CONTROLBYTE_SHIFT))	//no shift
+			if (!(controlbyte & WMS_BLITTER_CONTROLBYTE_SHIFT)) //no shift
 			{
 				blit_pixel(space, dest, m_blitter_remap[space.read_byte(source)], controlbyte);
 			}
 			else
-			{	//shift one pixel right
+			{   //shift one pixel right
 				pixdata = (pixdata << 8) | m_blitter_remap[space.read_byte(source)];
 				blit_pixel(space, dest, (pixdata >> 4) & 0xff, controlbyte);
 			}

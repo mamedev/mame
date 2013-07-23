@@ -47,15 +47,15 @@ public:
 
 	/* Undrfire needs to read this for a sprite/tile priority hack */
 	DECLARE_READ8_MEMBER( pri_reg_r );
-	
+
 	void postload();
-	
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 private:
 	// internal state
 	UINT16           m_ctrl[0x18];
@@ -78,13 +78,13 @@ private:
 
 	void common_get_tc0480bg_tile_info( tile_data &tileinfo, int tile_index, UINT16 *ram, int gfxnum );
 	void common_get_tc0480tx_tile_info( tile_data &tileinfo, int tile_index, UINT16 *ram, int gfxnum );
-	
+
 	TILE_GET_INFO_MEMBER(get_bg0_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg3_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
-	
+
 	void dirty_tilemaps();
 	void set_layer_ptrs();
 	void bg01_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority );

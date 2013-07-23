@@ -114,15 +114,15 @@ private:
 };
 
 /*static ADDRESS_MAP_START( de_2_map, AS_PROGRAM, 8, de_2_state )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x2100, 0x2103) AM_DEVREADWRITE("pia21", pia6821_device, read, write) // sound+solenoids
-	AM_RANGE(0x2200, 0x2200) AM_WRITE(sol3_w) // solenoids
-	AM_RANGE(0x2400, 0x2403) AM_DEVREADWRITE("pia24", pia6821_device, read, write) // lamps
-	AM_RANGE(0x2800, 0x2803) AM_DEVREADWRITE("pia28", pia6821_device, read, write) // display
-	AM_RANGE(0x2c00, 0x2c03) AM_DEVREADWRITE("pia2c", pia6821_device, read, write) // alphanumeric display
-	AM_RANGE(0x3000, 0x3003) AM_DEVREADWRITE("pia30", pia6821_device, read, write) // inputs
-	AM_RANGE(0x3400, 0x3403) AM_DEVREADWRITE("pia34", pia6821_device, read, write) // widget
-	AM_RANGE(0x4000, 0xffff) AM_ROM
+    AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram")
+    AM_RANGE(0x2100, 0x2103) AM_DEVREADWRITE("pia21", pia6821_device, read, write) // sound+solenoids
+    AM_RANGE(0x2200, 0x2200) AM_WRITE(sol3_w) // solenoids
+    AM_RANGE(0x2400, 0x2403) AM_DEVREADWRITE("pia24", pia6821_device, read, write) // lamps
+    AM_RANGE(0x2800, 0x2803) AM_DEVREADWRITE("pia28", pia6821_device, read, write) // display
+    AM_RANGE(0x2c00, 0x2c03) AM_DEVREADWRITE("pia2c", pia6821_device, read, write) // alphanumeric display
+    AM_RANGE(0x3000, 0x3003) AM_DEVREADWRITE("pia30", pia6821_device, read, write) // inputs
+    AM_RANGE(0x3400, 0x3403) AM_DEVREADWRITE("pia34", pia6821_device, read, write) // widget
+    AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 */
 static ADDRESS_MAP_START( de_2_audio_map, AS_PROGRAM, 8, de_2_state )
@@ -850,8 +850,8 @@ GAME(1990,  bttf_a27,       0,          de_type3,   de_2, de_2_state,   de_2,   
 GAME(1990,  bttf_a20,       bttf_a27,   de_type3,   de_2, de_2_state,   de_2,   ROT0,   "Data East",    "Back To the Future (2.0)",                                     GAME_IS_SKELETON_MECHANICAL)
 GAME(1990,  bttf_a21,       bttf_a27,   de_type3,   de_2, de_2_state,   de_2,   ROT0,   "Data East",    "Back To The Future (2.1)",                                     GAME_IS_SKELETON_MECHANICAL)
 GAME(199?,  bttf_g27,       bttf_a27,   de_type3,   de_2, de_2_state,   de_2,   ROT0,   "Data East",    "Back To the Future (2.7 Germany)",                             GAME_IS_SKELETON_MECHANICAL)
-GAME(1987,  lwar_a83,		0,      	de_type1,	de_2, de_2_state,   de_2,   ROT0,   "Data East",        "Laser War (8.3)",           GAME_IS_SKELETON_MECHANICAL)
-GAME(1987,  lwar_e90,		lwar_a83,	de_type1,	de_2, de_2_state,   de_2,   ROT0,   "Data East",        "Laser War (9.0 Europe)",    GAME_IS_SKELETON_MECHANICAL)
+GAME(1987,  lwar_a83,       0,          de_type1,   de_2, de_2_state,   de_2,   ROT0,   "Data East",        "Laser War (8.3)",           GAME_IS_SKELETON_MECHANICAL)
+GAME(1987,  lwar_e90,       lwar_a83,   de_type1,   de_2, de_2_state,   de_2,   ROT0,   "Data East",        "Laser War (9.0 Europe)",    GAME_IS_SKELETON_MECHANICAL)
 GAME(1989,  mnfb_c27,       0,          de_type2_alpha3,   de_2, de_2_state,   de_2,   ROT0,   "Data East",        "Monday Night Football (2.7, 50cts)",       GAME_IS_SKELETON_MECHANICAL)
 GAME(1990,  poto_a32,       0,          de_type2_alpha3,   de_2, de_2_state,   de_2,   ROT0,   "Data East",        "The Phantom of the Opera (3.2)",           GAME_IS_SKELETON_MECHANICAL)
 GAME(1989,  play_a24,       0,          de_type2,   de_2, de_2_state,   de_2,   ROT0,   "Data East",        "Playboy 35th Anniversary (2.4)",           GAME_IS_SKELETON_MECHANICAL)

@@ -24,7 +24,7 @@ public:
 	DECLARE_WRITE8_MEMBER( spritecodehigh_w8 );
 	DECLARE_READ16_MEMBER( spritecode_r16 );
 	DECLARE_WRITE16_MEMBER( spritecode_w16 );
-	
+
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int bank_size, int setac);
 
 	void setac_eof( void );

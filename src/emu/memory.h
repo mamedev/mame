@@ -753,7 +753,7 @@ private:
 	void *                  m_ptr;                  // pointer to the memory backing the region
 	size_t                  m_bytes;                // size of the shared region in bytes
 	UINT8                   m_width;                // width of the shared region
-	endianness_t			m_endianness;			// endianness of the memory
+	endianness_t            m_endianness;           // endianness of the memory
 };
 
 

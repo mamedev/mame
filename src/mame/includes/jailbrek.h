@@ -28,7 +28,7 @@ public:
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_scroll_x;
 	required_shared_ptr<UINT8> m_scroll_dir;
-	
+
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<vlm5030_device> m_vlm;

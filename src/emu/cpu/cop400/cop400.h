@@ -131,7 +131,7 @@ protected:
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const
 	{
 		return (spacenum == AS_PROGRAM) ? &m_program_config :
-		       ( (spacenum == AS_IO) ? &m_io_config : ( (spacenum == AS_DATA) ? &m_data_config : NULL ) );
+				( (spacenum == AS_IO) ? &m_io_config : ( (spacenum == AS_DATA) ? &m_data_config : NULL ) );
 	}
 
 	// device_state_interface overrides

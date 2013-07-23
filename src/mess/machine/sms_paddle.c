@@ -109,4 +109,3 @@ UINT8 sms_paddle_device::peripheral_r()
 
 	return m_paddle_pins->read();
 }
-

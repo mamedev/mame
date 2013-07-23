@@ -1104,7 +1104,7 @@ static INPUT_PORTS_START( hellfire )
 	PORT_START("DSWB")
 	TOAPLAN_DIFFICULTY
 	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) )       /* table at 0x00390e ('hellfire') */
-	PORT_DIPSETTING(    0x00, "70k 270k 200k+" )            /*        / 0x0030f0 ('hellfire1') */ 
+	PORT_DIPSETTING(    0x00, "70k 270k 200k+" )            /*        / 0x0030f0 ('hellfire1') */
 	PORT_DIPSETTING(    0x04, "100k 350k 250k+" )           /*        / 0x003aac ('hellfire2a') */
 	PORT_DIPSETTING(    0x08, "100k Only" )                 /*        / 0x00329c ('hellfire1a') */
 	PORT_DIPSETTING(    0x0c, "200k Only" )

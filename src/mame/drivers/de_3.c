@@ -84,24 +84,24 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 	DECLARE_READ8_MEMBER(dmd_status_r);
 
-//	DECLARE_READ8_MEMBER(sound_latch_r);
-//	DECLARE_WRITE8_MEMBER(sample_bank_w);
+//  DECLARE_READ8_MEMBER(sound_latch_r);
+//  DECLARE_WRITE8_MEMBER(sample_bank_w);
 
 	required_device<decobsmt_device> m_decobsmt;
-//	required_device<msm5205_device> m_msm5205;
-//	required_memory_bank m_sample_bank;
-//	UINT8 m_sample_data;
-//	bool m_more_data;
+//  required_device<msm5205_device> m_msm5205;
+//  required_memory_bank m_sample_bank;
+//  UINT8 m_sample_data;
+//  bool m_more_data;
 	bool m_nmi_enable;
-//	bool m_is_alpha3;
+//  bool m_is_alpha3;
 
 protected:
 
 	// driver_device overrides
 	virtual void machine_reset();
 private:
-//	UINT32 m_segment1;
-//	UINT32 m_segment2;
+//  UINT32 m_segment1;
+//  UINT32 m_segment2;
 	UINT8 m_strobe;
 	UINT8 m_kbdrow;
 	UINT8 m_diag;
@@ -326,27 +326,27 @@ static const pia6821_interface pia24_intf =
 // 6821 PIA at 0x2800
 WRITE8_MEMBER( de_3_state::dig0_w )
 {
-//	static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7447
-//	data &= 0x7f;
-//	m_strobe = data & 15;
-//	m_diag = (data & 0x70) >> 4;
-//	output_set_digit_value(60, patterns[data>>4]); // diag digit
-//	m_segment1 = 0;
-//	m_segment2 = 0;
+//  static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7447
+//  data &= 0x7f;
+//  m_strobe = data & 15;
+//  m_diag = (data & 0x70) >> 4;
+//  output_set_digit_value(60, patterns[data>>4]); // diag digit
+//  m_segment1 = 0;
+//  m_segment2 = 0;
 }
 
 WRITE8_MEMBER( de_3_state::dig1_w )
 {
-//	m_segment2 |= data;
-//	m_segment2 |= 0x30000;
-//	if ((m_segment2 & 0x70000) == 0x30000)
-//	{
-//		if(m_is_alpha3)  // Alphanumeric type 2 uses 7 segment LEDs on the bottom row, type 3 uses 14 segment LEDs
-//			output_set_digit_value(m_strobe+16, BITSWAP16(m_segment2, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
-//		else
-//			output_set_digit_value(m_strobe+16, BITSWAP16(m_segment2, 11, 15, 12, 10, 8, 14, 13, 9, 7, 6, 5, 4, 3, 2, 1, 0));
-//		m_segment2 |= 0x40000;
-//	}
+//  m_segment2 |= data;
+//  m_segment2 |= 0x30000;
+//  if ((m_segment2 & 0x70000) == 0x30000)
+//  {
+//      if(m_is_alpha3)  // Alphanumeric type 2 uses 7 segment LEDs on the bottom row, type 3 uses 14 segment LEDs
+//          output_set_digit_value(m_strobe+16, BITSWAP16(m_segment2, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
+//      else
+//          output_set_digit_value(m_strobe+16, BITSWAP16(m_segment2, 11, 15, 12, 10, 8, 14, 13, 9, 7, 6, 5, 4, 3, 2, 1, 0));
+//      m_segment2 |= 0x40000;
+//  }
 }
 
 READ8_MEMBER( de_3_state::pia28_w7_r )
@@ -392,13 +392,13 @@ WRITE8_MEMBER( de_3_state::pia2c_pa_w )
 		m_dmdtype1->data_w(space,offset,data);
 		logerror("DMD: Data write %02x\n", data);
 	}
-//	m_segment1 |= (data<<8);
-//	m_segment1 |= 0x10000;
-//	if ((m_segment1 & 0x70000) == 0x30000)
-//	{
-//		output_set_digit_value(m_strobe, BITSWAP16(m_segment1, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
-//		m_segment1 |= 0x40000;
-//	}
+//  m_segment1 |= (data<<8);
+//  m_segment1 |= 0x10000;
+//  if ((m_segment1 & 0x70000) == 0x30000)
+//  {
+//      output_set_digit_value(m_strobe, BITSWAP16(m_segment1, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
+//      m_segment1 |= 0x40000;
+//  }
 }
 
 READ8_MEMBER( de_3_state::pia2c_pb_r )
@@ -424,13 +424,13 @@ WRITE8_MEMBER( de_3_state::pia2c_pb_w )
 		logerror("DMD: Control write %02x\n", data);
 	}
 
-//	m_segment1 |= data;
-//	m_segment1 |= 0x20000;
-//	if ((m_segment1 & 0x70000) == 0x30000)
-//	{
-//		output_set_digit_value(m_strobe, BITSWAP16(m_segment1, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
-//		m_segment1 |= 0x40000;
-//	}
+//  m_segment1 |= data;
+//  m_segment1 |= 0x20000;
+//  if ((m_segment1 & 0x70000) == 0x30000)
+//  {
+//      output_set_digit_value(m_strobe, BITSWAP16(m_segment1, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
+//      m_segment1 |= 0x40000;
+//  }
 }
 
 static const pia6821_interface pia2c_intf =
@@ -482,13 +482,13 @@ static const pia6821_interface pia30_intf =
 WRITE8_MEMBER( de_3_state::pia34_pa_w )
 {
 	// Not connected?
-//	m_segment2 |= (data<<8);
-//	m_segment2 |= 0x10000;
-//	if ((m_segment2 & 0x70000) == 0x30000)
-//	{
-//		output_set_digit_value(m_strobe+16, BITSWAP16(m_segment2, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
-//		m_segment2 |= 0x40000;
-//	}
+//  m_segment2 |= (data<<8);
+//  m_segment2 |= 0x10000;
+//  if ((m_segment2 & 0x70000) == 0x30000)
+//  {
+//      output_set_digit_value(m_strobe+16, BITSWAP16(m_segment2, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
+//      m_segment2 |= 0x40000;
+//  }
 }
 
 READ8_MEMBER( de_3_state::dmd_status_r )
@@ -549,13 +549,13 @@ static MACHINE_CONFIG_START( de_3, de_3_state )
 
 	MCFG_DECOBSMT_ADD(DECOBSMT_TAG)
 
-//	MCFG_SPEAKER_STANDARD_MONO("bg")
-//	MCFG_YM2151_ADD("ym2151", 3580000)
-//	MCFG_YM2151_IRQ_HANDLER(WRITELINE(de_2_state, ym2151_irq_w))
-//	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bg", 0.50)
-//	MCFG_SOUND_ADD("msm5205", MSM5205, 384000)
-//	MCFG_SOUND_CONFIG(msm5205_intf)
-//	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bg", 0.50)
+//  MCFG_SPEAKER_STANDARD_MONO("bg")
+//  MCFG_YM2151_ADD("ym2151", 3580000)
+//  MCFG_YM2151_IRQ_HANDLER(WRITELINE(de_2_state, ym2151_irq_w))
+//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bg", 0.50)
+//  MCFG_SOUND_ADD("msm5205", MSM5205, 384000)
+//  MCFG_SOUND_CONFIG(msm5205_intf)
+//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bg", 0.50)
 
 MACHINE_CONFIG_END
 

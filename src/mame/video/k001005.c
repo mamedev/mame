@@ -974,5 +974,3 @@ void k001005_device::device_stop()
 {
 	DEVICE_STOP_NAME( k001005 )(this);
 }
-
-

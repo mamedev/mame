@@ -3278,19 +3278,19 @@ void device_debug::set_state(symbol_table &table, void *ref, UINT64 value)
 //  breakpoint - constructor
 //-------------------------------------------------
 
-device_debug::breakpoint::breakpoint(device_debug* debugInterface, 
-                                     symbol_table &symbols, 
-                                     int index, 
-                                     offs_t address, 
-                                     const char *condition, 
-                                     const char *action)
+device_debug::breakpoint::breakpoint(device_debug* debugInterface,
+										symbol_table &symbols,
+										int index,
+										offs_t address,
+										const char *condition,
+										const char *action)
 	: m_debugInterface(debugInterface),
-	  m_next(NULL),
-	  m_index(index),
-	  m_enabled(true),
-	  m_address(address),
-	  m_condition(&symbols, (condition != NULL) ? condition : "1"),
-	  m_action((action != NULL) ? action : "")
+		m_next(NULL),
+		m_index(index),
+		m_enabled(true),
+		m_address(address),
+		m_condition(&symbols, (condition != NULL) ? condition : "1"),
+		m_action((action != NULL) ? action : "")
 {
 }
 

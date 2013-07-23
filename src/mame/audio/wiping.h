@@ -20,7 +20,7 @@ public:
 	~wiping_sound_device() {}
 
 	DECLARE_WRITE8_MEMBER( sound_w );
-		
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -49,7 +49,7 @@ private:
 	short *m_mixer_buffer_2;
 
 	UINT8 m_soundregs[0x4000];
-	
+
 	void make_mixer_table(int voices, int gain);
 };
 

@@ -15,7 +15,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_tilegen1(*this, "tilegen1"),
-		m_tilegen2(*this, "tilegen2"),	
+		m_tilegen2(*this, "tilegen2"),
 		m_tilegen3(*this, "tilegen3") { }
 
 	/* memory pointers */

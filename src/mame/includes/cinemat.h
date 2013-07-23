@@ -93,4 +93,3 @@ MACHINE_CONFIG_EXTERN( wotw_sound );
 MACHINE_CONFIG_EXTERN( wotwc_sound );
 MACHINE_CONFIG_EXTERN( demon_sound );
 MACHINE_CONFIG_EXTERN( qb3_sound );
-

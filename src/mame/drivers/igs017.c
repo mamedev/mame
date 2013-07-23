@@ -1820,7 +1820,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( spkrform_map, AS_PROGRAM, 8, igs017_state )
 	AM_RANGE( 0x00000, 0x0dfff ) AM_ROM
-	AM_RANGE( 0x0e9bf, 0x0e9bf ) AM_NOP	// hack: uncomment to switch to Formosa
+	AM_RANGE( 0x0e9bf, 0x0e9bf ) AM_NOP // hack: uncomment to switch to Formosa
 	AM_RANGE( 0x0e000, 0x0efff ) AM_RAM
 	AM_RANGE( 0x0f000, 0x0ffff ) AM_RAM
 	AM_RANGE( 0x10000, 0x3ffff ) AM_ROM
@@ -1864,7 +1864,7 @@ static ADDRESS_MAP_START( spkrform_io, AS_IO, 8, igs017_state )
 
 	AM_RANGE( 0x9000, 0x9001 ) AM_DEVWRITE("ymsnd", ym2413_device, write)
 
-	AM_RANGE( 0xa000, 0xa000 ) AM_READ_PORT( "A000" )	// Game selection
+	AM_RANGE( 0xa000, 0xa000 ) AM_READ_PORT( "A000" )   // Game selection
 	AM_RANGE( 0xa001, 0xa001 ) AM_READ_PORT( "A001" )
 
 	AM_RANGE( 0xb000, 0xb000 ) AM_WRITE(input_select_w )

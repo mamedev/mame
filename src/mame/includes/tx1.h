@@ -246,7 +246,7 @@ public:
 	DECLARE_WRITE8_MEMBER( pit8253_w );
 	DECLARE_WRITE8_MEMBER( ay8910_a_w );
 	DECLARE_WRITE8_MEMBER( ay8910_b_w );
-	
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -255,7 +255,7 @@ protected:
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
-	
+
 	// internal state
 	sound_stream *m_stream;
 	UINT32 m_freq_to_step;
@@ -296,11 +296,11 @@ class buggyboy_sound_device : public tx1_sound_device
 {
 public:
 	buggyboy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	DECLARE_WRITE8_MEMBER( ym1_a_w );
 	DECLARE_WRITE8_MEMBER( ym2_a_w );
 	DECLARE_WRITE8_MEMBER( ym2_b_w );
-	
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -309,7 +309,7 @@ protected:
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
-	
+
 private:
 	// internal state
 };

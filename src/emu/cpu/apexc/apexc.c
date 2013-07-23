@@ -825,7 +825,7 @@ void apexc_cpu_device::device_reset()
 	/* next two lines are just the product of my bold fantasy */
 	m_cr = 0;               /* first instruction executed will be a stop */
 	m_running = TRUE;       /* this causes the CPU to load the instruction at 0/0,
-	                           which enables easy booting (just press run on the panel) */
+                               which enables easy booting (just press run on the panel) */
 	m_a = 0;
 	m_r = 0;
 	m_pc = 0;
@@ -854,4 +854,3 @@ offs_t apexc_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8
 	extern CPU_DISASSEMBLE( apexc );
 	return CPU_DISASSEMBLE_NAME(apexc)(this, buffer, pc, oprom, opram, options);
 }
-

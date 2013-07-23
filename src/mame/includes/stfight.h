@@ -74,7 +74,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(stfight_adpcm_int);
 
 	/*
-		MCU specifics
+	    MCU specifics
 	*/
 
 	DECLARE_READ8_MEMBER(cshooter_68705_port_a_r);

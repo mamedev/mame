@@ -196,9 +196,9 @@ void am29000_cpu_device::device_start()
 	state_add( AM29000_IPB,  "IPB",  m_ipb    ).formatstr("%08X");
 	state_add( AM29000_Q,    "Q",    m_q      ).formatstr("%08X");
 	state_add( AM29000_ALU,  "ALU",  m_alu    ).formatstr("%08X");
-//	state_add( AM29000_BP,   "BP",   GET_ALU_BP).formatstr("%08X");
-//	state_add( AM29000_FC,   "FC",   GET_ALU_FC).formatstr("%08X");
-//	state_add( AM29000_CR,   "CR",   GET_CHC_CR).formatstr("%08X");
+//  state_add( AM29000_BP,   "BP",   GET_ALU_BP).formatstr("%08X");
+//  state_add( AM29000_FC,   "FC",   GET_ALU_FC).formatstr("%08X");
+//  state_add( AM29000_CR,   "CR",   GET_CHC_CR).formatstr("%08X");
 	state_add( AM29000_FPE,  "FPE",  m_fpe    ).formatstr("%08X");
 	state_add( AM29000_INTE, "INTE", m_inte   ).formatstr("%08X");
 	state_add( AM29000_FPS,  "FPS",  m_fps    ).formatstr("%08X");
@@ -409,15 +409,15 @@ void am29000_cpu_device::state_string_export(const device_state_entry &entry, as
 	{
 		case STATE_GENFLAGS:
 			string.printf("%c%c%c%c%c%c%c%c%c|%3d", m_alu & ALU_V ? 'V' : '.',
-			                                        m_alu & ALU_Z ? 'Z' : '.',
-			                                        m_alu & ALU_N ? 'N' : '.',
-			                                        m_alu & ALU_C ? 'C' : '.',
-			                                        m_cps & CPS_IP ? 'I' : '.',
-			                                        m_cps & CPS_FZ ? 'F' : '.',
-			                                        m_cps & CPS_SM ? 'S' : 'U',
-			                                        m_cps & CPS_DI ? 'I' : '.',
-			                                        m_cps & CPS_DA ? 'D' : '.',
-			                                        (m_r[1] >> 2) & 0x7f);
+													m_alu & ALU_Z ? 'Z' : '.',
+													m_alu & ALU_N ? 'N' : '.',
+													m_alu & ALU_C ? 'C' : '.',
+													m_cps & CPS_IP ? 'I' : '.',
+													m_cps & CPS_FZ ? 'F' : '.',
+													m_cps & CPS_SM ? 'S' : 'U',
+													m_cps & CPS_DI ? 'I' : '.',
+													m_cps & CPS_DA ? 'D' : '.',
+													(m_r[1] >> 2) & 0x7f);
 			break;
 	}
 }
@@ -675,4 +675,3 @@ offs_t am29000_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UIN
 	extern CPU_DISASSEMBLE( am29000 );
 	return CPU_DISASSEMBLE_NAME(am29000)(this, buffer, pc, oprom, opram, options);
 }
-

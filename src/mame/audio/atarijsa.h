@@ -1,7 +1,7 @@
 /***************************************************************************
 
-	audio/atarijsa.h
-	
+    audio/atarijsa.h
+
     Functions to emulate the Atari "JSA" audio boards
 
 ****************************************************************************
@@ -83,8 +83,7 @@ extern const device_type ATARI_JSA_IIIS;
 
 #define MCFG_ATARI_JSA_TEST_PORT(_port, _bitnum) \
 	devcb = &atari_jsa_base_device::static_set_test_read_cb(*device, DEVCB2_IOPORT(_port)); \
-	MCFG_DEVCB_RSHIFT(_bitnum); \
-
+	MCFG_DEVCB_RSHIFT(_bitnum);
 
 
 //**************************************************************************
@@ -105,7 +104,7 @@ extern const device_type ATARI_JSA_IIIS;
 
 // ======================> atari_jsa_base_device
 
-class atari_jsa_base_device :  	public device_t,
+class atari_jsa_base_device :   public device_t,
 								public device_mixer_interface
 {
 protected:
@@ -126,7 +125,7 @@ public:
 	DECLARE_WRITE8_MEMBER(main_command_w);
 	DECLARE_READ8_MEMBER(main_response_r);
 	DECLARE_WRITE16_MEMBER(sound_reset_w);
-	
+
 	// read/write handlers
 	DECLARE_WRITE8_MEMBER(ym2151_port_w);
 	DECLARE_READ_LINE_MEMBER(main_test_read_line);
@@ -138,7 +137,7 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 	// internal helpers
 	virtual void update_all_volumes() = 0;
 
@@ -146,18 +145,18 @@ protected:
 	required_device<atari_sound_comm_device> m_soundcomm;
 	required_device<m6502_device> m_jsacpu;
 	required_device<ym2151_device> m_ym2151;
-	
+
 	// memory banks
 	required_memory_bank m_cpu_bank;
 
 	// configuration state
-	devcb2_read_line	m_test_read_cb;
-	devcb2_write_line	m_main_int_cb;
+	devcb2_read_line    m_test_read_cb;
+	devcb2_write_line   m_main_int_cb;
 
 	// internal state
-	double 				m_ym2151_volume;
-	UINT8 				m_ym2151_ct1;
-	UINT8 				m_ym2151_ct2;
+	double              m_ym2151_volume;
+	UINT8               m_ym2151_ct1;
+	UINT8               m_ym2151_ct2;
 };
 
 
@@ -187,17 +186,17 @@ protected:
 
 	// devices
 	optional_device<okim6295_device> m_oki1;
-	optional_device<okim6295_device> m_oki2;	// JSA IIIs only
+	optional_device<okim6295_device> m_oki2;    // JSA IIIs only
 
 	// memory banks
-	optional_memory_bank m_oki1_banklo;			// JSA III(s) only
-	optional_memory_bank m_oki1_bankhi;			// JSA III(s)
-	optional_memory_bank m_oki2_banklo;			// JSA IIIs only
-	optional_memory_bank m_oki2_bankhi;			// JSA IIIs only
+	optional_memory_bank m_oki1_banklo;         // JSA III(s) only
+	optional_memory_bank m_oki1_bankhi;         // JSA III(s)
+	optional_memory_bank m_oki2_banklo;         // JSA IIIs only
+	optional_memory_bank m_oki2_bankhi;         // JSA IIIs only
 
 	// internal state
-	double 				m_oki6295_volume;
-	double 				m_overall_volume;		// JSA III(s) only
+	double              m_oki6295_volume;
+	double              m_overall_volume;       // JSA III(s) only
 };
 
 
@@ -223,7 +222,7 @@ protected:
 	virtual ioport_constructor device_input_ports() const;
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 	// internal helpers
 	virtual void update_all_volumes();
 
@@ -231,9 +230,9 @@ protected:
 	optional_device<pokey_device> m_pokey;
 	optional_device<tms5220_device> m_tms5220;
 
-	// internal state	
-	double 				m_pokey_volume;
-	double 				m_tms5220_volume;
+	// internal state
+	double              m_pokey_volume;
+	double              m_tms5220_volume;
 };
 
 

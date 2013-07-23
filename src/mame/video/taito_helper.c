@@ -38,4 +38,3 @@ void taitoic_drawscanline( bitmap_ind16 &bitmap, const rectangle &cliprect, int 
 		}
 	}
 }
-

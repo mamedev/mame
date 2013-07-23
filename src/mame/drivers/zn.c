@@ -1366,7 +1366,7 @@ READ16_MEMBER(zn_state::vt83c461_16_r)
 
 	if( offset >= 0x30 / 2 && offset < 0x40 / 2 )
 	{
-		return m_vt83c461->read_config( space, ( offset / 2 ) & 3, mem_mask << shift ) >> shift; 
+		return m_vt83c461->read_config( space, ( offset / 2 ) & 3, mem_mask << shift ) >> shift;
 	}
 	else if( offset >= 0x1f0 / 2 && offset < 0x1f8 / 2 )
 	{
@@ -1389,7 +1389,7 @@ WRITE16_MEMBER(zn_state::vt83c461_16_w)
 
 	if( offset >= 0x30 / 2 && offset < 0x40 / 2 )
 	{
-		m_vt83c461->write_config( space, ( offset / 2 ) & 3, data << shift, mem_mask << shift ); 
+		m_vt83c461->write_config( space, ( offset / 2 ) & 3, data << shift, mem_mask << shift );
 	}
 	else if( offset >= 0x1f0 / 2 && offset < 0x1f8 / 2 )
 	{

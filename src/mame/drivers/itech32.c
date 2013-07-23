@@ -1335,7 +1335,7 @@ static INPUT_PORTS_START( wcbowlj )
 	PORT_MODIFY("DIPS")
 	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Controls ) ) PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(      0x0000, "One Trackball" )
-	PORT_DIPSETTING(      0x0040, "Two Trackballs" )	/* Two Trackballs will work for Upright for "side by side" controls */
+	PORT_DIPSETTING(      0x0040, "Two Trackballs" )    /* Two Trackballs will work for Upright for "side by side" controls */
 INPUT_PORTS_END
 
 

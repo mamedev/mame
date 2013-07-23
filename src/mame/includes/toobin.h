@@ -18,7 +18,7 @@ public:
 			m_interrupt_scan(*this, "interrupt_scan") { }
 
 	required_device<atari_jsa_i_device> m_jsa;
-	
+
 	required_device<tilemap_device> m_playfield_tilemap;
 	required_device<tilemap_device> m_alpha_tilemap;
 

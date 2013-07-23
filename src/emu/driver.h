@@ -381,7 +381,7 @@ public:
 	// general fatal error handlers
 	DECLARE_READ8_MEMBER( fatal_generic_read );
 	DECLARE_WRITE8_MEMBER( fatal_generic_write );
-	
+
 	// generic palette init routines
 	DECLARE_PALETTE_INIT( all_black );
 	DECLARE_PALETTE_INIT( black_and_white );

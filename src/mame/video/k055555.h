@@ -83,7 +83,7 @@ public:
 
 	void k055555_write_reg(UINT8 regnum, UINT8 regdat);
 
-	
+
 	/**  Konami 055555  **/
 
 	DECLARE_WRITE16_MEMBER( k055555_word_w );
@@ -121,4 +121,3 @@ extern const device_type K055555;
 
 
 #endif
-

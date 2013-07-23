@@ -96,7 +96,7 @@ void ds2404_device::device_start()
 	m_rtc[2] = (current_time >> 8) & 0xff;
 	m_rtc[3] = (current_time >> 16) & 0xff;
 	m_rtc[4] = (current_time >> 24) & 0xff;
-	
+
 	for (int i = 0; i < 8; i++)
 		m_state[i] = DS2404_STATE_IDLE;
 
@@ -361,7 +361,7 @@ void ds2404_device::device_timer(emu_timer &timer, device_timer_id id, int param
 					break;
 				}
 			}
-			
+
 			break;
 		}
 

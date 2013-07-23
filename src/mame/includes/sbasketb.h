@@ -25,7 +25,7 @@ public:
 	required_shared_ptr<UINT8> m_palettebank;
 	required_shared_ptr<UINT8> m_spriteram_select;
 	required_shared_ptr<UINT8> m_scroll;
-	
+
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;

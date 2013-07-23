@@ -566,7 +566,7 @@ $(CPUOBJ)/sh2/sh2fe.o:  $(CPUSRC)/sh2/sh2fe.c \
 
 #-------------------------------------------------
 # Hitachi SH4
-#@src/emu/cpu/sh4/sh4.h,CPUS += SH4 
+#@src/emu/cpu/sh4/sh4.h,CPUS += SH4
 #-------------------------------------------------
 
 ifneq ($(filter SH4,$(CPUS)),)

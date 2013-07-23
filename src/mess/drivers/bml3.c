@@ -28,37 +28,37 @@
 
 // System clock definitions, from the MB-6890 servce manual, p.48:
 
-#define MASTER_CLOCK ( 32256000 )	// Master clock crystal (X1) frequency, 32.256 MHz.  "fx" in the manual.
+#define MASTER_CLOCK ( 32256000 )   // Master clock crystal (X1) frequency, 32.256 MHz.  "fx" in the manual.
 
-#define D80_CLOCK ( MASTER_CLOCK / 2 )	// Graphics dot clock in 80-column mode. ~16 MHz.
-#define D40_CLOCK ( D80_CLOCK / 2 )		// Graphics dot clock in 40-column mode.  ~8 MHz.
+#define D80_CLOCK ( MASTER_CLOCK / 2 )  // Graphics dot clock in 80-column mode. ~16 MHz.
+#define D40_CLOCK ( D80_CLOCK / 2 )     // Graphics dot clock in 40-column mode.  ~8 MHz.
 
-#define CPU_EXT_CLOCK ( D40_CLOCK / 2 )	// IC37, 4.032 MHz signal to EXTAL on the 6809 MPU.
-#define CPU_CLOCK     ( CPU_EXT_CLOCK / 4 )	// Actual MPU clock frequency ("fE" in the manual). The division yielding CPU_CLOCK is done in the 6809 itself.  Also used as the 40-column character clock.
+#define CPU_EXT_CLOCK ( D40_CLOCK / 2 ) // IC37, 4.032 MHz signal to EXTAL on the 6809 MPU.
+#define CPU_CLOCK     ( CPU_EXT_CLOCK / 4 ) // Actual MPU clock frequency ("fE" in the manual). The division yielding CPU_CLOCK is done in the 6809 itself.  Also used as the 40-column character clock.
 
-#define C80_CLOCK ( CPU_EXT_CLOCK / 2 )	// 80-column character mode.  IC37, "80CHRCK"; ~2 MHz.
-#define C40_CLOCK ( CPU_CLOCK )			// 40-column character mode; same as MPU clock.  "40CHRCK";       ~1 MHz.
+#define C80_CLOCK ( CPU_EXT_CLOCK / 2 ) // 80-column character mode.  IC37, "80CHRCK"; ~2 MHz.
+#define C40_CLOCK ( CPU_CLOCK )         // 40-column character mode; same as MPU clock.  "40CHRCK";       ~1 MHz.
 
 // Video signal clocks from the HD4650SSP CRTC (IC36)
 // In the real hardware, the 80-/40-column Mode switch changes the CRTC character clock input source.  However, it just uses a different divider, so the end result is the same horizontal vsync frequency.
-#define H_CLOCK ( C80_CLOCK / 128 )	// in 80-column mode
-//#define H_CLOCK ( C40_CLOCK / 64 )	// in 40-column mode (either way the frequency is the same: 15.75 kHz)
-#define V_CLOCK ( 2 * H_CLOCK / 525 )	// Vertical refresh rate comes out at exactly 60 Hz.
+#define H_CLOCK ( C80_CLOCK / 128 ) // in 80-column mode
+//#define H_CLOCK ( C40_CLOCK / 64 )    // in 40-column mode (either way the frequency is the same: 15.75 kHz)
+#define V_CLOCK ( 2 * H_CLOCK / 525 )   // Vertical refresh rate comes out at exactly 60 Hz.
 
 // TODO: ACIA RS-232C and cassette interface clocks (service manual p.67); perhaps reverse the order and simply divide by 2 from each previous frequency.
 // IC111 (74LS157P) takes 16.128 MHz and 1.008 MHz TTL clock inputs.  The RS/C SW input line determines the mode (high -> RS-232C).
 
 // Frequencies for RS-232C mode:
-// D80_CLOCK / 840.0	// 19200 Hz
-// D80_CLOCK / 420	// 38400 Hz
-// D80_CLOCK / 210	// 76800 Hz
-// D80_CLOCK / 105.0	// 153600 Hz
+// D80_CLOCK / 840.0    // 19200 Hz
+// D80_CLOCK / 420  // 38400 Hz
+// D80_CLOCK / 210  // 76800 Hz
+// D80_CLOCK / 105.0    // 153600 Hz
 
 // Frequencies for cassette mode:
-// / 13440	//1200
-// / 6720	// 2400
-// / 3360	// 4800
-// / 1680	// 9600
+// / 13440  //1200
+// / 6720   // 2400
+// / 3360   // 4800
+// / 1680   // 9600
 
 
 class bml3_state : public driver_device
@@ -332,7 +332,7 @@ WRITE8_MEMBER( bml3_state::bml3_keyboard_w )
 
 void bml3_state::m6845_change_clock(UINT8 setting)
 {
-	int m6845_clock = CPU_CLOCK;	// CRTC and MPU are synchronous by default
+	int m6845_clock = CPU_CLOCK;    // CRTC and MPU are synchronous by default
 
 	switch(setting & 0x88)
 	{
@@ -349,11 +349,11 @@ WRITE8_MEMBER( bml3_state::bml3_hres_reg_w )
 {
 	// MODE SEL register (see service manual p.43).
 	/*
-    x--- ---- "W" bit: 0 = 40 columns, 1 = 80 columns
-    -x-- ---- "HR" bit: 0 = high resolution, 1 = normal
-    --x- ---- "C" bit - ACIA mode: 0 = cassette, 1 = RS-232C
-    ---- -RGB Background colour
-    */
+	x--- ---- "W" bit: 0 = 40 columns, 1 = 80 columns
+	-x-- ---- "HR" bit: 0 = high resolution, 1 = normal
+	--x- ---- "C" bit - ACIA mode: 0 = cassette, 1 = RS-232C
+	---- -RGB Background colour
+	*/
 
 	m_hres_reg = data;
 
@@ -430,11 +430,11 @@ WRITE8_MEMBER( bml3_state::bml3_vram_attr_w)
 	// C-REG-SELECT register
 	// Writes to a VRAM address copy the low-order 5 bits of this register to the corresponding 'colour RAM' address as a side-effect
 	/*
-    x--- ---- "MK" bit: 0 = enable write, 1 = prohibit write
-    ---x ---- "GC" bit: 0 = character, 1 = graphic
-    ---- x--- "RV" bit: 0 = normal, 1 - reverse
-    ---- -RGB Foreground colour
-    */
+	x--- ---- "MK" bit: 0 = enable write, 1 = prohibit write
+	---x ---- "GC" bit: 0 = character, 1 = graphic
+	---- x--- "RV" bit: 0 = normal, 1 - reverse
+	---- -RGB Foreground colour
+	*/
 	m_attr_latch = data;
 }
 
@@ -600,11 +600,11 @@ static INPUT_PORTS_START( bml3 )
 
 	// RAM expansion configurations (see service manual p.76)
 /*
-	PORT_START("RAM")
-	PORT_DIPNAME( 0x0003, 0x0002, "RAM size" )
-	PORT_DIPSETTING(   0x0000, "32 kiB (standard)" )
-	PORT_DIPSETTING(   0x0001, "40 kiB (32 kiB + 8 kiB)" )
-	PORT_DIPSETTING(   0x0002, "60 kiB (32 kiB + 28 kiB)" )
+    PORT_START("RAM")
+    PORT_DIPNAME( 0x0003, 0x0002, "RAM size" )
+    PORT_DIPSETTING(   0x0000, "32 kiB (standard)" )
+    PORT_DIPSETTING(   0x0001, "40 kiB (32 kiB + 8 kiB)" )
+    PORT_DIPSETTING(   0x0002, "60 kiB (32 kiB + 28 kiB)" )
 */
 
 	PORT_START("key1") //0x00-0x1f
@@ -756,7 +756,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(bml3_state::keyboard_callback)
 		}
 		/* Don't need this apparently...
 		else {
-			m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
+		    m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 		}
 		*/
 	}

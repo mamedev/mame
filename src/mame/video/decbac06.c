@@ -68,7 +68,7 @@ const device_type DECO_BAC06 = &device_creator<deco_bac06_device>;
 deco_bac06_device::deco_bac06_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, DECO_BAC06, "decbac06_device", tag, owner, clock, "deco_bac06", __FILE__),
 		m_pf_data(NULL),
-	    m_pf_rowscroll(NULL),
+		m_pf_rowscroll(NULL),
 		m_pf_colscroll(NULL),
 		m_tile_region(0),
 		m_gfxcolmask(0),
@@ -80,7 +80,7 @@ deco_bac06_device::deco_bac06_device(const machine_config &mconfig, const char *
 		m_bppmask(0)
 		//m_pf_control_0[8]
 		//m_pf_control_1[8]
-{ 
+{
 }
 
 void deco_bac06_device::device_start()
@@ -335,7 +335,7 @@ void deco_bac06_device::deco_bac06_pf_draw_bootleg(bitmap_ind16 &bitmap,const re
 WRITE16_MEMBER( deco_bac06_device::pf_control_0_w )
 {
 	offset &= 3;
-	
+
 	COMBINE_DATA(&m_pf_control_0[offset]);
 
 	if (offset==2)

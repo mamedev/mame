@@ -104,7 +104,7 @@ control registers
      -----x-- firq enable
      ----x--- flip screen
      ---x---- unknown (contra, labyrunr)
-	 */
+     */
 
 #include "emu.h"
 #include "k007121.h"

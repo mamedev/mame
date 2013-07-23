@@ -388,11 +388,11 @@ struct nvidia_object_data
 class chihiro_state : public driver_device
 {
 public:
-	chihiro_state(const machine_config &mconfig, device_type type, const char *tag)	:
-	  driver_device(mconfig, type, tag),
-	  nvidia_nv2a(NULL),
-	  debug_irq_active(false),
-	  m_maincpu(*this, "maincpu") { }
+	chihiro_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		nvidia_nv2a(NULL),
+		debug_irq_active(false),
+		m_maincpu(*this, "maincpu") { }
 
 	DECLARE_READ32_MEMBER( geforce_r );
 	DECLARE_WRITE32_MEMBER( geforce_w );
@@ -435,7 +435,7 @@ public:
 		pic8259_device    *pic8259_2;
 		bus_master_ide_controller_device    *ide;
 		naomi_gdrom_board *dimmboard;
-	} chihiro_devs;	
+	} chihiro_devs;
 	struct smbus_state {
 		int status;
 		int control;
@@ -1006,16 +1006,16 @@ static void curthread_command(running_machine &machine, int ref, int params, con
 	address=(offs_t)kthrd+0x1c;
 	if (!debug_cpu_translate(space,TRANSLATE_READ_DEBUG,&address))
 		return;
-    topstack=space.read_dword_unaligned(address);
+	topstack=space.read_dword_unaligned(address);
 	debug_console_printf(machine,"Current thread stack top is %08X\n",topstack);
 	address=(offs_t)kthrd+0x28;
 	if (!debug_cpu_translate(space,TRANSLATE_READ_DEBUG,&address))
 		return;
-    tlsdata=space.read_dword_unaligned(address);
+	tlsdata=space.read_dword_unaligned(address);
 	if (tlsdata == 0)
 		address=(offs_t)topstack-0x210-8;
-	else 
-	    address=(offs_t)tlsdata-8;
+	else
+		address=(offs_t)tlsdata-8;
 	if (!debug_cpu_translate(space,TRANSLATE_READ_DEBUG,&address))
 		return;
 	debug_console_printf(machine,"Current thread function is %08X\n",space.read_dword_unaligned(address));
@@ -1777,11 +1777,11 @@ void nv2a_renderer::geforce_exec_method(address_space & space,UINT32 chanel,UINT
 			offset=data;
 			texture[unit].buffer=space.get_read_ptr(offset);
 			/*if (dma0 != 0) {
-				dmahand=channel[channel][subchannel].object.method[0x184/4];
-				geforce_read_dma_object(dmahand,dmaoff,smasiz);
+			    dmahand=channel[channel][subchannel].object.method[0x184/4];
+			    geforce_read_dma_object(dmahand,dmaoff,smasiz);
 			} else if (dma1 != 0) {
-				dmahand=channel[channel][subchannel].object.method[0x188/4];
-				geforce_read_dma_object(dmahand,dmaoff,smasiz);
+			    dmahand=channel[channel][subchannel].object.method[0x188/4];
+			    geforce_read_dma_object(dmahand,dmaoff,smasiz);
 			}*/
 		}
 		if (maddress == 0x1b04) {
@@ -2629,7 +2629,7 @@ void chihiro_state::debug_generate_irq(int irq,bool active)
 		debug_irq_number=irq;
 		state=1;
 	}
-	else 
+	else
 	{
 		debug_irq_active=false;
 		state=0;
@@ -2896,7 +2896,7 @@ WRITE32_MEMBER( nv2a_renderer::geforce_w )
 			}
 		}
 	} else ;
-//		logerror("NV_2A: write at %08X mask %08X value %08X\n",0xfd000000+offset*4,mem_mask,data);
+//      logerror("NV_2A: write at %08X mask %08X value %08X\n",0xfd000000+offset*4,mem_mask,data);
 }
 
 READ32_MEMBER( chihiro_state::geforce_r )
@@ -2912,7 +2912,7 @@ WRITE32_MEMBER( chihiro_state::geforce_w )
 static UINT32 geforce_pci_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
 {
 #ifdef LOG_PCI
-//	logerror("  bus:1 device:NV_2A function:%d register:%d mask:%08X\n",function,reg,mem_mask);
+//  logerror("  bus:1 device:NV_2A function:%d register:%d mask:%08X\n",function,reg,mem_mask);
 #endif
 	return 0;
 }
@@ -2920,7 +2920,7 @@ static UINT32 geforce_pci_r(device_t *busdevice, device_t *device, int function,
 static void geforce_pci_w(device_t *busdevice, device_t *device, int function, int reg, UINT32 data, UINT32 mem_mask)
 {
 #ifdef LOG_PCI
-//	logerror("  bus:1 device:NV_2A function:%d register:%d data:%08X mask:%08X\n",function,reg,data,mem_mask);
+//  logerror("  bus:1 device:NV_2A function:%d register:%d data:%08X mask:%08X\n",function,reg,data,mem_mask);
 #endif
 }
 
@@ -3080,7 +3080,7 @@ TIMER_CALLBACK_MEMBER(chihiro_state::audio_apu_timer)
 	if (cmd == 3)
 		apust.space->write_dword(apust.memory0_address+0x800+0x10,0);
 	/*else
-		logerror("Audio_APU: unexpected value at address %d\n",apust.memory0_address+0x800+0x10);*/
+	    logerror("Audio_APU: unexpected value at address %d\n",apust.memory0_address+0x800+0x10);*/
 }
 
 /*
@@ -3090,7 +3090,7 @@ TIMER_CALLBACK_MEMBER(chihiro_state::audio_apu_timer)
 static UINT32 dummy_pci_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
 {
 #ifdef LOG_PCI
-//	logerror("  bus:0 function:%d register:%d mask:%08X\n",function,reg,mem_mask);
+//  logerror("  bus:0 function:%d register:%d mask:%08X\n",function,reg,mem_mask);
 #endif
 	return 0;
 }
@@ -3188,7 +3188,7 @@ int ide_baseboard_device::read_sector(UINT32 lba, void *buffer)
 	   0   0x40000-0x8000
 	     ...
 	   4   0x400000-0x8000
-    The size of the second one is always 0x8000 sectors, and is used as a special communication area
+	The size of the second one is always 0x8000 sectors, and is used as a special communication area
 	This is a list of the partitions in the minimum size case:
 	 Name          Start lba  Size lba Size
 	 \??\mbfs:     0x0        0x38000  112MB

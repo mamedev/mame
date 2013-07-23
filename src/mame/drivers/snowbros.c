@@ -1773,7 +1773,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( snowbros )
-	ROM_REGION( 0x40000, "maincpu", 0 ) 
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "sn6.bin",  0x00000, 0x20000, CRC(4899ddcf) SHA1(47d750d3022a80e47ffabe47566bb2556cc8d477) )
 	ROM_LOAD16_BYTE( "sn5.bin",  0x00001, 0x20000, CRC(ad310d3f) SHA1(f39295b38d99087dbb9c5b00bf9cb963337a50e2) )
 
@@ -1790,7 +1790,7 @@ ROM_START( snowbros )
 ROM_END
 
 ROM_START( snowbrosa )
-	ROM_REGION( 0x40000, "maincpu", 0 ) 
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "sbros-3a.5",  0x00000, 0x20000, CRC(10cb37e1) SHA1(786be4640f8df2c81a32decc189ea7657ace00c6) )
 	ROM_LOAD16_BYTE( "sbros-2a.6",  0x00001, 0x20000, CRC(ab91cc1e) SHA1(8cff61539dc7d35fcbf110d3e54fc1883e7b8509) )
 
@@ -1802,7 +1802,7 @@ ROM_START( snowbrosa )
 ROM_END
 
 ROM_START( snowbrosb )
-	ROM_REGION( 0x40000, "maincpu", 0 ) 
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "sbros3-a",     0x00000, 0x20000, CRC(301627d6) SHA1(0d1dc70091c87e9c27916d4232ff31b7381a64e1) )
 	ROM_LOAD16_BYTE( "sbros2-a",     0x00001, 0x20000, CRC(f6689f41) SHA1(e4fd27b930a31479c0d99e0ddd23d5db34044666) )
 
@@ -1814,7 +1814,7 @@ ROM_START( snowbrosb )
 ROM_END
 
 ROM_START( snowbrosc )
-	ROM_REGION( 0x40000, "maincpu", 0 ) 
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "3-a.ic5",  0x00000, 0x20000, CRC(e1bc346b) SHA1(a20c343d9ed2ad4f785d21076499008edad251f9) )
 	ROM_LOAD16_BYTE( "2-a.ic6",  0x00001, 0x20000, CRC(1be27f9d) SHA1(76dd14480b9274831e51016f7bb57459d7b15cf9) )
 
@@ -1826,7 +1826,7 @@ ROM_START( snowbrosc )
 ROM_END
 
 ROM_START( snowbrosd ) /* Korean release, but no specific "For use in Korea only..." notice screen */
-	ROM_REGION( 0x40000, "maincpu", 0 ) 
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "sbk_3-a.bin",   0x00000, 0x20000, CRC(97174d40) SHA1(481e8c680af8b03d4bcf97b87ca0ba5a3ffca0d7) )
 	ROM_LOAD16_BYTE( "sbk_2-a.bin",   0x00001, 0x20000, CRC(80cc80e5) SHA1(1eeca0924c93e9f0536683160e80c59871569088) )
 
@@ -1838,7 +1838,7 @@ ROM_START( snowbrosd ) /* Korean release, but no specific "For use in Korea only
 ROM_END
 
 ROM_START( snowbrosj )/* "For use in Japan only..." notice screen */
-	ROM_REGION( 0x40000, "maincpu", 0 ) 
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "snowbros.3",   0x00000, 0x20000, CRC(3f504f9e) SHA1(700758b114c3fde6ea8f84222af0850dba13cd3b) )
 	ROM_LOAD16_BYTE( "snowbros.2",   0x00001, 0x20000, CRC(854b02bc) SHA1(4ad1548eef94dcb95119cb4a7dcdefa037591b5b) )
 
@@ -1851,7 +1851,7 @@ ROM_START( snowbrosj )/* "For use in Japan only..." notice screen */
 ROM_END
 
 ROM_START( wintbob )
-	ROM_REGION( 0x40000, "maincpu", 0 ) 
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "wb3", 0x00000, 0x10000, CRC(b9719767) SHA1(431c97d409f2a5ff7f46116a4d8907e446434431) )
 	ROM_LOAD16_BYTE( "wb1", 0x00001, 0x10000, CRC(a4488998) SHA1(4e927e31c1b865dbdba2b985c7a819a07e2e81b8) )
 
@@ -1906,7 +1906,7 @@ ROM_END
 /* Barko */
 
 ROM_START( honeydol )
-	ROM_REGION( 0x40000, "maincpu", 0 ) 
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "d-16.uh12",  0x00001, 0x20000, CRC(cee1a2e3) SHA1(6d1ff5358ec704616b724eea2ab9b60b84709eb1) )
 	ROM_LOAD16_BYTE( "d-17.ui12",  0x00000, 0x20000, CRC(cac44154) SHA1(2c30dc033001fc9303da7e117e3401bc7af16607) )
 
@@ -1968,7 +1968,7 @@ ROMs
 */
 
 ROM_START( twinadv )
-	ROM_REGION( 0x40000, "maincpu", 0 ) 
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "13.uh12",  0x00001, 0x20000, CRC(9f70a39b) SHA1(d49823be58b00c4c5a4f6cc4e4371531492aff1e) )
 	ROM_LOAD16_BYTE( "12.ui12",  0x00000, 0x20000, CRC(d8776495) SHA1(15b93ded80bf9f240faef2d89b6076f33f1f4ece) )
 
@@ -1987,7 +1987,7 @@ ROM_START( twinadv )
 ROM_END
 
 ROM_START( twinadvk )
-	ROM_REGION( 0x40000, "maincpu", 0 ) 
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "uh12",  0x00001, 0x20000, CRC(e0bcc738) SHA1(7fc6a793fcdd80122c0ac6409ae4cac5597b7b5a) )
 	ROM_LOAD16_BYTE( "ui12",  0x00000, 0x20000, CRC(a3ee6451) SHA1(9c0b415a2f325513739f2047780c2a56df350aa5) )
 

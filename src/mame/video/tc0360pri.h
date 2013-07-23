@@ -9,7 +9,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ8_MEMBER( read );
-	
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();

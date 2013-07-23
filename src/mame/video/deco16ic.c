@@ -182,7 +182,6 @@ deco16ic_device::deco16ic_device(const machine_config &mconfig, const char *tag,
 	m_pf12_last_big(0),
 	m_pf1_8bpp_mode(0)
 {
-
 }
 
 //-------------------------------------------------
@@ -197,7 +196,7 @@ void deco16ic_device::device_config_complete()
 	const deco16ic_interface *intf = reinterpret_cast<const deco16ic_interface *>(static_config());
 	if (intf != NULL)
 	*static_cast<deco16ic_interface *>(this) = *intf;
-	
+
 	// or initialize to defaults if none provided
 	else
 	{

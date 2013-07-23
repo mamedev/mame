@@ -214,7 +214,7 @@ TILE_GET_INFO_MEMBER( sengokmj_state::seibucrtc_sc0_tile_info )
 {
 	int tile = m_sc0_vram[tile_index] & 0xfff;
 	int color = (m_sc0_vram[tile_index] >> 12) & 0x0f;
-//	tile+=(m_seibucrtc_sc0bank<<12);
+//  tile+=(m_seibucrtc_sc0bank<<12);
 	SET_TILE_INFO_MEMBER(1, tile, color, 0);
 }
 

@@ -71,7 +71,7 @@ void pc080sn_device::device_config_complete()
 	const pc080sn_interface *intf = reinterpret_cast<const pc080sn_interface *>(static_config());
 	if (intf != NULL)
 	*static_cast<pc080sn_interface *>(this) = *intf;
-	
+
 	// or initialize to defaults if none provided
 	else
 	{
@@ -130,7 +130,7 @@ void pc080sn_device::device_start()
 void pc080sn_device::common_get_pc080sn_bg_tile_info( tile_data &tileinfo, int tile_index, UINT16 *ram, int gfxnum )
 {
 	UINT16 code, attr;
-	
+
 	if (!m_dblwidth)
 	{
 		code = (ram[2 * tile_index + 1] & 0x3fff);
@@ -157,7 +157,7 @@ TILE_GET_INFO_MEMBER(pc080sn_device::get_bg_tile_info)
 void pc080sn_device::common_get_pc080sn_fg_tile_info( tile_data &tileinfo, int tile_index, UINT16 *ram, int gfxnum )
 {
 	UINT16 code,attr;
-		
+
 	if (!m_dblwidth)
 	{
 		code = (ram[2 * tile_index + 1] & 0x3fff);
@@ -357,7 +357,7 @@ static UINT16 topspeed_get_road_pixel_color( UINT16 pixel, UINT16 color )
 }
 
 
-void pc080sn_device::topspeed_custom_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags,	UINT32 priority, UINT16 *color_ctrl_ram )
+void pc080sn_device::topspeed_custom_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags,   UINT32 priority, UINT16 *color_ctrl_ram )
 {
 	UINT16 *dst16, *src16;
 	UINT8 *tsrc;
@@ -476,7 +476,6 @@ void pc080sn_device::tilemap_draw_special( bitmap_ind16 &bitmap, const rectangle
 
 void pc080sn_device::restore_scroll()
 {
-	
 	int flip;
 
 	m_bgscrollx[0] = -m_ctrl[0];

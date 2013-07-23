@@ -33,7 +33,7 @@ private:
 	// internal state
 	screen_device *m_screen;
 	tilemap_t     *m_layer[2];
-	
+
 	UINT32 *       m_tile_ram;
 	UINT32 *       m_char_ram;
 	UINT32 *       m_reg;

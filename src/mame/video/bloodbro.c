@@ -2,9 +2,9 @@
 
     Video Hardware for Blood Brothers
 
-	Note:
-	- An extra layer is currently disabled via the layer enable register
-	  in Seibu CRTC device (bit 2). Is it even tied to any RAM portion?
+    Note:
+    - An extra layer is currently disabled via the layer enable register
+      in Seibu CRTC device (bit 2). Is it even tied to any RAM portion?
 
 ***************************************************************************/
 

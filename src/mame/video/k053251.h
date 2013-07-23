@@ -46,7 +46,7 @@ private:
 	UINT8    m_ram[16];
 	int      m_tilemaps_set;
 	int      m_palette_index[5];
-	
+
 	void reset_indexes();
 };
 

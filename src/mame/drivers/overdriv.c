@@ -12,14 +12,14 @@
       and the coin A setting isn't shown. It's OK with 1 IRQ5 per frame.
     - The "Continue?" sprites are not visible until you press start
     - priorities
-	
 
-	The issues below are both IRQ timing, and relate to when the sprites get
-	copied across by the DMA
-	    - Some flickering sprites, this might be an interrupt/timing issue
-	    - The screen is cluttered with sprites which aren't supposed to be visible,
-	      increasing the coordinate mask in k053247_sprites_draw() from 0x3ff to 0xfff
-	      fixes this but breaks other games (e.g. Vendetta).
+
+    The issues below are both IRQ timing, and relate to when the sprites get
+    copied across by the DMA
+        - Some flickering sprites, this might be an interrupt/timing issue
+        - The screen is cluttered with sprites which aren't supposed to be visible,
+          increasing the coordinate mask in k053247_sprites_draw() from 0x3ff to 0xfff
+          fixes this but breaks other games (e.g. Vendetta).
 
 
 ***************************************************************************/
@@ -92,7 +92,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(overdriv_state::overdriv_cpuA_scanline)
 INTERRUPT_GEN_MEMBER(overdriv_state::cpuB_interrupt)
 {
 	// this doesn't get turned on until the irq has happened? wrong irq?
-//	if (m_k053246->k053246_is_irq_enabled())
+//  if (m_k053246->k053246_is_irq_enabled())
 	m_subcpu->set_input_line(4, HOLD_LINE); // likely wrong
 }
 

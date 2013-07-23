@@ -287,7 +287,7 @@ int hcd62121_cpu_device::check_cond( UINT8 op )
 
 void hcd62121_cpu_device::device_start()
 {
-//	m_irq_callback = irqcallback;
+//  m_irq_callback = irqcallback;
 	m_program = &space(AS_PROGRAM);
 	m_io = &space(AS_IO);
 
@@ -519,4 +519,3 @@ offs_t hcd62121_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UI
 	extern CPU_DISASSEMBLE( hcd62121 );
 	return CPU_DISASSEMBLE_NAME(hcd62121)(this, buffer, pc, oprom, opram, options);
 }
-

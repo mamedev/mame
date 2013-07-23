@@ -86,7 +86,7 @@ const rom_entry *bml3bus_mp1805_device::device_rom_region() const
 READ8_MEMBER( bml3bus_mp1805_device::bml3_mp1805_r)
 {
 	// TODO: read supported or not?
-	//	return mc6843_drq_r(m_mc6843) ? 0x00 : 0x80;
+	//  return mc6843_drq_r(m_mc6843) ? 0x00 : 0x80;
 	return -1;
 }
 

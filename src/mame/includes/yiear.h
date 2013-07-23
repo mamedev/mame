@@ -17,7 +17,7 @@ public:
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_spriteram2;
 	required_shared_ptr<UINT8> m_videoram;
-	
+
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<sn76489a_device> m_sn;

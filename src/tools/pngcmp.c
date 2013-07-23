@@ -1,6 +1,6 @@
 /***************************************************************************
 
-	pngcmp.c
+    pngcmp.c
 
     PNG comparison (based on regrep.c)
 
@@ -50,7 +50,7 @@
     CONSTANTS & DEFINES
 ***************************************************************************/
 
-#define BITMAP_SPACE			4
+#define BITMAP_SPACE            4
 
 /***************************************************************************
     PROTOTYPES
@@ -68,16 +68,16 @@ static int generate_png_diff(const astring& imgfile1, const astring& imgfile2, c
 
 int main(int argc, char *argv[])
 {
-    /* first argument is the directory */
-    if (argc < 4)
-    {
-    	fprintf(stderr, "Usage:\npngcmp <image1> <image2> <outfile>\n");
-    	return 10;
-    }
-    astring imgfilename1(argv[1]);
-    astring imgfilename2(argv[2]);
+	/* first argument is the directory */
+	if (argc < 4)
+	{
+		fprintf(stderr, "Usage:\npngcmp <image1> <image2> <outfile>\n");
+		return 10;
+	}
+	astring imgfilename1(argv[1]);
+	astring imgfilename2(argv[2]);
 	astring outfilename(argv[3]);
-	
+
 	try {
 		return generate_png_diff(imgfilename1, imgfilename2, outfilename);
 	}
@@ -172,7 +172,7 @@ static int generate_png_diff(const astring& imgfile1, const astring& imgfile2, c
 
 		/* allocate the final bitmap */
 		finalbitmap.allocate(width, height);
-	
+
 		/* now copy and compare each set of bitmaps */
 		int curheight = MAX(bitmap1.height(), bitmap2.height());
 		/* iterate over rows in these bitmaps */

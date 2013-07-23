@@ -9,11 +9,11 @@
 
 /*
 
-	Part No		Layout
-	-------------------
-	1501100		US
-	1501102		Germany
-	1501105		UK
+    Part No     Layout
+    -------------------
+    1501100     US
+    1501102     Germany
+    1501105     UK
 
 */
 
@@ -199,7 +199,7 @@ INPUT_PORTS_START( ibm_pc_xt_83_keyboard )
 
 	PORT_START("MD09")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('\\') PORT_CHAR('|')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1) 
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('a') PORT_CHAR('A')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_CHAR('q') PORT_CHAR('Q')
@@ -250,25 +250,25 @@ ioport_constructor ibm_pc_xt_83_keyboard_device::device_input_ports() const
 
 ibm_pc_xt_83_keyboard_device::ibm_pc_xt_83_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, PC_KBD_IBM_PC_XT_83, "IBM PC/XT Keyboard", tag, owner, clock, "kb_pcxt83", __FILE__),
-	  device_pc_kbd_interface(mconfig, *this),
-	  m_maincpu(*this, I8048_TAG),
-	  m_md00(*this, "MD00"),
-	  m_md01(*this, "MD01"),
-	  m_md02(*this, "MD02"),
-	  m_md03(*this, "MD03"),
-	  m_md04(*this, "MD04"),
-	  m_md05(*this, "MD05"),
-	  m_md06(*this, "MD06"),
-	  m_md07(*this, "MD07"),
-	  m_md08(*this, "MD08"),
-	  m_md09(*this, "MD09"),
-	  m_md10(*this, "MD10"),
-	  m_md11(*this, "MD11"),
-	  m_bus(0xff),
-	  m_p1(0xff),
-	  m_p2(0xff),
-	  m_sense(0),
-	  m_q(1)
+		device_pc_kbd_interface(mconfig, *this),
+		m_maincpu(*this, I8048_TAG),
+		m_md00(*this, "MD00"),
+		m_md01(*this, "MD01"),
+		m_md02(*this, "MD02"),
+		m_md03(*this, "MD03"),
+		m_md04(*this, "MD04"),
+		m_md05(*this, "MD05"),
+		m_md06(*this, "MD06"),
+		m_md07(*this, "MD07"),
+		m_md08(*this, "MD08"),
+		m_md09(*this, "MD09"),
+		m_md10(*this, "MD10"),
+		m_md11(*this, "MD11"),
+		m_bus(0xff),
+		m_p1(0xff),
+		m_p2(0xff),
+		m_sense(0),
+		m_q(1)
 {
 }
 
@@ -280,7 +280,7 @@ ibm_pc_xt_83_keyboard_device::ibm_pc_xt_83_keyboard_device(const machine_config 
 void ibm_pc_xt_83_keyboard_device::device_start()
 {
 	set_pc_kbdc_device();
-	
+
 	// state saving
 	save_item(NAME(m_bus));
 	save_item(NAME(m_p1));
@@ -336,18 +336,18 @@ READ8_MEMBER( ibm_pc_xt_83_keyboard_device::bus_r )
 WRITE8_MEMBER( ibm_pc_xt_83_keyboard_device::bus_w )
 {
 	/*
-	
+
 	    bit     description
-	
-	    0       
-	    1       
-	    2       
-	    3       
-	    4       
+
+	    0
+	    1
+	    2
+	    3
+	    4
 	    5       DATAOUT
 	    6       -REQOUT
 	    7       Z1 RESET
-	
+
 	*/
 
 	m_pc_kbdc->data_write_from_kb(BIT(data, 5));
@@ -369,7 +369,7 @@ WRITE8_MEMBER( ibm_pc_xt_83_keyboard_device::bus_w )
 		if (BIT(m_p2, 5)) data &= m_md09->read();
 		if (BIT(m_p2, 6)) data &= m_md10->read();
 		if (BIT(m_p2, 7)) data &= m_md11->read();
-		
+
 		m_q = BIT(data, m_sense);
 	}
 
@@ -384,9 +384,9 @@ WRITE8_MEMBER( ibm_pc_xt_83_keyboard_device::bus_w )
 WRITE8_MEMBER( ibm_pc_xt_83_keyboard_device::p1_w )
 {
 	/*
-	
+
 	    bit     description
-	
+
 	    0       MD00
 	    1       MD01
 	    2       MD02
@@ -395,7 +395,7 @@ WRITE8_MEMBER( ibm_pc_xt_83_keyboard_device::p1_w )
 	    5       MD05
 	    6       MD06
 	    7       MD07
-	
+
 	*/
 
 	m_p1 = data;
@@ -409,9 +409,9 @@ WRITE8_MEMBER( ibm_pc_xt_83_keyboard_device::p1_w )
 WRITE8_MEMBER( ibm_pc_xt_83_keyboard_device::p2_w )
 {
 	/*
-	
+
 	    bit     description
-	
+
 	    0       SELECT 2
 	    1       SELECT 1
 	    2       SELECT 0
@@ -420,7 +420,7 @@ WRITE8_MEMBER( ibm_pc_xt_83_keyboard_device::p2_w )
 	    5       MD09
 	    6       MD10
 	    7       MD11
-	
+
 	*/
 
 	if (!BIT(m_p2, 3) && BIT(data, 3))

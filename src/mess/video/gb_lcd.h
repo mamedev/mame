@@ -42,7 +42,7 @@ public:
 	gb_lcd_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	gb_lcd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	
+
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER(vram_r);
@@ -54,10 +54,10 @@ public:
 
 	// FIXME: remove it when proper sgb support is added
 	void set_sgb_hack(bool val) { m_sgb_border_hack = val ? 1 : 0; }
-	
+
 protected:
 	inline void plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color);
-	
+
 	void select_sprites();
 	virtual void update_sprites();
 	virtual void update_scanline();
@@ -71,7 +71,7 @@ protected:
 	// pointer to the main system
 	cpu_device *m_maincpu;
 	screen_device *m_screen;
-	
+
 	// state variables
 	bitmap_ind16 m_bitmap;
 
@@ -83,22 +83,22 @@ protected:
 	UINT8 *m_sgb_tile_data;
 	UINT8 m_sgb_tile_map[2048];
 	UINT8 m_sgb_window_mask;
-	
+
 	// this is temporarily needed for a bunch of games which draw the border differently...
 	int m_sgb_border_hack;
-	
+
 	int m_window_lines_drawn;
-	
+
 	UINT8   m_vid_regs[_NR_GB_VID_REGS];
 	UINT8   m_bg_zbuf[160];
-	
+
 	UINT16  m_cgb_bpal[32];   /* CGB current background palette table */
 	UINT16  m_cgb_spal[32];   /* CGB current sprite palette table */
-	
+
 	UINT8   m_gb_bpal[4];     /* Background palette */
 	UINT8   m_gb_spal0[4];    /* Sprite 0 palette */
 	UINT8   m_gb_spal1[4];    /* Sprite 1 palette */
-	
+
 	/* Things used to render current line */
 	int m_current_line;       /* Current line */
 	int m_cmp_line;           /* Compare line */
@@ -125,7 +125,7 @@ protected:
 	struct layer_struct m_layer[2];
 	emu_timer *m_lcd_timer;
 	int m_gbc_mode;
-	
+
 	UINT8   *m_vram;     // Pointer to VRAM
 	UINT8   *m_oam;      // Pointer to OAM memory
 	UINT8   m_gb_tile_no_mod;
@@ -152,7 +152,7 @@ public:
 	mgb_lcd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
@@ -163,15 +163,15 @@ class sgb_lcd_device : public gb_lcd_device
 {
 public:
 	sgb_lcd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	void sgb_io_write_pal(int offs, UINT8 *data);
 
 protected:
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 	virtual void update_sprites();
 	virtual void update_scanline();
 	void refresh_border();
@@ -182,16 +182,16 @@ class cgb_lcd_device : public gb_lcd_device
 {
 public:
 	cgb_lcd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	virtual DECLARE_READ8_MEMBER(video_r);
 	virtual DECLARE_WRITE8_MEMBER(video_w);
 
 protected:
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 	virtual void update_sprites();
 	virtual void update_scanline();
 

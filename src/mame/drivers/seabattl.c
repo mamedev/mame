@@ -176,7 +176,7 @@ UINT32 seabattl_state::screen_update_seabattl(screen_device &screen, bitmap_ind1
 			int code = (m_objram[offset] & 0x0f) | 0x10;
 			int x = ((offset & 0x0f) << 4) - ((m_objram[offset] & 0xf0) >> 4);
 			int y = (offset & 0xf0);
-			
+
 			drawgfx_transpen(bitmap, cliprect, machine().gfx[0], code, 0, 0, 0, x, y, 0);
 		}
 	}
@@ -194,7 +194,7 @@ UINT32 seabattl_state::screen_update_seabattl(screen_device &screen, bitmap_ind1
 			bool obj = (bitmap.pix(y,x) > 0) && (bitmap.pix(y,x) < 8);
 			bool pvi = S2636_IS_PIXEL_DRAWN(s2636_0_bitmap.pix16(y, x));
 			bool scr = (m_collision_bg.pix(y,x) & 1) != 0;
-			
+
 			if (obj && pvi)
 				m_collision |= 0x01;
 

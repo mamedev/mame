@@ -250,7 +250,7 @@ void k053936_device::device_config_complete()
 	const k053936_interface *intf = reinterpret_cast<const k053936_interface *>(static_config());
 	if (intf != NULL)
 	*static_cast<k053936_interface *>(this) = *intf;
-	
+
 	// or initialize to defaults if none provided
 	else
 	{
@@ -717,5 +717,3 @@ void K053936GP_0_zoom_draw(running_machine &machine, bitmap_rgb32 &bitmap, const
 		K053936GP_zoom_draw(machine, 0,temp_m_k053936_0_ctrl,temp_m_k053936_0_linectrl,bitmap,cliprect,tmap,tilebpp,blend,alpha, pixeldouble_output);
 	}
 }
-
-

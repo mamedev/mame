@@ -73,7 +73,7 @@ protected:
 	int m_current_word;   /* current word position within track (0-31) */
 
 	int m_running;    /* 1 flag: */
-	                  /* running: flag implied by the existence of the stop instruction */
+						/* running: flag implied by the existence of the stop instruction */
 	UINT32 m_pc;  /* address of next instruction for the disassembler */
 
 	address_space *m_program;

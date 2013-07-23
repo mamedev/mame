@@ -38,7 +38,7 @@ void k001604_device::device_config_complete()
 	const k001604_interface *intf = reinterpret_cast<const k001604_interface *>(static_config());
 	if (intf != NULL)
 	*static_cast<k001604_interface *>(this) = *intf;
-	
+
 	// or initialize to defaults if none provided
 	else
 	{
@@ -78,7 +78,7 @@ void k001604_device::device_start()
 		{ 0*256, 1*256, 2*256, 3*256, 4*256, 5*256, 6*256, 7*256, 8*256, 9*256, 10*256, 11*256, 12*256, 13*256, 14*256, 15*256 },
 		16*256
 	};
-	
+
 	int roz_tile_size;
 
 	m_gfx_index[0] = m_gfx_index_1;

@@ -38,7 +38,7 @@ void k001006_device::device_config_complete()
 	const k001006_interface *intf = reinterpret_cast<const k001006_interface *>(static_config());
 	if (intf != NULL)
 	*static_cast<k001006_interface *>(this) = *intf;
-	
+
 	// or initialize to defaults if none provided
 	else
 	{
@@ -163,4 +163,3 @@ UINT32 k001006_device::get_palette( int index )
 {
 	return m_palette[index];
 }
-

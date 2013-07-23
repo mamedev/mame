@@ -497,7 +497,7 @@ void ymf271_device::update_pcm(int slotnum, INT32 *mixp, int length)
 
 		*mixp++ += (sample * ch0_vol) >> 16;
 		*mixp++ += (sample * ch1_vol) >> 16;
-		
+
 		// go to next step
 		slot->stepptr += slot->step;
 	}
@@ -508,11 +508,11 @@ INT64 ymf271_device::calculate_op(int slotnum, INT64 inp)
 {
 	YMF271Slot *slot = &m_slots[slotnum];
 	INT64 env, slot_output, slot_input = 0;
-	
+
 	update_envelope(slot);
 	update_lfo(slot);
 	env = calculate_slot_volume(slot);
-	
+
 	if (inp == OP_INPUT_FEEDBACK)
 	{
 		// from own feedback
@@ -524,11 +524,11 @@ INT64 ymf271_device::calculate_op(int slotnum, INT64 inp)
 		// from previous slot output
 		slot_input = ((inp << (SIN_BITS-2)) * modulation_level[slot->feedback]);
 	}
-	
+
 	slot_output = m_lut_waves[slot->waveform][((slot->stepptr + slot_input) >> 16) & SIN_MASK];
 	slot_output = (slot_output * env) >> 16;
 	slot->stepptr += slot->step;
-	
+
 	return slot_output;
 }
 
@@ -702,7 +702,7 @@ void ymf271_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 							//              --[S4]--|
 							//              --[S2]--|
 							// <--------|           |
-							// +--[S1]--|--+--[S3]--+-->   
+							// +--[S1]--|--+--[S3]--+-->
 							case 10:
 								phase_mod1 = calculate_op(slot1, OP_INPUT_FEEDBACK);
 								set_feedback(slot1, phase_mod1);
@@ -714,7 +714,7 @@ void ymf271_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 							//           --[S4]-----|
 							//           --[S2]-----|
 							// <-----------------|  |
-							// +--[S1]--+--[S3]--|--+-->   
+							// +--[S1]--+--[S3]--|--+-->
 							case 11:
 								phase_mod1 = calculate_op(slot1, OP_INPUT_FEEDBACK);
 								phase_mod3 = calculate_op(slot3, phase_mod1);
@@ -1298,7 +1298,7 @@ void ymf271_device::device_timer(emu_timer &timer, device_timer_id id, int param
 			// reload timer
 			m_timB->adjust(attotime::from_hz(m_clock) * (384 * 16 * (256 - m_timerB)), 0);
 			break;
-		
+
 		default:
 			assert_always(FALSE, "Unknown id in ymf271_device::device_timer");
 			break;
@@ -1416,7 +1416,7 @@ void ymf271_device::ymf271_write_timer(UINT8 address, UINT8 data)
 				if (!m_ext_rw && !m_ext_write_handler.isnull())
 					m_ext_write_handler(m_ext_address, data);
 				break;
-			
+
 			case 0x20:
 			case 0x21:
 			case 0x22:
@@ -1432,7 +1432,7 @@ void ymf271_device::ymf271_write_timer(UINT8 address, UINT8 data)
 WRITE8_MEMBER( ymf271_device::write )
 {
 	m_stream->update();
-	
+
 	m_regs_main[offset & 0xf] = data;
 
 	switch (offset & 0xf)
@@ -1481,7 +1481,7 @@ READ8_MEMBER( ymf271_device::read )
 	{
 		case 0x0:
 			return m_status;
-		
+
 		case 0x1:
 			// statusreg 2
 			return 0;
@@ -1496,7 +1496,7 @@ READ8_MEMBER( ymf271_device::read )
 			m_ext_readlatch = ymf271_read_memory(m_ext_address);
 			return ret;
 		}
-		
+
 		default:
 			break;
 	}
@@ -1507,10 +1507,10 @@ READ8_MEMBER( ymf271_device::read )
 void ymf271_device::init_tables()
 {
 	int i, j;
-	
+
 	for (i = 0; i < 8; i++)
 		m_lut_waves[i] = auto_alloc_array(machine(), INT16, SIN_LEN);
-	
+
 	for (i = 0; i < 4*8; i++)
 		m_lut_plfo[i>>3][i&7] = auto_alloc_array(machine(), double, LFO_LENGTH);
 
@@ -1607,7 +1607,7 @@ void ymf271_device::init_tables()
 		double db = 0.75 * (double)i;
 		m_lut_total_level[i] = (int)(65536.0 / pow(10.0, db / 20.0));
 	}
-	
+
 	// timing may use a non-standard XTAL
 	double clock_correction = (double)(STD_CLOCK) / (double)(m_clock);
 	for (i = 0; i < 256; i++)

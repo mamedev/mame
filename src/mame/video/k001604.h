@@ -7,8 +7,8 @@ struct k001604_interface
 {
 	int            m_gfx_index_1;
 	int            m_gfx_index_2;
-	int            m_layer_size;		// 0 -> width = 128 tiles, 1 -> width = 256 tiles
-	int            m_roz_size;			// 0 -> 8x8, 1 -> 16x16
+	int            m_layer_size;        // 0 -> width = 128 tiles, 1 -> width = 256 tiles
+	int            m_roz_size;          // 0 -> 8x8, 1 -> 16x16
 	int            m_txt_mem_offset;
 	int            m_roz_mem_offset;
 };

@@ -320,7 +320,7 @@ void arm_cpu_device::device_reset()
 		m_coproRegister[i] = 0;
 	}
 	m_pendingIrq = 0;
-	m_pendingFiq = 0; 
+	m_pendingFiq = 0;
 
 	/* start up in SVC mode with interrupts disabled. */
 	R15 = eARM_MODE_SVC|I_MASK|F_MASK;
@@ -549,13 +549,13 @@ void arm_cpu_device::state_string_export(const device_state_entry &entry, astrin
 	{
 		case STATE_GENFLAGS:
 			string.printf("%c%c%c%c%c%c %s",
-			    (m_sArmRegister[15] & N_MASK) ? 'N' : '-',
-			    (m_sArmRegister[15] & Z_MASK) ? 'Z' : '-',
-			    (m_sArmRegister[15] & C_MASK) ? 'C' : '-',
-			    (m_sArmRegister[15] & V_MASK) ? 'V' : '-',
-			    (m_sArmRegister[15] & I_MASK) ? 'I' : '-',
-			    (m_sArmRegister[15] & F_MASK) ? 'F' : '-',
-			    s[m_sArmRegister[15] & 3] );
+				(m_sArmRegister[15] & N_MASK) ? 'N' : '-',
+				(m_sArmRegister[15] & Z_MASK) ? 'Z' : '-',
+				(m_sArmRegister[15] & C_MASK) ? 'C' : '-',
+				(m_sArmRegister[15] & V_MASK) ? 'V' : '-',
+				(m_sArmRegister[15] & I_MASK) ? 'I' : '-',
+				(m_sArmRegister[15] & F_MASK) ? 'F' : '-',
+				s[m_sArmRegister[15] & 3] );
 			break;
 	}
 }
@@ -1470,4 +1470,3 @@ offs_t arm_be_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT
 	extern CPU_DISASSEMBLE( arm_be );
 	return CPU_DISASSEMBLE_NAME(arm_be)(this, buffer, pc, oprom, opram, options);
 }
-

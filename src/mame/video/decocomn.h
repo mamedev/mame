@@ -25,7 +25,7 @@ class decocomn_device : public device_t,
 public:
 	decocomn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~decocomn_device() {}
-	
+
 	DECLARE_WRITE16_MEMBER( nonbuffered_palette_w );
 	DECLARE_WRITE16_MEMBER( buffered_palette_w );
 	DECLARE_WRITE16_MEMBER( palette_dma_w );

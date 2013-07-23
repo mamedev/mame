@@ -25,9 +25,9 @@ public:
 
 	UINT8           m_is_primrage;
 	required_shared_ptr<UINT16> m_colorram;
-	
-	required_device<tilemap_device>	m_playfield_tilemap;
-	required_device<tilemap_device>	m_alpha_tilemap;
+
+	required_device<tilemap_device> m_playfield_tilemap;
+	required_device<tilemap_device> m_alpha_tilemap;
 
 	bitmap_ind16 *      m_pf_bitmap;
 	bitmap_ind16 *      m_an_bitmap;

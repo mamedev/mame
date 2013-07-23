@@ -182,7 +182,7 @@ public:
 
 
 	UINT32 cpu_type;     /* CPU Type: 68000, 68008, 68010, 68EC020, 68020, 68EC030, 68030, 68EC040, or 68040 */
-//	UINT32 dasm_type;    /* disassembly type */
+//  UINT32 dasm_type;    /* disassembly type */
 	UINT32 dar[16];      /* Data and Address Registers */
 	UINT32 ppc;        /* Previous program counter */
 	UINT32 pc;           /* Program Counter */
@@ -272,8 +272,8 @@ public:
 	typedef delegate<void (offs_t, UINT16)> m68k_write16_delegate;
 	typedef delegate<void (offs_t, UINT32)> m68k_write32_delegate;
 
-//	class m68k_memory_interface
-//	{
+//  class m68k_memory_interface
+//  {
 	public:
 		void init8(address_space &space);
 		void init16(address_space &space);
@@ -312,15 +312,15 @@ public:
 		UINT32 readlong_d32_hmmu(offs_t address);
 		void writelong_d32_hmmu(offs_t address, UINT32 data);
 
-//		m68000_base_device *m_cpustate;
-//	};
+//      m68000_base_device *m_cpustate;
+//  };
 
 	public:
-//	m68k_memory_interface memory;
+//  m68k_memory_interface memory;
 
 	address_space *m_space;
 	direct_read_data *m_direct;
-	
+
 	offs_t encrypted_start;
 	offs_t encrypted_end;
 
@@ -390,7 +390,7 @@ public:
 
 	void reset_cpu(void);
 	inline void cpu_execute(void);
-	
+
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry);
 	virtual void state_export(const device_state_entry &entry);
@@ -720,7 +720,7 @@ class fscpu32_device : public m68000_base_device
 public:
 	// construction/destruction
 	fscpu32_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	fscpu32_device(const machine_config &mconfig, const char *name, const char *tag, device_t *owner, UINT32 clock,
 						const device_type type, UINT32 prg_data_width, UINT32 prg_address_bits, address_map_constructor internal_map, const char *shortname, const char *source);
 

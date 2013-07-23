@@ -146,5 +146,3 @@ void m68340cpu_device::device_start()
 
 	internal = &this->space(AS_PROGRAM);
 }
-
-

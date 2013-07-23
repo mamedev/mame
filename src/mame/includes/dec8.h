@@ -21,7 +21,7 @@ public:
 		m_tilegen1(*this, "tilegen1"),
 		m_tilegen2(*this, "tilegen2"),
 		m_videoram(*this, "videoram"),
-		m_bg_data(*this, "bg_data")	{ }
+		m_bg_data(*this, "bg_data") { }
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

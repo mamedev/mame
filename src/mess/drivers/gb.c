@@ -674,13 +674,13 @@ static const unsigned char palette[] =
 	 0xB0,0xB0,0xB0,
 	 0x60,0x60,0x60,
 	 0x00,0x00,0x00 */
-	
+
 	/* Possibly needs a little more green in it */
 	0xFF,0xFB,0x87,     /* Background */
 	0xB1,0xAE,0x4E,     /* Light */
 	0x84,0x80,0x4E,     /* Medium */
 	0x4E,0x4E,0x4E,     /* Dark */
-	
+
 	/* Palette for Game Boy Pocket/Light */
 	0xC4,0xCF,0xA1,     /* Background */
 	0x8B,0x95,0x6D,     /* Light      */
@@ -708,7 +708,7 @@ PALETTE_INIT_MEMBER(gb_state, gbp)
 PALETTE_INIT_MEMBER(gb_state, sgb)
 {
 	int r, g, b;
-	
+
 	for (int i = 0; i < 32768; i++)
 	{
 		r = (i & 0x1F) << 3;
@@ -721,7 +721,7 @@ PALETTE_INIT_MEMBER(gb_state, sgb)
 PALETTE_INIT_MEMBER(gb_state, gbc)
 {
 	int r, g, b;
-	
+
 	for (int i = 0; i < 32768; i++)
 	{
 		r = (i & 0x1F) << 3;

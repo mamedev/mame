@@ -645,4 +645,3 @@ offs_t alpha8201_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const U
 	extern CPU_DISASSEMBLE( alpha8201 );
 	return CPU_DISASSEMBLE_NAME(alpha8201)(this, buffer, pc, oprom, opram, options);
 }
-

@@ -286,7 +286,7 @@ void bking_state::screen_eof_bking(screen_device &screen, bool state)
 		}
 		else
 			return;
-		
+
 		m_bg_tilemap->set_scrollx(0, flip_screen() ? -xld : xld);
 		m_bg_tilemap->set_scrolly(0, flip_screen() ? -yld : yld);
 

@@ -182,7 +182,7 @@ int include_mapping(const char *srcfile)
 				filename[pos] = *srcptr++;
 				filename[pos+1] = 0;
 			}
-			srcptr++;			// skip comma
+			srcptr++;           // skip comma
 			char mapping[256];
 			mapping[0] = 0;
 			for (int pos = 0; srcptr < endptr && pos < ARRAY_LENGTH(mapping) - 1 && (*srcptr!=10) && (*srcptr!=13); pos++)
@@ -296,23 +296,23 @@ int parse_file(const char *srcfile)
 				drivname[pos] = *srcptr++;
 				drivname[pos+1] = 0;
 			}
-			
+
 			librarylist_entry *lentry = new librarylist_entry;
 			lentry->name.cpy(drivname);
 			lentry->next = NULL;
 			lentry->sourcefiles = NULL;
 			if (last_libraryitem!=NULL)
 			{
-				last_libraryitem->next = lentry;			
-			}			
-			last_libraryitem = lentry;			
+				last_libraryitem->next = lentry;
+			}
+			last_libraryitem = lentry;
 			last_sourceitem = NULL;
 
 			if (librarylist==NULL)
 			{
 				librarylist = lentry;
 			}
-			
+
 			continue;
 		}
 
@@ -331,9 +331,9 @@ int parse_file(const char *srcfile)
 		lentry->next = NULL;
 		if (last_sourceitem!=NULL)
 		{
-			last_sourceitem->next = lentry;			
-		}			
-		last_sourceitem = lentry;			
+			last_sourceitem->next = lentry;
+		}
+		last_sourceitem = lentry;
 		if (last_libraryitem->sourcefiles==NULL)
 		{
 			last_libraryitem->sourcefiles = lentry;
@@ -361,7 +361,7 @@ int parse_for_drivers(const char *srcfile)
 	while (core_fgets(buffer, ARRAY_LENGTH(buffer), file) != NULL)
 	{
 		astring line;
-		
+
 		// rip through it to find all drivers
 		char *srcptr = (char *)buffer;
 		char *endptr = srcptr + strlen(buffer);
@@ -408,7 +408,7 @@ int parse_for_drivers(const char *srcfile)
 				line.cat(*srcptr++);
 			}
 		}
-		
+
 		if ((line.find(0,"GAME(")==0) || (line.find(0,"GAMEL(")==0) ||
 			(line.find(0,"COMP(")==0) || (line.find(0,"CONS(")==0) ||
 			(line.find(0,"SYST(")==0))
@@ -417,7 +417,7 @@ int parse_for_drivers(const char *srcfile)
 			if (p1<0) continue;
 			int p2 = line.find(p1+1,",");
 			if (p2<0) continue;
-			
+
 			printf("%s\n",line.substr(p1+1,p2-p1-1).cstr());
 		}
 	}
@@ -445,14 +445,14 @@ int main(int argc, char *argv[])
 	exclude_path **excpathhead = &excpaths;
 	astring srcdir;
 	int unadorned = 0;
-	
+
 	librarylist = NULL;
 	last_libraryitem = NULL;
 	last_sourceitem = NULL;
-	
-	
+
+
 	// extract arguments
-	const char *srcfile = argv[1];	
+	const char *srcfile = argv[1];
 	if (parse_file(srcfile))
 		return 1;
 
@@ -500,16 +500,16 @@ int main(int argc, char *argv[])
 	// generate list of drivers
 	if (srcdir.len() == 0)
 	{
-		for (librarylist_entry *lib = librarylist; lib != NULL; lib = lib->next)	
+		for (librarylist_entry *lib = librarylist; lib != NULL; lib = lib->next)
 		{
-			for (list_entry *src = lib->sourcefiles; src != NULL; src = src->next)	
+			for (list_entry *src = lib->sourcefiles; src != NULL; src = src->next)
 			{
 				printf("// Drivers from %s.c\n",src->name.cstr());
 				astring srcfile;
 				// build the source filename
 				srcfile.printf("%s%c%s.c", "src", PATH_SEPARATOR[0], src->name.cstr());
 				parse_for_drivers(srcfile);
-				
+
 				astring srcfile_inc;
 				// build the source filename
 				srcfile_inc.printf("%s%c%s.inc", "src", PATH_SEPARATOR[0], src->name.cstr());
@@ -518,15 +518,15 @@ int main(int argc, char *argv[])
 			}
 		}
 		return 0;
-	} 
-	else 
+	}
+	else
 	{
 		include_mapping("src/emu/cpu/cpu.mak");
 		include_mapping("src/emu/video/video.mak");
 		include_mapping("src/emu/sound/sound.mak");
 		include_mapping("src/emu/machine/machine.mak");
-		if (librarylist!=NULL) 
-		{	
+		if (librarylist!=NULL)
+		{
 			printf("OBJDIRS += \\\n");
 			printf("\t$(OBJ)/target \\\n");
 			printf("\t$(OBJ)/mame/audio \\\n");
@@ -541,13 +541,13 @@ int main(int argc, char *argv[])
 			printf("\t$(OBJ)/mess/video \\\n");
 			printf("\n\n");
 			printf("DRVLIBS += \\\n");
-			
-			for (librarylist_entry *lib = librarylist; lib != NULL; lib = lib->next)	
+
+			for (librarylist_entry *lib = librarylist; lib != NULL; lib = lib->next)
 			{
 				printf("\t$(OBJ)/target/%s.a \\\n",lib->name.cstr());
 			}
 			printf("\n");
-		}	
+		}
 
 		// recurse over subdirectories
 		return recurse_dir(srcdir);
@@ -593,24 +593,23 @@ static int recurse_dir(astring &srcdir)
 {
 	int result = 0;
 
-	// iterate through each file	
-	for (librarylist_entry *lib = librarylist; lib != NULL; lib = lib->next)	
+	// iterate through each file
+	for (librarylist_entry *lib = librarylist; lib != NULL; lib = lib->next)
 	{
-		for (list_entry *src = lib->sourcefiles; src != NULL; src = src->next)	
+		for (list_entry *src = lib->sourcefiles; src != NULL; src = src->next)
 		{
-	
 			astring srcfile;
 
 			// build the source filename
 			srcfile.printf("%s%s.c", srcdir.cstr(), src->name.cstr());
-		
+
 			dependency_map depend_map;
 
 			// find dependencies
 			file_entry &file = compute_dependencies(srcfile);
 			recurse_dependencies(file, depend_map);
-			
-			for (dependency_map::entry_t *entry = depend_map.first(); entry != NULL; entry = depend_map.next(entry)) 
+
+			for (dependency_map::entry_t *entry = depend_map.first(); entry != NULL; entry = depend_map.next(entry))
 			{
 				astring t(entry->tag());
 				if (core_filename_ends_with(t, ".h"))
@@ -623,19 +622,19 @@ static int recurse_dir(astring &srcdir)
 					}
 				}
 			}
-		}		
+		}
 	}
 
-		
+
 	// iterate through each file
-	for (librarylist_entry *lib = librarylist; lib != NULL; lib = lib->next)	
+	for (librarylist_entry *lib = librarylist; lib != NULL; lib = lib->next)
 	{
 		// convert the target from source to object (makes assumptions about rules)
 		astring target("$(OBJ)/target/",lib->name.cstr());
 		target.cat(".a");
 		printf("\n%s : \\\n", target.cstr());
-	
-		for (list_entry *src = lib->sourcefiles; src != NULL; src = src->next)	
+
+		for (list_entry *src = lib->sourcefiles; src != NULL; src = src->next)
 		{
 			astring srcfile;
 
@@ -648,7 +647,7 @@ static int recurse_dir(astring &srcdir)
 			recurse_dependencies(file, depend_map);
 
 			// iterate over the hashed dependencies and output them as well
-			for (dependency_map::entry_t *entry = depend_map.first(); entry != NULL; entry = depend_map.next(entry)) 
+			for (dependency_map::entry_t *entry = depend_map.first(); entry != NULL; entry = depend_map.next(entry))
 			{
 				astring t(entry->tag());
 				t.replace(0, "src/", "$(OBJ)/");
@@ -659,8 +658,8 @@ static int recurse_dir(astring &srcdir)
 				}
 			}
 		}
-		printf("\n");	
-		for (list_entry *src = lib->sourcefiles; src != NULL; src = src->next)	
+		printf("\n");
+		for (list_entry *src = lib->sourcefiles; src != NULL; src = src->next)
 		{
 			astring srcfile;
 
@@ -670,8 +669,8 @@ static int recurse_dir(astring &srcdir)
 
 			// find dependencies
 			file_entry &file = compute_dependencies(srcfile);
-			recurse_dependencies(file, depend_map);		
-			for (dependency_map::entry_t *entry = depend_map.first(); entry != NULL; entry = depend_map.next(entry)) 
+			recurse_dependencies(file, depend_map);
+			for (dependency_map::entry_t *entry = depend_map.first(); entry != NULL; entry = depend_map.next(entry))
 			{
 				astring t(entry->tag());
 				if (core_filename_ends_with(t, ".lay"))
@@ -682,8 +681,8 @@ static int recurse_dir(astring &srcdir)
 
 					t.replace(0, "src/", "$(OBJ)/");
 					t.replace(0, ".lay", ".lh");
-					
-					printf("%s:	%s\n", target2.cstr(), t.cstr());
+
+					printf("%s: %s\n", target2.cstr(), t.cstr());
 				}
 				if (core_filename_ends_with(t, ".inc"))
 				{
@@ -691,7 +690,7 @@ static int recurse_dir(astring &srcdir)
 					target2.replace(0, "src/", "$(OBJ)/");
 					target2.replace(0, ".c", ".o");
 
-					printf("%s:	%s\n", target2.cstr(), t.cstr());
+					printf("%s: %s\n", target2.cstr(), t.cstr());
 				}
 			}
 		}
@@ -747,7 +746,7 @@ static file_entry &compute_dependencies(astring &srcfile)
 		file.deplist = dep;
 		dep->file = &compute_dependencies(machinefile);
 	}
-	
+
 	astring videofile = astring(srcfile);
 	videofile.replace("drivers","video");
 	if (check_file(videofile))
@@ -757,7 +756,7 @@ static file_entry &compute_dependencies(astring &srcfile)
 		file.deplist = dep;
 		dep->file = &compute_dependencies(videofile);
 	}
-	
+
 
 	// find the #include directives in this file
 	for (int index = 0; index < filelength; index++)
@@ -795,7 +794,7 @@ static file_entry &compute_dependencies(astring &srcfile)
 			astring target;
 
 			filename.replace(".lh",".lay");
-			
+
 			// create a new dependency
 			if (find_include_file(target, srcfile, filename))
 			{

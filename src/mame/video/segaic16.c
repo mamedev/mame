@@ -379,17 +379,14 @@ segaic16_video_device::segaic16_video_device(const machine_config &mconfig, cons
 
 void segaic16_video_device::device_config_complete()
 {
-
 }
 
 void segaic16_video_device::device_start()
 {
-
 }
 
 void segaic16_video_device::device_reset()
 {
-
 }
 
 

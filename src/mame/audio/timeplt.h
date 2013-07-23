@@ -12,7 +12,7 @@ public:
 	DECLARE_WRITE8_MEMBER( sh_irqtrigger_w );
 	DECLARE_WRITE8_MEMBER( filter_w );
 	DECLARE_READ8_MEMBER( portB_r );
-	
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -32,7 +32,7 @@ private:
 	device_t *m_filter_1_0;
 	device_t *m_filter_1_1;
 	device_t *m_filter_1_2;
-	
+
 	void filter_w( device_t *device, int data );
 };
 

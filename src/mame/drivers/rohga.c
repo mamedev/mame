@@ -134,7 +134,7 @@ static ADDRESS_MAP_START( rohga_map, AS_PROGRAM, 16, rohga_state )
 	AM_RANGE(0x200000, 0x20000f) AM_DEVWRITE("tilegen1", deco16ic_device, pf_control_w)
 	AM_RANGE(0x240000, 0x24000f) AM_DEVWRITE("tilegen2", deco16ic_device, pf_control_w)
 
-//	AM_RANGE(0x280000, 0x2807ff) AM_MIRROR(0x800) AM_READWRITE_LEGACY(deco16_104_rohga_prot_r,deco16_104_rohga_prot_w)  AM_SHARE("prot16ram") /* Protection device */
+//  AM_RANGE(0x280000, 0x2807ff) AM_MIRROR(0x800) AM_READWRITE_LEGACY(deco16_104_rohga_prot_r,deco16_104_rohga_prot_w)  AM_SHARE("prot16ram") /* Protection device */
 	AM_RANGE(0x280000, 0x283fff) AM_READWRITE(wf_protection_region_0_104_r,wf_protection_region_0_104_w) AM_SHARE("prot16ram") /* Protection device */
 
 	AM_RANGE(0x2c0000, 0x2c0001) AM_READ_PORT("DSW3")
@@ -171,7 +171,7 @@ READ16_MEMBER( rohga_state::wf_protection_region_0_104_r )
 }
 
 WRITE16_MEMBER( rohga_state::wf_protection_region_0_104_w )
-{		
+{
 	int real_address = 0 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	UINT8 cs = 0;
@@ -206,7 +206,7 @@ static ADDRESS_MAP_START( wizdfire_map, AS_PROGRAM, 16, rohga_state )
 	AM_RANGE(0x380000, 0x381fff) AM_RAM_DEVWRITE("deco_common", decocomn_device, buffered_palette_w) AM_SHARE("paletteram")
 	AM_RANGE(0x390008, 0x390009) AM_DEVWRITE("deco_common", decocomn_device, palette_dma_w)
 
-//	AM_RANGE(0xfe4000, 0xfe47ff) AM_READWRITE_LEGACY(deco16_104_prot_r,deco16_104_prot_w) AM_SHARE("prot16ram") /* Protection device */
+//  AM_RANGE(0xfe4000, 0xfe47ff) AM_READWRITE_LEGACY(deco16_104_prot_r,deco16_104_prot_w) AM_SHARE("prot16ram") /* Protection device */
 	AM_RANGE(0xfe4000, 0xfe7fff) AM_READWRITE(wf_protection_region_0_104_r,wf_protection_region_0_104_w) AM_SHARE("prot16ram") /* Protection device */
 	AM_RANGE(0xfdc000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
@@ -222,7 +222,7 @@ READ16_MEMBER( rohga_state::nb_protection_region_0_146_r )
 }
 
 WRITE16_MEMBER( rohga_state::nb_protection_region_0_146_w )
-{		
+{
 	int real_address = 0 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	UINT8 cs = 0;
@@ -259,7 +259,7 @@ static ADDRESS_MAP_START( nitrobal_map, AS_PROGRAM, 16, rohga_state )
 	AM_RANGE(0x390008, 0x390009) AM_DEVWRITE("deco_common", decocomn_device, palette_dma_w)
 
 	AM_RANGE(0xfec000, 0xff3fff) AM_RAM
-//	AM_RANGE(0xff4000, 0xff47ff) AM_MIRROR(0x800) AM_READWRITE_LEGACY(deco16_146_nitroball_prot_r,deco16_146_nitroball_prot_w) AM_SHARE("prot16ram") /* Protection device */
+//  AM_RANGE(0xff4000, 0xff47ff) AM_MIRROR(0x800) AM_READWRITE_LEGACY(deco16_146_nitroball_prot_r,deco16_146_nitroball_prot_w) AM_SHARE("prot16ram") /* Protection device */
 	AM_RANGE(0xff4000, 0xff7fff) AM_READWRITE(nb_protection_region_0_146_r,nb_protection_region_0_146_w) AM_SHARE("prot16ram") /* Protection device */
 
 AM_RANGE(0xff8000, 0xffffff) AM_RAM

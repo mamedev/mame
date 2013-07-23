@@ -438,7 +438,7 @@ READ8_MEMBER(itech8_state::itech8_blitter_r)
 WRITE8_MEMBER(itech8_state::itech8_blitter_w)
 {
 	UINT8 *blitter_data = m_blitter_data;
-	
+
 	/* low bit seems to be ignored */
 	offset /= 2;
 	blitter_data[offset] = data;

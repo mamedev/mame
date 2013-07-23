@@ -544,7 +544,7 @@ static INPUT_PORTS_START( mahjong_panel )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START ) PORT_NAME("P1 Mahjong Start") PORT_CONDITION("EXP", 0x0f, EQUALS, 0x07)
 INPUT_PORTS_END
 
-// these are read differently than the powerpad inputs, but we share the tags, to reduce 
+// these are read differently than the powerpad inputs, but we share the tags, to reduce
 static INPUT_PORTS_START( fc_ftrainer )
 // difference between the two sides is that we mirror the key mapping to match the real pad layout!
 	PORT_START("FT_COL0")

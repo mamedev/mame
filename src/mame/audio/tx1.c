@@ -496,7 +496,7 @@ WRITE8_MEMBER( buggyboy_sound_device::ym2_b_w )
 void buggyboy_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 	/* This is admittedly a bit of a hack job... */
-	
+
 	UINT32 step_0, step_1;
 	int n1_en, n2_en;
 	double gain0, gain1_l, gain1_r;

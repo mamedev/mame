@@ -77,24 +77,24 @@ sms_control_port_device::~sms_control_port_device()
 void sms_control_port_device::device_start()
 {
 	m_device = dynamic_cast<device_sms_control_port_interface *>(get_card_device());
-	
+
 	m_th_pin_handler.resolve_safe();
 	m_pixel_handler.resolve_safe(0);
 }
 
 
-UINT8 sms_control_port_device::port_r() 
-{ 
-	UINT8 data = 0xff; 
-	if (m_device) 
-		data = m_device->peripheral_r(); 
-	return data; 
+UINT8 sms_control_port_device::port_r()
+{
+	UINT8 data = 0xff;
+	if (m_device)
+		data = m_device->peripheral_r();
+	return data;
 }
 
-void sms_control_port_device::port_w( UINT8 data ) 
-{ 
-	if (m_device) 
-		m_device->peripheral_w(data); 
+void sms_control_port_device::port_w( UINT8 data )
+{
+	if (m_device)
+		m_device->peripheral_w(data);
 }
 
 

@@ -231,7 +231,6 @@ static void draw_sprites(running_machine &machine,
 							const rectangle &cliprect,
 							int priority_to_draw)
 {
-
 	thepit_state *state = machine.driver_data<thepit_state>();
 	int offs;
 

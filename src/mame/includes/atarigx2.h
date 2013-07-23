@@ -24,9 +24,9 @@ public:
 
 	required_shared_ptr<UINT32> m_mo_command;
 	required_shared_ptr<UINT32> m_protection_base;
-	
-	required_device<tilemap_device>	m_playfield_tilemap;
-	required_device<tilemap_device>	m_alpha_tilemap;
+
+	required_device<tilemap_device> m_playfield_tilemap;
+	required_device<tilemap_device> m_alpha_tilemap;
 
 	UINT16          m_current_control;
 	UINT8           m_playfield_tile_bank;

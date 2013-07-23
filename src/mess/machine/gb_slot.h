@@ -178,7 +178,7 @@ public:
 	virtual bool call_load();
 	virtual const char *image_interface() const { return "megaduck_cart"; }
 	virtual const char *file_extensions() const { return "bin"; }
-	
+
 	// slot interface overrides
 	virtual const char * get_default_card_software(const machine_config &config, emu_options &options);
 };

@@ -125,9 +125,9 @@ static INPUT_PORTS_START( xybots )
 
 	/* Xybots uses a swapped version */
 // todo:
-//	PORT_MODIFY("jsa:JSAI")
-//	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 )
-//	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
+//  PORT_MODIFY("jsa:JSAI")
+//  PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 )
+//  PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
 INPUT_PORTS_END
 
 
@@ -204,7 +204,7 @@ static MACHINE_CONFIG_START( xybots, xybots_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	
+
 	MCFG_ATARI_JSA_I_ADD("jsa", WRITELINE(atarigen_state, sound_int_write_line))
 	MCFG_ATARI_JSA_TEST_PORT("FFE200", 8)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)

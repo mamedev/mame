@@ -111,7 +111,7 @@ READ16_MEMBER( dblewing_state::wf_protection_region_0_104_r )
 }
 
 WRITE16_MEMBER( dblewing_state::wf_protection_region_0_104_w )
-{		
+{
 	int real_address = 0 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	UINT8 cs = 0;
@@ -127,7 +127,7 @@ static ADDRESS_MAP_START( dblewing_map, AS_PROGRAM, 16, dblewing_state )
 	AM_RANGE(0x104000, 0x104fff) AM_RAM AM_SHARE("pf1_rowscroll")
 	AM_RANGE(0x106000, 0x106fff) AM_RAM AM_SHARE("pf2_rowscroll")
 
-//	AM_RANGE(0x280000, 0x2807ff) AM_DEVREADWRITE("ioprot104", deco104_device, dblewing_prot_r, dblewing_prot_w) AM_SHARE("prot16ram")
+//  AM_RANGE(0x280000, 0x2807ff) AM_DEVREADWRITE("ioprot104", deco104_device, dblewing_prot_r, dblewing_prot_w) AM_SHARE("prot16ram")
 	AM_RANGE(0x280000, 0x283fff) AM_READWRITE(wf_protection_region_0_104_r,wf_protection_region_0_104_w) AM_SHARE("prot16ram") /* Protection device */
 
 
@@ -358,13 +358,11 @@ static const deco16ic_interface dblewing_deco16ic_tilegen1_intf =
 
 void dblewing_state::machine_start()
 {
-
 	save_item(NAME(m_sound_irq));
 }
 
 void dblewing_state::machine_reset()
 {
-
 	m_sound_irq = 0;
 }
 

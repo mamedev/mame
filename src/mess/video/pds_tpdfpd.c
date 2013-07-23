@@ -1,29 +1,29 @@
 /***************************************************************************
 
   Radius Full Page Display card for the Mac SE, assy # 632-0022-A1
- 
+
   EPROMs are marked
   "(c) 1991 Radius TPD/FPD-ASIC  U6  297-0204-A  V 4.1  256K" and "U7" with
   all other text the same.
- 
+
   The SE PDS does not auto-configure like NuBus; cards have to snoop the 68k
   address bus and claim spots the motherboard logic doesn't want.
- 
+
   This card claims these address ranges:
   770000-77000F: Bt9014 RAMDAC
   C00000-C0FFFF: EPROM
   C10000       : read to ack vblank IRQ 2 (returns bit 7 = 0 for vblank active)
   C20000       : read to enable vblank IRQ 2
   C40000-C7FFFF: 256k VRAM
-  F80000-F8FFFF: EPROM mirror (the SE ROM looks for signatures and jump tables in this region) 
- 
+  F80000-F8FFFF: EPROM mirror (the SE ROM looks for signatures and jump tables in this region)
+
   TODO:
     * suppress SE built-in screen (it stops working after OS boot with this card installed) & make our screen 3:4
     * investigate if there's also a two-page display mode as the rom labels imply; 256K is
       far too much for just 1024x880 but would fit double that nicely.
     * later ROM versions provide System 7 compatibility; our current dump is good only
       up to 6.0.8.  (We have 4.1; the last version is 4.4).
- 
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -33,7 +33,7 @@
 #define SEDISPLAY_SCREEN_NAME "fpd_screen"
 #define SEDISPLAY_ROM_REGION  "fpd_rom"
 
-#define VRAM_SIZE   (256*1024) 	// PCB has a jumper for 1MByte; may require different EPROMs
+#define VRAM_SIZE   (256*1024)  // PCB has a jumper for 1MByte; may require different EPROMs
 
 MACHINE_CONFIG_FRAGMENT( sedisplay )
 	MCFG_SCREEN_ADD( SEDISPLAY_SCREEN_NAME, RASTER)
@@ -45,8 +45,8 @@ MACHINE_CONFIG_END
 
 ROM_START( sedisplay )
 	ROM_REGION(0x10000, SEDISPLAY_ROM_REGION, ROMREGION_16BIT|ROMREGION_BE)
-	ROM_LOAD16_BYTE( "tfd_fpd-asic_u6_297-0205-a_v4_1", 0x0000, 0x8000, CRC(fd363f45) SHA1(3c4c596654647ee6ce1880de329aa675d298dc26) ) 
-	ROM_LOAD16_BYTE( "tfd_fpd-asic_u7_297-0205-a_v4_1", 0x0001, 0x8000, CRC(5872451a) SHA1(4673d9f341766c49ff1264b7819916e28a20518f) ) 
+	ROM_LOAD16_BYTE( "tfd_fpd-asic_u6_297-0205-a_v4_1", 0x0000, 0x8000, CRC(fd363f45) SHA1(3c4c596654647ee6ce1880de329aa675d298dc26) )
+	ROM_LOAD16_BYTE( "tfd_fpd-asic_u7_297-0205-a_v4_1", 0x0001, 0x8000, CRC(5872451a) SHA1(4673d9f341766c49ff1264b7819916e28a20518f) )
 ROM_END
 
 //**************************************************************************
@@ -192,11 +192,11 @@ WRITE16_MEMBER( macpds_sedisplay_device::sedisplay_w )
 
 READ16_MEMBER( macpds_sedisplay_device::sedisplay_r )
 {
-	if (offset == 0)	// ack vbl
+	if (offset == 0)    // ack vbl
 	{
 		m_macpds->set_irq_line(M68K_IRQ_2, CLEAR_LINE);
 	}
-	else if (offset == 0x8000)	// enable vbl
+	else if (offset == 0x8000)  // enable vbl
 	{
 		m_vbl_disable = 0;
 	}
@@ -213,10 +213,10 @@ WRITE16_MEMBER( macpds_sedisplay_device::ramdac_w )
 			break;
 
 		case 5:
-			m_colors[m_count++] = data>>4;	// they only fill in the lower nibble
+			m_colors[m_count++] = data>>4;  // they only fill in the lower nibble
 
 			if (m_count == 3)
-			{						// only the green channel drives the output
+			{                       // only the green channel drives the output
 				m_palette[m_clutoffs] = MAKE_RGB(m_colors[1], m_colors[1], m_colors[1]);
 				m_clutoffs++;
 				m_count = 0;
@@ -224,7 +224,7 @@ WRITE16_MEMBER( macpds_sedisplay_device::ramdac_w )
 			break;
 
 		default:
-//			printf("RAMDAC: %x to %x (mask %04x)\n", data, offset, mem_mask);
+//          printf("RAMDAC: %x to %x (mask %04x)\n", data, offset, mem_mask);
 			break;
 	}
 }

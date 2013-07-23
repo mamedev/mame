@@ -571,7 +571,7 @@ static MACHINE_CONFIG_START( atarig42, atarig42_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	
+
 	MCFG_ATARI_JSA_III_ADD("jsa", WRITELINE(atarigen_state, sound_int_write_line))
 	MCFG_ATARI_JSA_TEST_PORT("IN2", 6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

@@ -213,7 +213,7 @@ static TILE_GET_INFO( get_tile_info_A_8 )
 static TILE_GET_INFO( get_tile_info_B_8 )
 {
 	running_machine &machine = device.machine();
-	
+
 	// extract row,col packed into tile_index
 	int             col = tile_index >> 6;
 	int             row = tile_index & 0x3f;

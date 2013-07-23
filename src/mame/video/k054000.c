@@ -208,4 +208,3 @@ WRITE16_MEMBER( k054000_device::lsb_w )
 	if (ACCESSING_BITS_0_7)
 		write(space, offset, data & 0xff);
 }
-

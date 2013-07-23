@@ -86,15 +86,15 @@ tc0080vco_device::tc0080vco_device(const machine_config &mconfig, const char *ta
 	m_tx_ram_1(NULL),
 	m_char_ram(NULL),
 	m_bgscroll_ram(NULL),
-    m_chain_ram_0(NULL),
+	m_chain_ram_0(NULL),
 	m_chain_ram_1(NULL),
 	m_spriteram(NULL),
 	m_scroll_ram(NULL),
-    m_bg0_scrollx(0),
-    m_bg0_scrolly(0),
-    m_bg1_scrollx(0),
-    m_bg1_scrolly(0),
-    m_flipscreen(0)
+	m_bg0_scrollx(0),
+	m_bg0_scrolly(0),
+	m_bg1_scrollx(0),
+	m_bg1_scrolly(0),
+	m_flipscreen(0)
 {
 }
 
@@ -110,7 +110,7 @@ void tc0080vco_device::device_config_complete()
 	const tc0080vco_interface *intf = reinterpret_cast<const tc0080vco_interface *>(static_config());
 	if (intf != NULL)
 	*static_cast<tc0080vco_interface *>(this) = *intf;
-	
+
 	// or initialize to defaults if none provided
 	else
 	{
@@ -128,7 +128,7 @@ void tc0080vco_device::device_start()
 	#define XOR(a) WORD_XOR_BE(a)
 
 	static const gfx_layout charlayout =
-	{ 
+	{
 	8, 8,   /* 8x8 pixels */
 	256,    /* 256 chars */
 	3,      /* 3 bits per pixel */
@@ -137,7 +137,7 @@ void tc0080vco_device::device_start()
 	{ 16*0, 16*1, 16*2, 16*3, 16*4, 16*5, 16*6, 16*7 },
 	16*8
 	};
-	
+
 	m_tilemap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tc0080vco_device::get_bg0_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 	m_tilemap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tc0080vco_device::get_bg1_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 

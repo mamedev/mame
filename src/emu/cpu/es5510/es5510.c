@@ -559,7 +559,7 @@ void es5510_device::execute_set_input(int linenum, int state) {
 
 void es5510_device::list_program(void(p)(const char *, ...)) {
 	LOG(("ES5501: Starting!\n"));
-	
+
 	UINT8 addr;
 	char buf[1024];
 	for (addr = 0; addr < 0xa0; addr++) {
@@ -802,14 +802,14 @@ void es5510_device::run_once()
 {
 	// turn HALT off
 	set_HALT(false);
-	
-	// run for one instruction                                                                                                                                                       
+
+	// run for one instruction
 	icount = 1;
 	execute_run();
-	
-	// turn HALT on again                                                                                                                                                              
+
+	// turn HALT on again
 	set_HALT(true);
-	
+
 	// run ESP to the end of its program, a few instructions at a time
 	while (state != STATE_HALTED) {
 		icount = 1;
@@ -898,7 +898,7 @@ void es5510_device::write_to_dol(INT32 value) {
 }
 
 void es5510_device::alu_operation_end() {
- // Handle the END instruction separately
+	// Handle the END instruction separately
 	LOG(("ES5510: END\n"));
 	// sample the HALT line
 	if (halt_asserted) {

@@ -2319,7 +2319,7 @@ static ADDRESS_MAP_START( pc9801ux_map, AS_PROGRAM, 16, pc9801_state )
 	AM_RANGE(0x0a8000, 0x0b0fff) AM_READWRITE8(pc9801_gvram_r, pc9801_gvram_w, 0xffff)
 	AM_RANGE(0x0e0000, 0x0fffff) AM_READ8(pc9801rs_ipl_r, 0xffff)
 
-//	AM_RANGE(0x000000, 0xffffff) AM_READWRITE8(pc980ux_memory_r,pc9801ux_memory_w,0xffff)
+//  AM_RANGE(0x000000, 0xffffff) AM_READWRITE8(pc980ux_memory_r,pc9801ux_memory_w,0xffff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc9801ux_io, AS_IO, 16, pc9801_state )

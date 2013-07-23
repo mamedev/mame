@@ -36,8 +36,8 @@ struct seibu_crtc_interface
 // ======================> seibu_crtc_device
 
 class seibu_crtc_device : public device_t,
-                          public device_memory_interface,
-                          public seibu_crtc_interface
+							public device_memory_interface,
+							public seibu_crtc_interface
 {
 public:
 	// construction/destruction

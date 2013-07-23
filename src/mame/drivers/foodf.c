@@ -366,7 +366,7 @@ static MACHINE_CONFIG_START( foodf, foodf_state )
 	/* video hardware */
 	MCFG_GFXDECODE(foodf)
 	MCFG_PALETTE_LENGTH(256)
-	
+
 	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("playfield", 2, foodf_state, get_playfield_tile_info, 8,8, SCAN_COLS, 32,32, 0)
 
 	MCFG_SCREEN_ADD("screen", RASTER)

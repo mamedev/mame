@@ -26,11 +26,11 @@ struct deco16ic_interface
 	int                m_split;
 	int                m_full_width12;
 
-	int				   m_pf1_trans_mask, m_pf2_trans_mask;
-	int				   m_pf1_colour_bank, m_pf2_colour_bank;
-	int				   m_pf1_colourmask, m_pf2_colourmask;
+	int                m_pf1_trans_mask, m_pf2_trans_mask;
+	int                m_pf1_colour_bank, m_pf2_colour_bank;
+	int                m_pf1_colourmask, m_pf2_colourmask;
 	deco16_bank_cb     m_bank_cb0, m_bank_cb1;
-	int				   m_pf12_8x8_gfx_bank, m_pf12_16x16_gfx_bank;
+	int                m_pf12_8x8_gfx_bank, m_pf12_16x16_gfx_bank;
 };
 
 class deco16ic_device : public device_t,
@@ -39,7 +39,7 @@ class deco16ic_device : public device_t,
 public:
 	deco16ic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~deco16ic_device() {}
-	
+
 	DECLARE_WRITE16_MEMBER( pf1_data_w );
 	DECLARE_WRITE16_MEMBER( pf2_data_w );
 
@@ -63,7 +63,7 @@ public:
 	void print_debug_info(bitmap_ind16 &bitmap);
 
 	void pf_update(const UINT16 *rowscroll_1_ptr, const UINT16 *rowscroll_2_ptr);
-	
+
 	template<class _BitmapClass>
 	void tilemap_1_draw_common(_BitmapClass &bitmap, const rectangle &cliprect, int flags, UINT32 priority);
 	template<class _BitmapClass>
@@ -89,7 +89,7 @@ public:
 
 	/* used by cninjabl */
 	void set_enable(int tmap, int enable );
-	
+
 	template<class _BitmapClass>
 	void custom_tilemap_draw(
 	_BitmapClass &bitmap,
@@ -110,7 +110,7 @@ public:
 	UINT32 priority,
 	int is_tattoo
 	);
-	
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -134,7 +134,7 @@ private:
 	int m_use_custom_pf1, m_use_custom_pf2;
 
 	int m_pf1_bank, m_pf2_bank;
-	
+
 	int m_pf12_last_small, m_pf12_last_big;
 
 	int m_pf1_8bpp_mode;

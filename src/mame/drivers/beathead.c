@@ -375,9 +375,9 @@ static INPUT_PORTS_START( beathead )
 	PORT_BIT( 0xfff0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 // to do
-//	PORT_MODIFY("jsa:JSAIII")
+//  PORT_MODIFY("jsa:JSAIII")
 // coin 1+2 import from JSAIII not used - set to unused
-//	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
+//  PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -410,7 +410,7 @@ static MACHINE_CONFIG_START( beathead, beathead_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	
+
 	MCFG_ATARI_JSA_III_ADD("jsa", WRITELINE(atarigen_state, sound_int_write_line))
 	MCFG_ATARI_JSA_TEST_PORT("IN2", 6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

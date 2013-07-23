@@ -16,17 +16,17 @@ class pc080sn_device : public device_t,
 public:
 	pc080sn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~pc080sn_device() {}
-	
+
 	DECLARE_READ16_MEMBER( word_r );
 	DECLARE_WRITE16_MEMBER( word_w );
 	DECLARE_WRITE16_MEMBER( xscroll_word_w );
 	DECLARE_WRITE16_MEMBER( yscroll_word_w );
 	DECLARE_WRITE16_MEMBER( ctrl_word_w );
 	DECLARE_WRITE16_MEMBER( scrollram_w );
-	
+
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	
+
 	void common_get_pc080sn_bg_tile_info( tile_data &tileinfo, int tile_index, UINT16 *ram, int gfxnum );
 	void common_get_pc080sn_fg_tile_info( tile_data &tileinfo, int tile_index, UINT16 *ram, int gfxnum );
 
@@ -39,26 +39,26 @@ public:
 
 	/* For Topspeed */
 	void tilemap_draw_special(bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority, UINT16 *ram);
-	
+
 	void restore_scroll();
 
 	protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
-	
+
 	private:
 	// internal state
 	UINT16         m_ctrl[8];
 
-	UINT16 		   *m_ram;
-	UINT16 		   *m_bg_ram[2];
-	UINT16		   *m_bgscroll_ram[2];
+	UINT16         *m_ram;
+	UINT16         *m_bg_ram[2];
+	UINT16         *m_bgscroll_ram[2];
 
 	int            m_bgscrollx[2], m_bgscrolly[2];
-		
+
 	tilemap_t      *m_tilemap[2];
-			
+
 };
 
 extern const device_type PC080SN;

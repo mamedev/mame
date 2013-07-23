@@ -311,7 +311,6 @@ static const deco16ic_interface pktgaldx_deco16ic_tilegen1_intf =
 
 void pktgaldx_state::machine_start()
 {
-
 }
 
 static MACHINE_CONFIG_START( pktgaldx, pktgaldx_state )

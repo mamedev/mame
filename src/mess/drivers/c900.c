@@ -23,7 +23,7 @@ public:
 		m_terminal(*this, TERMINAL_TAG)
 	{ }
 
-//	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+//  UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_READ16_MEMBER(key_r);
 	DECLARE_READ16_MEMBER(stat_r);
 	DECLARE_WRITE8_MEMBER(kbd_put);
@@ -47,7 +47,7 @@ INPUT_PORTS_END
 
 //UINT32 c900_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 //{
-//	return 0;
+//  return 0;
 //}
 
 
@@ -80,13 +80,13 @@ static MACHINE_CONFIG_START( c900, c900_state )
 	MCFG_CPU_IO_MAP(c900_io)
 
 	/* video hardware */
-//	MCFG_SCREEN_ADD("screen", RASTER)
-//	MCFG_SCREEN_REFRESH_RATE(60)
-//	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-//	MCFG_SCREEN_SIZE(512, 256)
-//	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-//	MCFG_PALETTE_LENGTH(4)
-//	MCFG_SCREEN_UPDATE_DRIVER(c900_state, screen_update)
+//  MCFG_SCREEN_ADD("screen", RASTER)
+//  MCFG_SCREEN_REFRESH_RATE(60)
+//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+//  MCFG_SCREEN_SIZE(512, 256)
+//  MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
+//  MCFG_PALETTE_LENGTH(4)
+//  MCFG_SCREEN_UPDATE_DRIVER(c900_state, screen_update)
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 MACHINE_CONFIG_END
 

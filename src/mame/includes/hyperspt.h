@@ -23,7 +23,7 @@ public:
 	optional_device<sn76496_device> m_sn;
 	required_device<cpu_device> m_maincpu;
 	optional_device<vlm5030_device> m_vlm;
-	
+
 	UINT8 *  m_scroll2;
 	UINT8 *  m_spriteram2;
 

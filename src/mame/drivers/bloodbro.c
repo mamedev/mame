@@ -141,7 +141,7 @@ static ADDRESS_MAP_START( common_map, AS_PROGRAM, 16, bloodbro_state )
 	AM_RANGE(0x08e800, 0x08f7ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x08f800, 0x08ffff) AM_RAM
 	AM_RANGE(0x0a0000, 0x0a000d) AM_READWRITE_LEGACY(seibu_main_word_r, seibu_main_word_w)
-//	AM_RANGE(0x0c0000, 0x0c007f) AM_RAM AM_SHARE("scroll")
+//  AM_RANGE(0x0c0000, 0x0c007f) AM_RAM AM_SHARE("scroll")
 	AM_RANGE(0x0c0080, 0x0c0081) AM_WRITENOP // ??? IRQ Ack VBL?
 	AM_RANGE(0x0c00c0, 0x0c00c1) AM_WRITENOP // ??? watchdog?
 	AM_RANGE(0x0c0100, 0x0c0101) AM_WRITENOP // ??? written once

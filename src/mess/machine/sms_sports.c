@@ -161,4 +161,3 @@ void sms_sports_pad_device::peripheral_w(UINT8 data)
 {
 	m_sports_out->write(data);
 }
-

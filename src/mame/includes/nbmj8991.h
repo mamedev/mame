@@ -7,12 +7,12 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_nb1413m3(*this, "nb1413m3")	{ }
+		m_nb1413m3(*this, "nb1413m3")   { }
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	required_device<nb1413m3_device> m_nb1413m3;
-	
+
 	int m_scrollx;
 	int m_scrolly;
 	int m_blitter_destx;

@@ -40,7 +40,7 @@ public:
 	~k053936_device() {}
 
 	DECLARE_WRITE16_MEMBER( ctrl_w );
-	DECLARE_READ16_MEMBER( ctrl_r );    
+	DECLARE_READ16_MEMBER( ctrl_r );
 	DECLARE_WRITE16_MEMBER( linectrl_w );
 	DECLARE_READ16_MEMBER( linectrl_r );
 	void zoom_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tmap, int flags, UINT32 priority, int glfgreat_hack);

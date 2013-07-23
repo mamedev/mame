@@ -64,7 +64,7 @@ void k007342_device::device_config_complete()
 	const k007342_interface *intf = reinterpret_cast<const k007342_interface *>(static_config());
 	if (intf != NULL)
 	*static_cast<k007342_interface *>(this) = *intf;
-	
+
 	// or initialize to defaults if none provided
 	else
 	{
@@ -303,5 +303,3 @@ TILE_GET_INFO_MEMBER(k007342_device::get_tile_info1)
 {
 	get_tile_info(tileinfo, tile_index, 1, m_colorram_1, m_videoram_1);
 }
-
-
