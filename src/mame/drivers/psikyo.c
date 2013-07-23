@@ -624,7 +624,7 @@ INPUT_PORTS_END
 /***************************************************************************
                                 Battle K-Road
 
-Handicap Mode: When you turn ON the Handicap Mode, if the sam player wins
+Handicap Mode: When you turn ON the Handicap Mode, if the same player wins
  consecutive matches against other players, the challenger will get a
  handicap. However, it works only when the player challenges again while
  counting down continuous games.
