@@ -486,9 +486,9 @@ int bfm_sc2_state::Scorpion2_GetSwitchState(int strobe, int data)
 
 void bfm_sc2_state::e2ram_init(nvram_device &nvram, void *data, size_t size)
 {
-	static const UINT8 init_e2ram[10] = { 1, 4, 10, 20, 0, 1, 1, 4, 10, 20 };
+	static const UINT8 init_e2ram[] = { 1, 4, 10, 20, 0, 1, 1, 4, 10, 20 };
 	memset(data,0x00,size);
-	memcpy(data,init_e2ram,size);
+	memcpy(data,init_e2ram,sizeof(init_e2ram));
 }
 
 ///////////////////////////////////////////////////////////////////////////
