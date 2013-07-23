@@ -13,6 +13,29 @@ static const char *BCND_CONDITION[32] =
 	"nev.d",    "gt0.d",    "eq0.d",    "ge0.d",    "lt0.d",    "ne0.d",    "le0.d",    "alw.d",
 };
 
+static const char *BITNUM_CONDITION[32] =
+{
+	"eq.b",		"ne.b",		"gt.b",		"le.b",		"lt.b",		"ge.b",		"hi.b",		"ls.b",
+	"lo.b",		"hs.b",		"eq.h",		"ne.h",		"gt.h",		"le.h",		"lt.h",		"ge.h",
+	"hi.h",		"ls.h",		"lo.h",		"hs.h",		"eq.w",		"ne.w",		"gt.w",		"le.w",
+	"lt.w",		"ge.w",		"hi.w",		"ls.w",		"lo.w",		"hs.w",		"?",		"?",
+};
+
+static const char *MEMOP_S[2] =
+{
+	":s", ""
+};
+
+static const char *MEMOP_M[2] =
+{
+	":m", ""
+};
+
+static const char *FLOATOP_PRECISION[4] =
+{
+	"s", "d", "i", "u"
+};
+
 static char *output;
 static const UINT8 *opdata;
 static int opbytes;
@@ -83,7 +106,7 @@ static offs_t tms32082_disasm_mp(char *buffer, offs_t pc, const UINT8 *oprom)
 
 	int rd = (op >> 27) & 0x1f;
 	int link = rd;
-	int bitnum = rd;
+	int bitnum = rd ^ 0x1f;
 	int rs = (op >> 22) & 0x1f;
 	int endmask = (op >> 5) & 0x1f;
 	int rotate = (op & 0x1f);
@@ -95,81 +118,82 @@ static offs_t tms32082_disasm_mp(char *buffer, offs_t pc, const UINT8 *oprom)
 		case 0: case 1: case 2:     // Short immediate
 		{
 			int subop = (op >> 15) & 0x7f;
+			int m = op & (1 << 17) ? 0 : 1;
 
 			switch (subop)
 			{
-				case 0x00:  print("illop0      "); break;
-				case 0x01:  print("trap        %d", UIMM15(uimm15)); break;
-				case 0x02:  print("cmnd        0x%04X", UIMM15(uimm15)); break;
-				case 0x04:  print("rdcr        R%d, %s", rd, get_creg_name(UIMM15(uimm15))); break;
-				case 0x05:  print("swcr        %s, R%d, R%d", get_creg_name(UIMM15(uimm15)), rs, rd); break;
-				case 0x06:  print("brcr        0x%04X", UIMM15(uimm15)); break;
-				case 0x08:  print("shift%s.dz   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
-				case 0x09:  print("shift%s.dm   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
-				case 0x0a:  print("shift%s.ds   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
-				case 0x0b:  print("shift%s.ez   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
-				case 0x0c:  print("shift%s.em   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
-				case 0x0d:  print("shift%s.es   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
-				case 0x0e:  print("shift%s.iz   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
-				case 0x0f:  print("shift%s.im   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
-				case 0x11:  print("and         0x%04X, R%d, R%d", UIMM15(uimm15), rs, rd); break;
-				case 0x12:  print("and.tf      0x%04X, R%d, R%d", UIMM15(uimm15), rs, rd); break;
-				case 0x14:  print("and.ft      0x%04X, R%d, R%d", UIMM15(uimm15), rs, rd); break;
-				case 0x16:  print("xor         0x%04X, R%d, R%d", UIMM15(uimm15), rs, rd); break;
-				case 0x17:  print("or          0x%04X, R%d, R%d", UIMM15(uimm15), rs, rd); break;
-				case 0x18:  print("and.ff      0x%04X, R%d, R%d", UIMM15(uimm15), rs, rd); break;
-				case 0x19:  print("xnor        0x%04X, R%d, R%d", UIMM15(uimm15), rs, rd); break;
-				case 0x1b:  print("or.tf       0x%04X, R%d, R%d", UIMM15(uimm15), rs, rd); break;
-				case 0x1d:  print("or.ft       0x%04X, R%d, R%d", UIMM15(uimm15), rs, rd); break;
-				case 0x1e:  print("or.ff       0x%04X, R%d, R%d", UIMM15(uimm15), rs, rd); break;
+				case 0x00:	print("illop0      "); break;
+				case 0x01:	print("trap        %d", UIMM15(uimm15)); break;
+				case 0x02:	print("cmnd        0x%04X", UIMM15(uimm15)); break;
+				case 0x04:	print("rdcr        %s, R%d", get_creg_name(UIMM15(uimm15)), rd); break;
+				case 0x05:	print("swcr        R%d, %s, R%d", rd, get_creg_name(UIMM15(uimm15)), rs); break;
+				case 0x06:	print("brcr        %s", get_creg_name(UIMM15(uimm15))); break;
+				case 0x08:	print("shift%s.dz   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
+				case 0x09:	print("shift%s.dm   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
+				case 0x0a:	print("shift%s.ds   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
+				case 0x0b:	print("shift%s.ez   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
+				case 0x0c:	print("shift%s.em   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
+				case 0x0d:	print("shift%s.es   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
+				case 0x0e:	print("shift%s.iz   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
+				case 0x0f:	print("shift%s.im   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
+				case 0x11:	print("and         0x%04X, R%d, R%d", UIMM15(uimm15), rs, rd); break;
+				case 0x12:	print("and.tf      0x%04X, R%d, R%d", UIMM15(uimm15), rs, rd); break;
+				case 0x14:	print("and.ft      0x%04X, R%d, R%d", UIMM15(uimm15), rs, rd); break;
+				case 0x16:	print("xor         0x%04X, R%d, R%d", UIMM15(uimm15), rs, rd); break;
+				case 0x17:	print("or          0x%04X, R%d, R%d", UIMM15(uimm15), rs, rd); break;
+				case 0x18:	print("and.ff      0x%04X, R%d, R%d", UIMM15(uimm15), rs, rd); break;
+				case 0x19:	print("xnor        0x%04X, R%d, R%d", UIMM15(uimm15), rs, rd); break;
+				case 0x1b:	print("or.tf       0x%04X, R%d, R%d", UIMM15(uimm15), rs, rd); break;
+				case 0x1d:	print("or.ft       0x%04X, R%d, R%d", UIMM15(uimm15), rs, rd); break;
+				case 0x1e:	print("or.ff       0x%04X, R%d, R%d", UIMM15(uimm15), rs, rd); break;
 
 				case 0x24: case 0x20:
-							print("ld.b        0x%04X(R%d), R%d", UIMM15(uimm15), rs, rd);
+							print("ld.b        0x%04X(R%d%s), R%d", UIMM15(uimm15), rs, MEMOP_M[m], rd);
 							break;
 				case 0x25: case 0x21:
-							print("ld.h        0x%04X(R%d), R%d", UIMM15(uimm15), rs, rd);
+							print("ld.h        0x%04X(R%d%s), R%d", UIMM15(uimm15), rs, MEMOP_M[m], rd);
 							break;
 				case 0x26: case 0x22:
-							print("ld          0x%04X(R%d), R%d", UIMM15(uimm15), rs, rd);
+							print("ld          0x%04X(R%d%s), R%d", UIMM15(uimm15), rs, MEMOP_M[m], rd);
 							break;
 				case 0x27: case 0x23:
-							print("ld.d        0x%04X(R%d), R%d", UIMM15(uimm15), rs, rd);
+							print("ld.d        0x%04X(R%d%s), R%d", UIMM15(uimm15), rs, MEMOP_M[m], rd);
 							break;
 				case 0x2c: case 0x28:
-							print("ld.ub       0x%04X(R%d), R%d", UIMM15(uimm15), rs, rd);
+							print("ld.ub       0x%04X(R%d%s), R%d", UIMM15(uimm15), rs, MEMOP_M[m], rd);
 							break;
 				case 0x2d: case 0x29:
-							print("ld.uh       0x%04X(R%d), R%d", UIMM15(uimm15), rs, rd);
+							print("ld.uh       0x%04X(R%d%s), R%d", UIMM15(uimm15), rs, MEMOP_M[m], rd);
 							break;
 
 				case 0x34: case 0x30:
-							print("st.b        R%d, 0x%04X(R%d)", rd, UIMM15(uimm15), rs);
+							print("st.b        R%d, 0x%04X(R%d%s)", rd, UIMM15(uimm15), rs, MEMOP_M[m]);
 							break;
 				case 0x35: case 0x31:
-							print("st.h        R%d, 0x%04X(R%d)", rd, UIMM15(uimm15), rs);
+							print("st.h        R%d, 0x%04X(R%d%s)", rd, UIMM15(uimm15), rs, MEMOP_M[m]);
 							break;
 				case 0x36: case 0x32:
-							print("st          R%d, 0x%04X(R%d)", rd, UIMM15(uimm15), rs);
+							print("st          R%d, 0x%04X(R%d%s)", rd, UIMM15(uimm15), rs, MEMOP_M[m]);
 							break;
 				case 0x37: case 0x33:
-							print("st.d        R%d, 0x%04X(R%d)", rd, UIMM15(uimm15), rs);
+							print("st.d        R%d, 0x%04X(R%d%s)", rd, UIMM15(uimm15), rs, MEMOP_M[m]);
 							break;
 
-				case 0x40:  print("bsr         0x%08X, R%d", pc + (SIMM15(uimm15) * 4), link); break;
-				case 0x41:  print("bsr.a       0x%08X, R%d", pc + (SIMM15(uimm15) * 4), link); break;
-				case 0x44:  print("jsr         0x%04X(R%d), R%d", SIMM15(uimm15), rs, link); break;
-				case 0x45:  print("jsr.a       0x%04X(R%d), R%d", SIMM15(uimm15), rs, link); break;
-				case 0x48:  print("bbz         0x%08X, R%d, #%d", pc + (SIMM15(uimm15) * 4), rs, bitnum); break;
-				case 0x49:  print("bbz.a       0x%08X, R%d, #%d", pc + (SIMM15(uimm15) * 4), rs, bitnum); break;
-				case 0x4a:  print("bbo         0x%08X, R%d, #%d", pc + (SIMM15(uimm15) * 4), rs, bitnum); break;
-				case 0x4b:  print("bbo.a       0x%08X, R%d, #%d", pc + (SIMM15(uimm15) * 4), rs, bitnum); break;
-				case 0x4c:  print("bcnd        0x%08X, R%d, %s", pc + (SIMM15(uimm15) * 4), rs, BCND_CONDITION[rd]); break;
-				case 0x4d:  print("bcnd.a      0x%08X, R%d, %s", pc + (SIMM15(uimm15) * 4), rs, BCND_CONDITION[rd]); break;
-				case 0x50:  print("cmp         0x%08X, R%d, R%d", SIMM15(uimm15), rs, rd); break;
-				case 0x58:  print("add         0x%08X, R%d, R%d", SIMM15(uimm15), rs, rd); break;
-				case 0x59:  print("addu        0x%08X, R%d, R%d", SIMM15(uimm15), rs, rd); break;
-				case 0x5a:  print("sub         0x%08X, R%d, R%d", SIMM15(uimm15), rs, rd); break;
-				case 0x5b:  print("subu        0x%08X, R%d, R%d", SIMM15(uimm15), rs, rd); break;
+				case 0x40:	print("bsr         0x%08X, R%d", pc + (SIMM15(uimm15) * 4), link); break;
+				case 0x41:	print("bsr.a       0x%08X, R%d", pc + (SIMM15(uimm15) * 4), link); break;
+				case 0x44:	print("jsr         0x%04X(R%d), R%d", SIMM15(uimm15), rs, link); break;
+				case 0x45:	print("jsr.a       0x%04X(R%d), R%d", SIMM15(uimm15), rs, link); break;
+				case 0x48:	print("bbz         0x%08X, R%d, %s (%d)", pc + (SIMM15(uimm15) * 4), rs, BITNUM_CONDITION[bitnum], bitnum); break;
+				case 0x49:	print("bbz.a       0x%08X, R%d, %s (%d)", pc + (SIMM15(uimm15) * 4), rs, BITNUM_CONDITION[bitnum], bitnum); break;
+				case 0x4a:	print("bbo         0x%08X, R%d, %s (%d)", pc + (SIMM15(uimm15) * 4), rs, BITNUM_CONDITION[bitnum], bitnum); break;
+				case 0x4b:	print("bbo.a       0x%08X, R%d, %s (%d)", pc + (SIMM15(uimm15) * 4), rs, BITNUM_CONDITION[bitnum], bitnum); break;
+				case 0x4c:	print("bcnd        0x%08X, R%d, %s", pc + (SIMM15(uimm15) * 4), rs, BCND_CONDITION[rd]); break;
+				case 0x4d:	print("bcnd.a      0x%08X, R%d, %s", pc + (SIMM15(uimm15) * 4), rs, BCND_CONDITION[rd]); break;
+				case 0x50:	print("cmp         0x%08X, R%d, R%d", SIMM15(uimm15), rs, rd); break;
+				case 0x58:	print("add         0x%08X, R%d, R%d", SIMM15(uimm15), rs, rd); break;
+				case 0x59:	print("addu        0x%08X, R%d, R%d", SIMM15(uimm15), rs, rd); break;
+				case 0x5a:	print("sub         0x%08X, R%d, R%d", SIMM15(uimm15), rs, rd); break;
+				case 0x5b:	print("subu        0x%08X, R%d, R%d", SIMM15(uimm15), rs, rd); break;
 			}
 			break;
 		}
@@ -182,19 +206,26 @@ static offs_t tms32082_disasm_mp(char *buffer, offs_t pc, const UINT8 *oprom)
 			if (op & (1 << 12))     // fetch 32-bit immediate if needed
 				imm32 = fetch();
 
+			int m = op & (1 << 15) ? 0 : 1;
+			int s = op & (1 << 11) ? 0 : 1;
+
+			int p1 = (op >> 5) & 3;
+			int p2 = (op >> 7) & 3;
+			int pd = (op >> 9) & 3;
+
 
 			switch (subop)
 			{
-				case 0x02:  print("trap        %d", src1); break;
-				case 0x03:  print("trap        %d", imm32); break;
-				case 0x04:  print("cmnd        R%d", src1); break;
-				case 0x05:  print("cmnd        0x%08X", imm32); break;
-				case 0x08:  print("rdcr        R%d, R%d", rd, src1); break;
-				case 0x09:  print("rdcr        R%d, %s", rd, get_creg_name(imm32)); break;
-				case 0x0a:  print("swcr        R%d, R%d, R%d", src1, rs, rd); break;
-				case 0x0b:  print("swcr        %s, R%d, R%d", get_creg_name(imm32), rs, rd); break;
-				case 0x0c:  print("brcr        R%d", src1); break;
-				case 0x0d:  print("brcr        0x%08X", imm32); break;
+				case 0x02:	print("trap        %d", src1); break;
+				case 0x03:	print("trap        %d", imm32); break;
+				case 0x04:	print("cmnd        R%d", src1); break;
+				case 0x05:	print("cmnd        0x%08X", imm32); break;
+				case 0x08:	print("rdcr        R%d, R%d,", src1, rd); break;
+				case 0x09:	print("rdcr        %s, R%d", get_creg_name(imm32), rd); break;
+				case 0x0a:	print("swcr        R%d, R%d, R%d", rd, src1, rs); break;
+				case 0x0b:	print("swcr        R%d, %s, R%d", rd, get_creg_name(imm32), rs); break;
+				case 0x0c:	print("brcr        R%d", src1); break;
+				case 0x0d:	print("brcr        %s", get_creg_name(imm32)); break;
 
 				case 0x10:  print("shift%s.dz   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
 				case 0x12:  print("shift%s.dm   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
@@ -227,65 +258,65 @@ static offs_t tms32082_disasm_mp(char *buffer, offs_t pc, const UINT8 *oprom)
 				case 0x3d:  print("or.ff       0x%08X, R%d, R%d", imm32, rs, rd); break;
 
 				case 0x48: case 0x40:
-							print("ld.b        R%d(R%d), R%d", src1, rs, rd);
+							print("ld.b        R%d%s(R%d%s), R%d", src1, MEMOP_S[s], rs, MEMOP_M[m], rd);
 							break;
 				case 0x49: case 0x41:
-							print("ld.b        0x%08X(R%d), R%d", imm32, rs, rd);
+							print("ld.b        0x%08X%s(R%d%s), R%d", imm32, MEMOP_S[s], rs, MEMOP_M[m], rd);
 							break;
 				case 0x4a: case 0x42:
-							print("ld.h        R%d(R%d), R%d", src1, rs, rd);
+							print("ld.h        R%d%s(R%d%s), R%d", src1, MEMOP_S[s], rs, MEMOP_M[m], rd);
 							break;
 				case 0x4b: case 0x43:
-							print("ld.h        0x%08X(R%d), R%d", imm32, rs, rd);
+							print("ld.h        0x%08X%s(R%d%s), R%d", imm32, MEMOP_S[s], rs, MEMOP_M[m], rd);
 							break;
 				case 0x4c: case 0x44:
-							print("ld          R%d(R%d), R%d", src1, rs, rd);
+							print("ld          R%d%s(R%d%s), R%d", src1, MEMOP_S[s], rs, MEMOP_M[m], rd);
 							break;
 				case 0x4d: case 0x45:
-							print("ld          0x%08X(R%d), R%d", imm32, rs, rd);
+							print("ld          0x%08X%s(R%d%s), R%d", imm32, MEMOP_S[s], rs,MEMOP_M[m], rd);
 							break;
 				case 0x4e: case 0x46:
-							print("ld.d        R%d(R%d), R%d", src1, rs, rd);
+							print("ld.d        R%d%s(R%d%s), R%d", src1, MEMOP_S[s], rs, MEMOP_M[m], rd);
 							break;
 				case 0x4f: case 0x47:
-							print("ld.d        0x%08X(R%d), R%d", imm32, rs, rd);
+							print("ld.d        0x%08X%s(R%d%s), R%d", imm32, MEMOP_S[s], rs, MEMOP_M[m], rd);
 							break;
 				case 0x58: case 0x50:
-							print("ld.ub       R%d(R%d), R%d", src1, rs, rd);
+							print("ld.ub       R%d%s(R%d%s), R%d", src1, MEMOP_S[s], rs, MEMOP_M[m], rd);
 							break;
 				case 0x59: case 0x51:
-							print("ld.ub       0x%08X(R%d), R%d", imm32, rs, rd);
+							print("ld.ub       0x%08X%s(R%d%s), R%d", imm32, MEMOP_S[s], rs, MEMOP_M[m], rd);
 							break;
 				case 0x5a: case 0x52:
-							print("ld.uh       R%d(R%d), R%d", src1, rs, rd);
+							print("ld.uh       R%d%s(R%d%s), R%d", src1, MEMOP_S[s], rs, MEMOP_M[m], rd);
 							break;
 				case 0x5b: case 0x53:
-							print("ld.uh       0x%08X(R%d), R%d", imm32, rs, rd);
+							print("ld.uh       0x%08X%s(R%d%s), R%d", imm32, MEMOP_S[s], rs, MEMOP_M[m], rd);
 							break;
 
 				case 0x68: case 0x60:
-							print("st.b        R%d, R%d(R%d)", rd, src1, rs);
+							print("st.b        R%d, R%d%s(R%d%s)", rd, src1, MEMOP_S[s], rs, MEMOP_M[m]);
 							break;
 				case 0x69: case 0x61:
-							print("st.b        R%d, 0x%08X(R%d)", rd, imm32, rs);
+							print("st.b        R%d, 0x%08X%s(R%d%s)", rd, imm32, MEMOP_S[s], rs, MEMOP_M[m]);
 							break;
 				case 0x6a: case 0x62:
-							print("st.h        R%d, R%d(R%d)", rd, src1, rs);
+							print("st.h        R%d, R%d%s(R%d%s)", rd, src1, MEMOP_S[s], rs, MEMOP_M[m]);
 							break;
 				case 0x6b: case 0x63:
-							print("st.h        R%d, 0x%08X(R%d)", rd, imm32, rs);
+							print("st.h        R%d, 0x%08X%s(R%d%s)", rd, imm32, MEMOP_S[s], rs, MEMOP_M[m]);
 							break;
 				case 0x6c: case 0x64:
-							print("st          R%d, R%d(R%d)", rd, src1, rs);
+							print("st          R%d, R%d%s(R%d%s)", rd, src1, MEMOP_S[s], rs, MEMOP_M[m]);
 							break;
 				case 0x6d: case 0x65:
-							print("st          R%d, 0x%08X(R%d)", rd, imm32, rs);
+							print("st          R%d, 0x%08X%s(R%d%s)", rd, imm32, MEMOP_S[s], rs, MEMOP_M[m]);
 							break;
 				case 0x6e: case 0x66:
-							print("st.d        R%d, R%d(R%d)", rd, src1, rs);
+							print("st.d        R%d, R%d%s(R%d%s)", rd, src1, MEMOP_S[s], rs, MEMOP_M[m]);
 							break;
 				case 0x6f: case 0x67:
-							print("st.d        R%d, 0x%08X(R%d)", rd, imm32, rs);
+							print("st.d        R%d, 0x%08X%s(R%d%s)", rd, imm32, MEMOP_S[s], rs, MEMOP_M[m]);
 							break;
 
 				case 0x78: case 0x70:
@@ -295,36 +326,36 @@ static offs_t tms32082_disasm_mp(char *buffer, offs_t pc, const UINT8 *oprom)
 							print("dcache      0x%08X(R%d)", imm32, rs);
 							break;
 
-				case 0x80:  print("bsr         R%d, R%d", src1, link); break;
-				case 0x81:  print("bsr         0x%08X, R%d", imm32, link); break;
-				case 0x82:  print("bsr.a       R%d, R%d", src1, rd); break;
-				case 0x83:  print("bsr.a       0x%08X, R%d", imm32, link); break;
-				case 0x88:  print("jsr         R%d, R%d", src1, link); break;
-				case 0x89:  print("jsr         0x%08X, R%d", imm32, link); break;
-				case 0x8a:  print("jsr.a       R%d, R%d", src1, link); break;
-				case 0x8b:  print("jsr.a       0x%08X, R%d", imm32, link); break;
-				case 0x90:  print("bbz         R%d, R%d, #%d", src1, rs, bitnum); break;
-				case 0x91:  print("bbz         0x%08X, R%d, #%d", imm32, rs, bitnum); break;
-				case 0x92:  print("bbz.a       R%d, R%d, #%d", src1, rs, bitnum); break;
-				case 0x93:  print("bbz.a       0x%08X, R%d, #%d", imm32, rs, bitnum); break;
-				case 0x94:  print("bbo         R%d, R%d, #%d", src1, rs, bitnum); break;
-				case 0x95:  print("bbo         0x%08X, R%d, #%d", imm32, rs, bitnum); break;
-				case 0x96:  print("bbo.a       R%d, R%d, #%d", src1, rs, bitnum); break;
-				case 0x97:  print("bbo.a       0x%08X, R%d, #%d", imm32, rs, bitnum); break;
-				case 0x98:  print("bcnd        R%d, R%d, %s", src1, rs, BCND_CONDITION[rd]); break;
-				case 0x99:  print("bcnd        0x%08X, R%d, %s", imm32, rs, BCND_CONDITION[rd]); break;
-				case 0x9a:  print("bcnd.a      R%d, R%d, %s", src1, rs, BCND_CONDITION[rd]); break;
-				case 0x9b:  print("bcnd.a      0x%08X, R%d, %s", imm32, rs, BCND_CONDITION[rd]); break;
-				case 0xa0:  print("cmp         R%d, R%d, R%d", src1, rs, rd); break;
-				case 0xa1:  print("cmp         0x%08X, R%d, R%d", imm32, rs, rd); break;
-				case 0xb0:  print("add         R%d, R%d, R%d", src1, rs, rd); break;
-				case 0xb1:  print("add         0x%08X, R%d, R%d", imm32, rs, rd); break;
-				case 0xb2:  print("addu        R%d, R%d, R%d", src1, rs, rd); break;
-				case 0xb3:  print("addu        0x%08X, R%d, R%d", imm32, rs, rd); break;
-				case 0xb4:  print("sub         R%d, R%d, R%d", src1, rs, rd); break;
-				case 0xb5:  print("sub         0x%08X, R%d, R%d", imm32, rs, rd); break;
-				case 0xb6:  print("subu        R%d, R%d, R%d", src1, rs, rd); break;
-				case 0xb7:  print("subu        0x%08X, R%d, R%d", imm32, rs, rd); break;
+				case 0x80:	print("bsr         R%d, R%d", src1, link); break;
+				case 0x81:	print("bsr         0x%08X, R%d", imm32, link); break;
+				case 0x82:	print("bsr.a       R%d, R%d", src1, rd); break;
+				case 0x83:	print("bsr.a       0x%08X, R%d", imm32, link); break;
+				case 0x88:	print("jsr         R%d, R%d", src1, link); break;
+				case 0x89:	print("jsr         0x%08X, R%d", imm32, link); break;
+				case 0x8a:	print("jsr.a       R%d, R%d", src1, link); break;
+				case 0x8b:	print("jsr.a       0x%08X, R%d", imm32, link); break;
+				case 0x90:	print("bbz         R%d, R%d, %s (%d)", src1, rs, BITNUM_CONDITION[bitnum], bitnum); break;
+				case 0x91:	print("bbz         0x%08X, R%d, %s (%d)", imm32, rs, BITNUM_CONDITION[bitnum], bitnum); break;
+				case 0x92:	print("bbz.a       R%d, R%d, %s (%d)", src1, rs, BITNUM_CONDITION[bitnum], bitnum); break;
+				case 0x93:	print("bbz.a       0x%08X, R%d, %s (%d)", imm32, rs, BITNUM_CONDITION[bitnum], bitnum); break;
+				case 0x94:	print("bbo         R%d, R%d, %s (%d)", src1, rs, BITNUM_CONDITION[bitnum], bitnum); break;
+				case 0x95:	print("bbo         0x%08X, R%d, %s (%d)", imm32, rs, BITNUM_CONDITION[bitnum], bitnum); break;
+				case 0x96:	print("bbo.a       R%d, R%d, %s (%d)", src1, rs, BITNUM_CONDITION[bitnum], bitnum); break;
+				case 0x97:	print("bbo.a       0x%08X, R%d, %s (%d)", imm32, rs, BITNUM_CONDITION[bitnum], bitnum); break;
+				case 0x98:	print("bcnd        R%d, R%d, %s", src1, rs, BCND_CONDITION[rd]); break;
+				case 0x99:	print("bcnd        0x%08X, R%d, %s", imm32, rs, BCND_CONDITION[rd]); break;
+				case 0x9a:	print("bcnd.a      R%d, R%d, %s", src1, rs, BCND_CONDITION[rd]); break;
+				case 0x9b:	print("bcnd.a      0x%08X, R%d, %s", imm32, rs, BCND_CONDITION[rd]); break;
+				case 0xa0:	print("cmp         R%d, R%d, R%d", src1, rs, rd); break;
+				case 0xa1:	print("cmp         0x%08X, R%d, R%d", imm32, rs, rd); break;
+				case 0xb0:	print("add         R%d, R%d, R%d", src1, rs, rd); break;
+				case 0xb1:	print("add         0x%08X, R%d, R%d", imm32, rs, rd); break;
+				case 0xb2:	print("addu        R%d, R%d, R%d", src1, rs, rd); break;
+				case 0xb3:	print("addu        0x%08X, R%d, R%d", imm32, rs, rd); break;
+				case 0xb4:	print("sub         R%d, R%d, R%d", src1, rs, rd); break;
+				case 0xb5:	print("sub         0x%08X, R%d, R%d", imm32, rs, rd); break;
+				case 0xb6:	print("subu        R%d, R%d, R%d", src1, rs, rd); break;
+				case 0xb7:	print("subu        0x%08X, R%d, R%d", imm32, rs, rd); break;
 
 				case 0xc0:  print("vadd        R%d, R%d, R%d", src1, rs, rd); break;
 				case 0xc1:  print("vadd        0x%08X, R%d, R%d", imm32, rs, rd); break;
@@ -346,30 +377,30 @@ static offs_t tms32082_disasm_mp(char *buffer, offs_t pc, const UINT8 *oprom)
 							print("vrnd        0x%08X, R%d, R%d", imm32, rs, rd);
 							break;
 
-				case 0xca:  print("vrnd        R%d, R%d, R%d", src1, rs, rd); break;
-				case 0xcb:  print("vrnd        0x%08X, R%d, R%d", imm32, rs, rd); break;
-				case 0xcc:  print("vmac        R%d, R%d, R%d", src1, rs, rd); break;
-				case 0xcd:  print("vmac        0x%08X, R%d, R%d", imm32, rs, rd); break;
-				case 0xce:  print("vmsc        R%d, R%d, R%d", src1, rs, rd); break;
-				case 0xcf:  print("vmsc        0x%08X, R%d, R%d", imm32, rs, rd); break;
-				case 0xe0:  print("fadd        R%d, R%d, R%d", src1, rs, rd); break;
-				case 0xe1:  print("fadd        0x%08X, R%d, R%d", imm32, rs, rd); break;
-				case 0xe2:  print("fsub        R%d, R%d, R%d", src1, rs, rd); break;
-				case 0xe3:  print("fsub        0x%08X, R%d, R%d", imm32, rs, rd); break;
-				case 0xe4:  print("fmpy        R%d, R%d, R%d", src1, rs, rd); break;
-				case 0xe5:  print("fmpy        0x%08X, R%d, R%d", imm32, rs, rd); break;
-				case 0xe6:  print("fdiv        R%d, R%d, R%d", src1, rs, rd); break;
-				case 0xe7:  print("fdiv        0x%08X, R%d, R%d", imm32, rs, rd); break;
-				case 0xe8:  print("frndx       R%d, R%d", src1, rd); break;
-				case 0xe9:  print("frndx       0x%08X, R%d", imm32, rd); break;
-				case 0xea:  print("fcmp        R%d, R%d, R%d", src1, rs, rd); break;
-				case 0xeb:  print("fcmp        0x%08X, R%d, R%d", imm32, rs, rd); break;
-				case 0xee:  print("fsqrt       R%d, R%d", src1, rd); break;
-				case 0xef:  print("fsqrt       0x%08X, R%d", imm32, rd); break;
-				case 0xf0:  print("lmo         R%d, R%d", rs, rd); break;
-				case 0xf2:  print("rmo         R%d, R%d", rs, rd); break;
-				case 0xfc:  print("estop       "); break;
-
+				case 0xca:	print("vrnd        R%d, R%d, R%d", src1, rs, rd); break;
+				case 0xcb:	print("vrnd        0x%08X, R%d, R%d", imm32, rs, rd); break;
+				case 0xcc:	print("vmac        R%d, R%d, R%d", src1, rs, rd); break;
+				case 0xcd:	print("vmac        0x%08X, R%d, R%d", imm32, rs, rd); break;
+				case 0xce:	print("vmsc        R%d, R%d, R%d", src1, rs, rd); break;
+				case 0xcf:	print("vmsc        0x%08X, R%d, R%d", imm32, rs, rd); break;
+				case 0xe0:	print("fadd.%s%s%s    R%d, R%d, R%d", FLOATOP_PRECISION[p1], FLOATOP_PRECISION[p2], FLOATOP_PRECISION[pd], src1, rs, rd); break;
+				case 0xe1:	print("fadd.%s%s%s    0x%08X, R%d, R%d", FLOATOP_PRECISION[p1], FLOATOP_PRECISION[p2], FLOATOP_PRECISION[pd], imm32, rs, rd); break;
+				case 0xe2:	print("fsub.%s%s%s    R%d, R%d, R%d", FLOATOP_PRECISION[p1], FLOATOP_PRECISION[p2], FLOATOP_PRECISION[pd], src1, rs, rd); break;
+				case 0xe3:	print("fsub.%s%s%s    0x%08X, R%d, R%d", FLOATOP_PRECISION[p1], FLOATOP_PRECISION[p2], FLOATOP_PRECISION[pd], imm32, rs, rd); break;
+				case 0xe4:	print("fmpy.%s%s%s    R%d, R%d, R%d", FLOATOP_PRECISION[p1], FLOATOP_PRECISION[p2], FLOATOP_PRECISION[pd], src1, rs, rd); break;
+				case 0xe5:	print("fmpy.%s%s%s    0x%08X, R%d, R%d", FLOATOP_PRECISION[p1], FLOATOP_PRECISION[p2], FLOATOP_PRECISION[pd], imm32, rs, rd); break;
+				case 0xe6:	print("fdiv.%s%s%s    R%d, R%d, R%d", FLOATOP_PRECISION[p1], FLOATOP_PRECISION[p2], FLOATOP_PRECISION[pd], src1, rs, rd); break;
+				case 0xe7:	print("fdiv.%s%s%s    0x%08X, R%d, R%d", FLOATOP_PRECISION[p1], FLOATOP_PRECISION[p2], FLOATOP_PRECISION[pd], imm32, rs, rd); break;
+				case 0xe8:	print("frndx       R%d, R%d", src1, rd); break;
+				case 0xe9:	print("frndx       0x%08X, R%d", imm32, rd); break;
+				case 0xea:	print("fcmp        R%d, R%d, R%d", src1, rs, rd); break;
+				case 0xeb:	print("fcmp        0x%08X, R%d, R%d", imm32, rs, rd); break;
+				case 0xee:	print("fsqrt       R%d, R%d", src1, rd); break;
+				case 0xef:	print("fsqrt       0x%08X, R%d", imm32, rd); break;
+				case 0xf0:	print("lmo         R%d, R%d", rs, rd); break;
+				case 0xf2:	print("rmo         R%d, R%d", rs, rd); break;
+				case 0xfc:	print("estop       "); break;
+				
 				case 0xfe: case 0xff:
 							print("illopF      ");
 							break;

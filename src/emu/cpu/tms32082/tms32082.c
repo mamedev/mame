@@ -214,7 +214,7 @@ UINT32 tms32082_mp_device::read_creg(int reg)
 	switch (reg)
 	{
 		case 0xa:           // PPERROR
-			return 0;
+			return 0xe0000;
 
 		default:
 			printf("read_creg(): %08X\n", reg);

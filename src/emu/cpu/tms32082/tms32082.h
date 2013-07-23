@@ -90,7 +90,12 @@ protected:
 
 	UINT32 m_pc;
 	UINT32 m_fetchpc;
-	UINT32 m_reg[32];
+	//UINT32 m_reg[32];
+	union
+	{
+		UINT32 m_reg[32];
+		UINT64 m_fpair[16];
+	};
 	UINT64 m_acc[4];
 	UINT32 m_ir;
 
@@ -109,6 +114,7 @@ protected:
 	UINT32 read_creg(int reg);
 	void write_creg(int reg, UINT32 data);
 	bool test_condition(int condition, UINT32 value);
+	UINT32 calculate_cmp(UINT32 src1, UINT32 src2);
 };
 
 extern const device_type TMS32082_MP;
