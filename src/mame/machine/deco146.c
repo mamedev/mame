@@ -1263,10 +1263,10 @@ UINT16 deco_146_base_device::read_protport(UINT16 address, UINT16 mem_mask)
 	{
 	//	logerror("(bankswitch) %04x %04x\n", address, mem_mask);
 	
-		if (m_current_rambank==m_rambank0)
-			m_current_rambank = m_rambank1;
+		if (m_current_rambank==0)
+			m_current_rambank = 1;
 		else
-			m_current_rambank = m_rambank0;
+			m_current_rambank = 0;
 	}
 
 
@@ -1297,7 +1297,10 @@ void deco_146_base_device::write_protport(address_space &space, UINT16 address, 
 	}
 
 	// always store
-	COMBINE_DATA(&m_current_rambank[(address&0xff)>>1]);
+	if (m_current_rambank==0)
+		COMBINE_DATA(&m_rambank0[(address&0xff)>>1]);
+	else
+		COMBINE_DATA(&m_rambank1[(address&0xff)>>1]);
 
 }
 
@@ -1458,6 +1461,17 @@ void deco_146_base_device::device_start()
 
 	save_item(NAME(m_xor));
 	save_item(NAME(m_nand));
+	save_item(NAME(m_soundlatch));
+
+	save_item(NAME(m_rambank0));
+	save_item(NAME(m_rambank1));
+	save_item(NAME(m_current_rambank));
+
+	save_item(NAME(region_selects));
+
+	save_item(NAME(m_latchaddr));
+	save_item(NAME(m_latchdata));
+	save_item(NAME(m_latchflag));
 }
 
 void deco_146_base_device::device_reset()
@@ -1471,7 +1485,7 @@ void deco_146_base_device::device_reset()
 
 
 
-	m_current_rambank = m_rambank0;
+	m_current_rambank = 0;
 
 	m_nand = 0x0000;
 	m_xor = 0x0000;
@@ -1519,7 +1533,10 @@ UINT16 deco146_device::read_data_getloc(UINT16 address, int& location)
 	}
 	else
 	{
-		retdata = m_current_rambank[location>>1];
+		if (m_current_rambank==0)
+			retdata = m_rambank0[location>>1];
+		else
+			retdata = m_rambank1[location>>1];
 	}
 
 	UINT16 realret = reorder(retdata, &port_table[address>>1].mapping[0] );

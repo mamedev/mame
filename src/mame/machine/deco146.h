@@ -102,7 +102,7 @@ protected:
 	UINT16 m_rambank0[0x80];
 	UINT16 m_rambank1[0x80];
 
-	UINT16* m_current_rambank;
+	int m_current_rambank;
 
 
 	UINT16 m_nand;
@@ -112,10 +112,6 @@ protected:
 	UINT16 m_latchaddr;
 	UINT16 m_latchdata;
 	int m_latchflag;
-
-
-	int m_strobe;
-
 private:
 	UINT8 region_selects[6];
 

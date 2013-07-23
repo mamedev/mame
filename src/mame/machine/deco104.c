@@ -127,7 +127,13 @@ void deco104_device::device_reset()
 
 UINT16 deco104_device::read_data_getloc(UINT16 offset, int& location)
 {
-	const UINT16* prot_ram=m_current_rambank;
+	UINT16* prot_ram;
+	
+	if (m_current_rambank==0)
+		prot_ram = m_rambank0;
+	else
+		prot_ram = m_rambank1;
+
 
 	location = 0x00;
 	int tempinput = 0;
