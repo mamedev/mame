@@ -95,6 +95,72 @@ static char* get_creg_name(UINT32 reg)
 	return buffer;
 }
 
+static char* format_vector_op(UINT32 op, UINT32 imm32)
+{
+	static char buffer[256];
+	char *b = buffer;
+
+	int rd = (op >> 27) & 0x1f;
+	int rs = (op >> 22) & 0x1f;
+	int src1 = (op & 0x1f);
+	int subop = (op >> 12) & 0xff;
+	int vector_ls_bits = (((op >> 9) & 0x3) << 1) | ((op >> 6) & 1);
+
+	// base op
+	switch (subop)
+	{
+		case 0xc0:  b += sprintf(b, "vadd        R%d, R%d, R%d", src1, rs, rd); break;
+		case 0xc1:  b += sprintf(b, "vadd        0x%08X, R%d, R%d", imm32, rs, rd); break;
+		case 0xc2:  b += sprintf(b, "vsub        R%d, R%d, R%d", src1, rs, rd); break;
+		case 0xc3:  b += sprintf(b, "vsub        0x%08X, R%d, R%d", imm32, rs, rd); break;
+		case 0xc4:  b += sprintf(b, "vmpy        R%d, R%d, R%d", src1, rs, rd); break;
+		case 0xc5:  b += sprintf(b, "vmpy        0x%08X, R%d, R%d", imm32, rs, rd); break;
+
+		case 0xd6: case 0xc6:
+					b += sprintf(b, "vmsub       R%d, R%d, R%d", src1, rs, rd);
+					break;
+		case 0xd7: case 0xc7:
+					b += sprintf(b, "vmsub       0x%08X, R%d, R%d", imm32, rs, rd);
+					break;
+		case 0xd8: case 0xc8:
+					b += sprintf(b, "vrnd        R%d, R%d, R%d", src1, rs, rd);
+					break;
+		case 0xd9: case 0xc9:
+					b += sprintf(b, "vrnd        0x%08X, R%d, R%d", imm32, rs, rd);
+					break;
+
+		case 0xca:	b += sprintf(b, "vrnd        R%d, R%d, R%d", src1, rs, rd); break;
+		case 0xcb:	b += sprintf(b, "vrnd        0x%08X, R%d, R%d", imm32, rs, rd); break;
+		case 0xcc:	b += sprintf(b, "vmac        R%d, R%d, R%d", src1, rs, rd); break;
+		case 0xcd:	b += sprintf(b, "vmac        0x%08X, R%d, R%d", imm32, rs, rd); break;
+		case 0xce:	b += sprintf(b, "vmsc        R%d, R%d, R%d", src1, rs, rd); break;
+		case 0xcf:	b += sprintf(b, "vmsc        0x%08X, R%d, R%d", imm32, rs, rd); break;
+	}
+
+	// align the line end
+	int len = strlen(buffer);
+	if (len < 27)
+	{
+		for (int i=0; i < (27-len); i++)
+		{
+			b += sprintf(b, " ");
+		}
+	}	
+
+	// optional load/store op
+	switch (vector_ls_bits)
+	{
+		case 0x01:		b += sprintf(b, "|| vst.s   R%d", rd); break;
+		case 0x03:		b += sprintf(b, "|| vst.d   R%d", rd); break;
+		case 0x04:		b += sprintf(b, "|| vld0.s  R%d", rd); break;
+		case 0x05:		b += sprintf(b, "|| vld1.s  R%d", rd); break;
+		case 0x06:		b += sprintf(b, "|| vld0.d  R%d", rd); break;
+		case 0x07:		b += sprintf(b, "|| vld1.d  R%d", rd); break;
+	}
+
+	return buffer;
+}
+
 static offs_t tms32082_disasm_mp(char *buffer, offs_t pc, const UINT8 *oprom)
 {
 	output = buffer;
@@ -357,32 +423,14 @@ static offs_t tms32082_disasm_mp(char *buffer, offs_t pc, const UINT8 *oprom)
 				case 0xb6:	print("subu        R%d, R%d, R%d", src1, rs, rd); break;
 				case 0xb7:	print("subu        0x%08X, R%d, R%d", imm32, rs, rd); break;
 
-				case 0xc0:  print("vadd        R%d, R%d, R%d", src1, rs, rd); break;
-				case 0xc1:  print("vadd        0x%08X, R%d, R%d", imm32, rs, rd); break;
-				case 0xc2:  print("vsub        R%d, R%d, R%d", src1, rs, rd); break;
-				case 0xc3:  print("vsub        0x%08X, R%d, R%d", imm32, rs, rd); break;
-				case 0xc4:  print("vmpy        R%d, R%d, R%d", src1, rs, rd); break;
-				case 0xc5:  print("vmpy        0x%08X, R%d, R%d", imm32, rs, rd); break;
+				case 0xc0: case 0xc1: case 0xc2: case 0xc3: case 0xc4: case 0xc5:
+				case 0xc6: case 0xd6: case 0xc7: case 0xd7: case 0xc8: case 0xd8: case 0xc9: case 0xd9:
+				case 0xca: case 0xcb: case 0xcc: case 0xcd: case 0xce: case 0xcf:
+				{
+					print("%s", format_vector_op(op, imm32));
+					break;
+				}
 
-				case 0xd6: case 0xc6:
-							print("vmsub       R%d, R%d, R%d", src1, rs, rd);
-							break;
-				case 0xd7: case 0xc7:
-							print("vmsub       0x%08X, R%d, R%d", imm32, rs, rd);
-							break;
-				case 0xd8: case 0xc8:
-							print("vrnd        R%d, R%d, R%d", src1, rs, rd);
-							break;
-				case 0xd9: case 0xc9:
-							print("vrnd        0x%08X, R%d, R%d", imm32, rs, rd);
-							break;
-
-				case 0xca:	print("vrnd        R%d, R%d, R%d", src1, rs, rd); break;
-				case 0xcb:	print("vrnd        0x%08X, R%d, R%d", imm32, rs, rd); break;
-				case 0xcc:	print("vmac        R%d, R%d, R%d", src1, rs, rd); break;
-				case 0xcd:	print("vmac        0x%08X, R%d, R%d", imm32, rs, rd); break;
-				case 0xce:	print("vmsc        R%d, R%d, R%d", src1, rs, rd); break;
-				case 0xcf:	print("vmsc        0x%08X, R%d, R%d", imm32, rs, rd); break;
 				case 0xe0:	print("fadd.%s%s%s    R%d, R%d, R%d", FLOATOP_PRECISION[p1], FLOATOP_PRECISION[p2], FLOATOP_PRECISION[pd], src1, rs, rd); break;
 				case 0xe1:	print("fadd.%s%s%s    0x%08X, R%d, R%d", FLOATOP_PRECISION[p1], FLOATOP_PRECISION[p2], FLOATOP_PRECISION[pd], imm32, rs, rd); break;
 				case 0xe2:	print("fsub.%s%s%s    R%d, R%d, R%d", FLOATOP_PRECISION[p1], FLOATOP_PRECISION[p2], FLOATOP_PRECISION[pd], src1, rs, rd); break;
