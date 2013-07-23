@@ -206,7 +206,10 @@ static const int sampleLimits[] =
 	0x2C00,     // player shooting
 	0x3C00,     // girl screaming
 	0x5400,     // girl getting shot
-	0x7200      // (end of samples)
+	0x7200,     // (end of samples)
+	0x7200,
+	0x7200,
+	0x7200
 };
 
 WRITE_LINE_MEMBER(stfight_state::stfight_adpcm_int)
@@ -222,7 +225,9 @@ WRITE_LINE_MEMBER(stfight_state::stfight_adpcm_int)
 	}
 
 	if( m_toggle == 0 )
+	{
 		m_msm->data_w((adpcm_data >> 4) & 0x0f);
+	}
 	else
 	{
 		m_msm->data_w(adpcm_data & 0x0f);
@@ -234,7 +239,7 @@ WRITE_LINE_MEMBER(stfight_state::stfight_adpcm_int)
 
 WRITE8_MEMBER(stfight_state::stfight_adpcm_control_w)
 {
-	if( data < ARRAY_LENGTH(sampleLimits) )
+	if( data < 0x08 )
 	{
 		m_adpcm_data_offs = sampleLimits[data];
 		m_adpcm_data_end = sampleLimits[data+1];
