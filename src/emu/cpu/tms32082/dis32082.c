@@ -36,6 +36,11 @@ static const char *FLOATOP_PRECISION[4] =
 	"s", "d", "i", "u"
 };
 
+static const char *ACC_SEL[4] =
+{
+	"a0", "a1", "a2", "a3"
+};
+
 static char *output;
 static const UINT8 *opdata;
 static int opbytes;
@@ -98,6 +103,7 @@ static char* get_creg_name(UINT32 reg)
 static char* format_vector_op(UINT32 op, UINT32 imm32)
 {
 	static char buffer[256];
+	static char dest[64];
 	char *b = buffer;
 
 	int rd = (op >> 27) & 0x1f;
@@ -106,35 +112,61 @@ static char* format_vector_op(UINT32 op, UINT32 imm32)
 	int subop = (op >> 12) & 0xff;
 	int vector_ls_bits = (((op >> 9) & 0x3) << 1) | ((op >> 6) & 1);
 
+	int p1 = (op >> 5) & 1;
+	int pd2 = (op >> 7) & 1;
+	int pd4 = (op >> 7) & 3;
+
+	int z = op & (1 << 8);
+
+	int acc = (((op >> 16) << 1) & 2) | ((op >> 11) & 1);
+	bool regdest = (op & (1 << 10)) == 0 && (op & (1 << 6)) == 0;
+
+	// accumulator or register destination
+	if (regdest)
+		sprintf(dest, "R%d", rd);
+	else
+		sprintf(dest, "A%d", acc);
+
 	// base op
 	switch (subop)
 	{
-		case 0xc0:  b += sprintf(b, "vadd        R%d, R%d, R%d", src1, rs, rd); break;
-		case 0xc1:  b += sprintf(b, "vadd        0x%08X, R%d, R%d", imm32, rs, rd); break;
-		case 0xc2:  b += sprintf(b, "vsub        R%d, R%d, R%d", src1, rs, rd); break;
-		case 0xc3:  b += sprintf(b, "vsub        0x%08X, R%d, R%d", imm32, rs, rd); break;
-		case 0xc4:  b += sprintf(b, "vmpy        R%d, R%d, R%d", src1, rs, rd); break;
-		case 0xc5:  b += sprintf(b, "vmpy        0x%08X, R%d, R%d", imm32, rs, rd); break;
+		case 0xc0:  b += sprintf(b, "vadd.%s%s     R%d, R%d, R%d", FLOATOP_PRECISION[p1], FLOATOP_PRECISION[pd2], src1, rs, rs); break;
+		case 0xc1:  b += sprintf(b, "vadd.%s%s     0x%08X, R%d, R%d", FLOATOP_PRECISION[p1], FLOATOP_PRECISION[pd2], imm32, rs, rs); break;
+		case 0xc2:  b += sprintf(b, "vsub.%s%s     R%d, R%d, R%d", FLOATOP_PRECISION[p1], FLOATOP_PRECISION[pd2], rs, src1, rs); break;
+		case 0xc3:  b += sprintf(b, "vsub.%s%s     R%d, 0x%08X, R%d", FLOATOP_PRECISION[p1], FLOATOP_PRECISION[pd2], rs, imm32, rs); break;
+		case 0xc4:  b += sprintf(b, "vmpy.%s%s     R%d, R%d, R%d", FLOATOP_PRECISION[p1], FLOATOP_PRECISION[pd2], src1, rs, rs); break;
+		case 0xc5:  b += sprintf(b, "vmpy.%s%s     0x%08X, R%d, R%d", FLOATOP_PRECISION[p1], FLOATOP_PRECISION[pd2], imm32, rs, rs); break;
 
 		case 0xd6: case 0xc6:
-					b += sprintf(b, "vmsub       R%d, R%d, R%d", src1, rs, rd);
+					b += sprintf(b, "vmsub.s%s    R%d, %s, R%d", FLOATOP_PRECISION[pd2], src1, z ? "0" : ACC_SEL[acc], rs);
 					break;
 		case 0xd7: case 0xc7:
-					b += sprintf(b, "vmsub       0x%08X, R%d, R%d", imm32, rs, rd);
+					b += sprintf(b, "vmsub.s%s    0x%08X, %s, R%d", FLOATOP_PRECISION[pd2], imm32, z ? "0" : ACC_SEL[acc], rs);
 					break;
 		case 0xd8: case 0xc8:
-					b += sprintf(b, "vrnd        R%d, R%d, R%d", src1, rs, rd);
+					b += sprintf(b, "vrnd.%s%s     R%d, R%d", FLOATOP_PRECISION[p1], FLOATOP_PRECISION[pd4], src1, rs);
 					break;
 		case 0xd9: case 0xc9:
-					b += sprintf(b, "vrnd        0x%08X, R%d, R%d", imm32, rs, rd);
+					b += sprintf(b, "vrnd.%s%s     0x%08X, R%d", FLOATOP_PRECISION[p1], FLOATOP_PRECISION[pd4], imm32, rs);
 					break;
 
-		case 0xca:	b += sprintf(b, "vrnd        R%d, R%d, R%d", src1, rs, rd); break;
-		case 0xcb:	b += sprintf(b, "vrnd        0x%08X, R%d, R%d", imm32, rs, rd); break;
-		case 0xcc:	b += sprintf(b, "vmac        R%d, R%d, R%d", src1, rs, rd); break;
-		case 0xcd:	b += sprintf(b, "vmac        0x%08X, R%d, R%d", imm32, rs, rd); break;
-		case 0xce:	b += sprintf(b, "vmsc        R%d, R%d, R%d", src1, rs, rd); break;
-		case 0xcf:	b += sprintf(b, "vmsc        0x%08X, R%d, R%d", imm32, rs, rd); break;
+		case 0xca:	b += sprintf(b, "vrnd.%s%s     R%d, R%d", FLOATOP_PRECISION[2 + p1], FLOATOP_PRECISION[pd2],src1, rs); break;
+		case 0xcb:	b += sprintf(b, "vrnd.%s%s     0x%08X, R%d", FLOATOP_PRECISION[2 + p1], FLOATOP_PRECISION[pd2], imm32, rs); break;
+
+		case 0xcc: case 0xdc:
+					b += sprintf(b, "vmac.ss%s    R%d, R%d, %s, %s", FLOATOP_PRECISION[(op >> 9) & 1], src1, rs, z ? "0" : ACC_SEL[acc], (regdest && rd == 0) ? ACC_SEL[acc] : dest);
+					break;
+		case 0xcd: case 0xdd:
+					b += sprintf(b, "vmac.ss%s    0x%08X, R%d, %s, %s", FLOATOP_PRECISION[(op >> 9) & 1], imm32, rs, z ? "0" : ACC_SEL[acc], (regdest && rd == 0) ? ACC_SEL[acc] : dest);
+					break;
+		case 0xce: case 0xde:
+					b += sprintf(b, "vmsc.ss%s    R%d, R%d, %s, %s", FLOATOP_PRECISION[(op >> 9) & 1], src1, rs, z ? "0" : ACC_SEL[acc], (regdest && rd == 0) ? ACC_SEL[acc] : dest);
+					break;
+		case 0xcf: case 0xdf:
+					b += sprintf(b, "vmsc.ss%s    0x%08X, R%d, %s, %s", FLOATOP_PRECISION[(op >> 9) & 1], imm32, rs, z ? "0" : ACC_SEL[acc], (regdest && rd == 0) ? ACC_SEL[acc] : dest);
+					break;
+
+		default:	b += sprintf(b, "?"); break;
 	}
 
 	// align the line end
@@ -260,6 +292,8 @@ static offs_t tms32082_disasm_mp(char *buffer, offs_t pc, const UINT8 *oprom)
 				case 0x59:	print("addu        0x%08X, R%d, R%d", SIMM15(uimm15), rs, rd); break;
 				case 0x5a:	print("sub         0x%08X, R%d, R%d", SIMM15(uimm15), rs, rd); break;
 				case 0x5b:	print("subu        0x%08X, R%d, R%d", SIMM15(uimm15), rs, rd); break;
+
+				default:	print("?"); break;
 			}
 			break;
 		}
@@ -425,7 +459,8 @@ static offs_t tms32082_disasm_mp(char *buffer, offs_t pc, const UINT8 *oprom)
 
 				case 0xc0: case 0xc1: case 0xc2: case 0xc3: case 0xc4: case 0xc5:
 				case 0xc6: case 0xd6: case 0xc7: case 0xd7: case 0xc8: case 0xd8: case 0xc9: case 0xd9:
-				case 0xca: case 0xcb: case 0xcc: case 0xcd: case 0xce: case 0xcf:
+				case 0xca: case 0xcb: case 0xcc: case 0xdc: case 0xcd: case 0xdd: case 0xce: case 0xde: 
+				case 0xcf: case 0xdf:
 				{
 					print("%s", format_vector_op(op, imm32));
 					break;
@@ -452,6 +487,8 @@ static offs_t tms32082_disasm_mp(char *buffer, offs_t pc, const UINT8 *oprom)
 				case 0xfe: case 0xff:
 							print("illopF      ");
 							break;
+
+				default:	print("?"); break;
 			}
 			break;
 		}
