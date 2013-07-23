@@ -29,6 +29,9 @@ To Do:
 
 - Flip Screen support
 
+NOTE: Despite being mentioned in the manual Strikers 1945 doesn't seem to
+      have a Free Play mode.
+
 ***************************************************************************/
 
 /***** Gun Bird Japan Crash Notes
@@ -482,30 +485,31 @@ static INPUT_PORTS_START( psikyo_common )
 
 	PORT_START("DSW")       /* c00004 -> c00007 */
 	PORT_BIT( 0x0000ffff, IP_ACTIVE_LOW, IPT_UNUSED )   // these depends by the games
-	PORT_DIPNAME( 0x00010000, 0x00010000, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x00010000, 0x00010000, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(          0x00010000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00020000, 0x00000000, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x00020000, 0x00000000, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(          0x00020000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x000c0000, 0x000c0000, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x000c0000, 0x000c0000, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(          0x00080000, DEF_STR( Easy ) )
 	PORT_DIPSETTING(          0x000c0000, DEF_STR( Normal ) )
 	PORT_DIPSETTING(          0x00040000, DEF_STR( Hard ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x00300000, 0x00300000, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x00300000, 0x00300000, DEF_STR( Lives ) )	PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(          0x00200000, "1" )
 	PORT_DIPSETTING(          0x00100000, "2" )
 	PORT_DIPSETTING(          0x00300000, "3" )
 	PORT_DIPSETTING(          0x00000000, "4" )
-	PORT_DIPNAME( 0x00400000, 0x00400000, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x00400000, 0x00400000, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(          0x00400000, "400K" )
 	PORT_DIPSETTING(          0x00000000, "600K" )
-	PORT_SERVICE( 0x00800000, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x01000000, 0x01000000, "Credits/Coinage" )   // [Free Play] on all for free play
-	PORT_DIPSETTING(          0x01000000, "A+B/A&B" )
-	PORT_DIPSETTING(          0x00000000, "A&B/A [Free Play]" )
-	PORT_DIPNAME( 0x0e000000, 0x0e000000, DEF_STR( Coin_A ) )
+	PORT_SERVICE_DIPLOC(  0x00800000, IP_ACTIVE_LOW, "SW2:8" )
+
+	PORT_DIPNAME( 0x01000000, 0x01000000, "Coin Slot" )		PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(          0x01000000, "Shared" )
+	PORT_DIPSETTING(          0x00000000, "Individual [Free Play]" )
+	PORT_DIPNAME( 0x0e000000, 0x0e000000, DEF_STR( Coin_A ) )	PORT_DIPLOCATION("SW1:2,3,4")
 	PORT_DIPSETTING(          0x0a000000, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(          0x0c000000, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(          0x0e000000, DEF_STR( 1C_1C ) )
@@ -514,7 +518,7 @@ static INPUT_PORTS_START( psikyo_common )
 	PORT_DIPSETTING(          0x04000000, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(          0x02000000, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(          0x00000000, "1C 6C [Free Play]" )
-	PORT_DIPNAME( 0x70000000, 0x70000000, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x70000000, 0x70000000, DEF_STR( Coin_B ) )	PORT_DIPLOCATION("SW1:5,6,7")
 	PORT_DIPSETTING(          0x50000000, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(          0x60000000, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(          0x70000000, DEF_STR( 1C_1C ) )
@@ -523,7 +527,7 @@ static INPUT_PORTS_START( psikyo_common )
 	PORT_DIPSETTING(          0x20000000, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(          0x10000000, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(          0x00000000, "1C 6C [Free Play]" )
-	PORT_DIPNAME( 0x80000000, 0x80000000, "2C Start, 1C Continue" )
+	PORT_DIPNAME( 0x80000000, 0x80000000, "2C Start, 1C Continue" )	PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(          0x80000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00000000, "On [Free Play]" ) // Forces 1C_1C
 INPUT_PORTS_END
@@ -579,12 +583,12 @@ static INPUT_PORTS_START( samuraia )
 	    1 1 1 0 Taiwan With FBI logo??
 
 	************************************************/
-	PORT_DIPNAME( 0x000000ff, 0x000000ff, DEF_STR( Region ) )
-	PORT_DIPSETTING(          0x000000ff, DEF_STR( World ) )
-	PORT_DIPSETTING(          0x000000ef, "USA & Canada" )
-	PORT_DIPSETTING(          0x000000df, DEF_STR( Korea ) )
-	PORT_DIPSETTING(          0x000000bf, DEF_STR( Hong_Kong ) )
-	PORT_DIPSETTING(          0x0000007f, DEF_STR( Taiwan ) )
+	PORT_CONFNAME( 0x000000ff, 0x000000ff, DEF_STR( Region ) )
+	PORT_CONFSETTING(          0x000000ff, DEF_STR( World ) )
+	PORT_CONFSETTING(          0x000000ef, "USA & Canada" )
+	PORT_CONFSETTING(          0x000000df, DEF_STR( Korea ) )
+	PORT_CONFSETTING(          0x000000bf, DEF_STR( Hong_Kong ) )
+	PORT_CONFSETTING(          0x0000007f, DEF_STR( Taiwan ) )
 	PORT_BIT( 0x0000ff00, IP_ACTIVE_LOW, IPT_UNKNOWN )  // unused?
 INPUT_PORTS_END
 
@@ -606,12 +610,12 @@ static INPUT_PORTS_START( sngkace )
 
 	************************************************/
 #if 0 // See Patch in MACHINE_RESET, only text not logo
-	PORT_DIPNAME( 0x000000ff, 0x000000ff, DEF_STR( Region ) )
-	PORT_DIPSETTING(          0x000000ff, DEF_STR( Japan ) )
-	PORT_DIPSETTING(          0x000000ef, "USA & Canada" )
-	PORT_DIPSETTING(          0x000000df, DEF_STR( Korea ) )
-	PORT_DIPSETTING(          0x000000bf, DEF_STR( Hong_Kong ) )
-	PORT_DIPSETTING(          0x0000007f, DEF_STR( Taiwan ) )
+	PORT_CONFNAME( 0x000000ff, 0x000000ff, DEF_STR( Region ) )
+	PORT_CONFSETTING(          0x000000ff, DEF_STR( Japan ) )
+	PORT_CONFSETTING(          0x000000ef, "USA & Canada" )
+	PORT_CONFSETTING(          0x000000df, DEF_STR( Korea ) )
+	PORT_CONFSETTING(          0x000000bf, DEF_STR( Hong_Kong ) )
+	PORT_CONFSETTING(          0x0000007f, DEF_STR( Taiwan ) )
 #endif
 	PORT_BIT( 0x000000ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
@@ -619,6 +623,12 @@ INPUT_PORTS_END
 
 /***************************************************************************
                                 Battle K-Road
+
+Handicap Mode: When you turn ON the Handicap Mode, if the sam player wins
+ consecutive matches against other players, the challenger will get a
+ handicap. However, it works only when the player challenges again while
+ counting down continuous games.
+
 ***************************************************************************/
 
 static INPUT_PORTS_START( btlkroad )
@@ -655,50 +665,42 @@ static INPUT_PORTS_START( btlkroad )
 	    Other   World
 
 	************************************************/
-	PORT_DIPNAME( 0x0000000f, 0x00000000, DEF_STR( Region ) )
-	PORT_DIPSETTING(          0x0000000f, DEF_STR( Japan ) )
-	PORT_DIPSETTING(          0x0000000e, "USA & Canada (Jaleco license)" )
-	PORT_DIPSETTING(          0x0000000c, DEF_STR( Korea ) )
-	PORT_DIPSETTING(          0x0000000a, DEF_STR( Hong_Kong ) )
-	PORT_DIPSETTING(          0x00000006, DEF_STR( Taiwan ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( World ) )
+	PORT_CONFNAME( 0x0000000f, 0x00000000, DEF_STR( Region ) )
+	PORT_CONFSETTING(          0x0000000f, DEF_STR( Japan ) )
+	PORT_CONFSETTING(          0x0000000e, "USA & Canada (Jaleco license)" )
+	PORT_CONFSETTING(          0x0000000c, DEF_STR( Korea ) )
+	PORT_CONFSETTING(          0x0000000a, DEF_STR( Hong_Kong ) )
+	PORT_CONFSETTING(          0x00000006, DEF_STR( Taiwan ) )
+	PORT_CONFSETTING(          0x00000000, DEF_STR( World ) )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_VBLANK("screen")   // vblank   ACTIVE_HIGH fixes slowdowns, but is it right?
 	// This DSW is used for debugging the game
-	PORT_DIPNAME( 0x00000100, 0x00000100, "Unknown 3-0" )   // tested!
+	PORT_DIPNAME( 0x00000100, 0x00000100, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW3:1")   // tested! - So leave as is until filled in
 	PORT_DIPSETTING(          0x00000100, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000200, 0x00000200, "Unknown 3-1" )   // tested!
+	PORT_DIPNAME( 0x00000200, 0x00000200, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW3:2")   // tested! - So leave as is until filled in
 	PORT_DIPSETTING(          0x00000200, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000400, 0x00000400, "Unknown 3-2" )
-	PORT_DIPSETTING(          0x00000400, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000800, 0x00000800, "Unknown 3-3" )
-	PORT_DIPSETTING(          0x00000800, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00001000, 0x00001000, "Unknown 3-4" )   // tested!
+	PORT_DIPUNUSED_DIPLOC( 0x00000400, IP_ACTIVE_LOW, "SW3:3" )
+	PORT_DIPUNUSED_DIPLOC( 0x00000800, IP_ACTIVE_LOW, "SW3:4" )
+	PORT_DIPNAME( 0x00001000, 0x00001000, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW3:5")   // tested! - So leave as is until filled in
 	PORT_DIPSETTING(          0x00001000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00002000, 0x00002000, "Unknown 3-5" )
-	PORT_DIPSETTING(          0x00002000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00004000, 0x00004000, "Unknown 3-6" )
-	PORT_DIPSETTING(          0x00004000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00008000, 0x00008000, "Unknown 3-7" )   // tested!
+	PORT_DIPUNUSED_DIPLOC( 0x00002000, IP_ACTIVE_LOW, "SW3:6" )
+	PORT_DIPUNUSED_DIPLOC( 0x00004000, IP_ACTIVE_LOW, "SW3:7" )
+	PORT_DIPNAME( 0x00008000, 0x00008000, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW3:8")   // tested! - So leave as is until filled in
 	PORT_DIPSETTING(          0x00008000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
 
-	PORT_DIPNAME( 0x00100000, 0x00100000, "Unknown 2-4" )   // used
-	PORT_DIPSETTING(          0x00100000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00200000, 0x00200000, "Unknown 2-5" )   // used (energy lost?)
+	PORT_DIPNAME( 0x00100000, 0x00100000, "Blood Effects" )		PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(          0x00000000, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00100000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00200000, 0x00200000, "Handicap Mode" )		PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(          0x00200000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00400000, 0x00400000, "Use DSW 3 (Debug)" )
+	PORT_DIPNAME( 0x00400000, 0x00400000, "Use DSW 3 (Debug)" )	PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(          0x00400000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -742,12 +744,12 @@ static INPUT_PORTS_START( gunbird )
 	Has no effects on Japan or Korea versions.
 
 	************************************************/
-	PORT_DIPNAME( 0x0000000f, 0x0000000f, DEF_STR( Region ) )
-	PORT_DIPSETTING(          0x0000000f, DEF_STR( World ) )
-	PORT_DIPSETTING(          0x0000000e, DEF_STR( USA ) )
-	PORT_DIPSETTING(          0x0000000d, DEF_STR( Korea ) )
-	PORT_DIPSETTING(          0x0000000b, DEF_STR( Hong_Kong ) )
-	PORT_DIPSETTING(          0x00000007, DEF_STR( Taiwan ) )
+	PORT_CONFNAME( 0x0000000f, 0x0000000f, DEF_STR( Region ) )
+	PORT_CONFSETTING(          0x0000000f, DEF_STR( World ) )
+	PORT_CONFSETTING(          0x0000000e, DEF_STR( USA ) )
+	PORT_CONFSETTING(          0x0000000d, DEF_STR( Korea ) )
+	PORT_CONFSETTING(          0x0000000b, DEF_STR( Hong_Kong ) )
+	PORT_CONFSETTING(          0x00000007, DEF_STR( Taiwan ) )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -766,10 +768,7 @@ static INPUT_PORTS_START( gunbirdj )
 	PORT_INCLUDE( gunbird )
 
 	PORT_MODIFY("DSW")      /* c00004 -> c00007 */
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0000000f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
@@ -812,12 +811,12 @@ static INPUT_PORTS_START( s1945 )
 	No effect on set s1945j or s1945k
 
 	************************************************/
-	PORT_DIPNAME( 0x0000000f, 0x0000000f, DEF_STR( Region ) )
-	PORT_DIPSETTING(          0x0000000f, DEF_STR( World ) )
-	PORT_DIPSETTING(          0x0000000e, "USA & Canada" )
-	PORT_DIPSETTING(          0x0000000d, DEF_STR( Korea ) )
-	PORT_DIPSETTING(          0x0000000b, DEF_STR( Hong_Kong ) )
-	PORT_DIPSETTING(          0x00000007, DEF_STR( Taiwan ) )
+	PORT_CONFNAME( 0x0000000f, 0x0000000f, DEF_STR( Region ) )
+	PORT_CONFSETTING(          0x0000000f, DEF_STR( World ) )
+	PORT_CONFSETTING(          0x0000000e, "USA & Canada" )
+	PORT_CONFSETTING(          0x0000000d, DEF_STR( Korea ) )
+	PORT_CONFSETTING(          0x0000000b, DEF_STR( Hong_Kong ) )
+	PORT_CONFSETTING(          0x00000007, DEF_STR( Taiwan ) )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -831,10 +830,14 @@ static INPUT_PORTS_START( s1945 )
 	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_UNKNOWN )  // tested!
 
-	PORT_DIPNAME( 0x00400000, 0x00400000, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x00400000, 0x00400000, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(          0x00400000, "600K" )
 	PORT_DIPSETTING(          0x00000000, "800K" )
-	PORT_DIPNAME( 0x0e000000, 0x0e000000, DEF_STR( Coin_A ) )
+
+	PORT_DIPNAME( 0x01000000, 0x01000000, "Coin Slot" )		PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(          0x01000000, "Shared" )
+	PORT_DIPSETTING(          0x00000000, "Individual" )
+	PORT_DIPNAME( 0x0e000000, 0x0e000000, DEF_STR( Coin_A ) )	PORT_DIPLOCATION("SW1:2,3,4")
 	PORT_DIPSETTING(          0x0a000000, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(          0x0c000000, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(          0x0e000000, DEF_STR( 1C_1C ) )
@@ -843,7 +846,7 @@ static INPUT_PORTS_START( s1945 )
 	PORT_DIPSETTING(          0x04000000, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(          0x02000000, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x70000000, 0x70000000, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x70000000, 0x70000000, DEF_STR( Coin_B ) )	PORT_DIPLOCATION("SW1:5,6,7")
 	PORT_DIPSETTING(          0x50000000, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(          0x60000000, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(          0x70000000, DEF_STR( 1C_1C ) )
@@ -852,7 +855,7 @@ static INPUT_PORTS_START( s1945 )
 	PORT_DIPSETTING(          0x20000000, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(          0x10000000, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x80000000, 0x80000000, "2C Start, 1C Continue" )
+	PORT_DIPNAME( 0x80000000, 0x80000000, "2C Start, 1C Continue" )	PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(          0x80000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) ) // Forces 1C_1C
 INPUT_PORTS_END
@@ -868,20 +871,16 @@ static INPUT_PORTS_START( s1945a )
 	Bit 0 1 2 3
 	    1 1 1 1 Japan, anything but 0x0f = "World"
 	************************************************/
-	PORT_DIPNAME( 0x0000000f, 0x0000000f, DEF_STR( Region ) )
-	PORT_DIPSETTING(          0x0000000f, DEF_STR( Japan ) )
-	PORT_DIPSETTING(          0x0000000e, DEF_STR( World ) )
+	PORT_CONFNAME( 0x0000000f, 0x0000000f, DEF_STR( Region ) )
+	PORT_CONFSETTING(          0x0000000f, DEF_STR( Japan ) )
+	PORT_CONFSETTING(          0x0000000e, DEF_STR( World ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( s1945j )
 	PORT_INCLUDE( s1945 )
 
 	PORT_MODIFY("DSW")
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0000000f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( s1945bl )
@@ -928,12 +927,12 @@ static INPUT_PORTS_START( tengai )
 	    1 1 1 0 Taiwan
 
 	************************************************/
-	PORT_DIPNAME( 0x0000000f, 0x0000000f, DEF_STR( Region ) )
-	PORT_DIPSETTING(          0x0000000f, DEF_STR( World ) )
-	PORT_DIPSETTING(          0x0000000e, "USA & Canada" )
-	PORT_DIPSETTING(          0x0000000d, DEF_STR( Korea ) )
-	PORT_DIPSETTING(          0x0000000b, DEF_STR( Hong_Kong ) )
-	PORT_DIPSETTING(          0x00000007, DEF_STR( Taiwan ) )
+	PORT_CONFNAME( 0x0000000f, 0x0000000f, DEF_STR( Region ) )
+	PORT_CONFSETTING(          0x0000000f, DEF_STR( World ) )
+	PORT_CONFSETTING(          0x0000000e, "USA & Canada" )
+	PORT_CONFSETTING(          0x0000000d, DEF_STR( Korea ) )
+	PORT_CONFSETTING(          0x0000000b, DEF_STR( Hong_Kong ) )
+	PORT_CONFSETTING(          0x00000007, DEF_STR( Taiwan ) )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -947,7 +946,7 @@ static INPUT_PORTS_START( tengai )
 	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_UNKNOWN )  // tested!
 
-	PORT_DIPNAME( 0x00400000, 0x00400000, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x00400000, 0x00400000, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(          0x00400000, "600K" )
 	PORT_DIPSETTING(          0x00000000, "800K" )
 INPUT_PORTS_END
@@ -966,9 +965,9 @@ static INPUT_PORTS_START( tengaij )
 	Text for other regions is present though.
 
 	************************************************/
-	PORT_DIPNAME( 0x0000000f, 0x0000000f, DEF_STR( Region ) )
-	PORT_DIPSETTING(          0x0000000f, DEF_STR( Japan ) )
-	PORT_DIPSETTING(          0x0000000e, DEF_STR( World ) )
+	PORT_CONFNAME( 0x0000000f, 0x0000000f, DEF_STR( Region ) )
+	PORT_CONFSETTING(          0x0000000f, DEF_STR( Japan ) )
+	PORT_CONFSETTING(          0x0000000e, DEF_STR( World ) )
 INPUT_PORTS_END
 
 
