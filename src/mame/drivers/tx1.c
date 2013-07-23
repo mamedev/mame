@@ -534,7 +534,7 @@ static ADDRESS_MAP_START( tx1_sound_prg, AS_PROGRAM, 8, tx1_state )
 	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_MIRROR(0x800) AM_SHARE("z80_ram")
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(z80_intreq_w)
 	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-	AM_RANGE(0x6000, 0x6003) AM_DEVREADWRITE_LEGACY("tx1", tx1_pit8253_r, tx1_pit8253_w)
+	AM_RANGE(0x6000, 0x6003) AM_DEVREADWRITE("tx1", tx1_sound_device, pit8253_r, pit8253_w)
 	AM_RANGE(0x7000, 0x7fff) AM_WRITE(tx1_ppi_latch_w)
 	AM_RANGE(0xb000, 0xbfff) AM_READWRITE(ts_r, ts_w)
 ADDRESS_MAP_END
@@ -598,7 +598,7 @@ static ADDRESS_MAP_START( buggyboy_sound_prg, AS_PROGRAM, 8, tx1_state )
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("z80_ram")
 	AM_RANGE(0x6000, 0x6001) AM_READ(bb_analog_r)
 	AM_RANGE(0x6800, 0x6803) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-	AM_RANGE(0x7000, 0x7003) AM_DEVREADWRITE_LEGACY("buggyboy", tx1_pit8253_r, tx1_pit8253_w)
+	AM_RANGE(0x7000, 0x7003) AM_DEVREADWRITE("buggyboy", buggyboy_sound_device, pit8253_r, pit8253_w)
 	AM_RANGE(0x7800, 0x7800) AM_WRITE(z80_intreq_w)
 	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(ts_r, ts_w)
 ADDRESS_MAP_END
@@ -607,7 +607,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( buggybjr_sound_prg, AS_PROGRAM, 8, tx1_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("z80_ram")
-	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE_LEGACY("buggyboy", tx1_pit8253_r, tx1_pit8253_w)
+	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("buggyboy", buggyboy_sound_device, pit8253_r, pit8253_w)
 	AM_RANGE(0x6000, 0x6001) AM_READ(bbjr_analog_r)
 	AM_RANGE(0x7000, 0x7000) AM_WRITE(z80_intreq_w)
 	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(ts_r, ts_w)
@@ -635,8 +635,8 @@ static const ay8910_interface tx1_ay8910_interface =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER("tx1", tx1_ay8910_a_w),
-	DEVCB_DEVICE_HANDLER("tx1", tx1_ay8910_b_w),
+	DEVCB_DEVICE_MEMBER("tx1", tx1_sound_device, ay8910_a_w),
+	DEVCB_DEVICE_MEMBER("tx1", tx1_sound_device, ay8910_b_w),
 };
 
 
@@ -646,7 +646,7 @@ static const ay8910_interface buggyboy_ym2149_interface_1 =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER("buggyboy", bb_ym1_a_w),
+	DEVCB_DEVICE_MEMBER("buggyboy", buggyboy_sound_device, ym1_a_w),
 	DEVCB_NULL,
 };
 
@@ -656,8 +656,8 @@ static const ay8910_interface buggyboy_ym2149_interface_2 =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER("buggyboy", bb_ym2_a_w),
-	DEVCB_DEVICE_HANDLER("buggyboy", bb_ym2_b_w),
+	DEVCB_DEVICE_MEMBER("buggyboy", buggyboy_sound_device, ym2_a_w),
+	DEVCB_DEVICE_MEMBER("buggyboy", buggyboy_sound_device, ym2_b_w),
 };
 
 
@@ -679,8 +679,8 @@ static const ay8910_interface buggybjr_ym2149_interface_2 =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER("buggyboy", bb_ym2_a_w),
-	DEVCB_DEVICE_HANDLER("buggyboy", bb_ym2_b_w),
+	DEVCB_DEVICE_MEMBER("buggyboy", buggyboy_sound_device, ym2_a_w),
+	DEVCB_DEVICE_MEMBER("buggyboy", buggyboy_sound_device, ym2_b_w),
 };
 
 
