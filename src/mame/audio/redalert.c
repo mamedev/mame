@@ -14,7 +14,6 @@
 #include "cpu/i8085/i8085.h"
 #include "machine/6821pia.h"
 #include "sound/ay8910.h"
-#include "sound/hc55516.h"
 #include "includes/redalert.h"
 #include "drivlgcy.h"
 
@@ -162,13 +161,13 @@ WRITE8_MEMBER(redalert_state::redalert_voice_command_w)
 
 WRITE_LINE_MEMBER(redalert_state::sod_callback)
 {
-	hc55516_digit_w(machine().device("cvsd"), state);
+	m_cvsd->digit_w(state);
 }
 
 
 READ_LINE_MEMBER(redalert_state::sid_callback)
 {
-	return hc55516_clock_state_r(machine().device("cvsd"));
+	return m_cvsd->clock_state_r();
 }
 
 

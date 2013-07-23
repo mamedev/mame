@@ -417,7 +417,7 @@ static MC6852_INTERFACE( ssda_intf )
 	0,
 	0,
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE(HC55516_TAG, hc55516_digit_w),
+	DEVCB_DEVICE_LINE_MEMBER(HC55516_TAG, hc55516_device, digit_w),
 	DEVCB_DRIVER_LINE_MEMBER(victor9k_state, ssda_irq_w),
 	DEVCB_NULL,
 	DEVCB_NULL,

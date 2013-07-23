@@ -168,8 +168,8 @@ WRITE8_MEMBER(williams_cvsd_sound_device::talkback_w)
 
 WRITE8_MEMBER(williams_cvsd_sound_device::cvsd_digit_clock_clear_w)
 {
-	hc55516_digit_w(m_hc55516, data);
-	hc55516_clock_w(m_hc55516, 0);
+	m_hc55516->digit_w(data);
+	m_hc55516->clock_w(0);
 }
 
 
@@ -179,7 +179,7 @@ WRITE8_MEMBER(williams_cvsd_sound_device::cvsd_digit_clock_clear_w)
 
 WRITE8_MEMBER(williams_cvsd_sound_device::cvsd_clock_set_w)
 {
-	hc55516_clock_w(m_hc55516, 1);
+	m_hc55516->clock_w(1);
 }
 
 
@@ -524,8 +524,8 @@ WRITE8_MEMBER(williams_narc_sound_device::slave_sync_w)
 
 WRITE8_MEMBER(williams_narc_sound_device::cvsd_digit_clock_clear_w)
 {
-	hc55516_digit_w(m_hc55516, data);
-	hc55516_clock_w(m_hc55516, 0);
+	m_hc55516->digit_w(data);
+	m_hc55516->clock_w(0);
 }
 
 
@@ -535,7 +535,7 @@ WRITE8_MEMBER(williams_narc_sound_device::cvsd_digit_clock_clear_w)
 
 WRITE8_MEMBER(williams_narc_sound_device::cvsd_clock_set_w)
 {
-	hc55516_clock_w(m_hc55516, 1);
+	m_hc55516->clock_w(1);
 }
 
 

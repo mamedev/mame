@@ -96,7 +96,7 @@ const pia6821_interface lottofun_pia_0_intf =
 const pia6821_interface sinistar_snd_pia_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B,CA/B2       */ DEVCB_DEVICE_MEMBER("wmsdac", dac_device, write_unsigned8), DEVCB_NULL, DEVCB_DEVICE_LINE("cvsd", hc55516_digit_w), DEVCB_DEVICE_LINE("cvsd", hc55516_clock_w),
+	/*outputs: A/B,CA/B2       */ DEVCB_DEVICE_MEMBER("wmsdac", dac_device, write_unsigned8), DEVCB_NULL, DEVCB_DEVICE_LINE_MEMBER("cvsd", hc55516_device, digit_w), DEVCB_DEVICE_LINE_MEMBER("cvsd", hc55516_device, clock_w),
 	/*irqs   : A/B             */ DEVCB_DRIVER_LINE_MEMBER(williams_state,williams_snd_irq), DEVCB_DRIVER_LINE_MEMBER(williams_state,williams_snd_irq)
 };
 

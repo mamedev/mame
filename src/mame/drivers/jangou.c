@@ -43,7 +43,8 @@ public:
 		m_cpu_0(*this, "cpu0"),
 		m_cpu_1(*this, "cpu1"),
 		m_nsc(*this, "nsc"),
-		m_msm(*this, "msm") { }
+		m_msm(*this, "msm"),
+		m_cvsd(*this, "cvsd") { }
 
 	/* sound-related */
 	// Jangou CVSD Sound
@@ -62,8 +63,9 @@ public:
 	/* devices */
 	required_device<cpu_device> m_cpu_0;
 	optional_device<cpu_device> m_cpu_1;
-	device_t *m_cvsd;
 	optional_device<cpu_device> m_nsc;
+	optional_device<msm5205_device> m_msm;
+	optional_device<hc55516_device> m_cvsd;
 
 	/* video-related */
 	UINT8        m_pen_data[0x10];
@@ -99,7 +101,6 @@ public:
 	UINT8 jangou_gfx_nibble( UINT16 niboffset );
 	void plot_jangou_gfx_pixel( UINT8 pix, int x, int y );
 	DECLARE_WRITE_LINE_MEMBER(jngolady_vclk_cb);
-	optional_device<msm5205_device> m_msm;
 };
 
 
@@ -338,7 +339,7 @@ WRITE8_MEMBER(jangou_state::cvsd_w)
 TIMER_CALLBACK_MEMBER(jangou_state::cvsd_bit_timer_callback)
 {
 	/* Data is shifted out at the MSB */
-	hc55516_digit_w(m_cvsd, (m_cvsd_shiftreg >> 7) & 1);
+	m_cvsd->digit_w((m_cvsd_shiftreg >> 7) & 1);
 	m_cvsd_shiftreg <<= 1;
 
 	/* Trigger an IRQ for every 8 shifted bits */
@@ -922,8 +923,6 @@ static SOUND_START( jangou )
 
 MACHINE_START_MEMBER(jangou_state,common)
 {
-	m_cvsd = machine().device("cvsd");
-
 	save_item(NAME(m_pen_data));
 	save_item(NAME(m_blit_data));
 	save_item(NAME(m_mux_data));

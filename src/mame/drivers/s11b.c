@@ -152,13 +152,13 @@ MACHINE_RESET_MEMBER( s11b_state, s11b )
 WRITE8_MEMBER( s11b_state::bg_speech_clock_w )
 {
 	// pulses clock input?
-	hc55516_clock_w(m_bg_hc55516, 1);
-	hc55516_clock_w(m_bg_hc55516, 0);
+	m_bg_hc55516->clock_w(1);
+	m_bg_hc55516->clock_w(0);
 }
 
 WRITE8_MEMBER( s11b_state::bg_speech_digit_w )
 {
-	hc55516_digit_w(m_bg_hc55516, data);
+	m_bg_hc55516->digit_w(data);
 }
 
 static const pia6821_interface pia21_intf =

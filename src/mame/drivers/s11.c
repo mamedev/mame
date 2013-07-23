@@ -424,14 +424,14 @@ WRITE_LINE_MEMBER( s11_state::pias_ca2_w )
 {
 // speech clock
 	if(m_hc55516)
-		hc55516_clock_w(m_hc55516, state);
+		m_hc55516->clock_w(state);
 }
 
 WRITE_LINE_MEMBER( s11_state::pias_cb2_w )
 {
 // speech data
 	if(m_hc55516)
-		hc55516_digit_w(m_hc55516, state);
+		m_hc55516->digit_w(state);
 }
 
 READ8_MEMBER( s11_state::dac_r )

@@ -103,7 +103,7 @@ struct exidy_sound_state
 	int m_has_sh8253;
 
 	/* 5220/CVSD variables */
-	device_t *m_cvsd;
+	hc55516_device *m_cvsd;
 	tms5220_device *m_tms;
 	pia6821_device *m_pia1;
 
@@ -851,7 +851,7 @@ static DEVICE_START( venture_common_sh_start )
 	state->m_pia1 = device->machine().device<pia6821_device>("pia1");
 
 	/* determine which sound hardware is installed */
-	state->m_cvsd = device->machine().device("cvsd");
+	state->m_cvsd = device->machine().device<hc55516_device>("cvsd");
 
 	/* 8253 */
 	state->m_freq_to_step = (double)(1 << 24) / (double)SH8253_CLOCK;
@@ -975,7 +975,7 @@ static WRITE8_DEVICE_HANDLER( mtrap_voiceio_w )
 	exidy_sound_state *state = get_safe_token(device);
 
 	if (!(offset & 0x10))
-		hc55516_digit_w(state->m_cvsd, data & 1);
+		state->m_cvsd->digit_w(data & 1);
 
 	if (!(offset & 0x20))
 		state->m_riot->portb_in_set(data & 1, 0xff);
@@ -996,7 +996,7 @@ static READ8_DEVICE_HANDLER( mtrap_voiceio_r )
 	}
 
 	if (!(offset & 0x40))
-		return hc55516_clock_state_r(state->m_cvsd) << 7;
+		return state->m_cvsd->clock_state_r() << 7;
 
 	return 0;
 }
