@@ -234,7 +234,7 @@ WRITE_LINE_MEMBER(stfight_state::stfight_adpcm_int)
 
 WRITE8_MEMBER(stfight_state::stfight_adpcm_control_w)
 {
-	if( data < 0x08 )
+	if( data < ARRAY_LENGTH(sampleLimits) )
 	{
 		m_adpcm_data_offs = sampleLimits[data];
 		m_adpcm_data_end = sampleLimits[data+1];
