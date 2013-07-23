@@ -45,6 +45,7 @@ public:
 	DECLARE_WRITE8_MEMBER(stfight_coin_w);
 	DECLARE_WRITE8_MEMBER(stfight_e800_w);
 	DECLARE_WRITE8_MEMBER(stfight_fm_w);
+	DECLARE_WRITE8_MEMBER(cshooter_fm_w);
 	DECLARE_READ8_MEMBER(stfight_fm_r);
 	DECLARE_WRITE8_MEMBER(stfight_bank_w);
 	DECLARE_WRITE8_MEMBER(stfight_text_char_w);

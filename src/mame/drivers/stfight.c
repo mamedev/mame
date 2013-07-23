@@ -218,8 +218,8 @@ conventional RAM. See the memory map for sprite data format.
  ****************************************************************************
 
 TODO:
-- MCU is identical between Empire City and Cross Shooter, I guess it's coinage
-  related.
+- MCU is identical between Empire City and Cross Shooter, it's ADPCM and
+  perhaps coinage related too.
 - palette is incorporated - fix!!!
 - handle transparency in text layer properly (how?)
 - second bank of sf02 is this used? (probably NOT)
@@ -263,6 +263,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cshooter_cpu1_map, AS_PROGRAM, 8, stfight_state )
 	/* wants 0xff at PC=0x9a otherwise it won't boot, MCU related? */
 	AM_RANGE(0x0007, 0x0007) AM_READ(cshooter_mcu_unk1_r)
+	AM_RANGE(0xc500, 0xc500) AM_WRITE(cshooter_fm_w)               /* play fm sound */
 	AM_RANGE(0xc801, 0xc801) AM_WRITE(stfight_bank_w)
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(cshooter_text_w) AM_SHARE("tx_vram")
 	AM_RANGE(0xe000, 0xfdff) AM_RAM
@@ -533,8 +534,10 @@ static MACHINE_CONFIG_START( stfight, stfight_state )
 	MCFG_CPU_PROGRAM_MAP(cpu2_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(stfight_state, irq0_line_hold, 120)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+	MCFG_CPU_ADD("mcu", M68705, 6000000)   /* 6 MHz? */
+	MCFG_CPU_PROGRAM_MAP(cshooter_mcu_map)
 
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -579,9 +582,6 @@ static MACHINE_CONFIG_DERIVED( cshooter, stfight )
 	MCFG_CPU_PERIODIC_INT_DRIVER(stfight_state, irq0_line_hold, 120)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
-
-	MCFG_CPU_ADD("mcu", M68705, 6000000)   /* 6 MHz? */
-	MCFG_CPU_PROGRAM_MAP(cshooter_mcu_map)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(stfight_state, screen_update_cshooter)
@@ -660,6 +660,10 @@ ROM_START( empcityu )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the second CPU */
 	ROM_LOAD( "ec_04.rom",  0x0000,  0x8000, CRC(aa3e7d1e) SHA1(da350384d55f011253d19ce17fc327cd2604257f) )
 
+	// not hooked up yet, what's it for, coinage?
+	ROM_REGION( 0x0800, "mcu", 0 )
+	ROM_LOAD( "empirecity_68705.bin",  0x0000,  0x0800, CRC(182f7616) SHA1(38b4f23a559ae13f8ca1b974407a2a40fc52879f) )
+
 	ROM_REGION( 0x02000, "gfx1", 0 )    /* character data */
 	ROM_LOAD( "vid.2p",   0x0000, 0x2000, CRC(15593793) SHA1(ac9ca8a0aa0ce3810f45aa41e74d4946ecced245) )
 
@@ -714,6 +718,10 @@ ROM_START( empcityj )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the second CPU */
 	ROM_LOAD( "ec_04.rom",  0x0000,  0x8000, CRC(aa3e7d1e) SHA1(da350384d55f011253d19ce17fc327cd2604257f) )
 
+	// not hooked up yet, what's it for, coinage?
+	ROM_REGION( 0x0800, "mcu", 0 )
+	ROM_LOAD( "empirecity_68705.bin",  0x0000,  0x0800, CRC(182f7616) SHA1(38b4f23a559ae13f8ca1b974407a2a40fc52879f) )
+
 	ROM_REGION( 0x02000, "gfx1", 0 )    /* character data */
 	ROM_LOAD( "sf17.bin",   0x0000, 0x2000, CRC(1b3706b5) SHA1(61f069329a7a836523ffc8cce915b0d0129fd896) )
 
@@ -764,6 +772,10 @@ ROM_START( stfight )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the second CPU */
 	ROM_LOAD( "sf03.bin",   0x0000,  0x8000, CRC(6a8cb7a6) SHA1(dc123cc48d3623752b78e7c23dd8d2f5adf84f92) )
+
+	// not hooked up yet, what's it for, coinage?
+	ROM_REGION( 0x0800, "mcu", 0 )
+	ROM_LOAD( "empirecity_68705.bin",  0x0000,  0x0800, CRC(182f7616) SHA1(38b4f23a559ae13f8ca1b974407a2a40fc52879f) )
 
 	ROM_REGION( 0x02000, "gfx1", 0 )    /* character data */
 	ROM_LOAD( "sf17.bin",   0x0000, 0x2000, CRC(1b3706b5) SHA1(61f069329a7a836523ffc8cce915b0d0129fd896) )
@@ -818,6 +830,10 @@ ROM_START( stfighta )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the second CPU */
 	ROM_LOAD( "sf03.bin",   0x0000,  0x8000, CRC(6a8cb7a6) SHA1(dc123cc48d3623752b78e7c23dd8d2f5adf84f92) )
 
+	// not hooked up yet, what's it for, coinage?
+	ROM_REGION( 0x0800, "mcu", 0 )
+	ROM_LOAD( "empirecity_68705.bin",  0x0000,  0x0800, CRC(182f7616) SHA1(38b4f23a559ae13f8ca1b974407a2a40fc52879f) )
+
 	ROM_REGION( 0x02000, "gfx1", 0 )    /* character data */
 	ROM_LOAD( "sf17.bin",   0x0000, 0x2000, CRC(1b3706b5) SHA1(61f069329a7a836523ffc8cce915b0d0129fd896) )
 
@@ -868,6 +884,10 @@ ROM_START( empcityi ) // very similar to above set
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the second CPU */
 	ROM_LOAD( "sf03.bin",   0x0000,  0x8000, CRC(6a8cb7a6) SHA1(dc123cc48d3623752b78e7c23dd8d2f5adf84f92) )
+
+	// not hooked up yet, what's it for, coinage?
+	ROM_REGION( 0x0800, "mcu", 0 )
+	ROM_LOAD( "empirecity_68705.bin",  0x0000,  0x0800, CRC(182f7616) SHA1(38b4f23a559ae13f8ca1b974407a2a40fc52879f) )
 
 	ROM_REGION( 0x02000, "gfx1", 0 )    /* character data */
 	ROM_LOAD( "sf17.bin",   0x0000, 0x2000, CRC(1b3706b5) SHA1(61f069329a7a836523ffc8cce915b0d0129fd896) )

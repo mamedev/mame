@@ -245,6 +245,11 @@ WRITE8_MEMBER(stfight_state::stfight_adpcm_control_w)
 		m_adpcm_data_end = sampleLimits[data+1];
 	}
 
+	m_mcu->set_input_line(0, HOLD_LINE);
+	m_from_main = data;
+	m_main_sent = 1;
+//	m_maincpu->set_input_line(INPUT_LINE_NMI,PULSE_LINE);
+
 	m_msm->reset_w(BIT(data, 3));
 }
 
@@ -260,6 +265,11 @@ WRITE8_MEMBER(stfight_state::stfight_fm_w)
 {
 	// the sound cpu ignores any fm data without bit 7 set, it's very likely to be xor'ed and both CPUs can write to it.
 	m_fm_data = 0x80 ^ data;
+}
+
+WRITE8_MEMBER(stfight_state::cshooter_fm_w)
+{
+	m_fm_data = data;
 }
 
 READ8_MEMBER(stfight_state::stfight_fm_r)
@@ -307,6 +317,8 @@ READ8_MEMBER(stfight_state::cshooter_68705_port_a_r)
 
 WRITE8_MEMBER(stfight_state::cshooter_68705_port_a_w)
 {
+	// ADPCM start offset goes there
+	// TODO: where's end offset?
 	m_portA_out = data;
 }
 
@@ -339,10 +351,13 @@ WRITE8_MEMBER(stfight_state::cshooter_68705_port_b_w)
 	}
 	if ((m_ddrB & 0x20) && (data & 0x20) && (~m_portB_out & 0x20))
 	{
-		m_portA_in = m_from_main;
+		//printf("bit 5\n");
+		m_portB_in = m_from_main;
 
-		//if (m_main_sent)
-		//  m_mcu->set_input_line(0, CLEAR_LINE);
+		if (m_main_sent)
+		{
+			//m_mcu->set_input_line(0, CLEAR_LINE);
+		}
 
 		m_main_sent = 0;
 	}
