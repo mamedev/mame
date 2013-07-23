@@ -20,6 +20,12 @@
 
     Valid regions: US = USA, CAN = Canada, ENG = England, EUR = Euro, SWD = Sweden, AUS = Australia, NZ  = New Zealand, SA  = South Africa
 
+    Note:
+        Golden Tee Fore! 2004 & Golden Tee Fore! 2005 had updates called "Extra" that installed 2 additional courses.
+         It's unknown if the Extra version required a different security chip or simply validation with IT's servers.
+        There are "8-meg" versions of Big Buck Hunter: Call of the Wild to upgrade Eagle PCBs with only 8 megs of main
+         memory. This was common for the ealier Big Buck Hunter series. The security chip is labeled CW-US-8
+
     Hardware overview:
         * NEC VR4310 CPU (similar to the N64's VR4300)
         * NEC VR4373 "Nile 3" system controller / PCI bridge
@@ -255,6 +261,11 @@ MACHINE_CONFIG_END
 	ROM_LOAD( "e2-card1.u22.jed", 0x000000, 0x000bd1, CRC(9d1e1ace) SHA1(287d6a30e9f32137ef4eba54f0effa092c97a6eb) ) \
 	ROM_LOAD( "e2-res3.u117.jed", 0x001000, 0x000bd1, CRC(4f1ff45a) SHA1(213cbdd6cd37ad9b5bfc9545084892a68d29f5ff) )
 
+/*
+17s20lpc_sb4.u26 & 17s20lpc_sb5.u26 are alternate versions of configuration data for GREEN boards only.
+17s50a_red1.u26 is configuration data for RED boards only.
+*/
+
 ROM_START( iteagle )
 	EAGLE_BIOS
 
@@ -264,26 +275,38 @@ ROM_END
 ROM_START( gtfore02 )
 	EAGLE_BIOS
 
+	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
+	ROM_LOAD( "g42-us-u.u53", 0x0000, 0x0880, CRC(06e0b452) SHA1(f6b865799cb94941e0e77453b9d556d5988b0194) )
+
 	DISK_REGION( "ata:0:hdd:image" )
-	DISK_IMAGE( "gt2002", 0, SHA1(e902b91bd739daee0b95b10e5cf33700dd63a76b) )
+	DISK_IMAGE( "golf_fore_2002_v2.01.04_umv", 0, SHA1(e902b91bd739daee0b95b10e5cf33700dd63a76b) ) /* Labeled Golf Fore! V2.01.04 UMV */
 ROM_END
 
 ROM_START( gtfore02o )
 	EAGLE_BIOS
 
+	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
+	ROM_LOAD( "g42-us-u.u53", 0x0000, 0x0880, CRC(06e0b452) SHA1(f6b865799cb94941e0e77453b9d556d5988b0194) )
+
 	DISK_REGION( "ata:0:hdd:image" )
-	DISK_IMAGE( "gt2002o", 0, SHA1(d789ef86837a5012beb224c487537dd563d93886) )
+	DISK_IMAGE( "golf_fore_2002_v2.00.00", 0, SHA1(d789ef86837a5012beb224c487537dd563d93886) ) /* Labeled Golf Fore! 2002 V2.00.00 */
 ROM_END
 
 ROM_START( carnking )
 	EAGLE_BIOS
 
+	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
+	ROM_LOAD( "ck1-us.u53", 0x0000, 0x0880, NO_DUMP )
+
 	DISK_REGION( "ata:0:hdd:image" )
-	DISK_IMAGE( "carnking", 0, SHA1(c819af66d36df173ab17bf42f4045c7cca3203d8) )
+	DISK_IMAGE( "carnival_king_v_1.00.11", 0, SHA1(c819af66d36df173ab17bf42f4045c7cca3203d8) ) /* Labeled Carnival King V 1.00.11 */
 ROM_END
 
 ROM_START( gtfore04 )
 	EAGLE_BIOS
+
+	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
+	ROM_LOAD( "g44-us-u.u53", 0x0000, 0x0880, NO_DUMP )
 
 	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "gt2004", 0, SHA1(739a52d6ce13bb6ac7a543ee0e8086fb66be19b9) )
@@ -291,6 +314,9 @@ ROM_END
 
 ROM_START( gtfore05 )
 	EAGLE_BIOS
+
+	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
+	ROM_LOAD( "g45-us-u.u53", 0x0000, 0x0880, NO_DUMP )
 
 	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "gt2005", 0, SHA1(d8de569d8cf97b5aaada10ce896eb3c75f1b37f1) )
