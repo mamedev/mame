@@ -234,7 +234,6 @@ Who Dunnit           1988  6809
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/nvram.h"
-#include "audio/exidy440.h"
 #include "includes/exidy440.h"
 
 
@@ -342,7 +341,7 @@ READ8_MEMBER(exidy440_state::exidy440_input_port_3_r)
 READ8_MEMBER(exidy440_state::sound_command_ack_r)
 {
 	/* sound command acknowledgements come on bit 3 here */
-	return exidy440_sound_command_ack(m_custom) ? 0xf7 : 0xff;
+	return m_custom->exidy440_sound_command_ack() ? 0xf7 : 0xff;
 }
 
 
@@ -355,7 +354,7 @@ READ8_MEMBER(exidy440_state::sound_command_ack_r)
 
 TIMER_CALLBACK_MEMBER(exidy440_state::delayed_sound_command_w)
 {
-	exidy440_sound_command(m_custom, param);
+	m_custom->exidy440_sound_command(param);
 }
 
 
@@ -444,7 +443,6 @@ void exidy440_state::machine_start()
 	/* the EEROM lives in the uppermost 8k of the top bank */
 	UINT8 *rom = memregion("maincpu")->base();
 
-	m_custom = machine().device("custom");
 	machine().device<nvram_device>("nvram")->set_base(&rom[0x10000 + 15 * 0x4000 + 0x2000], 0x2000);
 }
 

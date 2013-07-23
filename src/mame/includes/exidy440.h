@@ -4,6 +4,8 @@
 
 *************************************************************************/
 
+#include "audio/exidy440.h"
+
 #define EXIDY440_MASTER_CLOCK       (XTAL_12_9792MHz)
 
 
@@ -15,12 +17,16 @@ public:
 		m_imageram(*this, "imageram"),
 		m_spriteram(*this, "spriteram"),
 		m_scanline(*this, "scanline"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_custom(*this, "custom") { }
 
 	required_shared_ptr<UINT8> m_imageram;
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_scanline;
-
+	
+	required_device<cpu_device> m_maincpu;
+	required_device<exidy440_sound_device> m_custom;
+	
 	UINT8 m_bank;
 	const UINT8 *m_showdown_bank_data[2];
 	INT8 m_showdown_bank_select;
@@ -35,7 +41,6 @@ public:
 	UINT8 m_firq_select;
 	UINT8 m_palettebank_io;
 	UINT8 m_palettebank_vis;
-	device_t *m_custom;
 	DECLARE_WRITE8_MEMBER(bankram_w);
 	DECLARE_READ8_MEMBER(exidy440_input_port_3_r);
 	DECLARE_READ8_MEMBER(sound_command_ack_r);
@@ -76,7 +81,6 @@ public:
 	TIMER_CALLBACK_MEMBER(collide_firq_callback);
 	void exidy440_update_firq();
 	void exidy440_bank_select(UINT8 bank);
-	required_device<cpu_device> m_maincpu;
 };
 
 

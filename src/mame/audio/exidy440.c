@@ -10,7 +10,6 @@
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "audio/exidy440.h"
-#include "devlegcy.h"
 
 
 #define SOUND_LOG       0
@@ -37,72 +36,6 @@
 #define FILTER_MAX              1.0954
 #define SAMPLE_GAIN             10000.0
 
-
-/* channel_data structure holds info about each 6844 DMA channel */
-struct m6844_channel_data
-{
-	int active;
-	int address;
-	int counter;
-	UINT8 control;
-	int start_address;
-	int start_counter;
-};
-
-
-/* channel_data structure holds info about each active sound channel */
-struct sound_channel_data
-{
-	INT16 *base;
-	int offset;
-	int remaining;
-};
-
-
-/* sound_cache_entry structure contains info on each decoded sample */
-struct sound_cache_entry
-{
-	struct sound_cache_entry *next;
-	int address;
-	int length;
-	int bits;
-	int frequency;
-	INT16 data[1];
-};
-
-
-
-struct exidy440_audio_state
-{
-	UINT8 sound_command;
-	UINT8 sound_command_ack;
-
-	UINT8 sound_banks[4];
-	UINT8 m6844_data[0x20];
-	UINT8 sound_volume[0x10];
-	INT32 *mixer_buffer_left;
-	INT32 *mixer_buffer_right;
-	sound_cache_entry *sound_cache;
-	sound_cache_entry *sound_cache_end;
-	sound_cache_entry *sound_cache_max;
-
-	/* 6844 description */
-	m6844_channel_data m6844_channel[4];
-	UINT8 m6844_priority;
-	UINT8 m6844_interrupt;
-	UINT8 m6844_chain;
-
-	/* sound interface parameters */
-	sound_stream *stream;
-	sound_channel_data sound_channel[4];
-
-	/* debugging */
-	FILE *debuglog;
-
-	/* channel frequency is configurable */
-	int channel_frequency[4];
-};
-
 /* constant channel parameters */
 static const int channel_bits[4] =
 {
@@ -111,125 +44,96 @@ static const int channel_bits[4] =
 };
 
 
-/* function prototypes */
-static STREAM_UPDATE( channel_update );
-static void m6844_finished(m6844_channel_data *channel);
-static void play_cvsd(device_t *device, int ch);
-static void stop_cvsd(device_t *device, int ch);
+const device_type EXIDY440 = &device_creator<exidy440_sound_device>;
 
-static void reset_sound_cache(device_t *device);
-static INT16 *add_to_sound_cache(device_t *device, UINT8 *input, int address, int length, int bits, int frequency);
-static INT16 *find_or_add_to_sound_cache(device_t *device, int address, int length, int bits, int frequency);
-
-static void decode_and_filter_cvsd(device_t *device, UINT8 *data, int bytes, int maskbits, int frequency, INT16 *dest);
-static void fir_filter(device_t *device, INT32 *input, INT16 *output, int count);
-
-
-class exidy440_sound_device : public device_t,
-									public device_sound_interface
+exidy440_sound_device::exidy440_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, EXIDY440, "Exidy 440 CVSD", tag, owner, clock, "exidy440_sound", __FILE__),
+		device_sound_interface(mconfig, *this),
+		m_sound_command(0),
+		m_sound_command_ack(0),
+		m_mixer_buffer_left(NULL),
+		m_mixer_buffer_right(NULL),
+		m_sound_cache(NULL),
+		m_sound_cache_end(NULL),
+		m_sound_cache_max(NULL),
+		m_m6844_priority(0x00),
+		m_m6844_interrupt(0x00),
+		m_m6844_chain(0x00),
+		m_stream(NULL)
 {
-public:
-	exidy440_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~exidy440_sound_device() { global_free(m_token); }
-
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
-protected:
-	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
-	virtual void device_stop();
-
-	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
-private:
-	// internal state
-	void *m_token;
-};
-
-extern const device_type EXIDY440;
-
-
-/*************************************
- *
- *  Initialize the sound system
- *
- *************************************/
-
-INLINE exidy440_audio_state *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-		assert(device->type() == EXIDY440);
-
-		return (exidy440_audio_state *)downcast<exidy440_sound_device *>(device)->token();
 }
 
-static DEVICE_START( exidy440_sound )
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void exidy440_sound_device::device_config_complete()
 {
-	exidy440_audio_state *state = get_safe_token(device);
-	running_machine &machine = device->machine();
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void exidy440_sound_device::device_start()
+{
 	int i, length;
 
 	/* reset the system */
-	state->sound_command = 0;
-	state->sound_command_ack = 1;
-	machine.save().save_item(NAME(state->sound_command));
-	machine.save().save_item(NAME(state->sound_command_ack));
+	m_sound_command = 0;
+	m_sound_command_ack = 1;
+	save_item(NAME(m_sound_command));
+	save_item(NAME(m_sound_command_ack));
 
 	/* reset the 6844 */
 	for (i = 0; i < 4; i++)
 	{
-		state->m6844_channel[i].active = 0;
-		state->m6844_channel[i].control = 0x00;
+		m_m6844_channel[i].active = 0;
+		m_m6844_channel[i].control = 0x00;
 	}
-	state->m6844_priority = 0x00;
-	state->m6844_interrupt = 0x00;
-	state->m6844_chain = 0x00;
+	m_m6844_priority = 0x00;
+	m_m6844_interrupt = 0x00;
+	m_m6844_chain = 0x00;
 
-	machine.save().save_item(NAME(state->m6844_priority));
-	machine.save().save_item(NAME(state->m6844_interrupt));
-	machine.save().save_item(NAME(state->m6844_chain));
+	save_item(NAME(m_m6844_priority));
+	save_item(NAME(m_m6844_interrupt));
+	save_item(NAME(m_m6844_chain));
 
-	state->channel_frequency[0] = device->clock();   /* channels 0 and 1 are run by FCLK */
-	state->channel_frequency[1] = device->clock();
-	state->channel_frequency[2] = device->clock()/2; /* channels 2 and 3 are run by SCLK */
-	state->channel_frequency[3] = device->clock()/2;
+	m_channel_frequency[0] = clock();   /* channels 0 and 1 are run by FCLK */
+	m_channel_frequency[1] = clock();
+	m_channel_frequency[2] = clock()/2; /* channels 2 and 3 are run by SCLK */
+	m_channel_frequency[3] = clock()/2;
 
 	/* get stream channels */
-	state->stream = device->machine().sound().stream_alloc(*device, 0, 2, device->clock(), NULL, channel_update);
+	m_stream = machine().sound().stream_alloc(*this, 0, 2, clock(), this);
 
 	/* allocate the sample cache */
-	length = machine.root_device().memregion("cvsd")->bytes() * 16 + MAX_CACHE_ENTRIES * sizeof(sound_cache_entry);
-	state->sound_cache = (sound_cache_entry *)auto_alloc_array(machine, UINT8, length);
+	length = machine().root_device().memregion("cvsd")->bytes() * 16 + MAX_CACHE_ENTRIES * sizeof(sound_cache_entry);
+	m_sound_cache = (sound_cache_entry *)auto_alloc_array_clear(machine(), UINT8, length);
 
 	/* determine the hard end of the cache and reset */
-	state->sound_cache_max = (sound_cache_entry *)((UINT8 *)state->sound_cache + length);
-	reset_sound_cache(device);
+	m_sound_cache_max = (sound_cache_entry *)((UINT8 *)m_sound_cache + length);
+	reset_sound_cache();
 
 	/* allocate the mixer buffer */
-	state->mixer_buffer_left = auto_alloc_array(machine, INT32, 2 * device->clock());
-	state->mixer_buffer_right = state->mixer_buffer_left + device->clock();
+	m_mixer_buffer_left = auto_alloc_array_clear(machine(), INT32, 2 * clock());
+	m_mixer_buffer_right = m_mixer_buffer_left + clock();
 
 	if (SOUND_LOG)
-		state->debuglog = fopen("sound.log", "w");
+		m_debuglog = fopen("sound.log", "w");
 }
 
+//-------------------------------------------------
+//  device_stop - device-specific stop
+//-------------------------------------------------
 
-
-/*************************************
- *
- *  Tear down the sound system
- *
- *************************************/
-
-static DEVICE_STOP( exidy440_sound )
+void exidy440_sound_device::device_stop()
 {
-	exidy440_audio_state *state = get_safe_token(device);
-	if (SOUND_LOG && state->debuglog)
-		fclose(state->debuglog);
+	if (SOUND_LOG && m_debuglog)
+		fclose(m_debuglog);
 }
-
-
 
 /*************************************
  *
@@ -237,10 +141,9 @@ static DEVICE_STOP( exidy440_sound )
  *
  *************************************/
 
-static void add_and_scale_samples(device_t *device, int ch, INT32 *dest, int samples, int volume)
+void exidy440_sound_device::add_and_scale_samples(int ch, INT32 *dest, int samples, int volume)
 {
-	exidy440_audio_state *state = get_safe_token(device);
-	sound_channel_data *channel = &state->sound_channel[ch];
+	sound_channel_data *channel = &m_sound_channel[ch];
 	INT16 *srcdata;
 	int i;
 
@@ -282,11 +185,10 @@ static void add_and_scale_samples(device_t *device, int ch, INT32 *dest, int sam
  *
  *************************************/
 
-static void mix_to_16(device_t *device, int length, stream_sample_t *dest_left, stream_sample_t *dest_right)
+void exidy440_sound_device::mix_to_16(int length, stream_sample_t *dest_left, stream_sample_t *dest_right)
 {
-	exidy440_audio_state *state = get_safe_token(device);
-	INT32 *mixer_left = state->mixer_buffer_left;
-	INT32 *mixer_right = state->mixer_buffer_right;
+	INT32 *mixer_left = m_mixer_buffer_left;
+	INT32 *mixer_right = m_mixer_buffer_right;
 	int i, clippers = 0;
 
 	for (i = 0; i < length; i++)
@@ -304,100 +206,33 @@ static void mix_to_16(device_t *device, int length, stream_sample_t *dest_left, 
 	}
 }
 
-
-
-/*************************************
- *
- *  Stream callback
- *
- *************************************/
-
-static STREAM_UPDATE( channel_update )
-{
-	exidy440_audio_state *state = get_safe_token(device);
-	int ch;
-
-	/* reset the mixer buffers */
-	memset(state->mixer_buffer_left, 0, samples * sizeof(INT32));
-	memset(state->mixer_buffer_right, 0, samples * sizeof(INT32));
-
-	/* loop over channels */
-	for (ch = 0; ch < 4; ch++)
-	{
-		sound_channel_data *channel = &state->sound_channel[ch];
-		int length, volume, left = samples;
-		int effective_offset;
-
-		/* if we're not active, bail */
-		if (channel->remaining <= 0)
-			continue;
-
-		/* see how many samples to copy */
-		length = (left > channel->remaining) ? channel->remaining : left;
-
-		/* get a pointer to the sample data and copy to the left */
-		volume = state->sound_volume[2 * ch + 0];
-		if (volume)
-			add_and_scale_samples(device, ch, state->mixer_buffer_left, length, volume);
-
-		/* get a pointer to the sample data and copy to the left */
-		volume = state->sound_volume[2 * ch + 1];
-		if (volume)
-			add_and_scale_samples(device, ch, state->mixer_buffer_right, length, volume);
-
-		/* update our counters */
-		channel->offset += length;
-		channel->remaining -= length;
-		left -= length;
-
-		/* update the MC6844 */
-		effective_offset = (ch & 2) ? channel->offset / 2 : channel->offset;
-		state->m6844_channel[ch].address = state->m6844_channel[ch].start_address + effective_offset / 8;
-		state->m6844_channel[ch].counter = state->m6844_channel[ch].start_counter - effective_offset / 8;
-		if (state->m6844_channel[ch].counter <= 0)
-		{
-			if (SOUND_LOG && state->debuglog)
-				fprintf(state->debuglog, "Channel %d finished\n", ch);
-			m6844_finished(&state->m6844_channel[ch]);
-		}
-	}
-
-	/* all done, time to mix it */
-	mix_to_16(device, samples, outputs[0], outputs[1]);
-}
-
-
-
 /*************************************
  *
  *  Sound command register
  *
  *************************************/
 
-static READ8_DEVICE_HANDLER( sound_command_r )
+READ8_MEMBER( exidy440_sound_device::sound_command_r )
 {
-	exidy440_audio_state *state = get_safe_token(device);
 	/* clear the FIRQ that got us here and acknowledge the read to the main CPU */
 	space.machine().device("audiocpu")->execute().set_input_line(1, CLEAR_LINE);
-	state->sound_command_ack = 1;
+	m_sound_command_ack = 1;
 
-	return state->sound_command;
+	return m_sound_command;
 }
 
 
-void exidy440_sound_command(device_t *device, UINT8 param)
+void exidy440_sound_device::exidy440_sound_command(UINT8 param)
 {
-	exidy440_audio_state *state = get_safe_token(device);
-	state->sound_command = param;
-	state->sound_command_ack = 0;
-	device->machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
+	m_sound_command = param;
+	m_sound_command_ack = 0;
+	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
 }
 
 
-UINT8 exidy440_sound_command_ack(device_t *device)
+UINT8 exidy440_sound_device::exidy440_sound_command_ack()
 {
-	exidy440_audio_state *state = get_safe_token(device);
-	return state->sound_command_ack;
+	return m_sound_command_ack;
 }
 
 
@@ -408,23 +243,21 @@ UINT8 exidy440_sound_command_ack(device_t *device)
  *
  *************************************/
 
-static READ8_DEVICE_HANDLER( sound_volume_r )
+READ8_MEMBER( exidy440_sound_device::sound_volume_r )
 {
-	exidy440_audio_state *state = get_safe_token(device);
-	return state->sound_volume[offset];
+	return m_sound_volume[offset];
 }
 
-static WRITE8_DEVICE_HANDLER( sound_volume_w )
+WRITE8_MEMBER( exidy440_sound_device::sound_volume_w )
 {
-	exidy440_audio_state *state = get_safe_token(device);
-	if (SOUND_LOG && state->debuglog)
-		fprintf(state->debuglog, "Volume %02X=%02X\n", offset, data);
+	if (SOUND_LOG && m_debuglog)
+		fprintf(m_debuglog, "Volume %02X=%02X\n", offset, data);
 
 	/* update the stream */
-	state->stream->update();
+	m_stream->update();
 
 	/* set the new volume */
-	state->sound_volume[offset] = ~data;
+	m_sound_volume[offset] = ~data;
 }
 
 
@@ -435,7 +268,7 @@ static WRITE8_DEVICE_HANDLER( sound_volume_w )
  *
  *************************************/
 
-static WRITE8_DEVICE_HANDLER( sound_interrupt_clear_w )
+WRITE8_MEMBER( exidy440_sound_device::sound_interrupt_clear_w )
 {
 	space.machine().device("audiocpu")->execute().set_input_line(0, CLEAR_LINE);
 }
@@ -448,15 +281,14 @@ static WRITE8_DEVICE_HANDLER( sound_interrupt_clear_w )
  *
  *************************************/
 
-static void m6844_update(device_t *device)
+void exidy440_sound_device::m6844_update()
 {
-	exidy440_audio_state *state = get_safe_token(device);
 	/* update the stream */
-	state->stream->update();
+	m_stream->update();
 }
 
 
-static void m6844_finished(m6844_channel_data *channel)
+void exidy440_sound_device::m6844_finished(m6844_channel_data *channel)
 {
 	/* mark us inactive */
 	channel->active = 0;
@@ -478,14 +310,13 @@ static void m6844_finished(m6844_channel_data *channel)
  *
  *************************************/
 
-static READ8_DEVICE_HANDLER( m6844_r )
+READ8_MEMBER( exidy440_sound_device::m6844_r )
 {
-	exidy440_audio_state *state = get_safe_token(device);
-	m6844_channel_data *m6844_channel = state->m6844_channel;
+	m6844_channel_data *m6844_channel = m_m6844_channel;
 	int result = 0;
 
 	/* first update the current state of the DMA transfers */
-	m6844_update(device);
+	m6844_update();
 
 	/* switch off the offset we were given */
 	switch (offset)
@@ -535,25 +366,25 @@ static READ8_DEVICE_HANDLER( m6844_r )
 
 		/* priority control */
 		case 0x14:
-			result = state->m6844_priority;
+			result = m_m6844_priority;
 			break;
 
 		/* interrupt control */
 		case 0x15:
 
 			/* update the global DMA end flag */
-			state->m6844_interrupt &= ~0x80;
-			state->m6844_interrupt |= (m6844_channel[0].control & 0x80) |
+			m_m6844_interrupt &= ~0x80;
+			m_m6844_interrupt |= (m6844_channel[0].control & 0x80) |
 								(m6844_channel[1].control & 0x80) |
 								(m6844_channel[2].control & 0x80) |
 								(m6844_channel[3].control & 0x80);
 
-			result = state->m6844_interrupt;
+			result = m_m6844_interrupt;
 			break;
 
 		/* chaining control */
 		case 0x16:
-			result = state->m6844_chain;
+			result = m_m6844_chain;
 			break;
 
 		/* 0x17-0x1f not used */
@@ -564,14 +395,13 @@ static READ8_DEVICE_HANDLER( m6844_r )
 }
 
 
-static WRITE8_DEVICE_HANDLER( m6844_w )
+WRITE8_MEMBER( exidy440_sound_device::m6844_w )
 {
-	exidy440_audio_state *state = get_safe_token(device);
-	m6844_channel_data *m6844_channel = state->m6844_channel;
+	m6844_channel_data *m6844_channel = m_m6844_channel;
 	int i;
 
 	/* first update the current state of the DMA transfers */
-	m6844_update(device);
+	m6844_update();
 
 	/* switch off the offset we were given */
 	switch (offset)
@@ -618,7 +448,7 @@ static WRITE8_DEVICE_HANDLER( m6844_w )
 
 		/* priority control */
 		case 0x14:
-			state->m6844_priority = data;
+			m_m6844_priority = data;
 
 			/* update the sound playback on each channel */
 			for (i = 0; i < 4; i++)
@@ -638,7 +468,7 @@ static WRITE8_DEVICE_HANDLER( m6844_w )
 					m6844_channel[i].start_counter = m6844_channel[i].counter;
 
 					/* generate and play the sample */
-					play_cvsd(device, i);
+					play_cvsd(i);
 				}
 
 				/* if we're going inactive... */
@@ -648,19 +478,19 @@ static WRITE8_DEVICE_HANDLER( m6844_w )
 					m6844_channel[i].active = 0;
 
 					/* stop playing the sample */
-					stop_cvsd(device, i);
+					stop_cvsd(i);
 				}
 			}
 			break;
 
 		/* interrupt control */
 		case 0x15:
-			state->m6844_interrupt = (state->m6844_interrupt & 0x80) | (data & 0x7f);
+			m_m6844_interrupt = (m_m6844_interrupt & 0x80) | (data & 0x7f);
 			break;
 
 		/* chaining control */
 		case 0x16:
-			state->m6844_chain = data;
+			m_m6844_chain = data;
 			break;
 
 		/* 0x17-0x1f not used */
@@ -676,51 +506,48 @@ static WRITE8_DEVICE_HANDLER( m6844_w )
  *
  *************************************/
 
-static void reset_sound_cache(device_t *device)
+void exidy440_sound_device::reset_sound_cache()
 {
-	exidy440_audio_state *state = get_safe_token(device);
-	state->sound_cache_end = state->sound_cache;
+	m_sound_cache_end = m_sound_cache;
 }
 
 
-static INT16 *add_to_sound_cache(device_t *device, UINT8 *input, int address, int length, int bits, int frequency)
+INT16 *exidy440_sound_device::add_to_sound_cache(UINT8 *input, int address, int length, int bits, int frequency)
 {
-	exidy440_audio_state *state = get_safe_token(device);
-	sound_cache_entry *current = state->sound_cache_end;
+	sound_cache_entry *current = m_sound_cache_end;
 
 	/* compute where the end will be once we add this entry */
-	state->sound_cache_end = (sound_cache_entry *)((UINT8 *)current + sizeof(sound_cache_entry) + length * 16);
+	m_sound_cache_end = (sound_cache_entry *)((UINT8 *)current + sizeof(sound_cache_entry) + length * 16);
 
 	/* if this will overflow the cache, reset and re-add */
-	if (state->sound_cache_end > state->sound_cache_max)
+	if (m_sound_cache_end > m_sound_cache_max)
 	{
-		reset_sound_cache(device);
-		return add_to_sound_cache(device, input, address, length, bits, frequency);
+		reset_sound_cache();
+		return add_to_sound_cache(input, address, length, bits, frequency);
 	}
 
 	/* fill in this entry */
-	current->next = state->sound_cache_end;
+	current->next = m_sound_cache_end;
 	current->address = address;
 	current->length = length;
 	current->bits = bits;
 	current->frequency = frequency;
 
 	/* decode the data into the cache */
-	decode_and_filter_cvsd(device, input, length, bits, frequency, current->data);
+	decode_and_filter_cvsd(input, length, bits, frequency, current->data);
 	return current->data;
 }
 
 
-static INT16 *find_or_add_to_sound_cache(device_t *device, int address, int length, int bits, int frequency)
+INT16 *exidy440_sound_device::find_or_add_to_sound_cache(int address, int length, int bits, int frequency)
 {
-	exidy440_audio_state *state = get_safe_token(device);
 	sound_cache_entry *current;
 
-	for (current = state->sound_cache; current < state->sound_cache_end; current = current->next)
+	for (current = m_sound_cache; current < m_sound_cache_end; current = current->next)
 		if (current->address == address && current->length == length && current->bits == bits && current->frequency == frequency)
 			return current->data;
 
-	return add_to_sound_cache(device, &device->machine().root_device().memregion("cvsd")->base()[address], address, length, bits, frequency);
+	return add_to_sound_cache(&machine().root_device().memregion("cvsd")->base()[address], address, length, bits, frequency);
 }
 
 
@@ -731,26 +558,25 @@ static INT16 *find_or_add_to_sound_cache(device_t *device, int address, int leng
  *
  *************************************/
 
-static void play_cvsd(device_t *device, int ch)
+void exidy440_sound_device::play_cvsd(int ch)
 {
-	exidy440_audio_state *state = get_safe_token(device);
-	sound_channel_data *channel = &state->sound_channel[ch];
-	int address = state->m6844_channel[ch].address;
-	int length = state->m6844_channel[ch].counter;
+	sound_channel_data *channel = &m_sound_channel[ch];
+	int address = m_m6844_channel[ch].address;
+	int length = m_m6844_channel[ch].counter;
 	INT16 *base;
 
 	/* add the bank number to the address */
-	if (state->sound_banks[ch] & 1)
+	if (m_sound_banks[ch] & 1)
 		address += 0x00000;
-	else if (state->sound_banks[ch] & 2)
+	else if (m_sound_banks[ch] & 2)
 		address += 0x08000;
-	else if (state->sound_banks[ch] & 4)
+	else if (m_sound_banks[ch] & 4)
 		address += 0x10000;
-	else if (state->sound_banks[ch] & 8)
+	else if (m_sound_banks[ch] & 8)
 		address += 0x18000;
 
 	/* compute the base address in the converted samples array */
-	base = find_or_add_to_sound_cache(device, address, length, channel_bits[ch], state->channel_frequency[ch]);
+	base = find_or_add_to_sound_cache(address, length, channel_bits[ch], m_channel_frequency[ch]);
 	if (!base)
 		return;
 
@@ -760,15 +586,15 @@ static void play_cvsd(device_t *device, int ch)
 		channel->base = base;
 		channel->offset = length;
 		channel->remaining = 0;
-		m6844_finished(&state->m6844_channel[ch]);
+		m6844_finished(&m_m6844_channel[ch]);
 		return;
 	}
 
-	if (SOUND_LOG && state->debuglog)
-		fprintf(state->debuglog, "Sound channel %d play at %02X,%04X, length = %04X, volume = %02X/%02X\n",
-				ch, state->sound_banks[ch],
-				state->m6844_channel[ch].address, state->m6844_channel[ch].counter,
-				state->sound_volume[ch * 2], state->sound_volume[ch * 2 + 1]);
+	if (SOUND_LOG && m_debuglog)
+		fprintf(m_debuglog, "Sound channel %d play at %02X,%04X, length = %04X, volume = %02X/%02X\n",
+				ch, m_sound_banks[ch],
+				m_m6844_channel[ch].address, m_m6844_channel[ch].counter,
+				m_sound_volume[ch * 2], m_sound_volume[ch * 2 + 1]);
 
 	/* set the pointer and count */
 	channel->base = base;
@@ -780,15 +606,14 @@ static void play_cvsd(device_t *device, int ch)
 }
 
 
-static void stop_cvsd(device_t *device, int ch)
+void exidy440_sound_device::stop_cvsd(int ch)
 {
-	exidy440_audio_state *state = get_safe_token(device);
 	/* the DMA channel is marked inactive; that will kill the audio */
-	state->sound_channel[ch].remaining = 0;
-	state->stream->update();
+	m_sound_channel[ch].remaining = 0;
+	m_stream->update();
 
-	if (SOUND_LOG && state->debuglog)
-		fprintf(state->debuglog, "Channel %d stop\n", ch);
+	if (SOUND_LOG && m_debuglog)
+		fprintf(m_debuglog, "Channel %d stop\n", ch);
 }
 
 
@@ -799,7 +624,7 @@ static void stop_cvsd(device_t *device, int ch)
  *
  *************************************/
 
-static void fir_filter(device_t *device, INT32 *input, INT16 *output, int count)
+void exidy440_sound_device::fir_filter(INT32 *input, INT16 *output, int count)
 {
 	while (count--)
 	{
@@ -834,7 +659,7 @@ static void fir_filter(device_t *device, INT32 *input, INT16 *output, int count)
  *
  *************************************/
 
-static void decode_and_filter_cvsd(device_t *device, UINT8 *input, int bytes, int maskbits, int frequency, INT16 *output)
+void exidy440_sound_device::decode_and_filter_cvsd(UINT8 *input, int bytes, int maskbits, int frequency, INT16 *output)
 {
 	INT32 buffer[SAMPLE_BUFFER_LENGTH + FIR_HISTORY_LENGTH];
 	int total_samples = bytes * 8;
@@ -933,7 +758,7 @@ static void decode_and_filter_cvsd(device_t *device, UINT8 *input, int bytes, in
 		}
 
 		/* all done with this chunk, run the filter on it */
-		fir_filter(device, &buffer[FIR_HISTORY_LENGTH], &output[chunk_start], chunk_bytes * 8);
+		fir_filter(&buffer[FIR_HISTORY_LENGTH], &output[chunk_start], chunk_bytes * 8);
 
 		/* copy the last few input samples down to the start for a new history */
 		memcpy(&buffer[0], &buffer[SAMPLE_BUFFER_LENGTH], FIR_HISTORY_LENGTH * sizeof(INT32));
@@ -955,10 +780,66 @@ static void decode_and_filter_cvsd(device_t *device, UINT8 *input, int bytes, in
 }
 
 
-static WRITE8_DEVICE_HANDLER( sound_banks_w )
+WRITE8_MEMBER( exidy440_sound_device::sound_banks_w )
 {
-	exidy440_audio_state *state = get_safe_token(device);
-	state->sound_banks[offset] = data;
+	m_sound_banks[offset] = data;
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void exidy440_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	int ch;
+
+	/* reset the mixer buffers */
+	memset(m_mixer_buffer_left, 0, samples * sizeof(INT32));
+	memset(m_mixer_buffer_right, 0, samples * sizeof(INT32));
+
+	/* loop over channels */
+	for (ch = 0; ch < 4; ch++)
+	{
+		sound_channel_data *channel = &m_sound_channel[ch];
+		int length, volume, left = samples;
+		int effective_offset;
+
+		/* if we're not active, bail */
+		if (channel->remaining <= 0)
+			continue;
+
+		/* see how many samples to copy */
+		length = (left > channel->remaining) ? channel->remaining : left;
+
+		/* get a pointer to the sample data and copy to the left */
+		volume = m_sound_volume[2 * ch + 0];
+		if (volume)
+			add_and_scale_samples(ch, m_mixer_buffer_left, length, volume);
+
+		/* get a pointer to the sample data and copy to the left */
+		volume = m_sound_volume[2 * ch + 1];
+		if (volume)
+			add_and_scale_samples(ch, m_mixer_buffer_right, length, volume);
+
+		/* update our counters */
+		channel->offset += length;
+		channel->remaining -= length;
+		left -= length;
+
+		/* update the MC6844 */
+		effective_offset = (ch & 2) ? channel->offset / 2 : channel->offset;
+		m_m6844_channel[ch].address = m_m6844_channel[ch].start_address + effective_offset / 8;
+		m_m6844_channel[ch].counter = m_m6844_channel[ch].start_counter - effective_offset / 8;
+		if (m_m6844_channel[ch].counter <= 0)
+		{
+			if (SOUND_LOG && m_debuglog)
+				fprintf(m_debuglog, "Channel %d finished\n", ch);
+			m6844_finished(&m_m6844_channel[ch]);
+		}
+	}
+
+	/* all done, time to mix it */
+	mix_to_16(samples, outputs[0], outputs[1]);
 }
 
 
@@ -970,74 +851,17 @@ static WRITE8_DEVICE_HANDLER( sound_banks_w )
 
 static ADDRESS_MAP_START( exidy440_audio_map, AS_PROGRAM, 8, driver_device )
 	AM_RANGE(0x0000, 0x7fff) AM_NOP
-	AM_RANGE(0x8000, 0x801f) AM_MIRROR(0x03e0) AM_DEVREADWRITE_LEGACY("custom", m6844_r, m6844_w)
-	AM_RANGE(0x8400, 0x840f) AM_MIRROR(0x03f0) AM_DEVREADWRITE_LEGACY("custom", sound_volume_r, sound_volume_w)
-	AM_RANGE(0x8800, 0x8800) AM_MIRROR(0x03ff) AM_DEVREAD_LEGACY("custom", sound_command_r) AM_WRITENOP
+	AM_RANGE(0x8000, 0x801f) AM_MIRROR(0x03e0) AM_DEVREADWRITE("custom", exidy440_sound_device, m6844_r, m6844_w)
+	AM_RANGE(0x8400, 0x840f) AM_MIRROR(0x03f0) AM_DEVREADWRITE("custom", exidy440_sound_device, sound_volume_r, sound_volume_w)
+	AM_RANGE(0x8800, 0x8800) AM_MIRROR(0x03ff) AM_DEVREAD("custom", exidy440_sound_device, sound_command_r) AM_WRITENOP
 	AM_RANGE(0x8c00, 0x93ff) AM_NOP
-	AM_RANGE(0x9400, 0x9403) AM_MIRROR(0x03fc) AM_READNOP AM_DEVWRITE_LEGACY("custom", sound_banks_w)
-	AM_RANGE(0x9800, 0x9800) AM_MIRROR(0x03ff) AM_READNOP AM_DEVWRITE_LEGACY("custom", sound_interrupt_clear_w)
+	AM_RANGE(0x9400, 0x9403) AM_MIRROR(0x03fc) AM_READNOP AM_DEVWRITE("custom", exidy440_sound_device, sound_banks_w)
+	AM_RANGE(0x9800, 0x9800) AM_MIRROR(0x03ff) AM_READNOP AM_DEVWRITE("custom", exidy440_sound_device, sound_interrupt_clear_w)
 	AM_RANGE(0x9c00, 0x9fff) AM_NOP
 	AM_RANGE(0xa000, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xdfff) AM_NOP
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
-
-
-
-/*************************************
- *
- *  Audio definitions
- *
- *************************************/
-
-const device_type EXIDY440 = &device_creator<exidy440_sound_device>;
-
-exidy440_sound_device::exidy440_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, EXIDY440, "Exidy 440 CVSD", tag, owner, clock, "exidy440_sound", __FILE__),
-		device_sound_interface(mconfig, *this)
-{
-	m_token = global_alloc_clear(exidy440_audio_state);
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void exidy440_sound_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void exidy440_sound_device::device_start()
-{
-	DEVICE_START_NAME( exidy440_sound )(this);
-}
-
-//-------------------------------------------------
-//  device_stop - device-specific stop
-//-------------------------------------------------
-
-void exidy440_sound_device::device_stop()
-{
-	DEVICE_STOP_NAME( exidy440_sound )(this);
-}
-
-//-------------------------------------------------
-//  sound_stream_update - handle a stream update
-//-------------------------------------------------
-
-void exidy440_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
-{
-	// should never get here
-	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
-}
-
-
 
 
 

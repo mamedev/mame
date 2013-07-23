@@ -7,7 +7,6 @@
 #include "emu.h"
 #include "machine/74148.h"
 #include "machine/pit8253.h"
-#include "audio/exidy440.h"
 #include "includes/vertigo.h"
 
 
@@ -165,7 +164,7 @@ WRITE16_MEMBER(vertigo_state::vertigo_wsot_w)
 
 TIMER_CALLBACK_MEMBER(vertigo_state::sound_command_w)
 {
-	exidy440_sound_command(m_custom, param);
+	m_custom->exidy440_sound_command(param);
 
 	/* It is important that the sound cpu ACKs the sound command
 	   quickly. Otherwise the main CPU gives up with sound. Boosting
@@ -184,7 +183,7 @@ WRITE16_MEMBER(vertigo_state::vertigo_audio_w)
 
 READ16_MEMBER(vertigo_state::vertigo_sio_r)
 {
-	return exidy440_sound_command_ack(m_custom) ? 0xfc : 0xfd;
+	return m_custom->exidy440_sound_command_ack() ? 0xfc : 0xfd;
 }
 
 
@@ -197,7 +196,6 @@ READ16_MEMBER(vertigo_state::vertigo_sio_r)
 
 void vertigo_state::machine_start()
 {
-	m_custom = machine().device("custom");
 	m_ttl74148 = machine().device("74148");
 
 	save_item(NAME(m_irq_state));

@@ -16,7 +16,6 @@
 #include "machine/74148.h"
 #include "machine/pit8253.h"
 #include "machine/nvram.h"
-#include "audio/exidy440.h"
 #include "includes/vertigo.h"
 #include "drivlgcy.h"
 #include "scrlegcy.h"
