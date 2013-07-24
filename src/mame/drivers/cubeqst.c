@@ -40,9 +40,9 @@ public:
 	UINT8 m_io_latch;
 	UINT8 m_reset_latch;
 	required_device<simutrek_special_device> m_laserdisc;
-	required_device<cpu_device> m_rotatecpu;
-	required_device<cpu_device> m_linecpu;
-	required_device<cpu_device> m_soundcpu;
+	required_device<cquestrot_cpu_device> m_rotatecpu;
+	required_device<cquestlin_cpu_device> m_linecpu;
+	required_device<cquestsnd_cpu_device> m_soundcpu;
 	rgb_t *m_colormap;
 	DECLARE_WRITE16_MEMBER(palette_w);
 	DECLARE_READ16_MEMBER(line_r);
@@ -58,6 +58,7 @@ public:
 	DECLARE_WRITE16_MEMBER(write_rotram);
 	DECLARE_READ16_MEMBER(read_sndram);
 	DECLARE_WRITE16_MEMBER(write_sndram);
+	DECLARE_WRITE16_MEMBER(sound_dac_w);
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
@@ -136,8 +137,8 @@ UINT32 cubeqst_state::screen_update_cubeqst(screen_device &screen, bitmap_rgb32 
 	for (y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
 		int i;
-		int num_entries = cubeqcpu_get_ptr_ram_val(m_linecpu, y);
-		UINT32 *stk_ram = cubeqcpu_get_stack_ram(m_linecpu);
+		int num_entries = m_linecpu->cubeqcpu_get_ptr_ram_val(y);
+		UINT32 *stk_ram = m_linecpu->cubeqcpu_get_stack_ram();
 		UINT32 *dest = &bitmap.pix32(y);
 		UINT32 pen;
 
@@ -266,10 +267,10 @@ WRITE16_MEMBER(cubeqst_state::control_w)
 
 TIMER_CALLBACK_MEMBER(cubeqst_state::delayed_bank_swap)
 {
-	cubeqcpu_swap_line_banks(m_linecpu);
+	m_linecpu->cubeqcpu_swap_line_banks();
 
 	/* TODO: This is a little dubious */
-	cubeqcpu_clear_stack(m_linecpu);
+	m_linecpu->cubeqcpu_clear_stack();
 }
 
 
@@ -401,22 +402,22 @@ INPUT_PORTS_END
 
 READ16_MEMBER(cubeqst_state::read_rotram)
 {
-	return cubeqcpu_rotram_r(m_rotatecpu, space, offset, mem_mask);
+	return m_rotatecpu->rotram_r(space, offset, mem_mask);
 }
 
 WRITE16_MEMBER(cubeqst_state::write_rotram)
 {
-	cubeqcpu_rotram_w(m_rotatecpu, space, offset, data, mem_mask);
+	m_rotatecpu->rotram_w(space, offset, data, mem_mask);
 }
 
 READ16_MEMBER(cubeqst_state::read_sndram)
 {
-	return cubeqcpu_sndram_r(m_soundcpu, space, offset, mem_mask);
+	return m_soundcpu->sndram_r(space, offset, mem_mask);
 }
 
 WRITE16_MEMBER(cubeqst_state::write_sndram)
 {
-	cubeqcpu_sndram_w(m_soundcpu, space, offset, data, mem_mask);
+	m_soundcpu->sndram_w(space, offset, data, mem_mask);
 }
 
 static ADDRESS_MAP_START( m68k_program_map, AS_PROGRAM, 16, cubeqst_state )
@@ -479,7 +480,7 @@ void cubeqst_state::machine_reset()
  */
 
 /* Called by the sound CPU emulation */
-static void sound_dac_w(device_t *device, UINT16 data)
+WRITE16_MEMBER( cubeqst_state::sound_dac_w )
 {
 	static const char *const dacs[] =
 	{
@@ -492,24 +493,8 @@ static void sound_dac_w(device_t *device, UINT16 data)
 		"rdac6", "ldac6",
 		"rdac7", "ldac7"
 	};
-	device->machine().device<dac_device>(dacs[data & 15])->write_signed16((data & 0xfff0) ^ 0x8000);
+	machine().device<dac_device>(dacs[data & 15])->write_signed16((data & 0xfff0) ^ 0x8000);
 }
-
-static const cubeqst_snd_config snd_config =
-{
-	sound_dac_w,
-	"soundproms"
-};
-
-static const cubeqst_rot_config rot_config =
-{
-	"line_cpu"
-};
-
-static const cubeqst_lin_config lin_config =
-{
-	"rotate_cpu"
-};
 
 
 /*************************************
@@ -525,15 +510,15 @@ static MACHINE_CONFIG_START( cubeqst, cubeqst_state )
 
 	MCFG_CPU_ADD("rotate_cpu", CQUESTROT, XTAL_10MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(rotate_map)
-	MCFG_CPU_CONFIG(rot_config)
+	MCFG_CQUESTROT_CONFIG( DEVWRITE16( "line_cpu", cquestlin_cpu_device, linedata_w ) )
 
 	MCFG_CPU_ADD("line_cpu", CQUESTLIN, XTAL_10MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(line_sound_map)
-	MCFG_CPU_CONFIG(lin_config)
+	MCFG_CQUESTLIN_CONFIG( DEVREAD16( "rotate_cpu", cquestrot_cpu_device, linedata_r ) )
 
 	MCFG_CPU_ADD("sound_cpu", CQUESTSND, XTAL_10MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(line_sound_map)
-	MCFG_CPU_CONFIG(snd_config)
+	MCFG_CQUESTSND_CONFIG( WRITE16( cubeqst_state, sound_dac_w ), "soundproms" )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(48000))
 

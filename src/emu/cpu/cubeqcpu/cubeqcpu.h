@@ -116,43 +116,268 @@ enum
     CONFIGURATION STRUCTURE
 ***************************************************************************/
 
-typedef void (*cubeqst_dac_w_func)(device_t *, UINT16);
 
-struct cubeqst_snd_config
-{
-	cubeqst_dac_w_func  dac_w;
-	const char *        sound_data_region;
+#define MCFG_CQUESTSND_CONFIG(_dac_w, _sound_tag) \
+	cquestsnd_cpu_device::set_dac_w(*device, DEVCB2_##_dac_w); \
+	cquestsnd_cpu_device::set_sound_region(*device, _sound_tag);
 
-};
 
-struct cubeqst_lin_config
-{
-	const char *        rot_cpu_tag;
-};
+#define MCFG_CQUESTROT_CONFIG(_linedata_w) \
+	cquestrot_cpu_device::set_linedata_w(*device, DEVCB2_##_linedata_w );
 
-struct cubeqst_rot_config
-{
-	const char *        lin_cpu_tag;
-};
+
+#define MCFG_CQUESTLIN_CONFIG(_linedata_r) \
+	cquestlin_cpu_device::set_linedata_r(*device, DEVCB2_##_linedata_r );
+
 
 /***************************************************************************
     PUBLIC FUNCTIONS
 ***************************************************************************/
 
-extern DECLARE_READ16_DEVICE_HANDLER( cubeqcpu_sndram_r );
-extern DECLARE_WRITE16_DEVICE_HANDLER( cubeqcpu_sndram_w );
+class cquestsnd_cpu_device : public cpu_device
+{
+public:
+	// construction/destruction
+	cquestsnd_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-extern DECLARE_READ16_DEVICE_HANDLER( cubeqcpu_rotram_r );
-extern DECLARE_WRITE16_DEVICE_HANDLER( cubeqcpu_rotram_w );
+	// static configuration helpers
+	template<class _Object> static devcb2_base &set_dac_w(device_t &device, _Object object) { return downcast<cquestsnd_cpu_device &>(device).m_dac_w.set_callback(object); }
+	static void set_sound_region(device_t &device, const char *tag) { downcast<cquestsnd_cpu_device &>(device).m_sound_region_tag = tag; }
 
-void cubeqcpu_swap_line_banks(device_t *device);
+	DECLARE_WRITE16_MEMBER(sndram_w);
+	DECLARE_READ16_MEMBER(sndram_r);
 
-void cubeqcpu_clear_stack(device_t *device);
-UINT8 cubeqcpu_get_ptr_ram_val(device_t *device, int i);
-UINT32* cubeqcpu_get_stack_ram(device_t *device);
+protected:
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
 
-DECLARE_LEGACY_CPU_DEVICE(CQUESTSND, cquestsnd);
-DECLARE_LEGACY_CPU_DEVICE(CQUESTROT, cquestrot);
-DECLARE_LEGACY_CPU_DEVICE(CQUESTLIN, cquestlin);
+	// device_execute_interface overrides
+	virtual UINT32 execute_min_cycles() const { return 1; }
+	virtual UINT32 execute_max_cycles() const { return 1; }
+	virtual UINT32 execute_input_lines() const { return 0; }
+	virtual void execute_run();
+
+	// device_memory_interface overrides
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == AS_PROGRAM) ? &m_program_config : NULL; }
+
+	// device_disasm_interface overrides
+	virtual UINT32 disasm_min_opcode_bytes() const { return 8; }
+	virtual UINT32 disasm_max_opcode_bytes() const { return 8; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+
+private:
+	address_space_config m_program_config;
+
+	/* AM2901 internals */
+	UINT16  m_ram[16];
+	UINT16  m_q;
+	UINT16  m_f;
+	UINT16  m_y;
+	UINT32  m_cflag;
+	UINT32  m_vflag;
+
+	UINT8   m_pc;         /* 2 x LS161 @ 6E, 6F */
+	UINT16  m_platch;
+	UINT8   m_rtnlatch;   /* LS374 @ 5F */
+	UINT8   m_adrcntr;    /* 2 x LS161 */
+	UINT16  m_adrlatch;
+	UINT16  m_dinlatch;
+	UINT16  m_ramwlatch;
+
+	UINT16 *m_sram;
+
+	int m_prev_ipram;
+	int m_prev_ipwrt;
+
+	devcb2_write16 m_dac_w;
+	const char *m_sound_region_tag;
+	UINT16 *m_sound_data;
+
+	address_space *m_program;
+	direct_read_data *m_direct;
+	int m_icount;
+
+	int do_sndjmp(int jmp);
+};
+
+
+class cquestrot_cpu_device : public cpu_device
+{
+public:
+	// construction/destruction
+	cquestrot_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// static configuration helpers
+	template<class _Object> static devcb2_base &set_linedata_w(device_t &device, _Object object) { return downcast<cquestrot_cpu_device &>(device).m_linedata_w.set_callback(object); }
+
+	DECLARE_READ16_MEMBER(linedata_r);
+	DECLARE_WRITE16_MEMBER(rotram_w);
+	DECLARE_READ16_MEMBER(rotram_r);
+
+protected:
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
+
+	// device_execute_interface overrides
+	virtual UINT32 execute_min_cycles() const { return 1; }
+	virtual UINT32 execute_max_cycles() const { return 1; }
+	virtual UINT32 execute_input_lines() const { return 0; }
+	virtual void execute_run();
+
+	// device_memory_interface overrides
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == AS_PROGRAM) ? &m_program_config : NULL; }
+
+	// device_state_interface overrides
+	void state_string_export(const device_state_entry &entry, astring &string);
+
+	// device_disasm_interface overrides
+	virtual UINT32 disasm_min_opcode_bytes() const { return 8; }
+	virtual UINT32 disasm_max_opcode_bytes() const { return 8; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+
+private:
+	address_space_config m_program_config;
+	devcb2_write16 m_linedata_w;
+
+	/* AM2901 internals */
+	UINT16  m_ram[16];
+	UINT16  m_q;
+	UINT16  m_f;
+	UINT16  m_y;
+	UINT32  m_cflag;
+	UINT32  m_vflag;
+
+	UINT16  m_pc;         /* 12-bit, but only 9 used */
+	UINT8   m_seqcnt;     /* 4-bit counter */
+
+	UINT8   m_dsrclatch;
+	UINT8   m_rsrclatch;
+	UINT16  m_dynaddr;    /* LS374 at 2D, 8D  */
+	UINT16  m_dyndata;    /* LS374 at 10B, 9B */
+	UINT16  m_yrlatch;    /* LS374 at 9D, 10D */
+	UINT16  m_ydlatch;    /* LS374 at 9C, 10C */
+	UINT16  m_dinlatch;
+	UINT8   m_divreg;     /* LS74 at ? */
+
+	UINT16  m_linedata;
+	UINT16  m_lineaddr;
+
+	UINT16 *m_dram;
+	UINT16 *m_sram;
+
+	UINT8 m_prev_dred;
+	UINT8 m_prev_dwrt;
+	UINT8 m_wc;
+	UINT8 m_rc;
+	UINT8 m_clkcnt;
+
+	address_space *m_program;
+	direct_read_data *m_direct;
+	int m_icount;
+
+	// For the debugger
+	UINT8 m_flags;
+
+	int do_rotjmp(int jmp);
+};
+
+
+class cquestlin_cpu_device : public cpu_device
+{
+public:
+	// construction/destruction
+	cquestlin_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// static configuration helpers
+	template<class _Object> static devcb2_base &set_linedata_r(device_t &device, _Object object) { return downcast<cquestlin_cpu_device &>(device).m_linedata_r.set_callback(object); }
+
+	DECLARE_WRITE16_MEMBER( linedata_w );
+	void cubeqcpu_swap_line_banks();
+	void cubeqcpu_clear_stack();
+	UINT8 cubeqcpu_get_ptr_ram_val(int i);
+	UINT32* cubeqcpu_get_stack_ram();
+
+protected:
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
+
+	// device_execute_interface overrides
+	virtual UINT32 execute_min_cycles() const { return 1; }
+	virtual UINT32 execute_max_cycles() const { return 1; }
+	virtual UINT32 execute_input_lines() const { return 0; }
+	virtual void execute_run();
+
+	// device_memory_interface overrides
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == AS_PROGRAM) ? &m_program_config : NULL; }
+
+	// device_state_interface overrides
+	void state_string_export(const device_state_entry &entry, astring &string);
+
+	// device_disasm_interface overrides
+	virtual UINT32 disasm_min_opcode_bytes() const { return 8; }
+	virtual UINT32 disasm_max_opcode_bytes() const { return 8; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+
+private:
+	address_space_config m_program_config;
+	devcb2_read16 m_linedata_r;
+
+	/* 12-bit AM2901 internals */
+	UINT16  m_ram[16];
+	UINT16  m_q;
+	UINT16  m_f;
+	UINT16  m_y;
+	UINT32  m_cflag;
+	UINT32  m_vflag;
+
+	UINT8   m_pc[2];      /* Two program counters; one for FG, other for BG */
+
+	UINT16  m_seqcnt;     /* 12-bit */
+	UINT16  m_clatch;     /* LS374 at 9E and 1-bit FF */
+	UINT8   m_zlatch;     /* LS374 at 4H */
+
+	UINT16  m_xcnt;
+	UINT16  m_ycnt;
+	UINT8   m_sreg;
+
+	UINT16  m_fadlatch;
+	UINT16  m_badlatch;
+
+	UINT16  m_sramdlatch;
+
+	UINT8   m_fglatch;
+	UINT8   m_bglatch;
+	UINT8   m_gt0reg;
+	UINT8   m_fdxreg;
+	UINT32  m_field;
+
+	UINT32  m_clkcnt;
+
+	/* RAM */
+	UINT16  *m_sram;
+	UINT8   *m_ptr_ram;
+	UINT32  *m_e_stack;
+	UINT32  *m_o_stack;
+
+	legacy_cpu_device *m_rotdevice;
+	address_space *m_program;
+	direct_read_data *m_direct;
+	int m_icount;
+
+	// For the debugger
+	UINT8 m_flags;
+	UINT16 m_curpc;
+
+	int do_linjmp(int jmp);
+};
+
+
+extern const device_type CQUESTSND;
+extern const device_type CQUESTROT;
+extern const device_type CQUESTLIN;
+
 
 #endif /* _CUBEQCPU_H */
