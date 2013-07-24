@@ -135,8 +135,8 @@ device_memory_interface::~device_memory_interface()
 
 
 //-------------------------------------------------
-//  static_set_vblank_int - configuration helper
-//  to set up VBLANK interrupts on the device
+//  static_set_addrmap - configuration helper
+//  to connect an address map to a device
 //-------------------------------------------------
 
 void device_memory_interface::static_set_addrmap(device_t &device, address_spacenum spacenum, address_map_constructor map)
