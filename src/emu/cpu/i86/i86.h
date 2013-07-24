@@ -197,6 +197,8 @@ protected:
 	address_space *m_program;
 	direct_read_data *m_direct;
 	address_space *m_io;
+	offs_t m_fetch_xor;
+
 	int m_icount;
 
 	UINT32 m_prefix_base;   /* base address of the latest prefix segment */

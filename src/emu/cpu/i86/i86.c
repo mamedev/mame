@@ -273,6 +273,7 @@ i80188_cpu_device::i80188_cpu_device(const machine_config &mconfig, const char *
 	: i80186_cpu_device(mconfig, I80188, "I80188", tag, owner, clock, "i80188", __FILE__, 8)
 {
 	memcpy(m_timing, m_i80186_timing, sizeof(m_i80186_timing));
+	m_fetch_xor = 0;
 }
 
 i80186_cpu_device::i80186_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -281,6 +282,7 @@ i80186_cpu_device::i80186_cpu_device(const machine_config &mconfig, const char *
 	, m_io_config("io", ENDIANNESS_LITTLE, 16, 16, 0)
 {
 	memcpy(m_timing, m_i80186_timing, sizeof(m_i80186_timing));
+	m_fetch_xor = BYTE_XOR_LE(0);
 }
 
 i80186_cpu_device::i80186_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int data_bus_size)
@@ -638,6 +640,7 @@ i8088_cpu_device::i8088_cpu_device(const machine_config &mconfig, const char *ta
 	: i8086_cpu_device(mconfig, I8088, "I8088", tag, owner, clock, "i8088", __FILE__, 8)
 {
 	memcpy(m_timing, m_i8086_timing, sizeof(m_i8086_timing));
+	m_fetch_xor = 0;
 }
 
 i8086_cpu_device::i8086_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -646,6 +649,7 @@ i8086_cpu_device::i8086_cpu_device(const machine_config &mconfig, const char *ta
 	, m_io_config("io", ENDIANNESS_LITTLE, 16, 16, 0)
 {
 	memcpy(m_timing, m_i8086_timing, sizeof(m_i8086_timing));
+	m_fetch_xor = BYTE_XOR_LE(0);
 }
 
 i8086_cpu_device::i8086_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int data_bus_size)
@@ -999,7 +1003,7 @@ inline void i8086_common_cpu_device::write_port_word(UINT16 port, UINT16 data)
 
 inline UINT8 i8086_common_cpu_device::fetch_op()
 {
-	UINT8 data = m_direct->read_decrypted_byte( pc() );
+	UINT8 data = m_direct->read_decrypted_byte(pc(), m_fetch_xor);
 	m_ip++;
 	return data;
 }
@@ -1007,7 +1011,7 @@ inline UINT8 i8086_common_cpu_device::fetch_op()
 
 inline UINT8 i8086_common_cpu_device::fetch()
 {
-	UINT8 data = m_direct->read_raw_byte( pc() );
+	UINT8 data = m_direct->read_raw_byte(pc(), m_fetch_xor);
 	m_ip++;
 	return data;
 }
