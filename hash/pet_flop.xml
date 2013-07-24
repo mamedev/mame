@@ -289,6 +289,24 @@
 		</part>
 	</software>
 
+	<software name="hardbox">
+		<description>HardBox Utilities</description>
+		<year>1981</year>
+		<publisher>Small Systems Engineering"</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<rom name="hardbox-utils.d80" size="533248" crc="13e90ead" sha1="99449d79c6bca9f291afb672a67025419cbd1199" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="hardbox-utils.d64" size="174848" crc="4e1880e3" sha1="0e6bb17f7361be3be5f05ba55fb307a89cfc1897" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="assorted">
 		<!-- assorted.d80-d82 from zimmers.net, needs cleaning and splitting up -->
 		<description>Assorted PET software</description>
