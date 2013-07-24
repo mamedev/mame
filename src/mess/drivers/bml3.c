@@ -703,7 +703,6 @@ INPUT_PORTS_END
 
 static MC6845_INTERFACE( mc6845_intf )
 {
-	"screen",   /* screen we are acting on */
 	false,      /* show border area */
 	8,          /* number of pixels per video memory address */
 	NULL,       /* before pixel update callback */
@@ -1015,7 +1014,7 @@ static MACHINE_CONFIG_START( bml3_common, bml3_state )
 
 	/* Devices */
 	// CRTC clock should be synchronous with the CPU clock.
-	MCFG_MC6845_ADD("crtc", H46505, CPU_CLOCK, mc6845_intf)
+	MCFG_MC6845_ADD("crtc", H46505, "screen", CPU_CLOCK, mc6845_intf)
 	// fire once per scan of an individual key
 	// According to the service manual (p.65), the keyboard timer is driven by the horizontal video sync clock.
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", bml3_state, keyboard_callback, attotime::from_hz(H_CLOCK/2))

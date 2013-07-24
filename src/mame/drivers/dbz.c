@@ -300,7 +300,6 @@ static const k056832_interface dbz_k056832_intf =
 
 static const k053247_interface dbz_k053246_intf =
 {
-	"screen",
 	"gfx2", 3,
 	NORMAL_PLANE_ORDER,
 	-52, 16,
@@ -322,7 +321,6 @@ WRITE_LINE_MEMBER(dbz_state::dbz_irq2_ack_w)
 
 static const k053252_interface dbz_k053252_intf =
 {
-	"screen",
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_DRIVER_LINE_MEMBER(dbz_state,dbz_irq2_ack_w),

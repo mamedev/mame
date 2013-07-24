@@ -222,7 +222,6 @@ GFXDECODE_END
 
 static const deco16ic_interface darkseal_deco16ic_tilegen1_intf =
 {
-	"screen",
 	0, 3, // both these tilemaps need to be twice the y size of usual!
 	0x0f, 0x0f, /* trans masks (default values) */
 	0x00, 0x00, /* color base */
@@ -235,7 +234,6 @@ static const deco16ic_interface darkseal_deco16ic_tilegen1_intf =
 
 static const deco16ic_interface darkseal_deco16ic_tilegen2_intf =
 {
-	"screen",
 	0, 1,
 	0x0f, 0x0f, /* trans masks (default values) */
 	0x00, 0x00, /* color base */

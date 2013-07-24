@@ -456,7 +456,6 @@ static CRTC_EGA_UPDATE_ROW( ega_update_row );
 
 static CRTC_EGA_INTERFACE( crtc_ega_ega_intf )
 {
-	EGA_SCREEN_NAME,    /* screen number */
 	8,                  /* numbers of pixels per video memory address */
 	NULL,               /* begin_update */
 	ega_update_row,     /* update_row */
@@ -475,6 +474,7 @@ MACHINE_CONFIG_FRAGMENT( pcvideo_ega )
 
 	MCFG_PALETTE_LENGTH( 64 )
 	MCFG_CRTC_EGA_ADD(EGA_CRTC_NAME, 16257000/8, crtc_ega_ega_intf)
+	MCFG_CRTC_EGA_SET_SCREEN(EGA_SCREEN_NAME)
 MACHINE_CONFIG_END
 
 ROM_START( ega )

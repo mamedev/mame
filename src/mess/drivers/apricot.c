@@ -241,7 +241,6 @@ WRITE_LINE_MEMBER( apricot_state::apricot_mc6845_de )
 
 static MC6845_INTERFACE( apricot_mc6845_intf )
 {
-	"screen",
 	false,
 	10,
 	NULL,
@@ -395,7 +394,7 @@ static MACHINE_CONFIG_START( apricot, apricot_state )
 	MCFG_RAM_EXTRA_OPTIONS("384k,512k") /* with 1 or 2 128k expansion boards */
 
 	/* Devices */
-	MCFG_MC6845_ADD("ic30", MC6845, XTAL_15MHz / 10, apricot_mc6845_intf)
+	MCFG_MC6845_ADD("ic30", MC6845, "screen", XTAL_15MHz / 10, apricot_mc6845_intf)
 	MCFG_I8255A_ADD("ic17", apricot_i8255a_intf)
 	MCFG_PIC8259_ADD("ic31", INPUTLINE("maincpu",0), VCC, NULL)
 	MCFG_PIT8253_ADD("ic16", apricot_pit8253_intf)

@@ -873,7 +873,6 @@ GFXDECODE_END
 
 static MC6845_INTERFACE( vdc_intf )
 {
-	SCREEN_VDC_TAG,
 	false,
 	8,
 	NULL,

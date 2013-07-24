@@ -800,11 +800,6 @@ void nss_state::machine_reset()
 	m_joy_flag = 1;
 }
 
-static M50458_INTERFACE( m50458_intf )
-{
-	"osd"
-};
-
 static MACHINE_CONFIG_START( nss, nss_state )
 
 	/* base snes hardware */
@@ -822,7 +817,7 @@ static MACHINE_CONFIG_START( nss, nss_state )
 	MCFG_CPU_IO_MAP(bios_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", nss_state,  nss_vblank_irq)
 
-	MCFG_M50458_ADD("m50458",m50458_intf,4000000) /* TODO: correct clock */
+	MCFG_M50458_ADD("m50458", 4000000, "osd") /* TODO: correct clock */
 	MCFG_S3520CF_ADD("s3520cf") /* RTC */
 	MCFG_RP5H01_ADD("rp5h01")
 	MCFG_M6M80011AP_ADD("m6m80011ap")

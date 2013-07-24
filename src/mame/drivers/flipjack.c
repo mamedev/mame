@@ -429,7 +429,6 @@ static const ay8910_interface ay8910_config_2 =
 
 static MC6845_INTERFACE( mc6845_intf )
 {
-	"screen",   /* screen we are acting on */
 	false,      /* show border area */
 	8,          /* number of pixels per video memory address */
 	NULL,       /* before pixel update callback */
@@ -494,7 +493,7 @@ static MACHINE_CONFIG_START( flipjack, flipjack_state )
 	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK, 0x188, 0, 0x100, 0x100, 0, 0xc0) // from crtc
 	MCFG_SCREEN_UPDATE_DRIVER(flipjack_state, screen_update_flipjack)
 
-	MCFG_MC6845_ADD("crtc", HD6845, VIDEO_CLOCK/8, mc6845_intf)
+	MCFG_MC6845_ADD("crtc", HD6845, "screen", VIDEO_CLOCK/8, mc6845_intf)
 
 	MCFG_GFXDECODE(flipjack)
 

@@ -70,7 +70,6 @@
 
 struct crt9007_interface
 {
-	const char *m_screen_tag;       /* screen we are acting on */
 	int hpixels_per_column;     /* number of pixels per video memory address */
 
 	devcb_write_line        m_out_int_cb;
@@ -94,6 +93,7 @@ struct crt9007_interface
 
 class crt9007_device :  public device_t,
 						public device_memory_interface,
+						public device_video_interface,
 						public crt9007_interface
 {
 public:
@@ -151,8 +151,6 @@ private:
 	devcb_resolved_write_line   m_out_cblank_func;
 	devcb_resolved_write_line   m_out_slg_func;
 	devcb_resolved_write_line   m_out_sld_func;
-
-	screen_device *m_screen;
 
 	// registers
 	UINT8 m_reg[0x3d];

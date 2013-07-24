@@ -299,7 +299,6 @@ static MC6845_UPDATE_ROW( victor9k_update_row )
 
 static MC6845_INTERFACE( hd46505s_intf )
 {
-	SCREEN_TAG,
 	false,
 	10,
 	NULL,
@@ -1257,7 +1256,7 @@ static MACHINE_CONFIG_START( victor9k, victor9k_state )
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, monochrome_green)
 
-	MCFG_MC6845_ADD(HD46505S_TAG, HD6845, 1000000, hd46505s_intf) // HD6845 == HD46505S
+	MCFG_MC6845_ADD(HD46505S_TAG, HD6845, SCREEN_TAG, 1000000, hd46505s_intf) // HD6845 == HD46505S
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

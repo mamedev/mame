@@ -17,11 +17,11 @@
 
 #define MCFG_V9938_ADD(_tag, _screen, _vramsize) \
 	MCFG_DEVICE_ADD(_tag, V9938, 0) \
-	v9938_device::static_set_screen(*device, _screen); \
+	MCFG_VIDEO_SET_SCREEN(_screen) \
 	v9938_device::static_set_vram_size(*device, _vramsize);
 #define MCFG_V9958_ADD(_tag, _screen, _vramsize) \
 	MCFG_DEVICE_ADD(_tag, V9958, 0) \
-	v9938_device::static_set_screen(*device, _screen); \
+	MCFG_VIDEO_SET_SCREEN(_screen) \
 	v9938_device::static_set_vram_size(*device, _vramsize);
 
 #define MCFG_V99X8_INTERRUPT_CALLBACK(_irq) \
@@ -55,7 +55,9 @@ extern const device_type V9958;
 
 // ======================> v99x8_device
 
-class v99x8_device : public device_t, public device_memory_interface
+class v99x8_device : 	public device_t, 
+						public device_memory_interface,
+						public device_video_interface
 {
 	friend PALETTE_INIT( v9958 );
 
@@ -85,7 +87,6 @@ public:
 	void command_w(UINT8 data);
 	void register_w(UINT8 data);
 
-	static void static_set_screen(device_t &device, const char *screen_name);
 	static void static_set_vram_size(device_t &device, UINT32 vram_size);
 
 	/* RESET pin */
@@ -204,9 +205,6 @@ private:
 	// palette
 	UINT16 m_pal_ind16[16];
 	UINT16 m_pal_ind256[256];
-	// render screen
-	screen_device *m_screen;
-	const char *m_screen_name;
 	// render bitmap
 	bitmap_ind16 m_bitmap;
 	// Command unit

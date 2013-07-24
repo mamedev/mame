@@ -373,7 +373,6 @@ INPUT_PORTS_END
 
 static TMS9928A_INTERFACE(re900_tms9928a_interface)
 {
-	"screen",
 	0x4000,
 	DEVCB_DRIVER_LINE_MEMBER(re900_state,vdp_interrupt)
 };

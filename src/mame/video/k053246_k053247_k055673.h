@@ -44,7 +44,6 @@ Callback procedures for non-standard shadows:
 
 struct k053247_interface
 {
-	const char         *m_intf_screen;
 	const char         *m_intf_gfx_memory_region;
 	int                m_intf_gfx_num;
 	int                m_intf_plane_order;
@@ -54,6 +53,7 @@ struct k053247_interface
 };
 
 class k053247_device : public device_t,
+						public device_video_interface,
 						public k053247_interface
 {
 public:
@@ -113,7 +113,6 @@ public:
 	k05324x_callback m_callback;
 
 	const char *m_memory_region;
-	screen_device *m_screen;
 
 	/* alt implementation - to be collapsed */
 	void alt_k055673_vh_start(running_machine &machine, const char *gfx_memory_region, int alt_layout, int dx, int dy,
@@ -182,7 +181,7 @@ public:
 		// for Escape Kids (GX975)
 		if ( objset1 & 8 ) // Check only "Bit #3 is '1'?"
 		{
-			int screenwidth = machine().primary_screen->width();
+			int screenwidth = m_screen->width();
 
 			zoomx = zoomx>>1; // Fix sprite width to HALF size
 			ox = (ox>>1) + 1; // Fix sprite draw position
@@ -497,6 +496,8 @@ extern const device_type K055673;
 	MCFG_DEVICE_ADD(_tag, K053246, 0) \
 	MCFG_DEVICE_CONFIG(_interface)
 
+#define MCFG_K053246_SET_SCREEN MCFG_VIDEO_SET_SCREEN
+
 #define MCFG_K055673_ADD(_tag, _interface) \
 	MCFG_DEVICE_ADD(_tag, K055673, 0) \
 	MCFG_DEVICE_CONFIG(_interface)
@@ -504,6 +505,7 @@ extern const device_type K055673;
 #define MCFG_K055673_ADD_NOINTF(_tag ) \
 	MCFG_DEVICE_ADD(_tag, K055673, 0)
 
+#define MCFG_K055673_SET_SCREEN MCFG_VIDEO_SET_SCREEN
 
 
 /* old non-device stuff */

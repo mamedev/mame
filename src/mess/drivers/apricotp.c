@@ -59,7 +59,6 @@ static MC6845_UPDATE_ROW( fp_update_row )
 
 static MC6845_INTERFACE( crtc_intf )
 {
-	SCREEN_CRT_TAG,
 	false,
 	8,
 	NULL,
@@ -641,7 +640,7 @@ static MACHINE_CONFIG_START( fp, fp_state )
 
 	MCFG_PALETTE_LENGTH(16)
 	MCFG_GFXDECODE(act_f1)
-	MCFG_MC6845_ADD(MC6845_TAG, MC6845, 4000000, crtc_intf)
+	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_CRT_TAG, 4000000, crtc_intf)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

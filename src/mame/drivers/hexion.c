@@ -210,7 +210,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(hexion_state::hexion_scanline)
 
 static const k053252_interface hexion_k053252_intf =
 {
-	"screen",
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_DRIVER_LINE_MEMBER(hexion_state,hexion_irq_ack_w),

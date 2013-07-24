@@ -26,7 +26,6 @@ void crtc_ega_device::device_config_complete()
 	}
 	else
 	{
-		m_screen_tag = NULL;
 		m_hpixels_per_column = 0;
 		m_begin_update = NULL;
 		m_update_row = NULL;
@@ -40,7 +39,8 @@ void crtc_ega_device::device_config_complete()
 
 
 crtc_ega_device::crtc_ega_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, CRTC_EGA, "crtc_EGA", tag, owner, clock, "crtc_ega", __FILE__)
+	: device_t(mconfig, CRTC_EGA, "crtc_EGA", tag, owner, clock, "crtc_ega", __FILE__),
+		device_video_interface(mconfig, *this, false)
 {
 }
 
@@ -599,16 +599,6 @@ void crtc_ega_device::device_start()
 	m_res_out_hsync_func.resolve(m_out_hsync_func, *this);
 	m_res_out_vsync_func.resolve(m_out_vsync_func, *this);
 	m_res_out_vblank_func.resolve(m_out_vblank_func, *this);
-
-	/* get the screen device */
-	if ( m_screen_tag != NULL )
-	{
-		astring tempstring;
-		m_screen = downcast<screen_device *>(machine().device(siblingtag(tempstring,m_screen_tag)));
-		assert(m_screen != NULL);
-	}
-	else
-		m_screen = NULL;
 
 	/* create the timers */
 	m_line_timer = timer_alloc(TIMER_LINE);

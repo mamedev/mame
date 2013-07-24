@@ -320,7 +320,6 @@ static const UPD7810_CONFIG fp1100_slave_cpu_config = { TYPE_7801, NULL };
 
 static MC6845_INTERFACE( mc6845_intf )
 {
-	"screen",   /* screen we are acting on */
 	false,      /* show border area */
 	8,          /* number of pixels per video memory address */
 	NULL,       /* before pixel update callback */
@@ -364,7 +363,7 @@ static MACHINE_CONFIG_START( fp1100, fp1100_state )
 	MCFG_GFXDECODE(fp1100)
 
 	/* Devices */
-	MCFG_MC6845_ADD("crtc", H46505, MAIN_CLOCK/2, mc6845_intf)   /* hand tuned to get ~60 fps */
+	MCFG_MC6845_ADD("crtc", H46505, "screen", MAIN_CLOCK/2, mc6845_intf)   /* hand tuned to get ~60 fps */
 MACHINE_CONFIG_END
 
 /* ROM definition */

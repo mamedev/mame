@@ -105,6 +105,7 @@ ADDRESS_MAP_END
 nick_device::nick_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, NICK, "NICK", tag, owner, clock, "nick", __FILE__),
 		device_memory_interface(mconfig, *this),
+		device_video_interface(mconfig, *this),
 		m_space_config("vram", ENDIANNESS_LITTLE, 8, 16, 0, *ADDRESS_MAP_NAME(nick_map)),
 		m_write_virq(*this),
 		horizontal_clock(0),
@@ -126,7 +127,6 @@ nick_device::nick_device(const machine_config &mconfig, const char *tag, device_
 
 void nick_device::device_start()
 {
-	m_screen = machine().device<screen_device>(m_screen_tag);
 	m_screen->register_screen_bitmap(m_bitmap);
 	calc_visible_clocks(ENTERPRISE_SCREEN_WIDTH);
 

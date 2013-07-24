@@ -131,7 +131,6 @@ static MC6845_UPDATE_ROW( comx_clm_update_row )
 
 static MC6845_INTERFACE( crtc_intf )
 {
-	MC6845_SCREEN_TAG,
 	false,
 	8,
 	NULL,
@@ -168,7 +167,7 @@ static MACHINE_CONFIG_FRAGMENT( comx_clm )
 
 	//MCFG_GFXDECODE(comx_clm)
 
-	MCFG_MC6845_ADD(MC6845_TAG, MC6845, XTAL_14_31818MHz/7, crtc_intf)
+	MCFG_MC6845_ADD(MC6845_TAG, MC6845, MC6845_SCREEN_TAG, XTAL_14_31818MHz/7, crtc_intf)
 MACHINE_CONFIG_END
 
 

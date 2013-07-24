@@ -45,7 +45,7 @@
 
 #define MCFG_CDP1862_ADD(_tag, _screen_tag, _clock, _rd, _bd, _gd) \
 	MCFG_DEVICE_ADD(_tag, CDP1862, _clock) \
-	downcast<cdp1862_device *>(device)->set_screen_tag(_screen_tag); \
+	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
 	downcast<cdp1862_device *>(device)->set_rd_callback(DEVCB2_##_rd); \
 	downcast<cdp1862_device *>(device)->set_bd_callback(DEVCB2_##_bd); \
 	downcast<cdp1862_device *>(device)->set_gd_callback(DEVCB2_##_gd);
@@ -64,13 +64,13 @@
 
 // ======================> cdp1862_device
 
-class cdp1862_device :  public device_t
+class cdp1862_device :  public device_t,
+						public device_video_interface
 {
 public:
 	// construction/destruction
 	cdp1862_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	void set_screen_tag(const char *screen_tag) { m_screen_tag = screen_tag; }
 	template<class _rd> void set_rd_callback(_rd rd) { m_read_rd.set_callback(rd); }
 	template<class _bd> void set_bd_callback(_bd bd) { m_read_bd.set_callback(bd); }
 	template<class _gd> void set_gd_callback(_gd gd) { m_read_gd.set_callback(gd); }
@@ -95,8 +95,6 @@ private:
 	devcb2_read_line m_read_bd;
 	devcb2_read_line m_read_gd;
 
-	const char *m_screen_tag;
-	screen_device *m_screen;        // screen
 	bitmap_rgb32 m_bitmap;          // bitmap
 
 	double m_lum_r;             // red luminance resistor value

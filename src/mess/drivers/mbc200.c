@@ -139,7 +139,6 @@ MC6845_UPDATE_ROW( mbc200_update_row )
 
 static MC6845_INTERFACE( mbc200_crtc )
 {
-	"screen",           /* name of screen */
 	false,
 	8,          /* number of dots per character */
 	NULL,
@@ -274,7 +273,7 @@ static MACHINE_CONFIG_START( mbc200, mbc200_state )
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 
 
-	MCFG_MC6845_ADD("crtc", H46505, XTAL_8MHz / 4, mbc200_crtc) // HD46505SP
+	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_8MHz / 4, mbc200_crtc) // HD46505SP
 	MCFG_I8255_ADD("ppi8255_1", mbc200_ppi8255_interface_1) // i8255AC-5
 	MCFG_I8255_ADD("ppi8255_2", mbc200_ppi8255_interface_2) // i8255AC-5
 	MCFG_I8251_ADD("i8251_1", default_i8251_interface) // INS8251N

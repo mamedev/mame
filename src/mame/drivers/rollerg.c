@@ -241,7 +241,6 @@ WRITE_LINE_MEMBER(rollerg_state::rollerg_irq_ack_w)
 
 static const k053252_interface rollerg_k053252_intf =
 {
-	"screen",
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_DRIVER_LINE_MEMBER(rollerg_state,rollerg_irq_ack_w),

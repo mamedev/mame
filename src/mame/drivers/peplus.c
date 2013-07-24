@@ -304,7 +304,6 @@ static MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
 
 static MC6845_INTERFACE( mc6845_intf )
 {
-	"screen",               /* screen we are acting on */
 	false,                  /* show border area */
 	8,                      /* number of pixels per video memory address */
 	NULL,                   /* before pixel update callback */
@@ -1378,7 +1377,7 @@ static MACHINE_CONFIG_START( peplus, peplus_state )
 	MCFG_GFXDECODE(peplus)
 	MCFG_PALETTE_LENGTH(16*16*2)
 
-	MCFG_MC6845_ADD("crtc", R6545_1, MC6845_CLOCK, mc6845_intf)
+	MCFG_MC6845_ADD("crtc", R6545_1, "screen", MC6845_CLOCK, mc6845_intf)
 	MCFG_I2CMEM_ADD("i2cmem", i2cmem_interface)
 
 

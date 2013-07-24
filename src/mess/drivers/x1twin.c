@@ -90,7 +90,6 @@ static I8255A_INTERFACE( ppi8255_intf )
 
 static MC6845_INTERFACE( mc6845_intf )
 {
-	"x1_screen",    /* screen we are acting on */
 	false,          /* show border area*/
 	8,              /* number of pixels per video memory address */
 	NULL,           /* before pixel update callback */
@@ -556,7 +555,7 @@ static MACHINE_CONFIG_START( x1twin, x1twin_state )
 	MCFG_SCREEN_RAW_PARAMS(PCE_MAIN_CLOCK/2, VDC_WPF, 70, 70 + 512 + 32, VDC_LPF, 14, 14+242)
 	MCFG_SCREEN_UPDATE_DRIVER(x1twin_state, screen_update_x1pce)
 
-	MCFG_MC6845_ADD("crtc", H46505, (VDP_CLOCK/48), mc6845_intf) //unknown divider
+	MCFG_MC6845_ADD("crtc", H46505, "x1_screen", (VDP_CLOCK/48), mc6845_intf) //unknown divider
 	MCFG_PALETTE_LENGTH(0x10+0x1000)
 	MCFG_PALETTE_INIT_OVERRIDE(x1twin_state,x1)
 

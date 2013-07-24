@@ -2947,7 +2947,6 @@ Contcirc road glitchiness in attract?
 
 static const tc0100scn_interface taitoz_tc0100scn_intf =
 {
-	"screen",
 	1, 2,       /* gfxnum, txnum */
 	0, 0,       /* x_offset, y_offset */
 	0, 0,       /* flip_xoff, flip_yoff */
@@ -2957,7 +2956,6 @@ static const tc0100scn_interface taitoz_tc0100scn_intf =
 
 static const tc0100scn_interface chasehq_tc0100scn_intf =
 {
-	"screen",
 	1, 3,       /* gfxnum, txnum */
 	0, 0,       /* x_offset, y_offset */
 	0, 0,       /* flip_xoff, flip_yoff */
@@ -2967,7 +2965,6 @@ static const tc0100scn_interface chasehq_tc0100scn_intf =
 
 static const tc0100scn_interface spacegun_tc0100scn_intf =
 {
-	"screen",
 	1, 2,       /* gfxnum, txnum */
 	4, 0,       /* x_offset, y_offset */
 	0, 0,       /* flip_xoff, flip_yoff */

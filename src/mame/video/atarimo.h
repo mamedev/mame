@@ -49,7 +49,7 @@
 
 #define MCFG_ATARI_MOTION_OBJECTS_ADD(_tag, _screen, _config) \
 	MCFG_DEVICE_ADD(_tag, ATARI_MOTION_OBJECTS, 0) \
-	atari_motion_objects_device::static_set_screen(*device, _screen); \
+	MCFG_VIDEO_SET_SCREEN(_screen) \
 	atari_motion_objects_device::static_set_config(*device, _config); \
 
 
@@ -103,6 +103,7 @@ struct atari_motion_objects_config
 extern const device_type ATARI_MOTION_OBJECTS;
 
 class atari_motion_objects_device : public sprite16_device_ind16,
+									public device_video_interface,
 									public atari_motion_objects_config
 {
 	static const int MAX_PER_BANK = 1024;
@@ -112,7 +113,6 @@ public:
 	atari_motion_objects_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
-	static void static_set_screen(device_t &device, const char *screentag);
 	static void static_set_config(device_t &device, const atari_motion_objects_config &config);
 	
 	// getters
@@ -193,9 +193,6 @@ private:
 		UINT16				m_uppershift;		// upper shift
 	};
 	
-	// configuration state
-	const char *			m_screen_tag;		// pointer to the screen
-
 	// parameter masks
 	sprite_parameter		m_linkmask;			// mask for the link
 	sprite_parameter		m_gfxmask;			// mask for the graphics bank
@@ -234,7 +231,6 @@ private:
 	int                 	m_slipramsize;        // total size of SLIP RAM, in entries
 
 	// live state
-	screen_device *			m_screen;				// pointer to our screen
 	emu_timer *				m_force_update_timer;	// timer for forced updating
 	UINT32              	m_bank;               // current bank number
 	UINT32					m_xscroll;			  // xscroll offset

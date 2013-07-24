@@ -3,8 +3,6 @@
 
 struct tc0100scn_interface
 {
-	const char         *m_screen_tag;
-
 	int                m_gfxnum;
 	int                m_txnum;
 
@@ -17,6 +15,7 @@ struct tc0100scn_interface
 };
 
 class tc0100scn_device : public device_t,
+							public device_video_interface,
 							public tc0100scn_interface
 {
 public:
@@ -89,8 +88,6 @@ private:
 	INT32        m_bg0_colbank, m_bg1_colbank, m_tx_colbank;
 	int          m_dblwidth;
 
-	screen_device *m_screen;
-
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
@@ -111,5 +108,7 @@ extern const device_type TC0100SCN;
 #define MCFG_TC0100SCN_ADD(_tag, _interface) \
 	MCFG_DEVICE_ADD(_tag, TC0100SCN, 0) \
 	MCFG_DEVICE_CONFIG(_interface)
+
+#define MCFG_TC0100SCN_SET_SCREEN MCFG_VIDEO_SET_SCREEN
 
 #endif

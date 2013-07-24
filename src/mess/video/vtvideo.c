@@ -27,13 +27,15 @@ const device_type RAINBOW_VIDEO = &device_creator<rainbow_video_device>;
 
 
 vt100_video_device::vt100_video_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-					: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+						device_video_interface(mconfig, *this)
 {
 }
 
 
 vt100_video_device::vt100_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: device_t(mconfig, VT100_VIDEO, "VT100 Video", tag, owner, clock, "vt100_video", __FILE__)
+					: device_t(mconfig, VT100_VIDEO, "VT100 Video", tag, owner, clock, "vt100_video", __FILE__),
+						device_video_interface(mconfig, *this)
 {
 }
 
@@ -62,7 +64,6 @@ void vt100_video_device::device_config_complete()
 	{
 		memset(&m_in_ram_cb, 0, sizeof(m_in_ram_cb));
 		memset(&m_clear_video_cb, 0, sizeof(m_clear_video_cb));
-		m_screen_tag = "";
 		m_char_rom_tag = "";
 	}
 }
@@ -76,10 +77,6 @@ void vt100_video_device::device_start()
 	/* resolve callbacks */
 	m_in_ram_func.resolve(m_in_ram_cb, *this);
 	m_clear_video_interrupt.resolve(m_clear_video_cb, *this);
-
-	/* get the screen device */
-	m_screen = machine().device<screen_device>(m_screen_tag);
-	assert(m_screen != NULL);
 
 	m_gfx = machine().root_device().memregion(m_char_rom_tag)->base();
 	assert(m_gfx != NULL);

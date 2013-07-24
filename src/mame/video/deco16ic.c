@@ -168,7 +168,7 @@ const device_type DECO16IC = &device_creator<deco16ic_device>;
 
 deco16ic_device::deco16ic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, DECO16IC, "Data East IC 55 / 56 / 74 / 141", tag, owner, clock, "deco16ic", __FILE__),
-	//m_screen(NULL),
+		device_video_interface(mconfig, *this),
 	m_pf1_data(NULL),
 	m_pf2_data(NULL),
 	m_pf12_control(NULL),
@@ -200,7 +200,6 @@ void deco16ic_device::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-	m_screen_tag = "";
 	m_bank_cb0 = NULL;
 	m_bank_cb1 = NULL;
 	}
@@ -618,7 +617,7 @@ READ16_MEMBER( deco16ic_device::pf2_data_r )
 
 WRITE16_MEMBER( deco16ic_device::pf_control_w )
 {
-	space.machine().primary_screen->update_partial(space.machine().primary_screen->vpos());
+	m_screen->update_partial(m_screen->vpos());
 
 	COMBINE_DATA(&m_pf12_control[offset]);
 }

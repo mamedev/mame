@@ -82,7 +82,7 @@
 
 #define MCFG_CDP1864_ADD(_tag, _screen_tag, _clock, _inlace, _irq, _dma_out, _efx, _hsync, _rdata, _bdata, _gdata) \
 	MCFG_SOUND_ADD(_tag, CDP1864, _clock) \
-	downcast<cdp1864_device *>(device)->set_screen_tag(_screen_tag); \
+	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
 	downcast<cdp1864_device *>(device)->set_inlace_callback(DEVCB2_##_inlace); \
 	downcast<cdp1864_device *>(device)->set_irq_callback(DEVCB2_##_irq); \
 	downcast<cdp1864_device *>(device)->set_dma_out_callback(DEVCB2_##_dma_out); \
@@ -108,13 +108,13 @@
 // ======================> cdp1864_device
 
 class cdp1864_device :  public device_t,
-						public device_sound_interface
+						public device_sound_interface,
+						public device_video_interface
 {
 public:
 	// construction/destruction
 	cdp1864_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	void set_screen_tag(const char *screen_tag) { m_screen_tag = screen_tag; }
 	template<class _inlace> void set_inlace_callback(_inlace inlace) { m_read_inlace.set_callback(inlace); }
 	template<class _irq> void set_irq_callback(_irq irq) { m_write_irq.set_callback(irq); }
 	template<class _dma_out> void set_dma_out_callback(_dma_out dma_out) { m_write_dma_out.set_callback(dma_out); }
@@ -168,8 +168,6 @@ private:
 	devcb2_write_line       m_write_efx;
 	devcb2_write_line       m_write_hsync;
 
-	const char *m_screen_tag;
-	screen_device *m_screen;        // screen
 	bitmap_rgb32 m_bitmap;          // bitmap
 	sound_stream *m_stream;         // sound output
 

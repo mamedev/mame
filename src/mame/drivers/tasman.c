@@ -570,7 +570,6 @@ static const k056832_interface k056832_intf =
 
 static const k053247_interface k053247_intf =
 {
-	"screen",
 	"gfx2", 1,
 	TASMAN_PLANE_ORDER,
 	-48+1, 23,

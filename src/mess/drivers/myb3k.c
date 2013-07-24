@@ -232,7 +232,6 @@ GFXDECODE_END
 
 static MC6845_INTERFACE( mc6845_intf )
 {
-	"screen",   /* screen we are acting on */
 	false,      /* show border area */
 	8,          /* number of pixels per video memory address */
 	NULL,       /* before pixel update callback */
@@ -287,7 +286,7 @@ static MACHINE_CONFIG_START( myb3k, myb3k_state )
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 
 	/* Devices */
-	MCFG_MC6845_ADD("crtc", H46505, XTAL_3_579545MHz/4, mc6845_intf)    /* unknown clock, hand tuned to get ~60 fps */
+	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_3_579545MHz/4, mc6845_intf)    /* unknown clock, hand tuned to get ~60 fps */
 	MCFG_MB8877_ADD("fdc", myb3k_wd17xx_interface ) //unknown type
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(myb3k_floppy_interface)
 MACHINE_CONFIG_END

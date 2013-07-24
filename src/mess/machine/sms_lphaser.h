@@ -25,6 +25,7 @@
 // ======================> sms_light_phaser_device
 
 class sms_light_phaser_device : public device_t,
+							public device_video_interface,
 							public device_sms_control_port_interface
 {
 public:
@@ -50,7 +51,6 @@ private:
 	required_ioport m_lphaser_y;
 
 	int m_last_state;
-	screen_device *m_screen;
 	emu_timer *m_lphaser_timer;
 	static const device_timer_id TIMER_LPHASER = 0;
 

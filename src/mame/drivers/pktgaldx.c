@@ -290,14 +290,8 @@ static int pktgaldx_bank_callback( const int bank )
 	return ((bank >> 4) & 0x7) * 0x1000;
 }
 
-static const decocomn_interface pktgaldx_decocomn_intf =
-{
-	"screen",
-};
-
 static const deco16ic_interface pktgaldx_deco16ic_tilegen1_intf =
 {
-	"screen",
 	0, 1,
 	0x0f, 0x0f, /* trans masks (default values) */
 	0, 16, /* color base (default values) */
@@ -332,7 +326,7 @@ static MACHINE_CONFIG_START( pktgaldx, pktgaldx_state )
 	MCFG_PALETTE_LENGTH(4096)
 	MCFG_GFXDECODE(pktgaldx)
 
-	MCFG_DECOCOMN_ADD("deco_common", pktgaldx_decocomn_intf)
+	MCFG_DECOCOMN_ADD("deco_common")
 
 	MCFG_DECO16IC_ADD("tilegen1", pktgaldx_deco16ic_tilegen1_intf)
 

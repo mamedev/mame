@@ -560,7 +560,6 @@ GFXDECODE_END
 
 static MC6845_INTERFACE( mc6845_intf )
 {
-	"screen",   /* screen we are acting on */
 	false,      /* show border area */
 	8,          /* number of pixels per video memory address */
 	NULL,       /* before pixel update callback */
@@ -684,7 +683,7 @@ static MACHINE_CONFIG_START( multi8, multi8_state )
 
 	/* Devices */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", multi8_state, keyboard_callback, attotime::from_hz(240/32))
-	MCFG_MC6845_ADD("crtc", H46505, XTAL_3_579545MHz/2, mc6845_intf)    /* unknown clock, hand tuned to get ~60 fps */
+	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_3_579545MHz/2, mc6845_intf)    /* unknown clock, hand tuned to get ~60 fps */
 	MCFG_I8255_ADD( "ppi8255_0", ppi8255_intf_0 )
 MACHINE_CONFIG_END
 

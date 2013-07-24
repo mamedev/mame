@@ -16,7 +16,6 @@ public:
 		m_dac_2(*this, "dac2") { }
 
 	required_device<cpu_device> m_maincpu;
-	device_t *m_screen;
 
 	UINT16 m_blitter[RLT_NUM_BLITTER_REGS];
 

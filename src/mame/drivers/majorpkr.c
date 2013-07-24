@@ -1003,7 +1003,6 @@ GFXDECODE_END
 
 static MC6845_INTERFACE( mc6845_intf )
 {
-	"screen",       /* screen we are acting on */
 	false,          /* show border area */
 	16,             /* number of pixels per video memory address */
 	NULL,           /* before pixel update callback */
@@ -1042,7 +1041,7 @@ static MACHINE_CONFIG_START( majorpkr, majorpkr_state )
 
 	MCFG_SCREEN_UPDATE_DRIVER(majorpkr_state, screen_update_majorpkr)
 
-	MCFG_MC6845_ADD("crtc", MC6845, CRTC_CLOCK, mc6845_intf) /* verified */
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK, mc6845_intf) /* verified */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

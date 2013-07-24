@@ -450,11 +450,6 @@ WRITE8_MEMBER(dassault_state::sound_bankswitch_w)
 
 /**********************************************************************************/
 
-static const decocomn_interface dassault_decocomn_intf =
-{
-	"screen",
-};
-
 static int dassault_bank_callback( const int bank )
 {
 	return ((bank >> 4) & 0xf) << 12;
@@ -462,7 +457,6 @@ static int dassault_bank_callback( const int bank )
 
 static const deco16ic_interface dassault_deco16ic_tilegen1_intf =
 {
-	"screen",
 	0, 1,
 	0x0f, 0x0f, /* trans masks (default values) */
 	0, 16, /* color base (default values) */
@@ -474,7 +468,6 @@ static const deco16ic_interface dassault_deco16ic_tilegen1_intf =
 
 static const deco16ic_interface dassault_deco16ic_tilegen2_intf =
 {
-	"screen",
 	0, 1,
 	0x0f, 0x0f, /* trans masks (default values) */
 	0, 16, /* color base (default values) */
@@ -517,7 +510,7 @@ static MACHINE_CONFIG_START( dassault, dassault_state )
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram2")
 
-	MCFG_DECOCOMN_ADD("deco_common", dassault_decocomn_intf)
+	MCFG_DECOCOMN_ADD("deco_common")
 
 	MCFG_DECO16IC_ADD("tilegen1", dassault_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_ADD("tilegen2", dassault_deco16ic_tilegen2_intf)

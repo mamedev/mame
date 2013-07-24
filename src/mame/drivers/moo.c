@@ -462,7 +462,6 @@ static const k056832_interface moo_k056832_intf =
 
 static const k053247_interface moo_k053247_intf =
 {
-	"screen",
 	"gfx2", 1,
 	NORMAL_PLANE_ORDER,
 	-48+1, 23,
@@ -472,7 +471,6 @@ static const k053247_interface moo_k053247_intf =
 
 static const k053247_interface bucky_k053247_intf =
 {
-	"screen",
 	"gfx2", 1,
 	NORMAL_PLANE_ORDER,
 	-48, 23,
@@ -482,14 +480,12 @@ static const k053247_interface bucky_k053247_intf =
 
 static const k054338_interface moo_k054338_intf =
 {
-	"screen",
 	0,
 	"none"
 };
 
 static const k053252_interface moo_k053252_intf =
 {
-	"screen",
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,

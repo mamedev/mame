@@ -23,7 +23,6 @@ public:
 			m_maincpu(*this, "maincpu"),
 			m_cassette(*this, "cassette"),
 			m_speaker(*this, "speaker"),
-			m_screen(*this, "screen"),
 			m_ram(*this, RAM_TAG),
 			m_rom(*this, "maincpu"),
 			m_videoram(*this, "videoram"),
@@ -41,7 +40,6 @@ public:
 	required_device<legacy_cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
 	required_device<speaker_sound_device> m_speaker;
-	required_device<screen_device> m_screen;
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
 	required_shared_ptr<UINT8> m_videoram;

@@ -371,7 +371,6 @@ INPUT_PORTS_END
 
 static MC6845_INTERFACE( h46505_intf )
 {
-	"screen",   /* screen we are acting on */
 	false,      /* show border area */
 	TILE_WIDTH, /* number of pixels per video memory address */
 	NULL,       /* before pixel update callback */
@@ -436,7 +435,7 @@ static MACHINE_CONFIG_START( othello, othello_state )
 
 	MCFG_PALETTE_LENGTH(0x10)
 
-	MCFG_MC6845_ADD("crtc", H46505, 1000000 /* ? MHz */, h46505_intf)   /* H46505 @ CPU clock */
+	MCFG_MC6845_ADD("crtc", H46505, "screen", 1000000 /* ? MHz */, h46505_intf)   /* H46505 @ CPU clock */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -45,8 +45,6 @@
 
 struct hd61830_interface
 {
-	const char *screen_tag;
-
 	devcb_read8 m_in_rd_cb;
 };
 
@@ -56,6 +54,7 @@ struct hd61830_interface
 
 class hd61830_device :  public device_t,
 						public device_memory_interface,
+						public device_video_interface,
 						public hd61830_interface
 {
 public:
@@ -94,7 +93,6 @@ private:
 
 	devcb_resolved_read8 m_in_rd_func;
 
-	screen_device *m_screen;
 	emu_timer *m_busy_timer;
 	//address_space *m_data;
 

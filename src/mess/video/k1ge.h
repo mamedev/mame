@@ -5,18 +5,19 @@
 
 #define MCFG_K1GE_ADD(_tag, _clock, _screen, _vblank, _hblank ) \
 	MCFG_DEVICE_ADD( _tag, K1GE, _clock ) \
-	k1ge_device::static_set_screen( *device, _screen ); \
+	MCFG_VIDEO_SET_SCREEN( _screen ) \
 	devcb = &k1ge_device::static_set_vblank_callback( *device, DEVCB2_##_vblank ); \
 	devcb = &k1ge_device::static_set_hblank_callback( *device, DEVCB2_##_hblank );
 
 #define MCFG_K2GE_ADD(_tag, _clock, _screen, _vblank, _hblank ) \
 	MCFG_DEVICE_ADD( _tag, K2GE, _clock ) \
-	k1ge_device::static_set_screen( *device, _screen ); \
+	MCFG_VIDEO_SET_SCREEN( _screen ) \
 	devcb = &k1ge_device::static_set_vblank_callback( *device, DEVCB2_##_vblank ); \
 	devcb = &k1ge_device::static_set_hblank_callback( *device, DEVCB2_##_hblank );
 
 
-class k1ge_device : public device_t
+class k1ge_device : public device_t,
+					public device_video_interface
 {
 public:
 	k1ge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -30,7 +31,6 @@ public:
 	void update( bitmap_ind16 &bitmap, const rectangle &cliprect );
 
 	// Static methods
-	static void static_set_screen(device_t &device, const char *screen_name) { downcast<k1ge_device &>(device).m_screen_tag = screen_name; }
 	template<class _Object> static devcb2_base &static_set_vblank_callback(device_t &device, _Object object) { return downcast<k1ge_device &>(device).m_vblank_pin_w.set_callback(object); }
 	template<class _Object> static devcb2_base &static_set_hblank_callback(device_t &device, _Object object) { return downcast<k1ge_device &>(device).m_hblank_pin_w.set_callback(object); }
 
@@ -40,8 +40,6 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 
-	const char *m_screen_tag;
-	screen_device *m_screen;
 	devcb2_write_line m_vblank_pin_w;
 	devcb2_write_line m_hblank_pin_w;
 	UINT8 *m_vram;

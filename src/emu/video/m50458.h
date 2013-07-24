@@ -15,12 +15,9 @@ Mitsubishi M50458 OSD chip
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_M50458_ADD(_tag,_config,_freq) \
+#define MCFG_M50458_ADD(_tag,_freq,_screen) \
 	MCFG_DEVICE_ADD(_tag, M50458,_freq) \
-	MCFG_DEVICE_CONFIG(_config)
-
-#define M50458_INTERFACE(name) \
-	const m50458_interface (name) =
+	MCFG_VIDEO_SET_SCREEN(_screen)
 
 
 //**************************************************************************
@@ -33,18 +30,11 @@ enum m50458_state_t
 	OSD_SET_DATA
 };
 
-// ======================> upd7220_interface
-
-struct m50458_interface
-{
-	const char *m_screen_tag;
-};
-
 // ======================> m50458_device
 
 class m50458_device :   public device_t,
 						public device_memory_interface,
-						public m50458_interface
+						public device_video_interface
 {
 public:
 	// construction/destruction
@@ -72,9 +62,6 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
-	virtual void device_config_complete();
-
-	screen_device *m_screen;
 
 	int m_latch;
 	int m_reset_line;

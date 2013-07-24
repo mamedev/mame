@@ -85,13 +85,13 @@ void K054338_update_all_shadows(running_machine &machine, int rushingheroes_hack
 
 
 // Unified K054338/K055555 BG color fill
-void K054338_fill_backcolor(running_machine &machine, bitmap_rgb32 &bitmap, int mode) // (see p.67)
+void K054338_fill_backcolor(running_machine &machine, screen_device &screen, bitmap_rgb32 &bitmap, int mode) // (see p.67)
 {
 	int clipx, clipy, clipw, cliph, i, dst_pitch;
 	int BGC_CBLK, BGC_SET;
 	UINT32 *dst_ptr, *pal_ptr;
 	int bgcolor;
-	const rectangle &visarea = machine.primary_screen->visible_area();
+	const rectangle &visarea = screen.visible_area();
 	driver_device *state = machine.driver_data();
 
 	clipx = visarea.min_x & ~3;
@@ -236,7 +236,8 @@ void K054338_export_config(int **shdRGB)
 const device_type K054338 = &device_creator<k054338_device>;
 
 k054338_device::k054338_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, K054338, "Konami 054338", tag, owner, clock, "k054338", __FILE__)
+	: device_t(mconfig, K054338, "Konami 054338", tag, owner, clock, "k054338", __FILE__),
+	device_video_interface(mconfig, *this)
 	//m_regs[32],
 	//m_shd_rgb[9],
 {
@@ -258,7 +259,6 @@ void k054338_device::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-	m_screen_tag = "";
 	m_alpha_inv = 0;
 	m_k055555_tag = "";
 	};
@@ -270,7 +270,6 @@ void k054338_device::device_config_complete()
 
 void k054338_device::device_start()
 {
-	m_screen = machine().device<screen_device>(m_screen_tag);
 	m_k055555 = machine().device<k055555_device>(m_k055555_tag);
 
 	save_item(NAME(m_regs));

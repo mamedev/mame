@@ -1111,7 +1111,6 @@ MACHINE_CONFIG_END
 
 static TMS9928A_INTERFACE(msx_tms9928a_interface)
 {
-	"screen",
 	0x4000,
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0)
 };

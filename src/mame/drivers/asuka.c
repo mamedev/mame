@@ -787,7 +787,6 @@ static const msm5205_interface msm5205_config =
 
 static const tc0100scn_interface asuka_tc0100scn_intf =
 {
-	"screen",
 	1, 2,       /* gfxnum, txnum */
 	0, 0,       /* x_offset, y_offset */
 	0, 0,       /* flip_xoff, flip_yoff */
@@ -797,7 +796,6 @@ static const tc0100scn_interface asuka_tc0100scn_intf =
 
 static const tc0100scn_interface cadash_tc0100scn_intf =
 {
-	"screen",
 	1, 2,       /* gfxnum, txnum */
 	1, 0,       /* x_offset, y_offset */
 	0, 0,       /* flip_xoff, flip_yoff */

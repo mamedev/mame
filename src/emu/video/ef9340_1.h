@@ -17,16 +17,14 @@
 
 #define MCFG_EF9340_1_ADD(_tag, _clock, _screen_tag) \
 	MCFG_DEVICE_ADD(_tag, EF9340_1, _clock) \
-	ef9340_1_device::set_screen_tag(*device, _screen_tag);
+	MCFG_VIDEO_SET_SCREEN(_screen_tag)
 
-class ef9340_1_device : public device_t
+class ef9340_1_device : public device_t,
+						public device_video_interface
 {
 public:
 	// construction/destruction
 	ef9340_1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	// static configuration helpers
-	static void set_screen_tag(device_t &device, const char *screen_tag) { downcast<ef9340_1_device &>(device).m_screen_tag = screen_tag; }
 
 	inline bitmap_ind16 *get_bitmap() { return &m_tmp_bitmap; }
 
@@ -51,9 +49,6 @@ protected:
 	static const device_timer_id TIMER_LINE = 0;
 
 	emu_timer *m_line_timer;
-
-	const char *m_screen_tag;
-	screen_device *m_screen;
 
 	bitmap_ind16 m_tmp_bitmap;
 

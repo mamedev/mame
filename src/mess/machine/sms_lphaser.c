@@ -71,6 +71,7 @@ ioport_constructor sms_light_phaser_device::device_input_ports() const
 
 sms_light_phaser_device::sms_light_phaser_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, SMS_LIGHT_PHASER, "Light Phaser", tag, owner, clock, "sms_light_phaser", __FILE__),
+	device_video_interface(mconfig, *this),
 	device_sms_control_port_interface(mconfig, *this),
 	m_lphaser_pins(*this, "CTRL_PORT"),
 	m_lphaser_x(*this, "LPHASER_X"),
@@ -85,7 +86,6 @@ sms_light_phaser_device::sms_light_phaser_device(const machine_config &mconfig, 
 
 void sms_light_phaser_device::device_start()
 {
-	m_screen = machine().first_screen();
 	m_lphaser_timer = timer_alloc(TIMER_LPHASER);
 	m_last_state = 1;
 }

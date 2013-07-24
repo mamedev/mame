@@ -204,7 +204,6 @@ static int vaportra_bank_callback( const int bank )
 
 static const deco16ic_interface vaportra_deco16ic_tilegen1_intf =
 {
-	"screen",
 	0, 1,
 	0x0f, 0x0f, /* trans masks (default values) */
 	0x00, 0x20, /* color base */
@@ -217,7 +216,6 @@ static const deco16ic_interface vaportra_deco16ic_tilegen1_intf =
 
 static const deco16ic_interface vaportra_deco16ic_tilegen2_intf =
 {
-	"screen",
 	0, 1,
 	0x0f, 0x0f, /* trans masks (default values) */
 	0x30, 0x40, /* color base */

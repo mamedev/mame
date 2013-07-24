@@ -693,7 +693,6 @@ READ8_MEMBER(portfolio_state::hd61830_rd_r)
 
 static HD61830_INTERFACE( lcdc_intf )
 {
-	SCREEN_TAG,
 	DEVCB_DRIVER_MEMBER(portfolio_state,hd61830_rd_r)
 };
 

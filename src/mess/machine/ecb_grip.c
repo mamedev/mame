@@ -284,7 +284,6 @@ static const speaker_interface speaker_intf =
 
 static MC6845_INTERFACE( crtc_intf )
 {
-	SCREEN_TAG,
 	false,
 	8,
 	NULL,
@@ -300,7 +299,6 @@ static MC6845_INTERFACE( crtc_intf )
 
 static MC6845_INTERFACE( grip5_crtc_intf )
 {
-    SCREEN_TAG,
     false,
     8,
     NULL,
@@ -550,8 +548,8 @@ static MACHINE_CONFIG_FRAGMENT( grip )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
-	MCFG_MC6845_ADD(MC6845_TAG, MC6845, XTAL_16MHz/4, crtc_intf)
-//  MCFG_MC6845_ADD(HD6345_TAG, HD6345, XTAL_16MHz/4, grip5_crtc_intf)
+	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, XTAL_16MHz/4, crtc_intf)
+//  MCFG_MC6845_ADD(HD6345_TAG, HD6345, SCREEN_TAG, XTAL_16MHz/4, grip5_crtc_intf)
 	MCFG_I8255A_ADD(I8255A_TAG, ppi_intf)
 	MCFG_Z80STI_ADD(Z80STI_TAG, XTAL_16MHz/4, sti_intf)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)

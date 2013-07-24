@@ -970,7 +970,6 @@ WRITE_LINE_MEMBER( adam_state::vdc_int_w )
 
 static TMS9928A_INTERFACE( vdc_intf )
 {
-	SCREEN_TAG,
 	0x4000,
 	DEVCB_DRIVER_LINE_MEMBER(adam_state, vdc_int_w)
 };

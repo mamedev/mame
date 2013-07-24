@@ -270,7 +270,6 @@ GFXDECODE_END
 
 static MC6845_INTERFACE( mc6845_intf )
 {
-	"screen",   /* screen we are acting on */
 	false,      /* show border area */
 	8,          /* number of pixels per video memory address */
 	NULL,       /* before pixel update callback */
@@ -353,7 +352,7 @@ static MACHINE_CONFIG_START( paso1600, paso1600_state )
 //  MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 
 	/* Devices */
-	MCFG_MC6845_ADD("crtc", H46505, 16000000/4, mc6845_intf)    /* unknown clock, hand tuned to get ~60 fps */
+	MCFG_MC6845_ADD("crtc", H46505, "screen", 16000000/4, mc6845_intf)    /* unknown clock, hand tuned to get ~60 fps */
 	MCFG_PIC8259_ADD( "pic8259", WRITELINE(paso1600_state, paso1600_set_int_line), GND, NULL )
 	MCFG_I8237_ADD("8237dma", 16000000/4, paso1600_dma8237_interface)
 MACHINE_CONFIG_END

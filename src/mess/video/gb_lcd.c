@@ -180,12 +180,14 @@ const device_type GB_LCD_CGB = &device_creator<cgb_lcd_device>;
 
 gb_lcd_device::gb_lcd_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 				: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+					device_video_interface(mconfig, *this),
 					m_sgb_border_hack(0)
 {
 }
 
 gb_lcd_device::gb_lcd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 				: device_t(mconfig, GB_LCD_DMG, "DMG LCD", tag, owner, clock, "dmg_lcd", __FILE__),
+					device_video_interface(mconfig, *this),
 					m_sgb_border_hack(0)
 {
 }
@@ -219,7 +221,6 @@ void gb_lcd_device::common_start()
 	machine().save().register_postload(save_prepost_delegate(FUNC(gb_lcd_device::videoptr_restore), this));
 
 	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_screen = machine().device<screen_device>("screen");
 
 	save_pointer(NAME(m_oam), 0x100);
 	save_item(NAME(m_window_lines_drawn));

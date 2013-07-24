@@ -51,7 +51,8 @@
 	MCFG_SCREEN_VISIBLE_AREA(MOS6560_MAME_XPOS, MOS6560_MAME_XPOS + MOS6560_MAME_XSIZE - 1, MOS6560_MAME_YPOS, MOS6560_MAME_YPOS + MOS6560_MAME_YSIZE - 1) \
 	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos6560_device, screen_update) \
 	MCFG_SOUND_ADD(_tag, MOS6560, _clock) \
-	downcast<mos6560_device *>(device)->set_callbacks(_screen_tag, DEVCB2_##_potx, DEVCB2_##_poty); \
+	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
+	downcast<mos6560_device *>(device)->set_callbacks(DEVCB2_##_potx, DEVCB2_##_poty); \
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, _videoram_map) \
 	MCFG_DEVICE_ADDRESS_MAP(AS_1, _colorram_map)
 
@@ -63,7 +64,8 @@
 	MCFG_SCREEN_VISIBLE_AREA(MOS6561_MAME_XPOS, MOS6561_MAME_XPOS + MOS6561_MAME_XSIZE - 1, MOS6561_MAME_YPOS, MOS6561_MAME_YPOS + MOS6561_MAME_YSIZE - 1) \
 	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos6560_device, screen_update) \
 	MCFG_SOUND_ADD(_tag, MOS6561, _clock) \
-	downcast<mos6560_device *>(device)->set_callbacks(_screen_tag, DEVCB2_##_potx, DEVCB2_##_poty); \
+	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
+	downcast<mos6560_device *>(device)->set_callbacks(DEVCB2_##_potx, DEVCB2_##_poty); \
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, _videoram_map) \
 	MCFG_DEVICE_ADDRESS_MAP(AS_1, _colorram_map)
 
@@ -75,7 +77,8 @@
 	MCFG_SCREEN_VISIBLE_AREA(0, 23*8 - 1, 0, 22*8 - 1) \
 	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos6560_device, screen_update) \
 	MCFG_SOUND_ADD(_tag, MOS656X_ATTACK_UFO, _clock) \
-	downcast<mos6560_device *>(device)->set_callbacks(_screen_tag, DEVCB2_NULL, DEVCB2_NULL); \
+	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
+	downcast<mos6560_device *>(device)->set_callbacks(DEVCB2_NULL, DEVCB2_NULL); \
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, _videoram_map) \
 	MCFG_DEVICE_ADDRESS_MAP(AS_1, _colorram_map)
 
@@ -125,14 +128,14 @@
 
 class mos6560_device : public device_t,
 						public device_memory_interface,
-						public device_sound_interface
+						public device_sound_interface,
+						public device_video_interface
 {
 public:
 	mos6560_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source);
 	mos6560_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _potx, class _poty> void set_callbacks(const char *screen_tag, _potx potx, _poty poty) {
-		m_screen_tag = screen_tag;
+	template<class _potx, class _poty> void set_callbacks(_potx potx, _poty poty) {
 		m_read_potx.set_callback(potx);
 		m_read_poty.set_callback(poty);
 	}
@@ -186,9 +189,6 @@ protected:
 
 	devcb2_read8    m_read_potx;
 	devcb2_read8    m_read_poty;
-
-	const char *m_screen_tag;
-	screen_device *m_screen;
 
 	UINT8 m_reg[16];
 

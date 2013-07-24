@@ -32,7 +32,6 @@ static WRITE_LINE_DEVICE_HANDLER( pcjr_vsync_changed );
 
 static MC6845_INTERFACE( mc6845_t1000_intf )
 {
-	T1000_SCREEN_NAME,      /* screen number */
 	false,                  /* show border area */
 	8,                      /* numbers of pixels per video memory address */
 	NULL,                   /* begin_update */
@@ -54,7 +53,7 @@ MACHINE_CONFIG_FRAGMENT( pcvideo_t1000 )
 	MCFG_PALETTE_LENGTH( 32 )
 	MCFG_PALETTE_INIT(pcjr)
 
-	MCFG_MC6845_ADD(T1000_MC6845_NAME, MC6845, XTAL_14_31818MHz/8, mc6845_t1000_intf)
+	MCFG_MC6845_ADD(T1000_MC6845_NAME, MC6845, T1000_SCREEN_NAME, XTAL_14_31818MHz/8, mc6845_t1000_intf)
 
 	MCFG_VIDEO_START(pc_t1t)
 MACHINE_CONFIG_END
@@ -62,7 +61,6 @@ MACHINE_CONFIG_END
 
 static MC6845_INTERFACE( mc6845_pcjr_intf )
 {
-	T1000_SCREEN_NAME,      /* screen number */
 	false,                  /* show border area */
 	8,                      /* numbers of pixels per video memory address */
 	NULL,                   /* begin_update */
@@ -84,7 +82,7 @@ MACHINE_CONFIG_FRAGMENT( pcvideo_pcjr )
 	MCFG_PALETTE_LENGTH( 32 )
 	MCFG_PALETTE_INIT(pcjr)
 
-	MCFG_MC6845_ADD(T1000_MC6845_NAME, MC6845, XTAL_14_31818MHz/16, mc6845_pcjr_intf)
+	MCFG_MC6845_ADD(T1000_MC6845_NAME, MC6845, T1000_SCREEN_NAME, XTAL_14_31818MHz/16, mc6845_pcjr_intf)
 
 	MCFG_VIDEO_START(pc_pcjr)
 MACHINE_CONFIG_END

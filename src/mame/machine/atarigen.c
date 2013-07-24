@@ -385,14 +385,13 @@ const device_type ATARI_VAD = &device_creator<atari_vad_device>;
 
 atari_vad_device::atari_vad_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ATARI_VAD, "Atari VAD", tag, owner, clock, "atarivad", __FILE__),
-		m_screen_tag(NULL),
+		device_video_interface(mconfig, *this),
 		m_scanline_int_cb(*this),
 		m_alpha_tilemap(*this, "alpha"),
 		m_playfield_tilemap(*this, "playfield"),
 		m_playfield2_tilemap(*this, "playfield2"),
 		m_mob(*this, "mob"),
 		m_eof_data(*this, "eof"),
-		m_screen(NULL),
 		m_scanline_int_timer(NULL),
 		m_tilerow_update_timer(NULL),
 		m_eof_timer(NULL),
@@ -404,16 +403,6 @@ atari_vad_device::atari_vad_device(const machine_config &mconfig, const char *ta
 		m_mo_xscroll(0),
 		m_mo_yscroll(0)
 {
-}
-
-
-//-------------------------------------------------
-//  static_set_screen: Set the tag of the screen
-//-------------------------------------------------
-
-void atari_vad_device::static_set_screen(device_t &device, const char *screentag)
-{
-	downcast<atari_vad_device &>(device).m_screen_tag = screentag;
 }
 
 
@@ -530,13 +519,6 @@ void atari_vad_device::device_start()
 		throw emu_fatalerror("Playfield tilemap not found!");
 	if (m_eof_data == NULL)
 		throw emu_fatalerror("EOF data not found!");
-
-	// find the screen
-	if (m_screen_tag == NULL)
-		throw emu_fatalerror("No screen specified!");
-	m_screen = siblingdevice<screen_device>(m_screen_tag);
-	if (m_screen == NULL)
-		throw emu_fatalerror("Screen '%s' not found!", m_screen_tag);
 
 	// resolve callbacks
 	m_scanline_int_cb.resolve_safe();

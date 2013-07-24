@@ -216,7 +216,6 @@ GFXDECODE_END
 
 static MC6845_INTERFACE( mc6845_intf )
 {
-	"screen",   /* screen we are acting on */
 	false,      /* show border area */
 	8,          /* number of pixels per video memory address */
 	NULL,       /* before pixel update callback */
@@ -251,7 +250,7 @@ static MACHINE_CONFIG_START( usg32, usgames_state )
 	MCFG_PALETTE_LENGTH(2*256)
 
 
-	MCFG_MC6845_ADD("crtc", MC6845, XTAL_18MHz / 16, mc6845_intf)
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_18MHz / 16, mc6845_intf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

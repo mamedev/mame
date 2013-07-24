@@ -916,7 +916,6 @@ GFXDECODE_END
 
 static MC6845_INTERFACE( mc6845_intf )
 {
-	"screen",   /* screen we are acting on */
 	false,      /* show border area */
 	8,          /* number of pixels per video memory address */
 	NULL,       /* before pixel update callback */
@@ -1047,7 +1046,7 @@ static MACHINE_CONFIG_START( kingdrby, kingdrby_state )
 	MCFG_SCREEN_UPDATE_DRIVER(kingdrby_state, screen_update_kingdrby)
 
 
-	MCFG_MC6845_ADD("crtc", MC6845, CLK_1/32, mc6845_intf)  /* 53.333 Hz. guess */
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", CLK_1/32, mc6845_intf)  /* 53.333 Hz. guess */
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

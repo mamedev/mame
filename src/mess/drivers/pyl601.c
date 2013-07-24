@@ -468,7 +468,6 @@ static MC6845_UPDATE_ROW( pyl601a_update_row )
 
 static MC6845_INTERFACE( pyl601_crtc6845_interface )
 {
-	"screen",
 	false,
 	8 /*?*/,
 	NULL,
@@ -483,7 +482,6 @@ static MC6845_INTERFACE( pyl601_crtc6845_interface )
 
 static MC6845_INTERFACE( pyl601a_crtc6845_interface )
 {
-	"screen",
 	false,
 	8 /*?*/,
 	NULL,
@@ -574,7 +572,7 @@ static MACHINE_CONFIG_START( pyl601, pyl601_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
-	MCFG_MC6845_ADD("crtc", MC6845, XTAL_2MHz, pyl601_crtc6845_interface)
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_2MHz, pyl601_crtc6845_interface)
 	MCFG_UPD765A_ADD("upd765", true, true)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", pyl601_floppies, "525hd", pyl601_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", pyl601_floppies, "525hd", pyl601_state::floppy_formats)
@@ -591,7 +589,7 @@ static MACHINE_CONFIG_DERIVED( pyl601a, pyl601 )
 
 	MCFG_GFXDECODE(pyl601a)
 	MCFG_DEVICE_REMOVE("crtc")
-	MCFG_MC6845_ADD("crtc", MC6845, XTAL_2MHz, pyl601a_crtc6845_interface)
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_2MHz, pyl601a_crtc6845_interface)
 MACHINE_CONFIG_END
 
 /* ROM definition */

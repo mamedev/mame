@@ -36,12 +36,14 @@ const device_type CRT5037 = &device_creator<crt5037_device>;
 const device_type CRT5057 = &device_creator<crt5057_device>;
 
 tms9927_device::tms9927_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-				: device_t(mconfig, TMS9927, "TMS9927", tag, owner, clock, "tms9927", __FILE__)
+				: device_t(mconfig, TMS9927, "TMS9927", tag, owner, clock, "tms9927", __FILE__),
+					device_video_interface(mconfig, *this)
 {
 }
 
 tms9927_device::tms9927_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-				: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+				: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+					device_video_interface(mconfig, *this)
 {
 }
 
@@ -88,10 +90,6 @@ void tms9927_device::device_start()
 
 	/* copy the initial parameters */
 	m_clock = clock();
-
-	/* get the screen device */
-	m_screen = downcast<screen_device *>(machine().device(m_screen_tag));
-	assert(m_screen != NULL);
 
 	/* get the self-load PROM */
 	if (m_selfload_region != NULL)

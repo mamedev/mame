@@ -284,7 +284,6 @@ static const k052109_interface simpsons_k052109_intf =
 
 static const k053247_interface simpsons_k053246_intf =
 {
-	"screen",
 	"gfx2", 1,
 	NORMAL_PLANE_ORDER,
 	53, 23,

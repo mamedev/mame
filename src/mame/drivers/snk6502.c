@@ -755,7 +755,6 @@ INTERRUPT_GEN_MEMBER(snk6502_state::snk6502_interrupt)
 
 static MC6845_INTERFACE( mc6845_intf )
 {
-	"screen",   /* screen we are acting on */
 	false,      /* show border area */
 	8,          /* number of pixels per video memory address */
 	NULL,       /* before pixel update callback */
@@ -837,7 +836,7 @@ static MACHINE_CONFIG_START( sasuke, snk6502_state )
 	MCFG_PALETTE_INIT_OVERRIDE(snk6502_state,satansat)
 	MCFG_VIDEO_START_OVERRIDE(snk6502_state,satansat)
 
-	MCFG_MC6845_ADD("crtc", MC6845, MASTER_CLOCK / 16, mc6845_intf)
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK / 16, mc6845_intf)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("sasuke_timer", snk6502_state, sasuke_update_counter, attotime::from_hz(MASTER_CLOCK / 8))
 
@@ -910,7 +909,7 @@ static MACHINE_CONFIG_START( vanguard, snk6502_state )
 	MCFG_PALETTE_INIT_OVERRIDE(snk6502_state,snk6502)
 	MCFG_VIDEO_START_OVERRIDE(snk6502_state,snk6502)
 
-	MCFG_MC6845_ADD("crtc", MC6845, MASTER_CLOCK / 16, mc6845_intf)
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK / 16, mc6845_intf)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

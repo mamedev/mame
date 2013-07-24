@@ -15,13 +15,13 @@
 
 struct kaneko_pandora_interface
 {
-	const char *m_screen_tag;
 	UINT8      m_gfx_region;
 	int        m_xoffset;
 	int        m_yoffset;
 };
 
 class kaneko_pandora_device : public device_t,
+								public device_video_interface,
 								public kaneko_pandora_interface
 {
 public:
@@ -47,7 +47,6 @@ protected:
 
 private:
 	// internal state
-	screen_device   *m_screen;
 	UINT8 *         m_spriteram;
 	bitmap_ind16    *m_sprites_bitmap; /* bitmap to render sprites to, Pandora seems to be frame'buffered' */
 	int             m_clear_bitmap;

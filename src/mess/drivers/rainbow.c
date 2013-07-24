@@ -398,7 +398,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(rainbow_state::keyboard_tick)
 
 static const vt_video_interface video_interface =
 {
-	"screen",
 	"chargen",
 	DEVCB_DRIVER_MEMBER(rainbow_state, read_video_ram_r),
 	DEVCB_DRIVER_MEMBER(rainbow_state, clear_video_interrupt)

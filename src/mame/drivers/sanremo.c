@@ -345,7 +345,6 @@ static const mc6845_interface mc6845_intf =
 
 */
 {
-	"screen",   /* screen we are acting on */
 	false,      /* show border area */
 	8,          /* number of pixels per video memory address */
 	NULL,       /* before pixel update callback */
@@ -396,7 +395,7 @@ static MACHINE_CONFIG_START( sanremo, sanremo_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 48*8-1, 0, 38*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sanremo_state, screen_update_sanremo)
 
-	MCFG_MC6845_ADD("crtc", MC6845, CRTC_CLOCK, mc6845_intf)
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK, mc6845_intf)
 
 	MCFG_GFXDECODE(sanremo)
 	MCFG_PALETTE_LENGTH(0x10)

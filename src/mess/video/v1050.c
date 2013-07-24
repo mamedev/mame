@@ -95,7 +95,6 @@ WRITE_LINE_MEMBER( v1050_state::crtc_vs_w )
 
 static MC6845_INTERFACE( crtc_intf )
 {
-	SCREEN_TAG,
 	false,
 	8,
 	NULL,
@@ -122,7 +121,7 @@ void v1050_state::video_start()
 /* Machine Drivers */
 
 MACHINE_CONFIG_FRAGMENT( v1050_video )
-	MCFG_MC6845_ADD(H46505_TAG, H46505, XTAL_15_36MHz/8, crtc_intf)
+	MCFG_MC6845_ADD(H46505_TAG, H46505, SCREEN_TAG, XTAL_15_36MHz/8, crtc_intf)
 
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_UPDATE_DEVICE(H46505_TAG, h46505_device, screen_update)

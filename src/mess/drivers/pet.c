@@ -1193,7 +1193,6 @@ static MC6845_UPDATE_ROW( pet80_update_row )
 
 static MC6845_INTERFACE( crtc_intf )
 {
-	SCREEN_TAG,
 	false,
 	2*8,
 	NULL,
@@ -1257,7 +1256,6 @@ static MC6845_UPDATE_ROW( cbm8296_update_row )
 
 static MC6845_INTERFACE( cbm8296_crtc_intf )
 {
-	SCREEN_TAG,
 	false,
 	2*8,
 	NULL,
@@ -1738,7 +1736,7 @@ static MACHINE_CONFIG_START( pet80, pet80_state )
 	MCFG_SCREEN_SIZE(640, 250)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 250 - 1)
 	MCFG_SCREEN_UPDATE_DEVICE(MC6845_TAG, mc6845_device, screen_update)
-	MCFG_MC6845_ADD(MC6845_TAG, MC6845, XTAL_16MHz/16, crtc_intf)
+	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, XTAL_16MHz/16, crtc_intf)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

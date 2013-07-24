@@ -81,7 +81,6 @@ static const struct tms9995reset_param cortex_processor_config =
 
 static TMS9928A_INTERFACE(cortex_tms9929a_interface)
 {
-	"screen",   // screen tag
 	0x4000,     // vram size
 	DEVCB_NULL  // write line if int changes
 };

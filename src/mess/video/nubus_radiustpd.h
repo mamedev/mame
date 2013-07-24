@@ -14,6 +14,7 @@
 
 class nubus_radiustpd_device :
 		public device_t,
+		public device_video_interface,
 		public device_nubus_card_interface
 {
 public:
@@ -42,7 +43,6 @@ public:
 		UINT32 *m_vram32;
 		UINT32 m_mode, m_vbl_disable, m_toggle;
 		UINT32 m_palette[256], m_colors[3], m_count, m_clutoffs;
-		screen_device *m_screen;
 		emu_timer *m_timer;
 };
 

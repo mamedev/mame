@@ -940,7 +940,6 @@ static const z80_daisy_config attache_daisy_chain[] =
 
 static const tms9927_interface crtc_interface =
 {
-	"screen",
 	8,  // guessing for now
 	NULL
 };

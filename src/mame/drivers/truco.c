@@ -434,7 +434,6 @@ static const pia6821_interface pia0_intf =
 
 static MC6845_INTERFACE( mc6845_intf )
 {
-	"screen",   /* screen we are acting on */
 	false,      /* show border area */
 	4,          /* number of pixels per video memory address */
 	NULL,       /* before pixel update callback */
@@ -473,7 +472,7 @@ static MACHINE_CONFIG_START( truco, truco_state )
 
 	MCFG_PALETTE_LENGTH(16)
 
-	MCFG_MC6845_ADD("crtc", MC6845, CRTC_CLOCK, mc6845_intf)    /* Identified as UM6845 */
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK, mc6845_intf)    /* Identified as UM6845 */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

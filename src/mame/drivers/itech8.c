@@ -1661,7 +1661,6 @@ static void generate_interrupt(running_machine &machine, int state_num)
 
 static const struct tms34061_interface tms34061intf =
 {
-	"screen",               /* the screen we are acting on */
 	8,                      /* VRAM address is (row << rowshift) | col */
 	0x40000,                /* size of video RAM */
 	generate_interrupt      /* interrupt gen callback */

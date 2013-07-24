@@ -142,23 +142,10 @@ inline void sed1330_device::increment_csr()
 sed1330_device::sed1330_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SED1330, "SED1330", tag, owner, clock, "sed1330", __FILE__),
 		device_memory_interface(mconfig, *this),
+		device_video_interface(mconfig, *this),
 		m_bf(0),
 		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, NULL, *ADDRESS_MAP_NAME(sed1330))
 {
-}
-
-
-//-------------------------------------------------
-//  static_set_config - configuration helper
-//-------------------------------------------------
-
-void sed1330_device::static_set_config(device_t &device, const char *screen_tag)
-{
-	sed1330_device &sed1330 = downcast<sed1330_device &>(device);
-
-	assert(screen_tag != NULL);
-
-	sed1330.m_screen_tag = screen_tag;
 }
 
 

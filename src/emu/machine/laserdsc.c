@@ -89,7 +89,7 @@ const UINT32 VIRTUAL_LEAD_OUT_TRACKS = LEAD_OUT_MIN_SIZE_IN_UM * 1000 / NOMINAL_
 laserdisc_device::laserdisc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_sound_interface(mconfig, *this),
-		m_screen_name(NULL),
+		device_video_interface(mconfig, *this),
 		m_overwidth(0),
 		m_overheight(0),
 		m_overclip(0, -1, 0, -1),
@@ -236,16 +236,6 @@ UINT32 laserdisc_device::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 
 
 //-------------------------------------------------
-//  static_set_screen - set the screen name
-//-------------------------------------------------
-
-void laserdisc_device::static_set_screen(device_t &device, const char *screen)
-{
-	downcast<laserdisc_device &>(device).m_screen_name = screen;
-}
-
-
-//-------------------------------------------------
 //  static_set_get_disc - set the get disc
 //  delegate
 //-------------------------------------------------
@@ -340,12 +330,6 @@ void laserdisc_device::static_set_overlay_scale(device_t &device, float scalex, 
 
 void laserdisc_device::device_start()
 {
-	// ensure that our screen is started first
-	m_screen = machine().device<screen_device>(m_screen_name);
-	assert(m_screen != NULL);
-	if (!m_screen->started())
-		throw device_missing_dependencies();
-
 	// initialize the various pieces
 	init_disc();
 	init_video();

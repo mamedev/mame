@@ -70,6 +70,7 @@ inline void hd44102_device::count_up_or_down()
 
 hd44102_device::hd44102_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, HD44102, "HD44102", tag, owner, clock, "hd44102", __FILE__),
+		device_video_interface(mconfig, *this),
 		m_cs2(0),
 		m_page(0),
 		m_x(0),
@@ -82,13 +83,10 @@ hd44102_device::hd44102_device(const machine_config &mconfig, const char *tag, d
 //  static_set_config - configuration helper
 //-------------------------------------------------
 
-void hd44102_device::static_set_config(device_t &device, const char *screen_tag, int sx, int sy)
+void hd44102_device::static_set_config(device_t &device, int sx, int sy)
 {
 	hd44102_device &hd44102 = downcast<hd44102_device &>(device);
 
-	assert(screen_tag != NULL);
-
-	hd44102.m_screen_tag = screen_tag;
 	hd44102.m_sx = sx;
 	hd44102.m_sy = sy;
 }
@@ -100,9 +98,6 @@ void hd44102_device::static_set_config(device_t &device, const char *screen_tag,
 
 void hd44102_device::device_start()
 {
-	// find screen
-	m_screen = machine().device<screen_device>(m_screen_tag);
-
 	// register for state saving
 	save_item(NAME(m_ram[0]));
 	save_item(NAME(m_ram[1]));

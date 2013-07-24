@@ -36,7 +36,8 @@ struct layer_struct {
 };
 
 
-class gb_lcd_device : public device_t
+class gb_lcd_device : 	public device_t,
+						public device_video_interface
 {
 public:
 	gb_lcd_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
@@ -70,7 +71,6 @@ protected:
 
 	// pointer to the main system
 	cpu_device *m_maincpu;
-	screen_device *m_screen;
 
 	// state variables
 	bitmap_ind16 m_bitmap;

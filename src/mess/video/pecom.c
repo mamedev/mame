@@ -82,7 +82,6 @@ WRITE_LINE_MEMBER(pecom_state::pecom_prd_w)
 
 static CDP1869_INTERFACE( pecom_cdp1869_intf )
 {
-	SCREEN_TAG,
 	CDP1869_COLOR_CLK_PAL,
 	CDP1869_PAL,
 	pecom_pcb_r,

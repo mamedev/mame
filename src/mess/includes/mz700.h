@@ -49,7 +49,7 @@ public:
 	int m_mz800_ram_monitor;    /* 1 if monitor rom banked in */
 
 	int m_hires_mode;           /* 1 if in 640x200 mode */
-	int m_screen;           /* screen designation */
+	int m_screennum;           /* screen designation */
 	UINT8 *m_colorram;
 	UINT8 *m_videoram;
 	UINT8 m_speaker_level;

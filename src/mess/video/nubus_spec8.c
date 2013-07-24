@@ -67,14 +67,18 @@ const rom_entry *nubus_spec8s3_device::device_rom_region() const
 
 nubus_spec8s3_device::nubus_spec8s3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, NUBUS_SPEC8S3, "SuperMac Spectrum/8 Series III video card", tag, owner, clock, "nb_sp8s3", __FILE__),
+		device_video_interface(mconfig, *this),
 		device_nubus_card_interface(mconfig, *this)
 {
+	m_screen_tag = SPEC8S3_SCREEN_NAME;
 }
 
 nubus_spec8s3_device::nubus_spec8s3_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+		device_video_interface(mconfig, *this),
 		device_nubus_card_interface(mconfig, *this)
 {
+	m_screen_tag = SPEC8S3_SCREEN_NAME;
 }
 
 //-------------------------------------------------
@@ -100,7 +104,7 @@ void nubus_spec8s3_device::device_start()
 	m_nubus->install_device(slotspace+0xd0000, slotspace+0xfffff, read32_delegate(FUNC(nubus_spec8s3_device::spec8s3_r), this), write32_delegate(FUNC(nubus_spec8s3_device::spec8s3_w), this));
 
 	m_timer = timer_alloc(0, NULL);
-	m_screen = NULL;    // can we look this up now?
+	m_timer->adjust(m_screen->time_until_pos(767, 0), 0);
 }
 
 //-------------------------------------------------
@@ -146,12 +150,6 @@ UINT32 nubus_spec8s3_device::screen_update(screen_device &screen, bitmap_rgb32 &
 	int x, y;
 	UINT8 pixels, *vram;
 
-	// first time?  kick off the VBL timer
-	if (!m_screen)
-	{
-		m_screen = &screen;
-		m_timer->adjust(m_screen->time_until_pos(767, 0), 0);
-	}
 	vram = m_vram + 0x400;
 
 	switch (m_mode)

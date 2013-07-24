@@ -387,7 +387,6 @@ static int sshangha_bank_callback( int bank )
 
 static const deco16ic_interface sshangha_deco16ic_tilegen1_intf =
 {
-	"screen",
 	0, 1,
 	0x0f, 0x0f, /* trans masks (default values) */
 	0x10, 0x00, /* color base */

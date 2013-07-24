@@ -1706,6 +1706,7 @@ static MACHINE_CONFIG_START( vsnes, vsnes_state )
 	MCFG_VIDEO_START_OVERRIDE(vsnes_state,vsnes)
 
 	MCFG_PPU2C04_ADD("ppu1", vsnes_ppu_interface_1)
+	MCFG_PPU2C0X_SET_SCREEN("screen1")
 	MCFG_PPU2C0X_SET_NMI(vsnes_state, ppu_irq_1)
 
 	/* sound hardware */
@@ -1723,6 +1724,7 @@ static MACHINE_CONFIG_DERIVED( jajamaru, vsnes )
 
 	MCFG_DEVICE_REMOVE( "ppu1" )
 	MCFG_PPU2C05_01_ADD("ppu1", vsnes_ppu_interface_1)
+	MCFG_PPU2C0X_SET_SCREEN("screen1")
 	MCFG_PPU2C0X_SET_NMI(vsnes_state, ppu_irq_1)
 MACHINE_CONFIG_END
 
@@ -1730,6 +1732,7 @@ static MACHINE_CONFIG_DERIVED( mightybj, vsnes )
 
 	MCFG_DEVICE_REMOVE( "ppu1" )
 	MCFG_PPU2C05_02_ADD("ppu1", vsnes_ppu_interface_1)
+	MCFG_PPU2C0X_SET_SCREEN("screen1")
 	MCFG_PPU2C0X_SET_NMI(vsnes_state, ppu_irq_1)
 MACHINE_CONFIG_END
 
@@ -1737,6 +1740,7 @@ static MACHINE_CONFIG_DERIVED( vsgshoe, vsnes )
 
 	MCFG_DEVICE_REMOVE( "ppu1" )
 	MCFG_PPU2C05_03_ADD("ppu1", vsnes_ppu_interface_1)
+	MCFG_PPU2C0X_SET_SCREEN("screen1")
 	MCFG_PPU2C0X_SET_NMI(vsnes_state, ppu_irq_1)
 MACHINE_CONFIG_END
 
@@ -1744,6 +1748,7 @@ static MACHINE_CONFIG_DERIVED( topgun, vsnes )
 
 	MCFG_DEVICE_REMOVE( "ppu1" )
 	MCFG_PPU2C05_04_ADD("ppu1", vsnes_ppu_interface_1)
+	MCFG_PPU2C0X_SET_SCREEN("screen1")
 	MCFG_PPU2C0X_SET_NMI(vsnes_state, ppu_irq_1)
 MACHINE_CONFIG_END
 
@@ -1779,8 +1784,10 @@ static MACHINE_CONFIG_START( vsdual, vsnes_state )
 	MCFG_VIDEO_START_OVERRIDE(vsnes_state,vsdual)
 
 	MCFG_PPU2C04_ADD("ppu1", vsnes_ppu_interface_1)
+	MCFG_PPU2C0X_SET_SCREEN("screen1")
 	MCFG_PPU2C0X_SET_NMI(vsnes_state, ppu_irq_1)
 	MCFG_PPU2C04_ADD("ppu2", vsnes_ppu_interface_2)
+	MCFG_PPU2C0X_SET_SCREEN("screen2")
 	MCFG_PPU2C0X_SET_NMI(vsnes_state, ppu_irq_2)
 
 	/* sound hardware */

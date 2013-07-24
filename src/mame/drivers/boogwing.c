@@ -311,14 +311,8 @@ static int boogwing_bank_callback2( const int bank )
 	return offset;
 }
 
-static const decocomn_interface boogwing_decocomn_intf =
-{
-	"screen",
-};
-
 static const deco16ic_interface boogwing_deco16ic_tilegen1_intf =
 {
-	"screen",
 	0, 1,
 	0x0f, 0x1f, /* trans masks (pf2 has 5bpp graphics) */
 	0, 0,  /* color base (pf2 is non default) */
@@ -330,7 +324,6 @@ static const deco16ic_interface boogwing_deco16ic_tilegen1_intf =
 
 static const deco16ic_interface boogwing_deco16ic_tilegen2_intf =
 {
-	"screen",
 	0, 1,
 	0x0f, 0x0f,
 	0, 16,
@@ -366,7 +359,7 @@ static MACHINE_CONFIG_START( boogwing, boogwing_state )
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram2")
 
-	MCFG_DECOCOMN_ADD("deco_common", boogwing_decocomn_intf)
+	MCFG_DECOCOMN_ADD("deco_common")
 
 	MCFG_DECO16IC_ADD("tilegen1", boogwing_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_ADD("tilegen2", boogwing_deco16ic_tilegen2_intf)

@@ -100,6 +100,7 @@ inline void cdp1864_device::initialize_palette()
 cdp1864_device::cdp1864_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, CDP1864, "CDP1864", tag, owner, clock, "cdp1864", __FILE__),
 		device_sound_interface(mconfig, *this),
+		device_video_interface(mconfig, *this),
 		m_read_inlace(*this),
 		m_read_rdata(*this),
 		m_read_bdata(*this),
@@ -147,7 +148,6 @@ void cdp1864_device::device_start()
 	m_hsync_timer = timer_alloc(TIMER_HSYNC);
 
 	// find devices
-	m_screen = machine().device<screen_device>(m_screen_tag);
 	m_screen->register_screen_bitmap(m_bitmap);
 
 	// register for state saving

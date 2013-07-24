@@ -37,7 +37,6 @@ UINT32 tandy200_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 static HD61830_INTERFACE( lcdc_intf )
 {
-	SCREEN_TAG,
 	DEVCB_NULL
 };
 

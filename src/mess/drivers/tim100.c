@@ -107,7 +107,6 @@ static I8275_DISPLAY_PIXELS(tim100_display_pixels)
 }
 
 static const i8275_interface tim100_i8276_interface = {
-	"screen",
 	16, //12
 	0,
 	DEVCB_CPU_INPUT_LINE("maincpu", I8085_RST65_LINE),

@@ -235,7 +235,6 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
-	device_t *m_screen;
 
 	INT32 *m_zoom_table;
 	UINT16 *m_blitter_data;
@@ -764,8 +763,6 @@ void wheelfir_state::machine_reset()
 
 void wheelfir_state::machine_start()
 {
-	m_screen = machine().device("screen");
-
 	m_zoom_table = auto_alloc_array(machine(), INT32, ZOOM_TABLE_SIZE);
 	m_blitter_data = auto_alloc_array(machine(), UINT16, 16);
 

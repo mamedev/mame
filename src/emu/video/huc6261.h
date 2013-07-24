@@ -24,9 +24,6 @@
 
 struct huc6261_interface
 {
-	/* Tag for the screen we will be drawing on */
-	const char *screen_tag;
-
 	/* Tags for the 2 HuC6270 devices */
 	const char *huc6270_a_tag;
 	const char *huc6270_b_tag;
@@ -34,6 +31,7 @@ struct huc6261_interface
 
 
 class huc6261_device :  public device_t,
+						public device_video_interface,
 						public huc6261_interface
 {
 public:
@@ -54,7 +52,6 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 private:
-	screen_device *m_screen;
 	huc6270_device *m_huc6270_a;
 	huc6270_device *m_huc6270_b;
 	int     m_last_h;

@@ -141,7 +141,6 @@ void multi16_state::machine_reset()
 
 static MC6845_INTERFACE( mc6845_intf )
 {
-	"screen",   /* screen we are acting on */
 	false,      /* show border area */
 	8,          /* number of pixels per video memory address */
 	NULL,       /* before pixel update callback */
@@ -171,7 +170,7 @@ static MACHINE_CONFIG_START( multi16, multi16_state )
 	MCFG_PALETTE_LENGTH(8)
 
 	/* Devices */
-	MCFG_MC6845_ADD("crtc", H46505, 16000000/5, mc6845_intf)    /* unknown clock, hand tuned to get ~60 fps */
+	MCFG_MC6845_ADD("crtc", H46505, "screen", 16000000/5, mc6845_intf)    /* unknown clock, hand tuned to get ~60 fps */
 	MCFG_PIC8259_ADD( "pic8259", WRITELINE(multi16_state, multi16_set_int_line), GND, NULL )
 MACHINE_CONFIG_END
 

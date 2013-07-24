@@ -615,7 +615,6 @@ static const cassette_interface super80_cassette_interface =
 
 static MC6845_INTERFACE( super80v_crtc )
 {
-	"screen",           /* name of screen */
 	false,
 	SUPER80V_DOTS,          /* number of dots per character */
 	NULL,
@@ -713,7 +712,7 @@ static MACHINE_CONFIG_START( super80v, super80_state )
 	MCFG_PALETTE_LENGTH(16)
 	MCFG_PALETTE_INIT_OVERRIDE(super80_state,super80m)
 
-	MCFG_MC6845_ADD("crtc", MC6845, MASTER_CLOCK / SUPER80V_DOTS, super80v_crtc)
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK / SUPER80V_DOTS, super80v_crtc)
 
 	MCFG_GFXDECODE(super80v)
 	MCFG_DEFAULT_LAYOUT( layout_super80 )

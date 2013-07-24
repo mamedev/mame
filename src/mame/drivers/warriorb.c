@@ -425,7 +425,6 @@ WRITE_LINE_MEMBER(warriorb_state::irqhandler)
 
 static const tc0100scn_interface darius2d_tc0100scn_intf_l =
 {
-	"lscreen",
 	1, 3,       /* gfxnum, txnum */
 	4, 0,       /* x_offset, y_offset */
 	0, 0,       /* flip_xoff, flip_yoff */
@@ -435,7 +434,6 @@ static const tc0100scn_interface darius2d_tc0100scn_intf_l =
 
 static const tc0100scn_interface darius2d_tc0100scn_intf_r =
 {
-	"rscreen",
 	2, 3,       /* gfxnum, txnum */
 	4, 0,       /* x_offset, y_offset */
 	0, 0,       /* flip_xoff, flip_yoff */
@@ -445,7 +443,6 @@ static const tc0100scn_interface darius2d_tc0100scn_intf_r =
 
 static const tc0100scn_interface warriorb_tc0100scn_intf_l =
 {
-	"lscreen",
 	1, 3,       /* gfxnum, txnum */
 	4, 0,       /* x_offset, y_offset */
 	0, 0,       /* flip_xoff, flip_yoff */
@@ -455,7 +452,6 @@ static const tc0100scn_interface warriorb_tc0100scn_intf_l =
 
 static const tc0100scn_interface warriorb_tc0100scn_intf_r =
 {
-	"rscreen",
 	2, 3,       /* gfxnum, txnum */
 	4, 0,       /* x_offset, y_offset */
 	0, 0,       /* flip_xoff, flip_yoff */
@@ -543,7 +539,9 @@ static MACHINE_CONFIG_START( darius2d, warriorb_state )
 
 
 	MCFG_TC0100SCN_ADD("tc0100scn_1", darius2d_tc0100scn_intf_l)
+	MCFG_TC0100SCN_SET_SCREEN("lscreen")
 	MCFG_TC0100SCN_ADD("tc0100scn_2", darius2d_tc0100scn_intf_r)
+	MCFG_TC0100SCN_SET_SCREEN("rscreen")
 	MCFG_TC0110PCR_ADD("tc0110pcr_1", darius2d_tc0110pcr_intf_l)
 	MCFG_TC0110PCR_ADD("tc0110pcr_2", darius2d_tc0110pcr_intf_r)
 
@@ -606,7 +604,9 @@ static MACHINE_CONFIG_START( warriorb, warriorb_state )
 
 
 	MCFG_TC0100SCN_ADD("tc0100scn_1", warriorb_tc0100scn_intf_l)
+	MCFG_TC0100SCN_SET_SCREEN("lscreen")
 	MCFG_TC0100SCN_ADD("tc0100scn_2", warriorb_tc0100scn_intf_r)
+	MCFG_TC0100SCN_SET_SCREEN("rscreen")
 	MCFG_TC0110PCR_ADD("tc0110pcr_1", darius2d_tc0110pcr_intf_l)
 	MCFG_TC0110PCR_ADD("tc0110pcr_2", darius2d_tc0110pcr_intf_r)
 

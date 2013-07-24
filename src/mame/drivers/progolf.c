@@ -374,7 +374,6 @@ GFXDECODE_END
 
 static MC6845_INTERFACE( mc6845_intf )
 {
-	"screen",   /* screen we are acting on */
 	false,      /* show border area */
 	8,          /* number of pixels per video memory address */
 	NULL,       /* before pixel update callback */
@@ -438,7 +437,7 @@ static MACHINE_CONFIG_START( progolf, progolf_state )
 	MCFG_GFXDECODE(progolf)
 	MCFG_PALETTE_LENGTH(32*3)
 
-	MCFG_MC6845_ADD("crtc", MC6845, 3000000/4, mc6845_intf) /* hand tuned to get ~57 fps */
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", 3000000/4, mc6845_intf) /* hand tuned to get ~57 fps */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

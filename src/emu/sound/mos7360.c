@@ -258,6 +258,7 @@ mos7360_device::mos7360_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, MOS7360, "MOS7360", tag, owner, clock, "mos7360", __FILE__),
 		device_memory_interface(mconfig, *this),
 		device_sound_interface(mconfig, *this),
+		device_video_interface(mconfig, *this),
 		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, NULL, *ADDRESS_MAP_NAME(mos7360_videoram_map)),
 		m_write_irq(*this),
 		m_read_k(*this),
@@ -272,10 +273,6 @@ mos7360_device::mos7360_device(const machine_config &mconfig, const char *tag, d
 
 void mos7360_device::device_start()
 {
-	// get the screen device
-	m_screen = machine().device<screen_device>(m_screen_tag);
-	assert(m_screen != NULL);
-
 	// get the CPU device
 	m_cpu = machine().device<cpu_device>(m_cpu_tag);
 	assert(m_cpu != NULL);

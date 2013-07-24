@@ -323,7 +323,6 @@ WRITE_LINE_MEMBER(mtx_state::mtx_tms9929a_interrupt)
 
 static TMS9928A_INTERFACE(mtx_tms9928a_interface)
 {
-	"screen",
 	0x4000,
 	DEVCB_DRIVER_LINE_MEMBER(mtx_state,mtx_tms9929a_interrupt)
 };

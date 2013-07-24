@@ -29,6 +29,7 @@ const device_type TMS34061 = &device_creator<tms34061_device>;
 
 tms34061_device::tms34061_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TMS34061, "tms34061", tag, owner, clock, "tms34061", __FILE__),
+	device_video_interface(mconfig, *this),
 	//m_regs[TMS34061_REGCOUNT],
 	m_xmask(0),
 	m_yshift(0),
@@ -63,7 +64,6 @@ void tms34061_device::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-	m_screen_tag = "";
 	m_rowshift = 0;
 	m_vramsize = 0;
 	//(*m_interrupt)(int state)
@@ -77,7 +77,6 @@ void tms34061_device::device_config_complete()
 void tms34061_device::device_start()
 {
 	/* reset the data */
-	m_screen = machine().device<screen_device>(m_screen_tag);
 	m_vrammask = m_vramsize - 1;
 
 	/* allocate memory for VRAM */

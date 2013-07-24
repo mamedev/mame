@@ -23,7 +23,7 @@
 #define MCFG_SED1330_ADD(_tag, _clock, _screen_tag, _map) \
 	MCFG_DEVICE_ADD(_tag, SED1330, _clock) \
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, _map) \
-	sed1330_device::static_set_config(*device, _screen_tag);
+	MCFG_VIDEO_SET_SCREEN(_screen_tag)
 
 
 
@@ -34,14 +34,12 @@
 // ======================> sed1330_device
 
 class sed1330_device :  public device_t,
-						public device_memory_interface
+						public device_memory_interface,
+						public device_video_interface
 {
 public:
 	// construction/destruction
 	sed1330_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	// inline configuration helpers
-	static void static_set_config(device_t &device, const char *screen_tag);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
@@ -116,12 +114,8 @@ private:
 	int m_dm;                   // display mode for pages 1, 3
 	int m_ov;                   // graphics mode layer composition
 
-	// devices
-	//screen_device *m_screen;
-
 	// address space configurations
 	const address_space_config      m_space_config;
-	const char *m_screen_tag;
 };
 
 

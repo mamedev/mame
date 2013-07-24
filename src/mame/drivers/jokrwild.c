@@ -460,7 +460,6 @@ static const pia6821_interface pia1_intf =
 
 static MC6845_INTERFACE( mc6845_intf )
 {
-	"screen",   /* screen we are acting on */
 	false,      /* show border area */
 	8,          /* number of pixels per video memory address */
 	NULL,       /* before pixel update callback */
@@ -501,7 +500,7 @@ static MACHINE_CONFIG_START( jokrwild, jokrwild_state )
 	MCFG_GFXDECODE(jokrwild)
 	MCFG_PALETTE_LENGTH(512)
 
-	MCFG_MC6845_ADD("crtc", MC6845, MASTER_CLOCK/16, mc6845_intf) /* guess */
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/16, mc6845_intf) /* guess */
 
 MACHINE_CONFIG_END
 

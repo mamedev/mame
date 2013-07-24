@@ -8,7 +8,6 @@
 
 struct k053252_interface
 {
-	const char         *m_screen_tag;
 	devcb_write_line   m_int1_en;
 	devcb_write_line   m_int2_en;
 	devcb_write_line   m_int1_ack;
@@ -19,6 +18,7 @@ struct k053252_interface
 };
 
 class k053252_device : public device_t,
+						public device_video_interface,
 						public k053252_interface
 {
 public:
@@ -43,7 +43,6 @@ protected:
 	UINT16  m_vc,m_vfp,m_vbp;
 	UINT8   m_vsw,m_hsw;
 
-	screen_device *m_screen;
 	devcb_resolved_write_line m_int1_en_func;
 	devcb_resolved_write_line m_int2_en_func;
 	devcb_resolved_write_line m_int1_ack_func;

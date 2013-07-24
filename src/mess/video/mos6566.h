@@ -93,7 +93,8 @@
 
 #define MCFG_MOS6566_ADD(_tag, _screen_tag, _clock, _videoram_map, _colorram_map, _irq) \
 	MCFG_DEVICE_ADD(_tag, MOS6566, _clock) \
-	downcast<mos6566_device *>(device)->set_callbacks(_screen_tag, NULL, DEVCB2_##_irq, DEVCB2_NULL); \
+	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
+	downcast<mos6566_device *>(device)->set_callbacks(NULL, DEVCB2_##_irq, DEVCB2_NULL); \
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, _videoram_map) \
 	MCFG_DEVICE_ADDRESS_MAP(AS_1, _colorram_map) \
 	MCFG_SCREEN_ADD(_screen_tag, RASTER) \
@@ -104,7 +105,8 @@
 
 #define MCFG_MOS6567_ADD(_tag, _screen_tag, _clock, _videoram_map, _colorram_map, _irq) \
 	MCFG_DEVICE_ADD(_tag, MOS6567, _clock) \
-	downcast<mos6566_device *>(device)->set_callbacks(_screen_tag, NULL, DEVCB2_##_irq, DEVCB2_NULL); \
+	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
+	downcast<mos6566_device *>(device)->set_callbacks(NULL, DEVCB2_##_irq, DEVCB2_NULL); \
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, _videoram_map) \
 	MCFG_DEVICE_ADDRESS_MAP(AS_1, _colorram_map) \
 	MCFG_SCREEN_ADD(_screen_tag, RASTER) \
@@ -115,7 +117,8 @@
 
 #define MCFG_MOS8562_ADD(_tag, _screen_tag, _clock, _videoram_map, _colorram_map, _irq) \
 	MCFG_DEVICE_ADD(_tag, MOS8562, _clock) \
-	downcast<mos6566_device *>(device)->set_callbacks(_screen_tag, NULL, DEVCB2_##_irq, DEVCB2_NULL); \
+	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
+	downcast<mos6566_device *>(device)->set_callbacks(NULL, DEVCB2_##_irq, DEVCB2_NULL); \
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, _videoram_map) \
 	MCFG_DEVICE_ADDRESS_MAP(AS_1, _colorram_map) \
 	MCFG_SCREEN_ADD(_screen_tag, RASTER) \
@@ -126,7 +129,8 @@
 
 #define MCFG_MOS8564_ADD(_tag, _screen_tag, _cpu_tag, _clock, _videoram_map, _colorram_map, _irq, _k) \
 	MCFG_DEVICE_ADD(_tag, MOS8564, _clock) \
-	downcast<mos6566_device *>(device)->set_callbacks(_screen_tag, _cpu_tag, DEVCB2_##_irq, DEVCB2_##_k); \
+	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
+	downcast<mos6566_device *>(device)->set_callbacks(_cpu_tag, DEVCB2_##_irq, DEVCB2_##_k); \
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, _videoram_map) \
 	MCFG_DEVICE_ADDRESS_MAP(AS_1, _colorram_map) \
 	MCFG_SCREEN_ADD(_screen_tag, RASTER) \
@@ -137,7 +141,8 @@
 
 #define MCFG_MOS6569_ADD(_tag, _screen_tag, _clock, _videoram_map, _colorram_map, _irq) \
 	MCFG_DEVICE_ADD(_tag, MOS6569, _clock) \
-	downcast<mos6566_device *>(device)->set_callbacks(_screen_tag, NULL, DEVCB2_##_irq, DEVCB2_NULL); \
+	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
+	downcast<mos6566_device *>(device)->set_callbacks(NULL, DEVCB2_##_irq, DEVCB2_NULL); \
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, _videoram_map) \
 	MCFG_DEVICE_ADDRESS_MAP(AS_1, _colorram_map) \
 	MCFG_SCREEN_ADD(_screen_tag, RASTER) \
@@ -148,7 +153,8 @@
 
 #define MCFG_MOS8565_ADD(_tag, _screen_tag, _clock, _videoram_map, _colorram_map, _irq) \
 	MCFG_DEVICE_ADD(_tag, MOS8565, _clock) \
-	downcast<mos6566_device *>(device)->set_callbacks(_screen_tag, NULL, DEVCB2_##_irq, DEVCB2_NULL); \
+	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
+	downcast<mos6566_device *>(device)->set_callbacks(NULL, DEVCB2_##_irq, DEVCB2_NULL); \
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, _videoram_map) \
 	MCFG_DEVICE_ADDRESS_MAP(AS_1, _colorram_map) \
 	MCFG_SCREEN_ADD(_screen_tag, RASTER) \
@@ -159,7 +165,8 @@
 
 #define MCFG_MOS8566_ADD(_tag, _screen_tag, _cpu_tag, _clock, _videoram_map, _colorram_map, _irq, _k) \
 	MCFG_DEVICE_ADD(_tag, MOS8566, _clock) \
-	downcast<mos6566_device *>(device)->set_callbacks(_screen_tag, _cpu_tag, DEVCB2_##_irq, DEVCB2_##_k); \
+	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
+	downcast<mos6566_device *>(device)->set_callbacks(_cpu_tag, DEVCB2_##_irq, DEVCB2_##_k); \
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, _videoram_map) \
 	MCFG_DEVICE_ADDRESS_MAP(AS_1, _colorram_map) \
 	MCFG_SCREEN_ADD(_screen_tag, RASTER) \
@@ -269,6 +276,7 @@
 
 class mos6566_device :  public device_t,
 						public device_memory_interface,
+						public device_video_interface,
 						public device_execute_interface
 {
 public:
@@ -276,8 +284,7 @@ public:
 	mos6566_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source);
 	mos6566_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _irq, class _k> void set_callbacks(const char *screen_tag, const char *cpu_tag, _irq irq, _k k) {
-		m_screen_tag = screen_tag;
+	template<class _irq, class _k> void set_callbacks(const char *cpu_tag, _irq irq, _k k) {
 		m_cpu_tag = cpu_tag;
 		m_write_irq.set_callback(irq);
 		m_write_k.set_callback(k);
@@ -355,9 +362,7 @@ protected:
 	devcb2_write_line       m_write_aec;
 	devcb2_write8           m_write_k;
 
-	const char *m_screen_tag;
 	const char *m_cpu_tag;
-	screen_device *m_screen;            // screen which sets bitmap properties
 	cpu_device *m_cpu;
 
 	int m_phi0;

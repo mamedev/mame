@@ -367,7 +367,6 @@ static const ins8250_interface h19_ace_interface =
 
 static MC6845_INTERFACE( h19_crtc6845_interface )
 {
-	"screen",
 	false,
 	8 /*?*/,
 	NULL,
@@ -427,7 +426,7 @@ static MACHINE_CONFIG_START( h19, h19_state )
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, monochrome_green)
 
-	MCFG_MC6845_ADD("crtc", MC6845, XTAL_12_288MHz / 8, h19_crtc6845_interface) // clk taken from schematics
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_12_288MHz / 8, h19_crtc6845_interface) // clk taken from schematics
 	MCFG_INS8250_ADD( "ins8250", h19_ace_interface, XTAL_12_288MHz / 4) // 3.072mhz clock which gets divided down for the various baud rates
 	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
 

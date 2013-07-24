@@ -383,7 +383,6 @@ WRITE8_MEMBER(einstein_state::einstein_fire_int_w)
 
 static TMS9928A_INTERFACE(einstein_tms9929a_interface)
 {
-	"screen",
 	0x4000, /* 16k RAM, provided by IC i040 and i041 */
 	DEVCB_NULL
 };
@@ -695,7 +694,6 @@ static const centronics_interface einstein_centronics_config =
 
 static MC6845_INTERFACE( einstein_crtc6845_interface )
 {
-	"80column",
 	false,
 	8,
 	NULL,
@@ -756,6 +754,7 @@ static MACHINE_CONFIG_START( einstein, einstein_state )
 
 	/* video hardware */
 	MCFG_TMS9928A_ADD( "tms9929a", TMS9929A, einstein_tms9929a_interface )
+	MCFG_TMS9928A_SET_SCREEN( "screen" )
 	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9929a", tms9929a_device, screen_update )
 
@@ -810,7 +809,7 @@ static MACHINE_CONFIG_DERIVED( einstei2, einstein )
 	/* 2 additional colors for the 80 column screen */
 	MCFG_PALETTE_LENGTH(TMS9928A_PALETTE_SIZE + 2)
 
-	MCFG_MC6845_ADD("crtc", MC6845, XTAL_X002 / 4, einstein_crtc6845_interface)
+	MCFG_MC6845_ADD("crtc", MC6845, "80column", XTAL_X002 / 4, einstein_crtc6845_interface)
 MACHINE_CONFIG_END
 
 

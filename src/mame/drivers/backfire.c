@@ -456,7 +456,6 @@ static int backfire_bank_callback( int bank )
 
 static const deco16ic_interface backfire_deco16ic_tilegen1_intf =
 {
-	"lscreen",
 	0, 1,
 	0x0f, 0x0f, /* trans masks (default values) */
 	0x00, 0x40, /* color base */
@@ -468,7 +467,6 @@ static const deco16ic_interface backfire_deco16ic_tilegen1_intf =
 
 static const deco16ic_interface backfire_deco16ic_tilegen2_intf =
 {
-	"lscreen",
 	0, 1,
 	0x0f, 0x0f, /* trans masks (default values) */
 	0x10, 0x50, /* color base */
@@ -525,7 +523,9 @@ static MACHINE_CONFIG_START( backfire, backfire_state )
 
 
 	MCFG_DECO16IC_ADD("tilegen1", backfire_deco16ic_tilegen1_intf)
+	MCFG_DECO16IC_SET_SCREEN("lscreen")
 	MCFG_DECO16IC_ADD("tilegen2", backfire_deco16ic_tilegen2_intf)
+	MCFG_DECO16IC_SET_SCREEN("lscreen")
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 4);

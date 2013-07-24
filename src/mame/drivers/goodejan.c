@@ -641,7 +641,6 @@ WRITE16_MEMBER( goodejan_state::layer_scroll_w )
 
 SEIBU_CRTC_INTERFACE(crtc_intf)
 {
-	"screen",
 	DEVCB_DRIVER_MEMBER16(goodejan_state, layer_en_w),
 	DEVCB_DRIVER_MEMBER16(goodejan_state, layer_scroll_w),
 

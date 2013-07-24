@@ -384,7 +384,6 @@ ADDRESS_MAP_END
 
 static MC6845_INTERFACE( mc6845_intf )
 {
-	"screen",                           /* screen we are acting on */
 	false,                              /* show border area */
 	8,                                  /* number of pixels per video memory address */
 	begin_update,                       /* before pixel update callback */
@@ -404,7 +403,7 @@ MACHINE_CONFIG_FRAGMENT( qix_video )
 
 	MCFG_VIDEO_START_OVERRIDE(qix_state,qix)
 
-	MCFG_MC6845_ADD(MC6845_TAG, MC6845, QIX_CHARACTER_CLOCK, mc6845_intf)
+	MCFG_MC6845_ADD(MC6845_TAG, MC6845, "screen", QIX_CHARACTER_CLOCK, mc6845_intf)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(QIX_CHARACTER_CLOCK*8, 0x148, 0, 0x100, 0x111, 0, 0x100) /* from CRTC */

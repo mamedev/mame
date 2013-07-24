@@ -93,6 +93,7 @@ static const rgb_t tms9928a_palette[TMS9928A_PALETTE_SIZE] =
 tms9928a_device::tms9928a_device( const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, bool is_50hz, bool is_reva, bool is_99, const char *shortname, const char *source)
 	: device_t( mconfig, type, name, tag, owner, clock, shortname, source),
 		device_memory_interface(mconfig, *this),
+		device_video_interface(mconfig, *this),
 		m_space_config("vram",ENDIANNESS_BIG, 8, 14, 0, NULL, *ADDRESS_MAP_NAME(memmap))
 {
 	m_50hz = is_50hz;
@@ -105,6 +106,7 @@ tms9928a_device::tms9928a_device( const machine_config &mconfig, device_type typ
 tms9928a_device::tms9928a_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock )
 	: device_t( mconfig, TMS9928A, "TMS9928A", tag, owner, clock, "tms9928a", __FILE__),
 		device_memory_interface(mconfig, *this),
+		device_video_interface(mconfig, *this),
 	m_space_config("vram",ENDIANNESS_BIG, 8, 14, 0, NULL, *ADDRESS_MAP_NAME(memmap))
 {
 	m_50hz = false;
@@ -629,8 +631,6 @@ void tms9928a_device::device_config_complete()
 void tms9928a_device::device_start()
 {
 	astring tempstring;
-	m_screen = downcast<screen_device *>(machine().device(siblingtag(tempstring,m_screen_tag)));
-	assert( m_screen != NULL );
 
 	m_top_border = m_50hz ? TMS9928A_VERT_DISPLAY_START_PAL : TMS9928A_VERT_DISPLAY_START_NTSC;
 	m_vertical_size = m_50hz ? TMS9928A_TOTAL_VERT_PAL : TMS9928A_TOTAL_VERT_NTSC;

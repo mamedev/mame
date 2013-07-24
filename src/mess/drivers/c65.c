@@ -362,7 +362,6 @@ READ8_MEMBER(c65_state::c65_c64_mem_r)
 }
 
 static const vic3_interface c65_vic3_ntsc_intf = {
-	"screen",
 	"maincpu",
 	VIC4567_NTSC,
 	DEVCB_DRIVER_MEMBER(c65_state,c65_lightpen_x_cb),
@@ -376,7 +375,6 @@ static const vic3_interface c65_vic3_ntsc_intf = {
 };
 
 static const vic3_interface c65_vic3_pal_intf = {
-	"screen",
 	"maincpu",
 	VIC4567_PAL,
 	DEVCB_DRIVER_MEMBER(c65_state,c65_lightpen_x_cb),

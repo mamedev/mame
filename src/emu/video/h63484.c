@@ -27,7 +27,8 @@ ADDRESS_MAP_END
 
 h63484_device::h63484_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, H63484, "H63484", tag, owner, clock, "h63484", __FILE__),
-		device_memory_interface(mconfig, *this),
+	device_memory_interface(mconfig, *this),
+	device_video_interface(mconfig, *this),
 	m_ar(0),
 	m_sr(0),
 	m_fifo_ptr(-1),
@@ -1139,8 +1140,6 @@ WRITE16_MEMBER( h63484_device::data_w )
 
 void h63484_device::device_start()
 {
-	m_screen = machine().device<screen_device>(m_screen_tag);
-
 	//h63484->space = device->memory().space(AS_0);
 	m_vram = auto_alloc_array_clear(machine(), UINT8, 1 << 20);
 }

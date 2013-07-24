@@ -154,6 +154,7 @@ const device_type ATARI_MOTION_OBJECTS = &device_creator<atari_motion_objects_de
 
 atari_motion_objects_device::atari_motion_objects_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: sprite16_device_ind16(mconfig, ATARI_MOTION_OBJECTS, "Atari Motion Objects", tag, owner, "atarimo", __FILE__),
+		device_video_interface(mconfig, *this),
 		m_tilewidth(0),
 		m_tileheight(0),
 		m_tilexshift(0),
@@ -177,16 +178,6 @@ atari_motion_objects_device::atari_motion_objects_device(const machine_config &m
 		m_last_xpos(0),
 		m_next_xpos(0)
 {
-}
-
-
-//-------------------------------------------------
-//  static_set_screen: Set the tag of the screen
-//-------------------------------------------------
-
-void atari_motion_objects_device::static_set_screen(device_t &device, const char *screentag)
-{
-	downcast<atari_motion_objects_device &>(device).m_screen_tag = screentag;
 }
 
 
@@ -305,13 +296,6 @@ void atari_motion_objects_device::device_start()
 	if (gfx == NULL)
 		throw emu_fatalerror("No gfxelement #%d!", m_gfxindex);
 
-	// find the screen
-	if (m_screen_tag == NULL)
-		throw emu_fatalerror("No screen specified!");
-	m_screen = siblingdevice<screen_device>(m_screen_tag);
-	if (m_screen == NULL)
-		throw emu_fatalerror("Screen '%s' not found!", m_screen_tag);
-	
 	// determine the masks
 	m_linkmask.set(m_link_entry);
 	m_codemask.set(m_code_entry);

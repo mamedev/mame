@@ -355,7 +355,6 @@ static MC6845_UPDATE_ROW( bw12_update_row )
 
 static MC6845_INTERFACE( bw12_mc6845_interface )
 {
-	SCREEN_TAG,
 	false,
 	8,
 	NULL,
@@ -665,7 +664,7 @@ static MACHINE_CONFIG_START( common, bw12_state )
 
 	MCFG_GFXDECODE(bw12)
 
-	MCFG_MC6845_ADD(MC6845_TAG, MC6845, XTAL_16MHz/8, bw12_mc6845_interface)
+	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, XTAL_16MHz/8, bw12_mc6845_interface)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

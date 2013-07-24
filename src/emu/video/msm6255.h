@@ -23,7 +23,8 @@
 #define MCFG_MSM6255_ADD(_tag, _clock, _char_clock, _screen_tag, _map) \
 	MCFG_DEVICE_ADD(_tag, MSM6255, _clock) \
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, _map) \
-	msm6255_device::static_set_config(*device, _char_clock, _screen_tag);
+	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
+	msm6255_device::static_set_config(*device, _char_clock);
 
 
 
@@ -34,14 +35,15 @@
 // ======================> msm6255_device
 
 class msm6255_device :  public device_t,
-						public device_memory_interface
+						public device_memory_interface,
+						public device_video_interface
 {
 public:
 	// construction/destruction
 	msm6255_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// inline configuration helpers
-	static void static_set_config(device_t &device, int char_clock, const char *screen_tag);
+	static void static_set_config(device_t &device, int char_clock);
 
 	virtual DECLARE_ADDRESS_MAP(map, 8);
 
@@ -70,8 +72,6 @@ private:
 	void update_text(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	const address_space_config m_space_config;
-	const char *m_screen_tag;
-	screen_device *m_screen;
 	int m_char_clock;
 
 	UINT8 m_ir;                     // instruction register

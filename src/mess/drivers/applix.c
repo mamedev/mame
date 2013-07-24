@@ -823,7 +823,6 @@ static MC6845_UPDATE_ROW( applix_update_row )
 
 static MC6845_INTERFACE( applix_crtc )
 {
-	"screen",           /* name of screen */
 	false, // should show a border
 	8,          /* number of dots per character */
 	NULL,
@@ -921,7 +920,7 @@ static MACHINE_CONFIG_START( applix, applix_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 
 	/* Devices */
-	MCFG_MC6845_ADD("crtc", MC6845, 1875000, applix_crtc) // 6545
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", 1875000, applix_crtc) // 6545
 	MCFG_VIA6522_ADD("via6522", 0, applix_via)
 	MCFG_CENTRONICS_PRINTER_ADD("centronics", applix_centronics_config)
 	MCFG_CASSETTE_ADD("cassette", applix_cassette_interface)

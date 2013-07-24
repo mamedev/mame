@@ -270,7 +270,6 @@ static MC6845_UPDATE_ROW( atamanot_update_row )
 
 static MC6845_INTERFACE( ssingles_mc6845_intf )
 {
-	"screen",
 	false,
 	8,
 	NULL,                       /* before pixel update callback */
@@ -285,7 +284,6 @@ static MC6845_INTERFACE( ssingles_mc6845_intf )
 
 static MC6845_INTERFACE( atamanot_mc6845_intf )
 {
-	"screen",
 	false,
 	8,
 	NULL,                       /* before pixel update callback */
@@ -580,7 +578,7 @@ static MACHINE_CONFIG_START( ssingles, ssingles_state )
 	MCFG_GFXDECODE(ssingles)
 
 
-	MCFG_MC6845_ADD("crtc", MC6845, 1000000 /* ? MHz */, ssingles_mc6845_intf)
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", 1000000 /* ? MHz */, ssingles_mc6845_intf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -606,7 +604,7 @@ static MACHINE_CONFIG_DERIVED( atamanot, ssingles )
 
 	MCFG_DEVICE_REMOVE("crtc")
 
-	MCFG_MC6845_ADD("crtc", MC6845, 1000000 /* ? MHz */, atamanot_mc6845_intf)
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", 1000000 /* ? MHz */, atamanot_mc6845_intf)
 
 	MCFG_GFXDECODE(atamanot)
 MACHINE_CONFIG_END

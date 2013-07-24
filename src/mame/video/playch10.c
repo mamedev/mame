@@ -71,7 +71,6 @@ void playch10_state::ppu_irq(int *ppu_regs)
 const ppu2c0x_interface playch10_ppu_interface =
 {
 	"cart",
-	"bottom",
 	1,                  /* gfxlayout num */
 	256,                /* color base */
 	PPU_MIRROR_NONE     /* mirroring */

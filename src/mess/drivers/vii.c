@@ -123,7 +123,7 @@ public:
 	{
 		UINT8 r, g, b;
 	}
-	m_screen[320*240];
+	m_screenram[320*240];
 
 	UINT16 m_io_regs[0x200];
 	UINT16 m_uart_rx_count;
@@ -225,16 +225,16 @@ inline UINT8 vii_state::vii_mix_channel(UINT8 a, UINT8 b)
 
 void vii_state::vii_mix_pixel(UINT32 offset, UINT16 rgb)
 {
-	m_screen[offset].r = vii_mix_channel(m_screen[offset].r, expand_rgb5_to_rgb8(rgb >> 10));
-	m_screen[offset].g = vii_mix_channel(m_screen[offset].g, expand_rgb5_to_rgb8(rgb >> 5));
-	m_screen[offset].b = vii_mix_channel(m_screen[offset].b, expand_rgb5_to_rgb8(rgb));
+	m_screenram[offset].r = vii_mix_channel(m_screenram[offset].r, expand_rgb5_to_rgb8(rgb >> 10));
+	m_screenram[offset].g = vii_mix_channel(m_screenram[offset].g, expand_rgb5_to_rgb8(rgb >> 5));
+	m_screenram[offset].b = vii_mix_channel(m_screenram[offset].b, expand_rgb5_to_rgb8(rgb));
 }
 
 void vii_state::vii_set_pixel(UINT32 offset, UINT16 rgb)
 {
-	m_screen[offset].r = expand_rgb5_to_rgb8(rgb >> 10);
-	m_screen[offset].g = expand_rgb5_to_rgb8(rgb >> 5);
-	m_screen[offset].b = expand_rgb5_to_rgb8(rgb);
+	m_screenram[offset].r = expand_rgb5_to_rgb8(rgb >> 10);
+	m_screenram[offset].g = expand_rgb5_to_rgb8(rgb >> 5);
+	m_screenram[offset].b = expand_rgb5_to_rgb8(rgb);
 }
 
 void vii_state::vii_blit(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT32 xoff, UINT32 yoff, UINT32 attr, UINT32 ctrl, UINT32 bitmap_addr, UINT16 tile)
@@ -439,7 +439,7 @@ UINT32 vii_state::screen_update_vii(screen_device &screen, bitmap_rgb32 &bitmap,
 
 	bitmap.fill(0, cliprect);
 
-	memset(m_screen, 0, sizeof(m_screen));
+	memset(m_screenram, 0, sizeof(m_screenram));
 
 	for(i = 0; i < 4; i++)
 	{
@@ -452,7 +452,7 @@ UINT32 vii_state::screen_update_vii(screen_device &screen, bitmap_rgb32 &bitmap,
 	{
 		for(x = 0; x < 320; x++)
 		{
-			bitmap.pix32(y, x) = (m_screen[x + 320*y].r << 16) | (m_screen[x + 320*y].g << 8) | m_screen[x + 320*y].b;
+			bitmap.pix32(y, x) = (m_screenram[x + 320*y].r << 16) | (m_screenram[x + 320*y].g << 8) | m_screenram[x + 320*y].b;
 		}
 	}
 

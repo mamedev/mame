@@ -909,7 +909,6 @@ MACHINE_RESET_MEMBER(mystwarr_state,gaiapols)
 
 static const k053252_interface mystwarr_k053252_intf =
 {
-	"screen",
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -919,7 +918,6 @@ static const k053252_interface mystwarr_k053252_intf =
 
 static const k053252_interface viostorm_k053252_intf =
 {
-	"screen",
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -929,7 +927,6 @@ static const k053252_interface viostorm_k053252_intf =
 
 static const k053252_interface metamrph_k053252_intf =
 {
-	"screen",
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -939,7 +936,6 @@ static const k053252_interface metamrph_k053252_intf =
 
 static const k053252_interface martchmp_k053252_intf =
 {
-	"screen",
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -949,7 +945,6 @@ static const k053252_interface martchmp_k053252_intf =
 
 static const k053252_interface dadandrm_k053252_intf =
 {
-	"screen",
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -959,7 +954,6 @@ static const k053252_interface dadandrm_k053252_intf =
 
 static const k053252_interface gaiapols_k053252_intf =
 {
-	"screen",
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,

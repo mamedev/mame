@@ -573,7 +573,6 @@ WRITE_LINE_MEMBER(vcombat_state::sound_update)
 
 static MC6845_INTERFACE( mc6845_intf )
 {
-	"screen",                   /* screen we are acting on */
 	false,                      /* show border area */
 	16,                         /* number of pixels per video memory address */
 	NULL,                       /* before pixel update callback */
@@ -617,7 +616,7 @@ static MACHINE_CONFIG_START( vcombat, vcombat_state )
 	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
 
 	/* Disabled for now as it can't handle multiple screens */
-//  MCFG_MC6845_ADD("crtc", MC6845, 6000000 / 16, mc6845_intf)
+//  MCFG_MC6845_ADD("crtc", MC6845, "screen", 6000000 / 16, mc6845_intf)
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -653,7 +652,7 @@ static MACHINE_CONFIG_START( shadfgtr, vcombat_state )
 
 	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
 
-	MCFG_MC6845_ADD("crtc", MC6845, XTAL_20MHz / 4 / 16, mc6845_intf)
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_20MHz / 4 / 16, mc6845_intf)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_20MHz / 4, 320, 0, 256, 277, 0, 224)

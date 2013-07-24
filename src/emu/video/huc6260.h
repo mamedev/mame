@@ -28,9 +28,6 @@ PALETTE_INIT( huc6260 );
 
 struct huc6260_interface
 {
-	/* Tag for the screen we will be drawing on */
-	const char *screen_tag;
-
 	/* Callback function to retrieve pixel data */
 	devcb_read16                    get_next_pixel_data;
 
@@ -47,6 +44,7 @@ struct huc6260_interface
 
 
 class huc6260_device :  public device_t,
+						public device_video_interface,
 						public huc6260_interface
 {
 public:
@@ -65,7 +63,6 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 private:
-	screen_device *m_screen;
 	int     m_last_h;
 	int     m_last_v;
 	int     m_height;

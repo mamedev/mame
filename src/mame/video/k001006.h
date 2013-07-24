@@ -14,7 +14,7 @@ struct k001006_interface
 
 
 class k001006_device : public device_t,
-										public k001006_interface
+						public k001006_interface
 {
 public:
 	k001006_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -33,8 +33,6 @@ protected:
 
 private:
 	// internal state
-	//screen_device *m_screen;
-
 	UINT16 *     m_pal_ram;
 	UINT16 *     m_unknown_ram;
 	UINT32       m_addr;

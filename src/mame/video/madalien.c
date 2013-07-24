@@ -376,7 +376,6 @@ GFXDECODE_END
 
 static MC6845_INTERFACE( mc6845_intf )
 {
-	"screen",   /* screen we are acting on */
 	false,      /* show border area */
 	8,          /* number of pixels per video memory address */
 	NULL,       /* before pixel update callback */
@@ -400,5 +399,5 @@ MACHINE_CONFIG_FRAGMENT( madalien_video )
 	MCFG_PALETTE_INIT_OVERRIDE(madalien_state,madalien)
 	MCFG_VIDEO_START_OVERRIDE(madalien_state,madalien)
 
-	MCFG_MC6845_ADD("crtc", MC6845, PIXEL_CLOCK / 8, mc6845_intf)
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", PIXEL_CLOCK / 8, mc6845_intf)
 MACHINE_CONFIG_END

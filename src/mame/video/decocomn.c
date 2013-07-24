@@ -13,7 +13,7 @@ const device_type DECOCOMN = &device_creator<decocomn_device>;
 
 decocomn_device::decocomn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, DECOCOMN, "Data East Common Video Functions", tag, owner, clock, "decocomn", __FILE__),
-	m_screen(NULL),
+	device_video_interface(mconfig, *this),
 	m_dirty_palette(NULL),
 	m_priority(0)
 {
@@ -27,16 +27,6 @@ decocomn_device::decocomn_device(const machine_config &mconfig, const char *tag,
 
 void decocomn_device::device_config_complete()
 {
-	// inherit a copy of the static data
-	const decocomn_interface *intf = reinterpret_cast<const decocomn_interface *>(static_config());
-	if (intf != NULL)
-	*static_cast<decocomn_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-	m_screen_tag = "";
-	}
 }
 
 //-------------------------------------------------
@@ -47,7 +37,6 @@ void decocomn_device::device_start()
 {
 //  int width, height;
 
-	m_screen = machine().device<screen_device>(m_screen_tag);
 //  width = m_screen->width();
 //  height = m_screen->height();
 

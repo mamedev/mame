@@ -401,7 +401,6 @@ void alphatro_state::palette_init()
 
 static MC6845_INTERFACE( alphatro_crtc6845_interface )
 {
-	"screen",
 	false,
 	8,
 	NULL,
@@ -485,7 +484,7 @@ static MACHINE_CONFIG_START( alphatro, alphatro_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* Devices */
-	MCFG_MC6845_ADD("crtc", MC6845, XTAL_12_288MHz / 8, alphatro_crtc6845_interface) // clk unknown
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_12_288MHz / 8, alphatro_crtc6845_interface) // clk unknown
 
 	MCFG_I8251_ADD("usart", alphatro_usart_interface)
 

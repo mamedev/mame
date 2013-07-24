@@ -158,6 +158,7 @@ struct laserdisc_overlay_config
 // base laserdisc class
 class laserdisc_device :    public device_t,
 							public device_sound_interface,
+							public device_video_interface,
 							public laserdisc_overlay_config
 {
 protected:
@@ -186,7 +187,6 @@ public:
 	void set_overlay_config(const laserdisc_overlay_config &config) { static_cast<laserdisc_overlay_config &>(*this) = config; }
 
 	// static configuration helpers
-	static void static_set_screen(device_t &device, const char *screen);
 	static void static_set_get_disc(device_t &device, laserdisc_get_disc_delegate callback);
 	static void static_set_audio(device_t &device, laserdisc_audio_delegate callback);
 	static void static_set_overlay(device_t &device, UINT32 width, UINT32 height, screen_update_ind16_delegate update);
@@ -270,7 +270,6 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
 	// subclass helpers
-	screen_device &screen() { assert(m_screen != NULL); return *m_screen; }
 	void set_audio_squelch(bool squelchleft, bool squelchright) { m_stream->update(); m_audiosquelch = (squelchleft ? 1 : 0) | (squelchright ? 2 : 0); }
 	void set_video_squelch(bool squelch) { m_videosquelch = squelch; }
 	void set_slider_speed(INT32 tracks_per_vsync);
@@ -314,7 +313,6 @@ private:
 	// configuration
 	laserdisc_get_disc_delegate m_getdisc_callback;
 	laserdisc_audio_delegate m_audio_callback;  // audio streaming callback
-	const char *        m_screen_name;          // name of the screen device
 	laserdisc_overlay_config m_orig_config;     // original overlay configuration
 	UINT32              m_overwidth;            // overlay screen width
 	UINT32              m_overheight;           // overlay screen height
@@ -347,7 +345,6 @@ private:
 	attotime            m_sliderupdate;         // time of last slider update
 
 	// video data
-	screen_device *     m_screen;               // pointer to the screen device
 	frame_data          m_frame[3];             // circular list of frames
 	UINT8               m_videoindex;           // index of the current video buffer
 	bitmap_yuy16        m_emptyframe;           // blank frame

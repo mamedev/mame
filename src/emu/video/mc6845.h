@@ -16,12 +16,14 @@
 #define MC6845_INTERFACE(name) \
 	const mc6845_interface (name) =
 
-#define MCFG_MC6845_ADD(_tag, _variant, _clock, _config) \
+#define MCFG_MC6845_ADD(_tag, _variant, _screen_tag, _clock, _config) \
 	MCFG_DEVICE_ADD(_tag, _variant, _clock) \
+	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
 	MCFG_DEVICE_CONFIG(_config)
 
 #define MCFG_MOS8563_ADD(_tag, _screen_tag, _clock, _config, _map) \
 	MCFG_DEVICE_ADD(_tag, MOS8563, _clock) \
+	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
 	MCFG_DEVICE_CONFIG(_config) \
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, _map) \
 	MCFG_SCREEN_ADD(_screen_tag, RASTER) \
@@ -32,6 +34,7 @@
 
 #define MCFG_MOS8568_ADD(_tag, _screen_tag, _clock, _config, _map) \
 	MCFG_DEVICE_ADD(_tag, MOS8568, _clock) \
+	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
 	MCFG_DEVICE_CONFIG(_config) \
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, _map) \
 	MCFG_SCREEN_ADD(_screen_tag, RASTER) \
@@ -69,7 +72,6 @@ typedef void (*mc6845_on_update_addr_changed_func)(mc6845_device *device, int ad
 /* interface */
 struct mc6845_interface
 {
-	const char *m_screen_tag;       /* screen we are acting on */
 	bool m_show_border_area;        /* visible screen area (false) active display (true) active display + blanking */
 	int m_hpixels_per_column;       /* number of pixels per video memory address */
 
@@ -108,6 +110,7 @@ struct mc6845_interface
 
 
 class mc6845_device :   public device_t,
+						public device_video_interface,
 						public mc6845_interface
 {
 	friend class mc6845_1_device;
@@ -188,8 +191,6 @@ protected:
 	devcb_resolved_write_line   m_res_out_cur_func;
 	devcb_resolved_write_line   m_res_out_hsync_func;
 	devcb_resolved_write_line   m_res_out_vsync_func;
-
-	screen_device *m_screen;
 
 	/* register file */
 	UINT8   m_horiz_char_total;     /* 0x00 */

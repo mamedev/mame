@@ -503,7 +503,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(djboy_state::djboy_scanline)
 
 static const kaneko_pandora_interface djboy_pandora_config =
 {
-	"screen",   /* screen tag */
 	0,  /* gfx_region */
 	0, 0    /* x_offs, y_offs */
 };

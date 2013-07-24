@@ -127,7 +127,6 @@ ADDRESS_MAP_END
 
 static CDP1869_INTERFACE( destryer_vis_intf )
 {
-	SCREEN_TAG,
 	0,
 	CDP1869_PAL,
 	cidelsa_pcb_r,
@@ -138,7 +137,6 @@ static CDP1869_INTERFACE( destryer_vis_intf )
 
 static CDP1869_INTERFACE( altair_vis_intf )
 {
-	SCREEN_TAG,
 	0,
 	CDP1869_PAL,
 	cidelsa_pcb_r,
@@ -149,7 +147,6 @@ static CDP1869_INTERFACE( altair_vis_intf )
 
 static CDP1869_INTERFACE( draco_vis_intf )
 {
-	SCREEN_TAG,
 	0,
 	CDP1869_PAL,
 	draco_pcb_r,

@@ -410,7 +410,7 @@ void konamigx_state::konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitm
 	if (!objpool) return;
 
 	// clear screen with backcolor and update flicker pulse
-	K054338_fill_backcolor(machine, bitmap, konamigx_wrport1_0 & 0x20);
+	K054338_fill_backcolor(machine, m_screen, bitmap, konamigx_wrport1_0 & 0x20);
 
 
 	// abort if video has been disabled

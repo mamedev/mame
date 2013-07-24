@@ -11,7 +11,6 @@ Template for skeleton device
 
 struct seibu_crtc_interface
 {
-	const char         *m_screen_tag;
 	devcb_write16       m_layer_en_cb;
 	devcb_write16       m_layer_scroll_cb;
 
@@ -37,6 +36,7 @@ struct seibu_crtc_interface
 
 class seibu_crtc_device : public device_t,
 							public device_memory_interface,
+							public device_video_interface,
 							public seibu_crtc_interface
 {
 public:
@@ -60,7 +60,6 @@ protected:
 	virtual void device_reset();
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
 
-	screen_device *m_screen;
 	devcb_resolved_write16       m_layer_en_func;
 	devcb_resolved_write16       m_layer_scroll_func;
 private:

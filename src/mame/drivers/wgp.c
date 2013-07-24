@@ -935,7 +935,6 @@ void wgp_state::machine_start()
 
 static const tc0100scn_interface wgp_tc0100scn_intf =
 {
-	"screen",
 	1, 3,       /* gfxnum, txnum */
 	0, 0,       /* x_offset, y_offset */
 	0, 0,       /* flip_xoff, flip_yoff */
@@ -945,7 +944,6 @@ static const tc0100scn_interface wgp_tc0100scn_intf =
 
 static const tc0100scn_interface wgp2_tc0100scn_intf =
 {
-	"screen",
 	1, 3,       /* gfxnum, txnum */
 	4, 2,       /* x_offset, y_offset */
 	0, 0,       /* flip_xoff, flip_yoff */

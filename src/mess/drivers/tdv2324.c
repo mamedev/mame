@@ -347,7 +347,6 @@ static Z80SIO_INTERFACE( sio_intf )
 
 static const tms9927_interface vtac_intf =
 {
-	SCREEN_TAG,
 	8,
 	NULL
 };

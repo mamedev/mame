@@ -1237,7 +1237,6 @@ void genesis_vdp_lv4irqline_callback_segas18(running_machine &machine, bool stat
 static const sega315_5124_interface sms_vdp_ntsc_intf =
 {
 	false,
-	"screen",
 	DEVCB_NULL,
 	DEVCB_NULL,
 };

@@ -98,7 +98,6 @@ static I8275_DISPLAY_PIXELS(ipds_display_pixels)
 
 const i8275_interface ipds_i8275_interface =
 {
-	"screen",
 	6,
 	0,
 	DEVCB_NULL,

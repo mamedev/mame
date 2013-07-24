@@ -38,7 +38,6 @@ static const ay8910_interface arcadeboard_ay8910_interface =
 
 static TMS9928A_INTERFACE(arcadeboard_tms9918a_interface)
 {
-	SCREEN_TAG,
 	0x4000,         // 16k of VRAM
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, a2bus_arcboard_device, tms_irq_w)
 };

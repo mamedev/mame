@@ -85,14 +85,18 @@ const rom_entry *macpds_sedisplay_device::device_rom_region() const
 
 macpds_sedisplay_device::macpds_sedisplay_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, PDS_SEDISPLAY, "Radius SE Full Page Display", tag, owner, clock, "pds_sefp", __FILE__),
+		device_video_interface(mconfig, *this),
 		device_macpds_card_interface(mconfig, *this)
 {
+	m_screen_tag = SEDISPLAY_SCREEN_NAME;
 }
 
 macpds_sedisplay_device::macpds_sedisplay_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+		device_video_interface(mconfig, *this),
 		device_macpds_card_interface(mconfig, *this)
 {
+	m_screen_tag = SEDISPLAY_SCREEN_NAME;
 }
 
 //-------------------------------------------------
@@ -115,7 +119,7 @@ void macpds_sedisplay_device::device_start()
 	m_macpds->install_device(0xc10000, 0xc2ffff, read16_delegate(FUNC(macpds_sedisplay_device::sedisplay_r), this), write16_delegate(FUNC(macpds_sedisplay_device::sedisplay_w), this));
 
 	m_timer = timer_alloc(0, NULL);
-	m_screen = NULL;    // can we look this up now?
+	m_timer->adjust(m_screen->time_until_pos(879, 0), 0);
 }
 
 //-------------------------------------------------
@@ -157,12 +161,6 @@ UINT32 macpds_sedisplay_device::screen_update(screen_device &screen, bitmap_rgb3
 	int x, y;
 	UINT8 pixels, *vram;
 
-	// first time?  kick off the VBL timer
-	if (!m_screen)
-	{
-		m_screen = &screen;
-		m_timer->adjust(m_screen->time_until_pos(879, 0), 0);
-	}
 	vram = m_vram;
 
 	for (y = 0; y < 870; y++)

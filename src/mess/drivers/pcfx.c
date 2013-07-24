@@ -459,7 +459,6 @@ WRITE_LINE_MEMBER( pcfx_state::irq15_w )
 
 static const huc6261_interface pcfx_huc6261_config =
 {
-	"screen",
 	"huc6270_a",
 	"huc6270_b"
 };

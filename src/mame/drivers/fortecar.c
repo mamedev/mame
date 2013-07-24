@@ -535,7 +535,6 @@ static const ay8910_interface ay8910_config =
 
 static MC6845_INTERFACE( mc6845_intf )
 {
-	"screen",   /* screen we are acting on */
 	false,      /* show border area */
 	8,          /* number of pixels per video memory address */
 	NULL,       /* before pixel update callback */
@@ -713,7 +712,7 @@ static MACHINE_CONFIG_START( fortecar, fortecar_state )
 	MCFG_PALETTE_LENGTH(0x200)
 
 
-	MCFG_MC6845_ADD("crtc", MC6845, CRTC_CLOCK, mc6845_intf)    /* 1.5 MHz, measured */
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK, mc6845_intf)    /* 1.5 MHz, measured */
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

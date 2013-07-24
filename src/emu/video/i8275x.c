@@ -81,6 +81,7 @@ const device_type I8275x = &device_creator<i8275x_device>;
 
 i8275x_device::i8275x_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, I8275x, "I8275", tag, owner, clock, "i8275x", __FILE__),
+		device_video_interface(mconfig, *this),
 		m_status(0),
 		m_param_idx(0),
 		m_param_end(0),
@@ -132,8 +133,6 @@ void i8275x_device::device_config_complete()
 void i8275x_device::device_start()
 {
 	// get the screen device
-	m_screen = machine().device<screen_device>(m_screen_tag);
-	assert(m_screen != NULL);
 	m_screen->register_screen_bitmap(m_bitmap);
 
 	// resolve callbacks

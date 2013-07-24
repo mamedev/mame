@@ -38,7 +38,6 @@ enum
 /* interface structure */
 struct tms34061_interface
 {
-	const char  *m_screen_tag;    /* the screen we are acting on */
 	UINT8       m_rowshift;       /* VRAM address is (row << rowshift) | col */
 	UINT32      m_vramsize;       /* size of video RAM */
 	void        (*m_interrupt)(running_machine &machine, int state);  /* interrupt gen callback */
@@ -60,7 +59,8 @@ struct tms34061_display
 // ======================> tms34061_device
 
 class tms34061_device :  public device_t,
-											public tms34061_interface
+						public device_video_interface,
+						public tms34061_interface
 {
 public:
 	// construction/destruction
@@ -95,7 +95,6 @@ private:
 	UINT8               m_latchdata;
 	UINT8 *             m_shiftreg;
 	emu_timer *         m_timer;
-	screen_device *m_screen;
 
 	void update_interrupts(void);
 	TIMER_CALLBACK_MEMBER( interrupt );

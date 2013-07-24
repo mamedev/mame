@@ -633,7 +633,6 @@ QUICKLOAD_LOAD_MEMBER( tvc_state,tvc64)
 
 static MC6845_INTERFACE( tvc_crtc6845_interface )
 {
-	"screen",
 	false,
 	8 /*?*/,
 	NULL,
@@ -694,7 +693,7 @@ static MACHINE_CONFIG_START( tvc, tvc_state )
 
 	MCFG_PALETTE_LENGTH( 16 )
 
-	MCFG_MC6845_ADD("crtc", MC6845, 3125000/2, tvc_crtc6845_interface) // clk taken from schematics
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", 3125000/2, tvc_crtc6845_interface) // clk taken from schematics
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

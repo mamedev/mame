@@ -701,7 +701,6 @@ MC6845_UPDATE_ROW( bigbord2_update_row )
 
 static MC6845_INTERFACE( bigbord2_crtc )
 {
-	SCREEN_TAG,         /* name of screen */
 	false,
 	8,          /* number of dots per character */
 	NULL,
@@ -744,7 +743,7 @@ static MACHINE_CONFIG_START( bigbord2, bigbord2_state )
 	MCFG_Z80CTC_ADD(Z80CTCB_TAG, MAIN_CLOCK / 6, ctcb_intf)
 	MCFG_FD1793_ADD("fdc", fdc_intf)
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(bigbord2_floppy_interface)
-	MCFG_MC6845_ADD("crtc", MC6845, XTAL_16MHz / 8, bigbord2_crtc)
+	MCFG_MC6845_ADD("crtc", MC6845, SCREEN_TAG, XTAL_16MHz / 8, bigbord2_crtc)
 	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
 
 	/* sound hardware */

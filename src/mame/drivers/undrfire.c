@@ -710,7 +710,6 @@ INTERRUPT_GEN_MEMBER(undrfire_state::undrfire_interrupt)
 
 static const tc0100scn_interface undrfire_tc0100scn_intf =
 {
-	"screen",
 	2, 3,       /* gfxnum, txnum */
 	50, 8,      /* x_offset, y_offset */
 	0, 0,       /* flip_xoff, flip_yoff */

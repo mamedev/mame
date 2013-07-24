@@ -175,7 +175,6 @@ MACHINE_START_MEMBER(tm990189_state,tm990_189)
 
 static TMS9928A_INTERFACE(tms9918_interface)
 {
-	"screen",
 	0x4000,
 	DEVCB_NULL
 };

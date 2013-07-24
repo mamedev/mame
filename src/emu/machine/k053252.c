@@ -59,7 +59,8 @@ TODO:
 const device_type K053252 = &device_creator<k053252_device>;
 
 k053252_device::k053252_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, K053252, "Konami 053252", tag, owner, clock, "k053252", __FILE__)
+	: device_t(mconfig, K053252, "Konami 053252", tag, owner, clock, "k053252", __FILE__),
+		device_video_interface(mconfig, *this)
 {
 }
 
@@ -79,7 +80,6 @@ void k053252_device::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-	m_screen_tag = "";
 	memset(&m_int1_en, 0, sizeof(m_int1_en));
 	memset(&m_int2_en, 0, sizeof(m_int2_en));
 	memset(&m_int1_ack, 0, sizeof(m_int1_ack));
@@ -95,7 +95,6 @@ void k053252_device::device_config_complete()
 void k053252_device::device_start()
 {
 	save_item(NAME(m_regs));
-	m_screen = machine().device<screen_device>(m_screen_tag);
 	m_int1_en_func.resolve(m_int1_en, *this);
 	m_int2_en_func.resolve(m_int2_en, *this);
 	m_int1_ack_func.resolve(m_int1_ack, *this);
@@ -141,28 +140,25 @@ READ8_MEMBER( k053252_device::read )
 
 void k053252_device::res_change()
 {
-	if(m_screen != NULL)
+	if(m_hc && m_vc &&
+		m_hbp && m_hfp &&
+		m_vbp && m_vfp &&
+		m_hsw && m_vsw) //safety checks
 	{
-		if(m_hc && m_vc &&
-			m_hbp && m_hfp &&
-			m_vbp && m_vfp &&
-			m_hsw && m_vsw) //safety checks
-		{
-			rectangle visarea;
-			//(HC+1) - HFP - HBP - 8*(HSW+1)
-			//VC - VFP - VBP - (VSW+1)
-			attoseconds_t refresh = HZ_TO_ATTOSECONDS(clock()) * (m_hc) * m_vc;
+		rectangle visarea;
+		//(HC+1) - HFP - HBP - 8*(HSW+1)
+		//VC - VFP - VBP - (VSW+1)
+		attoseconds_t refresh = HZ_TO_ATTOSECONDS(clock()) * (m_hc) * m_vc;
 
-			//printf("H %d %d %d %d\n",m_hc,m_hfp,m_hbp,m_hsw);
-			//printf("V %d %d %d %d\n",m_vc,m_vfp,m_vbp,m_vsw);
+		//printf("H %d %d %d %d\n",m_hc,m_hfp,m_hbp,m_hsw);
+		//printf("V %d %d %d %d\n",m_vc,m_vfp,m_vbp,m_vsw);
 
-			visarea.min_x = m_offsx;
-			visarea.min_y = m_offsy;
-			visarea.max_x = m_offsx + m_hc - m_hfp - m_hbp - 8*(m_hsw) - 1;
-			visarea.max_y = m_offsy + m_vc - m_vfp - m_vbp - (m_vsw) - 1;
+		visarea.min_x = m_offsx;
+		visarea.min_y = m_offsy;
+		visarea.max_x = m_offsx + m_hc - m_hfp - m_hbp - 8*(m_hsw) - 1;
+		visarea.max_y = m_offsy + m_vc - m_vfp - m_vbp - (m_vsw) - 1;
 
-			m_screen->configure(m_hc, m_vc, visarea, refresh);
-		}
+		m_screen->configure(m_hc, m_vc, visarea, refresh);
 	}
 }
 

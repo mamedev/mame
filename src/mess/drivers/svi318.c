@@ -267,7 +267,6 @@ WRITE_LINE_MEMBER(svi318_state::vdp_interrupt)
 
 static TMS9928A_INTERFACE(svi318_tms9928a_interface)
 {
-	"screen",
 	0x4000,
 	DEVCB_DRIVER_LINE_MEMBER(svi318_state,vdp_interrupt)
 };
@@ -388,7 +387,6 @@ MACHINE_CONFIG_END
 
 static MC6845_INTERFACE( svi806_crtc6845_interface )
 {
-	"svi806",
 	false,
 	8 /*?*/,
 	NULL,
@@ -438,6 +436,7 @@ static MACHINE_CONFIG_START( svi328_806, svi318_state )
 	MCFG_DEFAULT_LAYOUT( layout_dualhsxs )
 
 	MCFG_TMS9928A_ADD( "tms9928a", TMS9929A, svi318_tms9928a_interface )
+	MCFG_TMS9928A_SET_SCREEN( "screen" )
 	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9929a_device, screen_update )
 	MCFG_PALETTE_LENGTH(TMS9928A_PALETTE_SIZE + 2)  /* 2 additional entries for monochrome svi806 output */
@@ -451,7 +450,7 @@ static MACHINE_CONFIG_START( svi328_806, svi318_state )
 
 	MCFG_GFXDECODE(svi328)
 
-	MCFG_MC6845_ADD("crtc", MC6845, XTAL_12MHz / 8, svi806_crtc6845_interface)
+	MCFG_MC6845_ADD("crtc", MC6845, "svi806", XTAL_12MHz / 8, svi806_crtc6845_interface)
 
 	MCFG_VIDEO_START_OVERRIDE(svi318_state, svi328_806 )
 

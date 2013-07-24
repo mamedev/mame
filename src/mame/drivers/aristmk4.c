@@ -1565,7 +1565,6 @@ static MC6845_INTERFACE( mc6845_intf )
 	/* in fact is a mc6845 driving 4 pixels by memory address.
 	that's why the big horizontal parameters */
 
-	"screen",   /* screen we are acting on */
 	false,      /* show border area */
 	4,          /* number of pixels per video memory address */
 	NULL,       /* before pixel update callback */
@@ -1707,7 +1706,7 @@ static MACHINE_CONFIG_START( aristmk4, aristmk4_state )
 	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_intf )
 	MCFG_VIA6522_ADD("via6522_0", 0, via_interface) /* 1 MHz.(only 1 or 2 MHz.are valid) */
 	MCFG_PIA6821_ADD("pia6821_0", aristmk4_pia1_intf)
-	MCFG_MC6845_ADD("crtc", C6545_1, MAIN_CLOCK/8, mc6845_intf) // TODO: type is unknown
+	MCFG_MC6845_ADD("crtc", C6545_1, "screen", MAIN_CLOCK/8, mc6845_intf) // TODO: type is unknown
 	MCFG_MC146818_ADD("rtc", MC146818_IGNORE_CENTURY)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

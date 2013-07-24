@@ -149,7 +149,6 @@ WRITE_LINE_MEMBER(kingpin_state::vdp_interrupt)
 
 static TMS9928A_INTERFACE(kingpin_tms9928a_interface)
 {
-	"screen",
 	0x4000,
 	DEVCB_DRIVER_LINE_MEMBER(kingpin_state, vdp_interrupt)
 };

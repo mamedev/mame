@@ -391,7 +391,6 @@ static UPD3301_DISPLAY_PIXELS( pc8001_display_pixels )
 
 static UPD3301_INTERFACE( pc8001_upd3301_intf )
 {
-	SCREEN_TAG,
 	8,
 	pc8001_display_pixels,
 	DEVCB_NULL,

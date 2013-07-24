@@ -146,7 +146,6 @@ WRITE_LINE_MEMBER(mpu4dealem_state::dealem_vsync_changed)
 
 static MC6845_INTERFACE( hd6845_intf )
 {
-	"screen",                           /* screen we are acting on */
 	false,                              /* show border area */
 	8,                                  /* number of pixels per video memory address */
 	NULL,                               /* before pixel update callback */
@@ -233,7 +232,7 @@ static MACHINE_CONFIG_START( dealem, mpu4dealem_state )
 	MCFG_PALETTE_LENGTH(32)
 	MCFG_PALETTE_INIT_OVERRIDE(mpu4dealem_state,dealem)
 
-	MCFG_MC6845_ADD("crtc", HD6845, MPU4_MASTER_CLOCK / 4 / 8, hd6845_intf) /* HD68B45 */
+	MCFG_MC6845_ADD("crtc", HD6845, "screen", MPU4_MASTER_CLOCK / 4 / 8, hd6845_intf) /* HD68B45 */
 MACHINE_CONFIG_END
 
 

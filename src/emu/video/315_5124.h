@@ -53,7 +53,6 @@ PALETTE_INIT( sega315_5378 );
 struct sega315_5124_interface
 {
 	bool               m_is_pal;             /* false = NTSC, true = PAL */
-	const char         *m_screen_tag;
 	devcb_write_line   m_int_callback;       /* Interrupt callback function */
 	devcb_write_line   m_pause_callback;     /* Pause callback function */
 };
@@ -66,7 +65,8 @@ extern const device_type SEGA315_5378;      /* aka Gamegear vdp */
 
 class sega315_5124_device : public device_t,
 							public sega315_5124_interface,
-							public device_memory_interface
+							public device_memory_interface,
+							public device_video_interface
 {
 public:
 	// construction/destruction
@@ -158,7 +158,6 @@ protected:
 	emu_timer        *m_check_hint_timer;
 	emu_timer        *m_check_vint_timer;
 	emu_timer        *m_draw_timer;
-	screen_device    *m_screen;
 
 	const address_space_config  m_space_config;
 
@@ -204,12 +203,18 @@ protected:
 	MCFG_DEVICE_ADD(_tag, SEGA315_5124, 0) \
 	MCFG_DEVICE_CONFIG(_interface)
 
+#define MCFG_SEGA315_5124_SET_SCREEN MCFG_VIDEO_SET_SCREEN
+
 #define MCFG_SEGA315_5246_ADD(_tag, _interface) \
 	MCFG_DEVICE_ADD(_tag, SEGA315_5246, 0) \
 	MCFG_DEVICE_CONFIG(_interface)
 
+#define MCFG_SEGA315_5246_SET_SCREEN MCFG_VIDEO_SET_SCREEN
+
 #define MCFG_SEGA315_5378_ADD(_tag, _interface) \
 	MCFG_DEVICE_ADD(_tag, SEGA315_5378, 0) \
 	MCFG_DEVICE_CONFIG(_interface)
+
+#define MCFG_SEGA315_5378_SET_SCREEN MCFG_VIDEO_SET_SCREEN
 
 #endif /* __SEGA315_5124_H__ */

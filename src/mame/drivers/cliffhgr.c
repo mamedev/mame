@@ -677,7 +677,6 @@ INPUT_PORTS_END
 
 static TMS9928A_INTERFACE(cliffhgr_tms9928a_interface)
 {
-	"screen",
 	0x4000,
 	DEVCB_DRIVER_LINE_MEMBER(cliffhgr_state,vdp_interrupt)
 };

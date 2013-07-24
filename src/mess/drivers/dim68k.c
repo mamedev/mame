@@ -292,7 +292,6 @@ GFXDECODE_END
 
 static MC6845_INTERFACE( dim68k_crtc )
 {
-	"screen",           /* name of screen */
 	false,
 	8,          /* number of dots per character - switchable 7 or 8 */
 	NULL,
@@ -344,7 +343,7 @@ static MACHINE_CONFIG_START( dim68k, dim68k_state )
 	MCFG_UPD765A_ADD("fdc", true, true) // these options unknown
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", dim68k_floppies, "525hd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", dim68k_floppies, "525hd", floppy_image_device::default_floppy_formats)
-	MCFG_MC6845_ADD("crtc", MC6845, 1790000, dim68k_crtc)
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", 1790000, dim68k_crtc)
 	MCFG_ASCII_KEYBOARD_ADD("keyboard", kb_intf)
 MACHINE_CONFIG_END
 

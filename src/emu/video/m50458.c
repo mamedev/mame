@@ -173,6 +173,7 @@ inline void m50458_device::write_word(offs_t address, UINT16 data)
 m50458_device::m50458_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, M50458, "m50458", tag, owner, clock, "m50458", __FILE__),
 		device_memory_interface(mconfig, *this),
+		device_video_interface(mconfig, *this),
 		m_space_config("videoram", ENDIANNESS_LITTLE, 16, 16, 0, NULL, *ADDRESS_MAP_NAME(m50458_vram))
 {
 }
@@ -187,20 +188,6 @@ void m50458_device::device_validity_check(validity_checker &valid) const
 {
 }
 
-
-void m50458_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const m50458_interface *intf = reinterpret_cast<const m50458_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<m50458_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		// ...
-	}
-}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -248,14 +235,6 @@ void m50458_device::device_start()
 			m_shadow_gfx[dst+1] |= tmp & 0xff;
 			m_shadow_gfx[dst] |= (tmp >> 8);
 		}
-	}
-
-	// find screen
-	m_screen = machine().device<screen_device>(m_screen_tag);
-
-	if (m_screen == NULL)
-	{
-		m_screen = owner()->subdevice<screen_device>(m_screen_tag);
 	}
 }
 

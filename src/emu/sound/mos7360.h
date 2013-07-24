@@ -52,7 +52,8 @@
 	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos7360_device, screen_update) \
 	MCFG_DEVICE_ADD(_tag, MOS7360, _clock) \
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, _videoram_map) \
-	downcast<mos7360_device *>(device)->set_callbacks(_screen_tag, _cpu_tag, DEVCB2_##_irq, DEVCB2_##_k);
+	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
+	downcast<mos7360_device *>(device)->set_callbacks(_cpu_tag, DEVCB2_##_irq, DEVCB2_##_k);
 
 
 
@@ -89,15 +90,15 @@
 
 class mos7360_device :  public device_t,
 						public device_memory_interface,
-						public device_sound_interface
+						public device_sound_interface,
+						public device_video_interface
 {
 public:
 	// construction/destruction
 	//mos7360_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 	mos7360_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _irq, class _k> void set_callbacks(const char *screen_tag, const char *cpu_tag, _irq irq, _k k) {
-		m_screen_tag = screen_tag;
+	template<class _irq, class _k> void set_callbacks(const char *cpu_tag, _irq irq, _k k) {
 		m_cpu_tag = cpu_tag;
 		m_write_irq.set_callback(irq);
 		m_read_k.set_callback(k);
@@ -156,9 +157,7 @@ protected:
 	devcb2_write_line   m_write_irq;
 	devcb2_read8        m_read_k;
 
-	const char *m_screen_tag;
 	const char *m_cpu_tag;
-	screen_device *m_screen;            // screen which sets bitmap properties
 	cpu_device *m_cpu;
 	sound_stream *m_stream;
 

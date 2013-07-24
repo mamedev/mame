@@ -246,7 +246,6 @@ DRIVER_INIT_MEMBER(tutor_state,pyuuta)
 
 static TMS9928A_INTERFACE(tutor_tms9928a_interface)
 {
-	"screen",
 	0x4000,
 	DEVCB_NULL
 };

@@ -14,6 +14,7 @@
 
 class macpds_sedisplay_device :
 		public device_t,
+		public device_video_interface,
 		public device_macpds_card_interface
 {
 public:
@@ -41,7 +42,6 @@ public:
 		UINT8 *m_vram;
 		UINT32 m_vbl_disable;
 		UINT32 m_palette[256], m_colors[3], m_count, m_clutoffs;
-		screen_device *m_screen;
 		emu_timer *m_timer;
 };
 

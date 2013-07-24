@@ -410,7 +410,8 @@ UINT32 i8275_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 const device_type I8275 = &device_creator<i8275_device>;
 
 i8275_device::i8275_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, I8275, "Intel 8275", tag, owner, clock, "i8275", __FILE__)
+	: device_t(mconfig, I8275, "Intel 8275", tag, owner, clock, "i8275", __FILE__),
+		device_video_interface(mconfig, *this)
 {
 }
 
@@ -446,8 +447,6 @@ void i8275_device::device_config_complete()
 void i8275_device::device_start()
 {
 	/* get the screen device */
-	m_screen = machine().device<screen_device>(m_screen_tag);
-	assert(m_screen != NULL);
 	m_screen->register_screen_bitmap(m_bitmap);
 
 	/* resolve callbacks */

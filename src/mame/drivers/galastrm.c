@@ -290,7 +290,6 @@ static const eeprom_interface galastrm_eeprom_interface =
 
 static const tc0100scn_interface galastrm_tc0100scn_intf =
 {
-	"screen",
 	0, 2,       /* gfxnum, txnum */
 	-48, -56,       /* x_offset, y_offset */
 	0, 0,       /* flip_xoff, flip_yoff */

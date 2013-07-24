@@ -428,7 +428,6 @@ static const k052109_interface esckids_k052109_intf =
 
 static const k053247_interface vendetta_k053246_intf =
 {
-	"screen",
 	"gfx2", 1,
 	NORMAL_PLANE_ORDER,
 	53, 6,
@@ -438,7 +437,6 @@ static const k053247_interface vendetta_k053246_intf =
 
 static const k053247_interface esckids_k053246_intf =
 {
-	"screen",
 	"gfx2", 1,
 	NORMAL_PLANE_ORDER,
 	101, 6,
@@ -448,7 +446,6 @@ static const k053247_interface esckids_k053246_intf =
 
 static const k053252_interface esckids_k053252_intf =
 {
-	"screen",
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,

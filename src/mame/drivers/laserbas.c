@@ -240,7 +240,6 @@ void laserbas_state::machine_reset()
 
 static MC6845_INTERFACE( mc6845_intf )
 {
-	"screen",   /* screen we are acting on */
 	false,      /* show border area */
 	8,          /* number of pixels per video memory address */
 	NULL,       /* before pixel update callback */
@@ -315,7 +314,7 @@ static MACHINE_CONFIG_START( laserbas, laserbas_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(laserbas_state, screen_update_laserbas)
 
-	MCFG_MC6845_ADD("crtc", H46505, 3000000/4, mc6845_intf) /* unknown clock, hand tuned to get ~60 fps */
+	MCFG_MC6845_ADD("crtc", H46505, "screen", 3000000/4, mc6845_intf) /* unknown clock, hand tuned to get ~60 fps */
 
 	MCFG_PALETTE_LENGTH(32)
 MACHINE_CONFIG_END

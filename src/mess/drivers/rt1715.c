@@ -158,7 +158,6 @@ GFXDECODE_END
 
 static const i8275_interface rt1715_i8275_intf =
 {
-	"screen",
 	8,
 	0,
 	DEVCB_NULL,

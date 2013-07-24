@@ -14,13 +14,8 @@
 ***************************************************************************/
 
 
-struct decocomn_interface
-{
-	const char         *m_screen_tag;
-};
-
 class decocomn_device : public device_t,
-										public decocomn_interface
+						public device_video_interface
 {
 public:
 	decocomn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -41,7 +36,6 @@ protected:
 
 private:
 	// internal state
-	screen_device *m_screen;
 	UINT8 *m_dirty_palette;
 	UINT16 m_priority;
 };
@@ -54,8 +48,7 @@ extern const device_type DECOCOMN;
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MCFG_DECOCOMN_ADD(_tag, _interface) \
-	MCFG_DEVICE_ADD(_tag, DECOCOMN, 0) \
-	MCFG_DEVICE_CONFIG(_interface)
+#define MCFG_DECOCOMN_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, DECOCOMN, 0)
 
 #endif

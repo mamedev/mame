@@ -101,6 +101,7 @@ typedef device_t * (*machine_config_constructor)(machine_config &config, device_
 #include "diserial.h"
 #include "dislot.h"
 #include "disound.h"
+#include "divideo.h"
 #include "dinvram.h"
 #include "dirtc.h"
 #include "didisasm.h"

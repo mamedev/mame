@@ -303,7 +303,6 @@ static Z80PIO_INTERFACE( z80pio_intf )
 
 static MC6845_INTERFACE( mc6845_intf )
 {
-	"screen",               /* screen we are acting on */
 	false,                  /* show border area */
 	8,                      /* number of pixels per video memory address */
 	NULL,                   /* before pixel update callback */
@@ -373,7 +372,7 @@ static MACHINE_CONFIG_START( pasopia, pasopia_state )
 	MCFG_PALETTE_LENGTH(8)
 
 	/* Devices */
-	MCFG_MC6845_ADD("crtc", H46505, XTAL_4MHz/4, mc6845_intf)   /* unknown clock, hand tuned to get ~60 fps */
+	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_4MHz/4, mc6845_intf)   /* unknown clock, hand tuned to get ~60 fps */
 	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_intf_0 )
 	MCFG_I8255A_ADD( "ppi8255_1", ppi8255_intf_1 )
 	MCFG_I8255A_ADD( "ppi8255_2", ppi8255_intf_2 )

@@ -195,14 +195,8 @@ static int dietgo_bank_callback(const int bank)
 	return ((bank >> 4) & 0x7) * 0x1000;
 }
 
-static const decocomn_interface dietgo_decocomn_intf =
-{
-	"screen",
-};
-
 static const deco16ic_interface dietgo_deco16ic_tilegen1_intf =
 {
-	"screen",
 	0, 1,
 	0x0f, 0x0f, /* trans masks (default values) */
 	0, 16, /* color base (default values) */
@@ -239,7 +233,7 @@ static MACHINE_CONFIG_START( dietgo, dietgo_state )
 	MCFG_PALETTE_LENGTH(1024)
 	MCFG_GFXDECODE(dietgo)
 
-	MCFG_DECOCOMN_ADD("deco_common", dietgo_decocomn_intf)
+	MCFG_DECOCOMN_ADD("deco_common")
 
 	MCFG_DECO16IC_ADD("tilegen1", dietgo_deco16ic_tilegen1_intf)
 

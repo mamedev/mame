@@ -143,7 +143,8 @@
 const device_type VIC3 = &device_creator<vic3_device>;
 
 vic3_device::vic3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-			: device_t(mconfig, VIC3, "4567 VIC III", tag, owner, clock, "vic3", __FILE__)
+			: device_t(mconfig, VIC3, "4567 VIC III", tag, owner, clock, "vic3", __FILE__),
+				device_video_interface(mconfig, *this)
 {
 }
 
@@ -171,7 +172,6 @@ void vic3_device::device_config_complete()
 		memset(&irq, 0, sizeof(irq));
 		memset(&port_changed, 0, sizeof(port_changed));
 		memset(&c64_mem_r, 0, sizeof(c64_mem_r));
-		screen_tag = "";
 		cpu_tag = "";
 		vic_type = VIC4567_NTSC;
 	}
@@ -186,9 +186,8 @@ void vic3_device::device_start()
 	int width, height;
 
 	m_cpu = machine().device(cpu_tag);
-	m_main_screen = machine().device<screen_device>(screen_tag);
-	width = m_main_screen->width();
-	height = m_main_screen->height();
+	width = m_screen->width();
+	height = m_screen->height();
 
 	m_bitmap = auto_bitmap_ind16_alloc(machine(), width, height);
 
@@ -206,10 +205,10 @@ void vic3_device::device_start()
 	m_lightpen_x_cb.resolve(x_cb, *this);
 	m_lightpen_y_cb.resolve(y_cb, *this);
 
-	m_screen[0] = auto_alloc_array(machine(), UINT8, 216 * 656 / 8);
+	m_screenptr[0] = auto_alloc_array(machine(), UINT8, 216 * 656 / 8);
 
 	for (int i = 1; i < 216; i++)
-		m_screen[i] = m_screen[i - 1] + 656 / 8;
+		m_screenptr[i] = m_screenptr[i - 1] + 656 / 8;
 
 	for (int i = 0; i < 256; i++)
 	{
@@ -385,12 +384,12 @@ void vic3_device::device_reset()
 
 inline int vic3_device::getforeground( int y, int x )
 {
-	return ((m_screen[y][x >> 3] << 8) | (m_screen[y][(x >> 3) + 1])) >> (8 - (x & 7));
+	return ((m_screenptr[y][x >> 3] << 8) | (m_screenptr[y][(x >> 3) + 1])) >> (8 - (x & 7));
 }
 
 inline int vic3_device::getforeground16( int y, int x )
 {
-	return ((m_screen[y][x >> 3] << 16) | (m_screen[y][(x >> 3) + 1] << 8) | (m_screen[y][(x >> 3) + 2])) >> (8 - (x & 7));
+	return ((m_screenptr[y][x >> 3] << 16) | (m_screenptr[y][(x >> 3) + 1] << 8) | (m_screenptr[y][(x >> 3) + 2])) >> (8 - (x & 7));
 }
 
 void vic3_device::set_interrupt( int mask )
@@ -443,7 +442,7 @@ void vic3_device::draw_character( int ybegin, int yend, int ch, int yoff, int xo
 	for (int y = ybegin; y <= yend; y++)
 	{
 		code = m_dma_read(m_chargenaddr + ch * 8 + y);
-		m_screen[y + yoff][xoff >> 3] = code;
+		m_screenptr[y + yoff][xoff >> 3] = code;
 		if ((xoff + 0 > start_x) && (xoff + 0 < end_x)) m_bitmap->pix16(y + yoff + FIRSTLINE, xoff + 0) = color[code >> 7];
 		if ((xoff + 1 > start_x) && (xoff + 0 < end_x)) m_bitmap->pix16(y + yoff + FIRSTLINE, xoff + 1) = color[(code >> 6) & 1];
 		if ((xoff + 2 > start_x) && (xoff + 0 < end_x)) m_bitmap->pix16(y + yoff + FIRSTLINE, xoff + 2) = color[(code >> 5) & 1];
@@ -462,7 +461,7 @@ void vic3_device::draw_character_multi( int ybegin, int yend, int ch, int yoff, 
 	for (int y = ybegin; y <= yend; y++)
 	{
 		code = m_dma_read(m_chargenaddr + ch * 8 + y);
-		m_screen[y + yoff][xoff >> 3] = m_foreground[code];
+		m_screenptr[y + yoff][xoff >> 3] = m_foreground[code];
 		if ((xoff + 0 > start_x) && (xoff + 0 < end_x)) m_bitmap->pix16(y + yoff + FIRSTLINE, xoff + 0) = m_multi[code >> 6];
 		if ((xoff + 1 > start_x) && (xoff + 1 < end_x)) m_bitmap->pix16(y + yoff + FIRSTLINE, xoff + 1) = m_multi[code >> 6];
 		if ((xoff + 2 > start_x) && (xoff + 2 < end_x)) m_bitmap->pix16(y + yoff + FIRSTLINE, xoff + 2) = m_multi[(code >> 4) & 3];
@@ -481,7 +480,7 @@ void vic3_device::draw_bitmap( int ybegin, int yend, int ch, int yoff, int xoff,
 	for (int y = ybegin; y <= yend; y++)
 	{
 		code = m_dma_read((m_chargenaddr & 0x2000) + ch * 8 + y);
-		m_screen[y + yoff][xoff >> 3] = code;
+		m_screenptr[y + yoff][xoff >> 3] = code;
 		if ((xoff + 0 > start_x) && (xoff + 0 < end_x)) m_bitmap->pix16(y + yoff + FIRSTLINE, xoff + 0) = m_c64_bitmap[code >> 7];
 		if ((xoff + 1 > start_x) && (xoff + 1 < end_x)) m_bitmap->pix16(y + yoff + FIRSTLINE, xoff + 1) = m_c64_bitmap[(code >> 6) & 1];
 		if ((xoff + 2 > start_x) && (xoff + 2 < end_x)) m_bitmap->pix16(y + yoff + FIRSTLINE, xoff + 2) = m_c64_bitmap[(code >> 5) & 1];
@@ -500,7 +499,7 @@ void vic3_device::draw_bitmap_multi( int ybegin, int yend, int ch, int yoff, int
 	for (int y = ybegin; y <= yend; y++)
 	{
 		code = m_dma_read((m_chargenaddr & 0x2000) + ch * 8 + y);
-		m_screen[y + yoff][xoff >> 3] = m_foreground[code];
+		m_screenptr[y + yoff][xoff >> 3] = m_foreground[code];
 		if ((xoff + 0 > start_x) && (xoff + 0 < end_x)) m_bitmap->pix16(y + yoff + FIRSTLINE, xoff + 0) = m_bitmapmulti[code >> 6];
 		if ((xoff + 1 > start_x) && (xoff + 1 < end_x)) m_bitmap->pix16(y + yoff + FIRSTLINE, xoff + 1) = m_bitmapmulti[code >> 6];
 		if ((xoff + 2 > start_x) && (xoff + 2 < end_x)) m_bitmap->pix16(y + yoff + FIRSTLINE, xoff + 2) = m_bitmapmulti[(code >> 4) & 3];
@@ -1885,7 +1884,7 @@ void vic3_device::draw_bitplanes()
 {
 	int x, y, y1s, offset;
 	rectangle vis;
-	const rectangle &visarea = m_main_screen->visible_area();
+	const rectangle &visarea = m_screen->visible_area();
 
 	if (VIC3_LINES == 400)
 	{ /* interlaced! */
@@ -1989,13 +1988,13 @@ void vic3_device::raster_interrupt_gen()
 			m_rows = new_rows;
 			m_columns = new_columns;
 			if (m_type == VIC4567_PAL)
-				m_main_screen->set_visible_area(
+				m_screen->set_visible_area(
 									VIC2_STARTVISIBLECOLUMNS + 32,
 									VIC2_STARTVISIBLECOLUMNS + 32 + m_columns + 16 - 1,
 									VIC2_STARTVISIBLELINES + 34,
 									VIC2_STARTVISIBLELINES + 34 + m_rows + 16 - 1);
 			else
-				m_main_screen->set_visible_area(
+				m_screen->set_visible_area(
 									VIC2_STARTVISIBLECOLUMNS + 34,
 									VIC2_STARTVISIBLECOLUMNS + 34 + m_columns + 16 - 1,
 									VIC2_STARTVISIBLELINES + 10,

@@ -14,6 +14,7 @@
 
 class nubus_lview_device :
 		public device_t,
+		public device_video_interface,
 		public device_nubus_card_interface
 {
 public:
@@ -42,7 +43,6 @@ public:
 		UINT32 *m_vram32;
 		UINT32 m_vbl_disable, m_toggle;
 		UINT32 m_palette[256];
-		screen_device *m_screen;
 		emu_timer *m_timer;
 		int m_protstate;
 };

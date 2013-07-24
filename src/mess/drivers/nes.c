@@ -662,7 +662,6 @@ void nes_state::ppu_nmi(int *ppu_regs)
 static const ppu2c0x_interface nes_ppu_interface =
 {
 	"maincpu",
-	"screen",
 	0,
 	0,
 	PPU_MIRROR_NONE

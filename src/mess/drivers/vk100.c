@@ -167,7 +167,6 @@ public:
 	vk100_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_screen(*this, "screen"),
 		m_crtc(*this, "crtc"),
 		m_speaker(*this, "beeper"),
 		m_uart(*this, "i8251"),
@@ -180,7 +179,6 @@ public:
 		m_dipsw(*this, "SWITCHES")
 		{ }
 	required_device<cpu_device> m_maincpu;
-	required_device<screen_device> m_screen;
 	required_device<mc6845_device> m_crtc;
 	required_device<beep_device> m_speaker;
 	required_device<i8251_device> m_uart;
@@ -995,7 +993,6 @@ static MC6845_UPDATE_ROW( vk100_update_row )
 
 static MC6845_INTERFACE( mc6845_intf )
 {
-	"screen",
 	false,
 	12,
 	NULL,
@@ -1042,7 +1039,7 @@ static MACHINE_CONFIG_START( vk100, vk100_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_45_6192Mhz/3, 882, 0, 720, 370, 0, 350 ) // fake screen timings for startup until 6845 sets real ones
 	MCFG_SCREEN_UPDATE_DEVICE( "crtc", mc6845_device, screen_update )
-	MCFG_MC6845_ADD( "crtc", H46505, XTAL_45_6192Mhz/3/12, mc6845_intf)
+	MCFG_MC6845_ADD( "crtc", H46505, "screen", XTAL_45_6192Mhz/3/12, mc6845_intf)
 
 	/* i8251 uart */
 	MCFG_I8251_ADD("i8251", i8251_intf)

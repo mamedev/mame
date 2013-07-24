@@ -151,7 +151,6 @@ static const z80_daisy_config kaypro2x_daisy_chain[] =
 
 static MC6845_INTERFACE( kaypro2x_crtc )
 {
-	"screen",           /* name of screen */
 	false,
 	7,              /* number of dots per character */
 	NULL,
@@ -295,7 +294,7 @@ static MACHINE_CONFIG_START( kaypro2x, kaypro_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* devices */
-	MCFG_MC6845_ADD("crtc", MC6845, 2000000, kaypro2x_crtc) /* comes out of ULA - needs to be measured */
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", 2000000, kaypro2x_crtc) /* comes out of ULA - needs to be measured */
 	MCFG_QUICKLOAD_ADD("quickload", kaypro_state, kaypro2x, "com,cpm", 3)
 	MCFG_FD1793_ADD("wd1793", kaypro_wd1793_interface )
 	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)

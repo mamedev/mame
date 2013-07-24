@@ -133,7 +133,6 @@ void vt240_state::machine_reset()
 
 static UPD7220_INTERFACE( hgdc_intf )
 {
-	"screen",
 	NULL,
 	hgdc_draw_text,
 	DEVCB_NULL,

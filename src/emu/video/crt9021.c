@@ -82,7 +82,8 @@ enum
 //-------------------------------------------------
 
 crt9021_device::crt9021_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, CRT9021, "SMC CRT9021", tag, owner, clock, "crt9021", __FILE__)
+	: device_t(mconfig, CRT9021, "SMC CRT9021", tag, owner, clock, "crt9021", __FILE__),
+		device_video_interface(mconfig, *this)
 {
 }
 
@@ -122,10 +123,6 @@ void crt9021_device::device_start()
 	m_in_data_func.resolve(in_data_cb, *this);
 	m_in_attr_func.resolve(in_attr_cb, *this);
 	m_in_atten_func.resolve(in_atten_cb, *this);
-
-	// get the screen device
-	m_screen = machine().device<screen_device>(screen_tag);
-	assert(m_screen != NULL);
 
 	// register for state saving
 	save_item(NAME(m_slg));

@@ -43,29 +43,6 @@ const address_space_config *ef9345_device::memory_space_config(address_spacenum 
 	return (spacenum == AS_0) ? &m_space_config : NULL;
 }
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void ef9345_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const ef9345_interface *intf = reinterpret_cast<const ef9345_interface *>(static_config());
-
-	if (intf != NULL)
-	{
-		*static_cast<ef9345_interface *>(this) = *intf;
-	}
-	// or initialize to defaults if none provided
-	else
-	{
-		screen_tag = NULL;
-	}
-}
-
-
 //**************************************************************************
 //  INLINE HELPERS
 //**************************************************************************
@@ -123,6 +100,7 @@ inline void ef9345_device::inc_y(UINT8 r)
 ef9345_device::ef9345_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, EF9345, "EF9345", tag, owner, clock, "ef9345", __FILE__),
 	device_memory_interface(mconfig, *this),
+	device_video_interface(mconfig, *this),
 	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, NULL, *ADDRESS_MAP_NAME(ef9345))
 {
 }
@@ -133,10 +111,6 @@ ef9345_device::ef9345_device(const machine_config &mconfig, const char *tag, dev
 
 void ef9345_device::device_start()
 {
-	m_screen = machine().device<screen_device>(screen_tag);
-
-	assert(m_screen != NULL);
-
 	m_busy_timer = timer_alloc(BUSY_TIMER);
 	m_blink_timer = timer_alloc(BLINKING_TIMER);
 

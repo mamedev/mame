@@ -38,7 +38,8 @@ void huc6261_device::device_config_complete()
 
 
 huc6261_device::huc6261_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, HUC6261, "HuC6261", tag, owner, clock, "huc6261", __FILE__)
+	: 	device_t(mconfig, HUC6261, "HuC6261", tag, owner, clock, "huc6261", __FILE__),
+		device_video_interface(mconfig, *this)
 {
 	// Set up UV lookup table
 	for ( int ur = 0; ur < 256; ur++ )
@@ -402,19 +403,16 @@ WRITE16_MEMBER( huc6261_device::write )
 void huc6261_device::device_start()
 {
 	/* Make sure we are supplied all our mandatory tags */
-	assert( screen_tag != NULL );
 	assert( huc6270_a_tag != NULL );
 	assert( huc6270_b_tag != NULL );
 
 	m_timer = timer_alloc();
-	m_screen = machine().device<screen_device>( screen_tag );
 	m_huc6270_a = machine().device<huc6270_device>( huc6270_a_tag );
 	m_huc6270_b = machine().device<huc6270_device>( huc6270_b_tag );
 
 	m_bmp = auto_bitmap_rgb32_alloc( machine(), HUC6261_WPF, HUC6261_LPF );
 
 	/* We want to have valid devices */
-	assert( m_screen != NULL );
 	assert( m_huc6270_a != NULL );
 	assert( m_huc6270_b != NULL );
 

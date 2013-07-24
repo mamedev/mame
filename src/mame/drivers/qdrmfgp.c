@@ -555,7 +555,6 @@ WRITE_LINE_MEMBER(qdrmfgp_state::qdrmfgp_irq4_ack_w)
 
 static const k053252_interface qdrmfgp_k053252_intf =
 {
-	"screen",
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_DRIVER_LINE_MEMBER(qdrmfgp_state,qdrmfgp_irq3_ack_w),
@@ -565,7 +564,6 @@ static const k053252_interface qdrmfgp_k053252_intf =
 
 static const k053252_interface qdrmfgp2_k053252_intf =
 {
-	"screen",
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_DRIVER_LINE_MEMBER(qdrmfgp_state,qdrmfgp_irq4_ack_w),

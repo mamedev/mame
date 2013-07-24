@@ -348,7 +348,6 @@ INTERRUPT_GEN_MEMBER(pachifev_state::pachifev_vblank_irq)
 
 static TMS9928A_INTERFACE(pachifev_tms9928a_interface)
 {
-	"screen",
 	0x4000,
 	DEVCB_NULL
 };

@@ -376,7 +376,6 @@ WRITE8_MEMBER( vt100_state::vt100_clear_video_interrupt )
 
 static const vt_video_interface vt100_video_interface =
 {
-	"screen",
 	"chargen",
 	DEVCB_DRIVER_MEMBER(vt100_state, vt100_read_video_ram_r),
 	DEVCB_DRIVER_MEMBER(vt100_state, vt100_clear_video_interrupt)

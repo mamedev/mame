@@ -336,7 +336,6 @@ static const k053936_interface rng_k053936_intf =
 
 static const k053247_interface rng_k055673_intf =
 {
-	"screen",
 	"gfx2", 1,
 	K055673_LAYOUT_RNG,
 	-8, 15,
@@ -346,7 +345,6 @@ static const k053247_interface rng_k055673_intf =
 
 static const k053252_interface rng_k053252_intf =
 {
-	"screen",
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,

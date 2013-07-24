@@ -12,7 +12,7 @@ public:
 		m_videoram(*this, "videoram"),
 		m_vregs(*this, "vregs"),
 		m_spriteram(*this, "spriteram"),
-		m_screen(*this, "screen"),
+		m_screenram(*this, "screenram"),
 		m_audiocpu(*this, "audiocpu"),
 		m_maincpu(*this, "maincpu") { }
 
@@ -20,7 +20,7 @@ public:
 	required_shared_ptr<UINT16> m_videoram;
 	required_shared_ptr<UINT16> m_vregs;
 	required_shared_ptr<UINT16> m_spriteram;
-	optional_shared_ptr<UINT16> m_screen;
+	optional_shared_ptr<UINT16> m_screenram;
 //  UINT16 *     paletteram;    // currently this uses generic palette handling
 
 	/* video-related */

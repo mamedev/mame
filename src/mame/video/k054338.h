@@ -18,7 +18,7 @@ DECLARE_WRITE32_HANDLER( K054338_long_w );
 int K054338_read_register(int reg);
 void K054338_update_all_shadows(running_machine &machine, int rushingheroes_hack);          // called at the beginning of SCREEN_UPDATE()
 void K054338_fill_solid_bg(bitmap_ind16 &bitmap);               // solid backcolor fill
-void K054338_fill_backcolor(running_machine &machine, bitmap_rgb32 &bitmap, int mode);  // unified fill, 0=solid, 1=gradient
+void K054338_fill_backcolor(running_machine &machine, screen_device &screen, bitmap_rgb32 &bitmap, int mode);  // unified fill, 0=solid, 1=gradient
 int  K054338_set_alpha_level(int pblend);                           // blend style 0-2
 void K054338_invert_alpha(int invert);                              // 0=0x00(invis)-0x1f(solid), 1=0x1f(invis)-0x00(solod)
 void K054338_export_config(int **shdRGB);
@@ -40,13 +40,13 @@ void K054338_export_config(int **shdRGB);
 
 struct k054338_interface
 {
-	const char         *m_screen_tag;
 	int                m_alpha_inv;
 	const char         *m_k055555_tag;
 };
 
 
 class k054338_device : public device_t,
+										public device_video_interface,
 										public k054338_interface
 {
 public:
@@ -77,7 +77,6 @@ private:
 	UINT16    m_regs[32];
 	int       m_shd_rgb[9];
 
-	screen_device *m_screen;
 	k055555_device *m_k055555;  /* used to fill BG color */
 };
 

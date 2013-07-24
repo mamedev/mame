@@ -365,7 +365,6 @@ WRITE_LINE_MEMBER(tapatune_state::crtc_vsync)
 
 static MC6845_INTERFACE( h46505_intf )
 {
-	"screen",   /* screen we are acting on */
 	false,      /* show border area */
 	5,          /* number of pixels per video memory address */
 	begin_update,/* before pixel update callback */
@@ -400,7 +399,7 @@ static MACHINE_CONFIG_START( tapatune, tapatune_state )
 	MCFG_PALETTE_LENGTH(16)
 
 
-	MCFG_MC6845_ADD("crtc", H46505, 24000000/16, h46505_intf)   /* H46505 */
+	MCFG_MC6845_ADD("crtc", H46505, "screen", 24000000/16, h46505_intf)   /* H46505 */
 
 	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW)
 

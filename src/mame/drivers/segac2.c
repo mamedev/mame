@@ -1335,7 +1335,6 @@ void genesis_vdp_lv4irqline_callback_segac2(running_machine &machine, bool state
 static const sega315_5124_interface sms_vdp_ntsc_intf =
 {
 	false,
-	"megadriv",
 	DEVCB_NULL,
 	DEVCB_NULL,
 };
@@ -1358,6 +1357,7 @@ static MACHINE_CONFIG_START( segac, segac2_state )
 //  MCFG_FRAGMENT_ADD(megadriv_timers)
 
 	MCFG_DEVICE_ADD("gen_vdp", SEGA_GEN_VDP, 0)
+	MCFG_VIDEO_SET_SCREEN("megadriv")
 	MCFG_DEVICE_CONFIG( sms_vdp_ntsc_intf )
 	sega_genesis_vdp_device::set_genesis_vdp_sndirqline_callback(*device, genesis_vdp_sndirqline_callback_segac2);
 	sega_genesis_vdp_device::set_genesis_vdp_lv6irqline_callback(*device, genesis_vdp_lv6irqline_callback_segac2);

@@ -433,7 +433,6 @@ void camplynx_state::video_start()
 
 static MC6845_INTERFACE( lynx48k_crtc6845_interface )
 {
-	"screen",
 	false,
 	8,
 	NULL,
@@ -449,7 +448,6 @@ static MC6845_INTERFACE( lynx48k_crtc6845_interface )
 
 static MC6845_INTERFACE( lynx128k_crtc6845_interface )
 {
-	"screen",           /* screen name */
 	false,
 	8,              /* dots per character */
 	NULL,
@@ -485,7 +483,7 @@ static MACHINE_CONFIG_START( lynx48k, camplynx_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
 
 	/* Devices */
-	MCFG_MC6845_ADD("crtc", MC6845, XTAL_12MHz / 8 /*? dot clock divided by dots per char */, lynx48k_crtc6845_interface)
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_12MHz / 8 /*? dot clock divided by dots per char */, lynx48k_crtc6845_interface)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( lynx128k, camplynx_state )
@@ -512,7 +510,7 @@ static MACHINE_CONFIG_START( lynx128k, camplynx_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
 
 	/* Devices */
-	MCFG_MC6845_ADD("crtc", MC6845, XTAL_12MHz / 8 /*? dot clock divided by dots per char */, lynx128k_crtc6845_interface)
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_12MHz / 8 /*? dot clock divided by dots per char */, lynx128k_crtc6845_interface)
 MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(camplynx_state,lynx48k)

@@ -76,6 +76,7 @@ struct zx8301_interface
 
 class zx8301_device :   public device_t,
 						public device_memory_interface,
+						public device_video_interface,
 						public zx8301_interface
 {
 public:
@@ -113,7 +114,6 @@ private:
 	devcb_resolved_write_line   m_out_vsync_func;
 
 	cpu_device *m_cpu;
-	screen_device *m_screen;
 	//address_space *m_data;
 
 	int m_dispoff;                  // display off

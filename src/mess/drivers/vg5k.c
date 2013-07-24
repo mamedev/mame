@@ -349,11 +349,6 @@ DRIVER_INIT_MEMBER(vg5k_state,vg5k)
 }
 
 
-static const ef9345_interface vg5k_ef9345_config =
-{
-	"screen"            /* screen we are acting on */
-};
-
 static const struct CassetteOptions vg5k_cassette_options =
 {
 	1,      /* channels */
@@ -382,7 +377,7 @@ static MACHINE_CONFIG_START( vg5k, vg5k_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer", vg5k_state, z80_irq, attotime::from_msec(20))
 
-	MCFG_EF9345_ADD("ef9345", vg5k_ef9345_config)
+	MCFG_EF9345_ADD("ef9345", "screen")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

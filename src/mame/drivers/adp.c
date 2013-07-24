@@ -628,7 +628,6 @@ ADDRESS_MAP_END
 
 static H63484_INTERFACE( adp_h63484_intf )
 {
-	"screen",
 	acrtc_display_pixels
 };
 

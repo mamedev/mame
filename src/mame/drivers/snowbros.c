@@ -1512,7 +1512,6 @@ MACHINE_RESET_MEMBER(snowbros_state,finalttr)
 
 static const kaneko_pandora_interface snowbros_pandora_config =
 {
-	"screen",   /* screen tag */
 	0,  /* gfx_region */
 	0, 0    /* x_offs, y_offs */
 };

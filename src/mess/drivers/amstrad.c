@@ -856,7 +856,7 @@ static MACHINE_CONFIG_START( amstrad_nofdc, amstrad_state )
 	MCFG_PALETTE_LENGTH(32)
 	MCFG_PALETTE_INIT_OVERRIDE(amstrad_state,amstrad_cpc)
 
-	MCFG_MC6845_ADD( "mc6845", MC6845, XTAL_16MHz / 16, amstrad_mc6845_intf )
+	MCFG_MC6845_ADD( "mc6845", MC6845, NULL, XTAL_16MHz / 16, amstrad_mc6845_intf )
 
 	MCFG_VIDEO_START_OVERRIDE(amstrad_state,amstrad)
 
@@ -930,7 +930,7 @@ static MACHINE_CONFIG_START( cpcplus, amstrad_state )
 	MCFG_PALETTE_LENGTH(4096)
 	MCFG_PALETTE_INIT_OVERRIDE(amstrad_state,amstrad_plus)
 
-	MCFG_MC6845_ADD( "mc6845", MC6845, XTAL_40MHz / 40, amstrad_plus_mc6845_intf )
+	MCFG_MC6845_ADD( "mc6845", MC6845, NULL, XTAL_40MHz / 40, amstrad_plus_mc6845_intf )
 
 	MCFG_VIDEO_START_OVERRIDE(amstrad_state,amstrad)
 
@@ -989,7 +989,7 @@ static MACHINE_CONFIG_START( gx4000, amstrad_state )
 	MCFG_PALETTE_LENGTH(4096)
 	MCFG_PALETTE_INIT_OVERRIDE(amstrad_state,amstrad_plus)
 
-	MCFG_MC6845_ADD( "mc6845", MC6845, XTAL_40MHz / 40, amstrad_plus_mc6845_intf )
+	MCFG_MC6845_ADD( "mc6845", MC6845, NULL, XTAL_40MHz / 40, amstrad_plus_mc6845_intf )
 
 	MCFG_VIDEO_START_OVERRIDE(amstrad_state,amstrad)
 

@@ -74,7 +74,6 @@ typedef void (*upd3301_display_pixels_func)(device_t *device, bitmap_rgb32 &bitm
 
 struct upd3301_interface
 {
-	const char *m_screen_tag;       // screen we are acting on
 	int m_width;                    // char width in pixels
 
 	upd3301_display_pixels_func m_display_cb;
@@ -90,6 +89,7 @@ struct upd3301_interface
 // ======================> upd3301_device
 
 class upd3301_device :  public device_t,
+						public device_video_interface,
 						public upd3301_interface
 {
 public:
@@ -132,8 +132,6 @@ private:
 	devcb_resolved_write_line       m_out_drq_func;
 	devcb_resolved_write_line       m_out_hrtc_func;
 	devcb_resolved_write_line       m_out_vrtc_func;
-
-	screen_device *m_screen;
 
 	// screen drawing
 	bitmap_rgb32 *m_bitmap;     // bitmap

@@ -50,7 +50,6 @@ static MC6845_UPDATE_ROW( videoterm_update_row );
 
 static MC6845_INTERFACE( mc6845_mda_intf )
 {
-	VIDEOTERM_SCREEN_NAME, /* screen number */
 	false,              /* show border area */
 	8,                  /* number of pixels per video memory address */
 	NULL,               /* begin_update */
@@ -68,7 +67,7 @@ MACHINE_CONFIG_FRAGMENT( a2videoterm )
 	MCFG_SCREEN_RAW_PARAMS(MDA_CLOCK, 882, 0, 720, 370, 0, 350 )
 	MCFG_SCREEN_UPDATE_DEVICE( VIDEOTERM_MC6845_NAME, mc6845_device, screen_update )
 
-	MCFG_MC6845_ADD( VIDEOTERM_MC6845_NAME, MC6845, MDA_CLOCK/9, mc6845_mda_intf)
+	MCFG_MC6845_ADD( VIDEOTERM_MC6845_NAME, MC6845, VIDEOTERM_SCREEN_NAME, MDA_CLOCK/9, mc6845_mda_intf)
 MACHINE_CONFIG_END
 
 ROM_START( a2videoterm )

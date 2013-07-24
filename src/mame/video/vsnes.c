@@ -31,7 +31,6 @@ void vsnes_state::ppu_irq_2(int *ppu_regs)
 const ppu2c0x_interface vsnes_ppu_interface_1 =
 {
 	"maincpu",
-	"screen1",
 	0,                  /* gfxlayout num */
 	0,                  /* color base */
 	PPU_MIRROR_NONE     /* mirroring */
@@ -41,7 +40,6 @@ const ppu2c0x_interface vsnes_ppu_interface_1 =
 const ppu2c0x_interface vsnes_ppu_interface_2 =
 {
 	"sub",
-	"screen2",
 	1,                  /* gfxlayout num */
 	512,                /* color base */
 	PPU_MIRROR_NONE     /* mirroring */

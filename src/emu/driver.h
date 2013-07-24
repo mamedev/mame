@@ -422,6 +422,9 @@ protected:
 	inline UINT32 paletteram32_be(offs_t offset) const { return m_generic_paletteram_16[offset | 1] | (m_generic_paletteram_16[offset & ~1] << 16); }
 
 public:
+	// generic devices
+	optional_device<screen_device> m_screen;
+
 	// generic pointers
 	optional_shared_ptr<UINT8> m_generic_paletteram_8;
 	optional_shared_ptr<UINT8> m_generic_paletteram2_8;

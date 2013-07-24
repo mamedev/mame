@@ -980,21 +980,6 @@ static const k033906_interface hornet_k033906_intf_1 =
 	"voodoo1"
 };
 
-static const k037122_interface hornet_k037122_intf =
-{
-	"screen", 0
-};
-
-static const k037122_interface hornet_k037122_intf_l =
-{
-	"lscreen", 0
-};
-
-static const k037122_interface hornet_k037122_intf_r =
-{
-	"rscreen", 1
-};
-
 static const voodoo_config hornet_voodoo_intf =
 {
 	2, //               fbmem;
@@ -1038,7 +1023,7 @@ static MACHINE_CONFIG_START( hornet, hornet_state )
 
 	MCFG_PALETTE_LENGTH(65536)
 
-	MCFG_K037122_ADD("k037122_1", hornet_k037122_intf)
+	MCFG_K037122_ADD("k037122_1", "screen", 0)
 
 	MCFG_K056800_ADD("k056800", hornet_k056800_interface, XTAL_64MHz/4)
 
@@ -1106,8 +1091,8 @@ static MACHINE_CONFIG_DERIVED( hornet_2board, hornet )
 
 
 	MCFG_DEVICE_REMOVE("k037122_1")
-	MCFG_K037122_ADD("k037122_1", hornet_k037122_intf_l)
-	MCFG_K037122_ADD("k037122_2", hornet_k037122_intf_r)
+	MCFG_K037122_ADD("k037122_1", "lscreen", 0)
+	MCFG_K037122_ADD("k037122_2", "rscreen", 1)
 
 	MCFG_DEVICE_REMOVE("voodoo0")
 	MCFG_3DFX_VOODOO_1_ADD("voodoo0", STD_VOODOO_1_CLOCK, voodoo_l_intf)

@@ -105,7 +105,6 @@ public:
 		m_ay(*this, "ay"),
 		m_fdc(*this, "upd765"),
 		m_crtc(*this, "mc6845"),
-		m_screen(*this, "screen"),
 		m_ppi(*this, "ppi8255"),
 		m_centronics(*this, "centronics"),
 		m_cassette(*this, "cassette"),
@@ -152,7 +151,6 @@ public:
 	required_device<ay8910_device> m_ay;
 	optional_device<upd765_family_device> m_fdc;  // not on a GX4000
 	required_device<mc6845_device> m_crtc;
-	required_device<screen_device> m_screen;
 	required_device<i8255_device> m_ppi;
 	optional_device<centronics_device> m_centronics;  // not on a GX4000
 	optional_device<cassette_image_device> m_cassette; // not on a GX4000, (or technically, the 6128+)

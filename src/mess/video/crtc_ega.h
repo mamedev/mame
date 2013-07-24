@@ -16,6 +16,8 @@
 	MCFG_DEVICE_ADD(_tag, CRTC_EGA, _clock) \
 	MCFG_DEVICE_CONFIG(_intrf)
 
+#define MCFG_CRTC_EGA_SET_SCREEN MCFG_VIDEO_SET_SCREEN
+
 
 class crtc_ega_device;
 
@@ -37,7 +39,6 @@ typedef void (*crtc_ega_end_update_func)(crtc_ega_device *device, bitmap_ind16 &
 /* interface */
 struct crtc_ega_interface
 {
-	const char *m_screen_tag;       /* screen we are acting on */
 	int m_hpixels_per_column;       /* number of pixels per video memory address */
 
 	/* if specified, this gets called before any pixel update,
@@ -68,6 +69,7 @@ struct crtc_ega_interface
 
 
 class crtc_ega_device : public device_t,
+						public device_video_interface,
 						public crtc_ega_interface
 {
 public:
@@ -111,8 +113,6 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 private:
-	screen_device *m_screen;
-
 	devcb_resolved_write_line   m_res_out_de_func;
 	devcb_resolved_write_line   m_res_out_cur_func;
 	devcb_resolved_write_line   m_res_out_hsync_func;

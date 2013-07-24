@@ -117,7 +117,6 @@ MC6845_UPDATE_ROW( dmd_update_row )
 
 MC6845_INTERFACE( decodmd2_6845_intf )
 {
-	NULL,                                   /* screen name */
 	false,                                  /* show border area */
 	8,                                     /* number of pixels per video memory address */
 	NULL,                                   /* begin_update */
@@ -149,7 +148,7 @@ static MACHINE_CONFIG_FRAGMENT( decodmd2 )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("firq_timer",decodmd_type2_device,dmd_firq,attotime::from_hz(80))
 
-	MCFG_MC6845_ADD("dmd6845",MC6845,XTAL_8MHz / 8,decodmd2_6845_intf)  // TODO: confirm clock speed
+	MCFG_MC6845_ADD("dmd6845",MC6845,NULL,XTAL_8MHz / 8,decodmd2_6845_intf)  // TODO: confirm clock speed
 
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 

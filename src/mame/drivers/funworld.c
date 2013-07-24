@@ -2533,7 +2533,6 @@ static const ay8910_interface funquiz_ay8910_intf =
 
 static MC6845_INTERFACE( mc6845_intf )
 {
-	"screen",   /* screen we are acting on */
 	false,      /* show border area */
 	4,          /* number of pixels per video memory address */
 	NULL,       /* before pixel update callback */
@@ -2577,7 +2576,7 @@ static MACHINE_CONFIG_START( fw1stpal, funworld_state )
 	MCFG_PALETTE_INIT_OVERRIDE(funworld_state, funworld)
 	MCFG_VIDEO_START_OVERRIDE(funworld_state, funworld)
 
-	MCFG_MC6845_ADD("crtc", MC6845, MASTER_CLOCK/8, mc6845_intf)    /* 2MHz, veryfied on jollycrd & royalcrd */
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/8, mc6845_intf)    /* 2MHz, veryfied on jollycrd & royalcrd */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

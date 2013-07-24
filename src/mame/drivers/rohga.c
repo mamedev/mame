@@ -763,11 +763,6 @@ WRITE8_MEMBER(rohga_state::sound_bankswitch_w)
 
 /**********************************************************************************/
 
-static const decocomn_interface rohga_decocomn_intf =
-{
-	"screen",
-};
-
 static int rohga_bank_callback( const int bank )
 {
 	return ((bank >> 4) & 0x3) << 12;
@@ -775,7 +770,6 @@ static int rohga_bank_callback( const int bank )
 
 static const deco16ic_interface rohga_deco16ic_tilegen1_intf =
 {
-	"screen",
 	0, 1,
 	0x0f, 0x0f, /* trans masks (default values) */
 	0, 16,/* color base (default values) */
@@ -787,7 +781,6 @@ static const deco16ic_interface rohga_deco16ic_tilegen1_intf =
 
 static const deco16ic_interface rohga_deco16ic_tilegen2_intf =
 {
-	"screen",
 	0, 1,
 	0x0f, 0x0f, /* trans masks (default values) */
 	0, 16, /* color base (default values) */
@@ -799,7 +792,6 @@ static const deco16ic_interface rohga_deco16ic_tilegen2_intf =
 
 static const deco16ic_interface nitrobal_deco16ic_tilegen1_intf =
 {
-	"screen",
 	0, 0,
 	0x0f, 0x0f, /* trans masks (default values) */
 	0, 16, /* color base (pf4 is not default) */
@@ -811,7 +803,6 @@ static const deco16ic_interface nitrobal_deco16ic_tilegen1_intf =
 
 static const deco16ic_interface nitrobal_deco16ic_tilegen2_intf =
 {
-	"screen",
 	0, 0,
 	0x0f, 0x0f, /* trans masks (default values) */
 	0, 0, /* color base (pf4 is not default) */
@@ -846,7 +837,7 @@ static MACHINE_CONFIG_START( rohga, rohga_state )
 
 	MCFG_VIDEO_START_OVERRIDE(rohga_state,rohga)
 
-	MCFG_DECOCOMN_ADD("deco_common", rohga_decocomn_intf)
+	MCFG_DECOCOMN_ADD("deco_common")
 
 	MCFG_DECO16IC_ADD("tilegen1", rohga_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_ADD("tilegen2", rohga_deco16ic_tilegen2_intf)
@@ -898,7 +889,7 @@ static MACHINE_CONFIG_START( wizdfire, rohga_state )
 	MCFG_GFXDECODE(wizdfire)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_DECOCOMN_ADD("deco_common", rohga_decocomn_intf)
+	MCFG_DECOCOMN_ADD("deco_common")
 
 	MCFG_DECO16IC_ADD("tilegen1", rohga_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_ADD("tilegen2", rohga_deco16ic_tilegen2_intf)
@@ -956,7 +947,7 @@ static MACHINE_CONFIG_START( nitrobal, rohga_state )
 	MCFG_GFXDECODE(wizdfire)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_DECOCOMN_ADD("deco_common", rohga_decocomn_intf)
+	MCFG_DECOCOMN_ADD("deco_common")
 
 	MCFG_DECO16IC_ADD("tilegen1", nitrobal_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_ADD("tilegen2", nitrobal_deco16ic_tilegen2_intf)
@@ -1017,7 +1008,7 @@ static MACHINE_CONFIG_START( schmeisr, rohga_state )
 
 	MCFG_VIDEO_START_OVERRIDE(rohga_state,schmeisr)
 
-	MCFG_DECOCOMN_ADD("deco_common", rohga_decocomn_intf)
+	MCFG_DECOCOMN_ADD("deco_common")
 
 	MCFG_DECO16IC_ADD("tilegen1", rohga_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_ADD("tilegen2", rohga_deco16ic_tilegen2_intf)

@@ -2716,7 +2716,6 @@ static const ay8910_interface sys906_ay8912_intf =
 
 static MC6845_INTERFACE( mc6845_intf )
 {
-	"screen",   /* screen we are acting on */
 	false,      /* show border area */
 	8,          /* number of pixels per video memory address */
 	NULL,       /* before pixel update callback */
@@ -2757,7 +2756,7 @@ static MACHINE_CONFIG_START( sys903, calomega_state )
 	MCFG_PALETTE_LENGTH(1024)
 
 
-	MCFG_MC6845_ADD("crtc", MC6845, CPU_CLOCK, mc6845_intf) /* 6845 @ CPU clock */
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", CPU_CLOCK, mc6845_intf) /* 6845 @ CPU clock */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

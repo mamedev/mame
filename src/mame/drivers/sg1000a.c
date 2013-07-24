@@ -247,7 +247,6 @@ WRITE_LINE_MEMBER(sg1000a_state::vdp_interrupt)
 
 static TMS9928A_INTERFACE(sg1000a_tms9928a_interface)
 {
-	"screen",
 	0x4000,
 	DEVCB_DRIVER_LINE_MEMBER(sg1000a_state,vdp_interrupt)
 };

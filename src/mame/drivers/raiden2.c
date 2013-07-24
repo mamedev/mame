@@ -1863,7 +1863,6 @@ GFXDECODE_END
 
 SEIBU_CRTC_INTERFACE(crtc_intf)
 {
-	"screen",
 	DEVCB_DRIVER_MEMBER16(raiden2_state, tilemap_enable_w),
 	DEVCB_DRIVER_MEMBER16(raiden2_state, tile_scroll_w),
 };

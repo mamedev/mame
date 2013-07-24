@@ -344,6 +344,7 @@ inline int cdp1869_device::get_pen(int ccb0, int ccb1, int pcb)
 cdp1869_device::cdp1869_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, CDP1869, "RCA CDP1869", tag, owner, clock, "cdp1869", __FILE__),
 		device_sound_interface(mconfig, *this),
+		device_video_interface(mconfig, *this),
 		device_memory_interface(mconfig, *this),
 		m_stream(NULL),
 		m_space_config("pageram", ENDIANNESS_LITTLE, 8, 11, 0, NULL, *ADDRESS_MAP_NAME(cdp1869))
@@ -382,10 +383,6 @@ void cdp1869_device::device_config_complete()
 
 void cdp1869_device::device_start()
 {
-	// get the screen device
-	m_screen = machine().device<screen_device>(screen_tag);
-	assert(m_screen != NULL);
-
 	// resolve callbacks
 	m_in_pal_ntsc_func.resolve(in_pal_ntsc_cb, *this);
 	m_out_prd_func.resolve(out_prd_cb, *this);

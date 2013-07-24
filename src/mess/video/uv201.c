@@ -98,7 +98,8 @@ const device_type UV201 = &device_creator<uv201_device>;
 //-------------------------------------------------
 
 uv201_device::uv201_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, UV201, "UV201", tag, owner, clock, "uv201", __FILE__)
+	: device_t(mconfig, UV201, "UV201", tag, owner, clock, "uv201", __FILE__),
+		device_video_interface(mconfig, *this)
 {
 }
 
@@ -142,9 +143,6 @@ void uv201_device::device_start()
 	m_timer_y_even = timer_alloc(TIMER_Y_EVEN);
 	m_timer_hblank_on = timer_alloc(TIMER_HBLANK_ON);
 	m_timer_hblank_off = timer_alloc(TIMER_HBLANK_OFF);
-
-	// find devices
-	m_screen = machine().device<screen_device>(m_screen_tag);
 
 	initialize_palette();
 

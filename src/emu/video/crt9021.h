@@ -63,8 +63,6 @@
 
 struct crt9021_interface
 {
-	const char *screen_tag;     /* screen we are acting on */
-
 	devcb_read8             in_data_cb;
 	devcb_read8             in_attr_cb;
 
@@ -76,6 +74,7 @@ struct crt9021_interface
 // ======================> crt9021_device
 
 class crt9021_device :  public device_t,
+						public device_video_interface,
 						public crt9021_interface
 {
 public:
@@ -101,8 +100,6 @@ private:
 	devcb_resolved_read8            m_in_data_func;
 	devcb_resolved_read8            m_in_attr_func;
 	devcb_resolved_read_line        m_in_atten_func;
-
-	screen_device *m_screen;
 
 	int m_slg;
 	int m_sld;

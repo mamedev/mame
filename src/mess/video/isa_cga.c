@@ -606,7 +606,6 @@ static MC6845_UPDATE_ROW( cga_update_row )
 
 static MC6845_INTERFACE( mc6845_cga_intf )
 {
-	CGA_SCREEN_NAME,    /* screen number */
 	false,              /* show border area */
 	8,                  /* numbers of pixels per video memory address */
 	NULL,               /* begin_update */
@@ -630,7 +629,7 @@ static MACHINE_CONFIG_FRAGMENT( cga )
 
 	MCFG_PALETTE_LENGTH(/* CGA_PALETTE_SETS * 16*/ 65536 )
 
-	MCFG_MC6845_ADD(CGA_MC6845_NAME, MC6845, XTAL_14_31818MHz/8, mc6845_cga_intf)
+	MCFG_MC6845_ADD(CGA_MC6845_NAME, MC6845, CGA_SCREEN_NAME, XTAL_14_31818MHz/8, mc6845_cga_intf)
 MACHINE_CONFIG_END
 
 

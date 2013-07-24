@@ -610,7 +610,7 @@ WRITE8_MEMBER(mz_state::mz800_display_mode_w)
 {
 	m_mz700_mode = BIT(data, 3);
 	m_hires_mode = BIT(data, 2);
-	m_screen = data & 0x03;
+	m_screennum = data & 0x03;
 
 	/* change memory maps if we switched mode */
 //  if (BIT(data, 3) != m_mz700_mode)

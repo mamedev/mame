@@ -690,6 +690,7 @@ mos6560_device::mos6560_device(const machine_config &mconfig, device_type type, 
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_memory_interface(mconfig, *this),
 		device_sound_interface(mconfig, *this),
+		device_video_interface(mconfig, *this),
 		m_variant(variant),
 		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, NULL, *ADDRESS_MAP_NAME(mos6560_videoram_map)),
 		m_colorram_space_config("colorram", ENDIANNESS_LITTLE, 8, 10, 0, NULL, *ADDRESS_MAP_NAME(mos6560_colorram_map)),
@@ -702,6 +703,7 @@ mos6560_device::mos6560_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, MOS6560, "MOS6560", tag, owner, clock, "mos6560", __FILE__),
 		device_memory_interface(mconfig, *this),
 		device_sound_interface(mconfig, *this),
+		device_video_interface(mconfig, *this),
 		m_variant(TYPE_6560),
 		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, NULL, *ADDRESS_MAP_NAME(mos6560_videoram_map)),
 		m_colorram_space_config("colorram", ENDIANNESS_LITTLE, 8, 10, 0, NULL, *ADDRESS_MAP_NAME(mos6560_colorram_map)),
@@ -739,9 +741,7 @@ const address_space_config *mos6560_device::memory_space_config(address_spacenum
 
 void mos6560_device::device_start()
 {
-	m_screen = machine().device<screen_device>(m_screen_tag);
 	m_screen->register_screen_bitmap(m_bitmap);
-	assert(m_screen);
 
 	// resolve callbacks
 	m_read_potx.resolve_safe(0xff);

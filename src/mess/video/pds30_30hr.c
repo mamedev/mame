@@ -68,14 +68,18 @@ const rom_entry *nubus_xceed30hr_device::device_rom_region() const
 
 nubus_xceed30hr_device::nubus_xceed30hr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, PDS030_XCEED30HR, "Micron/XCEED Technology Color 30HR", tag, owner, clock, "pd3_30hr", __FILE__),
+		device_video_interface(mconfig, *this),
 		device_nubus_card_interface(mconfig, *this)
 {
+	m_screen_tag = XCEED30HR_SCREEN_NAME;
 }
 
 nubus_xceed30hr_device::nubus_xceed30hr_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+		device_video_interface(mconfig, *this),
 		device_nubus_card_interface(mconfig, *this)
 {
+	m_screen_tag = XCEED30HR_SCREEN_NAME;
 }
 
 //-------------------------------------------------
@@ -101,7 +105,7 @@ void nubus_xceed30hr_device::device_start()
 	m_nubus->install_device(slotspace+0x800000, slotspace+0xefffff, read32_delegate(FUNC(nubus_xceed30hr_device::xceed30hr_r), this), write32_delegate(FUNC(nubus_xceed30hr_device::xceed30hr_w), this));
 
 	m_timer = timer_alloc(0, NULL);
-	m_screen = NULL;    // can we look this up now?
+	m_timer->adjust(m_screen->time_until_pos(479, 0), 0);
 }
 
 //-------------------------------------------------
@@ -143,13 +147,6 @@ UINT32 nubus_xceed30hr_device::screen_update(screen_device &screen, bitmap_rgb32
 	UINT32 *scanline;
 	int x, y;
 	UINT8 pixels, *vram;
-
-	// first time?  kick off the VBL timer
-	if (!m_screen)
-	{
-		m_screen = &screen;
-		m_timer->adjust(m_screen->time_until_pos(479, 0), 0);
-	}
 
 	vram = m_vram + 1024;
 

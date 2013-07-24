@@ -170,7 +170,6 @@ WRITE_LINE_MEMBER(slotcarn_state::vsync_changed)
 
 static MC6845_INTERFACE( mc6845_intf )
 {
-	"screen",                   /* screen we are acting on */
 	false,                      /* show border area */
 	8,                          /* number of pixels per video memory address */
 	begin_update,               /* before pixel update callback */
@@ -623,7 +622,7 @@ static MACHINE_CONFIG_START( slotcarn, slotcarn_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 512, 0, 512, 256, 0, 256)   /* temporary, CRTC will configure screen */
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
-	MCFG_MC6845_ADD("crtc", MC6845, CRTC_CLOCK, mc6845_intf)
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK, mc6845_intf)
 
 	MCFG_GFXDECODE(slotcarn)
 	MCFG_PALETTE_LENGTH(0x400)

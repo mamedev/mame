@@ -275,7 +275,6 @@ static const sn76496_config psg_intf =
 
 static TMS9928A_INTERFACE(pencil2_tms9929a_interface)
 {
-	"screen",   // screen tag
 	0x4000,     // vram size
 	DEVCB_NULL  // write line if int changes
 };

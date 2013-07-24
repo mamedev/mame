@@ -659,7 +659,6 @@ SLOT_INTERFACE_END
 
 static MC6845_INTERFACE( mbee_crtc )
 {
-	"screen",           /* name of screen */
 	false,
 	8,          /* number of dots per character */
 	NULL,
@@ -675,7 +674,6 @@ static MC6845_INTERFACE( mbee_crtc )
 
 static MC6845_INTERFACE( mbeeic_crtc )
 {
-	"screen",           /* name of screen */
 	false,
 	8,          /* number of dots per character */
 	NULL,
@@ -690,7 +688,6 @@ static MC6845_INTERFACE( mbeeic_crtc )
 
 static MC6845_INTERFACE( mbeeppc_crtc )
 {
-	"screen",           /* name of screen */
 	false,
 	8,          /* number of dots per character */
 	NULL,
@@ -705,7 +702,6 @@ static MC6845_INTERFACE( mbeeppc_crtc )
 
 static MC6845_INTERFACE( mbee256_crtc )
 {
-	"screen",           /* name of screen */
 	false,
 	8,          /* number of dots per character */
 	NULL,
@@ -750,7 +746,7 @@ static MACHINE_CONFIG_START( mbee, mbee_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
-	MCFG_MC6845_ADD("crtc", SY6545_1, XTAL_12MHz / 8, mbee_crtc)
+	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", XTAL_12MHz / 8, mbee_crtc)
 	MCFG_QUICKLOAD_ADD("quickload", mbee_state, mbee, "mwb,com", 2)
 	MCFG_QUICKLOAD_ADD("quickload2", mbee_state, mbee_z80bin, "bin", 2)
 	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
@@ -791,7 +787,7 @@ static MACHINE_CONFIG_START( mbeeic, mbee_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
-	MCFG_MC6845_ADD("crtc", SY6545_1, XTAL_13_5MHz / 8, mbeeic_crtc)
+	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", XTAL_13_5MHz / 8, mbeeic_crtc)
 	MCFG_QUICKLOAD_ADD("quickload", mbee_state, mbee, "mwb,com", 2)
 	MCFG_QUICKLOAD_ADD("quickload2", mbee_state, mbee_z80bin, "bin", 2)
 	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
@@ -823,7 +819,7 @@ static MACHINE_CONFIG_DERIVED( mbeeppc, mbeeic )
 	MCFG_PALETTE_LENGTH(16)
 	MCFG_PALETTE_INIT_OVERRIDE(mbee_state,mbeeppc)
 	MCFG_DEVICE_REMOVE("crtc")
-	MCFG_MC6845_ADD("crtc", SY6545_1, XTAL_13_5MHz / 8, mbeeppc_crtc)
+	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", XTAL_13_5MHz / 8, mbeeppc_crtc)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mbee56, mbeeic )
@@ -859,7 +855,7 @@ static MACHINE_CONFIG_DERIVED( mbee256, mbee128 )
 	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee256 )
 	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
 	MCFG_DEVICE_REMOVE("crtc")
-	MCFG_MC6845_ADD("crtc", SY6545_1, XTAL_13_5MHz / 8, mbee256_crtc)
+	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", XTAL_13_5MHz / 8, mbee256_crtc)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mbeett, mbeeppc )
@@ -869,7 +865,7 @@ static MACHINE_CONFIG_DERIVED( mbeett, mbeeppc )
 	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbeett )
 	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
 	MCFG_DEVICE_REMOVE("crtc")
-	MCFG_MC6845_ADD("crtc", SY6545_1, XTAL_13_5MHz / 8, mbee256_crtc)
+	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", XTAL_13_5MHz / 8, mbee256_crtc)
 MACHINE_CONFIG_END
 
 /* Unused roms:

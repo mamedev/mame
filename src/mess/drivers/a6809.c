@@ -85,7 +85,6 @@ static MC6845_UPDATE_ROW( a6809_update_row )
 
 static MC6845_INTERFACE( a6809_crtc6845_interface )
 {
-	"screen",
 	false,
 	12 /*?*/,
 	NULL,
@@ -196,7 +195,7 @@ static MACHINE_CONFIG_START( a6809, a6809_state )
 
 	/* Devices */
 	MCFG_VIA6522_ADD("via", XTAL_4MHz / 4, via_intf)
-	MCFG_MC6845_ADD("mc6845", MC6845, XTAL_4MHz / 2, a6809_crtc6845_interface)
+	MCFG_MC6845_ADD("mc6845", MC6845, "screen", XTAL_4MHz / 2, a6809_crtc6845_interface)
 	MCFG_ASCII_KEYBOARD_ADD("keyboard", kb_intf)
 	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("a6809_c", a6809_state, a6809_c, attotime::from_hz(4800))

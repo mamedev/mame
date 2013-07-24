@@ -250,7 +250,6 @@ I8255A_INTERFACE( mikrosha_ppi8255_interface_2 )
 };
 
 const i8275_interface radio86_i8275_interface = {
-	"screen",
 	6,
 	0,
 	DEVCB_DEVICE_LINE_MEMBER("dma8257", i8257_device, i8257_drq2_w),
@@ -261,7 +260,6 @@ const i8275_interface radio86_i8275_interface = {
 };
 
 const i8275_interface mikrosha_i8275_interface = {
-	"screen",
 	6,
 	0,
 	DEVCB_DEVICE_LINE_MEMBER("dma8257", i8257_device, i8257_drq2_w),
@@ -272,7 +270,6 @@ const i8275_interface mikrosha_i8275_interface = {
 };
 
 const i8275_interface apogee_i8275_interface = {
-	"screen",
 	6,
 	0,
 	DEVCB_DEVICE_LINE_MEMBER("dma8257", i8257_device, i8257_drq2_w),
@@ -283,7 +280,6 @@ const i8275_interface apogee_i8275_interface = {
 };
 
 const i8275_interface partner_i8275_interface = {
-	"screen",
 	6,
 	1,
 	DEVCB_DEVICE_LINE_MEMBER("dma8257", i8257_device, i8257_drq2_w),

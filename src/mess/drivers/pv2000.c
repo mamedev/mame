@@ -341,7 +341,6 @@ WRITE_LINE_MEMBER( pv2000_state::pv2000_vdp_interrupt )
 
 static TMS9928A_INTERFACE(pv2000_tms9928a_interface)
 {
-	"screen",
 	0x4000,
 	DEVCB_DRIVER_LINE_MEMBER(pv2000_state, pv2000_vdp_interrupt)
 };

@@ -27,7 +27,6 @@ public:
 	odyssey2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_screen(*this, "screen"),
 		m_i8244(*this, "i8244"),
 		m_sp0256(*this, "sp0256_speech"),
 		m_user1(*this, "user1"),
@@ -43,7 +42,6 @@ public:
 		m_joy1(*this, "JOY1") { }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<screen_device> m_screen;
 	required_device<i8244_device> m_i8244;
 	required_device<sp0256_device> m_sp0256;
 

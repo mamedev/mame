@@ -735,7 +735,6 @@ Darius2: arbitrary interleaving of 10 to keep cpus synced.
 
 static const tc0100scn_interface darius2_tc0100scn_intf_l =
 {
-	"lscreen",
 	1, 3,       /* gfxnum, txnum */
 	22, 0,      /* x_offset, y_offset */
 	0, 0,       /* flip_xoff, flip_yoff */
@@ -745,7 +744,6 @@ static const tc0100scn_interface darius2_tc0100scn_intf_l =
 
 static const tc0100scn_interface darius2_tc0100scn_intf_m =
 {
-	"mscreen",
 	2, 3,       /* gfxnum, txnum */
 	22, 0,      /* x_offset, y_offset */
 	0, 0,       /* flip_xoff, flip_yoff */
@@ -755,7 +753,6 @@ static const tc0100scn_interface darius2_tc0100scn_intf_m =
 
 static const tc0100scn_interface darius2_tc0100scn_intf_r =
 {
-	"rscreen",
 	2, 3,       /* gfxnum, txnum */
 	22, 0,      /* x_offset, y_offset */
 	0, 0,       /* flip_xoff, flip_yoff */
@@ -852,8 +849,11 @@ static MACHINE_CONFIG_START( ninjaw, ninjaw_state )
 
 
 	MCFG_TC0100SCN_ADD("tc0100scn_1", darius2_tc0100scn_intf_l)
+	MCFG_TC0100SCN_SET_SCREEN("lscreen")
 	MCFG_TC0100SCN_ADD("tc0100scn_2", darius2_tc0100scn_intf_m)
+	MCFG_TC0100SCN_SET_SCREEN("mscreen")
 	MCFG_TC0100SCN_ADD("tc0100scn_3", darius2_tc0100scn_intf_r)
+	MCFG_TC0100SCN_SET_SCREEN("rscreen")
 	MCFG_TC0110PCR_ADD("tc0110pcr_1", darius2_tc0110pcr_intf_l)
 	MCFG_TC0110PCR_ADD("tc0110pcr_2", darius2_tc0110pcr_intf_m)
 	MCFG_TC0110PCR_ADD("tc0110pcr_3", darius2_tc0110pcr_intf_r)
@@ -932,8 +932,11 @@ static MACHINE_CONFIG_START( darius2, ninjaw_state )
 
 
 	MCFG_TC0100SCN_ADD("tc0100scn_1", darius2_tc0100scn_intf_l)
+	MCFG_TC0100SCN_SET_SCREEN("lscreen")
 	MCFG_TC0100SCN_ADD("tc0100scn_2", darius2_tc0100scn_intf_m)
+	MCFG_TC0100SCN_SET_SCREEN("mscreen")
 	MCFG_TC0100SCN_ADD("tc0100scn_3", darius2_tc0100scn_intf_r)
+	MCFG_TC0100SCN_SET_SCREEN("rscreen")
 	MCFG_TC0110PCR_ADD("tc0110pcr_1", darius2_tc0110pcr_intf_l)
 	MCFG_TC0110PCR_ADD("tc0110pcr_2", darius2_tc0110pcr_intf_m)
 	MCFG_TC0110PCR_ADD("tc0110pcr_3", darius2_tc0110pcr_intf_r)

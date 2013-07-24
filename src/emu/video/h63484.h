@@ -33,7 +33,6 @@ typedef void (*h63484_display_pixels_func)(device_t *device, bitmap_ind16 &bitma
 
 struct h63484_interface
 {
-	const char *m_screen_tag;       /* screen we are acting on */
 	h63484_display_pixels_func  m_display_cb;
 };
 
@@ -41,6 +40,7 @@ struct h63484_interface
 
 class h63484_device :   public device_t,
 						public device_memory_interface,
+						public device_video_interface,
 						public h63484_interface
 {
 public:
@@ -91,8 +91,6 @@ private:
 	int translate_command(UINT16 data);
 	void draw_graphics_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int y, int layer_n);
 
-
-	screen_device *m_screen;
 
 	UINT8 *m_vram;
 	UINT8 m_ar;

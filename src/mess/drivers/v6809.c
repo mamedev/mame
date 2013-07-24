@@ -176,7 +176,6 @@ void v6809_state::video_start()
 
 static MC6845_INTERFACE( v6809_crtc )
 {
-	"screen",           /* name of screen */
 	false,
 	8,              /* number of dots per character */
 	NULL,
@@ -267,7 +266,7 @@ static MACHINE_CONFIG_START( v6809, v6809_state )
 	MCFG_GFXDECODE(v6809)
 
 	/* Devices */
-	MCFG_MC6845_ADD("crtc", SY6545_1, XTAL_16MHz / 8, v6809_crtc)
+	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", XTAL_16MHz / 8, v6809_crtc)
 	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
 MACHINE_CONFIG_END
 

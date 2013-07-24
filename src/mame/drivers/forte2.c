@@ -106,7 +106,6 @@ WRITE_LINE_MEMBER(forte2_state::vdp_interrupt)
 
 static TMS9928A_INTERFACE(forte2_tms9928a_interface)
 {
-	"screen",
 	0x4000,
 	DEVCB_DRIVER_LINE_MEMBER(forte2_state,vdp_interrupt)
 };

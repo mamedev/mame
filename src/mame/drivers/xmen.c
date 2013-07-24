@@ -329,7 +329,6 @@ static const k052109_interface xmen_k052109_intf =
 
 static const k053247_interface xmen_k053246_intf =
 {
-	"screen",
 	"gfx2", 1,
 	NORMAL_PLANE_ORDER,
 	53, -2,
@@ -393,7 +392,6 @@ MACHINE_CONFIG_END
 
 static const k053247_interface xmen6p_k053246_intf =
 {
-	"lscreen",  /* is this correct? */
 	"gfx2", 1,
 	NORMAL_PLANE_ORDER,
 	53, -2,
@@ -438,6 +436,7 @@ static MACHINE_CONFIG_START( xmen6p, xmen_state )
 
 	MCFG_K052109_ADD("k052109", xmen_k052109_intf)
 	MCFG_K053246_ADD("k053246", xmen6p_k053246_intf)
+	MCFG_K053246_SET_SCREEN("lscreen")
 	MCFG_K053251_ADD("k053251")
 
 	/* sound hardware */

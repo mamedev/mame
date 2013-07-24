@@ -153,7 +153,6 @@ INTERRUPT_GEN_MEMBER(rltennis_state::rltennis_interrupt)
 
 void rltennis_state::machine_start()
 {
-	m_screen = machine().device(  "screen");
 	m_samples_1 = memregion("samples1")->base();
 	m_samples_2 = memregion("samples2")->base();
 	m_gfx =  memregion("gfx1")->base();

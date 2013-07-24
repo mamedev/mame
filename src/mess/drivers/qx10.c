@@ -805,7 +805,6 @@ void qx10_state::video_start()
 
 static UPD7220_INTERFACE( hgdc_intf )
 {
-	"screen",
 	hgdc_display_pixels,
 	hgdc_draw_text,
 	DEVCB_NULL,

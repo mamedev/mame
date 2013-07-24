@@ -29,7 +29,6 @@ public:
 	pcw_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
-			m_screen(*this, "screen"),
 			m_fdc(*this, "upd765"),
 			m_ram(*this, RAM_TAG),
 			m_beeper(*this, "beeper")
@@ -118,7 +117,6 @@ public:
 
 	void pcw_fdc_interrupt(bool state);
 	required_device<cpu_device> m_maincpu;
-	required_device<screen_device> m_screen;
 	required_device<upd765a_device> m_fdc;
 	required_device<ram_device> m_ram;
 	required_device<beep_device> m_beeper;

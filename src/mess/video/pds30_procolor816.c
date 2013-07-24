@@ -67,14 +67,18 @@ const rom_entry *nubus_procolor816_device::device_rom_region() const
 
 nubus_procolor816_device::nubus_procolor816_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, PDS030_PROCOLOR816, "Lapis ProColor Server 8*16", tag, owner, clock, "pd3_pc16", __FILE__),
+		device_video_interface(mconfig, *this),
 		device_nubus_card_interface(mconfig, *this)
 {
+	m_screen_tag = PROCOLOR816_SCREEN_NAME;
 }
 
 nubus_procolor816_device::nubus_procolor816_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+		device_video_interface(mconfig, *this),
 		device_nubus_card_interface(mconfig, *this)
 {
+	m_screen_tag = PROCOLOR816_SCREEN_NAME;
 }
 
 //-------------------------------------------------
@@ -101,7 +105,7 @@ void nubus_procolor816_device::device_start()
 	m_nubus->install_device(slotspace+0xf00000, slotspace+0xff7fff, read32_delegate(FUNC(nubus_procolor816_device::procolor816_r), this), write32_delegate(FUNC(nubus_procolor816_device::procolor816_w), this));
 
 	m_timer = timer_alloc(0, NULL);
-	m_screen = NULL;    // can we look this up now?
+	m_timer->adjust(m_screen->time_until_pos(479, 0), 0);
 }
 
 //-------------------------------------------------
@@ -143,13 +147,6 @@ UINT32 nubus_procolor816_device::screen_update(screen_device &screen, bitmap_rgb
 	UINT32 *scanline;
 	int x, y;
 	UINT8 pixels, *vram;
-
-	// first time?  kick off the VBL timer
-	if (!m_screen)
-	{
-		m_screen = &screen;
-		m_timer->adjust(m_screen->time_until_pos(479, 0), 0);
-	}
 
 	vram = m_vram + 4;
 

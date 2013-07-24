@@ -99,7 +99,6 @@ void mc6845_device::device_config_complete()
 	}
 	else
 	{
-		m_screen_tag = NULL;
 		m_show_border_area = false;
 		m_hpixels_per_column = 0;
 		m_begin_update = NULL;
@@ -115,12 +114,14 @@ void mc6845_device::device_config_complete()
 
 
 mc6845_device::mc6845_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+		device_video_interface(mconfig, *this, false)
 {
 }
 
 mc6845_device::mc6845_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MC6845, "mc6845", tag, owner, clock, "mc6845", __FILE__)
+	: device_t(mconfig, MC6845, "mc6845", tag, owner, clock, "mc6845", __FILE__),
+		device_video_interface(mconfig, *this, false)
 {
 }
 
@@ -999,16 +1000,6 @@ void mc6845_device::device_start()
 	m_res_out_cur_func.resolve(m_out_cur_func, *this);
 	m_res_out_hsync_func.resolve(m_out_hsync_func, *this);
 	m_res_out_vsync_func.resolve(m_out_vsync_func, *this);
-
-	/* get the screen device */
-	if ( m_screen_tag != NULL )
-	{
-		astring tempstring;
-		m_screen = downcast<screen_device *>(machine().device(siblingtag(tempstring,m_screen_tag)));
-		assert(m_screen != NULL);
-	}
-	else
-		m_screen = NULL;
 
 	/* create the timers */
 	m_line_timer = timer_alloc(TIMER_LINE);

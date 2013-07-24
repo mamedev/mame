@@ -411,7 +411,6 @@ WRITE_LINE_MEMBER( abc806_state::vs_w )
 
 static MC6845_INTERFACE( crtc_intf )
 {
-	SCREEN_TAG,
 	false,
 	ABC800_CHAR_WIDTH,
 	NULL,
@@ -527,7 +526,7 @@ UINT32 abc806_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 //-------------------------------------------------
 
 MACHINE_CONFIG_FRAGMENT( abc806_video )
-	MCFG_MC6845_ADD(MC6845_TAG, MC6845, ABC800_CCLK, crtc_intf)
+	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, ABC800_CCLK, crtc_intf)
 
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(abc806_state, screen_update)

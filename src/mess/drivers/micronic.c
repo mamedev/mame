@@ -330,7 +330,6 @@ void micronic_state::palette_init()
 
 static HD61830_INTERFACE( lcdc_intf )
 {
-	SCREEN_TAG,
 	DEVCB_NULL
 };
 

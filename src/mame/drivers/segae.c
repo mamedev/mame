@@ -1060,7 +1060,6 @@ WRITE_LINE_MEMBER( systeme_state::int_callback )
 static const sega315_5124_interface _315_5124_1_intf =
 {
 	false,
-	"screen",
 	DEVCB_NULL,
 	DEVCB_NULL,
 };
@@ -1069,7 +1068,6 @@ static const sega315_5124_interface _315_5124_1_intf =
 static const sega315_5124_interface _315_5124_2_intf =
 {
 	false,
-	"screen",
 	DEVCB_DRIVER_LINE_MEMBER(systeme_state, int_callback),
 	DEVCB_NULL,
 };

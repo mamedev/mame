@@ -48,6 +48,8 @@
 	MCFG_DEVICE_ADD(_tag, _variant, XTAL_10_738635MHz / 2 ) \
 	MCFG_DEVICE_CONFIG(_config)
 
+#define MCFG_TMS9928A_SET_SCREEN MCFG_VIDEO_SET_SCREEN
+
 
 #define MCFG_TMS9928A_SCREEN_ADD_NTSC(_screen_tag) \
 	MCFG_SCREEN_ADD( _screen_tag, RASTER ) \
@@ -73,7 +75,6 @@ extern const device_type TMS9129;
 
 struct tms9928a_interface
 {
-	const char          *m_screen_tag;
 	int                 m_vram_size;    /* 4K, 8K, or 16K. This should be replaced by fetching data from an address space? */
 	devcb_write_line    m_out_int_line; /* Callback is called whenever the state of the INT output changes */
 	const char          *m_regionname;      // Alternatively, get the name of the region (if vram size is 0)
@@ -82,6 +83,7 @@ struct tms9928a_interface
 
 class tms9928a_device : public device_t,
 						public device_memory_interface,
+						public device_video_interface,
 						public tms9928a_interface
 {
 public:
@@ -118,8 +120,6 @@ private:
 	void update_table_masks();
 
 	static const device_timer_id TIMER_LINE = 0;
-
-	screen_device   *m_screen;
 
 	/* TMS9928A internal settings */
 	UINT8   m_ReadAhead;

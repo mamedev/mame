@@ -129,6 +129,7 @@ inline void zx8301_device::writebyte(offs_t address, UINT8 data)
 zx8301_device::zx8301_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ZX8301, "Sinclair ZX8301", tag, owner, clock, "zx8301", __FILE__),
 		device_memory_interface(mconfig, *this),
+		device_video_interface(mconfig, *this),
 		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, NULL, *ADDRESS_MAP_NAME(zx8301)),
 		m_dispoff(1),
 		m_mode8(0),
@@ -149,10 +150,6 @@ void zx8301_device::device_start()
 	// get the CPU
 	m_cpu = machine().device<cpu_device>(cpu_tag);
 	assert(m_cpu != NULL);
-
-	// get the screen device
-	m_screen = machine().device<screen_device>(screen_tag);
-	assert(m_screen != NULL);
 
 	// resolve callbacks
 	m_out_vsync_func.resolve(out_vsync_cb, *this);

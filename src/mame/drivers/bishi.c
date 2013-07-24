@@ -374,7 +374,6 @@ static const k056832_interface bishi_k056832_intf =
 
 static const k054338_interface bishi_k054338_intf =
 {
-	"screen",
 	0,
 	"none"
 };

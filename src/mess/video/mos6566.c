@@ -582,6 +582,7 @@ inline void mos6566_device::draw_multi( UINT16 p, UINT8 c0, UINT8 c1, UINT8 c2, 
 mos6566_device::mos6566_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MOS6566, "MOS6566", tag, owner, clock, "mos6566", __FILE__),
 		device_memory_interface(mconfig, *this),
+		device_video_interface(mconfig, *this),
 		device_execute_interface(mconfig, *this),
 		m_icount(0),
 		m_variant(TYPE_6566),
@@ -597,6 +598,7 @@ mos6566_device::mos6566_device(const machine_config &mconfig, const char *tag, d
 mos6566_device::mos6566_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_memory_interface(mconfig, *this),
+		device_video_interface(mconfig, *this),
 		device_execute_interface(mconfig, *this),
 		m_icount(0),
 		m_variant(variant),
@@ -657,7 +659,6 @@ void mos6566_device::device_start()
 	else
 		m_cpu = machine().firstcpu;
 
-	m_screen = machine().device<screen_device>(m_screen_tag);
 	m_screen->register_screen_bitmap(m_bitmap);
 
 	for (int i = 0; i < 256; i++)

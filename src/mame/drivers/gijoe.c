@@ -256,7 +256,6 @@ static const k056832_interface gijoe_k056832_intf =
 
 static const k053247_interface gijoe_k053247_intf =
 {
-	"screen",
 	"gfx2", 1,
 	NORMAL_PLANE_ORDER,
 	-37, 20,

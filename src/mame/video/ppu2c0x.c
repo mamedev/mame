@@ -123,12 +123,12 @@ void ppu2c0x_device::device_config_complete()
 	m_color_base = config->color_base;
 
 	m_cpu_tag = config->cpu_tag;
-	m_screen_tag = config->screen_tag;
 }
 
 ppu2c0x_device::ppu2c0x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 				: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 					device_memory_interface(mconfig, *this),
+					device_video_interface(mconfig, *this),
 					m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, NULL, *ADDRESS_MAP_NAME(ppu2c0x)),
 					m_scanline(0),  // reset the scanline count
 					m_refresh_data(0),
@@ -208,10 +208,9 @@ ppu2c05_04_device::ppu2c05_04_device(const machine_config &mconfig, const char *
 
 void ppu2c0x_device::device_start()
 {
-	m_screen = machine().device<screen_device>( m_screen_tag );
 	m_cpu = machine().device<cpu_device>( m_cpu_tag );
 
-	assert(m_screen && m_cpu);
+	assert(m_cpu);
 
 	// bind our handler
 	m_nmi_callback_proc.bind_relative_to(*owner());

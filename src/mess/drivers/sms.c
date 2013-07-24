@@ -424,7 +424,6 @@ WRITE_LINE_MEMBER(sms_state::sms_int_callback)
 static const sega315_5124_interface _315_5124_ntsc_intf =
 {
 	false,
-	"screen",
 	DEVCB_DRIVER_LINE_MEMBER(sms_state,sms_int_callback),
 	DEVCB_DRIVER_LINE_MEMBER(sms_state,sms_pause_callback)
 };
@@ -432,7 +431,6 @@ static const sega315_5124_interface _315_5124_ntsc_intf =
 static const sega315_5124_interface _315_5124_pal_intf =
 {
 	true,
-	"screen",
 	DEVCB_DRIVER_LINE_MEMBER(sms_state,sms_int_callback),
 	DEVCB_DRIVER_LINE_MEMBER(sms_state,sms_pause_callback)
 };
@@ -440,7 +438,6 @@ static const sega315_5124_interface _315_5124_pal_intf =
 static const sega315_5124_interface sms_store_intf =
 {
 	false,
-	"screen",
 	DEVCB_DRIVER_LINE_MEMBER(smssdisp_state,sms_store_int_callback),
 	DEVCB_DRIVER_LINE_MEMBER(sms_state,sms_pause_callback)
 };
@@ -534,6 +531,7 @@ static MACHINE_CONFIG_DERIVED( sms2_ntsc, sms_ntsc_base )
 	MCFG_PALETTE_INIT(sega315_5124)
 
 	MCFG_SEGA315_5246_ADD("sms_vdp", _315_5124_ntsc_intf)
+	MCFG_SEGA315_5246_SET_SCREEN("screen")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( sms1_ntsc, sms_ntsc_base )
@@ -571,6 +569,7 @@ static MACHINE_CONFIG_DERIVED( sms1_ntsc, sms_ntsc_base )
 	MCFG_VIDEO_START_OVERRIDE(sms_state,sms1)
 
 	MCFG_SEGA315_5124_ADD("sms_vdp", _315_5124_ntsc_intf)
+	MCFG_SEGA315_5124_SET_SCREEN("screen")
 
 	// cardslot, not present in Master System II
 	MCFG_SMS_CARD_ADD("mycard", sms_cart, NULL)
@@ -605,6 +604,7 @@ static MACHINE_CONFIG_START( sms_sdisp, smssdisp_state )
 	MCFG_PALETTE_INIT(sega315_5124)
 
 	MCFG_SEGA315_5246_ADD("sms_vdp", sms_store_intf)
+	MCFG_SEGA315_5246_SET_SCREEN("screen")
 
 	MCFG_CPU_ADD("control", Z80, XTAL_53_693175MHz/15)
 	MCFG_CPU_PROGRAM_MAP(sms_store_mem)
@@ -699,6 +699,7 @@ static MACHINE_CONFIG_DERIVED( sms2_pal, sms_pal_base )
 	MCFG_PALETTE_INIT(sega315_5124)
 
 	MCFG_SEGA315_5246_ADD("sms_vdp", _315_5124_pal_intf)
+	MCFG_SEGA315_5246_SET_SCREEN("screen")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( sms1_pal, sms_pal_base )
@@ -736,6 +737,7 @@ static MACHINE_CONFIG_DERIVED( sms1_pal, sms_pal_base )
 	MCFG_VIDEO_START_OVERRIDE(sms_state,sms1)
 
 	MCFG_SEGA315_5124_ADD("sms_vdp", _315_5124_pal_intf)
+	MCFG_SEGA315_5124_SET_SCREEN("screen")
 
 	// cardslot, not present in Master System II
 	MCFG_SMS_CARD_ADD("mycard", sms_cart, NULL)
@@ -787,6 +789,7 @@ static MACHINE_CONFIG_START( gamegear, sms_state )
 	MCFG_VIDEO_START_OVERRIDE(sms_state,gamegear)
 
 	MCFG_SEGA315_5378_ADD("sms_vdp", _315_5124_ntsc_intf)
+	MCFG_SEGA315_5378_SET_SCREEN("screen")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")

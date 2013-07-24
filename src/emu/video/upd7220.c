@@ -682,6 +682,7 @@ inline void upd7220_device::get_graphics_partition(int index, UINT32 *sad, UINT1
 upd7220_device::upd7220_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, UPD7220, "uPD7220", tag, owner, clock, "upd7220", __FILE__),
 		device_memory_interface(mconfig, *this),
+		device_video_interface(mconfig, *this),
 		m_mask(0),
 		m_pitch(0),
 		m_ead(0),
@@ -755,16 +756,6 @@ void upd7220_device::device_start()
 	m_out_hsync_func.resolve(m_out_hsync_cb, *this);
 	m_out_vsync_func.resolve(m_out_vsync_cb, *this);
 	m_out_blank_func.resolve(m_out_blank_cb, *this);
-
-	// find screen
-	m_screen = machine().device<screen_device>(m_screen_tag);
-
-	if (m_screen == NULL)
-	{
-		m_screen = owner()->subdevice<screen_device>(m_screen_tag);
-	}
-
-	assert(m_screen);
 
 	// register for state saving
 	save_item(NAME(m_ra));

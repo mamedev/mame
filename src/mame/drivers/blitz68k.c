@@ -1667,7 +1667,6 @@ WRITE_LINE_MEMBER(blitz68k_state::crtc_vsync_irq5)
 
 static MC6845_INTERFACE( mc6845_intf_irq1 )
 {
-	"screen",   /* screen we are acting on */
 	false,      /* show border area */
 	4,          /* number of pixels per video memory address */ /* Horizontal Display programmed to 160 characters */
 	NULL,       /* before pixel update callback */
@@ -1682,7 +1681,6 @@ static MC6845_INTERFACE( mc6845_intf_irq1 )
 
 static MC6845_INTERFACE( mc6845_intf_irq3 )
 {
-	"screen",   /* screen we are acting on */
 	false,      /* show border area */
 	4,          /* number of pixels per video memory address */ /* Horizontal Display programmed to 160 characters */
 	NULL,       /* before pixel update callback */
@@ -1697,7 +1695,6 @@ static MC6845_INTERFACE( mc6845_intf_irq3 )
 
 static MC6845_INTERFACE( mc6845_intf_irq5 )
 {
-	"screen",   /* screen we are acting on */
 	false,      /* show border area */
 	4,          /* number of pixels per video memory address */ /* Horizontal Display programmed to 160 characters */
 	NULL,       /* before pixel update callback */
@@ -1805,7 +1802,7 @@ static MACHINE_CONFIG_START( cjffruit, blitz68k_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k)
 
-	MCFG_MC6845_ADD("crtc", R6545_1, XTAL_22_1184MHz/8, mc6845_intf_irq1)
+	MCFG_MC6845_ADD("crtc", R6545_1, "screen", XTAL_22_1184MHz/8, mc6845_intf_irq1)
 
 	MCFG_PALETTE_LENGTH(0x100)
 
@@ -1837,7 +1834,7 @@ static MACHINE_CONFIG_START( bankrob, blitz68k_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+4, 256-1-4)
 	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k)
 
-	MCFG_MC6845_ADD("crtc", H46505, XTAL_11_0592MHz/4, mc6845_intf_irq3)
+	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_11_0592MHz/4, mc6845_intf_irq3)
 
 	MCFG_PALETTE_LENGTH(0x100)
 
@@ -1867,7 +1864,7 @@ static MACHINE_CONFIG_START( bankroba, blitz68k_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+7, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k)
 
-	MCFG_MC6845_ADD("crtc", H46505, XTAL_11_0592MHz/4, mc6845_intf_irq5)
+	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_11_0592MHz/4, mc6845_intf_irq5)
 
 	MCFG_PALETTE_LENGTH(0x100)
 
@@ -1896,7 +1893,7 @@ static MACHINE_CONFIG_START( deucesw2, blitz68k_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k)
 
-	MCFG_MC6845_ADD("crtc", R6545_1, XTAL_22_1184MHz/8, mc6845_intf_irq3)
+	MCFG_MC6845_ADD("crtc", R6545_1, "screen", XTAL_22_1184MHz/8, mc6845_intf_irq3)
 
 	MCFG_PALETTE_LENGTH(0x100)
 
@@ -1927,7 +1924,7 @@ static MACHINE_CONFIG_START( dualgame, blitz68k_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+4, 256-1-4)
 	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k)
 
-	MCFG_MC6845_ADD("crtc", H46505, XTAL_11_0592MHz/4, mc6845_intf_irq3)
+	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_11_0592MHz/4, mc6845_intf_irq3)
 
 	MCFG_PALETTE_LENGTH(0x100)
 
@@ -1956,7 +1953,7 @@ static MACHINE_CONFIG_START( hermit, blitz68k_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+4, 256-1-4)
 	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k)
 
-	MCFG_MC6845_ADD("crtc", H46505, XTAL_22_1184MHz/8, mc6845_intf_irq1)
+	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_22_1184MHz/8, mc6845_intf_irq1)
 
 	MCFG_PALETTE_LENGTH(0x100)
 
@@ -1990,7 +1987,7 @@ static MACHINE_CONFIG_START( maxidbl, blitz68k_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k_noblit)
 
-	MCFG_MC6845_ADD("crtc", H46505, XTAL_11_0592MHz/4, mc6845_intf_irq3)
+	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_11_0592MHz/4, mc6845_intf_irq3)
 
 	MCFG_PALETTE_LENGTH(0x100)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map)

@@ -1130,7 +1130,6 @@ static MC6845_UPDATE_ROW( crtc_update_row )
 
 static MC6845_INTERFACE( crtc_intf )
 {
-	SCREEN_TAG,
 	false,
 	9,
 	NULL,
@@ -2296,7 +2295,7 @@ static MACHINE_CONFIG_START( cbm2lp_ntsc, cbm2_state )
 	MCFG_SCREEN_SIZE(768, 312)
 	MCFG_SCREEN_VISIBLE_AREA(0, 768-1, 0, 312-1)
 
-	MCFG_MC6845_ADD(MC68B45_TAG, MC6845, XTAL_18MHz/9, crtc_intf)
+	MCFG_MC6845_ADD(MC68B45_TAG, MC6845, SCREEN_TAG, XTAL_18MHz/9, crtc_intf)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

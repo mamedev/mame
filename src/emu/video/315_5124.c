@@ -141,6 +141,7 @@ ADDRESS_MAP_END
 sega315_5124_device::sega315_5124_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t( mconfig, SEGA315_5124, "Sega 315-5124", tag, owner, clock, "sega315_5124", __FILE__)
 	, device_memory_interface(mconfig, *this)
+	, device_video_interface(mconfig, *this)
 	, m_cram_size( SEGA315_5124_CRAM_SIZE )
 	, m_palette_offset( 0 )
 	, m_supports_224_240( false )
@@ -152,6 +153,7 @@ sega315_5124_device::sega315_5124_device(const machine_config &mconfig, const ch
 sega315_5124_device::sega315_5124_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 cram_size, UINT8 palette_offset, bool supports_224_240, const char *shortname, const char *source)
 	: device_t( mconfig, type, name, tag, owner, clock, shortname, source)
 	, device_memory_interface(mconfig, *this)
+	, device_video_interface(mconfig, *this)
 	, m_cram_size( cram_size )
 	, m_palette_offset( palette_offset )
 	, m_supports_224_240( supports_224_240 )
@@ -1703,8 +1705,6 @@ void sega315_5124_device::vdp_postload()
 
 void sega315_5124_device::device_start()
 {
-	m_screen = machine().device<screen_device>( m_screen_tag );
-
 	/* Resolve callbacks */
 	m_cb_int.resolve( m_int_callback, *this );
 	m_cb_pause.resolve( m_pause_callback, *this );

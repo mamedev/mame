@@ -17,7 +17,6 @@
 
 struct vt_video_interface
 {
-	const char *m_screen_tag;     /* screen we are acting on */
 	const char *m_char_rom_tag; /* character rom region */
 
 	/* this gets called for every memory read */
@@ -27,6 +26,7 @@ struct vt_video_interface
 
 
 class vt100_video_device : public device_t,
+							public device_video_interface,
 							public vt_video_interface
 {
 public:
@@ -55,7 +55,6 @@ protected:
 	devcb_resolved_read8        m_in_ram_func;
 	devcb_resolved_write8       m_clear_video_interrupt;
 
-	screen_device *m_screen;  /* screen */
 	UINT8 *m_gfx;     /* content of char rom */
 
 	int m_lba7;

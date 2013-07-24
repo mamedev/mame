@@ -17,7 +17,6 @@ const device_type K001006 = &device_creator<k001006_device>;
 
 k001006_device::k001006_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K001006, "Konami 001006", tag, owner, clock, "k001006", __FILE__),
-	//m_screen(NULL),
 	m_pal_ram(NULL),
 	m_unknown_ram(NULL),
 	m_addr(0),

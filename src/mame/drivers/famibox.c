@@ -529,7 +529,6 @@ void famibox_state::ppu_irq(int *ppu_regs)
 static const ppu2c0x_interface ppu_interface =
 {
 	"maincpu",
-	"screen",
 	0,                  /* gfxlayout num */
 	0,                  /* color base */
 	PPU_MIRROR_NONE     /* mirroring */

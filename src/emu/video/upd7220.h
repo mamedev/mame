@@ -75,8 +75,6 @@ typedef void (*upd7220_draw_text_line)(device_t *device, bitmap_rgb32 &bitmap, U
 
 struct upd7220_interface
 {
-	const char *m_screen_tag;
-
 	upd7220_display_pixels_func m_display_cb;
 	upd7220_draw_text_line m_draw_text_cb;
 
@@ -90,6 +88,7 @@ struct upd7220_interface
 
 class upd7220_device :  public device_t,
 						public device_memory_interface,
+						public device_video_interface,
 						public upd7220_interface
 {
 public:
@@ -158,8 +157,6 @@ private:
 	devcb_resolved_write_line   m_out_hsync_func;
 	devcb_resolved_write_line   m_out_vsync_func;
 	devcb_resolved_write_line   m_out_blank_func;
-
-	screen_device *m_screen;
 
 	UINT16 m_mask;                  // mask register
 	UINT8 m_pitch;                  // number of word addresses in display memory in the horizontal direction

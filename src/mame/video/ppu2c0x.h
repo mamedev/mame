@@ -100,6 +100,8 @@ enum
 #define MCFG_PPU2C05_04_ADD(_tag, _intrf)   \
 	MCFG_PPU2C0X_ADD(_tag, PPU_2C05_04, _intrf)
 
+#define MCFG_PPU2C0X_SET_SCREEN MCFG_VIDEO_SET_SCREEN
+
 #define MCFG_PPU2C0X_SET_NMI( _class, _method) \
 	ppu2c0x_device::set_nmi_delegate(*device, ppu2c0x_nmi_delegate(&_class::_method, #_class "::" #_method, NULL, (_class *)0));
 
@@ -118,7 +120,6 @@ typedef device_delegate<void (offs_t offset)> ppu2c0x_latch_delegate;
 struct ppu2c0x_interface
 {
 	const char        *cpu_tag;
-	const char        *screen_tag;
 	int               gfx_layout_number;        /* gfx layout number used by each chip */
 	int               color_base;               /* color base to use per ppu */
 	int               mirroring;                /* mirroring options (PPU_MIRROR_* flag) */
@@ -129,6 +130,7 @@ struct ppu2c0x_interface
 
 class ppu2c0x_device :  public device_t,
 						public device_memory_interface,
+						public device_video_interface,
 						public ppu2c0x_interface
 {
 public:
@@ -177,7 +179,6 @@ public:
 	//  void update_screen(bitmap_t &bitmap, const rectangle &cliprect);
 
 	cpu_device                  *m_cpu;
-	screen_device               *m_screen;
 	bitmap_ind16                *m_bitmap;          /* target bitmap */
 	UINT8                       *m_spriteram;           /* sprite ram */
 	pen_t                       *m_colortable;          /* color table modified at run time */
@@ -212,7 +213,6 @@ public:
 	emu_timer                   *m_scanline_timer;      /* scanline timer */
 
 	const char        *m_cpu_tag;
-	const char        *m_screen_tag;
 
 private:
 	static const device_timer_id TIMER_HBLANK = 0;

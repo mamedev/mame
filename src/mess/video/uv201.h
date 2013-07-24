@@ -67,6 +67,7 @@
 
 #define MCFG_UV201_ADD(_tag, _screen_tag, _clock, _config) \
 	MCFG_DEVICE_ADD(_tag, UV201, _clock) \
+	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
 	MCFG_DEVICE_CONFIG(_config) \
 	MCFG_SCREEN_ADD(_screen_tag, RASTER) \
 	MCFG_SCREEN_UPDATE_DEVICE(_tag, uv201_device, screen_update) \
@@ -86,8 +87,6 @@
 
 struct uv201_interface
 {
-	const char *m_screen_tag;
-
 	devcb_write_line        m_out_ext_int_cb;
 	devcb_write_line        m_out_hblank_cb;
 	devcb_read8             m_in_db_cb;
@@ -97,6 +96,7 @@ struct uv201_interface
 // ======================> uv201_device
 
 class uv201_device :    public device_t,
+						public device_video_interface,
 						public uv201_interface
 {
 public:
@@ -136,8 +136,6 @@ private:
 	devcb_resolved_write_line   m_out_ext_int_func;
 	devcb_resolved_write_line   m_out_hblank_func;
 	devcb_resolved_read8        m_in_db_func;
-
-	screen_device *m_screen;
 
 	rgb_t m_palette[32];
 	UINT8 m_ram[0x90];

@@ -216,7 +216,6 @@ static MC6845_UPDATE_ROW( ec65_update_row )
 
 static MC6845_INTERFACE( ec65_crtc6845_interface )
 {
-	"screen",
 	false,
 	8 /*?*/,
 	NULL,
@@ -267,7 +266,7 @@ static MACHINE_CONFIG_START( ec65, ec65_state )
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 
-	MCFG_MC6845_ADD(MC6845_TAG, MC6845, XTAL_16MHz / 8, ec65_crtc6845_interface)
+	MCFG_MC6845_ADD(MC6845_TAG, MC6845, "screen", XTAL_16MHz / 8, ec65_crtc6845_interface)
 
 
 	/* devices */
@@ -298,7 +297,7 @@ static MACHINE_CONFIG_START( ec65k, ec65_state )
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 
-	MCFG_MC6845_ADD(MC6845_TAG, MC6845, XTAL_16MHz / 8, ec65_crtc6845_interface)
+	MCFG_MC6845_ADD(MC6845_TAG, MC6845, "screen", XTAL_16MHz / 8, ec65_crtc6845_interface)
 
 MACHINE_CONFIG_END
 

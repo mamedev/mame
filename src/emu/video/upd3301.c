@@ -194,6 +194,7 @@ inline void upd3301_device::recompute_parameters()
 
 upd3301_device::upd3301_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, UPD3301, "UPD3301", tag, owner, clock, "upd3301", __FILE__),
+		device_video_interface(mconfig, *this),
 		m_status(0),
 		m_param_count(0),
 		m_data_fifo_pos(0),
@@ -256,10 +257,6 @@ void upd3301_device::device_start()
 	m_out_drq_func.resolve(m_out_drq_cb, *this);
 	m_out_hrtc_func.resolve(m_out_hrtc_cb, *this);
 	m_out_vrtc_func.resolve(m_out_vrtc_cb, *this);
-
-	// get the screen device
-	m_screen = machine().device<screen_device>(m_screen_tag);
-	assert(m_screen != NULL);
 
 	// state saving
 	save_item(NAME(m_y));

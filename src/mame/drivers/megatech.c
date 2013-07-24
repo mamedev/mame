@@ -495,7 +495,6 @@ WRITE_LINE_MEMBER( mtech_state::int_callback )
 static const sega315_5124_interface _vdp_intf =
 {
 	false,
-	"menu",
 	DEVCB_DRIVER_LINE_MEMBER(mtech_state, int_callback),
 	DEVCB_NULL,
 };
@@ -535,6 +534,7 @@ static MACHINE_CONFIG_START( megatech, mtech_state )
 	MCFG_PALETTE_INIT(sega315_5124)
 
 	MCFG_SEGA315_5246_ADD("vdp1", _vdp_intf)
+	MCFG_SEGA315_5246_SET_SCREEN("menu")
 
 
 	MCFG_SCREEN_MODIFY("megadriv")

@@ -62,7 +62,8 @@ void huc6260_device::device_config_complete()
 
 
 huc6260_device::huc6260_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, HUC6260, "HuC6260", tag, owner, clock, "huc6260", __FILE__)
+	: 	device_t(mconfig, HUC6260, "HuC6260", tag, owner, clock, "huc6260", __FILE__),
+		device_video_interface(mconfig, *this)
 {
 }
 
@@ -250,11 +251,7 @@ WRITE8_MEMBER( huc6260_device::write )
 
 void huc6260_device::device_start()
 {
-	/* Make sure we are supplied a screen tag */
-	assert( screen_tag != NULL );
-
 	m_timer = timer_alloc();
-	m_screen = machine().device<screen_device>( screen_tag );
 	m_bmp = auto_bitmap_ind16_alloc( machine(), HUC6260_WPF, HUC6260_LPF );
 
 	/* Resolve callbacks */
@@ -264,7 +261,6 @@ void huc6260_device::device_start()
 	m_get_time_til_next_event.resolve( get_time_til_next_event, *this );
 
 	/* We want to have a valid screen and valid callbacks */
-	assert( m_screen != NULL );
 	assert( ! m_hsync_changed.isnull() );
 	assert( ! m_vsync_changed.isnull() );
 	assert( ! m_get_next_pixel_data.isnull() );

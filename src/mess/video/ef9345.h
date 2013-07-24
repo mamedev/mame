@@ -21,18 +21,11 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> ef9345_interface
-
-struct ef9345_interface
-{
-	const char *screen_tag;     // screen we are acting on
-};
-
 // ======================> ef9345_device
 
 class ef9345_device :   public device_t,
 						public device_memory_interface,
-						public ef9345_interface
+						public device_video_interface
 {
 public:
 	// construction/destruction
@@ -49,8 +42,6 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	// device_config overrides
-	virtual void device_config_complete();
 
 	// device_config_memory_interface overrides
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
@@ -91,8 +82,6 @@ private:
 
 	memory_region *m_charset;
 	address_space *m_videoram;
-
-	screen_device *m_screen;                //screen we are acting on
 
 	UINT8 m_bf;                             //busy flag
 	UINT8 m_char_mode;                      //40 or 80 chars for line

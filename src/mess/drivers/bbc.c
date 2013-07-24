@@ -868,7 +868,7 @@ static MACHINE_CONFIG_START( bbca, bbc_state )
 	MCFG_PALETTE_INIT_OVERRIDE(bbc_state,bbc)
 	MCFG_SAA5050_ADD("saa505x", XTAL_12MHz/2, trom_intf)
 
-	MCFG_MC6845_ADD("mc6845",MC6845,2000000, bbc_mc6845_intf)
+	MCFG_MC6845_ADD("mc6845",MC6845,"screen",2000000, bbc_mc6845_intf)
 
 	MCFG_VIDEO_START_OVERRIDE(bbc_state,bbca)
 
@@ -963,7 +963,7 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 
 	MCFG_SAA5050_ADD("saa505x", XTAL_12MHz/2, trom_intf)
 
-	MCFG_MC6845_ADD("mc6845",MC6845,2000000, bbc_mc6845_intf)
+	MCFG_MC6845_ADD("mc6845",MC6845,"screen",2000000, bbc_mc6845_intf)
 
 	MCFG_VIDEO_START_OVERRIDE(bbc_state,bbcm)
 

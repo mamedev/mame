@@ -35,7 +35,6 @@ static I8275_DISPLAY_PIXELS( crtc_display_pixels )
 
 static const i8275_interface crtc_intf =
 {
-	SCREEN_TAG,
 	8,
 	0,
 	DEVCB_DEVICE_LINE_MEMBER(I8237_TAG, am9517a_device, dreq0_w),
@@ -74,7 +73,6 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 
 static UPD7220_INTERFACE( hgdc_intf )
 {
-	SCREEN_TAG,
 	hgdc_display_pixels,
 	NULL,
 	DEVCB_NULL,

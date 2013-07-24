@@ -98,7 +98,6 @@ static CDP1869_PCB_READ( tmc600_pcb_r )
 
 static CDP1869_INTERFACE( vis_intf )
 {
-	SCREEN_TAG,
 	CDP1869_COLOR_CLK_PAL,
 	CDP1869_PAL,
 	tmc600_pcb_r,

@@ -742,7 +742,6 @@ static const pia6821_interface megadpkr_pia1_intf =
 
 static MC6845_INTERFACE( mc6845_intf )
 {
-	"screen",   /* screen we are acting on */
 	false,      /* show border area */
 	8,          /* number of pixels per video memory address */
 	NULL,       /* before pixel update callback */
@@ -815,7 +814,7 @@ static MACHINE_CONFIG_START( megadpkr, blitz_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(blitz_state, screen_update_megadpkr)
 
-	MCFG_MC6845_ADD("crtc", MC6845, CPU_CLOCK, mc6845_intf)
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", CPU_CLOCK, mc6845_intf)
 
 	MCFG_GFXDECODE(megadpkr)
 	MCFG_PALETTE_LENGTH(256)

@@ -482,7 +482,6 @@ static const ay8910_interface ay8910_config =
 
 static const kaneko_pandora_interface sandscrp_pandora_config =
 {
-	"screen",   /* screen tag */
 	0,  /* gfx_region */
 	0, 0    /* x_offs, y_offs */
 };

@@ -258,7 +258,6 @@ WRITE_LINE_MEMBER(dgn_beta_state::dgnbeta_vsync_changed)
 
 MC6845_INTERFACE( dgnbeta_crtc6845_interface )
 {
-	"screen",
 	false,
 	16 /*?*/,
 	NULL,

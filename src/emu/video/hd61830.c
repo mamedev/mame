@@ -108,6 +108,7 @@ inline void hd61830_device::writebyte(offs_t address, UINT8 data)
 hd61830_device::hd61830_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, HD61830, "Hitachi HD61830", tag, owner, clock, "hd61830", __FILE__),
 		device_memory_interface(mconfig, *this),
+		device_video_interface(mconfig, *this),
 		m_bf(false),
 		m_cac(0),
 		m_blink(0),
@@ -160,8 +161,6 @@ void hd61830_device::device_start()
 
 	// resolve callbacks
 	m_in_rd_func.resolve(m_in_rd_cb, *this);
-
-	m_screen = machine().device<screen_device>(screen_tag);
 
 	// register for state saving
 	save_item(NAME(m_bf));

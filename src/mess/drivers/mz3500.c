@@ -238,7 +238,6 @@ UINT32 mz3500_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap,
 
 static UPD7220_INTERFACE( hgdc_1_intf )
 {
-	"screen",
 	NULL,
 	hgdc_draw_text,
 	DEVCB_NULL,
@@ -248,7 +247,6 @@ static UPD7220_INTERFACE( hgdc_1_intf )
 
 static UPD7220_INTERFACE( hgdc_2_intf )
 {
-	"screen",
 	hgdc_display_pixels,
 	NULL,
 	DEVCB_NULL,

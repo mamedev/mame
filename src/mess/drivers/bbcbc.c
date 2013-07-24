@@ -108,7 +108,6 @@ WRITE_LINE_MEMBER(bbcbc_state::tms_interrupt)
 
 static TMS9928A_INTERFACE(tms9129_interface)
 {
-	"screen",
 	0x4000,
 	DEVCB_DRIVER_LINE_MEMBER(bbcbc_state, tms_interrupt)
 };

@@ -1085,7 +1085,6 @@ UINT32 amstrad_state::screen_update_amstrad(screen_device &screen, bitmap_ind16 
 
 MC6845_INTERFACE( amstrad_mc6845_intf )
 {
-	NULL,                                   /* screen name */
 	false,                                  /* show border area */
 	16,                                     /* number of pixels per video memory address */
 	NULL,                                   /* begin_update */
@@ -1101,7 +1100,6 @@ MC6845_INTERFACE( amstrad_mc6845_intf )
 
 MC6845_INTERFACE( amstrad_plus_mc6845_intf )
 {
-	NULL,                                       /* screen name */
 	false,                                      /* show border area */
 	16,                                         /* number of pixels per video memory address */
 	NULL,                                       /* begin_update */

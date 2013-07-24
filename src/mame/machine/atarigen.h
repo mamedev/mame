@@ -68,7 +68,7 @@
 
 #define MCFG_ATARI_VAD_ADD(_tag, _screen, _intcb) \
 	MCFG_DEVICE_ADD(_tag, ATARI_VAD, 0) \
-	atari_vad_device::static_set_screen(*device, _screen); \
+	MCFG_VIDEO_SET_SCREEN(_screen) \
 	devcb = &atari_vad_device::static_set_scanline_int_cb(*device, DEVCB2_##_intcb);
 #define MCFG_ATARI_VAD_PLAYFIELD(_class, _getinfo) \
 	{ astring fulltag(device->tag(), ":playfield"); device_t *device; \
@@ -191,14 +191,14 @@ class atari_motion_objects_device;
 // device type definition
 extern const device_type ATARI_VAD;
 
-class atari_vad_device :  public device_t
+class atari_vad_device :  	public device_t,
+							public device_video_interface
 {
 public:
 	// construction/destruction
 	atari_vad_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
-	static void static_set_screen(device_t &device, const char *screentag);
 	template<class _Object> static devcb2_base &static_set_scanline_int_cb(device_t &device, _Object object) { return downcast<atari_vad_device &>(device).m_scanline_int_cb.set_callback(object); }
 
 	// getters
@@ -241,7 +241,6 @@ private:
 	void eof_update(emu_timer &timer);
 
 	// configuration state
-	const char *        m_screen_tag;
 	devcb2_write_line   m_scanline_int_cb;
 
 	// internal state
@@ -251,7 +250,6 @@ private:
 	optional_device<atari_motion_objects_device> m_mob;
 	optional_shared_ptr<UINT16> m_eof_data;
 
-	screen_device *     m_screen;
 	emu_timer *         m_scanline_int_timer;
 	emu_timer *         m_tilerow_update_timer;
 	emu_timer *         m_eof_timer;

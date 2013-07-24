@@ -20,18 +20,16 @@
 
 #define MCFG_I8244_ADD(_tag, _clock, _screen_tag, _irq_cb, _postprocess_cb) \
 	MCFG_DEVICE_ADD(_tag, I8244, _clock) \
-	MCFG_I8244_SCREEN_TAG(_screen_tag) \
+	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
 	MCFG_I8244_IRQ_CB(_irq_cb) \
 	MCFG_I8244_POSTPROCESS_CB(_postprocess_cb)
-#define MCFG_I8244_SCREEN_TAG(_screen_tag) \
-	i8244_device::set_screen_tag(*device, _screen_tag);
 #define MCFG_I8244_IRQ_CB(_devcb) \
 	devcb = &i8244_device::set_irq_cb(*device, DEVCB2_##_devcb);
 #define MCFG_I8244_POSTPROCESS_CB(_devcb) \
 	devcb = &i8244_device::set_postprocess_cb(*device, DEVCB2_##_devcb);
 #define MCFG_I8245_ADD(_tag, _clock, _screen_tag, _irq_cb, _postprocess_cb) \
 	MCFG_DEVICE_ADD(_tag, I8245, _clock) \
-	MCFG_I8244_SCREEN_TAG(_screen_tag) \
+	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
 	MCFG_I8244_IRQ_CB(_irq_cb) \
 	MCFG_I8244_POSTPROCESS_CB(_postprocess_cb )
 
@@ -76,6 +74,7 @@ union vdc_t {
 
 class i8244_device :  public device_t
 					, public device_sound_interface
+					, public device_video_interface
 {
 public:
 	// construction/destruction
@@ -132,8 +131,6 @@ protected:
 	devcb2_write_line m_irq_func;
 	devcb2_write16 m_postprocess_func;
 
-	const char *m_screen_tag;
-	screen_device *m_screen;
 	bitmap_ind16 m_tmp_bitmap;
 	emu_timer *m_line_timer;
 	emu_timer *m_hblank_timer;

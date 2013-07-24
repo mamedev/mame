@@ -248,7 +248,6 @@ static int fghthist_bank_callback( int bank )
 
 static const deco16ic_interface fghthist_deco16ic_tilegen1_intf =
 {
-	"screen",
 	0, 1,
 	0x0f, 0x0f, /* trans masks (default values) */
 	0x00, 0x10, /* color base */
@@ -260,7 +259,6 @@ static const deco16ic_interface fghthist_deco16ic_tilegen1_intf =
 
 static const deco16ic_interface fghthist_deco16ic_tilegen2_intf =
 {
-	"screen",
 	0, 1,
 	0x0f, 0x0f, /* trans masks (default values) */
 	0x20, 0x30, /* color base */
@@ -1720,7 +1718,6 @@ static int captaven_bank_callback( int bank )
 // pf4 not used (pf3 is in 8bpp mode)
 static const deco16ic_interface captaven_deco16ic_tilegen1_intf =
 {
-	"screen",
 	0, 1, // pf12only, split, fullwidth12 / fullwidth34
 	0x0f, 0x0f, /* trans masks (default values) */
 	0x20, 0x30, /* color base */
@@ -1732,7 +1729,6 @@ static const deco16ic_interface captaven_deco16ic_tilegen1_intf =
 
 static const deco16ic_interface captaven_deco16ic_tilegen2_intf =
 {
-	"screen",
 	0, 0, // pf12only, split, fullwidth12 / fullwidth34
 	0xff, 0x00, /* trans masks (default values) */
 	0x10, 0x00, /* color base */
@@ -1940,7 +1936,6 @@ static int dragngun_bank2_callback( int bank )
 
 static const deco16ic_interface dragngun_deco16ic_tilegen1_intf =
 {
-	"screen",
 	0, 1, // dragon gun definitely needs pf3/4 full width, bgs in 2nd attract demo.
 	0x0f, 0x0f, /* trans masks (default values) */
 	0x20, 0x30, /* color base */
@@ -1952,7 +1947,6 @@ static const deco16ic_interface dragngun_deco16ic_tilegen1_intf =
 
 static const deco16ic_interface dragngun_deco16ic_tilegen2_intf =
 {
-	"screen",
 	0, 1, // dragon gun definitely needs pf3/4 full width, bgs in 2nd attract demo.
 	0xff, 0xff, /* trans masks (default values) */
 	0x04, 0x04, /* color base */
@@ -1964,7 +1958,6 @@ static const deco16ic_interface dragngun_deco16ic_tilegen2_intf =
 
 static const deco16ic_interface lockload_deco16ic_tilegen1_intf =
 {
-	"screen",
 	0, 1, // lockload definitely wants pf34 half width..
 	0x0f, 0x0f, /* trans masks (default values) */
 	0x20, 0x30, /* color base */
@@ -1976,7 +1969,6 @@ static const deco16ic_interface lockload_deco16ic_tilegen1_intf =
 
 static const deco16ic_interface lockload_deco16ic_tilegen2_intf =
 {
-	"screen",
 	0, 0, // lockload definitely wants pf34 half width..
 	0xff, 0xff, /* trans masks (default values) */
 	0x04, 0x04, /* color base */
@@ -2140,7 +2132,6 @@ static int tattass_bank_callback( int bank )
 
 static const deco16ic_interface tattass_deco16ic_tilegen1_intf =
 {
-	"screen",
 	0, 1,
 	0x0f, 0x0f, /* trans masks (default values) */
 	0x00, 0x10, /* color base */
@@ -2152,7 +2143,6 @@ static const deco16ic_interface tattass_deco16ic_tilegen1_intf =
 
 static const deco16ic_interface tattass_deco16ic_tilegen2_intf =
 {
-	"screen",
 	0, 1,
 	0x0f, 0x0f, /* trans masks (default values) */
 	0x20, 0x30, /* color base */

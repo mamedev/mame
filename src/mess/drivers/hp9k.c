@@ -138,7 +138,7 @@ public:
 	required_device<mc6845_device> m_6845;
 
 	UINT8 m_videoram[0x4000];
-	UINT8 m_screen[0x800];
+	UINT8 m_screenram[0x800];
 
 	DECLARE_DRIVER_INIT(hp9k);
 
@@ -271,7 +271,7 @@ WRITE16_MEMBER( hp9k_state::hp9k_videoram_w )
 
 		if (mem_mask==0xff00)
 			{
-				m_screen[offset&0x7ff]=data>>8;
+				m_screenram[offset&0x7ff]=data>>8;
 				m_videoram[offset&0x3fff]=data>>8;
 
 				//UINT8 *rom = machine().region("bootrom")->base();
@@ -279,7 +279,7 @@ WRITE16_MEMBER( hp9k_state::hp9k_videoram_w )
 			}
 			else
 			{
-				m_screen[offset&0x7ff]=data;
+				m_screenram[offset&0x7ff]=data;
 				m_videoram[offset&0x3fff]=data;
 			}
 	}
@@ -359,7 +359,7 @@ void hp9k_state::putChar(UINT8 thec,int x,int y,bitmap_ind16 &bitmap)
 
 UINT32 hp9k_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	//UINT8* pvram=&m_screen[1];
+	//UINT8* pvram=&m_screenram[1];
 
 	int startAddr=((crtc_addrStartLow&0xff)|((crtc_addrStartHi<<8)))&0x3fff;
 	int chStart=startAddr&0x1fff;
@@ -370,7 +370,7 @@ UINT32 hp9k_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 		{
 			//UINT8 thec=pvram[((c+(r*80))+160+47)&0x7ff];
 			//UINT8 thec=m_videoram[((c+(r*80))+startAddr)];
-			UINT8 thec=m_screen[chStart&0x7ff];
+			UINT8 thec=m_screenram[chStart&0x7ff];
 			putChar(thec,c,r,bitmap);
 			chStart++;
 		}
@@ -388,7 +388,6 @@ WRITE8_MEMBER( hp9k_state::kbd_put )
 
 static MC6845_INTERFACE( hp9k_mc6845_intf )
 {
-	"screen",           /* name of screen */
 	false,
 	8,          /* number of dots per character */
 	NULL,
@@ -420,7 +419,7 @@ static MACHINE_CONFIG_START( hp9k, hp9k_state )
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 
-	MCFG_MC6845_ADD( "mc6845", MC6845, XTAL_16MHz / 16, hp9k_mc6845_intf )
+	MCFG_MC6845_ADD( "mc6845", MC6845, "screen", XTAL_16MHz / 16, hp9k_mc6845_intf )
 MACHINE_CONFIG_END
 
 /* ROM definition */

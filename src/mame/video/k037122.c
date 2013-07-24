@@ -15,32 +15,12 @@ const device_type K037122 = &device_creator<k037122_device>;
 
 k037122_device::k037122_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K037122, "Konami 0371222", tag, owner, clock, "k037122", __FILE__),
-	m_screen(NULL),
+	device_video_interface(mconfig, *this),
 	m_tile_ram(NULL),
 	m_char_ram(NULL),
-	m_reg(NULL)
+	m_reg(NULL),
+	m_gfx_index(0)
 {
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void k037122_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const k037122_interface *intf = reinterpret_cast<const k037122_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<k037122_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		m_screen_tag = "";
-		m_gfx_index = 0;
-	}
 }
 
 //-------------------------------------------------
@@ -59,8 +39,6 @@ void k037122_device::device_start()
 	{ 0*128, 1*128, 2*128, 3*128, 4*128, 5*128, 6*128, 7*128 },
 	8*128
 	};
-
-	m_screen = machine().device<screen_device>(m_screen_tag);
 
 	m_char_ram = auto_alloc_array_clear(machine(), UINT32, 0x200000 / 4);
 	m_tile_ram = auto_alloc_array_clear(machine(), UINT32, 0x20000 / 4);

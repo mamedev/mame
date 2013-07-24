@@ -310,7 +310,6 @@ static const huc6270_interface pce_huc6270_config =
 
 static const huc6260_interface pce_huc6260_config =
 {
-	"screen",
 	DEVCB_DEVICE_MEMBER16( "huc6270", huc6270_device, next_pixel ),
 	DEVCB_DEVICE_MEMBER16( "huc6270", huc6270_device, time_until_next_event ),
 	DEVCB_DEVICE_LINE_MEMBER( "huc6270", huc6270_device, vsync_changed ),
@@ -351,7 +350,6 @@ static const huc6202_interface sgx_huc6202_config =
 
 static const huc6260_interface sgx_huc6260_config =
 {
-	"screen",
 	DEVCB_DEVICE_MEMBER16( "huc6202", huc6202_device, next_pixel ),
 	DEVCB_DEVICE_MEMBER16( "huc6202", huc6202_device, time_until_next_event ),
 	DEVCB_DEVICE_LINE_MEMBER( "huc6202", huc6202_device, vsync_changed ),

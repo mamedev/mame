@@ -278,7 +278,6 @@ static const k053260_interface k053260_config =
 
 static const k053247_interface overdriv_k053246_intf =
 {
-	"screen",
 	"gfx1", 0,
 	NORMAL_PLANE_ORDER,
 	77, 22,
@@ -326,7 +325,6 @@ void overdriv_state::machine_reset()
 
 static const k053252_interface overdriv_k053252_intf =
 {
-	"screen",
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,

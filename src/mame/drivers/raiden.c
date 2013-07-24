@@ -318,7 +318,6 @@ WRITE16_MEMBER( raiden_state::raidenb_layer_scroll_w )
 
 SEIBU_CRTC_INTERFACE(crtc_intf)
 {
-	"screen",
 	DEVCB_DRIVER_MEMBER16(raiden_state, raidenb_layer_enable_w),
 	DEVCB_DRIVER_MEMBER16(raiden_state, raidenb_layer_scroll_w),
 };

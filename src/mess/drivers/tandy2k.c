@@ -354,7 +354,6 @@ WRITE_LINE_MEMBER( tandy2k_state::vpac_drb_w )
 
 static CRT9007_INTERFACE( vpac_intf )
 {
-	SCREEN_TAG,
 	10,
 	DEVCB_DEVICE_LINE_MEMBER(I8259A_1_TAG, pic8259_device, ir1_w),
 	DEVCB_NULL, // DMAR     80186 HOLD
@@ -388,7 +387,6 @@ static CRT9212_INTERFACE( drb1_intf )
 
 static CRT9021_INTERFACE( vac_intf )
 {
-	SCREEN_TAG,
 	DEVCB_DEVICE_MEMBER(CRT9212_0_TAG, crt9212_device, read), // data
 	DEVCB_DEVICE_MEMBER(CRT9212_1_TAG, crt9212_device, read), // attributes
 	DEVCB_LINE_VCC // ATTEN

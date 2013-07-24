@@ -155,6 +155,8 @@
 #define CDP1869_INTERFACE(_name) \
 	const cdp1869_interface (_name) =
 
+#define MCFG_CDP1869_SET_SCREEN MCFG_VIDEO_SET_SCREEN
+
 #define CDP1869_CHAR_RAM_READ(name) UINT8 name(device_t *device, UINT16 pma, UINT8 cma, UINT8 pmd)
 #define CDP1869_CHAR_RAM_WRITE(name) void name(device_t *device, UINT16 pma, UINT8 cma, UINT8 pmd, UINT8 data)
 #define CDP1869_PCB_READ(name) int name(device_t *device, UINT16 pma, UINT8 cma, UINT8 pmd)
@@ -180,8 +182,6 @@ typedef int (*cdp1869_pcb_read_func)(device_t *device, UINT16 pma, UINT8 cma, UI
 
 struct cdp1869_interface
 {
-	const char *screen_tag;     // screen we are acting on
-
 	// pixel clock of the chip is the device clock
 	int color_clock;            // the chroma clock of the chip
 
@@ -207,6 +207,7 @@ struct cdp1869_interface
 
 class cdp1869_device :  public device_t,
 						public device_sound_interface,
+						public device_video_interface,
 						public device_memory_interface,
 						public cdp1869_interface
 {
@@ -272,7 +273,6 @@ private:
 	cdp1869_char_ram_read_func      m_in_char_ram_func;
 	cdp1869_char_ram_write_func     m_out_char_ram_func;
 
-	screen_device *m_screen;
 	//address_space *m_page_ram;
 	emu_timer *m_prd_timer;
 	sound_stream *m_stream;

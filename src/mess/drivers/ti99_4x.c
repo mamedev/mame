@@ -703,7 +703,6 @@ WRITE_LINE_MEMBER( ti99_4x_state::notconnected )
 
 static TMS9928A_INTERFACE(ti99_4_tms9928a_interface)
 {
-	SCREEN_TAG,
 	0x4000,
 	DEVCB_DRIVER_LINE_MEMBER(ti99_4x_state, set_tms9901_INT2)
 };

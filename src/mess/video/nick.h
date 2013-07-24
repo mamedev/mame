@@ -30,7 +30,7 @@
 	MCFG_SCREEN_VISIBLE_AREA(0, ENTERPRISE_SCREEN_WIDTH-1, 0, ENTERPRISE_SCREEN_HEIGHT-1) \
 	MCFG_SCREEN_UPDATE_DEVICE(_tag, nick_device, screen_update) \
 	MCFG_DEVICE_ADD(_tag, NICK, _clock) \
-	downcast<nick_device *>(device)->set_screen_tag(_screen_tag); \
+	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
 	downcast<nick_device *>(device)->set_virq_callback(DEVCB2_##_virq);
 
 
@@ -66,13 +66,13 @@ struct LPT_ENTRY
 // ======================> nick_device
 
 class nick_device :  public device_t,
-						public device_memory_interface
+						public device_memory_interface,
+						public device_video_interface
 {
 public:
 	// construction/destruction
 	nick_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	void set_screen_tag(const char *screen_tag) { m_screen_tag = screen_tag; }
 	template<class _virq> void set_virq_callback(_virq virq) { m_write_virq.set_callback(virq); }
 
 	virtual DECLARE_ADDRESS_MAP(vram_map, 8);
@@ -161,8 +161,6 @@ private:
 
 	int m_virq;
 
-	const char *m_screen_tag;
-	screen_device *m_screen;
 	bitmap_rgb32 m_bitmap;
 	rgb_t m_palette[256];
 

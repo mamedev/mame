@@ -813,14 +813,8 @@ static int mutantf_2_bank_callback( const int bank )
 	return ((bank >> 5) & 0x1) << 14;
 }
 
-static const decocomn_interface cninja_decocomn_intf =
-{
-	"screen",
-};
-
 static const deco16ic_interface cninja_deco16ic_tilegen1_intf =
 {
-	"screen",
 	1, 1,
 	0x0f, 0x0f, /* trans masks (default values) */
 	0, 16, /* color base */
@@ -832,7 +826,6 @@ static const deco16ic_interface cninja_deco16ic_tilegen1_intf =
 
 static const deco16ic_interface cninja_deco16ic_tilegen2_intf =
 {
-	"screen",
 	0, 1,
 	0x0f, 0x0f, /* trans masks (default values) */
 	0, 48, /* color base */
@@ -846,7 +839,6 @@ static const deco16ic_interface cninja_deco16ic_tilegen2_intf =
 
 static const deco16ic_interface edrandy_deco16ic_tilegen1_intf =
 {
-	"screen",
 	0, 1,
 	0x0f, 0x0f, /* trans masks (default values) */
 	0, 16, /* color base  */
@@ -858,7 +850,6 @@ static const deco16ic_interface edrandy_deco16ic_tilegen1_intf =
 
 static const deco16ic_interface edrandy_deco16ic_tilegen2_intf =
 {
-	"screen",
 	0, 1,
 	0x0f, 0x0f, /* trans masks (default values) */
 	0, 48, /* color base  */
@@ -871,7 +862,6 @@ static const deco16ic_interface edrandy_deco16ic_tilegen2_intf =
 
 static const deco16ic_interface robocop2_deco16ic_tilegen1_intf =
 {
-	"screen",
 	0, 1,
 	0x0f, 0x0f, /* trans masks (default values) */
 	0, 16, /* color base */
@@ -883,7 +873,6 @@ static const deco16ic_interface robocop2_deco16ic_tilegen1_intf =
 
 static const deco16ic_interface robocop2_deco16ic_tilegen2_intf =
 {
-	"screen",
 	0, 1,
 	0x0f, 0x0f, /* trans masks (default values) */
 	0, 48, /* color base */
@@ -896,7 +885,6 @@ static const deco16ic_interface robocop2_deco16ic_tilegen2_intf =
 
 static const deco16ic_interface mutantf_deco16ic_tilegen1_intf =
 {
-	"screen",
 	0, 1,
 	0x0f, 0x0f, /* trans masks (default values) */
 	0, 0x30, /* color base */
@@ -908,7 +896,6 @@ static const deco16ic_interface mutantf_deco16ic_tilegen1_intf =
 
 static const deco16ic_interface mutantf_deco16ic_tilegen2_intf =
 {
-	"screen",
 	0, 1,
 	0x0f, 0x0f, /* trans masks (default values) */
 	0x20, 0x40, /* color base */
@@ -972,7 +959,7 @@ static MACHINE_CONFIG_START( cninja, cninja_state )
 
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 
-	MCFG_DECOCOMN_ADD("deco_common", cninja_decocomn_intf)
+	MCFG_DECOCOMN_ADD("deco_common")
 
 	MCFG_DECO16IC_ADD("tilegen1", cninja_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_ADD("tilegen2", cninja_deco16ic_tilegen2_intf)
@@ -1031,7 +1018,7 @@ static MACHINE_CONFIG_START( stoneage, cninja_state )
 
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 
-	MCFG_DECOCOMN_ADD("deco_common", cninja_decocomn_intf)
+	MCFG_DECOCOMN_ADD("deco_common")
 
 	MCFG_DECO16IC_ADD("tilegen1", cninja_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_ADD("tilegen2", cninja_deco16ic_tilegen2_intf)
@@ -1085,7 +1072,7 @@ static MACHINE_CONFIG_START( cninjabl, cninja_state )
 
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 
-	MCFG_DECOCOMN_ADD("deco_common", cninja_decocomn_intf)
+	MCFG_DECOCOMN_ADD("deco_common")
 
 	MCFG_DECO16IC_ADD("tilegen1", cninja_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_ADD("tilegen2", cninja_deco16ic_tilegen2_intf)
@@ -1128,7 +1115,7 @@ static MACHINE_CONFIG_START( edrandy, cninja_state )
 
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 
-	MCFG_DECOCOMN_ADD("deco_common", cninja_decocomn_intf)
+	MCFG_DECOCOMN_ADD("deco_common")
 
 	MCFG_DECO16IC_ADD("tilegen1", edrandy_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_ADD("tilegen2", edrandy_deco16ic_tilegen2_intf)
@@ -1184,7 +1171,7 @@ static MACHINE_CONFIG_START( robocop2, cninja_state )
 
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 
-	MCFG_DECOCOMN_ADD("deco_common", cninja_decocomn_intf)
+	MCFG_DECOCOMN_ADD("deco_common")
 
 	MCFG_DECO16IC_ADD("tilegen1", robocop2_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_ADD("tilegen2", robocop2_deco16ic_tilegen2_intf)
@@ -1246,7 +1233,7 @@ static MACHINE_CONFIG_START( mutantf, cninja_state )
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram2")
 
-	MCFG_DECOCOMN_ADD("deco_common", cninja_decocomn_intf)
+	MCFG_DECOCOMN_ADD("deco_common")
 
 	MCFG_DECO16IC_ADD("tilegen1", mutantf_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_ADD("tilegen2", mutantf_deco16ic_tilegen2_intf)

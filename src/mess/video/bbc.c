@@ -257,7 +257,6 @@ WRITE_LINE_MEMBER(bbc_state::bbc_vsync)
 
 MC6845_INTERFACE( bbc_mc6845_intf )
 {
-	"screen",                       /* screen number */
 	false,                          /* show border area */
 	8,                              /* numbers of pixels per video memory address */
 	NULL,                           /* begin_update */

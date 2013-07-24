@@ -426,7 +426,6 @@ static const samples_interface natodef_samples_interface =
 
 static const tms9927_interface tms9927_intf =
 {
-	"screen",
 	8,
 	NULL
 };

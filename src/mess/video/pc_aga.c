@@ -31,7 +31,6 @@ static VIDEO_START( pc200 );
 
 static MC6845_INTERFACE( mc6845_aga_intf )
 {
-	AGA_SCREEN_NAME,    /* screen number */
 	false,              /* show border area */
 	8,                  /* numbers of pixels per video memory address */
 	NULL,               /* begin_update */
@@ -75,7 +74,7 @@ MACHINE_CONFIG_FRAGMENT( pcvideo_aga )
 	MCFG_PALETTE_LENGTH( CGA_PALETTE_SETS * 16 )
 	MCFG_PALETTE_INIT( pc_aga )
 
-	MCFG_MC6845_ADD( AGA_MC6845_NAME, MC6845, XTAL_14_31818MHz/8, mc6845_aga_intf )
+	MCFG_MC6845_ADD( AGA_MC6845_NAME, MC6845, AGA_SCREEN_NAME, XTAL_14_31818MHz/8, mc6845_aga_intf )
 
 	MCFG_VIDEO_START( pc_aga )
 MACHINE_CONFIG_END

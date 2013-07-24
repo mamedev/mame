@@ -326,7 +326,6 @@ static int deco156_bank_callback(const int bank)
 
 static const deco16ic_interface deco156_deco16ic_tilegen1_intf =
 {
-	"screen",
 	0, 1,
 	0x0f, 0x0f, /* trans masks (default values) */
 	0, 16, /* color base (default values) */

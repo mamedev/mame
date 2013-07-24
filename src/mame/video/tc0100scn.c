@@ -121,6 +121,7 @@ const device_type TC0100SCN = &device_creator<tc0100scn_device>;
 
 tc0100scn_device::tc0100scn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TC0100SCN, "Taito TC0100SCN", tag, owner, clock, "tc0100scn", __FILE__),
+	device_video_interface(mconfig, *this),
 	m_ram(NULL),
 	m_bg_ram(NULL),
 	m_fg_ram(NULL),
@@ -141,8 +142,7 @@ tc0100scn_device::tc0100scn_device(const machine_config &mconfig, const char *ta
 	m_bg0_colbank(0),
 	m_bg1_colbank(0),
 	m_tx_colbank(0),
-	m_dblwidth(0),
-	m_screen(NULL)
+	m_dblwidth(0)
 {
 }
 
@@ -183,8 +183,6 @@ void tc0100scn_device::device_start()
 	};
 
 	int xd, yd;
-
-	m_screen = machine().device<screen_device>(m_screen_tag);
 
 	/* Set up clipping for multi-TC0100SCN games. We assume
 	   this code won't ever affect single screen games:

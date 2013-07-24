@@ -22,7 +22,6 @@ typedef int (*deco16_bank_cb)( const int bank );
 
 struct deco16ic_interface
 {
-	const char         *m_screen_tag;
 	int                m_split;
 	int                m_full_width12;
 
@@ -34,7 +33,8 @@ struct deco16ic_interface
 };
 
 class deco16ic_device : public device_t,
-										public deco16ic_interface
+						public device_video_interface,
+						public deco16ic_interface
 {
 public:
 	deco16ic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -119,8 +119,6 @@ protected:
 
 private:
 	// internal state
-	//screen_device *m_screen;
-
 	UINT16 *m_pf1_data, *m_pf2_data;
 	UINT16 *m_pf12_control;
 
@@ -158,5 +156,6 @@ extern const device_type DECO16IC;
 	MCFG_DEVICE_ADD(_tag, DECO16IC, 0) \
 	MCFG_DEVICE_CONFIG(_interface)
 
+#define MCFG_DECO16IC_SET_SCREEN MCFG_VIDEO_SET_SCREEN
 
 #endif

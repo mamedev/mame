@@ -457,7 +457,6 @@ READ8_MEMBER(vidbrain_state::memory_read_byte)
 
 static UV201_INTERFACE( uv_intf )
 {
-	SCREEN_TAG,
 	DEVCB_DRIVER_LINE_MEMBER(vidbrain_state, ext_int_w),
 	DEVCB_DRIVER_LINE_MEMBER(vidbrain_state, hblank_w),
 	DEVCB_DRIVER_MEMBER(vidbrain_state, memory_read_byte)

@@ -996,7 +996,6 @@ static const ay8910_interface ay8912_interface =
 
 static MC6845_INTERFACE( h46505_intf )
 {
-	"screen",   /* screen we are acting on */
 	false,      /* show border area */
 	8,          /* number of pixels per video memory address */
 	NULL,       /* before pixel update callback */
@@ -1031,7 +1030,7 @@ static MACHINE_CONFIG_START( coinmstr, coinmstr_state )
 	MCFG_PALETTE_LENGTH(46*32*4)
 
 
-	MCFG_MC6845_ADD("crtc", H46505, 14000000 / 16, h46505_intf)
+	MCFG_MC6845_ADD("crtc", H46505, "screen", 14000000 / 16, h46505_intf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

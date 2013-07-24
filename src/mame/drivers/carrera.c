@@ -313,7 +313,6 @@ void carrera_state::palette_init()
 
 static MC6845_INTERFACE( mc6845_intf )
 {
-	"screen",   /* screen we are acting on */
 	false,      /* show border area */
 	8,          /* number of pixels per video memory address */
 	NULL,       /* before pixel update callback */
@@ -342,7 +341,7 @@ static MACHINE_CONFIG_START( carrera, carrera_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(carrera_state, screen_update_carrera)
 
-	MCFG_MC6845_ADD("crtc", MC6845, MASTER_CLOCK / 16, mc6845_intf)
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK / 16, mc6845_intf)
 
 	MCFG_GFXDECODE(carrera)
 	MCFG_PALETTE_LENGTH(32)

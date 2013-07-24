@@ -401,7 +401,6 @@ static const k054539_interface k054539_config =
 
 static const k054338_interface xexex_k054338_intf =
 {
-	"screen",
 	0,
 	"none"
 };
@@ -417,7 +416,6 @@ static const k056832_interface xexex_k056832_intf =
 
 static const k053247_interface xexex_k053246_intf =
 {
-	"screen",
 	"gfx2", 1,
 	NORMAL_PLANE_ORDER,
 	-48, 32,
@@ -427,7 +425,6 @@ static const k053247_interface xexex_k053246_intf =
 
 static const k053252_interface xexex_k053252_intf =
 {
-	"screen",
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,

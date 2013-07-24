@@ -70,7 +70,6 @@ typedef void (*i8275_display_pixels_func)(i8275x_device *device, bitmap_rgb32 &b
 
 struct i8275_interface
 {
-	const char *m_screen_tag;
 	int m_hpixels_per_column;
 	int m_dummy;
 
@@ -88,6 +87,7 @@ struct i8275_interface
 // ======================> i8275x_device
 
 class i8275x_device :   public device_t,
+						public device_video_interface,
 						public i8275_interface
 {
 public:
@@ -177,7 +177,6 @@ protected:
 	devcb_resolved_write_line   m_out_hrtc_func;
 	devcb_resolved_write_line   m_out_vrtc_func;
 
-	screen_device *m_screen;
 	bitmap_rgb32 m_bitmap;
 
 	UINT8 m_status;

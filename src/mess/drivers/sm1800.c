@@ -104,7 +104,6 @@ static I8275_DISPLAY_PIXELS(sm1800_display_pixels)
 }
 
 const i8275_interface sm1800_i8275_interface = {
-	"screen",
 	8,
 	0,
 	DEVCB_NULL,

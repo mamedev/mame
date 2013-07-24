@@ -233,7 +233,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(coleco_state::paddle_update_callback)
 
 static TMS9928A_INTERFACE(coleco_tms9928a_interface)
 {
-	"screen",
 	0x4000,
 	DEVCB_DRIVER_LINE_MEMBER(coleco_state,coleco_vdp_interrupt)
 };
