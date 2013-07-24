@@ -62,6 +62,10 @@ public:
 	
 	void loadFonts(const char* directory);
 	void loadDocument(const char *filename);
+	
+	void mouse_move(int x, int y);
+	void mouse_up();
+	void mouse_down();
 private:
 	// internal state
 	running_machine &   m_machine;                          // reference to our machine

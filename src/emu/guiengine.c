@@ -405,3 +405,18 @@ void gui_engine::loadDocument(const char *filename)
 		document->RemoveReference();
 	}
 }
+
+void gui_engine::mouse_move(int x, int y)
+{
+	context->ProcessMouseMove(x, y, 0);
+}
+
+void gui_engine::mouse_up()
+{
+	context->ProcessMouseButtonDown(0, 0);
+}
+
+void gui_engine::mouse_down()
+{
+	context->ProcessMouseButtonUp(0, 0);
+}

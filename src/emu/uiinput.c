@@ -128,6 +128,7 @@ int ui_input_push_event(running_machine &machine, ui_event evt)
 			uidata->current_mouse_target = evt.target;
 			uidata->current_mouse_x = evt.mouse_x;
 			uidata->current_mouse_y = evt.mouse_y;
+			machine.gui().mouse_move(evt.mouse_x, evt.mouse_y);
 			break;
 
 		case UI_EVENT_MOUSE_LEAVE:
@@ -141,10 +142,12 @@ int ui_input_push_event(running_machine &machine, ui_event evt)
 
 		case UI_EVENT_MOUSE_DOWN:
 			uidata->current_mouse_down = TRUE;
+			machine.gui().mouse_down();
 			break;
 
 		case UI_EVENT_MOUSE_UP:
 			uidata->current_mouse_down = FALSE;
+			machine.gui().mouse_up();
 			break;
 
 		default:
