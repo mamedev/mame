@@ -109,40 +109,9 @@ void set_led_status(running_machine &machine, int num, int value);
 void generic_pulse_irq_line(device_t *device, int irqline, int cycles);
 void generic_pulse_irq_line_and_vector(device_t *device, int irqline, int vector, int cycles);
 
-
-INTERRUPT_GEN( nmi_line_pulse );
-INTERRUPT_GEN( nmi_line_assert );
-
-INTERRUPT_GEN( irq0_line_hold );
-INTERRUPT_GEN( irq0_line_pulse );
-INTERRUPT_GEN( irq0_line_assert );
-
-INTERRUPT_GEN( irq1_line_hold );
-INTERRUPT_GEN( irq1_line_pulse );
-INTERRUPT_GEN( irq1_line_assert );
-
+// legacy
 INTERRUPT_GEN( irq2_line_hold );
 INTERRUPT_GEN( irq2_line_pulse );
 INTERRUPT_GEN( irq2_line_assert );
-
-INTERRUPT_GEN( irq3_line_hold );
-INTERRUPT_GEN( irq3_line_pulse );
-INTERRUPT_GEN( irq3_line_assert );
-
-INTERRUPT_GEN( irq4_line_hold );
-INTERRUPT_GEN( irq4_line_pulse );
-INTERRUPT_GEN( irq4_line_assert );
-
-INTERRUPT_GEN( irq5_line_hold );
-INTERRUPT_GEN( irq5_line_pulse );
-INTERRUPT_GEN( irq5_line_assert );
-
-INTERRUPT_GEN( irq6_line_hold );
-INTERRUPT_GEN( irq6_line_pulse );
-INTERRUPT_GEN( irq6_line_assert );
-
-INTERRUPT_GEN( irq7_line_hold );
-INTERRUPT_GEN( irq7_line_pulse );
-INTERRUPT_GEN( irq7_line_assert );
 
 #endif  /* __MACHINE_GENERIC_H__ */

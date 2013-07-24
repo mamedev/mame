@@ -875,7 +875,7 @@ MACHINE_CONFIG_FRAGMENT( exidy440_audio )
 
 	MCFG_CPU_ADD("audiocpu", M6809, EXIDY440_AUDIO_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(exidy440_audio_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_assert)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", driver_device, irq0_line_assert)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
