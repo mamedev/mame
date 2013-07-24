@@ -87,6 +87,8 @@ public:
 	virtual void RenderGeometry(Rocket::Core::Vertex* vertices, int num_vertices, int* indices, int num_indices, Rocket::Core::TextureHandle texture, const Rocket::Core::Vector2f& translation)
 	{
 		bitmap_rgb32 *bitmap = ((bitmap_rgb32 *)texture);
+		int width = machine().render().ui_target().width();
+		int height = machine().render().ui_target().height();
 			for (int i = 0; i < num_indices/6; i++)
 			{			
 				int p1 = indices[i*6+0];
@@ -106,7 +108,7 @@ public:
 
 					hilight_texture->set_bitmap(*((bitmap_rgb32 *)texture), myrect, TEXFORMAT_ARGB32);		
 					rgb_t col = MAKE_ARGB(vertices[p1].colour.alpha, vertices[p1].colour.red, vertices[p1].colour.green, vertices[p1].colour.blue);
-					machine().render().ui_container().add_quad((vertices[p1].position.x+translation.x)/1280,(vertices[p1].position.y+translation.y)/960, (vertices[p2].position.x+translation.x)/1280,(vertices[p2].position.y+translation.y)/960, col, hilight_texture,PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+					machine().render().ui_container().add_quad((vertices[p1].position.x+translation.x)/width,(vertices[p1].position.y+translation.y)/height, (vertices[p2].position.x+translation.x)/width,(vertices[p2].position.y+translation.y)/height, col, hilight_texture,PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 					//machine().render().texture_free(hilight_texture);				
 				} else {
 					rgb_t col = MAKE_ARGB(vertices[p1].colour.alpha, vertices[p1].colour.red, vertices[p1].colour.green, vertices[p1].colour.blue);
@@ -114,7 +116,7 @@ public:
 					int x2  = MAX(vertices[p1].position.x,vertices[p2].position.x);
 					int y1  = MIN(vertices[p1].position.y,vertices[p2].position.y);
 					int y2  = MAX(vertices[p1].position.y,vertices[p2].position.y);
-					machine().render().ui_container().add_quad((x1+translation.x)/1280,(y1+translation.y)/960, (x2+translation.x)/1280,(y2+translation.y)/960, col, NULL,PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+					machine().render().ui_container().add_quad((x1+translation.x)/width,(y1+translation.y)/height, (x2+translation.x)/width,(y2+translation.y)/height, col, NULL,PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 				}
 
 			}						
@@ -376,7 +378,10 @@ void gui_engine::update()
 {
 	/* always start clean */
 	machine().render().ui_container().empty();
-	
+	int width = machine().render().ui_target().width();
+	int height = machine().render().ui_target().height();
+	Rocket::Core::Vector2i dim(width, height);
+	context->SetDimensions(dim);
 	context->Update();
 	context->Render();
 }
