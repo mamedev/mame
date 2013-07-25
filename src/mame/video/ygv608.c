@@ -1642,7 +1642,7 @@ READ16_MEMBER( ygv608_device::debug_trigger_r )
 	*/
 
 	logerror( "Scroll Table\n" );
-	for( i=0; i<512; i++ ) {
+	for( i=0; i<256; i++ ) {
 	if( i % 16 == 0 )
 		logerror( "$%04X : ", i );
 	logerror( "%02X ", m_scroll_data_table[0][i] );
