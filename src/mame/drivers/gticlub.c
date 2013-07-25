@@ -232,8 +232,7 @@ Hang Pilot (uses an unknown but similar video board)                12W         
 #include "video/voodoo.h"
 #include "video/gticlub.h"
 #include "video/k001604.h"
-#include "drivlgcy.h"
-#include "scrlegcy.h"
+
 
 #include "rendlay.h"
 
@@ -288,10 +287,18 @@ public:
 	DECLARE_MACHINE_START(gticlub);
 	DECLARE_MACHINE_RESET(gticlub);
 	DECLARE_MACHINE_RESET(hangplt);
+	DECLARE_VIDEO_START(gticlub);
 	INTERRUPT_GEN_MEMBER(gticlub_vblank);
+	
+	UINT32 screen_update_gticlub(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_hangplt(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+private:
+	void gticlub_led_setreg(int offset, UINT8 data);
+	
+	UINT8 gticlub_led_reg[2];	
 };
 
 
@@ -836,6 +843,125 @@ MACHINE_RESET_MEMBER(gticlub_state,gticlub)
 	m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
+void gticlub_state::gticlub_led_setreg(int offset, UINT8 data)
+{
+	gticlub_led_reg[offset] = data;
+}
+
+
+VIDEO_START_MEMBER(gticlub_state,gticlub)
+{
+	gticlub_led_reg[0] = gticlub_led_reg[1] = 0x7f;
+	/*
+	tick = 0;
+	debug_tex_page = 0;
+	debug_tex_palette = 0;
+	*/
+
+	K001006_init(machine());
+	K001005_init(machine());
+}
+
+UINT32 gticlub_state::screen_update_gticlub(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	k001604_device *k001604 = machine().device<k001604_device>("k001604_1");
+
+	k001604->draw_back_layer(bitmap, cliprect);
+
+	K001005_draw(bitmap, cliprect);
+
+	k001604->draw_front_layer(bitmap, cliprect);
+
+#if 0
+	tick++;
+	if( tick >= 5 ) {
+		tick = 0;
+
+		if( machine().input().code_pressed(KEYCODE_O) )
+			debug_tex_page++;
+
+		if( machine().input().code_pressed(KEYCODE_I) )
+			debug_tex_page--;
+
+		if (machine().input().code_pressed(KEYCODE_U))
+			debug_tex_palette++;
+		if (machine().input().code_pressed(KEYCODE_Y))
+			debug_tex_palette--;
+
+		if (debug_tex_page < 0)
+			debug_tex_page = 32;
+		if (debug_tex_page > 32)
+			debug_tex_page = 0;
+
+		if (debug_tex_palette < 0)
+			debug_tex_palette = 15;
+		if (debug_tex_palette > 15)
+			debug_tex_palette = 0;
+	}
+
+	if (debug_tex_page > 0)
+	{
+		char string[200];
+		int x,y;
+		int index = (debug_tex_page - 1) * 0x40000;
+		int pal = debug_tex_palette & 7;
+		int tp = (debug_tex_palette >> 3) & 1;
+		UINT8 *rom = machine.root_device().memregion("gfx1")->base();
+
+		for (y=0; y < 384; y++)
+		{
+			for (x=0; x < 512; x++)
+			{
+				UINT8 pixel = rom[index + (y*512) + x];
+				bitmap.pix32(y, x) = K001006_palette[tp][(pal * 256) + pixel];
+			}
+		}
+
+		sprintf(string, "Texture page %d\nPalette %d", debug_tex_page, debug_tex_palette);
+		//popmessage("%s", string);
+	}
+#endif
+
+	draw_7segment_led(bitmap, 3, 3, gticlub_led_reg[0]);
+	draw_7segment_led(bitmap, 9, 3, gticlub_led_reg[1]);
+
+	//machine().device("dsp")->execute().set_input_line(SHARC_INPUT_FLAG1, ASSERT_LINE);
+	sharc_set_flag_input(machine().device("dsp"), 1, ASSERT_LINE);
+	return 0;
+}
+
+UINT32 gticlub_state::screen_update_hangplt(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(machine().pens[0], cliprect);
+
+	if (strcmp(screen.tag(), ":lscreen") == 0)
+	{
+		k001604_device *k001604 = machine().device<k001604_device>("k001604_1");
+		device_t *voodoo = machine().device("voodoo0");
+
+	//  k001604->draw_back_layer(bitmap, cliprect);
+
+		voodoo_update(voodoo, bitmap, cliprect);
+
+		k001604->draw_front_layer(bitmap, cliprect);
+	}
+	else if (strcmp(screen.tag(), ":rscreen") == 0)
+	{
+		k001604_device *k001604 = machine().device<k001604_device>("k001604_2");
+		device_t *voodoo = machine().device("voodoo1");
+
+	//  k001604->draw_back_layer(bitmap, cliprect);
+
+		voodoo_update(voodoo, bitmap, cliprect);
+
+		k001604->draw_front_layer(bitmap, cliprect);
+	}
+
+	draw_7segment_led(bitmap, 3, 3, gticlub_led_reg[0]);
+	draw_7segment_led(bitmap, 9, 3, gticlub_led_reg[1]);
+
+	return 0;
+}
 static MACHINE_CONFIG_START( gticlub, gticlub_state )
 
 	/* basic machine hardware */
@@ -866,11 +992,11 @@ static MACHINE_CONFIG_START( gticlub, gticlub_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(512, 384)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
-	MCFG_SCREEN_UPDATE_STATIC(gticlub)
+	MCFG_SCREEN_UPDATE_DRIVER(gticlub_state, screen_update_gticlub)
 
 	MCFG_PALETTE_LENGTH(65536)
 
-	MCFG_VIDEO_START(gticlub)
+	MCFG_VIDEO_START_OVERRIDE(gticlub_state,gticlub)
 
 	MCFG_K001604_ADD("k001604_1", gticlub_k001604_intf)
 
@@ -980,13 +1106,13 @@ static MACHINE_CONFIG_START( hangplt, gticlub_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(512, 384)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
-	MCFG_SCREEN_UPDATE_STATIC(hangplt)
+	MCFG_SCREEN_UPDATE_DRIVER(gticlub_state, screen_update_hangplt)
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(512, 384)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
-	MCFG_SCREEN_UPDATE_STATIC(hangplt)
+	MCFG_SCREEN_UPDATE_DRIVER(gticlub_state, screen_update_hangplt)
 
 	MCFG_K001604_ADD("k001604_1", hangplt_k001604_intf_l)
 	MCFG_K001604_ADD("k001604_2", hangplt_k001604_intf_r)
