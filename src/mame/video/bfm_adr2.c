@@ -96,6 +96,8 @@ E000-FFFF  | R | D D D D D D D D | 8K ROM
 #include "video/bfm_adr2.h"
 #include "rendlay.h"
 #include "tilelgcy.h"
+#include "drivlgcy.h"
+#include "scrlegcy.h"
 
 #ifdef MAME_DEBUG
 #define VERBOSE 1
@@ -109,6 +111,9 @@ E000-FFFF  | R | D D D D D D D D | 8K ROM
 
 #define SL_DISPLAY    0x02  // displayed Adder screen,  1=screen1 0=screen0
 #define SL_ACCESS     0x01  // accessable Adder screen, 1=screen1 0=screen0
+
+#define ADDER_CLOCK     (XTAL_8MHz)
+
 
 static int adder2_screen_page_reg;        // access/display select
 static int adder2_c101;
@@ -176,7 +181,7 @@ static TILE_GET_INFO( get_tile1_info )
 
 // video initialisation ///////////////////////////////////////////////////
 
-VIDEO_RESET( adder2 )
+static VIDEO_RESET( adder2 )
 {
 	adder2_screen_page_reg   = 0;
 	adder2_c101              = 0;
@@ -195,7 +200,7 @@ VIDEO_RESET( adder2 )
 	}
 }
 
-VIDEO_START( adder2 )
+static VIDEO_START( adder2 )
 {
 	machine.save().save_item(NAME(adder2_screen_page_reg));
 	machine.save().save_item(NAME(adder2_c101));
@@ -215,7 +220,7 @@ VIDEO_START( adder2 )
 }
 
 // video update ///////////////////////////////////////////////////////////
-SCREEN_UPDATE_IND16( adder2 )
+static SCREEN_UPDATE_IND16( adder2 )
 {
 	const rectangle visible1(0, 400-1,  0,  280-1);  //minx,maxx, miny,maxy
 
@@ -227,7 +232,7 @@ SCREEN_UPDATE_IND16( adder2 )
 
 // adder2 palette initialisation //////////////////////////////////////////
 
-PALETTE_INIT( adder2 )
+static PALETTE_INIT( adder2 )
 {
 	palette_set_color(machine, 0,MAKE_RGB(0x00,0x00,0x00));
 	palette_set_color(machine, 1,MAKE_RGB(0x00,0x00,0xFF));
@@ -249,7 +254,7 @@ PALETTE_INIT( adder2 )
 
 ///////////////////////////////////////////////////////////////////////////
 
-INTERRUPT_GEN( adder2_vbl )
+static INTERRUPT_GEN( adder2_vbl )
 {
 	if ( adder2_c101 & 0x01 )
 	{
@@ -486,7 +491,7 @@ void adder2_decode_char_roms(running_machine &machine)
 // adder2 board memorymap /////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-ADDRESS_MAP_START( adder2_memmap, AS_PROGRAM, 8, driver_device )
+static ADDRESS_MAP_START( adder2_memmap, AS_PROGRAM, 8, driver_device )
 
 	AM_RANGE(0x0000, 0x0000) AM_WRITE_LEGACY(adder2_screen_page_w)      // screen access/display select
 	AM_RANGE(0x0000, 0x7FFF) AM_ROMBANK("bank2")                // 8k  paged ROM (4 pages)
@@ -523,8 +528,27 @@ static const gfx_layout charlayout =
 // characters are grouped by 64 (512 pixels)
 // there are max 128 of these groups
 
-GFXDECODE_START( adder2 )
+static GFXDECODE_START( adder2 )
 	GFXDECODE_ENTRY( "gfx1",  0, charlayout, 0, 16 )
 GFXDECODE_END
 
 ///////////////////////////////////////////////////////////////////////////
+
+MACHINE_CONFIG_FRAGMENT( adder2 )
+	MCFG_SCREEN_ADD("adder", RASTER)
+	MCFG_SCREEN_SIZE( 400, 280)
+	MCFG_SCREEN_VISIBLE_AREA(  0, 400-1, 0, 280-1)
+	MCFG_SCREEN_REFRESH_RATE(50)
+
+	MCFG_VIDEO_START( adder2)
+	MCFG_SCREEN_UPDATE_STATIC(adder2)
+	MCFG_VIDEO_RESET( adder2)
+
+	MCFG_PALETTE_LENGTH(16)
+	MCFG_PALETTE_INIT(adder2)
+	MCFG_GFXDECODE(adder2)
+
+	MCFG_CPU_ADD("adder2", M6809, ADDER_CLOCK/4 )  // adder2 board 6809 CPU at 2 Mhz
+	MCFG_CPU_PROGRAM_MAP(adder2_memmap)             // setup adder2 board memorymap
+	MCFG_CPU_VBLANK_INT("adder", adder2_vbl)        // board has a VBL IRQ
+MACHINE_CONFIG_END

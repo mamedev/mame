@@ -2164,22 +2164,8 @@ static MACHINE_CONFIG_START( scorpion2_vid, bfm_sc2_state )
 	MCFG_NVRAM_ADD_CUSTOM_DRIVER("e2ram", bfm_sc2_state, e2ram_init)
 	MCFG_DEFAULT_LAYOUT(layout_sc2_vid)
 
-	MCFG_SCREEN_ADD("adder", RASTER)
-	MCFG_SCREEN_SIZE( 400, 280)
-	MCFG_SCREEN_VISIBLE_AREA(  0, 400-1, 0, 280-1)
-	MCFG_SCREEN_REFRESH_RATE(50)
-
-	MCFG_VIDEO_START( adder2)
-	MCFG_SCREEN_UPDATE_STATIC(adder2)
-	MCFG_VIDEO_RESET( adder2)
-
-	MCFG_PALETTE_LENGTH(16)
-	MCFG_PALETTE_INIT(adder2)
-	MCFG_GFXDECODE(adder2)
-
-	MCFG_CPU_ADD("adder2", M6809, MASTER_CLOCK/4 )  // adder2 board 6809 CPU at 2 Mhz
-	MCFG_CPU_PROGRAM_MAP(adder2_memmap)             // setup adder2 board memorymap
-	MCFG_CPU_VBLANK_INT("adder", adder2_vbl)        // board has a VBL IRQ
+	//MCFG_BFM_ADDER2_ADD("adder2")
+	MCFG_FRAGMENT_ADD(adder2)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
