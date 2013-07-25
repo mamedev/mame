@@ -95,9 +95,6 @@ E000-FFFF  | R | D D D D D D D D | 8K ROM
 #include "machine/bfm_bd1.h"  // vfd
 #include "video/bfm_adr2.h"
 #include "rendlay.h"
-#include "tilelgcy.h"
-#include "drivlgcy.h"
-#include "scrlegcy.h"
 
 #ifdef MAME_DEBUG
 #define VERBOSE 1
@@ -115,27 +112,19 @@ E000-FFFF  | R | D D D D D D D D | 8K ROM
 #define ADDER_CLOCK     (XTAL_8MHz)
 
 
-static int adder2_screen_page_reg;        // access/display select
-static int adder2_c101;
-static int adder2_rx;
-static int adder_vbl_triggered;           // flag <>0, VBL IRQ triggered
-static int adder2_acia_triggered;         // flag <>0, ACIA receive IRQ
 
-static UINT8 adder_ram[0xE80];              // normal RAM
-static UINT8 adder_screen_ram[2][0x1180];   // paged  display RAM
+const device_type BFM_ADDER2 = &device_creator<bfm_adder2_device>;
 
-static tilemap_t *tilemap0;  // tilemap screen0
-static tilemap_t *tilemap1;  // timemap screen1
+bfm_adder2_device::bfm_adder2_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock )
+	: device_t(mconfig, BFM_ADDER2, "BFM ADDER2", tag, owner, clock, "bfm_adder2", __FILE__),
+	  m_cpu(*this, "adder2")
+{
+}
 
-static UINT8 adder2_data_from_sc2;
-static UINT8 adder2_data_to_sc2;
-
-static UINT8 adder2_data;
-static UINT8 adder2_sc2data;
 
 ///////////////////////////////////////////////////////////////////////////
 
-static TILE_GET_INFO( get_tile0_info )
+TILE_GET_INFO_MEMBER( bfm_adder2_device::get_tile0_info )
 {
 	short data;
 	int  code,  color, flags,x,y;
@@ -145,20 +134,20 @@ static TILE_GET_INFO( get_tile0_info )
 
 	tile_index = y * 128 + (x * 2);
 
-	data =  adder_screen_ram[0][tile_index    ]<<8;
-	data |= adder_screen_ram[0][tile_index + 1];
+	data =  m_adder_screen_ram[0][tile_index    ]<<8;
+	data |= m_adder_screen_ram[0][tile_index + 1];
 
 	code  = data & 0x1FFF;
 	color = 0;
 	flags = ((data & 0x4000)?TILE_FLIPY:0) |
 			((data & 0x2000)?TILE_FLIPX:0);
 
-	SET_TILE_INFO(0, code, color, flags);
+	SET_TILE_INFO_MEMBER(0, code, color, flags);
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-static TILE_GET_INFO( get_tile1_info )
+TILE_GET_INFO_MEMBER( bfm_adder2_device::get_tile1_info )
 {
 	short data;
 	int  code,  color, flags,x,y;
@@ -168,111 +157,109 @@ static TILE_GET_INFO( get_tile1_info )
 
 	tile_index = y * 128 + (x * 2);
 
-	data =  adder_screen_ram[1][tile_index    ]<<8;
-	data |= adder_screen_ram[1][tile_index + 1];
+	data =  m_adder_screen_ram[1][tile_index    ]<<8;
+	data |= m_adder_screen_ram[1][tile_index + 1];
 
 	code  = data & 0x1FFF;
 	color = 0;
 	flags = ((data & 0x4000)?TILE_FLIPY:0) |
 			((data & 0x2000)?TILE_FLIPX:0);
 
-	SET_TILE_INFO(0, code, color, flags);
+	SET_TILE_INFO_MEMBER(0, code, color, flags);
 }
 
 // video initialisation ///////////////////////////////////////////////////
 
-static VIDEO_RESET( adder2 )
+void bfm_adder2_device::device_reset()
 {
-	adder2_screen_page_reg   = 0;
-	adder2_c101              = 0;
-	adder2_rx                = 0;
-	adder_vbl_triggered      = 0;
-	adder2_acia_triggered    = 0;
-	adder2_data_from_sc2     = 0;
-	adder2_data_to_sc2       = 0;
+	m_adder2_screen_page_reg   = 0;
+	m_adder2_c101              = 0;
+	m_adder2_rx                = 0;
+	m_adder_vbl_triggered      = 0;
+	m_adder2_acia_triggered    = 0;
+	m_adder2_data_from_sc2     = 0;
+	m_adder2_data_to_sc2       = 0;
 
 	{
-		UINT8 *rom = machine.root_device().memregion("adder2")->base();
+		UINT8 *rom = machine().root_device().memregion("adder2")->base();
 
-		machine.root_device().membank("bank2")->configure_entries(0, 4, &rom[0x00000], 0x08000);
+		membank("bank2")->configure_entries(0, 4, &rom[0x00000], 0x08000);
 
-		machine.root_device().membank("bank2")->set_entry(0&0x03);
+		membank("bank2")->set_entry(0&0x03);
 	}
 }
 
-static VIDEO_START( adder2 )
+void bfm_adder2_device::device_start()
 {
-	machine.save().save_item(NAME(adder2_screen_page_reg));
-	machine.save().save_item(NAME(adder2_c101));
-	machine.save().save_item(NAME(adder2_rx));
-	machine.save().save_item(NAME(adder_vbl_triggered));
-	machine.save().save_item(NAME(adder2_acia_triggered));
+	adder2_decode_char_roms();
+	
+	save_item(NAME(m_adder2_screen_page_reg));
+	save_item(NAME(m_adder2_c101));
+	save_item(NAME(m_adder2_rx));
+	save_item(NAME(m_adder_vbl_triggered));
+	save_item(NAME(m_adder2_acia_triggered));
 
-	machine.save().save_item(NAME(adder2_data_from_sc2));
-	machine.save().save_item(NAME(adder2_data_to_sc2));
+	save_item(NAME(m_adder2_data_from_sc2));
+	save_item(NAME(m_adder2_data_to_sc2));
 
-	machine.save().save_item(NAME(adder_ram));
-	machine.save().save_item(NAME(adder_screen_ram));
+	save_item(NAME(m_adder_ram));
+	save_item(NAME(m_adder_screen_ram));
 
-	tilemap0 = tilemap_create(machine, get_tile0_info, TILEMAP_SCAN_ROWS,  8, 8, 50, 35);
+	m_tilemap0 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(bfm_adder2_device::get_tile0_info),this), TILEMAP_SCAN_ROWS,  8, 8, 50, 35);
 
-	tilemap1 = tilemap_create(machine, get_tile1_info, TILEMAP_SCAN_ROWS,  8, 8, 50, 35);
+	m_tilemap1 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(bfm_adder2_device::get_tile1_info),this), TILEMAP_SCAN_ROWS,  8, 8, 50, 35);
+	
+	palette_set_color(machine(), 0,MAKE_RGB(0x00,0x00,0x00));
+	palette_set_color(machine(), 1,MAKE_RGB(0x00,0x00,0xFF));
+	palette_set_color(machine(), 2,MAKE_RGB(0x00,0xFF,0x00));
+	palette_set_color(machine(), 3,MAKE_RGB(0x00,0xFF,0xFF));
+	palette_set_color(machine(), 4,MAKE_RGB(0xFF,0x00,0x00));
+	palette_set_color(machine(), 5,MAKE_RGB(0xFF,0x00,0xFF));
+	palette_set_color(machine(), 6,MAKE_RGB(0xFF,0xFF,0x00));
+	palette_set_color(machine(), 7,MAKE_RGB(0xFF,0xFF,0xFF));
+	palette_set_color(machine(), 8,MAKE_RGB(0x80,0x80,0x80));
+	palette_set_color(machine(), 9,MAKE_RGB(0x00,0x00,0x80));
+	palette_set_color(machine(),10,MAKE_RGB(0x00,0x80,0x00));
+	palette_set_color(machine(),11,MAKE_RGB(0x00,0x80,0x80));
+	palette_set_color(machine(),12,MAKE_RGB(0x80,0x00,0x00));
+	palette_set_color(machine(),13,MAKE_RGB(0x80,0x00,0x80));
+	palette_set_color(machine(),14,MAKE_RGB(0x80,0x80,0x00));
+	palette_set_color(machine(),15,MAKE_RGB(0x80,0x80,0x80));	
 }
 
 // video update ///////////////////////////////////////////////////////////
-static SCREEN_UPDATE_IND16( adder2 )
+UINT32 bfm_adder2_device::update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+
 	const rectangle visible1(0, 400-1,  0,  280-1);  //minx,maxx, miny,maxy
 
-	if (adder2_screen_page_reg & SL_DISPLAY) tilemap1->draw(bitmap, visible1, 0, 0);
-	else                                     tilemap0->draw(bitmap, visible1, 0, 0);
+	if (m_adder2_screen_page_reg & SL_DISPLAY) m_tilemap1->draw(bitmap, visible1, 0, 0);
+	else                                     m_tilemap0->draw(bitmap, visible1, 0, 0);
 
 	return 0;
 }
 
-// adder2 palette initialisation //////////////////////////////////////////
-
-static PALETTE_INIT( adder2 )
-{
-	palette_set_color(machine, 0,MAKE_RGB(0x00,0x00,0x00));
-	palette_set_color(machine, 1,MAKE_RGB(0x00,0x00,0xFF));
-	palette_set_color(machine, 2,MAKE_RGB(0x00,0xFF,0x00));
-	palette_set_color(machine, 3,MAKE_RGB(0x00,0xFF,0xFF));
-	palette_set_color(machine, 4,MAKE_RGB(0xFF,0x00,0x00));
-	palette_set_color(machine, 5,MAKE_RGB(0xFF,0x00,0xFF));
-	palette_set_color(machine, 6,MAKE_RGB(0xFF,0xFF,0x00));
-	palette_set_color(machine, 7,MAKE_RGB(0xFF,0xFF,0xFF));
-	palette_set_color(machine, 8,MAKE_RGB(0x80,0x80,0x80));
-	palette_set_color(machine, 9,MAKE_RGB(0x00,0x00,0x80));
-	palette_set_color(machine,10,MAKE_RGB(0x00,0x80,0x00));
-	palette_set_color(machine,11,MAKE_RGB(0x00,0x80,0x80));
-	palette_set_color(machine,12,MAKE_RGB(0x80,0x00,0x00));
-	palette_set_color(machine,13,MAKE_RGB(0x80,0x00,0x80));
-	palette_set_color(machine,14,MAKE_RGB(0x80,0x80,0x00));
-	palette_set_color(machine,15,MAKE_RGB(0x80,0x80,0x80));
-}
-
 ///////////////////////////////////////////////////////////////////////////
 
-static INTERRUPT_GEN( adder2_vbl )
+INTERRUPT_GEN_MEMBER( bfm_adder2_device::adder2_vbl )
 {
-	if ( adder2_c101 & 0x01 )
+	if ( m_adder2_c101 & 0x01 )
 	{
-		adder_vbl_triggered = 1;
-		device->execute().set_input_line(M6809_IRQ_LINE, HOLD_LINE );
+		m_adder_vbl_triggered = 1;
+		device.execute().set_input_line(M6809_IRQ_LINE, HOLD_LINE );
 	}
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-static READ8_HANDLER( screen_ram_r )
+READ8_MEMBER( bfm_adder2_device::screen_ram_r )
 {
-	return adder2_screen_page_reg & SL_ACCESS ? adder_screen_ram[1][offset]:adder_screen_ram[0][offset];
+	return m_adder2_screen_page_reg & SL_ACCESS ? m_adder_screen_ram[1][offset]:m_adder_screen_ram[0][offset];
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-static WRITE8_HANDLER( screen_ram_w )
+WRITE8_MEMBER( bfm_adder2_device::screen_ram_w )
 {
 	int dirty_off = (offset>>7)*50 + ((offset & 0x7F)>>1);
 
@@ -289,102 +276,102 @@ static WRITE8_HANDLER( screen_ram_w )
 		palette_set_color(space.machine(), pal, MAKE_RGB(r,g,b));
 	}
 
-	if ( adder2_screen_page_reg & SL_ACCESS )
+	if ( m_adder2_screen_page_reg & SL_ACCESS )
 	{
-		adder_screen_ram[1][offset] = data;
-		tilemap1->mark_tile_dirty(dirty_off);
+		m_adder_screen_ram[1][offset] = data;
+		m_tilemap1->mark_tile_dirty(dirty_off);
 	}
 
 	else
 	{
-		adder_screen_ram[0][offset] = data;
-		tilemap0->mark_tile_dirty(dirty_off);
+		m_adder_screen_ram[0][offset] = data;
+		m_tilemap0->mark_tile_dirty(dirty_off);
 	}
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-static READ8_HANDLER( normal_ram_r )
+READ8_MEMBER( bfm_adder2_device::normal_ram_r )
 {
-	return adder_ram[offset];
+	return m_adder_ram[offset];
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-static WRITE8_HANDLER( normal_ram_w )
+WRITE8_MEMBER( bfm_adder2_device::normal_ram_w )
 {
-	adder_ram[offset] = data;
+	m_adder_ram[offset] = data;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-static WRITE8_HANDLER( adder2_rom_page_w )
+WRITE8_MEMBER( bfm_adder2_device::adder2_rom_page_w )
 {
-	space.machine().root_device().membank("bank2")->set_entry(data&0x03);
+	membank("bank2")->set_entry(data&0x03);
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-static WRITE8_HANDLER( adder2_c001_w )
+WRITE8_MEMBER( bfm_adder2_device::adder2_c001_w )
 {
 	logerror("c101 = %02X\n",data);
 
-	//adder2_screen_page_reg = 0;
+	//m_adder2_screen_page_reg = 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-static WRITE8_HANDLER( adder2_screen_page_w )
+WRITE8_MEMBER( bfm_adder2_device::adder2_screen_page_w )
 {
-	adder2_screen_page_reg = data;
+	m_adder2_screen_page_reg = data;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-static READ8_HANDLER( adder2_vbl_ctrl_r )
+READ8_MEMBER( bfm_adder2_device::adder2_vbl_ctrl_r )
 {
-	adder_vbl_triggered = 0;    // clear VBL start IRQ
+	m_adder_vbl_triggered = 0;    // clear VBL start IRQ
 
-	return adder2_c101;
+	return m_adder2_c101;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-static WRITE8_HANDLER( adder2_vbl_ctrl_w )
+WRITE8_MEMBER( bfm_adder2_device::adder2_vbl_ctrl_w )
 {
-	adder2_c101 = data;
+	m_adder2_c101 = data;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-static READ8_HANDLER( adder2_uart_ctrl_r )
+READ8_MEMBER( bfm_adder2_device::adder2_uart_ctrl_r )
 {
 	int status = 0;
 
-	if ( adder2_data_from_sc2 ) status |= 0x01; // receive  buffer full
-	if ( !adder2_data_to_sc2 ) status |= 0x02; // transmit buffer empty
+	if ( m_adder2_data_from_sc2 ) status |= 0x01; // receive  buffer full
+	if ( !m_adder2_data_to_sc2 ) status |= 0x02; // transmit buffer empty
 
 	return status;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-static WRITE8_HANDLER( adder2_uart_ctrl_w )
+WRITE8_MEMBER( bfm_adder2_device::adder2_uart_ctrl_w )
 {
-	adder2_data_from_sc2 = 0;   // data available for adder from sc2
-	adder2_sc2data       = 0;   // data
-	adder2_data_to_sc2   = 0;   // data available for sc2 from adder
-	adder2_data          = 0;   // data
+	m_adder2_data_from_sc2 = 0;   // data available for adder from sc2
+	m_adder2_sc2data       = 0;   // data
+	m_adder2_data_to_sc2   = 0;   // data available for sc2 from adder
+	m_adder2_data          = 0;   // data
 
 	LOG_CTRL(("adder2 uart ctrl:%02X\n", data));
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-static READ8_HANDLER( adder2_uart_rx_r )
+READ8_MEMBER( bfm_adder2_device::adder2_uart_rx_r )
 {
-	int data = adder2_sc2data;
-	adder2_data_from_sc2 = 0;       // clr flag, data from scorpion2 board available
+	int data = m_adder2_sc2data;
+	m_adder2_data_from_sc2 = 0;       // clr flag, data from scorpion2 board available
 
 	LOG_CTRL(("rsc2:%02X  (%c)\n",data, data ));
 
@@ -393,51 +380,71 @@ static READ8_HANDLER( adder2_uart_rx_r )
 
 ///////////////////////////////////////////////////////////////////////////
 
-static WRITE8_HANDLER( adder2_uart_tx_w )
+WRITE8_MEMBER( bfm_adder2_device::adder2_uart_tx_w )
 {
-	adder2_data_to_sc2 = 1;     // set flag, data from adder available
-	adder2_data       = data;   // store data
+	m_adder2_data_to_sc2 = 1;     // set flag, data from adder available
+	m_adder2_data       = data;   // store data
 
 	LOG_CTRL(("ssc2    %02X(%c)\n",data, data ));
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-static READ8_HANDLER( adder2_irq_r )
+READ8_MEMBER( bfm_adder2_device::adder2_irq_r )
 {
 	int status = 0;
 
-	if ( adder_vbl_triggered )  status |= 0x02;
-	if ( adder2_acia_triggered ) status |= 0x08;
+	if ( m_adder_vbl_triggered )  status |= 0x02;
+	if ( m_adder2_acia_triggered ) status |= 0x08;
 
 	return status;
 }
 
-void adder2_send(int data)
-{
-	adder2_data_from_sc2 = 1;       // set flag, data from scorpion2 board available
-	adder2_sc2data       = data;    // store data
 
-	adder2_acia_triggered = 1;      // set flag, acia IRQ triggered
+///////////////////////////////////////////////////////////////////////////
+
+WRITE8_MEMBER(bfm_adder2_device::vid_uart_tx_w)
+{
+	m_adder2_data_from_sc2 = 1;       // set flag, data from scorpion2 board available
+	m_adder2_sc2data       = data;    // store data
+
+	m_adder2_acia_triggered = 1;      // set flag, acia IRQ triggered
+	
+	m_cpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE );
+
+	//LOG_SERIAL(("sadder  %02X  (%c)\n",data, data ));
 }
 
-int adder2_receive(void)
+///////////////////////////////////////////////////////////////////////////
+
+WRITE8_MEMBER(bfm_adder2_device::vid_uart_ctrl_w)
 {
-	UINT8 data = adder2_data;
-	adder2_data_to_sc2 = 0;   // clr flag, data from adder available
+}
+
+///////////////////////////////////////////////////////////////////////////
+
+READ8_MEMBER(bfm_adder2_device::vid_uart_rx_r)
+{
+	UINT8 data = m_adder2_data;
+	m_adder2_data_to_sc2 = 0;   // clr flag, data from adder available
+
+	//LOG_SERIAL(("radder:  %02X(%c)\n",data, data ));
 
 	return data;
 }
 
-int adder2_status()
+///////////////////////////////////////////////////////////////////////////
+
+READ8_MEMBER(bfm_adder2_device::vid_uart_ctrl_r)
 {
 	int status = 0;
 
-	if ( adder2_data_to_sc2  ) status |= 0x01; // receive  buffer full
-	if ( !adder2_data_from_sc2) status |= 0x02; // transmit buffer empty
+	if ( m_adder2_data_to_sc2  ) status |= 0x01; // receive  buffer full
+	if ( !m_adder2_data_from_sc2) status |= 0x02; // transmit buffer empty
 
 	return status;
 }
+
 
 ////////////////////////////////////////////////////////////////////
 //                                                                //
@@ -445,17 +452,15 @@ int adder2_status()
 //                                                                //
 ////////////////////////////////////////////////////////////////////
 
-void adder2_decode_char_roms(running_machine &machine)
+void bfm_adder2_device::adder2_decode_char_roms()
 {
-	UINT8 *p;
-
-	p = machine.root_device().memregion("gfx1")->base();
+	UINT8 *p = machine().root_device().memregion("gfx1")->base();
 
 	if ( p )
 	{
 		UINT8 *s;
 
-		s = auto_alloc_array(machine, UINT8, 0x40000 );
+		s = auto_alloc_array(machine(), UINT8, 0x40000 );
 		{
 			int x, y;
 
@@ -482,7 +487,7 @@ void adder2_decode_char_roms(running_machine &machine)
 				}
 				y++;
 			}
-			auto_free(machine, s);
+			auto_free(machine(), s);
 		}
 	}
 }
@@ -491,25 +496,25 @@ void adder2_decode_char_roms(running_machine &machine)
 // adder2 board memorymap /////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-static ADDRESS_MAP_START( adder2_memmap, AS_PROGRAM, 8, driver_device )
+static ADDRESS_MAP_START( adder2_memmap, AS_PROGRAM, 8, bfm_adder2_device )
 
-	AM_RANGE(0x0000, 0x0000) AM_WRITE_LEGACY(adder2_screen_page_w)      // screen access/display select
+	AM_RANGE(0x0000, 0x0000) AM_WRITE(adder2_screen_page_w)      // screen access/display select
 	AM_RANGE(0x0000, 0x7FFF) AM_ROMBANK("bank2")                // 8k  paged ROM (4 pages)
-	AM_RANGE(0x8000, 0x917F) AM_READWRITE_LEGACY(screen_ram_r, screen_ram_w)
-	AM_RANGE(0x9180, 0x9FFF) AM_READWRITE_LEGACY(normal_ram_r, normal_ram_w)
+	AM_RANGE(0x8000, 0x917F) AM_READWRITE(screen_ram_r, screen_ram_w)
+	AM_RANGE(0x9180, 0x9FFF) AM_READWRITE(normal_ram_r, normal_ram_w)
 
-	AM_RANGE(0xC000, 0xC000) AM_WRITE_LEGACY(adder2_rom_page_w)     // ROM page select
-	AM_RANGE(0xC001, 0xC001) AM_WRITE_LEGACY(adder2_c001_w)         // ??
+	AM_RANGE(0xC000, 0xC000) AM_WRITE(adder2_rom_page_w)     // ROM page select
+	AM_RANGE(0xC001, 0xC001) AM_WRITE(adder2_c001_w)         // ??
 
-	AM_RANGE(0xC101, 0xC101) AM_READWRITE_LEGACY(adder2_vbl_ctrl_r, adder2_vbl_ctrl_w)
-	AM_RANGE(0xC103, 0xC103) AM_READ_LEGACY(adder2_irq_r)               // IRQ latch read
+	AM_RANGE(0xC101, 0xC101) AM_READWRITE(adder2_vbl_ctrl_r, adder2_vbl_ctrl_w)
+	AM_RANGE(0xC103, 0xC103) AM_READ(adder2_irq_r)               // IRQ latch read
 
 	// MC6850 compatible uart connected to main (scorpion2) board ///////////////////////////////////////
 
-	AM_RANGE(0xC200, 0xC200) AM_READWRITE_LEGACY(adder2_uart_ctrl_r, adder2_uart_ctrl_w )   // 6850 compatible uart control reg
-	AM_RANGE(0xC201, 0xC201) AM_READWRITE_LEGACY(adder2_uart_rx_r, adder2_uart_tx_w )   // 6850 compatible uart data reg
+	AM_RANGE(0xC200, 0xC200) AM_READWRITE(adder2_uart_ctrl_r, adder2_uart_ctrl_w )   // 6850 compatible uart control reg
+	AM_RANGE(0xC201, 0xC201) AM_READWRITE(adder2_uart_rx_r, adder2_uart_tx_w )   // 6850 compatible uart data reg
 
-	AM_RANGE(0xE000, 0xFFFF) AM_ROM                             // 8k  ROM
+	AM_RANGE(0xE000, 0xFFFF) AM_ROM  AM_REGION(":adder2", 0xE000)                         // 8k  ROM
 ADDRESS_MAP_END
 
 static const gfx_layout charlayout =
@@ -534,21 +539,29 @@ GFXDECODE_END
 
 ///////////////////////////////////////////////////////////////////////////
 
-MACHINE_CONFIG_FRAGMENT( adder2 )
-	MCFG_SCREEN_ADD("adder", RASTER)
+static MACHINE_CONFIG_FRAGMENT( adder2 )
+	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_SIZE( 400, 280)
 	MCFG_SCREEN_VISIBLE_AREA(  0, 400-1, 0, 280-1)
 	MCFG_SCREEN_REFRESH_RATE(50)
 
-	MCFG_VIDEO_START( adder2)
-	MCFG_SCREEN_UPDATE_STATIC(adder2)
-	MCFG_VIDEO_RESET( adder2)
+	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, bfm_adder2_device, update_screen)
 
 	MCFG_PALETTE_LENGTH(16)
-	MCFG_PALETTE_INIT(adder2)
 	MCFG_GFXDECODE(adder2)
 
 	MCFG_CPU_ADD("adder2", M6809, ADDER_CLOCK/4 )  // adder2 board 6809 CPU at 2 Mhz
 	MCFG_CPU_PROGRAM_MAP(adder2_memmap)             // setup adder2 board memorymap
-	MCFG_CPU_VBLANK_INT("adder", adder2_vbl)        // board has a VBL IRQ
+	MCFG_DEVICE_VBLANK_INT_DEVICE("screen", DEVICE_SELF, bfm_adder2_device, adder2_vbl)        // board has a VBL IRQ
 MACHINE_CONFIG_END
+
+//-------------------------------------------------
+//  machine_config_additions - device-specific
+//  machine configurations
+//-------------------------------------------------
+
+machine_config_constructor bfm_adder2_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( adder2 );
+}
+

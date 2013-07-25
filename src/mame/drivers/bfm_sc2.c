@@ -171,8 +171,6 @@ Adder hardware:
 #include "sc2_dmd.lh"
 #include "drwho.lh"
 #include "machine/bfm_comn.h"
-#include "drivlgcy.h"
-#include "scrlegcy.h"
 
 
 class bfm_sc2_state : public driver_device
@@ -183,8 +181,7 @@ public:
 			m_vfd0(*this, "vfd0"),
 			m_vfd1(*this, "vfd1"),
 			m_maincpu(*this, "maincpu"),
-			m_upd7759(*this, "upd"),
-			m_adder2(*this, "adder2") { }
+			m_upd7759(*this, "upd") { }
 
 	optional_device<bfm_bd1_t> m_vfd0;
 	optional_device<bfm_bd1_t> m_vfd1;
@@ -270,10 +267,6 @@ public:
 	DECLARE_READ8_MEMBER(uart2data_r);
 	DECLARE_WRITE8_MEMBER(uart2ctrl_w);
 	DECLARE_WRITE8_MEMBER(uart2data_w);
-	DECLARE_WRITE8_MEMBER(vid_uart_tx_w);
-	DECLARE_WRITE8_MEMBER(vid_uart_ctrl_w);
-	DECLARE_READ8_MEMBER(vid_uart_rx_r);
-	DECLARE_READ8_MEMBER(vid_uart_ctrl_r);
 	DECLARE_READ8_MEMBER(key_r);
 	DECLARE_READ8_MEMBER(vfd_status_r);
 	DECLARE_WRITE8_MEMBER(vfd1_bd1_w);
@@ -321,7 +314,6 @@ public:
 	void sc2awpdmd_common_init(int reels, int decrypt);
 	required_device<cpu_device> m_maincpu;
 	required_device<upd7759_device> m_upd7759;
-	optional_device<cpu_device> m_adder2;
 };
 
 
@@ -1027,40 +1019,8 @@ WRITE8_MEMBER(bfm_sc2_state::uart2data_w)
 	UART_LOG(("uart2:%x\n", data));
 }
 
-///////////////////////////////////////////////////////////////////////////
-
-WRITE8_MEMBER(bfm_sc2_state::vid_uart_tx_w)
-{
-	adder2_send(data);
-	m_adder2->set_input_line(M6809_IRQ_LINE, HOLD_LINE );
-
-	LOG_SERIAL(("sadder  %02X  (%c)\n",data, data ));
-}
 
 ///////////////////////////////////////////////////////////////////////////
-
-WRITE8_MEMBER(bfm_sc2_state::vid_uart_ctrl_w)
-{
-}
-
-///////////////////////////////////////////////////////////////////////////
-
-READ8_MEMBER(bfm_sc2_state::vid_uart_rx_r)
-{
-	int data = adder2_receive();
-
-	LOG_SERIAL(("radder:  %02X(%c)\n",data, data ));
-
-	return data;
-}
-
-///////////////////////////////////////////////////////////////////////////
-
-READ8_MEMBER(bfm_sc2_state::vid_uart_ctrl_r)
-{
-	return adder2_status();
-}
-
 ///////////////////////////////////////////////////////////////////////////
 
 READ8_MEMBER(bfm_sc2_state::key_r)
@@ -1490,8 +1450,8 @@ static ADDRESS_MAP_START( memmap_vid, AS_PROGRAM, 8, bfm_sc2_state )
 	AM_RANGE(0x3C00, 0x3C07) AM_READ(key_r   )
 	AM_RANGE(0x3C80, 0x3C80) AM_WRITE(e2ram_w )
 
-	AM_RANGE(0x3E00, 0x3E00) AM_READWRITE(vid_uart_ctrl_r, vid_uart_ctrl_w)     // video uart control reg
-	AM_RANGE(0x3E01, 0x3E01) AM_READWRITE(vid_uart_rx_r, vid_uart_tx_w)         // video uart data  reg
+	AM_RANGE(0x3E00, 0x3E00) AM_DEVREADWRITE("adder2", bfm_adder2_device, vid_uart_ctrl_r, vid_uart_ctrl_w)     // video uart control reg
+	AM_RANGE(0x3E01, 0x3E01) AM_DEVREADWRITE("adder2", bfm_adder2_device, vid_uart_rx_r,   vid_uart_tx_w)       // video uart data  reg
 ADDRESS_MAP_END
 
 // input ports for pyramid ////////////////////////////////////////
@@ -2164,8 +2124,7 @@ static MACHINE_CONFIG_START( scorpion2_vid, bfm_sc2_state )
 	MCFG_NVRAM_ADD_CUSTOM_DRIVER("e2ram", bfm_sc2_state, e2ram_init)
 	MCFG_DEFAULT_LAYOUT(layout_sc2_vid)
 
-	//MCFG_BFM_ADDER2_ADD("adder2")
-	MCFG_FRAGMENT_ADD(adder2)
+	MCFG_BFM_ADDER2_ADD("adder2")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
@@ -2275,7 +2234,6 @@ void bfm_sc2_state::adder2_common_init()
 DRIVER_INIT_MEMBER(bfm_sc2_state,quintoon)
 {
 	sc2_common_init( 1);
-	adder2_decode_char_roms(machine());
 	MechMtr_config(machine(),8);                    // setup mech meters
 
 	m_has_hopper = 0;
@@ -2296,7 +2254,6 @@ DRIVER_INIT_MEMBER(bfm_sc2_state,quintoon)
 DRIVER_INIT_MEMBER(bfm_sc2_state,pyramid)
 {
 	sc2_common_init(1);
-	adder2_decode_char_roms(machine());         // decode GFX roms
 	adder2_common_init();
 
 	m_has_hopper = 1;
@@ -2313,7 +2270,6 @@ DRIVER_INIT_MEMBER(bfm_sc2_state,pyramid)
 DRIVER_INIT_MEMBER(bfm_sc2_state,sltsbelg)
 {
 	sc2_common_init(1);
-	adder2_decode_char_roms(machine());         // decode GFX roms
 	adder2_common_init();
 
 	m_has_hopper = 1;
@@ -2327,7 +2283,6 @@ DRIVER_INIT_MEMBER(bfm_sc2_state,sltsbelg)
 DRIVER_INIT_MEMBER(bfm_sc2_state,adder_dutch)
 {
 	sc2_common_init(1);
-	adder2_decode_char_roms(machine());         // decode GFX roms
 	adder2_common_init();
 
 	m_has_hopper = 0;
@@ -2345,7 +2300,6 @@ DRIVER_INIT_MEMBER(bfm_sc2_state,adder_dutch)
 DRIVER_INIT_MEMBER(bfm_sc2_state,gldncrwn)
 {
 	sc2_common_init(1);
-	adder2_decode_char_roms(machine());         // decode GFX roms
 	adder2_common_init();
 
 	m_has_hopper = 0;

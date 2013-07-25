@@ -100,8 +100,6 @@ Optional (on expansion card) (Viper)
 #include "sound/upd7759.h"
 #include "machine/nvram.h"
 #include "machine/bfm_comn.h"
-#include "drivlgcy.h"
-#include "scrlegcy.h"
 
 #include "sc1_vfd.lh"
 #include "sc1_vid.lh"
@@ -113,8 +111,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_vfd0(*this, "vfd0"),
 		m_maincpu(*this, "maincpu"),
-		m_upd7759(*this, "upd"),
-		m_adder2(*this, "adder2") { }
+		m_upd7759(*this, "upd") { }
 
 	optional_device<bfm_bd1_t> m_vfd0;
 
@@ -167,10 +164,6 @@ public:
 	DECLARE_READ8_MEMBER(aciadata_r);
 	DECLARE_WRITE8_MEMBER(triac_w);
 	DECLARE_READ8_MEMBER(triac_r);
-	DECLARE_WRITE8_MEMBER(vid_uart_tx_w);
-	DECLARE_WRITE8_MEMBER(vid_uart_ctrl_w);
-	DECLARE_READ8_MEMBER(vid_uart_rx_r);
-	DECLARE_READ8_MEMBER(vid_uart_ctrl_r);
 	DECLARE_READ8_MEMBER(nec_r);
 	DECLARE_WRITE8_MEMBER(nec_reset_w);
 	DECLARE_WRITE8_MEMBER(nec_latch_w);
@@ -189,8 +182,7 @@ public:
 	int Scorpion1_GetSwitchState(int strobe, int data);
 	int sc1_find_project_string( );
 	required_device<cpu_device> m_maincpu;
-	optional_device<upd7759_device> m_upd7759;
-	optional_device<cpu_device> m_adder2;
+	optional_device<upd7759_device> m_upd7759;	
 };
 
 #define VFD_RESET  0x20
@@ -619,35 +611,6 @@ WRITE8_MEMBER(bfm_sc1_state::nec_latch_w)
 	m_upd7759->start_w(1);         // start
 }
 
-/////////////////////////////////////////////////////////////////////////////////////
-
-WRITE8_MEMBER(bfm_sc1_state::vid_uart_tx_w)
-{
-	adder2_send(data);
-	m_adder2->set_input_line(M6809_IRQ_LINE, ASSERT_LINE );//HOLD_LINE);// trigger IRQ
-}
-
-///////////////////////////////////////////////////////////////////////////
-
-WRITE8_MEMBER(bfm_sc1_state::vid_uart_ctrl_w)
-{
-}
-
-///////////////////////////////////////////////////////////////////////////
-
-READ8_MEMBER(bfm_sc1_state::vid_uart_rx_r)
-{
-	return adder2_receive();
-}
-
-///////////////////////////////////////////////////////////////////////////
-
-READ8_MEMBER(bfm_sc1_state::vid_uart_ctrl_r)
-{
-	return adder2_status();
-}
-
-
 // machine start (called only once) /////////////////////////////////////////////////
 
 void bfm_sc1_state::machine_reset()
@@ -742,8 +705,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sc1_adder2, AS_PROGRAM, 8, bfm_sc1_state )
 	AM_IMPORT_FROM( sc1_base )
 
-	AM_RANGE(0x3E00, 0x3E00) AM_READWRITE(vid_uart_ctrl_r,vid_uart_ctrl_w)  // video uart control reg read
-	AM_RANGE(0x3E01, 0x3E01) AM_READWRITE(vid_uart_rx_r,vid_uart_tx_w)      // video uart receive  reg
+	AM_RANGE(0x3E00, 0x3E00) AM_DEVREADWRITE("adder2", bfm_adder2_device, vid_uart_ctrl_r,vid_uart_ctrl_w)  // video uart control reg read
+	AM_RANGE(0x3E01, 0x3E01) AM_DEVREADWRITE("adder2", bfm_adder2_device, vid_uart_rx_r,vid_uart_tx_w)      // video uart receive  reg
 ADDRESS_MAP_END
 
 
@@ -1130,8 +1093,7 @@ static MACHINE_CONFIG_DERIVED( scorpion1_adder2, scorpion1 )
 
 	MCFG_DEFAULT_LAYOUT(layout_sc1_vid)
 	
-	//MCFG_BFM_ADDER2_ADD("adder2")
-	MCFG_FRAGMENT_ADD(adder2)
+	MCFG_BFM_ADDER2_ADD("adder2")
 MACHINE_CONFIG_END
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -1244,7 +1206,6 @@ int bfm_sc1_state::sc1_find_project_string( )
 DRIVER_INIT_MEMBER(bfm_sc1_state,toppoker)
 {
 	sc1_common_init(3,1, 3);
-	adder2_decode_char_roms(machine()); // decode GFX roms
 	MechMtr_config(machine(),8);
 	sc1_find_project_string();
 }
