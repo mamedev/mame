@@ -282,8 +282,8 @@ WRITE16_MEMBER(highvdeo_state::tv_oki6376_w)
 	if (ACCESSING_BITS_0_7 && okidata != data)
 	{
 		okidata = data;
-		okim6376_w(m_okim6376, space, 0, data & ~0x80);
-		okim6376_st_w (m_okim6376, data & 0x80);
+		m_okim6376->write(space, 0, data & ~0x80);
+		m_okim6376->st_w(data & 0x80);
 	}
 }
 
@@ -291,7 +291,7 @@ READ16_MEMBER(highvdeo_state::tv_oki6376_r)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		return okim6376_busy_r(m_okim6376);
+		return m_okim6376->busy_r();
 	}
 	return 0xff;
 }
@@ -354,7 +354,7 @@ WRITE16_MEMBER(highvdeo_state::tv_ncf_oki6376_w)
 	static int okidata;
 	if (ACCESSING_BITS_0_7 && okidata != data) {
 		okidata = data;
-		okim6376_w(m_okim6376, space, 0, data );
+		m_okim6376->write( space, 0, data );
 	}
 }
 
@@ -362,7 +362,7 @@ WRITE16_MEMBER(highvdeo_state::tv_ncf_oki6376_st_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		okim6376_st_w(m_okim6376, (data & 0x80) );
+		m_okim6376->st_w( (data & 0x80) );
 	}
 }
 

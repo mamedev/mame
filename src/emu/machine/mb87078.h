@@ -19,25 +19,46 @@ typedef void (*mb87078_gain_changed_cb)(running_machine &machine, int channel, i
 
 struct mb87078_interface
 {
-	mb87078_gain_changed_cb   gain_changed_cb;
+	mb87078_gain_changed_cb   m_gain_changed_cb;
 };
 
-class mb87078_device : public device_t
+class mb87078_device : public device_t,
+										mb87078_interface
 {
 public:
 	mb87078_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~mb87078_device() { global_free(m_token); }
+	~mb87078_device() {}
 
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
+	void data_w(int data, int dsel);
+	void reset_comp_w(int level);
+
+
+	/* gain_decibel_r will return 'channel' gain on the device.
+	   Returned value represents channel gain expressed in decibels,
+	   Range from 0 to -32.0 (or -256.0 for -infinity) */
+	float gain_decibel_r(int channel);
+
+
+	/* gain_percent_r will return 'channel' gain on the device.
+	   Returned value represents channel gain expressed in percents of maximum volume.
+	   Range from 100 to 0. (100 = 0dB; 50 = -6dB; 0 = -infinity)
+	   This function is designed for use with MAME mixer_xxx() functions. */
+	int gain_percent_r(int channel);
+	
+	void gain_recalc();
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
+	
 private:
 	// internal state
-	void *m_token;
+	int          m_gain[4];       /* gain index 0-63,64,65 */
+	int          m_channel_latch; /* current channel */
+	UINT8        m_latch[2][4];   /* 6bit+3bit 4 data latches */
+	UINT8        m_reset_comp;
 };
 
 extern const device_type MB87078;
@@ -50,27 +71,5 @@ extern const device_type MB87078;
 #define MCFG_MB87078_ADD(_tag, _interface) \
 	MCFG_DEVICE_ADD(_tag, MB87078, 0) \
 	MCFG_DEVICE_CONFIG(_interface)
-
-
-/***************************************************************************
-    DEVICE I/O FUNCTIONS
-***************************************************************************/
-
-void mb87078_data_w(device_t *device, int data, int dsel);
-void mb87078_reset_comp_w(device_t *device, int level);
-
-
-/* mb87078_gain_decibel_r will return 'channel' gain on the device.
-   Returned value represents channel gain expressed in decibels,
-   Range from 0 to -32.0 (or -256.0 for -infinity) */
-float mb87078_gain_decibel_r(device_t *device, int channel);
-
-
-/* mb87078_gain_percent_r will return 'channel' gain on the device.
-   Returned value represents channel gain expressed in percents of maximum volume.
-   Range from 100 to 0. (100 = 0dB; 50 = -6dB; 0 = -infinity)
-   This function is designed for use with MAME mixer_xxx() functions. */
-int   mb87078_gain_percent_r(device_t *device, int channel);
-
 
 #endif  /* __MB87078_H__ */

@@ -1459,7 +1459,7 @@ static const pia6821_interface pia_ic8_intf =
 WRITE8_MEMBER(mpu4_state::pia_gb_porta_w)
 {
 	LOG_SS(("%s: GAMEBOARD: PIA Port A Set to %2x\n", machine().describe_context(),data));
-	okim6376_w(m_msm6376, space, 0, data);
+	m_msm6376->write(space, 0, data);
 }
 
 WRITE8_MEMBER(mpu4_state::pia_gb_portb_w)
@@ -1488,8 +1488,8 @@ WRITE8_MEMBER(mpu4_state::pia_gb_portb_w)
 			}
 		}
 	}
-	okim6376_ch2_w(m_msm6376,data&0x02);
-	okim6376_st_w(m_msm6376,data&0x01);
+	m_msm6376->ch2_w(data&0x02);
+	m_msm6376->st_w(data&0x01);
 }
 READ8_MEMBER(mpu4_state::pia_gb_portb_r)
 {
@@ -1501,10 +1501,10 @@ READ8_MEMBER(mpu4_state::pia_gb_portb_r)
 	// b4, 1 = Vol down, 0 = Vol up
 	//
 
-	if ( okim6376_nar_r(m_msm6376) ) data |= 0x80;
+	if ( m_msm6376->nar_r() ) data |= 0x80;
 	else                           data &= ~0x80;
 
-	if ( okim6376_busy_r(m_msm6376) ) data |= 0x40;
+	if ( m_msm6376->busy_r() ) data |= 0x40;
 	else                            data &= ~0x40;
 
 	return ( data | m_expansion_latch );
@@ -1606,7 +1606,7 @@ WRITE8_MEMBER(mpu4_state::ic3ss_w)
 
 	if (freq)
 	{
-		okim6376_set_frequency(m_msm6376, freq);
+		m_msm6376->set_frequency(freq);
 	}
 }
 

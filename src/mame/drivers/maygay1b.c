@@ -776,20 +776,20 @@ WRITE8_MEMBER(maygay1b_state::m1_latch_w)
 
 WRITE8_MEMBER(maygay1b_state::latch_ch2_w)
 {
-	okim6376_w(m_msm6376, space, 0, data&0x7f);
-	okim6376_ch2_w(m_msm6376,data&0x80);
+	m_msm6376->write(space, 0, data&0x7f);
+	m_msm6376->ch2_w(data&0x80);
 }
 
 //A strange setup this, the address lines are used to move st to the right level
 READ8_MEMBER(maygay1b_state::latch_st_hi)
 {
-	okim6376_st_w(m_msm6376,1);
+	m_msm6376->st_w(1);
 	return 0;
 }
 
 READ8_MEMBER(maygay1b_state::latch_st_lo)
 {
-	okim6376_st_w(m_msm6376,0);
+	m_msm6376->st_w(0);
 	return 0;
 }
 

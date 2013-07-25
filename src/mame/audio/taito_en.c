@@ -83,7 +83,7 @@ static WRITE16_HANDLER( en_es5505_bank_w )
 static WRITE16_HANDLER( en_volume_w )
 {
 	if (ACCESSING_BITS_8_15)
-		mb87078_data_w(space.machine().device("mb87078"), data >> 8, offset ^ 1);
+		space.machine().device<mb87078_device>("mb87078")->data_w(data >> 8, offset ^ 1);
 }
 
 

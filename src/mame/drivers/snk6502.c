@@ -317,7 +317,7 @@ void snk6502_state::sasuke_start_counter()
 
 CUSTOM_INPUT_MEMBER(snk6502_state::snk6502_music0_r)
 {
-	return (snk6502_music0_playing(machine()) ? 0x01 : 0x00);
+	return (m_sound->music0_playing() ? 0x01 : 0x00);
 }
 
 CUSTOM_INPUT_MEMBER(snk6502_state::sasuke_count_r)
@@ -341,7 +341,7 @@ static ADDRESS_MAP_START( sasuke_map, AS_PROGRAM, 8, snk6502_state )
 	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE("crtc", mc6845_device, register_w)
 	AM_RANGE(0x4000, 0x8fff) AM_ROM
-	AM_RANGE(0xb000, 0xb001) AM_WRITE_LEGACY(sasuke_sound_w)
+	AM_RANGE(0xb000, 0xb001) AM_DEVWRITE("snk6502", snk6502_sound_device, sasuke_sound_w)
 	AM_RANGE(0xb002, 0xb002) AM_WRITE(satansat_b002_w)  /* flip screen & irq enable */
 	AM_RANGE(0xb003, 0xb003) AM_WRITE(satansat_backcolor_w)
 	AM_RANGE(0xb004, 0xb004) AM_READ_PORT("IN0")
@@ -360,7 +360,7 @@ static ADDRESS_MAP_START( satansat_map, AS_PROGRAM, 8, snk6502_state )
 	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE("crtc", mc6845_device, register_w)
 	AM_RANGE(0x4000, 0x9fff) AM_ROM
-	AM_RANGE(0xb000, 0xb001) AM_WRITE_LEGACY(satansat_sound_w)
+	AM_RANGE(0xb000, 0xb001) AM_DEVWRITE("snk6502", snk6502_sound_device, satansat_sound_w)
 	AM_RANGE(0xb002, 0xb002) AM_WRITE(satansat_b002_w)  /* flip screen & irq enable */
 	AM_RANGE(0xb003, 0xb003) AM_WRITE(satansat_backcolor_w)
 	AM_RANGE(0xb004, 0xb004) AM_READ_PORT("IN0")
@@ -378,7 +378,7 @@ static ADDRESS_MAP_START( vanguard_map, AS_PROGRAM, 8, snk6502_state )
 	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(snk6502_charram_w) AM_SHARE("charram")
 	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE("crtc", mc6845_device, register_w)
-	AM_RANGE(0x3100, 0x3102) AM_WRITE_LEGACY(vanguard_sound_w)
+	AM_RANGE(0x3100, 0x3102) AM_DEVWRITE("snk6502", snk6502_sound_device, vanguard_sound_w)
 	AM_RANGE(0x3103, 0x3103) AM_WRITE(snk6502_flipscreen_w)
 	AM_RANGE(0x3104, 0x3104) AM_READ_PORT("IN0")
 	AM_RANGE(0x3105, 0x3105) AM_READ_PORT("IN1")
@@ -386,7 +386,7 @@ static ADDRESS_MAP_START( vanguard_map, AS_PROGRAM, 8, snk6502_state )
 	AM_RANGE(0x3107, 0x3107) AM_READ_PORT("IN2")
 	AM_RANGE(0x3200, 0x3200) AM_WRITE(snk6502_scrollx_w)
 	AM_RANGE(0x3300, 0x3300) AM_WRITE(snk6502_scrolly_w)
-	AM_RANGE(0x3400, 0x3400) AM_WRITE_LEGACY(vanguard_speech_w) // speech
+	AM_RANGE(0x3400, 0x3400) AM_DEVWRITE("snk6502", snk6502_sound_device, vanguard_speech_w) // speech
 	AM_RANGE(0x4000, 0xbfff) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_ROM /* for the reset / interrupt vectors */
 ADDRESS_MAP_END
@@ -399,14 +399,14 @@ static ADDRESS_MAP_START( fantasy_map, AS_PROGRAM, 8, snk6502_state )
 	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(snk6502_charram_w) AM_SHARE("charram")
 	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x2001, 0x2001) AM_DEVWRITE("crtc", mc6845_device, register_w)
-	AM_RANGE(0x2100, 0x2103) AM_WRITE_LEGACY(fantasy_sound_w)
+	AM_RANGE(0x2100, 0x2103) AM_DEVWRITE("snk6502", snk6502_sound_device, fantasy_sound_w)
 	AM_RANGE(0x2104, 0x2104) AM_READ_PORT("IN0")
 	AM_RANGE(0x2105, 0x2105) AM_READ_PORT("IN1")
 	AM_RANGE(0x2106, 0x2106) AM_READ_PORT("DSW")
 	AM_RANGE(0x2107, 0x2107) AM_READ_PORT("IN2")
 	AM_RANGE(0x2200, 0x2200) AM_WRITE(snk6502_scrollx_w)
 	AM_RANGE(0x2300, 0x2300) AM_WRITE(snk6502_scrolly_w)
-	AM_RANGE(0x2400, 0x2400) AM_WRITE_LEGACY(fantasy_speech_w)  // speech
+	AM_RANGE(0x2400, 0x2400) AM_DEVWRITE("snk6502", snk6502_sound_device, fantasy_speech_w)  // speech
 	AM_RANGE(0x3000, 0xbfff) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -420,7 +420,7 @@ static ADDRESS_MAP_START( pballoon_map, AS_PROGRAM, 8, snk6502_state )
 	AM_RANGE(0x3000, 0x9fff) AM_ROM
 	AM_RANGE(0xb000, 0xb000) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0xb001, 0xb001) AM_DEVWRITE("crtc", mc6845_device, register_w)
-	AM_RANGE(0xb100, 0xb103) AM_WRITE_LEGACY(fantasy_sound_w)
+	AM_RANGE(0xb100, 0xb103) AM_DEVWRITE("snk6502", snk6502_sound_device, fantasy_sound_w)
 	AM_RANGE(0xb104, 0xb104) AM_READ_PORT("IN0")
 	AM_RANGE(0xb105, 0xb105) AM_READ_PORT("IN1")
 	AM_RANGE(0xb106, 0xb106) AM_READ_PORT("DSW")
@@ -776,10 +776,10 @@ static MC6845_INTERFACE( mc6845_intf )
 
 MACHINE_RESET_MEMBER(snk6502_state,sasuke)
 {
-	snk6502_set_music_clock(machine(), M_LN2 * (RES_K(18) + RES_K(1)) * CAP_U(1));
+	m_sound->set_music_clock(M_LN2 * (RES_K(18) + RES_K(1)) * CAP_U(1));
 
 	// adjusted (measured through audio recording of pcb)
-	snk6502_set_music_freq(machine(), 35300);
+	m_sound->set_music_freq(35300);
 
 	sasuke_start_counter();
 }
@@ -788,7 +788,7 @@ MACHINE_RESET_MEMBER(snk6502_state,satansat)
 {
 	// same as sasuke (assumption?)
 	// NOTE: this was set before sasuke was adjusted to a lower freq, please don't modify until measured/confirmed on pcb
-	snk6502_set_music_freq(machine(), 38000);
+	m_sound->set_music_freq(38000);
 
 	sasuke_start_counter();
 }
@@ -796,13 +796,13 @@ MACHINE_RESET_MEMBER(snk6502_state,satansat)
 MACHINE_RESET_MEMBER(snk6502_state,vanguard)
 {
 	// 41.6 Hz update (measured)
-	snk6502_set_music_clock(machine(), 1 / 41.6);
+	m_sound->set_music_clock(1 / 41.6);
 }
 
 MACHINE_RESET_MEMBER(snk6502_state,pballoon)
 {
 	// 40.3 Hz update (measured)
-	snk6502_set_music_clock(machine(), 1 / 40.3);
+	m_sound->set_music_clock(1 / 40.3);
 }
 
 

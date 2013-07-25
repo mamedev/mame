@@ -28,7 +28,6 @@
 
 #include "emu.h"
 #include "gaelco3d.h"
-#include "devlegcy.h"
 
 //#define SHARED_MEM_DRIVER      (1)
 
@@ -78,46 +77,6 @@
 #define LINK_SLACK_B ((LINK_SLACK / 3) + 1)
 
 
-struct buf_t
-{
-	volatile UINT8 data;
-	volatile UINT8 stat;
-	volatile int cnt;
-	volatile int data_cnt;
-};
-
-struct shmem_t
-{
-	volatile INT32  lock;
-	buf_t               buf[2];
-};
-
-struct osd_shared_mem;
-
-struct gaelco_serial_state
-{
-	device_t *m_device;
-	devcb_resolved_write_line m_irq_func;
-
-	UINT8 m_status;
-	int m_last_in_msg_cnt;
-	int m_slack_cnt;
-
-	emu_timer *m_sync_timer;
-
-	buf_t *m_in_ptr;
-	buf_t *m_out_ptr;
-	osd_shared_mem *m_os_shmem;
-	shmem_t *m_shmem;
-};
-
-struct osd_shared_mem
-{
-	char *fn;
-	size_t size;
-	void *ptr;
-	int creator;
-};
 
 /* code below currently works on unix only */
 #ifdef SHARED_MEM_DRIVER
@@ -197,25 +156,6 @@ static void *osd_sharedmem_ptr(osd_shared_mem *os_shmem)
     INLINE FUNCTIONS
 ***************************************************************************/
 
-/*-------------------------------------------------
-    get_safe_token - convert a device's token
-    into a gaelco_serial_state
--------------------------------------------------*/
-
-INLINE gaelco_serial_state *get_token(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == GAELCO_SERIAL);
-	return (gaelco_serial_state *) downcast<gaelco_serial_device *>(device)->token();
-}
-
-INLINE const gaelco_serial_interface *get_interface(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == GAELCO_SERIAL);
-	return (gaelco_serial_interface *) downcast<gaelco_serial_device *>(device)->static_config();
-}
-
 INLINE void shmem_lock(shmem_t *shmem)
 {
 	while (atomic_exchange32(&shmem->lock,1) == 0)
@@ -227,239 +167,12 @@ INLINE void shmem_unlock(shmem_t *shmem)
 	atomic_exchange32(&shmem->lock,0);
 }
 
-/***************************************************************************
-    STATIC FUNCTIONS
-***************************************************************************/
-
-
-static TIMER_CALLBACK( set_status_cb )
-{
-	gaelco_serial_state *state = (gaelco_serial_state *) ptr;
-	UINT8 mask = param >> 8;
-	UINT8 set = param & 0xff;
-
-	state->m_status &= mask;
-	state->m_status |= set;
-}
-
-static void set_status(gaelco_serial_state *state, UINT8 mask, UINT8 set, int wait)
-{
-	state->m_device->machine().scheduler().timer_set(attotime::from_hz(wait), FUNC(set_status_cb), (mask << 8)|set,
-			state);
-}
-
-static void process_in(gaelco_serial_state *state)
-{
-	int t;
-
-	if ((state->m_in_ptr->stat & GAELCOSER_STATUS_RESET) != 0)
-		state->m_out_ptr->cnt = 0;
-
-	/* new data available ? */
-	t = state->m_in_ptr->data_cnt;
-	if (t != state->m_last_in_msg_cnt)
-	{
-		state->m_last_in_msg_cnt = t;
-		if (state->m_in_ptr->cnt > 10)
-		{
-			state->m_status &= ~GAELCOSER_STATUS_READY;
-			LOGMSG(("command receive %02x at %d (%d)\n", state->m_in_ptr->data, state->m_out_ptr->cnt, state->m_in_ptr->cnt));
-			if ((state->m_status & GAELCOSER_STATUS_IRQ_ENABLE) != 0)
-			{
-				state->m_irq_func(1);
-				LOGMSG(("irq!\n"));
-			}
-		}
-	}
-}
-
-static void sync_link(gaelco_serial_state *state)
-{
-	volatile buf_t *buf = state->m_in_ptr;
-	int breakme = 1;
-	do
-	{
-		shmem_lock(state->m_shmem);
-		process_in(state);
-		/* HACK: put some timing noise on the line */
-		if (buf->cnt + state->m_slack_cnt > state->m_out_ptr->cnt)
-			breakme = 0;
-		/* stop if not connected .. */
-		if ((state->m_out_ptr->stat & GAELCOSER_STATUS_RESET) != 0)
-			breakme = 0;
-		shmem_unlock(state->m_shmem);
-	} while (breakme);
-
-	state->m_slack_cnt++;
-	state->m_slack_cnt = (state->m_slack_cnt % LINK_SLACK) + LINK_SLACK_B;
-
-	shmem_lock(state->m_shmem);
-	state->m_out_ptr->stat &= ~GAELCOSER_STATUS_RESET;
-	shmem_unlock(state->m_shmem);
-}
-
-static TIMER_CALLBACK( link_cb )
-{
-	gaelco_serial_state *state = (gaelco_serial_state *) ptr;
-
-	shmem_lock(state->m_shmem);
-	state->m_out_ptr->cnt++;
-	sync_link(state);
-	shmem_unlock(state->m_shmem);
-}
-
-
-/***************************************************************************
-    INTERFACE FUNCTIONS
-***************************************************************************/
-
-
-
-WRITE8_DEVICE_HANDLER( gaelco_serial_irq_enable )
-{
-	LOGMSG(("???? irq enable %d\n", data));
-}
-
-READ8_DEVICE_HANDLER( gaelco_serial_status_r)
-{
-	gaelco_serial_state *serial = get_token(device);
-	UINT8 ret = 0;
-
-	shmem_lock(serial->m_shmem);
-	process_in(serial);
-	if ((serial->m_status & GAELCOSER_STATUS_READY) != 0)
-		ret |= 0x01;
-	if ((serial->m_in_ptr->stat & GAELCOSER_STATUS_RTS) != 0)
-		ret |= 0x02;
-	shmem_unlock(serial->m_shmem);
-	return ret;
-}
-
-WRITE8_DEVICE_HANDLER( gaelco_serial_data_w)
-{
-	gaelco_serial_state *serial = get_token(device);
-
-	shmem_lock(serial->m_shmem);
-
-	serial->m_out_ptr->data = data;
-	serial->m_status &= ~GAELCOSER_STATUS_READY;
-	serial->m_out_ptr->data_cnt++;
-
-	set_status(serial, ~GAELCOSER_STATUS_READY, GAELCOSER_STATUS_READY, LINK_FREQ );
-
-	shmem_unlock(serial->m_shmem);
-	LOGMSG(("command send %02x at %d\n", data, serial->m_out_ptr->cnt));
-}
-
-READ8_DEVICE_HANDLER( gaelco_serial_data_r)
-{
-	gaelco_serial_state *serial = get_token(device);
-	UINT8 ret;
-
-	shmem_lock(serial->m_shmem);
-	process_in(serial);
-	ret = (serial->m_in_ptr->data & 0xff);
-
-	serial->m_irq_func(0);
-	LOGMSG(("read %02x at %d (%d)\n", ret, serial->m_out_ptr->cnt, serial->m_in_ptr->cnt));
-
-	/* if we are not sending, mark as as ready */
-	if ((serial->m_status & GAELCOSER_STATUS_SEND) == 0)
-		serial->m_status |= GAELCOSER_STATUS_READY;
-
-	shmem_unlock(serial->m_shmem);
-	return ret;
-}
-
-WRITE8_DEVICE_HANDLER( gaelco_serial_unknown_w)
-{
-	gaelco_serial_state *serial = get_token(device);
-
-	shmem_lock(serial->m_shmem);
-	LOGMSG(("???? unknown serial access %d\n", data));
-	shmem_unlock(serial->m_shmem);
-
-}
-
-WRITE8_DEVICE_HANDLER( gaelco_serial_rts_w )
-{
-	gaelco_serial_state *serial = get_token(device);
-
-	shmem_lock(serial->m_shmem);
-
-	if (data == 0)
-		serial->m_out_ptr->stat |= GAELCOSER_STATUS_RTS;
-	else
-	{
-		//Commented out for now
-		//serial->m_status |= GAELCOSER_STATUS_READY;
-		serial->m_out_ptr->stat &= ~GAELCOSER_STATUS_RTS;
-	}
-
-	shmem_unlock(serial->m_shmem);
-}
-
-WRITE8_DEVICE_HANDLER( gaelco_serial_tr_w)
-{
-	gaelco_serial_state *serial = get_token(device);
-
-	LOGMSG(("set transmit %d\n", data));
-	shmem_lock(serial->m_shmem);
-	if ((data & 0x01) != 0)
-		serial->m_status |= GAELCOSER_STATUS_SEND;
-	else
-		serial->m_status &= ~GAELCOSER_STATUS_SEND;
-
-	shmem_unlock(serial->m_shmem);
-}
-
 
 /***************************************************************************
     DEVICE INTERFACE
 ***************************************************************************/
 
 #define PATH_NAME "/tmp/gaelco_serial"
-
-static DEVICE_START( gaelco_serial )
-{
-	gaelco_serial_state *state = get_token(device);
-	const gaelco_serial_interface *intf = get_interface(device);
-
-	/* validate arguments */
-	assert(device != NULL);
-	assert(strlen(device->tag()) < 20);
-
-	/* clear out CIA structure, and copy the interface */
-	memset(state, 0, sizeof(*state));
-	state->m_device = device;
-
-	state->m_irq_func.resolve(intf->irq_func, *device);
-	state->m_sync_timer = device->machine().scheduler().timer_alloc(FUNC(link_cb), state);
-
-	/* register for save states */
-	//device->save_item(NAME(earom->offset));
-	//device->save_item(NAME(earom->data));
-
-#ifdef SHARED_MEM_DRIVER
-	state->m_sync_timer->adjust(attotime::zero,0,attotime::from_hz(SYNC_FREQ));
-#endif
-
-	state->m_os_shmem = osd_sharedmem_alloc(PATH_NAME, 0, sizeof(shmem_t));
-	if (state->m_os_shmem == NULL)
-	{
-		state->m_os_shmem = osd_sharedmem_alloc(PATH_NAME, 1, sizeof(shmem_t));
-		state->m_shmem = (shmem_t *) osd_sharedmem_ptr(state->m_os_shmem);
-
-		state->m_in_ptr = &state->m_shmem->buf[0];
-		state->m_out_ptr = &state->m_shmem->buf[1];
-	}
-	else
-	{
-		state->m_shmem = (shmem_t *) osd_sharedmem_ptr(state->m_os_shmem);
-		state->m_in_ptr = &state->m_shmem->buf[1];
-		state->m_out_ptr = &state->m_shmem->buf[0];
-	}
-}
 
 static void buf_reset(buf_t *buf)
 {
@@ -469,39 +182,19 @@ static void buf_reset(buf_t *buf)
 	buf->cnt = 0;
 }
 
-static DEVICE_RESET( gaelco_serial )
-{
-	gaelco_serial_state *state = get_token(device);
-
-	state->m_status = GAELCOSER_STATUS_READY    |GAELCOSER_STATUS_IRQ_ENABLE ;
-
-	state->m_last_in_msg_cnt = -1;
-	state->m_slack_cnt = LINK_SLACK_B;
-
-	shmem_lock(state->m_shmem);
-	buf_reset(state->m_out_ptr);
-	buf_reset(state->m_in_ptr);
-	shmem_unlock(state->m_shmem);
-}
-
-static DEVICE_STOP( gaelco_serial )
-{
-	gaelco_serial_state *state = get_token(device);
-
-	shmem_lock(state->m_shmem);
-	buf_reset(state->m_out_ptr);
-	buf_reset(state->m_in_ptr);
-	shmem_unlock(state->m_shmem);
-
-	osd_sharedmem_free(state->m_os_shmem);
-}
-
 const device_type GAELCO_SERIAL = &device_creator<gaelco_serial_device>;
 
 gaelco_serial_device::gaelco_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, GAELCO_SERIAL, "gaelco_serial", tag, owner, clock, "gaelco_serial", __FILE__)
+	: device_t(mconfig, GAELCO_SERIAL, "gaelco_serial", tag, owner, clock, "gaelco_serial", __FILE__),
+	m_status(0),
+	m_last_in_msg_cnt(0),
+	m_slack_cnt(0),
+	m_sync_timer(NULL),
+	m_in_ptr(NULL),
+	m_out_ptr(NULL),
+	m_os_shmem(NULL),
+	m_shmem(NULL)
 {
-	m_token = global_alloc_clear(gaelco_serial_state);
 }
 
 //-------------------------------------------------
@@ -512,6 +205,16 @@ gaelco_serial_device::gaelco_serial_device(const machine_config &mconfig, const 
 
 void gaelco_serial_device::device_config_complete()
 {
+	// inherit a copy of the static data
+	const gaelco_serial_interface *intf = reinterpret_cast<const gaelco_serial_interface *>(static_config());
+	if (intf != NULL)
+		*static_cast<gaelco_serial_interface *>(this) = *intf;
+
+	// or initialize to defaults if none provided
+	else
+	{
+		memset(&m_irq, 0, sizeof(m_irq));
+	}
 }
 
 //-------------------------------------------------
@@ -520,7 +223,39 @@ void gaelco_serial_device::device_config_complete()
 
 void gaelco_serial_device::device_start()
 {
-	DEVICE_START_NAME( gaelco_serial )(this);
+	/* validate arguments */
+	assert(strlen(tag()) < 20);
+
+	/* clear out CIA structure, and copy the interface */
+	//memset(state, 0, sizeof(*state));
+	//m_device = device;
+
+	m_irq_func.resolve(m_irq, *this);
+	m_sync_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gaelco_serial_device::link_cb), this));
+
+	/* register for save states */
+	//save_item(NAME(earom->offset));
+	//save_item(NAME(earom->data));
+
+#ifdef SHARED_MEM_DRIVER
+	m_sync_timer->adjust(attotime::zero,0,attotime::from_hz(SYNC_FREQ));
+#endif
+
+	m_os_shmem = osd_sharedmem_alloc(PATH_NAME, 0, sizeof(shmem_t));
+	if (m_os_shmem == NULL)
+	{
+		m_os_shmem = osd_sharedmem_alloc(PATH_NAME, 1, sizeof(shmem_t));
+		m_shmem = (shmem_t *) osd_sharedmem_ptr(m_os_shmem);
+
+		m_in_ptr = &m_shmem->buf[0];
+		m_out_ptr = &m_shmem->buf[1];
+	}
+	else
+	{
+		m_shmem = (shmem_t *) osd_sharedmem_ptr(m_os_shmem);
+		m_in_ptr = &m_shmem->buf[1];
+		m_out_ptr = &m_shmem->buf[0];
+	}
 }
 
 //-------------------------------------------------
@@ -529,7 +264,15 @@ void gaelco_serial_device::device_start()
 
 void gaelco_serial_device::device_reset()
 {
-	DEVICE_RESET_NAME( gaelco_serial )(this);
+	m_status = GAELCOSER_STATUS_READY    |GAELCOSER_STATUS_IRQ_ENABLE ;
+
+	m_last_in_msg_cnt = -1;
+	m_slack_cnt = LINK_SLACK_B;
+
+	shmem_lock(m_shmem);
+	buf_reset(m_out_ptr);
+	buf_reset(m_in_ptr);
+	shmem_unlock(m_shmem);
 }
 
 //-------------------------------------------------
@@ -538,5 +281,177 @@ void gaelco_serial_device::device_reset()
 
 void gaelco_serial_device::device_stop()
 {
-	DEVICE_STOP_NAME( gaelco_serial )(this);
+	shmem_lock(m_shmem);
+	buf_reset(m_out_ptr);
+	buf_reset(m_in_ptr);
+	shmem_unlock(m_shmem);
+
+	osd_sharedmem_free(m_os_shmem);
+}
+
+TIMER_CALLBACK_MEMBER( gaelco_serial_device::set_status_cb )
+{
+	UINT8 mask = param >> 8;
+	UINT8 set = param & 0xff;
+
+	m_status &= mask;
+	m_status |= set;
+}
+
+void gaelco_serial_device::set_status(UINT8 mask, UINT8 set, int wait)
+{
+	machine().scheduler().timer_set(attotime::from_hz(wait), timer_expired_delegate(FUNC(gaelco_serial_device::set_status_cb), this), (mask << 8)|set);
+}
+
+void gaelco_serial_device::process_in()
+{
+	int t;
+
+	if ((m_in_ptr->stat & GAELCOSER_STATUS_RESET) != 0)
+		m_out_ptr->cnt = 0;
+
+	/* new data available ? */
+	t = m_in_ptr->data_cnt;
+	if (t != m_last_in_msg_cnt)
+	{
+		m_last_in_msg_cnt = t;
+		if (m_in_ptr->cnt > 10)
+		{
+			m_status &= ~GAELCOSER_STATUS_READY;
+			LOGMSG(("command receive %02x at %d (%d)\n", m_in_ptr->data, m_out_ptr->cnt, m_in_ptr->cnt));
+			if ((m_status & GAELCOSER_STATUS_IRQ_ENABLE) != 0)
+			{
+				m_irq_func(1);
+				LOGMSG(("irq!\n"));
+			}
+		}
+	}
+}
+
+void gaelco_serial_device::sync_link()
+{
+	volatile buf_t *buf = m_in_ptr;
+	int breakme = 1;
+	do
+	{
+		shmem_lock(m_shmem);
+		process_in();
+		/* HACK: put some timing noise on the line */
+		if (buf->cnt + m_slack_cnt > m_out_ptr->cnt)
+			breakme = 0;
+		/* stop if not connected .. */
+		if ((m_out_ptr->stat & GAELCOSER_STATUS_RESET) != 0)
+			breakme = 0;
+		shmem_unlock(m_shmem);
+	} while (breakme);
+
+	m_slack_cnt++;
+	m_slack_cnt = (m_slack_cnt % LINK_SLACK) + LINK_SLACK_B;
+
+	shmem_lock(m_shmem);
+	m_out_ptr->stat &= ~GAELCOSER_STATUS_RESET;
+	shmem_unlock(m_shmem);
+}
+
+TIMER_CALLBACK_MEMBER( gaelco_serial_device::link_cb )
+{
+	shmem_lock(m_shmem);
+	m_out_ptr->cnt++;
+	sync_link();
+	shmem_unlock(m_shmem);
+}
+
+
+/***************************************************************************
+    INTERFACE FUNCTIONS
+***************************************************************************/
+
+
+
+WRITE8_MEMBER( gaelco_serial_device::irq_enable )
+{
+	LOGMSG(("???? irq enable %d\n", data));
+}
+
+READ8_MEMBER( gaelco_serial_device::status_r)
+{
+	UINT8 ret = 0;
+
+	shmem_lock(m_shmem);
+	process_in();
+	if ((m_status & GAELCOSER_STATUS_READY) != 0)
+		ret |= 0x01;
+	if ((m_in_ptr->stat & GAELCOSER_STATUS_RTS) != 0)
+		ret |= 0x02;
+	shmem_unlock(m_shmem);
+	return ret;
+}
+
+WRITE8_MEMBER( gaelco_serial_device::data_w)
+{
+	shmem_lock(m_shmem);
+
+	m_out_ptr->data = data;
+	m_status &= ~GAELCOSER_STATUS_READY;
+	m_out_ptr->data_cnt++;
+
+	set_status( ~GAELCOSER_STATUS_READY, GAELCOSER_STATUS_READY, LINK_FREQ );
+
+	shmem_unlock(m_shmem);
+	LOGMSG(("command send %02x at %d\n", data, m_out_ptr->cnt));
+}
+
+READ8_MEMBER( gaelco_serial_device::data_r)
+{
+	UINT8 ret;
+
+	shmem_lock(m_shmem);
+	process_in();
+	ret = (m_in_ptr->data & 0xff);
+
+	m_irq_func(0);
+	LOGMSG(("read %02x at %d (%d)\n", ret, m_out_ptr->cnt, m_in_ptr->cnt));
+
+	/* if we are not sending, mark as as ready */
+	if ((m_status & GAELCOSER_STATUS_SEND) == 0)
+		m_status |= GAELCOSER_STATUS_READY;
+
+	shmem_unlock(m_shmem);
+	return ret;
+}
+
+WRITE8_MEMBER( gaelco_serial_device::unknown_w)
+{
+	shmem_lock(m_shmem);
+	LOGMSG(("???? unknown serial access %d\n", data));
+	shmem_unlock(m_shmem);
+
+}
+
+WRITE8_MEMBER( gaelco_serial_device::rts_w )
+{
+	shmem_lock(m_shmem);
+
+	if (data == 0)
+		m_out_ptr->stat |= GAELCOSER_STATUS_RTS;
+	else
+	{
+		//Commented out for now
+		//m_status |= GAELCOSER_STATUS_READY;
+		m_out_ptr->stat &= ~GAELCOSER_STATUS_RTS;
+	}
+
+	shmem_unlock(m_shmem);
+}
+
+WRITE8_MEMBER( gaelco_serial_device::tr_w)
+{
+	LOGMSG(("set transmit %d\n", data));
+	shmem_lock(m_shmem);
+	if ((data & 0x01) != 0)
+		m_status |= GAELCOSER_STATUS_SEND;
+	else
+		m_status &= ~GAELCOSER_STATUS_SEND;
+
+	shmem_unlock(m_shmem);
 }

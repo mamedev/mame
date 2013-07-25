@@ -70,17 +70,6 @@
 
 #include "emu.h"
 #include "machine/mb87078.h"
-#include "devlegcy.h"
-
-struct mb87078_state
-{
-	int          gain[4];       /* gain index 0-63,64,65 */
-	int          channel_latch; /* current channel */
-	UINT8        latch[2][4];   /* 6bit+3bit 4 data latches */
-	UINT8        reset_comp;
-
-	mb87078_gain_changed_cb   gain_changed_cb;
-};
 
 
 static const float mb87078_gain_decibel[66] = {
@@ -108,22 +97,64 @@ static const int mb87078_gain_percent[66] = {
 };
 
 /*****************************************************************************
-    INLINE FUNCTIONS
+    DEVICE INTERFACE
 *****************************************************************************/
 
-INLINE mb87078_state *get_safe_token( device_t *device )
-{
-	assert(device != NULL);
-	assert(device->type() == MB87078);
+const device_type MB87078 = &device_creator<mb87078_device>;
 
-	return (mb87078_state *)downcast<mb87078_device *>(device)->token();
+mb87078_device::mb87078_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, MB87078, "Fujitsu MB87078", tag, owner, clock, "mb87078", __FILE__),
+	//m_gain[4],
+	m_channel_latch(0),
+	//m_latch[2][4],
+	m_reset_comp(0)
+{
 }
 
-INLINE const mb87078_interface *get_interface( device_t *device )
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void mb87078_device::device_config_complete()
 {
-	assert(device != NULL);
-	assert((device->type() == MB87078));
-	return (const mb87078_interface *) device->static_config();
+	// inherit a copy of the static data
+	const mb87078_interface *intf = reinterpret_cast<const mb87078_interface *>(static_config());
+	if (intf != NULL)
+		*static_cast<mb87078_interface *>(this) = *intf;
+
+	// or initialize to defaults if none provided
+	else
+	{
+		m_gain_changed_cb = NULL;
+	}
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void mb87078_device::device_start()
+{
+	save_item(NAME(m_channel_latch));
+	save_item(NAME(m_reset_comp));
+	save_item(NAME(m_latch[0]));
+	save_item(NAME(m_latch[1]));
+	save_item(NAME(m_gain));
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void mb87078_device::device_reset()
+{
+	m_channel_latch = 0;
+
+	/* reset chip */
+	reset_comp_w(0);
+	reset_comp_w(1);
 }
 
 /*****************************************************************************
@@ -165,139 +196,67 @@ static int calc_gain_index( int data0, int data1 )
 }
 
 
-static void gain_recalc( device_t *device )
+void mb87078_device::gain_recalc()
 {
-	mb87078_state *mb87078 = get_safe_token(device);
 	int i;
 
 	for (i = 0; i < 4; i++)
 	{
-		int old_index = mb87078->gain[i];
-		mb87078->gain[i] = calc_gain_index(mb87078->latch[0][i], mb87078->latch[1][i]);
-		if (old_index != mb87078->gain[i])
-			mb87078->gain_changed_cb(device->machine(), i, mb87078_gain_percent[mb87078->gain[i]]);
+		int old_index = m_gain[i];
+		m_gain[i] = calc_gain_index(m_latch[0][i], m_latch[1][i]);
+		if (old_index != m_gain[i])
+			m_gain_changed_cb(machine(), i, mb87078_gain_percent[m_gain[i]]);
 	}
 }
 
 
 
-void mb87078_data_w( device_t *device, int data, int dsel )
+void mb87078_device::data_w( int data, int dsel )
 {
-	mb87078_state *mb87078 = get_safe_token(device);
-
-	if (mb87078->reset_comp == 0)
+	if (m_reset_comp == 0)
 		return;
 
 	if (dsel == 0)  /* gd0 - gd5 */
 	{
-		mb87078->latch[0][mb87078->channel_latch] = data & 0x3f;
+		m_latch[0][m_channel_latch] = data & 0x3f;
 	}
 	else        /* dcs1, dsc2, en, c0, c32, X */
 	{
-		mb87078->channel_latch = data & 3;
-		mb87078->latch[1][mb87078->channel_latch] = data & 0x1f; //always zero bit 5
+		m_channel_latch = data & 3;
+		m_latch[1][m_channel_latch] = data & 0x1f; //always zero bit 5
 	}
-	gain_recalc(device);
+	gain_recalc();
 }
 
 
-float mb87078_gain_decibel_r( device_t *device, int channel )
+float mb87078_device::gain_decibel_r( int channel )
 {
-	mb87078_state *mb87078 = get_safe_token(device);
-	return mb87078_gain_decibel[mb87078->gain[channel]];
+	return mb87078_gain_decibel[m_gain[channel]];
 }
 
 
-int mb87078_gain_percent_r( device_t *device, int channel )
+int mb87078_device::gain_percent_r( int channel )
 {
-	mb87078_state *mb87078 = get_safe_token(device);
-	return mb87078_gain_percent[mb87078->gain[channel]];
+	return mb87078_gain_percent[m_gain[channel]];
 }
 
-void mb87078_reset_comp_w( device_t *device, int level )
+void mb87078_device::reset_comp_w( int level )
 {
-	mb87078_state *mb87078 = get_safe_token(device);
-
-	mb87078->reset_comp = level;
+	m_reset_comp = level;
 
 	/*this seems to be true, according to the datasheets*/
 	if (level == 0)
 	{
-		mb87078->latch[0][0] = 0x3f;
-		mb87078->latch[0][1] = 0x3f;
-		mb87078->latch[0][2] = 0x3f;
-		mb87078->latch[0][3] = 0x3f;
+		m_latch[0][0] = 0x3f;
+		m_latch[0][1] = 0x3f;
+		m_latch[0][2] = 0x3f;
+		m_latch[0][3] = 0x3f;
 
-		mb87078->latch[1][0] = 0x0 | 0x4;
-		mb87078->latch[1][1] = 0x1 | 0x4;
-		mb87078->latch[1][2] = 0x2 | 0x4;
-		mb87078->latch[1][3] = 0x3 | 0x4;
+		m_latch[1][0] = 0x0 | 0x4;
+		m_latch[1][1] = 0x1 | 0x4;
+		m_latch[1][2] = 0x2 | 0x4;
+		m_latch[1][3] = 0x3 | 0x4;
 	}
 
-	gain_recalc(device);
-}
-
-/*****************************************************************************
-    DEVICE INTERFACE
-*****************************************************************************/
-
-static DEVICE_START( mb87078 )
-{
-	mb87078_state *mb87078 = get_safe_token(device);
-	const mb87078_interface *intf = get_interface(device);
-
-	mb87078->gain_changed_cb = intf->gain_changed_cb;
-
-	device->save_item(NAME(mb87078->channel_latch));
-	device->save_item(NAME(mb87078->reset_comp));
-	device->save_item(NAME(mb87078->latch[0]));
-	device->save_item(NAME(mb87078->latch[1]));
-	device->save_item(NAME(mb87078->gain));
-}
-
-static DEVICE_RESET( mb87078 )
-{
-	mb87078_state *mb87078 = get_safe_token(device);
-
-	mb87078->channel_latch = 0;
-
-	/* reset chip */
-	mb87078_reset_comp_w(device, 0);
-	mb87078_reset_comp_w(device, 1);
-}
-
-const device_type MB87078 = &device_creator<mb87078_device>;
-
-mb87078_device::mb87078_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MB87078, "Fujitsu MB87078", tag, owner, clock, "mb87078", __FILE__)
-{
-	m_token = global_alloc_clear(mb87078_state);
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void mb87078_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void mb87078_device::device_start()
-{
-	DEVICE_START_NAME( mb87078 )(this);
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void mb87078_device::device_reset()
-{
-	DEVICE_RESET_NAME( mb87078 )(this);
+	gain_recalc();
 }

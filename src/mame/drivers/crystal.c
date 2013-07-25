@@ -136,7 +136,9 @@ public:
 		m_textureram(*this, "textureram"),
 		m_frameram(*this, "frameram"),
 		m_reset_patch(*this, "reset_patch"),
-		m_maincpu(*this, "maincpu"){ }
+		m_maincpu(*this, "maincpu"),
+		m_vr0(*this, "vr0"),
+		m_ds1302(*this, "rtc") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT32> m_sysregs;
@@ -146,6 +148,11 @@ public:
 	required_shared_ptr<UINT32> m_frameram;
 	required_shared_ptr<UINT32> m_reset_patch;
 //  UINT32 *  m_nvram;    // currently this uses generic nvram handling
+
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<vr0video_device> m_vr0;
+	required_device<ds1302_device> m_ds1302;
 
 #ifdef IDLE_LOOP_SPEEDUP
 	UINT8     m_FlipCntRead;
@@ -161,9 +168,6 @@ public:
 	UINT32    m_DMActrl[2];
 	UINT8     m_OldPort4;
 
-	required_device<cpu_device> m_maincpu;
-	ds1302_device *m_ds1302;
-	device_t *m_vr0video;
 	DECLARE_READ32_MEMBER(FlipCount_r);
 	DECLARE_WRITE32_MEMBER(FlipCount_w);
 	DECLARE_READ32_MEMBER(Input_r);
@@ -578,10 +582,8 @@ void crystal_state::machine_start()
 {
 	int i;
 
-	m_ds1302 = machine().device<ds1302_device>("rtc");
-	m_vr0video = machine().device("vr0");
-
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(crystal_state::icallback),this));
+	
 	for (i = 0; i < 4; i++)
 		m_Timer[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(crystal_state::Timercb),this), (void*)(FPTR)i);
 
@@ -689,7 +691,7 @@ UINT32 crystal_state::screen_update_crystal(screen_device &screen, bitmap_ind16 
 	while ((head & 0x7ff) != (tail & 0x7ff))
 	{
 		// ERROR: This cast is NOT endian-safe without the use of BYTE/WORD/DWORD_XOR_* macros!
-		DoFlip = vrender0_ProcessPacket(m_vr0video, 0x03800000 + head * 64, DrawDest, reinterpret_cast<UINT8*>(m_textureram.target()));
+		DoFlip = m_vr0->vrender0_ProcessPacket(0x03800000 + head * 64, DrawDest, reinterpret_cast<UINT8*>(m_textureram.target()));
 		head++;
 		head &= 0x7ff;
 		if (DoFlip)

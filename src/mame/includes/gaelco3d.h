@@ -9,6 +9,7 @@
 #include "sound/dmadac.h"
 #include "video/polynew.h"
 #include "machine/eeprom.h"
+#include "machine/gaelco3d.h"
 
 #define SOUND_CHANNELS  4
 
@@ -61,13 +62,19 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_adsp(*this, "adsp"),
 		m_eeprom(*this, "eeprom"),
-		m_tms(*this, "tms") { }
+		m_tms(*this, "tms"),
+		m_serial(*this, "serial") { }
 
 	required_shared_ptr<UINT32> m_adsp_ram_base;
 	required_shared_ptr<UINT16> m_m68k_ram_base;
 	required_shared_ptr<UINT16> m_tms_comm_base;
 	required_shared_ptr<UINT16> m_adsp_control_regs;
 	required_shared_ptr<UINT16> m_adsp_fastram_base;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_adsp;
+	required_device<eeprom_device> m_eeprom;
+	required_device<cpu_device> m_tms;
+	required_device<gaelco_serial_device> m_serial;
 	UINT16 m_sound_data;
 	UINT8 m_sound_status;
 	offs_t m_tms_offset_xor;
@@ -125,8 +132,4 @@ public:
 	TIMER_CALLBACK_MEMBER(delayed_sound_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(adsp_autobuffer_irq);
 	void gaelco3d_render(screen_device &screen);
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_adsp;
-	required_device<eeprom_device> m_eeprom;
-	required_device<cpu_device> m_tms;
 };

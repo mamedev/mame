@@ -181,7 +181,6 @@ TODO!
 #include "includes/taitoipt.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/eeprom.h"
-#include "machine/mb87078.h"
 #include "audio/taitosnd.h"
 #include "sound/2203intf.h"
 #include "sound/2610intf.h"
@@ -352,12 +351,12 @@ WRITE16_MEMBER(taitob_state::gain_control_w)
 	{
 		if (offset == 0)
 		{
-			mb87078_data_w(m_mb87078, data >> 8, 0);
+			m_mb87078->data_w(data >> 8, 0);
 				//logerror("MB87078 dsel=0 data=%4x\n", data);
 		}
 		else
 		{
-			mb87078_data_w(m_mb87078, data >> 8, 1);
+			m_mb87078->data_w(data >> 8, 1);
 				//logerror("MB87078 dsel=1 data=%4x\n", data);
 		}
 	}
@@ -1975,7 +1974,6 @@ static const tc0140syt_interface taitob_tc0140syt_intf =
 
 void taitob_state::machine_start()
 {
-	m_mb87078 = machine().device("mb87078");
 	m_ym = machine().device("ymsnd");
 
 	save_item(NAME(m_eep_latch));
