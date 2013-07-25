@@ -808,27 +808,14 @@ CPUOBJS += $(CPUOBJ)/i386/i386.o
 DASMOBJS += $(CPUOBJ)/i386/i386dasm.o
 endif
 
-I86DEPS = \
-	$(CPUSRC)/i86/i86priv.h \
-	$(CPUSRC)/i86/ea.h \
-	$(CPUSRC)/i86/host.h \
-	$(CPUSRC)/i86/modrm.h
-
 $(CPUOBJ)/i86/i86.o:    $(CPUSRC)/i86/i86.c \
 						$(CPUSRC)/i86/i86.h \
-						$(CPUSRC)/i86/i86time.c \
-						$(CPUSRC)/i86/instr86.c \
-						$(CPUSRC)/i86/instr186.c \
-						$(I86DEPS)
+						$(CPUSRC)/i86/i86inline.h
 
 $(CPUOBJ)/i86/i286.o:   $(CPUSRC)/i86/i286.c \
+						$(CPUSRC)/i86/i86.h \
 						$(CPUSRC)/i86/i286.h \
-						$(CPUSRC)/i86/i86time.c \
-						$(CPUSRC)/i86/instr86.c \
-						$(CPUSRC)/i86/instr186.c \
-						$(CPUSRC)/i86/instr286.c \
-						$(CPUSRC)/i86/modrm286.h \
-						$(I86DEPS)
+						$(CPUSRC)/i86/i86inline.h
 
 $(CPUOBJ)/i386/i386.o:  $(CPUSRC)/i386/i386.c \
 						$(CPUSRC)/i386/i386.h \

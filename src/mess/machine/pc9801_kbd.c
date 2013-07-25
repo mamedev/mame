@@ -345,7 +345,9 @@ void pc9801_kbd_device::device_timer(emu_timer &timer, device_timer_id id, int p
 READ8_MEMBER( pc9801_kbd_device::rx_r )
 {
 	m_irq_func(CLEAR_LINE);
-	return m_keyb_tx;
+	if(!offset)
+		return m_keyb_tx;
+	return 1 | 4 | 2;
 }
 
 WRITE8_MEMBER( pc9801_kbd_device::tx_w )

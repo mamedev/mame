@@ -268,10 +268,10 @@ READ8_MEMBER( at_state::at_portb_r )
 	UINT8 data = m_at_speaker;
 	data &= ~0xc0; /* AT BIOS don't likes this being set */
 
-	/* This needs fixing/updating not sure what this is meant to fix */
+	/* 0x10 is the dram refresh line bit.  The 5170 (bios 1) and 5162 test the cpu clock against it in post. */
 	if ( --m_poll_delay < 0 )
 	{
-		m_poll_delay = 3;
+		m_poll_delay = m_at_offset1 ? 3 : 2;
 		m_at_offset1 ^= 0x10;
 	}
 	data = (data & ~0x10) | ( m_at_offset1 & 0x10 );
@@ -315,7 +315,7 @@ void at_state::init_at_common()
 		membank("bank1")->set_base(m_ram->pointer() + 0xa0000);
 	}
 
-	m_at_offset1 = 0xff;
+	m_at_offset1 = 0;
 }
 
 DRIVER_INIT_MEMBER(at_state,atcga)
@@ -340,7 +340,7 @@ MACHINE_START_MEMBER(at_state,at)
 
 MACHINE_RESET_MEMBER(at_state,at)
 {
-	m_poll_delay = 4;
+	m_poll_delay = 3;
 	m_at_spkrdata = 0;
 	m_at_speaker_input = 0;
 	m_dma_channel = -1;

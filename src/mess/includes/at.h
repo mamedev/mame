@@ -140,6 +140,7 @@ public:
 	UINT8 m_at_offset1;
 	void at_speaker_set_spkrdata(UINT8 data);
 	void at_speaker_set_input(UINT8 data);
+	DECLARE_WRITE_LINE_MEMBER(at_shutdown);
 
 	UINT8 m_channel_check;
 	UINT8 m_nmi_enabled;
@@ -155,7 +156,7 @@ public:
 	void pc_set_dma_channel(int channel, int state);
 	IRQ_CALLBACK_MEMBER(at_irq_callback);
 	void init_at_common();
-	static UINT32 at_286_a20(bool state);
+	UINT32 at_286_a20(bool state);
 };
 
 
