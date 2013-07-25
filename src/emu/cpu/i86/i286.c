@@ -224,6 +224,7 @@ void i80286_cpu_device::device_start()
 	save_item(NAME(m_tr.limit));
 	save_item(NAME(m_tr.rights));
 	save_item(NAME(m_amask));
+	save_item(NAME(m_shutdown));
 
 	state_add( I286_ES, "ES", m_sregs[ES] ).callimport().callexport().formatstr("%04X");
 	state_add( I286_ES_BASE, "ESBASE", m_base[ES]).callimport().callexport().formatstr("%06X");

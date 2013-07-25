@@ -836,6 +836,8 @@ void i8086_common_cpu_device::device_start()
 	save_item(NAME(m_ParityVal));
 	save_item(NAME(m_seg_prefix));
 	save_item(NAME(m_seg_prefix_next));
+	save_item(NAME(m_prefix_seg));
+	save_item(NAME(m_halt));
 
 	// Register state for debugger
 //  state_add( I8086_PC, "PC", m_PC ).callimport().callexport().formatstr("%04X");

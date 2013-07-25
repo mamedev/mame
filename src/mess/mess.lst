@@ -775,6 +775,7 @@ i8550061  // IBM PS/2 8550-061 (Model 50Z)
 i8555081  // IBM PS/2 8550-081 (Model 55SX)
 i8580071  // IBM PS/2 8580-071 (Model 80)
 i8580111  // IBM PS/2 8580-111 (Model 80)
+ibmps1es  // IBM PS/1 (Spanish)
 
 at  // 1987 AMI Bios and Diagnostics
 atvga    // 19?? AT VGA

@@ -138,6 +138,11 @@ public:
 	UINT16 m_dma_high_byte;
 	UINT8 m_at_speaker;
 	UINT8 m_at_offset1;
+	UINT16 m_ps1_reg[2];
+	DECLARE_READ16_MEMBER(ps1_unk_r);
+	DECLARE_WRITE16_MEMBER(ps1_unk_w);
+	DECLARE_READ8_MEMBER(ps1_kbdc_r);
+
 	void at_speaker_set_spkrdata(UINT8 data);
 	void at_speaker_set_input(UINT8 data);
 	DECLARE_WRITE_LINE_MEMBER(at_shutdown);
