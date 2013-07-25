@@ -60,7 +60,7 @@ void FLAC__lpc_window_data(const FLAC__int32 in[], const FLAC__real window[], FL
 		out[i] = in[i] * window[i];
 }
 
-#if defined(__GNUC__) && defined(__i386__)
+#if defined(__GNUC__) && defined(__i386__) && (__GNUC__ > 4) || (__GNUC__ == 4 && __GNUC_MINOR__ >= 3)
 __attribute__((optimize("O0")))
 #endif
 void FLAC__lpc_compute_autocorrelation(const FLAC__real data[], unsigned data_len, unsigned lag, FLAC__real autoc[])
