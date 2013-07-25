@@ -34,6 +34,10 @@ DRIVER_INIT_MEMBER(mpu4_state,m4debug)
 	UINT8 *src = memregion( "maincpu" )->base();
 	int size = memregion( "maincpu" )->bytes();
 
+	// m4richfm__e only has 0x004000
+	if (size < 0x10000)
+		return;
+
 	for (int j=0;j<size;j+=0x10000)
 	{
 		if (size>0x10000) printf("\nblock 0x%06x:\n",j);
