@@ -6,6 +6,8 @@
 
 ***************************************************************************/
 
+#include "video/ygv608.h"
+
 class namcond1_state : public driver_device
 {
 public:
@@ -13,7 +15,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_shared_ram(*this, "shared_ram"),
 		m_maincpu(*this, "maincpu"),
-		m_mcu(*this, "mcu") { }
+		m_mcu(*this, "mcu"),
+		m_ygv608(*this, "ygv608") { }
 
 	UINT8 m_h8_irq5_enabled;
 	required_shared_ptr<UINT16> m_shared_ram;
@@ -32,4 +35,5 @@ public:
 	INTERRUPT_GEN_MEMBER(mcu_interrupt);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_mcu;
+	required_device<ygv608_device> m_ygv608;
 };

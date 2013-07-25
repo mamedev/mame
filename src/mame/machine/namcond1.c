@@ -99,7 +99,7 @@ WRITE16_MEMBER(namcond1_state::namcond1_cuskey_w)
 			break;
 
 		case (0x0c>>1):
-			ygv608_set_gfxbank((data & 0x0002) >> 1); // i think
+			m_ygv608->set_gfxbank((data & 0x0002) >> 1); // i think
 			// should mark tilemaps dirty but i think they already are
 			break;
 

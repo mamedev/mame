@@ -81,10 +81,10 @@ Notes:
 static ADDRESS_MAP_START( namcond1_map, AS_PROGRAM, 16, namcond1_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_READWRITE(namcond1_shared_ram_r,namcond1_shared_ram_w) AM_SHARE("shared_ram")
-	AM_RANGE(0x800000, 0x80000f) AM_READWRITE_LEGACY(ygv608_r,ygv608_w)
+	AM_RANGE(0x800000, 0x80000f) AM_DEVREADWRITE("ygv608", ygv608_device, read, write)
 	AM_RANGE(0xa00000, 0xa00fff) AM_DEVREADWRITE8("at28c16", at28c16_device, read, write, 0xff00)
 #ifdef MAME_DEBUG
-	AM_RANGE(0xb00000, 0xb00001) AM_READ_LEGACY(ygv608_debug_trigger)
+	AM_RANGE(0xb00000, 0xb00001) AM_DEVREAD("ygv608", ygv608_device, debug_trigger_r)
 #endif
 	AM_RANGE(0xc3ff00, 0xc3ffff) AM_READWRITE(namcond1_cuskey_r,namcond1_cuskey_w)
 ADDRESS_MAP_END
@@ -293,7 +293,7 @@ static MACHINE_CONFIG_START( namcond1, namcond1_state )
 	// mode (and could also be responsible for the random resets?)
 	// also, if you log the timing of it and the scanlines on which the interrupt fires, it doesn't
 	// seem correct for the intended purpose?
-	//MCFG_CPU_PERIODIC_INT(ygv608_timed_interrupt, 1000)
+	//MCFG_DEVICE_PERIODIC_INT_DEVICE("ygv608", ygv608_device, timed_interrupt, 1000)
 
 
 	MCFG_CPU_ADD("mcu", H83002, XTAL_49_152MHz/3 )
@@ -310,12 +310,10 @@ static MACHINE_CONFIG_START( namcond1, namcond1_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(288, 224)   // maximum display resolution (512x512 in theory)
 	MCFG_SCREEN_VISIBLE_AREA(0, 287, 0, 223)   // default visible area
-	MCFG_SCREEN_UPDATE_STATIC(ygv608)
+	MCFG_SCREEN_UPDATE_DEVICE("ygv608", ygv608_device, update_screen)
 
 	MCFG_GFXDECODE(namcond1)
 	MCFG_PALETTE_LENGTH(256)
-
-	MCFG_VIDEO_START(ygv608)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -327,6 +325,8 @@ static MACHINE_CONFIG_START( namcond1, namcond1_state )
 	MCFG_SOUND_ROUTE(3, "lspeaker", 1.00)
 
 	MCFG_AT28C16_ADD( "at28c16", NULL )
+	
+	MCFG_YGV608_ADD("ygv608")
 MACHINE_CONFIG_END
 
 ROM_START( ncv1 )

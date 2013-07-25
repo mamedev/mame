@@ -1,6 +1,7 @@
 #ifndef __YGV608_H__
 #define __YGV608_H__
 
+#include "tilemap.h"
 /*
  *    Yamaha YGV608 - PVDC2 Pattern mode Video Display Controller 2
  *    - Mark McDougall
@@ -279,65 +280,108 @@ struct SPRITE_ATTR {
 	UINT8 sn;    // pattern name (0-255)
 };
 
+class ygv608_device : public device_t
+{
+public:
+	// construction/destruction
+	ygv608_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-struct YGV608 {
+	DECLARE_WRITE16_MEMBER( write );
+	DECLARE_READ16_MEMBER( read );
+	
+
+	void set_gfxbank(UINT8 gfxbank);
+	
+	UINT32 update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	
+	INTERRUPT_GEN_MEMBER( timed_interrupt );
+	
+	// to be removed
+	DECLARE_READ16_MEMBER( debug_trigger_r );	
+protected:
+	// device-level overrides
+	virtual void device_start();
+private:
+	TILEMAP_MAPPER_MEMBER(get_tile_offset);
+	TILE_GET_INFO_MEMBER(get_tile_info_A_8);
+	TILE_GET_INFO_MEMBER(get_tile_info_B_8);
+	TILE_GET_INFO_MEMBER(get_tile_info_A_16);
+	TILE_GET_INFO_MEMBER(get_tile_info_B_16);
+	void postload();
+	void register_state_save();
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	UINT8 m_namcond1_gfxbank;
+
+	tilemap_t *m_tilemap_A_cache_8[3];
+	tilemap_t *m_tilemap_A_cache_16[3];
+	tilemap_t *m_tilemap_B_cache_8[3];
+	tilemap_t *m_tilemap_B_cache_16[3];
+	tilemap_t *m_tilemap_A;
+	tilemap_t *m_tilemap_B;
+	bitmap_ind16 *m_work_bitmap;
+
+	void HandleYGV608Reset();
+	void HandleRomTransfers();
+	void SetPreShortcuts(int reg, int data );
+	void SetPostShortcuts(int reg);
+	void ShowYGV608Registers();
+	
 	union {
-	UINT8       b[8];
-	YGV_PORTS   s;
-	} ports;
+		UINT8       b[8];
+		YGV_PORTS   s;
+	} m_ports;
 
 	union {
-	UINT8       b[50];
-	YGV_REGS    s;
-	} regs;
+		UINT8       b[50];
+		YGV_REGS    s;
+	} m_regs;
 
 	/*
 	*  Built in ram
 	*/
 
-	UINT8 pattern_name_table[4096];
+	UINT8 m_pattern_name_table[4096];
 
 	union {
-	UINT8           b[YGV608_SPRITE_ATTR_TABLE_SIZE];
-	SPRITE_ATTR     s[YGV608_MAX_SPRITES];
-	} sprite_attribute_table;
+		UINT8           b[YGV608_SPRITE_ATTR_TABLE_SIZE];
+		SPRITE_ATTR     s[YGV608_MAX_SPRITES];
+	} m_sprite_attribute_table;
 
-	UINT8 scroll_data_table[2][256];
-	UINT8 colour_palette[256][3];
+	UINT8 m_scroll_data_table[2][256];
+	UINT8 m_colour_palette[256][3];
 
 	/*
 	*  Shortcut variables
 	*/
 
-	UINT32 bits16;          // bits per pattern (8/16)
-	UINT32 page_x, page_y;  // pattern page size
-	UINT32 pny_shift;       // y coord multiplier
-	UINT8 na8_mask;       // mask on/off na11/9:8
-	int col_shift;                // shift in scroll table column index
+	UINT32 m_bits16;          // bits per pattern (8/16)
+	UINT32 m_page_x, m_page_y;  // pattern page size
+	UINT32 m_pny_shift;       // y coord multiplier
+	UINT8 m_na8_mask;       // mask on/off na11/9:8
+	int m_col_shift;                // shift in scroll table column index
 
 	// rotation, zoom shortcuts
-	UINT32 ax, dx, dxy, ay, dy, dyx;
+	UINT32 m_ax, m_dx, m_dxy, m_ay, m_dy, m_dyx;
 
 	// base address shortcuts
-	UINT32 base_addr[2][8];
-	UINT32 base_y_shift;    // for extracting pattern y coord 'base'
+	UINT32 m_base_addr[2][8];
+	UINT32 m_base_y_shift;    // for extracting pattern y coord 'base'
 
-	UINT8 screen_resize;  // screen requires resize
-	UINT8 tilemap_resize; // tilemap requires resize
-
+	UINT8 m_screen_resize;  // screen requires resize
+	UINT8 m_tilemap_resize; // tilemap requires resize	
 };
 
+// device type definition
+extern const device_type YGV608;
 
-void ygv608_set_gfxbank(UINT8 gfxbank);
 
-INTERRUPT_GEN( ygv608_timed_interrupt );
-VIDEO_START( ygv608 );
-SCREEN_UPDATE_IND16( ygv608 );
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
 
-DECLARE_READ16_HANDLER( ygv608_r );
-DECLARE_WRITE16_HANDLER( ygv608_w );
+#define MCFG_YGV608_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, YGV608, 0)
 
-// to be removed
-DECLARE_READ16_HANDLER( ygv608_debug_trigger );
 
 #endif
