@@ -17,6 +17,7 @@
 #define OP_PD() ((m_ir >> 9) & 0x3)
 #define OP_P1() ((m_ir >> 5) & 0x3)
 #define OP_P2() ((m_ir >> 7) & 0x3)
+#define OP_ACC() ((m_ir >> 15) & 0x2) | ((m_ir >> 11) & 1)
 
 #define ROTATE_L(x, r) ((x << r) | (x >> (32-r)))
 #define ROTATE_R(x, r) ((x >> r) | (x << (32-r)))
@@ -130,6 +131,57 @@ UINT32 tms32082_mp_device::calculate_cmp(UINT32 src1, UINT32 src2)
 	return flags;
 }
 
+void tms32082_mp_device::vector_loadstore()
+{
+	int rd = OP_RD();
+	int vector_ls_bits = (((m_ir >> 9) & 0x3) << 1) | ((m_ir >> 6) & 1);
+
+	switch (vector_ls_bits)
+	{
+		case 0x01:			// vst.s
+		{
+			m_program->write_dword(m_outp, m_reg[rd]);
+			m_outp += 4;
+			break;
+		}
+		case 0x03:			// vst.d
+		{
+			UINT64 data = m_fpair[rd >> 1];
+			m_program->write_qword(m_outp, data);
+			m_outp += 8;
+			break;
+		}
+		case 0x04:			// vld0.s
+		{
+			m_reg[rd] = m_program->read_dword(m_in0p);
+			m_in0p += 4;
+			break;
+		}
+		case 0x05:			// vld1.s
+		{
+			m_reg[rd] = m_program->read_dword(m_in1p);
+			m_in1p += 4;
+			break;
+		}
+		case 0x06:			// vld0.d
+		{
+			m_fpair[rd >> 1] = m_program->read_qword(m_in0p);
+			m_in0p += 8;
+			break;
+		}
+		case 0x07:			// vld1.d
+		{
+			m_fpair[rd >> 1] = m_program->read_qword(m_in1p);
+			m_in1p += 8;
+			break;
+		}
+
+		default:
+			fatalerror("vector_loadstore(): ls bits = %02X\n", vector_ls_bits);
+			break;
+	}
+}
+
 void tms32082_mp_device::execute_short_imm()
 {
 	switch ((m_ir >> 15) & 0x7f)
@@ -137,7 +189,7 @@ void tms32082_mp_device::execute_short_imm()
 		case 0x04:          // rdcr
 		{
 			int rd = OP_RD();
-			INT32 imm = OP_SIMM15();
+			UINT32 imm = OP_UIMM15();
 
 			UINT32 r = read_creg(imm);
 
@@ -150,7 +202,7 @@ void tms32082_mp_device::execute_short_imm()
 		{
 			int rd = OP_RD();
 			int rs = OP_RS();
-			INT32 imm = OP_SIMM15();
+			UINT32 imm = OP_UIMM15();
 
 			UINT32 r = read_creg(imm);
 			if (rd)
@@ -998,7 +1050,188 @@ void tms32082_mp_device::execute_reg_long_imm()
 			break;
 		}
 
-		case 0xe4:			// fmpy
+		case 0xc4:
+		case 0xd4:
+		case 0xc5:
+		case 0xd5:			// vmpy
+		{
+			int p1 = m_ir & (1 << 5);
+			int pd = m_ir & (1 << 7);
+			int ls_bit1 = m_ir & (1 << 10);
+			int ls_bit2 = m_ir & (1 << 6);
+			int rd = OP_RS();
+			int src1 OP_SRC1();
+
+			double source = has_imm ? (double)u2f(imm32) : (p1 ? u2d(m_fpair[src1 >> 1]) : (double)u2f(m_reg[src1]));
+
+			if (rd)
+			{
+				if (pd)
+				{
+					double res = source * u2d(m_fpair[rd >> 1]);
+					m_fpair[rd >> 1] = d2u(res);
+				}
+				else
+				{
+					float res = (float)(source) * u2f(m_reg[rd]);
+					m_reg[rd] = f2u(res);
+				}
+			}
+
+			// parallel load/store op
+			if (!(ls_bit1 == 0 && ls_bit2 == 0))
+			{
+				vector_loadstore();
+			}
+			break;
+		}
+
+		case 0xcc:
+		case 0xdc:
+		case 0xcd:
+		case 0xdd:			// vmac
+		{
+			int acc = OP_ACC();
+			int z = m_ir & (1 << 8);
+			int pd = m_ir & (1 << 9);
+			int ls_bit1 = m_ir & (1 << 10);
+			int ls_bit2 = m_ir & (1 << 6);
+			int rd = OP_RD();
+
+			float src1 = u2f(m_reg[OP_SRC1()]);
+			float src2 = u2f(m_reg[OP_RS()]);
+
+			float res = (src1 * src2) + (z ? 0.0f : m_acc[acc]);
+
+			// parallel load/store op
+			if (!(ls_bit1 == 0 && ls_bit2 == 0))
+			{
+				vector_loadstore();
+
+				// if the opcode has load/store, dest is always accumulator
+				m_facc[acc] = (double)res;
+			}
+			else
+			{
+				if (rd)
+				{
+					if (pd)
+						m_fpair[rd >> 1] = d2u(res);
+					else
+						m_reg[rd] = f2u((float)res);
+				}
+				else
+				{
+					// write to accumulator
+					m_facc[acc] = (double)res;
+				}
+			}
+			break;
+		}
+
+		case 0xce:
+		case 0xde:
+		case 0xcf:
+		case 0xdf:			// vmsc
+		{
+			int acc = OP_ACC();
+			int z = m_ir & (1 << 8);
+			int pd = m_ir & (1 << 9);
+			int ls_bit1 = m_ir & (1 << 10);
+			int ls_bit2 = m_ir & (1 << 6);
+			int rd = OP_RD();
+
+			float src1 = u2f(m_reg[OP_SRC1()]);
+			float src2 = u2f(m_reg[OP_RS()]);
+
+			float res = (z ? 0.0f : m_acc[acc]) - (src1 * src2);
+
+			// parallel load/store op
+			if (!(ls_bit1 == 0 && ls_bit2 == 0))
+			{
+				vector_loadstore();
+
+				// if the opcode has load/store, dest is always accumulator
+				m_facc[acc] = (double)res;
+			}
+			else
+			{
+				if (rd)
+				{
+					if (pd)
+						m_fpair[rd >> 1] = d2u(res);
+					else
+						m_reg[rd] = f2u((float)res);
+				}
+				else
+				{
+					// write to accumulator
+					m_facc[acc] = (double)res;
+				}
+			}
+			break;
+		}
+
+		case 0xe2:
+		case 0xe3:			// fsub
+		{
+			int rd = OP_RD();
+			int rs = OP_RS();
+			int src1 = OP_SRC1();
+			int precision = (m_ir >> 5) & 0x3f;
+
+			if (rd)		// only calculate if destination register is valid
+			{
+				switch (precision)
+				{
+					case 0x00:			// SP - SP -> SP
+					{
+						float s1 = u2f(has_imm ? imm32 : m_reg[src1]);
+						float s2 = u2f(m_reg[rs]);
+						m_reg[rd] = f2u(s1 - s2);
+						break;
+					}
+					case 0x10:			// SP - SP -> DP
+					{
+						float s1 = u2f(has_imm ? imm32 : m_reg[src1]);
+						float s2 = u2f(m_reg[rs]);
+						UINT64 res = d2u((double)(s1 - s2));
+						m_fpair[rd >> 1] = res;
+						break;
+					}
+					case 0x14:			// SP - DP -> DP
+					{
+						float s1 = u2f(has_imm ? imm32 : m_reg[src1]);
+						double s2 = u2d(m_fpair[rs >> 1]);
+						UINT64 res = d2u((double)(s1 - s2));
+						m_fpair[rd >> 1] = res;
+						break;
+					}
+					case 0x11:			// DP - SP -> DP
+					{
+						double s1 = u2d(m_fpair[src1 >> 1]);
+						float s2 = u2f(m_reg[rs]);
+						UINT64 res = d2u((double)(s1 - s2));
+						m_fpair[rd >> 1] = res;
+						break;
+					}
+					case 0x15:			// DP - DP -> DP
+					{
+						double s1 = u2d(m_fpair[src1 >> 1]);
+						double s2 = u2d(m_fpair[rs >> 1]);
+						UINT64 res = d2u((double)(s1 - s2));
+						m_fpair[rd >> 1] = res;
+						break;
+					}
+					default:
+						fatalerror("fsub: invalid precision combination %02X\n", precision);
+				}
+			}
+			break;
+		}
+
+		case 0xe4:
+		case 0xe5:			// fmpy
 		{
 			int rd = OP_RD();
 			int rs = OP_RS();
@@ -1061,6 +1294,27 @@ void tms32082_mp_device::execute_reg_long_imm()
 					default:
 						fatalerror("fmpy: invalid precision combination %02X\n", precision);
 				}
+			}
+			break;
+		}
+
+		case 0xee:
+		case 0xef:			// fsqrt
+		{
+			int rd = OP_RD();
+			int src1 = OP_SRC1();
+			int p1 = m_ir & (1 << 5);
+			int pd = m_ir & (1 << 9);
+			double source = has_imm ? (double)u2f(imm32) : (p1 ? u2d(m_fpair[src1 >> 1]) : (double)u2f(m_reg[src1]));
+
+			if (rd)
+			{
+				double res = sqrt(source);
+
+				if (pd)
+					m_fpair[rd >> 1] = d2u(res);
+				else
+					m_reg[rd] = f2u((float)res);
 			}
 			break;
 		}

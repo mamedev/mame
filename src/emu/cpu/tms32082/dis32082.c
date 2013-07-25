@@ -38,7 +38,7 @@ static const char *FLOATOP_PRECISION[4] =
 
 static const char *ACC_SEL[4] =
 {
-	"a0", "a1", "a2", "a3"
+	"A0", "A1", "A2", "A3"
 };
 
 static char *output;
@@ -94,7 +94,7 @@ static char* get_creg_name(UINT32 reg)
 		case 0x4000:    sprintf(buffer, "IN0P"); break;
 		case 0x4001:    sprintf(buffer, "IN1P"); break;
 		case 0x4002:    sprintf(buffer, "OUTP"); break;
-		default:        sprintf(buffer, "CR %04X\n", reg);
+		default:        sprintf(buffer, "CR %04X", reg);
 	}
 
 	return buffer;
@@ -171,9 +171,9 @@ static char* format_vector_op(UINT32 op, UINT32 imm32)
 
 	// align the line end
 	int len = strlen(buffer);
-	if (len < 27)
+	if (len < 29)
 	{
-		for (int i=0; i < (27-len); i++)
+		for (int i=0; i < (29-len); i++)
 		{
 			b += sprintf(b, " ");
 		}

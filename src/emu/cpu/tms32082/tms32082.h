@@ -48,6 +48,9 @@ public:
 		MP_ACC1,
 		MP_ACC2,
 		MP_ACC3,
+		MP_IN0P,
+		MP_IN1P,
+		MP_OUTP
 	};
 
 	DECLARE_READ32_MEMBER(mp_param_r);
@@ -90,14 +93,21 @@ protected:
 
 	UINT32 m_pc;
 	UINT32 m_fetchpc;
-	//UINT32 m_reg[32];
 	union
 	{
 		UINT32 m_reg[32];
 		UINT64 m_fpair[16];
 	};
-	UINT64 m_acc[4];
+	union
+	{
+		UINT64 m_acc[4];
+		double m_facc[4];
+	};
 	UINT32 m_ir;
+
+	UINT32 m_in0p;
+	UINT32 m_in1p;
+	UINT32 m_outp;
 
 	UINT32 *m_param_ram;
 
@@ -115,6 +125,7 @@ protected:
 	void write_creg(int reg, UINT32 data);
 	bool test_condition(int condition, UINT32 value);
 	UINT32 calculate_cmp(UINT32 src1, UINT32 src2);
+	void vector_loadstore();
 };
 
 extern const device_type TMS32082_MP;

@@ -173,6 +173,10 @@ void tms32082_mp_device::device_start()
 	state_add(MP_ACC2, "acc2", m_acc[2]).formatstr("%016X");
 	state_add(MP_ACC3, "acc3", m_acc[3]).formatstr("%016X");
 
+	state_add(MP_IN0P, "in0p", m_in0p).formatstr("%08X");
+	state_add(MP_IN1P, "in1p", m_in1p).formatstr("%08X");
+	state_add(MP_OUTP, "outp", m_outp).formatstr("%08X");
+
 	state_add(STATE_GENPC, "curpc", m_pc).noshow();
 
 	m_param_ram = auto_alloc_array(machine(), UINT32, 0x800);
@@ -216,6 +220,15 @@ UINT32 tms32082_mp_device::read_creg(int reg)
 		case 0xa:           // PPERROR
 			return 0xe0000;
 
+		case 0x4000:		// IN0P
+			return m_in0p;
+
+		case 0x4001:		// IN1P
+			return m_in1p;
+
+		case 0x4002:		// OUTP
+			return m_outp;
+
 		default:
 			printf("read_creg(): %08X\n", reg);
 			break;
@@ -225,7 +238,24 @@ UINT32 tms32082_mp_device::read_creg(int reg)
 
 void tms32082_mp_device::write_creg(int reg, UINT32 data)
 {
-	printf("write_creg(): %08X, %08X\n", reg, data);
+	switch (reg)
+	{
+		case 0x4000:		// IN0P
+			m_in0p = data;
+			break;
+
+		case 0x4001:		// IN1P
+			m_in1p = data;
+			break;
+
+		case 0x4002:		// OUTP
+			m_outp = data;
+			break;
+
+		default:
+			printf("write_creg(): %08X, %08X\n", reg, data);
+			break;
+	}
 }
 
 UINT32 tms32082_mp_device::fetch()
