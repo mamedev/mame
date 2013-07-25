@@ -203,12 +203,28 @@ struct tms34010_config
 
 
 /* PUBLIC FUNCTIONS - 34010 */
-SCREEN_UPDATE_IND16( tms340x0_ind16 );
-SCREEN_UPDATE_RGB32( tms340x0_rgb32 );
 void tms34010_get_display_params(device_t *cpu, tms34010_display_params *params);
 
-DECLARE_LEGACY_CPU_DEVICE(TMS34010, tms34010);
-DECLARE_LEGACY_CPU_DEVICE(TMS34020, tms34020);
+class tms34010_device : public legacy_cpu_device
+{
+public:
+	tms34010_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock);
+	tms34010_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, cpu_get_info_func get_info);
+	
+	UINT32 tms340x0_ind16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 tms340x0_rgb32(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+}; 
+
+extern const device_type TMS34010;
+
+class tms34020_device : public tms34010_device
+{
+public:
+	tms34020_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock);
+};
+
+extern const device_type TMS34020;
+
 
 
 /* Host control interface */

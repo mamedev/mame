@@ -91,7 +91,6 @@ Notes:
 #include "machine/nvram.h"
 #include "includes/midtunit.h"
 #include "includes/midwunit.h"
-#include "scrlegcy.h"
 
 
 #define PIXEL_CLOCK     (8000000)
@@ -649,7 +648,7 @@ static MACHINE_CONFIG_START( wunit, midwunit_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 505, 0, 399, 289, 0, 253)
-	MCFG_SCREEN_UPDATE_STATIC(tms340x0_ind16)
+	MCFG_SCREEN_UPDATE_DEVICE("maincpu", tms34010_device, tms340x0_ind16)
 
 	MCFG_VIDEO_START_OVERRIDE(midwunit_state,midwunit)
 

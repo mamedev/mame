@@ -142,7 +142,6 @@ Pin #11(+) | | R               |
 #include "includes/lethalj.h"
 #include "machine/ticket.h"
 #include "sound/okim6295.h"
-#include "scrlegcy.h"
 
 
 #define MASTER_CLOCK            XTAL_40MHz
@@ -574,7 +573,7 @@ static MACHINE_CONFIG_START( gameroom, lethalj_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK, 701, 0, 512, 263, 0, 236)
-	MCFG_SCREEN_UPDATE_STATIC(tms340x0_ind16)
+	MCFG_SCREEN_UPDATE_DEVICE("maincpu", tms34010_device, tms340x0_ind16)
 
 
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, RRRRR_GGGGG_BBBBB)

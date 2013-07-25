@@ -30,7 +30,6 @@
 #include "includes/artmagic.h"
 #include "sound/okim6295.h"
 #include "machine/nvram.h"
-#include "scrlegcy.h"
 
 
 #define MASTER_CLOCK_40MHz      (XTAL_40MHz)
@@ -857,7 +856,7 @@ static MACHINE_CONFIG_START( artmagic, artmagic_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK_40MHz/6, 428, 0, 320, 313, 0, 256)
-	MCFG_SCREEN_UPDATE_STATIC(tms340x0_rgb32)
+	MCFG_SCREEN_UPDATE_DEVICE("tms", tms34010_device, tms340x0_rgb32)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

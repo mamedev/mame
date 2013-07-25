@@ -8,7 +8,6 @@
 
 #include "emu.h"
 #include "includes/btoads.h"
-#include "scrlegcy.h"
 
 
 #define CPU_CLOCK           XTAL_64MHz
@@ -337,7 +336,7 @@ static MACHINE_CONFIG_START( btoads, btoads_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK/2, 640, 0, 512, 257, 0, 224)
-	MCFG_SCREEN_UPDATE_STATIC(tms340x0_rgb32)
+	MCFG_SCREEN_UPDATE_DEVICE("maincpu", tms34020_device, tms340x0_rgb32)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

@@ -116,7 +116,6 @@ Notes:
 #include "cpu/tms34010/tms34010.h"
 #include "sound/okim6295.h"
 #include "includes/midyunit.h"
-#include "scrlegcy.h"
 
 
 /* master clocks vary based on game */
@@ -1019,7 +1018,7 @@ static MACHINE_CONFIG_START( zunit, midyunit_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MEDRES_PIXEL_CLOCK*2, 673, 0, 511, 433, 0, 399)
-	MCFG_SCREEN_UPDATE_STATIC(tms340x0_ind16)
+	MCFG_SCREEN_UPDATE_DEVICE("maincpu", tms34010_device, tms340x0_ind16)
 
 	MCFG_VIDEO_START_OVERRIDE(midyunit_state,midzunit)
 
@@ -1054,7 +1053,7 @@ static MACHINE_CONFIG_START( yunit_core, midyunit_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(STDRES_PIXEL_CLOCK*2, 505, 0, 399, 289, 0, 253)
-	MCFG_SCREEN_UPDATE_STATIC(tms340x0_ind16)
+	MCFG_SCREEN_UPDATE_DEVICE("maincpu", tms34010_device, tms340x0_ind16)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

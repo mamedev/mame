@@ -67,7 +67,6 @@
 #include "sound/2151intf.h"
 #include "machine/nvram.h"
 #include "includes/exterm.h"
-#include "scrlegcy.h"
 
 
 
@@ -463,7 +462,7 @@ static MACHINE_CONFIG_START( exterm, exterm_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(40000000/8, 318, 0, 256, 264, 0, 240)
-	MCFG_SCREEN_UPDATE_STATIC(tms340x0_ind16)
+	MCFG_SCREEN_UPDATE_DEVICE("maincpu", tms34010_device, tms340x0_ind16)
 
 
 	/* sound hardware */

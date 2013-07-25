@@ -38,7 +38,6 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/tms34010/tms34010.h"
 #include "sound/okim6295.h"
-#include "scrlegcy.h"
 
 
 class skimaxx_state : public driver_device
@@ -76,7 +75,6 @@ public:
 	DECLARE_READ32_MEMBER(skimaxx_analog_r);
 	virtual void machine_reset();
 	virtual void video_start();
-	UINT32 screen_update_skimaxx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 };
@@ -153,15 +151,6 @@ void skimaxx_state::video_start()
 	m_bg_buffer_front = m_bg_buffer + 0x400 * 0x100 * sizeof(UINT16) / sizeof(UINT32) * 1;
 	membank("bank1")->configure_entry(0, m_bg_buffer_back);
 	membank("bank1")->configure_entry(1, m_bg_buffer_front);
-}
-
-UINT32 skimaxx_state::screen_update_skimaxx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-//  popmessage("%02x %02x", ioport("X")->read(), ioport("Y")->read() );
-
-	SCREEN_UPDATE16_CALL(tms340x0_ind16);
-
-	return 0;
 }
 
 /*************************************
@@ -544,8 +533,7 @@ static MACHINE_CONFIG_START( skimaxx, skimaxx_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(0x400, 0x100)
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x280-1, 0, 0xf0-1)
-//  MCFG_SCREEN_UPDATE_STATIC(tms340x0_ind16)
-	MCFG_SCREEN_UPDATE_DRIVER(skimaxx_state, screen_update_skimaxx)
+    MCFG_SCREEN_UPDATE_DEVICE("maincpu", tms34010_device, tms340x0_ind16)
 
 
 //  MCFG_GFXDECODE( skimaxx )

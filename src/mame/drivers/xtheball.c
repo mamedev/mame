@@ -12,7 +12,6 @@
 #include "machine/ticket.h"
 #include "machine/nvram.h"
 #include "sound/dac.h"
-#include "scrlegcy.h"
 
 
 class xtheball_state : public driver_device
@@ -358,7 +357,7 @@ static MACHINE_CONFIG_START( xtheball, xtheball_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(10000000, 640, 114, 626, 257, 24, 248)
-	MCFG_SCREEN_UPDATE_STATIC(tms340x0_rgb32)
+	MCFG_SCREEN_UPDATE_DEVICE("maincpu", tms34010_device, tms340x0_rgb32)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

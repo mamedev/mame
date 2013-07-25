@@ -111,7 +111,6 @@ Thanks to Tony Friery and JPeMU for I/O routines and documentation.
 #include "machine/steppers.h"
 #include "machine/roc10937.h"
 #include "machine/i8255.h"
-#include "scrlegcy.h"
 
 /*************************************
  *
@@ -880,7 +879,7 @@ static MACHINE_CONFIG_START( jpmimpct, jpmimpct_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(40000000/4, 156*4, 0, 100*4, 328, 0, 300)
-	MCFG_SCREEN_UPDATE_STATIC(tms340x0_rgb32)
+	MCFG_SCREEN_UPDATE_DEVICE("dsp", tms34010_device, tms340x0_rgb32)
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

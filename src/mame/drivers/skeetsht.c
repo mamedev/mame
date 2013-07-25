@@ -12,7 +12,6 @@
 #include "cpu/tms34010/tms34010.h"
 #include "sound/ay8910.h"
 #include "video/tlc34076.h"
-#include "scrlegcy.h"
 
 
 /*************************************
@@ -272,7 +271,7 @@ static MACHINE_CONFIG_START( skeetsht, skeetsht_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(48000000 / 8, 156*4, 0, 100*4, 328, 0, 300) // FIXME
-	MCFG_SCREEN_UPDATE_STATIC(tms340x0_rgb32)
+	MCFG_SCREEN_UPDATE_DEVICE("tms", tms34010_device, tms340x0_rgb32)
 
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

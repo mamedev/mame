@@ -329,7 +329,6 @@ Notes:
 #include "sound/dac.h"
 #include "includes/slapstic.h"
 #include "includes/harddriv.h"
-#include "scrlegcy.h"
 
 
 /*************************************
@@ -1360,7 +1359,7 @@ static MACHINE_CONFIG_START( driver_nomsp, harddriv_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(HARDDRIV_GSP_CLOCK/12*4, 160*4, 0, 127*4, 417, 0, 384)
-	MCFG_SCREEN_UPDATE_STATIC(tms340x0_ind16)
+	MCFG_SCREEN_UPDATE_DEVICE("maincpu", tms34010_device, tms340x0_ind16)
 
 	MCFG_VIDEO_START_OVERRIDE(harddriv_state,harddriv)
 MACHINE_CONFIG_END

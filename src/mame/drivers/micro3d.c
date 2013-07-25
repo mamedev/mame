@@ -30,7 +30,6 @@
 #include "sound/2151intf.h"
 #include "machine/nvram.h"
 #include "includes/micro3d.h"
-#include "scrlegcy.h"
 
 
 /*************************************
@@ -359,7 +358,7 @@ static MACHINE_CONFIG_START( micro3d, micro3d_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_40MHz/8*4, 192*4, 0, 144*4, 434, 0, 400)
-	MCFG_SCREEN_UPDATE_STATIC(tms340x0_ind16)
+	MCFG_SCREEN_UPDATE_DEVICE("vgb", tms34010_device, tms340x0_ind16)
 
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
