@@ -123,6 +123,7 @@ EMUOBJS = \
 	$(EMUOBJ)/debug/dvdisasm.o \
 	$(EMUOBJ)/debug/dvmemory.o \
 	$(EMUOBJ)/debug/dvbpoints.o \
+	$(EMUOBJ)/debug/dvwpoints.o \
 	$(EMUOBJ)/debug/dvstate.o \
 	$(EMUOBJ)/debug/dvtext.o \
 	$(EMUOBJ)/debug/express.o \

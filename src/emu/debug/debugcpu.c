@@ -2394,7 +2394,7 @@ int device_debug::watchpoint_set(address_space &space, int type, offs_t address,
 	assert(space.spacenum() < ARRAY_LENGTH(m_wplist));
 
 	// allocate a new one
-	watchpoint *wp = auto_alloc(m_device.machine(), watchpoint(m_symtable, m_device.machine().debugcpu_data->bpindex++, space, type, address, length, condition, action));
+	watchpoint *wp = auto_alloc(m_device.machine(), watchpoint(this, m_symtable, m_device.machine().debugcpu_data->wpindex++, space, type, address, length, condition, action));
 
 	// hook it into our list
 	wp->m_next = m_wplist[space.spacenum()];
@@ -3279,18 +3279,18 @@ void device_debug::set_state(symbol_table &table, void *ref, UINT64 value)
 //-------------------------------------------------
 
 device_debug::breakpoint::breakpoint(device_debug* debugInterface,
-										symbol_table &symbols,
-										int index,
-										offs_t address,
-										const char *condition,
-										const char *action)
+									 symbol_table &symbols,
+									 int index,
+									 offs_t address,
+									 const char *condition,
+									 const char *action)
 	: m_debugInterface(debugInterface),
-		m_next(NULL),
-		m_index(index),
-		m_enabled(true),
-		m_address(address),
-		m_condition(&symbols, (condition != NULL) ? condition : "1"),
-		m_action((action != NULL) ? action : "")
+	  m_next(NULL),
+	  m_index(index),
+	  m_enabled(true),
+	  m_address(address),
+	  m_condition(&symbols, (condition != NULL) ? condition : "1"),
+	  m_action((action != NULL) ? action : "")
 {
 }
 
@@ -3335,16 +3335,25 @@ bool device_debug::breakpoint::hit(offs_t pc)
 //  watchpoint - constructor
 //-------------------------------------------------
 
-device_debug::watchpoint::watchpoint(symbol_table &symbols, int index, address_space &space, int type, offs_t address, offs_t length, const char *condition, const char *action)
-	: m_next(NULL),
-		m_space(space),
-		m_index(index),
-		m_enabled(true),
-		m_type(type),
-		m_address(space.address_to_byte(address) & space.bytemask()),
-		m_length(space.address_to_byte(length)),
-		m_condition(&symbols, (condition != NULL) ? condition : "1"),
-		m_action((action != NULL) ? action : "")
+device_debug::watchpoint::watchpoint(device_debug* debugInterface, 
+									 symbol_table &symbols, 
+									 int index, 
+									 address_space &space, 
+									 int type, 
+									 offs_t address, 
+									 offs_t length, 
+									 const char *condition, 
+									 const char *action)
+	: m_debugInterface(debugInterface),
+	  m_next(NULL),
+	  m_space(space),
+	  m_index(index),
+	  m_enabled(true),
+	  m_type(type),
+	  m_address(space.address_to_byte(address) & space.bytemask()),
+	  m_length(space.address_to_byte(length)),
+	  m_condition(&symbols, (condition != NULL) ? condition : "1"),
+	  m_action((action != NULL) ? action : "")
 {
 }
 

@@ -1,6 +1,6 @@
 /*********************************************************************
 
-    dvpoints.h
+    dvbpoints.h
 
     Breakpoint debugger view.
 

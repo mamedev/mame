@@ -80,11 +80,11 @@ public:
 	public:
 		// construction/destruction
 		breakpoint(device_debug* debugInterface,
-					symbol_table &symbols,
-					int index,
-					offs_t address,
-					const char *condition = NULL,
-					const char *action = NULL);
+				   symbol_table &symbols,
+				   int index,
+				   offs_t address,
+				   const char *condition = NULL,
+				   const char *action = NULL);
 
 		// getters
 		const device_debug *debugInterface() const { return m_debugInterface; }
@@ -118,16 +118,18 @@ public:
 
 	public:
 		// construction/destruction
-		watchpoint(symbol_table &symbols,
-					int index,
-					address_space &space,
-					int type,
-					offs_t address,
-					offs_t length,
-					const char *condition = NULL,
-					const char *action = NULL);
+		watchpoint(device_debug* debugInterface,
+				   symbol_table &symbols,
+				   int index,
+				   address_space &space,
+				   int type,
+				   offs_t address,
+				   offs_t length,
+				   const char *condition = NULL,
+				   const char *action = NULL);
 
 		// getters
+		const device_debug *debugInterface() const { return m_debugInterface; }
 		watchpoint *next() const { return m_next; }
 		address_space &space() const { return m_space; }
 		int index() const { return m_index; }
@@ -138,19 +140,23 @@ public:
 		const char *condition() const { return m_condition.original_string(); }
 		const char *action() const { return m_action; }
 
+		// setters
+		void setEnabled(bool value) { m_enabled = value; }
+
 	private:
 		// internals
 		bool hit(int type, offs_t address, int size);
 
-		watchpoint *        m_next;                     // next in the list
-		address_space &     m_space;                    // address space
-		int                 m_index;                    // user reported index
-		bool                m_enabled;                  // enabled?
-		UINT8               m_type;                     // type (read/write)
-		offs_t              m_address;                  // start address
-		offs_t              m_length;                   // length of watch area
-		parsed_expression   m_condition;                // condition
-		astring             m_action;                   // action
+		const device_debug * m_debugInterface;           // the interface we were created from
+		watchpoint *         m_next;                     // next in the list
+		address_space &      m_space;                    // address space
+		int                  m_index;                    // user reported index
+		bool                 m_enabled;                  // enabled?
+		UINT8                m_type;                     // type (read/write)
+		offs_t               m_address;                  // start address
+		offs_t               m_length;                   // length of watch area
+		parsed_expression    m_condition;                // condition
+		astring              m_action;                   // action
 	};
 
 	// registerpoint class
