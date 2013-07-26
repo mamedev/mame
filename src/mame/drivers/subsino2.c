@@ -733,7 +733,7 @@ UINT32 subsino2_state::screen_update_subsino2(screen_device &screen, bitmap_ind1
 						if ( reelwrap_y-1 <= visible.max_y )
 							tmp.max_y = reelwrap_y-1;
 						l->tmap->set_scrolly(0, reelscroll_y);
-						l->tmap->draw(bitmap, tmp, 0, 0);
+						l->tmap->draw(screen, bitmap, tmp, 0, 0);
 						tmp.max_y = visible.max_y;
 					}
 
@@ -743,7 +743,7 @@ UINT32 subsino2_state::screen_update_subsino2(screen_device &screen, bitmap_ind1
 						if ( reelwrap_y >= visible.min_y )
 							tmp.min_y = reelwrap_y;
 						l->tmap->set_scrolly(0, -((reelwrap_y &0xff) | (reelscroll_y & 0x100)));
-						l->tmap->draw(bitmap, tmp, 0, 0);
+						l->tmap->draw(screen, bitmap, tmp, 0, 0);
 						tmp.min_y = visible.min_y;
 					}
 				}
@@ -751,11 +751,11 @@ UINT32 subsino2_state::screen_update_subsino2(screen_device &screen, bitmap_ind1
 		}
 		else
 		{
-			l->tmap->draw(bitmap, cliprect, 0, 0);
+			l->tmap->draw(screen, bitmap, cliprect, 0, 0);
 		}
 	}
 
-	if (layers_ctrl & 2)    m_layers[1].tmap->draw(bitmap, cliprect, 0, 0);
+	if (layers_ctrl & 2)    m_layers[1].tmap->draw(screen, bitmap, cliprect, 0, 0);
 
 //  popmessage("scrl: %03x,%03x - %03x,%03x dis: %02x siz: %02x ctrl: %02x", m_layers[0].scroll_x,m_layers[0].scroll_y, m_layers[1].scroll_x,m_layers[1].scroll_y, m_ss9601_disable, m_ss9601_tilesize, m_ss9601_scrollctrl);
 

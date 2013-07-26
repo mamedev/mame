@@ -297,10 +297,10 @@ WRITE8_MEMBER(dday_state::dday_control_w)
 
 UINT32 dday_state::screen_update_dday(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_bg_tilemap->draw(m_main_bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
-	m_fg_tilemap->draw(m_main_bitmap, cliprect, 0, 0);
-	m_bg_tilemap->draw(m_main_bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
-	m_text_tilemap->draw(m_main_bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, m_main_bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
+	m_fg_tilemap->draw(screen, m_main_bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, m_main_bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
+	m_text_tilemap->draw(screen, m_main_bitmap, cliprect, 0, 0);
 
 	if (m_sl_enable)
 	{

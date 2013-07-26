@@ -80,11 +80,11 @@ void gstriker_state::VS920A_set_gfx_region(int numchip, int gfx_region)
 	m_VS920A[numchip].gfx_region = gfx_region;
 }
 
-void gstriker_state::VS920A_draw(int numchip, bitmap_ind16& screen, const rectangle &cliprect, int priority)
+void gstriker_state::VS920A_draw(int numchip, screen_device &screen, bitmap_ind16& bitmap, const rectangle &cliprect, int priority)
 {
 	m_VS920A_cur_chip = &m_VS920A[numchip];
 
-	m_VS920A_cur_chip->tmap->draw(screen, cliprect, 0, priority);
+	m_VS920A_cur_chip->tmap->draw(screen, bitmap, cliprect, 0, priority);
 }
 
 
@@ -232,7 +232,7 @@ void gstriker_state::MB60553_set_gfx_region(int numchip, int gfx_region)
 }
 
 /* THIS IS STILL WRONG! */
-void gstriker_state::MB60553_draw(int numchip, bitmap_ind16& screen, const rectangle &cliprect, int priority)
+void gstriker_state::MB60553_draw(int numchip, screen_device &screen, bitmap_ind16& bitmap, const rectangle &cliprect, int priority)
 {
 	int line;
 	rectangle clip;
@@ -262,7 +262,7 @@ void gstriker_state::MB60553_draw(int numchip, bitmap_ind16& screen, const recta
 
 		clip.min_y = clip.max_y = line;
 
-		m_MB60553_cur_chip->tmap->draw_roz(screen, clip, startx<<12,starty<<12,
+		m_MB60553_cur_chip->tmap->draw_roz(screen, bitmap, clip, startx<<12,starty<<12,
 				incxx,0,0,incyy,
 				1,
 				0,priority);
@@ -335,13 +335,13 @@ UINT32 gstriker_state::screen_update_gstriker(screen_device &screen, bitmap_ind1
 
 	// Sandwitched screen/sprite0/score/sprite1. Surely wrong, probably
 	//  needs sprite orthogonality
-	MB60553_draw(0, bitmap,cliprect, 0);
+	MB60553_draw(0, screen, bitmap,cliprect, 0);
 
-	m_spr->draw_sprites(m_CG10103_vram, 0x2000, machine(), bitmap, cliprect, 0x2, 0x0);
+	m_spr->draw_sprites(m_CG10103_vram, 0x2000, screen, bitmap, cliprect, 0x2, 0x0);
 
-	VS920A_draw(0, bitmap, cliprect, 0);
+	VS920A_draw(0, screen, bitmap, cliprect, 0);
 
-	m_spr->draw_sprites(m_CG10103_vram, 0x2000, machine(), bitmap, cliprect, 0x2, 0x2);
+	m_spr->draw_sprites(m_CG10103_vram, 0x2000, screen, bitmap, cliprect, 0x2, 0x2);
 
 #if 0
 	popmessage("%04x %04x %04x %04x %04x %04x %04x %04x",

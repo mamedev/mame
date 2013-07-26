@@ -170,7 +170,7 @@ void pc090oj_device::eof_callback( )
 }
 
 
-void pc090oj_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int pri_type )
+void pc090oj_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, int pri_type )
 {
 	int offs, priority = 0;
 	int sprite_colbank = (m_sprite_ctrl & 0xf) << 4; /* top nibble */
@@ -224,7 +224,7 @@ void pc090oj_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 				color,
 				flipx,flipy,
 				x,y,
-				machine().priority_bitmap,
+				priority_bitmap,
 				priority ? 0xfc : 0xf0,0);
 	}
 }

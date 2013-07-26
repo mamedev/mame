@@ -451,8 +451,8 @@ UINT32 gaelco2_state::screen_update_gaelco2(screen_device &screen, bitmap_ind16 
 	/* draw screen */
 	bitmap.fill(0, cliprect);
 
-	m_pant[1]->draw(bitmap, cliprect, 0, 0);
-	m_pant[0]->draw(bitmap, cliprect, 0, 0);
+	m_pant[1]->draw(screen, bitmap, cliprect, 0, 0);
+	m_pant[0]->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
@@ -480,7 +480,7 @@ UINT32 gaelco2_state::dual_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	/* draw screen */
 	bitmap.fill(0, cliprect);
 
-	m_pant[index]->draw(bitmap, cliprect, 0, 0);
+	m_pant[index]->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(screen,bitmap,cliprect, 0x8000 * index, 0);
 
 	return 0;

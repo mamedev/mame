@@ -253,7 +253,7 @@ Note:   Not all sprites are displayed: in the top part of spriteram
 
 ***************************************************************************/
 
-void psikyo_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int trans_pen )
+void psikyo_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int trans_pen )
 {
 	/* tile layers 0 & 1 have priorities 1 & 2 */
 	static const int pri[] = { 0, 0xfc, 0xff, 0xff };
@@ -348,7 +348,7 @@ void psikyo_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 							attr >> 8,
 							flipx, flipy,
 							x + dx * 16, y + dy * 16,
-							machine().priority_bitmap,
+							screen.priority(),
 							pri[(attr & 0xc0) >> 6],trans_pen);
 				else
 					pdrawgfxzoom_transpen(bitmap,cliprect,machine().gfx[0],
@@ -357,7 +357,7 @@ void psikyo_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 								flipx, flipy,
 								x + (dx * zoomx) / 2, y + (dy * zoomy) / 2,
 								zoomx << 11,zoomy << 11,
-								machine().priority_bitmap,pri[(attr & 0xc0) >> 6],trans_pen);
+								screen.priority(),pri[(attr & 0xc0) >> 6],trans_pen);
 
 				code++;
 			}
@@ -370,7 +370,7 @@ void psikyo_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 // until I work out why it makes a partial copy of the sprite list, and how best to apply it
 // sprite placement of the explosion graphic seems incorrect compared to the original sets? (no / different zoom support?)
 // it might be a problem with the actual bootleg
-void psikyo_state::draw_sprites_bootleg( bitmap_ind16 &bitmap, const rectangle &cliprect, int trans_pen )
+void psikyo_state::draw_sprites_bootleg( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int trans_pen )
 {
 	/* tile layers 0 & 1 have priorities 1 & 2 */
 	static const int pri[] = { 0, 0xfc, 0xff, 0xff };
@@ -467,7 +467,7 @@ void psikyo_state::draw_sprites_bootleg( bitmap_ind16 &bitmap, const rectangle &
 							attr >> 8,
 							flipx, flipy,
 							x + dx * 16, y + dy * 16,
-							machine().priority_bitmap,
+							screen.priority(),
 							pri[(attr & 0xc0) >> 6],trans_pen);
 				else
 					pdrawgfxzoom_transpen(bitmap,cliprect,machine().gfx[0],
@@ -476,7 +476,7 @@ void psikyo_state::draw_sprites_bootleg( bitmap_ind16 &bitmap, const rectangle &
 								flipx, flipy,
 								x + (dx * zoomx) / 2, y + (dy * zoomy) / 2,
 								zoomx << 11,zoomy << 11,
-								machine().priority_bitmap,pri[(attr & 0xc0) >> 6],trans_pen);
+								screen.priority(),pri[(attr & 0xc0) >> 6],trans_pen);
 
 				code++;
 			}
@@ -657,16 +657,16 @@ UINT32 psikyo_state::screen_update_psikyo(screen_device &screen, bitmap_ind16 &b
 
 	bitmap.fill(get_black_pen(machine()), cliprect);
 
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 
 	if (layers_ctrl & 1)
-		tmptilemap0->draw(bitmap, cliprect, layer0_ctrl & 2 ? TILEMAP_DRAW_OPAQUE : 0, 1);
+		tmptilemap0->draw(screen, bitmap, cliprect, layer0_ctrl & 2 ? TILEMAP_DRAW_OPAQUE : 0, 1);
 
 	if (layers_ctrl & 2)
-		tmptilemap1->draw(bitmap, cliprect, layer1_ctrl & 2 ? TILEMAP_DRAW_OPAQUE : 0, 2);
+		tmptilemap1->draw(screen, bitmap, cliprect, layer1_ctrl & 2 ? TILEMAP_DRAW_OPAQUE : 0, 2);
 
 	if (layers_ctrl & 4)
-		draw_sprites(bitmap, cliprect, (spr_ctrl & 4 ? 0 : 15));
+		draw_sprites(screen, bitmap, cliprect, (spr_ctrl & 4 ? 0 : 15));
 
 	return 0;
 }
@@ -830,16 +830,16 @@ UINT32 psikyo_state::screen_update_psikyo_bootleg(screen_device &screen, bitmap_
 
 	bitmap.fill(get_black_pen(machine()), cliprect);
 
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 
 	if (layers_ctrl & 1)
-		tmptilemap0->draw(bitmap, cliprect, layer0_ctrl & 2 ? TILEMAP_DRAW_OPAQUE : 0, 1);
+		tmptilemap0->draw(screen, bitmap, cliprect, layer0_ctrl & 2 ? TILEMAP_DRAW_OPAQUE : 0, 1);
 
 	if (layers_ctrl & 2)
-		tmptilemap1->draw(bitmap, cliprect, layer1_ctrl & 2 ? TILEMAP_DRAW_OPAQUE : 0, 2);
+		tmptilemap1->draw(screen, bitmap, cliprect, layer1_ctrl & 2 ? TILEMAP_DRAW_OPAQUE : 0, 2);
 
 	if (layers_ctrl & 4)
-		draw_sprites_bootleg(bitmap, cliprect, (spr_ctrl & 4 ? 0 : 15));
+		draw_sprites_bootleg(screen, bitmap, cliprect, (spr_ctrl & 4 ? 0 : 15));
 
 	return 0;
 }

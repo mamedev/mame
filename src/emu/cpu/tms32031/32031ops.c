@@ -120,8 +120,7 @@ inline void tms3203x_device::execute_one()
 	m_icount -= 2;  // 2 clocks per cycle
 	m_pc++;
 #if (TMS_3203X_LOG_OPCODE_USAGE)
-	if (machine.primary_screen->frame_number() == 2003)
-		m_hits[op >> 21]++;
+	m_hits[op >> 21]++;
 #endif
 	(this->*s_tms32031ops[op >> 21])(op);
 }

@@ -112,12 +112,12 @@ public:
 	UINT32 screen_update_racingb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(sci_interrupt);
 	void taitoz_postload();
-	void contcirc_draw_sprites_16x8( bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs );
-	void chasehq_draw_sprites_16x16( bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs );
-	void bshark_draw_sprites_16x8( bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs );
-	void sci_draw_sprites_16x8( bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs );
-	void aquajack_draw_sprites_16x8(bitmap_ind16 &bitmap,const rectangle &cliprect,int y_offs);
-	void spacegun_draw_sprites_16x8(bitmap_ind16 &bitmap,const rectangle &cliprect,int y_offs);
+	void contcirc_draw_sprites_16x8( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs );
+	void chasehq_draw_sprites_16x16( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs );
+	void bshark_draw_sprites_16x8( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs );
+	void sci_draw_sprites_16x8( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs );
+	void aquajack_draw_sprites_16x8(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,int y_offs);
+	void spacegun_draw_sprites_16x8(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,int y_offs);
 	void parse_cpu_control(  );
 	void reset_sound_region(  );
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);

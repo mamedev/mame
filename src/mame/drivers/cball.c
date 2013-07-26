@@ -70,7 +70,7 @@ void cball_state::video_start()
 UINT32 cball_state::screen_update_cball(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* draw playfield */
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* draw sprite */
 	drawgfx_transpen(bitmap, cliprect, machine().gfx[1],

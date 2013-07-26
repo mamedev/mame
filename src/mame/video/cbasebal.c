@@ -166,7 +166,7 @@ void cbasebal_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 UINT32 cbasebal_state::screen_update_cbasebal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_bg_on)
-		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	else
 		bitmap.fill(768, cliprect);
 
@@ -174,6 +174,6 @@ UINT32 cbasebal_state::screen_update_cbasebal(screen_device &screen, bitmap_ind1
 		draw_sprites(bitmap, cliprect);
 
 	if (m_text_on)
-		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }

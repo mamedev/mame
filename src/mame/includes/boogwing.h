@@ -58,7 +58,7 @@ public:
 	DECLARE_DRIVER_INIT(boogwing);
 	virtual void video_start();
 	UINT32 screen_update_boogwing(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void mix_boogwing(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void mix_boogwing(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_READ16_MEMBER( boogwing_protection_region_0_104_r );
 	DECLARE_WRITE16_MEMBER( boogwing_protection_region_0_104_w );
 

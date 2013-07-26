@@ -304,7 +304,7 @@ void macrossp_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
 }
 
 
-void macrossp_state::draw_layer( bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer )
+void macrossp_state::draw_layer( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer )
 {
 	tilemap_t *tm;
 	UINT32 *vr;
@@ -341,7 +341,7 @@ void macrossp_state::draw_layer( bitmap_rgb32 &bitmap, const rectangle &cliprect
 		startx -= (368/2) * inc;
 		starty -= (240/2) * inc;
 
-		tm->draw_roz(bitmap, cliprect,
+		tm->draw_roz(screen, bitmap, cliprect,
 				startx,starty,inc,0,0,inc,
 				1,  /* wraparound */
 				0,0);
@@ -350,7 +350,7 @@ void macrossp_state::draw_layer( bitmap_rgb32 &bitmap, const rectangle &cliprect
 	{
 		tm->set_scrollx(0, ((vr[0] & 0x000003ff) >> 0 ) );
 		tm->set_scrolly(0, ((vr[0] & 0x03ff0000) >> 16) );
-		tm->draw(bitmap, cliprect, 0, 0);
+		tm->draw(screen, bitmap, cliprect, 0, 0);
 	}
 }
 
@@ -385,14 +385,14 @@ UINT32 macrossp_state::screen_update_macrossp(screen_device &screen, bitmap_rgb3
 
 	sortlayers(layers, layerpri);
 
-	draw_layer(bitmap, cliprect, layers[0]);
+	draw_layer(screen, bitmap, cliprect, layers[0]);
 	draw_sprites(bitmap, cliprect, 0);
-	draw_layer(bitmap, cliprect, layers[1]);
+	draw_layer(screen, bitmap, cliprect, layers[1]);
 	draw_sprites(bitmap, cliprect, 1);
-	draw_layer(bitmap, cliprect, layers[2]);
+	draw_layer(screen, bitmap, cliprect, layers[2]);
 	draw_sprites(bitmap, cliprect, 2);
 	draw_sprites(bitmap, cliprect, 3);
-	m_text_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_text_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 #if 0
 popmessage  ("scra - %08x %08x %08x\nscrb - %08x %08x %08x\nscrc - %08x %08x %08x",

@@ -316,7 +316,7 @@ VIDEO_START_MEMBER(m92_state,ppan)
 
 /*****************************************************************************/
 
-void m92_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+void m92_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT16 *source = m_spriteram->buffer();
 	int offs, layer;
@@ -357,26 +357,26 @@ void m92_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 						pdrawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 								code + s_ptr, color, !flipx, !flipy,
 								464 - x, 240 - (y - row * 16),
-								machine().priority_bitmap, pri, 0);
+								screen.priority(), pri, 0);
 
 						// wrap around x
 						pdrawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 								code + s_ptr, color, !flipx, !flipy,
 								464 - x + 512, 240 - (y - row * 16),
-								machine().priority_bitmap, pri, 0);
+								screen.priority(), pri, 0);
 					}
 					else
 					{
 						pdrawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 								code + s_ptr, color, flipx, flipy,
 								x, y - row * 16,
-								machine().priority_bitmap, pri, 0);
+								screen.priority(), pri, 0);
 
 						// wrap around x
 						pdrawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 								code + s_ptr, color, flipx, flipy,
 								x - 512, y - row * 16,
-								machine().priority_bitmap, pri, 0);
+								screen.priority(), pri, 0);
 					}
 					if (flipy) s_ptr++;
 					else s_ptr--;
@@ -389,7 +389,7 @@ void m92_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 }
 
 // This needs a lot of work...
-void m92_state::ppan_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+void m92_state::ppan_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT16 *source = m_spriteram->live(); // sprite buffer control is never triggered
 	int offs, layer;
@@ -431,26 +431,26 @@ void m92_state::ppan_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 						pdrawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 								code + s_ptr, color, !flipx, !flipy,
 								464 - x, 240 - (y - row * 16),
-								machine().priority_bitmap, pri, 0);
+								screen.priority(), pri, 0);
 
 						// wrap around x
 						pdrawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 								code + s_ptr, color, !flipx, !flipy,
 								464 - x + 512, 240 - (y - row * 16),
-								machine().priority_bitmap, pri, 0);
+								screen.priority(), pri, 0);
 					}
 					else
 					{
 						pdrawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 								code + s_ptr, color, flipx, flipy,
 								x, y - row * 16,
-								machine().priority_bitmap, pri, 0);
+								screen.priority(), pri, 0);
 
 						// wrap around x
 						pdrawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 								code + s_ptr, color, flipx, flipy,
 								x - 512, y - row * 16,
-								machine().priority_bitmap, pri, 0);
+								screen.priority(), pri, 0);
 					}
 					if (flipy) s_ptr++;
 					else s_ptr--;
@@ -511,36 +511,36 @@ void m92_state::m92_update_scroll_positions()
 
 /*****************************************************************************/
 
-void m92_state::m92_draw_tiles(bitmap_ind16 &bitmap,const rectangle &cliprect)
+void m92_state::m92_draw_tiles(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	if ((~m_pf_master_control[2] >> 4) & 1)
 	{
-		m_pf_layer[2].wide_tmap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
-		m_pf_layer[2].tmap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
-		m_pf_layer[2].wide_tmap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 1);
-		m_pf_layer[2].tmap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 1);
+		m_pf_layer[2].wide_tmap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
+		m_pf_layer[2].tmap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
+		m_pf_layer[2].wide_tmap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 1);
+		m_pf_layer[2].tmap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 1);
 	}
 
-	m_pf_layer[1].wide_tmap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
-	m_pf_layer[1].tmap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
-	m_pf_layer[1].wide_tmap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 1);
-	m_pf_layer[1].tmap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 1);
+	m_pf_layer[1].wide_tmap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
+	m_pf_layer[1].tmap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
+	m_pf_layer[1].wide_tmap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 1);
+	m_pf_layer[1].tmap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 1);
 
-	m_pf_layer[0].wide_tmap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
-	m_pf_layer[0].tmap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
-	m_pf_layer[0].wide_tmap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 1);
-	m_pf_layer[0].tmap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 1);
+	m_pf_layer[0].wide_tmap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
+	m_pf_layer[0].tmap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
+	m_pf_layer[0].wide_tmap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 1);
+	m_pf_layer[0].tmap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 1);
 }
 
 
 UINT32 m92_state::screen_update_m92(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 	bitmap.fill(0, cliprect);
 	m92_update_scroll_positions();
-	m92_draw_tiles(bitmap, cliprect);
+	m92_draw_tiles(screen, bitmap, cliprect);
 
-	draw_sprites(bitmap, cliprect);
+	draw_sprites(screen, bitmap, cliprect);
 
 	/* Flipscreen appears hardwired to the dipswitch - strange */
 	if (ioport("DSW")->read() & 0x100)
@@ -552,12 +552,12 @@ UINT32 m92_state::screen_update_m92(screen_device &screen, bitmap_ind16 &bitmap,
 
 UINT32 m92_state::screen_update_ppan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 	bitmap.fill(0, cliprect);
 	m92_update_scroll_positions();
-	m92_draw_tiles(bitmap, cliprect);
+	m92_draw_tiles(screen, bitmap, cliprect);
 
-	ppan_draw_sprites(bitmap, cliprect);
+	ppan_draw_sprites(screen, bitmap, cliprect);
 
 	/* Flipscreen appears hardwired to the dipswitch - strange */
 	if (ioport("DSW")->read() & 0x100)

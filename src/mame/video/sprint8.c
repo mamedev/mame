@@ -156,7 +156,7 @@ TIMER_CALLBACK_MEMBER(sprint8_state::sprint8_collision_callback)
 UINT32 sprint8_state::screen_update_sprint8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	set_pens(this, machine().colortable);
-	m_tilemap1->draw(bitmap, cliprect, 0, 0);
+	m_tilemap1->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);
 	return 0;
 }
@@ -171,7 +171,7 @@ void sprint8_state::screen_eof_sprint8(screen_device &screen, bool state)
 		int y;
 		const rectangle &visarea = machine().primary_screen->visible_area();
 
-		m_tilemap2->draw(m_helper2, visarea, 0, 0);
+		m_tilemap2->draw(screen, m_helper2, visarea, 0, 0);
 
 		m_helper1.fill(0x20, visarea);
 

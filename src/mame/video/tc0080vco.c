@@ -408,7 +408,7 @@ void tc0080vco_device::tilemap_update( )
 
 /* NB: orientation_flipx code in following routine has not been tested */
 
-void tc0080vco_device::bg0_tilemap_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, UINT32 priority )
+void tc0080vco_device::bg0_tilemap_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, UINT32 priority )
 {
 	UINT16 zoom = m_scroll_ram[6];
 	int zx, zy;
@@ -418,7 +418,7 @@ void tc0080vco_device::bg0_tilemap_draw( bitmap_ind16 &bitmap, const rectangle &
 
 	if (zx == 0x3f && zy == 0x7f)       /* normal size */
 	{
-		m_tilemap[0]->draw(bitmap, cliprect, flags, priority);
+		m_tilemap[0]->draw(screen, bitmap, cliprect, flags, priority);
 	}
 	else        /* zoom + rowscroll = custom draw routine */
 	{
@@ -534,7 +534,7 @@ void tc0080vco_device::bg0_tilemap_draw( bitmap_ind16 &bitmap, const rectangle &
 				}
 			}
 
-			taitoic_drawscanline(bitmap, cliprect, 0, y, scanline, (flags & TILEMAP_DRAW_OPAQUE) ? 0 : 1 , ROT0, machine().priority_bitmap, priority);
+			taitoic_drawscanline(bitmap, cliprect, 0, y, scanline, (flags & TILEMAP_DRAW_OPAQUE) ? 0 : 1 , ROT0, screen.priority(), priority);
 
 			y_index += zoomy;
 
@@ -559,7 +559,7 @@ do                                                                              
 	}                                                                               \
 }                                                                                   \
 while (0)
-void tc0080vco_device::bg1_tilemap_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, UINT32 priority )
+void tc0080vco_device::bg1_tilemap_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, UINT32 priority )
 {
 	UINT8 layer = 1;
 	UINT16 zoom = m_scroll_ram[6 + layer];
@@ -574,7 +574,7 @@ void tc0080vco_device::bg1_tilemap_draw( bitmap_ind16 &bitmap, const rectangle &
 
 	if (zoomx == 0x3f && zoomy == 0x7f)     /* normal size */
 	{
-		m_tilemap[layer]->draw(bitmap, cliprect, flags, priority);
+		m_tilemap[layer]->draw(screen, bitmap, cliprect, flags, priority);
 	}
 	else        /* zoomed */
 	{
@@ -633,7 +633,7 @@ void tc0080vco_device::bg1_tilemap_draw( bitmap_ind16 &bitmap, const rectangle &
 			INT32 incyy = zy;
 			int wraparound = 0;
 			UINT32 privalue = priority;
-			bitmap_ind8 &priority = machine().priority_bitmap;
+			bitmap_ind8 &priority = screen.priority();
 
 			if (dest.bpp() == 16)
 				COPYROZBITMAP_CORE(UINT16, PIXEL_OP_COPY_TRANS0_SET_PRIORITY, UINT8);
@@ -644,7 +644,7 @@ void tc0080vco_device::bg1_tilemap_draw( bitmap_ind16 &bitmap, const rectangle &
 }
 
 
-void tc0080vco_device::tilemap_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority )
+void tc0080vco_device::tilemap_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority )
 {
 	int disable = 0x00; /* possibly layer disable bits do exist ?? */
 
@@ -657,17 +657,17 @@ void tc0080vco_device::tilemap_draw( bitmap_ind16 &bitmap, const rectangle &clip
 		case 0:
 			if (disable & 0x01)
 				return;
-			bg0_tilemap_draw(bitmap, cliprect, flags, priority);
+			bg0_tilemap_draw(screen, bitmap, cliprect, flags, priority);
 			break;
 		case 1:
 			if (disable & 0x02)
 				return;
-			bg1_tilemap_draw(bitmap, cliprect, flags, priority);
+			bg1_tilemap_draw(screen, bitmap, cliprect, flags, priority);
 			break;
 		case 2:
 			if (disable & 0x04)
 				return;
-			m_tilemap[2]->draw(bitmap, cliprect, flags, priority);
+			m_tilemap[2]->draw(screen, bitmap, cliprect, flags, priority);
 			break;
 	}
 }

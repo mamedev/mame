@@ -134,7 +134,7 @@ UINT32 skyarmy_state::screen_update_skyarmy(screen_device &screen, bitmap_ind16 
 	for(i=0;i<0x20;i++)
 		m_tilemap->set_scrolly(i,m_scrollram[i]);
 
-	m_tilemap->draw(bitmap, cliprect, 0,0);
+	m_tilemap->draw(screen, bitmap, cliprect, 0,0);
 
 	for (offs = 0 ; offs < 0x40; offs+=4)
 	{

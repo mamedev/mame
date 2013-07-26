@@ -162,11 +162,11 @@ UINT32 stlforce_state::screen_update_stlforce(screen_device &screen, bitmap_ind1
 	m_tx_tilemap->set_scrollx(0, m_vidattrram[0]+8);
 	m_tx_tilemap->set_scrolly(0,m_vidattrram[4]);
 
-	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
-	m_mlow_tilemap->draw(bitmap, cliprect, 0,0);
-	m_mhigh_tilemap->draw(bitmap, cliprect, 0,0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
+	m_mlow_tilemap->draw(screen, bitmap, cliprect, 0,0);
+	m_mhigh_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	draw_sprites(bitmap,cliprect);
-	m_tx_tilemap->draw(bitmap, cliprect, 0,0);
+	m_tx_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
 }
 

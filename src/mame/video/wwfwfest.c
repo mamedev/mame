@@ -263,24 +263,24 @@ UINT32 wwfwfest_state::screen_update_wwfwfest(screen_device &screen, bitmap_ind1
 	/* todo : which bits of pri are significant to the order */
 
 	if (m_pri == 0x007b) {
-		m_bg0_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
-		m_bg1_tilemap->draw(bitmap, cliprect, 0,0);
+		m_bg0_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
+		m_bg1_tilemap->draw(screen, bitmap, cliprect, 0,0);
 		draw_sprites(bitmap,cliprect);
-		m_fg0_tilemap->draw(bitmap, cliprect, 0,0);
+		m_fg0_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	}
 
 	if (m_pri == 0x007c) {
-		m_bg0_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
+		m_bg0_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
 		draw_sprites(bitmap,cliprect);
-		m_bg1_tilemap->draw(bitmap, cliprect, 0,0);
-		m_fg0_tilemap->draw(bitmap, cliprect, 0,0);
+		m_bg1_tilemap->draw(screen, bitmap, cliprect, 0,0);
+		m_fg0_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	}
 
 	if (m_pri == 0x0078) {
-		m_bg1_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
-		m_bg0_tilemap->draw(bitmap, cliprect, 0,0);
+		m_bg1_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
+		m_bg0_tilemap->draw(screen, bitmap, cliprect, 0,0);
 		draw_sprites(bitmap,cliprect);
-		m_fg0_tilemap->draw(bitmap, cliprect, 0,0);
+		m_fg0_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	}
 	return 0;
 }

@@ -93,17 +93,17 @@ UINT32 asterix_state::screen_update_asterix(screen_device &screen, bitmap_ind16 
 
 	konami_sortlayers3(layer, m_layerpri);
 
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 	bitmap.fill(0, cliprect);
 
-	m_k056832->tilemap_draw(bitmap, cliprect, layer[0], K056832_DRAW_FLAG_MIRROR, 1);
-	m_k056832->tilemap_draw(bitmap, cliprect, layer[1], K056832_DRAW_FLAG_MIRROR, 2);
-	m_k056832->tilemap_draw(bitmap, cliprect, layer[2], K056832_DRAW_FLAG_MIRROR, 4);
+	m_k056832->tilemap_draw(screen, bitmap, cliprect, layer[0], K056832_DRAW_FLAG_MIRROR, 1);
+	m_k056832->tilemap_draw(screen, bitmap, cliprect, layer[1], K056832_DRAW_FLAG_MIRROR, 2);
+	m_k056832->tilemap_draw(screen, bitmap, cliprect, layer[2], K056832_DRAW_FLAG_MIRROR, 4);
 
 /* this isn't supported anymore and it is unsure if still needed; keeping here for reference
     pdrawgfx_shadow_lowpri = 1; fix shadows in front of feet */
-	m_k053244->k053245_sprites_draw(bitmap, cliprect);
+	m_k053244->k053245_sprites_draw(bitmap, cliprect, screen.priority());
 
-	m_k056832->tilemap_draw(bitmap, cliprect, 2, K056832_DRAW_FLAG_MIRROR, 0);
+	m_k056832->tilemap_draw(screen, bitmap, cliprect, 2, K056832_DRAW_FLAG_MIRROR, 0);
 	return 0;
 }

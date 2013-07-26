@@ -656,9 +656,9 @@ if (machine().input().code_pressed(KEYCODE_F))
 #endif
 }
 
-void k052109_device::tilemap_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, int tmap_num, UINT32 flags, UINT8 priority )
+void k052109_device::tilemap_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tmap_num, UINT32 flags, UINT8 priority )
 {
-	m_tilemap[tmap_num]->draw(bitmap, cliprect, flags, priority);
+	m_tilemap[tmap_num]->draw(screen, bitmap, cliprect, flags, priority);
 }
 
 int k052109_device::is_irq_enabled( )

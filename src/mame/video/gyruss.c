@@ -155,9 +155,9 @@ UINT32 gyruss_state::screen_update_gyruss(screen_device &screen, bitmap_ind16 &b
 		machine().tilemap().set_flip_all((*m_flipscreen & 0x01) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 	}
 
-	m_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	m_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 	draw_sprites(bitmap, cliprect, machine().gfx);
-	m_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }

@@ -402,7 +402,7 @@ WRITE16_MEMBER(playmark_state::hrdtimes_scroll_w)
 
 ***************************************************************************/
 
-void playmark_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int codeshift )
+void playmark_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int codeshift )
 {
 	int offs, start_offset = m_spriteram.bytes() / 2 - 4;
 	int height = machine().gfx[0]->height();
@@ -440,12 +440,12 @@ void playmark_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 					color,
 					flipx,0,
 					sx + m_xoffset,sy + m_yoffset,
-					machine().priority_bitmap,m_pri_masks[pri],0);
+					screen.priority(),m_pri_masks[pri],0);
 	}
 }
 
 
-void playmark_state::bigtwinb_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int codeshift )
+void playmark_state::bigtwinb_draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int codeshift )
 {
 	int offs, start_offset = m_spriteram.bytes() / 2 - 4;
 	int height = machine().gfx[0]->height();
@@ -481,7 +481,7 @@ void playmark_state::bigtwinb_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 	}
 }
 
-void playmark_state::draw_bitmap( bitmap_ind16 &bitmap, const rectangle &cliprect )
+void playmark_state::draw_bitmap( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	int x, y, count;
 	int color;
@@ -500,7 +500,7 @@ void playmark_state::draw_bitmap( bitmap_ind16 &bitmap, const rectangle &cliprec
 				{
 					bitmap.pix16((y + m_bgscrolly) & 0x1ff, (x + m_bgscrollx) & 0x1ff) = 0x100 + color;
 
-					pri = &machine().priority_bitmap.pix8((y + m_bgscrolly) & 0x1ff);
+					pri = &screen.priority().pix8((y + m_bgscrolly) & 0x1ff);
 					pri[(x + m_bgscrollx) & 0x1ff] |= 2;
 				}
 				else
@@ -510,7 +510,7 @@ void playmark_state::draw_bitmap( bitmap_ind16 &bitmap, const rectangle &cliprec
 					{
 						bitmap.pix16((y / 2 + m_bgscrolly) & 0x1ff, (x / 2 + m_bgscrollx) & 0x1ff) = 0x100 + color;
 
-						pri = &machine().priority_bitmap.pix8((y / 2 + m_bgscrolly) & 0x1ff);
+						pri = &screen.priority().pix8((y / 2 + m_bgscrolly) & 0x1ff);
 						pri[(x / 2 + m_bgscrollx) & 0x1ff] |= 2;
 					}
 				}
@@ -523,13 +523,13 @@ void playmark_state::draw_bitmap( bitmap_ind16 &bitmap, const rectangle &cliprec
 
 UINT32 playmark_state::screen_update_bigtwin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 
-	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	if (m_bg_enable)
-		draw_bitmap(bitmap, cliprect);
-	draw_sprites(bitmap, cliprect, 4);
-	m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
+		draw_bitmap(screen, bitmap, cliprect);
+	draw_sprites(screen, bitmap, cliprect, 4);
+	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -539,10 +539,10 @@ UINT32 playmark_state::screen_update_bigtwinb(screen_device &screen, bitmap_ind1
 	// video enabled
 	if (m_scroll[6] & 1)
 	{
-		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
-		bigtwinb_draw_sprites(bitmap, cliprect, 4);
-		m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+		bigtwinb_draw_sprites(screen, bitmap, cliprect, 4);
+		m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	}
 	else
 		bitmap.fill(get_black_pen(machine()), cliprect);
@@ -551,13 +551,13 @@ UINT32 playmark_state::screen_update_bigtwinb(screen_device &screen, bitmap_ind1
 
 UINT32 playmark_state::screen_update_excelsr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 
-	m_fg_tilemap->draw(bitmap, cliprect, 0, 1);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 1);
 	if (m_bg_enable)
-		draw_bitmap(bitmap, cliprect);
-	m_tx_tilemap->draw(bitmap, cliprect, 0, 4);
-	draw_sprites(bitmap, cliprect, 2);
+		draw_bitmap(screen, bitmap, cliprect);
+	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 4);
+	draw_sprites(screen, bitmap, cliprect, 2);
 	return 0;
 }
 
@@ -577,26 +577,26 @@ UINT32 playmark_state::screen_update_wbeachvl(screen_device &screen, bitmap_ind1
 		m_fg_tilemap->set_scrollx(0, m_fgscrollx);
 	}
 
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 1);
-	m_fg_tilemap->draw(bitmap, cliprect, 0, 2);
-	draw_sprites(bitmap, cliprect, 0);
-	m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 1);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 2);
+	draw_sprites(screen, bitmap, cliprect, 0);
+	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
 UINT32 playmark_state::screen_update_hrdtimes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 
 	// video enabled
 	if (m_scroll[6] & 1)
 	{
-		m_bg_tilemap->draw(bitmap, cliprect, 0, 1);
-		m_fg_tilemap->draw(bitmap, cliprect, 0, 2);
-		draw_sprites(bitmap, cliprect, 2);
-		m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 1);
+		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 2);
+		draw_sprites(screen, bitmap, cliprect, 2);
+		m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	}
 	else
 		bitmap.fill(get_black_pen(machine()), cliprect);

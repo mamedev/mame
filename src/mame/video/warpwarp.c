@@ -236,7 +236,7 @@ void warpwarp_state::draw_ball(bitmap_ind16 &bitmap, const rectangle &cliprect,p
 
 UINT32 warpwarp_state::screen_update_geebee(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
 
 	draw_ball(bitmap, cliprect, m_ball_pen);
 	return 0;

@@ -135,7 +135,7 @@ UINT32 alpha68k_state::screen_update_alpha68k_II(screen_device &screen, bitmap_i
 	draw_sprites(bitmap, cliprect, 2, 0x0000, 0x0800);
 	draw_sprites(bitmap, cliprect, 0, 0x0000, 0x07c0);
 //ZT
-	m_fix_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fix_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -299,7 +299,7 @@ UINT32 alpha68k_state::screen_update_alpha68k_V(screen_device &screen, bitmap_in
 		draw_sprites_V(bitmap, cliprect, 0, 0x0000, 0x07c0, 0x8000, 0, 0x7fff);
 	}
 
-	m_fix_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fix_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -319,7 +319,7 @@ UINT32 alpha68k_state::screen_update_alpha68k_V_sb(screen_device &screen, bitmap
 	draw_sprites_V(bitmap, cliprect, 2, 0x0000, 0x0800, 0x4000, 0x8000, 0x3fff);
 	draw_sprites_V(bitmap, cliprect, 0, 0x0000, 0x07c0, 0x4000, 0x8000, 0x3fff);
 
-	m_fix_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fix_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 

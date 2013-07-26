@@ -203,7 +203,7 @@ UINT32 statriv2_state::screen_update_statriv2(screen_device &screen, bitmap_ind1
 	if (m_tms->screen_reset())
 		bitmap.fill(get_black_pen(machine()), cliprect);
 	else
-		m_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 

@@ -409,6 +409,6 @@ UINT32 ladybug_state::screen_update_redclash(screen_device &screen, bitmap_ind16
 	redclash_draw_stars(bitmap, cliprect, 0x60, 0, 0x00, 0xff);
 	redclash_draw_sprites(bitmap, cliprect);
 	redclash_draw_bullets(bitmap, cliprect);
-	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }

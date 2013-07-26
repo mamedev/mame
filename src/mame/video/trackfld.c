@@ -253,7 +253,7 @@ UINT32 trackfld_state::screen_update_trackfld(screen_device &screen, bitmap_ind1
 		m_bg_tilemap->set_scrollx(row, scrollx);
 	}
 
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);
 	return 0;
 }

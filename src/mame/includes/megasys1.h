@@ -144,7 +144,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(megasys1B_scanline);
 	inline void scrollram_w(offs_t offset, UINT16 data, UINT16 mem_mask, int which);
 	void create_tilemaps();
-	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void rodlandj_gfx_unmangle(const char *region);
 	void jitsupro_gfx_unmangle(const char *region);
 	void stdragona_gfx_unmangle(const char *region);

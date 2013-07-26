@@ -129,13 +129,13 @@ UINT32 sandscrp_state::screen_update_sandscrp(screen_device &screen, bitmap_ind1
 
 	int i;
 
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 
 	m_view2_0->kaneko16_prepare(bitmap, cliprect);
 
 	for ( i = 0; i < 8; i++ )
 	{
-		m_view2_0->render_tilemap_chip(bitmap,cliprect,i);
+		m_view2_0->render_tilemap_chip(screen,bitmap,cliprect,i);
 	}
 
 	// copy sprite bitmap to screen

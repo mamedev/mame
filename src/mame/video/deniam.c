@@ -200,7 +200,7 @@ WRITE16_MEMBER(deniam_state::deniam_coinctrl_w)
  *   c  | ---------------- | zoomy like in System 16?
  *   e  | ---------------- |
  */
-void deniam_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
+void deniam_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	int offs;
 	UINT8 *gfx = memregion("gfx2")->base();
@@ -256,9 +256,9 @@ void deniam_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 						{
 							if (cliprect.contains(sx + x, y))
 							{
-								if ((machine().priority_bitmap.pix8(y, sx + x) & primask) == 0)
+								if ((screen.priority().pix8(y, sx + x) & primask) == 0)
 									bitmap.pix16(y, sx + x) = color * 16 + (rom[i] & 0x0f);
-								machine().priority_bitmap.pix8(y, sx + x) = 8;
+								screen.priority().pix8(y, sx + x) = 8;
 							}
 						}
 						x++;
@@ -275,9 +275,9 @@ void deniam_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 						{
 							if (cliprect.contains(sx + x, y))
 							{
-								if ((machine().priority_bitmap.pix8(y, sx + x) & primask) == 0)
+								if ((screen.priority().pix8(y, sx + x) & primask) == 0)
 									bitmap.pix16(y, sx + x) = color * 16+(rom[i] >> 4);
-								machine().priority_bitmap.pix8(y, sx + x) = 8;
+								screen.priority().pix8(y, sx + x) = 8;
 							}
 						}
 						x++;
@@ -298,9 +298,9 @@ void deniam_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 						{
 							if (cliprect.contains(sx + x, y))
 							{
-								if ((machine().priority_bitmap.pix8(y, sx + x) & primask) == 0)
+								if ((screen.priority().pix8(y, sx + x) & primask) == 0)
 									bitmap.pix16(y, sx + x) = color * 16 + (rom[i] >> 4);
-								machine().priority_bitmap.pix8(y, sx + x) = 8;
+								screen.priority().pix8(y, sx + x) = 8;
 							}
 						}
 						x++;
@@ -317,9 +317,9 @@ void deniam_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 						{
 							if (cliprect.contains(sx + x, y))
 							{
-								if ((machine().priority_bitmap.pix8(y, sx + x) & primask) == 0)
+								if ((screen.priority().pix8(y, sx + x) & primask) == 0)
 									bitmap.pix16(y, sx + x) = color * 16 + (rom[i] & 0x0f);
-								machine().priority_bitmap.pix8(y, sx + x) = 8;
+								screen.priority().pix8(y, sx + x) = 8;
 							}
 						}
 						x++;
@@ -385,12 +385,12 @@ UINT32 deniam_state::screen_update_deniam(screen_device &screen, bitmap_ind16 &b
 	m_fg_tilemap->set_scrollx(0, fg_scrollx & 0x1ff);
 	m_fg_tilemap->set_scrolly(0, fg_scrolly & 0x0ff);
 
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 1);
-	m_fg_tilemap->draw(bitmap, cliprect, 0, 2);
-	m_tx_tilemap->draw(bitmap, cliprect, 0, 4);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 1);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 2);
+	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 4);
 
-	draw_sprites(bitmap, cliprect);
+	draw_sprites(screen, bitmap, cliprect);
 	return 0;
 }

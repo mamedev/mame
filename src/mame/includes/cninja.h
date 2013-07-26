@@ -84,7 +84,7 @@ public:
 	UINT32 screen_update_robocop2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_mutantf(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt_gen);
-	void cninjabl_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void cninjabl_draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 
 	DECLARE_READ16_MEMBER( sshangha_protection_region_6_146_r );
 	DECLARE_WRITE16_MEMBER( sshangha_protection_region_6_146_w );

@@ -66,7 +66,7 @@ public:
 	int m_gfx_index; // for RAM tiles
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 global_flip);
+	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 global_flip);
 	void screen_eof(void);
 
 protected:

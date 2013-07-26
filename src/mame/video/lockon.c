@@ -920,7 +920,7 @@ UINT32 lockon_state::screen_update_lockon(screen_device &screen, bitmap_ind16 &b
 	rotate_draw(bitmap, cliprect);
 
 	/* Draw the character tilemap */
-	m_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* Draw the HUD */
 	hud_draw(bitmap, cliprect);

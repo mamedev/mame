@@ -14,7 +14,7 @@ void warriorb_state::video_start()
             SPRITE DRAW ROUTINE
 ************************************************************/
 
-void warriorb_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int x_offs, int y_offs )
+void warriorb_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int x_offs, int y_offs )
 {
 	UINT16 *spriteram = m_spriteram;
 	int offs, data, data2, tilenum, color, flipx, flipy;
@@ -66,7 +66,7 @@ void warriorb_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 					color,
 					flipx,flipy,
 					x,y,
-					machine().priority_bitmap,pri_mask,0);
+					screen.priority(),pri_mask,0);
 	}
 
 #ifdef MAME_DEBUG
@@ -91,24 +91,24 @@ UINT32 warriorb_state::update_screen(screen_device &screen, bitmap_ind16 &bitmap
 	layer[2] = 2;
 
 	/* Clear priority bitmap */
-	screen.machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 
 	/* chip 0 does tilemaps on the left, chip 1 does the ones on the right */
 	// draw bottom layer
-	nodraw  = tc0100scn->tilemap_draw(bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 0);    /* left */
+	nodraw  = tc0100scn->tilemap_draw(screen, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 0);    /* left */
 
 	/* Ensure screen blanked even when bottom layers not drawn due to disable bit */
 	if (nodraw)
 		bitmap.fill(get_black_pen(machine()), cliprect);
 
 	// draw middle layer
-	tc0100scn->tilemap_draw(bitmap, cliprect, layer[1], 0, 1);
+	tc0100scn->tilemap_draw(screen, bitmap, cliprect, layer[1], 0, 1);
 
 	/* Sprites can be under/over the layer below text layer */
-	draw_sprites(bitmap, cliprect, xoffs, 8); // draw sprites
+	draw_sprites(screen, bitmap, cliprect, xoffs, 8); // draw sprites
 
 	// draw top(text) layer
-	tc0100scn->tilemap_draw(bitmap, cliprect, layer[2], 0, 0);
+	tc0100scn->tilemap_draw(screen, bitmap, cliprect, layer[2], 0, 0);
 	return 0;
 }
 

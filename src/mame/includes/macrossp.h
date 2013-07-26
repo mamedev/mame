@@ -76,7 +76,7 @@ public:
 	UINT32 screen_update_macrossp(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_eof_macrossp(screen_device &screen, bool state);
 	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, int priority );
-	void draw_layer( bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer );
+	void draw_layer( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer );
 	void sortlayers(int *layer,int *pri);
 	void update_colors(  );
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);

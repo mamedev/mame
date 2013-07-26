@@ -116,7 +116,7 @@ UINT32 himesiki_state::screen_update_himesiki(screen_device &screen, bitmap_ind1
 	int x = -(m_scrollx[0] << 8 | m_scrollx[1]) & 0x1ff;
 	m_bg_tilemap->set_scrolldx(x, x);
 
-	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 	himesiki_draw_sprites(bitmap, cliprect);
 
 	return 0;

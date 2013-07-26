@@ -233,7 +233,7 @@ UINT32 pitnrun_state::screen_update_pitnrun(screen_device &screen, bitmap_ind16 
 	bitmap.fill(0, cliprect);
 
 	if(!(m_ha&4))
-		m_bg->draw(bitmap, cliprect, 0,0);
+		m_bg->draw(screen, bitmap, cliprect, 0,0);
 	else
 	{
 		dx=128-m_h_heed+((m_ha&8)<<5)+3;
@@ -248,13 +248,13 @@ UINT32 pitnrun_state::screen_update_pitnrun(screen_device &screen, bitmap_ind16 
 		myclip.set(dx, dx+127, dy, dy+127);
 		myclip &= cliprect;
 
-		m_bg->draw(bitmap, myclip, 0,0);
+		m_bg->draw(screen, bitmap, myclip, 0,0);
 	}
 
 	draw_sprites(bitmap,myclip);
 
 	if(m_ha&4)
 		copybitmap_trans(bitmap,*m_tmp_bitmap[m_ha&3],flip_screen_x(),flip_screen_y(),dx,dy,myclip, 1);
-	m_fg->draw(bitmap, cliprect, 0,0);
+	m_fg->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
 }

@@ -121,7 +121,7 @@ public:
 	void tilemap_update();
 	void tilemap_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority);
 	void tilemap_draw_offset(bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority, int xoffs, int yoffs);
-	void topspeed_custom_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority, UINT16 *color_ctrl_ram);
+	void topspeed_custom_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, bitmap_ind8 &priority_bitmap, UINT32 priority, UINT16 *color_ctrl_ram);
 
 	/* For Topspeed */
 	void tilemap_draw_special(bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority, UINT16 *ram);
@@ -353,13 +353,13 @@ public:
 	DECLARE_WRITE16_MEMBER( tc0280grd_word_w );
 	DECLARE_WRITE16_MEMBER( tc0280grd_ctrl_word_w );
 	void tc0280grd_tilemap_update(int base_color);
-	void tc0280grd_zoom_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffset, int yoffset, UINT32 priority);
+	void tc0280grd_zoom_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffset, int yoffset, UINT32 priority);
 
 	DECLARE_READ16_MEMBER( tc0430grw_word_r );
 	DECLARE_WRITE16_MEMBER( tc0430grw_word_w );
 	DECLARE_WRITE16_MEMBER( tc0430grw_ctrl_word_w );
 	void tc0430grw_tilemap_update(int base_color);
-	void tc0430grw_zoom_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffset, int yoffset, UINT32 priority);
+	void tc0430grw_zoom_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffset, int yoffset, UINT32 priority);
 
 protected:
 	// device-level overrides

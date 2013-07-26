@@ -89,10 +89,10 @@ TILE_GET_INFO_MEMBER(apple1_state::terminal_gettileinfo)
 		0);         /* flags */
 }
 
-void apple1_state::terminal_draw(bitmap_ind16 &dest, const rectangle &cliprect, terminal_t *terminal)
+void apple1_state::terminal_draw(screen_device &screen, bitmap_ind16 &dest, const rectangle &cliprect, terminal_t *terminal)
 {
 	m_current_terminal = terminal;
-	terminal->tm->draw(dest, cliprect, 0, 0);
+	terminal->tm->draw(screen, dest, cliprect, 0, 0);
 	m_current_terminal = NULL;
 }
 
@@ -386,6 +386,6 @@ void apple1_state::apple1_vh_cursor_blink ()
 UINT32 apple1_state::screen_update_apple1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	apple1_vh_cursor_blink();
-	terminal_draw(bitmap, cliprect, m_terminal);
+	terminal_draw(screen, bitmap, cliprect, m_terminal);
 	return 0;
 }

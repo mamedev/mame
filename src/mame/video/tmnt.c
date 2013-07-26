@@ -546,11 +546,11 @@ UINT32 tmnt_state::screen_update_mia(screen_device &screen, bitmap_ind16 &bitmap
 {
 	m_k052109->tilemap_update();
 
-	m_k052109->tilemap_draw(bitmap, cliprect, 2, TILEMAP_DRAW_OPAQUE,0);
-	if ((m_tmnt_priorityflag & 1) == 1) m_k051960->k051960_sprites_draw(bitmap, cliprect, 0, 0);
-	m_k052109->tilemap_draw(bitmap, cliprect, 1, 0, 0);
-	if ((m_tmnt_priorityflag & 1) == 0) m_k051960->k051960_sprites_draw(bitmap, cliprect, 0, 0);
-	m_k052109->tilemap_draw(bitmap, cliprect, 0, 0, 0);
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, 2, TILEMAP_DRAW_OPAQUE,0);
+	if ((m_tmnt_priorityflag & 1) == 1) m_k051960->k051960_sprites_draw(bitmap, cliprect, screen.priority(), 0, 0);
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, 1, 0, 0);
+	if ((m_tmnt_priorityflag & 1) == 0) m_k051960->k051960_sprites_draw(bitmap, cliprect, screen.priority(), 0, 0);
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, 0, 0, 0);
 
 	return 0;
 }
@@ -559,11 +559,11 @@ UINT32 tmnt_state::screen_update_tmnt(screen_device &screen, bitmap_ind16 &bitma
 {
 	m_k052109->tilemap_update();
 
-	m_k052109->tilemap_draw(bitmap, cliprect, 2, TILEMAP_DRAW_OPAQUE,0);
-	if ((m_tmnt_priorityflag & 1) == 1) m_k051960->k051960_sprites_draw(bitmap, cliprect, 0, 0);
-	m_k052109->tilemap_draw(bitmap, cliprect, 1, 0, 0);
-	if ((m_tmnt_priorityflag & 1) == 0) m_k051960->k051960_sprites_draw(bitmap, cliprect, 0, 0);
-	m_k052109->tilemap_draw(bitmap, cliprect, 0, 0, 0);
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, 2, TILEMAP_DRAW_OPAQUE,0);
+	if ((m_tmnt_priorityflag & 1) == 1) m_k051960->k051960_sprites_draw(bitmap, cliprect, screen.priority(), 0, 0);
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, 1, 0, 0);
+	if ((m_tmnt_priorityflag & 1) == 0) m_k051960->k051960_sprites_draw(bitmap, cliprect, screen.priority(), 0, 0);
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, 0, 0, 0);
 
 	return 0;
 }
@@ -587,12 +587,12 @@ UINT32 tmnt_state::screen_update_punkshot(screen_device &screen, bitmap_ind16 &b
 
 	konami_sortlayers3(m_sorted_layer, m_layerpri);
 
-	machine().priority_bitmap.fill(0, cliprect);
-	m_k052109->tilemap_draw(bitmap, cliprect, m_sorted_layer[0], TILEMAP_DRAW_OPAQUE, 1);
-	m_k052109->tilemap_draw(bitmap, cliprect, m_sorted_layer[1], 0, 2);
-	m_k052109->tilemap_draw(bitmap, cliprect, m_sorted_layer[2], 0, 4);
+	screen.priority().fill(0, cliprect);
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, m_sorted_layer[0], TILEMAP_DRAW_OPAQUE, 1);
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, m_sorted_layer[1], 0, 2);
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, m_sorted_layer[2], 0, 4);
 
-	m_k051960->k051960_sprites_draw(bitmap, cliprect, -1, -1);
+	m_k051960->k051960_sprites_draw(bitmap, cliprect, screen.priority(), -1, -1);
 	return 0;
 }
 
@@ -618,13 +618,13 @@ UINT32 tmnt_state::screen_update_lgtnfght(screen_device &screen, bitmap_ind16 &b
 
 	konami_sortlayers3(m_sorted_layer, m_layerpri);
 
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 	bitmap.fill(16 * bg_colorbase, cliprect);
-	m_k052109->tilemap_draw(bitmap, cliprect, m_sorted_layer[0], 0, 1);
-	m_k052109->tilemap_draw(bitmap, cliprect, m_sorted_layer[1], 0, 2);
-	m_k052109->tilemap_draw(bitmap, cliprect, m_sorted_layer[2], 0, 4);
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, m_sorted_layer[0], 0, 1);
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, m_sorted_layer[1], 0, 2);
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, m_sorted_layer[2], 0, 4);
 
-	m_k053245->k053245_sprites_draw(bitmap, cliprect);
+	m_k053245->k053245_sprites_draw(bitmap, cliprect, screen.priority());
 	return 0;
 }
 
@@ -664,33 +664,33 @@ UINT32 tmnt_state::screen_update_glfgreat(screen_device &screen, bitmap_ind16 &b
 
 	/* not sure about the 053936 priority, but it seems to work */
 
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 	bitmap.fill(16 * bg_colorbase, cliprect);
-	m_k052109->tilemap_draw(bitmap, cliprect, m_sorted_layer[0], 0, 1);
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, m_sorted_layer[0], 0, 1);
 
 	if (m_layerpri[0] >= 0x30 && m_layerpri[1] < 0x30)
 	{
-		m_k053936->zoom_draw(bitmap, cliprect, m_roz_tilemap, 0, 1, 1);
+		m_k053936->zoom_draw(screen, bitmap, cliprect, m_roz_tilemap, 0, 1, 1);
 		m_glfgreat_pixel = bitmap.pix16(0x80, 0x105);
 	}
 
-	m_k052109->tilemap_draw(bitmap, cliprect, m_sorted_layer[1], 0, 2);
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, m_sorted_layer[1], 0, 2);
 
 	if (m_layerpri[1] >= 0x30 && m_layerpri[2] < 0x30)
 	{
-		m_k053936->zoom_draw(bitmap, cliprect, m_roz_tilemap, 0, 1, 1);
+		m_k053936->zoom_draw(screen, bitmap, cliprect, m_roz_tilemap, 0, 1, 1);
 		m_glfgreat_pixel = bitmap.pix16(0x80, 0x105);
 	}
 
-	m_k052109->tilemap_draw(bitmap, cliprect, m_sorted_layer[2], 0, 4);
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, m_sorted_layer[2], 0, 4);
 
 	if (m_layerpri[2] >= 0x30)
 	{
-		m_k053936->zoom_draw(bitmap, cliprect, m_roz_tilemap, 0, 1, 1);
+		m_k053936->zoom_draw(screen, bitmap, cliprect, m_roz_tilemap, 0, 1, 1);
 		m_glfgreat_pixel = bitmap.pix16(0x80, 0x105);
 	}
 
-	m_k053245->k053245_sprites_draw(bitmap, cliprect);
+	m_k053245->k053245_sprites_draw(bitmap, cliprect, screen.priority());
 	return 0;
 }
 
@@ -767,13 +767,13 @@ UINT32 tmnt_state::screen_update_thndrx2(screen_device &screen, bitmap_ind16 &bi
 
 	konami_sortlayers3(m_sorted_layer, m_layerpri);
 
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 	bitmap.fill(16 * bg_colorbase, cliprect);
-	m_k052109->tilemap_draw(bitmap, cliprect, m_sorted_layer[0], 0, 1);
-	m_k052109->tilemap_draw(bitmap, cliprect, m_sorted_layer[1], 0, 2);
-	m_k052109->tilemap_draw(bitmap, cliprect, m_sorted_layer[2], 0, 4);
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, m_sorted_layer[0], 0, 1);
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, m_sorted_layer[1], 0, 2);
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, m_sorted_layer[2], 0, 4);
 
-	m_k051960->k051960_sprites_draw(bitmap, cliprect, -1, -1);
+	m_k051960->k051960_sprites_draw(bitmap, cliprect, screen.priority(), -1, -1);
 	return 0;
 }
 

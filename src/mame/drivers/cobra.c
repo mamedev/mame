@@ -1008,7 +1008,7 @@ UINT32 cobra_state::screen_update_cobra(screen_device &screen, bitmap_rgb32 &bit
 	if (m_has_psac)
 	{
 		m_k001604->draw_back_layer(bitmap, cliprect);
-		m_k001604->draw_front_layer(bitmap, cliprect);
+		m_k001604->draw_front_layer(screen, bitmap, cliprect);
 	}
 
 	m_renderer->display(&bitmap, cliprect);

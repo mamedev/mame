@@ -98,19 +98,19 @@ void sderby_state::video_start()
 
 UINT32 sderby_state::screen_update_sderby(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_tilemap->draw(bitmap, cliprect, 0,0);
+	m_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	draw_sprites(bitmap,cliprect,0);
-	m_md_tilemap->draw(bitmap, cliprect, 0,0);
-	m_fg_tilemap->draw(bitmap, cliprect, 0,0);
+	m_md_tilemap->draw(screen, bitmap, cliprect, 0,0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
 }
 
 UINT32 sderby_state::screen_update_pmroulet(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_tilemap->draw(bitmap, cliprect, 0,0);
-	m_md_tilemap->draw(bitmap, cliprect, 0,0);
+	m_tilemap->draw(screen, bitmap, cliprect, 0,0);
+	m_md_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	draw_sprites(bitmap,cliprect,0);
-	m_fg_tilemap->draw(bitmap, cliprect, 0,0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
 }
 

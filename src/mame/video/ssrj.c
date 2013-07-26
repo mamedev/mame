@@ -277,11 +277,11 @@ UINT32 ssrj_state::screen_update_ssrj(screen_device &screen, bitmap_ind16 &bitma
 {
 	m_tilemap1->set_scrollx(0, 0xff-m_scrollram[2] );
 	m_tilemap1->set_scrolly(0, m_scrollram[0] );
-	m_tilemap1->draw(bitmap, cliprect, 0, 0);
+	m_tilemap1->draw(screen, bitmap, cliprect, 0, 0);
 	draw_objects(bitmap, cliprect);
-	m_tilemap2->draw(bitmap, cliprect, 0, 0);
+	m_tilemap2->draw(screen, bitmap, cliprect, 0, 0);
 
-	if (m_scrollram[0x101] == 0xb) m_tilemap4->draw(bitmap, cliprect, 0, 0);/* hack to display 4th tilemap */
+	if (m_scrollram[0x101] == 0xb) m_tilemap4->draw(screen, bitmap, cliprect, 0, 0);/* hack to display 4th tilemap */
 	return 0;
 }
 

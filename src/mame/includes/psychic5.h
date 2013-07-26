@@ -54,7 +54,7 @@ public:
 	void psychic5_change_bg_palette(int color, int lo_offs, int hi_offs);
 	void set_background_palette_intensity();
 	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void draw_background(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;

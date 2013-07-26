@@ -30,8 +30,8 @@ public:
 	DECLARE_READ32_MEMBER(char32_r);
 	DECLARE_WRITE32_MEMBER(char32_w);
 
-	void draw(bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int pri, int flags);
-	void draw(bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, int pri, int flags);
+	void draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int pri, int flags);
+	void draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, int pri, int flags);
 
 protected:
 	virtual void device_start();
@@ -54,13 +54,13 @@ private:
 	TILE_GET_INFO_MEMBER(tile_info_1s);
 	TILE_GET_INFO_MEMBER(tile_info_1w);
 
-	void draw_rect(bitmap_ind16 &bm, bitmap_ind8 &tm, bitmap_ind16 &dm, const UINT16 *mask,
+	void draw_rect(screen_device &screen, bitmap_ind16 &bm, bitmap_ind8 &tm, bitmap_ind16 &dm, const UINT16 *mask,
 					UINT16 tpri, UINT8 lpri, int win, int sx, int sy, int xx1, int yy1, int xx2, int yy2);
-	void draw_rect(bitmap_ind16 &bm, bitmap_ind8 &tm, bitmap_rgb32 &dm, const UINT16 *mask,
-						UINT16 tpri, UINT8 lpri, int win, int sx, int sy, int xx1, int yy1, int xx2, int yy2);
+	void draw_rect(screen_device &screen, bitmap_ind16 &bm, bitmap_ind8 &tm, bitmap_rgb32 &dm, const UINT16 *mask,
+					UINT16 tpri, UINT8 lpri, int win, int sx, int sy, int xx1, int yy1, int xx2, int yy2);
 
 	template<class _BitmapClass>
-	void draw_common(_BitmapClass &bitmap, const rectangle &cliprect, int layer, int pri, int flags);
+	void draw_common(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, int layer, int pri, int flags);
 };
 
 class segas24_sprite : public device_t
@@ -73,7 +73,7 @@ public:
 	DECLARE_READ16_MEMBER(read);
 	DECLARE_WRITE16_MEMBER(write);
 
-	void draw(bitmap_ind16 &bitmap, const rectangle &cliprect, const int *spri);
+	void draw(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, const int *spri);
 
 protected:
 	virtual void device_start();

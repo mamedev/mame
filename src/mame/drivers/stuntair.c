@@ -219,12 +219,12 @@ UINT32 stuntair_state::screen_update_stuntair(screen_device &screen, bitmap_ind1
 {
 	m_bg_tilemap->set_scrollx(0, m_bg_xscroll);
 
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	m_fg_tilemap->draw(bitmap, cliprect, 0, TILEMAP_PIXEL_LAYER0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, TILEMAP_PIXEL_LAYER0);
 
 	draw_sprites(bitmap, cliprect);
 
-	m_fg_tilemap->draw(bitmap, cliprect, 0, TILEMAP_PIXEL_LAYER1|TILEMAP_DRAW_OPAQUE);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, TILEMAP_PIXEL_LAYER1|TILEMAP_DRAW_OPAQUE);
 
 	return 0;
 }

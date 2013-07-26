@@ -111,15 +111,15 @@ UINT32 foodf_state::screen_update_foodf(screen_device &screen, bitmap_ind16 &bit
 {
 	int offs;
 	gfx_element *gfx = machine().gfx[1];
-	bitmap_ind8 &priority_bitmap = machine().priority_bitmap;
+	bitmap_ind8 &priority_bitmap = screen.priority();
 	UINT16 *spriteram16 = m_spriteram;
 
 	/* first draw the playfield opaquely */
-	m_playfield_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	m_playfield_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 
 	/* then draw the non-transparent parts with a priority of 1 */
 	priority_bitmap.fill(0);
-	m_playfield_tilemap->draw(bitmap, cliprect, 0, 1);
+	m_playfield_tilemap->draw(screen, bitmap, cliprect, 0, 1);
 
 	/* draw the motion objects front-to-back */
 	for (offs = 0x80-2; offs >= 0x20; offs -= 2)

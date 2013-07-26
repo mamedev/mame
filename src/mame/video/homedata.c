@@ -829,8 +829,8 @@ UINT32 homedata_state::screen_update_mrokumei(screen_device &screen, bitmap_ind1
 
 	m_bg_tilemap[m_visible_page][0]->set_scrollx(0, m_vreg[0xc] << 1);
 
-	m_bg_tilemap[m_visible_page][0]->draw(bitmap, cliprect, 0, 0);
-	m_bg_tilemap[m_visible_page][1]->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap[m_visible_page][0]->draw(screen, bitmap, cliprect, 0, 0);
+	m_bg_tilemap[m_visible_page][1]->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -910,7 +910,7 @@ UINT32 homedata_state::screen_update_reikaids(screen_device &screen, bitmap_ind1
 
 	pri = (m_blitter_bank & 0x70) >> 4;
 	for (i = 0; i < 4; i++)
-		m_bg_tilemap[m_visible_page][pritable[m_priority][pri][3 - i]]->draw(bitmap, cliprect, 0, 0);
+		m_bg_tilemap[m_visible_page][pritable[m_priority][pri][3 - i]]->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -988,8 +988,8 @@ UINT32 homedata_state::screen_update_pteacher(screen_device &screen, bitmap_ind1
 	m_bg_tilemap[m_visible_page][0]->set_scrollx(0, scroll_high * 8 + scroll_low);
 	m_bg_tilemap[m_visible_page][1]->set_scrollx(0, scroll_high * 8 + scroll_low);
 
-	m_bg_tilemap[m_visible_page][0]->draw(bitmap, cliprect, 0, 0);
-	m_bg_tilemap[m_visible_page][1]->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap[m_visible_page][0]->draw(screen, bitmap, cliprect, 0, 0);
+	m_bg_tilemap[m_visible_page][1]->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 

@@ -121,7 +121,7 @@ WRITE8_MEMBER(sbowling_state::sbw_videoram_w)
 UINT32 sbowling_state::screen_update_sbowling(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0x18, cliprect);
-	m_sb_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_sb_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	copybitmap_trans(bitmap, *m_tmpbitmap, 0, 0, 0, 0, cliprect, m_color_prom_address);
 	return 0;
 }

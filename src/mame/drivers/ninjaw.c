@@ -849,11 +849,8 @@ static MACHINE_CONFIG_START( ninjaw, ninjaw_state )
 
 
 	MCFG_TC0100SCN_ADD("tc0100scn_1", darius2_tc0100scn_intf_l)
-	MCFG_TC0100SCN_SET_SCREEN("lscreen")
 	MCFG_TC0100SCN_ADD("tc0100scn_2", darius2_tc0100scn_intf_m)
-	MCFG_TC0100SCN_SET_SCREEN("mscreen")
 	MCFG_TC0100SCN_ADD("tc0100scn_3", darius2_tc0100scn_intf_r)
-	MCFG_TC0100SCN_SET_SCREEN("rscreen")
 	MCFG_TC0110PCR_ADD("tc0110pcr_1", darius2_tc0110pcr_intf_l)
 	MCFG_TC0110PCR_ADD("tc0110pcr_2", darius2_tc0110pcr_intf_m)
 	MCFG_TC0110PCR_ADD("tc0110pcr_3", darius2_tc0110pcr_intf_r)
@@ -932,11 +929,8 @@ static MACHINE_CONFIG_START( darius2, ninjaw_state )
 
 
 	MCFG_TC0100SCN_ADD("tc0100scn_1", darius2_tc0100scn_intf_l)
-	MCFG_TC0100SCN_SET_SCREEN("lscreen")
 	MCFG_TC0100SCN_ADD("tc0100scn_2", darius2_tc0100scn_intf_m)
-	MCFG_TC0100SCN_SET_SCREEN("mscreen")
 	MCFG_TC0100SCN_ADD("tc0100scn_3", darius2_tc0100scn_intf_r)
-	MCFG_TC0100SCN_SET_SCREEN("rscreen")
 	MCFG_TC0110PCR_ADD("tc0110pcr_1", darius2_tc0110pcr_intf_l)
 	MCFG_TC0110PCR_ADD("tc0110pcr_2", darius2_tc0110pcr_intf_m)
 	MCFG_TC0110PCR_ADD("tc0110pcr_3", darius2_tc0110pcr_intf_r)

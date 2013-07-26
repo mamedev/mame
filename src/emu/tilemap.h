@@ -628,10 +628,10 @@ public:
 	void set_transmask(int group, UINT32 fgmask, UINT32 bgmask);
 
 	// drawing
-	void draw(bitmap_ind16 &dest, const rectangle &cliprect, UINT32 flags, UINT8 priority, UINT8 priority_mask = 0xff);
-	void draw(bitmap_rgb32 &dest, const rectangle &cliprect, UINT32 flags, UINT8 priority, UINT8 priority_mask = 0xff);
-	void draw_roz(bitmap_ind16 &dest, const rectangle &cliprect, UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, bool wraparound, UINT32 flags, UINT8 priority, UINT8 priority_mask = 0xff);
-	void draw_roz(bitmap_rgb32 &dest, const rectangle &cliprect, UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, bool wraparound, UINT32 flags, UINT8 priority, UINT8 priority_mask = 0xff);
+	void draw(screen_device &screen, bitmap_ind16 &dest, const rectangle &cliprect, UINT32 flags, UINT8 priority = 0, UINT8 priority_mask = 0xff);
+	void draw(screen_device &screen, bitmap_rgb32 &dest, const rectangle &cliprect, UINT32 flags, UINT8 priority = 0, UINT8 priority_mask = 0xff);
+	void draw_roz(screen_device &screen, bitmap_ind16 &dest, const rectangle &cliprect, UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, bool wraparound, UINT32 flags, UINT8 priority = 0, UINT8 priority_mask = 0xff);
+	void draw_roz(screen_device &screen, bitmap_rgb32 &dest, const rectangle &cliprect, UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, bool wraparound, UINT32 flags, UINT8 priority = 0, UINT8 priority_mask = 0xff);
 	void draw_debug(bitmap_rgb32 &dest, UINT32 scrollx, UINT32 scrolly);
 
 	// mappers
@@ -665,6 +665,7 @@ private:
 	// blitting parameters for rendering
 	struct blit_parameters
 	{
+		bitmap_ind8 *		priority;
 		rectangle           cliprect;
 		UINT32              tilemap_priority_code;
 		UINT8               mask;
@@ -698,9 +699,9 @@ private:
 	void tile_update(logical_index logindex, UINT32 col, UINT32 row);
 	UINT8 tile_draw(const UINT8 *pendata, UINT32 x0, UINT32 y0, UINT32 palette_base, UINT8 category, UINT8 group, UINT8 flags, UINT8 pen_mask);
 	UINT8 tile_apply_bitmask(const UINT8 *maskdata, UINT32 x0, UINT32 y0, UINT8 category, UINT8 flags);
-	void configure_blit_parameters(blit_parameters &blit, const rectangle &cliprect, UINT32 flags, UINT8 priority, UINT8 priority_mask);
-	template<class _BitmapClass> void draw_common(_BitmapClass &dest, const rectangle &cliprect, UINT32 flags, UINT8 priority, UINT8 priority_mask);
-	template<class _BitmapClass> void draw_roz_common(_BitmapClass &dest, const rectangle &cliprect, UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, bool wraparound, UINT32 flags, UINT8 priority, UINT8 priority_mask);
+	void configure_blit_parameters(blit_parameters &blit, bitmap_ind8 &priority_bitmap, const rectangle &cliprect, UINT32 flags, UINT8 priority, UINT8 priority_mask);
+	template<class _BitmapClass> void draw_common(screen_device &screen, _BitmapClass &dest, const rectangle &cliprect, UINT32 flags, UINT8 priority, UINT8 priority_mask);
+	template<class _BitmapClass> void draw_roz_common(screen_device &screen, _BitmapClass &dest, const rectangle &cliprect, UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, bool wraparound, UINT32 flags, UINT8 priority, UINT8 priority_mask);
 	template<class _BitmapClass> void draw_instance(_BitmapClass &dest, const blit_parameters &blit, int xpos, int ypos);
 	template<class _BitmapClass> void draw_roz_core(_BitmapClass &destbitmap, const blit_parameters &blit, UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, bool wraparound);
 

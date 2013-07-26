@@ -350,7 +350,7 @@ UINT32 fortyl_state::screen_update_fortyl(screen_device &screen, bitmap_ind16 &b
 	draw_pixram(bitmap, cliprect);
 
 	m_bg_tilemap->set_scrolldy(- m_video_ctrl[1] + 1, - m_video_ctrl[1] - 1 );
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	draw_sprites(bitmap, cliprect);
 	return 0;

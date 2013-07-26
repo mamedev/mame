@@ -320,7 +320,7 @@ UINT32 cntsteer_state::screen_update_zerotrgt(screen_device &screen, bitmap_ind1
 		x = -256 - (m_scrollx | m_scrollx_hi);
 		y = 256 + (m_scrolly | m_scrolly_hi);
 
-		m_bg_tilemap->draw_roz(bitmap, cliprect,
+		m_bg_tilemap->draw_roz(screen, bitmap, cliprect,
 						(x << 16), (y << 16),
 						p1, p2,
 						p3, p4,
@@ -329,7 +329,7 @@ UINT32 cntsteer_state::screen_update_zerotrgt(screen_device &screen, bitmap_ind1
 	}
 
 	zerotrgt_draw_sprites(bitmap, cliprect);
-	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }
@@ -367,7 +367,7 @@ UINT32 cntsteer_state::screen_update_cntsteer(screen_device &screen, bitmap_ind1
 		x = 256 + (m_scrollx | m_scrollx_hi);
 		y = 256 - (m_scrolly | m_scrolly_hi);
 
-		m_bg_tilemap->draw_roz(bitmap, cliprect,
+		m_bg_tilemap->draw_roz(screen, bitmap, cliprect,
 						(x << 16), (y << 16),
 						p1, p2,
 						p3, p4,
@@ -376,7 +376,7 @@ UINT32 cntsteer_state::screen_update_cntsteer(screen_device &screen, bitmap_ind1
 	}
 
 	cntsteer_draw_sprites(bitmap, cliprect);
-	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }

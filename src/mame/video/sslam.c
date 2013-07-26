@@ -189,7 +189,7 @@ UINT32 sslam_state::screen_update_sslam(screen_device &screen, bitmap_ind16 &bit
 	m_bg_tilemap->set_scrollx(0, m_regs[4]+4);
 	m_bg_tilemap->set_scrolly(0, m_regs[5]+8);
 
-	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
 
 	/* remove wraparound from the tilemap (used on title screen) */
 	if (m_regs[2]+2 > 0x8c8)
@@ -200,15 +200,15 @@ UINT32 sslam_state::screen_update_sslam(screen_device &screen, bitmap_ind16 &bit
 		md_clip.min_y = cliprect.min_y;
 		md_clip.max_y = cliprect.max_y;
 
-		m_md_tilemap->draw(bitmap, md_clip, 0,0);
+		m_md_tilemap->draw(screen, bitmap, md_clip, 0,0);
 	}
 	else
 	{
-		m_md_tilemap->draw(bitmap, cliprect, 0,0);
+		m_md_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	}
 
 	draw_sprites(bitmap,cliprect);
-	m_tx_tilemap->draw(bitmap, cliprect, 0,0);
+	m_tx_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
 }
 
@@ -223,7 +223,7 @@ UINT32 sslam_state::screen_update_powerbls(screen_device &screen, bitmap_ind16 &
 	m_bg_tilemap->set_scrollx(0, m_regs[0]+21);
 	m_bg_tilemap->set_scrolly(0, m_regs[1]-240);
 
-	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	draw_sprites(bitmap,cliprect);
 	return 0;
 }

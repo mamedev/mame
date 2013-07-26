@@ -30,8 +30,8 @@ UINT32 supbtime_state::screen_update_supbtime(screen_device &screen, bitmap_ind1
 
 	bitmap.fill(768, cliprect);
 
-	m_deco_tilegen1->tilemap_2_draw(bitmap, cliprect, 0, 0);
+	m_deco_tilegen1->tilemap_2_draw(screen, bitmap, cliprect, 0, 0);
 	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
-	m_deco_tilegen1->tilemap_1_draw(bitmap, cliprect, 0, 0);
+	m_deco_tilegen1->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }

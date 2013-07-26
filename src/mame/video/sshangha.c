@@ -44,13 +44,13 @@ UINT32 sshangha_state::screen_update_sshangha(screen_device &screen, bitmap_rgb3
 
 	/* the tilemap 4bpp + 4bpp = 8bpp mixing actually seems external to the tilemap, note video_control is not part of the tilemap chip */
 	if ((m_video_control&4)==0) {
-		m_deco_tilegen1->tilemap_12_combine_draw(bitmap, cliprect, 0, 0, 1);
+		m_deco_tilegen1->tilemap_12_combine_draw(screen, bitmap, cliprect, 0, 0, 1);
 		m_sprgen1->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0200, 0x0200, 0x100, 0x1ff);
 	}
 	else {
-		m_deco_tilegen1->tilemap_2_draw(bitmap, cliprect, 0, 0);
+		m_deco_tilegen1->tilemap_2_draw(screen, bitmap, cliprect, 0, 0);
 		m_sprgen1->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0200, 0x0200, 0x100, 0x1ff);
-		m_deco_tilegen1->tilemap_1_draw(bitmap, cliprect, 0, 0);
+		m_deco_tilegen1->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
 	}
 
 	if (m_spriteram2 != NULL)

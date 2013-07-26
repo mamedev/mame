@@ -212,7 +212,7 @@ UINT32 eprom_state::screen_update_eprom(screen_device &screen, bitmap_ind16 &bit
 	m_mob->draw_async(cliprect);
 
 	/* draw the playfield */
-	m_playfield_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_playfield_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	// draw and merge the MO
 	bitmap_ind16 &mobitmap = m_mob->bitmap();
@@ -319,7 +319,7 @@ UINT32 eprom_state::screen_update_eprom(screen_device &screen, bitmap_ind16 &bit
 		}
 
 	/* add the alpha on top */
-	m_alpha_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_alpha_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* now go back and process the upper bit of MO priority */
 	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != NULL; rect = rect->next())
@@ -359,7 +359,7 @@ UINT32 eprom_state::screen_update_guts(screen_device &screen, bitmap_ind16 &bitm
 	m_mob->draw_async(cliprect);
 
 	/* draw the playfield */
-	m_playfield_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_playfield_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	// draw and merge the MO
 	bitmap_ind16 &mobitmap = m_mob->bitmap();
@@ -385,7 +385,7 @@ UINT32 eprom_state::screen_update_guts(screen_device &screen, bitmap_ind16 &bitm
 		}
 
 	/* add the alpha on top */
-	m_alpha_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_alpha_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* now go back and process the upper bit of MO priority */
 	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != NULL; rect = rect->next())

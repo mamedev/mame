@@ -287,6 +287,7 @@ void screen_device::device_start()
 		m_bitmap[index].set_format(format(), texformat);
 		register_screen_bitmap(m_bitmap[index]);
 	}
+	register_screen_bitmap(m_priority);
 
 	// allocate raw textures
 	m_texture[0] = machine().render().texture_alloc();

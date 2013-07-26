@@ -370,9 +370,9 @@ UINT32 goldstar_state::screen_update_goldstar(screen_device &screen, bitmap_ind1
 		const rectangle visible2(0*8, (14+48)*8-1, 12*8, (12+7)*8-1);
 		const rectangle visible3(0*8, (14+48)*8-1, 20*8, (20+7)*8-1);
 
-		m_reel1_tilemap->draw(bitmap, visible1, 0, 0);
-		m_reel2_tilemap->draw(bitmap, visible2, 0, 0);
-		m_reel3_tilemap->draw(bitmap, visible3, 0, 0);
+		m_reel1_tilemap->draw(screen, bitmap, visible1, 0, 0);
+		m_reel2_tilemap->draw(screen, bitmap, visible2, 0, 0);
+		m_reel3_tilemap->draw(screen, bitmap, visible3, 0, 0);
 	}
 
 	if (m_cm_enable_reg &0x04)
@@ -389,7 +389,7 @@ UINT32 goldstar_state::screen_update_goldstar(screen_device &screen, bitmap_ind1
 
 	if (m_cm_enable_reg &0x02)
 	{
-		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	}
 
 	return 0;
@@ -414,7 +414,7 @@ UINT32 goldstar_state::screen_update_bingowng(screen_device &screen, bitmap_ind1
 
 
 		const rectangle visible1(0*8, (14+48)*8-1,  3*8,  (4+7)*8-1);
-		m_reel1_tilemap->draw(bitmap, visible1, 0, 0);
+		m_reel1_tilemap->draw(screen, bitmap, visible1, 0, 0);
 	}
 
 	if (m_cm_enable_reg &0x04)
@@ -431,7 +431,7 @@ UINT32 goldstar_state::screen_update_bingowng(screen_device &screen, bitmap_ind1
 
 	if (m_cm_enable_reg &0x02)
 	{
-		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	}
 
 	return 0;
@@ -463,9 +463,9 @@ UINT32 goldstar_state::screen_update_magical(screen_device &screen, bitmap_ind16
 			const rectangle visible1alt(0*8, (16+48)*8-1,  4*8,  16*8-1);
 			const rectangle visible2alt(0*8, (16+48)*8-1, 16*8,  28*8-1);
 
-			m_reel1_tilemap->draw(bitmap, visible1alt, 0, 0);
-			m_reel2_tilemap->draw(bitmap, visible2alt, 0, 0);
-			//m_reel3_tilemap->draw(bitmap, &magical_visible3, 0, 0);
+			m_reel1_tilemap->draw(screen, bitmap, visible1alt, 0, 0);
+			m_reel2_tilemap->draw(screen, bitmap, visible2alt, 0, 0);
+			//m_reel3_tilemap->draw(screen, bitmap, &magical_visible3, 0, 0);
 		}
 		else
 		{
@@ -481,15 +481,15 @@ UINT32 goldstar_state::screen_update_magical(screen_device &screen, bitmap_ind16
 			const rectangle visible2(0*8, (14+48)*8-1, 12*8, (12+8)*8-1);
 			const rectangle visible3(0*8, (14+48)*8-1, 20*8, (20+8)*8-1);
 
-			m_reel1_tilemap->draw(bitmap, visible1, 0, 0);
-			m_reel2_tilemap->draw(bitmap, visible2, 0, 0);
-			m_reel3_tilemap->draw(bitmap, visible3, 0, 0);
+			m_reel1_tilemap->draw(screen, bitmap, visible1, 0, 0);
+			m_reel2_tilemap->draw(screen, bitmap, visible2, 0, 0);
+			m_reel3_tilemap->draw(screen, bitmap, visible3, 0, 0);
 		}
 	}
 
 	if (m_cm_enable_reg &0x02)
 	{
-		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	}
 
 	return 0;
@@ -518,7 +518,7 @@ UINT32 goldstar_state::screen_update_unkch(screen_device &screen, bitmap_ind16 &
 			//  m_reel3_tilemap->set_scrolly(i, m_reel3_scroll[(i*2)+1]);
 			}
 
-			m_reel1_tilemap->draw(bitmap, cliprect, 0, 0);
+			m_reel1_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 		}
 		// or draw the reels normally?
@@ -535,15 +535,15 @@ UINT32 goldstar_state::screen_update_unkch(screen_device &screen, bitmap_ind16 &
 			const rectangle visible2(0*8, (14+48)*8-1, 10*8, (10+7)*8-1);
 			const rectangle visible3(0*8, (14+48)*8-1, 17*8, (17+7)*8-1);
 
-			m_reel1_tilemap->draw(bitmap, visible1, 0, 0);
-			m_reel2_tilemap->draw(bitmap, visible2, 0, 0);
-			m_reel3_tilemap->draw(bitmap, visible3, 0, 0);
+			m_reel1_tilemap->draw(screen, bitmap, visible1, 0, 0);
+			m_reel2_tilemap->draw(screen, bitmap, visible2, 0, 0);
+			m_reel3_tilemap->draw(screen, bitmap, visible3, 0, 0);
 		}
 	}
 
 	if (m_cm_enable_reg &0x02)
 	{
-		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	}
 
 	return 0;
@@ -571,14 +571,14 @@ UINT32 goldstar_state::screen_update_cmast91(screen_device &screen, bitmap_ind16
 		const rectangle visible2(0*8, (14+48)*8-1, 11*8, (12+7)*8-1);   /* 4 pixels less for reel2 */
 		const rectangle visible3(0*8, (14+48)*8-1, 19*8, (19+7)*8-1);   /* 8 pixels less for reel3 */
 
-		m_reel1_tilemap->draw(bitmap, visible1, 0, 0);
-		m_reel2_tilemap->draw(bitmap, visible2, 0, 0);
-		m_reel3_tilemap->draw(bitmap, visible3, 0, 0);
+		m_reel1_tilemap->draw(screen, bitmap, visible1, 0, 0);
+		m_reel2_tilemap->draw(screen, bitmap, visible2, 0, 0);
+		m_reel3_tilemap->draw(screen, bitmap, visible3, 0, 0);
 	}
 
 	if (m_cm_enable_reg &0x02)
 	{
-		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	}
 
 	return 0;
@@ -606,9 +606,9 @@ UINT32 goldstar_state::screen_update_amcoe1a(screen_device &screen, bitmap_ind16
 		const rectangle visible2(0*8, (14+48)*8-1, 10*8, (10+6)*8-1);
 		const rectangle visible3(0*8, (14+48)*8-1, 16*8, (16+6)*8-1);
 
-		m_reel1_tilemap->draw(bitmap, visible1, 0, 0);
-		m_reel2_tilemap->draw(bitmap, visible2, 0, 0);
-		m_reel3_tilemap->draw(bitmap, visible3, 0, 0);
+		m_reel1_tilemap->draw(screen, bitmap, visible1, 0, 0);
+		m_reel2_tilemap->draw(screen, bitmap, visible2, 0, 0);
+		m_reel3_tilemap->draw(screen, bitmap, visible3, 0, 0);
 	}
 
 	if (m_cm_enable_reg &0x04)
@@ -618,7 +618,7 @@ UINT32 goldstar_state::screen_update_amcoe1a(screen_device &screen, bitmap_ind16
 
 	if (m_cm_enable_reg &0x02)
 	{
-		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	}
 
 	return 0;

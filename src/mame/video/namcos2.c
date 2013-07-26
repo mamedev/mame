@@ -113,6 +113,7 @@ DrawRozHelperBlock(const struct RozParam *rozInfo, int destx, int desty,
 
 static void
 DrawRozHelper(
+	screen_device &screen, 
 	bitmap_ind16 &bitmap,
 	tilemap_t *tmap,
 	const rectangle &clip,
@@ -225,7 +226,7 @@ DrawRozHelper(
 	}
 	else
 	{
-		tmap->draw_roz(
+		tmap->draw_roz(screen, 
 			bitmap, clip,
 			rozInfo->startx, rozInfo->starty,
 			rozInfo->incxx, rozInfo->incxy,
@@ -234,7 +235,7 @@ DrawRozHelper(
 	}
 } /* DrawRozHelper */
 
-void namcos2_state::draw_roz(bitmap_ind16 &bitmap, const rectangle &cliprect)
+void namcos2_state::draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	const int xoffset = 38,yoffset = 0;
 	struct RozParam rozParam;
@@ -281,7 +282,7 @@ void namcos2_state::draw_roz(bitmap_ind16 &bitmap, const rectangle &cliprect)
 	rozParam.incyx<<=8;
 	rozParam.incyy<<=8;
 
-	DrawRozHelper( bitmap, m_tilemap_roz, cliprect, &rozParam );
+	DrawRozHelper( screen, bitmap, m_tilemap_roz, cliprect, &rozParam );
 }
 
 WRITE16_MEMBER( namcos2_state::rozram_word_w )
@@ -430,13 +431,13 @@ UINT32 namcos2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	{
 		if( (pri&1)==0 )
 		{
-			namco_tilemap_draw( bitmap, clip, pri/2 );
+			namco_tilemap_draw( screen, bitmap, clip, pri/2 );
 
 			if( ((m_gfx_ctrl & 0x7000) >> 12)==pri/2 )
 			{
-				draw_roz(bitmap,clip);
+				draw_roz(screen, bitmap,clip);
 			}
-			draw_sprites(bitmap, clip, pri/2, m_gfx_ctrl );
+			draw_sprites(screen, bitmap, clip, pri/2, m_gfx_ctrl );
 		}
 	}
 	return 0;
@@ -463,10 +464,10 @@ UINT32 namcos2_state::screen_update_finallap(screen_device &screen, bitmap_ind16
 	{
 		if( (pri&1)==0 )
 		{
-			namco_tilemap_draw( bitmap, clip, pri/2 );
+			namco_tilemap_draw( screen, bitmap, clip, pri/2 );
 		}
 		m_c45_road->draw(bitmap,clip,pri);
-		draw_sprites(bitmap,clip,pri,m_gfx_ctrl );
+		draw_sprites(screen,bitmap,clip,pri,m_gfx_ctrl );
 	}
 	return 0;
 }
@@ -496,14 +497,14 @@ UINT32 namcos2_state::screen_update_luckywld(screen_device &screen, bitmap_ind16
 	{
 		if( (pri&1)==0 )
 		{
-			namco_tilemap_draw( bitmap, clip, pri/2 );
+			namco_tilemap_draw( screen, bitmap, clip, pri/2 );
 		}
 		m_c45_road->draw(bitmap,clip,pri);
 		if( m_gametype==NAMCOS2_LUCKY_AND_WILD )
 		{
-			c169_roz_draw(bitmap, clip, pri);
+			c169_roz_draw(screen, bitmap, clip, pri);
 		}
-		c355_obj_draw(bitmap, clip, pri );
+		c355_obj_draw(screen, bitmap, clip, pri );
 	}
 	return 0;
 }
@@ -527,8 +528,8 @@ UINT32 namcos2_state::screen_update_sgunner(screen_device &screen, bitmap_ind16 
 
 	for( pri=0; pri<8; pri++ )
 	{
-		namco_tilemap_draw( bitmap, clip, pri );
-		c355_obj_draw(bitmap, clip, pri );
+		namco_tilemap_draw( screen, bitmap, clip, pri );
+		c355_obj_draw(screen, bitmap, clip, pri );
 	}
 	return 0;
 }
@@ -555,10 +556,10 @@ UINT32 namcos2_state::screen_update_metlhawk(screen_device &screen, bitmap_ind16
 	{
 		if( (pri&1)==0 )
 		{
-			namco_tilemap_draw( bitmap, clip, pri/2 );
+			namco_tilemap_draw( screen, bitmap, clip, pri/2 );
 		}
-		c169_roz_draw(bitmap, clip, pri);
-		draw_sprites_metalhawk(bitmap,clip,pri );
+		c169_roz_draw(screen, bitmap, clip, pri);
+		draw_sprites_metalhawk(screen,bitmap,clip,pri );
 	}
 	return 0;
 }

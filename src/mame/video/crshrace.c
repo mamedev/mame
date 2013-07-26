@@ -95,15 +95,15 @@ WRITE16_MEMBER(crshrace_state::crshrace_gfxctrl_w)
 
 ***************************************************************************/
 
-void crshrace_state::draw_bg( bitmap_ind16 &bitmap, const rectangle &cliprect )
+void crshrace_state::draw_bg( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	m_tilemap2->draw(bitmap, cliprect, 0, 0);
+	m_tilemap2->draw(screen, bitmap, cliprect, 0, 0);
 }
 
 
-void crshrace_state::draw_fg(bitmap_ind16 &bitmap, const rectangle &cliprect)
+void crshrace_state::draw_fg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_k053936->zoom_draw(bitmap, cliprect, m_tilemap1, 0, 0, 1);
+	m_k053936->zoom_draw(screen, bitmap, cliprect, m_tilemap1, 0, 0, 1);
 }
 
 
@@ -122,15 +122,15 @@ UINT32 crshrace_state::screen_update_crshrace(screen_device &screen, bitmap_ind1
 	switch (m_gfxctrl & 0xfb)
 	{
 		case 0x00:  /* high score screen */
-			m_spr->draw_sprites(m_spriteram->buffer(), 0x2000,  machine(), bitmap, cliprect);
-			draw_bg(bitmap, cliprect);
-			draw_fg(bitmap, cliprect);
+			m_spr->draw_sprites(m_spriteram->buffer(), 0x2000,  screen, bitmap, cliprect);
+			draw_bg(screen, bitmap, cliprect);
+			draw_fg(screen, bitmap, cliprect);
 			break;
 		case 0x01:
 		case 0x02:
-			draw_bg(bitmap, cliprect);
-			draw_fg(bitmap, cliprect);
-			m_spr->draw_sprites(m_spriteram->buffer(), 0x2000,  machine(), bitmap, cliprect);
+			draw_bg(screen, bitmap, cliprect);
+			draw_fg(screen, bitmap, cliprect);
+			m_spr->draw_sprites(m_spriteram->buffer(), 0x2000,  screen, bitmap, cliprect);
 			break;
 		default:
 			popmessage("gfxctrl = %02x", m_gfxctrl);

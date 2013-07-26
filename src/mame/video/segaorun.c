@@ -76,7 +76,7 @@ UINT32 segaorun_state::screen_update_shangon(screen_device &screen, bitmap_ind16
 	m_sprites->draw_async(cliprect);
 
 	// reset priorities
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 
 	// draw the low priority road layer
 	m_segaic16road->segaic16_road_draw(0, bitmap, cliprect, SEGAIC16_ROAD_BACKGROUND);
@@ -105,7 +105,7 @@ UINT32 segaorun_state::screen_update_shangon(screen_device &screen, bitmap_ind16
 		{
 			UINT16 *dest = &bitmap.pix(y);
 			UINT16 *src = &sprites.pix(y);
-			UINT8 *pri = &machine().priority_bitmap.pix(y);
+			UINT8 *pri = &screen.priority().pix(y);
 			for (int x = rect->min_x; x <= rect->max_x; x++)
 			{
 				// only process written pixels
@@ -145,7 +145,7 @@ UINT32 segaorun_state::screen_update_outrun(screen_device &screen, bitmap_ind16 
 	m_sprites->draw_async(cliprect);
 
 	// reset priorities
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 
 	// draw the low priority road layer
 	m_segaic16road->segaic16_road_draw(0, bitmap, cliprect, SEGAIC16_ROAD_BACKGROUND);
@@ -172,7 +172,7 @@ UINT32 segaorun_state::screen_update_outrun(screen_device &screen, bitmap_ind16 
 		{
 			UINT16 *dest = &bitmap.pix(y);
 			UINT16 *src = &sprites.pix(y);
-			UINT8 *pri = &machine().priority_bitmap.pix(y);
+			UINT8 *pri = &screen.priority().pix(y);
 			for (int x = rect->min_x; x <= rect->max_x; x++)
 			{
 				// only process written pixels

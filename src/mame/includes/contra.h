@@ -69,6 +69,6 @@ public:
 	UINT32 screen_update_contra(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(contra_interrupt);
 	void set_pens(  );
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int bank );
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, int bank );
 	required_device<cpu_device> m_maincpu;
 };

@@ -165,7 +165,7 @@ void jokrwild_state::video_start()
 
 UINT32 jokrwild_state::screen_update_jokrwild(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 

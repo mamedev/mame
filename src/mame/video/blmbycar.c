@@ -157,7 +157,7 @@ void blmbycar_state::video_start()
 
 ***************************************************************************/
 
-void blmbycar_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
+void blmbycar_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	UINT16 *source, *finish;
 
@@ -196,7 +196,7 @@ void blmbycar_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 					0x20 + (attr & 0xf),
 					flipx, flipy,
 					x, y,
-					machine().priority_bitmap,
+					screen.priority(),
 					pri_mask,0);
 	}
 }
@@ -233,20 +233,20 @@ if (machine().input().code_pressed(KEYCODE_Z))
 }
 #endif
 
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 
 	if (layers_ctrl & 1)
 		for (i = 0; i <= 1; i++)
-			m_tilemap_0->draw(bitmap, cliprect, i, i);
+			m_tilemap_0->draw(screen, bitmap, cliprect, i, i);
 	else
 		bitmap.fill(0, cliprect);
 
 	if (layers_ctrl & 2)
 		for (i = 0; i <= 1; i++)
-			m_tilemap_1->draw(bitmap, cliprect, i, i);
+			m_tilemap_1->draw(screen, bitmap, cliprect, i, i);
 
 	if (layers_ctrl & 8)
-		draw_sprites(bitmap, cliprect);
+		draw_sprites(screen, bitmap, cliprect);
 
 	return 0;
 }

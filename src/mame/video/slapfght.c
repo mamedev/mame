@@ -185,9 +185,9 @@ UINT32 slapfght_state::screen_update_perfrman(screen_device &screen, bitmap_ind1
 		m_pf1_tilemap ->set_scrollx(0 , -16 );
 	}
 
-	m_pf1_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
+	m_pf1_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
 	draw_sprites(bitmap,cliprect,0);
-	m_pf1_tilemap->draw(bitmap, cliprect, 0,0);
+	m_pf1_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	draw_sprites(bitmap,cliprect,0x80);
 
 	slapfght_log_vram();
@@ -214,7 +214,7 @@ UINT32 slapfght_state::screen_update_slapfight(screen_device &screen, bitmap_ind
 		m_fix_tilemap->set_scrolly(0, -1 ); /* Glitch in Tiger Heli otherwise */
 	}
 
-	m_pf1_tilemap->draw(bitmap, cliprect, 0,0);
+	m_pf1_tilemap->draw(screen, bitmap, cliprect, 0,0);
 
 	/* Draw the sprites */
 	for (offs = 0;offs < m_spriteram->bytes();offs += 4)
@@ -233,7 +233,7 @@ UINT32 slapfght_state::screen_update_slapfight(screen_device &screen, bitmap_ind
 				(buffered_spriteram[offs+1] + ((buffered_spriteram[offs+2] & 0x01) << 8)) - 13,buffered_spriteram[offs+3],0);
 	}
 
-	m_fix_tilemap->draw(bitmap, cliprect, 0,0);
+	m_fix_tilemap->draw(screen, bitmap, cliprect, 0,0);
 
 	slapfght_log_vram();
 	return 0;

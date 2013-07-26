@@ -222,6 +222,6 @@ UINT32 gomoku_state::screen_update_gomoku(screen_device &screen, bitmap_ind16 &b
 		bitmap.fill(0x20);
 	}
 
-	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }

@@ -15,7 +15,6 @@ struct tc0100scn_interface
 };
 
 class tc0100scn_device : public device_t,
-							public device_video_interface,
 							public tc0100scn_interface
 {
 public:
@@ -50,7 +49,7 @@ public:
 	DECLARE_WRITE32_MEMBER(ctrl_long_w);
 
 	void tilemap_update();
-	int tilemap_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority);
+	int tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority);
 
 	/* returns 0 or 1 depending on the lowest priority tilemap set in the internal
 	register. Use this function to draw tilemaps in the correct order. */
@@ -81,7 +80,6 @@ private:
 
 	/* We keep two tilemaps for each of the 3 actual tilemaps: one at standard width, one double */
 	tilemap_t      *m_tilemap[3][2];
-	rectangle    m_cliprect;
 
 	int          m_bg_col_mult, m_bg_tilemask, m_tx_col_mult;
 	INT32        m_gfxbank, m_colbank;
@@ -96,7 +94,7 @@ private:
 	void common_get_bg1_tile_info(tile_data &tileinfo, int tile_index, UINT16 *ram, int gfxnum, int colbank, int dblwidth);
 	void common_get_tx_tile_info(tile_data &tileinfo, int tile_index, UINT16 *ram, int gfxnum, int colbank, int dblwidth);
 
-	void tilemap_draw_fg(bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t* tmap, int flags, UINT32 priority);
+	void tilemap_draw_fg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t* tmap, int flags, UINT32 priority);
 	void set_layer_ptrs();
 	void dirty_tilemaps();
 	void restore_scroll();
@@ -108,7 +106,5 @@ extern const device_type TC0100SCN;
 #define MCFG_TC0100SCN_ADD(_tag, _interface) \
 	MCFG_DEVICE_ADD(_tag, TC0100SCN, 0) \
 	MCFG_DEVICE_CONFIG(_interface)
-
-#define MCFG_TC0100SCN_SET_SCREEN MCFG_VIDEO_SET_SCREEN
 
 #endif

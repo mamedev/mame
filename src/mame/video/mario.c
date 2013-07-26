@@ -209,7 +209,7 @@ UINT32 mario_state::screen_update_mario(screen_device &screen, bitmap_ind16 &bit
 	m_bg_tilemap->set_scrollx(0, m_flip ? (HTOTAL-HBSTART) : 0);
 	m_bg_tilemap->set_scrolly(0, m_gfx_scroll - (m_flip ? 8 : 0));
 
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);
 
 	return 0;

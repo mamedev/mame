@@ -159,13 +159,13 @@ UINT32 aquarium_state::screen_update_aquarium(screen_device &screen, bitmap_ind1
 	m_txt_tilemap->set_scrollx(0, m_scroll[4]);
 	m_txt_tilemap->set_scrolly(0, m_scroll[5]);
 
-	m_bak_tilemap->draw(bitmap, cliprect, 0, 0);
-	m_mid_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bak_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_mid_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	draw_sprites(bitmap, cliprect, 16);
 
-	m_bak_tilemap->draw(bitmap, cliprect, 1, 0);
-	m_mid_tilemap->draw(bitmap, cliprect, 1, 0);
-	m_txt_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bak_tilemap->draw(screen, bitmap, cliprect, 1, 0);
+	m_mid_tilemap->draw(screen, bitmap, cliprect, 1, 0);
+	m_txt_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }

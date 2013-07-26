@@ -149,7 +149,7 @@ if (machine().input().code_pressed(KEYCODE_Z))
 #endif
 
 	bitmap.fill(0, cliprect);
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 
 	if (layers_ctrl & 0x1)
 	{
@@ -184,6 +184,6 @@ if (machine().input().code_pressed(KEYCODE_Z))
 								cliprect,0x4000 + 0);
 	}
 
-	if (layers_ctrl & 0x8) m_kaneko_spr->kaneko16_render_sprites(machine(), bitmap, cliprect, m_spriteram, m_spriteram.bytes());
+	if (layers_ctrl & 0x8) m_kaneko_spr->kaneko16_render_sprites(machine(), bitmap, cliprect, screen.priority(), m_spriteram, m_spriteram.bytes());
 	return 0;
 }

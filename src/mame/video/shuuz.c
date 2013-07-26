@@ -84,7 +84,7 @@ UINT32 shuuz_state::screen_update_shuuz(screen_device &screen, bitmap_ind16 &bit
 	m_vad->mob()->draw_async(cliprect);
 
 	/* draw the playfield */
-	m_vad->playfield()->draw(bitmap, cliprect, 0, 0);
+	m_vad->playfield()->draw(screen, bitmap, cliprect, 0, 0);
 
 	// draw and merge the MO
 	bitmap_ind16 &mobitmap = m_vad->mob()->bitmap();

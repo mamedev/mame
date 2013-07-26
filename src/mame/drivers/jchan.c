@@ -307,13 +307,13 @@ UINT32 jchan_state::screen_update_jchan(screen_device &screen, bitmap_ind16 &bit
 
 	bitmap.fill(get_black_pen(machine()), cliprect);
 
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 
 	m_view2_0->kaneko16_prepare(bitmap, cliprect);
 
 	for ( int i = 0; i < 8; i++ )
 	{
-		m_view2_0->render_tilemap_chip(bitmap,cliprect,i);
+		m_view2_0->render_tilemap_chip(screen,bitmap,cliprect,i);
 	}
 
 	m_sprite_bitmap_1->fill(0x0000, cliprect);

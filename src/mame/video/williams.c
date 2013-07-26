@@ -227,7 +227,7 @@ UINT32 williams_state::screen_update_williams2(screen_device &screen, bitmap_rgb
 	int x, y;
 
 	/* draw the background */
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* fetch the relevant pens */
 	for (x = 1; x < 16; x++)

@@ -504,7 +504,7 @@ VIDEO_START_MEMBER(subsino_state,stisub)
 UINT32 subsino_state::screen_update_subsino(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
-	m_tmap->draw(bitmap, cliprect, 0, 0);
+	m_tmap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -527,12 +527,12 @@ UINT32 subsino_state::screen_update_subsino_reels(screen_device &screen, bitmap_
 		const rectangle visible2(0*8, (14+48)*8-1, 10*8, (10+7)*8-1);
 		const rectangle visible3(0*8, (14+48)*8-1, 18*8, (18+7)*8-1);
 
-		m_reel1_tilemap->draw(bitmap, visible1, 0, 0);
-		m_reel2_tilemap->draw(bitmap, visible2, 0, 0);
-		m_reel3_tilemap->draw(bitmap, visible3, 0, 0);
+		m_reel1_tilemap->draw(screen, bitmap, visible1, 0, 0);
+		m_reel2_tilemap->draw(screen, bitmap, visible2, 0, 0);
+		m_reel3_tilemap->draw(screen, bitmap, visible3, 0, 0);
 	}
 
-	m_tmap->draw(bitmap, cliprect, 0, 0);
+	m_tmap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -563,12 +563,12 @@ UINT32 subsino_state::screen_update_stisub_reels(screen_device &screen, bitmap_i
 		const rectangle visible2(0, 511,  88, 143);
 		const rectangle visible3(0, 511,  144, 223);
 
-		m_reel1_tilemap->draw(bitmap, visible1, 0, 0);
-		m_reel2_tilemap->draw(bitmap, visible2, 0, 0);
-		m_reel3_tilemap->draw(bitmap, visible3, 0, 0);
+		m_reel1_tilemap->draw(screen, bitmap, visible1, 0, 0);
+		m_reel2_tilemap->draw(screen, bitmap, visible2, 0, 0);
+		m_reel3_tilemap->draw(screen, bitmap, visible3, 0, 0);
 	}
 
-	m_tmap->draw(bitmap, cliprect, 0, 0);
+	m_tmap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 

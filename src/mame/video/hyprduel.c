@@ -454,7 +454,7 @@ VIDEO_START_MEMBER(hyprduel_state,magerror_14220)
 
 /* Draw sprites */
 
-void hyprduel_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
+void hyprduel_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	UINT8 *base_gfx4 = m_expanded_gfx1;
 	UINT8 *base_gfx8 = memregion("gfx1")->base();
@@ -560,7 +560,7 @@ void hyprduel_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 								flipx, flipy,
 								x, y,
 								zoom, zoom,
-								machine().priority_bitmap,primask[pri], 255);
+								screen.priority(),primask[pri], 255);
 			}
 			else
 			{
@@ -576,7 +576,7 @@ void hyprduel_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 								flipx, flipy,
 								x, y,
 								zoom, zoom,
-								machine().priority_bitmap,primask[pri], 15);
+								screen.priority(),primask[pri], 15);
 			}
 #if 0
 {   /* Display priority + zoom on each sprite */
@@ -624,7 +624,7 @@ WRITE16_MEMBER(hyprduel_state::hyprduel_scrollreg_init_w)
 }
 
 
-void hyprduel_state::draw_layers( bitmap_ind16 &bitmap, const rectangle &cliprect, int pri, int layers_ctrl )
+void hyprduel_state::draw_layers( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri, int layers_ctrl )
 {
 	UINT16 layers_pri = m_videoregs[0x10/2];
 	int layer;
@@ -635,7 +635,7 @@ void hyprduel_state::draw_layers( bitmap_ind16 &bitmap, const rectangle &cliprec
 		if ( pri == ((layers_pri >> (layer*2)) & 3) )
 		{
 			if (layers_ctrl & (1 << layer)) // for debug
-				m_bg_tilemap[layer]->draw(bitmap, cliprect, 0, 1 << (3 - pri));
+				m_bg_tilemap[layer]->draw(screen, bitmap, cliprect, 0, 1 << (3 - pri));
 		}
 	}
 }
@@ -693,7 +693,7 @@ UINT32 hyprduel_state::screen_update_hyprduel(screen_device &screen, bitmap_ind1
 	m_sprite_yoffs = m_videoregs[0x04 / 2] - screen.height() / 2 - m_sprite_yoffs_sub;
 
 	/* The background color is selected by a register */
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 	bitmap.fill((m_videoregs[0x12 / 2] & 0x0fff) + 0x1000, cliprect);
 
 	/*  Screen Control Register:
@@ -732,10 +732,10 @@ if (machine().input().code_pressed(KEYCODE_Z))
 #endif
 
 	for (pri = 3; pri >= 0; pri--)
-		draw_layers(bitmap, cliprect, pri, layers_ctrl);
+		draw_layers(screen, bitmap, cliprect, pri, layers_ctrl);
 
 	if (layers_ctrl & 0x08)
-		draw_sprites(bitmap, cliprect);
+		draw_sprites(screen, bitmap, cliprect);
 
 	return 0;
 }

@@ -127,7 +127,7 @@ WRITE8_MEMBER(mole_state::mole_flipscreen_w)
 
 UINT32 mole_state::screen_update_mole(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 

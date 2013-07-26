@@ -97,7 +97,7 @@ void lkage_state::video_start()
 }
 
 
-void lkage_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
+void lkage_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	const UINT8 *source = m_spriteram;
 	const UINT8 *finish = source + 0x60;
@@ -157,7 +157,7 @@ void lkage_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect 
 				flipx,flipy,
 				sx&0xff,
 				sy + 16*y,
-				machine().priority_bitmap,
+				screen.priority(),
 				priority_mask,0 );
 		}
 		source += 4;
@@ -206,17 +206,17 @@ UINT32 lkage_state::screen_update_lkage(screen_device &screen, bitmap_ind16 &bit
 	m_bg_tilemap->set_scrollx(0, m_scroll[4]);
 	m_bg_tilemap->set_scrolly(0, m_scroll[5]);
 
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 	if ((m_vreg[2] & 0xf0) == 0xf0)
 	{
-		m_bg_tilemap->draw(bitmap, cliprect, 0, 1);
-		m_fg_tilemap->draw(bitmap, cliprect, 0, (m_vreg[1] & 2) ? 2 : 4);
-		m_tx_tilemap->draw(bitmap, cliprect, 0, 4);
-		draw_sprites(bitmap, cliprect);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 1);
+		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, (m_vreg[1] & 2) ? 2 : 4);
+		m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 4);
+		draw_sprites(screen, bitmap, cliprect);
 	}
 	else
 	{
-		m_tx_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		m_tx_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 	}
 
 	return 0;

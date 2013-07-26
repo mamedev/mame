@@ -626,12 +626,12 @@ UINT32 segas1x_bootleg_state::screen_update_s16a_bootleg(screen_device &screen, 
 		m_bg_tilemaps[0]->set_scrollx(0, m_fg_scrollx + offset_bg0x);
 		m_bg_tilemaps[0]->set_scrolly(0, m_fg_scrolly + offset_bg0y + m_fore_yscroll);
 
-		m_bg_tilemaps[0]->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		m_bg_tilemaps[1]->draw(bitmap, cliprect, 0, 0);
+		m_bg_tilemaps[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		m_bg_tilemaps[1]->draw(screen, bitmap, cliprect, 0, 0);
 
 		m_text_tilemap->set_scrolly(0, m_text_yscroll);
 
-		m_text_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_text_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	}
 	else if ((m_tilemapselect & 0xff) == 0x21)
 	{
@@ -640,12 +640,12 @@ UINT32 segas1x_bootleg_state::screen_update_s16a_bootleg(screen_device &screen, 
 		m_bg_tilemaps[1]->set_scrollx(0, m_fg_scrollx + 187 );
 		m_bg_tilemaps[1]->set_scrolly(0, m_fg_scrolly + 1 + m_fore_yscroll );
 
-		m_bg_tilemaps[1]->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		m_bg_tilemaps[0]->draw(bitmap, cliprect, 0, 0);
+		m_bg_tilemaps[1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		m_bg_tilemaps[0]->draw(screen, bitmap, cliprect, 0, 0);
 
 		m_text_tilemap->set_scrolly(0, m_text_yscroll);
 
-		m_text_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_text_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	}
 
 	// mix in sprites
@@ -655,7 +655,7 @@ UINT32 segas1x_bootleg_state::screen_update_s16a_bootleg(screen_device &screen, 
 		{
 			UINT16 *dest = &bitmap.pix(y);
 			UINT16 *src = &sprites.pix(y);
-//          UINT8 *pri = &machine().priority_bitmap.pix(y);
+//          UINT8 *pri = &screen.priority().pix(y);
 			for (int x = rect->min_x; x <= rect->max_x; x++)
 			{
 				// only process written pixels
@@ -713,9 +713,9 @@ UINT32 segas1x_bootleg_state::screen_update_s16a_bootleg_passht4b(screen_device 
 		m_bg_tilemaps[0]->set_scrollx(0, (m_fg_scrollx ^ 0x7) + offset_bg0x);
 		m_bg_tilemaps[0]->set_scrolly(0, m_fg_scrolly + offset_bg0y);
 
-		m_bg_tilemaps[0]->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		m_bg_tilemaps[1]->draw(bitmap, cliprect, 0, 0);
-		m_text_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_bg_tilemaps[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		m_bg_tilemaps[1]->draw(screen, bitmap, cliprect, 0, 0);
+		m_text_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	}
 
 	// mix in sprites
@@ -725,7 +725,7 @@ UINT32 segas1x_bootleg_state::screen_update_s16a_bootleg_passht4b(screen_device 
 		{
 			UINT16 *dest = &bitmap.pix(y);
 			UINT16 *src = &sprites.pix(y);
-//          UINT8 *pri = &machine().priority_bitmap.pix(y);
+//          UINT8 *pri = &screen.priority().pix(y);
 			for (int x = rect->min_x; x <= rect->max_x; x++)
 			{
 				// only process written pixels
@@ -768,7 +768,7 @@ UINT32 segas1x_bootleg_state::screen_update_system16(screen_device &screen, bitm
 
 	update_page();
 
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 
 	m_background->set_scrollx(0, -320 - m_bg_scrollx);
 	m_background->set_scrolly(0, -256 + m_bg_scrolly + m_back_yscroll);
@@ -779,20 +779,20 @@ UINT32 segas1x_bootleg_state::screen_update_system16(screen_device &screen, bitm
 	m_text_layer->set_scrolly(0, 0 + m_text_yscroll);
 
 	/* Background */
-	m_background->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0x00);
+	m_background->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0x00);
 
 	/* Foreground */
-	m_foreground->draw(bitmap, cliprect, 0, 0x03);
-	m_foreground->draw(bitmap, cliprect, 1, 0x07);
+	m_foreground->draw(screen, bitmap, cliprect, 0, 0x03);
+	m_foreground->draw(screen, bitmap, cliprect, 1, 0x07);
 
 
 	/* Text Layer */
 	if (m_textlayer_lo_max != 0)
 	{
-		m_text_layer->draw(bitmap, cliprect, 1, 7);// needed for Body Slam
+		m_text_layer->draw(screen, bitmap, cliprect, 1, 7);// needed for Body Slam
 	}
 
-	m_text_layer->draw(bitmap, cliprect, 0, 0xf);
+	m_text_layer->draw(screen, bitmap, cliprect, 0, 0xf);
 
 	//draw_sprites(machine(), bitmap, cliprect,0);
 
@@ -804,7 +804,7 @@ UINT32 segas1x_bootleg_state::screen_update_system16(screen_device &screen, bitm
 		{
 			UINT16 *dest = &bitmap.pix(y);
 			UINT16 *src = &sprites.pix(y);
-//          UINT8 *pri = &machine().priority_bitmap.pix(y);
+//          UINT8 *pri = &screen.priority().pix(y);
 			for (int x = rect->min_x; x <= rect->max_x; x++)
 			{
 				// only process written pixels
@@ -844,21 +844,21 @@ UINT32 segas1x_bootleg_state::screen_update_system18old(screen_device &screen, b
 
 	update_page();
 
-	machine().priority_bitmap.fill(0);
+	screen.priority().fill(0);
 
 	bitmap.fill(0, cliprect);
 
-	m_background->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	m_background->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE | 1, 0);   //??
-	m_background->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE | 2, 0);   //??
-	m_background->draw(bitmap, cliprect, 1, 0x1);
-	m_background->draw(bitmap, cliprect, 2, 0x3);
+	m_background->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	m_background->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE | 1, 0);   //??
+	m_background->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE | 2, 0);   //??
+	m_background->draw(screen, bitmap, cliprect, 1, 0x1);
+	m_background->draw(screen, bitmap, cliprect, 2, 0x3);
 
-	m_foreground->draw(bitmap, cliprect, 0, 0x3);
-	m_foreground->draw(bitmap, cliprect, 1, 0x7);
+	m_foreground->draw(screen, bitmap, cliprect, 0, 0x3);
+	m_foreground->draw(screen, bitmap, cliprect, 1, 0x7);
 
-	m_text_layer->draw(bitmap, cliprect, 1, 0x7);
-	m_text_layer->draw(bitmap, cliprect, 0, 0xf);
+	m_text_layer->draw(screen, bitmap, cliprect, 1, 0x7);
+	m_text_layer->draw(screen, bitmap, cliprect, 0, 0xf);
 
 	// mix in sprites
 	bitmap_ind16 &sprites = m_sprites->bitmap();
@@ -867,7 +867,7 @@ UINT32 segas1x_bootleg_state::screen_update_system18old(screen_device &screen, b
 		{
 			UINT16 *dest = &bitmap.pix(y);
 			UINT16 *src = &sprites.pix(y);
-//          UINT8 *pri = &machine().priority_bitmap.pix(y);
+//          UINT8 *pri = &screen.priority().pix(y);
 			for (int x = rect->min_x; x <= rect->max_x; x++)
 			{
 				// only process written pixels

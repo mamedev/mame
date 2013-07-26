@@ -207,10 +207,10 @@ UINT32 tbowl_state::screen_update_tbowl_left(screen_device &screen, bitmap_ind16
 	m_tx_tilemap->set_scrolly(0, 0 );
 
 	bitmap.fill(0x100, cliprect); /* is there a register controling the colour? looks odd when screen is blank */
-	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	tbowl_draw_sprites(bitmap,cliprect, 0, m_spriteram);
-	m_bg2_tilemap->draw(bitmap, cliprect, 0,0);
-	m_tx_tilemap->draw(bitmap, cliprect, 0,0);
+	m_bg2_tilemap->draw(screen, bitmap, cliprect, 0,0);
+	m_tx_tilemap->draw(screen, bitmap, cliprect, 0,0);
 
 	return 0;
 }
@@ -225,10 +225,10 @@ UINT32 tbowl_state::screen_update_tbowl_right(screen_device &screen, bitmap_ind1
 	m_tx_tilemap->set_scrolly(0, 0 );
 
 	bitmap.fill(0x100, cliprect); /* is there a register controling the colour? looks odd when screen is blank */
-	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	tbowl_draw_sprites(bitmap,cliprect, 32*8, m_spriteram);
-	m_bg2_tilemap->draw(bitmap, cliprect, 0,0);
-	m_tx_tilemap->draw(bitmap, cliprect, 0,0);
+	m_bg2_tilemap->draw(screen, bitmap, cliprect, 0,0);
+	m_tx_tilemap->draw(screen, bitmap, cliprect, 0,0);
 
 	return 0;
 }

@@ -304,7 +304,7 @@ UINT32 bwing_state::screen_update_bwing(screen_device &screen, bitmap_ind16 &bit
 		m_bgmap->set_scrollx(0, x);
 		y = (m_sreg[1]<<4 & 0x300) + m_sreg[3];
 		m_bgmap->set_scrolly(0, y);
-		m_bgmap->draw(bitmap, cliprect, 0, 0);
+		m_bgmap->draw(screen, bitmap, cliprect, 0, 0);
 	}
 	else
 		bitmap.fill(get_black_pen(machine()), cliprect);
@@ -320,7 +320,7 @@ UINT32 bwing_state::screen_update_bwing(screen_device &screen, bitmap_ind16 &bit
 		m_fgmap->set_scrollx(0, x);
 		y = (m_sreg[1] << 8 & 0x300) + m_sreg[5];
 		m_fgmap->set_scrolly(0, y);
-		m_fgmap->draw(bitmap, cliprect, 0, 0);
+		m_fgmap->draw(screen, bitmap, cliprect, 0, 0);
 	}
 
 	// draw high priority sprites
@@ -330,7 +330,7 @@ UINT32 bwing_state::screen_update_bwing(screen_device &screen, bitmap_ind16 &bit
 //  if (m_mapmask & 4)
 	{
 		m_charmap->set_flip(m_mapflip);
-		m_charmap->draw(bitmap, cliprect, 0, 0);
+		m_charmap->draw(screen, bitmap, cliprect, 0, 0);
 	}
 	return 0;
 }

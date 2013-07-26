@@ -303,7 +303,7 @@ UINT32 multfish_state::screen_update_multfish(screen_device &screen, bitmap_ind1
 	if (!m_disp_enable) return 0;
 
 	/* Draw lower part of static tilemap (low pri tiles) */
-	m_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1),0);
+	m_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1),0);
 
 	/* Setup the column scroll and draw the reels */
 	for (i=0;i<64;i++)
@@ -311,10 +311,10 @@ UINT32 multfish_state::screen_update_multfish(screen_device &screen, bitmap_ind1
 		int colscroll = (m_vid[i*2] | m_vid[i*2+1] << 8);
 		m_reel_tilemap->set_scrolly(i, colscroll );
 	}
-	m_reel_tilemap->draw(bitmap, cliprect, 0,0);
+	m_reel_tilemap->draw(screen, bitmap, cliprect, 0,0);
 
 	/* Draw upper part of static tilemap (high pri tiles) */
-	m_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_CATEGORY(0),0);
+	m_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(0),0);
 
 	return 0;
 }

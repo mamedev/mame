@@ -64,7 +64,7 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_deniam(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void deniam_common_init(  );
-	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void set_bg_page( int page, int value );
 	void set_fg_page( int page, int value );
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);

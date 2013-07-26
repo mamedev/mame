@@ -490,14 +490,14 @@ static UINT32 update_screen(screen_device &screen, bitmap_ind16 &bitmap, const r
 
 	draw_road(screen,bitmap,cliprect,screen_shift, 0x00);
 
-	state->m_tilemap2_tilemap->draw(bitmap, cliprect, 0,0);
-	state->m_tilemap1_tilemap->draw(bitmap, cliprect, 0,0);
+	state->m_tilemap2_tilemap->draw(screen, bitmap, cliprect, 0,0);
+	state->m_tilemap1_tilemap->draw(screen, bitmap, cliprect, 0,0);
 
 	draw_road(screen,bitmap,cliprect,screen_shift, 0x80);
 
 	draw_sprites(screen,bitmap,cliprect,screen_shift);
 
-	state->m_tilemap0_tilemap->draw(bitmap, cliprect, 0,0);
+	state->m_tilemap0_tilemap->draw(screen, bitmap, cliprect, 0,0);
 
 
 	return 0;

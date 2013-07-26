@@ -211,7 +211,7 @@ UINT32 exedexes_state::screen_update_exedexes(screen_device &screen, bitmap_ind1
 	if (m_sc2on)
 	{
 		m_bg_tilemap->set_scrollx(0, ((m_bg_scroll[1]) << 8) + m_bg_scroll[0]);
-		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	}
 	else
 		bitmap.fill(0, cliprect);
@@ -222,13 +222,13 @@ UINT32 exedexes_state::screen_update_exedexes(screen_device &screen, bitmap_ind1
 	{
 		m_fg_tilemap->set_scrollx(0, ((m_nbg_yscroll[1]) << 8) + m_nbg_yscroll[0]);
 		m_fg_tilemap->set_scrolly(0, ((m_nbg_xscroll[1]) << 8) + m_nbg_xscroll[0]);
-		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	}
 
 	draw_sprites(bitmap, cliprect, 0);
 
 	if (m_chon)
-		m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }

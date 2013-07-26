@@ -82,10 +82,10 @@ UINT32 bladestl_state::screen_update_bladestl(screen_device &screen, bitmap_ind1
 
 	m_k007342->tilemap_update();
 
-	m_k007342->tilemap_draw(bitmap, cliprect, 1, TILEMAP_DRAW_OPAQUE ,0);
+	m_k007342->tilemap_draw(screen, bitmap, cliprect, 1, TILEMAP_DRAW_OPAQUE ,0);
 	m_k007420->sprites_draw(bitmap, cliprect, machine().gfx[1]);
-	m_k007342->tilemap_draw(bitmap, cliprect, 1, 1 | TILEMAP_DRAW_OPAQUE ,0);
-	m_k007342->tilemap_draw(bitmap, cliprect, 0, 0 ,0);
-	m_k007342->tilemap_draw(bitmap, cliprect, 0, 1 ,0);
+	m_k007342->tilemap_draw(screen, bitmap, cliprect, 1, 1 | TILEMAP_DRAW_OPAQUE ,0);
+	m_k007342->tilemap_draw(screen, bitmap, cliprect, 0, 0 ,0);
+	m_k007342->tilemap_draw(screen, bitmap, cliprect, 0, 1 ,0);
 	return 0;
 }

@@ -40,8 +40,8 @@ public:
 	DECLARE_READ16_MEMBER( k053244_word_r );
 	DECLARE_WRITE16_MEMBER( k053244_word_w );
 	void k053244_bankselect(int bank);    /* used by TMNT2, Asterix and Premier Soccer for ROM testing */
-	void k053245_sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void k053245_sprites_draw_lethal(bitmap_ind16 &bitmap, const rectangle &cliprect); /* for lethal enforcers */
+	void k053245_sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap);
+	void k053245_sprites_draw_lethal(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap); /* for lethal enforcers */
 	void k053245_clear_buffer();
 	void k053245_update_buffer();
 	void k053245_set_sprite_offs(int offsx, int offsy);

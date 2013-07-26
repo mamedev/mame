@@ -220,13 +220,13 @@ UINT32 r2dx_v33_state::screen_update_rdx_v33(screen_device &screen, bitmap_ind16
 {
 	bitmap.fill(get_black_pen(machine()), cliprect);
 
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	m_md_tilemap->draw(bitmap, cliprect, 0, 0);
-	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_md_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	draw_sprites(bitmap,cliprect,0);
 
-	m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* debug DMA processing */
 	if(0)

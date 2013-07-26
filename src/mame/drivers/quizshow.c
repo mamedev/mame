@@ -114,7 +114,7 @@ void quizshow_state::video_start()
 
 UINT32 quizshow_state::screen_update_quizshow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	m_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 	return 0;
 }
 

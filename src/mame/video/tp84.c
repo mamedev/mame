@@ -187,18 +187,18 @@ UINT32 tp84_state::screen_update_tp84(screen_device &screen, bitmap_ind16 &bitma
 										((*m_flipscreen_y & 0x01) ? TILEMAP_FLIPY : 0));
 	}
 
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);
 
 	/* draw top status region */
 	clip.min_x = visarea.min_x;
 	clip.max_x = visarea.min_x + 15;
-	m_fg_tilemap->draw(bitmap, clip, 0, 0);
+	m_fg_tilemap->draw(screen, bitmap, clip, 0, 0);
 
 	/* draw bottom status region */
 	clip.min_x = visarea.max_x - 15;
 	clip.max_x = visarea.max_x;
-	m_fg_tilemap->draw(bitmap, clip, 0, 0);
+	m_fg_tilemap->draw(screen, bitmap, clip, 0, 0);
 
 	return 0;
 }

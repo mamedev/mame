@@ -79,7 +79,7 @@ UINT32 hitme_state::screen_update_hitme(screen_device &screen, bitmap_ind16 &bit
 	offs_t offs = 0;
 
 	/* start by drawing the tilemap */
-	m_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* now loop over and invert anything */
 	for (y = 0; y < 19; y++)
@@ -114,7 +114,7 @@ UINT32 hitme_state::screen_update_hitme(screen_device &screen, bitmap_ind16 &bit
 
 UINT32 hitme_state::screen_update_barricad(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 

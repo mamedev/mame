@@ -125,7 +125,7 @@ void segas18_state::set_vdp_mixing(UINT8 mixing)
 
 void segas18_state::draw_vdp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority)
 {
-	bitmap_ind8 &priority_bitmap = machine().priority_bitmap;
+	bitmap_ind8 &priority_bitmap = screen.priority();
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 	//  UINT16 *src = vdp->m_render_line; // can't use this because we're not in RGB32, which we'll need to be if there are palette effects
@@ -226,7 +226,7 @@ UINT32 segas18_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	m_sprites->draw_async(cliprect);
 
 	// reset priorities
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 
 	// draw background opaquely first, not setting any priorities
 	m_segaic16vid->segaic16_tilemap_draw(screen, bitmap, cliprect, 0, SEGAIC16_TILEMAP_BACKGROUND, 0 | TILEMAP_DRAW_OPAQUE, 0x00);
@@ -255,7 +255,7 @@ UINT32 segas18_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 		{
 			UINT16 *dest = &bitmap.pix(y);
 			UINT16 *src = &sprites.pix(y);
-			UINT8 *pri = &machine().priority_bitmap.pix(y);
+			UINT8 *pri = &screen.priority().pix(y);
 			for (int x = rect->min_x; x <= rect->max_x; x++)
 			{
 				// only process written pixels

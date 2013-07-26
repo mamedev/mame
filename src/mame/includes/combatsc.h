@@ -94,6 +94,6 @@ public:
 	UINT32 screen_update_combatsc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_combatscb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void set_pens(  );
-	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, const UINT8 *source, int circuit, UINT32 pri_mask );
+	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, const UINT8 *source, int circuit, bitmap_ind8 &priority_bitmap, UINT32 pri_mask );
 	void bootleg_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, const UINT8 *source, int circuit );
 };

@@ -59,13 +59,13 @@ UINT32 bishi_state::screen_update_bishi(screen_device &screen, bitmap_rgb32 &bit
 
 	konami_sortlayers4(layers, layerpri);
 
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 
 	for (i = 0; i < 4; i++)
 	{
 		if (m_k055555->k055555_read_register(m_k055555, K55_INPUT_ENABLES) & enables[layers[i]])
 		{
-			m_k056832->tilemap_draw(bitmap, cliprect, layers[i], 0, 1 << i);
+			m_k056832->tilemap_draw(screen, bitmap, cliprect, layers[i], 0, 1 << i);
 		}
 	}
 	return 0;

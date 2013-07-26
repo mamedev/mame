@@ -218,7 +218,7 @@ UINT32 dogfgt_state::screen_update_dogfgt(screen_device &screen, bitmap_ind16 &b
 	}
 
 
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	draw_sprites(bitmap, cliprect);
 

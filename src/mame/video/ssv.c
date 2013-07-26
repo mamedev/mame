@@ -980,7 +980,7 @@ UINT32 ssv_state::screen_update_gdfs(screen_device &screen, bitmap_ind16 &bitmap
 
 	m_gdfs_tmap->set_scrollx(0, m_gdfs_tmapscroll[0x0c/2]);
 	m_gdfs_tmap->set_scrolly(0, m_gdfs_tmapscroll[0x10/2]);
-	m_gdfs_tmap->draw(bitmap, cliprect, 0, 0);
+	m_gdfs_tmap->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }

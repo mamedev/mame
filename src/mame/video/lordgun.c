@@ -364,10 +364,10 @@ UINT32 lordgun_state::screen_update_lordgun(screen_device &screen, bitmap_ind16 
 	for (l = 0; l < 5; l++)
 		m_bitmaps[l]->fill(trans_pen, cliprect);
 
-	if (layers_ctrl & 1)    m_tilemap[0]->draw(*m_bitmaps[0], cliprect, 0, 0);
-	if (layers_ctrl & 2)    m_tilemap[1]->draw(*m_bitmaps[1], cliprect, 0, 0);
-	if (layers_ctrl & 4)    m_tilemap[2]->draw(*m_bitmaps[2], cliprect, 0, 0);
-	if (layers_ctrl & 8)    m_tilemap[3]->draw(*m_bitmaps[3], cliprect, 0, 0);
+	if (layers_ctrl & 1)    m_tilemap[0]->draw(screen, *m_bitmaps[0], cliprect, 0, 0);
+	if (layers_ctrl & 2)    m_tilemap[1]->draw(screen, *m_bitmaps[1], cliprect, 0, 0);
+	if (layers_ctrl & 4)    m_tilemap[2]->draw(screen, *m_bitmaps[2], cliprect, 0, 0);
+	if (layers_ctrl & 8)    m_tilemap[3]->draw(screen, *m_bitmaps[3], cliprect, 0, 0);
 	if (layers_ctrl & 16)   draw_sprites(*m_bitmaps[4], cliprect);
 
 	// copy to screen bitmap

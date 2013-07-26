@@ -253,18 +253,18 @@ void lwings_state::trojan_draw_sprites( bitmap_ind16 &bitmap, const rectangle &c
 
 UINT32 lwings_state::screen_update_lwings(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_bg1_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg1_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	lwings_draw_sprites(bitmap, cliprect);
-	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
 UINT32 lwings_state::screen_update_trojan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_bg2_tilemap->draw(bitmap, cliprect, 0, 0);
-	m_bg1_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
+	m_bg2_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_bg1_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
 	trojan_draw_sprites(bitmap, cliprect);
-	m_bg1_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
-	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg1_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }

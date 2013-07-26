@@ -127,7 +127,7 @@ UINT32 dbz_state::screen_update_dbz(screen_device &screen, bitmap_ind16 &bitmap,
 
 	konami_sortlayers5(layer, m_layerpri);
 
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 
 	for (plane = 0; plane < 5; plane++)
 	{
@@ -145,11 +145,11 @@ UINT32 dbz_state::screen_update_dbz(screen_device &screen, bitmap_ind16 &bitmap,
 		}
 
 		if(layer[plane] == 4)
-			m_k053936_2->zoom_draw(bitmap, cliprect, m_bg1_tilemap, flag, pri, 1);
+			m_k053936_2->zoom_draw(screen, bitmap, cliprect, m_bg1_tilemap, flag, pri, 1);
 		else if(layer[plane] == 5)
-			m_k053936_1->zoom_draw(bitmap, cliprect, m_bg2_tilemap, flag, pri, 1);
+			m_k053936_1->zoom_draw(screen, bitmap, cliprect, m_bg2_tilemap, flag, pri, 1);
 		else
-			m_k056832->tilemap_draw(bitmap, cliprect, layer[plane], flag, pri);
+			m_k056832->tilemap_draw(screen, bitmap, cliprect, layer[plane], flag, pri);
 	}
 
 	m_k053246->k053247_sprites_draw( bitmap, cliprect);

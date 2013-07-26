@@ -32,7 +32,7 @@ public:
 	UINT32 screen_update_bloodbro(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_weststry(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_skysmash(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void bloodbro_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void weststry_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void bloodbro_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void weststry_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 };

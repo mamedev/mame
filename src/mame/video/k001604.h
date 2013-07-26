@@ -22,7 +22,7 @@ public:
 	~k001604_device() {}
 
 	void draw_back_layer( bitmap_rgb32 &bitmap, const rectangle &cliprect );
-	void draw_front_layer( bitmap_rgb32 &bitmap, const rectangle &cliprect );
+	void draw_front_layer( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect );
 	DECLARE_WRITE32_MEMBER( tile_w );
 	DECLARE_READ32_MEMBER( tile_r );
 	DECLARE_WRITE32_MEMBER( char_w );

@@ -235,10 +235,10 @@ UINT32 tankbust_state::screen_update_tankbust(screen_device &screen, bitmap_ind1
 	}
 #endif
 
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);
-	m_bg_tilemap->draw(bitmap, cliprect, 1, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 1, 0);
 
-	m_txt_tilemap->draw(bitmap, cliprect, 0,0);
+	m_txt_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
 }

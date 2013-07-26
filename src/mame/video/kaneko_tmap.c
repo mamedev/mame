@@ -231,16 +231,16 @@ void kaneko_view2_tilemap_device::kaneko16_prepare(bitmap_ind16 &bitmap, const r
 	}
 }
 
-void kaneko_view2_tilemap_device::render_tilemap_chip(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri)
+void kaneko_view2_tilemap_device::render_tilemap_chip(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri)
 {
-	m_tmap[0]->draw(bitmap, cliprect, pri, pri, 0);
-	m_tmap[1]->draw(bitmap, cliprect, pri, pri, 0);
+	m_tmap[0]->draw(screen, bitmap, cliprect, pri, pri, 0);
+	m_tmap[1]->draw(screen, bitmap, cliprect, pri, pri, 0);
 }
 
-void kaneko_view2_tilemap_device::render_tilemap_chip_alt(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri, int v2pri)
+void kaneko_view2_tilemap_device::render_tilemap_chip_alt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri, int v2pri)
 {
-	m_tmap[0]->draw(bitmap, cliprect, pri, v2pri ? pri : 0, 0);
-	m_tmap[1]->draw(bitmap, cliprect, pri, v2pri ? pri : 0, 0);
+	m_tmap[0]->draw(screen, bitmap, cliprect, pri, v2pri ? pri : 0, 0);
+	m_tmap[1]->draw(screen, bitmap, cliprect, pri, v2pri ? pri : 0, 0);
 }
 
 WRITE16_MEMBER(kaneko_view2_tilemap_device::kaneko16_vram_0_w){ kaneko16_vram_w(offset, data, mem_mask, 0); }

@@ -365,6 +365,6 @@ UINT32 popeye_state::screen_update_popeye(screen_device &screen, bitmap_ind16 &b
 {
 	draw_background(bitmap, cliprect);
 	draw_sprites(bitmap, cliprect);
-	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }

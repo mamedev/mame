@@ -104,7 +104,7 @@ TILE_GET_INFO_MEMBER(k037122_device::tile_info_layer1)
 }
 
 
-void k037122_device::tile_draw( bitmap_rgb32 &bitmap, const rectangle &cliprect )
+void k037122_device::tile_draw( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
 	const rectangle &visarea = m_screen->visible_area();
 
@@ -112,13 +112,13 @@ void k037122_device::tile_draw( bitmap_rgb32 &bitmap, const rectangle &cliprect 
 	{
 		m_layer[1]->set_scrolldx(visarea.min_x, visarea.min_x);
 		m_layer[1]->set_scrolldy(visarea.min_y, visarea.min_y);
-		m_layer[1]->draw(bitmap, cliprect, 0, 0);
+		m_layer[1]->draw(screen, bitmap, cliprect, 0, 0);
 	}
 	else
 	{
 		m_layer[0]->set_scrolldx(visarea.min_x, visarea.min_x);
 		m_layer[0]->set_scrolldy(visarea.min_y, visarea.min_y);
-		m_layer[0]->draw(bitmap, cliprect, 0, 0);
+		m_layer[0]->draw(screen, bitmap, cliprect, 0, 0);
 	}
 }
 

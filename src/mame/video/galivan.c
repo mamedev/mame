@@ -340,19 +340,19 @@ UINT32 galivan_state::screen_update_galivan(screen_device &screen, bitmap_ind16 
 	if (m_layers & 0x40)
 		bitmap.fill(0, cliprect);
 	else
-		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	if (m_layers & 0x20)
 	{
-		m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
-		m_tx_tilemap->draw(bitmap, cliprect, 1, 0);
+		m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+		m_tx_tilemap->draw(screen, bitmap, cliprect, 1, 0);
 		draw_sprites(bitmap, cliprect);
 	}
 	else
 	{
 		draw_sprites(bitmap, cliprect);
-		m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
-		m_tx_tilemap->draw(bitmap, cliprect, 1, 0);
+		m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+		m_tx_tilemap->draw(screen, bitmap, cliprect, 1, 0);
 	}
 
 	return 0;
@@ -367,9 +367,9 @@ UINT32 galivan_state::screen_update_ninjemak(screen_device &screen, bitmap_ind16
 	if (m_ninjemak_dispdisable)
 		bitmap.fill(0, cliprect);
 	else
-		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	draw_sprites(bitmap, cliprect);
-	m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }

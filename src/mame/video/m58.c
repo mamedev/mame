@@ -298,7 +298,7 @@ UINT32 m58_state::screen_update_yard(screen_device &screen, bitmap_ind16 &bitmap
 	m_bg_tilemap->set_scrollx(0, (*m_yard_scroll_x_high * 0x100) + *m_yard_scroll_x_low);
 	m_bg_tilemap->set_scrolly(0, *m_yard_scroll_y_low);
 
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);
 	draw_panel(bitmap, cliprect);
 	return 0;

@@ -591,17 +591,17 @@ UINT32 taitoair_state::screen_update_taitoair(screen_device &screen, bitmap_ind1
 		#endif
 	}
 
-	m_tc0080vco->tilemap_draw(bitmap, cliprect, 0, 0, 0);
+	m_tc0080vco->tilemap_draw(screen, bitmap, cliprect, 0, 0, 0);
 
 	draw_sprites(bitmap, cliprect, 0);
 
 	copybitmap_trans(bitmap, *m_framebuffer[1], 0, 0, 0, 0, cliprect, 0);
 
-	m_tc0080vco->tilemap_draw(bitmap, cliprect, 1, 0, 0);
+	m_tc0080vco->tilemap_draw(screen, bitmap, cliprect, 1, 0, 0);
 
 	draw_sprites(bitmap, cliprect, 1);
 
-	m_tc0080vco->tilemap_draw(bitmap, cliprect, 2, 0, 0);
+	m_tc0080vco->tilemap_draw(screen, bitmap, cliprect, 2, 0, 0);
 
 	/* Hacky 3d bitmap */
 	//copybitmap_trans(bitmap, m_buffer3d, 0, 0, 0, 0, cliprect, 0);

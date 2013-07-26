@@ -87,9 +87,9 @@ public:
 	DECLARE_WRITE8_MEMBER( b_w );
 	void mark_plane_dirty(int num);
 	void mark_all_tilemaps_dirty();
-	void tilemap_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, int num, UINT32 flags, UINT32 priority);
-	void tilemap_draw(bitmap_rgb32 &bitmap, const rectangle &cliprect, int num, UINT32 flags, UINT32 priority);
-	void tilemap_draw_dj(bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, UINT32 flags, UINT32 priority);
+	void tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int num, UINT32 flags, UINT32 priority);
+	void tilemap_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int num, UINT32 flags, UINT32 priority);
+	void tilemap_draw_dj(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, UINT32 flags, UINT32 priority);
 	void set_layer_association(int status);
 	int  get_layer_association();
 	void set_layer_offs(int layer, int offsx, int offsy);
@@ -206,10 +206,10 @@ private:
 	int rom_read_b(int offset, int blksize, int blksize2, int zerosec);
 
 	template<class _BitmapClass>
-	int update_linemap(_BitmapClass &bitmap, int page, int flags);
+	int update_linemap(screen_device &screen, _BitmapClass &bitmap, int page, int flags);
 
 	template<class _BitmapClass>
-	void tilemap_draw_common(_BitmapClass &bitmap, const rectangle &cliprect, int layer, UINT32 flags, UINT32 priority);
+	void tilemap_draw_common(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, int layer, UINT32 flags, UINT32 priority);
 
 	void create_gfx(running_machine &machine, const char *gfx_memory_region, int bpp, int big);
 	void create_tilemaps(running_machine &machine);
@@ -227,9 +227,9 @@ public:
 	void K056832_set_k055555(k055555_device* mode); // k055555 hook
 
 
-	void m_tilemap_draw(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int num, UINT32 flags, UINT32 priority);
+	void m_tilemap_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int num, UINT32 flags, UINT32 priority);
 private:
-	int altK056832_update_linemap(running_machine &machine, bitmap_rgb32 &bitmap, int page, int flags);
+	int altK056832_update_linemap(screen_device &screen, bitmap_rgb32 &bitmap, int page, int flags);
 
 
 };

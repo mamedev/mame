@@ -234,17 +234,17 @@ UINT32 metlclsh_state::screen_update_metlclsh(screen_device &screen, bitmap_ind1
 {
 	bitmap.fill(0x10, cliprect);
 
-	m_fg_tilemap->draw(bitmap, cliprect, 1, 0); // low priority tiles of foreground
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 1, 0); // low priority tiles of foreground
 
 	if (m_scrollx[0] & 0x08)                    // background (if enabled)
 	{
 		/* The background seems to be always flipped along x */
 		m_bg_tilemap->set_flip((flip_screen() ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0) ^ TILEMAP_FLIPX);
 		m_bg_tilemap->set_scrollx(0, m_scrollx[1] + ((m_scrollx[0] & 0x02) << 7) );
-		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	}
 	draw_sprites(bitmap, cliprect);          // sprites
-	m_fg_tilemap->draw(bitmap, cliprect, 2, 0); // high priority tiles of foreground
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 2, 0); // high priority tiles of foreground
 
 //  popmessage("%02X", m_scrollx[0]);
 	return 0;

@@ -88,17 +88,17 @@ UINT32 dassault_state::screen_update_dassault(screen_device &screen, bitmap_rgb3
 	m_deco_tilegen2->pf_update(0, m_pf4_rowscroll);
 
 	/* Draw playfields/update priority bitmap */
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 	bitmap.fill(machine().pens[3072], cliprect);
-	m_deco_tilegen2->tilemap_2_draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	m_deco_tilegen2->tilemap_2_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 
 	/* The middle playfields can be swapped priority-wise */
 	if ((priority & 3) == 0)
 	{
 		mixdassaultlayer(bitmap, sprite_bitmap1, cliprect,  0x0600, 0x0600,  0x400, 0xff); // 1
-		m_deco_tilegen1->tilemap_2_draw(bitmap, cliprect, 0, 2); // 2
+		m_deco_tilegen1->tilemap_2_draw(screen, bitmap, cliprect, 0, 2); // 2
 		mixdassaultlayer(bitmap, sprite_bitmap1, cliprect,  0x0400, 0x0600,  0x400, 0xff); // 8
-		m_deco_tilegen2->tilemap_1_draw(bitmap, cliprect, 0, 16); // 16
+		m_deco_tilegen2->tilemap_1_draw(screen, bitmap, cliprect, 0, 16); // 16
 		mixdassaultlayer(bitmap, sprite_bitmap1, cliprect,  0x0200, 0x0600,  0x400, 0xff); // 32
 		mixdassaultlayer(bitmap, sprite_bitmap2, cliprect,  0x0000, 0x0000,  0x800, 0x80); // 64?
 		mixdassaultlayer(bitmap, sprite_bitmap1, cliprect,  0x0000, 0x0600,  0x400, 0xff); // 128
@@ -107,19 +107,19 @@ UINT32 dassault_state::screen_update_dassault(screen_device &screen, bitmap_rgb3
 	else if ((priority & 3) == 1)
 	{
 		mixdassaultlayer(bitmap, sprite_bitmap1, cliprect,  0x0600, 0x0600,  0x400, 0xff); // 1
-		m_deco_tilegen2->tilemap_1_draw(bitmap, cliprect, 0, 2); // 2
+		m_deco_tilegen2->tilemap_1_draw(screen, bitmap, cliprect, 0, 2); // 2
 		mixdassaultlayer(bitmap, sprite_bitmap1, cliprect,  0x0400, 0x0600,  0x400, 0xff); // 8
 		mixdassaultlayer(bitmap, sprite_bitmap2, cliprect,  0x0000, 0x0000,  0x800, 0x80); // 16?
 		mixdassaultlayer(bitmap, sprite_bitmap1, cliprect,  0x0200, 0x0600,  0x400, 0xff); // 32
-		m_deco_tilegen1->tilemap_2_draw(bitmap, cliprect, 0, 64); // 64
+		m_deco_tilegen1->tilemap_2_draw(screen, bitmap, cliprect, 0, 64); // 64
 		mixdassaultlayer(bitmap, sprite_bitmap1, cliprect,  0x0000, 0x0600,  0x400, 0xff); // 128
 	}
 	else if ((priority & 3) == 3)
 	{
 		mixdassaultlayer(bitmap, sprite_bitmap1, cliprect,  0x0600, 0x0600,  0x400, 0xff); // 1
-		m_deco_tilegen2->tilemap_1_draw(bitmap, cliprect, 0, 2); // 2
+		m_deco_tilegen2->tilemap_1_draw(screen, bitmap, cliprect, 0, 2); // 2
 		mixdassaultlayer(bitmap, sprite_bitmap1, cliprect,  0x0400, 0x0600,  0x400, 0xff); // 8
-		m_deco_tilegen1->tilemap_2_draw(bitmap, cliprect, 0, 16); // 16
+		m_deco_tilegen1->tilemap_2_draw(screen, bitmap, cliprect, 0, 16); // 16
 		mixdassaultlayer(bitmap, sprite_bitmap1, cliprect,  0x0200, 0x0600,  0x400, 0xff); // 32
 		mixdassaultlayer(bitmap, sprite_bitmap2, cliprect,  0x0000, 0x0000,  0x800, 0x80); // 64?
 		mixdassaultlayer(bitmap, sprite_bitmap1, cliprect,  0x0000, 0x0600,  0x400, 0xff); // 128
@@ -129,6 +129,6 @@ UINT32 dassault_state::screen_update_dassault(screen_device &screen, bitmap_rgb3
 		/* Unused */
 	}
 
-	m_deco_tilegen1->tilemap_1_draw(bitmap, cliprect, 0, 0);
+	m_deco_tilegen1->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }

@@ -220,11 +220,10 @@ int kaneko16_sprite_device::kaneko16_parse_sprite_type012(running_machine &machi
 // custom function to draw a single sprite. needed to keep correct sprites - sprites and sprites - tilemaps priorities
 void kaneko16_sprite_device::kaneko16_draw_sprites_custom(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,
 		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
-		int priority)
+		bitmap_ind8 &priority_bitmap, int priority)
 {
 	pen_t pen_base = gfx->colorbase() + gfx->granularity() * (color % gfx->colors());
 	const UINT8 *source_base = gfx->get_data(code % gfx->elements());
-	bitmap_ind8 &priority_bitmap = gfx->machine().priority_bitmap;
 	int sprite_screen_height = ((1<<16)*gfx->height()+0x8000)>>16;
 	int sprite_screen_width = ((1<<16)*gfx->width()+0x8000)>>16;
 
@@ -315,7 +314,7 @@ void kaneko16_sprite_device::kaneko16_draw_sprites_custom(bitmap_ind16 &dest_bmp
 
 /* Build a list of sprites to display & draw them */
 
-void kaneko16_sprite_device::kaneko16_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16* spriteram16, int spriteram16_bytes)
+void kaneko16_sprite_device::kaneko16_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, UINT16* spriteram16, int spriteram16_bytes)
 {
 	/* Sprites *must* be parsed from the first in RAM to the last,
 	   because of the multisprite feature. But they *must* be drawn
@@ -434,6 +433,7 @@ void kaneko16_sprite_device::kaneko16_draw_sprites(running_machine &machine, bit
 										s->color,
 										s->flipx, s->flipy,
 										s->x, s->y,
+										priority_bitmap,
 										primask );
 	}
 }
@@ -540,7 +540,7 @@ WRITE16_MEMBER(kaneko16_sprite_device::kaneko16_sprites_regs_w)
 
 
 
-void kaneko16_sprite_device::kaneko16_render_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16* spriteram16, int spriteram16_bytes)
+void kaneko16_sprite_device::kaneko16_render_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, UINT16* spriteram16, int spriteram16_bytes)
 {
 	/* Sprites last (rendered with pdrawgfx, so they can slip
 	   in between the layers) */
@@ -548,13 +548,13 @@ void kaneko16_sprite_device::kaneko16_render_sprites(running_machine &machine, b
 	if(m_keep_sprites)
 	{
 		/* keep sprites on screen */
-		kaneko16_draw_sprites(machine,m_sprites_bitmap, cliprect, spriteram16, spriteram16_bytes);
+		kaneko16_draw_sprites(machine,m_sprites_bitmap, cliprect, priority_bitmap, spriteram16, spriteram16_bytes);
 		copybitmap_trans(bitmap,m_sprites_bitmap,0,0,0,0,cliprect,0);
 	}
 	else
 	{
 		m_sprites_bitmap.fill(0, cliprect);
-		kaneko16_draw_sprites(machine,bitmap,cliprect, spriteram16, spriteram16_bytes);
+		kaneko16_draw_sprites(machine,bitmap,cliprect, priority_bitmap, spriteram16, spriteram16_bytes);
 	}
 }
 

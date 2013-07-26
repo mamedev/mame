@@ -895,35 +895,35 @@ UINT32 nmg5_state::screen_update_nmg5(screen_device &screen, bitmap_ind16 &bitma
 	m_fg_tilemap->set_scrolly(0, m_scroll_ram[1] + 9);
 	m_fg_tilemap->set_scrollx(0, m_scroll_ram[0] - 1);
 
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	if (m_priority_reg == 0)
 	{
 		m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
-		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 		draw_bitmap(bitmap);
 	}
 	else if (m_priority_reg == 1)
 	{
 		draw_bitmap(bitmap);
 		m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
-		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	}
 	else if (m_priority_reg == 2)
 	{
 		m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
 		draw_bitmap(bitmap);
-		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	}
 	else if (m_priority_reg == 3)
 	{
-		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 		m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
 		draw_bitmap(bitmap);
 	}
 	else if (m_priority_reg == 7)
 	{
-		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 		draw_bitmap(bitmap);
 		m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
 	}

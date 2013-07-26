@@ -197,6 +197,7 @@ public:
 
 	// information getters
 	render_container &container() const { assert(m_container != NULL); return *m_container; }
+	bitmap_ind8 &priority() { return m_priority; }
 
 	// dynamic configuration
 	void configure(int width, int height, const rectangle &visarea, attoseconds_t frame_period);
@@ -286,6 +287,7 @@ private:
 	texture_format      m_texformat;                // texture format
 	render_texture *    m_texture[2];               // 2x textures for the screen bitmap
 	screen_bitmap       m_bitmap[2];                // 2x bitmaps for rendering
+	bitmap_ind8         m_priority;                 // priority bitmap
 	bitmap_ind64        m_burnin;                   // burn-in bitmap
 	UINT8               m_curbitmap;                // current bitmap index
 	UINT8               m_curtexture;               // current texture index

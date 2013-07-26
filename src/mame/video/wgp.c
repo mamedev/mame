@@ -337,7 +337,7 @@ static const UINT8 ylookup[16] =
 		2, 2, 3, 3,
 		2, 2, 3, 3 };
 
-void wgp_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs )
+void wgp_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs )
 {
 	UINT16 *spriteram = m_spriteram;
 	int offs, i, j, k;
@@ -424,7 +424,7 @@ void wgp_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, i
 							flipx, flipy,
 							curx,cury,
 							zx << 12, zy << 12,
-							machine().priority_bitmap,primasks[((priority >> 1) &1)],0);  /* maybe >> 2 or 0...? */
+							screen.priority(),primasks[((priority >> 1) &1)],0);  /* maybe >> 2 or 0...? */
 				}
 			}
 			else
@@ -455,7 +455,7 @@ void wgp_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, i
 							flipx, flipy,
 							curx,cury,
 							zx << 12, zy << 12,
-							machine().priority_bitmap,primasks[((priority >> 1) &1)],0);  /* maybe >> 2 or 0...? */
+							screen.priority(),primasks[((priority >> 1) &1)],0);  /* maybe >> 2 or 0...? */
 				}
 			}
 		}
@@ -508,7 +508,7 @@ INLINE void bryan2_drawscanline( bitmap_ind16 &bitmap, int x, int y, int length,
 
 
 
-void wgp_state::wgp_piv_layer_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority )
+void wgp_state::wgp_piv_layer_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority )
 {
 	bitmap_ind16 &srcbitmap = m_piv_tilemap[layer]->pixmap();
 	bitmap_ind8 &flagsbitmap = m_piv_tilemap[layer]->flagsmap();
@@ -617,7 +617,7 @@ void wgp_state::wgp_piv_layer_draw( bitmap_ind16 &bitmap, const rectangle &clipr
 			}
 		}
 
-		bryan2_drawscanline(bitmap, 0, y, screen_width, scanline, (flags & TILEMAP_DRAW_OPAQUE) ? 0 : 1, ROT0, machine().priority_bitmap, priority);
+		bryan2_drawscanline(bitmap, 0, y, screen_width, scanline, (flags & TILEMAP_DRAW_OPAQUE) ? 0 : 1, ROT0, screen.priority(), priority);
 
 		y_index += zoomy;
 		if (!machine_flip) y++; else y--;
@@ -688,32 +688,32 @@ UINT32 wgp_state::screen_update_wgp(screen_device &screen, bitmap_ind16 &bitmap,
 #ifdef MAME_DEBUG
 	if (m_dislayer[layer[0]] == 0)
 #endif
-	wgp_piv_layer_draw(bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 1);
+	wgp_piv_layer_draw(screen, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 1);
 
 #ifdef MAME_DEBUG
 	if (m_dislayer[layer[1]] == 0)
 #endif
-	wgp_piv_layer_draw(bitmap, cliprect, layer[1], 0, 2);
+	wgp_piv_layer_draw(screen, bitmap, cliprect, layer[1], 0, 2);
 
 #ifdef MAME_DEBUG
 	if (m_dislayer[layer[2]] == 0)
 #endif
-	wgp_piv_layer_draw(bitmap, cliprect, layer[2], 0, 4);
+	wgp_piv_layer_draw(screen, bitmap, cliprect, layer[2], 0, 4);
 
-	draw_sprites(bitmap, cliprect, 16);
+	draw_sprites(screen, bitmap, cliprect, 16);
 
 /* ... then here we should apply rotation from wgp_sate_ctrl[] to the bitmap before we draw the TC0100SCN layers on it */
 	layer[0] = m_tc0100scn->bottomlayer();
 	layer[1] = layer[0] ^ 1;
 	layer[2] = 2;
 
-	m_tc0100scn->tilemap_draw(bitmap, cliprect, layer[0], 0, 0);
+	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, layer[0], 0, 0);
 
 #ifdef MAME_DEBUG
 	if (m_dislayer[3] == 0)
 #endif
-	m_tc0100scn->tilemap_draw(bitmap, cliprect, layer[1], 0, 0);
-	m_tc0100scn->tilemap_draw(bitmap, cliprect, layer[2], 0, 0);
+	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, layer[1], 0, 0);
+	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, layer[2], 0, 0);
 
 #if 0
 	{

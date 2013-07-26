@@ -188,16 +188,16 @@ UINT32 wrally_state::screen_update_wrally(screen_device &screen, bitmap_ind16 &b
 	}
 
 	/* draw tilemaps + sprites */
-	m_pant[1]->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
-	m_pant[0]->draw(bitmap, cliprect, TILEMAP_DRAW_CATEGORY(0) | TILEMAP_DRAW_LAYER0,0);
-	m_pant[0]->draw(bitmap, cliprect, TILEMAP_DRAW_CATEGORY(0) | TILEMAP_DRAW_LAYER1,0);
+	m_pant[1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
+	m_pant[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(0) | TILEMAP_DRAW_LAYER0,0);
+	m_pant[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(0) | TILEMAP_DRAW_LAYER1,0);
 
-	m_pant[1]->draw(bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1),0);
-	m_pant[0]->draw(bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1) | TILEMAP_DRAW_LAYER0,0);
+	m_pant[1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1),0);
+	m_pant[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1) | TILEMAP_DRAW_LAYER0,0);
 
 	draw_sprites(bitmap,cliprect,0);
 
-	m_pant[0]->draw(bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1) | TILEMAP_DRAW_LAYER1,0);
+	m_pant[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1) | TILEMAP_DRAW_LAYER1,0);
 
 	draw_sprites(bitmap,cliprect,1);
 

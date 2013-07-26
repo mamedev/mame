@@ -548,8 +548,8 @@ UINT32 majorpkr_state::screen_update_majorpkr(screen_device &screen, bitmap_ind1
 	custom_clip = cliprect;
 	custom_clip.max_x -= 16;
 
-	m_bg_tilemap->draw(bitmap, custom_clip, 0, 0);
-	m_fg_tilemap->draw(bitmap, custom_clip, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, custom_clip, 0, 0);
+	m_fg_tilemap->draw(screen, bitmap, custom_clip, 0, 0);
 
 	if (m_flip_state == 1)
 	{

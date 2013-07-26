@@ -1069,7 +1069,7 @@ UINT32 tatsumi_state::screen_update_apache3(screen_device &screen, bitmap_rgb32 
 	draw_sky(machine(), bitmap, cliprect, 256, m_apache3_rotate_ctrl[1]);
 //  draw_ground(machine(), bitmap, cliprect);
 	draw_sprites(machine(), bitmap,cliprect,0, (m_sprite_control_ram[0x20]&0x1000) ? 0x1000 : 0);
-	m_tx_layer->draw(bitmap, cliprect, 0,0);
+	m_tx_layer->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
 }
 
@@ -1084,12 +1084,12 @@ UINT32 tatsumi_state::screen_update_roundup5(screen_device &screen, bitmap_rgb32
 	m_tx_layer->set_scrolly(0,0); //(((m_roundupt_crt_reg[0xe]<<8)|m_roundupt_crt_reg[0xf])>>5) + 96);
 
 	bitmap.fill(machine().pens[384], cliprect); // todo
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 
-	draw_sprites(machine(), machine().priority_bitmap,cliprect,1,(m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0); // Alpha pass only
-	draw_road(machine(), bitmap,cliprect,machine().priority_bitmap);
+	draw_sprites(machine(), screen.priority(),cliprect,1,(m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0); // Alpha pass only
+	draw_road(machine(), bitmap,cliprect,screen.priority());
 	draw_sprites(machine(), bitmap,cliprect,0,(m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0); // Full pass
-	m_tx_layer->draw(bitmap, cliprect, 0,0);
+	m_tx_layer->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
 }
 

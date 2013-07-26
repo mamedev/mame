@@ -170,7 +170,7 @@ WRITE8_MEMBER(m57_state::m57_flipscreen_w)
  *
  *************************************/
 
-void m57_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect)
+void m57_state::draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int y,x;
 	INT16 scrolly;
@@ -179,7 +179,7 @@ void m57_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect)
 	for (y = 64; y < 128; y++)
 		m_bg_tilemap->set_scrollx(y, m_scrollram[0x40]);
 
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	// from 128 to 255: wrapped
 	for (y = 128; y <= cliprect.max_y; y++)
@@ -260,7 +260,7 @@ void m57_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 UINT32 m57_state::screen_update_m57(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	draw_background(bitmap, cliprect);
+	draw_background(screen, bitmap, cliprect);
 	draw_sprites(bitmap, cliprect);
 	return 0;
 }

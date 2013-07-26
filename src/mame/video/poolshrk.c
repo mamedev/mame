@@ -46,6 +46,6 @@ UINT32 poolshrk_state::screen_update_poolshrk(screen_device &screen, bitmap_ind1
 
 	/* draw playfield */
 
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }

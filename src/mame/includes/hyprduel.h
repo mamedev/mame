@@ -103,8 +103,8 @@ public:
 	inline void hyprduel_vram_w( offs_t offset, UINT16 data, UINT16 mem_mask, int layer, UINT16 *vram );
 	void alloc_empty_tiles(  );
 	void expand_gfx1(hyprduel_state &state);
-	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void draw_layers( bitmap_ind16 &bitmap, const rectangle &cliprect, int pri, int layers_ctrl );
+	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void draw_layers( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri, int layers_ctrl );
 	void dirty_tiles( int layer, UINT16 *vram );
 	void update_irq_state(  );
 	inline int blt_read( const UINT8 *ROM, const int offs );

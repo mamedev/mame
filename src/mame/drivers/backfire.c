@@ -139,19 +139,19 @@ UINT32 backfire_state::screen_update_backfire_left(screen_device &screen, bitmap
 	m_deco_tilegen1->pf_update(m_pf1_rowscroll, m_pf2_rowscroll);
 	m_deco_tilegen2->pf_update(m_pf3_rowscroll, m_pf4_rowscroll);
 
-	machine().priority_bitmap.fill(0);
+	screen.priority().fill(0);
 	bitmap.fill(0x100, cliprect);
 
 	if (m_left_priority[0] == 0)
 	{
-		m_deco_tilegen2->tilemap_1_draw(bitmap, cliprect, 0, 1);
-		m_deco_tilegen1->tilemap_1_draw(bitmap, cliprect, 0, 2);
+		m_deco_tilegen2->tilemap_1_draw(screen, bitmap, cliprect, 0, 1);
+		m_deco_tilegen1->tilemap_1_draw(screen, bitmap, cliprect, 0, 2);
 		m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram_1, 0x800);
 	}
 	else if (m_left_priority[0] == 2)
 	{
-		m_deco_tilegen1->tilemap_1_draw(bitmap, cliprect, 0, 2);
-		m_deco_tilegen2->tilemap_1_draw(bitmap, cliprect, 0, 4);
+		m_deco_tilegen1->tilemap_1_draw(screen, bitmap, cliprect, 0, 2);
+		m_deco_tilegen2->tilemap_1_draw(screen, bitmap, cliprect, 0, 4);
 		m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram_1, 0x800);
 	}
 	else
@@ -170,19 +170,19 @@ UINT32 backfire_state::screen_update_backfire_right(screen_device &screen, bitma
 	m_deco_tilegen1->pf_update(m_pf1_rowscroll, m_pf2_rowscroll);
 	m_deco_tilegen2->pf_update(m_pf3_rowscroll, m_pf4_rowscroll);
 
-	machine().priority_bitmap.fill(0);
+	screen.priority().fill(0);
 	bitmap.fill(0x500, cliprect);
 
 	if (m_right_priority[0] == 0)
 	{
-		m_deco_tilegen2->tilemap_2_draw(bitmap, cliprect, 0, 1);
-		m_deco_tilegen1->tilemap_2_draw(bitmap, cliprect, 0, 2);
+		m_deco_tilegen2->tilemap_2_draw(screen, bitmap, cliprect, 0, 1);
+		m_deco_tilegen1->tilemap_2_draw(screen, bitmap, cliprect, 0, 2);
 		m_sprgen2->draw_sprites(bitmap, cliprect, m_spriteram_2, 0x800);
 	}
 	else if (m_right_priority[0] == 2)
 	{
-		m_deco_tilegen1->tilemap_2_draw(bitmap, cliprect, 0, 2);
-		m_deco_tilegen2->tilemap_2_draw(bitmap, cliprect, 0, 4);
+		m_deco_tilegen1->tilemap_2_draw(screen, bitmap, cliprect, 0, 2);
+		m_deco_tilegen2->tilemap_2_draw(screen, bitmap, cliprect, 0, 4);
 		m_sprgen2->draw_sprites(bitmap, cliprect, m_spriteram_2, 0x800);
 	}
 	else
@@ -528,10 +528,12 @@ static MACHINE_CONFIG_START( backfire, backfire_state )
 	MCFG_DECO16IC_SET_SCREEN("lscreen")
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
+	MCFG_VIDEO_SET_SCREEN("lscreen")
 	decospr_device::set_gfx_region(*device, 4);
 	decospr_device::set_pri_callback(*device, backfire_pri_callback);
 
 	MCFG_DEVICE_ADD("spritegen2", DECO_SPRITE, 0)
+	MCFG_VIDEO_SET_SCREEN("rscreen")
 	decospr_device::set_gfx_region(*device, 5);
 	decospr_device::set_pri_callback(*device, backfire_pri_callback);
 

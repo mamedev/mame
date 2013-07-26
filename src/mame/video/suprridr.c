@@ -167,23 +167,23 @@ UINT32 suprridr_state::screen_update_suprridr(screen_device &screen, bitmap_ind1
 	subclip = visarea;;
 	subclip.max_x = subclip.min_x + (m_flipx ? 1*8 : 4*8) - 1;
 	subclip &= cliprect;
-	m_bg_tilemap_noscroll->draw(bitmap, subclip, 0, 0);
+	m_bg_tilemap_noscroll->draw(screen, bitmap, subclip, 0, 0);
 
 	/* render right 1 column with no scroll */
 	subclip = visarea;;
 	subclip.min_x = subclip.max_x - (m_flipx ? 4*8 : 1*8) + 1;
 	subclip &= cliprect;
-	m_bg_tilemap_noscroll->draw(bitmap, subclip, 0, 0);
+	m_bg_tilemap_noscroll->draw(screen, bitmap, subclip, 0, 0);
 
 	/* render the middle columns normally */
 	subclip = visarea;;
 	subclip.min_x += m_flipx ? 1*8 : 4*8;
 	subclip.max_x -= m_flipx ? 4*8 : 1*8;
 	subclip &= cliprect;
-	m_bg_tilemap->draw(bitmap, subclip, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, subclip, 0, 0);
 
 	/* render the top layer */
-	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* draw the sprites */
 	for (i = 0; i < 48; i++)

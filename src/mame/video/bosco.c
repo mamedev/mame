@@ -289,14 +289,14 @@ UINT32 bosco_state::screen_update_bosco(screen_device &screen, bitmap_ind16 &bit
 	bitmap.fill(get_black_pen(machine()), cliprect);
 	draw_stars(bitmap,cliprect,flip_screen());
 
-	m_bg_tilemap->draw(bitmap, bg_clip, 0,0);
-	m_fg_tilemap->draw(bitmap, fg_clip, 0,0);
+	m_bg_tilemap->draw(screen, bitmap, bg_clip, 0,0);
+	m_fg_tilemap->draw(screen, bitmap, fg_clip, 0,0);
 
 	draw_sprites(bitmap,cliprect);
 
 	/* draw the high priority characters */
-	m_bg_tilemap->draw(bitmap, bg_clip, 1,0);
-	m_fg_tilemap->draw(bitmap, fg_clip, 1,0);
+	m_bg_tilemap->draw(screen, bitmap, bg_clip, 1,0);
+	m_fg_tilemap->draw(screen, bitmap, fg_clip, 1,0);
 
 	draw_bullets(bitmap,cliprect);
 

@@ -521,7 +521,7 @@ UINT32 fromanc2_state::screen_update_fromanc2_left(screen_device &screen, bitmap
 		{
 			m_tilemap[0][i]->set_scrollx(0, -m_scrollx[0][i]);
 			m_tilemap[0][i]->set_scrolly(0, -m_scrolly[0][i]);
-			m_tilemap[0][i]->draw(bitmap, cliprect, 0, 0);
+			m_tilemap[0][i]->draw(screen, bitmap, cliprect, 0, 0);
 		}
 	}
 
@@ -538,7 +538,7 @@ UINT32 fromanc2_state::screen_update_fromanc2_right(screen_device &screen, bitma
 		{
 			m_tilemap[1][i]->set_scrollx(0, -m_scrollx[1][i]);
 			m_tilemap[1][i]->set_scrolly(0, -m_scrolly[1][i]);
-			m_tilemap[1][i]->draw(bitmap, cliprect, 0, 0);
+			m_tilemap[1][i]->draw(screen, bitmap, cliprect, 0, 0);
 		}
 	}
 

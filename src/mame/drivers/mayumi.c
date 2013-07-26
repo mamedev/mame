@@ -78,7 +78,7 @@ WRITE8_MEMBER(mayumi_state::mayumi_videoram_w)
 
 UINT32 mayumi_state::screen_update_mayumi(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 

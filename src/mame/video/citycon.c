@@ -152,8 +152,8 @@ UINT32 citycon_state::screen_update_citycon(screen_device &screen, bitmap_ind16 
 	for (offs = 6; offs < 32; offs++)
 		m_fg_tilemap->set_scrollx(offs, scroll);
 
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);
 	return 0;
 }

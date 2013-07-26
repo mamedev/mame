@@ -329,9 +329,9 @@ UINT32 clshroad_state::screen_update_clshroad(screen_device &screen, bitmap_ind1
 	m_tilemap_0a->set_scrollx(0, scrollx);
 	m_tilemap_0b->set_scrollx(0, scrollx);
 
-	m_tilemap_0a->draw(bitmap, cliprect, 0,0);  // Opaque
-	m_tilemap_0b->draw(bitmap, cliprect, 0,0);
+	m_tilemap_0a->draw(screen, bitmap, cliprect, 0,0);  // Opaque
+	m_tilemap_0b->draw(screen, bitmap, cliprect, 0,0);
 	draw_sprites(bitmap,cliprect);
-	m_tilemap_1->draw(bitmap, cliprect, 0,0);
+	m_tilemap_1->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
 }

@@ -167,7 +167,7 @@ UINT32 marineb_state::screen_update_marineb(screen_device &screen, bitmap_ind16 
 	int offs;
 
 	set_tilemap_scrolly(24);
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* draw the sprites */
 	for (offs = 0x0f; offs >= 0; offs--)
@@ -228,7 +228,7 @@ UINT32 marineb_state::screen_update_changes(screen_device &screen, bitmap_ind16 
 	int offs, sx, sy, code, col, flipx, flipy;
 
 	set_tilemap_scrolly(26);
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* draw the small sprites */
 	for (offs = 0x05; offs >= 0; offs--)
@@ -306,7 +306,7 @@ UINT32 marineb_state::screen_update_springer(screen_device &screen, bitmap_ind16
 	int offs;
 
 	set_tilemap_scrolly(0);
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* draw the sprites */
 	for (offs = 0x0f; offs >= 0; offs--)
@@ -365,7 +365,7 @@ UINT32 marineb_state::screen_update_hoccer(screen_device &screen, bitmap_ind16 &
 	int offs;
 
 	set_tilemap_scrolly(0);
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* draw the sprites */
 	for (offs = 0x07; offs >= 0; offs--)
@@ -408,7 +408,7 @@ UINT32 marineb_state::screen_update_hopprobo(screen_device &screen, bitmap_ind16
 	int offs;
 
 	set_tilemap_scrolly(0);
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* draw the sprites */
 	for (offs = 0x0f; offs >= 0; offs--)

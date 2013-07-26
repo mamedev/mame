@@ -307,7 +307,7 @@ void k05324x_device::k05324x_set_z_rejection( int zcode )
  * The rest of the sprite remains normal.
  */
 
-void k05324x_device::k053245_sprites_draw( bitmap_ind16 &bitmap, const rectangle &cliprect )
+void k05324x_device::k053245_sprites_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap )
 {
 #define NUM_SPRITES 128
 	int offs, pri_code, i;
@@ -523,7 +523,7 @@ void k05324x_device::k053245_sprites_draw( bitmap_ind16 &bitmap, const rectangle
 							color,
 							fx,fy,
 							sx,sy,
-							machine().priority_bitmap,pri,
+							priority_bitmap,pri,
 							drawmode_table,machine().shadow_table);
 				}
 				else
@@ -534,7 +534,7 @@ void k05324x_device::k053245_sprites_draw( bitmap_ind16 &bitmap, const rectangle
 							fx,fy,
 							sx,sy,
 							(zw << 16) / 16,(zh << 16) / 16,
-							machine().priority_bitmap,pri,
+							priority_bitmap,pri,
 							drawmode_table,machine().shadow_table);
 
 				}
@@ -559,7 +559,7 @@ if (machine().input().code_pressed(KEYCODE_D))
 
 /* Lethal Enforcers has 2 of these chips hooked up in parallel to give 6bpp gfx.. let's cheat a
   bit and make emulating it a little less messy by using a custom function instead */
-void k05324x_device::k053245_sprites_draw_lethal( bitmap_ind16 &bitmap, const rectangle &cliprect )
+void k05324x_device::k053245_sprites_draw_lethal( bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap )
 {
 #define NUM_SPRITES 128
 	int offs, pri_code, i;
@@ -771,7 +771,7 @@ void k05324x_device::k053245_sprites_draw_lethal( bitmap_ind16 &bitmap, const re
 							color,
 							fx,fy,
 							sx,sy,
-							machine().priority_bitmap,pri,
+							priority_bitmap,pri,
 							drawmode_table,machine().shadow_table);
 				}
 				else
@@ -782,7 +782,7 @@ void k05324x_device::k053245_sprites_draw_lethal( bitmap_ind16 &bitmap, const re
 							fx,fy,
 							sx,sy,
 							(zw << 16) / 16,(zh << 16) / 16,
-							machine().priority_bitmap,pri,
+							priority_bitmap,pri,
 							drawmode_table,machine().shadow_table);
 
 				}

@@ -102,7 +102,7 @@ UINT32 speedspn_state::screen_update_speedspn(screen_device &screen, bitmap_ind1
 	}
 #endif
 	m_tilemap->set_scrollx(0, 0x100); // verify
-	m_tilemap->draw(bitmap, cliprect, 0,0);
+	m_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	draw_sprites(bitmap,cliprect);
 	return 0;
 }

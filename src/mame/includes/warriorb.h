@@ -63,7 +63,7 @@ public:
 	UINT32 screen_update_warriorb_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_warriorb_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void reset_sound_region();
-	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int x_offs, int y_offs );
+	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int x_offs, int y_offs );
 	UINT32 update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffs, tc0100scn_device *tc0100scn);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 };

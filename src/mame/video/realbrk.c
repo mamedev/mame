@@ -511,12 +511,12 @@ if ( machine().input().code_pressed(KEYCODE_Z) )
 	else
 		bitmap.fill(m_vregs[0xc/2] & 0x7fff, cliprect);
 
-	if (layers_ctrl & 2)    m_tilemap_1->draw(bitmap, cliprect, 0,0);
-	if (layers_ctrl & 1)    m_tilemap_0->draw(bitmap, cliprect, 0,0);
+	if (layers_ctrl & 2)    m_tilemap_1->draw(screen, bitmap, cliprect, 0,0);
+	if (layers_ctrl & 1)    m_tilemap_0->draw(screen, bitmap, cliprect, 0,0);
 
 	if (layers_ctrl & 8)    draw_sprites(bitmap,cliprect);
 
-	if (layers_ctrl & 4)    m_tilemap_2->draw(bitmap, cliprect, 0,0);
+	if (layers_ctrl & 4)    m_tilemap_2->draw(screen, bitmap, cliprect, 0,0);
 
 //  popmessage("%04x",m_vregs[0x8/2]);
 	return 0;
@@ -588,9 +588,9 @@ if ( machine().input().code_pressed(KEYCODE_Z) )
 
 	// bglow
 	if( m_vregs[8/2] & (0x8000)){
-		if (layers_ctrl & 1)    m_tilemap_0->draw(bitmap, cliprect, 0,0);
+		if (layers_ctrl & 1)    m_tilemap_0->draw(screen, bitmap, cliprect, 0,0);
 	} else {
-		if (layers_ctrl & 2)    m_tilemap_1->draw(bitmap, cliprect, 0,0);
+		if (layers_ctrl & 2)    m_tilemap_1->draw(screen, bitmap, cliprect, 0,0);
 	}
 
 	// spr 1
@@ -598,16 +598,16 @@ if ( machine().input().code_pressed(KEYCODE_Z) )
 
 	// bghigh
 	if( m_vregs[8/2] & (0x8000)){
-		if (layers_ctrl & 2)    m_tilemap_1->draw(bitmap, cliprect, 0,0);
+		if (layers_ctrl & 2)    m_tilemap_1->draw(screen, bitmap, cliprect, 0,0);
 	} else {
-		if (layers_ctrl & 1)    m_tilemap_0->draw(bitmap, cliprect, 0,0);
+		if (layers_ctrl & 1)    m_tilemap_0->draw(screen, bitmap, cliprect, 0,0);
 	}
 
 	// spr 2
 	if (layers_ctrl & 8)    dai2kaku_draw_sprites(bitmap,cliprect,0);
 
 	// fix
-	if (layers_ctrl & 4)    m_tilemap_2->draw(bitmap, cliprect, 0,0);
+	if (layers_ctrl & 4)    m_tilemap_2->draw(screen, bitmap, cliprect, 0,0);
 
 //  usrintf_showmessage("%04x",m_vregs[0x8/2]);
 	return 0;

@@ -200,8 +200,8 @@ UINT32 glass_state::screen_update_glass(screen_device &screen, bitmap_ind16 &bit
 	/* draw layers + sprites */
 	bitmap.fill(get_black_pen(machine()), cliprect);
 	copybitmap(bitmap, *m_screen_bitmap, 0, 0, 0x18, 0x24, cliprect);
-	m_pant[1]->draw(bitmap, cliprect, 0, 0);
-	m_pant[0]->draw(bitmap, cliprect, 0, 0);
+	m_pant[1]->draw(screen, bitmap, cliprect, 0, 0);
+	m_pant[0]->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);
 	return 0;
 }

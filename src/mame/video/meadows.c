@@ -103,7 +103,7 @@ void meadows_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip)
 UINT32 meadows_state::screen_update_meadows(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* draw the background */
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* draw the sprites */
 	if (machine().gfx[1])

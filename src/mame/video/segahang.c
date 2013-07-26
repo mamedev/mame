@@ -71,7 +71,7 @@ UINT32 segahang_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	m_sprites->draw_async(cliprect);
 
 	// reset priorities
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 
 	// draw the low priority road layer
 	m_segaic16road->segaic16_road_draw(0, bitmap, cliprect, SEGAIC16_ROAD_BACKGROUND);
@@ -100,7 +100,7 @@ UINT32 segahang_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 		{
 			UINT16 *dest = &bitmap.pix(y);
 			UINT16 *src = &sprites.pix(y);
-			UINT8 *pri = &machine().priority_bitmap.pix(y);
+			UINT8 *pri = &screen.priority().pix(y);
 
 			// hangon mixing
 			if (!m_sharrier_video)

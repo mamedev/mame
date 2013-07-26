@@ -166,8 +166,8 @@ UINT32 flower_state::screen_update_flower(screen_device &screen, bitmap_ind16 &b
 	m_bg0_tilemap->set_scrolly(0, m_bg0_scroll[0]+16);
 	m_bg1_tilemap->set_scrolly(0, m_bg1_scroll[0]+16);
 
-	m_bg0_tilemap->draw(bitmap, cliprect, 0,0);
-	m_bg1_tilemap->draw(bitmap, cliprect, 0,0);
+	m_bg0_tilemap->draw(screen, bitmap, cliprect, 0,0);
+	m_bg1_tilemap->draw(screen, bitmap, cliprect, 0,0);
 
 	draw_sprites(bitmap,cliprect);
 
@@ -182,8 +182,8 @@ UINT32 flower_state::screen_update_flower(screen_device &screen, bitmap_ind16 &b
 		myclip.max_x = cliprect.max_x;
 	}
 
-	m_text_tilemap->draw(bitmap, cliprect, 0,0);
-	m_text_right_tilemap->draw(bitmap, myclip, 0,0);
+	m_text_tilemap->draw(screen, bitmap, cliprect, 0,0);
+	m_text_right_tilemap->draw(screen, bitmap, myclip, 0,0);
 	return 0;
 }
 

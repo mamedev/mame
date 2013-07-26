@@ -499,9 +499,9 @@ UINT32 polepos_state::screen_update_polepos(screen_device &screen, bitmap_ind16 
 {
 	rectangle clip = cliprect;
 	clip.max_y = 127;
-	m_bg_tilemap->draw(bitmap, clip, 0,0);
+	m_bg_tilemap->draw(screen, bitmap, clip, 0,0);
 	draw_road(bitmap);
 	draw_sprites(bitmap,cliprect);
-	m_tx_tilemap->draw(bitmap, cliprect, 0,0);
+	m_tx_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
 }

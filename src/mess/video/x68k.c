@@ -1209,13 +1209,13 @@ UINT32 x68k_state::screen_update_x68000(screen_device &screen, bitmap_ind16 &bit
 				{
 					x68k_bg0->set_scrollx(0,(m_spritereg[0x402] - m_crtc.hbegin - m_crtc.bg_hshift) & 0x3ff);
 					x68k_bg0->set_scrolly(0,(m_spritereg[0x403] - m_crtc.vbegin) & 0x3ff);
-					x68k_bg0->draw(bitmap,rect,0,0);
+					x68k_bg0->draw(screen, bitmap,rect,0,0);
 				}
 				else
 				{
 					x68k_bg1->set_scrollx(0,(m_spritereg[0x402] - m_crtc.hbegin - m_crtc.bg_hshift) & 0x3ff);
 					x68k_bg1->set_scrolly(0,(m_spritereg[0x403] - m_crtc.vbegin) & 0x3ff);
-					x68k_bg1->draw(bitmap,rect,0,0);
+					x68k_bg1->draw(screen, bitmap,rect,0,0);
 				}
 			}
 			x68k_draw_sprites(bitmap,2,rect);
@@ -1225,13 +1225,13 @@ UINT32 x68k_state::screen_update_x68000(screen_device &screen, bitmap_ind16 &bit
 				{
 					x68k_bg0->set_scrollx(0,(m_spritereg[0x400] - m_crtc.hbegin - m_crtc.bg_hshift) & 0x3ff);
 					x68k_bg0->set_scrolly(0,(m_spritereg[0x401] - m_crtc.vbegin) & 0x3ff);
-					x68k_bg0->draw(bitmap,rect,0,0);
+					x68k_bg0->draw(screen, bitmap,rect,0,0);
 				}
 				else
 				{
 					x68k_bg1->set_scrollx(0,(m_spritereg[0x400] - m_crtc.hbegin - m_crtc.bg_hshift) & 0x3ff);
 					x68k_bg1->set_scrolly(0,(m_spritereg[0x401] - m_crtc.vbegin) & 0x3ff);
-					x68k_bg1->draw(bitmap,rect,0,0);
+					x68k_bg1->draw(screen, bitmap,rect,0,0);
 				}
 			}
 			x68k_draw_sprites(bitmap,3,rect);

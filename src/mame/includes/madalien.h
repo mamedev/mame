@@ -67,9 +67,9 @@ public:
 	DECLARE_PALETTE_INIT(madalien);
 	UINT32 screen_update_madalien(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	inline int scan_helper(int col, int row, int section);
-	void draw_edges(bitmap_ind16 &bitmap, const rectangle &cliprect, int flip, int scroll_mode);
+	void draw_edges(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flip, int scroll_mode);
 	void draw_headlight(bitmap_ind16 &bitmap, const rectangle &cliprect, int flip);
-	void draw_foreground(bitmap_ind16 &bitmap, const rectangle &cliprect, int flip);
+	void draw_foreground(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flip);
 	inline UINT8 shift_common(UINT8 hi, UINT8 lo);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;

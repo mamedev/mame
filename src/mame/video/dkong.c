@@ -979,12 +979,12 @@ UINT32 dkong_state::screen_update_dkong(screen_device &screen, bitmap_ind16 &bit
 		case HARDWARE_TKG02:
 		case HARDWARE_TKG04:
 			check_palette();
-			m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+			m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 			draw_sprites(bitmap, cliprect, 0x40, 1);
 			break;
 		case HARDWARE_TRS01:
 		case HARDWARE_TRS02:
-			m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+			m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 			draw_sprites(bitmap, cliprect, 0x40, 1);
 			radarscp_draw_background(this, bitmap, cliprect);
 			break;
@@ -998,7 +998,7 @@ UINT32 dkong_state::screen_update_pestplce(screen_device &screen, bitmap_ind16 &
 {
 	int offs;
 
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* Draw the sprites. */
 	for (offs = 0;offs < m_sprite_ram.bytes();offs += 4)
@@ -1017,7 +1017,7 @@ UINT32 dkong_state::screen_update_pestplce(screen_device &screen, bitmap_ind16 &
 
 UINT32 dkong_state::screen_update_spclforc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* it uses sprite_ram[offs + 2] & 0x10 for sprite bank */
 	draw_sprites(bitmap, cliprect, 0x10, 3);

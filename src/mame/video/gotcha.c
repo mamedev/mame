@@ -100,8 +100,8 @@ WRITE16_MEMBER(gotcha_state::gotcha_scroll_w)
 
 UINT32 gotcha_state::screen_update_gotcha(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
 	return 0;
 }

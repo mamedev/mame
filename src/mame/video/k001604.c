@@ -291,7 +291,7 @@ void k001604_device::draw_back_layer( bitmap_rgb32 &bitmap, const rectangle &cli
 	}
 }
 
-void k001604_device::draw_front_layer( bitmap_rgb32 &bitmap, const rectangle &cliprect )
+void k001604_device::draw_front_layer( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
 	m_layer_8x8[0]->set_scrollx(-cliprect.min_x);
 	m_layer_8x8[0]->set_scrolly(-cliprect.min_y);
@@ -300,7 +300,7 @@ void k001604_device::draw_front_layer( bitmap_rgb32 &bitmap, const rectangle &cl
 	m_layer_8x8[1]->set_scrolly(-cliprect.min_y);
 
 	//m_layer_8x8[1]->draw(bitmap, cliprect, 0,0);
-	m_layer_8x8[0]->draw(bitmap, cliprect, 0,0);
+	m_layer_8x8[0]->draw(screen, bitmap, cliprect, 0,0);
 }
 
 READ32_MEMBER( k001604_device::tile_r )

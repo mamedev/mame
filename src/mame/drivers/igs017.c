@@ -455,11 +455,11 @@ UINT32 igs017_state::screen_update_igs017(screen_device &screen, bitmap_ind16 &b
 	if (m_video_disable)
 		return 0;
 
-	if (layers_ctrl & 1)    m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	if (layers_ctrl & 1)    m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 
 	if (layers_ctrl & 4)    draw_sprites(bitmap, cliprect);
 
-	if (layers_ctrl & 2)    m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	if (layers_ctrl & 2)    m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }

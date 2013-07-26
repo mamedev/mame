@@ -896,13 +896,13 @@ void toaplan1_state::toaplan1_log_vram()
 ***************************************************************************/
 
 // custom function to draw a single sprite. needed to keep correct sprites - sprites and sprites - tilemaps priorities
-static void toaplan1_draw_sprite_custom(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,
+static void toaplan1_draw_sprite_custom(screen_device &screen, bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,
 		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
 		int priority)
 {
 	int pal_base = gfx->colorbase() + gfx->granularity() * (color % gfx->colors());
 	const UINT8 *source_base = gfx->get_data(code % gfx->elements());
-	bitmap_ind8 &priority_bitmap = gfx->machine().priority_bitmap;
+	bitmap_ind8 &priority_bitmap = screen.priority();
 	int sprite_screen_height = ((1<<16)*gfx->height()+0x8000)>>16;
 	int sprite_screen_width = ((1<<16)*gfx->width()+0x8000)>>16;
 
@@ -992,7 +992,7 @@ static void toaplan1_draw_sprite_custom(bitmap_ind16 &dest_bmp,const rectangle &
 }
 
 
-void toaplan1_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
+void toaplan1_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	UINT16 *source = (UINT16 *)m_buffered_spriteram;
 	UINT16 *size   = (UINT16 *)m_buffered_spritesizeram16;
@@ -1045,7 +1045,7 @@ void toaplan1_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 					if (fcu_flipscreen) sx = sx_base - dim_x;
 					else                sx = sx_base + dim_x;
 
-					toaplan1_draw_sprite_custom(bitmap,cliprect,machine().gfx[1],
+					toaplan1_draw_sprite_custom(screen,bitmap,cliprect,machine().gfx[1],
 												sprite,color,
 												fcu_flipscreen,fcu_flipscreen,
 												sx,sy,
@@ -1075,15 +1075,15 @@ UINT32 toaplan1_rallybik_state::screen_update_rallybik(screen_device &screen, bi
 	m_spritegen->draw_sprites_to_tempbitmap(cliprect, m_buffered_spriteram,  m_spriteram.bytes());
 
 
-	m_pf1_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE | 0, 0);
-	m_pf1_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE | 1, 0);
+	m_pf1_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE | 0, 0);
+	m_pf1_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE | 1, 0);
 
 	for (priority = 1; priority < 16; priority++)
 	{
-		m_pf4_tilemap->draw(bitmap, cliprect, priority, 0);
-		m_pf3_tilemap->draw(bitmap, cliprect, priority, 0);
-		m_pf2_tilemap->draw(bitmap, cliprect, priority, 0);
-		m_pf1_tilemap->draw(bitmap, cliprect, priority, 0);
+		m_pf4_tilemap->draw(screen, bitmap, cliprect, priority, 0);
+		m_pf3_tilemap->draw(screen, bitmap, cliprect, priority, 0);
+		m_pf2_tilemap->draw(screen, bitmap, cliprect, priority, 0);
+		m_pf1_tilemap->draw(screen, bitmap, cliprect, priority, 0);
 
 		//if (pririoty==0x00)  m_spritegen->copy_sprites_from_tempbitmap(bitmap,cliprect,0);
 		if (priority==0x04)  m_spritegen->copy_sprites_from_tempbitmap(bitmap,cliprect,1);
@@ -1101,22 +1101,22 @@ UINT32 toaplan1_state::screen_update_toaplan1(screen_device &screen, bitmap_ind1
 
 	toaplan1_log_vram();
 
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 	bitmap.fill(0x120, cliprect);
 
 // it's really correct?
-	m_pf1_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE | 0, 0);
-	m_pf1_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE | 1, 0);
+	m_pf1_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE | 0, 0);
+	m_pf1_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE | 1, 0);
 
 	for (priority = 1; priority < 16; priority++)
 	{
-		m_pf4_tilemap->draw(bitmap, cliprect, priority, priority, 0);
-		m_pf3_tilemap->draw(bitmap, cliprect, priority, priority, 0);
-		m_pf2_tilemap->draw(bitmap, cliprect, priority, priority, 0);
-		m_pf1_tilemap->draw(bitmap, cliprect, priority, priority, 0);
+		m_pf4_tilemap->draw(screen, bitmap, cliprect, priority, priority, 0);
+		m_pf3_tilemap->draw(screen, bitmap, cliprect, priority, priority, 0);
+		m_pf2_tilemap->draw(screen, bitmap, cliprect, priority, priority, 0);
+		m_pf1_tilemap->draw(screen, bitmap, cliprect, priority, priority, 0);
 	}
 
-	draw_sprites(bitmap, cliprect);
+	draw_sprites(screen, bitmap, cliprect);
 	return 0;
 }
 

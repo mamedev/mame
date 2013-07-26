@@ -201,12 +201,12 @@ UINT32 igs_m027_state::screen_update_igs_majhong(screen_device &screen, bitmap_i
 	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	//??????
-	m_igs_bg_tilemap->draw(bitmap, cliprect, 0,0);
+	m_igs_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
 
 	//CG??????
 
 	//??????
-	m_igs_tx_tilemap->draw(bitmap, cliprect, 0,0);
+	m_igs_tx_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	//fprintf(stdout,"Video UPDATE OK!\n");
 	return 0;
 }

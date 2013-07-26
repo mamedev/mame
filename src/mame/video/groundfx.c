@@ -58,7 +58,7 @@ Heavy use is made of sprite zooming.
 
 ***************************************************************/
 
-void groundfx_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int do_hack,int x_offs,int y_offs)
+void groundfx_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,int do_hack,int x_offs,int y_offs)
 {
 	UINT32 *spriteram32 = m_spriteram;
 	UINT16 *spritemap = (UINT16 *)memregion("user1")->base();
@@ -185,7 +185,7 @@ void groundfx_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 				sprite_ptr->flipx,sprite_ptr->flipy,
 				sprite_ptr->x,sprite_ptr->y,
 				sprite_ptr->zoomx,sprite_ptr->zoomy,
-				machine().priority_bitmap,primasks[sprite_ptr->pri],0);
+				screen.priority(),primasks[sprite_ptr->pri],0);
 	}
 }
 
@@ -215,11 +215,11 @@ UINT32 groundfx_state::screen_update_groundfx(screen_device &screen, bitmap_ind1
 	pivlayer[1] = pivlayer[0]^1;
 	pivlayer[2] = 2;
 
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 	bitmap.fill(0, cliprect);   /* wrong color? */
 
-	m_tc0100scn->tilemap_draw(bitmap, cliprect, pivlayer[0], TILEMAP_DRAW_OPAQUE, 0);
-	m_tc0100scn->tilemap_draw(bitmap, cliprect, pivlayer[1], 0, 0);
+	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, pivlayer[0], TILEMAP_DRAW_OPAQUE, 0);
+	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, pivlayer[1], 0, 0);
 
 	/*  BIG HACK!
 
@@ -240,28 +240,28 @@ UINT32 groundfx_state::screen_update_groundfx(screen_device &screen, bitmap_ind1
 	if (m_tc0100scn->long_r(space, 0x4090 / 4, 0xffffffff) ||
 			m_tc0480scp->long_r(space, 0x20 / 4, 0xffffffff) == 0x240866)  /* Anything in text layer - really stupid hack */
 	{
-		m_tc0480scp->tilemap_draw(bitmap, cliprect, layer[1], 0, 2);
-		m_tc0480scp->tilemap_draw(bitmap, cliprect, layer[2], 0, 4);
-		m_tc0480scp->tilemap_draw(bitmap, cliprect, layer[3], 0, 8);
+		m_tc0480scp->tilemap_draw(screen, bitmap, cliprect, layer[1], 0, 2);
+		m_tc0480scp->tilemap_draw(screen, bitmap, cliprect, layer[2], 0, 4);
+		m_tc0480scp->tilemap_draw(screen, bitmap, cliprect, layer[3], 0, 8);
 
-		//m_tc0100scn->tilemap_draw(bitmap, cliprect, 0, pivlayer[2], 0, 0);
+		//m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, 0, pivlayer[2], 0, 0);
 
 		if (m_tc0480scp->long_r(space, 0x20 / 4, 0xffffffff) != 0x240866) /* Stupid hack for start of race */
-			m_tc0480scp->tilemap_draw(bitmap, m_hack_cliprect, layer[0], 0, 0);
-		draw_sprites(bitmap, cliprect, 1, 44, -574);
+			m_tc0480scp->tilemap_draw(screen, bitmap, m_hack_cliprect, layer[0], 0, 0);
+		draw_sprites(screen, bitmap, cliprect, 1, 44, -574);
 	}
 	else
 	{
-		m_tc0480scp->tilemap_draw(bitmap, cliprect, layer[0], 0, 1);
-		m_tc0480scp->tilemap_draw(bitmap, cliprect, layer[1], 0, 2);
-		m_tc0480scp->tilemap_draw(bitmap, cliprect, layer[2], 0, 4);
-		m_tc0480scp->tilemap_draw(bitmap, cliprect, layer[3], 0, 8);
+		m_tc0480scp->tilemap_draw(screen, bitmap, cliprect, layer[0], 0, 1);
+		m_tc0480scp->tilemap_draw(screen, bitmap, cliprect, layer[1], 0, 2);
+		m_tc0480scp->tilemap_draw(screen, bitmap, cliprect, layer[2], 0, 4);
+		m_tc0480scp->tilemap_draw(screen, bitmap, cliprect, layer[3], 0, 8);
 
-		m_tc0100scn->tilemap_draw(bitmap, cliprect, pivlayer[2], 0, 0);
+		m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, pivlayer[2], 0, 0);
 
-		draw_sprites(bitmap, cliprect, 0, 44, -574);
+		draw_sprites(screen, bitmap, cliprect, 0, 44, -574);
 	}
 
-	m_tc0480scp->tilemap_draw(bitmap, cliprect, layer[4], 0, 0);    /* TC0480SCP text layer */
+	m_tc0480scp->tilemap_draw(screen, bitmap, cliprect, layer[4], 0, 0);    /* TC0480SCP text layer */
 	return 0;
 }

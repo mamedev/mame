@@ -130,21 +130,21 @@ void freekick_state::freekick_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 
 UINT32 freekick_state::screen_update_gigas(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_freek_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_freek_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	gigas_draw_sprites(bitmap, cliprect);
 	return 0;
 }
 
 UINT32 freekick_state::screen_update_pbillrd(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_freek_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_freek_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	pbillrd_draw_sprites(bitmap, cliprect);
 	return 0;
 }
 
 UINT32 freekick_state::screen_update_freekick(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_freek_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_freek_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	freekick_draw_sprites(bitmap, cliprect);
 	return 0;
 }

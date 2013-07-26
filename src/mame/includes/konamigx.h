@@ -112,8 +112,8 @@ public:
 	void _gxcommoninitnosprites(running_machine &machine);
 	void _gxcommoninit(running_machine &machine);
 	DECLARE_READ32_MEMBER( k_6bpp_rom_long_r );
-	void konamigx_mixer     (running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect,tilemap_t *sub1, int sub1flags,tilemap_t *sub2, int sub2flags,int mixerflags, bitmap_ind16 *extra_bitmap, int rushingheroes_hack);
-	void konamigx_mixer_draw(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect,
+	void konamigx_mixer     (screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect,tilemap_t *sub1, int sub1flags,tilemap_t *sub2, int sub2flags,int mixerflags, bitmap_ind16 *extra_bitmap, int rushingheroes_hack);
+	void konamigx_mixer_draw(screen_device &Screen, bitmap_rgb32 &bitmap, const rectangle &cliprect,
 						tilemap_t *sub1, int sub1flags,
 						tilemap_t *sub2, int sub2flags,
 						int mixerflags, bitmap_ind16 *extra_bitmap, int rushingheroes_hack,
@@ -123,16 +123,16 @@ public:
 						);
 
 
-	void gx_draw_basic_tilemaps(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int mixerflags, int code);
-	void gx_draw_basic_extended_tilemaps_1(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int mixerflags, int code, tilemap_t *sub1, int sub1flags, int rushingheroes_hack, int offs);
-	void gx_draw_basic_extended_tilemaps_2(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int mixerflags, int code, tilemap_t *sub2, int sub2flags, bitmap_ind16 *extra_bitmap, int offs);
+	void gx_draw_basic_tilemaps(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int mixerflags, int code);
+	void gx_draw_basic_extended_tilemaps_1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int mixerflags, int code, tilemap_t *sub1, int sub1flags, int rushingheroes_hack, int offs);
+	void gx_draw_basic_extended_tilemaps_2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int mixerflags, int code, tilemap_t *sub2, int sub2flags, bitmap_ind16 *extra_bitmap, int offs);
 
 	void konamigx_esc_alert(UINT32 *srcbase, int srcoffs, int count, int mode);
 	void konamigx_precache_registers(void);
 
 	void dmastart_callback(int data);
 
-	void konamigx_mixer_init(running_machine &machine, int objdma);
+	void konamigx_mixer_init(screen_device &screen, int objdma);
 	void konamigx_objdma(void);
 
 
@@ -190,12 +190,12 @@ extern UINT16 konamigx_wrport2;
 #define GXSUB_5BPP      0x05    //  32 colors
 #define GXSUB_8BPP      0x08    // 256 colors
 
-void konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect,
+void konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect,
 					tilemap_t *sub1, int sub1flags,
 					tilemap_t *sub2, int sub2flags,
 					int mixerflags, bitmap_ind16* extra_bitmap, int rushingheroes_hack);
 
-void konamigx_mixer_init(running_machine &machine, int objdma);
+void konamigx_mixer_init(screen_device &screen, int objdma);
 void konamigx_mixer_primode(int mode);
 
 

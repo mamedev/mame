@@ -62,7 +62,7 @@ public:
 	DECLARE_WRITE8_MEMBER(apple1_pia0_dsp_write_signal);
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
-	void terminal_draw(bitmap_ind16 &dest, const rectangle &cliprect, terminal_t *terminal);
+	void terminal_draw(screen_device &screen, bitmap_ind16 &dest, const rectangle &cliprect, terminal_t *terminal);
 	void verify_coords(terminal_t *terminal, int x, int y);
 	void terminal_putchar(terminal_t *terminal, int x, int y, int ch);
 	int terminal_getchar(terminal_t *terminal, int x, int y);

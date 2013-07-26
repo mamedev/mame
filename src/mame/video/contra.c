@@ -281,7 +281,7 @@ WRITE8_MEMBER(contra_state::contra_K007121_ctrl_1_w)
 
 ***************************************************************************/
 
-void contra_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int bank )
+void contra_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, int bank )
 {
 	k007121_device *k007121 = bank ? m_k007121_2 : m_k007121_1;
 	address_space &space = machine().driver_data()->generic_space();
@@ -293,7 +293,7 @@ void contra_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect,
 	else
 		source = m_buffered_spriteram_2;
 
-	k007121->sprites_draw(bitmap, cliprect, machine().gfx[bank], machine().colortable, source, base_color, 40, 0, (UINT32)-1);
+	k007121->sprites_draw(bitmap, cliprect, machine().gfx[bank], machine().colortable, source, base_color, 40, 0, priority_bitmap, (UINT32)-1);
 }
 
 UINT32 contra_state::screen_update_contra(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -318,10 +318,10 @@ UINT32 contra_state::screen_update_contra(screen_device &screen, bitmap_ind16 &b
 	m_bg_tilemap->set_scrollx(0, ctrl_2_0 - 40);
 	m_bg_tilemap->set_scrolly(0, ctrl_2_2);
 
-	m_bg_tilemap->draw(bitmap, bg_finalclip, 0 ,0);
-	m_fg_tilemap->draw(bitmap, fg_finalclip, 0 ,0);
-	draw_sprites(bitmap,cliprect, 0);
-	draw_sprites(bitmap,cliprect, 1);
-	m_tx_tilemap->draw(bitmap, tx_finalclip, 0 ,0);
+	m_bg_tilemap->draw(screen, bitmap, bg_finalclip, 0 ,0);
+	m_fg_tilemap->draw(screen, bitmap, fg_finalclip, 0 ,0);
+	draw_sprites(bitmap,cliprect, screen.priority(), 0);
+	draw_sprites(bitmap,cliprect, screen.priority(), 1);
+	m_tx_tilemap->draw(screen, bitmap, tx_finalclip, 0 ,0);
 	return 0;
 }

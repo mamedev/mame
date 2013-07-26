@@ -93,12 +93,12 @@ UINT32 kongambl_state::screen_update_kongambl(screen_device &screen, bitmap_ind1
 
 	#else
 	bitmap.fill(0, cliprect);
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 
-	m_k056832->tilemap_draw(bitmap, cliprect, 3, 0, 0);
-	m_k056832->tilemap_draw(bitmap, cliprect, 2, 0, 0);
-	m_k056832->tilemap_draw(bitmap, cliprect, 1, 0, 0);
-	m_k056832->tilemap_draw(bitmap, cliprect, 0, 0, 0);
+	m_k056832->tilemap_draw(screen, bitmap, cliprect, 3, 0, 0);
+	m_k056832->tilemap_draw(screen, bitmap, cliprect, 2, 0, 0);
+	m_k056832->tilemap_draw(screen, bitmap, cliprect, 1, 0, 0);
+	m_k056832->tilemap_draw(screen, bitmap, cliprect, 0, 0, 0);
 	#endif
 	return 0;
 }

@@ -504,9 +504,9 @@ UINT32 liberate_state::screen_update_prosoccr(screen_device &screen, bitmap_ind1
 	if (m_background_disable)
 		bitmap.fill(32, cliprect);
 	else
-		m_back_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_back_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
-	m_fix_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fix_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	prosoccr_draw_sprites(bitmap, cliprect);
 
 	return 0;
@@ -529,7 +529,7 @@ UINT32 liberate_state::screen_update_prosport(screen_device &screen, bitmap_ind1
 	m_back_tilemap->set_scrolly(0, scrolly);
 	m_back_tilemap->set_scrollx(0, -scrollx);
 
-	m_back_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_back_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 //  popmessage("%d %02x %02x %02x %02x %02x %02x %02x %02x",scrollx,deco16_io_ram[0],deco16_io_ram[1],deco16_io_ram[2],deco16_io_ram[3]
 //  ,deco16_io_ram[4],deco16_io_ram[5],deco16_io_ram[6],deco16_io_ram[7]);
@@ -563,14 +563,14 @@ UINT32 liberate_state::screen_update_boomrang(screen_device &screen, bitmap_ind1
 	if (m_background_disable)
 		bitmap.fill(32, cliprect);
 	else
-		m_back_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
+		m_back_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
 
 	boomrang_draw_sprites(bitmap,cliprect,8);
 	if (!m_background_disable)
-		m_back_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
+		m_back_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
 
 	boomrang_draw_sprites(bitmap, cliprect, 0);
-	m_fix_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fix_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -582,9 +582,9 @@ UINT32 liberate_state::screen_update_liberate(screen_device &screen, bitmap_ind1
 	if (m_background_disable)
 		bitmap.fill(32, cliprect);
 	else
-		m_back_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_back_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	liberate_draw_sprites(bitmap, cliprect);
-	m_fix_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fix_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }

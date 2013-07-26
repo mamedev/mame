@@ -267,9 +267,9 @@ UINT32 rpunch_state::screen_update_rpunch(screen_device &screen, bitmap_ind16 &b
 	/* this seems like the most plausible explanation */
 	effbins = (m_bins > m_gins) ? m_gins : m_bins;
 
-	m_background[0]->draw(bitmap, cliprect, 0,0);
+	m_background[0]->draw(screen, bitmap, cliprect, 0,0);
 	draw_sprites(bitmap, cliprect, 0, effbins);
-	m_background[1]->draw(bitmap, cliprect, 0,0);
+	m_background[1]->draw(screen, bitmap, cliprect, 0,0);
 	draw_sprites(bitmap, cliprect, effbins, m_gins);
 	if (m_bitmapram)
 		draw_bitmap(bitmap, cliprect);

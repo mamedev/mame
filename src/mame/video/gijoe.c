@@ -156,12 +156,12 @@ UINT32 gijoe_state::screen_update_gijoe(screen_device &screen, bitmap_ind16 &bit
 	konami_sortlayers4(layer, m_layer_pri);
 
 	bitmap.fill(get_black_pen(machine()), cliprect);
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 
-	m_k056832->tilemap_draw(bitmap, cliprect, layer[0], 0, 1);
-	m_k056832->tilemap_draw(bitmap, cliprect, layer[1], 0, 2);
-	m_k056832->tilemap_draw(bitmap, cliprect, layer[2], 0, 4);
-	m_k056832->tilemap_draw(bitmap, cliprect, layer[3], 0, 8);
+	m_k056832->tilemap_draw(screen, bitmap, cliprect, layer[0], 0, 1);
+	m_k056832->tilemap_draw(screen, bitmap, cliprect, layer[1], 0, 2);
+	m_k056832->tilemap_draw(screen, bitmap, cliprect, layer[2], 0, 4);
+	m_k056832->tilemap_draw(screen, bitmap, cliprect, layer[3], 0, 8);
 
 	m_k053246->k053247_sprites_draw( bitmap, cliprect);
 	return 0;

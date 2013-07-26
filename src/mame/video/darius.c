@@ -90,20 +90,20 @@ UINT32 darius_state::update_screen(screen_device &screen, bitmap_ind16 &bitmap, 
 	m_pc080sn->tilemap_update();
 
 	// draw bottom layer(always active)
-	m_pc080sn->tilemap_draw_offset(bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0, -xoffs, 0);
+	m_pc080sn->tilemap_draw_offset(screen, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0, -xoffs, 0);
 
 	/* Sprites can be under/over the layer below text layer */
 	draw_sprites(bitmap, cliprect, 0, xoffs, -8); // draw sprites with priority 0 which are under the mid layer
 
 	// draw middle layer
-	m_pc080sn->tilemap_draw_offset(bitmap, cliprect, 1, 0, 0, -xoffs, 0);
+	m_pc080sn->tilemap_draw_offset(screen, bitmap, cliprect, 1, 0, 0, -xoffs, 0);
 
 	draw_sprites(bitmap, cliprect, 1, xoffs, -8); // draw sprites with priority 1 which are over the mid layer
 
 	/* top(text) layer is in fixed position */
 	m_fg_tilemap->set_scrollx(0, 0 + xoffs);
 	m_fg_tilemap->set_scrolly(0, -8);
-	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 

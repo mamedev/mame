@@ -216,7 +216,7 @@ void superqix_state::superqix_draw_sprites(bitmap_ind16 &bitmap,const rectangle 
 
 UINT32 superqix_state::screen_update_pbillian(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	pbillian_draw_sprites(bitmap,cliprect);
 
 	return 0;
@@ -224,9 +224,9 @@ UINT32 superqix_state::screen_update_pbillian(screen_device &screen, bitmap_ind1
 
 UINT32 superqix_state::screen_update_superqix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
 	copybitmap_trans(bitmap,*m_fg_bitmap[m_show_bitmap],flip_screen(),flip_screen(),0,0,cliprect,0);
 	superqix_draw_sprites(bitmap,cliprect);
-	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
 	return 0;
 }

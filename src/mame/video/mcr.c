@@ -247,7 +247,7 @@ WRITE8_MEMBER(mcr_state::mcr_91490_videoram_w)
  *
  *************************************/
 
-void mcr_state::render_sprites_91399(bitmap_ind16 &bitmap, const rectangle &cliprect)
+void mcr_state::render_sprites_91399(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT8 *spriteram = m_spriteram;
 	gfx_element *gfx = machine().gfx[1];
@@ -286,7 +286,7 @@ void mcr_state::render_sprites_91399(bitmap_ind16 &bitmap, const rectangle &clip
 			{
 				const UINT8 *src = gfx->get_data(code) + gfx->rowbytes() * (y ^ vflip);
 				UINT16 *dst = &bitmap.pix16(sy);
-				UINT8 *pri = &machine().priority_bitmap.pix8(sy);
+				UINT8 *pri = &screen.priority().pix8(sy);
 
 				/* loop over columns */
 				for (x = 0; x < 32; x++)
@@ -319,7 +319,7 @@ void mcr_state::render_sprites_91399(bitmap_ind16 &bitmap, const rectangle &clip
  *
  *************************************/
 
-void mcr_state::render_sprites_91464(bitmap_ind16 &bitmap, const rectangle &cliprect, int primask, int sprmask, int colormask)
+void mcr_state::render_sprites_91464(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int primask, int sprmask, int colormask)
 {
 	UINT8 *spriteram = m_spriteram;
 	gfx_element *gfx = machine().gfx[1];
@@ -357,7 +357,7 @@ void mcr_state::render_sprites_91464(bitmap_ind16 &bitmap, const rectangle &clip
 			{
 				const UINT8 *src = gfx->get_data(code) + gfx->rowbytes() * (y ^ vflip);
 				UINT16 *dst = &bitmap.pix16(sy);
-				UINT8 *pri = &machine().priority_bitmap.pix8(sy);
+				UINT8 *pri = &screen.priority().pix8(sy);
 
 				/* loop over columns */
 				for (x = 0; x < 32; x++)
@@ -399,28 +399,28 @@ UINT32 mcr_state::screen_update_mcr(screen_device &screen, bitmap_ind16 &bitmap,
 	bg_tilemap->set_flip(mcr_cocktail_flip ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 
 	/* draw the background */
-	machine().priority_bitmap.fill(0, cliprect);
-	bg_tilemap->draw(bitmap, cliprect, 0, 0x00);
-	bg_tilemap->draw(bitmap, cliprect, 1, 0x10);
-	bg_tilemap->draw(bitmap, cliprect, 2, 0x20);
-	bg_tilemap->draw(bitmap, cliprect, 3, 0x30);
+	screen.priority().fill(0, cliprect);
+	bg_tilemap->draw(screen, bitmap, cliprect, 0, 0x00);
+	bg_tilemap->draw(screen, bitmap, cliprect, 1, 0x10);
+	bg_tilemap->draw(screen, bitmap, cliprect, 2, 0x20);
+	bg_tilemap->draw(screen, bitmap, cliprect, 3, 0x30);
 
 	/* update the sprites and render them */
 	switch (mcr_sprite_board)
 	{
 		case 91399:
-			render_sprites_91399(bitmap, cliprect);
+			render_sprites_91399(screen, bitmap, cliprect);
 			break;
 
 		case 91464:
 			if (mcr_cpu_board == 91442)
-				render_sprites_91464(bitmap, cliprect, 0x00, 0x30, 0x00);
+				render_sprites_91464(screen, bitmap, cliprect, 0x00, 0x30, 0x00);
 			else if (mcr_cpu_board == 91475)
-				render_sprites_91464(bitmap, cliprect, 0x00, 0x30, 0x40);
+				render_sprites_91464(screen, bitmap, cliprect, 0x00, 0x30, 0x40);
 			else if (mcr_cpu_board == 91490)
-				render_sprites_91464(bitmap, cliprect, 0x00, 0x30, 0x00);
+				render_sprites_91464(screen, bitmap, cliprect, 0x00, 0x30, 0x00);
 			else if (mcr_cpu_board == 91721)
-				render_sprites_91464(bitmap, cliprect, 0x00, 0x30, 0x00);
+				render_sprites_91464(screen, bitmap, cliprect, 0x00, 0x30, 0x00);
 			break;
 	}
 	return 0;

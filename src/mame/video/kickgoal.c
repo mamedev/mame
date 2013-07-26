@@ -168,12 +168,12 @@ UINT32 kickgoal_state::screen_update_kickgoal(screen_device &screen, bitmap_ind1
 	m_bg2tm->set_scrolly(0, m_scrram[5]);
 
 	/* draw */
-	m_bg2tm->draw(bitmap, cliprect, 0, 0);
-	m_bgtm->draw(bitmap, cliprect, 0, 0);
+	m_bg2tm->draw(screen, bitmap, cliprect, 0, 0);
+	m_bgtm->draw(screen, bitmap, cliprect, 0, 0);
 
 	kickgoal_draw_sprites(bitmap, cliprect);
 
-	m_fgtm->draw(bitmap, cliprect, 0, 0);
+	m_fgtm->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }

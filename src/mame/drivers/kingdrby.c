@@ -244,10 +244,10 @@ UINT32 kingdrby_state::screen_update_kingdrby(screen_device &screen, bitmap_ind1
 	clip.set(visarea.min_x, 256, 192, visarea.max_y);
 
 	/*TILEMAP_DRAW_CATEGORY + TILEMAP_DRAW_OPAQUE doesn't suit well?*/
-	m_sc0_tilemap->draw(bitmap, cliprect, 0,0);
+	m_sc0_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	draw_sprites(bitmap,cliprect);
-	m_sc1_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1),0);
-	m_sc0w_tilemap->draw(bitmap, clip, 0,0);
+	m_sc1_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1),0);
+	m_sc0w_tilemap->draw(screen, bitmap, clip, 0,0);
 
 	return 0;
 }

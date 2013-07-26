@@ -279,14 +279,14 @@ UINT32 atarisy2_state::screen_update_atarisy2(screen_device &screen, bitmap_ind1
 	m_mob->draw_async(cliprect);
 
 	// reset priorities
-	bitmap_ind8 &priority_bitmap = machine().priority_bitmap;
+	bitmap_ind8 &priority_bitmap = screen.priority();
 	priority_bitmap.fill(0, cliprect);
 
 	/* draw the playfield */
-	m_playfield_tilemap->draw(bitmap, cliprect, 0, 0);
-	m_playfield_tilemap->draw(bitmap, cliprect, 1, 1);
-	m_playfield_tilemap->draw(bitmap, cliprect, 2, 2);
-	m_playfield_tilemap->draw(bitmap, cliprect, 3, 3);
+	m_playfield_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_playfield_tilemap->draw(screen, bitmap, cliprect, 1, 1);
+	m_playfield_tilemap->draw(screen, bitmap, cliprect, 2, 2);
+	m_playfield_tilemap->draw(screen, bitmap, cliprect, 3, 3);
 
 	/* draw and merge the MO */
 	bitmap_ind16 &mobitmap = m_mob->bitmap();
@@ -316,6 +316,6 @@ UINT32 atarisy2_state::screen_update_atarisy2(screen_device &screen, bitmap_ind1
 		}
 
 	/* add the alpha on top */
-	m_alpha_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_alpha_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }

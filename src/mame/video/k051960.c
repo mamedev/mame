@@ -387,7 +387,7 @@ WRITE16_MEMBER( k051960_device::k051937_word_w )
  * Note that Aliens also uses the shadow bit to select the second sprite bank.
  */
 
-void k051960_device::k051960_sprites_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, int min_priority, int max_priority )
+void k051960_device::k051960_sprites_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, int min_priority, int max_priority )
 {
 #define NUM_SPRITES 128
 	int offs, pri_code;
@@ -505,7 +505,7 @@ void k051960_device::k051960_sprites_draw( bitmap_ind16 &bitmap, const rectangle
 								color,
 								flipx,flipy,
 								sx & 0x1ff,sy,
-								machine().priority_bitmap,pri,
+								priority_bitmap,pri,
 								drawmode_table,machine().shadow_table);
 					else
 						drawgfx_transtable(bitmap,cliprect,m_gfx,
@@ -549,7 +549,7 @@ void k051960_device::k051960_sprites_draw( bitmap_ind16 &bitmap, const rectangle
 								flipx,flipy,
 								sx & 0x1ff,sy,
 								(zw << 16) / 16,(zh << 16) / 16,
-								machine().priority_bitmap,pri,
+								priority_bitmap,pri,
 								drawmode_table,machine().shadow_table);
 					else
 						drawgfxzoom_transtable(bitmap,cliprect,m_gfx,

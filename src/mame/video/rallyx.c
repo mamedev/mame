@@ -461,7 +461,7 @@ void rallyx_state::draw_stars( bitmap_ind16 &bitmap, const rectangle &cliprect )
 }
 
 
-void rallyx_state::rallyx_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int displacement )
+void rallyx_state::rallyx_draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int displacement )
 {
 	UINT8 *spriteram = m_spriteram;
 	UINT8 *spriteram_2 = m_spriteram2;
@@ -482,12 +482,12 @@ void rallyx_state::rallyx_draw_sprites( bitmap_ind16 &bitmap, const rectangle &c
 				color,
 				flipx,flipy,
 				sx,sy,
-				machine().priority_bitmap,0x02,
+				screen.priority(),0x02,
 				colortable_get_transpen_mask(machine().colortable, machine().gfx[1], color, 0));
 	}
 }
 
-void rallyx_state::locomotn_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int displacement )
+void rallyx_state::locomotn_draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int displacement )
 {
 	UINT8 *spriteram = m_spriteram;
 	UINT8 *spriteram_2 = m_spriteram2;
@@ -505,7 +505,7 @@ void rallyx_state::locomotn_draw_sprites( bitmap_ind16 &bitmap, const rectangle 
 				color,
 				flip,flip,
 				sx,sy,
-				machine().priority_bitmap,0x02,
+				screen.priority(),0x02,
 				colortable_get_transpen_mask(machine().colortable, machine().gfx[1], color, 0));
 	}
 }
@@ -623,15 +623,15 @@ UINT32 rallyx_state::screen_update_rallyx(screen_device &screen, bitmap_ind16 &b
 		fg_clip.min_x = 28 * 8;
 	}
 
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 
-	m_bg_tilemap->draw(bitmap, bg_clip, 0, 0);
-	m_fg_tilemap->draw(bitmap, fg_clip, 0, 0);
-	m_bg_tilemap->draw(bitmap, bg_clip, 1, 1);
-	m_fg_tilemap->draw(bitmap, fg_clip, 1, 1);
+	m_bg_tilemap->draw(screen, bitmap, bg_clip, 0, 0);
+	m_fg_tilemap->draw(screen, bitmap, fg_clip, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, bg_clip, 1, 1);
+	m_fg_tilemap->draw(screen, bitmap, fg_clip, 1, 1);
 
 	rallyx_draw_bullets(bitmap, cliprect, TRUE);
-	rallyx_draw_sprites(bitmap, cliprect, 1);
+	rallyx_draw_sprites(screen, bitmap, cliprect, 1);
 	rallyx_draw_bullets(bitmap, cliprect, FALSE);
 
 	return 0;
@@ -656,16 +656,16 @@ UINT32 rallyx_state::screen_update_jungler(screen_device &screen, bitmap_ind16 &
 		fg_clip.min_x = 28 * 8;
 	}
 
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 
 	/* tile priority doesn't seem to be supported in Jungler */
-	m_bg_tilemap->draw(bitmap, bg_clip, 0, 0);
-	m_fg_tilemap->draw(bitmap, fg_clip, 0, 0);
-	m_bg_tilemap->draw(bitmap, bg_clip, 1, 0);
-	m_fg_tilemap->draw(bitmap, fg_clip, 1, 0);
+	m_bg_tilemap->draw(screen, bitmap, bg_clip, 0, 0);
+	m_fg_tilemap->draw(screen, bitmap, fg_clip, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, bg_clip, 1, 0);
+	m_fg_tilemap->draw(screen, bitmap, fg_clip, 1, 0);
 
 	jungler_draw_bullets(bitmap, cliprect, TRUE);
-	rallyx_draw_sprites(bitmap, cliprect, 0);
+	rallyx_draw_sprites(screen, bitmap, cliprect, 0);
 	jungler_draw_bullets(bitmap, cliprect, FALSE);
 
 	if (m_stars_enable)
@@ -702,15 +702,15 @@ UINT32 rallyx_state::screen_update_locomotn(screen_device &screen, bitmap_ind16 
 		fg_clip.min_x = 28 * 8;
 	}
 
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 
-	m_bg_tilemap->draw(bitmap, bg_clip, 0, 0);
-	m_fg_tilemap->draw(bitmap, fg_clip, 0, 0);
-	m_bg_tilemap->draw(bitmap, bg_clip, 1, 1);
-	m_fg_tilemap->draw(bitmap, fg_clip, 1, 1);
+	m_bg_tilemap->draw(screen, bitmap, bg_clip, 0, 0);
+	m_fg_tilemap->draw(screen, bitmap, fg_clip, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, bg_clip, 1, 1);
+	m_fg_tilemap->draw(screen, bitmap, fg_clip, 1, 1);
 
 	locomotn_draw_bullets(bitmap, cliprect, TRUE);
-	locomotn_draw_sprites(bitmap, cliprect, 0);
+	locomotn_draw_sprites(screen, bitmap, cliprect, 0);
 	locomotn_draw_bullets(bitmap, cliprect, FALSE);
 
 	if (m_stars_enable)

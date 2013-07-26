@@ -136,8 +136,8 @@ void drtomy_state::video_start()
 
 UINT32 drtomy_state::screen_update_drtomy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_tilemap_bg->draw(bitmap, cliprect, 0, 0);
-	m_tilemap_fg->draw(bitmap, cliprect, 0, 0);
+	m_tilemap_bg->draw(screen, bitmap, cliprect, 0, 0);
+	m_tilemap_fg->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);
 	return 0;
 }

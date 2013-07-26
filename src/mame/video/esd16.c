@@ -166,7 +166,7 @@ UINT32 esd16_state::screen_update_hedpanic(screen_device &screen, bitmap_ind16 &
 {
 	int layers_ctrl = -1;
 
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 
 #ifdef MAME_DEBUG
 if (machine().input().code_pressed(KEYCODE_Z))
@@ -185,13 +185,13 @@ if (machine().input().code_pressed(KEYCODE_Z))
 		{
 			m_tilemap_0_16x16->set_scrollx(0, m_scroll_0[0]);
 			m_tilemap_0_16x16->set_scrolly(0, m_scroll_0[1]);
-			m_tilemap_0_16x16->draw(bitmap, cliprect, 0, 0);
+			m_tilemap_0_16x16->draw(screen, bitmap, cliprect, 0, 0);
 		}
 		else
 		{
 			m_tilemap_0->set_scrollx(0, m_scroll_0[0]);
 			m_tilemap_0->set_scrolly(0, m_scroll_0[1]);
-			m_tilemap_0->draw(bitmap, cliprect, 0, 0);
+			m_tilemap_0->draw(screen, bitmap, cliprect, 0, 0);
 		}
 	}
 	else
@@ -206,13 +206,13 @@ if (machine().input().code_pressed(KEYCODE_Z))
 		{
 			m_tilemap_1_16x16->set_scrollx(0, m_scroll_1[0]);
 			m_tilemap_1_16x16->set_scrolly(0, m_scroll_1[1]);
-			m_tilemap_1_16x16->draw(bitmap, cliprect, 0, 1);
+			m_tilemap_1_16x16->draw(screen, bitmap, cliprect, 0, 1);
 		}
 		else
 		{
 			m_tilemap_1->set_scrollx(0, m_scroll_1[0]);
 			m_tilemap_1->set_scrolly(0, m_scroll_1[1]);
-			m_tilemap_1->draw(bitmap, cliprect, 0, 1);
+			m_tilemap_1->draw(screen, bitmap, cliprect, 0, 1);
 		}
 
 	}

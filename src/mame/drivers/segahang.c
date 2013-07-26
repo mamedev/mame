@@ -125,7 +125,7 @@ WRITE8_MEMBER( segahang_state::video_lamps_w )
 	m_shadow = ~data & 0x40;
 
 	// bit 4: enable display
-	m_segaic16vid->segaic16_set_display_enable(machine(), data & 0x10);
+	m_segaic16vid->segaic16_set_display_enable(*m_screen, data & 0x10);
 
 	// bits 2 & 3: control the lamps
 	set_led_status(machine(), 1, data & 0x08);
@@ -409,7 +409,7 @@ INTERRUPT_GEN_MEMBER( segahang_state::i8751_main_cpu_vblank )
 void segahang_state::machine_reset()
 {
 	// reset misc components
-	m_segaic16vid->segaic16_tilemap_reset(machine(), 0);
+	m_segaic16vid->segaic16_tilemap_reset(*m_screen);
 
 	// queue up a timer to either boost interleave or disable the MCU
 	synchronize(TID_INIT_I8751);

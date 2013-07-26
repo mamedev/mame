@@ -194,12 +194,12 @@ WRITE8_MEMBER(mcr3_state::spyhunt_scroll_value_w)
  *
  *************************************/
 
-void mcr3_state::mcr3_update_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int color_mask, int code_xor, int dx, int dy)
+void mcr3_state::mcr3_update_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int color_mask, int code_xor, int dx, int dy)
 {
 	UINT8 *spriteram = m_spriteram;
 	int offs;
 
-	machine().priority_bitmap.fill(1, cliprect);
+	m_screen->priority().fill(1, cliprect);
 
 	/* loop over sprite RAM */
 	for (offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
@@ -241,21 +241,21 @@ void mcr3_state::mcr3_update_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 		{
 			/* first draw the sprite, visible */
 			pdrawgfx_transmask(bitmap, cliprect, machine().gfx[1], code, color, flipx, flipy, sx, sy,
-					machine().priority_bitmap, 0x00, 0x0101);
+					screen.priority(), 0x00, 0x0101);
 
 			/* then draw the mask, behind the background but obscuring following sprites */
 			pdrawgfx_transmask(bitmap, cliprect, machine().gfx[1], code, color, flipx, flipy, sx, sy,
-					machine().priority_bitmap, 0x02, 0xfeff);
+					screen.priority(), 0x02, 0xfeff);
 		}
 		else
 		{
 			/* first draw the sprite, visible */
 			pdrawgfx_transmask(bitmap, cliprect, machine().gfx[1], code, color, !flipx, !flipy, 480 - sx, 452 - sy,
-					machine().priority_bitmap, 0x00, 0x0101);
+					screen.priority(), 0x00, 0x0101);
 
 			/* then draw the mask, behind the background but obscuring following sprites */
 			pdrawgfx_transmask(bitmap, cliprect, machine().gfx[1], code, color, !flipx, !flipy, 480 - sx, 452 - sy,
-					machine().priority_bitmap, 0x02, 0xfeff);
+					screen.priority(), 0x02, 0xfeff);
 		}
 	}
 }
@@ -274,10 +274,10 @@ UINT32 mcr3_state::screen_update_mcr3(screen_device &screen, bitmap_ind16 &bitma
 	m_bg_tilemap->set_flip(mcr_cocktail_flip ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 
 	/* draw the background */
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* draw the sprites */
-	mcr3_update_sprites(bitmap, cliprect, 0x03, 0, 0, 0);
+	mcr3_update_sprites(screen, bitmap, cliprect, 0x03, 0, 0, 0);
 	return 0;
 }
 
@@ -288,12 +288,12 @@ UINT32 mcr3_state::screen_update_spyhunt(screen_device &screen, bitmap_ind16 &bi
 	/* since last time and update it accordingly. */
 	m_bg_tilemap->set_scrollx(0, m_spyhunt_scrollx * 2 + m_spyhunt_scroll_offset);
 	m_bg_tilemap->set_scrolly(0, m_spyhunt_scrolly * 2);
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* draw the sprites */
-	mcr3_update_sprites(bitmap, cliprect, m_spyhunt_sprite_color_mask, 0, -12, 0);
+	mcr3_update_sprites(screen, bitmap, cliprect, m_spyhunt_sprite_color_mask, 0, -12, 0);
 
 	/* render any characters on top */
-	m_alpha_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_alpha_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }

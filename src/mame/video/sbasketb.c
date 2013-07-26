@@ -173,7 +173,7 @@ UINT32 sbasketb_state::screen_update_sbasketb(screen_device &screen, bitmap_ind1
 	for (col = 6; col < 32; col++)
 		m_bg_tilemap->set_scrolly(col, *m_scroll);
 
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);
 	return 0;
 }

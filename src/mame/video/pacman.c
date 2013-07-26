@@ -211,7 +211,7 @@ UINT32 pacman_state::screen_update_pacman(screen_device &screen, bitmap_ind16 &b
 	if (m_bgpriority != 0)
 		bitmap.fill(0, cliprect);
 	else
-		m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
 
 	if( m_spriteram != NULL )
 	{
@@ -302,7 +302,7 @@ UINT32 pacman_state::screen_update_pacman(screen_device &screen, bitmap_ind16 &b
 	}
 
 	if (m_bgpriority != 0)
-		m_bg_tilemap->draw(bitmap, cliprect, 0,0);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
 }
 
@@ -403,7 +403,7 @@ UINT32 pacman_state::screen_update_s2650games(screen_device &screen, bitmap_ind1
 	UINT8 *spriteram_2 = m_spriteram2;
 	int offs;
 
-	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
 
 	for (offs = m_spriteram.bytes() - 2;offs > 2*2;offs -= 2)
 	{

@@ -63,6 +63,6 @@ UINT32 shisen_state::screen_update_sichuan2(screen_device &screen, bitmap_ind16 
 	flip_screen_set(~ioport("DSW2")->read() & 1);
 
 
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }

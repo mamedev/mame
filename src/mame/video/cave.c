@@ -1402,14 +1402,13 @@ static void sprite_draw_donpachi_zbuf( running_machine &machine, int priority )
 
 ***************************************************************************/
 
-INLINE void cave_tilemap_draw(
-	running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect,
+inline void cave_state::tilemap_draw(
+	screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect,
 	UINT32 flags, UINT32 priority, UINT32 priority2, int GFX )
 {
-	cave_state *state = machine.driver_data<cave_state>();
-	tilemap_t *TILEMAP = state->m_tilemap[GFX];
-	UINT16 *VRAM = state->m_vram[GFX];
-	UINT16 *VCTRL = state->m_vctrl[GFX];
+	tilemap_t *TILEMAP = m_tilemap[GFX];
+	UINT16 *VRAM = m_vram[GFX];
+	UINT16 *VCTRL = m_vctrl[GFX];
 	int sx, sy, flipx, flipy, offs_x, offs_y, offs_row;
 
 	/* Bail out if ... */
@@ -1423,21 +1422,21 @@ INLINE void cave_tilemap_draw(
 	flipy = ~VCTRL[1] & 0x8000;
 	TILEMAP->set_flip((flipx ? TILEMAP_FLIPX : 0) | (flipy ? TILEMAP_FLIPY : 0) );
 
-	offs_x  =   state->m_layers_offs_x;
-	offs_y  =   state->m_layers_offs_y;
+	offs_x  =   m_layers_offs_x;
+	offs_y  =   m_layers_offs_y;
 
-	offs_row =  flipy ? state->m_row_effect_offs_f : state->m_row_effect_offs_n;
+	offs_row =  flipy ? m_row_effect_offs_f : m_row_effect_offs_n;
 
 	/* An additional 8 pixel offset for layers with 8x8 tiles. Plus
 	   Layer 0 is displaced by 1 pixel wrt Layer 1, so is Layer 2 wrt
 	   Layer 1 */
-	if      (TILEMAP == state->m_tilemap[0])    offs_x -= (state->m_tiledim[0] ? 1 : (1 + 8));
-	else if (TILEMAP == state->m_tilemap[1])    offs_x -= (state->m_tiledim[1] ? 2 : (2 + 8));
-	else if (TILEMAP == state->m_tilemap[2])    offs_x -= (state->m_tiledim[2] ? 3 : (3 + 8));
-	else if (TILEMAP == state->m_tilemap[3])    offs_x -= (state->m_tiledim[3] ? 4 : (4 + 8));
+	if      (TILEMAP == m_tilemap[0])    offs_x -= (m_tiledim[0] ? 1 : (1 + 8));
+	else if (TILEMAP == m_tilemap[1])    offs_x -= (m_tiledim[1] ? 2 : (2 + 8));
+	else if (TILEMAP == m_tilemap[2])    offs_x -= (m_tiledim[2] ? 3 : (3 + 8));
+	else if (TILEMAP == m_tilemap[3])    offs_x -= (m_tiledim[3] ? 4 : (4 + 8));
 
-	sx = VCTRL[0] - state->m_videoregs[0] + (flipx ? (offs_x + 2) : -offs_x);
-	sy = VCTRL[1] - state->m_videoregs[1] + (flipy ? (offs_y + 2) : -offs_y);
+	sx = VCTRL[0] - m_videoregs[0] + (flipx ? (offs_x + 2) : -offs_x);
+	sy = VCTRL[1] - m_videoregs[1] + (flipy ? (offs_y + 2) : -offs_y);
 
 	if (VCTRL[1] & 0x4000)  // row-select
 	{
@@ -1498,7 +1497,7 @@ INLINE void cave_tilemap_draw(
 				clip.max_y = endline - 1;
 			}
 
-			TILEMAP->draw(bitmap, clip, flags, priority);
+			TILEMAP->draw(screen, bitmap, clip, flags, priority);
 
 			startline = endline;
 		}
@@ -1511,7 +1510,7 @@ INLINE void cave_tilemap_draw(
 			TILEMAP->set_scrollx((line + sy) & 511,
 							sx + VRAM[(0x1000+(((sy + offs_row + line) * 4) & 0x7ff)) / 2] );
 		TILEMAP->set_scrolly(0, sy);
-		TILEMAP->draw(bitmap, cliprect, flags, priority);
+		TILEMAP->draw(screen, bitmap, cliprect, flags, priority);
 	}
 	else
 	{
@@ -1520,7 +1519,7 @@ INLINE void cave_tilemap_draw(
 		TILEMAP->set_scroll_cols(1);
 		TILEMAP->set_scrollx(0, sx);
 		TILEMAP->set_scrolly(0, sy);
-		TILEMAP->draw(bitmap, cliprect, flags, priority);
+		TILEMAP->draw(screen, bitmap, cliprect, flags, priority);
 	}
 }
 
@@ -1627,10 +1626,10 @@ UINT32 cave_state::screen_update_cave(screen_device &screen, bitmap_ind16 &bitma
 
 		for (pri2 = 0; pri2 <= 3; pri2++)   // priority of the whole layer
 		{
-			if (layers_ctrl & (1 << (pri +  0)))    cave_tilemap_draw(machine(), bitmap, cliprect, pri, 0, pri2, 0);
-			if (layers_ctrl & (1 << (pri +  4)))    cave_tilemap_draw(machine(), bitmap, cliprect, pri, 0, pri2, 1);
-			if (layers_ctrl & (1 << (pri +  8)))    cave_tilemap_draw(machine(), bitmap, cliprect, pri, 0, pri2, 2);
-			if (layers_ctrl & (1 << (pri + 12)))    cave_tilemap_draw(machine(), bitmap, cliprect, pri, 0, pri2, 3);
+			if (layers_ctrl & (1 << (pri +  0)))    tilemap_draw(screen, bitmap, cliprect, pri, 0, pri2, 0);
+			if (layers_ctrl & (1 << (pri +  4)))    tilemap_draw(screen, bitmap, cliprect, pri, 0, pri2, 1);
+			if (layers_ctrl & (1 << (pri +  8)))    tilemap_draw(screen, bitmap, cliprect, pri, 0, pri2, 2);
+			if (layers_ctrl & (1 << (pri + 12)))    tilemap_draw(screen, bitmap, cliprect, pri, 0, pri2, 3);
 		}
 	}
 	return 0;

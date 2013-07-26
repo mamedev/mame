@@ -33,12 +33,12 @@ public:
 	void set_scroll(int tilemap_num, int scrollx, int scrolly);
 	void set_trans_pen(int tilemap_num, int pen);
 	void tilemap_update();
-	void tilemap_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority);
-	void tilemap_draw_offset(bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority, int xoffs, int yoffs);
-	void topspeed_custom_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority, UINT16 *color_ctrl_ram);
+	void tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority);
+	void tilemap_draw_offset(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority, int xoffs, int yoffs);
+	void topspeed_custom_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority, UINT16 *color_ctrl_ram);
 
 	/* For Topspeed */
-	void tilemap_draw_special(bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority, UINT16 *ram);
+	void tilemap_draw_special(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority, UINT16 *ram);
 
 	void restore_scroll();
 

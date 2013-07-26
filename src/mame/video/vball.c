@@ -162,7 +162,7 @@ UINT32 vball_state::screen_update_vb(screen_device &screen, bitmap_ind16 &bitmap
 		m_bg_tilemap->set_scrollx(i,m_vb_scrollx[i-2]);
 		//logerror("scrollx[%d] = %d\n",i,m_vb_scrollx[i]);
 	}
-	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	draw_sprites(bitmap,cliprect);
 	return 0;
 }

@@ -1156,7 +1156,7 @@ WRITE16_MEMBER( segas16b_state::standard_io_w )
 			m_segaic16vid->segaic16_tilemap_set_flip(machine(), 0, data & 0x40);
 			m_sprites->set_flip(data & 0x40);
 			if (!m_disable_screen_blanking)
-				m_segaic16vid->segaic16_set_display_enable(machine(), data & 0x20);
+				m_segaic16vid->segaic16_set_display_enable(*m_screen, data & 0x20);
 			set_led_status(machine(), 1, data & 0x08);
 			set_led_status(machine(), 0, data & 0x04);
 			coin_counter_w(machine(), 1, data & 0x02);
@@ -1318,7 +1318,7 @@ void segas16b_state::machine_reset()
 	synchronize(TID_INIT_I8751);
 
 	// reset tilemap state
-	m_segaic16vid->segaic16_tilemap_reset(machine(), 0);
+	m_segaic16vid->segaic16_tilemap_reset(*m_screen);
 
 	// configure sprite banks
 	static const UINT8 default_banklist[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
@@ -7160,7 +7160,7 @@ INPUT_PORTS_END
 
 void isgsm_state::machine_reset()
 {
-	m_segaic16vid->segaic16_tilemap_reset(machine(), 0);
+	m_segaic16vid->segaic16_tilemap_reset(*m_screen);
 
 	// configure sprite banks
 	for (int i = 0; i < 16; i++)

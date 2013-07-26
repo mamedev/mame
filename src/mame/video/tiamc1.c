@@ -194,9 +194,9 @@ UINT32 tiamc1_state::screen_update_tiamc1(screen_device &screen, bitmap_ind16 &b
 #endif
 
 	if (m_layers_ctrl & 0x80)
-		m_bg_tilemap2->draw(bitmap, cliprect, 0, 0);
+		m_bg_tilemap2->draw(screen, bitmap, cliprect, 0, 0);
 	else
-		m_bg_tilemap1->draw(bitmap, cliprect, 0, 0);
+		m_bg_tilemap1->draw(screen, bitmap, cliprect, 0, 0);
 
 
 	draw_sprites(bitmap, cliprect);

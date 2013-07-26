@@ -161,8 +161,8 @@ UINT32 flkatck_state::screen_update_flkatck(screen_device &screen, bitmap_ind16 
 	clip[1] &= cliprect;
 
 	/* draw the graphics */
-	m_k007121_tilemap[0]->draw(bitmap, clip[0], 0, 0);
-	m_k007121->sprites_draw(bitmap, cliprect, machine().gfx[0], NULL, &m_k007121_ram[0x1000], 0, 40, 0, (UINT32)-1);
-	m_k007121_tilemap[1]->draw(bitmap, clip[1], 0, 0);
+	m_k007121_tilemap[0]->draw(screen, bitmap, clip[0], 0, 0);
+	m_k007121->sprites_draw(bitmap, cliprect, machine().gfx[0], NULL, &m_k007121_ram[0x1000], 0, 40, 0, screen.priority(), (UINT32)-1);
+	m_k007121_tilemap[1]->draw(screen, bitmap, clip[1], 0, 0);
 	return 0;
 }

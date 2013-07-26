@@ -292,7 +292,7 @@ UINT32 ladybug_state::screen_update_ladybug(screen_device &screen, bitmap_ind16 
 			m_bg_tilemap->set_scrollx(offs, m_videoram[32 * sx + sy]);
 	}
 
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);
 	return 0;
 }
@@ -336,7 +336,7 @@ UINT32 ladybug_state::screen_update_sraider(screen_device &screen, bitmap_ind16 
 	colortable_palette_set_color(machine().colortable, 0x40, MAKE_RGB(m_grid_color & 0x40 ? 0xff : 0,
 																				m_grid_color & 0x20 ? 0xff : 0,
 																				m_grid_color & 0x10 ? 0xff : 0));
-	m_grid_tilemap->draw(bitmap, cliprect, 0, flip_screen());
+	m_grid_tilemap->draw(screen, bitmap, cliprect, 0, flip_screen());
 
 	for (i = 0; i < 0x100; i++)
 	{
@@ -353,7 +353,7 @@ UINT32 ladybug_state::screen_update_sraider(screen_device &screen, bitmap_ind16 
 	}
 
 	// now the chars
-	m_bg_tilemap->draw(bitmap, cliprect, 0, flip_screen());
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, flip_screen());
 
 	// now the sprites
 	draw_sprites(bitmap, cliprect);

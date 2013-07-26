@@ -393,6 +393,6 @@ UINT32 tunhunt_state::screen_update_tunhunt(screen_device &screen, bitmap_ind16 
 		m_workram[SHL1ST],  /* vstretch */
 		m_control&0x10 ); /* hstretch */
 
-	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }

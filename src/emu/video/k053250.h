@@ -26,7 +26,7 @@ public:
 	DECLARE_WRITE16_MEMBER(ram_w);
 	DECLARE_READ16_MEMBER(rom_r);
 
-	void draw( bitmap_rgb32 &bitmap, const rectangle &cliprect, int colorbase, int flags, int priority );
+	void draw( bitmap_rgb32 &bitmap, const rectangle &cliprect, int colorbase, int flags, bitmap_ind8 &priority_bitmap, int priority );
 
 protected:
 	virtual void device_start();

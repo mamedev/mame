@@ -139,7 +139,7 @@ void tc0280grd_device::tc0430grw_tilemap_update( int base_color )
 	tc0280grd_tilemap_update(base_color);
 }
 
-void tc0280grd_device::zoom_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffset, int yoffset, UINT32 priority, int xmultiply )
+void tc0280grd_device::zoom_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffset, int yoffset, UINT32 priority, int xmultiply )
 {
 	UINT32 startx, starty;
 	int incxx, incxy, incyx, incyy;
@@ -167,18 +167,18 @@ void tc0280grd_device::zoom_draw( bitmap_ind16 &bitmap, const rectangle &cliprec
 	startx -= xoffset * incxx + yoffset * incyx;
 	starty -= xoffset * incxy + yoffset * incyy;
 
-	m_tilemap->draw_roz(bitmap, cliprect, startx << 4, starty << 4,
+	m_tilemap->draw_roz(screen, bitmap, cliprect, startx << 4, starty << 4,
 			incxx << 4, incxy << 4, incyx << 4, incyy << 4,
 			1,  /* copy with wraparound */
 			0, priority);
 }
 
-void tc0280grd_device::tc0280grd_zoom_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffset, int yoffset, UINT32 priority )
+void tc0280grd_device::tc0280grd_zoom_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffset, int yoffset, UINT32 priority )
 {
-	zoom_draw(bitmap, cliprect, xoffset, yoffset, priority, 2);
+	zoom_draw(screen, bitmap, cliprect, xoffset, yoffset, priority, 2);
 }
 
-void tc0280grd_device::tc0430grw_zoom_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffset, int yoffset, UINT32 priority )
+void tc0280grd_device::tc0430grw_zoom_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffset, int yoffset, UINT32 priority )
 {
-	zoom_draw(bitmap, cliprect, xoffset, yoffset, priority, 1);
+	zoom_draw(screen, bitmap, cliprect, xoffset, yoffset, priority, 1);
 }

@@ -252,7 +252,7 @@ UINT32 firefox_state::screen_update_firefox(screen_device &screen, bitmap_rgb32 
 		}
 	}
 
-	m_bgtiles->draw(bitmap, cliprect, 0, 0 );
+	m_bgtiles->draw(screen, bitmap, cliprect, 0, 0 );
 
 	return 0;
 }

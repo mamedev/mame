@@ -421,7 +421,7 @@ UINT32 centiped_state::screen_update_centiped(screen_device &screen, bitmap_ind1
 	int offs;
 
 	/* draw the background */
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* apply the sprite clip */
 	if (m_flipscreen)
@@ -460,7 +460,7 @@ UINT32 centiped_state::screen_update_warlords(screen_device &screen, bitmap_ind1
 	}
 
 	/* draw the background */
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* draw the sprites */
 	for (offs = 0; offs < 0x10; offs++)
@@ -498,7 +498,7 @@ UINT32 centiped_state::screen_update_bullsdrt(screen_device &screen, bitmap_ind1
 	int offs;
 
 	/* draw the background */
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* apply the sprite clip */
 	if (m_flipscreen)
@@ -531,7 +531,7 @@ UINT32 centiped_state::screen_update_milliped(screen_device &screen, bitmap_ind1
 	int offs;
 
 	/* draw the background */
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* apply the sprite clip */
 	if (m_flipscreen)

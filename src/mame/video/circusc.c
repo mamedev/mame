@@ -204,8 +204,8 @@ UINT32 circusc_state::screen_update_circusc(screen_device &screen, bitmap_ind16 
 		m_bg_tilemap->set_scrolly(i, *m_scroll);
 
 	bitmap.fill(0, cliprect);
-	m_bg_tilemap->draw(bitmap, cliprect, 1, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 1, 0);
 	draw_sprites(bitmap, cliprect);
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }

@@ -124,9 +124,9 @@ UINT32 cultures_state::screen_update_cultures(screen_device &screen, bitmap_ind1
 	m_bg1_tilemap->set_scrolly(0, (m_bg1_regs_y[2] << 8) + m_bg1_regs_y[0]);
 	m_bg2_tilemap->set_scrolly(0, (m_bg2_regs_y[2] << 8) + m_bg2_regs_y[0]);
 
-	m_bg2_tilemap->draw(bitmap, cliprect, 0, 0);
-	m_bg0_tilemap->draw(bitmap, cliprect, 0, 0);
-	m_bg1_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg2_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_bg0_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_bg1_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }

@@ -159,9 +159,9 @@ public:
 	UINT32 screen_update_bnstars_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_bnstars_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(ms32_interrupt);
-	void draw_roz(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, int chip);
+	void draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, int chip);
 	void update_color(int color, int screen);
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32 *sprram_top, size_t sprram_size, int region);
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32 *sprram_top, size_t sprram_size, int region);
 	void irq_init();
 	void irq_raise(int level);
 	IRQ_CALLBACK_MEMBER(irq_callback);
@@ -238,7 +238,7 @@ WRITE32_MEMBER(bnstars_state::ms32_bg1_ram_w)
 
 /* ROZ Layers */
 
-void bnstars_state::draw_roz(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, int chip)
+void bnstars_state::draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, int chip)
 {
 	/* TODO: registers 0x40/4 / 0x44/4 and 0x50/4 / 0x54/4 are used, meaning unknown */
 
@@ -282,7 +282,7 @@ void bnstars_state::draw_roz(bitmap_ind16 &bitmap, const rectangle &cliprect, in
 		    if (incxx & 0x10000) incxx |= ~0x1ffff;
 		    if (incxy & 0x10000) incxy |= ~0x1ffff;
 
-		    m_ms32_roz_tilemap->draw_roz(bitmap, &my_clip,
+		    m_ms32_roz_tilemap->draw_roz(screen, bitmap, &my_clip,
 		            (start2x+startx+offsx)<<16, (start2y+starty+offsy)<<16,
 		            incxx<<8, incxy<<8, 0, 0,
 		            1, // Wrap
@@ -314,7 +314,7 @@ void bnstars_state::draw_roz(bitmap_ind16 &bitmap, const rectangle &cliprect, in
 		if (incyy & 0x10000) incyy |= ~0x1ffff;
 		if (incyx & 0x10000) incyx |= ~0x1ffff;
 
-		m_ms32_roz_tilemap[chip]->draw_roz(bitmap, cliprect,
+		m_ms32_roz_tilemap[chip]->draw_roz(screen, bitmap, cliprect,
 				(startx+offsx)<<16, (starty+offsy)<<16,
 				incxx<<8, incxy<<8, incyx<<8, incyy<<8,
 				1, // Wrap
@@ -381,7 +381,7 @@ WRITE32_MEMBER(bnstars_state::ms32_pal1_ram_w)
 
 
 /* SPRITES based on tetrisp2 for now, readd priority bits later */
-void bnstars_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32 *sprram_top, size_t sprram_size, int region)
+void bnstars_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32 *sprram_top, size_t sprram_size, int region)
 {
 /***************************************************************************
 
@@ -502,7 +502,7 @@ void bnstars_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 				color,
 				flipx, flipy,
 				sx,sy,
-				xzoom, yzoom, machine().priority_bitmap,pri_mask, 0);
+				xzoom, yzoom, screen.priority(),pri_mask, 0);
 	}   /* end sprite loop */
 }
 
@@ -540,45 +540,45 @@ void bnstars_state::video_start()
 
 UINT32 bnstars_state::screen_update_bnstars_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 
 	bitmap.fill(0, cliprect);   /* bg color */
 
 
 	m_ms32_bg_tilemap[0]->set_scrollx(0, m_ms32_bg0_scroll[0x00/4] + m_ms32_bg0_scroll[0x08/4] + 0x10 );
 	m_ms32_bg_tilemap[0]->set_scrolly(0, m_ms32_bg0_scroll[0x0c/4] + m_ms32_bg0_scroll[0x14/4] );
-	m_ms32_bg_tilemap[0]->draw(bitmap, cliprect, 0,1);
+	m_ms32_bg_tilemap[0]->draw(screen, bitmap, cliprect, 0,1);
 
-	draw_roz(bitmap,cliprect,2,0);
+	draw_roz(screen,bitmap,cliprect,2,0);
 
 	m_ms32_tx_tilemap[0]->set_scrollx(0, m_ms32_tx0_scroll[0x00/4] + m_ms32_tx0_scroll[0x08/4] + 0x18);
 	m_ms32_tx_tilemap[0]->set_scrolly(0, m_ms32_tx0_scroll[0x0c/4] + m_ms32_tx0_scroll[0x14/4]);
-	m_ms32_tx_tilemap[0]->draw(bitmap, cliprect, 0,4);
+	m_ms32_tx_tilemap[0]->draw(screen, bitmap, cliprect, 0,4);
 
 
-	draw_sprites(bitmap,cliprect, m_ms32_spram, 0x20000, 0);
+	draw_sprites(screen,bitmap,cliprect, m_ms32_spram, 0x20000, 0);
 
 	return 0;
 }
 
 UINT32 bnstars_state::screen_update_bnstars_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 
 	bitmap.fill(0x8000+0, cliprect);    /* bg color */
 
 
 	m_ms32_bg_tilemap[1]->set_scrollx(0, m_ms32_bg1_scroll[0x00/4] + m_ms32_bg1_scroll[0x08/4] + 0x10 );
 	m_ms32_bg_tilemap[1]->set_scrolly(0, m_ms32_bg1_scroll[0x0c/4] + m_ms32_bg1_scroll[0x14/4] );
-	m_ms32_bg_tilemap[1]->draw(bitmap, cliprect, 0,1);
+	m_ms32_bg_tilemap[1]->draw(screen, bitmap, cliprect, 0,1);
 
-	draw_roz(bitmap,cliprect,2,1);
+	draw_roz(screen,bitmap,cliprect,2,1);
 
 	m_ms32_tx_tilemap[1]->set_scrollx(0, m_ms32_tx1_scroll[0x00/4] + m_ms32_tx1_scroll[0x08/4] + 0x18);
 	m_ms32_tx_tilemap[1]->set_scrolly(0, m_ms32_tx1_scroll[0x0c/4] + m_ms32_tx1_scroll[0x14/4]);
-	m_ms32_tx_tilemap[1]->draw(bitmap, cliprect, 0,4);
+	m_ms32_tx_tilemap[1]->draw(screen, bitmap, cliprect, 0,4);
 
-	draw_sprites(bitmap,cliprect, m_ms32_spram+(0x20000/4), 0x20000, 4);
+	draw_sprites(screen,bitmap,cliprect, m_ms32_spram+(0x20000/4), 0x20000, 4);
 
 	return 0;
 }

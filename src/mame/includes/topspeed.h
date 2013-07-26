@@ -76,7 +76,7 @@ public:
 	INTERRUPT_GEN_MEMBER(topspeed_interrupt);
 	INTERRUPT_GEN_MEMBER(topspeed_cpub_interrupt);
 	void topspeed_postload();
-	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void parse_control(  )   /* assumes Z80 sandwiched between 68Ks */;
 	void reset_sound_region(  );
 	void topspeed_msm5205_clock(int chip);

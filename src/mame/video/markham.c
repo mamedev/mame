@@ -126,7 +126,7 @@ UINT32 markham_state::screen_update_markham(screen_device &screen, bitmap_ind16 
 			m_bg_tilemap->set_scrollx(i, m_xscroll[1]);
 	}
 
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);
 	return 0;
 }

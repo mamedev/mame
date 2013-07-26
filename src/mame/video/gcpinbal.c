@@ -163,7 +163,7 @@ WRITE16_MEMBER(gcpinbal_state::gcpinbal_ctrl_word_w)
 
 ****************************************************************/
 
-void gcpinbal_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs )
+void gcpinbal_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs )
 {
 	UINT16 *spriteram = m_spriteram;
 	int offs, chain_pos;
@@ -207,7 +207,7 @@ void gcpinbal_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 						col,
 						flipx, flipy,
 						curx,cury,
-						machine().priority_bitmap,
+						screen.priority(),
 						priority ? 0xfc : 0xf0,0);
 
 				code++;
@@ -284,7 +284,7 @@ UINT32 gcpinbal_state::screen_update_gcpinbal(screen_device &screen, bitmap_ind1
 		m_tilemap[i]->set_scrolly(0, m_scrolly[i]);
 	}
 
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 	bitmap.fill(0, cliprect);
 
 	layer[0] = 0;
@@ -295,20 +295,20 @@ UINT32 gcpinbal_state::screen_update_gcpinbal(screen_device &screen, bitmap_ind1
 #ifdef MAME_DEBUG
 	if (m_dislayer[layer[0]] == 0)
 #endif
-	m_tilemap[layer[0]]->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 1);
+	m_tilemap[layer[0]]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 1);
 
 #ifdef MAME_DEBUG
 	if (m_dislayer[layer[1]] == 0)
 #endif
-	m_tilemap[layer[1]]->draw(bitmap, cliprect, 0, 2);
+	m_tilemap[layer[1]]->draw(screen, bitmap, cliprect, 0, 2);
 
 #ifdef MAME_DEBUG
 	if (m_dislayer[layer[2]] == 0)
 #endif
-	m_tilemap[layer[2]]->draw(bitmap, cliprect, 0, 4);
+	m_tilemap[layer[2]]->draw(screen, bitmap, cliprect, 0, 4);
 
 
-	draw_sprites(bitmap, cliprect, 16);
+	draw_sprites(screen, bitmap, cliprect, 16);
 
 #if 0
 	{

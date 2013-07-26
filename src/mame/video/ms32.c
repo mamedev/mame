@@ -263,7 +263,7 @@ void ms32_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_pri, con
 }
 
 
-void ms32_state::draw_roz(bitmap_ind16 &bitmap, const rectangle &cliprect,int priority)
+void ms32_state::draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect,int priority)
 {
 	/* TODO: registers 0x40/4 / 0x44/4 and 0x50/4 / 0x54/4 are used, meaning unknown */
 
@@ -304,7 +304,7 @@ void ms32_state::draw_roz(bitmap_ind16 &bitmap, const rectangle &cliprect,int pr
 			if (incxx & 0x10000) incxx |= ~0x1ffff;
 			if (incxy & 0x10000) incxy |= ~0x1ffff;
 
-			m_roz_tilemap->draw_roz(bitmap, my_clip,
+			m_roz_tilemap->draw_roz(screen, bitmap, my_clip,
 					(start2x+startx+offsx)<<16, (start2y+starty+offsy)<<16,
 					incxx<<8, incxy<<8, 0, 0,
 					1, // Wrap
@@ -335,7 +335,7 @@ void ms32_state::draw_roz(bitmap_ind16 &bitmap, const rectangle &cliprect,int pr
 		if (incyy & 0x10000) incyy |= ~0x1ffff;
 		if (incyx & 0x10000) incyx |= ~0x1ffff;
 
-		m_roz_tilemap->draw_roz(bitmap, cliprect,
+		m_roz_tilemap->draw_roz(screen, bitmap, cliprect,
 				(startx+offsx)<<16, (starty+offsy)<<16,
 				incxx<<8, incxy<<8, incyx<<8, incyy<<8,
 				1, // Wrap
@@ -378,7 +378,7 @@ UINT32 ms32_state::screen_update_ms32(screen_device &screen, bitmap_rgb32 &bitma
 	m_bg_tilemap_alt->set_scrolly(0, scrolly);
 
 
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 
 
 
@@ -413,46 +413,46 @@ UINT32 ms32_state::screen_update_ms32(screen_device &screen, bitmap_rgb32 &bitma
 		rot_pri++;
 
 	if (rot_pri == 0)
-		draw_roz(m_temp_bitmap_tilemaps, cliprect, 1 << 1);
+		draw_roz(screen, m_temp_bitmap_tilemaps, cliprect, 1 << 1);
 	else if (scr_pri == 0)
 		if (m_tilemaplayoutcontrol&1)
 		{
-			m_bg_tilemap_alt->draw(m_temp_bitmap_tilemaps, cliprect, 0, 1 << 0);
+			m_bg_tilemap_alt->draw(screen, m_temp_bitmap_tilemaps, cliprect, 0, 1 << 0);
 		}
 		else
 		{
-			m_bg_tilemap->draw(m_temp_bitmap_tilemaps, cliprect, 0, 1 << 0);
+			m_bg_tilemap->draw(screen, m_temp_bitmap_tilemaps, cliprect, 0, 1 << 0);
 		}
 	else if (asc_pri == 0)
-		m_tx_tilemap->draw(m_temp_bitmap_tilemaps, cliprect, 0, 1 << 2);
+		m_tx_tilemap->draw(screen, m_temp_bitmap_tilemaps, cliprect, 0, 1 << 2);
 
 	if (rot_pri == 1)
-		draw_roz(m_temp_bitmap_tilemaps, cliprect, 1 << 1);
+		draw_roz(screen, m_temp_bitmap_tilemaps, cliprect, 1 << 1);
 	else if (scr_pri == 1)
 		if (m_tilemaplayoutcontrol&1)
 		{
-			m_bg_tilemap_alt->draw(m_temp_bitmap_tilemaps, cliprect, 0, 1 << 0);
+			m_bg_tilemap_alt->draw(screen, m_temp_bitmap_tilemaps, cliprect, 0, 1 << 0);
 		}
 		else
 		{
-			m_bg_tilemap->draw(m_temp_bitmap_tilemaps, cliprect, 0, 1 << 0);
+			m_bg_tilemap->draw(screen, m_temp_bitmap_tilemaps, cliprect, 0, 1 << 0);
 		}
 	else if (asc_pri == 1)
-		m_tx_tilemap->draw(m_temp_bitmap_tilemaps, cliprect, 0, 1 << 2);
+		m_tx_tilemap->draw(screen, m_temp_bitmap_tilemaps, cliprect, 0, 1 << 2);
 
 	if (rot_pri == 2)
-		draw_roz(m_temp_bitmap_tilemaps, cliprect, 1 << 1);
+		draw_roz(screen, m_temp_bitmap_tilemaps, cliprect, 1 << 1);
 	else if (scr_pri == 2)
 		if (m_tilemaplayoutcontrol&1)
 		{
-			m_bg_tilemap_alt->draw(m_temp_bitmap_tilemaps, cliprect, 0, 1 << 0);
+			m_bg_tilemap_alt->draw(screen, m_temp_bitmap_tilemaps, cliprect, 0, 1 << 0);
 		}
 		else
 		{
-			m_bg_tilemap->draw(m_temp_bitmap_tilemaps, cliprect, 0, 1 << 0);
+			m_bg_tilemap->draw(screen, m_temp_bitmap_tilemaps, cliprect, 0, 1 << 0);
 		}
 	else if (asc_pri == 2)
-		m_tx_tilemap->draw(m_temp_bitmap_tilemaps, cliprect, 0, 1 << 2);
+		m_tx_tilemap->draw(screen, m_temp_bitmap_tilemaps, cliprect, 0, 1 << 2);
 
 	/* MIX it! */
 	/* this mixing isn't 100% accurate, it should be using ALL the data in
@@ -476,7 +476,7 @@ UINT32 ms32_state::screen_update_ms32(screen_device &screen, bitmap_rgb32 &bitma
 		for (yy=0;yy<height;yy++)
 		{
 			srcptr_tile =     &m_temp_bitmap_tilemaps.pix16(yy);
-			srcptr_tilepri =  &machine().priority_bitmap.pix8(yy);
+			srcptr_tilepri =  &screen.priority().pix8(yy);
 			srcptr_spri =     &m_temp_bitmap_sprites.pix16(yy);
 			//srcptr_spripri =  &m_temp_bitmap_sprites_pri.pix8(yy);
 			dstptr_bitmap  =  &bitmap.pix32(yy);

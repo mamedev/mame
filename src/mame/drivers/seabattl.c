@@ -163,8 +163,8 @@ UINT32 seabattl_state::screen_update_seabattl(screen_device &screen, bitmap_ind1
 	}
 
 	// background (scr.sm.obj)
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	m_bg_tilemap->draw(m_collision_bg, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, m_collision_bg, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 
 	// sprites (m.obj)
 	for ( offset = 0; offset < 256; offset++ )

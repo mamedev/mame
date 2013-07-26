@@ -396,7 +396,7 @@ WRITE8_MEMBER( segaorun_state::video_control_w )
 	//  D1: (CONT) - affects sprite hardware
 	//  D0: Sound section reset (1= normal operation, 0= reset)
 
-	m_segaic16vid->segaic16_set_display_enable(machine(), data & 0x20);
+	m_segaic16vid->segaic16_set_display_enable(*m_screen, data & 0x20);
 	m_adc_select = (data >> 2) & 7;
 	m_soundcpu->set_input_line(INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 }
@@ -543,7 +543,7 @@ void segaorun_state::machine_reset()
 	// reset misc components
 	if (m_custom_map != NULL)
 		m_mapper->configure_explicit(m_custom_map);
-	m_segaic16vid->segaic16_tilemap_reset(machine(), 0);
+	m_segaic16vid->segaic16_tilemap_reset(*m_screen);
 
 	// hook the RESET line, which resets CPU #1
 	m68k_set_reset_callback(m_maincpu, m68k_reset_callback);
@@ -747,7 +747,7 @@ WRITE16_MEMBER( segaorun_state::shangon_custom_io_w )
 			//  D7-D6: (ADC1-0)
 			//  D5: Screen display
 			m_adc_select = (data >> 6) & 3;
-			m_segaic16vid->segaic16_set_display_enable(machine(), (data >> 5) & 1);
+			m_segaic16vid->segaic16_set_display_enable(*m_screen, (data >> 5) & 1);
 			return;
 
 		case 0x0020/2:

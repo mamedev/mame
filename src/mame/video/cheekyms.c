@@ -158,7 +158,7 @@ UINT32 cheekyms_state::screen_update_cheekyms(screen_device &screen, bitmap_ind1
 	draw_sprites(bitmap, cliprect, machine().gfx[1], flip);
 
 	/* draw the tilemap to a temp bitmap */
-	m_cm_tilemap->draw(*m_bitmap_buffer, cliprect, 0, 0);
+	m_cm_tilemap->draw(screen, *m_bitmap_buffer, cliprect, 0, 0);
 
 	/* draw the tilemap to the final bitmap applying the scroll to the man character */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)

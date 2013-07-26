@@ -54,7 +54,7 @@ Heavy use is made of sprite zooming.
 
 ********************************************************/
 
-void gunbustr_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,const int *primasks,int x_offs,int y_offs)
+void gunbustr_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,const int *primasks,int x_offs,int y_offs)
 {
 	UINT32 *spriteram32 = m_spriteram;
 	UINT16 *spritemap = (UINT16 *)memregion("user1")->base();
@@ -189,7 +189,7 @@ logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 				sprite_ptr->flipx,sprite_ptr->flipy,
 				sprite_ptr->x,sprite_ptr->y,
 				sprite_ptr->zoomx,sprite_ptr->zoomy,
-				machine().priority_bitmap,sprite_ptr->primask,0);
+				screen.priority(),sprite_ptr->primask,0);
 	}
 }
 
@@ -214,25 +214,25 @@ UINT32 gunbustr_state::screen_update_gunbustr(screen_device &screen, bitmap_ind1
 	layer[3] = (priority & 0x000f) >>  0;   /* tells us which is top */
 	layer[4] = 4;   /* text layer always over bg layers */
 
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 
 	/* We have to assume 2nd to bottom layer is always underneath
 	   sprites as pdrawgfx cannot yet cope with more than 4 layers */
 
 #ifdef MAME_DEBUG
-	if (!machine().input().code_pressed (KEYCODE_Z)) m_tc0480scp->tilemap_draw(bitmap, cliprect, layer[0],TILEMAP_DRAW_OPAQUE, 0);
-	if (!machine().input().code_pressed (KEYCODE_X)) m_tc0480scp->tilemap_draw(bitmap, cliprect, layer[1], 0, 1);
-	if (!machine().input().code_pressed (KEYCODE_C)) m_tc0480scp->tilemap_draw(bitmap, cliprect, layer[2], 0, 2);
-	if (!machine().input().code_pressed (KEYCODE_V)) m_tc0480scp->tilemap_draw(bitmap, cliprect, layer[3], 0, 4);
-	if (!machine().input().code_pressed (KEYCODE_B)) m_tc0480scp->tilemap_draw(bitmap, cliprect, layer[4], 0, 8);
-	if (!machine().input().code_pressed (KEYCODE_N)) draw_sprites(bitmap, cliprect, primasks, 48, -116);
+	if (!machine().input().code_pressed (KEYCODE_Z)) m_tc0480scp->tilemap_draw(screen, bitmap, cliprect, layer[0],TILEMAP_DRAW_OPAQUE, 0);
+	if (!machine().input().code_pressed (KEYCODE_X)) m_tc0480scp->tilemap_draw(screen, bitmap, cliprect, layer[1], 0, 1);
+	if (!machine().input().code_pressed (KEYCODE_C)) m_tc0480scp->tilemap_draw(screen, bitmap, cliprect, layer[2], 0, 2);
+	if (!machine().input().code_pressed (KEYCODE_V)) m_tc0480scp->tilemap_draw(screen, bitmap, cliprect, layer[3], 0, 4);
+	if (!machine().input().code_pressed (KEYCODE_B)) m_tc0480scp->tilemap_draw(screen, bitmap, cliprect, layer[4], 0, 8);
+	if (!machine().input().code_pressed (KEYCODE_N)) draw_sprites(screen, bitmap, cliprect, primasks, 48, -116);
 #else
-	m_tc0480scp->tilemap_draw(bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 0);
-	m_tc0480scp->tilemap_draw(bitmap, cliprect, layer[1], 0, 1);
-	m_tc0480scp->tilemap_draw(bitmap, cliprect, layer[2], 0, 2);
-	m_tc0480scp->tilemap_draw(bitmap, cliprect, layer[3], 0, 4);
-	m_tc0480scp->tilemap_draw(bitmap, cliprect, layer[4], 0, 8);    /* text layer */
-	draw_sprites(bitmap, cliprect, primasks, 48, -116);
+	m_tc0480scp->tilemap_draw(screen, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 0);
+	m_tc0480scp->tilemap_draw(screen, bitmap, cliprect, layer[1], 0, 1);
+	m_tc0480scp->tilemap_draw(screen, bitmap, cliprect, layer[2], 0, 2);
+	m_tc0480scp->tilemap_draw(screen, bitmap, cliprect, layer[3], 0, 4);
+	m_tc0480scp->tilemap_draw(screen, bitmap, cliprect, layer[4], 0, 8);    /* text layer */
+	draw_sprites(screen, bitmap, cliprect, primasks, 48, -116);
 #endif
 	return 0;
 }

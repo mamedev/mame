@@ -149,21 +149,21 @@ UINT32 raiden_state::screen_update_common(screen_device &screen, bitmap_ind16 &b
 
 	// back layer
 	if (m_bg_layer_enabled)
-		m_bg_layer->draw(bitmap, cliprect, 0, 0);
+		m_bg_layer->draw(screen, bitmap, cliprect, 0, 0);
 
 	// draw sprites underneath foreground
 	draw_sprites(bitmap, cliprect, 1);
 
 	// fore layer
 	if (m_fg_layer_enabled)
-		m_fg_layer->draw(bitmap, cliprect, 0, 0);
+		m_fg_layer->draw(screen, bitmap, cliprect, 0, 0);
 
 	// rest of sprites
 	draw_sprites(bitmap, cliprect, 2);
 
 	// text layer
 	if (m_tx_layer_enabled)
-		m_tx_layer->draw(bitmap, cliprect, 0, 0);
+		m_tx_layer->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }

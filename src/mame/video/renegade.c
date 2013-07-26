@@ -126,8 +126,8 @@ void renegade_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 UINT32 renegade_state::screen_update_renegade(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->set_scrollx(0, m_scrollx);
-	m_bg_tilemap->draw(bitmap, cliprect, 0 , 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0 , 0);
 	draw_sprites(bitmap, cliprect);
-	m_fg_tilemap->draw(bitmap, cliprect, 0 , 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0 , 0);
 	return 0;
 }

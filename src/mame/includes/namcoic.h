@@ -157,7 +157,7 @@ extern const device_type NAMCO_C45_ROAD;
 
 /*----------- defined in drivers/namcoic.c -----------*/
 
-void namco_tilemap_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
+void namco_tilemap_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
 void namco_tilemap_invalidate( void );
 
 DECLARE_READ32_HANDLER( namco_tilemapvideoram32_r );

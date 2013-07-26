@@ -2,7 +2,8 @@
 typedef UINT16 (*decospr_priority_callback_func)(UINT16 pri);
 typedef UINT16 (*decospr_colour_callback_func)(UINT16 col);
 
-class decospr_device : public device_t
+class decospr_device : public device_t,
+						public device_video_interface
 {
 public:
 	decospr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

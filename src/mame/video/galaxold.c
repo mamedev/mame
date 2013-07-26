@@ -608,9 +608,9 @@ VIDEO_START_MEMBER(galaxold_state,batman2)
 
 
 
-void galaxold_state::rockclim_draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect)
+void galaxold_state::rockclim_draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_rockclim_tilemap->draw(bitmap, cliprect, 0,0);
+	m_rockclim_tilemap->draw(screen, bitmap, cliprect, 0,0);
 }
 
 void galaxold_state::rockclim_modify_spritecode(UINT8 *spriteram, int *code, int *flipx, int *flipy, int offs)
@@ -1145,13 +1145,13 @@ void galaxold_state::dambustr_draw_bullets(bitmap_ind16 &bitmap, const rectangle
 
 /* background drawing functions */
 
-void galaxold_state::galaxold_draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect)
+void galaxold_state::galaxold_draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* plain black background */
 	bitmap.fill(0, cliprect);
 }
 
-void galaxold_state::scrambold_draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect)
+void galaxold_state::scrambold_draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_background_enable)
 		bitmap.fill(BACKGROUND_COLOR_BASE, cliprect);
@@ -1159,14 +1159,14 @@ void galaxold_state::scrambold_draw_background(bitmap_ind16 &bitmap, const recta
 		bitmap.fill(0, cliprect);
 }
 
-void galaxold_state::ad2083_draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect)
+void galaxold_state::ad2083_draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int color = (m_background_blue << 2) | (m_background_green << 1) | m_background_red;
 
 	bitmap.fill(BACKGROUND_COLOR_BASE + color, cliprect);
 }
 
-void galaxold_state::stratgyx_draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect)
+void galaxold_state::stratgyx_draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT8 x;
 	UINT8 *prom;
@@ -1202,7 +1202,7 @@ void galaxold_state::stratgyx_draw_background(bitmap_ind16 &bitmap, const rectan
 	}
 }
 
-void galaxold_state::minefld_draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect)
+void galaxold_state::minefld_draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_background_enable)
 	{
@@ -1222,7 +1222,7 @@ void galaxold_state::minefld_draw_background(bitmap_ind16 &bitmap, const rectang
 		bitmap.fill(0, cliprect);
 }
 
-void galaxold_state::rescue_draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect)
+void galaxold_state::rescue_draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_background_enable)
 	{
@@ -1241,7 +1241,7 @@ void galaxold_state::rescue_draw_background(bitmap_ind16 &bitmap, const rectangl
 		bitmap.fill(0, cliprect);
 }
 
-void galaxold_state::mariner_draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect)
+void galaxold_state::mariner_draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int base = BACKGROUND_COLOR_BASE;
 	UINT8 x;
@@ -1284,7 +1284,7 @@ void galaxold_state::mariner_draw_background(bitmap_ind16 &bitmap, const rectang
 	}
 }
 
-void galaxold_state::dambustr_draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect)
+void galaxold_state::dambustr_draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int base = BACKGROUND_COLOR_BASE;
 	int col1 = base + m_dambustr_bg_color_1;
@@ -1710,7 +1710,7 @@ void galaxold_state::draw_sprites(bitmap_ind16 &bitmap, UINT8 *spriteram, size_t
 
 UINT32 galaxold_state::screen_update_galaxold(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	(this->*m_draw_background)(bitmap, cliprect);
+	(this->*m_draw_background)(screen, bitmap, cliprect);
 
 	if (m_stars_on)
 	{
@@ -1718,7 +1718,7 @@ UINT32 galaxold_state::screen_update_galaxold(screen_device &screen, bitmap_ind1
 	}
 
 
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	if (m_draw_bullets)
 	{
@@ -1741,7 +1741,7 @@ UINT32 galaxold_state::screen_update_dambustr(screen_device &screen, bitmap_ind1
 	int i, j;
 	UINT8 color;
 
-	(this->*m_draw_background)(bitmap, cliprect);
+	(this->*m_draw_background)(screen, bitmap, cliprect);
 
 	if (m_stars_on)
 	{
@@ -1751,7 +1751,7 @@ UINT32 galaxold_state::screen_update_dambustr(screen_device &screen, bitmap_ind1
 	/* save the background for drawing it again later, if background has priority over characters */
 	copybitmap(*m_dambustr_tmpbitmap, bitmap, 0, 0, 0, 0, m_dambustr_tmpbitmap->cliprect());
 
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	if (m_draw_bullets)
 	{
@@ -1775,7 +1775,7 @@ UINT32 galaxold_state::screen_update_dambustr(screen_device &screen, bitmap_ind1
 			};
 		};
 		m_dambustr_tilemap2->mark_all_dirty();
-		m_dambustr_tilemap2->draw(bitmap, cliprect, 0, 0);
+		m_dambustr_tilemap2->draw(screen, bitmap, cliprect, 0, 0);
 	};
 
 	return 0;

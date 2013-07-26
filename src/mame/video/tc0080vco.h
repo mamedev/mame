@@ -23,7 +23,7 @@ public:
 	DECLARE_WRITE16_MEMBER( word_w );
 
 	void tilemap_update();
-	void tilemap_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority);
+	void tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority);
 
 	DECLARE_READ16_MEMBER( cram_0_r );
 	DECLARE_READ16_MEMBER( cram_1_r );
@@ -69,8 +69,8 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg0_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
-	void bg0_tilemap_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, UINT32 priority );
-	void bg1_tilemap_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, UINT32 priority );
+	void bg0_tilemap_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, UINT32 priority );
+	void bg1_tilemap_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, UINT32 priority );
 };
 
 extern const device_type TC0080VCO;

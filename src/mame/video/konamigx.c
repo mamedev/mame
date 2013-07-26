@@ -354,27 +354,27 @@ static void (*k053247_callback)(running_machine &machine, int *code,int *color,i
 static int *K054338_shdRGB;
 
 
-void konamigx_state::konamigx_mixer_init(running_machine &machine, int objdma)
+void konamigx_state::konamigx_mixer_init(screen_device &screen, int objdma)
 {
 	gx_objdma = 0;
 	gx_primode = 0;
 
-	gx_objzbuf = &machine.priority_bitmap.pix8(0);
-	gx_shdzbuf = auto_alloc_array(machine, UINT8, GX_ZBUFSIZE);
-	gx_objpool = auto_alloc_array(machine, struct GX_OBJ, GX_MAX_OBJECTS);
+	gx_objzbuf = &screen.priority().pix8(0);
+	gx_shdzbuf = auto_alloc_array(machine(), UINT8, GX_ZBUFSIZE);
+	gx_objpool = auto_alloc_array(machine(), struct GX_OBJ, GX_MAX_OBJECTS);
 
 	m_k055673->alt_k053247_export_config(&k053247_callback);
 	K054338_export_config(&K054338_shdRGB);
 
 	if (objdma)
 	{
-		gx_spriteram = auto_alloc_array(machine, UINT16, 0x1000/2);
+		gx_spriteram = auto_alloc_array(machine(), UINT16, 0x1000/2);
 		gx_objdma = 1;
 	}
 	else
 		m_k055673->k053247_get_ram(&gx_spriteram);
 
-	palette_set_shadow_dRGB32(machine, 3,-80,-80,-80, 0);
+	palette_set_shadow_dRGB32(machine(), 3,-80,-80,-80, 0);
 	K054338_invert_alpha(1);
 }
 
@@ -391,7 +391,7 @@ void konamigx_state::konamigx_objdma(void)
 	if (gx_objdma && gx_spriteram && k053247_ram) memcpy(gx_spriteram, k053247_ram, 0x1000);
 }
 
-void konamigx_state::konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect,
+void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect,
 					tilemap_t *sub1, int sub1flags,
 					tilemap_t *sub2, int sub2flags,
 					int mixerflags, bitmap_ind16 *extra_bitmap, int rushingheroes_hack)
@@ -403,14 +403,14 @@ void konamigx_state::konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitm
 	int cltc_shdpri, /*prflp,*/ disp;
 
 	// buffer can move when it's resized, so refresh the pointer
-	gx_objzbuf = &machine.priority_bitmap.pix8(0);
+	gx_objzbuf = &screen.priority().pix8(0);
 
 	// abort if object database failed to initialize
 	objpool = gx_objpool;
 	if (!objpool) return;
 
 	// clear screen with backcolor and update flicker pulse
-	K054338_fill_backcolor(machine, m_screen, bitmap, konamigx_wrport1_0 & 0x20);
+	K054338_fill_backcolor(machine(), m_screen, bitmap, konamigx_wrport1_0 & 0x20);
 
 
 	// abort if video has been disabled
@@ -432,7 +432,7 @@ void konamigx_state::konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitm
 	if (mixerflags & GXMIX_NOZBUF)
 		mixerflags |= GXMIX_NOSHADOW;
 	else
-		gx_wipezbuf(machine, mixerflags & GXMIX_NOSHADOW);
+		gx_wipezbuf(machine(), mixerflags & GXMIX_NOSHADOW);
 
 	// cache global parameters
 	konamigx_precache_registers();
@@ -494,7 +494,7 @@ void konamigx_state::konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitm
 		for (i=0; i<4; i++) if (!(temp>>i & 1) && spri_min < layerpri[i]) spri_min = layerpri[i]; // HACK
 
 		// update shadows status
-		K054338_update_all_shadows(machine, rushingheroes_hack);
+		K054338_update_all_shadows(machine(), rushingheroes_hack);
 	}
 
 	// pre-sort layers
@@ -575,7 +575,7 @@ void konamigx_state::konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitm
 		int color = k = gx_spriteram[offs+6];
 		l     = gx_spriteram[offs+7];
 
-		(*k053247_callback)(machine, &code, &color, &pri);
+		(*k053247_callback)(machine(), &code, &color, &pri);
 
 		/*
 		    shadow = shadow code
@@ -716,14 +716,14 @@ void konamigx_state::konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitm
 	}
 
 
-	konamigx_mixer_draw(machine,bitmap,cliprect,sub1,sub1flags,sub2,sub2flags,mixerflags,extra_bitmap,rushingheroes_hack,
+	konamigx_mixer_draw(screen,bitmap,cliprect,sub1,sub1flags,sub2,sub2flags,mixerflags,extra_bitmap,rushingheroes_hack,
 		objpool,
 		objbuf,
 		nobj
 		);
 }
 
-void konamigx_state::gx_draw_basic_tilemaps(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int mixerflags, int code)
+void konamigx_state::gx_draw_basic_tilemaps(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int mixerflags, int code)
 {
 	int temp1,temp2,temp3,temp4;
 	int i = code<<1;
@@ -758,11 +758,11 @@ void konamigx_state::gx_draw_basic_tilemaps(running_machine &machine, bitmap_rgb
 
 		if (mixerflags & 1<<(code+12)) k |= K056382_DRAW_FLAG_FORCE_XYSCROLL;
 
-		m_k056832->m_tilemap_draw(machine, bitmap, cliprect, code, k, 0);
+		m_k056832->m_tilemap_draw(screen, bitmap, cliprect, code, k, 0);
 	}
 }
 
-void konamigx_state::gx_draw_basic_extended_tilemaps_1(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int mixerflags, int code, tilemap_t *sub1, int sub1flags, int rushingheroes_hack, int offs)
+void konamigx_state::gx_draw_basic_extended_tilemaps_1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int mixerflags, int code, tilemap_t *sub1, int sub1flags, int rushingheroes_hack, int offs)
 {
 	int temp1,temp2,temp3,temp4;
 	int i = code<<1;
@@ -798,22 +798,22 @@ void konamigx_state::gx_draw_basic_extended_tilemaps_1(running_machine &machine,
 		if (offs == -2)
 		{
 			int pixeldouble_output = 0;
-			const rectangle &visarea = machine.primary_screen->visible_area();
+			const rectangle &visarea = screen.machine().primary_screen->visible_area();
 			int width = visarea.width();
 
 			if (width>512) // vsnetscr case
 				pixeldouble_output = 1;
 
-			K053936GP_0_zoom_draw(machine, bitmap, cliprect, sub1, l, k, alpha, pixeldouble_output, m_k053936_0_ctrl_16, m_k053936_0_linectrl_16, m_k053936_0_ctrl, m_k053936_0_linectrl);
+			K053936GP_0_zoom_draw(screen.machine(), bitmap, cliprect, sub1, l, k, alpha, pixeldouble_output, m_k053936_0_ctrl_16, m_k053936_0_linectrl_16, m_k053936_0_ctrl, m_k053936_0_linectrl);
 		}
 		else
 		{
-			machine.device<k053250_device>("k053250_1")->draw(bitmap, cliprect, vcblk[4]<<l, 0, 0);
+			screen.machine().device<k053250_device>("k053250_1")->draw(bitmap, cliprect, vcblk[4]<<l, 0, screen.priority(), 0);
 		}
 	}
 }
 
-void konamigx_state::gx_draw_basic_extended_tilemaps_2(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int mixerflags, int code, tilemap_t *sub2, int sub2flags, bitmap_ind16 *extra_bitmap, int offs)
+void konamigx_state::gx_draw_basic_extended_tilemaps_2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int mixerflags, int code, tilemap_t *sub2, int sub2flags, bitmap_ind16 *extra_bitmap, int offs)
 {
 	int temp1,temp2,temp3,temp4;
 	int i = code<<1;
@@ -851,9 +851,9 @@ void konamigx_state::gx_draw_basic_extended_tilemaps_2(running_machine &machine,
 			if (extra_bitmap) // soccer superstars roz layer
 			{
 				int xx,yy;
-				int width = machine.primary_screen->width();
-				int height = machine.primary_screen->height();
-				const pen_t *paldata = machine.pens;
+				int width = screen.machine().primary_screen->width();
+				int height = screen.machine().primary_screen->height();
+				const pen_t *paldata = screen.machine().pens;
 
 				// the output size of the roz layer has to be doubled horizontally
 				// so that it aligns with the sprites and normal tilemaps.  This appears
@@ -880,11 +880,11 @@ void konamigx_state::gx_draw_basic_extended_tilemaps_2(running_machine &machine,
 			}
 		}
 		else
-			machine.device<k053250_device>("k053250_2")->draw(bitmap, cliprect, vcblk[5]<<l, 0, 0);
+			screen.machine().device<k053250_device>("k053250_2")->draw(bitmap, cliprect, vcblk[5]<<l, 0, screen.priority(), 0);
 	}
 }
 
-void konamigx_state::konamigx_mixer_draw(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect,
+void konamigx_state::konamigx_mixer_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect,
 					tilemap_t *sub1, int sub1flags,
 					tilemap_t *sub2, int sub2flags,
 					int mixerflags, bitmap_ind16 *extra_bitmap, int rushingheroes_hack,
@@ -925,7 +925,7 @@ void konamigx_state::konamigx_mixer_draw(running_machine &machine, bitmap_rgb32 
 			}
 			color &= K055555_COLORMASK;
 
-			if (drawmode >= 4) palette_set_shadow_mode(machine, order & 0x0f);
+			if (drawmode >= 4) palette_set_shadow_mode(machine(), order & 0x0f);
 
 			if (!(mixerflags & GXMIX_NOZBUF))
 			{
@@ -949,15 +949,15 @@ void konamigx_state::konamigx_mixer_draw(running_machine &machine, bitmap_rgb32 
 			switch (offs)
 			{
 				case -1:
-					gx_draw_basic_tilemaps(machine, bitmap, cliprect, mixerflags, code);
+					gx_draw_basic_tilemaps(screen, bitmap, cliprect, mixerflags, code);
 					continue;
 				case -2:
 				case -4:
-					gx_draw_basic_extended_tilemaps_1(machine, bitmap, cliprect, mixerflags, code, sub1, sub1flags, rushingheroes_hack, offs);
+					gx_draw_basic_extended_tilemaps_1(screen, bitmap, cliprect, mixerflags, code, sub1, sub1flags, rushingheroes_hack, offs);
 				continue;
 				case -3:
 				case -5:
-					gx_draw_basic_extended_tilemaps_2(machine, bitmap, cliprect, mixerflags, code, sub2, sub2flags, extra_bitmap, offs);
+					gx_draw_basic_extended_tilemaps_2(screen, bitmap, cliprect, mixerflags, code, sub2, sub2flags, extra_bitmap, offs);
 				continue;
 			}
 			continue;
@@ -1171,7 +1171,7 @@ void konamigx_state::_gxcommoninitnosprites(running_machine &machine)
 	K054338_vh_start(machine, m_k055555);
 	m_k055555->K055555_vh_start(machine);
 
-	konamigx_mixer_init(machine, 0);
+	konamigx_mixer_init(*m_screen, 0);
 
 	for (i = 0; i < 8; i++)
 	{
@@ -1483,7 +1483,7 @@ VIDEO_START_MEMBER(konamigx_state,opengolf)
 
 	// urgh.. the priority bitmap is global, and because our temp bitmaps are bigger than the screen, this causes issues.. so just allocate something huge
 	// until there is a better solution, or priority bitmap can be specified manually.
-	machine().priority_bitmap.allocate(2048,2048);
+	m_screen->priority().allocate(2048,2048);
 
 }
 
@@ -1521,7 +1521,7 @@ VIDEO_START_MEMBER(konamigx_state,racinfrc)
 
 	// urgh.. the priority bitmap is global, and because our temp bitmaps are bigger than the screen, this causes issues.. so just allocate something huge
 	// until there is a better solution, or priority bitmap can be specified manually.
-	machine().priority_bitmap.allocate(2048,2048);
+	m_screen->priority().allocate(2048,2048);
 
 
 }
@@ -1581,15 +1581,15 @@ UINT32 konamigx_state::screen_update_konamigx(screen_device &screen, bitmap_rgb3
 	// Type-1
 	if (gx_specialrozenable == 1)
 	{
-		K053936_0_zoom_draw(*gxtype1_roz_dstbitmap, gxtype1_roz_dstbitmapclip,gx_psac_tilemap, 0,0,0); // height data
-		K053936_0_zoom_draw(*gxtype1_roz_dstbitmap2,gxtype1_roz_dstbitmapclip,gx_psac_tilemap2,0,0,0); // colour data (+ some voxel height data?)
+		K053936_0_zoom_draw(screen, *gxtype1_roz_dstbitmap, gxtype1_roz_dstbitmapclip,gx_psac_tilemap, 0,0,0); // height data
+		K053936_0_zoom_draw(screen, *gxtype1_roz_dstbitmap2,gxtype1_roz_dstbitmapclip,gx_psac_tilemap2,0,0,0); // colour data (+ some voxel height data?)
 	}
 
 
 
 	if (gx_specialrozenable==3)
 	{
-		konamigx_mixer(machine(), bitmap, cliprect, gx_psac_tilemap, GXSUB_8BPP,0,0,  0, 0, gx_rushingheroes_hack);
+		konamigx_mixer(screen, bitmap, cliprect, gx_psac_tilemap, GXSUB_8BPP,0,0,  0, 0, gx_rushingheroes_hack);
 	}
 	// hack, draw the roz tilemap if W is held
 	// todo: fix so that it works with the mixer without crashing(!)
@@ -1600,15 +1600,15 @@ UINT32 konamigx_state::screen_update_konamigx(screen_device &screen, bitmap_rgb3
 		temprect = cliprect;
 		temprect.max_x = cliprect.min_x+320;
 
-		if (konamigx_type3_psac2_actual_bank == 1) K053936_0_zoom_draw(*type3_roz_temp_bitmap, temprect,gx_psac_tilemap_alt, 0,0,0); // soccerss playfield
-		else K053936_0_zoom_draw(*type3_roz_temp_bitmap, temprect,gx_psac_tilemap, 0,0,0); // soccerss playfield
+		if (konamigx_type3_psac2_actual_bank == 1) K053936_0_zoom_draw(screen, *type3_roz_temp_bitmap, temprect,gx_psac_tilemap_alt, 0,0,0); // soccerss playfield
+		else K053936_0_zoom_draw(screen, *type3_roz_temp_bitmap, temprect,gx_psac_tilemap, 0,0,0); // soccerss playfield
 
 
-		konamigx_mixer(machine(), bitmap, cliprect, 0, 0, 0, 0, 0, type3_roz_temp_bitmap, gx_rushingheroes_hack);
+		konamigx_mixer(screen, bitmap, cliprect, 0, 0, 0, 0, 0, type3_roz_temp_bitmap, gx_rushingheroes_hack);
 	}
 	else
 	{
-		konamigx_mixer(machine(), bitmap, cliprect, 0, 0, 0, 0, 0, 0, gx_rushingheroes_hack);
+		konamigx_mixer(screen, bitmap, cliprect, 0, 0, 0, 0, 0, 0, gx_rushingheroes_hack);
 	}
 
 

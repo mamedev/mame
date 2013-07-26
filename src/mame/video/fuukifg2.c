@@ -137,7 +137,7 @@ void fuuki16_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, c
 {
 	int offs;
 	gfx_element *gfx = screen.machine().gfx[0];
-	bitmap_ind8 &priority_bitmap = screen.machine().priority_bitmap;
+	bitmap_ind8 &priority_bitmap = screen.priority();
 	const rectangle &visarea = screen.visible_area();
 	UINT16 *spriteram16 = m_spriteram;
 	int max_x = visarea.max_x + 1;
@@ -262,18 +262,18 @@ if (screen.machine().input().code_pressed(KEYCODE_X))
 ***************************************************************************/
 
 /* Wrapper to handle bg and bg2 ttogether */
-void fuuki16_state::fuuki16_draw_layer( bitmap_ind16 &bitmap, const rectangle &cliprect, int i, int flag, int pri )
+void fuuki16_state::fuuki16_draw_layer( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int i, int flag, int pri )
 {
 	int buffer = (m_vregs[0x1e / 2] & 0x40);
 
 	switch( i )
 	{
-		case 2: if (buffer) m_tilemap[3]->draw(bitmap, cliprect, flag, pri);
-				else        m_tilemap[2]->draw(bitmap, cliprect, flag, pri);
+		case 2: if (buffer) m_tilemap[3]->draw(screen, bitmap, cliprect, flag, pri);
+				else        m_tilemap[2]->draw(screen, bitmap, cliprect, flag, pri);
 				return;
-		case 1: m_tilemap[1]->draw(bitmap, cliprect, flag, pri);
+		case 1: m_tilemap[1]->draw(screen, bitmap, cliprect, flag, pri);
 				return;
-		case 0: m_tilemap[0]->draw(bitmap, cliprect, flag, pri);
+		case 0: m_tilemap[0]->draw(screen, bitmap, cliprect, flag, pri);
 				return;
 	}
 }
@@ -333,11 +333,11 @@ UINT32 fuuki16_state::screen_update_fuuki16(screen_device &screen, bitmap_ind16 
 
 	/* Actually, bg colour is simply the last pen i.e. 0x1fff -pjp */
 	bitmap.fill((0x800 * 4) - 1, cliprect);
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 
-	fuuki16_draw_layer(bitmap, cliprect, tm_back,   0, 1);
-	fuuki16_draw_layer(bitmap, cliprect, tm_middle, 0, 2);
-	fuuki16_draw_layer(bitmap, cliprect, tm_front,  0, 4);
+	fuuki16_draw_layer(screen, bitmap, cliprect, tm_back,   0, 1);
+	fuuki16_draw_layer(screen, bitmap, cliprect, tm_middle, 0, 2);
+	fuuki16_draw_layer(screen, bitmap, cliprect, tm_front,  0, 4);
 
 	draw_sprites(screen, bitmap, cliprect);
 

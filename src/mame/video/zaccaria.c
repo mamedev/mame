@@ -242,7 +242,7 @@ void zaccaria_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 
 UINT32 zaccaria_state::screen_update_zaccaria(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
 
 	// 3 layers of sprites, each with their own palette and priorities
 	// Not perfect yet, does spriteram(1) layer have a priority bit somewhere?

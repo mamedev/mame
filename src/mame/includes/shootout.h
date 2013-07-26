@@ -29,7 +29,7 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_shootout(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_shootouj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int bank_bits );
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int bank_bits );
 	DECLARE_WRITE_LINE_MEMBER(shootout_snd_irq);
 	DECLARE_WRITE_LINE_MEMBER(shootout_snd2_irq);
 	required_device<cpu_device> m_maincpu;

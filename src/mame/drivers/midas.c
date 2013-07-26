@@ -207,7 +207,7 @@ UINT32 midas_state::screen_update_midas(screen_device &screen, bitmap_ind16 &bit
 	bitmap.fill(4095, cliprect);
 
 	if (layers_ctrl & 2)    draw_sprites(bitmap,cliprect);
-	if (layers_ctrl & 1)    m_tmap->draw(bitmap, cliprect, 0, 0);
+	if (layers_ctrl & 1)    m_tmap->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }

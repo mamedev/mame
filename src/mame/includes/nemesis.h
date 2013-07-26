@@ -101,7 +101,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(konamigt_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(gx400_interrupt);
 	void nemesis_postload();
-	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 	DECLARE_WRITE_LINE_MEMBER(sound_irq);
 	DECLARE_WRITE8_MEMBER(volume_callback);
 };

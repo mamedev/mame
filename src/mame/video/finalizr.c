@@ -89,7 +89,7 @@ UINT32 finalizr_state::screen_update_finalizr(screen_device &screen, bitmap_ind1
 	m_fg_tilemap->mark_all_dirty();
 
 	m_bg_tilemap->set_scrollx(0, *m_scroll - 32);
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* Draw the sprites. */
 	{
@@ -215,7 +215,7 @@ UINT32 finalizr_state::screen_update_finalizr(screen_device &screen, bitmap_ind1
 		clip.min_x = visarea.min_x;
 		clip.max_x = visarea.min_x + 31;
 		m_fg_tilemap->set_scrolldx(0,-32);
-		m_fg_tilemap->draw(bitmap, clip, 0, 0);
+		m_fg_tilemap->draw(screen, bitmap, clip, 0, 0);
 	}
 	return 0;
 }

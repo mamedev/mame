@@ -398,10 +398,10 @@ UINT32 taitoh_state::screen_update_syvalion(screen_device &screen, bitmap_ind16 
 
 	bitmap.fill(0, cliprect);
 
-	m_tc0080vco->tilemap_draw(bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0);
-	m_tc0080vco->tilemap_draw(bitmap, cliprect, 1, 0, 0);
+	m_tc0080vco->tilemap_draw(screen, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0);
+	m_tc0080vco->tilemap_draw(screen, bitmap, cliprect, 1, 0, 0);
 	syvalion_draw_sprites(bitmap,cliprect);
-	m_tc0080vco->tilemap_draw(bitmap, cliprect, 2, 0, 0);
+	m_tc0080vco->tilemap_draw(screen, bitmap, cliprect, 2, 0, 0);
 
 	return 0;
 }
@@ -417,21 +417,21 @@ UINT32 taitoh_state::screen_update_recordbr(screen_device &screen, bitmap_ind16 
 
 #ifdef MAME_DEBUG
 	if (!machine().input().code_pressed(KEYCODE_A))
-		m_tc0080vco->tilemap_draw(bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0);
+		m_tc0080vco->tilemap_draw(screen, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0);
 	if (!machine().input().code_pressed(KEYCODE_S))
 		recordbr_draw_sprites(bitmap, cliprect, 0);
 	if (!machine().input().code_pressed(KEYCODE_D))
-		m_tc0080vco->tilemap_draw(bitmap, cliprect, 1, 0, 0);
+		m_tc0080vco->tilemap_draw(screen, bitmap, cliprect, 1, 0, 0);
 	if (!machine().input().code_pressed(KEYCODE_F))
 		recordbr_draw_sprites(bitmap, cliprect, 1);
 #else
-	m_tc0080vco->tilemap_draw(bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0);
+	m_tc0080vco->tilemap_draw(screen, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0);
 	recordbr_draw_sprites(bitmap, cliprect, 0);
-	m_tc0080vco->tilemap_draw(bitmap, cliprect, 1, 0, 0);
+	m_tc0080vco->tilemap_draw(screen, bitmap, cliprect, 1, 0, 0);
 	recordbr_draw_sprites(bitmap, cliprect, 1);
 #endif
 
-	m_tc0080vco->tilemap_draw(bitmap, cliprect, 2, 0, 0);
+	m_tc0080vco->tilemap_draw(screen, bitmap, cliprect, 2, 0, 0);
 	return 0;
 }
 
@@ -446,20 +446,20 @@ UINT32 taitoh_state::screen_update_dleague(screen_device &screen, bitmap_ind16 &
 
 #ifdef MAME_DEBUG
 	if (!machine().input().code_pressed(KEYCODE_A))
-		m_tc0080vco->tilemap_draw(bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0);
+		m_tc0080vco->tilemap_draw(screen, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0);
 	if (!machine().input().code_pressed(KEYCODE_S))
 		dleague_draw_sprites(bitmap, cliprect, 0);
 	if (!machine().input().code_pressed(KEYCODE_D))
-		m_tc0080vco->tilemap_draw(bitmap, cliprect, 1, 0, 0);
+		m_tc0080vco->tilemap_draw(screen, bitmap, cliprect, 1, 0, 0);
 	if (!machine().input().code_pressed(KEYCODE_F))
 		dleague_draw_sprites(bitmap, cliprect, 1);
 #else
-	m_tc0080vco->tilemap_draw(bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0);
+	m_tc0080vco->tilemap_draw(screen, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0);
 	dleague_draw_sprites (bitmap, cliprect, 0);
-	m_tc0080vco->tilemap_draw(bitmap, cliprect, 1, 0, 0);
+	m_tc0080vco->tilemap_draw(screen, bitmap, cliprect, 1, 0, 0);
 	dleague_draw_sprites (bitmap, cliprect, 1);
 #endif
 
-	m_tc0080vco->tilemap_draw(bitmap, cliprect, 2, 0, 0);
+	m_tc0080vco->tilemap_draw(screen, bitmap, cliprect, 2, 0, 0);
 	return 0;
 }

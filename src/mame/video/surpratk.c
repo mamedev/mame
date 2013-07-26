@@ -67,12 +67,12 @@ UINT32 surpratk_state::screen_update_surpratk(screen_device &screen, bitmap_ind1
 
 	konami_sortlayers3(layer, m_layerpri);
 
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 	bitmap.fill(16 * bg_colorbase, cliprect);
-	m_k052109->tilemap_draw(bitmap, cliprect, layer[0], 0, 1);
-	m_k052109->tilemap_draw(bitmap, cliprect, layer[1], 0, 2);
-	m_k052109->tilemap_draw(bitmap, cliprect, layer[2], 0, 4);
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, layer[0], 0, 1);
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, layer[1], 0, 2);
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, layer[2], 0, 4);
 
-	m_k053244->k053245_sprites_draw(bitmap, cliprect);
+	m_k053244->k053245_sprites_draw(bitmap, cliprect, screen.priority());
 	return 0;
 }

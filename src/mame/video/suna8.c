@@ -486,7 +486,7 @@ UINT32 suna8_state::screen_update_suna8(screen_device &screen, bitmap_ind16 &bit
 
 		m_bg_tilemap->set_scrollx(0, 0x100 * m_page);
 		m_bg_tilemap->set_scrolly(0, 0);
-		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 #if 1
 	popmessage("%02X %02X %02X - p%2X g%02X r%02X",
 						m_rombank, m_palettebank, m_spritebank,

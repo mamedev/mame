@@ -205,9 +205,9 @@ UINT32 cop01_state::screen_update_cop01(screen_device &screen, bitmap_ind16 &bit
 	m_bg_tilemap->set_scrollx(0, m_vreg[1] + 256 * (m_vreg[2] & 1));
 	m_bg_tilemap->set_scrolly(0, m_vreg[3]);
 
-	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
 	draw_sprites(bitmap, cliprect);
-	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
-	m_fg_tilemap->draw(bitmap, cliprect, 0, 0 );
+	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0 );
 	return 0;
 }

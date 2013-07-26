@@ -194,13 +194,13 @@ UINT32 portrait_state::screen_update_portrait(screen_device &screen, bitmap_ind1
 
 	m_background->set_scrolly(0, 0);
 	m_foreground->set_scrolly(0, 0);
-	m_background->draw(bitmap, cliprect_no_scroll, 0, 0);
-	m_foreground->draw(bitmap, cliprect_no_scroll, 0, 0);
+	m_background->draw(screen, bitmap, cliprect_no_scroll, 0, 0);
+	m_foreground->draw(screen, bitmap, cliprect_no_scroll, 0, 0);
 
 	m_background->set_scrolly(0, m_scroll);
 	m_foreground->set_scrolly(0, m_scroll);
-	m_background->draw(bitmap, cliprect_scroll, 0, 0);
-	m_foreground->draw(bitmap, cliprect_scroll, 0, 0);
+	m_background->draw(screen, bitmap, cliprect_scroll, 0, 0);
+	m_foreground->draw(screen, bitmap, cliprect_scroll, 0, 0);
 
 	draw_sprites(bitmap,cliprect);
 	return 0;

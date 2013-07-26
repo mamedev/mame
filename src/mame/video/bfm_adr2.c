@@ -233,8 +233,8 @@ UINT32 bfm_adder2_device::update_screen(screen_device &screen, bitmap_ind16 &bit
 
 	const rectangle visible1(0, 400-1,  0,  280-1);  //minx,maxx, miny,maxy
 
-	if (m_adder2_screen_page_reg & SL_DISPLAY) m_tilemap1->draw(bitmap, visible1, 0, 0);
-	else                                     m_tilemap0->draw(bitmap, visible1, 0, 0);
+	if (m_adder2_screen_page_reg & SL_DISPLAY) m_tilemap1->draw(screen, bitmap, visible1, 0, 0);
+	else                                     m_tilemap0->draw(screen, bitmap, visible1, 0, 0);
 
 	return 0;
 }

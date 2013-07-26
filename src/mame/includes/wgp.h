@@ -92,8 +92,8 @@ public:
 	void wgp_postload();
 	inline void common_get_piv_tile_info( tile_data &tileinfo, int tile_index, int num );
 	void wgp_core_vh_start( int piv_xoffs, int piv_yoffs );
-	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs );
-	void wgp_piv_layer_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority );
+	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs );
+	void wgp_piv_layer_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority );
 	void parse_control();
 	void reset_sound_region(  )  /* assumes Z80 sandwiched between the 68Ks */;
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);

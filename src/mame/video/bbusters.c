@@ -270,12 +270,12 @@ UINT32 bbusters_state::screen_update_bbuster(screen_device &screen, bitmap_ind16
 	m_pf2_tilemap->set_scrollx(0, m_pf2_scroll_data[0]);
 	m_pf2_tilemap->set_scrolly(0, m_pf2_scroll_data[1]);
 
-	m_pf2_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_pf2_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	//draw_sprites(machine(), bitmap, m_spriteram2->buffer(), 2, 0x8, 0x8);
-	m_pf1_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_pf1_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, m_spriteram2->buffer(), 2, 0, 0);
 	draw_sprites(bitmap, m_spriteram->buffer(), 1, 0, 0);
-	m_fix_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fix_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -286,9 +286,9 @@ UINT32 bbusters_state::screen_update_mechatt(screen_device &screen, bitmap_ind16
 	m_pf2_tilemap->set_scrollx(0, m_pf2_scroll_data[0]);
 	m_pf2_tilemap->set_scrolly(0, m_pf2_scroll_data[1]);
 
-	m_pf2_tilemap->draw(bitmap, cliprect, 0, 0);
-	m_pf1_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_pf2_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_pf1_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, m_spriteram->buffer(), 1, 0, 0);
-	m_fix_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fix_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }

@@ -492,7 +492,7 @@ void cps_state::fcrash_update_transmasks()
 	}
 }
 
-void cps_state::fcrash_render_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
+void cps_state::fcrash_render_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	int pos;
 	int base = m_sprite_base / 2;
@@ -523,27 +523,27 @@ void cps_state::fcrash_render_sprites( bitmap_ind16 &bitmap, const rectangle &cl
 			ypos   = 256 - ypos - 16;
 			xpos   = xpos + m_sprite_x_offset + 49;
 
-			pdrawgfx_transpen(bitmap, cliprect, machine().gfx[2], tileno, colour, flipx, flipy, xpos, ypos, machine().priority_bitmap, 0x02, 15);
+			pdrawgfx_transpen(bitmap, cliprect, machine().gfx[2], tileno, colour, flipx, flipy, xpos, ypos, screen.priority(), 0x02, 15);
 		}
 	}
 }
 
-void cps_state::fcrash_render_layer( bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int primask )
+void cps_state::fcrash_render_layer( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int primask )
 {
 	switch (layer)
 	{
 		case 0:
-			fcrash_render_sprites(bitmap, cliprect);
+			fcrash_render_sprites(screen, bitmap, cliprect);
 			break;
 		case 1:
 		case 2:
 		case 3:
-			m_bg_tilemap[layer - 1]->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, primask);
+			m_bg_tilemap[layer - 1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1, primask);
 			break;
 	}
 }
 
-void cps_state::fcrash_render_high_layer( bitmap_ind16 &bitmap, const rectangle &cliprect, int layer )
+void cps_state::fcrash_render_high_layer( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer )
 {
 	bitmap_ind16 dummy_bitmap;
 
@@ -555,7 +555,7 @@ void cps_state::fcrash_render_high_layer( bitmap_ind16 &bitmap, const rectangle 
 		case 1:
 		case 2:
 		case 3:
-			m_bg_tilemap[layer - 1]->draw(dummy_bitmap, cliprect, TILEMAP_DRAW_LAYER0, 1);
+			m_bg_tilemap[layer - 1]->draw(screen, dummy_bitmap, cliprect, TILEMAP_DRAW_LAYER0, 1);
 			break;
 	}
 }
@@ -637,28 +637,28 @@ UINT32 cps_state::screen_update_fcrash(screen_device &screen, bitmap_ind16 &bitm
 	/* Blank screen */
 	bitmap.fill(0xbff, cliprect);
 
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 	l0 = (layercontrol >> 0x06) & 03;
 	l1 = (layercontrol >> 0x08) & 03;
 	l2 = (layercontrol >> 0x0a) & 03;
 	l3 = (layercontrol >> 0x0c) & 03;
 
-	fcrash_render_layer(bitmap, cliprect, l0, 0);
+	fcrash_render_layer(screen, bitmap, cliprect, l0, 0);
 
 	if (l1 == 0)
-		fcrash_render_high_layer(bitmap, cliprect, l0);
+		fcrash_render_high_layer(screen, bitmap, cliprect, l0);
 
-	fcrash_render_layer(bitmap, cliprect, l1, 0);
+	fcrash_render_layer(screen, bitmap, cliprect, l1, 0);
 
 	if (l2 == 0)
-		fcrash_render_high_layer(bitmap, cliprect, l1);
+		fcrash_render_high_layer(screen, bitmap, cliprect, l1);
 
-	fcrash_render_layer(bitmap, cliprect, l2, 0);
+	fcrash_render_layer(screen, bitmap, cliprect, l2, 0);
 
 	if (l3 == 0)
-		fcrash_render_high_layer(bitmap, cliprect, l2);
+		fcrash_render_high_layer(screen, bitmap, cliprect, l2);
 
-	fcrash_render_layer(bitmap, cliprect, l3, 0);
+	fcrash_render_layer(screen, bitmap, cliprect, l3, 0);
 
 	return 0;
 }

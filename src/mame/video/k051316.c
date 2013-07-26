@@ -272,7 +272,7 @@ void k051316_device::get_tile_info( tile_data &tileinfo, int tile_index )
 TILE_GET_INFO_MEMBER(k051316_device::get_tile_info0) { get_tile_info(tileinfo, tile_index); }
 
 
-void k051316_device::zoom_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, UINT32 priority )
+void k051316_device::zoom_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, UINT32 priority )
 {
 	UINT32 startx, starty;
 	int incxx, incxy, incyx, incyy;
@@ -290,7 +290,7 @@ void k051316_device::zoom_draw( bitmap_ind16 &bitmap, const rectangle &cliprect,
 	startx -= (89 + m_xoffs) * incxx;
 	starty -= (89 + m_xoffs) * incxy;
 
-	m_tmap->draw_roz(bitmap, cliprect, startx << 5,starty << 5,
+	m_tmap->draw_roz(screen, bitmap, cliprect, startx << 5,starty << 5,
 			incxx << 5,incxy << 5,incyx << 5,incyy << 5,
 			m_wrap,
 			flags,priority);

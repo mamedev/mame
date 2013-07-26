@@ -205,7 +205,7 @@ void segas18_state::device_timer(emu_timer &timer, device_timer_id id, int param
 
 void segas18_state::machine_reset()
 {
-	m_segaic16vid->segaic16_tilemap_reset(machine(), 0);
+	m_segaic16vid->segaic16_tilemap_reset(*m_screen);
 
 	m_vdp->device_reset_old();
 
@@ -319,7 +319,7 @@ WRITE16_MEMBER( segas18_state::io_chip_w )
 
 		// CNT register
 		case 0x1c/2:
-			m_segaic16vid->segaic16_set_display_enable(machine(), data & 2);
+			m_segaic16vid->segaic16_set_display_enable(*m_screen, data & 2);
 			if ((old ^ data) & 4)
 				set_vdp_enable(data & 4);
 			break;

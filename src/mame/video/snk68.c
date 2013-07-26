@@ -275,6 +275,6 @@ UINT32 snk68_state::screen_update_pow(screen_device &screen, bitmap_ind16 &bitma
 	draw_sprites(bitmap, cliprect, 3);
 	draw_sprites(bitmap, cliprect, 1);
 
-	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }

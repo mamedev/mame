@@ -197,14 +197,14 @@ WRITE8_MEMBER(hcastle_state::hcastle_pf2_control_w)
 
 /*****************************************************************************/
 
-void hcastle_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 *sbank, int bank )
+void hcastle_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, UINT8 *sbank, int bank )
 {
 	k007121_device *k007121 = bank ? m_k007121_2 : m_k007121_1;
 	address_space &space = machine().driver_data()->generic_space();
 	int base_color = (k007121->ctrlram_r(space, 6) & 0x30) * 2;
 	int bank_base = (bank == 0) ? 0x4000 * (m_gfx_bank & 1) : 0;
 
-	k007121->sprites_draw(bitmap, cliprect, machine().gfx[bank], machine().colortable, sbank, base_color, 0, bank_base, (UINT32)-1);
+	k007121->sprites_draw(bitmap, cliprect, machine().gfx[bank], machine().colortable, sbank, base_color, 0, bank_base, priority_bitmap, (UINT32)-1);
 }
 
 /*****************************************************************************/
@@ -250,17 +250,17 @@ UINT32 hcastle_state::screen_update_hcastle(screen_device &screen, bitmap_ind16 
 //  if (ctrl_1_3 & 0x20)
 	if ((m_gfx_bank & 0x04) == 0)
 	{
-		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-		draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0);
-		draw_sprites(bitmap, cliprect, m_spriteram2->buffer(), 1);
-		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+		draw_sprites(bitmap, cliprect, screen.priority(), m_spriteram->buffer(), 0);
+		draw_sprites(bitmap, cliprect, screen.priority(), m_spriteram2->buffer(), 1);
+		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	}
 	else
 	{
-		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
-		draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0);
-		draw_sprites(bitmap, cliprect, m_spriteram2->buffer(), 1);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+		draw_sprites(bitmap, cliprect, screen.priority(), m_spriteram->buffer(), 0);
+		draw_sprites(bitmap, cliprect, screen.priority(), m_spriteram2->buffer(), 1);
 	}
 	return 0;
 }

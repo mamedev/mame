@@ -242,9 +242,9 @@ void k007342_device::tilemap_update( )
 #endif
 }
 
-void k007342_device::tilemap_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, int num, int flags, UINT32 priority )
+void k007342_device::tilemap_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int num, int flags, UINT32 priority )
 {
-	m_tilemap[num]->draw(bitmap, cliprect, flags, priority);
+	m_tilemap[num]->draw(screen, bitmap, cliprect, flags, priority);
 }
 
 int k007342_device::is_int_enabled( )

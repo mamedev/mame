@@ -125,11 +125,11 @@ VIDEO_START_MEMBER(docastle_state,dorunrun)
 	video_start_common(0xff00);
 }
 
-void docastle_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
+void docastle_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	int offs;
 
-	machine().priority_bitmap.fill(1);
+	screen.priority().fill(1);
 
 	for (offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
@@ -202,7 +202,7 @@ void docastle_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 				color,
 				flipx,flipy,
 				sx,sy,
-				machine().priority_bitmap,
+				screen.priority(),
 				0x00,0x80ff);
 
 		/* then draw the mask, behind the background but obscuring following sprites */
@@ -211,15 +211,15 @@ void docastle_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 				color,
 				flipx,flipy,
 				sx,sy,
-				machine().priority_bitmap,
+				screen.priority(),
 				0x02,0x7fff);
 	}
 }
 
 UINT32 docastle_state::screen_update_docastle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_do_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	draw_sprites(bitmap, cliprect);
-	m_do_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
+	m_do_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	draw_sprites(screen, bitmap, cliprect);
+	m_do_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
 	return 0;
 }

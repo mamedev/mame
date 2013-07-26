@@ -495,7 +495,7 @@ UINT32 laserbat_state::screen_update_laserbat(screen_device &screen, bitmap_ind1
 {
 	int y;
 
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* update the S2636 chips */
 	bitmap_ind16 &s2636_1_bitmap = s2636_update(m_s2636_1, cliprect);

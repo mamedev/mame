@@ -126,7 +126,7 @@ UINT32 pzletime_state::screen_update_pzletime(screen_device &screen, bitmap_ind1
 		}
 	}
 
-	m_mid_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_mid_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	{
 		UINT16 *spriteram = m_spriteram;
@@ -148,9 +148,9 @@ UINT32 pzletime_state::screen_update_pzletime(screen_device &screen, bitmap_ind1
 		}
 	}
 
-	m_txt_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_txt_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	if ((screen.frame_number() % 16) != 0)
-		m_txt_tilemap->draw(bitmap, cliprect, 1, 0);
+		m_txt_tilemap->draw(screen, bitmap, cliprect, 1, 0);
 
 	return 0;
 }

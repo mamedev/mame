@@ -271,16 +271,16 @@ if (machine().input().code_pressed(KEYCODE_Z))
 
 
 	if (layers_ctrl1 & 1)
-		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	else
 		bitmap.fill(0, cliprect);
 
 	if (layers_ctrl1 & 2)
-		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	if (layers_ctrl1 & 8)
 		draw_sprites(bitmap, cliprect);
 	if (layers_ctrl1 & 4)
-		m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }

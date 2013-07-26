@@ -38,7 +38,7 @@ UINT32 videopin_state::screen_update_videopin(screen_device &screen, bitmap_ind1
 
 	m_bg_tilemap->set_scrollx(0, -8);   /* account for delayed loading of shift reg C6 */
 
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	for (row = 0; row < 32; row++)
 	{

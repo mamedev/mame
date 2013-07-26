@@ -149,7 +149,7 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void rabbit_clearspritebitmap( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_sprite_bitmap( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void rabbit_drawtilemap( bitmap_ind16 &bitmap, const rectangle &cliprect, int whichtilemap );
+	void rabbit_drawtilemap( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int whichtilemap );
 	void rabbit_do_blit();
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_device> m_eeprom;
@@ -450,7 +450,7 @@ each line represents the differences on each tilemap for unknown variables
 
 */
 
-void rabbit_state::rabbit_drawtilemap( bitmap_ind16 &bitmap, const rectangle &cliprect, int whichtilemap )
+void rabbit_state::rabbit_drawtilemap( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int whichtilemap )
 {
 	INT32 startx, starty, incxx, incxy, incyx, incyy, tran;
 
@@ -467,7 +467,7 @@ void rabbit_state::rabbit_drawtilemap( bitmap_ind16 &bitmap, const rectangle &cl
 	   startx/starty are also 16.16 scrolling
 	  */
 
-	m_tilemap[whichtilemap]->draw_roz(bitmap, cliprect, startx << 12,starty << 12,
+	m_tilemap[whichtilemap]->draw_roz(screen, bitmap, cliprect, startx << 12,starty << 12,
 			incxx << 5,incxy << 8,incyx << 8,incyy << 5,
 			1,  /* wraparound */
 			tran ? 0 : TILEMAP_DRAW_OPAQUE,0);
@@ -495,10 +495,10 @@ UINT32 rabbit_state::screen_update_rabbit(screen_device &screen, bitmap_ind16 &b
 	/* prio isnt certain but seems to work.. */
 	for (prilevel = 0xf; prilevel >0; prilevel--)
 	{
-		if (prilevel == ((m_tilemap_regs[3][0]&0x0f000000)>>24)) rabbit_drawtilemap(bitmap,cliprect, 3);
-		if (prilevel == ((m_tilemap_regs[2][0]&0x0f000000)>>24)) rabbit_drawtilemap(bitmap,cliprect, 2);
-		if (prilevel == ((m_tilemap_regs[1][0]&0x0f000000)>>24)) rabbit_drawtilemap(bitmap,cliprect, 1);
-		if (prilevel == ((m_tilemap_regs[0][0]&0x0f000000)>>24)) rabbit_drawtilemap(bitmap,cliprect, 0);
+		if (prilevel == ((m_tilemap_regs[3][0]&0x0f000000)>>24)) rabbit_drawtilemap(screen,bitmap,cliprect, 3);
+		if (prilevel == ((m_tilemap_regs[2][0]&0x0f000000)>>24)) rabbit_drawtilemap(screen,bitmap,cliprect, 2);
+		if (prilevel == ((m_tilemap_regs[1][0]&0x0f000000)>>24)) rabbit_drawtilemap(screen,bitmap,cliprect, 1);
+		if (prilevel == ((m_tilemap_regs[0][0]&0x0f000000)>>24)) rabbit_drawtilemap(screen,bitmap,cliprect, 0);
 
 		if (prilevel == 0x09) // should it be selectable?
 		{

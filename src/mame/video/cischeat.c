@@ -98,7 +98,7 @@ Note:   if MAME_DEBUG is defined, pressing Z or X with:
 #define cischeat_tmap_DRAW(_n_) \
 	if ( (m_tmap[_n_]) && (m_active_layers & (1 << _n_) ) ) \
 	{ \
-		m_tmap[_n_]->draw(bitmap, cliprect, flag, 0 ); \
+		m_tmap[_n_]->draw(screen, bitmap, cliprect, flag, 0 ); \
 		flag = 0; \
 	}
 

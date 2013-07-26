@@ -110,8 +110,8 @@ public:
 	DECLARE_WRITE8_MEMBER(zwackery_pia1_w);
 	DECLARE_WRITE_LINE_MEMBER(zwackery_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(zwackery_pia_irq);
-	void mcr68_update_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
-	void zwackery_update_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
+	void mcr68_update_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
+	void zwackery_update_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
 	void mcr68_common_init();
 	void update_mcr68_interrupts();
 	inline void update_interrupts();

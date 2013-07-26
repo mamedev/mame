@@ -68,7 +68,7 @@ UINT32 segas16a_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	m_sprites->draw_async(cliprect);
 
 	// reset priorities
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 
 	// draw background opaquely first, not setting any priorities
 	m_segaic16vid->segaic16_tilemap_draw(screen, bitmap, cliprect, 0, SEGAIC16_TILEMAP_BACKGROUND, 0 | TILEMAP_DRAW_OPAQUE, 0x00);
@@ -94,7 +94,7 @@ UINT32 segas16a_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 		{
 			UINT16 *dest = &bitmap.pix(y);
 			UINT16 *src = &sprites.pix(y);
-			UINT8 *pri = &machine().priority_bitmap.pix(y);
+			UINT8 *pri = &screen.priority().pix(y);
 			for (int x = rect->min_x; x <= rect->max_x; x++)
 			{
 				// only process written pixels

@@ -204,15 +204,15 @@ UINT32 ashnojoe_state::screen_update_ashnojoe(screen_device &screen, bitmap_ind1
 	flip_screen_set(m_tilemap_reg[0] & 1);
 
 	if(m_tilemap_reg[0] & 0x02)
-		m_joetilemap7->draw(bitmap, cliprect, 0, 0);
+		m_joetilemap7->draw(screen, bitmap, cliprect, 0, 0);
 	else
-		m_joetilemap6->draw(bitmap, cliprect, 0, 0);
+		m_joetilemap6->draw(screen, bitmap, cliprect, 0, 0);
 
-	m_joetilemap4->draw(bitmap, cliprect, 0, 0);
-	m_joetilemap2->draw(bitmap, cliprect, 0, 0);
-	m_joetilemap5->draw(bitmap, cliprect, 0, 0);
-	m_joetilemap3->draw(bitmap, cliprect, 0, 0);
-	m_joetilemap->draw(bitmap, cliprect, 0, 0);
+	m_joetilemap4->draw(screen, bitmap, cliprect, 0, 0);
+	m_joetilemap2->draw(screen, bitmap, cliprect, 0, 0);
+	m_joetilemap5->draw(screen, bitmap, cliprect, 0, 0);
+	m_joetilemap3->draw(screen, bitmap, cliprect, 0, 0);
+	m_joetilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }

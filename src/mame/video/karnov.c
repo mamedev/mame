@@ -127,7 +127,7 @@ UINT32 karnov_state::screen_update_karnov(screen_device &screen, bitmap_ind16 &b
 {
 	draw_background(bitmap, cliprect);
 	machine().device<deco_karnovsprites_device>("spritegen")->draw_sprites(machine(), bitmap, cliprect, m_spriteram->buffer(), 0x800, 0);
-	m_fix_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fix_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 

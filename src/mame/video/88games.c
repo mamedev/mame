@@ -59,21 +59,21 @@ UINT32 _88games_state::screen_update_88games(screen_device &screen, bitmap_ind16
 
 	if (m_k88games_priority)
 	{
-		m_k052109->tilemap_draw(bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0);   // tile 0
-		m_k051960->k051960_sprites_draw(bitmap,cliprect, 1, 1);
-		m_k052109->tilemap_draw(bitmap, cliprect, 2, 0, 0); // tile 2
-		m_k052109->tilemap_draw(bitmap, cliprect, 1, 0, 0); // tile 1
-		m_k051960->k051960_sprites_draw(bitmap, cliprect, 0, 0);
-		m_k051316->zoom_draw(bitmap, cliprect, 0, 0);
+		m_k052109->tilemap_draw(screen, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0);   // tile 0
+		m_k051960->k051960_sprites_draw(bitmap, cliprect, screen.priority(), 1, 1);
+		m_k052109->tilemap_draw(screen, bitmap, cliprect, 2, 0, 0); // tile 2
+		m_k052109->tilemap_draw(screen, bitmap, cliprect, 1, 0, 0); // tile 1
+		m_k051960->k051960_sprites_draw(bitmap, cliprect, screen.priority(), 0, 0);
+		m_k051316->zoom_draw(screen, bitmap, cliprect, 0, 0);
 	}
 	else
 	{
-		m_k052109->tilemap_draw(bitmap, cliprect, 2, TILEMAP_DRAW_OPAQUE, 0);   // tile 2
-		m_k051316->zoom_draw(bitmap, cliprect, 0, 0);
-		m_k051960->k051960_sprites_draw(bitmap, cliprect, 0, 0);
-		m_k052109->tilemap_draw(bitmap, cliprect, 1, 0, 0); // tile 1
-		m_k051960->k051960_sprites_draw(bitmap, cliprect, 1, 1);
-		m_k052109->tilemap_draw(bitmap, cliprect, 0, 0, 0); // tile 0
+		m_k052109->tilemap_draw(screen, bitmap, cliprect, 2, TILEMAP_DRAW_OPAQUE, 0);   // tile 2
+		m_k051316->zoom_draw(screen, bitmap, cliprect, 0, 0);
+		m_k051960->k051960_sprites_draw(bitmap, cliprect, screen.priority(), 0, 0);
+		m_k052109->tilemap_draw(screen, bitmap, cliprect, 1, 0, 0); // tile 1
+		m_k051960->k051960_sprites_draw(bitmap, cliprect, screen.priority(), 1, 1);
+		m_k052109->tilemap_draw(screen, bitmap, cliprect, 0, 0, 0); // tile 0
 	}
 
 	return 0;

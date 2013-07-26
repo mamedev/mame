@@ -391,8 +391,8 @@ UINT32 popobear_state::screen_update_popobear(screen_device &screen, bitmap_ind1
 	m_bg_tilemap[3]->set_scrollx(0, vreg[0x09]);
 	m_bg_tilemap[3]->set_scrolly(0, vreg[0x0a]);
 
-	if (enable3) m_bg_tilemap[3]->draw(bitmap, cliprect, 0, 0);
-	if (enable2) m_bg_tilemap[2]->draw(bitmap, cliprect, 0, 0);
+	if (enable3) m_bg_tilemap[3]->draw(screen, bitmap, cliprect, 0, 0);
+	if (enable2) m_bg_tilemap[2]->draw(screen, bitmap, cliprect, 0, 0);
 
 	// the upper 2 tilemaps have a lineselect / linescroll logic
 
@@ -411,14 +411,14 @@ UINT32 popobear_state::screen_update_popobear(screen_device &screen, bitmap_ind1
 			m_bg_tilemap[1]->set_scrollx(0,(val&0x00ff) | (upper << 8));
 			m_bg_tilemap[1]->set_scrolly(0,((val&0xff00)>>8)-line);
 
-			m_bg_tilemap[1]->draw(bitmap, clip, 0, 0);
+			m_bg_tilemap[1]->draw(screen, bitmap, clip, 0, 0);
 		}
 	}
 	else if (enable1 != 0x00)
 	{
 		m_bg_tilemap[1]->set_scrollx(0, 0);
 		m_bg_tilemap[1]->set_scrolly(0, 0);
-		m_bg_tilemap[1]->draw(bitmap, cliprect, 0, 0);
+		m_bg_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
 	}
 
 	if (enable0 == 0x1f)
@@ -436,14 +436,14 @@ UINT32 popobear_state::screen_update_popobear(screen_device &screen, bitmap_ind1
 			m_bg_tilemap[0]->set_scrollx(0,(val&0x00ff) | (upper << 8));
 			m_bg_tilemap[0]->set_scrolly(0,((val&0xff00)>>8)-line);
 
-			m_bg_tilemap[0]->draw(bitmap, clip, 0, 0);
+			m_bg_tilemap[0]->draw(screen, bitmap, clip, 0, 0);
 		}
 	}
 	else if (enable0 != 0x00)
 	{
 		m_bg_tilemap[0]->set_scrollx(0, 0);
 		m_bg_tilemap[0]->set_scrolly(0, 0);
-		m_bg_tilemap[0]->draw(bitmap, cliprect, 0, 0);
+		m_bg_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
 	}
 
 	draw_sprites(bitmap,cliprect);

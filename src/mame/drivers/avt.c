@@ -526,7 +526,7 @@ UINT32 avt_state::screen_update_avt(screen_device &screen, bitmap_ind16 &bitmap,
 			count++;
 		}
 	}
-	//m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	//m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 

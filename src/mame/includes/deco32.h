@@ -144,7 +144,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt_gen);
 	TIMER_DEVICE_CALLBACK_MEMBER(lockload_vbl_irq);
 	void updateAceRam();
-	void mixDualAlphaSprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx0, gfx_element *gfx1, int mixAlphaTilemap);
+	void mixDualAlphaSprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx0, gfx_element *gfx1, int mixAlphaTilemap);
 
 	UINT16 port_a_fghthist(int unused);
 	UINT16 port_b_fghthist(int unused);

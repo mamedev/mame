@@ -112,7 +112,7 @@ void dcon_state::video_start()
 	m_gfx_bank_select = 0;
 }
 
-void dcon_state::draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect)
+void dcon_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	UINT16 *spriteram16 = m_spriteram;
 	int offs,fx,fy,x,y,color,sprite;
@@ -160,76 +160,76 @@ void dcon_state::draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect)
 					pdrawgfx_transpen(bitmap,cliprect,machine().gfx[4],
 						sprite + inc,
 						color,fx,fy,x+ax*16,y+ay*16,
-						machine().priority_bitmap,pri_mask,15);
+						screen.priority(),pri_mask,15);
 
 					// wrap around y
 					pdrawgfx_transpen(bitmap,cliprect,machine().gfx[4],
 						sprite + inc,
 						color,fx,fy,x+ax*16,y+ay*16 + 512,
-						machine().priority_bitmap,pri_mask,15);
+						screen.priority(),pri_mask,15);
 
 					// wrap around y
 					pdrawgfx_transpen(bitmap,cliprect,machine().gfx[4],
 						sprite + inc,
 						color,fx,fy,x+ax*16,y+ay*16 - 512,
-						machine().priority_bitmap,pri_mask,15);
+						screen.priority(),pri_mask,15);
 				}
 				else if (fx && !fy)
 				{
 					pdrawgfx_transpen(bitmap,cliprect,machine().gfx[4],
 						sprite + inc,
 						color,fx,fy,x+(dx-1-ax)*16,y+ay*16,
-						machine().priority_bitmap,pri_mask,15);
+						screen.priority(),pri_mask,15);
 
 					// wrap around y
 					pdrawgfx_transpen(bitmap,cliprect,machine().gfx[4],
 						sprite + inc,
 						color,fx,fy,x+(dx-1-ax)*16,y+ay*16 + 512,
-						machine().priority_bitmap,pri_mask,15);
+						screen.priority(),pri_mask,15);
 
 					// wrap around y
 					pdrawgfx_transpen(bitmap,cliprect,machine().gfx[4],
 						sprite + inc,
 						color,fx,fy,x+(dx-1-ax)*16,y+ay*16 - 512,
-						machine().priority_bitmap,pri_mask,15);
+						screen.priority(),pri_mask,15);
 				}
 				else if (!fx && fy)
 				{
 					pdrawgfx_transpen(bitmap,cliprect,machine().gfx[4],
 						sprite + inc,
 						color,fx,fy,x+ax*16,y+(dy-1-ay)*16,
-						machine().priority_bitmap,pri_mask,15);
+						screen.priority(),pri_mask,15);
 
 					// wrap around y
 					pdrawgfx_transpen(bitmap,cliprect,machine().gfx[4],
 						sprite + inc,
 						color,fx,fy,x+ax*16,y+(dy-1-ay)*16 + 512,
-						machine().priority_bitmap,pri_mask,15);
+						screen.priority(),pri_mask,15);
 
 					// wrap around y
 					pdrawgfx_transpen(bitmap,cliprect,machine().gfx[4],
 						sprite + inc,
 						color,fx,fy,x+ax*16,y+(dy-1-ay)*16 - 512,
-						machine().priority_bitmap,pri_mask,15);
+						screen.priority(),pri_mask,15);
 				}
 				else
 				{
 					pdrawgfx_transpen(bitmap,cliprect,machine().gfx[4],
 						sprite + inc,
 						color,fx,fy,x+(dx-1-ax)*16,y+(dy-1-ay)*16,
-						machine().priority_bitmap,pri_mask,15);
+						screen.priority(),pri_mask,15);
 
 					// wrap around y
 					pdrawgfx_transpen(bitmap,cliprect,machine().gfx[4],
 						sprite + inc,
 						color,fx,fy,x+(dx-1-ax)*16,y+(dy-1-ay)*16 + 512,
-						machine().priority_bitmap,pri_mask,15);
+						screen.priority(),pri_mask,15);
 
 					// wrap around y
 					pdrawgfx_transpen(bitmap,cliprect,machine().gfx[4],
 						sprite + inc,
 						color,fx,fy,x+(dx-1-ax)*16,y+(dy-1-ay)*16 - 512,
-						machine().priority_bitmap,pri_mask,15);
+						screen.priority(),pri_mask,15);
 				}
 
 				inc++;
@@ -239,7 +239,7 @@ void dcon_state::draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect)
 
 UINT32 dcon_state::screen_update_dcon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 
 	/* Setup the tilemaps */
 	m_background_layer->set_scrollx(0, m_scroll_ram[0] );
@@ -250,28 +250,28 @@ UINT32 dcon_state::screen_update_dcon(screen_device &screen, bitmap_ind16 &bitma
 	m_foreground_layer->set_scrolly(0, m_scroll_ram[5] );
 
 	if (!(m_layer_en & 1))
-		m_background_layer->draw(bitmap, cliprect, 0,0);
+		m_background_layer->draw(screen, bitmap, cliprect, 0,0);
 	else
 		bitmap.fill(15, cliprect); /* Should always be black, not pen 15 */
 
 	if (!(m_layer_en & 2))
-		m_midground_layer->draw(bitmap, cliprect, 0,1);
+		m_midground_layer->draw(screen, bitmap, cliprect, 0,1);
 
 	if (!(m_layer_en & 4))
-		m_foreground_layer->draw(bitmap, cliprect, 0,2);
+		m_foreground_layer->draw(screen, bitmap, cliprect, 0,2);
 
 	if (!(m_layer_en & 8))
-		m_text_layer->draw(bitmap, cliprect, 0,4);
+		m_text_layer->draw(screen, bitmap, cliprect, 0,4);
 
 	if (!(m_layer_en & 0x10))
-		draw_sprites(bitmap,cliprect);
+		draw_sprites(screen, bitmap,cliprect);
 
 	return 0;
 }
 
 UINT32 dcon_state::screen_update_sdgndmps(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 
 	/* Gfx banking */
 	if (m_last_gfx_bank!=m_gfx_bank_select)
@@ -291,21 +291,21 @@ UINT32 dcon_state::screen_update_sdgndmps(screen_device &screen, bitmap_ind16 &b
 	m_text_layer->set_scrolly(0, /*m_scroll_ram[7] + */ 0 );
 
 	if (!(m_layer_en & 1))
-		m_background_layer->draw(bitmap, cliprect, 0,0);
+		m_background_layer->draw(screen, bitmap, cliprect, 0,0);
 	else
 		bitmap.fill(15, cliprect); /* Should always be black, not pen 15 */
 
 	if (!(m_layer_en & 2))
-		m_midground_layer->draw(bitmap, cliprect, 0,1);
+		m_midground_layer->draw(screen, bitmap, cliprect, 0,1);
 
 	if (!(m_layer_en & 4))
-		m_foreground_layer->draw(bitmap, cliprect, 0,2);
+		m_foreground_layer->draw(screen, bitmap, cliprect, 0,2);
 
 	if (!(m_layer_en & 8))
-		m_text_layer->draw(bitmap, cliprect, 0,4);
+		m_text_layer->draw(screen, bitmap, cliprect, 0,4);
 
 	if (!(m_layer_en & 0x10))
-		draw_sprites(bitmap,cliprect);
+		draw_sprites(screen, bitmap,cliprect);
 
 	return 0;
 }

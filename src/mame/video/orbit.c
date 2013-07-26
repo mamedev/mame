@@ -79,7 +79,7 @@ UINT32 orbit_state::screen_update_orbit(screen_device &screen, bitmap_ind16 &bit
 {
 	m_flip_screen = ioport("DSW2")->read() & 8;
 
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	draw_sprites(bitmap, cliprect);
 	return 0;

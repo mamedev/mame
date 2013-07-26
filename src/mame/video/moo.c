@@ -112,12 +112,12 @@ UINT32 moo_state::screen_update_moo(screen_device &screen, bitmap_rgb32 &bitmap,
 	m_k054338->update_all_shadows(0);
 	m_k054338->fill_backcolor(bitmap, 0);
 
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 
 	if (m_layerpri[0] < m_k053251->get_priority(K053251_CI1))   /* bucky hides back layer behind background */
-		m_k056832->tilemap_draw(bitmap, cliprect, layers[0], 0, 1);
+		m_k056832->tilemap_draw(screen, bitmap, cliprect, layers[0], 0, 1);
 
-	m_k056832->tilemap_draw(bitmap, cliprect, layers[1], 0, 2);
+	m_k056832->tilemap_draw(screen, bitmap, cliprect, layers[1], 0, 2);
 
 	// Enabling alpha improves fog and fading in Moo but causes other things to disappear.
 	// There is probably a control bit somewhere to turn off alpha blending.
@@ -126,10 +126,10 @@ UINT32 moo_state::screen_update_moo(screen_device &screen, bitmap_rgb32 &bitmap,
 	alpha = (m_alpha_enabled) ? m_k054338->set_alpha_level(1) : 255;
 
 	if (alpha > 0)
-		m_k056832->tilemap_draw(bitmap, cliprect, layers[2], TILEMAP_DRAW_ALPHA(alpha), 4);
+		m_k056832->tilemap_draw(screen, bitmap, cliprect, layers[2], TILEMAP_DRAW_ALPHA(alpha), 4);
 
 	m_k053246->k053247_sprites_draw( bitmap, cliprect);
 
-	m_k056832->tilemap_draw(bitmap, cliprect, 0, 0, 0);
+	m_k056832->tilemap_draw(screen, bitmap, cliprect, 0, 0, 0);
 	return 0;
 }

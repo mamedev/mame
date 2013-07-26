@@ -126,8 +126,8 @@ void airbustr_state::video_start()
 
 UINT32 airbustr_state::screen_update_airbustr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	// copy the sprite bitmap to the screen
 	m_pandora->update(bitmap, cliprect);

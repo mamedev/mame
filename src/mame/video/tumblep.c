@@ -27,8 +27,8 @@ UINT32 tumblep_state::screen_update_tumblep(screen_device &screen, bitmap_ind16 
 
 	bitmap.fill(256, cliprect); /* not verified */
 
-	m_deco_tilegen1->tilemap_2_draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	m_deco_tilegen1->tilemap_1_draw(bitmap, cliprect, 0, 0);
+	m_deco_tilegen1->tilemap_2_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	m_deco_tilegen1->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
 
 	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
 	return 0;

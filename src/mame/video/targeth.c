@@ -136,8 +136,8 @@ UINT32 targeth_state::screen_update_targeth(screen_device &screen, bitmap_ind16 
 	m_pant[1]->set_scrolly(0, m_vregs[2]);
 	m_pant[1]->set_scrollx(0, m_vregs[3]);
 
-	m_pant[1]->draw(bitmap, cliprect, 0,0);
-	m_pant[0]->draw(bitmap, cliprect, 0,0);
+	m_pant[1]->draw(screen, bitmap, cliprect, 0,0);
+	m_pant[0]->draw(screen, bitmap, cliprect, 0,0);
 	draw_sprites(bitmap,cliprect);
 
 	return 0;

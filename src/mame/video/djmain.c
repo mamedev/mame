@@ -176,7 +176,7 @@ UINT32 djmain_state::screen_update_djmain(screen_device &screen, bitmap_rgb32 &b
 		else
 		{
 			if (enables & (K55_INP_VRAM_A << layer))
-				m_k056832->tilemap_draw_dj(bitmap, cliprect, layer, 0, 1 << i);
+				m_k056832->tilemap_draw_dj(screen, bitmap, cliprect, layer, 0, 1 << i);
 		}
 	}
 	return 0;

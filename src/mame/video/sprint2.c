@@ -119,7 +119,7 @@ UINT32 sprint2_state::screen_update_sprint2(screen_device &screen, bitmap_ind16 
 	UINT8 *video_ram = m_video_ram;
 	int i;
 
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* draw the sprites */
 
@@ -167,7 +167,7 @@ void sprint2_state::screen_eof_sprint2(screen_device &screen, bool state)
 
 			/* check for sprite-tilemap collisions */
 
-			m_bg_tilemap->draw(m_helper, rect, 0, 0);
+			m_bg_tilemap->draw(screen, m_helper, rect, 0, 0);
 
 			drawgfx_transpen(m_helper, rect, machine().gfx[1],
 				get_sprite_code(video_ram, i),

@@ -17,13 +17,13 @@ public:
 	DECLARE_WRITE16_MEMBER( tc0280grd_word_w );
 	DECLARE_WRITE16_MEMBER( tc0280grd_ctrl_word_w );
 	void tc0280grd_tilemap_update(int base_color);
-	void tc0280grd_zoom_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffset, int yoffset, UINT32 priority);
+	void tc0280grd_zoom_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffset, int yoffset, UINT32 priority);
 
 	DECLARE_READ16_MEMBER( tc0430grw_word_r );
 	DECLARE_WRITE16_MEMBER( tc0430grw_word_w );
 	DECLARE_WRITE16_MEMBER( tc0430grw_ctrl_word_w );
 	void tc0430grw_tilemap_update(int base_color);
-	void tc0430grw_zoom_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffset, int yoffset, UINT32 priority);
+	void tc0430grw_zoom_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffset, int yoffset, UINT32 priority);
 
 protected:
 	// device-level overrides
@@ -41,7 +41,7 @@ private:
 	int            m_base_color;
 
 	TILE_GET_INFO_MEMBER(tc0280grd_get_tile_info);
-	void zoom_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffset, int yoffset, UINT32 priority, int xmultiply );
+	void zoom_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffset, int yoffset, UINT32 priority, int xmultiply );
 };
 
 extern const device_type TC0280GRD;

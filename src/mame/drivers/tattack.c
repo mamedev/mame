@@ -64,7 +64,7 @@ TILE_GET_INFO_MEMBER(tattack_state::get_tile_info)
 UINT32 tattack_state::screen_update_tattack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_tmap->mark_all_dirty();
-	m_tmap->draw(bitmap, cliprect, 0,0);
+	m_tmap->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
 }
 

@@ -330,19 +330,19 @@ UINT32 igs009_state::screen_update_jingbell(screen_device &screen, bitmap_ind16 
 
 			if (rowenable==0)
 			{ // 0 and 1 are the same? or is there a global switchoff?
-				m_gp98_reel1_tilemap->draw(bitmap, clip, 0,0);
+				m_gp98_reel1_tilemap->draw(screen, bitmap, clip, 0,0);
 			}
 			else if (rowenable==1)
 			{
-				m_gp98_reel2_tilemap->draw(bitmap, clip, 0,0);
+				m_gp98_reel2_tilemap->draw(screen, bitmap, clip, 0,0);
 			}
 			else if (rowenable==2)
 			{
-				m_gp98_reel3_tilemap->draw(bitmap, clip, 0,0);
+				m_gp98_reel3_tilemap->draw(screen, bitmap, clip, 0,0);
 			}
 			else if (rowenable==3)
 			{
-				m_gp98_reel4_tilemap->draw(bitmap, clip, 0,0);
+				m_gp98_reel4_tilemap->draw(screen, bitmap, clip, 0,0);
 			}
 
 
@@ -353,7 +353,7 @@ UINT32 igs009_state::screen_update_jingbell(screen_device &screen, bitmap_ind16 
 	else                    bitmap.fill(get_black_pen(machine()), cliprect);
 
 
-	if (layers_ctrl & 2)    m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	if (layers_ctrl & 2)    m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }

@@ -205,7 +205,7 @@ UINT32 cshooter_state::screen_update_cshooter(screen_device &screen, bitmap_ind1
 
 	//draw_sprites(bitmap, cliprect);
 
-	m_txtilemap->draw(bitmap, cliprect, 0,0);
+	m_txtilemap->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
 }
 
@@ -226,7 +226,7 @@ UINT32 cshooter_state::screen_update_airraid(screen_device &screen, bitmap_ind16
 
 	draw_sprites(bitmap, cliprect);
 
-	m_txtilemap->draw(bitmap, cliprect, 0,0);
+	m_txtilemap->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
 }
 

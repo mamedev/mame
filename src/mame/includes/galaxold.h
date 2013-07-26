@@ -68,7 +68,7 @@ public:
 	UINT8 m_background_red;
 	UINT8 m_background_green;
 	UINT8 m_background_blue;
-	void (galaxold_state::*m_draw_background)(bitmap_ind16 &bitmap, const rectangle &cliprect);   /* function to call to draw the background */
+	void (galaxold_state::*m_draw_background)(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);   /* function to call to draw the background */
 	UINT16 m_rockclim_v;
 	UINT16 m_rockclim_h;
 	int m_dambustr_bg_split_line;
@@ -201,7 +201,7 @@ public:
 	void theend_draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect, int offs, int x, int y);
 	void mooncrst_modify_spritecode(UINT8 *spriteram, int *code, int *flipx, int *flipy, int offs);
 	void batman2_modify_charcode(UINT16 *code, UINT8 x);
-	void rockclim_draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void rockclim_draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void rockclim_modify_spritecode(UINT8 *spriteram, int *code, int *flipx, int *flipy, int offs);
 	void harem_modify_spritecode(UINT8 *spriteram, int *code, int *flipx, int *flipy, int offs);
 	void mooncrst_modify_charcode(UINT16 *code, UINT8 x);
@@ -220,14 +220,14 @@ public:
 	void scrambold_draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect, int offs, int x, int y);
 	void darkplnt_draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect, int offs, int x, int y);
 	void dambustr_draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect, int offs, int x, int y);
-	void galaxold_draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void scrambold_draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void ad2083_draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void stratgyx_draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void minefld_draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void rescue_draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void mariner_draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void dambustr_draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void galaxold_draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void scrambold_draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void ad2083_draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void stratgyx_draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void minefld_draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void rescue_draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void mariner_draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void dambustr_draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void dambustr_draw_upper_background(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void galaxold_init_stars(int colors_offset);
 	void plot_star(bitmap_ind16 &bitmap, int x, int y, int color, const rectangle &cliprect);

@@ -219,7 +219,7 @@ void cloak_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 UINT32 cloak_state::screen_update_cloak(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	set_pens();
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_bitmap(bitmap, cliprect);
 	draw_sprites(bitmap, cliprect);
 	return 0;

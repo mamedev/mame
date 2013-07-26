@@ -240,16 +240,16 @@ UINT32 expro02_state::screen_update_galsnew(screen_device &screen, bitmap_ind16 
 
 	int i;
 
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 
 	m_view2_0->kaneko16_prepare(bitmap, cliprect);
 
 	for ( i = 0; i < 8; i++ )
 	{
-		m_view2_0->render_tilemap_chip(bitmap,cliprect,i);
+		m_view2_0->render_tilemap_chip(screen,bitmap,cliprect,i);
 	}
 
-	m_kaneko_spr->kaneko16_render_sprites(machine(),bitmap,cliprect, m_spriteram, m_spriteram.bytes());
+	m_kaneko_spr->kaneko16_render_sprites(machine(),bitmap,cliprect, screen.priority(), m_spriteram, m_spriteram.bytes());
 	return 0;
 }
 

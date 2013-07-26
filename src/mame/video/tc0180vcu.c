@@ -282,12 +282,12 @@ WRITE16_MEMBER( tc0180vcu_device::word_w )
 		m_tilemap[2]->mark_tile_dirty(offset & 0x7ff);
 }
 
-void tc0180vcu_device::tilemap_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, int tmap_num, int plane )
+void tc0180vcu_device::tilemap_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tmap_num, int plane )
 {
 	assert(tmap_num < 3);
 
 	if (tmap_num == 2)
-		m_tilemap[2]->draw(bitmap, cliprect, 0, 0);    /* not much to do for tx_tilemap */
+		m_tilemap[2]->draw(screen, bitmap, cliprect, 0, 0);    /* not much to do for tx_tilemap */
 	else
 	{
 		/*plane = 0 fg tilemap*/
@@ -324,7 +324,7 @@ void tc0180vcu_device::tilemap_draw( bitmap_ind16 &bitmap, const rectangle &clip
 			{
 				m_tilemap[tmap_num]->set_scrollx(0, -scrollx);
 				m_tilemap[tmap_num]->set_scrolly(0, -scrolly);
-				m_tilemap[tmap_num]->draw(bitmap, my_clip, 0, 0);
+				m_tilemap[tmap_num]->draw(screen, bitmap, my_clip, 0, 0);
 			}
 		}
 	}

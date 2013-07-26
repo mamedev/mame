@@ -479,7 +479,7 @@ WRITE16_MEMBER( segaxbd_state::iochip_0_w )
 			if (((oldval ^ data) & 0x40) && !(data & 0x40))
 				machine().watchdog_reset();
 
-			m_segaic16vid->segaic16_set_display_enable(machine(), data & 0x20);
+			m_segaic16vid->segaic16_set_display_enable(*m_screen, data & 0x20);
 
 			m_soundcpu->set_input_line(INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 			if (m_soundcpu2 != NULL)
@@ -670,7 +670,7 @@ READ8_MEMBER( segaxbd_state::sound_data_r )
 
 void segaxbd_state::machine_reset()
 {
-	m_segaic16vid->segaic16_tilemap_reset(machine(), 0);
+	m_segaic16vid->segaic16_tilemap_reset(*m_screen);
 
 	// hook the RESET line, which resets CPU #1
 	m68k_set_reset_callback(m_maincpu, &segaxbd_state::m68k_reset_callback);

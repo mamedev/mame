@@ -219,4 +219,5 @@ public:
 
 private:
 	inline void get_tile_info( tile_data &tileinfo, int tile_index, int GFX );
+	inline void tilemap_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32 flags, UINT32 priority, UINT32 priority2, int GFX );
 };

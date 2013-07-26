@@ -266,7 +266,7 @@ UINT32 cyberbal_state::update_one_screen(screen_device &screen, bitmap_ind16 &bi
 
 	/* draw the playfield */
 	tilemap_t &curplayfield = index ? static_cast<tilemap_t &>(m_playfield2_tilemap) : static_cast<tilemap_t &>(m_playfield_tilemap);
-	curplayfield.draw(bitmap, cliprect, 0, 0);
+	curplayfield.draw(screen, bitmap, cliprect, 0, 0);
 
 	/* draw and merge the MO */
 	bitmap_ind16 &mobitmap = curmob->bitmap();
@@ -287,7 +287,7 @@ UINT32 cyberbal_state::update_one_screen(screen_device &screen, bitmap_ind16 &bi
 
 	/* add the alpha on top */
 	tilemap_t &curalpha = index ? static_cast<tilemap_t &>(m_alpha2_tilemap) : static_cast<tilemap_t &>(m_alpha_tilemap);
-	curalpha.draw(bitmap, cliprect, 0, 0);
+	curalpha.draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 

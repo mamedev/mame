@@ -159,18 +159,18 @@ void atarig42_state::scanline_update(screen_device &screen, int scanline)
 
 UINT32 atarig42_state::screen_update_atarig42(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap_ind8 &priority_bitmap = machine().priority_bitmap;
+	bitmap_ind8 &priority_bitmap = screen.priority();
 
 	/* draw the playfield */
 	priority_bitmap.fill(0, cliprect);
-	m_playfield_tilemap->draw(bitmap, cliprect, 0, 0);
-	m_playfield_tilemap->draw(bitmap, cliprect, 1, 1);
-	m_playfield_tilemap->draw(bitmap, cliprect, 2, 2);
-	m_playfield_tilemap->draw(bitmap, cliprect, 3, 3);
-	m_playfield_tilemap->draw(bitmap, cliprect, 4, 4);
-	m_playfield_tilemap->draw(bitmap, cliprect, 5, 5);
-	m_playfield_tilemap->draw(bitmap, cliprect, 6, 6);
-	m_playfield_tilemap->draw(bitmap, cliprect, 7, 7);
+	m_playfield_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_playfield_tilemap->draw(screen, bitmap, cliprect, 1, 1);
+	m_playfield_tilemap->draw(screen, bitmap, cliprect, 2, 2);
+	m_playfield_tilemap->draw(screen, bitmap, cliprect, 3, 3);
+	m_playfield_tilemap->draw(screen, bitmap, cliprect, 4, 4);
+	m_playfield_tilemap->draw(screen, bitmap, cliprect, 5, 5);
+	m_playfield_tilemap->draw(screen, bitmap, cliprect, 6, 6);
+	m_playfield_tilemap->draw(screen, bitmap, cliprect, 7, 7);
 
 	/* copy the motion objects on top */
 	{
@@ -199,7 +199,7 @@ UINT32 atarig42_state::screen_update_atarig42(screen_device &screen, bitmap_ind1
 	}
 
 	/* add the alpha on top */
-	m_alpha_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_alpha_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 

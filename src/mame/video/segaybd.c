@@ -72,7 +72,7 @@ UINT32 segaybd_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	m_bsprites->draw_async(cliprect);
 
 	// apply rotation
-	m_segaic16vid->segaic16_rotate_draw(machine(), 0, bitmap, cliprect, m_ysprites->bitmap());
+	m_segaic16vid->segaic16_rotate_draw(0, bitmap, cliprect, screen.priority(), m_ysprites->bitmap());
 
 	// mix in 16B sprites
 	bitmap_ind16 &sprites = m_bsprites->bitmap();
@@ -81,7 +81,7 @@ UINT32 segaybd_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 		{
 			UINT16 *dest = &bitmap.pix(y);
 			UINT16 *src = &sprites.pix(y);
-			UINT8 *pri = &machine().priority_bitmap.pix(y);
+			UINT8 *pri = &screen.priority().pix(y);
 			for (int x = rect->min_x; x <= rect->max_x; x++)
 			{
 				// only process written pixels

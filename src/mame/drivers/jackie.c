@@ -224,15 +224,15 @@ UINT32 jackie_state::screen_update_jackie(screen_device &screen, bitmap_ind16 &b
 
 		if (rowenable==0)
 		{
-			m_reel1_tilemap->draw(bitmap, clip, 0,0);
+			m_reel1_tilemap->draw(screen, bitmap, clip, 0,0);
 		}
 		else if (rowenable==1)
 		{
-			m_reel2_tilemap->draw(bitmap, clip, 0,0);
+			m_reel2_tilemap->draw(screen, bitmap, clip, 0,0);
 		}
 		else if (rowenable==2)
 		{
-			m_reel3_tilemap->draw(bitmap, clip, 0,0);
+			m_reel3_tilemap->draw(screen, bitmap, clip, 0,0);
 		}
 		else if (rowenable==3)
 		{
@@ -241,7 +241,7 @@ UINT32 jackie_state::screen_update_jackie(screen_device &screen, bitmap_ind16 &b
 		startclipmin+=1;
 	}
 
-	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }

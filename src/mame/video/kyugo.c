@@ -209,8 +209,8 @@ UINT32 kyugo_state::screen_update_kyugo(screen_device &screen, bitmap_ind16 &bit
 
 	m_bg_tilemap->set_scrolly(0, m_scroll_y);
 
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);
-	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }

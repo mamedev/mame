@@ -370,11 +370,11 @@ UINT32 taitob_state::screen_update_taitob(screen_device &screen, bitmap_ind16 &b
 	}
 
 	/* Draw playfields */
-	m_tc0180vcu->tilemap_draw(bitmap, cliprect, 0, 1);
+	m_tc0180vcu->tilemap_draw(screen, bitmap, cliprect, 0, 1);
 
 	draw_framebuffer(bitmap, cliprect, 1);
 
-	m_tc0180vcu->tilemap_draw(bitmap, cliprect, 1, 0);
+	m_tc0180vcu->tilemap_draw(screen, bitmap, cliprect, 1, 0);
 
 	if (m_pixel_bitmap)  /* hitice only */
 	{
@@ -387,7 +387,7 @@ UINT32 taitob_state::screen_update_taitob(screen_device &screen, bitmap_ind16 &b
 
 	draw_framebuffer(bitmap, cliprect, 0);
 
-	m_tc0180vcu->tilemap_draw(bitmap, cliprect, 2, 0);
+	m_tc0180vcu->tilemap_draw(screen, bitmap, cliprect, 2, 0);
 
 	return 0;
 }
@@ -409,11 +409,11 @@ UINT32 taitob_state::screen_update_realpunc(screen_device &screen, bitmap_rgb32 
 	}
 
 	/* Draw the palettized playfields to an indexed bitmap */
-	m_tc0180vcu->tilemap_draw(*m_realpunc_bitmap, cliprect, 0, 1);
+	m_tc0180vcu->tilemap_draw(screen, *m_realpunc_bitmap, cliprect, 0, 1);
 
 	draw_framebuffer(*m_realpunc_bitmap, cliprect, 1);
 
-	m_tc0180vcu->tilemap_draw(*m_realpunc_bitmap, cliprect, 1, 0);
+	m_tc0180vcu->tilemap_draw(screen, *m_realpunc_bitmap, cliprect, 1, 0);
 
 	if (m_realpunc_video_ctrl & 0x0001)
 		draw_framebuffer(*m_realpunc_bitmap, cliprect, 0);
@@ -469,7 +469,7 @@ UINT32 taitob_state::screen_update_realpunc(screen_device &screen, bitmap_rgb32 
 	if (!(m_realpunc_video_ctrl & 0x0001))
 		draw_framebuffer(*m_realpunc_bitmap, cliprect, 0);
 
-	m_tc0180vcu->tilemap_draw(*m_realpunc_bitmap, cliprect, 2, 0);
+	m_tc0180vcu->tilemap_draw(screen, *m_realpunc_bitmap, cliprect, 2, 0);
 
 	/* Merge the indexed layers with the output bitmap */
 	for (y = 0; y <= cliprect.max_y; y++)
@@ -496,7 +496,7 @@ void taitob_state::screen_eof_taitob(screen_device &screen, bool state)
 		UINT8 framebuffer_page = m_tc0180vcu->get_fb_page(space, 0);
 
 		if (~video_control & 0x01)
-			m_framebuffer[framebuffer_page]->fill(0, machine().primary_screen->visible_area());
+			m_framebuffer[framebuffer_page]->fill(0, screen.visible_area());
 
 		if (~video_control & 0x80)
 		{
@@ -504,6 +504,6 @@ void taitob_state::screen_eof_taitob(screen_device &screen, bool state)
 			m_tc0180vcu->set_fb_page(space, 0, framebuffer_page);
 		}
 
-		draw_sprites(*m_framebuffer[framebuffer_page], machine().primary_screen->visible_area());
+		draw_sprites(*m_framebuffer[framebuffer_page], screen.visible_area());
 	}
 }

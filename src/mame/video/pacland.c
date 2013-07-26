@@ -271,7 +271,7 @@ WRITE8_MEMBER(pacland_state::pacland_bankswitch_w)
 ***************************************************************************/
 
 /* the sprite generator IC is the same as Mappy */
-void pacland_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int whichmask)
+void pacland_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int whichmask)
 {
 	UINT8 *spriteram = m_spriteram + 0x780;
 	UINT8 *spriteram_2 = spriteram + 0x800;
@@ -323,26 +323,26 @@ void pacland_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 						color,
 						flipx,flipy,
 						sx + 16*x,sy + 16*y,
-						machine().priority_bitmap,0,m_transmask[whichmask][color]);
+						screen.priority(),0,m_transmask[whichmask][color]);
 			}
 		}
 	}
 }
 
 
-void pacland_state::draw_fg(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority )
+void pacland_state::draw_fg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority )
 {
 	int y, x;
 
 	/* draw tilemap transparently over it; this will leave invalid pens (0xffff)
 	   anywhere where the fg_tilemap should be transparent; note that we assume
 	   the fg_bitmap has been pre-erased to 0xffff */
-	m_fg_tilemap->draw(m_fg_bitmap, cliprect, priority, 0);
+	m_fg_tilemap->draw(screen, m_fg_bitmap, cliprect, priority, 0);
 
 	/* now copy the fg_bitmap to the destination wherever the sprite pixel allows */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		const UINT8 *pri = &machine().priority_bitmap.pix8(y);
+		const UINT8 *pri = &screen.priority().pix8(y);
 		UINT16 *src = &m_fg_bitmap.pix16(y);
 		UINT16 *dst = &bitmap.pix16(y);
 
@@ -373,22 +373,22 @@ UINT32 pacland_state::screen_update_pacland(screen_device &screen, bitmap_ind16 
 	/* draw high priority sprite pixels, setting priority bitmap to non-zero
 	   wherever there is a high-priority pixel; note that we draw to the bitmap
 	   which is safe because the bg_tilemap draw will overwrite everything */
-	machine().priority_bitmap.fill(0x00, cliprect);
-	draw_sprites(bitmap, cliprect, 0);
+	screen.priority().fill(0x00, cliprect);
+	draw_sprites(screen, bitmap, cliprect, 0);
 
 	/* draw background */
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* draw low priority fg tiles */
-	draw_fg(bitmap, cliprect, 0);
+	draw_fg(screen, bitmap, cliprect, 0);
 
 	/* draw sprites with regular transparency */
-	draw_sprites(bitmap, cliprect, 1);
+	draw_sprites(screen, bitmap, cliprect, 1);
 
 	/* draw high priority fg tiles */
-	draw_fg(bitmap, cliprect, 1);
+	draw_fg(screen, bitmap, cliprect, 1);
 
 	/* draw sprite pixels with colortable values >= 0xf0, which have priority over everything */
-	draw_sprites(bitmap, cliprect, 2);
+	draw_sprites(screen, bitmap, cliprect, 2);
 	return 0;
 }

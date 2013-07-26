@@ -102,30 +102,30 @@ static void namconb1_install_palette(running_machine &machine)
 } /* namconb1_install_palette */
 
 static void
-video_update_common(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int bROZ )
+video_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int bROZ )
 {
-	namconb1_state *state = machine.driver_data<namconb1_state>();
+	namconb1_state *state = screen.machine().driver_data<namconb1_state>();
 	int pri;
-	namconb1_install_palette(machine);
+	namconb1_install_palette(screen.machine());
 
 	if( bROZ )
 	{
 		for( pri=0; pri<16; pri++ )
 		{
-			state->c169_roz_draw(bitmap, cliprect, pri);
+			state->c169_roz_draw(screen, bitmap, cliprect, pri);
 			if( (pri&1)==0 )
 			{
-				namco_tilemap_draw( bitmap, cliprect, pri/2 );
+				namco_tilemap_draw( screen, bitmap, cliprect, pri/2 );
 			}
-			state->c355_obj_draw(bitmap, cliprect, pri );
+			state->c355_obj_draw(screen, bitmap, cliprect, pri );
 		}
 	}
 	else
 	{
 		for( pri=0; pri<8; pri++ )
 		{
-			namco_tilemap_draw( bitmap, cliprect, pri );
-			state->c355_obj_draw(bitmap, cliprect, pri );
+			namco_tilemap_draw( screen, bitmap, cliprect, pri );
+			state->c355_obj_draw(screen, bitmap, cliprect, pri );
 		}
 	}
 } /* video_update_common */
@@ -148,7 +148,7 @@ UINT32 namconb1_state::screen_update_namconb1(screen_device &screen, bitmap_ind1
 
 	bitmap.fill(get_black_pen(machine()), cliprect );
 
-	video_update_common( machine(), bitmap, clip, 0 );
+	video_update_common( screen, bitmap, clip, 0 );
 
 	return 0;
 }
@@ -190,7 +190,7 @@ UINT32 namconb1_state::screen_update_namconb2(screen_device &screen, bitmap_ind1
 		namco_tilemap_invalidate();
 		memcpy(m_tilemap_tile_bank,m_tilebank32,sizeof(m_tilemap_tile_bank));
 	}
-	video_update_common( machine(), bitmap, clip, 1 );
+	video_update_common( screen, bitmap, clip, 1 );
 	return 0;
 }
 

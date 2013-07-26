@@ -449,7 +449,7 @@ VIDEO_START_MEMBER(powerbal_state,powerbal)
 
 UINT32 powerbal_state::screen_update_powerbal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites_powerbal(bitmap, cliprect);
 	return 0;
 }

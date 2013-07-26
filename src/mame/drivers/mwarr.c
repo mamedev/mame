@@ -102,7 +102,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_mwarr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki2;
 };
@@ -408,7 +408,7 @@ void mwarr_state::video_start()
 	save_item(NAME(m_sprites_buffer));
 }
 
-void mwarr_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
+void mwarr_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	const UINT16 *source = m_sprites_buffer + 0x800 - 4;
 	const UINT16 *finish = m_sprites_buffer;
@@ -440,7 +440,7 @@ void mwarr_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect 
 							color,
 							flipx,0,
 							x,y+i*16,
-							machine().priority_bitmap,pri_mask,0 );
+							screen.priority(),pri_mask,0 );
 
 				/* wrap around x */
 				pdrawgfx_transpen( bitmap,
@@ -450,7 +450,7 @@ void mwarr_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect 
 							color,
 							flipx,0,
 							x-1024,y+i*16,
-							machine().priority_bitmap,pri_mask,0 );
+							screen.priority(),pri_mask,0 );
 
 				/* wrap around y */
 				pdrawgfx_transpen( bitmap,
@@ -460,7 +460,7 @@ void mwarr_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect 
 							color,
 							flipx,0,
 							x,y-512+i*16,
-							machine().priority_bitmap,pri_mask,0 );
+							screen.priority(),pri_mask,0 );
 
 				/* wrap around x & y */
 				pdrawgfx_transpen( bitmap,
@@ -470,7 +470,7 @@ void mwarr_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect 
 							color,
 							flipx,0,
 							x-1024,y-512+i*16,
-							machine().priority_bitmap,pri_mask,0 );
+							screen.priority(),pri_mask,0 );
 			}
 		}
 
@@ -482,7 +482,7 @@ UINT32 mwarr_state::screen_update_mwarr(screen_device &screen, bitmap_ind16 &bit
 {
 	int i;
 
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 
 	if (BIT(m_vidattrram[6], 0))
 	{
@@ -524,11 +524,11 @@ UINT32 mwarr_state::screen_update_mwarr(screen_device &screen, bitmap_ind16 &bit
 	m_tx_tilemap->set_scrollx(0, m_vidattrram[0] + 16);
 	m_tx_tilemap->set_scrolly(0, m_vidattrram[4] + 1);
 
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0x01);
-	m_mlow_tilemap->draw(bitmap, cliprect, 0, 0x02);
-	m_mhigh_tilemap->draw(bitmap, cliprect, 0, 0x04);
-	m_tx_tilemap->draw(bitmap, cliprect, 0, 0x10);
-	draw_sprites(bitmap, cliprect);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0x01);
+	m_mlow_tilemap->draw(screen, bitmap, cliprect, 0, 0x02);
+	m_mhigh_tilemap->draw(screen, bitmap, cliprect, 0, 0x04);
+	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0x10);
+	draw_sprites(screen, bitmap, cliprect);
 	return 0;
 }
 

@@ -507,11 +507,11 @@ UINT32 jollyjgr_state::screen_update_jollyjgr(screen_device &screen, bitmap_ind1
 		if(!(m_bitmap_disable))
 			draw_bitmap(bitmap);
 
-		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	}
 	else
 	{
-		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 		if(!(m_bitmap_disable))
 			draw_bitmap(bitmap);

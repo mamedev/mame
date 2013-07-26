@@ -551,7 +551,7 @@ int nmk16_state::nmk16_bg_spr_update(screen_device &screen, bitmap_ind16 &bitmap
 {
 	m_bg_tilemap0->set_scrollx(0,-m_videoshift);
 
-	m_bg_tilemap0->draw(bitmap, cliprect, 0,0);
+	m_bg_tilemap0->draw(screen, bitmap, cliprect, 0,0);
 
 	nmk16_draw_sprites(bitmap,cliprect,3);
 	nmk16_draw_sprites(bitmap,cliprect,2);
@@ -564,15 +564,15 @@ int nmk16_state::nmk16_bg_fg_spr_tx_update(screen_device &screen, bitmap_ind16 &
 {
 	m_tx_tilemap->set_scrollx(0,-m_videoshift);
 
-	m_bg_tilemap0->draw(bitmap, cliprect, 0,0);
-	m_fg_tilemap->draw(bitmap, cliprect, 0,0);
+	m_bg_tilemap0->draw(screen, bitmap, cliprect, 0,0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0,0);
 
 	nmk16_draw_sprites(bitmap,cliprect,3);
 	nmk16_draw_sprites(bitmap,cliprect,2);
 	nmk16_draw_sprites(bitmap,cliprect,1);
 	nmk16_draw_sprites(bitmap,cliprect,0);
 
-	m_tx_tilemap->draw(bitmap, cliprect, 0,0);
+	m_tx_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
 }
 
@@ -580,14 +580,14 @@ int nmk16_state::nmk16_bg_spr_tx_update(screen_device &screen, bitmap_ind16 &bit
 {
 	m_tx_tilemap->set_scrollx(0,-m_videoshift);
 
-	m_bg_tilemap0->draw(bitmap, cliprect, 0,0);
+	m_bg_tilemap0->draw(screen, bitmap, cliprect, 0,0);
 
 	nmk16_draw_sprites(bitmap,cliprect,3);
 	nmk16_draw_sprites(bitmap,cliprect,2);
 	nmk16_draw_sprites(bitmap,cliprect,1);
 	nmk16_draw_sprites(bitmap,cliprect,0);
 
-	m_tx_tilemap->draw(bitmap, cliprect, 0,0);
+	m_tx_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
 }
 
@@ -595,14 +595,14 @@ int nmk16_state::nmk16_bg_sprflip_tx_update(screen_device &screen, bitmap_ind16 
 {
 	m_tx_tilemap->set_scrollx(0,-m_videoshift);
 
-	m_bg_tilemap0->draw(bitmap, cliprect, 0,0);
+	m_bg_tilemap0->draw(screen, bitmap, cliprect, 0,0);
 
 	nmk16_draw_sprites_flipsupported(bitmap,cliprect,3);
 	nmk16_draw_sprites_flipsupported(bitmap,cliprect,2);
 	nmk16_draw_sprites_flipsupported(bitmap,cliprect,1);
 	nmk16_draw_sprites_flipsupported(bitmap,cliprect,0);
 
-	m_tx_tilemap->draw(bitmap, cliprect, 0,0);
+	m_tx_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
 }
 
@@ -647,14 +647,14 @@ int nmk16_state::nmk16_bioshipbg_sprflip_tx_update(screen_device &screen, bitmap
 	}
 
 	copyscrollbitmap(bitmap,*m_background_bitmap,1,&scrollx,1,&scrolly,cliprect);
-	m_bg_tilemap0->draw(bitmap, cliprect, 0,0);
+	m_bg_tilemap0->draw(screen, bitmap, cliprect, 0,0);
 
 	nmk16_draw_sprites(bitmap,cliprect,3);
 	nmk16_draw_sprites(bitmap,cliprect,2);
 	nmk16_draw_sprites(bitmap,cliprect,1);
 	nmk16_draw_sprites(bitmap,cliprect,0);
 
-	m_tx_tilemap->draw(bitmap, cliprect, 0,0);
+	m_tx_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
 }
 
@@ -662,11 +662,11 @@ int nmk16_state::nmk16_bg_sprswap_tx_update(screen_device &screen, bitmap_ind16 
 {
 	m_tx_tilemap->set_scrollx(0,-m_videoshift);
 
-	m_bg_tilemap0->draw(bitmap, cliprect, 0,0);
+	m_bg_tilemap0->draw(screen, bitmap, cliprect, 0,0);
 
 	nmk16_draw_sprites_swap(bitmap,cliprect, bittbl);
 
-	m_tx_tilemap->draw(bitmap, cliprect, 0,0);
+	m_tx_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
 }
 
@@ -674,11 +674,11 @@ int nmk16_state::nmk16_bg_sprswapflip_tx_update(screen_device &screen, bitmap_in
 {
 	m_tx_tilemap->set_scrollx(0,-m_videoshift);
 
-	m_bg_tilemap0->draw(bitmap, cliprect, 0,0);
+	m_bg_tilemap0->draw(screen, bitmap, cliprect, 0,0);
 
 	nmk16_draw_sprites_swap_flipsupported(bitmap,cliprect, bittbl);
 
-	m_tx_tilemap->draw(bitmap, cliprect, 0,0);
+	m_tx_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
 }
 
@@ -718,7 +718,7 @@ int nmk16_state::nmk16_complexbg_sprswap_tx_update(screen_device &screen, bitmap
 			bg_tilemap->set_scrolly(0, yscroll);
 			bg_tilemap->set_scrollx((i + yscroll) & 0x1ff, m_gunnail_scrollram[0] + m_gunnail_scrollram[i] - m_videoshift);
 
-			bg_tilemap->draw(bitmap, bgclip, 0,0);
+			bg_tilemap->draw(screen, bitmap, bgclip, 0,0);
 
 			y1++;
 			i++;
@@ -747,12 +747,12 @@ int nmk16_state::nmk16_complexbg_sprswap_tx_update(screen_device &screen, bitmap
 		bg_tilemap->set_scrolly(0, yscroll);
 		bg_tilemap->set_scrollx(0, xscroll - m_videoshift);
 
-		bg_tilemap->draw(bitmap, cliprect, 0,0);
+		bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	}
 
 	nmk16_draw_sprites_swap(bitmap,cliprect, bittbl);
 
-	m_tx_tilemap->draw(bitmap, cliprect, 0,0);
+	m_tx_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
 }
 
@@ -921,7 +921,7 @@ VIDEO_START_MEMBER(nmk16_state,firehawk)
 
 ***************************************************************************/
 
-void nmk16_state::video_update(bitmap_ind16 &bitmap, const rectangle &cliprect,
+void nmk16_state::video_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect,
 	int dsw_flipscreen,         // 1 = Horizontal and vertical screen flip are hardwired to 2 dip switches
 	int xoffset, int yoffset,   // bg_tilemap0 offsets
 	int attr_mask               // "sprite active" mask
@@ -941,22 +941,22 @@ void nmk16_state::video_update(bitmap_ind16 &bitmap, const rectangle &cliprect,
 	m_tx_tilemap->set_scrolly(0, m_afega_scroll_1[0]);
 
 
-	m_bg_tilemap0->draw(bitmap, cliprect, 0,0);
+	m_bg_tilemap0->draw(screen, bitmap, cliprect, 0,0);
 
 	nmk16_draw_sprites_flipsupported(bitmap,cliprect,3);
 	nmk16_draw_sprites_flipsupported(bitmap,cliprect,2);
 	nmk16_draw_sprites_flipsupported(bitmap,cliprect,1);
 	nmk16_draw_sprites_flipsupported(bitmap,cliprect,0);
 
-	m_tx_tilemap->draw(bitmap, cliprect, 0,0);
+	m_tx_tilemap->draw(screen, bitmap, cliprect, 0,0);
 }
 
-void nmk16_state::redhawki_video_update(bitmap_ind16 &bitmap, const rectangle &cliprect )
+void nmk16_state::redhawki_video_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	m_bg_tilemap0->set_scrollx(0, m_afega_scroll_1[0]&0xff);
 	m_bg_tilemap0->set_scrolly(0, m_afega_scroll_1[1]&0xff);
 
-	m_bg_tilemap0->draw(bitmap, cliprect, 0,0);
+	m_bg_tilemap0->draw(screen, bitmap, cliprect, 0,0);
 
 	nmk16_draw_sprites_flipsupported(bitmap,cliprect,3);
 	nmk16_draw_sprites_flipsupported(bitmap,cliprect,2);
@@ -964,23 +964,23 @@ void nmk16_state::redhawki_video_update(bitmap_ind16 &bitmap, const rectangle &c
 	nmk16_draw_sprites_flipsupported(bitmap,cliprect,0);
 }
 
-UINT32 nmk16_state::screen_update_afega(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)   { video_update(bitmap,cliprect, 1, -0x100,+0x000, 0x0001);  return 0; }
-UINT32 nmk16_state::screen_update_bubl2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ video_update(bitmap,cliprect, 0, -0x100,+0x000, 0x0001);  return 0; } // no flipscreen support, I really would confirmation from the schematics
-UINT32 nmk16_state::screen_update_redhawkb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ video_update(bitmap,cliprect, 0, +0x000,+0x100, 0x0001);  return 0; }
-UINT32 nmk16_state::screen_update_redhawki(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ redhawki_video_update(bitmap,cliprect); return 0;} // strange scroll regs
+UINT32 nmk16_state::screen_update_afega(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)   { video_update(screen,bitmap,cliprect, 1, -0x100,+0x000, 0x0001);  return 0; }
+UINT32 nmk16_state::screen_update_bubl2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ video_update(screen,bitmap,cliprect, 0, -0x100,+0x000, 0x0001);  return 0; } // no flipscreen support, I really would confirmation from the schematics
+UINT32 nmk16_state::screen_update_redhawkb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ video_update(screen,bitmap,cliprect, 0, +0x000,+0x100, 0x0001);  return 0; }
+UINT32 nmk16_state::screen_update_redhawki(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ redhawki_video_update(screen,bitmap,cliprect); return 0;} // strange scroll regs
 
 UINT32 nmk16_state::screen_update_firehawk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap0->set_scrolly(0, m_afega_scroll_1[1] + 0x100);
 	m_bg_tilemap0->set_scrollx(0, m_afega_scroll_1[0]);
 
-	m_bg_tilemap0->draw(bitmap, cliprect, 0,0);
+	m_bg_tilemap0->draw(screen, bitmap, cliprect, 0,0);
 
 	nmk16_draw_sprites_flipsupported(bitmap,cliprect,3);
 	nmk16_draw_sprites_flipsupported(bitmap,cliprect,2);
 	nmk16_draw_sprites_flipsupported(bitmap,cliprect,1);
 	nmk16_draw_sprites_flipsupported(bitmap,cliprect,0);
 
-	m_tx_tilemap->draw(bitmap, cliprect, 0,0);
+	m_tx_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
 }

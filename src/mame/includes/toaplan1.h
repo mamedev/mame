@@ -157,7 +157,7 @@ public:
 	void toaplan1_set_scrolls();
 	void register_common();
 	void toaplan1_log_vram();
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void demonwld_dsp(int enable);
 	void toaplan1_driver_savestate();
 	void demonwld_driver_savestate();

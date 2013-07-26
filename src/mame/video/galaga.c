@@ -561,7 +561,7 @@ UINT32 galaga_state::screen_update_galaga(screen_device &screen, bitmap_ind16 &b
 	bitmap.fill(get_black_pen(machine()), cliprect);
 	draw_stars(bitmap,cliprect);
 	draw_sprites(bitmap,cliprect);
-	m_fg_tilemap->draw(bitmap, cliprect, 0,0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
 }
 

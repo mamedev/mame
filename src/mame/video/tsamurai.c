@@ -206,9 +206,9 @@ UINT32 tsamurai_state::screen_update_tsamurai(screen_device &screen, bitmap_ind1
 	    (screenshots would be helpful)
 	*/
 	bitmap.fill(m_bgcolor, cliprect);
-	m_background->draw(bitmap, cliprect, 0,0);
+	m_background->draw(screen, bitmap, cliprect, 0,0);
 	draw_sprites(bitmap,cliprect);
-	m_foreground->draw(bitmap, cliprect, 0,0);
+	m_foreground->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
 }
 
@@ -258,7 +258,7 @@ UINT32 tsamurai_state::screen_update_vsgongf(screen_device &screen, bitmap_ind16
 	}
 	#endif
 
-	m_foreground->draw(bitmap, cliprect, 0,0);
+	m_foreground->draw(screen, bitmap, cliprect, 0,0);
 	draw_sprites(bitmap,cliprect);
 	return 0;
 }

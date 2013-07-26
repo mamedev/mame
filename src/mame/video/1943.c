@@ -251,7 +251,7 @@ UINT32 _1943_state::screen_update_1943(screen_device &screen, bitmap_ind16 &bitm
 	m_bg_tilemap->set_scrolly(0, m_scrolly[0]);
 
 	if (m_bg2_on)
-		m_bg2_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_bg2_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	else
 		bitmap.fill(get_black_pen(machine()), cliprect);
 
@@ -259,13 +259,13 @@ UINT32 _1943_state::screen_update_1943(screen_device &screen, bitmap_ind16 &bitm
 		draw_sprites(bitmap, cliprect, 0);
 
 	if (m_bg1_on)
-		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	if (m_obj_on)
 		draw_sprites(bitmap, cliprect, 1);
 
 	if (m_char_on)
-		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }

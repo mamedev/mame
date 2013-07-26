@@ -156,31 +156,31 @@ UINT32 drgnmst_state::screen_update_drgnmst(screen_device &screen, bitmap_ind16 
 		case 0x2d9a: // fg unsure
 		case 0x2440: // all ok
 		case 0x245a: // fg unsure, title screen
-			m_fg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-			m_md_tilemap->draw(bitmap, cliprect, 0, 0);
-			m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+			m_fg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+			m_md_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+			m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 			break;
 		case 0x23c0: // all ok
-			m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-			m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
-			m_md_tilemap->draw(bitmap, cliprect, 0, 0);
+			m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+			m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+			m_md_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 			break;
 		case 0x38da: // fg unsure
 		case 0x215a: // fg unsure
 		case 0x2140: // all ok
-			m_fg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-			m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-			m_md_tilemap->draw(bitmap, cliprect, 0, 0);
+			m_fg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+			m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+			m_md_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 			break;
 		case 0x2d80: // all ok
-			m_md_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-			m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-			m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+			m_md_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+			m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+			m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 			break;
 		default:
-			m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-			m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
-			m_md_tilemap->draw(bitmap, cliprect, 0, 0);
+			m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+			m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+			m_md_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 			logerror ("unknown video priority regs %04x\n", m_vidregs2[0]);
 
 	}

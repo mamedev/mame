@@ -77,7 +77,7 @@ additional control from extra RAM:
 
 
 
-static void K053936_zoom_draw(int chip,UINT16 *ctrl,UINT16 *linectrl, bitmap_ind16 &bitmap,const rectangle &cliprect,tilemap_t *tmap,int flags,UINT32 priority, int glfgreat_hack)
+static void K053936_zoom_draw(int chip,UINT16 *ctrl,UINT16 *linectrl, screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,tilemap_t *tmap,int flags,UINT32 priority, int glfgreat_hack)
 {
 	if (!tmap)
 		return;
@@ -140,7 +140,7 @@ static void K053936_zoom_draw(int chip,UINT16 *ctrl,UINT16 *linectrl, bitmap_ind
 			startx -= K053936_offset[chip][0] * incxx;
 			starty -= K053936_offset[chip][0] * incxy;
 
-			tmap->draw_roz(bitmap, my_clip, startx << 5,starty << 5,
+			tmap->draw_roz(screen, bitmap, my_clip, startx << 5,starty << 5,
 					incxx << 5,incxy << 5,0,0,
 					K053936_wraparound[chip],
 					flags,priority);
@@ -169,7 +169,7 @@ static void K053936_zoom_draw(int chip,UINT16 *ctrl,UINT16 *linectrl, bitmap_ind
 		startx -= K053936_offset[chip][0] * incxx;
 		starty -= K053936_offset[chip][0] * incxy;
 
-		tmap->draw_roz(bitmap, cliprect, startx << 5,starty << 5,
+		tmap->draw_roz(screen, bitmap, cliprect, startx << 5,starty << 5,
 				incxx << 5,incxy << 5,incyx << 5,incyy << 5,
 				K053936_wraparound[chip],
 				flags,priority);
@@ -198,11 +198,11 @@ if (machine.input().code_pressed(KEYCODE_D))
 }
 
 
-void K053936_0_zoom_draw(bitmap_ind16 &bitmap,const rectangle &cliprect,tilemap_t *tmap,int flags,UINT32 priority, int glfgreat_hack)
+void K053936_0_zoom_draw(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,tilemap_t *tmap,int flags,UINT32 priority, int glfgreat_hack)
 {
 	UINT16 *ctrl = reinterpret_cast<UINT16 *>(tmap->machine().root_device().memshare("k053936_0_ctrl")->ptr());
 	UINT16 *linectrl = reinterpret_cast<UINT16 *>(tmap->machine().root_device().memshare("k053936_0_line")->ptr());
-	K053936_zoom_draw(0,ctrl,linectrl,bitmap,cliprect,tmap,flags,priority, glfgreat_hack);
+	K053936_zoom_draw(0,ctrl,linectrl,screen,bitmap,cliprect,tmap,flags,priority, glfgreat_hack);
 }
 
 void K053936_wraparound_enable(int chip, int status)
@@ -309,7 +309,7 @@ READ16_MEMBER( k053936_device::linectrl_r )
 
 // there is another implementation of this in  video/konamigx.c (!)
 //  why? shall they be merged?
-void k053936_device::zoom_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tmap, int flags, UINT32 priority, int glfgreat_hack )
+void k053936_device::zoom_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tmap, int flags, UINT32 priority, int glfgreat_hack )
 {
 	if (!tmap)
 		return;
@@ -374,7 +374,7 @@ void k053936_device::zoom_draw( bitmap_ind16 &bitmap, const rectangle &cliprect,
 			startx -= m_xoff * incxx;
 			starty -= m_xoff * incxy;
 
-			tmap->draw_roz(bitmap, my_clip, startx << 5,starty << 5,
+			tmap->draw_roz(screen, bitmap, my_clip, startx << 5,starty << 5,
 					incxx << 5,incxy << 5,0,0,
 					m_wrap,
 					flags,priority);
@@ -412,7 +412,7 @@ void k053936_device::zoom_draw( bitmap_ind16 &bitmap, const rectangle &cliprect,
 		startx -= m_xoff * incxx;
 		starty -= m_xoff * incxy;
 
-		tmap->draw_roz(bitmap, cliprect, startx << 5,starty << 5,
+		tmap->draw_roz(screen, bitmap, cliprect, startx << 5,starty << 5,
 				incxx << 5,incxy << 5,incyx << 5,incyy << 5,
 				m_wrap,
 				flags,priority);

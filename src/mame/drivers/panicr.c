@@ -254,9 +254,9 @@ UINT32 panicr_state::screen_update_panicr(screen_device &screen, bitmap_ind16 &b
 	bitmap.fill(get_black_pen(machine()), cliprect);
 	m_txttilemap->mark_all_dirty();
 	m_bgtilemap->set_scrollx(0, m_scrollx);
-	m_bgtilemap->draw(bitmap, cliprect, 0,0);
+	m_bgtilemap->draw(screen, bitmap, cliprect, 0,0);
 	draw_sprites(bitmap,cliprect);
-	m_txttilemap->draw(bitmap, cliprect, 0,0);
+	m_txttilemap->draw(screen, bitmap, cliprect, 0,0);
 
 	return 0;
 }

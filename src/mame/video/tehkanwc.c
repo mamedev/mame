@@ -156,10 +156,10 @@ void tehkanwc_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 UINT32 tehkanwc_state::screen_update_tehkanwc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->set_scrollx(0, m_scroll_x[0] + 256 * m_scroll_x[1]);
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);
-	m_fg_tilemap->draw(bitmap, cliprect, 1, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 1, 0);
 	gridiron_draw_led(bitmap, cliprect, m_led0, 0);
 	gridiron_draw_led(bitmap, cliprect, m_led1, 1);
 	return 0;

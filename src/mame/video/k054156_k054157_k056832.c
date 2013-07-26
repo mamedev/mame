@@ -1235,7 +1235,7 @@ WRITE32_MEMBER( k056832_device::b_long_w )
 }
 
 template<class _BitmapClass>
-int k056832_device::update_linemap( _BitmapClass &bitmap, int page, int flags )
+int k056832_device::update_linemap( screen_device &screen, _BitmapClass &bitmap, int page, int flags )
 {
 	if (m_page_tile_mode[page])
 		return(0);
@@ -1264,7 +1264,7 @@ int k056832_device::update_linemap( _BitmapClass &bitmap, int page, int flags )
 			// force tilemap into a clean, static state
 			// *really ugly but it minimizes alteration to tilemap.c
 			memset(&zerorect, 0, sizeof(rectangle));    // zero dimension
-			tmap->draw(bitmap, zerorect, 0, 0); // dummy call to reset tile_dirty_map
+			tmap->draw(screen, bitmap, zerorect, 0, 0); // dummy call to reset tile_dirty_map
 			xprmap.fill(0);                     // reset pixel transparency_bitmap;
 			memset(xprdata, TILEMAP_PIXEL_LAYER0, 0x800);   // reset tile transparency_data;
 		}
@@ -1356,7 +1356,7 @@ int k056832_device::update_linemap( _BitmapClass &bitmap, int page, int flags )
 }
 
 template<class _BitmapClass>
-void k056832_device::tilemap_draw_common( _BitmapClass &bitmap, const rectangle &cliprect, int layer, UINT32 flags, UINT32 priority )
+void k056832_device::tilemap_draw_common( screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, int layer, UINT32 flags, UINT32 priority )
 {
 	UINT32 last_dx, last_visible, new_colorbase, last_active;
 	int sx, sy, ay, tx, ty, width, height;
@@ -1582,7 +1582,7 @@ printf("\nend\n");
 					m_active_layer = 0;
 			}
 
-			if (update_linemap(bitmap, pageIndex, flags))
+			if (update_linemap(screen, bitmap, pageIndex, flags))
 				continue;
 
 			tmap = m_tilemap[pageIndex];
@@ -1668,7 +1668,7 @@ printf("\nend\n");
 				tmap->set_scrollx(0, dx);
 
 				LINE_SHORTCIRCUIT:
-					tmap->draw(bitmap, drawrect, flags, priority);
+					tmap->draw(screen, bitmap, drawrect, flags, priority);
 
 			} // end of line loop
 		} // end of column loop
@@ -1677,14 +1677,14 @@ printf("\nend\n");
 	m_active_layer = last_active;
 } // end of function
 
-void k056832_device::tilemap_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, UINT32 flags, UINT32 priority )
-{ tilemap_draw_common(bitmap, cliprect, layer, flags, priority); }
+void k056832_device::tilemap_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, UINT32 flags, UINT32 priority )
+{ tilemap_draw_common(screen, bitmap, cliprect, layer, flags, priority); }
 
-void k056832_device::tilemap_draw( bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, UINT32 flags, UINT32 priority )
-{ tilemap_draw_common(bitmap, cliprect, layer, flags, priority); }
+void k056832_device::tilemap_draw( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, UINT32 flags, UINT32 priority )
+{ tilemap_draw_common(screen, bitmap, cliprect, layer, flags, priority); }
 
 
-void k056832_device::tilemap_draw_dj( bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, UINT32 flags, UINT32 priority )
+void k056832_device::tilemap_draw_dj( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, UINT32 flags, UINT32 priority )
 {
 	UINT32 last_dx, last_visible, new_colorbase, last_active;
 	int sx, sy, ay, tx, ty, width, height;
@@ -1863,7 +1863,7 @@ void k056832_device::tilemap_draw_dj( bitmap_rgb32 &bitmap, const rectangle &cli
 					m_active_layer = 0;
 			}
 
-			if (update_linemap(bitmap, pageIndex, flags))
+			if (update_linemap(screen, bitmap, pageIndex, flags))
 				continue;
 
 			tmap = m_tilemap[pageIndex];
@@ -1941,7 +1941,7 @@ void k056832_device::tilemap_draw_dj( bitmap_rgb32 &bitmap, const rectangle &cli
 				tmap->set_scrollx(0, dx);
 
 				LINE_SHORTCIRCUIT:
-					tmap->draw(bitmap, drawrect, flags, priority);
+					tmap->draw(screen, bitmap, drawrect, flags, priority);
 
 			} // end of line loop
 		} // end of column loop
@@ -2194,7 +2194,7 @@ void k056832_device::altK056832_vh_start(running_machine &machine, const char *g
 
 
 
-int k056832_device::altK056832_update_linemap(running_machine &machine, bitmap_rgb32 &bitmap, int page, int flags)
+int k056832_device::altK056832_update_linemap(screen_device &screen, bitmap_rgb32 &bitmap, int page, int flags)
 {
 	if (m_page_tile_mode[page]) return(0);
 	if (!m_linemap_enabled) return(1);
@@ -2222,7 +2222,7 @@ int k056832_device::altK056832_update_linemap(running_machine &machine, bitmap_r
 			// force tilemap into a clean, static state
 			// *really ugly but it minimizes alteration to tilemap.c
 			memset (&zerorect, 0, sizeof(rectangle));   // zero dimension
-			tmap->draw(bitmap, zerorect, 0, 0); // dummy call to reset tile_dirty_map
+			tmap->draw(screen, bitmap, zerorect, 0, 0); // dummy call to reset tile_dirty_map
 			xprmap.fill(0);                     // reset pixel transparency_bitmap;
 			memset(xprdata, TILEMAP_PIXEL_LAYER0, 0x800);   // reset tile transparency_data;
 		}
@@ -2311,7 +2311,7 @@ int k056832_device::altK056832_update_linemap(running_machine &machine, bitmap_r
 	return(0);
 }
 
-void k056832_device::m_tilemap_draw(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, UINT32 flags, UINT32 priority)
+void k056832_device::m_tilemap_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, UINT32 flags, UINT32 priority)
 {
 	static int last_colorbase[K056832_PAGE_COUNT];
 
@@ -2511,7 +2511,7 @@ void k056832_device::m_tilemap_draw(running_machine &machine, bitmap_rgb32 &bitm
 		else
 			if (!pageIndex) m_active_layer = 0;
 
-		if (altK056832_update_linemap(machine, bitmap, pageIndex, flags)) continue;
+		if (altK056832_update_linemap(screen, bitmap, pageIndex, flags)) continue;
 
 		tmap = m_tilemap[pageIndex];
 		tmap->set_scrolly(0, ay);
@@ -2590,7 +2590,7 @@ void k056832_device::m_tilemap_draw(running_machine &machine, bitmap_rgb32 &bitm
 			tmap->set_scrollx(0, dx);
 
 			LINE_SHORTCIRCUIT:
-			tmap->draw(bitmap, drawrect, flags, priority);
+			tmap->draw(screen, bitmap, drawrect, flags, priority);
 
 		} // end of line loop
 	} // end of column loop

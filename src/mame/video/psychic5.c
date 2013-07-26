@@ -348,7 +348,7 @@ void psychic5_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
 	}
 }
 
-void psychic5_state::draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void psychic5_state::draw_background(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	UINT8 *spriteram = m_spriteram;
 
@@ -401,27 +401,27 @@ void psychic5_state::draw_background(bitmap_rgb32 &bitmap, const rectangle &clip
 			clip.set(255 - clip.max_x, 255 - clip.min_x, 255 - clip.max_y, 255 - clip.min_y);
 	}
 
-	m_bg_tilemap->draw(bitmap, clip, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, clip, 0, 0);
 }
 
 UINT32 psychic5_state::screen_update_psychic5(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(get_black_pen(machine()), cliprect);
 	if (m_bg_status & 1)    /* Backgound enable */
-		draw_background(bitmap, cliprect);
+		draw_background(screen, bitmap, cliprect);
 	if (!(m_title_screen & 1))
 		draw_sprites(bitmap, cliprect);
-	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
 UINT32 psychic5_state::screen_update_bombsa(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	if (m_bg_status & 1)    /* Backgound enable */
-		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	else
 		bitmap.fill(machine().pens[0x0ff], cliprect);
 	draw_sprites(bitmap, cliprect);
-	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }

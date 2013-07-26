@@ -26,8 +26,8 @@ public:
 
 	// call to do the rendering etc.
 	void kaneko16_prepare(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void render_tilemap_chip(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri);
-	void render_tilemap_chip_alt(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri, int v2pri);
+	void render_tilemap_chip(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri);
+	void render_tilemap_chip_alt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri, int v2pri);
 
 	// access
 	DECLARE_READ16_MEMBER( kaneko_tmap_vram_r );

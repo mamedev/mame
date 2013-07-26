@@ -289,7 +289,7 @@ UINT32 ojankohs_state::screen_update_ojankohs(screen_device &screen, bitmap_ind1
 	m_tilemap->set_scrollx(0, m_scrollx);
 	m_tilemap->set_scrolly(0, m_scrolly);
 
-	m_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 

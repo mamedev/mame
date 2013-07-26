@@ -131,13 +131,13 @@ void atarig1_state::scanline_update(screen_device &screen, int scanline)
 UINT32 atarig1_state::screen_update_atarig1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* draw the playfield */
-	m_playfield_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_playfield_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* copy the motion objects on top */
 	copybitmap_trans(bitmap, *atarirle_get_vram(m_rle, 0), 0, 0, 0, 0, cliprect, 0);
 
 	/* add the alpha on top */
-	m_alpha_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_alpha_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 

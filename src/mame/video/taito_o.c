@@ -143,13 +143,13 @@ UINT32 taitoo_state::screen_update_parentj(screen_device &screen, bitmap_ind16 &
 
 	bitmap.fill(0, cliprect);
 
-	m_tc0080vco->tilemap_draw(bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0);
+	m_tc0080vco->tilemap_draw(screen, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0);
 
 	parentj_draw_sprites(bitmap, cliprect, 0);
 	parentj_draw_sprites(bitmap, cliprect, 1);
 
-	m_tc0080vco->tilemap_draw(bitmap, cliprect, 1, 0, 0);
-	m_tc0080vco->tilemap_draw(bitmap, cliprect, 2, 0, 0);
+	m_tc0080vco->tilemap_draw(screen, bitmap, cliprect, 1, 0, 0);
+	m_tc0080vco->tilemap_draw(screen, bitmap, cliprect, 2, 0, 0);
 
 	return 0;
 }

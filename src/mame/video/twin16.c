@@ -214,7 +214,7 @@ void twin16_state::twin16_spriteram_process(  )
 	m_need_process_spriteram = 0;
 }
 
-void twin16_state::draw_sprites( bitmap_ind16 &bitmap )
+void twin16_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap )
 {
 	const UINT16 *source = 0x1800+m_spriteram->buffer() + 0x800 - 4;
 	const UINT16 *finish = 0x1800+m_spriteram->buffer();
@@ -296,7 +296,7 @@ void twin16_state::draw_sprites( bitmap_ind16 &bitmap )
 				if( sy>=16 && sy<256-16 )
 				{
 					UINT16 *dest = &bitmap.pix16(sy);
-					UINT8 *pdest = &machine().priority_bitmap.pix8(sy);
+					UINT8 *pdest = &screen.priority().pix8(sy);
 
 					for( x=0; x<width; x++ )
 					{
@@ -336,7 +336,7 @@ void twin16_state::draw_sprites( bitmap_ind16 &bitmap )
 
 
 
-void twin16_state::draw_layer( bitmap_ind16 &bitmap, int opaque )
+void twin16_state::draw_layer( screen_device &screen, bitmap_ind16 &bitmap, int opaque )
 {
 	UINT16 *videoram = m_videoram;
 	const UINT16 *gfx_base;
@@ -430,7 +430,7 @@ void twin16_state::draw_layer( bitmap_ind16 &bitmap, int opaque )
 				{
 					const UINT16 *gfxptr = gfx_data + ((y - ypos) ^ yxor) * 2;
 					UINT16 *dest = &bitmap.pix16(y);
-					UINT8 *pdest = &machine().priority_bitmap.pix8(y);
+					UINT8 *pdest = &screen.priority().pix8(y);
 
 					for (x = x1; x <= x2; x++)
 					{
@@ -447,7 +447,7 @@ void twin16_state::draw_layer( bitmap_ind16 &bitmap, int opaque )
 				{
 					const UINT16 *gfxptr = gfx_data + ((y - ypos) ^ yxor) * 2;
 					UINT16 *dest = &bitmap.pix16(y);
-					UINT8 *pdest = &machine().priority_bitmap.pix8(y);
+					UINT8 *pdest = &screen.priority().pix8(y);
 
 					for (x = x1; x <= x2; x++)
 					{
@@ -515,13 +515,13 @@ UINT32 twin16_state::screen_update_twin16(screen_device &screen, bitmap_ind16 &b
 	if (m_video_register&TWIN16_SCREEN_FLIPX) text_flip|=TILEMAP_FLIPX;
 	if (m_video_register&TWIN16_SCREEN_FLIPY) text_flip|=TILEMAP_FLIPY;
 
-	machine().priority_bitmap.fill(0, cliprect);
-	draw_layer( bitmap, 1 );
-	draw_layer( bitmap, 0 );
-	draw_sprites( bitmap );
+	screen.priority().fill(0, cliprect);
+	draw_layer( screen, bitmap, 1 );
+	draw_layer( screen, bitmap, 0 );
+	draw_sprites( screen, bitmap );
 
 	if (text_flip) m_text_tilemap->set_flip(text_flip);
-	m_text_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_text_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 

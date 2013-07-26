@@ -248,7 +248,7 @@ void chaknpop_state::draw_bitmap( bitmap_ind16 &bitmap, const rectangle &cliprec
 
 UINT32 chaknpop_state::screen_update_chaknpop(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);
 	draw_bitmap(bitmap, cliprect);
 	return 0;

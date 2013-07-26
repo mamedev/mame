@@ -187,10 +187,10 @@ UINT32 bestleag_state::screen_update_bestleag(screen_device &screen, bitmap_ind1
 	m_fg_tilemap->set_scrollx(0,m_vregs[0x08/2] & 0xfff8);
 	m_fg_tilemap->set_scrolly(0,m_vregs[0x0a/2]);
 
-	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
-	m_fg_tilemap->draw(bitmap, cliprect, 0,0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	draw_sprites(bitmap,cliprect);
-	m_tx_tilemap->draw(bitmap, cliprect, 0,0);
+	m_tx_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
 }
 
@@ -203,10 +203,10 @@ UINT32 bestleag_state::screen_update_bestleaw(screen_device &screen, bitmap_ind1
 	m_fg_tilemap->set_scrollx(0,m_vregs[0x04/2]);
 	m_fg_tilemap->set_scrolly(0,m_vregs[0x06/2]);
 
-	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
-	m_fg_tilemap->draw(bitmap, cliprect, 0,0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	draw_sprites(bitmap,cliprect);
-	m_tx_tilemap->draw(bitmap, cliprect, 0,0);
+	m_tx_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
 }
 

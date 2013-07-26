@@ -410,7 +410,7 @@ public:
 								color,
 								fx,fy,
 								sx,sy,
-								machine().priority_bitmap,primask,
+								m_screen->priority(),primask,
 								whichtable,machine().shadow_table);
 					}
 					else
@@ -421,7 +421,7 @@ public:
 								fx,fy,
 								sx,sy,
 								(zw << 16) >> 4,(zh << 16) >> 4,
-								machine().priority_bitmap,primask,
+								m_screen->priority(),primask,
 								whichtable,machine().shadow_table);
 					}
 
@@ -434,7 +434,7 @@ public:
 									color,
 									fx,!fy,
 									sx,sy,
-									machine().priority_bitmap,primask,
+									m_screen->priority(),primask,
 									whichtable,machine().shadow_table);
 						}
 						else
@@ -445,7 +445,7 @@ public:
 									fx,!fy,
 									sx,sy,
 									(zw << 16) >> 4,(zh << 16) >> 4,
-									machine().priority_bitmap,primask,
+									m_screen->priority(),primask,
 									whichtable,machine().shadow_table);
 						}
 					}

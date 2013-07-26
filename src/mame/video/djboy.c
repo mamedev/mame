@@ -67,7 +67,7 @@ UINT32 djboy_state::screen_update_djboy(screen_device &screen, bitmap_ind16 &bit
 	scroll = m_scrolly | ((m_videoreg & 0x20) << 3);
 	m_background->set_scrolly(0, scroll);
 
-	m_background->draw(bitmap, cliprect, 0, 0);
+	m_background->draw(screen, bitmap, cliprect, 0, 0);
 	m_pandora->update(bitmap, cliprect);
 
 	return 0;

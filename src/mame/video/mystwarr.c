@@ -172,7 +172,7 @@ VIDEO_START_MEMBER(mystwarr_state,gaiapols)
 
 	m_k055673->alt_k055673_vh_start(machine(), "gfx2", 1, -61, -22, gaiapols_sprite_callback); // stage2 brick walls
 
-	konamigx_mixer_init(machine(), 0);
+	konamigx_mixer_init(*m_screen, 0);
 
 	m_k056832->set_layer_offs(0, -2+2-1, 0-1);
 	m_k056832->set_layer_offs(1,  0+2, 0);
@@ -212,7 +212,7 @@ VIDEO_START_MEMBER(mystwarr_state,dadandrn)
 
 	m_k055673->alt_k055673_vh_start(machine(), "gfx2", 0, -42, -22, gaiapols_sprite_callback);
 
-	konamigx_mixer_init(machine(), 0);
+	konamigx_mixer_init(*m_screen, 0);
 
 	konamigx_mixer_primode(1);
 
@@ -241,7 +241,7 @@ VIDEO_START_MEMBER(mystwarr_state,mystwarr)
 
 	m_k055673->alt_k055673_vh_start(machine(), "gfx2", 0, -48, -24, mystwarr_sprite_callback);
 
-	konamigx_mixer_init(machine(), 0);
+	konamigx_mixer_init(*m_screen, 0);
 
 	m_k056832->set_layer_offs(0, -2-3, 0);
 	m_k056832->set_layer_offs(1,  0-3, 0);
@@ -264,7 +264,7 @@ VIDEO_START_MEMBER(mystwarr_state,metamrph)
 
 	m_k055673->alt_k055673_vh_start(machine(), "gfx2", 1, -51, -22, metamrph_sprite_callback);
 
-	konamigx_mixer_init(machine(), 0);
+	konamigx_mixer_init(*m_screen, 0);
 
 	// other reference, floor at first boss
 	m_k056832->set_layer_offs(0, -2+4, 0); // text
@@ -286,7 +286,7 @@ VIDEO_START_MEMBER(mystwarr_state,viostorm)
 
 	m_k055673->alt_k055673_vh_start(machine(), "gfx2", 1, -62, -23, metamrph_sprite_callback);
 
-	konamigx_mixer_init(machine(), 0);
+	konamigx_mixer_init(*m_screen, 0);
 
 	m_k056832->set_layer_offs(0, -2+1, 0);
 	m_k056832->set_layer_offs(1,  0+1, 0);
@@ -307,7 +307,7 @@ VIDEO_START_MEMBER(mystwarr_state,martchmp)
 
 	m_k055673->alt_k055673_vh_start(machine(), "gfx2", 0, -58, -23, martchmp_sprite_callback);
 
-	konamigx_mixer_init(machine(), 0);
+	konamigx_mixer_init(*m_screen, 0);
 
 	m_k056832->set_layer_offs(0, -2-4, 0);
 	m_k056832->set_layer_offs(1,  0-4, 0);
@@ -334,7 +334,7 @@ UINT32 mystwarr_state::screen_update_mystwarr(screen_device &screen, bitmap_rgb3
 
 	m_sprite_colorbase = m_k055555->K055555_get_palette_index(4)<<5;
 
-	konamigx_mixer(machine(), bitmap, cliprect, 0, 0, 0, 0, blendmode, 0, 0);
+	konamigx_mixer(screen, bitmap, cliprect, 0, 0, 0, 0, blendmode, 0, 0);
 	return 0;
 }
 
@@ -351,7 +351,7 @@ UINT32 mystwarr_state::screen_update_metamrph(screen_device &screen, bitmap_rgb3
 
 	m_sprite_colorbase = m_k055555->K055555_get_palette_index(4)<<4;
 
-	konamigx_mixer(machine(), bitmap, cliprect, 0, GXSUB_K053250 | GXSUB_4BPP, 0, 0, 0, 0, 0);
+	konamigx_mixer(screen, bitmap, cliprect, 0, GXSUB_K053250 | GXSUB_4BPP, 0, 0, 0, 0, 0);
 	return 0;
 }
 
@@ -374,7 +374,7 @@ UINT32 mystwarr_state::screen_update_martchmp(screen_device &screen, bitmap_rgb3
 	// not quite right
 	blendmode = (m_oinprion==0xef && K054338_read_register(K338_REG_PBLEND)) ? ((1<<16|GXMIX_BLEND_FORCE)<<2) : 0;
 
-	konamigx_mixer(machine(), bitmap, cliprect, 0, 0, 0, 0, blendmode, 0, 0);
+	konamigx_mixer(screen, bitmap, cliprect, 0, 0, 0, 0, blendmode, 0, 0);
 	return 0;
 }
 
@@ -535,6 +535,6 @@ UINT32 mystwarr_state::screen_update_dadandrn(screen_device &screen, bitmap_rgb3
 			popmessage("K053936: PSAC colorbase changed");
 	}
 
-	konamigx_mixer(machine(), bitmap, cliprect, (m_roz_enable) ? m_ult_936_tilemap : 0, rozmode, 0, 0, 0, 0, 0);
+	konamigx_mixer(screen, bitmap, cliprect, (m_roz_enable) ? m_ult_936_tilemap : 0, rozmode, 0, 0, 0, 0, 0);
 	return 0;
 }

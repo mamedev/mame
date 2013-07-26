@@ -180,16 +180,16 @@ if (machine().input().code_pressed(KEYCODE_Z))
 	switch (m_layers)
 	{
 		case 0x04:  // girl select: bg over fg
-			if (layers_ctrl & 2)    m_tmap2->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-			if (layers_ctrl & 1)    m_tmap->draw(bitmap, cliprect, 0, 0);
+			if (layers_ctrl & 2)    m_tmap2->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+			if (layers_ctrl & 1)    m_tmap->draw(screen, bitmap, cliprect, 0, 0);
 			break;
 		case 0x05:  // dips: must hide fg
-			if (layers_ctrl & 1)    m_tmap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+			if (layers_ctrl & 1)    m_tmap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 			break;
 		case 0x07:  // game,demo: fg over bg
 		default:
-			if (layers_ctrl & 1)    m_tmap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-			if (layers_ctrl & 2)    m_tmap2->draw(bitmap, cliprect, 0, 0);
+			if (layers_ctrl & 1)    m_tmap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+			if (layers_ctrl & 2)    m_tmap2->draw(screen, bitmap, cliprect, 0, 0);
 			break;
 	}
 

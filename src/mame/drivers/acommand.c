@@ -260,9 +260,9 @@ void acommand_state::draw_led(bitmap_ind16 &bitmap, int x, int y,UINT8 value)
 
 UINT32 acommand_state::screen_update_acommand(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	draw_sprites(bitmap,cliprect,0,0);
-	m_tx_tilemap->draw(bitmap, cliprect, 0,0);
+	m_tx_tilemap->draw(screen, bitmap, cliprect, 0,0);
 
 	/*Order might be wrong,but these for sure are the led numbers tested*/
 	draw_led(bitmap,  0, 20, (m_led0 & 0x0f00) >> 8);

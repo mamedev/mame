@@ -90,10 +90,10 @@ UINT32 namcofl_state::screen_update_namcofl(screen_device &screen, bitmap_ind16 
 
 	for( pri=0; pri<16; pri++ )
 	{
-		c169_roz_draw(bitmap, cliprect, pri);
+		c169_roz_draw(screen, bitmap, cliprect, pri);
 		if((pri&1)==0)
-			namco_tilemap_draw( bitmap, cliprect, pri>>1 );
-		c355_obj_draw(bitmap, cliprect, pri );
+			namco_tilemap_draw( screen, bitmap, cliprect, pri>>1 );
+		c355_obj_draw(screen, bitmap, cliprect, pri );
 	}
 
 	return 0;

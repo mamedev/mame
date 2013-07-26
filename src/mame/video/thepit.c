@@ -303,14 +303,14 @@ UINT32 thepit_state::screen_update_thepit(screen_device &screen, bitmap_ind16 &b
 	}
 
 	/* low priority tiles */
-	m_solid_tilemap->draw(bitmap, cliprect, 0, 0);
-	m_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_solid_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* low priority sprites */
 	draw_sprites(machine(), bitmap, m_flip_screen_x ? spritevisibleareaflipx : spritevisiblearea, 0);
 
 	/* high priority tiles */
-	m_solid_tilemap->draw(bitmap, cliprect, 1, 1);
+	m_solid_tilemap->draw(screen, bitmap, cliprect, 1, 1);
 
 	/* high priority sprites */
 	draw_sprites(machine(), bitmap, m_flip_screen_x ? spritevisibleareaflipx : spritevisiblearea, 1);
@@ -338,8 +338,8 @@ UINT32 thepit_state::screen_update_desertdan(screen_device &screen, bitmap_ind16
 
 	/* low priority tiles */
 	m_graphics_bank = 0;
-	m_solid_tilemap->draw(bitmap, cliprect, 0, 0);
-	m_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_solid_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* low priority sprites */
 	m_graphics_bank = 1;
@@ -347,7 +347,7 @@ UINT32 thepit_state::screen_update_desertdan(screen_device &screen, bitmap_ind16
 
 	/* high priority tiles */ // not sure about this, draws a white block over the title logo sprite, looks like it should be behind?
 	m_graphics_bank = 0;
-	m_solid_tilemap->draw(bitmap, cliprect, 1, 1);
+	m_solid_tilemap->draw(screen, bitmap, cliprect, 1, 1);
 
 	/* high priority sprites */
 	m_graphics_bank = 1;

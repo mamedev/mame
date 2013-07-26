@@ -227,7 +227,7 @@ UINT32 battlane_state::screen_update_battlane(screen_device &screen, bitmap_ind1
 {
 	m_bg_tilemap->mark_all_dirty(); // HACK
 
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);
 	draw_fg_bitmap(bitmap);
 	return 0;

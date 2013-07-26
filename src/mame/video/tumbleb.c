@@ -282,7 +282,7 @@ VIDEO_START_MEMBER(tumbleb_state,suprtrio)
 
 /******************************************************************************/
 
-void tumbleb_state::tumbleb_draw_common(bitmap_ind16 &bitmap, const rectangle &cliprect, int pf1x_offs, int pf1y_offs, int pf2x_offs, int pf2y_offs)
+void tumbleb_state::tumbleb_draw_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pf1x_offs, int pf1y_offs, int pf2x_offs, int pf2y_offs)
 {
 	m_pf1_tilemap->set_scrollx(0, m_control_0[1] + pf1x_offs);
 	m_pf1_tilemap->set_scrolly(0, m_control_0[2] + pf1y_offs);
@@ -291,12 +291,12 @@ void tumbleb_state::tumbleb_draw_common(bitmap_ind16 &bitmap, const rectangle &c
 	m_pf2_tilemap->set_scrollx(0, m_control_0[3] + pf2x_offs);
 	m_pf2_tilemap->set_scrolly(0, m_control_0[4] + pf2y_offs);
 
-	m_pf2_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_pf2_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	if (m_control_0[6] & 0x80)
-		m_pf1_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_pf1_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	else
-		m_pf1_alt_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_pf1_alt_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, m_spriteram, m_spriteram.bytes()/2);
 }
@@ -318,7 +318,7 @@ UINT32 tumbleb_state::screen_update_tumblepb(screen_device &screen, bitmap_ind16
 	else
 		offs2 = -5;
 
-	tumbleb_draw_common(bitmap,cliprect, offs2, 0, offs, 0);
+	tumbleb_draw_common(screen, bitmap, cliprect, offs2, 0, offs, 0);
 
 	return 0;
 }
@@ -340,7 +340,7 @@ UINT32 tumbleb_state::screen_update_jumpkids(screen_device &screen, bitmap_ind16
 	else
 		offs2 = -5;
 
-	tumbleb_draw_common(bitmap,cliprect, offs2, 0, offs, 0);
+	tumbleb_draw_common(screen, bitmap, cliprect, offs2, 0, offs, 0);
 	return 0;
 }
 
@@ -361,7 +361,7 @@ UINT32 tumbleb_state::screen_update_semicom(screen_device &screen, bitmap_ind16 
 	else
 		offs2 = -5;
 
-	tumbleb_draw_common(bitmap,cliprect, offs2, 0, offs, 0);
+	tumbleb_draw_common(screen, bitmap, cliprect, offs2, 0, offs, 0);
 	return 0;
 }
 
@@ -375,7 +375,7 @@ UINT32 tumbleb_state::screen_update_semicom_altoffsets(screen_device &screen, bi
 	offsy = 2;
 	offsx2 = -5;
 
-	tumbleb_draw_common(bitmap,cliprect, offsx2, 0, offsx, offsy);
+	tumbleb_draw_common(screen, bitmap, cliprect, offsx2, 0, offsx, offsy);
 
 	return 0;
 }
@@ -399,7 +399,7 @@ UINT32 tumbleb_state::screen_update_bcstory(screen_device &screen, bitmap_ind16 
 	else
 		offs2 = 8;
 
-	tumbleb_draw_common(bitmap,cliprect, offs2, 0, offs, 0);
+	tumbleb_draw_common(screen, bitmap, cliprect, offs2, 0, offs, 0);
 	return 0;
 }
 
@@ -412,7 +412,7 @@ UINT32 tumbleb_state::screen_update_semibase(screen_device &screen, bitmap_ind16
 	offs = -1;
 	offs2 = -2;
 
-	tumbleb_draw_common(bitmap,cliprect, offs2, 0, offs, 0);
+	tumbleb_draw_common(screen, bitmap, cliprect, offs2, 0, offs, 0);
 
 	return 0;
 }
@@ -426,7 +426,7 @@ UINT32 tumbleb_state::screen_update_sdfight(screen_device &screen, bitmap_ind16 
 	offs = -1;
 	offs2 = -5; // foreground scroll..
 
-	tumbleb_draw_common(bitmap,cliprect, offs2, -16, offs, 0);
+	tumbleb_draw_common(screen, bitmap, cliprect, offs2, -16, offs, 0);
 
 	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, m_spriteram.bytes()/2);
 	return 0;
@@ -449,7 +449,7 @@ UINT32 tumbleb_state::screen_update_fncywld(screen_device &screen, bitmap_ind16 
 	else
 		offs2 = -5;
 
-	tumbleb_draw_common(bitmap,cliprect, offs2, 0, offs, 0);
+	tumbleb_draw_common(screen, bitmap, cliprect, offs2, 0, offs, 0);
 
 	return 0;
 }
@@ -471,7 +471,7 @@ UINT32 tumbleb_state::screen_update_pangpang(screen_device &screen, bitmap_ind16
 	else
 		offs2 = -5;
 
-	tumbleb_draw_common(bitmap,cliprect, offs2, 0, offs, 0);
+	tumbleb_draw_common(screen, bitmap, cliprect, offs2, 0, offs, 0);
 	return 0;
 }
 
@@ -484,8 +484,8 @@ UINT32 tumbleb_state::screen_update_suprtrio(screen_device &screen, bitmap_ind16
 	m_pf2_tilemap->set_scrollx(0, -m_control[3] - 2);
 	m_pf2_tilemap->set_scrolly(0, -m_control[4]);
 
-	m_pf2_tilemap->draw(bitmap, cliprect, 0, 0);
-	m_pf1_alt_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_pf2_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_pf1_alt_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, m_spriteram.bytes()/2);
 	return 0;

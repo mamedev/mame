@@ -220,8 +220,8 @@ UINT32 thedeep_state::screen_update_thedeep(screen_device &screen, bitmap_ind16 
 
 	bitmap.fill(get_black_pen(machine()), cliprect);
 
-	m_tilemap_0->draw(bitmap, cliprect, 0,0);
+	m_tilemap_0->draw(screen, bitmap, cliprect, 0,0);
 	draw_sprites(bitmap,cliprect);
-	m_tilemap_1->draw(bitmap, cliprect, 0,0);
+	m_tilemap_1->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
 }

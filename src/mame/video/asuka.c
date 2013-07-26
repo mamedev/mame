@@ -26,17 +26,17 @@ UINT32 asuka_state::screen_update_asuka(screen_device &screen, bitmap_ind16 &bit
 	layer[1] = layer[0] ^ 1;
 	layer[2] = 2;
 
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 
 	/* Ensure screen blanked even when bottom layer not drawn due to disable bit */
 	bitmap.fill(0, cliprect);
 
-	m_tc0100scn->tilemap_draw(bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 1);
-	m_tc0100scn->tilemap_draw(bitmap, cliprect, layer[1], 0, 2);
-	m_tc0100scn->tilemap_draw(bitmap, cliprect, layer[2], 0, 4);
+	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 1);
+	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, layer[1], 0, 2);
+	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, layer[2], 0, 4);
 
 	/* Sprites may be over or under top bg layer */
-	m_pc090oj->draw_sprites(bitmap, cliprect, 2);
+	m_pc090oj->draw_sprites(bitmap, cliprect, screen.priority(), 2);
 	return 0;
 }
 
@@ -51,16 +51,16 @@ UINT32 asuka_state::screen_update_bonzeadv(screen_device &screen, bitmap_ind16 &
 	layer[1] = layer[0] ^ 1;
 	layer[2] = 2;
 
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 
 	/* Ensure screen blanked even when bottom layer not drawn due to disable bit */
 	bitmap.fill(0, cliprect);
 
-	m_tc0100scn->tilemap_draw(bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 1);
-	m_tc0100scn->tilemap_draw(bitmap, cliprect, layer[1], 0, 2);
-	m_tc0100scn->tilemap_draw(bitmap, cliprect, layer[2], 0, 4);
+	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 1);
+	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, layer[1], 0, 2);
+	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, layer[2], 0, 4);
 
 	/* Sprites are always over both bg layers */
-	m_pc090oj->draw_sprites(bitmap, cliprect, 0);
+	m_pc090oj->draw_sprites(bitmap, cliprect, screen.priority(), 0);
 	return 0;
 }

@@ -118,8 +118,8 @@ UINT32 drmicro_state::screen_update_drmicro(screen_device &screen, bitmap_ind16 
 	int chr, col, attr;
 	int x, y, fx, fy;
 
-	m_bg1->draw(bitmap, cliprect, 0, 0);
-	m_bg2->draw(bitmap, cliprect, 0, 0);
+	m_bg1->draw(screen, bitmap, cliprect, 0, 0);
+	m_bg2->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* draw sprites */
 	for (g = 0; g < 2; g++)

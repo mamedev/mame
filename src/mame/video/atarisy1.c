@@ -464,7 +464,7 @@ UINT32 atarisy1_state::screen_update_atarisy1(screen_device &screen, bitmap_ind1
 	m_mob->draw_async(cliprect);
 
 	// draw the playfield
-	m_playfield_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_playfield_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	// draw and merge the MO
 	bitmap_ind16 &mobitmap = m_mob->bitmap();
@@ -495,7 +495,7 @@ UINT32 atarisy1_state::screen_update_atarisy1(screen_device &screen, bitmap_ind1
 		}
 
 	/* add the alpha on top */
-	m_alpha_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_alpha_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 

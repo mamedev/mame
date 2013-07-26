@@ -116,8 +116,8 @@ public:
 	DECLARE_WRITE8_MEMBER(ipu_break_changed);
 	void mcr_set_color(int index, int data);
 	void journey_set_color(int index, int data);
-	void render_sprites_91399(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void render_sprites_91464(bitmap_ind16 &bitmap, const rectangle &cliprect, int primask, int sprmask, int colormask);
+	void render_sprites_91399(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void render_sprites_91464(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int primask, int sprmask, int colormask);
 	void mcr_init(int cpuboard, int vidboard, int ssioboard);
 };
 

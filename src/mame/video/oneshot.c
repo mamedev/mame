@@ -153,10 +153,10 @@ UINT32 oneshot_state::screen_update_oneshot(screen_device &screen, bitmap_ind16 
 	m_mid_tilemap->set_scrollx(0, m_scroll[0] - 0x1f5);
 	m_mid_tilemap->set_scrolly(0, m_scroll[1]);
 
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	m_mid_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_mid_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);
-	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_crosshairs(bitmap, cliprect);
 	return 0;
 }
@@ -167,9 +167,9 @@ UINT32 oneshot_state::screen_update_maddonna(screen_device &screen, bitmap_ind16
 
 	m_mid_tilemap->set_scrolly(0, m_scroll[1]); // other registers aren't used so we don't know which layers they relate to
 
-	m_mid_tilemap->draw(bitmap, cliprect, 0, 0);
-	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_mid_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);
 
 //  popmessage ("%04x %04x %04x %04x %04x %04x %04x %04x", m_scroll[0], m_scroll[1], m_scroll[2], m_scroll[3], m_scroll[4], m_scroll[5], m_scroll[6], m_scroll[7]);

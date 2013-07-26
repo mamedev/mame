@@ -339,49 +339,49 @@ void nova2001_state::pkunwar_draw_sprites(bitmap_ind16 &bitmap, const rectangle 
 
 UINT32 nova2001_state::screen_update_nova2001(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	nova2001_draw_sprites(bitmap, cliprect);
 
 	// according to the schematics, fg category 0 should be drawn behind sprites,
 	// but it doesn't look right that way
-	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
-	m_fg_tilemap->draw(bitmap, cliprect, 1, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 1, 0);
 
 	return 0;
 }
 
 UINT32 nova2001_state::screen_update_pkunwar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES, 0);
 
 	pkunwar_draw_sprites(bitmap, cliprect);
 
-	m_bg_tilemap->draw(bitmap, cliprect, 1, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 1, 0);
 
 	return 0;
 }
 
 UINT32 nova2001_state::screen_update_ninjakun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
-	m_fg_tilemap->draw(bitmap, cliprect, 1, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 1, 0);
 
 	nova2001_draw_sprites(bitmap, cliprect);
 
-	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }
 
 UINT32 nova2001_state::screen_update_raiders5(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	pkunwar_draw_sprites(bitmap, cliprect);
 
-	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }

@@ -158,12 +158,12 @@ UINT32 calorie_state::screen_update_calorie(screen_device &screen, bitmap_ind16 
 
 	if (m_bg_bank & 0x10)
 	{
-		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	}
 	else
 	{
-		m_fg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		m_fg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 	}
 
 

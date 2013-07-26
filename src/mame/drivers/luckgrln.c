@@ -359,10 +359,10 @@ UINT32 luckgrln_state::screen_update_luckgrln(screen_device &screen, bitmap_ind1
 #if 0 // treat bit as fg enable
 			if (tileattr&0x04)
 			{
-				if (bgenable==0) m_reel1_tilemap->draw(bitmap, clip, 0, 0);
-				if (bgenable==1) m_reel2_tilemap->draw(bitmap, clip, 0, 0);
-				if (bgenable==2) m_reel3_tilemap->draw(bitmap, clip, 0, 0);
-				if (bgenable==3) m_reel4_tilemap->draw(bitmap, clip, 0, 0);
+				if (bgenable==0) m_reel1_tilemap->draw(screen, bitmap, clip, 0, 0);
+				if (bgenable==1) m_reel2_tilemap->draw(screen, bitmap, clip, 0, 0);
+				if (bgenable==2) m_reel3_tilemap->draw(screen, bitmap, clip, 0, 0);
+				if (bgenable==3) m_reel4_tilemap->draw(screen, bitmap, clip, 0, 0);
 			}
 
 			if (tileattr&0x08) drawgfx_transpen(bitmap,clip,machine().gfx[region],tile,col,0,0,x*8,y*8, 0);
@@ -372,10 +372,10 @@ UINT32 luckgrln_state::screen_update_luckgrln(screen_device &screen, bitmap_ind1
 
 			if (tileattr&0x04)
 			{
-				if (bgenable==0) m_reel1_tilemap->draw(bitmap, clip, 0, 0);
-				if (bgenable==1) m_reel2_tilemap->draw(bitmap, clip, 0, 0);
-				if (bgenable==2) m_reel3_tilemap->draw(bitmap, clip, 0, 0);
-				if (bgenable==3) m_reel4_tilemap->draw(bitmap, clip, 0, 0);
+				if (bgenable==0) m_reel1_tilemap->draw(screen, bitmap, clip, 0, 0);
+				if (bgenable==1) m_reel2_tilemap->draw(screen, bitmap, clip, 0, 0);
+				if (bgenable==2) m_reel3_tilemap->draw(screen, bitmap, clip, 0, 0);
+				if (bgenable==3) m_reel4_tilemap->draw(screen, bitmap, clip, 0, 0);
 			}
 
 			if ((tileattr&0x08)) drawgfx_transpen(bitmap,clip,machine().gfx[region],tile,col,0,0,x*8,y*8, 0);

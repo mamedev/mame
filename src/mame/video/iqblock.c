@@ -86,8 +86,8 @@ WRITE8_MEMBER(iqblock_state::iqblock_fgscroll_w)
 UINT32 iqblock_state::screen_update_iqblock(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (!m_videoenable) return 0;
-	m_fg_tilemap->draw(bitmap, cliprect, 0,0);
-	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0,0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
 
 	return 0;
 }

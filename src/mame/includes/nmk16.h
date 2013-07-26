@@ -182,8 +182,8 @@ public:
 	int nmk16_bg_sprswap_tx_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int bittbl[8]);
 	int nmk16_bg_sprswapflip_tx_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int bittbl[8]);
 	int nmk16_complexbg_sprswap_tx_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int bittbl[8]);
-	void video_update(bitmap_ind16 &bitmap, const rectangle &cliprect,int dsw_flipscreen,int xoffset, int yoffset,int attr_mask);
-	void redhawki_video_update(bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void video_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect,int dsw_flipscreen,int xoffset, int yoffset,int attr_mask);
+	void redhawki_video_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void mcu_run(UINT8 dsw_setting);
 	UINT8 decode_byte(UINT8 src, const UINT8 *bitp);
 	UINT32 bjtwin_address_map_bg0(UINT32 addr);

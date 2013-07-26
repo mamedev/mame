@@ -143,7 +143,7 @@ public:
 	void taitol_bg19_m( int offset );
 	void taitol_char1a_m( int offset );
 	void taitol_obj1b_m( int offset );
-	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void palette_notifier(int addr);
 	void state_register(  );
 	void taito_machine_reset();

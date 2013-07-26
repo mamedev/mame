@@ -296,19 +296,19 @@ UINT32 tecmosys_state::screen_update_tecmosys(screen_device &screen, bitmap_rgb3
 	m_tmp_tilemap_composebitmap.fill(0, cliprect);
 
 	m_tmp_tilemap_renderbitmap.fill(0, cliprect);
-	m_bg0tilemap->draw(m_tmp_tilemap_renderbitmap, cliprect, 0,0);
+	m_bg0tilemap->draw(screen, m_tmp_tilemap_renderbitmap, cliprect, 0,0);
 	tecmosys_tilemap_copy_to_compose(0x0000);
 
 	m_tmp_tilemap_renderbitmap.fill(0, cliprect);
-	m_bg1tilemap->draw(m_tmp_tilemap_renderbitmap, cliprect, 0,0);
+	m_bg1tilemap->draw(screen, m_tmp_tilemap_renderbitmap, cliprect, 0,0);
 	tecmosys_tilemap_copy_to_compose(0x4000);
 
 	m_tmp_tilemap_renderbitmap.fill(0, cliprect);
-	m_bg2tilemap->draw(m_tmp_tilemap_renderbitmap, cliprect, 0,0);
+	m_bg2tilemap->draw(screen, m_tmp_tilemap_renderbitmap, cliprect, 0,0);
 	tecmosys_tilemap_copy_to_compose(0x8000);
 
 	m_tmp_tilemap_renderbitmap.fill(0, cliprect);
-	m_txt_tilemap->draw(m_tmp_tilemap_renderbitmap, cliprect, 0,0);
+	m_txt_tilemap->draw(screen, m_tmp_tilemap_renderbitmap, cliprect, 0,0);
 	tecmosys_tilemap_copy_to_compose(0xc000);
 
 

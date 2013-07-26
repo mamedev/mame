@@ -92,7 +92,7 @@ WRITE16_MEMBER(shadfrce_state::shadfrce_bg1scrolly_w)
 
 
 
-void shadfrce_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
+void shadfrce_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	/* | ---- ---- hhhf Fe-Y | ---- ---- yyyy yyyy | ---- ---- TTTT TTTT | ---- ---- tttt tttt |
 	   | ---- ---- -pCc cccX | ---- ---- xxxx xxxx | ---- ---- ---- ---- | ---- ---- ---- ---- | */
@@ -129,10 +129,10 @@ void shadfrce_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		height++;
 		if (enable) {
 			for (hcount=0;hcount<height;hcount++) {
-				pdrawgfx_transpen(bitmap,cliprect,gfx,tile+hcount,pal,flipx,flipy,xpos,ypos-hcount*16-16,machine().priority_bitmap,pri_mask,0);
-				pdrawgfx_transpen(bitmap,cliprect,gfx,tile+hcount,pal,flipx,flipy,xpos-0x200,ypos-hcount*16-16,machine().priority_bitmap,pri_mask,0);
-				pdrawgfx_transpen(bitmap,cliprect,gfx,tile+hcount,pal,flipx,flipy,xpos,ypos-hcount*16-16+0x200,machine().priority_bitmap,pri_mask,0);
-				pdrawgfx_transpen(bitmap,cliprect,gfx,tile+hcount,pal,flipx,flipy,xpos-0x200,ypos-hcount*16-16+0x200,machine().priority_bitmap,pri_mask,0);
+				pdrawgfx_transpen(bitmap,cliprect,gfx,tile+hcount,pal,flipx,flipy,xpos,ypos-hcount*16-16,screen.priority(),pri_mask,0);
+				pdrawgfx_transpen(bitmap,cliprect,gfx,tile+hcount,pal,flipx,flipy,xpos-0x200,ypos-hcount*16-16,screen.priority(),pri_mask,0);
+				pdrawgfx_transpen(bitmap,cliprect,gfx,tile+hcount,pal,flipx,flipy,xpos,ypos-hcount*16-16+0x200,screen.priority(),pri_mask,0);
+				pdrawgfx_transpen(bitmap,cliprect,gfx,tile+hcount,pal,flipx,flipy,xpos-0x200,ypos-hcount*16-16+0x200,screen.priority(),pri_mask,0);
 			}
 		}
 		source-=8;
@@ -141,14 +141,14 @@ void shadfrce_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 UINT32 shadfrce_state::screen_update_shadfrce(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 
 	if (m_video_enable)
 	{
-		m_bg1tilemap->draw(bitmap, cliprect, 0,0);
-		m_bg0tilemap->draw(bitmap, cliprect, 0,1);
-		draw_sprites(bitmap,cliprect);
-		m_fgtilemap->draw(bitmap, cliprect, 0,0);
+		m_bg1tilemap->draw(screen, bitmap, cliprect, 0,0);
+		m_bg0tilemap->draw(screen, bitmap, cliprect, 0,1);
+		draw_sprites(screen,bitmap,cliprect);
+		m_fgtilemap->draw(screen, bitmap, cliprect, 0,0);
 	}
 	else
 	{

@@ -1019,38 +1019,38 @@ static void sfbonus_draw_reel_layer(screen_device &screen, bitmap_ind16 &bitmap,
 
 		if (rowenable2==0)
 		{
-			state->m_reel_tilemap->draw(*state->m_temp_reel_bitmap, clip, TILEMAP_DRAW_CATEGORY(catagory),3);
+			state->m_reel_tilemap->draw(screen, *state->m_temp_reel_bitmap, clip, TILEMAP_DRAW_CATEGORY(catagory),3);
 		}
 		if (rowenable==0)
 		{
-			state->m_reel_tilemap->draw(*state->m_temp_reel_bitmap, clip, TILEMAP_DRAW_CATEGORY(catagory),3);
+			state->m_reel_tilemap->draw(screen, *state->m_temp_reel_bitmap, clip, TILEMAP_DRAW_CATEGORY(catagory),3);
 		}
 
 		if (rowenable2==0x1)
 		{
-			state->m_reel2_tilemap->draw(*state->m_temp_reel_bitmap, clip, TILEMAP_DRAW_CATEGORY(catagory),2);
+			state->m_reel2_tilemap->draw(screen, *state->m_temp_reel_bitmap, clip, TILEMAP_DRAW_CATEGORY(catagory),2);
 		}
 		if (rowenable==0x1)
 		{
-			state->m_reel2_tilemap->draw(*state->m_temp_reel_bitmap, clip, TILEMAP_DRAW_CATEGORY(catagory),2);
+			state->m_reel2_tilemap->draw(screen, *state->m_temp_reel_bitmap, clip, TILEMAP_DRAW_CATEGORY(catagory),2);
 		}
 
 		if (rowenable2==0x2)
 		{
-			state->m_reel3_tilemap->draw(*state->m_temp_reel_bitmap, clip, TILEMAP_DRAW_CATEGORY(catagory),1);
+			state->m_reel3_tilemap->draw(screen, *state->m_temp_reel_bitmap, clip, TILEMAP_DRAW_CATEGORY(catagory),1);
 		}
 		if (rowenable==0x2)
 		{
-			state->m_reel3_tilemap->draw(*state->m_temp_reel_bitmap, clip, TILEMAP_DRAW_CATEGORY(catagory),1);
+			state->m_reel3_tilemap->draw(screen, *state->m_temp_reel_bitmap, clip, TILEMAP_DRAW_CATEGORY(catagory),1);
 		}
 
 		if (rowenable2==0x3)
 		{
-			state->m_reel4_tilemap->draw(*state->m_temp_reel_bitmap, clip, TILEMAP_DRAW_CATEGORY(catagory),4);
+			state->m_reel4_tilemap->draw(screen, *state->m_temp_reel_bitmap, clip, TILEMAP_DRAW_CATEGORY(catagory),4);
 		}
 		if (rowenable==0x3)
 		{
-			state->m_reel4_tilemap->draw(*state->m_temp_reel_bitmap, clip, TILEMAP_DRAW_CATEGORY(catagory),4);
+			state->m_reel4_tilemap->draw(screen, *state->m_temp_reel_bitmap, clip, TILEMAP_DRAW_CATEGORY(catagory),4);
 		}
 
 
@@ -1104,7 +1104,7 @@ UINT32 sfbonus_state::screen_update_sfbonus(screen_device &screen, bitmap_ind16 
 		scroll = front_rowscroll[(i*2)+0x000] | (front_rowscroll[(i*2)+0x001]<<8);
 		m_tilemap->set_scrollx(i, scroll+globalxscroll );
 	}
-	m_tilemap->draw(bitmap, cliprect, 0,0);
+	m_tilemap->draw(screen, bitmap, cliprect, 0,0);
 
 	{
 		int y,x;

@@ -211,9 +211,9 @@ static void warpspeed_draw_circles(bitmap_ind16 &bitmap, warpspeed_state *state)
 
 UINT32 warpspeed_state::screen_update_warpspeed(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_starfield_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_starfield_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	warpspeed_draw_circles(bitmap, this);
-	m_text_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_text_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 

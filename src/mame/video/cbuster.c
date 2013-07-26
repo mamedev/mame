@@ -59,23 +59,23 @@ UINT32 cbuster_state::screen_update_twocrude(screen_device &screen, bitmap_rgb32
 	m_deco_tilegen2->pf_update(m_pf3_rowscroll, m_pf4_rowscroll);
 
 	/* Draw playfields & sprites */
-	m_deco_tilegen2->tilemap_2_draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	m_deco_tilegen2->tilemap_2_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 	m_sprgen->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0800, 0x0900, 0x100, 0x0ff);
 	m_sprgen->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0900, 0x0900, 0x500, 0x0ff);
 
 	if (m_pri)
 	{
-		m_deco_tilegen1->tilemap_2_draw(bitmap, cliprect, 0, 0);
-		m_deco_tilegen2->tilemap_1_draw(bitmap, cliprect, 0, 0);
+		m_deco_tilegen1->tilemap_2_draw(screen, bitmap, cliprect, 0, 0);
+		m_deco_tilegen2->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
 	}
 	else
 	{
-		m_deco_tilegen2->tilemap_1_draw(bitmap, cliprect, 0, 0);
-		m_deco_tilegen1->tilemap_2_draw(bitmap, cliprect, 0, 0);
+		m_deco_tilegen2->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
+		m_deco_tilegen1->tilemap_2_draw(screen, bitmap, cliprect, 0, 0);
 	}
 
 	m_sprgen->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0000, 0x0900, 0x100, 0x0ff);
 	m_sprgen->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0100, 0x0900, 0x500, 0x0ff);
-	m_deco_tilegen1->tilemap_1_draw(bitmap, cliprect, 0, 0);
+	m_deco_tilegen1->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }

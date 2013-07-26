@@ -160,20 +160,20 @@ UINT32 goal92_state::screen_update_goal92(screen_device &screen, bitmap_ind16 &b
 
 	bitmap.fill(get_black_pen(machine()), cliprect);
 
-	m_bg_layer->draw(bitmap, cliprect, 0, 0);
+	m_bg_layer->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect, 2);
 
 	if (!(m_fg_bank & 0xff))
 		draw_sprites(bitmap, cliprect, 1);
 
-	m_fg_layer->draw(bitmap, cliprect, 0, 0);
+	m_fg_layer->draw(screen, bitmap, cliprect, 0, 0);
 
 	if(m_fg_bank & 0xff)
 		draw_sprites(bitmap, cliprect, 1);
 
 	draw_sprites(bitmap, cliprect, 0);
 	draw_sprites(bitmap, cliprect, 3);
-	m_tx_layer->draw(bitmap, cliprect, 0, 0);
+	m_tx_layer->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 

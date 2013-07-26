@@ -450,11 +450,11 @@ UINT32 equites_state::screen_update_equites(screen_device &screen, bitmap_ind16 
 {
 	bitmap.fill(m_bgcolor, cliprect);
 
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	equites_draw_sprites(bitmap, cliprect);
 
-	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }
@@ -466,12 +466,12 @@ UINT32 equites_state::screen_update_splndrbt(screen_device &screen, bitmap_ind16
 	splndrbt_copy_bg(bitmap, cliprect);
 
 	if (m_fg_char_bank)
-		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	splndrbt_draw_sprites(bitmap, cliprect);
 
 	if (!m_fg_char_bank)
-		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }

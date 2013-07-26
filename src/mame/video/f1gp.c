@@ -186,22 +186,22 @@ WRITE16_MEMBER(f1gp_state::f1gp2_gfxctrl_w)
 
 UINT32 f1gp_state::screen_update_f1gp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 
-	m_k053936->zoom_draw(bitmap, cliprect, m_roz_tilemap, 0, 0, 1);
+	m_k053936->zoom_draw(screen, bitmap, cliprect, m_roz_tilemap, 0, 0, 1);
 
-	m_fg_tilemap->draw(bitmap, cliprect, 0, 1);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 1);
 
 	/* quick kludge for "continue" screen priority */
 	if (m_gfxctrl == 0x00)
 	{
-		m_spr_old->turbofrc_draw_sprites(m_spr1vram, m_spr1vram.bytes(),  0, machine(), bitmap, cliprect, 0x02);
-		m_spr_old2->turbofrc_draw_sprites(m_spr2vram, m_spr2vram.bytes(), 0, machine(), bitmap, cliprect, 0x02);
+		m_spr_old->turbofrc_draw_sprites(m_spr1vram, m_spr1vram.bytes(),  0, machine(), bitmap, cliprect, screen.priority(), 0x02);
+		m_spr_old2->turbofrc_draw_sprites(m_spr2vram, m_spr2vram.bytes(), 0, machine(), bitmap, cliprect, screen.priority(), 0x02);
 	}
 	else
 	{
-		m_spr_old->turbofrc_draw_sprites(m_spr1vram, m_spr1vram.bytes(), 0, machine(), bitmap, cliprect, 0x00);
-		m_spr_old2->turbofrc_draw_sprites(m_spr2vram, m_spr2vram.bytes(), 0, machine(), bitmap, cliprect, 0x02);
+		m_spr_old->turbofrc_draw_sprites(m_spr1vram, m_spr1vram.bytes(), 0, machine(), bitmap, cliprect, screen.priority(), 0x00);
+		m_spr_old2->turbofrc_draw_sprites(m_spr2vram, m_spr2vram.bytes(), 0, machine(), bitmap, cliprect, screen.priority(), 0x02);
 	}
 	return 0;
 }
@@ -216,19 +216,19 @@ UINT32 f1gp_state::screen_update_f1gp2(screen_device &screen, bitmap_ind16 &bitm
 		switch (m_gfxctrl & 3)
 		{
 			case 0:
-				m_k053936->zoom_draw(bitmap, cliprect, m_roz_tilemap, TILEMAP_DRAW_OPAQUE, 0, 1);
-				m_spr->draw_sprites(m_spritelist, 0x2000, machine(), bitmap, cliprect);
-				m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+				m_k053936->zoom_draw(screen, bitmap, cliprect, m_roz_tilemap, TILEMAP_DRAW_OPAQUE, 0, 1);
+				m_spr->draw_sprites(m_spritelist, 0x2000, screen, bitmap, cliprect);
+				m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 				break;
 			case 1:
-				m_k053936->zoom_draw(bitmap, cliprect, m_roz_tilemap, TILEMAP_DRAW_OPAQUE, 0, 1);
-				m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
-				m_spr->draw_sprites(m_spritelist, 0x2000, machine(), bitmap, cliprect);
+				m_k053936->zoom_draw(screen, bitmap, cliprect, m_roz_tilemap, TILEMAP_DRAW_OPAQUE, 0, 1);
+				m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+				m_spr->draw_sprites(m_spritelist, 0x2000, screen, bitmap, cliprect);
 				break;
 			case 2:
-				m_fg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-				m_k053936->zoom_draw(bitmap, cliprect, m_roz_tilemap, 0, 0, 1);
-				m_spr->draw_sprites(m_spritelist, 0x2000, machine(), bitmap, cliprect);
+				m_fg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+				m_k053936->zoom_draw(screen, bitmap, cliprect, m_roz_tilemap, 0, 0, 1);
+				m_spr->draw_sprites(m_spritelist, 0x2000, screen, bitmap, cliprect);
 				break;
 #ifdef MAME_DEBUG
 			case 3:
@@ -246,7 +246,7 @@ UINT32 f1gp_state::screen_update_f1gp2(screen_device &screen, bitmap_ind16 &bitm
 ***************************************************************************/
 
 // BOOTLEG
-void f1gp_state::f1gpb_draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect )
+void f1gp_state::f1gpb_draw_sprites( screen_device &screen,bitmap_ind16 &bitmap,const rectangle &cliprect )
 {
 	UINT16 *spriteram = m_spriteram;
 	int attr_start, start_offset = m_spriteram.bytes() / 2 - 4;
@@ -299,7 +299,7 @@ void f1gp_state::f1gpb_draw_sprites( bitmap_ind16 &bitmap,const rectangle &clipr
 			color,
 			flipx,flipy,
 			x,y,
-			machine().priority_bitmap,
+			screen.priority(),
 			pri ? 0 : 0x2,15);
 
 		// wrap around x
@@ -308,7 +308,7 @@ void f1gp_state::f1gpb_draw_sprites( bitmap_ind16 &bitmap,const rectangle &clipr
 			color,
 			flipx,flipy,
 			x - 512,y,
-			machine().priority_bitmap,
+			screen.priority(),
 			pri ? 0 : 0x2,15);
 	}
 }
@@ -327,16 +327,16 @@ UINT32 f1gp_state::screen_update_f1gpb(screen_device &screen, bitmap_ind16 &bitm
 
 	m_fg_tilemap->set_scrolly(0, m_fgregs[0] + 8);
 
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 
-	m_roz_tilemap->draw_roz(bitmap, cliprect,
+	m_roz_tilemap->draw_roz(screen, bitmap, cliprect,
 		startx << 13, starty << 13,
 		incxx << 5, incxy << 5, incyx << 5, incyy << 5,
 		1, 0, 0);
 
-	m_fg_tilemap->draw(bitmap, cliprect, 0, 1);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 1);
 
-	f1gpb_draw_sprites(bitmap, cliprect);
+	f1gpb_draw_sprites(screen, bitmap, cliprect);
 
 	return 0;
 }

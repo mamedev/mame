@@ -142,7 +142,7 @@ UINT32 homerun_state::screen_update_homerun(screen_device &screen, bitmap_ind16 
 	m_tilemap->set_scrolly(0, m_scrolly);
 	m_tilemap->set_scrollx(0, m_scrollx);
 
-	m_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);
 
 	return 0;

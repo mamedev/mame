@@ -139,10 +139,10 @@ UINT32 timelimt_state::screen_update_timelimt(screen_device &screen, bitmap_ind1
 {
 	m_bg_tilemap->set_scrollx(0, m_scrollx);
 	m_bg_tilemap->set_scrolly(0, m_scrolly);
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	draw_sprites(bitmap, cliprect);
 
-	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }

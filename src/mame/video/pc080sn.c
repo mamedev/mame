@@ -357,7 +357,7 @@ static UINT16 topspeed_get_road_pixel_color( UINT16 pixel, UINT16 color )
 }
 
 
-void pc080sn_device::topspeed_custom_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags,   UINT32 priority, UINT16 *color_ctrl_ram )
+void pc080sn_device::topspeed_custom_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority, UINT16 *color_ctrl_ram )
 {
 	UINT16 *dst16, *src16;
 	UINT8 *tsrc;
@@ -438,7 +438,7 @@ void pc080sn_device::topspeed_custom_draw( bitmap_ind16 &bitmap, const rectangle
 			}
 		}
 
-		taitoic_drawscanline(bitmap, cliprect, 0, y, scanline, (flags & TILEMAP_DRAW_OPAQUE) ? 0 : 1, ROT0, machine().priority_bitmap, priority);
+		taitoic_drawscanline(bitmap, cliprect, 0, y, scanline, (flags & TILEMAP_DRAW_OPAQUE) ? 0 : 1, ROT0, screen.priority(), priority);
 		y_index++;
 
 		if (!machine_flip)
@@ -449,12 +449,12 @@ void pc080sn_device::topspeed_custom_draw( bitmap_ind16 &bitmap, const rectangle
 	while ((!machine_flip && y <= max_y) || (machine_flip && y >= min_y));
 }
 
-void pc080sn_device::tilemap_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority )
+void pc080sn_device::tilemap_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority )
 {
-	m_tilemap[layer]->draw(bitmap, cliprect, flags, priority);
+	m_tilemap[layer]->draw(screen, bitmap, cliprect, flags, priority);
 }
 
-void pc080sn_device::tilemap_draw_offset( bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority, int x_offset, int y_offset )
+void pc080sn_device::tilemap_draw_offset( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority, int x_offset, int y_offset )
 {
 	int basedx = -16 - m_x_offset;
 	int basedxflip = -16 + m_x_offset;
@@ -463,14 +463,14 @@ void pc080sn_device::tilemap_draw_offset( bitmap_ind16 &bitmap, const rectangle 
 
 	m_tilemap[layer]->set_scrolldx(basedx + x_offset, basedxflip + x_offset);
 	m_tilemap[layer]->set_scrolldy(basedy + y_offset, basedyflip + y_offset);
-	m_tilemap[layer]->draw(bitmap, cliprect, flags, priority);
+	m_tilemap[layer]->draw(screen, bitmap, cliprect, flags, priority);
 	m_tilemap[layer]->set_scrolldx(basedx, basedxflip);
 	m_tilemap[layer]->set_scrolldy(basedy, basedyflip);
 }
 
-void pc080sn_device::tilemap_draw_special( bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority, UINT16 *ram )
+void pc080sn_device::tilemap_draw_special( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority, UINT16 *ram )
 {
-	pc080sn_device::topspeed_custom_draw(bitmap, cliprect, layer, flags, priority, ram);
+	pc080sn_device::topspeed_custom_draw(screen, bitmap, cliprect, layer, flags, priority, ram);
 }
 
 

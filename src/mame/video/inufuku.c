@@ -139,7 +139,7 @@ UINT32 inufuku_state::screen_update_inufuku(screen_device &screen, bitmap_ind16 
 	int i;
 
 	bitmap.fill(get_black_pen(machine()), cliprect);
-	machine().priority_bitmap.fill(0);
+	screen.priority().fill(0);
 
 	if (m_bg_raster)
 	{
@@ -153,13 +153,13 @@ UINT32 inufuku_state::screen_update_inufuku(screen_device &screen, bitmap_ind16 
 		m_bg_tilemap->set_scrollx(0, m_bg_scrollx);
 	}
 	m_bg_tilemap->set_scrolly(0, m_bg_scrolly);
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	m_tx_tilemap->set_scrollx(0, m_tx_scrollx);
 	m_tx_tilemap->set_scrolly(0, m_tx_scrolly);
-	m_tx_tilemap->draw(bitmap, cliprect, 0, 4);
+	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 4);
 
-	m_spr->draw_sprites( m_spriteram1_old, m_spriteram1.bytes(), machine(), bitmap, cliprect );
+	m_spr->draw_sprites( m_spriteram1_old, m_spriteram1.bytes(), screen, bitmap, cliprect );
 	return 0;
 }
 

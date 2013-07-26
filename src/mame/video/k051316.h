@@ -36,7 +36,7 @@ public:
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ8_MEMBER( rom_r );
 	DECLARE_WRITE8_MEMBER( ctrl_w );
-	void zoom_draw(bitmap_ind16 &bitmap,const rectangle &cliprect,int flags,UINT32 priority);
+	void zoom_draw(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,int flags,UINT32 priority);
 	void wraparound_enable(int status);
 
 protected:

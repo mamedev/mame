@@ -35,7 +35,7 @@ UINT32 galspnbl_state::screen_update_galspnbl(screen_device &screen, bitmap_ind1
 
 	draw_background(bitmap, cliprect);
 
-	galspnbl_draw_sprites(machine(), bitmap, cliprect, 0,  m_spriteram, m_spriteram.bytes());
+	galspnbl_draw_sprites(screen, bitmap, cliprect, 0,  m_spriteram, m_spriteram.bytes());
 
 	for (offs = 0; offs < 0x1000 / 2; offs++)
 	{
@@ -59,6 +59,6 @@ UINT32 galspnbl_state::screen_update_galspnbl(screen_device &screen, bitmap_ind1
 		}
 	}
 
-	galspnbl_draw_sprites(machine(), bitmap, cliprect, 1, m_spriteram, m_spriteram.bytes());
+	galspnbl_draw_sprites(screen, bitmap, cliprect, 1, m_spriteram, m_spriteram.bytes());
 	return 0;
 }

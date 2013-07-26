@@ -32,7 +32,7 @@ void slapshot_state::video_start()
             SPRITE DRAW ROUTINES
 ************************************************************/
 
-void slapshot_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int *primasks, int y_offset )
+void slapshot_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int *primasks, int y_offset )
 {
 	/*
 	    Sprite format:
@@ -369,7 +369,7 @@ void slapshot_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 				sprite_ptr->flipx,sprite_ptr->flipy,
 				sprite_ptr->x,sprite_ptr->y,
 				sprite_ptr->zoomx,sprite_ptr->zoomy,
-				machine().priority_bitmap,sprite_ptr->primask,0);
+				screen.priority(),sprite_ptr->primask,0);
 	}
 }
 
@@ -515,28 +515,28 @@ UINT32 slapshot_state::screen_update_slapshot(screen_device &screen, bitmap_ind1
 	spritepri[2] = m_tc0360pri->read(space, 7) & 0x0f;
 	spritepri[3] = m_tc0360pri->read(space, 7) >> 4;
 
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 	bitmap.fill(0, cliprect);
 
 #ifdef MAME_DEBUG
 	if (m_dislayer[layer[0]] == 0)
 #endif
-		m_tc0480scp->tilemap_draw(bitmap, cliprect, layer[0], 0, 1);
+		m_tc0480scp->tilemap_draw(screen, bitmap, cliprect, layer[0], 0, 1);
 
 #ifdef MAME_DEBUG
 	if (m_dislayer[layer[1]] == 0)
 #endif
-		m_tc0480scp->tilemap_draw(bitmap, cliprect, layer[1], 0, 2);
+		m_tc0480scp->tilemap_draw(screen, bitmap, cliprect, layer[1], 0, 2);
 
 #ifdef MAME_DEBUG
 	if (m_dislayer[layer[2]] == 0)
 #endif
-		m_tc0480scp->tilemap_draw(bitmap, cliprect, layer[2], 0, 4);
+		m_tc0480scp->tilemap_draw(screen, bitmap, cliprect, layer[2], 0, 4);
 
 #ifdef MAME_DEBUG
 	if (m_dislayer[layer[3]] == 0)
 #endif
-		m_tc0480scp->tilemap_draw(bitmap, cliprect, layer[3], 0, 8);
+		m_tc0480scp->tilemap_draw(screen, bitmap, cliprect, layer[3], 0, 8);
 
 	{
 		int primasks[4] = {0,0,0,0};
@@ -550,7 +550,7 @@ UINT32 slapshot_state::screen_update_slapshot(screen_device &screen, bitmap_ind1
 			if (spritepri[i] < tilepri[(layer[3])]) primasks[i] |= 0xff00;
 		}
 
-		draw_sprites(bitmap,cliprect,primasks,0);
+		draw_sprites(screen,bitmap,cliprect,primasks,0);
 	}
 
 	/*
@@ -562,6 +562,6 @@ UINT32 slapshot_state::screen_update_slapshot(screen_device &screen, bitmap_ind1
 #ifdef MAME_DEBUG
 	if (m_dislayer[layer[4]] == 0)
 #endif
-	m_tc0480scp->tilemap_draw(bitmap, cliprect, layer[4], 0, 0);
+	m_tc0480scp->tilemap_draw(screen, bitmap, cliprect, layer[4], 0, 0);
 	return 0;
 }

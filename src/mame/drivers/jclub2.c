@@ -255,11 +255,11 @@ UINT32 darkhors_state::screen_update_darkhors(screen_device &screen, bitmap_ind1
 
 	m_tmap->set_scrollx(0, (m_tmapscroll[0] >> 16) - 5);
 	m_tmap->set_scrolly(0, (m_tmapscroll[0] & 0xffff) - 0xff );
-	if (layers_ctrl & 1)    m_tmap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	if (layers_ctrl & 1)    m_tmap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 
 	m_tmap2->set_scrollx(0, (m_tmapscroll2[0] >> 16) - 5);
 	m_tmap2->set_scrolly(0, (m_tmapscroll2[0] & 0xffff) - 0xff );
-	if (layers_ctrl & 2)    m_tmap2->draw(bitmap, cliprect, 0, 0);
+	if (layers_ctrl & 2)    m_tmap2->draw(screen, bitmap, cliprect, 0, 0);
 	if (layers_ctrl & 4)    draw_sprites_darkhors(bitmap,cliprect);
 
 

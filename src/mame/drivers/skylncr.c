@@ -190,7 +190,7 @@ UINT32 skylncr_state::screen_update_skylncr(screen_device &screen, bitmap_ind16 
 	int i;
 
 	bitmap.fill(0, cliprect);
-	m_reel_1_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_reel_1_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	// are these hardcoded, or registers?
 	const rectangle visible1(0*8, (20+48)*8-1,  4*8,  (4+7)*8-1);
@@ -204,12 +204,12 @@ UINT32 skylncr_state::screen_update_skylncr(screen_device &screen, bitmap_ind16 
 		m_reel_4_tilemap->set_scrolly(i, m_reelscroll4[i]);
 	}
 
-	m_reel_2_tilemap->draw(bitmap, visible1, 0, 0);
-	m_reel_3_tilemap->draw(bitmap, visible2, 0, 0);
-	m_reel_4_tilemap->draw(bitmap, visible3, 0, 0);
+	m_reel_2_tilemap->draw(screen, bitmap, visible1, 0, 0);
+	m_reel_3_tilemap->draw(screen, bitmap, visible2, 0, 0);
+	m_reel_4_tilemap->draw(screen, bitmap, visible3, 0, 0);
 
 
-	m_tmap->draw(bitmap, cliprect, 0, 0);
+	m_tmap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 

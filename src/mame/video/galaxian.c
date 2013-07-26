@@ -441,7 +441,7 @@ UINT32 galaxian_state::screen_update_galaxian(screen_device &screen, bitmap_rgb3
 	(this->*m_draw_background_ptr)(bitmap, cliprect);
 
 	/* draw the tilemap characters over top */
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* render the sprites next. Some custom pcbs (eg. zigzag, fantastc) have more than one sprite generator (ideally, this should be rendered in parallel) */
 	for (int i = 0; i < m_numspritegens; i++)

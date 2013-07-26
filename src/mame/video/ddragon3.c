@@ -160,21 +160,21 @@ UINT32 ddragon3_state::screen_update_ddragon3(screen_device &screen, bitmap_ind1
 
 	if ((m_vreg & 0x60) == 0x40)
 	{
-		m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 		draw_sprites(bitmap, cliprect);
 	}
 	else if ((m_vreg & 0x60) == 0x60)
 	{
-		m_fg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_fg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 		draw_sprites(bitmap, cliprect);
 	}
 	else
 	{
-		m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 		draw_sprites(bitmap, cliprect);
-		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	}
 	return 0;
 }
@@ -188,14 +188,14 @@ UINT32 ddragon3_state::screen_update_ctribe(screen_device &screen, bitmap_ind16 
 
 	if(m_vreg & 8)
 	{
-		m_fg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		m_fg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 		draw_sprites(bitmap, cliprect);
-		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	}
 	else
 	{
-		m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 		draw_sprites(bitmap, cliprect);
 	}
 	return 0;

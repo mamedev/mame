@@ -2162,7 +2162,7 @@ UINT32 namcos23_state::screen_update_s23(screen_device &screen, bitmap_rgb32 &bi
 
 	m_bgtilemap->set_palette_offset(m_c404.palbase);
 	if (m_c404.layer & 4)
-		m_bgtilemap->draw(bitmap, cliprect, 0, 0);
+		m_bgtilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 

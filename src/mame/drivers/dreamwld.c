@@ -393,8 +393,8 @@ UINT32 dreamwld_state::screen_update_dreamwld(screen_device &screen, bitmap_ind1
 		m_bg2_tilemap->mark_all_dirty();
 	}
 
-	tmptilemap0->draw(bitmap, cliprect, 0, 0);
-	tmptilemap1->draw(bitmap, cliprect, 0, 0);
+	tmptilemap0->draw(screen, bitmap, cliprect, 0, 0);
+	tmptilemap1->draw(screen, bitmap, cliprect, 0, 0);
 
 	draw_sprites(bitmap, cliprect);
 

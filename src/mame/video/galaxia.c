@@ -117,7 +117,7 @@ UINT32 galaxia_state::screen_update_galaxia(screen_device &screen, bitmap_ind16 
 
 	bitmap.fill(0, cliprect);
 	cvs_update_stars(bitmap, cliprect, STAR_PEN, 1);
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
@@ -181,7 +181,7 @@ UINT32 galaxia_state::screen_update_astrowar(screen_device &screen, bitmap_ind16
 
 	bitmap.fill(0, cliprect);
 	cvs_update_stars(bitmap, cliprect, STAR_PEN, 1);
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	copybitmap(m_temp_bitmap, bitmap, 0, 0, 0, 0, cliprect);
 
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)

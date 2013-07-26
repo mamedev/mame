@@ -87,7 +87,7 @@ UINT32 runaway_state::screen_update_runaway(screen_device &screen, bitmap_ind16 
 {
 	int i;
 
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	for (i = 0; i < 16; i++)
 	{
@@ -121,7 +121,7 @@ UINT32 runaway_state::screen_update_qwak(screen_device &screen, bitmap_ind16 &bi
 {
 	int i;
 
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	for (i = 0; i < 16; i++)
 	{

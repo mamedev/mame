@@ -121,7 +121,6 @@ const device_type TC0100SCN = &device_creator<tc0100scn_device>;
 
 tc0100scn_device::tc0100scn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TC0100SCN, "Taito TC0100SCN", tag, owner, clock, "tc0100scn", __FILE__),
-	device_video_interface(mconfig, *this),
 	m_ram(NULL),
 	m_bg_ram(NULL),
 	m_fg_ram(NULL),
@@ -188,8 +187,6 @@ void tc0100scn_device::device_start()
 	   this code won't ever affect single screen games:
 	   Thundfox is the only one of those with two chips, and
 	   we're safe as it uses single width tilemaps. */
-
-	m_cliprect = m_screen->visible_area();
 
 	/* Single width versions */
 	m_tilemap[0][0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tc0100scn_device::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
@@ -620,7 +617,7 @@ void tc0100scn_device::tilemap_update()
 		m_tilemap[1][m_dblwidth]->set_scrollx((j + m_fgscrolly) & 0x1ff, m_fgscrollx - m_fgscroll_ram[j]);
 }
 
-void tc0100scn_device::tilemap_draw_fg( bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t* tmap, int flags, UINT32 priority )
+void tc0100scn_device::tilemap_draw_fg( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t* tmap, int flags, UINT32 priority )
 {
 	const bitmap_ind16 &src_bitmap = tmap->pixmap();
 	int width_mask, height_mask, x, y, p;
@@ -653,9 +650,9 @@ void tc0100scn_device::tilemap_draw_fg( bitmap_ind16 &bitmap, const rectangle &c
 			if ((p & 0xf)!= 0 || (flags & TILEMAP_DRAW_OPAQUE))
 			{
 				bitmap.pix16(y, x + cliprect.min_x) = p;
-				if (machine().priority_bitmap.valid())
+				if (screen.priority().valid())
 				{
-					UINT8 *pri = &machine().priority_bitmap.pix8(y);
+					UINT8 *pri = &screen.priority().pix8(y);
 					pri[x + cliprect.min_x] |= priority;
 				}
 			}
@@ -665,11 +662,11 @@ void tc0100scn_device::tilemap_draw_fg( bitmap_ind16 &bitmap, const rectangle &c
 	}
 }
 
-int tc0100scn_device::tilemap_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority )
+int tc0100scn_device::tilemap_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority )
 {
 	int disable = m_ctrl[6] & 0xf7;
 	rectangle clip = cliprect;
-	clip &= m_cliprect;
+	clip &= screen.visible_area();
 
 #if 0
 if (disable != 0 && disable != 3 && disable != 7)
@@ -681,17 +678,17 @@ if (disable != 0 && disable != 3 && disable != 7)
 		case 0:
 			if (disable & 0x01)
 				return 1;
-			m_tilemap[0][m_dblwidth]->draw(bitmap, clip, flags, priority);
+			m_tilemap[0][m_dblwidth]->draw(screen, bitmap, clip, flags, priority);
 			break;
 		case 1:
 			if (disable & 0x02)
 				return 1;
-			tilemap_draw_fg(bitmap, clip, m_tilemap[1][m_dblwidth], flags, priority);
+			tilemap_draw_fg(screen, bitmap, clip, m_tilemap[1][m_dblwidth], flags, priority);
 			break;
 		case 2:
 			if (disable & 0x04)
 				return 1;
-			m_tilemap[2][m_dblwidth]->draw(bitmap, clip, flags, priority);
+			m_tilemap[2][m_dblwidth]->draw(screen, bitmap, clip, flags, priority);
 			break;
 	}
 	return 0;

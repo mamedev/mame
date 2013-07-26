@@ -127,10 +127,10 @@ UINT32 taotaido_state::screen_update_taotaido(screen_device &screen, bitmap_ind1
 		m_bg_tilemap->set_scrollx(0,((m_scrollram[(0x00+4*line)/2])>>4)+30);
 		m_bg_tilemap->set_scrolly(0,((m_scrollram[(0x02+4*line)/2])>>4)-line);
 
-		m_bg_tilemap->draw(bitmap, clip, 0,0);
+		m_bg_tilemap->draw(screen, bitmap, clip, 0,0);
 	}
 
-	m_spr->draw_sprites(m_spriteram_older, m_spriteram.bytes(), machine(), bitmap,cliprect);
+	m_spr->draw_sprites(m_spriteram_older, m_spriteram.bytes(), screen, bitmap,cliprect);
 	return 0;
 }
 

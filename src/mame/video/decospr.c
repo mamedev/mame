@@ -161,6 +161,7 @@ const device_type DECO_SPRITE = &device_creator<decospr_device>;
 
 decospr_device::decospr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, DECO_SPRITE, "decospr_device", tag, owner, clock, "decospr", __FILE__),
+		device_video_interface(mconfig, *this),
 		m_gfxregion(0),
 		m_pricallback(NULL),
 		m_colcallback(decospr_default_colour_callback),
@@ -187,7 +188,7 @@ void decospr_device::device_reset()
 
 void decospr_device::alloc_sprite_bitmap()
 {
-	machine().primary_screen->register_screen_bitmap(m_sprite_bitmap);
+	m_screen->register_screen_bitmap(m_sprite_bitmap);
 }
 
 void decospr_device::set_pri_callback(decospr_priority_callback_func callback)
@@ -246,7 +247,7 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 			w = y & 0x0800;
 
 
-			if (!(flash && (machine().primary_screen->frame_number() & 1)))
+			if (!(flash && (m_screen->frame_number() & 1)))
 			{
 				x = spriteram[offs + 2];
 
@@ -348,7 +349,7 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 											colour,
 											fx,fy,
 											x,ypos,
-											machine().priority_bitmap,pri,m_transpen);
+											m_screen->priority(),pri,m_transpen);
 									else
 										drawgfx_transpen(bitmap,cliprect,machine().gfx[m_gfxregion],
 											sprite - multi * inc,
@@ -367,7 +368,7 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 												colour,
 												fx,fy,
 												x-16,ypos,
-												machine().priority_bitmap,pri,m_transpen);
+												m_screen->priority(),pri,m_transpen);
 									else
 										drawgfx_transpen(bitmap,cliprect,machine().gfx[m_gfxregion],
 												(sprite - multi * inc)-mult2,
@@ -417,7 +418,7 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 
 			x = spriteram[offs+1];
 
-			if (!((y&0x2000) && (machine().primary_screen->frame_number() & 1)))
+			if (!((y&0x2000) && (m_screen->frame_number() & 1)))
 			{
 				if (!m_sprite_bitmap.valid())
 					colour = (spriteram[offs+2] >>0) & 0x1f;
@@ -472,7 +473,7 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 											colour,
 											fx,fy,
 												x + mult * (w-xx),ypos,
-											machine().priority_bitmap,pri,m_transpen);
+											m_screen->priority(),pri,m_transpen);
 								}
 
 								ypos -= 512; // wrap-around y
@@ -484,7 +485,7 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 											colour,
 											fx,fy,
 											x + mult * (w-xx),ypos,
-											machine().priority_bitmap,pri,m_transpen);
+											m_screen->priority(),pri,m_transpen);
 								}
 
 							}

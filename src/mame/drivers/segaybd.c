@@ -204,7 +204,7 @@ WRITE16_MEMBER( segaybd_state::io_chip_w )
 			//  D2 = YRES
 			//  D1-D0 = ADC0-1
 			//
-			m_segaic16vid->segaic16_set_display_enable(machine(), data & 0x80);
+			m_segaic16vid->segaic16_set_display_enable(*m_screen, data & 0x80);
 			if (((old ^ data) & 0x20) && !(data & 0x20))
 				machine().watchdog_reset();
 			m_soundcpu->set_input_line(INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);

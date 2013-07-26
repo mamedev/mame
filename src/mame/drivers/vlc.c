@@ -304,7 +304,7 @@ UINT32 nevada_state::screen_update_nevada(screen_device &screen, bitmap_ind16 &b
 {
 	// Todo
 /*
-    m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+    m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 */
 	return 0;
 }

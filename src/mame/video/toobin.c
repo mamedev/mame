@@ -213,12 +213,12 @@ UINT32 toobin_state::screen_update_toobin(screen_device &screen, bitmap_rgb32 &b
 	m_mob->draw_async(cliprect);
 
 	/* draw the playfield */
-	bitmap_ind8 &priority_bitmap = machine().priority_bitmap;
+	bitmap_ind8 &priority_bitmap = screen.priority();
 	priority_bitmap.fill(0, cliprect);
-	m_playfield_tilemap->draw(m_pfbitmap, cliprect, 0, 0);
-	m_playfield_tilemap->draw(m_pfbitmap, cliprect, 1, 1);
-	m_playfield_tilemap->draw(m_pfbitmap, cliprect, 2, 2);
-	m_playfield_tilemap->draw(m_pfbitmap, cliprect, 3, 3);
+	m_playfield_tilemap->draw(screen, m_pfbitmap, cliprect, 0, 0);
+	m_playfield_tilemap->draw(screen, m_pfbitmap, cliprect, 1, 1);
+	m_playfield_tilemap->draw(screen, m_pfbitmap, cliprect, 2, 2);
+	m_playfield_tilemap->draw(screen, m_pfbitmap, cliprect, 3, 3);
 
 	/* draw and merge the MO */
 	bitmap_ind16 &mobitmap = m_mob->bitmap();
@@ -249,6 +249,6 @@ UINT32 toobin_state::screen_update_toobin(screen_device &screen, bitmap_rgb32 &b
 	}
 
 	/* add the alpha on top */
-	m_alpha_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_alpha_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }

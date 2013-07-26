@@ -64,8 +64,8 @@ struct tilemap_info
 	tilemap_t *     textmap;                        /* a single text tilemap */
 	struct tilemap_callback_info tmap_info[16];     /* callback info for 16 tilemap pages */
 	struct tilemap_callback_info textmap_info;      /* callback info for a single textmap page */
-	void            (*reset)(running_machine &machine, struct tilemap_info *info);/* reset callback */
-	void            (*draw_layer)(running_machine &machine, struct tilemap_info *info, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int flags, int priority);
+	void            (*reset)(screen_device &screen, struct tilemap_info *info);/* reset callback */
+	void            (*draw_layer)(screen_device &screen, struct tilemap_info *info, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int flags, int priority);
 	UINT16 *        textram;                        /* pointer to textram pointer */
 	UINT16 *        tileram;                        /* pointer to tileram pointer */
 	emu_timer *     latch_timer;                    /* timer for latching 16b tilemap scroll values */
@@ -104,19 +104,19 @@ public:
 	void segaic16_tilemap_set_rowscroll(running_machine &machine, int which, int enable);
 	void segaic16_tilemap_set_flip(running_machine &machine, int which, int flip);
 	void segaic16_tilemap_set_bank(running_machine &machine, int which, int banknum, int offset);
-	void segaic16_tilemap_reset(running_machine &machine, int which);
+	void segaic16_tilemap_reset(screen_device &screen);
 	void segaic16_tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int map, int priority, int priority_mark);
-//  void segaic16_tilemap_16b_draw_layer(running_machine &machine, struct tilemap_info *info, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int flags, int priority);
-//  void segaic16_tilemap_16a_draw_layer(running_machine &machine, struct tilemap_info *info, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int flags, int priority);
-//  void segaic16_draw_virtual_tilemap(running_machine &machine, struct tilemap_info *info, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 pages, UINT16 xscroll, UINT16 yscroll, UINT32 flags, UINT32 priority);
-//  void segaic16_tilemap_16b_reset(running_machine &machine, struct tilemap_info *info);
+//  void segaic16_tilemap_16b_draw_layer(screen_device &screen, struct tilemap_info *info, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int flags, int priority);
+//  void segaic16_tilemap_16a_draw_layer(screen_device &screen, struct tilemap_info *info, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int flags, int priority);
+//  void segaic16_draw_virtual_tilemap(screen_device &screen, struct tilemap_info *info, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 pages, UINT16 xscroll, UINT16 yscroll, UINT32 flags, UINT32 priority);
+//  void segaic16_tilemap_16b_reset(screen_device &screen, struct tilemap_info *info);
 
 	TIMER_CALLBACK_MEMBER( segaic16_tilemap_16b_latch_values );
 
 	struct rotate_info segaic16_rotate[SEGAIC16_MAX_ROTATE];
 	struct tilemap_info bg_tilemap[SEGAIC16_MAX_TILEMAPS];
 
-	void segaic16_set_display_enable(running_machine &machine, int enable);
+	void segaic16_set_display_enable(screen_device &screen, int enable);
 	void segaic16_tilemap_init(running_machine &machine, int which, int type, int colorbase, int xoffs, int numbanks);
 	void segaic16_rotate_init(running_machine &machine, int which, int type, int colorbase);
 
@@ -125,7 +125,7 @@ public:
 	DECLARE_WRITE16_MEMBER( segaic16_tileram_0_w );
 	DECLARE_WRITE16_MEMBER( segaic16_textram_0_w );
 
-	void segaic16_rotate_draw(running_machine &machine, int which, bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind16 &srcbitmap);
+	void segaic16_rotate_draw(int which, bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, bitmap_ind16 &srcbitmap);
 
 	DECLARE_READ16_MEMBER( segaic16_rotate_control_0_r );
 

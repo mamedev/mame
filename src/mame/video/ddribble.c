@@ -255,9 +255,9 @@ UINT32 ddribble_state::screen_update_ddribble(screen_device &screen, bitmap_ind1
 	m_fg_tilemap->set_scrolly(0, m_vregs[0][0]);
 	m_bg_tilemap->set_scrolly(0, m_vregs[1][0]);
 
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect, m_spriteram_1, 0x07d, 2, m_vregs[0][4] & 0x08);
 	draw_sprites(bitmap, cliprect, m_spriteram_2, 0x140, 3, m_vregs[1][4] & 0x08);
-	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }

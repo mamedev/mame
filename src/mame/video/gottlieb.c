@@ -239,7 +239,7 @@ UINT32 gottlieb_state::screen_update_gottlieb(screen_device &screen, bitmap_rgb3
 {
 	/* if the background has lower priority, render it first, else clear the screen */
 	if (!m_background_priority)
-		m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 	else
 		bitmap.fill(machine().pens[0], cliprect);
 
@@ -248,7 +248,7 @@ UINT32 gottlieb_state::screen_update_gottlieb(screen_device &screen, bitmap_rgb3
 
 	/* if the background has higher priority, render it now */
 	if (m_background_priority)
-		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }

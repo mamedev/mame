@@ -57,7 +57,7 @@ public:
 	inline void get_tile_info(tile_data &tileinfo, tilemap_memory_index tile_index, int _N_);
 	inline void fuuki16_vram_w(offs_t offset, UINT16 data, UINT16 mem_mask, int _N_);
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void fuuki16_draw_layer( bitmap_ind16 &bitmap, const rectangle &cliprect, int i, int flag, int pri );
+	void fuuki16_draw_layer( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int i, int flag, int pri );
 	DECLARE_WRITE_LINE_MEMBER(soundirq);
 	required_device<okim6295_device> m_oki;
 

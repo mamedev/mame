@@ -173,7 +173,7 @@ void gotya_state::draw_status( bitmap_ind16 &bitmap, const rectangle &cliprect )
 UINT32 gotya_state::screen_update_gotya(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->set_scrollx(0, -(*m_scroll + (m_scroll_bit_8 * 256)) - 2 * 8);
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);
 	draw_status(bitmap, cliprect);
 	return 0;

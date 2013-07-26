@@ -147,7 +147,7 @@ UINT32 bagman_state::screen_update_bagman(screen_device &screen, bitmap_ind16 &b
 	if (*m_video_enable == 0)
 		return 0;
 
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);
 	return 0;
 }

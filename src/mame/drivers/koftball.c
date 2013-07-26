@@ -100,8 +100,8 @@ void koftball_state::video_start()
 
 UINT32 koftball_state::screen_update_koftball(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_tilemap_2->draw(bitmap, cliprect, 0, 0);
-	m_tilemap_1->draw(bitmap, cliprect, 0, 0);
+	m_tilemap_2->draw(screen, bitmap, cliprect, 0, 0);
+	m_tilemap_1->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 

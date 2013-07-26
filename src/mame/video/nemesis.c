@@ -311,7 +311,7 @@ void nemesis_state::video_start()
 }
 
 
-void nemesis_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
+void nemesis_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	/*
 	 *  16 bytes per sprite, in memory from 56000-56fff
@@ -392,7 +392,7 @@ void nemesis_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 						flipx,flipy,
 						sx,sy,
 						zoom,zoom,
-						machine().priority_bitmap,0xffcc,0 );
+						screen.priority(),0xffcc,0 );
 				}
 			}
 		}
@@ -406,7 +406,7 @@ UINT32 nemesis_state::screen_update_nemesis(screen_device &screen, bitmap_ind16 
 	int offs;
 	rectangle clip;
 
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 	bitmap.fill(0, cliprect);
 
 	clip.min_x = 0;
@@ -444,14 +444,14 @@ UINT32 nemesis_state::screen_update_nemesis(screen_device &screen, bitmap_ind16 
 
 		for (i = 0; i < 4; i += 2)
 		{
-			m_background->draw(bitmap, clip, TILEMAP_DRAW_CATEGORY(i + 0), 1);
-			m_background->draw(bitmap, clip, TILEMAP_DRAW_CATEGORY(i + 1), 2);
-			m_foreground->draw(bitmap, clip, TILEMAP_DRAW_CATEGORY(i + 0), 1);
-			m_foreground->draw(bitmap, clip, TILEMAP_DRAW_CATEGORY(i + 1), 2);
+			m_background->draw(screen, bitmap, clip, TILEMAP_DRAW_CATEGORY(i + 0), 1);
+			m_background->draw(screen, bitmap, clip, TILEMAP_DRAW_CATEGORY(i + 1), 2);
+			m_foreground->draw(screen, bitmap, clip, TILEMAP_DRAW_CATEGORY(i + 0), 1);
+			m_foreground->draw(screen, bitmap, clip, TILEMAP_DRAW_CATEGORY(i + 1), 2);
 		}
 	}
 
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(screen,bitmap,cliprect);
 
 	return 0;
 }

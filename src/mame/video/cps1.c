@@ -2282,7 +2282,7 @@ void cps_state::cps1_find_last_sprite()    /* Find the offset of last sprite */
 }
 
 
-void cps_state::cps1_render_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
+void cps_state::cps1_render_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 #define DRAWSPRITE(CODE,COLOR,FLIPX,FLIPY,SX,SY)                    \
 {                                                                   \
@@ -2292,14 +2292,14 @@ void cps_state::cps1_render_sprites( bitmap_ind16 &bitmap, const rectangle &clip
 				CODE,                                               \
 				COLOR,                                              \
 				!(FLIPX),!(FLIPY),                                  \
-				511-16-(SX),255-16-(SY),    machine().priority_bitmap,0x02,15);                   \
+				511-16-(SX),255-16-(SY),    screen.priority(),0x02,15);                   \
 	else                                                            \
 		pdrawgfx_transpen(bitmap,\
 				cliprect,machine().gfx[2],                            \
 				CODE,                                               \
 				COLOR,                                              \
 				FLIPX,FLIPY,                                        \
-				SX,SY, machine().priority_bitmap,0x02,15);          \
+				SX,SY, screen.priority(),0x02,15);          \
 }
 
 
@@ -2515,7 +2515,7 @@ void cps_state::cps2_find_last_sprite()    /* Find the offset of last sprite */
 	m_cps2_last_sprite_offset = m_cps2_obj_size / 2 - 4;
 }
 
-void cps_state::cps2_render_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int *primasks )
+void cps_state::cps2_render_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int *primasks )
 {
 #define DRAWSPRITE(CODE,COLOR,FLIPX,FLIPY,SX,SY)                                    \
 {                                                                                   \
@@ -2525,14 +2525,14 @@ void cps_state::cps2_render_sprites( bitmap_ind16 &bitmap, const rectangle &clip
 				CODE,                                                               \
 				COLOR,                                                              \
 				!(FLIPX),!(FLIPY),                                                  \
-				511-16-(SX),255-16-(SY), machine().priority_bitmap,primasks[priority],15);                 \
+				511-16-(SX),255-16-(SY), screen.priority(),primasks[priority],15);                 \
 	else                                                                            \
 		pdrawgfx_transpen(bitmap,\
 				cliprect,machine().gfx[2],                                            \
 				CODE,                                                               \
 				COLOR,                                                              \
 				FLIPX,FLIPY,                                                        \
-				SX,SY, machine().priority_bitmap,primasks[priority],15);                 \
+				SX,SY, screen.priority(),primasks[priority],15);                 \
 }
 
 	int i;
@@ -2727,22 +2727,22 @@ void cps_state::cps1_render_stars( screen_device &screen, bitmap_ind16 &bitmap, 
 }
 
 
-void cps_state::cps1_render_layer( bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int primask )
+void cps_state::cps1_render_layer( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int primask )
 {
 	switch (layer)
 	{
 		case 0:
-			cps1_render_sprites(bitmap, cliprect);
+			cps1_render_sprites(screen, bitmap, cliprect);
 			break;
 		case 1:
 		case 2:
 		case 3:
-			m_bg_tilemap[layer - 1]->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, primask);
+			m_bg_tilemap[layer - 1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1, primask);
 			break;
 	}
 }
 
-void cps_state::cps1_render_high_layer( bitmap_ind16 &bitmap, const rectangle &cliprect, int layer )
+void cps_state::cps1_render_high_layer( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer )
 {
 	bitmap_ind16 dummy_bitmap;
 	switch (layer)
@@ -2753,7 +2753,7 @@ void cps_state::cps1_render_high_layer( bitmap_ind16 &bitmap, const rectangle &c
 		case 1:
 		case 2:
 		case 3:
-			m_bg_tilemap[layer - 1]->draw(dummy_bitmap, cliprect, TILEMAP_DRAW_LAYER0, 1);
+			m_bg_tilemap[layer - 1]->draw(screen, dummy_bitmap, cliprect, TILEMAP_DRAW_LAYER0, 1);
 			break;
 	}
 }
@@ -2833,26 +2833,26 @@ UINT32 cps_state::screen_update_cps1(screen_device &screen, bitmap_ind16 &bitmap
 	l1 = (layercontrol >> 0x08) & 03;
 	l2 = (layercontrol >> 0x0a) & 03;
 	l3 = (layercontrol >> 0x0c) & 03;
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 
 	if (m_cps_version == 1)
 	{
-		cps1_render_layer(bitmap, cliprect, l0, 0);
+		cps1_render_layer(screen, bitmap, cliprect, l0, 0);
 
 		if (l1 == 0)
-			cps1_render_high_layer(bitmap, cliprect, l0); /* prepare mask for sprites */
+			cps1_render_high_layer(screen, bitmap, cliprect, l0); /* prepare mask for sprites */
 
-		cps1_render_layer(bitmap, cliprect, l1, 0);
+		cps1_render_layer(screen, bitmap, cliprect, l1, 0);
 
 		if (l2 == 0)
-			cps1_render_high_layer(bitmap, cliprect, l1); /* prepare mask for sprites */
+			cps1_render_high_layer(screen, bitmap, cliprect, l1); /* prepare mask for sprites */
 
-		cps1_render_layer(bitmap, cliprect, l2, 0);
+		cps1_render_layer(screen, bitmap, cliprect, l2, 0);
 
 		if (l3 == 0)
-			cps1_render_high_layer(bitmap, cliprect, l2); /* prepare mask for sprites */
+			cps1_render_high_layer(screen, bitmap, cliprect, l2); /* prepare mask for sprites */
 
-		cps1_render_layer(bitmap, cliprect, l3, 0);
+		cps1_render_layer(screen, bitmap, cliprect, l3, 0);
 	}
 	else
 	{
@@ -2903,10 +2903,10 @@ if (0 && machine().input().code_pressed(KEYCODE_Z))
 			}
 		}
 
-		cps1_render_layer(bitmap, cliprect, l0, 1);
-		cps1_render_layer(bitmap, cliprect, l1, 2);
-		cps1_render_layer(bitmap, cliprect, l2, 4);
-		cps2_render_sprites(bitmap, cliprect, primasks);
+		cps1_render_layer(screen, bitmap, cliprect, l0, 1);
+		cps1_render_layer(screen, bitmap, cliprect, l1, 2);
+		cps1_render_layer(screen, bitmap, cliprect, l2, 4);
+		cps2_render_sprites(screen, bitmap, cliprect, primasks);
 	}
 
 	return 0;

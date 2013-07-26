@@ -673,7 +673,7 @@ Historical Issues
 
 **********************************************************************/
 
-void tc0480scp_device::bg01_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority )
+void tc0480scp_device::bg01_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority )
 {
 	/* X-axis zoom offers expansion only: 0 = no zoom, 0xff = max
 	   Y-axis zoom offers expansion/compression: 0x7f = no zoom, 0xff = max
@@ -685,7 +685,7 @@ void tc0480scp_device::bg01_draw( bitmap_ind16 &bitmap, const rectangle &cliprec
 	if ((zoomx == 0x10000) && (zoomy == 0x10000))   /* no zoom, simple */
 	{
 		/* Prevent bad things */
-		m_tilemap[layer][m_dblwidth]->draw(bitmap, cliprect, flags, priority);
+		m_tilemap[layer][m_dblwidth]->draw(screen, bitmap, cliprect, flags, priority);
 	}
 	else    /* zoom */
 	{
@@ -767,7 +767,7 @@ void tc0480scp_device::bg01_draw( bitmap_ind16 &bitmap, const rectangle &cliprec
 				}
 			}
 
-			taitoic_drawscanline(bitmap, cliprect, 0, y, scanline, (flags & TILEMAP_DRAW_OPAQUE) ? 0 : 1, ROT0, machine().priority_bitmap, priority);
+			taitoic_drawscanline(bitmap, cliprect, 0, y, scanline, (flags & TILEMAP_DRAW_OPAQUE) ? 0 : 1, ROT0, screen.priority(), priority);
 
 			y_index += zoomy;
 			if (!machine_flip)
@@ -821,7 +821,7 @@ flipscreen.
 
 ****************************************************************/
 
-void tc0480scp_device::bg23_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority )
+void tc0480scp_device::bg23_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority )
 {
 	bitmap_ind16 &srcbitmap = m_tilemap[layer][m_dblwidth]->pixmap();
 	bitmap_ind8 &flagsbitmap = m_tilemap[layer][m_dblwidth]->flagsmap();
@@ -930,7 +930,7 @@ void tc0480scp_device::bg23_draw(bitmap_ind16 &bitmap, const rectangle &cliprect
 			}
 		}
 
-		taitoic_drawscanline(bitmap, cliprect, 0, y, scanline, (flags & TILEMAP_DRAW_OPAQUE) ? 0 : 1, ROT0, machine().priority_bitmap, priority);
+		taitoic_drawscanline(bitmap, cliprect, 0, y, scanline, (flags & TILEMAP_DRAW_OPAQUE) ? 0 : 1, ROT0, screen.priority(), priority);
 
 		y_index += zoomy;
 		if (!machine_flip)
@@ -942,25 +942,25 @@ void tc0480scp_device::bg23_draw(bitmap_ind16 &bitmap, const rectangle &cliprect
 }
 
 
-void tc0480scp_device::tilemap_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority )
+void tc0480scp_device::tilemap_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority )
 {
 	/* no layer disable bits */
 	switch (layer)
 	{
 		case 0:
-			bg01_draw(bitmap, cliprect, 0, flags, priority);
+			bg01_draw(screen, bitmap, cliprect, 0, flags, priority);
 			break;
 		case 1:
-			bg01_draw(bitmap, cliprect, 1, flags, priority);
+			bg01_draw(screen, bitmap, cliprect, 1, flags, priority);
 			break;
 		case 2:
-			bg23_draw(bitmap, cliprect, 2, flags, priority);
+			bg23_draw(screen, bitmap, cliprect, 2, flags, priority);
 			break;
 		case 3:
-			bg23_draw(bitmap, cliprect, 3, flags, priority);
+			bg23_draw(screen, bitmap, cliprect, 3, flags, priority);
 			break;
 		case 4:
-			m_tilemap[4][m_dblwidth]->draw(bitmap, cliprect, flags, priority);
+			m_tilemap[4][m_dblwidth]->draw(screen, bitmap, cliprect, flags, priority);
 			break;
 	}
 }

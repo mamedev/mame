@@ -78,14 +78,14 @@ UINT32 bottom9_state::screen_update_bottom9(screen_device &screen, bitmap_ind16 
 	bitmap.fill(m_layer_colorbase[1], cliprect);
 //  if (m_video_enable)
 	{
-		m_k051960->k051960_sprites_draw(bitmap, cliprect, 1, 1);
-		m_k051316->zoom_draw(bitmap, cliprect, 0, 0);
-		m_k051960->k051960_sprites_draw(bitmap, cliprect, 0, 0);
-		m_k052109->tilemap_draw(bitmap, cliprect, 2, 0, 0);
+		m_k051960->k051960_sprites_draw(bitmap, cliprect, screen.priority(), 1, 1);
+		m_k051316->zoom_draw(screen, bitmap, cliprect, 0, 0);
+		m_k051960->k051960_sprites_draw(bitmap, cliprect, screen.priority(), 0, 0);
+		m_k052109->tilemap_draw(screen, bitmap, cliprect, 2, 0, 0);
 		/* note that priority 3 is opposite to the basic layer priority! */
 		/* (it IS used, but hopefully has no effect) */
-		m_k051960->k051960_sprites_draw(bitmap, cliprect, 2, 3);
-		m_k052109->tilemap_draw(bitmap, cliprect, 1, 0, 0);
+		m_k051960->k051960_sprites_draw(bitmap, cliprect, screen.priority(), 2, 3);
+		m_k052109->tilemap_draw(screen, bitmap, cliprect, 1, 0, 0);
 	}
 	return 0;
 }

@@ -182,7 +182,7 @@ UINT32 labyrunr_state::screen_update_labyrunr(screen_device &screen, bitmap_ind1
 
 	set_pens();
 
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	if (~m_k007121->ctrlram_r(space, 3) & 0x20)
@@ -207,10 +207,10 @@ UINT32 labyrunr_state::screen_update_labyrunr(screen_device &screen, bitmap_ind1
 				m_layer0->set_scrolly((i + 2) & 0x1f, m_k007121->ctrlram_r(space, 2));
 		}
 
-		m_layer0->draw(bitmap, finalclip0, TILEMAP_DRAW_OPAQUE, 0);
-		m_k007121->sprites_draw(bitmap, cliprect, machine().gfx[0], machine().colortable, m_spriteram,(m_k007121->ctrlram_r(space, 6) & 0x30) * 2, 40,0,(m_k007121->ctrlram_r(space, 3) & 0x40) >> 5);
+		m_layer0->draw(screen, bitmap, finalclip0, TILEMAP_DRAW_OPAQUE, 0);
+		m_k007121->sprites_draw(bitmap, cliprect, machine().gfx[0], machine().colortable, m_spriteram,(m_k007121->ctrlram_r(space, 6) & 0x30) * 2, 40,0,screen.priority(),(m_k007121->ctrlram_r(space, 3) & 0x40) >> 5);
 		/* we ignore the transparency because layer1 is drawn only at the top of the screen also covering sprites */
-		m_layer1->draw(bitmap, finalclip1, TILEMAP_DRAW_OPAQUE, 0);
+		m_layer1->draw(screen, bitmap, finalclip1, TILEMAP_DRAW_OPAQUE, 0);
 	}
 	else
 	{
@@ -270,15 +270,15 @@ UINT32 labyrunr_state::screen_update_labyrunr(screen_device &screen, bitmap_ind1
 		m_layer0->set_scrollx(0, ctrl_0 - 40);
 		m_layer1->set_scrollx(0, ctrl_0 - 40);
 
-		m_layer0->draw(bitmap, finalclip0, 0, 1);
+		m_layer0->draw(screen, bitmap, finalclip0, 0, 1);
 		if(use_clip3[0])
-			m_layer0->draw(bitmap, finalclip3, 0, 1);
+			m_layer0->draw(screen, bitmap, finalclip3, 0, 1);
 
-		m_layer1->draw(bitmap, finalclip1, 0, 1);
+		m_layer1->draw(screen, bitmap, finalclip1, 0, 1);
 		if(use_clip3[1])
-			m_layer1->draw(bitmap, finalclip3, 0, 1);
+			m_layer1->draw(screen, bitmap, finalclip3, 0, 1);
 
-		m_k007121->sprites_draw(bitmap, cliprect, machine().gfx[0], machine().colortable, m_spriteram, (m_k007121->ctrlram_r(space, 6) & 0x30) * 2,40,0,(m_k007121->ctrlram_r(space, 3) & 0x40) >> 5);
+		m_k007121->sprites_draw(bitmap, cliprect, machine().gfx[0], machine().colortable, m_spriteram, (m_k007121->ctrlram_r(space, 6) & 0x30) * 2,40,0,screen.priority(),(m_k007121->ctrlram_r(space, 3) & 0x40) >> 5);
 	}
 	return 0;
 }

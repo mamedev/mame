@@ -120,7 +120,7 @@ public:
 	// C169 ROZ Layer Emulation
 public:
 	void c169_roz_init(int gfxbank, const char *maskregion);
-	void c169_roz_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri);
+	void c169_roz_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri);
 	DECLARE_READ16_MEMBER( c169_roz_control_r );
 	DECLARE_WRITE16_MEMBER( c169_roz_control_w );
 	DECLARE_READ16_MEMBER( c169_roz_bank_r );
@@ -143,8 +143,8 @@ protected:
 		int color, priority;
 	};
 	void c169_roz_unpack_params(const UINT16 *source, roz_parameters &params);
-	void c169_roz_draw_helper(bitmap_ind16 &bitmap, tilemap_t &tmap, const rectangle &clip, const roz_parameters &params);
-	void c169_roz_draw_scanline(bitmap_ind16 &bitmap, int line, int which, int pri, const rectangle &cliprect);
+	void c169_roz_draw_helper(screen_device &screen, bitmap_ind16 &bitmap, tilemap_t &tmap, const rectangle &clip, const roz_parameters &params);
+	void c169_roz_draw_scanline(screen_device &screen, bitmap_ind16 &bitmap, int line, int which, int pri, const rectangle &cliprect);
 	void c169_roz_get_info(tile_data &tileinfo, int tile_index, int which);
 	TILE_GET_INFO_MEMBER( c169_roz_get_info0 );
 	TILE_GET_INFO_MEMBER( c169_roz_get_info1 );
@@ -164,8 +164,8 @@ public:
 	// for pal_xor, supply either 0x0 (normal) or 0xf (palette mapping reversed)
 	void c355_obj_init(int gfxbank, int pal_xor, c355_obj_code2tile_delegate code2tile);
 	int c355_obj_default_code2tile(int code);
-	void c355_obj_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri);
-	void c355_obj_draw(bitmap_rgb32 &bitmap, const rectangle &cliprect, int pri);
+	void c355_obj_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri);
+	void c355_obj_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int pri);
 	DECLARE_READ16_MEMBER( c355_obj_ram_r );
 	DECLARE_WRITE16_MEMBER( c355_obj_ram_w );
 	DECLARE_READ16_MEMBER( c355_obj_position_r );
@@ -175,9 +175,9 @@ public:
 protected:
 	// C355 Motion Object internals
 	template<class _BitmapClass>
-	void c355_obj_draw_sprite(_BitmapClass &bitmap, const rectangle &cliprect, const UINT16 *pSource, int pri, int zpos);
+	void c355_obj_draw_sprite(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, const UINT16 *pSource, int pri, int zpos);
 	template<class _BitmapClass>
-	void c355_obj_draw_list(_BitmapClass &bitmap, const rectangle &cliprect, int pri, const UINT16 *pSpriteList16, const UINT16 *pSpriteTable);
+	void c355_obj_draw_list(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, int pri, const UINT16 *pSpriteList16, const UINT16 *pSpriteTable);
 
 	c355_obj_code2tile_delegate m_c355_obj_code2tile;
 	int m_c355_obj_gfxbank;
@@ -190,8 +190,8 @@ protected:
 
 public:
 	// general
-	void zdrawgfxzoom(bitmap_ind16 &dest_bmp, const rectangle &clip, gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy, int scalex, int scaley, int zpos);
-	void zdrawgfxzoom(bitmap_rgb32 &dest_bmp, const rectangle &clip, gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy, int scalex, int scaley, int zpos);
+	void zdrawgfxzoom(screen_device &screen, bitmap_ind16 &dest_bmp, const rectangle &clip, gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy, int scalex, int scaley, int zpos);
+	void zdrawgfxzoom(screen_device &screen, bitmap_rgb32 &dest_bmp, const rectangle &clip, gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy, int scalex, int scaley, int zpos);
 	INTERRUPT_GEN_MEMBER(namcos2_68k_master_vblank);
 	INTERRUPT_GEN_MEMBER(namcos2_68k_slave_vblank);
 	INTERRUPT_GEN_MEMBER(namcos2_68k_gpu_vblank);
@@ -305,9 +305,9 @@ public:
 	void draw_sprite_init();
 	void update_palette();
 	void apply_clip( rectangle &clip, const rectangle &cliprect );
-	void draw_roz(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri, int control );
-	void draw_sprites_metalhawk(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
+	void draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri, int control );
+	void draw_sprites_metalhawk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
 	UINT16 get_palette_register( int which );
 
 	int get_pos_irq_scanline() { return (get_palette_register(5) - 32) & 0xff; }

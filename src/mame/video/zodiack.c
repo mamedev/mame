@@ -177,8 +177,8 @@ UINT32 zodiack_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap
 	for (int i = 0; i < 32; i++)
 		m_fg_tilemap->set_scrolly(i, m_attributeram[i * 2]);
 
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_bullets(bitmap, cliprect);
 	draw_sprites(bitmap, cliprect);
 	return 0;

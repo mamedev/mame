@@ -111,7 +111,7 @@ UINT32 carjmbre_state::screen_update_carjmbre(screen_device &screen, bitmap_ind1
 	//-xxx---- unused
 	//----xxxx colour
 
-	m_cj_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_cj_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	//spriteram[offs]
 	//+0       y pos

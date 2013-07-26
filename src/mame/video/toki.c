@@ -271,14 +271,14 @@ UINT32 toki_state::screen_update_toki(screen_device &screen, bitmap_ind16 &bitma
 	flip_screen_set((m_scrollram16[0x28]&0x8000)==0);
 
 	if (m_scrollram16[0x28]&0x100) {
-		m_background_layer->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
-		m_foreground_layer->draw(bitmap, cliprect, 0,0);
+		m_background_layer->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
+		m_foreground_layer->draw(screen, bitmap, cliprect, 0,0);
 	} else {
-		m_foreground_layer->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
-		m_background_layer->draw(bitmap, cliprect, 0,0);
+		m_foreground_layer->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
+		m_background_layer->draw(screen, bitmap, cliprect, 0,0);
 	}
 	toki_draw_sprites(bitmap,cliprect);
-	m_text_layer->draw(bitmap, cliprect, 0,0);
+	m_text_layer->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
 }
 
@@ -292,14 +292,14 @@ UINT32 toki_state::screen_update_tokib(screen_device &screen, bitmap_ind16 &bitm
 	m_foreground_layer->set_scrollx(0, m_scrollram16[3]-0x101 );
 
 	if (m_scrollram16[3]&0x2000) {
-		m_background_layer->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
-		m_foreground_layer->draw(bitmap, cliprect, 0,0);
+		m_background_layer->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
+		m_foreground_layer->draw(screen, bitmap, cliprect, 0,0);
 	} else {
-		m_foreground_layer->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
-		m_background_layer->draw(bitmap, cliprect, 0,0);
+		m_foreground_layer->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
+		m_background_layer->draw(screen, bitmap, cliprect, 0,0);
 	}
 
 	tokib_draw_sprites(bitmap,cliprect);
-	m_text_layer->draw(bitmap, cliprect, 0,0);
+	m_text_layer->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
 }

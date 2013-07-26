@@ -209,10 +209,10 @@ public:
 	UINT32 screen_update_urashima(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(jalmah_mcu_sim);
 	void jalmah_priority_system();
-	void draw_sc0_layer(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sc1_layer(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sc2_layer(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sc3_layer(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sc0_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sc1_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sc2_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sc3_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void daireika_palette_dma(UINT16 val);
 	void daireika_mcu_run();
 	void mjzoomin_mcu_run();
@@ -402,47 +402,47 @@ void jalmah_state::jalmah_priority_system()
 	//popmessage("%02x %02x %02x %02x",m_sc0_prin,m_sc1_prin,m_sc2_prin,m_sc3_prin);
 }
 
-void jalmah_state::draw_sc0_layer(bitmap_ind16 &bitmap, const rectangle &cliprect)
+void jalmah_state::draw_sc0_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	switch(m_jm_vregs[0] & 3)
 	{
-		case 0: m_sc0_tilemap_0->draw(bitmap, cliprect, 0,0); break;
-		case 1: m_sc0_tilemap_1->draw(bitmap, cliprect, 0,0); break;
-		case 2: m_sc0_tilemap_2->draw(bitmap, cliprect, 0,0); break;
-		case 3: m_sc0_tilemap_3->draw(bitmap, cliprect, 0,0); break;
+		case 0: m_sc0_tilemap_0->draw(screen, bitmap, cliprect, 0,0); break;
+		case 1: m_sc0_tilemap_1->draw(screen, bitmap, cliprect, 0,0); break;
+		case 2: m_sc0_tilemap_2->draw(screen, bitmap, cliprect, 0,0); break;
+		case 3: m_sc0_tilemap_3->draw(screen, bitmap, cliprect, 0,0); break;
 	}
 }
 
-void jalmah_state::draw_sc1_layer(bitmap_ind16 &bitmap, const rectangle &cliprect)
+void jalmah_state::draw_sc1_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	switch(m_jm_vregs[1] & 3)
 	{
-		case 0: m_sc1_tilemap_0->draw(bitmap, cliprect, 0,0); break;
-		case 1: m_sc1_tilemap_1->draw(bitmap, cliprect, 0,0); break;
-		case 2: m_sc1_tilemap_2->draw(bitmap, cliprect, 0,0); break;
-		case 3: m_sc1_tilemap_3->draw(bitmap, cliprect, 0,0); break;
+		case 0: m_sc1_tilemap_0->draw(screen, bitmap, cliprect, 0,0); break;
+		case 1: m_sc1_tilemap_1->draw(screen, bitmap, cliprect, 0,0); break;
+		case 2: m_sc1_tilemap_2->draw(screen, bitmap, cliprect, 0,0); break;
+		case 3: m_sc1_tilemap_3->draw(screen, bitmap, cliprect, 0,0); break;
 	}
 }
 
-void jalmah_state::draw_sc2_layer(bitmap_ind16 &bitmap, const rectangle &cliprect)
+void jalmah_state::draw_sc2_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	switch(m_jm_vregs[2] & 3)
 	{
-		case 0: m_sc2_tilemap_0->draw(bitmap, cliprect, 0,0); break;
-		case 1: m_sc2_tilemap_1->draw(bitmap, cliprect, 0,0); break;
-		case 2: m_sc2_tilemap_2->draw(bitmap, cliprect, 0,0); break;
-		case 3: m_sc2_tilemap_3->draw(bitmap, cliprect, 0,0); break;
+		case 0: m_sc2_tilemap_0->draw(screen, bitmap, cliprect, 0,0); break;
+		case 1: m_sc2_tilemap_1->draw(screen, bitmap, cliprect, 0,0); break;
+		case 2: m_sc2_tilemap_2->draw(screen, bitmap, cliprect, 0,0); break;
+		case 3: m_sc2_tilemap_3->draw(screen, bitmap, cliprect, 0,0); break;
 	}
 }
 
-void jalmah_state::draw_sc3_layer(bitmap_ind16 &bitmap, const rectangle &cliprect)
+void jalmah_state::draw_sc3_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	switch(m_jm_vregs[3] & 3)
 	{
 		case 0:
-		case 1: m_sc3_tilemap_0->draw(bitmap, cliprect, 0,0); break;
-		case 2: m_sc3_tilemap_2->draw(bitmap, cliprect, 0,0); break;
-		case 3: m_sc3_tilemap_3->draw(bitmap, cliprect, 0,0); break;
+		case 1: m_sc3_tilemap_0->draw(screen, bitmap, cliprect, 0,0); break;
+		case 2: m_sc3_tilemap_2->draw(screen, bitmap, cliprect, 0,0); break;
+		case 3: m_sc3_tilemap_3->draw(screen, bitmap, cliprect, 0,0); break;
 	}
 }
 
@@ -497,10 +497,10 @@ UINT32 jalmah_state::screen_update_jalmah(screen_device &screen, bitmap_ind16 &b
 
 	for(cur_prin=1;cur_prin<=0x8;cur_prin<<=1)
 	{
-		if(cur_prin==m_sc0_prin) { draw_sc0_layer(bitmap,cliprect); }
-		if(cur_prin==m_sc1_prin) { draw_sc1_layer(bitmap,cliprect); }
-		if(cur_prin==m_sc2_prin) { draw_sc2_layer(bitmap,cliprect); }
-		if(cur_prin==m_sc3_prin) { draw_sc3_layer(bitmap,cliprect); }
+		if(cur_prin==m_sc0_prin) { draw_sc0_layer(screen,bitmap,cliprect); }
+		if(cur_prin==m_sc1_prin) { draw_sc1_layer(screen,bitmap,cliprect); }
+		if(cur_prin==m_sc2_prin) { draw_sc2_layer(screen,bitmap,cliprect); }
+		if(cur_prin==m_sc3_prin) { draw_sc3_layer(screen,bitmap,cliprect); }
 	}
 
 	return 0;
@@ -516,8 +516,8 @@ UINT32 jalmah_state::screen_update_urashima(screen_device &screen, bitmap_ind16 
 	m_sc3_tilemap_0->set_scrolly(0, jm_scrollram[7]);
 
 	bitmap.fill(machine().pens[0x1ff], cliprect);//selectable by a ram address?
-	if(m_jm_vregs[0] & 1) { m_sc0_tilemap_0->draw(bitmap, cliprect, 0,0); }
-	if(m_jm_vregs[3] & 1) { m_sc3_tilemap_0->draw(bitmap, cliprect, 0,0); }
+	if(m_jm_vregs[0] & 1) { m_sc0_tilemap_0->draw(screen, bitmap, cliprect, 0,0); }
+	if(m_jm_vregs[3] & 1) { m_sc3_tilemap_0->draw(screen, bitmap, cliprect, 0,0); }
 	return 0;
 }
 

@@ -84,7 +84,7 @@ void shootout_state::video_start()
 	m_foreground->set_transparent_pen(0 );
 }
 
-void shootout_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int bank_bits )
+void shootout_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int bank_bits )
 {
 	UINT8 *spriteram = m_spriteram;
 	gfx_element *gfx = machine().gfx[1];
@@ -136,7 +136,7 @@ void shootout_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 						0 /*color*/,
 						flipx,flipy,
 						vx,vy,
-						machine().priority_bitmap,
+						screen.priority(),
 						priority_mask,0);
 
 					number++;
@@ -155,7 +155,7 @@ void shootout_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 						0 /*color*/,
 						flipx,flipy,
 						vx,vy,
-						machine().priority_bitmap,
+						screen.priority(),
 						priority_mask,0);
 			}
 		}
@@ -165,20 +165,20 @@ void shootout_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 UINT32 shootout_state::screen_update_shootout(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 
-	m_background->draw(bitmap, cliprect, 0,0);
-	m_foreground->draw(bitmap, cliprect, 0,1);
-	draw_sprites(bitmap,cliprect,3/*bank bits */);
+	m_background->draw(screen, bitmap, cliprect, 0,0);
+	m_foreground->draw(screen, bitmap, cliprect, 0,1);
+	draw_sprites(screen, bitmap, cliprect,3/*bank bits */);
 	return 0;
 }
 
 UINT32 shootout_state::screen_update_shootouj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 
-	m_background->draw(bitmap, cliprect, 0,0);
-	m_foreground->draw(bitmap, cliprect, 0,1);
-	draw_sprites(bitmap,cliprect,2/*bank bits*/);
+	m_background->draw(screen, bitmap, cliprect, 0,0);
+	m_foreground->draw(screen, bitmap, cliprect, 0,1);
+	draw_sprites(screen, bitmap, cliprect,2/*bank bits*/);
 	return 0;
 }

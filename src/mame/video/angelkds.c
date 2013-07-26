@@ -258,23 +258,23 @@ UINT32 angelkds_state::screen_update_angelkds(screen_device &screen, bitmap_ind1
 	clip.set(8*0, 8*16-1, visarea.min_y, visarea.max_y);
 
 	if ((m_layer_ctrl & 0x80) == 0x00)
-		m_bgtop_tilemap->draw(bitmap, clip, 0, 0);
+		m_bgtop_tilemap->draw(screen, bitmap, clip, 0, 0);
 
 	draw_sprites(bitmap, clip, 0x80);
 
 	if ((m_layer_ctrl & 0x20) == 0x00)
-		m_tx_tilemap->draw(bitmap, clip, 0, 0);
+		m_tx_tilemap->draw(screen, bitmap, clip, 0, 0);
 
 	/* draw bottom of screen */
 	clip.set(8*16, 8*32-1, visarea.min_y, visarea.max_y);
 
 	if ((m_layer_ctrl & 0x40) == 0x00)
-		m_bgbot_tilemap->draw(bitmap, clip, 0, 0);
+		m_bgbot_tilemap->draw(screen, bitmap, clip, 0, 0);
 
 	draw_sprites(bitmap, clip, 0x40);
 
 	if ((m_layer_ctrl & 0x20) == 0x00)
-		m_tx_tilemap->draw(bitmap, clip, 0, 0);
+		m_tx_tilemap->draw(screen, bitmap, clip, 0, 0);
 
 	return 0;
 }

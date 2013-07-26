@@ -302,7 +302,6 @@ public:
 	const pen_t *           pens;               // remapped palette pen numbers
 	colortable_t *          colortable;         // global colortable for remapping
 	pen_t *                 shadow_table;       // table for looking up a shadowed pen
-	bitmap_ind8             priority_bitmap;    // priority bitmap
 
 	// debugger-related information
 	UINT32                  debug_flags;        // the current debug flags

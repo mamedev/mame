@@ -310,13 +310,13 @@ UINT32 gaplus_state::screen_update_gaplus(screen_device &screen, bitmap_ind16 &b
 	starfield_render(bitmap);
 
 	/* draw the low priority characters */
-	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
 
 	draw_sprites(bitmap, cliprect);
 
 	/* draw the high priority characters */
 	/* (I don't know if this feature is used by Gaplus, but it's shown in the schematics) */
-	m_bg_tilemap->draw(bitmap, cliprect, 1,0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 1,0);
 	return 0;
 }
 

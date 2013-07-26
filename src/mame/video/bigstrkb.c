@@ -130,11 +130,11 @@ UINT32 bigstrkb_state::screen_update_bigstrkb(screen_device &screen, bitmap_ind1
 	m_tilemap3->set_scrollx(0, m_vidreg1[1]+(256-14));
 	m_tilemap3->set_scrolly(0, m_vidreg2[1]);
 
-	m_tilemap2->draw(bitmap, cliprect, 0,0);
-	m_tilemap3->draw(bitmap, cliprect, 0,0);
+	m_tilemap2->draw(screen, bitmap, cliprect, 0,0);
+	m_tilemap3->draw(screen, bitmap, cliprect, 0,0);
 
 	draw_sprites(bitmap,cliprect);
-	m_tilemap->draw(bitmap, cliprect, 0,0);
+	m_tilemap->draw(screen, bitmap, cliprect, 0,0);
 
 //  popmessage ("Regs %08x %08x %08x %08x",bsb_vidreg2[0],bsb_vidreg2[1],bsb_vidreg2[2],bsb_vidreg2[3]);
 	return 0;

@@ -229,7 +229,7 @@ lookup table from rom for the TaitoZ sprites.
 
 ******************************************************************************/
 
-void tc0150rod_device::draw( bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs, int palette_offs, int type, int road_trans, UINT32 low_priority, UINT32 high_priority )
+void tc0150rod_device::draw( bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs, int palette_offs, int type, int road_trans, bitmap_ind8 &priority_bitmap, UINT32 low_priority, UINT32 high_priority )
 {
 	#ifdef MAME_DEBUG
 	static int dislayer[6]; /* Road Layer toggles to help get road correct */
@@ -787,7 +787,7 @@ void tc0150rod_device::draw( bitmap_ind16 &bitmap, const rectangle &cliprect, in
 				}
 			}
 
-			taitoic_drawscanline(bitmap, cliprect, 0, y, scanline, 1, ROT0, machine().priority_bitmap, (y > priority_switch_line) ? high_priority : low_priority);
+			taitoic_drawscanline(bitmap, cliprect, 0, y, scanline, 1, ROT0, priority_bitmap, (y > priority_switch_line) ? high_priority : low_priority);
 		}
 
 		y++;

@@ -206,12 +206,12 @@ UINT32 aeroboto_state::screen_update_aeroboto(screen_device &screen, bitmap_ind1
 
 	// the playfield is part of a splitscreen and should not overlap with status display
 	m_bg_tilemap->set_scrolly(0, *m_vscroll);
-	m_bg_tilemap->draw(bitmap, splitrect2, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, splitrect2, 0, 0);
 
 	draw_sprites(bitmap, cliprect);
 
 	// the status display behaves more closely to a 40-line splitscreen than an overlay
 	m_bg_tilemap->set_scrolly(0, 0);
-	m_bg_tilemap->draw(bitmap, splitrect1, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, splitrect1, 0, 0);
 	return 0;
 }

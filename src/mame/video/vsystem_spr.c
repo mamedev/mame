@@ -193,7 +193,7 @@ void vsystem_spr_device::get_sprite_attributes(UINT16* ram)
 }
 
 
-void vsystem_spr_device::common_sprite_drawgfx( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void vsystem_spr_device::common_sprite_drawgfx( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap)
 {
 	gfx_element *gfx = machine.gfx[m_gfx_region];
 	int priority_mask = 0x00;
@@ -235,10 +235,10 @@ void vsystem_spr_device::common_sprite_drawgfx( running_machine &machine, bitmap
 			int startno = m_newtilecb(curr_sprite.map++);
 			if (m_pdraw)
 			{
-				pdrawgfxzoom_transpen(bitmap, cliprect, gfx, startno, curr_sprite.color + m_pal_base, curr_sprite.flipx, curr_sprite.flipy, curr_sprite.ox + xcnt * curr_sprite.zoomx/2,        curr_sprite.oy + ycnt * curr_sprite.zoomy/2,        curr_sprite.zoomx << 11, curr_sprite.zoomy << 11, machine.priority_bitmap,priority_mask, m_transpen);
-				pdrawgfxzoom_transpen(bitmap, cliprect, gfx, startno, curr_sprite.color + m_pal_base, curr_sprite.flipx, curr_sprite.flipy, -0x200+curr_sprite.ox + xcnt * curr_sprite.zoomx/2, curr_sprite.oy + ycnt * curr_sprite.zoomy/2,        curr_sprite.zoomx << 11, curr_sprite.zoomy << 11, machine.priority_bitmap,priority_mask, m_transpen);
-				pdrawgfxzoom_transpen(bitmap, cliprect, gfx, startno, curr_sprite.color + m_pal_base, curr_sprite.flipx, curr_sprite.flipy, curr_sprite.ox + xcnt * curr_sprite.zoomx/2,        -0x200+curr_sprite.oy + ycnt * curr_sprite.zoomy/2, curr_sprite.zoomx << 11, curr_sprite.zoomy << 11, machine.priority_bitmap,priority_mask, m_transpen);
-				pdrawgfxzoom_transpen(bitmap, cliprect, gfx, startno, curr_sprite.color + m_pal_base, curr_sprite.flipx, curr_sprite.flipy, -0x200+curr_sprite.ox + xcnt * curr_sprite.zoomx/2, -0x200+curr_sprite.oy + ycnt * curr_sprite.zoomy/2, curr_sprite.zoomx << 11, curr_sprite.zoomy << 11, machine.priority_bitmap,priority_mask, m_transpen);
+				pdrawgfxzoom_transpen(bitmap, cliprect, gfx, startno, curr_sprite.color + m_pal_base, curr_sprite.flipx, curr_sprite.flipy, curr_sprite.ox + xcnt * curr_sprite.zoomx/2,        curr_sprite.oy + ycnt * curr_sprite.zoomy/2,        curr_sprite.zoomx << 11, curr_sprite.zoomy << 11, priority_bitmap, priority_mask, m_transpen);
+				pdrawgfxzoom_transpen(bitmap, cliprect, gfx, startno, curr_sprite.color + m_pal_base, curr_sprite.flipx, curr_sprite.flipy, -0x200+curr_sprite.ox + xcnt * curr_sprite.zoomx/2, curr_sprite.oy + ycnt * curr_sprite.zoomy/2,        curr_sprite.zoomx << 11, curr_sprite.zoomy << 11, priority_bitmap, priority_mask, m_transpen);
+				pdrawgfxzoom_transpen(bitmap, cliprect, gfx, startno, curr_sprite.color + m_pal_base, curr_sprite.flipx, curr_sprite.flipy, curr_sprite.ox + xcnt * curr_sprite.zoomx/2,        -0x200+curr_sprite.oy + ycnt * curr_sprite.zoomy/2, curr_sprite.zoomx << 11, curr_sprite.zoomy << 11, priority_bitmap, priority_mask, m_transpen);
+				pdrawgfxzoom_transpen(bitmap, cliprect, gfx, startno, curr_sprite.color + m_pal_base, curr_sprite.flipx, curr_sprite.flipy, -0x200+curr_sprite.ox + xcnt * curr_sprite.zoomx/2, -0x200+curr_sprite.oy + ycnt * curr_sprite.zoomy/2, curr_sprite.zoomx << 11, curr_sprite.zoomy << 11, priority_bitmap, priority_mask, m_transpen);
 			}
 			else
 			{
@@ -256,7 +256,7 @@ void vsystem_spr_device::common_sprite_drawgfx( running_machine &machine, bitmap
 
 
 
-void vsystem_spr_device::draw_sprites( UINT16* spriteram, int spriteram_bytes, running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int prihack_mask, int prihack_val )
+void vsystem_spr_device::draw_sprites( UINT16* spriteram, int spriteram_bytes, screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int prihack_mask, int prihack_val )
 {
 	int offs;
 	int end = 0;
@@ -301,11 +301,11 @@ void vsystem_spr_device::draw_sprites( UINT16* spriteram, int spriteram_bytes, r
 			if (prihack_mask != -1)
 			{
 				if ((curr_sprite.pri & prihack_mask) == prihack_val)
-					common_sprite_drawgfx(machine, bitmap, cliprect);
+					common_sprite_drawgfx(screen.machine(), bitmap, cliprect, screen.priority());
 			}
 			else
 			{
-				common_sprite_drawgfx(machine, bitmap, cliprect);
+				common_sprite_drawgfx(screen.machine(), bitmap, cliprect, screen.priority());
 			}
 		}
 

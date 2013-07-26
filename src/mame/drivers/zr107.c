@@ -252,7 +252,7 @@ UINT32 zr107_state::screen_update_jetwave(screen_device &screen, bitmap_rgb32 &b
 
 	K001005_draw(bitmap, cliprect);
 
-	m_k001604->draw_front_layer(bitmap, cliprect);
+	m_k001604->draw_front_layer(screen, bitmap, cliprect);
 
 	draw_7segment_led(bitmap, 3, 3, m_led_reg0);
 	draw_7segment_led(bitmap, 9, 3, m_led_reg1);
@@ -298,9 +298,9 @@ UINT32 zr107_state::screen_update_zr107(screen_device &screen, bitmap_rgb32 &bit
 {
 	bitmap.fill(machine().pens[0], cliprect);
 
-	m_k056832->tilemap_draw(bitmap, cliprect, 1, 0, 0);
+	m_k056832->tilemap_draw(screen, bitmap, cliprect, 1, 0, 0);
 	K001005_draw(bitmap, cliprect);
-	m_k056832->tilemap_draw(bitmap, cliprect, 0, 0, 0);
+	m_k056832->tilemap_draw(screen, bitmap, cliprect, 0, 0, 0);
 
 	draw_7segment_led(bitmap, 3, 3, m_led_reg0);
 	draw_7segment_led(bitmap, 9, 3, m_led_reg1);

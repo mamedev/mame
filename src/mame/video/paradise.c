@@ -253,8 +253,8 @@ if (machine().input().code_pressed(KEYCODE_Z))
 		if (layers_ctrl & 16)
 			draw_sprites(bitmap, cliprect);
 
-	if (layers_ctrl & 1)    m_tilemap_0->draw(bitmap, cliprect, 0, 0);
-	if (layers_ctrl & 2)    m_tilemap_1->draw(bitmap, cliprect, 0, 0);
+	if (layers_ctrl & 1)    m_tilemap_0->draw(screen, bitmap, cliprect, 0, 0);
+	if (layers_ctrl & 2)    m_tilemap_1->draw(screen, bitmap, cliprect, 0, 0);
 	if (layers_ctrl & 4)    copybitmap_trans(bitmap, m_tmpbitmap, flip_screen(), flip_screen(), 0, 0, cliprect, 0x80f);
 
 	if (m_priority & 2)
@@ -263,12 +263,12 @@ if (machine().input().code_pressed(KEYCODE_Z))
 			if (layers_ctrl & 16)
 				draw_sprites(bitmap, cliprect);
 		if (layers_ctrl & 8)
-			m_tilemap_2->draw(bitmap, cliprect, 0, 0);
+			m_tilemap_2->draw(screen, bitmap, cliprect, 0, 0);
 	}
 	else
 	{
 		if (layers_ctrl & 8)
-			m_tilemap_2->draw(bitmap, cliprect, 0, 0);
+			m_tilemap_2->draw(screen, bitmap, cliprect, 0, 0);
 		if (!(m_priority & 1))
 			if (layers_ctrl & 16)
 				draw_sprites(bitmap, cliprect);
@@ -287,18 +287,18 @@ UINT32 paradise_state::screen_update_torus(screen_device &screen, bitmap_ind16 &
 	if (m_priority & 1)
 		draw_sprites(bitmap, cliprect);
 
-	m_tilemap_1->draw(bitmap, cliprect, 0,0);
+	m_tilemap_1->draw(screen, bitmap, cliprect, 0,0);
 
 	if (m_priority & 4)
 	{
 		if (!(m_priority & 1))
 			draw_sprites(bitmap, cliprect);
 
-		m_tilemap_2->draw(bitmap, cliprect, 0, 0);
+		m_tilemap_2->draw(screen, bitmap, cliprect, 0, 0);
 	}
 	else
 	{
-		m_tilemap_2->draw(bitmap, cliprect, 0, 0);
+		m_tilemap_2->draw(screen, bitmap, cliprect, 0, 0);
 
 		if (!(m_priority & 1))
 			draw_sprites(bitmap,cliprect);
@@ -310,9 +310,9 @@ UINT32 paradise_state::screen_update_torus(screen_device &screen, bitmap_ind16 &
 UINT32 paradise_state::screen_update_madball(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(get_black_pen(machine()), cliprect);
-	m_tilemap_0->draw(bitmap, cliprect, 0, 0);
-	m_tilemap_1->draw(bitmap, cliprect, 0, 0);
-	m_tilemap_2->draw(bitmap, cliprect, 0, 0);
+	m_tilemap_0->draw(screen, bitmap, cliprect, 0, 0);
+	m_tilemap_1->draw(screen, bitmap, cliprect, 0, 0);
+	m_tilemap_2->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);
 	return 0;
 }

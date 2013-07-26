@@ -134,7 +134,7 @@ UINT32 scotrsht_state::screen_update_scotrsht(screen_device &screen, bitmap_ind1
 	for (col = 0; col < 32; col++)
 		m_bg_tilemap->set_scrolly(col, m_scroll[col]);
 
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);
 	return 0;
 }

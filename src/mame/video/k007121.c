@@ -224,10 +224,9 @@ WRITE8_MEMBER( k007121_device::ctrl_w )
  */
 
 void k007121_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx, colortable_t *ctable,
-							const UINT8 *source, int base_color, int global_x_offset, int bank_base, UINT32 pri_mask )
+							const UINT8 *source, int base_color, int global_x_offset, int bank_base, bitmap_ind8 &priority_bitmap, UINT32 pri_mask )
 {
 	//  gfx_element *gfx = gfxs[chip];
-	bitmap_ind8 &priority_bitmap = gfx->machine().priority_bitmap;
 	int flipscreen = m_flipscreen;
 	int i, num, inc, offs[5];
 	int is_flakatck = (ctable == NULL);

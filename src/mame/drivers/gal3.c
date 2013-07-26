@@ -207,14 +207,14 @@ UINT32 gal3_state::screen_update_gal3(screen_device &screen, bitmap_rgb32 &bitma
 
 	for( pri=0; pri<pivot; pri++ )
 	{
-		c355_obj_draw(bitmap, cliprect, pri);
+		c355_obj_draw(screen, bitmap, cliprect, pri);
 	}
 
 /*  CopyVisiblePolyFrameBuffer( bitmap, cliprect,0,0x7fbf );
 
     for( pri=pivot; pri<15; pri++ )
     {
-        c355_obj_draw(bitmap, cliprect, pri);
+        c355_obj_draw(screen, bitmap, cliprect, pri);
     }*/
 
 	// CPU Diag LEDs

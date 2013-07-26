@@ -30,7 +30,7 @@ UINT32 segas24_state::screen_update_system24(screen_device &screen, bitmap_ind16
 		return 0;
 	}
 
-	machine().priority_bitmap.fill(0);
+	screen.priority().fill(0);
 	bitmap.fill(0, cliprect);
 
 	std::vector<int> order;
@@ -44,12 +44,12 @@ UINT32 segas24_state::screen_update_system24(screen_device &screen, bitmap_ind16
 	int level = 0;
 	for(int i=0; i<12; i++)
 		if(order[i] < 8)
-			vtile->draw(bitmap, cliprect, order[i], level, 0);
+			vtile->draw(screen, bitmap, cliprect, order[i], level, 0);
 		else {
 			spri[order[i]-8] = level;
 			level++;
 		}
 
-	vsprite->draw(bitmap, cliprect, spri);
+	vsprite->draw(bitmap, cliprect, screen.priority(), spri);
 	return 0;
 }

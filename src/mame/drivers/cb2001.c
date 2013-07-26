@@ -401,9 +401,9 @@ UINT32 cb2001_state::screen_update_cb2001(screen_device &screen, bitmap_rgb32 &b
 			const rectangle visible2(0*8, (14+48)*8-1, 10*8, (10+7)*8-1);
 			const rectangle visible3(0*8, (14+48)*8-1, 17*8, (17+7)*8-1);
 
-			m_reel1_tilemap->draw(bitmap, visible1, 0, 0);
-			m_reel2_tilemap->draw(bitmap, visible2, 0, 0);
-			m_reel3_tilemap->draw(bitmap, visible3, 0, 0);
+			m_reel1_tilemap->draw(screen, bitmap, visible1, 0, 0);
+			m_reel2_tilemap->draw(screen, bitmap, visible2, 0, 0);
+			m_reel3_tilemap->draw(screen, bitmap, visible3, 0, 0);
 		}
 	}
 

@@ -80,7 +80,7 @@ UINT32 quizpani_state::screen_update_quizpani(screen_device &screen, bitmap_ind1
 	m_txt_tilemap->set_scrollx(0, m_scrollreg[2] - 64);
 	m_txt_tilemap->set_scrolly(0, m_scrollreg[3] + 16);
 
-	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
-	m_txt_tilemap->draw(bitmap, cliprect, 0,0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
+	m_txt_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
 }

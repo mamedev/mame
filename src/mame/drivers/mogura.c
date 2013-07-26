@@ -95,12 +95,12 @@ UINT32 mogura_state::screen_update_mogura(screen_device &screen, bitmap_ind16 &b
 	rectangle clip = visarea;
 	clip.max_x = 256 - 1;
 	m_tilemap->set_scrollx(0, 256);
-	m_tilemap->draw(bitmap, clip, 0, 0);
+	m_tilemap->draw(screen, bitmap, clip, 0, 0);
 
 	clip.min_x = 256;
 	clip.max_x = 512 - 1;
 	m_tilemap->set_scrollx(0, -128);
-	m_tilemap->draw(bitmap, clip, 0, 0);
+	m_tilemap->draw(screen, bitmap, clip, 0, 0);
 
 	return 0;
 }

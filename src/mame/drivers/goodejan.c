@@ -350,13 +350,13 @@ UINT32 goodejan_state::screen_update_goodejan(screen_device &screen, bitmap_ind1
 	m_sc3_tilemap->set_scrollx(0, (0) & 0x1ff );
 	m_sc3_tilemap->set_scrolly(0, (0) & 0x1ff );
 
-	if(SEIBU_CRTC_ENABLE_SC0) { m_sc0_tilemap->draw(bitmap, cliprect, 0,0); }
+	if(SEIBU_CRTC_ENABLE_SC0) { m_sc0_tilemap->draw(screen, bitmap, cliprect, 0,0); }
 	if(SEIBU_CRTC_ENABLE_SPR) { draw_sprites(screen.machine(), bitmap,cliprect, 2); }
-	if(SEIBU_CRTC_ENABLE_SC2) { m_sc2_tilemap->draw(bitmap, cliprect, 0,0); }
+	if(SEIBU_CRTC_ENABLE_SC2) { m_sc2_tilemap->draw(screen, bitmap, cliprect, 0,0); }
 	if(SEIBU_CRTC_ENABLE_SPR) { draw_sprites(screen.machine(), bitmap,cliprect, 1); }
-	if(SEIBU_CRTC_ENABLE_SC1) { m_sc1_tilemap->draw(bitmap, cliprect, 0,0); }
+	if(SEIBU_CRTC_ENABLE_SC1) { m_sc1_tilemap->draw(screen, bitmap, cliprect, 0,0); }
 	if(SEIBU_CRTC_ENABLE_SPR) { draw_sprites(screen.machine(), bitmap,cliprect, 0); }
-	if(SEIBU_CRTC_ENABLE_SC3) { m_sc3_tilemap->draw(bitmap, cliprect, 0,0); }
+	if(SEIBU_CRTC_ENABLE_SC3) { m_sc3_tilemap->draw(screen, bitmap, cliprect, 0,0); }
 	if(SEIBU_CRTC_ENABLE_SPR) { draw_sprites(screen.machine(), bitmap,cliprect, 3); }
 
 	return 0;

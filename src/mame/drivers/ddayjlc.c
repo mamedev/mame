@@ -392,7 +392,7 @@ void ddayjlc_state::video_start()
 UINT32 ddayjlc_state::screen_update_ddayjlc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT32 i;
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	for (i = 0; i < 0x400; i += 4)
 	{

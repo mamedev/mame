@@ -337,7 +337,7 @@ UINT32 sbrkout_state::screen_update_sbrkout(screen_device &screen, bitmap_ind16 
 	UINT8 *videoram = m_videoram;
 	int ball;
 
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	for (ball = 2; ball >= 0; ball--)
 	{

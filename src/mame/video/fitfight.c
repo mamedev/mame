@@ -127,7 +127,7 @@ UINT32 fitfight_state::screen_update_fitfight(screen_device &screen, bitmap_ind1
 		scrollbak = ((m_fof_a00000[0] & 0xffe0) >> 5);
 		m_fof_bak_tilemap->set_scrollx(0, scrollbak );
 		m_fof_bak_tilemap->set_scrolly(0, m_fof_a00000[0] & 0xff);
-		m_fof_bak_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_fof_bak_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 		draw_sprites(bitmap, cliprect, 0);
 
@@ -144,11 +144,11 @@ UINT32 fitfight_state::screen_update_fitfight(screen_device &screen, bitmap_ind1
 		m_fof_mid_tilemap->set_scrollx(0, scrollmid );
 		m_fof_mid_tilemap->set_scrolly(0, m_fof_900000[0] & 0xff);
 //      if (!machine().input().code_pressed(KEYCODE_F))
-		m_fof_mid_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_fof_mid_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 		draw_sprites(bitmap, cliprect, 1);
 
-		m_fof_txt_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_fof_txt_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	}
 /*  popmessage ("Regs %04x %04x %04x %04x %04x %04x",
             m_fof_100000[0], m_fof_600000[0], m_fof_700000[0],

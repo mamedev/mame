@@ -214,9 +214,9 @@ UINT32 magic10_state::screen_update_magic10(screen_device &screen, bitmap_ind16 
 	m_layer1_tilemap->set_scrolly(0, (m_vregs[0/2] - m_vregs[4/2])+0);
 	m_layer1_tilemap->set_scrollx(0, (m_vregs[2/2] - m_vregs[6/2])+4);
 
-	m_layer0_tilemap->draw(bitmap, cliprect, 0, 0);
-	m_layer1_tilemap->draw(bitmap, cliprect, 0, 0);
-	m_layer2_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_layer0_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_layer1_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_layer2_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }

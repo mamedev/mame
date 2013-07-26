@@ -59,7 +59,7 @@ UINT32 ultratnk_state::screen_update_ultratnk(screen_device &screen, bitmap_ind1
 	UINT8 *videoram = m_videoram;
 	int i;
 
-	m_playfield->draw(bitmap, cliprect, 0, 0);
+	m_playfield->draw(screen, bitmap, cliprect, 0, 0);
 
 	for (i = 0; i < 4; i++)
 	{
@@ -119,7 +119,7 @@ void ultratnk_state::screen_eof_ultratnk(screen_device &screen, bool state)
 
 			rect &= machine().primary_screen->visible_area();
 
-			m_playfield->draw(m_helper, rect, 0, 0);
+			m_playfield->draw(screen, m_helper, rect, 0, 0);
 
 			if (code & 4)
 				bank = 32;

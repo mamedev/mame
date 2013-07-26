@@ -11,7 +11,7 @@ public:
 	
 	static void static_set_gfx_index(device_t &device, int index) { downcast<k037122_device &>(device).m_gfx_index = index; }
 
-	void tile_draw( bitmap_rgb32 &bitmap, const rectangle &cliprect );
+	void tile_draw( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect );
 	DECLARE_READ32_MEMBER( sram_r );
 	DECLARE_WRITE32_MEMBER( sram_w );
 	DECLARE_READ32_MEMBER( char_r );

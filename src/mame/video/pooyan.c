@@ -190,7 +190,7 @@ void pooyan_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 
 UINT32 pooyan_state::screen_update_pooyan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);
 	return 0;
 }

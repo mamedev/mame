@@ -156,7 +156,7 @@ WRITE8_MEMBER(tecmo_state::tecmo_flipscreen_w)
 
 ***************************************************************************/
 
-void tecmo_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
+void tecmo_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	UINT8 *spriteram = m_spriteram;
 	int offs;
@@ -225,7 +225,7 @@ void tecmo_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 							flags & 0xf,
 							flipx,flipy,
 							sx,sy,
-							machine().priority_bitmap,
+							screen.priority(),
 							priority_mask,0);
 				}
 			}
@@ -236,12 +236,12 @@ void tecmo_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 
 UINT32 tecmo_state::screen_update_tecmo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 	bitmap.fill(0x100, cliprect);
-	m_bg_tilemap->draw(bitmap, cliprect, 0,1);
-	m_fg_tilemap->draw(bitmap, cliprect, 0,2);
-	m_tx_tilemap->draw(bitmap, cliprect, 0,4);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0,1);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0,2);
+	m_tx_tilemap->draw(screen, bitmap, cliprect, 0,4);
 
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(screen,bitmap,cliprect);
 	return 0;
 }

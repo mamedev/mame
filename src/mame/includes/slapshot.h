@@ -84,7 +84,7 @@ public:
 	void screen_eof_taito_no_buffer(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(slapshot_interrupt);
 	void reset_sound_region();
-	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int *primasks, int y_offset );
+	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int *primasks, int y_offset );
 	void taito_handle_sprite_buffering(  );
 	void taito_update_sprites_active_area(  );
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);

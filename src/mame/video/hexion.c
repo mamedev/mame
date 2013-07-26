@@ -159,7 +159,7 @@ WRITE8_MEMBER(hexion_state::hexion_gfxrom_select_w)
 
 UINT32 hexion_state::screen_update_hexion(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_bg_tilemap[1]->draw(bitmap, cliprect, 0,0);
-	m_bg_tilemap[0]->draw(bitmap, cliprect, 0,0);
+	m_bg_tilemap[1]->draw(screen, bitmap, cliprect, 0,0);
+	m_bg_tilemap[0]->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
 }

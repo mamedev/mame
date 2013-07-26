@@ -1514,21 +1514,21 @@ UINT32 model1_state::screen_update_model1(screen_device &screen, bitmap_rgb32 &b
 	view->ayyc = cos(view->ayy);
 	view->ayys = sin(view->ayy);
 
-	machine().priority_bitmap.fill(0);
+	screen.priority().fill(0);
 	bitmap.fill(machine().pens[0], cliprect);
 
 	segas24_tile *tile = machine().device<segas24_tile>("tile");
-	tile->draw(bitmap, cliprect, 6, 0, 0);
-	tile->draw(bitmap, cliprect, 4, 0, 0);
-	tile->draw(bitmap, cliprect, 2, 0, 0);
-	tile->draw(bitmap, cliprect, 0, 0, 0);
+	tile->draw(screen, bitmap, cliprect, 6, 0, 0);
+	tile->draw(screen, bitmap, cliprect, 4, 0, 0);
+	tile->draw(screen, bitmap, cliprect, 2, 0, 0);
+	tile->draw(screen, bitmap, cliprect, 0, 0, 0);
 
 	tgp_render(machine(), bitmap, cliprect);
 
-	tile->draw(bitmap, cliprect, 7, 0, 0);
-	tile->draw(bitmap, cliprect, 5, 0, 0);
-	tile->draw(bitmap, cliprect, 3, 0, 0);
-	tile->draw(bitmap, cliprect, 1, 0, 0);
+	tile->draw(screen, bitmap, cliprect, 7, 0, 0);
+	tile->draw(screen, bitmap, cliprect, 5, 0, 0);
+	tile->draw(screen, bitmap, cliprect, 3, 0, 0);
+	tile->draw(screen, bitmap, cliprect, 1, 0, 0);
 
 	return 0;
 }

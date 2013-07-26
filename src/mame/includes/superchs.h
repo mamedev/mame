@@ -46,7 +46,7 @@ public:
 	DECLARE_DRIVER_INIT(superchs);
 	virtual void video_start();
 	UINT32 screen_update_superchs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,const int *primasks,int x_offs,int y_offs);
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,const int *primasks,int x_offs,int y_offs);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<tc0480scp_device> m_tc0480scp;

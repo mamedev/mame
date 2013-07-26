@@ -741,7 +741,7 @@ UINT32 decocass_state::screen_update_decocass(screen_device &screen, bitmap_ind1
 			draw_edge(bitmap,cliprect,1,false);
 		}
 	}
-	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect, (m_color_center_bot >> 1) & 1, 0, 0, m_fgvideoram, 0x20);
 	draw_missiles(bitmap, cliprect, 1, 0, m_colorram, 0x20);
 	return 0;

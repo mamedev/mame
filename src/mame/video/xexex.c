@@ -77,17 +77,17 @@ UINT32 xexex_state::screen_update_xexex(screen_device &screen, bitmap_rgb32 &bit
 	m_k054338->update_all_shadows(0);
 	m_k054338->fill_backcolor(bitmap, 0);
 
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 
 	for (plane = 0; plane < 4; plane++)
 	{
 		if (layer[plane] < 0)
 		{
-			m_k053250->draw(bitmap, cliprect, bg_colorbase, 0, 1 << plane);
+			m_k053250->draw(bitmap, cliprect, bg_colorbase, 0, screen.priority(), 1 << plane);
 		}
 		else if (!m_cur_alpha || layer[plane] != 1)
 		{
-			m_k056832->tilemap_draw(bitmap, cliprect, layer[plane], 0, 1 << plane);
+			m_k056832->tilemap_draw(screen, bitmap, cliprect, layer[plane], 0, 1 << plane);
 		}
 	}
 
@@ -99,10 +99,10 @@ UINT32 xexex_state::screen_update_xexex(screen_device &screen, bitmap_rgb32 &bit
 
 		if (alpha > 0)
 		{
-			m_k056832->tilemap_draw(bitmap, cliprect, 1, TILEMAP_DRAW_ALPHA(alpha), 0);
+			m_k056832->tilemap_draw(screen, bitmap, cliprect, 1, TILEMAP_DRAW_ALPHA(alpha), 0);
 		}
 	}
 
-	m_k056832->tilemap_draw(bitmap, cliprect, 0, 0, 0);
+	m_k056832->tilemap_draw(screen, bitmap, cliprect, 0, 0, 0);
 	return 0;
 }

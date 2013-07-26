@@ -77,11 +77,11 @@ UINT32 crimfght_state::screen_update_crimfght(screen_device &screen, bitmap_ind1
 {
 	m_k052109->tilemap_update();
 
-	m_k052109->tilemap_draw(bitmap, cliprect, 1, TILEMAP_DRAW_OPAQUE, 0);
-	m_k051960->k051960_sprites_draw(bitmap, cliprect, 2, 2);
-	m_k052109->tilemap_draw(bitmap, cliprect, 2, 0, 0);
-	m_k051960->k051960_sprites_draw(bitmap, cliprect, 1, 1);
-	m_k052109->tilemap_draw(bitmap, cliprect, 0, 0, 0);
-	m_k051960->k051960_sprites_draw(bitmap, cliprect, 0, 0);
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, 1, TILEMAP_DRAW_OPAQUE, 0);
+	m_k051960->k051960_sprites_draw(bitmap, cliprect, screen.priority(), 2, 2);
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, 2, 0, 0);
+	m_k051960->k051960_sprites_draw(bitmap, cliprect, screen.priority(), 1, 1);
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, 0, 0, 0);
+	m_k051960->k051960_sprites_draw(bitmap, cliprect, screen.priority(), 0, 0);
 	return 0;
 }

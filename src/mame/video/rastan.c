@@ -37,11 +37,11 @@ UINT32 rastan_state::screen_update_rastan(screen_device &screen, bitmap_ind16 &b
 	layer[0] = 0;
 	layer[1] = 1;
 
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 
-	m_pc080sn->tilemap_draw(bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 1);
-	m_pc080sn->tilemap_draw(bitmap, cliprect, layer[1], 0, 2);
+	m_pc080sn->tilemap_draw(screen, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 1);
+	m_pc080sn->tilemap_draw(screen, bitmap, cliprect, layer[1], 0, 2);
 
-	m_pc090oj->draw_sprites(bitmap, cliprect, 0);
+	m_pc090oj->draw_sprites(bitmap, cliprect, screen.priority(), 0);
 	return 0;
 }

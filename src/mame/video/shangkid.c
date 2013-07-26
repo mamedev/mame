@@ -186,9 +186,9 @@ UINT32 shangkid_state::screen_update_shangkid(screen_device &screen, bitmap_ind1
 	m_background->set_scrollx(0,m_videoreg[0]-40 );
 	m_background->set_scrolly(0,m_videoreg[2]+0x10 );
 
-	m_background->draw(bitmap, cliprect, 0,0 );
+	m_background->draw(screen, bitmap, cliprect, 0,0 );
 	shangkid_draw_sprites(bitmap,cliprect );
-	m_background->draw(bitmap, cliprect, 1,0 ); /* high priority tiles */
+	m_background->draw(screen, bitmap, cliprect, 1,0 ); /* high priority tiles */
 	return 0;
 }
 

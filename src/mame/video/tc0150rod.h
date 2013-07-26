@@ -15,7 +15,7 @@ public:
 
 	DECLARE_READ16_MEMBER( word_r );
 	DECLARE_WRITE16_MEMBER( word_w );
-	void draw(bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs, int palette_offs, int type, int road_trans, UINT32 low_priority, UINT32 high_priority);
+	void draw(bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs, int palette_offs, int type, int road_trans, bitmap_ind8 &priority_bitmap, UINT32 low_priority, UINT32 high_priority);
 
 protected:
 	// device-level overrides

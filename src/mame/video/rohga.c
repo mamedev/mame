@@ -72,7 +72,7 @@ UINT32 rohga_state::screen_update_rohga(screen_device &screen, bitmap_ind16 &bit
 	m_deco_tilegen2->pf_update(m_pf3_rowscroll, m_pf4_rowscroll);
 
 	/* Draw playfields */
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 	bitmap.fill(machine().pens[768], cliprect);
 
 	switch (priority & 3)
@@ -81,30 +81,30 @@ UINT32 rohga_state::screen_update_rohga(screen_device &screen, bitmap_ind16 &bit
 		if (priority & 4)
 		{
 			// Draw as 1 8BPP layer
-			m_deco_tilegen2->tilemap_12_combine_draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 3);
+			m_deco_tilegen2->tilemap_12_combine_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 3);
 		}
 		else
 		{
 			// Draw as 2 4BPP layers
-			m_deco_tilegen2->tilemap_2_draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 1);
-			m_deco_tilegen2->tilemap_1_draw(bitmap, cliprect, 0, 2);
+			m_deco_tilegen2->tilemap_2_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 1);
+			m_deco_tilegen2->tilemap_1_draw(screen, bitmap, cliprect, 0, 2);
 		}
-		m_deco_tilegen1->tilemap_2_draw(bitmap, cliprect, 0, 4);
+		m_deco_tilegen1->tilemap_2_draw(screen, bitmap, cliprect, 0, 4);
 		break;
 	case 1:
-		m_deco_tilegen2->tilemap_2_draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 1);
-		m_deco_tilegen1->tilemap_2_draw(bitmap, cliprect, 0, 2);
-		m_deco_tilegen2->tilemap_1_draw(bitmap, cliprect, 0, 4);
+		m_deco_tilegen2->tilemap_2_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 1);
+		m_deco_tilegen1->tilemap_2_draw(screen, bitmap, cliprect, 0, 2);
+		m_deco_tilegen2->tilemap_1_draw(screen, bitmap, cliprect, 0, 4);
 		break;
 	case 2:
-		m_deco_tilegen1->tilemap_2_draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 1);
-		m_deco_tilegen2->tilemap_2_draw(bitmap, cliprect, 0, 2);
-		m_deco_tilegen2->tilemap_1_draw(bitmap, cliprect, 0, 4);
+		m_deco_tilegen1->tilemap_2_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 1);
+		m_deco_tilegen2->tilemap_2_draw(screen, bitmap, cliprect, 0, 2);
+		m_deco_tilegen2->tilemap_1_draw(screen, bitmap, cliprect, 0, 4);
 		break;
 	}
 
 	m_sprgen1->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0x400, true);
-	m_deco_tilegen1->tilemap_1_draw(bitmap, cliprect, 0, 0);
+	m_deco_tilegen1->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }
@@ -181,21 +181,21 @@ UINT32 rohga_state::screen_update_wizdfire(screen_device &screen, bitmap_rgb32 &
 	/* Draw playfields - Palette of 2nd playfield chip visible if playfields turned off */
 	bitmap.fill(machine().pens[512], cliprect);
 
-	m_deco_tilegen2->tilemap_2_draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	m_deco_tilegen2->tilemap_2_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 	m_sprgen1->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0600, 0x0600, 0x400, 0x1ff);
-	m_deco_tilegen1->tilemap_2_draw(bitmap, cliprect, 0, 0);
+	m_deco_tilegen1->tilemap_2_draw(screen, bitmap, cliprect, 0, 0);
 	m_sprgen1->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0400, 0x0600, 0x400, 0x1ff);
 
 	if ((priority & 0x1f) == 0x1f) /* Wizdfire has bit 0x40 always set, Dark Seal 2 doesn't?! */
-		m_deco_tilegen2->tilemap_1_draw(bitmap, cliprect, TILEMAP_DRAW_ALPHA(0x80), 0);
+		m_deco_tilegen2->tilemap_1_draw(screen, bitmap, cliprect, TILEMAP_DRAW_ALPHA(0x80), 0);
 	else
-		m_deco_tilegen2->tilemap_1_draw(bitmap, cliprect, 0, 0);
+		m_deco_tilegen2->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
 
 	m_sprgen1->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0000, 0x0400, 0x400, 0x1ff); // 0x000 and 0x200 of 0x600
 
 	mixwizdfirelayer(bitmap, cliprect, 4, 0x000, 0x000);
 
-	m_deco_tilegen1->tilemap_1_draw(bitmap, cliprect, 0, 0);
+	m_deco_tilegen1->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -217,18 +217,18 @@ UINT32 rohga_state::screen_update_nitrobal(screen_device &screen, bitmap_rgb32 &
 
 	/* Draw playfields - Palette of 2nd playfield chip visible if playfields turned off */
 	bitmap.fill(machine().pens[512], cliprect);
-	machine().priority_bitmap.fill(0);
+	screen.priority().fill(0);
 
 	/* pf3 and pf4 are combined into a single 8bpp bitmap */
-	m_deco_tilegen2->tilemap_12_combine_draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	m_deco_tilegen2->tilemap_12_combine_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 
-	m_deco_tilegen1->tilemap_2_draw(bitmap, cliprect, 0, 16);
+	m_deco_tilegen1->tilemap_2_draw(screen, bitmap, cliprect, 0, 16);
 
 	/* ToDo reimplement priorities + mixing / alpha, it was busted worse than this before anyway, so no big loss that we don't do it for now ;-) */
 	m_sprgen2->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0000, 0x0000, 0x600, 0xff);
 	m_sprgen1->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0000, 0x0000, 0x400, 0x1ff);
 
 
-	m_deco_tilegen1->tilemap_1_draw(bitmap, cliprect, 0, 0);
+	m_deco_tilegen1->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }

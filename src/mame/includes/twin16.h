@@ -75,8 +75,8 @@ public:
 	TIMER_CALLBACK_MEMBER(twin16_sprite_tick);
 	int twin16_set_sprite_timer(  );
 	void twin16_spriteram_process(  );
-	void draw_sprites( bitmap_ind16 &bitmap );
-	void draw_layer( bitmap_ind16 &bitmap, int opaque );
+	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap );
+	void draw_layer( screen_device &screen, bitmap_ind16 &bitmap, int opaque );
 	int twin16_spriteram_process_enable(  );
 	void gfx_untangle(  );
 	DECLARE_WRITE8_MEMBER(volume_callback);

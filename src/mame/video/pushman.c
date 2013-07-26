@@ -119,8 +119,8 @@ UINT32 pushman_state::screen_update_pushman(screen_device &screen, bitmap_ind16 
 	m_bg_tilemap->set_scrollx(0, m_control[0]);
 	m_bg_tilemap->set_scrolly(0, 0xf00 - m_control[1]);
 
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);
-	m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }

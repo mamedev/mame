@@ -98,8 +98,8 @@ public:
 	void screen_eof_psikyo(screen_device &screen, bool state);
 	TIMER_CALLBACK_MEMBER(psikyo_soundlatch_callback);
 	void psikyo_switch_banks( int tmap, int bank );
-	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int trans_pen );
-	void draw_sprites_bootleg( bitmap_ind16 &bitmap, const rectangle &cliprect, int trans_pen );
+	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int trans_pen );
+	void draw_sprites_bootleg( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int trans_pen );
 	int tilemap_width( int size );
 	void s1945_mcu_init(  );
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);

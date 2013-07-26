@@ -116,7 +116,7 @@ VIDEO_START_MEMBER(gaelco_state,maniacsq)
       3  | xxxxxxxx xxxxxx-- | sprite code
 */
 
-void gaelco_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
+void gaelco_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	int i, x, y, ex, ey;
 	gfx_element *gfx = machine().gfx[0];
@@ -169,7 +169,7 @@ void gaelco_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 				pdrawgfx_transpen(bitmap,cliprect,gfx,number + x_offset[ex] + y_offset[ey],
 						color,xflip,yflip,
 						sx-0x0f+x*8,sy+y*8,
-						machine().priority_bitmap,pri_mask,0);
+						screen.priority(),pri_mask,0);
 			}
 		}
 	}
@@ -189,22 +189,22 @@ UINT32 gaelco_state::screen_update_maniacsq(screen_device &screen, bitmap_ind16 
 	m_tilemap[1]->set_scrolly(0, m_vregs[2]);
 	m_tilemap[1]->set_scrollx(0, m_vregs[3]);
 
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 	bitmap.fill(0, cliprect);
 
-	m_tilemap[1]->draw(bitmap, cliprect, 3, 0);
-	m_tilemap[0]->draw(bitmap, cliprect, 3, 0);
+	m_tilemap[1]->draw(screen, bitmap, cliprect, 3, 0);
+	m_tilemap[0]->draw(screen, bitmap, cliprect, 3, 0);
 
-	m_tilemap[1]->draw(bitmap, cliprect, 2, 1);
-	m_tilemap[0]->draw(bitmap, cliprect, 2, 1);
+	m_tilemap[1]->draw(screen, bitmap, cliprect, 2, 1);
+	m_tilemap[0]->draw(screen, bitmap, cliprect, 2, 1);
 
-	m_tilemap[1]->draw(bitmap, cliprect, 1, 2);
-	m_tilemap[0]->draw(bitmap, cliprect, 1, 2);
+	m_tilemap[1]->draw(screen, bitmap, cliprect, 1, 2);
+	m_tilemap[0]->draw(screen, bitmap, cliprect, 1, 2);
 
-	m_tilemap[1]->draw(bitmap, cliprect, 0, 4);
-	m_tilemap[0]->draw(bitmap, cliprect, 0, 4);
+	m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 4);
+	m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 4);
 
-	draw_sprites(bitmap, cliprect);
+	draw_sprites(screen, bitmap, cliprect);
 	return 0;
 }
 
@@ -216,33 +216,33 @@ UINT32 gaelco_state::screen_update_bigkarnk(screen_device &screen, bitmap_ind16 
 	m_tilemap[1]->set_scrolly(0, m_vregs[2]);
 	m_tilemap[1]->set_scrollx(0, m_vregs[3]);
 
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 	bitmap.fill(0, cliprect);
 
-	m_tilemap[1]->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 3, 0);
-	m_tilemap[0]->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 3, 0);
+	m_tilemap[1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 3, 0);
+	m_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 3, 0);
 
-	m_tilemap[1]->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 3, 1);
-	m_tilemap[0]->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 3, 1);
+	m_tilemap[1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 3, 1);
+	m_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 3, 1);
 
-	m_tilemap[1]->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 2, 1);
-	m_tilemap[0]->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 2, 1);
+	m_tilemap[1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 2, 1);
+	m_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 2, 1);
 
-	m_tilemap[1]->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 2, 2);
-	m_tilemap[0]->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 2, 2);
+	m_tilemap[1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 2, 2);
+	m_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 2, 2);
 
-	m_tilemap[1]->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 1, 2);
-	m_tilemap[0]->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 1, 2);
+	m_tilemap[1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 1, 2);
+	m_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 1, 2);
 
-	m_tilemap[1]->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 1, 4);
-	m_tilemap[0]->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 1, 4);
+	m_tilemap[1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 1, 4);
+	m_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 1, 4);
 
-	m_tilemap[1]->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 0, 4);
-	m_tilemap[0]->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 0, 4);
+	m_tilemap[1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 0, 4);
+	m_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 0, 4);
 
-	m_tilemap[1]->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 0, 8);
-	m_tilemap[0]->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 0, 8);
+	m_tilemap[1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 0, 8);
+	m_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 0, 8);
 
-	draw_sprites(bitmap, cliprect);
+	draw_sprites(screen, bitmap, cliprect);
 	return 0;
 }

@@ -128,7 +128,7 @@ void yunsun16_state::video_start()
 
 ***************************************************************************/
 
-void yunsun16_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
+void yunsun16_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	int offs;
 	const rectangle &visarea = machine().primary_screen->visible_area();
@@ -176,7 +176,7 @@ void yunsun16_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 					attr & 0x1f,
 					flipx, flipy,
 					x,y,
-					machine().priority_bitmap,
+					screen.priority(),
 					pri_mask,15);
 	}
 }
@@ -201,23 +201,23 @@ UINT32 yunsun16_state::screen_update_yunsun16(screen_device &screen, bitmap_ind1
 
 	//popmessage("%04X", *m_priorityram);
 
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 
 	if ((*m_priorityram & 0x0c) == 4)
 	{
 		/* The color of the this layer's transparent pen goes below everything */
-		m_tilemap_0->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		m_tilemap_0->draw(bitmap, cliprect, 0, 1);
-		m_tilemap_1->draw(bitmap, cliprect, 0, 2);
+		m_tilemap_0->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		m_tilemap_0->draw(screen, bitmap, cliprect, 0, 1);
+		m_tilemap_1->draw(screen, bitmap, cliprect, 0, 2);
 	}
 	else if ((*m_priorityram & 0x0c) == 8)
 	{
 		/* The color of the this layer's transparent pen goes below everything */
-		m_tilemap_1->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		m_tilemap_1->draw(bitmap, cliprect, 0, 1);
-		m_tilemap_0->draw(bitmap, cliprect, 0, 2);
+		m_tilemap_1->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		m_tilemap_1->draw(screen, bitmap, cliprect, 0, 1);
+		m_tilemap_0->draw(screen, bitmap, cliprect, 0, 2);
 	}
 
-	draw_sprites(bitmap, cliprect);
+	draw_sprites(screen, bitmap, cliprect);
 	return 0;
 }

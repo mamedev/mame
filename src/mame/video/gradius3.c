@@ -130,20 +130,20 @@ UINT32 gradius3_state::screen_update_gradius3(screen_device &screen, bitmap_ind1
 
 	m_k052109->tilemap_update();
 
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 	if (m_priority == 0)
 	{
-		m_k052109->tilemap_draw(bitmap, cliprect, 1, TILEMAP_DRAW_OPAQUE, 2);
-		m_k052109->tilemap_draw(bitmap, cliprect, 2, 0, 4);
-		m_k052109->tilemap_draw(bitmap, cliprect, 0, 0, 1);
+		m_k052109->tilemap_draw(screen, bitmap, cliprect, 1, TILEMAP_DRAW_OPAQUE, 2);
+		m_k052109->tilemap_draw(screen, bitmap, cliprect, 2, 0, 4);
+		m_k052109->tilemap_draw(screen, bitmap, cliprect, 0, 0, 1);
 	}
 	else
 	{
-		m_k052109->tilemap_draw(bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 1);
-		m_k052109->tilemap_draw(bitmap, cliprect, 1, 0, 2);
-		m_k052109->tilemap_draw(bitmap, cliprect, 2, 0, 4);
+		m_k052109->tilemap_draw(screen, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 1);
+		m_k052109->tilemap_draw(screen, bitmap, cliprect, 1, 0, 2);
+		m_k052109->tilemap_draw(screen, bitmap, cliprect, 2, 0, 4);
 	}
 
-	m_k051960->k051960_sprites_draw(bitmap, cliprect, -1, -1);
+	m_k051960->k051960_sprites_draw(bitmap, cliprect, screen.priority(), -1, -1);
 	return 0;
 }

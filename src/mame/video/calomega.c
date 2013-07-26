@@ -61,7 +61,7 @@ void calomega_state::video_start()
 
 UINT32 calomega_state::screen_update_calomega(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 

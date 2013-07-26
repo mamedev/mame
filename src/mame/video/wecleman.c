@@ -1061,7 +1061,7 @@ UINT32 wecleman_state::screen_update_wecleman(screen_device &screen, bitmap_rgb3
 	if (video_on) wecleman_draw_road(machine(), bitmap, cliprect, 0x02);
 
 	/* Draw the background */
-	if (video_on) m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	if (video_on) m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	// draws the cloud layer; needs work
 	if (m_cloud_visible)
@@ -1089,7 +1089,7 @@ UINT32 wecleman_state::screen_update_wecleman(screen_device &screen, bitmap_rgb3
 	}
 
 	/* Draw the foreground */
-	if (video_on) m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	if (video_on) m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* Draw the road (lines which have priority 0x04) */
 	if (video_on) wecleman_draw_road(machine(), bitmap,cliprect, 0x04);
@@ -1098,7 +1098,7 @@ UINT32 wecleman_state::screen_update_wecleman(screen_device &screen, bitmap_rgb3
 	if (video_on) sprite_draw(machine(), bitmap,cliprect);
 
 	/* Draw the text layer */
-	if (video_on) m_txt_tilemap->draw(bitmap, cliprect, 0, 0);
+	if (video_on) m_txt_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -1120,7 +1120,7 @@ UINT32 wecleman_state::screen_update_hotchase(screen_device &screen, bitmap_ind1
 
 	/* Draw the background */
 	if (video_on)
-		m_k051316_1->zoom_draw(bitmap, cliprect, 0, 0);
+		m_k051316_1->zoom_draw(screen, bitmap, cliprect, 0, 0);
 
 	/* Draw the road */
 	if (video_on)
@@ -1132,6 +1132,6 @@ UINT32 wecleman_state::screen_update_hotchase(screen_device &screen, bitmap_ind1
 
 	/* Draw the foreground (text) */
 	if (video_on)
-		m_k051316_2->zoom_draw(bitmap, cliprect, 0, 0);
+		m_k051316_2->zoom_draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }

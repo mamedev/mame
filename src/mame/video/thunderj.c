@@ -107,16 +107,16 @@ UINT32 thunderj_state::screen_update_thunderj(screen_device &screen, bitmap_ind1
 	m_vad->mob()->draw_async(cliprect);
 
 	/* draw the playfield */
-	bitmap_ind8 &priority_bitmap = machine().priority_bitmap;
+	bitmap_ind8 &priority_bitmap = screen.priority();
 	priority_bitmap.fill(0, cliprect);
-	m_vad->playfield()->draw(bitmap, cliprect, 0, 0x00);
-	m_vad->playfield()->draw(bitmap, cliprect, 1, 0x01);
-	m_vad->playfield()->draw(bitmap, cliprect, 2, 0x02);
-	m_vad->playfield()->draw(bitmap, cliprect, 3, 0x03);
-	m_vad->playfield2()->draw(bitmap, cliprect, 0, 0x80);
-	m_vad->playfield2()->draw(bitmap, cliprect, 1, 0x84);
-	m_vad->playfield2()->draw(bitmap, cliprect, 2, 0x88);
-	m_vad->playfield2()->draw(bitmap, cliprect, 3, 0x8c);
+	m_vad->playfield()->draw(screen, bitmap, cliprect, 0, 0x00);
+	m_vad->playfield()->draw(screen, bitmap, cliprect, 1, 0x01);
+	m_vad->playfield()->draw(screen, bitmap, cliprect, 2, 0x02);
+	m_vad->playfield()->draw(screen, bitmap, cliprect, 3, 0x03);
+	m_vad->playfield2()->draw(screen, bitmap, cliprect, 0, 0x80);
+	m_vad->playfield2()->draw(screen, bitmap, cliprect, 1, 0x84);
+	m_vad->playfield2()->draw(screen, bitmap, cliprect, 2, 0x88);
+	m_vad->playfield2()->draw(screen, bitmap, cliprect, 3, 0x8c);
 
 	// draw and merge the MO
 	bitmap_ind16 &mobitmap = m_vad->mob()->bitmap();
@@ -215,7 +215,7 @@ UINT32 thunderj_state::screen_update_thunderj(screen_device &screen, bitmap_ind1
 		}
 
 	/* add the alpha on top */
-	m_vad->alpha()->draw(bitmap, cliprect, 0, 0);
+	m_vad->alpha()->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* now go back and process the upper bit of MO priority */
 	for (const sparse_dirty_rect *rect = m_vad->mob()->first_dirty_rect(cliprect); rect != NULL; rect = rect->next())

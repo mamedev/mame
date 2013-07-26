@@ -63,6 +63,6 @@ WRITE8_MEMBER(usgames_state::usgames_charram_w)
 
 UINT32 usgames_state::screen_update_usgames(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_tilemap->draw(bitmap, cliprect, 0,0);
+	m_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
 }

@@ -1011,19 +1011,19 @@ UINT32 raiden2_state::screen_update_raiden2(screen_device &screen, bitmap_ind16 
 	//if (!machine().input().code_pressed(KEYCODE_Q))
 	{
 		if (!(raiden2_tilemap_enable & 1))
-			background_layer->draw(bitmap, cliprect, 0, 0);
+			background_layer->draw(screen, bitmap, cliprect, 0, 0);
 	}
 
 	//if (!machine().input().code_pressed(KEYCODE_W))
 	{
 		if (!(raiden2_tilemap_enable & 2))
-			midground_layer->draw(bitmap, cliprect, 0, 0);
+			midground_layer->draw(screen, bitmap, cliprect, 0, 0);
 	}
 
 	//if (!machine().input().code_pressed(KEYCODE_E))
 	{
 		if (!(raiden2_tilemap_enable & 4))
-			foreground_layer->draw(bitmap, cliprect, 0, 0);
+			foreground_layer->draw(screen, bitmap, cliprect, 0, 0);
 	}
 
 	//if (!machine().input().code_pressed(KEYCODE_S))
@@ -1035,7 +1035,7 @@ UINT32 raiden2_state::screen_update_raiden2(screen_device &screen, bitmap_ind16 
 	//if (!machine().input().code_pressed(KEYCODE_A))
 	{
 		if (!(raiden2_tilemap_enable & 8))
-			text_layer->draw(bitmap, cliprect, 0, 0);
+			text_layer->draw(screen, bitmap, cliprect, 0, 0);
 	}
 
 	return 0;

@@ -517,14 +517,14 @@ UINT32 tceptor_state::screen_update_tceptor_2d(screen_device &screen, bitmap_ind
 	rect.max_x = bg_center;
 	m_bg1_tilemap->set_scrollx(0, m_bg1_scroll_x + 12);
 	m_bg1_tilemap->set_scrolly(0, m_bg1_scroll_y + 20); //32?
-	m_bg1_tilemap->draw(bitmap, rect, 0, 0);
+	m_bg1_tilemap->draw(screen, bitmap, rect, 0, 0);
 
 	// right background
 	rect.min_x = bg_center;
 	rect.max_x = cliprect.max_x;
 	m_bg2_tilemap->set_scrollx(0, m_bg2_scroll_x + 20);
 	m_bg2_tilemap->set_scrolly(0, m_bg2_scroll_y + 20); // 32?
-	m_bg2_tilemap->draw(bitmap, rect, 0, 0);
+	m_bg2_tilemap->draw(screen, bitmap, rect, 0, 0);
 
 	for (pri = 0; pri < 8; pri++)
 	{
@@ -533,7 +533,7 @@ UINT32 tceptor_state::screen_update_tceptor_2d(screen_device &screen, bitmap_ind
 		draw_sprites(bitmap, cliprect, pri);
 	}
 
-	m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 

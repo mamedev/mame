@@ -32,7 +32,7 @@ void sbugger_state::video_start()
 
 UINT32 sbugger_state::screen_update_sbugger(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_tilemap->draw(bitmap, cliprect, 0,0);
+	m_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
 }
 

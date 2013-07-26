@@ -187,7 +187,7 @@ WRITE8_MEMBER(punchout_state::punchout_spr2_videoram_w)
 
 
 
-void punchout_state::draw_big_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, int palette)
+void punchout_state::draw_big_sprite(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int palette)
 {
 	int zoom;
 
@@ -221,7 +221,7 @@ void punchout_state::draw_big_sprite(bitmap_ind16 &bitmap, const rectangle &clip
 
 		m_spr1_tilemap->set_palette_offset(0x100 * palette);
 
-		m_spr1_tilemap->draw_roz(bitmap, cliprect,
+		m_spr1_tilemap->draw_roz(screen, bitmap, cliprect,
 			startx,starty + 0x200*(2) * zoom,
 			incxx,0,0,incyy,    /* zoom, no rotation */
 			0,  /* no wraparound */
@@ -230,7 +230,7 @@ void punchout_state::draw_big_sprite(bitmap_ind16 &bitmap, const rectangle &clip
 }
 
 
-void punchout_state::armwrest_draw_big_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, int palette)
+void punchout_state::armwrest_draw_big_sprite(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int palette)
 {
 	int zoom;
 
@@ -268,7 +268,7 @@ void punchout_state::armwrest_draw_big_sprite(bitmap_ind16 &bitmap, const rectan
 
 		_tilemap->set_palette_offset(0x100 * palette);
 
-		_tilemap->draw_roz(bitmap, cliprect,
+		_tilemap->draw_roz(screen, bitmap, cliprect,
 			startx,starty + 0x200*(2) * zoom,
 			incxx,0,0,incyy,    /* zoom, no rotation */
 			0,  /* no wraparound */
@@ -276,7 +276,7 @@ void punchout_state::armwrest_draw_big_sprite(bitmap_ind16 &bitmap, const rectan
 	}
 }
 
-void punchout_state::drawbs2(bitmap_ind16 &bitmap, const rectangle &cliprect)
+void punchout_state::drawbs2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int sx,sy;
 	int incxx;
@@ -300,7 +300,7 @@ void punchout_state::drawbs2(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		incxx = 1;
 
 	// this tilemap doesn't actually zoom, but draw_roz is the only way to draw it without wraparound
-	m_spr2_tilemap->draw_roz(bitmap, cliprect,
+	m_spr2_tilemap->draw_roz(screen, bitmap, cliprect,
 		sx, sy, incxx << 16, 0, 0, 1 << 16,
 		0, 0, 0);
 }
@@ -350,10 +350,10 @@ UINT32 punchout_state::screen_update_punchout_top(screen_device &screen, bitmap_
 {
 	punchout_copy_top_palette(BIT(*m_palettebank,1));
 
-	m_bg_top_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_top_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	if (m_spr1_ctrlram[7] & 1)  /* display in top monitor */
-		draw_big_sprite(bitmap, cliprect, 0);
+		draw_big_sprite(screen, bitmap, cliprect, 0);
 
 	return 0;
 }
@@ -368,11 +368,11 @@ UINT32 punchout_state::screen_update_punchout_bottom(screen_device &screen, bitm
 	for (offs = 0;offs < 32;offs++)
 		m_bg_bot_tilemap->set_scrollx(offs, 58 + m_bg_bot_videoram[2*offs] + 256 * (m_bg_bot_videoram[2*offs + 1] & 0x01));
 
-	m_bg_bot_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_bot_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	if (m_spr1_ctrlram[7] & 2)  /* display in bottom monitor */
-		draw_big_sprite(bitmap, cliprect, 1);
-	drawbs2(bitmap, cliprect);
+		draw_big_sprite(screen, bitmap, cliprect, 1);
+	drawbs2(screen, bitmap, cliprect);
 
 	return 0;
 }
@@ -382,10 +382,10 @@ UINT32 punchout_state::screen_update_armwrest_top(screen_device &screen, bitmap_
 {
 	punchout_copy_top_palette(BIT(*m_palettebank,1));
 
-	m_bg_top_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_top_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	if (m_spr1_ctrlram[7] & 1)  /* display in top monitor */
-		armwrest_draw_big_sprite(bitmap, cliprect, 0);
+		armwrest_draw_big_sprite(screen, bitmap, cliprect, 0);
 
 	return 0;
 }
@@ -394,13 +394,13 @@ UINT32 punchout_state::screen_update_armwrest_bottom(screen_device &screen, bitm
 {
 	punchout_copy_bot_palette(BIT(*m_palettebank,0));
 
-	m_bg_bot_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_bot_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	if (m_spr1_ctrlram[7] & 2)  /* display in bottom monitor */
-		armwrest_draw_big_sprite(bitmap, cliprect, 1);
-	drawbs2(bitmap, cliprect);
+		armwrest_draw_big_sprite(screen, bitmap, cliprect, 1);
+	drawbs2(screen, bitmap, cliprect);
 
-	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }

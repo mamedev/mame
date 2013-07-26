@@ -227,7 +227,7 @@ void taitol_state::taitol_obj1b_m( int offset )
                  plgirs2 bullets and raimais big bosses.
 */
 
-void taitol_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
+void taitol_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	int offs;
 
@@ -261,7 +261,7 @@ void taitol_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 				color,
 				flipx,flipy,
 				sx,sy,
-				machine().priority_bitmap,
+				screen.priority(),
 				(color & 0x08) ? 0xaa : 0x00,0);
 	}
 }
@@ -289,18 +289,18 @@ UINT32 taitol_state::screen_update_taitol(screen_device &screen, bitmap_ind16 &b
 
 	if (m_cur_ctrl & 0x20)  /* display enable */
 	{
-		machine().priority_bitmap.fill(0, cliprect);
+		screen.priority().fill(0, cliprect);
 
-		m_bg19_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_bg19_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 		if (m_cur_ctrl & 0x08)  /* sprites always over BG1 */
-			m_bg18_tilemap->draw(bitmap, cliprect, 0, 0);
+			m_bg18_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 		else                    /* split priority */
-			m_bg18_tilemap->draw(bitmap, cliprect, 0,1);
+			m_bg18_tilemap->draw(screen, bitmap, cliprect, 0,1);
 
-		draw_sprites(bitmap, cliprect);
+		draw_sprites(screen, bitmap, cliprect);
 
-		m_ch1a_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_ch1a_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	}
 	else
 		bitmap.fill(machine().pens[0], cliprect);

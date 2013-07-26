@@ -177,20 +177,20 @@ UINT32 bankp_state::screen_update_bankp(screen_device &screen, bitmap_ind16 &bit
 	switch (m_priority)
 	{
 	case 0: // combat hawk uses this
-		m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 		break;
 	case 1:
-		m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 		break;
 	case 2:
-		m_fg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_fg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 		break;
 	case 3:
-		m_fg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0); // just a guess
-		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_fg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0); // just a guess
+		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 		break;
 	}
 	return 0;

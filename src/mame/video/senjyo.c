@@ -311,13 +311,13 @@ UINT32 senjyo_state::screen_update_senjyo(screen_device &screen, bitmap_ind16 &b
 
 	draw_bgbitmap(bitmap, cliprect);
 	draw_sprites(bitmap, cliprect, 0);
-	m_bg3_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg3_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect, 1);
-	m_bg2_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg2_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect, 2);
-	m_bg1_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg1_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect, 3);
-	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_radar(bitmap, cliprect);
 
 #if 0

@@ -99,7 +99,7 @@ void jack_state::jack_draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipr
 
 UINT32 jack_state::screen_update_jack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	jack_draw_sprites(bitmap, cliprect);
 	return 0;
 }
@@ -108,7 +108,7 @@ UINT32 jack_state::screen_update_jack(screen_device &screen, bitmap_ind16 &bitma
 UINT32 jack_state::screen_update_striv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// no sprites
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -219,7 +219,7 @@ void jack_state::joinem_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cli
 
 UINT32 jack_state::screen_update_joinem(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	joinem_draw_sprites(bitmap, cliprect);
 	return 0;
 }

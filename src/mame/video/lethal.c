@@ -100,16 +100,16 @@ WRITE8_MEMBER(lethal_state::lethalen_palette_control)
 UINT32 lethal_state::screen_update_lethalen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(7168, cliprect);
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 
-	m_k056832->tilemap_draw(bitmap, cliprect, 3, K056832_DRAW_FLAG_MIRROR, 1);
-	m_k056832->tilemap_draw(bitmap, cliprect, 2, K056832_DRAW_FLAG_MIRROR, 2);
-	m_k056832->tilemap_draw(bitmap, cliprect, 1, K056832_DRAW_FLAG_MIRROR, 4);
+	m_k056832->tilemap_draw(screen, bitmap, cliprect, 3, K056832_DRAW_FLAG_MIRROR, 1);
+	m_k056832->tilemap_draw(screen, bitmap, cliprect, 2, K056832_DRAW_FLAG_MIRROR, 2);
+	m_k056832->tilemap_draw(screen, bitmap, cliprect, 1, K056832_DRAW_FLAG_MIRROR, 4);
 
-	m_k053244->k053245_sprites_draw_lethal(bitmap, cliprect);
+	m_k053244->k053245_sprites_draw_lethal(bitmap, cliprect, screen.priority());
 
 	// force "A" layer over top of everything
-	m_k056832->tilemap_draw(bitmap, cliprect, 0, K056832_DRAW_FLAG_MIRROR, 0);
+	m_k056832->tilemap_draw(screen, bitmap, cliprect, 0, K056832_DRAW_FLAG_MIRROR, 0);
 
 	return 0;
 }

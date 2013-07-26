@@ -56,9 +56,9 @@ UINT32 qdrmfgp_state::screen_update_qdrmfgp(screen_device &screen, bitmap_ind16 
 {
 	bitmap.fill(get_black_pen(machine()), cliprect);
 
-	m_k056832->tilemap_draw(bitmap, cliprect, 3, 0, 1);
-	m_k056832->tilemap_draw(bitmap, cliprect, 2, 0, 2);
-	m_k056832->tilemap_draw(bitmap, cliprect, 1, 0, 4);
-	m_k056832->tilemap_draw(bitmap, cliprect, 0, 0, 8);
+	m_k056832->tilemap_draw(screen, bitmap, cliprect, 3, 0, 1);
+	m_k056832->tilemap_draw(screen, bitmap, cliprect, 2, 0, 2);
+	m_k056832->tilemap_draw(screen, bitmap, cliprect, 1, 0, 4);
+	m_k056832->tilemap_draw(screen, bitmap, cliprect, 0, 0, 8);
 	return 0;
 }

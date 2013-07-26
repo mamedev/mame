@@ -188,24 +188,24 @@ UINT32 othldrby_state::screen_update_othldrby(screen_device &screen, bitmap_ind1
 		}
 	}
 
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 
 	bitmap.fill(0, cliprect);
 
 	for (layer = 0; layer < 3; layer++)
-		m_bg_tilemap[layer]->draw(bitmap, cliprect, 0, 0);
+		m_bg_tilemap[layer]->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect, 0);
 
 	for (layer = 0; layer < 3; layer++)
-		m_bg_tilemap[layer]->draw(bitmap, cliprect, 1, 0);
+		m_bg_tilemap[layer]->draw(screen, bitmap, cliprect, 1, 0);
 	draw_sprites(bitmap, cliprect, 1);
 
 	for (layer = 0; layer < 3; layer++)
-		m_bg_tilemap[layer]->draw(bitmap, cliprect, 2, 0);
+		m_bg_tilemap[layer]->draw(screen, bitmap, cliprect, 2, 0);
 	draw_sprites(bitmap, cliprect, 2);
 
 	for (layer = 0; layer < 3; layer++)
-		m_bg_tilemap[layer]->draw(bitmap, cliprect, 3, 0);
+		m_bg_tilemap[layer]->draw(screen, bitmap, cliprect, 3, 0);
 	draw_sprites(bitmap, cliprect, 3);
 
 	return 0;

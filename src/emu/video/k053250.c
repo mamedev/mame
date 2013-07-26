@@ -221,7 +221,7 @@ inline void k053250_device::pdraw_scanline32(bitmap_rgb32 &bitmap, const pen_t *
 #undef FIXPOINT_PRECISION_HALF
 }
 
-void k053250_device::draw( bitmap_rgb32 &bitmap, const rectangle &cliprect, int colorbase, int flags, int priority )
+void k053250_device::draw( bitmap_rgb32 &bitmap, const rectangle &cliprect, int colorbase, int flags, bitmap_ind8 &priority_bitmap, int priority )
 {
 	UINT8 *pix_ptr;
 	const pen_t *pal_base, *pal_ptr;
@@ -414,7 +414,7 @@ void k053250_device::draw( bitmap_rgb32 &bitmap, const rectangle &cliprect, int 
 			    priority     : value to be written to the priority bitmap, no effect when equals 0
 			*/
 			pdraw_scanline32(bitmap, pal_ptr, pix_ptr, cliprect,
-				line_pos, scroll, zoom, src_clipmask, src_wrapmask, orientation, machine().priority_bitmap, (UINT8)priority);
+				line_pos, scroll, zoom, src_clipmask, src_wrapmask, orientation, priority_bitmap, (UINT8)priority);
 
 			// shift scanline position one virtual screen upward to render the wrapped end if necessary
 			scroll -= dst_height;

@@ -353,7 +353,7 @@ UINT32 firetrk_state::screen_update_firetrk(screen_device &screen, bitmap_ind16 
 	m_tilemap2->set_scrolly(0, *m_scroll_y);
 
 	bitmap.fill(0, cliprect);
-	m_tilemap1->draw(bitmap, playfield_window, 0, 0);
+	m_tilemap1->draw(screen, bitmap, playfield_window, 0, 0);
 	firetrk_draw_car(bitmap, playfield_window, machine().gfx, 0, m_flash);
 	firetrk_draw_car(bitmap, playfield_window, machine().gfx, 1, m_flash);
 	draw_text(bitmap, cliprect, machine().gfx, m_alpha_num_ram + 0x00, 296, 0x10, 0x10);
@@ -361,7 +361,7 @@ UINT32 firetrk_state::screen_update_firetrk(screen_device &screen, bitmap_ind16 
 
 	if (cliprect.max_y == screen.visible_area().max_y)
 	{
-		m_tilemap2->draw(m_helper1, playfield_window, 0, 0);
+		m_tilemap2->draw(screen, m_helper1, playfield_window, 0, 0);
 
 		m_helper2.fill(0xff, playfield_window);
 		firetrk_draw_car(m_helper2, playfield_window, machine().gfx, 0, FALSE);
@@ -387,14 +387,14 @@ UINT32 firetrk_state::screen_update_superbug(screen_device &screen, bitmap_ind16
 	m_tilemap2->set_scrolly(0, *m_scroll_y);
 
 	bitmap.fill(0, cliprect);
-	m_tilemap1->draw(bitmap, playfield_window, 0, 0);
+	m_tilemap1->draw(screen, bitmap, playfield_window, 0, 0);
 	superbug_draw_car(bitmap, playfield_window, machine().gfx, m_flash);
 	draw_text(bitmap, cliprect, machine().gfx, m_alpha_num_ram + 0x00, 296, 0x10, 0x10);
 	draw_text(bitmap, cliprect, machine().gfx, m_alpha_num_ram + 0x10,   8, 0x10, 0x10);
 
 	if (cliprect.max_y == screen.visible_area().max_y)
 	{
-		m_tilemap2->draw(m_helper1, playfield_window, 0, 0);
+		m_tilemap2->draw(screen, m_helper1, playfield_window, 0, 0);
 
 		m_helper2.fill(0xff, playfield_window);
 		superbug_draw_car(m_helper2, playfield_window, machine().gfx, FALSE);
@@ -416,7 +416,7 @@ UINT32 firetrk_state::screen_update_montecar(screen_device &screen, bitmap_ind16
 	m_tilemap2->set_scrolly(0, *m_scroll_y);
 
 	bitmap.fill(0x2c, cliprect);
-	m_tilemap1->draw(bitmap, playfield_window, 0, 0);
+	m_tilemap1->draw(screen, bitmap, playfield_window, 0, 0);
 	montecar_draw_car(bitmap, playfield_window, machine().gfx, 0, FALSE);
 	montecar_draw_car(bitmap, playfield_window, machine().gfx, 1, FALSE);
 	draw_text(bitmap, cliprect, machine().gfx, m_alpha_num_ram + 0x00, 24, 0x20, 0x08);
@@ -424,7 +424,7 @@ UINT32 firetrk_state::screen_update_montecar(screen_device &screen, bitmap_ind16
 
 	if (cliprect.max_y == screen.visible_area().max_y)
 	{
-		m_tilemap2->draw(m_helper1, playfield_window, 0, 0);
+		m_tilemap2->draw(screen, m_helper1, playfield_window, 0, 0);
 
 		m_helper2.fill(0xff, playfield_window);
 		montecar_draw_car(m_helper2, playfield_window, machine().gfx, 0, TRUE);

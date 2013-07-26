@@ -77,7 +77,7 @@ void jackal_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(jackal_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
-void jackal_state::draw_background( bitmap_ind16 &bitmap, const rectangle &cliprect )
+void jackal_state::draw_background( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	UINT8 *RAM = memregion("master")->base();
 	int i;
@@ -109,7 +109,7 @@ void jackal_state::draw_background( bitmap_ind16 &bitmap, const rectangle &clipr
 		}
 	}
 
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 }
 
 #define DRAW_SPRITE(bank, code, sx, sy) drawgfx_transpen(bitmap, cliprect, machine().gfx[bank], code, color, flipx, flipy, sx, sy, 0);
@@ -221,7 +221,7 @@ void jackal_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 UINT32 jackal_state::screen_update_jackal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	set_pens();
-	draw_background(bitmap, cliprect);
+	draw_background(screen, bitmap, cliprect);
 	draw_sprites(bitmap, cliprect);
 	return 0;
 }

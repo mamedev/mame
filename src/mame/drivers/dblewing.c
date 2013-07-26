@@ -93,10 +93,10 @@ UINT32 dblewing_state::screen_update_dblewing(screen_device &screen, bitmap_ind1
 	m_deco_tilegen1->pf_update(m_pf1_rowscroll, m_pf2_rowscroll);
 
 	bitmap.fill(0, cliprect); /* not Confirmed */
-	machine().priority_bitmap.fill(0);
+	screen.priority().fill(0);
 
-	m_deco_tilegen1->tilemap_2_draw(bitmap, cliprect, 0, 2);
-	m_deco_tilegen1->tilemap_1_draw(bitmap, cliprect, 0, 4);
+	m_deco_tilegen1->tilemap_2_draw(screen, bitmap, cliprect, 0, 2);
+	m_deco_tilegen1->tilemap_1_draw(screen, bitmap, cliprect, 0, 4);
 	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
 	return 0;
 }

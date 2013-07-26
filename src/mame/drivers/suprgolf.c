@@ -139,7 +139,7 @@ UINT32 suprgolf_state::screen_update_suprgolf(screen_device &screen, bitmap_ind1
 		}
 	}
 
-	m_tilemap->draw(bitmap, cliprect, 0,0);
+	m_tilemap->draw(screen, bitmap, cliprect, 0,0);
 
 	return 0;
 }

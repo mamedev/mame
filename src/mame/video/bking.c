@@ -228,7 +228,7 @@ void bking_state::video_start()
 
 UINT32 bking_state::screen_update_bking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* draw the balls */
 	drawgfx_transpen(bitmap, cliprect, machine().gfx[2],
@@ -290,7 +290,7 @@ void bking_state::screen_eof_bking(screen_device &screen, bool state)
 		m_bg_tilemap->set_scrollx(0, flip_screen() ? -xld : xld);
 		m_bg_tilemap->set_scrolly(0, flip_screen() ? -yld : yld);
 
-		m_bg_tilemap->draw(m_colmap_bg, rect, 0, 0);
+		m_bg_tilemap->draw(screen, m_colmap_bg, rect, 0, 0);
 
 		m_bg_tilemap->set_scrollx(0, 0);
 		m_bg_tilemap->set_scrolly(0, 0);

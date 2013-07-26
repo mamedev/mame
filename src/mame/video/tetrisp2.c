@@ -417,7 +417,7 @@ UINT32 tetrisp2_state::screen_update_tetrisp2(screen_device &screen, bitmap_ind1
 
 	/* Black background color */
 	bitmap.fill(0, cliprect);
-	machine().priority_bitmap.fill(0);
+	screen.priority().fill(0);
 
 	/* Flip Screen */
 	if (flipscreen != m_flipscreen_old)
@@ -465,27 +465,27 @@ UINT32 tetrisp2_state::screen_update_tetrisp2(screen_device &screen, bitmap_ind1
 		rot_pri++;
 
 	if (rot_pri == 0)
-		m_tilemap_rot->draw(bitmap, cliprect, 0, 1 << 1);
+		m_tilemap_rot->draw(screen, bitmap, cliprect, 0, 1 << 1);
 	else if (scr_pri == 0)
-		m_tilemap_bg->draw(bitmap, cliprect, 0, 1 << 0);
+		m_tilemap_bg->draw(screen, bitmap, cliprect, 0, 1 << 0);
 	else if (asc_pri == 0)
-		m_tilemap_fg->draw(bitmap, cliprect, 0, 1 << 2);
+		m_tilemap_fg->draw(screen, bitmap, cliprect, 0, 1 << 2);
 
 	if (rot_pri == 1)
-		m_tilemap_rot->draw(bitmap, cliprect, 0, 1 << 1);
+		m_tilemap_rot->draw(screen, bitmap, cliprect, 0, 1 << 1);
 	else if (scr_pri == 1)
-		m_tilemap_bg->draw(bitmap, cliprect, 0, 1 << 0);
+		m_tilemap_bg->draw(screen, bitmap, cliprect, 0, 1 << 0);
 	else if (asc_pri == 1)
-		m_tilemap_fg->draw(bitmap, cliprect, 0, 1 << 2);
+		m_tilemap_fg->draw(screen, bitmap, cliprect, 0, 1 << 2);
 
 	if (rot_pri == 2)
-		m_tilemap_rot->draw(bitmap, cliprect, 0, 1 << 1);
+		m_tilemap_rot->draw(screen, bitmap, cliprect, 0, 1 << 1);
 	else if (scr_pri == 2)
-		m_tilemap_bg->draw(bitmap, cliprect, 0, 1 << 0);
+		m_tilemap_bg->draw(screen, bitmap, cliprect, 0, 1 << 0);
 	else if (asc_pri == 2)
-		m_tilemap_fg->draw(bitmap, cliprect, 0, 1 << 2);
+		m_tilemap_fg->draw(screen, bitmap, cliprect, 0, 1 << 2);
 
-	tetrisp2_draw_sprites(  machine(), bitmap, machine().priority_bitmap, cliprect, m_priority,
+	tetrisp2_draw_sprites(  machine(), bitmap, screen.priority(), cliprect, m_priority,
 							m_spriteram, m_spriteram.bytes(), 0, (m_systemregs[0x00] & 0x02)    );
 	return 0;
 }
@@ -502,7 +502,7 @@ UINT32 tetrisp2_state::screen_update_rockntread(screen_device &screen, bitmap_in
 
 	/* Black background color */
 	bitmap.fill(0, cliprect);
-	machine().priority_bitmap.fill(0);
+	screen.priority().fill(0);
 
 	/* Flip Screen */
 	if (flipscreen != m_flipscreen_old)
@@ -550,27 +550,27 @@ UINT32 tetrisp2_state::screen_update_rockntread(screen_device &screen, bitmap_in
 		rot_pri++;
 
 	if (rot_pri == 0)
-		m_tilemap_rot->draw(bitmap, cliprect, 0, 1 << 1);
+		m_tilemap_rot->draw(screen, bitmap, cliprect, 0, 1 << 1);
 	else if (scr_pri == 0)
-		m_tilemap_bg->draw(bitmap, cliprect, 0, 1 << 0);
+		m_tilemap_bg->draw(screen, bitmap, cliprect, 0, 1 << 0);
 	else if (asc_pri == 0)
-		m_tilemap_fg->draw(bitmap, cliprect, 0, 1 << 2);
+		m_tilemap_fg->draw(screen, bitmap, cliprect, 0, 1 << 2);
 
 	if (rot_pri == 1)
-		m_tilemap_rot->draw(bitmap, cliprect, 0, 1 << 1);
+		m_tilemap_rot->draw(screen, bitmap, cliprect, 0, 1 << 1);
 	else if (scr_pri == 1)
-		m_tilemap_bg->draw(bitmap, cliprect, 0, 1 << 0);
+		m_tilemap_bg->draw(screen, bitmap, cliprect, 0, 1 << 0);
 	else if (asc_pri == 1)
-		m_tilemap_fg->draw(bitmap, cliprect, 0, 1 << 2);
+		m_tilemap_fg->draw(screen, bitmap, cliprect, 0, 1 << 2);
 
 	if (rot_pri == 2)
-		m_tilemap_rot->draw(bitmap, cliprect, 0, 1 << 1);
+		m_tilemap_rot->draw(screen, bitmap, cliprect, 0, 1 << 1);
 	else if (scr_pri == 2)
-		m_tilemap_bg->draw(bitmap, cliprect, 0, 1 << 0);
+		m_tilemap_bg->draw(screen, bitmap, cliprect, 0, 1 << 0);
 	else if (asc_pri == 2)
-		m_tilemap_fg->draw(bitmap, cliprect, 0, 1 << 2);
+		m_tilemap_fg->draw(screen, bitmap, cliprect, 0, 1 << 2);
 
-	tetrisp2_draw_sprites(  machine(), bitmap, machine().priority_bitmap, cliprect, m_priority,
+	tetrisp2_draw_sprites(  machine(), bitmap, screen.priority(), cliprect, m_priority,
 							m_spriteram, m_spriteram.bytes(), 0, (m_systemregs[0x00] & 0x02)    );
 	return 0;
 }
@@ -592,7 +592,7 @@ UINT32 tetrisp2_state::screen_update_rocknms_left(screen_device &screen, bitmap_
 	m_tilemap_sub_rot->set_scrolly(0, m_rocknms_sub_rotregs[ 2 ] + 0x400);
 
 	bitmap.fill(machine().pens[0x0000], cliprect);
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 
 	asc_pri = scr_pri = rot_pri = 0;
 
@@ -612,27 +612,27 @@ UINT32 tetrisp2_state::screen_update_rocknms_left(screen_device &screen, bitmap_
 		rot_pri++;
 
 	if (rot_pri == 0)
-		m_tilemap_sub_rot->draw(bitmap, cliprect, 0, 1 << 1);
+		m_tilemap_sub_rot->draw(screen, bitmap, cliprect, 0, 1 << 1);
 	else if (scr_pri == 0)
-		m_tilemap_sub_bg->draw(bitmap, cliprect, 0, 1 << 0);
+		m_tilemap_sub_bg->draw(screen, bitmap, cliprect, 0, 1 << 0);
 	else if (asc_pri == 0)
-		m_tilemap_sub_fg->draw(bitmap, cliprect, 0, 1 << 2);
+		m_tilemap_sub_fg->draw(screen, bitmap, cliprect, 0, 1 << 2);
 
 	if (rot_pri == 1)
-		m_tilemap_sub_rot->draw(bitmap, cliprect, 0, 1 << 1);
+		m_tilemap_sub_rot->draw(screen, bitmap, cliprect, 0, 1 << 1);
 	else if (scr_pri == 1)
-		m_tilemap_sub_bg->draw(bitmap, cliprect, 0, 1 << 0);
+		m_tilemap_sub_bg->draw(screen, bitmap, cliprect, 0, 1 << 0);
 	else if (asc_pri == 1)
-		m_tilemap_sub_fg->draw(bitmap, cliprect, 0, 1 << 2);
+		m_tilemap_sub_fg->draw(screen, bitmap, cliprect, 0, 1 << 2);
 
 	if (rot_pri == 2)
-		m_tilemap_sub_rot->draw(bitmap, cliprect, 0, 1 << 1);
+		m_tilemap_sub_rot->draw(screen, bitmap, cliprect, 0, 1 << 1);
 	else if (scr_pri == 2)
-		m_tilemap_sub_bg->draw(bitmap, cliprect, 0, 1 << 0);
+		m_tilemap_sub_bg->draw(screen, bitmap, cliprect, 0, 1 << 0);
 	else if (asc_pri == 2)
-		m_tilemap_sub_fg->draw(bitmap, cliprect, 0, 1 << 2);
+		m_tilemap_sub_fg->draw(screen, bitmap, cliprect, 0, 1 << 2);
 
-	tetrisp2_draw_sprites(  machine(), bitmap, machine().priority_bitmap, cliprect, m_priority,
+	tetrisp2_draw_sprites(  machine(), bitmap, screen.priority(), cliprect, m_priority,
 							m_spriteram2, m_spriteram2.bytes(), 4, (m_systemregs[0x00] & 0x02)  );
 
 	return 0;
@@ -653,7 +653,7 @@ UINT32 tetrisp2_state::screen_update_rocknms_right(screen_device &screen, bitmap
 
 	/* Black background color */
 	bitmap.fill(machine().pens[0x0000], cliprect);
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 
 	asc_pri = scr_pri = rot_pri = 0;
 
@@ -673,27 +673,27 @@ UINT32 tetrisp2_state::screen_update_rocknms_right(screen_device &screen, bitmap
 		rot_pri++;
 
 	if (rot_pri == 0)
-		m_tilemap_rot->draw(bitmap, cliprect, 0, 1 << 1);
+		m_tilemap_rot->draw(screen, bitmap, cliprect, 0, 1 << 1);
 	else if (scr_pri == 0)
-		m_tilemap_bg->draw(bitmap, cliprect, 0, 1 << 0);
+		m_tilemap_bg->draw(screen, bitmap, cliprect, 0, 1 << 0);
 	else if (asc_pri == 0)
-		m_tilemap_fg->draw(bitmap, cliprect, 0, 1 << 2);
+		m_tilemap_fg->draw(screen, bitmap, cliprect, 0, 1 << 2);
 
 	if (rot_pri == 1)
-		m_tilemap_rot->draw(bitmap, cliprect, 0, 1 << 1);
+		m_tilemap_rot->draw(screen, bitmap, cliprect, 0, 1 << 1);
 	else if (scr_pri == 1)
-		m_tilemap_bg->draw(bitmap, cliprect, 0, 1 << 0);
+		m_tilemap_bg->draw(screen, bitmap, cliprect, 0, 1 << 0);
 	else if (asc_pri == 1)
-		m_tilemap_fg->draw(bitmap, cliprect, 0, 1 << 2);
+		m_tilemap_fg->draw(screen, bitmap, cliprect, 0, 1 << 2);
 
 	if (rot_pri == 2)
-		m_tilemap_rot->draw(bitmap, cliprect, 0, 1 << 1);
+		m_tilemap_rot->draw(screen, bitmap, cliprect, 0, 1 << 1);
 	else if (scr_pri == 2)
-		m_tilemap_bg->draw(bitmap, cliprect, 0, 1 << 0);
+		m_tilemap_bg->draw(screen, bitmap, cliprect, 0, 1 << 0);
 	else if (asc_pri == 2)
-		m_tilemap_fg->draw(bitmap, cliprect, 0, 1 << 2);
+		m_tilemap_fg->draw(screen, bitmap, cliprect, 0, 1 << 2);
 
-	tetrisp2_draw_sprites(  machine(), bitmap, machine().priority_bitmap, cliprect, m_priority,
+	tetrisp2_draw_sprites(  machine(), bitmap, screen.priority(), cliprect, m_priority,
 							m_spriteram, m_spriteram.bytes(), 0, (m_systemregs[0x00] & 0x02)    );
 
 	return 0;
@@ -746,18 +746,18 @@ VIDEO_START_MEMBER(stepstag_state,stepstag)
 UINT32 stepstag_state::screen_update_stepstag_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
-	machine().priority_bitmap.fill(0);
+	screen.priority().fill(0);
 
-	tetrisp2_draw_sprites(  machine(), bitmap, machine().priority_bitmap, cliprect, m_priority,
+	tetrisp2_draw_sprites(  machine(), bitmap, screen.priority(), cliprect, m_priority,
 							m_spriteram, m_spriteram.bytes(), 1, (m_systemregs[0x00] & 0x02)    );
 	return 0;
 }
 UINT32 stepstag_state::screen_update_stepstag_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
-	machine().priority_bitmap.fill(0);
+	screen.priority().fill(0);
 
-	tetrisp2_draw_sprites(  machine(), bitmap, machine().priority_bitmap, cliprect, m_priority,
+	tetrisp2_draw_sprites(  machine(), bitmap, screen.priority(), cliprect, m_priority,
 							m_spriteram3, m_spriteram3.bytes(), 1, (m_systemregs[0x00] & 0x02)  );
 	return 0;
 }
@@ -765,12 +765,12 @@ UINT32 stepstag_state::screen_update_stepstag_right(screen_device &screen, bitma
 UINT32 stepstag_state::screen_update_stepstag_mid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
-	machine().priority_bitmap.fill(0);
+	screen.priority().fill(0);
 
-	tetrisp2_draw_sprites(  machine(), bitmap, machine().priority_bitmap, cliprect, m_priority,
+	tetrisp2_draw_sprites(  machine(), bitmap, screen.priority(), cliprect, m_priority,
 							m_spriteram2, m_spriteram2.bytes(), 0, (m_systemregs[0x00] & 0x02)  );
 
-	m_tilemap_fg->draw(bitmap, cliprect, 0, 1 << 2);
+	m_tilemap_fg->draw(screen, bitmap, cliprect, 0, 1 << 2);
 
 	return 0;
 }

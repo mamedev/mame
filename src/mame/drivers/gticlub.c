@@ -870,7 +870,7 @@ UINT32 gticlub_state::screen_update_gticlub(screen_device &screen, bitmap_rgb32 
 
 	K001005_draw(bitmap, cliprect);
 
-	k001604->draw_front_layer(bitmap, cliprect);
+	k001604->draw_front_layer(screen, bitmap, cliprect);
 
 #if 0
 	tick++;
@@ -943,7 +943,7 @@ UINT32 gticlub_state::screen_update_hangplt(screen_device &screen, bitmap_rgb32 
 
 		voodoo_update(voodoo, bitmap, cliprect);
 
-		k001604->draw_front_layer(bitmap, cliprect);
+		k001604->draw_front_layer(screen, bitmap, cliprect);
 	}
 	else if (strcmp(screen.tag(), ":rscreen") == 0)
 	{
@@ -954,7 +954,7 @@ UINT32 gticlub_state::screen_update_hangplt(screen_device &screen, bitmap_rgb32 
 
 		voodoo_update(voodoo, bitmap, cliprect);
 
-		k001604->draw_front_layer(bitmap, cliprect);
+		k001604->draw_front_layer(screen, bitmap, cliprect);
 	}
 
 	draw_7segment_led(bitmap, 3, 3, gticlub_led_reg[0]);

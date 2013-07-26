@@ -275,7 +275,7 @@ UINT32 ddealer_state::screen_update_ddealer(screen_device &screen, bitmap_ind16 
 {
 	m_back_tilemap->set_scrollx(0, m_flipscreen ? -192 : -64);
 	m_back_tilemap->set_flip(m_flipscreen ? TILEMAP_FLIPY | TILEMAP_FLIPX : 0);
-	m_back_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_back_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* the fg tilemap handling is a little hacky right now,
 	   i'm not sure if it should be a single tilemap with

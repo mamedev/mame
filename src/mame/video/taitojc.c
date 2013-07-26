@@ -345,7 +345,7 @@ UINT32 taitojc_state::screen_update_taitojc(screen_device &screen, bitmap_ind16 
 
 	// text layer
 	if (m_objlist[0xfc4/4] & 0x10000)
-		m_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }

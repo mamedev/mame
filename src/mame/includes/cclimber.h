@@ -75,9 +75,9 @@ public:
 	UINT32 screen_update_toprollr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	void swimmer_set_background_pen();
-	void draw_playfield(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void cclimber_draw_bigsprite(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void toprollr_draw_bigsprite(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_playfield(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void cclimber_draw_bigsprite(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void toprollr_draw_bigsprite(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void cclimber_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx);
 	void toprollr_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx);
 	void swimmer_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx);

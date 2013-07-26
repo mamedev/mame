@@ -208,9 +208,9 @@ void chanbara_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 UINT32 chanbara_state::screen_update_chanbara(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg2_tilemap->set_scrolly(0, m_scroll | (m_scrollhi << 8));
-	m_bg2_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg2_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 

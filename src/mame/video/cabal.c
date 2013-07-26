@@ -138,8 +138,8 @@ void cabal_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 UINT32 cabal_state::screen_update_cabal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_background_layer->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
+	m_background_layer->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
 	draw_sprites(bitmap,cliprect);
-	m_text_layer->draw(bitmap, cliprect, 0,0);
+	m_text_layer->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
 }

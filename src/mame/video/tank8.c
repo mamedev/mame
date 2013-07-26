@@ -182,7 +182,7 @@ void tank8_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 UINT32 tank8_state::screen_update_tank8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	set_pens(machine().colortable);
-	m_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	draw_sprites(bitmap, cliprect);
 	draw_bullets(bitmap, cliprect);
@@ -199,7 +199,7 @@ void tank8_state::screen_eof_tank8(screen_device &screen, bool state)
 		int y;
 		const rectangle &visarea = machine().primary_screen->visible_area();
 
-		m_tilemap->draw(m_helper1, visarea, 0, 0);
+		m_tilemap->draw(screen, m_helper1, visarea, 0, 0);
 
 		m_helper2.fill(8, visarea);
 		m_helper3.fill(8, visarea);

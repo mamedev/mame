@@ -159,7 +159,7 @@ VIDEO_START_MEMBER(madalien_state,madalien)
 }
 
 
-void madalien_state::draw_edges(bitmap_ind16 &bitmap, const rectangle &cliprect, int flip, int scroll_mode)
+void madalien_state::draw_edges(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flip, int scroll_mode)
 {
 	rectangle clip_edge1;
 	rectangle clip_edge2;
@@ -192,8 +192,8 @@ void madalien_state::draw_edges(bitmap_ind16 &bitmap, const rectangle &cliprect,
 	m_tilemap_edge2[scroll_mode]->set_scrollx(0, -(*m_scroll & 0xfc));
 	m_tilemap_edge2[scroll_mode]->set_scrolly(0, *m_edge2_pos & 0x7f);
 
-	m_tilemap_edge1[scroll_mode]->draw(bitmap, clip_edge1, 0, 0);
-	m_tilemap_edge2[scroll_mode]->draw(bitmap, clip_edge2, 0, 0);
+	m_tilemap_edge1[scroll_mode]->draw(screen, bitmap, clip_edge1, 0, 0);
+	m_tilemap_edge2[scroll_mode]->draw(screen, bitmap, clip_edge2, 0, 0);
 }
 
 
@@ -232,10 +232,10 @@ void madalien_state::draw_headlight(bitmap_ind16 &bitmap, const rectangle &clipr
 }
 
 
-void madalien_state::draw_foreground(bitmap_ind16 &bitmap, const rectangle &cliprect, int flip)
+void madalien_state::draw_foreground(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flip)
 {
 	m_tilemap_fg->set_flip(flip ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
-	m_tilemap_fg->draw(bitmap, cliprect, 0, 0);
+	m_tilemap_fg->draw(screen, bitmap, cliprect, 0, 0);
 }
 
 
@@ -260,8 +260,8 @@ UINT32 madalien_state::screen_update_madalien(screen_device &screen, bitmap_ind1
 	int scroll_mode = *m_scroll & 3;
 
 	bitmap.fill(0, cliprect);
-	draw_edges(bitmap, cliprect, flip, scroll_mode);
-	draw_foreground(bitmap, cliprect, flip);
+	draw_edges(screen, bitmap, cliprect, flip, scroll_mode);
+	draw_foreground(screen, bitmap, cliprect, flip);
 
 	/* highlight section A (outside of tunnels).
 	 * also, bit 1 of the video_flags register (6A) is

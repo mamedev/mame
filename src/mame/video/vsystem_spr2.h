@@ -45,10 +45,10 @@ public:
 	int m_xoffs, m_yoffs;
 
 	template<class _BitmapClass>
-	void turbofrc_draw_sprites_common( UINT16* spriteram3,  int spriteram3_bytes, int spritepalettebank, running_machine &machine, _BitmapClass &bitmap, const rectangle &cliprect, int pri_param );
+	void turbofrc_draw_sprites_common( UINT16* spriteram3,  int spriteram3_bytes, int spritepalettebank, running_machine &machine, _BitmapClass &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, int pri_param );
 
-	void turbofrc_draw_sprites( UINT16* spriteram3,  int spriteram3_bytes,  int spritepalettebank, running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri_param );
-	void turbofrc_draw_sprites( UINT16* spriteram3,  int spriteram3_bytes,  int spritepalettebank, running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int pri_param );
+	void turbofrc_draw_sprites( UINT16* spriteram3,  int spriteram3_bytes,  int spritepalettebank, running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, int pri_param );
+	void turbofrc_draw_sprites( UINT16* spriteram3,  int spriteram3_bytes,  int spritepalettebank, running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, int pri_param );
 
 
 

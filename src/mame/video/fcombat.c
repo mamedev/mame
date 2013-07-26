@@ -141,7 +141,7 @@ UINT32 fcombat_state::screen_update_fcombat(screen_device &screen, bitmap_ind16 
 	m_bgmap->set_scrollx(0, m_fcombat_sv - 24);
 
 	m_bgmap->mark_all_dirty();
-	m_bgmap->draw(bitmap, cliprect, 0, 0);
+	m_bgmap->draw(screen, bitmap, cliprect, 0, 0);
 	//draw_background(bitmap, cliprect);
 
 	/* draw sprites */

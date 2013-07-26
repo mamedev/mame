@@ -528,11 +528,11 @@ UINT32 m72_state::screen_update_m72(screen_device &screen, bitmap_ind16 &bitmap,
 	m_bg_tilemap->set_scrollx(0,m_scrollx2);
 	m_bg_tilemap->set_scrolly(0,m_scrolly2);
 
-	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1,0);
-	m_fg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1,0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1,0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1,0);
 	m72_draw_sprites(bitmap,cliprect);
-	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0,0);
-	m_fg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0,0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0,0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0,0);
 	return 0;
 }
 
@@ -564,11 +564,11 @@ UINT32 m72_state::screen_update_majtitle(screen_device &screen, bitmap_ind16 &bi
 	}
 	m_bg_tilemap->set_scrolly(0,m_scrolly2);
 
-	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1,0);
-	m_fg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1,0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1,0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1,0);
 	majtitle_draw_sprites(bitmap,cliprect);
 	m72_draw_sprites(bitmap,cliprect);
-	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0,0);
-	m_fg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0,0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0,0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0,0);
 	return 0;
 }

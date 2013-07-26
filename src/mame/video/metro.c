@@ -406,7 +406,7 @@ VIDEO_START_MEMBER(metro_state,gstrik2)
 
 ***************************************************************************/
 
-void metro_state::metro_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
+void metro_state::metro_draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	UINT8 *base_gfx4 = m_expanded_gfx1;
 	UINT8 *base_gfx8 = memregion("gfx1")->base();
@@ -510,7 +510,7 @@ void metro_state::metro_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cli
 								flipx, flipy,
 								x, y,
 								zoom, zoom,
-								machine().priority_bitmap,primask[pri], 255);
+								screen.priority(),primask[pri], 255);
 			}
 			else
 			{
@@ -526,7 +526,7 @@ void metro_state::metro_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cli
 								flipx, flipy,
 								x, y,
 								zoom, zoom,
-								machine().priority_bitmap,primask[pri], 15);
+								screen.priority(),primask[pri], 15);
 			}
 #if 0
 {   /* Display priority + zoom on each sprite */
@@ -552,12 +552,12 @@ void metro_state::metro_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cli
 
 // Copy a 'window' from the large 2048x2048 (or 4096x4096 for 16x16 tiles) tilemap
 
-void metro_state::draw_tilemap( bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32 flags, UINT32 pcode,
+void metro_state::draw_tilemap( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32 flags, UINT32 pcode,
 							int sx, int sy, int wx, int wy, int big, UINT16 *tilemapram, int layer )
 {
 	int y;
 
-	bitmap_ind8 &priority_bitmap = machine().priority_bitmap;
+	bitmap_ind8 &priority_bitmap = m_screen->priority();
 
 	int width  = big ? 4096 : 2048;
 	int height = big ? 4096 : 2048;
@@ -632,7 +632,7 @@ void metro_state::draw_tilemap( bitmap_ind16 &bitmap, const rectangle &cliprect,
 
 // Draw all the layers that match the given priority
 
-void metro_state::draw_layers( bitmap_ind16 &bitmap, const rectangle &cliprect, int pri, int layers_ctrl )
+void metro_state::draw_layers( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri, int layers_ctrl )
 {
 	UINT16 layers_pri = m_videoregs[0x10 / 2];
 	int layer;
@@ -659,7 +659,7 @@ void metro_state::draw_layers( bitmap_ind16 &bitmap, const rectangle &cliprect, 
 
 				int big = m_support_16x16 && (*m_screenctrl & (0x0020 << layer));
 
-				draw_tilemap(bitmap, cliprect, 0, 1 << (3 - pri), sx, sy, wx, wy, big, tilemapram, layer);
+				draw_tilemap(screen, bitmap, cliprect, 0, 1 << (3 - pri), sx, sy, wx, wy, big, tilemapram, layer);
 			}
 		}
 	}
@@ -674,7 +674,7 @@ UINT32 metro_state::screen_update_metro(screen_device &screen, bitmap_ind16 &bit
 	m_sprite_xoffs = m_videoregs[0x06 / 2] - screen.width()  / 2 + m_sprite_xoffs_dx;
 	m_sprite_yoffs = m_videoregs[0x04 / 2] - screen.height() / 2;
 
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 
 	// The background color is selected by a register
 	bitmap.fill(m_videoregs[0x12/2] & 0x0fff, cliprect);
@@ -715,13 +715,13 @@ if (machine().input().code_pressed(KEYCODE_Z))
 #endif
 
 	if (m_has_zoom)
-		m_k053936->zoom_draw(bitmap, cliprect, m_k053936_tilemap, 0, 0, 1);
+		m_k053936->zoom_draw(screen, bitmap, cliprect, m_k053936_tilemap, 0, 0, 1);
 
 	for (pri = 3; pri >= 0; pri--)
-		draw_layers(bitmap, cliprect, pri, layers_ctrl);
+		draw_layers(screen, bitmap, cliprect, pri, layers_ctrl);
 
 	if (layers_ctrl & 0x08)
-		metro_draw_sprites(bitmap, cliprect);
+		metro_draw_sprites(screen, bitmap, cliprect);
 
 	return 0;
 }

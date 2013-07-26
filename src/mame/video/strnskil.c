@@ -140,7 +140,7 @@ UINT32 strnskil_state::screen_update_strnskil(screen_device &screen, bitmap_ind1
 		}
 	}
 
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);
 	return 0;
 }

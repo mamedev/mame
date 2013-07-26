@@ -408,11 +408,11 @@ UINT32 twincobr_state::screen_update_toaplan0(screen_device &screen, bitmap_ind1
 	if (m_display_on) m_spritegen->draw_sprites_to_tempbitmap(cliprect, buffered_spriteram16, bytes);
 
 
-	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
 	if (m_display_on) m_spritegen->copy_sprites_from_tempbitmap(bitmap,cliprect,1);
-	m_fg_tilemap->draw(bitmap, cliprect, 0,0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	if (m_display_on) m_spritegen->copy_sprites_from_tempbitmap(bitmap,cliprect,2);
-	m_tx_tilemap->draw(bitmap, cliprect, 0,0);
+	m_tx_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	if (m_display_on) m_spritegen->copy_sprites_from_tempbitmap(bitmap,cliprect,3);
 	return 0;
 }

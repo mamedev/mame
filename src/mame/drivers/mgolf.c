@@ -80,7 +80,7 @@ UINT32 mgolf_state::screen_update_mgolf(screen_device &screen, bitmap_ind16 &bit
 	int i;
 
 	/* draw playfield */
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* draw sprites */
 	for (i = 0; i < 2; i++)

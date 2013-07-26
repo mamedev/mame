@@ -232,7 +232,7 @@ void olibochu_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 
 UINT32 olibochu_state::screen_update_olibochu(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);
 	return 0;
 }

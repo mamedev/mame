@@ -66,7 +66,7 @@ UINT32 dragrace_state::screen_update_dragrace(screen_device &screen, bitmap_ind1
 		if (rect.min_y < y + 0) rect.min_y = y + 0;
 		if (rect.max_y > y + 3) rect.max_y = y + 3;
 
-		m_bg_tilemap->draw(bitmap, rect, 0, 0);
+		m_bg_tilemap->draw(screen, bitmap, rect, 0, 0);
 	}
 	return 0;
 }

@@ -268,17 +268,17 @@ sprite format:
 15   xxxxxxxx  Y position
 */
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	namcos86_state *state = machine.driver_data<namcos86_state>();
+	namcos86_state *state = screen.machine().driver_data<namcos86_state>();
 	const UINT8 *source = &state->m_spriteram[0x0800-0x20]; /* the last is NOT a sprite */
 	const UINT8 *finish = &state->m_spriteram[0];
-	gfx_element *gfx = machine.gfx[2];
+	gfx_element *gfx = screen.machine().gfx[2];
 
 	int sprite_xoffs = state->m_spriteram[0x07f5] + ((state->m_spriteram[0x07f4] & 1) << 8);
 	int sprite_yoffs = state->m_spriteram[0x07f7];
 
-	int bank_sprites = machine.gfx[2]->elements() / 8;
+	int bank_sprites = screen.machine().gfx[2]->elements() / 8;
 
 	while (source >= finish)
 	{
@@ -323,7 +323,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 				flipx,flipy,
 				sx & 0x1ff,
 				((sy + 16) & 0xff) - 16,
-				machine.priority_bitmap, pri_mask,0xf);
+				screen.priority(), pri_mask,0xf);
 
 		source -= 0x10;
 	}
@@ -361,7 +361,7 @@ UINT32 namcos86_state::screen_update_namcos86(screen_device &screen, bitmap_ind1
 	set_scroll(machine(), 2);
 	set_scroll(machine(), 3);
 
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 
 	bitmap.fill(machine().gfx[0]->colorbase() + 8*m_backcolor+7, cliprect);
 
@@ -372,11 +372,11 @@ UINT32 namcos86_state::screen_update_namcos86(screen_device &screen, bitmap_ind1
 		for (i = 3;i >= 0;i--)
 		{
 			if (((m_xscroll[i] & 0x0e00) >> 9) == layer)
-				m_bg_tilemap[i]->draw(bitmap, cliprect, 0,layer,0);
+				m_bg_tilemap[i]->draw(screen, bitmap, cliprect, 0,layer,0);
 		}
 	}
 
-	draw_sprites(machine(),bitmap,cliprect);
+	draw_sprites(screen,bitmap,cliprect);
 	return 0;
 }
 

@@ -85,10 +85,10 @@ public:
 	UINT32 screen_update_m92(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_ppan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(m92_scanline_interrupt);
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void ppan_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void ppan_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void m92_update_scroll_positions();
-	void m92_draw_tiles(bitmap_ind16 &bitmap,const rectangle &cliprect);
+	void m92_draw_tiles(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void m92_sprite_interrupt();
 	optional_device<okim6295_device> m_oki;
 

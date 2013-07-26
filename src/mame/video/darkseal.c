@@ -65,12 +65,12 @@ UINT32 darkseal_state::screen_update_darkseal(screen_device &screen, bitmap_ind1
 	m_deco_tilegen1->pf_update(m_pf1_rowscroll, m_pf1_rowscroll);
 	m_deco_tilegen2->pf_update(m_pf3_rowscroll, m_pf3_rowscroll);
 
-	m_deco_tilegen2->tilemap_1_draw(bitmap, cliprect, 0, 0);
-	m_deco_tilegen2->tilemap_2_draw(bitmap, cliprect, 0, 0);
+	m_deco_tilegen2->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
+	m_deco_tilegen2->tilemap_2_draw(screen, bitmap, cliprect, 0, 0);
 
-	m_deco_tilegen1->tilemap_1_draw(bitmap, cliprect, 0, 0);
+	m_deco_tilegen1->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
 	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0x400);
-	m_deco_tilegen1->tilemap_2_draw(bitmap, cliprect, 0, 0);
+	m_deco_tilegen1->tilemap_2_draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }

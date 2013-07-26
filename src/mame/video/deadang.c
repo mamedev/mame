@@ -81,7 +81,7 @@ void deadang_state::video_start()
 	m_text_layer->set_transparent_pen(15);
 }
 
-void deadang_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+void deadang_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT16 *spriteram16 = m_spriteram;
 	int offs,fx,fy,x,y,color,sprite,pri;
@@ -119,7 +119,7 @@ void deadang_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 		pdrawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 				sprite,
 				color,fx,fy,x,y,
-				machine().priority_bitmap,pri,15);
+				screen.priority(),pri,15);
 	}
 }
 
@@ -149,11 +149,11 @@ UINT32 deadang_state::screen_update_deadang(screen_device &screen, bitmap_ind16 
 	flip_screen_set(m_scroll_ram[0x34]&0x40 );
 
 	bitmap.fill(get_black_pen(machine()), cliprect);
-	machine().priority_bitmap.fill(0, cliprect);
-	m_pf3_layer->draw(bitmap, cliprect, 0,1);
-	m_pf1_layer->draw(bitmap, cliprect, 0,2);
-	m_pf2_layer->draw(bitmap, cliprect, 0,4);
-	if (!(m_scroll_ram[0x34]&0x10)) draw_sprites(bitmap,cliprect);
-	m_text_layer->draw(bitmap, cliprect, 0,0);
+	screen.priority().fill(0, cliprect);
+	m_pf3_layer->draw(screen, bitmap, cliprect, 0,1);
+	m_pf1_layer->draw(screen, bitmap, cliprect, 0,2);
+	m_pf2_layer->draw(screen, bitmap, cliprect, 0,4);
+	if (!(m_scroll_ram[0x34]&0x10)) draw_sprites(screen, bitmap,cliprect);
+	m_text_layer->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
 }

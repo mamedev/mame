@@ -510,9 +510,9 @@ UINT32 gstream_state::screen_update_gstream(screen_device &screen, bitmap_ind16 
 	m_tilemap2->set_scrollx(0, m_tmap2_scrollx >> 16);
 	m_tilemap2->set_scrolly(0, m_tmap2_scrolly >> 16);
 
-	m_tilemap3->draw(bitmap, cliprect, 0, 0);
-	m_tilemap2->draw(bitmap, cliprect, 0, 0);
-	m_tilemap1->draw(bitmap, cliprect, 0, 0);
+	m_tilemap3->draw(screen, bitmap, cliprect, 0, 0);
+	m_tilemap2->draw(screen, bitmap, cliprect, 0, 0);
+	m_tilemap1->draw(screen, bitmap, cliprect, 0, 0);
 
 	for (i = 0x0000 / 4; i < 0x4000 / 4; i += 4)
 	{

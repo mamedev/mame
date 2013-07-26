@@ -46,15 +46,15 @@ UINT32 kaneko16_state::screen_update_common(screen_device &screen, bitmap_ind16 
 {
 	int i;
 
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 
 	if (m_view2_0) m_view2_0->kaneko16_prepare(bitmap, cliprect);
 	if (m_view2_1) m_view2_1->kaneko16_prepare(bitmap, cliprect);
 
 	for ( i = 0; i < 8; i++ )
 	{
-		if (m_view2_0) m_view2_0->render_tilemap_chip(bitmap,cliprect,i);
-		if (m_view2_1) m_view2_1->render_tilemap_chip_alt(bitmap,cliprect,i, VIEW2_2_pri);
+		if (m_view2_0) m_view2_0->render_tilemap_chip(screen,bitmap,cliprect,i);
+		if (m_view2_1) m_view2_1->render_tilemap_chip_alt(screen,bitmap,cliprect,i, VIEW2_2_pri);
 	}
 
 	return 0;
@@ -72,7 +72,7 @@ UINT32 kaneko16_state::screen_update_kaneko16(screen_device &screen, bitmap_ind1
 	if (!m_disp_enable) return 0;
 
 	screen_update_common(screen, bitmap, cliprect);
-	m_kaneko_spr->kaneko16_render_sprites(machine(),bitmap,cliprect, m_spriteram, m_spriteram.bytes());
+	m_kaneko_spr->kaneko16_render_sprites(machine(),bitmap,cliprect, screen.priority(), m_spriteram, m_spriteram.bytes());
 	return 0;
 }
 
@@ -195,6 +195,6 @@ UINT32 kaneko16_berlwall_state::screen_update_berlwall(screen_device &screen, bi
 	if (!m_disp_enable) return 0;
 
 	screen_update_common(screen, bitmap, cliprect);
-	m_kaneko_spr->kaneko16_render_sprites(machine(),bitmap,cliprect, m_spriteram, m_spriteram.bytes());
+	m_kaneko_spr->kaneko16_render_sprites(machine(),bitmap,cliprect, screen.priority(), m_spriteram, m_spriteram.bytes());
 	return 0;
 }

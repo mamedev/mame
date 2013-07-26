@@ -264,10 +264,10 @@ void appoooh_state::robowres_draw_sprites( bitmap_ind16 &dest_bmp, const rectang
 
 UINT32 appoooh_state::screen_update_appoooh(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	if (m_priority == 0)    /* fg behind sprites */
-		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* draw sprites */
 	if (m_priority == 1)
@@ -286,17 +286,17 @@ UINT32 appoooh_state::screen_update_appoooh(screen_device &screen, bitmap_ind16 
 	}
 
 	if (m_priority != 0)    /* fg in front of sprites */
-		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }
 
 UINT32 appoooh_state::screen_update_robowres(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	if (m_priority == 0)    /* fg behind sprites */
-		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* draw sprites */
 	if (m_priority == 1)
@@ -315,7 +315,7 @@ UINT32 appoooh_state::screen_update_robowres(screen_device &screen, bitmap_ind16
 	}
 
 	if (m_priority != 0)    /* fg in front of sprites */
-		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }

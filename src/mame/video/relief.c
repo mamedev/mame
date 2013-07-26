@@ -97,10 +97,10 @@ UINT32 relief_state::screen_update_relief(screen_device &screen, bitmap_ind16 &b
 	m_vad->mob()->draw_async(cliprect);
 
 	/* draw the playfield */
-	bitmap_ind8 &priority_bitmap = machine().priority_bitmap;
+	bitmap_ind8 &priority_bitmap = screen.priority();
 	priority_bitmap.fill(0, cliprect);
-	m_vad->playfield()->draw(bitmap, cliprect, 0, 0);
-	m_vad->playfield2()->draw(bitmap, cliprect, 0, 1);
+	m_vad->playfield()->draw(screen, bitmap, cliprect, 0, 0);
+	m_vad->playfield2()->draw(screen, bitmap, cliprect, 0, 1);
 
 	// draw and merge the MO
 	bitmap_ind16 &mobitmap = m_vad->mob()->bitmap();

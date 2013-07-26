@@ -243,19 +243,19 @@ void brkthru_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 UINT32 brkthru_state::screen_update_brkthru(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->set_scrollx(0, m_bgscroll);
-	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 
 	/* low priority sprites */
 	draw_sprites(bitmap, cliprect, 0x01);
 
 	/* draw background over low priority sprites */
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* high priority sprites */
 	draw_sprites(bitmap, cliprect, 0x09);
 
 	/* fg layer */
-	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 /*  show_register(bitmap, 8, 8, (UINT32)m_flipscreen); */
 

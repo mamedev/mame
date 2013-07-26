@@ -204,9 +204,9 @@ UINT32 igspoker_state::screen_update_igs_video(screen_device &screen, bitmap_ind
 	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	// FIX: CSK227IT must have some way to disable background, or wrong gfx?
-	if (m_bg_enable) m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	if (m_bg_enable) m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
-	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }
@@ -218,7 +218,7 @@ VIDEO_START_MEMBER(igspoker_state,cpokerpk)
 
 UINT32 igspoker_state::screen_update_cpokerpk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }

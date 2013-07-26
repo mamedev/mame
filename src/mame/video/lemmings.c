@@ -159,7 +159,7 @@ UINT32 lemmings_state::screen_update_lemmings(screen_device &screen, bitmap_rgb3
 
 	m_sprgen2->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0800, 0x0800, 0x200, 0xff);
 	m_sprgen->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0000, 0x0800, 0x300, 0xff);
-	m_vram_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_vram_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_sprgen2->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0000, 0x0800, 0x200, 0xff);
 	return 0;
 }

@@ -379,13 +379,13 @@ WRITE8_MEMBER(combatsc_state::combatsc_scrollram_w)
 
 ***************************************************************************/
 
-void combatsc_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, const UINT8 *source, int circuit, UINT32 pri_mask )
+void combatsc_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, const UINT8 *source, int circuit, bitmap_ind8 &priority_bitmap, UINT32 pri_mask )
 {
 	k007121_device *k007121 = circuit ? m_k007121_2 : m_k007121_1;
 	address_space &space = machine().driver_data()->generic_space();
 	int base_color = (circuit * 4) * 16 + (k007121->ctrlram_r(space, 6) & 0x10) * 2;
 
-	k007121->sprites_draw(bitmap, cliprect, machine().gfx[circuit], machine().colortable, source, base_color, 0, 0, pri_mask);
+	k007121->sprites_draw(bitmap, cliprect, machine().gfx[circuit], machine().colortable, source, base_color, 0, 0, priority_bitmap, pri_mask);
 }
 
 
@@ -423,29 +423,29 @@ UINT32 combatsc_state::screen_update_combatsc(screen_device &screen, bitmap_ind1
 	m_bg_tilemap[0]->set_scrolly(0, m_k007121_1->ctrlram_r(space, 2));
 	m_bg_tilemap[1]->set_scrolly(0, m_k007121_2->ctrlram_r(space, 2));
 
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 
 	if (m_priority == 0)
 	{
-		m_bg_tilemap[1]->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE | 0, 4);
-		m_bg_tilemap[1]->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE | 1, 8);
-		m_bg_tilemap[0]->draw(bitmap, cliprect, 0, 1);
-		m_bg_tilemap[0]->draw(bitmap, cliprect, 1, 2);
+		m_bg_tilemap[1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE | 0, 4);
+		m_bg_tilemap[1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE | 1, 8);
+		m_bg_tilemap[0]->draw(screen, bitmap, cliprect, 0, 1);
+		m_bg_tilemap[0]->draw(screen, bitmap, cliprect, 1, 2);
 
 		/* we use the priority buffer so sprites are drawn front to back */
-		draw_sprites(bitmap, cliprect, m_spriteram[1], 1, 0x0f00);
-		draw_sprites(bitmap, cliprect, m_spriteram[0], 0, 0x4444);
+		draw_sprites(bitmap, cliprect, m_spriteram[1], 1, screen.priority(), 0x0f00);
+		draw_sprites(bitmap, cliprect, m_spriteram[0], 0, screen.priority(), 0x4444);
 	}
 	else
 	{
-		m_bg_tilemap[0]->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE | 0, 1);
-		m_bg_tilemap[0]->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE | 1, 2);
-		m_bg_tilemap[1]->draw(bitmap, cliprect, 1, 4);
-		m_bg_tilemap[1]->draw(bitmap, cliprect, 0, 8);
+		m_bg_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE | 0, 1);
+		m_bg_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE | 1, 2);
+		m_bg_tilemap[1]->draw(screen, bitmap, cliprect, 1, 4);
+		m_bg_tilemap[1]->draw(screen, bitmap, cliprect, 0, 8);
 
 		/* we use the priority buffer so sprites are drawn front to back */
-		draw_sprites(bitmap, cliprect, m_spriteram[1], 1, 0x0f00);
-		draw_sprites(bitmap, cliprect, m_spriteram[0], 0, 0x4444);
+		draw_sprites(bitmap, cliprect, m_spriteram[1], 1, screen.priority(), 0x0f00);
+		draw_sprites(bitmap, cliprect, m_spriteram[0], 0, screen.priority(), 0x4444);
 	}
 
 	if (m_k007121_1->ctrlram_r(space, 1) & 0x08)
@@ -453,7 +453,7 @@ UINT32 combatsc_state::screen_update_combatsc(screen_device &screen, bitmap_ind1
 		for (i = 0; i < 32; i++)
 		{
 			m_textlayer->set_scrollx(i, m_scrollram0[0x20 + i] ? 0 : TILE_LINE_DISABLED);
-			m_textlayer->draw(bitmap, cliprect, 0, 0);
+			m_textlayer->draw(screen, bitmap, cliprect, 0, 0);
 		}
 	}
 
@@ -563,19 +563,19 @@ UINT32 combatsc_state::screen_update_combatscb(screen_device &screen, bitmap_ind
 
 	if (m_priority == 0)
 	{
-		m_bg_tilemap[1]->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		m_bg_tilemap[1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 		bootleg_draw_sprites(bitmap,cliprect, m_page[0], 0);
-		m_bg_tilemap[0]->draw(bitmap, cliprect, 0 ,0);
+		m_bg_tilemap[0]->draw(screen, bitmap, cliprect, 0 ,0);
 		bootleg_draw_sprites(bitmap,cliprect, m_page[1], 1);
 	}
 	else
 	{
-		m_bg_tilemap[0]->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		m_bg_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 		bootleg_draw_sprites(bitmap,cliprect, m_page[0], 0);
-		m_bg_tilemap[1]->draw(bitmap, cliprect, 0, 0);
+		m_bg_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
 		bootleg_draw_sprites(bitmap,cliprect, m_page[1], 1);
 	}
 
-	m_textlayer->draw(bitmap, cliprect, 0, 0);
+	m_textlayer->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }

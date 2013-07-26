@@ -142,10 +142,10 @@ UINT32 darkmist_state::screen_update_darkmist(screen_device &screen, bitmap_ind1
 	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	if(m_hw & DISPLAY_BG)
-		m_bgtilemap->draw(bitmap, cliprect, 0,0);
+		m_bgtilemap->draw(screen, bitmap, cliprect, 0,0);
 
 	if(m_hw & DISPLAY_FG)
-		m_fgtilemap->draw(bitmap, cliprect, 0,0);
+		m_fgtilemap->draw(screen, bitmap, cliprect, 0,0);
 
 	if(m_hw & DISPLAY_SPR)
 	{
@@ -191,7 +191,7 @@ UINT32 darkmist_state::screen_update_darkmist(screen_device &screen, bitmap_ind1
 	if(m_hw & DISPLAY_TXT)
 	{
 		m_txtilemap->mark_all_dirty();
-		m_txtilemap->draw(bitmap, cliprect, 0,0);
+		m_txtilemap->draw(screen, bitmap, cliprect, 0,0);
 	}
 
 

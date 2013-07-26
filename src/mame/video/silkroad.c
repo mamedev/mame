@@ -7,7 +7,7 @@
 /* Clean Up */
 /* is theres a bg colour register? */
 
-void silkroad_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+void silkroad_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	gfx_element *gfx = machine().gfx[0];
 	UINT32 *source = m_sprram;
@@ -36,14 +36,14 @@ void silkroad_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		{
 			for (wcount=0;wcount<width;wcount++)
 			{
-				pdrawgfx_transpen(bitmap,cliprect,gfx,tileno+wcount,color,0,0,xpos+wcount*16+8,ypos,machine().priority_bitmap,pri_mask,0);
+				pdrawgfx_transpen(bitmap,cliprect,gfx,tileno+wcount,color,0,0,xpos+wcount*16+8,ypos,screen.priority(),pri_mask,0);
 			}
 		}
 		else
 		{
 			for (wcount=width;wcount>0;wcount--)
 			{
-				pdrawgfx_transpen(bitmap,cliprect,gfx,tileno+(width-wcount),color,1,0,xpos+wcount*16-16+8,ypos,machine().priority_bitmap,pri_mask,0);
+				pdrawgfx_transpen(bitmap,cliprect,gfx,tileno+(width-wcount),color,1,0,xpos+wcount*16-16+8,ypos,screen.priority(),pri_mask,0);
 			}
 		}
 
@@ -130,7 +130,7 @@ void silkroad_state::video_start()
 
 UINT32 silkroad_state::screen_update_silkroad(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 	bitmap.fill(0x7c0, cliprect);
 
 	m_fg_tilemap->set_scrollx(0, ((m_regs[0] & 0xffff0000) >> 16) );
@@ -142,10 +142,10 @@ UINT32 silkroad_state::screen_update_silkroad(screen_device &screen, bitmap_ind1
 	m_fg2_tilemap->set_scrolly(0, ((m_regs[5] & 0xffff0000) >> 16));
 	m_fg2_tilemap->set_scrollx(0, (m_regs[2] & 0x0000ffff) >> 0 );
 
-	m_fg_tilemap->draw(bitmap, cliprect, 0,0);
-	m_fg2_tilemap->draw(bitmap, cliprect, 0,1);
-	m_fg3_tilemap->draw(bitmap, cliprect, 0,2);
-	draw_sprites(bitmap,cliprect);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0,0);
+	m_fg2_tilemap->draw(screen, bitmap, cliprect, 0,1);
+	m_fg3_tilemap->draw(screen, bitmap, cliprect, 0,2);
+	draw_sprites(screen,bitmap,cliprect);
 
 	if (0)
 	{

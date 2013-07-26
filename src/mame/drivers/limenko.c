@@ -519,7 +519,7 @@ UINT32 limenko_state::screen_update_limenko(screen_device &screen, bitmap_ind16 
 {
 	// m_videoreg[4] ???? It always has this value: 0xffeffff8 (2 signed bytes? values: -17 and -8 ?)
 
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 
 	m_bg_tilemap->enable(m_videoreg[0] & 4);
 	m_md_tilemap->enable(m_videoreg[0] & 2);
@@ -533,12 +533,12 @@ UINT32 limenko_state::screen_update_limenko(screen_device &screen, bitmap_ind16 
 	m_md_tilemap->set_scrollx(0, (m_videoreg[2] & 0xffff0000) >> 16);
 	m_fg_tilemap->set_scrollx(0, (m_videoreg[1] & 0xffff0000) >> 16);
 
-	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
-	m_md_tilemap->draw(bitmap, cliprect, 0,0);
-	m_fg_tilemap->draw(bitmap, cliprect, 0,1);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
+	m_md_tilemap->draw(screen, bitmap, cliprect, 0,0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0,1);
 
 	if(m_videoreg[0] & 8)
-		copy_sprites(bitmap, m_sprites_bitmap, machine().priority_bitmap, cliprect);
+		copy_sprites(bitmap, m_sprites_bitmap, screen.priority(), cliprect);
 
 	return 0;
 }

@@ -120,10 +120,10 @@ WRITE16_MEMBER(ultraman_state::ultraman_gfxctrl_w)
 
 UINT32 ultraman_state::screen_update_ultraman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_k051316_3->zoom_draw(bitmap, cliprect, 0, 0);
-	m_k051316_2->zoom_draw(bitmap, cliprect, 0, 0);
-	m_k051960->k051960_sprites_draw(bitmap, cliprect, 0, 0);
-	m_k051316_1->zoom_draw(bitmap, cliprect, 0, 0);
-	m_k051960->k051960_sprites_draw(bitmap, cliprect, 1, 1);
+	m_k051316_3->zoom_draw(screen, bitmap, cliprect, 0, 0);
+	m_k051316_2->zoom_draw(screen, bitmap, cliprect, 0, 0);
+	m_k051960->k051960_sprites_draw(bitmap, cliprect, screen.priority(), 0, 0);
+	m_k051316_1->zoom_draw(screen, bitmap, cliprect, 0, 0);
+	m_k051960->k051960_sprites_draw(bitmap, cliprect, screen.priority(), 1, 1);
 	return 0;
 }

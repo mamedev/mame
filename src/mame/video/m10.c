@@ -150,7 +150,7 @@ UINT32 m10_state::screen_update_m10(screen_device &screen, bitmap_ind16 &bitmap,
 		m_tx_tilemap->mark_tile_dirty(offs);
 
 	m_tx_tilemap->set_flip(m_flip ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
-	m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }
@@ -171,7 +171,7 @@ UINT32 m10_state::screen_update_m15(screen_device &screen, bitmap_ind16 &bitmap,
 
 	//m_tx_tilemap->mark_all_dirty();
 	m_tx_tilemap->set_flip(m_flip ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
-	m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }

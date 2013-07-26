@@ -864,7 +864,7 @@ UINT32 ygv608_device::update_screen(screen_device &screen, bitmap_ind16 &bitmap,
 	}
 	else
 #endif
-		m_tilemap_B->draw(*m_work_bitmap, finalclip, 0, 0 );
+		m_tilemap_B->draw(screen, *m_work_bitmap, finalclip, 0, 0 );
 
 #ifdef _ENABLE_ROTATE_ZOOM
 
@@ -901,7 +901,7 @@ UINT32 ygv608_device::update_screen(screen_device &screen, bitmap_ind16 &bitmap,
 		(m_regs.s.r11 & r11_prm) == PRM_ASEBDX )
 		draw_sprites(bitmap, finalclip);
 
-	m_tilemap_A->draw(*m_work_bitmap, finalclip, 0, 0 );
+	m_tilemap_A->draw(screen, *m_work_bitmap, finalclip, 0, 0 );
 
 #ifdef _ENABLE_ROTATE_ZOOM
 	if( m_regs.s.zron )

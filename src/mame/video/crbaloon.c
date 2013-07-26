@@ -143,7 +143,7 @@ void crbaloon_state::draw_sprite_and_check_collision(bitmap_ind16 &bitmap)
 
 UINT32 crbaloon_state::screen_update_crbaloon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	draw_sprite_and_check_collision(bitmap);
 

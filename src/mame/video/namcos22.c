@@ -500,22 +500,22 @@ static void renderscanline_uvi_full(void *destbase, INT32 scanline, const poly_e
 	}
 }
 
-static void poly3d_DrawQuad(running_machine &machine, bitmap_rgb32 &bitmap, int textureBank, int color, Poly3dVertex pv[4], int flags, int cz_adjust, int direct, int cmode )
+static void poly3d_DrawQuad(screen_device &screen, bitmap_rgb32 &bitmap, int textureBank, int color, Poly3dVertex pv[4], int flags, int cz_adjust, int direct, int cmode )
 {
-	namcos22_state *state = machine.driver_data<namcos22_state>();
+	namcos22_state *state = screen.machine().driver_data<namcos22_state>();
 	poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(state->m_poly);
 	poly_vertex v[4], clipv[6];
 	int clipverts;
 	int vertnum;
 
-	extra->machine = &machine;
+	extra->machine = &screen.machine();
 	extra->pfade_enabled = 0;
 	extra->zfog_enabled = 0;
 	extra->fadeFactor = 0;
 	extra->fogFactor = 0;
 
-	extra->pens = &machine.pens[(color&0x7f)<<8];
-	extra->priority_bitmap = &machine.priority_bitmap;
+	extra->pens = &screen.machine().pens[(color&0x7f)<<8];
+	extra->priority_bitmap = &screen.priority();
 	extra->bn = textureBank;
 	extra->flags = flags;
 	extra->cz_adjust = cz_adjust;
@@ -755,7 +755,7 @@ static void renderscanline_sprite(void *destbase, INT32 scanline, const poly_ext
 }
 
 
-static void poly3d_DrawSprite(bitmap_rgb32 &dest_bmp, gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy, int scalex, int scaley, int cz_factor, int prioverchar, int alpha)
+static void poly3d_DrawSprite(screen_device &screen, bitmap_rgb32 &dest_bmp, gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy, int scalex, int scaley, int cz_factor, int prioverchar, int alpha)
 {
 	namcos22_state *state = gfx->machine().driver_data<namcos22_state>();
 	int sprite_screen_height = (scaley*gfx->height()+0x8000)>>16;
@@ -782,7 +782,7 @@ static void poly3d_DrawSprite(bitmap_rgb32 &dest_bmp, gfx_element *gfx, UINT32 c
 		extra->flipx = flipx;
 		extra->flipy = flipy;
 		extra->pens = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color&0x7f)];
-		extra->priority_bitmap = &gfx->machine().priority_bitmap;
+		extra->priority_bitmap = &screen.priority();
 		extra->source = gfx->get_data(code % gfx->elements());
 
 		vert[0].x = fsx;
@@ -1048,9 +1048,9 @@ static struct SceneNode *NewSceneNode( running_machine &machine, UINT32 zsortval
 }
 
 
-static void RenderSprite(running_machine &machine, bitmap_rgb32 &bitmap, struct SceneNode *node )
+static void RenderSprite(screen_device &screen, bitmap_rgb32 &bitmap, struct SceneNode *node )
 {
-	namcos22_state *state = machine.driver_data<namcos22_state>();
+	namcos22_state *state = screen.machine().driver_data<namcos22_state>();
 	int tile = node->data.sprite.tile;
 	int col,row;
 	int i = 0;
@@ -1065,8 +1065,9 @@ static void RenderSprite(running_machine &machine, bitmap_rgb32 &bitmap, struct 
 				code += nthword( &state->m_spriteram[0x800/4], i+node->data.sprite.linkType*4 );
 
 			poly3d_DrawSprite(
+				screen,
 				bitmap,
-				machine.gfx[GFX_SPRITE],
+				screen.machine().gfx[GFX_SPRITE],
 				code,
 				node->data.sprite.color,
 				node->data.sprite.flipx,
@@ -1084,7 +1085,7 @@ static void RenderSprite(running_machine &machine, bitmap_rgb32 &bitmap, struct 
 	}
 }
 
-static void RenderSceneHelper(running_machine &machine, bitmap_rgb32 &bitmap, struct SceneNode *node )
+static void RenderSceneHelper(screen_device &screen, bitmap_rgb32 &bitmap, struct SceneNode *node )
 {
 	if( node )
 	{
@@ -1093,7 +1094,7 @@ static void RenderSceneHelper(running_machine &machine, bitmap_rgb32 &bitmap, st
 			int i;
 			for( i=RADIX_BUCKETS-1; i>=0; i-- )
 			{
-				RenderSceneHelper(machine, bitmap, node->data.nonleaf.next[i] );
+				RenderSceneHelper(screen, bitmap, node->data.nonleaf.next[i] );
 			}
 			FreeSceneNode( node );
 		}
@@ -1112,7 +1113,7 @@ static void RenderSceneHelper(running_machine &machine, bitmap_rgb32 &bitmap, st
 						node->data.quad3d.vw,
 						node->data.quad3d.vh
 					);
-					poly3d_DrawQuad(machine,
+					poly3d_DrawQuad(screen,
 						bitmap,
 						node->data.quad3d.textureBank,
 						node->data.quad3d.color,
@@ -1131,7 +1132,7 @@ static void RenderSceneHelper(running_machine &machine, bitmap_rgb32 &bitmap, st
 						node->data.sprite.cy_min,
 						node->data.sprite.cy_max
 					);
-					RenderSprite(machine, bitmap, node );
+					RenderSprite(screen, bitmap, node );
 					break;
 
 				default:
@@ -1145,14 +1146,14 @@ static void RenderSceneHelper(running_machine &machine, bitmap_rgb32 &bitmap, st
 	}
 }
 
-static void RenderScene(running_machine &machine, bitmap_rgb32 &bitmap )
+static void RenderScene(screen_device &screen, bitmap_rgb32 &bitmap )
 {
-	namcos22_state *state = machine.driver_data<namcos22_state>();
+	namcos22_state *state = screen.machine().driver_data<namcos22_state>();
 	struct SceneNode *node = &mSceneRoot;
 	int i;
 	for( i=RADIX_BUCKETS-1; i>=0; i-- )
 	{
-		RenderSceneHelper(machine, bitmap, node->data.nonleaf.next[i] );
+		RenderSceneHelper(screen, bitmap, node->data.nonleaf.next[i] );
 		node->data.nonleaf.next[i] = NULL;
 	}
 	poly3d_NoClip();
@@ -1908,10 +1909,10 @@ WRITE32_MEMBER(namcos22_state::namcos22s_spotram_w)
 	}
 }
 
-static void namcos22s_mix_textlayer( running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int prival )
+static void namcos22s_mix_textlayer( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int prival )
 {
-	namcos22_state *state = machine.driver_data<namcos22_state>();
-	const pen_t *pens = machine.pens;
+	namcos22_state *state = screen.machine().driver_data<namcos22_state>();
+	const pen_t *pens = screen.machine().pens;
 	UINT16 *src;
 	UINT32 *dest;
 	UINT8 *pri;
@@ -1939,7 +1940,7 @@ static void namcos22s_mix_textlayer( running_machine &machine, bitmap_rgb32 &bit
 	{
 		src = &state->m_mix_bitmap->pix16(y);
 		dest = &bitmap.pix32(y);
-		pri = &machine.priority_bitmap.pix8(y);
+		pri = &screen.priority().pix8(y);
 		for (x=0;x<640;x++)
 		{
 			// skip if transparent or under poly/sprite
@@ -1992,10 +1993,10 @@ static void namcos22s_mix_textlayer( running_machine &machine, bitmap_rgb32 &bit
 	}
 }
 
-static void namcos22_mix_textlayer( running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect )
+static void namcos22_mix_textlayer( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
-	namcos22_state *state = machine.driver_data<namcos22_state>();
-	const pen_t *pens = machine.pens;
+	namcos22_state *state = screen.machine().driver_data<namcos22_state>();
+	const pen_t *pens = screen.machine().pens;
 	UINT16 *src;
 	UINT32 *dest;
 	UINT8 *pri;
@@ -2016,7 +2017,7 @@ static void namcos22_mix_textlayer( running_machine &machine, bitmap_rgb32 &bitm
 	{
 		src = &state->m_mix_bitmap->pix16(y);
 		dest = &bitmap.pix32(y);
-		pri = &machine.priority_bitmap.pix8(y);
+		pri = &screen.priority().pix8(y);
 		for (x=0;x<640;x++)
 		{
 			// skip if transparent or under poly
@@ -2054,9 +2055,9 @@ static void namcos22_mix_textlayer( running_machine &machine, bitmap_rgb32 &bitm
 	}
 }
 
-static void DrawCharacterLayer(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect )
+static void DrawCharacterLayer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
-	namcos22_state *state = machine.driver_data<namcos22_state>();
+	namcos22_state *state = screen.machine().driver_data<namcos22_state>();
 	int scroll_x = (state->m_tilemapattr[0]>>16) - 0x35c;
 	int scroll_y = state->m_tilemapattr[0]&0xffff;
 
@@ -2066,13 +2067,13 @@ static void DrawCharacterLayer(running_machine &machine, bitmap_rgb32 &bitmap, c
 
 	if (state->m_bSuperSystem22)
 	{
-		state->m_bgtilemap->draw(*state->m_mix_bitmap, cliprect, 0, 4, 4);
-		namcos22s_mix_textlayer(machine, bitmap, cliprect, 4);
+		state->m_bgtilemap->draw(screen, *state->m_mix_bitmap, cliprect, 0, 4, 4);
+		namcos22s_mix_textlayer(screen, bitmap, cliprect, 4);
 	}
 	else
 	{
-		state->m_bgtilemap->draw(*state->m_mix_bitmap, cliprect, 0, 2, 3);
-		namcos22_mix_textlayer(machine, bitmap, cliprect);
+		state->m_bgtilemap->draw(screen, *state->m_mix_bitmap, cliprect, 0, 2, 3);
+		namcos22_mix_textlayer(screen, bitmap, cliprect);
 	}
 }
 
@@ -2744,7 +2745,7 @@ UINT32 namcos22_state::screen_update_namcos22s(screen_device &screen, bitmap_rgb
 	UpdateVideoMixer(machine());
 	UpdatePalette(machine());
 	namcos22s_recalc_czram(machine());
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 
 	// background color
 	rgbint bg_color;
@@ -2759,11 +2760,11 @@ UINT32 namcos22_state::screen_update_namcos22s(screen_device &screen, bitmap_rgb
 
 	// layers
 	UINT8 layer = nthbyte(m_gamma,0x1f);
-	if (layer&4) DrawCharacterLayer(machine(), bitmap, cliprect);
+	if (layer&4) DrawCharacterLayer(screen, bitmap, cliprect);
 	if (layer&2) DrawSprites(machine(), bitmap, cliprect);
 	if (layer&1) DrawPolygons(machine(), bitmap);
-	RenderScene(machine(), bitmap );
-	if (layer&4) namcos22s_mix_textlayer(machine(), bitmap, cliprect, 6);
+	RenderScene(screen, bitmap );
+	if (layer&4) namcos22s_mix_textlayer(screen, bitmap, cliprect, 6);
 	ApplyGamma(machine(), bitmap);
 
 	// debug stuff
@@ -2825,11 +2826,11 @@ UINT32 namcos22_state::screen_update_namcos22(screen_device &screen, bitmap_rgb3
 {
 	UpdateVideoMixer(machine());
 	UpdatePalette(machine());
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 	bitmap.fill(0, cliprect);
 	DrawPolygons(machine(), bitmap);
-	RenderScene(machine(), bitmap);
-	DrawCharacterLayer(machine(), bitmap, cliprect);
+	RenderScene(screen, bitmap);
+	DrawCharacterLayer(screen, bitmap, cliprect);
 	ApplyGamma(machine(), bitmap);
 
 #if ALLOW_MEMDUMP

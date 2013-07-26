@@ -169,8 +169,8 @@ void mikie_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 UINT32 mikie_state::screen_update_mikie(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_CATEGORY(0), 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(0), 0);
 	draw_sprites(bitmap, cliprect);
-	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1), 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1), 0);
 	return 0;
 }

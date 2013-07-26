@@ -210,10 +210,10 @@ void mil4000_state::video_start()
 
 UINT32 mil4000_state::screen_update_mil4000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_sc0_tilemap->draw(bitmap, cliprect, 0,0);
-	m_sc1_tilemap->draw(bitmap, cliprect, 0,0);
-	m_sc2_tilemap->draw(bitmap, cliprect, 0,0);
-	m_sc3_tilemap->draw(bitmap, cliprect, 0,0);
+	m_sc0_tilemap->draw(screen, bitmap, cliprect, 0,0);
+	m_sc1_tilemap->draw(screen, bitmap, cliprect, 0,0);
+	m_sc2_tilemap->draw(screen, bitmap, cliprect, 0,0);
+	m_sc3_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
 }
 

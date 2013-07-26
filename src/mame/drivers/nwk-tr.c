@@ -300,7 +300,7 @@ UINT32 nwktr_state::screen_update_nwktr(screen_device &screen, bitmap_rgb32 &bit
 	const rectangle &visarea = screen.visible_area();
 	const rectangle tilemap_rect(visarea.min_x, visarea.max_x, visarea.min_y+16, visarea.max_y);
 
-	m_k001604->draw_front_layer(bitmap, tilemap_rect);
+	m_k001604->draw_front_layer(screen, bitmap, tilemap_rect);
 
 	draw_7segment_led(bitmap, 3, 3, m_led_reg0);
 	draw_7segment_led(bitmap, 9, 3, m_led_reg1);

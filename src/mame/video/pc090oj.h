@@ -21,7 +21,7 @@ public:
 
 	void set_sprite_ctrl(UINT16 sprctrl);
 	void eof_callback();
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri_type);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, int pri_type);
 
 protected:
 	// device-level overrides

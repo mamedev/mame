@@ -507,10 +507,10 @@ UINT32 atarigt_state::screen_update_atarigt(screen_device &screen, bitmap_rgb32 
 	int x, y;
 
 	/* draw the playfield */
-	m_playfield_tilemap->draw(*m_pf_bitmap, cliprect, 0, 0);
+	m_playfield_tilemap->draw(screen, *m_pf_bitmap, cliprect, 0, 0);
 
 	/* draw the alpha layer */
-	m_alpha_tilemap->draw(*m_an_bitmap, cliprect, 0, 0);
+	m_alpha_tilemap->draw(screen, *m_an_bitmap, cliprect, 0, 0);
 
 	/* cache pointers */
 	color_latch = m_colorram[0x30000/2];

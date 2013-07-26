@@ -524,7 +524,7 @@ UINT32 marinedt_state::screen_update_marinedt(screen_device &screen, bitmap_ind1
 	int sx, sy;
 
 	m_tile->fill(0);
-	m_tx_tilemap->draw(*m_tile, cliprect, 0, 0);
+	m_tx_tilemap->draw(screen, *m_tile, cliprect, 0, 0);
 
 	m_obj1->fill(0);
 	drawgfx_transpen(*m_obj1, m_obj1->cliprect(), machine().gfx[1],

@@ -201,12 +201,12 @@ if (machine().input().code_pressed(KEYCODE_Z))
 #endif
 
 	if (layers_ctrl & 1)
-		m_tilemap_0->draw(bitmap, cliprect, 0, 0);
+		m_tilemap_0->draw(screen, bitmap, cliprect, 0, 0);
 	else
 		bitmap.fill(0, cliprect);
 
 	if (layers_ctrl & 2)
-		m_tilemap_1->draw(bitmap, cliprect, 0, 0);
+		m_tilemap_1->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }

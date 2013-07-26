@@ -95,7 +95,7 @@ void namcos2_shared_state::namco_tilemap_init( int gfxbank, void *maskBaseAddr,
 } /* namco_tilemap_init */
 
 void
-namco_tilemap_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, int pri )
+namco_tilemap_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri )
 {
 	int i;
 	for( i=0; i<6; i++ )
@@ -105,7 +105,7 @@ namco_tilemap_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, int pri )
 		{
 			int color = mTilemapInfo.control[0x30/2+i] & 0x07;
 			mTilemapInfo.tmap[i]->set_palette_offset( color*256 );
-			mTilemapInfo.tmap[i]->draw(bitmap,cliprect,0,0);
+			mTilemapInfo.tmap[i]->draw(screen, bitmap,cliprect,0,0);
 		}
 	}
 } /* namco_tilemap_draw */
@@ -272,6 +272,7 @@ WRITE32_HANDLER( namco_tilemapvideoram32_le_w )
 /**************************************************************************************/
 
 void namcos2_shared_state::zdrawgfxzoom(
+		screen_device &screen,
 		bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,
 		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
 		int scalex, int scaley, int zpos )
@@ -344,7 +345,7 @@ void namcos2_shared_state::zdrawgfxzoom(
 				if( ex>sx )
 				{ /* skip if inner loop doesn't draw anything */
 					int y;
-					bitmap_ind8 &priority_bitmap = gfx->machine().priority_bitmap;
+					bitmap_ind8 &priority_bitmap = screen.priority();
 					if( priority_bitmap.valid() )
 					{
 						for( y=sy; y<ey; y++ )
@@ -414,6 +415,7 @@ void namcos2_shared_state::zdrawgfxzoom(
 } /* zdrawgfxzoom */
 
 void namcos2_shared_state::zdrawgfxzoom(
+		screen_device &screen,
 		bitmap_rgb32 &dest_bmp,const rectangle &clip,gfx_element *gfx,
 		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
 		int scalex, int scaley, int zpos )
@@ -422,13 +424,13 @@ void namcos2_shared_state::zdrawgfxzoom(
 }
 
 void
-namcos2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri, int control )
+namcos2_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri, int control )
 {
 	int offset = (control & 0x000f) * (128*4);
 	int loop;
 	if( pri==0 )
 	{
-		machine().priority_bitmap.fill(0, cliprect );
+		screen.priority().fill(0, cliprect );
 	}
 	for( loop=0; loop < 128; loop++ )
 	{
@@ -486,6 +488,7 @@ namcos2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int
 						gfx->set_source_clip(0, 32, 0, 32);
 
 					zdrawgfxzoom(
+						screen,
 						bitmap,
 						cliprect,
 						gfx,
@@ -501,7 +504,7 @@ namcos2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int
 	}
 } /* namcos2_draw_sprites */
 
-void namcos2_state::draw_sprites_metalhawk(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri )
+void namcos2_state::draw_sprites_metalhawk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri )
 {
 	/**
 	 * word#0
@@ -538,7 +541,7 @@ void namcos2_state::draw_sprites_metalhawk(bitmap_ind16 &bitmap, const rectangle
 	int loop;
 	if( pri==0 )
 	{
-		machine().priority_bitmap.fill(0, cliprect );
+		screen.priority().fill(0, cliprect );
 	}
 	for( loop=0; loop < 128; loop++ )
 	{
@@ -609,6 +612,7 @@ void namcos2_state::draw_sprites_metalhawk(bitmap_ind16 &bitmap, const rectangle
 				rect.max_y += (tile&2)?16:0;
 			}
 			zdrawgfxzoom(
+				screen,
 				bitmap,
 				rect,
 				machine().gfx[0],
@@ -697,7 +701,7 @@ nth_byte32( const UINT32 *pSource, int which )
  * 0x14000 sprite list (page1)
  */
 template<class _BitmapClass>
-void namcos2_shared_state::c355_obj_draw_sprite(_BitmapClass &bitmap, const rectangle &cliprect, const UINT16 *pSource, int pri, int zpos )
+void namcos2_shared_state::c355_obj_draw_sprite(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, const UINT16 *pSource, int pri, int zpos )
 {
 	UINT16 *spriteram16 = m_c355_obj_ram;
 	unsigned screen_height_remaining, screen_width_remaining;
@@ -848,6 +852,7 @@ void namcos2_shared_state::c355_obj_draw_sprite(_BitmapClass &bitmap, const rect
 			if( (tile&0x8000)==0 )
 			{
 				zdrawgfxzoom(
+					screen,
 					bitmap,
 					clip,
 					machine().gfx[m_c355_obj_gfxbank],
@@ -893,40 +898,40 @@ void namcos2_shared_state::c355_obj_init(int gfxbank, int pal_xor, c355_obj_code
 }
 
 template<class _BitmapClass>
-void namcos2_shared_state::c355_obj_draw_list(_BitmapClass &bitmap, const rectangle &cliprect, int pri, const UINT16 *pSpriteList16, const UINT16 *pSpriteTable)
+void namcos2_shared_state::c355_obj_draw_list(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, int pri, const UINT16 *pSpriteList16, const UINT16 *pSpriteTable)
 {
 	int i;
 	/* draw the sprites */
 	for( i=0; i<256; i++ )
 	{
 		UINT16 which = pSpriteList16[i];
-		c355_obj_draw_sprite(bitmap, cliprect, &pSpriteTable[(which&0xff)*8], pri, i );
+		c355_obj_draw_sprite(screen, bitmap, cliprect, &pSpriteTable[(which&0xff)*8], pri, i );
 		if( which&0x100 ) break;
 	}
 }
 
-void namcos2_shared_state::c355_obj_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri)
+void namcos2_shared_state::c355_obj_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri)
 {
 //  int offs = spriteram16[0x18000/2]; /* end-of-sprite-list */
 	if (pri == 0)
-		machine().priority_bitmap.fill(0, cliprect);
+		screen.priority().fill(0, cliprect);
 
 //  if (offs == 0)  // boot
-		c355_obj_draw_list(bitmap, cliprect, pri, &m_c355_obj_ram[0x02000/2], &m_c355_obj_ram[0x00000/2]);
+		c355_obj_draw_list(screen, bitmap, cliprect, pri, &m_c355_obj_ram[0x02000/2], &m_c355_obj_ram[0x00000/2]);
 //  else
-		c355_obj_draw_list(bitmap, cliprect, pri, &m_c355_obj_ram[0x14000/2], &m_c355_obj_ram[0x10000/2]);
+		c355_obj_draw_list(screen, bitmap, cliprect, pri, &m_c355_obj_ram[0x14000/2], &m_c355_obj_ram[0x10000/2]);
 }
 
-void namcos2_shared_state::c355_obj_draw(bitmap_rgb32 &bitmap, const rectangle &cliprect, int pri)
+void namcos2_shared_state::c355_obj_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int pri)
 {
 //  int offs = spriteram16[0x18000/2]; /* end-of-sprite-list */
 	if (pri == 0)
-		machine().priority_bitmap.fill(0, cliprect);
+		screen.priority().fill(0, cliprect);
 
 //  if (offs == 0)  // boot
-		c355_obj_draw_list(bitmap, cliprect, pri, &m_c355_obj_ram[0x02000/2], &m_c355_obj_ram[0x00000/2]);
+		c355_obj_draw_list(screen, bitmap, cliprect, pri, &m_c355_obj_ram[0x02000/2], &m_c355_obj_ram[0x00000/2]);
 //  else
-		c355_obj_draw_list(bitmap, cliprect, pri, &m_c355_obj_ram[0x14000/2], &m_c355_obj_ram[0x10000/2]);
+		c355_obj_draw_list(screen, bitmap, cliprect, pri, &m_c355_obj_ram[0x14000/2], &m_c355_obj_ram[0x10000/2]);
 }
 
 WRITE16_MEMBER( namcos2_shared_state::c355_obj_ram_w )
@@ -1114,7 +1119,7 @@ void namcos2_shared_state::c169_roz_unpack_params(const UINT16 *source, roz_para
 	params.incyy <<= 8;
 }
 
-void namcos2_shared_state::c169_roz_draw_helper(bitmap_ind16 &bitmap, tilemap_t &tmap, const rectangle &clip, const roz_parameters &params)
+void namcos2_shared_state::c169_roz_draw_helper(screen_device &screen, bitmap_ind16 &bitmap, tilemap_t &tmap, const rectangle &clip, const roz_parameters &params)
 {
 	if (m_gametype != NAMCOFL_SPEED_RACER && m_gametype != NAMCOFL_FINAL_LAP_R)
 	{
@@ -1151,6 +1156,7 @@ void namcos2_shared_state::c169_roz_draw_helper(bitmap_ind16 &bitmap, tilemap_t 
 	{
 		tmap.set_palette_offset(params.color);
 		tmap.draw_roz(
+			screen,
 			bitmap,
 			clip,
 			params.startx, params.starty,
@@ -1160,7 +1166,7 @@ void namcos2_shared_state::c169_roz_draw_helper(bitmap_ind16 &bitmap, tilemap_t 
 	}
 }
 
-void namcos2_shared_state::c169_roz_draw_scanline(bitmap_ind16 &bitmap, int line, int which, int pri, const rectangle &cliprect)
+void namcos2_shared_state::c169_roz_draw_scanline(screen_device &screen, bitmap_ind16 &bitmap, int line, int which, int pri, const rectangle &cliprect)
 {
 	if (line >= cliprect.min_y && line <= cliprect.max_y)
 	{
@@ -1179,13 +1185,13 @@ void namcos2_shared_state::c169_roz_draw_scanline(bitmap_ind16 &bitmap, int line
 			{
 				rectangle clip(0, bitmap.width() - 1, line, line);
 				clip &= cliprect;
-				c169_roz_draw_helper(bitmap, *m_c169_roz_tilemap[which], clip, params);
+				c169_roz_draw_helper(screen, bitmap, *m_c169_roz_tilemap[which], clip, params);
 			}
 		}
 	}
 }
 
-void namcos2_shared_state::c169_roz_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri)
+void namcos2_shared_state::c169_roz_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri)
 {
 	int special = (m_gametype == NAMCOFL_SPEED_RACER || m_gametype == NAMCOFL_FINAL_LAP_R) ? 0 : 1;
 	int mode = m_c169_roz_control[0]; // 0x8000 or 0x1000
@@ -1202,14 +1208,14 @@ void namcos2_shared_state::c169_roz_draw(bitmap_ind16 &bitmap, const rectangle &
 			if (which == special && mode == 0x8000)
 			{
 				for (int line = 0; line < 224; line++)
-					c169_roz_draw_scanline(bitmap, line, which, pri, cliprect);
+					c169_roz_draw_scanline(screen, bitmap, line, which, pri, cliprect);
 			}
 			else
 			{
 				roz_parameters params;
 				c169_roz_unpack_params(source, params);
 				if (params.priority == pri)
-					c169_roz_draw_helper(bitmap, *m_c169_roz_tilemap[which], cliprect, params);
+					c169_roz_draw_helper(screen, bitmap, *m_c169_roz_tilemap[which], cliprect, params);
 			}
 		}
 	}

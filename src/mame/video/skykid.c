@@ -241,7 +241,7 @@ UINT32 skykid_state::screen_update_skykid(screen_device &screen, bitmap_ind16 &b
 		m_bg_tilemap->set_scrolly(0, m_scroll_y + 25);
 	}
 
-	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
 
 	if (m_priority & 0x04)
 	{
@@ -249,18 +249,18 @@ UINT32 skykid_state::screen_update_skykid(screen_device &screen, bitmap_ind16 &b
 		int cat, pri = m_priority >> 4;
 
 		// draw low priority tiles
-		m_tx_tilemap->draw(bitmap, cliprect, pri, 0);
+		m_tx_tilemap->draw(screen, bitmap, cliprect, pri, 0);
 
 		draw_sprites(bitmap, cliprect);
 
 		// draw the other tiles
 		for (cat = 0; cat < 0xf; cat++)
-			if (cat != pri) m_tx_tilemap->draw(bitmap, cliprect, cat, 0);
+			if (cat != pri) m_tx_tilemap->draw(screen, bitmap, cliprect, cat, 0);
 	}
 	else
 	{
 		draw_sprites(bitmap, cliprect);
-		m_tx_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_ALL_CATEGORIES, 0);
+		m_tx_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_ALL_CATEGORIES, 0);
 	}
 
 	return 0;

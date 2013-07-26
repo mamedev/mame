@@ -25,7 +25,7 @@
 
 ********************************************************************************/
 
-void topspeed_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
+void topspeed_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	UINT16 *spriteram = m_spriteram;
 	int offs, map_offset, x, y, curx, cury, sprite_chunk;
@@ -96,7 +96,7 @@ void topspeed_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 					flipx,flipy,
 					curx,cury,
 					zx<<12,zy<<13,
-					machine().priority_bitmap,primasks[priority],0);
+					screen.priority(),primasks[priority],0);
 		}
 
 		if (bad_chunks)
@@ -152,33 +152,33 @@ UINT32 topspeed_state::screen_update_topspeed(screen_device &screen, bitmap_ind1
 	layer[2] = 1;
 	layer[3] = 0;
 
-	machine().priority_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 	bitmap.fill(0, cliprect);
 
 #ifdef MAME_DEBUG
 	if (m_dislayer[3] == 0)
 #endif
-	m_pc080sn_2->tilemap_draw(bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 1);
+	m_pc080sn_2->tilemap_draw(screen, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 1);
 
 #ifdef MAME_DEBUG
 	if (m_dislayer[2] == 0)
 #endif
-	m_pc080sn_2->tilemap_draw_special(bitmap, cliprect, layer[1], 0, 2, m_raster_ctrl);
+	m_pc080sn_2->tilemap_draw_special(screen, bitmap, cliprect, layer[1], 0, 2, m_raster_ctrl);
 
 #ifdef MAME_DEBUG
 	if (m_dislayer[1] == 0)
 #endif
-	m_pc080sn_1->tilemap_draw_special(bitmap, cliprect, layer[2], 0, 4, m_raster_ctrl + 0x100);
+	m_pc080sn_1->tilemap_draw_special(screen, bitmap, cliprect, layer[2], 0, 4, m_raster_ctrl + 0x100);
 
 #ifdef MAME_DEBUG
 	if (m_dislayer[0] == 0)
 #endif
-	m_pc080sn_1->tilemap_draw(bitmap, cliprect, layer[3], 0, 8);
+	m_pc080sn_1->tilemap_draw(screen, bitmap, cliprect, layer[3], 0, 8);
 
 #ifdef MAME_DEBUG
 	if (m_dislayer[4] == 0)
 #endif
 
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(screen,bitmap,cliprect);
 	return 0;
 }
