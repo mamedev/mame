@@ -64,6 +64,8 @@
 
 class device_video_interface : public device_interface
 {
+	static const char s_unconfigured_screen_tag[];
+
 public:
 	// construction/destruction
 	device_video_interface(const machine_config &mconfig, device_t &device, bool screen_required = true);
