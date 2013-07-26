@@ -34,7 +34,7 @@ WindowQt::WindowQt(running_machine* machine, QWidget* parent) :
 	debugActOpenLog->setShortcut(QKeySequence("Ctrl+L"));
 	connect(debugActOpenLog, SIGNAL(triggered()), this, SLOT(debugActOpenLog()));
 
-	QAction* debugActOpenPoints = new QAction("New &Breakpoints Window", this);
+	QAction* debugActOpenPoints = new QAction("New &Break|Watchpoints Window", this);
 	debugActOpenPoints->setShortcut(QKeySequence("Ctrl+B"));
 	connect(debugActOpenPoints, SIGNAL(triggered()), this, SLOT(debugActOpenPoints()));
 

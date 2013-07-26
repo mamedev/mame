@@ -19,6 +19,10 @@ public:
 	virtual ~BreakpointsWindow();
 
 
+private slots:
+	void typeChanged(QAction* changedTo);
+
+
 private:
 	// Widgets
 	DebuggerView* m_breakpointsView;
@@ -32,11 +36,15 @@ class BreakpointsWindowQtConfig : public WindowQtConfig
 {
 public:
 	BreakpointsWindowQtConfig() :
-		WindowQtConfig(WIN_TYPE_BREAK_POINTS)
+		WindowQtConfig(WIN_TYPE_BREAK_POINTS),
+		m_bwType(0)
 	{
 	}
 
 	~BreakpointsWindowQtConfig() {}
+
+	// Settings
+	int m_bwType;
 
 	void buildFromQWidget(QWidget* widget);
 	void applyToQWidget(QWidget* widget);
