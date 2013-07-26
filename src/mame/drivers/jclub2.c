@@ -692,7 +692,7 @@ static MACHINE_CONFIG_START( darkhors, darkhors_state )
 	MCFG_CPU_PROGRAM_MAP(darkhors_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", darkhors_state, darkhors_irq, "screen", 0, 1)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_interface_93C46_8bit)
+	MCFG_EEPROM_93C46_8BIT_ADD("eeprom")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -733,7 +733,7 @@ static MACHINE_CONFIG_START( jclub2, darkhors_state )
 	MCFG_CPU_PROGRAM_MAP(jclub2_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", darkhors_state, darkhors_irq, "screen", 0, 1)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_interface_93C46_8bit)
+	MCFG_EEPROM_93C46_8BIT_ADD("eeprom")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -799,7 +799,7 @@ static MACHINE_CONFIG_START( jclub2o, darkhors_state )
 	MCFG_CPU_IO_MAP(st0016_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", darkhors_state,  irq0_line_hold)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_interface_93C46_8bit)
+	MCFG_EEPROM_93C46_8BIT_ADD("eeprom")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
