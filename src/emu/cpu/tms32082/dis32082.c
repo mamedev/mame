@@ -2,6 +2,9 @@
 
 #include "emu.h"
 
+
+// Master Processor
+
 #define SIMM15(v) (INT32)((v & 0x4000) ? (v | 0xffffe000) : (v))
 #define UIMM15(v) (v)
 
@@ -39,6 +42,11 @@ static const char *FLOATOP_PRECISION[4] =
 static const char *ACC_SEL[4] =
 {
 	"A0", "A1", "A2", "A3"
+};
+
+static const char *FLOATOP_ROUND[4] =
+{
+	"n", "z", "p", "m"
 };
 
 static char *output;
@@ -171,9 +179,9 @@ static char* format_vector_op(UINT32 op, UINT32 imm32)
 
 	// align the line end
 	int len = strlen(buffer);
-	if (len < 29)
+	if (len < 30)
 	{
-		for (int i=0; i < (29-len); i++)
+		for (int i=0; i < (30-len); i++)
 		{
 			b += sprintf(b, " ");
 		}
@@ -312,6 +320,8 @@ static offs_t tms32082_disasm_mp(char *buffer, offs_t pc, const UINT8 *oprom)
 			int p1 = (op >> 5) & 3;
 			int p2 = (op >> 7) & 3;
 			int pd = (op >> 9) & 3;
+
+			int rndmode = (op >> 7) & 3;
 
 
 			switch (subop)
@@ -474,8 +484,8 @@ static offs_t tms32082_disasm_mp(char *buffer, offs_t pc, const UINT8 *oprom)
 				case 0xe5:	print("fmpy.%s%s%s    0x%08X, R%d, R%d", FLOATOP_PRECISION[p1], FLOATOP_PRECISION[p2], FLOATOP_PRECISION[pd], imm32, rs, rd); break;
 				case 0xe6:	print("fdiv.%s%s%s    R%d, R%d, R%d", FLOATOP_PRECISION[p1], FLOATOP_PRECISION[p2], FLOATOP_PRECISION[pd], src1, rs, rd); break;
 				case 0xe7:	print("fdiv.%s%s%s    0x%08X, R%d, R%d", FLOATOP_PRECISION[p1], FLOATOP_PRECISION[p2], FLOATOP_PRECISION[pd], imm32, rs, rd); break;
-				case 0xe8:	print("frndx       R%d, R%d", src1, rd); break;
-				case 0xe9:	print("frndx       0x%08X, R%d", imm32, rd); break;
+				case 0xe8:	print("frnd%s.%s%s    R%d, R%d", FLOATOP_ROUND[rndmode], FLOATOP_PRECISION[p1], FLOATOP_PRECISION[pd], src1, rd); break;
+				case 0xe9:	print("frnd%s.%s%s    0x%08X, R%d", FLOATOP_ROUND[rndmode], FLOATOP_PRECISION[p1], FLOATOP_PRECISION[pd], imm32, rd); break;
 				case 0xea:	print("fcmp        R%d, R%d, R%d", src1, rs, rd); break;
 				case 0xeb:	print("fcmp        0x%08X, R%d, R%d", imm32, rs, rd); break;
 				case 0xee:	print("fsqrt       R%d, R%d", src1, rd); break;
@@ -500,4 +510,24 @@ static offs_t tms32082_disasm_mp(char *buffer, offs_t pc, const UINT8 *oprom)
 CPU_DISASSEMBLE(tms32082_mp)
 {
 	return tms32082_disasm_mp(buffer, pc, oprom);
+}
+
+
+
+// Parallel Processor
+
+static offs_t tms32082_disasm_pp(char *buffer, offs_t pc, const UINT8 *oprom)
+{
+	output = buffer;
+	UINT32 flags = 0;
+
+	print("???");
+
+	return opbytes | flags | DASMFLAG_SUPPORTED;
+}
+
+
+CPU_DISASSEMBLE(tms32082_pp)
+{
+	return tms32082_disasm_pp(buffer, pc, oprom);
 }

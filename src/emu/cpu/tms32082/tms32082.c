@@ -10,15 +10,20 @@
 #include "tms32082.h"
 
 extern CPU_DISASSEMBLE(tms32082_mp);
+extern CPU_DISASSEMBLE(tms32082_pp);
 
 const device_type TMS32082_MP = &device_creator<tms32082_mp_device>;
+const device_type TMS32082_PP = &device_creator<tms32082_pp_device>;
+
+
+
+
+// Master Processor
 
 // internal memory map
-static ADDRESS_MAP_START(internal_map, AS_PROGRAM, 32, tms32082_mp_device)
+static ADDRESS_MAP_START(mp_internal_map, AS_PROGRAM, 32, tms32082_mp_device)
 	AM_RANGE(0x01010000, 0x010107ff) AM_READWRITE(mp_param_r, mp_param_w)
 ADDRESS_MAP_END
-
-
 
 const UINT32 tms32082_mp_device::SHIFT_MASK[] =
 {
@@ -31,10 +36,9 @@ const UINT32 tms32082_mp_device::SHIFT_MASK[] =
 
 
 
-
 tms32082_mp_device::tms32082_mp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, TMS32082_MP, "TMS32082 MP", tag, owner, clock, "tms32082_mp", __FILE__)
-	, m_program_config("program", ENDIANNESS_BIG, 32, 32, 0, ADDRESS_MAP_NAME(internal_map))
+	, m_program_config("program", ENDIANNESS_BIG, 32, 32, 0, ADDRESS_MAP_NAME(mp_internal_map))
 {
 }
 
@@ -286,6 +290,71 @@ void tms32082_mp_device::execute_run()
 
 		m_icount--;
 	};
+
+	return;
+}
+
+
+
+
+// Parallel Processor
+
+// internal memory map
+static ADDRESS_MAP_START(pp_internal_map, AS_PROGRAM, 32, tms32082_mp_device)
+ADDRESS_MAP_END
+
+tms32082_pp_device::tms32082_pp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: cpu_device(mconfig, TMS32082_PP, "TMS32082 PP", tag, owner, clock, "tms32082_pp", __FILE__)
+	, m_program_config("program", ENDIANNESS_BIG, 32, 32, 0, ADDRESS_MAP_NAME(pp_internal_map))
+{
+}
+
+
+offs_t tms32082_pp_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+{
+	return CPU_DISASSEMBLE_NAME(tms32082_pp)(this, buffer, pc, oprom, opram, options);
+}
+
+void tms32082_pp_device::device_start()
+{
+	m_program = &space(AS_PROGRAM);
+
+	save_item(NAME(m_pc));
+	save_item(NAME(m_fetchpc));
+
+	// Register state for debugger
+	state_add(PP_PC, "pc", m_pc).formatstr("%08X");
+
+	state_add(STATE_GENPC, "curpc", m_pc).noshow();
+
+	m_program = &space(AS_PROGRAM);
+	m_direct = &m_program->direct();
+
+	m_icountptr = &m_icount;
+}
+
+void tms32082_pp_device::state_string_export(const device_state_entry &entry, astring &string)
+{
+	switch (entry.index())
+	{
+		case STATE_GENFLAGS:
+			string.printf("?");
+			break;
+	}
+}
+
+void tms32082_pp_device::device_reset()
+{
+	m_pc = 0;
+	m_fetchpc = 0;
+}
+
+void tms32082_pp_device::execute_run()
+{
+	m_pc = m_fetchpc;
+	debugger_instruction_hook(this, m_pc);
+
+	m_icount = 0;
 
 	return;
 }

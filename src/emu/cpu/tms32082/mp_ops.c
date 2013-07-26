@@ -786,6 +786,37 @@ void tms32082_mp_device::execute_reg_long_imm()
 			break;
 		}
 
+		case 0x1c:			// shift.iz
+		{
+			int r = (m_ir & (1 << 10));
+			int inv = (m_ir & (1 << 11));
+			int rot = m_reg[OP_ROTATE()];
+			int end = OP_ENDMASK();
+			UINT32 source = m_reg[OP_RS()];
+			int rd = OP_RD();
+
+			UINT32 endmask = end ? SHIFT_MASK[end ? end : 32] : m_reg[OP_ROTATE()+1];
+			if (inv) endmask = ~endmask;
+
+			int shift = r ? 32-rot : rot;
+			UINT32 shiftmask = SHIFT_MASK[shift ? shift : 32];
+			UINT32 compmask = endmask & ~shiftmask;
+
+			UINT32 res = 0;
+			if (r)      // right
+			{
+				res = ROTATE_R(source, rot) & compmask;
+			}
+			else        // left
+			{
+				res = ROTATE_L(source, rot) & compmask;
+			}
+
+			if (rd)
+				m_reg[rd] = res;
+			break;
+		}
+
 		case 0x22:
 		case 0x23:			// and
 		{
@@ -892,6 +923,27 @@ void tms32082_mp_device::execute_reg_long_imm()
 
 			if (rd)
 				m_reg[rd] = r;
+
+			if (m && base)
+				m_reg[base] = address;
+			break;
+		}
+
+		case 0x4e:
+		case 0x4f:
+		case 0x46:
+		case 0x47:			// ld.d
+		{
+			int shift = (m_ir & (1 << 11)) ? 3 : 0;
+			int m = m_ir & (1 << 15);
+			int base = OP_BASE();
+			int rd = OP_RD();
+
+			UINT32 address = m_reg[base] + ((has_imm ? imm32 : m_reg[OP_SRC1()]) << shift);
+			UINT64 r = m_program->read_qword(address);
+
+			if (rd)
+				m_fpair[rd >> 1] = r;
 
 			if (m && base)
 				m_reg[base] = address;
@@ -1086,6 +1138,57 @@ void tms32082_mp_device::execute_reg_long_imm()
 			break;
 		}
 
+		case 0xc8:
+		case 0xd8:
+		case 0xc9:
+		case 0xd9:			// vrnd
+		{
+			int acc = OP_ACC();
+			int p1 = m_ir & (1 << 5);
+			int pd = (m_ir >> 7) & 3;
+			int ls_bit1 = m_ir & (1 << 10);
+			int ls_bit2 = m_ir & (1 << 6);
+			int rd = OP_RS();
+			int rs1 = OP_SRC1();
+
+			double source = has_imm ? (double)u2f(imm32) : (p1 ? u2d(m_fpair[rs1 >> 1]) : (double)u2f(m_reg[rs1]));
+
+			if (rd)
+			{
+				// destination register
+				switch (pd)
+				{
+					case 0:
+						m_reg[rd] = f2u((float)source);
+						break;
+					case 1:	
+						m_fpair[rd >> 1] = d2u(source);
+						break;
+					case 2:
+						m_reg[rd] = (INT32)(source);
+						break;
+					case 3:
+						m_reg[rd] = (UINT32)(source);
+						break;
+				}
+			}
+			else
+			{
+				// destination accumulator
+				if (pd != 3)
+					fatalerror("vrnd pd = %d\n", pd);
+
+				m_facc[acc] = source;
+			}
+
+			// parallel load/store op
+			if (!(ls_bit1 == 0 && ls_bit2 == 0))
+			{
+				vector_loadstore();
+			}
+			break;
+		}
+
 		case 0xcc:
 		case 0xdc:
 		case 0xcd:
@@ -1167,6 +1270,64 @@ void tms32082_mp_device::execute_reg_long_imm()
 				{
 					// write to accumulator
 					m_facc[acc] = (double)res;
+				}
+			}
+			break;
+		}
+
+		case 0xe0:
+		case 0xe1:			// fadd
+		{
+			int rd = OP_RD();
+			int rs = OP_RS();
+			int src1 = OP_SRC1();
+			int precision = (m_ir >> 5) & 0x3f;
+
+			if (rd)		// only calculate if destination register is valid
+			{
+				switch (precision)
+				{
+					case 0x00:			// SP - SP -> SP
+					{
+						float s1 = u2f(has_imm ? imm32 : m_reg[src1]);
+						float s2 = u2f(m_reg[rs]);
+						m_reg[rd] = f2u(s1 + s2);
+						break;
+					}
+					case 0x10:			// SP - SP -> DP
+					{
+						float s1 = u2f(has_imm ? imm32 : m_reg[src1]);
+						float s2 = u2f(m_reg[rs]);
+						UINT64 res = d2u((double)(s1 + s2));
+						m_fpair[rd >> 1] = res;
+						break;
+					}
+					case 0x14:			// SP - DP -> DP
+					{
+						float s1 = u2f(has_imm ? imm32 : m_reg[src1]);
+						double s2 = u2d(m_fpair[rs >> 1]);
+						UINT64 res = d2u((double)(s1 + s2));
+						m_fpair[rd >> 1] = res;
+						break;
+					}
+					case 0x11:			// DP - SP -> DP
+					{
+						double s1 = u2d(m_fpair[src1 >> 1]);
+						float s2 = u2f(m_reg[rs]);
+						UINT64 res = d2u((double)(s1 + s2));
+						m_fpair[rd >> 1] = res;
+						break;
+					}
+					case 0x15:			// DP - DP -> DP
+					{
+						double s1 = u2d(m_fpair[src1 >> 1]);
+						double s2 = u2d(m_fpair[rs >> 1]);
+						UINT64 res = d2u((double)(s1 + s2));
+						m_fpair[rd >> 1] = res;
+						break;
+					}
+					default:
+						fatalerror("fadd: invalid precision combination %02X\n", precision);
 				}
 			}
 			break;
@@ -1294,6 +1455,114 @@ void tms32082_mp_device::execute_reg_long_imm()
 					default:
 						fatalerror("fmpy: invalid precision combination %02X\n", precision);
 				}
+			}
+			break;
+		}
+
+		case 0xe6:
+		case 0xe7:			// fdiv
+		{
+			int rd = OP_RD();
+			int p1 = m_ir & (1 << 5);
+			int p2 = m_ir & (1 << 7);
+			int pd = m_ir & (1 << 9);
+			int rs1 = OP_SRC1();
+			int rs2 = OP_RS();
+
+			if (rd)
+			{
+				double src1 = has_imm ? (double)u2f(imm32) : (p1 ? u2d(m_fpair[rs1 >> 1]) : (double)u2f(m_reg[rs1]));
+				double src2 = p2 ? u2d(m_fpair[rs2 >> 1]) : (double)u2f(m_reg[rs2]);
+
+				double res = src1 / src2;
+
+				if (pd)
+					m_fpair[rd >> 1] = d2u(res);
+				else
+					m_reg[rd] = f2u((float)res);
+			}
+			break;
+		}
+
+		case 0xe8:
+		case 0xe9:			// frnd
+		{
+			//int mode = (m_ir >> 7) & 3;
+			int p1 = (m_ir >> 5) & 3;
+			int pd = (m_ir >> 9) & 3;
+			int src1 = OP_SRC1();
+			int rd = OP_RD();
+
+			double s = 0.0;
+
+			switch (p1)
+			{
+				case 0:
+					s = has_imm ? (double)(u2f(imm32)) : (double)u2f(m_reg[src1]);
+					break;
+				case 1:
+					s = u2d(m_fpair[src1 >> 1]);
+					break;
+				case 2:
+					s = has_imm ? (double)((INT32)(imm32)) : (double)(INT32)(m_reg[src1]);
+					break;
+				case 3:
+					s = has_imm ? (double)((UINT32)(imm32)) : (double)(UINT32)(m_reg[src1]);
+					break;
+			}
+
+			// TODO: round
+
+			if (rd)
+			{
+				switch (pd)
+				{
+					case 0:
+						m_reg[rd] = f2u((float)(s));
+						break;
+					case 1:
+						m_fpair[rd] = d2u(s);
+						break;
+					case 2:
+						m_reg[rd] = (INT32)(s);
+						break;
+					case 3:
+						m_reg[rd] = (UINT32)(s);
+						break;
+				}
+			}
+			break;
+		}
+		
+		case 0xea:
+		case 0xeb:			// fcmp
+		{
+			int rd = OP_RD();
+			int p1 = m_ir & (1 << 5);
+			int p2 = m_ir & (1 << 7);
+			int rs1 = OP_SRC1();
+			int rs2 = OP_RS();
+
+			double src1 = has_imm ? (double)(u2f(imm32)) : (p1 ? u2d(m_fpair[rs1 >> 1]) : (double)u2f(m_reg[rs1]));
+			double src2 = p2 ? u2d(m_fpair[rs2 >> 1]) : (double)u2f(m_reg[rs2]);
+
+			if (rd)
+			{
+				UINT32 flags = 0;
+				flags |= (src1 == src2) ? (1 << 20) : 0;
+				flags |= (src1 != src2) ? (1 << 21) : 0;
+				flags |= (src1 >  src2) ? (1 << 22) : 0;
+				flags |= (src1 <= src2) ? (1 << 23) : 0;
+				flags |= (src1 <  src2) ? (1 << 24) : 0;
+				flags |= (src1 >= src2) ? (1 << 25) : 0;
+				flags |= (src1 < 0 || src1 > src2) ? (1 << 26) : 0;
+				flags |= (src1 > 0 && src1 < src2) ? (1 << 27) : 0;
+				flags |= (src1 >= 0 && src1 <= src2) ? (1 << 28) : 0;
+				flags |= (src1 <= 0 || src1 >= src2) ? (1 << 29) : 0;
+				// TODO: src1 or src2 unordered
+				// TODO: src1 and src2 ordered
+
+				m_reg[rd] = flags;
 			}
 			break;
 		}

@@ -3,6 +3,7 @@
 #ifndef __TMS32082_H__
 #define __TMS32082_H__
 
+// Master Processor class
 class tms32082_mp_device : public cpu_device
 {
 public:
@@ -128,7 +129,62 @@ protected:
 	void vector_loadstore();
 };
 
+
+// Parallel Processor class
+class tms32082_pp_device : public cpu_device
+{
+public:
+	// construction/destruction
+	tms32082_pp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	enum
+	{
+		PP_PC = 1,
+	};
+
+protected:
+	// device level overrides
+	virtual void device_start();
+	virtual void device_reset();
+
+	// device_execute_interface overrides
+	virtual UINT32 execute_min_cycles() const { return 1; }
+	virtual UINT32 execute_max_cycles() const { return 1; }
+	virtual UINT32 execute_input_lines() const { return 0; }
+	virtual void execute_run();
+
+	// device_memory_interface overrides
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const
+	{
+		switch (spacenum)
+		{
+			case AS_PROGRAM: return &m_program_config;
+			default:         return NULL;
+		}
+	}
+
+	// device_state_interface overrides
+	void state_string_export(const device_state_entry &entry, astring &string);
+
+	// device_disasm_interface overrides
+	virtual UINT32 disasm_min_opcode_bytes() const { return 8; }
+	virtual UINT32 disasm_max_opcode_bytes() const { return 8; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+
+	address_space_config m_program_config;
+
+	UINT32 m_pc;
+	UINT32 m_fetchpc;
+
+	int m_icount;
+
+	address_space *m_program;
+	direct_read_data* m_direct;
+};
+
+
 extern const device_type TMS32082_MP;
+extern const device_type TMS32082_PP;
 
 
 #endif /* __TMS32082_H__ */
