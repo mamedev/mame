@@ -6361,6 +6361,7 @@ src/mess/drivers/next.c svneol=native#text/plain
 src/mess/drivers/ng_aes.c svneol=native#text/plain
 src/mess/drivers/ngp.c svneol=native#text/plain
 src/mess/drivers/ob68k1a.c svneol=native#text/plain
+src/mess/drivers/octopus.c svneol=native#text/plain
 src/mess/drivers/odyssey2.c svneol=native#text/plain
 src/mess/drivers/okean240.c svneol=native#text/plain
 src/mess/drivers/ondra.c svneol=native#text/plain
