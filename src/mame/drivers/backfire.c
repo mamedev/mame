@@ -60,7 +60,7 @@ public:
 	required_device<deco16ic_device> m_deco_tilegen1;
 	required_device<deco16ic_device> m_deco_tilegen2;
 
-	required_device<eeprom_device> m_eeprom;
+	required_device<serial_eeprom_device> m_eeprom;
 
 	/* memory */
 	UINT16    m_pf1_rowscroll[0x0800/2];

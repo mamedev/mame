@@ -223,7 +223,7 @@ static INPUT_PORTS_START( superchs )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit) /* reserved for EEROM */
+	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit) /* reserved for EEROM */
 	PORT_BIT( 0x00000100, IP_ACTIVE_LOW,  IPT_SERVICE2 ) PORT_NAME("Seat Center")   /* seat center (cockpit only) */
 	PORT_BIT( 0x00000200, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x00000400, IP_ACTIVE_LOW,  IPT_UNKNOWN )
@@ -303,7 +303,7 @@ GFXDECODE_END
                  MACHINE DRIVERS
 ***********************************************************/
 
-static const eeprom_interface superchs_eeprom_interface =
+static const serial_eeprom_interface superchs_eeprom_interface =
 {
 	6,              /* address bits */
 	16,             /* data bits */
@@ -337,7 +337,7 @@ static MACHINE_CONFIG_START( superchs, superchs_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(480)) /* Need to interleave CPU 1 & 3 */
 
-	MCFG_EEPROM_ADD("eeprom", superchs_eeprom_interface)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", superchs_eeprom_interface)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

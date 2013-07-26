@@ -114,7 +114,7 @@ void groundfx_state::device_timer(emu_timer &timer, device_timer_id id, int para
                 EPROM
 **********************************************************/
 
-static const eeprom_interface groundfx_eeprom_interface =
+static const serial_eeprom_interface groundfx_eeprom_interface =
 {
 	6,              /* address bits */
 	16,             /* data bits */
@@ -251,7 +251,7 @@ static INPUT_PORTS_START( groundfx )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
+	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
 	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_BUTTON3 )      /* shift hi */
 	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_BUTTON1 )      /* brake */
 	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -263,9 +263,9 @@ static INPUT_PORTS_START( groundfx )
 	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_cs_line)
-	PORT_BIT( 0x00000020, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_clock_line)
-	PORT_BIT( 0x00000040, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, write_bit)
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, set_cs_line)
+	PORT_BIT( 0x00000020, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, set_clock_line)
+	PORT_BIT( 0x00000040, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, write_bit)
 
 	PORT_START("SYSTEM")
 	PORT_SERVICE_NO_TOGGLE( 0x00000001, IP_ACTIVE_LOW )
@@ -372,7 +372,7 @@ static MACHINE_CONFIG_START( groundfx, groundfx_state )
 	MCFG_CPU_PROGRAM_MAP(groundfx_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", groundfx_state,  groundfx_interrupt)
 
-	MCFG_EEPROM_ADD("eeprom", groundfx_eeprom_interface)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", groundfx_eeprom_interface)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

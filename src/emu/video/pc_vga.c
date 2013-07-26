@@ -2105,7 +2105,7 @@ WRITE8_MEMBER(vga_device::mem_linear_w)
 }
 
 
-static struct eeprom_interface ati_eeprom_interface =
+static struct serial_eeprom_interface ati_eeprom_interface =
 {
 	6,      /* address bits */
 	16,     /* data bits */
@@ -2164,7 +2164,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( ati_vga )
 	MCFG_MACH8_ADD_OWNER("8514a")
-	MCFG_EEPROM_ADD("ati_eeprom",ati_eeprom_interface)
+	MCFG_SERIAL_EEPROM_ADD("ati_eeprom",ati_eeprom_interface)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( s3_764 )
@@ -5255,7 +5255,7 @@ READ8_MEMBER(ati_vga_device::ati_port_ext_r)
 			break;
 		case 0x37:
 			{
-				eeprom_device* eep = subdevice<eeprom_device>("ati_eeprom");
+				serial_eeprom_device* eep = subdevice<serial_eeprom_device>("ati_eeprom");
 				ret = 0x00;
 				ret |= eep->read_bit() << 3;
 			}
@@ -5315,7 +5315,7 @@ WRITE8_MEMBER(ati_vga_device::ati_port_ext_w)
 
 			if(data & 0x04)
 			{
-				eeprom_device* eep = subdevice<eeprom_device>("ati_eeprom");
+				serial_eeprom_device* eep = subdevice<serial_eeprom_device>("ati_eeprom");
 				if(eep != NULL)
 				{
 					eep->write_bit((data & 0x01) ? ASSERT_LINE : CLEAR_LINE);

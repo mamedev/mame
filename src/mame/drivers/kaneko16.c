@@ -768,8 +768,8 @@ static INPUT_PORTS_START( bakubrkr )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_clock_line)
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, write_bit)
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, set_clock_line)
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, write_bit)
 INPUT_PORTS_END
 
 
@@ -1343,8 +1343,8 @@ static INPUT_PORTS_START( mgcrystl )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_clock_line)
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, write_bit)
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, set_clock_line)
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, write_bit)
 INPUT_PORTS_END
 
 
@@ -1419,8 +1419,8 @@ static INPUT_PORTS_START( shogwarr )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_clock_line)
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, write_bit)
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, set_clock_line)
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, write_bit)
 INPUT_PORTS_END
 
 
@@ -1495,8 +1495,8 @@ Difficulty    Lives      Bonus Players    Play Level
 ******************************************************/
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_clock_line)
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, write_bit)
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, set_clock_line)
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, write_bit)
 INPUT_PORTS_END
 
 
@@ -1603,7 +1603,7 @@ static const ay8910_interface ay8910_intf_eeprom =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_DEVICE_LINE_MEMBER("eeprom", eeprom_device, read_bit),    /* inputs  A:  0,EEPROM bit read */
+	DEVCB_DEVICE_LINE_MEMBER("eeprom", serial_eeprom_device, read_bit),    /* inputs  A:  0,EEPROM bit read */
 	DEVCB_NULL,                     /* inputs  B */
 	DEVCB_NULL,                     /* outputs A */
 	DEVCB_DRIVER_MEMBER(kaneko16_state,kaneko16_eeprom_reset_w) /* outputs B:  0,EEPROM reset */
@@ -2054,7 +2054,7 @@ static MACHINE_CONFIG_START( shogwarr, kaneko16_shogwarr_state )
 	MCFG_MACHINE_RESET_OVERRIDE(kaneko16_shogwarr_state,mgcrystl)
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
-	MCFG_EEPROM_DATA(shogwarr_default_eeprom, 128)
+	MCFG_SERIAL_EEPROM_DATA(shogwarr_default_eeprom, 128)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2124,7 +2124,7 @@ static MACHINE_CONFIG_DERIVED( brapboys, shogwarr )
 
 	MCFG_DEVICE_REMOVE("eeprom")
 	MCFG_EEPROM_93C46_ADD("eeprom")
-	MCFG_EEPROM_DATA(brapboys_default_eeprom, 128)
+	MCFG_SERIAL_EEPROM_DATA(brapboys_default_eeprom, 128)
 MACHINE_CONFIG_END
 
 /***************************************************************************

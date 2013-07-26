@@ -1321,7 +1321,7 @@ static INPUT_PORTS_START( system32_generic )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE3 )   /* sometimes mirrors SERVICE1 */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE4 )   /* tends to also work as a test switch */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
 
 	PORT_START("PORTG_A")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1356,7 +1356,7 @@ static INPUT_PORTS_START( multi32_generic )
 
 	PORT_START("SERVICE34_B")
 	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
 
 	PORT_START("PORTG_B")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )

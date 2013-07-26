@@ -73,7 +73,7 @@ public:
 	TIMER_CALLBACK_MEMBER(ip20_timer_rtc);
 	required_device<wd33c93_device> m_wd33c93;
 	required_device<scc8530_t> m_scc;
-	required_device<eeprom_device> m_eeprom;
+	required_device<serial_eeprom_device> m_eeprom;
 	inline void ATTR_PRINTF(3,4) verboselog(int n_level, const char *s_fmt, ... );
 	required_device<cpu_device> m_maincpu;
 
@@ -106,7 +106,7 @@ UINT32 ip20_state::screen_update_ip204415(screen_device &screen, bitmap_ind16 &b
 	return 0;
 }
 
-static const eeprom_interface eeprom_interface_93C56 =
+static const serial_eeprom_interface eeprom_interface_93C56 =
 {
 	7,                  // address bits 7
 	16,                 // data bits    16
@@ -627,7 +627,7 @@ static MACHINE_CONFIG_START( ip204415, ip20_state )
 	MCFG_SOUND_MODIFY( "scsi:cdrom:cdda" )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "^^^mono", 1.0)
 
-	MCFG_EEPROM_ADD("eeprom", eeprom_interface_93C56)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_interface_93C56)
 MACHINE_CONFIG_END
 
 ROM_START( ip204415 )

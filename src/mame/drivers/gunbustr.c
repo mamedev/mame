@@ -185,7 +185,7 @@ static INPUT_PORTS_START( gunbustr )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
+	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
 	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -284,7 +284,7 @@ GFXDECODE_END
                  MACHINE DRIVERS
 ***********************************************************/
 
-static const eeprom_interface gunbustr_eeprom_interface =
+static const serial_eeprom_interface gunbustr_eeprom_interface =
 {
 	6,              /* address bits */
 	16,             /* data bits */
@@ -312,7 +312,7 @@ static MACHINE_CONFIG_START( gunbustr, gunbustr_state )
 	MCFG_CPU_PROGRAM_MAP(gunbustr_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gunbustr_state,  gunbustr_interrupt) /* VBL */
 
-	MCFG_EEPROM_ADD("eeprom", gunbustr_eeprom_interface)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", gunbustr_eeprom_interface)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -72,7 +72,7 @@
 
 enum { BANK_GROUP_A, BANK_GROUP_B, INVALID_BANK_GROUP };
 
-static const eeprom_interface eeprom_intf =
+static const serial_eeprom_interface eeprom_intf =
 {
 	9,               // address bits
 	8,               // data bits
@@ -671,7 +671,7 @@ static MACHINE_CONFIG_START( plygonet, polygonet_state )
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu") /* TODO: TEMPORARY!  UNTIL A MORE LOCALIZED SYNC CAN BE MADE */
 
-	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_intf)
 
 	MCFG_GFXDECODE(plygonet)
 
@@ -726,7 +726,7 @@ static INPUT_PORTS_START( polygonet )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED ) // Start 2, unused

@@ -105,7 +105,7 @@ static KONAMI_SETLINES_CALLBACK( vendetta_banking );
 
 ***************************************************************************/
 
-static const eeprom_interface eeprom_intf =
+static const serial_eeprom_interface eeprom_intf =
 {
 	7,              /* address bits */
 	8,              /* data bits */
@@ -320,16 +320,16 @@ static INPUT_PORTS_START( vendet4p )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("EEPROM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* EEPROM ready */
 	PORT_SERVICE_NO_TOGGLE(0x04, IP_ACTIVE_LOW)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen") /* not really vblank, object related. Its timed, otherwise sprites flicker */
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_cs_line)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_clock_line)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, write_bit)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, set_cs_line)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, set_clock_line)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, write_bit)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vendetta )
@@ -376,16 +376,16 @@ static INPUT_PORTS_START( esckids )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("EEPROM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* EEPROM ready */
 	PORT_SERVICE_NO_TOGGLE(0x04, IP_ACTIVE_LOW)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen") /* not really vblank, object related. Its timed, otherwise sprites flicker */
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_cs_line)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_clock_line)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, write_bit)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, set_cs_line)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, set_clock_line)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, write_bit)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( esckidsj )
@@ -499,7 +499,7 @@ static MACHINE_CONFIG_START( vendetta, vendetta_state )
 							/* interrupts are triggered by the main CPU */
 
 
-	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_intf)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)

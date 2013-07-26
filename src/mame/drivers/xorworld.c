@@ -104,7 +104,7 @@ static INPUT_PORTS_START( xorworld )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)   /* used for accessing the NVRAM */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)   /* used for accessing the NVRAM */
 	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x60, DEF_STR( Normal ) )

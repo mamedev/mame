@@ -507,7 +507,7 @@ static INPUT_PORTS_START( zeropnt2 )
 	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit) // EEPROM
+	PORT_BIT( 0x80000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit) // EEPROM
 
 	PORT_START("Y0")    /* $800140.b */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(35) PORT_KEYDELTA(15) PORT_PLAYER(2)
@@ -567,7 +567,7 @@ MACHINE_RESET_MEMBER(unico_state,unico)
 }
 
 
-static const eeprom_interface zeropnt2_eeprom_interface =
+static const serial_eeprom_interface zeropnt2_eeprom_interface =
 {
 	7,              // address bits 7
 	8,              // data bits    8
@@ -679,7 +679,7 @@ static MACHINE_CONFIG_START( zeropnt2, unico_state )
 
 	MCFG_MACHINE_RESET_OVERRIDE(unico_state,zeropt)
 
-	MCFG_EEPROM_ADD("eeprom", zeropnt2_eeprom_interface)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", zeropnt2_eeprom_interface)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

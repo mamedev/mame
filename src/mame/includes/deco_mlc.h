@@ -64,7 +64,7 @@ public:
 	void draw_sprites( const rectangle &cliprect, int scanline, UINT32* dest);
 	void descramble_sound(  );
 	required_device<cpu_device> m_maincpu;
-	required_device<eeprom_device> m_eeprom;
+	required_device<serial_eeprom_device> m_eeprom;
 
 	DECLARE_READ16_MEMBER( sh96_protection_region_0_146_r );
 	DECLARE_WRITE16_MEMBER( sh96_protection_region_0_146_w );

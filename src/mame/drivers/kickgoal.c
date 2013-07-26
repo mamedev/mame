@@ -650,7 +650,7 @@ static MACHINE_CONFIG_START( kickgoal, kickgoal_state )
 
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
-	MCFG_EEPROM_DATA(kickgoal_default_eeprom_type1, 128)
+	MCFG_SERIAL_EEPROM_DATA(kickgoal_default_eeprom_type1, 128)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -685,7 +685,7 @@ static MACHINE_CONFIG_START( actionhw, kickgoal_state )
 
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
-	MCFG_EEPROM_DATA(kickgoal_default_eeprom_type1, 128)
+	MCFG_SERIAL_EEPROM_DATA(kickgoal_default_eeprom_type1, 128)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

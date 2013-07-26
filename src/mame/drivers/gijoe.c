@@ -45,7 +45,7 @@ Known Issues
 #define JOE_DMADELAY (attotime::from_nsec(42700 + 341300))
 
 
-static const eeprom_interface eeprom_intf =
+static const serial_eeprom_interface eeprom_intf =
 {
 	7,              /* address bits */
 	8,              /* data bits */
@@ -200,14 +200,14 @@ static INPUT_PORTS_START( gijoe )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW,  IPT_START2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_START3 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW,  IPT_START4 )
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW,  IPT_SPECIAL ) // EEPROM ready (always 1)
 	PORT_SERVICE_NO_TOGGLE( 0x0800, IP_ACTIVE_LOW )
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, write_bit)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_cs_line)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_clock_line)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, write_bit)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, set_cs_line)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, set_clock_line)
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_COIN1 )
@@ -286,7 +286,7 @@ static MACHINE_CONFIG_START( gijoe, gijoe_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 
-	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_intf)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_UPDATE_BEFORE_VBLANK)

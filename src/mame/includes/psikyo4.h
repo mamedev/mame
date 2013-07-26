@@ -37,7 +37,7 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
-	required_device<eeprom_device> m_eeprom;
+	required_device<serial_eeprom_device> m_eeprom;
 
 	DECLARE_WRITE32_MEMBER(ps4_paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w);
 	DECLARE_WRITE32_MEMBER(ps4_bgpen_1_dword_w);

@@ -33,7 +33,7 @@ public:
 	/* devices */
 	required_device<cpu_device> m_audiocpu;
 	optional_device<cpu_device> m_subcpu;
-	optional_device<eeprom_device> m_eeprom;
+	optional_device<serial_eeprom_device> m_eeprom;
 	DECLARE_WRITE16_MEMBER(fromanc2_sndcmd_w);
 	DECLARE_WRITE16_MEMBER(fromanc2_portselect_w);
 	DECLARE_READ16_MEMBER(fromanc2_keymatrix_r);

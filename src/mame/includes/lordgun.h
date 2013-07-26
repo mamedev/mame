@@ -83,7 +83,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	required_device<okim6295_device> m_oki;
-	required_device<eeprom_device> m_eeprom;
+	required_device<serial_eeprom_device> m_eeprom;
 };
 
 /*----------- defined in video/lordgun.c -----------*/

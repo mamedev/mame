@@ -49,7 +49,7 @@ public:
 	int           m_tilemap1_color;
 
 	/* devices */
-	optional_device<eeprom_device> m_eeprom;
+	optional_device<serial_eeprom_device> m_eeprom;
 	DECLARE_WRITE16_MEMBER(esd16_sound_command_w);
 	DECLARE_WRITE16_MEMBER(hedpanic_platform_w);
 	DECLARE_READ16_MEMBER(esd_eeprom_r);

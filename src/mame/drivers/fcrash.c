@@ -94,7 +94,7 @@ slampic: no sound. In the wrestling ring, a layer flashes on and off.
 #include "sound/okim6295.h"
 #include "machine/eeprom.h"
 
-static const eeprom_interface qsound_eeprom_interface =
+static const serial_eeprom_interface qsound_eeprom_interface =
 {
 	7,      /* address bits */
 	8,      /* data bits */
@@ -1322,12 +1322,12 @@ static INPUT_PORTS_START( sgyxz )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START3 )
 
 	PORT_START( "EEPROMIN" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, write_bit)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_clock_line)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_cs_line)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, write_bit)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, set_clock_line)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, set_cs_line)
 INPUT_PORTS_END
 
 
@@ -1976,7 +1976,7 @@ static MACHINE_CONFIG_START( dinopic, cps_state )
 
 	MCFG_MACHINE_START_OVERRIDE(cps_state, dinopic)
 
-	MCFG_EEPROM_ADD("eeprom", qsound_eeprom_interface)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", qsound_eeprom_interface)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2143,7 +2143,7 @@ static MACHINE_CONFIG_START( sgyxz, cps_state )
 	MCFG_PALETTE_LENGTH(0xc00)
 	MCFG_VIDEO_START_OVERRIDE(cps_state,cps1)
 
-	MCFG_EEPROM_ADD("eeprom", qsound_eeprom_interface)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", qsound_eeprom_interface)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2221,7 +2221,7 @@ static MACHINE_CONFIG_START( punipic, cps_state )
 
 	MCFG_MACHINE_START_OVERRIDE(cps_state, punipic)
 
-	MCFG_EEPROM_ADD("eeprom", qsound_eeprom_interface)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", qsound_eeprom_interface)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2611,7 +2611,7 @@ static MACHINE_CONFIG_START( slampic, cps_state )
 
 	MCFG_MACHINE_START_OVERRIDE(cps_state, slampic)
 
-	MCFG_EEPROM_ADD("eeprom", qsound_eeprom_interface)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", qsound_eeprom_interface)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -249,7 +249,7 @@ static INPUT_PORTS_START( bang )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit) /* bit 6 is EEPROM data (DOUT) */
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit) /* bit 6 is EEPROM data (DOUT) */
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL )  /* bit 7 is EEPROM ready */
 
 	PORT_START("LIGHT0_X")
@@ -271,7 +271,7 @@ static const gaelcosnd_interface bang_snd_interface =
 	{ 0*0x0200000, 1*0x0200000, 2*0x0200000, 3*0x0200000 }  /* start of each ROM bank */
 };
 
-static const eeprom_interface gaelco2_eeprom_interface =
+static const serial_eeprom_interface gaelco2_eeprom_interface =
 {
 	8,              /* address bits */
 	16,             /* data bits */
@@ -290,7 +290,7 @@ static MACHINE_CONFIG_START( bang, gaelco2_state )
 	MCFG_CPU_PROGRAM_MAP(bang_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", gaelco2_state, bang_irq, "screen", 0, 1)
 
-	MCFG_EEPROM_ADD("eeprom", gaelco2_eeprom_interface)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", gaelco2_eeprom_interface)
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
@@ -951,7 +951,7 @@ static INPUT_PORTS_START( snowboar )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)   /* bit 6 is EEPROM data (DOUT) */
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)   /* bit 6 is EEPROM data (DOUT) */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )    /* bit 7 is EEPROM ready */
 INPUT_PORTS_END
 
@@ -967,7 +967,7 @@ static MACHINE_CONFIG_START( snowboar, gaelco2_state )
 	MCFG_CPU_PROGRAM_MAP(snowboar_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaelco2_state,  irq6_line_hold)
 
-	MCFG_EEPROM_ADD("eeprom", gaelco2_eeprom_interface)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", gaelco2_eeprom_interface)
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
@@ -1208,7 +1208,7 @@ static MACHINE_CONFIG_START( wrally2, gaelco2_state )
 	MCFG_CPU_PROGRAM_MAP(wrally2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", gaelco2_state,  irq6_line_hold)
 
-	MCFG_EEPROM_ADD("eeprom", gaelco2_eeprom_interface)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", gaelco2_eeprom_interface)
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")

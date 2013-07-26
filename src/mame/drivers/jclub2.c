@@ -131,7 +131,7 @@ public:
 	optional_shared_ptr<UINT32> m_spriteram;
 	optional_device<st0020_device> m_gdfs_st0020;
 	required_device<cpu_device> m_maincpu;
-	required_device<eeprom_device> m_eeprom;
+	required_device<serial_eeprom_device> m_eeprom;
 	DECLARE_WRITE32_MEMBER(darkhors_tmapram_w);
 	DECLARE_WRITE32_MEMBER(darkhors_tmapram2_w);
 	DECLARE_WRITE32_MEMBER(paletteram32_xBBBBBGGGGGRRRRR_dword_w);
@@ -474,7 +474,7 @@ static INPUT_PORTS_START( darkhors )
 	PORT_BIT( 0x00100000, IP_ACTIVE_LOW,  IPT_SERVICE  ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1) // test
 	PORT_BIT( 0x00200000, IP_ACTIVE_LOW,  IPT_UNKNOWN  )    // door 1
 	PORT_BIT( 0x00400000, IP_ACTIVE_LOW,  IPT_UNKNOWN  )    // door 2
-	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_SPECIAL  ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
+	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_SPECIAL  ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
 	PORT_BIT( 0x01000000, IP_ACTIVE_LOW,  IPT_START1   )    // start
 	PORT_BIT( 0x02000000, IP_ACTIVE_LOW,  IPT_OTHER ) PORT_NAME("P1 Payout") PORT_CODE(KEYCODE_LCONTROL)    // payout
 	PORT_BIT( 0x04000000, IP_ACTIVE_LOW,  IPT_OTHER ) PORT_NAME("P1 Cancel") PORT_CODE(KEYCODE_LALT)        // cancel
@@ -692,7 +692,7 @@ static MACHINE_CONFIG_START( darkhors, darkhors_state )
 	MCFG_CPU_PROGRAM_MAP(darkhors_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", darkhors_state, darkhors_irq, "screen", 0, 1)
 
-	MCFG_EEPROM_ADD("eeprom", eeprom_interface_93C46_8bit)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_interface_93C46_8bit)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -733,7 +733,7 @@ static MACHINE_CONFIG_START( jclub2, darkhors_state )
 	MCFG_CPU_PROGRAM_MAP(jclub2_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", darkhors_state, darkhors_irq, "screen", 0, 1)
 
-	MCFG_EEPROM_ADD("eeprom", eeprom_interface_93C46_8bit)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_interface_93C46_8bit)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -799,7 +799,7 @@ static MACHINE_CONFIG_START( jclub2o, darkhors_state )
 	MCFG_CPU_IO_MAP(st0016_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", darkhors_state,  irq0_line_hold)
 
-	MCFG_EEPROM_ADD("eeprom", eeprom_interface_93C46_8bit)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_interface_93C46_8bit)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

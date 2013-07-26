@@ -34,7 +34,7 @@ public:
 	required_shared_ptr<UINT32> m_spriteram;
 
 	required_device<cpu_device> m_maincpu;
-	required_device<eeprom_device> m_eeprom;
+	required_device<serial_eeprom_device> m_eeprom;
 	required_device<tc0100scn_device> m_tc0100scn;
 	required_device<tc0480scp_device> m_tc0480scp;
 	UINT16 m_coin_word;

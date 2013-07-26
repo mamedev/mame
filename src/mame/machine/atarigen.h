@@ -42,6 +42,7 @@
 
 #include "machine/nvram.h"
 #include "machine/er2055.h"
+#include "video/atarimo.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/okim6295.h"
 
@@ -185,8 +186,6 @@ private:
 
 
 // ======================> atari_vad_device
-
-class atari_motion_objects_device;
 
 // device type definition
 extern const device_type ATARI_VAD;

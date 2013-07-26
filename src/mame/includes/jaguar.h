@@ -322,6 +322,6 @@ protected:
 	emu_file *jaguar_nvram_fopen( UINT32 openflags);
 	void jaguar_nvram_load();
 	void jaguar_nvram_save();
-	optional_device<eeprom_device> m_eeprom;
+	optional_device<serial_eeprom_device> m_eeprom;
 	optional_device<vt83c461_device> m_ide;
 };

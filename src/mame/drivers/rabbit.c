@@ -152,7 +152,7 @@ public:
 	void rabbit_drawtilemap( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int whichtilemap );
 	void rabbit_do_blit();
 	required_device<cpu_device> m_maincpu;
-	required_device<eeprom_device> m_eeprom;
+	required_device<serial_eeprom_device> m_eeprom;
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
@@ -740,7 +740,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( rabbit )
 	PORT_START("INPUTS")
-	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit) // as per code at 4d932
+	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit) // as per code at 4d932
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_UNKNOWN ) // unlabeled in input test
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_START2 )

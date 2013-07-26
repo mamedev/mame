@@ -154,11 +154,11 @@ public:
 	DECLARE_READ16_MEMBER(pntnpuzl_eeprom_r);
 	DECLARE_WRITE16_MEMBER(pntnpuzl_eeprom_w);
 	DECLARE_DRIVER_INIT(pip);
-	required_device<eeprom_device> m_eeprom;
+	required_device<serial_eeprom_device> m_eeprom;
 };
 
 
-static const eeprom_interface eeprom_intf =
+static const serial_eeprom_interface eeprom_intf =
 {
 	6,              /* address bits */
 	16,             /* data bits */
@@ -359,7 +359,7 @@ static MACHINE_CONFIG_START( pntnpuzl, pntnpuzl_state )
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)//??
 	MCFG_CPU_PROGRAM_MAP(pntnpuzl_map)
 
-	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_intf)
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_vga )

@@ -109,7 +109,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_nvram;
-	required_device<eeprom_device> m_eeprom;
+	required_device<serial_eeprom_device> m_eeprom;
 
 	UINT8 m_reg;
 	UINT8 m_rombank;
@@ -1516,7 +1516,7 @@ static INPUT_PORTS_START( gegege )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )   PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )   PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN2   ) PORT_IMPULSE(5)   // ? (coin error, pulses mask 4 of port c6)
@@ -1554,7 +1554,7 @@ static INPUT_PORTS_START( pepsiman )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )   PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )   PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN2   ) PORT_IMPULSE(5)   // ? (coin error, pulses mask 4 of port c6)
@@ -1592,7 +1592,7 @@ static INPUT_PORTS_START( ucytokyu )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )   PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )   PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN2   ) PORT_IMPULSE(10)  // ? (coin error, pulses mask 4 of port c6)
@@ -1675,7 +1675,7 @@ INPUT_PORTS_END
                         GeGeGe no Kitarou Youkai Slot
 ***************************************************************************/
 
-const eeprom_interface eeprom_intf =
+const serial_eeprom_interface eeprom_intf =
 {
 	6,              // address bits 6
 	16,             // data bits    16
@@ -1700,7 +1700,7 @@ static MACHINE_CONFIG_START( gegege, sigmab98_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", sigmab98_state,  gegege_vblank_interrupt)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
-	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_intf)
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW )
 
@@ -1726,7 +1726,7 @@ MACHINE_CONFIG_END
                              Sammy Medal Games
 ***************************************************************************/
 
-static const eeprom_interface eeprom_interface_93C46_8bit_delay =
+static const serial_eeprom_interface eeprom_interface_93C46_8bit_delay =
 {
 	7,              // address bits 6
 	8,              // data bits    8
@@ -1754,7 +1754,7 @@ static MACHINE_CONFIG_START( sammymdl, sigmab98_state )
 	MCFG_MACHINE_RESET_OVERRIDE(sigmab98_state, sammymdl )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")   // battery
-	MCFG_EEPROM_ADD("eeprom", eeprom_interface_93C46_8bit_delay)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_interface_93C46_8bit_delay)
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW )
 

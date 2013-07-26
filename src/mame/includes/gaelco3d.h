@@ -72,7 +72,7 @@ public:
 	required_shared_ptr<UINT16> m_adsp_fastram_base;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_adsp;
-	required_device<eeprom_device> m_eeprom;
+	required_device<serial_eeprom_device> m_eeprom;
 	required_device<cpu_device> m_tms;
 	required_device<gaelco_serial_device> m_serial;
 	UINT16 m_sound_data;

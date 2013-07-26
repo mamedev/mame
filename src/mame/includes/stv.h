@@ -144,7 +144,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_slave;
 	required_device<m68000_base_device> m_audiocpu;
-	optional_device<eeprom_device> m_eeprom;
+	optional_device<serial_eeprom_device> m_eeprom;
 
 	bitmap_rgb32 m_tmpbitmap;
 	DECLARE_VIDEO_START(stv_vdp2);

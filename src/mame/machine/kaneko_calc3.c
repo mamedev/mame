@@ -1330,7 +1330,7 @@ int kaneko_calc3_device::calc3_decompress_table(running_machine& machine, int ta
 					//printf("save to eeprom\n");
 
 					{
-						address_space &eeprom_space = space.machine().device<eeprom_device>(":eeprom")->space();
+						address_space &eeprom_space = space.machine().device<serial_eeprom_device>(":eeprom")->space();
 
 						for (i=0;i<0x80;i++)
 						{
@@ -1673,7 +1673,7 @@ void kaneko_calc3_device::calc3_mcu_run(running_machine &machine)
 			}
 #endif
 			{
-				address_space &eeprom_space = space.machine().device<eeprom_device>(":eeprom")->space();
+				address_space &eeprom_space = space.machine().device<serial_eeprom_device>(":eeprom")->space();
 
 				for (i=0;i<0x80;i++)
 				{

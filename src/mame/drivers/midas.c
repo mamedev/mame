@@ -84,7 +84,7 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(livequiz_irqhandler);
 	required_device<cpu_device> m_maincpu;
-	required_device<eeprom_device> m_eeprom;
+	required_device<serial_eeprom_device> m_eeprom;
 };
 
 
@@ -456,7 +456,7 @@ static INPUT_PORTS_START( livequiz )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_COIN1   )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit) // EEPROM
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit) // EEPROM
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_SERVICE_NO_TOGGLE( 0x0040,   IP_ACTIVE_LOW )
@@ -589,7 +589,7 @@ static INPUT_PORTS_START( hammer )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_COIN1     )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW,  IPT_COIN2     )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_SERVICE1  )
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_SPECIAL   ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_SPECIAL   ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW,  IPT_UNKNOWN   )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW,  IPT_UNKNOWN   )
 	PORT_SERVICE_NO_TOGGLE( 0x0040,   IP_ACTIVE_LOW )

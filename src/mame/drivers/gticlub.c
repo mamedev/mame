@@ -262,7 +262,7 @@ public:
 	required_device<cpu_device> m_dsp;
 	optional_device<cpu_device> m_dsp2;
 	required_device<adc1038_device> m_adc1038;
-	required_device<eeprom_device> m_eeprom;
+	required_device<serial_eeprom_device> m_eeprom;
 	UINT32 *m_sharc_dataram_0;
 	UINT32 *m_sharc_dataram_1;
 	DECLARE_WRITE32_MEMBER(paletteram32_w);
@@ -360,7 +360,7 @@ WRITE32_MEMBER(gticlub_state::gticlub_k001604_reg_w)
 /******************************************************************/
 
 /* 93C56 EEPROM */
-static const eeprom_interface eeprom_intf =
+static const serial_eeprom_interface eeprom_intf =
 {
 	8,              /* address bits */
 	16,             /* data bits */
@@ -978,7 +978,7 @@ static MACHINE_CONFIG_START( gticlub, gticlub_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_intf)
 
 	MCFG_MACHINE_START_OVERRIDE(gticlub_state,gticlub)
 	MCFG_MACHINE_RESET_OVERRIDE(gticlub_state,gticlub)
@@ -1085,7 +1085,7 @@ static MACHINE_CONFIG_START( hangplt, gticlub_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_intf)
 
 	MCFG_MACHINE_START_OVERRIDE(gticlub_state,gticlub)
 	MCFG_MACHINE_RESET_OVERRIDE(gticlub_state,hangplt)

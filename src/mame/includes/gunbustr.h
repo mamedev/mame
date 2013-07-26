@@ -34,7 +34,7 @@ public:
 	required_device<tc0480scp_device> m_tc0480scp;
 	required_shared_ptr<UINT32> m_ram;
 	required_shared_ptr<UINT32> m_spriteram;
-	required_device<eeprom_device> m_eeprom;
+	required_device<serial_eeprom_device> m_eeprom;
 
 	bool m_coin_lockout;
 	UINT16 m_coin_word;

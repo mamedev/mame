@@ -50,7 +50,7 @@ public:
 	PXA255_LCD_Regs m_lcd_regs;
 
 	dmadac_sound_device *m_dmadac[2];
-	required_device<eeprom_device> m_eeprom;
+	required_device<serial_eeprom_device> m_eeprom;
 	UINT32 m_pxa255_lcd_palette[0x100];
 	UINT8 m_pxa255_lcd_framebuffer[0x100000];
 

@@ -56,7 +56,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_subcpu;
-	optional_device<eeprom_device> m_eeprom;
+	optional_device<serial_eeprom_device> m_eeprom;
 	optional_device<tc0480scp_device> m_tc0480scp;
 	optional_device<tc0150rod_device> m_tc0150rod;
 	optional_device<tc0100scn_device> m_tc0100scn;

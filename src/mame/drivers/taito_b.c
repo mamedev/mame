@@ -373,7 +373,7 @@ INPUT_CHANGED_MEMBER(taitob_state::realpunc_sensor)
 
 ***************************************************************************/
 
-static const eeprom_interface taitob_eeprom_intf =
+static const serial_eeprom_interface taitob_eeprom_intf =
 {
 	6,              /* address bits */
 	16,             /* data bits */
@@ -1166,7 +1166,7 @@ static INPUT_PORTS_START( pbobble ) /* Missing P3&4 controls ! */
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW ) /*ok*/
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1226,9 +1226,9 @@ static INPUT_PORTS_START( pbobble ) /* Missing P3&4 controls ! */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(4)
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, write_bit)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_clock_line)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_cs_line)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, write_bit)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, set_clock_line)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, set_cs_line)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( spacedxo )
@@ -1328,7 +1328,7 @@ static INPUT_PORTS_START( qzshowby )
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW ) /*ok*/
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1388,9 +1388,9 @@ static INPUT_PORTS_START( qzshowby )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4)
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, write_bit)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_clock_line)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_cs_line)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, write_bit)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, set_clock_line)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, set_cs_line)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( viofight )
@@ -2356,7 +2356,7 @@ static MACHINE_CONFIG_START( pbobble, taitob_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_EEPROM_ADD("eeprom", taitob_eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", taitob_eeprom_intf)
 
 	MCFG_TC0640FIO_ADD("tc0640fio", pbobble_io_intf)
 
@@ -2404,7 +2404,7 @@ static MACHINE_CONFIG_START( spacedx, taitob_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 
-	MCFG_EEPROM_ADD("eeprom", taitob_eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", taitob_eeprom_intf)
 
 	MCFG_TC0640FIO_ADD("tc0640fio", pbobble_io_intf)
 
@@ -2496,7 +2496,7 @@ static MACHINE_CONFIG_START( qzshowby, taitob_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 
-	MCFG_EEPROM_ADD("eeprom", taitob_eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", taitob_eeprom_intf)
 
 	MCFG_TC0640FIO_ADD("tc0640fio", pbobble_io_intf)
 

@@ -284,7 +284,7 @@ static INPUT_PORTS_START( f3 )
 
 	/* These are not read directly, but through PORT_CUSTOMs above */
 	PORT_START("EEPROMIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED ) /* Another service mode */
@@ -300,9 +300,9 @@ static INPUT_PORTS_START( f3 )
 	PORT_BIT( 0xfff, 0x000, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(25) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2)
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, write_bit)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_clock_line)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_cs_line)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, write_bit)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, set_clock_line)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, set_cs_line)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( kn )
@@ -488,14 +488,14 @@ static MACHINE_CONFIG_DERIVED( f3_eeprom, f3 )
 
 	MCFG_DEVICE_REMOVE("eeprom")
 	MCFG_EEPROM_93C46_ADD("eeprom")
-	MCFG_EEPROM_DATA(recalh_eeprom, 128) //TODO: convert this into ROM
+	MCFG_SERIAL_EEPROM_DATA(recalh_eeprom, 128) //TODO: convert this into ROM
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( f3_224b_eeprom, f3 )
 
 	MCFG_DEVICE_REMOVE("eeprom")
 	MCFG_EEPROM_93C46_ADD("eeprom")
-	MCFG_EEPROM_DATA(recalh_eeprom, 128) //TODO: convert this into ROM
+	MCFG_SERIAL_EEPROM_DATA(recalh_eeprom, 128) //TODO: convert this into ROM
 MACHINE_CONFIG_END
 
 static const gfx_layout bubsympb_sprite_layout =

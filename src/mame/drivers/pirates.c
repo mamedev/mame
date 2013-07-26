@@ -94,7 +94,7 @@ Notes:
 #include "includes/pirates.h"
 
 
-static const eeprom_interface eeprom_intf =
+static const serial_eeprom_interface eeprom_intf =
 {
 	6,              /* address bits */
 	16,             /* data bits */
@@ -206,7 +206,7 @@ static INPUT_PORTS_START( pirates )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x0008, IP_ACTIVE_LOW )
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH,IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)  // EEPROM data
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH,IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)  // EEPROM data
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_UNKNOWN )     // seems checked in "test mode"
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNKNOWN )     // seems checked in "test mode"
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH,IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, pirates_state,prot_r, NULL)      // protection
@@ -262,7 +262,7 @@ static MACHINE_CONFIG_START( pirates, pirates_state )
 	MCFG_CPU_PROGRAM_MAP(pirates_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pirates_state,  irq1_line_hold)
 
-	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_intf)
 
 	MCFG_GFXDECODE(pirates)
 

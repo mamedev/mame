@@ -61,7 +61,7 @@ WRITE16_MEMBER(playmark_state::coinctrl_w)
 
 ***************************************************************************/
 
-static const eeprom_interface eeprom_intf =
+static const serial_eeprom_interface eeprom_intf =
 {
 	6,              /* address bits */
 	16,             /* data bits */
@@ -550,7 +550,7 @@ static INPUT_PORTS_START( wbeachvl )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE(0x20, IP_ACTIVE_LOW)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* ?? see code at 746a. sound status? */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)   /* EEPROM data */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)   /* EEPROM data */
 
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
@@ -716,7 +716,7 @@ static INPUT_PORTS_START( hotmind )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)   /* EEPROM data */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)   /* EEPROM data */
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Difficulty ) )
@@ -1128,8 +1128,8 @@ static MACHINE_CONFIG_START( wbeachvl, playmark_state )
 	/* Program and Data Maps are internal to the MCU */
 //  MCFG_CPU_IO_MAP(playmark_sound_io_map)
 
-	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
-	MCFG_EEPROM_DEFAULT_VALUE(0)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_SERIAL_EEPROM_DEFAULT_VALUE(0)
 
 	MCFG_MACHINE_START_OVERRIDE(playmark_state,playmark)
 	MCFG_MACHINE_RESET_OVERRIDE(playmark_state,playmark)
@@ -1199,8 +1199,8 @@ static MACHINE_CONFIG_START( hotmind, playmark_state )
 	/* Program and Data Maps are internal to the MCU */
 	MCFG_CPU_IO_MAP(playmark_sound_io_map)
 
-	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
-	MCFG_EEPROM_DEFAULT_VALUE(0)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_SERIAL_EEPROM_DEFAULT_VALUE(0)
 
 	MCFG_MACHINE_START_OVERRIDE(playmark_state,playmark)
 	MCFG_MACHINE_RESET_OVERRIDE(playmark_state,playmark)

@@ -25,9 +25,9 @@
 //**************************************************************************
 
 // device type definition
-const device_type EEPROM = &device_creator<eeprom_device>;
+const device_type SERIAL_EEPROM = &device_creator<serial_eeprom_device>;
 
-const eeprom_interface eeprom_interface_93C46 =
+const serial_eeprom_interface eeprom_interface_93C46 =
 {
 	6,              // address bits 6
 	16,             // data bits    16
@@ -42,7 +42,7 @@ const eeprom_interface eeprom_interface_93C46 =
 //  "*10010xxxx"    // erase all    1 00 10xxxx
 };
 
-const eeprom_interface eeprom_interface_93C46_8bit =
+const serial_eeprom_interface eeprom_interface_93C46_8bit =
 {
 	7,              // address bits 7
 	8,              // data bits    8
@@ -57,7 +57,7 @@ const eeprom_interface eeprom_interface_93C46_8bit =
 //  "*10010xxxx"    // erase all    1 00 10xxxx
 };
 
-const eeprom_interface eeprom_interface_93C66B =
+const serial_eeprom_interface eeprom_interface_93C66B =
 {
 	8,              // address bits
 	16,             // data bits
@@ -73,12 +73,12 @@ const eeprom_interface eeprom_interface_93C66B =
 };
 
 
-static ADDRESS_MAP_START( eeprom_map8, AS_PROGRAM, 8, eeprom_device )
+static ADDRESS_MAP_START( eeprom_map8, AS_PROGRAM, 8, serial_eeprom_device )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( eeprom_map16, AS_PROGRAM, 16, eeprom_device )
+static ADDRESS_MAP_START( eeprom_map16, AS_PROGRAM, 16, serial_eeprom_device )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 ADDRESS_MAP_END
 
@@ -89,11 +89,11 @@ ADDRESS_MAP_END
 //**************************************************************************
 
 //-------------------------------------------------
-//  eeprom_device - constructor
+//  serial_eeprom_device - constructor
 //-------------------------------------------------
 
-eeprom_device::eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, EEPROM, "EEPROM", tag, owner, clock, "eeprom", __FILE__),
+serial_eeprom_device::serial_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, SERIAL_EEPROM, "Serial EEPROM", tag, owner, clock, "seeprom", __FILE__),
 		device_memory_interface(mconfig, *this),
 		device_nvram_interface(mconfig, *this),
 		m_default_data_size(0),
@@ -110,7 +110,7 @@ eeprom_device::eeprom_device(const machine_config &mconfig, const char *tag, dev
 		m_reset_counter(0)
 {
 	m_default_data.u8 = NULL;
-	memset(downcast<eeprom_interface *>(this), 0, sizeof(eeprom_interface));
+	memset(downcast<serial_eeprom_interface *>(this), 0, sizeof(serial_eeprom_interface));
 }
 
 
@@ -119,10 +119,10 @@ eeprom_device::eeprom_device(const machine_config &mconfig, const char *tag, dev
 //  to set the interface
 //-------------------------------------------------
 
-void eeprom_device::static_set_interface(device_t &device, const eeprom_interface &interface)
+void serial_eeprom_device::static_set_interface(device_t &device, const serial_eeprom_interface &interface)
 {
-	eeprom_device &eeprom = downcast<eeprom_device &>(device);
-	static_cast<eeprom_interface &>(eeprom) = interface;
+	serial_eeprom_device &eeprom = downcast<serial_eeprom_device &>(device);
+	static_cast<serial_eeprom_interface &>(eeprom) = interface;
 
 	// describe our address space
 	if (eeprom.m_data_bits == 8)
@@ -137,17 +137,17 @@ void eeprom_device::static_set_interface(device_t &device, const eeprom_interfac
 //  to set the default data
 //-------------------------------------------------
 
-void eeprom_device::static_set_default_data(device_t &device, const UINT8 *data, UINT32 size)
+void serial_eeprom_device::static_set_default_data(device_t &device, const UINT8 *data, UINT32 size)
 {
-	eeprom_device &eeprom = downcast<eeprom_device &>(device);
+	serial_eeprom_device &eeprom = downcast<serial_eeprom_device &>(device);
 	assert(eeprom.m_data_bits == 8);
 	eeprom.m_default_data.u8 = const_cast<UINT8 *>(data);
 	eeprom.m_default_data_size = size;
 }
 
-void eeprom_device::static_set_default_data(device_t &device, const UINT16 *data, UINT32 size)
+void serial_eeprom_device::static_set_default_data(device_t &device, const UINT16 *data, UINT32 size)
 {
-	eeprom_device &eeprom = downcast<eeprom_device &>(device);
+	serial_eeprom_device &eeprom = downcast<serial_eeprom_device &>(device);
 	assert(eeprom.m_data_bits == 16);
 	eeprom.m_default_data.u16 = const_cast<UINT16 *>(data);
 	eeprom.m_default_data_size = size / 2;
@@ -159,9 +159,9 @@ void eeprom_device::static_set_default_data(device_t &device, const UINT16 *data
 //  to set the default value
 //-------------------------------------------------
 
-void eeprom_device::static_set_default_value(device_t &device, UINT16 value)
+void serial_eeprom_device::static_set_default_value(device_t &device, UINT16 value)
 {
-	downcast<eeprom_device &>(device).m_default_value = 0x10000 | value;
+	downcast<serial_eeprom_device &>(device).m_default_value = 0x10000 | value;
 }
 
 
@@ -170,7 +170,7 @@ void eeprom_device::static_set_default_value(device_t &device, UINT16 value)
 //  on this device
 //-------------------------------------------------
 
-void eeprom_device::device_validity_check(validity_checker &valid) const
+void serial_eeprom_device::device_validity_check(validity_checker &valid) const
 {
 	if (m_data_bits != 8 && m_data_bits != 16)
 		mame_printf_error("Invalid data width %d specified\n", m_data_bits);
@@ -181,7 +181,7 @@ void eeprom_device::device_validity_check(validity_checker &valid) const
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void eeprom_device::device_start()
+void serial_eeprom_device::device_start()
 {
 	m_locked = (m_cmd_unlock != NULL);
 
@@ -202,7 +202,7 @@ void eeprom_device::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void eeprom_device::device_reset()
+void serial_eeprom_device::device_reset()
 {
 }
 
@@ -212,7 +212,7 @@ void eeprom_device::device_reset()
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-const address_space_config *eeprom_device::memory_space_config(address_spacenum spacenum) const
+const address_space_config *serial_eeprom_device::memory_space_config(address_spacenum spacenum) const
 {
 	return (spacenum == 0) ? &m_space_config : NULL;
 }
@@ -223,7 +223,7 @@ const address_space_config *eeprom_device::memory_space_config(address_spacenum 
 //  its default state
 //-------------------------------------------------
 
-void eeprom_device::nvram_default()
+void serial_eeprom_device::nvram_default()
 {
 	UINT32 eeprom_length = 1 << m_address_bits;
 	UINT32 eeprom_bytes = eeprom_length * m_data_bits / 8;
@@ -271,7 +271,7 @@ void eeprom_device::nvram_default()
 //  .nv file
 //-------------------------------------------------
 
-void eeprom_device::nvram_read(emu_file &file)
+void serial_eeprom_device::nvram_read(emu_file &file)
 {
 	UINT32 eeprom_length = 1 << m_address_bits;
 	UINT32 eeprom_bytes = eeprom_length * m_data_bits / 8;
@@ -289,7 +289,7 @@ void eeprom_device::nvram_read(emu_file &file)
 //  .nv file
 //-------------------------------------------------
 
-void eeprom_device::nvram_write(emu_file &file)
+void serial_eeprom_device::nvram_write(emu_file &file)
 {
 	UINT32 eeprom_length = 1 << m_address_bits;
 	UINT32 eeprom_bytes = eeprom_length * m_data_bits / 8;
@@ -307,7 +307,7 @@ void eeprom_device::nvram_write(emu_file &file)
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-WRITE_LINE_MEMBER( eeprom_device::write_bit )
+WRITE_LINE_MEMBER( serial_eeprom_device::write_bit )
 {
 	LOG(("write bit %d\n",state));
 	m_latch = state;
@@ -316,10 +316,10 @@ WRITE_LINE_MEMBER( eeprom_device::write_bit )
 
 READ_LINE_DEVICE_HANDLER( eeprom_read_bit )
 {
-	return downcast<eeprom_device *>(device)->read_bit();
+	return downcast<serial_eeprom_device *>(device)->read_bit();
 }
 
-READ_LINE_MEMBER( eeprom_device::read_bit )
+READ_LINE_MEMBER( serial_eeprom_device::read_bit )
 {
 	int res;
 
@@ -344,7 +344,7 @@ READ_LINE_MEMBER( eeprom_device::read_bit )
 
 
 
-WRITE_LINE_MEMBER( eeprom_device::set_cs_line )
+WRITE_LINE_MEMBER( serial_eeprom_device::set_cs_line )
 {
 	LOG(("set reset line %d\n",state));
 	m_reset_line = state;
@@ -362,7 +362,7 @@ WRITE_LINE_MEMBER( eeprom_device::set_cs_line )
 
 
 
-WRITE_LINE_MEMBER( eeprom_device::set_clock_line )
+WRITE_LINE_MEMBER( serial_eeprom_device::set_clock_line )
 {
 	LOG(("set clock line %d\n",state));
 	if (state == PULSE_LINE || (m_clock_line == CLEAR_LINE && state != CLEAR_LINE))
@@ -398,7 +398,7 @@ WRITE_LINE_MEMBER( eeprom_device::set_clock_line )
 //  INTERNAL HELPERS
 //**************************************************************************
 
-void eeprom_device::write(int bit)
+void serial_eeprom_device::write(int bit)
 {
 	LOG(("EEPROM %s write bit %d\n", tag(), bit));
 
@@ -515,7 +515,7 @@ void eeprom_device::write(int bit)
 
     Note: (cmd) may be NULL. Return 0 (no match) in this case.
 */
-bool eeprom_device::command_match(const char *buf, const char *cmd, int len)
+bool serial_eeprom_device::command_match(const char *buf, const char *cmd, int len)
 {
 	if ( cmd == 0 ) return false;
 	if ( len == 0 ) return false;

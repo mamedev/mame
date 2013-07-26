@@ -52,5 +52,5 @@ public:
 	void zeropnt2_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	optional_device<okim6295_device> m_oki;
-	optional_device<eeprom_device> m_eeprom;
+	optional_device<serial_eeprom_device> m_eeprom;
 };

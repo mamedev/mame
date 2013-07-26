@@ -39,7 +39,7 @@ public:
 		m_deco_tilegen1(*this, "tilegen1")
 	{ }
 
-	required_device<eeprom_device> m_eeprom;
+	required_device<serial_eeprom_device> m_eeprom;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -191,7 +191,7 @@ static INPUT_PORTS_START( dreambal )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
 	PORT_START("DSW")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
 	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )

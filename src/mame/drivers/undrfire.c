@@ -241,7 +241,7 @@ void undrfire_state::device_timer(emu_timer &timer, device_timer_id id, int para
                 EPROM
 **********************************************************/
 
-static const eeprom_interface undrfire_eeprom_interface =
+static const serial_eeprom_interface undrfire_eeprom_interface =
 {
 	6,              /* address bits */
 	16,             /* data bits */
@@ -538,7 +538,7 @@ static INPUT_PORTS_START( undrfire )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit) /* reserved for EEROM */
+	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit) /* reserved for EEROM */
 	PORT_BIT( 0x00000100, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x00000200, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x00000400, IP_ACTIVE_LOW,  IPT_UNKNOWN )
@@ -606,7 +606,7 @@ static INPUT_PORTS_START( cbombers )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit) /* reserved for EEROM */
+	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit) /* reserved for EEROM */
 	PORT_BIT( 0x00000100, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x00000200, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x00000400, IP_ACTIVE_LOW,  IPT_UNKNOWN )
@@ -734,7 +734,7 @@ static MACHINE_CONFIG_START( undrfire, undrfire_state )
 	MCFG_CPU_PROGRAM_MAP(undrfire_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", undrfire_state,  undrfire_interrupt)
 
-	MCFG_EEPROM_ADD("eeprom", undrfire_eeprom_interface)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", undrfire_eeprom_interface)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -769,7 +769,7 @@ static MACHINE_CONFIG_START( cbombers, undrfire_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(480))   /* CPU slices - Need to interleave Cpu's 1 & 3 */
 
-	MCFG_EEPROM_ADD("eeprom", undrfire_eeprom_interface)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", undrfire_eeprom_interface)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

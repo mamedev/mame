@@ -73,7 +73,7 @@ public:
 	INTERRUPT_GEN_MEMBER(rdx_v33_interrupt);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int pri);
 	required_device<cpu_device> m_maincpu;
-	optional_device<eeprom_device> m_eeprom;
+	optional_device<serial_eeprom_device> m_eeprom;
 };
 
 
@@ -568,7 +568,7 @@ static INPUT_PORTS_START( rdx_v33 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x0040, 0x0040, "Test Mode" )
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
@@ -606,7 +606,7 @@ static INPUT_PORTS_START( nzerotea )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
-	//PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
+	//PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x0040, 0x0040, "Test Mode" )
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )

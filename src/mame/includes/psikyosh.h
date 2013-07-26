@@ -49,7 +49,7 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
-	required_device<eeprom_device> m_eeprom;
+	required_device<serial_eeprom_device> m_eeprom;
 
 	DECLARE_WRITE32_MEMBER(psikyosh_irqctrl_w);
 	DECLARE_WRITE32_MEMBER(paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w);

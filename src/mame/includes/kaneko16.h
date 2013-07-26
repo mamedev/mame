@@ -41,7 +41,7 @@ public:
 	optional_device<okim6295_device> m_oki;
 	optional_device<okim6295_device> m_oki1;
 	optional_device<okim6295_device> m_oki2;
-	optional_device<eeprom_device> m_eeprom;
+	optional_device<serial_eeprom_device> m_eeprom;
 	optional_shared_ptr<UINT16> m_spriteram;
 	optional_shared_ptr<UINT16> m_mainram;
 	optional_device<kaneko_view2_tilemap_device> m_view2_0;

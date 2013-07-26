@@ -679,7 +679,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(cps_state::cps2_interrupt)
  *
  *************************************/
 
-static const eeprom_interface cps2_eeprom_interface =
+static const serial_eeprom_interface cps2_eeprom_interface =
 {
 	6,      /* address bits */
 	16,     /* data bits */
@@ -936,7 +936,7 @@ static INPUT_PORTS_START( cps2_4p4b )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(4)
 
 	PORT_START("IN2")      /* (0x20) */
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
 	PORT_SERVICE_NO_TOGGLE( 0x0002, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x00f8, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -950,9 +950,9 @@ static INPUT_PORTS_START( cps2_4p4b )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN4 )
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, write_bit)
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_clock_line)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_cs_line)
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, write_bit)
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, set_clock_line)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, set_cs_line)
 
 	/* fake inputs for digital volume buttons */
 	PORT_START( "DIGITALVOL" )
@@ -1258,7 +1258,7 @@ static MACHINE_CONFIG_START( cps2, cps_state )
 
 	MCFG_MACHINE_START_OVERRIDE(cps_state,cps2)
 
-	MCFG_EEPROM_ADD("eeprom", cps2_eeprom_interface)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", cps2_eeprom_interface)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)

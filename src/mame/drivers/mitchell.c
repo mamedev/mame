@@ -83,7 +83,7 @@ mw-9.rom = ST M27C1001 / GFX
  *
  *************************************/
 
-static const eeprom_interface eeprom_intf =
+static const serial_eeprom_interface eeprom_intf =
 {
 	6,      /* address bits */
 	16,     /* data bits */
@@ -397,7 +397,7 @@ static INPUT_PORTS_START( mj_common )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* unused? */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* unused? */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -647,7 +647,7 @@ static INPUT_PORTS_START( pang )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* unused? */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* unused? */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -814,7 +814,7 @@ static INPUT_PORTS_START( qtono1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* unused? */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* unused? */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )    /* same as the service mode farther down */
@@ -854,7 +854,7 @@ static INPUT_PORTS_START( block )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* unused? */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* unused? */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -896,7 +896,7 @@ static INPUT_PORTS_START( blockjoy )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* unused? */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* unused? */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1090,7 +1090,7 @@ static MACHINE_CONFIG_START( mgakuen, mitchell_state )
 	MCFG_MACHINE_START_OVERRIDE(mitchell_state,mitchell)
 	MCFG_MACHINE_RESET_OVERRIDE(mitchell_state,mitchell)
 
-	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_intf)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1127,7 +1127,7 @@ static MACHINE_CONFIG_START( pang, mitchell_state )
 	MCFG_MACHINE_START_OVERRIDE(mitchell_state,mitchell)
 	MCFG_MACHINE_RESET_OVERRIDE(mitchell_state,mitchell)
 
-	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_intf)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1262,7 +1262,7 @@ static MACHINE_CONFIG_START( marukin, mitchell_state )
 	MCFG_CPU_IO_MAP(mitchell_io_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mitchell_state, mitchell_irq, "screen", 0, 1)
 
-	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_intf)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1313,7 +1313,7 @@ static MACHINE_CONFIG_START( pkladiesbl, mitchell_state )
 	MCFG_CPU_IO_MAP(mitchell_io_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mitchell_state, mitchell_irq, "screen", 0, 1)
 
-	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_intf)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

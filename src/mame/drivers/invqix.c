@@ -147,7 +147,7 @@ public:
 protected:
 	// devices
 	required_device<cpu_device> m_maincpu;
-	required_device<eeprom_device> m_eeprom;
+	required_device<serial_eeprom_device> m_eeprom;
 	required_shared_ptr<UINT16> m_vram;
 
 	// driver_device overrides
@@ -345,7 +345,7 @@ static MACHINE_CONFIG_START( invqix, invqix_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
-	MCFG_EEPROM_DEFAULT_VALUE(0)
+	MCFG_SERIAL_EEPROM_DEFAULT_VALUE(0)
 MACHINE_CONFIG_END
 
 ROM_START( invqix )

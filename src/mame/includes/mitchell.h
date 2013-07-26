@@ -32,7 +32,7 @@ public:
 	required_shared_ptr<UINT8> m_colorram;
 	required_shared_ptr<UINT8> m_videoram;
 
-	optional_device<eeprom_device> m_eeprom;
+	optional_device<serial_eeprom_device> m_eeprom;
 	optional_device<msm5205_device> m_msm;
 
 	/* video-related */

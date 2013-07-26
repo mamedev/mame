@@ -17,22 +17,24 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_EEPROM_ADD(_tag, _interface) \
-	MCFG_DEVICE_ADD(_tag, EEPROM, 0) \
-	eeprom_device::static_set_interface(*device, _interface);
+#define MCFG_SERIAL_EEPROM_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, SERIAL_EEPROM, 0) \
+	serial_eeprom_device::static_set_interface(*device, _interface);
+
+#define MCFG_SERIAL_EEPROM_DATA(_data, _size) \
+	serial_eeprom_device::static_set_default_data(*device, _data, _size);
+#define MCFG_SERIAL_EEPROM_DEFAULT_VALUE(_value) \
+	serial_eeprom_device::static_set_default_value(*device, _value);
+
 #define MCFG_EEPROM_93C46_ADD(_tag) \
-	MCFG_EEPROM_ADD(_tag, eeprom_interface_93C46)
+	MCFG_SERIAL_EEPROM_ADD(_tag, eeprom_interface_93C46)
 
 #define MCFG_EEPROM_93C46_8BIT_ADD(_tag) \
-	MCFG_EEPROM_ADD(_tag, eeprom_interface_93C46_8bit)
+	MCFG_SERIAL_EEPROM_ADD(_tag, eeprom_interface_93C46_8bit)
 
 #define MCFG_EEPROM_93C66B_ADD(_tag) \
-	MCFG_EEPROM_ADD(_tag, eeprom_interface_93C66B)
+	MCFG_SERIAL_EEPROM_ADD(_tag, eeprom_interface_93C66B)
 
-#define MCFG_EEPROM_DATA(_data, _size) \
-	eeprom_device::static_set_default_data(*device, _data, _size);
-#define MCFG_EEPROM_DEFAULT_VALUE(_value) \
-	eeprom_device::static_set_default_value(*device, _value);
 
 
 //**************************************************************************
@@ -40,9 +42,9 @@
 //**************************************************************************
 
 
-// ======================> eeprom_interface
+// ======================> serial_eeprom_interface
 
-struct eeprom_interface
+struct serial_eeprom_interface
 {
 	UINT8       m_address_bits;         // EEPROM has 2^address_bits cells
 	UINT8       m_data_bits;            // every cell has this many bits (8 or 16)
@@ -58,19 +60,19 @@ struct eeprom_interface
 
 
 
-// ======================> eeprom_device
+// ======================> serial_eeprom_device
 
-class eeprom_device :   public device_t,
-						public device_memory_interface,
-						public device_nvram_interface,
-						public eeprom_interface
+class serial_eeprom_device :   	public device_t,
+								public device_memory_interface,
+								public device_nvram_interface,
+								public serial_eeprom_interface
 {
 public:
 	// construction/destruction
-	eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	serial_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// inline configuration helpers
-	static void static_set_interface(device_t &device, const eeprom_interface &interface);
+	static void static_set_interface(device_t &device, const serial_eeprom_interface &interface);
 	static void static_set_default_data(device_t &device, const UINT8 *data, UINT32 size);
 	static void static_set_default_data(device_t &device, const UINT16 *data, UINT32 size);
 	static void static_set_default_value(device_t &device, UINT16 value);
@@ -123,7 +125,7 @@ protected:
 
 
 // device type definition
-extern const device_type EEPROM;
+extern const device_type SERIAL_EEPROM;
 
 
 
@@ -131,9 +133,9 @@ extern const device_type EEPROM;
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-extern const eeprom_interface eeprom_interface_93C46;
-extern const eeprom_interface eeprom_interface_93C46_8bit;
-extern const eeprom_interface eeprom_interface_93C66B;
+extern const serial_eeprom_interface eeprom_interface_93C46;
+extern const serial_eeprom_interface eeprom_interface_93C46_8bit;
+extern const serial_eeprom_interface eeprom_interface_93C66B;
 
 
 #endif

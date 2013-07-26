@@ -52,7 +52,7 @@ Bucky:
 #define MOO_DMADELAY (100)
 
 
-static const eeprom_interface eeprom_intf =
+static const serial_eeprom_interface eeprom_intf =
 {
 	7,          /* address bits */
 	8,          /* data bits */
@@ -378,7 +378,7 @@ static INPUT_PORTS_START( moo )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE4 )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )    /* EEPROM ready (always 1) */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_SERVICE_NO_TOGGLE(0x08, IP_ACTIVE_LOW)
@@ -394,9 +394,9 @@ static INPUT_PORTS_START( moo )
 	PORT_DIPSETTING(    0x80, "4")
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, write_bit)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_cs_line)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_clock_line)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, write_bit)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, set_cs_line)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, set_clock_line)
 
 	PORT_START("P1_P3")
 	KONAMI16_LSB( 1, IPT_UNKNOWN, IPT_START1 )
@@ -508,7 +508,7 @@ static MACHINE_CONFIG_START( moo, moo_state )
 	MCFG_MACHINE_START_OVERRIDE(moo_state,moo)
 	MCFG_MACHINE_RESET_OVERRIDE(moo_state,moo)
 
-	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_intf)
 
 	MCFG_K053252_ADD("k053252", 16000000/2, moo_k053252_intf)
 
@@ -553,7 +553,7 @@ static MACHINE_CONFIG_START( moobl, moo_state )
 	MCFG_MACHINE_START_OVERRIDE(moo_state,moo)
 	MCFG_MACHINE_RESET_OVERRIDE(moo_state,moo)
 
-	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_intf)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS | VIDEO_UPDATE_AFTER_VBLANK)

@@ -29,7 +29,7 @@ public:
 
 	required_device<cpu_device> m_master;
 	required_device<cpu_device> m_slave;
-	required_device<eeprom_device> m_eeprom;
+	required_device<serial_eeprom_device> m_eeprom;
 
 	UINT8 m_dac_control;
 	UINT8 *m_alleymas_kludge_mem;

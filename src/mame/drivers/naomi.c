@@ -1828,9 +1828,9 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( naomi_mie )
 	PORT_START("MIE.3")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("mie_eeprom", eeprom_device, write_bit)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("mie_eeprom", eeprom_device, set_cs_line)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("mie_eeprom", eeprom_device, set_clock_line)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("mie_eeprom", serial_eeprom_device, write_bit)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("mie_eeprom", serial_eeprom_device, set_cs_line)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("mie_eeprom", serial_eeprom_device, set_clock_line)
 
 	PORT_START("MIE.5")
 	PORT_DIPNAME( 0x01, 0x00, "Monitor" ) PORT_DIPLOCATION("SW1:1")
@@ -1848,7 +1848,7 @@ static INPUT_PORTS_START( naomi_mie )
 	PORT_SERVICE_NO_TOGGLE( 0x10, IP_ACTIVE_LOW )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("mie_eeprom", eeprom_device, read_bit)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("mie_eeprom", serial_eeprom_device, read_bit)
 INPUT_PORTS_END
 
 /* 2 players with 1 joystick and 6 buttons each */
@@ -2494,7 +2494,7 @@ static MACHINE_CONFIG_START( naomi_aw_base, naomi_state )
 	MCFG_MACHINE_RESET_OVERRIDE(naomi_state,naomi)
 
 	MCFG_EEPROM_93C46_ADD("main_eeprom")
-	MCFG_EEPROM_DEFAULT_VALUE(0)
+	MCFG_SERIAL_EEPROM_DEFAULT_VALUE(0)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

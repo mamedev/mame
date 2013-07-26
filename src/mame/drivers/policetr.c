@@ -237,7 +237,7 @@ WRITE32_MEMBER(policetr_state::speedup_w)
  *
  *************************************/
 
-static const eeprom_interface eeprom_interface_policetr =
+static const serial_eeprom_interface eeprom_interface_policetr =
 {
 	8,              // address bits 8
 	16,             // data bits    16
@@ -334,7 +334,7 @@ static INPUT_PORTS_START( policetr )
 	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit) /* EEPROM read */
+	PORT_BIT( 0x20000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit) /* EEPROM read */
 	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -416,7 +416,7 @@ static MACHINE_CONFIG_START( policetr, policetr_state )
 	MCFG_CPU_PROGRAM_MAP(policetr_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", policetr_state,  irq4_gen)
 
-	MCFG_EEPROM_ADD("eeprom", eeprom_interface_policetr)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_interface_policetr)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)

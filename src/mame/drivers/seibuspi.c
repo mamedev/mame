@@ -1247,7 +1247,7 @@ static INPUT_PORTS_START( sxx2f )
 	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("SYSTEM")
-	PORT_BIT( 0x00000040, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
+	PORT_BIT( 0x00000040, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
 INPUT_PORTS_END
 
 
@@ -1365,7 +1365,7 @@ static INPUT_PORTS_START( sys386f )
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x00004000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
+	PORT_BIT( 0x00004000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
 	PORT_BIT( 0xffffbf3f, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("INPUTS")
@@ -1751,7 +1751,7 @@ GFXDECODE_END
 /*****************************************************************************/
 
 /* this is a 93C46 but with reset delay */
-static const eeprom_interface eeprom_intf =
+static const serial_eeprom_interface eeprom_intf =
 {
 	6,              /* address bits */
 	16,             /* data bits */
@@ -1917,7 +1917,7 @@ static MACHINE_CONFIG_DERIVED( sxx2f, sxx2e )
 
 	MCFG_DEVICE_REMOVE("ds2404")
 
-	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_intf)
 
 	// Z80 is Z84C0006PCS instead of Z84C0008PEC
 	// clock is unknown, possibly slower than 7.159MHz
@@ -1950,7 +1950,7 @@ static MACHINE_CONFIG_START( sys386i, seibuspi_state )
 	MCFG_CPU_PROGRAM_MAP(sys386i_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", seibuspi_state, spi_interrupt)
 
-	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_intf)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2000,7 +2000,7 @@ static MACHINE_CONFIG_START( sys386f, seibuspi_state )
 	MCFG_CPU_PROGRAM_MAP(sys386f_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", seibuspi_state, spi_interrupt)
 
-	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_intf)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -70,7 +70,7 @@ public:
 	optional_shared_ptr<UINT16> m_input_sel;
 	optional_shared_ptr<UINT16> m_k053936_ram;
 
-	optional_device<eeprom_device> m_eeprom;
+	optional_device<serial_eeprom_device> m_eeprom;
 
 
 	int         m_flip_screen;

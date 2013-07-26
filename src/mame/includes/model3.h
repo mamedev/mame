@@ -209,7 +209,7 @@ public:
 	void model3_exit();
 	DECLARE_WRITE_LINE_MEMBER(scsp_irq);
 	required_device<cpu_device> m_audiocpu;
-	required_device<eeprom_device> m_eeprom;
+	required_device<serial_eeprom_device> m_eeprom;
 };
 
 

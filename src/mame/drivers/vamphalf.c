@@ -173,7 +173,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<okim6295_device> m_oki;
 	optional_device<okim6295_device> m_oki2;
-	required_device<eeprom_device> m_eeprom;
+	required_device<serial_eeprom_device> m_eeprom;
 };
 
 READ16_MEMBER(vamphalf_state::eeprom_r)
@@ -885,7 +885,7 @@ static INPUT_PORTS_START( aoh )
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000010, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit) // eeprom bit
+	PORT_BIT( 0x00000010, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit) // eeprom bit
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNKNOWN )

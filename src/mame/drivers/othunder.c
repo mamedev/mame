@@ -297,7 +297,7 @@ The eeprom unlock command is different, and the write/clock/reset
 bits are different.
 ******************************************************************/
 
-static const eeprom_interface eeprom_intf =
+static const serial_eeprom_interface eeprom_intf =
 {
 	6,              /* address bits */
 	16,             /* data bits */
@@ -688,7 +688,7 @@ static MACHINE_CONFIG_START( othunder, othunder_state )
 	MCFG_CPU_ADD("audiocpu", Z80,16000000/4 )   /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(z80_sound_map)
 
-	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_intf)
 
 
 	MCFG_TC0220IOC_ADD("tc0220ioc", othunder_io_intf)

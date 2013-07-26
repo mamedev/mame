@@ -254,7 +254,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ym3438_irq_handler);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
-	required_device<eeprom_device> m_eeprom;
+	required_device<serial_eeprom_device> m_eeprom;
 };
 
 /*----------- defined in machine/segas32.c -----------*/

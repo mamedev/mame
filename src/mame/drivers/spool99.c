@@ -122,7 +122,7 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_spool99(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
-	required_device<eeprom_device> m_eeprom;
+	required_device<serial_eeprom_device> m_eeprom;
 	required_device<okim6295_device> m_oki;
 };
 

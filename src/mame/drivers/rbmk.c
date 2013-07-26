@@ -85,7 +85,7 @@ public:
 	INTERRUPT_GEN_MEMBER(mcu_irq);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_mcu;
-	required_device<eeprom_device> m_eeprom;
+	required_device<serial_eeprom_device> m_eeprom;
 };
 
 
@@ -366,7 +366,7 @@ static INPUT_PORTS_START( rbmk )
 	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
 
 	PORT_START("IN4")   /* 16bit */
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )

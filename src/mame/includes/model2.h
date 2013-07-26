@@ -180,7 +180,7 @@ public:
 	optional_device<cpu_device> m_tgp;
 	optional_device<cpu_device> m_dsp;
 	optional_device<cpu_device> m_drivecpu;
-	required_device<eeprom_device> m_eeprom;
+	required_device<serial_eeprom_device> m_eeprom;
 };
 
 /*----------- defined in video/model2.c -----------*/

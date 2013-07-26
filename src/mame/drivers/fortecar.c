@@ -345,7 +345,7 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_fortecar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<eeprom_device> m_eeprom;
+	required_device<serial_eeprom_device> m_eeprom;
 };
 
 
@@ -548,7 +548,7 @@ static MC6845_INTERFACE( mc6845_intf )
 };
 
 
-static const eeprom_interface forte_eeprom_intf =
+static const serial_eeprom_interface forte_eeprom_intf =
 {/*
     Preliminary interface for NM93CS56N Serial EEPROM.
     Correct address & data. Using 93C46 similar protocol.
@@ -702,8 +702,8 @@ static MACHINE_CONFIG_START( fortecar, fortecar_state )
 	MCFG_SCREEN_UPDATE_DRIVER(fortecar_state, screen_update_fortecar)
 
 
-	MCFG_EEPROM_ADD("eeprom", forte_eeprom_intf)
-	MCFG_EEPROM_DEFAULT_VALUE(0)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", forte_eeprom_intf)
+	MCFG_SERIAL_EEPROM_DEFAULT_VALUE(0)
 
 	MCFG_I8255A_ADD( "fcppi0", ppi8255_intf )
 	MCFG_V3021_ADD("rtc")

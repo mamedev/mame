@@ -1193,7 +1193,7 @@ static void real3d_dma_callback(running_machine &machine, UINT32 src, UINT32 dst
 /*****************************************************************************/
 
 /* this is a 93C46 but with reset delay that is needed by Lost World */
-static const eeprom_interface eeprom_intf =
+static const serial_eeprom_interface eeprom_intf =
 {
 	6,              /* address bits */
 	16,             /* data bits */
@@ -1874,7 +1874,7 @@ static INPUT_PORTS_START( common )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service Button B") PORT_CODE(KEYCODE_8)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Test Button B") PORT_CODE(KEYCODE_7)
 	PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -2109,7 +2109,7 @@ static INPUT_PORTS_START( skichamp )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )     /* Select 2 */
 
 	PORT_START("IN1")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service Button B") PORT_CODE(KEYCODE_8)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Test Button B") PORT_CODE(KEYCODE_7)
 	PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -5371,7 +5371,7 @@ static MACHINE_CONFIG_START( model3_10, model3_state )
 	MCFG_MACHINE_START_OVERRIDE(model3_state,model3_10)
 	MCFG_MACHINE_RESET_OVERRIDE(model3_state,model3_10)
 
-	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_intf)
 	MCFG_NVRAM_ADD_1FILL("backup")
 
 
@@ -5412,7 +5412,7 @@ static MACHINE_CONFIG_START( model3_15, model3_state )
 	MCFG_MACHINE_START_OVERRIDE(model3_state,model3_15)
 	MCFG_MACHINE_RESET_OVERRIDE(model3_state,model3_15)
 
-	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_intf)
 	MCFG_NVRAM_ADD_1FILL("backup")
 
 
@@ -5459,7 +5459,7 @@ static MACHINE_CONFIG_START( model3_20, model3_state )
 	MCFG_MACHINE_START_OVERRIDE(model3_state,model3_20)
 	MCFG_MACHINE_RESET_OVERRIDE(model3_state,model3_20)
 
-	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_intf)
 	MCFG_NVRAM_ADD_1FILL("backup")
 
 
@@ -5497,7 +5497,7 @@ static MACHINE_CONFIG_START( model3_21, model3_state )
 	MCFG_MACHINE_START_OVERRIDE(model3_state,model3_21)
 	MCFG_MACHINE_RESET_OVERRIDE(model3_state,model3_21)
 
-	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_intf)
 	MCFG_NVRAM_ADD_1FILL("backup")
 
 
