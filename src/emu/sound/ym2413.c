@@ -323,8 +323,8 @@ static const UINT32 ksl_tab[8*16]=
 };
 #undef DV
 
-/* 0 / 3.0 / 1.5 / 6.0 dB/OCT */
-static const UINT32 ksl_shift[4] = { 31, 1, 2, 0 };
+/* 0 / 1.5 / 3.0 / 6.0 dB/OCT, confirmed on a real YM2413 (the application manual is incorrect) */
+static const UINT32 ksl_shift[4] = { 31, 2, 1, 0 };
 
 
 /* sustain level table (3dB per step) */
