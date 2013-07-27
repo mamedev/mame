@@ -188,8 +188,9 @@ WRITE8_MEMBER( kaypro_state::kaypro2x_system_port_w )
 	output_set_value("ledB", BIT(data, 1));
 
 	/* CLEAR_LINE means to turn motors on */
-	floppy_mon_w(floppy_get_device(machine(), 0), BIT(data, 4) ? CLEAR_LINE : ASSERT_LINE);
-	floppy_mon_w(floppy_get_device(machine(), 1), BIT(data, 4) ? CLEAR_LINE : ASSERT_LINE);
+	// commented out because turning the motors on causes an assert... turning them off is ok though??
+	//floppy_mon_w(floppy_get_device(machine(), 0), BIT(data, 4) ? CLEAR_LINE : ASSERT_LINE);
+	//floppy_mon_w(floppy_get_device(machine(), 1), BIT(data, 4) ? CLEAR_LINE : ASSERT_LINE);
 
 	m_system_port = data;
 }
