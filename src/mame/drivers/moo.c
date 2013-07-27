@@ -41,7 +41,7 @@ Bucky:
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
 #include "sound/k054539.h"
@@ -54,8 +54,6 @@ Bucky:
 
 static const serial_eeprom_interface eeprom_intf =
 {
-	7,          /* address bits */
-	8,          /* data bits */
 	"011000",       /* read command */
 	"011100",       /* write command */
 	"0100100000000",    /* erase command */
@@ -508,7 +506,7 @@ static MACHINE_CONFIG_START( moo, moo_state )
 	MCFG_MACHINE_START_OVERRIDE(moo_state,moo)
 	MCFG_MACHINE_RESET_OVERRIDE(moo_state,moo)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 128, 8, eeprom_intf)
 
 	MCFG_K053252_ADD("k053252", 16000000/2, moo_k053252_intf)
 
@@ -553,7 +551,7 @@ static MACHINE_CONFIG_START( moobl, moo_state )
 	MCFG_MACHINE_START_OVERRIDE(moo_state,moo)
 	MCFG_MACHINE_RESET_OVERRIDE(moo_state,moo)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 128, 8, eeprom_intf)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS | VIDEO_UPDATE_AFTER_VBLANK)

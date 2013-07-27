@@ -593,7 +593,7 @@ Stephh's inputs notes (based on some tests on the "parent" set) :
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/qsound.h"
 #include "sound/okim6295.h" // gigaman2 bootleg
@@ -681,8 +681,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(cps_state::cps2_interrupt)
 
 static const serial_eeprom_interface cps2_eeprom_interface =
 {
-	6,      /* address bits */
-	16,     /* data bits */
 	"0110", /*  read command */
 	"0101", /* write command */
 	"0111"  /* erase command */
@@ -1258,7 +1256,7 @@ static MACHINE_CONFIG_START( cps2, cps_state )
 
 	MCFG_MACHINE_START_OVERRIDE(cps_state,cps2)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", cps2_eeprom_interface)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 64, 16, cps2_eeprom_interface)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)

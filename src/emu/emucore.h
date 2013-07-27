@@ -85,6 +85,7 @@ class running_machine;
 // generic_ptr is a union of pointers to various sizes
 union generic_ptr
 {
+	generic_ptr(void *value) { v = value; }
 	void *      v;
 	INT8 *      i8;
 	UINT8 *     u8;

@@ -90,7 +90,7 @@
 #include "cpu/z80/z80.h"
 
 #include "cpu/m6809/konami.h" /* for the callback and the firq irq definition */
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "sound/2151intf.h"
 #include "sound/k053260.h"
 #include "includes/konamipt.h"
@@ -107,8 +107,6 @@ static KONAMI_SETLINES_CALLBACK( vendetta_banking );
 
 static const serial_eeprom_interface eeprom_intf =
 {
-	7,              /* address bits */
-	8,              /* data bits */
 	"011000",       /*  read command */
 	"011100",       /* write command */
 	0,              /* erase command */
@@ -499,7 +497,7 @@ static MACHINE_CONFIG_START( vendetta, vendetta_state )
 							/* interrupts are triggered by the main CPU */
 
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 128, 8, eeprom_intf)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)

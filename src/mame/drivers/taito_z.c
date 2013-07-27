@@ -968,7 +968,7 @@ DIP switches are not verified
 #include "cpu/z80/z80.h"
 #include "includes/taitoipt.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "sound/2610intf.h"
 #include "sound/flt_vol.h"
 #include "includes/taito_z.h"
@@ -1066,8 +1066,6 @@ static const UINT16 spacegun_default_eeprom[64]=
 
 static const serial_eeprom_interface spacegun_eeprom_intf =
 {
-	6,              /* address bits */
-	16,             /* data bits */
 	"0110",         /* read command */
 	"0101",         /* write command */
 	"0111",         /* erase command */
@@ -3504,7 +3502,7 @@ static MACHINE_CONFIG_START( spacegun, taitoz_state )
 	MCFG_MACHINE_START_OVERRIDE(taitoz_state,bshark)
 	MCFG_MACHINE_RESET_OVERRIDE(taitoz_state,taitoz)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", spacegun_eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 64, 16, spacegun_eeprom_intf)
 	MCFG_SERIAL_EEPROM_DATA(spacegun_default_eeprom, 128)
 
 	MCFG_TC0220IOC_ADD("tc0220ioc", taitoz_io220_intf)

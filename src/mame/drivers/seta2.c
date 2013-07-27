@@ -111,7 +111,7 @@ reelquak:
 #include "cpu/m68000/m68000.h"
 #include "cpu/h83002/h8.h"
 #include "sound/okim9810.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
 #include "machine/mcf5206e.h"

@@ -239,7 +239,7 @@ Stephh's log (2006.09.20) :
 #include "cpu/z80/z80.h"
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
 #include "sound/qsound.h"
@@ -434,8 +434,6 @@ WRITE8_MEMBER(cps_state::qsound_banksw_w)
 
 static const serial_eeprom_interface qsound_eeprom_interface =
 {
-	7,      /* address bits */
-	8,      /* data bits */
 	"0110", /*  read command */
 	"0101", /* write command */
 	"0111"  /* erase command */
@@ -443,8 +441,6 @@ static const serial_eeprom_interface qsound_eeprom_interface =
 
 static const serial_eeprom_interface pang3_eeprom_interface =
 {
-	6,      /* address bits */
-	16,     /* data bits */
 	"0110", /*  read command */
 	"0101", /* write command */
 	"0111"  /* erase command */
@@ -3217,7 +3213,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( pang3, cps1_12MHz )
 
 	/* basic machine hardware */
-	MCFG_SERIAL_EEPROM_ADD("eeprom", pang3_eeprom_interface)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 64, 16, pang3_eeprom_interface)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ganbare, cps1_10MHz )
@@ -3242,7 +3238,7 @@ static MACHINE_CONFIG_DERIVED( qsound, cps1_12MHz )
 
 	MCFG_MACHINE_START_OVERRIDE(cps_state,qsound)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", qsound_eeprom_interface)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 128, 8, qsound_eeprom_interface)
 
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("mono")
@@ -3259,7 +3255,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( wofhfh, cps1_12MHz )
 
 	/* basic machine hardware */
-	MCFG_SERIAL_EEPROM_ADD("eeprom", qsound_eeprom_interface)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 128, 8, qsound_eeprom_interface)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( sf2m3, cps1_12MHz)

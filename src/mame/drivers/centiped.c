@@ -428,7 +428,7 @@ each direction to assign the boundries.
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/s2650/s2650.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "machine/atari_vg.h"
 #include "includes/centiped.h"
 #include "sound/ay8910.h"

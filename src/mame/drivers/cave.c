@@ -84,7 +84,7 @@ Versions known to exist but not dumped:
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "machine/nvram.h"
 #include "cpu/z80/z80.h"
 #include "includes/cave.h"
@@ -389,8 +389,6 @@ WRITE16_MEMBER(cave_state::metmqstr_eeprom_msb_w)
 
 static const serial_eeprom_interface eeprom_interface_93C46_pacslot =
 {
-	6,              // address bits 6
-	16,             // data bits    16
 	"*110",         // read         1 10 aaaaaa
 	"*101",         // write        1 01 aaaaaa dddddddddddddddd
 	"*111",         // erase        1 11 aaaaaa
@@ -2301,7 +2299,7 @@ static MACHINE_CONFIG_START( pacslot, cave_state )
 
 	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
-	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_interface_93C46_pacslot)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 64, 16, eeprom_interface_93C46_pacslot)
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
 

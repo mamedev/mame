@@ -3,7 +3,7 @@
     Cave hardware
 
 ***************************************************************************/
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "machine/nmk112.h"
 
 struct sprite_cave

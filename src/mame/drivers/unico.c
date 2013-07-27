@@ -24,7 +24,7 @@ Year + Game         PCB             Notes
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "includes/unico.h"
 #include "sound/2151intf.h"
 #include "sound/3812intf.h"
@@ -569,8 +569,6 @@ MACHINE_RESET_MEMBER(unico_state,unico)
 
 static const serial_eeprom_interface zeropnt2_eeprom_interface =
 {
-	7,              // address bits 7
-	8,              // data bits    8
 	"*110",         // read         1 10 aaaaaaa
 	"*101",         // write        1 01 aaaaaaa dddddddd
 	"*111",         // erase        1 11 aaaaaaa
@@ -679,7 +677,7 @@ static MACHINE_CONFIG_START( zeropnt2, unico_state )
 
 	MCFG_MACHINE_RESET_OVERRIDE(unico_state,zeropt)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", zeropnt2_eeprom_interface)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 128, 8, zeropnt2_eeprom_interface)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

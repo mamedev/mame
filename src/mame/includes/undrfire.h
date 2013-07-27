@@ -1,4 +1,4 @@
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "video/tc0100scn.h"
 #include "video/tc0480scp.h"
 

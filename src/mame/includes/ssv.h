@@ -1,6 +1,6 @@
 #include "cpu/upd7725/upd7725.h"
 #include "video/st0020.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 
 
 class ssv_state : public driver_device

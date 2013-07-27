@@ -92,7 +92,7 @@ Note
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/okim6295.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 
 class spool99_state : public driver_device
 {

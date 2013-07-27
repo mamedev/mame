@@ -1,5 +1,5 @@
 #include "sound/okim6295.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 
 class unico_state : public driver_device
 {

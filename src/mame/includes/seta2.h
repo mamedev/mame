@@ -1,5 +1,5 @@
 #include "sound/okim9810.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "sound/x1_010.h"
 #include "machine/tmp68301.h"
 

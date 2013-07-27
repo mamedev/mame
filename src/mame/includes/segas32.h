@@ -4,7 +4,7 @@
 
 ***************************************************************************/
 
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 
 
 class segas32_state : public driver_device

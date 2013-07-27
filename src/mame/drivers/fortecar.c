@@ -314,7 +314,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "sound/ay8910.h"
 #include "machine/i8255.h"
 #include "machine/v3021.h"
@@ -553,8 +553,6 @@ static const serial_eeprom_interface forte_eeprom_intf =
     Preliminary interface for NM93CS56N Serial EEPROM.
     Correct address & data. Using 93C46 similar protocol.
 */
-	8,                /* address bits */
-	16,               /* data bits */
 	"*110",           /* read command */
 	"*101",           /* write command */
 	"*111",           /* erase command */
@@ -702,7 +700,7 @@ static MACHINE_CONFIG_START( fortecar, fortecar_state )
 	MCFG_SCREEN_UPDATE_DRIVER(fortecar_state, screen_update_fortecar)
 
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", forte_eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 256, 16, forte_eeprom_intf)
 	MCFG_SERIAL_EEPROM_DEFAULT_VALUE(0)
 
 	MCFG_I8255A_ADD( "fcppi0", ppi8255_intf )

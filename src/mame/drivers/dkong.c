@@ -317,7 +317,7 @@ Donkey Kong Junior Notes
 #include "machine/8257dma.h"
 #include "machine/z80dma.h"
 #include "machine/latch8.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 
 /*************************************
  *

@@ -235,7 +235,7 @@ TODO:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "audio/taitosnd.h"
 #include "sound/2610intf.h"
 #include "sound/flt_vol.h"
@@ -299,8 +299,6 @@ bits are different.
 
 static const serial_eeprom_interface eeprom_intf =
 {
-	6,              /* address bits */
-	16,             /* data bits */
 	"0110",         /* read command */
 	"0101",         /* write command */
 	"0111",         /* erase command */
@@ -688,7 +686,7 @@ static MACHINE_CONFIG_START( othunder, othunder_state )
 	MCFG_CPU_ADD("audiocpu", Z80,16000000/4 )   /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(z80_sound_map)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 64, 16, eeprom_intf)
 
 
 	MCFG_TC0220IOC_ADD("tc0220ioc", othunder_io_intf)

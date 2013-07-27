@@ -20,7 +20,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "sound/gaelco.h"
 #include "rendlay.h"
 #include "includes/gaelco2.h"
@@ -273,8 +273,6 @@ static const gaelcosnd_interface bang_snd_interface =
 
 static const serial_eeprom_interface gaelco2_eeprom_interface =
 {
-	8,              /* address bits */
-	16,             /* data bits */
 	"*110",         /* read command */
 	"*101",         /* write command */
 	"*111",         /* erase command */
@@ -290,7 +288,7 @@ static MACHINE_CONFIG_START( bang, gaelco2_state )
 	MCFG_CPU_PROGRAM_MAP(bang_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", gaelco2_state, bang_irq, "screen", 0, 1)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", gaelco2_eeprom_interface)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 256, 16, gaelco2_eeprom_interface)
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
@@ -967,7 +965,7 @@ static MACHINE_CONFIG_START( snowboar, gaelco2_state )
 	MCFG_CPU_PROGRAM_MAP(snowboar_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaelco2_state,  irq6_line_hold)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", gaelco2_eeprom_interface)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 256, 16, gaelco2_eeprom_interface)
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
@@ -1208,7 +1206,7 @@ static MACHINE_CONFIG_START( wrally2, gaelco2_state )
 	MCFG_CPU_PROGRAM_MAP(wrally2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", gaelco2_state,  irq6_line_hold)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", gaelco2_eeprom_interface)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 256, 16, gaelco2_eeprom_interface)
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")

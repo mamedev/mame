@@ -1,4 +1,4 @@
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 
 class xorworld_state : public driver_device
 {

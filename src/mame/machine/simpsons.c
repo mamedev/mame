@@ -1,7 +1,7 @@
 #include "emu.h"
 
 #include "cpu/m6809/konami.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "sound/k053260.h"
 #include "includes/simpsons.h"
 

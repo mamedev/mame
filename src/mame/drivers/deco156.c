@@ -17,7 +17,7 @@
 #include "emu.h"
 #include "cpu/arm/arm.h"
 #include "includes/decocrpt.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "sound/okim6295.h"
 #include "sound/ymz280b.h"
 #include "video/deco16ic.h"

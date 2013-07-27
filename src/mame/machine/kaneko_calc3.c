@@ -23,7 +23,7 @@
 
 #include "emu.h"
 #include "kaneko_calc3.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 
 const device_type KANEKO_CALC3 = &device_creator<kaneko_calc3_device>;
 

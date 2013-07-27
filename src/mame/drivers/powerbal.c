@@ -15,7 +15,7 @@ Magic Sticks:
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "sound/okim6295.h"
 #include "includes/playmark.h"
 
@@ -49,8 +49,6 @@ public:
 
 static const serial_eeprom_interface eeprom_intf =
 {
-	6,              /* address bits */
-	16,             /* data bits */
 	"*110",         /*  read command */
 	"*101",         /* write command */
 	0,              /* erase command */
@@ -534,7 +532,7 @@ static MACHINE_CONFIG_START( magicstk, powerbal_state )
 	MCFG_CPU_PROGRAM_MAP(magicstk_main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", powerbal_state, irq2_line_hold)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 64, 16, eeprom_intf)
 	MCFG_SERIAL_EEPROM_DEFAULT_VALUE(0)
 
 	MCFG_MACHINE_START_OVERRIDE(powerbal_state,powerbal)

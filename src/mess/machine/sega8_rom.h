@@ -2,7 +2,7 @@
 #define __SEGA8_ROM_H
 
 #include "machine/sega8_slot.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 
 // ======================> sega8_rom_device
 

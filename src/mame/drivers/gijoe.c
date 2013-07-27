@@ -36,7 +36,7 @@ Known Issues
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "sound/k054539.h"
 #include "includes/konamipt.h"
 #include "includes/gijoe.h"
@@ -47,8 +47,6 @@ Known Issues
 
 static const serial_eeprom_interface eeprom_intf =
 {
-	7,              /* address bits */
-	8,              /* data bits */
 	"011000",       /*  read command */
 	"011100",       /* write command */
 	"0100100000000",/* erase command */
@@ -286,7 +284,7 @@ static MACHINE_CONFIG_START( gijoe, gijoe_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 128, 8, eeprom_intf)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_UPDATE_BEFORE_VBLANK)

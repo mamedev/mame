@@ -1,4 +1,4 @@
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "sound/okim6295.h"
 
 class pirates_state : public driver_device

@@ -6,7 +6,7 @@
 
 #include "sound/okim6295.h"
 #include "machine/nvram.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "sound/msm5205.h"
 
 class mitchell_state : public driver_device

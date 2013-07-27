@@ -65,7 +65,7 @@ Updates:
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "sound/2151intf.h"
@@ -405,8 +405,6 @@ WRITE16_MEMBER(tmnt_state::ssriders_protection_w)
 
 static const serial_eeprom_interface eeprom_intf =
 {
-	7,              /* address bits */
-	8,              /* data bits */
 	"011000",       /*  read command */
 	"011100",       /* write command */
 	0,              /* erase command */
@@ -468,8 +466,6 @@ WRITE16_MEMBER(tmnt_state::blswhstl_eeprom_w)
 
 static const serial_eeprom_interface thndrx2_eeprom_intf =
 {
-	7,              /* address bits */
-	8,              /* data bits */
 	"011000",       /*  read command */
 	"010100",       /* write command */
 	0,              /* erase command */
@@ -2440,7 +2436,7 @@ static MACHINE_CONFIG_START( blswhstl, tmnt_state )
 	MCFG_MACHINE_START_OVERRIDE(tmnt_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(tmnt_state,common)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 128, 8, eeprom_intf)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS | VIDEO_UPDATE_AFTER_VBLANK)
@@ -2569,7 +2565,7 @@ static MACHINE_CONFIG_START( prmrsocr, tmnt_state )
 	MCFG_MACHINE_START_OVERRIDE(tmnt_state,prmrsocr)
 	MCFG_MACHINE_RESET_OVERRIDE(tmnt_state,common)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", thndrx2_eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 128, 8, thndrx2_eeprom_intf)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS | VIDEO_UPDATE_AFTER_VBLANK)
@@ -2618,7 +2614,7 @@ static MACHINE_CONFIG_START( tmnt2, tmnt_state )
 	MCFG_MACHINE_START_OVERRIDE(tmnt_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(tmnt_state,common)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 128, 8, eeprom_intf)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS | VIDEO_UPDATE_AFTER_VBLANK)
@@ -2665,7 +2661,7 @@ static MACHINE_CONFIG_START( ssriders, tmnt_state )
 	MCFG_MACHINE_START_OVERRIDE(tmnt_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(tmnt_state,common)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 128, 8, eeprom_intf)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS | VIDEO_UPDATE_AFTER_VBLANK)
@@ -2708,7 +2704,7 @@ static MACHINE_CONFIG_START( sunsetbl, tmnt_state )
 	MCFG_MACHINE_START_OVERRIDE(tmnt_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(tmnt_state,common)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 128, 8, eeprom_intf)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS | VIDEO_UPDATE_AFTER_VBLANK)
@@ -2748,7 +2744,7 @@ static MACHINE_CONFIG_START( thndrx2, tmnt_state )
 	MCFG_MACHINE_START_OVERRIDE(tmnt_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(tmnt_state,common)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", thndrx2_eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 128, 8, thndrx2_eeprom_intf)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS)

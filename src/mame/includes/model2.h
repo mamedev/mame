@@ -1,6 +1,6 @@
 #include "video/poly.h"
 #include "audio/dsbz80.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 
 struct raster_state;
 struct geo_state;

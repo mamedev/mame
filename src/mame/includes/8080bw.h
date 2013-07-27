@@ -6,7 +6,7 @@
 
 #include "includes/mw8080bw.h"
 #include "sound/speaker.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 /* for games in 8080bw.c */
 #define CABINET_PORT_TAG                  "CAB"
 

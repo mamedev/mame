@@ -1,4 +1,4 @@
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "machine/deco146.h"
 
 class deco_mlc_state : public driver_device

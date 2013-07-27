@@ -656,7 +656,7 @@ ALL VROM ROMs are 16M MASK
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/powerpc/ppc.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "machine/53c810.h"
 #include "machine/nvram.h"
 #include "sound/scsp.h"
@@ -1195,8 +1195,6 @@ static void real3d_dma_callback(running_machine &machine, UINT32 src, UINT32 dst
 /* this is a 93C46 but with reset delay that is needed by Lost World */
 static const serial_eeprom_interface eeprom_intf =
 {
-	6,              /* address bits */
-	16,             /* data bits */
 	"*110",         /*  read command */
 	"*101",         /* write command */
 	"*111",         /* erase command */
@@ -5371,7 +5369,7 @@ static MACHINE_CONFIG_START( model3_10, model3_state )
 	MCFG_MACHINE_START_OVERRIDE(model3_state,model3_10)
 	MCFG_MACHINE_RESET_OVERRIDE(model3_state,model3_10)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 64, 16, eeprom_intf)
 	MCFG_NVRAM_ADD_1FILL("backup")
 
 
@@ -5412,7 +5410,7 @@ static MACHINE_CONFIG_START( model3_15, model3_state )
 	MCFG_MACHINE_START_OVERRIDE(model3_state,model3_15)
 	MCFG_MACHINE_RESET_OVERRIDE(model3_state,model3_15)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 64, 16, eeprom_intf)
 	MCFG_NVRAM_ADD_1FILL("backup")
 
 
@@ -5459,7 +5457,7 @@ static MACHINE_CONFIG_START( model3_20, model3_state )
 	MCFG_MACHINE_START_OVERRIDE(model3_state,model3_20)
 	MCFG_MACHINE_RESET_OVERRIDE(model3_state,model3_20)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 64, 16, eeprom_intf)
 	MCFG_NVRAM_ADD_1FILL("backup")
 
 
@@ -5497,7 +5495,7 @@ static MACHINE_CONFIG_START( model3_21, model3_state )
 	MCFG_MACHINE_START_OVERRIDE(model3_state,model3_21)
 	MCFG_MACHINE_RESET_OVERRIDE(model3_state,model3_21)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 64, 16, eeprom_intf)
 	MCFG_NVRAM_ADD_1FILL("backup")
 
 

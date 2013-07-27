@@ -3,7 +3,7 @@
     P&P Marketing Police Trainer hardware
 
 **************************************************************************/
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 class policetr_state : public driver_device
 {
 public:

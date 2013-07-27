@@ -1,6 +1,6 @@
 /*----------- defined in drivers/stv.c -----------*/
 #include "cdrom.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/adsp2100/adsp2100.h"
 

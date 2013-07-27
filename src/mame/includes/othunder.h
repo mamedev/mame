@@ -5,7 +5,7 @@
 *************************************************************************/
 
 #include "audio/taitosnd.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "machine/taitoio.h"
 #include "sound/flt_vol.h"
 #include "video/tc0100scn.h"

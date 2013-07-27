@@ -8,7 +8,7 @@
 
 #include "sound/dmadac.h"
 #include "video/polynew.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "machine/gaelco3d.h"
 
 #define SOUND_CHANNELS  4

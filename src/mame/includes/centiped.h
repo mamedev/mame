@@ -3,7 +3,7 @@
     Atari Centipede hardware
 
 *************************************************************************/
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 
 class centiped_state : public driver_device
 {

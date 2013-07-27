@@ -92,12 +92,10 @@ slampic: no sound. In the wrestling ring, a layer flashes on and off.
 #include "sound/msm5205.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 
 static const serial_eeprom_interface qsound_eeprom_interface =
 {
-	7,      /* address bits */
-	8,      /* data bits */
 	"0110", /*  read command */
 	"0101", /* write command */
 	"0111"  /* erase command */
@@ -1976,7 +1974,7 @@ static MACHINE_CONFIG_START( dinopic, cps_state )
 
 	MCFG_MACHINE_START_OVERRIDE(cps_state, dinopic)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", qsound_eeprom_interface)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 128, 8, qsound_eeprom_interface)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2143,7 +2141,7 @@ static MACHINE_CONFIG_START( sgyxz, cps_state )
 	MCFG_PALETTE_LENGTH(0xc00)
 	MCFG_VIDEO_START_OVERRIDE(cps_state,cps1)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", qsound_eeprom_interface)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 128, 8, qsound_eeprom_interface)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2221,7 +2219,7 @@ static MACHINE_CONFIG_START( punipic, cps_state )
 
 	MCFG_MACHINE_START_OVERRIDE(cps_state, punipic)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", qsound_eeprom_interface)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 128, 8, qsound_eeprom_interface)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2611,7 +2609,7 @@ static MACHINE_CONFIG_START( slampic, cps_state )
 
 	MCFG_MACHINE_START_OVERRIDE(cps_state, slampic)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", qsound_eeprom_interface)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 128, 8, qsound_eeprom_interface)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

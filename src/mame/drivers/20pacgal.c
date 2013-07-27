@@ -83,7 +83,7 @@ Graphics: CY37256P160-83AC x 2 (Ultra37000 CPLD family - 160 pin TQFP, 256 Macro
 
 #include "emu.h"
 #include "cpu/z180/z180.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "sound/dac.h"
 #include "includes/20pacgal.h"
 
@@ -141,8 +141,6 @@ static const namco_interface namco_config =
 
 static const serial_eeprom_interface _20pacgal_eeprom_intf =
 {
-	7,                /* address bits */
-	8,                /* data bits */
 	"*110",           /* read command */
 	"*101",           /* write command */
 	0,                /* erase command */
@@ -368,7 +366,7 @@ static MACHINE_CONFIG_START( 20pacgal, _20pacgal_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", _20pacgal_state,  vblank_irq)
 
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", _20pacgal_eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 128, 8, _20pacgal_eeprom_intf)
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD(20pacgal_video)

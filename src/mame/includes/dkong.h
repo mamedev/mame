@@ -1,5 +1,5 @@
 #include "sound/discrete.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "machine/tms6100.h"
 
 /*

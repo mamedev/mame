@@ -104,7 +104,7 @@ To Do:
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "machine/microtch.h"
 #include "machine/n68681.h"
 #include "machine/nvram.h"
@@ -573,8 +573,6 @@ ADDRESS_MAP_END
 
 static const serial_eeprom_interface galgames_eeprom_interface =
 {
-	10,                 // address bits 10
-	8,                  // data bits    8
 	"*1100",            // read         110 0aaaaaaaaaa
 	"*1010",            // write        101 0aaaaaaaaaa dddddddd
 	"*1110",            // erase        111 0aaaaaaaaaa
@@ -968,11 +966,11 @@ static MACHINE_CONFIG_START( galgames, tmaster_state )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", tmaster_state, tm3k_interrupt, "screen", 0, 1)
 
 	// 5 EEPROMs on the motherboard (for BIOS + 4 Carts)
-	MCFG_SERIAL_EEPROM_ADD(GALGAMES_EEPROM_BIOS,  galgames_eeprom_interface)
-	MCFG_SERIAL_EEPROM_ADD(GALGAMES_EEPROM_CART1, galgames_eeprom_interface)
-	MCFG_SERIAL_EEPROM_ADD(GALGAMES_EEPROM_CART2, galgames_eeprom_interface)
-	MCFG_SERIAL_EEPROM_ADD(GALGAMES_EEPROM_CART3, galgames_eeprom_interface)
-	MCFG_SERIAL_EEPROM_ADD(GALGAMES_EEPROM_CART4, galgames_eeprom_interface)
+	MCFG_SERIAL_EEPROM_ADD(GALGAMES_EEPROM_BIOS,  1024, 8, galgames_eeprom_interface)
+	MCFG_SERIAL_EEPROM_ADD(GALGAMES_EEPROM_CART1, 1024, 8, galgames_eeprom_interface)
+	MCFG_SERIAL_EEPROM_ADD(GALGAMES_EEPROM_CART2, 1024, 8, galgames_eeprom_interface)
+	MCFG_SERIAL_EEPROM_ADD(GALGAMES_EEPROM_CART3, 1024, 8, galgames_eeprom_interface)
+	MCFG_SERIAL_EEPROM_ADD(GALGAMES_EEPROM_CART4, 1024, 8, galgames_eeprom_interface)
 
 	MCFG_MACHINE_RESET_OVERRIDE(tmaster_state, galgames )
 

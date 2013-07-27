@@ -87,7 +87,7 @@
 
 #include "emu.h"
 #include "deco146.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 
 
 

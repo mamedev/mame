@@ -29,7 +29,7 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "sound/i5000.h"
 #include "rendlay.h"
 

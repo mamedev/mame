@@ -101,7 +101,7 @@
 #include "cpu/e132xs/e132xs.h"
 #include "cpu/mcs51/mcs51.h"
 
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "includes/eolith.h"
 #include "includes/eolithsp.h"
 
@@ -546,8 +546,6 @@ INPUT_PORTS_END
 // It's configured for 512 bytes
 static const serial_eeprom_interface eeprom_interface_93C66 =
 {
-	9,              // address bits 9
-	8,              // data bits    8
 	"*110",         // read         110 aaaaaaaaa
 	"*101",         // write        101 aaaaaaaaa dddddddd
 	"*111",         // erase        111 aaaaaaaaa
@@ -597,7 +595,7 @@ static MACHINE_CONFIG_START( eolith45, eolith_state )
 
 	MCFG_MACHINE_RESET_OVERRIDE(eolith_state,eolith)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_interface_93C66)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 512, 8, eeprom_interface_93C66)
 
 //  for testing sound sync
 //  MCFG_QUANTUM_PERFECT_CPU("maincpu")

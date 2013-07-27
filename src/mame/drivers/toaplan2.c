@@ -352,7 +352,7 @@ To Do / Unknowns:
 #include "cpu/nec/nec.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z180/z180.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "sound/2151intf.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
@@ -951,8 +951,6 @@ static const serial_eeprom_interface bbakraid_93C66_intf =
 	// Pin 6 of the 93C66 is connected to Gnd!
 	// So it's configured for 512 bytes
 
-	9,          // address bits
-	8,          // data bits
 	"*110",     // read         110 aaaaaaaaa
 	"*101",     // write        101 aaaaaaaaa dddddddd
 	"*111",     // erase        111 aaaaaaaaa
@@ -3727,7 +3725,7 @@ static MACHINE_CONFIG_START( bbakraid, toaplan2_state )
 	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
 	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,toaplan2)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", bbakraid_93C66_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 512, 8, bbakraid_93C66_intf)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)

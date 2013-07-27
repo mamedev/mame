@@ -31,7 +31,7 @@
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "machine/ticket.h"
 #include "sound/bsmt2000.h"
 #include "includes/dcheese.h"

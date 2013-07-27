@@ -20,7 +20,7 @@
 #include "cpu/mips/mips3.h"
 #include "machine/8530scc.h"
 #include "machine/sgi.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "machine/scsibus.h"
 #include "machine/scsicd.h"
 #include "machine/wd33c93.h"
@@ -108,8 +108,6 @@ UINT32 ip20_state::screen_update_ip204415(screen_device &screen, bitmap_ind16 &b
 
 static const serial_eeprom_interface eeprom_interface_93C56 =
 {
-	7,                  // address bits 7
-	16,                 // data bits    16
 	"*110x",            // read         110x aaaaaaaa
 	"*101x",            // write        101x aaaaaaaa dddddddd
 	"*111x",            // erase        111x aaaaaaaa
@@ -627,7 +625,7 @@ static MACHINE_CONFIG_START( ip204415, ip20_state )
 	MCFG_SOUND_MODIFY( "scsi:cdrom:cdda" )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "^^^mono", 1.0)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_interface_93C56)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 128, 16, eeprom_interface_93C56)
 MACHINE_CONFIG_END
 
 ROM_START( ip204415 )

@@ -335,7 +335,7 @@ orunners:  Interleaved with the dj and << >> buttons is the data the drives the 
 #include "cpu/nec/nec.h"
 #include "rendlay.h"
 #include "includes/segas32.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "sound/2612intf.h"
 #include "sound/rf5c68.h"
 #include "sound/multipcm.h"

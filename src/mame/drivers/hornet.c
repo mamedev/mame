@@ -312,7 +312,7 @@
 #include "cpu/powerpc/ppc.h"
 #include "cpu/sharc/sharc.h"
 #include "machine/adc1213x.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "machine/k033906.h"
 #include "machine/konppc.h"
 #include "machine/timekpr.h"

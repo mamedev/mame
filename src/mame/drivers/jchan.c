@@ -172,7 +172,7 @@ there are 9 PALS on the pcb (not dumped)
 #include "machine/nvram.h"
 #include "sound/ymz280b.h"
 #include "video/sknsspr.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "video/kaneko_tmap.h"
 #include "machine/kaneko_toybox.h"
 

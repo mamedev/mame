@@ -43,7 +43,7 @@
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "machine/nvram.h"
 #include "cpu/z80/z80.h"
 #include "includes/leland.h"
@@ -730,8 +730,6 @@ static const ay8910_interface ay8910_config =
 
 static const serial_eeprom_interface eeprom_intf =
 {
-	6,
-	16,
 	"110",
 	"101",
 	"111"
@@ -760,7 +758,7 @@ static MACHINE_CONFIG_START( leland, leland_state )
 	MCFG_MACHINE_START_OVERRIDE(leland_state,leland)
 	MCFG_MACHINE_RESET_OVERRIDE(leland_state,leland)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 64, 16, eeprom_intf)
 	MCFG_NVRAM_ADD_0FILL("battery")
 
 	/* video hardware */

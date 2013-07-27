@@ -19,7 +19,7 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "sound/2610intf.h"
 #include "rendlay.h"
 #include "includes/fromanc2.h"

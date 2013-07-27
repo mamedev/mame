@@ -2,7 +2,7 @@
 #include "video/bufsprite.h"
 #include "video/decospr.h"
 #include "video/deco16ic.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "sound/okim6295.h"
 #include "machine/deco146.h"
 #include "machine/deco104.h"

@@ -4,7 +4,7 @@
 
 *************************************************************************/
 #include "sound/okim6295.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 
 struct lordgun_gun_data
 {

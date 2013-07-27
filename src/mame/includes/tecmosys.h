@@ -3,7 +3,7 @@
     tecmosys protection simulation
 
 ***************************************************************************/
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 
 class tecmosys_state : public driver_device
 {

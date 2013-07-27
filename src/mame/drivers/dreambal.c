@@ -25,7 +25,7 @@ lamps?
 #include "sound/okim6295.h"
 #include "video/deco16ic.h"
 #include "video/decospr.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "machine/deco104.h"
 
 class dreambal_state : public driver_device

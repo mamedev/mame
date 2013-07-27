@@ -2,7 +2,7 @@
 #define __MIE_H__
 
 #include "cpu/z80/z80.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "machine/jvshost.h"
 #include "machine/mapledev.h"
 

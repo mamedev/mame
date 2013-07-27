@@ -47,7 +47,7 @@ mcu_subcmd  = kaneko16_mcu_ram[0x0014/2];    // sub-command parameter, happens o
 
 #include "emu.h"
 #include "kaneko_toybox.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 
 const device_type KANEKO_TOYBOX = &device_creator<kaneko_toybox_device>;
 

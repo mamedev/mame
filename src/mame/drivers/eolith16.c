@@ -11,7 +11,7 @@
 
 #include "emu.h"
 #include "cpu/e132xs/e132xs.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 
 #include "sound/okim6295.h"
 #include "includes/eolith.h"
@@ -41,8 +41,6 @@ public:
 // It's configured for 512 bytes
 static const serial_eeprom_interface eeprom_interface_93C66 =
 {
-	9,              // address bits 9
-	8,              // data bits    8
 	"*110",         // read         110 aaaaaaaaa
 	"*101",         // write        101 aaaaaaaaa dddddddd
 	"*111",         // erase        111 aaaaaaaaa
@@ -181,7 +179,7 @@ static MACHINE_CONFIG_START( eolith16, eolith16_state )
 	MCFG_CPU_PROGRAM_MAP(eolith16_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", eolith16_state, eolith_speedup, "screen", 0, 1)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_interface_93C66)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 512, 8, eeprom_interface_93C66)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -91,7 +91,7 @@ Notes:
 #include "cpu/z80/z80.h"
 #include "sound/okim9810.h"
 #include "sound/ymz280b.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
 
@@ -1677,8 +1677,6 @@ INPUT_PORTS_END
 
 const serial_eeprom_interface eeprom_intf =
 {
-	6,              // address bits 6
-	16,             // data bits    16
 	"*110",         // read         1 10 aaaaaa
 	"*101",         // write        1 01 aaaaaa dddddddddddddddd
 	"*111",         // erase        1 11 aaaaaa
@@ -1700,7 +1698,7 @@ static MACHINE_CONFIG_START( gegege, sigmab98_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", sigmab98_state,  gegege_vblank_interrupt)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
-	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 64, 16, eeprom_intf)
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW )
 
@@ -1728,8 +1726,6 @@ MACHINE_CONFIG_END
 
 static const serial_eeprom_interface eeprom_interface_93C46_8bit_delay =
 {
-	7,              // address bits 6
-	8,              // data bits    8
 	"*110",         // read         1 10 aaaaaa
 	"*101",         // write        1 01 aaaaaa dddddddd
 	"*111",         // erase        1 11 aaaaaa
@@ -1754,7 +1750,7 @@ static MACHINE_CONFIG_START( sammymdl, sigmab98_state )
 	MCFG_MACHINE_RESET_OVERRIDE(sigmab98_state, sammymdl )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")   // battery
-	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_interface_93C46_8bit_delay)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 128, 8, eeprom_interface_93C46_8bit_delay)
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW )
 

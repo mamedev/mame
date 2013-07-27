@@ -86,7 +86,7 @@ PC5380-9651            5380-JY3306A           5380-N1045503A
 
 #include "emu.h"
 #include "cpu/mips/r3000.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "includes/policetr.h"
 #include "sound/bsmt2000.h"
 
@@ -239,8 +239,6 @@ WRITE32_MEMBER(policetr_state::speedup_w)
 
 static const serial_eeprom_interface eeprom_interface_policetr =
 {
-	8,              // address bits 8
-	16,             // data bits    16
 	"*110",         // read         1 10 aaaaaa
 	"*101",         // write        1 01 aaaaaa dddddddddddddddd
 	"*111",         // erase        1 11 aaaaaa
@@ -416,7 +414,7 @@ static MACHINE_CONFIG_START( policetr, policetr_state )
 	MCFG_CPU_PROGRAM_MAP(policetr_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", policetr_state,  irq4_gen)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_interface_policetr)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 256, 16, eeprom_interface_policetr)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)

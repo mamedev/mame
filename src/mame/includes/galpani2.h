@@ -1,6 +1,6 @@
 #include "video/kaneko_spr.h"
 #include "sound/okim6295.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 
 class galpani2_state : public driver_device
 {

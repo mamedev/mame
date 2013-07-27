@@ -24,7 +24,7 @@
 
 #include "emu.h"
 #include "cpu/e132xs/e132xs.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "sound/qs1000.h"
 #include "sound/okim6295.h"
 

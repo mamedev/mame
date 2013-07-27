@@ -380,7 +380,7 @@ Notes:
 #include "cpu/mc68hc11/mc68hc11.h"
 #include "sound/es5506.h"
 #include "sound/okim6295.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "audio/taito_en.h"
 #include "includes/taitojc.h"
 

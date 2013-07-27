@@ -3,7 +3,7 @@
 naomi.h -> NAOMI includes
 
 */
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "machine/intelfsh.h"
 
 enum {

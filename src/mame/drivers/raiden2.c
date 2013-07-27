@@ -148,7 +148,7 @@ Current Problem(s) - in order of priority
 #include "cpu/nec/nec.h"
 #include "cpu/z80/z80.h"
 #include "audio/seibu.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "sound/okim6295.h"
 #include "includes/raiden2.h"
 #include "video/seibu_crtc.h"

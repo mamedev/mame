@@ -1,5 +1,5 @@
 #include "video/bufsprite.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 
 #define MASTER_CLOCK 57272700   // main oscillator frequency
 

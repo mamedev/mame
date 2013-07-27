@@ -27,7 +27,7 @@
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "machine/nvram.h"
 #include "cpu/z80/z80.h"
 #include "includes/leland.h"
@@ -292,8 +292,6 @@ INPUT_PORTS_END
 
 static const serial_eeprom_interface eeprom_intf =
 {
-	7,
-	16,
 	"000001100",
 	"000001010",
 	0,
@@ -328,7 +326,7 @@ static MACHINE_CONFIG_START( ataxx, leland_state )
 	MCFG_MACHINE_START_OVERRIDE(leland_state,ataxx)
 	MCFG_MACHINE_RESET_OVERRIDE(leland_state,ataxx)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 128, 16, eeprom_intf)
 	MCFG_NVRAM_ADD_0FILL("battery")
 
 	/* video hardware */

@@ -1,5 +1,5 @@
 #include "sound/okim6295.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 
 class playmark_state : public driver_device
 {

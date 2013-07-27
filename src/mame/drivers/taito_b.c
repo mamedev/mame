@@ -180,7 +180,7 @@ TODO!
 #include "cpu/z80/z80.h"
 #include "includes/taitoipt.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "audio/taitosnd.h"
 #include "sound/2203intf.h"
 #include "sound/2610intf.h"
@@ -375,8 +375,6 @@ INPUT_CHANGED_MEMBER(taitob_state::realpunc_sensor)
 
 static const serial_eeprom_interface taitob_eeprom_intf =
 {
-	6,              /* address bits */
-	16,             /* data bits */
 	"0110",         /*  read command */
 	"0101",         /* write command */
 	"0111",         /* erase command */
@@ -2356,7 +2354,7 @@ static MACHINE_CONFIG_START( pbobble, taitob_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", taitob_eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 64, 16, taitob_eeprom_intf)
 
 	MCFG_TC0640FIO_ADD("tc0640fio", pbobble_io_intf)
 
@@ -2404,7 +2402,7 @@ static MACHINE_CONFIG_START( spacedx, taitob_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", taitob_eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 64, 16, taitob_eeprom_intf)
 
 	MCFG_TC0640FIO_ADD("tc0640fio", pbobble_io_intf)
 
@@ -2496,7 +2494,7 @@ static MACHINE_CONFIG_START( qzshowby, taitob_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", taitob_eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 64, 16, taitob_eeprom_intf)
 
 	MCFG_TC0640FIO_ADD("tc0640fio", pbobble_io_intf)
 

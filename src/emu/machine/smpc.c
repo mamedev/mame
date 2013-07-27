@@ -150,7 +150,7 @@ TODO:
 #include "coreutil.h"
 #include "includes/stv.h"
 #include "machine/smpc.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 
 #define LOG_SMPC 0
 #define LOG_PAD_CMD 0

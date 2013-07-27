@@ -16,7 +16,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/kabuki.h"  // needed for decoding functions only
 #include "includes/cbasebal.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "sound/okim6295.h"
 #include "sound/2413intf.h"
 
@@ -91,8 +91,6 @@ WRITE8_MEMBER(cbasebal_state::cbasebal_coinctrl_w)
 
 static const serial_eeprom_interface cbasebal_eeprom_intf =
 {
-	6,      /* address bits */
-	16,     /* data bits */
 	"0110", /*  read command */
 	"0101", /* write command */
 	"0111"  /* erase command */
@@ -275,7 +273,7 @@ static MACHINE_CONFIG_START( cbasebal, cbasebal_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cbasebal_state,  irq0_line_hold)   /* ??? */
 
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", cbasebal_eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 64, 16, cbasebal_eeprom_intf)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)

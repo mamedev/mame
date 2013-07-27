@@ -230,7 +230,7 @@ Notes:
 #include "cpu/m6809/m6809.h"
 #include "cpu/z80/z80.h"
 #include "includes/decocrpt.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "includes/deco32.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
@@ -1671,8 +1671,6 @@ WRITE8_MEMBER(deco32_state::sound_bankswitch_w)
 
 static const serial_eeprom_interface eeprom_interface_tattass =
 {
-	10,             // address bits 10  ==> } 1024 byte eprom
-	8,              // data bits    8
 };
 
 /**********************************************************************************/
@@ -2161,7 +2159,7 @@ static MACHINE_CONFIG_START( tattass, deco32_state )
 	MCFG_CPU_PROGRAM_MAP(tattass_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", deco32_state,  deco32_vbl_interrupt)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_interface_tattass)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 1024, 8, eeprom_interface_tattass)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

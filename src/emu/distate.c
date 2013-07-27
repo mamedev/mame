@@ -81,6 +81,7 @@ const UINT64 device_state_entry::k_decimal_divisor[] =
 device_state_entry::device_state_entry(int index, const char *symbol, void *dataptr, UINT8 size)
 	: m_next(NULL),
 		m_index(index),
+		m_dataptr(dataptr),
 		m_datamask(0),
 		m_datasize(size),
 		m_flags(0),
@@ -88,9 +89,6 @@ device_state_entry::device_state_entry(int index, const char *symbol, void *data
 		m_default_format(true),
 		m_sizemask(0)
 {
-	// set the data pointer
-	m_dataptr.v = dataptr;
-
 	// convert the size to a mask
 	assert(size == 1 || size == 2 || size == 4 || size == 8);
 	if (size == 1)

@@ -65,7 +65,7 @@ Dumped by Uki
 #include "cpu/m68000/m68000.h"
 #include "sound/ymz280b.h"
 #include "video/sknsspr.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "machine/kaneko_toybox.h"
 #include "video/kaneko_grap2.h"
 

@@ -67,15 +67,13 @@
 #include "cpu/z80/z80.h"
 #include "cpu/dsp56k/dsp56k.h"
 #include "sound/k054539.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "includes/plygonet.h"
 
 enum { BANK_GROUP_A, BANK_GROUP_B, INVALID_BANK_GROUP };
 
 static const serial_eeprom_interface eeprom_intf =
 {
-	9,               // address bits
-	8,               // data bits
 	"*110",          // read command
 	"*101",          // write command
 	"*111",          // erase command
@@ -671,7 +669,7 @@ static MACHINE_CONFIG_START( plygonet, polygonet_state )
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu") /* TODO: TEMPORARY!  UNTIL A MORE LOCALIZED SYNC CAN BE MADE */
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 512, 8, eeprom_intf)
 
 	MCFG_GFXDECODE(plygonet)
 

@@ -14,7 +14,7 @@
 #include "machine/kaneko_calc3.h"
 #include "machine/kaneko_toybox.h"
 #include "sound/okim6295.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 
 
 class kaneko16_state : public driver_device

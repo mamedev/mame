@@ -7,7 +7,7 @@
 #include "cpu/jaguar/jaguar.h"
 #include "machine/nvram.h"
 #include "sound/dac.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "machine/vt83c461.h"
 #include "imagedev/snapquik.h"
 

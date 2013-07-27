@@ -98,7 +98,7 @@ driver modified by Eisuke Watanabe
 #include "cpu/h83002/h8.h"
 #include "cpu/upd7810/upd7810.h"
 #include "includes/metro.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "sound/2151intf.h"
 #include "sound/2413intf.h"
 #include "sound/2610intf.h"

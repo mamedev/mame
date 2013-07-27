@@ -23,7 +23,7 @@
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "machine/pxa255.h"
 #include "sound/dmadac.h"
 

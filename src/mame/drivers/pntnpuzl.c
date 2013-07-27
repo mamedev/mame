@@ -122,7 +122,7 @@ CN1 standard DB15 VGA connector (15KHz)
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "video/pc_vga.h"
 
 
@@ -160,8 +160,6 @@ public:
 
 static const serial_eeprom_interface eeprom_intf =
 {
-	6,              /* address bits */
-	16,             /* data bits */
 	"*110",         /*  read command */
 	"*101",         /* write command */
 	NULL,           /* erase command */
@@ -359,7 +357,7 @@ static MACHINE_CONFIG_START( pntnpuzl, pntnpuzl_state )
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)//??
 	MCFG_CPU_PROGRAM_MAP(pntnpuzl_map)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 64, 16, eeprom_intf)
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_vga )

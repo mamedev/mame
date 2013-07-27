@@ -5,7 +5,7 @@
 *************************************************************************/
 
 #include "sound/okim6295.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 
 class kickgoal_state : public driver_device
 {

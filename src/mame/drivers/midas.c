@@ -53,7 +53,7 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/ymz280b.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "machine/ticket.h"
 
 

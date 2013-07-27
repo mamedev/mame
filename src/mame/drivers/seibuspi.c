@@ -845,7 +845,7 @@ Notes:
 #include "cpu/z80/z80.h"
 #include "cpu/i386/i386.h"
 #include "machine/ds2404.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "machine/intelfsh.h"
 #include "machine/7200fifo.h"
 #include "sound/okim6295.h"
@@ -1753,8 +1753,6 @@ GFXDECODE_END
 /* this is a 93C46 but with reset delay */
 static const serial_eeprom_interface eeprom_intf =
 {
-	6,              /* address bits */
-	16,             /* data bits */
 	"*110",         /* read command */
 	"*101",         /* write command */
 	"*111",         /* erase command */
@@ -1917,7 +1915,7 @@ static MACHINE_CONFIG_DERIVED( sxx2f, sxx2e )
 
 	MCFG_DEVICE_REMOVE("ds2404")
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 64, 16, eeprom_intf)
 
 	// Z80 is Z84C0006PCS instead of Z84C0008PEC
 	// clock is unknown, possibly slower than 7.159MHz
@@ -1950,7 +1948,7 @@ static MACHINE_CONFIG_START( sys386i, seibuspi_state )
 	MCFG_CPU_PROGRAM_MAP(sys386i_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", seibuspi_state, spi_interrupt)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 64, 16, eeprom_intf)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2000,7 +1998,7 @@ static MACHINE_CONFIG_START( sys386f, seibuspi_state )
 	MCFG_CPU_PROGRAM_MAP(sys386f_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", seibuspi_state, spi_interrupt)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 64, 16, eeprom_intf)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

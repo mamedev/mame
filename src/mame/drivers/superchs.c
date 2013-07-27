@@ -39,7 +39,7 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "sound/es5506.h"
 #include "audio/taito_en.h"
 
@@ -305,8 +305,6 @@ GFXDECODE_END
 
 static const serial_eeprom_interface superchs_eeprom_interface =
 {
-	6,              /* address bits */
-	16,             /* data bits */
 	"0110",         /* read command */
 	"0101",         /* write command */
 	"0111",         /* erase command */
@@ -337,7 +335,7 @@ static MACHINE_CONFIG_START( superchs, superchs_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(480)) /* Need to interleave CPU 1 & 3 */
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", superchs_eeprom_interface)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 64, 16, superchs_eeprom_interface)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

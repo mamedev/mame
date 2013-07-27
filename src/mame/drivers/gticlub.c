@@ -220,7 +220,7 @@ Hang Pilot (uses an unknown but similar video board)                12W         
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "cpu/powerpc/ppc.h"
 #include "cpu/sharc/sharc.h"
 #include "machine/konppc.h"
@@ -362,8 +362,6 @@ WRITE32_MEMBER(gticlub_state::gticlub_k001604_reg_w)
 /* 93C56 EEPROM */
 static const serial_eeprom_interface eeprom_intf =
 {
-	8,              /* address bits */
-	16,             /* data bits */
 	"*110",         /*  read command */
 	"*101",         /* write command */
 	"*111",         /* erase command */
@@ -978,7 +976,7 @@ static MACHINE_CONFIG_START( gticlub, gticlub_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 256, 16, eeprom_intf)
 
 	MCFG_MACHINE_START_OVERRIDE(gticlub_state,gticlub)
 	MCFG_MACHINE_RESET_OVERRIDE(gticlub_state,gticlub)
@@ -1085,7 +1083,7 @@ static MACHINE_CONFIG_START( hangplt, gticlub_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 256, 16, eeprom_intf)
 
 	MCFG_MACHINE_START_OVERRIDE(gticlub_state,gticlub)
 	MCFG_MACHINE_RESET_OVERRIDE(gticlub_state,hangplt)

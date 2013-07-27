@@ -8,7 +8,7 @@
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "cpu/z80/z80.h"
 #include "includes/leland.h"
 #include "sound/ay8910.h"

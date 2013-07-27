@@ -89,15 +89,13 @@ Notes:
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "sound/okim6295.h"
 #include "includes/pirates.h"
 
 
 static const serial_eeprom_interface eeprom_intf =
 {
-	6,              /* address bits */
-	16,             /* data bits */
 	"*110",         /*  read command */
 	"*101",         /* write command */
 	0,              /* erase command */
@@ -262,7 +260,7 @@ static MACHINE_CONFIG_START( pirates, pirates_state )
 	MCFG_CPU_PROGRAM_MAP(pirates_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pirates_state,  irq1_line_hold)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 64, 16, eeprom_intf)
 
 	MCFG_GFXDECODE(pirates)
 

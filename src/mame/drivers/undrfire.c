@@ -188,7 +188,7 @@ Board contains only 29 ROMs and not much else.
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "sound/es5506.h"
 #include "audio/taito_en.h"
 #include "includes/undrfire.h"
@@ -243,8 +243,6 @@ void undrfire_state::device_timer(emu_timer &timer, device_timer_id id, int para
 
 static const serial_eeprom_interface undrfire_eeprom_interface =
 {
-	6,              /* address bits */
-	16,             /* data bits */
 	"0110",         /* read command */
 	"0101",         /* write command */
 	"0111",         /* erase command */
@@ -734,7 +732,7 @@ static MACHINE_CONFIG_START( undrfire, undrfire_state )
 	MCFG_CPU_PROGRAM_MAP(undrfire_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", undrfire_state,  undrfire_interrupt)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", undrfire_eeprom_interface)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 64, 16, undrfire_eeprom_interface)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -769,7 +767,7 @@ static MACHINE_CONFIG_START( cbombers, undrfire_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(480))   /* CPU slices - Need to interleave Cpu's 1 & 3 */
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", undrfire_eeprom_interface)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 64, 16, undrfire_eeprom_interface)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "deco104.h"
 
 // the same way some 146 games require an address XOR of 0x44a at some point during the read chain

@@ -2,7 +2,7 @@
 #include "machine/scsibus.h"
 #include "machine/53c810.h"
 #include "audio/dsbz80.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 
 typedef float MATRIX[4][4];
 typedef float VECTOR[4];

@@ -39,7 +39,7 @@ $305.b invincibility
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "sound/es5506.h"
 #include "audio/taito_en.h"
 #include "includes/galastrm.h"
@@ -277,8 +277,6 @@ GFXDECODE_END
 
 static const serial_eeprom_interface galastrm_eeprom_interface =
 {
-	6,              /* address bits */
-	16,             /* data bits */
 	"0110",         /* read command */
 	"0101",         /* write command */
 	"0111",         /* erase command */
@@ -313,7 +311,7 @@ static MACHINE_CONFIG_START( galastrm, galastrm_state )
 	MCFG_CPU_PROGRAM_MAP(galastrm_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", galastrm_state,  galastrm_interrupt) /* VBL */
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", galastrm_eeprom_interface)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 64, 16, galastrm_eeprom_interface)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

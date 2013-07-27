@@ -27,7 +27,7 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "video/k053250.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/2151intf.h"
 #include "sound/k053260.h"
@@ -56,8 +56,6 @@ static const UINT16 overdriv_default_eeprom[64] =
 
 static const serial_eeprom_interface eeprom_intf =
 {
-	6,              /* address bits */
-	16,             /* data bits */
 	"011000",       /*  read command */
 	"010100",       /* write command */
 	0,              /* erase command */
@@ -353,7 +351,7 @@ static MACHINE_CONFIG_START( overdriv, overdriv_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 64, 16, eeprom_intf)
 	MCFG_SERIAL_EEPROM_DATA(overdriv_default_eeprom, 128)
 
 	/* video hardware */

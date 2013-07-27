@@ -34,7 +34,7 @@ PCB:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
 #include "machine/i8255.h"

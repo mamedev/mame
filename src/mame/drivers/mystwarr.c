@@ -26,7 +26,7 @@
 #include "includes/konamigx.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "sound/k054539.h"
 #include "includes/konamipt.h"
 #include "includes/mystwarr.h"
@@ -35,8 +35,6 @@
 
 static const serial_eeprom_interface eeprom_intf =
 {
-	7,          /* address bits */
-	8,          /* data bits */
 	"011000",       /*  read command */
 	"011100",       /* write command */
 	"0100100000000",/* erase command */
@@ -48,8 +46,6 @@ static const serial_eeprom_interface eeprom_intf =
    but the command formats are slightly different.  Why? */
 static const serial_eeprom_interface gaia_eeprom_intf =
 {
-	7,          /* address bits */
-	8,          /* data bits */
 	"011000",       /*  read command */
 	"010100",       /* write command */
 	"0100100000000",/* erase command */
@@ -974,7 +970,7 @@ static MACHINE_CONFIG_START( mystwarr, mystwarr_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(1920))
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 128, 8, eeprom_intf)
 	MCFG_K053252_ADD("k053252", 6000000, mystwarr_k053252_intf) // 6 MHz?
 
 	MCFG_MACHINE_START_OVERRIDE(mystwarr_state,mystwarr)
@@ -1101,7 +1097,7 @@ static MACHINE_CONFIG_DERIVED( gaiapols, mystwarr )
 	MCFG_GFXDECODE(gaiapols)
 
 	MCFG_DEVICE_REMOVE("eeprom")
-	MCFG_SERIAL_EEPROM_ADD("eeprom", gaia_eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 128, 8, gaia_eeprom_intf)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(mystwarr_state,gaiapols)

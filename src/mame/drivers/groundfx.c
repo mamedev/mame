@@ -64,7 +64,7 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "sound/es5506.h"
 #include "audio/taito_en.h"
 #include "includes/groundfx.h"
@@ -116,8 +116,6 @@ void groundfx_state::device_timer(emu_timer &timer, device_timer_id id, int para
 
 static const serial_eeprom_interface groundfx_eeprom_interface =
 {
-	6,              /* address bits */
-	16,             /* data bits */
 	"0110",         /* read command */
 	"0101",         /* write command */
 	"0111",         /* erase command */
@@ -372,7 +370,7 @@ static MACHINE_CONFIG_START( groundfx, groundfx_state )
 	MCFG_CPU_PROGRAM_MAP(groundfx_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", groundfx_state,  groundfx_interrupt)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", groundfx_eeprom_interface)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 64, 16, groundfx_eeprom_interface)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

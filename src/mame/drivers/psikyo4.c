@@ -129,7 +129,7 @@ ROMs -
 #include "emu.h"
 
 #include "cpu/sh2/sh2.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "sound/ymf278b.h"
 #include "rendlay.h"
 #include "includes/psikyo4.h"
@@ -152,8 +152,6 @@ GFXDECODE_END
 
 static const serial_eeprom_interface eeprom_interface_93C56 =
 {
-	8,      // address bits 8
-	8,      // data bits    8
 	"*110x",    // read         110x aaaaaaaa
 	"*101x",    // write        101x aaaaaaaa dddddddd
 	"*111x",    // erase        111x aaaaaaaa
@@ -669,7 +667,7 @@ static MACHINE_CONFIG_START( ps4big, psikyo4_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", psikyo4_state,  psikyosh_interrupt)
 
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_interface_93C56)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 256, 8, eeprom_interface_93C56)
 	MCFG_SERIAL_EEPROM_DEFAULT_VALUE(0)
 
 	/* video hardware */

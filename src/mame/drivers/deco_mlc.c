@@ -99,7 +99,7 @@
 
 #include "emu.h"
 #include "includes/decocrpt.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "sound/ymz280b.h"
 #include "cpu/arm/arm.h"
 #include "cpu/sh2/sh2.h"

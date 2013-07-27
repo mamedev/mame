@@ -7,7 +7,7 @@
 #include "sound/okim6295.h"
 #include "sound/2151intf.h"
 #include "video/k053936.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 
 class metro_state : public driver_device
 {

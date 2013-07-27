@@ -1,6 +1,6 @@
 #include "cpu/m68000/m68000.h"
 #include "video/bufsprite.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 
 class gaelco2_state : public driver_device
 {

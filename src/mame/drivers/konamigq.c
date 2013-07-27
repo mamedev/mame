@@ -50,7 +50,7 @@
 #include "cpu/psx/psx.h"
 #include "video/psx.h"
 #include "machine/am53cf96.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "machine/mb89371.h"
 #include "machine/scsibus.h"
 #include "machine/scsihd.h"

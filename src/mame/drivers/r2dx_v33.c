@@ -17,7 +17,7 @@ Then it puts settings at 0x9e08 and 0x9e0a (bp 91acb)
 #include "cpu/nec/nec.h"
 #include "cpu/z80/z80.h"
 #include "audio/seibu.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "sound/okim6295.h"
 #include "includes/raiden2.h"
 #include "drivlgcy.h"

@@ -162,7 +162,7 @@ maybe some sprite placement issues
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6809/hd6309.h"
 #include "cpu/z80/z80.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "sound/k054539.h"
 #include "includes/lethal.h"
 
@@ -178,8 +178,6 @@ static const char *const gunnames[] = { "LIGHT0_X", "LIGHT0_Y", "LIGHT1_X", "LIG
 
 static const serial_eeprom_interface eeprom_intf =
 {
-	7,          /* address bits */
-	8,          /* data bits */
 	"011000",       /* read command */
 	"011100",       /* write command */
 	"0100100000000",    /* erase command */
@@ -639,7 +637,7 @@ static MACHINE_CONFIG_START( lethalen, lethal_state )
 	MCFG_CPU_PROGRAM_MAP(le_sound)
 
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 128, 8, eeprom_intf)
 
 	MCFG_GFXDECODE(lethal)
 

@@ -119,7 +119,7 @@ as well as Up Right, Cocktail or Flip Screen from the service menu.
 #include "emu.h"
 #include "cpu/h83002/h8.h"
 #include "sound/okim9810.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 
 class invqix_state : public driver_device
 {

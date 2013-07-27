@@ -37,7 +37,7 @@ TODO:
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "sound/okim6295.h"
 #include "includes/playmark.h"
@@ -63,8 +63,6 @@ WRITE16_MEMBER(playmark_state::coinctrl_w)
 
 static const serial_eeprom_interface eeprom_intf =
 {
-	6,              /* address bits */
-	16,             /* data bits */
 	"*110",         /*  read command */
 	"*101",         /* write command */
 	0,              /* erase command */
@@ -1128,7 +1126,7 @@ static MACHINE_CONFIG_START( wbeachvl, playmark_state )
 	/* Program and Data Maps are internal to the MCU */
 //  MCFG_CPU_IO_MAP(playmark_sound_io_map)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 64, 16, eeprom_intf)
 	MCFG_SERIAL_EEPROM_DEFAULT_VALUE(0)
 
 	MCFG_MACHINE_START_OVERRIDE(playmark_state,playmark)
@@ -1199,7 +1197,7 @@ static MACHINE_CONFIG_START( hotmind, playmark_state )
 	/* Program and Data Maps are internal to the MCU */
 	MCFG_CPU_IO_MAP(playmark_sound_io_map)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 64, 16, eeprom_intf)
 	MCFG_SERIAL_EEPROM_DEFAULT_VALUE(0)
 
 	MCFG_MACHINE_START_OVERRIDE(playmark_state,playmark)

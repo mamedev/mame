@@ -68,7 +68,7 @@ mw-9.rom = ST M27C1001 / GFX
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "machine/kabuki.h"  // needed for decoding functions only
 #include "includes/mitchell.h"
 #include "sound/okim6295.h"
@@ -85,8 +85,6 @@ mw-9.rom = ST M27C1001 / GFX
 
 static const serial_eeprom_interface eeprom_intf =
 {
-	6,      /* address bits */
-	16,     /* data bits */
 	"0110", /*  read command */
 	"0101", /* write command */
 	"0111"  /* erase command */
@@ -1090,7 +1088,7 @@ static MACHINE_CONFIG_START( mgakuen, mitchell_state )
 	MCFG_MACHINE_START_OVERRIDE(mitchell_state,mitchell)
 	MCFG_MACHINE_RESET_OVERRIDE(mitchell_state,mitchell)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 64, 16, eeprom_intf)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1127,7 +1125,7 @@ static MACHINE_CONFIG_START( pang, mitchell_state )
 	MCFG_MACHINE_START_OVERRIDE(mitchell_state,mitchell)
 	MCFG_MACHINE_RESET_OVERRIDE(mitchell_state,mitchell)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 64, 16, eeprom_intf)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1262,7 +1260,7 @@ static MACHINE_CONFIG_START( marukin, mitchell_state )
 	MCFG_CPU_IO_MAP(mitchell_io_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mitchell_state, mitchell_irq, "screen", 0, 1)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 64, 16, eeprom_intf)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1313,7 +1311,7 @@ static MACHINE_CONFIG_START( pkladiesbl, mitchell_state )
 	MCFG_CPU_IO_MAP(mitchell_io_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mitchell_state, mitchell_irq, "screen", 0, 1)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 64, 16, eeprom_intf)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -224,6 +224,7 @@ private:
 
 
 // template specializations to enumerate the fundamental atomic types you are allowed to save
+ALLOW_SAVE_TYPE(char);
 ALLOW_SAVE_TYPE(bool);
 ALLOW_SAVE_TYPE(INT8);
 ALLOW_SAVE_TYPE(UINT8);

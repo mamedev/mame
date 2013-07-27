@@ -43,7 +43,7 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "sound/es5506.h"
 #include "audio/taito_en.h"
 #include "includes/gunbustr.h"
@@ -286,8 +286,6 @@ GFXDECODE_END
 
 static const serial_eeprom_interface gunbustr_eeprom_interface =
 {
-	6,              /* address bits */
-	16,             /* data bits */
 	"0110",         /* read command */
 	"0101",         /* write command */
 	"0111",         /* erase command */
@@ -312,7 +310,7 @@ static MACHINE_CONFIG_START( gunbustr, gunbustr_state )
 	MCFG_CPU_PROGRAM_MAP(gunbustr_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gunbustr_state,  gunbustr_interrupt) /* VBL */
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", gunbustr_eeprom_interface)
+	MCFG_SERIAL_EEPROM_ADD("eeprom", 64, 16, gunbustr_eeprom_interface)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

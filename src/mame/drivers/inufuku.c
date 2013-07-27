@@ -73,7 +73,7 @@ TODO:
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "sound/2610intf.h"
 #include "video/vsystem_spr.h"
 #include "includes/inufuku.h"

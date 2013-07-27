@@ -5,7 +5,7 @@
 *************************************************************************/
 
 #define MASTER_CLOCK 57272700   // main oscillator frequency
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 
 class psikyo4_state : public driver_device
 {

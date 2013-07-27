@@ -4,7 +4,7 @@
 
 ***************************************************************************/
 
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "video/decospr.h"
 
 class esd16_state : public driver_device

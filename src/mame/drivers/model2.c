@@ -87,7 +87,7 @@
 */
 
 #include "emu.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "machine/nvram.h"
 #include "video/segaic24.h"
 #include "cpu/i960/i960.h"

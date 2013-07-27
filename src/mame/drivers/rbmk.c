@@ -54,7 +54,7 @@ Notes:
 #include "cpu/mcs51/mcs51.h"
 #include "sound/okim6295.h"
 #include "sound/2151intf.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 
 
 class rbmk_state : public driver_device

@@ -4,7 +4,7 @@
 
 *************************************************************************/
 
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 
 #define LELAND_BATTERY_RAM_SIZE 0x4000
 #define ATAXX_EXTRA_TRAM_SIZE 0x800

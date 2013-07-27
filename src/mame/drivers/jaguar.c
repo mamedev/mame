@@ -341,7 +341,7 @@ Notes:
 #include "imagedev/cartslot.h"
 #include "imagedev/snapquik.h"
 #include "sound/dac.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 
 #define COJAG_CLOCK         XTAL_52MHz
 #define R3000_CLOCK         XTAL_40MHz

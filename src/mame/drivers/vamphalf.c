@@ -61,7 +61,7 @@ TODO:
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/e132xs/e132xs.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "machine/nvram.h"
 #include "sound/qs1000.h"
 #include "sound/2151intf.h"
