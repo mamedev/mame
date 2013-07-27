@@ -125,7 +125,7 @@ void base_eeprom_device::static_set_size(device_t &device, int cells, int cellbi
 void base_eeprom_device::static_set_default_data(device_t &device, const UINT8 *data, UINT32 size)
 {
 	base_eeprom_device &eeprom = downcast<base_eeprom_device &>(device);
-	assert(eeprom.m_cellbits == 8);
+	assert(eeprom.m_data_bits == 8);
 	eeprom.m_default_data.u8 = const_cast<UINT8 *>(data);
 	eeprom.m_default_data_size = size;
 }
@@ -133,7 +133,7 @@ void base_eeprom_device::static_set_default_data(device_t &device, const UINT8 *
 void base_eeprom_device::static_set_default_data(device_t &device, const UINT16 *data, UINT32 size)
 {
 	base_eeprom_device &eeprom = downcast<base_eeprom_device &>(device);
-	assert(eeprom.m_cellbits == 16);
+	assert(eeprom.m_data_bits == 16);
 	eeprom.m_default_data.u16 = const_cast<UINT16 *>(data);
 	eeprom.m_default_data_size = size / 2;
 }
