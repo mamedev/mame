@@ -7,48 +7,48 @@
 
 **********************************************************************
                             _____   _____
-                   GND   1 |*    \_/     | 40
-                     G   2 |             | 39
+                   GND   1 |*    \_/     | 40  DMAREQ
+                     G   2 |             | 39  /CE
                      I   3 |             | 38  RESET
-                     B   4 |             | 37  BRC
-                     R   5 |             | 36
-                   BA0   6 |             | 35  B1 STROBE
-                   BA1   7 |             | 34  COLOR XTAL (3.636 MHz)
-                   BA2   8 |             | 33
-                   BA3   9 |             | 32
-                   BA4  10 |    UV201    | 31
-                   BA5  11 |             | 30  EXTINT
-                   BA6  12 |             | 29  O/E
-                   BA7  13 |             | 28  BO7
-                   BA8  14 |             | 27  BO6
-                   BA9  15 |             | 26  BO5
-                  BA10  16 |             | 25  BO4
-                  BA11  17 |             | 24  BO3
-                  BA12  18 |             | 23  BO2
-                 HSYNC  19 |             | 22  BO1
-                 HSYNC  20 |_____________| 21  BO0
+                     B   4 |             | 37  BISTROBE
+                     R   5 |             | 36  UMIREQ0
+                   BA0   6 |             | 35  BRCLK
+                   BA1   7 |             | 34  HBLANK
+                   BA2   8 |             | 33  VBLANK
+                   BA3   9 |             | 32  R/W
+                   BA4  10 |    UV201    | 31  keypad column 8
+                   BA5  11 |             | 30  EXT INT
+                   BA6  12 |             | 29  FIELD
+                   BA7  13 |             | 28  BD7
+                   BA8  14 |             | 27  BD6
+                   BA9  15 |             | 26  BD5
+                  BA10  16 |             | 25  BD4
+                  BA11  17 |             | 24  BD3
+                  BA12  18 |             | 23  BD2
+                   +5V  19 |             | 22  BD1
+                  +12V  20 |_____________| 21  BD0
 
                             _____   _____
-                         1 |*    \_/     | 40  B1 STROBE
-                         2 |             | 39  CPU RQ1
-               CPU RQ0   3 |             | 38  GND
-               XTAL IN   4 |             | 37
-               XTAL IN   5 |             | 36  RESET
-                         6 |             | 35
-               CPU phi   7 |             | 34  COLOR XTAL
-                         8 |             | 33  BRC
-                   BD0   9 |             | 32  BD7
-                   BO0  10 |    UV202    | 31  BO7
-                   BD1  11 |             | 30  BD6
-                   BO1  12 |             | 29  BO6
-                   BD2  13 |             | 28  BD5
-                   BO2  14 |             | 27  BO5
-                   BD3  15 |             | 26  BD4
-                   BO3  16 |             | 25  BO4
-                HBLANK  17 |             | 24
-                        18 |             | 23
-                        19 |             | 22
-                        20 |_____________| 21
+               UMIREQ1   1 |*    \_/     | 40  BISTROBE
+               UMIREQ0   2 |             | 39  CPUREQ1
+               CPUREQ0   3 |             | 38  GND
+                   XIN   4 |             | 37  /800-BFF
+                  XOUT   5 |             | 36  RST
+               DMAREQ0   6 |             | 35  DMAREQ1
+               CPU CLK   7 |             | 34  COLCLK
+                  WACK   8 |             | 33  BRCLK
+                    D0   9 |             | 32  D7
+                   BD0  10 |    UV202    | 31  BD7
+                    D1  11 |             | 30  D6
+                   BD1  12 |             | 29  BD6
+                    D2  13 |             | 28  D5
+                   BD2  14 |             | 27  BD5
+                    D3  15 |             | 26  D4
+                   BD3  16 |             | 25  BD4
+                HBLANK  17 |             | 24  FIELD
+                VBLANK  18 |             | 23  SCANLINE
+                 BURST  19 |             | 22  +12V
+                CSYNCH  20 |_____________| 21  +5V
 
 **********************************************************************/
 
