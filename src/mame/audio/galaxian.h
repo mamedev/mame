@@ -1,12 +1,37 @@
+#include "sound/discrete.h"
+
 #define GAL_AUDIO   "discrete"
+
+class galaxian_sound_device : public device_t,
+									public device_sound_interface
+{
+public:
+	galaxian_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~galaxian_sound_device() {}
+
+	DECLARE_WRITE8_MEMBER( sound_w );
+	DECLARE_WRITE8_MEMBER( pitch_w );
+	DECLARE_WRITE8_MEMBER( vol_w );
+	DECLARE_WRITE8_MEMBER( noise_enable_w );
+	DECLARE_WRITE8_MEMBER( background_enable_w );
+	DECLARE_WRITE8_MEMBER( fire_enable_w );
+	DECLARE_WRITE8_MEMBER( lfo_freq_w );
+
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+
+private:
+	// internal state
+	UINT8 m_lfo_val;
+	discrete_device *m_discrete;
+};
+
+extern const device_type GALAXIAN;
 
 MACHINE_CONFIG_EXTERN( mooncrst_audio );
 MACHINE_CONFIG_EXTERN( galaxian_audio );
-
-DECLARE_WRITE8_DEVICE_HANDLER( galaxian_sound_w );
-DECLARE_WRITE8_DEVICE_HANDLER( galaxian_pitch_w );
-DECLARE_WRITE8_DEVICE_HANDLER( galaxian_vol_w );
-DECLARE_WRITE8_DEVICE_HANDLER( galaxian_noise_enable_w );
-DECLARE_WRITE8_DEVICE_HANDLER( galaxian_background_enable_w );
-DECLARE_WRITE8_DEVICE_HANDLER( galaxian_shoot_enable_w );
-DECLARE_WRITE8_DEVICE_HANDLER( galaxian_lfo_freq_w );

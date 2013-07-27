@@ -58,8 +58,11 @@ class dambustr_state : public galaxold_state
 {
 public:
 	dambustr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: galaxold_state(mconfig, type, tag) { }
+		: galaxold_state(mconfig, type, tag),
+		m_custom(*this, "cust") { }
 
+	required_device<galaxian_sound_device> m_custom;
+	
 	int m_noise_data;
 	DECLARE_WRITE8_MEMBER(dambustr_noise_enable_w);
 	DECLARE_DRIVER_INIT(dambustr);
@@ -70,10 +73,9 @@ public:
 /* FIXME: Really needed? - Should be handled by either interface */
 WRITE8_MEMBER(dambustr_state::dambustr_noise_enable_w)
 {
-	device_t *device = machine().device(GAL_AUDIO);
 	if (data != m_noise_data) {
 		m_noise_data = data;
-		galaxian_noise_enable_w(device, space, offset, data);
+		m_custom->noise_enable_w(space, offset, data);
 	}
 }
 
@@ -96,14 +98,14 @@ static ADDRESS_MAP_START( dambustr_map, AS_PROGRAM, 8, dambustr_state )
 
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("IN0")
 	AM_RANGE(0xe002, 0xe003) AM_WRITE(galaxold_coin_counter_w)
-	AM_RANGE(0xe004, 0xe007) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_lfo_freq_w)
+	AM_RANGE(0xe004, 0xe007) AM_DEVWRITE("cust", galaxian_sound_device, lfo_freq_w)
 
 	AM_RANGE(0xe800, 0xefff) AM_READ_PORT("IN1")
-	AM_RANGE(0xe800, 0xe802) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_background_enable_w)
+	AM_RANGE(0xe800, 0xe802) AM_DEVWRITE("cust", galaxian_sound_device, background_enable_w)
 	AM_RANGE(0xe803, 0xe803) AM_WRITE(dambustr_noise_enable_w)
-	AM_RANGE(0xe804, 0xe804) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_shoot_enable_w) // probably louder than normal shot
-	AM_RANGE(0xe805, 0xe805) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_shoot_enable_w) // normal shot (like Galaxian)
-	AM_RANGE(0xe806, 0xe807) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_vol_w)
+	AM_RANGE(0xe804, 0xe804) AM_DEVWRITE("cust", galaxian_sound_device, fire_enable_w) // probably louder than normal shot
+	AM_RANGE(0xe805, 0xe805) AM_DEVWRITE("cust", galaxian_sound_device, fire_enable_w) // normal shot (like Galaxian)
+	AM_RANGE(0xe806, 0xe807) AM_DEVWRITE("cust", galaxian_sound_device, vol_w)
 
 	AM_RANGE(0xf000, 0xf7ff) AM_READ_PORT("DSW")
 	AM_RANGE(0xf001, 0xf001) AM_WRITE(galaxold_nmi_enable_w)
@@ -111,7 +113,7 @@ static ADDRESS_MAP_START( dambustr_map, AS_PROGRAM, 8, dambustr_state )
 	AM_RANGE(0xf006, 0xf006) AM_WRITE(galaxold_flip_screen_x_w)
 	AM_RANGE(0xf007, 0xf007) AM_WRITE(galaxold_flip_screen_y_w)
 
-	AM_RANGE(0xf800, 0xf800) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_pitch_w)
+	AM_RANGE(0xf800, 0xf800) AM_DEVWRITE("cust", galaxian_sound_device, pitch_w)
 	AM_RANGE(0xf800, 0xffff) AM_READ(watchdog_reset_r)
 ADDRESS_MAP_END
 

@@ -21,9 +21,7 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
-#include "sound/discrete.h"
 #include "audio/galaxian.h"
-#include "drivlgcy.h"
 
 /*************************************
  *
@@ -387,17 +385,36 @@ static DISCRETE_SOUND_START(mooncrst)
 	DISCRETE_MIXER7(NODE_280, 1, NODE_133_00, NODE_133_02, NODE_133_02,NODE_133_03, NODE_120, NODE_157, NODE_182, &mooncrst_mixer_desc)
 DISCRETE_SOUND_END
 
-/*************************************
- *
- *  Static Variables
- *
- *************************************/
+const device_type GALAXIAN = &device_creator<galaxian_sound_device>;
 
-static UINT8 lfo_val;
-
-static SOUND_START(galaxian)
+galaxian_sound_device::galaxian_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, GALAXIAN, "Galaxian Custom", tag, owner, clock, "galaxian_sound", __FILE__),
+		device_sound_interface(mconfig, *this),
+		m_lfo_val(0)
 {
-	lfo_val = 0;
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void galaxian_sound_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void galaxian_sound_device::device_start()
+{
+	m_lfo_val = 0;
+	
+	m_discrete = machine().device<discrete_device>(GAL_AUDIO);
+	
+	save_item(NAME(m_lfo_val));
 }
 
 /*************************************
@@ -407,45 +424,44 @@ static SOUND_START(galaxian)
  *************************************/
 
 /* IC 9J */
-WRITE8_DEVICE_HANDLER( galaxian_pitch_w )
+WRITE8_MEMBER( galaxian_sound_device::pitch_w )
 {
-	discrete_sound_w(device, space, GAL_INP_PITCH, data );
+	discrete_sound_w(m_discrete, space, GAL_INP_PITCH, data );
 }
 
-WRITE8_DEVICE_HANDLER( galaxian_lfo_freq_w )
+WRITE8_MEMBER( galaxian_sound_device::lfo_freq_w )
 {
-	UINT8 lfo_val_new = (lfo_val & ~(1<<offset)) | ((data & 0x01) << offset);
+	UINT8 lfo_val_new = (m_lfo_val & ~(1<<offset)) | ((data & 0x01) << offset);
 
-	if (lfo_val != lfo_val_new)
+	if (m_lfo_val != lfo_val_new)
 	{
-		lfo_val = lfo_val_new;
-		discrete_sound_w(device, space, GAL_INP_BG_DAC, lfo_val);
+		m_lfo_val = lfo_val_new;
+		discrete_sound_w(m_discrete, space, GAL_INP_BG_DAC, m_lfo_val);
 	}
 }
 
-WRITE8_DEVICE_HANDLER( galaxian_background_enable_w )
+WRITE8_MEMBER( galaxian_sound_device::background_enable_w )
 {
-	discrete_sound_w(device, space, NODE_RELATIVE(GAL_INP_FS1, offset), data & 0x01);
+	discrete_sound_w(m_discrete, space, NODE_RELATIVE(GAL_INP_FS1, offset), data & 0x01);
 }
 
-WRITE8_DEVICE_HANDLER( galaxian_noise_enable_w )
+WRITE8_MEMBER( galaxian_sound_device::noise_enable_w )
 {
-	discrete_sound_w(device, space, GAL_INP_HIT, data & 0x01);
+	discrete_sound_w(m_discrete, space, GAL_INP_HIT, data & 0x01);
 }
 
-WRITE8_DEVICE_HANDLER( galaxian_vol_w )
+WRITE8_MEMBER( galaxian_sound_device::vol_w )
 {
-	discrete_sound_w(device, space, NODE_RELATIVE(GAL_INP_VOL1,offset), data & 0x01);
+	discrete_sound_w(m_discrete, space, NODE_RELATIVE(GAL_INP_VOL1,offset), data & 0x01);
 }
 
-/* FIXME: rename to fire to be consistent */
-WRITE8_DEVICE_HANDLER( galaxian_shoot_enable_w )
+WRITE8_MEMBER( galaxian_sound_device::fire_enable_w )
 {
-	discrete_sound_w(device, space, GAL_INP_FIRE, data & 0x01);
+	discrete_sound_w(m_discrete, space, GAL_INP_FIRE, data & 0x01);
 }
 
 /* FIXME: May be replaced by one call! */
-WRITE8_DEVICE_HANDLER( galaxian_sound_w )
+WRITE8_MEMBER( galaxian_sound_device::sound_w )
 {
 	data &= 0x01;
 	switch (offset & 7)
@@ -453,25 +469,33 @@ WRITE8_DEVICE_HANDLER( galaxian_sound_w )
 		case 0:     /* FS1 (controls 555 timer at 8R) */
 		case 1:     /* FS2 (controls 555 timer at 8S) */
 		case 2:     /* FS3 (controls 555 timer at 8T) */
-			galaxian_background_enable_w(device, space, offset, data);
+			background_enable_w(space, offset, data);
 			break;
 
 		case 3:     /* HIT */
-			galaxian_noise_enable_w(device, space, 0, data);
+			noise_enable_w(space, 0, data);
 			break;
 
 		case 4:     /* n/c */
 			break;
 
 		case 5:     /* FIRE */
-			galaxian_shoot_enable_w(device, space, 0, data);
+			fire_enable_w(space, 0, data);
 			break;
 
 		case 6:     /* VOL1 */
 		case 7:     /* VOL2 */
-			galaxian_vol_w(device, space, offset & 1, data);
+			vol_w(space, offset & 1, data);
 			break;
 	}
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void galaxian_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
 }
 
 /*************************************
@@ -482,18 +506,19 @@ WRITE8_DEVICE_HANDLER( galaxian_sound_w )
 
 MACHINE_CONFIG_FRAGMENT( galaxian_audio )
 
-	MCFG_SOUND_START(galaxian)
-
+	MCFG_SOUND_ADD("cust", GALAXIAN, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.4)
+	
 	MCFG_SOUND_ADD(GAL_AUDIO, DISCRETE, 0)
 	MCFG_SOUND_CONFIG_DISCRETE(galaxian)
-
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_FRAGMENT( mooncrst_audio )
 
-	MCFG_SOUND_START(galaxian)
-
+	MCFG_SOUND_ADD("cust", GALAXIAN, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.4)
+	
 	MCFG_SOUND_ADD(GAL_AUDIO, DISCRETE, 0)
 	MCFG_SOUND_CONFIG_DISCRETE(mooncrst)
 

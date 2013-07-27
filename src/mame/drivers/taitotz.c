@@ -900,7 +900,7 @@ void taitotz_renderer::draw_scanline(INT32 scanline, const extent_t &extent, con
 		case 0: tex0_shift = 16;  tex1_shift = 0; break;
 		case 1: tex0_shift = 16; tex1_shift = 0; break;
 		case 2: tex0_shift = 16; tex1_shift = 0;  break;
-		case 3: tex0_shift = 0;  tex1_shift = 16; break;
+		default: tex0_shift = 0;  tex1_shift = 16; break;
 	}
 
 	for (int x = extent.startx; x < extent.stopx; x++)
