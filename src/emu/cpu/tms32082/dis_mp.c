@@ -1,9 +1,7 @@
-// TMS32082 MP/PP Disassembler
+// TMS32082 MP Disassembler
 
 #include "emu.h"
 
-
-// Master Processor
 
 #define SIMM15(v) (INT32)((v & 0x4000) ? (v | 0xffffe000) : (v))
 #define UIMM15(v) (v)
@@ -510,24 +508,4 @@ static offs_t tms32082_disasm_mp(char *buffer, offs_t pc, const UINT8 *oprom)
 CPU_DISASSEMBLE(tms32082_mp)
 {
 	return tms32082_disasm_mp(buffer, pc, oprom);
-}
-
-
-
-// Parallel Processor
-
-static offs_t tms32082_disasm_pp(char *buffer, offs_t pc, const UINT8 *oprom)
-{
-	output = buffer;
-	UINT32 flags = 0;
-
-	print("???");
-
-	return opbytes | flags | DASMFLAG_SUPPORTED;
-}
-
-
-CPU_DISASSEMBLE(tms32082_pp)
-{
-	return tms32082_disasm_pp(buffer, pc, oprom);
 }

@@ -300,7 +300,7 @@ void tms32082_mp_device::execute_run()
 // Parallel Processor
 
 // internal memory map
-static ADDRESS_MAP_START(pp_internal_map, AS_PROGRAM, 32, tms32082_mp_device)
+static ADDRESS_MAP_START(pp_internal_map, AS_PROGRAM, 32, tms32082_pp_device)
 ADDRESS_MAP_END
 
 tms32082_pp_device::tms32082_pp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
