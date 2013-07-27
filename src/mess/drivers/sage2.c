@@ -15,15 +15,6 @@
     TODO:
 
     - floppy loading
-    - PROM test fails
-    - i8251 test fails on boot
-
-        001BD8: move.b  D6, $c071.w
-        001BDC: moveq   #$e, D7
-        001BDE: dbra    D7, $1bde
-        001BE2: btst    #$2, $c073.w
-        001BE8: bne     $1bec
-
     - TMS9914 IEEE-488 controller
     - board 2 (4x 2651 USART)
     - Winchester controller
@@ -645,10 +636,6 @@ DRIVER_INIT_MEMBER(sage2_state,sage2)
 {
 	address_space &program = machine().device<cpu_device>(M68000_TAG)->space(AS_PROGRAM);
 	program.set_direct_update_handler(direct_update_delegate(FUNC(sage2_state::sage2_direct_update_handler), this));
-
-	// patch out i8251 test
-	memregion(M68000_TAG)->base()[0x1be8] = 0xd6;
-	memregion(M68000_TAG)->base()[0x1be9] = 0x4e;
 }
 
 
