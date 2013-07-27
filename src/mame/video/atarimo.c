@@ -425,10 +425,10 @@ void atari_motion_objects_device::build_active_list(int link)
 		else
 		{
 			UINT16 *srcdata = &bankbase[link];
-			*current++ = srcdata[UINT32(0) << m_entrybits];
-			*current++ = srcdata[UINT32(1) << m_entrybits];
-			*current++ = srcdata[UINT32(2) << m_entrybits];
-			*current++ = srcdata[UINT32(3) << m_entrybits];
+			*current++ = srcdata[UINT32(0 << m_entrybits)];
+			*current++ = srcdata[UINT32(1 << m_entrybits)];
+			*current++ = srcdata[UINT32(2 << m_entrybits)];
+			*current++ = srcdata[UINT32(3 << m_entrybits)];
 		}
 
 		// link to the next object
