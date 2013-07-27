@@ -76,8 +76,10 @@ const rom_entry *nubus_824gc_device::device_rom_region() const
 
 jmfb_device::jmfb_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+		device_video_interface(mconfig, *this),
 		device_nubus_card_interface(mconfig, *this)
 {
+	m_screen_tag = GC48_SCREEN_NAME;
 }
 
 nubus_48gc_device::nubus_48gc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
@@ -112,6 +114,9 @@ void jmfb_device::device_start()
 	install_bank(slotspace, slotspace+VRAM_SIZE-1, 0, 0, "bank_48gc", m_vram);
 
 	m_nubus->install_device(slotspace+0x200000, slotspace+0x2003ff, read32_delegate(FUNC(jmfb_device::mac_48gc_r), this), write32_delegate(FUNC(jmfb_device::mac_48gc_w), this));
+
+	m_timer = timer_alloc(0, NULL);
+	m_screen = NULL;    // can we look this up now?
 }
 
 //-------------------------------------------------
@@ -139,6 +144,16 @@ void jmfb_device::device_reset()
 
 ***************************************************************************/
 
+void jmfb_device::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
+{
+	if (!m_vbl_disable)
+	{
+		raise_slot_irq();
+	}
+
+	m_timer->adjust(m_screen->time_until_pos(479, 0), 0);
+}
+
 UINT32 jmfb_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	UINT32 *scanline, *base;
@@ -146,9 +161,11 @@ UINT32 jmfb_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	UINT8 *vram8 = (UINT8 *)m_vram;
 	UINT8 pixels;
 
-	if (!m_vbl_disable)
+	// first time?  kick off the VBL timer
+	if (!m_screen)
 	{
-		raise_slot_irq();
+		m_screen = &screen;
+		m_timer->adjust(m_screen->time_until_pos(479, 0), 0);
 	}
 
 	vram8 += 0xa00;

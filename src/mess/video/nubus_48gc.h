@@ -14,6 +14,7 @@
 
 class jmfb_device :
 		public device_t,
+		public device_video_interface,
 		public device_nubus_card_interface
 {
 public:
@@ -23,8 +24,12 @@ public:
 		// optional information overrides
 		virtual machine_config_constructor device_mconfig_additions() const;
 		virtual const rom_entry *device_rom_region() const;
+		virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 		UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+		screen_device *m_screen;
+		emu_timer *m_timer;
 protected:
 		// device-level overrides
 		virtual void device_start();
