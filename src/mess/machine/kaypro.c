@@ -60,22 +60,25 @@ WRITE8_MEMBER( kaypro_state::common_pio_system_w )
 		membank("bank3")->set_base(memregion("rambank")->base());
 	}
 
-	wd17xx_dden_w(m_fdc, BIT(data, 5));
-
-	m_centronics->strobe_w(BIT(data, 4));
-
+	m_floppy = NULL;
 	if (BIT(data, 0))
-		wd17xx_set_drive(m_fdc, 0);
-
+		m_floppy = m_floppy0->get_device();
+	else
 	if (BIT(data, 1))
-		wd17xx_set_drive(m_fdc, 1);
+		m_floppy = m_floppy1->get_device();
+
+	m_fdc->set_floppy(m_floppy);
+	m_fdc->dden_w(BIT(data, 5));
+
+	if (m_floppy)
+	{
+		m_floppy->mon_w(BIT(data, 6) ? 0 : 1); // motor on
+	}
 
 	output_set_value("ledA", BIT(data, 0));     /* LEDs in artwork */
 	output_set_value("ledB", BIT(data, 1));
 
-	/* CLEAR_LINE means to turn motors on */
-	floppy_mon_w(floppy_get_device(machine(), 0), BIT(data, 6) ? ASSERT_LINE : CLEAR_LINE);
-	floppy_mon_w(floppy_get_device(machine(), 1), BIT(data, 6) ? ASSERT_LINE : CLEAR_LINE);
+	m_centronics->strobe_w(BIT(data, 4));
 
 	m_system_port = data;
 }
@@ -85,7 +88,7 @@ WRITE8_MEMBER( kaypro_state::kayproii_pio_system_w )
 	common_pio_system_w(space, offset, data);
 
 	/* side select */
-	wd17xx_set_side(m_fdc, !BIT(data, 2));
+	m_floppy->ss_w(!BIT(data, 2));
 }
 
 WRITE8_MEMBER( kaypro_state::kaypro4_pio_system_w )
@@ -93,7 +96,7 @@ WRITE8_MEMBER( kaypro_state::kaypro4_pio_system_w )
 	common_pio_system_w(space, offset, data);
 
 	/* side select */
-	wd17xx_set_side(m_fdc, BIT(data, 2));
+	m_floppy->ss_w(BIT(data, 2));
 }
 
 const z80pio_interface kayproii_pio_g_intf =
@@ -172,25 +175,26 @@ WRITE8_MEMBER( kaypro_state::kaypro2x_system_port_w )
 		membank("bank3")->set_base(memregion("rambank")->base());
 	}
 
-	wd17xx_dden_w(m_fdc, BIT(data, 5));
-
-	m_centronics->strobe_w(BIT(data, 3));
-
+	m_floppy = NULL;
 	if (BIT(data, 0))
-		wd17xx_set_drive(m_fdc, 0);
+		m_floppy = m_floppy0->get_device();
 	else
 	if (BIT(data, 1))
-		wd17xx_set_drive(m_fdc, 1);
+		m_floppy = m_floppy1->get_device();
 
-	wd17xx_set_side(m_fdc, BIT(data, 2) ? 0 : 1);
+	m_fdc->set_floppy(m_floppy);
+	m_fdc->dden_w(BIT(data, 5));
+
+	if (m_floppy)
+	{
+		m_floppy->mon_w(BIT(data, 6) ? 0 : 1); // motor on
+		m_floppy->ss_w(BIT(data, 2));
+	}
 
 	output_set_value("ledA", BIT(data, 0));     /* LEDs in artwork */
 	output_set_value("ledB", BIT(data, 1));
 
-	/* CLEAR_LINE means to turn motors on */
-	// commented out because turning the motors on causes an assert... turning them off is ok though??
-	//floppy_mon_w(floppy_get_device(machine(), 0), BIT(data, 4) ? CLEAR_LINE : ASSERT_LINE);
-	//floppy_mon_w(floppy_get_device(machine(), 1), BIT(data, 4) ? CLEAR_LINE : ASSERT_LINE);
+	m_centronics->strobe_w(BIT(data, 3));
 
 	m_system_port = data;
 }
@@ -292,7 +296,8 @@ void kaypro_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 	}
 }
 
-WRITE_LINE_MEMBER( kaypro_state::kaypro_fdc_intrq_w )
+void kaypro_state::fdc_intrq_w (bool state)
+//WRITE_LINE_MEMBER( kaypro_state::kaypro_fdc_intrq_w )
 {
 	if (state)
 		timer_set(attotime::from_usec(25), TIMER_FLOPPY);
@@ -300,7 +305,8 @@ WRITE_LINE_MEMBER( kaypro_state::kaypro_fdc_intrq_w )
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER( kaypro_state::kaypro_fdc_drq_w )
+void kaypro_state::fdc_drq_w (bool state)
+//WRITE_LINE_MEMBER( kaypro_state::kaypro_fdc_drq_w )
 {
 	if (state)
 		timer_set(attotime::from_usec(25), TIMER_FLOPPY);
@@ -308,14 +314,6 @@ WRITE_LINE_MEMBER( kaypro_state::kaypro_fdc_drq_w )
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 
 }
-
-const wd17xx_interface kaypro_wd1793_interface =
-{
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(kaypro_state, kaypro_fdc_intrq_w),
-	DEVCB_DRIVER_LINE_MEMBER(kaypro_state, kaypro_fdc_drq_w),
-	{FLOPPY_0, FLOPPY_1, NULL, NULL}
-};
 
 
 /***********************************************************
