@@ -107,7 +107,8 @@
 #define AUDIO_IS_CLASSIC (m_model <= MODEL_MAC_CLASSIC)
 #define MAC_HAS_VIA2    ((m_model >= MODEL_MAC_II) && (m_model != MODEL_MAC_IIFX))
 
-#define ASC_INTS_RBV    ((mac->m_model >= MODEL_MAC_IICI) && (mac->m_model <= MODEL_MAC_IIVI)) || ((mac->m_model >= MODEL_MAC_LC) && (mac->m_model <= MODEL_MAC_COLOR_CLASSIC))
+#define ASC_INTS_RBV    ((mac->m_model >= MODEL_MAC_IICI) && (mac->m_model <= MODEL_MAC_IIVI)) || ((mac->m_model >= MODEL_MAC_LC) && (mac->m_model <= MODEL_MAC_LC_580))
+#define INTS_RBV    ((m_model >= MODEL_MAC_IICI) && (m_model <= MODEL_MAC_IIVI)) || ((m_model >= MODEL_MAC_LC) && (m_model <= MODEL_MAC_LC_580)) 
 
 #ifdef MAME_DEBUG
 #define LOG_ADB         0
@@ -2122,7 +2123,7 @@ void mac_state::nubus_slot_interrupt(UINT8 slot, UINT32 state)
 		m_nubus_irq_state |= masks[slot];
 	}
 
-	if ((m_model != MODEL_MAC_IIFX) && (m_model != MODEL_MAC_IICI) && (m_model != MODEL_MAC_IISI))
+	if ((m_model != MODEL_MAC_IIFX) && (!INTS_RBV))
 	{
 		if ((m_nubus_irq_state & mask) != mask)
 		{
@@ -2139,7 +2140,7 @@ void mac_state::nubus_slot_interrupt(UINT8 slot, UINT32 state)
 		}
 	}
 
-	if ((m_model == MODEL_MAC_IICI) || (m_model == MODEL_MAC_IISI) || (m_model == MODEL_MAC_IIVX) || (m_model == MODEL_MAC_IIVI))
+	if (INTS_RBV)
 	{
 		m_rbv_regs[2] &= ~0x38;
 		m_rbv_regs[2] |= (m_nubus_irq_state & 0x38);
