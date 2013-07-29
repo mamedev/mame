@@ -107,7 +107,6 @@
 #define AUDIO_IS_CLASSIC (m_model <= MODEL_MAC_CLASSIC)
 #define MAC_HAS_VIA2    ((m_model >= MODEL_MAC_II) && (m_model != MODEL_MAC_IIFX))
 
-#define ASC_INTS_RBV    ((mac->m_model >= MODEL_MAC_IICI) && (mac->m_model <= MODEL_MAC_IIVI)) || ((mac->m_model >= MODEL_MAC_LC) && (mac->m_model <= MODEL_MAC_LC_580))
 #define INTS_RBV    ((m_model >= MODEL_MAC_IICI) && (m_model <= MODEL_MAC_IIVI)) || ((m_model >= MODEL_MAC_LC) && (m_model <= MODEL_MAC_LC_580)) 
 
 #ifdef MAME_DEBUG
@@ -304,31 +303,29 @@ void mac_state::set_via2_interrupt(int value)
 	this->field_interrupts();
 }
 
-void mac_asc_irq(device_t *device, int state)
+WRITE_LINE_MEMBER(mac_state::mac_asc_irq)
 {
-	mac_state *mac = device->machine().driver_data<mac_state>();
-
-	if (ASC_INTS_RBV)
+	if (INTS_RBV)
 	{
-		if (state)
+		if (state == ASSERT_LINE)
 		{
-			mac->m_rbv_regs[3] |= 0x10; // any VIA 2 interrupt | sound interrupt
-			mac->rbv_recalc_irqs();
+			m_rbv_regs[3] |= 0x10; // any VIA 2 interrupt | sound interrupt
+			rbv_recalc_irqs();
 		}
 		else
 		{
-			mac->m_rbv_regs[3] &= ~0x10;
-			mac->rbv_recalc_irqs();
+			m_rbv_regs[3] &= ~0x10;
+			rbv_recalc_irqs();
 		}
 	}
-	else if ((mac->m_model == MODEL_MAC_PORTABLE) || (mac->m_model == MODEL_MAC_PB100))
+	else if ((m_model == MODEL_MAC_PORTABLE) || (m_model == MODEL_MAC_PB100))
 	{
 //      m_asc_interrupt = state;
-//      mac->field_interrupts();
+//      field_interrupts();
 	}
-	else if ((mac->m_model >= MODEL_MAC_II) && (mac->m_model != MODEL_MAC_IIFX))
+	else if ((m_model >= MODEL_MAC_II) && (m_model != MODEL_MAC_IIFX))
 	{
-		mac->m_via2->write_cb1(state^1);
+		m_via2->write_cb1(state^1);
 	}
 }
 

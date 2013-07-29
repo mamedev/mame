@@ -143,7 +143,6 @@ extern const via6522_interface mac_via6522_intf;
 extern const via6522_interface mac_via6522_2_intf;
 extern const via6522_interface mac_via6522_adb_intf;
 
-void mac_asc_irq(device_t *device, int state);
 void mac_fdc_set_enable_lines(device_t *device, int enable_mask);
 
 /*----------- defined in audio/mac.c -----------*/
@@ -408,6 +407,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(adb_linechange_w);
 
 	DECLARE_WRITE_LINE_MEMBER(mac_scsi_irq);
+	DECLARE_WRITE_LINE_MEMBER(mac_asc_irq);
 
 	DECLARE_DIRECT_UPDATE_MEMBER(overlay_opbaseoverride);
 private:

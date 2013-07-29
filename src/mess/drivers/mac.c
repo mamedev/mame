@@ -1051,7 +1051,7 @@ static MACHINE_CONFIG_START( macprtb, mac_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_ASC_ADD("asc", C15M, ASC_TYPE_ASC, mac_asc_irq)
+	MCFG_ASC_ADD("asc", C15M, ASC_TYPE_ASC, WRITELINE(mac_state, mac_asc_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -1087,7 +1087,7 @@ static MACHINE_CONFIG_START( macii, mac_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_ASC_ADD("asc", C15M, ASC_TYPE_ASC, mac_asc_irq)
+	MCFG_ASC_ADD("asc", C15M, ASC_TYPE_ASC, WRITELINE(mac_state, mac_asc_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -1137,7 +1137,7 @@ static MACHINE_CONFIG_START( maciifx, mac_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_ASC_ADD("asc", C15M, ASC_TYPE_ASC, mac_asc_irq)
+	MCFG_ASC_ADD("asc", C15M, ASC_TYPE_ASC, WRITELINE(mac_state, mac_asc_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -1206,7 +1206,7 @@ static MACHINE_CONFIG_DERIVED( maclc, macii )
 	MCFG_NUBUS_BUS_ADD("pds", "maincpu", nubus_intf)
 	MCFG_NUBUS_SLOT_ADD("pds","lcpds", mac_lcpds_cards, NULL)
 
-	MCFG_ASC_REPLACE("asc", C15M, ASC_TYPE_V8, mac_asc_irq)
+	MCFG_ASC_REPLACE("asc", C15M, ASC_TYPE_V8, WRITELINE(mac_state, mac_asc_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -1247,7 +1247,7 @@ static MACHINE_CONFIG_DERIVED( maclc3, maclc )
 	MCFG_RAM_DEFAULT_SIZE("4M")
 	MCFG_RAM_EXTRA_OPTIONS("8M,16M,32M,48M,64M,80M")
 
-	MCFG_ASC_REPLACE("asc", C15M, ASC_TYPE_SONORA, mac_asc_irq)
+	MCFG_ASC_REPLACE("asc", C15M, ASC_TYPE_SONORA, WRITELINE(mac_state, mac_asc_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -1345,7 +1345,7 @@ static MACHINE_CONFIG_START( macse30, mac_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_ASC_ADD("asc", C15M, ASC_TYPE_ASC, mac_asc_irq)
+	MCFG_ASC_ADD("asc", C15M, ASC_TYPE_ASC, WRITELINE(mac_state, mac_asc_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -1397,7 +1397,7 @@ static MACHINE_CONFIG_START( macpb140, mac_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_ASC_ADD("asc", C15M, ASC_TYPE_ASC, mac_asc_irq)
+	MCFG_ASC_ADD("asc", C15M, ASC_TYPE_ASC, WRITELINE(mac_state, mac_asc_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -1465,7 +1465,7 @@ static MACHINE_CONFIG_START( macpb160, mac_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_ASC_ADD("asc", C15M, ASC_TYPE_ASC, mac_asc_irq)
+	MCFG_ASC_ADD("asc", C15M, ASC_TYPE_ASC, WRITELINE(mac_state, mac_asc_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -1537,7 +1537,7 @@ static MACHINE_CONFIG_DERIVED( macclas2, maclc )
 	MCFG_SCREEN_VISIBLE_AREA(0, MAC_H_VIS-1, 0, MAC_V_VIS-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mac_state, screen_update_macrbv)
 
-	MCFG_ASC_REPLACE("asc", C15M, ASC_TYPE_EAGLE, mac_asc_irq)
+	MCFG_ASC_REPLACE("asc", C15M, ASC_TYPE_EAGLE, WRITELINE(mac_state, mac_asc_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -1679,7 +1679,7 @@ static MACHINE_CONFIG_START( macqd700, mac_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_ASC_ADD("asc", C15M, ASC_TYPE_EASC, mac_asc_irq)
+	MCFG_ASC_ADD("asc", C15M, ASC_TYPE_EASC, WRITELINE(mac_state, mac_asc_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 

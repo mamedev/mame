@@ -46,8 +46,8 @@ const device_type ASC = &device_creator<asc_device>;
 asc_device::asc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ASC, "ASC", tag, owner, clock, "asc", __FILE__),
 		device_sound_interface(mconfig, *this),
-		m_chip_type(0),
-		m_irq_cb(NULL)
+		write_irq(*this),
+		m_chip_type(0)
 {
 }
 
@@ -61,18 +61,6 @@ void asc_device::static_set_type(device_t &device, int type)
 {
 	asc_device &asc = downcast<asc_device &>(device);
 	asc.m_chip_type = type;
-}
-
-//-------------------------------------------------
-//  static_set_type - configuration helper to set
-//  the IRQ callback
-//-------------------------------------------------
-
-
-void asc_device::static_set_irqf(device_t &device, void (*irqf)(device_t *device, int state))
-{
-	asc_device &asc = downcast<asc_device &>(device);
-	asc.m_irq_cb = irqf;
 }
 
 //-------------------------------------------------
@@ -99,6 +87,8 @@ void asc_device::device_start()
 	save_item(NAME(m_regs));
 	save_item(NAME(m_phase));
 	save_item(NAME(m_incr));
+
+	write_irq.resolve_safe();
 }
 
 
@@ -183,10 +173,7 @@ void asc_device::sound_stream_update(sound_stream &stream, stream_sample_t **inp
 						{
 							m_regs[R_FIFOSTAT-0x800] |= 0x4;    // fifo less than half full
 							m_regs[R_FIFOSTAT-0x800] |= 0x8;    // just pass the damn test
-							if (m_irq_cb)
-							{
-								m_irq_cb(this, 1);
-							}
+							write_irq(ASSERT_LINE);
 						}
 						break;
 
@@ -194,35 +181,23 @@ void asc_device::sound_stream_update(sound_stream &stream, stream_sample_t **inp
 						if (m_fifo_cap_a == 0x1ff)
 						{
 							m_regs[R_FIFOSTAT-0x800] |= 1;  // fifo A half-empty
-							if (m_irq_cb)
-							{
-								m_irq_cb(this, 1);
-							}
+							write_irq(ASSERT_LINE);
 						}
 						else if (m_fifo_cap_a == 0x1)   // fifo A fully empty
 						{
 							m_regs[R_FIFOSTAT-0x800] |= 2;  // fifo A empty
-							if (m_irq_cb)
-							{
-								m_irq_cb(this, 1);
-							}
+							write_irq(ASSERT_LINE);
 						}
 
 						if (m_fifo_cap_b == 0x1ff)
 						{
 							m_regs[R_FIFOSTAT-0x800] |= 4;  // fifo B half-empty
-							if (m_irq_cb)
-							{
-								m_irq_cb(this, 1);
-							}
+							write_irq(ASSERT_LINE);
 						}
 						else if (m_fifo_cap_b == 0x1)   // fifo B fully empty
 						{
 							m_regs[R_FIFOSTAT-0x800] |= 8;  // fifo B empty
-							if (m_irq_cb)
-							{
-								m_irq_cb(this, 1);
-							}
+							write_irq(ASSERT_LINE);
 						}
 						break;
 				}
@@ -356,10 +331,7 @@ READ8_MEMBER( asc_device::read )
 				m_regs[R_FIFOSTAT-0x800] = 0;
 
 				// reading this clears interrupts
-				if (m_irq_cb)
-				{
-					m_irq_cb(this, 0);
-				}
+				write_irq(CLEAR_LINE);
 
 				return rv;
 

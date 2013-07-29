@@ -51,7 +51,7 @@ enum
 #define MCFG_ASC_TYPE(_type) \
 	asc_device::static_set_type(*device, _type);
 #define MCFG_IRQ_FUNC(_irqf) \
-	asc_device::static_set_irqf(*device, _irqf);
+	downcast<asc_device *>(device)->set_irqf(DEVCB2_##_irqf);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -67,7 +67,14 @@ public:
 
 	// inline configuration helpers
 	static void static_set_type(device_t &device, int type);
-	static void static_set_irqf(device_t &device, void (*irqf)(device_t *device, int state));
+
+
+	template<class _write> void set_irqf(_write wr)
+	{
+		write_irq.set_callback(wr);
+	}
+
+	devcb2_write_line write_irq;
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
@@ -104,7 +111,6 @@ protected:
 
 	// inline data
 	UINT8   m_chip_type;
-	void (*m_irq_cb)(device_t *device, int state);
 
 	UINT8   m_fifo_a[0x400];
 	UINT8   m_fifo_b[0x400];
