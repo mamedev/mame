@@ -41,14 +41,8 @@ class c1581_device :  public device_t,
 {
 public:
 	// construction/destruction
-	c1581_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source);
+	c1581_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	c1581_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	enum
-	{
-		TYPE_1563,
-		TYPE_1581
-	};
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
@@ -76,6 +70,12 @@ protected:
 	virtual void cbm_iec_data(int state);
 	virtual void cbm_iec_reset(int state);
 
+	enum
+	{
+		LED_POWER = 0,
+		LED_ACT
+	};
+
 	void update_iec();
 
 	required_device<cpu_device> m_maincpu;
@@ -89,8 +89,6 @@ protected:
 	int m_fast_ser_dir;         // fast serial direction
 	int m_sp_out;               // fast serial data out
 	int m_cnt_out;              // fast serial clock out
-
-	int m_variant;
 };
 
 
@@ -101,6 +99,9 @@ class c1563_device :  public c1581_device
 public:
 	// construction/destruction
 	c1563_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// optional information overrides
+	virtual const rom_entry *device_rom_region() const;
 };
 
 

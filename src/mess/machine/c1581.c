@@ -30,13 +30,6 @@
 #define WD1772_TAG      "u4"
 
 
-enum
-{
-	LED_POWER = 0,
-	LED_ACT
-};
-
-
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -65,6 +58,16 @@ ROM_END
 
 
 //-------------------------------------------------
+//  rom_region - device-specific ROM region
+//-------------------------------------------------
+
+const rom_entry *c1581_device::device_rom_region() const
+{
+	return ROM_NAME( c1581 );
+}
+
+
+//-------------------------------------------------
 //  ROM( c1563 )
 //-------------------------------------------------
 
@@ -78,17 +81,9 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *c1581_device::device_rom_region() const
+const rom_entry *c1563_device::device_rom_region() const
 {
-	switch (m_variant)
-	{
-	default:
-	case TYPE_1581:
-		return ROM_NAME( c1581 );
-
-	case TYPE_1563:
-		return ROM_NAME( c1563 );
-	}
+	return ROM_NAME( c1563 );
 }
 
 
@@ -332,7 +327,7 @@ ioport_constructor c1581_device::device_input_ports() const
 //  c1581_device - constructor
 //-------------------------------------------------
 
-c1581_device::c1581_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source)
+c1581_device::c1581_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_cbm_iec_interface(mconfig, *this),
 		m_maincpu(*this, M6502_TAG),
@@ -344,8 +339,7 @@ c1581_device::c1581_device(const machine_config &mconfig, device_type type, cons
 		m_atn_ack(0),
 		m_fast_ser_dir(0),
 		m_sp_out(1),
-		m_cnt_out(1),
-		m_variant(variant)
+		m_cnt_out(1)
 {
 }
 
@@ -361,8 +355,7 @@ c1581_device::c1581_device(const machine_config &mconfig, const char *tag, devic
 		m_atn_ack(0),
 		m_fast_ser_dir(0),
 		m_sp_out(1),
-		m_cnt_out(1),
-		m_variant(TYPE_1581)
+		m_cnt_out(1)
 {
 }
 
@@ -372,7 +365,7 @@ c1581_device::c1581_device(const machine_config &mconfig, const char *tag, devic
 //-------------------------------------------------
 
 c1563_device::c1563_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: c1581_device(mconfig, C1563, "C1563", tag, owner, clock, TYPE_1563, "c1563", __FILE__) { }
+	: c1581_device(mconfig, C1563, "C1563", tag, owner, clock, "c1563", __FILE__) { }
 
 
 //-------------------------------------------------

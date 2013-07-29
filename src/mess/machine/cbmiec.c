@@ -190,14 +190,6 @@ C64 SERIAL BUS
     5)  Tei minimum must be 80us for external device to be a listener.
 */
 
-/*
-
-    TODO:
-
-    - refactor into an actual daisy chain instead of this convenient hack
-
-*/
-
 #include "cbmiec.h"
 
 
@@ -270,123 +262,6 @@ void cbm_iec_slot_device::device_start()
 	m_bus = machine().device<cbm_iec_device>(CBM_IEC_TAG);
 	device_cbm_iec_interface *dev = dynamic_cast<device_cbm_iec_interface *>(get_card_device());
 	if (dev) m_bus->add_device(get_card_device());
-}
-
-
-
-//**************************************************************************
-//  INLINE HELPERS
-//**************************************************************************
-
-//-------------------------------------------------
-//  set_signal -
-//-------------------------------------------------
-
-inline void cbm_iec_device::set_signal(device_t *device, int signal, int state)
-{
-	bool changed = false;
-
-	if (device == this)
-	{
-		if (m_line[signal] != state)
-		{
-			if (LOG) logerror("CBM IEC: '%s' %s %u\n", tag(), SIGNAL_NAME[signal], state);
-			m_line[signal] = state;
-			changed = true;
-		}
-	}
-	else
-	{
-		daisy_entry *entry = m_device_list.first();
-
-		while (entry)
-		{
-			if (!strcmp(entry->m_device->tag(), device->tag()))
-			{
-				if (entry->m_line[signal] != state)
-				{
-					if (LOG) logerror("CBM IEC: '%s' %s %u\n", device->tag(), SIGNAL_NAME[signal], state);
-					entry->m_line[signal] = state;
-					changed = true;
-				}
-			}
-
-			entry = entry->next();
-		}
-	}
-
-	if (changed)
-	{
-		switch (signal)
-		{
-		case SRQ:   m_write_srq(state);  break;
-		case ATN:   m_write_atn(state);  break;
-		case CLK:   m_write_clk(state);  break;
-		case DATA:  m_write_data(state); break;
-		case RESET: m_write_reset(state);break;
-		}
-
-		daisy_entry *entry = m_device_list.first();
-
-		while (entry)
-		{
-			switch (signal)
-			{
-			case SRQ:
-				entry->m_interface->cbm_iec_srq(state);
-				break;
-
-			case ATN:
-				entry->m_interface->cbm_iec_atn(state);
-				break;
-
-			case CLK:
-				entry->m_interface->cbm_iec_clk(state);
-				break;
-
-			case DATA:
-				entry->m_interface->cbm_iec_data(state);
-				break;
-
-			case RESET:
-				entry->m_interface->cbm_iec_reset(state);
-				break;
-			}
-
-			entry = entry->next();
-		}
-
-		if (LOG) logerror("CBM IEC: SRQ %u ATN %u CLK %u DATA %u RESET %u\n",
-			get_signal(SRQ), get_signal(ATN), get_signal(CLK), get_signal(DATA), get_signal(RESET));
-	}
-}
-
-
-//-------------------------------------------------
-//  get_signal -
-//-------------------------------------------------
-
-inline int cbm_iec_device::get_signal(int signal)
-{
-	int state = m_line[signal];
-
-	if (state)
-	{
-		daisy_entry *entry = m_device_list.first();
-
-		while (entry)
-		{
-			if (!entry->m_line[signal])
-			{
-				state = 0;
-				break;
-			}
-
-			entry = entry->next();
-		}
-	}
-
-	return state;
 }
 
 
@@ -483,150 +358,112 @@ cbm_iec_device::daisy_entry::daisy_entry(device_t *device)
 
 
 //-------------------------------------------------
-//  srq_r -
+//  set_signal -
 //-------------------------------------------------
 
-READ_LINE_MEMBER( cbm_iec_device::srq_r )
+void cbm_iec_device::set_signal(device_t *device, int signal, int state)
 {
-	return get_signal(SRQ);
+	bool changed = false;
+
+	if (device == this)
+	{
+		if (m_line[signal] != state)
+		{
+			if (LOG) logerror("CBM IEC: '%s' %s %u\n", tag(), SIGNAL_NAME[signal], state);
+			m_line[signal] = state;
+			changed = true;
+		}
+	}
+	else
+	{
+		daisy_entry *entry = m_device_list.first();
+
+		while (entry)
+		{
+			if (!strcmp(entry->m_device->tag(), device->tag()))
+			{
+				if (entry->m_line[signal] != state)
+				{
+					if (LOG) logerror("CBM IEC: '%s' %s %u\n", device->tag(), SIGNAL_NAME[signal], state);
+					entry->m_line[signal] = state;
+					changed = true;
+				}
+			}
+
+			entry = entry->next();
+		}
+	}
+
+	if (changed)
+	{
+		switch (signal)
+		{
+		case SRQ:   m_write_srq(state);  break;
+		case ATN:   m_write_atn(state);  break;
+		case CLK:   m_write_clk(state);  break;
+		case DATA:  m_write_data(state); break;
+		case RESET: m_write_reset(state);break;
+		}
+
+		daisy_entry *entry = m_device_list.first();
+
+		while (entry)
+		{
+			switch (signal)
+			{
+			case SRQ:
+				entry->m_interface->cbm_iec_srq(state);
+				break;
+
+			case ATN:
+				entry->m_interface->cbm_iec_atn(state);
+				break;
+
+			case CLK:
+				entry->m_interface->cbm_iec_clk(state);
+				break;
+
+			case DATA:
+				entry->m_interface->cbm_iec_data(state);
+				break;
+
+			case RESET:
+				entry->m_interface->cbm_iec_reset(state);
+				break;
+			}
+
+			entry = entry->next();
+		}
+
+		if (LOG) logerror("CBM IEC: SRQ %u ATN %u CLK %u DATA %u RESET %u\n",
+			get_signal(SRQ), get_signal(ATN), get_signal(CLK), get_signal(DATA), get_signal(RESET));
+	}
 }
 
 
 //-------------------------------------------------
-//  atn_r -
+//  get_signal -
 //-------------------------------------------------
 
-READ_LINE_MEMBER( cbm_iec_device::atn_r )
+int cbm_iec_device::get_signal(int signal)
 {
-	return get_signal(ATN);
-}
+	int state = m_line[signal];
 
+	if (state)
+	{
+		daisy_entry *entry = m_device_list.first();
 
-//-------------------------------------------------
-//  clk_r -
-//-------------------------------------------------
+		while (entry)
+		{
+			if (!entry->m_line[signal])
+			{
+				state = 0;
+				break;
+			}
 
-READ_LINE_MEMBER( cbm_iec_device::clk_r )
-{
-	return get_signal(CLK);
-}
+			entry = entry->next();
+		}
+	}
 
-
-//-------------------------------------------------
-//  data_r -
-//-------------------------------------------------
-
-READ_LINE_MEMBER( cbm_iec_device::data_r )
-{
-	return get_signal(DATA);
-}
-
-
-//-------------------------------------------------
-//  reset_r -
-//-------------------------------------------------
-
-READ_LINE_MEMBER( cbm_iec_device::reset_r )
-{
-	return get_signal(RESET);
-}
-
-
-//-------------------------------------------------
-//  srq_w -
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( cbm_iec_device::srq_w )
-{
-	set_signal(this, SRQ, state);
-}
-
-
-//-------------------------------------------------
-//  atn_w -
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( cbm_iec_device::atn_w )
-{
-	set_signal(this, ATN, state);
-}
-
-
-//-------------------------------------------------
-//  clk_w -
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( cbm_iec_device::clk_w )
-{
-	set_signal(this, CLK, state);
-}
-
-
-//-------------------------------------------------
-//  data_w -
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( cbm_iec_device::data_w )
-{
-	set_signal(this, DATA, state);
-}
-
-
-//-------------------------------------------------
-//  reset_w -
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( cbm_iec_device::reset_w )
-{
-	set_signal(this, RESET, state);
-}
-
-
-//-------------------------------------------------
-//  srq_w -
-//-------------------------------------------------
-
-void cbm_iec_device::srq_w(device_t *device, int state)
-{
-	set_signal(device, SRQ, state);
-}
-
-
-//-------------------------------------------------
-//  atn_w -
-//-------------------------------------------------
-
-void cbm_iec_device::atn_w(device_t *device, int state)
-{
-	set_signal(device, ATN, state);
-}
-
-
-//-------------------------------------------------
-//  clk_w -
-//-------------------------------------------------
-
-void cbm_iec_device::clk_w(device_t *device, int state)
-{
-	set_signal(device, CLK, state);
-}
-
-
-//-------------------------------------------------
-//  data_w -
-//-------------------------------------------------
-
-void cbm_iec_device::data_w(device_t *device, int state)
-{
-	set_signal(device, DATA, state);
-}
-
-
-//-------------------------------------------------
-//  reset_w -
-//-------------------------------------------------
-
-void cbm_iec_device::reset_w(device_t *device, int state)
-{
-	set_signal(device, RESET, state);
+	return state;
 }

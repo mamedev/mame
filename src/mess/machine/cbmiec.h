@@ -77,25 +77,25 @@ public:
 	void add_device(device_t *target);
 
 	// reads for both host and peripherals
-	DECLARE_READ_LINE_MEMBER( srq_r );
-	DECLARE_READ_LINE_MEMBER( atn_r );
-	DECLARE_READ_LINE_MEMBER( clk_r );
-	DECLARE_READ_LINE_MEMBER( data_r );
-	DECLARE_READ_LINE_MEMBER( reset_r );
+	DECLARE_READ_LINE_MEMBER( srq_r ) { return get_signal(SRQ); }
+	DECLARE_READ_LINE_MEMBER( atn_r ) { return get_signal(ATN); }
+	DECLARE_READ_LINE_MEMBER( clk_r ) { return get_signal(CLK); }
+	DECLARE_READ_LINE_MEMBER( data_r ) { return get_signal(DATA); }
+	DECLARE_READ_LINE_MEMBER( reset_r ) { return get_signal(RESET); }
 
 	// writes for host (driver_device)
-	DECLARE_WRITE_LINE_MEMBER( srq_w );
-	DECLARE_WRITE_LINE_MEMBER( atn_w );
-	DECLARE_WRITE_LINE_MEMBER( clk_w );
-	DECLARE_WRITE_LINE_MEMBER( data_w );
-	DECLARE_WRITE_LINE_MEMBER( reset_w );
+	DECLARE_WRITE_LINE_MEMBER( srq_w ) { set_signal(this, SRQ, state); }
+	DECLARE_WRITE_LINE_MEMBER( atn_w ) { set_signal(this, ATN, state); }
+	DECLARE_WRITE_LINE_MEMBER( clk_w ) { set_signal(this, CLK, state); }
+	DECLARE_WRITE_LINE_MEMBER( data_w ) { set_signal(this, DATA, state); }
+	DECLARE_WRITE_LINE_MEMBER( reset_w ) { set_signal(this, RESET, state); }
 
 	// writes for peripherals (device_t)
-	void srq_w(device_t *device, int state);
-	void atn_w(device_t *device, int state);
-	void clk_w(device_t *device, int state);
-	void data_w(device_t *device, int state);
-	void reset_w(device_t *device, int state);
+	void srq_w(device_t *device, int state) { set_signal(device, SRQ, state); }
+	void atn_w(device_t *device, int state) { set_signal(device, ATN, state); }
+	void clk_w(device_t *device, int state) { set_signal(device, CLK, state); }
+	void data_w(device_t *device, int state) { set_signal(device, DATA, state); }
+	void reset_w(device_t *device, int state) { set_signal(device, RESET, state); }
 
 protected:
 	enum
@@ -135,8 +135,8 @@ private:
 	devcb2_write_line   m_write_data;
 	devcb2_write_line   m_write_reset;
 
-	inline void set_signal(device_t *device, int signal, int state);
-	inline int get_signal(int signal);
+	void set_signal(device_t *device, int signal, int state);
+	int get_signal(int signal);
 
 	int m_line[SIGNAL_COUNT];
 };

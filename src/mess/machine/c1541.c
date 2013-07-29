@@ -155,13 +155,6 @@
 #define CENTRONICS_TAG  "centronics"
 
 
-enum
-{
-	LED_POWER = 0,
-	LED_ACT
-};
-
-
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -178,6 +171,7 @@ const device_type C1541_DOLPHIN_DOS = &device_creator<c1541_dolphin_dos_device>;
 const device_type C1541_PROFESSIONAL_DOS_V1 = &device_creator<c1541_professional_dos_v1_device>;
 const device_type C1541_PROLOGIC_DOS_CLASSIC = &device_creator<c1541_prologic_dos_classic_device>;
 
+
 //-------------------------------------------------
 //  ROM( c1540 )
 //-------------------------------------------------
@@ -187,6 +181,16 @@ ROM_START( c1540 )
 	ROM_LOAD( "325302-01.uab4", 0x0000, 0x2000, CRC(29ae9752) SHA1(8e0547430135ba462525c224e76356bd3d430f11) )
 	ROM_LOAD( "325303-01.uab5", 0x2000, 0x2000, CRC(10b39158) SHA1(56dfe79b26f50af4e83fd9604857756d196516b9) )
 ROM_END
+
+
+//-------------------------------------------------
+//  rom_region - device-specific ROM region
+//-------------------------------------------------
+
+const rom_entry *c1540_device::device_rom_region() const
+{
+	return ROM_NAME( c1540 );
+}
 
 
 //-------------------------------------------------
@@ -224,6 +228,16 @@ ROM_END
 
 
 //-------------------------------------------------
+//  rom_region - device-specific ROM region
+//-------------------------------------------------
+
+const rom_entry *c1541_device::device_rom_region() const
+{
+	return ROM_NAME( c1541 );
+}
+
+
+//-------------------------------------------------
 //  ROM( c1541c )
 //-------------------------------------------------
 
@@ -235,6 +249,16 @@ ROM_START( c1541c )
 	ROM_SYSTEM_BIOS( 1, "r2", "Revision 2" )
 	ROMX_LOAD( "251968-02.ua2", 0x0000, 0x4000, CRC(2d862d20) SHA1(38a7a489c7bbc8661cf63476bf1eb07b38b1c704), ROM_BIOS(2) )
 ROM_END
+
+
+//-------------------------------------------------
+//  rom_region - device-specific ROM region
+//-------------------------------------------------
+
+const rom_entry *c1541c_device::device_rom_region() const
+{
+	return ROM_NAME( c1541c );
+}
 
 
 //-------------------------------------------------
@@ -251,6 +275,16 @@ ROM_START( c1541ii )
 	ROM_SYSTEM_BIOS( 1, "jiffydos", "JiffyDOS v6.01" )
 	ROMX_LOAD( "jiffydos 1541-ii.u4", 0x0000, 0x4000, CRC(dd409902) SHA1(b1a5b826304d3df2a27d7163c6a81a532e040d32), ROM_BIOS(2) )
 ROM_END
+
+
+//-------------------------------------------------
+//  rom_region - device-specific ROM region
+//-------------------------------------------------
+
+const rom_entry *c1541ii_device::device_rom_region() const
+{
+	return ROM_NAME( c1541ii );
+}
 
 
 //-------------------------------------------------
@@ -272,6 +306,16 @@ ROM_END
 
 
 //-------------------------------------------------
+//  rom_region - device-specific ROM region
+//-------------------------------------------------
+
+const rom_entry *sx1541_device::device_rom_region() const
+{
+	return ROM_NAME( sx1541 );
+}
+
+
+//-------------------------------------------------
 //  ROM( fsd2 )
 //-------------------------------------------------
 
@@ -288,6 +332,16 @@ ROM_END
 
 
 //-------------------------------------------------
+//  rom_region - device-specific ROM region
+//-------------------------------------------------
+
+const rom_entry *fsd2_device::device_rom_region() const
+{
+	return ROM_NAME( fsd2 );
+}
+
+
+//-------------------------------------------------
 //  ROM( csd1 )
 //-------------------------------------------------
 
@@ -296,6 +350,16 @@ ROM_START( csd1 )
 	ROM_LOAD( "ic14", 0x0000, 0x2000, CRC(adb6980e) SHA1(13051587dfe43b04ce1bf354b89438ddf6d8d76b) )
 	ROM_LOAD( "ic15", 0x2000, 0x2000, CRC(b0cecfa1) SHA1(c67e79a7ffefc9e9eafc238cb6ff6bb718f19afb) )
 ROM_END
+
+
+//-------------------------------------------------
+//  rom_region - device-specific ROM region
+//-------------------------------------------------
+
+const rom_entry *csd1_device::device_rom_region() const
+{
+	return ROM_NAME( csd1 );
+}
 
 
 //-------------------------------------------------
@@ -309,6 +373,16 @@ ROM_END
 
 
 //-------------------------------------------------
+//  rom_region - device-specific ROM region
+//-------------------------------------------------
+
+const rom_entry *c1541_dolphin_dos_device::device_rom_region() const
+{
+	return ROM_NAME( c1541dd );
+}
+
+
+//-------------------------------------------------
 //  ROM( c1541pd )
 //-------------------------------------------------
 
@@ -317,6 +391,16 @@ ROM_START( c1541pd )
 	ROM_LOAD( "325302-01.uab4", 0x0000, 0x2000, CRC(29ae9752) SHA1(8e0547430135ba462525c224e76356bd3d430f11) )
 	ROM_LOAD( "professionaldos-v1-floppy-expansion-eprom-27128.bin", 0x2000, 0x4000, CRC(c9abf072) SHA1(2b26adc1f4192b6ca1514754f73c929087b24426) )
 ROM_END
+
+
+//-------------------------------------------------
+//  rom_region - device-specific ROM region
+//-------------------------------------------------
+
+const rom_entry *c1541_professional_dos_v1_device::device_rom_region() const
+{
+	return ROM_NAME( c1541pd );
+}
 
 
 //-------------------------------------------------
@@ -338,43 +422,10 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *base_c1541_device::device_rom_region() const
+const rom_entry *c1541_prologic_dos_classic_device::device_rom_region() const
 {
-	switch (m_variant)
-	{
-	case TYPE_1540:
-		return ROM_NAME( c1540 );
-
-	default:
-	case TYPE_1541:
-		return ROM_NAME( c1541 );
-
-	case TYPE_1541C:
-		return ROM_NAME( c1541c );
-
-	case TYPE_1541II:
-		return ROM_NAME( c1541ii );
-
-	case TYPE_SX1541:
-		return ROM_NAME( sx1541 );
-
-	case TYPE_FSD2: // aka Excelerator PLUS / Oceanic OC-118N
-		return ROM_NAME( fsd2 );
-
-	case TYPE_CSD1:
-		return ROM_NAME( csd1 );
-
-	case TYPE_1541_DOLPHIN_DOS:
-		return ROM_NAME( c1541dd );
-
-	case TYPE_1541_PROFESSIONAL_DOS_V1:
-		return ROM_NAME( c1541pd );
-
-	case TYPE_1541_PROLOGIC_DOS_CLASSIC:
-		return ROM_NAME( c1541pdc );
-	}
+	return ROM_NAME( c1541pdc );
 }
-
 
 
 //-------------------------------------------------
@@ -839,6 +890,17 @@ MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
+//  machine_config_additions - device-specific
+//  machine configurations
+//-------------------------------------------------
+
+machine_config_constructor base_c1541_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( c1541 );
+}
+
+
+//-------------------------------------------------
 //  MACHINE_DRIVER( c1541c )
 //-------------------------------------------------
 
@@ -848,6 +910,17 @@ static MACHINE_CONFIG_FRAGMENT( c1541c )
 	MCFG_DEVICE_MODIFY(M6522_0_TAG)
 	MCFG_DEVICE_CONFIG(c1541c_via0_intf)
 MACHINE_CONFIG_END
+
+
+//-------------------------------------------------
+//  machine_config_additions - device-specific
+//  machine configurations
+//-------------------------------------------------
+
+machine_config_constructor c1541c_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( c1541c );
+}
 
 
 //-------------------------------------------------
@@ -863,6 +936,17 @@ MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
+//  machine_config_additions - device-specific
+//  machine configurations
+//-------------------------------------------------
+
+machine_config_constructor c1541_dolphin_dos_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( c1541dd );
+}
+
+
+//-------------------------------------------------
 //  MACHINE_DRIVER( c1541pd )
 //-------------------------------------------------
 
@@ -872,6 +956,17 @@ static MACHINE_CONFIG_FRAGMENT( c1541pd )
 	MCFG_CPU_MODIFY(M6502_TAG)
 	MCFG_CPU_PROGRAM_MAP(c1541pd_mem)
 MACHINE_CONFIG_END
+
+
+//-------------------------------------------------
+//  machine_config_additions - device-specific
+//  machine configurations
+//-------------------------------------------------
+
+machine_config_constructor c1541_professional_dos_v1_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( c1541pd );
+}
 
 
 //-------------------------------------------------
@@ -894,25 +989,9 @@ MACHINE_CONFIG_END
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor base_c1541_device::device_mconfig_additions() const
+machine_config_constructor c1541_prologic_dos_classic_device::device_mconfig_additions() const
 {
-	switch (m_variant)
-	{
-	default:
-		return MACHINE_CONFIG_NAME( c1541 );
-
-	case TYPE_1541C:
-		return MACHINE_CONFIG_NAME( c1541c );
-
-	case TYPE_1541_DOLPHIN_DOS:
-		return MACHINE_CONFIG_NAME( c1541dd );
-
-	case TYPE_1541_PROFESSIONAL_DOS_V1:
-		return MACHINE_CONFIG_NAME( c1541pd );
-
-	case TYPE_1541_PROLOGIC_DOS_CLASSIC:
-		return MACHINE_CONFIG_NAME( c1541pdc );
-	}
+	return MACHINE_CONFIG_NAME( c1541pdc );
 }
 
 
@@ -966,7 +1045,7 @@ inline void base_c1541_device::set_iec_data()
 //  base_c1541_device - constructor
 //-------------------------------------------------
 
-base_c1541_device:: base_c1541_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source)
+base_c1541_device:: base_c1541_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_cbm_iec_interface(mconfig, *this),
 		device_c64_floppy_parallel_interface(mconfig, *this),
@@ -978,8 +1057,7 @@ base_c1541_device:: base_c1541_device(const machine_config &mconfig, device_type
 		m_address(*this, "ADDRESS"),
 		m_data_out(1),
 		m_via0_irq(CLEAR_LINE),
-		m_via1_irq(CLEAR_LINE),
-		m_variant(variant)
+		m_via1_irq(CLEAR_LINE)
 {
 }
 
@@ -989,7 +1067,7 @@ base_c1541_device:: base_c1541_device(const machine_config &mconfig, device_type
 //-------------------------------------------------
 
 c1540_device::c1540_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: base_c1541_device(mconfig, C1540, "C1540", tag, owner, clock, TYPE_1540, "c1540", __FILE__) { }
+	: base_c1541_device(mconfig, C1540, "C1540", tag, owner, clock, "c1540", __FILE__) { }
 
 
 //-------------------------------------------------
@@ -997,7 +1075,7 @@ c1540_device::c1540_device(const machine_config &mconfig, const char *tag, devic
 //-------------------------------------------------
 
 c1541_device::c1541_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: base_c1541_device(mconfig, C1541, "C1541", tag, owner, clock, TYPE_1541, "c1541", __FILE__) { }
+	: base_c1541_device(mconfig, C1541, "C1541", tag, owner, clock, "c1541", __FILE__) { }
 
 
 //-------------------------------------------------
@@ -1005,7 +1083,7 @@ c1541_device::c1541_device(const machine_config &mconfig, const char *tag, devic
 //-------------------------------------------------
 
 c1541c_device::c1541c_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: base_c1541_device(mconfig, C1541C, "C1541C", tag, owner, clock, TYPE_1541C, "c1541c", __FILE__) {  }
+	: base_c1541_device(mconfig, C1541C, "C1541C", tag, owner, clock, "c1541c", __FILE__) {  }
 
 
 //-------------------------------------------------
@@ -1013,7 +1091,7 @@ c1541c_device::c1541c_device(const machine_config &mconfig, const char *tag, dev
 //-------------------------------------------------
 
 c1541ii_device::c1541ii_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: base_c1541_device(mconfig, C1541II, "C1541-II", tag, owner, clock, TYPE_1541II, "c1541ii", __FILE__) {  }
+	: base_c1541_device(mconfig, C1541II, "C1541-II", tag, owner, clock, "c1541ii", __FILE__) {  }
 
 
 //-------------------------------------------------
@@ -1021,7 +1099,7 @@ c1541ii_device::c1541ii_device(const machine_config &mconfig, const char *tag, d
 //-------------------------------------------------
 
 sx1541_device::sx1541_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: base_c1541_device(mconfig, SX1541, "SX1541", tag, owner, clock, TYPE_SX1541, "sx1541", __FILE__) { }
+	: base_c1541_device(mconfig, SX1541, "SX1541", tag, owner, clock, "sx1541", __FILE__) { }
 
 
 //-------------------------------------------------
@@ -1029,7 +1107,7 @@ sx1541_device::sx1541_device(const machine_config &mconfig, const char *tag, dev
 //-------------------------------------------------
 
 fsd2_device::fsd2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: base_c1541_device(mconfig, FSD2, "FSD-2", tag, owner, clock, TYPE_FSD2, "fsd2", __FILE__) { }
+	: base_c1541_device(mconfig, FSD2, "FSD-2", tag, owner, clock, "fsd2", __FILE__) { }
 
 
 //-------------------------------------------------
@@ -1037,7 +1115,7 @@ fsd2_device::fsd2_device(const machine_config &mconfig, const char *tag, device_
 //-------------------------------------------------
 
 csd1_device::csd1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: base_c1541_device(mconfig, CSD1, "CSD-1", tag, owner, clock, TYPE_CSD1, "csd1", __FILE__) { }
+	: base_c1541_device(mconfig, CSD1, "CSD-1", tag, owner, clock, "csd1", __FILE__) { }
 
 
 //-------------------------------------------------
@@ -1045,7 +1123,7 @@ csd1_device::csd1_device(const machine_config &mconfig, const char *tag, device_
 //-------------------------------------------------
 
 c1541_dolphin_dos_device::c1541_dolphin_dos_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: base_c1541_device(mconfig, C1541_DOLPHIN_DOS, "C1541 Dolphin-DOS 2.0", tag, owner, clock, TYPE_1541_DOLPHIN_DOS, "c1541dd", __FILE__) {  }
+	: base_c1541_device(mconfig, C1541_DOLPHIN_DOS, "C1541 Dolphin-DOS 2.0", tag, owner, clock, "c1541dd", __FILE__) {  }
 
 
 //-------------------------------------------------
@@ -1053,7 +1131,7 @@ c1541_dolphin_dos_device::c1541_dolphin_dos_device(const machine_config &mconfig
 //-------------------------------------------------
 
 c1541_professional_dos_v1_device::c1541_professional_dos_v1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: base_c1541_device(mconfig, C1541_PROFESSIONAL_DOS_V1, "C1541 Professional-DOS v1", tag, owner, clock, TYPE_1541_PROFESSIONAL_DOS_V1, "c1541pd", __FILE__) {  }
+	: base_c1541_device(mconfig, C1541_PROFESSIONAL_DOS_V1, "C1541 Professional-DOS v1", tag, owner, clock, "c1541pd", __FILE__) {  }
 
 
 //-------------------------------------------------
@@ -1061,7 +1139,7 @@ c1541_professional_dos_v1_device::c1541_professional_dos_v1_device(const machine
 //-------------------------------------------------
 
 c1541_prologic_dos_classic_device::c1541_prologic_dos_classic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: base_c1541_device(mconfig, C1541_PROLOGIC_DOS_CLASSIC, "C1541 ProLogic-DOS Classic", tag, owner, clock, TYPE_1541_PROLOGIC_DOS_CLASSIC, "c1541pdc", __FILE__),
+	: base_c1541_device(mconfig, C1541_PROLOGIC_DOS_CLASSIC, "C1541 ProLogic-DOS Classic", tag, owner, clock, "c1541pdc", __FILE__),
 		m_pia(*this, MC6821_TAG),
 		m_centronics(*this, CENTRONICS_TAG),
 		m_mmu_rom(*this, "mmu")

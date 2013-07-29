@@ -12,8 +12,6 @@
     TODO:
 
     - modernize floppy
-        - add wpt callback to floppy.c
-        - refactor d64/g64
         - refactor 64H156
     - 1571CR
         - MOS5710
@@ -43,13 +41,6 @@
 #define ISA_BUS_TAG     "isabus"
 
 
-enum
-{
-	LED_POWER = 0,
-	LED_ACT
-};
-
-
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -72,6 +63,16 @@ ROM_END
 
 
 //-------------------------------------------------
+//  rom_region - device-specific ROM region
+//-------------------------------------------------
+
+const rom_entry *c1570_device::device_rom_region() const
+{
+	return ROM_NAME( c1570 );
+}
+
+
+//-------------------------------------------------
 //  ROM( c1571 )
 //-------------------------------------------------
 
@@ -88,6 +89,16 @@ ROM_END
 
 
 //-------------------------------------------------
+//  rom_region - device-specific ROM region
+//-------------------------------------------------
+
+const rom_entry *c1571_device::device_rom_region() const
+{
+	return ROM_NAME( c1571 );
+}
+
+
+//-------------------------------------------------
 //  ROM( c1571cr )
 //-------------------------------------------------
 
@@ -99,6 +110,16 @@ ROM_START( c1571cr )
 	ROM_SYSTEM_BIOS( 1, "jiffydos", "JiffyDOS v6.01" )
 	ROMX_LOAD( "jiffydos 1571d.u102", 0x0000, 0x8000, CRC(9cba146d) SHA1(823b178561302b403e6bfd8dd741d757efef3958), ROM_BIOS(2) )
 ROM_END
+
+
+//-------------------------------------------------
+//  rom_region - device-specific ROM region
+//-------------------------------------------------
+
+const rom_entry *c1571cr_device::device_rom_region() const
+{
+	return ROM_NAME( c1571cr );
+}
 
 
 //-------------------------------------------------
@@ -118,23 +139,9 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *c1571_device::device_rom_region() const
+const rom_entry *mini_chief_device::device_rom_region() const
 {
-	switch (m_variant)
-	{
-	case TYPE_1570:
-		return ROM_NAME( c1570 );
-
-	default:
-	case TYPE_1571:
-		return ROM_NAME( c1571 );
-
-	case TYPE_1571CR:
-		return ROM_NAME( c1571cr );
-
-	case TYPE_MINI_CHIEF:
-		return ROM_NAME( minichief );
-	}
+	return ROM_NAME( minichief );
 }
 
 
@@ -755,6 +762,17 @@ MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
+//  machine_config_additions - device-specific
+//  machine configurations
+//-------------------------------------------------
+
+machine_config_constructor c1570_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( c1570 );
+}
+
+
+//-------------------------------------------------
 //  MACHINE_DRIVER( c1571 )
 //-------------------------------------------------
 
@@ -779,6 +797,17 @@ MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
+//  machine_config_additions - device-specific
+//  machine configurations
+//-------------------------------------------------
+
+machine_config_constructor c1571_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( c1571 );
+}
+
+
+//-------------------------------------------------
 //  MACHINE_DRIVER( c1571cr )
 //-------------------------------------------------
 
@@ -800,6 +829,17 @@ static MACHINE_CONFIG_FRAGMENT( c1571cr )
 
 	MCFG_CBM_IEC_SLOT_ADD("iec", cbm_iec_devices, NULL)
 MACHINE_CONFIG_END
+
+
+//-------------------------------------------------
+//  machine_config_additions - device-specific
+//  machine configurations
+//-------------------------------------------------
+
+machine_config_constructor c1571cr_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( c1571cr );
+}
 
 
 //-------------------------------------------------
@@ -834,23 +874,9 @@ MACHINE_CONFIG_END
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor c1571_device::device_mconfig_additions() const
+machine_config_constructor mini_chief_device::device_mconfig_additions() const
 {
-	switch (m_variant)
-	{
-	case TYPE_1570:
-		return MACHINE_CONFIG_NAME( c1570 );
-
-	default:
-	case TYPE_1571:
-		return MACHINE_CONFIG_NAME( c1571 );
-
-	case TYPE_1571CR:
-		return MACHINE_CONFIG_NAME( c1571cr );
-
-	case TYPE_MINI_CHIEF:
-		return MACHINE_CONFIG_NAME( mini_chief );
-	}
+	return MACHINE_CONFIG_NAME( mini_chief );
 }
 
 
@@ -887,7 +913,7 @@ ioport_constructor c1571_device::device_input_ports() const
 //  c1571_device - constructor
 //-------------------------------------------------
 
-c1571_device::c1571_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source)
+c1571_device::c1571_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_cbm_iec_interface(mconfig, *this),
 		device_c64_floppy_parallel_interface(mconfig, *this),
@@ -906,8 +932,7 @@ c1571_device::c1571_device(const machine_config &mconfig, device_type type, cons
 		m_cnt_out(1),
 		m_via0_irq(CLEAR_LINE),
 		m_via1_irq(CLEAR_LINE),
-		m_cia_irq(CLEAR_LINE),
-		m_variant(variant)
+		m_cia_irq(CLEAR_LINE)
 {
 }
 
@@ -930,8 +955,7 @@ c1571_device::c1571_device(const machine_config &mconfig, const char *tag, devic
 		m_cnt_out(1),
 		m_via0_irq(CLEAR_LINE),
 		m_via1_irq(CLEAR_LINE),
-		m_cia_irq(CLEAR_LINE),
-		m_variant(TYPE_1571)
+		m_cia_irq(CLEAR_LINE)
 		//m_floppy(*this, WD1770_TAG":0:525dd")
 {
 }
@@ -942,7 +966,7 @@ c1571_device::c1571_device(const machine_config &mconfig, const char *tag, devic
 //-------------------------------------------------
 
 c1570_device::c1570_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: c1571_device(mconfig, C1570, "C1570", tag, owner, clock, TYPE_1570, "c1570", __FILE__)
+	: c1571_device(mconfig, C1570, "C1570", tag, owner, clock, "c1570", __FILE__)
 		//m_floppy(*this, WD1770_TAG":0:525ssdd")
 {
 }
@@ -953,7 +977,7 @@ c1570_device::c1570_device(const machine_config &mconfig, const char *tag, devic
 //-------------------------------------------------
 
 c1571cr_device::c1571cr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: c1571_device(mconfig, C1571CR, "C1571CR", tag, owner, clock, TYPE_1571CR, "c1571cr", __FILE__)
+	: c1571_device(mconfig, C1571CR, "C1571CR", tag, owner, clock, "c1571cr", __FILE__)
 		//m_floppy(*this, WD1770_TAG":0:525dd")
 {
 }
@@ -964,7 +988,7 @@ c1571cr_device::c1571cr_device(const machine_config &mconfig, const char *tag, d
 //-------------------------------------------------
 
 mini_chief_device::mini_chief_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: c1571_device(mconfig, MINI_CHIEF, "ICT Mini Chief", tag, owner, clock, TYPE_MINI_CHIEF, "minichif", __FILE__)
+	: c1571_device(mconfig, MINI_CHIEF, "ICT Mini Chief", tag, owner, clock, "minichif", __FILE__)
 		//m_floppy(*this, WD1770_TAG":0:525dd")
 {
 }
