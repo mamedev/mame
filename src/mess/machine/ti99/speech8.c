@@ -123,12 +123,12 @@ void ti998_spsyn_device::device_reset()
 	if (VERBOSE>4) LOG("speech8: reset\n");
 }
 
-// Unlike the TI-99/4A, the 99/8 uses the TMS5220
+// Unlike the TI-99/4A, the 99/8 uses the TMS5220C
 MACHINE_CONFIG_FRAGMENT( ti998_speech )
 	MCFG_DEVICE_ADD("vsm", SPEECHROM, 0)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(SPEECHSYN_TAG, TMS5220, 640000L)
+	MCFG_SOUND_ADD(SPEECHSYN_TAG, TMS5220C, 640000L)
 	MCFG_TMS52XX_READYQ_HANDLER(WRITELINE(ti998_spsyn_device, speech8_ready))
 	MCFG_TMS52XX_SPEECHROM("vsm")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

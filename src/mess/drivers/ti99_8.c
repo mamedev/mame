@@ -855,14 +855,15 @@ static TI_SOUND_CONFIG( sound_conf )
 static const mapper8_list_entry mapper_devices[] =
 {
 	// TI-99/4A mode (CRUS=1)
+	// Full/partial decoding has been verified on a real machine
 	// GROMs: According to the spec, the 99/8 supports up to 4 GROM libraries
 	// (99/4A supports 256 libraries)
 	// at 9800, 9804, 9808, 980c. Address counter access is at 9802,6,a,e. Write access +0400.
 	{ ROM0NAME,         TI99EM, STOP, 0x0000, 0xe000, 0x0000    },  // 0000-1fff
 
-	{ TISOUND_TAG,      TI99EM, STOP, 0x8400, 0xfff0, 0x0000    },  // 8400-840f
-	{ VIDEO_SYSTEM_TAG, TI99EM, STOP, 0x8800, 0xfffd, 0x0400    },  // 8800,8802 / 8c00,8c02
-	{ SPEECH_TAG,       TI99EM, STOP, 0x9000, 0xfff0, 0x0400    },  // 9000-900f / 9400-940f
+	{ TISOUND_TAG,      TI99EM, STOP, 0x8400, 0xfff1, 0x0000    },  // 8400-840f
+	{ VIDEO_SYSTEM_TAG, TI99EM, STOP, 0x8800, 0xfff1, 0x0400    },  // 8800,8802 / 8c00,8c02
+	{ SPEECH_TAG,       TI99EM, STOP, 0x9000, 0xfff1, 0x0400    },  // 9000-900f / 9400-940f
 	{ SRAMNAME,         TI99EM, STOP, 0x8000, 0xf800, 0x0000    },  // 8000-87ff; must follow the sound generator
 	{ MAPPER_TAG,       TI99EM, STOP, 0x8810, 0xfff0, 0x0000    },
 
@@ -872,10 +873,16 @@ static const mapper8_list_entry mapper_devices[] =
 	{ GROMPORT_TAG,     TI99EM, CONT, 0x9800, 0xfff1, 0x0400    },  // dto.  use internal address counter and id)
 
 	// TI-99/8 mode
+	// Full/partial decoding has been verified on a real machine
+	// Sound ports are at f800, f802, f804, ..., f80e
+	// VDP ports are (f810,f812), (f814,f816), (f818,f81a), (f81c,f81e)
+	// Note that unmapped GROM accesses (odd addresses like F831) return FF,
+	// not 00 as in our emulation, so that is not quite consistent, but tolerable ... I guess
+
 	{ SRAMNAME,         NATIVE, STOP, 0xf000, 0xf800, 0x0000    },  // f000-f7ff
-	{ TISOUND_TAG,      NATIVE, STOP, 0xf800, 0xfff0, 0x0000    },  // f800-f80f
-	{ VIDEO_SYSTEM_TAG, NATIVE, STOP, 0xf810, 0xfffd, 0x0000    },  // f810,2 (unlike 99/4A, no different read/write ports)
-	{ SPEECH_TAG,       NATIVE, STOP, 0xf820, 0xfff0, 0x0000    },  // f820-f82f
+	{ TISOUND_TAG,      NATIVE, STOP, 0xf800, 0xfff1, 0x0000    },  // f800-f80e (even addresses)
+	{ VIDEO_SYSTEM_TAG, NATIVE, STOP, 0xf810, 0xfff1, 0x0000    },  // f810,2 (unlike 99/4A, no different read/write ports)
+	{ SPEECH_TAG,       NATIVE, STOP, 0xf820, 0xfff1, 0x0000    },  // f820-f82f
 	{ MAPPER_TAG,       NATIVE, STOP, 0xf870, 0xfff0, 0x0000    },
 
 	{ GROM0_TAG,        NATIVE, CONT, 0xf830, 0xfff1, 0x0000    },  // f830-f83e (4 banks), no different read/write ports
