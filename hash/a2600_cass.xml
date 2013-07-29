@@ -18,6 +18,46 @@ Some games had different titles during development. Some of these are known (and
 MultiLoad (TM) games, i.e. the few games which had separate chunks of data on the tapes, are currently emulated with separate a26 files for each chunk.
 -->
 
+	<software name="3dgensp">
+		<description>3-D Genesis (Prototype)</description>
+		<year>1983</year>
+		<publisher>Amiga</publisher>
+		<info name="programmers" value="Jerry Lawson, Dan Mcelroy" />
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cass" interface="a2600_cass">
+			<dataarea name="rom" size="8192">
+				<rom name="3-d genesis (1983) (amiga, jerry lawson, dan mcelroy) (prototype).bin" size="8192" crc="931a0bdc" sha1="0e146e5eb1a68cba4f8fa55ec6f125438efcfcb4" offset="0" />
+			</dataarea>
+		</part>
+	</software>	
+
+	<software name="3dghostp">
+		<description>3-D Ghost Attack (Prototype)</description>
+		<year>1983</year>
+		<publisher>Amiga</publisher>
+		<info name="programmer" value="michael k. glass, jerry lawson" />
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cass" interface="a2600_cass">
+			<dataarea name="rom" size="16384">
+				<rom name="3-d ghost attack (1983) (amiga, michael k. glass, jerry lawson) (prototype).bin" size="16384" crc="11396d94" sha1="29e431c27ddb8649ec3f15966011505822907139" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="3dhavocp">
+		<description>3-D Havoc (Prototype)</description>
+		<year>1983</year>
+		<publisher>Amiga</publisher>
+		<info name="programmer" value="Frank Ellis, Jerry Lawson" />
+		<info name="serial" value="2110"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cass" interface="a2600_cass">
+			<dataarea name="rom" size="8192">
+				<rom name="3-d havoc (1983) (amiga, frank ellis, jerry lawson) (2110) (prototype) ~.bin" size="8192" crc="df48ce59" sha1="0879fd553fa541bb0c67db04de08f6c0079a6bc1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="commumut">
 		<description>Communist Mutants from Space</description>
 		<year>1982</year>
@@ -70,6 +110,18 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
 				<rom name="communist mutants from space (preview) (1982) (starpath corporation) (pal).a26" size="8448" crc="d1a5b3bb" sha1="b0483e5de99833d630433281953a670dd72a0df4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="depthchp">
+		<description>Depth Charge (Prototype)</description>
+		<year>1983</year>
+		<publisher>Amiga</publisher>
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cass" interface="a2600_cass">
+			<dataarea name="rom" size="4096">
+				<rom name="depth charge (1983) (amiga) (prototype) ~.bin" size="4096" crc="442d6289" sha1="d72fd778313dca0d70202d2ff2c20213b0d3ed30" offset="0" />
 			</dataarea>
 		</part>
 	</software>
