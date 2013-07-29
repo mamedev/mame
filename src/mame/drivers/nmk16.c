@@ -249,7 +249,7 @@ READ16_MEMBER(nmk16_state::tharrier_mcu_r)
 		else
 		{
 			res = to_main[m_prot_count++];
-			if (m_prot_count > sizeof(to_main))
+			if (m_prot_count == sizeof(to_main))
 				m_prot_count = 0;
 		}
 
