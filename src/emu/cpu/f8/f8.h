@@ -84,7 +84,7 @@ private:
 	UINT8   m_dbus;   /* data bus value */
 	UINT16  m_io;     /* last I/O address */
 	UINT16  m_irq_vector;
-	device_irq_acknowledge_callback m_irq_callback;
+	//device_irq_acknowledge_callback m_irq_callback;
 	address_space *m_program;
 	direct_read_data *m_direct;
 	address_space *m_iospace;
