@@ -96,14 +96,99 @@ void ieee488_slot_device::device_start()
 
 
 //**************************************************************************
-//  INLINE HELPERS
+//  LIVE DEVICE
 //**************************************************************************
+
+//-------------------------------------------------
+//  ieee488_device - constructor
+//-------------------------------------------------
+
+ieee488_device::ieee488_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, IEEE488, "IEEE488 bus", tag, owner, clock, "ieee488", __FILE__),
+		m_write_eoi(*this),
+		m_write_dav(*this),
+		m_write_nrfd(*this),
+		m_write_ndac(*this),
+		m_write_ifc(*this),
+		m_write_srq(*this),
+		m_write_atn(*this),
+		m_write_ren(*this),
+		m_dio(0xff)
+{
+	for (int i = 0; i < SIGNAL_COUNT; i++)
+	{
+		m_line[i] = 1;
+	}
+}
+
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void ieee488_device::device_start()
+{
+	// resolve callbacks
+	m_write_eoi.resolve_safe();
+	m_write_dav.resolve_safe();
+	m_write_nrfd.resolve_safe();
+	m_write_ndac.resolve_safe();
+	m_write_ifc.resolve_safe();
+	m_write_srq.resolve_safe();
+	m_write_atn.resolve_safe();
+	m_write_ren.resolve_safe();
+}
+
+
+//-------------------------------------------------
+//  device_stop - device-specific stop
+//-------------------------------------------------
+
+void ieee488_device::device_stop()
+{
+	m_device_list.reset();
+}
+
+
+//-------------------------------------------------
+//  add_device -
+//-------------------------------------------------
+
+void ieee488_device::add_device(device_t *target, int address)
+{
+	daisy_entry *entry = auto_alloc(machine(), daisy_entry(target));
+
+	entry->m_interface->m_bus = this;
+	entry->m_interface->m_address = address;
+
+	m_device_list.append(*entry);
+}
+
+
+//-------------------------------------------------
+//  daisy_entry - constructor
+//-------------------------------------------------
+
+ieee488_device::daisy_entry::daisy_entry(device_t *device)
+	: m_next(NULL),
+		m_device(device),
+		m_interface(NULL),
+		m_dio(0xff)
+{
+	for (int i = 0; i < SIGNAL_COUNT; i++)
+	{
+		m_line[i] = 1;
+	}
+
+	device->interface(m_interface);
+}
+
 
 //-------------------------------------------------
 //  set_signal -
 //-------------------------------------------------
 
-inline void ieee488_device::set_signal(device_t *device, int signal, int state)
+void ieee488_device::set_signal(device_t *device, int signal, int state)
 {
 	bool changed = false;
 
@@ -203,7 +288,7 @@ inline void ieee488_device::set_signal(device_t *device, int signal, int state)
 //  get_signal -
 //-------------------------------------------------
 
-inline int ieee488_device::get_signal(int signal)
+int ieee488_device::get_signal(int signal)
 {
 	int state = m_line[signal];
 
@@ -231,7 +316,7 @@ inline int ieee488_device::get_signal(int signal)
 //  set_data -
 //-------------------------------------------------
 
-inline void ieee488_device::set_data(device_t *device, UINT8 data)
+void ieee488_device::set_data(device_t *device, UINT8 data)
 {
 	if (device == this)
 	{
@@ -264,7 +349,7 @@ inline void ieee488_device::set_data(device_t *device, UINT8 data)
 //  get_data -
 //-------------------------------------------------
 
-inline UINT8 ieee488_device::get_data()
+UINT8 ieee488_device::get_data()
 {
 	UINT8 data = m_dio;
 
@@ -278,384 +363,4 @@ inline UINT8 ieee488_device::get_data()
 	}
 
 	return data;
-}
-
-
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  ieee488_device - constructor
-//-------------------------------------------------
-
-ieee488_device::ieee488_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, IEEE488, "IEEE488 bus", tag, owner, clock, "ieee488", __FILE__),
-		m_write_eoi(*this),
-		m_write_dav(*this),
-		m_write_nrfd(*this),
-		m_write_ndac(*this),
-		m_write_ifc(*this),
-		m_write_srq(*this),
-		m_write_atn(*this),
-		m_write_ren(*this),
-		m_dio(0xff)
-{
-	for (int i = 0; i < SIGNAL_COUNT; i++)
-	{
-		m_line[i] = 1;
-	}
-}
-
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void ieee488_device::device_start()
-{
-	// resolve callbacks
-	m_write_eoi.resolve_safe();
-	m_write_dav.resolve_safe();
-	m_write_nrfd.resolve_safe();
-	m_write_ndac.resolve_safe();
-	m_write_ifc.resolve_safe();
-	m_write_srq.resolve_safe();
-	m_write_atn.resolve_safe();
-	m_write_ren.resolve_safe();
-}
-
-
-//-------------------------------------------------
-//  device_stop - device-specific stop
-//-------------------------------------------------
-
-void ieee488_device::device_stop()
-{
-	m_device_list.reset();
-}
-
-
-//-------------------------------------------------
-//  add_device -
-//-------------------------------------------------
-
-void ieee488_device::add_device(device_t *target, int address)
-{
-	daisy_entry *entry = auto_alloc(machine(), daisy_entry(target));
-
-	entry->m_interface->m_bus = this;
-	entry->m_interface->m_address = address;
-
-	m_device_list.append(*entry);
-}
-
-
-//-------------------------------------------------
-//  daisy_entry - constructor
-//-------------------------------------------------
-
-ieee488_device::daisy_entry::daisy_entry(device_t *device)
-	: m_next(NULL),
-		m_device(device),
-		m_interface(NULL),
-		m_dio(0xff)
-{
-	for (int i = 0; i < SIGNAL_COUNT; i++)
-	{
-		m_line[i] = 1;
-	}
-
-	device->interface(m_interface);
-}
-
-
-//-------------------------------------------------
-//  dio_r -
-//-------------------------------------------------
-
-UINT8 ieee488_device::dio_r()
-{
-	return get_data();
-}
-
-
-//-------------------------------------------------
-//  dio_r -
-//-------------------------------------------------
-
-READ8_MEMBER( ieee488_device::dio_r )
-{
-	return get_data();
-}
-
-
-//-------------------------------------------------
-//  eoi_r -
-//-------------------------------------------------
-
-READ_LINE_MEMBER( ieee488_device::eoi_r )
-{
-	return get_signal(EOI);
-}
-
-
-//-------------------------------------------------
-//  dav_r -
-//-------------------------------------------------
-
-READ_LINE_MEMBER( ieee488_device::dav_r )
-{
-	return get_signal(DAV);
-}
-
-
-//-------------------------------------------------
-//  nrfd_r -
-//-------------------------------------------------
-
-READ_LINE_MEMBER( ieee488_device::nrfd_r )
-{
-	return get_signal(NRFD);
-}
-
-
-//-------------------------------------------------
-//  ndac_r -
-//-------------------------------------------------
-
-READ_LINE_MEMBER( ieee488_device::ndac_r )
-{
-	return get_signal(NDAC);
-}
-
-
-//-------------------------------------------------
-//  ifc_r -
-//-------------------------------------------------
-
-READ_LINE_MEMBER( ieee488_device::ifc_r )
-{
-	return get_signal(IFC);
-}
-
-
-//-------------------------------------------------
-//  srq_r -
-//-------------------------------------------------
-
-READ_LINE_MEMBER( ieee488_device::srq_r )
-{
-	return get_signal(SRQ);
-}
-
-
-//-------------------------------------------------
-//  atn_r -
-//-------------------------------------------------
-
-READ_LINE_MEMBER( ieee488_device::atn_r )
-{
-	return get_signal(ATN);
-}
-
-
-//-------------------------------------------------
-//  ren_r -
-//-------------------------------------------------
-
-READ_LINE_MEMBER( ieee488_device::ren_r )
-{
-	return get_signal(REN);
-}
-
-
-//-------------------------------------------------
-//  dio_w -
-//-------------------------------------------------
-
-void ieee488_device::dio_w(UINT8 data)
-{
-	return set_data(this, data);
-}
-
-
-//-------------------------------------------------
-//  dio_w -
-//-------------------------------------------------
-
-WRITE8_MEMBER( ieee488_device::dio_w )
-{
-	return set_data(this, data);
-}
-
-
-//-------------------------------------------------
-//  eoi_w -
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( ieee488_device::eoi_w )
-{
-	set_signal(this, EOI, state);
-}
-
-
-//-------------------------------------------------
-//  dav_w -
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( ieee488_device::dav_w )
-{
-	set_signal(this, DAV, state);
-}
-
-
-//-------------------------------------------------
-//  nrfd_w -
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( ieee488_device::nrfd_w )
-{
-	set_signal(this, NRFD, state);
-}
-
-
-//-------------------------------------------------
-//  ndac_w -
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( ieee488_device::ndac_w )
-{
-	set_signal(this, NDAC, state);
-}
-
-
-//-------------------------------------------------
-//  ifc_w -
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( ieee488_device::ifc_w )
-{
-	set_signal(this, IFC, state);
-}
-
-
-//-------------------------------------------------
-//  srq_w -
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( ieee488_device::srq_w )
-{
-	set_signal(this, SRQ, state);
-}
-
-
-//-------------------------------------------------
-//  atn_w -
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( ieee488_device::atn_w )
-{
-	set_signal(this, ATN, state);
-}
-
-
-//-------------------------------------------------
-//  ren_w -
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( ieee488_device::ren_w )
-{
-	set_signal(this, REN, state);
-}
-
-
-//-------------------------------------------------
-//  dio_w -
-//-------------------------------------------------
-
-void ieee488_device::dio_w(device_t *device, UINT8 data)
-{
-	return set_data(device, data);
-}
-
-
-//-------------------------------------------------
-//  eoi_w -
-//-------------------------------------------------
-
-void ieee488_device::eoi_w(device_t *device, int state)
-{
-	set_signal(device, EOI, state);
-}
-
-
-//-------------------------------------------------
-//  dav_w -
-//-------------------------------------------------
-
-void ieee488_device::dav_w(device_t *device, int state)
-{
-	set_signal(device, DAV, state);
-}
-
-
-//-------------------------------------------------
-//  nrfd_w -
-//-------------------------------------------------
-
-void ieee488_device::nrfd_w(device_t *device, int state)
-{
-	set_signal(device, NRFD, state);
-}
-
-
-//-------------------------------------------------
-//  ndac_w -
-//-------------------------------------------------
-
-void ieee488_device::ndac_w(device_t *device, int state)
-{
-	set_signal(device, NDAC, state);
-}
-
-
-//-------------------------------------------------
-//  ifc_w -
-//-------------------------------------------------
-
-void ieee488_device::ifc_w(device_t *device, int state)
-{
-	set_signal(device, IFC, state);
-}
-
-
-//-------------------------------------------------
-//  srq_w -
-//-------------------------------------------------
-
-void ieee488_device::srq_w(device_t *device, int state)
-{
-	set_signal(device, SRQ, state);
-}
-
-
-//-------------------------------------------------
-//  atn_w -
-//-------------------------------------------------
-
-void ieee488_device::atn_w(device_t *device, int state)
-{
-	set_signal(device, ATN, state);
-}
-
-
-//-------------------------------------------------
-//  ren_w -
-//-------------------------------------------------
-
-void ieee488_device::ren_w(device_t *device, int state)
-{
-	set_signal(device, REN, state);
 }
