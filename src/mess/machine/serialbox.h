@@ -12,10 +12,10 @@
 #ifndef __SERIAL_BOX__
 #define __SERIAL_BOX__
 
-
 #include "emu.h"
 #include "cpu/m6502/m65c02.h"
 #include "machine/cbmiec.h"
+#include "machine/cbmipt.h"
 
 
 

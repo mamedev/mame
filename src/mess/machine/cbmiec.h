@@ -48,10 +48,9 @@
 	downcast<cbm_iec_device *>(device)->set_reset_callback(DEVCB2_##_write);
 
 
-#define MCFG_CBM_IEC_SLOT_ADD(_tag, _num, _slot_intf, _def_slot) \
+#define MCFG_CBM_IEC_SLOT_ADD(_tag, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, CBM_IEC_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
-	cbm_iec_slot_device::static_set_slot(*device, _num);
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 
 
@@ -75,7 +74,7 @@ public:
 	template<class _write> void set_data_callback(_write wr) { m_write_data.set_callback(wr); }
 	template<class _write> void set_reset_callback(_write wr) { m_write_reset.set_callback(wr); }
 
-	void add_device(device_t *target, int address);
+	void add_device(device_t *target);
 
 	// reads for both host and peripherals
 	DECLARE_READ_LINE_MEMBER( srq_r );
@@ -155,12 +154,8 @@ public:
 	// device-level overrides
 	virtual void device_start();
 
-	// inline configuration
-	static void static_set_slot(device_t &device, int address);
-
 private:
 	// configuration
-	int m_address;
 	cbm_iec_device  *m_bus;
 };
 
@@ -187,7 +182,6 @@ public:
 	virtual void cbm_iec_reset(int state) { };
 
 	cbm_iec_device  *m_bus;
-	int m_address;
 };
 
 

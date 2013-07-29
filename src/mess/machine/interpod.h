@@ -12,7 +12,6 @@
 #ifndef __INTERPOD__
 #define __INTERPOD__
 
-
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/6522via.h"

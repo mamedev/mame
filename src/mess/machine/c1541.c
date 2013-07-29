@@ -504,7 +504,7 @@ READ8_MEMBER( base_c1541_device::via0_pb_r )
 	data |= !m_bus->clk_r() << 2;
 
 	// serial bus address
-	data |= (m_address - 8) << 5;
+	data |= (m_address->read() & 0x03) << 5;
 
 	// attention in
 	data |= !m_bus->atn_r() << 7;
@@ -833,6 +833,8 @@ static MACHINE_CONFIG_FRAGMENT( c1541 )
 
 	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, c1541_floppy_interface)
 	MCFG_64H156_ADD(C64H156_TAG, XTAL_16MHz, ga_intf)
+
+	MCFG_CBM_IEC_SLOT_ADD("iec", cbm_iec_devices, NULL)
 MACHINE_CONFIG_END
 
 
@@ -914,6 +916,30 @@ machine_config_constructor base_c1541_device::device_mconfig_additions() const
 }
 
 
+//-------------------------------------------------
+//  INPUT_PORTS( c1541 )
+//-------------------------------------------------
+
+static INPUT_PORTS_START( c1541 )
+	PORT_START("ADDRESS")
+	PORT_DIPNAME( 0x03, 0x00, "Device Address" )
+	PORT_DIPSETTING(    0x00, "8" )
+	PORT_DIPSETTING(    0x01, "9" )
+	PORT_DIPSETTING(    0x02, "10" )
+	PORT_DIPSETTING(    0x03, "11" )
+INPUT_PORTS_END
+
+
+//-------------------------------------------------
+//  input_ports - device-specific input ports
+//-------------------------------------------------
+
+ioport_constructor base_c1541_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( c1541 );
+}
+
+
 
 //**************************************************************************
 //  INLINE HELPERS
@@ -949,6 +975,7 @@ base_c1541_device:: base_c1541_device(const machine_config &mconfig, device_type
 		m_via1(*this, M6522_1_TAG),
 		m_ga(*this, C64H156_TAG),
 		m_image(*this, FLOPPY_0),
+		m_address(*this, "ADDRESS"),
 		m_data_out(1),
 		m_via0_irq(CLEAR_LINE),
 		m_via1_irq(CLEAR_LINE),

@@ -1130,8 +1130,8 @@ static MACHINE_CONFIG_START( ntsc_sx, sx64_state )
 	MCFG_M6510_PORT_PULLS(0x07, 0xc0)
 
 	// devices
-	MCFG_DEVICE_REMOVE("iec8")
-	MCFG_CBM_IEC_SLOT_ADD("iec8", 8, sx1541_iec_devices, "sx1541")
+	MCFG_DEVICE_REMOVE("iec")
+	MCFG_CBM_IEC_SLOT_ADD("iec", sx1541_iec_devices, "sx1541")
 MACHINE_CONFIG_END
 
 
@@ -1143,8 +1143,7 @@ static MACHINE_CONFIG_START( ntsc_dx, sx64_state )
 	MCFG_FRAGMENT_ADD(ntsc_sx)
 
 	// devices
-	MCFG_DEVICE_REMOVE("iec9")
-	MCFG_CBM_IEC_SLOT_ADD("iec9", 9, sx1541_iec_devices, "sx1541")
+	//MCFG_CBM_IEC_SLOT_ADD("iec", sx1541_iec_devices, "sx1541")
 MACHINE_CONFIG_END
 
 
@@ -1234,8 +1233,8 @@ static MACHINE_CONFIG_START( pal_sx, sx64_state )
 	MCFG_M6510_PORT_PULLS(0x07, 0xc0)
 
 	// devices
-	MCFG_DEVICE_REMOVE("iec8")
-	MCFG_CBM_IEC_SLOT_ADD("iec8", 8, sx1541_iec_devices, "sx1541")
+	MCFG_DEVICE_REMOVE("iec")
+	MCFG_CBM_IEC_SLOT_ADD("iec", sx1541_iec_devices, "sx1541")
 MACHINE_CONFIG_END
 
 

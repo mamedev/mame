@@ -145,7 +145,7 @@ READ8_MEMBER( c1581_device::cia_pa_r )
 	//data |= !m_floppy->ready_r() << 1;
 
 	// device number
-	data |= (m_address - 8) << 3;
+	data |= (m_address->read() & 0x03) << 3;
 
 	// disk change
 	data |= m_floppy->dskchg_r() << 7;
@@ -282,8 +282,9 @@ static MACHINE_CONFIG_FRAGMENT( c1581 )
 	MCFG_MOS6526_PORT_B_CALLBACKS(READ8(c1581_device, cia_pb_r), WRITE8(c1581_device, cia_pb_w), NULL)
 
 	MCFG_WD1772x_ADD(WD1772_TAG, XTAL_16MHz/2)
-
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG":0", c1581_floppies, "35dd", c1581_device::floppy_formats)
+
+	MCFG_CBM_IEC_SLOT_ADD("iec", cbm_iec_devices, NULL)
 MACHINE_CONFIG_END
 
 
@@ -295,6 +296,30 @@ MACHINE_CONFIG_END
 machine_config_constructor c1581_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( c1581 );
+}
+
+
+//-------------------------------------------------
+//  INPUT_PORTS( c1581 )
+//-------------------------------------------------
+
+static INPUT_PORTS_START( c1581 )
+	PORT_START("ADDRESS")
+	PORT_DIPNAME( 0x03, 0x00, "Device Address" )
+	PORT_DIPSETTING(    0x00, "8" )
+	PORT_DIPSETTING(    0x01, "9" )
+	PORT_DIPSETTING(    0x02, "10" )
+	PORT_DIPSETTING(    0x03, "11" )
+INPUT_PORTS_END
+
+
+//-------------------------------------------------
+//  input_ports - device-specific input ports
+//-------------------------------------------------
+
+ioport_constructor c1581_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( c1581 );
 }
 
 
@@ -314,6 +339,7 @@ c1581_device::c1581_device(const machine_config &mconfig, device_type type, cons
 		m_cia(*this, M8520_TAG),
 		m_fdc(*this, WD1772_TAG),
 		m_floppy(*this, WD1772_TAG":0:35dd"),
+		m_address(*this, "ADDRESS"),
 		m_data_out(0),
 		m_atn_ack(0),
 		m_fast_ser_dir(0),
@@ -330,6 +356,7 @@ c1581_device::c1581_device(const machine_config &mconfig, const char *tag, devic
 		m_cia(*this, M8520_TAG),
 		m_fdc(*this, WD1772_TAG),
 		m_floppy(*this, WD1772_TAG":0:35dd"),
+		m_address(*this, "ADDRESS"),
 		m_data_out(0),
 		m_atn_ack(0),
 		m_fast_ser_dir(0),

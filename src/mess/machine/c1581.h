@@ -12,11 +12,11 @@
 #ifndef __C1581__
 #define __C1581__
 
-
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "formats/d81_dsk.h"
 #include "machine/cbmiec.h"
+#include "machine/cbmipt.h"
 #include "machine/mos6526.h"
 #include "machine/wd_fdc.h"
 
@@ -53,6 +53,7 @@ public:
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual ioport_constructor device_input_ports() const;
 
 	// not really public
 	DECLARE_WRITE_LINE_MEMBER( cnt_w );
@@ -81,6 +82,7 @@ protected:
 	required_device<mos6526_device> m_cia;
 	required_device<wd1772_t> m_fdc;
 	required_device<floppy_image_device> m_floppy;
+	required_ioport m_address;
 
 	int m_data_out;             // serial data out
 	int m_atn_ack;              // attention acknowledge

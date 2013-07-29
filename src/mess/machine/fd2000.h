@@ -17,6 +17,7 @@
 #include "formats/d81_dsk.h"
 #include "machine/6522via.h"
 #include "machine/cbmiec.h"
+#include "machine/cbmipt.h"
 #include "machine/upd765.h"
 
 

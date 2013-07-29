@@ -12,7 +12,6 @@
 #ifndef __C1541__
 #define __C1541__
 
-
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "imagedev/flopdrv.h"
@@ -23,6 +22,7 @@
 #include "machine/6821pia.h"
 #include "machine/c64/bn1541.h"
 #include "machine/cbmiec.h"
+#include "machine/cbmipt.h"
 #include "machine/ctronics.h"
 
 
@@ -81,6 +81,7 @@ public:
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual ioport_constructor device_input_ports() const;
 
 protected:
 	// device-level overrides
@@ -102,6 +103,7 @@ protected:
 	required_device<via6522_device> m_via1;
 	required_device<c64h156_device> m_ga;
 	required_device<legacy_floppy_image_device> m_image;
+	required_ioport m_address;
 
 	// IEC bus
 	int m_data_out;                         // serial data out

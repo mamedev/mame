@@ -262,17 +262,6 @@ cbm_iec_slot_device::cbm_iec_slot_device(const machine_config &mconfig, const ch
 
 
 //-------------------------------------------------
-//  static_set_slot -
-//-------------------------------------------------
-
-void cbm_iec_slot_device::static_set_slot(device_t &device, int address)
-{
-	cbm_iec_slot_device &cbm_iec_card = dynamic_cast<cbm_iec_slot_device &>(device);
-	cbm_iec_card.m_address = address;
-}
-
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
@@ -280,7 +269,7 @@ void cbm_iec_slot_device::device_start()
 {
 	m_bus = machine().device<cbm_iec_device>(CBM_IEC_TAG);
 	device_cbm_iec_interface *dev = dynamic_cast<device_cbm_iec_interface *>(get_card_device());
-	if (dev) m_bus->add_device(get_card_device(), m_address);
+	if (dev) m_bus->add_device(get_card_device());
 }
 
 
@@ -450,6 +439,7 @@ void cbm_iec_device::device_reset()
 	reset_w(1);
 }
 
+
 //-------------------------------------------------
 //  device_stop - device-specific stop
 //-------------------------------------------------
@@ -464,15 +454,15 @@ void cbm_iec_device::device_stop()
 //  add_device -
 //-------------------------------------------------
 
-void cbm_iec_device::add_device(device_t *target, int address)
+void cbm_iec_device::add_device(device_t *target)
 {
 	daisy_entry *entry = auto_alloc(machine(), daisy_entry(target));
 
 	entry->m_interface->m_bus = this;
-	entry->m_interface->m_address = address;
 
 	m_device_list.append(*entry);
 }
+
 
 //-------------------------------------------------
 //  daisy_entry - constructor

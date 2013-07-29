@@ -21,6 +21,7 @@
 #include "machine/6522via.h"
 #include "machine/c64/bn1541.h"
 #include "machine/cbmiec.h"
+#include "machine/cbmipt.h"
 #include "machine/isa.h"
 #include "machine/mos6526.h"
 #include "machine/wd_fdc.h"
@@ -61,6 +62,7 @@ public:
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual ioport_constructor device_input_ports() const;
 
 	DECLARE_WRITE_LINE_MEMBER( via0_irq_w );
 	DECLARE_READ8_MEMBER( via0_pa_r );
@@ -112,6 +114,7 @@ protected:
 	required_device<c64h156_device> m_ga;
 	required_device<legacy_floppy_image_device> m_image;
 	//required_device<floppy_image_device> m_floppy;
+	required_ioport m_address;
 
 	// signals
 	int m_1_2mhz;                           // clock speed
