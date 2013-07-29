@@ -254,7 +254,7 @@ private:
 	emu_timer *         m_eof_timer;
 
 	UINT32              m_palette_bank;            // which palette bank is enabled
-	UINT32              m_pf0_xscroll;             // playfield 1 xscroll
+	//UINT32              m_pf0_xscroll;             // playfield 1 xscroll
 	UINT32              m_pf0_xscroll_raw;         // playfield 1 xscroll raw value
 	UINT32              m_pf0_yscroll;             // playfield 1 yscroll
 	UINT32              m_pf1_xscroll_raw;         // playfield 2 xscroll raw value

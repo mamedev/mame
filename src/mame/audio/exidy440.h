@@ -63,7 +63,7 @@ private:
 	UINT8 m_sound_command_ack;
 
 	UINT8 m_sound_banks[4];
-	UINT8 m_m6844_data[0x20];
+	//UINT8 m_m6844_data[0x20];
 	UINT8 m_sound_volume[0x10];
 	INT32 *m_mixer_buffer_left;
 	INT32 *m_mixer_buffer_right;
