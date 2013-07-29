@@ -175,7 +175,11 @@ WRITE8_MEMBER(sidepckt_state::sidepckt_i8751_w)
 			break;
 
 		case 6: /* Read table data */
-			if (m_current_table==1) m_i8751_return=table_1[m_current_ptr++];
+			if (m_current_table==1)
+			{
+				assert(m_current_ptr >= 0 && m_current_ptr < ARRAY_LENGTH(table_1));
+				m_i8751_return=table_1[m_current_ptr++];
+			}
 			if (m_current_table==2) m_i8751_return=table_2[m_current_ptr++];
 			if (m_current_table==3) m_i8751_return=table_3[m_current_ptr++];
 			break;
@@ -215,7 +219,11 @@ WRITE8_MEMBER(sidepckt_state::sidepctj_i8751_w)
 			break;
 
 		case 6: /* Read table data */
-			if (m_current_table==1) m_i8751_return=table_1[m_current_ptr++];
+			if (m_current_table==1)
+			{
+				assert(m_current_ptr >= 0 && m_current_ptr < ARRAY_LENGTH(table_1));
+				m_i8751_return=table_1[m_current_ptr++];
+			}
 			if (m_current_table==2) m_i8751_return=table_2[m_current_ptr++];
 			if (m_current_table==3) m_i8751_return=table_3[m_current_ptr++];
 			break;
