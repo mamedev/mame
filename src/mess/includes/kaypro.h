@@ -78,13 +78,13 @@ public:
 	UINT8 m_framecnt;
 	UINT16 m_cursor;
 	required_shared_ptr<UINT8> m_p_videoram;
+	kay_kbd_t *m_kbd;
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 private:
 	UINT8 m_system_port;
 	UINT16 m_mc6845_video_address;
-	kay_kbd_t *m_kbd;
 	floppy_image_device *m_floppy;
 	void mc6845_cursor_configure();
 	void mc6845_screen_configure();
