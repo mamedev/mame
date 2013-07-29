@@ -141,6 +141,7 @@ FORMATSOBJS = \
 	$(LIBOBJ)/formats/iq151_dsk.o   \
 	$(LIBOBJ)/formats/imd_dsk.o     \
 	$(LIBOBJ)/formats/ipf_dsk.o     \
+	$(LIBOBJ)/formats/kaypro_dsk.o  \
 	$(LIBOBJ)/formats/kc_cas.o      \
 	$(LIBOBJ)/formats/kc85_dsk.o    \
 	$(LIBOBJ)/formats/kim1_cas.o    \

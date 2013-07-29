@@ -59,7 +59,8 @@ public:
 	DECLARE_PALETTE_INIT(kaypro);
 	DECLARE_MACHINE_RESET(kay_kbd);
 	DECLARE_DRIVER_INIT(kaypro);
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	DECLARE_FLOPPY_FORMATS(kayproii_floppy_formats);
+	DECLARE_FLOPPY_FORMATS(kaypro2x_floppy_formats);
 	UINT32 screen_update_kayproii(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_kaypro2x(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_omni2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

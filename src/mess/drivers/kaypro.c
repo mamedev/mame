@@ -30,6 +30,7 @@
 **************************************************************************************************/
 
 #include "includes/kaypro.h"
+#include "formats/kaypro_dsk.h"
 
 
 READ8_MEMBER( kaypro_state::kaypro2x_87_r ) { return 0x7f; }    /* to bypass unemulated HD controller */
@@ -176,50 +177,6 @@ static MC6845_INTERFACE( kaypro2x_crtc )
     Machine Driver
 
 ************************************************************/
-#if 0
-static LEGACY_FLOPPY_OPTIONS_START(kayproii)
-	LEGACY_FLOPPY_OPTION(kayproii, "dsk", "Kaypro II disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([1])
-		TRACKS([40])
-		SECTORS([10])
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([0]))
-LEGACY_FLOPPY_OPTIONS_END
-
-static LEGACY_FLOPPY_OPTIONS_START(kaypro2x)
-	LEGACY_FLOPPY_OPTION(kaypro2x, "dsk", "Kaypro 2x disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([2])
-		TRACKS([80])
-		SECTORS([10])
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([0]))
-LEGACY_FLOPPY_OPTIONS_END
-
-static const floppy_interface kayproii_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(kayproii),
-	"floppy_5_25",
-	NULL
-};
-
-static const floppy_interface kaypro2x_floppy_interface =
-{
-	DEVCB_LINE(wd17xx_idx_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(kaypro2x),
-	"floppy_5_25",
-	NULL
-};
 
 FLOPPY_FORMATS_MEMBER( kaypro_state::kayproii_floppy_formats )
 	FLOPPY_KAYPROII_FORMAT
@@ -228,7 +185,6 @@ FLOPPY_FORMATS_END
 FLOPPY_FORMATS_MEMBER( kaypro_state::kaypro2x_floppy_formats )
 	FLOPPY_KAYPRO2X_FORMAT
 FLOPPY_FORMATS_END
-#endif
 
 static SLOT_INTERFACE_START( kaypro_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
@@ -272,8 +228,8 @@ static MACHINE_CONFIG_START( kayproii, kaypro_state )
 	MCFG_Z80SIO_ADD( "z80sio", 4800, kaypro_sio_intf )  /* start at 300 baud */
 
 	MCFG_FD1793x_ADD("fdc", XTAL_20MHz / 20)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", kaypro_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", kaypro_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", kaypro_floppies, "525dd", kaypro_state::kayproii_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", kaypro_floppies, "525dd", kaypro_state::kayproii_floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","kayproii")
 MACHINE_CONFIG_END
 
@@ -317,8 +273,8 @@ static MACHINE_CONFIG_START( kaypro2x, kaypro_state )
 	MCFG_Z80SIO_ADD( "z80sio", 4800, kaypro_sio_intf )
 	MCFG_Z80SIO_ADD( "z80sio_2x", 4800, kaypro_sio_intf )   /* extra sio for modem and printer */
 	MCFG_FD1793x_ADD("fdc", XTAL_16MHz / 16)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", kaypro_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", kaypro_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", kaypro_floppies, "525dd", kaypro_state::kaypro2x_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", kaypro_floppies, "525dd", kaypro_state::kaypro2x_floppy_formats)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( omni2, kaypro4 )
