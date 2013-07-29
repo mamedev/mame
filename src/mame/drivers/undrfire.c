@@ -238,20 +238,6 @@ void undrfire_state::device_timer(emu_timer &timer, device_timer_id id, int para
 
 
 /**********************************************************
-                EPROM
-**********************************************************/
-
-static const serial_eeprom_interface undrfire_eeprom_interface =
-{
-	"0110",         /* read command */
-	"0101",         /* write command */
-	"0111",         /* erase command */
-	"0100000000",   /* unlock command */
-	"0100110000",   /* lock command */
-};
-
-
-/**********************************************************
             GAME INPUTS
 **********************************************************/
 
@@ -291,9 +277,9 @@ WRITE32_MEMBER(undrfire_state::undrfire_input_w)
 
 			if (ACCESSING_BITS_0_7)
 			{
-				m_eeprom->set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
-				m_eeprom->write_bit(data & 0x40);
-				m_eeprom->set_cs_line((data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+				m_eeprom->clk_write((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+				m_eeprom->di_write((data & 0x40) >> 6);
+				m_eeprom->cs_write((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 				return;
 			}
 
@@ -536,7 +522,7 @@ static INPUT_PORTS_START( undrfire )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit) /* reserved for EEROM */
+	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read) /* reserved for EEROM */
 	PORT_BIT( 0x00000100, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x00000200, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x00000400, IP_ACTIVE_LOW,  IPT_UNKNOWN )
@@ -604,7 +590,7 @@ static INPUT_PORTS_START( cbombers )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit) /* reserved for EEROM */
+	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read) /* reserved for EEROM */
 	PORT_BIT( 0x00000100, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x00000200, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x00000400, IP_ACTIVE_LOW,  IPT_UNKNOWN )
@@ -732,7 +718,7 @@ static MACHINE_CONFIG_START( undrfire, undrfire_state )
 	MCFG_CPU_PROGRAM_MAP(undrfire_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", undrfire_state,  undrfire_interrupt)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", 64, 16, undrfire_eeprom_interface)
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -767,7 +753,7 @@ static MACHINE_CONFIG_START( cbombers, undrfire_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(480))   /* CPU slices - Need to interleave Cpu's 1 & 3 */
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", 64, 16, undrfire_eeprom_interface)
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

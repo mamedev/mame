@@ -215,7 +215,7 @@ public:
 	void sailormn_tilebank_w(int bank);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	DECLARE_WRITE_LINE_MEMBER(sound_irq_gen);
-	optional_device<serial_eeprom_device> m_eeprom;
+	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 
 private:
 	inline void get_tile_info( tile_data &tileinfo, int tile_index, int GFX );

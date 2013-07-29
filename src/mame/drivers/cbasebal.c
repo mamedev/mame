@@ -85,20 +85,6 @@ WRITE8_MEMBER(cbasebal_state::cbasebal_coinctrl_w)
 
 /*************************************
  *
- *  EEPROM
- *
- *************************************/
-
-static const serial_eeprom_interface cbasebal_eeprom_intf =
-{
-	"0110", /*  read command */
-	"0101", /* write command */
-	"0111"  /* erase command */
-};
-
-
-/*************************************
- *
  *  Address maps
  *
  *************************************/
@@ -164,16 +150,16 @@ static INPUT_PORTS_START( cbasebal )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")       /* ? */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 
 	PORT_START( "IO_01" )
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, set_cs_line)
+	PORT_BIT( 0x00000010, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
 
 	PORT_START( "IO_02" )
-	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, set_clock_line)
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write)
 
 	PORT_START( "IO_03" )
-	PORT_BIT( 0x00000040, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, write_bit)
+	PORT_BIT( 0x00000040, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
 INPUT_PORTS_END
 
 
@@ -272,8 +258,7 @@ static MACHINE_CONFIG_START( cbasebal, cbasebal_state )
 	MCFG_CPU_IO_MAP(cbasebal_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cbasebal_state,  irq0_line_hold)   /* ??? */
 
-
-	MCFG_SERIAL_EEPROM_ADD("eeprom", 64, 16, cbasebal_eeprom_intf)
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)

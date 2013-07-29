@@ -50,7 +50,7 @@ public:
 	PXA255_LCD_Regs m_lcd_regs;
 
 	dmadac_sound_device *m_dmadac[2];
-	required_device<serial_eeprom_device> m_eeprom;
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	UINT32 m_pxa255_lcd_palette[0x100];
 	UINT8 m_pxa255_lcd_framebuffer[0x100000];
 
@@ -806,7 +806,7 @@ READ32_MEMBER(_39in1_state::pxa255_gpio_r)
 	{
 		case PXA255_GPLR0:
 			verboselog( machine(), 3, "pxa255_gpio_r: GPIO Pin-Level Register 0: %08x & %08x\n", gpio_regs->gplr0 | (1 << 1), mem_mask );
-			return gpio_regs->gplr0 | (1 << 1) | (m_eeprom->read_bit() << 5); // Must be on.  Probably a DIP switch.
+			return gpio_regs->gplr0 | (1 << 1) | (m_eeprom->do_read() << 5); // Must be on.  Probably a DIP switch.
 		case PXA255_GPLR1:
 			verboselog( machine(), 3, "pxa255_gpio_r: *Not Yet Implemented* GPIO Pin-Level Register 1: %08x & %08x\n", gpio_regs->gplr1, mem_mask );
 			return 0xff9fffff;
@@ -927,15 +927,15 @@ WRITE32_MEMBER(_39in1_state::pxa255_gpio_w)
 			gpio_regs->gpsr0 |= data & gpio_regs->gpdr0;
 			if(data & 0x00000004)
 			{
-				m_eeprom->set_cs_line(CLEAR_LINE);
+				m_eeprom->cs_write(ASSERT_LINE);
 			}
 			if(data & 0x00000008)
 			{
-				m_eeprom->set_clock_line(ASSERT_LINE);
+				m_eeprom->clk_write(ASSERT_LINE);
 			}
 			if(data & 0x00000010)
 			{
-				m_eeprom->write_bit(1);
+				m_eeprom->di_write(1);
 			}
 			break;
 		case PXA255_GPSR1:
@@ -951,15 +951,15 @@ WRITE32_MEMBER(_39in1_state::pxa255_gpio_w)
 			gpio_regs->gpsr0 &= ~(data & gpio_regs->gpdr0);
 			if(data & 0x00000004)
 			{
-				m_eeprom->set_cs_line(ASSERT_LINE);
+				m_eeprom->cs_write(ASSERT_LINE);
 			}
 			if(data & 0x00000008)
 			{
-				m_eeprom->set_clock_line(CLEAR_LINE);
+				m_eeprom->clk_write(CLEAR_LINE);
 			}
 			if(data & 0x00000010)
 			{
-				m_eeprom->write_bit(0);
+				m_eeprom->di_write(0);
 			}
 			break;
 		case PXA255_GPCR1:
@@ -1591,7 +1591,7 @@ static MACHINE_CONFIG_START( 39in1, _39in1_state )
 
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_EEPROM_93C66B_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_93C66_ADD("eeprom")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

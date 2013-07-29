@@ -173,14 +173,14 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<okim6295_device> m_oki;
 	optional_device<okim6295_device> m_oki2;
-	required_device<serial_eeprom_device> m_eeprom;
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
 };
 
 READ16_MEMBER(vamphalf_state::eeprom_r)
 {
 	if(offset)
 	{
-		return m_eeprom->read_bit();
+		return m_eeprom->do_read();
 	}
 	else
 		return 0;
@@ -188,16 +188,16 @@ READ16_MEMBER(vamphalf_state::eeprom_r)
 
 READ32_MEMBER(vamphalf_state::eeprom32_r)
 {
-	return m_eeprom->read_bit();
+	return m_eeprom->do_read();
 }
 
 WRITE16_MEMBER(vamphalf_state::eeprom_w)
 {
 	if(offset)
 	{
-		m_eeprom->write_bit(data & 0x01);
-		m_eeprom->set_cs_line((data & 0x04) ? CLEAR_LINE : ASSERT_LINE );
-		m_eeprom->set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE );
+		m_eeprom->di_write(data & 0x01);
+		m_eeprom->cs_write((data & 0x04) ? ASSERT_LINE : CLEAR_LINE );
+		m_eeprom->clk_write((data & 0x02) ? ASSERT_LINE : CLEAR_LINE );
 
 		// data & 8?
 	}
@@ -205,16 +205,16 @@ WRITE16_MEMBER(vamphalf_state::eeprom_w)
 
 WRITE32_MEMBER(vamphalf_state::eeprom32_w)
 {
-	m_eeprom->write_bit(data & 0x01);
-	m_eeprom->set_cs_line((data & 0x04) ? CLEAR_LINE : ASSERT_LINE );
-	m_eeprom->set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE );
+	m_eeprom->di_write(data & 0x01);
+	m_eeprom->cs_write((data & 0x04) ? ASSERT_LINE : CLEAR_LINE );
+	m_eeprom->clk_write((data & 0x02) ? ASSERT_LINE : CLEAR_LINE );
 }
 
 WRITE32_MEMBER(vamphalf_state::finalgdr_eeprom_w)
 {
-	m_eeprom->write_bit(data & 0x4000);
-	m_eeprom->set_cs_line((data & 0x1000) ? CLEAR_LINE : ASSERT_LINE );
-	m_eeprom->set_clock_line((data & 0x2000) ? ASSERT_LINE : CLEAR_LINE );
+	m_eeprom->di_write((data & 0x4000) >> 14);
+	m_eeprom->cs_write((data & 0x1000) ? ASSERT_LINE : CLEAR_LINE );
+	m_eeprom->clk_write((data & 0x2000) ? ASSERT_LINE : CLEAR_LINE );
 }
 
 WRITE16_MEMBER(vamphalf_state::flipscreen_w)
@@ -885,7 +885,7 @@ static INPUT_PORTS_START( aoh )
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000010, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit) // eeprom bit
+	PORT_BIT( 0x00000010, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read) // eeprom bit
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -982,7 +982,7 @@ static MACHINE_CONFIG_START( common, vamphalf_state )
 	MCFG_CPU_PROGRAM_MAP(common_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
 
-	MCFG_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1113,7 +1113,7 @@ static MACHINE_CONFIG_START( aoh, vamphalf_state )
 	MCFG_CPU_IO_MAP(aoh_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
 
-	MCFG_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

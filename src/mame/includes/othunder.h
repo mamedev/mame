@@ -63,7 +63,7 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	optional_device<serial_eeprom_device> m_eeprom;
+	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<tc0220ioc_device> m_tc0220ioc;
 	required_device<tc0100scn_device> m_tc0100scn;
 	required_device<tc0110pcr_device> m_tc0110pcr;

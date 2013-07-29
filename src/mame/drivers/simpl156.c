@@ -127,7 +127,7 @@ INPUT_PORTS_END
 
 READ32_MEMBER(simpl156_state::simpl156_inputs_read)
 {
-	int eep = m_eeprom->read_bit();
+	int eep = m_eeprom->do_read();
 	UINT32 returndata = ioport("IN0")->read() ^ 0xffff0000;
 
 	returndata ^= ((eep << 8));
@@ -172,9 +172,9 @@ WRITE32_MEMBER(simpl156_state::simpl156_eeprom_w)
 
 	m_okimusic->set_bank_base(0x40000 * (data & 0x7));
 
-	m_eeprom->set_clock_line(BIT(data, 5) ? ASSERT_LINE : CLEAR_LINE);
-	m_eeprom->write_bit(BIT(data, 4));
-	m_eeprom->set_cs_line(BIT(data, 6) ? CLEAR_LINE : ASSERT_LINE);
+	m_eeprom->clk_write(BIT(data, 5) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->di_write(BIT(data, 4));
+	m_eeprom->cs_write(BIT(data, 6) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -424,7 +424,7 @@ static MACHINE_CONFIG_START( chainrec, simpl156_state )
 	MCFG_CPU_PROGRAM_MAP(chainrec_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", simpl156_state,  simpl156_vbl_interrupt)
 
-	MCFG_EEPROM_93C46_ADD("eeprom")  // 93C45
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")  // 93C45
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

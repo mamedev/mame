@@ -144,9 +144,9 @@ WRITE32_MEMBER(policetr_state::control_w)
 	/* handle EEPROM I/O */
 	if (ACCESSING_BITS_16_23)
 	{
-		m_eeprom->write_bit(data & 0x00800000);
-		m_eeprom->set_cs_line((data & 0x00200000) ? CLEAR_LINE : ASSERT_LINE);
-		m_eeprom->set_clock_line((data & 0x00400000) ? ASSERT_LINE : CLEAR_LINE);
+		m_eeprom->di_write((data & 0x00800000) >> 23);
+		m_eeprom->cs_write((data & 0x00200000) ? ASSERT_LINE : CLEAR_LINE);
+		m_eeprom->clk_write((data & 0x00400000) ? ASSERT_LINE : CLEAR_LINE);
 	}
 
 	/* toggling BSMT off then on causes a reset */
@@ -228,23 +228,6 @@ WRITE32_MEMBER(policetr_state::speedup_w)
 		m_last_cycles = curr_cycles;
 	}
 }
-
-
-
-/*************************************
- *
- *  EEPROM interface/saving
- *
- *************************************/
-
-static const serial_eeprom_interface eeprom_interface_policetr =
-{
-	"*110",         // read         1 10 aaaaaa
-	"*101",         // write        1 01 aaaaaa dddddddddddddddd
-	"*111",         // erase        1 11 aaaaaa
-	"*10000xxxx",   // lock         1 00 00xxxx
-	"*10011xxxx"    // unlock       1 00 11xxxx
-};
 
 
 
@@ -332,7 +315,7 @@ static INPUT_PORTS_START( policetr )
 	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit) /* EEPROM read */
+	PORT_BIT( 0x20000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read) /* EEPROM read */
 	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -414,7 +397,7 @@ static MACHINE_CONFIG_START( policetr, policetr_state )
 	MCFG_CPU_PROGRAM_MAP(policetr_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", policetr_state,  irq4_gen)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", 256, 16, eeprom_interface_policetr)
+	MCFG_EEPROM_SERIAL_93C66_ADD("eeprom")
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)

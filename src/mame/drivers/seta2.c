@@ -181,14 +181,14 @@ ADDRESS_MAP_END
 
 READ16_MEMBER(seta2_state::gundamex_eeprom_r)
 {
-	return ((m_eeprom->read_bit() & 1)) << 3;
+	return ((m_eeprom->do_read() & 1)) << 3;
 }
 
 WRITE16_MEMBER(seta2_state::gundamex_eeprom_w)
 {
-	m_eeprom->set_clock_line((data & 0x2) ? ASSERT_LINE : CLEAR_LINE);
-	m_eeprom->write_bit(data & 0x1);
-	m_eeprom->set_cs_line((data & 0x4) ? CLEAR_LINE : ASSERT_LINE);
+	m_eeprom->clk_write((data & 0x2) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->di_write(data & 0x1);
+	m_eeprom->cs_write((data & 0x4) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static ADDRESS_MAP_START( gundamex_map, AS_PROGRAM, 16, seta2_state )
@@ -2036,7 +2036,7 @@ static MACHINE_CONFIG_DERIVED( gundamex, seta2 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(gundamex_map)
 
-	MCFG_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")

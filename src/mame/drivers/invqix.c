@@ -147,7 +147,7 @@ public:
 protected:
 	// devices
 	required_device<cpu_device> m_maincpu;
-	required_device<serial_eeprom_device> m_eeprom;
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_shared_ptr<UINT16> m_vram;
 
 	// driver_device overrides
@@ -226,14 +226,14 @@ UINT32 invqix_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 
 READ8_MEMBER(invqix_state::port3_r)
 {
-	return (m_eeprom->read_bit() << 5) | 0x03;
+	return (m_eeprom->do_read() << 5) | 0x03;
 }
 
 WRITE8_MEMBER(invqix_state::port3_w)
 {
-	m_eeprom->set_cs_line(((data >> 2) & 1) ^ 1);
-	m_eeprom->write_bit((data >> 4) & 1);
-	m_eeprom->set_clock_line((data >> 3) & 1);
+	m_eeprom->cs_write((data >> 2) & 1);
+	m_eeprom->di_write((data >> 4) & 1);
+	m_eeprom->clk_write((data >> 3) & 1);
 }
 
 READ8_MEMBER(invqix_state::port5_r)
@@ -344,8 +344,8 @@ static MACHINE_CONFIG_START( invqix, invqix_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 
-	MCFG_EEPROM_93C46_ADD("eeprom")
-	MCFG_SERIAL_EEPROM_DEFAULT_VALUE(0)
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_DEFAULT_VALUE(0)
 MACHINE_CONFIG_END
 
 ROM_START( invqix )

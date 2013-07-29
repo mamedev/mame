@@ -54,15 +54,6 @@ static const UINT16 overdriv_default_eeprom[64] =
 };
 
 
-static const serial_eeprom_interface eeprom_intf =
-{
-	"011000",       /*  read command */
-	"010100",       /* write command */
-	0,              /* erase command */
-	"010000000000", /* lock command */
-	"010011000000"  /* unlock command */
-};
-
 WRITE16_MEMBER(overdriv_state::eeprom_w)
 {
 //logerror("%06x: write %04x to eeprom_w\n",space.device().safe_pc(),data);
@@ -246,8 +237,8 @@ static INPUT_PORTS_START( overdriv )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, ready_read)
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -263,9 +254,9 @@ static INPUT_PORTS_START( overdriv )
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(50)
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, write_bit)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, set_clock_line)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, set_cs_line)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, di_write)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, clk_write)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, cs_write)
 INPUT_PORTS_END
 
 
@@ -350,9 +341,8 @@ static MACHINE_CONFIG_START( overdriv, overdriv_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
-
-	MCFG_SERIAL_EEPROM_ADD("eeprom", 64, 16, eeprom_intf)
-	MCFG_SERIAL_EEPROM_DATA(overdriv_default_eeprom, 128)
+	MCFG_EEPROM_SERIAL_ER5911_16BIT_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_DATA(overdriv_default_eeprom, 128)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)

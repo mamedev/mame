@@ -297,15 +297,6 @@ The eeprom unlock command is different, and the write/clock/reset
 bits are different.
 ******************************************************************/
 
-static const serial_eeprom_interface eeprom_intf =
-{
-	"0110",         /* read command */
-	"0101",         /* write command */
-	"0111",         /* erase command */
-	"0100000000",   /* lock command */
-	"0100111111"    /* unlock command */
-};
-
 WRITE16_MEMBER(othunder_state::othunder_tc0220ioc_w)
 {
 	if (ACCESSING_BITS_0_7)
@@ -330,9 +321,9 @@ WRITE16_MEMBER(othunder_state::othunder_tc0220ioc_w)
 				if (data & 4)
 					popmessage("OBPRI SET!");
 
-				m_eeprom->write_bit(data & 0x40);
-				m_eeprom->set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
-				m_eeprom->set_cs_line((data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+				m_eeprom->di_write((data & 0x40) >> 6);
+				m_eeprom->clk_write((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+				m_eeprom->cs_write((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 				break;
 
 			default:
@@ -351,7 +342,7 @@ READ16_MEMBER(othunder_state::othunder_tc0220ioc_r)
 	switch (offset)
 	{
 		case 0x03:
-			return (m_eeprom->read_bit() & 1) << 7;
+			return (m_eeprom->do_read() & 1) << 7;
 
 		default:
 			return m_tc0220ioc->read(space, offset);
@@ -686,7 +677,7 @@ static MACHINE_CONFIG_START( othunder, othunder_state )
 	MCFG_CPU_ADD("audiocpu", Z80,16000000/4 )   /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(z80_sound_map)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", 64, 16, eeprom_intf)
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 
 	MCFG_TC0220IOC_ADD("tc0220ioc", othunder_io_intf)

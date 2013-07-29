@@ -679,13 +679,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(cps_state::cps2_interrupt)
  *
  *************************************/
 
-static const serial_eeprom_interface cps2_eeprom_interface =
-{
-	"0110", /*  read command */
-	"0101", /* write command */
-	"0111"  /* erase command */
-};
-
 WRITE16_MEMBER( cps_state::cps2_eeprom_port_w )
 {
 	if (ACCESSING_BITS_8_15)
@@ -934,7 +927,7 @@ static INPUT_PORTS_START( cps2_4p4b )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(4)
 
 	PORT_START("IN2")      /* (0x20) */
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_SERVICE_NO_TOGGLE( 0x0002, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x00f8, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -948,9 +941,9 @@ static INPUT_PORTS_START( cps2_4p4b )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN4 )
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, write_bit)
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, set_clock_line)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, set_cs_line)
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write)
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
 
 	/* fake inputs for digital volume buttons */
 	PORT_START( "DIGITALVOL" )
@@ -1256,7 +1249,7 @@ static MACHINE_CONFIG_START( cps2, cps_state )
 
 	MCFG_MACHINE_START_OVERRIDE(cps_state,cps2)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", 64, 16, cps2_eeprom_interface)
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)

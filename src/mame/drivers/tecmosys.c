@@ -269,16 +269,16 @@ READ16_MEMBER(tecmosys_state::unk880000_r)
 
 READ16_MEMBER(tecmosys_state::eeprom_r)
 {
-	return ((m_eeprom->read_bit() & 0x01) << 11);
+	return ((m_eeprom->do_read() & 0x01) << 11);
 }
 
 WRITE16_MEMBER(tecmosys_state::eeprom_w)
 {
 	if ( ACCESSING_BITS_8_15 )
 	{
-		m_eeprom->write_bit(data & 0x0800);
-		m_eeprom->set_cs_line((data & 0x0200) ? CLEAR_LINE : ASSERT_LINE );
-		m_eeprom->set_clock_line((data & 0x0400) ? CLEAR_LINE: ASSERT_LINE );
+		m_eeprom->di_write((data & 0x0800) >> 11);
+		m_eeprom->cs_write((data & 0x0200) ? ASSERT_LINE : CLEAR_LINE );
+		m_eeprom->clk_write((data & 0x0400) ? CLEAR_LINE: ASSERT_LINE );
 	}
 }
 
@@ -456,7 +456,7 @@ static MACHINE_CONFIG_START( deroon, tecmosys_state )
 
 	MCFG_GFXDECODE(tecmosys)
 
-	MCFG_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 

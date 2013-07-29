@@ -612,7 +612,7 @@ static MACHINE_CONFIG_START( jchan, jchan_state )
 	MCFG_DEVICE_ADD("toybox", KANEKO_TOYBOX, 0)
 
 
-	MCFG_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

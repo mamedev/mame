@@ -820,9 +820,9 @@ WRITE8_MEMBER(leland_state::ataxx_eeprom_w)
 {
 	if (LOG_EEPROM) logerror("%s:EE write %d%d%d\n", machine().describe_context(),
 			(data >> 6) & 1, (data >> 5) & 1, (data >> 4) & 1);
-	m_eeprom->write_bit     ((data & 0x10) >> 4);
-	m_eeprom->set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
-	m_eeprom->set_cs_line   ((~data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->di_write ((data & 0x10) >> 4);
+	m_eeprom->clk_write((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->cs_write ((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -1122,9 +1122,9 @@ WRITE8_MEMBER(leland_state::leland_master_output_w)
 
 			if (LOG_EEPROM) logerror("%04X:EE write %d%d%d\n", space.device().safe_pc(),
 					(data >> 6) & 1, (data >> 5) & 1, (data >> 4) & 1);
-			m_eeprom->write_bit     ((data & 0x10) >> 4);
-			m_eeprom->set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
-			m_eeprom->set_cs_line   ((~data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+			m_eeprom->di_write ((data & 0x10) >> 4);
+			m_eeprom->clk_write((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+			m_eeprom->cs_write ((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 			break;
 
 		case 0x0a:  /* /OGIA */

@@ -413,9 +413,9 @@ WRITE32_MEMBER(model2_state::ctrl0_w)
 	if(ACCESSING_BITS_0_7)
 	{
 		m_ctrlmode = data & 0x01;
-		m_eeprom->write_bit(data & 0x20);
-		m_eeprom->set_clock_line((data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
-		m_eeprom->set_cs_line((data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+		m_eeprom->di_write((data & 0x20) >> 5);
+		m_eeprom->clk_write((data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
+		m_eeprom->cs_write((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -454,7 +454,7 @@ CUSTOM_INPUT_MEMBER(model2_state::_1c00000_r)
 	else
 	{
 		ret &= ~0x0030;
-		return ret | 0x00d0 | (m_eeprom->read_bit() << 5);
+		return ret | 0x00d0 | (m_eeprom->do_read() << 5);
 	}
 }
 
@@ -1979,7 +1979,7 @@ static MACHINE_CONFIG_START( model2o, model2_state )
 	MCFG_MACHINE_START_OVERRIDE(model2_state,model2)
 	MCFG_MACHINE_RESET_OVERRIDE(model2_state,model2o)
 
-	MCFG_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_NVRAM_ADD_1FILL("backup1")
 	MCFG_NVRAM_ADD_1FILL("backup2")
 
@@ -2038,7 +2038,7 @@ static MACHINE_CONFIG_START( model2a, model2_state )
 	MCFG_MACHINE_START_OVERRIDE(model2_state,model2)
 	MCFG_MACHINE_RESET_OVERRIDE(model2_state,model2)
 
-	MCFG_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_NVRAM_ADD_1FILL("backup1")
 
 	MCFG_TIMER_DRIVER_ADD("timer0", model2_state, model2_timer_cb)
@@ -2141,7 +2141,7 @@ static MACHINE_CONFIG_START( model2b, model2_state )
 	MCFG_MACHINE_START_OVERRIDE(model2_state,model2)
 	MCFG_MACHINE_RESET_OVERRIDE(model2_state,model2b)
 
-	MCFG_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_NVRAM_ADD_1FILL("backup1")
 
 	MCFG_TIMER_DRIVER_ADD("timer0", model2_state, model2_timer_cb)
@@ -2188,7 +2188,7 @@ static MACHINE_CONFIG_START( model2c, model2_state )
 	MCFG_MACHINE_START_OVERRIDE(model2_state,model2)
 	MCFG_MACHINE_RESET_OVERRIDE(model2_state,model2c)
 
-	MCFG_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_NVRAM_ADD_1FILL("backup1")
 
 	MCFG_TIMER_DRIVER_ADD("timer0", model2_state, model2_timer_cb)

@@ -1583,7 +1583,7 @@ GFXDECODE_END
 
 READ8_MEMBER(dkong_state::braze_eeprom_r)
 {
-	return m_eeprom->read_bit();
+	return m_eeprom->do_read();
 }
 
 WRITE8_MEMBER(dkong_state::braze_a15_w)
@@ -1594,9 +1594,9 @@ WRITE8_MEMBER(dkong_state::braze_a15_w)
 
 WRITE8_MEMBER(dkong_state::braze_eeprom_w)
 {
-	m_eeprom->write_bit(data & 0x01);
-	m_eeprom->set_cs_line(data & 0x04 ? CLEAR_LINE : ASSERT_LINE);
-	m_eeprom->set_clock_line(data & 0x02 ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->di_write(data & 0x01);
+	m_eeprom->cs_write(data & 0x04 ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->clk_write(data & 0x02 ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void dkong_state::braze_decrypt_rom(UINT8 *dest)
@@ -1690,7 +1690,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( braze, dkong2b )
 
-	MCFG_EEPROM_93C46_8BIT_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_93C46_8BIT_ADD("eeprom")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( dkong3, dkong_state )

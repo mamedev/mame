@@ -71,5 +71,5 @@ public:
 
 	DECLARE_WRITE16_MEMBER( galpani2_bg15_w );
 	required_device<okim6295_device> m_oki2;
-	required_device<serial_eeprom_device> m_eeprom;
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
 };

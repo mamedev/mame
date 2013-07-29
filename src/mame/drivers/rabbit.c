@@ -152,7 +152,7 @@ public:
 	void rabbit_drawtilemap( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int whichtilemap );
 	void rabbit_do_blit();
 	required_device<cpu_device> m_maincpu;
-	required_device<serial_eeprom_device> m_eeprom;
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
@@ -692,13 +692,13 @@ WRITE32_MEMBER(rabbit_state::rabbit_eeprom_write)
 	if (mem_mask == 0xff000000)
 	{
 		// latch the bit
-		m_eeprom->write_bit(data & 0x01000000);
+		m_eeprom->di_write((data & 0x01000000) >> 24);
 
 		// reset line asserted: reset.
-		m_eeprom->set_cs_line((data & 0x04000000) ? CLEAR_LINE : ASSERT_LINE );
+		m_eeprom->cs_write((data & 0x04000000) ? ASSERT_LINE : CLEAR_LINE );
 
 		// clock line asserted: write latch or select next bit to read
-		m_eeprom->set_clock_line((data & 0x02000000) ? ASSERT_LINE : CLEAR_LINE );
+		m_eeprom->clk_write((data & 0x02000000) ? ASSERT_LINE : CLEAR_LINE );
 	}
 }
 
@@ -740,7 +740,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( rabbit )
 	PORT_START("INPUTS")
-	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit) // as per code at 4d932
+	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read) // as per code at 4d932
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_UNKNOWN ) // unlabeled in input test
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_START2 )
@@ -893,7 +893,7 @@ static MACHINE_CONFIG_START( rabbit, rabbit_state )
 	MCFG_CPU_PROGRAM_MAP(rabbit_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", rabbit_state,  rabbit_vblank_interrupt)
 
-	MCFG_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	MCFG_GFXDECODE(rabbit)
 

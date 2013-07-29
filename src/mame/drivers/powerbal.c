@@ -30,7 +30,7 @@ public:
 	int         m_tilebank;
 	int         m_bg_yoffset;
 
-	optional_device<serial_eeprom_device> m_eeprom;
+	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 
 	DECLARE_DRIVER_INIT(powerbal);
 	DECLARE_DRIVER_INIT(magicstk);
@@ -47,26 +47,15 @@ public:
 };
 
 
-static const serial_eeprom_interface eeprom_intf =
-{
-	"*110",         /*  read command */
-	"*101",         /* write command */
-	0,              /* erase command */
-	"*10000xxxx",   /* lock command */
-	"*10011xxxx",   /* unlock command */
-	0,              /* enable_multi_read */
-	5               /* reset_delay (otherwise wbeachvl will hang when saving settings) */
-};
-
 WRITE16_MEMBER(powerbal_state::magicstk_coin_eeprom_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
 		coin_counter_w(machine(), 0, data & 0x20);
 
-		m_eeprom->set_cs_line((data & 8) ? CLEAR_LINE : ASSERT_LINE);
-		m_eeprom->write_bit(data & 2);
-		m_eeprom->set_clock_line((data & 4) ? CLEAR_LINE : ASSERT_LINE);
+		m_eeprom->cs_write((data & 8) ? ASSERT_LINE : CLEAR_LINE);
+		m_eeprom->di_write((data & 2) >> 1);
+		m_eeprom->clk_write((data & 4) ? CLEAR_LINE : ASSERT_LINE);
 	}
 }
 
@@ -242,7 +231,7 @@ static INPUT_PORTS_START( magicstk )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)   /* EEPROM data */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)   /* EEPROM data */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -339,7 +328,7 @@ static INPUT_PORTS_START( hotminda )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)   /* EEPROM data */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)   /* EEPROM data */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -532,8 +521,8 @@ static MACHINE_CONFIG_START( magicstk, powerbal_state )
 	MCFG_CPU_PROGRAM_MAP(magicstk_main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", powerbal_state, irq2_line_hold)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", 64, 16, eeprom_intf)
-	MCFG_SERIAL_EEPROM_DEFAULT_VALUE(0)
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_DEFAULT_VALUE(0)
 
 	MCFG_MACHINE_START_OVERRIDE(powerbal_state,powerbal)
 	MCFG_MACHINE_RESET_OVERRIDE(powerbal_state,powerbal)

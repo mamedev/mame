@@ -78,7 +78,7 @@ public:
 	void ttmjprd_draw_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32*tileram, UINT32*tileregs, UINT8*rom );
 	void tmmjprd_do_blit();
 	required_device<cpu_device> m_maincpu;
-	required_device<serial_eeprom_device> m_eeprom;
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
 };
 
 
@@ -509,13 +509,13 @@ WRITE32_MEMBER(tmmjprd_state::tmmjprd_eeprom_write)
 	if (mem_mask == 0xff000000)
 	{
 		// latch the bit
-		m_eeprom->write_bit(data & 0x01000000);
+		m_eeprom->di_write((data & 0x01000000) >> 24);
 
 		// reset line asserted: reset.
-		m_eeprom->set_cs_line((data & 0x04000000) ? CLEAR_LINE : ASSERT_LINE );
+		m_eeprom->cs_write((data & 0x04000000) ? ASSERT_LINE : CLEAR_LINE );
 
 		// clock line asserted: write latch or select next bit to read
-		m_eeprom->set_clock_line((data & 0x02000000) ? ASSERT_LINE : CLEAR_LINE );
+		m_eeprom->clk_write((data & 0x02000000) ? ASSERT_LINE : CLEAR_LINE );
 	}
 }
 
@@ -544,7 +544,7 @@ static INPUT_PORTS_START( tmmjprd )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_NAME("Right Screen Coin B") // might actually be service 1
 	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)   // CHECK!
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)   // CHECK!
 
 	PORT_START("PL1_1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A ) PORT_PLAYER(1)
@@ -753,7 +753,7 @@ static MACHINE_CONFIG_START( tmmjprd, tmmjprd_state )
 	MCFG_CPU_PROGRAM_MAP(tmmjprd_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", tmmjprd_state, tmmjprd_scanline, "lscreen", 0, 1)
 
-	MCFG_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	MCFG_GFXDECODE(tmmjprd)
 

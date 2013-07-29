@@ -684,7 +684,7 @@ READ8_MEMBER(sega8_eeprom_device::read_cart)
 	if (offset == 0x8000 && m_93c46_enabled)
 	{
 		UINT8 value = (m_93c46_lines & 0xfc) | 0x02;
-		value |= m_eeprom->read_bit() ? 1 : 0;
+		value |= m_eeprom->do_read() ? 1 : 0;
 		return value;
 	}
 
@@ -699,9 +699,9 @@ WRITE8_MEMBER(sega8_eeprom_device::write_cart)
 	if (offset == 0x8000 && m_93c46_enabled)
 	{
 		m_93c46_lines = data;
-		m_eeprom->write_bit((data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
-		m_eeprom->set_cs_line(!(data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
-		m_eeprom->set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
+		m_eeprom->di_write((data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
+		m_eeprom->cs_write((data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
+		m_eeprom->clk_write((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -714,7 +714,7 @@ WRITE8_MEMBER(sega8_eeprom_device::write_mapper)
 			{
 				m_eeprom->reset();
 				logerror("eeprom CS = 1\n");
-				m_eeprom->set_cs_line(ASSERT_LINE);
+				m_eeprom->cs_write(CLEAR_LINE);
 			}
 			m_93c46_enabled = BIT(data, 3);
 			logerror("eeprom %s\n", m_93c46_enabled ? "enabled" : "disabled");
@@ -729,7 +729,7 @@ WRITE8_MEMBER(sega8_eeprom_device::write_mapper)
 }
 
 MACHINE_CONFIG_FRAGMENT( gg_eeprom )
-	MCFG_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 MACHINE_CONFIG_END
 
 machine_config_constructor sega8_eeprom_device::device_mconfig_additions() const

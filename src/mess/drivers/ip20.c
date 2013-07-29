@@ -73,7 +73,7 @@ public:
 	TIMER_CALLBACK_MEMBER(ip20_timer_rtc);
 	required_device<wd33c93_device> m_wd33c93;
 	required_device<scc8530_t> m_scc;
-	required_device<serial_eeprom_device> m_eeprom;
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	inline void ATTR_PRINTF(3,4) verboselog(int n_level, const char *s_fmt, ... );
 	required_device<cpu_device> m_maincpu;
 
@@ -105,16 +105,6 @@ UINT32 ip20_state::screen_update_ip204415(screen_device &screen, bitmap_ind16 &b
 {
 	return 0;
 }
-
-static const serial_eeprom_interface eeprom_interface_93C56 =
-{
-	"*110x",            // read         110x aaaaaaaa
-	"*101x",            // write        101x aaaaaaaa dddddddd
-	"*111x",            // erase        111x aaaaaaaa
-	"*10000xxxxxxx",    // lock         100x 00xxxx
-	"*10011xxxxxxx",    // unlock       100x 11xxxx
-};
-
 
 
 
@@ -169,7 +159,7 @@ READ32_MEMBER(ip20_state::hpc_r)
 		return m_HPC.nMiscStatus;
 	case 0x01bc:
 //      verboselog(machine, 2, "HPC CPU Serial EEPROM Read\n" );
-		return m_eeprom->read_bit() << 4;
+		return m_eeprom->do_read() << 4;
 	case 0x01c4:
 		verboselog(2, "HPC Local IO Register 0 Mask Read: %08x (%08x)\n", m_HPC.nLocalIOReg0Mask, mem_mask );
 		return m_HPC.nLocalIOReg0Mask;
@@ -353,9 +343,9 @@ WRITE32_MEMBER(ip20_state::hpc_w)
 		{
 			verboselog(2, "    CPU board LED on\n" );
 		}
-		m_eeprom->write_bit((data & 0x00000008) ? 1 : 0 );
-		m_eeprom->set_cs_line((data & 0x00000002) ? ASSERT_LINE : CLEAR_LINE );
-		m_eeprom->set_clock_line((data & 0x00000004) ? CLEAR_LINE : ASSERT_LINE );
+		m_eeprom->di_write((data & 0x00000008) ? 1 : 0 );
+		m_eeprom->cs_write((data & 0x00000002) ? CLEAR_LINE : ASSERT_LINE );
+		m_eeprom->clk_write((data & 0x00000004) ? CLEAR_LINE : ASSERT_LINE );
 		break;
 	case 0x01c4:
 		verboselog(2, "HPC Local IO Register 0 Mask Write: %08x (%08x)\n", data, mem_mask );
@@ -625,7 +615,7 @@ static MACHINE_CONFIG_START( ip204415, ip20_state )
 	MCFG_SOUND_MODIFY( "scsi:cdrom:cdda" )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "^^^mono", 1.0)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", 128, 16, eeprom_interface_93C56)
+	MCFG_EEPROM_SERIAL_93C56_ADD("eeprom")
 MACHINE_CONFIG_END
 
 ROM_START( ip204415 )

@@ -184,9 +184,9 @@ WRITE32_MEMBER(deco_mlc_state::avengrs_eprom_w)
 	if (ACCESSING_BITS_8_15) {
 		UINT8 ebyte=(data>>8)&0xff;
 //      if (ebyte&0x80) {
-			m_eeprom->set_clock_line((ebyte & 0x2) ? ASSERT_LINE : CLEAR_LINE);
-			m_eeprom->write_bit(ebyte & 0x1);
-			m_eeprom->set_cs_line((ebyte & 0x4) ? CLEAR_LINE : ASSERT_LINE);
+			m_eeprom->clk_write((ebyte & 0x2) ? ASSERT_LINE : CLEAR_LINE);
+			m_eeprom->di_write(ebyte & 0x1);
+			m_eeprom->cs_write((ebyte & 0x4) ? ASSERT_LINE : CLEAR_LINE);
 //      }
 	}
 	else if (ACCESSING_BITS_0_7) {
@@ -344,7 +344,7 @@ static INPUT_PORTS_START( mlc )
 	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
+	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -420,7 +420,7 @@ static MACHINE_CONFIG_START( avengrgs, deco_mlc_state )
 	MCFG_CPU_PROGRAM_MAP(decomlc_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(deco_mlc_state,mlc)
-	MCFG_EEPROM_93C46_ADD("eeprom") /* Actually 93c45 */
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom") /* Actually 93c45 */
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", deco_mlc_state, interrupt_gen)
 
@@ -453,7 +453,7 @@ static MACHINE_CONFIG_START( mlc, deco_mlc_state )
 	MCFG_CPU_PROGRAM_MAP(decomlc_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(deco_mlc_state,mlc)
-	MCFG_EEPROM_93C46_ADD("eeprom") /* Actually 93c45 */
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom") /* Actually 93c45 */
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", deco_mlc_state, interrupt_gen)
 

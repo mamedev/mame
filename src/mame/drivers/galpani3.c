@@ -512,7 +512,7 @@ static MACHINE_CONFIG_START( galpani3, galpani3_state )
 	//MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 64*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(galpani3_state, screen_update_galpani3)
 
-	MCFG_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	MCFG_DEVICE_ADD("toybox", KANEKO_TOYBOX, 0)
 

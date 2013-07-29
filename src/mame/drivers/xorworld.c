@@ -47,19 +47,19 @@ EEPROM chip: 93C46
 WRITE16_MEMBER(xorworld_state::eeprom_chip_select_w)
 {
 	/* bit 0 is CS (active low) */
-	m_eeprom->set_cs_line((data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+	m_eeprom->cs_write((data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE16_MEMBER(xorworld_state::eeprom_serial_clock_w)
 {
 	/* bit 0 is SK (active high) */
-	m_eeprom->set_clock_line((data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->clk_write((data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE16_MEMBER(xorworld_state::eeprom_data_w)
 {
 	/* bit 0 is EEPROM data (DIN) */
-	m_eeprom->write_bit(data & 0x01);
+	m_eeprom->di_write(data & 0x01);
 }
 
 WRITE16_MEMBER(xorworld_state::xorworld_irq2_ack_w)
@@ -104,7 +104,7 @@ static INPUT_PORTS_START( xorworld )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)   /* used for accessing the NVRAM */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)   /* used for accessing the NVRAM */
 	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x60, DEF_STR( Normal ) )
@@ -174,7 +174,7 @@ static MACHINE_CONFIG_START( xorworld, xorworld_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)

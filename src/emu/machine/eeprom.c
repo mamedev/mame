@@ -55,12 +55,11 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-static ADDRESS_MAP_START( eeprom_map8, AS_PROGRAM, 8, base_eeprom_device )
+static ADDRESS_MAP_START( eeprom_map8, AS_PROGRAM, 8, eeprom_base_device )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 ADDRESS_MAP_END
 
-
-static ADDRESS_MAP_START( eeprom_map16, AS_PROGRAM, 16, base_eeprom_device )
+static ADDRESS_MAP_START( eeprom_map16, AS_PROGRAM, 16, eeprom_base_device )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 ADDRESS_MAP_END
 
@@ -71,10 +70,10 @@ ADDRESS_MAP_END
 //**************************************************************************
 
 //-------------------------------------------------
-//  base_eeprom_device - constructor
+//  eeprom_base_device - constructor
 //-------------------------------------------------
 
-base_eeprom_device::base_eeprom_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, const char *shortname, const char *file)
+eeprom_base_device::eeprom_base_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, const char *shortname, const char *file)
 	: device_t(mconfig, devtype, name, tag, owner, 0, shortname, file),
 		device_memory_interface(mconfig, *this),
 		device_nvram_interface(mconfig, *this),
@@ -84,8 +83,13 @@ base_eeprom_device::base_eeprom_device(const machine_config &mconfig, device_typ
 		m_default_data(0),
 		m_default_data_size(0),
 		m_default_value(0),
-		m_default_value_set(false)
+		m_default_value_set(false),
+		m_completion_time(attotime::zero)
 {
+	m_operation_time[WRITE_TIME] 		= attotime::from_msec(2);
+	m_operation_time[WRITE_ALL_TIME] 	= attotime::from_msec(8);
+	m_operation_time[ERASE_TIME] 		= attotime::from_msec(1);
+	m_operation_time[ERASE_ALL_TIME] 	= attotime::from_msec(8);
 }
 
 
@@ -94,9 +98,9 @@ base_eeprom_device::base_eeprom_device(const machine_config &mconfig, device_typ
 //  to set the default data
 //-------------------------------------------------
 
-void base_eeprom_device::static_set_size(device_t &device, int cells, int cellbits)
+void eeprom_base_device::static_set_size(device_t &device, int cells, int cellbits)
 {
-	base_eeprom_device &eeprom = downcast<base_eeprom_device &>(device);
+	eeprom_base_device &eeprom = downcast<eeprom_base_device &>(device);
 	eeprom.m_cells = cells;
 	eeprom.m_data_bits = cellbits;
 
@@ -122,17 +126,17 @@ void base_eeprom_device::static_set_size(device_t &device, int cells, int cellbi
 //  to set the default data
 //-------------------------------------------------
 
-void base_eeprom_device::static_set_default_data(device_t &device, const UINT8 *data, UINT32 size)
+void eeprom_base_device::static_set_default_data(device_t &device, const UINT8 *data, UINT32 size)
 {
-	base_eeprom_device &eeprom = downcast<base_eeprom_device &>(device);
+	eeprom_base_device &eeprom = downcast<eeprom_base_device &>(device);
 	assert(eeprom.m_data_bits == 8);
 	eeprom.m_default_data.u8 = const_cast<UINT8 *>(data);
 	eeprom.m_default_data_size = size;
 }
 
-void base_eeprom_device::static_set_default_data(device_t &device, const UINT16 *data, UINT32 size)
+void eeprom_base_device::static_set_default_data(device_t &device, const UINT16 *data, UINT32 size)
 {
-	base_eeprom_device &eeprom = downcast<base_eeprom_device &>(device);
+	eeprom_base_device &eeprom = downcast<eeprom_base_device &>(device);
 	assert(eeprom.m_data_bits == 16);
 	eeprom.m_default_data.u16 = const_cast<UINT16 *>(data);
 	eeprom.m_default_data_size = size / 2;
@@ -144,37 +148,90 @@ void base_eeprom_device::static_set_default_data(device_t &device, const UINT16 
 //  to set the default value
 //-------------------------------------------------
 
-void base_eeprom_device::static_set_default_value(device_t &device, UINT32 value)
+void eeprom_base_device::static_set_default_value(device_t &device, UINT32 value)
 {
-	base_eeprom_device &eeprom = downcast<base_eeprom_device &>(device);
+	eeprom_base_device &eeprom = downcast<eeprom_base_device &>(device);
 	eeprom.m_default_value = value;
 	eeprom.m_default_value_set = true;
 }
 
 
 //-------------------------------------------------
-//  read_data - read data at the given address
+//  static_set_timing - configuration helper
+//  to set timing constants for various operations
 //-------------------------------------------------
 
-UINT32 base_eeprom_device::read_data(offs_t address)
+void eeprom_base_device::static_set_timing(device_t &device, timing_type type, attotime duration)
 {
-	if (m_data_bits == 16)
-		return m_addrspace[0]->read_word(address * 2);
-	else
-		return m_addrspace[0]->read_byte(address);
+	downcast<eeprom_base_device &>(device).m_operation_time[type] = duration;
 }
 
 
 //-------------------------------------------------
-//  write_data - write data at the given address
+//  read - read data at the given address
 //-------------------------------------------------
 
-void base_eeprom_device::write_data(offs_t address, UINT32 data)
+UINT32 eeprom_base_device::read(offs_t address)
 {
-	if (m_data_bits == 16)
-		m_addrspace[0]->write_word(address * 2, data);
-	else
-		m_addrspace[0]->write_byte(address, data);
+	if (!ready())
+		logerror("EEPROM: Read performed before previous operation completed!");
+	return internal_read(address);
+}
+
+
+//-------------------------------------------------
+//  write - write data at the given address
+//-------------------------------------------------
+
+void eeprom_base_device::write(offs_t address, UINT32 data)
+{
+	if (!ready())
+		logerror("EEPROM: Write performed before previous operation completed!");
+	internal_write(address, data);
+	m_completion_time = machine().time() + m_operation_time[WRITE_TIME];
+}
+
+
+//-------------------------------------------------
+//  write_all - write data at all addresses
+//	(assumes an erase has previously been 
+//	performed)
+//-------------------------------------------------
+
+void eeprom_base_device::write_all(UINT32 data)
+{
+	if (!ready())
+		logerror("EEPROM: Write all performed before previous operation completed!");
+	for (offs_t address = 0; address < (1 << m_address_bits); address++)
+		internal_write(address, internal_read(address) & data);
+	m_completion_time = machine().time() + m_operation_time[WRITE_ALL_TIME];
+}
+
+
+//-------------------------------------------------
+//  erase - erase data at the given address
+//-------------------------------------------------
+
+void eeprom_base_device::erase(offs_t address)
+{
+	if (!ready())
+		logerror("EEPROM: Erase performed before previous operation completed!");
+	internal_write(address, ~0);
+	m_completion_time = machine().time() + m_operation_time[ERASE_TIME];
+}
+
+
+//-------------------------------------------------
+//  erase_all - erase data at all addresses
+//-------------------------------------------------
+
+void eeprom_base_device::erase_all()
+{
+	if (!ready())
+		logerror("EEPROM: Erase all performed before previous operation completed!");
+	for (offs_t address = 0; address < (1 << m_address_bits); address++)
+		internal_write(address, ~0);
+	m_completion_time = machine().time() + m_operation_time[ERASE_ALL_TIME];
 }
 
 
@@ -183,7 +240,7 @@ void base_eeprom_device::write_data(offs_t address, UINT32 data)
 //  on this device
 //-------------------------------------------------
 
-void base_eeprom_device::device_validity_check(validity_checker &valid) const
+void eeprom_base_device::device_validity_check(validity_checker &valid) const
 {
 	// ensure the number of cells is an even power of 2
 	if (m_cells != (1 << m_address_bits))
@@ -199,8 +256,10 @@ void base_eeprom_device::device_validity_check(validity_checker &valid) const
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void base_eeprom_device::device_start()
+void eeprom_base_device::device_start()
 {
+	// save states
+	save_item(NAME(m_completion_time));
 }
 
 
@@ -208,8 +267,10 @@ void base_eeprom_device::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void base_eeprom_device::device_reset()
+void eeprom_base_device::device_reset()
 {
+	// reset any pending operations
+	m_completion_time = attotime::zero;
 }
 
 
@@ -218,7 +279,7 @@ void base_eeprom_device::device_reset()
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-const address_space_config *base_eeprom_device::memory_space_config(address_spacenum spacenum) const
+const address_space_config *eeprom_base_device::memory_space_config(address_spacenum spacenum) const
 {
 	return (spacenum == 0) ? &m_space_config : NULL;
 }
@@ -229,7 +290,7 @@ const address_space_config *base_eeprom_device::memory_space_config(address_spac
 //  its default state
 //-------------------------------------------------
 
-void base_eeprom_device::nvram_default()
+void eeprom_base_device::nvram_default()
 {
 	UINT32 eeprom_length = 1 << m_address_bits;
 	UINT32 eeprom_bytes = eeprom_length * m_data_bits / 8;
@@ -276,7 +337,7 @@ void base_eeprom_device::nvram_default()
 //  .nv file
 //-------------------------------------------------
 
-void base_eeprom_device::nvram_read(emu_file &file)
+void eeprom_base_device::nvram_read(emu_file &file)
 {
 	UINT32 eeprom_length = 1 << m_address_bits;
 	UINT32 eeprom_bytes = eeprom_length * m_data_bits / 8;
@@ -293,7 +354,7 @@ void base_eeprom_device::nvram_read(emu_file &file)
 //  .nv file
 //-------------------------------------------------
 
-void base_eeprom_device::nvram_write(emu_file &file)
+void eeprom_base_device::nvram_write(emu_file &file)
 {
 	UINT32 eeprom_length = 1 << m_address_bits;
 	UINT32 eeprom_bytes = eeprom_length * m_data_bits / 8;
@@ -302,4 +363,31 @@ void base_eeprom_device::nvram_write(emu_file &file)
 	for (offs_t offs = 0; offs < eeprom_bytes; offs++)
 		buffer[offs] = m_addrspace[0]->read_byte(offs);
 	file.write(buffer, eeprom_bytes);
+}
+
+
+//-------------------------------------------------
+//  internal_read - read data at the given address
+//-------------------------------------------------
+
+UINT32 eeprom_base_device::internal_read(offs_t address)
+{
+	if (m_data_bits == 16)
+		return m_addrspace[0]->read_word(address * 2);
+	else
+		return m_addrspace[0]->read_byte(address);
+}
+
+
+//-------------------------------------------------
+//  internal_write - write data at the given 
+//	address
+//-------------------------------------------------
+
+void eeprom_base_device::internal_write(offs_t address, UINT32 data)
+{
+	if (m_data_bits == 16)
+		m_addrspace[0]->write_word(address * 2, data);
+	else
+		m_addrspace[0]->write_byte(address, data);
 }

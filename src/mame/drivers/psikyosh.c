@@ -306,24 +306,13 @@ static GFXDECODE_START( psikyosh )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8, 0x000, 0x100 ) // 8bpp tiles
 GFXDECODE_END
 
-static const serial_eeprom_interface eeprom_interface_93C56 =
-{
-	"*110x",    // read         110x aaaaaaaa
-	"*101x",    // write        101x aaaaaaaa dddddddd
-	"*111x",    // erase        111x aaaaaaaa
-	"*10000xxxxxxx",// lock         100x 00xxxx
-	"*10011xxxxxxx",// unlock       100x 11xxxx
-//  "*10001xxxx",   // write all    1 00 01xxxx dddddddddddddddd
-//  "*10010xxxx"    // erase all    1 00 10xxxx
-};
-
 WRITE32_MEMBER(psikyosh_state::psh_eeprom_w)
 {
 	if (ACCESSING_BITS_24_31)
 	{
-		m_eeprom->write_bit((data & 0x20000000) ? 1 : 0);
-		m_eeprom->set_cs_line((data & 0x80000000) ? CLEAR_LINE : ASSERT_LINE);
-		m_eeprom->set_clock_line((data & 0x40000000) ? ASSERT_LINE : CLEAR_LINE);
+		m_eeprom->di_write((data & 0x20000000) ? 1 : 0);
+		m_eeprom->cs_write((data & 0x80000000) ? ASSERT_LINE : CLEAR_LINE);
+		m_eeprom->clk_write((data & 0x40000000) ? ASSERT_LINE : CLEAR_LINE);
 
 		return;
 	}
@@ -604,7 +593,7 @@ static INPUT_PORTS_START( s1945ii )
 	PORT_DIPNAME( 0x01000000, 0x01000000, DEF_STR( Region ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( Japan ) )
 	PORT_DIPSETTING(          0x01000000, DEF_STR( World ) )
-	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
+	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( soldivid )
@@ -614,7 +603,7 @@ static INPUT_PORTS_START( soldivid )
 	PORT_DIPNAME( 0x01000000, 0x01000000, DEF_STR( Region ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( Japan ) )
 	PORT_DIPSETTING(          0x01000000, DEF_STR( World ) )
-	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
+	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( daraku )
@@ -632,7 +621,7 @@ static INPUT_PORTS_START( daraku )
 	PORT_DIPNAME( 0x01000000, 0x01000000, DEF_STR( Region ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( Japan ) )
 	PORT_DIPSETTING(          0x01000000, DEF_STR( World ) ) /* Title screen is different, English is default now */
-	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
+	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sbomberb )
@@ -647,7 +636,7 @@ static INPUT_PORTS_START( sbomberb )
 	PORT_DIPNAME( 0x01000000, 0x01000000, DEF_STR( Region ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( Japan ) )
 	PORT_DIPSETTING(          0x01000000, DEF_STR( World ) )
-	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
+	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( gunbird2 ) /* Different Region */
@@ -659,7 +648,7 @@ static INPUT_PORTS_START( gunbird2 ) /* Different Region */
 	PORT_DIPSETTING(          0x00000000, DEF_STR( Japan ) )
 	PORT_DIPSETTING(          0x01000000, "International Ver A." )
 	PORT_DIPSETTING(          0x02000000, "International Ver B." )
-	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
+	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( s1945iii ) /* Different Region again */
@@ -671,7 +660,7 @@ static INPUT_PORTS_START( s1945iii ) /* Different Region again */
 	PORT_DIPSETTING(          0x00000000, DEF_STR( Japan ) )
 	PORT_DIPSETTING(          0x02000000, "International Ver A." )
 	PORT_DIPSETTING(          0x01000000, "International Ver B." )
-	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
+	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( dragnblz ) /* Security requires bit high */
@@ -687,7 +676,7 @@ static INPUT_PORTS_START( dragnblz ) /* Security requires bit high */
 	PORT_DIPSETTING(          0x00000000, DEF_STR( Japan ) )
 	PORT_DIPSETTING(          0x02000000, "International Ver A." )
 	PORT_DIPSETTING(          0x01000000, "International Ver B." )
-	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
+	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( gnbarich ) /* Same as S1945iii except only one button */
@@ -699,7 +688,7 @@ static INPUT_PORTS_START( gnbarich ) /* Same as S1945iii except only one button 
 	PORT_DIPSETTING(          0x00000000, DEF_STR( Japan ) )
 	PORT_DIPSETTING(          0x02000000, "International Ver A." )
 	PORT_DIPSETTING(          0x01000000, "International Ver B." )
-	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
+	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( tgm2 )
@@ -720,7 +709,7 @@ static INPUT_PORTS_START( tgm2 )
 //  PORT_DIPSETTING(          0x00000000, DEF_STR( Japan ) )
 //  PORT_DIPSETTING(          0x02000000, "International Ver A." )
 //  PORT_DIPSETTING(          0x01000000, "International Ver B." )
-	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
+	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mjgtaste )
@@ -774,7 +763,7 @@ static INPUT_PORTS_START( mjgtaste )
 //  PORT_DIPSETTING(          0x00000000, DEF_STR( Japan ) )
 //  PORT_DIPSETTING(          0x02000000, "International Ver A." )
 //  PORT_DIPSETTING(          0x01000000, "International Ver B." )
-	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
+	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 INPUT_PORTS_END
 
 
@@ -798,8 +787,8 @@ static MACHINE_CONFIG_START( psikyo3v1, psikyosh_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", psikyosh_state,  psikyosh_interrupt)
 
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", 256, 8, eeprom_interface_93C56)
-	MCFG_SERIAL_EEPROM_DEFAULT_VALUE(0)
+	MCFG_EEPROM_SERIAL_93C56_8BIT_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_DEFAULT_VALUE(0)
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM32_ADD("spriteram") /* If using alpha */

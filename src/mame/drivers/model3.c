@@ -1192,18 +1192,6 @@ static void real3d_dma_callback(running_machine &machine, UINT32 src, UINT32 dst
 
 /*****************************************************************************/
 
-/* this is a 93C46 but with reset delay that is needed by Lost World */
-static const serial_eeprom_interface eeprom_intf =
-{
-	"*110",         /*  read command */
-	"*101",         /* write command */
-	"*111",         /* erase command */
-	"*10000xxxx",   /* lock command */
-	"*10011xxxx",   /* unlock command */
-	1,              /* enable_multi_read */
-	5               /* reset_delay (Lost World needs this, very similar to wbeachvl in playmark.c) */
-};
-
 static const struct LSI53C810interface lsi53c810_intf =
 {
 	&scsi_irq_callback,
@@ -1393,9 +1381,9 @@ WRITE64_MEMBER(model3_state::model3_ctrl_w)
 			if (ACCESSING_BITS_56_63)
 			{
 				int reg = (data >> 56) & 0xff;
-				m_eeprom->write_bit((reg & 0x20) ? 1 : 0);
-				m_eeprom->set_clock_line((reg & 0x80) ? ASSERT_LINE : CLEAR_LINE);
-				m_eeprom->set_cs_line((reg & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+				m_eeprom->di_write((reg & 0x20) ? 1 : 0);
+				m_eeprom->clk_write((reg & 0x80) ? ASSERT_LINE : CLEAR_LINE);
+				m_eeprom->cs_write((reg & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 				m_controls_bank = reg & 0xff;
 			}
 			return;
@@ -1872,7 +1860,7 @@ static INPUT_PORTS_START( common )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service Button B") PORT_CODE(KEYCODE_8)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Test Button B") PORT_CODE(KEYCODE_7)
 	PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -2107,7 +2095,7 @@ static INPUT_PORTS_START( skichamp )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )     /* Select 2 */
 
 	PORT_START("IN1")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service Button B") PORT_CODE(KEYCODE_8)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Test Button B") PORT_CODE(KEYCODE_7)
 	PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -5369,7 +5357,7 @@ static MACHINE_CONFIG_START( model3_10, model3_state )
 	MCFG_MACHINE_START_OVERRIDE(model3_state,model3_10)
 	MCFG_MACHINE_RESET_OVERRIDE(model3_state,model3_10)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", 64, 16, eeprom_intf)
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_NVRAM_ADD_1FILL("backup")
 
 
@@ -5410,7 +5398,7 @@ static MACHINE_CONFIG_START( model3_15, model3_state )
 	MCFG_MACHINE_START_OVERRIDE(model3_state,model3_15)
 	MCFG_MACHINE_RESET_OVERRIDE(model3_state,model3_15)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", 64, 16, eeprom_intf)
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_NVRAM_ADD_1FILL("backup")
 
 
@@ -5457,7 +5445,7 @@ static MACHINE_CONFIG_START( model3_20, model3_state )
 	MCFG_MACHINE_START_OVERRIDE(model3_state,model3_20)
 	MCFG_MACHINE_RESET_OVERRIDE(model3_state,model3_20)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", 64, 16, eeprom_intf)
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_NVRAM_ADD_1FILL("backup")
 
 
@@ -5495,7 +5483,7 @@ static MACHINE_CONFIG_START( model3_21, model3_state )
 	MCFG_MACHINE_START_OVERRIDE(model3_state,model3_21)
 	MCFG_MACHINE_RESET_OVERRIDE(model3_state,model3_21)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", 64, 16, eeprom_intf)
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_NVRAM_ADD_1FILL("backup")
 
 

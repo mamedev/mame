@@ -53,15 +53,6 @@
 #define RNG_DEBUG 0
 
 
-static const serial_eeprom_interface eeprom_intf =
-{
-	"011000",       /*  read command */
-	"011100",       /* write command */
-	"0100100000000",/* erase command */
-	"0100000000000",/* lock command */
-	"0100110000000" /* unlock command */
-};
-
 READ16_MEMBER(rungun_state::rng_sysregs_r)
 {
 	UINT16 data = 0;
@@ -113,9 +104,9 @@ WRITE16_MEMBER(rungun_state::rng_sysregs_w)
 	{
 		case 0x08/2:
 			/*
-			    bit0  : eeprom_write_bit
-			    bit1  : eeprom_set_cs_line
-			    bit2  : eeprom_set_clock_line
+			    bit0  : eeprom_di_write
+			    bit1  : eeprom_cs_write
+			    bit2  : eeprom_clk_write
 			    bit3  : coin counter?
 			    bit7  : set before massive memory writes
 			    bit10 : IRQ5 ACK
@@ -261,8 +252,8 @@ static INPUT_PORTS_START( rng )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )    /* EEPROM ready (always 1) */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, ready_read)
 	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x10, 0x00, "Monitors" )
 	PORT_DIPSETTING(    0x00, "1" )
@@ -281,9 +272,9 @@ static INPUT_PORTS_START( rng )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, write_bit)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, set_cs_line)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, set_clock_line)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, di_write)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, cs_write)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, clk_write)
 
 	PORT_START("P1")
 	KONAMI8_B123_START(1)
@@ -387,8 +378,7 @@ static MACHINE_CONFIG_START( rng, rungun_state )
 
 	MCFG_GFXDECODE(rungun)
 
-
-	MCFG_SERIAL_EEPROM_ADD("eeprom", 128, 8, eeprom_intf)
+	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS | VIDEO_UPDATE_BEFORE_VBLANK)

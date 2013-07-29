@@ -53,7 +53,7 @@ public:
 
 	/* devices */
 	required_device<okim6295_device> m_oki;
-	optional_device<serial_eeprom_device> m_eeprom;
+	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 	DECLARE_WRITE16_MEMBER(coinctrl_w);
 	DECLARE_WRITE16_MEMBER(wbeachvl_coin_eeprom_w);
 	DECLARE_WRITE16_MEMBER(hotmind_coin_eeprom_w);

@@ -35,7 +35,7 @@ public:
 	optional_device<cpu_device> m_subcpu;
 	required_device<tc0100scn_device> m_tc0100scn;
 	required_device<tc0480scp_device> m_tc0480scp;
-	required_device<serial_eeprom_device> m_eeprom;
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	optional_shared_ptr<UINT32> m_ram;
 	optional_shared_ptr<UINT32> m_shared_ram;
 	UINT16 m_coin_word;

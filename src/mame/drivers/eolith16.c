@@ -38,16 +38,6 @@ public:
 
 
 
-// It's configured for 512 bytes
-static const serial_eeprom_interface eeprom_interface_93C66 =
-{
-	"*110",         // read         110 aaaaaaaaa
-	"*101",         // write        101 aaaaaaaaa dddddddd
-	"*111",         // erase        111 aaaaaaaaa
-	"*10000xxxxxx", // lock         100 00xxxxxxx
-	"*10011xxxxxx"  // unlock       100 11xxxxxxx
-};
-
 WRITE16_MEMBER(eolith16_state::eeprom_w)
 {
 	m_vbuffer = (data & 0x80) >> 7;
@@ -92,7 +82,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( eolith16 )
 	PORT_START("SPECIAL")
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, eolith16_state, eolith_speedup_getvblank, NULL)
 	PORT_BIT( 0xff6f, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -115,9 +105,9 @@ static INPUT_PORTS_START( eolith16 )
 	PORT_BIT( 0xffe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, set_cs_line)
-	PORT_BIT( 0x00000020, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, set_clock_line)
-	PORT_BIT( 0x00000040, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, write_bit)
+	PORT_BIT( 0x00000010, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
+	PORT_BIT( 0x00000020, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write)
+	PORT_BIT( 0x00000040, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
 INPUT_PORTS_END
 
 VIDEO_START_MEMBER(eolith16_state,eolith16)
@@ -179,7 +169,7 @@ static MACHINE_CONFIG_START( eolith16, eolith16_state )
 	MCFG_CPU_PROGRAM_MAP(eolith16_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", eolith16_state, eolith_speedup, "screen", 0, 1)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", 512, 8, eeprom_interface_93C66)
+	MCFG_EEPROM_SERIAL_93C66_8BIT_ADD("eeprom")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

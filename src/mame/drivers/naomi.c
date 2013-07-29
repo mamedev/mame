@@ -1461,7 +1461,7 @@ READ64_MEMBER(naomi_state::eeprom_93c46a_r )
 	int res;
 
 	/* bit 3 is EEPROM data */
-	res = m_eeprom->read_bit() << 4;
+	res = m_eeprom->do_read() << 4;
 	return res;
 }
 
@@ -1470,9 +1470,9 @@ WRITE64_MEMBER(naomi_state::eeprom_93c46a_w )
 	/* bit 4 is data */
 	/* bit 2 is clock */
 	/* bit 5 is cs */
-	m_eeprom->write_bit(data & 0x8);
-	m_eeprom->set_cs_line((data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
-	m_eeprom->set_clock_line((data & 0x4) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->di_write((data & 0x8) >> 3);
+	m_eeprom->cs_write((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->clk_write((data & 0x4) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /* Dreamcast MAP
@@ -1828,9 +1828,9 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( naomi_mie )
 	PORT_START("MIE.3")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("mie_eeprom", serial_eeprom_device, write_bit)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("mie_eeprom", serial_eeprom_device, set_cs_line)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("mie_eeprom", serial_eeprom_device, set_clock_line)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("mie_eeprom", eeprom_serial_93cxx_device, di_write)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("mie_eeprom", eeprom_serial_93cxx_device, cs_write)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("mie_eeprom", eeprom_serial_93cxx_device, clk_write)
 
 	PORT_START("MIE.5")
 	PORT_DIPNAME( 0x01, 0x00, "Monitor" ) PORT_DIPLOCATION("SW1:1")
@@ -1848,7 +1848,7 @@ static INPUT_PORTS_START( naomi_mie )
 	PORT_SERVICE_NO_TOGGLE( 0x10, IP_ACTIVE_LOW )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("mie_eeprom", serial_eeprom_device, read_bit)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("mie_eeprom", eeprom_serial_93cxx_device, do_read)
 INPUT_PORTS_END
 
 /* 2 players with 1 joystick and 6 buttons each */
@@ -2493,8 +2493,8 @@ static MACHINE_CONFIG_START( naomi_aw_base, naomi_state )
 
 	MCFG_MACHINE_RESET_OVERRIDE(naomi_state,naomi)
 
-	MCFG_EEPROM_93C46_ADD("main_eeprom")
-	MCFG_SERIAL_EEPROM_DEFAULT_VALUE(0)
+	MCFG_EEPROM_SERIAL_93C46_ADD("main_eeprom")
+	MCFG_EEPROM_SERIAL_DEFAULT_VALUE(0)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2514,7 +2514,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( naomi_base, naomi_aw_base )
 	MCFG_MIE_ADD("mie", 4000000, "maple_dc", 0, 0, 0, 0, ":MIE.3", 0, ":MIE.5", 0, 0) // Actual frequency unknown
 	MCFG_SEGA_837_13551_DEVICE_ADD("837_13551", "mie", ":TILT", ":P1", ":P2", ":A0", ":A1", ":A2", ":A3", ":A4", ":A5", ":A6", ":A7", ":OUTPUT")
-	MCFG_EEPROM_93C46_8BIT_ADD("mie_eeprom")
+	MCFG_EEPROM_SERIAL_93C46_8BIT_ADD("mie_eeprom")
 
 	MCFG_X76F100_ADD("naomibd_eeprom")
 MACHINE_CONFIG_END

@@ -297,13 +297,13 @@ WRITE16_MEMBER(cave_state::cave_eeprom_msb_w)
 		coin_counter_w(machine(), 0, data & 0x1000);
 
 		// latch the bit
-		m_eeprom->write_bit(data & 0x0800);
+		m_eeprom->di_write((data & 0x0800) >> 11);
 
 		// reset line asserted: reset.
-		m_eeprom->set_cs_line((data & 0x0200) ? CLEAR_LINE : ASSERT_LINE);
+		m_eeprom->cs_write((data & 0x0200) ? ASSERT_LINE : CLEAR_LINE);
 
 		// clock line asserted: write latch or select next bit to read
-		m_eeprom->set_clock_line((data & 0x0400) ? ASSERT_LINE : CLEAR_LINE);
+		m_eeprom->clk_write((data & 0x0400) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -318,13 +318,13 @@ WRITE16_MEMBER(cave_state::hotdogst_eeprom_msb_w)
 	if (ACCESSING_BITS_8_15)  // even address
 	{
 		// latch the bit
-		m_eeprom->write_bit(data & 0x0800);
+		m_eeprom->di_write((data & 0x0800) >> 11);
 
 		// reset line asserted: reset.
-		m_eeprom->set_cs_line((data & 0x0200) ? CLEAR_LINE : ASSERT_LINE);
+		m_eeprom->cs_write((data & 0x0200) ? ASSERT_LINE : CLEAR_LINE);
 
 		// clock line asserted: write latch or select next bit to read
-		m_eeprom->set_clock_line((data & 0x0400) ? CLEAR_LINE: ASSERT_LINE);
+		m_eeprom->clk_write((data & 0x0400) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -341,13 +341,13 @@ WRITE16_MEMBER(cave_state::cave_eeprom_lsb_w)
 		coin_counter_w(machine(), 0,  data & 0x0001);
 
 		// latch the bit
-		m_eeprom->write_bit(data & 0x80);
+		m_eeprom->di_write((data & 0x80) >> 7);
 
 		// reset line asserted: reset.
-		m_eeprom->set_cs_line((data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
+		m_eeprom->cs_write((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 
 		// clock line asserted: write latch or select next bit to read
-		m_eeprom->set_clock_line((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+		m_eeprom->clk_write((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -376,30 +376,16 @@ WRITE16_MEMBER(cave_state::metmqstr_eeprom_msb_w)
 		if (~data & 0x0100)
 		{
 			// latch the bit
-			m_eeprom->write_bit(data & 0x0800);
+			m_eeprom->di_write((data & 0x0800) >> 11);
 
 			// reset line asserted: reset.
-			m_eeprom->set_cs_line((data & 0x0200) ? CLEAR_LINE : ASSERT_LINE);
+			m_eeprom->cs_write((data & 0x0200) ? ASSERT_LINE : CLEAR_LINE);
 
 			// clock line asserted: write latch or select next bit to read
-			m_eeprom->set_clock_line((data & 0x0400) ? ASSERT_LINE : CLEAR_LINE);
+			m_eeprom->clk_write((data & 0x0400) ? ASSERT_LINE : CLEAR_LINE);
 		}
 	}
 }
-
-static const serial_eeprom_interface eeprom_interface_93C46_pacslot =
-{
-	"*110",         // read         1 10 aaaaaa
-	"*101",         // write        1 01 aaaaaa dddddddddddddddd
-	"*111",         // erase        1 11 aaaaaa
-	"*10000xxxx",   // lock         1 00 00xxxx
-	"*10011xxxx",   // unlock       1 00 11xxxx
-	1,              // enable_multi_read (needed by pacslot)
-	1               // reset_delay (otherwise pacslot will not recognize the eeprom)
-//  "*10001xxxx"    // write all    1 00 01xxxx dddddddddddddddd
-//  "*10010xxxx"    // erase all    1 00 10xxxx
-};
-
 
 /***************************************************************************
 
@@ -673,13 +659,13 @@ WRITE16_MEMBER(cave_state::korokoro_eeprom_msb_w)
 		m_hopper = data & 0x0100;   // ???
 
 		// latch the bit
-		m_eeprom->write_bit(data & 0x4000);
+		m_eeprom->di_write((data & 0x4000) >> 14);
 
 		// reset line asserted: reset.
-		m_eeprom->set_cs_line((data & 0x1000) ? CLEAR_LINE : ASSERT_LINE);
+		m_eeprom->cs_write((data & 0x1000) ? ASSERT_LINE : CLEAR_LINE);
 
 		// clock line asserted: write latch or select next bit to read
-		m_eeprom->set_clock_line((data & 0x2000) ? ASSERT_LINE : CLEAR_LINE);
+		m_eeprom->clk_write((data & 0x2000) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -787,7 +773,7 @@ ADDRESS_MAP_END
 
 READ16_MEMBER(cave_state::pwrinst2_eeprom_r)
 {
-	return ~8 + ((m_eeprom->read_bit() & 1) ? 8 : 0);
+	return ~8 + ((m_eeprom->do_read() & 1) ? 8 : 0);
 }
 
 INLINE void vctrl_w(address_space &space, offs_t offset, UINT16 data, UINT16 mem_mask, int GFX)
@@ -890,13 +876,13 @@ WRITE16_MEMBER(cave_state::tjumpman_eeprom_lsb_w)
 	if (ACCESSING_BITS_0_7)  // odd address
 	{
 		// latch the bit
-		m_eeprom->write_bit(data & 0x0020);
+		m_eeprom->di_write((data & 0x0020) >> 5);
 
 		// reset line asserted: reset.
-		m_eeprom->set_cs_line((data & 0x0008) ? CLEAR_LINE : ASSERT_LINE);
+		m_eeprom->cs_write((data & 0x0008) ? ASSERT_LINE : CLEAR_LINE);
 
 		// clock line asserted: write latch or select next bit to read
-		m_eeprom->set_clock_line((data & 0x0010) ? ASSERT_LINE : CLEAR_LINE);
+		m_eeprom->clk_write((data & 0x0010) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -1278,7 +1264,7 @@ static INPUT_PORTS_START( cave )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(6)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1431,7 +1417,7 @@ static INPUT_PORTS_START( guwange )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1475,7 +1461,7 @@ static INPUT_PORTS_START( korokoro )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1487,7 +1473,7 @@ static INPUT_PORTS_START( tjumpman )
 	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_LOW )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_OTHER ) PORT_NAME( DEF_STR( Yes ) ) PORT_CODE(KEYCODE_Y)    // suru ("do")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_GAMBLE_PAYOUT )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_NAME( "1 Bet" )
@@ -1512,7 +1498,7 @@ static INPUT_PORTS_START( pacslot )
 	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_COIN2 ) // credits
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_OTHER ) PORT_NAME( "Pac-Man" ) PORT_CODE(KEYCODE_Y)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_GAMBLE_PAYOUT )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_NAME( "Bet" )
@@ -1819,7 +1805,7 @@ static MACHINE_CONFIG_START( dfeveron, cave_state )
 
 	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
-	MCFG_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
 
@@ -1861,7 +1847,7 @@ static MACHINE_CONFIG_START( ddonpach, cave_state )
 
 	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
-	MCFG_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
 
@@ -1907,7 +1893,7 @@ static MACHINE_CONFIG_START( donpachi, cave_state )
 
 	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
-	MCFG_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
 
@@ -1953,7 +1939,7 @@ static MACHINE_CONFIG_START( esprade, cave_state )
 
 	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
-	MCFG_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
 
@@ -2034,7 +2020,7 @@ static MACHINE_CONFIG_START( guwange, cave_state )
 
 	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
-	MCFG_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
 
@@ -2078,7 +2064,7 @@ static MACHINE_CONFIG_START( hotdogst, cave_state )
 
 	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
-	MCFG_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
 
@@ -2131,7 +2117,7 @@ static MACHINE_CONFIG_START( korokoro, cave_state )
 
 	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
-	MCFG_EEPROM_93C46_8BIT_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_93C46_8BIT_ADD("eeprom")
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
 
@@ -2185,7 +2171,7 @@ static MACHINE_CONFIG_START( mazinger, cave_state )
 
 	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
-	MCFG_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
 
@@ -2244,7 +2230,7 @@ static MACHINE_CONFIG_START( metmqstr, cave_state )
 
 	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)    /* start with the watchdog armed */
-	MCFG_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
 
@@ -2299,7 +2285,9 @@ static MACHINE_CONFIG_START( pacslot, cave_state )
 
 	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
-	MCFG_SERIAL_EEPROM_ADD("eeprom", 64, 16, eeprom_interface_93C46_pacslot)
+	
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_ENABLE_STREAMING()
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
 
@@ -2355,7 +2343,7 @@ static MACHINE_CONFIG_START( pwrinst2, cave_state )
 
 	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
-	MCFG_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
 
@@ -2419,7 +2407,7 @@ static MACHINE_CONFIG_START( sailormn, cave_state )
 
 	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
-	MCFG_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
 
@@ -2473,7 +2461,9 @@ static MACHINE_CONFIG_START( tjumpman, cave_state )
 
 	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
-	MCFG_EEPROM_93C46_ADD("eeprom")
+
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_ENABLE_STREAMING()
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
 
@@ -2514,7 +2504,7 @@ static MACHINE_CONFIG_START( uopoko, cave_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
 	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
-	MCFG_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
 

@@ -818,7 +818,7 @@ static MACHINE_CONFIG_START( wheelfir, wheelfir_state )
 
 	MCFG_PALETTE_LENGTH(NUM_COLORS)
 
-	MCFG_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 
 

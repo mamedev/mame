@@ -280,7 +280,7 @@ static INPUT_PORTS_START( common )
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00000008, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
+	PORT_BIT( 0x00000008, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, eolith_state, eolith_speedup_getvblank, NULL)
@@ -316,9 +316,9 @@ static INPUT_PORTS_START( common )
 	PORT_BIT( 0xffffff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, set_cs_line)
-	PORT_BIT( 0x00000004, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, set_clock_line)
-	PORT_BIT( 0x00000008, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, write_bit)
+	PORT_BIT( 0x00000002, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
+	PORT_BIT( 0x00000004, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write)
+	PORT_BIT( 0x00000008, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( linkypip )
@@ -539,23 +539,6 @@ INPUT_PORTS_END
 
 /*************************************
  *
- *  EEPROM interface
- *
- *************************************/
-
-// It's configured for 512 bytes
-static const serial_eeprom_interface eeprom_interface_93C66 =
-{
-	"*110",         // read         110 aaaaaaaaa
-	"*101",         // write        101 aaaaaaaaa dddddddd
-	"*111",         // erase        111 aaaaaaaaa
-	"*10000xxxxxx", // lock         100 00xxxxxxx
-	"*10011xxxxxx"  // unlock       100 11xxxxxxx
-};
-
-
-/*************************************
- *
  *  QS1000 interface
  *
  *************************************/
@@ -595,7 +578,7 @@ static MACHINE_CONFIG_START( eolith45, eolith_state )
 
 	MCFG_MACHINE_RESET_OVERRIDE(eolith_state,eolith)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", 512, 8, eeprom_interface_93C66)
+	MCFG_EEPROM_SERIAL_93C66_8BIT_ADD("eeprom")
 
 //  for testing sound sync
 //  MCFG_QUANTUM_PERFECT_CPU("maincpu")

@@ -506,23 +506,23 @@ WRITE32_MEMBER(jaguar_state::eeprom_w)
 	m_eeprom_bit_count++;
 	if (m_eeprom_bit_count != 9)        /* kill extra bit at end of address */
 	{
-		m_eeprom->write_bit(data >> 31);
-		m_eeprom->set_clock_line(PULSE_LINE);
+		m_eeprom->di_write(data >> 31);
+		m_eeprom->clk_write(PULSE_LINE);
 	}
 }
 
 READ32_MEMBER(jaguar_state::eeprom_clk)
 {
-	m_eeprom->set_clock_line(PULSE_LINE); /* get next bit when reading */
+	m_eeprom->clk_write(PULSE_LINE); /* get next bit when reading */
 	return 0;
 }
 
 READ32_MEMBER(jaguar_state::eeprom_cs)
 {
-	m_eeprom->set_cs_line(ASSERT_LINE);   /* must do at end of an operation */
-	m_eeprom->set_cs_line(CLEAR_LINE);        /* enable chip for next operation */
-	m_eeprom->write_bit(1);           /* write a start bit */
-	m_eeprom->set_clock_line(PULSE_LINE);
+	m_eeprom->cs_write(CLEAR_LINE);   /* must do at end of an operation */
+	m_eeprom->cs_write(ASSERT_LINE);        /* enable chip for next operation */
+	m_eeprom->di_write(1);           /* write a start bit */
+	m_eeprom->clk_write(PULSE_LINE);
 	m_eeprom_bit_count = 0;
 	return 0;
 }
@@ -662,7 +662,7 @@ READ32_MEMBER(jaguar_state::joystick_r)
 		}
 	}
 
-	joystick_result |= m_eeprom->read_bit();
+	joystick_result |= m_eeprom->do_read();
 	joybuts_result |= (ioport("CONFIG")->read() & 0x10);
 
 	return (joystick_result << 16) | joybuts_result;
@@ -1630,7 +1630,7 @@ static MACHINE_CONFIG_START( jaguar, jaguar_state )
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","jaguar")
 
-	MCFG_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 MACHINE_CONFIG_END
 
 

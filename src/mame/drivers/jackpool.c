@@ -42,7 +42,7 @@ public:
 	UINT32 screen_update_jackpool(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(jackpool_interrupt);
 	required_device<cpu_device> m_maincpu;
-	required_device<serial_eeprom_device> m_eeprom;
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
 };
 
 
@@ -120,8 +120,8 @@ READ16_MEMBER(jackpool_state::jackpool_io_r)
 		case 0x1c: return ioport("BET")->read();
 		case 0x1e: return 0xff; //ticket motor
 		case 0x20: return 0xff; //hopper motor
-		case 0x2c: return m_eeprom->read_bit();
-		case 0x2e: return m_eeprom->read_bit();
+		case 0x2c: return m_eeprom->do_read();
+		case 0x2e: return m_eeprom->do_read();
 //      default: printf("R %02x\n",offset*2); break;
 	}
 
@@ -148,11 +148,11 @@ WRITE16_MEMBER(jackpool_state::jackpool_io_w)
 		case 0x4a: /* ---- ---x Ticket motor */break;
 		case 0x4c: /* ---- ---x Hopper motor */break;
 		case 0x4e: m_map_vreg = data & 1;        break;
-		case 0x50: m_eeprom->set_cs_line((data & 1) ? CLEAR_LINE : ASSERT_LINE ); break;
-		case 0x52: m_eeprom->set_clock_line((data & 1) ? ASSERT_LINE : CLEAR_LINE ); break;
-		case 0x54: m_eeprom->write_bit(data & 1); break;
-//      case 0x5a: m_eeprom->set_cs_line((data & 1) ? CLEAR_LINE : ASSERT_LINE ); break;
-//      case 0x5c: m_eeprom->set_cs_line((data & 1) ? CLEAR_LINE : ASSERT_LINE ); break;
+		case 0x50: m_eeprom->cs_write((data & 1) ? ASSERT_LINE : CLEAR_LINE ); break;
+		case 0x52: m_eeprom->clk_write((data & 1) ? ASSERT_LINE : CLEAR_LINE ); break;
+		case 0x54: m_eeprom->di_write(data & 1); break;
+//      case 0x5a: m_eeprom->cs_write((data & 1) ? ASSERT_LINE : CLEAR_LINE ); break;
+//      case 0x5c: m_eeprom->cs_write((data & 1) ? ASSERT_LINE : CLEAR_LINE ); break;
 		case 0x60: break;
 //      default: printf("[%02x] <- %02x W\n",offset*2,data);      break;
 	}
@@ -161,17 +161,17 @@ WRITE16_MEMBER(jackpool_state::jackpool_io_w)
 	if(offset*2 == 0x54)
 	{
 		printf("Write bit %02x\n",data);
-		m_eeprom->write_bit(data & 1);
+		m_eeprom->di_write(data & 1);
 	}
 	if(offset*2 == 0x52)
 	{
 		printf("Clock bit %02x\n",data);
-		m_eeprom->set_clock_line((data & 1) ? ASSERT_LINE : CLEAR_LINE );
+		m_eeprom->clk_write((data & 1) ? ASSERT_LINE : CLEAR_LINE );
 	}
 	if(offset*2 == 0x50)
 	{
 		printf("chip select bit %02x\n",data);
-		m_eeprom->set_cs_line((data & 1) ? CLEAR_LINE : ASSERT_LINE );
+		m_eeprom->cs_write((data & 1) ? ASSERT_LINE : CLEAR_LINE );
 	}
 	#endif
 }
@@ -273,7 +273,7 @@ static MACHINE_CONFIG_START( jackpool, jackpool_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(jackpool_state, screen_update_jackpool)
 
-	MCFG_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	MCFG_PALETTE_LENGTH(0x200)
 

@@ -1064,17 +1064,6 @@ static const UINT16 spacegun_default_eeprom[64]=
 	0xffff,0xffff,0xffff,0xffff,0xffff,0xffff,0xffff,0xffff
 };
 
-static const serial_eeprom_interface spacegun_eeprom_intf =
-{
-	"0110",         /* read command */
-	"0101",         /* write command */
-	"0111",         /* erase command */
-	"0100000000",   /* lock command */
-	"0100111111",   /* unlock command */
-	0,              /* multi-read disabled */
-	1               /* reset delay */
-};
-
 
 #if 0
 READ16_MEMBER(taitoz_state::eep_latch_r)
@@ -1252,7 +1241,7 @@ READ16_MEMBER(taitoz_state::spacegun_input_bypass_r)
 	switch (offset)
 	{
 		case 0x03:
-			return m_eeprom->read_bit() << 7;
+			return m_eeprom->do_read() << 7;
 
 		default:
 			return m_tc0220ioc->read(space, offset); /* might be a 510NIO ! */
@@ -2667,9 +2656,9 @@ static INPUT_PORTS_START( spacegun )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, set_cs_line)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, set_clock_line)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, write_bit)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
 
 	PORT_START("STICKX1")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(13) PORT_CENTERDELTA(0) PORT_REVERSE PORT_PLAYER(1)
@@ -3502,8 +3491,8 @@ static MACHINE_CONFIG_START( spacegun, taitoz_state )
 	MCFG_MACHINE_START_OVERRIDE(taitoz_state,bshark)
 	MCFG_MACHINE_RESET_OVERRIDE(taitoz_state,taitoz)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", 64, 16, spacegun_eeprom_intf)
-	MCFG_SERIAL_EEPROM_DATA(spacegun_default_eeprom, 128)
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_DATA(spacegun_default_eeprom, 128)
 
 	MCFG_TC0220IOC_ADD("tc0220ioc", taitoz_io220_intf)
 

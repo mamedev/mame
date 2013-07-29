@@ -78,9 +78,9 @@ WRITE16_MEMBER(stlforce_state::eeprom_w)
 {
 	if( ACCESSING_BITS_0_7 )
 	{
-		m_eeprom->write_bit(data & 0x01);
-		m_eeprom->set_cs_line((data & 0x02) ? CLEAR_LINE : ASSERT_LINE );
-		m_eeprom->set_clock_line((data & 0x04) ? ASSERT_LINE : CLEAR_LINE );
+		m_eeprom->di_write(data & 0x01);
+		m_eeprom->cs_write((data & 0x02) ? ASSERT_LINE : CLEAR_LINE );
+		m_eeprom->clk_write((data & 0x04) ? ASSERT_LINE : CLEAR_LINE );
 	}
 }
 
@@ -138,7 +138,7 @@ static INPUT_PORTS_START( stlforce )
 	PORT_SERVICE_NO_TOGGLE( 0x0008, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit) /* eeprom */
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read) /* eeprom */
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
@@ -190,7 +190,7 @@ static MACHINE_CONFIG_START( stlforce, stlforce_state )
 	MCFG_CPU_PROGRAM_MAP(stlforce_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", stlforce_state,  irq4_line_hold)
 
-	MCFG_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

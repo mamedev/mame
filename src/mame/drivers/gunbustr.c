@@ -100,9 +100,9 @@ WRITE32_MEMBER(gunbustr_state::gunbustr_input_w)
 
 			if (ACCESSING_BITS_0_7)
 			{
-				m_eeprom->set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
-				m_eeprom->write_bit(data & 0x40);
-				m_eeprom->set_cs_line((data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+				m_eeprom->clk_write((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+				m_eeprom->di_write((data & 0x40) >> 6);
+				m_eeprom->cs_write((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 			}
 			break;
 		}
@@ -185,7 +185,7 @@ static INPUT_PORTS_START( gunbustr )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
+	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -284,15 +284,6 @@ GFXDECODE_END
                  MACHINE DRIVERS
 ***********************************************************/
 
-static const serial_eeprom_interface gunbustr_eeprom_interface =
-{
-	"0110",         /* read command */
-	"0101",         /* write command */
-	"0111",         /* erase command */
-	"0100000000",   /* unlock command */
-	"0100110000",   /* lock command */
-};
-
 static const tc0480scp_interface gunbustr_tc0480scp_intf =
 {
 	1, 2,           /* gfxnum, txnum */
@@ -310,7 +301,7 @@ static MACHINE_CONFIG_START( gunbustr, gunbustr_state )
 	MCFG_CPU_PROGRAM_MAP(gunbustr_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gunbustr_state,  gunbustr_interrupt) /* VBL */
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", 64, 16, gunbustr_eeprom_interface)
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

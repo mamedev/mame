@@ -150,24 +150,13 @@ static GFXDECODE_START( ps4 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8, 0x000, 0x80 ) // 8bpp tiles
 GFXDECODE_END
 
-static const serial_eeprom_interface eeprom_interface_93C56 =
-{
-	"*110x",    // read         110x aaaaaaaa
-	"*101x",    // write        101x aaaaaaaa dddddddd
-	"*111x",    // erase        111x aaaaaaaa
-	"*10000xxxxxxx",// lock         100x 00xxxx
-	"*10011xxxxxxx",// unlock       100x 11xxxx
-//  "*10001xxxx",   // write all    1 00 01xxxx dddddddddddddddd
-//  "*10010xxxx"    // erase all    1 00 10xxxx
-};
-
 WRITE32_MEMBER(psikyo4_state::ps4_eeprom_w)
 {
 	if (ACCESSING_BITS_16_31)
 	{
-		m_eeprom->write_bit((data & 0x00200000) ? 1 : 0);
-		m_eeprom->set_cs_line((data & 0x00800000) ? CLEAR_LINE : ASSERT_LINE);
-		m_eeprom->set_clock_line((data & 0x00400000) ? ASSERT_LINE : CLEAR_LINE);
+		m_eeprom->di_write((data & 0x00200000) ? 1 : 0);
+		m_eeprom->cs_write((data & 0x00800000) ? ASSERT_LINE : CLEAR_LINE);
+		m_eeprom->clk_write((data & 0x00400000) ? ASSERT_LINE : CLEAR_LINE);
 
 		return;
 	}
@@ -383,7 +372,7 @@ static INPUT_PORTS_START( hotgmck )
 
 	PORT_START("JP4")/* jumper pads 'JP4' on the PCB */
 	/* EEPROM is read here */
-	PORT_BIT( 0x00100000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
+	PORT_BIT( 0x00100000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 
 	PORT_START("SYSTEM")    /* system inputs */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )  // Screen 1
@@ -558,7 +547,7 @@ static INPUT_PORTS_START( loderndf )
 	PORT_DIPSETTING(          0x00000000, "Japan (Shows Version Number)" )
 	PORT_DIPSETTING(          0x00010000, "World (Does Not Show Version Number)" )
 	/* EEPROM is read here */
-	PORT_BIT( 0x00100000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
+	PORT_BIT( 0x00100000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 INPUT_PORTS_END
 
 /* unused inputs also act as duplicate buttons */
@@ -637,7 +626,7 @@ static INPUT_PORTS_START( hotdebut )
 
 	PORT_START("JP4")/* jumper pads 'JP4' on the PCB */
 	/* EEPROM is read here */
-	PORT_BIT( 0x00100000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
+	PORT_BIT( 0x00100000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 INPUT_PORTS_END
 
 
@@ -667,8 +656,8 @@ static MACHINE_CONFIG_START( ps4big, psikyo4_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", psikyo4_state,  psikyosh_interrupt)
 
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", 256, 8, eeprom_interface_93C56)
-	MCFG_SERIAL_EEPROM_DEFAULT_VALUE(0)
+	MCFG_EEPROM_SERIAL_93C56_8BIT_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_DEFAULT_VALUE(0)
 
 	/* video hardware */
 	MCFG_GFXDECODE(ps4)

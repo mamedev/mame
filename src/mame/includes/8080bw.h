@@ -28,7 +28,7 @@ public:
 	optional_device<timer_device> m_claybust_gun_on;
 	optional_device<discrete_device> m_discrete;
 	optional_device<speaker_sound_device> m_speaker;
-	optional_device<serial_eeprom_device> m_eeprom;
+	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 
 
 	/* misc game specific */

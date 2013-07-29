@@ -33,7 +33,7 @@ public:
 	required_shared_ptr<UINT32> m_mainram;
 	optional_shared_ptr<UINT32> m_scrollram;
 	optional_memory_region m_z80_rom;
-	optional_device<serial_eeprom_device> m_eeprom;
+	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 	optional_device<intel_e28f008sa_device> m_soundflash1;
 	optional_device<intel_e28f008sa_device> m_soundflash2;
 	optional_device<fifo7200_device> m_soundfifo1;

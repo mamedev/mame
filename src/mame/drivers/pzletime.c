@@ -65,7 +65,7 @@ public:
 	UINT32 screen_update_pzletime(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
-	required_device<serial_eeprom_device> m_eeprom;
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
 };
 
 
@@ -171,9 +171,9 @@ WRITE16_MEMBER(pzletime_state::eeprom_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_eeprom->write_bit(data & 0x01);
-		m_eeprom->set_cs_line((data & 0x02) ? CLEAR_LINE : ASSERT_LINE );
-		m_eeprom->set_clock_line((data & 0x04) ? ASSERT_LINE : CLEAR_LINE );
+		m_eeprom->di_write(data & 0x01);
+		m_eeprom->cs_write((data & 0x02) ? ASSERT_LINE : CLEAR_LINE );
+		m_eeprom->clk_write((data & 0x04) ? ASSERT_LINE : CLEAR_LINE );
 	}
 }
 
@@ -246,7 +246,7 @@ static INPUT_PORTS_START( pzletime )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit) /* eeprom */
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read) /* eeprom */
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, pzletime_state,ticket_status_r, NULL) /* ticket dispenser */
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -335,7 +335,7 @@ static MACHINE_CONFIG_START( pzletime, pzletime_state )
 	MCFG_SCREEN_UPDATE_DRIVER(pzletime_state, screen_update_pzletime)
 	MCFG_GFXDECODE(pzletime)
 	MCFG_PALETTE_LENGTH(0x300 + 32768)
-	MCFG_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 
 	/* sound hardware */

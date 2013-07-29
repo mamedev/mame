@@ -124,9 +124,9 @@ popmessage(t);
 
 			if (ACCESSING_BITS_0_7)
 			{
-				m_eeprom->set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
-				m_eeprom->write_bit(data & 0x40);
-				m_eeprom->set_cs_line((data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+				m_eeprom->clk_write((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+				m_eeprom->di_write((data & 0x40) >> 6);
+				m_eeprom->cs_write((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 				return;
 			}
 			return;
@@ -200,7 +200,7 @@ static INPUT_PORTS_START( galastrm )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
+	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x00000200, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galastrm_state,frame_counter_r, NULL)
 	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -275,15 +275,6 @@ GFXDECODE_END
                  MACHINE DRIVERS
 ***********************************************************/
 
-static const serial_eeprom_interface galastrm_eeprom_interface =
-{
-	"0110",         /* read command */
-	"0101",         /* write command */
-	"0111",         /* erase command */
-	"0100000000",   /* unlock command */
-	"0100110000",   /* lock command */
-};
-
 /***************************************************************************/
 
 static const tc0100scn_interface galastrm_tc0100scn_intf =
@@ -311,7 +302,7 @@ static MACHINE_CONFIG_START( galastrm, galastrm_state )
 	MCFG_CPU_PROGRAM_MAP(galastrm_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", galastrm_state,  galastrm_interrupt) /* VBL */
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", 64, 16, galastrm_eeprom_interface)
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

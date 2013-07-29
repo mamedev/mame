@@ -445,7 +445,7 @@ READ16_MEMBER(kickgoal_state::kickgoal_eeprom_r)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		return m_eeprom->read_bit();
+		return m_eeprom->do_read();
 	}
 	return 0;
 }
@@ -458,13 +458,13 @@ WRITE16_MEMBER(kickgoal_state::kickgoal_eeprom_w)
 		switch (offset)
 		{
 			case 0:
-				m_eeprom->set_cs_line((data & 0x0001) ? CLEAR_LINE : ASSERT_LINE);
+				m_eeprom->cs_write((data & 0x0001) ? ASSERT_LINE : CLEAR_LINE);
 				break;
 			case 1:
-				m_eeprom->set_clock_line((data & 0x0001) ? ASSERT_LINE : CLEAR_LINE);
+				m_eeprom->clk_write((data & 0x0001) ? ASSERT_LINE : CLEAR_LINE);
 				break;
 			case 2:
-				m_eeprom->write_bit(data & 0x0001);
+				m_eeprom->di_write(data & 0x0001);
 				break;
 		}
 	}
@@ -649,8 +649,8 @@ static MACHINE_CONFIG_START( kickgoal, kickgoal_state )
 	MCFG_CPU_IO_MAP(kickgoal_sound_io_map)
 
 
-	MCFG_EEPROM_93C46_ADD("eeprom")
-	MCFG_SERIAL_EEPROM_DATA(kickgoal_default_eeprom_type1, 128)
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_DATA(kickgoal_default_eeprom_type1, 128)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -684,8 +684,8 @@ static MACHINE_CONFIG_START( actionhw, kickgoal_state )
 	MCFG_CPU_IO_MAP(actionhw_io_map)
 
 
-	MCFG_EEPROM_93C46_ADD("eeprom")
-	MCFG_SERIAL_EEPROM_DATA(kickgoal_default_eeprom_type1, 128)
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_DATA(kickgoal_default_eeprom_type1, 128)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

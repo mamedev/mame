@@ -18,15 +18,6 @@ colour, including the word "Konami"
 #include "includes/konamipt.h"
 #include "includes/asterix.h"
 
-static const serial_eeprom_interface eeprom_intf =
-{
-	"111000",       /*  read command */
-	"111100",       /* write command */
-	"1100100000000",/* erase command */
-	"1100000000000",/* lock command */
-	"1100110000000" /* unlock command */
-};
-
 #if 0
 READ16_MEMBER(asterix_state::control2_r)
 {
@@ -211,15 +202,15 @@ static INPUT_PORTS_START( asterix )
 
 	PORT_START("IN1")
 	KONAMI16_LSB(2, IPT_UNKNOWN, IPT_START2)
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW,  IPT_UNUSED )  // EEPROM ready (always 1)
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, ready_read)
 	PORT_SERVICE_NO_TOGGLE(0x0400, IP_ACTIVE_LOW )
 	PORT_BIT( 0xf800, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, write_bit)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, set_cs_line)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, set_clock_line)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, di_write)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, cs_write)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, clk_write)
 INPUT_PORTS_END
 
 
@@ -286,8 +277,7 @@ static MACHINE_CONFIG_START( asterix, asterix_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 8000000)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-
-	MCFG_SERIAL_EEPROM_ADD("eeprom", 128, 8, eeprom_intf)
+	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)

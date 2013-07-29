@@ -109,7 +109,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_nvram;
-	required_device<serial_eeprom_device> m_eeprom;
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
 
 	UINT8 m_reg;
 	UINT8 m_rombank;
@@ -446,14 +446,14 @@ void sigmab98_state::show_outputs()
 WRITE8_MEMBER(sigmab98_state::eeprom_w)
 {
 	// latch the bit
-	m_eeprom->write_bit(data & 0x40);
+	m_eeprom->di_write((data & 0x40) >> 6);
 
 	// reset line asserted: reset.
 //  if ((m_c0 ^ data) & 0x20)
-		m_eeprom->set_cs_line((data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
+		m_eeprom->cs_write((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 
 	// clock line asserted: write latch or select next bit to read
-	m_eeprom->set_clock_line((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->clk_write((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 
 	m_c0 = data;
 	//show_outputs(state);
@@ -644,19 +644,19 @@ READ8_MEMBER(sigmab98_state::animalc_rambank_r)
 
 READ8_MEMBER(sigmab98_state::sammymdl_eeprom_r)
 {
-	return m_eeprom->read_bit() ? 0x80 : 0;
+	return m_eeprom->do_read() ? 0x80 : 0;
 }
 
 WRITE8_MEMBER(sigmab98_state::sammymdl_eeprom_w)
 {
 	// latch the bit
-	m_eeprom->write_bit(data & 0x40);
+	m_eeprom->di_write((data & 0x40) >> 6);
 
 	// reset line asserted: reset.
-	m_eeprom->set_cs_line((data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
+	m_eeprom->cs_write((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 
 	// clock line asserted: write latch or select next bit to read
-	m_eeprom->set_clock_line((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->clk_write((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 
 	if (data & 0x8f)
 		logerror("%s: unknown eeeprom bits written %02x\n", machine().describe_context(), data);
@@ -1516,7 +1516,7 @@ static INPUT_PORTS_START( gegege )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )   PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )   PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN2   ) PORT_IMPULSE(5)   // ? (coin error, pulses mask 4 of port c6)
@@ -1554,7 +1554,7 @@ static INPUT_PORTS_START( pepsiman )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )   PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )   PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN2   ) PORT_IMPULSE(5)   // ? (coin error, pulses mask 4 of port c6)
@@ -1592,7 +1592,7 @@ static INPUT_PORTS_START( ucytokyu )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )   PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )   PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN2   ) PORT_IMPULSE(10)  // ? (coin error, pulses mask 4 of port c6)
@@ -1675,17 +1675,6 @@ INPUT_PORTS_END
                         GeGeGe no Kitarou Youkai Slot
 ***************************************************************************/
 
-const serial_eeprom_interface eeprom_intf =
-{
-	"*110",         // read         1 10 aaaaaa
-	"*101",         // write        1 01 aaaaaa dddddddddddddddd
-	"*111",         // erase        1 11 aaaaaa
-	"*10000xxxx",   // lock         1 00 00xxxx
-	"*10011xxxx",   // unlock       1 00 11xxxx
-	0,              // enable_multi_read
-	7               // reset_delay (otherwise gegege will hang when saving settings)
-};
-
 INTERRUPT_GEN_MEMBER(sigmab98_state::gegege_vblank_interrupt)
 {
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x5a);
@@ -1698,7 +1687,7 @@ static MACHINE_CONFIG_START( gegege, sigmab98_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", sigmab98_state,  gegege_vblank_interrupt)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
-	MCFG_SERIAL_EEPROM_ADD("eeprom", 64, 16, eeprom_intf)
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW )
 
@@ -1724,19 +1713,6 @@ MACHINE_CONFIG_END
                              Sammy Medal Games
 ***************************************************************************/
 
-static const serial_eeprom_interface eeprom_interface_93C46_8bit_delay =
-{
-	"*110",         // read         1 10 aaaaaa
-	"*101",         // write        1 01 aaaaaa dddddddd
-	"*111",         // erase        1 11 aaaaaa
-	"*10000xxxx",   // lock         1 00 00xxxx
-	"*10011xxxx",   // unlock       1 00 11xxxx
-	0,              // enable_multi_read
-	1               // reset_delay (needed by animalc)
-//  "*10001xxxx"    // write all    1 00 01xxxx dddddddd
-//  "*10010xxxx"    // erase all    1 00 10xxxx
-};
-
 MACHINE_RESET_MEMBER(sigmab98_state,sammymdl)
 {
 	m_maincpu->set_state_int(Z80_PC, 0x400);  // code starts at 400 ??? (000 = cart header)
@@ -1750,7 +1726,7 @@ static MACHINE_CONFIG_START( sammymdl, sigmab98_state )
 	MCFG_MACHINE_RESET_OVERRIDE(sigmab98_state, sammymdl )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")   // battery
-	MCFG_SERIAL_EEPROM_ADD("eeprom", 128, 8, eeprom_interface_93C46_8bit_delay)
+	MCFG_EEPROM_SERIAL_93C46_8BIT_ADD("eeprom")
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW )
 

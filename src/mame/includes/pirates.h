@@ -42,6 +42,6 @@ public:
 	void pirates_decrypt_s();
 	void pirates_decrypt_oki();
 	required_device<cpu_device> m_maincpu;
-	required_device<serial_eeprom_device> m_eeprom;
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<okim6295_device> m_oki;
 };

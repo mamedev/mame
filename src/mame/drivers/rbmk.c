@@ -85,7 +85,7 @@ public:
 	INTERRUPT_GEN_MEMBER(mcu_irq);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_mcu;
-	required_device<serial_eeprom_device> m_eeprom;
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
 };
 
 
@@ -113,10 +113,10 @@ WRITE16_MEMBER(rbmk_state::eeprom_w)
 	//bad ?
 	if( ACCESSING_BITS_0_7 )
 	{
-		m_eeprom->write_bit(data & 0x04);
-		m_eeprom->set_cs_line((data & 0x01) ? CLEAR_LINE:ASSERT_LINE );
+		m_eeprom->di_write((data & 0x04) >> 2);
+		m_eeprom->cs_write((data & 0x01) ? ASSERT_LINE : CLEAR_LINE );
 
-		m_eeprom->set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE );
+		m_eeprom->clk_write((data & 0x02) ? ASSERT_LINE : CLEAR_LINE );
 	}
 }
 
@@ -366,7 +366,7 @@ static INPUT_PORTS_START( rbmk )
 	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 
 	PORT_START("IN4")   /* 16bit */
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
@@ -560,7 +560,7 @@ static MACHINE_CONFIG_START( rbmk, rbmk_state )
 	MCFG_PALETTE_LENGTH(0x800)
 
 
-	MCFG_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

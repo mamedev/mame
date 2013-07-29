@@ -122,7 +122,7 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_spool99(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
-	required_device<serial_eeprom_device> m_eeprom;
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<okim6295_device> m_oki;
 };
 
@@ -186,7 +186,7 @@ READ8_MEMBER(spool99_state::spool99_io_r)
 			case 0xafe4: return ioport("SERVICE2")->read();//attract mode
 //          case 0xafe5: return 1;
 //          case 0xafe6: return 1;
-			case 0xafe7: return m_eeprom->read_bit();
+			case 0xafe7: return m_eeprom->do_read();
 			case 0xaff8: return m_oki->read(space,0);
 		}
 	}
@@ -199,19 +199,19 @@ READ8_MEMBER(spool99_state::spool99_io_r)
 WRITE8_MEMBER(spool99_state::eeprom_resetline_w)
 {
 	// reset line asserted: reset.
-	m_eeprom->set_cs_line((data & 0x01) ? CLEAR_LINE : ASSERT_LINE );
+	m_eeprom->cs_write((data & 0x01) ? ASSERT_LINE : CLEAR_LINE );
 }
 
 WRITE8_MEMBER(spool99_state::eeprom_clockline_w)
 {
 	// clock line asserted: write latch or select next bit to read
-	m_eeprom->set_clock_line((data & 0x01) ? ASSERT_LINE : CLEAR_LINE );
+	m_eeprom->clk_write((data & 0x01) ? ASSERT_LINE : CLEAR_LINE );
 }
 
 WRITE8_MEMBER(spool99_state::eeprom_dataline_w)
 {
 	// latch the bit
-	m_eeprom->write_bit(data & 0x01);
+	m_eeprom->di_write(data & 0x01);
 }
 
 static ADDRESS_MAP_START( spool99_map, AS_PROGRAM, 8, spool99_state )
@@ -251,7 +251,7 @@ READ8_MEMBER(spool99_state::vcarn_io_r)
 			case 0xa7a2: return ioport("START")->read();
 			case 0xa7a3: return ioport("BET")->read();//system 2
 
-			case 0xa7a7: return m_eeprom->read_bit();
+			case 0xa7a7: return m_eeprom->do_read();
 
 		}
 	}
@@ -361,7 +361,7 @@ static MACHINE_CONFIG_START( spool99, spool99_state )
 
 	MCFG_PALETTE_LENGTH(0x200)
 
-	MCFG_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

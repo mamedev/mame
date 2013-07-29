@@ -84,7 +84,7 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(livequiz_irqhandler);
 	required_device<cpu_device> m_maincpu;
-	required_device<serial_eeprom_device> m_eeprom;
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
 };
 
 
@@ -217,13 +217,13 @@ WRITE16_MEMBER(midas_state::midas_eeprom_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		// latch the bit
-		m_eeprom->write_bit(data & 0x04);
+		m_eeprom->di_write((data & 0x04) >> 2);
 
 		// reset line asserted: reset.
-		m_eeprom->set_cs_line((data & 0x01) ? CLEAR_LINE : ASSERT_LINE );
+		m_eeprom->cs_write((data & 0x01) ? ASSERT_LINE : CLEAR_LINE );
 
 		// clock line asserted: write latch or select next bit to read
-		m_eeprom->set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE );
+		m_eeprom->clk_write((data & 0x02) ? ASSERT_LINE : CLEAR_LINE );
 	}
 }
 
@@ -456,7 +456,7 @@ static INPUT_PORTS_START( livequiz )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_COIN1   )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit) // EEPROM
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read) // EEPROM
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_SERVICE_NO_TOGGLE( 0x0040,   IP_ACTIVE_LOW )
@@ -589,7 +589,7 @@ static INPUT_PORTS_START( hammer )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_COIN1     )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW,  IPT_COIN2     )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_SERVICE1  )
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_SPECIAL   ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_SPECIAL   ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW,  IPT_UNKNOWN   )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW,  IPT_UNKNOWN   )
 	PORT_SERVICE_NO_TOGGLE( 0x0040,   IP_ACTIVE_LOW )
@@ -701,7 +701,7 @@ static MACHINE_CONFIG_START( livequiz, midas_state )
 	MCFG_CPU_PROGRAM_MAP(livequiz_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", midas_state,  irq1_line_hold)
 
-	MCFG_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -730,7 +730,7 @@ static MACHINE_CONFIG_START( hammer, midas_state )
 	MCFG_CPU_PROGRAM_MAP(hammer_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", midas_state,  irq1_line_hold)
 
-	MCFG_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	MCFG_TICKET_DISPENSER_ADD("prize1", attotime::from_msec(1000*5), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )
 	MCFG_TICKET_DISPENSER_ADD("prize2", attotime::from_msec(1000*5), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )

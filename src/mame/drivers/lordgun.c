@@ -183,13 +183,13 @@ WRITE8_MEMBER(lordgun_state::lordgun_eeprom_w)
 			lordgun_update_gun(i);
 
 	// latch the bit
-	m_eeprom->write_bit(data & 0x40);
+	m_eeprom->di_write((data & 0x40) >> 6);
 
 	// reset line asserted: reset.
-	m_eeprom->set_cs_line((data & 0x10) ? CLEAR_LINE : ASSERT_LINE );
+	m_eeprom->cs_write((data & 0x10) ? ASSERT_LINE : CLEAR_LINE );
 
 	// clock line asserted: write latch or select next bit to read
-	m_eeprom->set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE );
+	m_eeprom->clk_write((data & 0x20) ? ASSERT_LINE : CLEAR_LINE );
 
 	m_whitescreen = data & 0x80;
 
@@ -211,13 +211,13 @@ WRITE8_MEMBER(lordgun_state::aliencha_eeprom_w)
 	coin_counter_w(machine(), 1, data & 0x10);
 
 	// latch the bit
-	m_eeprom->write_bit(data & 0x80);
+	m_eeprom->di_write((data & 0x80) >> 7);
 
 	// reset line asserted: reset.
-	m_eeprom->set_cs_line((data & 0x20) ? CLEAR_LINE : ASSERT_LINE );
+	m_eeprom->cs_write((data & 0x20) ? ASSERT_LINE : CLEAR_LINE );
 
 	// clock line asserted: write latch or select next bit to read
-	m_eeprom->set_clock_line((data & 0x40) ? ASSERT_LINE : CLEAR_LINE );
+	m_eeprom->clk_write((data & 0x40) ? ASSERT_LINE : CLEAR_LINE );
 }
 
 
@@ -451,7 +451,7 @@ static INPUT_PORTS_START( lordgun )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_SERVICE_NO_TOGGLE( 0x40, IP_ACTIVE_LOW )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 
 	PORT_START("START1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1   )
@@ -572,7 +572,7 @@ static INPUT_PORTS_START( aliencha )
 	PORT_DIPUNUSED_DIPLOC( 0x0080, 0x0080, "SW3:8" ) /* Listed as "Unused" */
 
 	PORT_START("SERVICE")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN  )
@@ -677,7 +677,7 @@ static MACHINE_CONFIG_START( lordgun, lordgun_state )
 	MCFG_I8255A_ADD( "ppi8255_0", lordgun_ppi8255_0_intf )
 	MCFG_I8255A_ADD( "ppi8255_1", lordgun_ppi8255_1_intf )
 
-	MCFG_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -713,7 +713,7 @@ static MACHINE_CONFIG_START( aliencha, lordgun_state )
 	MCFG_I8255A_ADD( "ppi8255_0", aliencha_ppi8255_0_intf )
 	MCFG_I8255A_ADD( "ppi8255_1", aliencha_ppi8255_1_intf )
 
-	MCFG_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

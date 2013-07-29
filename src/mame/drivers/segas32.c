@@ -666,9 +666,9 @@ void segas32_state::common_io_chip_w(address_space &space, int which, offs_t off
 
 			if (which == 0)
 			{
-				m_eeprom->write_bit(data & 0x80);
-				m_eeprom->set_cs_line((data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
-				m_eeprom->set_clock_line((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+				m_eeprom->di_write((data & 0x80) >> 7);
+				m_eeprom->cs_write((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+				m_eeprom->clk_write((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 			}
 /*            coin_lockout_w(machine(), 1 + 2*which, data & 0x08);
             coin_lockout_w(machine(), 0 + 2*which, data & 0x04);*/
@@ -683,9 +683,9 @@ void segas32_state::common_io_chip_w(address_space &space, int which, offs_t off
 			else
 			{
 				/* multi-32 EEPROM access */
-				m_eeprom->write_bit(data & 0x80);
-				m_eeprom->set_cs_line((data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
-				m_eeprom->set_clock_line((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+				m_eeprom->di_write((data & 0x80) >> 7);
+				m_eeprom->cs_write((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+				m_eeprom->clk_write((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 			}
 			break;
 
@@ -1321,7 +1321,7 @@ static INPUT_PORTS_START( system32_generic )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE3 )   /* sometimes mirrors SERVICE1 */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE4 )   /* tends to also work as a test switch */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 
 	PORT_START("PORTG_A")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1356,7 +1356,7 @@ static INPUT_PORTS_START( multi32_generic )
 
 	PORT_START("SERVICE34_B")
 	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 
 	PORT_START("PORTG_B")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -2178,7 +2178,7 @@ static MACHINE_CONFIG_START( system32, segas32_state )
 
 	MCFG_MACHINE_RESET_OVERRIDE(segas32_state,system32)
 
-	MCFG_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	MCFG_TIMER_DRIVER_ADD("v60_irq0", segas32_state, signal_v60_irq_callback)
 	MCFG_TIMER_DRIVER_ADD("v60_irq1", segas32_state, signal_v60_irq_callback)
@@ -2237,7 +2237,7 @@ static MACHINE_CONFIG_START( multi32, segas32_state )
 
 	MCFG_MACHINE_RESET_OVERRIDE(segas32_state,system32)
 
-	MCFG_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	MCFG_TIMER_DRIVER_ADD("v60_irq0", segas32_state, signal_v60_irq_callback)
 	MCFG_TIMER_DRIVER_ADD("v60_irq1", segas32_state, signal_v60_irq_callback)

@@ -94,5 +94,5 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(sound_irq);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	required_device<serial_eeprom_device> m_eeprom;
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
 };

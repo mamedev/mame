@@ -419,7 +419,7 @@ static MACHINE_CONFIG_START( pasha2, pasha2_state )
 	MCFG_CPU_IO_MAP(pasha2_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pasha2_state,  irq0_line_hold)
 
-	MCFG_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

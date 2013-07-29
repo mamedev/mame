@@ -175,7 +175,6 @@
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
 #include "cpu/i8085/i8085.h"
-#include "machine/eepromser.h"
 #include "sound/ay8910.h"
 #include "sound/speaker.h"
 #include "includes/8080bw.h"
@@ -3148,19 +3147,19 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(_8080bw_state::invmulti_eeprom_r)
 {
-	return m_eeprom->read_bit();
+	return m_eeprom->do_read();
 }
 
 WRITE8_MEMBER(_8080bw_state::invmulti_eeprom_w)
 {
 	// d0: latch bit
-	m_eeprom->write_bit(data & 1);
+	m_eeprom->di_write(data & 1);
 
 	// d6: reset
-	m_eeprom->set_cs_line((data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+	m_eeprom->cs_write((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 
 	// d4: write latch or select next bit to read
-	m_eeprom->set_clock_line((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->clk_write((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE8_MEMBER(_8080bw_state::invmulti_bank_w)
@@ -3184,7 +3183,7 @@ MACHINE_CONFIG_DERIVED_CLASS( invmulti, invaders, _8080bw_state )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(invmulti_map)
 
-	MCFG_EEPROM_93C46_8BIT_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_93C46_8BIT_ADD("eeprom")
 
 	MCFG_MACHINE_RESET_OVERRIDE(_8080bw_state,invmulti)
 MACHINE_CONFIG_END

@@ -368,7 +368,7 @@ READ32_MEMBER(deco32_state::fghthist_control_r)
 	switch (offset) {
 	case 0: return 0xffff0000 | ioport("IN0")->read();
 	case 1: return 0xffff0000 | ioport("IN1")->read(); //check top bits??
-	case 2: return 0xfffffffe | m_eeprom->read_bit();
+	case 2: return 0xfffffffe | m_eeprom->do_read();
 	}
 
 	return 0xffffffff;
@@ -377,9 +377,9 @@ READ32_MEMBER(deco32_state::fghthist_control_r)
 WRITE32_MEMBER(deco32_state::fghthist_eeprom_w)
 {
 	if (ACCESSING_BITS_0_7) {
-		m_eeprom->set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
-		m_eeprom->write_bit(data & 0x10);
-		m_eeprom->set_cs_line((data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+		m_eeprom->clk_write((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+		m_eeprom->di_write((data & 0x10) >> 4);
+		m_eeprom->cs_write((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 
 		deco32_pri_w(space,0,data&0x1,0xffffffff); /* Bit 0 - layer priority toggle */
 	}
@@ -429,15 +429,15 @@ WRITE32_MEMBER(dragngun_state::dragngun_lightgun_w)
 
 READ32_MEMBER(deco32_state::dragngun_eeprom_r)
 {
-	return 0xfffffffe | m_eeprom->read_bit();
+	return 0xfffffffe | m_eeprom->do_read();
 }
 
 WRITE32_MEMBER(deco32_state::dragngun_eeprom_w)
 {
 	if (ACCESSING_BITS_0_7) {
-		m_eeprom->set_clock_line((data & 0x2) ? ASSERT_LINE : CLEAR_LINE);
-		m_eeprom->write_bit(data & 0x1);
-		m_eeprom->set_cs_line((data & 0x4) ? CLEAR_LINE : ASSERT_LINE);
+		m_eeprom->clk_write((data & 0x2) ? ASSERT_LINE : CLEAR_LINE);
+		m_eeprom->di_write(data & 0x1);
+		m_eeprom->cs_write((data & 0x4) ? ASSERT_LINE : CLEAR_LINE);
 		return;
 	}
 	logerror("%s:Write control 1 %08x %08x\n",machine().describe_context(),offset,data);
@@ -581,7 +581,7 @@ WRITE32_MEMBER(deco32_state::tattass_control_w)
 
 UINT16 deco32_state::port_b_nslasher(int unused)
 {
-	return (m_eeprom->read_bit());
+	return (m_eeprom->do_read());
 }
 
 
@@ -613,9 +613,9 @@ WRITE32_MEMBER(deco32_state::nslasher_eeprom_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_eeprom->set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
-		m_eeprom->write_bit(data & 0x10);
-		m_eeprom->set_cs_line((data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+		m_eeprom->clk_write((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+		m_eeprom->di_write((data & 0x10) >> 4);
+		m_eeprom->cs_write((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 
 		deco32_pri_w(space,0,data&0x3,0xffffffff); /* Bit 0 - layer priority toggle, Bit 1 - BG2/3 Joint mode (8bpp) */
 	}
@@ -1669,10 +1669,6 @@ WRITE8_MEMBER(deco32_state::sound_bankswitch_w)
 	m_oki2->set_bank_base(((data >> 1)& 1) * 0x40000);
 }
 
-static const serial_eeprom_interface eeprom_interface_tattass =
-{
-};
-
 /**********************************************************************************/
 
 MACHINE_RESET_MEMBER(deco32_state,deco32)
@@ -1799,7 +1795,7 @@ UINT16 deco32_state::port_a_fghthist(int unused)
 
 UINT16 deco32_state::port_b_fghthist(int unused)
 {
-	return machine().device<serial_eeprom_device>(":eeprom")->read_bit();
+	return machine().device<eeprom_serial_93cxx_device>(":eeprom")->do_read();
 }
 
 UINT16 deco32_state::port_c_fghthist(int unused)
@@ -1817,7 +1813,7 @@ static MACHINE_CONFIG_START( fghthist, deco32_state ) /* DE-0380-2 PCB */
 	MCFG_CPU_ADD("audiocpu", H6280, 32220000/8)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1873,7 +1869,7 @@ static MACHINE_CONFIG_START( fghthsta, deco32_state ) /* DE-0395-1 PCB */
 	MCFG_CPU_ADD("audiocpu", H6280, 32220000/8)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1987,7 +1983,7 @@ static MACHINE_CONFIG_START( dragngun, dragngun_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(deco32_state,deco32)
-	MCFG_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", deco32_state, interrupt_gen)
 
@@ -2069,7 +2065,7 @@ static MACHINE_CONFIG_START( lockload, dragngun_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* to improve main<->audio comms */
 
 	MCFG_MACHINE_RESET_OVERRIDE(deco32_state,deco32)
-	MCFG_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", deco32_state, interrupt_gen)
 
@@ -2159,7 +2155,7 @@ static MACHINE_CONFIG_START( tattass, deco32_state )
 	MCFG_CPU_PROGRAM_MAP(tattass_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", deco32_state,  deco32_vbl_interrupt)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", 1024, 8, eeprom_interface_tattass)
+	MCFG_EEPROM_SERIAL_93C76_8BIT_ADD("eeprom")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -2204,7 +2200,7 @@ static MACHINE_CONFIG_START( nslasher, deco32_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* to improve main<->audio comms */
 
-	MCFG_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

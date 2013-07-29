@@ -29,7 +29,7 @@ class naomi_state : public dc_state
 	optional_shared_ptr<UINT64> pvr2_framebuffer_ram;
 	optional_shared_ptr<UINT64> elan_ram;
 	optional_device<macronix_29l001mc_device> m_awflash;
-	optional_device<serial_eeprom_device> m_eeprom;
+	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 
 	DECLARE_WRITE_LINE_MEMBER(aica_irq);
 	DECLARE_MACHINE_RESET(naomi);

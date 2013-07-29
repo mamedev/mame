@@ -35,7 +35,7 @@ To Do:
 
 READ16_MEMBER(galpani2_state::galpani2_eeprom_r)
 {
-	return (m_eeprom_word & ~1) | (m_eeprom->read_bit() & 1);
+	return (m_eeprom_word & ~1) | (m_eeprom->do_read() & 1);
 }
 
 WRITE16_MEMBER(galpani2_state::galpani2_eeprom_w)
@@ -44,13 +44,13 @@ WRITE16_MEMBER(galpani2_state::galpani2_eeprom_w)
 	if ( ACCESSING_BITS_0_7 )
 	{
 		// latch the bit
-		m_eeprom->write_bit(data & 0x02);
+		m_eeprom->di_write((data & 0x02) >> 1);
 
 		// reset line asserted: reset.
-		m_eeprom->set_cs_line((data & 0x08) ? CLEAR_LINE : ASSERT_LINE );
+		m_eeprom->cs_write((data & 0x08) ? ASSERT_LINE : CLEAR_LINE );
 
 		// clock line asserted: write latch or select next bit to read
-		m_eeprom->set_clock_line((data & 0x04) ? ASSERT_LINE : CLEAR_LINE );
+		m_eeprom->clk_write((data & 0x04) ? ASSERT_LINE : CLEAR_LINE );
 	}
 }
 
@@ -581,7 +581,7 @@ static MACHINE_CONFIG_START( galpani2, galpani2_state )
 	MCFG_CPU_PROGRAM_MAP(galpani2_mem2)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("s_scantimer", galpani2_state, galpani2_interrupt2, "screen", 0, 1)
 
-	MCFG_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -321,7 +321,7 @@ static MACHINE_CONFIG_START( konamigv, konamigv_state )
 	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psx_dma_write_delegate( FUNC( konamigv_state::scsi_dma_write ), (konamigv_state *) owner ) )
 
 	MCFG_DEVICE_ADD("mb89371", MB89371, 0)
-	MCFG_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	MCFG_SCSIBUS_ADD("scsi")
 	MCFG_SCSIDEV_ADD("scsi:cdrom", SCSICD, SCSI_ID_4)
@@ -359,7 +359,7 @@ static INPUT_PORTS_START( konamigv )
 	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x00001000, IP_ACTIVE_LOW )
-	PORT_BIT( 0x00002000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER( "eeprom", serial_eeprom_device, read_bit )
+	PORT_BIT( 0x00002000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER( "eeprom", eeprom_serial_93cxx_device, do_read )
 	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -403,9 +403,9 @@ static INPUT_PORTS_START( konamigv )
 	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("EEPROMOUT")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, write_bit)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, set_cs_line)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, set_clock_line)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write)
 INPUT_PORTS_END
 
 /* Simpsons Bowling */

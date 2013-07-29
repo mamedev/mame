@@ -97,7 +97,7 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_soundcpu;
-	optional_device<serial_eeprom_device> m_eeprom;
+	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 	optional_device<cpu_device> m_dev_n2a03a;
 	optional_device<cpu_device> m_dev_n2a03b;
 	optional_device<m58819_device> m_m58819;

@@ -1211,7 +1211,7 @@ READ16_MEMBER(metro_state::gakusai_input_r)
 
 READ16_MEMBER(metro_state::gakusai_eeprom_r)
 {
-	return m_eeprom->read_bit() & 1;
+	return m_eeprom->do_read() & 1;
 }
 
 WRITE16_MEMBER(metro_state::gakusai_eeprom_w)
@@ -1219,13 +1219,13 @@ WRITE16_MEMBER(metro_state::gakusai_eeprom_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		// latch the bit
-		m_eeprom->write_bit(BIT(data, 0));
+		m_eeprom->di_write(BIT(data, 0));
 
 		// reset line asserted: reset.
-		m_eeprom->set_cs_line(BIT(data, 2) ? CLEAR_LINE : ASSERT_LINE );
+		m_eeprom->cs_write(BIT(data, 2) ? ASSERT_LINE : CLEAR_LINE );
 
 		// clock line asserted: write latch or select next bit to read
-		m_eeprom->set_clock_line(BIT(data, 1) ? ASSERT_LINE : CLEAR_LINE );
+		m_eeprom->clk_write(BIT(data, 1) ? ASSERT_LINE : CLEAR_LINE );
 	}
 }
 
@@ -1309,10 +1309,10 @@ ADDRESS_MAP_END
 READ16_MEMBER(metro_state::dokyusp_eeprom_r)
 {
 	// clock line asserted: write latch or select next bit to read
-	m_eeprom->set_clock_line(CLEAR_LINE);
-	m_eeprom->set_clock_line(ASSERT_LINE);
+	m_eeprom->clk_write(CLEAR_LINE);
+	m_eeprom->clk_write(ASSERT_LINE);
 
-	return m_eeprom->read_bit() & 1;
+	return m_eeprom->do_read() & 1;
 }
 
 WRITE16_MEMBER(metro_state::dokyusp_eeprom_bit_w)
@@ -1320,11 +1320,11 @@ WRITE16_MEMBER(metro_state::dokyusp_eeprom_bit_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		// latch the bit
-		m_eeprom->write_bit(BIT(data, 0));
+		m_eeprom->di_write(BIT(data, 0));
 
 		// clock line asserted: write latch or select next bit to read
-		m_eeprom->set_clock_line(CLEAR_LINE);
-		m_eeprom->set_clock_line(ASSERT_LINE);
+		m_eeprom->clk_write(CLEAR_LINE);
+		m_eeprom->clk_write(ASSERT_LINE);
 	}
 }
 
@@ -1333,7 +1333,7 @@ WRITE16_MEMBER(metro_state::dokyusp_eeprom_reset_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		// reset line asserted: reset.
-		m_eeprom->set_cs_line(BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
+		m_eeprom->cs_write(BIT(data, 0) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -4021,7 +4021,7 @@ static MACHINE_CONFIG_START( dokyusp, metro_state )
 
 	MCFG_MACHINE_START_OVERRIDE(metro_state,metro)
 	MCFG_MACHINE_RESET_OVERRIDE(metro_state,metro)
-	MCFG_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -4057,7 +4057,7 @@ static MACHINE_CONFIG_START( gakusai, metro_state )
 
 	MCFG_MACHINE_START_OVERRIDE(metro_state,metro)
 	MCFG_MACHINE_RESET_OVERRIDE(metro_state,metro)
-	MCFG_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -4093,7 +4093,7 @@ static MACHINE_CONFIG_START( gakusai2, metro_state )
 
 	MCFG_MACHINE_START_OVERRIDE(metro_state,metro)
 	MCFG_MACHINE_RESET_OVERRIDE(metro_state,metro)
-	MCFG_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -262,7 +262,7 @@ public:
 	required_device<cpu_device> m_dsp;
 	optional_device<cpu_device> m_dsp2;
 	required_device<adc1038_device> m_adc1038;
-	required_device<serial_eeprom_device> m_eeprom;
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	UINT32 *m_sharc_dataram_0;
 	UINT32 *m_sharc_dataram_1;
 	DECLARE_WRITE32_MEMBER(paletteram32_w);
@@ -359,18 +359,6 @@ WRITE32_MEMBER(gticlub_state::gticlub_k001604_reg_w)
 
 /******************************************************************/
 
-/* 93C56 EEPROM */
-static const serial_eeprom_interface eeprom_intf =
-{
-	"*110",         /*  read command */
-	"*101",         /* write command */
-	"*111",         /* erase command */
-	"*10000xxxxxx", /* lock command */
-	"*10011xxxxxx", /* unlock command */
-	1,              /* enable_multi_read */
-	0               /* reset_delay */
-};
-
 READ8_MEMBER(gticlub_state::sysreg_r)
 {
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3" };
@@ -392,7 +380,7 @@ READ8_MEMBER(gticlub_state::sysreg_r)
 			// a = ADC readout
 			// e = EEPROM data out
 
-			UINT32 eeprom_bit = (m_eeprom->read_bit() << 1);
+			UINT32 eeprom_bit = (m_eeprom->do_read() << 1);
 			UINT32 adc_bit = (m_adc1038->do_read() << 2);
 			return (eeprom_bit | adc_bit);
 		}
@@ -414,9 +402,9 @@ WRITE8_MEMBER(gticlub_state::sysreg_w)
 			break;
 
 		case 3:
-			m_eeprom->write_bit((data & 0x01) ? 1 : 0);
-			m_eeprom->set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
-			m_eeprom->set_cs_line((data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
+			m_eeprom->di_write((data & 0x01) ? 1 : 0);
+			m_eeprom->clk_write((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
+			m_eeprom->cs_write((data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
 			break;
 
 		case 4:
@@ -976,7 +964,7 @@ static MACHINE_CONFIG_START( gticlub, gticlub_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", 256, 16, eeprom_intf)
+	MCFG_EEPROM_SERIAL_93C56_ADD("eeprom")
 
 	MCFG_MACHINE_START_OVERRIDE(gticlub_state,gticlub)
 	MCFG_MACHINE_RESET_OVERRIDE(gticlub_state,gticlub)
@@ -1083,7 +1071,7 @@ static MACHINE_CONFIG_START( hangplt, gticlub_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", 256, 16, eeprom_intf)
+	MCFG_EEPROM_SERIAL_93C56_ADD("eeprom")
 
 	MCFG_MACHINE_START_OVERRIDE(gticlub_state,gticlub)
 	MCFG_MACHINE_RESET_OVERRIDE(gticlub_state,hangplt)

@@ -2104,16 +2104,6 @@ WRITE8_MEMBER(vga_device::mem_linear_w)
 	vga.memory[offset] = data;
 }
 
-
-static struct serial_eeprom_interface ati_eeprom_interface =
-{
-	"*110", /*  read command */
-	"*101", /* write command */
-	"*111", /* erase command */
-	"*10000xxxx",   // lock         1 00 00xxxx
-	"*10011xxxx"    // unlock       1 00 11xxxx
-};
-
 MACHINE_CONFIG_FRAGMENT( pcvideo_vga )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
@@ -2162,7 +2152,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( ati_vga )
 	MCFG_MACH8_ADD_OWNER("8514a")
-	MCFG_SERIAL_EEPROM_ADD("ati_eeprom",64,16,ati_eeprom_interface)
+	MCFG_EEPROM_SERIAL_93C46_ADD("ati_eeprom")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( s3_764 )
@@ -5253,9 +5243,9 @@ READ8_MEMBER(ati_vga_device::ati_port_ext_r)
 			break;
 		case 0x37:
 			{
-				serial_eeprom_device* eep = subdevice<serial_eeprom_device>("ati_eeprom");
+				eeprom_serial_93cxx_device* eep = subdevice<eeprom_serial_93cxx_device>("ati_eeprom");
 				ret = 0x00;
-				ret |= eep->read_bit() << 3;
+				ret |= eep->do_read() << 3;
 			}
 			break;
 		default:
@@ -5313,12 +5303,12 @@ WRITE8_MEMBER(ati_vga_device::ati_port_ext_w)
 
 			if(data & 0x04)
 			{
-				serial_eeprom_device* eep = subdevice<serial_eeprom_device>("ati_eeprom");
+				eeprom_serial_93cxx_device* eep = subdevice<eeprom_serial_93cxx_device>("ati_eeprom");
 				if(eep != NULL)
 				{
-					eep->write_bit((data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
-					eep->set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
-					eep->set_cs_line((data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
+					eep->di_write((data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
+					eep->clk_write((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
+					eep->cs_write((data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 				}
 			}
 			else

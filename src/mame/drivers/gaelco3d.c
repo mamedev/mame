@@ -290,7 +290,7 @@ READ16_MEMBER(gaelco3d_state::eeprom_data_r)
 		result |= m_serial->status_r(space, 0);
 	}
 
-	if (m_eeprom->read_bit())
+	if (m_eeprom->do_read())
 		result ^= 0x0004;
 	if (LOG)
 		logerror("eeprom_data_r(%02X)\n", result);
@@ -319,7 +319,7 @@ WRITE16_MEMBER(gaelco3d_state::eeprom_data_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_eeprom->write_bit(data & 0x01);
+		m_eeprom->di_write(data & 0x01);
 	}
 	else if (mem_mask != 0xffff)
 		logerror("write mask: %08x data %08x\n", mem_mask, data);
@@ -330,7 +330,7 @@ WRITE16_MEMBER(gaelco3d_state::eeprom_clock_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_eeprom->set_clock_line((data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
+		m_eeprom->clk_write((data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -339,7 +339,7 @@ WRITE16_MEMBER(gaelco3d_state::eeprom_cs_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_eeprom->set_cs_line((data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+		m_eeprom->cs_write((data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -992,7 +992,7 @@ static MACHINE_CONFIG_START( gaelco3d, gaelco3d_state )
 	MCFG_CPU_DATA_MAP(adsp_data_map)
 
 
-	MCFG_EEPROM_93C66B_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_93C66_ADD("eeprom")
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 

@@ -38,7 +38,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_ensoniq;
-	optional_device<serial_eeprom_device> m_eeprom;
+	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 	optional_device<upd96050_device> m_dsp;
 
 	required_shared_ptr<UINT16> m_mainram;

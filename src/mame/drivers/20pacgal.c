@@ -135,22 +135,6 @@ static const namco_interface namco_config =
 
 /*************************************
  *
- *  Non-volatile memory
- *
- *************************************/
-
-static const serial_eeprom_interface _20pacgal_eeprom_intf =
-{
-	"*110",           /* read command */
-	"*101",           /* write command */
-	0,                /* erase command */
-	"*10000xxxxx",    /* lock command */
-	"*10011xxxxx",    /* unlock command */
-};
-
-
-/*************************************
- *
  *  Coin counter
  *
  *************************************/
@@ -304,12 +288,12 @@ static INPUT_PORTS_START( 20pacgal )
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
 
 	PORT_START( "EEPROMIN" )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)   /* bit 7 is EEPROM data */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)   /* bit 7 is EEPROM data */
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, set_cs_line)     /* bit 5 is cs (active low) */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, set_clock_line) /* bit 6 is clock (active high) */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, write_bit)      /* bit 7 is data */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)    /* bit 5 is cs (active high) */
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write) 	/* bit 6 is clock (active high) */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)    /* bit 7 is data */
 INPUT_PORTS_END
 
 
@@ -366,7 +350,7 @@ static MACHINE_CONFIG_START( 20pacgal, _20pacgal_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", _20pacgal_state,  vblank_irq)
 
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", 128, 8, _20pacgal_eeprom_intf)
+	MCFG_EEPROM_SERIAL_93C46_8BIT_ADD("eeprom")
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD(20pacgal_video)

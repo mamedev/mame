@@ -119,7 +119,7 @@ static INPUT_PORTS_START( ataxx )
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN2")       /* 0x20 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("AN0")       /* 0x00 - analog X */
@@ -150,7 +150,7 @@ static INPUT_PORTS_START( wsf )
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN2")       /* 0x20 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -202,7 +202,7 @@ static INPUT_PORTS_START( indyheat )
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN2")       /* 0x20 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("AN0")       /* Analog wheel 1 */
@@ -248,7 +248,7 @@ static INPUT_PORTS_START( brutforc )
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN2")       /* 0x20 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("P1")        /* 0x0E */
@@ -286,24 +286,6 @@ INPUT_PORTS_END
 
 /*************************************
  *
- *  EEPROM interface
- *
- *************************************/
-
-static const serial_eeprom_interface eeprom_intf =
-{
-	"000001100",
-	"000001010",
-	0,
-	"0000010000000000",
-	"0000010011000000",
-	1
-};
-
-
-
-/*************************************
- *
  *  Machine driver
  *
  *************************************/
@@ -326,7 +308,9 @@ static MACHINE_CONFIG_START( ataxx, leland_state )
 	MCFG_MACHINE_START_OVERRIDE(leland_state,ataxx)
 	MCFG_MACHINE_RESET_OVERRIDE(leland_state,ataxx)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", 128, 16, eeprom_intf)
+	MCFG_EEPROM_SERIAL_93C56_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_ENABLE_STREAMING()
+
 	MCFG_NVRAM_ADD_0FILL("battery")
 
 	/* video hardware */

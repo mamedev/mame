@@ -61,17 +61,6 @@ WRITE16_MEMBER(playmark_state::coinctrl_w)
 
 ***************************************************************************/
 
-static const serial_eeprom_interface eeprom_intf =
-{
-	"*110",         /*  read command */
-	"*101",         /* write command */
-	0,              /* erase command */
-	"*10000xxxx",   /* lock command */
-	"*10011xxxx",   /* unlock command */
-	0,              /* enable_multi_read */
-	5               /* reset_delay (otherwise wbeachvl will hang when saving settings) */
-};
-
 WRITE16_MEMBER(playmark_state::wbeachvl_coin_eeprom_w)
 {
 	if (ACCESSING_BITS_0_7)
@@ -83,9 +72,9 @@ WRITE16_MEMBER(playmark_state::wbeachvl_coin_eeprom_w)
 		coin_counter_w(machine(), 3, data & 0x08);
 
 		/* bits 5-7 control EEPROM */
-		m_eeprom->set_cs_line((data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
-		m_eeprom->write_bit(data & 0x80);
-		m_eeprom->set_clock_line((data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+		m_eeprom->cs_write((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+		m_eeprom->di_write((data & 0x80) >> 7);
+		m_eeprom->clk_write((data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 	}
 }
 
@@ -95,9 +84,9 @@ WRITE16_MEMBER(playmark_state::hotmind_coin_eeprom_w)
 	{
 		coin_counter_w(machine(), 0,data & 0x20);
 
-		m_eeprom->set_cs_line((data & 1) ? CLEAR_LINE : ASSERT_LINE);
-		m_eeprom->write_bit(data & 4);
-		m_eeprom->set_clock_line((data & 2) ? ASSERT_LINE : CLEAR_LINE );
+		m_eeprom->cs_write((data & 1) ? ASSERT_LINE : CLEAR_LINE);
+		m_eeprom->di_write((data & 4) >> 2);
+		m_eeprom->clk_write((data & 2) ? ASSERT_LINE : CLEAR_LINE );
 	}
 }
 
@@ -548,7 +537,7 @@ static INPUT_PORTS_START( wbeachvl )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE(0x20, IP_ACTIVE_LOW)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* ?? see code at 746a. sound status? */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)   /* EEPROM data */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)   /* EEPROM data */
 
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
@@ -714,7 +703,7 @@ static INPUT_PORTS_START( hotmind )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)   /* EEPROM data */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)   /* EEPROM data */
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Difficulty ) )
@@ -1126,8 +1115,8 @@ static MACHINE_CONFIG_START( wbeachvl, playmark_state )
 	/* Program and Data Maps are internal to the MCU */
 //  MCFG_CPU_IO_MAP(playmark_sound_io_map)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", 64, 16, eeprom_intf)
-	MCFG_SERIAL_EEPROM_DEFAULT_VALUE(0)
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_DEFAULT_VALUE(0)
 
 	MCFG_MACHINE_START_OVERRIDE(playmark_state,playmark)
 	MCFG_MACHINE_RESET_OVERRIDE(playmark_state,playmark)
@@ -1197,8 +1186,8 @@ static MACHINE_CONFIG_START( hotmind, playmark_state )
 	/* Program and Data Maps are internal to the MCU */
 	MCFG_CPU_IO_MAP(playmark_sound_io_map)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", 64, 16, eeprom_intf)
-	MCFG_SERIAL_EEPROM_DEFAULT_VALUE(0)
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_DEFAULT_VALUE(0)
 
 	MCFG_MACHINE_START_OVERRIDE(playmark_state,playmark)
 	MCFG_MACHINE_RESET_OVERRIDE(playmark_state,playmark)

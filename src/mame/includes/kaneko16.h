@@ -14,7 +14,6 @@
 #include "machine/kaneko_calc3.h"
 #include "machine/kaneko_toybox.h"
 #include "sound/okim6295.h"
-#include "machine/eepromser.h"
 
 
 class kaneko16_state : public driver_device
@@ -27,7 +26,6 @@ public:
 		m_oki(*this, "oki"),
 		m_oki1(*this, "oki1"),
 		m_oki2(*this, "oki2"),
-		m_eeprom(*this, "eeprom"),
 		m_spriteram(*this, "spriteram"),
 		m_mainram(*this, "mainram"),
 		m_view2_0(*this, "view2_0"),
@@ -41,7 +39,6 @@ public:
 	optional_device<okim6295_device> m_oki;
 	optional_device<okim6295_device> m_oki1;
 	optional_device<okim6295_device> m_oki2;
-	optional_device<serial_eeprom_device> m_eeprom;
 	optional_shared_ptr<UINT16> m_spriteram;
 	optional_shared_ptr<UINT16> m_mainram;
 	optional_device<kaneko_view2_tilemap_device> m_view2_0;
@@ -66,8 +63,6 @@ public:
 	DECLARE_READ16_MEMBER(kaneko16_ay2_YM2149_r);
 	DECLARE_WRITE16_MEMBER(kaneko16_ay2_YM2149_w);
 	DECLARE_WRITE16_MEMBER(bakubrkr_oki_bank_sw);
-
-	DECLARE_WRITE8_MEMBER(kaneko16_eeprom_reset_w);
 
 	DECLARE_DRIVER_INIT(kaneko16);
 	DECLARE_DRIVER_INIT(samplebank);

@@ -52,15 +52,6 @@ Bucky:
 #define MOO_DMADELAY (100)
 
 
-static const serial_eeprom_interface eeprom_intf =
-{
-	"011000",       /* read command */
-	"011100",       /* write command */
-	"0100100000000",    /* erase command */
-	"0100000000000",    /* lock command */
-	"0100110000000"     /* unlock command */
-};
-
 READ16_MEMBER(moo_state::control2_r)
 {
 	return m_cur_control2;
@@ -376,8 +367,8 @@ static INPUT_PORTS_START( moo )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE4 )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )    /* EEPROM ready (always 1) */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, ready_read)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_SERVICE_NO_TOGGLE(0x08, IP_ACTIVE_LOW)
 	PORT_DIPNAME( 0x10, 0x00, "Sound Output")       PORT_DIPLOCATION("SW1:1")
@@ -392,9 +383,9 @@ static INPUT_PORTS_START( moo )
 	PORT_DIPSETTING(    0x80, "4")
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, write_bit)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, set_cs_line)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, set_clock_line)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, di_write)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, cs_write)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, clk_write)
 
 	PORT_START("P1_P3")
 	KONAMI16_LSB( 1, IPT_UNKNOWN, IPT_START1 )
@@ -506,7 +497,7 @@ static MACHINE_CONFIG_START( moo, moo_state )
 	MCFG_MACHINE_START_OVERRIDE(moo_state,moo)
 	MCFG_MACHINE_RESET_OVERRIDE(moo_state,moo)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", 128, 8, eeprom_intf)
+	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
 
 	MCFG_K053252_ADD("k053252", 16000000/2, moo_k053252_intf)
 
@@ -551,7 +542,7 @@ static MACHINE_CONFIG_START( moobl, moo_state )
 	MCFG_MACHINE_START_OVERRIDE(moo_state,moo)
 	MCFG_MACHINE_RESET_OVERRIDE(moo_state,moo)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", 128, 8, eeprom_intf)
+	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS | VIDEO_UPDATE_AFTER_VBLANK)

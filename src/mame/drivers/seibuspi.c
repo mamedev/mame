@@ -895,9 +895,9 @@ READ8_MEMBER(seibuspi_state::spi_ds2404_unknown_r)
 
 WRITE8_MEMBER(seibuspi_state::eeprom_w)
 {
-	m_eeprom->write_bit((data & 0x80) ? 1 : 0);
-	m_eeprom->set_clock_line((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
-	m_eeprom->set_cs_line((data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
+	m_eeprom->di_write((data & 0x80) ? 1 : 0);
+	m_eeprom->clk_write((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->cs_write((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE8_MEMBER(seibuspi_state::spi_layerbanks_eeprom_w)
@@ -1247,7 +1247,7 @@ static INPUT_PORTS_START( sxx2f )
 	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("SYSTEM")
-	PORT_BIT( 0x00000040, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
+	PORT_BIT( 0x00000040, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 INPUT_PORTS_END
 
 
@@ -1365,7 +1365,7 @@ static INPUT_PORTS_START( sys386f )
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x00004000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)
+	PORT_BIT( 0x00004000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0xffffbf3f, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("INPUTS")
@@ -1750,18 +1750,6 @@ GFXDECODE_END
 
 /*****************************************************************************/
 
-/* this is a 93C46 but with reset delay */
-static const serial_eeprom_interface eeprom_intf =
-{
-	"*110",         /* read command */
-	"*101",         /* write command */
-	"*111",         /* erase command */
-	"*10000xxxx",   /* lock command */
-	"*10011xxxx",   /* unlock command */
-	1,              /* enable_multi_read */
-	1               /* reset_delay */
-};
-
 INTERRUPT_GEN_MEMBER(seibuspi_state::spi_interrupt)
 {
 	device.execute().set_input_line(0, HOLD_LINE); // where is ack?
@@ -1915,7 +1903,7 @@ static MACHINE_CONFIG_DERIVED( sxx2f, sxx2e )
 
 	MCFG_DEVICE_REMOVE("ds2404")
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", 64, 16, eeprom_intf)
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	// Z80 is Z84C0006PCS instead of Z84C0008PEC
 	// clock is unknown, possibly slower than 7.159MHz
@@ -1948,7 +1936,7 @@ static MACHINE_CONFIG_START( sys386i, seibuspi_state )
 	MCFG_CPU_PROGRAM_MAP(sys386i_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", seibuspi_state, spi_interrupt)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", 64, 16, eeprom_intf)
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1998,7 +1986,7 @@ static MACHINE_CONFIG_START( sys386f, seibuspi_state )
 	MCFG_CPU_PROGRAM_MAP(sys386f_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", seibuspi_state, spi_interrupt)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", 64, 16, eeprom_intf)
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

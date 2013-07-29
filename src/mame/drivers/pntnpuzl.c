@@ -154,24 +154,14 @@ public:
 	DECLARE_READ16_MEMBER(pntnpuzl_eeprom_r);
 	DECLARE_WRITE16_MEMBER(pntnpuzl_eeprom_w);
 	DECLARE_DRIVER_INIT(pip);
-	required_device<serial_eeprom_device> m_eeprom;
-};
-
-
-static const serial_eeprom_interface eeprom_intf =
-{
-	"*110",         /*  read command */
-	"*101",         /* write command */
-	NULL,           /* erase command */
-	"*10000xxxx",   /* lock command */
-	"*10011xxxx"    /* unlock command */
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
 };
 
 
 READ16_MEMBER(pntnpuzl_state::pntnpuzl_eeprom_r)
 {
 	/* bit 11 is EEPROM data */
-	return (m_eeprom_data & 0xf4ff) | (m_eeprom->read_bit()<<11) | (ioport("IN1")->read() & 0x0300);
+	return (m_eeprom_data & 0xf4ff) | (m_eeprom->do_read()<<11) | (ioport("IN1")->read() & 0x0300);
 }
 
 WRITE16_MEMBER(pntnpuzl_state::pntnpuzl_eeprom_w)
@@ -182,9 +172,9 @@ WRITE16_MEMBER(pntnpuzl_state::pntnpuzl_eeprom_w)
 	/* bit 13 is clock (active high) */
 	/* bit 14 is cs (active high) */
 
-	m_eeprom->write_bit(data & 0x1000);
-	m_eeprom->set_cs_line((data & 0x4000) ? CLEAR_LINE : ASSERT_LINE);
-	m_eeprom->set_clock_line((data & 0x2000) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->di_write((data & 0x1000) >> 12);
+	m_eeprom->cs_write((data & 0x4000) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->clk_write((data & 0x2000) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -357,7 +347,7 @@ static MACHINE_CONFIG_START( pntnpuzl, pntnpuzl_state )
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)//??
 	MCFG_CPU_PROGRAM_MAP(pntnpuzl_map)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", 64, 16, eeprom_intf)
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_vga )

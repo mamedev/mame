@@ -204,13 +204,13 @@ WRITE32_MEMBER(unico_state::zeropnt2_eeprom_w)
 	if ( ACCESSING_BITS_24_31 )
 	{
 		// latch the bit
-		m_eeprom->write_bit(data & 0x04000000);
+		m_eeprom->di_write((data & 0x04000000) >> 26);
 
 		// reset line asserted: reset.
-		m_eeprom->set_cs_line((data & 0x01000000) ? CLEAR_LINE : ASSERT_LINE);
+		m_eeprom->cs_write((data & 0x01000000) ? ASSERT_LINE : CLEAR_LINE);
 
 		// clock line asserted: write latch or select next bit to read
-		m_eeprom->set_clock_line((data & 0x02000000) ? ASSERT_LINE : CLEAR_LINE );
+		m_eeprom->clk_write((data & 0x02000000) ? ASSERT_LINE : CLEAR_LINE );
 	}
 }
 
@@ -507,7 +507,7 @@ static INPUT_PORTS_START( zeropnt2 )
 	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit) // EEPROM
+	PORT_BIT( 0x80000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read) // EEPROM
 
 	PORT_START("Y0")    /* $800140.b */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(35) PORT_KEYDELTA(15) PORT_PLAYER(2)
@@ -565,18 +565,6 @@ GFXDECODE_END
 MACHINE_RESET_MEMBER(unico_state,unico)
 {
 }
-
-
-static const serial_eeprom_interface zeropnt2_eeprom_interface =
-{
-	"*110",         // read         1 10 aaaaaaa
-	"*101",         // write        1 01 aaaaaaa dddddddd
-	"*111",         // erase        1 11 aaaaaaa
-	"*10000xxxx",   // lock         1 00 00xxxx
-	"*10011xxxx",   // unlock       1 00 11xxxx
-//  "*10001xxxx"    // write all    1 00 01xxxx dddddddd
-//  "*10010xxxx"    // erase all    1 00 10xxxx
-};
 
 
 /***************************************************************************
@@ -677,7 +665,7 @@ static MACHINE_CONFIG_START( zeropnt2, unico_state )
 
 	MCFG_MACHINE_RESET_OVERRIDE(unico_state,zeropt)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", 128, 8, zeropnt2_eeprom_interface)
+	MCFG_EEPROM_SERIAL_93C46_8BIT_ADD("eeprom")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

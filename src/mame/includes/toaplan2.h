@@ -154,7 +154,7 @@ public:
 	optional_device<nmk112_device> m_nmk112;
 	optional_device<okim6295_device> m_oki;
 	optional_device<okim6295_device> m_oki1;
-	optional_device<serial_eeprom_device> m_eeprom;
+	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);

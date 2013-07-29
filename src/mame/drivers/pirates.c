@@ -94,23 +94,14 @@ Notes:
 #include "includes/pirates.h"
 
 
-static const serial_eeprom_interface eeprom_intf =
-{
-	"*110",         /*  read command */
-	"*101",         /* write command */
-	0,              /* erase command */
-	"*10000xxxx",   /* lock command */
-	"*10011xxxx"    /* unlock command */
-};
-
 WRITE16_MEMBER(pirates_state::pirates_out_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bits 0-2 control EEPROM */
-		m_eeprom->write_bit(data & 0x04);
-		m_eeprom->set_cs_line((data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
-		m_eeprom->set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
+		m_eeprom->di_write((data & 0x04) >> 2);
+		m_eeprom->cs_write((data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
+		m_eeprom->clk_write((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
 
 		/* bit 6 selects oki bank */
 		m_oki->set_bank_base((data & 0x40) ? 0x40000 : 0x00000);
@@ -204,7 +195,7 @@ static INPUT_PORTS_START( pirates )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x0008, IP_ACTIVE_LOW )
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH,IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", serial_eeprom_device, read_bit)  // EEPROM data
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH,IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)  // EEPROM data
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_UNKNOWN )     // seems checked in "test mode"
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNKNOWN )     // seems checked in "test mode"
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH,IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, pirates_state,prot_r, NULL)      // protection
@@ -260,7 +251,7 @@ static MACHINE_CONFIG_START( pirates, pirates_state )
 	MCFG_CPU_PROGRAM_MAP(pirates_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pirates_state,  irq1_line_hold)
 
-	MCFG_SERIAL_EEPROM_ADD("eeprom", 64, 16, eeprom_intf)
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	MCFG_GFXDECODE(pirates)
 

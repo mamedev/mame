@@ -213,7 +213,7 @@ public:
 protected:
 	UINT8 m_rom_bank_base[3];
 
-	required_device<serial_eeprom_device> m_eeprom;
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	int m_93c46_enabled;
 	UINT8 m_93c46_lines;
 };
