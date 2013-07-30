@@ -21,6 +21,10 @@ Additional ROMs with 'a' in label are probably to convert
 the game back to normal version as current set on the PCB
 has adult graphics (sets provided are 'Normal' and 'Enterprise')
 
+Notes:
+ Casanova: Using 1C/2C and inserting 5 coins causes graphics corruption as
+           as the game places the "11" character on screen, but there really
+           isn't. Sould only be "0" through "9"
 
 ***************************************************************************/
 
@@ -281,12 +285,12 @@ static INPUT_PORTS_START( casanova )
 	PORT_MODIFY("SYS")
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_MODIFY("DSW01")
+	PORT_MODIFY("DSW01") /* Do NOT trust "DIP INFO" for correct settings! At least Coinage is WRONG! */
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Coinage ) )	PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(      0x0002, DEF_STR( 1C_2C ) ) /* Dip info shows 2 Coins / Credit */
 	PORT_DIPSETTING(      0x0003, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(      0x0001, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(      0x0001, DEF_STR( 2C_1C ) ) /* Dip info shows 3 Coins / Credit */
+	PORT_DIPSETTING(      0x0000, DEF_STR( 3C_1C ) ) /* Dip info shows 5 Coins / Credit */
 	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(      0x0008, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x000c, DEF_STR( Normal ) )
