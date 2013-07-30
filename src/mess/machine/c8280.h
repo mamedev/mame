@@ -16,6 +16,7 @@
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/6532riot.h"
+#include "machine/cbmipt.h"
 #include "machine/ieee488.h"
 #include "machine/wd_fdc.h"
 
@@ -37,6 +38,7 @@ public:
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual ioport_constructor device_input_ports() const;
 
 	// not really public
 	DECLARE_READ8_MEMBER( dio_r );
@@ -69,6 +71,7 @@ private:
 	required_device<fd1797_t> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
+	required_ioport m_address;
 	floppy_image_device *m_floppy;
 
 	// IEEE-488 bus

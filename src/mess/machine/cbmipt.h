@@ -115,10 +115,7 @@
 
 
 #define MCFG_CBM_IEEE488_ADD(_default_drive) \
-	MCFG_IEEE488_SLOT_ADD("ieee8", 8, cbm_ieee488_devices, _default_drive) \
-	MCFG_IEEE488_SLOT_ADD("ieee9", 9, cbm_ieee488_devices, NULL) \
-	MCFG_IEEE488_SLOT_ADD("ieee10", 10, cbm_ieee488_devices, NULL) \
-	MCFG_IEEE488_SLOT_ADD("ieee11", 11, cbm_ieee488_devices, NULL) \
+	MCFG_IEEE488_SLOT_ADD("ieee", cbm_ieee488_devices, _default_drive) \
 	MCFG_IEEE488_BUS_ADD()
 
 

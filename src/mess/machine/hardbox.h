@@ -43,7 +43,6 @@ public:
 
 	DECLARE_READ8_MEMBER( ppi0_pa_r );
 	DECLARE_WRITE8_MEMBER( ppi0_pb_w );
-	DECLARE_READ8_MEMBER( ppi0_pc_r );
 
 	DECLARE_READ8_MEMBER( ppi1_pa_r );
 	DECLARE_WRITE8_MEMBER( ppi1_pb_w );

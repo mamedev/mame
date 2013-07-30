@@ -257,7 +257,7 @@ READ8_MEMBER( c8280_device::riot1_pb_r )
 	UINT8 data = 0;
 
 	// device number selection
-	data |= m_address - 8;
+	data |= m_address->read() & 0x07;
 
 	// data accepted in
 	data |= m_bus->ndac_r() << 6;
@@ -340,9 +340,10 @@ static MACHINE_CONFIG_FRAGMENT( c8280 )
 	MCFG_CPU_PROGRAM_MAP(c8280_fdc_mem)
 
 	MCFG_FD1797x_ADD(WD1797_TAG, XTAL_12MHz/6) // clock?
-
 	MCFG_FLOPPY_DRIVE_ADD(WD1797_TAG":0", c8280_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1797_TAG":1", c8280_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
+
+	MCFG_IEEE488_SLOT_ADD("ieee", cbm_ieee488_devices, NULL)
 MACHINE_CONFIG_END
 
 
@@ -355,6 +356,35 @@ machine_config_constructor c8280_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( c8280 );
 }
+
+
+//-------------------------------------------------
+//  INPUT_PORTS( c8280 )
+//-------------------------------------------------
+
+static INPUT_PORTS_START( c8280 )
+	PORT_START("ADDRESS")
+	PORT_DIPNAME( 0x07, 0x00, "Device Address" )
+	PORT_DIPSETTING(    0x00, "8" )
+	PORT_DIPSETTING(    0x01, "9" )
+	PORT_DIPSETTING(    0x02, "10" )
+	PORT_DIPSETTING(    0x03, "11" )
+	PORT_DIPSETTING(    0x04, "12" )
+	PORT_DIPSETTING(    0x05, "13" )
+	PORT_DIPSETTING(    0x06, "14" )
+	PORT_DIPSETTING(    0x07, "15" )
+INPUT_PORTS_END
+
+
+//-------------------------------------------------
+//  input_ports - device-specific input ports
+//-------------------------------------------------
+
+ioport_constructor c8280_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( c8280 );
+}
+
 
 
 //**************************************************************************
@@ -395,6 +425,7 @@ c8280_device::c8280_device(const machine_config &mconfig, const char *tag, devic
 		m_fdc(*this, WD1797_TAG),
 		m_floppy0(*this, WD1797_TAG":0"),
 		m_floppy1(*this, WD1797_TAG":1"),
+		m_address(*this, "ADDRESS"),
 		m_rfdo(1),
 		m_daco(1),
 		m_atna(1)

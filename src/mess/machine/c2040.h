@@ -21,6 +21,7 @@
 #include "formats/g64_dsk.h"
 #include "machine/6522via.h"
 #include "machine/6532riot.h"
+#include "machine/cbmipt.h"
 #include "machine/mos6530.h"
 #include "machine/ieee488.h"
 
@@ -43,6 +44,7 @@ public:
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual ioport_constructor device_input_ports() const;
 
 	// not really public
 	static void on_disk0_change(device_image_interface &image);
@@ -92,6 +94,7 @@ protected:
 	required_device<legacy_floppy_image_device> m_image0;
 	optional_device<legacy_floppy_image_device> m_image1;
 	required_memory_region m_gcr;
+	required_ioport m_address;
 
 	struct {
 		// motors

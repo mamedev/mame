@@ -20,6 +20,7 @@
 #include "formats/g64_dsk.h"
 #include "machine/64h156.h"
 #include "machine/6522via.h"
+#include "machine/cbmipt.h"
 #include "machine/ieee488.h"
 
 
@@ -52,6 +53,7 @@ public:
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual ioport_constructor device_input_ports() const;
 
 protected:
 	// device-level overrides
@@ -69,6 +71,7 @@ protected:
 	required_device<via6522_device> m_via1;
 	required_device<c64h156_device> m_ga;
 	required_device<legacy_floppy_image_device> m_image;
+	required_ioport m_address;
 
 	// IEEE-488 bus
 	int m_nrfd_out;             // not ready for data

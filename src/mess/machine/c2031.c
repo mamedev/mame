@@ -358,6 +358,8 @@ static MACHINE_CONFIG_FRAGMENT( c2031 )
 
 	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, c1541_floppy_interface)
 	MCFG_64H156_ADD(C64H156_TAG, XTAL_16MHz, ga_intf)
+
+	MCFG_IEEE488_SLOT_ADD("ieee", cbm_ieee488_devices, NULL)
 MACHINE_CONFIG_END
 
 
@@ -369,6 +371,30 @@ MACHINE_CONFIG_END
 machine_config_constructor c2031_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( c2031 );
+}
+
+
+//-------------------------------------------------
+//  INPUT_PORTS( c2031 )
+//-------------------------------------------------
+
+static INPUT_PORTS_START( c2031 )
+	PORT_START("ADDRESS")
+	PORT_DIPNAME( 0x03, 0x00, "Device Address" )
+	PORT_DIPSETTING(    0x00, "8" )
+	PORT_DIPSETTING(    0x01, "9" )
+	PORT_DIPSETTING(    0x02, "10" )
+	PORT_DIPSETTING(    0x03, "11" )
+INPUT_PORTS_END
+
+
+//-------------------------------------------------
+//  input_ports - device-specific input ports
+//-------------------------------------------------
+
+ioport_constructor c2031_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( c2031 );
 }
 
 
@@ -385,12 +411,12 @@ inline int c2031_device::get_device_number()
 {
 	int state = 1;
 
-	switch (m_address)
+	switch (m_address->read() & 0x03)
 	{
-	case 8: state = (m_atna && m_nrfd_out); break;
-	case 9: state = m_nrfd_out;             break;
-	case 10: state = m_atna;                break;
-	case 11: state = 1;                     break;
+	case 0: state = (m_atna && m_nrfd_out); break;
+	case 1: state = m_nrfd_out;             break;
+	case 2: state = m_atna;                 break;
+	case 3: state = 1;                      break;
 	}
 
 	return state;
@@ -414,6 +440,7 @@ c2031_device::c2031_device(const machine_config &mconfig, const char *tag, devic
 		m_via1(*this, M6522_1_TAG),
 		m_ga(*this, C64H156_TAG),
 		m_image(*this, FLOPPY_0),
+		m_address(*this, "ADDRESS"),
 		m_nrfd_out(1),
 		m_ndac_out(1),
 		m_atna(1),

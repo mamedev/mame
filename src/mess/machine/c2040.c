@@ -505,9 +505,9 @@ READ8_MEMBER( c2040_device::riot1_pb_r )
 	    PB0     DEVICE NUMBER SELECTION
 	    PB1     DEVICE NUMBER SELECTION
 	    PB2     DEVICE NUMBER SELECTION
-	    PB3     ACT LED 1
-	    PB4     ACT LED 0
-	    PB5     ERR LED
+	    PB3     
+	    PB4     
+	    PB5     
 	    PB6     DACI
 	    PB7     RFDI
 
@@ -516,7 +516,7 @@ READ8_MEMBER( c2040_device::riot1_pb_r )
 	UINT8 data = 0;
 
 	// device number selection
-	data |= m_address - 8;
+	data |= m_address->read() & 0x07;
 
 	// data accepted in
 	data |= m_bus->ndac_r() << 6;
@@ -533,14 +533,14 @@ WRITE8_MEMBER( c2040_device::riot1_pb_w )
 
 	    bit     description
 
-	    PB0     DEVICE NUMBER SELECTION
-	    PB1     DEVICE NUMBER SELECTION
-	    PB2     DEVICE NUMBER SELECTION
+	    PB0     
+	    PB1     
+	    PB2     
 	    PB3     ACT LED 1
 	    PB4     ACT LED 0
 	    PB5     ERR LED
-	    PB6     DACI
-	    PB7     RFDI
+	    PB6     
+	    PB7     
 
 	*/
 
@@ -1099,6 +1099,8 @@ static MACHINE_CONFIG_FRAGMENT( c2040 )
 	MCFG_MOS6530_ADD(M6530_TAG, XTAL_16MHz/16, miot_intf)
 
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(c2040_floppy_interface)
+
+	MCFG_IEEE488_SLOT_ADD("ieee", cbm_ieee488_devices, NULL)
 MACHINE_CONFIG_END
 
 
@@ -1133,6 +1135,8 @@ static MACHINE_CONFIG_FRAGMENT( c4040 )
 	MCFG_MOS6530_ADD(M6530_TAG, XTAL_16MHz/16, miot_intf)
 
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(c4040_floppy_interface)
+
+	MCFG_IEEE488_SLOT_ADD("ieee", cbm_ieee488_devices, NULL)
 MACHINE_CONFIG_END
 
 
@@ -1167,6 +1171,8 @@ static MACHINE_CONFIG_FRAGMENT( c8050 )
 	MCFG_MOS6530_ADD(M6530_TAG, XTAL_12MHz/12, c8050_miot_intf)
 
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(c8050_floppy_interface)
+
+	MCFG_IEEE488_SLOT_ADD("ieee", cbm_ieee488_devices, NULL)
 MACHINE_CONFIG_END
 
 
@@ -1201,6 +1207,8 @@ static MACHINE_CONFIG_FRAGMENT( c8250 )
 	MCFG_MOS6530_ADD(M6530_TAG, XTAL_12MHz/12, c8050_miot_intf)
 
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(c8250_floppy_interface)
+
+	MCFG_IEEE488_SLOT_ADD("ieee", cbm_ieee488_devices, NULL)
 MACHINE_CONFIG_END
 
 
@@ -1235,6 +1243,8 @@ static MACHINE_CONFIG_FRAGMENT( c8250lp )
 	MCFG_MOS6530_ADD(M6530_TAG, XTAL_12MHz/12, c8050_miot_intf)
 
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(c8250_floppy_interface)
+
+	MCFG_IEEE488_SLOT_ADD("ieee", cbm_ieee488_devices, NULL)
 MACHINE_CONFIG_END
 
 
@@ -1269,6 +1279,8 @@ static MACHINE_CONFIG_FRAGMENT( sfd1001 )
 	MCFG_MOS6530_ADD(M6530_TAG, XTAL_12MHz/12, c8050_miot_intf)
 
 	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, c8250_floppy_interface)
+
+	MCFG_IEEE488_SLOT_ADD("ieee", cbm_ieee488_devices, NULL)
 MACHINE_CONFIG_END
 
 
@@ -1280,6 +1292,34 @@ MACHINE_CONFIG_END
 machine_config_constructor sfd1001_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( sfd1001 );
+}
+
+
+//-------------------------------------------------
+//  INPUT_PORTS( c2040 )
+//-------------------------------------------------
+
+static INPUT_PORTS_START( c2040 )
+	PORT_START("ADDRESS")
+	PORT_DIPNAME( 0x07, 0x00, "Device Address" )
+	PORT_DIPSETTING(    0x00, "8" )
+	PORT_DIPSETTING(    0x01, "9" )
+	PORT_DIPSETTING(    0x02, "10" )
+	PORT_DIPSETTING(    0x03, "11" )
+	PORT_DIPSETTING(    0x04, "12" )
+	PORT_DIPSETTING(    0x05, "13" )
+	PORT_DIPSETTING(    0x06, "14" )
+	PORT_DIPSETTING(    0x07, "15" )
+INPUT_PORTS_END
+
+
+//-------------------------------------------------
+//  input_ports - device-specific input ports
+//-------------------------------------------------
+
+ioport_constructor c2040_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( c2040 );
 }
 
 
@@ -1483,6 +1523,7 @@ c2040_device::c2040_device(const machine_config &mconfig, device_type type, cons
 		m_image0(*this, FLOPPY_0),
 		m_image1(*this, FLOPPY_1),
 		m_gcr(*this, "gcr"),
+		m_address(*this, "ADDRESS"),
 		m_drive(0),
 		m_side(0),
 		m_rfdo(1),
@@ -1520,6 +1561,7 @@ c2040_device::c2040_device(const machine_config &mconfig, const char *tag, devic
 		m_image0(*this, FLOPPY_0),
 		m_image1(*this, FLOPPY_1),
 		m_gcr(*this, "gcr"),
+		m_address(*this, "ADDRESS"),
 		m_drive(0),
 		m_side(0),
 		m_rfdo(1),

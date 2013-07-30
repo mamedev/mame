@@ -28,6 +28,7 @@
 #include "cpu/m6502/m6502.h"
 #include "machine/6522via.h"
 #include "machine/6532riot.h"
+#include "machine/cbmipt.h"
 #include "machine/ieee488.h"
 #include "machine/scsicb.h"
 
@@ -56,6 +57,7 @@ public:
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual ioport_constructor device_input_ports() const;
 
 	// not really public
 	DECLARE_WRITE_LINE_MEMBER( req_w );
@@ -90,6 +92,7 @@ private:
 	required_device<riot6532_device> m_riot1;
 	required_device<via6522_device> m_via;
 	required_device<scsicb_device> m_sasibus;
+	required_ioport m_address;
 
 	// IEEE-488 bus
 	int m_rfdo;                         // not ready for data output

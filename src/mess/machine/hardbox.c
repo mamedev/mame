@@ -19,7 +19,7 @@
 	Start the pet8032 emulator with the HardBox attached as device 9,
 	with the new CHD and the utilities floppy mounted:
 
-	$ mess pet8032 -ieee9 hardbox \
+	$ mess pet8032 -ieee:c8050:ieee hardbox \
 				   -hard1 /path/to/corvus20mb.chd \
 				   -flop1 /path/to/hardbox-utils.d80
 	
@@ -132,24 +132,13 @@ WRITE8_MEMBER( hardbox_device::ppi0_pb_w )
 	m_bus->dio_w(this, data ^ 0xff);
 }
 
-READ8_MEMBER( hardbox_device::ppi0_pc_r )
-{
-    UINT8 data = ioport("SW1")->read();
-
-	/* DIP switches on PC1,PC2,PC3 configure the IEEE-488 primary address.  
-	   We get the address from m_address instead. */
-    data |= ((m_address - 8) << 1) ^ 0xff;
-
-	return data;
-}
-
 static I8255A_INTERFACE( ppi0_intf )
 {
 	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, hardbox_device, ppi0_pa_r),
 	DEVCB_NULL, // Port A write
 	DEVCB_NULL, // Port B read
 	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, hardbox_device, ppi0_pb_w),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, hardbox_device, ppi0_pc_r),
+	DEVCB_INPUT_PORT("SW1"), // Port C read
 	DEVCB_NULL  // Port C write
 };
 
@@ -294,6 +283,8 @@ static MACHINE_CONFIG_FRAGMENT( hardbox )
 	MCFG_HARDDISK_ADD("harddisk2")
 	MCFG_HARDDISK_ADD("harddisk3")
 	MCFG_HARDDISK_ADD("harddisk4")
+
+	MCFG_IEEE488_SLOT_ADD("ieee", cbm_ieee488_devices, NULL)
 MACHINE_CONFIG_END
 
 
@@ -315,10 +306,15 @@ machine_config_constructor hardbox_device::device_mconfig_additions() const
 INPUT_PORTS_START( hardbox )
 	PORT_START("SW1")
 	PORT_DIPUNKNOWN_DIPLOC( 0x01, IP_ACTIVE_LOW, "SW1:1" )
-
-    /* SW1:2,3,4 are missing intentionally.  These switches would control
-       IEEE-488 primary address.  See the note in hardbox_device::ppi0_pc_r. */
-
+	PORT_DIPNAME( 0x0e, 0x0c, "Device Address" ) PORT_DIPLOCATION("SW1:2,3,4")
+	PORT_DIPSETTING(    0x0e, "8" )
+	PORT_DIPSETTING(    0x0c, "9" )
+	PORT_DIPSETTING(    0x0a, "10" )
+	PORT_DIPSETTING(    0x08, "11" )
+	PORT_DIPSETTING(    0x06, "12" )
+	PORT_DIPSETTING(    0x04, "13" )
+	PORT_DIPSETTING(    0x02, "14" )
+	PORT_DIPSETTING(    0x00, "15" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x10, IP_ACTIVE_LOW, "SW1:5" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, IP_ACTIVE_LOW, "SW1:6" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x40, IP_ACTIVE_LOW, "SW1:7" )
