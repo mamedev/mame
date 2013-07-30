@@ -139,7 +139,6 @@
 
 #define VERBOSE_PRINTF 0
 #define VERBOSE_LOGERROR 0
-#define LOG_TYPE printf
 
 #define LOG0(x) do { if (VERBOSE_PRINTF >= 1) printf x; logerror x; } while (0)
 #define LOG1(x) do { if (VERBOSE_PRINTF >= 1) printf x; if (VERBOSE_LOGERROR >= 1) logerror x; } while (0)
@@ -342,7 +341,7 @@ int eeprom_serial_base_device::base_do_read()
 int eeprom_serial_base_device::base_ready_read()
 {
 	// ready by default, except during long operations
-	int result = (m_state == STATE_WAIT_FOR_START_BIT && !ready()) ? CLEAR_LINE : ASSERT_LINE;
+	int result = ready() ? ASSERT_LINE : CLEAR_LINE;
 	LOG3(("  ready_read(%d)\n", result));
 	return result;
 }
@@ -691,7 +690,7 @@ void eeprom_serial_93cxx_device::parse_command_and_address()
 //  do_read - read handlers
 //-------------------------------------------------
 
-READ_LINE_MEMBER(eeprom_serial_93cxx_device::do_read) { return base_do_read() & base_ready_read(); }
+READ_LINE_MEMBER(eeprom_serial_93cxx_device::do_read) { return base_do_read() & ((m_state == STATE_WAIT_FOR_START_BIT) ? base_ready_read() : 1); }
 
 
 //-------------------------------------------------

@@ -1140,8 +1140,8 @@ ROM_START( gticlub ) /* Euro version EAA - Reports: GTI CLUB(TM) System ver 1.00
 	ROM_LOAD64_WORD( "688a15.9d",  0x000004, 0x200000, CRC(8aadee51) SHA1(be9020a47583da9d4ff586d227836dc5b7dc31f0) )
 	ROM_LOAD64_WORD( "688a16.4d",  0x000006, 0x200000, CRC(7f4e1893) SHA1(585be7b31ab7a48300c22b00443b00d631f4c49d) )
 
-	ROM_REGION16_BE( 0x200, "eeprom", 0 )
-	ROM_LOAD( "gticlub.nv", 0x0000, 0x0200, CRC(eca78a49) SHA1(3dcaccc4bee58f7ff5d6ecae551887cc967deaf7) )
+	ROM_REGION16_BE( 0x100, "eeprom", 0 )
+	ROM_LOAD( "gticlub.nv", 0x0000, 0x0100, CRC(eca78a49) SHA1(3dcaccc4bee58f7ff5d6ecae551887cc967deaf7) )
 ROM_END
 
 ROM_START( gticlubu ) /* USA version UAA - Reports: GTI CLUB(TM) System ver 1.02(USA) */
@@ -1170,8 +1170,8 @@ ROM_START( gticlubu ) /* USA version UAA - Reports: GTI CLUB(TM) System ver 1.02
 	ROM_LOAD64_WORD( "688a15.9d",  0x000004, 0x200000, CRC(8aadee51) SHA1(be9020a47583da9d4ff586d227836dc5b7dc31f0) )
 	ROM_LOAD64_WORD( "688a16.4d",  0x000006, 0x200000, CRC(7f4e1893) SHA1(585be7b31ab7a48300c22b00443b00d631f4c49d) )
 
-	ROM_REGION16_BE( 0x200, "eeprom", 0 )
-	ROM_LOAD( "gticlub.nv", 0x0000, 0x0200, CRC(eca78a49) SHA1(3dcaccc4bee58f7ff5d6ecae551887cc967deaf7) )
+	ROM_REGION16_BE( 0x100, "eeprom", 0 )
+	ROM_LOAD( "gticlub.nv", 0x0000, 0x0100, CRC(eca78a49) SHA1(3dcaccc4bee58f7ff5d6ecae551887cc967deaf7) )
 ROM_END
 
 ROM_START( gticluba ) /* Asia version AAA - Reports: GTI CLUB(TM) System ver 1.00(ASI) */
@@ -1200,8 +1200,8 @@ ROM_START( gticluba ) /* Asia version AAA - Reports: GTI CLUB(TM) System ver 1.0
 	ROM_LOAD64_WORD( "688a15.9d",  0x000004, 0x200000, CRC(8aadee51) SHA1(be9020a47583da9d4ff586d227836dc5b7dc31f0) )
 	ROM_LOAD64_WORD( "688a16.4d",  0x000006, 0x200000, CRC(7f4e1893) SHA1(585be7b31ab7a48300c22b00443b00d631f4c49d) )
 
-	ROM_REGION16_BE( 0x200, "eeprom", 0 )
-	ROM_LOAD( "gticlub.nv", 0x0000, 0x0200, CRC(eca78a49) SHA1(3dcaccc4bee58f7ff5d6ecae551887cc967deaf7) )
+	ROM_REGION16_BE( 0x100, "eeprom", 0 )
+	ROM_LOAD( "gticlub.nv", 0x0000, 0x0100, CRC(eca78a49) SHA1(3dcaccc4bee58f7ff5d6ecae551887cc967deaf7) )
 ROM_END
 
 ROM_START( gticlubj ) /* Japan version JAA - Reports: GTI CLUB(TM) System ver 1.00(JPN) */
@@ -1230,8 +1230,8 @@ ROM_START( gticlubj ) /* Japan version JAA - Reports: GTI CLUB(TM) System ver 1.
 	ROM_LOAD64_WORD( "688a15.9d",  0x000004, 0x200000, CRC(8aadee51) SHA1(be9020a47583da9d4ff586d227836dc5b7dc31f0) )
 	ROM_LOAD64_WORD( "688a16.4d",  0x000006, 0x200000, CRC(7f4e1893) SHA1(585be7b31ab7a48300c22b00443b00d631f4c49d) )
 
-	ROM_REGION16_BE( 0x200, "eeprom", 0 )
-	ROM_LOAD( "gticlub.nv", 0x0000, 0x0200, CRC(eca78a49) SHA1(3dcaccc4bee58f7ff5d6ecae551887cc967deaf7) )
+	ROM_REGION16_BE( 0x100, "eeprom", 0 )
+	ROM_LOAD( "gticlub.nv", 0x0000, 0x0100, CRC(eca78a49) SHA1(3dcaccc4bee58f7ff5d6ecae551887cc967deaf7) )
 ROM_END
 
 ROM_START( thunderh ) /* Euro version EAA */
@@ -1320,8 +1320,8 @@ ROM_START( slrasslt ) /* USA version UAA */
 	ROM_LOAD64_WORD( "792a15.9d",  0x000004, 0x200000, CRC(1c5531cb) SHA1(1b514f181c92e16d07bfe4719604f1e4caf15377) )
 	ROM_LOAD64_WORD( "792a16.4d",  0x000006, 0x200000, CRC(df89e392) SHA1(af37c5460d43bf8d8a1ab4213c4528083a7363c2) )
 
-	ROM_REGION16_BE(0x200, "eeprom", 0) /* default eeprom with magic number */
-	ROM_LOAD16_WORD( "eeprom-slrasslt.bin", 0x0000, 0x0200, CRC(924b4ed8) SHA1(247bf0c1394cbab3af03c26b9c016302b9b5723c) )
+	ROM_REGION16_BE(0x100, "eeprom", 0) /* default eeprom with magic number */
+	ROM_LOAD16_WORD( "eeprom-slrasslt.bin", 0x0000, 0x0100, CRC(924b4ed8) SHA1(247bf0c1394cbab3af03c26b9c016302b9b5723c) )
 ROM_END
 
 ROM_START( hangplt ) /* Japan version JAB */
@@ -1346,8 +1346,8 @@ ROM_START( hangplt ) /* Japan version JAB */
 	ROM_LOAD32_WORD( "685a13.4w",  0x000002, 0x400000, CRC(06329af4) SHA1(76cad9db604751ce48bb67bfd29e57bac0ee9a16) )
 	ROM_LOAD32_WORD( "685a14.12w", 0x000000, 0x400000, CRC(87437739) SHA1(0d45637af40938a54d5efd29c125b0fafd55f9a4) )
 
-	ROM_REGION16_BE( 0x200, "eeprom", 0 )
-	ROM_LOAD( "hangplt.nv", 0x0000, 0x0200, CRC(35f482c8) SHA1(445918156770449dce1a010aab9d310f15670092) )
+	ROM_REGION16_BE( 0x100, "eeprom", 0 )
+	ROM_LOAD( "hangplt.nv", 0x0000, 0x0100, CRC(35f482c8) SHA1(445918156770449dce1a010aab9d310f15670092) )
 ROM_END
 
 ROM_START( hangpltu ) /* USA version UAA */
@@ -1372,8 +1372,8 @@ ROM_START( hangpltu ) /* USA version UAA */
 	ROM_LOAD32_WORD( "685a13.4w",  0x000002, 0x400000, CRC(06329af4) SHA1(76cad9db604751ce48bb67bfd29e57bac0ee9a16) )
 	ROM_LOAD32_WORD( "685a14.12w", 0x000000, 0x400000, CRC(87437739) SHA1(0d45637af40938a54d5efd29c125b0fafd55f9a4) )
 
-	ROM_REGION16_BE( 0x200, "eeprom", 0 )
-	ROM_LOAD( "hangpltu.nv", 0x0000, 0x0200, CRC(8d74baf0) SHA1(297c0a064c6f8f8281d566629d896b49c6e85096) )
+	ROM_REGION16_BE( 0x100, "eeprom", 0 )
+	ROM_LOAD( "hangpltu.nv", 0x0000, 0x0100, CRC(8d74baf0) SHA1(297c0a064c6f8f8281d566629d896b49c6e85096) )
 ROM_END
 
 
