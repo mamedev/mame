@@ -156,7 +156,7 @@ private:
 	/* TODO/NOTE: the current interpolation period, counts 1,2,3,4,5,6,7,0 for divide by 8,8,8,4,4,2,2,1 */
 	UINT8 m_IP;               /* the current interpolation period */
 	UINT8 m_inhibit;          /* If 1, interpolation is inhibited until the DIV1 period */
-	UINT8 m_tms5220c_rate;    /* only relevant for tms5220C's multi frame rate feature; is the actual 4 bit value written on a 0x2* or 0x0* command */
+	UINT8 m_c_variant_rate;    /* only relevant for tms5220C's multi frame rate feature; is the actual 4 bit value written on a 0x2* or 0x0* command */
 	UINT16 m_pitch_count;     /* pitch counter; provides chirp rom address */
 
 	INT32 m_u[11];
@@ -216,16 +216,16 @@ protected:
 
 extern const device_type TMS5220C;
 
-class tmc0285_device : public tms5220_device
+class cd2501e_device : public tms5220_device
 {
 public:
-	tmc0285_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cd2501e_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 protected:
 	// device-level overrides
 	virtual void device_start();
 };
 
-extern const device_type TMC0285;
+extern const device_type CD2501E;
 
 class tms5200_device : public tms5220_device
 {
@@ -237,5 +237,16 @@ protected:
 };
 
 extern const device_type TMS5200;
+
+class cd2501ecd_device : public tms5220_device
+{
+public:
+	cd2501ecd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+protected:
+	// device-level overrides
+	virtual void device_start();
+};
+
+extern const device_type CD2501ECD;
 
 #endif

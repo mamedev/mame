@@ -41,7 +41,7 @@ protected:
 	virtual void            device_config_complete();
 
 private:
-	tmc0285_device *m_vsp;
+	cd2501e_device *m_vsp;
 };
 
 #endif

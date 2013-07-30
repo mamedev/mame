@@ -7,8 +7,9 @@
     right side of the console. In order to be used with Geneve and SGCPU, the
     speech synthesizer must be moved into the Peripheral Box.
 
-    The Speech Synthesizer used for the TI was the TMS5200, aka TMC0285, a
-    predecessor of the TMS5220 which was used in other commercial products.
+    The Speech Synthesizer used for the TI was the CD2501E, AKA TMS5200,
+	(internal name TMC0285), a predecessor of the TMS5220 which was used in
+	other commercial products.
 
     Note that this adapter also contains the speech roms.
 
@@ -166,7 +167,7 @@ void ti_speech_synthesizer_device::device_start()
 
 void ti_speech_synthesizer_device::device_config_complete()
 {
-	m_vsp = subdevice<tmc0285_device>("speechsyn");
+	m_vsp = subdevice<cd2501e_device>("speechsyn");
 }
 
 void ti_speech_synthesizer_device::device_reset()
@@ -187,7 +188,7 @@ MACHINE_CONFIG_FRAGMENT( ti99_speech )
 	MCFG_DEVICE_ADD("vsm", SPEECHROM, 0)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speechsyn", TMC0285, 640000L)
+	MCFG_SOUND_ADD("speechsyn", CD2501E, 640000L)
 	MCFG_TMS52XX_READYQ_HANDLER(WRITELINE(ti_speech_synthesizer_device, speech_ready))
 	MCFG_TMS52XX_SPEECHROM("vsm")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -195,7 +196,11 @@ MACHINE_CONFIG_END
 
 ROM_START( ti99_speech )
 	ROM_REGION(0x8000, "vsm", 0)
+	// Note: the following line is actually wrong; the speech roms in the ti 99/4a and 99/8 are two VSM roms labeled CD2325A and CD2326A, and contain the same data as the following line rom does, but with the byte bit order reversed. This bit ordering issue needs to be fixed elsewhere in the code here before the original/real roms can be used.
 	ROM_LOAD_OPTIONAL("spchrom.bin", 0x0000, 0x8000, CRC(58b155f7) SHA1(382292295c00dff348d7e17c5ce4da12a1d87763)) /* system speech ROM */
+	// correct lines are:
+	// ROM_LOAD_OPTIONAL("cd2325a.u2a", 0x0000, 0x4000, CRC(1f58b571) SHA1(0ef4f178716b575a1c0c970c56af8a8d97561ffe)) // at location u2, bottom of stack
+	// ROM_LOAD_OPTIONAL("cd2326a.u2b", 0x4000, 0x4000, CRC(65d00401) SHA1(a367242c2c96cebf0e2bf21862f3f6734b2b3020)) // at location u2, top of stack
 ROM_END
 
 machine_config_constructor ti_speech_synthesizer_device::device_mconfig_additions() const

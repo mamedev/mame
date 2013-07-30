@@ -123,12 +123,14 @@ void ti998_spsyn_device::device_reset()
 	if (VERBOSE>4) LOG("speech8: reset\n");
 }
 
-// Unlike the TI-99/4A, the 99/8 uses the TMS5220C
+// Unlike the TI-99/4A, the 99/8 uses the CD2501ECD
+// The CD2501ECD is a tms5200/cd2501e with the rate control from the tms5220c added in.
+// (it's probably actually a tms5220c die with the cd2501e/tms5200 lpc rom masked onto it)
 MACHINE_CONFIG_FRAGMENT( ti998_speech )
 	MCFG_DEVICE_ADD("vsm", SPEECHROM, 0)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(SPEECHSYN_TAG, TMS5220C, 640000L)
+	MCFG_SOUND_ADD(SPEECHSYN_TAG, CD2501ECD, 640000L)
 	MCFG_TMS52XX_READYQ_HANDLER(WRITELINE(ti998_spsyn_device, speech8_ready))
 	MCFG_TMS52XX_SPEECHROM("vsm")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -138,7 +140,11 @@ MACHINE_CONFIG_END
    as the TI speech synthesizer. */
 ROM_START( ti998_speech )
 	ROM_REGION(0x8000, "vsm", 0)
+	// Note: the following line is actually wrong; the speech roms in the ti 99/4a and 99/8 are two VSM roms labeled CD2325A and CD2326A, and contain the same data as the following line rom does, but with the byte bit order reversed. This bit ordering issue needs to be fixed elsewhere in the code here before the original/real roms can be used.
 	ROM_LOAD_OPTIONAL("spchrom.bin", 0x0000, 0x8000, CRC(58b155f7) SHA1(382292295c00dff348d7e17c5ce4da12a1d87763)) /* system speech ROM */
+	// correct lines are:
+	// ROM_LOAD_OPTIONAL("cd2325a.vsm", 0x0000, 0x4000, CRC(1f58b571) SHA1(0ef4f178716b575a1c0c970c56af8a8d97561ffe))
+	// ROM_LOAD_OPTIONAL("cd2326a.vsm", 0x4000, 0x4000, CRC(65d00401) SHA1(a367242c2c96cebf0e2bf21862f3f6734b2b3020))
 ROM_END
 
 machine_config_constructor ti998_spsyn_device::device_mconfig_additions() const
