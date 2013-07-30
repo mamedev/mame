@@ -26,6 +26,18 @@ public:
 		return 0;
 	}
 
+
+	DECLARE_READ16_MEMBER( unk_casanova_28x_r ) { return 0x0000; }
+
+	DECLARE_WRITE16_MEMBER( unk_casanova_40x_w ) { }
+	DECLARE_WRITE16_MEMBER( unk_casanova_48x_w ) { }
+
+
+	DECLARE_READ16_MEMBER( unk_casanova_50x_r ) { return 0x0000; }
+	DECLARE_READ16_MEMBER( unk_casanova_58x_r ) { return 0x0000; }
+	DECLARE_READ16_MEMBER( unk_casanova_60x_r ) { return 0x0000; }
+
+	DECLARE_WRITE16_MEMBER( unk_casanova_80x_w ) { }
 };
 
 
@@ -33,7 +45,25 @@ public:
 static ADDRESS_MAP_START( casanova_map, AS_PROGRAM, 16, casanova_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
+	AM_RANGE(0x200000, 0x202fff) AM_RAM // tilemaps
+
+	AM_RANGE(0x280000, 0x280001) AM_READ(unk_casanova_28x_r)
+
+	AM_RANGE(0x300000, 0x3005ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
+
+	AM_RANGE(0x400000, 0x400001) AM_WRITE(unk_casanova_40x_w)
+	AM_RANGE(0x480000, 0x480001) AM_WRITE(unk_casanova_48x_w)
+
+	AM_RANGE(0x500000, 0x500001) AM_READ(unk_casanova_50x_r)
+	AM_RANGE(0x580000, 0x580001) AM_READ(unk_casanova_58x_r)
+	AM_RANGE(0x600000, 0x600001) AM_READ(unk_casanova_60x_r)
+
+	AM_RANGE(0x800000, 0x800001) AM_WRITE(unk_casanova_80x_w)
+
 ADDRESS_MAP_END
+
+
+
 
 
 static INPUT_PORTS_START( casanova )
@@ -74,7 +104,7 @@ static MACHINE_CONFIG_START( casanova, casanova_state )
 
 	MCFG_CPU_ADD("maincpu", M68000, 10000000 )
 	MCFG_CPU_PROGRAM_MAP(casanova_map)
-//	MCFG_CPU_VBLANK_INT_DRIVER("screen", casanova_state,  irq1_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", casanova_state,  irq4_line_hold)
 
 	MCFG_GFXDECODE(casanova)
 
@@ -85,7 +115,7 @@ static MACHINE_CONFIG_START( casanova, casanova_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(casanova_state, screen_update_casanova)
 
-	MCFG_PALETTE_LENGTH(0x200)
+	MCFG_PALETTE_LENGTH(0x300)
 
 
 //	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
