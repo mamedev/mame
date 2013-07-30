@@ -1,3 +1,7 @@
+#include "sound/okiadpcm.h"
+
+class mjkjidai_adpcm_device;
+
 class mjkjidai_state : public driver_device
 {
 public:
@@ -8,13 +12,17 @@ public:
 		m_spriteram2(*this, "spriteram2"),
 		m_spriteram3(*this, "spriteram3"),
 		m_videoram(*this, "videoram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_mjk_adpcm(*this, "adpcm") { }
 
 	required_shared_ptr<UINT8> m_nvram;
 	required_shared_ptr<UINT8> m_spriteram1;
 	required_shared_ptr<UINT8> m_spriteram2;
 	required_shared_ptr<UINT8> m_spriteram3;
 	required_shared_ptr<UINT8> m_videoram;
+	
+	required_device<cpu_device> m_maincpu;
+	required_device<mjkjidai_adpcm_device> m_mjk_adpcm;
 
 	int m_keyb;
 	int m_nvram_init_count;
@@ -32,5 +40,33 @@ public:
 	UINT32 screen_update_mjkjidai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
 };
+
+class mjkjidai_adpcm_device : public device_t,
+									public device_sound_interface
+{
+public:
+	mjkjidai_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~mjkjidai_adpcm_device() {}
+	
+	void mjkjidai_adpcm_play (int offset, int length);
+
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+private:
+	// internal state
+	oki_adpcm_state m_adpcm;
+	sound_stream *m_stream;
+	UINT32 m_current;
+	UINT32 m_end;
+	UINT8 m_nibble;
+	UINT8 m_playing;
+	UINT8 *m_base;
+};
+
+extern const device_type MJKJIDAI;

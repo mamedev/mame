@@ -1,4 +1,5 @@
 #include "audio/dsbz80.h"
+#include "sound/multipcm.h"
 
 typedef void (*tgp_func)(running_machine &machine);
 
@@ -12,6 +13,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_multipcm_1(*this, "sega1"),
+		m_multipcm_2(*this, "sega2"),
 		m_dsbz80(*this, DSBZ80_TAG),
 		m_mr2(*this, "mr2"),
 		m_mr(*this, "mr"),
@@ -21,6 +24,8 @@ public:
 
 	required_device<cpu_device> m_maincpu;      // V60
 	required_device<cpu_device> m_audiocpu;     // sound 68000
+	required_device<multipcm_device> m_multipcm_1;
+	required_device<multipcm_device> m_multipcm_2;
 	optional_device<dsbz80_device> m_dsbz80;    // Digital Sound Board
 
 	required_shared_ptr<UINT16> m_mr2;

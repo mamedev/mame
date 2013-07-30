@@ -1,4 +1,8 @@
+#include "sound/okiadpcm.h"
+
 #define MCU_BUFFER_MAX 6
+
+class renegade_adpcm_device;
 
 class renegade_state : public driver_device
 {
@@ -81,3 +85,33 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	optional_device<cpu_device> m_mcu;
 };
+
+class renegade_adpcm_device : public device_t,
+									public device_sound_interface
+{
+public:
+	renegade_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~renegade_adpcm_device() {}
+
+	DECLARE_WRITE8_MEMBER(play_w);
+
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+
+private:
+	// internal state
+	oki_adpcm_state m_adpcm;
+	sound_stream *m_stream;
+	UINT32 m_current;
+	UINT32 m_end;
+	UINT8 m_nibble;
+	UINT8 m_playing;
+	UINT8 *m_base;
+};
+
+extern const device_type RENEGADE_ADPCM;

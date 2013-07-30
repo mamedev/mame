@@ -61,6 +61,14 @@ exidy440_sound_device::exidy440_sound_device(const machine_config &mconfig, cons
 		m_m6844_chain(0x00),
 		m_stream(NULL)
 {
+	m_sound_banks[0] = m_sound_banks[1] = m_sound_banks[2] = m_sound_banks[3] = 0;
+	
+	for (int i = 0; i < 4; i++)
+	{
+		m_sound_channel[i].base = NULL;
+		m_sound_channel[i].offset = 0;
+		m_sound_channel[i].remaining = 0;
+	}
 }
 
 //-------------------------------------------------
@@ -100,7 +108,7 @@ void exidy440_sound_device::device_start()
 	save_item(NAME(m_m6844_priority));
 	save_item(NAME(m_m6844_interrupt));
 	save_item(NAME(m_m6844_chain));
-
+	
 	m_channel_frequency[0] = clock();   /* channels 0 and 1 are run by FCLK */
 	m_channel_frequency[1] = clock();
 	m_channel_frequency[2] = clock()/2; /* channels 2 and 3 are run by SCLK */

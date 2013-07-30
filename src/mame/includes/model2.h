@@ -1,6 +1,7 @@
 #include "video/poly.h"
 #include "audio/dsbz80.h"
 #include "machine/eepromser.h"
+#include "sound/multipcm.h"
 
 struct raster_state;
 struct geo_state;
@@ -11,7 +12,6 @@ class model2_state : public driver_device
 public:
 	model2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu"),
 		m_workram(*this, "workram"),
 		m_bufferram(*this, "bufferram"),
 		m_paletteram32(*this, "paletteram32"),
@@ -20,15 +20,17 @@ public:
 		m_textureram1(*this, "textureram1"),
 		m_lumaram(*this, "lumaram"),
 		m_soundram(*this, "soundram"),
-		m_dsbz80(*this, DSBZ80_TAG),
 		m_tgp_program(*this, "tgp_program"),
+		m_maincpu(*this,"maincpu"),
+		m_dsbz80(*this, DSBZ80_TAG),
 		m_audiocpu(*this, "audiocpu"),
+		m_multipcm_1(*this, "sega1"),
+		m_multipcm_2(*this, "sega2"),
 		m_tgp(*this, "tgp"),
 		m_dsp(*this, "dsp"),
 		m_drivecpu(*this, "drivecpu"),
 		m_eeprom(*this, "eeprom") { }
 
-	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT32> m_workram;
 	required_shared_ptr<UINT32> m_bufferram;
 	required_shared_ptr<UINT32> m_paletteram32;
@@ -37,8 +39,17 @@ public:
 	required_shared_ptr<UINT32> m_textureram1;
 	required_shared_ptr<UINT32> m_lumaram;
 	optional_shared_ptr<UINT16> m_soundram;
-	optional_device<dsbz80_device> m_dsbz80;    // Z80-based MPEG Digital Sound Board
 	optional_shared_ptr<UINT32> m_tgp_program;
+	
+	required_device<cpu_device> m_maincpu;
+	optional_device<dsbz80_device> m_dsbz80;    // Z80-based MPEG Digital Sound Board
+	required_device<cpu_device> m_audiocpu;
+	optional_device<multipcm_device> m_multipcm_1;
+	optional_device<multipcm_device> m_multipcm_2;
+	optional_device<cpu_device> m_tgp;
+	optional_device<cpu_device> m_dsp;
+	optional_device<cpu_device> m_drivecpu;
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
 
 	UINT32 m_intreq;
 	UINT32 m_intena;
@@ -176,11 +187,6 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(model2c_interrupt);
 	void model2_exit();
 	DECLARE_WRITE_LINE_MEMBER(scsp_irq);
-	required_device<cpu_device> m_audiocpu;
-	optional_device<cpu_device> m_tgp;
-	optional_device<cpu_device> m_dsp;
-	optional_device<cpu_device> m_drivecpu;
-	required_device<eeprom_serial_93cxx_device> m_eeprom;
 };
 
 /*----------- defined in video/model2.c -----------*/

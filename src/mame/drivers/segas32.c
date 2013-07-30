@@ -338,7 +338,6 @@ orunners:  Interleaved with the dj and << >> buttons is the data the drives the 
 #include "machine/eepromser.h"
 #include "sound/2612intf.h"
 #include "sound/rf5c68.h"
-#include "sound/multipcm.h"
 
 #include "radr.lh"
 
@@ -1133,15 +1132,13 @@ WRITE8_MEMBER(segas32_state::sound_bank_hi_w)
 
 WRITE8_MEMBER(segas32_state::multipcm_bank_w)
 {
-	device_t *device = machine().device("sega");
-	multipcm_set_bank(device, 0x80000 * ((data >> 3) & 7), 0x80000 * (data & 7));
+	m_multipcm->set_bank(0x80000 * ((data >> 3) & 7), 0x80000 * (data & 7));
 }
 
 
 WRITE8_MEMBER(segas32_state::scross_bank_w)
 {
-	multipcm_device *multipcm = machine().device<multipcm_device>("sega");
-	multipcm_set_bank(multipcm, 0x80000 * (data & 7), 0x80000 * (data & 7));
+	m_multipcm->set_bank(0x80000 * (data & 7), 0x80000 * (data & 7));
 }
 
 
@@ -1243,7 +1240,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( multi32_sound_map, AS_PROGRAM, 8, segas32_state )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM AM_REGION("soundcpu", 0x100000)
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xdfff) AM_DEVREADWRITE_LEGACY("sega", multipcm_r, multipcm_w)
+	AM_RANGE(0xc000, 0xdfff) AM_DEVREADWRITE("sega", multipcm_device, read, write)
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("z80_shared_ram")
 ADDRESS_MAP_END
 

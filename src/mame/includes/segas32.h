@@ -5,6 +5,7 @@
 ***************************************************************************/
 
 #include "machine/eepromser.h"
+#include "sound/multipcm.h"
 
 
 class segas32_state : public driver_device
@@ -20,6 +21,7 @@ public:
 		m_system32_paletteram(*this,"paletteram", 0) ,
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
+		m_multipcm(*this, "sega"),
 		m_eeprom(*this, "eeprom") { }
 
 	required_shared_ptr<UINT8> m_z80_shared_ram;
@@ -27,6 +29,12 @@ public:
 	optional_shared_ptr<UINT16> m_system32_workram;
 	required_shared_ptr<UINT16> m_system32_videoram;
 	required_shared_ptr<UINT16> m_system32_spriteram;
+	optional_shared_ptr_array<UINT16, 2> m_system32_paletteram;
+	
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_soundcpu;
+	optional_device<multipcm_device> m_multipcm;
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
 
 	typedef void (segas32_state::*sys32_output_callback)(int which, UINT16 data);
 
@@ -68,7 +76,6 @@ public:
 	sys32_output_callback m_sw3_output;
 	UINT16* m_dual_pcb_comms;
 	UINT16 *m_system32_protram;
-	optional_shared_ptr_array<UINT16, 2> m_system32_paletteram;
 	UINT16 m_system32_displayenable[2];
 	UINT16 m_system32_tilebank_external;
 	UINT16 m_arescue_dsp_io[6];
@@ -252,9 +259,6 @@ public:
 	void update_bitmap(screen_device &screen, struct layer_info *layer, const rectangle &cliprect);
 	void update_background(struct layer_info *layer, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(ym3438_irq_handler);
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_soundcpu;
-	required_device<eeprom_serial_93cxx_device> m_eeprom;
 };
 
 /*----------- defined in machine/segas32.c -----------*/

@@ -642,31 +642,15 @@ WRITE_LINE_MEMBER(ninjaw_state::irqhandler)
 /**************************************************************
                  SUBWOOFER (SOUND)
 **************************************************************/
-
 #if 0
-static DEVICE_START( subwoofer )
-{
-	/* Adjust the lowpass filter of the first three YM2610 channels */
-
-	/* The 150 Hz is a common top frequency played by a generic */
-	/* subwoofer, the real Arcade Machine may differs */
-
-	mixer_set_lowpass_frequency(0, 20);
-	mixer_set_lowpass_frequency(1, 20);
-	mixer_set_lowpass_frequency(2, 20);
-
-	return 0;
-}
 
 class subwoofer_device : public device_t,
 									public device_sound_interface
 {
 public:
 	subwoofer_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~subwoofer_device() { global_free(m_token); }
+	~subwoofer_device() {}
 
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -674,9 +658,10 @@ protected:
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+
 private:
 	// internal state
-	void *m_token;
+
 };
 
 extern const device_type SUBWOOFER;
@@ -687,7 +672,6 @@ subwoofer_device::subwoofer_device(const machine_config &mconfig, const char *ta
 	: device_t(mconfig, SUBWOOFER, "Subwoofer", tag, owner, clock),
 		device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof());
 }
 
 //-------------------------------------------------
@@ -706,7 +690,16 @@ void subwoofer_device::device_config_complete()
 
 void subwoofer_device::device_start()
 {
-	DEVICE_START_NAME( subwoofer )(this);
+	/* Adjust the lowpass filter of the first three YM2610 channels */
+
+	/* The 150 Hz is a common top frequency played by a generic */
+	/* subwoofer, the real Arcade Machine may differs */
+
+	mixer_set_lowpass_frequency(0, 20);
+	mixer_set_lowpass_frequency(1, 20);
+	mixer_set_lowpass_frequency(2, 20);
+
+	return 0;
 }
 
 //-------------------------------------------------
@@ -715,8 +708,6 @@ void subwoofer_device::device_start()
 
 void subwoofer_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	// should never get here
-	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
 
 

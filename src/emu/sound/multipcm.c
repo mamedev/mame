@@ -33,79 +33,11 @@
 
 #include "emu.h"
 #include "multipcm.h"
-#include "devlegcy.h"
 
 //????
 #define MULTIPCM_CLOCKDIV       (180.0)
 
-struct Sample_t
-{
-	unsigned int Start;
-	unsigned int Loop;
-	unsigned int End;
-	unsigned char AR,DR1,DR2,DL,RR;
-	unsigned char KRS;
-	unsigned char LFOVIB;
-	unsigned char AM;
-};
-
-enum STATE {ATTACK,DECAY1,DECAY2,RELEASE};
 ALLOW_SAVE_TYPE(STATE); // allow save_item on a non-fundamental type
-struct EG_t
-{
-	int volume; //
-	STATE state;
-	int step;
-	//step vals
-	int AR;     //Attack
-	int D1R;    //Decay1
-	int D2R;    //Decay2
-	int RR;     //Release
-	int DL;     //Decay level
-};
-
-struct LFO_t
-{
-	unsigned short phase;
-	UINT32 phase_step;
-	int *table;
-	int *scale;
-};
-
-
-struct SLOT
-{
-	unsigned char Num;
-	unsigned char Regs[8];
-	int Playing;
-	Sample_t *Sample;
-	unsigned int Base;
-	unsigned int offset;
-	unsigned int step;
-	unsigned int Pan,TL;
-	unsigned int DstTL;
-	int TLStep;
-	signed int Prev;
-	EG_t EG;
-	LFO_t PLFO; //Phase lfo
-	LFO_t ALFO; //AM lfo
-};
-
-struct MultiPCM
-{
-	sound_stream * stream;
-	Sample_t Samples[0x200];        //Max 512 samples
-	SLOT Slots[28];
-	unsigned int CurSlot;
-	unsigned int Address;
-	unsigned int BankR,BankL;
-	float Rate;
-	INT8 *ROM;
-	//I include these in the chip because they depend on the chip clock
-	unsigned int ARStep[0x40],DRStep[0x40]; //Envelope step table
-	unsigned int FNS_Table[0x400];      //Frequency step table
-};
-
 
 static signed int LPANTABLE[0x800],RPANTABLE[0x800];
 
@@ -126,12 +58,6 @@ static const int val2chan[] =
 #define MULTIPCM_RATE   44100.0
 
 
-INLINE MultiPCM *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == MULTIPCM);
-	return (MultiPCM *)downcast<multipcm_device *>(device)->token();
-}
 
 
 /*******************************
@@ -202,7 +128,7 @@ static unsigned int Get_RATE(unsigned int *Steps,unsigned int rate,unsigned int 
 	return Steps[r];
 }
 
-static void EG_Calc(MultiPCM *ptChip,SLOT *slot)
+void multipcm_device::EG_Calc(SLOT *slot)
 {
 	int octave=((slot->Regs[3]>>4)-1)&0xf;
 	int rate;
@@ -212,10 +138,10 @@ static void EG_Calc(MultiPCM *ptChip,SLOT *slot)
 	else
 		rate=0;
 
-	slot->EG.AR=Get_RATE(ptChip->ARStep,rate,slot->Sample->AR);
-	slot->EG.D1R=Get_RATE(ptChip->DRStep,rate,slot->Sample->DR1);
-	slot->EG.D2R=Get_RATE(ptChip->DRStep,rate,slot->Sample->DR2);
-	slot->EG.RR=Get_RATE(ptChip->DRStep,rate,slot->Sample->RR);
+	slot->EG.AR=Get_RATE(m_ARStep,rate,slot->Sample->AR);
+	slot->EG.D1R=Get_RATE(m_DRStep,rate,slot->Sample->DR1);
+	slot->EG.D2R=Get_RATE(m_DRStep,rate,slot->Sample->DR2);
+	slot->EG.RR=Get_RATE(m_DRStep,rate,slot->Sample->RR);
 	slot->EG.DL=0xf-slot->Sample->DL;
 
 }
@@ -302,9 +228,9 @@ INLINE signed int ALFO_Step(LFO_t *LFO)
 	return p<<(SHIFT-LFO_SHIFT);
 }
 
-static void LFO_ComputeStep(MultiPCM *ptChip,LFO_t *LFO,UINT32 LFOF,UINT32 LFOS,int ALFO)
+void multipcm_device::LFO_ComputeStep(LFO_t *LFO,UINT32 LFOF,UINT32 LFOS,int ALFO)
 {
-	float step=(float) LFOFreq[LFOF]*256.0/(float) ptChip->Rate;
+	float step=(float) LFOFreq[LFOF]*256.0/(float) m_Rate;
 	LFO->phase_step=(unsigned int) ((float) (1<<LFO_SHIFT)*step);
 	if(ALFO)
 	{
@@ -320,7 +246,7 @@ static void LFO_ComputeStep(MultiPCM *ptChip,LFO_t *LFO,UINT32 LFOF,UINT32 LFOS,
 
 
 
-static void WriteSlot(MultiPCM *ptChip,SLOT *slot,int reg,unsigned char data)
+void multipcm_device::WriteSlot(SLOT *slot,int reg,unsigned char data)
 {
 	slot->Regs[reg]=data;
 
@@ -333,9 +259,9 @@ static void WriteSlot(MultiPCM *ptChip,SLOT *slot,int reg,unsigned char data)
 			//according to YMF278 sample write causes some base params written to the regs (envelope+lfos)
 			//the game should never change the sample while playing.
 			{
-				Sample_t *Sample=ptChip->Samples+slot->Regs[1];
-				WriteSlot(ptChip,slot,6,Sample->LFOVIB);
-				WriteSlot(ptChip,slot,7,Sample->AM);
+				Sample_t *Sample=m_Samples+slot->Regs[1];
+				WriteSlot(slot,6,Sample->LFOVIB);
+				WriteSlot(slot,7,Sample->AM);
 			}
 			break;
 		case 2: //Pitch
@@ -343,35 +269,35 @@ static void WriteSlot(MultiPCM *ptChip,SLOT *slot,int reg,unsigned char data)
 			{
 				unsigned int oct=((slot->Regs[3]>>4)-1)&0xf;
 				unsigned int pitch=((slot->Regs[3]&0xf)<<6)|(slot->Regs[2]>>2);
-				pitch=ptChip->FNS_Table[pitch];
+				pitch=m_FNS_Table[pitch];
 				if(oct&0x8)
 					pitch>>=(16-oct);
 				else
 					pitch<<=oct;
-				slot->step=pitch/ptChip->Rate;
+				slot->step=pitch/m_Rate;
 			}
 			break;
 		case 4:     //KeyOn/Off (and more?)
 			{
 				if(data&0x80)       //KeyOn
 				{
-					slot->Sample=ptChip->Samples+slot->Regs[1];
+					slot->Sample=m_Samples+slot->Regs[1];
 					slot->Playing=1;
 					slot->Base=slot->Sample->Start;
 					slot->offset=0;
 					slot->Prev=0;
 					slot->TL=slot->DstTL<<SHIFT;
 
-					EG_Calc(ptChip,slot);
+					EG_Calc(slot);
 					slot->EG.state=ATTACK;
 					slot->EG.volume=0;
 
 					if(slot->Base>=0x100000)
 					{
 						if(slot->Pan&8)
-							slot->Base=(slot->Base&0xfffff)|(ptChip->BankL);
+							slot->Base=(slot->Base&0xfffff)|(m_BankL);
 						else
-							slot->Base=(slot->Base&0xfffff)|(ptChip->BankR);
+							slot->Base=(slot->Base&0xfffff)|(m_BankR);
 					}
 
 				}
@@ -405,8 +331,8 @@ static void WriteSlot(MultiPCM *ptChip,SLOT *slot,int reg,unsigned char data)
 			{
 				if(data)
 				{
-					LFO_ComputeStep(ptChip,&(slot->PLFO),(slot->Regs[6]>>3)&7,slot->Regs[6]&7,0);
-					LFO_ComputeStep(ptChip,&(slot->ALFO),(slot->Regs[6]>>3)&7,slot->Regs[7]&7,1);
+					LFO_ComputeStep(&(slot->PLFO),(slot->Regs[6]>>3)&7,slot->Regs[6]&7,0);
+					LFO_ComputeStep(&(slot->ALFO),(slot->Regs[6]>>3)&7,slot->Regs[7]&7,1);
 				}
 			}
 			break;
@@ -414,96 +340,87 @@ static void WriteSlot(MultiPCM *ptChip,SLOT *slot,int reg,unsigned char data)
 			{
 				if(data)
 				{
-					LFO_ComputeStep(ptChip,&(slot->PLFO),(slot->Regs[6]>>3)&7,slot->Regs[6]&7,0);
-					LFO_ComputeStep(ptChip,&(slot->ALFO),(slot->Regs[6]>>3)&7,slot->Regs[7]&7,1);
+					LFO_ComputeStep(&(slot->PLFO),(slot->Regs[6]>>3)&7,slot->Regs[6]&7,0);
+					LFO_ComputeStep(&(slot->ALFO),(slot->Regs[6]>>3)&7,slot->Regs[7]&7,1);
 				}
 			}
 			break;
 	}
 }
 
-static STREAM_UPDATE( MultiPCM_update )
+READ8_MEMBER( multipcm_device::read )
 {
-	MultiPCM *ptChip = (MultiPCM *)param;
-	stream_sample_t  *datap[2];
-	int i,sl;
-
-	datap[0] = outputs[0];
-	datap[1] = outputs[1];
-
-	memset(datap[0], 0, sizeof(*datap[0])*samples);
-	memset(datap[1], 0, sizeof(*datap[1])*samples);
-
-
-	for(i=0;i<samples;++i)
-	{
-		signed int smpl=0;
-		signed int smpr=0;
-		for(sl=0;sl<28;++sl)
-		{
-			SLOT *slot=ptChip->Slots+sl;
-			if(slot->Playing)
-			{
-				unsigned int vol=(slot->TL>>SHIFT)|(slot->Pan<<7);
-				unsigned int adr=slot->offset>>SHIFT;
-				signed int sample;
-				unsigned int step=slot->step;
-				signed int csample=(signed short) (ptChip->ROM[slot->Base+adr]<<8);
-				signed int fpart=slot->offset&((1<<SHIFT)-1);
-				sample=(csample*fpart+slot->Prev*((1<<SHIFT)-fpart))>>SHIFT;
-
-				if(slot->Regs[6]&7) //Vibrato enabled
-				{
-					step=step*PLFO_Step(&(slot->PLFO));
-					step>>=SHIFT;
-				}
-
-				slot->offset+=step;
-				if(slot->offset>=(slot->Sample->End<<SHIFT))
-				{
-					slot->offset=slot->Sample->Loop<<SHIFT;
-				}
-				if(adr^(slot->offset>>SHIFT))
-				{
-					slot->Prev=csample;
-				}
-
-				if((slot->TL>>SHIFT)!=slot->DstTL)
-					slot->TL+=slot->TLStep;
-
-				if(slot->Regs[7]&7) //Tremolo enabled
-				{
-					sample=sample*ALFO_Step(&(slot->ALFO));
-					sample>>=SHIFT;
-				}
-
-				sample=(sample*EG_Update(slot))>>10;
-
-				smpl+=(LPANTABLE[vol]*sample)>>SHIFT;
-				smpr+=(RPANTABLE[vol]*sample)>>SHIFT;
-			}
-		}
-#define ICLIP16(x) (x<-32768)?-32768:((x>32767)?32767:x)
-		datap[0][i]=ICLIP16(smpl);
-		datap[1][i]=ICLIP16(smpr);
-	}
-}
-
-READ8_DEVICE_HANDLER( multipcm_r )
-{
-//  MultiPCM *ptChip = get_safe_token(device);
 	return 0;
 }
 
-static DEVICE_START( multipcm )
+
+WRITE8_MEMBER( multipcm_device::write )
 {
-	MultiPCM *ptChip = get_safe_token(device);
-	int i;
+	switch(offset)
+	{
+		case 0:     //Data write
+			WriteSlot(m_Slots+m_CurSlot,m_Address,data);
+			break;
+		case 1:
+			m_CurSlot=val2chan[data&0x1f];
+			break;
 
-	ptChip->ROM=*device->region();
-	ptChip->Rate=(float) device->clock() / MULTIPCM_CLOCKDIV;
+		case 2:
+			m_Address=(data>7)?7:data;
+			break;
+	}
+}
 
-	ptChip->stream = device->machine().sound().stream_alloc(*device, 0, 2, ptChip->Rate, ptChip, MultiPCM_update);
+/* MAME/M1 access functions */
+
+void multipcm_device::set_bank(UINT32 leftoffs, UINT32 rightoffs)
+{
+	m_BankL = leftoffs;
+	m_BankR = rightoffs;
+}
+
+const device_type MULTIPCM = &device_creator<multipcm_device>;
+
+multipcm_device::multipcm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, MULTIPCM, "Sega/Yamaha 315-5560", tag, owner, clock, "multipcm", __FILE__),
+		device_sound_interface(mconfig, *this),
+		m_stream(NULL),
+		//m_Samples(0x200),
+		//m_Slots[28],
+		m_CurSlot(0),
+		m_Address(0),
+		m_BankR(0),
+		m_BankL(0),
+		m_Rate(0),
+		m_ROM(NULL)
+		//m_ARStep(0),
+		//m_DRStep(0),
+		//m_FNS_Table(0)
+{
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void multipcm_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void multipcm_device::device_start()
+{
+		int i;
+
+	m_ROM=*region();
+	m_Rate=(float) clock() / MULTIPCM_CLOCKDIV;
+
+	m_stream = machine().sound().stream_alloc(*this, 0, 2, m_Rate, this);
 
 	//Volume+pan table
 	for(i=0;i<0x800;++i)
@@ -561,20 +478,20 @@ static DEVICE_START( multipcm )
 	//Pitch steps
 	for(i=0;i<0x400;++i)
 	{
-		float fcent=ptChip->Rate*(1024.0+(float) i)/1024.0;
-		ptChip->FNS_Table[i]=(unsigned int ) ((float) (1<<SHIFT) *fcent);
+		float fcent=m_Rate*(1024.0+(float) i)/1024.0;
+		m_FNS_Table[i]=(unsigned int ) ((float) (1<<SHIFT) *fcent);
 	}
 
 	//Envelope steps
 	for(i=0;i<0x40;++i)
 	{
 		//Times are based on 44100 clock, adjust to real chip clock
-		ptChip->ARStep[i]=(float) (0x400<<EG_SHIFT)/(BaseTimes[i]*44100.0/(1000.0));
-		ptChip->DRStep[i]=(float) (0x400<<EG_SHIFT)/(BaseTimes[i]*AR2DR*44100.0/(1000.0));
+		m_ARStep[i]=(float) (0x400<<EG_SHIFT)/(BaseTimes[i]*44100.0/(1000.0));
+		m_DRStep[i]=(float) (0x400<<EG_SHIFT)/(BaseTimes[i]*AR2DR*44100.0/(1000.0));
 	}
-	ptChip->ARStep[0]=ptChip->ARStep[1]=ptChip->ARStep[2]=ptChip->ARStep[3]=0;
-	ptChip->ARStep[0x3f]=0x400<<EG_SHIFT;
-	ptChip->DRStep[0]=ptChip->DRStep[1]=ptChip->DRStep[2]=ptChip->DRStep[3]=0;
+	m_ARStep[0]=m_ARStep[1]=m_ARStep[2]=m_ARStep[3]=0;
+	m_ARStep[0x3f]=0x400<<EG_SHIFT;
+	m_DRStep[0]=m_DRStep[1]=m_DRStep[2]=m_DRStep[3]=0;
 
 	//TL Interpolation steps
 	//lower
@@ -592,113 +509,56 @@ static DEVICE_START( multipcm )
 
 	for(i=0;i<512;++i)
 	{
-		UINT8 *ptSample=(UINT8 *) ptChip->ROM+i*12;
-		ptChip->Samples[i].Start=(ptSample[0]<<16)|(ptSample[1]<<8)|(ptSample[2]<<0);
-		ptChip->Samples[i].Loop=(ptSample[3]<<8)|(ptSample[4]<<0);
-		ptChip->Samples[i].End=0xffff-((ptSample[5]<<8)|(ptSample[6]<<0));
-		ptChip->Samples[i].LFOVIB=ptSample[7];
-		ptChip->Samples[i].DR1=ptSample[8]&0xf;
-		ptChip->Samples[i].AR=(ptSample[8]>>4)&0xf;
-		ptChip->Samples[i].DR2=ptSample[9]&0xf;
-		ptChip->Samples[i].DL=(ptSample[9]>>4)&0xf;
-		ptChip->Samples[i].RR=ptSample[10]&0xf;
-		ptChip->Samples[i].KRS=(ptSample[10]>>4)&0xf;
-		ptChip->Samples[i].AM=ptSample[11];
+		UINT8 *ptSample=(UINT8 *) m_ROM+i*12;
+		m_Samples[i].Start=(ptSample[0]<<16)|(ptSample[1]<<8)|(ptSample[2]<<0);
+		m_Samples[i].Loop=(ptSample[3]<<8)|(ptSample[4]<<0);
+		m_Samples[i].End=0xffff-((ptSample[5]<<8)|(ptSample[6]<<0));
+		m_Samples[i].LFOVIB=ptSample[7];
+		m_Samples[i].DR1=ptSample[8]&0xf;
+		m_Samples[i].AR=(ptSample[8]>>4)&0xf;
+		m_Samples[i].DR2=ptSample[9]&0xf;
+		m_Samples[i].DL=(ptSample[9]>>4)&0xf;
+		m_Samples[i].RR=ptSample[10]&0xf;
+		m_Samples[i].KRS=(ptSample[10]>>4)&0xf;
+		m_Samples[i].AM=ptSample[11];
 	}
 
-	device->save_item(NAME(ptChip->CurSlot));
-	device->save_item(NAME(ptChip->Address));
-	device->save_item(NAME(ptChip->BankL));
-	device->save_item(NAME(ptChip->BankR));
+	save_item(NAME(m_CurSlot));
+	save_item(NAME(m_Address));
+	save_item(NAME(m_BankL));
+	save_item(NAME(m_BankR));
 
 	for(i=0;i<28;++i)
 	{
-		ptChip->Slots[i].Num=i;
-		ptChip->Slots[i].Playing=0;
+		m_Slots[i].Num=i;
+		m_Slots[i].Playing=0;
 
-		device->save_item(NAME(ptChip->Slots[i].Num), i);
-		device->save_item(NAME(ptChip->Slots[i].Regs), i);
-		device->save_item(NAME(ptChip->Slots[i].Playing), i);
-		device->save_item(NAME(ptChip->Slots[i].Base), i);
-		device->save_item(NAME(ptChip->Slots[i].offset), i);
-		device->save_item(NAME(ptChip->Slots[i].step), i);
-		device->save_item(NAME(ptChip->Slots[i].Pan), i);
-		device->save_item(NAME(ptChip->Slots[i].TL), i);
-		device->save_item(NAME(ptChip->Slots[i].DstTL), i);
-		device->save_item(NAME(ptChip->Slots[i].TLStep), i);
-		device->save_item(NAME(ptChip->Slots[i].Prev), i);
-		device->save_item(NAME(ptChip->Slots[i].EG.volume), i);
-		device->save_item(NAME(ptChip->Slots[i].EG.state), i);
-		device->save_item(NAME(ptChip->Slots[i].EG.step), i);
-		device->save_item(NAME(ptChip->Slots[i].EG.AR), i);
-		device->save_item(NAME(ptChip->Slots[i].EG.D1R), i);
-		device->save_item(NAME(ptChip->Slots[i].EG.D2R), i);
-		device->save_item(NAME(ptChip->Slots[i].EG.RR), i);
-		device->save_item(NAME(ptChip->Slots[i].EG.DL), i);
-		device->save_item(NAME(ptChip->Slots[i].PLFO.phase), i);
-		device->save_item(NAME(ptChip->Slots[i].PLFO.phase_step), i);
-		device->save_item(NAME(ptChip->Slots[i].ALFO.phase), i);
-		device->save_item(NAME(ptChip->Slots[i].ALFO.phase_step), i);
+		save_item(NAME(m_Slots[i].Num), i);
+		save_item(NAME(m_Slots[i].Regs), i);
+		save_item(NAME(m_Slots[i].Playing), i);
+		save_item(NAME(m_Slots[i].Base), i);
+		save_item(NAME(m_Slots[i].offset), i);
+		save_item(NAME(m_Slots[i].step), i);
+		save_item(NAME(m_Slots[i].Pan), i);
+		save_item(NAME(m_Slots[i].TL), i);
+		save_item(NAME(m_Slots[i].DstTL), i);
+		save_item(NAME(m_Slots[i].TLStep), i);
+		save_item(NAME(m_Slots[i].Prev), i);
+		save_item(NAME(m_Slots[i].EG.volume), i);
+		save_item(NAME(m_Slots[i].EG.state), i);
+		save_item(NAME(m_Slots[i].EG.step), i);
+		save_item(NAME(m_Slots[i].EG.AR), i);
+		save_item(NAME(m_Slots[i].EG.D1R), i);
+		save_item(NAME(m_Slots[i].EG.D2R), i);
+		save_item(NAME(m_Slots[i].EG.RR), i);
+		save_item(NAME(m_Slots[i].EG.DL), i);
+		save_item(NAME(m_Slots[i].PLFO.phase), i);
+		save_item(NAME(m_Slots[i].PLFO.phase_step), i);
+		save_item(NAME(m_Slots[i].ALFO.phase), i);
+		save_item(NAME(m_Slots[i].ALFO.phase_step), i);
 	}
 
 	LFO_Init();
-}
-
-
-WRITE8_DEVICE_HANDLER( multipcm_w )
-{
-	MultiPCM *ptChip = get_safe_token(device);
-	switch(offset)
-	{
-		case 0:     //Data write
-			WriteSlot(ptChip,ptChip->Slots+ptChip->CurSlot,ptChip->Address,data);
-			break;
-		case 1:
-			ptChip->CurSlot=val2chan[data&0x1f];
-			break;
-
-		case 2:
-			ptChip->Address=(data>7)?7:data;
-			break;
-	}
-}
-
-/* MAME/M1 access functions */
-
-void multipcm_set_bank(device_t *device, UINT32 leftoffs, UINT32 rightoffs)
-{
-	MultiPCM *ptChip = get_safe_token(device);
-	ptChip->BankL = leftoffs;
-	ptChip->BankR = rightoffs;
-}
-
-
-const device_type MULTIPCM = &device_creator<multipcm_device>;
-
-multipcm_device::multipcm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MULTIPCM, "Sega/Yamaha 315-5560", tag, owner, clock, "multipcm", __FILE__),
-		device_sound_interface(mconfig, *this)
-{
-	m_token = global_alloc_clear(MultiPCM);
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void multipcm_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void multipcm_device::device_start()
-{
-	DEVICE_START_NAME( multipcm )(this);
 }
 
 //-------------------------------------------------
@@ -707,6 +567,66 @@ void multipcm_device::device_start()
 
 void multipcm_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	// should never get here
-	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+	stream_sample_t  *datap[2];
+	int i,sl;
+
+	datap[0] = outputs[0];
+	datap[1] = outputs[1];
+
+	memset(datap[0], 0, sizeof(*datap[0])*samples);
+	memset(datap[1], 0, sizeof(*datap[1])*samples);
+
+
+	for(i=0;i<samples;++i)
+	{
+		signed int smpl=0;
+		signed int smpr=0;
+		for(sl=0;sl<28;++sl)
+		{
+			SLOT *slot=m_Slots+sl;
+			if(slot->Playing)
+			{
+				unsigned int vol=(slot->TL>>SHIFT)|(slot->Pan<<7);
+				unsigned int adr=slot->offset>>SHIFT;
+				signed int sample;
+				unsigned int step=slot->step;
+				signed int csample=(signed short) (m_ROM[slot->Base+adr]<<8);
+				signed int fpart=slot->offset&((1<<SHIFT)-1);
+				sample=(csample*fpart+slot->Prev*((1<<SHIFT)-fpart))>>SHIFT;
+
+				if(slot->Regs[6]&7) //Vibrato enabled
+				{
+					step=step*PLFO_Step(&(slot->PLFO));
+					step>>=SHIFT;
+				}
+
+				slot->offset+=step;
+				if(slot->offset>=(slot->Sample->End<<SHIFT))
+				{
+					slot->offset=slot->Sample->Loop<<SHIFT;
+				}
+				if(adr^(slot->offset>>SHIFT))
+				{
+					slot->Prev=csample;
+				}
+
+				if((slot->TL>>SHIFT)!=slot->DstTL)
+					slot->TL+=slot->TLStep;
+
+				if(slot->Regs[7]&7) //Tremolo enabled
+				{
+					sample=sample*ALFO_Step(&(slot->ALFO));
+					sample>>=SHIFT;
+				}
+
+				sample=(sample*EG_Update(slot))>>10;
+
+				smpl+=(LPANTABLE[vol]*sample)>>SHIFT;
+				smpr+=(RPANTABLE[vol]*sample)>>SHIFT;
+			}
+		}
+#define ICLIP16(x) (x<-32768)?-32768:((x>32767)?32767:x)
+		datap[0][i]=ICLIP16(smpl);
+		datap[1][i]=ICLIP16(smpr);
+	}
 }
