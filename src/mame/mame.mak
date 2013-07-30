@@ -2030,6 +2030,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/blitz.o \
 	$(DRIVERS)/blitz68k.o \
 	$(DRIVERS)/buster.o \
+	$(DRIVERS)/casanova.o \
 	$(DRIVERS)/calomega.o $(VIDEO)/calomega.o \
 	$(DRIVERS)/carrera.o \
 	$(DRIVERS)/castle.o \
