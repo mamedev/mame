@@ -6207,6 +6207,7 @@ src/mess/drivers/dmv.c svneol=native#text/plain
 src/mess/drivers/dolphunk.c svneol=native#text/plain
 src/mess/drivers/dps1.c svneol=native#text/plain
 src/mess/drivers/dragon.c svneol=native#text/plain
+src/mess/drivers/dsb46.c svneol=native#text/plain
 src/mess/drivers/dual68.c svneol=native#text/plain
 src/mess/drivers/eacc.c svneol=native#text/plain
 src/mess/drivers/ec65.c svneol=native#text/plain
