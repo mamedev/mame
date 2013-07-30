@@ -275,6 +275,14 @@ static INPUT_PORTS_START( _3x3puzzle )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( casanova )
+	PORT_INCLUDE( _3x3puzzle )
+
+	PORT_MODIFY("SYS")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
+
+INPUT_PORTS_END
+
 static const gfx_layout tiles16x16x8_layout =
 {
 	16,16,
@@ -437,4 +445,4 @@ ROM_END
 
 GAME( 1998, 3x3puzzl,  0,          _3x3puzzle,  _3x3puzzle,  driver_device, 0,       ROT0, "Ace Enterprise",      "3X3 Puzzle (Enterprise)", 0 ) // 1998. 5. 28
 GAME( 1998, 3x3puzzla, 3x3puzzl,   _3x3puzzle,  _3x3puzzle,  driver_device, 0,       ROT0, "Ace Enterprise",      "3X3 Puzzle (Normal)", 0 ) // 1998. 5. 28
-GAME( 199?, casanova,  0,          _3x3puzzle,  _3x3puzzle,  driver_device, 0,       ROT0, "<unknown>",      "Casanova", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
+GAME( 199?, casanova,  0,          _3x3puzzle,  casanova,    driver_device, 0,       ROT0, "<unknown>",           "Casanova", GAME_IMPERFECT_SOUND )
