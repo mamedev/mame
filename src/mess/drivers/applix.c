@@ -53,13 +53,14 @@ class applix_state : public driver_device
 public:
 	applix_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_base(*this, "base"),
 		m_maincpu(*this, "maincpu"),
 		m_crtc(*this, "crtc"),
 		m_via(*this, "via6522"),
 		m_centronics(*this, "centronics"),
-		m_fdc(*this, "wd1772"),
-		m_floppy0(*this, "wd1772:0"),
-		m_floppy1(*this, "wd1772:1"),
+		m_fdc(*this, "fdc"),
+		m_floppy0(*this, "fdc:0"),
+		m_floppy1(*this, "fdc:1"),
 		m_dacl(*this, "dacl"),
 		m_dacr(*this, "dacr"),
 		m_cass(*this, "cassette"),
@@ -87,12 +88,9 @@ public:
 		m_io_k3a0(*this, "K3a_0"),
 		m_io_k3b0(*this, "K3b_0"),
 		m_io_k0b(*this, "K0b"),
-		m_base(*this, "base"),
 		m_expansion(*this, "expansion"){ }
 
 	DECLARE_READ16_MEMBER(applix_inputs_r);
-	DECLARE_WRITE16_MEMBER(applix_index_w);
-	DECLARE_WRITE16_MEMBER(applix_register_w);
 	DECLARE_WRITE16_MEMBER(palette_w);
 	DECLARE_WRITE16_MEMBER(analog_latch_w);
 	DECLARE_WRITE16_MEMBER(dac_latch_w);
@@ -136,6 +134,26 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT8 m_palette_latch[4];
+	required_shared_ptr<UINT16> m_base;
+private:
+	UINT8 m_pb;
+	UINT8 m_analog_latch;
+	UINT8 m_dac_latch;
+	UINT8 m_port08;
+	UINT8 m_data_to_fdc;
+	UINT8 m_data_from_fdc;
+	bool m_data;
+	bool m_data_or_cmd;
+	bool m_buffer_empty;
+	bool m_fdc_cmd;
+	UINT8 m_clock_count;
+	bool m_cp;
+	UINT8   m_p1;
+	UINT8   m_p1_data;
+	UINT8   m_p2;
+	UINT8   m_p3;
+	UINT16  m_last_write_addr;
+	UINT8 m_cass_data[4];
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
 	required_device<via6522_device> m_via;
@@ -170,29 +188,7 @@ public:
 	required_ioport m_io_k3a0;
 	required_ioport m_io_k3b0;
 	required_ioport m_io_k0b;
-	required_shared_ptr<UINT16> m_base;
 	required_shared_ptr<UINT16> m_expansion;
-private:
-	void fdc_intrq_w(bool state);
-	void fdc_drq_w(bool state);
-	UINT8 m_pb;
-	UINT8 m_analog_latch;
-	UINT8 m_dac_latch;
-	UINT8 m_port08;
-	UINT8 m_data_to_fdc;
-	UINT8 m_data_from_fdc;
-	bool m_data;
-	bool m_data_or_cmd;
-	bool m_buffer_empty;
-	bool m_fdc_cmd;
-	UINT8 m_clock_count;
-	bool m_cp;
-	UINT8   m_p1;
-	UINT8   m_p1_data;
-	UINT8   m_p2;
-	UINT8   m_p3;
-	UINT16  m_last_write_addr;
-	UINT8 m_cass_data[4];
 };
 
 /*
@@ -239,18 +235,6 @@ WRITE16_MEMBER( applix_state::video_latch_w )
 {
 	if (ACCESSING_BITS_0_7)
 		m_video_latch = data;
-}
-
-WRITE16_MEMBER( applix_state::applix_index_w )
-{
-	data >>= 8;
-	m_crtc->address_w( space, offset, data );
-}
-
-WRITE16_MEMBER( applix_state::applix_register_w )
-{
-	data >>= 8;
-	m_crtc->register_w( space, offset, data );
 }
 
 /*
@@ -459,8 +443,8 @@ static ADDRESS_MAP_START(applix_mem, AS_PROGRAM, 16, applix_state)
 	//AM_RANGE(0x700000, 0x700007) z80-scc (ch b control, ch b data, ch a control, ch a data) on even addresses
 	AM_RANGE(0x700080, 0x7000ff) AM_READ(applix_inputs_r)
 	AM_RANGE(0x700100, 0x70011f) AM_MIRROR(0x60) AM_DEVREADWRITE8("via6522", via6522_device, read, write, 0xff00)
-	AM_RANGE(0x700180, 0x700181) AM_MIRROR(0x7c) AM_WRITE(applix_index_w)
-	AM_RANGE(0x700182, 0x700183) AM_MIRROR(0x7c) AM_WRITE(applix_register_w)
+	AM_RANGE(0x700180, 0x700181) AM_MIRROR(0x7c) AM_DEVREADWRITE8("crtc", mc6845_device, status_r, address_w, 0xff00)
+	AM_RANGE(0x700182, 0x700183) AM_MIRROR(0x7c) AM_DEVREADWRITE8("crtc", mc6845_device, register_r, register_w, 0xff00)
 	AM_RANGE(0xffffc0, 0xffffc1) AM_READWRITE(fdc_data_r,fdc_data_w)
 	//AM_RANGE(0xffffc2, 0xffffc3) AM_READWRITE(fdc_int_r,fdc_int_w) // optional
 	AM_RANGE(0xffffc8, 0xffffcd) AM_READ(fdc_stat_r)
@@ -484,7 +468,7 @@ static ADDRESS_MAP_START( subcpu_io, AS_IO, 8, applix_state )
 	AM_RANGE(0x10, 0x17) AM_READWRITE(port10_r,port10_w) //IRQ
 	AM_RANGE(0x18, 0x1f) AM_READWRITE(port18_r,port18_w) //data&command
 	AM_RANGE(0x20, 0x27) AM_MIRROR(0x18) AM_READWRITE(port20_r,port20_w) //SCSI NCR5380
-	AM_RANGE(0x40, 0x43) AM_MIRROR(0x1c) AM_DEVREADWRITE("wd1772", wd1772_t, read, write) //FDC
+	AM_RANGE(0x40, 0x43) AM_MIRROR(0x1c) AM_DEVREADWRITE("fdc", wd1772_t, read, write) //FDC
 	AM_RANGE(0x60, 0x63) AM_MIRROR(0x1c) AM_READWRITE(port60_r,port60_w) //anotherZ80SCC
 ADDRESS_MAP_END
 
@@ -795,11 +779,12 @@ static MC6845_UPDATE_ROW( applix_update_row )
 
 	for (x = 0; x < x_count; x++)
 	{
+		mem = vidbase + ma + x + (ra<<12);
+		chr = state->m_base[mem];
+
 		if (BIT(state->m_pa, 3))
 		// 640 x 200 x 4of16 mode
 		{
-			mem = vidbase + ma + x + (ra<<12);
-			chr = state->m_base[mem];
 			for (i = 0; i < 8; i++)
 			{
 				*p++ = palette[state->m_palette_latch[chr>>14]];
@@ -809,8 +794,6 @@ static MC6845_UPDATE_ROW( applix_update_row )
 		else
 		// 320 x 200 x 16 mode
 		{
-			mem = vidbase + ma + x + (ra<<12);
-			chr = state->m_base[mem];
 			for (i = 0; i < 4; i++)
 			{
 				*p++ = palette[chr>>12];
@@ -924,9 +907,9 @@ static MACHINE_CONFIG_START( applix, applix_state )
 	MCFG_VIA6522_ADD("via6522", 0, applix_via)
 	MCFG_CENTRONICS_PRINTER_ADD("centronics", applix_centronics_config)
 	MCFG_CASSETTE_ADD("cassette", applix_cassette_interface)
-	MCFG_WD1772x_ADD("wd1772", XTAL_16MHz / 2) //connected to Z80H clock pin
-	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", applix_floppies, "35dd", applix_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("wd1772:1", applix_floppies, "35dd", applix_state::floppy_formats)
+	MCFG_WD1772x_ADD("fdc", XTAL_16MHz / 2) //connected to Z80H clock pin
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", applix_floppies, "35dd", applix_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", applix_floppies, "35dd", applix_state::floppy_formats)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("applix_c", applix_state, cass_timer, attotime::from_hz(100000))
 MACHINE_CONFIG_END
 
@@ -953,17 +936,6 @@ ROM_END
 
 DRIVER_INIT_MEMBER(applix_state, applix)
 {
-	floppy_connector *con = machine().device<floppy_connector>("wd1772:0");
-	floppy_image_device *floppy = con ? con->get_device() : 0;
-	if (floppy)
-	{
-		m_fdc->set_floppy(floppy);
-		//m_fdc->setup_intrq_cb(wd1772_t::line_cb(FUNC(applix_state::fdc_intrq_w), this));
-		//m_fdc->setup_drq_cb(wd1772_t::line_cb(FUNC(applix_state::fdc_drq_w), this));
-
-		floppy->ss_w(0);
-	}
-
 	UINT8 *RAM = memregion("subcpu")->base();
 	membank("bank1")->configure_entries(0, 2, &RAM[0x8000], 0x8000);
 }
