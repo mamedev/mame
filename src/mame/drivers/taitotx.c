@@ -258,6 +258,20 @@ ROM_START( spicaadv )
 	DISK_IMAGE( "spicaadventure_v2_03j", 0, SHA1(218ee0670a7b895f42480f0fe6719ecd4f4ba9e6) )
 ROM_END
 
+// stickers: CPU Cel 2.5 GHz  MEM 256 MB  GRA 9600XT
+//           TAITO Type X  Model 006B   No 150FG0217  AC100V  50/60Hz 2.5A
+//           Windows(R) XP Embedded    00039-111-243-487    X11-15305
+//
+//			 USAGI   M9006613A  VER.2.04JPN     40.0GB  WD  WD400BB-22JHCO
+ROM_START( usagiol )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD("taito_type_x_bios.bin", 0x00, 0x10000, NO_DUMP ) // size unknown.
+	/* bios, video bios etc. not dumped */
+
+	DISK_REGION( "ide:0:hdd:image" ) // Single 40GB drive, WD Caviar model WD400BB, LBA 78165360
+	DISK_IMAGE( "usagionline_v2_04j", 0, SHA1(6d4a780c40ee5c9b0192932e926f144d76b87262) )
+ROM_END
+
 ROM_START( trbwtchs )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD("taito_type_x_bios.bin", 0x00, 0x10000, NO_DUMP ) // size unknown.
@@ -273,6 +287,7 @@ GAME( 2005, homura,    0,    taito_type_x, taito_type_x, driver_device,  0, ROT0
 GAME( 2005, hotgmkmp,  0,    taito_type_x, taito_type_x, driver_device,  0, ROT0, "XNauts", "Taisen Hot Gimmick Mix Party",  GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2005, raiden3,   0,    taito_type_x, taito_type_x, driver_device,  0, ROT0, "Seibu Kaihatsu/Moss Ltd", "Raiden III (v2.01J)",  GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2005, spicaadv,  0,    taito_type_x, taito_type_x, driver_device,  0, ROT0, "Taito Corporation", "Spica Adventure (v2.03J)",  GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2005, usagiol,   0,    taito_type_x, taito_type_x, driver_device,  0, ROT0, "Taito Corporation/Warashi", "Usagi Online (v2.04J)",  GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2006, shikiga3,  0,    taito_type_x, taito_type_x, driver_device,  0, ROT0, "Alfa System/SKonec Entertainment", "Shikigami no Shiro III (v2.06J)",  GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2007, raiden4,   0,    taito_type_x, taito_type_x, driver_device,  0, ROT0, "Seibu Kaihatsu/Moss Ltd", "Raiden IV (v1.00J)",  GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2008, kof98um,   0,    taito_type_x, taito_type_x, driver_device,  0, ROT0, "SNK", "The King of Fighters '98: Ultimate Match (v1.00)",  GAME_NOT_WORKING | GAME_NO_SOUND )
