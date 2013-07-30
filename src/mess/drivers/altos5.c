@@ -53,6 +53,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
 	DECLARE_WRITE_LINE_MEMBER(busreq_w);
+private:
 	UINT8 m_port08;
 	UINT8 m_port09;
 	UINT8 *m_p_prom;
@@ -452,15 +453,6 @@ DRIVER_INIT_MEMBER( altos5_state, altos5 )
 {
 	m_fdc->setup_intrq_cb(fd1797_t::line_cb(FUNC(altos5_state::fdc_intrq_w), this));
 	m_fdc->setup_drq_cb(fd1797_t::line_cb(FUNC(altos5_state::fdc_drq_w), this));
-
-	floppy_connector *con = machine().device<floppy_connector>("fdc:0");
-	m_floppy = con ? con->get_device() : 0;
-	if (m_floppy)
-	{
-		m_fdc->set_floppy(m_floppy);
-		m_floppy->ss_w(0);
-	}
-
 
 	m_p_prom =  memregion("proms")->base();
 
