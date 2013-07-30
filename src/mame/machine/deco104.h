@@ -29,9 +29,8 @@ protected:
 
 	virtual void write_protport(address_space &space, UINT16 address, UINT16 data, UINT16 mem_mask);
 
-	/* for the buggy double wing sim */
-	/* protection */
-	int m_use_dblewings_hacks;
+
+	int m_use_complete_table;
 
 	UINT16 m_008_data;
 	UINT16 m_104_data;

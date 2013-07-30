@@ -93,43 +93,8 @@
 
 
 
+deco146port_xx port_table[] = {
 
-#define BLK (0xff)
-#define INPUT_PORT_A (-1)
-#define INPUT_PORT_B (-2)
-#define INPUT_PORT_C (-3)
-
-
-
-
-struct deco146port_xx
-{
-	int write_offset;
-	UINT8 mapping[16];
-	int use_xor;
-	int use_nand;
-} port_table[] = {
-#define NIB3__ 0xc, 0xd, 0xe, 0xf
-#define NIB3R1 0xd, 0xe, 0xf, 0xc
-#define NIB3R2 0xe, 0xf, 0xc, 0xd
-#define NIB3R3 0xf, 0xc, 0xd, 0xe
-
-#define NIB2__ 0x8, 0x9, 0xa, 0xb
-#define NIB2R1 0x9, 0xa, 0xb, 0x8
-#define NIB2R2 0xa, 0xb, 0x8, 0x9
-#define NIB2R3 0xb, 0x8, 0x9, 0xa
-
-#define NIB1__ 0x4, 0x5, 0x6, 0x7
-#define NIB1R1 0x5, 0x6, 0x7, 0x4
-#define NIB1R2 0x6, 0x7, 0x4, 0x5
-#define NIB1R3 0x7, 0x4, 0x5, 0x6
-
-#define NIB0__ 0x0, 0x1, 0x2, 0x3
-#define NIB0R1 0x1, 0x2, 0x3, 0x0
-#define NIB0R2 0x2, 0x3, 0x0, 0x1
-#define NIB0R3 0x3, 0x0, 0x1, 0x2
-
-#define BLANK_ BLK, BLK, BLK, BLK
 
 /* 0x000 */ { 0x08a,           {  NIB1__, NIB2__, NIB3__, BLANK_ },  0, 1 },
 /* 0x002 */ { 0x0aa,           {  NIB3__, NIB2__, NIB0__, NIB1__ },  0, 0 },
@@ -1509,12 +1474,12 @@ void deco_146_base_device::device_reset()
 
 const device_type DECO146PROT = &device_creator<deco146_device>;
 
-// 104 will probably use this too, once we have real tables for it!
-UINT16 deco146_device::read_data_getloc(UINT16 address, int& location)
+
+UINT16 deco_146_base_device::read_data_getloc(UINT16 address, int& location)
 {
 	UINT16 retdata = 0;
 
-	location = port_table[address>>1].write_offset;
+	location = m_lookup_table[address>>1].write_offset;
 
 	if (location==INPUT_PORT_A)
 	{
@@ -1528,6 +1493,25 @@ UINT16 deco146_device::read_data_getloc(UINT16 address, int& location)
 	{
 		retdata = m_port_c_r(0);
 	}
+	else if (location==INPUT_PORT_A_NV)
+	{
+		fatalerror("INPUT_PORT_A_NV %04x\n", address);
+	}
+	else if (location==INPUT_PORT_B_NV)
+	{
+		fatalerror("INPUT_PORT_B_NV %04x\n", address);
+
+	}
+	else if (location==INPUT_PORT_C_NV)
+	{
+		fatalerror("INPUT_PORT_C_NV %04x\n", address);
+
+	}
+	else if (location==INPUT_NOT_FOUND)
+	{
+		fatalerror("INPUT_NOT_FOUND %04x\n", address);
+
+	}
 	else
 	{
 		if (m_current_rambank==0)
@@ -1536,10 +1520,10 @@ UINT16 deco146_device::read_data_getloc(UINT16 address, int& location)
 			retdata = m_rambank1[location>>1];
 	}
 
-	UINT16 realret = reorder(retdata, &port_table[address>>1].mapping[0] );
+	UINT16 realret = reorder(retdata, &m_lookup_table[address>>1].mapping[0] );
 
-	if (port_table[address>>1].use_xor) realret ^= m_xor;
-	if (port_table[address>>1].use_nand) realret = (realret & ~m_nand);
+	if (m_lookup_table[address>>1].use_xor) realret ^= m_xor;
+	if (m_lookup_table[address>>1].use_nand) realret = (realret & ~m_nand);
 
 	return realret;
 }
@@ -1554,4 +1538,5 @@ deco146_device::deco146_device(const machine_config &mconfig, const char *tag, d
 	m_xor_port = 0x2c;
 	m_mask_port = 0x36;
 	m_soundlatch_port = 0x64;
+	m_lookup_table = port_table;
 }

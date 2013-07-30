@@ -35,6 +35,49 @@ typedef device_delegate<void (address_space &space, UINT16 data, UINT16 mem_mask
 
 
 
+#define BLK (0xff)
+#define INPUT_PORT_A (-1)
+#define INPUT_PORT_B (-2)
+#define INPUT_PORT_C (-3)
+
+#define INPUT_PORT_A_NV (-4)
+#define INPUT_PORT_B_NV (-5)
+#define INPUT_PORT_C_NV (-6)
+
+#define INPUT_NOT_FOUND (-7)
+
+#define NIB3__ 0xc, 0xd, 0xe, 0xf
+#define NIB3R1 0xd, 0xe, 0xf, 0xc
+#define NIB3R2 0xe, 0xf, 0xc, 0xd
+#define NIB3R3 0xf, 0xc, 0xd, 0xe
+
+#define NIB2__ 0x8, 0x9, 0xa, 0xb
+#define NIB2R1 0x9, 0xa, 0xb, 0x8
+#define NIB2R2 0xa, 0xb, 0x8, 0x9
+#define NIB2R3 0xb, 0x8, 0x9, 0xa
+
+#define NIB1__ 0x4, 0x5, 0x6, 0x7
+#define NIB1R1 0x5, 0x6, 0x7, 0x4
+#define NIB1R2 0x6, 0x7, 0x4, 0x5
+#define NIB1R3 0x7, 0x4, 0x5, 0x6
+
+#define NIB0__ 0x0, 0x1, 0x2, 0x3
+#define NIB0R1 0x1, 0x2, 0x3, 0x0
+#define NIB0R2 0x2, 0x3, 0x0, 0x1
+#define NIB0R3 0x3, 0x0, 0x1, 0x2
+
+#define BLANK_ BLK, BLK, BLK, BLK
+
+struct deco146port_xx
+{
+	int write_offset;
+	UINT8 mapping[16];
+	int use_xor;
+	int use_nand;
+};
+
+
+
 /* Data East 146 protection chip */
 
 class deco_146_base_device : public device_t
@@ -78,9 +121,8 @@ public:
 
 
 	UINT8 m_external_addrswap[10];
-	virtual UINT16 read_data_getloc(UINT16 address, int& location) = 0;
 
-
+	deco146port_xx* m_lookup_table;
 
 
 
@@ -98,6 +140,7 @@ protected:
 
 	UINT16 read_protport(UINT16 address, UINT16 mem_mask);
 	virtual void write_protport(address_space &space, UINT16 address, UINT16 data, UINT16 mem_mask);
+	virtual UINT16 read_data_getloc(UINT16 address, int& location);
 
 	UINT16 m_rambank0[0x80];
 	UINT16 m_rambank1[0x80];
@@ -123,7 +166,6 @@ class deco146_device : public deco_146_base_device
 {
 public:
 	deco146_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual UINT16 read_data_getloc(UINT16 address, int& location);
 };
 
 extern const device_type DECO146PROT;
