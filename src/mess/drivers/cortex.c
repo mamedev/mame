@@ -16,7 +16,7 @@
         TMS9929   - Video
         TMS9911   - DMA to floppy
         TMS9909   - Floppy Disk Controller
-    AY-5-2376 - Keyboard controller
+        AY-5-2376 - Keyboard controller
 
 ****************************************************************************/
 
