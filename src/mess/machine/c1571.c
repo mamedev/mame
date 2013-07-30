@@ -129,9 +129,6 @@ const rom_entry *c1571cr_device::device_rom_region() const
 ROM_START( minichief )
 	ROM_REGION( 0x8000, M6502_TAG, 0 )
 	ROM_LOAD( "ictdos710.u2", 0x0000, 0x8000, CRC(aaacf7e9) SHA1(c1296995238ef23f18e7fec70a144a0566a25a27) )
-
-	ROM_REGION( 0x2000, "wd1002a_wx1", 0 )
-	ROM_LOAD( "600693-001 type 5.u12", 0x0000, 0x2000, CRC(f3daf85f) SHA1(3bd29538832d3084cbddeec92593988772755283) )
 ROM_END
 
 
@@ -717,7 +714,7 @@ static const floppy_interface c1570_floppy_interface =
 //-------------------------------------------------
 
 static SLOT_INTERFACE_START( mini_chief_isa8_cards )
-	//SLOT_INTERFACE("wd1002a_wx1", WD1002A_WX1)
+	SLOT_INTERFACE("wd1002a_wx1", ISA8_WD1002A_WX1)
 SLOT_INTERFACE_END
 
 static const isa8bus_interface isabus_intf =
@@ -863,7 +860,7 @@ static MACHINE_CONFIG_FRAGMENT( mini_chief )
 	MCFG_64H156_ADD(C64H156_TAG, XTAL_16MHz, ga_intf)
 
 	MCFG_ISA8_BUS_ADD(ISA_BUS_TAG, M6502_TAG, isabus_intf)
-	MCFG_ISA8_SLOT_ADD(ISA_BUS_TAG, "isa1", mini_chief_isa8_cards, NULL/*"wd1002a_wx1"*/, false)
+	MCFG_ISA8_SLOT_ADD(ISA_BUS_TAG, "isa1", mini_chief_isa8_cards, "wd1002a_wx1", false)
 
 	MCFG_CBM_IEC_SLOT_ADD("iec", cbm_iec_devices, NULL)
 MACHINE_CONFIG_END

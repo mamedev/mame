@@ -25,6 +25,7 @@
 #include "machine/isa.h"
 #include "machine/mos6526.h"
 #include "machine/wd_fdc.h"
+#include "machine/isa_wd1002a_wx1.h"
 
 
 

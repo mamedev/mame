@@ -32,6 +32,7 @@
 #include "machine/isa_ide8.h"
 #include "machine/isa_ide_cd.h"
 #include "machine/isa_aha1542.h"
+#include "machine/isa_wd1002a_wx1.h"
 
 // sound
 #include "machine/isa_adlib.h"
