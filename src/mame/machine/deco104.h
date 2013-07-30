@@ -39,11 +39,4 @@ extern const device_type DECO104PROT;
 
 
 
-
-
-// legacy, has a weird scramble, need to update
-DECLARE_READ16_HANDLER( deco16_104_pktgaldx_prot_r );
-DECLARE_WRITE16_HANDLER( deco16_104_pktgaldx_prot_w );
-
-
 #endif

@@ -51,6 +51,6 @@ public:
 	UINT32 screen_update_pktgaldx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_pktgaldb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	READ16_MEMBER( pktgaldx_protection_region_0_104_r );
-	WRITE16_MEMBER( pktgaldx_protection_region_0_104_w );
+	READ16_MEMBER( pktgaldx_protection_region_f_104_r );
+	WRITE16_MEMBER( pktgaldx_protection_region_f_104_w );
 };

@@ -67,6 +67,22 @@ WRITE16_MEMBER(pktgaldx_state::pktgaldx_oki_bank_w)
 
 /**********************************************************************************/
 
+READ16_MEMBER( pktgaldx_state::pktgaldx_protection_region_f_104_r )
+{
+	int real_address = 0 + (offset *2);
+	UINT8 cs = 0;
+	UINT16 data = m_deco104->read_data( real_address&0x7fff, mem_mask, cs );
+	return data;
+}
+
+WRITE16_MEMBER( pktgaldx_state::pktgaldx_protection_region_f_104_w )
+{
+	int real_address = 0 + (offset *2);
+	UINT8 cs = 0;
+	m_deco104->write_data( space, real_address&0x7fff, data, mem_mask, cs );
+}
+
+
 static ADDRESS_MAP_START( pktgaldx_map, AS_PROGRAM, 16, pktgaldx_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 
@@ -85,7 +101,10 @@ static ADDRESS_MAP_START( pktgaldx_map, AS_PROGRAM, 16, pktgaldx_state )
 
 	AM_RANGE(0x161800, 0x16180f) AM_DEVWRITE("tilegen1", deco16ic_device, pf_control_w)
 	AM_RANGE(0x164800, 0x164801) AM_WRITE(pktgaldx_oki_bank_w)
-	AM_RANGE(0x167800, 0x167fff) AM_READWRITE_LEGACY(deco16_104_pktgaldx_prot_r,deco16_104_pktgaldx_prot_w) AM_SHARE("prot16ram")
+
+//	AM_RANGE(0x166000, 0x1667ff) AM_READWRITE(pktgaldx_protection_region_c_104_r,pktgaldx_protection_region_c_104_w) /* Protection device - chip select / config bank for it.. */
+	AM_RANGE(0x167800, 0x167fff) AM_READWRITE(pktgaldx_protection_region_f_104_r,pktgaldx_protection_region_f_104_w) AM_SHARE("prot16ram") /* Protection device */
+
 	AM_RANGE(0x170000, 0x17ffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -334,6 +353,7 @@ static MACHINE_CONFIG_START( pktgaldx, pktgaldx_state )
 	decospr_device::set_gfx_region(*device, 2);
 
 	MCFG_DECO104_ADD("ioprot104")
+	MCFG_DECO146_SET_INTERFACE_SCRAMBLE(8,9,  4,5,6,7    ,1,0,3,2) // hopefully this is correct, nothing else uses this arrangement!
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
