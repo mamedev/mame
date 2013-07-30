@@ -68,19 +68,19 @@
 
   Caveman Ninja                            104                                     None                   Yes
   Wizard Fire                              104                                     Reversed               No
-  Pocket Gal DX                            104                                     None*                  No*
+  Pocket Gal DX                            104                                     Custom*                No*
   Boogie Wings                             104                                     Reversed               Yes
   Rohga                                    104                                     None                   No
   Diet GoGo                                104                                     Interleave             Yes
   Tattoo Assassins                         104                                     Interleave             No
   Dream Ball                               104                                     None                   No
   Night Slashers                           104                                     Interleave             No
-  Double Wings                             104                                     Interleave**           Yes**
+  Double Wings                             104                                     Interleave             Yes
   Schmeiser Robo                           104                                     None                   No
 
 
-  * not currently hooked up, conflicts on an input port with Rohga, needs more investigation
-  ** simulation massively incomplete
+  * not currently hooked up, address scramble not figured out
+
 
 
   */

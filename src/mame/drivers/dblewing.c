@@ -396,7 +396,6 @@ static MACHINE_CONFIG_START( dblewing, dblewing_state )
 	decospr_device::set_pri_callback(*device, dblwings_pri_callback);
 
 	MCFG_DECO104_ADD("ioprot104")
-	MCFG_DECO104_SET_USE_DOUBLEWINGS_HACK
 	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_INTERLEAVE
 	MCFG_DECO146_SET_USE_MAGIC_ADDRESS_XOR
 
