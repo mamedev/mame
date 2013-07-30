@@ -572,7 +572,8 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 	{
 		case 0x13: // getting some kind of list maybe?
 		{
-
+			// 2d seems to be used when there is more data available
+			// 74 seems to be used when there isn't.. (end of buffer reached?)
 			m_valueresponse = 0x74<<16; // 2d or 74! (based on?)
 
 		}
@@ -605,21 +606,21 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 			m_valueresponse = 0x74<<16;
 		break;
 
-		case 0x47: // ASIC status?
-			m_valueresponse = 0x74<<16;
+
+		// 47 and 52 are used to get the images during the intro sequence, different each loop
+		// also some other gfx?
+		case 0x47:
+			printf("which %04x\n", m_value0);
+			m_valueresponse = 0x00740047;
 		break;
 
-		case 0x52: // ASIC status?
-		{
-			// how is this selected?
-
-			//if (m_value0 == 6) {
-				m_valueresponse = (0x74<<16)|1; // |1?
-			//} else {
-			//  m_valueresponse = 0x74<<16;
-			//}
-		}
+		case 0x52:
+			printf("which %04x\n", m_value0);
+			m_valueresponse = 0x00740060;
 		break;
+
+
+
 
 		case 0x54: // ??
 			m_puzzli_54_trigger = 1;
@@ -631,27 +632,42 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 		break;
 
 
-		// 63/67 are used on startup to get the z80 music at least
 
+
+		// 63/67 are used on startup to get the z80 music at least
 		case 0x63: // used as a read address by the 68k code (related to previous uploaded values like cave?) should point at a table of ~0x80 in size? seems to use values as further pointers?
-			if (m_value0==0x0002)
+			if (m_value0==0x0000)
+			{
+				m_valueresponse = 0x001694a8;
+			}
+			else if (m_value0==0x0001)
+			{
+				m_valueresponse = 0x0016cfae;
+			}
+			else if (m_value0==0x0002)
 			{
 				m_valueresponse = 0x0016ebf2; // right for puzzli2 , wrong for puzzli2s, probably calculated from the writes then?
 			}
+			else if (m_value0==0x0003) // before 'cast' screen
+			{
+				m_valueresponse = 0x0016faa8;
+			}
 			else
 			{
+				printf("unk case x63\n");
 				m_valueresponse = 0x00600000; // wrong
 
 			}
 		break;
 
 		case 0x67: // used as a read address by the 68k code (related to previous uploaded values like cave?) directly reads ~0xDBE from the address..
-			if (m_value0==0x0002)
+			if ( (m_value0==0x0000) || (m_value0==0x0001) || (m_value0==0x0002) || (m_value0==0x0003) )
 			{
 				m_valueresponse = 0x00166178; // right for puzzli2 , wrong for puzzli2s, probably calculated from the writes then?
 			}
 			else
 			{
+				printf("unk case x67\n");
 				m_valueresponse = 0x00400000; // wrong
 			}
 		break;
