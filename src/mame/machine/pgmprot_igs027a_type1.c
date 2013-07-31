@@ -573,24 +573,13 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 
 	switch (m_ddp3lastcommand)
 	{
-		case 0x13: // getting some kind of list maybe?
-		{
-			hackcount++;
 
-			if (hackcount<10)
-			{
-				m_valueresponse = 0x002d0008;
-			}
-			else
-			{
-				hackcount=0;
-				m_valueresponse = 0x00740008;
-			}
-			// 2d seems to be used when there is more data available
-			// 74 seems to be used when there isn't.. (end of buffer reached?)
-			// 2d or 74! (based on?)
-
-		}
+		// done before writes to 31 when getting level data, always just seems to return the 0x36 response.
+		case 0x54: // ??
+			m_puzzli_54_trigger = 1;
+			hackcount2 = 0;
+			hackcount = 0;
+			m_valueresponse = 0x36<<16;
 		break;
 
 		case 0x31:
@@ -598,18 +587,111 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 			// how is this selected? command 54?
 			hackcount2++;
 
-			if (hackcount2<30)
+			/* writes the following sequence before how to play
+			00138278: 31 00fd
+			00138278: 31 0087
+			00138278: 31 0032
+			00138278: 31 0029
+			00138278: 31 0031
+			00138278: 31 003f
+			00138278: 31 00b0
+			00138278: 31 0035
+			00138278: 31 0071
+			00138278: 31 002d
+			00138278: 31 00d5
+			00138278: 31 000d
+			00138278: 31 0034
+			00138278: 31 0059
+			00138278: 31 00dd
+			00138278: 31 0023
+			00138278: 31 007a
+			00138278: 31 00f3
+			00138278: 31 0077
+			00138278: 31 0022
+			00138278: 31 0036
+			00138278: 31 002e
+			00138278: 31 00b3
+			00138278: 31 0035
+			00138278: 31 0041
+			00138278: 31 005d
+			00138278: 31 00d6
+			00138278: 31 000c
+			00138278: 31 0036
+			00138278: 31 005e
+			00138278: 31 0089
+			00138278: 31 003c
+			00138278: 31 007a
+			00138278: 31 00a2
+			00138278: 31 006d
+			00138278: 31 0023
+			00138278: 31 0037
+			00138278: 31 003f
+			00138278: 31 00b3
+			00138278: 31 0034
+			*/
+
+
+			if (hackcount2<40)
 			{
-				m_valueresponse = 0x00d20008;
+				// always d2 0000 when writing doing level data
+				// but different for the writes on startup?
+				m_valueresponse = 0x00d20000;
 			}
 			else
 			{
 				hackcount2=0;
-				m_valueresponse = 0x00630008;
+				printf("end\n");
+
+				// 63 0006 after the last 31 write doing the how to play level data - the 06 is the width of the playfield, where does it come from?
+				m_valueresponse = 0x00630006;
 			}
 
 		}
 		break;
+	
+
+		// this is read immediately after the 31 writes before a level / how to play
+		case 0x13: // getting some kind of list maybe?
+		{
+
+			// before how to play
+			// clearly the level layout, where does it come from?
+			UINT16 retvals[61] = 
+			{ 0x0008,
+			  0x0103, 0x0101, 0x0102, 0x0102, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, // first column
+			  0x0103, 0x0100, 0x0101, 0x0105, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+			  0x0100, 0x0101, 0x0105, 0x0104, 0x0104, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+			  0x0102, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+			  0x0100, 0x0101, 0x0103, 0x0102, 0x0104, 0x0100 ,0x0100, 0x0000, 0x0000, 0x0000,
+			  0x0105, 0x0105, 0x0101, 0x0101, 0x0103, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000  // last column
+			};
+
+
+			if (hackcount<61)
+			{
+				m_valueresponse = 0x002d0000 | retvals[hackcount];
+				printf("returning %08x\n", m_valueresponse );
+
+			}
+			else
+			{
+				hackcount=0;
+				m_valueresponse = 0x00740054;  // 0x0074 0054 is returned after how to play reads above..
+				printf("END returning %08x\n", m_valueresponse );
+
+			}
+
+			hackcount++;
+
+
+			// 2d seems to be used when there is more data available
+			// 74 seems to be used when there isn't.. (end of buffer reached?)
+			// 2d or 74! (based on?)
+
+		}
+		break;
+
+
 
 		case 0x38: // Reset
 			m_valueresponse = 0x78<<16;
@@ -637,10 +719,6 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 
 
 
-		case 0x54: // ??
-			m_puzzli_54_trigger = 1;
-			m_valueresponse = 0x36<<16;
-		break;
 
 		case 0x61: // ??
 			m_valueresponse = 0x36<<16;
