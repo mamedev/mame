@@ -564,6 +564,9 @@ void pgm_arm_type1_state::command_handler_ddp3(int pc)
 
 /* preliminary */
 
+static int hackcount = 0;
+static int hackcount2 = 0;
+
 void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 {
 	printf("%08x: %02x %04x\n",pc, m_ddp3lastcommand, m_value0);
@@ -572,9 +575,20 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 	{
 		case 0x13: // getting some kind of list maybe?
 		{
+			hackcount++;
+
+			if (hackcount<10)
+			{
+				m_valueresponse = 0x002d0008;
+			}
+			else
+			{
+				hackcount=0;
+				m_valueresponse = 0x00740008;
+			}
 			// 2d seems to be used when there is more data available
 			// 74 seems to be used when there isn't.. (end of buffer reached?)
-			m_valueresponse = 0x74<<16; // 2d or 74! (based on?)
+			// 2d or 74! (based on?)
 
 		}
 		break;
@@ -582,17 +596,18 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 		case 0x31:
 		{
 			// how is this selected? command 54?
+			hackcount2++;
 
-			// just a wild guess
-			if (m_puzzli_54_trigger) {
-				// pc == 1387de
-				m_valueresponse = 0x63<<16; // ?
-			} else {
-				// pc == 14cf58
-				m_valueresponse = 0xd2<<16;
+			if (hackcount2<30)
+			{
+				m_valueresponse = 0x00d20008;
+			}
+			else
+			{
+				hackcount2=0;
+				m_valueresponse = 0x00630008;
 			}
 
-			m_puzzli_54_trigger = 0;
 		}
 		break;
 
