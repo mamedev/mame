@@ -134,10 +134,16 @@ TILE_GET_INFO_MEMBER(_3x3puzzle_state::get_tile3_info)
 
 WRITE16_MEMBER(_3x3puzzle_state::gfx_ctrl_w)
 {
+	// does this have registers to control when the actual tile/palette
+	// data is copied to a private buffer?
+
 	// bit 5 (0x20) cleared when palette is written
 	// bit 4 (0x10) screen width - 1: 512 pixels, 0: 320 pixels
 	// bit 3 (0x08) is set when tilemap scroll registers are written
-	// bit 1 (0x02) OKI banking
+	// bit 1,2(0x06) OKI banking
+	// bit 0 (0x01) set in Casanova intro (could be OKI bank instead of bit 2?)
+
+	//printf("%04x\n",data&0xc7);
 
 	if ( BIT(data,4) )
 	{
@@ -148,10 +154,10 @@ WRITE16_MEMBER(_3x3puzzle_state::gfx_ctrl_w)
 		machine().primary_screen->set_visible_area(0*8, 40*8-1, 0*8, 30*8-1);
 	}
 
-	if ( BIT(data, 1) != m_oki_bank )
+	if ( (data&0x06) != m_oki_bank )
 	{
-		m_oki_bank = BIT(data,1);
-		m_oki->set_bank_base(m_oki_bank * 0x40000);
+		m_oki_bank = data &0x6;
+		m_oki->set_bank_base((m_oki_bank>>1) * 0x40000);
 	}
 }
 
@@ -219,7 +225,7 @@ static INPUT_PORTS_START( _3x3puzzle )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
-
+	
 	PORT_START("SYS")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -477,4 +483,4 @@ ROM_END
 
 GAME( 1998, 3x3puzzl,  0,          _3x3puzzle,  _3x3puzzle,  driver_device, 0,       ROT0, "Ace Enterprise",      "3X3 Puzzle (Enterprise)", 0 ) // 1998. 5. 28
 GAME( 1998, 3x3puzzla, 3x3puzzl,   _3x3puzzle,  _3x3puzzle,  driver_device, 0,       ROT0, "Ace Enterprise",      "3X3 Puzzle (Normal)", 0 ) // 1998. 5. 28
-GAME( 199?, casanova,  0,          _3x3puzzle,  casanova,    driver_device, 0,       ROT0, "<unknown>",           "Casanova", GAME_IMPERFECT_SOUND )
+GAME( 199?, casanova,  0,          _3x3puzzle,  casanova,    driver_device, 0,       ROT0, "<unknown>",           "Casanova", GAME_IMPERFECT_GRAPHICS )
