@@ -1,19 +1,9 @@
-/* Double Wing */
+/* Double Wings
 
-/*
+ - sound CPU seems to miss commands sometimes
+ - flipscreen is wrong
+ - should sprites be buffered (is there a Deco71?)
 
-the most protected of the DE102 games?
-
-Protection TODO:
-- 3rd Boss (with Red Plane) causes a crash to the main CPU if you don't beat him on time;
-- What is the $330 related for? Appears to be read when you collect a power-up.
-- Check the remaining unmapped read/writes effect;
-- Boss BGM might be wrong / variable;
-- Haven't yet checked if bonus life and difficulty DIP-SW are rightly tested;
-- Clean-up the whole routine;
-
-
--- Dip locations verified with Japanese manual
 */
 
 #include "emu.h"
@@ -72,16 +62,7 @@ public:
 
 UINT16 dblwings_pri_callback(UINT16 x)
 {
-	UINT16 pri = (x & 0xc000); // 2 bits or 1?
-	switch (pri & 0xc000)
-	{
-		case 0x0000: pri = 0; break;
-		case 0x4000: pri = 0xf0; break;
-		case 0x8000: pri = 0xf0 | 0xcc; break;
-		case 0xc000: pri = 0xf0 | 0xcc; break; /*  or 0xf0|0xcc|0xaa ? */
-	}
-
-	return pri;
+	return 0; // sprites always on top?
 }
 
 
@@ -449,4 +430,4 @@ DRIVER_INIT_MEMBER(dblewing_state,dblewing)
 }
 
 
-GAME( 1993, dblewing, 0,     dblewing, dblewing, dblewing_state,  dblewing,  ROT90, "Mitchell", "Double Wings", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1993, dblewing, 0,     dblewing, dblewing, dblewing_state,  dblewing,  ROT90, "Mitchell", "Double Wings", GAME_SUPPORTS_SAVE )
