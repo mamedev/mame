@@ -1493,25 +1493,6 @@ UINT16 deco_146_base_device::read_data_getloc(UINT16 address, int& location)
 	{
 		retdata = m_port_c_r(0);
 	}
-	else if (location==INPUT_PORT_A_NV)
-	{
-		fatalerror("INPUT_PORT_A_NV %04x\n", address);
-	}
-	else if (location==INPUT_PORT_B_NV)
-	{
-		fatalerror("INPUT_PORT_B_NV %04x\n", address);
-
-	}
-	else if (location==INPUT_PORT_C_NV)
-	{
-		fatalerror("INPUT_PORT_C_NV %04x\n", address);
-
-	}
-	else if (location==INPUT_NOT_FOUND)
-	{
-		fatalerror("INPUT_NOT_FOUND %04x\n", address);
-
-	}
 	else
 	{
 		if (m_current_rambank==0)
