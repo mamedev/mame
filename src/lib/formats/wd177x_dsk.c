@@ -359,6 +359,7 @@ bool wd177x_format::save(io_generic *io, floppy_image *image)
 			io_generic_write(io, sectdata, (track*f.head_count + head)*track_size, track_size);
 		}
 
+	global_free(candidates);
 	return true;
 }
 
