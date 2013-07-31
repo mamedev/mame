@@ -3650,6 +3650,8 @@ static MACHINE_CONFIG_START( pc9801rs, pc9801_state )
 	MCFG_FLOPPY_DRIVE_ADD("upd765_2hd:0", pc9801_floppies, "525hd", pc9801_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765_2hd:1", pc9801_floppies, "525hd", pc9801_state::floppy_formats)
 
+	MCFG_SOFTWARE_LIST_ADD("disk_list","pc98")
+
 	MCFG_FRAGMENT_ADD(pc9801_cbus)
 
 	MCFG_RAM_ADD(RAM_TAG)
@@ -3722,6 +3724,8 @@ static MACHINE_CONFIG_START( pc9821, pc9801_state )
 	//"upd765_2dd"
 	MCFG_FLOPPY_DRIVE_ADD("upd765_2hd:0", pc9801_floppies, "525hd", pc9801_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765_2hd:1", pc9801_floppies, "525hd", pc9801_state::floppy_formats)
+
+	MCFG_SOFTWARE_LIST_ADD("disk_list","pc98")
 
 	MCFG_FRAGMENT_ADD(pc9801_cbus)
 
