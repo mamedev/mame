@@ -96,17 +96,17 @@ READ8_MEMBER(mitchell_state::pang_port5_r)
 
 WRITE8_MEMBER(mitchell_state::eeprom_cs_w)
 {
-	m_eeprom->cs_write(data ? CLEAR_LINE : ASSERT_LINE);
+	m_eeprom->cs_write(data ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE8_MEMBER(mitchell_state::eeprom_clock_w)
 {
-	m_eeprom->clk_write(data ? CLEAR_LINE : ASSERT_LINE);
+	m_eeprom->clk_write(data ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE8_MEMBER(mitchell_state::eeprom_serial_w)
 {
-	m_eeprom->di_write(data);
+	m_eeprom->di_write(data & 1);
 }
 
 

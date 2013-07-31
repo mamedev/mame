@@ -527,7 +527,10 @@ void eeprom_serial_base_device::execute_command()
 	switch (m_command)
 	{
 		// advance to the READING_DATA state; data is fetched after first CLK
+		// reset the shift register to 0 to simulate the dummy 0 bit that happens prior
+		// to the first clock
 		case COMMAND_READ:
+			m_shift_register = 0;
 			set_state(STATE_READING_DATA);
 			break;
 			
