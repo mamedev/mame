@@ -1,8 +1,67 @@
-/* Double Wings
+/*
+
+Double Wings
+Mitchell 1993 
+
+This game runs on Data East hardware.
+
+PCB Layout
+----------
+
+S-NK-3220
+DEC-22VO
+|---------------------------------------------|
+|MB3730 C3403    32.22MHz           MBE-01.16A|
+|  Y3014B  KP_03-.16H       77                |
+|           M6295                   MBE-00.14A|
+|  YM2151                            |------| |
+|          Z80      CXK5864          |      | |
+| VOL                       VG-02.11B|  52  | |
+|        LH5168     CXK5864          |      | |
+|                                    |------| |
+|                  |------|              28MHz|
+|J       KP_02-.10H|      |                   |
+|A                 | 141  |         CXK5814   |
+|M       MBE-02.8H |      |                   |
+|M                 |      |         CXK5814   |
+|A                 |------|                   |
+|                                   CXK5814   |
+|                 KP_01-.5D                   |
+|                                   CXK5814   |
+|                 CXK5864                     |
+| |----|          KP_00-.3D         |------|  |
+| |104 |                            | 102  |  |
+| |    |          CXK5864           |      |  |
+| |----|                            |      |  |
+|SW2 SW1 VG-01.1H VG-00.1F          |------|  |
+|---------------------------------------------|
+Notes:
+       102     - Custom encrypted 68000 CPU. Clock 14.000MHz [28/2]
+       Z80     - Toshiba TMPZ84C000AP-6 Z80 CPU. Clock 3.58MHz [32.22/9]
+       YM2151  - Yamaha YM2151 FM Operator Type-M (OPM) sound chip. Clock 3.58MHz [32.22/9]
+       M6295   - Oki M6295 4-channel mixing ADPCM LSI. Clock 1.000MHz [28/28]. Pin 7 HIGH
+       LH6168  - Sharp LH6168 8kx8 SRAM (DIP28)
+       CXK5814 - Sony CXK5816 2kx8 SRAM (DIP24)
+       CXK5864 - Sony CXK5864 8kx8 SRAM (DIP28)
+       VG-*    - MMI PAL16L8 (DIP20)
+       SW1/SW2 - 8-position DIP switch
+       HSync   - 15.6250kHz
+       VSync   - 58.4443Hz
+
+       Other DATA EAST Chips
+       --------------------------------------
+       DATA EAST 52  9235EV 205941 VC5259-0001 JAPAN   (Sprite Generator IC, 128 pin PQFP)
+       DATA EAST 102 (M) DATA EAST 250 JAPAN           (Encrypted 68000 CPU, 128 Pin PQFP)
+       DATA EAST 141 24220F008                         (Tile Generator IC, 160 pin PQFP)
+       DATA EAST 104 L7A0717 9143 (M) DATA EAST        (IO/Protection, 100 pin PQFP)
+       Small surface-mounted chip with number scratched off (28 pin SOP), but has number 9303K9200
+       A similar chip exists on Capt. America PCB and has the number 77 on it. Possibly the same chip?
+
+
 
  - sound CPU seems to miss commands sometimes
  - flipscreen is wrong
- - should sprites be buffered (is there a Deco71?)
+ - should sprites be buffered, is the Deco '77' a '71' or similar?
 
 */
 
@@ -141,7 +200,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, dblewing_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io, AS_IO, 8, dblewing_state )
-	AM_RANGE(0x0000, 0xffff)  AM_ROM AM_REGION("audio_data", 0)
+	AM_RANGE(0x0000, 0xffff)  AM_ROM AM_REGION("audiocpu", 0)
 ADDRESS_MAP_END
 
 
@@ -212,7 +271,6 @@ static INPUT_PORTS_START( dblewing )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
-	// Do not change these until the bit order from the protection device is correct!
 	PORT_START("DSW")
 		/* 16bit - These values are for Dip Switch #1 */
 	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:1,2,3")
@@ -309,11 +367,11 @@ void dblewing_state::dblewing_sound_cb( address_space &space, UINT16 data, UINT1
 static MACHINE_CONFIG_START( dblewing, dblewing_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 14000000)   /* DE102 */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_28MHz/2)   /* DE102 */
 	MCFG_CPU_PROGRAM_MAP(dblewing_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dblewing_state,  irq6_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_32_22MHz/9)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_io)
 
@@ -322,7 +380,7 @@ static MACHINE_CONFIG_START( dblewing, dblewing_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58)
+	MCFG_SCREEN_REFRESH_RATE(58.443)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
@@ -344,69 +402,24 @@ static MACHINE_CONFIG_START( dblewing, dblewing_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_YM2151_ADD("ymsnd", 32220000/9)
+	MCFG_YM2151_ADD("ymsnd", XTAL_32_22MHz/9)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE(dblewing_state, sound_irq))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_OKIM6295_ADD("oki", 32220000/32, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL_28MHz/28, OKIM6295_PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 
-/*
 
-Double Wings (JPN Ver.)
-(c)1993 Mitchell
-DEC-22V0 (S-NK-3220)
-
-Software is by Mitchell, but the PCB is pure Data East.
-
-Data East ROM code = KP
-
-
-CPU     :DE102 - Encrypted 68000
-Sound   :TMPZ84C00AP-6,YM2151,OKI M6295, YM3014B
-OSC     :28.0000MHz,32.2200MHz
-RAM     :LH6168 x 1, CXK5814 x 6, CXK5864 x 4
-DIP     :2 x 8 position
-Other   :DATA EAST Chips (numbers scratched)
-         --------------------------------------
-         DATA EAST #?  9235EV 205941  VC5259-0001 JAPAN (confirmed #52) - 128 pin PQFP
-         DATA EAST #?  DATA EAST 250 JAPAN (#102, the CPU) - 128 Pin PQFP
-         DATA EAST #?  24220F008 (confirmed #141) - 160 pin PQFP
-         DATA EAST #?  L7A0717   9143  (confirmed #104, IO/Protection) - 100 pin PQFP
-
-         PALs: PAL16L8 (x 2, VG-00, VG-01) between program ROMs and CPU
-               PAL16L8 (x 1, VG-02) next to #52
-
-         Small surface-mounted chip with number scratched off (28 pin SOP), but has number 9303K9200.
-         A similar chip exists on Capt. America PCB and has the number 77 on it. Possibly the same chip?
-
-KP_00-.3D    [547dc83e]
-KP_01-.5D    [7a210c33]
-
-KP_02-.10H   [def035fa]
-
-KP_03-.16H   [5d7f930d]
-
-MBE-00.14A   [e33f5c93]
-MBE-01.16A   [ef452ad7]
-MBE-02.8H    [5a6d3ac5]
-
-*/
 
 ROM_START( dblewing )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* DE102 code (encrypted) */
 	ROM_LOAD16_BYTE( "kp_00-.3d",    0x000001, 0x040000, CRC(547dc83e) SHA1(f6f96bd4338d366f06df718093f035afabc073d1) )
 	ROM_LOAD16_BYTE( "kp_01-.5d",    0x000000, 0x040000, CRC(7a210c33) SHA1(ced89140af6d6a1bc0ffb7728afca428ed007165) )
 
-	ROM_REGION( 0x18000, "audiocpu", 0 ) // sound cpu
-	ROM_LOAD( "kp_02-.10h",    0x00000, 0x08000, CRC(def035fa) SHA1(fd50314e5c94c25df109ee52c0ce701b0ff2140c) )
-	ROM_CONTINUE(              0x10000, 0x08000 )
-
-	ROM_REGION( 0x10000, "audio_data", 0 ) // sound data
-	ROM_COPY( "audiocpu" ,  0x00000, 0x00000, 0x8000 )
-	ROM_COPY( "audiocpu" ,  0x10000, 0x08000, 0x8000 )
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // sound cpu
+	ROM_LOAD( "kp_02-.10h",    0x00000, 0x10000, CRC(def035fa) SHA1(fd50314e5c94c25df109ee52c0ce701b0ff2140c) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD( "mbe-02.8h",    0x00000, 0x100000, CRC(5a6d3ac5) SHA1(738bb833e2c5d929ac75fe4e69ee0af88197d8a6) )
@@ -420,7 +433,6 @@ ROM_START( dblewing )
 	ROM_RELOAD(                0x20000, 0x20000 )
 	ROM_RELOAD(                0x40000, 0x20000 )
 	ROM_RELOAD(                0x60000, 0x20000 )
-
 ROM_END
 
 DRIVER_INIT_MEMBER(dblewing_state,dblewing)
