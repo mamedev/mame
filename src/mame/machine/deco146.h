@@ -40,11 +40,6 @@ typedef device_delegate<void (address_space &space, UINT16 data, UINT16 mem_mask
 #define INPUT_PORT_B (-2)
 #define INPUT_PORT_C (-3)
 
-#define INPUT_PORT_A_NV (-4)
-#define INPUT_PORT_B_NV (-5)
-#define INPUT_PORT_C_NV (-6)
-
-#define INPUT_NOT_FOUND (-7)
 
 #define NIB3__ 0xc, 0xd, 0xe, 0xf
 #define NIB3R1 0xd, 0xe, 0xf, 0xc
