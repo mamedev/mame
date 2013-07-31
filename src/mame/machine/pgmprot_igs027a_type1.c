@@ -648,7 +648,7 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 
 
 
-
+		// I think the values returned here must be connected to the values written to command 31 on startup
 		// 63/67 are used on startup to get the z80 music at least
 		case 0x63: // used as a read address by the 68k code (related to previous uploaded values like cave?) should point at a table of ~0x80 in size? seems to use values as further pointers?
 			if (m_value0==0x0000)
@@ -667,6 +667,10 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 			{
 				m_valueresponse = 0x0016faa8;
 			}
+			else if (m_value0==0x0004) // 2 player demo
+			{
+				m_valueresponse = 0x00174416;
+			}
 			else
 			{
 				printf("unk case x63\n");
@@ -679,6 +683,10 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 			if ( (m_value0==0x0000) || (m_value0==0x0001) || (m_value0==0x0002) || (m_value0==0x0003) )
 			{
 				m_valueresponse = 0x00166178; // right for puzzli2 , wrong for puzzli2s, probably calculated from the writes then?
+			}
+			else if ( (m_value0==0x0004) ) // 2 player demo
+			{
+				m_valueresponse = 0x00166e72;
 			}
 			else
 			{
