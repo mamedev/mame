@@ -281,8 +281,6 @@ static MACHINE_CONFIG_FRAGMENT( softbox )
 	MCFG_HARDDISK_ADD("harddisk3")
 	MCFG_HARDDISK_ADD("harddisk4")
 	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL)
-
-	MCFG_IEEE488_SLOT_ADD("ieee", cbm_ieee488_devices, NULL)
 MACHINE_CONFIG_END
 
 

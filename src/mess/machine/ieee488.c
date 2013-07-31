@@ -88,7 +88,7 @@ void ieee488_slot_device::device_start()
 	assert(bus);
 
 	device_ieee488_interface *dev = dynamic_cast<device_ieee488_interface *>(get_card_device());
-	if (dev) bus->add_device(get_card_device());
+	if (dev) bus->add_device(this, get_card_device());
 }
 
 
@@ -152,11 +152,12 @@ void ieee488_device::device_stop()
 //  add_device -
 //-------------------------------------------------
 
-void ieee488_device::add_device(device_t *target)
+void ieee488_device::add_device(ieee488_slot_device *slot, device_t *target)
 {
 	daisy_entry *entry = auto_alloc(machine(), daisy_entry(target));
 
 	entry->m_interface->m_bus = this;
+	entry->m_interface->m_slot = slot;
 
 	m_device_list.append(*entry);
 }

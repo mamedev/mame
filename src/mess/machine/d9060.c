@@ -267,7 +267,7 @@ READ8_MEMBER( base_d9060_device::riot1_pb_r )
 	UINT8 data = 0;
 
 	// device number selection
-	data |= m_address->read() & 0x07;
+	data |= m_slot->get_address() - 8;
 
 	// data accepted in
 	data |= m_bus->ndac_r() << 6;
@@ -446,8 +446,6 @@ static MACHINE_CONFIG_FRAGMENT( d9060 )
 	MCFG_SCSIDEV_ADD(SASIBUS_TAG ":harddisk0", D9060HD, SCSI_ID_0)
 	MCFG_SCSICB_ADD(SASIBUS_TAG ":host")
 	MCFG_SCSICB_REQ_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, base_d9060_device, req_w))
-
-	MCFG_IEEE488_SLOT_ADD("ieee", cbm_ieee488_devices, NULL)
 MACHINE_CONFIG_END
 
 

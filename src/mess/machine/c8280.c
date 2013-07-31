@@ -257,7 +257,7 @@ READ8_MEMBER( c8280_device::riot1_pb_r )
 	UINT8 data = 0;
 
 	// device number selection
-	data |= m_address->read() & 0x07;
+	data |= m_slot->get_address() - 8;
 
 	// data accepted in
 	data |= m_bus->ndac_r() << 6;
@@ -342,8 +342,6 @@ static MACHINE_CONFIG_FRAGMENT( c8280 )
 	MCFG_FD1797x_ADD(WD1797_TAG, XTAL_12MHz/6) // clock?
 	MCFG_FLOPPY_DRIVE_ADD(WD1797_TAG":0", c8280_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1797_TAG":1", c8280_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
-
-	MCFG_IEEE488_SLOT_ADD("ieee", cbm_ieee488_devices, NULL)
 MACHINE_CONFIG_END
 
 

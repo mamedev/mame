@@ -58,9 +58,10 @@
 	downcast<ieee488_device *>(device)->set_ren_callback(DEVCB2_##_write);
 
 
-#define MCFG_IEEE488_SLOT_ADD(_tag, _slot_intf, _def_slot) \
+#define MCFG_IEEE488_SLOT_ADD(_tag, _address, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, IEEE488_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
+	downcast<ieee488_slot_device *>(device)->set_address(_address);
 
 
 
@@ -70,6 +71,7 @@
 
 // ======================> ieee488_device
 
+class ieee488_slot_device;
 class device_ieee488_interface;
 
 class ieee488_device : public device_t
@@ -87,7 +89,7 @@ public:
 	template<class _write> void set_atn_callback(_write wr) { m_write_atn.set_callback(wr); }
 	template<class _write> void set_ren_callback(_write wr) { m_write_ren.set_callback(wr); }
 
-	void add_device(device_t *target);
+	void add_device(ieee488_slot_device *slot, device_t *target);
 
 	// reads for both host and peripherals
 	UINT8 dio_r() { return get_data(); }
@@ -187,8 +189,14 @@ public:
 	// construction/destruction
 	ieee488_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	void set_address(int address) { m_address = address; }
+	int get_address() { return m_address; }
+
 	// device-level overrides
 	virtual void device_start();
+
+protected:
+	int m_address;
 };
 
 
@@ -216,7 +224,8 @@ public:
 	virtual void ieee488_atn(int state) { };
 	virtual void ieee488_ren(int state) { };
 
-	ieee488_device  *m_bus;
+	ieee488_device *m_bus;
+	ieee488_slot_device *m_slot;
 };
 
 

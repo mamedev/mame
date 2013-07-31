@@ -358,8 +358,6 @@ static MACHINE_CONFIG_FRAGMENT( c2031 )
 
 	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, c1541_floppy_interface)
 	MCFG_64H156_ADD(C64H156_TAG, XTAL_16MHz, ga_intf)
-
-	MCFG_IEEE488_SLOT_ADD("ieee", cbm_ieee488_devices, NULL)
 MACHINE_CONFIG_END
 
 
@@ -411,7 +409,7 @@ inline int c2031_device::get_device_number()
 {
 	int state = 1;
 
-	switch (m_address->read() & 0x03)
+	switch ((m_slot->get_address() - 8) & 0x03)
 	{
 	case 0: state = (m_atna && m_nrfd_out); break;
 	case 1: state = m_nrfd_out;             break;
