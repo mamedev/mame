@@ -746,8 +746,8 @@ INLINE UINT16 FETCH16(i386_state *cpustate)
 	UINT32 address = cpustate->pc, error;
 
 	if( address & 0x1 ) {       /* Unaligned read */
-		value = (FETCH(cpustate) << 0) |
-				(FETCH(cpustate) << 8);
+		value = (FETCH(cpustate) << 0);
+		value |= (FETCH(cpustate) << 8);
 	} else {
 		if(!translate_address(cpustate,cpustate->CPL,TRANSLATE_FETCH,&address,&error))
 			PF_THROW(error);
@@ -764,10 +764,10 @@ INLINE UINT32 FETCH32(i386_state *cpustate)
 	UINT32 address = cpustate->pc, error;
 
 	if( cpustate->pc & 0x3 ) {      /* Unaligned read */
-		value = (FETCH(cpustate) << 0) |
-				(FETCH(cpustate) << 8) |
-				(FETCH(cpustate) << 16) |
-				(FETCH(cpustate) << 24);
+		value = (FETCH(cpustate) << 0);
+		value |= (FETCH(cpustate) << 8);
+		value |= (FETCH(cpustate) << 16);
+		value |= (FETCH(cpustate) << 24);
 	} else {
 		if(!translate_address(cpustate,cpustate->CPL,TRANSLATE_FETCH,&address,&error))
 			PF_THROW(error);
@@ -796,8 +796,8 @@ INLINE UINT16 READ16(i386_state *cpustate,UINT32 ea)
 	UINT32 address = ea, error;
 
 	if( ea & 0x1 ) {        /* Unaligned read */
-		value = (READ8( cpustate, address+0 ) << 0) |
-				(READ8( cpustate, address+1 ) << 8);
+		value = (READ8( cpustate, address+0 ) << 0);
+		value |= (READ8( cpustate, address+1 ) << 8);
 	} else {
 		if(!translate_address(cpustate,cpustate->CPL,TRANSLATE_READ,&address,&error))
 			PF_THROW(error);
@@ -813,10 +813,10 @@ INLINE UINT32 READ32(i386_state *cpustate,UINT32 ea)
 	UINT32 address = ea, error;
 
 	if( ea & 0x3 ) {        /* Unaligned read */
-		value = (READ8( cpustate, address+0 ) << 0) |
-				(READ8( cpustate, address+1 ) << 8) |
-				(READ8( cpustate, address+2 ) << 16) |
-				(READ8( cpustate, address+3 ) << 24);
+		value = (READ8( cpustate, address+0 ) << 0);
+		value |= (READ8( cpustate, address+1 ) << 8);
+		value |= (READ8( cpustate, address+2 ) << 16),
+		value |= (READ8( cpustate, address+3 ) << 24);
 	} else {
 		if(!translate_address(cpustate,cpustate->CPL,TRANSLATE_READ,&address,&error))
 			PF_THROW(error);
@@ -833,21 +833,21 @@ INLINE UINT64 READ64(i386_state *cpustate,UINT32 ea)
 	UINT32 address = ea, error;
 
 	if( ea & 0x7 ) {        /* Unaligned read */
-		value = (((UINT64) READ8( cpustate, address+0 )) << 0) |
-				(((UINT64) READ8( cpustate, address+1 )) << 8) |
-				(((UINT64) READ8( cpustate, address+2 )) << 16) |
-				(((UINT64) READ8( cpustate, address+3 )) << 24) |
-				(((UINT64) READ8( cpustate, address+4 )) << 32) |
-				(((UINT64) READ8( cpustate, address+5 )) << 40) |
-				(((UINT64) READ8( cpustate, address+6 )) << 48) |
-				(((UINT64) READ8( cpustate, address+7 )) << 56);
+		value = (((UINT64) READ8( cpustate, address+0 )) << 0);
+		value |= (((UINT64) READ8( cpustate, address+1 )) << 8);
+		value |= (((UINT64) READ8( cpustate, address+2 )) << 16);
+		value |= (((UINT64) READ8( cpustate, address+3 )) << 24);
+		value |= (((UINT64) READ8( cpustate, address+4 )) << 32);
+		value |= (((UINT64) READ8( cpustate, address+5 )) << 40);
+		value |= (((UINT64) READ8( cpustate, address+6 )) << 48);
+		value |= (((UINT64) READ8( cpustate, address+7 )) << 56);
 	} else {
 		if(!translate_address(cpustate,cpustate->CPL,TRANSLATE_READ,&address,&error))
 			PF_THROW(error);
 
 		address &= cpustate->a20_mask;
-		value = (((UINT64) cpustate->program->read_dword( address+0 )) << 0) |
-				(((UINT64) cpustate->program->read_dword( address+4 )) << 32);
+		value = (((UINT64) cpustate->program->read_dword( address+0 )) << 0);
+		value |= (((UINT64) cpustate->program->read_dword( address+4 )) << 32);
 	}
 	return value;
 }
@@ -867,8 +867,8 @@ INLINE UINT16 READ16PL0(i386_state *cpustate,UINT32 ea)
 	UINT32 address = ea, error;
 
 	if( ea & 0x1 ) {        /* Unaligned read */
-		value = (READ8PL0( cpustate, address+0 ) << 0) |
-				(READ8PL0( cpustate, address+1 ) << 8);
+		value = (READ8PL0( cpustate, address+0 ) << 0);
+		value |= (READ8PL0( cpustate, address+1 ) << 8);
 	} else {
 		if(!translate_address(cpustate,0,TRANSLATE_READ,&address,&error))
 			PF_THROW(error);
@@ -885,10 +885,10 @@ INLINE UINT32 READ32PL0(i386_state *cpustate,UINT32 ea)
 	UINT32 address = ea, error;
 
 	if( ea & 0x3 ) {        /* Unaligned read */
-		value = (READ8PL0( cpustate, address+0 ) << 0) |
-				(READ8PL0( cpustate, address+1 ) << 8) |
-				(READ8PL0( cpustate, address+2 ) << 16) |
-				(READ8PL0( cpustate, address+3 ) << 24);
+		value = (READ8PL0( cpustate, address+0 ) << 0);
+		value |= (READ8PL0( cpustate, address+1 ) << 8);
+		value |= (READ8PL0( cpustate, address+2 ) << 16);
+		value |= (READ8PL0( cpustate, address+3 ) << 24);
 	} else {
 		if(!translate_address(cpustate,0,TRANSLATE_READ,&address,&error))
 			PF_THROW(error);
@@ -1314,8 +1314,9 @@ INLINE UINT16 READPORT16(i386_state *cpustate, offs_t port)
 {
 	if (port & 1)
 	{
-		return  READPORT8(cpustate, port) |
-				(READPORT8(cpustate, port + 1) << 8);
+		UINT16 value = READPORT8(cpustate, port);
+		value |= (READPORT8(cpustate, port + 1) << 8);
+		return value;
 	}
 	else
 	{
@@ -1342,10 +1343,11 @@ INLINE UINT32 READPORT32(i386_state *cpustate, offs_t port)
 {
 	if (port & 3)
 	{
-		return  READPORT8(cpustate, port) |
-				(READPORT8(cpustate, port + 1) << 8) |
-				(READPORT8(cpustate, port + 2) << 16) |
-				(READPORT8(cpustate, port + 3) << 24);
+		UINT32 value = READPORT8(cpustate, port);
+		value |= (READPORT8(cpustate, port + 1) << 8);
+		value |= (READPORT8(cpustate, port + 2) << 16);
+		value |= (READPORT8(cpustate, port + 3) << 24);
+		return value;
 	}
 	else
 	{
