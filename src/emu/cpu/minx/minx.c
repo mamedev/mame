@@ -65,98 +65,106 @@ TODO:
 #define EXEC_01 0x01
 
 
-struct minx_state {
-//  MINX_CONFIG  config;
-	UINT16  PC;
-	UINT16  SP;
-	UINT16  BA;
-	UINT16  HL;
-	UINT16  X;
-	UINT16  Y;
-	UINT8   U;
-	UINT8   V;
-	UINT8   F;
-	UINT8   E;
-	UINT8   N;
-	UINT8   I;
-	UINT8   XI;
-	UINT8   YI;
-	UINT8   halted;
-	UINT8   interrupt_pending;
-	device_irq_acknowledge_callback irq_callback;
-	legacy_cpu_device *device;
-	address_space *program;
-	int icount;
-};
+#define RD(offset)      m_program->read_byte( offset )
+#define WR(offset,data) m_program->write_byte( offset, data )
+#define GET_MINX_PC     ( ( m_PC & 0x8000 ) ? ( m_V << 15 ) | (m_PC & 0x7FFF ) : m_PC )
 
-#define RD(offset)      minx->program->read_byte( offset )
-#define WR(offset,data) minx->program->write_byte( offset, data )
-#define GET_MINX_PC     ( ( minx->PC & 0x8000 ) ? ( minx->V << 15 ) | (minx->PC & 0x7FFF ) : minx->PC )
 
-INLINE minx_state *get_safe_token(device_t *device)
+const device_type MINX = &device_creator<minx_cpu_device>;
+
+
+minx_cpu_device::minx_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: cpu_device(mconfig, MINX, "Nintendo Minx", tag, owner, clock, "minx", __FILE__)
+	, m_program_config("program", ENDIANNESS_BIG, 8, 24, 0)
 {
-	assert(device != NULL);
-	assert(device->type() == MINX);
-
-	return (minx_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
-INLINE UINT16 rd16( minx_state *minx, UINT32 offset )
+
+UINT16 minx_cpu_device::rd16( UINT32 offset )
 {
 	return RD( offset ) | ( RD( offset + 1 ) << 8 );
 }
 
 
-INLINE void wr16( minx_state *minx, UINT32 offset, UINT16 data )
+void minx_cpu_device::wr16( UINT32 offset, UINT16 data )
 {
 	WR( offset, ( data & 0x00FF ) );
 	WR( offset + 1, ( data >> 8 ) );
 }
 
 
-static CPU_INIT( minx )
+void minx_cpu_device::device_start()
 {
-	minx_state *minx = get_safe_token(device);
-	minx->irq_callback = irqcallback;
-	minx->device = device;
-	minx->program = &device->space(AS_PROGRAM);
-	if ( device->static_config() != NULL )
+	m_program = &space(AS_PROGRAM);
+
+	state_add( MINX_PC, "PC", m_PC ).formatstr("%04X");
+	state_add( MINX_SP, "SP", m_SP ).formatstr("%04X");
+	state_add( MINX_BA, "BA", m_BA ).formatstr("%04X");
+	state_add( MINX_HL, "HL", m_HL ).formatstr("%04X");
+	state_add( MINX_X,  "X", m_X ).formatstr("%04X");
+	state_add( MINX_Y,  "Y", m_Y ).formatstr("%04X");
+	state_add( MINX_U,  "U", m_U ).formatstr("%02X");
+	state_add( MINX_V,  "V", m_V ).formatstr("%02X");
+	state_add( MINX_F,  "F", m_F ).formatstr("%02X");
+	state_add( MINX_E,  "E", m_E ).formatstr("%02X");
+	state_add( MINX_N,  "N", m_N ).formatstr("%02X");
+	state_add( MINX_I,  "I", m_I ).formatstr("%02X");
+	state_add( MINX_XI, "XI", m_XI ).formatstr("%02X");
+	state_add( MINX_YI, "YI", m_YI ).formatstr("%02X");
+
+	state_add(STATE_GENPC, "curpc", m_curpc).formatstr("%06X").noshow();
+	state_add(STATE_GENFLAGS, "GENFLAGS", m_flags).formatstr("%14s").noshow();
+
+	m_icountptr = &m_icount;
+}
+
+
+void minx_cpu_device::state_string_export(const device_state_entry &entry, astring &string)
+{
+	switch (entry.index())
 	{
+		case STATE_GENFLAGS:
+			string.printf( "%c%c%c%c%c%c%c%c-%c%c%c%c%c",
+				m_F & FLAG_I ? 'I' : '.',
+				m_F & FLAG_D ? 'D' : '.',
+				m_F & FLAG_L ? 'L' : '.',
+				m_F & FLAG_B ? 'B' : '.',
+				m_F & FLAG_S ? 'S' : '.',
+				m_F & FLAG_O ? 'O' : '.',
+				m_F & FLAG_C ? 'C' : '.',
+				m_F & FLAG_Z ? 'Z' : '.',
+				m_E & EXEC_X0 ? '0' : '.',
+				m_E & EXEC_X1 ? '1' : '.',
+				m_E & EXEC_X2 ? '2' : '.',
+				m_E & EXEC_DZ ? 'z' : '.',
+				m_E & EXEC_EN ? 'E' : '.' );
+			break;
 	}
-	else
-	{
-	}
 }
 
 
-static CPU_RESET( minx )
+void minx_cpu_device::device_reset()
 {
-	minx_state *minx = get_safe_token(device);
-	minx->SP = minx->BA = minx->HL = minx->X = minx->Y = 0;
-	minx->U = minx->V = minx->F = minx->E = minx->I = minx->XI = minx->YI = 0;
-	minx->halted = minx->interrupt_pending = 0;
+	m_SP = m_BA = m_HL = m_X = m_Y = 0;
+	m_U = m_V = m_F = m_E = m_I = m_XI = m_YI = 0;
+	m_halted = m_interrupt_pending = 0;
 
-	minx->PC = rd16( minx, 0 );
+	m_PC = rd16( 0 );
 }
 
 
-static CPU_EXIT( minx )
-{
-}
-
-
-INLINE UINT8 rdop( minx_state *minx )
+UINT8 minx_cpu_device::rdop()
 {
 	UINT8 op = RD( GET_MINX_PC );
-	minx->PC++;
+	m_PC++;
 	return op;
 }
 
 
-INLINE UINT16 rdop16( minx_state *minx )
+UINT16 minx_cpu_device::rdop16()
 {
-	UINT16 op = rdop(minx);
-	op = op | ( rdop(minx) << 8 );
+	UINT16 op = rdop();
+	op = op | ( rdop() << 8 );
 	return op;
 }
 
@@ -167,231 +175,65 @@ INLINE UINT16 rdop16( minx_state *minx )
 #include "minxops.h"
 
 
-static CPU_EXECUTE( minx )
+void minx_cpu_device::execute_run()
 {
 //  UINT32  oldpc;
 	UINT8   op;
-	minx_state *minx = get_safe_token(device);
 
 	do
 	{
-		debugger_instruction_hook(device, GET_MINX_PC);
+		m_curpc = GET_MINX_PC;
+		debugger_instruction_hook(this, m_curpc);
 //      oldpc = GET_MINX_PC;
 
-		if ( minx->interrupt_pending )
+		if ( m_interrupt_pending )
 		{
-			minx->halted = 0;
-			if ( ! ( minx->F & 0xc0 ) && minx->U == minx->V )
+			m_halted = 0;
+			if ( ! ( m_F & 0xc0 ) && m_U == m_V )
 			{
 				//logerror("minx_execute(): taking IRQ\n");
-				PUSH8( minx, minx->V );
-				PUSH16( minx, minx->PC );
-				PUSH8( minx, minx->F );
+				PUSH8( m_V );
+				PUSH16( m_PC );
+				PUSH8( m_F );
 
 				/* Set Interrupt Branch flag */
-				minx->F |= 0x80;
-				minx->V = 0;
-				minx->PC = rd16( minx, minx->irq_callback( minx->device, 0 ) << 1 );
-				minx->icount -= 28;     /* This cycle count is a guess */
+				m_F |= 0x80;
+				m_V = 0;
+				m_PC = rd16( standard_irq_callback( 0 ) << 1 );
+				m_icount -= 28;     /* This cycle count is a guess */
 			}
 		}
 
-		if ( minx->halted )
+		if ( m_halted )
 		{
-			minx->icount -= insnminx_cycles_CE[0xAE];
+			m_icount -= insnminx_cycles_CE[0xAE];
 		}
 		else
 		{
-			op = rdop(minx);
-			insnminx[op](minx);
-			minx->icount -= insnminx_cycles[op];
+			op = rdop();
+			(this->*insnminx[op])();
+			m_icount -= insnminx_cycles[op];
 		}
-	} while ( minx->icount > 0 );
+	} while ( m_icount > 0 );
 }
 
 
-static CPU_BURN( minx )
-{
-	minx_state *minx = get_safe_token(device);
-	minx->icount = 0;
-}
-
-
-static unsigned minx_get_reg( minx_state *minx, int regnum )
-{
-	switch( regnum )
-	{
-	case STATE_GENPC:   return GET_MINX_PC;
-	case MINX_PC:   return minx->PC;
-	case STATE_GENSP:
-	case MINX_SP:   return minx->SP;
-	case MINX_BA:   return minx->BA;
-	case MINX_HL:   return minx->HL;
-	case MINX_X:    return minx->X;
-	case MINX_Y:    return minx->Y;
-	case MINX_U:    return minx->U;
-	case MINX_V:    return minx->V;
-	case MINX_F:    return minx->F;
-	case MINX_E:    return minx->E;
-	case MINX_N:    return minx->N;
-	case MINX_I:    return minx->I;
-	case MINX_XI:   return minx->XI;
-	case MINX_YI:   return minx->YI;
-	}
-	return 0;
-}
-
-
-static void minx_set_reg( minx_state *minx, int regnum, unsigned val )
-{
-	switch( regnum )
-	{
-	case STATE_GENPC:   break;
-	case MINX_PC:   minx->PC = val; break;
-	case STATE_GENSP:
-	case MINX_SP:   minx->SP = val; break;
-	case MINX_BA:   minx->BA = val; break;
-	case MINX_HL:   minx->HL = val; break;
-	case MINX_X:    minx->X = val; break;
-	case MINX_Y:    minx->Y = val; break;
-	case MINX_U:    minx->U = val; break;
-	case MINX_V:    minx->V = val; break;
-	case MINX_F:    minx->F = val; break;
-	case MINX_E:    minx->E = val; break;
-	case MINX_N:    minx->N = val; break;
-	case MINX_I:    minx->I = val; break;
-	case MINX_XI:   minx->XI = val; break;
-	case MINX_YI:   minx->YI = val; break;
-	}
-}
-
-
-static void minx_set_irq_line( minx_state *minx, int irqline, int state )
+void minx_cpu_device::execute_set_input(int inputnum, int state)
 {
 	if ( state == ASSERT_LINE )
 	{
-		minx->interrupt_pending = 1;
+		m_interrupt_pending = 1;
 	}
 	else
 	{
-		minx->interrupt_pending = 0;
+		m_interrupt_pending = 0;
 	}
 }
 
 
-static CPU_SET_INFO( minx )
+offs_t minx_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
 {
-	minx_state *minx = get_safe_token(device);
-	switch( state )
-	{
-	case CPUINFO_INT_INPUT_STATE + 0:
-		minx_set_irq_line( minx, state - CPUINFO_INT_INPUT_STATE, info->i ); break;
-
-	case CPUINFO_INT_REGISTER + MINX_PC:
-	case CPUINFO_INT_REGISTER + MINX_SP:
-	case CPUINFO_INT_REGISTER + MINX_BA:
-	case CPUINFO_INT_REGISTER + MINX_HL:
-	case CPUINFO_INT_REGISTER + MINX_X:
-	case CPUINFO_INT_REGISTER + MINX_Y:
-	case CPUINFO_INT_REGISTER + MINX_U:
-	case CPUINFO_INT_REGISTER + MINX_V:
-	case CPUINFO_INT_REGISTER + MINX_F:
-	case CPUINFO_INT_REGISTER + MINX_E:
-	case CPUINFO_INT_REGISTER + MINX_N:
-	case CPUINFO_INT_REGISTER + MINX_I:
-	case CPUINFO_INT_REGISTER + MINX_XI:
-	case CPUINFO_INT_REGISTER + MINX_YI:
-		minx_set_reg( minx, state - CPUINFO_INT_REGISTER, info->i ); break;
-	}
+	extern CPU_DISASSEMBLE( minx );
+	return CPU_DISASSEMBLE_NAME(minx)(this, buffer, pc, oprom, opram, options);
 }
 
-
-CPU_GET_INFO( minx )
-{
-	minx_state *minx = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
-	switch( state )
-	{
-	case CPUINFO_INT_CONTEXT_SIZE:                              info->i = sizeof(minx_state); break;
-	case CPUINFO_INT_INPUT_LINES:                               info->i = 1; break;
-	case CPUINFO_INT_DEFAULT_IRQ_VECTOR:                        info->i = 0x00; break;
-	case CPUINFO_INT_ENDIANNESS:                                info->i = ENDIANNESS_BIG; break;
-	case CPUINFO_INT_CLOCK_MULTIPLIER:                          info->i = 1; break;
-	case CPUINFO_INT_CLOCK_DIVIDER:                             info->i = 1; break;
-	case CPUINFO_INT_MIN_INSTRUCTION_BYTES:                     info->i = 1; break;
-	case CPUINFO_INT_MAX_INSTRUCTION_BYTES:                     info->i = 5; break;
-	case CPUINFO_INT_MIN_CYCLES:                                info->i = 1; break;
-	case CPUINFO_INT_MAX_CYCLES:                                info->i = 4; break;
-	case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:        info->i = 8; break;
-	case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:        info->i = 24; break;
-	case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM:        info->i = 0; break;
-	case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:       info->i = 0; break;
-	case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:       info->i = 0; break;
-	case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:       info->i = 0; break;
-	case CPUINFO_INT_DATABUS_WIDTH + AS_IO:         info->i = 0; break;
-	case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:         info->i = 0; break;
-	case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:         info->i = 0; break;
-	case CPUINFO_INT_INPUT_STATE + 0:                           info->i = 0; break;
-	case CPUINFO_INT_REGISTER + STATE_GENPC:                            info->i = GET_MINX_PC; break;
-	case CPUINFO_INT_REGISTER + STATE_GENSP:
-	case CPUINFO_INT_REGISTER + MINX_PC:
-	case CPUINFO_INT_REGISTER + MINX_SP:
-	case CPUINFO_INT_REGISTER + MINX_BA:
-	case CPUINFO_INT_REGISTER + MINX_HL:
-	case CPUINFO_INT_REGISTER + MINX_X:
-	case CPUINFO_INT_REGISTER + MINX_Y:
-	case CPUINFO_INT_REGISTER + MINX_U:
-	case CPUINFO_INT_REGISTER + MINX_V:
-	case CPUINFO_INT_REGISTER + MINX_F:
-	case CPUINFO_INT_REGISTER + MINX_E:
-	case CPUINFO_INT_REGISTER + MINX_N:
-	case CPUINFO_INT_REGISTER + MINX_I:
-	case CPUINFO_INT_REGISTER + MINX_XI:
-	case CPUINFO_INT_REGISTER + MINX_YI:                        info->i = minx_get_reg( minx, state - CPUINFO_INT_REGISTER ); break;
-	case CPUINFO_INT_PREVIOUSPC:                                info->i = 0x0000; break;
-	case CPUINFO_FCT_SET_INFO:                                  info->setinfo = CPU_SET_INFO_NAME(minx); break;
-	case CPUINFO_FCT_INIT:                                      info->init = CPU_INIT_NAME(minx); break;
-	case CPUINFO_FCT_RESET:                                     info->reset = CPU_RESET_NAME(minx); break;
-	case CPUINFO_FCT_EXIT:                                      info->exit = CPU_EXIT_NAME(minx); break;
-	case CPUINFO_FCT_EXECUTE:                                   info->execute = CPU_EXECUTE_NAME(minx); break;
-	case CPUINFO_FCT_BURN:                                      info->burn = CPU_BURN_NAME(minx); break;
-	case CPUINFO_FCT_DISASSEMBLE:                               info->disassemble = CPU_DISASSEMBLE_NAME(minx); break;
-	case CPUINFO_PTR_INSTRUCTION_COUNTER:                       info->icount = &minx->icount; break;
-	case CPUINFO_STR_NAME:                                      strcpy( info->s, "Minx" ); break;
-	case CPUINFO_STR_FAMILY:                                strcpy( info->s, "Nintendo Minx" ); break;
-	case CPUINFO_STR_VERSION:                               strcpy( info->s, "0.1" ); break;
-	case CPUINFO_STR_SOURCE_FILE:                                   strcpy( info->s, __FILE__ ); break;
-	case CPUINFO_STR_CREDITS:                               strcpy( info->s, "Copyright The MESS Team." ); break;
-	case CPUINFO_STR_FLAGS:
-		sprintf( info->s, "%c%c%c%c%c%c%c%c-%c%c%c%c%c",
-			minx->F & FLAG_I ? 'I' : '.',
-			minx->F & FLAG_D ? 'D' : '.',
-			minx->F & FLAG_L ? 'L' : '.',
-			minx->F & FLAG_B ? 'B' : '.',
-			minx->F & FLAG_S ? 'S' : '.',
-			minx->F & FLAG_O ? 'O' : '.',
-			minx->F & FLAG_C ? 'C' : '.',
-			minx->F & FLAG_Z ? 'Z' : '.',
-			minx->E & EXEC_X0 ? '0' : '.',
-			minx->E & EXEC_X1 ? '1' : '.',
-			minx->E & EXEC_X2 ? '2' : '.',
-			minx->E & EXEC_DZ ? 'z' : '.',
-			minx->E & EXEC_EN ? 'E' : '.' );
-		break;
-	case CPUINFO_STR_REGISTER + MINX_PC:                        sprintf( info->s, "PC:%04X", minx->PC ); break;
-	case CPUINFO_STR_REGISTER + MINX_SP:                        sprintf( info->s, "SP:%04X", minx->SP ); break;
-	case CPUINFO_STR_REGISTER + MINX_BA:                        sprintf( info->s, "BA:%04X", minx->BA ); break;
-	case CPUINFO_STR_REGISTER + MINX_HL:                        sprintf( info->s, "HL:%04X", minx->HL ); break;
-	case CPUINFO_STR_REGISTER + MINX_X:                         sprintf( info->s, "X:%04X", minx->X ); break;
-	case CPUINFO_STR_REGISTER + MINX_Y:                         sprintf( info->s, "Y:%04X", minx->Y ); break;
-	case CPUINFO_STR_REGISTER + MINX_U:                         sprintf( info->s, "U:%02X", minx->U ); break;
-	case CPUINFO_STR_REGISTER + MINX_V:                         sprintf( info->s, "V:%02X", minx->V ); break;
-	case CPUINFO_STR_REGISTER + MINX_F:                         sprintf( info->s, "F:%02X", minx->F ); break;
-	case CPUINFO_STR_REGISTER + MINX_E:                         sprintf( info->s, "E:%02X", minx->E ); break;
-	case CPUINFO_STR_REGISTER + MINX_N:                         sprintf( info->s, "N:%02X", minx->N ); break;
-	case CPUINFO_STR_REGISTER + MINX_I:                         sprintf( info->s, "I:%02X", minx->I ); break;
-	case CPUINFO_STR_REGISTER + MINX_XI:                        sprintf( info->s, "XI:%02X", minx->XI ); break;
-	case CPUINFO_STR_REGISTER + MINX_YI:                        sprintf( info->s, "YI:%02X", minx->YI ); break;
-	}
-}
-
-DEFINE_LEGACY_CPU_DEVICE(MINX, minx);
