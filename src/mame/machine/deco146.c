@@ -42,6 +42,7 @@
   Soundlatch port           0x64        0xa8
   Bankswitch port           0x78        0x66
   Extra addr Xor(if used)   0x44a       0x2a4
+  CS config region          0x8         0xc
 
   Both chips are often connected with the lower 10 address lines
   scrambled or reversed.
@@ -1520,4 +1521,5 @@ deco146_device::deco146_device(const machine_config &mconfig, const char *tag, d
 	m_mask_port = 0x36;
 	m_soundlatch_port = 0x64;
 	m_lookup_table = port_table;
+	m_configregion = 0x8;
 }

@@ -149,6 +149,8 @@ protected:
 
 	UINT16 m_latchaddr;
 	UINT16 m_latchdata;
+
+	UINT8 m_configregion; // which value of upper 4 address lines accesses the config region
 	int m_latchflag;
 private:
 	UINT8 region_selects[6];
