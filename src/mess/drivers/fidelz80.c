@@ -681,14 +681,14 @@ WRITE8_MEMBER( fidelz80_state::cc10_porta_w )
 
 READ8_MEMBER( fidelz80_state::vcc_portb_r )
 {
-	return (s14001a_bsy_r(m_speech) != 0) ? 0x80 : 0x00;
+	return (m_speech->bsy_r() != 0) ? 0x80 : 0x00;
 }
 
 WRITE8_MEMBER( fidelz80_state::vcc_porta_w )
 {
-	s14001a_set_volume(m_speech, 15); // hack, s14001a core should assume a volume of 15 unless otherwise stated...
-	s14001a_reg_w(m_speech, data & 0x3f);
-	s14001a_rst_w(m_speech, BIT(data, 7));
+	m_speech->set_volume(15); // hack, s14001a core should assume a volume of 15 unless otherwise stated...
+	m_speech->reg_w(data & 0x3f);
+	m_speech->rst_w(BIT(data, 7));
 
 	m_digit_data = data;
 
@@ -743,7 +743,7 @@ WRITE8_MEMBER( fidelz80_state::vsc_porta_w )
 		output_set_value("low_dot", BIT(out_digit, 7));
 	}
 
-	s14001a_reg_w(m_speech, data & 0x3f);
+	m_speech->reg_w(data & 0x3f);
 }
 
 WRITE8_MEMBER( fidelz80_state::vsc_portb_w )
@@ -820,7 +820,7 @@ READ8_MEMBER( fidelz80_state::vsc_pio_portb_r )
 {
 	UINT8 data = 0x00;
 
-	if (s14001a_bsy_r(m_speech) == 0)
+	if (m_speech->bsy_r() == 0)
 		data |= 0x10;
 
 	return data;
@@ -830,8 +830,8 @@ WRITE8_MEMBER( fidelz80_state::vsc_pio_portb_w )
 {
 	m_kp_matrix = (m_kp_matrix & 0xff) | ((data & 0x03)<<8);
 
-	s14001a_set_volume(m_speech, 15); // hack, s14001a core should assume a volume of 15 unless otherwise stated...
-	s14001a_rst_w(m_speech, BIT(data, 6));
+	m_speech->set_volume(15); // hack, s14001a core should assume a volume of 15 unless otherwise stated...
+	m_speech->rst_w(BIT(data, 6));
 }
 
 static Z80PIO_INTERFACE( vsc_z80pio_intf )
@@ -997,9 +997,9 @@ READ8_MEMBER(fidelz80_state::mcu_status_r)
 WRITE8_MEMBER( fidelz80_state::bridgec_speech_w )
 {
 	// todo: HALT THE z80 here, and set up a callback to poll the s14001a DONE line to resume z80
-	s14001a_set_volume(m_speech, 15); // hack, s14001a core should assume a volume of 15 unless otherwise stated...
-	s14001a_reg_w(m_speech, data & 0x3f);
-	s14001a_rst_w(m_speech, BIT(data, 7));
+	m_speech->set_volume(15); // hack, s14001a core should assume a volume of 15 unless otherwise stated...
+	m_speech->reg_w(data & 0x3f);
+	m_speech->rst_w(BIT(data, 7));
 }
 
 void fidelz80_state::machine_reset()

@@ -87,7 +87,7 @@ WRITE8_MEMBER( csc_state::pia0_pa_w )
 		break;
 	}
 
-//  s14001a_reg_w(m_speech, data & 0x3f);
+//  m_speech->reg_w(data & 0x3f);
 
 	// for avoid the digit flashing
 	m_selector |= 0x80;
@@ -95,15 +95,15 @@ WRITE8_MEMBER( csc_state::pia0_pa_w )
 
 WRITE8_MEMBER( csc_state::pia0_pb_w )
 {
-//  s14001a_set_volume(m_speech, 15); // hack, s14001a core should assume a volume of 15 unless otherwise stated...
-//  s14001a_rst_w(m_speech, BIT(data, 1));
+//  m_speech->set_volume(15); // hack, s14001a core should assume a volume of 15 unless otherwise stated...
+//  m_speech->rst_w(BIT(data, 1));
 }
 
 READ8_MEMBER( csc_state::pia0_pb_r )
 {
 	UINT8 data = 0x04;
 
-	if(s14001a_bsy_r(m_speech))
+	if(m_speech->bsy_r())
 		data |= 0x08;
 
 	if (m_selector<9)

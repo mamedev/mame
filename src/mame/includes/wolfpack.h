@@ -1,3 +1,5 @@
+#include "sound/s14001a.h"
+
 class wolfpack_state : public driver_device
 {
 public:
@@ -9,10 +11,15 @@ public:
 	wolfpack_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_alpha_num_ram(*this, "alpha_num_ram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_s14001a(*this, "speech") { }
 
-	int m_collision;
 	required_shared_ptr<UINT8> m_alpha_num_ram;
+	
+	required_device<cpu_device> m_maincpu;
+	required_device<s14001a_device> m_s14001a;
+	
+	int m_collision;
 	unsigned m_current_index;
 	UINT8 m_video_invert;
 	UINT8 m_ship_reflect;
@@ -67,7 +74,6 @@ public:
 	void draw_torpedo(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_pt(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_water(colortable_t *colortable, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);

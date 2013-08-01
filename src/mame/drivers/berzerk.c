@@ -25,10 +25,17 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_s14001a(*this, "speech"),
+		m_custom(*this, "exidy") { }
 
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;
+	
+	required_device<cpu_device> m_maincpu;
+	required_device<s14001a_device> m_s14001a;
+	required_device<exidy_sound_device> m_custom;
+		
 	UINT8 m_magicram_control;
 	UINT8 m_last_shift_data;
 	UINT8 m_intercept;
@@ -70,7 +77,6 @@ public:
 	void create_nmi_timer();
 	void start_nmi_timer();
 	void get_pens(pen_t *pens);
-	required_device<cpu_device> m_maincpu;
 };
 
 
@@ -511,40 +517,37 @@ UINT32 berzerk_state::screen_update_berzerk(screen_device &screen, bitmap_rgb32 
 
 WRITE8_MEMBER(berzerk_state::berzerk_audio_w)
 {
-	device_t *device;
 	int clock_divisor;
 
 	switch (offset)
 	{
 	/* offset 4 writes to the S14001A */
 	case 4:
-		device = machine().device("speech");
 		switch (data >> 6)
 		{
 		/* write data to the S14001 */
 		case 0:
 			/* only if not busy */
-			if (!s14001a_bsy_r(device))
+			if (!m_s14001a->bsy_r())
 			{
-				s14001a_reg_w(device, data & 0x3f);
+				m_s14001a->reg_w(data & 0x3f);
 
 				/* clock the chip -- via a 555 timer */
-				s14001a_rst_w(device, 1);
-				s14001a_rst_w(device, 0);
+				m_s14001a->rst_w(1);
+				m_s14001a->rst_w(0);
 			}
 
 			break;
 
 		case 1:
-			device = machine().device("speech");
 			/* volume */
-			s14001a_set_volume(device, ((data & 0x38) >> 3) + 1);
+			m_s14001a->set_volume(((data & 0x38) >> 3) + 1);
 
 			/* clock control - the first LS161 divides the clock by 9 to 16, the 2nd by 8,
 			   giving a final clock from 19.5kHz to 34.7kHz */
 			clock_divisor = 16 - (data & 0x07);
 
-			s14001a_set_clock(device, S14001_CLOCK / clock_divisor / 8);
+			m_s14001a->set_clock(S14001_CLOCK / clock_divisor / 8);
 			break;
 
 		default: break; /* 2 and 3 are not connected */
@@ -554,12 +557,12 @@ WRITE8_MEMBER(berzerk_state::berzerk_audio_w)
 
 	/* offset 6 writes to the sfxcontrol latch */
 	case 6:
-		exidy_sfxctrl_w(machine().device("exidy"), space, data >> 6, data);
+		m_custom->sfxctrl_w(space, data >> 6, data);
 		break;
 
 	/* everything else writes to the 6840 */
 	default:
-		exidy_sh6840_w(machine().device("exidy"), space, offset, data);
+		m_custom->sh6840_w(space, offset, data);
 		break;
 
 	}
@@ -568,19 +571,18 @@ WRITE8_MEMBER(berzerk_state::berzerk_audio_w)
 
 READ8_MEMBER(berzerk_state::berzerk_audio_r)
 {
-	device_t *device = machine().device("speech");
 	switch (offset)
 	{
 	/* offset 4 reads from the S14001A */
 	case 4:
-		return (!s14001a_bsy_r(device)) ? 0x40 : 0x00;
+		return (!m_s14001a->bsy_r()) ? 0x40 : 0x00;
 	/* offset 6 is open bus */
 	case 6:
 		logerror("attempted read from berzerk audio reg 6 (sfxctrl)!\n");
 		return 0;
 	/* everything else reads from the 6840 */
 	default:
-		return exidy_sh6840_r(machine().device("exidy"), space, offset);
+		return m_custom->sh6840_r(space, offset);
 	}
 }
 

@@ -240,41 +240,6 @@ and off as it normally does during speech). Once START has gone low-high-low, th
 
 #include "emu.h"
 #include "s14001a.h"
-#include "devlegcy.h"
-
-struct S14001AChip
-{
-	sound_stream * stream;
-
-	UINT8 WordInput; // value on word input bus
-	UINT8 LatchedWord; // value latched from input bus
-	UINT16 SyllableAddress; // address read from word table
-	UINT16 PhoneAddress; // starting/current phone address from syllable table
-	UINT8 PlayParams; // playback parameters from syllable table
-	UINT8 PhoneOffset; // offset within phone
-	UINT8 LengthCounter; // 4-bit counter which holds the inverted length of the word in phones, leftshifted by 1
-	UINT8 RepeatCounter; // 3-bit counter which holds the inverted number of repeats per phone, leftshifted by 1
-	UINT8 OutputCounter; // 2-bit counter to determine forward/backward and output/silence state.
-	UINT8 machineState; // chip state machine state
-	UINT8 nextstate; // chip state machine's new state
-	UINT8 laststate; // chip state machine's previous state, needed for mirror increment masking
-	UINT8 resetState; // reset line state
-	UINT8 oddeven; // odd versus even cycle toggle
-	UINT8 GlobalSilenceState; // same as above but for silent syllables instead of silent portions of mirrored syllables
-	UINT8 OldDelta; // 2-bit old delta value
-	UINT8 DACOutput; // 4-bit DAC Accumulator/output
-	UINT8 audioout; // filtered audio output
-	UINT8 *SpeechRom; // array to hold rom contents, mame will not need this, will use a pointer
-	INT16 filtervals[8];
-	UINT8 VSU1000_amp; // amplitude setting on VSU-1000 board
-};
-
-INLINE S14001AChip *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == S14001A);
-	return (S14001AChip *)downcast<s14001a_device *>(device)->token();
-}
 
 
 //#define DEBUGSTATE
@@ -282,12 +247,12 @@ INLINE S14001AChip *get_safe_token(device_t *device)
 #define SILENCE 0x7 // value output when silent
 #define ALTFLAG 0xFF // value to tell renderer that this frame's output is the average of the 8 prior frames and not directly used.
 
-#define LASTSYLLABLE ((chip->PlayParams & 0x80)>>7)
-#define MIRRORMODE ((chip->PlayParams & 0x40)>>6)
-#define SILENCEFLAG ((chip->PlayParams & 0x20)>>5)
-#define LENGTHCOUNT ((chip->PlayParams & 0x1C)>>1) // remember: its 4 bits and the bottom bit is always zero!
-#define REPEATCOUNT ((chip->PlayParams<<1)&0x6) // remember: its 3 bits and the bottom bit is always zero!
-#define LOCALSILENCESTATE ((chip->OutputCounter & 0x2) && (MIRRORMODE)) // 1 when silent output, 0 when DAC output.
+#define LASTSYLLABLE ((m_PlayParams & 0x80)>>7)
+#define MIRRORMODE ((m_PlayParams & 0x40)>>6)
+#define SILENCEFLAG ((m_PlayParams & 0x20)>>5)
+#define LENGTHCOUNT ((m_PlayParams & 0x1C)>>1) // remember: its 4 bits and the bottom bit is always zero!
+#define REPEATCOUNT ((m_PlayParams<<1)&0x6) // remember: its 3 bits and the bottom bit is always zero!
+#define LOCALSILENCESTATE ((m_OutputCounter & 0x2) && (MIRRORMODE)) // 1 when silent output, 0 when DAC output.
 
 static const INT8 DeltaTable[4][4] =
 {
@@ -298,79 +263,79 @@ static const INT8 DeltaTable[4][4] =
 };
 
 #ifdef ACCURATE_SQUEAL
-static INT16 audiofilter(S14001AChip *chip) /* rewrite me to better match the real filter! */
+INT16 s14001a_device::audiofilter() /* rewrite me to better match the real filter! */
 {
 	UINT8 temp1;
 		INT16 temp2 = 0;
 	/* mean averaging filter! 1/n exponential *would* be somewhat better, but I'm lazy... */
-	for (temp1 = 0; temp1 < 8; temp1++) { temp2 += chip->filtervals[temp1]; }
+	for (temp1 = 0; temp1 < 8; temp1++) { temp2 += m_filtervals[temp1]; }
 	temp2 >>= 3;
 	return temp2;
 }
 
-static void shiftIntoFilter(S14001AChip *chip, INT16 inputvalue)
+void s14001a_device::shiftIntoFilter(INT16 inputvalue)
 {
 	UINT8 temp1;
 	for (temp1 = 7; temp1 > 0; temp1--)
 	{
-		chip->filtervals[temp1] = chip->filtervals[(temp1 - 1)];
+		m_filtervals[temp1] = m_filtervals[(temp1 - 1)];
 	}
-	chip->filtervals[0] = inputvalue;
+	m_filtervals[0] = inputvalue;
 }
 #endif
 
-static void PostPhoneme(S14001AChip *chip) /* figure out what the heck to do after playing a phoneme */
+void s14001a_device::PostPhoneme() /* figure out what the heck to do after playing a phoneme */
 {
 #ifdef DEBUGSTATE
 	fprintf(stderr,"0: entered PostPhoneme\n");
 #endif
-	chip->RepeatCounter++; // increment the repeat counter
-	chip->OutputCounter++; // increment the output counter
+	m_RepeatCounter++; // increment the repeat counter
+	m_OutputCounter++; // increment the output counter
 	if (MIRRORMODE) // if mirroring is enabled
 	{
 #ifdef DEBUGSTATE
 		fprintf(stderr,"1: MIRRORMODE was on\n");
 #endif
-		if (chip->RepeatCounter == 0x8) // exceeded 3 bits?
+		if (m_RepeatCounter == 0x8) // exceeded 3 bits?
 		{
 #ifdef DEBUGSTATE
 			fprintf(stderr,"2: RepeatCounter was == 8\n");
 #endif
 			// reset repeat counter, increment length counter
 			// but first check if lowest bit is set
-			chip->RepeatCounter = REPEATCOUNT; // reload repeat counter with reload value
-			if (chip->LengthCounter & 0x1) // if low bit is 1 (will carry after increment)
+			m_RepeatCounter = REPEATCOUNT; // reload repeat counter with reload value
+			if (m_LengthCounter & 0x1) // if low bit is 1 (will carry after increment)
 			{
 #ifdef DEBUGSTATE
 				fprintf(stderr,"3: LengthCounter's low bit was 1\n");
 #endif
-				chip->PhoneAddress+=8; // go to next phone in this syllable
+				m_PhoneAddress+=8; // go to next phone in this syllable
 			}
-			chip->LengthCounter++;
-			if (chip->LengthCounter == 0x10) // if Length counter carried out of 4 bits
+			m_LengthCounter++;
+			if (m_LengthCounter == 0x10) // if Length counter carried out of 4 bits
 			{
 #ifdef DEBUGSTATE
 				fprintf(stderr,"3: LengthCounter overflowed\n");
 #endif
-				chip->SyllableAddress += 2; // go to next syllable
-				chip->nextstate = LASTSYLLABLE ? 13 : 3; // if we're on the last syllable, go to end state, otherwise go and load the next syllable.
+				m_SyllableAddress += 2; // go to next syllable
+				m_nextstate = LASTSYLLABLE ? 13 : 3; // if we're on the last syllable, go to end state, otherwise go and load the next syllable.
 			}
 			else
 			{
 #ifdef DEBUGSTATE
 				fprintf(stderr,"3: LengthCounter's low bit wasn't 1 and it didn't overflow\n");
 #endif
-				chip->PhoneOffset = (chip->OutputCounter&1) ? 7 : 0;
-				chip->nextstate = (chip->OutputCounter&1) ? 9 : 5;
+				m_PhoneOffset = (m_OutputCounter&1) ? 7 : 0;
+				m_nextstate = (m_OutputCounter&1) ? 9 : 5;
 			}
 		}
 		else // repeatcounter did NOT carry out of 3 bits so leave length counter alone
 		{
 #ifdef DEBUGSTATE
-			fprintf(stderr,"2: RepeatCounter is less than 8 (its actually %d)\n", chip->RepeatCounter);
+			fprintf(stderr,"2: RepeatCounter is less than 8 (its actually %d)\n", m_RepeatCounter);
 #endif
-			chip->PhoneOffset = (chip->OutputCounter&1) ? 7 : 0;
-			chip->nextstate = (chip->OutputCounter&1) ? 9 : 5;
+			m_PhoneOffset = (m_OutputCounter&1) ? 7 : 0;
+			m_nextstate = (m_OutputCounter&1) ? 9 : 5;
 		}
 	}
 	else // if mirroring is NOT enabled
@@ -378,48 +343,48 @@ static void PostPhoneme(S14001AChip *chip) /* figure out what the heck to do aft
 #ifdef DEBUGSTATE
 		fprintf(stderr,"1: MIRRORMODE was off\n");
 #endif
-		if (chip->RepeatCounter == 0x8) // exceeded 3 bits?
+		if (m_RepeatCounter == 0x8) // exceeded 3 bits?
 		{
 #ifdef DEBUGSTATE
 			fprintf(stderr,"2: RepeatCounter was == 8\n");
 #endif
 			// reset repeat counter, increment length counter
-			chip->RepeatCounter = REPEATCOUNT; // reload repeat counter with reload value
-			chip->LengthCounter++;
-			if (chip->LengthCounter == 0x10) // if Length counter carried out of 4 bits
+			m_RepeatCounter = REPEATCOUNT; // reload repeat counter with reload value
+			m_LengthCounter++;
+			if (m_LengthCounter == 0x10) // if Length counter carried out of 4 bits
 			{
 #ifdef DEBUGSTATE
 				fprintf(stderr,"3: LengthCounter overflowed\n");
 #endif
-				chip->SyllableAddress += 2; // go to next syllable
-				chip->nextstate = LASTSYLLABLE ? 13 : 3; // if we're on the last syllable, go to end state, otherwise go and load the next syllable.
+				m_SyllableAddress += 2; // go to next syllable
+				m_nextstate = LASTSYLLABLE ? 13 : 3; // if we're on the last syllable, go to end state, otherwise go and load the next syllable.
 #ifdef DEBUGSTATE
-				fprintf(stderr,"nextstate is now %d\n", chip->nextstate); // see line below, same reason.
+				fprintf(stderr,"nextstate is now %d\n", m_nextstate); // see line below, same reason.
 #endif
 				return; // need a return here so we don't hit the 'nextstate = 5' line below
 			}
 		}
-		chip->PhoneAddress += 8; // regardless of counters, the phone address always increments in non-mirrored mode
-		chip->PhoneOffset = 0;
-		chip->nextstate = 5;
+		m_PhoneAddress += 8; // regardless of counters, the phone address always increments in non-mirrored mode
+		m_PhoneOffset = 0;
+		m_nextstate = 5;
 	}
 #ifdef DEBUGSTATE
-	fprintf(stderr,"nextstate is now %d\n", chip->nextstate);
+	fprintf(stderr,"nextstate is now %d\n", m_nextstate);
 #endif
 }
 
-static void s14001a_clock(S14001AChip *chip) /* called once per clock */
+void s14001a_device::s14001a_clock() /* called once per clock */
 {
 	UINT8 CurDelta; // Current delta
 
 	/* on even clocks, audio output is floating, /romen is low so rom data bus is driven
 	     * on odd clocks, audio output is driven, /romen is high, state machine 2 is clocked
 	     */
-	chip->oddeven = !(chip->oddeven); // invert the clock
-	if (chip->oddeven == 0) // even clock
+	m_oddeven = !(m_oddeven); // invert the clock
+	if (m_oddeven == 0) // even clock
 	{
 #ifdef ACCURATE_SQUEAL
-		chip->audioout = ALTFLAG; // flag to the renderer that this output should be the average of the last 8
+		m_audioout = ALTFLAG; // flag to the renderer that this output should be the average of the last 8
 #endif
 		// DIGITAL INPUT *MIGHT* occur on the test pins occurs on this cycle?
 	}
@@ -427,123 +392,123 @@ static void s14001a_clock(S14001AChip *chip) /* called once per clock */
 	{
 		// fix dac output between samples. theoretically this might be unnecessary but it would require some messy logic in state 5 on the first sample load.
 		// Note: this behavior is NOT accurate, and needs to be fixed. see TODO.
-		if (chip->GlobalSilenceState || LOCALSILENCESTATE)
+		if (m_GlobalSilenceState || LOCALSILENCESTATE)
 		{
-			chip->DACOutput = SILENCE;
-			chip->OldDelta = 2;
+			m_DACOutput = SILENCE;
+			m_OldDelta = 2;
 		}
-		chip->audioout = (chip->GlobalSilenceState || LOCALSILENCESTATE) ? SILENCE : chip->DACOutput; // when either silence state is 1, output silence.
+		m_audioout = (m_GlobalSilenceState || LOCALSILENCESTATE) ? SILENCE : m_DACOutput; // when either silence state is 1, output silence.
 		// DIGITAL OUTPUT *might* be driven onto the test pins on this cycle?
-		switch(chip->machineState) // HUUUUUGE switch statement
+		switch(m_machineState) // HUUUUUGE switch statement
 		{
 		case 0: // idle state
-			chip->nextstate = 0;
+			m_nextstate = 0;
 			break;
 		case 1: // read starting syllable high byte from word table
-			chip->SyllableAddress = 0; // clear syllable address
-			chip->SyllableAddress |= chip->SpeechRom[(chip->LatchedWord<<1)]<<4;
-			chip->nextstate = chip->resetState ? 1 : 2;
+			m_SyllableAddress = 0; // clear syllable address
+			m_SyllableAddress |= m_SpeechRom[(m_LatchedWord<<1)]<<4;
+			m_nextstate = m_resetState ? 1 : 2;
 			break;
 		case 2: // read starting syllable low byte from word table
-			chip->SyllableAddress |= chip->SpeechRom[(chip->LatchedWord<<1)+1]>>4;
-			chip->nextstate = 3;
+			m_SyllableAddress |= m_SpeechRom[(m_LatchedWord<<1)+1]>>4;
+			m_nextstate = 3;
 			break;
 		case 3: // read starting phone address
-			chip->PhoneAddress = chip->SpeechRom[chip->SyllableAddress]<<4;
-			chip->nextstate = 4;
+			m_PhoneAddress = m_SpeechRom[m_SyllableAddress]<<4;
+			m_nextstate = 4;
 			break;
 		case 4: // read playback parameters and prepare for play
-			chip->PlayParams = chip->SpeechRom[chip->SyllableAddress+1];
-			chip->GlobalSilenceState = SILENCEFLAG; // load phone silence flag
-			chip->LengthCounter = LENGTHCOUNT; // load length counter
-			chip->RepeatCounter = REPEATCOUNT; // load repeat counter
-			chip->OutputCounter = 0; // clear output counter and disable mirrored phoneme silence indirectly via LOCALSILENCESTATE
-			chip->PhoneOffset = 0; // set offset within phone to zero
-			chip->OldDelta = 0x2; // set old delta to 2 <- is this right?
-			chip->DACOutput = SILENCE ; // set DAC output to center/silence position
-			chip->nextstate = 5;
+			m_PlayParams = m_SpeechRom[m_SyllableAddress+1];
+			m_GlobalSilenceState = SILENCEFLAG; // load phone silence flag
+			m_LengthCounter = LENGTHCOUNT; // load length counter
+			m_RepeatCounter = REPEATCOUNT; // load repeat counter
+			m_OutputCounter = 0; // clear output counter and disable mirrored phoneme silence indirectly via LOCALSILENCESTATE
+			m_PhoneOffset = 0; // set offset within phone to zero
+			m_OldDelta = 0x2; // set old delta to 2 <- is this right?
+			m_DACOutput = SILENCE ; // set DAC output to center/silence position
+			m_nextstate = 5;
 			break;
 		case 5: // Play phone forward, shift = 0 (also load)
-			CurDelta = (chip->SpeechRom[(chip->PhoneAddress)+chip->PhoneOffset]&0xc0)>>6; // grab current delta from high 2 bits of high nybble
-			chip->DACOutput += DeltaTable[CurDelta][chip->OldDelta]; // send data to forward delta table and add result to accumulator
-			chip->OldDelta = CurDelta; // Move current delta to old
-			chip->nextstate = 6;
+			CurDelta = (m_SpeechRom[(m_PhoneAddress)+m_PhoneOffset]&0xc0)>>6; // grab current delta from high 2 bits of high nybble
+			m_DACOutput += DeltaTable[CurDelta][m_OldDelta]; // send data to forward delta table and add result to accumulator
+			m_OldDelta = CurDelta; // Move current delta to old
+			m_nextstate = 6;
 			break;
 		case 6: // Play phone forward, shift = 2
-			CurDelta = (chip->SpeechRom[(chip->PhoneAddress)+chip->PhoneOffset]&0x30)>>4; // grab current delta from low 2 bits of high nybble
-			chip->DACOutput += DeltaTable[CurDelta][chip->OldDelta]; // send data to forward delta table and add result to accumulator
-			chip->OldDelta = CurDelta; // Move current delta to old
-			chip->nextstate = 7;
+			CurDelta = (m_SpeechRom[(m_PhoneAddress)+m_PhoneOffset]&0x30)>>4; // grab current delta from low 2 bits of high nybble
+			m_DACOutput += DeltaTable[CurDelta][m_OldDelta]; // send data to forward delta table and add result to accumulator
+			m_OldDelta = CurDelta; // Move current delta to old
+			m_nextstate = 7;
 			break;
 		case 7: // Play phone forward, shift = 4
-			CurDelta = (chip->SpeechRom[(chip->PhoneAddress)+chip->PhoneOffset]&0xc)>>2; // grab current delta from high 2 bits of low nybble
-			chip->DACOutput += DeltaTable[CurDelta][chip->OldDelta]; // send data to forward delta table and add result to accumulator
-			chip->OldDelta = CurDelta; // Move current delta to old
-			chip->nextstate = 8;
+			CurDelta = (m_SpeechRom[(m_PhoneAddress)+m_PhoneOffset]&0xc)>>2; // grab current delta from high 2 bits of low nybble
+			m_DACOutput += DeltaTable[CurDelta][m_OldDelta]; // send data to forward delta table and add result to accumulator
+			m_OldDelta = CurDelta; // Move current delta to old
+			m_nextstate = 8;
 			break;
 		case 8: // Play phone forward, shift = 6 (increment address if needed)
-			CurDelta = chip->SpeechRom[(chip->PhoneAddress)+chip->PhoneOffset]&0x3; // grab current delta from low 2 bits of low nybble
-			chip->DACOutput += DeltaTable[CurDelta][chip->OldDelta]; // send data to forward delta table and add result to accumulator
-			chip->OldDelta = CurDelta; // Move current delta to old
-			chip->PhoneOffset++; // increment phone offset
-			if (chip->PhoneOffset == 0x8) // if we're now done this phone
+			CurDelta = m_SpeechRom[(m_PhoneAddress)+m_PhoneOffset]&0x3; // grab current delta from low 2 bits of low nybble
+			m_DACOutput += DeltaTable[CurDelta][m_OldDelta]; // send data to forward delta table and add result to accumulator
+			m_OldDelta = CurDelta; // Move current delta to old
+			m_PhoneOffset++; // increment phone offset
+			if (m_PhoneOffset == 0x8) // if we're now done this phone
 			{
 				/* call the PostPhoneme Function */
-				PostPhoneme(chip);
+				PostPhoneme();
 			}
 			else
 			{
-				chip->nextstate = 5;
+				m_nextstate = 5;
 			}
 			break;
 		case 9: // Play phone backward, shift = 6 (also load)
-			CurDelta = (chip->SpeechRom[(chip->PhoneAddress)+chip->PhoneOffset]&0x3); // grab current delta from low 2 bits of low nybble
-			if (chip->laststate != 8) // ignore first (bogus) dac change in mirrored backwards mode. observations and the patent show this.
+			CurDelta = (m_SpeechRom[(m_PhoneAddress)+m_PhoneOffset]&0x3); // grab current delta from low 2 bits of low nybble
+			if (m_laststate != 8) // ignore first (bogus) dac change in mirrored backwards mode. observations and the patent show this.
 			{
-				chip->DACOutput -= DeltaTable[chip->OldDelta][CurDelta]; // send data to forward delta table and subtract result from accumulator
+				m_DACOutput -= DeltaTable[m_OldDelta][CurDelta]; // send data to forward delta table and subtract result from accumulator
 			}
-			chip->OldDelta = CurDelta; // Move current delta to old
-			chip->nextstate = 10;
+			m_OldDelta = CurDelta; // Move current delta to old
+			m_nextstate = 10;
 			break;
 		case 10: // Play phone backward, shift = 4
-			CurDelta = (chip->SpeechRom[(chip->PhoneAddress)+chip->PhoneOffset]&0xc)>>2; // grab current delta from high 2 bits of low nybble
-			chip->DACOutput -= DeltaTable[chip->OldDelta][CurDelta]; // send data to forward delta table and subtract result from accumulator
-			chip->OldDelta = CurDelta; // Move current delta to old
-			chip->nextstate = 11;
+			CurDelta = (m_SpeechRom[(m_PhoneAddress)+m_PhoneOffset]&0xc)>>2; // grab current delta from high 2 bits of low nybble
+			m_DACOutput -= DeltaTable[m_OldDelta][CurDelta]; // send data to forward delta table and subtract result from accumulator
+			m_OldDelta = CurDelta; // Move current delta to old
+			m_nextstate = 11;
 			break;
 		case 11: // Play phone backward, shift = 2
-			CurDelta = (chip->SpeechRom[(chip->PhoneAddress)+chip->PhoneOffset]&0x30)>>4; // grab current delta from low 2 bits of high nybble
-			chip->DACOutput -= DeltaTable[chip->OldDelta][CurDelta]; // send data to forward delta table and subtract result from accumulator
-			chip->OldDelta = CurDelta; // Move current delta to old
-			chip->nextstate = 12;
+			CurDelta = (m_SpeechRom[(m_PhoneAddress)+m_PhoneOffset]&0x30)>>4; // grab current delta from low 2 bits of high nybble
+			m_DACOutput -= DeltaTable[m_OldDelta][CurDelta]; // send data to forward delta table and subtract result from accumulator
+			m_OldDelta = CurDelta; // Move current delta to old
+			m_nextstate = 12;
 			break;
 		case 12: // Play phone backward, shift = 0 (increment address if needed)
-			CurDelta = (chip->SpeechRom[(chip->PhoneAddress)+chip->PhoneOffset]&0xc0)>>6; // grab current delta from high 2 bits of high nybble
-			chip->DACOutput -= DeltaTable[chip->OldDelta][CurDelta]; // send data to forward delta table and subtract result from accumulator
-			chip->OldDelta = CurDelta; // Move current delta to old
-			chip->PhoneOffset--; // decrement phone offset
-			if (chip->PhoneOffset == 0xFF) // if we're now done this phone
+			CurDelta = (m_SpeechRom[(m_PhoneAddress)+m_PhoneOffset]&0xc0)>>6; // grab current delta from high 2 bits of high nybble
+			m_DACOutput -= DeltaTable[m_OldDelta][CurDelta]; // send data to forward delta table and subtract result from accumulator
+			m_OldDelta = CurDelta; // Move current delta to old
+			m_PhoneOffset--; // decrement phone offset
+			if (m_PhoneOffset == 0xFF) // if we're now done this phone
 			{
 				/* call the PostPhoneme() function */
-				PostPhoneme(chip);
+				PostPhoneme();
 			}
 			else
 			{
-				chip->nextstate = 9;
+				m_nextstate = 9;
 			}
 			break;
 		case 13: // For those pedantic among us, consume an extra two clocks like the real chip does.
-			chip->nextstate = 0;
+			m_nextstate = 0;
 			break;
 		}
 #ifdef DEBUGSTATE
-		fprintf(stderr, "Machine state is now %d, was %d, PhoneOffset is %d\n", chip->nextstate, chip->machineState, chip->PhoneOffset);
+		fprintf(stderr, "Machine state is now %d, was %d, PhoneOffset is %d\n", m_nextstate, m_machineState, m_PhoneOffset);
 #endif
-		chip->laststate = chip->machineState;
-		chip->machineState = chip->nextstate;
+		m_laststate = m_machineState;
+		m_machineState = m_nextstate;
 
 			/* the dac is 4 bits wide. if a delta step forced it outside of 4 bits, mask it back over here */
-			chip->DACOutput &= 0xF;
+			m_DACOutput &= 0xF;
 	}
 }
 
@@ -551,96 +516,67 @@ static void s14001a_clock(S14001AChip *chip) /* called once per clock */
    MAME glue code
  **************************************************************************/
 
-static STREAM_UPDATE( s14001a_pcm_update )
+int s14001a_device::bsy_r()
 {
-	S14001AChip *chip = (S14001AChip *)param;
-	int i;
-
-	for (i = 0; i < samples; i++)
-	{
-		s14001a_clock(chip);
-#ifdef ACCURATE_SQUEAL
-		if (chip->audioout == ALTFLAG) // input from test pins -> output
-		{
-			shiftIntoFilter(chip, audiofilter(chip)); // shift over the previous outputs and stick in audioout.
-			outputs[0][i] = audiofilter(chip)*chip->VSU1000_amp;
-		}
-		else // normal, dac-driven output
-		{
-			shiftIntoFilter(chip, ((((INT16)chip->audioout)-8)<<9)); // shift over the previous outputs and stick in audioout 4 times. note <<9 instead of <<10, to prevent clipping, and to simulate that the filtered output normally has a somewhat lower amplitude than the driven one.
-#endif
-			outputs[0][i] = ((((INT16)chip->audioout)-8)<<10)*chip->VSU1000_amp;
-#ifdef ACCURATE_SQUEAL
-		}
-#endif
-	}
-}
-
-static DEVICE_START( s14001a )
-{
-	S14001AChip *chip = get_safe_token(device);
-	int i;
-
-	chip->GlobalSilenceState = 1;
-	chip->OldDelta = 0x02;
-	chip->DACOutput = SILENCE;
-
-	for (i = 0; i < 8; i++)
-	{
-		chip->filtervals[i] = SILENCE;
-	}
-
-	chip->SpeechRom = *device->region();
-
-	chip->stream = device->machine().sound().stream_alloc(*device, 0, 1, device->clock() ? device->clock() : device->machine().sample_rate(), chip, s14001a_pcm_update);
-}
-
-int s14001a_bsy_r(device_t *device)
-{
-	S14001AChip *chip = get_safe_token(device);
-	chip->stream->update();
+	m_stream->update();
 #ifdef DEBUGSTATE
-	fprintf(stderr,"busy state checked: %d\n",(chip->machineState != 0) );
+	fprintf(stderr,"busy state checked: %d\n",(m_machineState != 0) );
 #endif
-	return (chip->machineState != 0);
+	return (m_machineState != 0);
 }
 
-void s14001a_reg_w(device_t *device, int data)
+void s14001a_device::reg_w(int data)
 {
-	S14001AChip *chip = get_safe_token(device);
-	chip->stream->update();
-	chip->WordInput = data;
+	m_stream->update();
+	m_WordInput = data;
 }
 
-void s14001a_rst_w(device_t *device, int data)
+void s14001a_device::rst_w(int data)
 {
-	S14001AChip *chip = get_safe_token(device);
-	chip->stream->update();
-	chip->LatchedWord = chip->WordInput;
-	chip->resetState = (data==1);
-	chip->machineState = chip->resetState ? 1 : chip->machineState;
+	m_stream->update();
+	m_LatchedWord = m_WordInput;
+	m_resetState = (data==1);
+	m_machineState = m_resetState ? 1 : m_machineState;
 }
 
-void s14001a_set_clock(device_t *device, int clock)
+void s14001a_device::set_clock(int clock)
 {
-	S14001AChip *chip = get_safe_token(device);
-	chip->stream->set_sample_rate(clock);
+	m_stream->set_sample_rate(clock);
 }
 
-void s14001a_set_volume(device_t *device, int volume)
+void s14001a_device::set_volume(int volume)
 {
-	S14001AChip *chip = get_safe_token(device);
-	chip->stream->update();
-	chip->VSU1000_amp = volume;
+	m_stream->update();
+	m_VSU1000_amp = volume;
 }
 
 const device_type S14001A = &device_creator<s14001a_device>;
 
 s14001a_device::s14001a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, S14001A, "S14001A", tag, owner, clock, "s14001a", __FILE__),
-		device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this),
+		m_stream(NULL),
+		m_WordInput(0),
+		m_LatchedWord(0),
+		m_SyllableAddress(0),
+		m_PhoneAddress(0),
+		m_PlayParams(0),
+		m_PhoneOffset(0),
+		m_LengthCounter(0),
+		m_RepeatCounter(0),
+		m_OutputCounter(0),
+		m_machineState(0),
+		m_nextstate(0),
+		m_laststate(0),
+		m_resetState(0),
+		m_oddeven(0),
+		m_GlobalSilenceState(1),
+		m_OldDelta(0x02),
+		m_DACOutput(SILENCE),
+		m_audioout(0),
+		m_SpeechRom(NULL),
+		m_VSU1000_amp(0)
 {
-	m_token = global_alloc_clear(S14001AChip);
 }
 
 //-------------------------------------------------
@@ -659,7 +595,20 @@ void s14001a_device::device_config_complete()
 
 void s14001a_device::device_start()
 {
-	DEVICE_START_NAME( s14001a )(this);
+	int i;
+
+	m_GlobalSilenceState = 1;
+	m_OldDelta = 0x02;
+	m_DACOutput = SILENCE;
+
+	for (i = 0; i < 8; i++)
+	{
+		m_filtervals[i] = SILENCE;
+	}
+
+	m_SpeechRom = *region();
+
+	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock() ? clock() : machine().sample_rate(), this);
 }
 
 //-------------------------------------------------
@@ -668,6 +617,24 @@ void s14001a_device::device_start()
 
 void s14001a_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	// should never get here
-	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+	int i;
+
+	for (i = 0; i < samples; i++)
+		{
+			s14001a_clock();
+	#ifdef ACCURATE_SQUEAL
+		if (m_audioout == ALTFLAG) // input from test pins -> output
+			{
+				shiftIntoFilter(chip, audiofilter(chip)); // shift over the previous outputs and stick in audioout.
+				outputs[0][i] = audiofilter(chip)*m_VSU1000_amp;
+			}
+		else // normal, dac-driven output
+			{
+				shiftIntoFilter(chip, ((((INT16)m_audioout)-8)<<9)); // shift over the previous outputs and stick in audioout 4 times. note <<9 instead of <<10, to prevent clipping, and to simulate that the filtered output normally has a somewhat lower amplitude than the driven one.
+	#endif
+				outputs[0][i] = ((((INT16)m_audioout)-8)<<10)*m_VSU1000_amp;
+	#ifdef ACCURATE_SQUEAL
+			}
+	#endif
+		}
 }
