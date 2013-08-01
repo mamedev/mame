@@ -718,58 +718,152 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 
 
 
-
-
 		case 0x61: // ??
 			m_valueresponse = 0x36<<16;
 		break;
 
 
+	/* 
+	  these are probably scrambled with some kind of rotating xor?
+	  note puzzli2   004e  == 0016?
+	       puzzli2s  0051  == 0019? 
+		   maybe...
+
+	  puzzli2 on startup
+
+		001489f6: 61 0202
+		00148a84: 31 004e
+		00148acc: 31 a6f7
+		00148a84: 31 279e
+		00148acc: 31 534f
+		00148a84: 31 ab5c
+		00148acc: 31 a7cf
+		00148a84: 31 145f
+		00148acc: 31 7054
+		00148a84: 31 85a0
+		00148acc: 31 7b7f
+		
+		00148a84: 31 7003
+		00148acc: 31 c5ab
+		00148a84: 31 456d
+		00148acc: 31 f3aa
+		00148b34: 41 e2bb
+	
+	  puzzli2 super on startup
+		0014ceca: 61 0202
+		0014cf58: 31 0051
+		0014cfa0: 31 14c9
+		0014cf58: 31 27a0
+		0014cfa0: 31 c121
+		0014cf58: 31 ab5f
+		0014cfa0: 31 15a1
+		0014cf58: 31 1461
+		0014cfa0: 31 de26
+		0014cf58: 31 85a2
+		0014cfa0: 31 e951
+		
+		0014cf58: 31 7006
+		0014cfa0: 31 337d
+		0014cf58: 31 4570
+		0014cfa0: 31 617c
+		0014d008: 41 706d
+
+	*/
 
 		// I think the values returned here must be connected to the values written to command 31 on startup
 		// 63/67 are used on startup to get the z80 music at least
 		case 0x63: // used as a read address by the 68k code (related to previous uploaded values like cave?) should point at a table of ~0x80 in size? seems to use values as further pointers?
-			if (m_value0==0x0000)
+			if (!strcmp(machine().system().name,"puzzli2"))
 			{
-				m_valueresponse = 0x001694a8;
-			}
-			else if (m_value0==0x0001)
-			{
-				m_valueresponse = 0x0016cfae;
-			}
-			else if (m_value0==0x0002)
-			{
-				m_valueresponse = 0x0016ebf2; // right for puzzli2 , wrong for puzzli2s, probably calculated from the writes then?
-			}
-			else if (m_value0==0x0003) // before 'cast' screen
-			{
-				m_valueresponse = 0x0016faa8;
-			}
-			else if (m_value0==0x0004) // 2 player demo
-			{
-				m_valueresponse = 0x00174416;
-			}
-			else
-			{
-				printf("unk case x63\n");
-				m_valueresponse = 0x00600000; // wrong
+				if (m_value0==0x0000)
+				{
+					m_valueresponse = 0x001694a8;
+				}
+				else if (m_value0==0x0001)
+				{
+					m_valueresponse = 0x0016cfae;
+				}
+				else if (m_value0==0x0002)
+				{
+					m_valueresponse = 0x0016ebf2; // right for puzzli2 , wrong for puzzli2s, probably calculated from the writes then?
+				}
+				else if (m_value0==0x0003) // before 'cast' screen
+				{
+					m_valueresponse = 0x0016faa8;
+				}
+				else if (m_value0==0x0004) // 2 player demo
+				{
+					m_valueresponse = 0x00174416;
+				}
+				else
+				{
+					printf("unk case x63\n");
+					m_valueresponse = 0x00600000; // wrong
 
+				}
+			}
+			else // puzzli2 super
+			{
+				if (m_value0==0x0000)
+				{
+					m_valueresponse = 0x19027a;
+				}
+				else if (m_value0==0x0001)
+				{
+					m_valueresponse = 0x193D80;
+				}
+				else if (m_value0==0x0002)
+				{
+					m_valueresponse = 0x1959c4;
+				}
+				else if (m_value0==0x0003)
+				{
+					m_valueresponse = 0x19687a;
+				}
+				else if (m_value0==0x0004)
+				{
+					m_valueresponse = 0x19b1e8;
+				}
+				else
+				{
+					printf("unk case x63\n");
+					m_valueresponse = 0x00600000; // wrong
+				}
 			}
 		break;
 
 		case 0x67: // used as a read address by the 68k code (related to previous uploaded values like cave?) directly reads ~0xDBE from the address..
-			if ( (m_value0==0x0000) || (m_value0==0x0001) || (m_value0==0x0002) || (m_value0==0x0003) )
+			if (!strcmp(machine().system().name,"puzzli2"))
 			{
-				m_valueresponse = 0x00166178; // right for puzzli2 , wrong for puzzli2s, probably calculated from the writes then?
+				if ( (m_value0==0x0000) || (m_value0==0x0001) || (m_value0==0x0002) || (m_value0==0x0003) )
+				{
+					m_valueresponse = 0x00166178; // right for puzzli2 , wrong for puzzli2s, probably calculated from the writes then?
+				}
+				else if ( (m_value0==0x0004) ) // 2 player demo
+				{
+					m_valueresponse = 0x00166e72;
+				}
+				else
+				{
+					printf("unk case x67\n");
+					m_valueresponse = 0x00400000; // wrong
+				}
 			}
-			else if ( (m_value0==0x0004) ) // 2 player demo
+			else // puzzli2 super
 			{
-				m_valueresponse = 0x00166e72;
-			}
-			else
-			{
-				printf("unk case x67\n");
-				m_valueresponse = 0x00400000; // wrong
+				if ((m_value0==0x0000) || (m_value0==0x0001) || (m_value0==0x0002) ||  (m_value0==0x0003))
+				{
+					m_valueresponse = 0x18cf4a;
+				}
+				else if ( (m_value0==0x0004) ) // 2 player demo
+				{
+					m_valueresponse = 0x0018dc44;
+				}
+				else
+				{
+					printf("unk case x67\n");
+					m_valueresponse = 0x00600000; // wrong
+				}
 			}
 		break;
 
