@@ -139,6 +139,7 @@ public:
 	DECLARE_WRITE8_MEMBER( portb_w );
 	DECLARE_WRITE8_MEMBER( rtc_w );
 	DECLARE_WRITE8_MEMBER( sysctrl_w );
+	DECLARE_READ8_MEMBER( sysctrl_r );
 	DECLARE_READ8_MEMBER( dma_page_r ) { return m_dma_page[offset]; }
 	DECLARE_WRITE8_MEMBER( dma_page_w ) { m_dma_page[offset] = data; }
 	DECLARE_READ8_MEMBER( dma2_r ) { return m_dma2->read(space, offset / 2); }
@@ -239,6 +240,7 @@ private:
 	int m_refresh_toggle;
 	int m_iochck;
 	int m_nmi_mask;
+	UINT8 m_sysctrl;
 
 	// keyboard
 	at_keyboard_controller_device *m_keybc;

@@ -210,6 +210,7 @@ cs4031_device::cs4031_device(const machine_config &mconfig, const char *tag, dev
 	m_refresh_toggle(0),
 	m_iochck(1),
 	m_nmi_mask(1),
+	m_sysctrl(0),
 	m_cpureset(0),
 	m_kbrst(1),
 	m_ext_gatea20(0),
@@ -316,7 +317,7 @@ void cs4031_device::device_start()
 	m_space_io->install_write_handler(0x0070, 0x0073, write8_delegate(FUNC(cs4031_device::rtc_w), this), 0x000000ff);
 	m_space_io->install_readwrite_handler(0x0070, 0x0073, read8_delegate(FUNC(mc146818_device::data_r), &(*m_rtc)), write8_delegate(FUNC(mc146818_device::data_w), &(*m_rtc)), 0x0000ff00);
 	m_space_io->install_readwrite_handler(0x0080, 0x008f, read8_delegate(FUNC(cs4031_device::dma_page_r), this), write8_delegate(FUNC(cs4031_device::dma_page_w), this), 0xffffffff);
-	m_space_io->install_write_handler(0x0090, 0x0093, write8_delegate(FUNC(cs4031_device::sysctrl_w), this), 0x00ff0000);
+	m_space_io->install_readwrite_handler(0x0090, 0x0093, read8_delegate(FUNC(cs4031_device::sysctrl_r), this), write8_delegate(FUNC(cs4031_device::sysctrl_w), this), 0x00ff0000);
 	m_space_io->install_readwrite_handler(0x00a0, 0x00a3, read8_delegate(FUNC(pic8259_device::read), &(*m_intc2)), write8_delegate(FUNC(pic8259_device::write), &(*m_intc2)), 0x0000ffff);
 	m_space_io->install_readwrite_handler(0x00c0, 0x00df, read8_delegate(FUNC(cs4031_device::dma2_r),this), write8_delegate(FUNC(cs4031_device::dma2_w),this), 0xffffffff);
 }
@@ -785,6 +786,8 @@ WRITE8_MEMBER( cs4031_device::sysctrl_w )
 	if (LOG_IO)
 		logerror("cs4031_device::sysctrl_w: %u\n", data);
 
+	m_sysctrl = data;
+
 	m_fast_gatea20 = BIT(data, 1);
 	a20m();
 
@@ -798,6 +801,13 @@ WRITE8_MEMBER( cs4031_device::sysctrl_w )
 	m_cpureset = BIT(data, 0);
 }
 
+READ8_MEMBER( cs4031_device::sysctrl_r )
+{
+	if (LOG_IO)
+		logerror("cs4031_device::sysctrl_r: %u\n", m_sysctrl);
+
+	return m_sysctrl;
+}
 
 //**************************************************************************
 //  MISCELLANEOUS
