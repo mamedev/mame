@@ -187,7 +187,7 @@ deco146port_xx port104_table[] = {
  /* 0x146 */ { 0x16,          { NIB0R2, NIB1__, NIB2__, NIB3__ } , 0, 0 }, 
  /* 0x148 */ { 0xb8,          { NIB3__, NIB2__, NIB1__, NIB0__ } , 1, 0 }, 
  /* 0x14a */ { 0x50,          { NIB2__, NIB1__, NIB3__, NIB0__ } , 1, 0 }, 
- /* 0x14c */ { 0x42,          { NIB1R1, NIB2__, NIB3__, BLANK_ } , 0, 0 }, 
+ /* 0x14c */ { 0x42,          { NIB1R1, NIB2__, NIB3__, BLANK_ } , 1, 0 },  // xor readback address, affected by xor, funky
  /* 0x14e */ { 0xd6,          { NIB0__, NIB2__, NIB3__, NIB1__ } , 1, 1 }, 
  /* 0x150 */ { 0x7e,          { NIB0__, NIB1__, NIB2__, NIB3__ } , 0, 0 }, 
  /* 0x152 */ { 0x92,          { NIB2R3, NIB3__, NIB0__, NIB1__ } , 1, 0 }, 
