@@ -2968,1156 +2968,832 @@ TODO:
 		</part>
 	</software>
 
-<software name="camisole">
-	<description>Camisole</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="data.fdi" size="1265664" crc="121f7ffa" sha1="3c54e55d9c54b97b00e7c12d095681239469c4da" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="camisole">
-	<description>Camisole</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="omake.fdi" size="1265664" crc="54812047" sha1="c87aa911e2c6b4368226059d607a2b988344ae33" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="camisole">
-	<description>Camisole</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="system.fdi" size="1265664" crc="a65ca88d" sha1="fc346a0d292d398d2e4e0e7abda8ebec66e2881f" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="cancan">
-	<description>Can Can Bunny</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="main.fdi" size="1265664" crc="f45ed475" sha1="8b4bd048a152f0dacde2794fc94b01eb73f88c8f" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="cancan">
-	<description>Can Can Bunny 2 - Superior</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="can2_a.fdi" size="1265664" crc="4c98465b" sha1="b95760f8eef712b600bc7e6c99934a47b3cf4ef6" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="cancan">
-	<description>Can Can Bunny 2 - Superior</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="can2_b.fdi" size="1265664" crc="eda630c4" sha1="48d6424ad150309ab2e573f833063258419798fa" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="cancan">
-	<description>Can Can Bunny 3 - Spirits</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="ccbsprta.fdi" size="1265664" crc="72b7cd15" sha1="4c2a0932b3b59196f68e6af394b53f3829d89c56" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="cancan">
-	<description>Can Can Bunny 3 - Spirits</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="ccbsprtb.fdi" size="1265664" crc="11e4e386" sha1="39011a688809e95a7c8b088a8cfc126ff47a4feb" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="cancan">
-	<description>Can Can Bunny 3 - Spirits</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="ccbsprtc.fdi" size="1265664" crc="1574e103" sha1="e2aca4c914df11513a43db69ebe6c2a9eebc5439" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="car2gr">
-	<description>Car 2 Grand Prix</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="car 2 grand prix (bio 100%).fdi" size="1265664" crc="d60d66eb" sha1="27f3015f11157d9a631f2386b49c45b9a3d62133" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="carat-">
-	<description>Carat - Magical Blocks</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="carat_a.fdi" size="1265664" crc="b5170cdf" sha1="d40bca585a3de046e8c77bf9dd7b62a5364dc5f1" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="carat-">
-	<description>Carat - Magical Blocks</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="carat_b.fdi" size="1265664" crc="67cd392c" sha1="48fcb06680d6933ac23e9da18f320e86e1e0c8ed" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="carat-">
-	<description>Carat - Magical Blocks(another)</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="disk_a.fdi" size="1265664" crc="f37ba8e9" sha1="ca4048cf256f1ce415e72f75da8e006b92875335" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="carat-">
-	<description>Carat - Magical Blocks(another)</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="disk_b.fdi" size="1265664" crc="a6b9c72f" sha1="19518f0e3df9469500ad116c9934c5f72d1c4fe5" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="carax92">
-	<description>Carax 92</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="carax'92 (bio100%).fdi" size="1265664" crc="fcc52afb" sha1="1dd507301005d9287a5e53e1055d00ac9b1d66dd" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="cardbus">
-	<description>Card Buster</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="cbuster1.fdi" size="1265664" crc="e0e6e4a5" sha1="baebdace730a63f5d796e5f2397531911721edc9" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="cardbus">
-	<description>Card Buster</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="cbuster2.fdi" size="1265664" crc="5e3cfae2" sha1="ea88bedde8d9ed30f946f1487bb65034cd619a20" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="cardbus">
-	<description>Card Buster 2 - Fukkatsu no Seihishaku</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="c_buster2_1.fdi" size="1265664" crc="5e3cfae2" sha1="ea88bedde8d9ed30f946f1487bb65034cd619a20" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="cardbus">
-	<description>Card Buster 2 - Fukkatsu no Seihishaku</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="c_buster2_2.fdi" size="1265664" crc="2331f498" sha1="0ab7affe08386c9ea9edb720537cff6e1fe2b29f" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="carmens">
-	<description>Carmen Sandiego in Japan - Hannin Sagashite Nihon Zenkoku</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="csijapn1.fdi" size="1265664" crc="3f3baa31" sha1="35c455b54a4bd5e1e8f88a9ee8f630c6098d55c1" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="carmens">
-	<description>Carmen Sandiego in Japan - Hannin Sagashite Nihon Zenkoku</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="csijapn2.fdi" size="1265664" crc="ea5a0a61" sha1="42de3a6becb49ebed8373df29064293ec999f703" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="carmine">
-	<description>Carmine</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="disk_1.fdi" size="1265664" crc="d7983b5f" sha1="c0f8818486365c68418d89b725b2a1ffc0eb5d66" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="carmine">
-	<description>Carmine</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="disk_2.fdi" size="1265664" crc="5a0e31ed" sha1="63996918733bd5a6ee8bbd3d1aa20289a2fa68f9" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="castles">
-	<description>Castles</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="castles data.fdi" size="1265664" crc="6bea4dff" sha1="7db025f80b5971486dc764deff17cb632fe04b89" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="castles">
-	<description>Castles</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="castles system.fdi" size="1265664" crc="e8face38" sha1="bf2fad94581c09d4cff32d14f196d56b7efa39af" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="catspar">
-	<description>Cats Part 1</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="disk_a.fdi" size="1265664" crc="2c03a5c3" sha1="cbc8e28b063f76cbd3badec68287a1447d818143" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="catspar">
-	<description>Cats Part 1</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="disk_b.fdi" size="1265664" crc="ae10c752" sha1="d5e102f882a9a07262e4aadb943fcc5b7935ac12" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="catspar">
-	<description>Cats Part 1</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="disk_c.fdi" size="1265664" crc="b96499c9" sha1="e33356584a429a8064c1ce82a6525dd667950149" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="celery">
-	<description>Celery</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="celery1.fdi" size="1265664" crc="bf3dffa3" sha1="50df967036c49deb342b8e9b40a0a963b0ede6b6" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="celery">
-	<description>Celery</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="celery2.fdi" size="1265664" crc="f6d0d830" sha1="8cbe3b34bd120ce203f481cdf71efc24a21d7303" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="cggalle">
-	<description>CG Gallery 1 - Sailor Moon</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="cg gallery 1 - sailor moon (j).fdi" size="1265664" crc="b3d4a86c" sha1="7a73f9805370aba1bbb25ca997076c5fad89d35e" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="cggalle">
-	<description>CG Gallery Escort</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="escort (1992)(studio z&3n).fdi" size="1265664" crc="f87a47ad" sha1="e9cc34c075eef14c72cb1b2fcc2044bfae73e192" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="chaosan">
-	<description>Chaos Angels</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="data_m.fdi" size="1265664" crc="cbe6319f" sha1="c43f95b9a264bacd520889f6c8eefdc78d6bf6d6" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="chaosst">
-	<description>Chaos Strikes Back</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="chaos strikes back (j).fdi" size="1265664" crc="4c403a86" sha1="66cf87323ebdf67247f20b5c39ec35864f07e129" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="charm">
-	<description>Charm</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="a.fdi" size="1265664" crc="09e2ba46" sha1="d72b25f933182816b45e74e3a35e3dae9fe1c6ad" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="charm">
-	<description>Charm</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="b.fdi" size="1265664" crc="f80264b7" sha1="97ed2207a3c611dc0c3e850e7ad3911facea16ac" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="charm">
-	<description>Charm</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="c.fdi" size="1265664" crc="1b1bd467" sha1="59ba5a2d9e1364d7325634d7bb73adc77a2903ea" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="charm">
-	<description>Charm</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="d.fdi" size="1265664" crc="aab23d85" sha1="8ecddd459222cd123f81d9946253f8c135ac3881" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="charm">
-	<description>Charm</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="e.fdi" size="1265664" crc="fe2c8ccc" sha1="ba6d3def500ea475d58683888b6141c7fb61b1ca" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="charm">
-	<description>Charm</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="f.fdi" size="1265664" crc="5bf0dff0" sha1="60500bb57c323dd2e8010ecdf382f9e24eee6d85" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="cherryb">
-	<description>Cherry Bomb - Chou Ojousama Sayaka-chan Nanpa Daisakusen</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="cherry bomb (1994)(pepper-mint kids)(disk 1 of 4)(disk a).fdi" size="1265664" crc="da7454c9" sha1="1ac54ee3323dbbd0203b1a7c1964bf0e6cb279c7" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="cherryb">
-	<description>Cherry Bomb - Chou Ojousama Sayaka-chan Nanpa Daisakusen</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="cherry bomb (1994)(pepper-mint kids)(disk 2 of 4)(disk b).fdi" size="1265664" crc="3166d06b" sha1="b88f26c972ccb1d4d4c66d7e46209a073385ad32" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="cherryb">
-	<description>Cherry Bomb - Chou Ojousama Sayaka-chan Nanpa Daisakusen</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="cherry bomb (1994)(pepper-mint kids)(disk 3 of 4)(disk c).fdi" size="1265664" crc="abe042c2" sha1="520b475064db77aaa05b52473fdb23fe021b33e3" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="cherryb">
-	<description>Cherry Bomb - Chou Ojousama Sayaka-chan Nanpa Daisakusen</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="cherry bomb (1994)(pepper-mint kids)(disk 4 of 4)(disk d).fdi" size="1265664" crc="ede8c5a3" sha1="dbbfe83213e4474fbd7905e4dcb7565eb3ee0dd2" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="chickst">
-	<description>Chicks Tale</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="c-tale_a.fdi" size="1265664" crc="17f11bc5" sha1="10f839f8ab715c2af2ad3b2f92fe85399ef0de6c" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="chickst">
-	<description>Chicks Tale</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="c-tale_b.fdi" size="1265664" crc="bfedeacd" sha1="ed290c0067c446a253b15d98d9174b5bad3325e9" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="chickst">
-	<description>Chicks Tale</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="c-tale_c.fdi" size="1265664" crc="06501558" sha1="23a8f47b018960725055f61607ddf256cd33f46f" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="chickst">
-	<description>Chicks Tale</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="c-tale_d.fdi" size="1265664" crc="bdab1402" sha1="576c8e34c7676b3bb4d3d8332c3dfb48c5f37155" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="chickst">
-	<description>Chicks Tale</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="c-tale_sys.fdi" size="1265664" crc="87f3e14a" sha1="8a531408f1a05c61d22dc9edbc77834b61a15143" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="chikashi">
-	<description>Chikashitsu no Ikenie</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="chikashitsu no ikenie (j).fdi" size="1265664" crc="2158f3cf" sha1="466840806429eb898a47812ca846a5d7c1e82d32" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="chimesq">
-	<description>Chimes Quest</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="rpg_dat1.fdi" size="1265664" crc="7acd0e17" sha1="a873248e5101171f362248ff02fabd226b8b6951" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="chimesq">
-	<description>Chimes Quest</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="rpg_dat2.fdi" size="1265664" crc="5b9054c9" sha1="4bd65922955d9594d0db884d60065c12029684e8" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="chimesq">
-	<description>Chimes Quest</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="rpg_sys.fdi" size="1265664" crc="1c180b6d" sha1="503f1133e34de362d786e84ef26b0e009a07dfeb" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="chingha">
-	<description>Ching Hai</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="chinghai (zepher).fdi" size="1265664" crc="e7e9516b" sha1="13265908ce7cb694f2c845db36f6afe33ddd6274" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="chittyc">
-	<description>Chitty Chitty Train</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="chitty chitty train (1993)(bit^2).fdi" size="1265664" crc="af527d06" sha1="53b4e459c9eab0c4573021fa6a724125e5e64a8e" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="choujik">
-	<description>Chou Jikuu Yousai Macross - Remember Me</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="mac1_1.fdi" size="1265664" crc="3d5ac921" sha1="05a944568872d530fd0b6b3912dac143cef50765" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="choujik">
-	<description>Chou Jikuu Yousai Macross - Remember Me</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="mac1_2.fdi" size="1265664" crc="ab84e7aa" sha1="da7e543380816fb7147ba7ade65f7d1d0c9bd5ec" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="choujik">
-	<description>Chou Jikuu Yousai Macross - Remember Me</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="mac1_3.fdi" size="1265664" crc="772035e5" sha1="265f4a716fdd459fe7e70d2a7fbfa3da262c53ea" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="choujik">
-	<description>Chou Jikuu Yousai Macross - Remember Me</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="mac1_4.fdi" size="1265664" crc="9b90d1f8" sha1="862050cfe5d7843a8b4cc37dd3a9b1e4c7fafaab" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="chromep">
-	<description>Chrome Paradise(another)</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="disk_1.fdi" size="1265664" crc="75dfa974" sha1="86506c54e5f414882635a17b27a98ddc7ae3a264" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="chromep">
-	<description>Chrome Paradise(another)</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="disk_2.fdi" size="1265664" crc="848a0748" sha1="068aef456cae947445cb613e85beb1533749550d" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="chromep">
-	<description>Chrome Paradise(another)</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="disk_3.fdi" size="1265664" crc="6ded09c5" sha1="32667c15c3ce1685498fa8b8bc0d5936c52d5682" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="chromep">
-	<description>Chrome Paradise(another)</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="disk_4.fdi" size="1265664" crc="d4e33aba" sha1="bf363695fcb3ffdafca1cdd7b55bb9aa90812049" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="chromep">
-	<description>Chrome Paradise(another)</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="disk_5.fdi" size="1265664" crc="f2260e42" sha1="37ecdaac1ffa7e71358e5631ec9e2154cc1d84ec" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="chromep">
-	<description>Chrome Paradise(another)</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="disk_6.fdi" size="1265664" crc="5c4f96b0" sha1="6adf3fe9ef20b55636a6ff631793c29964d7ef8d" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="chromep">
-	<description>Chrome Paradise(another)</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="disk_7.fdi" size="1265664" crc="a56ff72f" sha1="a188515960053ff94d4c68e8cc0b558a093db4a8" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="chromep">
-	<description>Chrome Paradise(another)</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="disk_8.fdi" size="1265664" crc="c36328ae" sha1="b71940163cbebf08c6c1c4cc37ab302109f13e6a" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="circlem">
-	<description>Circle Mate</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="circle_m_01.fdi" size="1265664" crc="6166e1b8" sha1="dee6fb3fe0786f447c4b4c6572209741823c9678" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="circlem">
-	<description>Circle Mate</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="circle_m_02.fdi" size="1265664" crc="05adcf50" sha1="2ecf1765f5cc13ce994bc6e8bc4ac747c7514002" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="circlem">
-	<description>Circle Mate</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="circle_m_03.fdi" size="1265664" crc="9a6f62e6" sha1="f6592348072c45634fb799d4c2b7394b0edc5e46" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="circlem">
-	<description>Circle Mate</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="circle_m_04.fdi" size="1265664" crc="68bd64ec" sha1="1d27c837a9d74ee19cdbf62c83567c3fe0c72f0a" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="circlem">
-	<description>Circle Mate</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="circle_m_05.fdi" size="1265664" crc="738ddb9a" sha1="325b32741b33f270d1c010b31190767acfb0cf6c" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="citykni">
-	<description>City Knights</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="data1.fdi" size="1265664" crc="907e4073" sha1="afd4a4f2089428c244422fe6786a9c9582304ec3" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="citykni">
-	<description>City Knights</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="data2.fdi" size="1265664" crc="e88b5cfa" sha1="5c573bae0e4900fba2e148586bef7cf8e2bf6266" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="citykni">
-	<description>City Knights</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="data3.fdi" size="1265664" crc="1ef78b30" sha1="0db12d96a7dbb5290cae12d0d7a6f027e7ef9930" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="citykni">
-	<description>City Knights</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="game.fdi" size="1265664" crc="05fa97fa" sha1="80e09213201145c7d7620c206feaa1c6b73881b0" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="civiliza">
-	<description>Civilization</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="civil1.fdi" size="1265664" crc="63670df2" sha1="bedd89f341ca0e7637c92d9bd2a88dc56fd9aa56" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="civiliza">
-	<description>Civilization</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="civil2.fdi" size="1265664" crc="b7a6146c" sha1="2de33b18aad6256ed9f72dd23addf51a688585ff" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="civiliza">
-	<description>Civilization</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="civil3.fdi" size="1265664" crc="2b599b7b" sha1="c6988d9e7b476b6bf5df0bfdd4d001a5df0c94f6" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="civiliza">
-	<description>Civilization</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="civil4.fdi" size="1265664" crc="ab595c7e" sha1="03ac7c11407e48865858452ef55b355546a46e30" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="civiliza">
-	<description>Civilization</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="civil5.fdi" size="1265664" crc="d415d6d9" sha1="f4940bbf3cd059646e8b99fc726654e33a2620b0" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="civiliza">
-	<description>Civilization</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="civil6.fdi" size="1265664" crc="913b2f6c" sha1="3ecd379da1afc80a7744e5ae344adf279888ca2e" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="civiliza">
-	<description>Civilization</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="civil7.fdi" size="1265664" crc="8927ee21" sha1="149434417463f658d7a2dcb2e7c06f42fbe9afda" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="cocktail">
-	<description>Cocktail Soft - Zoukangou</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="zoubbb_a.fdi" size="1265664" crc="8e1d4efb" sha1="b5b0c25e411146502f397a120af0d1e2eea2ee57" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="cocktail">
-	<description>Cocktail Soft - Zoukangou</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="zoubbb_b.fdi" size="1265664" crc="eaa0a18e" sha1="c9e31fba1007ab24d9e05b8ba6f1f2c0e8ffa4ca" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="collonc">
-	<description>Collon Club 3</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="collon club 3 (btb).fdi" size="1265664" crc="21dcaba7" sha1="9ef84b18ffe47c1795e347ccd13d96b066088162" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="colonial">
-	<description>Colonial Conquest</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="colonial conquest (1989)(victor).fdi" size="1265664" crc="d937e639" sha1="cdb08479af1b1ef1cff8da9db9f8e12d087a3a13" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="company">
-	<description>Company</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="company (gam)(disk 1 of 2).fdi" size="1265664" crc="4b96250e" sha1="4f25e1b346a85e14031dce14fd51c760335c78ec" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="company">
-	<description>Company</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="company (gam)(disk 2 of 2).fdi" size="1265664" crc="5c747a28" sha1="dd855db0e42092f128c922c905298025080beb92" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="crazyla">
-	<description>Crazy Labyrinth</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="(cat's organization) crazy labyrinth.fdi" size="1265664" crc="4b31f7c4" sha1="25bbe94315e2861bdbb6bfb7511b8625b25bb064" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="crescent">
-	<description>Crescent</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="crescent_01.fdi" size="1265664" crc="b40b23f6" sha1="e391a4eb118a909ef4eaa9fc90ebb9134faa906f" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="crescent">
-	<description>Crescent</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="crescent_02.fdi" size="1265664" crc="cc1d8253" sha1="ab87d592c8b10148a16241374588610fb2be3043" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="crescent">
-	<description>Crescent</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="crescent_03.fdi" size="1265664" crc="f02d4daa" sha1="a0cff7222892259a6f3a03a003d10ba682fa6966" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="crescent">
-	<description>Crescent</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="crescent_04.fdi" size="1265664" crc="bf046178" sha1="9de1b07b42beaf907ea85e08100b81a8e76f575f" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="curse">
-	<description>Curse</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="disk_1.fdi" size="1265664" crc="9d43b3de" sha1="fc0c2c3d6e72e78b517703ad663e480f46c04d49" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="curse">
-	<description>Curse</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="disk_2.fdi" size="1265664" crc="8a48fac8" sha1="160b09d6881ce293bf41225705b1157f17024a90" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="curse">
-	<description>Curse</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="disk_3.fdi" size="1265664" crc="5e8b87cd" sha1="f519af0e6cbe01b7c91055bc0bcd6950118e82e2" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="curse">
-	<description>Curse</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="disk_4.fdi" size="1265664" crc="21d9ca31" sha1="8bf57cd64fd4ed6c661ba76da3be432297321a9e" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="customm">
-	<description>Custom Mate</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="cm1_1.fdi" size="1265664" crc="2b73c30b" sha1="aaff84776e809d156cf378da134307698a1de6b3" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="customm">
-	<description>Custom Mate</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="cm1_2.fdi" size="1265664" crc="d77f6871" sha1="2d66c82a54bfa366dcc6be18fa013d4fb7692bd4" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="customm">
-	<description>Custom Mate</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="cm1_3.fdi" size="1265664" crc="94489066" sha1="59f2d62389315d122fe26f4c13ebbed28e193357" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="customm">
-	<description>Custom Mate</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="cm1_4.fdi" size="1265664" crc="b41034e1" sha1="b9c6a79b9e299c38f7031782173e8ee3eddcaee3" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="customm">
-	<description>Custom Mate</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="cm1_5.fdi" size="1265664" crc="86903149" sha1="60baf95f409850da85ea1c6fb8621337989f3d88" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="cybernet">
-	<description>Cybernetic Hi-School</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
+	<software name="camisole">
+		<description>Camisole</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="data.fdi" size="1265664" crc="121f7ffa" sha1="3c54e55d9c54b97b00e7c12d095681239469c4da" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="omake.fdi" size="1265664" crc="54812047" sha1="c87aa911e2c6b4368226059d607a2b988344ae33" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="system.fdi" size="1265664" crc="a65ca88d" sha1="fc346a0d292d398d2e4e0e7abda8ebec66e2881f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cancan">
+		<description>Can Can Bunny</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="main.fdi" size="1265664" crc="f45ed475" sha1="8b4bd048a152f0dacde2794fc94b01eb73f88c8f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cancan2">
+		<description>Can Can Bunny 2 - Superior</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="can2_a.fdi" size="1265664" crc="4c98465b" sha1="b95760f8eef712b600bc7e6c99934a47b3cf4ef6" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="can2_b.fdi" size="1265664" crc="eda630c4" sha1="48d6424ad150309ab2e573f833063258419798fa" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cancan3">
+		<description>Can Can Bunny 3 - Spirits</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="ccbsprta.fdi" size="1265664" crc="72b7cd15" sha1="4c2a0932b3b59196f68e6af394b53f3829d89c56" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="ccbsprtb.fdi" size="1265664" crc="11e4e386" sha1="39011a688809e95a7c8b088a8cfc126ff47a4feb" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="ccbsprtc.fdi" size="1265664" crc="1574e103" sha1="e2aca4c914df11513a43db69ebe6c2a9eebc5439" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="car2gp">
+		<description>Car 2 Grand Prix</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="car 2 grand prix (bio 100%).fdi" size="1265664" crc="d60d66eb" sha1="27f3015f11157d9a631f2386b49c45b9a3d62133" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carat">
+		<description>Carat - Magical Blocks</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="carat_a.fdi" size="1265664" crc="b5170cdf" sha1="d40bca585a3de046e8c77bf9dd7b62a5364dc5f1" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="carat_b.fdi" size="1265664" crc="67cd392c" sha1="48fcb06680d6933ac23e9da18f320e86e1e0c8ed" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="carata" cloneof="carat">
+		<description>Carat - Magical Blocks(another)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="disk_a.fdi" size="1265664" crc="f37ba8e9" sha1="ca4048cf256f1ce415e72f75da8e006b92875335" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="disk_b.fdi" size="1265664" crc="a6b9c72f" sha1="19518f0e3df9469500ad116c9934c5f72d1c4fe5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carax92">
+		<description>Carax 92</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="carax'92 (bio100%).fdi" size="1265664" crc="fcc52afb" sha1="1dd507301005d9287a5e53e1055d00ac9b1d66dd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cardbus">
+		<description>Card Buster</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="cbuster1.fdi" size="1265664" crc="e0e6e4a5" sha1="baebdace730a63f5d796e5f2397531911721edc9" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="cbuster2.fdi" size="1265664" crc="5e3cfae2" sha1="ea88bedde8d9ed30f946f1487bb65034cd619a20" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cardbus2">
+		<description>Card Buster 2 - Fukkatsu no Seihishaku</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="c_buster2_1.fdi" size="1265664" crc="5e3cfae2" sha1="ea88bedde8d9ed30f946f1487bb65034cd619a20" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="c_buster2_2.fdi" size="1265664" crc="2331f498" sha1="0ab7affe08386c9ea9edb720537cff6e1fe2b29f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carmensan">
+		<description>Carmen Sandiego in Japan - Hannin Sagashite Nihon Zenkoku</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="csijapn1.fdi" size="1265664" crc="3f3baa31" sha1="35c455b54a4bd5e1e8f88a9ee8f630c6098d55c1" offset="0" />
+		</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="csijapn2.fdi" size="1265664" crc="ea5a0a61" sha1="42de3a6becb49ebed8373df29064293ec999f703" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carmine">
+		<description>Carmine</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="disk_1.fdi" size="1265664" crc="d7983b5f" sha1="c0f8818486365c68418d89b725b2a1ffc0eb5d66" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="disk_2.fdi" size="1265664" crc="5a0e31ed" sha1="63996918733bd5a6ee8bbd3d1aa20289a2fa68f9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="castles">
+		<description>Castles</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="castles data.fdi" size="1265664" crc="6bea4dff" sha1="7db025f80b5971486dc764deff17cb632fe04b89" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="castles system.fdi" size="1265664" crc="e8face38" sha1="bf2fad94581c09d4cff32d14f196d56b7efa39af" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="catsp1">
+		<description>Cats Part 1</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="disk_a.fdi" size="1265664" crc="2c03a5c3" sha1="cbc8e28b063f76cbd3badec68287a1447d818143" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="disk_b.fdi" size="1265664" crc="ae10c752" sha1="d5e102f882a9a07262e4aadb943fcc5b7935ac12" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="disk_c.fdi" size="1265664" crc="b96499c9" sha1="e33356584a429a8064c1ce82a6525dd667950149" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="celery">
+		<description>Celery</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="celery1.fdi" size="1265664" crc="bf3dffa3" sha1="50df967036c49deb342b8e9b40a0a963b0ede6b6" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="celery2.fdi" size="1265664" crc="f6d0d830" sha1="8cbe3b34bd120ce203f481cdf71efc24a21d7303" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cg1sm">
+		<description>CG Gallery 1 - Sailor Moon</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="cg gallery 1 - sailor moon (j).fdi" size="1265664" crc="b3d4a86c" sha1="7a73f9805370aba1bbb25ca997076c5fad89d35e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cgesc">
+		<description>CG Gallery Escort</description>
+		<year>1992</year>
+		<publisher>Studio Z&amp;3n</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="escort (1992)(studio z&amp;3n).fdi" size="1265664" crc="f87a47ad" sha1="e9cc34c075eef14c72cb1b2fcc2044bfae73e192" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chaosan">
+		<description>Chaos Angels</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="data_m.fdi" size="1265664" crc="cbe6319f" sha1="c43f95b9a264bacd520889f6c8eefdc78d6bf6d6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chaosst">
+		<description>Chaos Strikes Back</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="chaos strikes back (j).fdi" size="1265664" crc="4c403a86" sha1="66cf87323ebdf67247f20b5c39ec35864f07e129" offset="0" />
+		</dataarea>
+		</part>
+	</software>
+
+	<software name="charm">
+		<description>Charm</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="a.fdi" size="1265664" crc="09e2ba46" sha1="d72b25f933182816b45e74e3a35e3dae9fe1c6ad" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="b.fdi" size="1265664" crc="f80264b7" sha1="97ed2207a3c611dc0c3e850e7ad3911facea16ac" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="c.fdi" size="1265664" crc="1b1bd467" sha1="59ba5a2d9e1364d7325634d7bb73adc77a2903ea" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="d.fdi" size="1265664" crc="aab23d85" sha1="8ecddd459222cd123f81d9946253f8c135ac3881" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="e.fdi" size="1265664" crc="fe2c8ccc" sha1="ba6d3def500ea475d58683888b6141c7fb61b1ca" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="f.fdi" size="1265664" crc="5bf0dff0" sha1="60500bb57c323dd2e8010ecdf382f9e24eee6d85" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cherryb">
+		<description>Cherry Bomb - Chou Ojousama Sayaka-chan Nanpa Daisakusen</description>
+		<year>1994</year>
+		<publisher>Pepper-Mint Kids</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="cherry bomb (1994)(pepper-mint kids)(disk 1 of 4)(disk a).fdi" size="1265664" crc="da7454c9" sha1="1ac54ee3323dbbd0203b1a7c1964bf0e6cb279c7" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="cherry bomb (1994)(pepper-mint kids)(disk 2 of 4)(disk b).fdi" size="1265664" crc="3166d06b" sha1="b88f26c972ccb1d4d4c66d7e46209a073385ad32" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="cherry bomb (1994)(pepper-mint kids)(disk 3 of 4)(disk c).fdi" size="1265664" crc="abe042c2" sha1="520b475064db77aaa05b52473fdb23fe021b33e3" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="cherry bomb (1994)(pepper-mint kids)(disk 4 of 4)(disk d).fdi" size="1265664" crc="ede8c5a3" sha1="dbbfe83213e4474fbd7905e4dcb7565eb3ee0dd2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chickst">
+		<description>Chicks Tale</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="c-tale_a.fdi" size="1265664" crc="17f11bc5" sha1="10f839f8ab715c2af2ad3b2f92fe85399ef0de6c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="c-tale_b.fdi" size="1265664" crc="bfedeacd" sha1="ed290c0067c446a253b15d98d9174b5bad3325e9" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="c-tale_c.fdi" size="1265664" crc="06501558" sha1="23a8f47b018960725055f61607ddf256cd33f46f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="c-tale_d.fdi" size="1265664" crc="bdab1402" sha1="576c8e34c7676b3bb4d3d8332c3dfb48c5f37155" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="c-tale_sys.fdi" size="1265664" crc="87f3e14a" sha1="8a531408f1a05c61d22dc9edbc77834b61a15143" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chikashi">
+		<description>Chikashitsu no Ikenie</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="chikashitsu no ikenie (j).fdi" size="1265664" crc="2158f3cf" sha1="466840806429eb898a47812ca846a5d7c1e82d32" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chimesq">
+		<description>Chimes Quest</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="rpg_dat1.fdi" size="1265664" crc="7acd0e17" sha1="a873248e5101171f362248ff02fabd226b8b6951" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="rpg_dat2.fdi" size="1265664" crc="5b9054c9" sha1="4bd65922955d9594d0db884d60065c12029684e8" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="rpg_sys.fdi" size="1265664" crc="1c180b6d" sha1="503f1133e34de362d786e84ef26b0e009a07dfeb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chingha">
+		<description>Ching Hai</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="chinghai (zepher).fdi" size="1265664" crc="e7e9516b" sha1="13265908ce7cb694f2c845db36f6afe33ddd6274" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chittyc">
+		<description>Chitty Chitty Train</description>
+		<year>1993</year>
+		<publisher>Bit^2</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="chitty chitty train (1993)(bit^2).fdi" size="1265664" crc="af527d06" sha1="53b4e459c9eab0c4573021fa6a724125e5e64a8e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="choujik">
+		<description>Chou Jikuu Yousai Macross - Remember Me</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="mac1_1.fdi" size="1265664" crc="3d5ac921" sha1="05a944568872d530fd0b6b3912dac143cef50765" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="mac1_2.fdi" size="1265664" crc="ab84e7aa" sha1="da7e543380816fb7147ba7ade65f7d1d0c9bd5ec" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="mac1_3.fdi" size="1265664" crc="772035e5" sha1="265f4a716fdd459fe7e70d2a7fbfa3da262c53ea" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="mac1_4.fdi" size="1265664" crc="9b90d1f8" sha1="862050cfe5d7843a8b4cc37dd3a9b1e4c7fafaab" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chromep">
+		<description>Chrome Paradise</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="disk_1.fdi" size="1265664" crc="75dfa974" sha1="86506c54e5f414882635a17b27a98ddc7ae3a264" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="disk_2.fdi" size="1265664" crc="848a0748" sha1="068aef456cae947445cb613e85beb1533749550d" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="disk_3.fdi" size="1265664" crc="6ded09c5" sha1="32667c15c3ce1685498fa8b8bc0d5936c52d5682" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="disk_4.fdi" size="1265664" crc="d4e33aba" sha1="bf363695fcb3ffdafca1cdd7b55bb9aa90812049" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="disk_5.fdi" size="1265664" crc="f2260e42" sha1="37ecdaac1ffa7e71358e5631ec9e2154cc1d84ec" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="disk_6.fdi" size="1265664" crc="5c4f96b0" sha1="6adf3fe9ef20b55636a6ff631793c29964d7ef8d" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="disk_7.fdi" size="1265664" crc="a56ff72f" sha1="a188515960053ff94d4c68e8cc0b558a093db4a8" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="disk_8.fdi" size="1265664" crc="c36328ae" sha1="b71940163cbebf08c6c1c4cc37ab302109f13e6a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="circlem">
+		<description>Circle Mate</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="circle_m_01.fdi" size="1265664" crc="6166e1b8" sha1="dee6fb3fe0786f447c4b4c6572209741823c9678" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="circle_m_02.fdi" size="1265664" crc="05adcf50" sha1="2ecf1765f5cc13ce994bc6e8bc4ac747c7514002" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="circle_m_03.fdi" size="1265664" crc="9a6f62e6" sha1="f6592348072c45634fb799d4c2b7394b0edc5e46" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="circle_m_04.fdi" size="1265664" crc="68bd64ec" sha1="1d27c837a9d74ee19cdbf62c83567c3fe0c72f0a" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="circle_m_05.fdi" size="1265664" crc="738ddb9a" sha1="325b32741b33f270d1c010b31190767acfb0cf6c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="citykn">
+		<description>City Knights</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="data1.fdi" size="1265664" crc="907e4073" sha1="afd4a4f2089428c244422fe6786a9c9582304ec3" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="data2.fdi" size="1265664" crc="e88b5cfa" sha1="5c573bae0e4900fba2e148586bef7cf8e2bf6266" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="data3.fdi" size="1265664" crc="1ef78b30" sha1="0db12d96a7dbb5290cae12d0d7a6f027e7ef9930" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="game.fdi" size="1265664" crc="05fa97fa" sha1="80e09213201145c7d7620c206feaa1c6b73881b0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="civ">
+		<description>Civilization</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="civil1.fdi" size="1265664" crc="63670df2" sha1="bedd89f341ca0e7637c92d9bd2a88dc56fd9aa56" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="civil2.fdi" size="1265664" crc="b7a6146c" sha1="2de33b18aad6256ed9f72dd23addf51a688585ff" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="civil3.fdi" size="1265664" crc="2b599b7b" sha1="c6988d9e7b476b6bf5df0bfdd4d001a5df0c94f6" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="civil4.fdi" size="1265664" crc="ab595c7e" sha1="03ac7c11407e48865858452ef55b355546a46e30" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="civil5.fdi" size="1265664" crc="d415d6d9" sha1="f4940bbf3cd059646e8b99fc726654e33a2620b0" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="civil6.fdi" size="1265664" crc="913b2f6c" sha1="3ecd379da1afc80a7744e5ae344adf279888ca2e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="civil7.fdi" size="1265664" crc="8927ee21" sha1="149434417463f658d7a2dcb2e7c06f42fbe9afda" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cocktail">
+		<description>Cocktail Soft - Zoukangou</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="zoubbb_a.fdi" size="1265664" crc="8e1d4efb" sha1="b5b0c25e411146502f397a120af0d1e2eea2ee57" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="zoubbb_b.fdi" size="1265664" crc="eaa0a18e" sha1="c9e31fba1007ab24d9e05b8ba6f1f2c0e8ffa4ca" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="collonc">
+		<description>Collon Club 3</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="collon club 3 (btb).fdi" size="1265664" crc="21dcaba7" sha1="9ef84b18ffe47c1795e347ccd13d96b066088162" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="colonial">
+		<description>Colonial Conquest</description>
+		<year>1989</year>
+		<publisher>Victor</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="colonial conquest (1989)(victor).fdi" size="1265664" crc="d937e639" sha1="cdb08479af1b1ef1cff8da9db9f8e12d087a3a13" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="company">
+		<description>Company</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="company (gam)(disk 1 of 2).fdi" size="1265664" crc="4b96250e" sha1="4f25e1b346a85e14031dce14fd51c760335c78ec" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="company (gam)(disk 2 of 2).fdi" size="1265664" crc="5c747a28" sha1="dd855db0e42092f128c922c905298025080beb92" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crazyla">
+		<description>Crazy Labyrinth</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="(cat's organization) crazy labyrinth.fdi" size="1265664" crc="4b31f7c4" sha1="25bbe94315e2861bdbb6bfb7511b8625b25bb064" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crescent">
+		<description>Crescent</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="crescent_01.fdi" size="1265664" crc="b40b23f6" sha1="e391a4eb118a909ef4eaa9fc90ebb9134faa906f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="crescent_02.fdi" size="1265664" crc="cc1d8253" sha1="ab87d592c8b10148a16241374588610fb2be3043" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="crescent_03.fdi" size="1265664" crc="f02d4daa" sha1="a0cff7222892259a6f3a03a003d10ba682fa6966" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="crescent_04.fdi" size="1265664" crc="bf046178" sha1="9de1b07b42beaf907ea85e08100b81a8e76f575f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="curse">
+		<description>Curse</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="disk_1.fdi" size="1265664" crc="9d43b3de" sha1="fc0c2c3d6e72e78b517703ad663e480f46c04d49" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="disk_2.fdi" size="1265664" crc="8a48fac8" sha1="160b09d6881ce293bf41225705b1157f17024a90" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="disk_3.fdi" size="1265664" crc="5e8b87cd" sha1="f519af0e6cbe01b7c91055bc0bcd6950118e82e2" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="disk_4.fdi" size="1265664" crc="21d9ca31" sha1="8bf57cd64fd4ed6c661ba76da3be432297321a9e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="customm">
+		<description>Custom Mate</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="cm1_1.fdi" size="1265664" crc="2b73c30b" sha1="aaff84776e809d156cf378da134307698a1de6b3" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="cm1_2.fdi" size="1265664" crc="d77f6871" sha1="2d66c82a54bfa366dcc6be18fa013d4fb7692bd4" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="cm1_3.fdi" size="1265664" crc="94489066" sha1="59f2d62389315d122fe26f4c13ebbed28e193357" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="cm1_4.fdi" size="1265664" crc="b41034e1" sha1="b9c6a79b9e299c38f7031782173e8ee3eddcaee3" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="cm1_5.fdi" size="1265664" crc="86903149" sha1="60baf95f409850da85ea1c6fb8621337989f3d88" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cybernet">
+		<description>Cybernetic Hi-School</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="ch1_a.fdi" size="1265664" crc="f2747929" sha1="c8c364a29bd47b11c7ae5ccf217cbaf7d38de476" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="ch1_b.fdi" size="1265664" crc="9b5498b2" sha1="35b612c3c59214ec0fdbbe93976f587a5df2bc04" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="ch1_c.fdi" size="1265664" crc="02b572f5" sha1="42d469982c05b64885943036170a573346b5a9dd" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="ch1_d.fdi" size="1265664" crc="17b59bf8" sha1="b781ba2600a5a0aa32920564470256591c1fe9b5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cyberne2">
+		<description>Cybernetic Hi-School Part 2 - Highway Buster</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="disk_a.fdi" size="1265664" crc="7be42e5c" sha1="6a3c3c481d8270b09fdf517a5e6693dd91047273" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="disk_b.fdi" size="1265664" crc="79008abf" sha1="c9fffaf3ff39072c81ccb67169df956b3389b169" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="disk_c.fdi" size="1265664" crc="5ad5e666" sha1="8421e733ef0550a8c11402c1ab22d1d632e402c3" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="disk_d.fdi" size="1265664" crc="ced9b455" sha1="0f4e2ea61f840d83f412e001eb0e87caf9efc275" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="cybern20">
+		<description>Cybernetic Hi-School Version 2.0</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
 			<rom name="ch1_a.fdi" size="1265664" crc="f2747929" sha1="c8c364a29bd47b11c7ae5ccf217cbaf7d38de476" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="cybernet">
-	<description>Cybernetic Hi-School</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="ch1_b.fdi" size="1265664" crc="9b5498b2" sha1="35b612c3c59214ec0fdbbe93976f587a5df2bc04" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="cybernet">
-	<description>Cybernetic Hi-School</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="ch1_c.fdi" size="1265664" crc="02b572f5" sha1="42d469982c05b64885943036170a573346b5a9dd" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="cybernet">
-	<description>Cybernetic Hi-School</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="ch1_d.fdi" size="1265664" crc="17b59bf8" sha1="b781ba2600a5a0aa32920564470256591c1fe9b5" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="cybernet">
-	<description>Cybernetic Hi-School Part 2 - Highway Buster</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="disk_a.fdi" size="1265664" crc="7be42e5c" sha1="6a3c3c481d8270b09fdf517a5e6693dd91047273" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="cybernet">
-	<description>Cybernetic Hi-School Part 2 - Highway Buster</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="disk_b.fdi" size="1265664" crc="79008abf" sha1="c9fffaf3ff39072c81ccb67169df956b3389b169" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="cybernet">
-	<description>Cybernetic Hi-School Part 2 - Highway Buster</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="disk_c.fdi" size="1265664" crc="5ad5e666" sha1="8421e733ef0550a8c11402c1ab22d1d632e402c3" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="cybernet">
-	<description>Cybernetic Hi-School Part 2 - Highway Buster</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="disk_d.fdi" size="1265664" crc="ced9b455" sha1="0f4e2ea61f840d83f412e001eb0e87caf9efc275" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="cybernet">
-	<description>Cybernetic Hi-School Version 2.0</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="dennougakuen1\ch1_a.fdi" size="1265664" crc="f2747929" sha1="c8c364a29bd47b11c7ae5ccf217cbaf7d38de476" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="cybernet">
-	<description>Cybernetic Hi-School Version 2.0</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="dennougakuen1\ch1_b.fdi" size="1265664" crc="9b5498b2" sha1="35b612c3c59214ec0fdbbe93976f587a5df2bc04" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="cybernet">
-	<description>Cybernetic Hi-School Version 2.0</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="dennougakuen1\ch1_c.fdi" size="1265664" crc="02b572f5" sha1="42d469982c05b64885943036170a573346b5a9dd" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="cybernet">
-	<description>Cybernetic Hi-School Version 2.0</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="dennougakuen1\ch1_d.fdi" size="1265664" crc="17b59bf8" sha1="b781ba2600a5a0aa32920564470256591c1fe9b5" offset="0" />
-		</dataarea>
-	</part>
-</software>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="dennougakuen1\ch1_b.fdi" size="1265664" crc="9b5498b2" sha1="35b612c3c59214ec0fdbbe93976f587a5df2bc04" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="dennougakuen1\ch1_c.fdi" size="1265664" crc="02b572f5" sha1="42d469982c05b64885943036170a573346b5a9dd" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="dennougakuen1\ch1_d.fdi" size="1265664" crc="17b59bf8" sha1="b781ba2600a5a0aa32920564470256591c1fe9b5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 <software name="d-oush">
 	<description>D - Oushuu Shinkirou</description>
 	<year>19??</year>
