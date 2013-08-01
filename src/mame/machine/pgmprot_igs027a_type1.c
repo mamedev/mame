@@ -710,8 +710,10 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 		// logic here seems correct, not sure where the 0x19 and 0x5 etc. come from tho!
 		case 0x47:
 			hack_47_value = ((m_value0 & 0x0700)>>8) * 0x19;
-			hack_47_value |=((m_value0 & 0x0007)>>0) * 0x05;
+			hack_47_value +=((m_value0 & 0x0007)>>0) * 0x05;
 			if (m_value0 & 0xf8f8) printf("unhandled 0x47 bits %04x\n", m_value0);
+
+			//printf("0x47 value was %04x - using %04x\n", m_value0, hack_47_value);
 
 			m_valueresponse = 0x00740047;
 
@@ -721,6 +723,9 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 			//printf("which %04x\n", m_value0);
 			
 			hack_47_value += m_value0 & 0x0007;
+
+			//printf("0x52 - adding %04x value is now %04x\n", m_value0, hack_47_value);
+
 			if (m_value0 & 0xfff8) printf("unhandled 0x52 bits %04x\n", m_value0);
 
 			m_valueresponse = 0x00740000 | (hack_47_value & 0xffff);
