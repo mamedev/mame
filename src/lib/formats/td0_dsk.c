@@ -973,17 +973,17 @@ bool td0_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 							}
 							break;
 					}
-
-					sects[i].actual_size = size;
-
-					if(size)
-					{
-						sects[i].data = &sect_data[sdatapos];
-						sdatapos += size;
-					}
-					else
-						sects[i].data = NULL;
 				}
+
+				sects[i].actual_size = size;
+
+				if(size)
+				{
+					sects[i].data = &sect_data[sdatapos];
+					sdatapos += size;
+				}
+				else
+					sects[i].data = NULL;
 			}
 			track_count = track;
 
