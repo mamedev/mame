@@ -38,6 +38,7 @@
 #define LOG_REGISTER    1
 #define LOG_MEMORY      1
 #define LOG_IO          1
+#define LOG_KEYBOARD	0
 
 
 //**************************************************************************
@@ -210,7 +211,6 @@ cs4031_device::cs4031_device(const machine_config &mconfig, const char *tag, dev
 	m_refresh_toggle(0),
 	m_iochck(1),
 	m_nmi_mask(1),
-	m_sysctrl(0),
 	m_cpureset(0),
 	m_kbrst(1),
 	m_ext_gatea20(0),
@@ -718,12 +718,15 @@ void cs4031_device::a20m()
 
 READ8_MEMBER( cs4031_device::keyb_status_r )
 {
+	if (LOG_KEYBOARD)
+		logerror("cs4031_device::keyb_status_r\n");
+
 	return m_keybc->status_r(space, 0);
 }
 
 WRITE8_MEMBER( cs4031_device::keyb_command_w )
 {
-	if (0)
+	if (LOG_KEYBOARD)
 		logerror("cs4031_device::keyb_command_w: %02x\n", data);
 
 	m_keybc->command_w(space, 0, data);
@@ -731,7 +734,7 @@ WRITE8_MEMBER( cs4031_device::keyb_command_w )
 
 READ8_MEMBER( cs4031_device::keyb_data_r )
 {
-	if (0)
+	if (LOG_KEYBOARD)
 		logerror("cs4031_device::keyb_data_r\n");
 
 	return m_keybc->data_r(space, 0);
@@ -739,7 +742,7 @@ READ8_MEMBER( cs4031_device::keyb_data_r )
 
 WRITE8_MEMBER( cs4031_device::keyb_data_w )
 {
-	if (0)
+	if (LOG_KEYBOARD)
 		logerror("cs4031_device::keyb_data_w: %02x\n", data);
 
 	m_keybc->data_w(space, 0, data);
@@ -747,7 +750,7 @@ WRITE8_MEMBER( cs4031_device::keyb_data_w )
 
 WRITE_LINE_MEMBER( cs4031_device::gatea20_w )
 {
-	if (LOG_IO)
+	if (LOG_KEYBOARD)
 		logerror("cs4031_device::gatea20_w: %u\n", state);
 
 	if (m_ext_gatea20 != state)
@@ -759,7 +762,7 @@ WRITE_LINE_MEMBER( cs4031_device::gatea20_w )
 
 WRITE_LINE_MEMBER( cs4031_device::kbrst_w )
 {
-	if (LOG_IO)
+	if (LOG_KEYBOARD)
 		logerror("cs4031_device::kbrst_w: %u\n", state);
 
 	// active low signal
@@ -786,8 +789,6 @@ WRITE8_MEMBER( cs4031_device::sysctrl_w )
 	if (LOG_IO)
 		logerror("cs4031_device::sysctrl_w: %u\n", data);
 
-	m_sysctrl = data;
-
 	m_fast_gatea20 = BIT(data, 1);
 	a20m();
 
@@ -803,11 +804,17 @@ WRITE8_MEMBER( cs4031_device::sysctrl_w )
 
 READ8_MEMBER( cs4031_device::sysctrl_r )
 {
-	if (LOG_IO)
-		logerror("cs4031_device::sysctrl_r: %u\n", m_sysctrl);
+	UINT8 result = 0; // reserved bits read as 0?
 
-	return m_sysctrl;
+	result |= m_cpureset << 0;
+	result |= m_fast_gatea20 << 1;
+
+	if (LOG_IO)
+		logerror("cs4031_device::sysctrl_r: %u\n", result);
+
+	return result;
 }
+
 
 //**************************************************************************
 //  MISCELLANEOUS

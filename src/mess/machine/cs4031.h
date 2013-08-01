@@ -240,7 +240,6 @@ private:
 	int m_refresh_toggle;
 	int m_iochck;
 	int m_nmi_mask;
-	UINT8 m_sysctrl;
 
 	// keyboard
 	at_keyboard_controller_device *m_keybc;
