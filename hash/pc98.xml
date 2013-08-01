@@ -6498,7 +6498,7 @@ Fake disk?
 			</dataarea>
 		</part>
 	</software>
-<!--
+
 	<software name="ieyasus">
 		<description>Ieyasu Senki</description>
 		<year>19??</year>
@@ -6508,37 +6508,23 @@ Fake disk?
 				<rom name="ieyasu senhata (j) 1.fdi" size="1265664" crc="cf920e02" sha1="56fb493749a6d732af7df42ad95c4527c4e6e836" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="ieyasus">
-		<description>Ieyasu Senki</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="ieyasu senhata (j) 2.fdi" size="1265664" crc="42ce9658" sha1="3ea32b1c83918844eb3edbac293b05ade36969fb" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="ieyasus">
-		<description>Ieyasu Senki</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="ieyasu senhata (j) 3.fdi" size="1265664" crc="7d458c5d" sha1="0905e8ee2a92cb0fb8d6328ea3202e31124038ae" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="ieyasus">
-		<description>Ieyasu Senki</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="ieyasu senhata (j) system.fdi" size="1265664" crc="d1860e48" sha1="904af733365f1b67889fe7c5d34832b0c608dbc8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="ikuikup">
 		<description>Ikuiku Pakkun</description>
 		<year>19??</year>
@@ -6548,87 +6534,48 @@ Fake disk?
 				<rom name="disk_a.fdi" size="1265664" crc="adf0537c" sha1="dc4c3e1eb576e10ce815242205ebdaf36c520e9b" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="ikuikup">
-		<description>Ikuiku Pakkun</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_b.fdi" size="1265664" crc="3f8bb0f2" sha1="4d0f9fb8e46688b4559798caf002785c97398d03" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="ikuikup">
-		<description>Ikuiku Pakkun</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_c.fdi" size="1265664" crc="4541c5c3" sha1="64bfaae4002bb43b98ab1ef8651e5a7de54c9156" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="ikuikup">
-		<description>Ikuiku Pakkun</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_d.fdi" size="1265664" crc="cb26cac2" sha1="5d7235b6994f264d4e67e966f8093e997f7e6e49" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="ikuikup">
-		<description>Ikuiku Pakkun</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop5" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_e.fdi" size="1265664" crc="fa86d2dc" sha1="0b41da0760f2e7c8bec456aa4677e01744942474" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="ikuikup">
-		<description>Ikuiku Pakkun</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop6" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_f.fdi" size="1265664" crc="635ff6e6" sha1="2343fcaca86c5ead8143f52ef1d374cbd8ace17c" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="ikuikup">
-		<description>Ikuiku Pakkun</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop7" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_g.fdi" size="1265664" crc="02de0717" sha1="55b73751a8b42bf3439a045982d41e209df0cddb" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="ikuikup">
-		<description>Ikuiku Pakkun</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop8" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_h.fdi" size="1265664" crc="638644f7" sha1="9bde4cf4275e280c1b4f54ea4d224851da767817" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="ikuikup">
-		<description>Ikuiku Pakkun</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop9" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="game.fdi" size="1265664" crc="23b60a56" sha1="dc568900e1abce43caf05ba342707e7f78c28a33" offset="0" />
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="illumina">
 		<description>Illumina!</description>
 		<year>19??</year>
@@ -6638,27 +6585,18 @@ Fake disk?
 				<rom name="illumina_a.fdi" size="1265664" crc="22552655" sha1="add3d633fb3d3a3c814ca326c7228bbbc2688481" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="illumina">
-		<description>Illumina!</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="illumina_b.fdi" size="1265664" crc="39dccaeb" sha1="58c57dcbe27886f697187a9bbfbd62b6e4bdfd0e" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="illumina">
-		<description>Illumina!</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="illumina_c.fdi" size="1265664" crc="07afc241" sha1="111429fec4d418652eeae688b2ac7f1f9a048d7e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="illusion">
 		<description>Illusion City</description>
 		<year>19??</year>
@@ -6668,97 +6606,62 @@ Fake disk?
 				<rom name="disk1.fdi" size="1265664" crc="6c28f456" sha1="b9595c3798b0faf5152df79f1ea1c74ce3a07672" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="illusion">
-		<description>Illusion City</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk2.fdi" size="1265664" crc="408aba76" sha1="5770ff0dc637776d6cb5e30cd4a128fb783befa3" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="illusion">
-		<description>Illusion City</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk3.fdi" size="1265664" crc="da57a623" sha1="3fbd4cdeccf99e531b34dfe5a3fe890966307fa8" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="illusion">
-		<description>Illusion City</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk4.fdi" size="1265664" crc="cfb2c03b" sha1="b7397ef886811f71927d53c6d940167f01147b9d" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="illusion">
-		<description>Illusion City</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop5" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk5.fdi" size="1265664" crc="1187eea4" sha1="7ad2a757460adaff37d73c59287b941241d1e160" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="illusion">
-		<description>Illusion City</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop6" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk6.fdi" size="1265664" crc="3256197f" sha1="26a46c2f6124c569b3586e6b9dd97e521460bc0e" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="illusion">
-		<description>Illusion City</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop7" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk7.fdi" size="1265664" crc="2b71cca8" sha1="60b32fe6816be8a9b0b35d9b779ab5baa2fac8af" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="illusion">
-		<description>Illusion City</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop8" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="user.fdi" size="1265664" crc="c1c566df" sha1="0211d36ee53453122d6e2df604d5fdf6c9bfba3a" offset="0" />
+				<rom name="user.fdi" size="1265664" crc="c1c566df" sha1="0211d36ee53453122d6e2df604d5fdf6c9bfba3a" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
+
+<!--
+Game is named "image", with lowercase i on title screen 
+-->
 	<software name="image">
 		<description>image</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1992</year>
+		<publisher>Software House Parsley</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_1.fdi" size="1265664" crc="39a6511f" sha1="0021dc96db65ca9d6d555c53dffc2623a3805866" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="image">
-		<description>image</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_2.fdi" size="1265664" crc="bb44dcc2" sha1="30bd7c1c54e95cddff8090cd4dccd978ee17bcf1" offset="0" />
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="inindou">
 		<description>Inindou - Datou Nobunaga</description>
 		<year>19??</year>
@@ -6768,27 +6671,18 @@ Fake disk?
 				<rom name="a_disk.fdi" size="1265664" crc="61d7293e" sha1="1d2d54053a6759e25e84b23b72240951f648c9bb" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="inindou">
-		<description>Inindou - Datou Nobunaga</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="b_disk.fdi" size="1265664" crc="a44a01f7" sha1="3f11ea07265dae42ff3b6c6b06b6cec682c93517" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="inindou">
-		<description>Inindou - Datou Nobunaga</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="c_disk.fdi" size="1265664" crc="44886a4c" sha1="326317e8dadf4fe6f8ceb845ca9e2c46c1671726" offset="0" />
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="inspecto">
 		<description>Inspector</description>
 		<year>19??</year>
@@ -6798,37 +6692,23 @@ Fake disk?
 				<rom name="hayate_a.fdi" size="1265664" crc="d078ba32" sha1="b35069895c9b6041d2da270b63b5f78825631567" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="inspecto">
-		<description>Inspector</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="hayate_b.fdi" size="1265664" crc="8edbd90e" sha1="6fc0549b67a8726a46e1b5ce500f88d9b88ff0bd" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="inspecto">
-		<description>Inspector</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="hayate_c.fdi" size="1265664" crc="ababe7ae" sha1="d48401a083c675344c93f0c203bafbbe09f1ac99" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="inspecto">
-		<description>Inspector</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="hayate_d.fdi" size="1265664" crc="9ba813cb" sha1="20738a9178b19ef07f02e0285b155e6ff7f02e54" offset="0" />
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="ippatsu">
 		<description>Ippatsu Jang!</description>
 		<year>19??</year>
@@ -6838,37 +6718,23 @@ Fake disk?
 				<rom name="ippatsu jang! (j) a.fdi" size="1265664" crc="d289b58f" sha1="b2238af1d44623a6fb885856c5147f7395c3a818" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="ippatsu">
-		<description>Ippatsu Jang!</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="ippatsu jang! (j) b.fdi" size="1265664" crc="0ddd60f8" sha1="a9d91cb8e397981b2e4d5a52f97a7c53db881ce8" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="ippatsu">
-		<description>Ippatsu Jang!</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="ippatsu jang! (j) c.fdi" size="1265664" crc="a412dae9" sha1="ca4dc1d74297902fbd8fd6be54baf34206601f59" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="ippatsu">
-		<description>Ippatsu Jang!</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="ippatsu jang! (j) d.fdi" size="1265664" crc="fe90d36b" sha1="e30ac11d8e31be010467d9bdd38d1122e07e6cac" offset="0" />
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="ireen">
 		<description>Ireen</description>
 		<year>19??</year>
@@ -6879,6 +6745,7 @@ Fake disk?
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="isaku">
 		<description>Isaku</description>
 		<year>19??</year>
@@ -6888,68 +6755,39 @@ Fake disk?
 				<rom name="isaku_a.fdi" size="1265664" crc="7220f890" sha1="a32bc974b31b3b5bf3201cc6b02abda21448d799" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="isaku">
-		<description>Isaku</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="isaku_b.fdi" size="1265664" crc="15d1f02a" sha1="565966623d539962e3a53e3490d5e7f43c790ec0" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="isaku">
-		<description>Isaku</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="isaku_c.fdi" size="1265664" crc="21b03ea2" sha1="53b970b00d7806a24e75ae034609354dc320e3ba" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="isaku">
-		<description>Isaku</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="isaku_d.fdi" size="1265664" crc="6ebd5a82" sha1="71797f2ec6cc26a7be8c8ad182411708389df615" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="isaku">
-		<description>Isaku</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop5" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="isaku_e.fdi" size="1265664" crc="bb0ceccb" sha1="2a72721700d49b5ca05f38108f52f242819ed5d1" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="isaku">
-		<description>Isaku</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop6" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="isaku_f.fdi" size="1265664" crc="067c4c38" sha1="697d0de2a7f8490ec79157e17f423d236486b6d5" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="isaku">
-		<description>Isaku</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop7" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="isaku_g.fdi" size="1265664" crc="3ea4e801" sha1="b2a513a7df63de1734ad0eedf137564442bf8f2e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
-	<software name="itsukad">
+
+	<software name="itsukado">
 		<description>Itsuka Dokoka de. - Erotic Baka Novel Series 2</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -6958,58 +6796,34 @@ Fake disk?
 				<rom name="disk_1.fdi" size="1265664" crc="3de7b037" sha1="689e84a04b827dfccd71617c8e6b922b8d1ce017" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="itsukad">
-		<description>Itsuka Dokoka de. - Erotic Baka Novel Series 2</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_2.fdi" size="1265664" crc="b662c5b3" sha1="b75b9503652a843a09ba08b6715d5454f88ca8bb" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="itsukad">
-		<description>Itsuka Dokoka de. - Erotic Baka Novel Series 2</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_3.fdi" size="1265664" crc="ed9a5135" sha1="312d86391d4423eaaed74692ad4e0ed391c6a934" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="itsukad">
-		<description>Itsuka Dokoka de. - Erotic Baka Novel Series 2</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_4.fdi" size="1265664" crc="977a2933" sha1="78c71cfe26002ff3a5c608f444772a31fa58b1e5" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="itsukad">
-		<description>Itsuka Dokoka de. - Erotic Baka Novel Series 2</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop5" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_5.fdi" size="1265664" crc="7d29e286" sha1="f99c596472b0f36f1666195eef060fc1955fdaf3" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="itsukad">
-		<description>Itsuka Dokoka de. - Erotic Baka Novel Series 2</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop6" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="protected_1.fdi" size="1265664" crc="9f905b2e" sha1="fbf14fcbf5de455b673c4e08feda0c55bdf5b19d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
-	<software name="iucdisk">
+
+	<software name="iuc001">
 		<description>IUC Disk Kaihou #001</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -7019,7 +6833,8 @@ Fake disk?
 			</dataarea>
 		</part>
 	</software>
-	<software name="iucdisk">
+
+	<software name="iuc002">
 		<description>IUC Disk Kaihou #002</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -7029,7 +6844,8 @@ Fake disk?
 			</dataarea>
 		</part>
 	</software>
-	<software name="iucdisk">
+
+	<software name="iuc003">
 		<description>IUC Disk Kaihou #003</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -7039,7 +6855,8 @@ Fake disk?
 			</dataarea>
 		</part>
 	</software>
-	<software name="janoh!">
+
+	<software name="janoh">
 		<description>Jan Oh! Quest</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -7048,27 +6865,18 @@ Fake disk?
 				<rom name="joquest1.fdi" size="1265664" crc="38c42198" sha1="655304903923589d053655557a1ef7441ea7ddc8" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="janoh!">
-		<description>Jan Oh! Quest</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="joquest2.fdi" size="1265664" crc="f4fffd5b" sha1="9e83def87e1888b53f6c851e1ed72824beab16dc" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="janoh!">
-		<description>Jan Oh! Quest</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="joquest3.fdi" size="1265664" crc="ea9f6aba" sha1="ee7d217e61b7d6bba507923d8522772cb75531a1" offset="0" />
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="jankirou">
 		<description>Jankirou</description>
 		<year>19??</year>
@@ -7078,38 +6886,24 @@ Fake disk?
 				<rom name="jun_a.fdi" size="1265664" crc="9ccfd9bd" sha1="d6dd2ae10c9d36687c53a8747567e53e04617c4b" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="jankirou">
-		<description>Jankirou</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="jun_b.fdi" size="1265664" crc="fe66ef9c" sha1="ad1450ecd06f7741c30155cb36f8f1f2e3826609" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="jankirou">
-		<description>Jankirou</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="jun_c.fdi" size="1265664" crc="4d3db0f7" sha1="7420ebbaeeb7396957048c1fdabb6f34951b33cd" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="jankirou">
-		<description>Jankirou</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="jun_d.fdi" size="1265664" crc="73af61e5" sha1="3e309ec794902a98e18a85099231b6d08e29d0fe" offset="0" />
 			</dataarea>
 		</part>
 	</software>
-	<software name="japanese">
+
+	<software name="jpquizz">
 		<description>Japanese Cult Quiz Zipang</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -7118,37 +6912,23 @@ Fake disk?
 				<rom name="disk_1.fdi" size="1265664" crc="b84cbd50" sha1="9d6eb238d732ab7d40fc0959c5b963de96c9a5d5" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="japanese">
-		<description>Japanese Cult Quiz Zipang</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_2.fdi" size="1265664" crc="1c2a60af" sha1="41686f6600e7e3da0c67fd0d098fdee73fbe55f6" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="japanese">
-		<description>Japanese Cult Quiz Zipang</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_3.fdi" size="1265664" crc="968557c5" sha1="551ab542194cb4d66f763a77d754ed56eec215b5" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="japanese">
-		<description>Japanese Cult Quiz Zipang</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_4.fdi" size="1265664" crc="17a38c49" sha1="d33b4e6c78d414c700e63e1eebd82ecd018debe3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="jealousy">
 		<description>Jealousy</description>
 		<year>19??</year>
@@ -7158,57 +6938,33 @@ Fake disk?
 				<rom name="disk_a.fdi" size="1265664" crc="94d82978" sha1="456ec7daf16179660127cd059747d011948d8119" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="jealousy">
-		<description>Jealousy</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_b.fdi" size="1265664" crc="3089f7ca" sha1="417ea147dd8691cffe87e8ce93f606cf318c8b4b" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="jealousy">
-		<description>Jealousy</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_c.fdi" size="1265664" crc="579725d0" sha1="0f3832c5739bb1c2bc9bb0f1afcdde435481abb2" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="jealousy">
-		<description>Jealousy</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_d.fdi" size="1265664" crc="35898012" sha1="12fa485ef778b86450f8553eaf1ab287d709a47a" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="jealousy">
-		<description>Jealousy</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop5" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_e.fdi" size="1265664" crc="1550f83b" sha1="9157ded692068aca2b25be3c8d78c9cd42396374" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="jealousy">
-		<description>Jealousy</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop6" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_f.fdi" size="1265664" crc="b39e678f" sha1="fe0c2dd533e2e11bcae9d837e63e0f24cd07219a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="jesus2">
 		<description>Jesus 2</description>
 		<year>19??</year>
@@ -7218,48 +6974,29 @@ Fake disk?
 				<rom name="jesus2_1.fdi" size="1265664" crc="7659aa42" sha1="2ae581abffd4228f5a156d5089e3db2f0593e9c5" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="jesus2">
-		<description>Jesus 2</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="jesus2_2.fdi" size="1265664" crc="98cf0012" sha1="48335d2e19ad4570721ac42dbafc3be9d0bda933" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="jesus2">
-		<description>Jesus 2</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="jesus2_3.fdi" size="1265664" crc="135bf7ad" sha1="6b52bc94dbe955308734e736a70ef9261bf06b17" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="jesus2">
-		<description>Jesus 2</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="jesus2_4.fdi" size="1265664" crc="50779c1e" sha1="46a99ec2657d4ad825a1958800aa2f156bb602ea" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="jesus2">
-		<description>Jesus 2</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop5" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="jesus2_5.fdi" size="1265664" crc="85f10316" sha1="aac6671fad6b9e02ffa5bb8b186be970e2622d71" offset="0" />
 			</dataarea>
 		</part>
 	</software>
-	<software name="jinn-e">
+
+	<software name="jinneh">
 		<description>Jinn - Eternal Hero</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -7268,57 +7005,33 @@ Fake disk?
 				<rom name="jinna.fdi" size="1265664" crc="e99773dc" sha1="909b2f769b5ea5d3738d363dad8997dda1d1a804" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="jinn-e">
-		<description>Jinn - Eternal Hero</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="jinnb.fdi" size="1265664" crc="c1fcb47e" sha1="17e736236f48b8c1d1318278a6309b899693497b" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="jinn-e">
-		<description>Jinn - Eternal Hero</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="jinnc.fdi" size="1265664" crc="79fbe82c" sha1="e6fa8749398f6623b5e24b37d2c3610f2b208faf" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="jinn-e">
-		<description>Jinn - Eternal Hero</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="jinnd.fdi" size="1265664" crc="d4e82843" sha1="2583da78249e145df3f163988cac145d9efb299f" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="jinn-e">
-		<description>Jinn - Eternal Hero</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop5" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="jinne.fdi" size="1265664" crc="baffbf6e" sha1="3df0b1a72d6230ae5bb26ee940e7cc14dd92e71c" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="jinn-e">
-		<description>Jinn - Eternal Hero</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop6" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="jinnf.fdi" size="1265664" crc="36a4c119" sha1="e49995eb8cd693c0ef391e1017a1fe8b23727019" offset="0" />
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="jinseiq">
 		<description>Jinsei Quiz Game Da</description>
 		<year>19??</year>
@@ -7328,27 +7041,18 @@ Fake disk?
 				<rom name="quiz_a.fdi" size="1265664" crc="14b7ee6e" sha1="63c21be58abc274b2129533b920c90f7ccfae46b" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="jinseiq">
-		<description>Jinsei Quiz Game Da</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="quiz_b.fdi" size="1265664" crc="863b5fae" sha1="6f1c9a09920d47adca4acbf9519d4e39832d406b" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="jinseiq">
-		<description>Jinsei Quiz Game Da</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="quiz_c.fdi" size="1265664" crc="5fc1ba52" sha1="0d3289a090f0e96769b30c67118d435526a45645" offset="0" />
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="joker">
 		<description>Joker</description>
 		<year>19??</year>
@@ -7358,37 +7062,30 @@ Fake disk?
 				<rom name="disk_a.fdi" size="1265664" crc="86a5f0f2" sha1="164a57b1790bea8b6226ce14ca7807c693f32be3" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="joker">
-		<description>Joker</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_b.fdi" size="1265664" crc="907f9a2e" sha1="73d52d91e0c97befbc39db19608715e47014af38" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="joker">
-		<description>Joker</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_c.fdi" size="1265664" crc="b5e74be0" sha1="29d17b0fe0544bc78aa042a65a5314bb3e4d6423" offset="0" />
 			</dataarea>
 		</part>
 	</software>
-	<software name="jumpher">
+
+	<software name="jumphero">
 		<description>Jump Hero</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Compile</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="jump hero.fdi" size="1265664" crc="847e673d" sha1="a58b97b11a3394ccba2dd039d5a5f14c8b0c870c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
+
+<!--
 	<software name="kakutou">
 		<description>Kakutou Musume Ryoko</description>
 		<year>19??</year>
