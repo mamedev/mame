@@ -2695,7 +2695,7 @@ TODO:
 		</part>
 		<part name="flop6" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="program.fdi" size="1265664" crc="d38a28fc" sha1="340c29ae7c7e5c29d1d4f15688603ddf53a3b417" offset="0" />
+				<rom name="program_alt.fdi" size="1265664" crc="d38a28fc" sha1="340c29ae7c7e5c29d1d4f15688603ddf53a3b417" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4410,7 +4410,7 @@ Presumably copy protection floppy, to be used with CD-Rom
 		</part>
 	</software>
 
-	<software name="discst01">
+	<software name="disc98_1">
 		<description>Disc Station 98 #01 - Soukangou</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -4436,7 +4436,7 @@ Presumably copy protection floppy, to be used with CD-Rom
 		</part>
 	</software>
 
-	<software name="discst02">
+	<software name="disc98_2">
 		<description>Disc Station 98 #02</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -4462,7 +4462,7 @@ Presumably copy protection floppy, to be used with CD-Rom
 		</part>
 	</software>
 
-	<software name="discst12">
+	<software name="disc9812">
 		<description>Disc Station 98 #12</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -4483,7 +4483,7 @@ Presumably copy protection floppy, to be used with CD-Rom
 		</part>
 	</software>
 
-	<software name="discst13">
+	<software name="disc9813">
 		<description>Disc Station 98 #13</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -4504,7 +4504,7 @@ Presumably copy protection floppy, to be used with CD-Rom
 		</part>
 	</software>
 
-	<software name="discst18">
+	<software name="disc9818">
 		<description>Disc Station 98 #18</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -4525,7 +4525,7 @@ Presumably copy protection floppy, to be used with CD-Rom
 		</part>
 	</software>
 
-	<software name="discst20">
+	<software name="disc9820">
 		<description>Disc Station 98 #20</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -4790,12 +4790,12 @@ Presumably copy protection floppy, to be used with CD-Rom
 	</software>
 
 	<software name="diskbisa" cloneof="diskbis">
-		<description>Disk Bishoujo Daizukan 91(another)</description>
+		<description>Disk Bishoujo Daizukan 91 (Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="zukan_a.fdi" size="1265664" crc="1376494c" sha1="10ad06e5291a972c0ca258b268798e0324a4c2ae" offset="0" />
+				<rom name="zukan_a_alt.fdi" size="1265664" crc="1376494c" sha1="10ad06e5291a972c0ca258b268798e0324a4c2ae" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
