@@ -663,6 +663,7 @@ static ADDRESS_MAP_START( pc88va_map, AS_PROGRAM, 16, pc88va_state )
 	AM_RANGE(0xf0000, 0xfffff) AM_ROMBANK("rom10_bank")
 ADDRESS_MAP_END
 
+/* IDP = NEC uPD72022 */
 READ8_MEMBER(pc88va_state::idp_status_r)
 {
 /*
@@ -742,6 +743,7 @@ WRITE8_MEMBER(pc88va_state::idp_command_w)
 		case SPROV:  m_cmd = SPROV; /* TODO: where it returns the info? */ break;
 
 		/* TODO: 0x89 shouldn't trigger, should be one of the above commands */
+		/* Update: actually 0x89 is mask command */
 		default:   m_cmd = 0x00; printf("PC=%05x: Unknown IDP %02x cmd set\n",space.device().safe_pc(),data); break;
 	}
 }
