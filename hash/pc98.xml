@@ -7085,7 +7085,6 @@ Game is named "image", with lowercase i on title screen
 		</part>
 	</software>
 
-<!--
 	<software name="kakutou">
 		<description>Kakutou Musume Ryoko</description>
 		<year>19??</year>
@@ -7095,47 +7094,28 @@ Game is named "image", with lowercase i on title screen
 				<rom name="k-musume_1.fdi" size="1265664" crc="9963669a" sha1="824a9aa001bda0844de7204bc922f375469fe813" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="kakutou">
-		<description>Kakutou Musume Ryoko</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="k-musume_2.fdi" size="1265664" crc="9045a2d9" sha1="6b916cb62ed4df0e1557929ec0ba77843dee3bf1" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="kakutou">
-		<description>Kakutou Musume Ryoko</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="k-musume_3.fdi" size="1265664" crc="203299c5" sha1="1f72f6de16a0f81c999a6b6726b52650aa3532de" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="kakutou">
-		<description>Kakutou Musume Ryoko</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="k-musume_4.fdi" size="1265664" crc="d777343d" sha1="ff37b9a087d552baaa29dc0419a26111b89b18b6" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="kakutou">
-		<description>Kakutou Musume Ryoko</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop5" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="k-musume_sys.fdi" size="1265664" crc="8b7b4bf6" sha1="24253b64925addb6568c161603e694616b588214" offset="0" />
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="kaouder">
 		<description>Kaou Derby</description>
 		<year>19??</year>
@@ -7146,16 +7126,20 @@ Game is named "image", with lowercase i on title screen
 			</dataarea>
 		</part>
 	</software>
+
+<!--
+TODO: other two disks, in .nfd format
 	<software name="kawaisou">
 		<description>Kawaisou Monogatari</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="user.fdi" size="1265664" crc="6c424c81" sha1="5feb465c5178534a575b555eeeabacae36b9f650" offset="0" />
+				<rom name="user.fdi" size="1265664" crc="6c424c81" sha1="5feb465c5178534a575b555eeeabacae36b9f650" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
+-->
 	<software name="kerakera">
 		<description>Kerakera-sei</description>
 		<year>19??</year>
@@ -7165,28 +7149,19 @@ Game is named "image", with lowercase i on title screen
 				<rom name="kera_a.fdi" size="1265664" crc="7a8b5095" sha1="d8e6df7f92fdfa1057daf7f04f29819b5243bbd4" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="kerakera">
-		<description>Kerakera-sei</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="kera_b.fdi" size="1265664" crc="a9829c90" sha1="68708891fdc615752b7a6ebca4c9b59307c71b5d" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="kikoush">
-		<description>Kikou Shidan 2</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="ks_dat.fdi" size="1265664" crc="2c543ad6" sha1="e82f4f7a959a6a76e65bc76d3da7fbb506ebe4fc" offset="0" />
 			</dataarea>
 		</part>
 	</software>
-	<software name="kikoush">
+
+	<software name="kikoush2">
 		<description>Kikou Shidan 2</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -7195,28 +7170,19 @@ Game is named "image", with lowercase i on title screen
 				<rom name="ks_sce.fdi" size="1265664" crc="c746a15f" sha1="e846b5dc4383da6ad88409522075469be5a1249e" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="kikoush">
-		<description>Kikou Shidan 2</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="ks_sys.fdi" size="1265664" crc="a9c894c3" sha1="446370a7fcecff5adf258ef6db08ad401c0abca3" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="kikoush">
-		<description>Kikou Shidan 2</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="ks_usr.fdi" size="1265664" crc="af9c7514" sha1="123bc99bf536c716478e0f9f9161b593f06b2da3" offset="0" />
+				<rom name="ks_usr.fdi" size="1265664" crc="af9c7514" sha1="123bc99bf536c716478e0f9f9161b593f06b2da3" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
-	<software name="kimagure">
+
+	<software name="orangerd">
 		<description>Kimagure Orange Road - Natsu no Mirage</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -7225,17 +7191,13 @@ Game is named "image", with lowercase i on title screen
 				<rom name="disk1.fdi" size="1265664" crc="2449cc9c" sha1="4d76b1eb773baff9295b4f9ea546587f3130808e" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="kimagure">
-		<description>Kimagure Orange Road - Natsu no Mirage</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk2.fdi" size="1265664" crc="181ba303" sha1="46855363d6ca36fcc40a11760f43d43134f14f72" offset="0" />
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="kimidak">
 		<description>Kimi Dake ni Ai o</description>
 		<year>19??</year>
@@ -7245,27 +7207,18 @@ Game is named "image", with lowercase i on title screen
 				<rom name="kimidaia.fdi" size="1265664" crc="d810f890" sha1="6363c2e81192e23b6ea39c9b370d9a2bd66be4ba" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="kimidak">
-		<description>Kimi Dake ni Ai o</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="kimidaib.fdi" size="1265664" crc="322d1b26" sha1="5ec565f6ba56ae2c486585e38d7a2932ec623b63" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="kimidak">
-		<description>Kimi Dake ni Ai o</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="kimidaic.fdi" size="1265664" crc="0bcb4d2d" sha1="34e59079e5d7fb56d74e424841b2f90953ac295f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="kinbaku">
 		<description>Kinbaku no Yakata</description>
 		<year>19??</year>
@@ -7276,6 +7229,7 @@ Game is named "image", with lowercase i on title screen
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="kingbre">
 		<description>King Breeder - Ijuu Ou</description>
 		<year>19??</year>
@@ -7285,38 +7239,24 @@ Game is named "image", with lowercase i on title screen
 				<rom name="kb01.fdi" size="1265664" crc="b0095269" sha1="2abdd8a013bd1afc51a871720548d0528130bc17" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="kingbre">
-		<description>King Breeder - Ijuu Ou</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="kb02.fdi" size="1265664" crc="58f620b7" sha1="0f0f05f4f589c6b2bebd6264ed3ec827fa94d868" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="kingbre">
-		<description>King Breeder - Ijuu Ou</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="kb03.fdi" size="1265664" crc="809ffb69" sha1="f85d536a109162e060c64ee73ae9db65fa609603" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="kingbre">
-		<description>King Breeder - Ijuu Ou</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="kb04.fdi" size="1265664" crc="63a61789" sha1="24939b6afb2272ce8cc4e0347687f5f1501ead8c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
-	<software name="kingsqu">
+
+	<software name="kingsq5">
 		<description>Kings Quest 5</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -7325,57 +7265,33 @@ Game is named "image", with lowercase i on title screen
 				<rom name="0.fdi" size="1265664" crc="8ae45913" sha1="1b6ddbcd6393604ef9c3adb72b323ed0abaf96fd" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="kingsqu">
-		<description>Kings Quest 5</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="1.fdi" size="1265664" crc="665ebc26" sha1="77b4899d3e517fdf5e95c3b5a4a55eefc03464de" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="kingsqu">
-		<description>Kings Quest 5</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="2.fdi" size="1265664" crc="e54965b7" sha1="b2e5bdd4b63a8ef9de1f6c3c2af87253e48bb1a6" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="kingsqu">
-		<description>Kings Quest 5</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="3.fdi" size="1265664" crc="489a0d1a" sha1="29e024f503a54979b5d6efc8b81f57a4b43e551e" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="kingsqu">
-		<description>Kings Quest 5</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop5" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="4.fdi" size="1265664" crc="c67fa9ae" sha1="494c0b5ce2a67bfe28378e87bef8b525b1f49370" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="kingsqu">
-		<description>Kings Quest 5</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop6" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="5.fdi" size="1265664" crc="17954934" sha1="87107a98634ae8f632830f62e81c5fd149732ac3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="kirakira">
 		<description>Kirakira Megami Sensei</description>
 		<year>19??</year>
@@ -7385,17 +7301,13 @@ Game is named "image", with lowercase i on title screen
 				<rom name="kmegamia.fdi" size="1265664" crc="5daeda37" sha1="f354a4120c6d759d0206c7ffeec68bd3e85352c3" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="kirakira">
-		<description>Kirakira Megami Sensei</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="kmegamib.fdi" size="1265664" crc="c947c836" sha1="befc8bbe5f3cff4368abb3ce55da647865dade9b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="kiss">
 		<description>Kiss</description>
 		<year>19??</year>
@@ -7405,28 +7317,19 @@ Game is named "image", with lowercase i on title screen
 				<rom name="kiss_a.fdi" size="1265664" crc="df699e3c" sha1="74bcaca7c43043a4b8741c621608f522de1636f5" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="kiss">
-		<description>Kiss</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="kiss_b.fdi" size="1265664" crc="956dabb6" sha1="fd866f86b96bc162cbdeb6a849ea2329d24757de" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="kiss">
-		<description>Kiss</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="kiss_c.fdi" size="1265664" crc="fad2d8f5" sha1="23ea5efe5da684016be7467b264034fbeec5ae7f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
-	<software name="kittywo">
+
+	<software name="kittyw2">
 		<description>Kitty World 2</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -7436,6 +7339,7 @@ Game is named "image", with lowercase i on title screen
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="klax">
 		<description>Klax</description>
 		<year>19??</year>
@@ -7446,6 +7350,7 @@ Game is named "image", with lowercase i on title screen
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="koseiki">
 		<description>KO Seiki Beast Sanjuushi - Rastak no Joou</description>
 		<year>19??</year>
@@ -7455,77 +7360,43 @@ Game is named "image", with lowercase i on title screen
 				<rom name="ko_1.fdi" size="1265664" crc="9c4685dc" sha1="3274a84cec8a756f26422a711525580bb385d50c" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="koseiki">
-		<description>KO Seiki Beast Sanjuushi - Rastak no Joou</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="ko_2.fdi" size="1265664" crc="df40d4c9" sha1="9421eccbfde73c46f2d002332e04f0a99a78dd8c" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="koseiki">
-		<description>KO Seiki Beast Sanjuushi - Rastak no Joou</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="ko_3.fdi" size="1265664" crc="7f7666ce" sha1="dfcec805676dbd9dc1e1bc27bae41acee92a6e5b" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="koseiki">
-		<description>KO Seiki Beast Sanjuushi - Rastak no Joou</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="ko_4.fdi" size="1265664" crc="ff6fdea6" sha1="e0ebd6647bbf7709ae373d70d90500e95351cd6e" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="koseiki">
-		<description>KO Seiki Beast Sanjuushi - Rastak no Joou</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop5" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="ko_5.fdi" size="1265664" crc="65e4e919" sha1="85d351949e9547367ed16d87d95bbd04b428c810" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="koseiki">
-		<description>KO Seiki Beast Sanjuushi - Rastak no Joou</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop6" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="ko_6.fdi" size="1265664" crc="f2a68ead" sha1="a068ed23770d4b7e7b3fccef2f57001f49b0dc0c" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="koseiki">
-		<description>KO Seiki Beast Sanjuushi - Rastak no Joou</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop7" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="ko_7.fdi" size="1265664" crc="7fc4c969" sha1="ba8c033a5daa68507e9119448872dd4ed259a78f" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="koseiki">
-		<description>KO Seiki Beast Sanjuushi - Rastak no Joou</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop8" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="ko_8.fdi" size="1265664" crc="ed06a04b" sha1="fc544c7280ddf311cb743deb7bb7694d91263351" offset="0" />
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="konpeki">
 		<description>Konpeki no Kantai</description>
 		<year>19??</year>
@@ -7535,38 +7406,24 @@ Game is named "image", with lowercase i on title screen
 				<rom name="kon_1.fdi" size="1265664" crc="dac18d7f" sha1="0487e88cd182eec70973c0ab7d5971051065a6f8" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="konpeki">
-		<description>Konpeki no Kantai</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="kon_2.fdi" size="1265664" crc="f4151c61" sha1="6de91335359ee7b79a2a0c7496a87d141d36025c" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="konpeki">
-		<description>Konpeki no Kantai</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="kon_3.fdi" size="1265664" crc="d955309c" sha1="1892cee8db4856a02834966d4357c5bd9323a2a0" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="konpeki">
-		<description>Konpeki no Kantai</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="kon_4.fdi" size="1265664" crc="d782b941" sha1="e608c91ffd989aafc5c0d4a744d584de9369303a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
-	<software name="koroshi">
+
+	<software name="koroshi2">
 		<description>Koroshi no Dress 2</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -7575,17 +7432,13 @@ Game is named "image", with lowercase i on title screen
 				<rom name="disk_a.fdi" size="1265664" crc="a6a14197" sha1="08a955d6d7e1459b0064fc023673b6c1f398ecdc" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="koroshi">
-		<description>Koroshi no Dress 2</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_b.fdi" size="1265664" crc="920c1227" sha1="263ae4cdd0fa85c2989a982903868fda9b8dd842" offset="0" />
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="kotestu">
 		<description>Kotestu no Daibouken</description>
 		<year>19??</year>
@@ -7595,88 +7448,49 @@ Game is named "image", with lowercase i on title screen
 				<rom name="a.fdi" size="1265664" crc="012dde37" sha1="6c473b3b546a887a2e09dc67b8d852680ecfa9e7" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="kotestu">
-		<description>Kotestu no Daibouken</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="b.fdi" size="1265664" crc="131edc62" sha1="b1feca9d196e4de9100b25ac49efb5aa1d3af6c8" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="kotestu">
-		<description>Kotestu no Daibouken</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="c.fdi" size="1265664" crc="3d04f25f" sha1="9947f8fd51cfc8a79a2ddb28cd21b5843252c4fa" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="kotestu">
-		<description>Kotestu no Daibouken</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="d.fdi" size="1265664" crc="123f247a" sha1="98e68ba16ecd91287086dfdb5b842ee2e6668de0" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="kotestu">
-		<description>Kotestu no Daibouken</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop5" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="e.fdi" size="1265664" crc="af8e1c16" sha1="6745d449b6a30f80fd41afc3747d6c4d7a258265" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="kotestu">
-		<description>Kotestu no Daibouken</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop6" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="f.fdi" size="1265664" crc="6d97aa71" sha1="02fa65cbface4e187b5f2408dda66d0ff3b7a1ab" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="kotestu">
-		<description>Kotestu no Daibouken</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop7" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="g.fdi" size="1265664" crc="fb3595a1" sha1="a072c09c73a2caaafb52b952adb81901dfa83751" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="kotestu">
-		<description>Kotestu no Daibouken</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop8" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="h.fdi" size="1265664" crc="81d9987c" sha1="ee64efa6d7e098063c1954145f56ea9b2e0499c7" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="kotestu">
-		<description>Kotestu no Daibouken</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop9" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="i.fdi" size="1265664" crc="2a271480" sha1="fcb62c422d3dadabf8c41aa8edf2045dab072f17" offset="0" />
 			</dataarea>
 		</part>
 	</software>
-	<software name="kounais">
+
+	<software name="kounais1">
 		<description>Kounai Shasei 1 - Yo ni mo H na Monogatari</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -7685,18 +7499,14 @@ Game is named "image", with lowercase i on title screen
 				<rom name="ko1_a.fdi" size="1265664" crc="a8549ce5" sha1="888ef8479f9ac932cdca0c565ff7e884b7b39a15" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="kounais">
-		<description>Kounai Shasei 1 - Yo ni mo H na Monogatari</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="ko1_b.fdi" size="1265664" crc="a5a5f6d4" sha1="d5718f29f5af1a4b63e16f207f3e8d302c210963" offset="0" />
 			</dataarea>
 		</part>
 	</software>
-	<software name="kounais">
+
+	<software name="kounais2">
 		<description>Kounai Shasei 2 - Bishoujo Kamen no Nazo - Bishoujo Kamen Kenzan!</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -7705,27 +7515,24 @@ Game is named "image", with lowercase i on title screen
 				<rom name="kounai2_1.fdi" size="1265664" crc="9db251e5" sha1="44e58cbdfcf063568f79f668de1d5d0292b5e44d" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="kounais">
-		<description>Kounai Shasei 2 - Bishoujo Kamen no Nazo - Bishoujo Kamen Kenzan!</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="kounai2_2.fdi" size="1265664" crc="4ca0756d" sha1="9a01a25c49c6ea5013cee9470032e088b079ea80" offset="0" />
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="kurunpa">
 		<description>Kurunpa</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1995</year>
+		<publisher>Circle Interface</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="kurunpa (1995)(circle interface).fdi" size="1265664" crc="2233a634" sha1="e4ee58a18ca301fc2d87b1491f88c35454e0a8ce" offset="0" />
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="kurutta">
 		<description>Kurutta Kajitsu</description>
 		<year>19??</year>
@@ -7735,27 +7542,18 @@ Game is named "image", with lowercase i on title screen
 				<rom name="kajitu_1.fdi" size="1265664" crc="610ac717" sha1="6582ade4f748ee1067b49df96b67f7d339397f3e" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="kurutta">
-		<description>Kurutta Kajitsu</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="kajitu_2.fdi" size="1265664" crc="c590f464" sha1="3cd79dabdbed7d6e9cad0b7e253ba28a2c699162" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="kurutta">
-		<description>Kurutta Kajitsu</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="kajitu_3.fdi" size="1265664" crc="3b11a676" sha1="acf34973cb5066885d05f845726e69604cadf444" offset="0" />
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="kuunyan">
 		<description>Kuunyan no Namida</description>
 		<year>19??</year>
@@ -7765,128 +7563,75 @@ Game is named "image", with lowercase i on title screen
 				<rom name="disk_a.fdi" size="1265664" crc="b779120f" sha1="5d103b2e5ce8c9871fcdd4bbd354ba4a39cccdb6" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="kuunyan">
-		<description>Kuunyan no Namida</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_b.fdi" size="1265664" crc="374a1801" sha1="2568ce1e3dff168cc0ef36a57359d9fb00b8dc2f" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="kuunyan">
-		<description>Kuunyan no Namida</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_c.fdi" size="1265664" crc="9649775b" sha1="0d123634ad183fa10f2cf9425420467df9e42a6a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
-	<software name="kyrandia">
+
+	<software name="kyrandi2">
 		<description>Kyrandia 2 - The Hand of Fate</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="disks\disk 01.fdi" size="1265664" crc="45dbe8e3" sha1="9f2aec573ea9cf88a1e5babdfdda7a54b960c7ff" offset="0" />
+				<rom name="disk 01.fdi" size="1265664" crc="45dbe8e3" sha1="9f2aec573ea9cf88a1e5babdfdda7a54b960c7ff" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="kyrandia">
-		<description>Kyrandia 2 - The Hand of Fate</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="disks\disk 02.fdi" size="1265664" crc="3dcaf508" sha1="56d0293126fb4e389aaf93583e1e3cbe1c19ddd6" offset="0" />
+				<rom name="disk 02.fdi" size="1265664" crc="3dcaf508" sha1="56d0293126fb4e389aaf93583e1e3cbe1c19ddd6" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="kyrandia">
-		<description>Kyrandia 2 - The Hand of Fate</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="disks\disk 03.fdi" size="1265664" crc="4e1eb2d7" sha1="f4dda5642409bf6a8ddcc5890e9f2b1f5682d240" offset="0" />
+				<rom name="disk 03.fdi" size="1265664" crc="4e1eb2d7" sha1="f4dda5642409bf6a8ddcc5890e9f2b1f5682d240" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="kyrandia">
-		<description>Kyrandia 2 - The Hand of Fate</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="disks\disk 04.fdi" size="1265664" crc="fcfadbec" sha1="f71a9c765eb1e8c978ae7f608a64ab3e2c9f6b07" offset="0" />
+				<rom name="disk 04.fdi" size="1265664" crc="fcfadbec" sha1="f71a9c765eb1e8c978ae7f608a64ab3e2c9f6b07" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="kyrandia">
-		<description>Kyrandia 2 - The Hand of Fate</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop5" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="disks\disk 05.fdi" size="1265664" crc="5e7026db" sha1="314d1021384af2bd514f0a793718556bfcaf0ed2" offset="0" />
+				<rom name="disk 05.fdi" size="1265664" crc="5e7026db" sha1="314d1021384af2bd514f0a793718556bfcaf0ed2" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="kyrandia">
-		<description>Kyrandia 2 - The Hand of Fate</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop6" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="disks\disk 06.fdi" size="1265664" crc="51da9afe" sha1="265c4da1014fb39434ee56d2dac6dbc177aab843" offset="0" />
+				<rom name="disk 06.fdi" size="1265664" crc="51da9afe" sha1="265c4da1014fb39434ee56d2dac6dbc177aab843" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="kyrandia">
-		<description>Kyrandia 2 - The Hand of Fate</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop7" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="disks\disk 07.fdi" size="1265664" crc="8f9738b2" sha1="c060692d284a0f3753eecfa6d04b2c98dac8c964" offset="0" />
+				<rom name="disk 07.fdi" size="1265664" crc="8f9738b2" sha1="c060692d284a0f3753eecfa6d04b2c98dac8c964" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="kyrandia">
-		<description>Kyrandia 2 - The Hand of Fate</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop8" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="disks\disk 08.fdi" size="1265664" crc="f08a9c25" sha1="dff7d8e142615308502c73f1d3540d952a947126" offset="0" />
+				<rom name="disk 08.fdi" size="1265664" crc="f08a9c25" sha1="dff7d8e142615308502c73f1d3540d952a947126" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="kyrandia">
-		<description>Kyrandia 2 - The Hand of Fate</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop9" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="disks\disk 09.fdi" size="1265664" crc="75525c19" sha1="ed445ddaa5fa6facc3da3654b482ee730e23823e" offset="0" />
+				<rom name="disk 09.fdi" size="1265664" crc="75525c19" sha1="ed445ddaa5fa6facc3da3654b482ee730e23823e" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="kyrandia">
-		<description>Kyrandia 2 - The Hand of Fate</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop10" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="disks\disk 10.fdi" size="1265664" crc="eb55ead7" sha1="16b7ee48778e578d21a405dd2ba524159a732a22" offset="0" />
+				<rom name="disk 10.fdi" size="1265664" crc="eb55ead7" sha1="16b7ee48778e578d21a405dd2ba524159a732a22" offset="0" />
 			</dataarea>
 		</part>
 	</software>
-	<software name="l-est">
+<!--
+	<software name="lest">
 		<description>L-est</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -7895,37 +7640,23 @@ Game is named "image", with lowercase i on title screen
 				<rom name="elest_1.fdi" size="1265664" crc="4d591ddd" sha1="d24c40680e1c7f2da3c1a61e19ac2b06bbcb689c" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="l-est">
-		<description>L-est</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="elest_2.fdi" size="1265664" crc="6d87959d" sha1="7f829041f569635a39391b3bc586660837687ae2" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="l-est">
-		<description>L-est</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="elest_3.fdi" size="1265664" crc="6c68693b" sha1="add3e1eaca14a9f186e4eb48d2c16c008faf3835" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="l-est">
-		<description>L-est</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="elest_4.fdi" size="1265664" crc="1efe7c80" sha1="3599384ace055adfe2d6bc5adf6f1be3628f637a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="largena">
 		<description>Large Navigation</description>
 		<year>19??</year>
@@ -7936,6 +7667,7 @@ Game is named "image", with lowercase i on title screen
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="lasersq">
 		<description>Laser Squad - Uchuu Kaiheitai</description>
 		<year>19??</year>
