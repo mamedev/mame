@@ -1104,13 +1104,13 @@ UINT32 poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_polyg
 template<typename _BaseType, class _ObjectData, int _MaxParams, int _MaxPolys>
 int poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::zclip_if_less(int numverts, const vertex_t *v, vertex_t *outv, int paramcount, _BaseType clipval)
 {
-	bool prevclipped = (v[numverts - 1]->p[0] < clipval);
+	bool prevclipped = (v[numverts - 1].p[0] < clipval);
 	vertex_t *nextout = outv;
 
 	// iterate over vertices
 	for (int vertnum = 0; vertnum < numverts; vertnum++)
 	{
-		bool thisclipped = (v[vertnum]->p[0] < clipval);
+		bool thisclipped = (v[vertnum].p[0] < clipval);
 
 		// if we switched from clipped to non-clipped, interpolate a vertex
 		if (thisclipped != prevclipped)
