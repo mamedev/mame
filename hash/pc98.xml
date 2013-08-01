@@ -882,7 +882,7 @@ TODO:
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1478656">
-				<rom name="main.fdi" size="1265664" crc="5e656df1" sha1="4182f3854eb510df600df606dc6cd949d84adc8c" offset="0" />
+				<rom name="main.fdi" size="1478656" crc="5e656df1" sha1="4182f3854eb510df600df606dc6cd949d84adc8c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3389,8 +3389,8 @@ TODO:
 		<year>1993</year>
 		<publisher>Bit^2</publisher>
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1265664">
-				<rom name="chitty chitty train (1993)(bit^2).fdi" size="1265664" crc="af527d06" sha1="53b4e459c9eab0c4573021fa6a724125e5e64a8e" offset="0" />
+			<dataarea name="flop" size="1478656">
+				<rom name="chitty chitty train (1993)(bit^2).fdi" size="1478656" crc="af527d06" sha1="53b4e459c9eab0c4573021fa6a724125e5e64a8e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -5131,427 +5131,298 @@ Presumably copy protection floppy, to be used with CD-Rom
 		</part>
 	</software>
 
+	<software name="esp">
+		<description>E.S.P</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="e.s.p.fdi" size="1265664" crc="dde58bb8" sha1="4bc74e9c7f4cdea35004b9cb94e70966ada2325f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="electric">
+		<description>Electric Device Marian</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="k-marian_a.fdi" size="1265664" crc="64345d9b" sha1="85f5ff0f61a17185ee67a82e6a66f893721cdc0f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="k-marian_b.fdi" size="1265664" crc="10155e18" sha1="ffa2481bab832fbe3c2b68581460ad533cc1c52d" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="k-marian_c.fdi" size="1265664" crc="f4eea893" sha1="a7c950584d596ca947f7d2036d462dc26702435d" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="k-marian_d.fdi" size="1265664" crc="98b244f1" sha1="0c4c7a0e8898631a89457d10695ea56fc8cd8ea1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="elmknig">
+		<description>Elm Knight - A Living Body Armor</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="elmknight_1.fdi" size="1265664" crc="7f7c9b48" sha1="054dcf47e9462d78cf63343ec49832eddfb18e90" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="elmknight_10.fdi" size="1265664" crc="34048786" sha1="67b8ebf164b1451f0a050a62cf380558c7425e56" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="elmknight_2.fdi" size="1265664" crc="ac58e5ea" sha1="506553837d4a54cdad18fda91a39cff679feb145" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="elmknight_3.fdi" size="1265664" crc="a59fc05e" sha1="e81053a20e15882fb82d9cf5efd4a33312be7652" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="elmknight_4.fdi" size="1265664" crc="3080a88b" sha1="d36555251ab995ee6c454bafa6fde56bfbf3e279" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="elmknight_5.fdi" size="1265664" crc="0279335a" sha1="74611159dfd66d02bd58feee40706a85b8f91230" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="elmknight_6.fdi" size="1265664" crc="97a16f99" sha1="8941482fd6f77cf308242dffa49afe33998e8ac4" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="elmknight_7.fdi" size="1265664" crc="f43c43a0" sha1="e094702b91a14465eff10d1275e831559cf91288" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="elmknight_8.fdi" size="1265664" crc="05f26922" sha1="d78bea8a6516717ed5f400ccada54433d8f08b47" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="elmknight_9.fdi" size="1265664" crc="a82d642c" sha1="c57b0f86391d7ddc124d85d15165cb10f8221557" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="emerald">
+		<description>Emerald Dragon</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="emerald dragon disk1 system disk.fdi" size="1265664" crc="c22990c6" sha1="90c6fad84c4afd7a723ac9940ac6e2d7b98cd562" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="emerald dragon disk2 opening disk.fdi" size="1265664" crc="d5f8ba83" sha1="2d8cee17aa2cb1eae24e0837708bd3d12984970f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="emerald dragon disk3 data disk.fdi" size="1265664" crc="f850549e" sha1="a2aefac04d1649507da699710f000d1d19259c2e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="entax">
+		<description>Entax</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="entax (aba).fdi" size="1265664" crc="b49575ec" sha1="cfe6b5adbcc301010094905a4726fa7988f6a79c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="emsdos50">
+		<description>Epson MS-DOS 5.0</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="edos5_1.fdi" size="1265664" crc="e8e860e5" sha1="7a2cf13d1e3e10f19f9ac4023bf1661be14e88f0" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="edos5_2.fdi" size="1265664" crc="b6d20e53" sha1="9603e00d702c07862c8955f8cce796ee57a35ae1" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="edos5_3.fdi" size="1265664" crc="3eb8bb63" sha1="882ac73a66e45ab1979787fea2af15c2052da962" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="edos5_4.fdi" size="1265664" crc="7a9da5ff" sha1="2d4439e2bfc56eb8301d82f255d907eccffb9a48" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="escalati">
+		<description>Escalation 95 - Oneesama tte Yonde Ii Desu ka</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="1.fdi" size="1265664" crc="65e41055" sha1="20c10d8680d6a4972754dfaea7f6dbacee74416d" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="2.fdi" size="1265664" crc="2c55c4d9" sha1="49c037dfd0f7aedfb4ba1a947756d421bdbb972f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="3.fdi" size="1265664" crc="5eee942e" sha1="bd142c655d4cd0ee43cc60a1a474f0b4b6d5fd2d" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="4.fdi" size="1265664" crc="c2275f06" sha1="a8fdacbdab70ab420aade68e777879b3231bdf5d" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="5.fdi" size="1265664" crc="04573716" sha1="2010574bfe29ca61507775dbee9c6d1022e4084e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="6.fdi" size="1265664" crc="58b80886" sha1="8aa75f81fc15fad93910d4f7829d92cd38eaa5cc" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="7.fdi" size="1265664" crc="b4c741d2" sha1="f5a4d93ea3479f72228c26ccc0c0ec0a8ab3cf30" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="estoria">
+		<description>Estoria</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="est_a.fdi" size="1265664" crc="e2755c65" sha1="3a1e1b9a2d87f994d001eb6b9ad8e9e10c0d0758" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="est_b.fdi" size="1265664" crc="28e10069" sha1="48f665dcc83acca637be0e5014188b15836583d2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="etemible">
+		<description>Etemible - Tenjou Mukyuu</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="data a.fdi" size="1265664" crc="e60bd314" sha1="7a1797b6f1939619ead1e716416fe5cfbe1a0a53" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="data b.fdi" size="1265664" crc="f60489d9" sha1="affbc7a9d20bdb84a04e29003867a00b979e130e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="data c.fdi" size="1265664" crc="18c2f072" sha1="8680762b978bdcf3860df7ae0e276588e631d2df" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="system disk.fdi" size="1265664" crc="27ba04f7" sha1="0b81a64f2c9b327c7e8471aaab4135736038d8b5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 <!--
-<software name="e.s.p">
-	<description>E.S.P</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="e.s.p.fdi" size="1265664" crc="dde58bb8" sha1="4bc74e9c7f4cdea35004b9cb94e70966ada2325f" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="electric">
-	<description>Electric Device Marian</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="k-marian_a.fdi" size="1265664" crc="64345d9b" sha1="85f5ff0f61a17185ee67a82e6a66f893721cdc0f" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="electric">
-	<description>Electric Device Marian</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="k-marian_b.fdi" size="1265664" crc="10155e18" sha1="ffa2481bab832fbe3c2b68581460ad533cc1c52d" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="electric">
-	<description>Electric Device Marian</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="k-marian_c.fdi" size="1265664" crc="f4eea893" sha1="a7c950584d596ca947f7d2036d462dc26702435d" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="electric">
-	<description>Electric Device Marian</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="k-marian_d.fdi" size="1265664" crc="98b244f1" sha1="0c4c7a0e8898631a89457d10695ea56fc8cd8ea1" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="elmknig">
-	<description>Elm Knight - A Living Body Armor</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="elmknight_1.fdi" size="1265664" crc="7f7c9b48" sha1="054dcf47e9462d78cf63343ec49832eddfb18e90" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="elmknig">
-	<description>Elm Knight - A Living Body Armor</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="elmknight_10.fdi" size="1265664" crc="34048786" sha1="67b8ebf164b1451f0a050a62cf380558c7425e56" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="elmknig">
-	<description>Elm Knight - A Living Body Armor</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="elmknight_2.fdi" size="1265664" crc="ac58e5ea" sha1="506553837d4a54cdad18fda91a39cff679feb145" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="elmknig">
-	<description>Elm Knight - A Living Body Armor</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="elmknight_3.fdi" size="1265664" crc="a59fc05e" sha1="e81053a20e15882fb82d9cf5efd4a33312be7652" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="elmknig">
-	<description>Elm Knight - A Living Body Armor</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="elmknight_4.fdi" size="1265664" crc="3080a88b" sha1="d36555251ab995ee6c454bafa6fde56bfbf3e279" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="elmknig">
-	<description>Elm Knight - A Living Body Armor</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="elmknight_5.fdi" size="1265664" crc="0279335a" sha1="74611159dfd66d02bd58feee40706a85b8f91230" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="elmknig">
-	<description>Elm Knight - A Living Body Armor</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="elmknight_6.fdi" size="1265664" crc="97a16f99" sha1="8941482fd6f77cf308242dffa49afe33998e8ac4" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="elmknig">
-	<description>Elm Knight - A Living Body Armor</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="elmknight_7.fdi" size="1265664" crc="f43c43a0" sha1="e094702b91a14465eff10d1275e831559cf91288" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="elmknig">
-	<description>Elm Knight - A Living Body Armor</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="elmknight_8.fdi" size="1265664" crc="05f26922" sha1="d78bea8a6516717ed5f400ccada54433d8f08b47" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="elmknig">
-	<description>Elm Knight - A Living Body Armor</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="elmknight_9.fdi" size="1265664" crc="a82d642c" sha1="c57b0f86391d7ddc124d85d15165cb10f8221557" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="emerald">
-	<description>Emerald Dragon</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="emerald dragon disk1 system disk.fdi" size="1265664" crc="c22990c6" sha1="90c6fad84c4afd7a723ac9940ac6e2d7b98cd562" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="emerald">
-	<description>Emerald Dragon</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="emerald dragon disk2 opening disk.fdi" size="1265664" crc="d5f8ba83" sha1="2d8cee17aa2cb1eae24e0837708bd3d12984970f" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="emerald">
-	<description>Emerald Dragon</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="emerald dragon disk3 data disk.fdi" size="1265664" crc="f850549e" sha1="a2aefac04d1649507da699710f000d1d19259c2e" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="entax">
-	<description>Entax</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="entax (aba).fdi" size="1265664" crc="b49575ec" sha1="cfe6b5adbcc301010094905a4726fa7988f6a79c" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="epsonms">
-	<description>Epson MS-DOS 5.0</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="edos5_1.fdi" size="1265664" crc="e8e860e5" sha1="7a2cf13d1e3e10f19f9ac4023bf1661be14e88f0" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="epsonms">
-	<description>Epson MS-DOS 5.0</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="edos5_2.fdi" size="1265664" crc="b6d20e53" sha1="9603e00d702c07862c8955f8cce796ee57a35ae1" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="epsonms">
-	<description>Epson MS-DOS 5.0</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="edos5_3.fdi" size="1265664" crc="3eb8bb63" sha1="882ac73a66e45ab1979787fea2af15c2052da962" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="epsonms">
-	<description>Epson MS-DOS 5.0</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="edos5_4.fdi" size="1265664" crc="7a9da5ff" sha1="2d4439e2bfc56eb8301d82f255d907eccffb9a48" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="escalati">
-	<description>Escalation 95 - Oneesama tte Yonde Ii Desu ka</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="1.fdi" size="1265664" crc="65e41055" sha1="20c10d8680d6a4972754dfaea7f6dbacee74416d" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="escalati">
-	<description>Escalation 95 - Oneesama tte Yonde Ii Desu ka</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="2.fdi" size="1265664" crc="2c55c4d9" sha1="49c037dfd0f7aedfb4ba1a947756d421bdbb972f" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="escalati">
-	<description>Escalation 95 - Oneesama tte Yonde Ii Desu ka</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="3.fdi" size="1265664" crc="5eee942e" sha1="bd142c655d4cd0ee43cc60a1a474f0b4b6d5fd2d" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="escalati">
-	<description>Escalation 95 - Oneesama tte Yonde Ii Desu ka</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="4.fdi" size="1265664" crc="c2275f06" sha1="a8fdacbdab70ab420aade68e777879b3231bdf5d" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="escalati">
-	<description>Escalation 95 - Oneesama tte Yonde Ii Desu ka</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="5.fdi" size="1265664" crc="04573716" sha1="2010574bfe29ca61507775dbee9c6d1022e4084e" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="escalati">
-	<description>Escalation 95 - Oneesama tte Yonde Ii Desu ka</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="6.fdi" size="1265664" crc="58b80886" sha1="8aa75f81fc15fad93910d4f7829d92cd38eaa5cc" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="escalati">
-	<description>Escalation 95 - Oneesama tte Yonde Ii Desu ka</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="7.fdi" size="1265664" crc="b4c741d2" sha1="f5a4d93ea3479f72228c26ccc0c0ec0a8ab3cf30" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="estoria">
-	<description>Estoria</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="est_a.fdi" size="1265664" crc="e2755c65" sha1="3a1e1b9a2d87f994d001eb6b9ad8e9e10c0d0758" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="estoria">
-	<description>Estoria</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="est_b.fdi" size="1265664" crc="28e10069" sha1="48f665dcc83acca637be0e5014188b15836583d2" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="etemible">
-	<description>Etemible - Tenjou Mukyuu</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="data a.fdi" size="1265664" crc="e60bd314" sha1="7a1797b6f1939619ead1e716416fe5cfbe1a0a53" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="etemible">
-	<description>Etemible - Tenjou Mukyuu</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="data b.fdi" size="1265664" crc="f60489d9" sha1="affbc7a9d20bdb84a04e29003867a00b979e130e" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="etemible">
-	<description>Etemible - Tenjou Mukyuu</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="data c.fdi" size="1265664" crc="18c2f072" sha1="8680762b978bdcf3860df7ae0e276588e631d2df" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="etemible">
-	<description>Etemible - Tenjou Mukyuu</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="system disk.fdi" size="1265664" crc="27ba04f7" sha1="0b81a64f2c9b327c7e8471aaab4135736038d8b5" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="eve-bu">
-	<description>Eve - Burst Error</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="dos62.fdi" size="1265664" crc="678b88a7" sha1="480dee4a4df0c588416b0895057caeba862eea7f" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="f-14fle">
-	<description>F-14 Fleet Defender</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="f14 杵動デッベハ.fdi" size="1265664" crc="2fde239e" sha1="4bcc668fc283cb5cfc666e57cf3123eb70f7fa03" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="f-15str">
-	<description>F-15 Strike Eagle 2</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="f15se2sc.fdi" size="1265664" crc="847a1ba0" sha1="2ee54ac1ebc38d0ddfc918d42ae602026c02c242" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="f-15str">
-	<description>F-15 Strike Eagle 2</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="f15se2sy.fdi" size="1265664" crc="c00ea134" sha1="f24afd67768a874a008c2cd2bcef340f35cff2db" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="f29reta">
-	<description>F29 Retaliator</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="f29reta1.fdi" size="1265664" crc="4ec286a8" sha1="dfc3693ec9fa1c450d8dc367b45bfa95c763b076" offset="0" />
-		</dataarea>
-	</part>
-</software>
-<software name="f29reta">
-	<description>F29 Retaliator</description>
-	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<part name="flop1" interface="floppy_5_25">
-		<dataarea name="flop" size="1265664">
-			<rom name="f29reta2.fdi" size="1265664" crc="4a2dc006" sha1="c17fc54df3f4985191c4b08ba79cec89eaeddb8d" offset="0" />
-		</dataarea>
-	</part>
-</software>
+TODO: missing install disks
+	<software name="eveber">
+		<description>Eve - Burst Error</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="dos62.fdi" size="1265664" crc="678b88a7" sha1="480dee4a4df0c588416b0895057caeba862eea7f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+-->
+
+	<software name="f14fd">
+		<description>F-14 Fleet Defender</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="main.fdi" size="1265664" crc="2fde239e" sha1="4bcc668fc283cb5cfc666e57cf3123eb70f7fa03" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="f15se2">
+		<description>F-15 Strike Eagle 2</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="f15se2sc.fdi" size="1265664" crc="847a1ba0" sha1="2ee54ac1ebc38d0ddfc918d42ae602026c02c242" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="f15se2sy.fdi" size="1265664" crc="c00ea134" sha1="f24afd67768a874a008c2cd2bcef340f35cff2db" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="f29reta">
+		<description>F29 Retaliator</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="f29reta1.fdi" size="1265664" crc="4ec286a8" sha1="dfc3693ec9fa1c450d8dc367b45bfa95c763b076" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="f29reta2.fdi" size="1265664" crc="4a2dc006" sha1="c17fc54df3f4985191c4b08ba79cec89eaeddb8d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!--
 <software name="fairyan">
 	<description>Fairy Angel</description>
 	<year>19??</year>
