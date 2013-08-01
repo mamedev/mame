@@ -5864,7 +5864,7 @@ TODO: missing install disks
 	</software>
 
 	<software name="fugasel1">
-		<description>Fuga Selection 1 - Calcutta & Maze Quest</description>
+		<description>Fuga Selection 1 - Calcutta &amp; Maze Quest</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -5925,7 +5925,6 @@ TODO: missing install disks
 		</part>
 	</software>
 
-<!--
 	<software name="gakuens">
 		<description>Gakuen Sodom - Kyoushitsu no Mesu Dorei-tachi SP Disk - Ikenai Omake Disk</description>
 		<year>19??</year>
@@ -5936,6 +5935,7 @@ TODO: missing install disks
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="gakuent">
 		<description>Gakuen Triangle</description>
 		<year>19??</year>
@@ -5945,57 +5945,33 @@ TODO: missing install disks
 				<rom name="disk_a.fdi" size="1265664" crc="40f877c9" sha1="dc2ebdddde20c92e7762d2cc34944d22b0d6a0e6" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="gakuent">
-		<description>Gakuen Triangle</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_b.fdi" size="1265664" crc="817dcb54" sha1="1eb42ba19412cc489168169b15ec54b48c24207c" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="gakuent">
-		<description>Gakuen Triangle</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_c.fdi" size="1265664" crc="bda737d7" sha1="542124ac4a42102aca90103c34c4126eb8ecb1c1" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="gakuent">
-		<description>Gakuen Triangle</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_d.fdi" size="1265664" crc="9579697b" sha1="22149659482dcebddb02026c161b78292799a236" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="gakuent">
-		<description>Gakuen Triangle</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop5" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_e.fdi" size="1265664" crc="010f843e" sha1="4aae4c68ddc59b29ec2ef2a3f601ccc8044fc2b1" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="gakuent">
-		<description>Gakuen Triangle</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop6" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_f.fdi" size="1265664" crc="ea689ead" sha1="9afa23d702fb9565f485456dbaa4769421722179" offset="0" />
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="garyoude">
 		<description>Garyouden - Sangoku Seiha no Kei</description>
 		<year>19??</year>
@@ -6005,47 +5981,28 @@ TODO: missing install disks
 				<rom name="garyou_a.fdi" size="1265664" crc="3a7e3736" sha1="9c812532577ee96bc5a4378ec9c451c6bca08284" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="garyoude">
-		<description>Garyouden - Sangoku Seiha no Kei</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="garyou_b.fdi" size="1265664" crc="2c0abd3a" sha1="975188c437b6deef9f1f6a5aedc145d00367592d" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="garyoude">
-		<description>Garyouden - Sangoku Seiha no Kei</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="garyou_c.fdi" size="1265664" crc="c42fb9c9" sha1="ed078355c4a00fed3f66610bff2cb6fa933e7c16" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="garyoude">
-		<description>Garyouden - Sangoku Seiha no Kei</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="garyou_d.fdi" size="1265664" crc="5d6ab6d5" sha1="3f17031e8b4ef9463e8ff23ac66c136bdf5b8f46" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="garyoude">
-		<description>Garyouden - Sangoku Seiha no Kei</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop5" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="garyou_e.fdi" size="1265664" crc="59d10171" sha1="3ad27cbebf355a040d8902ca8f216137fda8ab48" offset="0" />
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="gdleen">
 		<description>GDleen</description>
 		<year>19??</year>
@@ -6055,38 +6012,24 @@ TODO: missing install disks
 				<rom name="disk 1.fdi" size="1265664" crc="8b96d838" sha1="66a38b6c80c83f89bfadbabf28231001c3f2ac1f" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="gdleen">
-		<description>GDleen</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk 2.fdi" size="1265664" crc="2c3493f5" sha1="94a661b42e9ef95a9be0422a6e2b0ae724a5f863" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="gdleen">
-		<description>GDleen</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="ending.fdi" size="1265664" crc="ae2d746a" sha1="bd74c82226ea99e683098006bb51b7f0b88e184f" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="gdleen">
-		<description>GDleen</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="opening.fdi" size="1265664" crc="eeb5bef2" sha1="bca455e6e473339862f7a18b64aa1e990ebe4d5b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
-	<software name="ge-ten2">
+
+	<software name="geten2">
 		<description>Ge-Ten 2 - Taikai Nobunagaden Geten</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -6095,30 +6038,21 @@ TODO: missing install disks
 				<rom name="geten2a.fdi" size="1265664" crc="d301fbfc" sha1="7be408a2caf01672c7e80174cda2796dad61b2e4" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="ge-ten2">
-		<description>Ge-Ten 2 - Taikai Nobunagaden Geten</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="geten2b.fdi" size="1265664" crc="925b1c98" sha1="e398519d5265d1de3974cd4d1c18d70a56c6bf27" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="ge-ten2">
-		<description>Ge-Ten 2 - Taikai Nobunagaden Geten</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="geten2c.fdi" size="1265664" crc="91f24166" sha1="297bd5da5d59885d7fb01d7841b2796355b9af85" offset="0" />
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="geminis">
 		<description>Gemini Snake</description>
-		<year>19??</year>
+		<year>1990</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
@@ -6126,27 +6060,24 @@ TODO: missing install disks
 			</dataarea>
 		</part>
 	</software>
-	<software name="gendaid">
+
+	<software name="daisenex">
 		<description>Gendai Daisenryaku EX</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>System Soft</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="gendai daisenryaku ex (19xx)(system soft)(disk 1 of 2).fdi" size="1265664" crc="83465c26" sha1="95a149f3c4f9cbc787e76bd1407e93cd20bdb7b6" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="gendaid">
-		<description>Gendai Daisenryaku EX</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="gendai daisenryaku ex (19xx)(system soft)(disk 2 of 2).fdi" size="1265664" crc="654a8aa0" sha1="e7bc58f81d98585bec8206f923eb8615b6977bca" offset="0" />
 			</dataarea>
 		</part>
 	</software>
-	<software name="genji-">
+
+	<software name="genji">
 		<description>Genji - Time Suspense Adventure</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -6156,6 +6087,7 @@ TODO: missing install disks
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="gigamot">
 		<description>Giga Motion</description>
 		<year>19??</year>
@@ -6165,77 +6097,43 @@ TODO: missing install disks
 				<rom name="giga mortion_1.fdi" size="1265664" crc="ed3348b0" sha1="a6ea30b36916bae4fc16fa996cb1cf411304c115" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="gigamot">
-		<description>Giga Motion</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="giga mortion_2.fdi" size="1265664" crc="d0f8368d" sha1="dfdc53d433dee84124111848ebb0bc8e8b98a7f9" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="gigamot">
-		<description>Giga Motion</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="giga mortion_3.fdi" size="1265664" crc="fe159437" sha1="4adbb409e92535be350b6ae4404a4e916189917d" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="gigamot">
-		<description>Giga Motion</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="giga mortion_4.fdi" size="1265664" crc="5f728ae1" sha1="89940465d7f4465b999b624ecdda57921ee7ed55" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="gigamot">
-		<description>Giga Motion</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop5" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="giga mortion_5.fdi" size="1265664" crc="3b14d30a" sha1="ad034f8b4ab39727555fef96a9e678483d385c1c" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="gigamot">
-		<description>Giga Motion</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop6" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="giga mortion_6.fdi" size="1265664" crc="44a9c446" sha1="c2f60081a70a6304e77e275fce2549b652aeed9b" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="gigamot">
-		<description>Giga Motion</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop7" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="giga mortion_7.fdi" size="1265664" crc="1b755de9" sha1="c9c8af287787831ef73ed3eadfed73ab25fe4fda" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="gigamot">
-		<description>Giga Motion</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop8" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="giga mortion_8.fdi" size="1265664" crc="38de367c" sha1="23fc3573da8a41d9fa833f6baebb62e7d56ea073" offset="0" />
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="girlspa">
 		<description>Girls Paradise - Rakuen no Tenshi-tachi</description>
 		<year>19??</year>
@@ -6245,18 +6143,14 @@ TODO: missing install disks
 				<rom name="girls_a.fdi" size="1265664" crc="997c5211" sha1="5481502ae024209b9c6a35db0863b9b55475a69d" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="girlspa">
-		<description>Girls Paradise - Rakuen no Tenshi-tachi</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="girls_b.fdi" size="1265664" crc="73232a8a" sha1="4f716103d5dea75d4abe8527811e6d7a187c00b4" offset="0" />
 			</dataarea>
 		</part>
 	</software>
-	<software name="gods-k">
+
+	<software name="gods">
 		<description>Gods - Kami to Naru Otoko no Densetsu</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -6265,17 +6159,13 @@ TODO: missing install disks
 				<rom name="gods_a.fdi" size="1265664" crc="445979ee" sha1="8f7c143f3b971ddea00b91d0e69cd2f15ec76477" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="gods-k">
-		<description>Gods - Kami to Naru Otoko no Densetsu</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="gods_b.fdi" size="1265664" crc="dde0c444" sha1="54311cee19ce7c29e37673c451e327cd0dadc5cf" offset="0" />
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="goggle2">
 		<description>Goggle 2</description>
 		<year>19??</year>
@@ -6286,6 +6176,7 @@ TODO: missing install disks
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="goggle3">
 		<description>Goggle 3</description>
 		<year>19??</year>
@@ -6296,7 +6187,7 @@ TODO: missing install disks
 			</dataarea>
 		</part>
 	</software>
-	<software name="gokko-">
+	<software name="gokko01">
 		<description>Gokko - Vol. 01 Doctor</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -6305,58 +6196,34 @@ TODO: missing install disks
 				<rom name="disk_1.fdi" size="1265664" crc="3a13cc92" sha1="199b1f1d0e45420ec4abc3dcf9f15b3ee019d327" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="gokko-">
-		<description>Gokko - Vol. 01 Doctor</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_2.fdi" size="1265664" crc="1d1acea1" sha1="078a1d3e362b002046ff75558431c64fb891129e" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="gokko-">
-		<description>Gokko - Vol. 01 Doctor</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_3.fdi" size="1265664" crc="95e3af04" sha1="8553a04460cc5a9dd93ac3d53775d8a6e47946d7" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="gokko-">
-		<description>Gokko - Vol. 01 Doctor</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_4.fdi" size="1265664" crc="2166bfca" sha1="3b85f9a4ddad870329867515fad4282de6940b1c" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="gokko-">
-		<description>Gokko - Vol. 01 Doctor</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop5" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_5.fdi" size="1265664" crc="cf73c180" sha1="c053792bcac114fa297ceb30173f8ffe2320cb0c" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="gokko-">
-		<description>Gokko - Vol. 01 Doctor</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop6" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="system.fdi" size="1265664" crc="b816ccbd" sha1="8b8c3ef0e906df57660f924ad49e65593945f70a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
-	<software name="gokko-">
+
+	<software name="gokko02">
 		<description>Gokko - Vol. 02 School Gals</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -6365,57 +6232,36 @@ TODO: missing install disks
 				<rom name="gokko2_1.fdi" size="1265664" crc="05661343" sha1="2436fa8d4bb1749b1cadb22de9fd501e73e70ec5" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="gokko-">
-		<description>Gokko - Vol. 02 School Gals</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="gokko2_2.fdi" size="1265664" crc="5cb0def2" sha1="851c732a4f909d00196d4ec89e413f1ca4e9ba78" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="gokko-">
-		<description>Gokko - Vol. 02 School Gals</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="gokko2_3.fdi" size="1265664" crc="382d3523" sha1="2861ac46433ea96d90026fecf7d4b671162b975d" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="gokko-">
-		<description>Gokko - Vol. 02 School Gals</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="gokko2_4.fdi" size="1265664" crc="6df0df7a" sha1="bcca3312e7a2b1c214420a2ed3032bd1fd7b4abf" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="gokko-">
-		<description>Gokko - Vol. 02 School Gals</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop5" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="gokko2_5.fdi" size="1265664" crc="dc753cc0" sha1="3507384beb0981713a2be4d08961403a80eb3473" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="gokko-">
-		<description>Gokko - Vol. 02 School Gals</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop6" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="gokko2_s.fdi" size="1265664" crc="f59f40d1" sha1="dbc01bac7d3e1c368f432f3c7b41474d09445469" offset="0" />
 			</dataarea>
 		</part>
 	</software>
+
+<!--
+Fake disk?
+
 	<software name="golflin">
 		<description>Golf Links 386 Pro</description>
 		<year>19??</year>
@@ -6426,7 +6272,8 @@ TODO: missing install disks
 			</dataarea>
 		</part>
 	</software>
-	<software name="golflin">
+-->
+	<software name="golflpr">
 		<description>Golf Links Champion Course Pinehurst Resort and Country Ciub</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -6436,7 +6283,8 @@ TODO: missing install disks
 			</dataarea>
 		</part>
 	</software>
-	<software name="golflin">
+
+	<software name="golflbb">
 		<description>Golf Links Champion Course The Belfry Brabozon Course</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -6446,7 +6294,8 @@ TODO: missing install disks
 			</dataarea>
 		</part>
 	</software>
-	<software name="gramcat">
+
+	<software name="gramcat2">
 		<description>Gram Cats 2</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -6455,38 +6304,24 @@ TODO: missing install disks
 				<rom name="gcats2_a.fdi" size="1265664" crc="66abce18" sha1="89ce18b230e7849187e6e09455ae38816125200a" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="gramcat">
-		<description>Gram Cats 2</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="gcats2_b.fdi" size="1265664" crc="7bda2597" sha1="615eeea8fc370117c814bb9bed7f01335ad8b3e6" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="gramcat">
-		<description>Gram Cats 2</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="gcats2_c.fdi" size="1265664" crc="bfea906e" sha1="7640c741baad139412c51f2834f0f5ed7dcd6552" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="gramcat">
-		<description>Gram Cats 2</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="gcats2_d.fdi" size="1265664" crc="ca343b99" sha1="7630c933a13e747776bccc8ddca9015043b2a68d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
-	<software name="grandma">
+
+	<software name="gmaster">
 		<description>Grand Master</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -6496,6 +6331,7 @@ TODO: missing install disks
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="gunblaz">
 		<description>Gun Blaze</description>
 		<year>19??</year>
@@ -6505,77 +6341,49 @@ TODO: missing install disks
 				<rom name="1.fdi" size="1265664" crc="c1b38711" sha1="e8bfb723cb32b9e22dbc71cb70561aae589958c6" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="gunblaz">
-		<description>Gun Blaze</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="2.fdi" size="1265664" crc="0bbf6bb6" sha1="b4657b6e2583877fc3dfb2ea632da672b5b7f704" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="gunblaz">
-		<description>Gun Blaze</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="3.fdi" size="1265664" crc="27e6753f" sha1="6e9392ba9d32298552b8566e87aae05f7f82247b" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="gunblaz">
-		<description>Gun Blaze</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="4.fdi" size="1265664" crc="6dcea756" sha1="4ed67dd5fdae482dc52ccf1b2cfdd3e6b6a2aaa0" offset="0" />
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="gunship">
 		<description>Gunship 2000</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="disks\disk a.fdi" size="1265664" crc="9e66bc83" sha1="238fd653d4c9b7ffd41c39e232c9e7ea92f7ded8" offset="0" />
+				<rom name="disk a.fdi" size="1265664" crc="9e66bc83" sha1="238fd653d4c9b7ffd41c39e232c9e7ea92f7ded8" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="gunship">
-		<description>Gunship 2000</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="disks\disk b.fdi" size="1265664" crc="345ba083" sha1="77e979a66d2db30cfbb49105afbf29342994acfd" offset="0" />
+				<rom name="disk b.fdi" size="1265664" crc="345ba083" sha1="77e979a66d2db30cfbb49105afbf29342994acfd" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="gunship">
-		<description>Gunship 2000</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="disks\disk c.fdi" size="1265664" crc="5fc05298" sha1="e3d1dc92aa3d20762f777535c06b8b811eb55afc" offset="0" />
+				<rom name="disk c.fdi" size="1265664" crc="5fc05298" sha1="e3d1dc92aa3d20762f777535c06b8b811eb55afc" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="gunship">
-		<description>Gunship 2000</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="disks\disk d.fdi" size="1265664" crc="6b44d8d3" sha1="38b56ec1ad4b97f6a435baf4b9f9345424b7194c" offset="0" />
+				<rom name="disk d.fdi" size="1265664" crc="6b44d8d3" sha1="38b56ec1ad4b97f6a435baf4b9f9345424b7194c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="guynaroc">
 		<description>Guynarock - Galactic Guardian</description>
 		<year>19??</year>
@@ -6585,58 +6393,34 @@ TODO: missing install disks
 				<rom name="galactic guardian guynarock (silence)(boot disk).fdi" size="1265664" crc="45f56f14" sha1="8c9cd004a1cc136a9f638944cefa3ad9cff758ed" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="guynaroc">
-		<description>Guynarock - Galactic Guardian</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="galactic guardian guynarock (silence)(data disk 1).fdi" size="1265664" crc="b41783ea" sha1="a6287bb81449e894c81056359bc59f3bedc9f080" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="guynaroc">
-		<description>Guynarock - Galactic Guardian</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="galactic guardian guynarock (silence)(data disk 2).fdi" size="1265664" crc="53f0fd33" sha1="ea6293911007b1553f627e6257b6ff4c95e9621e" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="guynaroc">
-		<description>Guynarock - Galactic Guardian</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="galactic guardian guynarock (silence)(data disk 3).fdi" size="1265664" crc="e2e4974c" sha1="17148430ffc624a514bf502dd2427e11ed63def7" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="guynaroc">
-		<description>Guynarock - Galactic Guardian</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop5" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="galactic guardian guynarock (silence)(data disk 4).fdi" size="1265664" crc="8bd343b4" sha1="24572198ad80752150ed271acddc59568d7ab14f" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="guynaroc">
-		<description>Guynarock - Galactic Guardian</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop6" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="galactic guardian guynarock (silence)(user disk).fdi" size="1265664" crc="b854b4ee" sha1="945e521c17f0a2664444fe3dae7e215ce51b8953" offset="0" />
+				<rom name="galactic guardian guynarock (silence)(user disk).fdi" size="1265664" crc="b854b4ee" sha1="945e521c17f0a2664444fe3dae7e215ce51b8953" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
-	<software name="guynaroc">
+
+	<software name="guynaro2">
 		<description>Guynarock 2 - The Galactic Guardian Guyna-Rock</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -6645,27 +6429,18 @@ TODO: missing install disks
 				<rom name="a.fdi" size="1265664" crc="1e0196c2" sha1="2f706dbe451208f7abef38e69d628c6bd44d0e77" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="guynaroc">
-		<description>Guynarock 2 - The Galactic Guardian Guyna-Rock</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="b.fdi" size="1265664" crc="cd940910" sha1="e360780dfa50b5a4953d70ccb07d87aa640fc4d5" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="guynaroc">
-		<description>Guynarock 2 - The Galactic Guardian Guyna-Rock</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="c.fdi" size="1265664" crc="76df88ce" sha1="9de1028283c5e3f8204e6d987455b90516d20cfc" offset="0" />
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="hatris">
 		<description>Hatris</description>
 		<year>19??</year>
@@ -6676,7 +6451,8 @@ TODO: missing install disks
 			</dataarea>
 		</part>
 	</software>
-	<software name="hayate-">
+
+	<software name="hayate">
 		<description>Hayate - The Battle - Hyper Real Battle Action</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -6685,67 +6461,44 @@ TODO: missing install disks
 				<rom name="hayate the battle (19xx)(altacia)(disk 1 of 3).fdi" size="1265664" crc="e9a8d8c2" sha1="559cde44e0e9b12b96c77306736ac22a6952a766" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="hayate-">
-		<description>Hayate - The Battle - Hyper Real Battle Action</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="hayate the battle (19xx)(altacia)(disk 2 of 3).fdi" size="1265664" crc="5fe8ddab" sha1="7d9da5f479c937d257d9437bc907d3ab8fcda794" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="hayate-">
-		<description>Hayate - The Battle - Hyper Real Battle Action</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="hayate the battle (19xx)(altacia)(disk 3 of 3).fdi" size="1265664" crc="c16ee43c" sha1="fbc9f5acf76f57c5103aac676c24dc924ee55d8d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="hedgehog">
 		<description>HedgehoG</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="disks\disk 01.fdi" size="1265664" crc="2d105970" sha1="8d7b8274dfee987117aee846b485ee7e9c4f50fe" offset="0" />
+				<rom name="disk 01.fdi" size="1265664" crc="2d105970" sha1="8d7b8274dfee987117aee846b485ee7e9c4f50fe" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="hedgehog">
-		<description>HedgehoG</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="disks\disk 02.fdi" size="1265664" crc="6f367841" sha1="7117ad0475a05d328f50dab3062ca04e9ae6ef5a" offset="0" />
+				<rom name="disk 02.fdi" size="1265664" crc="6f367841" sha1="7117ad0475a05d328f50dab3062ca04e9ae6ef5a" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="hedgehog">
-		<description>HedgehoG</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="disks\disk 03.fdi" size="1265664" crc="032f09a5" sha1="4888ce2f874db88fccd7456a3774b279610e6f16" offset="0" />
+				<rom name="disk 03.fdi" size="1265664" crc="032f09a5" sha1="4888ce2f874db88fccd7456a3774b279610e6f16" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="hedgehog">
-		<description>HedgehoG</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="disks\disk 04.fdi" size="1265664" crc="b7c39d0d" sha1="b1bdaf1830681ba3f8e2ea54ca375e2bbeb3f07f" offset="0" />
+				<rom name="disk 04.fdi" size="1265664" crc="b7c39d0d" sha1="b1bdaf1830681ba3f8e2ea54ca375e2bbeb3f07f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
+<!--
 	<software name="ieyasus">
 		<description>Ieyasu Senki</description>
 		<year>19??</year>
