@@ -1,5 +1,6 @@
-#include "video/bufsprite.h"
+#include "audio/seibu.h"
 #include "sound/msm5205.h"
+#include "video/bufsprite.h"
 
 class toki_state : public driver_device
 {
@@ -13,6 +14,7 @@ public:
 		m_scrollram16(*this, "scrollram16"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_seibu_sound(*this, "seibu_sound"),
 		m_msm(*this, "msm") { }
 
 	required_device<buffered_spriteram16_device> m_spriteram;
@@ -20,6 +22,11 @@ public:
 	required_shared_ptr<UINT16> m_background2_videoram16;
 	required_shared_ptr<UINT16> m_videoram;
 	required_shared_ptr<UINT16> m_scrollram16;
+	
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	optional_device<seibu_sound_device> m_seibu_sound;
+	optional_device<msm5205_device> m_msm;
 
 	int m_msm5205next;
 	int m_toggle;
@@ -47,7 +54,4 @@ public:
 	void toki_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void tokib_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(toki_adpcm_int);
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
-	optional_device<msm5205_device> m_msm;
 };

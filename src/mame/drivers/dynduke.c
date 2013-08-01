@@ -65,11 +65,10 @@ Also, implemented conditional port for Coin Mode (SW1:1)
 #include "emu.h"
 #include "cpu/nec/nec.h"
 #include "cpu/z80/z80.h"
-#include "audio/seibu.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
 #include "includes/dynduke.h"
-#include "drivlgcy.h"
+
 
 /* Memory Maps */
 
@@ -83,7 +82,7 @@ static ADDRESS_MAP_START( master_map, AS_PROGRAM, 16, dynduke_state )
 	AM_RANGE(0x0b004, 0x0b005) AM_WRITENOP
 	AM_RANGE(0x0b006, 0x0b007) AM_WRITE(dynduke_control_w)
 	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM_WRITE(dynduke_text_w) AM_SHARE("videoram")
-	AM_RANGE(0x0d000, 0x0d00d) AM_READWRITE_LEGACY(seibu_main_word_r, seibu_main_word_w)
+	AM_RANGE(0x0d000, 0x0d00d) AM_DEVREADWRITE("seibu_sound", seibu_sound_device, main_word_r, main_word_w)
 	AM_RANGE(0xa0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -103,7 +102,7 @@ static ADDRESS_MAP_START( masterj_map, AS_PROGRAM, 16, dynduke_state )
 	AM_RANGE(0x00000, 0x06fff) AM_RAM
 	AM_RANGE(0x07000, 0x07fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x08000, 0x087ff) AM_RAM_WRITE(dynduke_text_w) AM_SHARE("videoram")
-	AM_RANGE(0x09000, 0x0900d) AM_READWRITE_LEGACY(seibu_main_word_r, seibu_main_word_w)
+	AM_RANGE(0x09000, 0x0900d) AM_DEVREADWRITE("seibu_sound", seibu_sound_device, main_word_r, main_word_w)
 	AM_RANGE(0x0c000, 0x0c0ff) AM_RAM AM_SHARE("scroll_ram")
 	AM_RANGE(0x0e000, 0x0efff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x0f000, 0x0f001) AM_READ_PORT("P1_P2")
@@ -284,8 +283,6 @@ static MACHINE_CONFIG_START( dynduke, dynduke_state )
 	SEIBU_SOUND_SYSTEM_CPU(14318180/4)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(3600))
-
-	MCFG_MACHINE_RESET(seibu_sound)
 
 	// video hardware
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
@@ -607,7 +604,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(dynduke_state,dynduke)
 {
-	seibu_sound_decrypt(machine(),"audiocpu",0x20000);
+	m_seibu_sound->decrypt("audiocpu",0x20000);
 }
 
 /* Game Drivers */

@@ -147,7 +147,6 @@ Current Problem(s) - in order of priority
 #include "emu.h"
 #include "cpu/nec/nec.h"
 #include "cpu/z80/z80.h"
-#include "audio/seibu.h"
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
 #include "includes/raiden2.h"
@@ -1176,8 +1175,7 @@ MACHINE_RESET_MEMBER(raiden2_state,raiden2)
 {
 	common_reset();
 	sprcpt_init();
-	MACHINE_RESET_CALL_LEGACY(seibu_sound);
-
+	
 	membank("mainbank")->set_entry(1);
 
 	prg_bank = 0;
@@ -1188,8 +1186,7 @@ MACHINE_RESET_MEMBER(raiden2_state,raidendx)
 {
 	common_reset();
 	sprcpt_init();
-	MACHINE_RESET_CALL_LEGACY(seibu_sound);
-
+	
 	membank("mainbank")->set_entry(8);
 
 	prg_bank = 0x08;
@@ -1203,8 +1200,7 @@ MACHINE_RESET_MEMBER(raiden2_state,zeroteam)
 	fg_bank = 2;
 	mid_bank = 1;
 	sprcpt_init();
-	MACHINE_RESET_CALL_LEGACY(seibu_sound);
-
+	
 	membank("mainbank")->set_entry(1);
 
 	prg_bank = 0;
@@ -1217,8 +1213,7 @@ MACHINE_RESET_MEMBER(raiden2_state,xsedae)
 	fg_bank = 2;
 	mid_bank = 1;
 	sprcpt_init();
-	MACHINE_RESET_CALL_LEGACY(seibu_sound);
-
+	
 	//membank("mainbank")->set_entry(1);
 
 	//cop_init();
@@ -1226,12 +1221,12 @@ MACHINE_RESET_MEMBER(raiden2_state,xsedae)
 
 READ16_MEMBER(raiden2_state::raiden2_sound_comms_r)
 {
-	return seibu_main_word_r(space,(offset >> 1) & 7,0xffff);
+	return m_seibu_sound->main_word_r(space,(offset >> 1) & 7,0xffff);
 }
 
 WRITE16_MEMBER(raiden2_state::raiden2_sound_comms_w)
 {
-	seibu_main_word_w(space,(offset >> 1) & 7,data,0x00ff);
+	m_seibu_sound->main_word_w(space,(offset >> 1) & 7,data,0x00ff);
 }
 
 WRITE16_MEMBER(raiden2_state::raiden2_bank_w)

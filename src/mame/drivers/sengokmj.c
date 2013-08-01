@@ -57,7 +57,6 @@ RSSENGO2.72   chr.
 #include "sound/3812intf.h"
 #include "video/seibu_crtc.h"
 #include "machine/nvram.h"
-#include "drivlgcy.h"
 
 
 class sengokmj_state : public driver_device
@@ -381,7 +380,7 @@ static ADDRESS_MAP_START( sengokmj_map, AS_PROGRAM, 16, sengokmj_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sengokmj_io_map, AS_IO, 16, sengokmj_state )
-	AM_RANGE(0x4000, 0x400f) AM_READWRITE_LEGACY(seibu_main_word_r, seibu_main_word_w)
+	AM_RANGE(0x4000, 0x400f) AM_DEVREADWRITE("seibu_sound", seibu_sound_device, main_word_r, main_word_w)
 	/*Areas from 8000-804f are for the custom Seibu CRTC.*/
 	AM_RANGE(0x8000, 0x804f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
 
@@ -571,7 +570,6 @@ static MACHINE_CONFIG_START( sengokmj, sengokmj_state )
 
 	SEIBU_SOUND_SYSTEM_CPU(14318180/4)
 
-	MCFG_MACHINE_RESET(seibu_sound)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */

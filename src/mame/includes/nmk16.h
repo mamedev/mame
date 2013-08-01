@@ -136,7 +136,6 @@ public:
 	TILE_GET_INFO_MEMBER(macross_get_tx_tile_info);
 	TILE_GET_INFO_MEMBER(bjtwin_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tile_info_0_8bit);
-	DECLARE_MACHINE_RESET(mustang_sound);
 	DECLARE_VIDEO_START(macross);
 	DECLARE_MACHINE_RESET(NMK004);
 	DECLARE_VIDEO_START(bioship);

@@ -75,7 +75,6 @@ Preliminary COP MCU memory map
 #include "cpu/m68000/m68000.h"
 #include "machine/seicop.h"
 #include "includes/legionna.h"
-#include "drivlgcy.h"
 
 /*****************************************************************************/
 
@@ -1066,8 +1065,6 @@ static MACHINE_CONFIG_START( legionna, legionna_state )
 
 	SEIBU_SOUND_SYSTEM_CPU(14318180/4)
 
-	MCFG_MACHINE_RESET(seibu_sound)
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1096,8 +1093,6 @@ static MACHINE_CONFIG_START( heatbrl, legionna_state )
 
 	SEIBU_SOUND_SYSTEM_CPU(14318180/4)
 
-	MCFG_MACHINE_RESET(seibu_sound)
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1124,8 +1119,6 @@ static MACHINE_CONFIG_START( godzilla, legionna_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", legionna_state,  irq4_line_hold)
 
 	SEIBU2_SOUND_SYSTEM_CPU(14318180/4)
-
-	MCFG_MACHINE_RESET(seibu_sound)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1155,8 +1148,6 @@ static MACHINE_CONFIG_START( denjinmk, legionna_state )
 
 	SEIBU2_SOUND_SYSTEM_CPU(14318180/4)
 
-	MCFG_MACHINE_RESET(seibu_sound)
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_SIZE(42*8, 36*8)
@@ -1183,8 +1174,6 @@ static MACHINE_CONFIG_START( grainbow, legionna_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", legionna_state,  irq4_line_hold)
 
 	SEIBU2_SOUND_SYSTEM_CPU(14318180/4)
-
-	MCFG_MACHINE_RESET(seibu_sound)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1213,8 +1202,6 @@ static MACHINE_CONFIG_START( cupsoc, legionna_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", legionna_state,  irq4_line_hold)/* VBL */
 
 	SEIBU_SOUND_SYSTEM_CPU(14318180/4)
-
-	MCFG_MACHINE_RESET(seibu_sound)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1251,8 +1238,6 @@ static MACHINE_CONFIG_START( cupsocbl, legionna_state )
 	MCFG_CPU_ADD("audiocpu", Z80,14318180/4)
 	MCFG_CPU_PROGRAM_MAP(cupsocbl_sound_mem)
 	//MCFG_PERIODIC_INT("screen", nmi_line_pulse)
-
-	//MCFG_MACHINE_INIT(seibu_sound)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

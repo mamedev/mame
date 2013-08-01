@@ -195,11 +195,6 @@ MACHINE_RESET_MEMBER(nmk16_state,NMK004)
 	NMK004_init(machine());
 }
 
-MACHINE_RESET_MEMBER(nmk16_state,mustang_sound)
-{
-	MACHINE_RESET_CALL_LEGACY(seibu_sound);
-}
-
 WRITE16_MEMBER(nmk16_state::ssmissin_sound_w)
 {
 	if (ACCESSING_BITS_0_7)
@@ -425,7 +420,7 @@ static ADDRESS_MAP_START( mustangb_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x08000e, 0x08000f) AM_NOP
 	AM_RANGE(0x080014, 0x080015) AM_WRITE(nmk_flipscreen_w)
 	AM_RANGE(0x080016, 0x080017) AM_WRITENOP    // frame number?
-	AM_RANGE(0x08001e, 0x08001f) AM_WRITE_LEGACY(seibu_main_mustb_w)
+	AM_RANGE(0x08001e, 0x08001f) AM_DEVWRITE("seibu_sound", seibu_sound_device, main_mustb_w)
 	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBRGBx_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x08c000, 0x08c001) AM_WRITE(mustang_scroll_w)
 	AM_RANGE(0x08c002, 0x08c087) AM_WRITENOP    // ??
@@ -913,7 +908,7 @@ static ADDRESS_MAP_START( tdragonb_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x0c000a, 0x0c000b) AM_READ_PORT("DSW2")
 	AM_RANGE(0x0c0014, 0x0c0015) AM_WRITE(nmk_flipscreen_w) /* Maybe */
 	AM_RANGE(0x0c0018, 0x0c0019) AM_WRITE(nmk_tilebank_w) /* Tile Bank ? */
-	AM_RANGE(0x0c001e, 0x0c001f) AM_WRITE_LEGACY(seibu_main_mustb_w)
+	AM_RANGE(0x0c001e, 0x0c001f) AM_DEVWRITE("seibu_sound", seibu_sound_device, main_mustb_w)
 	AM_RANGE(0x0c4000, 0x0c4007) AM_RAM_WRITE(nmk_scroll_w)
 	AM_RANGE(0x0c8000, 0x0c87ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBRGBx_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x0cc000, 0x0cffff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_SHARE("nmk_bgvideoram0")
@@ -3593,8 +3588,6 @@ static MACHINE_CONFIG_START( tharrier, nmk16_state )
 	MCFG_CPU_PROGRAM_MAP(tharrier_sound_map)
 	MCFG_CPU_IO_MAP(tharrier_sound_io_map)
 
-	MCFG_MACHINE_RESET_OVERRIDE(nmk16_state,mustang_sound)
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(56)
@@ -3722,8 +3715,6 @@ static MACHINE_CONFIG_START( mustangb, nmk16_state )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", nmk16_state, nmk16_scanline, "screen", 0, 1)
 
 	SEIBU_SOUND_SYSTEM_CPU(14318180/4)
-
-	MCFG_MACHINE_RESET_OVERRIDE(nmk16_state,mustang_sound)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3918,8 +3909,6 @@ static MACHINE_CONFIG_START( tdragonb, nmk16_state )    /* bootleg using Raiden 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", nmk16_state, nmk16_scanline, "screen", 0, 1)
 
 	SEIBU_SOUND_SYSTEM_CPU(14318180/4)
-
-	MCFG_MACHINE_RESET_OVERRIDE(nmk16_state,mustang_sound)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

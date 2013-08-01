@@ -49,9 +49,7 @@ Dip locations verified with Fabtek manual for the trackball version
 #include "cpu/z80/z80.h"
 #include "sound/2151intf.h"
 #include "sound/msm5205.h"
-#include "audio/seibu.h"
 #include "includes/cabal.h"
-#include "drivlgcy.h"
 
 MACHINE_RESET_MEMBER(cabal_state,cabalbl)
 {
@@ -101,7 +99,7 @@ READ16_MEMBER(cabal_state::track_r)
 
 WRITE16_MEMBER(cabal_state::cabal_sound_irq_trigger_word_w)
 {
-	seibu_main_word_w(space,4,data,mem_mask);
+	m_seibu_sound->main_word_w(space,4,data,mem_mask);
 
 	/* spin for a while to let the Z80 read the command, otherwise coins "stick" */
 	space.device().execute().spin_until_time(attotime::from_usec(50));
@@ -130,7 +128,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, cabal_state )
 	AM_RANGE(0xc0080, 0xc0081) AM_WRITE(cabal_flipscreen_w)
 	AM_RANGE(0xe0000, 0xe07ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0xe8008, 0xe8009) AM_WRITE(cabal_sound_irq_trigger_word_w) // fix coin insertion
-	AM_RANGE(0xe8000, 0xe800d) AM_READWRITE_LEGACY(seibu_main_word_r, seibu_main_word_w)
+	AM_RANGE(0xe8000, 0xe800d) AM_DEVREADWRITE("seibu_sound", seibu_sound_device, main_word_r, main_word_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cabalbl_main_map, AS_PROGRAM, 16, cabal_state )
@@ -176,19 +174,19 @@ WRITE8_MEMBER(cabal_state::cabalbl_coin_w)
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, cabal_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
-	AM_RANGE(0x4001, 0x4001) AM_WRITE_LEGACY(seibu_irq_clear_w)
-	AM_RANGE(0x4002, 0x4002) AM_WRITE_LEGACY(seibu_rst10_ack_w)
-	AM_RANGE(0x4003, 0x4003) AM_WRITE_LEGACY(seibu_rst18_ack_w)
-	AM_RANGE(0x4005, 0x4006) AM_DEVWRITE_LEGACY("adpcm1", seibu_adpcm_adr_w)
+	AM_RANGE(0x4001, 0x4001) AM_DEVWRITE("seibu_sound", seibu_sound_device, irq_clear_w)
+	AM_RANGE(0x4002, 0x4002) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst10_ack_w)
+	AM_RANGE(0x4003, 0x4003) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst18_ack_w)
+	AM_RANGE(0x4005, 0x4006) AM_DEVWRITE("adpcm1", seibu_adpcm_device, adr_w)
 	AM_RANGE(0x4008, 0x4009) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x4010, 0x4011) AM_READ_LEGACY(seibu_soundlatch_r)
-	AM_RANGE(0x4012, 0x4012) AM_READ_LEGACY(seibu_main_data_pending_r)
+	AM_RANGE(0x4010, 0x4011) AM_DEVREAD("seibu_sound", seibu_sound_device, soundlatch_r)
+	AM_RANGE(0x4012, 0x4012) AM_DEVREAD("seibu_sound", seibu_sound_device, main_data_pending_r)
 	AM_RANGE(0x4013, 0x4013) AM_READ_PORT("COIN")
-	AM_RANGE(0x4018, 0x4019) AM_WRITE_LEGACY(seibu_main_data_w)
-	AM_RANGE(0x401a, 0x401a) AM_DEVWRITE_LEGACY("adpcm1", seibu_adpcm_ctl_w)
-	AM_RANGE(0x401b, 0x401b) AM_WRITE_LEGACY(seibu_coin_w)
-	AM_RANGE(0x6005, 0x6006) AM_DEVWRITE_LEGACY("adpcm2", seibu_adpcm_adr_w)
-	AM_RANGE(0x601a, 0x601a) AM_DEVWRITE_LEGACY("adpcm2", seibu_adpcm_ctl_w)
+	AM_RANGE(0x4018, 0x4019) AM_DEVWRITE("seibu_sound", seibu_sound_device, main_data_w)
+	AM_RANGE(0x401a, 0x401a) AM_DEVWRITE("adpcm1", seibu_adpcm_device, ctl_w)
+	AM_RANGE(0x401b, 0x401b) AM_DEVWRITE("seibu_sound", seibu_sound_device, coin_w)
+	AM_RANGE(0x6005, 0x6006) AM_DEVWRITE("adpcm2", seibu_adpcm_device, adr_w)
+	AM_RANGE(0x601a, 0x601a) AM_DEVWRITE("adpcm2", seibu_adpcm_device, ctl_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -482,8 +480,6 @@ static MACHINE_CONFIG_START( cabal, cabal_state )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_MACHINE_RESET(seibu_sound)
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59.60)   /* verified on pcb */
@@ -497,10 +493,12 @@ static MACHINE_CONFIG_START( cabal, cabal_state )
 
 
 	/* sound hardware */
+	MCFG_SEIBU_SOUND_ADD("seibu_sound")
+	
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz) /* verified on pcb */
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(driver_device, member_wrapper_line<seibu_ym2151_irqhandler>))
+	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, ym2151_irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono", 0.80)
 
 	MCFG_SOUND_ADD("adpcm1", SEIBU_ADPCM, 8000) /* it should use the msm5205 */
@@ -525,12 +523,12 @@ static MACHINE_CONFIG_START( cabalbl, cabal_state )
 	MCFG_CPU_PROGRAM_MAP(cabalbl_sound_map)
 
 	/* there are 2x z80s for the ADPCM */
-	MCFG_CPU_ADD("adpcm1", Z80, XTAL_3_579545MHz) /* verified on pcb */
+	MCFG_CPU_ADD("adpcm_1", Z80, XTAL_3_579545MHz) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(cabalbl_talk1_map)
 	MCFG_CPU_IO_MAP(cabalbl_talk1_portmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(cabal_state, irq0_line_hold, 8000)
 
-	MCFG_CPU_ADD("adpcm2", Z80, XTAL_3_579545MHz) /* verified on pcb */
+	MCFG_CPU_ADD("adpcm_2", Z80, XTAL_3_579545MHz) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(cabalbl_talk2_map)
 	MCFG_CPU_IO_MAP(cabalbl_talk2_portmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(cabal_state, irq0_line_hold, 8000)
@@ -772,10 +770,10 @@ ROM_START( cabalbl )
 	ROM_LOAD16_BYTE( "cabal_01.bin",   0x60000, 0x10000, CRC(55c44764) SHA1(7fad1f2084664b5b4d1384c8081371b0c79c4f5e) )
 	ROM_LOAD16_BYTE( "cabal_08.bin",   0x60001, 0x10000, CRC(702735c9) SHA1(e4ac799dc85ff5b7c8e578611605989c78f9e8b3) )
 
-	ROM_REGION( 0x10000, "adpcm1", 0 )
+	ROM_REGION( 0x10000, "adpcm_1", 0 )
 	ROM_LOAD( "cabal_09.bin",   0x00000, 0x10000, CRC(4ffa7fe3) SHA1(381d8e765a7b94678fb3308965c748bbe9f8e247) ) /* Z80 code/adpcm data */
 
-	ROM_REGION( 0x10000, "adpcm2", 0 )
+	ROM_REGION( 0x10000, "adpcm_2", 0 )
 	ROM_LOAD( "cabal_10.bin",   0x00000, 0x10000, CRC(958789b6) SHA1(344c3ee8a1e272b56499e5c0415bb714aec0ddcf) ) /* Z80 code/adpcm data */
 ROM_END
 
@@ -849,16 +847,16 @@ void cabal_state::seibu_sound_bootleg(const char *cpu,int length)
 
 DRIVER_INIT_MEMBER(cabal_state,cabal)
 {
-	seibu_sound_decrypt(machine(),"audiocpu",0x2000);
-	seibu_adpcm_decrypt(machine(),"adpcm1");
-	seibu_adpcm_decrypt(machine(),"adpcm2");
+	m_seibu_sound->decrypt("audiocpu",0x2000);
+	m_adpcm1->decrypt("adpcm1");
+	m_adpcm2->decrypt("adpcm2");
 }
 
 DRIVER_INIT_MEMBER(cabal_state,cabalbl2)
 {
 	seibu_sound_bootleg("audiocpu",0x2000);
-	seibu_adpcm_decrypt(machine(),"adpcm1");
-	seibu_adpcm_decrypt(machine(),"adpcm2");
+	m_adpcm1->decrypt("adpcm1");
+	m_adpcm2->decrypt("adpcm2");
 }
 
 

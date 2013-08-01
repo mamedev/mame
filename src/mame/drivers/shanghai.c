@@ -26,7 +26,6 @@ displayed.
 #include "cpu/nec/nec.h"
 #include "audio/seibu.h"
 #include "video/hd63484.h"
-#include "drivlgcy.h"
 
 
 class shanghai_state : public driver_device
@@ -190,7 +189,7 @@ static ADDRESS_MAP_START( kothello_map, AS_PROGRAM, 16, shanghai_state )
 	AM_RANGE(0x09014, 0x09015) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x09016, 0x0901f) AM_WRITENOP // 0x9016 is set to 0 at the boot
 	AM_RANGE(0x0a000, 0x0a1ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x0b010, 0x0b01f) AM_READWRITE_LEGACY(seibu_main_word_r, seibu_main_word_w)
+	AM_RANGE(0x0b010, 0x0b01f) AM_DEVREADWRITE("seibu_sound", seibu_sound_device, main_word_r, main_word_w)
 	AM_RANGE(0x80000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -514,8 +513,6 @@ static MACHINE_CONFIG_START( kothello, shanghai_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
-	MCFG_MACHINE_RESET(seibu_sound)
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(30)
@@ -533,7 +530,7 @@ static MACHINE_CONFIG_START( kothello, shanghai_state )
 
 	/* same as standard seibu ym2203, but "ym1" also reads "DSW" */
 	MCFG_SOUND_ADD("ym1", YM2203, 14318180/4)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(driver_device, member_wrapper_line<seibu_ym2203_irqhandler>))
+	MCFG_YM2203_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, ym2203_irqhandler))
 	MCFG_YM2203_AY8910_INTF(&kothello_ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 

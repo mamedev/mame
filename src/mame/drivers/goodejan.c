@@ -55,7 +55,6 @@ Notes:
 #include "audio/seibu.h"
 #include "sound/3812intf.h"
 #include "video/seibu_crtc.h"
-#include "drivlgcy.h"
 
 
 class goodejan_state : public driver_device
@@ -417,7 +416,7 @@ static ADDRESS_MAP_START( common_io_map, AS_IO, 16, goodejan_state )
 	AM_RANGE(0xc000, 0xc001) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc002, 0xc003) AM_READ(mahjong_panel_r)
 	AM_RANGE(0xc004, 0xc005) AM_READ_PORT("DSW2") // switches
-	AM_RANGE(0xd000, 0xd00f) AM_READWRITE_LEGACY(seibu_main_word_r, seibu_main_word_w)
+	AM_RANGE(0xd000, 0xd00f) AM_DEVREADWRITE("seibu_sound", seibu_sound_device, main_word_r, main_word_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( totmejan_io_map, AS_IO, 16, goodejan_state )
@@ -655,8 +654,6 @@ static MACHINE_CONFIG_START( goodejan, goodejan_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", goodejan_state, goodejan_irq)
 
 	SEIBU_SOUND_SYSTEM_CPU(GOODEJAN_MHZ1/2)
-
-	MCFG_MACHINE_RESET(seibu_sound)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

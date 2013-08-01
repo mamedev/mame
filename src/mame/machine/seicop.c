@@ -1592,7 +1592,6 @@ raw angle|angle compare|angle mod value| res |
 */
 
 #include "emu.h"
-#include "audio/seibu.h"
 #include "includes/legionna.h"
 #include "includes/raiden2.h"
 #include "machine/seicop.h"
@@ -3079,7 +3078,7 @@ static WRITE16_HANDLER( generic_cop_w )
 READ16_HANDLER( heatbrl_mcu_r )
 {
 	if(offset >= 0x3c0/2 && offset <= 0x3df/2)
-		return seibu_main_word_r(space,(offset >> 1) & 7,0xffff);
+			return space.machine().device<seibu_sound_device>("seibu_sound")->main_word_r(space,(offset >> 1) & 7,0xffff);
 
 	if(offset >= 0x340/2 && offset <= 0x34f/2)
 	{
@@ -3114,7 +3113,7 @@ WRITE16_HANDLER( heatbrl_mcu_w )
 
 	if(offset >= 0x3c0/2 && offset <= 0x3df/2)
 	{
-		seibu_main_word_w(space,(offset >> 1) & 7,cop_mcu_ram[offset],0x00ff);
+		space.machine().device<seibu_sound_device>("seibu_sound")->main_word_w(space,(offset >> 1) & 7,cop_mcu_ram[offset],0x00ff);
 		return;
 	}
 
@@ -3130,7 +3129,7 @@ WRITE16_HANDLER( heatbrl_mcu_w )
 READ16_HANDLER( cupsoc_mcu_r )
 {
 	if(offset >= 0x300/2 && offset <= 0x31f/2)
-		return seibu_main_word_r(space,(offset >> 1) & 7,0xffff);
+		return space.machine().device<seibu_sound_device>("seibu_sound")->main_word_r(space,(offset >> 1) & 7,0xffff);
 
 	if(offset >= 0x340/2 && offset <= 0x34f/2)
 	{
@@ -3163,7 +3162,7 @@ WRITE16_HANDLER( cupsoc_mcu_w )
 
 	if(offset >= 0x300/2 && offset <= 0x31f/2)
 	{
-		seibu_main_word_w(space,(offset >> 1) & 7,cop_mcu_ram[offset],0x00ff);
+		space.machine().device<seibu_sound_device>("seibu_sound")->main_word_w(space,(offset >> 1) & 7,cop_mcu_ram[offset],0x00ff);
 		return;
 	}
 
@@ -3173,7 +3172,7 @@ WRITE16_HANDLER( cupsoc_mcu_w )
 READ16_HANDLER( cupsocs_mcu_r )
 {
 	if(offset >= 0x340/2 && offset <= 0x35f/2)
-		return seibu_main_word_r(space,(offset >> 1) & 7,0xffff);
+		return space.machine().device<seibu_sound_device>("seibu_sound")->main_word_r(space,(offset >> 1) & 7,0xffff);
 
 	if(offset >= 0x300/2 && offset <= 0x30f/2)
 	{
@@ -3212,7 +3211,7 @@ WRITE16_HANDLER( cupsocs_mcu_w )
 
 	if(offset >= 0x340/2 && offset <= 0x35f/2)
 	{
-		seibu_main_word_w(space,(offset >> 1) & 7,cop_mcu_ram[offset],0x00ff);
+		space.machine().device<seibu_sound_device>("seibu_sound")->main_word_w(space,(offset >> 1) & 7,cop_mcu_ram[offset],0x00ff);
 		return;
 	}
 
@@ -3226,7 +3225,7 @@ WRITE16_HANDLER( cupsocs_mcu_w )
 READ16_HANDLER( godzilla_mcu_r )
 {
 	if(offset >= 0x300/2 && offset <= 0x31f/2)
-		return seibu_main_word_r(space,(offset >> 1) & 7,0xffff);
+		return space.machine().device<seibu_sound_device>("seibu_sound")->main_word_r(space,(offset >> 1) & 7,0xffff);
 
 	if(offset >= 0x340/2 && offset <= 0x34f/2)
 	{
@@ -3260,7 +3259,7 @@ WRITE16_HANDLER( godzilla_mcu_w )
 
 	if(offset >= 0x300/2 && offset <= 0x31f/2)
 	{
-		seibu_main_word_w(space,(offset >> 1) & 7,cop_mcu_ram[offset],0x00ff);
+		space.machine().device<seibu_sound_device>("seibu_sound")->main_word_w(space,(offset >> 1) & 7,cop_mcu_ram[offset],0x00ff);
 		return;
 	}
 
@@ -3274,7 +3273,7 @@ WRITE16_HANDLER( godzilla_mcu_w )
 READ16_HANDLER( denjinmk_mcu_r )
 {
 	if(offset >= 0x300/2 && offset <= 0x31f/2)
-		return seibu_main_word_r(space,(offset >> 1) & 7,0xffff);
+		return space.machine().device<seibu_sound_device>("seibu_sound")->main_word_r(space,(offset >> 1) & 7,0xffff);
 
 	if(offset >= 0x340/2 && offset <= 0x34f/2)
 	{
@@ -3313,7 +3312,7 @@ WRITE16_HANDLER( denjinmk_mcu_w )
 
 	if(offset >= 0x300/2 && offset <= 0x31f/2)
 	{
-		seibu_main_word_w(space,(offset >> 1) & 7,cop_mcu_ram[offset],0x00ff);
+		space.machine().device<seibu_sound_device>("seibu_sound")->main_word_w(space,(offset >> 1) & 7,cop_mcu_ram[offset],0x00ff);
 		return;
 	}
 
@@ -3327,7 +3326,7 @@ WRITE16_HANDLER( denjinmk_mcu_w )
 READ16_HANDLER( grainbow_mcu_r )
 {
 	if(offset >= 0x300/2 && offset <= 0x31f/2)
-		return seibu_main_word_r(space,(offset >> 1) & 7,0xffff);
+		return space.machine().device<seibu_sound_device>("seibu_sound")->main_word_r(space,(offset >> 1) & 7,0xffff);
 
 	if(offset >= 0x340/2 && offset <= 0x34f/2)
 	{
@@ -3361,7 +3360,7 @@ WRITE16_HANDLER( grainbow_mcu_w )
 
 	if(offset >= 0x300/2 && offset <= 0x31f/2)
 	{
-		seibu_main_word_w(space,(offset >> 1) & 7,cop_mcu_ram[offset],0x00ff);
+		space.machine().device<seibu_sound_device>("seibu_sound")->main_word_w(space,(offset >> 1) & 7,cop_mcu_ram[offset],0x00ff);
 		return;
 	}
 
@@ -3376,7 +3375,7 @@ WRITE16_HANDLER( grainbow_mcu_w )
 READ16_HANDLER( legionna_mcu_r )
 {
 	if(offset >= 0x300/2 && offset <= 0x31f/2)
-		return seibu_main_word_r(space,(offset >> 1) & 7,0xffff);
+		return space.machine().device<seibu_sound_device>("seibu_sound")->main_word_r(space,(offset >> 1) & 7,0xffff);
 
 	if(offset >= 0x340/2 && offset <= 0x34f/2)
 	{
@@ -3407,7 +3406,7 @@ WRITE16_HANDLER( legionna_mcu_w )
 
 	if(offset >= 0x300/2 && offset <= 0x31f/2)
 	{
-		seibu_main_word_w(space,(offset >> 1) & 7,cop_mcu_ram[offset],0x00ff);
+		space.machine().device<seibu_sound_device>("seibu_sound")->main_word_w(space,(offset >> 1) & 7,cop_mcu_ram[offset],0x00ff);
 		return;
 	}
 

@@ -124,7 +124,6 @@ DIP locations verified for Blood Bros. & Sky Smasher via manual & DIP-SW setting
 #include "sound/3812intf.h"
 #include "includes/bloodbro.h"
 #include "video/seibu_crtc.h"
-#include "drivlgcy.h"
 
 
 /* Memory Maps */
@@ -140,7 +139,7 @@ static ADDRESS_MAP_START( common_map, AS_PROGRAM, 16, bloodbro_state )
 	AM_RANGE(0x08e000, 0x08e7ff) AM_RAM
 	AM_RANGE(0x08e800, 0x08f7ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x08f800, 0x08ffff) AM_RAM
-	AM_RANGE(0x0a0000, 0x0a000d) AM_READWRITE_LEGACY(seibu_main_word_r, seibu_main_word_w)
+	AM_RANGE(0x0a0000, 0x0a000d) AM_DEVREADWRITE("seibu_sound", seibu_sound_device, main_word_r, main_word_w)
 //  AM_RANGE(0x0c0000, 0x0c007f) AM_RAM AM_SHARE("scroll")
 	AM_RANGE(0x0c0080, 0x0c0081) AM_WRITENOP // ??? IRQ Ack VBL?
 	AM_RANGE(0x0c00c0, 0x0c00c1) AM_WRITENOP // ??? watchdog?
@@ -466,8 +465,6 @@ static MACHINE_CONFIG_START( bloodbro, bloodbro_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", bloodbro_state,  irq4_line_hold)
 
 	SEIBU_SOUND_SYSTEM_CPU(XTAL_7_15909MHz/2) /* verified on pcb */
-
-	MCFG_MACHINE_RESET(seibu_sound)
 
 	// video hardware
 

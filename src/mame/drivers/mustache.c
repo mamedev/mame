@@ -29,7 +29,6 @@ YM2151:
 ***************************************************************************/
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "audio/seibu.h"    // for seibu_sound_decrypt on the MAIN cpu (not sound)
 #include "audio/t5182.h"
 #include "includes/mustache.h"
 
@@ -195,6 +194,8 @@ static MACHINE_CONFIG_START( mustache, mustache_state )
 
 
 	/* sound hardware */
+	MCFG_SEIBU_SOUND_ADD("seibu_sound") // for seibu_sound_decrypt on the MAIN cpu (not sound)
+	
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_YM2151_ADD("ymsnd", YM_CLOCK)
@@ -278,7 +279,7 @@ DRIVER_INIT_MEMBER(mustache_state,mustache)
 		gfx2[i] = buf[BITSWAP24(i,23,22,21,20,19,18,17,16,15,12,11,10,9,8,7,6,5,4,13,14,3,2,1,0)];
 
 	auto_free(machine(), buf);
-	seibu_sound_decrypt(machine(),"maincpu",0x8000);
+	m_cpu_decrypt->decrypt("maincpu",0x8000);
 }
 
 

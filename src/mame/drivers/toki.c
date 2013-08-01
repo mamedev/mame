@@ -37,12 +37,10 @@ for now. Even at 12 this slowdown still happens a little.
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "audio/seibu.h"
 #include "sound/3812intf.h"
 #include "sound/msm5205.h"
 #include "sound/3812intf.h"
 #include "includes/toki.h"
-#include "drivlgcy.h"
 
 WRITE16_MEMBER(toki_state::tokib_soundcommand16_w)
 {
@@ -96,7 +94,7 @@ static ADDRESS_MAP_START( toki_map, AS_PROGRAM, 16, toki_state )
 	AM_RANGE(0x06e800, 0x06efff) AM_RAM_WRITE(toki_background1_videoram16_w) AM_SHARE("bg1_vram16")
 	AM_RANGE(0x06f000, 0x06f7ff) AM_RAM_WRITE(toki_background2_videoram16_w) AM_SHARE("bg2_vram16")
 	AM_RANGE(0x06f800, 0x06ffff) AM_RAM_WRITE(toki_foreground_videoram16_w) AM_SHARE("videoram")
-	AM_RANGE(0x080000, 0x08000d) AM_READWRITE_LEGACY(seibu_main_word_r, seibu_main_word_w)
+	AM_RANGE(0x080000, 0x08000d) AM_DEVREADWRITE("seibu_sound", seibu_sound_device, main_word_r, main_word_w)
 	AM_RANGE(0x0a0000, 0x0a005f) AM_WRITE(toki_control_w) AM_SHARE("scrollram16")
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ_PORT("DSW")
 	AM_RANGE(0x0c0002, 0x0c0003) AM_READ_PORT("INPUTS")
@@ -419,8 +417,6 @@ static MACHINE_CONFIG_START( toki, toki_state ) /* KOYO 20.000MHz near the cpu *
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", toki_state,  irq1_line_hold)/* VBL */
 
 	SEIBU_SOUND_SYSTEM_CPU(XTAL_14_31818MHz/4)  /* verifed on pcb */
-
-	MCFG_MACHINE_RESET(seibu_sound)
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
@@ -797,7 +793,7 @@ DRIVER_INIT_MEMBER(toki_state,toki)
 
 	auto_free(machine(), buffer);
 
-	seibu_sound_decrypt(machine(),"audiocpu",0x2000);
+	m_seibu_sound->decrypt("audiocpu",0x2000);
 }
 
 

@@ -1,3 +1,5 @@
+#include "audio/seibu.h"
+
 class deadang_state : public driver_device
 {
 public:
@@ -8,12 +10,22 @@ public:
 		m_scroll_ram(*this, "scroll_ram"),
 		m_video_data(*this, "video_data"),
 		m_maincpu(*this, "maincpu"),
-		m_subcpu(*this, "sub") { }
+		m_subcpu(*this, "sub"),
+		m_seibu_sound(*this, "seibu_sound"),
+		m_adpcm1(*this, "adpcm1"),
+		m_adpcm2(*this, "adpcm2") { }
 
 	required_shared_ptr<UINT16> m_spriteram;
 	required_shared_ptr<UINT16> m_videoram;
 	required_shared_ptr<UINT16> m_scroll_ram;
 	required_shared_ptr<UINT16> m_video_data;
+	
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_subcpu;
+	required_device<seibu_sound_device> m_seibu_sound;
+	required_device<seibu_adpcm_device> m_adpcm1;
+	required_device<seibu_adpcm_device> m_adpcm2;
+	
 	tilemap_t *m_pf3_layer;
 	tilemap_t *m_pf2_layer;
 	tilemap_t *m_pf1_layer;
@@ -38,6 +50,4 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(deadang_main_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(deadang_sub_scanline);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_subcpu;
 };

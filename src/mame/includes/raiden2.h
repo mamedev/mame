@@ -1,3 +1,5 @@
+#include "audio/seibu.h"
+
 class raiden2_state : public driver_device
 {
 public:
@@ -8,7 +10,12 @@ public:
 			mid_data(*this, "mid_data"),
 			text_data(*this, "text_data"),
 			sprites(*this, "sprites") ,
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_seibu_sound(*this, "seibu_sound") { }
+		
+	required_shared_ptr<UINT16> back_data,fore_data,mid_data, text_data, sprites;
+	required_device<cpu_device> m_maincpu;
+	required_device<seibu_sound_device> m_seibu_sound;
 
 	DECLARE_WRITE16_MEMBER( cop_itoa_low_w );
 	DECLARE_WRITE16_MEMBER( cop_itoa_high_w );
@@ -79,7 +86,6 @@ public:
 	void common_reset();
 
 	tilemap_t *background_layer,*midground_layer,*foreground_layer,*text_layer;
-	required_shared_ptr<UINT16> back_data,fore_data,mid_data, text_data, sprites;
 	int bg_bank, fg_bank, mid_bank;
 	UINT16 raiden2_tilemap_enable;
 	UINT8 prg_bank,prot_data;
@@ -158,7 +164,6 @@ public:
 	const UINT8 fade_table(int v);
 	void combine32(UINT32 *val, int offset, UINT16 data, UINT16 mem_mask);
 	void sprcpt_init(void);
-	required_device<cpu_device> m_maincpu;
 };
 
 /*----------- defined in machine/r2crypt.c -----------*/

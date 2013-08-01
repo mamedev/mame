@@ -4,6 +4,7 @@
 
 *******************************************************************************/
 
+#include "audio/seibu.h"
 #include "video/bufsprite.h"
 
 class raiden_state : public driver_device
@@ -12,6 +13,7 @@ public:
 	raiden_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_seibu_sound(*this, "seibu_sound"),
 		m_spriteram(*this, "spriteram"),
 		m_shared_ram(*this, "shared_ram"),
 		m_videoram(*this, "videoram"),
@@ -21,6 +23,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<seibu_sound_device> m_seibu_sound;
 	required_device<buffered_spriteram16_device> m_spriteram;
 	required_shared_ptr<UINT16> m_shared_ram;
 	required_shared_ptr<UINT16> m_videoram;

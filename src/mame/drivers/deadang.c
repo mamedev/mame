@@ -38,11 +38,10 @@ Dip locations and factory settings verified with US manual
 
 #include "emu.h"
 #include "cpu/nec/nec.h"
-#include "audio/seibu.h"
 #include "sound/2203intf.h"
 #include "sound/msm5205.h"
 #include "includes/deadang.h"
-#include "drivlgcy.h"
+
 
 /* Read/Write Handlers */
 
@@ -62,7 +61,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, deadang_state )
 	AM_RANGE(0x03800, 0x03fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x04000, 0x04fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x05000, 0x05fff) AM_WRITEONLY
-	AM_RANGE(0x06000, 0x0600f) AM_READWRITE_LEGACY(seibu_main_word_r, seibu_main_word_w)
+	AM_RANGE(0x06000, 0x0600f) AM_DEVREADWRITE("seibu_sound", seibu_sound_device, main_word_r, main_word_w)
 	AM_RANGE(0x06010, 0x07fff) AM_WRITEONLY
 	AM_RANGE(0x08000, 0x087ff) AM_WRITE(deadang_text_w) AM_SHARE("videoram")
 	AM_RANGE(0x08800, 0x0bfff) AM_WRITEONLY
@@ -246,8 +245,6 @@ static MACHINE_CONFIG_START( deadang, deadang_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60)) // the game stops working with higher interleave rates..
 
-	MCFG_MACHINE_RESET(seibu_sound)
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -412,16 +409,16 @@ ROM_END
 
 DRIVER_INIT_MEMBER(deadang_state,deadang)
 {
-	seibu_sound_decrypt(machine(), "audiocpu", 0x2000);
-	seibu_adpcm_decrypt(machine(), "adpcm1");
-	seibu_adpcm_decrypt(machine(), "adpcm2");
+	m_seibu_sound->decrypt("audiocpu", 0x2000);
+	m_adpcm1->decrypt("adpcm1");
+	m_adpcm2->decrypt("adpcm2");
 }
 
 DRIVER_INIT_MEMBER(deadang_state,ghunter)
 {
-	seibu_sound_decrypt(machine(), "audiocpu", 0x2000);
-	seibu_adpcm_decrypt(machine(), "adpcm1");
-	seibu_adpcm_decrypt(machine(), "adpcm2");
+	m_seibu_sound->decrypt("audiocpu", 0x2000);
+	m_adpcm1->decrypt("adpcm1");
+	m_adpcm2->decrypt("adpcm2");
 
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80000, 0x80001, read16_delegate(FUNC(deadang_state::ghunter_trackball_low_r),this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xb0000, 0xb0001, read16_delegate(FUNC(deadang_state::ghunter_trackball_high_r),this));

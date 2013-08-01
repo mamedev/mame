@@ -39,8 +39,12 @@
 #include "sound/2203intf.h"
 #include "sound/okiadpcm.h"
 #include "sound/okim6295.h"
-#include "devlegcy.h"
 
+
+
+/***************************************************************************
+	Seibu Sound System
+***************************************************************************/
 
 /*
     Games using encrypted sound cpu:
@@ -69,6 +73,66 @@
     00002CA2: 17 37
 */
 
+const device_type SEIBU_SOUND = &device_creator<seibu_sound_device>;
+
+seibu_sound_device::seibu_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, SEIBU_SOUND, "Seibu Sound System", tag, owner, clock, "seibu_sound", __FILE__),
+		m_main2sub_pending(0),
+		m_sub2main_pending(0)
+{
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void seibu_sound_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void seibu_sound_device::device_start()
+{
+	m_main2sub[0] = m_main2sub[1] = 0;
+	m_sub2main[0] = m_sub2main[1] = 0;
+	
+	save_item(NAME(m_main2sub_pending));
+	save_item(NAME(m_sub2main_pending));
+	
+	save_item(NAME(m_main2sub));
+	save_item(NAME(m_sub2main));
+	
+	for (int i = 0; i < 2; i++)
+	{
+		save_item(NAME(m_main2sub[i]), i);
+		save_item(NAME(m_sub2main[i]), i);
+	}
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void seibu_sound_device::device_reset()
+{
+	int romlength = machine().root_device().memregion("audiocpu")->bytes();
+	UINT8 *rom = machine().root_device().memregion("audiocpu")->base();
+
+	m_sound_cpu = machine().device("audiocpu");
+	update_irq_lines(VECTOR_INIT);
+	if (romlength > 0x10000)
+	{
+		machine().root_device().membank("bank1")->configure_entries(0, (romlength - 0x10000) / 0x8000, rom + 0x10000, 0x8000);
+
+		/* Denjin Makai definitely needs this at start-up, it never writes to the bankswitch */
+		machine().root_device().membank("bank1")->set_entry(0);
+	}
+}
 
 static UINT8 decrypt_data(int a,int src)
 {
@@ -103,11 +167,11 @@ static UINT8 decrypt_opcode(int a,int src)
 	return src;
 }
 
-void seibu_sound_decrypt(running_machine &machine,const char *cpu,int length)
+void seibu_sound_device::decrypt(const char *cpu,int length)
 {
-	address_space &space = machine.device(cpu)->memory().space(AS_PROGRAM);
-	UINT8 *decrypt = auto_alloc_array(machine, UINT8, length);
-	UINT8 *rom = machine.root_device().memregion(cpu)->base();
+	address_space &space = machine().device(cpu)->memory().space(AS_PROGRAM);
+	UINT8 *decrypt = auto_alloc_array_clear(machine(), UINT8, length);
+	UINT8 *rom = machine().root_device().memregion(cpu)->base();
 	int i;
 
 	space.set_decrypted_region(0x0000, (length < 0x10000) ? (length - 1) : 0x1fff, decrypt);
@@ -121,147 +185,10 @@ void seibu_sound_decrypt(running_machine &machine,const char *cpu,int length)
 	}
 
 	if (length > 0x10000)
-		machine.root_device().membank("bank1")->configure_decrypted_entries(0, (length - 0x10000) / 0x8000, decrypt + 0x10000, 0x8000);
+		machine().root_device().membank("bank1")->configure_decrypted_entries(0, (length - 0x10000) / 0x8000, decrypt + 0x10000, 0x8000);
 }
 
-
-/***************************************************************************/
-
-/*
-    Handlers for early Seibu/Tad games with dual channel ADPCM
-*/
-
-const seibu_adpcm_interface seibu_adpcm1_intf =
-{
-	"adpcm1"
-};
-
-const seibu_adpcm_interface seibu_adpcm2_intf =
-{
-	"adpcm2"
-};
-
-struct seibu_adpcm_state
-{
-	oki_adpcm_state m_adpcm;
-	sound_stream *m_stream;
-	UINT32 m_current;
-	UINT32 m_end;
-	UINT8 m_nibble;
-	UINT8 m_playing;
-	UINT8 m_allocated;
-	UINT8 *m_base;
-};
-
-static STREAM_UPDATE( seibu_adpcm_callback )
-{
-	seibu_adpcm_state *state = (seibu_adpcm_state *)param;
-	stream_sample_t *dest = outputs[0];
-
-	while (state->m_playing && samples > 0)
-	{
-		int val = (state->m_base[state->m_current] >> state->m_nibble) & 15;
-
-		state->m_nibble ^= 4;
-		if (state->m_nibble == 4)
-		{
-			state->m_current++;
-			if (state->m_current >= state->m_end)
-				state->m_playing = 0;
-		}
-
-		*dest++ = state->m_adpcm.clock(val) << 4;
-		samples--;
-	}
-	while (samples > 0)
-	{
-		*dest++ = 0;
-		samples--;
-	}
-}
-
-static DEVICE_START( seibu_adpcm )
-{
-	running_machine &machine = device->machine();
-	seibu_adpcm_state *state = (seibu_adpcm_state *)downcast<seibu_adpcm_device *>(device)->token();
-	const seibu_adpcm_interface *intf;
-
-	intf = (const seibu_adpcm_interface *)device->static_config();
-
-	state->m_playing = 0;
-	state->m_stream = device->machine().sound().stream_alloc(*device, 0, 1, device->clock(), state, seibu_adpcm_callback);
-	state->m_base = machine.root_device().memregion(intf->rom_region)->base();
-	state->m_adpcm.reset();
-}
-
-// "decrypt" is a bit flowery here, as it's probably just line-swapping to
-// simplify PCB layout/routing rather than intentional protection, but it
-// still fits, especially since the Z80s for all these games are truly encrypted.
-
-void seibu_adpcm_decrypt(running_machine &machine, const char *region)
-{
-	UINT8 *ROM = machine.root_device().memregion(region)->base();
-	int len = machine.root_device().memregion(region)->bytes();
-	int i;
-
-	for (i = 0; i < len; i++)
-	{
-		ROM[i] = BITSWAP8(ROM[i], 7, 5, 3, 1, 6, 4, 2, 0);
-	}
-}
-
-WRITE8_DEVICE_HANDLER( seibu_adpcm_adr_w )
-{
-	seibu_adpcm_state *state = (seibu_adpcm_state *)downcast<seibu_adpcm_device *>(device)->token();
-
-	if (state->m_stream)
-		state->m_stream->update();
-	if (offset)
-	{
-		state->m_end = data<<8;
-	}
-	else
-	{
-		state->m_current = data<<8;
-		state->m_nibble = 4;
-	}
-}
-
-WRITE8_DEVICE_HANDLER( seibu_adpcm_ctl_w )
-{
-	seibu_adpcm_state *state = (seibu_adpcm_state *)downcast<seibu_adpcm_device *>(device)->token();
-
-	// sequence is 00 02 01 each time.
-	if (state->m_stream)
-		state->m_stream->update();
-	switch (data)
-	{
-		case 0:
-			state->m_playing = 0;
-			break;
-		case 2:
-			break;
-		case 1:
-			state->m_playing = 1;
-			break;
-
-	}
-}
-
-/***************************************************************************/
-
-static device_t *sound_cpu;
-
-enum
-{
-	VECTOR_INIT,
-	RST10_ASSERT,
-	RST10_CLEAR,
-	RST18_ASSERT,
-	RST18_CLEAR
-};
-
-static void update_irq_lines(running_machine &machine, int param)
+void seibu_sound_device::update_irq_lines(int param)
 {
 	static int irq1,irq2;
 
@@ -288,116 +215,97 @@ static void update_irq_lines(running_machine &machine, int param)
 			break;
 	}
 
-	if ((irq1 & irq2) == 0xff)  /* no IRQs pending */
-		sound_cpu->execute().set_input_line(0,CLEAR_LINE);
-	else    /* IRQ pending */
-		sound_cpu->execute().set_input_line_and_vector(0,ASSERT_LINE,irq1 & irq2);
-}
+	if (m_sound_cpu != NULL)
+			if ((irq1 & irq2) == 0xff)  /* no IRQs pending */
+				m_sound_cpu->execute().set_input_line(0,CLEAR_LINE);
+			else    /* IRQ pending */
+				m_sound_cpu->execute().set_input_line_and_vector(0,ASSERT_LINE,irq1 & irq2);
+	else
+	return;
+	}	
+	
 
-WRITE8_HANDLER( seibu_irq_clear_w )
+WRITE8_MEMBER( seibu_sound_device::irq_clear_w )
 {
 	/* Denjin Makai and SD Gundam doesn't like this, it's tied to the rst18 ack ONLY so it could be related to it. */
-	//update_irq_lines(space.machine(), VECTOR_INIT);
+	//update_irq_lines(VECTOR_INIT);
 }
 
-WRITE8_HANDLER( seibu_rst10_ack_w )
+WRITE8_MEMBER( seibu_sound_device::rst10_ack_w )
 {
 	/* Unused for now */
 }
 
-WRITE8_HANDLER( seibu_rst18_ack_w )
+WRITE8_MEMBER( seibu_sound_device::rst18_ack_w )
 {
-	update_irq_lines(space.machine(), RST18_CLEAR);
+	update_irq_lines(RST18_CLEAR);
 }
 
-void seibu_ym3812_irqhandler(device_t *device, int linestate)
+void seibu_sound_device::ym3812_irqhandler(int linestate)
 {
-	update_irq_lines(device->machine(), linestate ? RST10_ASSERT : RST10_CLEAR);
+	update_irq_lines(linestate ? RST10_ASSERT : RST10_CLEAR);
 }
 
-WRITE_LINE_DEVICE_HANDLER( seibu_ym2151_irqhandler )
+WRITE_LINE_MEMBER( seibu_sound_device::ym2151_irqhandler )
 {
-	update_irq_lines(device->machine(), state ? RST10_ASSERT : RST10_CLEAR);
+	update_irq_lines(state ? RST10_ASSERT : RST10_CLEAR);
 }
 
-void seibu_ym2203_irqhandler(device_t *device, int linestate)
+void seibu_sound_device::ym2203_irqhandler(int linestate)
 {
-	update_irq_lines(device->machine(), linestate ? RST10_ASSERT : RST10_CLEAR);
+	update_irq_lines(linestate ? RST10_ASSERT : RST10_CLEAR);
 }
 
-/***************************************************************************/
-
-MACHINE_RESET( seibu_sound )
-{
-	int romlength = machine.root_device().memregion("audiocpu")->bytes();
-	UINT8 *rom = machine.root_device().memregion("audiocpu")->base();
-
-	sound_cpu = machine.device("audiocpu");
-	update_irq_lines(machine, VECTOR_INIT);
-	if (romlength > 0x10000)
-	{
-		machine.root_device().membank("bank1")->configure_entries(0, (romlength - 0x10000) / 0x8000, rom + 0x10000, 0x8000);
-
-		/* Denjin Makai definitely needs this at start-up, it never writes to the bankswitch */
-		machine.root_device().membank("bank1")->set_entry(0);
-	}
-}
-
-/***************************************************************************/
-
-static UINT8 main2sub[2],sub2main[2];
-static int main2sub_pending,sub2main_pending;
-
-WRITE8_HANDLER( seibu_bank_w )
+WRITE8_MEMBER( seibu_sound_device::bank_w )
 {
 	space.machine().root_device().membank("bank1")->set_entry(data & 1);
 }
 
-WRITE8_HANDLER( seibu_coin_w )
+WRITE8_MEMBER( seibu_sound_device::coin_w )
 {
 	coin_counter_w(space.machine(), 0,data & 1);
 	coin_counter_w(space.machine(), 1,data & 2);
 }
 
-READ8_HANDLER( seibu_soundlatch_r )
+READ8_MEMBER( seibu_sound_device::soundlatch_r )
 {
-	return main2sub[offset];
+	return m_main2sub[offset];
 }
 
-READ8_HANDLER( seibu_main_data_pending_r )
+READ8_MEMBER( seibu_sound_device::main_data_pending_r )
 {
-	return sub2main_pending ? 1 : 0;
+	return m_sub2main_pending ? 1 : 0;
 }
 
-WRITE8_HANDLER( seibu_main_data_w )
+WRITE8_MEMBER( seibu_sound_device::main_data_w )
 {
-	sub2main[offset] = data;
+	m_sub2main[offset] = data;
 }
 
-static WRITE8_HANDLER( seibu_pending_w )
+WRITE8_MEMBER( seibu_sound_device::pending_w )
 {
 	/* just a guess */
-	main2sub_pending = 0;
-	sub2main_pending = 1;
+	m_main2sub_pending = 0;
+	m_sub2main_pending = 1;
 }
 
-READ16_HANDLER( seibu_main_word_r )
+READ16_MEMBER( seibu_sound_device::main_word_r )
 {
 	//logerror("%06x: seibu_main_word_r(%x)\n",space.device().safe_pc(),offset);
 	switch (offset)
 	{
 		case 2:
 		case 3:
-			return sub2main[offset-2];
+			return m_sub2main[offset-2];
 		case 5:
-			return main2sub_pending ? 1 : 0;
+			return m_main2sub_pending ? 1 : 0;
 		default:
 			//logerror("%06x: seibu_main_word_r(%x)\n",space.device().safe_pc(),offset);
 			return 0xffff;
 	}
 }
 
-WRITE16_HANDLER( seibu_main_word_w )
+WRITE16_MEMBER( seibu_sound_device::main_word_w )
 {
 	//printf("%06x: seibu_main_word_w(%x,%02x)\n",space.device().safe_pc(),offset,data);
 	if (ACCESSING_BITS_0_7)
@@ -406,16 +314,16 @@ WRITE16_HANDLER( seibu_main_word_w )
 		{
 			case 0:
 			case 1:
-				main2sub[offset] = data;
+				m_main2sub[offset] = data;
 				break;
 			case 4:
-				update_irq_lines(space.machine(), RST18_ASSERT);
+				update_irq_lines(RST18_ASSERT);
 				break;
 			case 2: //Sengoku Mahjong writes here
 			case 6:
 				/* just a guess */
-				sub2main_pending = 0;
-				main2sub_pending = 1;
+				m_sub2main_pending = 0;
+				m_main2sub_pending = 1;
 				break;
 			default:
 				//logerror("%06x: seibu_main_word_w(%x,%02x)\n",space.device().safe_pc(),offset,data);
@@ -424,24 +332,24 @@ WRITE16_HANDLER( seibu_main_word_w )
 	}
 }
 
-READ8_HANDLER( seibu_main_v30_r )
+READ8_MEMBER( seibu_sound_device::main_v30_r )
 {
-	return seibu_main_word_r(space,offset/2,0xffff) >> (8 * (offset & 1));
+	return main_word_r(space,offset/2,0xffff) >> (8 * (offset & 1));
 }
 
-WRITE8_HANDLER( seibu_main_v30_w )
+WRITE8_MEMBER( seibu_sound_device::main_v30_w )
 {
-	seibu_main_word_w(space,offset/2,data << (8 * (offset & 1)),0x00ff << (8 * (offset & 1)));
+	main_word_w(space,offset/2,data << (8 * (offset & 1)),0x00ff << (8 * (offset & 1)));
 }
 
-WRITE16_HANDLER( seibu_main_mustb_w )
+WRITE16_MEMBER( seibu_sound_device::main_mustb_w )
 {
-	main2sub[0] = data&0xff;
-	main2sub[1] = data>>8;
+	m_main2sub[0] = data&0xff;
+	m_main2sub[1] = data>>8;
 
 //  logerror("seibu_main_mustb_w: %x -> %x %x\n", data, main2sub[0], main2sub[1]);
 
-	update_irq_lines(space.machine(), RST18_ASSERT);
+	update_irq_lines(RST18_ASSERT);
 }
 
 /***************************************************************************/
@@ -458,17 +366,17 @@ const ay8910_interface seibu_ay8910_config =
 ADDRESS_MAP_START( seibu_sound_map, AS_PROGRAM, 8, driver_device )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_WRITE_LEGACY(seibu_pending_w)
-	AM_RANGE(0x4001, 0x4001) AM_WRITE_LEGACY(seibu_irq_clear_w)
-	AM_RANGE(0x4002, 0x4002) AM_WRITE_LEGACY(seibu_rst10_ack_w)
-	AM_RANGE(0x4003, 0x4003) AM_WRITE_LEGACY(seibu_rst18_ack_w)
-	AM_RANGE(0x4007, 0x4007) AM_WRITE_LEGACY(seibu_bank_w)
+	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("seibu_sound", seibu_sound_device, pending_w)
+	AM_RANGE(0x4001, 0x4001) AM_DEVWRITE("seibu_sound", seibu_sound_device, irq_clear_w)
+	AM_RANGE(0x4002, 0x4002) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst10_ack_w)
+	AM_RANGE(0x4003, 0x4003) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst18_ack_w)
+	AM_RANGE(0x4007, 0x4007) AM_DEVWRITE("seibu_sound", seibu_sound_device, bank_w)
 	AM_RANGE(0x4008, 0x4009) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
-	AM_RANGE(0x4010, 0x4011) AM_READ_LEGACY(seibu_soundlatch_r)
-	AM_RANGE(0x4012, 0x4012) AM_READ_LEGACY(seibu_main_data_pending_r)
+	AM_RANGE(0x4010, 0x4011) AM_DEVREAD("seibu_sound", seibu_sound_device, soundlatch_r)
+	AM_RANGE(0x4012, 0x4012) AM_DEVREAD("seibu_sound", seibu_sound_device, main_data_pending_r)
 	AM_RANGE(0x4013, 0x4013) AM_READ_PORT("COIN")
-	AM_RANGE(0x4018, 0x4019) AM_WRITE_LEGACY(seibu_main_data_w)
-	AM_RANGE(0x401b, 0x401b) AM_WRITE_LEGACY(seibu_coin_w)
+	AM_RANGE(0x4018, 0x4019) AM_DEVWRITE("seibu_sound", seibu_sound_device, main_data_w)
+	AM_RANGE(0x401b, 0x401b) AM_DEVWRITE("seibu_sound", seibu_sound_device, coin_w)
 	AM_RANGE(0x6000, 0x6000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
@@ -476,17 +384,17 @@ ADDRESS_MAP_END
 ADDRESS_MAP_START( seibu2_airraid_sound_map, AS_PROGRAM, 8, driver_device )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_WRITE_LEGACY(seibu_pending_w)
-	AM_RANGE(0x4001, 0x4001) AM_WRITE_LEGACY(seibu_irq_clear_w)
-	AM_RANGE(0x4002, 0x4002) AM_WRITE_LEGACY(seibu_rst10_ack_w)
-	AM_RANGE(0x4003, 0x4003) AM_WRITE_LEGACY(seibu_rst18_ack_w)
+	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("seibu_sound", seibu_sound_device, pending_w)
+	AM_RANGE(0x4001, 0x4001) AM_DEVWRITE("seibu_sound", seibu_sound_device, irq_clear_w)
+	AM_RANGE(0x4002, 0x4002) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst10_ack_w)
+	AM_RANGE(0x4003, 0x4003) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst18_ack_w)
 	AM_RANGE(0x4007, 0x4007) AM_WRITENOP // bank, always 0
 	AM_RANGE(0x4008, 0x4009) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x4010, 0x4011) AM_READ_LEGACY(seibu_soundlatch_r)
-	AM_RANGE(0x4012, 0x4012) AM_READ_LEGACY(seibu_main_data_pending_r)
+	AM_RANGE(0x4010, 0x4011) AM_DEVREAD("seibu_sound", seibu_sound_device, soundlatch_r)
+	AM_RANGE(0x4012, 0x4012) AM_DEVREAD("seibu_sound", seibu_sound_device, main_data_pending_r)
 	AM_RANGE(0x4013, 0x4013) AM_READ_PORT("COIN")
-	AM_RANGE(0x4018, 0x4019) AM_WRITE_LEGACY(seibu_main_data_w)
-	AM_RANGE(0x401b, 0x401b) AM_WRITE_LEGACY(seibu_coin_w)
+	AM_RANGE(0x4018, 0x4019) AM_DEVWRITE("seibu_sound", seibu_sound_device, main_data_w)
+	AM_RANGE(0x401b, 0x401b) AM_DEVWRITE("seibu_sound", seibu_sound_device, coin_w)
 //  AM_RANGE(0x6000, 0x6000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -494,17 +402,17 @@ ADDRESS_MAP_END
 ADDRESS_MAP_START( seibu2_sound_map, AS_PROGRAM, 8, driver_device )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_WRITE_LEGACY(seibu_pending_w)
-	AM_RANGE(0x4001, 0x4001) AM_WRITE_LEGACY(seibu_irq_clear_w)
-	AM_RANGE(0x4002, 0x4002) AM_WRITE_LEGACY(seibu_rst10_ack_w)
-	AM_RANGE(0x4003, 0x4003) AM_WRITE_LEGACY(seibu_rst18_ack_w)
-	AM_RANGE(0x4007, 0x4007) AM_WRITE_LEGACY(seibu_bank_w)
+	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("seibu_sound", seibu_sound_device, pending_w)
+	AM_RANGE(0x4001, 0x4001) AM_DEVWRITE("seibu_sound", seibu_sound_device, irq_clear_w)
+	AM_RANGE(0x4002, 0x4002) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst10_ack_w)
+	AM_RANGE(0x4003, 0x4003) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst18_ack_w)
+	AM_RANGE(0x4007, 0x4007) AM_DEVWRITE("seibu_sound", seibu_sound_device, bank_w)
 	AM_RANGE(0x4008, 0x4009) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x4010, 0x4011) AM_READ_LEGACY(seibu_soundlatch_r)
-	AM_RANGE(0x4012, 0x4012) AM_READ_LEGACY(seibu_main_data_pending_r)
+	AM_RANGE(0x4010, 0x4011) AM_DEVREAD("seibu_sound", seibu_sound_device, soundlatch_r)
+	AM_RANGE(0x4012, 0x4012) AM_DEVREAD("seibu_sound", seibu_sound_device, main_data_pending_r)
 	AM_RANGE(0x4013, 0x4013) AM_READ_PORT("COIN")
-	AM_RANGE(0x4018, 0x4019) AM_WRITE_LEGACY(seibu_main_data_w)
-	AM_RANGE(0x401b, 0x401b) AM_WRITE_LEGACY(seibu_coin_w)
+	AM_RANGE(0x4018, 0x4019) AM_DEVWRITE("seibu_sound", seibu_sound_device, main_data_w)
+	AM_RANGE(0x401b, 0x401b) AM_DEVWRITE("seibu_sound", seibu_sound_device, coin_w)
 	AM_RANGE(0x6000, 0x6000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
@@ -512,17 +420,17 @@ ADDRESS_MAP_END
 ADDRESS_MAP_START( seibu2_raiden2_sound_map, AS_PROGRAM, 8, driver_device )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_WRITE_LEGACY(seibu_pending_w)
-	AM_RANGE(0x4001, 0x4001) AM_WRITE_LEGACY(seibu_irq_clear_w)
-	AM_RANGE(0x4002, 0x4002) AM_WRITE_LEGACY(seibu_rst10_ack_w)
-	AM_RANGE(0x4003, 0x4003) AM_WRITE_LEGACY(seibu_rst18_ack_w)
+	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("seibu_sound", seibu_sound_device, pending_w)
+	AM_RANGE(0x4001, 0x4001) AM_DEVWRITE("seibu_sound", seibu_sound_device, irq_clear_w)
+	AM_RANGE(0x4002, 0x4002) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst10_ack_w)
+	AM_RANGE(0x4003, 0x4003) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst18_ack_w)
 	AM_RANGE(0x4008, 0x4009) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x4010, 0x4011) AM_READ_LEGACY(seibu_soundlatch_r)
-	AM_RANGE(0x4012, 0x4012) AM_READ_LEGACY(seibu_main_data_pending_r)
+	AM_RANGE(0x4010, 0x4011) AM_DEVREAD("seibu_sound", seibu_sound_device, soundlatch_r)
+	AM_RANGE(0x4012, 0x4012) AM_DEVREAD("seibu_sound", seibu_sound_device, main_data_pending_r)
 	AM_RANGE(0x4013, 0x4013) AM_READ_PORT("COIN")
-	AM_RANGE(0x4018, 0x4019) AM_WRITE_LEGACY(seibu_main_data_w)
-	AM_RANGE(0x401a, 0x401a) AM_WRITE_LEGACY(seibu_bank_w)
-	AM_RANGE(0x401b, 0x401b) AM_WRITE_LEGACY(seibu_coin_w)
+	AM_RANGE(0x4018, 0x4019) AM_DEVWRITE("seibu_sound", seibu_sound_device, main_data_w)
+	AM_RANGE(0x401a, 0x401a) AM_DEVWRITE("seibu_sound", seibu_sound_device, bank_w)
+	AM_RANGE(0x401b, 0x401b) AM_DEVWRITE("seibu_sound", seibu_sound_device, coin_w)
 	AM_RANGE(0x6000, 0x6000) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
 	AM_RANGE(0x6002, 0x6002) AM_DEVREADWRITE("oki2", okim6295_device, read, write)
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
@@ -533,17 +441,17 @@ ADDRESS_MAP_END
 ADDRESS_MAP_START( seibu_newzeroteam_sound_map, AS_PROGRAM, 8, driver_device )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_WRITE_LEGACY(seibu_pending_w)
-	AM_RANGE(0x4001, 0x4001) AM_WRITE_LEGACY(seibu_irq_clear_w)
-	AM_RANGE(0x4002, 0x4002) AM_WRITE_LEGACY(seibu_rst10_ack_w)
-	AM_RANGE(0x4003, 0x4003) AM_WRITE_LEGACY(seibu_rst18_ack_w)
+	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("seibu_sound", seibu_sound_device, pending_w)
+	AM_RANGE(0x4001, 0x4001) AM_DEVWRITE("seibu_sound", seibu_sound_device, irq_clear_w)
+	AM_RANGE(0x4002, 0x4002) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst10_ack_w)
+	AM_RANGE(0x4003, 0x4003) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst18_ack_w)
 	AM_RANGE(0x4008, 0x4009) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
-	AM_RANGE(0x4010, 0x4011) AM_READ_LEGACY(seibu_soundlatch_r)
-	AM_RANGE(0x4012, 0x4012) AM_READ_LEGACY(seibu_main_data_pending_r)
+	AM_RANGE(0x4010, 0x4011) AM_DEVREAD("seibu_sound", seibu_sound_device, soundlatch_r)
+	AM_RANGE(0x4012, 0x4012) AM_DEVREAD("seibu_sound", seibu_sound_device, main_data_pending_r)
 	AM_RANGE(0x4013, 0x4013) AM_READ_PORT("COIN")
-	AM_RANGE(0x4018, 0x4019) AM_WRITE_LEGACY(seibu_main_data_w)
-	AM_RANGE(0x401a, 0x401a) AM_WRITE_LEGACY(seibu_bank_w)
-	AM_RANGE(0x401b, 0x401b) AM_WRITE_LEGACY(seibu_coin_w)
+	AM_RANGE(0x4018, 0x4019) AM_DEVWRITE("seibu_sound", seibu_sound_device, main_data_w)
+	AM_RANGE(0x401a, 0x401a) AM_DEVWRITE("seibu_sound", seibu_sound_device, bank_w)
+	AM_RANGE(0x401b, 0x401b) AM_DEVWRITE("seibu_sound", seibu_sound_device, coin_w)
 	AM_RANGE(0x6000, 0x6000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
@@ -551,17 +459,17 @@ ADDRESS_MAP_END
 ADDRESS_MAP_START( seibu3_sound_map, AS_PROGRAM, 8, driver_device )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_WRITE_LEGACY(seibu_pending_w)
-	AM_RANGE(0x4001, 0x4001) AM_WRITE_LEGACY(seibu_irq_clear_w)
-	AM_RANGE(0x4002, 0x4002) AM_WRITE_LEGACY(seibu_rst10_ack_w)
-	AM_RANGE(0x4003, 0x4003) AM_WRITE_LEGACY(seibu_rst18_ack_w)
-	AM_RANGE(0x4007, 0x4007) AM_WRITE_LEGACY(seibu_bank_w)
+	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("seibu_sound", seibu_sound_device, pending_w)
+	AM_RANGE(0x4001, 0x4001) AM_DEVWRITE("seibu_sound", seibu_sound_device, irq_clear_w)
+	AM_RANGE(0x4002, 0x4002) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst10_ack_w)
+	AM_RANGE(0x4003, 0x4003) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst18_ack_w)
+	AM_RANGE(0x4007, 0x4007) AM_DEVWRITE("seibu_sound", seibu_sound_device, bank_w)
 	AM_RANGE(0x4008, 0x4009) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
-	AM_RANGE(0x4010, 0x4011) AM_READ_LEGACY(seibu_soundlatch_r)
-	AM_RANGE(0x4012, 0x4012) AM_READ_LEGACY(seibu_main_data_pending_r)
+	AM_RANGE(0x4010, 0x4011) AM_DEVREAD("seibu_sound", seibu_sound_device, soundlatch_r)
+	AM_RANGE(0x4012, 0x4012) AM_DEVREAD("seibu_sound", seibu_sound_device, main_data_pending_r)
 	AM_RANGE(0x4013, 0x4013) AM_READ_PORT("COIN")
-	AM_RANGE(0x4018, 0x4019) AM_WRITE_LEGACY(seibu_main_data_w)
-	AM_RANGE(0x401b, 0x401b) AM_WRITE_LEGACY(seibu_coin_w)
+	AM_RANGE(0x4018, 0x4019) AM_DEVWRITE("seibu_sound", seibu_sound_device, main_data_w)
+	AM_RANGE(0x401b, 0x401b) AM_DEVWRITE("seibu_sound", seibu_sound_device, coin_w)
 	AM_RANGE(0x6008, 0x6009) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
@@ -569,33 +477,42 @@ ADDRESS_MAP_END
 ADDRESS_MAP_START( seibu3_adpcm_sound_map, AS_PROGRAM, 8, driver_device )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_WRITE_LEGACY(seibu_pending_w)
-	AM_RANGE(0x4001, 0x4001) AM_WRITE_LEGACY(seibu_irq_clear_w)
-	AM_RANGE(0x4002, 0x4002) AM_WRITE_LEGACY(seibu_rst10_ack_w)
-	AM_RANGE(0x4003, 0x4003) AM_WRITE_LEGACY(seibu_rst18_ack_w)
-	AM_RANGE(0x4005, 0x4006) AM_DEVWRITE_LEGACY("adpcm1", seibu_adpcm_adr_w)
-	AM_RANGE(0x4007, 0x4007) AM_WRITE_LEGACY(seibu_bank_w)
+	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("seibu_sound", seibu_sound_device, pending_w)
+	AM_RANGE(0x4001, 0x4001) AM_DEVWRITE("seibu_sound", seibu_sound_device, irq_clear_w)
+	AM_RANGE(0x4002, 0x4002) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst10_ack_w)
+	AM_RANGE(0x4003, 0x4003) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst18_ack_w)
+	AM_RANGE(0x4005, 0x4006) AM_DEVWRITE("adpcm1", seibu_adpcm_device, adr_w)
+	AM_RANGE(0x4007, 0x4007) AM_DEVWRITE("seibu_sound", seibu_sound_device, bank_w)
 	AM_RANGE(0x4008, 0x4009) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
-	AM_RANGE(0x4010, 0x4011) AM_READ_LEGACY(seibu_soundlatch_r)
-	AM_RANGE(0x4012, 0x4012) AM_READ_LEGACY(seibu_main_data_pending_r)
+	AM_RANGE(0x4010, 0x4011) AM_DEVREAD("seibu_sound", seibu_sound_device, soundlatch_r)
+	AM_RANGE(0x4012, 0x4012) AM_DEVREAD("seibu_sound", seibu_sound_device, main_data_pending_r)
 	AM_RANGE(0x4013, 0x4013) AM_READ_PORT("COIN")
-	AM_RANGE(0x4018, 0x4019) AM_WRITE_LEGACY(seibu_main_data_w)
-	AM_RANGE(0x401a, 0x401a) AM_DEVWRITE_LEGACY("adpcm1", seibu_adpcm_ctl_w)
-	AM_RANGE(0x401b, 0x401b) AM_WRITE_LEGACY(seibu_coin_w)
-	AM_RANGE(0x6005, 0x6006) AM_DEVWRITE_LEGACY("adpcm2", seibu_adpcm_adr_w)
+	AM_RANGE(0x4018, 0x4019) AM_DEVWRITE("seibu_sound", seibu_sound_device, main_data_w)
+	AM_RANGE(0x401a, 0x401a) AM_DEVWRITE("adpcm1", seibu_adpcm_device, ctl_w)
+	AM_RANGE(0x401b, 0x401b) AM_DEVWRITE("seibu_sound", seibu_sound_device, coin_w)
+	AM_RANGE(0x6005, 0x6006) AM_DEVWRITE("adpcm2", seibu_adpcm_device, adr_w)
 	AM_RANGE(0x6008, 0x6009) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
-	AM_RANGE(0x601a, 0x601a) AM_DEVWRITE_LEGACY("adpcm2", seibu_adpcm_ctl_w)
+	AM_RANGE(0x601a, 0x601a) AM_DEVWRITE("adpcm2", seibu_adpcm_device, ctl_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
+/***************************************************************************
+	Seibu ADPCM device
+***************************************************************************/
 
 const device_type SEIBU_ADPCM = &device_creator<seibu_adpcm_device>;
 
 seibu_adpcm_device::seibu_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SEIBU_ADPCM, "Seibu ADPCM", tag, owner, clock, "seibu_adpcm", __FILE__),
-		device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this),
+		m_stream(NULL),
+		m_current(0),
+		m_end(0),
+		m_nibble(0),
+		m_playing(0),
+		m_allocated(0),
+		m_base(NULL)
 {
-	m_token = global_alloc_clear(seibu_adpcm_state);
 }
 
 //-------------------------------------------------
@@ -606,6 +523,16 @@ seibu_adpcm_device::seibu_adpcm_device(const machine_config &mconfig, const char
 
 void seibu_adpcm_device::device_config_complete()
 {
+	// inherit a copy of the static data
+	const seibu_adpcm_interface *intf = reinterpret_cast<const seibu_adpcm_interface *>(static_config());
+	if (intf != NULL)
+		*static_cast<seibu_adpcm_interface *>(this) = *intf;
+
+	// or initialize to defaults if none provided
+	else
+	{
+		m_rom_region = "";
+	}
 }
 
 //-------------------------------------------------
@@ -614,8 +541,62 @@ void seibu_adpcm_device::device_config_complete()
 
 void seibu_adpcm_device::device_start()
 {
-	DEVICE_START_NAME( seibu_adpcm )(this);
+	m_playing = 0;
+	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock(), this);
+	m_base = machine().root_device().memregion(m_rom_region)->base();
+	m_adpcm.reset();
 }
+
+// "decrypt" is a bit flowery here, as it's probably just line-swapping to
+// simplify PCB layout/routing rather than intentional protection, but it
+// still fits, especially since the Z80s for all these games are truly encrypted.
+
+void seibu_adpcm_device::decrypt(const char *region)
+{
+	UINT8 *ROM = machine().root_device().memregion(region)->base();
+	int len = machine().root_device().memregion(region)->bytes();
+	int i;
+
+	for (i = 0; i < len; i++)
+	{
+		ROM[i] = BITSWAP8(ROM[i], 7, 5, 3, 1, 6, 4, 2, 0);
+	}
+}
+
+WRITE8_MEMBER( seibu_adpcm_device::adr_w )
+{
+	if (m_stream)
+		m_stream->update();
+	if (offset)
+	{
+		m_end = data<<8;
+	}
+	else
+	{
+		m_current = data<<8;
+		m_nibble = 4;
+	}
+}
+
+WRITE8_MEMBER( seibu_adpcm_device::ctl_w )
+{
+	// sequence is 00 02 01 each time.
+	if (m_stream)
+		m_stream->update();
+	switch (data)
+	{
+		case 0:
+			m_playing = 0;
+			break;
+		case 2:
+			break;
+		case 1:
+			m_playing = 1;
+			break;
+
+	}
+}
+
 
 //-------------------------------------------------
 //  sound_stream_update - handle a stream update
@@ -623,6 +604,39 @@ void seibu_adpcm_device::device_start()
 
 void seibu_adpcm_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	// should never get here
-	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+	stream_sample_t *dest = outputs[0];
+
+	while (m_playing && samples > 0)
+	{
+		int val = (m_base[m_current] >> m_nibble) & 15;
+
+		m_nibble ^= 4;
+		if (m_nibble == 4)
+		{
+			m_current++;
+			if (m_current >= m_end)
+				m_playing = 0;
+		}
+
+		*dest++ = m_adpcm.clock(val) << 4;
+		samples--;
+	}
+	while (samples > 0)
+	{
+		*dest++ = 0;
+		samples--;
+	}
 }
+
+//  Handlers for early Seibu/Tad games with dual channel ADPCM
+
+
+const seibu_adpcm_interface seibu_adpcm1_intf =
+{
+	"adpcm1"
+};
+
+const seibu_adpcm_interface seibu_adpcm2_intf =
+{
+	"adpcm2"
+};

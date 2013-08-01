@@ -94,12 +94,14 @@ public:
 	cshooter_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_seibu_sound(*this, "seibu_sound"),
 		m_txram(*this, "txram"),
 		m_mainram(*this, "mainram"),
 		m_spriteram(*this, "spriteram")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
+	optional_device<seibu_sound_device> m_seibu_sound;
 	required_shared_ptr<UINT8> m_txram;
 	optional_shared_ptr<UINT8> m_mainram;
 	optional_shared_ptr<UINT8> m_spriteram;
@@ -121,7 +123,6 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	DECLARE_MACHINE_RESET(cshooter);
-	DECLARE_MACHINE_RESET(airraid);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_cshooter(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_airraid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -250,11 +251,6 @@ MACHINE_RESET_MEMBER(cshooter_state,cshooter)
 	m_counter = 0;
 }
 
-MACHINE_RESET_MEMBER(cshooter_state,airraid)
-{
-	MACHINE_RESET_CALL_LEGACY(seibu_sound);
-}
-
 READ8_MEMBER(cshooter_state::cshooter_coin_r)
 {
 	/* Even reads must return 0xff - Odd reads must return the contents of input port 5.
@@ -279,12 +275,12 @@ WRITE8_MEMBER(cshooter_state::bank_w)
 
 READ8_MEMBER(cshooter_state::seibu_sound_comms_r)
 {
-	return seibu_main_word_r(space,offset,0x00ff);
+	return m_seibu_sound->main_word_r(space,offset,0x00ff);
 }
 
 WRITE8_MEMBER(cshooter_state::seibu_sound_comms_w)
 {
-	seibu_main_word_w(space,offset,data,0x00ff);
+	m_seibu_sound->main_word_w(space,offset,data,0x00ff);
 }
 
 #if 0
@@ -469,7 +465,7 @@ static MACHINE_CONFIG_START( cshooter, cshooter_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_MACHINE_RESET_OVERRIDE(cshooter_state,cshooter)
-
+	
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -483,6 +479,8 @@ static MACHINE_CONFIG_START( cshooter, cshooter_state )
 
 	/* sound hardware */
 	/* YM2151 and ym3931 seibu custom cpu running at XTAL_14_31818MHz/4 */
+	MCFG_SEIBU_SOUND_ADD("seibu_sound")
+	
 MACHINE_CONFIG_END
 #endif
 
@@ -496,8 +494,6 @@ static MACHINE_CONFIG_START( airraid, cshooter_state )
 	SEIBU2_AIRRAID_SOUND_SYSTEM_CPU(XTAL_14_31818MHz/4)      /* verified on pcb */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
-
-	MCFG_MACHINE_RESET_OVERRIDE(cshooter_state,airraid)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -678,7 +674,7 @@ DRIVER_INIT_MEMBER(cshooter_state,cshootere)
 	}
 
 	membank("bank1")->set_base(&memregion("user1")->base()[0]);
-	seibu_sound_decrypt(machine(),"audiocpu",0x2000);
+	m_seibu_sound->decrypt("audiocpu",0x2000);
 }
 
 

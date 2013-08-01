@@ -50,12 +50,10 @@
 #include "emu.h"
 #include "cpu/nec/nec.h"
 #include "cpu/z80/z80.h"
-#include "audio/seibu.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
 #include "includes/raiden.h"
 #include "video/seibu_crtc.h"
-#include "drivlgcy.h"
 
 
 /******************************************************************************/
@@ -64,7 +62,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, raiden_state )
 	AM_RANGE(0x00000, 0x06fff) AM_RAM
 	AM_RANGE(0x07000, 0x07fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x08000, 0x08fff) AM_RAM AM_SHARE("shared_ram")
-	AM_RANGE(0x0a000, 0x0a00d) AM_READWRITE_LEGACY(seibu_main_word_r, seibu_main_word_w)
+	AM_RANGE(0x0a000, 0x0a00d) AM_DEVREADWRITE("seibu_sound", seibu_sound_device, main_word_r, main_word_w)
 	AM_RANGE(0x0c000, 0x0c7ff) AM_WRITE(raiden_text_w) AM_SHARE("videoram")
 	AM_RANGE(0x0e000, 0x0e001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x0e002, 0x0e003) AM_READ_PORT("DSW")
@@ -99,7 +97,7 @@ static ADDRESS_MAP_START( raidenu_main_map, AS_PROGRAM, 16, raiden_state )
 	AM_RANGE(0x0b004, 0x0b005) AM_WRITENOP // watchdog?
 	AM_RANGE(0x0b006, 0x0b007) AM_WRITE8(raiden_control_w, 0x00ff)
 	AM_RANGE(0x0c000, 0x0c7ff) AM_WRITE(raiden_text_w) AM_SHARE("videoram")
-	AM_RANGE(0x0d000, 0x0d00d) AM_READWRITE_LEGACY(seibu_main_word_r, seibu_main_word_w)
+	AM_RANGE(0x0d000, 0x0d00d) AM_DEVREADWRITE("seibu_sound", seibu_sound_device, main_word_r, main_word_w)
 	AM_RANGE(0xa0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -126,7 +124,7 @@ static ADDRESS_MAP_START( raidenb_main_map, AS_PROGRAM, 16, raiden_state )
 	AM_RANGE(0x0b004, 0x0b005) AM_WRITENOP // watchdog?
 	AM_RANGE(0x0b006, 0x0b007) AM_WRITE8(raidenb_control_w, 0x00ff)
 	AM_RANGE(0x0c000, 0x0c7ff) AM_WRITE(raiden_text_w) AM_SHARE("videoram")
-	AM_RANGE(0x0d000, 0x0d00d) AM_READWRITE_LEGACY(seibu_main_word_r, seibu_main_word_w)
+	AM_RANGE(0x0d000, 0x0d00d) AM_DEVREADWRITE("seibu_sound", seibu_sound_device, main_word_r, main_word_w)
 	AM_RANGE(0x0d040, 0x0d08f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
 	AM_RANGE(0xa0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
@@ -280,8 +278,6 @@ static MACHINE_CONFIG_START( raiden, raiden_state )
 	SEIBU_SOUND_SYSTEM_CPU(XTAL_14_31818MHz/4) /* verified on pcb */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
-
-	MCFG_MACHINE_RESET(seibu_sound)
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
@@ -620,7 +616,7 @@ void raiden_state::common_decrypt()
 DRIVER_INIT_MEMBER(raiden_state,raiden)
 {
 	common_decrypt();
-	seibu_sound_decrypt(machine(),"audiocpu",0x20000);
+	m_seibu_sound->decrypt("audiocpu",0x20000);
 }
 
 DRIVER_INIT_MEMBER(raiden_state,raidenk)
@@ -630,7 +626,7 @@ DRIVER_INIT_MEMBER(raiden_state,raidenk)
 
 DRIVER_INIT_MEMBER(raiden_state,raidenu)
 {
-	seibu_sound_decrypt(machine(),"audiocpu",0x20000);
+	m_seibu_sound->decrypt("audiocpu",0x20000);
 }
 
 

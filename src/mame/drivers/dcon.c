@@ -18,7 +18,7 @@
 #include "audio/seibu.h"
 #include "includes/dcon.h"
 #include "video/seibu_crtc.h"
-#include "drivlgcy.h"
+
 
 /***************************************************************************/
 
@@ -34,7 +34,7 @@ static ADDRESS_MAP_START( dcon_map, AS_PROGRAM, 16, dcon_state )
 	AM_RANGE(0x8f800, 0x8ffff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x9d000, 0x9d7ff) AM_WRITE(dcon_gfxbank_w)
 
-	AM_RANGE(0xa0000, 0xa000d) AM_READWRITE_LEGACY(seibu_main_word_r, seibu_main_word_w)
+	AM_RANGE(0xa0000, 0xa000d) AM_DEVREADWRITE("seibu_sound", seibu_sound_device, main_word_r, main_word_w)
 	AM_RANGE(0xc0000, 0xc004f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
 	AM_RANGE(0xc0080, 0xc0081) AM_WRITENOP
 	AM_RANGE(0xc00c0, 0xc00c1) AM_WRITENOP
@@ -273,8 +273,6 @@ static MACHINE_CONFIG_START( dcon, dcon_state )
 
 	SEIBU_SOUND_SYSTEM_CPU(4000000) /* Perhaps 14318180/4? */
 
-	MCFG_MACHINE_RESET(seibu_sound)
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -300,8 +298,6 @@ static MACHINE_CONFIG_START( sdgndmps, dcon_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dcon_state,  irq4_line_hold)
 
 	SEIBU2_SOUND_SYSTEM_CPU(14318180/4)
-
-	MCFG_MACHINE_RESET(seibu_sound)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
