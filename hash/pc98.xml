@@ -875,20 +875,17 @@ TODO:
 			</dataarea>
 		</part>
 	</software>
-<!--
-3'5 floppy image
 
 	<software name="aishogi">
 		<description>AI Shogi</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1478656">
 				<rom name="main.fdi" size="1265664" crc="5e656df1" sha1="4182f3854eb510df600df606dc6cd949d84adc8c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
--->
 
 	<software name="airduel">
 		<description>Air Duel</description>
@@ -3387,20 +3384,16 @@ TODO:
 		</part>
 	</software>
 
-<!--
-3'5 floppy image
-
 	<software name="chittyc">
 		<description>Chitty Chitty Train</description>
 		<year>1993</year>
 		<publisher>Bit^2</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1265664">
 				<rom name="chitty chitty train (1993)(bit^2).fdi" size="1265664" crc="af527d06" sha1="53b4e459c9eab0c4573021fa6a724125e5e64a8e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
--->
 
 	<software name="choujik">
 		<description>Chou Jikuu Yousai Macross - Remember Me</description>
@@ -4945,19 +4938,17 @@ Presumably copy protection floppy, to be used with CD-Rom
 		</part>
 	</software>
 
-<!-- 
-3'5" image
+ 
 	<software name="dragone">
 		<description>Dragon Egg</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1478656">
 				<rom name="dragon egg (j).fdi" size="1478656" crc="0a7e627e" sha1="e17996299096f60afdbdb3dd41fb31b99d27e7e0" offset="0" />
 			</dataarea>
 		</part>
 	</software>
--->
 
 	<software name="dragonk">
 		<description>Dragon Knight</description>
