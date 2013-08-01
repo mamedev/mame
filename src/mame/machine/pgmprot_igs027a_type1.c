@@ -566,6 +566,7 @@ void pgm_arm_type1_state::command_handler_ddp3(int pc)
 
 static int hackcount = 0;
 static int hackcount2 = 0;
+static int hack_47_value = 0;
 
 void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 {
@@ -706,14 +707,23 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 
 		// 47 and 52 are used to get the images during the intro sequence, different each loop
 		// also some other gfx?
+		// logic here seems correct, not sure where the 0x19 and 0x5 etc. come from tho!
 		case 0x47:
-			printf("which %04x\n", m_value0);
+			hack_47_value = ((m_value0 & 0x0700)>>8) * 0x19;
+			hack_47_value = ((m_value0 & 0x0007)>>0) * 0x05;
+			if (m_value0 & 0xf8f8) printf("unhandled 0x47 bits %04x\n", m_value0);
+
 			m_valueresponse = 0x00740047;
+
 		break;
 
 		case 0x52:
-			printf("which %04x\n", m_value0);
-			m_valueresponse = 0x00740060;
+			//printf("which %04x\n", m_value0);
+			
+			hack_47_value += m_value0 & 0x0007;
+			if (m_value0 & 0xfff8) printf("unhandled 0x52 bits %04x\n", m_value0);
+
+			m_valueresponse = 0x00740000 | (hack_47_value & 0xffff);
 		break;
 
 
