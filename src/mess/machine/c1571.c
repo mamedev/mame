@@ -319,7 +319,7 @@ READ8_MEMBER( c1571_device::via0_pb_r )
 	data |= !m_bus->clk_r() << 2;
 
 	// serial bus address
-	data |= (m_address->read() & 0x03) << 5;
+	data |= ((m_slot->get_address() - 8) & 0x03) << 5;
 
 	// attention in
 	data |= !m_bus->atn_r() << 7;
@@ -753,8 +753,6 @@ static MACHINE_CONFIG_FRAGMENT( c1570 )
 	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, c1570_floppy_interface)
 	//MCFG_FLOPPY_DRIVE_ADD(WD1770_TAG":0", c1570_floppies, "525ssdd", 0, c1571_device::floppy_formats)
 	MCFG_64H156_ADD(C64H156_TAG, XTAL_16MHz, ga_intf)
-
-	MCFG_CBM_IEC_SLOT_ADD("iec", cbm_iec_devices, NULL)
 MACHINE_CONFIG_END
 
 
@@ -788,8 +786,6 @@ static MACHINE_CONFIG_FRAGMENT( c1571 )
 	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, c1571_floppy_interface)
 	//MCFG_FLOPPY_DRIVE_ADD(WD1770_TAG":0", c1571_floppies, "525dd", 0, c1571_device::floppy_formats)
 	MCFG_64H156_ADD(C64H156_TAG, XTAL_16MHz, ga_intf)
-
-	MCFG_CBM_IEC_SLOT_ADD("iec", cbm_iec_devices, NULL)
 MACHINE_CONFIG_END
 
 
@@ -823,8 +819,6 @@ static MACHINE_CONFIG_FRAGMENT( c1571cr )
 	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, c1571_floppy_interface)
 	//MCFG_FLOPPY_DRIVE_ADD(WD1770_TAG":0", c1571_floppies, "525dd", 0, c1571_device::floppy_formats)
 	MCFG_64H156_ADD(C64H156_TAG, XTAL_16MHz, ga_intf)
-
-	MCFG_CBM_IEC_SLOT_ADD("iec", cbm_iec_devices, NULL)
 MACHINE_CONFIG_END
 
 
@@ -861,8 +855,6 @@ static MACHINE_CONFIG_FRAGMENT( mini_chief )
 
 	MCFG_ISA8_BUS_ADD(ISA_BUS_TAG, M6502_TAG, isabus_intf)
 	MCFG_ISA8_SLOT_ADD(ISA_BUS_TAG, "isa1", mini_chief_isa8_cards, "wd1002a_wx1", false)
-
-	MCFG_CBM_IEC_SLOT_ADD("iec", cbm_iec_devices, NULL)
 MACHINE_CONFIG_END
 
 

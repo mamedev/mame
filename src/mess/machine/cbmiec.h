@@ -48,9 +48,10 @@
 	downcast<cbm_iec_device *>(device)->set_reset_callback(DEVCB2_##_write);
 
 
-#define MCFG_CBM_IEC_SLOT_ADD(_tag, _slot_intf, _def_slot) \
+#define MCFG_CBM_IEC_SLOT_ADD(_tag, _address, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, CBM_IEC_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
+	downcast<cbm_iec_slot_device *>(device)->set_address(_address);
 
 
 
@@ -60,6 +61,7 @@
 
 // ======================> cbm_iec_device
 
+class cbm_iec_slot_device;
 class device_cbm_iec_interface;
 
 class cbm_iec_device : public device_t
@@ -74,7 +76,7 @@ public:
 	template<class _write> void set_data_callback(_write wr) { m_write_data.set_callback(wr); }
 	template<class _write> void set_reset_callback(_write wr) { m_write_reset.set_callback(wr); }
 
-	void add_device(device_t *target);
+	void add_device(cbm_iec_slot_device *slot, device_t *target);
 
 	// reads for both host and peripherals
 	DECLARE_READ_LINE_MEMBER( srq_r ) { return get_signal(SRQ); }
@@ -151,12 +153,14 @@ public:
 	// construction/destruction
 	cbm_iec_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	void set_address(int address) { m_address = address; }
+	int get_address() { return m_address; }
+
 	// device-level overrides
 	virtual void device_start();
 
-private:
-	// configuration
-	cbm_iec_device  *m_bus;
+protected:
+	int m_address;
 };
 
 
@@ -181,7 +185,8 @@ public:
 	virtual void cbm_iec_data(int state) { };
 	virtual void cbm_iec_reset(int state) { };
 
-	cbm_iec_device  *m_bus;
+	cbm_iec_device *m_bus;
+	cbm_iec_slot_device *m_slot;
 };
 
 

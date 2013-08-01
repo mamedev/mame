@@ -259,9 +259,18 @@ cbm_iec_slot_device::cbm_iec_slot_device(const machine_config &mconfig, const ch
 
 void cbm_iec_slot_device::device_start()
 {
-	m_bus = machine().device<cbm_iec_device>(CBM_IEC_TAG);
+	cbm_iec_device* bus = NULL;
+
+	for (device_t *device = owner(); device != NULL; device = device->owner())
+	{
+		bus = device->subdevice<cbm_iec_device>(CBM_IEC_TAG);
+		if (bus != NULL) break;
+	}
+
+	assert(bus);
+
 	device_cbm_iec_interface *dev = dynamic_cast<device_cbm_iec_interface *>(get_card_device());
-	if (dev) m_bus->add_device(get_card_device());
+	if (dev) bus->add_device(this, get_card_device());
 }
 
 
@@ -329,10 +338,11 @@ void cbm_iec_device::device_stop()
 //  add_device -
 //-------------------------------------------------
 
-void cbm_iec_device::add_device(device_t *target)
+void cbm_iec_device::add_device(cbm_iec_slot_device *slot, device_t *target)
 {
 	daisy_entry *entry = auto_alloc(machine(), daisy_entry(target));
 
+	entry->m_interface->m_slot = slot;
 	entry->m_interface->m_bus = this;
 
 	m_device_list.append(*entry);

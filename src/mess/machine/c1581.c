@@ -140,7 +140,7 @@ READ8_MEMBER( c1581_device::cia_pa_r )
 	//data |= !m_floppy->ready_r() << 1;
 
 	// device number
-	data |= (m_address->read() & 0x03) << 3;
+	data |= ((m_slot->get_address() - 8) & 0x03) << 3;
 
 	// disk change
 	data |= m_floppy->dskchg_r() << 7;
@@ -278,8 +278,6 @@ static MACHINE_CONFIG_FRAGMENT( c1581 )
 
 	MCFG_WD1772x_ADD(WD1772_TAG, XTAL_16MHz/2)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG":0", c1581_floppies, "35dd", c1581_device::floppy_formats)
-
-	MCFG_CBM_IEC_SLOT_ADD("iec", cbm_iec_devices, NULL)
 MACHINE_CONFIG_END
 
 

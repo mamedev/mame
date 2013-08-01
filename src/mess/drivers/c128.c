@@ -1498,8 +1498,7 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_DERIVED( c128dcr, ntsc )
-	MCFG_CBM_IEC_SLOT_ADD("iec", c128dcr_iec_devices, "c1571") // TODO c1571cr
-	MCFG_CBM_IEC_BUS_ADD()
+	MCFG_CBM_IEC_ADD("c1571") // TODO c1571cr
 	MCFG_CBM_IEC_BUS_SRQ_CALLBACK(WRITELINE(c128_state, iec_srq_w))
 	MCFG_CBM_IEC_BUS_DATA_CALLBACK(WRITELINE(c128_state, iec_data_w))
 MACHINE_CONFIG_END
@@ -1510,10 +1509,12 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_DERIVED( c128d81, ntsc )
-	MCFG_CBM_IEC_SLOT_ADD("iec", c128d81_iec_devices, "c1563")
-	MCFG_CBM_IEC_BUS_ADD()
+	MCFG_CBM_IEC_ADD(NULL)
 	MCFG_CBM_IEC_BUS_SRQ_CALLBACK(WRITELINE(c128_state, iec_srq_w))
 	MCFG_CBM_IEC_BUS_DATA_CALLBACK(WRITELINE(c128_state, iec_data_w))
+
+	MCFG_DEVICE_MODIFY("iec8")
+	MCFG_DEVICE_SLOT_INTERFACE(c128d81_iec_devices, "c1563", false)
 MACHINE_CONFIG_END
 
 
@@ -1613,8 +1614,7 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_DERIVED( c128dcrp, pal )
-	MCFG_CBM_IEC_SLOT_ADD("iec", c128dcr_iec_devices, "c1571") // TODO c1571cr
-	MCFG_CBM_IEC_BUS_ADD()
+	MCFG_CBM_IEC_ADD("c1571") // TODO c1571cr
 	MCFG_CBM_IEC_BUS_SRQ_CALLBACK(WRITELINE(c128_state, iec_srq_w))
 	MCFG_CBM_IEC_BUS_DATA_CALLBACK(WRITELINE(c128_state, iec_data_w))
 MACHINE_CONFIG_END

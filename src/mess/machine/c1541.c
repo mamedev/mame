@@ -555,7 +555,7 @@ READ8_MEMBER( base_c1541_device::via0_pb_r )
 	data |= !m_bus->clk_r() << 2;
 
 	// serial bus address
-	data |= (m_address->read() & 0x03) << 5;
+	data |= ((m_slot->get_address() - 8) & 0x03) << 5;
 
 	// attention in
 	data |= !m_bus->atn_r() << 7;
@@ -884,8 +884,6 @@ static MACHINE_CONFIG_FRAGMENT( c1541 )
 
 	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, c1541_floppy_interface)
 	MCFG_64H156_ADD(C64H156_TAG, XTAL_16MHz, ga_intf)
-
-	MCFG_CBM_IEC_SLOT_ADD("iec", cbm_iec_devices, NULL)
 MACHINE_CONFIG_END
 
 
