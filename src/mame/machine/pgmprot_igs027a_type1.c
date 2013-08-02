@@ -1863,6 +1863,226 @@ DRIVER_INIT_MEMBER(pgm_arm_type1_state,espgal)
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x400000, 0x400005, read16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_r),this), write16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_w),this));
 }
 
+
+
+
+int pgm_arm_type1_state::puzzli2_take_leveldata_value(UINT8 datvalue)
+{
+	if (stage==-1)
+	{
+		printf("%02x <- table offset\n", datvalue);
+		tableoffs = datvalue;
+		tableoffs2 = 0;
+		stage = 0;
+	}
+	else
+	{
+	
+		UINT8 rawvalue = datvalue;
+		UINT8 tableloc = (tableoffs+tableoffs2)&0xff;
+		rawvalue ^= puzzli2_level_decode[tableloc];
+
+		tableoffs2++;
+		tableoffs2&=0xf;
+
+		if (stage==0)
+		{
+			stage = 1;
+
+			// this seems to be the first thing returned back when reading the level structure always seems to be 0x8 or 0x7, makes sense, levels would be too difficult otherwise ;-) (actually puzzli2 seems to have one specifying 5 unless it's a decrypt table error?!)
+			depth = (rawvalue & 0xf0);
+			numbercolumns = (rawvalue & 0x0f);
+			numbercolumns++;
+
+			printf("%02x <- Sizes (level depth %01x) (number of columns %01x)", rawvalue, depth>>4, numbercolumns);
+
+
+			if ((depth != 0x80) && (depth != 0x70) && (depth != 0x50))
+				fatalerror("depth isn't 0x5, 0x7 or 0x8");
+
+
+
+			// it seems to use this to specify the number of columns, ie how many data structures follow, so that the ARM knows when to send back the 'finished' flag.
+			// it also gets returned at the end with said flag
+			if ((numbercolumns != 0x6) && (numbercolumns != 0x7) && (numbercolumns != 0x8))
+				fatalerror("number of columns specified isn't 6,7, or 8");
+
+			printf("\n");
+
+		}
+		else if (stage==1)
+		{
+			printf("%02x <- Number of Entries for this Column (column is %d) (xor table location is %02x) ", rawvalue, currentcolumn, tableloc);
+			stage = 2;
+			entries_left = (rawvalue >> 4);
+			full_entry = rawvalue;
+			prev_tablloc = tableloc;
+
+			num_entries = entries_left;
+
+			if (num_entries == 0x00)
+			{
+				printf("0 entries for this column?"); // seems a valid condition based on the data
+			}
+
+
+
+			printf("\n");
+
+					
+		}
+		else if (stage==2)
+		{	
+			printf("%02x <- Mask value equal to number of entries (xor table location is %02x)", rawvalue, tableloc);
+			stage = 3;
+
+			// 
+			if (entries_left == 0)
+			{
+				// for 0 entries skip back to state 1 instead of 3, because there is nothing following
+				stage = 1;
+				currentcolumn++;
+
+				coverage[tableloc] = 1;
+				if (rawvalue!=0)
+				{
+					printf(" invalid mask after 00 length?");
+					// attempt to correct the table
+					//new_puzzli2_level_decode[tableloc] = new_puzzli2_level_decode[tableloc] ^ rawvalue;
+
+				}
+				coverage[prev_tablloc] = 1;
+				if (full_entry!=0)
+				{
+					printf(" previous value wasn't 0x00");
+				}
+
+				if (currentcolumn==numbercolumns)
+				{
+					return 1;
+				}
+	
+			}
+			else
+			{
+				if (num_entries> 0xa)
+				{
+					printf(" more than 10 entries?");
+				}
+				else
+				{
+					coverage[tableloc] = 1;
+
+					int desired_mask = 0;
+
+					if (num_entries==0x00) desired_mask = 0x00;
+					if (num_entries==0x01) desired_mask = 0x01;
+					if (num_entries==0x02) desired_mask = 0x03;
+					if (num_entries==0x03) desired_mask = 0x07;
+					if (num_entries==0x04) desired_mask = 0x0f;
+					if (num_entries==0x05) desired_mask = 0x1f;
+					if (num_entries==0x06) desired_mask = 0x3f;
+					if (num_entries==0x07) desired_mask = 0x7f;
+					if (num_entries==0x08) desired_mask = 0xff;
+					if (num_entries==0x09) desired_mask = 0xff;
+					if (num_entries==0x0a) desired_mask = 0xff;
+
+					if (rawvalue!=desired_mask)
+					{
+						printf(" possible wrong mask?");
+					}
+
+
+				}
+
+			}
+
+			printf("\n");
+
+		}
+		else if (stage==3)
+		{
+			// some of these might be due to bad decrypt values in the table
+			if (rawvalue==0x00)      printf("%02x <- fish type 0\n", rawvalue);
+			else if (rawvalue==0x01) printf("%02x <- fish type 1\n", rawvalue);
+			else if (rawvalue==0x02) printf("%02x <- fish type 2\n", rawvalue);
+			else if (rawvalue==0x03) printf("%02x <- fish type 3\n", rawvalue);
+			else if (rawvalue==0x04) printf("%02x <- fish type 4\n", rawvalue);
+			else if (rawvalue==0x05) printf("%02x <- fish type 5\n", rawvalue);
+			else if (rawvalue==0x06) printf("%02x <- fish type 6\n", rawvalue);
+			else if (rawvalue==0x07) printf("%02x <- fish type 7\n", rawvalue);
+	
+			else if (rawvalue==0x08) printf("%02x <- ?? 08\n", rawvalue);
+
+			else if (rawvalue==0x0b) printf("%02x <- ?? 0b\n", rawvalue);
+			else if (rawvalue==0x0c) printf("%02x <- ?? 0c\n", rawvalue);
+			else if (rawvalue==0x0d) printf("%02x <- ?? 0d\n", rawvalue);
+			else if (rawvalue==0x0e) printf("%02x <- ?? 0e\n", rawvalue);
+			else if (rawvalue==0x0f) printf("%02x <- ?? 0f\n", rawvalue);
+			else if (rawvalue==0x10) printf("%02x <- ?? 10\n", rawvalue);
+			else if (rawvalue==0x11) printf("%02x <- ?? 11\n", rawvalue);
+			else if (rawvalue==0x12) printf("%02x <- ?? 12\n", rawvalue);
+			else if (rawvalue==0x13) printf("%02x <- ?? 13\n", rawvalue);
+			else if (rawvalue==0x14) printf("%02x <- ?? 14\n", rawvalue);
+			else if (rawvalue==0x15) printf("%02x <- ?? 15\n", rawvalue);
+			else if (rawvalue==0x16) printf("%02x <- ?? 16\n", rawvalue);
+			else if (rawvalue==0x17) printf("%02x <- ?? 17\n", rawvalue);
+			else if (rawvalue==0x18) printf("%02x <- ?? 18\n", rawvalue);
+			else if (rawvalue==0x19) printf("%02x <- ?? 19\n", rawvalue);
+
+			else if (rawvalue==0x1e) printf("%02x <- ?? 1e\n", rawvalue);
+
+			else if (rawvalue==0x21) printf("%02x <- ?? 21\n", rawvalue); // puzzli2
+			else if (rawvalue==0x22) printf("%02x <- ?? 22\n", rawvalue);
+			else if (rawvalue==0x23) printf("%02x <- ?? 23\n", rawvalue);
+			else if (rawvalue==0x24) printf("%02x <- ?? 24\n", rawvalue);
+			else if (rawvalue==0x25) printf("%02x <- ?? 25\n", rawvalue);
+			else if (rawvalue==0x26) printf("%02x <- ?? 26\n", rawvalue);
+			else if (rawvalue==0x27) printf("%02x <- ?? 27\n", rawvalue);
+			else if (rawvalue==0x28) printf("%02x <- ?? 28\n", rawvalue);
+			else if (rawvalue==0x29) printf("%02x <- ?? 29\n", rawvalue);
+			else if (rawvalue==0x2a) printf("%02x <- ?? 2a\n", rawvalue);
+
+			else if (rawvalue==0x32) printf("%02x <- ?? 32\n", rawvalue); // puzzli2
+			else if (rawvalue==0x33) printf("%02x <- ?? 33\n", rawvalue); // puzzli2
+			else if (rawvalue==0x35) printf("%02x <- ?? 35\n", rawvalue);
+			else if (rawvalue==0x38) printf("%02x <- ?? 38\n", rawvalue); // puzzli2
+
+			else if (rawvalue==0x41) printf("%02x <- ?? 41\n", rawvalue); // puzzli2
+			else if (rawvalue==0x43) printf("%02x <- ?? 43\n", rawvalue); // puzzli2
+
+			else if (rawvalue==0xd0) printf("%02x <- ?? d0\n", rawvalue);
+
+			else if (rawvalue==0xe0) printf("%02x <- ?? e0\n", rawvalue);
+			else if (rawvalue==0xe1) printf("%02x <- ?? e1\n", rawvalue);
+			else if (rawvalue==0xe2) printf("%02x <- ?? e2\n", rawvalue);
+			else if (rawvalue==0xe3) printf("%02x <- ?? e3\n", rawvalue);
+			else if (rawvalue==0xe4) printf("%02x <- ?? e3\n", rawvalue);
+
+
+			else                     printf("%02x <- unknown object\n", rawvalue);
+
+			entries_left--;
+			if (entries_left == 0)
+			{
+				stage = 1;
+				currentcolumn++;
+
+				if (currentcolumn==numbercolumns)
+				{
+					return 1;
+				}
+
+			}
+		}
+				
+	}
+
+	return 0;
+}
+	
+
+
 DRIVER_INIT_MEMBER(pgm_arm_type1_state,puzzli2)
 {
 	pgm_basic_init();
@@ -1875,14 +2095,13 @@ DRIVER_INIT_MEMBER(pgm_arm_type1_state,puzzli2)
 //#define PUZZLI2_LEVEL_STRUCTURE_LOG
 #ifdef PUZZLI2_LEVEL_STRUCTURE_LOG
 	UINT8 *src2 = (UINT8 *) (machine().root_device().memregion("maincpu")->base());
-	UINT8 new_puzzli2_level_decode[256];
+//	UINT8 new_puzzli2_level_decode[256];
 
-	for (int i=0;i<256;i++)
-		new_puzzli2_level_decode[i] = puzzli2_level_decode[i];
+//	for (int i=0;i<256;i++)
+//		new_puzzli2_level_decode[i] = puzzli2_level_decode[i];
 
 	int offset;
 	int limit;
-	UINT8 coverage[256]; // coverage is how much of the table we've managed to verify using known facts about the table structure
 	for (int i=0;i<256;i++)
 		coverage[i] = 0;
 
@@ -1898,234 +2117,58 @@ DRIVER_INIT_MEMBER(pgm_arm_type1_state,puzzli2)
 	}
 
 
+
+
 	for (int i=0;i<limit;i++)
 	{
 		UINT32 val1 = (src2[offset+1]<<24) | (src2[offset+0] << 16) | (src2[offset+3]<<8) | (src2[offset+2] << 0);
 		offset += 4;
 		UINT32 val2 = (src2[offset+1]<<24) | (src2[offset+0] << 16) | (src2[offset+3]<<8) | (src2[offset+2] << 0);
 
-		int stage = 0;
 
 		printf("(%d) data range %08x %08x\n", i, val1, val2);
 
-		int tableoffs = 0;
-		int tableoffs2 = 0;
-		int entries_left = 0;
-		int currentcolumn = 0;
-		int num_entries = 0;
-		int full_entry = 0;
-		int prev_tablloc = 0;
-		int x  =  0;
-		int numbercolumns = 0;
-		int depth;
+		int x = 0;
+
+		tableoffs = 0;
+		tableoffs2 = 0;
+		entries_left = 0;
+		currentcolumn = 0;
+		num_entries = 0;
+		full_entry = 0;
+		prev_tablloc = 0;
+		numbercolumns = 0;
+		depth = 0;
+		stage = -1;
 
 		for (x=val1; x<val2;x++)
 		{
-	
-			if (x==val1)
+			int end = puzzli2_take_leveldata_value(src2[x^1]);
+
+			if (end)
 			{
-				 printf("%02x <- table offset\n", src2[x^1]);
-				 tableoffs = src2[x^1];
-				 tableoffs2 = 0;
+				printf("--- ended at %08x (val 2 was %08x)\n",x ,val2);
+
+				if ( (val2-x) > 2 )
+				{
+					fatalerror("ended even earlier than padding byte\n");
+				}
+				else if ( (val2-x) == 2)
+				{
+					printf("ended with padding byte\n");
+				}
+				else if ( (val2-x) == 1)
+				{
+					printf("ended normally\n");
+				}
+				else // can't happen
+				{
+					fatalerror("ended after marker?!\n");
+				}
+
+				x = val2;
 			}
-			else
-			{
-	
-				UINT8 rawvalue = src2[x^1];
-				UINT8 tableloc = (tableoffs+tableoffs2)&0xff;
-				rawvalue ^= puzzli2_level_decode[tableloc];
 
-				tableoffs2++;
-				tableoffs2&=0xf;
-
-				if (stage==0)
-				{
-					stage = 1;
-
-					// this seems to be the first thing returned back when reading the level structure always seems to be 0x8 or 0x7, makes sense, levels would be too difficult otherwise ;-) (actually puzzli2 seems to have one specifying 5 unless it's a decrypt table error?!)
-					depth = (rawvalue & 0xf0);
-					numbercolumns = (rawvalue & 0x0f);
-					numbercolumns++;
-
-					printf("%02x <- Sizes (level depth %01x) (number of columns %01x)", rawvalue, depth>>4, numbercolumns);
-
-
-					if ((depth != 0x80) && (depth != 0x70) && (depth != 0x50))
-						fatalerror("depth isn't 0x5, 0x7 or 0x8");
-
-
-
-					// it seems to use this to specify the number of columns, ie how many data structures follow, so that the ARM knows when to send back the 'finished' flag.
-					// it also gets returned at the end with said flag
-					if ((numbercolumns != 0x6) && (numbercolumns != 0x7) && (numbercolumns != 0x8))
-						fatalerror("number of columns specified isn't 6,7, or 8");
-
-					printf("\n");
-
-				}
-				else if (stage==1)
-				{
-					printf("%02x <- Number of Entries for this Column (column is %d) (xor table location is %02x) ", rawvalue, currentcolumn, tableloc);
-					stage = 2;
-					entries_left = (rawvalue >> 4);
-					full_entry = rawvalue;
-					prev_tablloc = tableloc;
-
-					num_entries = entries_left;
-
-					if (num_entries == 0x00)
-					{
-						printf("0 entries for this column?"); // seems a valid condition based on the data
-					}
-
-
-
-					printf("\n");
-
-					
-				}
-				else if (stage==2)
-				{	
-					printf("%02x <- Mask value equal to number of entries (xor table location is %02x)", rawvalue, tableloc);
-					stage = 3;
-
-					// 
-					if (entries_left == 0)
-					{
-						// for 0 entries skip back to state 1 instead of 3, because there is nothing following
-						stage = 1;
-						currentcolumn++;
-
-						coverage[tableloc] = 1;
-						if (rawvalue!=0)
-						{
-							printf(" invalid mask after 00 length?");
-							// attempt to correct the table
-							//new_puzzli2_level_decode[tableloc] = new_puzzli2_level_decode[tableloc] ^ rawvalue;
-
-						}
-						coverage[prev_tablloc] = 1;
-						if (full_entry!=0)
-						{
-							printf(" previous value wasn't 0x00");
-						}
-	
-					}
-					else
-					{
-						if (num_entries> 0xa)
-						{
-							printf(" more than 10 entries?");
-						}
-						else
-						{
-							coverage[tableloc] = 1;
-
-							int desired_mask = 0;
-
-							if (num_entries==0x00) desired_mask = 0x00;
-							if (num_entries==0x01) desired_mask = 0x01;
-							if (num_entries==0x02) desired_mask = 0x03;
-							if (num_entries==0x03) desired_mask = 0x07;
-							if (num_entries==0x04) desired_mask = 0x0f;
-							if (num_entries==0x05) desired_mask = 0x1f;
-							if (num_entries==0x06) desired_mask = 0x3f;
-							if (num_entries==0x07) desired_mask = 0x7f;
-							if (num_entries==0x08) desired_mask = 0xff;
-							if (num_entries==0x09) desired_mask = 0xff;
-							if (num_entries==0x0a) desired_mask = 0xff;
-
-							if (rawvalue!=desired_mask)
-							{
-								printf(" possible wrong mask?");
-							}
-
-
-						}
-
-					}
-
-					printf("\n");
-
-				}
-				else if (stage==3)
-				{
-					// some of these might be due to bad decrypt values in the table
-					if (rawvalue==0x00)      printf("%02x <- fish type 0\n", rawvalue);
-					else if (rawvalue==0x01) printf("%02x <- fish type 1\n", rawvalue);
-					else if (rawvalue==0x02) printf("%02x <- fish type 2\n", rawvalue);
-					else if (rawvalue==0x03) printf("%02x <- fish type 3\n", rawvalue);
-					else if (rawvalue==0x04) printf("%02x <- fish type 4\n", rawvalue);
-					else if (rawvalue==0x05) printf("%02x <- fish type 5\n", rawvalue);
-					else if (rawvalue==0x06) printf("%02x <- fish type 6\n", rawvalue);
-					else if (rawvalue==0x07) printf("%02x <- fish type 7\n", rawvalue);
-	
-					else if (rawvalue==0x08) printf("%02x <- ?? 08\n", rawvalue);
-
-					else if (rawvalue==0x0b) printf("%02x <- ?? 0b\n", rawvalue);
-					else if (rawvalue==0x0c) printf("%02x <- ?? 0c\n", rawvalue);
-					else if (rawvalue==0x0d) printf("%02x <- ?? 0d\n", rawvalue);
-					else if (rawvalue==0x0e) printf("%02x <- ?? 0e\n", rawvalue);
-					else if (rawvalue==0x0f) printf("%02x <- ?? 0f\n", rawvalue);
-					else if (rawvalue==0x10) printf("%02x <- ?? 10\n", rawvalue);
-					else if (rawvalue==0x11) printf("%02x <- ?? 11\n", rawvalue);
-					else if (rawvalue==0x12) printf("%02x <- ?? 12\n", rawvalue);
-					else if (rawvalue==0x13) printf("%02x <- ?? 13\n", rawvalue);
-					else if (rawvalue==0x14) printf("%02x <- ?? 14\n", rawvalue);
-					else if (rawvalue==0x15) printf("%02x <- ?? 15\n", rawvalue);
-					else if (rawvalue==0x16) printf("%02x <- ?? 16\n", rawvalue);
-					else if (rawvalue==0x17) printf("%02x <- ?? 17\n", rawvalue);
-					else if (rawvalue==0x18) printf("%02x <- ?? 18\n", rawvalue);
-					else if (rawvalue==0x19) printf("%02x <- ?? 19\n", rawvalue);
-
-					else if (rawvalue==0x1e) printf("%02x <- ?? 1e\n", rawvalue);
-
-					else if (rawvalue==0x21) printf("%02x <- ?? 21\n", rawvalue); // puzzli2
-					else if (rawvalue==0x22) printf("%02x <- ?? 22\n", rawvalue);
-					else if (rawvalue==0x23) printf("%02x <- ?? 23\n", rawvalue);
-					else if (rawvalue==0x24) printf("%02x <- ?? 24\n", rawvalue);
-					else if (rawvalue==0x25) printf("%02x <- ?? 25\n", rawvalue);
-					else if (rawvalue==0x26) printf("%02x <- ?? 26\n", rawvalue);
-					else if (rawvalue==0x27) printf("%02x <- ?? 27\n", rawvalue);
-					else if (rawvalue==0x28) printf("%02x <- ?? 28\n", rawvalue);
-					else if (rawvalue==0x29) printf("%02x <- ?? 29\n", rawvalue);
-					else if (rawvalue==0x2a) printf("%02x <- ?? 2a\n", rawvalue);
-
-					else if (rawvalue==0x32) printf("%02x <- ?? 32\n", rawvalue); // puzzli2
-					else if (rawvalue==0x33) printf("%02x <- ?? 33\n", rawvalue); // puzzli2
-					else if (rawvalue==0x35) printf("%02x <- ?? 35\n", rawvalue);
-					else if (rawvalue==0x38) printf("%02x <- ?? 38\n", rawvalue); // puzzli2
-
-					else if (rawvalue==0x41) printf("%02x <- ?? 41\n", rawvalue); // puzzli2
-					else if (rawvalue==0x43) printf("%02x <- ?? 43\n", rawvalue); // puzzli2
-
-					else if (rawvalue==0xd0) printf("%02x <- ?? d0\n", rawvalue);
-
-					else if (rawvalue==0xe0) printf("%02x <- ?? e0\n", rawvalue);
-					else if (rawvalue==0xe1) printf("%02x <- ?? e1\n", rawvalue);
-					else if (rawvalue==0xe2) printf("%02x <- ?? e2\n", rawvalue);
-					else if (rawvalue==0xe3) printf("%02x <- ?? e3\n", rawvalue);
-					else if (rawvalue==0xe4) printf("%02x <- ?? e3\n", rawvalue);
-
-
-					else                     printf("%02x <- unknown object\n", rawvalue);
-
-					entries_left--;
-					if (entries_left == 0)
-					{
-						stage = 1;
-						currentcolumn++;
-					}
-				}
-				
-			}
-		}
-
-		if (entries_left!=0)
-		{
-			printf("last column didn't terminate (sometimes this is ok, streams are padded to a word)\n");
-			UINT8 lastbyte = src2[(x-1)^1];
-			printf("last (pre-decrypted) byte in stream was %02x if this is 00 we're probably ok\n", lastbyte); 
 		}
 
 		printf("total number of valid columns was %02x\n", currentcolumn);
@@ -2137,8 +2180,10 @@ DRIVER_INIT_MEMBER(pgm_arm_type1_state,puzzli2)
 			fatalerror("mismatch in number of columns vs specified amount\n");
 
 		printf("\n");
+		
 
 	}
+	/*
 	int c=0;
 	for (int i=0;i<256;i++)
 	{
@@ -2165,6 +2210,7 @@ DRIVER_INIT_MEMBER(pgm_arm_type1_state,puzzli2)
 			c = 0;
 		}
 	}
+	*/
 
 #endif
 

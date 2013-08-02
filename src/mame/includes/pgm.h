@@ -254,6 +254,22 @@ public:
 	DECLARE_WRITE16_MEMBER( pgm_arm7_type1_sim_w );
 	DECLARE_READ16_MEMBER( pgm_arm7_type1_sim_protram_r );
 	DECLARE_READ16_MEMBER( pstars_arm7_type1_sim_protram_r );
+
+	/* puzzli2 protection internal state stuff */
+	int stage;
+	int tableoffs;
+	int tableoffs2;
+	int entries_left;
+	int currentcolumn;
+	int num_entries;
+	int full_entry;
+	int prev_tablloc;
+	int numbercolumns;
+	int depth;
+	UINT8 coverage[256]; // coverage is how much of the table we've managed to verify using known facts about the table structure
+
+
+	int puzzli2_take_leveldata_value(UINT8 datvalue);
 };
 
 /* for machine/pgmprot2.c type games */
