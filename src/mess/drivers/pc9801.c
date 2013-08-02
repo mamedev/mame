@@ -59,6 +59,7 @@
 
     - Bokosuka Wars
     - Jangou 2: floppy fails to load after the title screen;
+    - Mobile Suit Gundam - Advanced Operation: error: Device 5.25" high density floppy drive load failed: Unable to identify the image format [for msdos.fdi]
     - Okuman Chouja 2: fails loading in PC-9801RS only ("packed file is corrupt"). Maybe a 386 core bug?
     - Quarth: fails loading in PC-9801RS only ("packed file is corrupt"). Maybe a 386 core bug?
 
@@ -90,6 +91,7 @@
     - Jan Borg Suzume: gets stuck at a pic8259 read;
     - Karateka: no sound?
     - Lovely Horror: Doesn't show kanji, tries to read it thru the 0xa9 port;
+    - Madou Monogatari 1/2/3: doesn't display bitmap gfxs during gameplay;
     - Quarth: should do a split screen effect, it doesn't hence there are broken gfxs
     - Quarth: uploads a PCG charset
     - Runner's High: wrong double height on the title screen;
