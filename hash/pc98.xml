@@ -424,7 +424,35 @@ TODO:
 		</part>
 	</software>
 
+<!-- .nfd not supported -->
+	<software name="atrain" supported="no">
+		<description>A Ressha de Ikou</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="0x10a110">
+				<rom name="atrain.nfd" size="0x10a110" crc="7c754eec" sha1="3e2fc2e2538222f2f76ef2275b7ec799fb0db368" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="atrain2">
+		<description>A Ressha de Ikou 2</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="0x138fb0">
+				<rom name="atrain21.d88" size="0x138fb0" crc="07a1575d" sha1="caafcc99ac245ef824c6dc7570f55a6919189892" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="0x138fb0">
+				<rom name="atrain21.d88" size="0x138fb0" crc="47c8ba97" sha1="b699d1898555f51ffc9744bb351fc1c3d5b14727" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atrain2g" cloneof="atrain2">
 		<description>A Ressha de Ikou 2 - 5 Shuunen Kinen Tokubetsu Gentei Version</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -565,6 +593,43 @@ TODO:
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="main.fdi" size="1265664" crc="e4f2769f" sha1="677b6f354f2f2fb091d6c3f8cd12da64556d0e13" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="abunaite">
+		<description>Abunai Tengu Densetsu - Yomigaetta Tengu ga Yozora o Mau</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="0x10a110">
+				<rom name="abunai_a.nfd" size="0x10a110" crc="5f87e5f8" sha1="67cf3e32d8c087bbfa455943ad5d12f2fdb26249" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="0x10a110">
+				<rom name="abunai_b.nfd" size="0x10a110" crc="cf138161" sha1="d25ff1e817e33562eedce260be5cae0f84b5102e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="0x10a110">
+				<rom name="abunai_c.nfd" size="0x10a110" crc="dc317c14" sha1="aa94b70f5e10b556545398c3a8b85a1e4d46cadb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="actor98">
+		<description>Actor 98</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="0x138fb0">
+				<rom name="actor98_1.d88" size="0x138fb0" crc="331de54e" sha1="832b4aa83db13a76670df838db4d7c3c4543285c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="0x138fb0">
+				<rom name="actor98_2.d88" size="0x138fb0" crc="55c5f508" sha1="69cd11fb257a83082fdbc6b280fd6723b742ef62" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -765,26 +830,39 @@ TODO:
 		</part>
 	</software>
 
-	<software name="add_pdrk">
-		<description>AD&amp;D Pools of Darkness</description>
+	<software name="add_ssil" supported="no">
+		<description>AD&amp;D Secret of the Silver Blades</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="opening.fdi" size="1265664" crc="11cf2229" sha1="abf3bed693797d9bfecb1b7dc42eadcfb8a14641" offset="0" />
+			<dataarea name="flop" size="0x134000">
+				<rom name="add_ss_a.hdm" size="0x134000" crc="9479007e" sha1="5587ff5e6c304d74c0764d5d70e7176be2625ee9" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="diska.fdi" size="1265664" crc="a40becba" sha1="3c65e5ab1f95d5f9863681c472b8c73927e0a2c2" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="diskb.fdi" size="1265664" crc="2fb75bcb" sha1="78df14162d4fbd9e6c8f6a67e00d3aed3dd02bc7" offset="0" />
+			<dataarea name="flop" size="0x134000">
+				<rom name="add_ss_b.hdm" size="0x134000" crc="ec595488" sha1="9f350670d6746120ad152ea389fbf97443ba9c85" offset="0" />
 			</dataarea>
 		</part>
 	</software>
+
+
+
+	<software name="advanlm">
+		<description>Advanced Lord Monarch</description>
+		<year>19??</year>
+		<publisher>Nihon Falcom</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="0x138fb0">
+				<rom name="program.d88" size="0x138fb0" crc="17f949b8" sha1="e1466440127166761cc88967ef6444b7974f1dca" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="0x138fb0">
+				<rom name="user.d88" size="0x138fb0" crc="efd89d91" sha1="c243ec20af65ea9f612926c2c8ce868750a076e4" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>	
 
 	<software name="advanp2p">
 		<description>Advanced Power Dolls 2 Premium Disk</description>
@@ -795,6 +873,30 @@ TODO:
 				<rom name="main premium disk.fdi" size="1265664" crc="62608d45" sha1="347105ba66c4ee6125278ea45ea68322addc9f47" offset="0" />
 			</dataarea>
 		</part>
+	</software>
+
+<!-- 2d disk -->
+	<software name="advland" supported="no">
+		<description>Adventureland</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="0x0552b0">
+				<rom name="boot.d88" size="0x0552b0" crc="f914c48b" sha1="446a234f36465708df4ffabc0848b84a45cf6426" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="0x0541b0">
+				<rom name="adventureland.d88" size="0x0541b0" crc="eb33a2b4" sha1="63c84329954624c0d1b61c303412353418820b99" offset="0" />
+			</dataarea>
+		</part>
+		<!-- hacked (and working since it's 2hd floppy) set, not going to be supported however
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="0x1093f0">
+				<rom name="adventureland 2hd.d88" size="0x1093f0" crc="dfe46669" sha1="ee0e6fae3553f8b60d515ba5c0bfdbe56cb7df16" offset="0" />
+			</dataarea>
+		</part>
+		-->
 	</software>
 
 	<software name="aegeank">
@@ -11159,6 +11261,17 @@ other two disks
 		<part name="flop5" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="pc3_e.fdi" size="1265664" crc="600acc4f" sha1="dd31b002584fbcfe981919c6c23bf82ab1fb66fe" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="puzznic">
+		<description>Puzznic</description>
+		<year>19??</year>
+		<publisher>Taito</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="0x135000">
+				<rom name="puzznic.fdi" size="0x135000" crc="fd475bfe" sha1="7df354065c861db5e47100a3a7dfd35e47abd7fe" offset="0" />
 			</dataarea>
 		</part>
 	</software>

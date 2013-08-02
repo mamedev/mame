@@ -94,9 +94,10 @@
     - Madou Monogatari 1/2/3: doesn't display bitmap gfxs during gameplay;
     - Quarth: should do a split screen effect, it doesn't hence there are broken gfxs
     - Quarth: uploads a PCG charset
-    - Princess Maker 2: mouse is buggy;
+ 	- Princess Maker 2: mouse is buggy;
     - Princess Maker 2: screen transitions are very ugly (btanb?)
-    - Runner's High: wrong double height on the title screen;
+ 	- Puzznic: trips illegal irq 0x41 (?), prints an error on screen.
+ 	- Runner's High: wrong double height on the title screen;
     - Sorcerian, Twilight Zone 3: Fails initial booting, issue with 2dd irq?
     - Uchiyama Aki no Chou Bangai: keyboard irq is fussy (sometimes it doesn't register a key press);
     - Uno: uses EGC
