@@ -646,64 +646,65 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 			it is clear the low bits of our xor table are wrong, and obvious why, it's based on the data, and a value of 0 is very rare
 			because the data doesn't need to store blank space! the upper bits are more trusted because they're so rarely used
 
+		
+			00138278: 31 00fd | (set xor table offset)
+		
+		UNKNOWN - related to depth / number of columns?
+			00138278: 31 0087 | value 87, after xor is 75 (table address,value fd,f2)
+		COLUMN 1
+			00138278: 31 0032 | value 32, after xor is 40 (table address,value fe,72) << 4 is the number of entries in this column
+			00138278: 31 0029 | value 29, after xor is 0f (table address,value ff,26) << 0x0f is a mask of 4 bits..
+
+			00138278: 31 0031 | value 31, after xor is 03 (table address,value 00,32)  -> 0x0103
+			00138278: 31 003f | value 3f, after xor is 01 (table address,value 01,3e)  -> 0x0101
+			00138278: 31 00b0 | value b0, after xor is 02 (table address,value 02,b2)  -> 0x0102
+			00138278: 31 0035 | value 35, after xor is 02 (table address,value 03,37)  -> 0x0102
+        COLUMN 2
+			00138278: 31 0071 | value 71, after xor is 40 (table address,value 04,31) << 4 is the number of entries in this column
+			00138278: 31 002d | value 2d, after xor is 0f (table address,value 05,22) << 0x0f is a mask of 4 bits..
+
+			00138278: 31 00d5 | value d5, after xor is 03 (table address,value 06,d6)  -> 0x0103
+			00138278: 31 000d | value 0d, after xor is 00 (table address,value 07,0d)  -> 0x0100
+			00138278: 31 0034 | value 34, after xor is 01 (table address,value 08,35)  -> 0x0101
+			00138278: 31 0059 | value 59, after xor is 05 (table address,value 09,5c)  -> 0x0105
+		COLUMN 3
+			00138278: 31 00dd | value dd, after xor is 50 (table address,value 0a,8d) << 5 is the number of entries in this column
+			00138278: 31 0023 | value 23, after xor is 1f (table address,value 0b,3c) << 0x1f is a mask of 5 bits..
 			
-			001387de: 31 000e | value 0e, after xor is 76  << UNKNOWN  (related to number of columns?)
-			---- Column 1
-			001387de: 31 0098 | value 98, after xor is 40 << 4 = number of fish in ths column
-			001387de: 31 00a8 | value a8, after xor is 0e
+			00138278: 31 007a | value 7a, after xor is 00 (table address,value 0c,7a)  -> 0x0100
+			00138278: 31 00f3 | value f3, after xor is 01 (table address,value fd,f2)  -> 0x0101
+			00138278: 31 0077 | value 77, after xor is 05 (table address,value fe,72)  -> 0x0105
+			00138278: 31 0022 | value 22, after xor is 04 (table address,value ff,26)  -> 0x0104
+			00138278: 31 0036 | value 36, after xor is 04 (table address,value 00,32)  -> 0x0104	  
+		COLUMN 4
+			00138278: 31 002e | value 2e, after xor is 10 (table address,value 01,3e) << 1 is the number of entries in this column
+			00138278: 31 00b3 | value b3, after xor is 01 (table address,value 02,b2) << 0x01 is a mask of 1 bit..
 
-			001387de: 31 007c | value 7c, after xor is 02 | 4 entries here (builds 0x0103, 0x0101, 0x0102, 0x0102, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000 )
-			001387de: 31 0043 | value 43, after xor is 01
-			001387de: 31 00e4 | value e4, after xor is 00
-			001387de: 31 00a2 | value a2, after xor is 00
-			---- Column 2
-			001387de: 31 006a | value 6a, after xor is 41 << 4 = number of fish in ths column
-			001387de: 31 00e0 | value e0, after xor is 0f
-
-			001387de: 31 00ed | value ed, after xor is 00 | 4 entries here (builds 0x0103, 0x0100, 0x0101, 0x0105, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000 )
-			001387de: 31 0024 | value 24, after xor is 00
-			001387de: 31 00bb | value bb, after xor is 01
-			001387de: 31 00bd | value bd, after xor is 05
-			---- Column 3
-			001387de: 31 002e | value 2e, after xor is 50 << 5 = number of fish in ths column
-			001387de: 31 00d6 | value d6, after xor is 1f
-
-			001387de: 31 002b | value 2b, after xor is 00 | 5 entries here (builds 0x0100, 0x0101, 0x0105, 0x0104, 0x0104, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000 )
-			001387de: 31 007a | value 7a, after xor is 02
-			001387de: 31 00dd | value dd, after xor is 05
-			001387de: 31 00a3 | value a3, after xor is 05
-			001387de: 31 007b | value 7b, after xor is 05
-			---- Column 4
-			001387de: 31 0052 | value 52, after xor is 10 << 1 = number of fish in ths column
-			001387de: 31 00e7 | value e7, after xor is 03
-
-			001387de: 31 00a2 | value a2, after xor is 00 | 1 entry here ( builds 0x0102, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000 )
-			---- Column 5
-			001387de: 31 005a | value 5a, after xor is 71 << 7 = number of fish in this column
-			001387de: 31 0090 | value 90, after xor is 7f
+			00138278: 31 0035 | value 35, after xor is 02 (table address,value 03,37)  -> 0x0102
+		COLUMN 5
+			00138278: 31 0041 | value 41, after xor is 70 (table address,value 04,31) << 7 is the number of entries in this column
+			00138278: 31 005d | value 5d, after xor is 7f (table address,value 05,22) << 0x7f is a mask of 7 bits..
 			
-			001387de: 31 00ee | value ee, after xor is 03 | 7 entries here (builds 0x0100, 0x0101, 0x0103, 0x0102, 0x0104, 0x0100 ,0x0100, 0x0000, 0x0000, 0x0000 )
-			001387de: 31 0025 | value 25, after xor is 01
-			001387de: 31 00b9 | value b9, after xor is 03
-			001387de: 31 00ba | value ba, after xor is 02
-			001387de: 31 007a | value 7a, after xor is 04
-			001387de: 31 00c9 | value c9, after xor is 00
-			001387de: 31 002b | value 2b, after xor is 00
-			---- Column 6
-			001387de: 31 002b | value 2b, after xor is 53 << 5 = number of fish in this column
-			001387de: 31 00c7 | value c7, after xor is 1f
+			00138278: 31 00d6 | value d6, after xor is 00 (table address,value 06,d6)  -> 0x0100
+			00138278: 31 000c | value 0c, after xor is 01 (table address,value 07,0d)  -> 0x0101
+			00138278: 31 0036 | value 36, after xor is 03 (table address,value 08,35)  -> 0x0103
+			00138278: 31 005e | value 5e, after xor is 02 (table address,value 09,5c)  -> 0x0102
+			00138278: 31 0089 | value 89, after xor is 04 (table address,value 0a,8d)  -> 0x0104
+			00138278: 31 003c | value 3c, after xor is 00 (table address,value 0b,3c)  -> 0x0100
+			00138278: 31 007a | value 7a, after xor is 00 (table address,value 0c,7a)  -> 0x0100
+		COLUMN 6
+			00138278: 31 00a2 | value a2, after xor is 50 (table address,value fd,f2) << 5 is the number of entries in this column
+			00138278: 31 006d | value 6d, after xor is 1f (table address,value fe,72) << 0x1f is a mask of 5 bits..
+			
+			00138278: 31 0023 | value 23, after xor is 05 (table address,value ff,26)  -> 0x0105
+			00138278: 31 0037 | value 37, after xor is 05 (table address,value 00,32)  -> 0x0105
+			00138278: 31 003f | value 3f, after xor is 01 (table address,value 01,3e)  -> 0x0101
+			00138278: 31 00b3 | value b3, after xor is 01 (table address,value 02,b2)  -> 0x0101
+			00138278: 31 0034 | value 34, after xor is 03 (table address,value 03,37)  -> 0x0103
+			 ^ (end, returning 630006 as playfield width)
 
-			001387de: 31 00a2 | value a2, after xor is 04 | 5 entries here (builds 0x0105, 0x0105, 0x0101, 0x0101, 0x0103, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000 )
-			001387de: 31 007a | value 7a, after xor is 04
-			001387de: 31 0043 | value 43, after xor is 01
-			001387de: 31 00e7 | value e7, after xor is 03
-			001387de: 31 00a3 | value a3, after xor is 01 (end, returning 630006 as playfield width)
 
-
-						 
-			  
-			  
-			 
+					
 			  
 			 
 
@@ -711,31 +712,10 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 
 			// these table aren't accurate yet, generated with analysis of data sent, we never
 			// see the direct results of this operation (happens inside the MCU) 
-			/*
-			UINT8 puzzli2_level_decode[256] = {
-
-			0x31, 0x3e, 0xb2, 0x35, 0x31, 0x22, 0xd7, 0x0d, 0x35, 0x5c, 0x8d, 0x3c, 0x79, 0x5f, 0xd4, 0xad,
-			0x53, 0xff, 0xeb, 0x45, 0xec, 0x11, 0x68, 0x77, 0xd8, 0x34, 0x36, 0x45, 0xa6, 0xea, 0x1c, 0xc6,
-			0x3b, 0xbd, 0xad, 0x2e, 0x18, 0xde, 0xa0, 0xa8, 0xdd, 0x52, 0x57, 0xc2, 0xe5, 0x0b, 0x00, 0x6d,
-			0x67, 0x64, 0x14, 0x70, 0xb6, 0x39, 0x25, 0x79, 0x82, 0xd2, 0x70, 0xb9, 0x13, 0xf5, 0x92, 0x93,
-			0xfa, 0xe5, 0x5e, 0xb0, 0xf6, 0xaf, 0x95, 0x8b, 0x7d, 0x73, 0xf9, 0x63, 0x86, 0xcb, 0x1a, 0x56,
-			0xf1, 0x3a, 0xae, 0x62, 0x01, 0x29, 0x90, 0x22, 0x8f, 0x5c, 0x9a, 0x65, 0x74, 0x21, 0x20, 0x40,
-			0xd3, 0x05, 0xa2, 0xe2, 0xbc, 0x9e, 0x1e, 0x10, 0x15, 0x0c, 0x8a, 0x9c, 0xec, 0x38, 0xb6, 0x9d,
-			0x2a, 0xf5, 0x14, 0x0e, 0x85, 0xc7, 0x7d, 0xce, 0x94, 0x16, 0x48, 0xa8, 0x81, 0x6e, 0x7a, 0xd8,
-			0xa6, 0x7f, 0x42, 0xe4, 0xa0, 0x2a, 0xef, 0xed, 0x24, 0xba, 0xb8, 0x7c, 0xcb, 0x2b, 0x90, 0xcc,
-			0x59, 0xd1, 0xf3, 0xe2, 0x6f, 0xed, 0x9f, 0xf0, 0x4a, 0x54, 0x8d, 0x08, 0xf8, 0x51, 0x68, 0xc8,
-			0x03, 0x0b, 0xbb, 0xc0, 0xe3, 0x4c, 0x05, 0xc5, 0x8c, 0x09, 0x0e, 0xbf, 0x62, 0x48, 0x75, 0x59,
-			0x1d, 0x80, 0xdf, 0x60, 0x07, 0xe0, 0x1a, 0x67, 0xa5, 0xbf, 0xcd, 0x86, 0xdc, 0xc3, 0x6a, 0x4e,
-			0xd0, 0xfc, 0xd5, 0x3f, 0x98, 0x96, 0x2f, 0x4c, 0xb3, 0xea, 0x2d, 0x75, 0xe4, 0xc0, 0x6c, 0x69,
-			0x9b, 0xb7, 0x41, 0x8b, 0x41, 0x47, 0x02, 0xda, 0x99, 0x3d, 0xa3, 0x79, 0x10, 0x4f, 0xb4, 0x55,
-			0x5a, 0x25, 0xf4, 0xca, 0x58, 0x30, 0xc4, 0x12, 0xa9, 0x45, 0xda, 0x91, 0xa4, 0xaa, 0xfc, 0x84,
-			0xf8, 0x88, 0x06, 0xcf, 0xfe, 0x33, 0xd5, 0x28, 0x1c, 0x19, 0x4a, 0xb1, 0x83, 0xf3, 0x72, 0x26, 
 			
-			};
-			*/
-			/* alt table created with other data set, some bits differ, verify bits */
+		
 			UINT8 puzzli2_level_decode[256] = {
-			0x31, 0x3e, 0xb2, 0x35, 0x31, 0x22, 0xd6, 0x0d, 0x37, 0x5c, 0x8d, 0x3c, 0x79, 0x5f, 0xd4, 0xad,
+			0x32, 0x3e, 0xb2, 0x37, 0x31, 0x22, 0xd6, 0x0d, 0x35, 0x5c, 0x8d, 0x3c, 0x7a, 0x5f, 0xd4, 0xad,
 			0x53, 0xff, 0xe9, 0x45, 0xed, 0x11, 0x68, 0x77, 0xd8, 0x34, 0x36, 0x45, 0xa6, 0xeb, 0x1c, 0xc7,
 			0x3b, 0xbd, 0xad, 0x2f, 0x18, 0xde, 0xa1, 0xaa, 0xdd, 0x50, 0x57, 0xc2, 0xe5, 0x0a, 0x01, 0x6d,
 			0x67, 0x65, 0x14, 0x70, 0xb7, 0x39, 0x24, 0x79, 0x83, 0xd2, 0x71, 0xb9, 0x10, 0xf5, 0x92, 0x93,
@@ -750,7 +730,7 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 			0xd0, 0xfc, 0xd5, 0x3f, 0x98, 0x96, 0x2e, 0x4c, 0xb3, 0xea, 0x2d, 0x75, 0xe6, 0xc0, 0x6c, 0x69,
 			0x9b, 0xb7, 0x43, 0x8b, 0x41, 0x47, 0x02, 0xda, 0x98, 0x3d, 0xa3, 0x79, 0x10, 0x4f, 0xb4, 0x55,
 			0x5a, 0x25, 0xf4, 0xc8, 0x58, 0x30, 0xc4, 0x12, 0xa9, 0x45, 0xda, 0x91, 0xa4, 0xaa, 0xfc, 0x84,
-			0xfa, 0x88, 0x06, 0xce, 0xfe, 0x32, 0xd5, 0x28, 0x1d, 0x19, 0x4b, 0xb1, 0x83, 0xf3, 0x72, 0x27, 
+			0xfa, 0x88, 0x06, 0xce, 0xfe, 0x32, 0xd5, 0x28, 0x1d, 0x19, 0x4b, 0xb1, 0x83, 0xf2, 0x72, 0x26, 
 			};
 		
 			printf("%08x: %02x %04x | ",pc, m_ddp3lastcommand, m_value0);
@@ -772,8 +752,10 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 				// always d2 0000 when writing doing level data
 				// but different for the writes on startup?
 				m_valueresponse = 0x00d20000;
-				UINT8 xoredval = m_value0 ^ puzzli2_level_decode[(hack_31_table_offset + (hack_31_table_offset2&0xf))&0xff];
-				printf("value %02x, after xor is %02x\n", m_value0, xoredval);
+
+				UINT8 tableaddr = (hack_31_table_offset + (hack_31_table_offset2&0xf))&0xff;
+				UINT8 xoredval = m_value0 ^ puzzli2_level_decode[tableaddr];
+				printf("value %02x, after xor is %02x (table address,value %02x,%02x)\n", m_value0, xoredval, tableaddr, puzzli2_level_decode[tableaddr]);
 				
 				hackcount2++;
 				hack_31_table_offset2++;
@@ -785,8 +767,9 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 				// 63 0006 after the last 31 write doing the how to play level data - the 06 is the width of the playfield, where does it come from?
 				m_valueresponse = 0x00630006;
 				
-				UINT8 xoredval = m_value0 ^ puzzli2_level_decode[(hack_31_table_offset + (hack_31_table_offset2&0xf))&0xff];
-				printf("value %02x, after xor is %02x (end, returning %02x as playfield width)\n", m_value0, xoredval, m_valueresponse);
+				UINT8 tableaddr = (hack_31_table_offset + (hack_31_table_offset2&0xf))&0xff;
+				UINT8 xoredval = m_value0 ^ puzzli2_level_decode[tableaddr];
+				printf("value %02x, after xor is %02x (table address,value %02x,%02x) (end, returning %02x as playfield width)\n", m_value0, xoredval, tableaddr, puzzli2_level_decode[tableaddr], m_valueresponse);
 				
 
 			}
