@@ -3104,7 +3104,8 @@ TODO:
 		</part>
 	</software>
 
-	<software name="cardbus2">
+<!-- disk 01 is identical to disk 02 of cardbus set? -->
+	<software name="cardbus2" cloneof="cardbus">
 		<description>Card Buster 2 - Fukkatsu no Seihishaku</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -3204,17 +3205,6 @@ TODO:
 		</part>
 	</software>
 
-	<software name="cg1sm">
-		<description>CG Gallery 1 - Sailor Moon</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="cg gallery 1 - sailor moon (j).fdi" size="1265664" crc="b3d4a86c" sha1="7a73f9805370aba1bbb25ca997076c5fad89d35e" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="cgesc">
 		<description>CG Gallery Escort</description>
 		<year>1992</year>
@@ -3234,17 +3224,6 @@ TODO:
 			<dataarea name="flop" size="1265664">
 				<rom name="data_m.fdi" size="1265664" crc="cbe6319f" sha1="c43f95b9a264bacd520889f6c8eefdc78d6bf6d6" offset="0" />
 			</dataarea>
-		</part>
-	</software>
-
-	<software name="chaosst">
-		<description>Chaos Strikes Back</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="chaos strikes back (j).fdi" size="1265664" crc="4c403a86" sha1="66cf87323ebdf67247f20b5c39ec35864f07e129" offset="0" />
-		</dataarea>
 		</part>
 	</software>
 
@@ -3714,7 +3693,7 @@ TODO:
 	</software>
 
 	<software name="cybernet">
-		<description>Cybernetic Hi-School</description>
+		<description>Cybernetic Hi-School (Ver. 2.0)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -3761,32 +3740,6 @@ TODO:
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_d.fdi" size="1265664" crc="ced9b455" sha1="0f4e2ea61f840d83f412e001eb0e87caf9efc275" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-	
-	<software name="cybern20">
-		<description>Cybernetic Hi-School Version 2.0</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="ch1_a.fdi" size="1265664" crc="f2747929" sha1="c8c364a29bd47b11c7ae5ccf217cbaf7d38de476" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="ch1_b.fdi" size="1265664" crc="9b5498b2" sha1="35b612c3c59214ec0fdbbe93976f587a5df2bc04" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="ch1_c.fdi" size="1265664" crc="02b572f5" sha1="42d469982c05b64885943036170a573346b5a9dd" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="ch1_d.fdi" size="1265664" crc="17b59bf8" sha1="b781ba2600a5a0aa32920564470256591c1fe9b5" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4400,7 +4353,7 @@ Presumably copy protection floppy, to be used with CD-Rom
 	</software>
 
 	<software name="disaster">
-		<description>Disaster Ver. 2.0</description>
+		<description>Disaster (Ver. 2.0)</description>
 		<year>19??</year>
 		<publisher>Studio K2</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -5710,6 +5663,8 @@ TODO: missing install disks
 		</part>
 	</software>
 
+<!-- same as all bishoujo extra disk 2 -->
+<!--
 	<software name="floppyb2">
 		<description>Floppy Bunko 17 - All Bishoujo Art Graphics Vol. 2</description>
 		<year>19??</year>
@@ -5720,7 +5675,10 @@ TODO: missing install disks
 			</dataarea>
 		</part>
 	</software>
+-->
 
+<!-- same as all bishoujo extra disk 3 -->
+<!--
 	<software name="floppyb3">
 		<description>Floppy Bunko 20 - All Bishoujo Art Graphics Vol. 3</description>
 		<year>19??</year>
@@ -5731,6 +5689,7 @@ TODO: missing install disks
 			</dataarea>
 		</part>
 	</software>
+-->
 
 	<software name="foxy">
 		<description>Foxy</description>
@@ -5862,6 +5821,7 @@ TODO: missing install disks
 		</part>
 	</software>
 
+<!-- disk 01 Calcutta, disk 02 Maze Quest -->
 	<software name="fugasel1">
 		<description>Fuga Selection 1 - Calcutta &amp; Maze Quest</description>
 		<year>19??</year>
@@ -6596,6 +6556,7 @@ Fake disk?
 		</part>
 	</software>
 
+<!-- note: same as PC-88VA version -->
 	<software name="illusion">
 		<description>Illusion City</description>
 		<year>19??</year>
@@ -8551,6 +8512,7 @@ TODO: other two disks, in .nfd format
 		</part>
 	</software>
 
+<!-- same as disk 02 fugasel1
 	<software name="mazeque">
 		<description>Maze Quest</description>
 		<year>19??</year>
@@ -8561,6 +8523,7 @@ TODO: other two disks, in .nfd format
 			</dataarea>
 		</part>
 	</software>
+-->
 
 	<software name="meikyuu">
 		<description>Meikyuu Gakuensai - Kyuukousha no Nazo</description>
@@ -10550,7 +10513,7 @@ other two disks
 	<software name="policeq2">
 		<description>Police Quest 2</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Sierra</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk 01.fdi" size="1265664" crc="18f51678" sha1="49b137412230d20df0dec0c1236866003a3f1f15" offset="0" />
@@ -10567,6 +10530,7 @@ other two disks
 			</dataarea>
 		</part>
 	</software>
+
 <!-- PC-9821 specific, requires CD-Rom too -->
 	<software name="policena" supported="no">
 		<description>Policenauts</description>
@@ -10609,22 +10573,18 @@ other two disks
 				<rom name="ponyon_1.fdi" size="1265664" crc="1855e74d" sha1="958fc36c31266317784e6f95ae10f36b4f58219f" offset="0" />
 			</dataarea>
 		</part>
+<!-- ponyon_2.fdi in set is identical to user.fdi -->
 		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="ponyon_2.fdi" size="1265664" crc="3141d843" sha1="0ac4c114f99ae5ab3ba3219831f349523bba5a6f" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="ponyon_3.fdi" size="1265664" crc="54ba0189" sha1="eee1c6b0912a52138dd20a4c1e85cf0d7e9833bb" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop4" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="ponyon_4.fdi" size="1265664" crc="97d528ba" sha1="01be5b8faaabac18423da36ae123bea07eacef39" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop5" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="ponyon_user.fdi" size="1265664" crc="3141d843" sha1="0ac4c114f99ae5ab3ba3219831f349523bba5a6f" offset="0" status="baddump" />
 			</dataarea>
@@ -11776,7 +11736,7 @@ other two disks
 	</software>
 
 
-	<software name="rxanadue">
+	<software name="rxanadue" cloneof="rxanadu">
 		<description>Revival Xanadu - Easy Mode</description>
 		<year>19??</year>
 		<publisher>Nihon Falcom</publisher>
@@ -12527,6 +12487,8 @@ other two disks
 		</part>
 	</software>
 
+<!--
+Same as Police Quest 2 - Quest for Glory stand-alone disks
 	<software name="sierradp">
 		<description>Sierra 3D AVG Double Pack - Quest for Glory &amp; Police Quest 2</description>
 		<year>19??</year>
@@ -12562,6 +12524,7 @@ other two disks
 			</dataarea>
 		</part>
 	</software>
+-->
 
 	<software name="simcity2">
 		<description>SimCity 2000</description>
@@ -14606,24 +14569,12 @@ other two disks
 	</software>
 
 	<software name="vaindreb">
-		<description>Vain Dream Bekkan</description>
+		<description>Vain Dream Bekkan (Ver. Comptiq)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="bekkan.fdi" size="1265664" crc="2da2ce24" sha1="bf586c7e4c8ff01433b102e07c03fc4a3c22b1fb" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-<!-- perhaps not a clone? -->
-	<software name="vaindrebc" cloneof="vaindreb">
-		<description>Vain Dream Bekkan - Ver. Comptiq</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="vain dream bekkan (j).fdi" size="1265664" crc="2da2ce24" sha1="bf586c7e4c8ff01433b102e07c03fc4a3c22b1fb" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -14813,16 +14764,11 @@ other two disks
 		</part>
 	</software>
 
-	<software name="versus-">
+	<software name="versus">
 		<description>Versus - Kakutou Ouhe no Michi</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="versus - kakutou ouhe no michi (j).fdi" size="1265664" crc="adb2ff97" sha1="ed7222adbac92bf05b9f318e17e224df3cb777dc" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="versus - kakutou ouhe no michi (j).fdi" size="1265664" crc="adb2ff97" sha1="ed7222adbac92bf05b9f318e17e224df3cb777dc" offset="0" />
 			</dataarea>
@@ -15719,7 +15665,7 @@ other two disks
 		</part>
 	</software>
 
-	<software name="zanab">
+	<software name="zanab" cloneof="zan">
 		<description>Zan - Kagerou no Toki - Analog Ban</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
