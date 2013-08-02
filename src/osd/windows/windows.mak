@@ -57,9 +57,6 @@
 # uncomment next line to use cygwin compiler
 # CYGWIN_BUILD = 1
 
-# set this to the minimum Direct3D version to support (8 or 9)
-# DIRECT3D = 9
-
 # set this to the minimum DirectInput version to support (7 or 8)
 # DIRECTINPUT = 8
 
