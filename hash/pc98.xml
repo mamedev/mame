@@ -120,6 +120,18 @@ TODO:
 		</part>
 	</software>
 
+<!-- .FDD isn't supported yet -->
+	<software name="177" supported="no">
+		<description>177</description>
+		<year>1986</year>
+		<publisher>Macadamia</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="0x057cfc">
+				<rom name="177.fdd" size="0x057cfc" crc="b70eba3f" sha1="f2a33a0b3b37dd097bb5145e6be9f0281c73831d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="2069ad">
 		<description>2069AD</description>
 		<year>19??</year>
@@ -218,6 +230,11 @@ TODO:
 				<rom name="waialae no kiseki - harukanaru augusta expansion 4.fdi" size="1265664" crc="c40af1f5" sha1="f63067482ad01191d7dbcea8743c55ac0fcba117" offset="0" />
 			</dataarea>
 		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size="0x138fb0">
+				<rom name="devil's course.d88" size="0x138fb0" crc="9cbc4634" sha1="02007eecc7cc0cf4e60cc8a7efba60d870a0126c" offset="0" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="46okune">
@@ -291,15 +308,9 @@ TODO:
 				<rom name="diskb.fdi" size="1265664" crc="9d0c9843" sha1="3c754860c55f29050560d63a1070ee758c21fd23" offset="0" />
 			</dataarea>
 		</part>
-
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="user.fdi" size="1265664" crc="bdd16875" sha1="e359458fd99329791ec4b3302d13f9e5a22eb575" offset="0" status="baddump" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="user2.fdi" size="1265664" crc="37dcf431" sha1="cb24e2e047cc3aaa02526a4a26bbfd1b3d0405df" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -315,10 +326,28 @@ TODO:
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="4ddrive2.fdi" size="1265664" crc="3d285bb1" sha1="70c45123369b95e581d377a411bc8a1f06c6ccd9" offset="0" status="baddump" />
+				<rom name="4ddrive2.fdi" size="1265664" crc="3d285bb1" sha1="70c45123369b95e581d377a411bc8a1f06c6ccd9" offset="0" />
 			</dataarea>
 		</part>
 	</software>
+
+<!-- in d88 format, perhaps same thing as the one above -->
+	<software name="4drivinga" cloneof="4driving">
+		<description>4D Driving</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="0x138fb0">
+				<rom name="4ddrive1.d88" size="0x138fb0" crc="f5e69318" sha1="ebf16d5207352fd294f28dd9bc801a084bc733f4" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="0x138fb0">
+				<rom name="4ddrive2.d88" size="0x138fb0" crc="018a069e" sha1="efb741705bff51eb32b3609bd992408e3f59835e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 
 	<software name="5jikanm">
 		<description>5 Jikanme no Venus</description>
@@ -355,9 +384,9 @@ TODO:
 		<description>5x5 Go! Go!</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="5x5 go! go! (udukisya).fdi" size="1265664" crc="2a6aa7cd" sha1="88685ee0245a15b32d2c9636ccb2a3d7802e22c9" offset="0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1478656">
+				<rom name="5x5 go! go! (udukisya).fdi" size="1478656" crc="2a6aa7cd" sha1="88685ee0245a15b32d2c9636ccb2a3d7802e22c9" offset="0" />
 			</dataarea>
 		</part>
 	</software>
