@@ -4,8 +4,8 @@
 
 	<software name="batpro">
 		<description>BATPRO (v4.8)</description>
-		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1983</year>
+		<publisher>North American Rockwell</publisher>
 
 		<part name="rom1" interface="pet_9000_rom">
 			<dataarea name="rom" size="0x1000">
@@ -57,9 +57,9 @@
 	</software>
 
 	<software name="wordpro">
-		<description>Wordpro</description>
+		<description>WordPro 4 Plus</description>
 		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Professional Software Inc.</publisher>
 
 		<part name="rom" interface="pet_a000_rom">
 			<dataarea name="rom" size="0x1000">
@@ -81,9 +81,9 @@
 	</software>
 
 	<software name="commando">
-		<description>Command-O</description>
-		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Command-O (for 4016/4032, except "Fat-40")</description>
+		<year>1980</year>
+		<publisher>Skyles Electric Works Inc.</publisher>
 
 		<part name="rom" interface="pet_rom">
 			<dataarea name="rom" size="0x1000">
@@ -166,8 +166,8 @@
 
 	<software name="superchp">
 		<description>PetMaster Superchip</description>
-		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1980</year>
+		<publisher>Supersoft</publisher>
 
 		<part name="rom" interface="pet_9000_rom">
 			<dataarea name="rom" size="0x800">
@@ -178,8 +178,8 @@
 
 	<software name="toolkit">
 		<description>The BASIC Programmer's Toolkit</description>
-		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1979</year>
+		<publisher>Palo Alto ICs Inc.</publisher>
 
 		<part name="rom" interface="pet_b000_rom">
 			<dataarea name="rom" size="0x800">
