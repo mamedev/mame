@@ -1,13 +1,5 @@
 #include "emu.h"
 #include "nmk004.h"
-#include "sound/2203intf.h"
-#include "sound/okim6295.h"
-
-
-
-#define FM_CHANNELS          6
-#define PSG_CHANNELS         3
-#define EFFECTS_CHANNELS     8
 
 #define FM_FLAG_NEED_INITIALIZATION      (1<<0)
 #define FM_FLAG_UNKNOWN2                 (1<<1)
@@ -30,92 +22,6 @@
 
 #define NOTE_PAUSE             0x0c
 
-struct psg_control
-{
-/* C220      */ UINT8  flags;
-/* C221-C222 */ UINT16 note_timer;
-/* C223-C224 */ UINT16 note_length;
-/* C225      */ UINT8  volume_timer;
-/* C227-C228 */ UINT16 current;     // current position in control table
-/* C229-C22A */ UINT16 return_address[16];  // return address when control table calls a subtable
-				int return_address_depth;
-/* C22B-C22C */ UINT16 loop_start;  // first instruction of loop
-/* C22D      */ UINT8  loop_times;  // number of times to loop
-/* C22E      */ UINT8  volume_shape;
-/* C22F      */ UINT8  volume_position;
-/* C230      */ UINT8  octave;  // base octave
-/* C231      */ UINT8  note;    // note to play
-/* C233      */ UINT8  note_period_hi_bits;
-};
-
-struct fm_control
-{
-UINT8 note;
-/* C020      */ UINT8  flags;
-/* C021      */ UINT8  slot;    // for ym2203 keyon command
-/* C022-C039 */ UINT8  voice_params[0x18];  // parameters for the YM2203 to configure sound shape
-/* C03A-C03B */ UINT16 f_number;
-/* C03C      */ UINT8  self_feedback;
-/* C03D      */ UINT8  note_duration_table_select;
-/* C03E-C03F */ UINT16 current; // current position in control table
-/* C040-C041 */ UINT16 loop_start;  // first instruction of loop
-/* C042      */ UINT8  loop_times;  // number of times to loop
-/* C043-C044 */ UINT16 return_address[16];  // return address when control table calls a subtable
-				int    return_address_depth;
-/* C045      */ UINT8  octave;
-/* C046-C047 */ UINT16 timer1;
-/* C048-C049 */ UINT16 timer2;
-/* C04A-C04B */ UINT16 timer1_duration;
-/* C04C-C04D */ UINT16 timer2_duration;
-/* C04E      */ UINT8  modulation_table_number;
-/* C04F-C050 */ UINT16 modulation_timer;
-/* C051-C052 */ UINT16 modulation_table;
-/* C053-C054 */ UINT16 modulation_table_position;
-/* C055-C056 */ UINT16 note_period;
-/* C057-C05A */ UINT8  voice_volume[4]; // parameters for the YM2203 to configure sound shape
-/* C05C      */ UINT8  must_update_voice_params;
-};
-
-struct effects_control
-{
-/* C1A0      */ UINT8  flags;
-/* C1BE-C1BF */ UINT16 current; // current position in control table
-/* C1C0-C1C1 */ UINT16 loop_start;  // first instruction of loop
-/* C1C2      */ UINT8  loop_times;  // number of times to loop
-/* C1C3-C1C4 */ UINT16 return_address[16];  // return address when control table calls a subtable
-				int    return_address_depth;
-/* C1C6-C1C7 */ UINT16 timer;
-/* C1CA-C1CB */ UINT16 timer_duration;
-};
-
-struct nmk004_state
-{
-public:
-	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
-	void set_machine(running_machine &machine) { m_machine = &machine; }
-
-	const UINT8 *rom;   // NMK004 data ROM
-	UINT8 from_main;    // command from main CPU
-	UINT8 to_main;      // answer to main CPU
-	int protection_check;
-
-	ym2203_device *ymdevice;
-	okim6295_device *oki1device;
-	okim6295_device *oki2device;
-
-	/* C001      */ UINT8 last_command;     // last command received
-	/* C016      */ UINT8 oki_playing;      // bitmap of active Oki channels
-	/* C020-C19F */ struct fm_control fm_control[FM_CHANNELS];
-	/* C220-C2DF */ struct psg_control psg_control[PSG_CHANNELS];
-	/* C1A0-C21F */ struct effects_control effects_control[EFFECTS_CHANNELS];
-
-private:
-	running_machine *m_machine;
-};
-
-static nmk004_state NMK004_state;
-
-
 #define SAMPLE_TABLE_0      0xefe0
 #define SAMPLE_TABLE_1      0xefe2
 #define FM_MODULATION_TABLE 0xefe4
@@ -128,14 +34,58 @@ static nmk004_state NMK004_state;
 #define PSG_NOTE_TABLE      0xeff2
 
 
-static UINT8 read8(int address)
+const device_type NMK004 = &device_creator<nmk004_device>;
+
+nmk004_device::nmk004_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, NMK004, "NMK004", tag, owner, clock, "nmk004", __FILE__),
+	m_rom(NULL),
+	m_from_main(0),
+	m_to_main(0),
+	m_protection_check(0),
+	m_last_command(0),
+	m_oki_playing(0)
 {
-	return NMK004_state.rom[address];
+	memset(m_fm_control, 0, sizeof(m_fm_control));
+	memset(m_psg_control, 0, sizeof(m_psg_control));
+	memset(m_effects_control, 0, sizeof(m_effects_control));
 }
 
-static UINT16 read16(int address)
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void nmk004_device::device_config_complete()
 {
-	return NMK004_state.rom[address] + 256 * NMK004_state.rom[address+1];
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void nmk004_device::device_start()
+{
+	/* we have to do this via a timer because we get called before the sound reset */
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(nmk004_device::real_init), this));
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void nmk004_device::device_reset()
+{
+}
+
+UINT8 nmk004_device::read8(int address)
+{
+	return m_rom[address];
+}
+
+UINT16 nmk004_device::read16(int address)
+{
+	return m_rom[address] + 256 * m_rom[address+1];
 }
 
 
@@ -146,13 +96,13 @@ static UINT16 read16(int address)
 
 *****************************/
 
-static void oki_play_sample(int sample_no)
+void nmk004_device::oki_play_sample(int sample_no)
 {
 	UINT16 table_start = (sample_no & 0x80) ? read16(SAMPLE_TABLE_1) : read16(SAMPLE_TABLE_0);
 	UINT8 byte1 = read8(table_start + 2 * (sample_no & 0x7f) + 0);
 	UINT8 byte2 = read8(table_start + 2 * (sample_no & 0x7f) + 1);
 	int chip = (byte1 & 0x80) >> 7;
-	okim6295_device *okidevice = (chip) ? NMK004_state.oki2device : NMK004_state.oki1device;
+	okim6295_device *okidevice = (chip) ? m_oki2device : m_oki1device;
 
 	if ((byte1 & 0x7f) == 0)
 	{
@@ -165,17 +115,17 @@ static void oki_play_sample(int sample_no)
 		int ch = byte2 & 0x03;
 		int force = (byte2 & 0x80) >> 7;
 
-		if (!force && (NMK004_state.oki_playing & (1 << (ch + 4*chip))))
+		if (!force && (m_oki_playing & (1 << (ch + 4*chip))))
 			return;
 
-		NMK004_state.oki_playing |= 1 << (ch + 4*chip);
+		m_oki_playing |= 1 << (ch + 4*chip);
 
 		// stop channel
 		okidevice->write_command( 0x08 << ch );
 
 		if (sample != 0)
 		{
-			UINT8 *rom = NMK004_state.machine().root_device().memregion((chip == 0) ? "oki1" : "oki2")->base();
+			UINT8 *rom = machine().root_device().memregion((chip == 0) ? "oki1" : "oki2")->base();
 			int bank = (byte2 & 0x0c) >> 2;
 			int vol = (byte2 & 0x70) >> 4;
 
@@ -188,9 +138,9 @@ static void oki_play_sample(int sample_no)
 	}
 }
 
-static void oki_update_state(void)
+void nmk004_device::oki_update_state(void)
 {
-	NMK004_state.oki_playing = ((NMK004_state.oki2device->read_status() & 0x0f) << 4) | (NMK004_state.oki1device->read_status() & 0x0f);
+	m_oki_playing = ((m_oki2device->read_status() & 0x0f) << 4) | (m_oki1device->read_status() & 0x0f);
 }
 
 
@@ -201,9 +151,9 @@ static void oki_update_state(void)
 
 *****************************/
 
-static void effects_update(int channel)
+void nmk004_device::effects_update(int channel)
 {
-	struct effects_control *effects = &NMK004_state.effects_control[channel];
+	struct effects_control *effects = &m_effects_control[channel];
 
 	// advance the timers
 	if (effects->timer)
@@ -308,10 +258,10 @@ static void effects_update(int channel)
 
 *****************************/
 
-static void fm_update(int channel)
+void nmk004_device::fm_update(int channel)
 {
-	struct fm_control *fm = &NMK004_state.fm_control[channel];
-	address_space &space = NMK004_state.machine().firstcpu->space(AS_PROGRAM);
+	struct fm_control *fm = &m_fm_control[channel];
+	address_space &space = machine().firstcpu->space(AS_PROGRAM);
 
 	// advance the timers
 	if (fm->timer1)
@@ -355,10 +305,10 @@ static void fm_update(int channel)
 						case 0xf0:  // slot (for keyon ym2203 command)
 							fm->flags |= FM_FLAG_MUST_SEND_CONFIGURATION;
 							fm->slot = read8(fm->current++);
-							if (channel < 3 || !(NMK004_state.fm_control[channel-3].flags & FM_FLAG_ACTIVE))
+							if (channel < 3 || !(m_fm_control[channel-3].flags & FM_FLAG_ACTIVE))
 							{
-								NMK004_state.ymdevice->control_port_w(space, 0, 0x28);   // keyon/off
-								NMK004_state.ymdevice->write_port_w(space, 0, channel % 3);
+								m_ymdevice->control_port_w(space, 0, 0x28);   // keyon/off
+								m_ymdevice->write_port_w(space, 0, channel % 3);
 							}
 							break;
 
@@ -558,35 +508,35 @@ fm->note = note;
 
 #if 0
 popmessage("%02x %02x %02x %02x %02x %02x",
-		NMK004_state.fm_control[0].note,
-		NMK004_state.fm_control[1].note,
-		NMK004_state.fm_control[2].note,
-		NMK004_state.fm_control[3].note,
-		NMK004_state.fm_control[4].note,
-		NMK004_state.fm_control[5].note);
+		m_fm_control[0].note,
+		m_fm_control[1].note,
+		m_fm_control[2].note,
+		m_fm_control[3].note,
+		m_fm_control[4].note,
+		m_fm_control[5].note);
 #endif
 #if 0
 popmessage("%02x %02x%02x%02x%02x %02x %02x%02x%02x%02x %02x %02x%02x%02x%02x",
-		NMK004_state.fm_control[3].note,
-		NMK004_state.fm_control[3].voice_volume[0],
-		NMK004_state.fm_control[3].voice_volume[1],
-		NMK004_state.fm_control[3].voice_volume[2],
-		NMK004_state.fm_control[3].voice_volume[3],
-		NMK004_state.fm_control[4].note,
-		NMK004_state.fm_control[4].voice_volume[0],
-		NMK004_state.fm_control[4].voice_volume[1],
-		NMK004_state.fm_control[4].voice_volume[2],
-		NMK004_state.fm_control[4].voice_volume[3],
-		NMK004_state.fm_control[5].note,
-		NMK004_state.fm_control[5].voice_volume[0],
-		NMK004_state.fm_control[5].voice_volume[1],
-		NMK004_state.fm_control[5].voice_volume[2],
-		NMK004_state.fm_control[5].voice_volume[3]);
+		m_fm_control[3].note,
+		m_fm_control[3].voice_volume[0],
+		m_fm_control[3].voice_volume[1],
+		m_fm_control[3].voice_volume[2],
+		m_fm_control[3].voice_volume[3],
+		m_fm_control[4].note,
+		m_fm_control[4].voice_volume[0],
+		m_fm_control[4].voice_volume[1],
+		m_fm_control[4].voice_volume[2],
+		m_fm_control[4].voice_volume[3],
+		m_fm_control[5].note,
+		m_fm_control[5].voice_volume[0],
+		m_fm_control[5].voice_volume[1],
+		m_fm_control[5].voice_volume[2],
+		m_fm_control[5].voice_volume[3]);
 #endif
 }
 
 
-static void fm_voices_update(void)
+void nmk004_device::fm_voices_update(void)
 {
 	static const int ym2203_registers[0x18] =
 	{
@@ -595,11 +545,11 @@ static void fm_voices_update(void)
 	};
 	int channel,i;
 
-	address_space &space = NMK004_state.machine().firstcpu->space(AS_PROGRAM);
+	address_space &space = machine().firstcpu->space(AS_PROGRAM);
 	for (channel = 0; channel < 3;channel++)
 	{
-		struct fm_control *fm1 = &NMK004_state.fm_control[channel];
-		struct fm_control *fm2 = &NMK004_state.fm_control[channel + 3];
+		struct fm_control *fm1 = &m_fm_control[channel];
+		struct fm_control *fm2 = &m_fm_control[channel + 3];
 
 		if (fm1->flags &  FM_FLAG_MUST_SEND_CONFIGURATION)
 		{
@@ -607,8 +557,8 @@ static void fm_voices_update(void)
 
 			for (i = 0; i < 0x18; i++)
 			{
-				NMK004_state.ymdevice->control_port_w(space, 0, ym2203_registers[i] + channel);
-				NMK004_state.ymdevice->write_port_w(space, 0, fm1->voice_params[i]);
+				m_ymdevice->control_port_w(space, 0, ym2203_registers[i] + channel);
+				m_ymdevice->write_port_w(space, 0, fm1->voice_params[i]);
 			}
 		}
 
@@ -620,8 +570,8 @@ static void fm_voices_update(void)
 			{
 				for (i = 0; i < 0x18; i++)
 				{
-					NMK004_state.ymdevice->control_port_w(space, 0, ym2203_registers[i] + channel);
-					NMK004_state.ymdevice->write_port_w(space, 0, fm2->voice_params[i]);
+					m_ymdevice->control_port_w(space, 0, ym2203_registers[i] + channel);
+					m_ymdevice->write_port_w(space, 0, fm2->voice_params[i]);
 				}
 			}
 		}
@@ -629,25 +579,25 @@ static void fm_voices_update(void)
 
 		if (fm1->flags & FM_FLAG_ACTIVE)
 		{
-			NMK004_state.ymdevice->control_port_w(space, 0, 0xb0 + channel); // self-feedback
-			NMK004_state.ymdevice->write_port_w(space, 0, fm1->self_feedback);
+			m_ymdevice->control_port_w(space, 0, 0xb0 + channel); // self-feedback
+			m_ymdevice->write_port_w(space, 0, fm1->self_feedback);
 
-			NMK004_state.ymdevice->control_port_w(space, 0, 0xa4 + channel); // F-number
-			NMK004_state.ymdevice->write_port_w(space, 0, fm1->f_number >> 8);
+			m_ymdevice->control_port_w(space, 0, 0xa4 + channel); // F-number
+			m_ymdevice->write_port_w(space, 0, fm1->f_number >> 8);
 
-			NMK004_state.ymdevice->control_port_w(space, 0, 0xa0 + channel); // F-number
-			NMK004_state.ymdevice->write_port_w(space, 0, fm1->f_number & 0xff);
+			m_ymdevice->control_port_w(space, 0, 0xa0 + channel); // F-number
+			m_ymdevice->write_port_w(space, 0, fm1->f_number & 0xff);
 		}
 		else
 		{
-			NMK004_state.ymdevice->control_port_w(space, 0, 0xb0 + channel); // self-feedback
-			NMK004_state.ymdevice->write_port_w(space, 0, fm2->self_feedback);
+			m_ymdevice->control_port_w(space, 0, 0xb0 + channel); // self-feedback
+			m_ymdevice->write_port_w(space, 0, fm2->self_feedback);
 
-			NMK004_state.ymdevice->control_port_w(space, 0, 0xa4 + channel); // F-number
-			NMK004_state.ymdevice->write_port_w(space, 0, fm2->f_number >> 8);
+			m_ymdevice->control_port_w(space, 0, 0xa4 + channel); // F-number
+			m_ymdevice->write_port_w(space, 0, fm2->f_number >> 8);
 
-			NMK004_state.ymdevice->control_port_w(space, 0, 0xa0 + channel); // F-number
-			NMK004_state.ymdevice->write_port_w(space, 0, fm2->f_number & 0xff);
+			m_ymdevice->control_port_w(space, 0, 0xa0 + channel); // F-number
+			m_ymdevice->write_port_w(space, 0, fm2->f_number & 0xff);
 		}
 
 
@@ -656,8 +606,8 @@ static void fm_voices_update(void)
 		{
 			fm1->flags &= ~FM_FLAG_MUST_SEND_KEYON;
 
-			NMK004_state.ymdevice->control_port_w(space, 0, 0x28);   // keyon/off
-			NMK004_state.ymdevice->write_port_w(space, 0, fm1->slot | channel);
+			m_ymdevice->control_port_w(space, 0, 0x28);   // keyon/off
+			m_ymdevice->write_port_w(space, 0, fm1->slot | channel);
 		}
 
 		if (fm2->flags & FM_FLAG_MUST_SEND_KEYON)
@@ -666,8 +616,8 @@ static void fm_voices_update(void)
 
 			if (!(fm1->flags & FM_FLAG_ACTIVE))
 			{
-				NMK004_state.ymdevice->control_port_w(space, 0, 0x28);   // keyon/off
-				NMK004_state.ymdevice->write_port_w(space, 0, fm2->slot | channel);
+				m_ymdevice->control_port_w(space, 0, 0x28);   // keyon/off
+				m_ymdevice->write_port_w(space, 0, fm2->slot | channel);
 			}
 		}
 	}
@@ -681,10 +631,10 @@ static void fm_voices_update(void)
 
 *****************************/
 
-static void psg_update(int channel)
+void nmk004_device::psg_update(int channel)
 {
-	struct psg_control *psg = &NMK004_state.psg_control[channel];
-	address_space &space = NMK004_state.machine().firstcpu->space(AS_PROGRAM);
+	struct psg_control *psg = &m_psg_control[channel];
+	address_space &space = machine().firstcpu->space(AS_PROGRAM);
 
 	// advance the timers
 	if (psg->note_timer)
@@ -706,11 +656,11 @@ static void psg_update(int channel)
 			psg->flags &= ~PSG_FLAG_NOISE_NOT_ENABLED;
 
 			// enable noise, disable tone on this channel
-			NMK004_state.ymdevice->control_port_w(space, 0, 0x07);
-			enable = NMK004_state.ymdevice->read_port_r(space, 0);
+			m_ymdevice->control_port_w(space, 0, 0x07);
+			enable = m_ymdevice->read_port_r(space, 0);
 			enable |=  (0x01 << channel);   // disable tone
 			enable &= ~(0x08 << channel);   // enable noise
-			NMK004_state.ymdevice->write_port_w(space, 0, enable);
+			m_ymdevice->write_port_w(space, 0, enable);
 		}
 
 
@@ -744,11 +694,11 @@ static void psg_update(int channel)
 							psg->flags &= ~PSG_FLAG_NOISE_NOT_ENABLED;
 
 							// enable noise, disable tone on this channel
-							NMK004_state.ymdevice->control_port_w(space, 0, 0x07);
-							enable = NMK004_state.ymdevice->read_port_r(space, 0);
+							m_ymdevice->control_port_w(space, 0, 0x07);
+							enable = m_ymdevice->read_port_r(space, 0);
 							enable |=  (0x01 << channel);   // disable tone
 							enable &= ~(0x08 << channel);   // enable noise
-							NMK004_state.ymdevice->write_port_w(space, 0, enable);
+							m_ymdevice->write_port_w(space, 0, enable);
 							break;
 
 						case 0xf2:  // set volume shape
@@ -793,8 +743,8 @@ static void psg_update(int channel)
 							psg->volume_shape = 0;
 
 							// mute channel
-							NMK004_state.ymdevice->control_port_w(space, 0, 8 + channel);
-							NMK004_state.ymdevice->write_port_w(space, 0, 0);
+							m_ymdevice->control_port_w(space, 0, 8 + channel);
+							m_ymdevice->write_port_w(space, 0, 0);
 							return;
 					}
 				}
@@ -834,10 +784,10 @@ static void psg_update(int channel)
 
 					period >>= octave;
 
-					NMK004_state.ymdevice->control_port_w(space, 0, 2 * channel + 1);
-					NMK004_state.ymdevice->write_port_w(space, 0, (period & 0x0f00) >> 8);
-					NMK004_state.ymdevice->control_port_w(space, 0, 2 * channel + 0);
-					NMK004_state.ymdevice->write_port_w(space, 0, (period & 0x00ff));
+					m_ymdevice->control_port_w(space, 0, 2 * channel + 1);
+					m_ymdevice->write_port_w(space, 0, (period & 0x0f00) >> 8);
+					m_ymdevice->control_port_w(space, 0, 2 * channel + 0);
+					m_ymdevice->write_port_w(space, 0, (period & 0x00ff));
 
 					psg->note_period_hi_bits = (period & 0x0f00) >> 8;
 				}
@@ -850,15 +800,15 @@ static void psg_update(int channel)
 						psg->flags |= PSG_FLAG_NOISE_NOT_ENABLED;
 
 						// disable noise, enable tone on this channel
-						NMK004_state.ymdevice->control_port_w(space, 0, 0x07);
-						enable = NMK004_state.ymdevice->read_port_r(space, 0);
+						m_ymdevice->control_port_w(space, 0, 0x07);
+						enable = m_ymdevice->read_port_r(space, 0);
 						enable &= ~(0x01 << channel);   // enable tone
 						enable |=  (0x08 << channel);   // disable noise
-						NMK004_state.ymdevice->write_port_w(space, 0, enable);
+						m_ymdevice->write_port_w(space, 0, enable);
 					}
 
-					NMK004_state.ymdevice->control_port_w(space, 0, 0x06);   // noise period
-					NMK004_state.ymdevice->write_port_w(space, 0, psg->note);
+					m_ymdevice->control_port_w(space, 0, 0x06);   // noise period
+					m_ymdevice->write_port_w(space, 0, psg->note);
 					psg->note_period_hi_bits = psg->note;
 				}
 			}
@@ -883,8 +833,8 @@ static void psg_update(int channel)
 				volume = 0;
 
 			// set volume
-			NMK004_state.ymdevice->control_port_w(space, 0, 8 + channel);
-			NMK004_state.ymdevice->write_port_w(space, 0, volume & 0x0f);
+			m_ymdevice->control_port_w(space, 0, 8 + channel);
+			m_ymdevice->write_port_w(space, 0, volume & 0x0f);
 		}
 	}
 }
@@ -897,7 +847,7 @@ static void psg_update(int channel)
 
 *****************************/
 
-static void get_command(void)
+void nmk004_device::get_command(void)
 {
 	static const UINT8 from_main[] =
 	{
@@ -908,29 +858,29 @@ static void get_command(void)
 		0x82,0xc7,0x00,0x2c,0x6c,0x00,0x9f,0xc7,0x00,0x29,0x69,0x00,0x8b,0xc7,0x00
 	};
 
-	UINT8 cmd = NMK004_state.from_main;
+	UINT8 cmd = m_from_main;
 
-	if (NMK004_state.protection_check < sizeof(to_main))
+	if (m_protection_check < sizeof(to_main))
 	{
 		// startup handshake
-		if (cmd == from_main[NMK004_state.protection_check])
+		if (cmd == from_main[m_protection_check])
 		{
-			logerror("advance handshake to %02x\n",to_main[NMK004_state.protection_check]);
-			NMK004_state.to_main = to_main[NMK004_state.protection_check++];
+			logerror("advance handshake to %02x\n",to_main[m_protection_check]);
+			m_to_main = to_main[m_protection_check++];
 		}
 	}
 	else
 	{
 		// send command back to main CPU to acknowledge reception
-		NMK004_state.to_main = cmd;
+		m_to_main = cmd;
 	}
 
-	if (NMK004_state.last_command != cmd)
+	if (m_last_command != cmd)
 	{
 		UINT16 table_start = read16(COMMAND_TABLE);
 		UINT16 cmd_table = read16(table_start + 2 * cmd);
 
-		NMK004_state.last_command = cmd;
+		m_last_command = cmd;
 
 		if ((cmd_table & 0xff00) == 0)
 		{
@@ -950,18 +900,18 @@ static void get_command(void)
 //logerror("%04x: channel %d table %04x\n",cmd_table-3,channel,table_start);
 				if (channel < FM_CHANNELS)
 				{
-					NMK004_state.fm_control[channel].current = table_start;
-					NMK004_state.fm_control[channel].return_address_depth = 0;
-					NMK004_state.fm_control[channel].flags |= FM_FLAG_NEED_INITIALIZATION;
+					m_fm_control[channel].current = table_start;
+					m_fm_control[channel].return_address_depth = 0;
+					m_fm_control[channel].flags |= FM_FLAG_NEED_INITIALIZATION;
 				}
 				else
 				{
 					channel -= FM_CHANNELS;
 					if (channel < PSG_CHANNELS)
 					{
-						NMK004_state.psg_control[channel].current = table_start;
-						NMK004_state.psg_control[channel].return_address_depth = 0;
-						NMK004_state.psg_control[channel].flags |= PSG_FLAG_NEED_INITIALIZATION;
+						m_psg_control[channel].current = table_start;
+						m_psg_control[channel].return_address_depth = 0;
+						m_psg_control[channel].flags |= PSG_FLAG_NEED_INITIALIZATION;
 					}
 					else
 					{
@@ -970,9 +920,9 @@ static void get_command(void)
 						{
 							fatalerror("too many effects channels\n");
 						}
-						NMK004_state.effects_control[channel].current = table_start;
-						NMK004_state.effects_control[channel].return_address_depth = 0;
-						NMK004_state.effects_control[channel].flags |= EFFECTS_FLAG_NEED_INITIALIZATION;
+						m_effects_control[channel].current = table_start;
+						m_effects_control[channel].return_address_depth = 0;
+						m_effects_control[channel].flags |= EFFECTS_FLAG_NEED_INITIALIZATION;
 					}
 				}
 			}
@@ -982,7 +932,7 @@ static void get_command(void)
 
 
 
-static void update_music(void)
+void nmk004_device::update_music(void)
 {
 	int channel;
 
@@ -999,12 +949,12 @@ static void update_music(void)
 
 
 
-void NMK004_irq(device_t *device, int irq)
+void nmk004_device::ym2203_irq_handler(int irq)
 {
 	if (irq)
 	{
-		address_space &space = NMK004_state.machine().firstcpu->space(AS_PROGRAM);
-		int status = NMK004_state.ymdevice->status_port_r(space,0);
+		address_space &space = machine().firstcpu->space(AS_PROGRAM);
+		int status = m_ymdevice->status_port_r(space,0);
 
 		if (status & 1) // timer A expired
 		{
@@ -1013,14 +963,14 @@ void NMK004_irq(device_t *device, int irq)
 			update_music();
 
 			// restart timer
-			NMK004_state.ymdevice->control_port_w(space, 0, 0x27);
-			NMK004_state.ymdevice->write_port_w(space, 0, 0x15);
+			m_ymdevice->control_port_w(space, 0, 0x27);
+			m_ymdevice->write_port_w(space, 0, 0x15);
 		}
 	}
 }
 
 
-static TIMER_CALLBACK( real_nmk004_init )
+TIMER_CALLBACK_MEMBER( nmk004_device::real_init )
 {
 	static const UINT8 ym2203_init[] =
 	{
@@ -1030,52 +980,49 @@ static TIMER_CALLBACK( real_nmk004_init )
 	};
 	int i;
 
-	memset(&NMK004_state, 0, sizeof(NMK004_state));
+	m_ymdevice = machine().device<ym2203_device>("ymsnd");
+	m_oki1device = machine().device<okim6295_device>("oki1");
+	m_oki2device = machine().device<okim6295_device>("oki2");
 
-	NMK004_state.set_machine(machine);
-	NMK004_state.ymdevice = machine.device<ym2203_device>("ymsnd");
-	NMK004_state.oki1device = machine.device<okim6295_device>("oki1");
-	NMK004_state.oki2device = machine.device<okim6295_device>("oki2");
+	m_rom = machine().root_device().memregion("audiocpu")->base();
 
-	NMK004_state.rom = machine.root_device().memregion("audiocpu")->base();
-
-	address_space &space = NMK004_state.machine().firstcpu->space(AS_PROGRAM);
-	NMK004_state.ymdevice->control_port_w(space, 0, 0x2f);
-
-	i = 0;
-	while (ym2203_init[i] != 0xff)
+	address_space &space = machine().firstcpu->space(AS_PROGRAM);
+	
+	if (m_ymdevice != NULL)
 	{
-		NMK004_state.ymdevice->control_port_w(space, 0, ym2203_init[i++]);
-		NMK004_state.ymdevice->write_port_w(space, 0, ym2203_init[i++]);
-	}
+		m_ymdevice->control_port_w(space, 0, 0x2f);
 
-	NMK004_state.oki_playing = 0;
+		i = 0;
+		while (ym2203_init[i] != 0xff)
+		{
+			m_ymdevice->control_port_w(space, 0, ym2203_init[i++]);
+			m_ymdevice->write_port_w(space, 0, ym2203_init[i++]);
+		}
+	}	
+	else
+		return;
+	
+	m_oki_playing = 0;
 
 	oki_play_sample(0);
 
-	NMK004_state.protection_check = 0;
-}
-
-void NMK004_init(running_machine &machine)
-{
-	/* we have to do this via a timer because we get called before the sound reset */
-	machine.scheduler().synchronize(FUNC(real_nmk004_init));
+	m_protection_check = 0;
 }
 
 
-WRITE16_HANDLER( NMK004_w )
+WRITE16_MEMBER( nmk004_device::write )
 {
 	if (ACCESSING_BITS_0_7)
 	{
 //logerror("%06x: NMK004_w %02x\n",space.device().safe_pc(),data);
-		NMK004_state.from_main = data & 0xff;
+		m_from_main = data & 0xff;
 	}
 }
 
-READ16_HANDLER( NMK004_r )
+READ16_MEMBER( nmk004_device::read )
 {
 //static int last;
-	int res = NMK004_state.to_main;
+	int res = m_to_main;
 
 //if (res != last) logerror("%06x: NMK004_r %02x\n",space.device().safe_pc(),res);
 //last = res;

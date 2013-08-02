@@ -137,7 +137,6 @@ public:
 	TILE_GET_INFO_MEMBER(bjtwin_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tile_info_0_8bit);
 	DECLARE_VIDEO_START(macross);
-	DECLARE_MACHINE_RESET(NMK004);
 	DECLARE_VIDEO_START(bioship);
 	DECLARE_VIDEO_START(strahl);
 	DECLARE_VIDEO_START(gunnail);
