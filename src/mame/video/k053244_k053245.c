@@ -29,7 +29,6 @@ main ram and the buffer.
 #include "emu.h"
 #include "k053244_k053245.h"
 #include "konami_helper.h"
-#include "devlegcy.h"
 
 #define VERBOSE 0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)

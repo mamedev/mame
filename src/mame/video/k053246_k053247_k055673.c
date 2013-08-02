@@ -35,7 +35,6 @@ The sprite RAM format is very similar to the 053245.
 #include "emu.h"
 #include "k053246_k053247_k055673.h"
 #include "konami_helper.h"
-#include "devlegcy.h"
 
 #define VERBOSE 0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
