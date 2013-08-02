@@ -119,6 +119,13 @@
 		93Cxx has ERASE command; this maps to WRITE on ER5911
 		93Cxx has WRITEALL command; no equivalent on ER5911
 
+****************************************************************************
+
+	Issues with:
+	
+	kickgoal.c - code seems wrong, clock logic writes 0-0-0 instead of 0-1-0 as expected
+	overdriv.c - drops CS, raises CS, keeps DI=1, triggering extraneous start bit
+	
 ***************************************************************************/
 
 #include "emu.h"

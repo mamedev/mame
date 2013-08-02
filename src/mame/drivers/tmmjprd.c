@@ -754,6 +754,7 @@ static MACHINE_CONFIG_START( tmmjprd, tmmjprd_state )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", tmmjprd_state, tmmjprd_scanline, "lscreen", 0, 1)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_ENABLE_STREAMING()
 
 	MCFG_GFXDECODE(tmmjprd)
 

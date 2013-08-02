@@ -86,10 +86,11 @@ eeprom_base_device::eeprom_base_device(const machine_config &mconfig, device_typ
 		m_default_value_set(false),
 		m_completion_time(attotime::zero)
 {
-	m_operation_time[WRITE_TIME] 		= attotime::from_msec(2);
-	m_operation_time[WRITE_ALL_TIME] 	= attotime::from_msec(8);
-	m_operation_time[ERASE_TIME] 		= attotime::from_msec(1);
-	m_operation_time[ERASE_ALL_TIME] 	= attotime::from_msec(8);
+	// a 2ms write time is too long for rfjetsa
+	m_operation_time[WRITE_TIME] 		= attotime::from_usec(1750);
+	m_operation_time[WRITE_ALL_TIME] 	= attotime::from_usec(8000);
+	m_operation_time[ERASE_TIME] 		= attotime::from_usec(1000);
+	m_operation_time[ERASE_ALL_TIME] 	= attotime::from_usec(8000);
 }
 
 
