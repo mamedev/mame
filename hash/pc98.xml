@@ -333,7 +333,7 @@ TODO:
 
 <!-- in d88 format, perhaps same thing as the one above -->
 	<software name="4drivinga" cloneof="4driving">
-		<description>4D Driving</description>
+		<description>4D Driving (Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -11163,6 +11163,17 @@ other two disks
 		</part>
 	</software>
 
+	<software name="quarth">
+		<description>Quarth</description>
+		<year>19??</year>
+		<publisher>Konami</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="0x138fb0">
+				<rom name="quarth.d88" size="0x138fb0" crc="38fbd971" sha1="76b1e8146a45622e20a17efa1ae5d4ebd43595f5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="queensl">
 		<description>Queens Library</description>
 		<year>19??</year>
@@ -11771,7 +11782,7 @@ other two disks
 		<publisher>Nihon Falcom</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="xanadu_a.fdi" size="1265664" crc="4ae868e6" sha1="cb685bf97623c1839e10fe1c9d7ec01f095bb482" offset="0" />
+				<rom name="xanadue_a.fdi" size="1265664" crc="4ae868e6" sha1="cb685bf97623c1839e10fe1c9d7ec01f095bb482" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">

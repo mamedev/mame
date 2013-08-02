@@ -496,6 +496,10 @@ public:
 	inline UINT8 m_pc9801rs_grcg_r(UINT32 offset,int vbank);
 	inline void m_pc9801rs_grcg_w(UINT32 offset,int vbank,UINT8 data);
 	DECLARE_CUSTOM_INPUT_MEMBER(system_type_r);
+	DECLARE_READ8_MEMBER(pc9801ux_gvram_r);
+	DECLARE_WRITE8_MEMBER(pc9801ux_gvram_w);
+	DECLARE_READ8_MEMBER(pc9801ux_gvram0_r);
+	DECLARE_WRITE8_MEMBER(pc9801ux_gvram0_w);
 	UINT32 pc9801_286_a20(bool state);
 
 	DECLARE_WRITE8_MEMBER(sasi_data_w);
@@ -2276,11 +2280,32 @@ WRITE8_MEMBER(pc9801_state::pic_w)
 	((offset >= 4) ? m_pic2 : m_pic1)->write(space, offset & 3, data);
 }
 
+READ8_MEMBER(pc9801_state::pc9801ux_gvram_r)
+{
+	return m_pc9801rs_grcg_r(offset & 0x7fff,(offset>>15)+1);
+}
+
+WRITE8_MEMBER(pc9801_state::pc9801ux_gvram_w)
+{
+	m_pc9801rs_grcg_w(offset & 0x7fff,(offset>>15)+1,data);
+}
+
+READ8_MEMBER(pc9801_state::pc9801ux_gvram0_r)
+{
+	return m_pc9801rs_grcg_r(offset & 0x7fff,0);
+}
+
+WRITE8_MEMBER(pc9801_state::pc9801ux_gvram0_w)
+{
+	m_pc9801rs_grcg_w(offset & 0x7fff,0,data);
+}
+
 static ADDRESS_MAP_START( pc9801ux_map, AS_PROGRAM, 16, pc9801_state )
 	AM_RANGE(0x000000, 0x09ffff) AM_RAMBANK("wram")
 	AM_RANGE(0x0a0000, 0x0a3fff) AM_READWRITE8(pc9801_tvram_r, pc9801_tvram_w, 0xffff)
 	AM_RANGE(0x0a4000, 0x0a4fff) AM_READWRITE8(pc9801rs_knjram_r, pc9801rs_knjram_w, 0xffff)
-	AM_RANGE(0x0a8000, 0x0b0fff) AM_READWRITE8(pc9801_gvram_r, pc9801_gvram_w, 0xffff)
+	AM_RANGE(0x0a8000, 0x0bffff) AM_READWRITE8(pc9801ux_gvram_r, pc9801ux_gvram_w, 0xffff)
+	AM_RANGE(0x0e0000, 0x0e7fff) AM_READWRITE8(pc9801ux_gvram0_r,pc9801ux_gvram0_w, 0xffff)
 	AM_RANGE(0x0e0000, 0x0fffff) AM_READ8(pc9801rs_ipl_r, 0xffff)
 ADDRESS_MAP_END
 
