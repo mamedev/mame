@@ -250,6 +250,9 @@ BUILD_MIDILIB = 1
 # specify the sanitizer to use or leave empty to use none
 # SANITIZE = 
 
+# uncomment next line to enable LTO (link-time optimizations)
+# LTO = 1
+
 # specify optimization level or leave commented to use the default
 # (default is OPTIMIZE = 3 normally, or OPTIMIZE = 0 with symbols)
 # OPTIMIZE = 3
@@ -495,6 +498,9 @@ endif
 # if we are optimizing, include optimization options
 ifneq ($(OPTIMIZE),0)
 CCOMFLAGS += -fno-strict-aliasing $(ARCHOPTS)
+ifdef LTO
+CCOMFLAGS += -flto
+endif
 endif
 
 # add a basic set of warnings
@@ -600,6 +606,12 @@ endif
 ifndef SYMBOLS
 ifneq ($(TARGETOS),macosx)
 LDFLAGS += -s
+endif
+endif
+
+ifneq ($(OPTIMIZE),0)
+ifdef LTO
+LDFLAGS += -flto
 endif
 endif
 

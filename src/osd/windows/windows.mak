@@ -129,11 +129,11 @@ else
 CCOMFLAGS += /MT
 endif
 
-# turn on link-time codegen if the MAXOPT flag is also set
-ifdef MAXOPT
-CCOMFLAGS += /GL
-LDFLAGS += /LTCG
+# use link-time optimizations when enabled
+ifneq ($(OPTIMIZE),0)
+ifdef LTO
 AR += /LTCG
+endif
 endif
 
 # disable warnings and link against bufferoverflowu for 64-bit targets
