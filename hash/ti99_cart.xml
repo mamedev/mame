@@ -1648,7 +1648,7 @@
 		<info name="version" value="1.0"/>
 		<info name="comment" value="Does not include help texts"/>
 		<part name="cart" interface="ti99_cart">
-			<feature name="pcb" value="standard"/>
+			<feature name="pcb" value="gromemu"/>
 			<dataarea name="grom_socket" size="0x2000">
 				<rom name="disasnhg.bin" size="0x2000" crc="fe2130f2" sha1="b3aab6b2725e2f4949d58c1f1d2d1012c0d2913f" offset="0x0000" />
 			</dataarea>
@@ -1662,7 +1662,7 @@
 		<info name="version" value="1.0"/>
 		<info name="comment" value="Includes help texts"/>
 		<part name="cart" interface="ti99_cart">
-			<feature name="pcb" value="standard"/>
+			<feature name="pcb" value="gromemu"/>
 			<dataarea name="grom_socket" size="0x4000">
 				<rom name="disassg.bin" size="0x4000" crc="d446984a" sha1="4b7c8294cfe69c3d7fe991b9bd064aee74c645cd" offset="0x0000" />
 			</dataarea>
@@ -1952,7 +1952,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="comment" value="GROM only"/>
 		<part name="cart" interface="ti99_cart">
-			<feature name="pcb" value="standard"/>
+			<feature name="pcb" value="gromemu"/>
 			<dataarea name="grom_socket" size="0xa000">
 				<rom name="maxtesug.bin" size="0xa000" crc="e0ec4769" sha1="eba0c151044a5962b4ce380b84c3314f8dafb05a" offset="0x0000" />
 			</dataarea>
@@ -3127,7 +3127,7 @@
 		<year>1981</year>
 		<publisher>Scott, Foresman</publisher>
 		<part name="cart" interface="ti99_cart">
-			<feature name="pcb" value="standard"/>
+			<feature name="pcb" value="gromemu"/>
 			<dataarea name="grom_socket" size="0xa000">
 				<rom name="dump_g.bin" size="0xa000" crc="2ad92b71" sha1="ca1e8d3a6d82fa4eb9901f7be65b2b68ef20565f" offset="0x0000" />
 			</dataarea>
@@ -3139,7 +3139,7 @@
 		<year>1981</year>
 		<publisher>Scott, Foresman</publisher>
 		<part name="cart" interface="ti99_cart">
-			<feature name="pcb" value="standard"/>
+			<feature name="pcb" value="gromemu"/>
 			<dataarea name="grom_socket" size="0x6000">
 				<rom name="actvactg.bin" size="0x6000" crc="f40406f4" sha1="af152a8887a42693823e68493aaeb7f7533299ae" offset="0x0000" />
 			</dataarea>
@@ -3152,7 +3152,7 @@
 		<publisher>Scott, Foresman</publisher>
 		<info name="serial" value="PHM 3027"/>
 		<part name="cart" interface="ti99_cart">
-			<feature name="pcb" value="standard"/>
+			<feature name="pcb" value="gromemu"/>
 			<dataarea name="grom_socket" size="0x6000">
 				<rom name="phm3027g.bin" size="0x6000" crc="872738d4" sha1="7aedcdce07a027455732f2660ad58ac8cdfe2130" offset="0x0000" />
 			</dataarea>
@@ -3165,7 +3165,7 @@
 		<publisher>Scott, Foresman</publisher>
 		<info name="serial" value="PHM 3028"/>
 		<part name="cart" interface="ti99_cart">
-			<feature name="pcb" value="standard"/>
+			<feature name="pcb" value="gromemu"/>
 			<dataarea name="grom_socket" size="0x6000">
 				<rom name="phm3028g.bin" size="0x6000" crc="bae92e8f" sha1="b7bc545601c44f146a7836f296259b7a35c1c194" offset="0x0000" />
 			</dataarea>
@@ -3177,7 +3177,7 @@
 		<year>1983</year>
 		<publisher>Scott, Foresman</publisher>
 		<part name="cart" interface="ti99_cart">
-			<feature name="pcb" value="standard"/>
+			<feature name="pcb" value="gromemu"/>
 			<dataarea name="grom_socket" size="0x7800">
 				<rom name="dump_g.bin" size="0x7800" crc="9f8e7898" sha1="71a3e9e838b1361ff8f01bfe77cdc3d6f4e71270" offset="0x0000" />
 			</dataarea>
@@ -3189,7 +3189,7 @@
 		<year>1982</year>
 		<publisher>Scott, Foresman</publisher>
 		<part name="cart" interface="ti99_cart">
-			<feature name="pcb" value="standard"/>
+			<feature name="pcb" value="gromemu"/>
 			<dataarea name="grom_socket" size="0xa000">
 				<rom name="dump_g.bin" size="0xa000" crc="9422492f" sha1="1cd445aeaef361faf84617106730d717962e59cf" offset="0x0000" />
 			</dataarea>
@@ -3201,7 +3201,7 @@
 		<year>1981</year>
 		<publisher>Scott, Foresman</publisher>
 		<part name="cart" interface="ti99_cart">
-			<feature name="pcb" value="standard"/>
+			<feature name="pcb" value="gromemu"/>
 			<dataarea name="grom_socket" size="0x9800">
 				<rom name="clasdatg.bin" size="0x9800" crc="f5273127" sha1="4704db70cb040a86b4e84324e6fbe77095d2e5c3" offset="0x0000" />
 			</dataarea>
@@ -3213,7 +3213,7 @@
 		<year>1981</year>
 		<publisher>Scott, Foresman</publisher>
 		<part name="cart" interface="ti99_cart">
-			<feature name="pcb" value="standard"/>
+			<feature name="pcb" value="gromemu"/>
 			<dataarea name="grom_socket" size="0xa000">
 				<rom name="crsmang.bin" size="0xa000" crc="73df377d" sha1="956f3f83bb3028ea1615f50d25f4c121a2ab1aa3" offset="0x0000" />
 			</dataarea>
@@ -3225,7 +3225,7 @@
 		<year>1983</year>
 		<publisher>Scott, Foresman</publisher>
 		<part name="cart" interface="ti99_cart">
-			<feature name="pcb" value="standard"/>
+			<feature name="pcb" value="gromemu"/>
 			<dataarea name="grom_socket" size="0x7800">
 				<rom name="decdel2g.bin" size="0x7800" crc="b3c75bba" sha1="0074c33acf88b565edadd4ce7761aa7b68103e24" offset="0x0000" />
 			</dataarea>
@@ -3238,7 +3238,7 @@
 		<publisher>Scott, Foresman</publisher>
 		<info name="serial" value="PHM 3049"/>
 		<part name="cart" interface="ti99_cart">
-			<feature name="pcb" value="standard"/>
+			<feature name="pcb" value="gromemu"/>
 			<dataarea name="grom_socket" size="0x7800">
 				<rom name="phm3049g.bin" size="0x7800" crc="4a5e824b" sha1="50c19d7f93dce548e568668da1e6e08bfeeae916" offset="0x0000" />
 			</dataarea>
@@ -3250,7 +3250,7 @@
 		<year>1983</year>
 		<publisher>Scott, Foresman</publisher>
 		<part name="cart" interface="ti99_cart">
-			<feature name="pcb" value="standard"/>
+			<feature name="pcb" value="gromemu"/>
 			<dataarea name="grom_socket" size="0x7800">
 				<rom name="dump_g.bin" size="0x7800" crc="87a7b421" sha1="335871f5779cac0155cb43e963157deab3102c96" offset="0x0000" />
 			</dataarea>
@@ -3262,7 +3262,7 @@
 		<year>1983</year>
 		<publisher>Scott, Foresman</publisher>
 		<part name="cart" interface="ti99_cart">
-			<feature name="pcb" value="standard"/>
+			<feature name="pcb" value="gromemu"/>
 			<dataarea name="grom_socket" size="0x9800">
 				<rom name="fanfracg.bin" size="0x9800" crc="0f7fbdae" sha1="a910affdd80535d55bd05e4e75f83d726a337ee6" offset="0x0000" />
 			</dataarea>
@@ -3274,7 +3274,7 @@
 		<year>1983</year>
 		<publisher>Scott, Foresman</publisher>
 		<part name="cart" interface="ti99_cart">
-			<feature name="pcb" value="standard"/>
+			<feature name="pcb" value="gromemu"/>
 			<dataarea name="grom_socket" size="0x4000">
 				<rom name="frogjmpg.bin" size="0x4000" crc="f4c7beb0" sha1="2cd5ad0a726703c0d316e8673832703c13028618" offset="0x0000" />
 			</dataarea>
@@ -3286,7 +3286,7 @@
 		<year>1983</year>
 		<publisher>Scott, Foresman</publisher>
 		<part name="cart" interface="ti99_cart">
-			<feature name="pcb" value="standard"/>
+			<feature name="pcb" value="gromemu"/>
 			<dataarea name="grom_socket" size="0x8000">
 				<rom name="mitmultg.bin" size="0x8000" crc="9d7d72f6" sha1="486d91ac994dab64cf5a4aaf1daf940904c1c968" offset="0x0000" />
 			</dataarea>
@@ -3299,7 +3299,7 @@
 		<publisher>Scott, Foresman</publisher>
 		<info name="serial" value="PHM 3029"/>
 		<part name="cart" interface="ti99_cart">
-			<feature name="pcb" value="standard"/>
+			<feature name="pcb" value="gromemu"/>
 			<dataarea name="grom_socket" size="0x5800">
 				<rom name="phm3029g.bin" size="0x5800" crc="2fa5f0b8" sha1="389218ce5e062694162b7ef8b5e696ca4ecbe2fa" offset="0x0000" />
 			</dataarea>
@@ -3311,7 +3311,7 @@
 		<year>1983</year>
 		<publisher>Scott, Foresman</publisher>
 		<part name="cart" interface="ti99_cart">
-			<feature name="pcb" value="standard"/>
+			<feature name="pcb" value="gromemu"/>
 			<dataarea name="grom_socket" size="0x4000">
 				<rom name="numbowlg.bin" size="0x4000" crc="b374a166" sha1="577d9b9dbc521ddd1d7680d0dcb58696c37b2660" offset="0x0000" />
 			</dataarea>
@@ -3324,7 +3324,7 @@
 		<publisher>Scott, Foresman</publisher>
 		<info name="serial" value="PHM 3050"/>
 		<part name="cart" interface="ti99_cart">
-			<feature name="pcb" value="standard"/>
+			<feature name="pcb" value="gromemu"/>
 			<dataarea name="grom_socket" size="0x7800">
 				<rom name="phm3050g.bin" size="0x7800" crc="9a810966" sha1="0755d1fe5301a76285c2f1d73643ea7d64c3a6e4" offset="0x0000" />
 			</dataarea>
@@ -3337,7 +3337,7 @@
 		<publisher>Scott, Foresman</publisher>
 		<info name="serial" value="PHM 3051"/>
 		<part name="cart" interface="ti99_cart">
-			<feature name="pcb" value="standard"/>
+			<feature name="pcb" value="gromemu"/>
 			<dataarea name="grom_socket" size="0x6000">
 				<rom name="phm3051g.bin" size="0x6000" crc="c37e0373" sha1="75e245be1d383a797109d721a457fbcbb9facccd" offset="0x0000" />
 			</dataarea>
@@ -3349,7 +3349,7 @@
 		<year>1982</year>
 		<publisher>Scott, Foresman</publisher>
 		<part name="cart" interface="ti99_cart">
-			<feature name="pcb" value="standard"/>
+			<feature name="pcb" value="gromemu"/>
 			<dataarea name="grom_socket" size="0xa000">
 				<rom name="payasstg.bin" size="0xa000" crc="ef4fe4d1" sha1="cdb20888c06c98a2982099af6e2bef82fd4cea6b" offset="0x0000" />
 			</dataarea>
@@ -3361,7 +3361,7 @@
 		<year>1983</year>
 		<publisher>Scott, Foresman</publisher>
 		<part name="cart" interface="ti99_cart">
-			<feature name="pcb" value="standard"/>
+			<feature name="pcb" value="gromemu"/>
 			<dataarea name="grom_socket" size="0x7800">
 				<rom name="dump_g.bin" size="0x7800" crc="b543e4a3" sha1="754235dca84af3a17ec28aa2c14bd1b88f709ce2" offset="0x0000" />
 			</dataarea>
@@ -3373,7 +3373,7 @@
 		<year>1983</year>
 		<publisher>Scott, Foresman</publisher>
 		<part name="cart" interface="ti99_cart">
-			<feature name="pcb" value="standard"/>
+			<feature name="pcb" value="gromemu"/>
 			<dataarea name="grom_socket" size="0x9800">
 				<rom name="pyramidg.bin" size="0x9800" crc="2b9e394a" sha1="ba10cfb488edad9fa53cbae679ba1069a3cae0a7" offset="0x0000" />
 			</dataarea>
@@ -3385,7 +3385,7 @@
 		<year>1983</year>
 		<publisher>Scott, Foresman</publisher>
 		<part name="cart" interface="ti99_cart">
-			<feature name="pcb" value="standard"/>
+			<feature name="pcb" value="gromemu"/>
 			<dataarea name="grom_socket" size="0x9800">
 				<rom name="readadvg.bin" size="0x9800" crc="e7068e26" sha1="669dcb40d2d9c975755a99e59054f731973d37f8" offset="0x0000" />
 			</dataarea>
@@ -3397,7 +3397,7 @@
 		<year>1983</year>
 		<publisher>Scott, Foresman</publisher>
 		<part name="cart" interface="ti99_cart">
-			<feature name="pcb" value="standard"/>
+			<feature name="pcb" value="gromemu"/>
 			<dataarea name="grom_socket" size="0x9800">
 				<rom name="rdcheerg.bin" size="0x9800" crc="e458be8e" sha1="96e793169d14e50c25261715d140862b637e51f0" offset="0x0000" />
 			</dataarea>
@@ -3410,7 +3410,7 @@
 		<publisher>Scott, Foresman</publisher>
 		<info name="serial" value="PHM 3082"/>
 		<part name="cart" interface="ti99_cart">
-			<feature name="pcb" value="standard"/>
+			<feature name="pcb" value="gromemu"/>
 			<dataarea name="grom_socket" size="0x9800">
 				<rom name="phm3082g.bin" size="0x9800" crc="32beb7fa" sha1="9e854f6cb4f4e0f0735ff742d0056a988a15dd68" offset="0x0000" />
 			</dataarea>
@@ -3423,7 +3423,7 @@
 		<publisher>Scott, Foresman</publisher>
 		<info name="serial" value="PHM 3043"/>
 		<part name="cart" interface="ti99_cart">
-			<feature name="pcb" value="standard"/>
+			<feature name="pcb" value="gromemu"/>
 			<dataarea name="grom_socket" size="0xa000">
 				<rom name="phm3043g.bin" size="0xa000" crc="b8951ba5" sha1="28bc82c278c5975aab30090ac24d53c395806f7e" offset="0x0000" />
 			</dataarea>
@@ -3436,7 +3436,7 @@
 		<publisher>Scott, Foresman</publisher>
 		<info name="serial" value="PHM 3046"/>
 		<part name="cart" interface="ti99_cart">
-			<feature name="pcb" value="standard"/>
+			<feature name="pcb" value="gromemu"/>
 			<dataarea name="grom_socket" size="0xa000">
 				<rom name="phm3046g.bin" size="0xa000" crc="30fd86e2" sha1="c5c29028ecbc9573614276938ff5f5f481d01b79" offset="0x0000" />
 			</dataarea>
@@ -3448,7 +3448,7 @@
 		<year>1983</year>
 		<publisher>Scott, Foresman</publisher>
 		<part name="cart" interface="ti99_cart">
-			<feature name="pcb" value="standard"/>
+			<feature name="pcb" value="gromemu"/>
 			<dataarea name="grom_socket" size="0x9800">
 				<rom name="rdpowerg.bin" size="0x9800" crc="b839f8ff" sha1="ada5d1e59792108f9de9a56718e246eee36ea86c" offset="0x0000" />
 			</dataarea>
@@ -3460,7 +3460,7 @@
 		<year>1982</year>
 		<publisher>Scott, Foresman</publisher>
 		<part name="cart" interface="ti99_cart">
-			<feature name="pcb" value="standard"/>
+			<feature name="pcb" value="gromemu"/>
 			<dataarea name="grom_socket" size="0xa000">
 				<rom name="dump_g.bin" size="0xa000" crc="9b1319a4" sha1="452d61f1b817511e338bee0a530d9c2ee5f966ae" offset="0x0000" />
 			</dataarea>
@@ -3473,7 +3473,7 @@
 		<publisher>Scott, Foresman</publisher>
 		<info name="serial" value="PHM 3048"/>
 		<part name="cart" interface="ti99_cart">
-			<feature name="pcb" value="standard"/>
+			<feature name="pcb" value="gromemu"/>
 			<dataarea name="grom_socket" size="0x9800">
 				<rom name="phm3048g.bin" size="0x9800" crc="174fcdd3" sha1="76c6e58703a96712cffd32d44512dc53dd7cdd2c" offset="0x0000" />
 			</dataarea>
@@ -3486,7 +3486,7 @@
 		<publisher>Scott, Foresman</publisher>
 		<info name="serial" value="PHM 3047"/>
 		<part name="cart" interface="ti99_cart">
-			<feature name="pcb" value="standard"/>
+			<feature name="pcb" value="gromemu"/>
 			<dataarea name="grom_socket" size="0x9800">
 				<rom name="phm3047g.bin" size="0x9800" crc="c971fb28" sha1="77a687c05211b4ed4e2a12737c24adaa8ca64fb4" offset="0x0000" />
 			</dataarea>
@@ -3498,7 +3498,7 @@
 		<year>1983</year>
 		<publisher>Scott, Foresman</publisher>
 		<part name="cart" interface="ti99_cart">
-			<feature name="pcb" value="standard"/>
+			<feature name="pcb" value="gromemu"/>
 			<dataarea name="grom_socket" size="0x9800">
 				<rom name="rdtrailg.bin" size="0x9800" crc="6ab268eb" sha1="06576bce7b5b2994c8ab65bb5c1493378e60c755" offset="0x0000" />
 			</dataarea>
@@ -3510,7 +3510,7 @@
 		<year>1983</year>
 		<publisher>Scott, Foresman</publisher>
 		<part name="cart" interface="ti99_cart">
-			<feature name="pcb" value="standard"/>
+			<feature name="pcb" value="gromemu"/>
 			<dataarea name="grom_socket" size="0x9800">
 				<rom name="rdwondrg.bin" size="0x9800" crc="0e716875" sha1="ff0d17c6588c5ca1978ed9675745278d97443573" offset="0x0000" />
 			</dataarea>
@@ -3522,7 +3522,7 @@
 		<year>1980</year>
 		<publisher>Scott, Foresman</publisher>
 		<part name="cart" interface="ti99_cart">
-			<feature name="pcb" value="standard"/>
+			<feature name="pcb" value="gromemu"/>
 			<dataarea name="grom_socket" size="0x8000">
 				<rom name="salplang.bin" size="0x8000" crc="9b49bcfe" sha1="082b3337f46fd8b7c2810c140b9dee7b0b641e1b" offset="0x0000" />
 			</dataarea>
@@ -3534,7 +3534,7 @@
 		<year>1981</year>
 		<publisher>Scott, Foresman</publisher>
 		<part name="cart" interface="ti99_cart">
-			<feature name="pcb" value="standard"/>
+			<feature name="pcb" value="gromemu"/>
 			<dataarea name="grom_socket" size="0x8000">
 				<rom name="schmailg.bin" size="0x8000" crc="3ab421c6" sha1="12d03f39f10d445a811447af934422de60738668" offset="0x0000" />
 			</dataarea>
@@ -3546,7 +3546,7 @@
 		<year>1983</year>
 		<publisher>Scott, Foresman</publisher>
 		<part name="cart" interface="ti99_cart">
-			<feature name="pcb" value="standard"/>
+			<feature name="pcb" value="gromemu"/>
 			<dataarea name="grom_socket" size="0x7800">
 				<rom name="spajourg.bin" size="0x7800" crc="50bbdfab" sha1="9da98477c453a389556f1259b11dedd70db605a5" offset="0x0000" />
 			</dataarea>
@@ -3558,7 +3558,7 @@
 		<year>1983</year>
 		<publisher>Scott, Foresman</publisher>
 		<part name="cart" interface="ti99_cart">
-			<feature name="pcb" value="standard"/>
+			<feature name="pcb" value="gromemu"/>
 			<dataarea name="grom_socket" size="0x7800">
 				<rom name="starmazg.bin" size="0x7800" crc="b2dd0d77" sha1="be9b2dd774ad4705d70b40bb4613d0359a06e976" offset="0x0000" />
 			</dataarea>
@@ -3570,7 +3570,7 @@
 		<year>1983</year>
 		<publisher>Scott, Foresman</publisher>
 		<part name="cart" interface="ti99_cart">
-			<feature name="pcb" value="standard"/>
+			<feature name="pcb" value="gromemu"/>
 			<dataarea name="grom_socket" size="0x7800">
 				<rom name="dump_g.bin" size="0x7800" crc="58cf4d74" sha1="6b11e5c4d03474f92d878ab920a6539bd7fe5daa" offset="0x0000" />
 			</dataarea>
@@ -3649,19 +3649,6 @@
 			</dataarea>
 			<dataarea name="rom_socket" size="0x2000">
 				<rom name="crossfirec.bin" size="0x2000" crc="c40449d6" sha1="c5043ddbe82b9848ae57fad3b6b14bfc4c6425a5" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
-<!-- Softlist entry for Soduko -->
-	<software name="soduko">
-		<description>Soduko</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="comment" value="Inverse Sudoku?"/>
-		<part name="cart" interface="ti99_cart">
-			<feature name="pcb" value="standard"/>
-			<dataarea name="rom_socket" size="0x2000">
-				<rom name="soduc.bin" size="0x2000" crc="055c674b" sha1="5e1f05825a9ae24802232e22ccdb8954e4c7ab1b" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3812,25 +3799,6 @@
 			<feature name="pcb" value="standard"/>
 			<dataarea name="rom_socket" size="0x2000">
 				<rom name="sudoc.bin" size="0x2000" crc="7939a481" sha1="32b7076dcbb8aaaba19679bd0136f39b47dcf224" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
-<!-- Softlist entry for Super Extended Basic -->
-	<software name="superxb">
-		<description>Super Extended Basic</description>
-		<year>1987</year>
-		<publisher>Triton</publisher>
-		<info name="version" value="120"/>
-		<part name="cart" interface="ti99_cart">
-			<feature name="pcb" value="gromemu"/>
-			<dataarea name="grom_socket" size="0xa000">
-				<rom name="superxbg.bin" size="0xa000" crc="a94cfd99" sha1="12f1871c8e2dc39a474a78739dd2bd243b755eaf" offset="0x0000" />
-			</dataarea>
-			<dataarea name="rom_socket" size="0x2000">
-				<rom name="superxbc.bin" size="0x2000" crc="bd8addb9" sha1="d0be337b61552f7ac49d52872f66eb6ef549a774" offset="0x0000" />
-			</dataarea>
-			<dataarea name="rom2_socket" size="0x2000">
-				<rom name="superxbd.bin" size="0x2000" crc="d5a91251" sha1="dfa33094b67c31691b0396ea116c9da8d134bbc2" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4056,7 +4024,7 @@
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="ti99_cart">
-			<feature name="pcb" value="standard"/>
+			<feature name="pcb" value="gromemu"/>
 			<dataarea name="grom_socket" size="0x8000">
 				<rom name="tiwgdg.bin" size="0x8000" crc="16aad346" sha1="ff140b842886c191aaefdb2652589e3c5a0817ef" offset="0x0000" />
 			</dataarea>
