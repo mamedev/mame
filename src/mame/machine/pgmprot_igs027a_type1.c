@@ -641,6 +641,72 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 			the first step of decoding this is clearly a xor, with the first value written being an index
 			into a 256 byte table.. 
 
+
+			attempting to understand this (actual values are probably wrong because our table isn't correct, especially the low bits)
+			it is clear the low bits of our xor table are wrong, and obvious why, it's based on the data, and a value of 0 is very rare
+			because the data doesn't need to store blank space! the upper bits are more trusted because they're so rarely used
+
+			
+			001387de: 31 000e | value 0e, after xor is 76  << UNKNOWN  (related to number of columns?)
+			---- Column 1
+			001387de: 31 0098 | value 98, after xor is 40 << 4 = number of fish in ths column
+			001387de: 31 00a8 | value a8, after xor is 0e
+
+			001387de: 31 007c | value 7c, after xor is 02 | 4 entries here (builds 0x0103, 0x0101, 0x0102, 0x0102, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000 )
+			001387de: 31 0043 | value 43, after xor is 01
+			001387de: 31 00e4 | value e4, after xor is 00
+			001387de: 31 00a2 | value a2, after xor is 00
+			---- Column 2
+			001387de: 31 006a | value 6a, after xor is 41 << 4 = number of fish in ths column
+			001387de: 31 00e0 | value e0, after xor is 0f
+
+			001387de: 31 00ed | value ed, after xor is 00 | 4 entries here (builds 0x0103, 0x0100, 0x0101, 0x0105, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000 )
+			001387de: 31 0024 | value 24, after xor is 00
+			001387de: 31 00bb | value bb, after xor is 01
+			001387de: 31 00bd | value bd, after xor is 05
+			---- Column 3
+			001387de: 31 002e | value 2e, after xor is 50 << 5 = number of fish in ths column
+			001387de: 31 00d6 | value d6, after xor is 1f
+
+			001387de: 31 002b | value 2b, after xor is 00 | 5 entries here (builds 0x0100, 0x0101, 0x0105, 0x0104, 0x0104, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000 )
+			001387de: 31 007a | value 7a, after xor is 02
+			001387de: 31 00dd | value dd, after xor is 05
+			001387de: 31 00a3 | value a3, after xor is 05
+			001387de: 31 007b | value 7b, after xor is 05
+			---- Column 4
+			001387de: 31 0052 | value 52, after xor is 10 << 1 = number of fish in ths column
+			001387de: 31 00e7 | value e7, after xor is 03
+
+			001387de: 31 00a2 | value a2, after xor is 00 | 1 entry here ( builds 0x0102, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000 )
+			---- Column 5
+			001387de: 31 005a | value 5a, after xor is 71 << 7 = number of fish in this column
+			001387de: 31 0090 | value 90, after xor is 7f
+			
+			001387de: 31 00ee | value ee, after xor is 03 | 7 entries here (builds 0x0100, 0x0101, 0x0103, 0x0102, 0x0104, 0x0100 ,0x0100, 0x0000, 0x0000, 0x0000 )
+			001387de: 31 0025 | value 25, after xor is 01
+			001387de: 31 00b9 | value b9, after xor is 03
+			001387de: 31 00ba | value ba, after xor is 02
+			001387de: 31 007a | value 7a, after xor is 04
+			001387de: 31 00c9 | value c9, after xor is 00
+			001387de: 31 002b | value 2b, after xor is 00
+			---- Column 6
+			001387de: 31 002b | value 2b, after xor is 53 << 5 = number of fish in this column
+			001387de: 31 00c7 | value c7, after xor is 1f
+
+			001387de: 31 00a2 | value a2, after xor is 04 | 5 entries here (builds 0x0105, 0x0105, 0x0101, 0x0101, 0x0103, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000 )
+			001387de: 31 007a | value 7a, after xor is 04
+			001387de: 31 0043 | value 43, after xor is 01
+			001387de: 31 00e7 | value e7, after xor is 03
+			001387de: 31 00a3 | value a3, after xor is 01 (end, returning 630006 as playfield width)
+
+
+						 
+			  
+			  
+			 
+			  
+			 
+
 			*/
 
 			// these table aren't accurate yet, generated with analysis of data sent, we never
