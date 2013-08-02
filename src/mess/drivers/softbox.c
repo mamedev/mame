@@ -5,6 +5,14 @@
     http://mikenaberezny.com/hardware/pet-cbm/sse-softbox-z80-computer/
 
 
+    Standalone vs. PET/CBM Peripheral Mode
+    --------------------------------------
+
+    The SoftBox can be used as a standalone computer with an RS-232 terminal,
+    or as a PET/CBM peripheral.  This is an emulation of the standalone mode.
+    For the peripheral mode, see: src/mess/machine/softbox.c.
+
+
     Using the Corvus hard disk
     --------------------------
 
