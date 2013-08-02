@@ -1,12 +1,46 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-    Undumped:
 
-    18V401  Fun With Numbers            TV Arcade II
-            Bingo                       TV Casino
-            Math and Social Studies     TV School House I
+RCA Studio II games list
 
+Title                           Series                  Dumped
+----------------------------------------------------------------------------
+Bowling                         built-in                yes
+Doodles                         built-in                yes
+Freeway                         built-in                yes
+Math                            built-in                yes
+Patterns                        built-in                yes
+Gunfighter/Moonship Battle      TV Arcade               yes
+Space War                       TV Arcade I             yes
+Fun with Numbers                TV Arcade II            no, but Guru has one
+Tennis/Squash                   TV Arcade III           yes
+Baseball                        TV Arcade IV            yes
+Speedway/Tag                    TV Arcade               yes
+Blackjack                       TV Casino I             yes
+Bingo                           TV Casino               no
+Math and Social Studies         TV School House I       no, but Guru has one
+Math Fun                        TV School House II      yes
+Biorhythm                       TV Mystic               yes
+
+
+MPT-02 games list
+
+ID      Title                   Series                  Dumped
+----------------------------------------------------------------------------
+MG-201  Bingo                                           yes
+MG-202  Concentration Match                             yes
+MG-203  Star Wars                                       yes
+MG-204  Math Fun                School House II         yes
+MG-205  Pinball                                         yes
+MG-206  Biorythm                                        yes
+MG-207  Tennis/Squash                                   no
+MG-208  Fun with Numbers                                no
+MG-209  Computer Quiz           School House I          no
+MG-210  Baseball                                        no
+MG-211  Speedway/Tag                                    yes
+MG-212  Spacewar Intercept                              no
+MG-213  Gun Fight/Moon Ship                             yes
 -->
 
 <softwarelist name="studio2" description="RCA Studio II cartridges">

@@ -145,52 +145,9 @@ Notes:
 
 /*
 
-    RCA Studio II games list
-
-    Title                           Series                  Dumped
-    ----------------------------------------------------------------------------
-    Bowling                         built-in                yes
-    Doodles                         built-in                yes
-    Freeway                         built-in                yes
-    Math                            built-in                yes
-    Patterns                        built-in                yes
-    Gunfighter/Moonship Battle      TV Arcade               yes
-    Space War                       TV Arcade I             yes
-    Fun with Numbers                TV Arcade II            no, but Guru has one
-    Tennis/Squash                   TV Arcade III           yes
-    Baseball                        TV Arcade IV            yes
-    Speedway/Tag                    TV Arcade               yes
-    Blackjack                       TV Casino I             yes
-    Bingo                           TV Casino               no
-    Math and Social Studies         TV School House I       no, but Guru has one
-    Math Fun                        TV School House II      yes
-    Biorhythm                       TV Mystic               yes
-
-
-    MPT-02 games list
-
-    ID      Title                   Series                  Dumped
-    ----------------------------------------------------------------------------
-    MG-201  Bingo                                           no
-    MG-202  Concentration Match                             no, but Guru has one
-    MG-203  Star Wars                                       no, but Guru has one
-    MG-204  Math Fun                School House II         no, but Guru has one
-    MG-205  Pinball                                         no, but Guru has one
-    MG-206  Biorythm                                        no
-    MG-207  Tennis/Squash                                   no
-    MG-208  Fun with Numbers                                no
-    MG-209  Computer Quiz           School House I          no
-    MG-210  Baseball                                        no
-    MG-211  Speedway/Tag                                    no
-    MG-212  Spacewar Intercept                              no
-    MG-213  Gun Fight/Moon Ship                             no
-
-*/
-
-/*
-
     TODO:
 
+    - grandpak dual ROM
     - disable ic13/14 when cartridge plugged in
     - mpt02 clones' colors
     - visicom colors
