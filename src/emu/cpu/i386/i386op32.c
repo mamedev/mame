@@ -3111,7 +3111,8 @@ static void I386OP(group0F01_32)(i386_state *cpustate)      // Opcode 0x0f 01
 		case 4:         /* SMSW */
 			{
 				if( modrm >= 0xc0 ) {
-					STORE_RM32(modrm, cpustate->cr[0] & 0xffff);
+					// smsw stores all of cr0 into register
+					STORE_RM32(modrm, cpustate->cr[0]);
 					CYCLES(cpustate,CYCLES_SMSW_REG);
 				} else {
 					/* always 16-bit memory operand */
