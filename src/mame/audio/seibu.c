@@ -510,7 +510,7 @@ seibu_adpcm_device::seibu_adpcm_device(const machine_config &mconfig, const char
 		m_end(0),
 		m_nibble(0),
 		m_playing(0),
-		m_allocated(0),
+		//m_allocated(0),
 		m_base(NULL)
 {
 }

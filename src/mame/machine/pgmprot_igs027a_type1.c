@@ -997,7 +997,7 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 				{
 					m_valueresponse = 0x00166178; // right for puzzli2 , wrong for puzzli2s, probably calculated from the writes then?
 				}
-				else if ( (m_value0==0x0004) ) // 2 player demo
+				else if ( m_value0==0x0004 ) // 2 player demo
 				{
 					m_valueresponse = 0x00166e72;
 				}
@@ -1013,7 +1013,7 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 				{
 					m_valueresponse = 0x18cf4a;
 				}
-				else if ( (m_value0==0x0004) ) // 2 player demo
+				else if ( m_value0==0x0004 ) // 2 player demo
 				{
 					m_valueresponse = 0x0018dc44;
 				}

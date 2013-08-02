@@ -129,7 +129,7 @@ protected:
 	UINT32 m_end;
 	UINT8 m_nibble;
 	UINT8 m_playing;
-	UINT8 m_allocated;
+	//UINT8 m_allocated;
 	UINT8 *m_base;
 };
 
