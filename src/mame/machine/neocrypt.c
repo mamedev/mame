@@ -1324,7 +1324,7 @@ void neogeo_state::kf2k3pcb_decrypt_68k()
 
 	for (i = 0; i < 0x100000; i++)
 	{
-		rom[ 0x800000 + i ] ^= rom[ 0x100002 | BYTE_XOR_LE(i) ];
+		rom[ 0x800000 + i ] ^= rom[ 0x100002 | i ];
 	}
 	for( i = 0x100000; i < 0x800000; i++ )
 	{
@@ -1367,7 +1367,7 @@ void neogeo_state::kof2003_decrypt_68k()
 
 	for (i = 0; i < 0x100000; i++)
 	{
-		rom[ 0x800000 + i ] ^= rom[ 0x100002 | BYTE_XOR_LE(i) ];
+		rom[ 0x800000 + i ] ^= rom[ 0x100002 | i ];
 	}
 	for( i = 0; i < 0x100000; i++)
 	{
@@ -1415,7 +1415,7 @@ void neogeo_state::kof2003h_decrypt_68k()
 
 	for (i = 0; i < 0x100000; i++)
 	{
-		rom[ 0x800000 + i ] ^= rom[ 0x100002 | BYTE_XOR_LE(i) ];
+		rom[ 0x800000 + i ] ^= rom[ 0x100002 | i ];
 	}
 	for( i = 0; i < 0x100000; i++)
 	{

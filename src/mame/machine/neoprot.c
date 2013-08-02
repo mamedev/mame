@@ -503,18 +503,16 @@ void neogeo_state::pvc_write_unpack_color()
 
 void neogeo_state::pvc_write_pack_color()
 {
-	UINT8 b = m_pvc_cartridge_ram[0xff4] & 0xff;
-	UINT8 g = m_pvc_cartridge_ram[0xff4] >> 8;
-	UINT8 r = m_pvc_cartridge_ram[0xff5] & 0xff;
-	UINT8 s = m_pvc_cartridge_ram[0xff5] >> 8;
+	UINT16 gb = m_pvc_cartridge_ram[0xff4];
+	UINT16 sr = m_pvc_cartridge_ram[0xff5];
 
-	m_pvc_cartridge_ram[0xff6] = (b >> 1) |
-								((g >> 1) << 4) |
-								((r >> 1) << 8) |
-								((b & 1) << 12) |
-								((g & 1) << 13) |
-								((r & 1) << 14) |
-								((s & 1) << 15);
+	m_pvc_cartridge_ram[0xff6] = ((gb & 0x001e) >> 1) |
+								 ((gb & 0x1e00) >> 5) |
+								 ((sr & 0x001e) << 7) |
+								 ((gb & 0x0001) << 12) |
+								 ((gb & 0x0100) << 5) |
+								 ((sr & 0x0001) << 14) |
+								 ((sr & 0x0100) << 7);
 }
 
 
