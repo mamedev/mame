@@ -60,8 +60,6 @@
     - Bokosuka Wars
     - Jangou 2: floppy fails to load after the title screen;
     - Mobile Suit Gundam - Advanced Operation: error: Device 5.25" high density floppy drive load failed: Unable to identify the image format [for msdos.fdi]
-    - Okuman Chouja 2: fails loading in PC-9801RS only ("packed file is corrupt"). Maybe a 386 core bug?
-    - Quarth: fails loading in PC-9801RS only ("packed file is corrupt"). Maybe a 386 core bug?
 
     List of per-game TODO:
     - 4D Boxing: inputs are unresponsive
@@ -93,12 +91,12 @@
     - Lovely Horror: Doesn't show kanji, tries to read it thru the 0xa9 port;
     - Madou Monogatari 1/2/3: doesn't display bitmap gfxs during gameplay;
     - Quarth: should do a split screen effect, it doesn't hence there are broken gfxs
-    - Quarth: uploads a PCG charset
  	- Princess Maker 2: mouse is buggy;
     - Princess Maker 2: screen transitions are very ugly (btanb?)
  	- Puzznic: trips illegal irq 0x41 (?), prints an error on screen.
  	- Runner's High: wrong double height on the title screen;
     - Sorcerian, Twilight Zone 3: Fails initial booting, issue with 2dd irq?
+	- The Incredible Machine: hangs at main menu (YM mis-fires irq?)
     - Uchiyama Aki no Chou Bangai: keyboard irq is fussy (sometimes it doesn't register a key press);
     - Uno: uses EGC
 

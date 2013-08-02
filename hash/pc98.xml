@@ -846,8 +846,6 @@ TODO:
 		</part>
 	</software>
 
-
-
 	<software name="advanlm">
 		<description>Advanced Lord Monarch</description>
 		<year>19??</year>
@@ -1428,27 +1426,27 @@ TODO:
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="disk1.fdi" size="1265664" crc="a33dabc9" sha1="9397807188c51e85bed6b7bf67fdcdcf6da9b76d" offset="0" />
+				<rom name="systemdisk.fdi" size="1265664" crc="9e8b2929" sha1="7daa8f814dc3afe605a4747b9e3c2fb61de6cf88" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="disk2.fdi" size="1265664" crc="fa9e4ff7" sha1="fadad1735b358950f1b1cb75b3ce22f0e5da5e04" offset="0" />
+				<rom name="gamedisk.fdi" size="1265664" crc="a8c6e079" sha1="82b38db4d3acd95801839c4ee8e273b0f814ee99" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="disk3.fdi" size="1265664" crc="ed7af48f" sha1="c16b6e31095b7e6d26949c24f1d5bef75e6c810e" offset="0" />
+				<rom name="disk1.fdi" size="1265664" crc="a33dabc9" sha1="9397807188c51e85bed6b7bf67fdcdcf6da9b76d" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="gamedisk.fdi" size="1265664" crc="a8c6e079" sha1="82b38db4d3acd95801839c4ee8e273b0f814ee99" offset="0" />
+				<rom name="disk2.fdi" size="1265664" crc="fa9e4ff7" sha1="fadad1735b358950f1b1cb75b3ce22f0e5da5e04" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="systemdisk.fdi" size="1265664" crc="9e8b2929" sha1="7daa8f814dc3afe605a4747b9e3c2fb61de6cf88" offset="0" />
+				<rom name="disk3.fdi" size="1265664" crc="ed7af48f" sha1="c16b6e31095b7e6d26949c24f1d5bef75e6c810e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1879,13 +1877,13 @@ TODO:
 		</part>
 	</software>
 
-	<software name="arkanoid">
+	<software name="arkanoid" supported="yes">
 		<description>Arkanoid</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Taito</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="main.fdi" size="1265664" crc="6ee434e8" sha1="8ce3c8dcb47f026dae0033e0d3314294d6324fe9" offset="0" />
+				<rom name="arkanoid.fdi" size="1265664" crc="6ee434e8" sha1="8ce3c8dcb47f026dae0033e0d3314294d6324fe9" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2599,6 +2597,17 @@ TODO:
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="bokosuka" supported="no">
+		<description>Bokosuka Wars</description>
+		<year>19??</year>
+		<publisher>ASCII</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="0x10f760">
+				<rom name="bokosuka.d88" size="0x10f760" crc="d5da4869" sha1="1fd6124180be8f20acd188702e3b9f9c2d128428" offset="0" />
+			</dataarea>
+		</part>
+	</software>	
 
 	<software name="bomberq">
 		<description>Bomber Quest</description>
@@ -10154,6 +10163,23 @@ other two disks
 		</part>
 	</software>
 
+<!-- Note: order is trusted -->
+	<software name="okumanc2">
+		<description>Okuman Chouja 2</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="0x138fb0">
+				<rom name="okum2sce.d88" size="0x138fb0" crc="33b460bb" sha1="60caeef6c1fcede7034383555a9ef362e346b3a4" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="0x138fb0">
+				<rom name="okum2sys.d88" size="0x138fb0" crc="adfee121" sha1="8636d4415418010e4886de53f3501123082ac38b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="onnano">
 		<description>Onna no Ko no Shikumi</description>
 		<year>19??</year>
@@ -13833,10 +13859,10 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
 		</part>
 	</software>
 
-	<software name="tim">
+	<software name="tim" supported="no">
 		<description>The Incredible Machine</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Sierra On-Line / Cybelle</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="tim.fdi" size="1265664" crc="8a4b7a3c" sha1="c38ad365cb4404250f855635582d1a8d57300420" offset="0" />
