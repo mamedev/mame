@@ -647,17 +647,17 @@ TODO:
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="1.fdi" size="1265664" crc="b9b61bb5" sha1="42fd600432a68ee09348904590d1bee01f354e6a" offset="0" />
+				<rom name="system.fdi" size="1265664" crc="e86340ab" sha1="6d1082cc237db61814564a0f8f2f63b370ac8615" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="2.fdi" size="1265664" crc="9dbacf6c" sha1="2f3c73829f59bf21a3e48717f5981f2d594f39e1" offset="0" />
+				<rom name="1.fdi" size="1265664" crc="b9b61bb5" sha1="42fd600432a68ee09348904590d1bee01f354e6a" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="system.fdi" size="1265664" crc="e86340ab" sha1="6d1082cc237db61814564a0f8f2f63b370ac8615" offset="0" />
+				<rom name="2.fdi" size="1265664" crc="9dbacf6c" sha1="2f3c73829f59bf21a3e48717f5981f2d594f39e1" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -668,27 +668,27 @@ TODO:
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="instal1.fdi" size="1265664" crc="20f394ce" sha1="5ca4c953ba54c57841974ac2876ad7097aaaa4b3" offset="0" />
+				<rom name="startup.fdi" size="1265664" crc="4c61eff8" sha1="98cbb2530637959e1395f3a7bb73536f5e460ef5" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="instal2.fdi" size="1265664" crc="b8af33c6" sha1="8ccc23884b1ea913c2dcfd923269f6f3412ee6f8" offset="0" />
+				<rom name="instal1.fdi" size="1265664" crc="20f394ce" sha1="5ca4c953ba54c57841974ac2876ad7097aaaa4b3" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="instal3.fdi" size="1265664" crc="cbf830d3" sha1="6152519f9e9c87276a7322e0d5f76aaa0d094b3c" offset="0" />
+				<rom name="instal2.fdi" size="1265664" crc="b8af33c6" sha1="8ccc23884b1ea913c2dcfd923269f6f3412ee6f8" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="instal4.fdi" size="1265664" crc="ade89018" sha1="1b263e4ae4dfb06a8051faa4f299b2677718eb95" offset="0" />
+				<rom name="instal3.fdi" size="1265664" crc="cbf830d3" sha1="6152519f9e9c87276a7322e0d5f76aaa0d094b3c" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="startup.fdi" size="1265664" crc="4c61eff8" sha1="98cbb2530637959e1395f3a7bb73536f5e460ef5" offset="0" />
+				<rom name="instal4.fdi" size="1265664" crc="ade89018" sha1="1b263e4ae4dfb06a8051faa4f299b2677718eb95" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -742,22 +742,22 @@ TODO:
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="diska.fdi" size="1265664" crc="a40becba" sha1="3c65e5ab1f95d5f9863681c472b8c73927e0a2c2" offset="0" />
+				<rom name="opening.fdi" size="1265664" crc="11cf2229" sha1="abf3bed693797d9bfecb1b7dc42eadcfb8a14641" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="diskb.fdi" size="1265664" crc="2fb75bcb" sha1="78df14162d4fbd9e6c8f6a67e00d3aed3dd02bc7" offset="0" />
+				<rom name="diska.fdi" size="1265664" crc="a40becba" sha1="3c65e5ab1f95d5f9863681c472b8c73927e0a2c2" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="opening.fdi" size="1265664" crc="11cf2229" sha1="abf3bed693797d9bfecb1b7dc42eadcfb8a14641" offset="0" />
+				<rom name="diskb.fdi" size="1265664" crc="2fb75bcb" sha1="78df14162d4fbd9e6c8f6a67e00d3aed3dd02bc7" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="advanced">
+	<software name="advanp2p">
 		<description>Advanced Power Dolls 2 Premium Disk</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -945,28 +945,28 @@ TODO:
 		</part>
 	</software>
 
-	<software name="aizan">
+	<software name="aizanew">
 		<description>Aiza - New Generation</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="aiza-1.fdi" size="1265664" crc="f7997675" sha1="83503744bcbc5de78e9529cb0326d412c6f51013" offset="0" />
+				<rom name="aiza-system.fdi" size="1265664" crc="4734baa5" sha1="55f7a687b15d9ba67eb5eeb1440feb469d1f9a33" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="aiza-2.fdi" size="1265664" crc="913dfc51" sha1="6f177b0b204248fc5c0c44b58aa91a16aa4dc0b2" offset="0" />
+				<rom name="aiza-1.fdi" size="1265664" crc="f7997675" sha1="83503744bcbc5de78e9529cb0326d412c6f51013" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="aiza-3.fdi" size="1265664" crc="2cd2e174" sha1="d4ab7338efcf308bfedc27d36ca58b30788229a3" offset="0" />
+				<rom name="aiza-2.fdi" size="1265664" crc="913dfc51" sha1="6f177b0b204248fc5c0c44b58aa91a16aa4dc0b2" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="aiza-system.fdi" size="1265664" crc="4734baa5" sha1="55f7a687b15d9ba67eb5eeb1440feb469d1f9a33" offset="0" />
+				<rom name="aiza-3.fdi" size="1265664" crc="2cd2e174" sha1="d4ab7338efcf308bfedc27d36ca58b30788229a3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1832,32 +1832,32 @@ TODO:
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="disk_1.fdi" size="1265664" crc="3c0add57" sha1="bc087979f830b475015e29b1d46326e0c8f6691c" offset="0" />
+				<rom name="system.fdi" size="1265664" crc="df039e56" sha1="0ca56bd23e8f5442cef1161ceaf9c65b9b5fac22" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="disk_2.fdi" size="1265664" crc="9411d56d" sha1="2d0ac9d76d2fc95369aef90e95814703c6cac01f" offset="0" />
+				<rom name="disk_1.fdi" size="1265664" crc="3c0add57" sha1="bc087979f830b475015e29b1d46326e0c8f6691c" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="disk_3.fdi" size="1265664" crc="8daa4250" sha1="fbeebe7bab885bd0a8543de973e6288839cabf85" offset="0" />
+				<rom name="disk_2.fdi" size="1265664" crc="9411d56d" sha1="2d0ac9d76d2fc95369aef90e95814703c6cac01f" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="disk_5.fdi" size="1265664" crc="cde9ef7a" sha1="5974f53b8b7fedf877ee7e3596e2cc2a4a14462f" offset="0" />
+				<rom name="disk_3.fdi" size="1265664" crc="8daa4250" sha1="fbeebe7bab885bd0a8543de973e6288839cabf85" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="system.fdi" size="1265664" crc="df039e56" sha1="0ca56bd23e8f5442cef1161ceaf9c65b9b5fac22" offset="0" />
+				<rom name="disk_5.fdi" size="1265664" crc="cde9ef7a" sha1="5974f53b8b7fedf877ee7e3596e2cc2a4a14462f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="arrowgu">
+	<software name="arrowgex">
 		<description>Arrow Gunner EX</description>
 		<year>1994</year>
 		<publisher>Studio Ray</publisher>
@@ -1874,22 +1874,22 @@ TODO:
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="1.fdi" size="1265664" crc="21250fd7" sha1="2fcd2a2553128711afc4c74b1781766b13ccfcb8" offset="0" />
+				<rom name="system.fdi" size="1265664" crc="a7a7a900" sha1="5628dfa0f3d02a727b6b19187ea1deca4c38e2f8" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="2.fdi" size="1265664" crc="58bdf774" sha1="accd785b78896ee40848a6fc04508dc0fd5fae11" offset="0" />
+				<rom name="1.fdi" size="1265664" crc="21250fd7" sha1="2fcd2a2553128711afc4c74b1781766b13ccfcb8" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="3.fdi" size="1265664" crc="5959a721" sha1="e24c1007c1879129628409adf2b3a9ae82a302ab" offset="0" />
+				<rom name="2.fdi" size="1265664" crc="58bdf774" sha1="accd785b78896ee40848a6fc04508dc0fd5fae11" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="system.fdi" size="1265664" crc="a7a7a900" sha1="5628dfa0f3d02a727b6b19187ea1deca4c38e2f8" offset="0" />
+				<rom name="3.fdi" size="1265664" crc="5959a721" sha1="e24c1007c1879129628409adf2b3a9ae82a302ab" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2302,27 +2302,27 @@ TODO:
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="data_1.fdi" size="1265664" crc="42d3ba49" sha1="b647aba0c171698fe61533ad6f7ee228756c0ad3" offset="0" />
+				<rom name="system.fdi" size="1265664" crc="6b781cf7" sha1="c6738994b07d9b79f2c1424a54858d62366e3a0f" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="data_2.fdi" size="1265664" crc="57f42615" sha1="f94fdc4e562e300b41420e8934ab16f95c1befe0" offset="0" />
+				<rom name="data_1.fdi" size="1265664" crc="42d3ba49" sha1="b647aba0c171698fe61533ad6f7ee228756c0ad3" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="opening1.fdi" size="1265664" crc="81d8dfd4" sha1="41e827edab29f3955945f9e5253f5a8935c0c545" offset="0" />
+				<rom name="data_2.fdi" size="1265664" crc="57f42615" sha1="f94fdc4e562e300b41420e8934ab16f95c1befe0" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="opening2.fdi" size="1265664" crc="3c6f2ba6" sha1="4e3550a1b50875de9b209aa2ab9cd3692a59ce82" offset="0" />
+				<rom name="opening1.fdi" size="1265664" crc="81d8dfd4" sha1="41e827edab29f3955945f9e5253f5a8935c0c545" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="system.fdi" size="1265664" crc="6b781cf7" sha1="c6738994b07d9b79f2c1424a54858d62366e3a0f" offset="0" />
+				<rom name="opening2.fdi" size="1265664" crc="3c6f2ba6" sha1="4e3550a1b50875de9b209aa2ab9cd3692a59ce82" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2567,7 +2567,7 @@ TODO:
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="disks\disk d.fdi" size="1265664" crc="1c8b78f0" sha1="d8cbe817fbbde0a56ae232b36e886f822f3e5e32" offset="0" />
+				<rom name="disk d.fdi" size="1265664" crc="1c8b78f0" sha1="d8cbe817fbbde0a56ae232b36e886f822f3e5e32" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
@@ -2577,7 +2577,7 @@ TODO:
 		</part>
 		<part name="flop6" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="disks\disk f.fdi" size="1265664" crc="e328b74f" sha1="ce42318402b4b3a12e0e19981ada60a2349cf9e3" offset="0" />
+				<rom name="disk f.fdi" size="1265664" crc="e328b74f" sha1="ce42318402b4b3a12e0e19981ada60a2349cf9e3" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop7" interface="floppy_5_25">
@@ -2587,17 +2587,17 @@ TODO:
 		</part>
 		<part name="flop8" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="disks\disk h.fdi" size="1265664" crc="204a571f" sha1="ee64341731d579326305dea8ca2c8dcc8befe427" offset="0" />
+				<rom name="disk h.fdi" size="1265664" crc="204a571f" sha1="ee64341731d579326305dea8ca2c8dcc8befe427" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop9" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="disks\disk i.fdi" size="1265664" crc="3572a826" sha1="0d49a7fff2dd508465dd1f14f413495b1fe5e8b2" offset="0" />
+				<rom name="disk i.fdi" size="1265664" crc="3572a826" sha1="0d49a7fff2dd508465dd1f14f413495b1fe5e8b2" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop10" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="disks\disk j.fdi" size="1265664" crc="901cf7e0" sha1="565ddf31fd04a39e465a7cda7bd54bd614d273b9" offset="0" />
+				<rom name="disk j.fdi" size="1265664" crc="901cf7e0" sha1="565ddf31fd04a39e465a7cda7bd54bd614d273b9" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2634,32 +2634,32 @@ TODO:
 		<publisher>Nihon Falcom</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="data1.fdi" size="1265664" crc="d8efe13d" sha1="d46b2da251369410116a7649b297e8143807d34f" offset="0" />
+				<rom name="masterprogram.fdi" size="1265664" crc="d4fad96a" sha1="67a353cbfd5274b9c6af4e2781d312e19cee59d7" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="data2.fdi" size="1265664" crc="7065abc4" sha1="f4add5a0922425359a1b0f3f760d3cd8918dae9c" offset="0" />
+				<rom name="program.fdi" size="1265664" crc="d381cceb" sha1="c05328237ab820f144d1fc7f07d7cd131b7b5caa" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="data3.fdi" size="1265664" crc="0a54db67" sha1="45cae8508a8db65fe25634dc1269b9405865722a" offset="0" />
+				<rom name="data1.fdi" size="1265664" crc="d8efe13d" sha1="d46b2da251369410116a7649b297e8143807d34f" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="masterprogram.fdi" size="1265664" crc="d4fad96a" sha1="67a353cbfd5274b9c6af4e2781d312e19cee59d7" offset="0" />
+				<rom name="data2.fdi" size="1265664" crc="7065abc4" sha1="f4add5a0922425359a1b0f3f760d3cd8918dae9c" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="opening.fdi" size="1265664" crc="feac475b" sha1="fee6c9e507e1fa7a452283cbf4e3a2be0bf52556" offset="0" />
+				<rom name="data3.fdi" size="1265664" crc="0a54db67" sha1="45cae8508a8db65fe25634dc1269b9405865722a" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="program.fdi" size="1265664" crc="d381cceb" sha1="c05328237ab820f144d1fc7f07d7cd131b7b5caa" offset="0" />
+				<rom name="opening.fdi" size="1265664" crc="feac475b" sha1="fee6c9e507e1fa7a452283cbf4e3a2be0bf52556" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2670,32 +2670,32 @@ TODO:
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="data1.fdi" size="1265664" crc="d8efe13d" sha1="d46b2da251369410116a7649b297e8143807d34f" offset="0" />
+				<rom name="masterprogram.fdi" size="1265664" crc="d4fad96a" sha1="67a353cbfd5274b9c6af4e2781d312e19cee59d7" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="data2.fdi" size="1265664" crc="7065abc4" sha1="f4add5a0922425359a1b0f3f760d3cd8918dae9c" offset="0" />
+				<rom name="program_alt.fdi" size="1265664" crc="d38a28fc" sha1="340c29ae7c7e5c29d1d4f15688603ddf53a3b417" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="data3.fdi" size="1265664" crc="0a54db67" sha1="45cae8508a8db65fe25634dc1269b9405865722a" offset="0" />
+				<rom name="data1.fdi" size="1265664" crc="d8efe13d" sha1="d46b2da251369410116a7649b297e8143807d34f" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="masterprogram.fdi" size="1265664" crc="d4fad96a" sha1="67a353cbfd5274b9c6af4e2781d312e19cee59d7" offset="0" />
+				<rom name="data2.fdi" size="1265664" crc="7065abc4" sha1="f4add5a0922425359a1b0f3f760d3cd8918dae9c" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="opening.fdi" size="1265664" crc="feac475b" sha1="fee6c9e507e1fa7a452283cbf4e3a2be0bf52556" offset="0" />
+				<rom name="data3.fdi" size="1265664" crc="0a54db67" sha1="45cae8508a8db65fe25634dc1269b9405865722a" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="program_alt.fdi" size="1265664" crc="d38a28fc" sha1="340c29ae7c7e5c29d1d4f15688603ddf53a3b417" offset="0" />
+				<rom name="opening.fdi" size="1265664" crc="feac475b" sha1="fee6c9e507e1fa7a452283cbf4e3a2be0bf52556" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2752,17 +2752,17 @@ TODO:
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="disk 2.fdi" size="1265664" crc="cdee42e1" sha1="bdde4a11c616c7f419c8a52120dd810a300ffc27" offset="0" />
+				<rom name="master disk.fdi" size="1265664" crc="6cb4f3cf" sha1="b009291260eb382d27cb82fc407371cf033973a0" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="disk 3.fdi" size="1265664" crc="4266a633" sha1="13c021d7f049b9ef1807da976db81056ca1c8216" offset="0" />
+				<rom name="disk 2.fdi" size="1265664" crc="cdee42e1" sha1="bdde4a11c616c7f419c8a52120dd810a300ffc27" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="master disk.fdi" size="1265664" crc="6cb4f3cf" sha1="b009291260eb382d27cb82fc407371cf033973a0" offset="0" />
+				<rom name="disk 3.fdi" size="1265664" crc="4266a633" sha1="13c021d7f049b9ef1807da976db81056ca1c8216" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
@@ -2846,27 +2846,27 @@ TODO:
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="disk use.fdi" size="1265664" crc="0c9b1f82" sha1="5af2a9c6f014d1dc17ea93f6d37bd6f166309a3a" offset="0" status="baddump" />
+				<rom name="disk_a.fdi" size="1265664" crc="15bf08e5" sha1="6a63be0d679a9a2ee5f4f88972eb8a8937a53891" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="disk_a.fdi" size="1265664" crc="15bf08e5" sha1="6a63be0d679a9a2ee5f4f88972eb8a8937a53891" offset="0" />
+				<rom name="disk_b.fdi" size="1265664" crc="b9fe8474" sha1="51519c78c1edb47151331be74e3d3ceb624d5a34" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="disk_b.fdi" size="1265664" crc="b9fe8474" sha1="51519c78c1edb47151331be74e3d3ceb624d5a34" offset="0" />
+				<rom name="disk_c.fdi" size="1265664" crc="653b343b" sha1="6e8aff5e63da263d09e9be5111bd29ce55721a8a" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="disk_c.fdi" size="1265664" crc="653b343b" sha1="6e8aff5e63da263d09e9be5111bd29ce55721a8a" offset="0" />
+				<rom name="disk_d.fdi" size="1265664" crc="1cf51300" sha1="31937a3bf75a1d70975022f9de16a5965d4e45f9" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="disk_d.fdi" size="1265664" crc="1cf51300" sha1="31937a3bf75a1d70975022f9de16a5965d4e45f9" offset="0" />
+				<rom name="disk use.fdi" size="1265664" crc="0c9b1f82" sha1="5af2a9c6f014d1dc17ea93f6d37bd6f166309a3a" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -2897,7 +2897,7 @@ TODO:
 		</part>
 	</software>
 	
-	<software name="burning">
+	<software name="burningd">
 		<description>Burning Dragon</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2971,17 +2971,17 @@ TODO:
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="data.fdi" size="1265664" crc="121f7ffa" sha1="3c54e55d9c54b97b00e7c12d095681239469c4da" offset="0" />
+				<rom name="system.fdi" size="1265664" crc="a65ca88d" sha1="fc346a0d292d398d2e4e0e7abda8ebec66e2881f" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="omake.fdi" size="1265664" crc="54812047" sha1="c87aa911e2c6b4368226059d607a2b988344ae33" offset="0" />
+				<rom name="data.fdi" size="1265664" crc="121f7ffa" sha1="3c54e55d9c54b97b00e7c12d095681239469c4da" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="system.fdi" size="1265664" crc="a65ca88d" sha1="fc346a0d292d398d2e4e0e7abda8ebec66e2881f" offset="0" />
+				<rom name="omake.fdi" size="1265664" crc="54812047" sha1="c87aa911e2c6b4368226059d607a2b988344ae33" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3158,12 +3158,12 @@ TODO:
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="castles data.fdi" size="1265664" crc="6bea4dff" sha1="7db025f80b5971486dc764deff17cb632fe04b89" offset="0" />
+				<rom name="castles system.fdi" size="1265664" crc="e8face38" sha1="bf2fad94581c09d4cff32d14f196d56b7efa39af" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="castles system.fdi" size="1265664" crc="e8face38" sha1="bf2fad94581c09d4cff32d14f196d56b7efa39af" offset="0" />
+				<rom name="castles data.fdi" size="1265664" crc="6bea4dff" sha1="7db025f80b5971486dc764deff17cb632fe04b89" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3855,22 +3855,22 @@ TODO:
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="dps_sg_1.fdi" size="1265664" crc="06c4d7c6" sha1="006a00cc0881aea11f93e255a96b98188066a324" offset="0" />
+				<rom name="dps_sg_system.fdi" size="1265664" crc="54611af2" sha1="5f3ac1b13aefba1352bf434b11c4fce8266f4efd" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="dps_sg_2.fdi" size="1265664" crc="168363e5" sha1="c04411248c1f2641b17bcd1a148627831523b3cb" offset="0" />
+				<rom name="dps_sg_1.fdi" size="1265664" crc="06c4d7c6" sha1="006a00cc0881aea11f93e255a96b98188066a324" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="dps_sg_3.fdi" size="1265664" crc="30b2b286" sha1="385f3fc6cf1f59b0e2c5c5fe7bf024465350ddc5" offset="0" />
+				<rom name="dps_sg_2.fdi" size="1265664" crc="168363e5" sha1="c04411248c1f2641b17bcd1a148627831523b3cb" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="dps_sg_system.fdi" size="1265664" crc="54611af2" sha1="5f3ac1b13aefba1352bf434b11c4fce8266f4efd" offset="0" />
+				<rom name="dps_sg_3.fdi" size="1265664" crc="30b2b286" sha1="385f3fc6cf1f59b0e2c5c5fe7bf024465350ddc5" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -5443,17 +5443,17 @@ TODO: missing install disks
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="disk_a.fdi" size="1265664" crc="8290d26e" sha1="3178523590deec4901d3d0af6b31a064c4ac52f0" offset="0" />
+				<rom name="system.fdi" size="1265664" crc="dca786ba" sha1="435bcabc097ae18dc2bd12971d71fff7f5bdf02e" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="disk_b.fdi" size="1265664" crc="414ac632" sha1="f9ca271e5af3d6725678732b49bbdf9de322f55b" offset="0" />
+				<rom name="disk_a.fdi" size="1265664" crc="8290d26e" sha1="3178523590deec4901d3d0af6b31a064c4ac52f0" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="system.fdi" size="1265664" crc="dca786ba" sha1="435bcabc097ae18dc2bd12971d71fff7f5bdf02e" offset="0" />
+				<rom name="disk_b.fdi" size="1265664" crc="414ac632" sha1="f9ca271e5af3d6725678732b49bbdf9de322f55b" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
@@ -6192,32 +6192,32 @@ TODO: missing install disks
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="disk_1.fdi" size="1265664" crc="3a13cc92" sha1="199b1f1d0e45420ec4abc3dcf9f15b3ee019d327" offset="0" />
+				<rom name="system.fdi" size="1265664" crc="b816ccbd" sha1="8b8c3ef0e906df57660f924ad49e65593945f70a" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="disk_2.fdi" size="1265664" crc="1d1acea1" sha1="078a1d3e362b002046ff75558431c64fb891129e" offset="0" />
+				<rom name="disk_1.fdi" size="1265664" crc="3a13cc92" sha1="199b1f1d0e45420ec4abc3dcf9f15b3ee019d327" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="disk_3.fdi" size="1265664" crc="95e3af04" sha1="8553a04460cc5a9dd93ac3d53775d8a6e47946d7" offset="0" />
+				<rom name="disk_2.fdi" size="1265664" crc="1d1acea1" sha1="078a1d3e362b002046ff75558431c64fb891129e" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="disk_4.fdi" size="1265664" crc="2166bfca" sha1="3b85f9a4ddad870329867515fad4282de6940b1c" offset="0" />
+				<rom name="disk_3.fdi" size="1265664" crc="95e3af04" sha1="8553a04460cc5a9dd93ac3d53775d8a6e47946d7" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="disk_5.fdi" size="1265664" crc="cf73c180" sha1="c053792bcac114fa297ceb30173f8ffe2320cb0c" offset="0" />
+				<rom name="disk_4.fdi" size="1265664" crc="2166bfca" sha1="3b85f9a4ddad870329867515fad4282de6940b1c" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="system.fdi" size="1265664" crc="b816ccbd" sha1="8b8c3ef0e906df57660f924ad49e65593945f70a" offset="0" />
+				<rom name="disk_5.fdi" size="1265664" crc="cf73c180" sha1="c053792bcac114fa297ceb30173f8ffe2320cb0c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -6504,22 +6504,22 @@ Fake disk?
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="ieyasu senhata (j) 1.fdi" size="1265664" crc="cf920e02" sha1="56fb493749a6d732af7df42ad95c4527c4e6e836" offset="0" />
+				<rom name="ieyasu senhata (j) system.fdi" size="1265664" crc="d1860e48" sha1="904af733365f1b67889fe7c5d34832b0c608dbc8" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="ieyasu senhata (j) 2.fdi" size="1265664" crc="42ce9658" sha1="3ea32b1c83918844eb3edbac293b05ade36969fb" offset="0" />
+				<rom name="ieyasu senhata (j) 1.fdi" size="1265664" crc="cf920e02" sha1="56fb493749a6d732af7df42ad95c4527c4e6e836" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="ieyasu senhata (j) 3.fdi" size="1265664" crc="7d458c5d" sha1="0905e8ee2a92cb0fb8d6328ea3202e31124038ae" offset="0" />
+				<rom name="ieyasu senhata (j) 2.fdi" size="1265664" crc="42ce9658" sha1="3ea32b1c83918844eb3edbac293b05ade36969fb" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="ieyasu senhata (j) system.fdi" size="1265664" crc="d1860e48" sha1="904af733365f1b67889fe7c5d34832b0c608dbc8" offset="0" />
+				<rom name="ieyasu senhata (j) 3.fdi" size="1265664" crc="7d458c5d" sha1="0905e8ee2a92cb0fb8d6328ea3202e31124038ae" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -7802,22 +7802,22 @@ TODO: other two disks, in .nfd format
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="lenam - sword of legend (j) a.fdi" size="1265664" crc="90727b67" sha1="027878da6d38bb98542e7d6ede4c2b08f761aa4c" offset="0" />
+				<rom name="lenam - sword of legend (j) system.fdi" size="1265664" crc="b0f92983" sha1="40fea946d82d4d57d448b67856c23af4bde7cf69" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="lenam - sword of legend (j) b.fdi" size="1265664" crc="4dca2d24" sha1="346e2f144b98122590c97b9f703cd546cb1390e3" offset="0" />
+				<rom name="lenam - sword of legend (j) a.fdi" size="1265664" crc="90727b67" sha1="027878da6d38bb98542e7d6ede4c2b08f761aa4c" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="lenam - sword of legend (j) c.fdi" size="1265664" crc="4b370951" sha1="b83f8d5d41e4b5292c10dae7eaf63e1fd3f4e35c" offset="0" />
+				<rom name="lenam - sword of legend (j) b.fdi" size="1265664" crc="4dca2d24" sha1="346e2f144b98122590c97b9f703cd546cb1390e3" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="lenam - sword of legend (j) system.fdi" size="1265664" crc="b0f92983" sha1="40fea946d82d4d57d448b67856c23af4bde7cf69" offset="0" />
+				<rom name="lenam - sword of legend (j) c.fdi" size="1265664" crc="4b370951" sha1="b83f8d5d41e4b5292c10dae7eaf63e1fd3f4e35c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
