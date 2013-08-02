@@ -357,7 +357,7 @@ void report_bad_device_cast(const device_t *dev, const std::type_info &src_type,
 template<class _Dest, class _Source>
 inline _Dest downcast(_Source *src)
 {
-#ifdef MAME_DEBUG
+#if defined(MAME_DEBUG) && !defined(MAME_DEBUG_FAST)
 	try {
 		if (dynamic_cast<_Dest>(src) != src)
 		{
@@ -378,7 +378,7 @@ inline _Dest downcast(_Source *src)
 template<class _Dest, class _Source>
 inline _Dest downcast(_Source &src)
 {
-#ifdef MAME_DEBUG
+#if defined(MAME_DEBUG) && !defined(MAME_DEBUG_FAST)
 	try {
 		if (&dynamic_cast<_Dest>(src) != &src)
 		{

@@ -184,6 +184,9 @@ endif
 # uncomment next line to build a debug version
 # DEBUG = 1
 
+# uncomment next line to disable some debug-related hotspots/slowdowns (e.g. for profiling)
+# FASTDEBUG = 1
+
 # uncomment next line to include the internal profiler
 # PROFILER = 1
 
@@ -443,6 +446,9 @@ ifneq ($(BUILD_JPEGLIB),1)
 DEFS += -DUSE_SYSTEM_JPEGLIB
 endif
 
+ifdef FASTDEBUG
+DEFS += -DMAME_DEBUG_FAST
+endif
 
 
 #-------------------------------------------------

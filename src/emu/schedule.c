@@ -480,7 +480,9 @@ void device_scheduler::timeslice()
 				attoseconds_t delta = target.attoseconds - exec->m_localtime.attoseconds;
 				if (delta < 0 && target.seconds > exec->m_localtime.seconds)
 					delta += ATTOSECONDS_PER_SECOND;
+#ifndef MAME_DEBUG_FAST
 				assert(delta == (target - exec->m_localtime).as_attoseconds());
+#endif
 
 				// if we have enough for at least 1 cycle, do the math
 				if (delta >= exec->m_attoseconds_per_cycle)

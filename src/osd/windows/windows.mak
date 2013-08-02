@@ -144,7 +144,12 @@ endif
 
 # enable basic run-time checks in non-optimized build
 ifeq ($(OPTIMIZE),0)
+ifndef FASTDEBUG
 CCOMFLAGS += /RTC1
+else
+# disable the stack check since it has quite a speed impact
+CCOMFLAGS += /RTCu
+endif
 endif
 
 ifdef MSVC_ANALYSIS
