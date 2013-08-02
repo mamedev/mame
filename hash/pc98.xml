@@ -10008,8 +10008,8 @@ other two disks
 			</dataarea>
 		</part>
 	</software>
-<!--
-	<software name="oh!pai">
+
+	<software name="ohpai">
 		<description>Oh! Pai</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -10018,48 +10018,29 @@ other two disks
 				<rom name="oh! pai_a.fdi" size="1265664" crc="7e7ed96e" sha1="aa141e20e6fc8c0002846ee0b0acd23d5fd88cf6" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="oh!pai">
-		<description>Oh! Pai</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="oh! pai_b.fdi" size="1265664" crc="f627b6ba" sha1="d8af8963378bd1442a01454e595f7fe91411a138" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="oh!pai">
-		<description>Oh! Pai</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="oh! pai_c.fdi" size="1265664" crc="c8926407" sha1="8b06c4437e460a848779c97e7af3ae1cd0bea67f" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="oh!pai">
-		<description>Oh! Pai</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="oh! pai_d.fdi" size="1265664" crc="4ab5eedc" sha1="7292754fd47d42113380c9faf850238e1b1502c8" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="oh!pai">
-		<description>Oh! Pai</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop5" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="oh! pai_e.fdi" size="1265664" crc="78d3d6d2" sha1="0fe991087aa1bbc0f0b78eef905daaab0f4a6708" offset="0" />
 			</dataarea>
 		</part>
 	</software>
-	<software name="oh!tsuk">
+
+	<software name="ohtsuki">
 		<description>Oh! Tsukiaitai!!</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -10068,27 +10049,18 @@ other two disks
 				<rom name="a.fdi" size="1265664" crc="c5399502" sha1="32c2e83434a1a2855792d8175d9fd5c6536c5005" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="oh!tsuk">
-		<description>Oh! Tsukiaitai!!</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="b.fdi" size="1265664" crc="48bcedc7" sha1="cb67add6b390fcf52c70d8d9b1b173faea9e834b" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="oh!tsuk">
-		<description>Oh! Tsukiaitai!!</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="c.fdi" size="1265664" crc="cf7bc0ea" sha1="87cc3f25ca9d7f2467382de9a76bdc8c08e3eee8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="onnano">
 		<description>Onna no Ko no Shikumi</description>
 		<year>19??</year>
@@ -10098,38 +10070,24 @@ other two disks
 				<rom name="shikumi1.fdi" size="1265664" crc="afbf7e2e" sha1="ae42b4725037d1545ab27922b7553ba5aac118b6" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="onnano">
-		<description>Onna no Ko no Shikumi</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="shikumi2.fdi" size="1265664" crc="5d2ef9d2" sha1="81affe7493b82d3e46723278df69e8e379d9d966" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="onnano">
-		<description>Onna no Ko no Shikumi</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="shikumi3.fdi" size="1265664" crc="1181e6b3" sha1="9729f3dc7c011ffb0ab92aba90adeef0f5be1371" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="onnano">
-		<description>Onna no Ko no Shikumi</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="shikumi4.fdi" size="1265664" crc="2fb15626" sha1="760b1a7182d62680ea435bad075ddfa847b94277" offset="0" />
 			</dataarea>
 		</part>
 	</software>
-	<software name="orewas">
+
+	<software name="shugorei">
 		<description>Ore wa Shugorei-sama!</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -10138,48 +10096,29 @@ other two disks
 				<rom name="disk_a.fdi" size="1265664" crc="ea234e78" sha1="fc3640049f9af7113dc6997e97f3a60758e1d073" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="orewas">
-		<description>Ore wa Shugorei-sama!</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_b.fdi" size="1265664" crc="c6af6688" sha1="e1bc5137481f9aa9025910e017ce89fcf1c28afc" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="orewas">
-		<description>Ore wa Shugorei-sama!</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_c.fdi" size="1265664" crc="df6f986f" sha1="f7f52abf9bbd7aa97437d17bb4a2e8be8eeba23f" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="orewas">
-		<description>Ore wa Shugorei-sama!</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_d.fdi" size="1265664" crc="43dd0cc6" sha1="f9550b6236e49d18297aea38ca773095082bb170" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="orewas">
-		<description>Ore wa Shugorei-sama!</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop5" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="s_disk.fdi" size="1265664" crc="4f7eb621" sha1="17823b3c3c335aed078185a8a088c49eff767c61" offset="0" />
 			</dataarea>
 		</part>
 	</software>
-	<software name="oshioki">
+
+	<software name="oshioki2">
 		<description>Oshioki Kirai 2</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -10188,18 +10127,14 @@ other two disks
 				<rom name="osioki21.fdi" size="1265664" crc="7de3cdac" sha1="3faf71ba4c8bd63117bba694b8a6132c264833a3" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="oshioki">
-		<description>Oshioki Kirai 2</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="osioki22.fdi" size="1265664" crc="4c7b6bcf" sha1="78ff01efd688adbb8003a0ad8c938901fa6646dd" offset="0" />
 			</dataarea>
 		</part>
 	</software>
-	<software name="oshioki!">
+
+	<software name="oshioksm">
 		<description>Oshioki!! Sailor Moon</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -10209,7 +10144,8 @@ other two disks
 			</dataarea>
 		</part>
 	</software>
-	<software name="ossault">
+
+	<software name="ossaultp">
 		<description>Ossault Plus</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -10219,7 +10155,8 @@ other two disks
 			</dataarea>
 		</part>
 	</software>
-	<software name="otakuyo">
+
+	<software name="otakuy2">
 		<description>Otaku Yobikou 2 - Otaku-tachi no Banka</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -10228,17 +10165,13 @@ other two disks
 				<rom name="a.fdi" size="1265664" crc="43b72693" sha1="c19b34ee5d6e0ac31bcf1186cf13bd3fd85f7d66" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="otakuyo">
-		<description>Otaku Yobikou 2 - Otaku-tachi no Banka</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="b.fdi" size="1265664" crc="af4320cc" sha1="8e4815a6e0e9667e7ba9fe2ebb8a753c1f694a3b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="otanoshi">
 		<description>Otanoshimi Disk Final</description>
 		<year>19??</year>
@@ -10249,7 +10182,8 @@ other two disks
 			</dataarea>
 		</part>
 	</software>
-	<software name="otomepa">
+
+	<software name="otomepar">
 		<description>Otome Party</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -10258,18 +10192,14 @@ other two disks
 				<rom name="disk_a.fdi" size="1265664" crc="ab970399" sha1="991a7ba708fd19dce929b8c97a2df4c6f8ca6268" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="otomepa">
-		<description>Otome Party</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_b.fdi" size="1265664" crc="1c1aa740" sha1="67a3785cca17cf2599521987f3db845a2d67626e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
-	<software name="pal-wo">
+
+	<software name="palwtc">
 		<description>Pal - Wonder Trip! Chizuru</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -10279,7 +10209,8 @@ other two disks
 			</dataarea>
 		</part>
 	</software>
-	<software name="panzerk">
+
+	<software name="panzerk2">
 		<description>Panzer Keil - Blitzkrieg 2</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -10288,28 +10219,19 @@ other two disks
 				<rom name="panzer keil_a.fdi" size="1265664" crc="bf8c5945" sha1="9791dd2d044885a71124901ce048ac155ce77d32" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="panzerk">
-		<description>Panzer Keil - Blitzkrieg 2</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="panzer keil_b.fdi" size="1265664" crc="70783899" sha1="97e75b4b8f4627f3eb64080ac0528fa513388f88" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="panzerk">
-		<description>Panzer Keil - Blitzkrieg 2</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="user disk.fdi" size="1265664" crc="2ea110e4" sha1="ae4ab75a5058d8ac127921d66b6f8c6fd276a4ef" offset="0" />
+				<rom name="user disk.fdi" size="1265664" crc="2ea110e4" sha1="ae4ab75a5058d8ac127921d66b6f8c6fd276a4ef" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
-	<software name="para-dic">
+
+	<software name="paradice">
 		<description>Para-Dice - Kimi wa Oihagi o Mita ka</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -10318,17 +10240,13 @@ other two disks
 				<rom name="paradice (aion)(disk 1 of 2).fdi" size="1265664" crc="c5146886" sha1="c8323412938fe8aa26b02646829355bb8e0d9009" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="para-dic">
-		<description>Para-Dice - Kimi wa Oihagi o Mita ka</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="paradice (aion)(disk 2 of 2).fdi" size="1265664" crc="a852be5b" sha1="66b10cc3140a431da2ae31c60beb1c7ca02bd33c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="patlabor">
 		<description>Patlabor - The Mobile Police - Operation Tokyo Bay</description>
 		<year>19??</year>
@@ -10338,28 +10256,19 @@ other two disks
 				<rom name="disk_1.fdi" size="1265664" crc="9f14e21a" sha1="a0b73ae6fc5c29dd77f3568d7edc9acd9a9e16da" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="patlabor">
-		<description>Patlabor - The Mobile Police - Operation Tokyo Bay</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_2.fdi" size="1265664" crc="4021cbca" sha1="62c84da43fa6f5383ebf8ed0bbd3366591bbcc8c" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="patlabor">
-		<description>Patlabor - The Mobile Police - Operation Tokyo Bay</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_3.fdi" size="1265664" crc="c5a55546" sha1="e887036f2f18d9abc85de4cac61fd87545af5507" offset="0" />
 			</dataarea>
 		</part>
 	</software>
-	<software name="pc98jan!">
+
+	<software name="pc98jan">
 		<description>PC98Jan!</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -10369,6 +10278,7 @@ other two disks
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="pension">
 		<description>Pension Story - Hana no Kiyosato</description>
 		<year>19??</year>
@@ -10378,17 +10288,13 @@ other two disks
 				<rom name="pshanaka.fdi" size="1265664" crc="7b4da53a" sha1="fd5f0f3f690dcfcd9ab5433e347195639042de70" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="pension">
-		<description>Pension Story - Hana no Kiyosato</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="pshanakb.fdi" size="1265664" crc="854caee6" sha1="f2f10083d034fb679033920fbc4bdb04e253d37d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="pentium">
 		<description>Pentium</description>
 		<year>19??</year>
@@ -10399,7 +10305,8 @@ other two disks
 			</dataarea>
 		</part>
 	</software>
-	<software name="perfect">
+
+	<software name="perfectb">
 		<description>Perfect Blue</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -10408,37 +10315,23 @@ other two disks
 				<rom name="disk_1.fdi" size="1265664" crc="c6e1cb50" sha1="27f54c2fc154031a0097779e780287c539199b84" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="perfect">
-		<description>Perfect Blue</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_2.fdi" size="1265664" crc="233cf6b1" sha1="0674664d3484013bcb4204cc1dd92620face703a" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="perfect">
-		<description>Perfect Blue</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_3.fdi" size="1265664" crc="c62eb919" sha1="be7757bcd2d52c01e5ef38253ce41bceb83c190a" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="perfect">
-		<description>Perfect Blue</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_4.fdi" size="1265664" crc="4f5e70a1" sha1="43b389e9ed35e1e82e1332fd2d7fa876863c4b90" offset="0" />
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="phobos">
 		<description>Phobos</description>
 		<year>19??</year>
@@ -10448,18 +10341,14 @@ other two disks
 				<rom name="phobos_a.fdi" size="1265664" crc="8327323e" sha1="a34c7038eb7486e38047bf1adfa6fb0dc50e674c" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="phobos">
-		<description>Phobos</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="phobos_b.fdi" size="1265664" crc="62648430" sha1="c61d6b8825d8a68e77ebc067cb80dfad7ebbd51f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
-	<software name="pilcase">
+
+	<software name="pilsexsp">
 		<description>PIL caSEX SP Disk - Chijireta Omake Disk</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -10469,37 +10358,35 @@ other two disks
 			</dataarea>
 		</part>
 	</software>
-	<software name="pinball">
+
+	<software name="pinballp">
 		<description>Pinball Pinball</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1990</year>
+		<publisher>Softec</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="pinball pinball 1 (1990)(softec).fdi" size="1265664" crc="e3e0c875" sha1="6066cdeaf7dbed7c8dbe08e2dc10d9e4e29ad222" offset="0" />
 			</dataarea>
 		</part>
 	</software>
-	<software name="pinksho">
+
+	<software name="pinksho3">
 		<description>Pink Shock Pirates 3</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Softplan</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="pink shock pirates 3 (softplan)(disk 1 of 2).fdi" size="1265664" crc="25c0f161" sha1="2c7d6e75bfbab6ad65aa30f9c6c841a8eec58d52" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="pinksho">
-		<description>Pink Shock Pirates 3</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="pink shock pirates 3 (softplan)(disk 2 of 2).fdi" size="1265664" crc="27578b5b" sha1="58583bf4e36df66a194de2d4a3d4408639a2a0dc" offset="0" />
 			</dataarea>
 		</part>
 	</software>
-	<software name="pinksox">
+
+	<software name="pinksoxm">
 		<description>Pink Sox Mania</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -10508,68 +10395,45 @@ other two disks
 				<rom name="1.fdi" size="1265664" crc="a10fa5a5" sha1="7b745b3392c20ea3b94e2ad413a97362a9902b3c" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="pinksox">
-		<description>Pink Sox Mania</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="2.fdi" size="1265664" crc="62097ecf" sha1="316d806824439791add836ea49686e3f2e7b7d60" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="pinksox">
-		<description>Pink Sox Mania</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="3.fdi" size="1265664" crc="046b52a8" sha1="6d6db0a0c8a627fb6825e60b74ccfe02f1defbaf" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="pinksox">
-		<description>Pink Sox Mania</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="4.fdi" size="1265664" crc="10a19215" sha1="0b8677c5ade820330c0c6c20dbbeed6187d71de9" offset="0" />
 			</dataarea>
 		</part>
 	</software>
-	<software name="pinksox">
+
+	<software name="pinksox3">
 		<description>Pink Sox Mania 3</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="pink sox mania 3\a.fdi" size="1265664" crc="adc88cf1" sha1="bb24fc5b0c350c39dcabd4b7c0ecad3789a0fcec" offset="0" />
+				<rom name="a.fdi" size="1265664" crc="adc88cf1" sha1="bb24fc5b0c350c39dcabd4b7c0ecad3789a0fcec" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="pinksox">
-		<description>Pink Sox Mania 3</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="pink sox mania 3\b.fdi" size="1265664" crc="15586abb" sha1="b164f2cf806d4e8fb9276b748077216793e65d76" offset="0" />
+				<rom name="b.fdi" size="1265664" crc="15586abb" sha1="b164f2cf806d4e8fb9276b748077216793e65d76" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="pinksox">
-		<description>Pink Sox Mania 3</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="pink sox mania 3\c.fdi" size="1265664" crc="bb99362b" sha1="a021d7a8d30ae363a369afa6df90897a5a51953a" offset="0" />
+				<rom name="c.fdi" size="1265664" crc="bb99362b" sha1="a021d7a8d30ae363a369afa6df90897a5a51953a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
-	<software name="pinksox">
+
+	<software name="pinksoxt">
 		<description>Pink Sox Mania Taizen</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -10578,107 +10442,64 @@ other two disks
 				<rom name="disk_a.fdi" size="1265664" crc="36a27d9d" sha1="31b2d0bcd5dfb1e64fbde59c830eb2f7818a22f5" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="pinksox">
-		<description>Pink Sox Mania Taizen</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_b.fdi" size="1265664" crc="5158cff5" sha1="59d9601a610b27af75e2a39ac41739d9f84632f9" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="pinksox">
-		<description>Pink Sox Mania Taizen</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_c.fdi" size="1265664" crc="3ac077f0" sha1="70ea5ca7cca078abdf1ce2e3c8ff28757a13bf27" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="pinksox">
-		<description>Pink Sox Mania Taizen</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_d.fdi" size="1265664" crc="6681c24b" sha1="9f31660dede7daada72d2a10d3006e2ddf742c8b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
-	<software name="planets">
+
+	<software name="planetdr">
 		<description>Planets of Dragon</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="planets of dragon\disks\disk 01.fdi" size="1265664" crc="3ecf31e3" sha1="64e615813c3c575eade41b7faa5742239aaf29d3" offset="0" />
+				<rom name="disk 01.fdi" size="1265664" crc="3ecf31e3" sha1="64e615813c3c575eade41b7faa5742239aaf29d3" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="planets">
-		<description>Planets of Dragon</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="planets of dragon\disks\disk 02.fdi" size="1265664" crc="66eacb2d" sha1="bfdcd38d2481bf08c200bc501e56d58bc501059d" offset="0" />
+				<rom name="disk 02.fdi" size="1265664" crc="66eacb2d" sha1="bfdcd38d2481bf08c200bc501e56d58bc501059d" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="planets">
-		<description>Planets of Dragon</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="planets of dragon\disks\disk 03.fdi" size="1265664" crc="88de413c" sha1="73952ce32453659249e11594cedf6098984d435e" offset="0" />
+				<rom name="disk 03.fdi" size="1265664" crc="88de413c" sha1="73952ce32453659249e11594cedf6098984d435e" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="planets">
-		<description>Planets of Dragon</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="planets of dragon\disks\disk 04.fdi" size="1265664" crc="353a32ee" sha1="7a1691e84e08a8a3eeaf47b1640c8593763bcc4d" offset="0" />
+				<rom name="disk 04.fdi" size="1265664" crc="353a32ee" sha1="7a1691e84e08a8a3eeaf47b1640c8593763bcc4d" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="planets">
-		<description>Planets of Dragon</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop5" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="planets of dragon\disks\disk 05.fdi" size="1265664" crc="4d7c0f06" sha1="98804f36f7fece190b5d78a3093967bf31c6687c" offset="0" />
+				<rom name="disk 05.fdi" size="1265664" crc="4d7c0f06" sha1="98804f36f7fece190b5d78a3093967bf31c6687c" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="planets">
-		<description>Planets of Dragon</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop6" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="planets of dragon\disks\disk 06.fdi" size="1265664" crc="e5e61608" sha1="95c22baa305f1b8ca3baf70738602bbd4ef0e08e" offset="0" />
+				<rom name="disk 06.fdi" size="1265664" crc="e5e61608" sha1="95c22baa305f1b8ca3baf70738602bbd4ef0e08e" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="planets">
-		<description>Planets of Dragon</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop7" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="planets of dragon\disks\disk 07.fdi" size="1265664" crc="e4f3705c" sha1="1f1f5572b8600cca94e5cbe62c23c46d7496dd64" offset="0" />
+				<rom name="disk 07.fdi" size="1265664" crc="e4f3705c" sha1="1f1f5572b8600cca94e5cbe62c23c46d7496dd64" offset="0" />
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="pocky2">
 		<description>Pocky 2 - Kaijin Aka Mantle no Chousen</description>
 		<year>19??</year>
@@ -10688,27 +10509,18 @@ other two disks
 				<rom name="pocky2a.fdi" size="1265664" crc="39701def" sha1="8647fb85b2032f7c675f1d9b1b5edf432f5cdcff" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="pocky2">
-		<description>Pocky 2 - Kaijin Aka Mantle no Chousen</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="pocky2b.fdi" size="1265664" crc="d2c57fb0" sha1="1284f4e6c0768d3d06fe1b68f4650b0a07a89879" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="pocky2">
-		<description>Pocky 2 - Kaijin Aka Mantle no Chousen</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="pocky2c.fdi" size="1265664" crc="d054095b" sha1="84043b0797178a6765d2c7277641c67ce4db6bf5" offset="0" />
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="poisonn">
 		<description>Poison Needle</description>
 		<year>19??</year>
@@ -10718,28 +10530,25 @@ other two disks
 				<rom name="poison_a.fdi" size="1265664" crc="a7833fb6" sha1="1640ebd3a3d90e4b7b8d23106b8d005415359db6" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="poisonn">
-		<description>Poison Needle</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="poison_b.fdi" size="1265664" crc="0ca38b04" sha1="429369806449789b98267edab0d20093f81f57ce" offset="0" />
 			</dataarea>
 		</part>
 	</software>
-	<software name="pokapok">
+
+	<software name="pokapokp">
 		<description>Poka Poka Poker</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Bolze</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="poka poka poker (bolze).fdi" size="1265664" crc="5dd27584" sha1="a876f6ed40b90839ae1b99f12bd8bcf304e46288" offset="0" />
 			</dataarea>
 		</part>
 	</software>
-	<software name="policeq">
+
+	<software name="policeq2">
 		<description>Police Quest 2</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -10748,47 +10557,34 @@ other two disks
 				<rom name="disk 01.fdi" size="1265664" crc="18f51678" sha1="49b137412230d20df0dec0c1236866003a3f1f15" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="policeq">
-		<description>Police Quest 2</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk 02.fdi" size="1265664" crc="3fd79ed8" sha1="6893264fd7ecdbf8ceb14d2e62d76bb548fb344e" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="policeq">
-		<description>Police Quest 2</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk 03.fdi" size="1265664" crc="4c6f0d6a" sha1="442e4f2074087b5d8401f808153a12ffef9a6e7c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
-	<software name="policena">
+<!-- PC-9821 specific, requires CD-Rom too -->
+	<software name="policena" supported="no">
 		<description>Policenauts</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Konami</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="system.fdi" size="1265664" crc="ef3e4428" sha1="246b674a48903ff7e3fe90292b1236d75a8d6c23" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="policena">
-		<description>Policenauts</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="user.fdi" size="1265664" crc="fc89da2f" sha1="d782340f5523a405558365367494d73264255379" offset="0" />
+				<rom name="user.fdi" size="1265664" crc="fc89da2f" sha1="d782340f5523a405558365367494d73264255379" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="ponjalla">
 		<description>Ponjalla no Houkago - Sadoubu(re) Hen</description>
 		<year>19??</year>
@@ -10798,17 +10594,13 @@ other two disks
 				<rom name="npj1.fdi" size="1265664" crc="3f5fc131" sha1="374ff6a52f9ffde792758add3a9a250407e94c4f" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="ponjalla">
-		<description>Ponjalla no Houkago - Sadoubu(re) Hen</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="npj2.fdi" size="1265664" crc="d75bd08f" sha1="592eeb6a57637c666801e7addb8920cc8aed0bce" offset="0" />
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="ponyon">
 		<description>Ponyon</description>
 		<year>19??</year>
@@ -10818,48 +10610,29 @@ other two disks
 				<rom name="ponyon_1.fdi" size="1265664" crc="1855e74d" sha1="958fc36c31266317784e6f95ae10f36b4f58219f" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="ponyon">
-		<description>Ponyon</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="ponyon_2.fdi" size="1265664" crc="3141d843" sha1="0ac4c114f99ae5ab3ba3219831f349523bba5a6f" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="ponyon">
-		<description>Ponyon</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="ponyon_3.fdi" size="1265664" crc="54ba0189" sha1="eee1c6b0912a52138dd20a4c1e85cf0d7e9833bb" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="ponyon">
-		<description>Ponyon</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="ponyon_4.fdi" size="1265664" crc="97d528ba" sha1="01be5b8faaabac18423da36ae123bea07eacef39" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="ponyon">
-		<description>Ponyon</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop5" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="ponyon_user.fdi" size="1265664" crc="3141d843" sha1="0ac4c114f99ae5ab3ba3219831f349523bba5a6f" offset="0" />
+				<rom name="ponyon_user.fdi" size="1265664" crc="3141d843" sha1="0ac4c114f99ae5ab3ba3219831f349523bba5a6f" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
-	<software name="powerdo">
+
+	<software name="powerd">
 		<description>Power Dolls</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -10868,38 +10641,25 @@ other two disks
 				<rom name="pd_1.fdi" size="1265664" crc="0efd51b9" sha1="8ddc63b383967da8f741ee638f59e278ad3d8feb" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="powerdo">
-		<description>Power Dolls</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="pd_2.fdi" size="1265664" crc="6cac000e" sha1="cc93e45ba674f1093107b6f865bf7a4f87eb3de8" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="powerdo">
-		<description>Power Dolls</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="pd_3.fdi" size="1265664" crc="bb9ad321" sha1="ff3693efb2321c1087f2845361528f4f54bb8929" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="powerdo">
-		<description>Power Dolls</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="pd_4.fdi" size="1265664" crc="4163d990" sha1="30acad6b2a4ef4af00f93b51f60aed0a7d8346a4" offset="0" />
 			</dataarea>
 		</part>
 	</software>
-	<software name="powerdo">
+
+<!-- omake disk? -->
+	<software name="powerd2p">
 		<description>Power Dolls 2 Premium Disc</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -10909,7 +10669,8 @@ other two disks
 			</dataarea>
 		</part>
 	</software>
-	<software name="ppdisk">
+
+	<software name="ppdsk02">
 		<description>PP Disk No. 02</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -10919,7 +10680,8 @@ other two disks
 			</dataarea>
 		</part>
 	</software>
-	<software name="ppdisk">
+
+	<software name="ppdsk06">
 		<description>PP Disk No. 06</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -10928,18 +10690,14 @@ other two disks
 				<rom name="disk1.fdi" size="1265664" crc="471f983a" sha1="167f5f60cc85f7aacd745a7a3637d558ae4bb1ae" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="ppdisk">
-		<description>PP Disk No. 06</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk2.fdi" size="1265664" crc="bd442ebc" sha1="22af64bf8c6411b866ea25b2a90e384850a7860d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
-	<software name="ppdisk">
+
+	<software name="ppdsk10">
 		<description>PP Disk No. 10</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -10948,17 +10706,13 @@ other two disks
 				<rom name="disk1.fdi" size="1265664" crc="0d0224f7" sha1="b6e5e5bf78ff91cfce815c2c8f848f57c01fdfe3" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="ppdisk">
-		<description>PP Disk No. 10</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk2.fdi" size="1265664" crc="0578bf3d" sha1="d6c9f47393b324edb0c764e3b2f2b3659145048d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="premium">
 		<description>Premium</description>
 		<year>19??</year>
@@ -10968,38 +10722,24 @@ other two disks
 				<rom name="disk_a.fdi" size="1265664" crc="969f691a" sha1="f0b2a13dd1475a496fa3f52ac9d2e0a65dadbdc2" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="premium">
-		<description>Premium</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_b.fdi" size="1265664" crc="1bfe670d" sha1="ed1a5272ca719648c46cc6220e07522a75fb04e8" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="premium">
-		<description>Premium</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_c.fdi" size="1265664" crc="209a71c1" sha1="07f9bd49b119874bc7d1620d28d4b10a1bf00b6f" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="premium">
-		<description>Premium</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_d.fdi" size="1265664" crc="84798449" sha1="86766ebf1ce9b9559b3f45ffdf2dc06e49404e25" offset="0" />
 			</dataarea>
 		</part>
 	</software>
-	<software name="premium">
+
+	<software name="premium2">
 		<description>Premium 2</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -11008,38 +10748,24 @@ other two disks
 				<rom name="prem2_1.fdi" size="1265664" crc="870e6a23" sha1="9d67b57142d0f7641fa377cd5c3c149833c77cfb" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="premium">
-		<description>Premium 2</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="prem2_2.fdi" size="1265664" crc="4e994290" sha1="377d86e5ca2f419bde9e0fc342742c8d8deaaf09" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="premium">
-		<description>Premium 2</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="prem2_3.fdi" size="1265664" crc="724bed8c" sha1="6db136a133925e74f6c2dafbf208ec15dafbd462" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="premium">
-		<description>Premium 2</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="prem2_4.fdi" size="1265664" crc="a4e98182" sha1="71d39b3db066b5ca4fb71f8b3c985eccf61ae2cc" offset="0" />
 			</dataarea>
 		</part>
 	</software>
-	<software name="present">
+
+	<software name="presentd">
 		<description>Present Duo</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -11048,67 +10774,38 @@ other two disks
 				<rom name="p_duo_1.fdi" size="1265664" crc="ffde73e3" sha1="aa7c23f2066f085f59b8958e2a3149762b825d6c" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="present">
-		<description>Present Duo</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="p_duo_2.fdi" size="1265664" crc="07aca208" sha1="268ffc034b9cd6384c82b29dc9ac28dda4938c43" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="present">
-		<description>Present Duo</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="p_duo_3.fdi" size="1265664" crc="b7c85c9a" sha1="f198be1b6f879f39628aa91963cbaa121771231b" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="present">
-		<description>Present Duo</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="p_duo_4.fdi" size="1265664" crc="90917b25" sha1="e29ac959040e4192116cde91c34caf2792048d3d" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="present">
-		<description>Present Duo</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop5" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="p_duo_5.fdi" size="1265664" crc="ec5fa4b8" sha1="cbd6f226469ba4e09e650c6c2b06e4e6a9e8d4dd" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="present">
-		<description>Present Duo</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop6" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="p_duo_6.fdi" size="1265664" crc="bce356fb" sha1="6e409167340d4889672b9466169ab2ff09c7d0ce" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="present">
-		<description>Present Duo</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop7" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="p_duo_7.fdi" size="1265664" crc="77517fff" sha1="619539b0ebe4a030cf5f8abe51df6225cced0750" offset="0" />
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="prettym">
 		<description>Pretty Mahjong Soldier Mu</description>
 		<year>19??</year>
@@ -11118,28 +10815,19 @@ other two disks
 				<rom name="disk_1.fdi" size="1265664" crc="08a6d35e" sha1="90fdd5f69b578e75085b8c3ec25f6d2fb3350422" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="prettym">
-		<description>Pretty Mahjong Soldier Mu</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_2.fdi" size="1265664" crc="2ea3678b" sha1="173b50665193461889f64c3ab01c4f6dc0d6e0bb" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="prettym">
-		<description>Pretty Mahjong Soldier Mu</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_3.fdi" size="1265664" crc="1dfe9545" sha1="3aefbe53ff190bde0247218188c6d8033caaeb78" offset="0" />
 			</dataarea>
 		</part>
 	</software>
-	<software name="princeo">
+
+	<software name="pop">
 		<description>Prince of Persia</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -11149,8 +10837,9 @@ other two disks
 			</dataarea>
 		</part>
 	</software>
-	<software name="princeo">
-		<description>Prince of Persia(another)</description>
+
+	<software name="popa" cloneof="pop">
+		<description>Prince of Persia (Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -11158,28 +10847,25 @@ other two disks
 				<rom name="prince_of_persia_a.fdi" size="1265664" crc="4bba609b" sha1="5db5a2c8919b6ce024a751a0f2411fe54b45f455" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="princeo">
-		<description>Prince of Persia(another)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="prince_of_persia_b.fdi" size="1265664" crc="e15f8465" sha1="1b1c2ca4933c30897ea75d98194d5b92be769f17" offset="0" />
 			</dataarea>
 		</part>
 	</software>
-	<software name="princess">
+
+	<software name="princc">
 		<description>Princess Confusion</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1992</year>
+		<publisher>Initialize</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="princess confusion (1992)(initialize).fdi" size="1265664" crc="0dbc06a4" sha1="431166d2ad251f186f0bc72ad7186f1337ab6201" offset="0" />
 			</dataarea>
 		</part>
 	</software>
-	<software name="princess">
+
+	<software name="princmk2">
 		<description>Princess Maker 2</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -11188,148 +10874,65 @@ other two disks
 				<rom name="a.fdi" size="1265664" crc="125c89e2" sha1="8e1006ec471603a30b9b926617e910bb17a3379c" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="princess">
-		<description>Princess Maker 2</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="b.fdi" size="1265664" crc="a8f4e621" sha1="f89ba9002b8f349ab11c27872f3657a62d73e411" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="princess">
-		<description>Princess Maker 2</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="c.fdi" size="1265664" crc="ea75b2c3" sha1="f0e2aa185e1bb2996faa2ca065feec68ad23069d" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="princess">
-		<description>Princess Maker 2</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="d.fdi" size="1265664" crc="46929daf" sha1="7f497678946426dcea4487ccaf83e45da8c66e68" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="princess">
-		<description>Princess Maker 2</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop5" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="e.fdi" size="1265664" crc="4c211916" sha1="51e637b53a88c4cc4af9f3ec8383b02723886a5a" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="princess">
-		<description>Princess Maker 2</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop6" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="f.fdi" size="1265664" crc="20cfc6e8" sha1="d5cf98cf64406893f992945d446a3539e54243f0" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="princess">
-		<description>Princess Maker 2</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop7" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="g.fdi" size="1265664" crc="b8df6939" sha1="896a4262e4ef351a307ede01fc64693905c69dab" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="princess">
-		<description>Princess Maker 2</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop8" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="h.fdi" size="1265664" crc="8ac696bd" sha1="793baffaeba33869e1be065c3028ef4406c34bf6" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="princess">
-		<description>Princess Maker 2</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop9" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="i.fdi" size="1265664" crc="e603f6c1" sha1="2092d73b0d07ec9cd32fe1e8a8b71cfcc2749c25" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="princess">
-		<description>Princess Maker 2</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop10" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="j.fdi" size="1265664" crc="7e5032ac" sha1="e9125be59ca2cff77be307513985b1b9baf69a5e" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="princess">
-		<description>Princess Maker 2</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop11" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="k.fdi" size="1265664" crc="7cefed3b" sha1="822561d42fb7be74d4b185e23eb62b57ad158a89" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="princess">
-		<description>Princess Maker 2</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop12" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="l.fdi" size="1265664" crc="81137b5c" sha1="ce5a2582cb1a6623170bbe10d901ad7fef9bdda7" offset="0" />
 			</dataarea>
 		</part>
 	</software>
-	<software name="princess">
-		<description>Princess Minerva</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="pmin_sc1.fdi" size="1265664" crc="0a6961e6" sha1="7d8a0caa90aa11e297880cda391780f76a3257c6" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-	<software name="princess">
-		<description>Princess Minerva</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="pmin_sc2.fdi" size="1265664" crc="aa6e380a" sha1="e09fde15ba2e07826d315c329dbd823376dd5dfd" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-	<software name="princess">
-		<description>Princess Minerva</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="pmin_sc3.fdi" size="1265664" crc="5dd726f7" sha1="65fdf9212f5a00e409136b39e0fa6222e0063b09" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-	<software name="princess">
+
+
+	<software name="princmin">
 		<description>Princess Minerva</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -11338,29 +10941,35 @@ other two disks
 				<rom name="pmin_sys.fdi" size="1265664" crc="feb45e96" sha1="5358e17d72d8124e107a2948e79843cd562c1f51" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="princess">
-		<description>Princess Minerva</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="pmin_vi1.fdi" size="1265664" crc="a668481d" sha1="232f41c0f8cf159702b515aa8de60d1aa2fa2504" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="princess">
-		<description>Princess Minerva</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="pmin_vi2.fdi" size="1265664" crc="6ff348e6" sha1="f2a3d846920146d88bda0402cd10d501a83d7003" offset="0" />
 			</dataarea>
 		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="pmin_sc1.fdi" size="1265664" crc="0a6961e6" sha1="7d8a0caa90aa11e297880cda391780f76a3257c6" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="pmin_sc2.fdi" size="1265664" crc="aa6e380a" sha1="e09fde15ba2e07826d315c329dbd823376dd5dfd" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="pmin_sc3.fdi" size="1265664" crc="5dd726f7" sha1="65fdf9212f5a00e409136b39e0fa6222e0063b09" offset="0" />
+			</dataarea>
+		</part>
 	</software>
-	<software name="princess">
-		<description>Princess Quest - Mahjong Sword(another)</description>
+
+	<software name="princqms">
+		<description>Princess Quest - Mahjong Sword (Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -11368,117 +10977,63 @@ other two disks
 				<rom name="disk_1.fdi" size="1265664" crc="fdb2959e" sha1="5c900d1f6c3c22a7e1906215f9c6a416dc07f288" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="princess">
-		<description>Princess Quest - Mahjong Sword(another)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="disk_2.fdi" size="1265664" crc="09bfe056" sha1="6e6e5c2bb53fbd549511c57d9cb7497f6f5083c4" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="disk_3.fdi" size="1265664" crc="d27b4300" sha1="3f31151b20ace277eeb0ca385eecff10f96d2ae5" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="disk_4.fdi" size="1265664" crc="44e46ad7" sha1="b8d6353ac429579bab41264be0e7c22e68c59359" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="disk_5.fdi" size="1265664" crc="0d7a979b" sha1="7bb3653c25e8829e8d8932efe2b53f75cf86996f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="disk_6.fdi" size="1265664" crc="b25d89dc" sha1="ca2043de27a549459dfa7c339b56685ac1dce880" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="disk_7.fdi" size="1265664" crc="905d567e" sha1="e56295a6956f2e45adb2d60c8f7515cc82b1f1cb" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="disk_8.fdi" size="1265664" crc="0d9e4e65" sha1="9490ec4ca6a6b5e981f0a5b9235b2f8b67c6afda" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="disk_9.fdi" size="1265664" crc="852ad534" sha1="ea6d27089026be5cc4d6edecc32f6afdf0073d9e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_10.fdi" size="1265664" crc="ac00206c" sha1="0c97d5516338bcce6e3ef603ec1148b224c552c8" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="princess">
-		<description>Princess Quest - Mahjong Sword(another)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop11" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_11.fdi" size="1265664" crc="50772887" sha1="2f0a7589a1e1023f21960439c6adb6ff73bc1961" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="princess">
-		<description>Princess Quest - Mahjong Sword(another)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop12" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_12.fdi" size="1265664" crc="b70d3f0e" sha1="dd0b16c8437b311e1ebb50be95f62c40e551f505" offset="0" />
 			</dataarea>
 		</part>
 	</software>
-	<software name="princess">
-		<description>Princess Quest - Mahjong Sword(another)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="disk_2.fdi" size="1265664" crc="09bfe056" sha1="6e6e5c2bb53fbd549511c57d9cb7497f6f5083c4" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-	<software name="princess">
-		<description>Princess Quest - Mahjong Sword(another)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="disk_3.fdi" size="1265664" crc="d27b4300" sha1="3f31151b20ace277eeb0ca385eecff10f96d2ae5" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-	<software name="princess">
-		<description>Princess Quest - Mahjong Sword(another)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="disk_4.fdi" size="1265664" crc="44e46ad7" sha1="b8d6353ac429579bab41264be0e7c22e68c59359" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-	<software name="princess">
-		<description>Princess Quest - Mahjong Sword(another)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="disk_5.fdi" size="1265664" crc="0d7a979b" sha1="7bb3653c25e8829e8d8932efe2b53f75cf86996f" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-	<software name="princess">
-		<description>Princess Quest - Mahjong Sword(another)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="disk_6.fdi" size="1265664" crc="b25d89dc" sha1="ca2043de27a549459dfa7c339b56685ac1dce880" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-	<software name="princess">
-		<description>Princess Quest - Mahjong Sword(another)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="disk_7.fdi" size="1265664" crc="905d567e" sha1="e56295a6956f2e45adb2d60c8f7515cc82b1f1cb" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-	<software name="princess">
-		<description>Princess Quest - Mahjong Sword(another)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="disk_8.fdi" size="1265664" crc="0d9e4e65" sha1="9490ec4ca6a6b5e981f0a5b9235b2f8b67c6afda" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-	<software name="princess">
-		<description>Princess Quest - Mahjong Sword(another)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="disk_9.fdi" size="1265664" crc="852ad534" sha1="ea6d27089026be5cc4d6edecc32f6afdf0073d9e" offset="0" />
-			</dataarea>
-		</part>
-	</software>
+
 	<software name="pure">
 		<description>Pure</description>
 		<year>19??</year>
@@ -11488,17 +11043,13 @@ other two disks
 				<rom name="pure_a.fdi" size="1265664" crc="21e59c3d" sha1="82aa702c52adbe08e64be0dc4b012526d0a4ad9c" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="pure">
-		<description>Pure</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="pure_b.fdi" size="1265664" crc="adea468d" sha1="217150706e387ac7dd0c8770a3836028576fede0" offset="0" />
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="pure2">
 		<description>Pure 2</description>
 		<year>19??</year>
@@ -11508,18 +11059,14 @@ other two disks
 				<rom name="pure2_1.fdi" size="1265664" crc="91793e59" sha1="de4f585f660af9fef9be555a441dfb74c705fb46" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="pure2">
-		<description>Pure 2</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="pure2_2.fdi" size="1265664" crc="e6404329" sha1="581a510d76223ffc59203ac0e1673a854ae2337c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
-	<software name="puremy">
+
+	<software name="puremydl">
 		<description>Pure My Dool</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -11528,28 +11075,19 @@ other two disks
 				<rom name="pmydolla.fdi" size="1265664" crc="ce3a1e93" sha1="1d0c431bac3586b290a5257133ce1eaaa4e9aa19" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="puremy">
-		<description>Pure My Dool</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="pmydollb.fdi" size="1265664" crc="9caa0832" sha1="82d8be6c698fb7a5afe458598c02181e8e776eb2" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="puremy">
-		<description>Pure My Dool</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="pmydollc.fdi" size="1265664" crc="6e3aa8fb" sha1="b703c495bfdf1ac9d03d1659a88d683b8f3fb38a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
-	<software name="purplec">
+
+	<software name="purplec1">
 		<description>Purple Cat Vol. 1 - Bunny Girl Tokushuu</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -11558,19 +11096,14 @@ other two disks
 				<rom name="pc1_1.fdi" size="1265664" crc="ed5b71c9" sha1="831cbdfcc33815ae56461626132d609a84b1a200" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="purplec">
-		<description>Purple Cat Vol. 1 - Bunny Girl Tokushuu</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="pc1_2.fdi" size="1265664" crc="ea053e02" sha1="0215cae5ffa9244773374101d1280c27642ab92e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
-	<software name="purplec">
-		<description>Purple Cat Vol. 1 - Bunny Girl Tokushuu(another)</description>
+	<software name="purplec1a" cloneof="purplec1">
+		<description>Purple Cat Vol. 1 - Bunny Girl Tokushuu (Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -11578,18 +11111,14 @@ other two disks
 				<rom name="pc1_1.fdi" size="1265664" crc="ed5b71c9" sha1="831cbdfcc33815ae56461626132d609a84b1a200" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="purplec">
-		<description>Purple Cat Vol. 1 - Bunny Girl Tokushuu(another)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="pc1_2.fdi" size="1265664" crc="ea053e02" sha1="0215cae5ffa9244773374101d1280c27642ab92e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
-	<software name="purplec">
+
+	<software name="purplec2">
 		<description>Purple Cat Vol. 2 - Hospital Tokushuu</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -11598,38 +11127,24 @@ other two disks
 				<rom name="pc2_a.fdi" size="1265664" crc="03d17a97" sha1="5599c153743a91fd7463cb50859f97c995d2c535" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="purplec">
-		<description>Purple Cat Vol. 2 - Hospital Tokushuu</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="pc2_b.fdi" size="1265664" crc="05e44c27" sha1="bf84b4b06fa3035137d1bad5a3c6c987943d16e0" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="purplec">
-		<description>Purple Cat Vol. 2 - Hospital Tokushuu</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="pc2_c.fdi" size="1265664" crc="cbd72c25" sha1="d239d11c345c09fbca95298d24fd1d1c484dbde2" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="purplec">
-		<description>Purple Cat Vol. 2 - Hospital Tokushuu</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="pc2_d.fdi" size="1265664" crc="51f9addd" sha1="8d10ab0e4dec5d55384dc0db524840f93601762c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
-	<software name="purplec">
+
+	<software name="purplec3">
 		<description>Purple Cat Vol. 3 - Jokyoushi Tokushuu</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -11638,47 +11153,28 @@ other two disks
 				<rom name="pc3_a.fdi" size="1265664" crc="2d29db58" sha1="9d5d029104286c32e79452f963f7bdd97496a86d" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="purplec">
-		<description>Purple Cat Vol. 3 - Jokyoushi Tokushuu</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="pc3_b.fdi" size="1265664" crc="f81f87d6" sha1="ea0ac8f3cace6da108c9d5c45712c82013ceb535" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="purplec">
-		<description>Purple Cat Vol. 3 - Jokyoushi Tokushuu</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="pc3_c.fdi" size="1265664" crc="800bf68a" sha1="24461d2ffa0b71461d3ba096835444b6a0eb4bd4" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="purplec">
-		<description>Purple Cat Vol. 3 - Jokyoushi Tokushuu</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="pc3_d.fdi" size="1265664" crc="97ebca33" sha1="2809919c4d7fe962cc57ec56e554951a749382be" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="purplec">
-		<description>Purple Cat Vol. 3 - Jokyoushi Tokushuu</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop5" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="pc3_e.fdi" size="1265664" crc="600acc4f" sha1="dd31b002584fbcfe981919c6c23bf82ab1fb66fe" offset="0" />
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="queensl">
 		<description>Queens Library</description>
 		<year>19??</year>
@@ -11688,58 +11184,34 @@ other two disks
 				<rom name="disk_1.fdi" size="1265664" crc="1ec9bdff" sha1="542a1eae3874f03490fee227fe2e8981fb01fc1d" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="queensl">
-		<description>Queens Library</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_2.fdi" size="1265664" crc="63805119" sha1="c6c9c7f1980addf212406a1b3d21e54f4ded5626" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="queensl">
-		<description>Queens Library</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_3.fdi" size="1265664" crc="67867a77" sha1="e68cbf95004295992adea3167f2f10e5f83d6754" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="queensl">
-		<description>Queens Library</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_4.fdi" size="1265664" crc="bb715975" sha1="88c1e978d2964680d977bc80bf7a70624cf3b38c" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="queensl">
-		<description>Queens Library</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop5" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_5.fdi" size="1265664" crc="d2541e93" sha1="40beb3af3d9c92f47e975b6dbe68343eecca5838" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="queensl">
-		<description>Queens Library</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop6" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="user.fdi" size="1265664" crc="dc667b23" sha1="e668461b891282152751f3b8b39518d21dd5edb8" offset="0" />
+				<rom name="user.fdi" size="1265664" crc="dc667b23" sha1="e668461b891282152751f3b8b39518d21dd5edb8" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
-	<software name="questfo">
+
+	<software name="questg1">
 		<description>Quest for Glory - So You Want to Be a Hero</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -11748,28 +11220,19 @@ other two disks
 				<rom name="disk 01.fdi" size="1265664" crc="695c079e" sha1="93195094944af1d88338c4a2ce82f9188a7f3898" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="questfo">
-		<description>Quest for Glory - So You Want to Be a Hero</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk 02.fdi" size="1265664" crc="b8cdbf73" sha1="d6048c691963d159ce29c9e90b0f33a60e71c29d" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="questfo">
-		<description>Quest for Glory - So You Want to Be a Hero</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk 03.fdi" size="1265664" crc="10f50bfa" sha1="7aab2821b8a18ef3ec4811d6c8e50767f96f0108" offset="0" />
 			</dataarea>
 		</part>
 	</software>
-	<software name="quintia">
+
+	<software name="quintiar">
 		<description>Quintia Road</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -11778,88 +11241,55 @@ other two disks
 				<rom name="a.fdi" size="1265664" crc="6d63a231" sha1="0499f641bd016a3251e30d57b6b58333a858d97c" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="quintia">
-		<description>Quintia Road</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="b.fdi" size="1265664" crc="61364e8c" sha1="f9e07757e602c8f9dfd8710ec1decc38aeed539b" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="quintia">
-		<description>Quintia Road</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="c.fdi" size="1265664" crc="5a951759" sha1="03413b08a1ce11435220bf2ac362cde2dd472b7e" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="quintia">
-		<description>Quintia Road</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="d.fdi" size="1265664" crc="1edbac38" sha1="72bc3327722036dc6a90f46fe8b9b4bd0cca0196" offset="0" />
 			</dataarea>
 		</part>
 	</software>
-	<software name="quintia">
+
+	<software name="quintia2">
 		<description>Quintia Road 2</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1993</year>
+		<publisher>Communication Group Plus</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="quintia road 2 (1993)(communication group plum)(disk 1 of 5)(disk a).fdi" size="1265664" crc="1ee465e1" sha1="65233cd4eb088fa15799b5e2e023909cf399d158" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="quintia">
-		<description>Quintia Road 2</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="quintia road 2 (1993)(communication group plum)(disk 2 of 5)(disk b).fdi" size="1265664" crc="0c1bb87d" sha1="b93afb55efaa12afdda47c07157a09e33c80bbb9" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="quintia">
-		<description>Quintia Road 2</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="quintia road 2 (1993)(communication group plum)(disk 3 of 5)(disk c).fdi" size="1265664" crc="d9ef84e0" sha1="9de44f060faaf9988df79ba436df9f14307411f3" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="quintia">
-		<description>Quintia Road 2</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="quintia road 2 (1993)(communication group plum)(disk 4 of 5)(disk d).fdi" size="1265664" crc="3d94e6bc" sha1="ff90ab4acd0cd31959e1536e89f209fc89deb45e" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="quintia">
-		<description>Quintia Road 2</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop5" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="quintia road 2 (1993)(communication group plum)(disk 5 of 5)(disk e).fdi" size="1265664" crc="cbe0c544" sha1="635599b84aee230eaa676f7081a6f0185215b1d0" offset="0" />
 			</dataarea>
 		</part>
 	</software>
-	<software name="quizban">
+
+	<software name="qsanta2">
 		<description>Quiz Banchou Santa-kun 2</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -11868,17 +11298,14 @@ other two disks
 				<rom name="disk_a.fdi" size="1265664" crc="29db9623" sha1="fe578c0cbf89135bb2be63c92659ad8885e8a812" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-	<software name="quizban">
-		<description>Quiz Banchou Santa-kun 2</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_b.fdi" size="1265664" crc="a0ec703c" sha1="0800474bfa29900b667cb876174c286a2318e85a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
+
+<!--
 	<software name="railroad">
 		<description>Railroad Tycoon</description>
 		<year>19??</year>
