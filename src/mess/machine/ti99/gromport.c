@@ -1522,7 +1522,10 @@ READ8Z_MEMBER(ti99_minimem_cartridge::readz)
 	{
 		if ((offset & 0x1000)==0x0000)
 		{
-			*value = m_rom_ptr[offset & 0x0fff];
+			if (m_rom_ptr!=NULL)    // Super-Minimem seems to have no ROM
+			{
+				*value = m_rom_ptr[offset & 0x0fff];
+			}
 		}
 		else
 		{
@@ -1861,6 +1864,9 @@ void ti99_pagedcru_cartridge::cruwrite(offs_t offset, UINT8 data)
      rxbv555 (repeating reset on Master Title Screen)
      superxb (lockup, fix: add RAM at 7c00)
 
+  Super-MiniMemory is also included here. We assume a RAM area at addresses
+  7000-7fff for this cartridge.
+
 ******************************************************************************/
 
 READ8Z_MEMBER(ti99_gromemu_cartridge::readz)
@@ -1869,6 +1875,16 @@ READ8Z_MEMBER(ti99_gromemu_cartridge::readz)
 		gromemureadz(space, offset, value, mem_mask);
 	else
 	{
+		if (m_ram_ptr != NULL)
+		{
+			// Variant of the cartridge which emulates MiniMemory. We don't introduce
+			// another type for this single cartridge.
+			if ((offset & 0x1fff)==0x1000) {
+				*value = m_ram_ptr[offset & 0x0fff];
+				return;
+			}
+		}
+
 		if (m_rom_ptr == NULL) return;
 		if (m_rom_page==0)
 		{
@@ -1888,6 +1904,15 @@ WRITE8_MEMBER(ti99_gromemu_cartridge::write)
 		gromemuwrite(space, offset, data, mem_mask);
 
 	else {
+		if (m_ram_ptr != NULL)
+		{
+			// Lines for Super-Minimem; see above
+			if ((offset & 0x1fff)==0x1000) {
+				m_ram_ptr[offset & 0x0fff] = data;
+			}
+			return; // no paging
+		}
+
 		m_rom_page = (offset >> 1) & 1;
 	}
 }
