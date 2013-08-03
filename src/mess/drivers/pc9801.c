@@ -96,6 +96,7 @@
     - Princess Maker 2: screen transitions are very ugly (btanb?)
  	- Puzznic: trips illegal irq 0x41 (?), prints an error on screen. (PC-9801RS only, writes an 1 to 0x69d2f for whatever reason, almost surely a btanb)
  	- Runner's High: wrong double height on the title screen;
+ 	- Sokoban Perfect: hangs at title screen, after loading the menu;
     - Sorcerian, Twilight Zone 3: Fails initial booting, issue with 2dd irq?
 	- The Incredible Machine: hangs at main menu (YM mis-fires irq?)
     - Uchiyama Aki no Chou Bangai: keyboard irq is fussy (sometimes it doesn't register a key press);

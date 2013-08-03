@@ -9972,18 +9972,18 @@ other two disks
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="ningyo_pg.fdi" size="1265664" crc="5d95b363" sha1="197aa488b35cc52b2907691a2b9f6e171982ba32" offset="0" />
+			<dataarea name="flop" size="1423360">
+				<rom name="ningyo_pg.fdi" size="1423360" crc="5d95b363" sha1="197aa488b35cc52b2907691a2b9f6e171982ba32" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="ningyo_a.fdi" size="1265664" crc="c3200fe0" sha1="9affa5a00ecfd14a472c75b68639c3dbf64f042b" offset="0" />
+			<dataarea name="flop" size="1423360">
+				<rom name="ningyo_a.fdi" size="1423360" crc="c3200fe0" sha1="9affa5a00ecfd14a472c75b68639c3dbf64f042b" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="ningyo_b.fdi" size="1265664" crc="32949674" sha1="807b85fca8124a91c42201d14b6e59f14de06578" offset="0" />
+			<dataarea name="flop" size="1423360">
+				<rom name="ningyo_b.fdi" size="1423360" crc="32949674" sha1="807b85fca8124a91c42201d14b6e59f14de06578" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -10516,13 +10516,13 @@ other two disks
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="phobos_a.fdi" size="1265664" crc="8327323e" sha1="a34c7038eb7486e38047bf1adfa6fb0dc50e674c" offset="0" />
+			<dataarea name="flop" size="1423360">
+				<rom name="phobos_a.fdi" size="1423360" crc="8327323e" sha1="a34c7038eb7486e38047bf1adfa6fb0dc50e674c" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="phobos_b.fdi" size="1265664" crc="62648430" sha1="c61d6b8825d8a68e77ebc067cb80dfad7ebbd51f" offset="0" />
+			<dataarea name="flop" size="1423360">
+				<rom name="phobos_b.fdi" size="1423360" crc="62648430" sha1="c61d6b8825d8a68e77ebc067cb80dfad7ebbd51f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -12782,6 +12782,22 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
 	</software>
 -->
 
+	<software name="simcity">
+		<description>SimCity</description>
+		<year>1990</year>
+		<publisher>Maxis</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="0x135000">
+				<rom name="system.fdi" size="0x135000" crc="eda14dd1" sha1="6ac095bd91762976eefc5e258072b23b3c9a0bfa" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="0x135000">
+				<rom name="data.fdi" size="0x135000" crc="b7c535b4" sha1="fefe039fe863fb24b6f9c6213bcce57b8cd8ee38" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="simcity2">
 		<description>SimCity 2000</description>
 		<year>19??</year>
@@ -12932,6 +12948,22 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="soft2b.fdi" size="1265664" crc="d45c3eb8" sha1="7a910cde03487f555f8f9a54d286354b9103f544" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sokobanp">
+		<description>Soko-ban Perfect</description>
+		<year>19??</year>
+		<publisher>Thinking Rabbit</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="0x135000">
+				<rom name="sokoban perfect.fdi" size="0x135000" crc="fddcc15a" sha1="8b2d5f2f588e1b8ff9bc207876cdf72fd5fd1084" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="0x135000">
+				<rom name="sokoban perfect answers.fdi" size="0x135000" crc="ce85b153" sha1="636eca10352c51e86ef43c19e6b31748a2926c78" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -15159,9 +15191,9 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
 		<description>Walpurgis Night 3</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="warlpurgis night 3 (proper).fdi" size="1265664" crc="76c97542" sha1="df27fb9489226e27f26cbcd85b4ab6164f6b0fc3" offset="0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1478656">
+				<rom name="warlpurgis night 3 (proper).fdi" size="1478656" crc="76c97542" sha1="df27fb9489226e27f26cbcd85b4ab6164f6b0fc3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -15198,18 +15230,18 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="disk_a.fdi" size="1265664" crc="72080e40" sha1="2f4c70cd71c61504946725d4a6768a9440ada536" offset="0" />
+			<dataarea name="flop" size="1423360">
+				<rom name="disk_a.fdi" size="1423360" crc="72080e40" sha1="2f4c70cd71c61504946725d4a6768a9440ada536" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="disk_b.fdi" size="1265664" crc="d4ff6893" sha1="47055fde95ded80f87572c26648bf622814d9985" offset="0" />
+			<dataarea name="flop" size="1423360">
+				<rom name="disk_b.fdi" size="1423360" crc="d4ff6893" sha1="47055fde95ded80f87572c26648bf622814d9985" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="disk_c.fdi" size="1265664" crc="c22556de" sha1="2276d8cc80d1f6850fcd89ba57085a9055d1ef0d" offset="0" />
+			<dataarea name="flop" size="1423360">
+				<rom name="disk_c.fdi" size="1423360" crc="c22556de" sha1="2276d8cc80d1f6850fcd89ba57085a9055d1ef0d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -16085,18 +16117,18 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="disk 01.fdi" size="1265664" crc="06b7f7bd" sha1="52a2e083258d737db82058f44b17934c76ed1d5c" offset="0" />
+			<dataarea name="flop" size="1497088">
+				<rom name="disk 01.fdi" size="1497088" crc="06b7f7bd" sha1="52a2e083258d737db82058f44b17934c76ed1d5c" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="disk 02.fdi" size="1265664" crc="f4122b5e" sha1="749d630c1002d819ab9c9367daa500aae1bec431" offset="0" />
+			<dataarea name="flop" size="1497088">
+				<rom name="disk 02.fdi" size="1497088" crc="f4122b5e" sha1="749d630c1002d819ab9c9367daa500aae1bec431" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="user.fdi" size="1265664" crc="f7e55a83" sha1="99bfb132dcf1fc34230136276c8eeea51db51f2c" offset="0" status="baddump" />
+			<dataarea name="flop" size="1497088">
+				<rom name="user.fdi" size="1497088" crc="f7e55a83" sha1="99bfb132dcf1fc34230136276c8eeea51db51f2c" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
