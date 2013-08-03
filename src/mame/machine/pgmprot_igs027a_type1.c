@@ -659,60 +659,8 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 			 so it's probably compressed somehow as well as scrambled?  68k doesnt know in advance how big each lot of data is either, it only stops
 			 writing when it gets a difference response from the MCU.
 
-			 (puzzli2 left, puzzli2 super right) (Stored at 153ea - 15411 in puzzli2s program) results read back are the same, the data for level 1 is at f916, there does seem to be some form of pattern every 16 bytes?
-
-			00138278: 31 00fd  001387de: 31 007e
-			00138278: 31 0087  001387de: 31 000e
-			00138278: 31 0032  001387de: 31 0098
-			00138278: 31 0029  001387de: 31 00a8
-			00138278: 31 0031  001387de: 31 007c
-			00138278: 31 003f  001387de: 31 0043
-			00138278: 31 00b0  001387de: 31 00e4
-			00138278: 31 0035  001387de: 31 00a2
-			00138278: 31 0071  001387de: 31 006a
-			00138278: 31 002d  001387de: 31 00e0
-			00138278: 31 00d5  001387de: 31 00ed
-			00138278: 31 000d  001387de: 31 0024
-			00138278: 31 0034  001387de: 31 00bb
-			00138278: 31 0059  001387de: 31 00bd
-			00138278: 31 00dd  001387de: 31 002e
-			00138278: 31 0023  001387de: 31 00d6
-			00138278: 31 007a  001387de: 31 002b
-			00138278: 31 00f3  001387de: 31 007a
-			00138278: 31 0077  001387de: 31 00dd
-			00138278: 31 0022  001387de: 31 00a3
-			00138278: 31 0036  001387de: 31 007b
-			00138278: 31 002e  001387de: 31 0052
-			00138278: 31 00b3  001387de: 31 00e7
-			00138278: 31 0035  001387de: 31 00a2
-			00138278: 31 0041  001387de: 31 005a
-			00138278: 31 005d  001387de: 31 0090
-			00138278: 31 00d6  001387de: 31 00ee
-			00138278: 31 000c  001387de: 31 0025
-			00138278: 31 0036  001387de: 31 00b9
-			00138278: 31 005e  001387de: 31 00ba
-			00138278: 31 0089  001387de: 31 007a
-			00138278: 31 003c  001387de: 31 00c9
-			00138278: 31 007a  001387de: 31 002b
-			00138278: 31 00a2  001387de: 31 002b
-			00138278: 31 006d  001387de: 31 00c7
-			00138278: 31 0023  001387de: 31 00a2
-			00138278: 31 0037  001387de: 31 007a
-			00138278: 31 003f  001387de: 31 0043
-			00138278: 31 00b3  001387de: 31 00e7
-			00138278: 31 0034  001387de: 31 00a3
-
-			the first step of decoding this is clearly a xor, with the first value written being an index
-			into a 256 byte table.. 
-
-
-			attempting to understand this (actual values are probably wrong because our table isn't correct, especially the low bits)
-			it is clear the low bits of our xor table are wrong, and obvious why, it's based on the data, and a value of 0 is very rare
-			because the data doesn't need to store blank space! the upper bits are more trusted because they're so rarely used
-
 		
 			00138278: 31 00fd | (set xor table offset)
-		
 		UNKNOWN - related to depth / number of columns?
 			00138278: 31 0087 | value 87, after xor is 75 (table address,value fd,f2)
 		COLUMN 1
@@ -767,18 +715,7 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 			00138278: 31 0034 | value 34, after xor is 03 (table address,value 03,37)  -> 0x0103
 			 ^ (end, returning 630006 as playfield width)
 
-
-					
-	 
-
 			*/
-
-
-			
-		
-
-		
-
 
 			if (command_31_write_type==2)
 			{
@@ -844,13 +781,13 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 		break;
 	
 
-		// this is read immediately after the 31 writes before a level / how to play
-		case 0x13: // getting some kind of list maybe?
+		// after writing the compressed and scrambled data stream for the level (copied from ROM) with command 0x31
+		// the game expects to read back a fully formed level structure from the ARM
+		case 0x13:
 		{
 			printf("%08x: %02x %04x (READ LEVEL DATA) | ",pc, m_ddp3lastcommand, m_value0);
 
-			// before how to play
-			// clearly the level layout, where does it come from?
+			// this is the how to play screen, correctly returned with current code
 			/*
 			UINT16 retvals[61] = 
 			{ 0x0008, // depth (-2?)
@@ -867,10 +804,10 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 			UINT16* leveldata = &level_structure[0][0];
 			if (hackcount==0)
 			{
-				m_valueresponse = 0x002d0000 | ((depth>>4)+1); // this *seems* to come from upper bits of the first real value written to the device during the level stream (verify)
+				m_valueresponse = 0x002d0000 | ((depth>>4)+1); // this *seems* to come from upper bits of the first real value written to the device during the level stream (verify, seems wrong for some levels because you get a black bar on the bottom of the screen, but might be bad xors)
 				printf("level depth returning %08x\n", m_valueresponse );
 			}
-			else if (hackcount<61)
+			else if (hackcount<((10*numbercolumns)+1))
 			{
 				m_valueresponse = 0x002d0000 | leveldata[hackcount-1];
 				printf("level data returning %08x\n", m_valueresponse );
