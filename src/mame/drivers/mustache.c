@@ -29,15 +29,14 @@ YM2151:
 ***************************************************************************/
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "audio/t5182.h"
 #include "includes/mustache.h"
+#include "audio/t5182.h"
 
 #define XTAL1  14318180
 #define XTAL2  18432000
 #define XTAL3  12000000
 
 #define CPU_CLOCK   (XTAL3/2)
-#define T5182_CLOCK (XTAL1/4)
 #define YM_CLOCK    (XTAL1/4)
 
 
@@ -45,11 +44,11 @@ static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, mustache_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(mustache_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xd000, 0xd000) AM_WRITE_LEGACY(t5182_sound_irq_w)
-	AM_RANGE(0xd001, 0xd001) AM_READ_LEGACY(t5182_sharedram_semaphore_snd_r)
-	AM_RANGE(0xd002, 0xd002) AM_WRITE_LEGACY(t5182_sharedram_semaphore_main_acquire_w)
-	AM_RANGE(0xd003, 0xd003) AM_WRITE_LEGACY(t5182_sharedram_semaphore_main_release_w)
-	AM_RANGE(0xd400, 0xd4ff) AM_READWRITE_LEGACY(t5182_sharedram_r, t5182_sharedram_w)
+	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE("t5182", t5182_device, sound_irq_w)
+	AM_RANGE(0xd001, 0xd001) AM_DEVREAD("t5182", t5182_device, sharedram_semaphore_snd_r)
+	AM_RANGE(0xd002, 0xd002) AM_DEVWRITE("t5182", t5182_device, sharedram_semaphore_main_acquire_w)
+	AM_RANGE(0xd003, 0xd003) AM_DEVWRITE("t5182", t5182_device, sharedram_semaphore_main_release_w)
+	AM_RANGE(0xd400, 0xd4ff) AM_DEVREADWRITE("t5182", t5182_device, sharedram_r, sharedram_w)
 	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("P1")
 	AM_RANGE(0xd801, 0xd801) AM_READ_PORT("P2")
 	AM_RANGE(0xd802, 0xd802) AM_READ_PORT("START")
@@ -175,11 +174,9 @@ static MACHINE_CONFIG_START( mustache, mustache_state )
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(memmap)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mustache_state, mustache_scanline, "screen", 0, 1)
-
-	MCFG_CPU_ADD(CPUTAG_T5182,Z80, T5182_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(t5182_map)
-	MCFG_CPU_IO_MAP(t5182_io)
-
+	
+	MCFG_T5182_ADD("t5182")
+	MCFG_FRAGMENT_ADD(t5182)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -197,9 +194,9 @@ static MACHINE_CONFIG_START( mustache, mustache_state )
 	MCFG_SEIBU_SOUND_ADD("seibu_sound") // for seibu_sound_decrypt on the MAIN cpu (not sound)
 	
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-
+	
 	MCFG_YM2151_ADD("ymsnd", YM_CLOCK)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(driver_device, member_wrapper_line<t5182_ym2151_irq_handler>))
+	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("t5182", t5182_device, ym2151_irq_handler))
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -209,7 +206,7 @@ ROM_START( mustache )
 	ROM_LOAD( "mustache.h18", 0x0000, 0x8000, CRC(123bd9b8) SHA1(33a7cba5c3a54b0b1a15dd1e24d298b6f7274321) )
 	ROM_LOAD( "mustache.h16", 0x8000, 0x4000, CRC(62552beb) SHA1(ee10991d7de0596608fa1db48805781cbfbbdb9f) )
 
-	ROM_REGION( 0x10000, "t5182", 0 ) /* Toshiba T5182 module */
+	ROM_REGION( 0x10000, "t5182_z80", 0 ) /* Toshiba T5182 module */
 	ROM_LOAD( "t5182.rom",   0x0000, 0x2000, CRC(d354c8fc) SHA1(a1c9e1ac293f107f69cc5788cf6abc3db1646e33) )
 	ROM_LOAD( "mustache.e5", 0x8000, 0x8000, CRC(efbb1943) SHA1(3320e9eaeb776d09ed63f7dedc79e720674e6718) )
 
@@ -234,8 +231,6 @@ ROM_END
 
 DRIVER_INIT_MEMBER(mustache_state,mustache)
 {
-	t5182_init(machine());
-
 	int i;
 
 	int G1 = memregion("gfx1")->bytes()/3;

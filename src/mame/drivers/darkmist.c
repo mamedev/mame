@@ -25,7 +25,6 @@ TODO:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "audio/t5182.h"
 #include "includes/darkmist.h"
 
 
@@ -48,11 +47,11 @@ static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, darkmist_state )
 	AM_RANGE(0xc808, 0xc808) AM_READ_PORT("UNK")
 	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_SHARE("paletteram")
 	AM_RANGE(0xd400, 0xd41f) AM_RAM AM_SHARE("scroll")
-	AM_RANGE(0xd600, 0xd67f) AM_READWRITE_LEGACY(t5182_sharedram_r, t5182_sharedram_w)
-	AM_RANGE(0xd680, 0xd680) AM_WRITE_LEGACY(t5182_sound_irq_w)
-	AM_RANGE(0xd681, 0xd681) AM_READ_LEGACY(t5182_sharedram_semaphore_snd_r)
-	AM_RANGE(0xd682, 0xd682) AM_WRITE_LEGACY(t5182_sharedram_semaphore_main_acquire_w)
-	AM_RANGE(0xd683, 0xd683) AM_WRITE_LEGACY(t5182_sharedram_semaphore_main_release_w)
+	AM_RANGE(0xd600, 0xd67f) AM_DEVREADWRITE("t5182", t5182_device, sharedram_r, sharedram_w)
+	AM_RANGE(0xd680, 0xd680) AM_DEVWRITE("t5182", t5182_device, sound_irq_w)
+	AM_RANGE(0xd681, 0xd681) AM_DEVREAD("t5182", t5182_device, sharedram_semaphore_snd_r)
+	AM_RANGE(0xd682, 0xd682) AM_DEVWRITE("t5182", t5182_device, sharedram_semaphore_main_acquire_w)
+	AM_RANGE(0xd683, 0xd683) AM_DEVWRITE("t5182", t5182_device, sharedram_semaphore_main_release_w)
 	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("workram")
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("spriteram")
@@ -232,9 +231,8 @@ static MACHINE_CONFIG_START( darkmist, darkmist_state )
 	MCFG_CPU_PROGRAM_MAP(memmap)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", darkmist_state, darkmist_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD(CPUTAG_T5182,Z80,14318180/4)   /* 3.579545 MHz */
-	MCFG_CPU_PROGRAM_MAP(t5182_map)
-	MCFG_CPU_IO_MAP(t5182_io)
+	MCFG_T5182_ADD("t5182")
+	MCFG_FRAGMENT_ADD(t5182)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -251,7 +249,7 @@ static MACHINE_CONFIG_START( darkmist, darkmist_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_YM2151_ADD("ymsnd", 14318180/4)    /* 3.579545 MHz */
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(driver_device, member_wrapper_line<t5182_ym2151_irq_handler>))
+	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("t5182", t5182_device, ym2151_irq_handler))
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 
@@ -263,7 +261,7 @@ ROM_START( darkmist )
 
 	ROM_LOAD( "dm_16.rom", 0x10000, 0x08000, CRC(094579d9) SHA1(2449bc9ba38396912ee9b72dd870ea9fcff95776) )
 
-	ROM_REGION( 0x10000, "t5182", 0 ) /* Toshiba T5182 module */
+	ROM_REGION( 0x10000, "t5182_z80", 0 ) /* Toshiba T5182 module */
 	ROM_LOAD( "t5182.rom", 0x0000, 0x2000, CRC(d354c8fc) SHA1(a1c9e1ac293f107f69cc5788cf6abc3db1646e33) )
 	ROM_LOAD( "dm_17.rom", 0x8000, 0x8000, CRC(7723dcae) SHA1(a0c69e7a7b6fd74f7ed6b9c6419aed94aabcd4b0) )
 
@@ -392,7 +390,7 @@ void darkmist_state::decrypt_gfx()
 void darkmist_state::decrypt_snd()
 {
 	int i;
-	UINT8 *ROM = memregion("t5182")->base();
+	UINT8 *ROM = memregion("t5182_z80")->base();
 
 	for(i=0x8000;i<0x10000;i++)
 		ROM[i] = BITSWAP8(ROM[i], 7,1,2,3,4,5,6,0);
@@ -405,8 +403,6 @@ DRIVER_INIT_MEMBER(darkmist_state,darkmist)
 	UINT8 *ROM = memregion("maincpu")->base();
 	UINT8 *buffer = auto_alloc_array(machine(), UINT8, 0x10000);
 	UINT8 *decrypt = auto_alloc_array(machine(), UINT8, 0x8000);
-
-	t5182_init(machine());
 
 	decrypt_gfx();
 

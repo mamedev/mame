@@ -1,3 +1,5 @@
+#include "audio/t5182.h"
+
 class darkmist_state : public driver_device
 {
 public:
@@ -8,14 +10,18 @@ public:
 		m_videoram(*this, "videoram"),
 		m_workram(*this, "workram"),
 		m_spriteram(*this, "spriteram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_t5182(*this, "t5182") { }
 
 	required_shared_ptr<UINT8> m_spritebank;
 	required_shared_ptr<UINT8> m_scroll;
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_workram;
 	required_shared_ptr<UINT8> m_spriteram;
-
+	
+	required_device<cpu_device> m_maincpu;
+	required_device<t5182_device> m_t5182;
+	
 	int m_hw;
 	tilemap_t *m_bgtilemap;
 	tilemap_t *m_fgtilemap;
@@ -33,5 +39,4 @@ public:
 	void set_pens();
 	void decrypt_gfx();
 	void decrypt_snd();
-	required_device<cpu_device> m_maincpu;
 };

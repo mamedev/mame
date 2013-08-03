@@ -73,12 +73,16 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_textram(*this, "textram"),
 		m_spritebank(*this, "spritebank"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_t5182(*this, "t5182")	{ }
 
 	required_shared_ptr<UINT8> m_mainram;
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_textram;
 	required_shared_ptr<UINT8> m_spritebank;
+	
+	required_device<cpu_device> m_maincpu;
+	required_device<t5182_device> m_t5182;
 
 	tilemap_t *m_bgtilemap;
 	tilemap_t *m_infotilemap;
@@ -101,7 +105,6 @@ public:
 	UINT32 screen_update_panicr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(panicr_scanline);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect );
-	required_device<cpu_device> m_maincpu;
 };
 
 
@@ -312,7 +315,7 @@ WRITE8_MEMBER(panicr_state::panicr_output_w)
 READ8_MEMBER(panicr_state::t5182shared_r)
 {
 	if ((offset & 1) == 0)
-		return t5182_sharedram_r(space, offset/2);
+		return m_t5182->sharedram_r(space, offset/2);
 	else
 		return 0;
 }
@@ -320,7 +323,7 @@ READ8_MEMBER(panicr_state::t5182shared_r)
 WRITE8_MEMBER(panicr_state::t5182shared_w)
 {
 	if ((offset & 1) == 0)
-		t5182_sharedram_w(space, offset/2, data);
+		m_t5182->sharedram_w(space, offset/2, data);
 }
 
 
@@ -330,10 +333,10 @@ static ADDRESS_MAP_START( panicr_map, AS_PROGRAM, 8, panicr_state )
 	AM_RANGE(0x03000, 0x03fff) AM_RAM
 	AM_RANGE(0x08000, 0x0bfff) AM_READ(panicr_collision_r)
 	AM_RANGE(0x0c000, 0x0cfff) AM_RAM AM_SHARE("textram")
-	AM_RANGE(0x0d000, 0x0d000) AM_WRITE_LEGACY(t5182_sound_irq_w)
-	AM_RANGE(0x0d002, 0x0d002) AM_WRITE_LEGACY(t5182_sharedram_semaphore_main_acquire_w)
-	AM_RANGE(0x0d004, 0x0d004) AM_READ_LEGACY(t5182_sharedram_semaphore_snd_r)
-	AM_RANGE(0x0d006, 0x0d006) AM_WRITE_LEGACY(t5182_sharedram_semaphore_main_release_w)
+	AM_RANGE(0x0d000, 0x0d000) AM_DEVWRITE("t5182", t5182_device, sound_irq_w)
+	AM_RANGE(0x0d002, 0x0d002) AM_DEVWRITE("t5182", t5182_device, sharedram_semaphore_main_acquire_w)
+	AM_RANGE(0x0d004, 0x0d004) AM_DEVREAD("t5182", t5182_device, sharedram_semaphore_snd_r)
+	AM_RANGE(0x0d006, 0x0d006) AM_DEVWRITE("t5182", t5182_device, sharedram_semaphore_main_release_w)
 	AM_RANGE(0x0d200, 0x0d2ff) AM_READWRITE(t5182shared_r, t5182shared_w)
 	AM_RANGE(0x0d400, 0x0d400) AM_READ_PORT("P1")
 	AM_RANGE(0x0d402, 0x0d402) AM_READ_PORT("P2")
@@ -506,10 +509,9 @@ static MACHINE_CONFIG_START( panicr, panicr_state )
 	MCFG_CPU_ADD("maincpu", V20,MASTER_CLOCK/2) /* Sony 8623h9 CXQ70116D-8 (V20 compatible) */
 	MCFG_CPU_PROGRAM_MAP(panicr_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", panicr_state, panicr_scanline, "screen", 0, 1)
-
-	MCFG_CPU_ADD(CPUTAG_T5182,Z80,SOUND_CLOCK/4)    /* 3.579545 MHz */
-	MCFG_CPU_PROGRAM_MAP(t5182_map)
-	MCFG_CPU_IO_MAP(t5182_io)
+	
+	MCFG_T5182_ADD("t5182")
+	MCFG_FRAGMENT_ADD(t5182)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -526,7 +528,7 @@ static MACHINE_CONFIG_START( panicr, panicr_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_YM2151_ADD("ymsnd", SOUND_CLOCK/4) /* 3.579545 MHz */
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(driver_device, member_wrapper_line<t5182_ym2151_irq_handler>))
+	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("t5182", t5182_device, ym2151_irq_handler))
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 
@@ -538,7 +540,7 @@ ROM_START( panicr )
 	ROM_LOAD16_BYTE("2.19m",   0x0f0000, 0x08000, CRC(3d48b0b5) SHA1(a6e8b38971a8964af463c16f32bb7dbd301dd314) )
 	ROM_LOAD16_BYTE("1.19n",   0x0f0001, 0x08000, CRC(674131b9) SHA1(63499cd5ad39e79e70f3ba7060680f0aa133f095) )
 
-	ROM_REGION( 0x10000, "t5182", 0 ) /* Toshiba T5182 module */
+	ROM_REGION( 0x10000, "t5182_z80", 0 ) /* Toshiba T5182 module */
 	ROM_LOAD( "t5182.rom", 0x0000, 0x2000, CRC(d354c8fc) SHA1(a1c9e1ac293f107f69cc5788cf6abc3db1646e33) )
 	ROM_LOAD( "22d.bin",   0x8000, 0x8000, CRC(eb1a46e1) SHA1(278859ae4bca9f421247e646d789fa1206dcd8fc) )
 
@@ -577,7 +579,7 @@ ROM_START( panicrg ) /* Distributed by TV-Tuning Videospiele GMBH */
 	ROM_LOAD16_BYTE("2g.19m",   0x0f0000, 0x08000, CRC(cf759403) SHA1(1a0911c943ecc752e46873c9a5da981745f7562d) )
 	ROM_LOAD16_BYTE("1g.19n",   0x0f0001, 0x08000, CRC(06877f9b) SHA1(8b92209d6422ff2b1f3cb66bd39a3ff84e399eec) )
 
-	ROM_REGION( 0x10000, "t5182", 0 ) /* Toshiba T5182 module */
+	ROM_REGION( 0x10000, "t5182_z80", 0 ) /* Toshiba T5182 module */
 	ROM_LOAD( "t5182.rom", 0x0000, 0x2000, CRC(d354c8fc) SHA1(a1c9e1ac293f107f69cc5788cf6abc3db1646e33) )
 	ROM_LOAD( "22d.bin",   0x8000, 0x8000, CRC(eb1a46e1) SHA1(278859ae4bca9f421247e646d789fa1206dcd8fc) )
 
@@ -618,8 +620,6 @@ DRIVER_INIT_MEMBER(panicr_state,panicr)
 	UINT8 *rom;
 	int size;
 	int i,j;
-
-	t5182_init(machine());
 
 	rom = memregion("gfx1")->base();
 	size = memregion("gfx1")->bytes();

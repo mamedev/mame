@@ -146,135 +146,155 @@ rom.
 
 #include "emu.h"
 #include "t5182.h"
-#include "sound/2151intf.h"
 
+#define T5182_CLOCK     XTAL_14_31818MHz/4
 
-enum
+const device_type T5182 = &device_creator<t5182_device>;
+
+t5182_device::t5182_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, T5182, "T5182", tag, owner, clock, "Toshiba T5182", __FILE__),
+	m_t5182_sharedram(NULL),
+	m_irqstate(0),
+	m_semaphore_main(0),
+	m_semaphore_snd(0)
 {
-	VECTOR_INIT,
-	YM2151_ASSERT,
-	YM2151_CLEAR,
-	YM2151_ACK,
-	CPU_ASSERT,
-	CPU_CLEAR
-};
-
-static UINT8 *t5182_sharedram;
-static int irqstate;
-
-void t5182_init(running_machine &machine)
-{
-	t5182_sharedram = reinterpret_cast<UINT8 *>(machine.root_device().memshare("t5182_sharedram")->ptr());
 }
 
-READ8_HANDLER(t5182_sharedram_r)
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void t5182_device::device_config_complete()
 {
-	return t5182_sharedram[offset];
 }
 
-WRITE8_HANDLER(t5182_sharedram_w)
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void t5182_device::device_start()
 {
-	t5182_sharedram[offset] = data;
+	m_t5182_sharedram = reinterpret_cast<UINT8 *>(machine().root_device().memshare("t5182_sharedram")->ptr());
+	
+	save_pointer(NAME(m_t5182_sharedram), sizeof(UINT8));
+	save_item(NAME(m_irqstate));
+	save_item(NAME(m_semaphore_main));
+	save_item(NAME(m_semaphore_snd));
+	
+	m_ourcpu = machine().device<cpu_device>("t5182_z80");
 }
 
-static TIMER_CALLBACK( setirq_callback )
+READ8_MEMBER(t5182_device::sharedram_r)
 {
-	device_t *cpu;
+	return m_t5182_sharedram[offset];
+}
 
+WRITE8_MEMBER(t5182_device::sharedram_w)
+{
+	m_t5182_sharedram[offset] = data;
+}
+
+TIMER_CALLBACK_MEMBER( t5182_device::setirq_callback )
+{
 	switch(param)
 	{
 		case YM2151_ASSERT:
-			irqstate |= 1|4;
+			m_irqstate |= 1|4;
 			break;
 
 		case YM2151_CLEAR:
-			irqstate &= ~1;
+			m_irqstate &= ~1;
 			break;
 
 		case YM2151_ACK:
-			irqstate &= ~4;
+			m_irqstate &= ~4;
 			break;
 
 		case CPU_ASSERT:
-			irqstate |= 2;  // also used by t5182_sharedram_semaphore_main_r
+			m_irqstate |= 2;  // also used by t5182_sharedram_semaphore_main_r
 			break;
 
 		case CPU_CLEAR:
-			irqstate &= ~2;
+			m_irqstate &= ~2;
 			break;
 	}
-
-	cpu = machine.device(CPUTAG_T5182);
-
-	if (cpu == NULL)
+	
+	if (m_ourcpu == NULL)
 		return;
 
-	if (irqstate == 0)  /* no IRQs pending */
-		cpu->execute().set_input_line(0,CLEAR_LINE);
+	if (m_irqstate == 0)  /* no IRQs pending */
+		m_ourcpu->set_input_line(0,CLEAR_LINE);
 	else    /* IRQ pending */
-		cpu->execute().set_input_line(0,ASSERT_LINE);
+		m_ourcpu->set_input_line(0,ASSERT_LINE);
 }
 
 
 
-WRITE8_HANDLER( t5182_sound_irq_w )
+WRITE8_MEMBER( t5182_device::sound_irq_w )
 {
-	space.machine().scheduler().synchronize(FUNC(setirq_callback), CPU_ASSERT);
+	space.machine().scheduler().synchronize(timer_expired_delegate(FUNC(t5182_device::setirq_callback), this), CPU_ASSERT);
 }
 
-static WRITE8_HANDLER( t5182_ym2151_irq_ack_w )
+WRITE8_MEMBER( t5182_device::ym2151_irq_ack_w )
 {
-	space.machine().scheduler().synchronize(FUNC(setirq_callback), YM2151_ACK);
+	space.machine().scheduler().synchronize(timer_expired_delegate(FUNC(t5182_device::setirq_callback), this), YM2151_ACK);
 }
 
-static WRITE8_HANDLER( t5182_cpu_irq_ack_w )
+WRITE8_MEMBER( t5182_device::cpu_irq_ack_w )
 {
-	space.machine().scheduler().synchronize(FUNC(setirq_callback), CPU_CLEAR);
+	space.machine().scheduler().synchronize(timer_expired_delegate(FUNC(t5182_device::setirq_callback), this), CPU_CLEAR);
 }
 
-WRITE_LINE_DEVICE_HANDLER(t5182_ym2151_irq_handler)
+WRITE_LINE_MEMBER(t5182_device::ym2151_irq_handler)
 {
 	if (state)
-		device->machine().scheduler().synchronize(FUNC(setirq_callback), YM2151_ASSERT);
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(t5182_device::setirq_callback), this), YM2151_ASSERT);
 	else
-		device->machine().scheduler().synchronize(FUNC(setirq_callback), YM2151_CLEAR);
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(t5182_device::setirq_callback), this), YM2151_CLEAR);
 }
 
-
-
-static int semaphore_main, semaphore_snd;
-
-READ8_HANDLER(t5182_sharedram_semaphore_snd_r)
+READ8_MEMBER(t5182_device::sharedram_semaphore_snd_r)
 {
-	return semaphore_snd;
+	return m_semaphore_snd;
 }
 
-WRITE8_HANDLER(t5182_sharedram_semaphore_main_acquire_w)
+WRITE8_MEMBER(t5182_device::sharedram_semaphore_main_acquire_w)
 {
-	semaphore_main = 1;
+	m_semaphore_main = 1;
 }
 
-WRITE8_HANDLER(t5182_sharedram_semaphore_main_release_w)
+WRITE8_MEMBER(t5182_device::sharedram_semaphore_main_release_w)
 {
-	semaphore_main = 0;
+	m_semaphore_main = 0;
 }
 
-static WRITE8_HANDLER(t5182_sharedram_semaphore_snd_acquire_w)
+WRITE8_MEMBER(t5182_device::sharedram_semaphore_snd_acquire_w)
 {
-	semaphore_snd = 1;
+	m_semaphore_snd = 1;
 }
 
-static WRITE8_HANDLER(t5182_sharedram_semaphore_snd_release_w)
+WRITE8_MEMBER(t5182_device::sharedram_semaphore_snd_release_w)
 {
-	semaphore_snd = 0;
+	m_semaphore_snd = 0;
 }
 
-static READ8_HANDLER(t5182_sharedram_semaphore_main_r)
+READ8_MEMBER(t5182_device::sharedram_semaphore_main_r)
 {
-	return semaphore_main | (irqstate & 2);
+	return m_semaphore_main | (m_irqstate & 2);
 }
 
+//-------------------------------------------------
+//  MACHINE_CONFIG_FRAGMENT( t5182 )
+//-------------------------------------------------
 
+MACHINE_CONFIG_FRAGMENT( t5182 )
+	MCFG_CPU_ADD("t5182_z80", Z80, T5182_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(t5182_map)
+	MCFG_CPU_IO_MAP(t5182_io)
+
+MACHINE_CONFIG_END
 
 
 	// 4000-407F    RAM shared with main CPU
@@ -294,7 +314,7 @@ static READ8_HANDLER(t5182_sharedram_semaphore_main_r)
 	//  90XX reset
 	//  A0XX
 	// rest unused
-ADDRESS_MAP_START( t5182_map, AS_PROGRAM, 8, driver_device )
+ADDRESS_MAP_START( t5182_map, AS_PROGRAM, 8, t5182_device )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM // internal ROM
 	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_MIRROR(0x1800) // internal RAM
 	AM_RANGE(0x4000, 0x40ff) AM_RAM AM_MIRROR(0x3F00) AM_SHARE("t5182_sharedram") // 2016 with four 74ls245s, one each for main and t5182 address and data. pins 23, 22, 20, 19, 18 are all tied low so only 256 bytes are usable
@@ -312,13 +332,13 @@ ADDRESS_MAP_END
 	// 30 R  coin inputs (bits 0 and 1, active high)
 	// 40  W external ROM banking? (the only 0 bit enables a ROM)
 	// 50  W test mode status flags (bit 0 = ROM test fail, bit 1 = RAM test fail, bit 2 = YM2151 IRQ not received)
-ADDRESS_MAP_START( t5182_io, AS_IO, 8, driver_device )
+ADDRESS_MAP_START( t5182_io, AS_IO, 8, t5182_device )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x10, 0x10) AM_WRITE_LEGACY(t5182_sharedram_semaphore_snd_acquire_w)
-	AM_RANGE(0x11, 0x11) AM_WRITE_LEGACY(t5182_sharedram_semaphore_snd_release_w)
-	AM_RANGE(0x12, 0x12) AM_WRITE_LEGACY(t5182_ym2151_irq_ack_w)
-	AM_RANGE(0x13, 0x13) AM_WRITE_LEGACY(t5182_cpu_irq_ack_w)
-	AM_RANGE(0x20, 0x20) AM_READ_LEGACY(t5182_sharedram_semaphore_main_r)
+	AM_RANGE(0x10, 0x10) AM_DEVWRITE("t5182", t5182_device, sharedram_semaphore_snd_acquire_w)
+	AM_RANGE(0x11, 0x11) AM_DEVWRITE("t5182", t5182_device, sharedram_semaphore_snd_release_w)
+	AM_RANGE(0x12, 0x12) AM_DEVWRITE("t5182", t5182_device, ym2151_irq_ack_w)
+	AM_RANGE(0x13, 0x13) AM_DEVWRITE("t5182", t5182_device, cpu_irq_ack_w)
+	AM_RANGE(0x20, 0x20) AM_DEVREAD("t5182", t5182_device, sharedram_semaphore_main_r)
 	AM_RANGE(0x30, 0x30) AM_READ_PORT(T5182COINPORT)
 ADDRESS_MAP_END
