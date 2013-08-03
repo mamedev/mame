@@ -46,7 +46,6 @@
 //  SCREEN DEVICE CONFIGURATION MACROS
 //**************************************************************************
 
-#define SCREEN_UPDATE16_CALL(name)      SCREEN_UPDATE_NAME(name)(NULL, screen, bitmap, cliprect)
 #define SCREEN_UPDATE32_CALL(name)      SCREEN_UPDATE_NAME(name)(NULL, screen, bitmap, cliprect)
 
 #define SCREEN_VBLANK_CALL(name)        SCREEN_VBLANK_NAME(name)(NULL, screen, vblank_on)
