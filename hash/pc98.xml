@@ -1016,10 +1016,10 @@ TODO:
 		</part>
 	</software>
 
-	<software name="airduel">
+	<software name="airduel" supported="yes">
 		<description>Air Duel</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>POP Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="air duel (pop software).fdi" size="1265664" crc="ef76d453" sha1="f24ff1b32567ac374cd330568d35ed703c0831a6" offset="0" />
@@ -1100,10 +1100,10 @@ TODO:
 		</part>
 	</software>
 
-	<software name="akaisui">
+	<software name="akaisui" supported="yes">
 		<description>Akai Suishou no Hitomi</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1996</year>
+		<publisher>Fairy Dust</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="hitomi_a.fdi" size="1265664" crc="1d7eb82a" sha1="fd854d57dfb2bc64fe287bc2ba9a9e4ce239ec45" offset="0" />
@@ -1171,9 +1171,9 @@ TODO:
 		<description>Akemi</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="akemi (soft house indojin).fdi" size="1265664" crc="69f457bb" sha1="9df0f2ef5f00bf3c905a400d1da3904e5c3aba58" offset="0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1478656">
+				<rom name="akemi (soft house indojin).fdi" size="1478656" crc="69f457bb" sha1="9df0f2ef5f00bf3c905a400d1da3904e5c3aba58" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1242,18 +1242,18 @@ TODO:
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="1.fdi" size="1265664" crc="1644a42e" sha1="a98a9a4aee3f1af9601a6767bc234e02ee05e350" offset="0" />
+			<dataarea name="flop" size="1029120">
+				<rom name="1.fdi" size="1029120" crc="1644a42e" sha1="a98a9a4aee3f1af9601a6767bc234e02ee05e350" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="2.fdi" size="1265664" crc="e9c7769f" sha1="9034060948666a91cbed284f52cd0e9c96cc8c05" offset="0" />
+			<dataarea name="flop" size="1029120">
+				<rom name="2.fdi" size="1029120" crc="e9c7769f" sha1="9034060948666a91cbed284f52cd0e9c96cc8c05" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="3.fdi" size="1265664" crc="3f625678" sha1="cb643f0d1ef4acbf8b232c49f00d64233ae05c21" offset="0" />
+			<dataarea name="flop" size="1029120">
+				<rom name="3.fdi" size="1029120" crc="3f625678" sha1="cb643f0d1ef4acbf8b232c49f00d64233ae05c21" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1877,13 +1877,14 @@ TODO:
 		</part>
 	</software>
 
+<!-- 2dd image -->
 	<software name="arkanoid" supported="yes">
 		<description>Arkanoid</description>
 		<year>19??</year>
 		<publisher>Taito</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="arkanoid.fdi" size="1265664" crc="6ee434e8" sha1="8ce3c8dcb47f026dae0033e0d3314294d6324fe9" offset="0" />
+			<dataarea name="flop" size="659456">
+				<rom name="arkanoid.fdi" size="659456" crc="6ee434e8" sha1="8ce3c8dcb47f026dae0033e0d3314294d6324fe9" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2575,9 +2576,9 @@ TODO:
 		<description>BK Turb</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="bk turb (bio 100%).fdi" size="1265664" crc="d9a66884" sha1="284d4c05fc8fe5df48c09de57bf092717b699d1f" offset="0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1478656">
+				<rom name="bk turb (bio 100%).fdi" size="1478656" crc="d9a66884" sha1="284d4c05fc8fe5df48c09de57bf092717b699d1f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2959,9 +2960,9 @@ TODO:
 		<description>BTB Software CG Gallery 1</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="cg gallery 1 (btb software).fdi" size="1265664" crc="b3d4a86c" sha1="7a73f9805370aba1bbb25ca997076c5fad89d35e" offset="0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1478656">
+				<rom name="cg gallery 1 (btb software).fdi" size="1478656" crc="b3d4a86c" sha1="7a73f9805370aba1bbb25ca997076c5fad89d35e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3712,13 +3713,13 @@ TODO:
 		</part>
 	</software>
 
-	<software name="collonc">
+	<software name="collonc3">
 		<description>Collon Club 3</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="collon club 3 (btb).fdi" size="1265664" crc="21dcaba7" sha1="9ef84b18ffe47c1795e347ccd13d96b066088162" offset="0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1478656">
+				<rom name="collon club 3 (btb).fdi" size="1478656" crc="21dcaba7" sha1="9ef84b18ffe47c1795e347ccd13d96b066088162" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3984,9 +3985,9 @@ TODO:
 		<description>Dai Hinmin - Taiketsu Seifuku Musume</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="dai hinmin - taiketsu seifuku musume [udukisya].fdi" size="1265664" crc="52fb5b5a" sha1="70f51fcff69bfdef1afc69a7c917e184c4d86610" offset="0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1478656">
+				<rom name="dai hinmin - taiketsu seifuku musume [udukisya].fdi" size="1478656" crc="52fb5b5a" sha1="70f51fcff69bfdef1afc69a7c917e184c4d86610" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -5250,9 +5251,9 @@ Presumably copy protection floppy, to be used with CD-Rom
 		<description>E.S.P</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="e.s.p.fdi" size="1265664" crc="dde58bb8" sha1="4bc74e9c7f4cdea35004b9cb94e70966ada2325f" offset="0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1478656">
+				<rom name="e.s.p.fdi" size="1478656" crc="dde58bb8" sha1="4bc74e9c7f4cdea35004b9cb94e70966ada2325f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -5364,9 +5365,9 @@ Presumably copy protection floppy, to be used with CD-Rom
 		<description>Entax</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="entax (aba).fdi" size="1265664" crc="b49575ec" sha1="cfe6b5adbcc301010094905a4726fa7988f6a79c" offset="0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1478656">
+				<rom name="entax (aba).fdi" size="1478656" crc="b49575ec" sha1="cfe6b5adbcc301010094905a4726fa7988f6a79c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -5755,9 +5756,9 @@ TODO: missing install disks
 		<description>First Fantazy 5</description>
 		<year>1992</year>
 		<publisher>Kauda Project</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="first fantazy 5 (1992)(kauda project).fdi" size="1265664" crc="c09fb328" sha1="3d88be1f4a488d33010eea293de43e371ab1aae8" offset="0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1478656">
+				<rom name="first fantazy 5 (1992)(kauda project).fdi" size="1478656" crc="c09fb328" sha1="3d88be1f4a488d33010eea293de43e371ab1aae8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -6175,10 +6176,10 @@ TODO: missing install disks
 	<software name="geminis">
 		<description>Gemini Snake</description>
 		<year>1990</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="gemini snake (1990)(bio 100%).fdi" size="1265664" crc="2a28bfa9" sha1="8b20b04f86210b16683048b8a9a34b873b342b9d" offset="0" />
+		<publisher>Bio 100%</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1478656">
+				<rom name="gemini snake (1990)(bio 100%).fdi" size="1478656" crc="2a28bfa9" sha1="8b20b04f86210b16683048b8a9a34b873b342b9d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -6506,13 +6507,14 @@ Fake disk?
 		</part>
 	</software>
 
+<!-- huh, a 3'5" floppy tied with 5'25" ones? -->
 	<software name="guynaroc">
 		<description>Guynarock - Galactic Guardian</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="galactic guardian guynarock (silence)(boot disk).fdi" size="1265664" crc="45f56f14" sha1="8c9cd004a1cc136a9f638944cefa3ad9cff758ed" offset="0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1478656">
+				<rom name="galactic guardian guynarock (silence)(boot disk).fdi" size="1478656" crc="45f56f14" sha1="8c9cd004a1cc136a9f638944cefa3ad9cff758ed" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
@@ -7467,9 +7469,9 @@ TODO: other two disks, in .nfd format
 		<description>Kitty World 2</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="kitty world 2 (j).fdi" size="1265664" crc="99dc1c4d" sha1="007e887b7473272ca5d0af286e86582b04af55a3" offset="0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1478656">
+				<rom name="kitty world 2 (j).fdi" size="1478656" crc="99dc1c4d" sha1="007e887b7473272ca5d0af286e86582b04af55a3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -9145,9 +9147,9 @@ Omake disk?
 		<description>Mobile Delivery</description>
 		<year>19??</year>
 		<publisher>Kuni-Soft</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="mobile delivery (kuni-soft).fdi" size="1265664" crc="9f109e23" sha1="95008ca215228c5bc40d3a1f49d57ccfad6c48a9" offset="0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1478656">
+				<rom name="mobile delivery (kuni-soft).fdi" size="1478656" crc="9f109e23" sha1="95008ca215228c5bc40d3a1f49d57ccfad6c48a9" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -9268,9 +9270,9 @@ How to load this?
 		<description>Mogupoko</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="mogupoko (namikaze).fdi" size="1265664" crc="c86c48aa" sha1="0a818cddd0604d52fb1bf54b7fb154ea04c5aea1" offset="0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1478656">
+				<rom name="mogupoko (namikaze).fdi" size="1478656" crc="c86c48aa" sha1="0a818cddd0604d52fb1bf54b7fb154ea04c5aea1" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -9726,9 +9728,9 @@ Other three disks, in nfd format
 		<description>Nadia of the Sea - Mysteries of Blue Water</description>
 		<year>19??</year>
 		<publisher>Gainax</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="nadia of the sea mysteries of blue water (geinax).fdi" size="1265664" crc="27e8c81a" sha1="93074ee305b88c985f76cdf47eed1c00015828ce" offset="0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1478656">
+				<rom name="nadia of the sea mysteries of blue water (geinax).fdi" size="1478656" crc="27e8c81a" sha1="93074ee305b88c985f76cdf47eed1c00015828ce" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -10302,9 +10304,9 @@ other two disks
 		<description>Ossault Plus</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="ossault plus (exe).fdi" size="1265664" crc="7bf0db76" sha1="c6d9a9c4cb27d1178a15afa96059f96f9f2d531c" offset="0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1478656">
+				<rom name="ossault plus (exe).fdi" size="1478656" crc="7bf0db76" sha1="c6d9a9c4cb27d1178a15afa96059f96f9f2d531c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -10743,14 +10745,14 @@ other two disks
 		<description>Ponjalla no Houkago - Sadoubu(re) Hen</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="npj1.fdi" size="1265664" crc="3f5fc131" sha1="374ff6a52f9ffde792758add3a9a250407e94c4f" offset="0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1478656">
+				<rom name="npj1.fdi" size="1478656" crc="3f5fc131" sha1="374ff6a52f9ffde792758add3a9a250407e94c4f" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="npj2.fdi" size="1265664" crc="d75bd08f" sha1="592eeb6a57637c666801e7addb8920cc8aed0bce" offset="0" />
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1478656">
+				<rom name="npj2.fdi" size="1478656" crc="d75bd08f" sha1="592eeb6a57637c666801e7addb8920cc8aed0bce" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -11008,9 +11010,9 @@ other two disks
 		<description>Princess Confusion</description>
 		<year>1992</year>
 		<publisher>Initialize</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="princess confusion (1992)(initialize).fdi" size="1265664" crc="0dbc06a4" sha1="431166d2ad251f186f0bc72ad7186f1337ab6201" offset="0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1478656">
+				<rom name="princess confusion (1992)(initialize).fdi" size="1478656" crc="0dbc06a4" sha1="431166d2ad251f186f0bc72ad7186f1337ab6201" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -11577,9 +11579,9 @@ other two disks
 		<description>Ray Cards</description>
 		<year>1995</year>
 		<publisher>Nengollo Software</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="ray cards (1995)(nengollo software).fdi" size="1265664" crc="15f679a1" sha1="64b13f70f784ce1b4417b1fec1229d7807ff8608" offset="0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1478656">
+				<rom name="ray cards (1995)(nengollo software).fdi" size="1478656" crc="15f679a1" sha1="64b13f70f784ce1b4417b1fec1229d7807ff8608" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -11936,9 +11938,9 @@ other two disks
 		<description>Revival Astro Wars Part 2</description>
 		<year>19??</year>
 		<publisher>Taka</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="revival astro wars 2 (taka).fdi" size="1265664" crc="98fad3cc" sha1="34bcae222dff4a9e51c526bc17e6f6d4d8a1439d" offset="0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1478656">
+				<rom name="revival astro wars 2 (taka).fdi" size="1478656" crc="98fad3cc" sha1="34bcae222dff4a9e51c526bc17e6f6d4d8a1439d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -12172,13 +12174,14 @@ other two disks
 		</part>
 	</software>
 
+<!-- 3'5 floppy, compared to the 5'25" one used in Disc Station 10 -->
 	<software name="runners">
 		<description>Runner's High</description>
 		<year>1996</year>
 		<publisher>Compile</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="runner's high (1996)(compile).fdi" size="1265664" crc="5a9b94c6" sha1="ae1e1a3b4c2924d7cdad07e5339ea3a02bfb00a5" offset="0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1478656">
+				<rom name="runner's high (1996)(compile).fdi" size="1478656" crc="5a9b94c6" sha1="ae1e1a3b4c2924d7cdad07e5339ea3a02bfb00a5" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -12508,9 +12511,9 @@ other two disks
 		<description>SeeNa 2</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="seena 2 (bio 100%).fdi" size="1265664" crc="7ae621e9" sha1="9ab9ffe76e256df5e9a9cc03ba7e9680e8e0277f" offset="0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1478656">
+				<rom name="seena 2 (bio 100%).fdi" size="1478656" crc="7ae621e9" sha1="9ab9ffe76e256df5e9a9cc03ba7e9680e8e0277f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -12597,9 +12600,9 @@ other two disks
 		<description>Sentimental Graphics Vol. 1</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="sentimental graphics vol 1 (team zero).fdi" size="1265664" crc="a75f1c51" sha1="3f399c1525f193e8a5e89b0d35e7e20c3f1cea41" offset="0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1478656">
+				<rom name="sentimental graphics vol 1 (team zero).fdi" size="1478656" crc="a75f1c51" sha1="3f399c1525f193e8a5e89b0d35e7e20c3f1cea41" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -12780,9 +12783,9 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
 		<description>Sinora's Quest 2</description>
 		<year>19??</year>
 		<publisher>Roronworld</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="sinora's quest 2 (roronworld).fdi" size="1265664" crc="f91dabbf" sha1="d50dcafc907d78670649c78a8c9a9917cb0fc42e" offset="0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1478656">
+				<rom name="sinora's quest 2 (roronworld).fdi" size="1478656" crc="f91dabbf" sha1="d50dcafc907d78670649c78a8c9a9917cb0fc42e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -13006,9 +13009,9 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
 		<description>Stardust Chaser</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="stardust chaser (1992)(bio 100%).fdi" size="1265664" crc="9f4abc3c" sha1="f93da7c68144891b77f430714eadc247c9c05972" offset="0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1478656">
+				<rom name="stardust chaser (1992)(bio 100%).fdi" size="1478656" crc="9f4abc3c" sha1="f93da7c68144891b77f430714eadc247c9c05972" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -13966,9 +13969,9 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
 		<description>The Stellar Sign</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="tokinosirube.fdi" size="1265664" crc="018ebc04" sha1="bde43ab566c039736482016a6bfb58c2e4173f57" offset="0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1478656">
+				<rom name="tokinosirube.fdi" size="1478656" crc="018ebc04" sha1="bde43ab566c039736482016a6bfb58c2e4173f57" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -15008,10 +15011,33 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
 	<software name="viperf40">
 		<description>Viper-F40</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Sogna</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="boot.fdi" size="1265664" crc="904235a4" sha1="ceafd2899752517e45f6eeb3fa9f74f9e6145e1c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vipev16d" supported="no">
+		<description>Viper V16 Demo</description>
+		<year>19??</year>
+		<publisher>Sogna</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="0x13dbfc">
+				<rom name="viper-v16 demo.fdd" size="0x13dbfc" crc="5599f19a" sha1="96bff53d5122891755d6b9aad5c1d617a4338b62" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- probably identical contents but different floppy format used -->
+	<software name="vipev16da" cloneof="vipev16d">
+		<description>Viper V16 Demo (FDI)</description>
+		<year>19??</year>
+		<publisher>Sogna</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="0x135000">
+				<rom name="viper-v16 demo.fdi" size="0x135000" crc="9ccbe731" sha1="1a14375f2d10d78675f7731f3c0add9de61037c7" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -15168,9 +15194,9 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
 		<description>Weapons Free</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="weapons free (aba).fdi" size="1265664" crc="5be6a6bc" sha1="0268b0b366026804b0c8f94434f6bf81b2a19d7f" offset="0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1478656">
+				<rom name="weapons free (aba).fdi" size="1478656" crc="5be6a6bc" sha1="0268b0b366026804b0c8f94434f6bf81b2a19d7f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
