@@ -431,7 +431,7 @@ READ8_MEMBER(phoenix_state::survival_protection_r)
 
 READ_LINE_MEMBER(phoenix_state::survival_sid_callback)
 {
-	return m_survival_sid_value;
+	return m_survival_sid_value ? ASSERT_LINE : CLEAR_LINE;
 }
 
 

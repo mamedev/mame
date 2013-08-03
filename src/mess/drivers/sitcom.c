@@ -114,20 +114,13 @@ WRITE_LINE_MEMBER( sitcom_state::sod_led )
 	output_set_value("sod_led", state);
 }
 
-static I8085_CONFIG( sitcom_cpu_config )
-{
-	DEVCB_NULL,     /* Status changed callback */
-	DEVCB_NULL,         /* INTE changed callback */
-	DEVCB_DRIVER_LINE_MEMBER(sitcom_state, sid_line), /* SID changed callback (I8085A only) */
-	DEVCB_DRIVER_LINE_MEMBER(sitcom_state, sod_led) /* SOD changed callback (I8085A only) */
-};
-
 static MACHINE_CONFIG_START( sitcom, sitcom_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8085A, XTAL_6_144MHz) // 3.072MHz can be used for an old slow 8085
 	MCFG_CPU_PROGRAM_MAP(sitcom_mem)
 	MCFG_CPU_IO_MAP(sitcom_io)
-	MCFG_CPU_CONFIG(sitcom_cpu_config)
+	MCFG_I8085A_SID(READLINE(sitcom_state, sid_line))
+	MCFG_I8085A_SOD(WRITELINE(sitcom_state, sod_led))
 
 	/* video hardware */
 	MCFG_DL1416B_ADD("ds0", sitcom_ds0_intf)

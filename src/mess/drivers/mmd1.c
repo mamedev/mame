@@ -435,14 +435,6 @@ WRITE_LINE_MEMBER( mmd1_state::mmd2_inte_callback )
 	output_set_value("led_inte", state);
 }
 
-static I8085_CONFIG( mmd2_cpu_config )
-{
-	DEVCB_DRIVER_MEMBER(mmd1_state, mmd2_status_callback),      /* Status changed callback */
-	DEVCB_DRIVER_LINE_MEMBER(mmd1_state, mmd2_inte_callback),           /* INTE changed callback */
-	DEVCB_NULL,                 /* SID changed callback (I8085A only) */
-	DEVCB_NULL                  /* SOD changed callback (I8085A only) */
-};
-
 MACHINE_RESET_MEMBER(mmd1_state,mmd1)
 {
 	m_return_code = 0xff;
@@ -510,7 +502,8 @@ static MACHINE_CONFIG_START( mmd2, mmd1_state )
 	MCFG_CPU_ADD("maincpu",I8080, 6750000 / 9)
 	MCFG_CPU_PROGRAM_MAP(mmd2_mem)
 	MCFG_CPU_IO_MAP(mmd2_io)
-	MCFG_CPU_CONFIG(mmd2_cpu_config)
+	MCFG_I8085A_STATUS(WRITE8(mmd1_state, mmd2_status_callback))
+	MCFG_I8085A_INTE(WRITELINE(mmd1_state, mmd2_inte_callback))
 
 	MCFG_MACHINE_RESET_OVERRIDE(mmd1_state,mmd2)
 

@@ -509,19 +509,11 @@ MACHINE_CONFIG_END
 
 /* Same as Phoenix, but uses an AY8910 and an extra visible line (column) */
 
-static I8085_CONFIG( survival_i8085_config )
-{
-	DEVCB_NULL,                         /* STATUS changed callback */
-	DEVCB_NULL,                         /* INTE changed callback */
-	DEVCB_DRIVER_LINE_MEMBER(phoenix_state, survival_sid_callback), /* SID changed callback (8085A only) */
-	DEVCB_NULL                          /* SOD changed callback (8085A only) */
-};
-
 static MACHINE_CONFIG_START( survival, phoenix_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8085A, CPU_CLOCK)  /* 5.50 MHz */
-	MCFG_CPU_CONFIG(survival_i8085_config)
+	MCFG_I8085A_SID(READLINE(phoenix_state, survival_sid_callback))
 	MCFG_CPU_PROGRAM_MAP(survival_memory_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(phoenix_state,phoenix)

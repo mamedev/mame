@@ -72,19 +72,6 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  I8085_CONFIG( cpu_intf )
-//-------------------------------------------------
-
-static I8085_CONFIG( cpu_intf )
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
-//-------------------------------------------------
 //  rs232_port_interface rs232_intf
 //-------------------------------------------------
 
@@ -105,7 +92,6 @@ static const rs232_port_interface rs232_intf =
 static MACHINE_CONFIG_FRAGMENT( shark )
 	// basic machine hardware
 	MCFG_CPU_ADD(I8085_TAG, I8085A, 1000000)
-	MCFG_CPU_CONFIG(cpu_intf)
 	MCFG_CPU_PROGRAM_MAP(shark_mem)
 	MCFG_CPU_IO_MAP(shark_io)
 

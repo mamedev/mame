@@ -171,14 +171,6 @@ WRITE_LINE_MEMBER( exp85_state::sod_w )
 	}
 }
 
-static I8085_CONFIG( exp85_i8085_config )
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(exp85_state, sid_r),
-	DEVCB_DRIVER_LINE_MEMBER(exp85_state, sod_w)
-};
-
 /* Terminal Interface */
 
 static DEVICE_INPUT_DEFAULTS_START( terminal )
@@ -221,7 +213,8 @@ static MACHINE_CONFIG_START( exp85, exp85_state )
 	MCFG_CPU_ADD(I8085A_TAG, I8085A, XTAL_6_144MHz)
 	MCFG_CPU_PROGRAM_MAP(exp85_mem)
 	MCFG_CPU_IO_MAP(exp85_io)
-	MCFG_CPU_CONFIG(exp85_i8085_config)
+	MCFG_I8085A_SID(READLINE(exp85_state, sid_r))
+	MCFG_I8085A_SOD(WRITELINE(exp85_state, sod_w))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

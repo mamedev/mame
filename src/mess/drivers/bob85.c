@@ -205,20 +205,13 @@ READ_LINE_MEMBER( bob85_state::sid_r )
 	return m_cass->input() > 0.0;
 }
 
-static I8085_CONFIG( cpu_config )
-{
-	DEVCB_NULL,             /* STATUS changed callback */
-	DEVCB_NULL,             /* INTE changed callback */
-	DEVCB_DRIVER_LINE_MEMBER(bob85_state, sid_r),   /* SID changed callback (I8085A only) */
-	DEVCB_DRIVER_LINE_MEMBER(bob85_state, sod_w)    /* SOD changed callback (I8085A only) */
-};
-
 static MACHINE_CONFIG_START( bob85, bob85_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8085A, XTAL_5MHz)
 	MCFG_CPU_PROGRAM_MAP(bob85_mem)
 	MCFG_CPU_IO_MAP(bob85_io)
-	MCFG_CPU_CONFIG(cpu_config)
+	MCFG_I8085A_SID(READLINE(bob85_state, sid_r))
+	MCFG_I8085A_SOD(WRITELINE(bob85_state, sod_w))
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_bob85)

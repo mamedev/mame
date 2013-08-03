@@ -242,32 +242,6 @@ UINT32 tdv2324_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 //**************************************************************************
 
 //-------------------------------------------------
-//  I8085_CONFIG( i8085_intf )
-//-------------------------------------------------
-
-static I8085_CONFIG( i8085_intf )
-{
-	DEVCB_NULL, /* STATUS changed callback */
-	DEVCB_NULL, /* INTE changed callback */
-	DEVCB_NULL, /* SID changed callback (I8085A only) */
-	DEVCB_NULL  /* SOD changed callback (I8085A only) */
-};
-
-
-//-------------------------------------------------
-//  I8085_CONFIG( i8085_sub_intf )
-//-------------------------------------------------
-
-static I8085_CONFIG( i8085_sub_intf )
-{
-	DEVCB_NULL, /* STATUS changed callback */
-	DEVCB_NULL, /* INTE changed callback */
-	DEVCB_NULL, /* SID changed callback (I8085A only) */
-	DEVCB_NULL  /* SOD changed callback (I8085A only) */
-};
-
-
-//-------------------------------------------------
 //  pit8253_config pit0_intf
 //-------------------------------------------------
 
@@ -375,12 +349,10 @@ static MACHINE_CONFIG_START( tdv2324, tdv2324_state )
 	MCFG_CPU_ADD(P8085AH_0_TAG, I8085A, 8700000/2) // ???
 	MCFG_CPU_PROGRAM_MAP(tdv2324_mem)
 	MCFG_CPU_IO_MAP(tdv2324_io)
-	MCFG_CPU_CONFIG(i8085_intf)
 
 	MCFG_CPU_ADD(P8085AH_1_TAG, I8085A, 8000000/2) // ???
 	MCFG_CPU_PROGRAM_MAP(tdv2324_sub_mem)
 	MCFG_CPU_IO_MAP(tdv2324_sub_io)
-	MCFG_CPU_CONFIG(i8085_sub_intf)
 
 	MCFG_CPU_ADD(MC68B02P_TAG, M6802, 8000000/2) // ???
 	MCFG_CPU_PROGRAM_MAP(tdv2324_fdc_mem)

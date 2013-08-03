@@ -283,14 +283,6 @@ static const i8251_interface uart_intf =
 	DEVCB_NULL
 };
 
-static I8085_CONFIG( h8_cpu_config )
-{
-	DEVCB_DRIVER_MEMBER(h8_state, h8_status_callback),      /* Status changed callback */
-	DEVCB_DRIVER_LINE_MEMBER(h8_state, h8_inte_callback),           /* INTE changed callback */
-	DEVCB_NULL,                 /* SID changed callback (I8085A only) */
-	DEVCB_NULL                  /* SOD changed callback (I8085A only) */
-};
-
 TIMER_DEVICE_CALLBACK_MEMBER(h8_state::h8_c)
 {
 	m_uart->receive_clock();
@@ -332,7 +324,8 @@ static MACHINE_CONFIG_START( h8, h8_state )
 	MCFG_CPU_ADD("maincpu", I8080, H8_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(h8_mem)
 	MCFG_CPU_IO_MAP(h8_io)
-	MCFG_CPU_CONFIG(h8_cpu_config)
+	MCFG_I8085A_STATUS(WRITE8(h8_state, h8_status_callback))
+	MCFG_I8085A_INTE(WRITELINE(h8_state, h8_inte_callback))
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_h8)

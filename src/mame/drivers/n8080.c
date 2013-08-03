@@ -458,14 +458,6 @@ WRITE8_MEMBER(n8080_state::n8080_status_callback)
 	}
 }
 
-static I8085_CONFIG( n8080_cpu_config )
-{
-	DEVCB_DRIVER_MEMBER(n8080_state,n8080_status_callback), /* STATUS changed callback */
-	DEVCB_DRIVER_LINE_MEMBER(n8080_state,n8080_inte_callback),      /* INTE changed callback */
-	DEVCB_NULL,                             /* SID changed callback (8085A only) */
-	DEVCB_NULL                              /* SOD changed callback (8085A only) */
-};
-
 MACHINE_START_MEMBER(n8080_state,n8080)
 {
 	save_item(NAME(m_shift_data));
@@ -532,7 +524,8 @@ static MACHINE_CONFIG_START( spacefev, n8080_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, MASTER_CLOCK / 10)
-	MCFG_CPU_CONFIG(n8080_cpu_config)
+	MCFG_I8085A_STATUS(WRITE8(n8080_state,n8080_status_callback))
+	MCFG_I8085A_INTE(WRITELINE(n8080_state,n8080_inte_callback))
 	MCFG_CPU_PROGRAM_MAP(main_cpu_map)
 	MCFG_CPU_IO_MAP(main_io_map)
 
@@ -562,7 +555,8 @@ static MACHINE_CONFIG_START( sheriff, n8080_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, MASTER_CLOCK / 10)
-	MCFG_CPU_CONFIG(n8080_cpu_config)
+	MCFG_I8085A_STATUS(WRITE8(n8080_state,n8080_status_callback))
+	MCFG_I8085A_INTE(WRITELINE(n8080_state,n8080_inte_callback))
 	MCFG_CPU_PROGRAM_MAP(main_cpu_map)
 	MCFG_CPU_IO_MAP(main_io_map)
 
@@ -592,7 +586,8 @@ static MACHINE_CONFIG_DERIVED( westgun2, sheriff )
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", I8080, XTAL_19_968MHz / 10)
-	MCFG_CPU_CONFIG(n8080_cpu_config)
+	MCFG_I8085A_STATUS(WRITE8(n8080_state,n8080_status_callback))
+	MCFG_I8085A_INTE(WRITELINE(n8080_state,n8080_inte_callback))
 	MCFG_CPU_PROGRAM_MAP(main_cpu_map)
 	MCFG_CPU_IO_MAP(main_io_map)
 
@@ -603,7 +598,8 @@ static MACHINE_CONFIG_START( helifire, n8080_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, MASTER_CLOCK / 10)
-	MCFG_CPU_CONFIG(n8080_cpu_config)
+	MCFG_I8085A_STATUS(WRITE8(n8080_state,n8080_status_callback))
+	MCFG_I8085A_INTE(WRITELINE(n8080_state,n8080_inte_callback))
 	MCFG_CPU_PROGRAM_MAP(helifire_main_cpu_map)
 	MCFG_CPU_IO_MAP(main_io_map)
 

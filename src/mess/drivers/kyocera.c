@@ -1312,14 +1312,6 @@ READ_LINE_MEMBER( kc85_state::kc85_sid_r )
 	return m_cassette->input() > 0.0;
 }
 
-static I8085_CONFIG( kc85_i8085_config )
-{
-	DEVCB_NULL,             /* STATUS changed callback */
-	DEVCB_NULL,             /* INTE changed callback */
-	DEVCB_DRIVER_LINE_MEMBER(kc85_state,kc85_sid_r),    /* SID changed callback (I8085A only) */
-	DEVCB_DRIVER_LINE_MEMBER(kc85_state,kc85_sod_w) /* SOD changed callback (I8085A only) */
-};
-
 TIMER_DEVICE_CALLBACK_MEMBER(tandy200_state::tandy200_tp_tick)
 {
 	m_maincpu->set_input_line(I8085_RST75_LINE, m_tp);
@@ -1332,7 +1324,8 @@ static MACHINE_CONFIG_START( kc85, kc85_state )
 	MCFG_CPU_ADD(I8085_TAG, I8085A, XTAL_4_9152MHz)
 	MCFG_CPU_PROGRAM_MAP(kc85_mem)
 	MCFG_CPU_IO_MAP(kc85_io)
-	MCFG_CPU_CONFIG(kc85_i8085_config)
+	MCFG_I8085A_SID(READLINE(kc85_state,kc85_sid_r))
+	MCFG_I8085A_SOD(WRITELINE(kc85_state,kc85_sod_w))
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD(kc85_video)
@@ -1370,7 +1363,8 @@ static MACHINE_CONFIG_START( pc8201, pc8201_state )
 	MCFG_CPU_ADD(I8085_TAG, I8085A, XTAL_4_9152MHz)
 	MCFG_CPU_PROGRAM_MAP(pc8201_mem)
 	MCFG_CPU_IO_MAP(pc8201_io)
-	MCFG_CPU_CONFIG(kc85_i8085_config)
+	MCFG_I8085A_SID(READLINE(kc85_state,kc85_sid_r))
+	MCFG_I8085A_SOD(WRITELINE(kc85_state,kc85_sod_w))
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD(kc85_video)
@@ -1414,7 +1408,8 @@ static MACHINE_CONFIG_START( trsm100, trsm100_state )
 	MCFG_CPU_ADD(I8085_TAG, I8085A, XTAL_4_9152MHz)
 	MCFG_CPU_PROGRAM_MAP(kc85_mem)
 	MCFG_CPU_IO_MAP(trsm100_io)
-	MCFG_CPU_CONFIG(kc85_i8085_config)
+	MCFG_I8085A_SID(READLINE(kc85_state,kc85_sid_r))
+	MCFG_I8085A_SOD(WRITELINE(kc85_state,kc85_sod_w))
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD(kc85_video)
@@ -1459,7 +1454,8 @@ static MACHINE_CONFIG_START( tandy200, tandy200_state )
 	MCFG_CPU_ADD(I8085_TAG, I8085A, XTAL_4_9152MHz)
 	MCFG_CPU_PROGRAM_MAP(tandy200_mem)
 	MCFG_CPU_IO_MAP(tandy200_io)
-	MCFG_CPU_CONFIG(kc85_i8085_config)
+	MCFG_I8085A_SID(READLINE(kc85_state,kc85_sid_r))
+	MCFG_I8085A_SOD(WRITELINE(kc85_state,kc85_sod_w))
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD(tandy200_video)

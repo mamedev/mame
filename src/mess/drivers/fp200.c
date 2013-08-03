@@ -575,21 +575,14 @@ READ_LINE_MEMBER( fp200_state::sid_r )
 	return (ioport("KEYMOD")->read() >> m_keyb_mux) & 1;
 }
 
-static I8085_CONFIG( cpu_config )
-{
-	DEVCB_NULL,             /* STATUS changed callback */
-	DEVCB_NULL,             /* INTE changed callback */
-	DEVCB_DRIVER_LINE_MEMBER(fp200_state, sid_r),   /* SID changed callback (I8085A only) */
-	DEVCB_DRIVER_LINE_MEMBER(fp200_state, sod_w)    /* SOD changed callback (I8085A only) */
-};
-
 static MACHINE_CONFIG_START( fp200, fp200_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8085A,MAIN_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(fp200_map)
 	MCFG_CPU_IO_MAP(fp200_io)
-	MCFG_CPU_CONFIG(cpu_config)
+	MCFG_I8085A_SID(READLINE(fp200_state, sid_r))
+	MCFG_I8085A_SOD(WRITELINE(fp200_state, sod_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)

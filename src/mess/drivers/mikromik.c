@@ -648,22 +648,10 @@ static UPD7201_INTERFACE( mpsc_intf )
 };
 
 
-//-------------------------------------------------
-//  I8085_CONFIG( i8085_intf )
-//-------------------------------------------------
-
 READ_LINE_MEMBER( mm1_state::dsra_r )
 {
 	return 1;
 }
-
-static I8085_CONFIG( i8085_intf )
-{
-	DEVCB_NULL,         // STATUS changed callback
-	DEVCB_NULL,         // INTE changed callback
-	DEVCB_DRIVER_LINE_MEMBER(mm1_state, dsra_r),    // SID changed callback (I8085A only)
-	DEVCB_DEVICE_LINE_MEMBER("speaker", speaker_sound_device, level_w) // SOD changed callback (I8085A only)
-};
 
 
 //-------------------------------------------------
@@ -794,7 +782,8 @@ static MACHINE_CONFIG_START( mm1, mm1_state )
 	// basic system hardware
 	MCFG_CPU_ADD(I8085A_TAG, I8085A, XTAL_6_144MHz)
 	MCFG_CPU_PROGRAM_MAP(mm1_map)
-	MCFG_CPU_CONFIG(i8085_intf)
+	MCFG_I8085A_SID(READLINE(mm1_state, dsra_r))
+	MCFG_I8085A_SOD(DEVWRITELINE("speaker", speaker_sound_device, level_w))
 	MCFG_QUANTUM_PERFECT_CPU(I8085A_TAG)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("kbclk", mm1_state, kbclk_tick, attotime::from_hz(2500))

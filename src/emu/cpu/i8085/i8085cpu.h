@@ -36,122 +36,122 @@
 #define ADDR_INTR       0x0038
 
 
-#define M_MVI(R) R=ARG(cpustate)
+#define M_MVI(R) R=ARG()
 
 /* rotate */
 #define M_RLC {                                                                     \
-	cpustate->AF.b.h = (cpustate->AF.b.h << 1) | (cpustate->AF.b.h >> 7);           \
-	cpustate->AF.b.l = (cpustate->AF.b.l & 0xfe) | (cpustate->AF.b.h & CF);         \
+	m_AF.b.h = (m_AF.b.h << 1) | (m_AF.b.h >> 7);           \
+	m_AF.b.l = (m_AF.b.l & 0xfe) | (m_AF.b.h & CF);         \
 }
 
 #define M_RRC {                                                                     \
-	cpustate->AF.b.l = (cpustate->AF.b.l & 0xfe) | (cpustate->AF.b.h & CF);         \
-	cpustate->AF.b.h = (cpustate->AF.b.h >> 1) | (cpustate->AF.b.h << 7);           \
+	m_AF.b.l = (m_AF.b.l & 0xfe) | (m_AF.b.h & CF);         \
+	m_AF.b.h = (m_AF.b.h >> 1) | (m_AF.b.h << 7);           \
 }
 
 #define M_RAL {                                                                     \
-	int c = cpustate->AF.b.l&CF;                                                    \
-	cpustate->AF.b.l = (cpustate->AF.b.l & 0xfe) | (cpustate->AF.b.h >> 7);         \
-	cpustate->AF.b.h = (cpustate->AF.b.h << 1) | c;                                 \
+	int c = m_AF.b.l&CF;                                                    \
+	m_AF.b.l = (m_AF.b.l & 0xfe) | (m_AF.b.h >> 7);         \
+	m_AF.b.h = (m_AF.b.h << 1) | c;                                 \
 }
 
 #define M_RAR {                                                                     \
-	int c = (cpustate->AF.b.l&CF) << 7;                                             \
-	cpustate->AF.b.l = (cpustate->AF.b.l & 0xfe) | (cpustate->AF.b.h & CF);         \
-	cpustate->AF.b.h = (cpustate->AF.b.h >> 1) | c;                                 \
+	int c = (m_AF.b.l&CF) << 7;                                             \
+	m_AF.b.l = (m_AF.b.l & 0xfe) | (m_AF.b.h & CF);         \
+	m_AF.b.h = (m_AF.b.h >> 1) | c;                                 \
 }
 
 /* logical */
-#define M_ORA(R) cpustate->AF.b.h|=R; cpustate->AF.b.l=ZSP[cpustate->AF.b.h]
-#define M_XRA(R) cpustate->AF.b.h^=R; cpustate->AF.b.l=ZSP[cpustate->AF.b.h]
-#define M_ANA(R) {UINT8 hc = ((cpustate->AF.b.h | R)<<1) & HF; cpustate->AF.b.h&=R; cpustate->AF.b.l=ZSP[cpustate->AF.b.h]; if(IS_8085(cpustate)) { cpustate->AF.b.l |= HF; } else {cpustate->AF.b.l |= hc; } }
+#define M_ORA(R) m_AF.b.h|=R; m_AF.b.l=ZSP[m_AF.b.h]
+#define M_XRA(R) m_AF.b.h^=R; m_AF.b.l=ZSP[m_AF.b.h]
+#define M_ANA(R) {UINT8 hc = ((m_AF.b.h | R)<<1) & HF; m_AF.b.h&=R; m_AF.b.l=ZSP[m_AF.b.h]; if(IS_8085()) { m_AF.b.l |= HF; } else {m_AF.b.l |= hc; } }
 
 /* increase / decrease */
-#define M_INR(R) {UINT8 hc = ((R & 0x0f) == 0x0f) ? HF : 0; ++R; cpustate->AF.b.l= (cpustate->AF.b.l & CF ) | ZSP[R] | hc; }
-#define M_DCR(R) {UINT8 hc = ((R & 0x0f) != 0x00) ? HF : 0; --R; cpustate->AF.b.l= (cpustate->AF.b.l & CF ) | ZSP[R] | hc | VF; }
+#define M_INR(R) {UINT8 hc = ((R & 0x0f) == 0x0f) ? HF : 0; ++R; m_AF.b.l= (m_AF.b.l & CF ) | ZSP[R] | hc; }
+#define M_DCR(R) {UINT8 hc = ((R & 0x0f) != 0x00) ? HF : 0; --R; m_AF.b.l= (m_AF.b.l & CF ) | ZSP[R] | hc | VF; }
 
 /* arithmetic */
 #define M_ADD(R) {                                                                  \
-	int q = cpustate->AF.b.h+R;                                                     \
-	cpustate->AF.b.l=ZSP[q&255]|((q>>8)&CF)|((cpustate->AF.b.h^q^R)&HF);            \
-	cpustate->AF.b.h=q;                                                             \
+	int q = m_AF.b.h+R;                                                     \
+	m_AF.b.l=ZSP[q&255]|((q>>8)&CF)|((m_AF.b.h^q^R)&HF);            \
+	m_AF.b.h=q;                                                             \
 }
 
 #define M_ADC(R) {                                                                  \
-	int q = cpustate->AF.b.h+R+(cpustate->AF.b.l&CF);                               \
-	cpustate->AF.b.l=ZSP[q&255]|((q>>8)&CF)|((cpustate->AF.b.h^q^R)&HF);            \
-	cpustate->AF.b.h=q;                                                             \
+	int q = m_AF.b.h+R+(m_AF.b.l&CF);                               \
+	m_AF.b.l=ZSP[q&255]|((q>>8)&CF)|((m_AF.b.h^q^R)&HF);            \
+	m_AF.b.h=q;                                                             \
 }
 
 #define M_SUB(R) {                                                                  \
-	int q = cpustate->AF.b.h-R;                                                     \
-	cpustate->AF.b.l=ZSP[q&255]|((q>>8)&CF)|(~(cpustate->AF.b.h^q^R)&HF)|VF;        \
-	cpustate->AF.b.h=q;                                                             \
+	int q = m_AF.b.h-R;                                                     \
+	m_AF.b.l=ZSP[q&255]|((q>>8)&CF)|(~(m_AF.b.h^q^R)&HF)|VF;        \
+	m_AF.b.h=q;                                                             \
 }
 
 #define M_SBB(R) {                                                                  \
-	int q = cpustate->AF.b.h-R-(cpustate->AF.b.l&CF);                               \
-	cpustate->AF.b.l=ZSP[q&255]|((q>>8)&CF)|(~(cpustate->AF.b.h^q^R)&HF)|VF;        \
-	cpustate->AF.b.h=q;                                                             \
+	int q = m_AF.b.h-R-(m_AF.b.l&CF);                               \
+	m_AF.b.l=ZSP[q&255]|((q>>8)&CF)|(~(m_AF.b.h^q^R)&HF)|VF;        \
+	m_AF.b.h=q;                                                             \
 }
 
 #define M_CMP(R) {                                                                  \
-	int q = cpustate->AF.b.h-R;                                                     \
-	cpustate->AF.b.l=ZSP[q&255]|((q>>8)&CF)|(~(cpustate->AF.b.h^q^R)&HF)|VF;        \
+	int q = m_AF.b.h-R;                                                     \
+	m_AF.b.l=ZSP[q&255]|((q>>8)&CF)|(~(m_AF.b.h^q^R)&HF)|VF;        \
 }
 
 #define M_DAD(R) {                                                                  \
-	int q = cpustate->HL.d + cpustate->R.d;                                         \
-	cpustate->AF.b.l = (cpustate->AF.b.l & ~CF) | (q>>16 & CF );                    \
-	cpustate->HL.w.l = q;                                                           \
+	int q = m_HL.d + m_##R.d;                                         \
+	m_AF.b.l = (m_AF.b.l & ~CF) | (q>>16 & CF );                    \
+	m_HL.w.l = q;                                                           \
 }
 
 // DSUB is 8085-only, not sure if H flag handling is correct
-#define M_DSUB(cpustate) {                                                          \
-	int q = cpustate->HL.b.l-cpustate->BC.b.l;                                      \
-	cpustate->AF.b.l=ZS[q&255]|((q>>8)&CF)|VF|                                      \
-		((cpustate->HL.b.l^q^cpustate->BC.b.l)&HF)|                                 \
-		(((cpustate->BC.b.l^cpustate->HL.b.l)&(cpustate->HL.b.l^q)&SF)>>5);         \
-	cpustate->HL.b.l=q;                                                             \
-	q = cpustate->HL.b.h-cpustate->BC.b.h-(cpustate->AF.b.l&CF);                    \
-	cpustate->AF.b.l=ZS[q&255]|((q>>8)&CF)|VF|                                      \
-		((cpustate->HL.b.h^q^cpustate->BC.b.h)&HF)|                                 \
-		(((cpustate->BC.b.h^cpustate->HL.b.h)&(cpustate->HL.b.h^q)&SF)>>5);         \
-	if (cpustate->HL.b.l!=0) cpustate->AF.b.l&=~ZF;                                 \
+#define M_DSUB() {                                                          \
+	int q = m_HL.b.l-m_BC.b.l;                                      \
+	m_AF.b.l=ZS[q&255]|((q>>8)&CF)|VF|                                      \
+		((m_HL.b.l^q^m_BC.b.l)&HF)|                                 \
+		(((m_BC.b.l^m_HL.b.l)&(m_HL.b.l^q)&SF)>>5);         \
+	m_HL.b.l=q;                                                             \
+	q = m_HL.b.h-m_BC.b.h-(m_AF.b.l&CF);                    \
+	m_AF.b.l=ZS[q&255]|((q>>8)&CF)|VF|                                      \
+		((m_HL.b.h^q^m_BC.b.h)&HF)|                                 \
+		(((m_BC.b.h^m_HL.b.h)&(m_HL.b.h^q)&SF)>>5);         \
+	if (m_HL.b.l!=0) m_AF.b.l&=~ZF;                                 \
 }
 
 /* i/o */
 #define M_IN                                                                        \
-	cpustate->STATUS = 0x42;                                                        \
-	cpustate->WZ.d=ARG(cpustate);                                                   \
-	cpustate->AF.b.h=cpustate->io->read_byte(cpustate->WZ.d);
+	m_STATUS = 0x42;                                                        \
+	m_WZ.d=ARG();                                                   \
+	m_AF.b.h=m_io->read_byte(m_WZ.d);
 
 #define M_OUT                                                                       \
-	cpustate->STATUS = 0x10;                                                        \
-	cpustate->WZ.d=ARG(cpustate);                                                   \
-	cpustate->io->write_byte(cpustate->WZ.d,cpustate->AF.b.h)
+	m_STATUS = 0x10;                                                        \
+	m_WZ.d=ARG();                                                   \
+	m_io->write_byte(m_WZ.d,m_AF.b.h)
 
 /* stack */
 #define M_PUSH(R) {                                                                 \
-	cpustate->STATUS = 0x04;                                                        \
-	cpustate->program->write_byte(--cpustate->SP.w.l, cpustate->R.b.h); \
-	cpustate->program->write_byte(--cpustate->SP.w.l, cpustate->R.b.l); \
+	m_STATUS = 0x04;                                                        \
+	m_program->write_byte(--m_SP.w.l, m_##R.b.h); \
+	m_program->write_byte(--m_SP.w.l, m_##R.b.l); \
 }
 
 #define M_POP(R) {                                                                  \
-	cpustate->STATUS = 0x86;                                                        \
-	cpustate->R.b.l = cpustate->program->read_byte(cpustate->SP.w.l++); \
-	cpustate->R.b.h = cpustate->program->read_byte(cpustate->SP.w.l++); \
+	m_STATUS = 0x86;                                                        \
+	m_##R.b.l = m_program->read_byte(m_SP.w.l++); \
+	m_##R.b.h = m_program->read_byte(m_SP.w.l++); \
 }
 
 /* jumps */
 // On 8085 jump if condition is not satisfied is shorter
 #define M_JMP(cc) {                                                                 \
 	if (cc) {                                                                       \
-		cpustate->PC.w.l = ARG16(cpustate);                                         \
+		m_PC.w.l = ARG16();                                         \
 	} else {                                                                        \
-		cpustate->PC.w.l += 2;                                                      \
-		cpustate->icount += (IS_8085(cpustate)) ? 3 : 0;                            \
+		m_PC.w.l += 2;                                                      \
+		m_icount += (IS_8085()) ? 3 : 0;                            \
 	}                                                                               \
 }
 
@@ -160,13 +160,13 @@
 {                                                                                   \
 	if (cc)                                                                         \
 	{                                                                               \
-		UINT16 a = ARG16(cpustate);                                                 \
-		cpustate->icount -= (IS_8085(cpustate)) ? 7 : 6 ;                           \
+		UINT16 a = ARG16();                                                 \
+		m_icount -= (IS_8085()) ? 7 : 6 ;                           \
 		M_PUSH(PC);                                                                 \
-		cpustate->PC.d = a;                                                         \
+		m_PC.d = a;                                                         \
 	} else {                                                                        \
-		cpustate->PC.w.l += 2;                                                      \
-		cpustate->icount += (IS_8085(cpustate)) ? 2 : 0;                            \
+		m_PC.w.l += 2;                                                      \
+		m_icount += (IS_8085()) ? 2 : 0;                            \
 	}                                                                               \
 }
 
@@ -175,12 +175,12 @@
 {                                                                                   \
 	if (cc)                                                                         \
 	{                                                                               \
-		cpustate->icount -= 6;                                                      \
+		m_icount -= 6;                                                      \
 		M_POP(PC);                                                                  \
 	}                                                                               \
 }
 
 #define M_RST(nn) {                                                                 \
 	M_PUSH(PC);                                                                     \
-	cpustate->PC.d = 8 * nn;                                                        \
+	m_PC.d = 8 * nn;                                                        \
 }

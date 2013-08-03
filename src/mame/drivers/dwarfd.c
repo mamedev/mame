@@ -856,16 +856,6 @@ WRITE_LINE_MEMBER(dwarfd_state::dwarfd_sod_callback)
 	m_crt_access = state;
 }
 
-
-static I8085_CONFIG( dwarfd_i8085_config )
-{
-	DEVCB_NULL,                     /* STATUS changed callback */
-	DEVCB_NULL,                     /* INTE changed callback */
-	DEVCB_NULL,                     /* SID changed callback (8085A only) */
-	DEVCB_DRIVER_LINE_MEMBER(dwarfd_state,dwarfd_sod_callback)  /* SOD changed callback (8085A only) */
-};
-
-
 TIMER_DEVICE_CALLBACK_MEMBER(dwarfd_state::dwarfd_interrupt)
 {
 	int scanline = param;
@@ -1062,7 +1052,7 @@ static MACHINE_CONFIG_START( dwarfd, dwarfd_state )
 	/* basic machine hardware */
 	/* FIXME: The 8085A had a max clock of 6MHz, internally divided by 2! */
 	MCFG_CPU_ADD("maincpu", I8085A, 10595000/3*2)        /* ? MHz */
-	MCFG_CPU_CONFIG(dwarfd_i8085_config)
+	MCFG_I8085A_SOD(WRITELINE(dwarfd_state,dwarfd_sod_callback))
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", dwarfd_state, dwarfd_interrupt, "screen", 0, 1)
