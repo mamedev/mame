@@ -447,7 +447,7 @@ TODO:
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="0x138fb0">
-				<rom name="atrain21.d88" size="0x138fb0" crc="47c8ba97" sha1="b699d1898555f51ffc9744bb351fc1c3d5b14727" offset="0" />
+				<rom name="atrain22.d88" size="0x138fb0" crc="47c8ba97" sha1="b699d1898555f51ffc9744bb351fc1c3d5b14727" offset="0" />
 			</dataarea>
 		</part>
 	</software>
