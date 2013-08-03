@@ -148,7 +148,7 @@ void ym2608_device::device_start()
 	const ay8910_interface *ay8910_config = m_ay8910_config != NULL ? m_ay8910_config : &default_ay8910_config;
 
 	m_irq_handler.resolve();
-	/* FIXME: Force to use simgle output */
+	/* FIXME: Force to use single output */
 	m_psg = ay8910_start_ym(this, ay8910_config);
 	assert_always(m_psg != NULL, "Error creating YM2608/AY8910 chip");
 

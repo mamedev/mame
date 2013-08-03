@@ -7227,6 +7227,17 @@ Game is named "image", with lowercase i on title screen
 		</part>
 	</software>
 
+	<software name="karateka" supported="yes">
+		<description>Karateka</description>
+		<year>1988</year>
+		<publisher>Broderbund Japan / Masternet Inc.</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="0x138fb0">
+				<rom name="karateka.d88" size="0x138fb0" crc="d762d4d1" sha1="fb9331c301dd641c3398090330ba906b173c2020" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 <!--
 TODO: other two disks, in .nfd format
 	<software name="kawaisou">
@@ -11291,10 +11302,26 @@ other two disks
 		</part>
 	</software>
 
+	<software name="puyopuyo" supported="yes">
+		<description>Puyo Puyo</description>
+		<year>1993</year>
+		<publisher>Compile</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="0x135000">
+				<rom name="puyopuyo a.fdi" size="0x135000" crc="6fe2a103" sha1="bd9aceddd7a3fe62fe0512e5e917784980990f74" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="0x135000">
+				<rom name="puyopuyo b.fdi" size="0x135000" crc="25ae69f4" sha1="f3d05b353db9ae298c80721a921591a61bf91e3e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="puzznic">
 		<description>Puzznic</description>
-		<year>19??</year>
-		<publisher>Taito</publisher>
+		<year>1990</year>
+		<publisher>Taito / Broderbund</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="0x135000">
 				<rom name="puzznic.fdi" size="0x135000" crc="fd475bfe" sha1="7df354065c861db5e47100a3a7dfd35e47abd7fe" offset="0" />

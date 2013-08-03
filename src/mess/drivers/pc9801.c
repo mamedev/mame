@@ -93,7 +93,7 @@
     - Quarth: should do a split screen effect, it doesn't hence there are broken gfxs
  	- Princess Maker 2: mouse is buggy;
     - Princess Maker 2: screen transitions are very ugly (btanb?)
- 	- Puzznic: trips illegal irq 0x41 (?), prints an error on screen.
+ 	- Puzznic: trips illegal irq 0x41 (?), prints an error on screen. (PC-9801RS only, writes an 1 to 0x69d2f for whatever reason, almost surely a btanb)
  	- Runner's High: wrong double height on the title screen;
     - Sorcerian, Twilight Zone 3: Fails initial booting, issue with 2dd irq?
 	- The Incredible Machine: hangs at main menu (YM mis-fires irq?)
@@ -3719,6 +3719,8 @@ static MACHINE_CONFIG_DERIVED( pc9801ux, pc9801rs )
 	MCFG_CPU_IO_MAP(pc9801ux_io)
 	MCFG_80286_A20(pc9801_state, pc9801_286_a20)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc9801_state, pc9801_vrtc_irq)
+
+//	MCFG_I8237_REPLACE("i8237", 10000000, pc9801rs_dmac_intf) // unknown clock
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pc9801bx2, pc9801rs )
