@@ -830,6 +830,27 @@ TODO:
 		</part>
 	</software>
 
+	<software name="add_pdrk">
+		<description>AD&amp;D Pools of Darkness</description>
+ 		<year>19??</year>
+ 		<publisher>&lt;unknown&gt;</publisher>
+ 		<part name="flop1" interface="floppy_5_25">
+ 			<dataarea name="flop" size="1265664">
+ 				<rom name="diska.fdi" size="1265664" crc="a40becba" sha1="3c65e5ab1f95d5f9863681c472b8c73927e0a2c2" offset="0" />
+ 			</dataarea>
+ 		</part>
+		<part name="flop2" interface="floppy_5_25">
+ 			<dataarea name="flop" size="1265664">
+ 				<rom name="diskb.fdi" size="1265664" crc="2fb75bcb" sha1="78df14162d4fbd9e6c8f6a67e00d3aed3dd02bc7" offset="0" />
+ 			</dataarea>
+ 		</part>
+		<part name="flop3" interface="floppy_5_25">
+ 			<dataarea name="flop" size="1265664">
+ 				<rom name="opening.fdi" size="1265664" crc="11cf2229" sha1="abf3bed693797d9bfecb1b7dc42eadcfb8a14641" offset="0" />
+ 			</dataarea>
+ 		</part>
+ 	</software>
+
 	<software name="add_ssil" supported="no">
 		<description>AD&amp;D Secret of the Silver Blades</description>
 		<year>19??</year>
@@ -14845,8 +14866,8 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="vampire high school (j) sys.fdi" size="1265664" crc="8bdca3c1" sha1="4296639130c590857a34be1c55ae1284e81baf75" offset="0" />
+			<dataarea name="flop" size="1261568">
+				<rom name="vampire high school (j) sys.fdi" size="1261568" crc="8bdca3c1" sha1="4296639130c590857a34be1c55ae1284e81baf75" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
@@ -14865,28 +14886,28 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="vampire high school (j) d.fdi" size="1265664" crc="564cce8e" sha1="708c73f40ae21955ea02b2a408cde3dec9c82228" offset="0" />
+			<dataarea name="flop" size="1261568">
+				<rom name="vampire high school (j) d.fdi" size="1261568" crc="564cce8e" sha1="708c73f40ae21955ea02b2a408cde3dec9c82228" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="vampire high school (j) e.fdi" size="1265664" crc="ae8ee3f9" sha1="67757be21858fdd1160d2f29de3cb6ba7e1cdfc5" offset="0" />
+			<dataarea name="flop" size="1261568">
+				<rom name="vampire high school (j) e.fdi" size="1261568" crc="ae8ee3f9" sha1="67757be21858fdd1160d2f29de3cb6ba7e1cdfc5" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop7" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="vampire high school (j) f.fdi" size="1265664" crc="7a003346" sha1="c712954a323d799335ed1b1133138185324c4967" offset="0" />
+			<dataarea name="flop" size="1261568">
+				<rom name="vampire high school (j) f.fdi" size="1261568" crc="7a003346" sha1="c712954a323d799335ed1b1133138185324c4967" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop8" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="vampire high school (j) g.fdi" size="1265664" crc="c8341566" sha1="421399885cdd8556590beffe8d4d1af198dac091" offset="0" />
+			<dataarea name="flop" size="1261568">
+				<rom name="vampire high school (j) g.fdi" size="1261568" crc="c8341566" sha1="421399885cdd8556590beffe8d4d1af198dac091" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop9" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="vampire high school (j) h.fdi" size="1265664" crc="84135970" sha1="1a8079c98e76731603a7cff48c5ccc43bf88c2e7" offset="0" />
+			<dataarea name="flop" size="1261568">
+				<rom name="vampire high school (j) h.fdi" size="1261568" crc="84135970" sha1="1a8079c98e76731603a7cff48c5ccc43bf88c2e7" offset="0" />
 			</dataarea>
 		</part>
 	</software>
