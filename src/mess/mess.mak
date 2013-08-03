@@ -925,6 +925,7 @@ $(MESSOBJ)/apple.a:             \
 	$(MESS_MACHINE)/a2midi.o    \
 	$(MESS_MACHINE)/a2vulcan.o  \
 	$(MESS_MACHINE)/a2zipdrive.o\
+	$(MESS_MACHINE)/a2applicard.o \
 	$(MESS_MACHINE)/a2estd80col.o \
 	$(MESS_MACHINE)/a2eext80col.o \
 	$(MESS_MACHINE)/a2eramworks3.o \

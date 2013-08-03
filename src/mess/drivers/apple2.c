@@ -213,6 +213,7 @@ Apple 3.5 and Apple 5.25 drives - up to three devices
 #include "machine/a2arcadebd.h"
 #include "machine/a2midi.h"
 #include "machine/a2zipdrive.h"
+#include "machine/a2applicard.h"
 #include "machine/a2estd80col.h"
 #include "machine/a2eext80col.h"
 #include "machine/a2eramworks3.h"
@@ -638,6 +639,7 @@ static SLOT_INTERFACE_START(apple2_cards)
 	SLOT_INTERFACE("zipdrive", A2BUS_ZIPDRIVE)  /* ZIP Technologies IDE card */
 	SLOT_INTERFACE("echoiiplus", A2BUS_ECHOPLUS)    /* Street Electronics Echo Plus (Echo II + Mockingboard clone) */
 	SLOT_INTERFACE("scsi", A2BUS_SCSI)  /* Apple II SCSI Card */
+	SLOT_INTERFACE("applicard", A2BUS_APPLICARD)	/* PCPI Applicard */
 SLOT_INTERFACE_END
 
 static SLOT_INTERFACE_START(apple2eaux_cards)
@@ -824,6 +826,20 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( space84, apple2p )
 	MCFG_MACHINE_START_OVERRIDE(apple2_state,space84)
 MACHINE_CONFIG_END
+
+#if 0
+static MACHINE_CONFIG_DERIVED( laba2p, apple2p )
+	MCFG_MACHINE_START_OVERRIDE(apple2_state,laba2p)
+
+	MCFG_A2BUS_SLOT_REMOVE("sl0")
+	MCFG_A2BUS_SLOT_REMOVE("sl3")
+	MCFG_A2BUS_SLOT_REMOVE("sl6")
+
+	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl3", A2BUS_LAB_80COL, NULL)
+	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl6", A2BUS_LAB_FDC, NULL)
+
+MACHINE_CONFIG_END
+#endif
 
 /***************************************************************************
 
@@ -1131,6 +1147,28 @@ ROM_START(am64)
 	ROM_LOAD( "tk10.bin",     0x0800, 0x0800, CRC(a06c5b78) SHA1(27c5160b913e0f62120f384026d24b9f1acb6970) )
 ROM_END
 
+#if 0
+ROM_START(laba2p) /* II Plus clone with on-board Disk II controller and Videx-compatible 80-column card, supposedly from lab equipment */
+	ROM_REGION(0x1000,"gfx1",0)
+	ROM_LOAD( "char.u30",     0x0000, 0x1000, CRC(2dbaef88) SHA1(9834842796132a11facd57923326d6954bcb609f) ) 
+
+	ROM_REGION(0x4700,"maincpu",0)
+	ROM_LOAD( "maind0.u35",   0x1000, 0x1000, CRC(24d73c7b) SHA1(d17a15868dc875c67061c95ec53a6b2699d3a425) ) 
+	ROM_LOAD( "maine0.u34",   0x2000, 0x2000, CRC(314462ca) SHA1(5a23616dca14e59b4aca8ff6cfa0d98592a78a79) ) 
+
+	ROM_REGION(0x1000, "fw80col", 0)
+	ROM_LOAD( "80cfw.u3",     0x0000, 0x1000, CRC(92d2b8b0) SHA1(5149483eb3e550ece1584e85fc821bb04d068dec) ) 	// firmware for on-board Videx
+
+	ROM_REGION(0x1000, "cg80col", 0)
+	ROM_LOAD( "80ccgv80.u25", 0x0000, 0x1000, CRC(6d5e2707) SHA1(c56f76e8a366fee7374eb09f4866435c692490b2) ) 	// character generator for on-board Videx
+
+	ROM_REGION(0x800, "diskii", 0)
+	ROM_LOAD( "diskfw.u7",    0x0000, 0x0800, CRC(9207ef4e) SHA1(5fcffa4c68b16a7ef2f62651d4c7470400e5bd35) ) 	// firmware for on-board Disk II
+
+	ROM_REGION(0x800, "unknown", 0)
+	ROM_LOAD( "unk.u5",       0x0000, 0x0800, CRC(240a1774) SHA1(e6aeb0702dc99d76fd8c5a642fdfbe9ab896acd4) ) 	// unknown ROM
+ROM_END
+#endif
 
 /*    YEAR  NAME      PARENT    COMPAT    MACHINE      INPUT     INIT      COMPANY            FULLNAME */
 COMP( 1977, apple2,   0,        0,        apple2,      apple2, driver_device,   0,        "Apple Computer",    "Apple ][", GAME_SUPPORTS_SAVE )
@@ -1158,3 +1196,5 @@ COMP( 1983, agat7,    apple2,   0,        apple2p,     apple2p, driver_device,  
 COMP( 1984, agat9,    apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Agat",              "Agat-9", GAME_NOT_WORKING)
 COMP( 1985, space84,  apple2,   0,        space84,     apple2p, driver_device,  0,        "ComputerTechnik/IBS",  "Space 84",   GAME_NOT_WORKING )
 COMP( 1985, am64,     apple2,   0,        space84,     apple2p, driver_device,  0,        "ASEM",              "AM 64", GAME_SUPPORTS_SAVE )
+//COMP( 19??, laba2p,   apple2,   0,        laba2p,      apple2p, driver_device,  0,        "<unknown>",         "Lab equipment Apple II Plus clone", GAME_SUPPORTS_SAVE )
+
