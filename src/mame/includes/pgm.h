@@ -261,6 +261,7 @@ public:
 	int tableoffs2;
 	int entries_left;
 	int currentcolumn;
+	int currentrow;
 	int num_entries;
 	int full_entry;
 	int prev_tablloc;
@@ -272,7 +273,7 @@ public:
 	
 
 	// the maximum level size returned or read by the device appears to be this size
-	UINT16 level_structure[10][8];
+	UINT16 level_structure[8][10];
 
 
 	int puzzli2_take_leveldata_value(UINT8 datvalue);

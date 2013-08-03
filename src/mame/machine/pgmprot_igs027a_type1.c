@@ -819,8 +819,8 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 					{
 						hackcount2=0;
 	
-						// 63 0006 after the last 31 write doing the how to play level data - the 06 is the width of the playfield, where does it come from?
-						m_valueresponse = 0x00630006;
+						// when the ARM detects the end of the stream has been reached it returns a 0x63 status with the number of columns in the data word
+						m_valueresponse = 0x00630000 | numbercolumns;
 				
 						//UINT8 tableaddr = (hack_31_table_offset + (hack_31_table_offset2&0xf))&0xff;
 						//UINT8 xoredval = m_value0 ^ puzzli2_level_decode[tableaddr];
@@ -851,6 +851,7 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 
 			// before how to play
 			// clearly the level layout, where does it come from?
+			/*
 			UINT16 retvals[61] = 
 			{ 0x0008, // depth (-2?)
 			  0x0103, 0x0101, 0x0102, 0x0102, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, // first column
@@ -860,19 +861,24 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 			  0x0100, 0x0101, 0x0103, 0x0102, 0x0104, 0x0100 ,0x0100, 0x0000, 0x0000, 0x0000,
 			  0x0105, 0x0105, 0x0101, 0x0101, 0x0103, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000  // last column
 			};
+			*/
 
 
-
-			if (hackcount<61)
+			UINT16* leveldata = &level_structure[0][0];
+			if (hackcount==0)
 			{
-				m_valueresponse = 0x002d0000 | retvals[hackcount];
-				printf("returning %08x\n", m_valueresponse );
-
+				m_valueresponse = 0x002d0000 | ((depth>>4)+1); // this *seems* to come from upper bits of the first real value written to the device during the level stream (verify)
+				printf("level depth returning %08x\n", m_valueresponse );
+			}
+			else if (hackcount<61)
+			{
+				m_valueresponse = 0x002d0000 | leveldata[hackcount-1];
+				printf("level data returning %08x\n", m_valueresponse );
 			}
 			else
 			{
 				hackcount=0;
-				m_valueresponse = 0x00740054;  // 0x0074 0054 is returned after how to play reads above..
+				m_valueresponse = 0x00740054;  // 0x0074 0054 is returned after how to play reads above.. where does 0x54 come from?
 				printf("END returning %08x\n", m_valueresponse );
 
 			}
@@ -961,6 +967,12 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 			hackcount2 = 0;
 			hackcount = 0;
 			m_valueresponse = 0x36<<16;
+			
+			//  clear the return structure
+			for (int columns=0;columns<8;columns++)
+				for (int rows=0;rows<10;rows++)
+					level_structure[columns][rows] = 0x0000;
+
 		break;
 
 	/* 
@@ -1907,6 +1919,7 @@ int pgm_arm_type1_state::puzzli2_take_leveldata_value(UINT8 datvalue)
 		tableoffs2 = 0;
 		entries_left = 0;
 		currentcolumn = 0;
+		currentrow = 0;
 		num_entries = 0;
 		full_entry = 0;
 		prev_tablloc = 0;
@@ -1985,6 +1998,7 @@ int pgm_arm_type1_state::puzzli2_take_leveldata_value(UINT8 datvalue)
 				// for 0 entries skip back to state 1 instead of 3, because there is nothing following
 				stage = 1;
 				currentcolumn++;
+				currentrow = 0;
 
 				coverage[tableloc] = 1;
 				if (rawvalue!=0)
@@ -2045,71 +2059,78 @@ int pgm_arm_type1_state::puzzli2_take_leveldata_value(UINT8 datvalue)
 		}
 		else if (stage==3)
 		{
+			UINT16 object_value;
+
 			// some of these might be due to bad decrypt values in the table
-			if (rawvalue==0x00)      printf("%02x <- fish type 0\n", rawvalue);
-			else if (rawvalue==0x01) printf("%02x <- fish type 1\n", rawvalue);
-			else if (rawvalue==0x02) printf("%02x <- fish type 2\n", rawvalue);
-			else if (rawvalue==0x03) printf("%02x <- fish type 3\n", rawvalue);
-			else if (rawvalue==0x04) printf("%02x <- fish type 4\n", rawvalue);
-			else if (rawvalue==0x05) printf("%02x <- fish type 5\n", rawvalue);
-			else if (rawvalue==0x06) printf("%02x <- fish type 6\n", rawvalue);
-			else if (rawvalue==0x07) printf("%02x <- fish type 7\n", rawvalue);
+			if (rawvalue==0x00)      {object_value = 0x0100; printf("%02x <- fish type 0\n", rawvalue);}
+			else if (rawvalue==0x01) {object_value = 0x0101; printf("%02x <- fish type 1\n", rawvalue);}
+			else if (rawvalue==0x02) {object_value = 0x0102; printf("%02x <- fish type 2\n", rawvalue);}
+			else if (rawvalue==0x03) {object_value = 0x0103; printf("%02x <- fish type 3\n", rawvalue);}
+			else if (rawvalue==0x04) {object_value = 0x0104; printf("%02x <- fish type 4\n", rawvalue);}
+			else if (rawvalue==0x05) {object_value = 0x0105; printf("%02x <- fish type 5\n", rawvalue);}
+			else if (rawvalue==0x06) {object_value = 0x0106; printf("%02x <- fish type 6\n", rawvalue);}
+			else if (rawvalue==0x07) {object_value = 0x0107; printf("%02x <- fish type 7\n", rawvalue);}
 	
-			else if (rawvalue==0x08) printf("%02x <- ?? 08\n", rawvalue);
+			else if (rawvalue==0x08) {object_value = 0x0100; printf("%02x <- ?? 08\n", rawvalue);}
 
-			else if (rawvalue==0x0b) printf("%02x <- ?? 0b\n", rawvalue);
-			else if (rawvalue==0x0c) printf("%02x <- ?? 0c\n", rawvalue);
-			else if (rawvalue==0x0d) printf("%02x <- ?? 0d\n", rawvalue);
-			else if (rawvalue==0x0e) printf("%02x <- ?? 0e\n", rawvalue);
-			else if (rawvalue==0x0f) printf("%02x <- ?? 0f\n", rawvalue);
-			else if (rawvalue==0x10) printf("%02x <- ?? 10\n", rawvalue);
-			else if (rawvalue==0x11) printf("%02x <- ?? 11\n", rawvalue);
-			else if (rawvalue==0x12) printf("%02x <- ?? 12\n", rawvalue);
-			else if (rawvalue==0x13) printf("%02x <- ?? 13\n", rawvalue);
-			else if (rawvalue==0x14) printf("%02x <- ?? 14\n", rawvalue);
-			else if (rawvalue==0x15) printf("%02x <- ?? 15\n", rawvalue);
-			else if (rawvalue==0x16) printf("%02x <- ?? 16\n", rawvalue);
-			else if (rawvalue==0x17) printf("%02x <- ?? 17\n", rawvalue);
-			else if (rawvalue==0x18) printf("%02x <- ?? 18\n", rawvalue);
-			else if (rawvalue==0x19) printf("%02x <- ?? 19\n", rawvalue);
+			else if (rawvalue==0x0b) {object_value = 0x0100; printf("%02x <- ?? 0b\n", rawvalue);}
+			else if (rawvalue==0x0c) {object_value = 0x0100; printf("%02x <- ?? 0c\n", rawvalue);}
+			else if (rawvalue==0x0d) {object_value = 0x0100; printf("%02x <- ?? 0d\n", rawvalue);}
+			else if (rawvalue==0x0e) {object_value = 0x0100; printf("%02x <- ?? 0e\n", rawvalue);}
+			else if (rawvalue==0x0f) {object_value = 0x0100; printf("%02x <- ?? 0f\n", rawvalue);}
+			else if (rawvalue==0x10) {object_value = 0x0100; printf("%02x <- ?? 10\n", rawvalue);}
+			else if (rawvalue==0x11) {object_value = 0x0100; printf("%02x <- ?? 11\n", rawvalue);}
+			else if (rawvalue==0x12) {object_value = 0x0100; printf("%02x <- ?? 12\n", rawvalue);}
+			else if (rawvalue==0x13) {object_value = 0x0100; printf("%02x <- ?? 13\n", rawvalue);}
+			else if (rawvalue==0x14) {object_value = 0x0100; printf("%02x <- ?? 14\n", rawvalue);}
+			else if (rawvalue==0x15) {object_value = 0x0100; printf("%02x <- ?? 15\n", rawvalue);}
+			else if (rawvalue==0x16) {object_value = 0x0100; printf("%02x <- ?? 16\n", rawvalue);}
+			else if (rawvalue==0x17) {object_value = 0x0100; printf("%02x <- ?? 17\n", rawvalue);}
+			else if (rawvalue==0x18) {object_value = 0x0100; printf("%02x <- ?? 18\n", rawvalue);}
+			else if (rawvalue==0x19) {object_value = 0x0100; printf("%02x <- ?? 19\n", rawvalue);}
 
-			else if (rawvalue==0x1e) printf("%02x <- ?? 1e\n", rawvalue);
+			else if (rawvalue==0x1e) {object_value = 0x0100; printf("%02x <- ?? 1e\n", rawvalue);}
 
-			else if (rawvalue==0x21) printf("%02x <- ?? 21\n", rawvalue); // puzzli2
-			else if (rawvalue==0x22) printf("%02x <- ?? 22\n", rawvalue);
-			else if (rawvalue==0x23) printf("%02x <- ?? 23\n", rawvalue);
-			else if (rawvalue==0x24) printf("%02x <- ?? 24\n", rawvalue);
-			else if (rawvalue==0x25) printf("%02x <- ?? 25\n", rawvalue);
-			else if (rawvalue==0x26) printf("%02x <- ?? 26\n", rawvalue);
-			else if (rawvalue==0x27) printf("%02x <- ?? 27\n", rawvalue);
-			else if (rawvalue==0x28) printf("%02x <- ?? 28\n", rawvalue);
-			else if (rawvalue==0x29) printf("%02x <- ?? 29\n", rawvalue);
-			else if (rawvalue==0x2a) printf("%02x <- ?? 2a\n", rawvalue);
+			else if (rawvalue==0x21) {object_value = 0x0100; printf("%02x <- ?? 21\n", rawvalue);}// puzzli2
+			else if (rawvalue==0x22) {object_value = 0x0100; printf("%02x <- ?? 22\n", rawvalue);}
+			else if (rawvalue==0x23) {object_value = 0x0100; printf("%02x <- ?? 23\n", rawvalue);}
+			else if (rawvalue==0x24) {object_value = 0x0100; printf("%02x <- ?? 24\n", rawvalue);}
+			else if (rawvalue==0x25) {object_value = 0x0100; printf("%02x <- ?? 25\n", rawvalue);}
+			else if (rawvalue==0x26) {object_value = 0x0100; printf("%02x <- ?? 26\n", rawvalue);}
+			else if (rawvalue==0x27) {object_value = 0x0100; printf("%02x <- ?? 27\n", rawvalue);}
+			else if (rawvalue==0x28) {object_value = 0x0100; printf("%02x <- ?? 28\n", rawvalue);}
+			else if (rawvalue==0x29) {object_value = 0x0100; printf("%02x <- ?? 29\n", rawvalue);}
+			else if (rawvalue==0x2a) {object_value = 0x0100; printf("%02x <- ?? 2a\n", rawvalue);}
 
-			else if (rawvalue==0x32) printf("%02x <- ?? 32\n", rawvalue); // puzzli2
-			else if (rawvalue==0x33) printf("%02x <- ?? 33\n", rawvalue); // puzzli2
-			else if (rawvalue==0x35) printf("%02x <- ?? 35\n", rawvalue);
-			else if (rawvalue==0x38) printf("%02x <- ?? 38\n", rawvalue); // puzzli2
+			else if (rawvalue==0x32) {object_value = 0x0100; printf("%02x <- ?? 32\n", rawvalue);} // puzzli2
+			else if (rawvalue==0x33) {object_value = 0x0100; printf("%02x <- ?? 33\n", rawvalue);} // puzzli2
+			else if (rawvalue==0x35) {object_value = 0x0100; printf("%02x <- ?? 35\n", rawvalue);}
+			else if (rawvalue==0x38) {object_value = 0x0100; printf("%02x <- ?? 38\n", rawvalue);} // puzzli2
 
-			else if (rawvalue==0x41) printf("%02x <- ?? 41\n", rawvalue); // puzzli2
-			else if (rawvalue==0x43) printf("%02x <- ?? 43\n", rawvalue); // puzzli2
+			else if (rawvalue==0x41) {object_value = 0x0100; printf("%02x <- ?? 41\n", rawvalue);} // puzzli2
+			else if (rawvalue==0x43) {object_value = 0x0100; printf("%02x <- ?? 43\n", rawvalue);} // puzzli2
 
-			else if (rawvalue==0xd0) printf("%02x <- ?? d0\n", rawvalue);
+			else if (rawvalue==0xd0) {object_value = 0x0100; printf("%02x <- ?? d0\n", rawvalue);}
 
-			else if (rawvalue==0xe0) printf("%02x <- ?? e0\n", rawvalue);
-			else if (rawvalue==0xe1) printf("%02x <- ?? e1\n", rawvalue);
-			else if (rawvalue==0xe2) printf("%02x <- ?? e2\n", rawvalue);
-			else if (rawvalue==0xe3) printf("%02x <- ?? e3\n", rawvalue);
-			else if (rawvalue==0xe4) printf("%02x <- ?? e3\n", rawvalue);
+			else if (rawvalue==0xe0) {object_value = 0x0100; printf("%02x <- ?? e0\n", rawvalue);}
+			else if (rawvalue==0xe1) {object_value = 0x0100; printf("%02x <- ?? e1\n", rawvalue);}
+			else if (rawvalue==0xe2) {object_value = 0x0100; printf("%02x <- ?? e2\n", rawvalue);}
+			else if (rawvalue==0xe3) {object_value = 0x0100; printf("%02x <- ?? e3\n", rawvalue);}
+			else if (rawvalue==0xe4) {object_value = 0x0100; printf("%02x <- ?? e3\n", rawvalue);}
 
 
-			else                     printf("%02x <- unknown object\n", rawvalue);
+			else                     {object_value = 0x0100; printf("%02x <- unknown object\n", rawvalue);}
+
+			level_structure[currentcolumn][currentrow] = object_value;
+
+			currentrow++;
 
 			entries_left--;
 			if (entries_left == 0)
 			{
 				stage = 1;
 				currentcolumn++;
+				currentrow = 0;
 
 				if (currentcolumn==numbercolumns)
 				{
