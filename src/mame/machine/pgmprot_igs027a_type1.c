@@ -1965,6 +1965,9 @@ int pgm_arm_type1_state::puzzli2_take_leveldata_value(UINT8 datvalue)
 				}
 				else
 				{
+
+					// this isn't a strict rule
+					// the mask is used so they can specify spaces between elements too without storing the 00 bytes
 					coverage[tableloc] = 1;
 
 					int desired_mask = 0;
@@ -2017,13 +2020,13 @@ int pgm_arm_type1_state::puzzli2_take_leveldata_value(UINT8 datvalue)
 			else if (rawvalue==0x0f) {object_value = 0x0100; printf("%02x <- ?? 0f\n", rawvalue);}
 			else if (rawvalue==0x10) {object_value = 0x0100; printf("%02x <- ?? 10\n", rawvalue);}
 			else if (rawvalue==0x11) {object_value = 0x0100; printf("%02x <- ?? 11\n", rawvalue);}
-			else if (rawvalue==0x12) {object_value = 0x0100; printf("%02x <- ?? 12\n", rawvalue);}
+			else if (rawvalue==0x12) {object_value = 0x0121; printf("%02x <- fish in bubble (type 1?)\n", rawvalue);}
 			else if (rawvalue==0x13) {object_value = 0x0100; printf("%02x <- ?? 13\n", rawvalue);}
 			else if (rawvalue==0x14) {object_value = 0x0100; printf("%02x <- ?? 14\n", rawvalue);}
 			else if (rawvalue==0x15) {object_value = 0x0100; printf("%02x <- ?? 15\n", rawvalue);}
 			else if (rawvalue==0x16) {object_value = 0x0100; printf("%02x <- ?? 16\n", rawvalue);}
 			else if (rawvalue==0x17) {object_value = 0x0100; printf("%02x <- ?? 17\n", rawvalue);}
-			else if (rawvalue==0x18) {object_value = 0x0100; printf("%02x <- ?? 18\n", rawvalue);}
+			else if (rawvalue==0x18) {object_value = 0x0127; printf("%02x <- fish in bubble (type 7?)\n", rawvalue);}
 			else if (rawvalue==0x19) {object_value = 0x0100; printf("%02x <- ?? 19\n", rawvalue);}
 
 			else if (rawvalue==0x1e) {object_value = 0x0100; printf("%02x <- ?? 1e\n", rawvalue);}
@@ -2047,13 +2050,13 @@ int pgm_arm_type1_state::puzzli2_take_leveldata_value(UINT8 datvalue)
 			else if (rawvalue==0x41) {object_value = 0x0100; printf("%02x <- ?? 41\n", rawvalue);} // puzzli2
 			else if (rawvalue==0x43) {object_value = 0x0100; printf("%02x <- ?? 43\n", rawvalue);} // puzzli2
 
-			else if (rawvalue==0xd0) {object_value = 0x0100; printf("%02x <- ?? d0\n", rawvalue);}
+			else if (rawvalue==0xd0) {object_value = 0x0200; printf("%02x <- generic bubbles\n", rawvalue);}
 
-			else if (rawvalue==0xe0) {object_value = 0x0100; printf("%02x <- ?? e0\n", rawvalue);}
-			else if (rawvalue==0xe1) {object_value = 0x0100; printf("%02x <- ?? e1\n", rawvalue);}
-			else if (rawvalue==0xe2) {object_value = 0x0100; printf("%02x <- ?? e2\n", rawvalue);}
-			else if (rawvalue==0xe3) {object_value = 0x0100; printf("%02x <- ?? e3\n", rawvalue);}
-			else if (rawvalue==0xe4) {object_value = 0x0100; printf("%02x <- ?? e3\n", rawvalue);}
+			else if (rawvalue==0xe0) {object_value = 0x8000; printf("%02x <- solid middle\n", rawvalue);}
+			else if (rawvalue==0xe1) {object_value = 0x8020; printf("%02x <- solid top slant down\n", rawvalue);} // solid slant top down
+			else if (rawvalue==0xe2) {object_value = 0x8040; printf("%02x <- solid top slant up\n", rawvalue);} // solid slant top up
+			else if (rawvalue==0xe3) {object_value = 0x8060; printf("%02x <- solid bottom slant up\n", rawvalue);}
+			else if (rawvalue==0xe4) {object_value = 0x8080; printf("%02x <- solid bottom slant down\n", rawvalue);} // sold slant bottom up
 
 
 			else                     {object_value = 0x0100; printf("%02x <- unknown object\n", rawvalue);}
