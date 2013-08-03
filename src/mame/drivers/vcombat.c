@@ -101,6 +101,8 @@ public:
 		m_framebuffer_ctrl(*this, "fb_control"),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
+		m_vid_0(*this, "vid_0"),
+		m_vid_1(*this, "vid_1"),
 		m_dac(*this, "dac") { }
 
 	UINT16* m_m68k_framebuffer[2];
@@ -133,6 +135,8 @@ public:
 	UINT32 screen_update_vcombat_aux(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
+	required_device<i860_cpu_device> m_vid_0;
+	optional_device<i860_cpu_device> m_vid_1;
 	required_device<dac_device> m_dac;
 };
 
@@ -228,7 +232,7 @@ READ16_MEMBER(vcombat_state::control_3_r)
 	return (ioport("IN2")->read() << 8);
 }
 
-static void wiggle_i860_common(device_t *device, UINT16 data)
+static void wiggle_i860_common(i860_cpu_device *device, UINT16 data)
 {
 	int bus_hold = (data & 0x03) == 0x03;
 	int reset = data & 0x10;
@@ -238,31 +242,31 @@ static void wiggle_i860_common(device_t *device, UINT16 data)
 	if (bus_hold)
 	{
 		fprintf(stderr, "M0 asserting bus HOLD to i860 %s\n", device->tag());
-		i860_set_pin(device, DEC_PIN_BUS_HOLD, 1);
+		device->i860_set_pin(DEC_PIN_BUS_HOLD, 1);
 	}
 	else
 	{
 		fprintf(stderr, "M0 clearing bus HOLD to i860 %s\n", device->tag());
-		i860_set_pin(device, DEC_PIN_BUS_HOLD, 0);
+		device->i860_set_pin(DEC_PIN_BUS_HOLD, 0);
 	}
 
 	if (reset)
 	{
 		fprintf(stderr, "M0 asserting RESET to i860 %s\n", device->tag());
-		i860_set_pin(device, DEC_PIN_RESET, 1);
+		device->i860_set_pin(DEC_PIN_RESET, 1);
 	}
 	else
-		i860_set_pin(device, DEC_PIN_RESET, 0);
+		device->i860_set_pin(DEC_PIN_RESET, 0);
 }
 
 WRITE16_MEMBER(vcombat_state::wiggle_i860p0_pins_w)
 {
-	wiggle_i860_common(machine().device("vid_0"), data);
+	wiggle_i860_common(m_vid_0, data);
 }
 
 WRITE16_MEMBER(vcombat_state::wiggle_i860p1_pins_w)
 {
-	wiggle_i860_common(machine().device("vid_1"), data);
+	wiggle_i860_common(m_vid_1, data);
 }
 
 READ16_MEMBER(vcombat_state::main_irqiack_r)
@@ -415,15 +419,15 @@ ADDRESS_MAP_END
 
 MACHINE_RESET_MEMBER(vcombat_state,vcombat)
 {
-	i860_set_pin(machine().device("vid_0"), DEC_PIN_BUS_HOLD, 1);
-	i860_set_pin(machine().device("vid_1"), DEC_PIN_BUS_HOLD, 1);
+	m_vid_0->i860_set_pin(DEC_PIN_BUS_HOLD, 1);
+	m_vid_1->i860_set_pin(DEC_PIN_BUS_HOLD, 1);
 
 	m_crtc_select = 0;
 }
 
 MACHINE_RESET_MEMBER(vcombat_state,shadfgtr)
 {
-	i860_set_pin(machine().device("vid_0"), DEC_PIN_BUS_HOLD, 1);
+	m_vid_0->i860_set_pin(DEC_PIN_BUS_HOLD, 1);
 
 	m_crtc_select = 0;
 }
@@ -455,10 +459,10 @@ DRIVER_INIT_MEMBER(vcombat_state,vcombat)
 	UINT8 *ROM = memregion("maincpu")->base();
 
 	/* The two i860s execute out of RAM */
-	address_space &v0space = machine().device<i860_device>("vid_0")->space(AS_PROGRAM);
+	address_space &v0space = m_vid_0->space(AS_PROGRAM);
 	v0space.set_direct_update_handler(direct_update_delegate(FUNC(vcombat_state::vcombat_vid_0_direct_handler), this));
 
-	address_space &v1space = machine().device<i860_device>("vid_1")->space(AS_PROGRAM);
+	address_space &v1space = m_vid_1->space(AS_PROGRAM);
 	v1space.set_direct_update_handler(direct_update_delegate(FUNC(vcombat_state::vcombat_vid_1_direct_handler), this));
 
 	/* Allocate the 68000 framebuffers */
@@ -502,7 +506,7 @@ DRIVER_INIT_MEMBER(vcombat_state,shadfgtr)
 	m_i860_framebuffer[1][1] = NULL;
 
 	/* The i860 executes out of RAM */
-	address_space &space = machine().device<i860_device>("vid_0")->space(AS_PROGRAM);
+	address_space &space = m_vid_0->space(AS_PROGRAM);
 	space.set_direct_update_handler(direct_update_delegate(FUNC(vcombat_state::vcombat_vid_0_direct_handler), this));
 }
 
