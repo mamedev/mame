@@ -12917,28 +12917,28 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
 		<year>19??</year>
 		<publisher>Nihon Falcom</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="program disk.fdi" size="1265664" crc="467b2a24" sha1="c172262c5e0396286bed722fad69bca6b33e2cd4" offset="0" />
+			<dataarea name="flop" size="659456">
+				<rom name="program disk.fdi" size="659456" crc="467b2a24" sha1="c172262c5e0396286bed722fad69bca6b33e2cd4" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="scenario disk 1.fdi" size="1265664" crc="03173c4e" sha1="c4abd4c14d88542ae4af58ee7ef155fe012cbd10" offset="0" />
+			<dataarea name="flop" size="659456">
+				<rom name="scenario disk 1.fdi" size="659456" crc="03173c4e" sha1="c4abd4c14d88542ae4af58ee7ef155fe012cbd10" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="scenario disk 2.fdi" size="1265664" crc="1d21538c" sha1="0c0baa04cda3cf4699d4b220c0de724e3aada77d" offset="0" />
+			<dataarea name="flop" size="659456">
+				<rom name="scenario disk 2.fdi" size="659456" crc="1d21538c" sha1="0c0baa04cda3cf4699d4b220c0de724e3aada77d" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="scenario disk 3.fdi" size="1265664" crc="1b54de75" sha1="f7e466dc9bf53fe1df200bd79b25b9ac6019bd96" offset="0" />
+			<dataarea name="flop" size="659456">
+				<rom name="scenario disk 3.fdi" size="659456" crc="1b54de75" sha1="f7e466dc9bf53fe1df200bd79b25b9ac6019bd96" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="user disk.fdi" size="1265664" crc="235d63a6" sha1="8bf6485bb0a08ed71aed91f1fda6da8db3200467" offset="0" status="baddump" />
+			<dataarea name="flop" size="659456">
+				<rom name="user disk.fdi" size="659456" crc="235d63a6" sha1="8bf6485bb0a08ed71aed91f1fda6da8db3200467" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -12949,58 +12949,58 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
 		<year>19??</year>
 		<publisher>Nihon Falcom</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="selected sorcerian - disk 1.fdi" size="1265664" crc="7247f097" sha1="1f480bd192282f815efd33335fd215d72e13f5f0" offset="0" />
+			<dataarea name="flop" size="659456">
+				<rom name="selected sorcerian - disk 1.fdi" size="659456" crc="7247f097" sha1="1f480bd192282f815efd33335fd215d72e13f5f0" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="selected sorcerian - disk 2.fdi" size="1265664" crc="2d861f22" sha1="98ce7633ca02d5bb0eaf820547292c1f77843371" offset="0" />
+			<dataarea name="flop" size="659456">
+				<rom name="selected sorcerian - disk 2.fdi" size="659456" crc="2d861f22" sha1="98ce7633ca02d5bb0eaf820547292c1f77843371" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="selected sorcerian - disk 3.fdi" size="1265664" crc="6f9d934b" sha1="dd39c9fc6d84c5917a3f8d7bf63a6abfbb00fe5c" offset="0" />
+			<dataarea name="flop" size="659456">
+				<rom name="selected sorcerian - disk 3.fdi" size="659456" crc="6f9d934b" sha1="dd39c9fc6d84c5917a3f8d7bf63a6abfbb00fe5c" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="selected sorcerian - disk 4.fdi" size="1265664" crc="8de2db26" sha1="f312c4f6014de48e0d063cc3ff166de4e0047292" offset="0" />
+			<dataarea name="flop" size="659456">
+				<rom name="selected sorcerian - disk 4.fdi" size="659456" crc="8de2db26" sha1="f312c4f6014de48e0d063cc3ff166de4e0047292" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="selected sorcerian - disk 5.fdi" size="1265664" crc="1f4b9d58" sha1="2008761f71332c586a0f51d9045e0a1a1d383095" offset="0" />
+			<dataarea name="flop" size="659456">
+				<rom name="selected sorcerian - disk 5.fdi" size="659456" crc="1f4b9d58" sha1="2008761f71332c586a0f51d9045e0a1a1d383095" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="sorcerian - civil war.fdi" size="1265664" crc="272c1c30" sha1="1805b8f5777d78844c905a225c824e94e498b217" offset="0" />
+			<dataarea name="flop" size="659456">
+				<rom name="sorcerian - civil war.fdi" size="659456" crc="272c1c30" sha1="1805b8f5777d78844c905a225c824e94e498b217" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop7" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="sorcerian - extra scenario 1.fdi" size="1265664" crc="f23fdd4f" sha1="7a056cc07d213dc01d10026f5172f496741869ca" offset="0" />
+			<dataarea name="flop" size="659456">
+				<rom name="sorcerian - extra scenario 1.fdi" size="659456" crc="f23fdd4f" sha1="7a056cc07d213dc01d10026f5172f496741869ca" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop8" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="sorcerian - gilgamesh.fdi" size="1265664" crc="d8442f1e" sha1="bd2a01f787794ef563fe1a44a0c5e4a10eb52927" offset="0" />
+			<dataarea name="flop" size="659456">
+				<rom name="sorcerian - gilgamesh.fdi" size="659456" crc="d8442f1e" sha1="bd2a01f787794ef563fe1a44a0c5e4a10eb52927" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop9" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="sorcerian - pyramid.fdi" size="1265664" crc="4508847b" sha1="6a52f9308bd26373d164a1de65ea35a48e0ced22" offset="0" />
+			<dataarea name="flop" size="659456">
+				<rom name="sorcerian - pyramid.fdi" size="659456" crc="4508847b" sha1="6a52f9308bd26373d164a1de65ea35a48e0ced22" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop10" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="sorcerian - utility disk 1.fdi" size="1265664" crc="b9fb63e4" sha1="e848900269bb8b45861947250538ff241b8edb21" offset="0" />
+			<dataarea name="flop" size="659456">
+				<rom name="sorcerian - utility disk 1.fdi" size="659456" crc="b9fb63e4" sha1="e848900269bb8b45861947250538ff241b8edb21" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop11" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="sorcerian - visitor from space.fdi" size="1265664" crc="a8091137" sha1="05d9f365b4a49aab190b739d2a3e4401b455071f" offset="0" />
+			<dataarea name="flop" size="659456">
+				<rom name="sorcerian - visitor from space.fdi" size="659456" crc="a8091137" sha1="05d9f365b4a49aab190b739d2a3e4401b455071f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
