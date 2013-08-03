@@ -1302,10 +1302,6 @@ static DEVICE_START( aica )
 	}
 }
 
-static DEVICE_STOP( aica )
-{
-}
-
 void aica_set_ram_base(device_t *device, void *base, int size)
 {
 	aica_state *AICA = get_safe_token(device);
@@ -1387,7 +1383,6 @@ void aica_device::device_start()
 
 void aica_device::device_stop()
 {
-	DEVICE_STOP_NAME( aica )(this);
 }
 
 //-------------------------------------------------

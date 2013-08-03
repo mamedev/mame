@@ -797,7 +797,7 @@ WRITE8_MEMBER( tms9902_device::cruwrite )
 }
 
 /*-------------------------------------------------
-    DEVICE_STOP( tms9902 )
+    device_stop - device-specific stop
 -------------------------------------------------*/
 
 void tms9902_device::device_stop()

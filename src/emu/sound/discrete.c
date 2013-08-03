@@ -27,9 +27,9 @@
  * order
  *
  * DEVICE_START(discrete)      - Read Node list, initialise & reset
- * DEVICE_STOP(discrete)       - Shutdown discrete sound system
+ * device_stop                 - Shutdown discrete sound system
  * DEVICE_RESET(discrete)      - Put sound system back to time 0
- * discrete_stream_update() - This does the real update to the sim
+ * discrete_stream_update()    - This does the real update to the sim
  *
  ************************************************************************/
 

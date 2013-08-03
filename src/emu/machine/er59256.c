@@ -112,11 +112,6 @@ static DEVICE_START( er59256 )
 	er59256->flags&= ~FLAG_DATA_LOADED;
 }
 
-static DEVICE_STOP( er59256 )
-{
-	/* Save contents of eerom */
-}
-
 void er59256_set_iobits(device_t *device, UINT8 newbits)
 {
 	er59256_t *er59256 = get_token(device);
@@ -256,5 +251,5 @@ void er59256_device::device_start()
 
 void er59256_device::device_stop()
 {
-	DEVICE_STOP_NAME( er59256 )(this);
+	/* Save contents of eerom */
 }

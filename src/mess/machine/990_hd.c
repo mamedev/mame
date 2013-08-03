@@ -193,13 +193,6 @@ static int get_id_from_device( device_t *device )
 }
 
 
-#ifdef UNUSED_FUNCTION
-DEVICE_STOP( ti990_hd )
-{
-	d->img = NULL;
-}
-#endif
-
 /*
     Initialize hard disk unit and open a hard disk image
 */

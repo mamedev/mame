@@ -485,7 +485,7 @@ void tms9901_device::device_timer(emu_timer &timer, device_timer_id id, int para
 }
 
 /*-------------------------------------------------
-    DEVICE_STOP( tms9901 )
+    device_stop - device-specific stop
 -------------------------------------------------*/
 
 void tms9901_device::device_stop(void)
