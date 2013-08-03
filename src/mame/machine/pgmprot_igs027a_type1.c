@@ -1846,7 +1846,18 @@ DRIVER_INIT_MEMBER(pgm_arm_type1_state,espgal)
 }
 
 
+int count_bits(UINT16 value)
+{
+	int count = 0;
+	for (int i=0;i<16;i++)
+	{
+		int bit = (value >> i) & 1;
 
+		if (bit) count++;
+	}
+
+	return count;
+}
 
 int pgm_arm_type1_state::puzzli2_take_leveldata_value(UINT8 datvalue)
 {
@@ -1862,6 +1873,7 @@ int pgm_arm_type1_state::puzzli2_take_leveldata_value(UINT8 datvalue)
 		prev_tablloc = 0;
 		numbercolumns = 0;
 		depth = 0;
+		m_row_bitmask = 0;
 
 		printf("%02x <- table offset\n", datvalue);
 		tableoffs = datvalue;
@@ -1905,9 +1917,11 @@ int pgm_arm_type1_state::puzzli2_take_leveldata_value(UINT8 datvalue)
 		}
 		else if (stage==1)
 		{
-			printf("%02x <- Number of Entries for this Column (column is %d) (xor table location is %02x) ", rawvalue, currentcolumn, tableloc);
+			printf("%02x <- Number of Entries for this Column (and upper mask) (column is %d) (xor table location is %02x) ", rawvalue, currentcolumn, tableloc);
 			stage = 2;
 			entries_left = (rawvalue >> 4);
+			m_row_bitmask = (rawvalue & 0x0f)<<8;
+			
 			full_entry = rawvalue;
 			prev_tablloc = tableloc;
 
@@ -1929,6 +1943,13 @@ int pgm_arm_type1_state::puzzli2_take_leveldata_value(UINT8 datvalue)
 			printf("%02x <- Mask value equal to number of entries (xor table location is %02x)", rawvalue, tableloc);
 			stage = 3;
 
+			m_row_bitmask |= rawvalue;
+
+			int num_mask_bits = count_bits(m_row_bitmask);
+
+			if (num_mask_bits != num_entries)
+				printf(" error - number of mask bits != number of entries - ");
+
 			// 
 			if (entries_left == 0)
 			{
@@ -1936,6 +1957,7 @@ int pgm_arm_type1_state::puzzli2_take_leveldata_value(UINT8 datvalue)
 				stage = 1;
 				currentcolumn++;
 				currentrow = 0;
+				m_row_bitmask = 0;
 
 				coverage[tableloc] = 1;
 				if (rawvalue!=0)
@@ -2071,6 +2093,7 @@ int pgm_arm_type1_state::puzzli2_take_leveldata_value(UINT8 datvalue)
 				stage = 1;
 				currentcolumn++;
 				currentrow = 0;
+				m_row_bitmask = 0;
 
 				if (currentcolumn==numbercolumns)
 				{

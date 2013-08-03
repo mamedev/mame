@@ -267,6 +267,8 @@ public:
 	int prev_tablloc;
 	int numbercolumns;
 	int depth;
+	UINT16 m_row_bitmask;
+
 	UINT8 coverage[256]; // coverage is how much of the table we've managed to verify using known facts about the table structure
 
 	int command_31_write_type;
