@@ -6,16 +6,15 @@
  used by
 
  Knights of Valor 2 (kov2)
- Knights of Valor 2 Nine Dragons (kov2p) *
+ Knights of Valor 2 Nine Dragons (kov2p)
  DoDonPachi 2 - Bee Storm (ddp2)
  Martial Masters (martmast)
  Dragon World 2001 (dw2001)
  Dragon World Pretty Chance (dwpc) (verified to be the same internal rom as dw2001)
 
- * using a hacked kov2 internal ROM
  ----
 
-  These games use a larger region of shared RAM than the 55857E
+  These games use a larger region of shared RAM than the earlier
   type and have a communication based on interrupts
 
  ----
@@ -24,6 +23,8 @@
 
  The external ARM roms are encrypted, the internal ARM rom uploads
  the decryption tables.
+
+ The external ARM rom is checksummed
 
  Game Region is supplied by internal ARM rom.
 
@@ -160,6 +161,16 @@ WRITE32_MEMBER(pgm_arm_type2_state::kov2_arm_region_w )
 	COMBINE_DATA(&m_arm7_shareram[0x138/4]);
 }
 
+WRITE32_MEMBER(pgm_arm_type2_state::kov2p_arm_region_w )
+{
+	int pc = space.device().safe_pc();
+	int regionhack = ioport("RegionHack")->read();
+//	printf("%08x\n", pc);
+	if (pc==0x1b0 && regionhack != 0xff) data = (data & 0xffff0000) | (regionhack << 0);
+	COMBINE_DATA(&m_arm7_shareram[0x138/4]);
+}
+
+
 DRIVER_INIT_MEMBER(pgm_arm_type2_state,kov2)
 {
 	pgm_basic_init();
@@ -181,7 +192,7 @@ DRIVER_INIT_MEMBER(pgm_arm_type2_state,kov2p)
 	kov2_latch_init();
 
 	// we only have a China internal ROM dumped for now, allow us to override that for debugging purposes.
-//	machine().device("prot")->memory().space(AS_PROGRAM).install_write_handler(0x48000138, 0x4800013b, write32_delegate(FUNC(pgm_arm_type2_state::kov2_arm_region_w),this));
+	machine().device("prot")->memory().space(AS_PROGRAM).install_write_handler(0x48000138, 0x4800013b, write32_delegate(FUNC(pgm_arm_type2_state::kov2p_arm_region_w),this));
 }
 
 WRITE32_MEMBER(pgm_arm_type2_state::martmast_arm_region_w )
@@ -273,7 +284,7 @@ INPUT_PORTS_START( kov2 )
 	PORT_CONFNAME( 0x00ff, 0x00ff, DEF_STR( Region ) )
 	PORT_CONFSETTING(      0x0000, DEF_STR( China ) )
 	PORT_CONFSETTING(      0x0001, DEF_STR( Taiwan ) )
-	PORT_CONFSETTING(      0x0002, "Japan (Cave license)" )
+	PORT_CONFSETTING(      0x0002, "Japan (Alta license)" ) // 'Busyou Souha' title for kov2p Japan
 	PORT_CONFSETTING(      0x0003, DEF_STR( Korea ) )
 	PORT_CONFSETTING(      0x0004, DEF_STR( Hong_Kong ) )
 	PORT_CONFSETTING(      0x0005, DEF_STR( World ) )

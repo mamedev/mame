@@ -268,6 +268,11 @@ public:
 	int numbercolumns;
 	int depth;
 	UINT16 m_row_bitmask;
+	int hackcount;
+	int hackcount2;
+	int hack_47_value;
+	int hack_31_table_offset;
+	int hack_31_table_offset2;
 
 	UINT8 coverage[256]; // coverage is how much of the table we've managed to verify using known facts about the table structure
 
@@ -318,6 +323,7 @@ public:
 	void kov2_latch_init();
 	DECLARE_WRITE32_MEMBER( martmast_arm_region_w );
 	DECLARE_WRITE32_MEMBER( kov2_arm_region_w );
+	DECLARE_WRITE32_MEMBER( kov2p_arm_region_w );
 	DECLARE_READ32_MEMBER( ddp2_speedup_r );
 	DECLARE_READ16_MEMBER( ddp2_main_speedup_r );
 };

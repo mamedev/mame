@@ -6,8 +6,9 @@
 
  Knights of Valor (kov) + bootlegs
  Knights of Valor Plus (kovplus)
- Puzzli 2 Super (puzzli2)
+ Puzzli 2 / Puzzli 2 Super (puzzli2s)
  Photo Y2k2 (py2k2)
+ Photo Y2k2 - Flash 3-in-1 (pgm3in1)
  Puzzle Star (puzlstar)
 
  These are implemented in 55857E type chips
@@ -42,6 +43,9 @@
 
  None of these games have an external ARM rom, although it appears
  the program code does check for the possibility of one existing.
+
+ The 68k ROM gets checksummed by the ARM, the code doesn't even
+ get decrytped if it fails.
 
  68k code is encrypted on these, decryption table is uploaded to
  ARM space.
@@ -564,7 +568,7 @@ void pgm_arm_type1_state::command_handler_ddp3(int pc)
 
 /* preliminary */
 
-// not accurate, low bits (0x03 mask) are certainly wrong, possibly others, 0/1 below each shows if i've attempted to automatically verify the value
+// fairly accurate now, although could still do with finding a way to verify on hw
 UINT8 puzzli2_level_decode[256] = {
   // 0  ,  1  ,  2  ,  3  ,  4  ,  5   , 6  ,  7  ,  8  ,  9  ,  a  ,  b  ,  c  ,  d  ,  e  ,  f  ,
 	0x32, 0x3e, 0xb2, 0x37, 0x31, 0x22, 0xd6, 0x0d, 0x35, 0x5c, 0x8d, 0x3c, 0x7a, 0x5f, 0xd7, 0xac, // 0x0
@@ -602,45 +606,6 @@ UINT8 puzzli2_level_decode[256] = {
 };
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-static int hackcount = 0;
-static int hackcount2 = 0;
-static int hack_47_value = 0;
-static int hack_31_table_offset = 0;
-static int hack_31_table_offset2 = 0;
 void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 {
 
@@ -2181,19 +2146,23 @@ int pgm_arm_type1_state::puzzli2_take_leveldata_value(UINT8 datvalue)
 DRIVER_INIT_MEMBER(pgm_arm_type1_state,puzzli2)
 {
 	pgm_basic_init();
+
+
 	pgm_puzzli2_decrypt(machine());
 	arm_sim_handler = &pgm_arm_type1_state::command_handler_puzzli2;
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_r),this), write16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_w),this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0000, 0x4f003f, read16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_protram_r),this));
-	m_irq4_disabled = 1; // // doesn't like this irq??
+	m_irq4_disabled = 1; // // doesn't like this irq?? - seems to be RTC related
+
+	hackcount = 0;
+	hackcount2 = 0;
+	hack_47_value = 0;
+	hack_31_table_offset = 0;
+	hack_31_table_offset = 0;
 
 //#define PUZZLI2_LEVEL_STRUCTURE_LOG
 #ifdef PUZZLI2_LEVEL_STRUCTURE_LOG
 	UINT8 *src2 = (UINT8 *) (machine().root_device().memregion("maincpu")->base());
-//	UINT8 new_puzzli2_level_decode[256];
-
-//	for (int i=0;i<256;i++)
-//		new_puzzli2_level_decode[i] = puzzli2_level_decode[i];
 
 	int offset;
 	int limit;
@@ -2270,34 +2239,7 @@ DRIVER_INIT_MEMBER(pgm_arm_type1_state,puzzli2)
 		
 
 	}
-	/*
-	int c=0;
-	for (int i=0;i<256;i++)
-	{
-		printf(" %d  , ",coverage[i]);
-		c++;
-		if (c==16)
-		{
-			printf("\n");
-			c = 0;
-		}
-	}
-	printf("\n");
 
-	c=0;
-
-	for (int i=0;i<256;i++)
-	{
-		printf("0x%02x, ", new_puzzli2_level_decode[i]);
-
-		c++;
-		if (c==16)
-		{
-			printf("\n");
-			c = 0;
-		}
-	}
-	*/
 
 #endif
 
