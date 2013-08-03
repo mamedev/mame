@@ -2040,6 +2040,7 @@ int pgm_arm_type1_state::puzzli2_take_leveldata_value(UINT8 datvalue)
 			UINT16 object_value;
 
 			// some of these might be due to bad decrypt values in the table
+			////////////////////// regular fish group
 			if (rawvalue==0x00)      {object_value = 0x0100; printf("%02x <- fish type 0\n", rawvalue);}
 			else if (rawvalue==0x01) {object_value = 0x0101; printf("%02x <- fish type 1\n", rawvalue);}
 			else if (rawvalue==0x02) {object_value = 0x0102; printf("%02x <- fish type 2\n", rawvalue);}
@@ -2048,16 +2049,17 @@ int pgm_arm_type1_state::puzzli2_take_leveldata_value(UINT8 datvalue)
 			else if (rawvalue==0x05) {object_value = 0x0105; printf("%02x <- fish type 5\n", rawvalue);}
 			else if (rawvalue==0x06) {object_value = 0x0106; printf("%02x <- fish type 6\n", rawvalue);}
 			else if (rawvalue==0x07) {object_value = 0x0107; printf("%02x <- fish type 7\n", rawvalue);}
-	
-			else if (rawvalue==0x08) {object_value = 0x0100; printf("%02x <- unk object ?? 08\n", rawvalue);}
-
-			else if (rawvalue==0x0b) {object_value = 0x0100; printf("%02x <- unk object ?? 0b\n", rawvalue);}
-			else if (rawvalue==0x0c) {object_value = 0x0100; printf("%02x <- unk object ?? 0c\n", rawvalue);}
-			else if (rawvalue==0x0d) {object_value = 0x0100; printf("%02x <- unk object ?? 0d\n", rawvalue);}
-			else if (rawvalue==0x0e) {object_value = 0x0100; printf("%02x <- unk object ?? 0e\n", rawvalue);}
-			else if (rawvalue==0x0f) {object_value = 0x0100; printf("%02x <- unk object ?? 0f\n", rawvalue);}
-			else if (rawvalue==0x10) {object_value = 0x0100; printf("%02x <- unk object ?? 10\n", rawvalue);}
-			else if (rawvalue==0x11) {object_value = 0x0100; printf("%02x <- unk object ?? 11\n", rawvalue);}
+			else if (rawvalue==0x08) {object_value = 0x0108; printf("%02x <- fish type 8\n", rawvalue);} // usually used to have the 2nd stripey type in a level
+			// 09?
+			// 0a?
+			else if (rawvalue==0x0b) {object_value = 0xffff; printf("%02x <- unk object ?? 0b\n", rawvalue);}
+			else if (rawvalue==0x0c) {object_value = 0xffff; printf("%02x <- unk object ?? 0c\n", rawvalue);}
+			else if (rawvalue==0x0d) {object_value = 0xffff; printf("%02x <- unk object ?? 0d\n", rawvalue);}
+			else if (rawvalue==0x0e) {object_value = 0xffff; printf("%02x <- unk object ?? 0e\n", rawvalue);}
+			else if (rawvalue==0x0f) {object_value = 0xffff; printf("%02x <- unk object ?? 0f\n", rawvalue);}
+			else if (rawvalue==0x10) {object_value = 0xffff; printf("%02x <- unk object ?? 10\n", rawvalue);}
+			////////////////////// fish in bubble group
+			else if (rawvalue==0x11) {object_value = 0xffff; printf("%02x <- unk object ?? 11\n", rawvalue);} // bubble type 0?
 			else if (rawvalue==0x12) {object_value = 0x0121; printf("%02x <- fish in bubble (type 1?)\n", rawvalue);}
 			else if (rawvalue==0x13) {object_value = 0x0122; printf("%02x <- fish in bubble (type 2?)\n", rawvalue);}
 			else if (rawvalue==0x14) {object_value = 0x0123; printf("%02x <- fish in bubble (type 3?)??\n", rawvalue);}
@@ -2066,28 +2068,52 @@ int pgm_arm_type1_state::puzzli2_take_leveldata_value(UINT8 datvalue)
 			else if (rawvalue==0x17) {object_value = 0x0126; printf("%02x <- fish in bubble (type 6?)\n", rawvalue);}
 			else if (rawvalue==0x18) {object_value = 0x0127; printf("%02x <- fish in bubble (type 7?)\n", rawvalue);}
 			else if (rawvalue==0x19) {object_value = 0x0128; printf("%02x <- fish in bubble (type 8?)\n", rawvalue);}
-
-			else if (rawvalue==0x1e) {object_value = 0x0100; printf("%02x <- unk object ?? 1e\n", rawvalue);}
-
-			else if (rawvalue==0x21) {object_value = 0x0100; printf("%02x <- unk object ?? 21\n", rawvalue);}// puzzli2
-			else if (rawvalue==0x22) {object_value = 0x0140; printf("%02x <- fish in egg (type w?)\n", rawvalue);}
-			else if (rawvalue==0x23) {object_value = 0x0141; printf("%02x <- fish in egg (type x?)\n", rawvalue);}
-			else if (rawvalue==0x24) {object_value = 0x0142; printf("%02x <- fish in egg (type y?)\n", rawvalue);}
-			else if (rawvalue==0x25) {object_value = 0x0143; printf("%02x <- fish in egg (type z?)\n", rawvalue);}
-			else if (rawvalue==0x26) {object_value = 0x0100; printf("%02x <- unk object ?? 26\n", rawvalue);}
-			else if (rawvalue==0x27) {object_value = 0x0100; printf("%02x <- unk object ?? 27\n", rawvalue);}
-			else if (rawvalue==0x28) {object_value = 0x0100; printf("%02x <- unk object ?? 28\n", rawvalue);}
-			else if (rawvalue==0x29) {object_value = 0x0100; printf("%02x <- unk object ?? 29\n", rawvalue);}
-			else if (rawvalue==0x2a) {object_value = 0x0100; printf("%02x <- unk object ?? 2a\n", rawvalue);}
-
-			else if (rawvalue==0x32) {object_value = 0x0100; printf("%02x <- unk object ?? 32\n", rawvalue);} // puzzli2
-			else if (rawvalue==0x33) {object_value = 0x0100; printf("%02x <- unk object ?? 33\n", rawvalue);} // puzzli2
-			else if (rawvalue==0x35) {object_value = 0x0100; printf("%02x <- unk object ?? 35\n", rawvalue);}
-			else if (rawvalue==0x38) {object_value = 0x0100; printf("%02x <- unk object ?? 38\n", rawvalue);} // puzzli2
-
-			else if (rawvalue==0x41) {object_value = 0x0100; printf("%02x <- unk object ?? 41\n", rawvalue);} // puzzli2
-			else if (rawvalue==0x43) {object_value = 0x0100; printf("%02x <- unk object ?? 43\n", rawvalue);} // puzzli2
-
+			// 1a
+			// 1b
+			// 1c
+			// 1d
+			else if (rawvalue==0x1e) {object_value = 0xffff; printf("%02x <- unk object ?? 1e\n", rawvalue);}
+			// 1e
+			// 1f
+			// 20
+			else if (rawvalue==0x21) {object_value = 0xffff; printf("%02x <- unk object ?? 21\n", rawvalue);}// puzzli2
+			////////////////////// fish in egg group
+			else if (rawvalue==0x22) {object_value = 0x0140; printf("%02x <- fish in egg (type 0)\n", rawvalue);}
+			else if (rawvalue==0x23) {object_value = 0x0141; printf("%02x <- fish in egg (type 1)\n", rawvalue);}
+			else if (rawvalue==0x24) {object_value = 0x0142; printf("%02x <- fish in egg (type 2)\n", rawvalue);}
+			else if (rawvalue==0x25) {object_value = 0x0143; printf("%02x <- fish in egg (type 3)\n", rawvalue);}
+			else if (rawvalue==0x26) {object_value = 0x0144; printf("%02x <- fish in egg (type 4)\n", rawvalue);}
+			else if (rawvalue==0x27) {object_value = 0x0145; printf("%02x <- fish in egg (type 5)\n", rawvalue);}
+			else if (rawvalue==0x28) {object_value = 0x0146; printf("%02x <- fish in egg (type 6)\n", rawvalue);}
+			else if (rawvalue==0x29) {object_value = 0x0147; printf("%02x <- fish in egg (type 7)\n", rawvalue);}
+			else if (rawvalue==0x2a) {object_value = 0xffff; printf("%02x <- unk object ?? 2a\n", rawvalue);}
+			// 2b
+			// 2c
+			// 2d
+			// 2e
+			// 2f
+			// 30
+			// 31
+			else if (rawvalue==0x32) {object_value = 0xffff; printf("%02x <- unk object ?? 32\n", rawvalue);} // puzzli2
+			////////////////////// don't fishing know yet group
+			else if (rawvalue==0x33) {object_value = 0xffff; printf("%02x <- unk object ?? 33\n", rawvalue);} // puzzli2
+			// 34
+			else if (rawvalue==0x35) {object_value = 0xffff; printf("%02x <- unk object ?? 35\n", rawvalue);}
+			// 36
+			// 37
+			else if (rawvalue==0x38) {object_value = 0xffff; printf("%02x <- unk object ?? 38\n", rawvalue);} // puzzli2
+			// 39
+			// 3a
+			// 3b
+			// 3c
+			// 3d
+			// 3e
+			// 3f
+			// 40
+			else if (rawvalue==0x41) {object_value = 0xffff; printf("%02x <- unk object ?? 41\n", rawvalue);} // puzzli2
+			// 42
+			else if (rawvalue==0x43) {object_value = 0xffff; printf("%02x <- unk object ?? 43\n", rawvalue);} // puzzli2
+			////////////////////// special objects follow
 			else if (rawvalue==0xd0) {object_value = 0x0200; printf("%02x <- generic bubbles\n", rawvalue);}
 
 			else if (rawvalue==0xe0) {object_value = 0x8000; printf("%02x <- solid middle\n", rawvalue);}
@@ -2097,7 +2123,13 @@ int pgm_arm_type1_state::puzzli2_take_leveldata_value(UINT8 datvalue)
 			else if (rawvalue==0xe4) {object_value = 0x8080; printf("%02x <- solid bottom slant down\n", rawvalue);} // sold slant bottom up
 
 
-			else                     {object_value = 0x0100; printf("%02x <- unknown object\n", rawvalue);}
+			else                     {object_value = 0xffff; printf("%02x <- unknown object\n", rawvalue);}
+
+			if (object_value==0xffff)
+			{
+				object_value = 0x110;
+				popmessage("unknown object type %02x\n", rawvalue); 
+			}
 
 			int realrow = get_position_of_bit(m_row_bitmask, currentrow);
 
