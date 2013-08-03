@@ -10404,8 +10404,8 @@ other two disks
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<dataarea name="flop" size="1282048">
-				<rom name="user disk.fdi" size="1282048" crc="2ea110e4" sha1="ae4ab75a5058d8ac127921d66b6f8c6fd276a4ef" offset="0" status="baddump" />
+			<dataarea name="flop" size="1265664">
+				<rom name="user disk.fdi" size="1265664" crc="2ea110e4" sha1="ae4ab75a5058d8ac127921d66b6f8c6fd276a4ef" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -10759,8 +10759,8 @@ other two disks
 			</dataarea>
 		</part>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="user.fdi" size="1265664" crc="fc89da2f" sha1="d782340f5523a405558365367494d73264255379" offset="0" status="baddump" />
+			<dataarea name="flop" size="1478656">
+				<rom name="user.fdi" size="1478656" crc="fc89da2f" sha1="d782340f5523a405558365367494d73264255379" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
