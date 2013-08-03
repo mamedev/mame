@@ -517,7 +517,7 @@ void tms9901_device::device_reset(void)
 
 
 /*-------------------------------------------------
-    DEVICE_START( tms9901 )
+    device_start - device-specific startup
 -------------------------------------------------*/
 
 void tms9901_device::device_start(void)

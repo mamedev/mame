@@ -212,8 +212,6 @@
 
 
 
-//static DEVICE_START(x1_daisy){}
-
 /*************************************
  *
  *  Video Functions

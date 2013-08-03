@@ -26,7 +26,7 @@
  * Core software takes care of traversing the netlist in the correct
  * order
  *
- * DEVICE_START(discrete)      - Read Node list, initialise & reset
+ * device_start                - Read Node list, initialise & reset
  * device_stop                 - Shutdown discrete sound system
  * device_reset                - Put sound system back to time 0
  * discrete_stream_update()    - This does the real update to the sim

@@ -157,7 +157,7 @@ void mpcc68561_t::device_timer(emu_timer &timer, device_timer_id id, int param, 
 }
 
 /*-------------------------------------------------
-    DEVICE_START( mpcc68561 )
+    device_start - device-specific startup
 -------------------------------------------------*/
 
 void mpcc68561_t::device_start()

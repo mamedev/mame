@@ -819,7 +819,7 @@ void tms9902_device::device_reset()
 }
 
 /*-------------------------------------------------
-    DEVICE_START( tms9902 )
+    device_start - device-specific startup
 -------------------------------------------------*/
 
 void tms9902_device::device_start()

@@ -153,7 +153,7 @@ void scc8530_t::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 }
 
 /*-------------------------------------------------
-    DEVICE_START( scc8530 )
+    device_start - device-specific startup
 -------------------------------------------------*/
 
 void scc8530_t::device_start()
