@@ -84,6 +84,7 @@
     - Bishoujo Tsuushin: hangs with a beep while writing some intro text;
 
 	- Bomber Quest: beeps when speech is supposed to be played (0->1 to i/o port 0xfe8e?)
+	- Deflektor: no sound, moans about a DIP-sw during loading, very slow on non-pc9801rs machines;
     - Dragon Buster: slight issue with window masking;
     - Far Side Moon: doesn't detect sound board (tied to 0x00ec ports)
     - Jan Borg Suzume: gets stuck at a pic8259 read;
