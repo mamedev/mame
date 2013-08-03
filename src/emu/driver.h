@@ -175,12 +175,6 @@ public:
 		(machine.driver_data<_DriverClass>()->*_Function)();
 	}
 
-	// member-to-legacy-static wrappers
-	template<read_line_device_func _Func>
-	DECLARE_READ_LINE_MEMBER( member_wrapper_line ) { return (*_Func)(this); }
-	template<write_line_device_func _Func>
-	DECLARE_WRITE_LINE_MEMBER( member_wrapper_line ) { (*_Func)(this, state); }
-
 	// dummy driver_init callbacks
 	void init_0() { }
 
