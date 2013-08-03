@@ -810,7 +810,7 @@ void tms9902_device::device_stop()
 }
 
 /*-------------------------------------------------
-    DEVICE_RESET( tms9902 )
+    device_reset - device-specific reset
 -------------------------------------------------*/
 
 void tms9902_device::device_reset()

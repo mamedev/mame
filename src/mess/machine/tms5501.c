@@ -215,7 +215,7 @@ void tms5501_device::timer_reload(int timer)
 
 
 /*-------------------------------------------------
-    DEVICE_RESET( tms5501 )
+    device_reset - device-specific reset
 -------------------------------------------------*/
 
 void tms5501_device::device_reset()

@@ -1044,11 +1044,6 @@ static DEVICE_STOP( es5506 )
 }
 
 
-static DEVICE_RESET( es5506 )
-{
-}
-
-
 
 /**********************************************************************************************
 
@@ -2199,7 +2194,6 @@ void es5506_device::device_start()
 
 void es5506_device::device_reset()
 {
-	DEVICE_RESET_NAME( es5506 )(this);
 }
 
 //-------------------------------------------------

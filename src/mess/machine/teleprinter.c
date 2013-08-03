@@ -225,7 +225,7 @@ machine_config_constructor teleprinter_device::device_mconfig_additions() const
 }
 
 /*-------------------------------------------------
-    DEVICE_RESET( teleprinter )
+    device_reset - device-specific reset
 -------------------------------------------------*/
 
 void teleprinter_device::device_reset()

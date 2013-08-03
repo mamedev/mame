@@ -493,7 +493,7 @@ void tms9901_device::device_stop(void)
 }
 
 /*-------------------------------------------------
-    DEVICE_RESET( tms9901 )
+    device_reset - device-specific reset
 -------------------------------------------------*/
 
 void tms9901_device::device_reset(void)

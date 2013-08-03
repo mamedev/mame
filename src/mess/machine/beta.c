@@ -319,14 +319,6 @@ static DEVICE_START( beta_disk )
 	beta->wd179x = device->machine().device(tempstring);
 }
 
-/*-------------------------------------------------
-    DEVICE_RESET( beta_disk )
--------------------------------------------------*/
-
-static DEVICE_RESET( beta_disk )
-{
-}
-
 const device_type BETA_DISK = &device_creator<beta_disk_device>;
 
 beta_disk_device::beta_disk_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -350,7 +342,6 @@ void beta_disk_device::device_start()
 
 void beta_disk_device::device_reset()
 {
-	DEVICE_RESET_NAME( beta_disk )(this);
 }
 
 //-------------------------------------------------

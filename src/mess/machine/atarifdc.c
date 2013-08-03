@@ -809,10 +809,6 @@ static DEVICE_START(atari_fdc)
 	}
 }
 
-static DEVICE_RESET(atari_fdc)
-{
-}
-
 const device_type ATARI_FDC = &device_creator<atari_fdc_device>;
 
 atari_fdc_device::atari_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -846,7 +842,6 @@ void atari_fdc_device::device_start()
 
 void atari_fdc_device::device_reset()
 {
-	DEVICE_RESET_NAME( atari_fdc )(this);
 }
 
 //-------------------------------------------------

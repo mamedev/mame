@@ -174,7 +174,7 @@ void scc8530_t::device_start()
 
 
 /*-------------------------------------------------
-    DEVICE_RESET( scc8530 )
+    device_reset - device-specific reset
 -------------------------------------------------*/
 void scc8530_t::device_reset()
 {
