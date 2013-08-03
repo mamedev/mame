@@ -2039,54 +2039,69 @@ int pgm_arm_type1_state::puzzli2_take_leveldata_value(UINT8 datvalue)
 		{
 			UINT16 object_value;
 
+			// return values
+			// 0x0100 = normal fish
+			// 0x0120 = fish in bubble
+			// 0x0140 = fish in egg
+			// 0x0160 = buggy fish in egg (displayed as normal fish)
+			// 0x0180 = fish on hook
+			// 0x01a0 = fish on hook (uncatchable)
+			// 0x01c0 - fish on hook (uncatchable)
+			// 0x01e0 - fish on hook (uncatchable)
+
+			// fish values
+			// 100 101 102 103 104 105 106 107 108 normal
+			// 110 - renders as a flashing fish you can't catch? glitches game?
+			// 111 - repeat of other fish type you can't catch...
+
+
 			// some of these might be due to bad decrypt values in the table
 			////////////////////// regular fish group
-			if (rawvalue==0x00)      {object_value = 0x0100; printf("%02x <- fish type 0\n", rawvalue);}
-			else if (rawvalue==0x01) {object_value = 0x0101; printf("%02x <- fish type 1\n", rawvalue);}
-			else if (rawvalue==0x02) {object_value = 0x0102; printf("%02x <- fish type 2\n", rawvalue);}
-			else if (rawvalue==0x03) {object_value = 0x0103; printf("%02x <- fish type 3\n", rawvalue);}
-			else if (rawvalue==0x04) {object_value = 0x0104; printf("%02x <- fish type 4\n", rawvalue);}
-			else if (rawvalue==0x05) {object_value = 0x0105; printf("%02x <- fish type 5\n", rawvalue);}
-			else if (rawvalue==0x06) {object_value = 0x0106; printf("%02x <- fish type 6\n", rawvalue);}
-			else if (rawvalue==0x07) {object_value = 0x0107; printf("%02x <- fish type 7\n", rawvalue);}
-			else if (rawvalue==0x08) {object_value = 0x0108; printf("%02x <- fish type 8\n", rawvalue);} // usually used to have the 2nd stripey type in a level
+			if (rawvalue==0x00)      {object_value = 0x0100; printf("%02x <- fish type 0", rawvalue);}
+			else if (rawvalue==0x01) {object_value = 0x0101; printf("%02x <- fish type 1", rawvalue);}
+			else if (rawvalue==0x02) {object_value = 0x0102; printf("%02x <- fish type 2", rawvalue);}
+			else if (rawvalue==0x03) {object_value = 0x0103; printf("%02x <- fish type 3", rawvalue);}
+			else if (rawvalue==0x04) {object_value = 0x0104; printf("%02x <- fish type 4", rawvalue);}
+			else if (rawvalue==0x05) {object_value = 0x0105; printf("%02x <- fish type 5", rawvalue);}
+			else if (rawvalue==0x06) {object_value = 0x0106; printf("%02x <- fish type 6", rawvalue);}
+			else if (rawvalue==0x07) {object_value = 0x0107; printf("%02x <- fish type 7", rawvalue);}
+			else if (rawvalue==0x08) {object_value = 0x0108; printf("%02x <- fish type 8", rawvalue);} // usually used to have the 2nd stripey type in a level
 			// 09?
 			// 0a?
-			else if (rawvalue==0x0b) {object_value = 0xffff; printf("%02x <- unk object ?? 0b\n", rawvalue);}
-			else if (rawvalue==0x0c) {object_value = 0xffff; printf("%02x <- unk object ?? 0c\n", rawvalue);}
-			else if (rawvalue==0x0d) {object_value = 0xffff; printf("%02x <- unk object ?? 0d\n", rawvalue);}
-			else if (rawvalue==0x0e) {object_value = 0xffff; printf("%02x <- unk object ?? 0e\n", rawvalue);}
-			else if (rawvalue==0x0f) {object_value = 0xffff; printf("%02x <- unk object ?? 0f\n", rawvalue);}
-			else if (rawvalue==0x10) {object_value = 0xffff; printf("%02x <- unk object ?? 10\n", rawvalue);}
+			else if (rawvalue==0x0b) {object_value = 0x010b; printf("%02x <- unk object ?? 0b", rawvalue);}
+			else if (rawvalue==0x0c) {object_value = 0x010c; printf("%02x <- unk object ?? 0c", rawvalue);}
+			else if (rawvalue==0x0d) {object_value = 0x010d; printf("%02x <- unk object ?? 0d", rawvalue);}
+			else if (rawvalue==0x0e) {object_value = 0x010e; printf("%02x <- unk object ?? 0e", rawvalue);}
+			else if (rawvalue==0x0f) {object_value = 0x010f; printf("%02x <- unk object ?? 0f", rawvalue);}
+			else if (rawvalue==0x10) {object_value = 0x0110; printf("%02x <- unk object ?? 10", rawvalue);} // broken flashy fish thing??
 			////////////////////// fish in bubble group
-			else if (rawvalue==0x11) {object_value = 0xffff; printf("%02x <- unk object ?? 11\n", rawvalue);} // bubble type 0?
-			else if (rawvalue==0x12) {object_value = 0x0121; printf("%02x <- fish in bubble (type 1?)\n", rawvalue);}
-			else if (rawvalue==0x13) {object_value = 0x0122; printf("%02x <- fish in bubble (type 2?)\n", rawvalue);}
-			else if (rawvalue==0x14) {object_value = 0x0123; printf("%02x <- fish in bubble (type 3?)??\n", rawvalue);}
-			else if (rawvalue==0x15) {object_value = 0x0124; printf("%02x <- fish in bubble (type 4?)??\n", rawvalue);}
-			else if (rawvalue==0x16) {object_value = 0x0125; printf("%02x <- fish in bubble (type 5?)??\n", rawvalue);}
-			else if (rawvalue==0x17) {object_value = 0x0126; printf("%02x <- fish in bubble (type 6?)\n", rawvalue);}
-			else if (rawvalue==0x18) {object_value = 0x0127; printf("%02x <- fish in bubble (type 7?)\n", rawvalue);}
-			else if (rawvalue==0x19) {object_value = 0x0128; printf("%02x <- fish in bubble (type 8?)\n", rawvalue);}
+			else if (rawvalue==0x11) {object_value = 0x0120; printf("%02x <- unk object ?? 11", rawvalue);} // bubble type 0?
+			else if (rawvalue==0x12) {object_value = 0x0121; printf("%02x <- fish in bubble (type 1?)", rawvalue);}
+			else if (rawvalue==0x13) {object_value = 0x0122; printf("%02x <- fish in bubble (type 2?)", rawvalue);}
+			else if (rawvalue==0x14) {object_value = 0x0123; printf("%02x <- fish in bubble (type 3?)??", rawvalue);}
+			else if (rawvalue==0x15) {object_value = 0x0124; printf("%02x <- fish in bubble (type 4?)??", rawvalue);}
+			else if (rawvalue==0x16) {object_value = 0x0125; printf("%02x <- fish in bubble (type 5?)??", rawvalue);}
+			else if (rawvalue==0x17) {object_value = 0x0126; printf("%02x <- fish in bubble (type 6?)", rawvalue);}
+			else if (rawvalue==0x18) {object_value = 0x0127; printf("%02x <- fish in bubble (type 7?)", rawvalue);}
+			else if (rawvalue==0x19) {object_value = 0x0128; printf("%02x <- fish in bubble (type 8?)", rawvalue);}
 			// 1a
 			// 1b
 			// 1c
 			// 1d
-			else if (rawvalue==0x1e) {object_value = 0xffff; printf("%02x <- unk object ?? 1e\n", rawvalue);}
-			// 1e
+			else if (rawvalue==0x1e) {object_value = 0x012d; printf("%02x <- unk object ?? 1e", rawvalue);}
 			// 1f
 			// 20
-			else if (rawvalue==0x21) {object_value = 0xffff; printf("%02x <- unk object ?? 21\n", rawvalue);}// puzzli2
+			else if (rawvalue==0x21) {object_value = 0x0130; printf("%02x <- unk object ?? 21", rawvalue);}// puzzli2  // broken flashy thing in a bubble?
 			////////////////////// fish in egg group
-			else if (rawvalue==0x22) {object_value = 0x0140; printf("%02x <- fish in egg (type 0)\n", rawvalue);}
-			else if (rawvalue==0x23) {object_value = 0x0141; printf("%02x <- fish in egg (type 1)\n", rawvalue);}
-			else if (rawvalue==0x24) {object_value = 0x0142; printf("%02x <- fish in egg (type 2)\n", rawvalue);}
-			else if (rawvalue==0x25) {object_value = 0x0143; printf("%02x <- fish in egg (type 3)\n", rawvalue);}
-			else if (rawvalue==0x26) {object_value = 0x0144; printf("%02x <- fish in egg (type 4)\n", rawvalue);}
-			else if (rawvalue==0x27) {object_value = 0x0145; printf("%02x <- fish in egg (type 5)\n", rawvalue);}
-			else if (rawvalue==0x28) {object_value = 0x0146; printf("%02x <- fish in egg (type 6)\n", rawvalue);}
-			else if (rawvalue==0x29) {object_value = 0x0147; printf("%02x <- fish in egg (type 7)\n", rawvalue);}
-			else if (rawvalue==0x2a) {object_value = 0xffff; printf("%02x <- unk object ?? 2a\n", rawvalue);}
+			else if (rawvalue==0x22) {object_value = 0x0140; printf("%02x <- fish in egg (type 0)", rawvalue);}
+			else if (rawvalue==0x23) {object_value = 0x0141; printf("%02x <- fish in egg (type 1)", rawvalue);}
+			else if (rawvalue==0x24) {object_value = 0x0142; printf("%02x <- fish in egg (type 2)", rawvalue);}
+			else if (rawvalue==0x25) {object_value = 0x0143; printf("%02x <- fish in egg (type 3)", rawvalue);}
+			else if (rawvalue==0x26) {object_value = 0x0144; printf("%02x <- fish in egg (type 4)", rawvalue);}
+			else if (rawvalue==0x27) {object_value = 0x0145; printf("%02x <- fish in egg (type 5)", rawvalue);}
+			else if (rawvalue==0x28) {object_value = 0x0146; printf("%02x <- fish in egg (type 6)", rawvalue);}
+			else if (rawvalue==0x29) {object_value = 0x0147; printf("%02x <- fish in egg (type 7)", rawvalue);}
+			else if (rawvalue==0x2a) {object_value = 0x0148; printf("%02x <- unk object ?? 2a", rawvalue);}
 			// 2b
 			// 2c
 			// 2d
@@ -2094,14 +2109,14 @@ int pgm_arm_type1_state::puzzli2_take_leveldata_value(UINT8 datvalue)
 			// 2f
 			// 30
 			// 31
-			else if (rawvalue==0x32) {object_value = 0xffff; printf("%02x <- unk object ?? 32\n", rawvalue);} // puzzli2
-			////////////////////// don't fishing know yet group
-			else if (rawvalue==0x33) {object_value = 0xffff; printf("%02x <- unk object ?? 33\n", rawvalue);} // puzzli2
+			else if (rawvalue==0x32) {object_value = 0x0150; printf("%02x <- unk object ?? 32", rawvalue);} // puzzli2  // broken flashy thing in an egg?
+			////////////////////// going to assume these are the hook graphics because other object types are too glitch (verify) (why would these be in a level tho?)
+			else if (rawvalue==0x33) {object_value = 0x0180; printf("%02x <- unk object ?? 33", rawvalue);} // puzzli2
 			// 34
-			else if (rawvalue==0x35) {object_value = 0xffff; printf("%02x <- unk object ?? 35\n", rawvalue);}
+			else if (rawvalue==0x35) {object_value = 0x0182; printf("%02x <- unk object ?? 35", rawvalue);}
 			// 36
 			// 37
-			else if (rawvalue==0x38) {object_value = 0xffff; printf("%02x <- unk object ?? 38\n", rawvalue);} // puzzli2
+			else if (rawvalue==0x38) {object_value = 0x0185; printf("%02x <- unk object ?? 38", rawvalue);} // puzzli2
 			// 39
 			// 3a
 			// 3b
@@ -2110,20 +2125,22 @@ int pgm_arm_type1_state::puzzli2_take_leveldata_value(UINT8 datvalue)
 			// 3e
 			// 3f
 			// 40
-			else if (rawvalue==0x41) {object_value = 0xffff; printf("%02x <- unk object ?? 41\n", rawvalue);} // puzzli2
+			else if (rawvalue==0x41) {object_value = 0x018e; printf("%02x <- unk object ?? 41", rawvalue);} // puzzli2
 			// 42
-			else if (rawvalue==0x43) {object_value = 0xffff; printf("%02x <- unk object ?? 43\n", rawvalue);} // puzzli2
+			else if (rawvalue==0x43) {object_value = 0x0190; printf("%02x <- unk object ?? 43", rawvalue);} // puzzli2  (this would be broken flashy thing on a hook?!)
 			////////////////////// special objects follow
-			else if (rawvalue==0xd0) {object_value = 0x0200; printf("%02x <- generic bubbles\n", rawvalue);}
+			else if (rawvalue==0xd0) {object_value = 0x0200; printf("%02x <- generic bubbles", rawvalue);}
 
-			else if (rawvalue==0xe0) {object_value = 0x8000; printf("%02x <- solid middle\n", rawvalue);}
-			else if (rawvalue==0xe1) {object_value = 0x8020; printf("%02x <- solid top slant down\n", rawvalue);} // solid slant top down
-			else if (rawvalue==0xe2) {object_value = 0x8040; printf("%02x <- solid top slant up\n", rawvalue);} // solid slant top up
-			else if (rawvalue==0xe3) {object_value = 0x8060; printf("%02x <- solid bottom slant up\n", rawvalue);}
-			else if (rawvalue==0xe4) {object_value = 0x8080; printf("%02x <- solid bottom slant down\n", rawvalue);} // sold slant bottom up
+			else if (rawvalue==0xe0) {object_value = 0x8000; printf("%02x <- solid middle", rawvalue);}
+			else if (rawvalue==0xe1) {object_value = 0x8020; printf("%02x <- solid top slant down", rawvalue);} // solid slant top down
+			else if (rawvalue==0xe2) {object_value = 0x8040; printf("%02x <- solid top slant up", rawvalue);} // solid slant top up
+			else if (rawvalue==0xe3) {object_value = 0x8060; printf("%02x <- solid bottom slant up", rawvalue);}
+			else if (rawvalue==0xe4) {object_value = 0x8080; printf("%02x <- solid bottom slant down", rawvalue);} // sold slant bottom up
 
 
-			else                     {object_value = 0xffff; printf("%02x <- unknown object\n", rawvalue);}
+			else                     {object_value = 0xffff; printf("%02x <- unknown object", rawvalue);}
+
+			printf("  (xor table location is %02x)\n",tableloc);
 
 			if (object_value==0xffff)
 			{
@@ -2284,6 +2301,17 @@ DRIVER_INIT_MEMBER(pgm_arm_type1_state,puzzli2)
 
 #endif
 
+#if 0
+	if (!strcmp(machine().system().name,"puzzli2"))
+	{
+	UINT8 *src3 = (UINT8 *) (machine().root_device().memregion("maincpu")->base());
+	printf("how to play data pointer %02x %02x %02x %02x\n", src3[0x17b28e ^1], src3[0x17b28f ^1], src3[0x17b290 ^1], src3[0x17b291 ^1]);
+	src3[0x17b28e ^1] = 0x00;
+	src3[0x17b28f ^1] = 0x11;
+	src3[0x17b290 ^1] = 0x42;
+	src3[0x17b291 ^1] = 0x40;
+	}
+#endif
 
 }
 
