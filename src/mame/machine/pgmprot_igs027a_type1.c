@@ -1859,6 +1859,22 @@ int count_bits(UINT16 value)
 	return count;
 }
 
+int get_position_of_bit(UINT16 value, int bit_wanted)
+{
+	int count = 0;
+	for (int i=0;i<16;i++)
+	{
+		int bit = (value >> i) & 1;
+
+		if (bit) count++;
+
+		if (count==(bit_wanted+1))
+			return i;
+	}
+
+	return -1;
+}
+
 int pgm_arm_type1_state::puzzli2_take_leveldata_value(UINT8 datvalue)
 {
 	if (stage==-1)
@@ -2083,7 +2099,10 @@ int pgm_arm_type1_state::puzzli2_take_leveldata_value(UINT8 datvalue)
 
 			else                     {object_value = 0x0100; printf("%02x <- unknown object\n", rawvalue);}
 
-			level_structure[currentcolumn][currentrow] = object_value;
+			int realrow = get_position_of_bit(m_row_bitmask, currentrow);
+
+			if (realrow != -1)
+				level_structure[currentcolumn][realrow] = object_value;
 
 			currentrow++;
 
