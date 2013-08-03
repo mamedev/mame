@@ -268,6 +268,12 @@ public:
 	int depth;
 	UINT8 coverage[256]; // coverage is how much of the table we've managed to verify using known facts about the table structure
 
+	int command_31_write_type;
+	
+
+	// the maximum level size returned or read by the device appears to be this size
+	UINT16 level_structure[10][8];
+
 
 	int puzzli2_take_leveldata_value(UINT8 datvalue);
 };

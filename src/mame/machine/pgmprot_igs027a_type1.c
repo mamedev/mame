@@ -647,15 +647,7 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 	switch (m_ddp3lastcommand)
 	{
 
-		// done before writes to 31 when getting level data, always just seems to return the 0x36 response.
-		case 0x54: // ??
-			printf("%08x: %02x %04x\n",pc, m_ddp3lastcommand, m_value0);
 
-			m_puzzli_54_trigger = 1;
-			hackcount2 = 0;
-			hackcount = 0;
-			m_valueresponse = 0x36<<16;
-		break;
 
 		case 0x31:
 		{
@@ -786,45 +778,66 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 		
 
 		
-			printf("%08x: %02x %04x | ",pc, m_ddp3lastcommand, m_value0);
 
 
-			// this shouldn't apply to the stuff written on startup, only the level data..
-
-			if (hackcount2==0)
+			if (command_31_write_type==2)
 			{
-				hack_31_table_offset = m_value0 & 0xff;
-				hack_31_table_offset2 = 0;
-				hackcount2++;
-				m_valueresponse = 0x00d20000;
+				printf("%08x: %02x %04x | ",pc, m_ddp3lastcommand, m_value0);
 
-				printf("(set xor table offset)\n");
-			}
-			else if (hackcount2<39) // how do we decide end?
-			{
-				// always d2 0000 when writing doing level data
-				// but different for the writes on startup?
-				m_valueresponse = 0x00d20000;
+				// this shouldn't apply to the stuff written on startup, only the level data..
 
-				UINT8 tableaddr = (hack_31_table_offset + (hack_31_table_offset2&0xf))&0xff;
-				UINT8 xoredval = m_value0 ^ puzzli2_level_decode[tableaddr];
-				printf("value %02x, after xor is %02x (table address,value %02x,%02x)\n", m_value0, xoredval, tableaddr, puzzli2_level_decode[tableaddr]);
+				if (hackcount2==0)
+				{
+					puzzli2_take_leveldata_value(m_value0&0xff);
+
+					hack_31_table_offset = m_value0 & 0xff;
+					hack_31_table_offset2 = 0;
+					hackcount2++;
+					m_valueresponse = 0x00d20000;
+
+					//printf("(set xor table offset)\n");
+				}
+				else  // how do we decide end?
+				{
+					int end = puzzli2_take_leveldata_value(m_value0&0xff);
+
+					if (!end)
+					{
+
+						// always d2 0000 when writing doing level data
+						// but different for the writes on startup?
+						m_valueresponse = 0x00d20000;
+
+						//UINT8 tableaddr = (hack_31_table_offset + (hack_31_table_offset2&0xf))&0xff;
+						//UINT8 xoredval = m_value0 ^ puzzli2_level_decode[tableaddr];
+						//printf("value %02x, after xor is %02x (table address,value %02x,%02x)\n", m_value0, xoredval, tableaddr, puzzli2_level_decode[tableaddr]);
 				
-				hackcount2++;
-				hack_31_table_offset2++;
+						hackcount2++;
+						hack_31_table_offset2++;
+					}
+					else
+					{
+						hackcount2=0;
+	
+						// 63 0006 after the last 31 write doing the how to play level data - the 06 is the width of the playfield, where does it come from?
+						m_valueresponse = 0x00630006;
+				
+						//UINT8 tableaddr = (hack_31_table_offset + (hack_31_table_offset2&0xf))&0xff;
+						//UINT8 xoredval = m_value0 ^ puzzli2_level_decode[tableaddr];
+						//printf("value %02x, after xor is %02x (table address,value %02x,%02x) (end, returning %02x as playfield width)\n", m_value0, xoredval, tableaddr, puzzli2_level_decode[tableaddr], m_valueresponse);
+
+
+					}
+				}
+
+
 			}
 			else
 			{
-				hackcount2=0;
-	
-				// 63 0006 after the last 31 write doing the how to play level data - the 06 is the width of the playfield, where does it come from?
-				m_valueresponse = 0x00630006;
-				
-				UINT8 tableaddr = (hack_31_table_offset + (hack_31_table_offset2&0xf))&0xff;
-				UINT8 xoredval = m_value0 ^ puzzli2_level_decode[tableaddr];
-				printf("value %02x, after xor is %02x (table address,value %02x,%02x) (end, returning %02x as playfield width)\n", m_value0, xoredval, tableaddr, puzzli2_level_decode[tableaddr], m_valueresponse);
-				
+				// todo, responses when uploading the startup values are different
+				printf("%08x: %02x %04x (for z80 address?)\n ",pc, m_ddp3lastcommand, m_value0);
 
+				m_valueresponse = 0x00d20000;
 			}
 
 		}
@@ -884,11 +897,7 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 			m_puzzli_54_trigger = 0;
 		break;
 
-		case 0x41: // ASIC status?
-			printf("%08x: %02x %04x (UNK)\n",pc, m_ddp3lastcommand, m_value0);
 
-			m_valueresponse = 0x74<<16;
-		break;
 
 
 		// 47 and 52 are used to get the images during the intro sequence, different each loop
@@ -925,10 +934,34 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 
 		case 0x61: // ??
 			printf("%08x: %02x %04x\n",pc, m_ddp3lastcommand, m_value0);
+			
+			// this command is written before the values used to decrypt the z80 addresses (assumed) are uploaded with command 31
+			command_31_write_type = 1;
 
 			m_valueresponse = 0x36<<16;
 		break;
 
+		case 0x41: // ASIC status?
+			printf("%08x: %02x %04x (UNK)\n",pc, m_ddp3lastcommand, m_value0);
+
+			// this command is written after the values used to decrypt the z80 addresses (assumed) are uploaded with command 31
+			command_31_write_type = 0;
+
+			m_valueresponse = 0x74<<16;
+		break;
+
+		case 0x54: // ??
+			printf("%08x: %02x %04x\n",pc, m_ddp3lastcommand, m_value0);
+			
+			// this command is written before uploading the compressed level data stream with command 31
+
+			command_31_write_type = 2;
+			stage = -1;
+			m_puzzli_54_trigger = 1;
+			hackcount2 = 0;
+			hackcount = 0;
+			m_valueresponse = 0x36<<16;
+		break;
 
 	/* 
 	  these are probably scrambled with some kind of rotating xor?
@@ -1870,6 +1903,16 @@ int pgm_arm_type1_state::puzzli2_take_leveldata_value(UINT8 datvalue)
 {
 	if (stage==-1)
 	{
+		tableoffs = 0;
+		tableoffs2 = 0;
+		entries_left = 0;
+		currentcolumn = 0;
+		num_entries = 0;
+		full_entry = 0;
+		prev_tablloc = 0;
+		numbercolumns = 0;
+		depth = 0;
+
 		printf("%02x <- table offset\n", datvalue);
 		tableoffs = datvalue;
 		tableoffs2 = 0;
@@ -2130,15 +2173,7 @@ DRIVER_INIT_MEMBER(pgm_arm_type1_state,puzzli2)
 
 		int x = 0;
 
-		tableoffs = 0;
-		tableoffs2 = 0;
-		entries_left = 0;
-		currentcolumn = 0;
-		num_entries = 0;
-		full_entry = 0;
-		prev_tablloc = 0;
-		numbercolumns = 0;
-		depth = 0;
+
 		stage = -1;
 
 		for (x=val1; x<val2;x++)
