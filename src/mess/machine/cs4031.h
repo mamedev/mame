@@ -148,6 +148,7 @@ public:
 	DECLARE_WRITE8_MEMBER( keyb_data_w );
 	DECLARE_READ8_MEMBER( keyb_status_r );
 	DECLARE_WRITE8_MEMBER( keyb_command_w );
+	DECLARE_WRITE8_MEMBER( keyb_command_blocked_w );
 
 	// input lines
 	DECLARE_WRITE_LINE_MEMBER( irq01_w ) { m_intc1->ir1_w(state); }
@@ -203,8 +204,16 @@ private:
 	offs_t page_offset();
 	void set_dma_channel(int channel, bool state);
 	void update_dma_clock();
+
 	void nmi();
-	void a20m();
+
+	// gate a20, various sources are ored
+	void a20m()	{ m_write_a20m(m_fast_gatea20 | m_ext_gatea20 | m_emu_gatea20); }
+
+	void emulated_kbreset(int state);
+	void emulated_gatea20(int state);
+	void fast_gatea20(int state);
+	void keyboard_gatea20(int state);
 
 	void update_read_region(int index, const char *region, offs_t start, offs_t end);
 	void update_write_region(int index, const char *region, offs_t start, offs_t end);
@@ -247,6 +256,9 @@ private:
 	int m_kbrst;
 	int m_ext_gatea20;
 	int m_fast_gatea20;
+	int m_emu_gatea20;
+	bool m_keybc_d1_written;
+	bool m_keybc_data_blocked;
 
 	// chipset configuration
 	static const char* m_register_names[];
