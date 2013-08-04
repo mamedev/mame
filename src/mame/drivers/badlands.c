@@ -185,13 +185,18 @@ void badlands_state::update_interrupts()
 
 void badlands_state::scanline_update(screen_device &screen, int scanline)
 {
-	address_space &space = m_audiocpu->space(AS_PROGRAM);
+	if (m_audiocpu != 0)
+	{
+		address_space &space = m_audiocpu->space(AS_PROGRAM);
 
-	/* sound IRQ is on 32V */
-	if (scanline & 32)
-		m_soundcomm->sound_irq_ack_r(space, 0);
-	else if (!(ioport("FE4000")->read() & 0x40))
-		m_soundcomm->sound_irq_gen(m_audiocpu);
+		/* sound IRQ is on 32V */
+		if (scanline & 32)
+			m_soundcomm->sound_irq_ack_r(space, 0);
+		else if (!(ioport("FE4000")->read() & 0x40))
+			m_soundcomm->sound_irq_gen(m_audiocpu);
+	}
+	else
+		return;
 }
 
 
@@ -443,7 +448,6 @@ static INPUT_PORTS_START( badlands )
 INPUT_PORTS_END
 
 
-
 /*************************************
  *
  *  Graphics definitions
@@ -650,6 +654,16 @@ static ADDRESS_MAP_START( bootleg_map, AS_PROGRAM, 16, badlands_state )
 	AM_RANGE(0xfff200, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
+static INPUT_PORTS_START( badlandsb )
+	
+	PORT_INCLUDE( badlands )
+
+	PORT_MODIFY("AUDIO") /* audio port */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+
+INPUT_PORTS_END
+
 
 static const gfx_layout pflayout_bootleg =
 {
@@ -784,5 +798,5 @@ ROM_END
 
 
 
-GAME( 1989, badlandsb, badlands, badlandsb, badlands, driver_device, 0, ROT0, "bootleg (Playmark)", "Bad Lands (bootleg)", GAME_NOT_WORKING )
-GAME( 1989, badlandsb2,badlands, badlandsb, badlands, driver_device, 0, ROT0, "bootleg (Playmark)", "Bad Lands (bootleg, alternate)", GAME_NOT_WORKING )
+GAME( 1989, badlandsb, badlands, badlandsb, badlandsb, driver_device, 0, ROT0, "bootleg (Playmark)", "Bad Lands (bootleg)", GAME_NOT_WORKING )
+GAME( 1989, badlandsb2,badlands, badlandsb, badlandsb, driver_device, 0, ROT0, "bootleg (Playmark)", "Bad Lands (bootleg, alternate)", GAME_NOT_WORKING )
