@@ -38,12 +38,6 @@ static const res_net_info popper_net_info =
 	}
 };
 
-/***************************************************************************
- *
- * PALETTE_INIT
- *
- ***************************************************************************/
-
 void popper_state::palette_init()
 {
 	const UINT8 *color_prom = memregion("proms")->base();

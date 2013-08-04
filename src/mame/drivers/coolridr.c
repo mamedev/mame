@@ -3581,15 +3581,6 @@ static const scsp_interface scsp2_interface =
 };
 
 
-PALETTE_INIT( RRRRR_GGGGG_BBBBB_double )
-{
-	int i;
-
-	for (i = 0; i < 0x10000; i++)
-		palette_set_color(machine, i, MAKE_RGB( pal5bit((i >> 10)&0x1f), pal5bit(((i >> 5))&0x1f), pal5bit((i >> 0)&0x1f)));
-}
-
-
 #define MAIN_CLOCK XTAL_28_63636MHz
 
 static MACHINE_CONFIG_START( coolridr, coolridr_state )

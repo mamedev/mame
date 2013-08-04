@@ -1081,7 +1081,7 @@ VIDEO_START_MEMBER( thomson_state, thom )
 
 
 
-PALETTE_INIT ( thom )
+PALETTE_INIT_MEMBER(thomson_state, thom)
 {
 	double gamma = 0.6f;
 	unsigned i;
@@ -1094,7 +1094,7 @@ PALETTE_INIT ( thom )
 		UINT8 g = 255. * pow( ((i>> 4) & 15) / 15., gamma );
 		UINT8 b = 255. * pow( ((i >> 8) & 15) / 15., gamma );
 		/* UINT8 alpha = i & 0x1000 ? 0 : 255;  TODO: transparency */
-		palette_set_color_rgb(machine,  i, r, g, b );
+		palette_set_color_rgb(machine(),  i, r, g, b );
 	}
 }
 

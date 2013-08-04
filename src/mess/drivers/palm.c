@@ -16,7 +16,6 @@
 #include "sound/dac.h"
 #include "debugger.h"
 #include "rendlay.h"
-#include "drivlgcy.h"
 
 #define MC68328_TAG "dragonball"
 
@@ -57,6 +56,7 @@ public:
 	DECLARE_READ16_MEMBER(palm_spim_in);
 	DECLARE_WRITE8_MEMBER(palm_dac_transition);
 	DECLARE_WRITE_LINE_MEMBER(palm_spim_exchange);
+	DECLARE_PALETTE_INIT(palm);
 
 	required_ioport m_io_penx;
 	required_ioport m_io_peny;
@@ -153,6 +153,13 @@ void palm_state::machine_reset()
 	m_maincpu->reset();
 }
 
+/* THIS IS PRETTY MUCH TOTALLY WRONG AND DOESN'T REFLECT THE MC68328'S INTERNAL FUNCTIONALITY AT ALL! */
+PALETTE_INIT_MEMBER(palm_state, palm)
+{
+	palette_set_color_rgb(machine(), 0, 0x7b, 0x8c, 0x5a);
+	palette_set_color_rgb(machine(), 1, 0x00, 0x00, 0x00);
+}
+
 
 /***************************************************************************
     ADDRESS MAPS
@@ -178,12 +185,6 @@ WRITE8_MEMBER(palm_state::palm_dac_transition)
     MACHINE DRIVERS
 ***************************************************************************/
 
-/* THIS IS PRETTY MUCH TOTALLY WRONG AND DOESN'T REFLECT THE MC68328'S INTERNAL FUNCTIONALITY AT ALL! */
-PALETTE_INIT( palm )
-{
-	palette_set_color_rgb(machine, 0, 0x7b, 0x8c, 0x5a);
-	palette_set_color_rgb(machine, 1, 0x00, 0x00, 0x00);
-}
 
 static MC68328_INTERFACE(palm_dragonball_iface)
 {
@@ -234,7 +235,7 @@ static MACHINE_CONFIG_START( palm, palm_state )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 159, 0, 219 )
 	MCFG_SCREEN_UPDATE_DEVICE(MC68328_TAG, mc68328_device, screen_update)
 	MCFG_PALETTE_LENGTH( 2 )
-	MCFG_PALETTE_INIT( palm )
+	MCFG_PALETTE_INIT_OVERRIDE(palm_state, palm)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	/* audio hardware */

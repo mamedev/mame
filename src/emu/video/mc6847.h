@@ -78,9 +78,6 @@ INPUT_PORTS_EXTERN(mc6847_artifacting);
 //  MC6847 CORE
 //**************************************************************************
 
-PALETTE_INIT( mc6847 );
-PALETTE_INIT( mc6847_bw );
-
 // base class so that the GIME emulation can access mc6847 stuff
 class mc6847_friend_device : public device_t
 {

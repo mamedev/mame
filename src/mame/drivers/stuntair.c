@@ -80,7 +80,6 @@ Bprom dump by f205v
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-#include "drivlgcy.h"
 
 class stuntair_state : public driver_device
 {
@@ -128,6 +127,7 @@ public:
 	virtual void video_start();
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_stuntair(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_PALETTE_INIT(stuntair);
 };
 
 
@@ -138,10 +138,10 @@ public:
 
 ***************************************************************************/
 
-PALETTE_INIT( stuntair )
+PALETTE_INIT_MEMBER(stuntair_state, stuntair)
 {
 	/* need resistor weights etc. */
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 
 	for (int i = 0; i < 0x100; i++)
 	{
@@ -151,12 +151,12 @@ PALETTE_INIT( stuntair )
 		int g = (data&0x38)>>3;
 		int r = (data&0x07)>>0;
 
-		palette_set_color(machine,i,MAKE_RGB(r<<5,g<<5,b<<6));
+		palette_set_color(machine(),i,MAKE_RGB(r<<5,g<<5,b<<6));
 	}
 
 	// just set the FG layer to black and white
-	palette_set_color(machine,0x100,MAKE_RGB(0x00,0x00,0x00));
-	palette_set_color(machine,0x101,MAKE_RGB(0xff,0xff,0xff));
+	palette_set_color(machine(),0x100,MAKE_RGB(0x00,0x00,0x00));
+	palette_set_color(machine(),0x101,MAKE_RGB(0xff,0xff,0xff));
 }
 
 
@@ -541,7 +541,7 @@ static MACHINE_CONFIG_START( stuntair, stuntair_state )
 	MCFG_GFXDECODE(stuntair)
 	MCFG_PALETTE_LENGTH(0x100+2)
 
-	MCFG_PALETTE_INIT(stuntair)
+	MCFG_PALETTE_INIT_OVERRIDE(stuntair_state, stuntair)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono") // stereo?

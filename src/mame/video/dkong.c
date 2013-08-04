@@ -197,12 +197,6 @@ static const res_net_info radarscp_grid_net_info =
 	}
 };
 
-/***************************************************************************
-
-  PALETTE_INIT
-
-***************************************************************************/
-
 PALETTE_INIT_MEMBER(dkong_state,dkong2b)
 {
 	const UINT8 *color_prom = memregion("proms")->base();

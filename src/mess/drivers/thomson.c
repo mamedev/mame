@@ -76,7 +76,6 @@
 #include "imagedev/serial.h"
 #include "formats/basicdsk.h"
 #include "machine/ram.h"
-#include "drivlgcy.h"
 
 
 /**************************** common *******************************/
@@ -639,7 +638,7 @@ static MACHINE_CONFIG_START( to7, thomson_state )
 	MCFG_SCREEN_VBLANK_DRIVER( thomson_state, thom_vblank )
 
 	MCFG_PALETTE_LENGTH ( 4097 ) /* 12-bit color + transparency */
-	MCFG_PALETTE_INIT ( thom )
+	MCFG_PALETTE_INIT_OVERRIDE(thomson_state, thom)
 	MCFG_VIDEO_START_OVERRIDE( thomson_state, thom )
 	MCFG_DEFAULT_LAYOUT( layout_thomson )
 
