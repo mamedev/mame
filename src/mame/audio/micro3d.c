@@ -8,61 +8,9 @@
 
 #include "emu.h"
 #include "includes/micro3d.h"
-#include "devlegcy.h"
 
 
 #define MM5837_CLOCK        100000
-
-
-/*************************************
- *
- *  Type definitions
- *
- *************************************/
-
-struct biquad
-{
-	double a0, a1, a2;      /* Numerator coefficients */
-	double b0, b1, b2;      /* Denominator coefficients */
-};
-
-struct lp_filter
-{
-	float *history;
-	float *coef;
-	double fs;
-	biquad ProtoCoef[2];
-};
-
-struct filter_state
-{
-	double      capval;
-	double      exponent;
-};
-
-struct noise_state
-{
-	union
-	{
-		struct
-		{
-			UINT8 vcf;
-			UINT8 vcq;
-			UINT8 vca;
-			UINT8 pan;
-		};
-		UINT8 dac[4];
-	};
-
-	float               gain;
-	UINT32              noise_shift;
-	UINT8               noise_value;
-	UINT8               noise_subcount;
-
-	filter_state        noise_filters[4];
-	lp_filter           filter;
-	sound_stream        *stream;
-};
 
 
 /*************************************
@@ -177,49 +125,106 @@ static void recompute_filter(lp_filter *iir, double k, double q, double fc)
 	iir->coef[0] = k;
 }
 
-void micro3d_noise_sh_w(running_machine &machine, UINT8 data)
+void micro3d_sound_device::noise_sh_w(UINT8 data)
 {
-	micro3d_state *state = machine.driver_data<micro3d_state>();
+	micro3d_state *state = machine().driver_data<micro3d_state>();
 
 	if (~data & 8)
 	{
-		device_t *device = machine.device(data & 4 ? "noise_2" : "noise_1");
-		noise_state *nstate = (noise_state *)downcast<micro3d_sound_device *>(device)->token();
-
-		if (state->m_dac_data != nstate->dac[data & 3])
+		if (state->m_dac_data != m_dac[data & 3])
 		{
 			double q;
 			double fc;
 
-			nstate->stream->update();
+			m_stream->update();
 
-			nstate->dac[data & 3] = state->m_dac_data;
+			m_dac[data & 3] = state->m_dac_data;
 
-			if (nstate->vca == 255)
-				nstate->gain = 0;
+			if (m_vca == 255)
+				m_gain = 0;
 			else
-				nstate->gain = exp(-(float)(nstate->vca) / 25.0) * 10.0;
+				m_gain = exp(-(float)(m_vca) / 25.0) * 10.0;
 
-			q = 0.75/255 * (255 - nstate->vcq) + 0.1;
-			fc = 4500.0/255 * (255 - nstate->vcf) + 100;
+			q = 0.75/255 * (255 - m_vcq) + 0.1;
+			fc = 4500.0/255 * (255 - m_vcf) + 100;
 
-			recompute_filter(&nstate->filter, nstate->gain, q, fc);
+			recompute_filter(&m_filter, m_gain, q, fc);
 		}
 	}
 }
 
-INLINE noise_state *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == MICRO3D);
 
-	return (noise_state *)downcast<micro3d_sound_device *>(device)->token();
+/*************************************
+ *
+ *  Initialisation
+ *
+ *************************************/
+
+
+const device_type MICRO3D = &device_creator<micro3d_sound_device>;
+
+micro3d_sound_device::micro3d_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, MICRO3D, "Microprose Custom", tag, owner, clock, "micro3d_sound", __FILE__),
+		device_sound_interface(mconfig, *this),
+		m_vcf(0),
+		m_vcq(0),
+		m_vca(0),
+		m_pan(0),
+		m_gain(0),
+		m_noise_shift(0),
+		m_noise_value(0),
+		m_noise_subcount(0),
+		m_stream(NULL)
+{
 }
 
-static STREAM_UPDATE( micro3d_stream_update )
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void micro3d_sound_device::device_config_complete()
 {
-	noise_state *state = (noise_state *)param;
-	lp_filter *iir = &state->filter;
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void micro3d_sound_device::device_start()
+{
+	/* Allocate the stream */
+	m_stream = machine().sound().stream_alloc(*this, 0, 2, machine().sample_rate(), this);
+	filter_init(machine(), &m_filter, machine().sample_rate());
+
+	configure_filter(&m_noise_filters[0], 2.7e3 + 2.7e3, 1.0e-6);
+	configure_filter(&m_noise_filters[1], 2.7e3 + 1e3, 0.30e-6);
+	configure_filter(&m_noise_filters[2], 2.7e3 + 270, 0.15e-6);
+	configure_filter(&m_noise_filters[3], 2.7e3 + 0, 0.082e-6);
+//  configure_filter(&m_noise_filters[4], 33e3, 0.1e-6);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void micro3d_sound_device::device_reset()
+{
+	m_noise_shift = 0x15555;
+	m_dac[0] = 255;
+	m_dac[1] = 255;
+	m_dac[2] = 255;
+	m_dac[3] = 255;
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void micro3d_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	lp_filter *iir = &m_filter;
 	float pan_l, pan_r;
 
 	stream_sample_t *fl = &outputs[0][0];
@@ -229,11 +234,11 @@ static STREAM_UPDATE( micro3d_stream_update )
 	memset(outputs[0], 0, samples * sizeof(*outputs[0]));
 	memset(outputs[1], 0, samples * sizeof(*outputs[1]));
 
-	if (state->gain == 0)
+	if (m_gain == 0)
 		return;
 
-	pan_l = (float)(255 - state->pan) / 255.0;
-	pan_r = (float)(state->pan) / 255.0;
+	pan_l = (float)(255 - m_pan) / 255.0;
+	pan_r = (float)(m_pan) / 255.0;
 
 	while (samples--)
 	{
@@ -244,21 +249,21 @@ static STREAM_UPDATE( micro3d_stream_update )
 		int step;
 
 		/* Update the noise source */
-		for (step = 2000000 / (2000000/8); step >= state->noise_subcount; step -= state->noise_subcount)
+		for (step = 2000000 / (2000000/8); step >= m_noise_subcount; step -= m_noise_subcount)
 		{
-			state->noise_shift = (state->noise_shift << 1) | (((state->noise_shift >> 13) ^ (state->noise_shift >> 16)) & 1);
-			state->noise_value = (state->noise_shift >> 16) & 1;
-			state->noise_subcount = 2000000 / MM5837_CLOCK;
+			m_noise_shift = (m_noise_shift << 1) | (((m_noise_shift >> 13) ^ (m_noise_shift >> 16)) & 1);
+			m_noise_value = (m_noise_shift >> 16) & 1;
+			m_noise_subcount = 2000000 / MM5837_CLOCK;
 		}
-		state->noise_subcount -= step;
-		input = (float)state->noise_value - 0.5;
+		m_noise_subcount -= step;
+		input = (float)m_noise_value - 0.5;
 		white = input;
 
 		/* Pink noise filtering */
-		state->noise_filters[0].capval = 0.99765 * state->noise_filters[0].capval + input * 0.0990460;
-		state->noise_filters[1].capval = 0.96300 * state->noise_filters[1].capval + input * 0.2965164;
-		state->noise_filters[2].capval = 0.57000 * state->noise_filters[2].capval + input * 1.0526913;
-		input = state->noise_filters[0].capval + state->noise_filters[1].capval + state->noise_filters[2].capval + input * 0.1848;
+		m_noise_filters[0].capval = 0.99765 * m_noise_filters[0].capval + input * 0.0990460;
+		m_noise_filters[1].capval = 0.96300 * m_noise_filters[1].capval + input * 0.2965164;
+		m_noise_filters[2].capval = 0.57000 * m_noise_filters[2].capval + input * 1.0526913;
+		input = m_noise_filters[0].capval + m_noise_filters[1].capval + m_noise_filters[2].capval + input * 0.1848;
 
 		input += white;
 		input *= 200.0f;
@@ -300,40 +305,6 @@ static STREAM_UPDATE( micro3d_stream_update )
 	}
 }
 
-
-/*************************************
- *
- *  Initialisation
- *
- *************************************/
-
-static DEVICE_START( micro3d_sound )
-{
-	running_machine &machine = device->machine();
-	noise_state *state = get_safe_token(device);
-
-	/* Allocate the stream */
-	state->stream = device->machine().sound().stream_alloc(*device, 0, 2, machine.sample_rate(), state, micro3d_stream_update);
-	filter_init(machine, &state->filter, machine.sample_rate());
-
-	configure_filter(&state->noise_filters[0], 2.7e3 + 2.7e3, 1.0e-6);
-	configure_filter(&state->noise_filters[1], 2.7e3 + 1e3, 0.30e-6);
-	configure_filter(&state->noise_filters[2], 2.7e3 + 270, 0.15e-6);
-	configure_filter(&state->noise_filters[3], 2.7e3 + 0, 0.082e-6);
-//  configure_filter(&state->noise_filters[4], 33e3, 0.1e-6);
-}
-
-static DEVICE_RESET( micro3d_sound )
-{
-	noise_state *state = get_safe_token(device);
-	state->noise_shift = 0x15555;
-	state->dac[0] = 255;
-	state->dac[1] = 255;
-	state->dac[2] = 255;
-	state->dac[3] = 255;
-}
-
-
 /***************************************************************************
 
     8031 port mappings:
@@ -370,7 +341,8 @@ WRITE8_MEMBER(micro3d_state::micro3d_sound_io_w)
 	{
 		case 0x01:
 		{
-			micro3d_noise_sh_w(machine(), data);
+			micro3d_sound_device *noise = machine().device<micro3d_sound_device>(data & 4 ? "noise_2" : "noise_1");
+			noise->noise_sh_w(data);
 			break;
 		}
 		case 0x03:
@@ -397,52 +369,4 @@ WRITE8_MEMBER(micro3d_state::micro3d_upd7759_w)
 	m_upd7759->port_w(space, 0, data);
 	m_upd7759->start_w(0);
 	m_upd7759->start_w(1);
-}
-
-
-const device_type MICRO3D = &device_creator<micro3d_sound_device>;
-
-micro3d_sound_device::micro3d_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MICRO3D, "Microprose Custom", tag, owner, clock, "micro3d_sound", __FILE__),
-		device_sound_interface(mconfig, *this)
-{
-	m_token = global_alloc_clear(noise_state);
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void micro3d_sound_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void micro3d_sound_device::device_start()
-{
-	DEVICE_START_NAME( micro3d_sound )(this);
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void micro3d_sound_device::device_reset()
-{
-	DEVICE_RESET_NAME( micro3d_sound )(this);
-}
-
-//-------------------------------------------------
-//  sound_stream_update - handle a stream update
-//-------------------------------------------------
-
-void micro3d_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
-{
-	// should never get here
-	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }

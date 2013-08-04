@@ -12,6 +12,7 @@
 #define VGB_MONITOR_DISPLAY         0
 #define DRMATH_MONITOR_DISPLAY      0
 
+
 class micro3d_state : public driver_device
 {
 public:
@@ -155,17 +156,35 @@ void micro3d_duart_tx(device_t *device, int channel, UINT8 data);
 
 /*----------- defined in audio/micro3d.c -----------*/
 
-void micro3d_noise_sh_w(running_machine &machine, UINT8 data);
+struct biquad
+{
+	double a0, a1, a2;      /* Numerator coefficients */
+	double b0, b1, b2;      /* Denominator coefficients */
+};
+
+struct lp_filter
+{
+	float *history;
+	float *coef;
+	double fs;
+	biquad ProtoCoef[2];
+};
+
+struct filter_state
+{
+	double      capval;
+	double      exponent;
+};
 
 class micro3d_sound_device : public device_t,
 									public device_sound_interface
 {
 public:
 	micro3d_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~micro3d_sound_device() { global_free(m_token); }
+	~micro3d_sound_device() {}
 
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
+	void noise_sh_w(UINT8 data);
+	
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -176,7 +195,26 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 private:
 	// internal state
-	void *m_token;
+	union
+	{
+		struct
+		{
+			UINT8 m_vcf;
+			UINT8 m_vcq;
+			UINT8 m_vca;
+			UINT8 m_pan;
+		};
+		UINT8 m_dac[4];
+	};
+
+	float               m_gain;
+	UINT32              m_noise_shift;
+	UINT8               m_noise_value;
+	UINT8               m_noise_subcount;
+
+	filter_state        m_noise_filters[4];
+	lp_filter           m_filter;
+	sound_stream        *m_stream;
 };
 
 extern const device_type MICRO3D;
