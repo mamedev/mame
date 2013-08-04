@@ -119,7 +119,6 @@
 #define VIDEO_START_MEMBER(cls,name) void cls::VIDEO_START_NAME(name)()
 
 #define VIDEO_RESET_NAME(name)      video_reset_##name
-#define VIDEO_RESET(name)           void VIDEO_RESET_NAME(name)(running_machine &machine) // legacy
 #define VIDEO_RESET_CALL_MEMBER(name)       VIDEO_RESET_NAME(name)()
 #define DECLARE_VIDEO_RESET(name)   void VIDEO_RESET_NAME(name)()
 #define VIDEO_RESET_MEMBER(cls,name) void cls::VIDEO_RESET_NAME(name)()
