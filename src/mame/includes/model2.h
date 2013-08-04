@@ -2,6 +2,7 @@
 #include "audio/dsbz80.h"
 #include "machine/eepromser.h"
 #include "sound/multipcm.h"
+#include "cpu/i960/i960.h"
 
 struct raster_state;
 struct geo_state;
