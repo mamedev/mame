@@ -183,7 +183,7 @@ static UINT32 copro_fifoout_pop(address_space &space)
 	if (state->m_copro_fifoout_num == 0)
 	{
 		/* Reading from empty FIFO causes the i960 to enter wait state */
-		i960_stall(&space.device());
+		downcast<i960_cpu_device &>(space.device()).i960_stall();
 
 		/* spin the main cpu and let the TGP catch up */
 		space.device().execute().spin_until_time(attotime::from_usec(100));
@@ -259,7 +259,7 @@ static void copro_fifoout_push(device_t *device, UINT32 data)
 /* Timers - these count down at 25 MHz and pull IRQ2 when they hit 0 */
 READ32_MEMBER(model2_state::timers_r)
 {
-	i960_noburst(&space.device());
+	m_maincpu->i960_noburst();
 
 	// if timer is running, calculate current value
 	if (m_timerrun[offset])
@@ -278,7 +278,7 @@ WRITE32_MEMBER(model2_state::timers_w)
 {
 	attotime period;
 
-	i960_noburst(&space.device());
+	m_maincpu->i960_noburst();
 	COMBINE_DATA(&m_timervals[offset]);
 
 	m_timerorig[offset] = m_timervals[offset];
@@ -935,7 +935,7 @@ READ32_MEMBER(model2_state::desert_unk_r)
 
 READ32_MEMBER(model2_state::model2_irq_r)
 {
-	i960_noburst(&space.device());
+	m_maincpu->i960_noburst();
 
 	if (offset)
 	{
@@ -947,7 +947,7 @@ READ32_MEMBER(model2_state::model2_irq_r)
 
 WRITE32_MEMBER(model2_state::model2_irq_w)
 {
-	i960_noburst(&space.device());
+	m_maincpu->i960_noburst();
 
 	if (offset)
 	{
