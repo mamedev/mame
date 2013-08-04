@@ -2246,6 +2246,22 @@ static MACHINE_CONFIG_START( nslasher, deco32_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
 MACHINE_CONFIG_END
 
+// the US release uses a H6280 instead of a Z80, much like Lock 'n' Loaded
+static MACHINE_CONFIG_DERIVED( nslasheru, nslasher )
+	MCFG_CPU_REPLACE("audiocpu", H6280, 32220000/8)
+	MCFG_CPU_PROGRAM_MAP(sound_map)
+
+	MCFG_SOUND_MODIFY("ymsnd")
+	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1))
+
+	MCFG_DEVICE_REMOVE("ioprot104")
+	MCFG_DECO104_ADD("ioprot104")
+	MCFG_DECO146_SET_PORTB_CALLBACK( deco32_state, port_b_nslasher )
+	MCFG_DECO146_SET_SOUNDLATCH_CALLBACK(deco32_state, deco32_sound_cb)
+	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_INTERLEAVE
+
+MACHINE_CONFIG_END
+
 /**********************************************************************************/
 
 ROM_START( captaven )
@@ -3413,6 +3429,38 @@ ROM_START( nslashers )
 	ROM_LOAD( "mbh-11.16l", 0x000000,  0x80000,  CRC(0ec40b6b) SHA1(9fef44149608ae2a00f6a75a6f77f2efcab6e78e) )
 ROM_END
 
+ROM_START( nslasheru )
+	ROM_REGION(0x100000, "maincpu", 0 ) /* Encrypted ARM 32 bit code */
+	ROM_LOAD32_WORD( "00.f1", 0x000000, 0x80000, CRC(944f3329) SHA1(7e7909e203b9752de3d3d798c6f84ac6ae824a07) )
+	ROM_LOAD32_WORD( "01.f2", 0x000002, 0x80000, CRC(ac12d18a) SHA1(7cd4e843bf575c70c5c39a8afa78b803106f59b0) )
+
+	ROM_REGION(0x10000, "audiocpu", 0 ) /* Sound CPU */
+	ROM_LOAD( "02.l18",  0x00000,  0x10000, CRC(5e63bd91) SHA1(a6ac3c8c50f44cf2e6cf029aef1c974d1fc16ed5) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_LOAD( "mbh-00.8c",  0x000000,  0x200000,  CRC(a877f8a3) SHA1(79253525f360a73161894f31e211e4d6b38d307a) ) /* Encrypted tiles */
+
+	ROM_REGION( 0x200000, "gfx2", 0 )
+	ROM_LOAD( "mbh-01.9c",  0x000000,  0x200000,  CRC(1853dafc) SHA1(b1183c0db301cbed9f079c782202dbfc553b198e) ) /* Encrypted tiles */
+
+	ROM_REGION( 0xa00000, "gfx3", 0 ) /* Sprites */
+	ROM_LOAD16_BYTE( "mbh-02.14c",  0x000001,  0x200000, CRC(b2f158a1) SHA1(4f8c0b324813db198fe1dad7fff4185b828b94de) )
+	ROM_LOAD16_BYTE( "mbh-04.16c",  0x000000,  0x200000, CRC(eecfe06d) SHA1(2df817fe5e2ea31207b217bb03dc58979c05d0d2) )
+	ROM_LOAD16_BYTE( "mbh-03.15c",  0x400001,  0x80000,  CRC(787787e3) SHA1(531444e3f28aa9a7539a5a76ca94a9d6b97274c5) )
+	ROM_LOAD16_BYTE( "mbh-05.17c",  0x400000,  0x80000,  CRC(1d2b7c17) SHA1(ae0b8e0448a1a8180fb424fb0bc8a4302f8ff602) )
+	ROM_LOAD32_BYTE( "mbh-06.18c",  0x500000,  0x100000, CRC(038c2127) SHA1(5bdb215305f1a419fde27a83b623a38b9328e560) )
+	ROM_LOAD32_BYTE( "mbh-07.19c",  0x900000,  0x40000,  CRC(bbd22323) SHA1(6ab665b2e6d04cdadc48c52e15098e978b61fe10) )
+
+	ROM_REGION( 0x100000, "gfx4", 0 ) /* Sprites */
+	ROM_LOAD16_BYTE( "mbh-08.16e",  0x000001,  0x80000,  CRC(cdd7f8cb) SHA1(910bbe8783c0ba722e9d6399b332d658fa059fdb) )
+	ROM_LOAD16_BYTE( "mbh-09.18e",  0x000000,  0x80000,  CRC(33fa2121) SHA1(eb0e99d29b1ad9995df28e5b7cfc89d53efb53c3) )
+
+	ROM_REGION(0x80000, "oki1", 0 )
+	ROM_LOAD( "mbh-10.14l", 0x000000,  0x80000,  CRC(c4d6b116) SHA1(c5685bce6a6c6a74ca600ebf766ba1007f0dc666) )
+
+	ROM_REGION(0x80000, "oki2", 0 )
+	ROM_LOAD( "mbh-11.16l", 0x000000,  0x80000,  CRC(0ec40b6b) SHA1(9fef44149608ae2a00f6a75a6f77f2efcab6e78e) )
+ROM_END
 
 DRIVER_INIT_MEMBER(deco32_state,captaven)
 {
@@ -3564,9 +3612,11 @@ GAME( 1993, fghthistj,  fghthist, fghthist, fghthist, deco32_state,   fghthist, 
 GAME( 1993, fghthistja, fghthist, fghthsta, fghthist, deco32_state,   fghthist,  ROT0, "Data East Corporation", "Fighter's History (Japan ver 42-03, DE-0395-1 PCB)", 0 )
 GAME( 1994, lockload,   0,        lockload, lockload, dragngun_state, lockload,  ROT0, "Data East Corporation", "Locked 'n Loaded (World)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1994, gunhard,    lockload, lockload, lockload, dragngun_state, lockload,  ROT0, "Data East Corporation", "Gun Hard (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-GAME( 1994, lockloadu,  lockload, lockloadu,lockload, dragngun_state, lockload,  ROT0, "Data East Corporation", "Locked 'n Loaded (US)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1994, lockloadu,  lockload, lockloadu,lockload, dragngun_state, lockload,  ROT0, "Data East Corporation", "Locked 'n Loaded (US, HuC6280 Sound CPU)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1994, tattass,    0,        tattass,  tattass,  deco32_state,   tattass,   ROT0, "Data East Pinball",     "Tattoo Assassins (US prototype)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1994, tattassa,   tattass,  tattass,  tattass,  deco32_state,   tattass,   ROT0, "Data East Pinball",     "Tattoo Assassins (Asia prototype)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1994, nslasher,   0,        nslasher, nslasher, deco32_state,   nslasher,  ROT0, "Data East Corporation", "Night Slashers (Korea Rev 1.3)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1994, nslasherj,  nslasher, nslasher, nslasher, deco32_state,   nslasher,  ROT0, "Data East Corporation", "Night Slashers (Japan Rev 1.2)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1994, nslashers,  nslasher, nslasher, nslasher, deco32_state,   nslasher,  ROT0, "Data East Corporation", "Night Slashers (Over Sea Rev 1.2)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1994, nslasheru,  nslasher, nslasheru,nslasher, deco32_state,   nslasher,  ROT0, "Data East Corporation", "Night Slashers (US Rev 1.2, HuC6280 Sound CPU)", GAME_IMPERFECT_GRAPHICS )
+
