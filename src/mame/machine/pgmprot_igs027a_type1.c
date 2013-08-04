@@ -606,6 +606,7 @@ UINT8 puzzli2_level_decode[256] = {
 };
 
 
+
 void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 {
 
@@ -814,9 +815,11 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 		case 0x47:
 			printf("%08x: %02x %04x (GFX OFF PART 1)\n",pc, m_ddp3lastcommand, m_value0);
 
-			hack_47_value = ((m_value0 & 0x0700)>>8) * 0x19;
-			hack_47_value +=((m_value0 & 0x0007)>>0) * 0x05;
-			if (m_value0 & 0xf8f8) printf("unhandled 0x47 bits %04x\n", m_value0);
+			hack_47_value = m_value0;
+
+			//hack_47_value = ((m_value0 & 0x0700)>>8) * 0x19;
+			//hack_47_value +=((m_value0 & 0x0007)>>0) * 0x05;
+			if (m_value0 & 0xf0f0) printf("unhandled 0x47 bits %04x\n", m_value0);
 
 			//printf("0x47 value was %04x - using %04x\n", m_value0, hack_47_value);
 
@@ -828,14 +831,27 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 			printf("%08x: %02x %04x (GFX OFF PART 2)\n",pc, m_ddp3lastcommand, m_value0);
 
 			//printf("which %04x\n", m_value0);
+			if (m_value0 & 0xfff0) printf("unhandled 0x52 bits %04x\n", m_value0);
+
+			// it writes a value of 0x0000 then expects to read back like
+			// this for the lower part of the game backgrounds
+			if (m_value0==0x0000)
+			{
+				int val = ((hack_47_value & 0x0f00)>>8) * 0x19;
+				m_valueresponse = 0x00740000 | (val & 0xffff);
+			}
+			else
+			{
+
+				int val = ((hack_47_value & 0x0f00)>>8) * 0x19;
+				val +=((hack_47_value & 0x000f)>>0) * 0x05;
+				val += m_value0 & 0x000f;
+				m_valueresponse = 0x00740000 | (val & 0xffff);
+
+			}
+
+
 			
-			hack_47_value += m_value0 & 0x0007;
-
-			//printf("0x52 - adding %04x value is now %04x\n", m_value0, hack_47_value);
-
-			if (m_value0 & 0xfff8) printf("unhandled 0x52 bits %04x\n", m_value0);
-
-			m_valueresponse = 0x00740000 | (hack_47_value & 0xffff);
 		break;
 
 
