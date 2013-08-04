@@ -406,8 +406,8 @@ void jaguar_state::machine_reset()
 	dsp_resume();
 
 	/* halt the CPUs */
-	jaguargpu_ctrl_w(m_gpu, G_CTRL, 0, 0xffffffff);
-	jaguardsp_ctrl_w(m_dsp, D_CTRL, 0, 0xffffffff);
+	m_gpu->ctrl_w(m_gpu->space(AS_PROGRAM), G_CTRL, 0, 0xffffffff);
+	m_dsp->ctrl_w(m_dsp->space(AS_PROGRAM), D_CTRL, 0, 0xffffffff);
 
 	/* set blitter idle flag */
 	m_blitter_status = 1;
@@ -567,8 +567,8 @@ WRITE32_MEMBER(jaguar_state::misc_control_w)
 		dsp_resume();
 
 		/* halt the CPUs */
-		jaguargpu_ctrl_w(m_gpu, G_CTRL, 0, 0xffffffff);
-		jaguardsp_ctrl_w(m_dsp, D_CTRL, 0, 0xffffffff);
+		m_gpu->ctrl_w(space, G_CTRL, 0, 0xffffffff);
+		m_dsp->ctrl_w(space, D_CTRL, 0, 0xffffffff);
 	}
 
 	/* adjust banking */
@@ -590,13 +590,13 @@ WRITE32_MEMBER(jaguar_state::misc_control_w)
 
 READ32_MEMBER(jaguar_state::gpuctrl_r)
 {
-	return jaguargpu_ctrl_r(m_gpu, offset);
+	return m_gpu->ctrl_r(space, offset);
 }
 
 
 WRITE32_MEMBER(jaguar_state::gpuctrl_w)
 {
-	jaguargpu_ctrl_w(m_gpu, offset, data, mem_mask);
+	m_gpu->ctrl_w(space, offset, data, mem_mask);
 }
 
 
@@ -609,13 +609,13 @@ WRITE32_MEMBER(jaguar_state::gpuctrl_w)
 
 READ32_MEMBER(jaguar_state::dspctrl_r)
 {
-	return jaguardsp_ctrl_r(m_dsp, offset);
+	return m_dsp->ctrl_r(space, offset);
 }
 
 
 WRITE32_MEMBER(jaguar_state::dspctrl_w)
 {
-	jaguardsp_ctrl_w(m_dsp, offset, data, mem_mask);
+	m_dsp->ctrl_w(space, offset, data, mem_mask);
 }
 
 

@@ -62,8 +62,8 @@ public:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
-	required_device<jaguargpu_device> m_gpu;
-	required_device<jaguardsp_device> m_dsp;
+	required_device<jaguargpu_cpu_device> m_gpu;
+	required_device<jaguardsp_cpu_device> m_dsp;
 	required_device<dac_device> m_dac1;
 	required_device<dac_device> m_dac2;
 
