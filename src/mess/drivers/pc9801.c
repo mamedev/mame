@@ -94,6 +94,7 @@
     - Quarth: should do a split screen effect, it doesn't hence there are broken gfxs
  	- Princess Maker 2: mouse is buggy;
     - Princess Maker 2: screen transitions are very ugly (btanb?)
+ 	- Puyo Puyo: beeps out when it's supposed to play samples, Not supposed to use ADPCM, is it a PIT issue?
  	- Puzznic: trips illegal irq 0x41 (?), prints an error on screen. (PC-9801RS only, writes an 1 to 0x69d2f for whatever reason, almost surely a btanb)
  	- Runner's High: wrong double height on the title screen;
  	- Sokoban Perfect: hangs at title screen, after loading the menu;
