@@ -1065,10 +1065,6 @@ WRITE16_MEMBER( st_state::blitter_ctrl_w )
 //  VIDEO
 //**************************************************************************
 
-//-------------------------------------------------
-//  VIDEO_START( st )
-//-------------------------------------------------
-
 void st_state::video_start()
 {
 	m_shifter_timer = timer_alloc(TIMER_SHIFTER_TICK);
@@ -1115,10 +1111,6 @@ void st_state::video_start()
 }
 
 
-//-------------------------------------------------
-//  VIDEO_START( ste )
-//-------------------------------------------------
-
 void ste_state::video_start()
 {
 	st_state::video_start();
@@ -1127,10 +1119,6 @@ void ste_state::video_start()
 	save_item(NAME(m_shifter_lineofs));
 	save_item(NAME(m_shifter_pixelofs));
 }
-
-//-------------------------------------------------
-//  VIDEO_START( stbook )
-//-------------------------------------------------
 
 void stbook_state::video_start()
 {

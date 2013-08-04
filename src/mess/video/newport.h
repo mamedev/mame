@@ -6,7 +6,6 @@
 #ifndef __VIDHRDW_NEWPORT__
 #define __VIDHRDW_NEWPORT__
 
-extern VIDEO_START( newport );
 extern SCREEN_UPDATE_RGB32( newport );
 
 struct VC2_t

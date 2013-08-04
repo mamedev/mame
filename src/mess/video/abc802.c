@@ -202,10 +202,6 @@ static MC6845_INTERFACE( crtc_intf )
 };
 
 
-//-------------------------------------------------
-//  VIDEO_START( abc802 )
-//-------------------------------------------------
-
 void abc802_state::video_start()
 {
 	// register for state saving

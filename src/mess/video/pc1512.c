@@ -541,10 +541,6 @@ static MC6845_INTERFACE( crtc_intf )
 };
 
 
-//-------------------------------------------------
-//  VIDEO_START( pc1512 )
-//-------------------------------------------------
-
 void pc1512_state::video_start()
 {
 	// allocate memory

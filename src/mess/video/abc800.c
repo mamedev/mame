@@ -120,10 +120,6 @@ void abc800c_state::hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 }
 
 
-//-------------------------------------------------
-//  VIDEO_START( abc800 )
-//-------------------------------------------------
-
 void abc800_state::video_start()
 {
 	// register for state saving

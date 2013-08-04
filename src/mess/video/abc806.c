@@ -455,10 +455,6 @@ void abc806_state::hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 }
 
 
-//-------------------------------------------------
-//  VIDEO_START( abc806 )
-//-------------------------------------------------
-
 void abc806_state::video_start()
 {
 	// initialize variables

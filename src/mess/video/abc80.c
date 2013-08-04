@@ -158,10 +158,6 @@ void abc80_state::update_screen(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 }
 
 
-//-------------------------------------------------
-//  VIDEO_START( abc80 )
-//-------------------------------------------------
-
 void abc80_state::video_start()
 {
 	screen_device *screen = machine().device<screen_device>(SCREEN_TAG);

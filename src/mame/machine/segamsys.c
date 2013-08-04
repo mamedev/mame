@@ -1188,11 +1188,6 @@ SCREEN_VBLANK(sms)
 }
 
 
-VIDEO_START(sms)
-{
-}
-
-
 static MACHINE_RESET(sms)
 {
 	md_sms_vdp->sms_scanline_timer->adjust(attotime::zero);
@@ -1738,8 +1733,6 @@ MACHINE_CONFIG_START( sms, driver_device )
 	MCFG_SCREEN_VBLANK_STATIC(sms) /* Used to Sync the timing */
 
 	MCFG_PALETTE_LENGTH(0x200)
-
-	MCFG_VIDEO_START(sms)
 
 	MCFG_NVRAM_HANDLER( sms )
 

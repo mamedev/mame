@@ -2097,10 +2097,6 @@ static void register_vblank_callback(device_t *device)
 			FUNC(vblank_state_changed),device) );
 }
 
-VIDEO_START( apollo_screen )
-{
-}
-
 SCREEN_UPDATE_RGB32( apollo_screen )
 {
 	// FIXME: omit using APOLLO_SCREEN_TAG
@@ -2122,7 +2118,6 @@ MACHINE_CONFIG_FRAGMENT( apollo_graphics )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(657))
 	MCFG_SCREEN_SIZE(1024, 800)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1023, 0, 799)
-	MCFG_VIDEO_START(apollo_screen)
 	MCFG_SCREEN_UPDATE_STATIC(apollo_screen)
 	MACHINE_CONFIG_END
 
@@ -2205,7 +2200,6 @@ MACHINE_CONFIG_FRAGMENT( apollo_mono19i )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(616))
 	MCFG_SCREEN_SIZE(1280, 1024)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1279, 0, 1023)
-	MCFG_VIDEO_START(apollo_screen)
 	MCFG_SCREEN_UPDATE_STATIC(apollo_screen)
 	MACHINE_CONFIG_END
 
