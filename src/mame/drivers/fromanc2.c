@@ -491,7 +491,7 @@ MACHINE_START_MEMBER(fromanc2_state,fromanc4)
 	save_item(NAME(m_datalatch_2h));
 	save_item(NAME(m_datalatch_2l));
 
-	/* video-related elements are saved in VIDEO_START */
+	/* video-related elements are saved in video_start */
 }
 
 MACHINE_START_MEMBER(fromanc2_state,fromanc2)

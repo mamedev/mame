@@ -610,7 +610,7 @@ MACHINE_START_MEMBER(pipedrm_state,pipedrm)
 	save_item(NAME(m_pending_command));
 	save_item(NAME(m_sound_command));
 
-	/* video-related elements are saved in VIDEO_START */
+	/* video-related elements are saved in video_start */
 }
 
 MACHINE_RESET_MEMBER(pipedrm_state,pipedrm)

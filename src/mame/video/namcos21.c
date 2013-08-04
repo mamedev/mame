@@ -124,7 +124,7 @@ VIDEO_START_MEMBER(namcos21_state,namcos21)
 		0,      /* gfx bank */
 		0xf,    /* reverse palette mapping */
 		namcos2_shared_state::c355_obj_code2tile_delegate() );
-} /* VIDEO_START( namcos21 ) */
+}
 
 static void
 update_palette( running_machine &machine )

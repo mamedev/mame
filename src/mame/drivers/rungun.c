@@ -328,7 +328,7 @@ static const k053247_interface rng_k055673_intf =
 	"gfx2", 1,
 	K055673_LAYOUT_RNG,
 	-8, 15,
-	KONAMI_ROM_DEINTERLEAVE_NONE,   // there is some interleave in VIDEO_START...
+	KONAMI_ROM_DEINTERLEAVE_NONE,   // there is some interleave in video_start...
 	rng_sprite_callback
 };
 

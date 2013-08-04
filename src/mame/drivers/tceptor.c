@@ -317,7 +317,7 @@ static const gfx_layout tile_layout =
 static GFXDECODE_START( tceptor )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_layout,     0,  256 )
 
-	/* decode in VIDEO_START */
+	/* decode in video_start */
 	//GFXDECODE_ENTRY( "gfx2", 0, bg_layout,    2048,   64 )
 	//GFXDECODE_ENTRY( "gfx3", 0, spr16_layout, 1024,   64 )
 	//GFXDECODE_ENTRY( "gfx4", 0, spr32_layout, 1024,   64 )

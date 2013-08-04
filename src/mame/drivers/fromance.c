@@ -960,7 +960,7 @@ MACHINE_START_MEMBER(fromance_state,fromance)
 	save_item(NAME(m_adpcm_data));
 	save_item(NAME(m_vclk_left));
 
-	/* video-related elements are saved in VIDEO_START */
+	/* video-related elements are saved in video_start */
 }
 
 MACHINE_RESET_MEMBER(fromance_state,fromance)

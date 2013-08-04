@@ -608,7 +608,7 @@ void rmnimbus_state::video_start()
 {
 	m_debug_video=0;
 
-	logerror("VIDEO_START\n");
+	logerror("video_start\n");
 
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{

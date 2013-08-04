@@ -142,7 +142,7 @@ public:
 	int          m_sample_select1;
 	int          m_sample_select2;
 
-	/* video config (never changed after VIDEO_START) */
+	/* video config (never changed after video_start) */
 	const struct CPS1config *m_game_config;
 	int          m_scroll_size;
 	int          m_obj_size;

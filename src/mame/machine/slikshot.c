@@ -512,13 +512,6 @@ WRITE8_MEMBER(itech8_state::slikshot_z80_control_w )
 
 
 
-/*************************************
- *
- *  VIDEO_START( slikshot )
- *
- *************************************/
-
-
 VIDEO_START_MEMBER(itech8_state,slikshot)
 {
 	itech8_state::video_start();

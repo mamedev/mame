@@ -497,7 +497,7 @@ void _2mindril_state::tile_decode()
 
 	    Most (all?) games with 5bpp tiles have the sixth bit set. Also, in Arabian Magic
 	    sprites 1200-120f contain 6bpp data which is probably bogus.
-	    VIDEO_START( f3 ) clears the fifth and sixth bit of the decoded graphics according
+	    video_start clears the fifth and sixth bit of the decoded graphics according
 	    to the bit depth specified in f3_config_table.
 
 	*/

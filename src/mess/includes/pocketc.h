@@ -11,7 +11,6 @@
 /*----------- defined in video/pocketc.c -----------*/
 
 extern PALETTE_INIT( pocketc );
-extern VIDEO_START( pocketc );
 
 extern const unsigned short pocketc_colortable[8][2];
 

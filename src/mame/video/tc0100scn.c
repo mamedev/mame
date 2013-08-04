@@ -258,7 +258,7 @@ void tc0100scn_device::device_start()
 	set_layer_ptrs();
 
 	set_colbanks(0, 0, 0);  /* standard values, only Wgp & multiscreen games change them */
-									/* we call this here, so that they can be modified at VIDEO_START*/
+									/* we call this here, so that they can be modified at video_start*/
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
 	machine().gfx[m_txnum] = auto_alloc_clear(machine(), gfx_element(machine(), tc0100scn_charlayout, (UINT8 *)m_char_ram, 64, 0));

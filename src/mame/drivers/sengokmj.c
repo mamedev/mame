@@ -278,12 +278,6 @@ void sengokmj_state::draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 	}
 }
 
-/***********************************
-*
-* VIDEO_START/VIDEO_UPDATE functions
-*
-***********************************/
-
 void sengokmj_state::video_start()
 {
 	m_sc0_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sengokmj_state::seibucrtc_sc0_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
