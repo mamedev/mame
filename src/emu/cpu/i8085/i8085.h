@@ -115,8 +115,6 @@ private:
 
 	UINT8               m_ietemp;         /* import/export temp space */
 
-	//device_irq_acknowledge_callback m_irq_callback;
-	//legacy_cpu_device *m_device;
 	address_space *m_program;
 	direct_read_data *m_direct;
 	address_space *m_io;
