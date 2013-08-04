@@ -10223,19 +10223,18 @@ other two disks
 		</part>
 	</software>
 
-<!-- Note: order is trusted -->
 	<software name="okumanc2">
 		<description>Okuman Chouja 2</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="0x138fb0">
-				<rom name="okum2sce.d88" size="0x138fb0" crc="33b460bb" sha1="60caeef6c1fcede7034383555a9ef362e346b3a4" offset="0" />
+				<rom name="okum2sys.d88" size="0x138fb0" crc="33b460bb" sha1="60caeef6c1fcede7034383555a9ef362e346b3a4" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="0x138fb0">
-				<rom name="okum2sys.d88" size="0x138fb0" crc="adfee121" sha1="8636d4415418010e4886de53f3501123082ac38b" offset="0" />
+				<rom name="okum2sce.d88" size="0x138fb0" crc="adfee121" sha1="8636d4415418010e4886de53f3501123082ac38b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
