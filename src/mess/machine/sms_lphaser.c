@@ -22,10 +22,10 @@ const device_type SMS_LIGHT_PHASER = &device_creator<sms_light_phaser_device>;
 #define LGUN_X_INTERVAL       4
 
 
-INPUT_CHANGED_MEMBER( sms_light_phaser_device::th_pin_w )
+CUSTOM_INPUT_MEMBER( sms_light_phaser_device::th_pin_r )
 {
-	if (newval != oldval)
-		m_port->th_pin_w(newval);
+	// The returned value is inverted due to IP_ACTIVE_LOW mapping.
+	return ~m_sensor_last_state;
 }
 
 
@@ -39,11 +39,11 @@ INPUT_CHANGED_MEMBER( sms_light_phaser_device::position_changed )
 static INPUT_PORTS_START( sms_light_phaser )
 	PORT_START("CTRL_PORT")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) // TL (trigger)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CHANGED_MEMBER(DEVICE_SELF, sms_light_phaser_device, th_pin_w, 0)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, sms_light_phaser_device, th_pin_r, NULL)
 	PORT_BIT( 0x9f, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("LPHASER_X")
-	PORT_BIT( 0xff, 0x00, IPT_LIGHTGUN_X) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(15)  PORT_CHANGED_MEMBER(DEVICE_SELF, sms_light_phaser_device, position_changed, 0)
+	PORT_BIT( 0xff, 0x00, IPT_LIGHTGUN_X) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_CHANGED_MEMBER(DEVICE_SELF, sms_light_phaser_device, position_changed, 0)
 
 	PORT_START("LPHASER_Y")
 	PORT_BIT( 0xff, 0x00, IPT_LIGHTGUN_Y) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_CHANGED_MEMBER(DEVICE_SELF, sms_light_phaser_device, position_changed, 0)
@@ -86,8 +86,14 @@ sms_light_phaser_device::sms_light_phaser_device(const machine_config &mconfig, 
 
 void sms_light_phaser_device::device_start()
 {
+	save_item(NAME(m_sensor_last_state));
 	m_lphaser_timer = timer_alloc(TIMER_LPHASER);
-	m_last_state = 1;
+}
+
+
+void sms_light_phaser_device::device_reset()
+{
+	m_sensor_last_state = 1;  // off (1)
 }
 
 
@@ -185,23 +191,20 @@ int sms_light_phaser_device::bright_aim_area( emu_timer *timer, int lgun_x, int 
 			pos_changed = 1;
 		}
 
-		if (!pos_changed)
+		if (pos_changed)
+			break;
+
+		if (m_sensor_last_state == 0) /* sensor is on */
+		{
+			/* keep sensor on until out of the aim area */
+			result = 0;
+		}
+		else
 		{
 			rgb_t color;
 			UINT8 brightness;
 			/* brightness of the lightgray color in the frame drawn by Light Phaser games */
 			const UINT8 sensor_min_brightness = 0x7f;
-
-			if (m_last_state == 0) /* sensor is on */
-			{
-				/* keep sensor on until out of the aim area */
-				result = 0;
-				/* Set next check for when sensor will be off */
-				beam_x = lgun_x + dx_radius + 1;
-				if (beam_x > visarea.max_x)
-					beam_x = visarea.max_x + 1;
-				break;
-			}
 
 			color = m_port->pixel_r();
 
@@ -210,13 +213,22 @@ int sms_light_phaser_device::bright_aim_area( emu_timer *timer, int lgun_x, int 
 			//printf ("color brightness: %2X for x %d y %d\n", brightness, beam_x, beam_y);
 
 			result = (brightness >= sensor_min_brightness) ? 0 : 1;
+		}
 
-			/* next check at same line */
+		if (result == 0)
+		{
+			/* Set next check for when sensor will be off */
+			beam_x = lgun_x + dx_radius + 1;
+			if (beam_x > visarea.max_x)
+				beam_x = visarea.max_x + 1;
+			break;
+		}
+		else
+		{
+			/* Next check after the minimum interval */
 			beam_x += LGUN_X_INTERVAL;
 			pos_changed = 1;
 		}
-		else
-			break;
 	}
 	timer->adjust(m_screen->time_until_pos(beam_y, beam_x));
 
@@ -242,16 +254,16 @@ UINT16 sms_light_phaser_device::screen_vpos_nonscaled(int scaled_vpos)
 
 void sms_light_phaser_device::sensor_check()
 {
-	int new_state;
+	int sensor_new_state;
 
 	const int x = screen_hpos_nonscaled(m_lphaser_x->read());
 	const int y = screen_vpos_nonscaled(m_lphaser_y->read());
 
-	new_state = bright_aim_area(m_lphaser_timer, x, y);
-	if (new_state != m_last_state)
+	sensor_new_state = bright_aim_area(m_lphaser_timer, x, y);
+	if (sensor_new_state != m_sensor_last_state)
 	{
-		m_port->th_pin_w(new_state);
-		m_last_state = new_state;
+		m_port->th_pin_w(sensor_new_state);
+		m_sensor_last_state = sensor_new_state;
 	}
 }
 

@@ -34,8 +34,8 @@ public:
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const;
 
-	CUSTOM_INPUT_MEMBER( dir_pins_r );
-	CUSTOM_INPUT_MEMBER( tr_pin_r );
+	DECLARE_CUSTOM_INPUT_MEMBER( dir_pins_r );
+	DECLARE_CUSTOM_INPUT_MEMBER( tr_pin_r );
 
 protected:
 	// device-level overrides

@@ -21,7 +21,7 @@ const device_type SMS_SPORTS_PAD = &device_creator<sms_sports_pad_device>;
 #define SPORTS_PAD_INTERVAL attotime::from_hz(XTAL_53_693175MHz/15/512)
 
 
-DECLARE_CUSTOM_INPUT_MEMBER( sms_sports_pad_device::dir_pins_r )
+CUSTOM_INPUT_MEMBER( sms_sports_pad_device::dir_pins_r )
 {
 	UINT8 data = 0xff;
 
@@ -41,18 +41,18 @@ DECLARE_CUSTOM_INPUT_MEMBER( sms_sports_pad_device::dir_pins_r )
 		break;
 	}
 
-	// Return the inverted value for the PORT_BIT mapping.
+	// The returned value is inverted due to IP_ACTIVE_LOW mapping.
 	return ~(data & 0x0f);
 }
 
 
-DECLARE_CUSTOM_INPUT_MEMBER( sms_sports_pad_device::th_pin_r )
+CUSTOM_INPUT_MEMBER( sms_sports_pad_device::th_pin_r )
 {
 	return m_sports_pad_last_data;
 }
 
 
-DECLARE_INPUT_CHANGED_MEMBER( sms_sports_pad_device::th_pin_w )
+INPUT_CHANGED_MEMBER( sms_sports_pad_device::th_pin_w )
 {
 	attotime cur_time = machine().time();
 
@@ -74,7 +74,7 @@ static INPUT_PORTS_START( sms_sports_pad )
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, sms_sports_pad_device, dir_pins_r, NULL) // Directional pins
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED ) // Vcc
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) // TL (Button 1)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CUSTOM_MEMBER(DEVICE_SELF, sms_sports_pad_device, th_pin_r, NULL)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, sms_sports_pad_device, th_pin_r, NULL)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) // TR (Button 2)
 
 	PORT_START("SPORTS_OUT")

@@ -965,6 +965,20 @@ VIDEO_START_MEMBER(sms_state,sms1)
 }
 
 
+VIDEO_RESET_MEMBER(sms_state,sms1)
+{
+	if (m_port_scope->read())
+	{
+		UINT8 sscope_binocular_hack = ioport("SSCOPE_BINOCULAR")->read();
+
+		if (sscope_binocular_hack & 0x01)
+			m_prevleft_bitmap.fill(RGB_BLACK);
+		if (sscope_binocular_hack & 0x02)
+			m_prevright_bitmap.fill(RGB_BLACK);
+	}
+}
+
+
 READ32_MEMBER(sms_state::sms_pixel_color)
 {
 	bitmap_rgb32 &vdp_bitmap = m_vdp->get_bitmap();
@@ -999,7 +1013,7 @@ UINT32 sms_state::screen_update_sms1(screen_device &screen, bitmap_rgb32 &bitmap
 
 	if (&screen != m_main_scr)
 	{
-		sscope = m_port_scope->read_safe(0x00);
+		sscope = m_port_scope->read();
 		if (!sscope)
 		{
 			// without SegaScope, both LCDs for glasses go black
@@ -1088,11 +1102,22 @@ UINT32 sms_state::screen_update_gamegear(screen_device &screen, bitmap_rgb32 &bi
 {
 	int x, y;
 	bitmap_rgb32 &vdp_bitmap = m_vdp->get_bitmap();
+	static bool prev_bitmap_copied = false;
 
 	if (!m_port_persist->read())
 	{
 		copybitmap(bitmap, vdp_bitmap, 0, 0, 0, 0, cliprect);
+		if (prev_bitmap_copied)
+		{
+			m_prev_bitmap.fill(RGB_BLACK);
+			prev_bitmap_copied = false;
+		}
+	}
+	else if (!prev_bitmap_copied)
+	{
+		copybitmap(bitmap, vdp_bitmap, 0, 0, 0, 0, cliprect);
 		copybitmap(m_prev_bitmap, vdp_bitmap, 0, 0, 0, 0, cliprect);
+		prev_bitmap_copied = true;
 	}
 	else
 	{

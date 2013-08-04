@@ -34,8 +34,8 @@ public:
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const;
 
-	WRITE_LINE_MEMBER(th_pin_w);
-	READ32_MEMBER(pixel_r);
+	DECLARE_WRITE_LINE_MEMBER(th_pin_w);
+	DECLARE_READ32_MEMBER(pixel_r);
 
 protected:
 	// device-level overrides

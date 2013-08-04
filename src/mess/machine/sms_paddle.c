@@ -21,21 +21,21 @@ const device_type SMS_PADDLE = &device_creator<sms_paddle_device>;
 #define PADDLE_INTERVAL attotime::from_hz(XTAL_53_693175MHz/15/256)
 
 
-DECLARE_CUSTOM_INPUT_MEMBER( sms_paddle_device::dir_pins_r )
+CUSTOM_INPUT_MEMBER( sms_paddle_device::dir_pins_r )
 {
 	UINT8 data = m_paddle_x->read();
 
 	if (m_paddle_read_state)
 		data >>= 4;
 
-	// Return the inverted value for the PORT_BIT mapping.
+	// The returned value is inverted due to IP_ACTIVE_LOW mapping.
 	return ~data;
 }
 
 
-DECLARE_CUSTOM_INPUT_MEMBER( sms_paddle_device::tr_pin_r )
+CUSTOM_INPUT_MEMBER( sms_paddle_device::tr_pin_r )
 {
-	// Return the inverted value for the PORT_BIT mapping.
+	// The returned value is inverted due to IP_ACTIVE_LOW mapping.
 	return ~m_paddle_read_state;
 }
 

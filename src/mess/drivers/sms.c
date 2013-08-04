@@ -567,6 +567,7 @@ static MACHINE_CONFIG_DERIVED( sms1_ntsc, sms_ntsc_base )
 	MCFG_PALETTE_INIT(sega315_5124)
 
 	MCFG_VIDEO_START_OVERRIDE(sms_state,sms1)
+	MCFG_VIDEO_RESET_OVERRIDE(sms_state,sms1)
 
 	MCFG_SEGA315_5124_ADD("sms_vdp", _315_5124_ntsc_intf)
 	MCFG_SEGA315_5124_SET_SCREEN("screen")
@@ -735,6 +736,7 @@ static MACHINE_CONFIG_DERIVED( sms1_pal, sms_pal_base )
 	MCFG_PALETTE_INIT(sega315_5124)
 
 	MCFG_VIDEO_START_OVERRIDE(sms_state,sms1)
+	MCFG_VIDEO_RESET_OVERRIDE(sms_state,sms1)
 
 	MCFG_SEGA315_5124_ADD("sms_vdp", _315_5124_pal_intf)
 	MCFG_SEGA315_5124_SET_SCREEN("screen")
