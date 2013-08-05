@@ -62,6 +62,7 @@
     - Mobile Suit Gundam - Advanced Operation: error: Device 5.25" high density floppy drive load failed: Unable to identify the image format [for msdos.fdi]
 
     List of per-game TODO:
+    - 38 Man Kilo no Kokuu: doesn't seem possible to skip the intro?
     - 4D Boxing: inputs are unresponsive
     - A Ressha de Ikou 2: missing text (PC-9801RS only);
     - Absolutely Mahjong: Transitions are too fast.
