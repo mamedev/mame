@@ -120,7 +120,7 @@ TIMER_CALLBACK_MEMBER(boxer_state::periodic_callback)
 
 		for (i = 1; i < 256; i++)
 			if (mask[i] != 0)
-				timer_set(machine().primary_screen->time_until_pos(i), TIMER_POT_INTERRUPT, mask[i]);
+				timer_set(m_screen->time_until_pos(i), TIMER_POT_INTERRUPT, mask[i]);
 
 		m_pot_state = 0;
 	}
@@ -130,7 +130,7 @@ TIMER_CALLBACK_MEMBER(boxer_state::periodic_callback)
 	if (scanline >= 262)
 		scanline = 0;
 
-	timer_set(machine().primary_screen->time_until_pos(scanline), TIMER_PERIODIC, scanline);
+	timer_set(m_screen->time_until_pos(scanline), TIMER_PERIODIC, scanline);
 }
 
 
@@ -233,7 +233,7 @@ READ8_MEMBER(boxer_state::boxer_input_r)
 {
 	UINT8 val = ioport("IN0")->read();
 
-	if (ioport("IN3")->read() < machine().primary_screen->vpos())
+	if (ioport("IN3")->read() < m_screen->vpos())
 		val |= 0x02;
 
 	return (val << ((offset & 7) ^ 7)) & 0x80;
@@ -251,7 +251,7 @@ READ8_MEMBER(boxer_state::boxer_misc_r)
 		break;
 
 	case 1:
-		val = machine().primary_screen->vpos();
+		val = m_screen->vpos();
 		break;
 
 	case 2:
@@ -458,7 +458,7 @@ void boxer_state::machine_start()
 
 void boxer_state::machine_reset()
 {
-	timer_set(machine().primary_screen->time_until_pos(0), TIMER_PERIODIC);
+	timer_set(m_screen->time_until_pos(0), TIMER_PERIODIC);
 
 	m_pot_state = 0;
 	m_pot_latch = 0;

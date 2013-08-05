@@ -636,7 +636,7 @@ VIDEO_START_MEMBER(taito_f3_state,f3)
 	m_pixel_layer = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(taito_f3_state::get_tile_info_pixel),this),TILEMAP_SCAN_COLS,8,8,64,32);
 	m_pf_line_inf = auto_alloc_array(machine(), struct f3_playfield_line_inf, 5);
 	m_sa_line_inf = auto_alloc_array(machine(), struct f3_spritealpha_line_inf, 1);
-	machine().primary_screen->register_screen_bitmap(m_pri_alp_bitmap);
+	m_screen->register_screen_bitmap(m_pri_alp_bitmap);
 	m_tile_opaque_sp = auto_alloc_array(machine(), UINT8, machine().gfx[2]->elements());
 	for (i=0; i<8; i++)
 		m_tile_opaque_pf[i] = auto_alloc_array(machine(), UINT8, machine().gfx[1]->elements());

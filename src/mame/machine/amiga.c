@@ -298,7 +298,7 @@ MACHINE_RESET_MEMBER(amiga_state,amiga)
 		(*m_intf->reset_callback)(machine());
 
 	/* start the scanline timer */
-	timer_set(machine().primary_screen->time_until_pos(0), TIMER_SCANLINE);
+	timer_set(m_screen->time_until_pos(0), TIMER_SCANLINE);
 }
 
 
@@ -352,7 +352,7 @@ TIMER_CALLBACK_MEMBER(amiga_state::scanline_callback)
 	mos6526_tod_w(m_cia_0, 1);
 
 	/* render up to this scanline */
-	if (!machine().primary_screen->update_partial(scanline))
+	if (!m_screen->update_partial(scanline))
 	{
 		if (IS_AGA(m_intf))
 		{
@@ -370,8 +370,8 @@ TIMER_CALLBACK_MEMBER(amiga_state::scanline_callback)
 	amiga_audio_update(m_sound_device);
 
 	/* set timer for next line */
-	scanline = (scanline + 1) % machine().primary_screen->height();
-	timer_set(machine().primary_screen->time_until_pos(scanline), TIMER_SCANLINE, scanline);
+	scanline = (scanline + 1) % m_screen->height();
+	timer_set(m_screen->time_until_pos(scanline), TIMER_SCANLINE, scanline);
 }
 
 
@@ -1189,14 +1189,14 @@ READ16_MEMBER( amiga_state::amiga_custom_r )
 
 		case REG_VPOSR:
 			CUSTOM_REG(REG_VPOSR) &= 0x7f00;
-			CUSTOM_REG(REG_VPOSR) |= amiga_gethvpos(*space.machine().primary_screen) >> 16;
-			if(CUSTOM_REG(REG_BPLCON0) & BPLCON0_LACE && space.machine().primary_screen->frame_number() & 0x1)
+			CUSTOM_REG(REG_VPOSR) |= amiga_gethvpos(*m_screen) >> 16;
+			if(CUSTOM_REG(REG_BPLCON0) & BPLCON0_LACE && m_screen->frame_number() & 0x1)
 				CUSTOM_REG(REG_VPOSR) |= 0x8000; // LOF bit
 
 			return CUSTOM_REG(REG_VPOSR);
 
 		case REG_VHPOSR:
-			return amiga_gethvpos(*space.machine().primary_screen) & 0xffff;
+			return amiga_gethvpos(*m_screen) & 0xffff;
 
 		case REG_SERDATR:
 			CUSTOM_REG(REG_SERDATR) &= ~0x4000;

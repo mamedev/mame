@@ -321,7 +321,7 @@ TILE_GET_INFO_MEMBER(mappy_state::mappy_get_tile_info)
 VIDEO_START_MEMBER(mappy_state,superpac)
 {
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(mappy_state::superpac_get_tile_info),this),tilemap_mapper_delegate(FUNC(mappy_state::superpac_tilemap_scan),this),8,8,36,28);
-	machine().primary_screen->register_screen_bitmap(m_sprite_bitmap);
+	m_screen->register_screen_bitmap(m_sprite_bitmap);
 
 	colortable_configure_tilemap_groups(machine().colortable, m_bg_tilemap, machine().gfx[0], 31);
 }

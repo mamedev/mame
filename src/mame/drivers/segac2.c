@@ -406,7 +406,7 @@ WRITE16_MEMBER(segac2_state::io_chip_w )
 			newbank = data & 3;
 			if (newbank != m_palbank)
 			{
-				//space.machine().primary_screen->update_partial(space.machine().primary_screen->vpos() + 1);
+				//m_screen->update_partial(m_screen->vpos() + 1);
 				m_palbank = newbank;
 				recompute_palette_tables();
 			}
@@ -505,11 +505,11 @@ WRITE16_MEMBER(segac2_state::prot_w )
 	/* if the palette changed, force an update */
 	if (new_sp_palbase != m_sp_palbase || new_bg_palbase != m_bg_palbase)
 	{
-		//space.machine().primary_screen->update_partial(space.machine().primary_screen->vpos() + 1);
+		//m_screen->update_partial(m_screen->vpos() + 1);
 		m_sp_palbase = new_sp_palbase;
 		m_bg_palbase = new_bg_palbase;
 		recompute_palette_tables();
-		if (LOG_PALETTE) logerror("Set palbank: %d/%d (scan=%d)\n", m_bg_palbase, m_sp_palbase, space.machine().primary_screen->vpos());
+		if (LOG_PALETTE) logerror("Set palbank: %d/%d (scan=%d)\n", m_bg_palbase, m_sp_palbase, m_screen->vpos());
 	}
 }
 

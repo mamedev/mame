@@ -670,7 +670,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(konamigx_state::konamigx_hbinterrupt)
 
 		// maybe this interrupt should only be every 30fps, or maybe there are flags to prevent the game running too fast
 		// the real hardware should output the display for each screen on alternate frames
-		//  if(device->machine().primary_screen->frame_number() & 1)
+		//  if(device->m_screen->frame_number() & 1)
 		if (1) // gx_syncen & 0x20)
 		{
 			gx_syncen &= ~0x20;

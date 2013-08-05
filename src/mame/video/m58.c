@@ -173,9 +173,9 @@ TILEMAP_MAPPER_MEMBER(m58_state::yard_tilemap_scan_rows)
 
 void m58_state::video_start()
 {
-	int width = machine().primary_screen->width();
-	int height = machine().primary_screen->height();
-	const rectangle &visarea = machine().primary_screen->visible_area();
+	int width = m_screen->width();
+	int height = m_screen->height();
+	const rectangle &visarea = m_screen->visible_area();
 
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(m58_state::yard_get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(m58_state::yard_tilemap_scan_rows),this),  8, 8, 64, 32);
 	m_bg_tilemap->set_scrolldx(visarea.min_x, width - (visarea.max_x + 1));
@@ -214,7 +214,7 @@ WRITE8_MEMBER(m58_state::yard_flipscreen_w)
 void m58_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	int offs;
-	const rectangle &visarea = machine().primary_screen->visible_area();
+	const rectangle &visarea = m_screen->visible_area();
 
 	for (offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
@@ -272,7 +272,7 @@ void m58_state::draw_panel( bitmap_ind16 &bitmap, const rectangle &cliprect )
 		const rectangle clippanel(26*8, 32*8-1, 1*8, 31*8-1);
 		const rectangle clippanelflip(0*8, 6*8-1, 1*8, 31*8-1);
 		rectangle clip = flip_screen() ? clippanelflip : clippanel;
-		const rectangle &visarea = machine().primary_screen->visible_area();
+		const rectangle &visarea = m_screen->visible_area();
 		int sx = flip_screen() ? cliprect.min_x - 8 : cliprect.max_x + 1 - SCROLL_PANEL_WIDTH;
 		int yoffs = flip_screen() ? -40 : -16;
 

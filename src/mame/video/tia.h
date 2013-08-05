@@ -49,6 +49,7 @@ struct tia_interface {
 // ======================> tia_video_device
 
 class tia_video_device :    public device_t,
+							public device_video_interface,
 							public tia_interface
 {
 public:

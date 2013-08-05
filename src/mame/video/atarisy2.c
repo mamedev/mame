@@ -110,7 +110,7 @@ WRITE16_MEMBER( atarisy2_state::xscroll_w )
 
 	/* if anything has changed, force a partial update */
 	if (newscroll != oldscroll)
-		space.machine().primary_screen->update_partial(space.machine().primary_screen->vpos());
+		m_screen->update_partial(m_screen->vpos());
 
 	/* update the playfield scrolling - hscroll is clocked on the following scanline */
 	m_playfield_tilemap->set_scrollx(0, newscroll >> 6);
@@ -141,13 +141,13 @@ WRITE16_MEMBER( atarisy2_state::yscroll_w )
 
 	/* if anything has changed, force a partial update */
 	if (newscroll != oldscroll)
-		space.machine().primary_screen->update_partial(space.machine().primary_screen->vpos());
+		m_screen->update_partial(m_screen->vpos());
 
 	/* if bit 4 is zero, the scroll value is clocked in right away */
 	if (!(newscroll & 0x10))
-		m_playfield_tilemap->set_scrolly(0, (newscroll >> 6) - space.machine().primary_screen->vpos());
+		m_playfield_tilemap->set_scrolly(0, (newscroll >> 6) - m_screen->vpos());
 	else
-		m_yscroll_reset_timer->adjust(space.machine().primary_screen->time_until_pos(0), newscroll >> 6);
+		m_yscroll_reset_timer->adjust(m_screen->time_until_pos(0), newscroll >> 6);
 
 	/* update the playfield banking */
 	if (m_playfield_tile_bank[1] != (newscroll & 0x0f) * 0x400)
@@ -250,7 +250,7 @@ WRITE16_MEMBER( atarisy2_state::videoram_w )
 	{
 		/* force an update if the link of object 0 is about to change */
 		if (offs == 0x0c03)
-			space.machine().primary_screen->update_partial(machine().primary_screen->vpos());
+			m_screen->update_partial(m_screen->vpos());
 		COMBINE_DATA(&m_mob->spriteram()[offs - 0x0c00]);
 	}
 

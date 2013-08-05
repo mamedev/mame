@@ -43,7 +43,8 @@ struct n64_savable_data_t
 	UINT8 mempak[2][0x8000];
 };
 
-class n64_periphs : public device_t
+class n64_periphs : public device_t,
+					public device_video_interface
 {
 private:
 	struct AUDIO_DMA

@@ -17,9 +17,9 @@
 
 void starfire_state::video_start()
 {
-	machine().primary_screen->register_screen_bitmap(m_starfire_screen);
+	m_screen->register_screen_bitmap(m_starfire_screen);
 	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(starfire_state::starfire_scanline_callback),this));
-	m_scanline_timer->adjust(machine().primary_screen->time_until_pos(STARFIRE_VBEND), STARFIRE_VBEND);
+	m_scanline_timer->adjust(m_screen->time_until_pos(STARFIRE_VBEND), STARFIRE_VBEND);
 
 	/* register for state saving */
 	save_item(NAME(m_starfire_vidctrl));
@@ -255,7 +255,7 @@ TIMER_CALLBACK_MEMBER(starfire_state::starfire_scanline_callback)
 
 	y++;
 	if (y >= STARFIRE_VBSTART) y = STARFIRE_VBEND;
-	m_scanline_timer->adjust(machine().primary_screen->time_until_pos(y), y);
+	m_scanline_timer->adjust(m_screen->time_until_pos(y), y);
 }
 
 UINT32 starfire_state::screen_update_starfire(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

@@ -118,14 +118,14 @@ WRITE8_MEMBER( segahang_state::video_lamps_w )
 	//
 
 	// bit 7: screen flip
-	m_segaic16vid->segaic16_tilemap_set_flip(machine(), 0, data & 0x80);
+	m_segaic16vid->segaic16_tilemap_set_flip(0, data & 0x80);
 	m_sprites->set_flip(data & 0x80);
 
 	// bit 6: shadow/highlight control
 	m_shadow = ~data & 0x40;
 
 	// bit 4: enable display
-	m_segaic16vid->segaic16_set_display_enable(*m_screen, data & 0x10);
+	m_segaic16vid->segaic16_set_display_enable(data & 0x10);
 
 	// bits 2 & 3: control the lamps
 	set_led_status(machine(), 1, data & 0x08);
@@ -161,8 +161,8 @@ WRITE8_MEMBER( segahang_state::tilemap_sound_w )
 	m_soundcpu->set_input_line(INPUT_LINE_NMI, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 
 	// bits 1 & 2: tilemap origin
-	m_segaic16vid->segaic16_tilemap_set_colscroll(machine(), 0, ~data & 0x04);
-	m_segaic16vid->segaic16_tilemap_set_rowscroll(machine(), 0, ~data & 0x02);
+	m_segaic16vid->segaic16_tilemap_set_colscroll(0, ~data & 0x04);
+	m_segaic16vid->segaic16_tilemap_set_rowscroll(0, ~data & 0x02);
 
 	// bit 0: sound mute
 	machine().sound().system_enable(data & 0x01);

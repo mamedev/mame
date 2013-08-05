@@ -63,7 +63,7 @@ static void insert_coin_msg(address_space &space,UINT8 *vram)
 {
 	UINT8 * data = (UINT8 *)space.machine().root_device().memregion("blit_data")->base();
 	int credit_count = (vram[0xf] & 0xff);
-	UINT8 fl_cond = space.machine().primary_screen->frame_number() & 0x10; /* for insert coin "flickering" */
+	UINT8 fl_cond = space.machine().first_screen()->frame_number() & 0x10; /* for insert coin "flickering" */
 	UINT16 dst;
 
 	if(credit_count == 0)
@@ -84,7 +84,7 @@ static void credit_msg(address_space &space,UINT8 *vram)
 {
 	UINT8 * data = (UINT8 *)space.machine().root_device().memregion("blit_data")->base();
 	int credit_count = (vram[0xf] & 0xff);
-	UINT8 fl_cond = space.machine().primary_screen->frame_number() & 0x10; /* for insert coin "flickering" */
+	UINT8 fl_cond = space.machine().first_screen()->frame_number() & 0x10; /* for insert coin "flickering" */
 	UINT16 dst;
 
 	dst = ((data[0x023]<<8)|(data[0x024]&0xff)) & 0x3fff;

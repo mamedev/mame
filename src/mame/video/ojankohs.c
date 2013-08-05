@@ -270,7 +270,7 @@ VIDEO_START_MEMBER(ojankohs_state,ojankoy)
 
 VIDEO_START_MEMBER(ojankohs_state,ojankoc)
 {
-	machine().primary_screen->register_screen_bitmap(m_tmpbitmap);
+	m_screen->register_screen_bitmap(m_tmpbitmap);
 	m_videoram.allocate(0x8000);
 	m_paletteram.allocate(0x20);
 

@@ -157,7 +157,7 @@ READ8_MEMBER(dragrace_state::dragrace_steering_r)
 
 READ8_MEMBER(dragrace_state::dragrace_scanline_r)
 {
-	return (machine().primary_screen->vpos() ^ 0xf0) | 0x0f;
+	return (m_screen->vpos() ^ 0xf0) | 0x0f;
 }
 
 

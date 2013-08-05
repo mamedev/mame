@@ -396,23 +396,23 @@ void peplus_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 }
 
 
-static void handle_lightpen( device_t *device )
+static void handle_lightpen( mc6845_device *device )
 {
 	peplus_state *state = device->machine().driver_data<peplus_state>();
 	int x_val = device->machine().root_device().ioport("TOUCH_X")->read_safe(0x00);
 	int y_val = device->machine().root_device().ioport("TOUCH_Y")->read_safe(0x00);
-	const rectangle &vis_area = device->machine().primary_screen->visible_area();
+	const rectangle &vis_area = device->screen().visible_area();
 	int xt, yt;
 
 	xt = x_val * vis_area.width() / 1024 + vis_area.min_x;
 	yt = y_val * vis_area.height() / 1024 + vis_area.min_y;
 
-	state->timer_set(device->machine().primary_screen->time_until_pos(yt, xt), peplus_state::TIMER_ASSERT_LP, 0, device);
+	state->timer_set(device->screen().time_until_pos(yt, xt), peplus_state::TIMER_ASSERT_LP, 0, device);
 }
 
 WRITE_LINE_MEMBER(peplus_state::crtc_vsync)
 {
-	device_t *device = machine().device("crtc");
+	mc6845_device *device = machine().device<mc6845_device>("crtc");
 	m_maincpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 	handle_lightpen(device);
 }

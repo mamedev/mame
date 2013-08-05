@@ -224,7 +224,7 @@ UINT32 seabattl_state::screen_update_seabattl(screen_device &screen, bitmap_ind1
 
 void seabattl_state::video_start()
 {
-	machine().primary_screen->register_screen_bitmap(m_collision_bg);
+	m_screen->register_screen_bitmap(m_collision_bg);
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(seabattl_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_tilemap->set_transparent_pen(0);
 	m_bg_tilemap->set_scrolldx(-12, 0);
@@ -263,7 +263,7 @@ ADDRESS_MAP_END
 
 READ8_HANDLER(seabattl_state::seabattl_collision_r)
 {
-	machine().primary_screen->update_partial(machine().primary_screen->vpos());
+	m_screen->update_partial(m_screen->vpos());
 	return m_collision;
 }
 
@@ -282,14 +282,14 @@ WRITE8_MEMBER(seabattl_state::seabattl_control_w)
 
 READ8_HANDLER(seabattl_state::seabattl_collision_clear_r)
 {
-	machine().primary_screen->update_partial(machine().primary_screen->vpos());
+	m_screen->update_partial(m_screen->vpos());
 	m_collision = 0;
 	return 0;
 }
 
 WRITE8_HANDLER(seabattl_state::seabattl_collision_clear_w )
 {
-	machine().primary_screen->update_partial(machine().primary_screen->vpos());
+	m_screen->update_partial(m_screen->vpos());
 	m_collision = 0;
 }
 

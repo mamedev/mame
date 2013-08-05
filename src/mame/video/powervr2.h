@@ -5,7 +5,8 @@
 	MCFG_DEVICE_ADD(_tag, POWERVR2, 0)                                  \
 	downcast<powervr2_device *>(device)->set_irq_cb(DEVCB2_ ## _irq_cb);
 
-class powervr2_device : public device_t
+class powervr2_device : public device_t,
+						public device_video_interface
 {
 public:
 	enum { NUM_BUFFERS = 4 };

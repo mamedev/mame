@@ -32,7 +32,7 @@ void exidy_state::exidy_video_config(UINT8 _collision_mask, UINT8 _collision_inv
 
 void exidy_state::video_start()
 {
-	machine().primary_screen->register_screen_bitmap(m_background_bitmap);
+	m_screen->register_screen_bitmap(m_background_bitmap);
 	m_motion_object_1_vid.allocate(16, 16);
 	m_motion_object_2_vid.allocate(16, 16);
 	m_motion_object_2_clip.allocate(16, 16);
@@ -335,7 +335,7 @@ void exidy_state::check_collision()
 
 				/* if we got one, trigger an interrupt */
 				if ((current_collision_mask & m_collision_mask) && (count++ < 128))
-					timer_set(machine().primary_screen->time_until_pos(org_1_x + sx, org_1_y + sy), TIMER_COLLISION_IRQ, current_collision_mask);
+					timer_set(m_screen->time_until_pos(org_1_x + sx, org_1_y + sy), TIMER_COLLISION_IRQ, current_collision_mask);
 			}
 
 			if (m_motion_object_2_vid.pix16(sy, sx) != 0xff)
@@ -343,7 +343,7 @@ void exidy_state::check_collision()
 				/* check for background collision (M2CHAR) */
 				if (m_background_bitmap.pix16(org_2_y + sy, org_2_x + sx) != 0)
 					if ((m_collision_mask & 0x08) && (count++ < 128))
-						timer_set(machine().primary_screen->time_until_pos(org_2_x + sx, org_2_y + sy), TIMER_COLLISION_IRQ, 0x08);
+						timer_set(m_screen->time_until_pos(org_2_x + sx, org_2_y + sy), TIMER_COLLISION_IRQ, 0x08);
 			}
 		}
 }

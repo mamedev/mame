@@ -218,7 +218,7 @@ void firefox_state::video_start()
 {
 	m_bgtiles = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(firefox_state::bgtile_get_info),this), TILEMAP_SCAN_ROWS, 8,8, 64,64);
 	m_bgtiles->set_transparent_pen(0);
-	m_bgtiles->set_scrolldy(machine().primary_screen->visible_area().min_y, 0);
+	m_bgtiles->set_scrolldy(m_screen->visible_area().min_y, 0);
 }
 
 
@@ -259,7 +259,7 @@ UINT32 firefox_state::screen_update_firefox(screen_device &screen, bitmap_rgb32 
 
 TIMER_DEVICE_CALLBACK_MEMBER(firefox_state::video_timer_callback)
 {
-	machine().primary_screen->update_now();
+	m_screen->update_now();
 
 	m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE );
 }

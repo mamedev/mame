@@ -112,7 +112,7 @@ void airbustr_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(airbustr_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(airbustr_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
-	machine().primary_screen->register_screen_bitmap(m_sprites_bitmap);
+	m_screen->register_screen_bitmap(m_sprites_bitmap);
 	m_fg_tilemap->set_transparent_pen(0);
 
 	m_bg_tilemap->set_scrolldx(0x094, 0x06a);

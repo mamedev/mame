@@ -341,7 +341,7 @@ void n8080_state::screen_eof_helifire(screen_device &screen, bool state)
 	// falling edge
 	if (!state)
 	{
-		int n = (machine().primary_screen->frame_number() >> 1) % sizeof m_helifire_LSFR;
+		int n = (m_screen->frame_number() >> 1) % sizeof m_helifire_LSFR;
 
 		int i;
 
@@ -358,7 +358,7 @@ void n8080_state::screen_eof_helifire(screen_device &screen, bool state)
 					G |= B;
 				}
 
-				if (machine().primary_screen->frame_number() & 0x04)
+				if (m_screen->frame_number() & 0x04)
 				{
 					R |= G;
 				}

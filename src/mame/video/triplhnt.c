@@ -18,7 +18,7 @@ TILE_GET_INFO_MEMBER(triplhnt_state::get_tile_info)
 
 void triplhnt_state::video_start()
 {
-	machine().primary_screen->register_screen_bitmap(m_helper);
+	m_screen->register_screen_bitmap(m_helper);
 
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(triplhnt_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
 }
@@ -105,7 +105,7 @@ void triplhnt_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	}
 
 	if (hit_line != 999 && hit_code != 999)
-		timer_set(machine().primary_screen->time_until_pos(hit_line), TIMER_HIT, hit_code);
+		timer_set(m_screen->time_until_pos(hit_line), TIMER_HIT, hit_code);
 }
 
 

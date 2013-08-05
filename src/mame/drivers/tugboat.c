@@ -218,7 +218,7 @@ void tugboat_state::device_timer(emu_timer &timer, device_timer_id id, int param
 	{
 	case TIMER_INTERRUPT:
 		m_maincpu->set_input_line(0, HOLD_LINE);
-		timer_set(machine().primary_screen->frame_period(), TIMER_INTERRUPT);
+		timer_set(m_screen->frame_period(), TIMER_INTERRUPT);
 		break;
 	default:
 		assert_always(FALSE, "Unknown id in tugboat_state::device_timer");
@@ -227,7 +227,7 @@ void tugboat_state::device_timer(emu_timer &timer, device_timer_id id, int param
 
 void tugboat_state::machine_reset()
 {
-	timer_set(machine().primary_screen->time_until_pos(30*8+4), TIMER_INTERRUPT);
+	timer_set(m_screen->time_until_pos(30*8+4), TIMER_INTERRUPT);
 }
 
 

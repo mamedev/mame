@@ -327,7 +327,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(shadfrce_state::shadfrce_scanline)
 		{
 			m_raster_scanline = (m_raster_scanline + 1) % 240;
 			if (m_raster_scanline > 0)
-				machine().primary_screen->update_partial(m_raster_scanline - 1);
+				m_screen->update_partial(m_raster_scanline - 1);
 			m_maincpu->set_input_line(1, ASSERT_LINE);
 		}
 	}
@@ -338,7 +338,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(shadfrce_state::shadfrce_scanline)
 		if (scanline % 16 == 0)
 		{
 			if (scanline > 0)
-				machine().primary_screen->update_partial(scanline - 1);
+				m_screen->update_partial(scanline - 1);
 			m_maincpu->set_input_line(2, ASSERT_LINE);
 		}
 	}
@@ -348,7 +348,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(shadfrce_state::shadfrce_scanline)
 	{
 		if (scanline == 248)
 		{
-			machine().primary_screen->update_partial(scanline - 1);
+			m_screen->update_partial(scanline - 1);
 			m_maincpu->set_input_line(3, ASSERT_LINE);
 		}
 	}

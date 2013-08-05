@@ -63,7 +63,7 @@ void cninja_state::cninjabl_draw_sprites( screen_device &screen, bitmap_ind16 &b
 		}
 
 		flash = y & 0x1000;
-		if (flash && (machine().primary_screen->frame_number() & 1))
+		if (flash && (m_screen->frame_number() & 1))
 			continue;
 
 		colour = (x >> 9) & 0x1f;

@@ -174,8 +174,8 @@ READ32_MEMBER(deco_mlc_state::mlc_20007c_r)
 
 READ32_MEMBER(deco_mlc_state::mlc_scanline_r)
 {
-//  logerror("read scanline counter (%d)\n", machine().primary_screen->vpos());
-	return machine().primary_screen->vpos();
+//  logerror("read scanline counter (%d)\n", m_screen->vpos());
+	return m_screen->vpos();
 }
 
 
@@ -212,7 +212,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(deco_mlc_state::interrupt_gen)
 
 WRITE32_MEMBER(deco_mlc_state::mlc_irq_w)
 {
-//  int scanline=machine().primary_screen->vpos();
+//  int scanline=m_screen->vpos();
 	COMBINE_DATA(&m_irq_ram[offset]);
 
 
@@ -222,8 +222,8 @@ WRITE32_MEMBER(deco_mlc_state::mlc_irq_w)
 		m_maincpu->set_input_line(m_mainCpuIsArm ? ARM_IRQ_LINE : 1, CLEAR_LINE);
 		return;
 	case 0x14: /* Prepare scanline interrupt */
-		m_raster_irq_timer->adjust(machine().primary_screen->time_until_pos(m_irq_ram[0x14/4]));
-		//logerror("prepare scanline to fire at %d (currently on %d)\n", m_irq_ram[0x14/4], machine().primary_screen->vpos());
+		m_raster_irq_timer->adjust(m_screen->time_until_pos(m_irq_ram[0x14/4]));
+		//logerror("prepare scanline to fire at %d (currently on %d)\n", m_irq_ram[0x14/4], m_screen->vpos());
 		return;
 
 	default:

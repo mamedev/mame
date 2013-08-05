@@ -221,7 +221,7 @@ MACHINE_RESET_MEMBER(atarisy2_state,atarisy2)
 {
 	atarigen_state::machine_reset();
 	slapstic_reset();
-	scanline_timer_reset(*machine().primary_screen, 64);
+	scanline_timer_reset(*m_screen, 64);
 
 	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(atarisy2_state::atarisy2_direct_handler), this));
 

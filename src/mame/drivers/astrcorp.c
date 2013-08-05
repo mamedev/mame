@@ -83,7 +83,7 @@ public:
 
 VIDEO_START_MEMBER(astrocorp_state,astrocorp)
 {
-	machine().primary_screen->register_screen_bitmap(m_bitmap);
+	m_screen->register_screen_bitmap(m_bitmap);
 
 	save_item(NAME(m_bitmap));
 	save_item       (NAME(m_screen_enable));
@@ -180,7 +180,7 @@ WRITE16_MEMBER(astrocorp_state::astrocorp_draw_sprites_w)
 	UINT16 now = COMBINE_DATA(&m_draw_sprites);
 
 	if (!old && now)
-		draw_sprites(m_bitmap, machine().primary_screen->visible_area());
+		draw_sprites(m_bitmap, m_screen->visible_area());
 }
 
 WRITE16_MEMBER(astrocorp_state::astrocorp_eeprom_w)

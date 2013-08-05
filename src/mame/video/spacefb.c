@@ -17,14 +17,14 @@
 
 WRITE8_MEMBER(spacefb_state::spacefb_port_0_w)
 {
-	machine().primary_screen->update_now();
+	m_screen->update_now();
 	m_port_0 = data;
 }
 
 
 WRITE8_MEMBER(spacefb_state::spacefb_port_2_w)
 {
-	machine().primary_screen->update_now();
+	m_screen->update_now();
 	m_port_2 = data;
 }
 
@@ -78,8 +78,8 @@ void spacefb_state::video_start()
 								2, resistances_b,  m_color_weights_b,  470, 0,
 								0, 0, 0, 0, 0);
 
-	width = machine().primary_screen->width();
-	height = machine().primary_screen->height();
+	width = m_screen->width();
+	height = m_screen->height();
 	m_object_present_map = auto_alloc_array(machine(), UINT8, width * height);
 
 	/* this start value positions the stars to match the flyer screen shot,

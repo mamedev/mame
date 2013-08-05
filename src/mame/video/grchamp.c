@@ -112,7 +112,7 @@ int grchamp_state::collision_check(grchamp_state *state, bitmap_ind16 &bitmap, i
 {
 	int bgcolor = machine().pens[0];
 	int sprite_transp = machine().pens[0x24];
-	const rectangle &visarea = machine().primary_screen->visible_area();
+	const rectangle &visarea = m_screen->visible_area();
 	int y0 = 240 - m_cpu0_out[3];
 	int x0 = 256 - m_cpu0_out[2];
 	int x,y,sx,sy;

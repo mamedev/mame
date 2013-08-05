@@ -63,11 +63,11 @@ WRITE8_MEMBER(balsente_state::balsente_palette_select_w)
 	if (m_palettebank_vis != (data & 3))
 	{
 		/* update the scanline palette */
-		machine().primary_screen->update_partial(machine().primary_screen->vpos() - 1 + BALSENTE_VBEND);
+		m_screen->update_partial(m_screen->vpos() - 1 + BALSENTE_VBEND);
 		m_palettebank_vis = data & 3;
 	}
 
-	logerror("balsente_palette_select_w(%d) scanline=%d\n", data & 3, machine().primary_screen->vpos());
+	logerror("balsente_palette_select_w(%d) scanline=%d\n", data & 3, m_screen->vpos());
 }
 
 
@@ -104,7 +104,7 @@ WRITE8_MEMBER(balsente_state::shrike_sprite_select_w)
 	if( m_sprite_data != m_sprite_bank[(data & 0x80 >> 7) ^ 1 ])
 	{
 		logerror( "shrike_sprite_select_w( 0x%02x )\n", data );
-		machine().primary_screen->update_partial(machine().primary_screen->vpos() - 1 + BALSENTE_VBEND);
+		m_screen->update_partial(m_screen->vpos() - 1 + BALSENTE_VBEND);
 		m_sprite_data = m_sprite_bank[(data & 0x80 >> 7) ^ 1];
 	}
 

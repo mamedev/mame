@@ -149,7 +149,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(beathead_state::scanline_callback)
 	int scanline = param;
 
 	/* update the video */
-	machine().primary_screen->update_now();
+	m_screen->update_now();
 
 	/* on scanline zero, clear any halt condition */
 	if (scanline == 0)
@@ -165,7 +165,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(beathead_state::scanline_callback)
 	update_interrupts();
 
 	/* set the timer for the next one */
-	timer.adjust(machine().primary_screen->time_until_pos(scanline) - m_hblank_offset, scanline);
+	timer.adjust(m_screen->time_until_pos(scanline) - m_hblank_offset, scanline);
 }
 
 
@@ -179,9 +179,9 @@ void beathead_state::machine_reset()
 	memcpy(m_ram_base, m_rom_base, 0x40);
 
 	/* compute the timing of the HBLANK interrupt and set the first timer */
-	m_hblank_offset = machine().primary_screen->scan_period() * (455 - 336 - 25) / 455;
+	m_hblank_offset = m_screen->scan_period() * (455 - 336 - 25) / 455;
 	timer_device *scanline_timer = machine().device<timer_device>("scan_timer");
-	scanline_timer->adjust(machine().primary_screen->time_until_pos(0) - m_hblank_offset);
+	scanline_timer->adjust(m_screen->time_until_pos(0) - m_hblank_offset);
 
 	/* reset IRQs */
 	m_irq_line_state = CLEAR_LINE;

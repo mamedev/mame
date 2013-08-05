@@ -138,21 +138,21 @@
 
 READ8_MEMBER(meadows_state::hsync_chain_r)
 {
-	UINT8 val = machine().primary_screen->hpos();
+	UINT8 val = m_screen->hpos();
 	return BITSWAP8(val,0,1,2,3,4,5,6,7);
 }
 
 
 READ8_MEMBER(meadows_state::vsync_chain_hi_r)
 {
-	UINT8 val = machine().primary_screen->vpos();
+	UINT8 val = m_screen->vpos();
 	return ((val >> 1) & 0x08) | ((val >> 3) & 0x04) | ((val >> 5) & 0x02) | (val >> 7);
 }
 
 
 READ8_MEMBER(meadows_state::vsync_chain_lo_r)
 {
-	UINT8 val = machine().primary_screen->vpos();
+	UINT8 val = m_screen->vpos();
 	return val & 0x0f;
 }
 

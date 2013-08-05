@@ -664,14 +664,14 @@ TIMER_CALLBACK_MEMBER(namcos2_shared_state::namcos2_posirq_tick)
 {
 	if (is_system21()) {
 		if (namcos2_68k_gpu_C148[NAMCOS2_C148_POSIRQ]) {
-			machine().primary_screen->update_partial(param);
+			m_screen->update_partial(param);
 			machine().device("gpu")->execute().set_input_line(namcos2_68k_gpu_C148[NAMCOS2_C148_POSIRQ] , ASSERT_LINE);
 		}
 		return;
 	}
 
 	if (namcos2_68k_master_C148[NAMCOS2_C148_POSIRQ]|namcos2_68k_slave_C148[NAMCOS2_C148_POSIRQ]) {
-		machine().primary_screen->update_partial(param);
+		m_screen->update_partial(param);
 		if (namcos2_68k_master_C148[NAMCOS2_C148_POSIRQ]) m_maincpu->set_input_line(namcos2_68k_master_C148[NAMCOS2_C148_POSIRQ] , ASSERT_LINE);
 		if (namcos2_68k_slave_C148[NAMCOS2_C148_POSIRQ]) m_slave->set_input_line(namcos2_68k_slave_C148[NAMCOS2_C148_POSIRQ] , ASSERT_LINE);
 	}

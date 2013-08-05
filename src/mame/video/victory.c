@@ -156,7 +156,7 @@ READ8_MEMBER(victory_state::victory_video_control_r)
 			result |= (~m_fgcoll & 1) << 6;
 			result |= (~m_vblank_irq & 1) << 5;
 			result |= (~m_bgcoll & 1) << 4;
-			result |= (machine().primary_screen->vpos() & 0x100) >> 5;
+			result |= (m_screen->vpos() & 0x100) >> 5;
 			if (LOG_COLLISION) logerror("%04X:5STAT read = %02X\n", space.device().safe_pcbase(), result);
 			return result;
 

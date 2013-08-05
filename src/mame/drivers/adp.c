@@ -405,15 +405,15 @@ READ8_MEMBER(adp_state::t2_r)
 	UINT8 res;
 	int h,w;
 	res = 0;
-	h = machine().primary_screen->height();
-	w = machine().primary_screen->width();
+	h = m_screen->height();
+	w = m_screen->width();
 
 //  popmessage("%d %d",h,w);
 
-	if (machine().primary_screen->hpos() > h)
+	if (m_screen->hpos() > h)
 		res|= 0x20; //hblank
 
-	if (machine().primary_screen->vpos() > w)
+	if (m_screen->vpos() > w)
 		res|= 0x40; //vblank
 
 	return res;

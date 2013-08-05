@@ -315,7 +315,7 @@ ADDRESS_MAP_END
 
 CUSTOM_INPUT_MEMBER( deco_ld_state::begas_vblank_r )
 {
-	return machine().primary_screen->vpos() >= 240*2;
+	return m_screen->vpos() >= 240*2;
 }
 
 INPUT_CHANGED_MEMBER(deco_ld_state::coin_inserted)

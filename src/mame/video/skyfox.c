@@ -161,8 +161,8 @@ void skyfox_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 {
 	int offs;
 
-	int width = machine().primary_screen->width();
-	int height = machine().primary_screen->height();
+	int width = m_screen->width();
+	int height = m_screen->height();
 
 	/* The 32x32 tiles in the 80-ff range are bankswitched */
 	int shift =(m_bg_ctrl & 0x80) ? (4 - 1) : 4;

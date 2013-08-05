@@ -70,7 +70,7 @@ static UINT8 hintcount;           /* line interrupt counter, decreased each scan
 static INTERRUPT_GEN (megaplay_bios_irq)
 {
 	int sline;
-	sline = device->machine().primary_screen->vpos();
+	sline = device->m_screen->vpos();
 
 	if (sline ==0) {
 		hintcount = segae_vdp_regs[0][10];

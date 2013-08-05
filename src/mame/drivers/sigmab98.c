@@ -886,7 +886,7 @@ READ8_MEMBER(sigmab98_state::haekaka_rambank_r)
 
 READ8_MEMBER(sigmab98_state::haekaka_vblank_r)
 {
-	return machine().primary_screen->vblank() ? 0 : 0x1c;
+	return m_screen->vblank() ? 0 : 0x1c;
 }
 
 READ8_MEMBER(sigmab98_state::haekaka_b000_r)

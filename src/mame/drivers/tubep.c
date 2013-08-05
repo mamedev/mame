@@ -322,16 +322,16 @@ TIMER_CALLBACK_MEMBER(tubep_state::tubep_scanline_callback)
 	}
 
 
-	machine().primary_screen->update_partial(machine().primary_screen->vpos());
+	m_screen->update_partial(m_screen->vpos());
 
 	//debug
-	logerror("scanline=%3i scrgetvpos(0)=%3i\n",scanline,machine().primary_screen->vpos());
+	logerror("scanline=%3i scrgetvpos(0)=%3i\n",scanline,m_screen->vpos());
 
 	scanline++;
 	if (scanline >= 264)
 		scanline = 0;
 
-	m_interrupt_timer->adjust(machine().primary_screen->time_until_pos(scanline), scanline);
+	m_interrupt_timer->adjust(m_screen->time_until_pos(scanline), scanline);
 }
 
 
@@ -363,7 +363,7 @@ MACHINE_START_MEMBER(tubep_state,tubep)
 
 MACHINE_RESET_MEMBER(tubep_state,tubep)
 {
-	m_interrupt_timer->adjust(machine().primary_screen->time_until_pos(0));
+	m_interrupt_timer->adjust(m_screen->time_until_pos(0));
 }
 
 
@@ -503,15 +503,15 @@ TIMER_CALLBACK_MEMBER(tubep_state::rjammer_scanline_callback)
 	}
 
 
-	machine().primary_screen->update_partial(machine().primary_screen->vpos());
+	m_screen->update_partial(m_screen->vpos());
 
-	logerror("scanline=%3i scrgetvpos(0)=%3i\n", scanline, machine().primary_screen->vpos());
+	logerror("scanline=%3i scrgetvpos(0)=%3i\n", scanline, m_screen->vpos());
 
 	scanline++;
 	if (scanline >= 264)
 		scanline = 0;
 
-	m_interrupt_timer->adjust(machine().primary_screen->time_until_pos(scanline), scanline);
+	m_interrupt_timer->adjust(m_screen->time_until_pos(scanline), scanline);
 }
 
 
@@ -525,7 +525,7 @@ MACHINE_START_MEMBER(tubep_state,rjammer)
 
 MACHINE_RESET_MEMBER(tubep_state,rjammer)
 {
-	m_interrupt_timer->adjust(machine().primary_screen->time_until_pos(0));
+	m_interrupt_timer->adjust(m_screen->time_until_pos(0));
 }
 
 

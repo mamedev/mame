@@ -827,7 +827,7 @@ UINT32 seta_state::screen_update_seta_no_layers(screen_device &screen, bitmap_in
 	set_pens();
 	bitmap.fill(0x1f0, cliprect);
 
-	m_seta001->draw_sprites(bitmap,cliprect,0x1000, 1);
+	m_seta001->draw_sprites(screen, bitmap,cliprect,0x1000, 1);
 	return 0;
 }
 
@@ -949,7 +949,7 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 
 		if (order & 2)  // layer-sprite priority?
 		{
-			if (layers_ctrl & 8)        m_seta001->draw_sprites(bitmap,cliprect,sprite_bank_size, sprite_setac);
+			if (layers_ctrl & 8)        m_seta001->draw_sprites(screen, bitmap,cliprect,sprite_bank_size, sprite_setac);
 
 			if(order & 4)
 			{
@@ -969,7 +969,7 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 			if (layers_ctrl & 1)    m_tilemap_0->draw(screen, bitmap, cliprect, 0, 0);
 			if (layers_ctrl & 1)    m_tilemap_1->draw(screen, bitmap, cliprect, 0, 0);
 
-			if (layers_ctrl & 8)        m_seta001->draw_sprites(bitmap,cliprect,sprite_bank_size, sprite_setac);
+			if (layers_ctrl & 8)        m_seta001->draw_sprites(screen, bitmap,cliprect,sprite_bank_size, sprite_setac);
 		}
 	}
 	else
@@ -979,7 +979,7 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 
 		if (order & 2)  // layer-sprite priority?
 		{
-			if (layers_ctrl & 8)        m_seta001->draw_sprites(bitmap,cliprect,sprite_bank_size, sprite_setac);
+			if (layers_ctrl & 8)        m_seta001->draw_sprites(screen, bitmap,cliprect,sprite_bank_size, sprite_setac);
 
 			if((order & 4) && m_paletteram2 != NULL)
 			{
@@ -1033,7 +1033,7 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 				}
 			}
 
-			if (layers_ctrl & 8) m_seta001->draw_sprites(bitmap,cliprect,sprite_bank_size, sprite_setac);
+			if (layers_ctrl & 8) m_seta001->draw_sprites(screen,bitmap,cliprect,sprite_bank_size, sprite_setac);
 		}
 	}
 

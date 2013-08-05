@@ -147,14 +147,14 @@ void xmen_state::screen_eof_xmen6p(screen_device &screen, bool state)
 		rectangle cliprect;
 		int offset;
 
-	//  const rectangle *visarea = machine().primary_screen->visible_area();
+	//  const rectangle *visarea = m_screen->visible_area();
 	//  cliprect = *visarea;
 
 		cliprect.set(0, 64 * 8 - 1, 2 * 8, 30 * 8 - 1);
 
 
 		address_space &space = machine().driver_data()->generic_space();
-		if (machine().primary_screen->frame_number() & 0x01)
+		if (m_screen->frame_number() & 0x01)
 		{
 			/* copy the desired spritelist to the chip */
 			memcpy(m_k053247_ram, m_xmen6p_spriteramright, 0x1000);

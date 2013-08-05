@@ -129,7 +129,7 @@ TIMER_CALLBACK_MEMBER(spacefb_state::interrupt_callback)
 	int next_vpos;
 
 	/* compute vector and set the interrupt line */
-	int vpos = machine().primary_screen->vpos();
+	int vpos = m_screen->vpos();
 	UINT8 vector = 0xc7 | ((vpos & 0x40) >> 2) | ((~vpos & 0x40) >> 3);
 	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, vector);
 
@@ -139,7 +139,7 @@ TIMER_CALLBACK_MEMBER(spacefb_state::interrupt_callback)
 	else
 		next_vpos = SPACEFB_INT_TRIGGER_COUNT_1;
 
-	m_interrupt_timer->adjust(machine().primary_screen->time_until_pos(next_vpos));
+	m_interrupt_timer->adjust(m_screen->time_until_pos(next_vpos));
 }
 
 
@@ -151,7 +151,7 @@ void spacefb_state::create_interrupt_timer()
 
 void spacefb_state::start_interrupt_timer()
 {
-	m_interrupt_timer->adjust(machine().primary_screen->time_until_pos(SPACEFB_INT_TRIGGER_COUNT_1));
+	m_interrupt_timer->adjust(m_screen->time_until_pos(SPACEFB_INT_TRIGGER_COUNT_1));
 }
 
 

@@ -372,7 +372,8 @@ Quick review of the system16 hardware:
 const device_type SEGAIC16VID = &device_creator<segaic16_video_device>;
 
 segaic16_video_device::segaic16_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SEGAIC16VID, "Sega 16-bit Video", tag, owner, clock, "segaic16_video", __FILE__)
+	: device_t(mconfig, SEGAIC16VID, "Sega 16-bit Video", tag, owner, clock, "segaic16_video", __FILE__),
+	  device_video_interface(mconfig, *this)
 {
 }
 
@@ -404,12 +405,12 @@ void segaic16_video_device::device_reset()
  *
  *************************************/
 
-void segaic16_video_device::segaic16_set_display_enable(screen_device &screen, int enable)
+void segaic16_video_device::segaic16_set_display_enable(int enable)
 {
 	enable = (enable != 0);
 	if (segaic16_display_enable != enable)
 	{
-		screen.update_partial(screen.vpos());
+		m_screen->update_partial(m_screen->vpos());
 		segaic16_display_enable = enable;
 	}
 }
@@ -1000,7 +1001,7 @@ TIMER_CALLBACK_MEMBER( segaic16_video_device::segaic16_tilemap_16b_latch_values 
 	}
 
 	/* set a timer to do this again next frame */
-	info->latch_timer->adjust(machine().primary_screen->time_until_pos(261), param);
+	info->latch_timer->adjust(m_screen->time_until_pos(261), param);
 }
 
 
@@ -1166,16 +1167,15 @@ void segaic16_video_device::segaic16_tilemap_reset(screen_device &screen)
  *
  *************************************/
 
-void segaic16_video_device::segaic16_tilemap_set_bank(running_machine &machine, int which, int banknum, int offset)
+void segaic16_video_device::segaic16_tilemap_set_bank(int which, int banknum, int offset)
 {
 	struct tilemap_info *info = &bg_tilemap[which];
 
 	if (info->bank[banknum] != offset)
 	{
-		screen_device &screen = *machine.primary_screen;
-		screen.update_partial(screen.vpos());
+		m_screen->update_partial(m_screen->vpos());
 		info->bank[banknum] = offset;
-		machine.tilemap().mark_all_dirty();
+		machine().tilemap().mark_all_dirty();
 	}
 }
 
@@ -1187,7 +1187,7 @@ void segaic16_video_device::segaic16_tilemap_set_bank(running_machine &machine, 
  *
  *************************************/
 
-void segaic16_video_device::segaic16_tilemap_set_flip(running_machine &machine, int which, int flip)
+void segaic16_video_device::segaic16_tilemap_set_flip(int which, int flip)
 {
 	struct tilemap_info *info = &bg_tilemap[which];
 	int pagenum;
@@ -1195,8 +1195,7 @@ void segaic16_video_device::segaic16_tilemap_set_flip(running_machine &machine, 
 	flip = (flip != 0);
 	if (info->flip != flip)
 	{
-		screen_device &screen = *machine.primary_screen;
-		screen.update_partial(screen.vpos());
+		m_screen->update_partial(m_screen->vpos());
 		info->flip = flip;
 		info->textmap->set_flip(flip ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 		for (pagenum = 0; pagenum < info->numpages; pagenum++)
@@ -1212,15 +1211,14 @@ void segaic16_video_device::segaic16_tilemap_set_flip(running_machine &machine, 
  *
  *************************************/
 
-void segaic16_video_device::segaic16_tilemap_set_rowscroll(running_machine &machine, int which, int enable)
+void segaic16_video_device::segaic16_tilemap_set_rowscroll(int which, int enable)
 {
 	struct tilemap_info *info = &bg_tilemap[which];
 
 	enable = (enable != 0);
 	if (info->rowscroll != enable)
 	{
-		screen_device &screen = *machine.primary_screen;
-		screen.update_partial(screen.vpos());
+		m_screen->update_partial(m_screen->vpos());
 		info->rowscroll = enable;
 	}
 }
@@ -1233,15 +1231,14 @@ void segaic16_video_device::segaic16_tilemap_set_rowscroll(running_machine &mach
  *
  *************************************/
 
-void segaic16_video_device::segaic16_tilemap_set_colscroll(running_machine &machine, int which, int enable)
+void segaic16_video_device::segaic16_tilemap_set_colscroll(int which, int enable)
 {
 	struct tilemap_info *info = &bg_tilemap[which];
 
 	enable = (enable != 0);
 	if (info->colscroll != enable)
 	{
-		screen_device &screen = *machine.primary_screen;
-		screen.update_partial(screen.vpos());
+		m_screen->update_partial(m_screen->vpos());
 		info->colscroll = enable;
 	}
 }
@@ -1277,7 +1274,7 @@ WRITE16_MEMBER( segaic16_video_device::segaic16_textram_0_w )
 {
 	/* certain ranges need immediate updates */
 	if (offset >= 0xe80/2)
-		space.machine().primary_screen->update_partial(space.machine().primary_screen->vpos());
+		m_screen->update_partial(m_screen->vpos());
 
 	COMBINE_DATA(&segaic16_textram_0[offset]);
 	bg_tilemap[0].textmap->mark_tile_dirty(offset);

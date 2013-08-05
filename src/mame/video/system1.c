@@ -135,7 +135,7 @@ void system1_state::video_start_common(int pagecount)
 	}
 
 	/* allocate a temporary bitmap for sprite rendering */
-	machine().primary_screen->register_screen_bitmap(m_sprite_bitmap);
+	m_screen->register_screen_bitmap(m_sprite_bitmap);
 
 	/* register for save stats */
 	save_item(NAME(m_video_mode));
@@ -187,19 +187,19 @@ WRITE8_MEMBER(system1_state::system1_videomode_w)
 
 READ8_MEMBER(system1_state::system1_mixer_collision_r)
 {
-	machine().primary_screen->update_now();
+	m_screen->update_now();
 	return m_mix_collide[offset & 0x3f] | 0x7e | (m_mix_collide_summary << 7);
 }
 
 WRITE8_MEMBER(system1_state::system1_mixer_collision_w)
 {
-	machine().primary_screen->update_now();
+	m_screen->update_now();
 	m_mix_collide[offset & 0x3f] = 0;
 }
 
 WRITE8_MEMBER(system1_state::system1_mixer_collision_reset_w)
 {
-	machine().primary_screen->update_now();
+	m_screen->update_now();
 	m_mix_collide_summary = 0;
 }
 
@@ -213,19 +213,19 @@ WRITE8_MEMBER(system1_state::system1_mixer_collision_reset_w)
 
 READ8_MEMBER(system1_state::system1_sprite_collision_r)
 {
-	machine().primary_screen->update_now();
+	m_screen->update_now();
 	return m_sprite_collide[offset & 0x3ff] | 0x7e | (m_sprite_collide_summary << 7);
 }
 
 WRITE8_MEMBER(system1_state::system1_sprite_collision_w)
 {
-	machine().primary_screen->update_now();
+	m_screen->update_now();
 	m_sprite_collide[offset & 0x3ff] = 0;
 }
 
 WRITE8_MEMBER(system1_state::system1_sprite_collision_reset_w)
 {
-	machine().primary_screen->update_now();
+	m_screen->update_now();
 	m_sprite_collide_summary = 0;
 }
 
@@ -271,7 +271,7 @@ WRITE8_MEMBER(system1_state::system1_videoram_w)
 
 	/* force a partial update if the page is changing */
 	if (m_tilemap_pages > 2 && offset >= 0x740 && offset < 0x748 && offset % 2 == 0)
-		machine().primary_screen->update_now();
+		m_screen->update_now();
 }
 
 WRITE8_MEMBER(system1_state::system1_videoram_bank_w)

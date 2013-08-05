@@ -86,8 +86,8 @@ VIDEO_START_MEMBER(atarigt_state,atarigt)
 	m_rle = machine().device("rle");
 
 	/* allocate temp bitmaps */
-	width = machine().primary_screen->width();
-	height = machine().primary_screen->height();
+	width = m_screen->width();
+	height = m_screen->height();
 
 	m_pf_bitmap = auto_bitmap_ind16_alloc(machine(), width, height);
 	m_an_bitmap = auto_bitmap_ind16_alloc(machine(), width, height);

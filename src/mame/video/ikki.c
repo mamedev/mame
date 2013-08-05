@@ -116,7 +116,7 @@ void ikki_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 
 void ikki_state::video_start()
 {
-	machine().primary_screen->register_screen_bitmap(m_sprite_bitmap);
+	m_screen->register_screen_bitmap(m_sprite_bitmap);
 	save_item(NAME(m_sprite_bitmap));
 }
 

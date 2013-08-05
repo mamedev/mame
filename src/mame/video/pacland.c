@@ -192,7 +192,7 @@ void pacland_state::video_start()
 {
 	int color;
 
-	machine().primary_screen->register_screen_bitmap(m_fg_bitmap);
+	m_screen->register_screen_bitmap(m_fg_bitmap);
 	m_fg_bitmap.fill(0xffff);
 
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(pacland_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);

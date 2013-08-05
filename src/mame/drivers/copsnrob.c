@@ -81,7 +81,7 @@ void copsnrob_state::palette_init()
 
 READ8_MEMBER(copsnrob_state::copsnrob_misc_r)
 {
-	return machine().primary_screen->vblank() ? 0x00 : 0x80;
+	return m_screen->vblank() ? 0x00 : 0x80;
 }
 
 WRITE8_MEMBER(copsnrob_state::copsnrob_misc2_w)

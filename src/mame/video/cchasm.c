@@ -126,7 +126,7 @@ WRITE16_MEMBER(cchasm_state::cchasm_refresh_control_w)
 
 void cchasm_state::video_start()
 {
-	const rectangle &visarea = machine().primary_screen->visible_area();
+	const rectangle &visarea = m_screen->visible_area();
 
 	m_xcenter=visarea.xcenter() << 16;
 	m_ycenter=visarea.ycenter() << 16;

@@ -329,8 +329,8 @@ WRITE8_MEMBER(williams_state::williams2_fg_select_w)
 
 READ8_MEMBER(williams_state::williams_video_counter_r)
 {
-	if (machine().primary_screen->vpos() < 0x100)
-		return machine().primary_screen->vpos() & 0xfc;
+	if (m_screen->vpos() < 0x100)
+		return m_screen->vpos() & 0xfc;
 	else
 		return 0xfc;
 }
@@ -338,8 +338,8 @@ READ8_MEMBER(williams_state::williams_video_counter_r)
 
 READ8_MEMBER(williams_state::williams2_video_counter_r)
 {
-	if (machine().primary_screen->vpos() < 0x100)
-		return machine().primary_screen->vpos() & 0xfc;
+	if (m_screen->vpos() < 0x100)
+		return m_screen->vpos() & 0xfc;
 	else
 		return 0xfc;
 }
@@ -524,7 +524,7 @@ WRITE8_MEMBER(williams_state::williams_blitter_w)
 
 	/* Log blits */
 	logerror("%04X:Blit @ %3d : %02X%02X -> %02X%02X, %3dx%3d, mask=%02X, flags=%02X, icount=%d, win=%d\n",
-			space.device().safe_pc(), machine().primary_screen->vpos(),
+			space.device().safe_pc(), m_screen->vpos(),
 			m_blitterram[2], m_blitterram[3],
 			m_blitterram[4], m_blitterram[5],
 			m_blitterram[6], m_blitterram[7],

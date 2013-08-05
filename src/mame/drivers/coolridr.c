@@ -547,15 +547,15 @@ void coolridr_state::video_start()
 		if (machine().gfx[m_gfx_index] == 0)
 			break;
 
-	machine().primary_screen->register_screen_bitmap(m_temp_bitmap_sprites);
-	machine().primary_screen->register_screen_bitmap(m_temp_bitmap_sprites2);
-	//machine().primary_screen->register_screen_bitmap(m_zbuffer_bitmap);
-	//machine().primary_screen->register_screen_bitmap(m_zbuffer_bitmap2);
-	machine().primary_screen->register_screen_bitmap(m_bg_bitmap);
-	machine().primary_screen->register_screen_bitmap(m_bg_bitmap2);
+	m_screen->register_screen_bitmap(m_temp_bitmap_sprites);
+	m_screen->register_screen_bitmap(m_temp_bitmap_sprites2);
+	//m_screen->register_screen_bitmap(m_zbuffer_bitmap);
+	//m_screen->register_screen_bitmap(m_zbuffer_bitmap2);
+	m_screen->register_screen_bitmap(m_bg_bitmap);
+	m_screen->register_screen_bitmap(m_bg_bitmap2);
 
-	machine().primary_screen->register_screen_bitmap(m_screen1_bitmap);
-	machine().primary_screen->register_screen_bitmap(m_screen2_bitmap);
+	m_screen->register_screen_bitmap(m_screen1_bitmap);
+	m_screen->register_screen_bitmap(m_screen2_bitmap);
 
 	machine().gfx[m_gfx_index] = auto_alloc(machine(), gfx_element(machine(), h1_tile_layout, m_h1_pcg, 8, 0));
 }
@@ -2546,7 +2546,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_fb_data_w)
 			printf("Blitter Clear Count == 3 used with param %08x\n",data);
 
 		{
-			const rectangle& visarea = machine().primary_screen->visible_area();
+			const rectangle& visarea = m_screen->visible_area();
 
 			if(m_blitterClearMode == 0x8c200000)
 			{

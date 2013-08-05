@@ -158,7 +158,7 @@ READ8_MEMBER(neoprint_state::neoprint_unk_r)
 	/* ---- xx-- one of these two must be high */
 	/* ---- --xx checked right before entering into attract mode, presumably printer/camera related */
 
-	m_vblank = (machine().primary_screen->frame_number() & 0x1) ? 0x10 : 0x00;
+	m_vblank = (m_screen->frame_number() & 0x1) ? 0x10 : 0x00;
 
 	//if(space.device().safe_pc() != 0x1504 && space.device().safe_pc() != 0x5f86 && space.device().safe_pc() != 0x5f90)
 	//  printf("%08x\n",space.device().safe_pc());

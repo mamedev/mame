@@ -309,7 +309,7 @@ void seta001_device::draw_background( bitmap_ind16 &bitmap, const rectangle &cli
 }
 
 
-void seta001_device::draw_foreground( bitmap_ind16 &bitmap, const rectangle &cliprect, int bank_size)
+void seta001_device::draw_foreground( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int bank_size)
 {
 	int screenflip = (m_spritectrl[0] & 0x40) >> 6;
 	int i;
@@ -334,7 +334,7 @@ void seta001_device::draw_foreground( bitmap_ind16 &bitmap, const rectangle &cli
 		color_pointer += bank_size;
 	}
 
-	int max_y = machine().primary_screen->height();
+	int max_y = screen.height();
 
 
 	/* Draw up to 512 sprites, mjyuugi has glitches if you draw them all.. */
@@ -360,7 +360,7 @@ void seta001_device::draw_foreground( bitmap_ind16 &bitmap, const rectangle &cli
 		if (screenflip)
 		{
 			sy = max_y - sy
-				+(machine().primary_screen->height() - (machine().primary_screen->visible_area().max_y + 1));
+				+(screen.height() - (screen.visible_area().max_y + 1));
 			flipx = !flipx;
 			flipy = !flipy;
 		}
@@ -447,8 +447,8 @@ void seta001_device::tnzs_eof( void )
 
 }
 
-void seta001_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int bank_size, int setac)
+void seta001_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int bank_size, int setac)
 {
 	draw_background(bitmap, cliprect, bank_size, setac);
-	draw_foreground(bitmap, cliprect, bank_size);
+	draw_foreground(screen, bitmap, cliprect, bank_size);
 }

@@ -94,8 +94,8 @@ void cheekyms_state::video_start()
 {
 	int width, height;
 
-	width = machine().primary_screen->width();
-	height = machine().primary_screen->height();
+	width = m_screen->width();
+	height = m_screen->height();
 	m_bitmap_buffer = auto_bitmap_ind16_alloc(machine(), width, height);
 
 	m_cm_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(cheekyms_state::cheekyms_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);

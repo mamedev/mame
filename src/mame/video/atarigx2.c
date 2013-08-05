@@ -91,7 +91,7 @@ VIDEO_START_MEMBER(atarigx2_state,atarigx2)
 
 WRITE16_MEMBER( atarigx2_state::atarigx2_mo_control_w )
 {
-	logerror("MOCONT = %d (scan = %d)\n", data, machine().primary_screen->vpos());
+	logerror("MOCONT = %d (scan = %d)\n", data, m_screen->vpos());
 
 	/* set the control value */
 	COMBINE_DATA(&m_current_control);

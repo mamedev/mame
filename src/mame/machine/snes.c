@@ -32,7 +32,7 @@
 
 void snes_state::video_start()
 {
-	m_ppu.ppu_start(machine());
+	m_ppu.ppu_start(m_screen);
 }
 
 UINT32 snes_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -137,7 +137,7 @@ TIMER_CALLBACK_MEMBER(snes_state::snes_update_io)
 TIMER_CALLBACK_MEMBER(snes_state::snes_scanline_tick)
 {
 	/* Increase current line - we want to latch on this line during it, not after it */
-	m_ppu.m_beam.current_vert = machine().primary_screen->vpos();
+	m_ppu.m_beam.current_vert = m_screen->vpos();
 
 	// not in hblank
 	SNES_CPU_REG(HVBJOY) &= ~0x40;
@@ -177,7 +177,7 @@ TIMER_CALLBACK_MEMBER(snes_state::snes_scanline_tick)
 			}
 			else
 			{
-				m_hirq_timer->adjust(machine().primary_screen->time_until_pos(m_ppu.m_beam.current_vert, pixel * m_ppu.m_htmult));
+				m_hirq_timer->adjust(m_screen->time_until_pos(m_ppu.m_beam.current_vert, pixel * m_ppu.m_htmult));
 			}
 		}
 	}
@@ -185,7 +185,7 @@ TIMER_CALLBACK_MEMBER(snes_state::snes_scanline_tick)
 	/* Start of VBlank */
 	if (m_ppu.m_beam.current_vert == m_ppu.m_beam.last_visible_line)
 	{
-		timer_set(machine().primary_screen->time_until_pos(m_ppu.m_beam.current_vert, 10), TIMER_RESET_OAM_ADDRESS);
+		timer_set(m_screen->time_until_pos(m_ppu.m_beam.current_vert, 10), TIMER_RESET_OAM_ADDRESS);
 
 		SNES_CPU_REG(HVBJOY) |= 0x81;       /* Set vblank bit to on & indicate controllers being read */
 		SNES_CPU_REG(RDNMI) |= 0x80;        /* Set NMI occurred bit */
@@ -197,7 +197,7 @@ TIMER_CALLBACK_MEMBER(snes_state::snes_scanline_tick)
 		}
 
 		/* three lines after start of vblank we update the controllers (value from snes9x) */
-		m_io_timer->adjust(machine().primary_screen->time_until_pos(m_ppu.m_beam.current_vert + 2, m_hblank_offset * m_ppu.m_htmult));
+		m_io_timer->adjust(m_screen->time_until_pos(m_ppu.m_beam.current_vert + 2, m_hblank_offset * m_ppu.m_htmult));
 	}
 
 	// hdma reset happens at scanline 0, H=~6
@@ -218,7 +218,7 @@ TIMER_CALLBACK_MEMBER(snes_state::snes_scanline_tick)
 	}
 
 	m_scanline_timer->adjust(attotime::never);
-	m_hblank_timer->adjust(machine().primary_screen->time_until_pos(m_ppu.m_beam.current_vert, m_hblank_offset * m_ppu.m_htmult));
+	m_hblank_timer->adjust(m_screen->time_until_pos(m_ppu.m_beam.current_vert, m_hblank_offset * m_ppu.m_htmult));
 
 //  printf("%02x %d\n",SNES_CPU_REG(HVBJOY),m_ppu.m_beam.current_vert);
 }
@@ -229,7 +229,7 @@ TIMER_CALLBACK_MEMBER(snes_state::snes_hblank_tick)
 	address_space &cpu0space = m_maincpu->space(AS_PROGRAM);
 	int nextscan;
 
-	m_ppu.m_beam.current_vert = machine().primary_screen->vpos();
+	m_ppu.m_beam.current_vert = m_screen->vpos();
 
 	/* make sure we halt */
 	m_hblank_timer->adjust(attotime::never);
@@ -237,13 +237,13 @@ TIMER_CALLBACK_MEMBER(snes_state::snes_hblank_tick)
 	/* draw a scanline */
 	if (m_ppu.m_beam.current_vert <= m_ppu.m_beam.last_visible_line)
 	{
-		if (machine().primary_screen->vpos() > 0)
+		if (m_screen->vpos() > 0)
 		{
 			/* Do HDMA */
 			if (SNES_CPU_REG(HDMAEN))
 				hdma(cpu0space);
 
-			machine().primary_screen->update_partial((m_ppu.m_interlace == 2) ? (m_ppu.m_beam.current_vert * m_ppu.m_interlace) : m_ppu.m_beam.current_vert - 1);
+			m_screen->update_partial((m_ppu.m_interlace == 2) ? (m_ppu.m_beam.current_vert * m_ppu.m_interlace) : m_ppu.m_beam.current_vert - 1);
 		}
 	}
 
@@ -257,7 +257,7 @@ TIMER_CALLBACK_MEMBER(snes_state::snes_hblank_tick)
 		nextscan = 0;
 	}
 
-	m_scanline_timer->adjust(machine().primary_screen->time_until_pos(nextscan));
+	m_scanline_timer->adjust(m_screen->time_until_pos(nextscan));
 }
 
 
@@ -441,7 +441,7 @@ READ8_MEMBER( snes_state::snes_r_io )
 			return value;
 		case HVBJOY:        /* H/V blank and joypad controller enable */
 			// electronics test says hcounter 272 is start of hblank, which is beampos 363
-//          if (space.machine().primary_screen->hpos() >= 363) SNES_CPU_REG(HVBJOY) |= 0x40;
+//          if (m_screen->hpos() >= 363) SNES_CPU_REG(HVBJOY) |= 0x40;
 //              else SNES_CPU_REG(HVBJOY) &= ~0x40;
 			return (SNES_CPU_REG(HVBJOY) & 0xc1) | (snes_open_bus_r(space, 0) & 0x3e);
 		case RDIO:          /* Programmable I/O port - echos back what's written to WRIO */
@@ -572,7 +572,7 @@ WRITE8_MEMBER( snes_state::snes_w_io )
 			return;
 		case HDMAEN:    /* HDMA channel designation */
 			if (data) //if a HDMA is enabled, data is inited at the next scanline
-				timer_set(space.machine().primary_screen->time_until_pos(m_ppu.m_beam.current_vert + 1), TIMER_RESET_HDMA);
+				timer_set(m_screen->time_until_pos(m_ppu.m_beam.current_vert + 1), TIMER_RESET_HDMA);
 			SNES_CPU_REG(HDMAEN) = data;
 			return;
 		case TIMEUP:    // IRQ Flag is cleared on both read and write
@@ -1040,7 +1040,7 @@ void snes_state::snes_init_timers()
 	// SNES hcounter has a 0-339 range.  hblank starts at counter 260.
 	// clayfighter sets an HIRQ at 260, apparently it wants it to be before hdma kicks off, so we'll delay 2 pixels.
 	m_hblank_offset = 274;
-	m_hblank_timer->adjust(machine().primary_screen->time_until_pos(((m_ppu.m_stat78 & 0x10) == SNES_NTSC) ? SNES_VTOTAL_NTSC - 1 : SNES_VTOTAL_PAL - 1, m_hblank_offset));
+	m_hblank_timer->adjust(m_screen->time_until_pos(((m_ppu.m_stat78 & 0x10) == SNES_NTSC) ? SNES_VTOTAL_NTSC - 1 : SNES_VTOTAL_PAL - 1, m_hblank_offset));
 }
 
 void snes_state::snes_init_ram()
@@ -1066,7 +1066,7 @@ void snes_state::snes_init_ram()
 	SNES_CPU_REG(WRIO) = 0xff;
 
 	// init frame counter so first line is 0
-	if (ATTOSECONDS_TO_HZ(machine().primary_screen->frame_period().attoseconds) >= 59)
+	if (ATTOSECONDS_TO_HZ(m_screen->frame_period().attoseconds) >= 59)
 		m_ppu.m_beam.current_vert = SNES_VTOTAL_NTSC;
 	else
 		m_ppu.m_beam.current_vert = SNES_VTOTAL_PAL;
@@ -1132,7 +1132,7 @@ void snes_state::machine_reset()
 	}
 
 	/* Set STAT78 to NTSC or PAL */
-	if (ATTOSECONDS_TO_HZ(machine().primary_screen->frame_period().attoseconds) >= 59.0f)
+	if (ATTOSECONDS_TO_HZ(m_screen->frame_period().attoseconds) >= 59.0f)
 		m_ppu.m_stat78 = SNES_NTSC;
 	else /* if (ATTOSECONDS_TO_HZ(machine.primary_screen->frame_period().attoseconds) == 50.0f) */
 		m_ppu.m_stat78 = SNES_PAL;

@@ -362,8 +362,8 @@ WRITE16_MEMBER(taitoair_state::dsp_flags_w)
 
 	cliprect.min_x = 0;
 	cliprect.min_y = 3*16;
-	cliprect.max_x = machine().primary_screen->width() - 1;
-	cliprect.max_y = machine().primary_screen->height() - 1;
+	cliprect.max_x = m_screen->width() - 1;
+	cliprect.max_y = m_screen->height() - 1;
 
 	{
 		/* clear and copy operation if offset is 0x3001 */
@@ -549,8 +549,8 @@ void taitoair_state::video_start()
 {
 	int width, height;
 
-	width = machine().primary_screen->width();
-	height = machine().primary_screen->height();
+	width = m_screen->width();
+	height = m_screen->height();
 	m_framebuffer[0] = auto_bitmap_ind16_alloc(machine(), width, height);
 	m_framebuffer[1] = auto_bitmap_ind16_alloc(machine(), width, height);
 	//m_buffer3d = auto_bitmap_ind16_alloc(machine(), width, height);

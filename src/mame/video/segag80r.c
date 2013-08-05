@@ -332,7 +332,7 @@ WRITE8_MEMBER(segag80r_state::segag80r_video_port_w)
 READ8_MEMBER(segag80r_state::spaceod_back_port_r)
 {
 	/* force an update to get the current detection value */
-	machine().primary_screen->update_partial(machine().primary_screen->vpos());
+	m_screen->update_partial(m_screen->vpos());
 	return 0xfe | m_spaceod_bg_detect;
 }
 
@@ -385,7 +385,7 @@ WRITE8_MEMBER(segag80r_state::spaceod_back_port_w)
 
 		/* port 3: clears the background detection flag */
 		case 3:
-			machine().primary_screen->update_partial(machine().primary_screen->vpos());
+			m_screen->update_partial(m_screen->vpos());
 			m_spaceod_bg_detect = 0;
 			break;
 

@@ -81,7 +81,7 @@ VIDEO_START_MEMBER(toaplan2_state,toaplan2)
 	m_vdp1 = machine().device<gp9001vdp_device>("gp9001vdp1");
 
 	/* our current VDP implementation needs this bitmap to work with */
-	machine().primary_screen->register_screen_bitmap(m_custom_priority_bitmap);
+	m_screen->register_screen_bitmap(m_custom_priority_bitmap);
 
 	if (m_vdp0 != NULL)
 	{
@@ -91,7 +91,7 @@ VIDEO_START_MEMBER(toaplan2_state,toaplan2)
 
 	if (m_vdp1 != NULL)
 	{
-		machine().primary_screen->register_screen_bitmap(m_secondary_render_bitmap);
+		m_screen->register_screen_bitmap(m_secondary_render_bitmap);
 		m_vdp1->custom_priority_bitmap = &m_custom_priority_bitmap;
 	}
 

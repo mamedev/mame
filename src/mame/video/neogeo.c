@@ -220,7 +220,7 @@ TIMER_CALLBACK_MEMBER(neogeo_state::auto_animation_timer_callback)
 	else
 		m_auto_animation_frame_counter = m_auto_animation_frame_counter - 1;
 
-	m_auto_animation_timer->adjust(machine().primary_screen->time_until_pos(NEOGEO_VSSTART));
+	m_auto_animation_timer->adjust(m_screen->time_until_pos(NEOGEO_VSSTART));
 }
 
 
@@ -232,7 +232,7 @@ void neogeo_state::create_auto_animation_timer(  )
 
 void neogeo_state::start_auto_animation_timer(  )
 {
-	m_auto_animation_timer->adjust(machine().primary_screen->time_until_pos(NEOGEO_VSSTART));
+	m_auto_animation_timer->adjust(m_screen->time_until_pos(NEOGEO_VSSTART));
 }
 
 
@@ -627,14 +627,14 @@ TIMER_CALLBACK_MEMBER(neogeo_state::sprite_line_timer_callback)
 	/* we are at the beginning of a scanline -
 	   we need to draw the previous scanline and parse the sprites on the current one */
 	if (scanline != 0)
-		machine().primary_screen->update_partial(scanline - 1);
+		m_screen->update_partial(scanline - 1);
 
 	parse_sprites(scanline);
 
 	/* let's come back at the beginning of the next line */
 	scanline = (scanline + 1) % NEOGEO_VTOTAL;
 
-	m_sprite_line_timer->adjust(machine().primary_screen->time_until_pos(scanline), scanline);
+	m_sprite_line_timer->adjust(m_screen->time_until_pos(scanline), scanline);
 }
 
 
@@ -646,7 +646,7 @@ void neogeo_state::create_sprite_line_timer(  )
 
 void neogeo_state::start_sprite_line_timer(  )
 {
-	m_sprite_line_timer->adjust(machine().primary_screen->time_until_pos(0));
+	m_sprite_line_timer->adjust(m_screen->time_until_pos(0));
 }
 
 
@@ -741,7 +741,7 @@ UINT16 neogeo_state::get_video_control(  )
 	*/
 
 	/* the vertical counter chain goes from 0xf8 - 0x1ff */
-	v_counter = machine().primary_screen->vpos() + 0x100;
+	v_counter = m_screen->vpos() + 0x100;
 
 	if (v_counter >= 0x200)
 		v_counter = v_counter - NEOGEO_VTOTAL;

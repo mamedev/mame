@@ -209,8 +209,8 @@ void realbrk_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 	UINT16 *spriteram16 = m_spriteram;
 	int offs;
 
-	int max_x = machine().primary_screen->width();
-	int max_y = machine().primary_screen->height();
+	int max_x = m_screen->width();
+	int max_y = m_screen->height();
 
 	rectangle spritetile_clip(0, 31, 0, 31);
 
@@ -371,8 +371,8 @@ void realbrk_state::dai2kaku_draw_sprites(bitmap_ind16 &bitmap,const rectangle &
 	UINT16 *spriteram16 = m_spriteram;
 	int offs;
 
-	int max_x = machine().primary_screen->width();
-	int max_y = machine().primary_screen->height();
+	int max_x = m_screen->width();
+	int max_y = m_screen->height();
 
 	for ( offs = 0x3000/2; offs < 0x3600/2; offs += 2/2 )
 	{

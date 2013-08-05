@@ -423,7 +423,7 @@ READ8_MEMBER(multfish_state::ray_r)
 {
 	// the games read the raster beam position as part of the hardware checks..
 	// with a 6mhz clock and 640x480 resolution this seems to give the right results.
-	return machine().primary_screen->vpos();
+	return m_screen->vpos();
 }
 
 CUSTOM_INPUT_MEMBER(multfish_state::multfish_hopper_r)

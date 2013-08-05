@@ -460,7 +460,7 @@ void missile_state::schedule_next_irq(int curv)
 		curv = ((curv + 32) & 0xff) & ~0x10;
 
 	/* next one at the start of this scanline */
-	m_irq_timer->adjust(machine().primary_screen->time_until_pos(v_to_scanline(curv)), curv);
+	m_irq_timer->adjust(m_screen->time_until_pos(v_to_scanline(curv)), curv);
 }
 
 
@@ -473,7 +473,7 @@ TIMER_CALLBACK_MEMBER(missile_state::clock_irq)
 	m_maincpu->set_input_line(0, m_irq_state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* force an update while we're here */
-	machine().primary_screen->update_partial(v_to_scanline(curv));
+	m_screen->update_partial(v_to_scanline(curv));
 
 	/* find the next edge */
 	schedule_next_irq(curv);
@@ -482,7 +482,7 @@ TIMER_CALLBACK_MEMBER(missile_state::clock_irq)
 
 CUSTOM_INPUT_MEMBER(missile_state::get_vblank)
 {
-	int v = scanline_to_v(machine().primary_screen->vpos());
+	int v = scanline_to_v(m_screen->vpos());
 	return v < 24;
 }
 
@@ -506,7 +506,7 @@ TIMER_CALLBACK_MEMBER(missile_state::adjust_cpu_speed)
 
 	/* scanline for the next run */
 	curv ^= 224;
-	m_cpu_timer->adjust(machine().primary_screen->time_until_pos(v_to_scanline(curv)), curv);
+	m_cpu_timer->adjust(m_screen->time_until_pos(v_to_scanline(curv)), curv);
 }
 
 
@@ -519,7 +519,7 @@ void missile_state::machine_start()
 
 	/* create a timer to speed/slow the CPU */
 	m_cpu_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(missile_state::adjust_cpu_speed),this));
-	m_cpu_timer->adjust(machine().primary_screen->time_until_pos(v_to_scanline(0), 0));
+	m_cpu_timer->adjust(m_screen->time_until_pos(v_to_scanline(0), 0));
 
 	/* create a timer for IRQs and set up the first callback */
 	m_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(missile_state::clock_irq),this));

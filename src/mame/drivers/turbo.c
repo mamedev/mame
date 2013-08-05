@@ -476,14 +476,14 @@ static I8279_INTERFACE( turbo_i8279_intf )
 
 READ8_MEMBER(turbo_state::turbo_collision_r)
 {
-	machine().primary_screen->update_partial(machine().primary_screen->vpos());
+	m_screen->update_partial(m_screen->vpos());
 	return ioport("DSW3")->read() | (m_turbo_collision & 15);
 }
 
 
 WRITE8_MEMBER(turbo_state::turbo_collision_clear_w)
 {
-	machine().primary_screen->update_partial(machine().primary_screen->vpos());
+	m_screen->update_partial(m_screen->vpos());
 	m_turbo_collision = 0;
 }
 

@@ -113,7 +113,7 @@ CUSTOM_INPUT_MEMBER(eolith_state::eolith_speedup_getvblank)
 //  printf("%s:eolith speedup_read data %02x\n",machine().describe_context(), eolith_vblank);
 
 
-	return (machine().primary_screen->vpos() >= 240);
+	return (m_screen->vpos() >= 240);
 }
 
 // StealSee doesn't use interrupts, just the vblank
@@ -125,5 +125,5 @@ CUSTOM_INPUT_MEMBER(eolith_state::stealsee_speedup_getvblank)
 		if(!eolith_vblank)
 			m_maincpu->eat_cycles(500);
 
-	return (machine().primary_screen->vpos() >= 240);
+	return (m_screen->vpos() >= 240);
 }

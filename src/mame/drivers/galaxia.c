@@ -82,14 +82,14 @@ INTERRUPT_GEN_MEMBER(galaxia_state::galaxia_interrupt)
 
 WRITE8_MEMBER(galaxia_state::galaxia_video_w)
 {
-//  machine().primary_screen->update_partial(machine().primary_screen->vpos());
+//  m_screen->update_partial(m_screen->vpos());
 	m_bg_tilemap->mark_tile_dirty(offset);
 	cvs_video_or_color_ram_w(space, offset, data);
 }
 
 WRITE8_MEMBER(galaxia_state::galaxia_scroll_w)
 {
-	machine().primary_screen->update_partial(machine().primary_screen->vpos());
+	m_screen->update_partial(m_screen->vpos());
 
 	// fixed scrolling area
 	for (int i = 1; i < 6; i++)
@@ -109,13 +109,13 @@ WRITE8_MEMBER(galaxia_state::galaxia_dataport_w)
 
 READ8_MEMBER(galaxia_state::galaxia_collision_r)
 {
-	machine().primary_screen->update_partial(machine().primary_screen->vpos());
+	m_screen->update_partial(m_screen->vpos());
 	return m_collision_register;
 }
 
 READ8_MEMBER(galaxia_state::galaxia_collision_clear)
 {
-	machine().primary_screen->update_partial(machine().primary_screen->vpos());
+	m_screen->update_partial(m_screen->vpos());
 	m_collision_register = 0;
 	return 0xff;
 }

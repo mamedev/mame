@@ -439,7 +439,7 @@ READ32_MEMBER(model2_state::fifoctl_r)
 
 READ32_MEMBER(model2_state::videoctl_r)
 {
-	return (machine().primary_screen->frame_number() & 1) << 2;
+	return (m_screen->frame_number() & 1) << 2;
 }
 
 CUSTOM_INPUT_MEMBER(model2_state::_1c00000_r)

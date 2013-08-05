@@ -116,7 +116,7 @@ void cubeqst_state::palette_init()
 
 WRITE16_MEMBER(cubeqst_state::palette_w)
 {
-	machine().primary_screen->update_now();
+	m_screen->update_now();
 	COMBINE_DATA(&m_generic_paletteram_16[offset]);
 }
 
@@ -199,7 +199,7 @@ UINT32 cubeqst_state::screen_update_cubeqst(screen_device &screen, bitmap_rgb32 
 READ16_MEMBER(cubeqst_state::line_r)
 {
 	/* I think this is unusued */
-	return machine().primary_screen->vpos();
+	return m_screen->vpos();
 }
 
 INTERRUPT_GEN_MEMBER(cubeqst_state::vblank)

@@ -159,7 +159,7 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, UINT
 	{
 		if ((mlc_spriteram[offs+0]&0x8000)==0)
 			continue;
-		if ((mlc_spriteram[offs+1]&0x2000) && (machine().primary_screen->frame_number() & 1))
+		if ((mlc_spriteram[offs+1]&0x2000) && (m_screen->frame_number() & 1))
 			continue;
 
 		/*

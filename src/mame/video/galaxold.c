@@ -793,7 +793,7 @@ VIDEO_START_MEMBER(galaxold_state,dambustr)
 	m_draw_bullets = &galaxold_state::dambustr_draw_bullets;
 
 	/* allocate the temporary bitmap for the background priority */
-	m_dambustr_tmpbitmap = auto_bitmap_ind16_alloc(machine(), machine().primary_screen->width(), machine().primary_screen->height());
+	m_dambustr_tmpbitmap = auto_bitmap_ind16_alloc(machine(), m_screen->width(), m_screen->height());
 
 	/* make a copy of the tilemap to emulate background priority */
 	m_dambustr_videoram2 = auto_alloc_array(machine(), UINT8, 0x0400);
@@ -1590,7 +1590,7 @@ TIMER_CALLBACK_MEMBER(galaxold_state::stars_scroll_callback)
 
 void galaxold_state::start_stars_scroll_timer()
 {
-	m_stars_scroll_timer->adjust(machine().primary_screen->frame_period(), 0, machine().primary_screen->frame_period());
+	m_stars_scroll_timer->adjust(m_screen->frame_period(), 0, m_screen->frame_period());
 }
 
 

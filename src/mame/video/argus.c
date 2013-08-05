@@ -300,7 +300,7 @@ VIDEO_START_MEMBER(argus_state,valtric)
 
 	m_tx_tilemap->set_transparent_pen(15);
 
-	machine().primary_screen->register_screen_bitmap(m_mosaicbitmap);
+	m_screen->register_screen_bitmap(m_mosaicbitmap);
 
 	jal_blend_init(machine(), 1);
 }

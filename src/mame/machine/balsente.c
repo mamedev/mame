@@ -30,15 +30,15 @@ TIMER_DEVICE_CALLBACK_MEMBER(balsente_state::balsente_interrupt_timer)
 {
 	/* next interrupt after scanline 256 is scanline 64 */
 	if (param == 256)
-		m_scanline_timer->adjust(machine().primary_screen->time_until_pos(64), 64);
+		m_scanline_timer->adjust(m_screen->time_until_pos(64), 64);
 	else
-		m_scanline_timer->adjust(machine().primary_screen->time_until_pos(param + 64), param + 64);
+		m_scanline_timer->adjust(m_screen->time_until_pos(param + 64), param + 64);
 
 	/* IRQ starts on scanline 0, 64, 128, etc. */
 	m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 
 	/* it will turn off on the next HBLANK */
-	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(param, BALSENTE_HBSTART), timer_expired_delegate(FUNC(balsente_state::irq_off),this));
+	machine().scheduler().timer_set(m_screen->time_until_pos(param, BALSENTE_HBSTART), timer_expired_delegate(FUNC(balsente_state::irq_off),this));
 
 	/* if this is Grudge Match, update the steering */
 	if (m_grudge_steering_result & 0x80)
@@ -168,7 +168,7 @@ void balsente_state::machine_reset()
 	m_maincpu->reset();
 
 	/* start a timer to generate interrupts */
-	m_scanline_timer->adjust(machine().primary_screen->time_until_pos(0));
+	m_scanline_timer->adjust(m_screen->time_until_pos(0));
 }
 
 
@@ -1144,7 +1144,7 @@ void balsente_state::update_grudge_steering()
 
 READ8_MEMBER(balsente_state::grudge_steering_r)
 {
-	logerror("%04X:grudge_steering_r(@%d)\n", space.device().safe_pc(), machine().primary_screen->vpos());
+	logerror("%04X:grudge_steering_r(@%d)\n", space.device().safe_pc(), m_screen->vpos());
 	m_grudge_steering_result |= 0x80;
 	return m_grudge_steering_result;
 }

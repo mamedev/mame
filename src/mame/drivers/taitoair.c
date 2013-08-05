@@ -251,7 +251,7 @@ WRITE16_MEMBER(taitoair_state::lineram_w)
 		m_line_ram[offset] = data;
 
 	//if(offset == 0x3fff)
-	//  printf("LineRAM go %d\n",(int)machine().primary_screen->frame_number());
+	//  printf("LineRAM go %d\n",(int)m_screen->frame_number());
 }
 
 READ16_MEMBER(taitoair_state::dspram_r)

@@ -77,7 +77,7 @@ TIMER_CALLBACK_MEMBER(atetris_state::interrupt_gen)
 	scanline += 32;
 	if (scanline >= 256)
 		scanline -= 256;
-	m_interrupt_timer->adjust(machine().primary_screen->time_until_pos(scanline), scanline);
+	m_interrupt_timer->adjust(m_screen->time_until_pos(scanline), scanline);
 }
 
 
@@ -120,7 +120,7 @@ void atetris_state::machine_reset()
 	reset_bank();
 
 	/* start interrupts going (32V clocked by 16V) */
-	m_interrupt_timer->adjust(machine().primary_screen->time_until_pos(48), 48);
+	m_interrupt_timer->adjust(m_screen->time_until_pos(48), 48);
 }
 
 

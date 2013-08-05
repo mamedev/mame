@@ -127,7 +127,7 @@ void tickee_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 TIMER_CALLBACK_MEMBER(tickee_state::trigger_gun_interrupt)
 {
 	int which = param & 1;
-	int beamx = (machine().primary_screen->hpos()/2)-58;
+	int beamx = (m_screen->hpos()/2)-58;
 
 	/* once we're ready to fire, set the X coordinate and assert the line */
 	m_gunx[which] = beamx;
@@ -149,7 +149,7 @@ TIMER_CALLBACK_MEMBER(tickee_state::setup_gun_interrupts)
 	int beamx, beamy;
 
 	/* set a timer to do this again next frame */
-	m_setup_gun_timer->adjust(machine().primary_screen->time_until_pos(0));
+	m_setup_gun_timer->adjust(m_screen->time_until_pos(0));
 
 	/* only do work if the palette is flashed */
 	if (m_control)
@@ -158,13 +158,13 @@ TIMER_CALLBACK_MEMBER(tickee_state::setup_gun_interrupts)
 
 	/* generate interrupts for player 1's gun */
 	get_crosshair_xy(machine(), 0, &beamx, &beamy);
-	timer_set(machine().primary_screen->time_until_pos(beamy + m_beamyadd, beamx + m_beamxadd), TIMER_TRIGGER_GUN_INTERRUPT, 0);
-	timer_set(machine().primary_screen->time_until_pos(beamy + m_beamyadd + 1, beamx + m_beamxadd), TIMER_CLEAR_GUN_INTERRUPT, 0);
+	timer_set(m_screen->time_until_pos(beamy + m_beamyadd, beamx + m_beamxadd), TIMER_TRIGGER_GUN_INTERRUPT, 0);
+	timer_set(m_screen->time_until_pos(beamy + m_beamyadd + 1, beamx + m_beamxadd), TIMER_CLEAR_GUN_INTERRUPT, 0);
 
 	/* generate interrupts for player 2's gun */
 	get_crosshair_xy(machine(), 1, &beamx, &beamy);
-	timer_set(machine().primary_screen->time_until_pos(beamy + m_beamyadd, beamx + m_beamxadd), TIMER_TRIGGER_GUN_INTERRUPT, 1);
-	timer_set(machine().primary_screen->time_until_pos(beamy + m_beamyadd + 1, beamx + m_beamxadd), TIMER_CLEAR_GUN_INTERRUPT, 1);
+	timer_set(m_screen->time_until_pos(beamy + m_beamyadd, beamx + m_beamxadd), TIMER_TRIGGER_GUN_INTERRUPT, 1);
+	timer_set(m_screen->time_until_pos(beamy + m_beamyadd + 1, beamx + m_beamxadd), TIMER_CLEAR_GUN_INTERRUPT, 1);
 }
 
 
@@ -179,7 +179,7 @@ VIDEO_START_MEMBER(tickee_state,tickee)
 {
 	/* start a timer going on the first scanline of every frame */
 	m_setup_gun_timer = timer_alloc(TIMER_SETUP_GUN_INTERRUPTS);
-	m_setup_gun_timer->adjust(machine().primary_screen->time_until_pos(0));
+	m_setup_gun_timer->adjust(m_screen->time_until_pos(0));
 }
 
 

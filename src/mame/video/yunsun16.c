@@ -131,7 +131,7 @@ void yunsun16_state::video_start()
 void yunsun16_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	int offs;
-	const rectangle &visarea = machine().primary_screen->visible_area();
+	const rectangle &visarea = m_screen->visible_area();
 
 	int max_x = visarea.max_x + 1;
 	int max_y = visarea.max_y + 1;

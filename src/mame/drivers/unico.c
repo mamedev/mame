@@ -110,7 +110,7 @@ READ16_MEMBER(unico_state::unico_gunx_0_msb_r)
 	if (x<0x160) x=0x30 + (x*0xd0/0x15f);
 	else x=((x-0x160) * 0x20)/0x1f;
 
-	return ((x&0xff) ^ (machine().primary_screen->frame_number()&1))<<8;
+	return ((x&0xff) ^ (m_screen->frame_number()&1))<<8;
 }
 
 READ16_MEMBER(unico_state::unico_guny_0_msb_r)
@@ -119,7 +119,7 @@ READ16_MEMBER(unico_state::unico_guny_0_msb_r)
 
 	y=0x18+((y*0xe0)/0xff);
 
-	return ((y&0xff) ^ (machine().primary_screen->frame_number()&1))<<8;
+	return ((y&0xff) ^ (m_screen->frame_number()&1))<<8;
 }
 
 READ16_MEMBER(unico_state::unico_gunx_1_msb_r)
@@ -130,7 +130,7 @@ READ16_MEMBER(unico_state::unico_gunx_1_msb_r)
 	if (x<0x160) x=0x30 + (x*0xd0/0x15f);
 	else x=((x-0x160) * 0x20)/0x1f;
 
-	return ((x&0xff) ^ (machine().primary_screen->frame_number()&1))<<8;
+	return ((x&0xff) ^ (m_screen->frame_number()&1))<<8;
 }
 
 READ16_MEMBER(unico_state::unico_guny_1_msb_r)
@@ -139,7 +139,7 @@ READ16_MEMBER(unico_state::unico_guny_1_msb_r)
 
 	y=0x18+((y*0xe0)/0xff);
 
-	return ((y&0xff) ^ (machine().primary_screen->frame_number()&1))<<8;
+	return ((y&0xff) ^ (m_screen->frame_number()&1))<<8;
 }
 
 static ADDRESS_MAP_START( zeropnt_map, AS_PROGRAM, 16, unico_state )

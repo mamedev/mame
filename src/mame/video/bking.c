@@ -221,8 +221,8 @@ TILE_GET_INFO_MEMBER(bking_state::get_tile_info)
 void bking_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(bking_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	machine().primary_screen->register_screen_bitmap(m_colmap_bg);
-	machine().primary_screen->register_screen_bitmap(m_colmap_ball);
+	m_screen->register_screen_bitmap(m_colmap_bg);
+	m_screen->register_screen_bitmap(m_colmap_ball);
 }
 
 

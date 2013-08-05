@@ -73,7 +73,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(nemesis_state::konamigt_interrupt)
 {
 	int scanline = param;
 
-	if (scanline == 240 && m_irq_on && (machine().primary_screen->frame_number() & 1) == 0)
+	if (scanline == 240 && m_irq_on && (m_screen->frame_number() & 1) == 0)
 		m_maincpu->set_input_line(1, HOLD_LINE);
 
 	if (scanline == 0 && m_irq2_on)
@@ -84,7 +84,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(nemesis_state::gx400_interrupt)
 {
 	int scanline = param;
 
-	if (scanline == 240 && m_irq1_on && (machine().primary_screen->frame_number() & 1) == 0)
+	if (scanline == 240 && m_irq1_on && (m_screen->frame_number() & 1) == 0)
 		m_maincpu->set_input_line(1, HOLD_LINE);
 
 	if (scanline == 0 && m_irq2_on)

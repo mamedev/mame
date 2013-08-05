@@ -70,7 +70,7 @@ void fantland_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 			*ram2       =   indx_ram;           // current sprite pointer in indx_ram
 
 	// wheelrun is the only game with a smaller visible area
-	const rectangle &visarea = machine().primary_screen->visible_area();
+	const rectangle &visarea = m_screen->visible_area();
 	int special = (visarea.max_y - visarea.min_y + 1) < 0x100;
 
 	for ( ; ram < indx_ram; ram += 8,ram2++)

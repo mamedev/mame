@@ -26,7 +26,7 @@ Notes:
 /* Guess: reads when doing r/w to video device */
 READ16_MEMBER(othldrby_state::othldrby_scanline_r)
 {
-	return machine().primary_screen->vpos();
+	return m_screen->vpos();
 }
 
 

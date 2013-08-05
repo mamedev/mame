@@ -42,7 +42,7 @@ void atarigx2_state::update_interrupts()
 MACHINE_RESET_MEMBER(atarigx2_state,atarigx2)
 {
 	atarigen_state::machine_reset();
-	scanline_timer_reset(*machine().primary_screen, 8);
+	scanline_timer_reset(*m_screen, 8);
 }
 
 

@@ -550,7 +550,7 @@ READ32_MEMBER(seta2_state::funcube_debug_r)
 	UINT32 ret = ioport("DEBUG")->read();
 
 	// This bits let you move the crosshair in the inputs / touch panel test with a joystick
-	if (!(machine().primary_screen->frame_number() % 3))
+	if (!(m_screen->frame_number() % 3))
 		ret |= 0x3f;
 
 	return ret;
@@ -632,7 +632,7 @@ READ8_MEMBER(seta2_state::funcube_coins_r)
 	UINT8 coin_bit0 = 1;    // active low
 	UINT8 coin_bit1 = 1;
 
-	UINT8 hopper_bit = (m_funcube_hopper_motor && !(machine().primary_screen->frame_number()%20)) ? 1 : 0;
+	UINT8 hopper_bit = (m_funcube_hopper_motor && !(m_screen->frame_number()%20)) ? 1 : 0;
 
 	const UINT64 coin_total_cycles = FUNCUBE_SUB_CPU_CLOCK / (1000/20);
 

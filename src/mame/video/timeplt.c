@@ -160,7 +160,7 @@ WRITE8_MEMBER(timeplt_state::timeplt_flipscreen_w)
 
 READ8_MEMBER(timeplt_state::timeplt_scanline_r)
 {
-	return machine().primary_screen->vpos();
+	return m_screen->vpos();
 }
 
 

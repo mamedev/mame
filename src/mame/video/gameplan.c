@@ -283,9 +283,9 @@ TIMER_CALLBACK_MEMBER(gameplan_state::via_0_ca1_timer_callback)
 	m_via_0->write_ca1(param);
 
 	if (param)
-		m_via_0_ca1_timer->adjust(machine().primary_screen->time_until_pos(VBSTART));
+		m_via_0_ca1_timer->adjust(m_screen->time_until_pos(VBSTART));
 	else
-		m_via_0_ca1_timer->adjust(machine().primary_screen->time_until_pos(VBEND), 1);
+		m_via_0_ca1_timer->adjust(m_screen->time_until_pos(VBEND), 1);
 }
 
 
@@ -334,7 +334,7 @@ VIDEO_START_MEMBER(gameplan_state,trvquest)
 
 VIDEO_RESET_MEMBER(gameplan_state,gameplan)
 {
-	m_via_0_ca1_timer->adjust(machine().primary_screen->time_until_pos(VBSTART));
+	m_via_0_ca1_timer->adjust(m_screen->time_until_pos(VBSTART));
 }
 
 

@@ -89,12 +89,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(spdodgeb_state::spdodgeb_interrupt)
 	if (scanline == 256)
 	{
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-		machine().primary_screen->update_partial(256);
+		m_screen->update_partial(256);
 	}
 	else if ((scanline % 8) == 0)
 	{
 		m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
-		machine().primary_screen->update_partial(scanline+16); /* TODO: pretty off ... */
+		m_screen->update_partial(scanline+16); /* TODO: pretty off ... */
 	}
 }
 

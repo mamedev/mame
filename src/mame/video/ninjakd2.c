@@ -127,7 +127,7 @@ void ninjakd2_state::video_init_common(UINT32 vram_alloc_size)
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ninjakd2_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_fg_tilemap->set_transparent_pen(0xf);
 
-	machine().primary_screen->register_screen_bitmap(m_sprites_bitmap);
+	m_screen->register_screen_bitmap(m_sprites_bitmap);
 
 	m_sprites_updated = 0;
 	m_robokid_sprites = 0;

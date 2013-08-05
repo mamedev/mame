@@ -2242,7 +2242,7 @@ READ16_MEMBER(namcos23_state::s23_c417_r)
 		   0:  xcpreq
 		 */
 		case 0:
-			return 0x8e | (machine().primary_screen->vblank() ? 0x0000 : 0x8000);
+			return 0x8e | (m_screen->vblank() ? 0x0000 : 0x8000);
 		case 1:
 			return m_c417.adr;
 		case 4:
@@ -2479,11 +2479,11 @@ TIMER_CALLBACK_MEMBER(namcos23_state::c361_timer_cb)
 	if (m_c361.scanline != 0x1ff)
 	{
 		// need to do a partial update here, but doesn't work properly yet
-		//machine().primary_screen->update_partial(machine().primary_screen->vpos());
+		//m_screen->update_partial(m_screen->vpos());
 		update_main_interrupts(m_main_irqcause | MAIN_C361_IRQ);
 
 		// TC2 indicates it's probably one-shot since it resets it each VBL...
-		//c361.timer->adjust(machine().primary_screen->time_until_pos(c361.scanline));
+		//c361.timer->adjust(m_screen->time_until_pos(c361.scanline));
 	}
 	else
 		update_main_interrupts(m_main_irqcause & ~MAIN_C361_IRQ);
@@ -2503,7 +2503,7 @@ WRITE16_MEMBER(namcos23_state::s23_c361_w)
 
 		case 4: // interrupt control
 			m_c361.scanline = data & 0x1ff;
-			m_c361.timer->adjust(machine().primary_screen->time_until_pos(m_c361.scanline));
+			m_c361.timer->adjust(m_screen->time_until_pos(m_c361.scanline));
 			break;
 
 		default:
@@ -2520,10 +2520,10 @@ READ16_MEMBER(namcos23_state::s23_c361_r)
 		// how does it work exactly? it's not understood in namcos22 either (also has a c361)
 		case 5:
 			update_main_interrupts(m_main_irqcause & ~MAIN_C361_IRQ);
-			return machine().primary_screen->vpos()*2 | (machine().primary_screen->vblank() ? 1 : 0);
+			return m_screen->vpos()*2 | (m_screen->vblank() ? 1 : 0);
 		case 6:
 			update_main_interrupts(m_main_irqcause & ~MAIN_C361_IRQ);
-			return machine().primary_screen->vblank() ? 1 : 0;
+			return m_screen->vblank() ? 1 : 0;
 	}
 
 	logerror("c361_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));

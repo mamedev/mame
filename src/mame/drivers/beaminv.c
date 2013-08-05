@@ -113,7 +113,7 @@ TIMER_CALLBACK_MEMBER(beaminv_state::interrupt_callback)
 	next_interrupt_number = (interrupt_number + 1) % INTERRUPTS_PER_FRAME;
 	next_vpos = interrupt_lines[next_interrupt_number];
 
-	m_interrupt_timer->adjust(machine().primary_screen->time_until_pos(next_vpos), next_interrupt_number);
+	m_interrupt_timer->adjust(m_screen->time_until_pos(next_vpos), next_interrupt_number);
 }
 
 
@@ -126,7 +126,7 @@ void beaminv_state::create_interrupt_timer()
 void beaminv_state::start_interrupt_timer()
 {
 	int vpos = interrupt_lines[0];
-	m_interrupt_timer->adjust(machine().primary_screen->time_until_pos(vpos));
+	m_interrupt_timer->adjust(m_screen->time_until_pos(vpos));
 }
 
 
@@ -197,7 +197,7 @@ UINT32 beaminv_state::screen_update_beaminv(screen_device &screen, bitmap_rgb32 
 
 READ8_MEMBER(beaminv_state::v128_r)
 {
-	return (machine().primary_screen->vpos() >> 7) & 0x01;
+	return (m_screen->vpos() >> 7) & 0x01;
 }
 
 

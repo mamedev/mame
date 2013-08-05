@@ -317,7 +317,7 @@ void toaplan1_state::register_common()
 
 VIDEO_START_MEMBER(toaplan1_rallybik_state,rallybik)
 {
-	m_spritegen->alloc_sprite_bitmap();
+	m_spritegen->alloc_sprite_bitmap(*m_screen);
 	m_spritegen->set_gfx_region(1);
 
 	toaplan1_create_tilemaps();
@@ -373,7 +373,7 @@ VIDEO_START_MEMBER(toaplan1_state,toaplan1)
 
 READ16_MEMBER(toaplan1_state::toaplan1_frame_done_r)
 {
-	return machine().primary_screen->vblank();
+	return m_screen->vblank();
 }
 
 WRITE16_MEMBER(toaplan1_state::toaplan1_tile_offsets_w)
@@ -428,7 +428,7 @@ WRITE16_MEMBER(toaplan1_state::toaplan1_bcu_flipscreen_w)
 		machine().tilemap().set_flip_all((data ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0));
 		if (m_bcu_flipscreen)
 		{
-			const rectangle &visarea = machine().primary_screen->visible_area();
+			const rectangle &visarea = m_screen->visible_area();
 
 			m_scrollx_offs1 = 0x151 - 6;
 			m_scrollx_offs2 = 0x151 - 4;
@@ -1028,7 +1028,7 @@ void toaplan1_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 			/****** flip the sprite layer ******/
 			if (fcu_flipscreen)
 			{
-				const rectangle &visarea = machine().primary_screen->visible_area();
+				const rectangle &visarea = m_screen->visible_area();
 
 				sx_base = visarea.width() - (sx_base + 8);  /* visarea.x = 320 */
 				sy_base = visarea.height() - (sy_base + 8); /* visarea.y = 240 */

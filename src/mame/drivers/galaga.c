@@ -866,7 +866,7 @@ TIMER_CALLBACK_MEMBER(galaga_state::cpu3_interrupt_callback)
 		scanline = 64;
 
 	/* the vertical synch chain is clocked by H256 -- this is probably not important, but oh well */
-	m_cpu3_interrupt_timer->adjust(machine().primary_screen->time_until_pos(scanline), scanline);
+	m_cpu3_interrupt_timer->adjust(m_screen->time_until_pos(scanline), scanline);
 }
 
 
@@ -896,7 +896,7 @@ MACHINE_RESET_MEMBER(galaga_state,galaga)
 	/* Reset all latches */
 	bosco_latch_reset();
 
-	m_cpu3_interrupt_timer->adjust(machine().primary_screen->time_until_pos(64), 64);
+	m_cpu3_interrupt_timer->adjust(m_screen->time_until_pos(64), 64);
 }
 
 MACHINE_RESET_MEMBER(xevious_state,battles)

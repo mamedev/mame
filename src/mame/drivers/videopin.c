@@ -69,13 +69,13 @@ TIMER_CALLBACK_MEMBER(videopin_state::interrupt_callback)
 	if (scanline >= 263)
 		scanline = 32;
 
-	timer_set(machine().primary_screen->time_until_pos(scanline), TIMER_INTERRUPT, scanline);
+	timer_set(m_screen->time_until_pos(scanline), TIMER_INTERRUPT, scanline);
 }
 
 
 void videopin_state::machine_reset()
 {
-	timer_set(machine().primary_screen->time_until_pos(32), TIMER_INTERRUPT, 32);
+	timer_set(m_screen->time_until_pos(32), TIMER_INTERRUPT, 32);
 
 	/* both output latches are cleared on reset */
 
@@ -120,7 +120,7 @@ READ8_MEMBER(videopin_state::videopin_misc_r)
 
 WRITE8_MEMBER(videopin_state::videopin_led_w)
 {
-	int i = (machine().primary_screen->vpos() >> 5) & 7;
+	int i = (m_screen->vpos() >> 5) & 7;
 	static const char *const matrix[8][4] =
 	{
 		{ "LED26", "LED18", "LED11", "LED13" },

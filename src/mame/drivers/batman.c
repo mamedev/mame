@@ -73,7 +73,7 @@ WRITE16_MEMBER(batman_state::latch_w)
 	/* alpha bank is selected by the upper 4 bits */
 	if ((oldword ^ m_latch_data) & 0x7000)
 	{
-		machine().primary_screen->update_partial(machine().primary_screen->vpos());
+		m_screen->update_partial(m_screen->vpos());
 		m_vad->alpha()->mark_all_dirty();
 		m_alpha_tile_bank = (m_latch_data >> 12) & 7;
 	}

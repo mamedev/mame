@@ -367,7 +367,7 @@ VIDEO_START_MEMBER(rallyx_state,locomotn)
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(rallyx_state::locomotn_fg_get_tile_info),this), tilemap_mapper_delegate(FUNC(rallyx_state::fg_tilemap_scan),this), 8, 8, 8, 32);
 
 	/* handle reduced visible area in some games */
-	if (machine().primary_screen->visible_area().max_x == 32 * 8 - 1)
+	if (m_screen->visible_area().max_x == 32 * 8 - 1)
 	{
 		m_bg_tilemap->set_scrolldx(0, 32);
 		m_fg_tilemap->set_scrolldx(0, 32);
@@ -386,7 +386,7 @@ VIDEO_START_MEMBER(rallyx_state,commsega)
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(rallyx_state::locomotn_fg_get_tile_info),this), tilemap_mapper_delegate(FUNC(rallyx_state::fg_tilemap_scan),this), 8, 8, 8, 32);
 
 	/* handle reduced visible area in some games */
-	if (machine().primary_screen->visible_area().max_x == 32 * 8 - 1)
+	if (m_screen->visible_area().max_x == 32 * 8 - 1)
 	{
 		m_bg_tilemap->set_scrolldx(0, 32);
 		m_fg_tilemap->set_scrolldx(0, 32);

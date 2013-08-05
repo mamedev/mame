@@ -228,7 +228,7 @@ TIMER_CALLBACK_MEMBER(mcr68_state::mcr68_493_callback)
 {
 	m_v493_irq_state = 1;
 	update_mcr68_interrupts();
-	machine().scheduler().timer_set(machine().primary_screen->scan_period(), timer_expired_delegate(FUNC(mcr68_state::mcr68_493_off_callback),this));
+	machine().scheduler().timer_set(m_screen->scan_period(), timer_expired_delegate(FUNC(mcr68_state::mcr68_493_off_callback),this));
 	logerror("--- (INT1) ---\n");
 }
 
@@ -284,7 +284,7 @@ TIMER_CALLBACK_MEMBER(mcr68_state::zwackery_493_callback)
 	pia6821_device *pia = machine().device<pia6821_device>("pia0");
 
 	pia->ca1_w(1);
-	machine().scheduler().timer_set(machine().primary_screen->scan_period(), timer_expired_delegate(FUNC(mcr68_state::zwackery_493_off_callback),this));
+	machine().scheduler().timer_set(m_screen->scan_period(), timer_expired_delegate(FUNC(mcr68_state::zwackery_493_off_callback),this));
 }
 
 

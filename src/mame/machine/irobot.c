@@ -155,7 +155,7 @@ TIMER_CALLBACK_MEMBER(irobot_state::scanline_callback)
 	/* set a callback for the next 32-scanline increment */
 	scanline += 32;
 	if (scanline >= 256) scanline = 0;
-	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(scanline), timer_expired_delegate(FUNC(irobot_state::scanline_callback),this), scanline);
+	machine().scheduler().timer_set(m_screen->time_until_pos(scanline), timer_expired_delegate(FUNC(irobot_state::scanline_callback),this), scanline);
 }
 
 void irobot_state::machine_reset()
@@ -175,7 +175,7 @@ void irobot_state::machine_reset()
 	m_irmb_timer = machine().device<timer_device>("irmb_timer");
 
 	/* set an initial timer to go off on scanline 0 */
-	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(0), timer_expired_delegate(FUNC(irobot_state::scanline_callback),this));
+	machine().scheduler().timer_set(m_screen->time_until_pos(0), timer_expired_delegate(FUNC(irobot_state::scanline_callback),this));
 
 	irobot_rom_banksel_w(m_maincpu->space(AS_PROGRAM),0,0);
 	irobot_out0_w(m_maincpu->space(AS_PROGRAM),0,0);

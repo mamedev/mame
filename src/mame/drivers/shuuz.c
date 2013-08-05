@@ -86,7 +86,7 @@ READ16_MEMBER(shuuz_state::special_port0_r)
 {
 	int result = ioport("SYSTEM")->read();
 
-	if ((result & 0x0800) && get_hblank(*machine().primary_screen))
+	if ((result & 0x0800) && get_hblank(*m_screen))
 		result &= ~0x0800;
 
 	return result;

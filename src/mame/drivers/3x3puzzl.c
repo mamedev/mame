@@ -147,11 +147,11 @@ WRITE16_MEMBER(_3x3puzzle_state::gfx_ctrl_w)
 
 	if ( BIT(data,4) )
 	{
-		machine().primary_screen->set_visible_area(0*8, 64*8-1, 0*8, 30*8-1);
+		m_screen->set_visible_area(0*8, 64*8-1, 0*8, 30*8-1);
 	}
 	else
 	{
-		machine().primary_screen->set_visible_area(0*8, 40*8-1, 0*8, 30*8-1);
+		m_screen->set_visible_area(0*8, 40*8-1, 0*8, 30*8-1);
 	}
 
 	if ( (data&0x06) != m_oki_bank )

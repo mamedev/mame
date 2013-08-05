@@ -270,12 +270,12 @@ WRITE16_MEMBER(galaxi_state::galaxi_500004_w)
 
 CUSTOM_INPUT_MEMBER(galaxi_state::ticket_r)
 {
-	return m_ticket && !(machine().primary_screen->frame_number() % 10);
+	return m_ticket && !(m_screen->frame_number() % 10);
 }
 
 CUSTOM_INPUT_MEMBER(galaxi_state::hopper_r)
 {
-	return m_hopper && !(machine().primary_screen->frame_number() % 10);
+	return m_hopper && !(m_screen->frame_number() % 10);
 }
 
 

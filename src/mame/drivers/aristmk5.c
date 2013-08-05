@@ -200,7 +200,7 @@ READ32_MEMBER(aristmk5_state::mk5_ioc_r)
 	{
 		int vert_pos;
 
-		vert_pos = machine().primary_screen->vpos();
+		vert_pos = m_screen->vpos();
 		m_flyback = (vert_pos <= m_vidc_regs[VIDC_VDSR] || vert_pos >= m_vidc_regs[VIDC_VDER]) ? 0x80 : 0x00;
 
 		//i2c_data = (i2cmem_sda_read(machine().device("i2cmem")) & 1);

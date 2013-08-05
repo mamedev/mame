@@ -173,8 +173,8 @@ WRITE8_MEMBER(itech8_state::itech8_palette_w)
 
 WRITE8_MEMBER(itech8_state::itech8_page_w)
 {
-	machine().primary_screen->update_partial(machine().primary_screen->vpos());
-	logerror("%04x:display_page = %02X (%d)\n", space.device().safe_pc(), data, machine().primary_screen->vpos());
+	m_screen->update_partial(m_screen->vpos());
+	logerror("%04x:display_page = %02X (%d)\n", space.device().safe_pc(), data, m_screen->vpos());
 	m_page_select = data;
 }
 
@@ -273,7 +273,7 @@ void itech8_state::perform_blit(address_space &space)
 	/* debugging */
 	if (FULL_LOGGING)
 		logerror("Blit: scan=%d  src=%06x @ (%05x) for %dx%d ... flags=%02x\n",
-				space.machine().primary_screen->vpos(),
+				m_screen->vpos(),
 				(m_grom_bank << 16) | (BLITTER_ADDRHI << 8) | BLITTER_ADDRLO,
 				m_tms34061->m_display.regs[TMS34061_XYADDRESS] | ((m_tms34061->m_display.regs[TMS34061_XYOFFSET] & 0x300) << 8),
 				BLITTER_WIDTH, BLITTER_HEIGHT, BLITTER_FLAGS);
@@ -395,7 +395,7 @@ TIMER_CALLBACK_MEMBER(itech8_state::blitter_done)
 	m_blit_in_progress = 0;
 	itech8_update_interrupts(-1, -1, 1);
 
-	if (FULL_LOGGING) logerror("------------ BLIT DONE (%d) --------------\n", machine().primary_screen->vpos());
+	if (FULL_LOGGING) logerror("------------ BLIT DONE (%d) --------------\n", m_screen->vpos());
 }
 
 
@@ -532,7 +532,7 @@ WRITE8_MEMBER(itech8_state::grmatch_palette_w)
 WRITE8_MEMBER(itech8_state::grmatch_xscroll_w)
 {
 	/* update the X scroll value */
-	machine().primary_screen->update_now();
+	m_screen->update_now();
 	m_grmatch_xscroll = data;
 }
 

@@ -108,7 +108,7 @@ WRITE16_MEMBER( gauntlet_state::gauntlet_xscroll_w )
 	/* if something changed, force a partial update */
 	if (*m_xscroll != oldxscroll)
 	{
-		machine().primary_screen->update_partial(machine().primary_screen->vpos());
+		m_screen->update_partial(m_screen->vpos());
 
 		/* adjust the scrolls */
 		m_playfield_tilemap->set_scrollx(0, *m_xscroll);
@@ -132,7 +132,7 @@ WRITE16_MEMBER( gauntlet_state::gauntlet_yscroll_w )
 	/* if something changed, force a partial update */
 	if (*m_yscroll != oldyscroll)
 	{
-		machine().primary_screen->update_partial(machine().primary_screen->vpos());
+		m_screen->update_partial(m_screen->vpos());
 
 		/* if the bank changed, mark all tiles dirty */
 		if (m_playfield_tile_bank != (*m_yscroll & 3))

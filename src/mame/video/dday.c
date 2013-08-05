@@ -211,7 +211,7 @@ void dday_state::video_start()
 	m_text_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dday_state::get_text_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_sl_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dday_state::get_sl_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
-	machine().primary_screen->register_screen_bitmap(m_main_bitmap);
+	m_screen->register_screen_bitmap(m_main_bitmap);
 
 	m_bg_tilemap->set_transmask(0, 0x00f0, 0xff0f); /* pens 0-3 have priority over the foreground layer */
 	m_fg_tilemap->set_transparent_pen(0);

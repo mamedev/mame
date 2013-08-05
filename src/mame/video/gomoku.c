@@ -111,7 +111,7 @@ void gomoku_state::video_start()
 	int bgdata;
 	int color;
 
-	machine().primary_screen->register_screen_bitmap(m_bg_bitmap);
+	m_screen->register_screen_bitmap(m_bg_bitmap);
 
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(gomoku_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32, 32);
 

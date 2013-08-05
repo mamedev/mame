@@ -217,7 +217,7 @@ TIMER_CALLBACK_MEMBER(berzerk_state::irq_callback)
 	next_v256 = irq_trigger_v256s[next_irq_number];
 
 	next_vpos = vsync_chain_counter_to_vpos(next_counter, next_v256);
-	m_irq_timer->adjust(machine().primary_screen->time_until_pos(next_vpos), next_irq_number);
+	m_irq_timer->adjust(m_screen->time_until_pos(next_vpos), next_irq_number);
 }
 
 
@@ -230,7 +230,7 @@ void berzerk_state::create_irq_timer()
 void berzerk_state::start_irq_timer()
 {
 	int vpos = vsync_chain_counter_to_vpos(irq_trigger_counts[0], irq_trigger_v256s[0]);
-	m_irq_timer->adjust(machine().primary_screen->time_until_pos(vpos));
+	m_irq_timer->adjust(m_screen->time_until_pos(vpos));
 }
 
 
@@ -294,7 +294,7 @@ TIMER_CALLBACK_MEMBER(berzerk_state::nmi_callback)
 	next_v256 = nmi_trigger_v256s[next_nmi_number];
 
 	next_vpos = vsync_chain_counter_to_vpos(next_counter, next_v256);
-	m_nmi_timer->adjust(machine().primary_screen->time_until_pos(next_vpos), next_nmi_number);
+	m_nmi_timer->adjust(m_screen->time_until_pos(next_vpos), next_nmi_number);
 }
 
 
@@ -307,7 +307,7 @@ void berzerk_state::create_nmi_timer()
 void berzerk_state::start_nmi_timer()
 {
 	int vpos = vsync_chain_counter_to_vpos(nmi_trigger_counts[0], nmi_trigger_v256s[0]);
-	m_nmi_timer->adjust(machine().primary_screen->time_until_pos(vpos));
+	m_nmi_timer->adjust(m_screen->time_until_pos(vpos));
 }
 
 
@@ -427,7 +427,7 @@ READ8_MEMBER(berzerk_state::intercept_v256_r)
 	UINT8 counter;
 	UINT8 v256;
 
-	vpos_to_vsync_chain_counter(machine().primary_screen->vpos(), &counter, &v256);
+	vpos_to_vsync_chain_counter(m_screen->vpos(), &counter, &v256);
 
 	return (!m_intercept << 7) | v256;
 }

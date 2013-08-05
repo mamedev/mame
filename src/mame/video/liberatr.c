@@ -187,7 +187,7 @@ void liberatr_state::init_planet(planet &liberatr_planet, UINT8 *planet_rom)
 
 			/* calculate the bitmap's x coordinate for the western horizon
 			   center of bitmap - (the number of planet pixels) / 4 */
-			*buffer++ = (machine().primary_screen->width() / 2) - ((line->max_x + 2) / 4);
+			*buffer++ = (m_screen->width() / 2) - ((line->max_x + 2) / 4);
 
 			for (i = 0; i < segment_count; i++)
 			{

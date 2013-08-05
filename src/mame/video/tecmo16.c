@@ -56,11 +56,11 @@ TILE_GET_INFO_MEMBER(tecmo16_state::tx_get_tile_info)
 void tecmo16_state::video_start()
 {
 	/* set up tile layers */
-	machine().primary_screen->register_screen_bitmap(m_tile_bitmap_bg);
-	machine().primary_screen->register_screen_bitmap(m_tile_bitmap_fg);
+	m_screen->register_screen_bitmap(m_tile_bitmap_bg);
+	m_screen->register_screen_bitmap(m_tile_bitmap_fg);
 
 	/* set up sprites */
-	machine().primary_screen->register_screen_bitmap(m_sprite_bitmap);
+	m_screen->register_screen_bitmap(m_sprite_bitmap);
 
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tecmo16_state::fg_get_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tecmo16_state::bg_get_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
@@ -78,11 +78,11 @@ void tecmo16_state::video_start()
 VIDEO_START_MEMBER(tecmo16_state,ginkun)
 {
 	/* set up tile layers */
-	machine().primary_screen->register_screen_bitmap(m_tile_bitmap_bg);
-	machine().primary_screen->register_screen_bitmap(m_tile_bitmap_fg);
+	m_screen->register_screen_bitmap(m_tile_bitmap_bg);
+	m_screen->register_screen_bitmap(m_tile_bitmap_fg);
 
 	/* set up sprites */
-	machine().primary_screen->register_screen_bitmap(m_sprite_bitmap);
+	m_screen->register_screen_bitmap(m_sprite_bitmap);
 
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tecmo16_state::fg_get_tile_info),this),TILEMAP_SCAN_ROWS,16,16,64,32);
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tecmo16_state::bg_get_tile_info),this),TILEMAP_SCAN_ROWS,16,16,64,32);
@@ -98,11 +98,11 @@ VIDEO_START_MEMBER(tecmo16_state,ginkun)
 VIDEO_START_MEMBER(tecmo16_state,riot)
 {
 	/* set up tile layers */
-	machine().primary_screen->register_screen_bitmap(m_tile_bitmap_bg);
-	machine().primary_screen->register_screen_bitmap(m_tile_bitmap_fg);
+	m_screen->register_screen_bitmap(m_tile_bitmap_bg);
+	m_screen->register_screen_bitmap(m_tile_bitmap_fg);
 
 	/* set up sprites */
-	machine().primary_screen->register_screen_bitmap(m_sprite_bitmap);
+	m_screen->register_screen_bitmap(m_sprite_bitmap);
 
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tecmo16_state::fg_get_tile_info),this),TILEMAP_SCAN_ROWS,16,16,64,32);
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tecmo16_state::bg_get_tile_info),this),TILEMAP_SCAN_ROWS,16,16,64,32);

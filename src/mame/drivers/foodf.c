@@ -130,7 +130,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(foodf_state::scanline_update_timer)
 		scanline = 0;
 
 	/* set a timer for it */
-	timer.adjust(machine().primary_screen->time_until_pos(scanline), scanline);
+	timer.adjust(m_screen->time_until_pos(scanline), scanline);
 }
 
 
@@ -144,7 +144,7 @@ MACHINE_START_MEMBER(foodf_state,foodf)
 MACHINE_RESET_MEMBER(foodf_state,foodf)
 {
 	timer_device *scan_timer = machine().device<timer_device>("scan_timer");
-	scan_timer->adjust(machine().primary_screen->time_until_pos(0));
+	scan_timer->adjust(m_screen->time_until_pos(0));
 }
 
 

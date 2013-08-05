@@ -49,7 +49,7 @@ TILE_GET_INFO_MEMBER(sprint4_state::sprint4_tile_info)
 
 void sprint4_state::video_start()
 {
-	machine().primary_screen->register_screen_bitmap(m_helper);
+	m_screen->register_screen_bitmap(m_helper);
 
 	m_playfield = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sprint4_state::sprint4_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
@@ -113,7 +113,7 @@ void sprint4_state::screen_eof_sprint4(screen_device &screen, bool state)
 			rect.max_x = horz - 15 + machine().gfx[1]->width() - 1;
 			rect.max_y = vert - 15 + machine().gfx[1]->height() - 1;
 
-			rect &= machine().primary_screen->visible_area();
+			rect &= m_screen->visible_area();
 
 			m_playfield->draw(screen, m_helper, rect, 0, 0);
 

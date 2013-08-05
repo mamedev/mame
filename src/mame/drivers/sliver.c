@@ -365,8 +365,8 @@ ADDRESS_MAP_END
 
 void sliver_state::video_start()
 {
-	machine().primary_screen->register_screen_bitmap(m_bitmap_bg);
-	machine().primary_screen->register_screen_bitmap(m_bitmap_fg);
+	m_screen->register_screen_bitmap(m_bitmap_bg);
+	m_screen->register_screen_bitmap(m_bitmap_fg);
 }
 
 UINT32 sliver_state::screen_update_sliver(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

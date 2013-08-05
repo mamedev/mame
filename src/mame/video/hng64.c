@@ -1639,7 +1639,7 @@ void hng64_state::screen_eof_hng64(screen_device &screen, bool state)
 
 void hng64_state::video_start()
 {
-	const rectangle &visarea = machine().primary_screen->visible_area();
+	const rectangle &visarea = m_screen->visible_area();
 
 	m_old_animmask = -1;
 	m_old_animbits = -1;

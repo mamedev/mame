@@ -29,7 +29,7 @@ TIMER_CALLBACK_MEMBER(runaway_state::interrupt_callback)
 	if (scanline >= 263)
 		scanline = 16;
 
-	m_interrupt_timer->adjust(machine().primary_screen->time_until_pos(scanline), scanline);
+	m_interrupt_timer->adjust(m_screen->time_until_pos(scanline), scanline);
 }
 
 void runaway_state::machine_start()
@@ -39,7 +39,7 @@ void runaway_state::machine_start()
 
 void runaway_state::machine_reset()
 {
-	m_interrupt_timer->adjust(machine().primary_screen->time_until_pos(16), 16);
+	m_interrupt_timer->adjust(m_screen->time_until_pos(16), 16);
 }
 
 

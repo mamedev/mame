@@ -166,7 +166,7 @@ void astrocde_state::video_start()
 {
 	/* allocate timers */
 	m_scanline_timer = timer_alloc(TIMER_SCANLINE);
-	m_scanline_timer->adjust(machine().primary_screen->time_until_pos(1), 1);
+	m_scanline_timer->adjust(m_screen->time_until_pos(1), 1);
 	m_intoff_timer = timer_alloc(TIMER_INTERRUPT_OFF);
 
 	/* register for save states */
@@ -182,7 +182,7 @@ VIDEO_START_MEMBER(astrocde_state,profpac)
 {
 	/* allocate timers */
 	m_scanline_timer = timer_alloc(TIMER_SCANLINE);
-	m_scanline_timer->adjust(machine().primary_screen->time_until_pos(1), 1);
+	m_scanline_timer->adjust(m_screen->time_until_pos(1), 1);
 	m_intoff_timer = timer_alloc(TIMER_INTERRUPT_OFF);
 
 	/* allocate videoram */
@@ -398,7 +398,7 @@ void astrocde_state::astrocade_trigger_lightpen(UINT8 vfeedback, UINT8 hfeedback
 		if ((m_interrupt_enabl & 0x01) == 0)
 		{
 			m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_interrupt_vector & 0xf0);
-			m_intoff_timer->adjust(machine().primary_screen->time_until_pos(vfeedback));
+			m_intoff_timer->adjust(m_screen->time_until_pos(vfeedback));
 		}
 
 		/* mode 1 means assert for 1 instruction */
@@ -429,7 +429,7 @@ TIMER_CALLBACK_MEMBER(astrocde_state::scanline_callback)
 
 	/* force an update against the current scanline */
 	if (scanline > 0)
-		machine().primary_screen->update_partial(scanline - 1);
+		m_screen->update_partial(scanline - 1);
 
 	/* generate a scanline interrupt if it's time */
 	if (astrocade_scanline == m_interrupt_scanline && (m_interrupt_enabl & 0x08) != 0)
@@ -438,7 +438,7 @@ TIMER_CALLBACK_MEMBER(astrocde_state::scanline_callback)
 		if ((m_interrupt_enabl & 0x04) == 0)
 		{
 			m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_interrupt_vector);
-			timer_set(machine().primary_screen->time_until_vblank_end(), TIMER_INTERRUPT_OFF);
+			timer_set(m_screen->time_until_vblank_end(), TIMER_INTERRUPT_OFF);
 		}
 
 		/* mode 1 means assert for 1 instruction */
@@ -455,9 +455,9 @@ TIMER_CALLBACK_MEMBER(astrocde_state::scanline_callback)
 
 	/* advance to the next scanline */
 	scanline++;
-	if (scanline >= machine().primary_screen->height())
+	if (scanline >= m_screen->height())
 		scanline = 0;
-	m_scanline_timer->adjust(machine().primary_screen->time_until_pos(scanline), scanline);
+	m_scanline_timer->adjust(m_screen->time_until_pos(scanline), scanline);
 }
 
 

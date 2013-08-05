@@ -230,7 +230,7 @@ WRITE16_HANDLER( hdgsp_control_hi_w )
 
 		case 0x01:
 			data = data & (15 >> state->m_gsp_multisync);
-			space.machine().primary_screen->update_partial(space.machine().primary_screen->vpos() - 1);
+			state->m_screen->update_partial(state->m_screen->vpos() - 1);
 			state->m_gfx_finescroll = data;
 			break;
 

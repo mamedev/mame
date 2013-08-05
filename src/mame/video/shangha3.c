@@ -67,7 +67,7 @@ void shangha3_state::video_start()
 {
 	int i;
 
-	machine().primary_screen->register_screen_bitmap(m_rawbitmap);
+	m_screen->register_screen_bitmap(m_rawbitmap);
 
 	for (i = 0;i < 14;i++)
 		m_drawmode_table[i] = DRAWMODE_SOURCE;

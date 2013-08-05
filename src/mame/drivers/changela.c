@@ -159,7 +159,7 @@ READ8_MEMBER(changela_state::changela_2d_r)
 	int v8 = 0;
 	int gas;
 
-	if ((machine().primary_screen->vpos() & 0xf8) == 0xf8)
+	if ((m_screen->vpos() & 0xf8) == 0xf8)
 		v8 = 1;
 
 	/* Gas pedal is made up of 2 switches, 1 active low, 1 active high */

@@ -82,7 +82,7 @@ WRITE16_MEMBER(aztarac_state::aztarac_ubr_w)
 
 void aztarac_state::video_start()
 {
-	const rectangle &visarea = machine().primary_screen->visible_area();
+	const rectangle &visarea = m_screen->visible_area();
 
 	int xmin = visarea.min_x;
 	int ymin = visarea.min_y;

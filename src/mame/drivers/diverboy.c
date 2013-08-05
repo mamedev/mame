@@ -105,7 +105,7 @@ void diverboy_state::draw_sprites(  bitmap_ind16 &bitmap, const rectangle &clipr
 
 		bank = (source[1] & 0x0002) >> 1;
 
-		if (!flash || (machine().primary_screen->frame_number() & 1))
+		if (!flash || (m_screen->frame_number() & 1))
 		{
 			drawgfx_transpen(bitmap,cliprect,machine().gfx[bank],
 					number,

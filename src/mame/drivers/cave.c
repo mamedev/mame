@@ -905,7 +905,7 @@ WRITE16_MEMBER(cave_state::tjumpman_leds_w)
 
 CUSTOM_INPUT_MEMBER(cave_state::tjumpman_hopper_r)
 {
-	return (m_hopper && !(machine().primary_screen->frame_number() % 10)) ? 0 : 1;
+	return (m_hopper && !(m_screen->frame_number() % 10)) ? 0 : 1;
 }
 
 static ADDRESS_MAP_START( tjumpman_map, AS_PROGRAM, 16, cave_state )

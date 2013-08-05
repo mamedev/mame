@@ -5,8 +5,8 @@
 
 VIDEO_START_MEMBER(galpanic_state,galpanic)
 {
-	machine().primary_screen->register_screen_bitmap(m_bitmap);
-	machine().primary_screen->register_screen_bitmap(m_sprites_bitmap);
+	m_screen->register_screen_bitmap(m_bitmap);
+	m_screen->register_screen_bitmap(m_sprites_bitmap);
 }
 
 PALETTE_INIT_MEMBER(galpanic_state,galpanic)

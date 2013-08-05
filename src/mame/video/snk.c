@@ -647,10 +647,10 @@ WRITE8_MEMBER(snk_state::tdfever_spriteram_w)
 	/*  partial updates avoid flickers in the fsoccer radar. */
 	if (offset < 0x80 && m_spriteram[offset] != data)
 	{
-		int vpos = machine().primary_screen->vpos();
+		int vpos = m_screen->vpos();
 
 		if (vpos > 0)
-			machine().primary_screen->update_partial(vpos - 1);
+			m_screen->update_partial(vpos - 1);
 	}
 
 	m_spriteram[offset] = data;

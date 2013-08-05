@@ -68,13 +68,13 @@ TIMER_CALLBACK_MEMBER(ultratnk_state::nmi_callback)
 	if (ioport("IN0")->read() & 0x40)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 
-	timer_set(machine().primary_screen->time_until_pos(scanline), TIMER_NMI, scanline);
+	timer_set(m_screen->time_until_pos(scanline), TIMER_NMI, scanline);
 }
 
 
 void ultratnk_state::machine_reset()
 {
-	timer_set(machine().primary_screen->time_until_pos(32), TIMER_NMI, 32);
+	timer_set(m_screen->time_until_pos(32), TIMER_NMI, 32);
 }
 
 

@@ -103,15 +103,15 @@ TIMER_CALLBACK_MEMBER(gridlee_state::irq_timer_tick)
 {
 	/* next interrupt after scanline 256 is scanline 64 */
 	if (param == 256)
-		m_irq_timer->adjust(machine().primary_screen->time_until_pos(64), 64);
+		m_irq_timer->adjust(m_screen->time_until_pos(64), 64);
 	else
-		m_irq_timer->adjust(machine().primary_screen->time_until_pos(param + 64), param + 64);
+		m_irq_timer->adjust(m_screen->time_until_pos(param + 64), param + 64);
 
 	/* IRQ starts on scanline 0, 64, 128, etc. */
 	m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 
 	/* it will turn off on the next HBLANK */
-	m_irq_off->adjust(machine().primary_screen->time_until_pos(param, GRIDLEE_HBSTART));
+	m_irq_off->adjust(m_screen->time_until_pos(param, GRIDLEE_HBSTART));
 }
 
 
@@ -124,13 +124,13 @@ TIMER_CALLBACK_MEMBER(gridlee_state::firq_off_tick)
 TIMER_CALLBACK_MEMBER(gridlee_state::firq_timer_tick)
 {
 	/* same time next frame */
-	m_firq_timer->adjust(machine().primary_screen->time_until_pos(FIRQ_SCANLINE));
+	m_firq_timer->adjust(m_screen->time_until_pos(FIRQ_SCANLINE));
 
 	/* IRQ starts on scanline FIRQ_SCANLINE? */
 	m_maincpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
 
 	/* it will turn off on the next HBLANK */
-	m_firq_off->adjust(machine().primary_screen->time_until_pos(FIRQ_SCANLINE, GRIDLEE_HBSTART));
+	m_firq_off->adjust(m_screen->time_until_pos(FIRQ_SCANLINE, GRIDLEE_HBSTART));
 }
 
 void gridlee_state::machine_start()
@@ -151,8 +151,8 @@ void gridlee_state::machine_start()
 void gridlee_state::machine_reset()
 {
 	/* start timers to generate interrupts */
-	m_irq_timer->adjust(machine().primary_screen->time_until_pos(0));
-	m_firq_timer->adjust(machine().primary_screen->time_until_pos(FIRQ_SCANLINE));
+	m_irq_timer->adjust(m_screen->time_until_pos(0));
+	m_firq_timer->adjust(m_screen->time_until_pos(FIRQ_SCANLINE));
 }
 
 

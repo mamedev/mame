@@ -176,14 +176,14 @@ TIMER_CALLBACK_MEMBER(destroyr_state::destroyr_frame_callback)
 	m_potsense[1] = 0;
 
 	/* PCB supports two dials, but cab has only got one */
-	timer_set(machine().primary_screen->time_until_pos(ioport("PADDLE")->read()), TIMER_DESTROYR_DIAL);
-	timer_set(machine().primary_screen->time_until_pos(0), TIMER_DESTROYR_FRAME);
+	timer_set(m_screen->time_until_pos(ioport("PADDLE")->read()), TIMER_DESTROYR_DIAL);
+	timer_set(m_screen->time_until_pos(0), TIMER_DESTROYR_FRAME);
 }
 
 
 void destroyr_state::machine_reset()
 {
-	timer_set(machine().primary_screen->time_until_pos(0), TIMER_DESTROYR_FRAME);
+	timer_set(m_screen->time_until_pos(0), TIMER_DESTROYR_FRAME);
 
 	m_cursor = 0;
 	m_wavemod = 0;
@@ -282,7 +282,7 @@ READ8_MEMBER(destroyr_state::destroyr_input_r)
 
 READ8_MEMBER(destroyr_state::destroyr_scanline_r)
 {
-	return machine().primary_screen->vpos();
+	return m_screen->vpos();
 }
 
 

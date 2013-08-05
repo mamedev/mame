@@ -159,13 +159,13 @@ READ8_MEMBER(sprint2_state::sprint2_sync_r)
 	if (m_attract != 0)
 		val |= 0x10;
 
-	if (machine().primary_screen->vpos() == 261)
+	if (m_screen->vpos() == 261)
 		val |= 0x20; /* VRESET */
 
-	if (machine().primary_screen->vpos() >= 224)
+	if (m_screen->vpos() >= 224)
 		val |= 0x40; /* VBLANK */
 
-	if (machine().primary_screen->vpos() >= 131)
+	if (m_screen->vpos() >= 131)
 		val |= 0x80; /* 60 Hz? */
 
 	return val;

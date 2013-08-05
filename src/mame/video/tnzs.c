@@ -49,7 +49,7 @@ UINT32 tnzs_state::screen_update_tnzs(screen_device &screen, bitmap_ind16 &bitma
 	m_seta001->set_fg_yoffsets( -0x12, 0x0e );
 	m_seta001->set_bg_yoffsets( 0x1, -0x1 );
 
-	m_seta001->draw_sprites(bitmap, cliprect, 0x800, 0 );
+	m_seta001->draw_sprites(screen, bitmap, cliprect, 0x800, 0 );
 	return 0;
 }
 

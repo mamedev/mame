@@ -116,7 +116,7 @@ inline void cloud9_state::schedule_next_irq(int curscanline)
 	curscanline = (curscanline + 64) & 255;
 
 	/* next one at the start of this scanline */
-	m_irq_timer->adjust(machine().primary_screen->time_until_pos(curscanline), curscanline);
+	m_irq_timer->adjust(m_screen->time_until_pos(curscanline), curscanline);
 }
 
 
@@ -130,7 +130,7 @@ TIMER_CALLBACK_MEMBER(cloud9_state::clock_irq)
 	}
 
 	/* force an update now */
-	machine().primary_screen->update_partial(machine().primary_screen->vpos());
+	m_screen->update_partial(m_screen->vpos());
 
 	/* find the next edge */
 	schedule_next_irq(param);
@@ -139,7 +139,7 @@ TIMER_CALLBACK_MEMBER(cloud9_state::clock_irq)
 
 CUSTOM_INPUT_MEMBER(cloud9_state::get_vblank)
 {
-	int scanline = machine().primary_screen->vpos();
+	int scanline = m_screen->vpos();
 	return (~m_syncprom[scanline & 0xff] >> 1) & 1;
 }
 
@@ -175,7 +175,7 @@ void cloud9_state::machine_start()
 
 	/* reconfigure the visible area to match */
 	visarea.set(0, 255, m_vblank_end + 1, m_vblank_start);
-	machine().primary_screen->configure(320, 256, visarea, HZ_TO_ATTOSECONDS(PIXEL_CLOCK) * VTOTAL * HTOTAL);
+	m_screen->configure(320, 256, visarea, HZ_TO_ATTOSECONDS(PIXEL_CLOCK) * VTOTAL * HTOTAL);
 
 	/* create a timer for IRQs and set up the first callback */
 	m_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cloud9_state::clock_irq),this));

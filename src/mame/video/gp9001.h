@@ -31,6 +31,7 @@ struct gp9001spritelayer : gp9001layer
 
 
 class gp9001vdp_device : public device_t,
+							public device_video_interface,
 							public device_memory_interface
 {
 public:

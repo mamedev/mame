@@ -197,7 +197,7 @@ WRITE16_MEMBER(mcr68_state::zwackery_spriteram_w)
 
 void mcr68_state::mcr68_update_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority)
 {
-	rectangle sprite_clip = machine().primary_screen->visible_area();
+	rectangle sprite_clip = m_screen->visible_area();
 	UINT16 *spriteram = m_spriteram;
 	int offs;
 

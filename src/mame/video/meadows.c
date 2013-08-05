@@ -62,7 +62,7 @@ WRITE8_MEMBER(meadows_state::meadows_videoram_w)
 
 WRITE8_MEMBER(meadows_state::meadows_spriteram_w)
 {
-	machine().primary_screen->update_now();
+	m_screen->update_now();
 	m_spriteram[offset] = data;
 }
 

@@ -892,7 +892,7 @@ WRITE32_MEMBER(hng64_state::tcram_w)
 	if(offset == 0x02)
 	{
 		UINT16 min_x, min_y, max_x, max_y;
-		rectangle visarea = machine().primary_screen->visible_area();
+		rectangle visarea = m_screen->visible_area();
 
 		min_x = (hng64_tcram[1] & 0xffff0000) >> 16;
 		min_y = (hng64_tcram[1] & 0x0000ffff) >> 0;
@@ -908,7 +908,7 @@ WRITE32_MEMBER(hng64_state::tcram_w)
 		m_screen_dis = 0;
 
 		visarea.set(min_x, min_x + max_x - 1, min_y, min_y + max_y - 1);
-		machine().primary_screen->configure(HTOTAL, VTOTAL, visarea, machine().primary_screen->frame_period().attoseconds );
+		m_screen->configure(HTOTAL, VTOTAL, visarea, m_screen->frame_period().attoseconds );
 	}
 }
 

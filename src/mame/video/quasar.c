@@ -96,7 +96,7 @@ VIDEO_START_MEMBER(quasar_state,quasar)
 	m_effectram = auto_alloc_array(machine(), UINT8, 0x400);
 
 	/* create helper bitmap */
-	machine().primary_screen->register_screen_bitmap(m_collision_background);
+	m_screen->register_screen_bitmap(m_collision_background);
 
 	/* register save */
 	save_item(NAME(m_collision_background));

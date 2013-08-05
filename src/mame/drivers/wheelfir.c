@@ -385,8 +385,8 @@ WRITE16_MEMBER(wheelfir_state::wheelfir_blit_w)
 		{
 			UINT8 *rom = memregion("gfx1")->base();
 
-			int width = machine().primary_screen->width();
-			int height = machine().primary_screen->height();
+			int width = m_screen->width();
+			int height = m_screen->height();
 
 			int src_x0=(m_blitter_data[0]>>8)+((m_blitter_data[6]&0x100)?256:0);
 			int src_y0=(m_blitter_data[2]>>8)+((m_blitter_data[6]&0x200)?256:0);

@@ -28,8 +28,8 @@ WRITE8_MEMBER(fgoal_state::fgoal_xpos_w)
 
 void fgoal_state::video_start()
 {
-	machine().primary_screen->register_screen_bitmap(m_fgbitmap);
-	machine().primary_screen->register_screen_bitmap(m_bgbitmap);
+	m_screen->register_screen_bitmap(m_fgbitmap);
+	m_screen->register_screen_bitmap(m_bgbitmap);
 
 	save_item(NAME(m_fgbitmap));
 	save_item(NAME(m_bgbitmap));

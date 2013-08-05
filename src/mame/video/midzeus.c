@@ -390,18 +390,18 @@ READ32_MEMBER(midzeus_state::zeus_r)
 	switch (offset & ~1)
 	{
 		case 0xf0:
-			result = machine().primary_screen->hpos();
+			result = m_screen->hpos();
 			logit = 0;
 			break;
 
 		case 0xf2:
-			result = machine().primary_screen->vpos();
+			result = m_screen->vpos();
 			logit = 0;
 			break;
 
 		case 0xf4:
 			result = 6;
-			if (machine().primary_screen->vblank())
+			if (m_screen->vblank())
 				result |= 0x800;
 			logit = 0;
 			break;

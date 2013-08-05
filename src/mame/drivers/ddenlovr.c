@@ -3270,7 +3270,7 @@ ADDRESS_MAP_END
 
 UINT8 ddenlovr_state::hgokou_player_r(int player )
 {
-	UINT8 hopper_bit = ((m_hopper && !(machine().primary_screen->frame_number() % 10)) ? 0 : (1 << 6));
+	UINT8 hopper_bit = ((m_hopper && !(m_screen->frame_number() % 10)) ? 0 : (1 << 6));
 
 	if (!BIT(m_input_sel, 0))   return ioport(player ? "KEY5" : "KEY0")->read() | hopper_bit;
 	if (!BIT(m_input_sel, 1))   return ioport(player ? "KEY6" : "KEY1")->read() | hopper_bit;
@@ -4120,7 +4120,7 @@ READ8_MEMBER(ddenlovr_state::htengoku_coin_r)
 	{
 		case 0x00:  return ioport("COINS")->read();
 		case 0x01:  return 0xff;    //?
-		case 0x02:  return 0xbf | ((m_hopper && !(machine().primary_screen->frame_number() % 10)) ? 0 : (1 << 6));  // bit 7 = blitter busy, bit 6 = hopper
+		case 0x02:  return 0xbf | ((m_hopper && !(m_screen->frame_number() % 10)) ? 0 : (1 << 6));  // bit 7 = blitter busy, bit 6 = hopper
 		case 0x03:  return m_coins;
 	}
 	logerror("%04x: coin_r with select = %02x\n", space.device().safe_pc(), m_input_sel);
@@ -4254,7 +4254,7 @@ READ8_MEMBER(ddenlovr_state::daimyojn_keyb1_r)
 {
 	UINT8 val = 0x3f;
 
-	UINT8 hopper_bit = ((m_hopper && !(machine().primary_screen->frame_number() % 10)) ? 0 : (1 << 6));
+	UINT8 hopper_bit = ((m_hopper && !(m_screen->frame_number() % 10)) ? 0 : (1 << 6));
 
 	if      (!BIT(m_keyb, 0))  val = ioport("KEY0")->read() | hopper_bit;
 	else if (!BIT(m_keyb, 1))  val = ioport("KEY1")->read() | hopper_bit;

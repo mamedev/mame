@@ -24,9 +24,9 @@ void toaplan_scu_device::device_reset()
 {
 }
 
-void toaplan_scu_device::alloc_sprite_bitmap()
+void toaplan_scu_device::alloc_sprite_bitmap(screen_device &screen)
 {
-	machine().primary_screen->register_screen_bitmap(m_temp_spritebitmap);
+	screen.register_screen_bitmap(m_temp_spritebitmap);
 }
 
 void toaplan_scu_device::set_gfx_region(int region)

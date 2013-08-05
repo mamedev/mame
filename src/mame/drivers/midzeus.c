@@ -485,7 +485,7 @@ static void update_gun_irq(running_machine &machine)
 TIMER_CALLBACK_MEMBER(midzeus_state::invasn_gun_callback)
 {
 	int player = param;
-	int beamy = machine().primary_screen->vpos();
+	int beamy = m_screen->vpos();
 
 	/* set the appropriate IRQ in the internal gun control and update */
 	gun_irq_state |= 0x01 << player;
@@ -493,8 +493,8 @@ TIMER_CALLBACK_MEMBER(midzeus_state::invasn_gun_callback)
 
 	/* generate another interrupt on the next scanline while we are within the BEAM_DY */
 	beamy++;
-	if (beamy <= machine().primary_screen->visible_area().max_y && beamy <= gun_y[player] + BEAM_DY)
-		gun_timer[player]->adjust(machine().primary_screen->time_until_pos(beamy, MAX(0, gun_x[player] - BEAM_DX)), player);
+	if (beamy <= m_screen->visible_area().max_y && beamy <= gun_y[player] + BEAM_DY)
+		gun_timer[player]->adjust(m_screen->time_until_pos(beamy, MAX(0, gun_x[player] - BEAM_DX)), player);
 }
 
 
@@ -515,7 +515,7 @@ WRITE32_MEMBER(midzeus_state::invasn_gun_w)
 		UINT8 pmask = 0x04 << player;
 		if (((old_control ^ gun_control) & pmask) != 0 && (gun_control & pmask) == 0)
 		{
-			const rectangle &visarea = machine().primary_screen->visible_area();
+			const rectangle &visarea = m_screen->visible_area();
 			static const char *const names[2][2] =
 			{
 				{ "GUNX1", "GUNY1" },
@@ -523,7 +523,7 @@ WRITE32_MEMBER(midzeus_state::invasn_gun_w)
 			};
 			gun_x[player] = ioport(names[player][0])->read() * visarea.width() / 255 + visarea.min_x + BEAM_XOFFS;
 			gun_y[player] = ioport(names[player][1])->read() * visarea.height() / 255 + visarea.min_y;
-			gun_timer[player]->adjust(machine().primary_screen->time_until_pos(MAX(0, gun_y[player] - BEAM_DY), MAX(0, gun_x[player] - BEAM_DX)), player);
+			gun_timer[player]->adjust(m_screen->time_until_pos(MAX(0, gun_y[player] - BEAM_DY), MAX(0, gun_x[player] - BEAM_DX)), player);
 		}
 	}
 }
@@ -531,8 +531,8 @@ WRITE32_MEMBER(midzeus_state::invasn_gun_w)
 
 READ32_MEMBER(midzeus_state::invasn_gun_r)
 {
-	int beamx = machine().primary_screen->hpos();
-	int beamy = machine().primary_screen->vpos();
+	int beamx = m_screen->hpos();
+	int beamy = m_screen->vpos();
 	UINT32 result = 0xffff;
 	int player;
 

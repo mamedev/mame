@@ -359,7 +359,7 @@ READ8_MEMBER(zn_state::boardconfig_r)
 
 	int boardconfig = 64 | 32;
 
-	if( machine().primary_screen->height() == 1024 )
+	if( m_screen->height() == 1024 )
 	{
 		boardconfig |= 8;
 	}

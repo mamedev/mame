@@ -487,7 +487,7 @@ void toaplan2_state::device_timer(emu_timer &timer, device_timer_id id, int para
 void toaplan2_state::toaplan2_vblank_irq(int irq_line)
 {
 	// the IRQ appears to fire at line 0xe6
-	timer_set(machine().primary_screen->time_until_pos(0xe6), TIMER_RAISE_IRQ, irq_line);
+	timer_set(m_screen->time_until_pos(0xe6), TIMER_RAISE_IRQ, irq_line);
 }
 
 INTERRUPT_GEN_MEMBER(toaplan2_state::toaplan2_vblank_irq1){ toaplan2_vblank_irq(1); }
@@ -503,8 +503,8 @@ READ16_MEMBER(toaplan2_state::video_count_r)
 	/* +---------+---------+--------+---------------------------+ */
 	/*************** Control Signals are active low ***************/
 
-	int hpos = machine().primary_screen->hpos();
-	int vpos = machine().primary_screen->vpos();
+	int hpos = m_screen->hpos();
+	int vpos = m_screen->vpos();
 
 	m_video_status = 0xff00;    // Set signals inactive
 
@@ -526,7 +526,7 @@ READ16_MEMBER(toaplan2_state::video_count_r)
 	else
 		m_video_status |= 0xff;
 
-//  logerror("VC: vpos=%04x hpos=%04x VBL=%04x\n",vpos,hpos,machine().primary_screen->vblank());
+//  logerror("VC: vpos=%04x hpos=%04x VBL=%04x\n",vpos,hpos,m_screen->vblank());
 
 	return m_video_status;
 }

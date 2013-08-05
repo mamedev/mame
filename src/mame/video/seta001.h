@@ -25,7 +25,7 @@ public:
 	DECLARE_READ16_MEMBER( spritecode_r16 );
 	DECLARE_WRITE16_MEMBER( spritecode_w16 );
 
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int bank_size, int setac);
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int bank_size, int setac);
 
 	void setac_eof( void );
 	void tnzs_eof( void );
@@ -71,7 +71,7 @@ protected:
 private:
 
 	void draw_background( bitmap_ind16 &bitmap, const rectangle &cliprect, int bank_size, int setac_type);
-	void draw_foreground( bitmap_ind16 &bitmap, const rectangle &cliprect, int bank_size);
+	void draw_foreground( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int bank_size);
 
 };
 

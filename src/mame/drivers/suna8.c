@@ -1136,7 +1136,7 @@ WRITE8_MEMBER(suna8_state::sparkman_coin_counter_w)
 // To do: implement this, affects the duration of copyright screen
 READ8_MEMBER(suna8_state::sparkman_c0a3_r)
 {
-	return (machine().primary_screen->frame_number() & 1) ? 0x80 : 0;
+	return (m_screen->frame_number() & 1) ? 0x80 : 0;
 }
 
 static ADDRESS_MAP_START( sparkman_map, AS_PROGRAM, 8, suna8_state )

@@ -102,8 +102,8 @@ void amspdwy_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 {
 	UINT8 *spriteram = m_spriteram;
 	int i;
-	int max_x = machine().primary_screen->width()  - 1;
-	int max_y = machine().primary_screen->height() - 1;
+	int max_x = m_screen->width()  - 1;
+	int max_y = m_screen->height() - 1;
 
 	for (i = 0; i < m_spriteram.bytes() ; i += 4)
 	{

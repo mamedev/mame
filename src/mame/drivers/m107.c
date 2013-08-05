@@ -55,14 +55,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(m107_state::m107_scanline_interrupt)
 	/* raster interrupt */
 	if (scanline == m_raster_irq_position)
 	{
-		machine().primary_screen->update_partial(scanline);
+		m_screen->update_partial(scanline);
 		state->m_maincpu->set_input_line_and_vector(0, HOLD_LINE, M107_IRQ_2);
 	}
 
 	/* VBLANK interrupt */
-	else if (scanline == machine().primary_screen->visible_area().max_y + 1)
+	else if (scanline == m_screen->visible_area().max_y + 1)
 	{
-		machine().primary_screen->update_partial(scanline);
+		m_screen->update_partial(scanline);
 		state->m_maincpu->set_input_line_and_vector(0, HOLD_LINE, M107_IRQ_0);
 	}
 }

@@ -72,7 +72,7 @@ void dogfgt_state::video_start()
 	m_bitmapram = auto_alloc_array(machine(), UINT8, BITMAPRAM_SIZE);
 	save_pointer(NAME(m_bitmapram), BITMAPRAM_SIZE);
 
-	machine().primary_screen->register_screen_bitmap(m_pixbitmap);
+	m_screen->register_screen_bitmap(m_pixbitmap);
 	save_item(NAME(m_pixbitmap));
 }
 

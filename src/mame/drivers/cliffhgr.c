@@ -213,7 +213,7 @@ TIMER_CALLBACK_MEMBER(cliffhgr_state::cliff_irq_callback)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
 	}
 
-	m_irq_timer->adjust(machine().primary_screen->time_until_pos(param * 2), param);
+	m_irq_timer->adjust(m_screen->time_until_pos(param * 2), param);
 }
 
 WRITE_LINE_MEMBER(cliffhgr_state::vdp_interrupt)
@@ -232,7 +232,7 @@ void cliffhgr_state::machine_reset()
 {
 	m_port_bank = 0;
 	m_phillips_code = 0;
-	m_irq_timer->adjust(machine().primary_screen->time_until_pos(17), 17);
+	m_irq_timer->adjust(m_screen->time_until_pos(17), 17);
 }
 
 /********************************************************/

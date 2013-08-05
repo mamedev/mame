@@ -98,7 +98,7 @@ void psikyo4_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 
 			if ((!scr && flipscreen1) || (scr && flipscreen2))
 			{
-				ypos = machine().primary_screen->visible_area().max_y + 1 - ypos - high * 16; /* Screen Height depends on game */
+				ypos = m_screen->visible_area().max_y + 1 - ypos - high * 16; /* Screen Height depends on game */
 				xpos = 40 * 8 - xpos - wide * 16;
 				flipx = !flipx;
 				flipy = !flipy;

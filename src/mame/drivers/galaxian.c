@@ -2253,7 +2253,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(galaxian_state::timefgtr_scanline)
 	// change spriteram base per each 64-line part of the screen
 	if ((split & 0x3f) == 0)
 	{
-		machine().primary_screen->update_now();
+		m_screen->update_now();
 		m_sprites_base = 0x40 | (split << 2 & 0x300);
 	}
 }

@@ -93,12 +93,12 @@ TIMER_CALLBACK_MEMBER(fgoal_state::interrupt_callback)
 
 	m_prev_coin = coin;
 
-	scanline = machine().primary_screen->vpos() + 128;
+	scanline = m_screen->vpos() + 128;
 
 	if (scanline > 256)
 		scanline = 0;
 
-	timer_set(machine().primary_screen->time_until_pos(scanline), TIMER_INTERRUPT);
+	timer_set(m_screen->time_until_pos(scanline), TIMER_INTERRUPT);
 }
 
 
@@ -116,7 +116,7 @@ READ8_MEMBER(fgoal_state::fgoal_analog_r)
 
 CUSTOM_INPUT_MEMBER(fgoal_state::fgoal_80_r)
 {
-	UINT8 ret = (machine().primary_screen->vpos() & 0x80) ? 1 : 0;
+	UINT8 ret = (m_screen->vpos() & 0x80) ? 1 : 0;
 
 	return ret;
 }
@@ -349,7 +349,7 @@ void fgoal_state::machine_start()
 
 void fgoal_state::machine_reset()
 {
-	timer_set(machine().primary_screen->time_until_pos(0), TIMER_INTERRUPT);
+	timer_set(m_screen->time_until_pos(0), TIMER_INTERRUPT);
 
 	m_xpos = 0;
 	m_ypos = 0;

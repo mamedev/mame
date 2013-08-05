@@ -89,7 +89,8 @@ struct rotate_info
 
 
 
-class segaic16_video_device : public device_t
+class segaic16_video_device : 	public device_t,
+								public device_video_interface
 {
 public:
 	segaic16_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -100,10 +101,10 @@ public:
 	UINT16 *segaic16_textram_0;
 	UINT16 *segaic16_rotateram_0;
 
-	void segaic16_tilemap_set_colscroll(running_machine &machine, int which, int enable);
-	void segaic16_tilemap_set_rowscroll(running_machine &machine, int which, int enable);
-	void segaic16_tilemap_set_flip(running_machine &machine, int which, int flip);
-	void segaic16_tilemap_set_bank(running_machine &machine, int which, int banknum, int offset);
+	void segaic16_tilemap_set_colscroll(int which, int enable);
+	void segaic16_tilemap_set_rowscroll(int which, int enable);
+	void segaic16_tilemap_set_flip(int which, int flip);
+	void segaic16_tilemap_set_bank(int which, int banknum, int offset);
 	void segaic16_tilemap_reset(screen_device &screen);
 	void segaic16_tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int map, int priority, int priority_mark);
 //  void segaic16_tilemap_16b_draw_layer(screen_device &screen, struct tilemap_info *info, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int flags, int priority);
@@ -116,7 +117,7 @@ public:
 	struct rotate_info segaic16_rotate[SEGAIC16_MAX_ROTATE];
 	struct tilemap_info bg_tilemap[SEGAIC16_MAX_TILEMAPS];
 
-	void segaic16_set_display_enable(screen_device &screen, int enable);
+	void segaic16_set_display_enable(int enable);
 	void segaic16_tilemap_init(running_machine &machine, int which, int type, int colorbase, int xoffs, int numbanks);
 	void segaic16_rotate_init(running_machine &machine, int which, int type, int colorbase);
 

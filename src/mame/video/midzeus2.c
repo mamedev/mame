@@ -437,7 +437,7 @@ READ32_HANDLER( zeus2_r )
 			/* bits $00080000 is tested in a loop until 0 */
 			/* bit  $00000004 is tested for toggling; probably VBLANK */
 			result = 0x00;
-			if (space.machine().primary_screen->vblank())
+			if (state->m_screen->vblank())
 				result |= 0x04;
 			break;
 
@@ -448,7 +448,7 @@ READ32_HANDLER( zeus2_r )
 
 		case 0x54:
 			/* both upper 16 bits and lower 16 bits seem to be used as vertical counters */
-			result = (space.machine().primary_screen->vpos() << 16) | space.machine().primary_screen->vpos();
+			result = (state->m_screen->vpos() << 16) | state->m_screen->vpos();
 			break;
 	}
 

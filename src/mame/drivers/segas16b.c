@@ -1032,7 +1032,7 @@ void segas16b_state::mapper_sound_w(UINT8 data)
 WRITE16_MEMBER( segas16b_state::rom_5704_bank_w )
 {
 	if (ACCESSING_BITS_0_7)
-		m_segaic16vid->segaic16_tilemap_set_bank(machine(), 0, offset & 1, data & 7);
+		m_segaic16vid->segaic16_tilemap_set_bank(0, offset & 1, data & 7);
 }
 
 
@@ -1080,7 +1080,7 @@ WRITE16_MEMBER( segas16b_state::rom_5797_bank_math_w )
 
 		case 0x2000/2:
 			if (ACCESSING_BITS_0_7)
-				m_segaic16vid->segaic16_tilemap_set_bank(machine(), 0, offset & 1, data & 7);
+				m_segaic16vid->segaic16_tilemap_set_bank(0, offset & 1, data & 7);
 			break;
 	}
 }
@@ -1153,10 +1153,10 @@ WRITE16_MEMBER( segas16b_state::standard_io_w )
 			//  D1 : (Output to coin counter 2?)
 			//  D0 : Output to coin counter 1
 			//
-			m_segaic16vid->segaic16_tilemap_set_flip(machine(), 0, data & 0x40);
+			m_segaic16vid->segaic16_tilemap_set_flip(0, data & 0x40);
 			m_sprites->set_flip(data & 0x40);
 			if (!m_disable_screen_blanking)
-				m_segaic16vid->segaic16_set_display_enable(*m_screen, data & 0x20);
+				m_segaic16vid->segaic16_set_display_enable(data & 0x20);
 			set_led_status(machine(), 1, data & 0x08);
 			set_led_status(machine(), 0, data & 0x04);
 			coin_counter_w(machine(), 1, data & 0x02);

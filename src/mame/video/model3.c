@@ -117,8 +117,8 @@ void model3_state::video_start()
 	m_poly = poly_alloc(machine(), 4000, sizeof(poly_extra_data), 0);
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(model3_state::model3_exit), this));
 
-	machine().primary_screen->register_screen_bitmap(m_bitmap3d);
-	machine().primary_screen->register_screen_bitmap(m_zbuffer);
+	m_screen->register_screen_bitmap(m_bitmap3d);
+	m_screen->register_screen_bitmap(m_zbuffer);
 
 	m_m3_char_ram = auto_alloc_array_clear(machine(), UINT64, 0x100000/8);
 	m_m3_tile_ram = auto_alloc_array_clear(machine(), UINT64, 0x8000/8);

@@ -23,7 +23,7 @@ static const pen_t pens_from_color_prom[] =
 
 WRITE8_MEMBER(vicdual_state::vicdual_palette_bank_w)
 {
-	machine().primary_screen->update_partial(machine().primary_screen->vpos());
+	m_screen->update_partial(m_screen->vpos());
 	m_palette_bank = data & 3;
 }
 

@@ -79,16 +79,16 @@ void starshp1_state::video_start()
 		val = (val << 1) | (bit & 1);
 	}
 
-	machine().primary_screen->register_screen_bitmap(m_helper);
+	m_screen->register_screen_bitmap(m_helper);
 }
 
 
 READ8_MEMBER(starshp1_state::starshp1_rng_r)
 {
-	int width = machine().primary_screen->width();
-	int height = machine().primary_screen->height();
-	int x = machine().primary_screen->hpos();
-	int y = machine().primary_screen->vpos();
+	int width = m_screen->width();
+	int height = m_screen->height();
+	int x = m_screen->hpos();
+	int y = m_screen->vpos();
 
 	/* the LFSR is only running in the non-blank region
 	   of the screen, so this is not quite right */
@@ -380,7 +380,7 @@ void starshp1_state::screen_eof_starshp1(screen_device &screen, bool state)
 	if (state)
 	{
 		rectangle rect;
-		const rectangle &visarea = machine().primary_screen->visible_area();
+		const rectangle &visarea = m_screen->visible_area();
 
 		rect.min_x = get_sprite_hpos(13);
 		rect.min_y = get_sprite_vpos(13);

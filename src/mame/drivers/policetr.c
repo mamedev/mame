@@ -117,7 +117,7 @@ void policetr_state::device_timer(emu_timer &timer, device_timer_id id, int para
 INTERRUPT_GEN_MEMBER(policetr_state::irq4_gen)
 {
 	device.execute().set_input_line(R3000_IRQ4, ASSERT_LINE);
-	timer_set(machine().primary_screen->time_until_pos(0), TIMER_IRQ5_GEN);
+	timer_set(m_screen->time_until_pos(0), TIMER_IRQ5_GEN);
 }
 
 

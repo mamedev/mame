@@ -293,7 +293,7 @@ WRITE8_MEMBER(m52_state::alpha1v_flipscreen_w)
 void m52_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect, int xpos, int ypos, int image)
 {
 	rectangle rect;
-	const rectangle &visarea = machine().primary_screen->visible_area();
+	const rectangle &visarea = m_screen->visible_area();
 
 
 	if (flip_screen())

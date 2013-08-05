@@ -477,7 +477,7 @@ WRITE8_MEMBER(smsmfg_state::video_w)
 
 void smsmfg_state::video_start()
 {
-	machine().primary_screen->register_screen_bitmap(m_bitmap);
+	m_screen->register_screen_bitmap(m_bitmap);
 
 	save_item(NAME(m_vid_regs));
 	save_item(NAME(m_bitmap));

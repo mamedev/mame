@@ -90,8 +90,8 @@ void volfied_state::refresh_pixel_layer( bitmap_ind16 &bitmap )
 	*********************************************************/
 
 	UINT16* p = m_video_ram;
-	int width = machine().primary_screen->width();
-	int height = machine().primary_screen->height();
+	int width = m_screen->width();
+	int height = m_screen->height();
 
 	if (m_video_ctrl & 1)
 		p += 0x20000;

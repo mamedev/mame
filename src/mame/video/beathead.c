@@ -117,9 +117,9 @@ WRITE32_MEMBER( beathead_state::finescroll_w )
 	UINT32 newword = COMBINE_DATA(&m_finescroll);
 
 	/* if VBLANK is going off on a scanline other than the last, suspend time */
-	if ((oldword & 8) && !(newword & 8) && space.machine().primary_screen->vpos() != 261)
+	if ((oldword & 8) && !(newword & 8) && m_screen->vpos() != 261)
 	{
-		logerror("Suspending time! (scanline = %d)\n", space.machine().primary_screen->vpos());
+		logerror("Suspending time! (scanline = %d)\n", m_screen->vpos());
 		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	}
 }

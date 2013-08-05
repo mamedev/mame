@@ -418,7 +418,7 @@ READ8_MEMBER(corona_state::blitter_status_r)
 	    -x-- ---- vblank
 	*/
 
-	return 0x80 | ((machine().primary_screen->vblank() & 1) << 6);
+	return 0x80 | ((m_screen->vblank() & 1) << 6);
 }
 
 void corona_state::blitter_execute(int x, int y, int color, int width, int flag)

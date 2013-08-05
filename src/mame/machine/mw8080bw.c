@@ -49,7 +49,7 @@ TIMER_CALLBACK_MEMBER(mw8080bw_state::mw8080bw_interrupt_callback)
 	int next_vblank;
 
 	/* compute vector and set the interrupt line */
-	int vpos = machine().primary_screen->vpos();
+	int vpos = m_screen->vpos();
 	UINT8 counter = vpos_to_vysnc_chain_counter(vpos);
 	UINT8 vector = 0xc7 | ((counter & 0x40) >> 2) | ((~counter & 0x40) >> 3);
 	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, vector);
@@ -67,7 +67,7 @@ TIMER_CALLBACK_MEMBER(mw8080bw_state::mw8080bw_interrupt_callback)
 	}
 
 	next_vpos = vysnc_chain_counter_to_vpos(next_counter, next_vblank);
-	m_interrupt_timer->adjust(machine().primary_screen->time_until_pos(next_vpos));
+	m_interrupt_timer->adjust(m_screen->time_until_pos(next_vpos));
 }
 
 
@@ -80,7 +80,7 @@ void mw8080bw_state::mw8080bw_create_interrupt_timer(  )
 void mw8080bw_state::mw8080bw_start_interrupt_timer(  )
 {
 	int vpos = vysnc_chain_counter_to_vpos(MW8080BW_INT_TRIGGER_COUNT_1, MW8080BW_INT_TRIGGER_VBLANK_1);
-	m_interrupt_timer->adjust(machine().primary_screen->time_until_pos(vpos));
+	m_interrupt_timer->adjust(m_screen->time_until_pos(vpos));
 }
 
 

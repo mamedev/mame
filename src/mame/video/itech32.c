@@ -438,10 +438,10 @@ void itech32_state::update_interrupts(int fast)
 TIMER_CALLBACK_MEMBER(itech32_state::scanline_interrupt)
 {
 	/* set timer for next frame */
-	m_scanline_timer->adjust(machine().primary_screen->time_until_pos(VIDEO_INTSCANLINE));
+	m_scanline_timer->adjust(m_screen->time_until_pos(VIDEO_INTSCANLINE));
 
 	/* set the interrupt bit in the status reg */
-	logerror("-------------- (DISPLAY INT @ %d) ----------------\n", machine().primary_screen->vpos());
+	logerror("-------------- (DISPLAY INT @ %d) ----------------\n", m_screen->vpos());
 	VIDEO_INTSTATE |= VIDEOINT_SCANLINE;
 
 	/* update the interrupt state */
@@ -1302,7 +1302,7 @@ WRITE16_MEMBER(itech32_state::itech32_video_w)
 			break;
 
 		case 0x2c/2:    /* VIDEO_INTSCANLINE */
-			m_scanline_timer->adjust(machine().primary_screen->time_until_pos(VIDEO_INTSCANLINE));
+			m_scanline_timer->adjust(m_screen->time_until_pos(VIDEO_INTSCANLINE));
 			break;
 
 		case 0x32/2:    /* VIDEO_VTOTAL */
@@ -1334,7 +1334,7 @@ WRITE16_MEMBER(itech32_state::itech32_video_w)
 
 				logerror("Configure Screen: HTOTAL: %x  HBSTART: %x  HBEND: %x  VTOTAL: %x  VBSTART: %x  VBEND: %x\n",
 					VIDEO_HTOTAL, VIDEO_HBLANK_START, VIDEO_HBLANK_END, VIDEO_VTOTAL, VIDEO_VBLANK_START, VIDEO_VBLANK_END);
-				machine().primary_screen->configure(VIDEO_HTOTAL, VIDEO_VTOTAL, visarea, HZ_TO_ATTOSECONDS(VIDEO_CLOCK) * VIDEO_HTOTAL * VIDEO_VTOTAL);
+				m_screen->configure(VIDEO_HTOTAL, VIDEO_VTOTAL, visarea, HZ_TO_ATTOSECONDS(VIDEO_CLOCK) * VIDEO_HTOTAL * VIDEO_VTOTAL);
 			}
 			break;
 	}
@@ -1349,7 +1349,7 @@ READ16_MEMBER(itech32_state::itech32_video_r)
 	}
 	else if (offset == 3)
 	{
-		return 0xef;/*machine().primary_screen->vpos() - 1;*/
+		return 0xef;/*m_screen->vpos() - 1;*/
 	}
 
 	return m_video[offset];

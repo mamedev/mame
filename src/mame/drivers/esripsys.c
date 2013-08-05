@@ -94,7 +94,7 @@ READ8_MEMBER(esripsys_state::uart_r)
 READ8_MEMBER(esripsys_state::g_status_r)
 {
 	int bank4 = BIT(m_videocpu->get_rip_status(), 2);
-	int vblank = machine().primary_screen->vblank();
+	int vblank = m_screen->vblank();
 
 	return (!vblank << 7) | (bank4 << 6) | (m_f_status & 0x2f);
 }
@@ -141,7 +141,7 @@ WRITE8_MEMBER(esripsys_state::g_status_w)
 
 READ8_MEMBER(esripsys_state::f_status_r)
 {
-	int vblank = machine().primary_screen->vblank();
+	int vblank = m_screen->vblank();
 	UINT8 rip_status = m_videocpu->get_rip_status();
 
 	rip_status = (rip_status & 0x18) | (BIT(rip_status, 6) << 1) |  BIT(rip_status, 7);

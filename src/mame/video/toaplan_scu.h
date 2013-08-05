@@ -9,7 +9,7 @@ public:
 
 	void draw_sprites_to_tempbitmap(const rectangle &cliprect, UINT16* spriteram, UINT32 bytes );
 	void copy_sprites_from_tempbitmap(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
-	void alloc_sprite_bitmap();
+	void alloc_sprite_bitmap(screen_device &screen);
 	void set_gfx_region(int region);
 
 protected:

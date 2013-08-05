@@ -301,7 +301,7 @@ READ32_MEMBER(deco32_state::deco32_irq_controller_r)
 
 		/* ZV03082007 - video_screen_get_vblank() doesn't work for Captain America, as it expects
 		   that this bit is NOT set in rows 0-7. */
-		vblank = machine().primary_screen->vpos() > machine().primary_screen->visible_area().max_y;
+		vblank = m_screen->vpos() > m_screen->visible_area().max_y;
 		if (vblank)
 			return 0xffffff80 | 0x1 | 0x10; /* Assume VBL takes priority over possible raster/lightgun irq */
 
@@ -327,7 +327,7 @@ WRITE32_MEMBER(deco32_state::deco32_irq_controller_w)
 		scanline=(data&0xff);
 		if (m_raster_enable && scanline>0 && scanline<240)
 		{
-			m_raster_irq_timer->adjust(machine().primary_screen->time_until_pos(scanline-1, 0));
+			m_raster_irq_timer->adjust(m_screen->time_until_pos(scanline-1, 0));
 		}
 		else
 			m_raster_irq_timer->reset();

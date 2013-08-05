@@ -27,8 +27,8 @@
 gaelco3d_renderer::gaelco3d_renderer(gaelco3d_state &state)
 	: poly_manager<float, gaelco3d_object_data, 1, 2000>(state.machine()),
 		m_state(state),
-		m_screenbits(state.machine().primary_screen->width(), state.machine().primary_screen->height()),
-		m_zbuffer(state.machine().primary_screen->width(), state.machine().primary_screen->height()),
+		m_screenbits(state.m_screen->width(), state.m_screen->height()),
+		m_zbuffer(state.m_screen->width(), state.m_screen->height()),
 		m_polygons(0),
 		m_texture_size(state.memregion("gfx1")->bytes()),
 		m_texmask_size(state.memregion("gfx2")->bytes() * 8),
@@ -382,14 +382,14 @@ WRITE32_MEMBER(gaelco3d_state::gaelco3d_render_w)
 	{
 		if (m_polydata_count >= 18 && (m_polydata_count % 2) == 1 && IS_POLYEND(m_polydata_buffer[m_polydata_count - 2]))
 		{
-			m_poly->render_poly(*machine().primary_screen, &m_polydata_buffer[0]);
+			m_poly->render_poly(*m_screen, &m_polydata_buffer[0]);
 			m_polydata_count = 0;
 		}
 		m_video_changed = TRUE;
 	}
 
 #if DISPLAY_STATS
-	m_lastscan = machine().primary_screen->vpos();
+	m_lastscan = m_screen->vpos();
 #endif
 }
 

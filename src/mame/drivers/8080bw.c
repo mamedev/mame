@@ -1466,7 +1466,7 @@ MACHINE_CONFIG_END
 
 CUSTOM_INPUT_MEMBER(_8080bw_state::sflush_80_r)
 {
-	return (machine().primary_screen->vpos() & 0x80) ? 1 : 0;
+	return (m_screen->vpos() & 0x80) ? 1 : 0;
 }
 
 static ADDRESS_MAP_START( sflush_map, AS_PROGRAM, 8, _8080bw_state )

@@ -292,7 +292,7 @@ WRITE8_MEMBER(astrof_state::video_control_1_w)
 	/* D2 - not connected in the schematics, but at one point Astro Fighter sets it to 1 */
 	/* D3-D7 - not connected */
 
-	machine().primary_screen->update_partial(machine().primary_screen->vpos());
+	m_screen->update_partial(m_screen->vpos());
 }
 
 
@@ -313,7 +313,7 @@ void astrof_state::astrof_set_video_control_2( UINT8 data )
 WRITE8_MEMBER(astrof_state::astrof_video_control_2_w)
 {
 	astrof_set_video_control_2(data);
-	machine().primary_screen->update_partial(machine().primary_screen->vpos());
+	m_screen->update_partial(m_screen->vpos());
 }
 
 
@@ -331,7 +331,7 @@ void astrof_state::spfghmk2_set_video_control_2( UINT8 data )
 WRITE8_MEMBER(astrof_state::spfghmk2_video_control_2_w)
 {
 	spfghmk2_set_video_control_2(data);
-	machine().primary_screen->update_partial(machine().primary_screen->vpos());
+	m_screen->update_partial(m_screen->vpos());
 }
 
 
@@ -348,7 +348,7 @@ void astrof_state::tomahawk_set_video_control_2( UINT8 data )
 WRITE8_MEMBER(astrof_state::tomahawk_video_control_2_w)
 {
 	tomahawk_set_video_control_2(data);
-	machine().primary_screen->update_partial(machine().primary_screen->vpos());
+	m_screen->update_partial(m_screen->vpos());
 }
 
 

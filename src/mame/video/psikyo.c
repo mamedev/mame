@@ -262,8 +262,8 @@ void psikyo_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, co
 	UINT8 *TILES = memregion("spritelut")->base();    // Sprites LUT
 	int TILES_LEN = memregion("spritelut")->bytes();
 
-	int width = machine().primary_screen->width();
-	int height = machine().primary_screen->height();
+	int width = m_screen->width();
+	int height = m_screen->height();
 
 	/* Exit if sprites are disabled */
 	if (spritelist[BYTE_XOR_BE((0x800 - 2) / 2)] & 1)   return;
@@ -379,8 +379,8 @@ void psikyo_state::draw_sprites_bootleg( screen_device &screen, bitmap_ind16 &bi
 	UINT8 *TILES = memregion("spritelut")->base();    // Sprites LUT
 	int TILES_LEN = memregion("spritelut")->bytes();
 
-	int width = machine().primary_screen->width();
-	int height = machine().primary_screen->height();
+	int width = m_screen->width();
+	int height = m_screen->height();
 
 	/* Exit if sprites are disabled */
 	if (spritelist[BYTE_XOR_BE((0x800 - 2) / 2)] & 1)

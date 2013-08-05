@@ -108,7 +108,7 @@ void xexex_state::xexex_objdma( int limiter )
 	UINT16 *src, *dst;
 
 	counter = m_frame;
-	m_frame = machine().primary_screen->frame_number();
+	m_frame = m_screen->frame_number();
 	if (limiter && counter == m_frame)
 		return; // make sure we only do DMA transfer once per frame
 

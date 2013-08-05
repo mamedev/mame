@@ -229,7 +229,7 @@ ADDRESS_MAP_END
 
 READ16_MEMBER(galpanic_state::comad_timer_r)
 {
-	return (machine().primary_screen->vpos() & 0x07) << 8;
+	return (m_screen->vpos() & 0x07) << 8;
 }
 
 /* a kludge! */

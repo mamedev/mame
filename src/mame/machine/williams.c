@@ -231,7 +231,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(williams_state::williams_va11_callback)
 	/* set a timer for the next update */
 	scanline += 0x20;
 	if (scanline >= 256) scanline = 0;
-	timer.adjust(machine().primary_screen->time_until_pos(scanline), scanline);
+	timer.adjust(m_screen->time_until_pos(scanline), scanline);
 }
 
 
@@ -252,10 +252,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(williams_state::williams_count240_callback)
 	pia_1->ca1_w(1);
 
 	/* set a timer to turn it off once the scanline counter resets */
-	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(0), timer_expired_delegate(FUNC(williams_state::williams_count240_off_callback),this));
+	machine().scheduler().timer_set(m_screen->time_until_pos(0), timer_expired_delegate(FUNC(williams_state::williams_count240_off_callback),this));
 
 	/* set a timer for next frame */
-	timer.adjust(machine().primary_screen->time_until_pos(240));
+	timer.adjust(m_screen->time_until_pos(240));
 }
 
 
@@ -345,11 +345,11 @@ MACHINE_RESET_MEMBER(williams_state,williams_common)
 {
 	/* set a timer to go off every 16 scanlines, to toggle the VA11 line and update the screen */
 	timer_device *scan_timer = machine().device<timer_device>("scan_timer");
-	scan_timer->adjust(machine().primary_screen->time_until_pos(0));
+	scan_timer->adjust(m_screen->time_until_pos(0));
 
 	/* also set a timer to go off on scanline 240 */
 	timer_device *l240_timer = machine().device<timer_device>("240_timer");
-	l240_timer->adjust(machine().primary_screen->time_until_pos(240));
+	l240_timer->adjust(m_screen->time_until_pos(240));
 }
 
 
@@ -385,7 +385,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(williams_state::williams2_va11_callback)
 	/* set a timer for the next update */
 	scanline += 0x20;
 	if (scanline >= 256) scanline = 0;
-	timer.adjust(machine().primary_screen->time_until_pos(scanline), scanline);
+	timer.adjust(m_screen->time_until_pos(scanline), scanline);
 }
 
 
@@ -406,10 +406,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(williams_state::williams2_endscreen_callback)
 	pia_0->ca1_w(0);
 
 	/* set a timer to turn it off once the scanline counter resets */
-	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(8), timer_expired_delegate(FUNC(williams_state::williams2_endscreen_off_callback),this));
+	machine().scheduler().timer_set(m_screen->time_until_pos(8), timer_expired_delegate(FUNC(williams_state::williams2_endscreen_off_callback),this));
 
 	/* set a timer for next frame */
-	timer.adjust(machine().primary_screen->time_until_pos(254));
+	timer.adjust(m_screen->time_until_pos(254));
 }
 
 
@@ -448,11 +448,11 @@ MACHINE_RESET_MEMBER(williams_state,williams2)
 
 	/* set a timer to go off every 16 scanlines, to toggle the VA11 line and update the screen */
 	timer_device *scan_timer = machine().device<timer_device>("scan_timer");
-	scan_timer->adjust(machine().primary_screen->time_until_pos(0));
+	scan_timer->adjust(m_screen->time_until_pos(0));
 
 	/* also set a timer to go off on scanline 254 */
 	timer_device *l254_timer = machine().device<timer_device>("254_timer");
-	l254_timer->adjust(machine().primary_screen->time_until_pos(254));
+	l254_timer->adjust(m_screen->time_until_pos(254));
 }
 
 

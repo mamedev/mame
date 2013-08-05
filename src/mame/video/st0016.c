@@ -458,27 +458,27 @@ VIDEO_START_MEMBER(st0016_state,st0016)
 	switch(st0016_game&0x3f)
 	{
 		case 0: //renju kizoku
-			machine().primary_screen->set_visible_area(0, 40*8-1, 0, 30*8-1);
+			m_screen->set_visible_area(0, 40*8-1, 0, 30*8-1);
 			spr_dx=0;
 			spr_dy=0;
 		break;
 
 		case 1: //neratte chu!
-			machine().primary_screen->set_visible_area(8,41*8-1,0,30*8-1);
+			m_screen->set_visible_area(8,41*8-1,0,30*8-1);
 			spr_dx=0;
 			spr_dy=8;
 		break;
 
 		case 4: //mayjinsen 1&2
-			machine().primary_screen->set_visible_area(0,32*8-1,0,28*8-1);
+			m_screen->set_visible_area(0,32*8-1,0,28*8-1);
 		break;
 
 		case 10:
-			machine().primary_screen->set_visible_area(0,383,0,255);
+			m_screen->set_visible_area(0,383,0,255);
 		break;
 
 		case 11:
-			machine().primary_screen->set_visible_area(0,383,0,383);
+			m_screen->set_visible_area(0,383,0,383);
 		break;
 
 	}

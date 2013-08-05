@@ -207,8 +207,8 @@ UINT32 go2000_state::screen_update_go2000(screen_device &screen, bitmap_ind16 &b
 	}
 
 	/*Sprite RAM code actually copied from video/suna16.c with minor modifications.*/
-	int max_x = machine().primary_screen->width() - 8;
-	int max_y = machine().primary_screen->height() - 8;
+	int max_x = m_screen->width() - 8;
+	int max_y = m_screen->height() - 8;
 
 	for (int offs = 0xf800 / 2; offs < 0x10000 / 2 ; offs += 4/2)
 	{

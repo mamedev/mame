@@ -80,7 +80,7 @@ TIMER_CALLBACK_MEMBER(firetrk_state::periodic_callback)
 	if (scanline > 262)
 		scanline = 0;
 
-	timer_set(machine().primary_screen->time_until_pos(scanline), TIMER_PERIODIC, scanline);
+	timer_set(m_screen->time_until_pos(scanline), TIMER_PERIODIC, scanline);
 }
 
 

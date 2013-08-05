@@ -128,19 +128,19 @@ MACHINE_RESET_MEMBER(m72_state,m72)
 	m_mcu_sample_addr = 0;
 	m_mcu_snd_cmd_latch = 0;
 
-	m_scanline_timer->adjust(machine().primary_screen->time_until_pos(0));
+	m_scanline_timer->adjust(m_screen->time_until_pos(0));
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(m72_state::synch_callback),this));
 }
 
 MACHINE_RESET_MEMBER(m72_state,xmultipl)
 {
 	m_irq_base = 0x08;
-	m_scanline_timer->adjust(machine().primary_screen->time_until_pos(0));
+	m_scanline_timer->adjust(m_screen->time_until_pos(0));
 }
 
 MACHINE_RESET_MEMBER(m72_state,kengo)
 {
-	m_scanline_timer->adjust(machine().primary_screen->time_until_pos(0));
+	m_scanline_timer->adjust(m_screen->time_until_pos(0));
 }
 
 TIMER_CALLBACK_MEMBER(m72_state::m72_scanline_interrupt)
@@ -150,21 +150,21 @@ TIMER_CALLBACK_MEMBER(m72_state::m72_scanline_interrupt)
 	/* raster interrupt - visible area only? */
 	if (scanline < 256 && scanline == m_raster_irq_position - 128)
 	{
-		machine().primary_screen->update_partial(scanline);
+		m_screen->update_partial(scanline);
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_irq_base + 2);
 	}
 
 	/* VBLANK interrupt */
 	else if (scanline == 256)
 	{
-		machine().primary_screen->update_partial(scanline);
+		m_screen->update_partial(scanline);
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_irq_base + 0);
 	}
 
 	/* adjust for next scanline */
-	if (++scanline >= machine().primary_screen->height())
+	if (++scanline >= m_screen->height())
 		scanline = 0;
-	m_scanline_timer->adjust(machine().primary_screen->time_until_pos(scanline), scanline);
+	m_scanline_timer->adjust(m_screen->time_until_pos(scanline), scanline);
 }
 
 TIMER_CALLBACK_MEMBER(m72_state::kengo_scanline_interrupt)
@@ -174,7 +174,7 @@ TIMER_CALLBACK_MEMBER(m72_state::kengo_scanline_interrupt)
 	/* raster interrupt - visible area only? */
 	if (scanline < 256 && scanline == m_raster_irq_position - 128)
 	{
-		machine().primary_screen->update_partial(scanline);
+		m_screen->update_partial(scanline);
 		m_maincpu->set_input_line(NEC_INPUT_LINE_INTP2, ASSERT_LINE);
 	}
 	else
@@ -183,16 +183,16 @@ TIMER_CALLBACK_MEMBER(m72_state::kengo_scanline_interrupt)
 	/* VBLANK interrupt */
 	if (scanline == 256)
 	{
-		machine().primary_screen->update_partial(scanline);
+		m_screen->update_partial(scanline);
 		m_maincpu->set_input_line(NEC_INPUT_LINE_INTP0, ASSERT_LINE);
 	}
 	else
 		m_maincpu->set_input_line(NEC_INPUT_LINE_INTP0, CLEAR_LINE);
 
 	/* adjust for next scanline */
-	if (++scanline >= machine().primary_screen->height())
+	if (++scanline >= m_screen->height())
 		scanline = 0;
-	m_scanline_timer->adjust(machine().primary_screen->time_until_pos(scanline), scanline);
+	m_scanline_timer->adjust(m_screen->time_until_pos(scanline), scanline);
 }
 
 /***************************************************************************

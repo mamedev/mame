@@ -70,7 +70,7 @@ TIMER_CALLBACK_MEMBER(magmax_state::scanline_callback)
 	scanline += 128;
 	scanline &= 255;
 
-	m_interrupt_timer->adjust(machine().primary_screen->time_until_pos(scanline), scanline);
+	m_interrupt_timer->adjust(m_screen->time_until_pos(scanline), scanline);
 }
 
 void magmax_state::machine_start()
@@ -87,7 +87,7 @@ void magmax_state::machine_start()
 
 void magmax_state::machine_reset()
 {
-	m_interrupt_timer->adjust(machine().primary_screen->time_until_pos(64), 64);
+	m_interrupt_timer->adjust(m_screen->time_until_pos(64), 64);
 
 #if 0
 	{

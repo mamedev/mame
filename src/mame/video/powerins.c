@@ -253,8 +253,8 @@ void powerins_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 	UINT16 *source = m_spriteram + 0x8000/2;
 	UINT16 *finish = m_spriteram + 0x9000/2;
 
-	int screen_w = machine().primary_screen->width();
-	int screen_h = machine().primary_screen->height();
+	int screen_w = m_screen->width();
+	int screen_h = m_screen->height();
 
 	for ( ; source < finish; source += 16/2 )
 	{

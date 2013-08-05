@@ -264,7 +264,7 @@ void gottlieb_state::machine_reset()
 {
 	/* if we have a laserdisc, reset our philips code callback for the next line 17 */
 	if (m_laserdisc != NULL)
-		m_laserdisc_philips_timer->adjust(machine().primary_screen->time_until_pos(17), 17);
+		m_laserdisc_philips_timer->adjust(m_screen->time_until_pos(17), 17);
 }
 
 
@@ -439,7 +439,7 @@ TIMER_CALLBACK_MEMBER(gottlieb_state::laserdisc_philips_callback)
 
 	/* toggle to the next one */
 	param = (param == 17) ? 18 : 17;
-	m_laserdisc_philips_timer->adjust(machine().primary_screen->time_until_pos(param * 2), param);
+	m_laserdisc_philips_timer->adjust(m_screen->time_until_pos(param * 2), param);
 }
 
 
@@ -681,7 +681,7 @@ INTERRUPT_GEN_MEMBER(gottlieb_state::gottlieb_interrupt)
 {
 	/* assert the NMI and set a timer to clear it at the first visible line */
 	device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-	timer_set(machine().primary_screen->time_until_pos(0), TIMER_NMI_CLEAR);
+	timer_set(m_screen->time_until_pos(0), TIMER_NMI_CLEAR);
 
 	/* if we have a laserdisc, update it */
 	if (m_laserdisc != NULL)

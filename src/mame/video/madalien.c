@@ -147,7 +147,7 @@ VIDEO_START_MEMBER(madalien_state,madalien)
 
 		m_tilemap_edge2[i] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(madalien_state::get_tile_info_BG_2),this), scan_functions[i], 16, 16, tilemap_cols[i], 8);
 		m_tilemap_edge2[i]->set_scrolldx(0, 0x50);
-		m_tilemap_edge2[i]->set_scrolldy(0, machine().primary_screen->height() - 256);
+		m_tilemap_edge2[i]->set_scrolldy(0, m_screen->height() - 256);
 	}
 
 	m_headlight_bitmap = auto_bitmap_ind16_alloc(machine(), 128, 128);

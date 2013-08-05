@@ -28,8 +28,8 @@ void galastrm_state::video_start()
 {
 	m_spritelist = auto_alloc_array(machine(), struct tempsprite, 0x4000);
 
-	machine().primary_screen->register_screen_bitmap(m_tmpbitmaps);
-	machine().primary_screen->register_screen_bitmap(m_polybitmap);
+	m_screen->register_screen_bitmap(m_tmpbitmaps);
+	m_screen->register_screen_bitmap(m_polybitmap);
 
 	m_poly = poly_alloc(machine(), 16, sizeof(poly_extra_data), POLYFLAG_ALLOW_QUADS);
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(galastrm_state::galastrm_exit), this));

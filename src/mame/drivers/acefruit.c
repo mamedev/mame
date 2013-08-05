@@ -71,14 +71,14 @@ void acefruit_state::acefruit_update_irq(int vpos)
 
 TIMER_CALLBACK_MEMBER(acefruit_state::acefruit_refresh)
 {
-	int vpos = machine().primary_screen->vpos();
+	int vpos = m_screen->vpos();
 
-	machine().primary_screen->update_partial(vpos );
+	m_screen->update_partial(vpos );
 	acefruit_update_irq(vpos);
 
 	vpos = ( ( vpos / 8 ) + 1 ) * 8;
 
-	m_refresh_timer->adjust( machine().primary_screen->time_until_pos(vpos) );
+	m_refresh_timer->adjust( m_screen->time_until_pos(vpos) );
 }
 
 void acefruit_state::video_start()

@@ -169,12 +169,12 @@ void contra_state::video_start()
 	m_buffered_spriteram = auto_alloc_array(machine(), UINT8, 0x800);
 	m_buffered_spriteram_2 = auto_alloc_array(machine(), UINT8, 0x800);
 
-	m_bg_clip = machine().primary_screen->visible_area();
+	m_bg_clip = m_screen->visible_area();
 	m_bg_clip.min_x += 40;
 
 	m_fg_clip = m_bg_clip;
 
-	m_tx_clip = machine().primary_screen->visible_area();
+	m_tx_clip = m_screen->visible_area();
 	m_tx_clip.max_x = 39;
 	m_tx_clip.min_x = 0;
 

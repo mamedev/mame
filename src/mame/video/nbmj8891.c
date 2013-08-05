@@ -268,8 +268,8 @@ void nbmj8891_state::nbmj8891_vramflip(int vram)
 	UINT8 color1, color2;
 	UINT8 *vidram;
 
-	int width = machine().primary_screen->width();
-	int height = machine().primary_screen->height();
+	int width = m_screen->width();
+	int height = m_screen->height();
 
 	if (m_flipscreen == m_flipscreen_old) return;
 
@@ -293,13 +293,13 @@ void nbmj8891_state::nbmj8891_vramflip(int vram)
 
 void nbmj8891_state::update_pixel0(int x, int y)
 {
-	UINT8 color = m_videoram0[(y * machine().primary_screen->width()) + x];
+	UINT8 color = m_videoram0[(y * m_screen->width()) + x];
 	m_tmpbitmap0.pix16(y, x) = color;
 }
 
 void nbmj8891_state::update_pixel1(int x, int y)
 {
-	UINT8 color = m_videoram1[(y * machine().primary_screen->width()) + x];
+	UINT8 color = m_videoram1[(y * m_screen->width()) + x];
 	m_tmpbitmap1.pix16(y, x) = (color == 0x7f) ? 0xff : color;
 }
 
@@ -318,7 +318,7 @@ void nbmj8891_state::device_timer(emu_timer &timer, device_timer_id id, int para
 void nbmj8891_state::nbmj8891_gfxdraw()
 {
 	UINT8 *GFX = memregion("gfx1")->base();
-	int width = machine().primary_screen->width();
+	int width = m_screen->width();
 
 	int x, y;
 	int dx1, dx2, dy1, dy2;
@@ -482,10 +482,10 @@ VIDEO_START_MEMBER(nbmj8891_state,nbmj8891_1layer)
 {
 	UINT8 *CLUT = memregion("protection")->base();
 	int i;
-	int width = machine().primary_screen->width();
-	int height = machine().primary_screen->height();
+	int width = m_screen->width();
+	int height = m_screen->height();
 
-	machine().primary_screen->register_screen_bitmap(m_tmpbitmap0);
+	m_screen->register_screen_bitmap(m_tmpbitmap0);
 	m_videoram0 = auto_alloc_array(machine(), UINT8, width * height);
 	m_palette = auto_alloc_array(machine(), UINT8, 0x200);
 	m_clut = auto_alloc_array(machine(), UINT8, 0x800);
@@ -498,11 +498,11 @@ VIDEO_START_MEMBER(nbmj8891_state,nbmj8891_1layer)
 
 void nbmj8891_state::video_start()
 {
-	int width = machine().primary_screen->width();
-	int height = machine().primary_screen->height();
+	int width = m_screen->width();
+	int height = m_screen->height();
 
-	machine().primary_screen->register_screen_bitmap(m_tmpbitmap0);
-	machine().primary_screen->register_screen_bitmap(m_tmpbitmap1);
+	m_screen->register_screen_bitmap(m_tmpbitmap0);
+	m_screen->register_screen_bitmap(m_tmpbitmap1);
 	m_videoram0 = auto_alloc_array(machine(), UINT8, width * height);
 	m_videoram1 = auto_alloc_array(machine(), UINT8, width * height);
 	m_palette = auto_alloc_array(machine(), UINT8, 0x200);

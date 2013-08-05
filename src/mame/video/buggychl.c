@@ -13,8 +13,8 @@ void buggychl_state::palette_init()
 
 void buggychl_state::video_start()
 {
-	machine().primary_screen->register_screen_bitmap(m_tmp_bitmap1);
-	machine().primary_screen->register_screen_bitmap(m_tmp_bitmap2);
+	m_screen->register_screen_bitmap(m_tmp_bitmap1);
+	m_screen->register_screen_bitmap(m_tmp_bitmap2);
 
 	save_item(NAME(m_tmp_bitmap1));
 	save_item(NAME(m_tmp_bitmap2));

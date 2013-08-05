@@ -32,7 +32,7 @@ void xexex_tile_callback(running_machine &machine, int layer, int *code, int *co
 
 void xexex_state::video_start()
 {
-	assert(machine().primary_screen->format() == BITMAP_FORMAT_RGB32);
+	assert(m_screen->format() == BITMAP_FORMAT_RGB32);
 
 	m_cur_alpha = 0;
 

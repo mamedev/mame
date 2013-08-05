@@ -297,7 +297,7 @@ WRITE16_MEMBER( segas18_state::io_chip_w )
 		// miscellaneous output
 		case 0x06/2:
 			set_grayscale(~data & 0x40);
-			m_segaic16vid->segaic16_tilemap_set_flip(machine(), 0, data & 0x20);
+			m_segaic16vid->segaic16_tilemap_set_flip(0, data & 0x20);
 			m_sprites->set_flip(data & 0x20);
 // These are correct according to cgfm's docs, but mwalker and ddcrew both
 // enable the lockout and never turn it off
@@ -312,14 +312,14 @@ WRITE16_MEMBER( segas18_state::io_chip_w )
 			if (m_romboard == ROM_BOARD_171_5874 || m_romboard == ROM_BOARD_171_SHADOW)
 				for (int i = 0; i < 4; i++)
 				{
-					m_segaic16vid->segaic16_tilemap_set_bank(machine(), 0, 0 + i, (data & 0xf) * 4 + i);
-					m_segaic16vid->segaic16_tilemap_set_bank(machine(), 0, 4 + i, ((data >> 4) & 0xf) * 4 + i);
+					m_segaic16vid->segaic16_tilemap_set_bank(0, 0 + i, (data & 0xf) * 4 + i);
+					m_segaic16vid->segaic16_tilemap_set_bank(0, 4 + i, ((data >> 4) & 0xf) * 4 + i);
 				}
 			break;
 
 		// CNT register
 		case 0x1c/2:
-			m_segaic16vid->segaic16_set_display_enable(*m_screen, data & 2);
+			m_segaic16vid->segaic16_set_display_enable(data & 2);
 			if ((old ^ data) & 4)
 				set_vdp_enable(data & 4);
 			break;
@@ -404,7 +404,7 @@ WRITE16_MEMBER( segas18_state::rom_5987_bank_w )
 		int maxbanks = machine().gfx[0]->elements() / 1024;
 		if (data >= maxbanks)
 			data %= maxbanks;
-		m_segaic16vid->segaic16_tilemap_set_bank(machine(), 0, offset, data);
+		m_segaic16vid->segaic16_tilemap_set_bank(0, offset, data);
 	}
 
 	// sprite banking

@@ -840,7 +840,7 @@ void dkong_state::radarscp_scanline(int scanline)
 	int         table_len = m_gfx3_len;
 	int             x,y,offset;
 	UINT16          *pixel;
-	const rectangle &visarea = machine().primary_screen->visible_area();
+	const rectangle &visarea = m_screen->visible_area();
 
 	y = scanline;
 	radarscp_step(y);
@@ -848,7 +848,7 @@ void dkong_state::radarscp_scanline(int scanline)
 		m_counter = 0;
 	offset = (m_flip ^ m_rflip_sig) ? 0x000 : 0x400;
 	x = 0;
-	while (x < machine().primary_screen->width())
+	while (x < m_screen->width())
 	{
 		pixel = &m_bg_bits.pix16(y, x);
 		if ((m_counter < table_len) && (x == 4 * (table[m_counter|offset] & 0x7f)))
@@ -877,11 +877,11 @@ TIMER_CALLBACK_MEMBER(dkong_state::scanline_callback)
 		radarscp_scanline(scanline);
 
 	/* update any video up to the current scanline */
-	machine().primary_screen->update_now();
+	m_screen->update_now();
 
 	scanline = (scanline+1) % VTOTAL;
 	/* come back at the next appropriate scanline */
-	m_scanline_timer->adjust(machine().primary_screen->time_until_pos(scanline), scanline);
+	m_scanline_timer->adjust(m_screen->time_until_pos(scanline), scanline);
 }
 
 void dkong_state::check_palette()
@@ -933,12 +933,12 @@ VIDEO_START_MEMBER(dkong_state,dkong)
 	VIDEO_START_CALL_MEMBER(dkong_base);
 
 	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dkong_state::scanline_callback),this));
-	m_scanline_timer->adjust(machine().primary_screen->time_until_pos(0));
+	m_scanline_timer->adjust(m_screen->time_until_pos(0));
 
 	switch (m_hardware_type)
 	{
 		case HARDWARE_TRS02:
-			machine().primary_screen->register_screen_bitmap(m_bg_bits);
+			m_screen->register_screen_bitmap(m_bg_bits);
 			m_gfx3 = memregion("gfx3")->base();
 			m_gfx3_len = memregion("gfx3")->bytes();
 			/* fall through */
@@ -951,7 +951,7 @@ VIDEO_START_MEMBER(dkong_state,dkong)
 			m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dkong_state::radarscp1_bg_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
 			m_bg_tilemap->set_scrolldx(0, 128);
 
-			machine().primary_screen->register_screen_bitmap(m_bg_bits);
+			m_screen->register_screen_bitmap(m_bg_bits);
 			m_gfx4 = memregion("gfx4")->base();
 			m_gfx3 = memregion("gfx3")->base();
 			m_gfx3_len = memregion("gfx3")->bytes();

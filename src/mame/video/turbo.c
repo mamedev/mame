@@ -188,7 +188,7 @@ WRITE8_MEMBER(turbo_state::turbo_videoram_w)
 	m_videoram[offset] = data;
 	if (offset < 0x400)
 	{
-		machine().primary_screen->update_partial(machine().primary_screen->vpos());
+		m_screen->update_partial(m_screen->vpos());
 		m_fg_tilemap->mark_tile_dirty(offset);
 	}
 }

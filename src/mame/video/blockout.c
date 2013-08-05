@@ -60,7 +60,7 @@ WRITE16_MEMBER(blockout_state::blockout_frontcolor_w)
 void blockout_state::video_start()
 {
 	/* Allocate temporary bitmaps */
-	machine().primary_screen->register_screen_bitmap(m_tmpbitmap);
+	m_screen->register_screen_bitmap(m_tmpbitmap);
 	save_item(NAME(m_tmpbitmap));
 }
 
@@ -68,7 +68,7 @@ void blockout_state::update_pixels( int x, int y )
 {
 	UINT16 front, back;
 	int color;
-	const rectangle &visarea = machine().primary_screen->visible_area();
+	const rectangle &visarea = m_screen->visible_area();
 
 	if (!visarea.contains(x, y))
 		return;

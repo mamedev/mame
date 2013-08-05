@@ -396,7 +396,7 @@ WRITE8_MEMBER( segaorun_state::video_control_w )
 	//  D1: (CONT) - affects sprite hardware
 	//  D0: Sound section reset (1= normal operation, 0= reset)
 
-	m_segaic16vid->segaic16_set_display_enable(*m_screen, data & 0x20);
+	m_segaic16vid->segaic16_set_display_enable(data & 0x20);
 	m_adc_select = (data >> 2) & 7;
 	m_soundcpu->set_input_line(INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 }
@@ -549,7 +549,7 @@ void segaorun_state::machine_reset()
 	m68k_set_reset_callback(m_maincpu, m68k_reset_callback);
 
 	// start timers to track interrupts
-	m_scanline_timer->adjust(machine().primary_screen->time_until_pos(223), 223);
+	m_scanline_timer->adjust(m_screen->time_until_pos(223), 223);
 }
 
 
@@ -584,7 +584,7 @@ void segaorun_state::device_timer(emu_timer &timer, device_timer_id id, int para
 				case 65:
 				case 129:
 				case 193:
-					timer_set(machine().primary_screen->time_until_pos(scanline, machine().primary_screen->visible_area().max_x + 1), TID_IRQ2_GEN);
+					timer_set(m_screen->time_until_pos(scanline, m_screen->visible_area().max_x + 1), TID_IRQ2_GEN);
 					next_scanline = scanline + 1;
 					break;
 
@@ -615,7 +615,7 @@ void segaorun_state::device_timer(emu_timer &timer, device_timer_id id, int para
 			update_main_irqs();
 
 			// come back at the next targeted scanline
-			timer.adjust(machine().primary_screen->time_until_pos(next_scanline), next_scanline);
+			timer.adjust(m_screen->time_until_pos(next_scanline), next_scanline);
 			break;
 		}
 	}
@@ -747,7 +747,7 @@ WRITE16_MEMBER( segaorun_state::shangon_custom_io_w )
 			//  D7-D6: (ADC1-0)
 			//  D5: Screen display
 			m_adc_select = (data >> 6) & 3;
-			m_segaic16vid->segaic16_set_display_enable(*m_screen, (data >> 5) & 1);
+			m_segaic16vid->segaic16_set_display_enable((data >> 5) & 1);
 			return;
 
 		case 0x0020/2:

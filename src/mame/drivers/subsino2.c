@@ -815,11 +815,11 @@ READ8_MEMBER(subsino2_state::dsw_r)
 
 READ8_MEMBER(subsino2_state::vblank_bit2_r)
 {
-	return machine().primary_screen->vblank() ? 0x04 : 0x00;
+	return m_screen->vblank() ? 0x04 : 0x00;
 }
 READ8_MEMBER(subsino2_state::vblank_bit6_r)
 {
-	return machine().primary_screen->vblank() ? 0x40 : 0x00;
+	return m_screen->vblank() ? 0x40 : 0x00;
 }
 
 WRITE8_MEMBER(subsino2_state::oki_bank_bit0_w)
@@ -917,7 +917,7 @@ READ16_MEMBER(subsino2_state::bishjan_serial_r)
 		(machine().rand() & 0x9800) |   // bit 7 - serial communication
 		(((m_bishjan_sel==0x12) ? 0x40:0x00) << 8) |
 //      (machine.rand() & 0xff);
-//      (((machine().primary_screen->frame_number()%60)==0)?0x18:0x00);
+//      (((m_screen->frame_number()%60)==0)?0x18:0x00);
 		0x18;
 }
 

@@ -206,7 +206,7 @@ WRITE32_MEMBER(namcofl_state::namcofl_paletteram_w)
 		UINT16 v = m_generic_paletteram_32[offset] >> 16;
 		UINT16 triggerscanline=(((v>>8)&0xff)|((v&0xff)<<8))-(32+1);
 
-		m_raster_interrupt_timer->adjust(machine().primary_screen->time_until_pos(triggerscanline));
+		m_raster_interrupt_timer->adjust(m_screen->time_until_pos(triggerscanline));
 	}
 }
 
@@ -525,22 +525,22 @@ GFXDECODE_END
 TIMER_CALLBACK_MEMBER(namcofl_state::network_interrupt_callback)
 {
 	m_maincpu->set_input_line(I960_IRQ0, ASSERT_LINE);
-	machine().scheduler().timer_set(machine().primary_screen->frame_period(), timer_expired_delegate(FUNC(namcofl_state::network_interrupt_callback),this));
+	machine().scheduler().timer_set(m_screen->frame_period(), timer_expired_delegate(FUNC(namcofl_state::network_interrupt_callback),this));
 }
 
 
 TIMER_CALLBACK_MEMBER(namcofl_state::vblank_interrupt_callback)
 {
 	m_maincpu->set_input_line(I960_IRQ2, ASSERT_LINE);
-	machine().scheduler().timer_set(machine().primary_screen->frame_period(), timer_expired_delegate(FUNC(namcofl_state::vblank_interrupt_callback),this));
+	machine().scheduler().timer_set(m_screen->frame_period(), timer_expired_delegate(FUNC(namcofl_state::vblank_interrupt_callback),this));
 }
 
 
 TIMER_CALLBACK_MEMBER(namcofl_state::raster_interrupt_callback)
 {
-	machine().primary_screen->update_partial(machine().primary_screen->vpos());
+	m_screen->update_partial(m_screen->vpos());
 	m_maincpu->set_input_line(I960_IRQ1, ASSERT_LINE);
-	m_raster_interrupt_timer->adjust(machine().primary_screen->frame_period());
+	m_raster_interrupt_timer->adjust(m_screen->frame_period());
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(namcofl_state::mcu_irq0_cb)
@@ -567,8 +567,8 @@ MACHINE_START_MEMBER(namcofl_state,namcofl)
 
 MACHINE_RESET_MEMBER(namcofl_state,namcofl)
 {
-	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(machine().primary_screen->visible_area().max_y + 3), timer_expired_delegate(FUNC(namcofl_state::network_interrupt_callback),this));
-	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(machine().primary_screen->visible_area().max_y + 1), timer_expired_delegate(FUNC(namcofl_state::vblank_interrupt_callback),this));
+	machine().scheduler().timer_set(m_screen->time_until_pos(m_screen->visible_area().max_y + 3), timer_expired_delegate(FUNC(namcofl_state::network_interrupt_callback),this));
+	machine().scheduler().timer_set(m_screen->time_until_pos(m_screen->visible_area().max_y + 1), timer_expired_delegate(FUNC(namcofl_state::vblank_interrupt_callback),this));
 
 	membank("bank1")->set_base(memregion("maincpu")->base() );
 	membank("bank2")->set_base(m_workram );

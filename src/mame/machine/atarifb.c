@@ -107,7 +107,7 @@ WRITE8_MEMBER(atarifb_state::soccer_out2_w)
 /* FIXME: almost surely not tied with screen vertical position */
 WRITE8_MEMBER(atarifb_state::atarifb_out3_w)
 {
-	int loop = machine().primary_screen->vpos() >= 123;
+	int loop = m_screen->vpos() >= 123;
 
 	switch (loop)
 	{

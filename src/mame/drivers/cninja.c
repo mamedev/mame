@@ -110,7 +110,7 @@ WRITE16_MEMBER(cninja_state::cninja_irq_w)
 			&&
 			m_scanline > 0 &&
 			m_scanline < 240)
-			m_raster_irq_timer->adjust(machine().primary_screen->time_until_pos(m_scanline), m_scanline);
+			m_raster_irq_timer->adjust(m_screen->time_until_pos(m_scanline), m_scanline);
 		else
 			m_raster_irq_timer->reset();
 		return;
@@ -127,14 +127,14 @@ WRITE16_MEMBER(cninja_state::cninja_irq_w)
 
 WRITE16_MEMBER(cninja_state::cninja_pf12_control_w)
 {
-	machine().primary_screen->update_partial(machine().primary_screen->vpos());
+	m_screen->update_partial(m_screen->vpos());
 	m_deco_tilegen1->pf_control_w(space, offset, data, mem_mask);
 }
 
 
 WRITE16_MEMBER(cninja_state::cninja_pf34_control_w)
 {
-	machine().primary_screen->update_partial(machine().primary_screen->vpos());
+	m_screen->update_partial(m_screen->vpos());
 	m_deco_tilegen2->pf_control_w(space, offset, data, mem_mask);
 }
 

@@ -28,7 +28,7 @@ remove all the code writing the $a0000 area.)
 
 WRITE16_MEMBER(toki_state::toki_control_w)
 {
-	machine().primary_screen->update_partial(machine().primary_screen->vpos() - 1);
+	m_screen->update_partial(m_screen->vpos() - 1);
 	COMBINE_DATA(&m_scrollram16[offset]);
 }
 

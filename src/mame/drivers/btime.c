@@ -377,7 +377,7 @@ READ8_MEMBER(btime_state::audio_command_r)
 
 READ8_MEMBER(btime_state::zoar_dsw1_read)
 {
-	return (!machine().primary_screen->vblank() << 7) | (ioport("DSW1")->read() & 0x7f);
+	return (!m_screen->vblank() << 7) | (ioport("DSW1")->read() & 0x7f);
 }
 
 static INPUT_PORTS_START( btime )

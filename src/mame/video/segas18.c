@@ -57,7 +57,7 @@
 
 void segas18_state::video_start()
 {
-	m_temp_bitmap.allocate(machine().primary_screen->width(), machine().primary_screen->height());
+	m_temp_bitmap.allocate(m_screen->width(), m_screen->height());
 	m_grayscale_enable = false;
 	m_vdp_enable = false;
 	m_vdp_mixing = 0;
@@ -83,7 +83,7 @@ void segas18_state::set_grayscale(bool enable)
 {
 	if (enable != m_grayscale_enable)
 	{
-		machine().primary_screen->update_partial(machine().primary_screen->vpos());
+		m_screen->update_partial(m_screen->vpos());
 		m_grayscale_enable = enable;
 //      mame_printf_debug("Grayscale = %02X\n", enable);
 	}
@@ -94,7 +94,7 @@ void segas18_state::set_vdp_enable(bool enable)
 {
 	if (enable != m_vdp_enable)
 	{
-		machine().primary_screen->update_partial(machine().primary_screen->vpos());
+		m_screen->update_partial(m_screen->vpos());
 		m_vdp_enable = enable;
 #if DEBUG_VDP
 		mame_printf_debug("VDP enable = %02X\n", enable);
@@ -107,7 +107,7 @@ void segas18_state::set_vdp_mixing(UINT8 mixing)
 {
 	if (mixing != m_vdp_mixing)
 	{
-		machine().primary_screen->update_partial(machine().primary_screen->vpos());
+		m_screen->update_partial(m_screen->vpos());
 		m_vdp_mixing = mixing;
 #if DEBUG_VDP
 		mame_printf_debug("VDP mixing = %02X\n", mixing);

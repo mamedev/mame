@@ -23,7 +23,7 @@
 inline void lethalj_state::get_crosshair_xy(int player, int *x, int *y)
 {
 	static const char *const gunnames[] = { "LIGHT0_X", "LIGHT0_Y", "LIGHT1_X", "LIGHT1_Y" };
-	const rectangle &visarea = machine().primary_screen->visible_area();
+	const rectangle &visarea = m_screen->visible_area();
 	int width = visarea.width();
 	int height = visarea.height();
 

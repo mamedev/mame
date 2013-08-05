@@ -62,7 +62,7 @@ void rampart_state::scanline_update(screen_device &screen, int scanline)
 MACHINE_RESET_MEMBER(rampart_state,rampart)
 {
 	atarigen_state::machine_reset();
-	scanline_timer_reset(*machine().primary_screen, 32);
+	scanline_timer_reset(*m_screen, 32);
 }
 
 

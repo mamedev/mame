@@ -404,7 +404,8 @@ void atarirle_device::device_start()
 void atarirle_control_w(device_t *device, UINT8 bits)
 {
 	atarirle_data *mo = get_safe_token(device);
-	int scanline = device->machine().primary_screen->vpos();
+	screen_device *screen = device->machine().first_screen();
+	int scanline = screen->vpos();
 	int oldbits = mo->control_bits;
 
 //logerror("atarirle_control_w(%d)\n", bits);
@@ -414,7 +415,7 @@ void atarirle_control_w(device_t *device, UINT8 bits)
 		return;
 
 	/* force a partial update first */
-	device->machine().primary_screen->update_partial(scanline);
+	screen->update_partial(scanline);
 
 	/* if the erase flag was set, erase the front map */
 	if (oldbits & ATARIRLE_CONTROL_ERASE)

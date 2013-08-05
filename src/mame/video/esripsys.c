@@ -17,7 +17,7 @@ INTERRUPT_GEN_MEMBER(esripsys_state::esripsys_vblank_irq)
 
 TIMER_CALLBACK_MEMBER(esripsys_state::hblank_start_callback)
 {
-	int v = machine().primary_screen->vpos();
+	int v = m_screen->vpos();
 
 	if (m_video_firq)
 	{
@@ -37,19 +37,19 @@ TIMER_CALLBACK_MEMBER(esripsys_state::hblank_start_callback)
 		v = 0;
 
 	/* Set end of HBLANK timer */
-	m_hblank_end_timer->adjust(machine().primary_screen->time_until_pos(v, ESRIPSYS_HBLANK_END), v);
+	m_hblank_end_timer->adjust(m_screen->time_until_pos(v, ESRIPSYS_HBLANK_END), v);
 	m_hblank = 0;
 }
 
 TIMER_CALLBACK_MEMBER(esripsys_state::hblank_end_callback)
 {
-	int v = machine().primary_screen->vpos();
+	int v = m_screen->vpos();
 
 	if (v > 0)
-		machine().primary_screen->update_partial(v - 1);
+		m_screen->update_partial(v - 1);
 
 	m_12sel ^= 1;
-	m_hblank_start_timer->adjust(machine().primary_screen->time_until_pos(v, ESRIPSYS_HBLANK_START));
+	m_hblank_start_timer->adjust(m_screen->time_until_pos(v, ESRIPSYS_HBLANK_START));
 
 	m_hblank = 1;
 }
@@ -71,7 +71,7 @@ void esripsys_state::video_start()
 	/* Create and initialise the HBLANK timers */
 	m_hblank_start_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(esripsys_state::hblank_start_callback),this));
 	m_hblank_end_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(esripsys_state::hblank_end_callback),this));
-	m_hblank_start_timer->adjust(machine().primary_screen->time_until_pos(0, ESRIPSYS_HBLANK_START));
+	m_hblank_start_timer->adjust(m_screen->time_until_pos(0, ESRIPSYS_HBLANK_START));
 
 	/* Create the sprite scaling table */
 	m_scale_table = auto_alloc_array(machine(), UINT8, 64 * 64);

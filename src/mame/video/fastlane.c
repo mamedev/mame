@@ -114,10 +114,10 @@ void fastlane_state::video_start()
 
 	m_layer0->set_scroll_rows(32);
 
-	m_clip0 = machine().primary_screen->visible_area();
+	m_clip0 = m_screen->visible_area();
 	m_clip0.min_x += 40;
 
-	m_clip1 = machine().primary_screen->visible_area();
+	m_clip1 = m_screen->visible_area();
 	m_clip1.max_x = 39;
 	m_clip1.min_x = 0;
 }

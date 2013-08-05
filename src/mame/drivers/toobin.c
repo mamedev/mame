@@ -63,7 +63,7 @@ WRITE16_MEMBER(toobin_state::interrupt_scan_w)
 	if (oldword != newword)
 	{
 		m_interrupt_scan[offset] = newword;
-		scanline_int_set(*machine().primary_screen, newword & 0x1ff);
+		scanline_int_set(*m_screen, newword & 0x1ff);
 	}
 }
 

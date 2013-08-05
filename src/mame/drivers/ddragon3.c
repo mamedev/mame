@@ -520,14 +520,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(ddragon3_state::ddragon3_scanline)
 	if (scanline % 16 == 0)
 	{
 		if (scanline > 0)
-			machine().primary_screen->update_partial(scanline - 1);
+			m_screen->update_partial(scanline - 1);
 		m_maincpu->set_input_line(5, ASSERT_LINE);
 	}
 
 	/* Vblank is raised on scanline 248 */
 	if (scanline == 248)
 	{
-		machine().primary_screen->update_partial(scanline - 1);
+		m_screen->update_partial(scanline - 1);
 		m_maincpu->set_input_line(6, ASSERT_LINE);
 	}
 }

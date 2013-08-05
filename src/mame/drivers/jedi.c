@@ -135,7 +135,7 @@ TIMER_CALLBACK_MEMBER(jedi_state::generate_interrupt)
 	scanline += 32;
 	if (scanline > 256)
 		scanline = 32;
-	m_interrupt_timer->adjust(machine().primary_screen->time_until_pos(scanline), scanline);
+	m_interrupt_timer->adjust(m_screen->time_until_pos(scanline), scanline);
 }
 
 
@@ -156,7 +156,7 @@ void jedi_state::machine_start()
 {
 	/* set a timer to run the interrupts */
 	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(jedi_state::generate_interrupt),this));
-	m_interrupt_timer->adjust(machine().primary_screen->time_until_pos(32), 32);
+	m_interrupt_timer->adjust(m_screen->time_until_pos(32), 32);
 
 	/* configure the banks */
 	membank("bank1")->configure_entries(0, 3, memregion("maincpu")->base() + 0x10000, 0x4000);

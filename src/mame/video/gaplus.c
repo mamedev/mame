@@ -132,8 +132,8 @@ void gaplus_state::starfield_init()
 	int x,y;
 	int set = 0;
 
-	int width = machine().primary_screen->width();
-	int height = machine().primary_screen->height();
+	int width = m_screen->width();
+	int height = m_screen->height();
 
 	m_total_stars = 0;
 
@@ -225,8 +225,8 @@ void gaplus_state::starfield_render(bitmap_ind16 &bitmap)
 	struct star *stars = m_stars;
 	int i;
 
-	int width = machine().primary_screen->width();
-	int height = machine().primary_screen->height();
+	int width = m_screen->width();
+	int height = m_screen->height();
 
 	/* check if we're running */
 	if ( ( m_starfield_control[0] & 1 ) == 0 )
@@ -329,8 +329,8 @@ void gaplus_state::screen_eof_gaplus(screen_device &screen, bool state)/* update
 		struct star *stars = m_stars;
 		int i;
 
-		int width = machine().primary_screen->width();
-		int height = machine().primary_screen->height();
+		int width = m_screen->width();
+		int height = m_screen->height();
 
 		/* check if we're running */
 		if ( ( m_starfield_control[0] & 1 ) == 0 )

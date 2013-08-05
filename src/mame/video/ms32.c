@@ -79,9 +79,9 @@ void ms32_state::video_start()
 
 
 	/* set up tile layers */
-	machine().primary_screen->register_screen_bitmap(m_temp_bitmap_tilemaps);
-	machine().primary_screen->register_screen_bitmap(m_temp_bitmap_sprites);
-	machine().primary_screen->register_screen_bitmap(m_temp_bitmap_sprites_pri); // not actually being used for rendering, we embed pri info in the raw colour bitmap
+	m_screen->register_screen_bitmap(m_temp_bitmap_tilemaps);
+	m_screen->register_screen_bitmap(m_temp_bitmap_sprites);
+	m_screen->register_screen_bitmap(m_temp_bitmap_sprites_pri); // not actually being used for rendering, we embed pri info in the raw colour bitmap
 
 	m_temp_bitmap_tilemaps.fill(0);
 	m_temp_bitmap_sprites.fill(0);

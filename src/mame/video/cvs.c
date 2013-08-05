@@ -124,9 +124,9 @@ VIDEO_START_MEMBER(cvs_state,cvs)
 	cvs_init_stars();
 
 	/* create helper bitmaps */
-	machine().primary_screen->register_screen_bitmap(m_background_bitmap);
-	machine().primary_screen->register_screen_bitmap(m_collision_background);
-	machine().primary_screen->register_screen_bitmap(m_scrolled_collision_background);
+	m_screen->register_screen_bitmap(m_background_bitmap);
+	m_screen->register_screen_bitmap(m_collision_background);
+	m_screen->register_screen_bitmap(m_scrolled_collision_background);
 
 	/* register save */
 	save_item(NAME(m_background_bitmap));

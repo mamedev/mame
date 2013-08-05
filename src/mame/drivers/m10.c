@@ -130,7 +130,7 @@ Notes (couriersud)
 
 WRITE8_MEMBER(m10_state::ic8j1_output_changed)
 {
-	LOG(("ic8j1: %d %d\n", data, machine().primary_screen->vpos()));
+	LOG(("ic8j1: %d %d\n", data, m_screen->vpos()));
 	m_maincpu->set_input_line(0, !data ? CLEAR_LINE : ASSERT_LINE);
 }
 
@@ -464,7 +464,7 @@ WRITE8_MEMBER(m10_state::m15_a100_w)
 
 READ8_MEMBER(m10_state::m10_a700_r)
 {
-	//LOG(("rd:%d\n",machine().primary_screen->vpos()));
+	//LOG(("rd:%d\n",m_screen->vpos()));
 	LOG(("clear\n"));
 	ttl74123_clear_w(m_ic8j1, space, 0, 0);
 	ttl74123_clear_w(m_ic8j1, space, 0, 1);
@@ -473,7 +473,7 @@ READ8_MEMBER(m10_state::m10_a700_r)
 
 READ8_MEMBER(m10_state::m11_a700_r)
 {
-	//LOG(("rd:%d\n",machine().primary_screen->vpos()));
+	//LOG(("rd:%d\n",m_screen->vpos()));
 	//m_maincpu->set_input_line(0, CLEAR_LINE);
 	LOG(("clear\n"));
 	ttl74123_clear_w(m_ic8j1, space, 0, 0);
@@ -499,12 +499,12 @@ TIMER_CALLBACK_MEMBER(m10_state::interrupt_callback)
 	if (param == 0)
 	{
 		m_maincpu->set_input_line(0, ASSERT_LINE);
-		timer_set(machine().primary_screen->time_until_pos(IREMM10_VBSTART + 16), TIMER_INTERRUPT, 1);
+		timer_set(m_screen->time_until_pos(IREMM10_VBSTART + 16), TIMER_INTERRUPT, 1);
 	}
 	if (param == 1)
 	{
 		m_maincpu->set_input_line(0, ASSERT_LINE);
-		timer_set(machine().primary_screen->time_until_pos(IREMM10_VBSTART + 24), TIMER_INTERRUPT, 2);
+		timer_set(m_screen->time_until_pos(IREMM10_VBSTART + 24), TIMER_INTERRUPT, 2);
 	}
 	if (param == -1)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
@@ -538,7 +538,7 @@ INTERRUPT_GEN_MEMBER(m10_state::m10_interrupt)
 INTERRUPT_GEN_MEMBER(m10_state::m15_interrupt)
 {
 	device.execute().set_input_line(0, ASSERT_LINE);
-	timer_set(machine().primary_screen->time_until_pos(IREMM10_VBSTART + 1, 80), TIMER_INTERRUPT, -1);
+	timer_set(m_screen->time_until_pos(IREMM10_VBSTART + 1, 80), TIMER_INTERRUPT, -1);
 }
 
 /*************************************

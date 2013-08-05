@@ -257,8 +257,8 @@ WRITE32_MEMBER(policetr_state::policetr_video_w)
 READ32_MEMBER(policetr_state::policetr_video_r)
 {
 	int inputval;
-	int width = machine().primary_screen->width();
-	int height = machine().primary_screen->height();
+	int width = m_screen->width();
+	int height = m_screen->height();
 
 	/* the value read is based on the latch */
 	switch (m_video_latch)

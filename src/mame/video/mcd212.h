@@ -114,7 +114,7 @@ typedef INT16 SWORD68K;
 	MCFG_DEVICE_ADD(_tag, MACHINE_MCD212, 0)
 #define MCFG_MCD212_REPLACE(_tag) \
 	MCFG_DEVICE_REPLACE(_tag, MACHINE_MCD212, 0)
-
+#define MCFG_MCD212_SET_SCREEN MCFG_VIDEO_SET_SCREEN
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -122,7 +122,8 @@ typedef INT16 SWORD68K;
 
 // ======================> mcd212_device
 
-class mcd212_device : public device_t
+class mcd212_device : public device_t,
+						public device_video_interface
 {
 public:
 	// construction/destruction

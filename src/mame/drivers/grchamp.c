@@ -334,7 +334,7 @@ UINT8 grchamp_state::get_pc3259_bits(int offs)
 	int bits;
 
 	/* force a partial update to the current position */
-	machine().primary_screen->update_partial(machine().primary_screen->vpos());
+	m_screen->update_partial(m_screen->vpos());
 
 	/* get the relevant 4 bits */
 	bits = (m_collide >> (offs*4)) & 0x0f;

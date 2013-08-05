@@ -36,7 +36,7 @@ enum
 
 void cinemat_state::cinemat_vector_callback(INT16 sx, INT16 sy, INT16 ex, INT16 ey, UINT8 shift)
 {
-	const rectangle &visarea = machine().primary_screen->visible_area();
+	const rectangle &visarea = m_screen->visible_area();
 	int intensity = 0xff;
 
 	/* adjust for slop */

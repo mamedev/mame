@@ -68,6 +68,6 @@ WRITE8_MEMBER(beezer_state::beezer_map_w)
 
 READ8_MEMBER(beezer_state::beezer_line_r)
 {
-	return machine().primary_screen->vpos();
+	return m_screen->vpos();
 //  Note: was (m_scanline & 0xfe) << 1; with scanline % 128
 }

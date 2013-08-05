@@ -420,7 +420,7 @@ INTERRUPT_GEN_MEMBER(itech32_state::generate_int1)
 {
 	/* signal the NMI */
 	itech32_update_interrupts(1, -1, -1);
-	if (FULL_LOGGING) logerror("------------ VBLANK (%d) --------------\n", machine().primary_screen->vpos());
+	if (FULL_LOGGING) logerror("------------ VBLANK (%d) --------------\n", m_screen->vpos());
 }
 
 
@@ -503,7 +503,7 @@ READ32_MEMBER(itech32_state::trackball32_4bit_p1_r)
 {
 	attotime curtime = machine().time();
 
-	if ((curtime - m_p1_lasttime) > machine().primary_screen->scan_period())
+	if ((curtime - m_p1_lasttime) > m_screen->scan_period())
 	{
 		int upper, lower;
 		int dx, dy;
@@ -539,7 +539,7 @@ READ32_MEMBER(itech32_state::trackball32_4bit_p2_r)
 {
 	attotime curtime = machine().time();
 
-	if ((curtime - m_p2_lasttime) > machine().primary_screen->scan_period())
+	if ((curtime - m_p2_lasttime) > m_screen->scan_period())
 	{
 		int upper, lower;
 		int dx, dy;

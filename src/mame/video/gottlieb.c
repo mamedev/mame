@@ -47,7 +47,7 @@ WRITE8_MEMBER(gottlieb_state::gottlieb_video_control_w)
 {
 	/* bit 0 controls foreground/background priority */
 	if (m_background_priority != (data & 0x01))
-		machine().primary_screen->update_partial(machine().primary_screen->vpos());
+		m_screen->update_partial(m_screen->vpos());
 	m_background_priority = data & 0x01;
 
 	/* bit 1 controls horizonal flip screen */

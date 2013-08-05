@@ -59,9 +59,9 @@ WRITE16_MEMBER( btoads_state::display_control_w )
 	if (ACCESSING_BITS_8_15)
 	{
 		/* allow multiple changes during display */
-		int scanline = machine().primary_screen->vpos();
+		int scanline = m_screen->vpos();
 		if (scanline > 0)
-			machine().primary_screen->update_partial(scanline - 1);
+			m_screen->update_partial(scanline - 1);
 
 		/* bit 15 controls which page is rendered and which page is displayed */
 		if (data & 0x8000)
@@ -91,7 +91,7 @@ WRITE16_MEMBER( btoads_state::display_control_w )
 WRITE16_MEMBER( btoads_state::scroll0_w )
 {
 	/* allow multiple changes during display */
-	machine().primary_screen->update_now();
+	m_screen->update_now();
 
 	/* upper bits are Y scroll, lower bits are X scroll */
 	if (ACCESSING_BITS_8_15)
@@ -104,7 +104,7 @@ WRITE16_MEMBER( btoads_state::scroll0_w )
 WRITE16_MEMBER( btoads_state::scroll1_w )
 {
 	/* allow multiple changes during display */
-	machine().primary_screen->update_now();
+	m_screen->update_now();
 
 	/* upper bits are Y scroll, lower bits are X scroll */
 	if (ACCESSING_BITS_8_15)

@@ -515,7 +515,7 @@ READ8_MEMBER(nss_state::port_00_r)
 	UINT8 res;
 
 	res = (m_joy_flag) << 7;
-	res|= (machine().primary_screen->vblank() & 1) << 6;
+	res|= (m_screen->vblank() & 1) << 6;
 	res|= (BIT(ioport("SERIAL1_DATA1")->read(), 15) << 5);
 	res|= (BIT(ioport("SERIAL1_DATA1")->read(),  7) << 4);
 	res|= (BIT(ioport("SERIAL1_DATA1")->read(), 10) << 3);

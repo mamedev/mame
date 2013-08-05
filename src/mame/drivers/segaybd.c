@@ -204,7 +204,7 @@ WRITE16_MEMBER( segaybd_state::io_chip_w )
 			//  D2 = YRES
 			//  D1-D0 = ADC0-1
 			//
-			m_segaic16vid->segaic16_set_display_enable(*m_screen, data & 0x80);
+			m_segaic16vid->segaic16_set_display_enable(data & 0x80);
 			if (((old ^ data) & 0x20) && !(data & 0x20))
 				machine().watchdog_reset();
 			m_soundcpu->set_input_line(INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
@@ -270,7 +270,7 @@ READ8_MEMBER( segaybd_state::sound_data_r )
 void segaybd_state::machine_reset()
 {
 	m_irq2_scanline = 170;
-	m_scanline_timer->adjust(machine().primary_screen->time_until_pos(223), 223);
+	m_scanline_timer->adjust(m_screen->time_until_pos(223), 223);
 }
 
 
@@ -350,7 +350,7 @@ void segaybd_state::device_timer(emu_timer &timer, device_timer_id id, int param
 				update_irqs();
 
 				// come back at the next appropriate scanline
-				m_scanline_timer->adjust(machine().primary_screen->time_until_pos(scanline), scanline);
+				m_scanline_timer->adjust(m_screen->time_until_pos(scanline), scanline);
 
 			#if TWEAK_IRQ2_SCANLINE
 				if (scanline == 223)

@@ -259,7 +259,7 @@ READ16_MEMBER(tecmosys_state::unk880000_r)
 	switch( offset )
 	{
 		case 0:
-			if ( machine().primary_screen->vpos() >= 240) return 0;
+			if ( m_screen->vpos() >= 240) return 0;
 			else return 1;
 
 		default:

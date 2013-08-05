@@ -225,7 +225,7 @@ void hyhoo_state::hyhoo_gfxdraw()
 
 void hyhoo_state::video_start()
 {
-	machine().primary_screen->register_screen_bitmap(m_tmpbitmap);
+	m_screen->register_screen_bitmap(m_tmpbitmap);
 }
 
 

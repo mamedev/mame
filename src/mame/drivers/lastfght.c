@@ -137,7 +137,7 @@ void lastfght_state::video_start()
 {
 	int i;
 	for (i = 0; i < 2; i++)
-		machine().primary_screen->register_screen_bitmap(m_bitmap[i]);
+		m_screen->register_screen_bitmap(m_bitmap[i]);
 
 	save_item(NAME(m_bitmap[0]));
 	save_item(NAME(m_bitmap[1]));

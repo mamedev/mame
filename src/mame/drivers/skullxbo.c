@@ -62,14 +62,14 @@ void skullxbo_state::scanline_update(screen_device &screen, int scanline)
 
 WRITE16_MEMBER(skullxbo_state::skullxbo_halt_until_hblank_0_w)
 {
-	halt_until_hblank_0(space.device(), *machine().primary_screen);
+	halt_until_hblank_0(space.device(), *m_screen);
 }
 
 
 MACHINE_RESET_MEMBER(skullxbo_state,skullxbo)
 {
 	atarigen_state::machine_reset();
-	scanline_timer_reset(*machine().primary_screen, 8);
+	scanline_timer_reset(*m_screen, 8);
 }
 
 

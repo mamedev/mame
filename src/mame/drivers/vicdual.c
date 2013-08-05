@@ -137,11 +137,11 @@ INPUT_CHANGED_MEMBER(vicdual_state::coin_changed)
 
 int vicdual_state::get_vcounter()
 {
-	int vcounter = machine().primary_screen->vpos();
+	int vcounter = m_screen->vpos();
 
 	/* the vertical synch counter gets incremented at the end of HSYNC,
 	   compensate for this */
-	if (machine().primary_screen->hpos() >= VICDUAL_HSEND)
+	if (m_screen->hpos() >= VICDUAL_HSEND)
 		vcounter = (vcounter + 1) % VICDUAL_VTOTAL;
 
 	return vcounter;
@@ -162,7 +162,7 @@ CUSTOM_INPUT_MEMBER(vicdual_state::vicdual_get_vblank_comp)
 
 CUSTOM_INPUT_MEMBER(vicdual_state::vicdual_get_composite_blank_comp)
 {
-	return (vicdual_get_vblank_comp(field, 0) && !machine().primary_screen->hblank());
+	return (vicdual_get_vblank_comp(field, 0) && !m_screen->hblank());
 }
 
 
@@ -205,14 +205,14 @@ int vicdual_state::vicdual_is_cabinet_color()
 
 WRITE8_MEMBER(vicdual_state::vicdual_videoram_w)
 {
-	machine().primary_screen->update_now();
+	m_screen->update_now();
 	m_videoram[offset] = data;
 }
 
 
 WRITE8_MEMBER(vicdual_state::vicdual_characterram_w)
 {
-	machine().primary_screen->update_now();
+	m_screen->update_now();
 	m_characterram[offset] = data;
 }
 

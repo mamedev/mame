@@ -242,7 +242,7 @@ INPUT_PORTS_END
 
 CUSTOM_INPUT_MEMBER(xmen_state::xmen_frame_r)
 {
-	return machine().primary_screen->frame_number() & 1;
+	return m_screen->frame_number() & 1;
 }
 
 static INPUT_PORTS_START( xmen6p )

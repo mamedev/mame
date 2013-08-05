@@ -103,7 +103,7 @@ void wolfpack_state::video_start()
 
 	m_LFSR = auto_alloc_array(machine(), UINT8, 0x8000);
 
-	machine().primary_screen->register_screen_bitmap(m_helper);
+	m_screen->register_screen_bitmap(m_helper);
 
 	for (i = 0; i < 0x8000; i++)
 	{

@@ -250,7 +250,7 @@ MACHINE_RESET_MEMBER(gaelco3d_state,gaelco3d2)
 
 INTERRUPT_GEN_MEMBER(gaelco3d_state::vblank_gen)
 {
-	gaelco3d_render(*machine().primary_screen);
+	gaelco3d_render(*m_screen);
 	device.execute().set_input_line(2, ASSERT_LINE);
 }
 

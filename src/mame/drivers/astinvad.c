@@ -267,7 +267,7 @@ TIMER_CALLBACK_MEMBER(astinvad_state::kamizake_int_gen)
 	/* interrupts are asserted on every state change of the 128V line */
 	m_maincpu->set_input_line(0, ASSERT_LINE);
 	param ^= 128;
-	m_int_timer->adjust(machine().primary_screen->time_until_pos(param), param);
+	m_int_timer->adjust(m_screen->time_until_pos(param), param);
 
 	/* an RC circuit turns the interrupt off after a short amount of time */
 	timer_set(attotime::from_double(300 * 0.1e-6), TIMER_INT_OFF);
@@ -277,7 +277,7 @@ TIMER_CALLBACK_MEMBER(astinvad_state::kamizake_int_gen)
 MACHINE_START_MEMBER(astinvad_state,kamikaze)
 {
 	m_int_timer = timer_alloc(TIMER_INT_GEN);
-	m_int_timer->adjust(machine().primary_screen->time_until_pos(128), 128);
+	m_int_timer->adjust(m_screen->time_until_pos(128), 128);
 
 	save_item(NAME(m_screen_flip));
 	save_item(NAME(m_screen_red));

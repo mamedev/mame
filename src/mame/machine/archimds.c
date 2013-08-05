@@ -106,7 +106,7 @@ void archimedes_state::vidc_vblank()
 	archimedes_request_irq_a(ARCHIMEDES_IRQA_VBL);
 
 	// set up for next vbl
-	m_vbl_timer->adjust(machine().primary_screen->time_until_pos(m_vidc_regs[0xb4]));
+	m_vbl_timer->adjust(m_screen->time_until_pos(m_vidc_regs[0xb4]));
 }
 
 /* video DMA */
@@ -123,7 +123,7 @@ void archimedes_state::vidc_video_tick()
 		vram[m_vidc_vidcur] = (space.read_byte(m_vidc_vidstart+m_vidc_vidcur));
 
 	if(m_video_dma_on)
-		m_vid_timer->adjust(machine().primary_screen->time_until_pos(m_vidc_regs[0xb4]));
+		m_vid_timer->adjust(m_screen->time_until_pos(m_vidc_regs[0xb4]));
 	else
 		m_vid_timer->adjust(attotime::never);
 }
@@ -464,7 +464,7 @@ READ32_MEMBER( archimedes_state::ioc_ctrl_r )
 			static UINT8 flyback; //internal name for vblank here
 			int vert_pos;
 
-			vert_pos = machine().primary_screen->vpos();
+			vert_pos = m_screen->vpos();
 			flyback = (vert_pos <= m_vidc_regs[VIDC_VDSR] || vert_pos >= m_vidc_regs[VIDC_VDER]) ? 0x80 : 0x00;
 
 			if ( m_i2cmem )
@@ -554,7 +554,7 @@ WRITE32_MEMBER( archimedes_state::ioc_ctrl_w )
 			archimedes_request_irq_a((data & 0x80) ? ARCHIMEDES_IRQA_FORCE : 0);
 
 			if(data & 0x08) //set up the VBLANK timer
-				m_vbl_timer->adjust(machine().primary_screen->time_until_pos(m_vidc_regs[0xb4]));
+				m_vbl_timer->adjust(m_screen->time_until_pos(m_vidc_regs[0xb4]));
 
 			break;
 
@@ -800,7 +800,7 @@ void archimedes_state::vidc_dynamic_res_change()
 			/* FIXME: pixel clock */
 			refresh = HZ_TO_ATTOSECONDS(pixel_rate[m_vidc_pixel_clk]*2) * m_vidc_regs[VIDC_HCR] * m_vidc_regs[VIDC_VCR];
 
-			machine().primary_screen->configure(m_vidc_regs[VIDC_HCR], m_vidc_regs[VIDC_VCR], visarea, refresh);
+			m_screen->configure(m_vidc_regs[VIDC_HCR], m_vidc_regs[VIDC_VCR], visarea, refresh);
 		}
 	}
 }
@@ -970,7 +970,7 @@ WRITE32_MEMBER(archimedes_state::archimedes_memc_w)
 				if ((data>>10)&1)
 				{
 					m_vidc_vidcur = 0;
-					m_vid_timer->adjust(machine().primary_screen->time_until_pos(m_vidc_regs[0xb4]));
+					m_vid_timer->adjust(m_screen->time_until_pos(m_vidc_regs[0xb4]));
 				}
 
 				if ((data>>11)&1)

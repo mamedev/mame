@@ -145,7 +145,7 @@ READ8_MEMBER(exidy440_state::exidy440_vertical_pos_r)
 	 * caused by collision or beam, ORed together with CHRCLK,
 	 * which probably goes off once per scanline; for now, we just
 	 * always return the current scanline */
-	result = machine().primary_screen->vpos();
+	result = m_screen->vpos();
 	return (result < 255) ? result : 255;
 }
 
@@ -159,7 +159,7 @@ READ8_MEMBER(exidy440_state::exidy440_vertical_pos_r)
 
 WRITE8_MEMBER(exidy440_state::exidy440_spriteram_w)
 {
-	machine().primary_screen->update_partial(machine().primary_screen->vpos());
+	m_screen->update_partial(m_screen->vpos());
 	m_spriteram[offset] = data;
 }
 

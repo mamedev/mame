@@ -462,7 +462,7 @@ WRITE16_MEMBER(igs011_state::igs011_blit_flags_w)
 	int gfx_size    =   memregion("blitter")->bytes();
 	int gfx2_size   =   memregion("blitter_hi")->bytes();
 
-	const rectangle &clip = machine().primary_screen->visible_area();
+	const rectangle &clip = m_screen->visible_area();
 
 	COMBINE_DATA(&blitter.flags);
 
@@ -567,7 +567,7 @@ WRITE16_MEMBER(igs011_state::igs011_blit_flags_w)
 
 CUSTOM_INPUT_MEMBER(igs011_state::igs_hopper_r)
 {
-	return (m_igs_hopper && ((machine().primary_screen->frame_number()/5)&1)) ? 0x0000 : 0x0001;
+	return (m_igs_hopper && ((m_screen->frame_number()/5)&1)) ? 0x0000 : 0x0001;
 }
 
 WRITE16_MEMBER(igs011_state::igs_dips_w)

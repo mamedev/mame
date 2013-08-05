@@ -225,9 +225,9 @@ WRITE32_MEMBER(fuuki32_state::fuuki32_vregs_w)
 		COMBINE_DATA(&m_vregs[offset]);
 		if (offset == 0x1c / 4)
 		{
-			const rectangle &visarea = machine().primary_screen->visible_area();
-			attotime period = machine().primary_screen->frame_period();
-			m_raster_interrupt_timer->adjust(machine().primary_screen->time_until_pos(m_vregs[0x1c / 4] >> 16, visarea.max_x + 1), 0, period);
+			const rectangle &visarea = m_screen->visible_area();
+			attotime period = m_screen->frame_period();
+			m_raster_interrupt_timer->adjust(m_screen->time_until_pos(m_vregs[0x1c / 4] >> 16, visarea.max_x + 1), 0, period);
 		}
 	}
 }
@@ -527,16 +527,16 @@ void fuuki32_state::device_timer(emu_timer &timer, device_timer_id id, int param
 	{
 	case TIMER_LEVEL_1_INTERRUPT:
 		m_maincpu->set_input_line(1, HOLD_LINE);
-		timer_set(machine().primary_screen->time_until_pos(248), TIMER_LEVEL_1_INTERRUPT);
+		timer_set(m_screen->time_until_pos(248), TIMER_LEVEL_1_INTERRUPT);
 		break;
 	case TIMER_VBLANK_INTERRUPT:
 		m_maincpu->set_input_line(3, HOLD_LINE);    // VBlank IRQ
-		timer_set(machine().primary_screen->time_until_vblank_start(), TIMER_VBLANK_INTERRUPT);
+		timer_set(m_screen->time_until_vblank_start(), TIMER_VBLANK_INTERRUPT);
 		break;
 	case TIMER_RASTER_INTERRUPT:
 		m_maincpu->set_input_line(5, HOLD_LINE);    // Raster Line IRQ
-		machine().primary_screen->update_partial(machine().primary_screen->vpos());
-		m_raster_interrupt_timer->adjust(machine().primary_screen->frame_period());
+		m_screen->update_partial(m_screen->vpos());
+		m_raster_interrupt_timer->adjust(m_screen->frame_period());
 		break;
 	default:
 		assert_always(FALSE, "Unknown id in fuuki32_state::device_timer");
@@ -559,11 +559,11 @@ void fuuki32_state::machine_start()
 
 void fuuki32_state::machine_reset()
 {
-	const rectangle &visarea = machine().primary_screen->visible_area();
+	const rectangle &visarea = m_screen->visible_area();
 
-	timer_set(machine().primary_screen->time_until_pos(248), TIMER_LEVEL_1_INTERRUPT);
-	timer_set(machine().primary_screen->time_until_vblank_start(), TIMER_VBLANK_INTERRUPT);
-	m_raster_interrupt_timer->adjust(machine().primary_screen->time_until_pos(0, visarea.max_x + 1));
+	timer_set(m_screen->time_until_pos(248), TIMER_LEVEL_1_INTERRUPT);
+	timer_set(m_screen->time_until_vblank_start(), TIMER_VBLANK_INTERRUPT);
+	m_raster_interrupt_timer->adjust(m_screen->time_until_pos(0, visarea.max_x + 1));
 }
 
 

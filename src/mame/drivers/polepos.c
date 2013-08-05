@@ -273,7 +273,7 @@ READ8_MEMBER(polepos_state::polepos_ready_r)
 {
 	int ret = 0xff;
 
-	if (machine().primary_screen->vpos() >= 128)
+	if (m_screen->vpos() >= 128)
 		ret ^= 0x02;
 
 	ret ^= 0x08; /* ADC End Flag */

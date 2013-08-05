@@ -62,7 +62,7 @@ MACHINE_START_MEMBER(cyberbal_state,cyberbal)
 MACHINE_RESET_MEMBER(cyberbal_state,cyberbal)
 {
 	atarigen_state::machine_reset();
-	scanline_timer_reset(*machine().primary_screen, 8);
+	scanline_timer_reset(*m_screen, 8);
 
 	cyberbal_sound_reset();
 
@@ -74,7 +74,7 @@ MACHINE_RESET_MEMBER(cyberbal_state,cyberbal)
 MACHINE_RESET_MEMBER(cyberbal_state,cyberbal2p)
 {
 	atarigen_state::machine_reset();
-	scanline_timer_reset(*machine().primary_screen, 8);
+	scanline_timer_reset(*m_screen, 8);
 }
 
 

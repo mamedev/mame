@@ -568,7 +568,7 @@ INTERRUPT_GEN_MEMBER(segas32_state::start_of_vblank_int)
 {
 	signal_v60_irq(MAIN_IRQ_VBSTART);
 	system32_set_vblank(1);
-	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(0), timer_expired_delegate(FUNC(segas32_state::end_of_vblank_int),this));
+	machine().scheduler().timer_set(m_screen->time_until_pos(0), timer_expired_delegate(FUNC(segas32_state::end_of_vblank_int),this));
 	if (m_system32_prot_vblank)
 		(*m_system32_prot_vblank)(&device);
 }

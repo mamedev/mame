@@ -500,7 +500,7 @@ void ppu2c0x_device::device_timer(emu_timer &timer, device_timer_id id, int para
 			/* increment our scanline count */
 			m_scanline++;
 
-			//  logerror("starting scanline %d (MAME %d, beam %d)\n", m_scanline, device->machine().primary_screen->vpos(), device->machine().primary_screen->hpos());
+			//  logerror("starting scanline %d (MAME %d, beam %d)\n", m_scanline, device->m_screen->vpos(), device->m_screen->hpos());
 
 			/* Note: this is called at the _end_ of each scanline */
 			if (m_scanline == PPU_VBLANK_FIRST_SCANLINE)

@@ -514,9 +514,9 @@ void mcd212_device::set_display_parameters(int channel, UINT8 value)
 
 void mcd212_device::update_visible_area()
 {
-	const rectangle &visarea = machine().primary_screen->visible_area();
+	const rectangle &visarea = m_screen->visible_area();
 	rectangle visarea1;
-	attoseconds_t period = machine().primary_screen->frame_period().attoseconds;
+	attoseconds_t period = m_screen->frame_period().attoseconds;
 	int width = 0;
 
 	if((m_channel[0].dcr & (MCD212_DCR_CF | MCD212_DCR_FD)) && (m_channel[0].csrw & MCD212_CSR1W_ST))
@@ -533,7 +533,7 @@ void mcd212_device::update_visible_area()
 	visarea1.min_y = visarea.min_y;
 	visarea1.max_y = visarea.max_y;
 
-	machine().primary_screen->configure(width, 302, visarea1, period);
+	m_screen->configure(width, 302, visarea1, period);
 }
 
 UINT32 mcd212_device::get_screen_width()
@@ -1418,7 +1418,7 @@ WRITE16_MEMBER( mcd212_device::regs_w )
 
 TIMER_CALLBACK_MEMBER( mcd212_device::perform_scan )
 {
-	int scanline = machine().primary_screen->vpos();
+	int scanline = m_screen->vpos();
 
 	if(1)
 	{
@@ -1463,7 +1463,7 @@ TIMER_CALLBACK_MEMBER( mcd212_device::perform_scan )
 			}
 		}
 	}
-	m_scan_timer->adjust(machine().primary_screen->time_until_pos(( scanline + 1 ) % 302, 0));
+	m_scan_timer->adjust(m_screen->time_until_pos(( scanline + 1 ) % 302, 0));
 }
 
 void mcd212_device::device_reset()
@@ -1509,7 +1509,8 @@ void mcd212_device::device_reset()
 //-------------------------------------------------
 
 mcd212_device::mcd212_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MACHINE_MCD212, "MCD212", tag, owner, clock, "mcd212", __FILE__)
+	: device_t(mconfig, MACHINE_MCD212, "MCD212", tag, owner, clock, "mcd212", __FILE__),
+	  device_video_interface(mconfig, *this)
 {
 }
 
@@ -1519,10 +1520,10 @@ mcd212_device::mcd212_device(const machine_config &mconfig, const char *tag, dev
 
 void mcd212_device::device_start()
 {
-	machine().primary_screen->register_screen_bitmap(m_bitmap);
+	m_screen->register_screen_bitmap(m_bitmap);
 
 	m_scan_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mcd212_device::perform_scan), this));
-	m_scan_timer->adjust(machine().primary_screen->time_until_pos(0, 0));
+	m_scan_timer->adjust(m_screen->time_until_pos(0, 0));
 
 	save_item(NAME(m_region_flag_0));
 	save_item(NAME(m_region_flag_1));

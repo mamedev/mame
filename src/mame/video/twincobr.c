@@ -96,7 +96,7 @@ void twincobr_state::twincobr_create_tilemaps()
 
 VIDEO_START_MEMBER(twincobr_state,toaplan0)
 {
-	m_spritegen->alloc_sprite_bitmap();
+	m_spritegen->alloc_sprite_bitmap(*m_screen);
 	m_spritegen->set_gfx_region(3);
 
 	/* the video RAM is accessed via ports, it's not memory mapped */

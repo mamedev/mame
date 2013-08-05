@@ -39,7 +39,7 @@ void vindictr_state::update_interrupts()
 MACHINE_RESET_MEMBER(vindictr_state,vindictr)
 {
 	atarigen_state::machine_reset();
-	scanline_timer_reset(*machine().primary_screen, 8);
+	scanline_timer_reset(*m_screen, 8);
 }
 
 

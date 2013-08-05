@@ -97,7 +97,7 @@ WRITE16_MEMBER(thunderj_state::latch_w)
 		/* bits 2-5 are the alpha bank */
 		if (m_alpha_tile_bank != ((data >> 2) & 7))
 		{
-			machine().primary_screen->update_partial(machine().primary_screen->vpos());
+			m_screen->update_partial(m_screen->vpos());
 			m_vad->alpha()->mark_all_dirty();
 			m_alpha_tile_bank = (data >> 2) & 7;
 		}

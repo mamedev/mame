@@ -190,7 +190,7 @@ READ8_MEMBER(fantland_state::borntofi_inputs_r)
 
 	x = ioport(offset ? "P2 Trackball X" : "P1 Trackball X")->read();
 	y = ioport(offset ? "P2 Trackball Y" : "P1 Trackball Y")->read();
-	f = machine().primary_screen->frame_number();
+	f = m_screen->frame_number();
 
 	m_input_ret[offset] = (m_input_ret[offset] & 0x14) | (ioport(offset ? "P2_TRACK" : "P1_TRACK")->read() & 0xc3);
 

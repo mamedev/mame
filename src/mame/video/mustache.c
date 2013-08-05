@@ -100,7 +100,7 @@ void mustache_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 {
 	rectangle clip = cliprect;
 	gfx_element *gfx = machine().gfx[1];
-	const rectangle &visarea = machine().primary_screen->visible_area();
+	const rectangle &visarea = m_screen->visible_area();
 	UINT8 *spriteram = m_spriteram;
 	int offs;
 

@@ -25,7 +25,8 @@ struct tempsprite
 
 
 
-class kaneko16_sprite_device : public device_t
+class kaneko16_sprite_device : public device_t,
+								public device_video_interface
 {
 public:
 	kaneko16_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock,  device_type type);

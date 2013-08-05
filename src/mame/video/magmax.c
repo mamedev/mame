@@ -72,7 +72,7 @@ void magmax_state::video_start()
 
 	m_prom_tab = auto_alloc_array(machine(), UINT32, 256);
 
-	machine().primary_screen->register_screen_bitmap(m_bitmap);
+	m_screen->register_screen_bitmap(m_bitmap);
 
 	/* Allocate temporary bitmap */
 	for (i=0; i<256; i++)

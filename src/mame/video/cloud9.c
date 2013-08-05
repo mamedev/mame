@@ -35,7 +35,7 @@ void cloud9_state::video_start()
 			3,  resistances, m_bweights, 1000, 0);
 
 	/* allocate a bitmap for drawing sprites */
-	machine().primary_screen->register_screen_bitmap(m_spritebitmap);
+	m_screen->register_screen_bitmap(m_spritebitmap);
 
 	/* register for savestates */
 	save_pointer(NAME(m_videoram), 0x8000);

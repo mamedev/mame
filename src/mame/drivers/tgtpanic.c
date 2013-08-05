@@ -72,7 +72,7 @@ UINT32 tgtpanic_state::screen_update_tgtpanic(screen_device &screen, bitmap_rgb3
 
 WRITE8_MEMBER(tgtpanic_state::color_w)
 {
-	machine().primary_screen->update_partial(machine().primary_screen->vpos());
+	m_screen->update_partial(m_screen->vpos());
 	m_color = data;
 }
 

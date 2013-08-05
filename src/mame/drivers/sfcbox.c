@@ -222,7 +222,7 @@ READ8_MEMBER( sfcbox_state::port_81_r )
 */
 	UINT8 res;
 
-	res = (machine().primary_screen->vblank() & 1) << 7;
+	res = (m_screen->vblank() & 1) << 7;
 	res = 1 << 6;
 	res = 0 << 5;
 	res = 0 << 4;

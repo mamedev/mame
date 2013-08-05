@@ -101,7 +101,7 @@ VIDEO_START_MEMBER(galaxia_state,astrowar)
 	m_bg_tilemap->set_scroll_cols(8);
 	m_bg_tilemap->set_scrolldx(8, 8);
 
-	machine().primary_screen->register_screen_bitmap(m_temp_bitmap);
+	m_screen->register_screen_bitmap(m_temp_bitmap);
 }
 
 

@@ -364,14 +364,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(battlera_state::battlera_irq)
 
 	/* If raster interrupt occurs, refresh screen _up_ to this point */
 	if (m_rcr_enable && (m_current_scanline+56)==m_HuC6270_registers[6]) {
-		machine().primary_screen->update_partial(m_current_scanline);
+		m_screen->update_partial(m_current_scanline);
 		m_maincpu->set_input_line(0, HOLD_LINE); /* RCR interrupt */
 	}
 
 	/* Start of vblank */
 	else if (m_current_scanline==240) {
 		m_bldwolf_vblank=1;
-		machine().primary_screen->update_partial(240);
+		m_screen->update_partial(240);
 		if (m_irq_enable)
 			m_maincpu->set_input_line(0, HOLD_LINE); /* VBL */
 	}

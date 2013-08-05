@@ -1210,7 +1210,7 @@ void psikyosh_state::video_start()
 {
 	UINT8 *alphatable = m_alphatable;
 
-	machine().primary_screen->register_screen_bitmap(m_z_bitmap); /* z-buffer */
+	m_screen->register_screen_bitmap(m_z_bitmap); /* z-buffer */
 	m_zoom_bitmap.allocate(16*16, 16*16); /* temp buffer for assembling sprites */
 	m_bg_bitmap.allocate(32*16, 32*16); /* temp buffer for assembling tilemaps */
 	m_bg_zoom = auto_alloc_array(machine(), UINT16, 256);

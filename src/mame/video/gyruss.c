@@ -94,7 +94,7 @@ void gyruss_state::palette_init()
 
 WRITE8_MEMBER(gyruss_state::gyruss_spriteram_w)
 {
-	machine().primary_screen->update_now();
+	m_screen->update_now();
 	m_spriteram[offset] = data;
 }
 
@@ -123,7 +123,7 @@ void gyruss_state::video_start()
 READ8_MEMBER(gyruss_state::gyruss_scanline_r)
 {
 	/* reads 1V - 128V */
-	return machine().primary_screen->vpos();
+	return m_screen->vpos();
 }
 
 

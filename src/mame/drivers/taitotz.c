@@ -743,8 +743,8 @@ void taitotz_state::taitotz_exit()
 */
 void taitotz_state::video_start()
 {
-	int width = machine().primary_screen->width();
-	int height = machine().primary_screen->height();
+	int width = m_screen->width();
+	int height = m_screen->height();
 
 	m_screen_ram = auto_alloc_array(machine(), UINT32, 0x200000);
 	m_frame_ram = auto_alloc_array(machine(), UINT32, 0x80000);

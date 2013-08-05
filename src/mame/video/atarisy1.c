@@ -183,7 +183,7 @@ WRITE16_MEMBER( atarisy1_state::atarisy1_bankselect_w )
 {
 	UINT16 oldselect = *m_bankselect;
 	UINT16 newselect = oldselect, diff;
-	int scanline = machine().primary_screen->vpos();
+	int scanline = m_screen->vpos();
 
 	/* update memory */
 	COMBINE_DATA(&newselect);
@@ -198,7 +198,7 @@ WRITE16_MEMBER( atarisy1_state::atarisy1_bankselect_w )
 
 	/* if MO or playfield banks change, force a partial update */
 	if (diff & 0x003c)
-		machine().primary_screen->update_partial(scanline);
+		m_screen->update_partial(scanline);
 
 	/* motion object bank select */
 	m_mob->set_bank((newselect >> 3) & 7);
@@ -231,7 +231,7 @@ WRITE16_MEMBER( atarisy1_state::atarisy1_priority_w )
 	/* force a partial update in case this changes mid-screen */
 	COMBINE_DATA(&newpens);
 	if (oldpens != newpens)
-		machine().primary_screen->update_partial(machine().primary_screen->vpos());
+		m_screen->update_partial(m_screen->vpos());
 	m_playfield_priority_pens = newpens;
 }
 
@@ -251,7 +251,7 @@ WRITE16_MEMBER( atarisy1_state::atarisy1_xscroll_w )
 	/* force a partial update in case this changes mid-screen */
 	COMBINE_DATA(&newscroll);
 	if (oldscroll != newscroll)
-		machine().primary_screen->update_partial(machine().primary_screen->vpos());
+		m_screen->update_partial(m_screen->vpos());
 
 	/* set the new scroll value */
 	m_playfield_tilemap->set_scrollx(0, newscroll);
@@ -278,23 +278,23 @@ WRITE16_MEMBER( atarisy1_state::atarisy1_yscroll_w )
 {
 	UINT16 oldscroll = *m_yscroll;
 	UINT16 newscroll = oldscroll;
-	int scanline = machine().primary_screen->vpos();
+	int scanline = m_screen->vpos();
 	int adjusted_scroll;
 
 	/* force a partial update in case this changes mid-screen */
 	COMBINE_DATA(&newscroll);
-	machine().primary_screen->update_partial(scanline);
+	m_screen->update_partial(scanline);
 
 	/* because this latches a new value into the scroll base,
 	   we need to adjust for the scanline */
 	adjusted_scroll = newscroll;
-	if (scanline <= machine().primary_screen->visible_area().max_y)
+	if (scanline <= m_screen->visible_area().max_y)
 		adjusted_scroll -= (scanline + 1);
 	m_playfield_tilemap->set_scrolly(0, adjusted_scroll);
 
 	/* but since we've adjusted it, we must reset it to the normal value
 	   once we hit scanline 0 again */
-	m_yscroll_reset_timer->adjust(machine().primary_screen->time_until_pos(0), newscroll);
+	m_yscroll_reset_timer->adjust(m_screen->time_until_pos(0), newscroll);
 
 	/* update the data */
 	*m_yscroll = newscroll;
@@ -325,7 +325,7 @@ WRITE16_MEMBER( atarisy1_state::atarisy1_spriteram_w )
 		{
 			/* if the timer is in the active bank, update the display list */
 			spriteram[offset] = data;
-			update_timers(machine().primary_screen->vpos());
+			update_timers(m_screen->vpos());
 		}
 
 		/* if we're about to modify data in the active sprite bank, make sure the video is up-to-date */
@@ -333,7 +333,7 @@ WRITE16_MEMBER( atarisy1_state::atarisy1_spriteram_w )
 		/* renders the next scanline's sprites to the line buffers, but Road Runner still glitches */
 		/* without the extra +1 */
 		else
-			machine().primary_screen->update_partial(machine().primary_screen->vpos() + 2);
+			m_screen->update_partial(m_screen->vpos() + 2);
 	}
 
 	/* let the MO handler do the basic work */
@@ -365,7 +365,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(atarisy1_state::atarisy1_int3_callback)
 	scanline_int_gen(m_maincpu);
 
 	/* set a timer to turn it off */
-	m_int3off_timer->adjust(machine().primary_screen->scan_period());
+	m_int3off_timer->adjust(m_screen->scan_period());
 
 	/* determine the time of the next one */
 	m_next_timer_scanline = -1;
@@ -444,7 +444,7 @@ void atarisy1_state::update_timers(int scanline)
 
 		/* set a new one */
 		if (best != -1)
-			m_scanline_timer->adjust(machine().primary_screen->time_until_pos(best), best);
+			m_scanline_timer->adjust(m_screen->time_until_pos(best), best);
 		else
 			m_scanline_timer->reset();
 	}

@@ -2699,7 +2699,7 @@ void model2_state::model2_exit()
 
 VIDEO_START_MEMBER(model2_state,model2)
 {
-	const rectangle &visarea = machine().primary_screen->visible_area();
+	const rectangle &visarea = m_screen->visible_area();
 	int width = visarea.width();
 	int height = visarea.height();
 

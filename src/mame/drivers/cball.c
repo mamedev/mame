@@ -107,7 +107,7 @@ TIMER_CALLBACK_MEMBER(cball_state::interrupt_callback)
 	if (scanline >= 262)
 		scanline = 16;
 
-	timer_set(machine().primary_screen->time_until_pos(scanline), TIMER_INTERRUPT, scanline);
+	timer_set(m_screen->time_until_pos(scanline), TIMER_INTERRUPT, scanline);
 }
 
 
@@ -117,7 +117,7 @@ void cball_state::machine_start()
 
 void cball_state::machine_reset()
 {
-	timer_set(machine().primary_screen->time_until_pos(16), TIMER_INTERRUPT, 16);
+	timer_set(m_screen->time_until_pos(16), TIMER_INTERRUPT, 16);
 }
 
 

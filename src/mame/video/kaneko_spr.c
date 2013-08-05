@@ -30,7 +30,8 @@ const device_type KANEKO_VU002_SPRITE = &device_creator<kaneko_vu002_sprite_devi
 const device_type KANEKO_KC002_SPRITE = &device_creator<kaneko_kc002_sprite_device>;
 
 kaneko16_sprite_device::kaneko16_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock, device_type type)
-	: device_t(mconfig, type, "kaneko16_sprite_device", tag, owner, clock, "kaneko16_sprite", __FILE__)
+	: device_t(mconfig, type, "kaneko16_sprite_device", tag, owner, clock, "kaneko16_sprite", __FILE__),
+	  device_video_interface(mconfig, *this)
 {
 	m_keep_sprites = 0; // default disabled for games not using it
 
@@ -61,7 +62,7 @@ void kaneko16_sprite_device::device_start()
 {
 	m_first_sprite = auto_alloc_array(machine(), struct tempsprite, 0x400);
 	m_sprites_regs = auto_alloc_array_clear(machine(), UINT16, 0x20/2);
-	machine().primary_screen->register_screen_bitmap(m_sprites_bitmap);
+	m_screen->register_screen_bitmap(m_sprites_bitmap);
 }
 
 
@@ -204,12 +205,12 @@ int kaneko16_sprite_device::kaneko16_parse_sprite_type012(running_machine &machi
 	if (m_sprite_flipy)
 	{
 		s->yoffs        -=      m_sprites_regs[0x2/2];
-		s->yoffs        -=      machine.primary_screen->visible_area().min_y<<6;
+		s->yoffs        -=      m_screen->visible_area().min_y<<6;
 	}
 	else
 	{
 		s->yoffs        -=      m_sprites_regs[0x2/2];
-		s->yoffs        +=      machine.primary_screen->visible_area().min_y<<6;
+		s->yoffs        +=      m_screen->visible_area().min_y<<6;
 	}
 
 	return                  ( (attr & 0x2000) ? USE_LATCHED_XY    : 0 ) |
@@ -325,7 +326,7 @@ void kaneko16_sprite_device::kaneko16_draw_sprites(running_machine &machine, bit
 	   in a temp buffer, then draw the buffer's contents from last
 	   to first. */
 
-	int max =   (machine.primary_screen->width() > 0x100) ? (0x200<<6) : (0x100<<6);
+	int max =   (m_screen->width() > 0x100) ? (0x200<<6) : (0x100<<6);
 
 	int i = 0;
 	struct tempsprite *s = m_first_sprite;

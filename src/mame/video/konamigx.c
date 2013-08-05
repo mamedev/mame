@@ -798,7 +798,7 @@ void konamigx_state::gx_draw_basic_extended_tilemaps_1(screen_device &screen, bi
 		if (offs == -2)
 		{
 			int pixeldouble_output = 0;
-			const rectangle &visarea = screen.machine().primary_screen->visible_area();
+			const rectangle &visarea = screen.visible_area();
 			int width = visarea.width();
 
 			if (width>512) // vsnetscr case
@@ -851,8 +851,8 @@ void konamigx_state::gx_draw_basic_extended_tilemaps_2(screen_device &screen, bi
 			if (extra_bitmap) // soccer superstars roz layer
 			{
 				int xx,yy;
-				int width = screen.machine().primary_screen->width();
-				int height = screen.machine().primary_screen->height();
+				int width = screen.width();
+				int height = screen.height();
 				const pen_t *paldata = screen.machine().pens;
 
 				// the output size of the roz layer has to be doubled horizontally
@@ -1301,8 +1301,8 @@ VIDEO_START_MEMBER(konamigx_state,konamigx_6bpp)
 
 VIDEO_START_MEMBER(konamigx_state,konamigx_type3)
 {
-	int width = machine().primary_screen->width();
-	int height = machine().primary_screen->height();
+	int width = m_screen->width();
+	int height = m_screen->height();
 
 	m_k056832->altK056832_vh_start(machine(), "gfx1", K056832_BPP_6, 0, NULL, konamigx_type2_tile_callback, 1);
 	m_k055673->alt_k055673_vh_start(machine(), "gfx2", K055673_LAYOUT_GX6, -132, -23, konamigx_type2_sprite_callback);
@@ -1340,8 +1340,8 @@ VIDEO_START_MEMBER(konamigx_state,konamigx_type3)
 
 VIDEO_START_MEMBER(konamigx_state,konamigx_type4)
 {
-	int width = machine().primary_screen->width();
-	int height = machine().primary_screen->height();
+	int width = m_screen->width();
+	int height = m_screen->height();
 
 	m_k056832->altK056832_vh_start(machine(), "gfx1", K056832_BPP_8, 0, NULL, konamigx_type2_tile_callback, 0);
 	m_k055673->alt_k055673_vh_start(machine(), "gfx2", K055673_LAYOUT_GX6, -79, -24, konamigx_type2_sprite_callback); // -23 looks better in intro
@@ -1371,8 +1371,8 @@ VIDEO_START_MEMBER(konamigx_state,konamigx_type4)
 
 VIDEO_START_MEMBER(konamigx_state,konamigx_type4_vsn)
 {
-	int width = machine().primary_screen->width();
-	int height = machine().primary_screen->height();
+	int width = m_screen->width();
+	int height = m_screen->height();
 
 	m_k056832->altK056832_vh_start(machine(), "gfx1", K056832_BPP_8, 0, NULL, konamigx_type2_tile_callback, 2);   // set djmain_hack to 2 to kill layer association or half the tilemaps vanish on screen 0
 	m_k055673->alt_k055673_vh_start(machine(), "gfx2", K055673_LAYOUT_GX6, -132, -23, konamigx_type2_sprite_callback);
@@ -1401,8 +1401,8 @@ VIDEO_START_MEMBER(konamigx_state,konamigx_type4_vsn)
 
 VIDEO_START_MEMBER(konamigx_state,konamigx_type4_sd2)
 {
-	int width = machine().primary_screen->width();
-	int height = machine().primary_screen->height();
+	int width = m_screen->width();
+	int height = m_screen->height();
 
 	m_k056832->altK056832_vh_start(machine(), "gfx1", K056832_BPP_8, 0, NULL, konamigx_type2_tile_callback, 0);
 	m_k055673->alt_k055673_vh_start(machine(), "gfx2", K055673_LAYOUT_GX6, -81, -23, konamigx_type2_sprite_callback);

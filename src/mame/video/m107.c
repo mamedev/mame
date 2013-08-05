@@ -311,7 +311,7 @@ void m107_state::m107_tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, 
 {
 	int line;
 	rectangle clip;
-	const rectangle &visarea = machine().primary_screen->visible_area();
+	const rectangle &visarea = m_screen->visible_area();
 	clip = visarea;
 
 	if (m_control[0x08 + laynum] & 0x02)

@@ -213,7 +213,7 @@ MACHINE_RESET_MEMBER(badlands_state,badlands)
 	m_pedal_value[0] = m_pedal_value[1] = 0x80;
 
 	atarigen_state::machine_reset();
-	scanline_timer_reset(*machine().primary_screen, 32);
+	scanline_timer_reset(*m_screen, 32);
 
 	memcpy(m_bank_base, &m_bank_source_data[0x0000], 0x1000);
 }
@@ -687,7 +687,7 @@ MACHINE_RESET_MEMBER(badlands_state,badlandsb)
 //  m_pedal_value[0] = m_pedal_value[1] = 0x80;
 
 	atarigen_state::machine_reset();
-	scanline_timer_reset(*machine().primary_screen, 32);
+	scanline_timer_reset(*m_screen, 32);
 
 //  memcpy(m_bank_base, &m_bank_source_data[0x0000], 0x1000);
 }

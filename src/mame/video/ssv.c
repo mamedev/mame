@@ -371,7 +371,7 @@ VIDEO_START_MEMBER(ssv_state,gdfs)
 
 READ16_MEMBER(ssv_state::ssv_vblank_r)
 {
-	if (machine().primary_screen->vblank())
+	if (m_screen->vblank())
 		return 0x2000 | 0x1000;
 	else
 		return 0x0000;
@@ -727,7 +727,7 @@ void ssv_state::draw_row(bitmap_ind16 &bitmap, const rectangle &cliprect, int sx
 void ssv_state::draw_layer(bitmap_ind16 &bitmap, const rectangle &cliprect, int  nr)
 {
 	int sy;
-	for ( sy = 0; sy <= machine().primary_screen->visible_area().max_y; sy += 0x40 )
+	for ( sy = 0; sy <= m_screen->visible_area().max_y; sy += 0x40 )
 		draw_row(bitmap, cliprect, 0, sy, nr);
 }
 

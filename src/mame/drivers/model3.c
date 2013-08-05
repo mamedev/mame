@@ -1604,7 +1604,7 @@ READ64_MEMBER(model3_state::real3d_status_r)
 	{
 		/* pretty sure this is VBLANK */
 		m_real3d_status &= ~U64(0x0000000200000000);
-		if (machine().primary_screen->vblank())
+		if (m_screen->vblank())
 			m_real3d_status |= U64(0x0000000200000000);
 		return m_real3d_status;
 	}

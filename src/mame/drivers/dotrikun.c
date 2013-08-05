@@ -61,7 +61,7 @@ WRITE8_MEMBER(dotrikun_state::dotrikun_color_w)
 	*/
 
 	m_color = data;
-	machine().primary_screen->update_partial(machine().primary_screen->vpos());
+	m_screen->update_partial(m_screen->vpos());
 }
 
 

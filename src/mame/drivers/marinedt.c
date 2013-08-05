@@ -310,7 +310,7 @@ WRITE8_MEMBER(marinedt_state::marinedt_pf_w)
 
 	//if (data & 0xf0)
 	//    logerror("pf:%02x %d\n", m_pf);
-	//logerror("pd:%02x %d\n", m_pd, machine().primary_screen->frame_number());
+	//logerror("pd:%02x %d\n", m_pd, m_screen->frame_number());
 
 }
 

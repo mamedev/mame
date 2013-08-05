@@ -738,13 +738,13 @@ void vamphalf_handle_flipped_visible_area( screen_device &screen )
 	{
 		rectangle visarea;
 		visarea.set(31, 350, 16, 251);
-		screen.machine().primary_screen->configure(512, 256, visarea, HZ_TO_ATTOSECONDS(60));
+		screen.configure(512, 256, visarea, HZ_TO_ATTOSECONDS(60));
 	}
 	else
 	{
 		rectangle visarea;
 		visarea.set(31, 350, 20, 255);
-		screen.machine().primary_screen->configure(512, 256, visarea, HZ_TO_ATTOSECONDS(60));
+		screen.configure(512, 256, visarea, HZ_TO_ATTOSECONDS(60));
 	}
 }
 

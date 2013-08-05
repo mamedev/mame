@@ -21,6 +21,7 @@ const device_type N64PERIPH = &device_creator<n64_periphs>;
 
 n64_periphs::n64_periphs(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, N64PERIPH, "N64 Periphal Chips", tag, owner, clock, "n64_periphs", __FILE__)
+	, device_video_interface(mconfig, *this)
 	, m_nvram_image(NULL)
 {
 }
@@ -1056,7 +1057,7 @@ TIMER_CALLBACK_MEMBER(n64_periphs::vi_scanline_callback)
 void n64_periphs::vi_scanline_tick()
 {
 	signal_rcp_interrupt(VI_INTERRUPT);
-	vi_scanline_timer->adjust(machine().primary_screen->time_until_pos(vi_intr >> 1));
+	vi_scanline_timer->adjust(m_screen->time_until_pos(vi_intr >> 1));
 }
 
 // Video Interface
@@ -1071,8 +1072,8 @@ void n64_periphs::vi_recalculate_resolution()
 	int width = ((vi_xscale & 0x00000fff) * (x_end - x_start)) / 0x400;
 	int height = ((vi_yscale & 0x00000fff) * (y_end - y_start)) / 0x400;
 	//printf("%04x | %02x | ", vi_xscale >> 16, vi_burst & 0x000000ff);
-	rectangle visarea = machine().primary_screen->visible_area();
-	attoseconds_t period = machine().primary_screen->frame_period().attoseconds;
+	rectangle visarea = m_screen->visible_area();
+	attoseconds_t period = m_screen->frame_period().attoseconds;
 
 	if (width == 0 || height == 0)
 	{
@@ -1099,7 +1100,7 @@ void n64_periphs::vi_recalculate_resolution()
 	visarea.max_x = width - 1;
 	visarea.max_y = height - 1;
 	//printf("Reconfig %d, %d (%d - %d), %08x, %08x, %08x, %08x, %08x\n", width, height, x_start, x_end, vi_width, vi_xscale, vi_hsync, vi_hstart, vi_burst);
-	machine().primary_screen->configure(width, 525, visarea, period);
+	m_screen->configure(width, 525, visarea, period);
 }
 
 READ32_MEMBER( n64_periphs::vi_reg_r )
@@ -1124,7 +1125,7 @@ READ32_MEMBER( n64_periphs::vi_reg_r )
 			break;
 
 		case 0x10/4:        // VI_CURRENT_REG
-			ret = machine().primary_screen->vpos() << 1;
+			ret = m_screen->vpos() << 1;
 			break;
 
 		case 0x14/4:        // VI_BURST_REG
@@ -1199,7 +1200,7 @@ WRITE32_MEMBER( n64_periphs::vi_reg_w )
 
 		case 0x0c/4:        // VI_INTR_REG
 			vi_intr = data;
-			vi_scanline_timer->adjust(machine().primary_screen->time_until_pos(vi_intr >> 1));
+			vi_scanline_timer->adjust(m_screen->time_until_pos(vi_intr >> 1));
 			break;
 
 		case 0x10/4:        // VI_CURRENT_REG

@@ -176,14 +176,14 @@ inline int xain_state::scanline_to_vcount(int scanline)
 TIMER_DEVICE_CALLBACK_MEMBER(xain_state::xain_scanline)
 {
 	int scanline = param;
-	int screen_height = machine().primary_screen->height();
+	int screen_height = m_screen->height();
 	int vcount_old = scanline_to_vcount((scanline == 0) ? screen_height - 1 : scanline - 1);
 	int vcount = scanline_to_vcount(scanline);
 
 	/* update to the current point */
 	if (scanline > 0)
 	{
-		machine().primary_screen->update_partial(scanline - 1);
+		m_screen->update_partial(scanline - 1);
 	}
 
 	/* FIRQ (IMS) fires every on every 8th scanline (except 0) */

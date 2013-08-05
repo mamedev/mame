@@ -451,7 +451,7 @@ READ8_MEMBER(mcr3_state::turbotag_ip2_r)
 	if (m_input_mux)
 		return ioport("ssio:IP2.ALT")->read();
 
-	return ioport("ssio:IP2")->read() + 5 * (machine().primary_screen->frame_number() & 1);
+	return ioport("ssio:IP2")->read() + 5 * (m_screen->frame_number() & 1);
 }
 
 

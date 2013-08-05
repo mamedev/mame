@@ -61,9 +61,9 @@ void dcheese_state::update_scanline_irq()
 			effscan += m_blitter_vidparam[0x1e/2];
 
 		/* determine the time; if it's in this scanline, bump to the next frame */
-		time = machine().primary_screen->time_until_pos(effscan);
-		if (time < machine().primary_screen->scan_period())
-			time += machine().primary_screen->frame_period();
+		time = m_screen->time_until_pos(effscan);
+		if (time < m_screen->scan_period())
+			time += m_screen->frame_period();
 		m_blitter_timer->adjust(time);
 	}
 }
@@ -149,7 +149,7 @@ void dcheese_state::do_clear(  )
 		memset(&m_dstbitmap->pix16(y % DSTBITMAP_HEIGHT), 0, DSTBITMAP_WIDTH * 2);
 
 	/* signal an IRQ when done (timing is just a guess) */
-	timer_set(machine().primary_screen->scan_period(), TIMER_SIGNAL_IRQ, 1);
+	timer_set(m_screen->scan_period(), TIMER_SIGNAL_IRQ, 1);
 }
 
 
@@ -203,7 +203,7 @@ void dcheese_state::do_blit(  )
 	}
 
 	/* signal an IRQ when done (timing is just a guess) */
-	timer_set(machine().primary_screen->scan_period() / 2, TIMER_SIGNAL_IRQ, 2);
+	timer_set(m_screen->scan_period() / 2, TIMER_SIGNAL_IRQ, 2);
 
 	/* these extra parameters are written but they are always zero, so I don't know what they do */
 	if (m_blitter_xparam[8] != 0 || m_blitter_xparam[9] != 0 || m_blitter_xparam[10] != 0 || m_blitter_xparam[11] != 0 ||

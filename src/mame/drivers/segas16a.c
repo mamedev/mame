@@ -232,7 +232,7 @@ WRITE8_MEMBER( segas16a_state::misc_control_w )
 	m_video_control = data;
 
 	// bit 7: screen flip
-	m_segaic16vid->segaic16_tilemap_set_flip(machine(), 0, data & 0x80);
+	m_segaic16vid->segaic16_tilemap_set_flip(0, data & 0x80);
 	m_sprites->set_flip(data & 0x80);
 
 	// bit 6: set 8751 interrupt line
@@ -240,7 +240,7 @@ WRITE8_MEMBER( segas16a_state::misc_control_w )
 		m_mcu->set_input_line(MCS51_INT1_LINE, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 
 	// bit 4: enable display
-	m_segaic16vid->segaic16_set_display_enable(*m_screen, data & 0x10);
+	m_segaic16vid->segaic16_set_display_enable(data & 0x10);
 
 	// bits 0 & 1: update coin counters
 	coin_counter_w(machine(), 1, data & 0x02);
@@ -269,8 +269,8 @@ WRITE8_MEMBER( segas16a_state::tilemap_sound_w )
 	//       1= sound is enabled
 	//
 	m_soundcpu->set_input_line(INPUT_LINE_NMI, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
-	m_segaic16vid->segaic16_tilemap_set_colscroll(machine(), 0, ~data & 0x04);
-	m_segaic16vid->segaic16_tilemap_set_rowscroll(machine(), 0, ~data & 0x02);
+	m_segaic16vid->segaic16_tilemap_set_colscroll(0, ~data & 0x04);
+	m_segaic16vid->segaic16_tilemap_set_rowscroll(0, ~data & 0x02);
 }
 
 
@@ -500,7 +500,7 @@ WRITE8_MEMBER( segas16a_state::mcu_control_w )
 
 	// enable/disable the display
 	if (data & 0x40)
-		m_segaic16vid->segaic16_set_display_enable(*m_screen, 1);
+		m_segaic16vid->segaic16_set_display_enable(1);
 
 	// apply an extra boost if the main CPU is just waking up
 	if ((m_mcu_control ^ data) & 0x40)

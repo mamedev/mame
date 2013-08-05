@@ -47,7 +47,7 @@ MACHINE_START_MEMBER(atarig1_state,atarig1)
 MACHINE_RESET_MEMBER(atarig1_state,atarig1)
 {
 	atarigen_state::machine_reset();
-	scanline_timer_reset(*machine().primary_screen, 8);
+	scanline_timer_reset(*m_screen, 8);
 }
 
 

@@ -97,7 +97,7 @@ WRITE16_MEMBER( skullxbo_state::skullxbo_xscroll_w )
 
 	/* if something changed, force an update */
 	if (oldscroll != newscroll)
-		machine().primary_screen->update_partial(machine().primary_screen->vpos());
+		m_screen->update_partial(m_screen->vpos());
 
 	/* adjust the actual scrolls */
 	m_playfield_tilemap->set_scrollx(0, 2 * (newscroll >> 7));
@@ -111,7 +111,7 @@ WRITE16_MEMBER( skullxbo_state::skullxbo_xscroll_w )
 WRITE16_MEMBER( skullxbo_state::skullxbo_yscroll_w )
 {
 	/* combine data */
-	int scanline = machine().primary_screen->vpos();
+	int scanline = m_screen->vpos();
 	UINT16 oldscroll = *m_yscroll;
 	UINT16 newscroll = oldscroll;
 	UINT16 effscroll;
@@ -119,10 +119,10 @@ WRITE16_MEMBER( skullxbo_state::skullxbo_yscroll_w )
 
 	/* if something changed, force an update */
 	if (oldscroll != newscroll)
-		machine().primary_screen->update_partial(scanline);
+		m_screen->update_partial(scanline);
 
 	/* adjust the effective scroll for the current scanline */
-	if (scanline > machine().primary_screen->visible_area().max_y)
+	if (scanline > m_screen->visible_area().max_y)
 		scanline = 0;
 	effscroll = (newscroll >> 7) - scanline;
 
@@ -144,7 +144,7 @@ WRITE16_MEMBER( skullxbo_state::skullxbo_yscroll_w )
 
 WRITE16_MEMBER( skullxbo_state::skullxbo_mobmsb_w )
 {
-	machine().primary_screen->update_partial(machine().primary_screen->vpos());
+	m_screen->update_partial(m_screen->vpos());
 	m_mob->set_bank((offset >> 9) & 1);
 }
 
@@ -211,7 +211,7 @@ void skullxbo_state::skullxbo_scanline_update(int scanline)
 
 			/* force a partial update with the previous scroll */
 			if (scanline > 0)
-				machine().primary_screen->update_partial(scanline - 1);
+				m_screen->update_partial(scanline - 1);
 
 			/* update the new scroll */
 			m_playfield_tilemap->set_scrolly(0, newscroll);

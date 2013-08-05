@@ -56,7 +56,7 @@ TIMER_CALLBACK_MEMBER(midvunit_state::scanline_timer_cb)
 	if (scanline != -1)
 	{
 		m_maincpu->set_input_line(0, ASSERT_LINE);
-		m_scanline_timer->adjust(machine().primary_screen->time_until_pos(scanline + 1), scanline);
+		m_scanline_timer->adjust(m_screen->time_until_pos(scanline + 1), scanline);
 		timer_set(attotime::from_hz(25000000), TIMER_SCANLINE, -1);
 	}
 	else
@@ -348,7 +348,7 @@ void midvunit_renderer::process_dma_queue()
 	objectdata.dither = ((m_state.m_dma_data[0] & 0x2000) != 0);
 
 	/* render as a quad */
-	render_polygon<4>(machine().primary_screen->visible_area(), callback, textured ? 2 : 0, vert);
+	render_polygon<4>(m_state.m_screen->visible_area(), callback, textured ? 2 : 0, vert);
 }
 
 
@@ -403,7 +403,7 @@ WRITE32_MEMBER(midvunit_state::midvunit_page_control_w)
 		m_video_changed = TRUE;
 		if (LOG_DMA && machine().input().code_pressed(KEYCODE_L))
 			logerror("##########################################################\n");
-		machine().primary_screen->update_partial(machine().primary_screen->vpos() - 1);
+		m_screen->update_partial(m_screen->vpos() - 1);
 	}
 	m_page_control = data;
 }
@@ -431,7 +431,7 @@ WRITE32_MEMBER(midvunit_state::midvunit_video_control_w)
 
 	/* update the scanline timer */
 	if (offset == 0)
-		m_scanline_timer->adjust(machine().primary_screen->time_until_pos((data & 0x1ff) + 1, 0), data & 0x1ff);
+		m_scanline_timer->adjust(m_screen->time_until_pos((data & 0x1ff) + 1, 0), data & 0x1ff);
 
 	/* if something changed, update our parameters */
 	if (old != m_video_regs[offset] && m_video_regs[6] != 0 && m_video_regs[11] != 0)
@@ -443,14 +443,14 @@ WRITE32_MEMBER(midvunit_state::midvunit_video_control_w)
 		visarea.max_x = (m_video_regs[6] + m_video_regs[2] - m_video_regs[5]) % m_video_regs[6];
 		visarea.min_y = 0;
 		visarea.max_y = (m_video_regs[11] + m_video_regs[7] - m_video_regs[10]) % m_video_regs[11];
-		machine().primary_screen->configure(m_video_regs[6], m_video_regs[11], visarea, HZ_TO_ATTOSECONDS(MIDVUNIT_VIDEO_CLOCK / 2) * m_video_regs[6] * m_video_regs[11]);
+		m_screen->configure(m_video_regs[6], m_video_regs[11], visarea, HZ_TO_ATTOSECONDS(MIDVUNIT_VIDEO_CLOCK / 2) * m_video_regs[6] * m_video_regs[11]);
 	}
 }
 
 
 READ32_MEMBER(midvunit_state::midvunit_scanline_r)
 {
-	return machine().primary_screen->vpos();
+	return m_screen->vpos();
 }
 
 

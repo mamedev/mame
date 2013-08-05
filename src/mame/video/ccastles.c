@@ -31,7 +31,7 @@ void ccastles_state::video_start()
 			3,  resistances, m_bweights, 1000, 0);
 
 	/* allocate a bitmap for drawing sprites */
-	machine().primary_screen->register_screen_bitmap(m_spritebitmap);
+	m_screen->register_screen_bitmap(m_spritebitmap);
 
 	/* register for savestates */
 	save_item(NAME(m_video_control));
@@ -50,7 +50,7 @@ void ccastles_state::video_start()
 
 WRITE8_MEMBER(ccastles_state::ccastles_hscroll_w)
 {
-	machine().primary_screen->update_partial(machine().primary_screen->vpos());
+	m_screen->update_partial(m_screen->vpos());
 	m_hscroll = data;
 }
 

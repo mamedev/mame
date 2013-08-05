@@ -157,7 +157,7 @@ void paradise_state::video_start()
 	m_tilemap_2 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(paradise_state::get_tile_info_2),this), TILEMAP_SCAN_ROWS, 8, 8, 0x20, 0x20);
 
 	/* pixmap */
-	machine().primary_screen->register_screen_bitmap(m_tmpbitmap);
+	m_screen->register_screen_bitmap(m_tmpbitmap);
 
 	m_tilemap_0->set_transparent_pen(0x0f);
 	m_tilemap_1->set_transparent_pen(0xff);

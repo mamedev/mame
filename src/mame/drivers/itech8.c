@@ -614,7 +614,7 @@ INTERRUPT_GEN_MEMBER(itech8_state::generate_nmi)
 	itech8_update_interrupts(1, -1, -1);
 	machine().scheduler().timer_set(attotime::from_usec(1), timer_expired_delegate(FUNC(itech8_state::irq_off),this));
 
-	if (FULL_LOGGING) logerror("------------ VBLANK (%d) --------------\n", machine().primary_screen->vpos());
+	if (FULL_LOGGING) logerror("------------ VBLANK (%d) --------------\n", m_screen->vpos());
 }
 
 
@@ -644,7 +644,7 @@ WRITE_LINE_MEMBER(itech8_state::generate_sound_irq)
 MACHINE_START_MEMBER(itech8_state,sstrike)
 {
 	/* we need to update behind the beam as well */
-	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(0), timer_expired_delegate(FUNC(itech8_state::behind_the_beam_update),this), 32);
+	machine().scheduler().timer_set(m_screen->time_until_pos(0), timer_expired_delegate(FUNC(itech8_state::behind_the_beam_update),this), 32);
 }
 
 void itech8_state::machine_reset()
@@ -661,7 +661,7 @@ void itech8_state::machine_reset()
 	/* set the visible area */
 	if (m_visarea.width() > 1)
 	{
-		machine().primary_screen->set_visible_area(m_visarea.min_x, m_visarea.max_x, m_visarea.min_y, m_visarea.max_y);
+		m_screen->set_visible_area(m_visarea.min_x, m_visarea.max_x, m_visarea.min_y, m_visarea.max_y);
 		m_visarea.set(0, 0, 0, 0);
 	}
 }
@@ -680,14 +680,14 @@ TIMER_CALLBACK_MEMBER(itech8_state::behind_the_beam_update)
 	int interval = param & 0xff;
 
 	/* force a partial update to the current scanline */
-	machine().primary_screen->update_partial(scanline);
+	m_screen->update_partial(scanline);
 
 	/* advance by the interval, and wrap to 0 */
 	scanline += interval;
 	if (scanline >= 256) scanline = 0;
 
 	/* set a new timer */
-	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(scanline), timer_expired_delegate(FUNC(itech8_state::behind_the_beam_update),this), (scanline << 8) + interval);
+	machine().scheduler().timer_set(m_screen->time_until_pos(scanline), timer_expired_delegate(FUNC(itech8_state::behind_the_beam_update),this), (scanline << 8) + interval);
 }
 
 

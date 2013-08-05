@@ -365,7 +365,7 @@ UINT32 igs009_state::screen_update_jingbell(screen_device &screen, bitmap_ind16 
 
 CUSTOM_INPUT_MEMBER(igs009_state::hopper_r)
 {
-	return m_hopper && !(machine().primary_screen->frame_number()%10);
+	return m_hopper && !(m_screen->frame_number()%10);
 }
 
 

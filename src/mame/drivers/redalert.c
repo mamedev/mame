@@ -122,7 +122,7 @@ READ8_MEMBER(redalert_state::redalert_interrupt_clear_r)
 	m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 
 	/* the result never seems to be actually used */
-	return machine().primary_screen->vpos();
+	return m_screen->vpos();
 }
 
 

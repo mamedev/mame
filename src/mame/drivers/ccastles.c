@@ -146,7 +146,7 @@ inline void ccastles_state::schedule_next_irq( int curscanline )
 			break;
 
 	/* next one at the start of this scanline */
-	m_irq_timer->adjust(machine().primary_screen->time_until_pos(curscanline), curscanline);
+	m_irq_timer->adjust(m_screen->time_until_pos(curscanline), curscanline);
 }
 
 
@@ -160,7 +160,7 @@ TIMER_CALLBACK_MEMBER(ccastles_state::clock_irq)
 	}
 
 	/* force an update now */
-	machine().primary_screen->update_partial(machine().primary_screen->vpos());
+	m_screen->update_partial(m_screen->vpos());
 
 	/* find the next edge */
 	schedule_next_irq(param);
@@ -169,7 +169,7 @@ TIMER_CALLBACK_MEMBER(ccastles_state::clock_irq)
 
 CUSTOM_INPUT_MEMBER(ccastles_state::get_vblank)
 {
-	int scanline = machine().primary_screen->vpos();
+	int scanline = m_screen->vpos();
 	return m_syncprom[scanline & 0xff] & 1;
 }
 
@@ -205,7 +205,7 @@ void ccastles_state::machine_start()
 
 	/* reconfigure the visible area to match */
 	visarea.set(0, 255, m_vblank_end, m_vblank_start - 1);
-	machine().primary_screen->configure(320, 256, visarea, HZ_TO_ATTOSECONDS(PIXEL_CLOCK) * VTOTAL * HTOTAL);
+	m_screen->configure(320, 256, visarea, HZ_TO_ATTOSECONDS(PIXEL_CLOCK) * VTOTAL * HTOTAL);
 
 	/* configure the ROM banking */
 	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0xa000, 0x6000);

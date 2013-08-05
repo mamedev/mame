@@ -460,8 +460,8 @@ void hyprduel_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, 
 	UINT8 *base_gfx8 = memregion("gfx1")->base();
 	UINT32 gfx_size = memregion("gfx1")->bytes();
 
-	int max_x = machine().primary_screen->width();
-	int max_y = machine().primary_screen->height();
+	int max_x = m_screen->width();
+	int max_y = m_screen->height();
 
 	int max_sprites = m_spriteram.bytes() / 8;
 	int sprites = m_videoregs[0x00 / 2] % max_sprites;

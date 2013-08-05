@@ -206,7 +206,7 @@ CUSTOM_INPUT_MEMBER(alg_state::lightgun_pos_r)
 	int x = 0, y = 0;
 
 	/* get the position based on the input select */
-	get_lightgun_pos(*machine().primary_screen, m_input_select, &x, &y);
+	get_lightgun_pos(*m_screen, m_input_select, &x, &y);
 	return (y << 8) | (x >> 2);
 }
 

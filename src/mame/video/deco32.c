@@ -542,8 +542,8 @@ VIDEO_START_MEMBER(deco32_state,nslasher)
 {
 	int width, height;
 	m_dirty_palette = auto_alloc_array(machine(), UINT8, 4096);
-	width = machine().primary_screen->width();
-	height = machine().primary_screen->height();
+	width = m_screen->width();
+	height = m_screen->height();
 	m_tilemap_alpha_bitmap=auto_bitmap_ind16_alloc(machine(), width, height );
 	m_sprgen1->alloc_sprite_bitmap();
 	m_sprgen2->alloc_sprite_bitmap();

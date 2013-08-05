@@ -126,7 +126,7 @@ VIDEO_START_MEMBER(equites_state,equites)
 
 VIDEO_START_MEMBER(equites_state,splndrbt)
 {
-	assert(machine().primary_screen->format() == BITMAP_FORMAT_IND16);
+	assert(m_screen->format() == BITMAP_FORMAT_IND16);
 
 	m_fg_videoram = auto_alloc_array(machine(), UINT8, 0x800);
 	save_pointer(NAME(m_fg_videoram), 0x800);

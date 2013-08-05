@@ -266,7 +266,7 @@ READ8_DEVICE_HANDLER( namco_51xx_read )
 
 					if (state->m_mode == 1)
 					{
-						int on = (space.machine().primary_screen->frame_number() & 0x10) >> 4;
+						int on = (device->machine().first_screen()->frame_number() & 0x10) >> 4;
 
 						if (state->m_credits >= 2)
 							WRITE_PORT(state,0,0x0c | 3*on);    // lamps

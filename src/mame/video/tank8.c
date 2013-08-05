@@ -101,9 +101,9 @@ TILE_GET_INFO_MEMBER(tank8_state::tank8_get_tile_info)
 
 void tank8_state::video_start()
 {
-	machine().primary_screen->register_screen_bitmap(m_helper1);
-	machine().primary_screen->register_screen_bitmap(m_helper2);
-	machine().primary_screen->register_screen_bitmap(m_helper3);
+	m_screen->register_screen_bitmap(m_helper1);
+	m_screen->register_screen_bitmap(m_helper2);
+	m_screen->register_screen_bitmap(m_helper3);
 
 	m_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tank8_state::tank8_get_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
@@ -197,7 +197,7 @@ void tank8_state::screen_eof_tank8(screen_device &screen, bool state)
 	{
 		int x;
 		int y;
-		const rectangle &visarea = machine().primary_screen->visible_area();
+		const rectangle &visarea = m_screen->visible_area();
 
 		m_tilemap->draw(screen, m_helper1, visarea, 0, 0);
 
@@ -215,7 +215,7 @@ void tank8_state::screen_eof_tank8(screen_device &screen, bool state)
 			const UINT16* p2 = &m_helper2.pix16(y);
 			const UINT16* p3 = &m_helper3.pix16(y);
 
-			if ((machine().primary_screen->frame_number() ^ y) & 1)
+			if ((m_screen->frame_number() ^ y) & 1)
 				continue; /* video display is interlaced */
 
 			for (x = visarea.min_x; x <= visarea.max_x; x++)

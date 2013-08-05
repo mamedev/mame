@@ -52,8 +52,8 @@ void snk68_state::common_video_start()
 {
 	m_fg_tilemap->set_transparent_pen(0);
 
-	m_fg_tilemap->set_scrolldx(0, machine().primary_screen->width() - 256);
-	m_fg_tilemap->set_scrolldy(0, machine().primary_screen->height() - 256);
+	m_fg_tilemap->set_scrolldx(0, m_screen->width() - 256);
+	m_fg_tilemap->set_scrolldy(0, m_screen->height() - 256);
 }
 
 void snk68_state::video_start()
@@ -99,10 +99,10 @@ WRITE16_MEMBER(snk68_state::pow_spriteram_w)
 
 	if (spriteram16[offset] != newword)
 	{
-		int vpos = machine().primary_screen->vpos();
+		int vpos = m_screen->vpos();
 
 		if (vpos > 0)
-			machine().primary_screen->update_partial(vpos - 1);
+			m_screen->update_partial(vpos - 1);
 
 		spriteram16[offset] = newword;
 	}

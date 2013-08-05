@@ -174,8 +174,8 @@ void taitosj_state::video_start()
 
 	for (i = 0; i < 3; i++)
 	{
-		machine().primary_screen->register_screen_bitmap(m_layer_bitmap[i]);
-		machine().primary_screen->register_screen_bitmap(m_sprite_layer_collbitmap2[i]);
+		m_screen->register_screen_bitmap(m_layer_bitmap[i]);
+		m_screen->register_screen_bitmap(m_sprite_layer_collbitmap2[i]);
 	}
 
 	m_sprite_sprite_collbitmap1.allocate(32,32);
@@ -388,8 +388,8 @@ void taitosj_state::check_sprite_sprite_collision()
 void taitosj_state::calculate_sprite_areas(int *sprites_on, rectangle *sprite_areas)
 {
 	int which;
-	int width = machine().primary_screen->width();
-	int height = machine().primary_screen->height();
+	int width = m_screen->width();
+	int height = m_screen->height();
 
 	for (which = 0; which < 0x20; which++)
 	{

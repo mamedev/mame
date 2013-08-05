@@ -118,8 +118,8 @@ WRITE16_MEMBER(suna16_state::suna16_paletteram16_w)
 void suna16_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 *sprites, int gfx)
 {
 	int offs;
-	int max_x = machine().primary_screen->width() - 8;
-	int max_y = machine().primary_screen->height() - 8;
+	int max_x = m_screen->width() - 8;
+	int max_y = m_screen->height() - 8;
 
 	for ( offs = 0xfc00/2; offs < 0x10000/2 ; offs += 4/2 )
 	{

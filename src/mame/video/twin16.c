@@ -148,7 +148,7 @@ int twin16_state::twin16_set_sprite_timer(  )
 
 	// sprite system busy, maybe a dma? time is guessed, assume 4 scanlines
 	m_sprite_busy = 1;
-	m_sprite_timer->adjust(machine().primary_screen->frame_period() / machine().primary_screen->height() * 4);
+	m_sprite_timer->adjust(m_screen->frame_period() / m_screen->height() * 4);
 
 	return 0;
 }

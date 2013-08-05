@@ -95,8 +95,8 @@ WRITE16_MEMBER(lordgun_state::lordgun_vram_3_w){ lordgun_vram_w(offset, data, me
 void lordgun_state::video_start()
 {
 	int i;
-	int w = machine().primary_screen->width();
-	int h = machine().primary_screen->height();
+	int w = m_screen->width();
+	int h = m_screen->height();
 
 	// 0x800 x 200
 	m_tilemap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(lordgun_state::get_tile_info_0),this), TILEMAP_SCAN_ROWS,8,8, 0x100, 0x40 );
@@ -195,7 +195,7 @@ void lordgun_state::lorddgun_calc_gun_scr(int i)
 
 void lordgun_state::lordgun_update_gun(int i)
 {
-	const rectangle &visarea = machine().primary_screen->visible_area();
+	const rectangle &visarea = m_screen->visible_area();
 
 	m_gun[i].hw_x = ioport(gunnames[i])->read();
 	m_gun[i].hw_y = ioport(gunnames[i+2])->read();

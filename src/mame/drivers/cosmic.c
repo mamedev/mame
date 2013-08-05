@@ -306,13 +306,13 @@ WRITE8_MEMBER(cosmic_state::cosmica_sound_output_w)
 
 READ8_MEMBER(cosmic_state::cosmica_pixel_clock_r)
 {
-	return (machine().primary_screen->vpos() >> 2) & 0x3f;
+	return (m_screen->vpos() >> 2) & 0x3f;
 }
 
 READ8_MEMBER(cosmic_state::cosmicg_port_0_r)
 {
 	/* The top four address lines from the CRTC are bits 0-3 */
-	return (ioport("IN0")->read() & 0xf0) | ((machine().primary_screen->vpos() & 0xf0) >> 4);
+	return (ioport("IN0")->read() & 0xf0) | ((m_screen->vpos() & 0xf0) >> 4);
 }
 
 READ8_MEMBER(cosmic_state::magspot_coinage_dip_r)

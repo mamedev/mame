@@ -1130,7 +1130,7 @@ UINT32 cps3_state::screen_update_cps3(screen_device &screen, bitmap_rgb32 &bitma
 
 								if (current_ypos&0x200) current_ypos-=0x400;
 
-								//if ( (whichbpp) && (machine().primary_screen->frame_number() & 1)) continue;
+								//if ( (whichbpp) && (m_screen->frame_number() & 1)) continue;
 
 								/* use the palette value from the main list or the sublists? */
 								if (whichpal)

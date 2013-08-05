@@ -36,7 +36,7 @@
 TIMER_CALLBACK_MEMBER(tx1_state::interrupt_callback)
 {
 	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
-	m_interrupt_timer->adjust(machine().primary_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS));
+	m_interrupt_timer->adjust(m_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS));
 }
 
 
@@ -1112,7 +1112,7 @@ VIDEO_START_MEMBER(tx1_state,tx1)
 	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tx1_state::interrupt_callback),this));
 
 	/* /CUDISP CRTC interrupt */
-	m_interrupt_timer->adjust(machine().primary_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS));
+	m_interrupt_timer->adjust(m_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS));
 }
 
 void tx1_state::screen_eof_tx1(screen_device &screen, bool state)
@@ -3006,7 +3006,7 @@ VIDEO_START_MEMBER(tx1_state,buggyboy)
 	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tx1_state::interrupt_callback),this));
 
 	/* /CUDISP CRTC interrupt */
-	m_interrupt_timer->adjust(machine().primary_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS));
+	m_interrupt_timer->adjust(m_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS));
 }
 
 VIDEO_START_MEMBER(tx1_state,buggybjr)
@@ -3020,7 +3020,7 @@ VIDEO_START_MEMBER(tx1_state,buggybjr)
 	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tx1_state::interrupt_callback),this));
 
 	/* /CUDISP CRTC interrupt */
-	m_interrupt_timer->adjust(machine().primary_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS));
+	m_interrupt_timer->adjust(m_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS));
 }
 
 void tx1_state::screen_eof_buggyboy(screen_device &screen, bool state)

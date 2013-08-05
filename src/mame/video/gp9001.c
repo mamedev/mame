@@ -204,6 +204,7 @@ const device_type GP9001_VDP = &device_creator<gp9001vdp_device>;
 
 gp9001vdp_device::gp9001vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, GP9001_VDP, "GP9001_VDP", tag, owner, clock, "gp9001vdp", __FILE__),
+		device_video_interface(mconfig, *this),
 		device_memory_interface(mconfig, *this),
 		m_space_config("gp9001vdp", ENDIANNESS_BIG, 16,14, 0, NULL, *ADDRESS_MAP_NAME(gp9001vdp_map)),
 		m_gfxregion(0)
@@ -406,7 +407,7 @@ void gp9001vdp_device::gp9001_videoram16_w(offs_t offset, UINT16 data, UINT16 me
 
 UINT16 gp9001vdp_device::gp9001_vdpstatus_r()
 {
-	return ((machine().primary_screen->vpos() + 15) % 262) >= 245;
+	return ((m_screen->vpos() + 15) % 262) >= 245;
 }
 
 void gp9001vdp_device::gp9001_scroll_reg_select_w( offs_t offset, UINT16 data, UINT16 mem_mask )

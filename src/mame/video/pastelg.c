@@ -123,8 +123,8 @@ void pastelg_state::pastelg_vramflip()
 {
 	int x, y;
 	UINT8 color1, color2;
-	int width = machine().primary_screen->width();
-	int height = machine().primary_screen->height();
+	int width = m_screen->width();
+	int height = m_screen->height();
 
 	if (m_flipscreen == m_flipscreen_old) return;
 
@@ -158,7 +158,7 @@ void pastelg_state::device_timer(emu_timer &timer, device_timer_id id, int param
 void pastelg_state::pastelg_gfxdraw()
 {
 	UINT8 *GFX = memregion("gfx1")->base();
-	int width = machine().primary_screen->width();
+	int width = m_screen->width();
 
 	int x, y;
 	int dx, dy;
@@ -284,8 +284,8 @@ void pastelg_state::pastelg_gfxdraw()
 ******************************************************************************/
 void pastelg_state::video_start()
 {
-	int width = machine().primary_screen->width();
-	int height = machine().primary_screen->height();
+	int width = m_screen->width();
+	int height = m_screen->height();
 
 	m_videoram = auto_alloc_array_clear(machine(), UINT8, width * height);
 	m_clut = auto_alloc_array(machine(), UINT8, 0x10);

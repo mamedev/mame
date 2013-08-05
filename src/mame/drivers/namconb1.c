@@ -302,7 +302,7 @@ TIMER_CALLBACK_MEMBER(namconb1_state::namconb1_TriggerPOSIRQ)
 	if(m_pos_irq_active || !(m_namconb_cpureg[0x02] & 0xf0))
 		return;
 
-	machine().primary_screen->update_partial(param);
+	m_screen->update_partial(param);
 	m_pos_irq_active = 1;
 	m_maincpu->set_input_line(m_namconb_cpureg[0x02] & 0xf, ASSERT_LINE);
 }
@@ -356,14 +356,14 @@ INTERRUPT_GEN_MEMBER(namconb1_state::namconb1_interrupt)
 	}
 	if( scanline < NAMCONB1_VBSTART )
 	{
-		machine().scheduler().timer_set( machine().primary_screen->time_until_pos(scanline), timer_expired_delegate(FUNC(namconb1_state::namconb1_TriggerPOSIRQ),this), scanline);
+		machine().scheduler().timer_set( m_screen->time_until_pos(scanline), timer_expired_delegate(FUNC(namconb1_state::namconb1_TriggerPOSIRQ),this), scanline);
 	}
 } /* namconb1_interrupt */
 
 
 TIMER_CALLBACK_MEMBER(namconb1_state::namconb2_TriggerPOSIRQ)
 {
-	machine().primary_screen->update_partial(param);
+	m_screen->update_partial(param);
 	m_pos_irq_active = 1;
 	m_maincpu->set_input_line(m_namconb_cpureg[0x02], ASSERT_LINE);
 }
@@ -410,7 +410,7 @@ INTERRUPT_GEN_MEMBER(namconb1_state::namconb2_interrupt)
 		scanline = 0;
 
 	if( scanline < NAMCONB1_VBSTART )
-		machine().scheduler().timer_set( machine().primary_screen->time_until_pos(scanline), timer_expired_delegate(FUNC(namconb1_state::namconb2_TriggerPOSIRQ),this), scanline);
+		machine().scheduler().timer_set( m_screen->time_until_pos(scanline), timer_expired_delegate(FUNC(namconb1_state::namconb2_TriggerPOSIRQ),this), scanline);
 } /* namconb2_interrupt */
 
 static void namconb1_cpureg8_w(running_machine &machine, int reg, UINT8 data)

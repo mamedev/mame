@@ -99,7 +99,7 @@ VIDEO_RESET_MEMBER(taitob_state,hitice)
 
 VIDEO_START_MEMBER(taitob_state,realpunc)
 {
-	m_realpunc_bitmap = auto_bitmap_ind16_alloc(machine(), machine().primary_screen->width(), machine().primary_screen->height());
+	m_realpunc_bitmap = auto_bitmap_ind16_alloc(machine(), m_screen->width(), m_screen->height());
 
 	VIDEO_START_CALL_MEMBER(taitob_color_order0);
 }

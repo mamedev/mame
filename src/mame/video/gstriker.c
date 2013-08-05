@@ -238,8 +238,8 @@ void gstriker_state::MB60553_draw(int numchip, screen_device &screen, bitmap_ind
 	rectangle clip;
 	m_MB60553_cur_chip = &m_MB60553[numchip];
 
-	clip.min_x = machine().primary_screen->visible_area().min_x;
-	clip.max_x = machine().primary_screen->visible_area().max_x;
+	clip.min_x = m_screen->visible_area().min_x;
+	clip.max_x = m_screen->visible_area().max_x;
 
 	for (line = 0; line < 224;line++)
 	{

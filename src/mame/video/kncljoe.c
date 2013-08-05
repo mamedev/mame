@@ -183,7 +183,7 @@ void kncljoe_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 	gfx_element *gfx = machine().gfx[1 + m_sprite_bank];
 	int i, j;
 	static const int pribase[4]={0x0180, 0x0080, 0x0100, 0x0000};
-	const rectangle &visarea = machine().primary_screen->visible_area();
+	const rectangle &visarea = m_screen->visible_area();
 
 	/* score covers sprites */
 	if (m_flipscreen)

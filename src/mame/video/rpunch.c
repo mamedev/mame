@@ -62,7 +62,7 @@ TIMER_CALLBACK_MEMBER(rpunch_state::crtc_interrupt_gen)
 {
 	m_maincpu->set_input_line(1, HOLD_LINE);
 	if (param != 0)
-		m_crtc_timer->adjust(machine().primary_screen->frame_period() / param, 0, machine().primary_screen->frame_period() / param);
+		m_crtc_timer->adjust(m_screen->frame_period() / param, 0, m_screen->frame_period() / param);
 }
 
 
@@ -149,7 +149,7 @@ WRITE16_MEMBER(rpunch_state::rpunch_crtc_data_w)
 		{
 			/* only register we know about.... */
 			case 0x0b:
-				m_crtc_timer->adjust(machine().primary_screen->time_until_vblank_start(), (data == 0xc0) ? 2 : 1);
+				m_crtc_timer->adjust(m_screen->time_until_vblank_start(), (data == 0xc0) ? 2 : 1);
 				break;
 
 			default:

@@ -113,7 +113,7 @@ WRITE8_MEMBER(gridlee_state::gridlee_videoram_w)
 WRITE8_MEMBER(gridlee_state::gridlee_palette_select_w)
 {
 	/* update the scanline palette */
-	machine().primary_screen->update_partial(machine().primary_screen->vpos() - 1 + GRIDLEE_VBEND);
+	m_screen->update_partial(m_screen->vpos() - 1 + GRIDLEE_VBEND);
 	m_palettebank_vis = data & 0x3f;
 }
 

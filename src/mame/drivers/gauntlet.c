@@ -165,7 +165,7 @@ MACHINE_RESET_MEMBER(gauntlet_state,gauntlet)
 	m_sound_reset_val = 1;
 
 	atarigen_state::machine_reset();
-	scanline_timer_reset(*machine().primary_screen, 32);
+	scanline_timer_reset(*m_screen, 32);
 }
 
 

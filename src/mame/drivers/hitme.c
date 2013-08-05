@@ -140,7 +140,7 @@ UINT8 hitme_state::read_port_and_t0( int port )
 UINT8 hitme_state::read_port_and_t0_and_hblank( int port )
 {
 	UINT8 val = read_port_and_t0(port);
-	if (machine().primary_screen->hpos() < (machine().primary_screen->width() * 9 / 10))
+	if (m_screen->hpos() < (m_screen->width() * 9 / 10))
 		val ^= 0x04;
 	return val;
 }

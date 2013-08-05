@@ -450,7 +450,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(centiped_state::generate_interrupt)
 		m_maincpu->set_input_line(0, ((scanline - 1) & 32) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* do a partial update now to handle sprite multiplexing (Maze Invaders) */
-	machine().primary_screen->update_partial(scanline);
+	m_screen->update_partial(scanline);
 }
 
 

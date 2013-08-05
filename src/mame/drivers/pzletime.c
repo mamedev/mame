@@ -218,7 +218,7 @@ WRITE16_MEMBER(pzletime_state::oki_bank_w)
 
 CUSTOM_INPUT_MEMBER(pzletime_state::ticket_status_r)
 {
-	return (m_ticket && !(machine().primary_screen->frame_number() % 128));
+	return (m_ticket && !(m_screen->frame_number() % 128));
 }
 
 static ADDRESS_MAP_START( pzletime_map, AS_PROGRAM, 16, pzletime_state )

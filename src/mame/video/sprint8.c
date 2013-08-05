@@ -113,8 +113,8 @@ WRITE8_MEMBER(sprint8_state::sprint8_video_ram_w)
 
 void sprint8_state::video_start()
 {
-	machine().primary_screen->register_screen_bitmap(m_helper1);
-	machine().primary_screen->register_screen_bitmap(m_helper2);
+	m_screen->register_screen_bitmap(m_helper1);
+	m_screen->register_screen_bitmap(m_helper2);
 
 	m_tilemap1 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sprint8_state::get_tile_info1),this), TILEMAP_SCAN_ROWS, 16, 8, 32, 32);
 	m_tilemap2 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sprint8_state::get_tile_info2),this), TILEMAP_SCAN_ROWS, 16, 8, 32, 32);
@@ -169,7 +169,7 @@ void sprint8_state::screen_eof_sprint8(screen_device &screen, bool state)
 	{
 		int x;
 		int y;
-		const rectangle &visarea = machine().primary_screen->visible_area();
+		const rectangle &visarea = m_screen->visible_area();
 
 		m_tilemap2->draw(screen, m_helper2, visarea, 0, 0);
 
@@ -184,7 +184,7 @@ void sprint8_state::screen_eof_sprint8(screen_device &screen, bool state)
 
 			for (x = visarea.min_x; x <= visarea.max_x; x++)
 				if (p1[x] != 0x20 && p2[x] == 0x23)
-					machine().scheduler().timer_set(machine().primary_screen->time_until_pos(y + 24, x),
+					machine().scheduler().timer_set(m_screen->time_until_pos(y + 24, x),
 							timer_expired_delegate(FUNC(sprint8_state::sprint8_collision_callback),this),
 							colortable_entry_get_value(machine().colortable, p1[x]));
 		}

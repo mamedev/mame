@@ -266,14 +266,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(wwfsstar_state::wwfsstar_scanline)
 	if (scanline % 16 == 0)
 	{
 		if (scanline > 0)
-			machine().primary_screen->update_partial(scanline - 1);
+			m_screen->update_partial(scanline - 1);
 		m_maincpu->set_input_line(5, ASSERT_LINE);
 	}
 
 	/* Vblank is raised on scanline 240 */
 	if (scanline == 240)
 	{
-		machine().primary_screen->update_partial(scanline - 1);
+		m_screen->update_partial(scanline - 1);
 		m_maincpu->set_input_line(6, ASSERT_LINE);
 	}
 }

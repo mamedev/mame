@@ -85,7 +85,7 @@ WRITE16_MEMBER( badlands_state::badlands_pf_bank_w )
 	if (ACCESSING_BITS_0_7)
 		if (m_playfield_tile_bank != (data & 1))
 		{
-			machine().primary_screen->update_partial(machine().primary_screen->vpos());
+			m_screen->update_partial(m_screen->vpos());
 			m_playfield_tile_bank = data & 1;
 			m_playfield_tilemap->mark_all_dirty();
 		}

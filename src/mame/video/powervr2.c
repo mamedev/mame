@@ -1132,8 +1132,8 @@ WRITE32_MEMBER( powervr2_device::spg_vblank_int_w )
 	vbin_timer->adjust(attotime::never);
 	vbout_timer->adjust(attotime::never);
 
-	vbin_timer->adjust(space.machine().primary_screen->time_until_pos(spg_vblank_int & 0x3ff));
-	vbout_timer->adjust(space.machine().primary_screen->time_until_pos((spg_vblank_int >> 16) & 0x3ff));
+	vbin_timer->adjust(m_screen->time_until_pos(spg_vblank_int & 0x3ff));
+	vbout_timer->adjust(m_screen->time_until_pos((spg_vblank_int >> 16) & 0x3ff));
 }
 
 READ32_MEMBER( powervr2_device::spg_hblank_r )
@@ -1234,19 +1234,19 @@ WRITE32_MEMBER( powervr2_device::pal_ram_ctrl_w )
 
 READ32_MEMBER( powervr2_device::spg_status_r )
 {
-	UINT32 fieldnum = (machine().primary_screen->frame_number() & 1) ? 1 : 0;
+	UINT32 fieldnum = (m_screen->frame_number() & 1) ? 1 : 0;
 
-	UINT32 vsync = machine().primary_screen->vblank() ? 1 : 0;
+	UINT32 vsync = m_screen->vblank() ? 1 : 0;
 	if(vo_control & 2) { vsync^=1; }
 
-	UINT32 hsync = machine().primary_screen->hblank() ? 1 : 0;
+	UINT32 hsync = m_screen->hblank() ? 1 : 0;
 	if(vo_control & 1) { hsync^=1; }
 
 	/* FIXME: following is just a wild guess */
-	UINT32 blank = (machine().primary_screen->vblank() | space.machine().primary_screen->hblank()) ? 0 : 1;
+	UINT32 blank = (m_screen->vblank() | m_screen->hblank()) ? 0 : 1;
 	if(vo_control & 4) { blank^=1; }
 
-	return (vsync << 13) | (hsync << 12) | (blank << 11) | (fieldnum << 10) | (machine().primary_screen->vpos() & 0x3ff);
+	return (vsync << 13) | (hsync << 12) | (blank << 11) | (fieldnum << 10) | (m_screen->vpos() & 0x3ff);
 }
 
 
@@ -1457,14 +1457,14 @@ void powervr2_device::update_screen_format()
 	INT32 vo_horz_start_pos = vo_startx & 0x3ff;
 	INT32 vo_vert_start_pos_f1 = vo_starty & 0x3ff;
 
-	rectangle visarea = machine().primary_screen->visible_area();
+	rectangle visarea = m_screen->visible_area();
 	/* FIXME: right visible area calculations aren't known yet*/
 	visarea.min_x = 0;
 	visarea.max_x = ((spg_hbstart - spg_hbend - vo_horz_start_pos) <= 0x180 ? 320 : 640) - 1;
 	visarea.min_y = 0;
 	visarea.max_y = ((spg_vbstart - spg_vbend - vo_vert_start_pos_f1) <= 0x100 ? 240 : 480) - 1;
 
-	machine().primary_screen->configure(spg_hbstart, spg_vbstart, visarea, machine().primary_screen->frame_period().attoseconds );
+	m_screen->configure(spg_hbstart, spg_vbstart, visarea, m_screen->frame_period().attoseconds );
 }
 
 
@@ -2754,14 +2754,14 @@ TIMER_CALLBACK_MEMBER(powervr2_device::vbin)
 {
 	irq_cb(VBL_IN_IRQ);
 
-	vbin_timer->adjust(machine().primary_screen->time_until_pos(spg_vblank_int & 0x3ff));
+	vbin_timer->adjust(m_screen->time_until_pos(spg_vblank_int & 0x3ff));
 }
 
 TIMER_CALLBACK_MEMBER(powervr2_device::vbout)
 {
 	irq_cb(VBL_OUT_IRQ);
 
-	vbout_timer->adjust(machine().primary_screen->time_until_pos((spg_vblank_int >> 16) & 0x3ff));
+	vbout_timer->adjust(m_screen->time_until_pos((spg_vblank_int >> 16) & 0x3ff));
 }
 
 TIMER_CALLBACK_MEMBER(powervr2_device::hbin)
@@ -2789,7 +2789,7 @@ TIMER_CALLBACK_MEMBER(powervr2_device::hbin)
 		next_y = spg_hblank_int & 0x3ff;
 	}
 
-	hbin_timer->adjust(machine().primary_screen->time_until_pos(scanline, ((spg_hblank_int >> 16) & 0x3ff)-1));
+	hbin_timer->adjust(m_screen->time_until_pos(scanline, ((spg_hblank_int >> 16) & 0x3ff)-1));
 }
 
 
@@ -2983,6 +2983,7 @@ void powervr2_device::pvr_dma_execute(address_space &space)
 
 powervr2_device::powervr2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, POWERVR2, "PowerVR 2", tag, owner, clock, "powervr2", __FILE__),
+		device_video_interface(mconfig, *this),
 		irq_cb(*this)
 {
 }
@@ -3139,9 +3140,9 @@ void powervr2_device::device_reset()
 	renderselect= -1;
 	grabsel=0;
 
-	vbout_timer->adjust(machine().primary_screen->time_until_pos((spg_vblank_int >> 16) & 0x3ff));
-	vbin_timer->adjust(machine().primary_screen->time_until_pos(spg_vblank_int & 0x3ff));
-	hbin_timer->adjust(machine().primary_screen->time_until_pos(0, ((spg_hblank_int >> 16) & 0x3ff)-1));
+	vbout_timer->adjust(m_screen->time_until_pos((spg_vblank_int >> 16) & 0x3ff));
+	vbin_timer->adjust(m_screen->time_until_pos(spg_vblank_int & 0x3ff));
+	hbin_timer->adjust(m_screen->time_until_pos(0, ((spg_hblank_int >> 16) & 0x3ff)-1));
 
 	scanline = 0;
 	next_y = 0;

@@ -56,7 +56,7 @@ TIMER_CALLBACK_MEMBER(mystston_state::interrupt_callback)
 		scanline = FIRST_INT_VPOS;
 
 	/* the vertical synch chain is clocked by H256 -- this is probably not important, but oh well */
-	m_interrupt_timer->adjust(machine().primary_screen->time_until_pos(scanline - 1, INT_HPOS), scanline);
+	m_interrupt_timer->adjust(m_screen->time_until_pos(scanline - 1, INT_HPOS), scanline);
 }
 
 
@@ -231,7 +231,7 @@ VIDEO_START_MEMBER(mystston_state,mystston)
 
 VIDEO_RESET_MEMBER(mystston_state,mystston)
 {
-	m_interrupt_timer->adjust(machine().primary_screen->time_until_pos(FIRST_INT_VPOS - 1, INT_HPOS), FIRST_INT_VPOS);
+	m_interrupt_timer->adjust(m_screen->time_until_pos(FIRST_INT_VPOS - 1, INT_HPOS), FIRST_INT_VPOS);
 }
 
 

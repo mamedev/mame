@@ -247,10 +247,10 @@ void mazerbla_state::video_start()
 	m_dbg_lookup = 4;
 #endif
 
-	machine().primary_screen->register_screen_bitmap(m_tmpbitmaps[0]);
-	machine().primary_screen->register_screen_bitmap(m_tmpbitmaps[1]);
-	machine().primary_screen->register_screen_bitmap(m_tmpbitmaps[2]);
-	machine().primary_screen->register_screen_bitmap(m_tmpbitmaps[3]);
+	m_screen->register_screen_bitmap(m_tmpbitmaps[0]);
+	m_screen->register_screen_bitmap(m_tmpbitmaps[1]);
+	m_screen->register_screen_bitmap(m_tmpbitmaps[2]);
+	m_screen->register_screen_bitmap(m_tmpbitmaps[3]);
 
 	save_item(NAME(m_tmpbitmaps[0]));
 	save_item(NAME(m_tmpbitmaps[1]));

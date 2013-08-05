@@ -60,7 +60,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(galaxold_state::galaxold_interrupt_timer)
 
 	param = (param + 0x10) & 0xff;
 
-	timer.adjust(machine().primary_screen->time_until_pos(param), param);
+	timer.adjust(m_screen->time_until_pos(param), param);
 }
 
 
@@ -80,7 +80,7 @@ void galaxold_state::machine_reset_common(int line)
 
 	/* start a timer to generate interrupts */
 	timer_device *int_timer = machine().device<timer_device>("int_timer");
-	int_timer->adjust(machine().primary_screen->time_until_pos(0));
+	int_timer->adjust(m_screen->time_until_pos(0));
 }
 
 MACHINE_RESET_MEMBER(galaxold_state,galaxold)

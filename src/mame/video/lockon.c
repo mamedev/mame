@@ -67,7 +67,7 @@ TIMER_CALLBACK_MEMBER(lockon_state::cursor_callback)
 	if (m_main_inten)
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 
-	m_cursor_timer->adjust(machine().primary_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS));
+	m_cursor_timer->adjust(m_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS));
 }
 
 /*************************************
@@ -900,7 +900,7 @@ void lockon_state::video_start()
 
 	/* Timer for the CRTC cursor pulse */
 	m_cursor_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(lockon_state::cursor_callback),this));
-	m_cursor_timer->adjust(machine().primary_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS));
+	m_cursor_timer->adjust(m_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS));
 
 	save_item(NAME(*m_back_buffer));
 	save_item(NAME(*m_front_buffer));

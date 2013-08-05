@@ -44,7 +44,7 @@ TILE_GET_INFO_MEMBER(sprint2_state::get_tile_info)
 
 void sprint2_state::video_start()
 {
-	machine().primary_screen->register_screen_bitmap(m_helper);
+	m_screen->register_screen_bitmap(m_helper);
 
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sprint2_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 16, 8, 32, 32);
 }
@@ -144,7 +144,7 @@ void sprint2_state::screen_eof_sprint2(screen_device &screen, bool state)
 		UINT8 *video_ram = m_video_ram;
 		int i;
 		int j;
-		const rectangle &visarea = machine().primary_screen->visible_area();
+		const rectangle &visarea = m_screen->visible_area();
 
 		/*
 		 * Collisions are detected for both player cars:

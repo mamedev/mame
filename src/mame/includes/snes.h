@@ -450,6 +450,8 @@ public:
 		UINT16 ver_offset;
 		UINT8 extbg;
 	} m_mode7;
+	
+	screen_device *m_screen;
 
 	UINT8 m_mosaic_size;
 	UINT8 m_clip_to_black;
@@ -525,7 +527,7 @@ public:
 	inline UINT32 get_vram_address(running_machine &machine);
 	UINT8 dbg_video(running_machine &machine, UINT16 curline);
 
-	void ppu_start(running_machine &machine);
+	void ppu_start(screen_device &screen);
 	UINT8 read(address_space &space, UINT32 offset, UINT8 wrio_bit7);
 	void write(address_space &space, UINT32 offset, UINT8 data);
 

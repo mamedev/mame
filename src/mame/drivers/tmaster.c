@@ -332,7 +332,7 @@ VIDEO_START_MEMBER(tmaster_state,tmaster)
 	{
 		for (buffer = 0; buffer < 2; buffer++)
 		{
-			machine().primary_screen->register_screen_bitmap(m_bitmap[layer][buffer]);
+			m_screen->register_screen_bitmap(m_bitmap[layer][buffer]);
 			m_bitmap[layer][buffer].fill(0xff);
 		}
 	}

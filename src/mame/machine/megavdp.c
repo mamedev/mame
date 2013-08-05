@@ -173,11 +173,11 @@ void sega_genesis_vdp_device::device_start()
 
 
 	if (!m_use_alt_timing)
-		m_render_bitmap = auto_bitmap_ind16_alloc(machine(), machine().primary_screen->width(), machine().primary_screen->height());
+		m_render_bitmap = auto_bitmap_ind16_alloc(machine(), m_screen->width(), m_screen->height());
 	else
-		m_render_line = auto_alloc_array(machine(), UINT16, machine().primary_screen->width());
+		m_render_line = auto_alloc_array(machine(), UINT16, m_screen->width());
 
-	m_render_line_raw = auto_alloc_array(machine(), UINT16, machine().primary_screen->width());
+	m_render_line_raw = auto_alloc_array(machine(), UINT16, m_screen->width());
 
 	// FIXME: are these all needed? I'm pretty sure some of these (most?) are just helpers which don't need to be saved,
 	// but better safe than sorry...
@@ -188,9 +188,9 @@ void sega_genesis_vdp_device::device_start()
 	save_pointer(NAME(megadrive_vdp_palette_lookup_sprite), 0x40/2);
 	save_pointer(NAME(megadrive_vdp_palette_lookup_shadow), 0x40/2);
 	save_pointer(NAME(megadrive_vdp_palette_lookup_highlight), 0x40/2);
-	save_pointer(NAME(m_render_line_raw), machine().primary_screen->width()/2);
+	save_pointer(NAME(m_render_line_raw), m_screen->width()/2);
 	if (m_use_alt_timing)
-		save_pointer(NAME(m_render_line), machine().primary_screen->width()/2);
+		save_pointer(NAME(m_render_line), m_screen->width()/2);
 
 	irq6_on_timer = machine().scheduler().timer_alloc(FUNC(irq6_on_timer_callback), (void*)this);
 	irq4_on_timer = machine().scheduler().timer_alloc(FUNC(irq4_on_timer_callback), (void*)this);
@@ -2789,7 +2789,7 @@ TIMER_DEVICE_CALLBACK( megadriv_scanline_timer_callback_alt_timing )
 	{
 		if (param==0)
 		{
-			//printf("where are we? %d %d\n", timer.machine().primary_screen->vpos(), timer.machine().primary_screen->hpos());
+			//printf("where are we? %d %d\n", m_screen->vpos(), vdp->screen().hpos());
 			vdp->vdp_handle_eof(timer.machine());
 			//vdp->vdp_clear_bitmap();
 		}
@@ -2797,8 +2797,8 @@ TIMER_DEVICE_CALLBACK( megadriv_scanline_timer_callback_alt_timing )
 
 		vdp->vdp_handle_scanline_callback(timer.machine(), param);
 
-		int vpos = timer.machine().primary_screen->vpos();
+		int vpos = vdp->screen().vpos();
 		if (vpos > 0)
-			timer.machine().primary_screen->update_partial(vpos-1);
+			vdp->screen().update_partial(vpos-1);
 	}
 }

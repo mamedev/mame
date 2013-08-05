@@ -131,8 +131,8 @@ void nbmj8991_state::nbmj8991_vramflip()
 {
 	int x, y;
 	UINT8 color1, color2;
-	int width = machine().primary_screen->width();
-	int height = machine().primary_screen->height();
+	int width = m_screen->width();
+	int height = m_screen->height();
 
 	if (m_flipscreen == m_flipscreen_old) return;
 
@@ -159,7 +159,7 @@ void nbmj8991_state::nbmj8991_vramflip()
 
 void nbmj8991_state::update_pixel(int x, int y)
 {
-	UINT8 color = m_videoram[(y * machine().primary_screen->width()) + x];
+	UINT8 color = m_videoram[(y * m_screen->width()) + x];
 	m_tmpbitmap.pix16(y, x) = color;
 }
 
@@ -171,7 +171,7 @@ TIMER_CALLBACK_MEMBER(nbmj8991_state::blitter_timer_callback)
 void nbmj8991_state::nbmj8991_gfxdraw()
 {
 	UINT8 *GFX = memregion("gfx1")->base();
-	int width = machine().primary_screen->width();
+	int width = m_screen->width();
 
 	int x, y;
 	int dx1, dx2, dy;
@@ -279,10 +279,10 @@ void nbmj8991_state::nbmj8991_gfxdraw()
 ******************************************************************************/
 void nbmj8991_state::video_start()
 {
-	int width = machine().primary_screen->width();
-	int height = machine().primary_screen->height();
+	int width = m_screen->width();
+	int height = m_screen->height();
 
-	machine().primary_screen->register_screen_bitmap(m_tmpbitmap);
+	m_screen->register_screen_bitmap(m_tmpbitmap);
 	m_videoram = auto_alloc_array(machine(), UINT8, width * height);
 	m_clut = auto_alloc_array(machine(), UINT8, 0x800);
 	memset(m_videoram, 0x00, (width * height * sizeof(UINT8)));
@@ -294,8 +294,8 @@ UINT32 nbmj8991_state::screen_update_nbmj8991_type1(screen_device &screen, bitma
 
 	if (m_screen_refresh)
 	{
-		int width = machine().primary_screen->width();
-		int height = machine().primary_screen->height();
+		int width = m_screen->width();
+		int height = m_screen->height();
 
 		m_screen_refresh = 0;
 

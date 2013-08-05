@@ -33,13 +33,13 @@ TIMER_CALLBACK_MEMBER(wolfpack_state::periodic_callback)
 	if (scanline >= 262)
 		scanline = 0;
 
-	timer_set(machine().primary_screen->time_until_pos(scanline), TIMER_PERIODIC, scanline);
+	timer_set(m_screen->time_until_pos(scanline), TIMER_PERIODIC, scanline);
 }
 
 
 void wolfpack_state::machine_reset()
 {
-	timer_set(machine().primary_screen->time_until_pos(0), TIMER_PERIODIC);
+	timer_set(m_screen->time_until_pos(0), TIMER_PERIODIC);
 }
 
 
@@ -69,7 +69,7 @@ READ8_MEMBER(wolfpack_state::wolfpack_misc_r)
 	if (!m_collision)
 		val |= 0x10;
 
-	if (machine().primary_screen->vpos() >= 240)
+	if (m_screen->vpos() >= 240)
 		val |= 0x80;
 
 	return val;

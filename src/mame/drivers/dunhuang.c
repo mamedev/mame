@@ -438,7 +438,7 @@ WRITE8_MEMBER(dunhuang_state::dunhuang_input_w)
 READ8_MEMBER(dunhuang_state::dunhuang_service_r)
 {
 	return ioport("SERVICE")->read()
-		| ((m_hopper && !(machine().primary_screen->frame_number() % 10)) ? 0x00 : 0x08)    // bit 3: hopper sensor
+		| ((m_hopper && !(m_screen->frame_number() % 10)) ? 0x00 : 0x08)    // bit 3: hopper sensor
 		| 0x80                                                              // bit 7 low -> tiles block transferrer busy
 	;
 }

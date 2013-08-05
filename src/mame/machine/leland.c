@@ -326,7 +326,7 @@ MACHINE_START_MEMBER(leland_state,leland)
 
 MACHINE_RESET_MEMBER(leland_state,leland)
 {
-	m_master_int_timer->adjust(machine().primary_screen->time_until_pos(8), 8);
+	m_master_int_timer->adjust(m_screen->time_until_pos(8), 8);
 
 	/* reset globals */
 	m_gfx_control = 0x00;
@@ -377,7 +377,7 @@ MACHINE_START_MEMBER(leland_state,ataxx)
 MACHINE_RESET_MEMBER(leland_state,ataxx)
 {
 	memset(m_extra_tram, 0, ATAXX_EXTRA_TRAM_SIZE);
-	m_master_int_timer->adjust(machine().primary_screen->time_until_pos(8), 8);
+	m_master_int_timer->adjust(m_screen->time_until_pos(8), 8);
 
 	/* initialize the XROM */
 	m_xrom_length = memregion("user1")->bytes();
@@ -426,7 +426,7 @@ TIMER_CALLBACK_MEMBER(leland_state::leland_interrupt_callback)
 	scanline += 16;
 	if (scanline > 248)
 		scanline = 8;
-	m_master_int_timer->adjust(machine().primary_screen->time_until_pos(scanline), scanline);
+	m_master_int_timer->adjust(m_screen->time_until_pos(scanline), scanline);
 }
 
 
@@ -438,7 +438,7 @@ TIMER_CALLBACK_MEMBER(leland_state::ataxx_interrupt_callback)
 	m_master->set_input_line(0, HOLD_LINE);
 
 	/* set a timer for the next one */
-	m_master_int_timer->adjust(machine().primary_screen->time_until_pos(scanline), scanline);
+	m_master_int_timer->adjust(m_screen->time_until_pos(scanline), scanline);
 }
 
 
@@ -1196,7 +1196,7 @@ WRITE8_MEMBER(leland_state::ataxx_master_output_w)
 			break;
 
 		case 0x08:  /*  */
-			m_master_int_timer->adjust(machine().primary_screen->time_until_pos(data + 1), data + 1);
+			m_master_int_timer->adjust(m_screen->time_until_pos(data + 1), data + 1);
 			break;
 
 		default:
@@ -1381,7 +1381,7 @@ WRITE8_MEMBER(leland_state::ataxx_slave_banksw_w)
 
 READ8_MEMBER(leland_state::leland_raster_r)
 {
-	return machine().primary_screen->vpos();
+	return m_screen->vpos();
 }
 
 

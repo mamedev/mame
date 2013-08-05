@@ -80,7 +80,7 @@ VIDEO_START_MEMBER(toobin_state,toobin)
 {
 
 	/* allocate a playfield bitmap for rendering */
-	machine().primary_screen->register_screen_bitmap(m_pfbitmap);
+	m_screen->register_screen_bitmap(m_pfbitmap);
 
 	save_item(NAME(m_brightness));
 }
@@ -148,7 +148,7 @@ WRITE16_MEMBER( toobin_state::toobin_xscroll_w )
 
 	/* if anything has changed, force a partial update */
 	if (newscroll != oldscroll)
-		machine().primary_screen->update_partial(machine().primary_screen->vpos());
+		m_screen->update_partial(m_screen->vpos());
 
 	/* update the playfield scrolling - hscroll is clocked on the following scanline */
 	m_playfield_tilemap->set_scrollx(0, newscroll >> 6);
@@ -167,7 +167,7 @@ WRITE16_MEMBER( toobin_state::toobin_yscroll_w )
 
 	/* if anything has changed, force a partial update */
 	if (newscroll != oldscroll)
-		machine().primary_screen->update_partial(machine().primary_screen->vpos());
+		m_screen->update_partial(m_screen->vpos());
 
 	/* if bit 4 is zero, the scroll value is clocked in right away */
 	m_playfield_tilemap->set_scrolly(0, newscroll >> 6);
@@ -193,7 +193,7 @@ WRITE16_MEMBER( toobin_state::toobin_slip_w )
 
 	/* if the SLIP is changing, force a partial update first */
 	if (oldslip != newslip)
-		machine().primary_screen->update_partial(machine().primary_screen->vpos());
+		m_screen->update_partial(m_screen->vpos());
 
 	/* update the data */
 	m_mob->slipram(offset) = newslip;

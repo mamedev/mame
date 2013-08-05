@@ -236,7 +236,7 @@ READ16_HANDLER( hd68k_port0_r )
 	*/
 	harddriv_state *state = space.machine().driver_data<harddriv_state>();
 	int temp = (space.machine().root_device().ioport("SW1")->read() << 8) | space.machine().root_device().ioport("IN0")->read();
-	if (state->get_hblank(*space.machine().primary_screen)) temp ^= 0x0002;
+	if (state->get_hblank(*state->m_screen)) temp ^= 0x0002;
 	temp ^= 0x0018;     /* both EOCs always high for now */
 	return temp;
 }
@@ -510,7 +510,7 @@ WRITE16_HANDLER( hdgsp_io_w )
 
 	/* detect changes to HEBLNK and HSBLNK and force an update before they change */
 	if ((offset == REG_HEBLNK || offset == REG_HSBLNK) && data != tms34010_io_register_r(space, offset, 0xffff))
-		space.machine().primary_screen->update_partial(space.machine().primary_screen->vpos() - 1);
+		state->m_screen->update_partial(state->m_screen->vpos() - 1);
 
 	tms34010_io_register_w(space, offset, data, mem_mask);
 }

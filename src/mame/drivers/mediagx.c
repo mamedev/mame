@@ -279,7 +279,7 @@ void mediagx_state::draw_framebuffer(bitmap_rgb32 &bitmap, const rectangle &clip
 		m_frame_height = height;
 
 		visarea.set(0, width - 1, 0, height - 1);
-		machine().primary_screen->configure(width, height * 262 / 240, visarea, machine().primary_screen->frame_period().attoseconds);
+		m_screen->configure(width, height * 262 / 240, visarea, m_screen->frame_period().attoseconds);
 	}
 
 	if (m_disp_ctrl_reg[DC_OUTPUT_CFG] & 0x1)        // 8-bit mode
@@ -390,7 +390,7 @@ READ32_MEMBER(mediagx_state::disp_ctrl_r)
 		case DC_TIMING_CFG:
 			r |= 0x40000000;
 
-			if (machine().primary_screen->vpos() >= m_frame_height)
+			if (m_screen->vpos() >= m_frame_height)
 				r &= ~0x40000000;
 
 #if SPEEDUP_HACKS

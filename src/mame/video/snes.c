@@ -1643,8 +1643,11 @@ void snes_ppu_class::refresh_scanline( running_machine &machine, bitmap_rgb32 &b
 	g_profiler.stop();
 }
 
-void snes_ppu_class::ppu_start(running_machine &machine)
+void snes_ppu_class::ppu_start(screen_device &screen)
 {
+	m_screen = &screen;
+	running_machine &machine = screen.machine();
+	
 #if SNES_LAYER_DEBUG
 	memset(&debug_options, 0, sizeof(debug_options));
 #endif
@@ -1893,8 +1896,8 @@ READ8_MEMBER( snes_ppu_class::vram_read )
 		res = m_vram[offset];
 	else
 	{
-		UINT16 v = space.machine().primary_screen->vpos();
-		UINT16 h = space.machine().primary_screen->hpos();
+		UINT16 v = m_screen->vpos();
+		UINT16 h = m_screen->hpos();
 		UINT16 ls = (((m_stat78 & 0x10) == SNES_NTSC ? 525 : 625) >> 1) - 1;
 
 		if (m_interlace == 2)
@@ -1928,8 +1931,8 @@ WRITE8_MEMBER( snes_ppu_class::vram_write )
 		m_vram[offset] = data;
 	else
 	{
-		UINT16 v = space.machine().primary_screen->vpos();
-		UINT16 h = space.machine().primary_screen->hpos();
+		UINT16 v = m_screen->vpos();
+		UINT16 h = m_screen->hpos();
 		if (v == 0)
 		{
 			if (h <= 4)
@@ -1994,7 +1997,7 @@ READ8_MEMBER( snes_ppu_class::oam_read )
 
 	if (!m_screen_disabled)
 	{
-		UINT16 v = space.machine().primary_screen->vpos();
+		UINT16 v = m_screen->vpos();
 
 		if (v < m_beam.last_visible_line)
 			offset = 0x010c;
@@ -2012,7 +2015,7 @@ WRITE8_MEMBER( snes_ppu_class::oam_write )
 
 	if (!m_screen_disabled)
 	{
-		UINT16 v = space.machine().primary_screen->vpos();
+		UINT16 v = m_screen->vpos();
 
 		if (v < m_beam.last_visible_line)
 			offset = 0x010c;
@@ -2053,8 +2056,8 @@ READ8_MEMBER( snes_ppu_class::cgram_read )
 #if 0
 	if (!m_screen_disabled)
 	{
-		UINT16 v = space.machine().primary_screen->vpos();
-		UINT16 h = space.machine().primary_screen->hpos();
+		UINT16 v = m_screen->vpos();
+		UINT16 h = m_screen->hpos();
 
 		if (v < m_beam.last_visible_line && h >= 128 && h < 1096)
 			offset = 0x1ff;
@@ -2081,8 +2084,8 @@ WRITE8_MEMBER( snes_ppu_class::cgram_write )
 	// writes to the cgram address
 	if (!m_screen_disabled)
 	{
-		UINT16 v = space.machine().primary_screen->vpos();
-		UINT16 h = space.machine().primary_screen->hpos();
+		UINT16 v = m_screen->vpos();
+		UINT16 h = m_screen->hpos();
 
 		if (v < m_beam.last_visible_line && h >= 128 && h < 1096)
 			offset = 0x1ff;

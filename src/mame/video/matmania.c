@@ -115,8 +115,8 @@ WRITE8_MEMBER(matmania_state::matmania_paletteram_w)
 
 void matmania_state::video_start()
 {
-	int width = machine().primary_screen->width();
-	int height = machine().primary_screen->height();
+	int width = m_screen->width();
+	int height = m_screen->height();
 
 	/* Mat Mania has a virtual screen twice as large as the visible screen */
 	m_tmpbitmap  = auto_bitmap_ind16_alloc(machine(), width, 2 * height);

@@ -50,10 +50,10 @@ READ8_MEMBER(bigevglf_state::bigevglf_vidram_r)
 
 void bigevglf_state::video_start()
 {
-	machine().primary_screen->register_screen_bitmap(m_tmp_bitmap[0]);
-	machine().primary_screen->register_screen_bitmap(m_tmp_bitmap[1]);
-	machine().primary_screen->register_screen_bitmap(m_tmp_bitmap[2]);
-	machine().primary_screen->register_screen_bitmap(m_tmp_bitmap[3]);
+	m_screen->register_screen_bitmap(m_tmp_bitmap[0]);
+	m_screen->register_screen_bitmap(m_tmp_bitmap[1]);
+	m_screen->register_screen_bitmap(m_tmp_bitmap[2]);
+	m_screen->register_screen_bitmap(m_tmp_bitmap[3]);
 	save_item(NAME(m_tmp_bitmap[0]));
 	save_item(NAME(m_tmp_bitmap[1]));
 	save_item(NAME(m_tmp_bitmap[2]));

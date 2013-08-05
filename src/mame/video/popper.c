@@ -178,7 +178,7 @@ void popper_state::video_start()
 	m_ol_p0_tilemap->set_transmask(0, 0x0f, 0x0e);
 	m_ol_p0_tilemap->set_transmask(1, 0x0e, 0x0f);
 
-	m_tilemap_clip = machine().primary_screen->visible_area();
+	m_tilemap_clip = m_screen->visible_area();
 }
 
 void popper_state::draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect )

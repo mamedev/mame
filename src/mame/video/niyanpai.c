@@ -123,8 +123,8 @@ void niyanpai_state::niyanpai_vramflip(int vram)
 {
 	int x, y;
 	UINT16 color1, color2;
-	int width = machine().primary_screen->width();
-	int height = machine().primary_screen->height();
+	int width = m_screen->width();
+	int height = m_screen->height();
 
 	if (m_flipscreen[vram] == m_flipscreen_old[vram]) return;
 
@@ -156,7 +156,7 @@ void niyanpai_state::niyanpai_vramflip(int vram)
 
 void niyanpai_state::update_pixel(int vram, int x, int y)
 {
-	UINT16 color = m_videoram[vram][(y * machine().primary_screen->width()) + x];
+	UINT16 color = m_videoram[vram][(y * m_screen->width()) + x];
 	m_tmpbitmap[vram].pix16(y, x) = color;
 }
 
@@ -175,7 +175,7 @@ void niyanpai_state::device_timer(emu_timer &timer, device_timer_id id, int para
 void niyanpai_state::niyanpai_gfxdraw(int vram)
 {
 	UINT8 *GFX = memregion("gfx1")->base();
-	int width = machine().primary_screen->width();
+	int width = m_screen->width();
 
 	int x, y;
 	int dx1, dx2, dy;
@@ -353,12 +353,12 @@ WRITE16_MEMBER(niyanpai_state::niyanpai_clutsel_2_w){ niyanpai_clutsel_w(2, data
 ******************************************************************************/
 void niyanpai_state::video_start()
 {
-	int width = machine().primary_screen->width();
-	int height = machine().primary_screen->height();
+	int width = m_screen->width();
+	int height = m_screen->height();
 
-	machine().primary_screen->register_screen_bitmap(m_tmpbitmap[0]);
-	machine().primary_screen->register_screen_bitmap(m_tmpbitmap[1]);
-	machine().primary_screen->register_screen_bitmap(m_tmpbitmap[2]);
+	m_screen->register_screen_bitmap(m_tmpbitmap[0]);
+	m_screen->register_screen_bitmap(m_tmpbitmap[1]);
+	m_screen->register_screen_bitmap(m_tmpbitmap[2]);
 	m_videoram[0] = auto_alloc_array_clear(machine(), UINT16, width * height);
 	m_videoram[1] = auto_alloc_array_clear(machine(), UINT16, width * height);
 	m_videoram[2] = auto_alloc_array_clear(machine(), UINT16, width * height);

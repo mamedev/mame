@@ -22,13 +22,13 @@ void changela_state::video_start()
 	m_memory_devices = auto_alloc_array(machine(), UINT8, 4 * 0x800); /* 0 - not connected, 1,2,3 - RAMs*/
 	m_tree_ram = auto_alloc_array(machine(), UINT8, 2 * 0x20);
 
-	machine().primary_screen->register_screen_bitmap(m_obj0_bitmap);
-	machine().primary_screen->register_screen_bitmap(m_river_bitmap);
-	machine().primary_screen->register_screen_bitmap(m_tree0_bitmap);
-	machine().primary_screen->register_screen_bitmap(m_tree1_bitmap);
+	m_screen->register_screen_bitmap(m_obj0_bitmap);
+	m_screen->register_screen_bitmap(m_river_bitmap);
+	m_screen->register_screen_bitmap(m_tree0_bitmap);
+	m_screen->register_screen_bitmap(m_tree1_bitmap);
 
 	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(changela_state::changela_scanline_callback),this));
-	m_scanline_timer->adjust(machine().primary_screen->time_until_pos(30), 30);
+	m_scanline_timer->adjust(m_screen->time_until_pos(30), 30);
 
 	save_pointer(NAME(m_memory_devices), 4 * 0x800);
 	save_pointer(NAME(m_tree_ram), 2 * 0x20);
@@ -712,7 +712,7 @@ TIMER_CALLBACK_MEMBER(changela_state::changela_scanline_callback)
 
 	sy++;
 	if (sy > 256) sy = 30;
-	m_scanline_timer->adjust(machine().primary_screen->time_until_pos(sy), sy);
+	m_scanline_timer->adjust(m_screen->time_until_pos(sy), sy);
 }
 
 UINT32 changela_state::screen_update_changela(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
