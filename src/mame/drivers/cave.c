@@ -731,7 +731,7 @@ static ADDRESS_MAP_START( mazinger_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("IN1")                                                    // Inputs + EEPROM
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(cave_eeprom_msb_w)                                // EEPROM
 /**/AM_RANGE(0xc08000, 0xc0ffff) AM_RAM AM_SHARE("paletteram")  // Palette
-	AM_RANGE(0xd00000, 0xd7ffff) AM_ROMBANK("bank1")                                                    // ROM
+	AM_RANGE(0xd00000, 0xd7ffff) AM_ROM AM_REGION("user1", 0)   // extra data ROM
 ADDRESS_MAP_END
 
 
@@ -999,13 +999,13 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( oki_map, AS_0, 8, cave_state )
-	AM_RANGE(0x00000, 0x1ffff) AM_ROMBANK("bank3")
-	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("bank4")
+	AM_RANGE(0x00000, 0x1ffff) AM_ROMBANK("okibank1")
+	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank2")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( oki2_map, AS_0, 8, cave_state )
-	AM_RANGE(0x00000, 0x1ffff) AM_ROMBANK("bank5")
-	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("bank6")
+	AM_RANGE(0x00000, 0x1ffff) AM_ROMBANK("oki2bank1")
+	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("oki2bank2")
 ADDRESS_MAP_END
 
 
@@ -1018,20 +1018,20 @@ WRITE8_MEMBER(cave_state::hotdogst_rombank_w)
 	if (data & ~0x0f)
 		logerror("CPU #1 - PC %04X: Bank %02X\n", space.device().safe_pc(), data);
 
-	membank("bank2")->set_entry(data & 0x0f);
+	membank("z80bank")->set_entry(data & 0x0f);
 }
 
 WRITE8_MEMBER(cave_state::hotdogst_okibank_w)
 {
 	int bank1 = (data >> 0) & 0x3;
 	int bank2 = (data >> 4) & 0x3;
-	membank("bank3")->set_entry(bank1);
-	membank("bank4")->set_entry(bank2);
+	membank("okibank1")->set_entry(bank1);
+	membank("okibank2")->set_entry(bank2);
 }
 
 static ADDRESS_MAP_START( hotdogst_sound_map, AS_PROGRAM, 8, cave_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM                 // ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank2")    // ROM (Banked)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("z80bank")  // ROM (Banked)
 	AM_RANGE(0xe000, 0xffff) AM_RAM                 // RAM
 ADDRESS_MAP_END
 
@@ -1055,12 +1055,12 @@ WRITE8_MEMBER(cave_state::mazinger_rombank_w)
 	if (data & ~0x07)
 		logerror("CPU #1 - PC %04X: Bank %02X\n", space.device().safe_pc(), data);
 
-	membank("bank2")->set_entry(data & 0x07);
+	membank("z80bank")->set_entry(data & 0x07);
 }
 
 static ADDRESS_MAP_START( mazinger_sound_map, AS_PROGRAM, 8, cave_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM                 // ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank2")    // ROM (Banked)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("z80bank")  // ROM (Banked)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM                 // RAM
 	AM_RANGE(0xf800, 0xffff) AM_RAM                 // RAM
 ADDRESS_MAP_END
@@ -1086,28 +1086,28 @@ WRITE8_MEMBER(cave_state::metmqstr_rombank_w)
 	if (data & ~0x0f)
 		logerror("CPU #1 - PC %04X: Bank %02X\n", space.device().safe_pc(), data);
 
-	membank("bank1")->set_entry(data & 0x0f);
+	membank("z80bank")->set_entry(data & 0x0f);
 }
 
-WRITE8_MEMBER(cave_state::metmqstr_okibank0_w)
+WRITE8_MEMBER(cave_state::metmqstr_okibank_w)
 {
 	int bank1 = (data >> 0) & 0x7;
 	int bank2 = (data >> 4) & 0x7;
-	membank("bank3")->set_entry(bank1);
-	membank("bank4")->set_entry(bank2);
+	membank("okibank1")->set_entry(bank1);
+	membank("okibank2")->set_entry(bank2);
 }
 
-WRITE8_MEMBER(cave_state::metmqstr_okibank1_w)
+WRITE8_MEMBER(cave_state::metmqstr_oki2bank_w)
 {
 	int bank1 = (data >> 0) & 0x7;
 	int bank2 = (data >> 4) & 0x7;
-	membank("bank5")->set_entry(bank1);
-	membank("bank6")->set_entry(bank2);
+	membank("oki2bank1")->set_entry(bank1);
+	membank("oki2bank2")->set_entry(bank2);
 }
 
 static ADDRESS_MAP_START( metmqstr_sound_map, AS_PROGRAM, 8, cave_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM                 // ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")    // ROM (Banked)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("z80bank")  // ROM (Banked)
 	AM_RANGE(0xe000, 0xffff) AM_RAM                 // RAM
 ADDRESS_MAP_END
 
@@ -1119,9 +1119,9 @@ static ADDRESS_MAP_START( metmqstr_sound_portmap, AS_IO, 8, cave_state )
 	AM_RANGE(0x40, 0x40) AM_READ(soundlatch_hi_r)                       //
 	AM_RANGE(0x50, 0x51) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)   // YM2151
 	AM_RANGE(0x60, 0x60) AM_DEVWRITE("oki1", okim6295_device, write)                // M6295 #0
-	AM_RANGE(0x70, 0x70) AM_WRITE(metmqstr_okibank0_w)                  // Samples Bank #0
+	AM_RANGE(0x70, 0x70) AM_WRITE(metmqstr_okibank_w)                   // Samples Bank #0
 	AM_RANGE(0x80, 0x80) AM_DEVWRITE("oki2", okim6295_device, write)                // M6295 #1
-	AM_RANGE(0x90, 0x90) AM_WRITE(metmqstr_okibank1_w)                  // Samples Bank #1
+	AM_RANGE(0x90, 0x90) AM_WRITE(metmqstr_oki2bank_w)                  // Samples Bank #1
 ADDRESS_MAP_END
 
 
@@ -1134,12 +1134,12 @@ WRITE8_MEMBER(cave_state::pwrinst2_rombank_w)
 	if (data & ~0x07)
 		logerror("CPU #1 - PC %04X: Bank %02X\n", space.device().safe_pc(), data);
 
-	membank("bank1")->set_entry(data & 0x07);
+	membank("z80bank")->set_entry(data & 0x07);
 }
 
 static ADDRESS_MAP_START( pwrinst2_sound_map, AS_PROGRAM, 8, cave_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM                 // ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")    // ROM (Banked)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("z80bank")  // ROM (Banked)
 	AM_RANGE(0xe000, 0xffff) AM_RAM                 // RAM
 ADDRESS_MAP_END
 
@@ -1161,45 +1161,34 @@ ADDRESS_MAP_END
                                 Sailor Moon
 ***************************************************************************/
 
-READ8_MEMBER(cave_state::mirror_ram_r)
-{
-	return m_mirror_ram[offset];
-}
-
-WRITE8_MEMBER(cave_state::mirror_ram_w)
-{
-	m_mirror_ram[offset] = data;
-}
-
 WRITE8_MEMBER(cave_state::sailormn_rombank_w)
 {
 	if (data & ~0x1f)
 		logerror("CPU #1 - PC %04X: Bank %02X\n", space.device().safe_pc(), data);
 
-	membank("bank1")->set_entry(data & 0x1f);
+	membank("z80bank")->set_entry(data & 0x1f);
 }
 
-WRITE8_MEMBER(cave_state::sailormn_okibank0_w)
+WRITE8_MEMBER(cave_state::sailormn_okibank_w)
 {
 	int bank1 = (data >> 0) & 0xf;
 	int bank2 = (data >> 4) & 0xf;
-	membank("bank3")->set_entry(bank1);
-	membank("bank4")->set_entry(bank2);
+	membank("okibank1")->set_entry(bank1);
+	membank("okibank2")->set_entry(bank2);
 }
 
-WRITE8_MEMBER(cave_state::sailormn_okibank1_w)
+WRITE8_MEMBER(cave_state::sailormn_oki2bank_w)
 {
 	int bank1 = (data >> 0) & 0xf;
 	int bank2 = (data >> 4) & 0xf;
-	membank("bank5")->set_entry(bank1);
-	membank("bank6")->set_entry(bank2);
+	membank("oki2bank1")->set_entry(bank1);
+	membank("oki2bank2")->set_entry(bank2);
 }
 
 static ADDRESS_MAP_START( sailormn_sound_map, AS_PROGRAM, 8, cave_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM                                     // ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")                        // ROM (Banked)
-	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(mirror_ram_r, mirror_ram_w) AM_SHARE("mirror_ram")    // RAM
-	AM_RANGE(0xe000, 0xffff) AM_READWRITE(mirror_ram_r, mirror_ram_w)   // Mirrored RAM (agallet)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("z80bank")                      // ROM (Banked)
+	AM_RANGE(0xc000, 0xdfff) AM_MIRROR(0x2000) AM_RAM                   // RAM (8KB, mirrored)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sailormn_sound_portmap, AS_IO, 8, cave_state )
@@ -1211,9 +1200,9 @@ static ADDRESS_MAP_START( sailormn_sound_portmap, AS_IO, 8, cave_state )
 	AM_RANGE(0x40, 0x40) AM_READ(soundlatch_hi_r)                           //
 	AM_RANGE(0x50, 0x51) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)       // YM2151
 	AM_RANGE(0x60, 0x60) AM_DEVREADWRITE("oki1", okim6295_device, read, write)  // M6295 #0
-	AM_RANGE(0x70, 0x70) AM_WRITE(sailormn_okibank0_w)                      // Samples Bank #0
+	AM_RANGE(0x70, 0x70) AM_WRITE(sailormn_okibank_w)                      // Samples Bank #0
 	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("oki2", okim6295_device, read, write)  // M6295 #1
-	AM_RANGE(0xc0, 0xc0) AM_WRITE(sailormn_okibank1_w)                      // Samples Bank #1
+	AM_RANGE(0xc0, 0xc0) AM_WRITE(sailormn_oki2bank_w)                      // Samples Bank #1
 ADDRESS_MAP_END
 
 
@@ -2544,7 +2533,7 @@ MACHINE_CONFIG_END
 static void unpack_sprites(running_machine &machine)
 {
 	const UINT32 len    =   machine.root_device().memregion("sprites")->bytes();
-	UINT8 *rgn          =   machine.root_device().memregion       ("sprites")->base();
+	UINT8 *rgn          =   machine.root_device().memregion("sprites")->base();
 	UINT8 *src          =   rgn + len / 2 - 1;
 	UINT8 *dst          =   rgn + len - 1;
 
@@ -2561,7 +2550,7 @@ static void unpack_sprites(running_machine &machine)
 static void ddonpach_unpack_sprites(running_machine &machine)
 {
 	const UINT32 len    =   machine.root_device().memregion("sprites")->bytes();
-	UINT8 *rgn          =   machine.root_device().memregion       ("sprites")->base();
+	UINT8 *rgn          =   machine.root_device().memregion("sprites")->base();
 	UINT8 *src          =   rgn + len / 2 - 1;
 	UINT8 *dst          =   rgn + len - 1;
 
@@ -2647,9 +2636,8 @@ BP962A.U77  23C16000    GFX
 	ROM_REGION( 0x400000, "maincpu", 0 ) \
 	ROM_LOAD16_WORD_SWAP( "bp962a.u45", 0x000000, 0x080000, CRC(24815046) SHA1(f5eeae60b923ae850b335e7898a2760407631d8b) ) \
 	\
-	ROM_REGION( 0x88000, "audiocpu", 0 ) \
-	ROM_LOAD( "bp962a.u9",  0x00000, 0x08000, CRC(06caddbe) SHA1(6a3cc50558ba19a31b21b7f3ec6c6e2846244ff1) ) \
-	ROM_CONTINUE(           0x10000, 0x78000             ) \
+	ROM_REGION( 0x80000, "audiocpu", 0 ) \
+	ROM_LOAD( "bp962a.u9",  0x00000, 0x80000, CRC(06caddbe) SHA1(6a3cc50558ba19a31b21b7f3ec6c6e2846244ff1) ) \
 	\
 	ROM_REGION( 0x400000 * 2, "sprites", 0 ) \
 	ROM_LOAD( "bp962a.u76", 0x000000, 0x200000, CRC(858da439) SHA1(33a3d2a3ec3fa3364b00e1e43b405e5030a5b2a3) ) \
@@ -3462,9 +3450,8 @@ ROM_START( hotdogst )
 	ROM_LOAD16_BYTE( "mp3.u29", 0x00000, 0x80000, CRC(1f4e5479) SHA1(5c3d7b36b1eda4c87c53e4f7cf89951cc5bcc871) )
 	ROM_LOAD16_BYTE( "mp4.u28", 0x00001, 0x80000, CRC(6f1c3c4b) SHA1(ab4e4d9b2ef74a2eefda718e120bef05fd0346ff) )
 
-	ROM_REGION( 0x48000, "audiocpu", 0 )    /* Z80 code */
-	ROM_LOAD( "mp2.u19", 0x00000, 0x08000, CRC(ff979ebe) SHA1(4cb80086cfdc69a321c7f75455cef89e20488b76) )   // FIRST AND SECOND HALF IDENTICAL
-	ROM_CONTINUE(        0x10000, 0x38000             )
+	ROM_REGION( 0x40000, "audiocpu", 0 )    /* Z80 code */
+	ROM_LOAD( "mp2.u19", 0x00000, 0x40000, CRC(ff979ebe) SHA1(4cb80086cfdc69a321c7f75455cef89e20488b76) )   // FIRST AND SECOND HALF IDENTICAL
 
 	ROM_REGION( 0x400000 * 2, "sprites", 0 )        /* Sprites: * 2 */
 	ROM_LOAD( "mp9.u55", 0x000000, 0x200000, CRC(258d49ec) SHA1(f39e30c82d8f680f248e1eb59d7c5acb479fa277) )
@@ -3598,9 +3585,8 @@ U55
 	ROM_REGION16_BE( 0x80000, "user1", 0 ) \
 	ROM_LOAD16_WORD_SWAP( "mzp-1.924", 0x00000, 0x80000, CRC(db40acba) SHA1(797a3046b6ab33773c5c4d6bb6d045ea60c1eb45) ) \
 	\
-	ROM_REGION( 0x28000, "audiocpu", 0 ) \
-	ROM_LOAD( "mzs.u21", 0x00000, 0x08000, CRC(c5b4f7ed) SHA1(01f3cd1dd4045029260544e0e1c15dd08817012e) ) \
-	ROM_CONTINUE(        0x10000, 0x18000             ) \
+	ROM_REGION( 0x20000, "audiocpu", 0 ) \
+	ROM_LOAD( "mzs.u21", 0x00000, 0x20000, CRC(c5b4f7ed) SHA1(01f3cd1dd4045029260544e0e1c15dd08817012e) ) \
 	\
 	ROM_REGION( 0x400000 * 2, "sprites", ROMREGION_ERASEFF ) \
 	ROM_LOAD( "bp943a-2.u56", 0x000000, 0x200000, CRC(97e13959) SHA1(c30b1093aacebafefcae701af767dd36fc55fac7) ) \
@@ -3681,9 +3667,8 @@ ROM_START( metmqstr )
 	ROM_LOAD16_WORD_SWAP( "bp947a.u28", 0x100000, 0x80000, CRC(8c55decf) SHA1(76c6ce4c8e621273258d31ceb9ec4442fcf1a393) )
 	ROM_LOAD16_WORD_SWAP( "bp947a.u29", 0x200000, 0x80000, CRC(cf0f3f3b) SHA1(49a3c0e7536edd53bbf09353e43e9166d736b3f4) )
 
-	ROM_REGION( 0x48000, "audiocpu", 0 )        /* Z80 code */
-	ROM_LOAD( "bp947a.u20",  0x00000, 0x08000, CRC(a4a36170) SHA1(ae55094518bd968ea0d04613a133c1421e412012) )
-	ROM_CONTINUE(            0x10000, 0x38000             )
+	ROM_REGION( 0x40000, "audiocpu", 0 )        /* Z80 code */
+	ROM_LOAD( "bp947a.u20",  0x00000, 0x40000, CRC(a4a36170) SHA1(ae55094518bd968ea0d04613a133c1421e412012) )
 
 	ROM_REGION( 0x800000 * 2, "sprites", 0 )        /* Sprites */
 	ROM_LOAD( "bp947a.u49", 0x000000, 0x200000, CRC(09749531) SHA1(6deeed2712241611ec3202c49a66beed28698af8) )
@@ -3718,9 +3703,8 @@ ROM_START( nmaster )
 	ROM_LOAD16_WORD_SWAP( "bp947a.u28" , 0x100000, 0x80000, CRC(8c55decf) SHA1(76c6ce4c8e621273258d31ceb9ec4442fcf1a393) )
 	ROM_LOAD16_WORD_SWAP( "bp947a.u29",  0x200000, 0x80000, CRC(cf0f3f3b) SHA1(49a3c0e7536edd53bbf09353e43e9166d736b3f4) )
 
-	ROM_REGION( 0x48000, "audiocpu", 0 )        /* Z80 code */
-	ROM_LOAD( "bp947a.u20",  0x00000, 0x08000, CRC(a4a36170) SHA1(ae55094518bd968ea0d04613a133c1421e412012) )
-	ROM_CONTINUE(            0x10000, 0x38000             )
+	ROM_REGION( 0x40000, "audiocpu", 0 )        /* Z80 code */
+	ROM_LOAD( "bp947a.u20",  0x00000, 0x40000, CRC(a4a36170) SHA1(ae55094518bd968ea0d04613a133c1421e412012) )
 
 	ROM_REGION( 0x800000 * 2, "sprites", 0 )        /* Sprites */
 	ROM_LOAD( "bp947a.u49", 0x000000, 0x200000, CRC(09749531) SHA1(6deeed2712241611ec3202c49a66beed28698af8) )
@@ -3818,9 +3802,8 @@ ROM_START( pwrinst2 )
 	ROM_REGION16_BE( 0x100000, "user1", ROMREGION_ERASE00 ) /* 68000 extra data roms */
 	/* not used */
 
-	ROM_REGION( 0x24000, "audiocpu", 0 )        /* Z80 code */
-	ROM_LOAD( "g02.u3a", 0x00000, 0x0c000, CRC(ebea5e1e) SHA1(4d3af9e5f29d0c1b26563f51250039c9e8bd3735) )
-	ROM_CONTINUE(        0x10000, 0x14000             )
+	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Z80 code */
+	ROM_LOAD( "g02.u3a", 0x00000, 0x20000, CRC(ebea5e1e) SHA1(4d3af9e5f29d0c1b26563f51250039c9e8bd3735) )
 
 	ROM_REGION( 0xe00000 * 2, "sprites", 0 )        /* Sprites */
 	ROM_LOAD( "g02.u61", 0x000000, 0x200000, CRC(91e30398) SHA1(2b59a5e40bed2a988382054fe30d92808dad3348) )
@@ -3864,9 +3847,8 @@ ROM_START( pwrinst2j )
 	ROM_REGION16_BE( 0x100000, "user1", ROMREGION_ERASE00 ) /* 68000 extra data roms */
 	/* not used */
 
-	ROM_REGION( 0x24000, "audiocpu", 0 )        /* Z80 code */
-	ROM_LOAD( "g02j.u3a", 0x00000, 0x0c000, CRC(eead01f1) SHA1(0ced6755e471e0303fe397b3d54a5c799762ebd8) )
-	ROM_CONTINUE(        0x10000, 0x14000             )
+	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Z80 code */
+	ROM_LOAD( "g02j.u3a", 0x00000, 0x20000, CRC(eead01f1) SHA1(0ced6755e471e0303fe397b3d54a5c799762ebd8) )
 
 	ROM_REGION( 0xe00000 * 2, "sprites", 0 )        /* Sprites */
 	ROM_LOAD( "g02.u61", 0x000000, 0x200000, CRC(91e30398) SHA1(2b59a5e40bed2a988382054fe30d92808dad3348) )
@@ -3964,9 +3946,8 @@ ROM_START( plegends )
 	ROM_LOAD16_BYTE( "d15.u4",  0x000000, 0x80000, CRC(6352cec0) SHA1(a54d55b8d642e438158268d0d41880b6589e48e2) )
 	ROM_LOAD16_BYTE( "d17.u5",  0x000001, 0x80000, CRC(7af810d8) SHA1(5e24f78a228809a001f3f3372c1b32ea05070e17) )
 
-	ROM_REGION( 0x44000, "audiocpu", 0 )        /* Z80 code */
-	ROM_LOAD( "d19.u3", 0x00000, 0x0c000, CRC(47598459) SHA1(4e9dcfebfbd160230768965e8c6e5ed446c1aa7b) ) /* Same as sound.u3 below, but twice the size? */
-	ROM_CONTINUE(        0x10000, 0x34000             )
+	ROM_REGION( 0x40000, "audiocpu", 0 )        /* Z80 code */
+	ROM_LOAD( "d19.u3", 0x00000, 0x40000, CRC(47598459) SHA1(4e9dcfebfbd160230768965e8c6e5ed446c1aa7b) ) /* Same as sound.u3 below, but twice the size? */
 
 	ROM_REGION( 0x1000000 * 2, "sprites", 0 )       /* Sprites */
 	ROM_LOAD( "g02.u61", 0x000000, 0x200000, CRC(91e30398) SHA1(2b59a5e40bed2a988382054fe30d92808dad3348) )
@@ -4012,9 +3993,8 @@ ROM_START( plegendsj )
 	ROM_LOAD16_BYTE( "d15.u4",  0x000000, 0x80000, CRC(6352cec0) SHA1(a54d55b8d642e438158268d0d41880b6589e48e2) )
 	ROM_LOAD16_BYTE( "d17.u5",  0x000001, 0x80000, CRC(7af810d8) SHA1(5e24f78a228809a001f3f3372c1b32ea05070e17) )
 
-	ROM_REGION( 0x24000, "audiocpu", 0 )        /* Z80 code */
-	ROM_LOAD( "sound.u3", 0x00000, 0x0c000, CRC(36f71520) SHA1(11d0a059ddba3e1aa4c54ccdde7b3f5c7bde482f) )
-	ROM_CONTINUE(        0x10000, 0x14000             )
+	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Z80 code */
+	ROM_LOAD( "sound.u3", 0x00000, 0x20000, CRC(36f71520) SHA1(11d0a059ddba3e1aa4c54ccdde7b3f5c7bde482f) )
 
 	ROM_REGION( 0x1000000 * 2, "sprites", 0 )       /* Sprites */
 	ROM_LOAD( "g02.u61", 0x000000, 0x200000, CRC(91e30398) SHA1(2b59a5e40bed2a988382054fe30d92808dad3348) )
@@ -4105,9 +4085,8 @@ BPSM.U77    23C16000    GFX
 	ROM_LOAD16_WORD_SWAP( "bpsm945a.u45", 0x000000, 0x080000, CRC(898c9515) SHA1(0fe8d7f13f5cfe2f6e79a0a21b2e8e7e70e65c4b) ) \
 	ROM_LOAD16_WORD_SWAP( "bpsm.u46",     0x200000, 0x200000, CRC(32084e80) SHA1(0ac503190d95009620b5ad7e7e0e63324f6fa4eb) ) \
 	\
-	ROM_REGION( 0x88000, "audiocpu", 0 ) \
-	ROM_LOAD( "bpsm945a.u9",  0x00000, 0x08000, CRC(438de548) SHA1(81a0ca1cd662e2017aa980da162d39cfd0a19f14) ) \
-	ROM_CONTINUE(             0x10000, 0x78000             ) \
+	ROM_REGION( 0x80000, "audiocpu", 0 ) \
+	ROM_LOAD( "bpsm945a.u9",  0x00000, 0x80000, CRC(438de548) SHA1(81a0ca1cd662e2017aa980da162d39cfd0a19f14) ) \
 	\
 	ROM_REGION( 0x400000 * 2, "sprites", 0 ) \
 	ROM_LOAD( "bpsm.u76", 0x000000, 0x200000, CRC(a243a5ba) SHA1(3a32d685e53e0b75977f7acb187cf414a50c7f8b) ) \
@@ -4189,9 +4168,8 @@ ROM_END
 	ROM_LOAD16_WORD_SWAP( "smprg.u45",    0x000000, 0x080000, CRC(234f1152) SHA1(8fc6d4a8995d550862d328011d3357c09334f0fa) ) \
 	ROM_LOAD16_WORD_SWAP( "bpsm.u46",     0x200000, 0x200000, CRC(32084e80) SHA1(0ac503190d95009620b5ad7e7e0e63324f6fa4eb) ) \
 	\
-	ROM_REGION( 0x88000, "audiocpu", 0 ) \
-	ROM_LOAD( "bpsm945a.u9",  0x00000, 0x08000, CRC(438de548) SHA1(81a0ca1cd662e2017aa980da162d39cfd0a19f14) ) \
-	ROM_CONTINUE(             0x10000, 0x78000             ) \
+	ROM_REGION( 0x80000, "audiocpu", 0 ) \
+	ROM_LOAD( "bpsm945a.u9",  0x00000, 0x80000, CRC(438de548) SHA1(81a0ca1cd662e2017aa980da162d39cfd0a19f14) ) \
 	\
 	ROM_REGION( 0x400000 * 2, "sprites", 0 ) \
 	ROM_LOAD( "bpsm.u76", 0x000000, 0x200000, CRC(a243a5ba) SHA1(3a32d685e53e0b75977f7acb187cf414a50c7f8b) ) \
@@ -4403,16 +4381,15 @@ DRIVER_INIT_MEMBER(cave_state,agallet)
 	UINT8 *ROM = memregion("audiocpu")->base();
 	init_cave(machine());
 
-	membank("bank1")->configure_entries(0, 0x02, &ROM[0x00000], 0x4000);
-	membank("bank1")->configure_entries(2, 0x1e, &ROM[0x10000], 0x4000);
+	membank("z80bank")->configure_entries(0, 0x20, &ROM[0x00000], 0x4000);
 
 	ROM = memregion("oki1")->base();
-	membank("bank3")->configure_entries(0, 0x10, &ROM[0x00000], 0x20000);
-	membank("bank4")->configure_entries(0, 0x10, &ROM[0x00000], 0x20000);
+	membank("okibank1")->configure_entries(0, 0x10, &ROM[0x00000], 0x20000);
+	membank("okibank2")->configure_entries(0, 0x10, &ROM[0x00000], 0x20000);
 
 	ROM = memregion("oki2")->base();
-	membank("bank5")->configure_entries(0, 0x10, &ROM[0x00000], 0x20000);
-	membank("bank6")->configure_entries(0, 0x10, &ROM[0x00000], 0x20000);
+	membank("oki2bank1")->configure_entries(0, 0x10, &ROM[0x00000], 0x20000);
+	membank("oki2bank2")->configure_entries(0, 0x10, &ROM[0x00000], 0x20000);
 
 	sailormn_unpack_tiles(machine(), "layer2");
 
@@ -4494,12 +4471,11 @@ DRIVER_INIT_MEMBER(cave_state,hotdogst)
 
 	init_cave(machine());
 
-	membank("bank2")->configure_entries(0, 0x2, &ROM[0x00000], 0x4000);
-	membank("bank2")->configure_entries(2, 0xe, &ROM[0x10000], 0x4000);
+	membank("z80bank")->configure_entries(0, 0x10, &ROM[0x00000], 0x4000);
 
 	ROM = memregion("oki")->base();
-	membank("bank3")->configure_entries(0, 4, &ROM[0x00000], 0x20000);
-	membank("bank4")->configure_entries(0, 4, &ROM[0x00000], 0x20000);
+	membank("okibank1")->configure_entries(0, 4, &ROM[0x00000], 0x20000);
+	membank("okibank2")->configure_entries(0, 4, &ROM[0x00000], 0x20000);
 
 	unpack_sprites(machine());
 	m_spritetype[0] = 2;    // Normal sprites with different position handling
@@ -4515,12 +4491,11 @@ DRIVER_INIT_MEMBER(cave_state,mazinger)
 
 	init_cave(machine());
 
-	membank("bank2")->configure_entries(0, 2, &ROM[0x00000], 0x4000);
-	membank("bank2")->configure_entries(2, 6, &ROM[0x10000], 0x4000);
+	membank("z80bank")->configure_entries(0, 8, &ROM[0x00000], 0x4000);
 
 	ROM = memregion("oki")->base();
-	membank("bank3")->configure_entries(0, 4, &ROM[0x00000], 0x20000);
-	membank("bank4")->configure_entries(0, 4, &ROM[0x00000], 0x20000);
+	membank("okibank1")->configure_entries(0, 4, &ROM[0x00000], 0x20000);
+	membank("okibank2")->configure_entries(0, 4, &ROM[0x00000], 0x20000);
 
 	/* decrypt sprites */
 	buffer = auto_alloc_array(machine(), UINT8, len);
@@ -4536,9 +4511,6 @@ DRIVER_INIT_MEMBER(cave_state,mazinger)
 	m_spritetype[0] = 2;    // Normal sprites with different position handling
 	m_kludge = 3;
 	m_time_vblank_irq = 2100;
-
-	/* setup extra ROM */
-	membank("bank1")->set_base(memregion("user1")->base());
 }
 
 
@@ -4548,16 +4520,15 @@ DRIVER_INIT_MEMBER(cave_state,metmqstr)
 
 	init_cave(machine());
 
-	membank("bank1")->configure_entries(0, 0x2, &ROM[0x00000], 0x4000);
-	membank("bank1")->configure_entries(2, 0xe, &ROM[0x10000], 0x4000);
+	membank("z80bank")->configure_entries(0, 0x10, &ROM[0x00000], 0x4000);
 
 	ROM = memregion("oki1")->base();
-	membank("bank3")->configure_entries(0, 8, &ROM[0x00000], 0x20000);
-	membank("bank4")->configure_entries(0, 8, &ROM[0x00000], 0x20000);
+	membank("okibank1")->configure_entries(0, 8, &ROM[0x00000], 0x20000);
+	membank("okibank2")->configure_entries(0, 8, &ROM[0x00000], 0x20000);
 
 	ROM = memregion("oki2")->base();
-	membank("bank5")->configure_entries(0, 8, &ROM[0x00000], 0x20000);
-	membank("bank6")->configure_entries(0, 8, &ROM[0x00000], 0x20000);
+	membank("oki2bank1")->configure_entries(0, 8, &ROM[0x00000], 0x20000);
+	membank("oki2bank2")->configure_entries(0, 8, &ROM[0x00000], 0x20000);
 
 	unpack_sprites(machine());
 	m_spritetype[0] = 2;    // Normal sprites with different position handling
@@ -4576,8 +4547,7 @@ DRIVER_INIT_MEMBER(cave_state,pwrinst2j)
 
 	init_cave(machine());
 
-	membank("bank1")->configure_entries(0, 3, &ROM[0x00000], 0x4000);
-	membank("bank1")->configure_entries(3, 5, &ROM[0x10000], 0x4000);
+	membank("z80bank")->configure_entries(0, 8, &ROM[0x00000], 0x4000);
 
 	buffer = auto_alloc_array(machine(), UINT8, len);
 	{
@@ -4623,16 +4593,15 @@ DRIVER_INIT_MEMBER(cave_state,sailormn)
 
 	init_cave(machine());
 
-	membank("bank1")->configure_entries(0, 0x02, &ROM[0x00000], 0x4000);
-	membank("bank1")->configure_entries(2, 0x1e, &ROM[0x10000], 0x4000);
+	membank("z80bank")->configure_entries(0, 0x20, &ROM[0x00000], 0x4000);
 
 	ROM = memregion("oki1")->base();
-	membank("bank3")->configure_entries(0, 0x10, &ROM[0x00000], 0x20000);
-	membank("bank4")->configure_entries(0, 0x10, &ROM[0x00000], 0x20000);
+	membank("okibank1")->configure_entries(0, 0x10, &ROM[0x00000], 0x20000);
+	membank("okibank2")->configure_entries(0, 0x10, &ROM[0x00000], 0x20000);
 
 	ROM = memregion("oki2")->base();
-	membank("bank5")->configure_entries(0, 0x10, &ROM[0x00000], 0x20000);
-	membank("bank6")->configure_entries(0, 0x10, &ROM[0x00000], 0x20000);
+	membank("oki2bank1")->configure_entries(0, 0x10, &ROM[0x00000], 0x20000);
+	membank("oki2bank2")->configure_entries(0, 0x10, &ROM[0x00000], 0x20000);
 
 	/* decrypt sprites */
 	buffer = auto_alloc_array(machine(), UINT8, len);

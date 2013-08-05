@@ -34,7 +34,6 @@ public:
 			m_spriteram(*this, "spriteram"),
 			m_spriteram_2(*this, "spriteram_2"),
 			m_paletteram(*this, "paletteram"),
-			m_mirror_ram(*this, "mirror_ram"),
 			m_maincpu(*this, "maincpu"),
 			m_audiocpu(*this, "audiocpu"),
 			m_nmk112(*this, "nmk112"),
@@ -104,13 +103,9 @@ public:
 	//UINT8        m_sound_flag1;
 	//UINT8        m_sound_flag2;
 
-	/* eeprom-related */
-	int          m_region_byte;
-
 	/* game specific */
 	// sailormn
 	int          m_sailormn_tilebank;
-	optional_shared_ptr<UINT8> m_mirror_ram;
 	// korokoro
 	UINT16       m_leds[2];
 	int          m_hopper;
@@ -144,14 +139,12 @@ public:
 	DECLARE_WRITE8_MEMBER(hotdogst_okibank_w);
 	DECLARE_WRITE8_MEMBER(mazinger_rombank_w);
 	DECLARE_WRITE8_MEMBER(metmqstr_rombank_w);
-	DECLARE_WRITE8_MEMBER(metmqstr_okibank0_w);
-	DECLARE_WRITE8_MEMBER(metmqstr_okibank1_w);
+	DECLARE_WRITE8_MEMBER(metmqstr_okibank_w);
+	DECLARE_WRITE8_MEMBER(metmqstr_oki2bank_w);
 	DECLARE_WRITE8_MEMBER(pwrinst2_rombank_w);
-	DECLARE_READ8_MEMBER(mirror_ram_r);
-	DECLARE_WRITE8_MEMBER(mirror_ram_w);
 	DECLARE_WRITE8_MEMBER(sailormn_rombank_w);
-	DECLARE_WRITE8_MEMBER(sailormn_okibank0_w);
-	DECLARE_WRITE8_MEMBER(sailormn_okibank1_w);
+	DECLARE_WRITE8_MEMBER(sailormn_okibank_w);
+	DECLARE_WRITE8_MEMBER(sailormn_oki2bank_w);
 	DECLARE_WRITE16_MEMBER(donpachi_videoregs_w);
 	DECLARE_WRITE16_MEMBER(cave_vram_0_w);
 	DECLARE_WRITE16_MEMBER(cave_vram_1_w);
