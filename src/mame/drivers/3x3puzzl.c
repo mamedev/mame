@@ -52,31 +52,32 @@ public:
 	required_shared_ptr<UINT16> m_videoram2;
 	required_shared_ptr<UINT16> m_videoram3;
 
+	UINT16 m_videoram1_buffer[0x800/2];
+	UINT16 m_videoram2_buffer[0x1000/2];
+	UINT16 m_videoram3_buffer[0x1000/2];
+
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
 
 	// screen updates
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	/* video-related */
 	tilemap_t   *m_tilemap1;
 	tilemap_t   *m_tilemap2;
 	tilemap_t   *m_tilemap3;
 
-	DECLARE_WRITE16_MEMBER(videoram1_w);
 	TILE_GET_INFO_MEMBER(get_tile1_info);
-	DECLARE_WRITE16_MEMBER(videoram2_w);
 	TILE_GET_INFO_MEMBER(get_tile2_info);
-	DECLARE_WRITE16_MEMBER(videoram3_w);
 	TILE_GET_INFO_MEMBER(get_tile3_info);
 
 	int       m_oki_bank;
+	UINT16	m_gfx_control;
 
 	DECLARE_WRITE16_HANDLER(gfx_ctrl_w);
 	DECLARE_WRITE16_HANDLER(tilemap1_scrollx_w);
 	DECLARE_WRITE16_HANDLER(tilemap1_scrolly_w);
-
 
 protected:
 	virtual void video_start();
@@ -84,31 +85,21 @@ protected:
 	virtual void machine_reset();
 };
 
-WRITE16_MEMBER(_3x3puzzle_state::videoram1_w)
-{
-	COMBINE_DATA(&m_videoram1[offset]);
-	m_tilemap1->mark_tile_dirty(offset);
-}
+
 
 TILE_GET_INFO_MEMBER(_3x3puzzle_state::get_tile1_info)
 {
-	UINT16 code = m_videoram1[tile_index];
+	UINT16 code = m_videoram1_buffer[tile_index];
 	SET_TILE_INFO_MEMBER(
 			0,
 			code,
 			0,
 			0);
-}
-
-WRITE16_MEMBER(_3x3puzzle_state::videoram2_w)
-{
-	COMBINE_DATA(&m_videoram2[offset]);
-	m_tilemap2->mark_tile_dirty(offset);
 }
 
 TILE_GET_INFO_MEMBER(_3x3puzzle_state::get_tile2_info)
 {
-	UINT16 code = m_videoram2[tile_index];
+	UINT16 code = m_videoram2_buffer[tile_index];
 	SET_TILE_INFO_MEMBER(
 			1,
 			code,
@@ -116,15 +107,9 @@ TILE_GET_INFO_MEMBER(_3x3puzzle_state::get_tile2_info)
 			0);
 }
 
-WRITE16_MEMBER(_3x3puzzle_state::videoram3_w)
-{
-	COMBINE_DATA(&m_videoram3[offset]);
-	m_tilemap3->mark_tile_dirty(offset);
-}
-
 TILE_GET_INFO_MEMBER(_3x3puzzle_state::get_tile3_info)
 {
-	UINT16 code = m_videoram3[tile_index];
+	UINT16 code = m_videoram3_buffer[tile_index];
 	SET_TILE_INFO_MEMBER(
 			2,
 			code,
@@ -144,6 +129,7 @@ WRITE16_MEMBER(_3x3puzzle_state::gfx_ctrl_w)
 	// bit 0 (0x01) set in Casanova intro (could be OKI bank instead of bit 2?)
 
 	//printf("%04x\n",data&0xc7);
+	COMBINE_DATA(&m_gfx_control);
 
 	if ( BIT(data,4) )
 	{
@@ -180,20 +166,41 @@ void _3x3puzzle_state::video_start()
 	m_tilemap3->set_transparent_pen(0);
 }
 
-UINT32 _3x3puzzle_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
+UINT32 _3x3puzzle_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
+
+
 	m_tilemap1->draw(screen, bitmap, cliprect, 0, 1);
 	m_tilemap2->draw(screen, bitmap, cliprect, 0, 2);
 	m_tilemap3->draw(screen, bitmap, cliprect, 0, 3);
+
+	// guess based on register use and Casanova intro
+	if (m_gfx_control&0x20)
+	{
+		for (int offset=0;offset<0x800/2;offset++)
+		{
+			m_videoram1_buffer[offset] = m_videoram1[offset];
+			m_tilemap1->mark_tile_dirty(offset);
+		}
+
+		for (int offset=0;offset<0x1000/2;offset++)
+		{
+			m_videoram2_buffer[offset] = m_videoram2[offset];
+			m_tilemap2->mark_tile_dirty(offset);
+			m_videoram3_buffer[offset] = m_videoram3[offset];
+			m_tilemap3->mark_tile_dirty(offset);
+		}
+	}
+
 	return 0;
 }
 
 static ADDRESS_MAP_START( _3x3puzzle_map, AS_PROGRAM, 16, _3x3puzzle_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
-	AM_RANGE(0x200000, 0x2007ff) AM_WRITE(videoram1_w) AM_SHARE("videoram1")
-	AM_RANGE(0x201000, 0x201fff) AM_WRITE(videoram2_w) AM_SHARE("videoram2")
-	AM_RANGE(0x202000, 0x202fff) AM_WRITE(videoram3_w) AM_SHARE("videoram3")
+	AM_RANGE(0x200000, 0x2007ff) AM_RAM AM_SHARE("videoram1")
+	AM_RANGE(0x201000, 0x201fff) AM_RAM AM_SHARE("videoram2")
+	AM_RANGE(0x202000, 0x202fff) AM_RAM AM_SHARE("videoram3")
 	AM_RANGE(0x280000, 0x280001) AM_READ_PORT("VBLANK")
 	AM_RANGE(0x300000, 0x3005ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x400000, 0x400001) AM_WRITE(tilemap1_scrollx_w)
