@@ -77,9 +77,10 @@ const rom_entry *nubus_824gc_device::device_rom_region() const
 jmfb_device::jmfb_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_video_interface(mconfig, *this),
-		device_nubus_card_interface(mconfig, *this)
+		device_nubus_card_interface(mconfig, *this),
+		m_assembled_tag(tag, ":", GC48_SCREEN_NAME)
 {
-	m_screen_tag = GC48_SCREEN_NAME;
+	m_screen_tag = m_assembled_tag;
 }
 
 nubus_48gc_device::nubus_48gc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
