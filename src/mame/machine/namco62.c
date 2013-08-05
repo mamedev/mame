@@ -12,25 +12,14 @@
 #include "emu.h"
 #include "namco62.h"
 #include "cpu/mb88xx/mb88xx.h"
-#include "devlegcy.h"
+
 
 #define VERBOSE 0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
-struct namco_62xx_state
-{
-	device_t* m_cpu;
-	devcb_resolved_read8 m_in[4];
-	devcb_resolved_write8 m_out[2];
-};
 
-INLINE namco_62xx_state *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == NAMCO_62XX);
 
-	return (namco_62xx_state *)downcast<namco_62xx_device *>(device)->token();
-}
+
 
 
 /***************************************************************************
@@ -57,40 +46,11 @@ ROM_START( namco_62xx )
 ROM_END
 
 
-/*-------------------------------------------------
-    device start callback
--------------------------------------------------*/
-
-static DEVICE_START( namco_62xx )
-{
-	const namco_62xx_interface *config = (const namco_62xx_interface *)device->static_config();
-	namco_62xx_state *state = get_safe_token(device);
-	astring tempstring;
-
-	assert(config != NULL);
-
-	/* find our CPU */
-	state->m_cpu = device->subdevice("mcu");
-	assert(state->m_cpu != NULL);
-
-	/* resolve our read callbacks */
-	state->m_in[0].resolve(config->in[0], *device);
-	state->m_in[1].resolve(config->in[1], *device);
-	state->m_in[2].resolve(config->in[2], *device);
-	state->m_in[3].resolve(config->in[3], *device);
-
-	/* resolve our write callbacks */
-	state->m_out[0].resolve(config->out[0], *device);
-	state->m_out[1].resolve(config->out[1], *device);
-}
-
-
 const device_type NAMCO_62XX = &device_creator<namco_62xx_device>;
 
 namco_62xx_device::namco_62xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, NAMCO_62XX, "Namco 62xx", tag, owner, clock, "namco62", __FILE__)
 {
-	m_token = global_alloc_clear(namco_62xx_state);
 }
 
 //-------------------------------------------------
@@ -99,7 +59,21 @@ namco_62xx_device::namco_62xx_device(const machine_config &mconfig, const char *
 
 void namco_62xx_device::device_start()
 {
-	DEVICE_START_NAME( namco_62xx )(this);
+	astring tempstring;
+
+	/* find our CPU */
+	m_cpu = subdevice("mcu");
+	assert(m_cpu != NULL);
+
+	/* resolve our read callbacks */
+	m_in_func[0].resolve(m_in[0], *this);
+	m_in_func[1].resolve(m_in[1], *this);
+	m_in_func[2].resolve(m_in[2], *this);
+	m_in_func[3].resolve(m_in[3], *this);
+
+	/* resolve our write callbacks */
+	m_out_func[0].resolve(m_out[0], *this);
+	m_out_func[1].resolve(m_out[1], *this);
 }
 
 //-------------------------------------------------
