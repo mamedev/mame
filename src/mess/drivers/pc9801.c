@@ -314,6 +314,32 @@
     PC-9821 Lt/Ld (1995) - aka 98NOTE Light, laptops, 486 based
     PC-9821 La/Ls (1995->1997) - aka 98NOTE Aile, laptops, Pentium based
 
+====
+
+Documentation notes (for unemulated stuff, provided by ):
+
+IDE:
+(r/w)
+0x430: IDE drive switch
+0x432: IDE drive switch
+0x435: <unknown>
+
+													(ISA correlated i/o)
+----------------------------------------------------------
+0x0640      |WORD|R/W|Data Register                |01F0h
+0x0642      |BYTE| R |Error Register               |01F1h
+0x0642      |BYTE| W |Write Precomp Register       |01F1h
+0x0644      |BYTE|R/W|Sector Count                 |01F2h
+0x0646      |BYTE|R/W|Sector Number                |01F3h
+0x0648      |BYTE|R/W|Cylinder Low                 |01F4h
+0x064A      |BYTE|R/W|Cylinder High                |01F5h
+0x064C      |BYTE|R/W|SDH Register                 |01F6h
+0x064E      |BYTE| R |Status Register              |01F7h
+0x064E      |BYTE| W |Command Register             |01F7h
+0x074C      |BYTE| R |Alternate Status Register    |03F6h
+0x074C      |BYTE| W |Digital Output Register      |03F6h
+0x074E      |BYTE| R |Digital Input Register       |03F7h
+
 ****************************************************************************************************/
 
 #include "emu.h"
