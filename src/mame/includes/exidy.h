@@ -4,6 +4,9 @@
 
 *************************************************************************/
 
+#include "sound/dac.h"
+#include "sound/samples.h"
+
 #define EXIDY_MASTER_CLOCK              (XTAL_11_289MHz)
 #define EXIDY_CPU_CLOCK                 (EXIDY_MASTER_CLOCK / 16)
 #define EXIDY_PIXEL_CLOCK               (EXIDY_MASTER_CLOCK / 2)
@@ -38,9 +41,11 @@ public:
 		m_sprite_enable(*this, "sprite_enable"),
 		m_color_latch(*this, "color_latch"),
 		m_characterram(*this, "characterram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_dac(*this, "dac"),
+		m_samples(*this, "samples") { }
 
-	UINT8 m_last_dial;
+	
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_sprite1_xpos;
 	required_shared_ptr<UINT8> m_sprite1_ypos;
@@ -50,6 +55,12 @@ public:
 	required_shared_ptr<UINT8> m_sprite_enable;
 	required_shared_ptr<UINT8> m_color_latch;
 	required_shared_ptr<UINT8> m_characterram;
+	
+	required_device<cpu_device> m_maincpu;
+	optional_device<dac_device> m_dac;
+	optional_device<samples_device> m_samples;
+		
+	UINT8 m_last_dial;
 	UINT8 m_collision_mask;
 	UINT8 m_collision_invert;
 	int m_is_2bpp;
@@ -83,12 +94,24 @@ public:
 	inline int sprite_1_enabled();
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void check_collision();
-	required_device<cpu_device> m_maincpu;
+	
+	/* Targ and Spectar samples */
+	int m_max_freq;
+	UINT8 m_port_1_last;
+	UINT8 m_port_2_last;
+	UINT8 m_tone_freq;
+	UINT8 m_tone_active;
+	UINT8 m_tone_pointer;
+	DECLARE_WRITE8_MEMBER(targ_audio_1_w);
+	DECLARE_WRITE8_MEMBER(targ_audio_2_w);
+	DECLARE_WRITE8_MEMBER(spectar_audio_2_w);
+	void adjust_sample(UINT8 freq);
+	void common_audio_start(int freq);
+	
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
-/*----------- defined in video/exidy.c -----------*/
-
-void exidy_video_config(running_machine &machine, UINT8 _collision_mask, UINT8 _collision_invert, int _is_2bpp);
+MACHINE_CONFIG_EXTERN( spectar_audio );
+MACHINE_CONFIG_EXTERN( targ_audio );

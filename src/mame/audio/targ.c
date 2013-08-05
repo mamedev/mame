@@ -12,25 +12,12 @@
 */
 
 #include "emu.h"
-#include "sound/samples.h"
-#include "sound/dac.h"
-#include "includes/targ.h"
+#include "includes/exidy.h"
 
 
 
 #define SPECTAR_MAXFREQ     525000
 #define TARG_MAXFREQ        125000
-
-
-static int max_freq;
-
-static UINT8 port_1_last;
-static UINT8 port_2_last;
-
-static UINT8 tone_freq;
-static UINT8 tone_active;
-static UINT8 tone_pointer;
-
 
 static const INT16 sine_wave[32] =
 {
@@ -40,96 +27,91 @@ static const INT16 sine_wave[32] =
 
 
 /* some macros to make detecting bit changes easier */
-#define RISING_EDGE(bit)  ( (data & bit) && !(port_1_last & bit))
-#define FALLING_EDGE(bit) (!(data & bit) &&  (port_1_last & bit))
+#define RISING_EDGE(bit)  ( (data & bit) && !(m_port_1_last & bit))
+#define FALLING_EDGE(bit) (!(data & bit) &&  (m_port_1_last & bit))
 
 
-
-static void adjust_sample(samples_device *samples, UINT8 freq)
+void exidy_state::adjust_sample(UINT8 freq)
 {
-	tone_freq = freq;
+	m_tone_freq = freq;
 
-	if ((tone_freq == 0xff) || (tone_freq == 0x00))
-		samples->set_volume(3, 0);
+	if ((m_tone_freq == 0xff) || (m_tone_freq == 0x00))
+		m_samples->set_volume(3, 0);
 	else
 	{
-		samples->set_frequency(3, 1.0 * max_freq / (0xff - tone_freq));
-		samples->set_volume(3, tone_active);
+		m_samples->set_frequency(3, 1.0 * m_max_freq / (0xff - m_tone_freq));
+		m_samples->set_volume(3, m_tone_active);
 	}
 }
 
 
-WRITE8_HANDLER( targ_audio_1_w )
+WRITE8_MEMBER( exidy_state::targ_audio_1_w )
 {
-	samples_device *samples = space.machine().device<samples_device>("samples");
-
 	/* CPU music */
-	if ((data & 0x01) != (port_1_last & 0x01))
-		space.machine().device<dac_device>("dac")->write_unsigned8((data & 0x01) * 0xff);
+	if ((data & 0x01) != (m_port_1_last & 0x01))
+		m_dac->write_unsigned8((data & 0x01) * 0xff);
 
 	/* shot */
-	if (FALLING_EDGE(0x02) && !samples->playing(0))  samples->start(0,1);
-	if (RISING_EDGE(0x02)) samples->stop(0);
+	if (FALLING_EDGE(0x02) && !m_samples->playing(0))  m_samples->start(0,1);
+	if (RISING_EDGE(0x02)) m_samples->stop(0);
 
 	/* crash */
 	if (RISING_EDGE(0x20))
 	{
 		if (data & 0x40)
-			samples->start(1,2);
+			m_samples->start(1,2);
 		else
-			samples->start(1,0);
+			m_samples->start(1,0);
 	}
 
 	/* Sspec */
 	if (data & 0x10)
-		samples->stop(2);
+		m_samples->stop(2);
 	else
 	{
-		if ((data & 0x08) != (port_1_last & 0x08))
+		if ((data & 0x08) != (m_port_1_last & 0x08))
 		{
 			if (data & 0x08)
-				samples->start(2,3,true);
+				m_samples->start(2,3,true);
 			else
-				samples->start(2,4,true);
+				m_samples->start(2,4,true);
 		}
 	}
 
 	/* Game (tone generator enable) */
 	if (FALLING_EDGE(0x80))
 	{
-		tone_pointer = 0;
-		tone_active = 0;
+		m_tone_pointer = 0;
+		m_tone_active = 0;
 
-		adjust_sample(samples, tone_freq);
+		adjust_sample(m_tone_freq);
 	}
 
 	if (RISING_EDGE(0x80))
-		tone_active=1;
+		m_tone_active=1;
 
-	port_1_last = data;
+	m_port_1_last = data;
 }
 
 
-WRITE8_HANDLER( targ_audio_2_w )
+WRITE8_MEMBER( exidy_state::targ_audio_2_w )
 {
-	if ((data & 0x01) && !(port_2_last & 0x01))
+	if ((data & 0x01) && !(m_port_2_last & 0x01))
 	{
-		samples_device *samples = space.machine().device<samples_device>("samples");
-		UINT8 *prom = space.machine().root_device().memregion("targ")->base();
+		UINT8 *prom = memregion("targ")->base();
 
-		tone_pointer = (tone_pointer + 1) & 0x0f;
+		m_tone_pointer = (m_tone_pointer + 1) & 0x0f;
 
-		adjust_sample(samples, prom[((data & 0x02) << 3) | tone_pointer]);
+		adjust_sample(prom[((data & 0x02) << 3) | m_tone_pointer]);
 	}
 
-	port_2_last = data;
+	m_port_2_last = data;
 }
 
 
-WRITE8_HANDLER( spectar_audio_2_w )
+WRITE8_MEMBER( exidy_state::spectar_audio_2_w )
 {
-	samples_device *samples = space.machine().device<samples_device>("samples");
-	adjust_sample(samples, data);
+	adjust_sample(data);
 }
 
 
@@ -145,38 +127,42 @@ static const char *const sample_names[] =
 };
 
 
-static void common_audio_start(running_machine &machine, int freq)
+void exidy_state::common_audio_start(int freq)
 {
-	samples_device *samples = machine.device<samples_device>("samples");
-	max_freq = freq;
+	m_max_freq = freq;
 
-	tone_freq = 0;
-	tone_active = 0;
+	m_tone_freq = 0;
+	m_tone_active = 0;
 
-	samples->set_volume(3, 0);
-	samples->start_raw(3, sine_wave, 32, 1000, true);
+	m_samples->set_volume(3, 0);
+	m_samples->start_raw(3, sine_wave, 32, 1000, true);
 
-	machine.save().save_item(NAME(port_1_last));
-	machine.save().save_item(NAME(port_2_last));
-	machine.save().save_item(NAME(tone_freq));
-	machine.save().save_item(NAME(tone_active));
+	save_item(NAME(m_port_1_last));
+	save_item(NAME(m_port_2_last));
+	save_item(NAME(m_tone_freq));
+	save_item(NAME(m_tone_active));
 }
 
 
 static SAMPLES_START( spectar_audio_start )
 {
-	common_audio_start(device.machine(), SPECTAR_MAXFREQ);
+	running_machine &machine = device.machine();
+	exidy_state *state = machine.driver_data<exidy_state>();
+	
+	state->common_audio_start(SPECTAR_MAXFREQ);
 }
 
 
 static SAMPLES_START( targ_audio_start )
 {
 	running_machine &machine = device.machine();
-	common_audio_start(machine, TARG_MAXFREQ);
+	exidy_state *state = machine.driver_data<exidy_state>();
+	
+	state->common_audio_start(TARG_MAXFREQ);
 
-	tone_pointer = 0;
+	state->m_tone_pointer = 0;
 
-	machine.save().save_item(NAME(tone_pointer));
+	state->save_item(NAME(state->m_tone_pointer));
 }
 
 
