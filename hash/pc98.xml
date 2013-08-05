@@ -1898,6 +1898,28 @@ TODO:
 		</part>
 	</software>
 
+	<software name="area88ia" cloneof="area88i">
+		<description>Area 88 - Ikkakujuu no Kiseki (Alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="area 88 - ikkakujou no kiseki 1.fdi" size="1265664" crc="368ef929" sha1="7ea3dc63e2fdfe291d3721ec945c837248bcfe7f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="area 88 - ikkakujou no kiseki 2.fdi" size="1265664" crc="d2229d87" sha1="c050e006be5ce5d6d0da98fdb4258d71951cfeae" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="0x135000">
+				<rom name="disk 3 alt.fdi" size="0x135000" crc="045761f1" sha1="bcd407aa3405049369cd68b3870ae70218888b7d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+
 <!-- 2dd image -->
 	<software name="arkanoid" supported="yes">
 		<description>Arkanoid</description>
@@ -13172,7 +13194,7 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="sucharaka junior high-school\sucharaka junior high-school (19xx)(bmp)(jp).fdi" size="1265664" crc="31547f20" sha1="783638e2f0c884a68c7b7f3ecdc3bcdce7cac53b" offset="0" />
+				<rom name="sucharaka junior high-school (19xx)(bmp)(jp).fdi" size="1265664" crc="31547f20" sha1="783638e2f0c884a68c7b7f3ecdc3bcdce7cac53b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -13332,7 +13354,7 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="original\super tetris 2 + bombliss (1994)(bps).fdi" size="1265664" crc="f087e8a4" sha1="3354a5702e7ba64508a69d2bf749791560922221" offset="0" />
+				<rom name="super tetris 2 + bombliss (1994)(bps).fdi" size="1265664" crc="f087e8a4" sha1="3354a5702e7ba64508a69d2bf749791560922221" offset="0" />
 			</dataarea>
 		</part>
 	</software>
