@@ -370,6 +370,8 @@ struct autoconfig_device
 	offs_t                  base;
 };
 
+class amiga_sound_device;
+
 class amiga_state : public driver_device
 {
 public:
@@ -386,6 +388,7 @@ public:
 			m_maincpu(*this, "maincpu"), /* accelerator cards may present an interesting challenge because the maincpu will be the one on the card instead */
 			m_cia_0(*this, "cia_0"),
 			m_cia_1(*this, "cia_1"),
+			m_sound(*this, "amiga"),
 			m_fdc(*this, "fdc"),
 			m_chip_ram(*this, "chip_ram", 0),
 			m_custom_regs(*this, "custom_regs", 0),
@@ -403,6 +406,7 @@ public:
 	required_device<m68000_base_device> m_maincpu;
 	required_device<legacy_mos6526_device> m_cia_0;
 	required_device<legacy_mos6526_device> m_cia_1;
+	required_device<amiga_sound_device> m_sound;
 	optional_device<amiga_fdc> m_fdc;
 	required_shared_ptr<UINT16> m_chip_ram;
 	UINT16 (*m_chip_ram_r)(amiga_state *state, offs_t offset);
@@ -425,7 +429,6 @@ public:
 	autoconfig_device *m_cur_autoconfig;
 	emu_timer * m_irq_timer;
 	emu_timer * m_blitter_timer;
-	device_t *m_sound_device;
 
 	/* sprite states */
 	UINT8 m_sprite_comparitor_enable_mask;
@@ -528,15 +531,28 @@ const amiga_machine_interface *amiga_get_interface(running_machine &machine);
 
 /*----------- defined in audio/amiga.c -----------*/
 
+struct audio_channel
+{
+	emu_timer * irq_timer;
+	UINT32          curlocation;
+	UINT16          curlength;
+	UINT16          curticks;
+	UINT8           index;
+	UINT8           dmaenabled;
+	UINT8           manualmode;
+	INT8            latched;
+};
+
 class amiga_sound_device : public device_t,
 									public device_sound_interface
 {
 public:
 	amiga_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~amiga_sound_device() { global_free(m_token); }
+	~amiga_sound_device() {}
 
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
+	void update();
+	void data_w(int which, UINT16 data);
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -546,15 +562,13 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 private:
 	// internal state
-	void *m_token;
+	audio_channel   m_channel[4];
+	sound_stream *  m_stream;
+	
+	TIMER_CALLBACK_MEMBER( signal_irq );
 };
 
 extern const device_type AMIGA;
-
-
-void amiga_audio_update(device_t *device);
-void amiga_audio_data_w(device_t *device, int which, UINT16 data);
-
 
 /*----------- defined in video/amiga.c -----------*/
 

@@ -253,7 +253,6 @@ void amiga_machine_config(running_machine &machine, const amiga_machine_interfac
 	state->m_irq_timer = state->timer_alloc(amiga_state::TIMER_AMIGA_IRQ);
 	state->m_blitter_timer = state->timer_alloc(amiga_state::TIMER_AMIGA_BLITTER);
 
-	state->m_sound_device = machine.device("amiga");
 }
 
 
@@ -367,7 +366,7 @@ TIMER_CALLBACK_MEMBER(amiga_state::scanline_callback)
 	}
 
 	/* force a sound update */
-	amiga_audio_update(m_sound_device);
+	m_sound->update();
 
 	/* set timer for next line */
 	scanline = (scanline + 1) % m_screen->height();
@@ -1427,7 +1426,7 @@ WRITE16_MEMBER( amiga_state::amiga_custom_w )
 			break;
 
 		case REG_DMACON:
-			amiga_audio_update(state->m_sound_device);
+			m_sound->update();
 
 			/* bits BBUSY (14) and BZERO (13) are read-only */
 			data &= 0x9fff;
@@ -1470,7 +1469,7 @@ WRITE16_MEMBER( amiga_state::amiga_custom_w )
 			break;
 
 		case REG_ADKCON:
-			amiga_audio_update(state->m_sound_device);
+			m_sound->update();
 			data = (data & 0x8000) ? (CUSTOM_REG(offset) | (data & 0x7fff)) : (CUSTOM_REG(offset) & ~(data & 0x7fff));
 			state->m_fdc->adkcon_set(data);
 			break;
@@ -1479,11 +1478,11 @@ WRITE16_MEMBER( amiga_state::amiga_custom_w )
 		case REG_AUD1LCL:   case REG_AUD1LCH:   case REG_AUD1LEN:   case REG_AUD1PER:   case REG_AUD1VOL:
 		case REG_AUD2LCL:   case REG_AUD2LCH:   case REG_AUD2LEN:   case REG_AUD2PER:   case REG_AUD2VOL:
 		case REG_AUD3LCL:   case REG_AUD3LCH:   case REG_AUD3LEN:   case REG_AUD3PER:   case REG_AUD3VOL:
-			amiga_audio_update(state->m_sound_device);
+			m_sound->update();
 			break;
 
 		case REG_AUD0DAT:   case REG_AUD1DAT:   case REG_AUD2DAT:   case REG_AUD3DAT:
-			amiga_audio_data_w(state->m_sound_device, (offset - REG_AUD0DAT) / 8, data);
+			m_sound->data_w((offset - REG_AUD0DAT) / 8, data);
 			break;
 
 		case REG_BPL1PTH:   case REG_BPL2PTH:   case REG_BPL3PTH:   case REG_BPL4PTH:
