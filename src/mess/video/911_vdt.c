@@ -131,20 +131,20 @@ static TIMER_CALLBACK(beep_callback);
 /*
     Initialize vdt911 palette
 */
-PALETTE_INIT( vdt911 )
+void vdt911_device::palette_init()
 {
 	UINT8 i, r, g, b;
 
-	machine.colortable = colortable_alloc(machine, 3);
+	machine().colortable = colortable_alloc(machine(), 3);
 
 	for ( i = 0; i < 3; i++ )
 	{
 		r = vdt911_colors[i*3]; g = vdt911_colors[i*3+1]; b = vdt911_colors[i*3+2];
-		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	for(i=0;i<8;i++)
-		colortable_entry_set_value(machine.colortable, i, vdt911_palette[i]);
+		colortable_entry_set_value(machine().colortable, i, vdt911_palette[i]);
 }
 
 /*

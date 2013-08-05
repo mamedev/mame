@@ -40,8 +40,6 @@ struct vdt911_init_params_t
 	void (*int_callback)(running_machine &machine, int state);
 };
 
-PALETTE_INIT( vdt911 );
-
 void vdt911_init(running_machine &machine);
 class vdt911_device : public device_t
 {
@@ -55,6 +53,7 @@ protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
+	virtual void palette_init();
 private:
 	// internal state
 	void *m_token;

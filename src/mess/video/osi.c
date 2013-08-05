@@ -1,23 +1,22 @@
 #include "includes/osi.h"
-#include "drivlgcy.h"
 
 /* Palette Initialization */
 
-static PALETTE_INIT( osi630 )
+PALETTE_INIT_MEMBER(sb2m600_state, osi630)
 {
 	/* black and white */
-	palette_set_color_rgb(machine, 0, 0x00, 0x00, 0x00); // black
-	palette_set_color_rgb(machine, 1, 0xff, 0xff, 0xff); // white
+	palette_set_color_rgb(machine(), 0, 0x00, 0x00, 0x00); // black
+	palette_set_color_rgb(machine(), 1, 0xff, 0xff, 0xff); // white
 
 	/* color enabled */
-	palette_set_color_rgb(machine, 2, 0xff, 0xff, 0x00); // yellow
-	palette_set_color_rgb(machine, 3, 0xff, 0x00, 0x00); // red
-	palette_set_color_rgb(machine, 4, 0x00, 0xff, 0x00); // green
-	palette_set_color_rgb(machine, 5, 0x00, 0x80, 0x00); // olive green
-	palette_set_color_rgb(machine, 6, 0x00, 0x00, 0xff); // blue
-	palette_set_color_rgb(machine, 7, 0xff, 0x00, 0xff); // purple
-	palette_set_color_rgb(machine, 8, 0x00, 0x00, 0x80); // sky blue
-	palette_set_color_rgb(machine, 9, 0x00, 0x00, 0x00); // black
+	palette_set_color_rgb(machine(), 2, 0xff, 0xff, 0x00); // yellow
+	palette_set_color_rgb(machine(), 3, 0xff, 0x00, 0x00); // red
+	palette_set_color_rgb(machine(), 4, 0x00, 0xff, 0x00); // green
+	palette_set_color_rgb(machine(), 5, 0x00, 0x80, 0x00); // olive green
+	palette_set_color_rgb(machine(), 6, 0x00, 0x00, 0xff); // blue
+	palette_set_color_rgb(machine(), 7, 0xff, 0x00, 0xff); // purple
+	palette_set_color_rgb(machine(), 8, 0x00, 0x00, 0x80); // sky blue
+	palette_set_color_rgb(machine(), 9, 0x00, 0x00, 0x00); // black
 }
 
 /* Video Start */
@@ -174,5 +173,5 @@ MACHINE_CONFIG_FRAGMENT( osi630_video )
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 16*16-1)
 
 	MCFG_PALETTE_LENGTH(8+2)
-	MCFG_PALETTE_INIT(osi630)
+	MCFG_PALETTE_INIT_OVERRIDE(sb2m600_state, osi630)
 MACHINE_CONFIG_END

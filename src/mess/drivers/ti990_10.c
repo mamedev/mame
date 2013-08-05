@@ -75,7 +75,6 @@ TODO :
 #include "machine/990_hd.h"
 #include "machine/990_tap.h"
 #include "video/911_vdt.h"
-#include "drivlgcy.h"
 
 
 class ti990_10_state : public driver_device
@@ -234,7 +233,6 @@ static MACHINE_CONFIG_START( ti990_10, ti990_10_state )
 	MCFG_GFXDECODE(vdt911)
 	MCFG_PALETTE_LENGTH(8)
 
-	MCFG_PALETTE_INIT(vdt911)
 	MCFG_VDT911_VIDEO_ADD("vdt911", vdt911_intf)
 
 	/* 911 VDT has a beep tone generator */

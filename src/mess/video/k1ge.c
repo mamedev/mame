@@ -11,7 +11,7 @@ used in the Neogeo pocket color.
 #include "k1ge.h"
 
 
-PALETTE_INIT( k1ge )
+void k1ge_device::palette_init()
 {
 	int i;
 
@@ -19,12 +19,12 @@ PALETTE_INIT( k1ge )
 	{
 		int j = ( i << 5 ) | ( i << 2 ) | ( i >> 1 );
 
-		palette_set_color_rgb( machine, 7-i, j, j, j );
+		palette_set_color_rgb( machine(), 7-i, j, j, j );
 	}
 }
 
 
-PALETTE_INIT( k2ge )
+void k2ge_device::palette_init()
 {
 	int r,g,b;
 
@@ -34,7 +34,7 @@ PALETTE_INIT( k2ge )
 		{
 			for ( r = 0; r < 16; r++ )
 			{
-				palette_set_color_rgb( machine, ( b << 8 ) | ( g << 4 ) | r, ( r << 4 ) | r, ( g << 4 ) | g, ( b << 4 ) | b );
+				palette_set_color_rgb( machine(), ( b << 8 ) | ( g << 4 ) | r, ( r << 4 ) | r, ( g << 4 ) | g, ( b << 4 ) | b );
 			}
 		}
 	}

@@ -16,8 +16,6 @@ struct asr733_init_params_t
 
 GFXDECODE_EXTERN( asr733 );
 
-PALETTE_INIT( asr733 );
-
 void asr733_init(running_machine &machine);
 class asr733_device : public device_t
 {
@@ -32,6 +30,7 @@ protected:
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
+	virtual void palette_init();
 private:
 	// internal state
 	void *m_token;
