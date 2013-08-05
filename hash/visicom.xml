@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+Toshiba Visicom games list
+
+ID      Title                                           Dumped
+_________________________________________________________________
+
+CAS-110 Arithmetic Drill (Math Fun & Fun with Numbers)  no
+CAS-130 Sports Fan (Baseball & Sumo Wrestling)          yes
+CAS-140 Gambler I (Blackjack)                           no
+CAS-141 Gambler II (Slot Machine and Dice)              no
+CAS-160 Space Command (Space War)                       no
+CAS-190 Inspiration (Bagua and Biorhythm)               no
+-->
+<softwarelist name="visicom" description="Toshiba Visicom cartridges">
+
+	<software name="sportfan">
+		<description>Sports Fan</description>
+		<year>1978</year>
+		<publisher>Toshiba</publisher>
+		<info name="serial" value="CAS-130" />
+
+		<part name="cart" interface="visicom_cart">
+			<dataarea name="rom" size="0x800">
+				<rom name="cas130.rom" size="0x800" crc="be86b65c" sha1="fdbcdf6b69de0ced2dea7695a777ec255b5df109" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

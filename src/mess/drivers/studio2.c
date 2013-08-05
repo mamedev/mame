@@ -76,7 +76,7 @@ Notes: (all chips shown above)
       2111    - NEC D2111AL-4 256 bytes x4 SRAM (DIP18, x6). Total 1.5k
       C       - Composite Video Output to TV from TV Modulator
       TMM331  - Toshiba TMM331AP 2k x8 MASKROM (DIP24)
-                Pinout (preliminary):
+                Pinout:
                            TMM331
                         |----\/----|
                      A7 |1       24| VCC
@@ -97,6 +97,36 @@ Notes: (all chips shown above)
       TMM331 is compatible with AMI S6831A, AMD AM9217,
       Intel 2316A/8316A, MOSTEK MK31000, GI RO-3-8316,
       NATIONAL/NEC/SYNERTEK 2316A etc
+
+
+Cartridges
+----------
+
+Inside is a Toshiba TMM331AP ROM, which is pin compatible with the Signetics S6831.
+The cartridge to TMM331 pin connections are as follows, with cartridge pin 1 being the leftmost angled contact:
+
+Pin 1 to ROM pins 12,13 (GND and E2)
+Pin 2 to ROM pins 24,15 (VCC and E0)
+Pin 3 to ROM pin 23 (D0)
+Pin 4 to ROM pin 22 (D1)
+Pin 5 to ROM pin 21 (D2)
+Pin 6 to ROM pin 20 (D3)
+Pin 7 to ROM pin 19 (D4)
+Pin 8 to ROM pin 18 (D5)
+Pin 9 to ROM pin 17 (D6)
+Pin 10 to ROM pin 16 (D7)
+Pin 11 to ROM pin 14 (E1)
+Pin 12 to ROM pin 11 (A6)
+Pin 13 to ROM pin 10 (A5)
+Pin 14 to ROM pin 9 (A4)
+Pin 15 to ROM pin 8 (A3)
+Pin 16 to ROM pin 7 (A2)
+Pin 17 to ROM pin 6 (A1)
+Pin 18 to ROM pin 5 (A0)
+Pin 19 to ROM pin 1 (A7)
+Pin 20 to ROM pin 4 (A10)
+Pin 21 to ROM pin 3 (A9)
+Pin 22 to ROM pin 2 (A8)
 
 */
 
@@ -147,8 +177,6 @@ Notes:
 
     TODO:
 
-    - grandpak dual ROM
-    - disable ic13/14 when cartridge plugged in
     - mpt02 clones' colors
     - visicom colors
     - NE555 discrete sound
@@ -161,7 +189,7 @@ Notes:
     PARAMETERS
 ***************************************************************************/
 
-#define LOG 1
+#define LOG 0
 
 #define ST2_BLOCK_SIZE 256
 
@@ -269,7 +297,7 @@ static ADDRESS_MAP_START( studio2_io_map, AS_IO, 8, studio2_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( visicom_map, AS_PROGRAM, 8, visicom_state )
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
+	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1000, 0x10ff) AM_RAM
 	AM_RANGE(0x1100, 0x11ff) AM_RAM AM_SHARE("color_ram")
 	AM_RANGE(0x1300, 0x13ff) AM_RAM AM_SHARE("color_ram1")
@@ -442,29 +470,64 @@ void mpt02_state::machine_reset()
 DEVICE_IMAGE_LOAD_MEMBER( studio2_state, studio2_cart_load )
 {
 	if (image.software_entry() == NULL)
-		return DEVICE_IMAGE_LOAD_MEMBER_NAME(st2_cartslot_load)(image);
+	{
+		if (!strcmp(image.filetype(), "st2"))
+		{
+			return DEVICE_IMAGE_LOAD_MEMBER_NAME(st2_cartslot_load)(image);
+		}
+		else
+		{
+			UINT8 *ptr = memregion(CDP1802_TAG)->base() + 0x400;
+			size_t size = image.length();
+			image.fread(ptr, size);
+		}
+	}
 	else
 	{
-		// WARNING: list code currently assume that cart mapping starts at 0x400.
-		// the five dumps currently available work like this, but the .st2 format
-		// allows for more freedom... how was the content of a real cart mapped?
-		UINT8 *ptr = ((UINT8 *) memregion(CDP1802_TAG)->base()) + 0x400;
-		memcpy(ptr, image.get_software_region("rom"), image.get_software_region_length("rom"));
-		return IMAGE_INIT_PASS;
+		UINT8 *ptr = memregion(CDP1802_TAG)->base();
+
+		size_t size = image.get_software_region_length("rom_400");
+		if (size) memcpy(ptr + 0x400, image.get_software_region("rom_400"), size);
+
+		size = image.get_software_region_length("rom_800");
+		if (size) memcpy(ptr + 0x800, image.get_software_region("rom_800"), size);
+
+		size = image.get_software_region_length("rom_c00");
+		if (size) memcpy(ptr + 0xc00, image.get_software_region("rom_c00"), size);
 	}
+
+	return IMAGE_INIT_PASS;
+}
+
+DEVICE_IMAGE_LOAD_MEMBER( visicom_state, visicom_cart_load )
+{
+	UINT8 *ptr = memregion(CDP1802_TAG)->base() + 0x800;
+
+	if (image.software_entry() == NULL)
+	{
+		size_t size = image.length();
+		image.fread(ptr, MAX(size, 0x800));
+	}
+	else
+	{
+		size_t size = image.get_software_region_length("rom");
+		if (size) memcpy(ptr, image.get_software_region("rom_800"), MAX(size, 0x800));
+	}
+
+	return IMAGE_INIT_PASS;
 }
 
 /* Machine Drivers */
 
 static MACHINE_CONFIG_FRAGMENT( studio2_cartslot )
 	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("st2,bin")
+	MCFG_CARTSLOT_EXTENSION_LIST("st2,bin,rom")
 	MCFG_CARTSLOT_NOT_MANDATORY
 	MCFG_CARTSLOT_LOAD(studio2_state,studio2_cart_load)
 	MCFG_CARTSLOT_INTERFACE("studio2_cart")
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","studio2")
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "studio2")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( studio2, studio2_state )
@@ -502,7 +565,14 @@ static MACHINE_CONFIG_START( visicom, visicom_state )
 	MCFG_SOUND_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_FRAGMENT_ADD( studio2_cartslot )
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_EXTENSION_LIST("bin,rom")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_LOAD(visicom_state, visicom_cart_load)
+	MCFG_CARTSLOT_INTERFACE("visicom_cart")
+
+	/* software lists */
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "visicom")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( mpt02, mpt02_state )
@@ -532,26 +602,30 @@ MACHINE_CONFIG_END
 /* ROMs */
 
 ROM_START( studio2 )
-	ROM_REGION( 0x10000, CDP1802_TAG, 0 )
-	ROM_LOAD( "84932.ic11", 0x0000, 0x0200, CRC(283b7e65) SHA1(4b6d21cde59712ecb5941ff63d8eb161420b0aac) )
-	ROM_LOAD( "84933.ic12", 0x0200, 0x0200, CRC(a396b77c) SHA1(023517f67af61790e6916b6c4dbe2d9dc07ae3ff) )
-	ROM_LOAD( "85456.ic13", 0x0400, 0x0200, CRC(d25cf97f) SHA1(d489f41f1125c76cc8ed9defa82a877ae014ef21) )
-	ROM_LOAD( "85457.ic14", 0x0600, 0x0200, CRC(74aa724f) SHA1(085832f29e0d2a387c75463d66c54fb6c1e9e72c) )
+	ROM_REGION( 0x1000, CDP1802_TAG, 0 )
+	ROM_LOAD( "84932.ic11", 0x000, 0x200, CRC(283b7e65) SHA1(4b6d21cde59712ecb5941ff63d8eb161420b0aac) )
+	ROM_LOAD( "84933.ic12", 0x200, 0x200, CRC(a396b77c) SHA1(023517f67af61790e6916b6c4dbe2d9dc07ae3ff) )
+	ROM_LOAD( "85456.ic13", 0x400, 0x200, CRC(d25cf97f) SHA1(d489f41f1125c76cc8ed9defa82a877ae014ef21) )
+	ROM_LOAD( "85457.ic14", 0x600, 0x200, CRC(74aa724f) SHA1(085832f29e0d2a387c75463d66c54fb6c1e9e72c) )
 ROM_END
 
 ROM_START( visicom )
-	ROM_REGION( 0x10000, CDP1802_TAG, 0 )
-	ROM_LOAD( "visicom.q003", 0x0000, 0x0800, CRC(23d22074) SHA1(a0a8be23f70621a2bd8010b1134e8a0019075bf1) )
+	ROM_REGION( 0x1000, CDP1802_TAG, 0 )
+	ROM_LOAD( "visicom.q003", 0x000, 0x800, CRC(23d22074) SHA1(a0a8be23f70621a2bd8010b1134e8a0019075bf1) )
 ROM_END
 
 ROM_START( mpt02 )
-	ROM_REGION( 0x10000, CDP1802_TAG, 0 )
-	ROM_LOAD( "86676.ic13",  0x0000, 0x0400, CRC(a7d0dd3b) SHA1(e1881ab4d67a5d735dd2c8d7e924e41df6f2aeec) )
-	ROM_LOAD( "86677b.ic14", 0x0400, 0x0400, CRC(82a2d29e) SHA1(37e02089d611db10bad070d89c8801de41521189) )
-	ROM_LOAD( "87201.ic12",  0x0c00, 0x0400, CRC(8006a1e3) SHA1(b67612d98231485fce55d604915abd19b6d64eac) )
+	ROM_REGION( 0x1000, CDP1802_TAG, 0 )
+	ROM_LOAD( "86676.ic13",  0x000, 0x400, CRC(a7d0dd3b) SHA1(e1881ab4d67a5d735dd2c8d7e924e41df6f2aeec) )
+	ROM_LOAD( "86677b.ic14", 0x400, 0x400, CRC(82a2d29e) SHA1(37e02089d611db10bad070d89c8801de41521189) )
+	ROM_LOAD( "87201.ic12",  0xc00, 0x400, CRC(8006a1e3) SHA1(b67612d98231485fce55d604915abd19b6d64eac) )
 ROM_END
 
-#define rom_mpt02h rom_mpt02
+ROM_START( mpt02h )
+	ROM_REGION( 0x1000, CDP1802_TAG, 0 )
+	ROM_LOAD( "86676.ic13",  0x000, 0x400, CRC(a7d0dd3b) SHA1(e1881ab4d67a5d735dd2c8d7e924e41df6f2aeec) )
+ROM_END
+
 #define rom_mtc9016 rom_mpt02
 #define rom_shmc1200 rom_mpt02
 #define rom_cm1200 rom_mpt02
@@ -581,7 +655,7 @@ DRIVER_INIT_MEMBER(studio2_state,studio2)
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        COMPANY   FULLNAME */
 CONS( 1977, studio2,    0,      0,      studio2,    studio2, studio2_state, studio2,    "RCA",      "Studio II", GAME_SUPPORTS_SAVE )
-CONS( 1978, visicom,    studio2,0,      visicom,    studio2, studio2_state, studio2,    "Toshiba",  "Visicom COM-100 (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+CONS( 1978, visicom,    studio2,0,      visicom,    studio2, studio2_state, studio2,    "Toshiba",  "Visicom COM-100 (Japan)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
 CONS( 1978, mpt02,      studio2,0,      mpt02,      studio2, studio2_state, studio2,    "Soundic",  "Victory MPT-02 Home TV Programmer (Austria)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
 CONS( 1978, mpt02h,     studio2,0,      mpt02,      studio2, studio2_state, studio2,    "Hanimex",  "MPT-02 Jeu TV Programmable (France)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE)
 CONS( 1978, mtc9016,    studio2,0,      mpt02,      studio2, studio2_state, studio2,    "Mustang",  "9016 Telespiel Computer (Germany)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )

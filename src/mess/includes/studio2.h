@@ -75,6 +75,8 @@ public:
 
 	required_shared_ptr<UINT8> m_color_ram;
 	required_shared_ptr<UINT8> m_color_ram1;
+
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( visicom_cart_load );
 };
 
 class mpt02_state : public studio2_state
