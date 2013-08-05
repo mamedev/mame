@@ -1308,28 +1308,25 @@ UINT32 segac2_state::screen_update_segac2_new(screen_device &screen, bitmap_rgb3
 
 
 // the main interrupt on C2 comes from the vdp line used to drive the z80 interrupt on a regular genesis(!)
-void genesis_vdp_sndirqline_callback_segac2(running_machine &machine, bool state)
+WRITE_LINE_MEMBER(segac2_state::genesis_vdp_sndirqline_callback_segac2)
 {
-	segac2_state *drvstate = machine.driver_data<segac2_state>();
-
-	if (state==true)
-		drvstate->m_maincpu->set_input_line(6, HOLD_LINE);
+	if (state==ASSERT_LINE)
+		m_maincpu->set_input_line(6, HOLD_LINE);
 }
 
 // the line usually used to drive irq6 is not connected
-void genesis_vdp_lv6irqline_callback_segac2(running_machine &machine, bool state)
+WRITE_LINE_MEMBER(segac2_state::genesis_vdp_lv6irqline_callback_segac2)
 {
 	//
 }
 
 // the scanline interrupt seems connected as usual
-void genesis_vdp_lv4irqline_callback_segac2(running_machine &machine, bool state)
+WRITE_LINE_MEMBER(segac2_state::genesis_vdp_lv4irqline_callback_segac2)
 {
-	segac2_state *drvstate = machine.driver_data<segac2_state>();
-	if (state==true)
-		drvstate->m_maincpu->set_input_line(4, HOLD_LINE);
+	if (state==ASSERT_LINE)
+		m_maincpu->set_input_line(4, HOLD_LINE);
 	else
-		drvstate->m_maincpu->set_input_line(4, CLEAR_LINE);
+		m_maincpu->set_input_line(4, CLEAR_LINE);
 }
 
 static const sega315_5124_interface sms_vdp_ntsc_intf =
@@ -1359,9 +1356,9 @@ static MACHINE_CONFIG_START( segac, segac2_state )
 	MCFG_DEVICE_ADD("gen_vdp", SEGA_GEN_VDP, 0)
 	MCFG_VIDEO_SET_SCREEN("megadriv")
 	MCFG_DEVICE_CONFIG( sms_vdp_ntsc_intf )
-	sega_genesis_vdp_device::set_genesis_vdp_sndirqline_callback(*device, genesis_vdp_sndirqline_callback_segac2);
-	sega_genesis_vdp_device::set_genesis_vdp_lv6irqline_callback(*device, genesis_vdp_lv6irqline_callback_segac2);
-	sega_genesis_vdp_device::set_genesis_vdp_lv4irqline_callback(*device, genesis_vdp_lv4irqline_callback_segac2);
+	sega_genesis_vdp_device::set_genesis_vdp_sndirqline_callback(*device, DEVCB2_WRITELINE(segac2_state, genesis_vdp_sndirqline_callback_segac2));
+	sega_genesis_vdp_device::set_genesis_vdp_lv6irqline_callback(*device, DEVCB2_WRITELINE(segac2_state, genesis_vdp_lv6irqline_callback_segac2));
+	sega_genesis_vdp_device::set_genesis_vdp_lv4irqline_callback(*device, DEVCB2_WRITELINE(segac2_state, genesis_vdp_lv4irqline_callback_segac2));
 	sega_genesis_vdp_device::set_genesis_vdp_alt_timing(*device, 1);
 
 	MCFG_TIMER_ADD_SCANLINE("scantimer", megadriv_scanline_timer_callback_alt_timing, "megadriv", 0, 1)

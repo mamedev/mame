@@ -22,9 +22,9 @@
 
 #define DISASSEMBLE_MB_ROM      0       /* generate a disassembly of the mathbox ROMs */
 
-#define IR_CPU_STATE(m) \
+#define IR_CPU_STATE() \
 	logerror(\
-			"%s, scanline: %d\n", (m).describe_context(), (m).primary_screen->vpos())
+			"%s, scanline: %d\n", machine().describe_context(), m_screen->vpos())
 
 
 READ8_MEMBER(irobot_state::irobot_sharedmem_r)
@@ -63,7 +63,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(irobot_state::irobot_irvg_done_callback)
 WRITE8_MEMBER(irobot_state::irobot_statwr_w)
 {
 	logerror("write %2x ", data);
-	IR_CPU_STATE(machine());
+	IR_CPU_STATE();
 
 	m_combase = m_comRAM[data >> 7];
 	m_combase_mb = m_comRAM[(data >> 7) ^ 1];
@@ -81,7 +81,7 @@ WRITE8_MEMBER(irobot_state::irobot_statwr_w)
 			logerror("vg start ");
 		else
 			logerror("vg start [busy!] ");
-		IR_CPU_STATE(machine());
+		IR_CPU_STATE();
 		m_irvg_timer->adjust(attotime::from_msec(10));
 #endif
 		m_irvg_running=1;
@@ -206,7 +206,7 @@ READ8_MEMBER(irobot_state::irobot_status_r)
 	int d=0;
 
 	logerror("status read. ");
-	IR_CPU_STATE(machine());
+	IR_CPU_STATE();
 
 	if (!m_irmb_running) d |= 0x20;
 	if (m_irvg_running) d |= 0x40;
@@ -800,12 +800,12 @@ default:    case 0x3f:  IXOR(irmb_din(curop), 0);                            bre
 	{
 		m_irmb_timer->adjust(attotime::from_hz(12000000) * icount);
 		logerror("mb start ");
-		IR_CPU_STATE(machine());
+		IR_CPU_STATE();
 	}
 	else
 	{
 		logerror("mb start [busy!] ");
-		IR_CPU_STATE(machine());
+		IR_CPU_STATE();
 		m_irmb_timer->adjust(attotime::from_hz(200) * icount);
 	}
 #else

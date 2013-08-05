@@ -101,6 +101,10 @@ public:
 	DECLARE_READ16_MEMBER( genesis_vdp_r );
 	DECLARE_WRITE16_MEMBER( genesis_vdp_w );
 
+	DECLARE_WRITE_LINE_MEMBER(genesis_vdp_sndirqline_callback_segas18);
+	DECLARE_WRITE_LINE_MEMBER(genesis_vdp_lv6irqline_callback_segas18);
+	DECLARE_WRITE_LINE_MEMBER(genesis_vdp_lv4irqline_callback_segas18);
+
 
 	// custom I/O
 	DECLARE_READ16_MEMBER( ddcrew_custom_io_r );

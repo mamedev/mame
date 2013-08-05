@@ -533,81 +533,7 @@ struct taitotz_polydata
 	VECTOR3 light;
 };
 
-class taitotz_renderer : public poly_manager<float, taitotz_polydata, 6, 50000>
-{
-public:
-	taitotz_renderer(running_machine &machine, int width, int height, UINT32 *texram)
-		: poly_manager<float, taitotz_polydata, 6, 50000>(machine)
-	{
-		m_zbuffer = auto_bitmap_ind32_alloc(machine, width, height);
-		m_texture = texram;
-
-		m_diffuse_intensity = 224;
-		m_ambient_intensity = 32;
-		m_specular_intensity = 256;
-		m_specular_power = 20;
-	}
-
-	void set_fb(bitmap_rgb32 *fb) { m_fb = fb; }
-	void render_displaylist(running_machine &machine, const rectangle &cliprect);
-	void draw_object(running_machine &machine, UINT32 address, float scale, UINT8 alpha);
-	float line_plane_intersection(const vertex_t *v1, const vertex_t *v2, PLANE cp);
-	int clip_polygon(const vertex_t *v, int num_vertices, PLANE cp, vertex_t *vout);
-	void setup_viewport(int x, int y, int width, int height, int center_x, int center_y);
-	void draw_scanline_noz(INT32 scanline, const extent_t &extent, const taitotz_polydata &extradata, int threadid);
-	void draw_scanline(INT32 scanline, const extent_t &extent, const taitotz_polydata &extradata, int threadid);
-
-private:
-	enum
-	{
-		POLY_Z      = 0,
-		POLY_U      = 1,
-		POLY_V      = 2,
-		POLY_NX     = 3,
-		POLY_NY     = 4,
-		POLY_NZ     = 5,
-	};
-
-	//static const float ZBUFFER_MAX = 10000000000.0f;
-
-	bitmap_rgb32 *m_fb;
-	bitmap_ind32 *m_zbuffer;
-	UINT32 *m_texture;
-
-	PLANE m_clip_plane[6];
-	float m_matrix[4][3];
-
-	float m_diffuse_intensity;
-	float m_ambient_intensity;
-	float m_specular_intensity;
-	float m_specular_power;
-
-	int m_ambient_r;
-	int m_ambient_g;
-	int m_ambient_b;
-	int m_diffuse_r;
-	int m_diffuse_g;
-	int m_diffuse_b;
-	int m_specular_r;
-	int m_specular_g;
-	int m_specular_b;
-
-	float m_vp_center_x;
-	float m_vp_center_y;
-	float m_vp_focus;
-	float m_vp_x;
-	float m_vp_y;
-	float m_vp_mul;
-
-	UINT32 m_reg_100;
-	UINT32 m_reg_101;
-	UINT32 m_reg_102;
-
-	UINT32 m_reg_10000100;
-	UINT32 m_reg_10000101;
-};
-
-
+class taitotz_renderer;
 
 class taitotz_state : public driver_device
 {
@@ -701,6 +627,84 @@ public:
 	void init_taitotz_111a();
 };
 
+class taitotz_renderer : public poly_manager<float, taitotz_polydata, 6, 50000>
+{
+public:
+	taitotz_renderer(taitotz_state &state, int width, int height, UINT32 *texram)
+		: poly_manager<float, taitotz_polydata, 6, 50000>(state.machine()),
+		  m_state(state)
+	{
+		m_zbuffer = auto_bitmap_ind32_alloc(state.machine(), width, height);
+		m_texture = texram;
+
+		m_diffuse_intensity = 224;
+		m_ambient_intensity = 32;
+		m_specular_intensity = 256;
+		m_specular_power = 20;
+	}
+
+	void set_fb(bitmap_rgb32 *fb) { m_fb = fb; }
+	void render_displaylist(running_machine &machine, const rectangle &cliprect);
+	void draw_object(running_machine &machine, UINT32 address, float scale, UINT8 alpha);
+	float line_plane_intersection(const vertex_t *v1, const vertex_t *v2, PLANE cp);
+	int clip_polygon(const vertex_t *v, int num_vertices, PLANE cp, vertex_t *vout);
+	void setup_viewport(int x, int y, int width, int height, int center_x, int center_y);
+	void draw_scanline_noz(INT32 scanline, const extent_t &extent, const taitotz_polydata &extradata, int threadid);
+	void draw_scanline(INT32 scanline, const extent_t &extent, const taitotz_polydata &extradata, int threadid);
+
+private:
+	enum
+	{
+		POLY_Z      = 0,
+		POLY_U      = 1,
+		POLY_V      = 2,
+		POLY_NX     = 3,
+		POLY_NY     = 4,
+		POLY_NZ     = 5,
+	};
+
+	//static const float ZBUFFER_MAX = 10000000000.0f;
+
+	taitotz_state &m_state;
+	bitmap_rgb32 *m_fb;
+	bitmap_ind32 *m_zbuffer;
+	UINT32 *m_texture;
+
+	PLANE m_clip_plane[6];
+	float m_matrix[4][3];
+
+	float m_diffuse_intensity;
+	float m_ambient_intensity;
+	float m_specular_intensity;
+	float m_specular_power;
+
+	int m_ambient_r;
+	int m_ambient_g;
+	int m_ambient_b;
+	int m_diffuse_r;
+	int m_diffuse_g;
+	int m_diffuse_b;
+	int m_specular_r;
+	int m_specular_g;
+	int m_specular_b;
+
+	float m_vp_center_x;
+	float m_vp_center_y;
+	float m_vp_focus;
+	float m_vp_x;
+	float m_vp_y;
+	float m_vp_mul;
+
+	UINT32 m_reg_100;
+	UINT32 m_reg_101;
+	UINT32 m_reg_102;
+
+	UINT32 m_reg_10000100;
+	UINT32 m_reg_10000101;
+};
+
+
+
 /*
 void taitotz_state::taitotz_exit()
 {
@@ -751,7 +755,7 @@ void taitotz_state::video_start()
 	m_texture_ram = auto_alloc_array(machine(), UINT32, 0x800000);
 
 	/* create renderer */
-	m_renderer = auto_alloc(machine(), taitotz_renderer(machine(), width, height, m_texture_ram));
+	m_renderer = auto_alloc(machine(), taitotz_renderer(*this, width, height, m_texture_ram));
 
 	//machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(taitotz_exit), &machine()));
 }
@@ -1158,10 +1162,9 @@ int taitotz_renderer::clip_polygon(const vertex_t *v, int num_vertices, PLANE cp
 
 void taitotz_renderer::draw_object(running_machine &machine, UINT32 address, float scale, UINT8 alpha)
 {
-	taitotz_state *state = machine.driver_data<taitotz_state>();
-	const rectangle& visarea = machine.primary_screen->visible_area();
+	const rectangle& visarea = m_state.m_screen->visible_area();
 
-	UINT32 *src = &state->m_screen_ram[address];
+	UINT32 *src = &m_state.m_screen_ram[address];
 	taitotz_renderer::vertex_t v[10];
 
 
@@ -1343,21 +1346,19 @@ void taitotz_renderer::setup_viewport(int x, int y, int width, int height, int c
 
 void taitotz_renderer::render_displaylist(running_machine &machine, const rectangle &cliprect)
 {
-	taitotz_state *state = machine.driver_data<taitotz_state>();
-
 	float zvalue = 0;//ZBUFFER_MAX;
 	m_zbuffer->fill(*(int*)&zvalue, cliprect);
 
-	const rectangle& visarea = machine.primary_screen->visible_area();
+	const rectangle& visarea = m_state.m_screen->visible_area();
 	vertex_t v[8];
 
-	UINT32 *src = (UINT32*)&state->m_work_ram[0];
+	UINT32 *src = (UINT32*)&m_state.m_work_ram[0];
 
 	UINT32 w[32];
 	int j;
 	int end = 0;
 
-	UINT32 index = state->m_displist_addr / 4;
+	UINT32 index = m_state.m_displist_addr / 4;
 
 	setup_viewport(0, 0, 256, 192, 256, 192);
 
@@ -2426,8 +2427,6 @@ READ8_MEMBER(taitotz_state::tlcs900_port_read)
 
 WRITE8_MEMBER(taitotz_state::tlcs900_port_write)
 {
-	//taitotz_state *state = device->machine().driver_data<taitotz_state>();
-
 	switch (offset)
 	{
 		case 0x7:
@@ -2438,7 +2437,7 @@ WRITE8_MEMBER(taitotz_state::tlcs900_port_write)
 		case 0x8:
 			if (data & 1)
 			{
-				//state->m_mbox_ram[0x17] = 0x55;
+				//m_mbox_ram[0x17] = 0x55;
 			}
 			break;
 

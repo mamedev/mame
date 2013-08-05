@@ -65,6 +65,8 @@ public:
 	UINT8 m_grmatch_palcontrol;
 	UINT8 m_grmatch_xscroll;
 	rgb_t m_grmatch_palette[2][16];
+	static void static_generate_interrupt(running_machine &machine, int state_num);
+	void generate_interrupt(int state_num);
 	DECLARE_WRITE8_MEMBER(itech8_nmi_ack_w);
 	DECLARE_WRITE8_MEMBER(blitter_w);
 	DECLARE_WRITE8_MEMBER(rimrockn_bank_w);

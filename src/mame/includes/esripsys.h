@@ -95,6 +95,8 @@ public:
 	DECLARE_WRITE8_MEMBER(frame_w);
 	DECLARE_READ8_MEMBER(fdt_r);
 	DECLARE_WRITE8_MEMBER(fdt_w);
+	static UINT8 static_rip_status_in(running_machine &machine);
+	UINT8 rip_status_in();
 	DECLARE_WRITE8_MEMBER(g_iobus_w);
 	DECLARE_READ8_MEMBER(g_iobus_r);
 	DECLARE_WRITE8_MEMBER(g_ioadd_w);

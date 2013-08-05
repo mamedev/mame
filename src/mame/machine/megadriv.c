@@ -913,40 +913,37 @@ void md_base_state::megadriv_stop_scanline_timer()
 
 
 // this comes from the VDP on lines 240 (on) 241 (off) and is connected to the z80 irq 0
-void genesis_vdp_sndirqline_callback_genesis_z80(running_machine &machine, bool state)
+WRITE_LINE_MEMBER(md_base_state::genesis_vdp_sndirqline_callback_genesis_z80)
 {
-	md_base_state *md_state = machine.driver_data<md_base_state>();
-	if (md_state->m_z80snd)
+	if (m_z80snd)
 	{
-		if (state == true)
+		if (state == ASSERT_LINE)
 		{
-			megadriv_z80_hold(machine);
+			megadriv_z80_hold(machine());
 		}
-		else if (state == false)
+		else if (state == CLEAR_LINE)
 		{
-			megadriv_z80_clear(machine);
+			megadriv_z80_clear(machine());
 		}
 	}
 }
 
 // this comes from the vdp, and is connected to 68k irq level 6 (main vbl interrupt)
-void genesis_vdp_lv6irqline_callback_genesis_68k(running_machine &machine, bool state)
+WRITE_LINE_MEMBER(md_base_state::genesis_vdp_lv6irqline_callback_genesis_68k)
 {
-	md_base_state *md_state = machine.driver_data<md_base_state>();
-	if (state == true)
-		md_state->m_maincpu->set_input_line(6, HOLD_LINE);
+	if (state == ASSERT_LINE)
+		m_maincpu->set_input_line(6, HOLD_LINE);
 	else
-		md_state->m_maincpu->set_input_line(6, CLEAR_LINE);
+		m_maincpu->set_input_line(6, CLEAR_LINE);
 }
 
 // this comes from the vdp, and is connected to 68k irq level 4 (raster interrupt)
-void genesis_vdp_lv4irqline_callback_genesis_68k(running_machine &machine, bool state)
+WRITE_LINE_MEMBER(md_base_state::genesis_vdp_lv4irqline_callback_genesis_68k)
 {
-	md_base_state *md_state = machine.driver_data<md_base_state>();
-	if (state == true)
-		md_state->m_maincpu->set_input_line(4, HOLD_LINE);
+	if (state == ASSERT_LINE)
+		m_maincpu->set_input_line(4, HOLD_LINE);
 	else
-		md_state->m_maincpu->set_input_line(4, CLEAR_LINE);
+		m_maincpu->set_input_line(4, CLEAR_LINE);
 }
 
 /* Callback when the 68k takes an IRQ */
@@ -1012,11 +1009,9 @@ MACHINE_CONFIG_FRAGMENT( md_ntsc )
 	MCFG_DEVICE_ADD("gen_vdp", SEGA_GEN_VDP, 0)
 	MCFG_DEVICE_CONFIG( sms_vdp_ntsc_intf )
 	MCFG_VIDEO_SET_SCREEN("megadriv")
-	sega_genesis_vdp_device::set_genesis_vdp_sndirqline_callback(*device, genesis_vdp_sndirqline_callback_genesis_z80);
-	sega_genesis_vdp_device::set_genesis_vdp_lv6irqline_callback(*device, genesis_vdp_lv6irqline_callback_genesis_68k);
-	sega_genesis_vdp_device::set_genesis_vdp_lv4irqline_callback(*device, genesis_vdp_lv4irqline_callback_genesis_68k);
-
-
+	sega_genesis_vdp_device::set_genesis_vdp_sndirqline_callback(*device, DEVCB2_WRITELINE(md_base_state, genesis_vdp_sndirqline_callback_genesis_z80));
+	sega_genesis_vdp_device::set_genesis_vdp_lv6irqline_callback(*device, DEVCB2_WRITELINE(md_base_state, genesis_vdp_lv6irqline_callback_genesis_68k));
+	sega_genesis_vdp_device::set_genesis_vdp_lv4irqline_callback(*device, DEVCB2_WRITELINE(md_base_state, genesis_vdp_lv4irqline_callback_genesis_68k));
 
 	MCFG_SCREEN_ADD("megadriv", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1066,9 +1061,9 @@ MACHINE_CONFIG_FRAGMENT( md_pal )
 	MCFG_DEVICE_ADD("gen_vdp", SEGA_GEN_VDP, 0)
 	MCFG_DEVICE_CONFIG( sms_vdp_pal_intf )
 	MCFG_VIDEO_SET_SCREEN("megadriv")
-	sega_genesis_vdp_device::set_genesis_vdp_sndirqline_callback(*device, genesis_vdp_sndirqline_callback_genesis_z80);
-	sega_genesis_vdp_device::set_genesis_vdp_lv6irqline_callback(*device, genesis_vdp_lv6irqline_callback_genesis_68k);
-	sega_genesis_vdp_device::set_genesis_vdp_lv4irqline_callback(*device, genesis_vdp_lv4irqline_callback_genesis_68k);
+	sega_genesis_vdp_device::set_genesis_vdp_sndirqline_callback(*device, DEVCB2_WRITELINE(md_base_state, genesis_vdp_sndirqline_callback_genesis_z80));
+	sega_genesis_vdp_device::set_genesis_vdp_lv6irqline_callback(*device, DEVCB2_WRITELINE(md_base_state, genesis_vdp_lv6irqline_callback_genesis_68k));
+	sega_genesis_vdp_device::set_genesis_vdp_lv4irqline_callback(*device, DEVCB2_WRITELINE(md_base_state, genesis_vdp_lv4irqline_callback_genesis_68k));
 
 	MCFG_SCREEN_ADD("megadriv", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -1305,7 +1300,7 @@ void md_base_state::screen_eof_megadriv(screen_device &screen, bool state)
 	{
 		if (!m_vdp->m_use_alt_timing)
 		{
-			m_vdp->vdp_handle_eof(machine());
+			m_vdp->vdp_handle_eof();
 			megadriv_scanline_timer->adjust(attotime::zero);
 		}
 	}

@@ -146,10 +146,6 @@
 #define MEGADRIVE_REG17_UNUSED          ((m_vdp_regs[0x17]&0x3f)>>0)
 
 
-typedef void (*genesis_vdp_sndirqline_callback_func)(running_machine &machine, bool state);
-typedef void (*genesis_vdp_lv6irqline_callback_func)(running_machine &machine, bool state);
-typedef void (*genesis_vdp_lv4irqline_callback_func)(running_machine &machine, bool state);
-
 TIMER_DEVICE_CALLBACK( megadriv_scanline_timer_callback_alt_timing );
 
 UINT16 vdp_get_word_from_68k_mem_default(running_machine &machine, UINT32 source, address_space & space68k);
@@ -160,9 +156,9 @@ class sega_genesis_vdp_device : public sega315_5124_device
 public:
 	sega_genesis_vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	static void set_genesis_vdp_sndirqline_callback(device_t &device, genesis_vdp_sndirqline_callback_func callback);
-	static void set_genesis_vdp_lv6irqline_callback(device_t &device, genesis_vdp_lv6irqline_callback_func callback);
-	static void set_genesis_vdp_lv4irqline_callback(device_t &device, genesis_vdp_lv4irqline_callback_func callback);
+	template<class _Object> static devcb2_base &set_genesis_vdp_sndirqline_callback(device_t &device, _Object object) { return downcast<sega_genesis_vdp_device &>(device).m_genesis_vdp_sndirqline_callback.set_callback(object); }
+	template<class _Object> static devcb2_base &set_genesis_vdp_lv6irqline_callback(device_t &device, _Object object) { return downcast<sega_genesis_vdp_device &>(device).m_genesis_vdp_lv6irqline_callback.set_callback(object); }
+	template<class _Object> static devcb2_base &set_genesis_vdp_lv4irqline_callback(device_t &device, _Object object) { return downcast<sega_genesis_vdp_device &>(device).m_genesis_vdp_lv4irqline_callback.set_callback(object); }
 	static void set_genesis_vdp_alt_timing(device_t &device, int use_alt_timing);
 	static void set_genesis_vdp_palwrite_base(device_t &device, int palwrite_base);
 
@@ -173,14 +169,14 @@ public:
 	DECLARE_READ16_MEMBER( megadriv_vdp_r );
 	DECLARE_WRITE16_MEMBER( megadriv_vdp_w );
 
-	int genesis_get_scanline_counter(running_machine &machine);
+	int genesis_get_scanline_counter();
 
 
-	void genesis_render_scanline(running_machine &machine);
-	void vdp_handle_scanline_callback(running_machine &machine, int scanline);
-	void vdp_handle_irq6_on_timer_callback(running_machine &machine, int param);
-	void vdp_handle_irq4_on_timer_callback(running_machine &machine, int param);
-	void vdp_handle_eof(running_machine &machine);
+	void genesis_render_scanline();
+	void vdp_handle_scanline_callback(int scanline);
+	void vdp_handle_irq6_on_timer_callback(int param);
+	void vdp_handle_irq4_on_timer_callback(int param);
+	void vdp_handle_eof();
 	void device_reset_old();
 	void vdp_clear_irq6_pending(void) { megadrive_irq6_pending = 0; };
 	void vdp_clear_irq4_pending(void) { megadrive_irq4_pending = 0; };
@@ -209,9 +205,9 @@ protected:
 	virtual void device_reset();
 
 	// called when we hit 240 and 241 (used to control the z80 irq line on genesis, or the main irq on c2)
-	genesis_vdp_sndirqline_callback_func m_genesis_vdp_sndirqline_callback;
-	genesis_vdp_lv6irqline_callback_func m_genesis_vdp_lv6irqline_callback;
-	genesis_vdp_lv6irqline_callback_func m_genesis_vdp_lv4irqline_callback;
+	devcb2_write_line m_genesis_vdp_sndirqline_callback;
+	devcb2_write_line m_genesis_vdp_lv6irqline_callback;
+	devcb2_write_line m_genesis_vdp_lv4irqline_callback;
 
 private:
 
@@ -257,38 +253,37 @@ private:
 	emu_timer* irq4_on_timer;
 	emu_timer* megadriv_render_timer;
 
-
 	UINT16 vdp_vram_r(void);
 	UINT16 vdp_vsram_r(void);
 	UINT16 vdp_cram_r(void);
 
-	void megadrive_do_insta_68k_to_cram_dma(running_machine &machine,UINT32 source,UINT16 length);
-	void megadrive_do_insta_68k_to_vsram_dma(running_machine &machine,UINT32 source,UINT16 length);
-	void megadrive_do_insta_68k_to_vram_dma(running_machine &machine, UINT32 source,int length);
+	void megadrive_do_insta_68k_to_cram_dma(UINT32 source,UINT16 length);
+	void megadrive_do_insta_68k_to_vsram_dma(UINT32 source,UINT16 length);
+	void megadrive_do_insta_68k_to_vram_dma(UINT32 source,int length);
 	void megadrive_do_insta_vram_copy(UINT32 source, UINT16 length);
 
 	void vdp_vram_write(UINT16 data);
-	void vdp_cram_write(running_machine &machine, UINT16 data);
-	void write_cram_value(running_machine &machine, int offset, int data);
+	void vdp_cram_write(UINT16 data);
+	void write_cram_value(int offset, int data);
 	void vdp_vsram_write(UINT16 data);
 
-	void megadrive_vdp_set_register(running_machine &machine, int regnum, UINT8 value);
+	void megadrive_vdp_set_register(int regnum, UINT8 value);
 
-	void handle_dma_bits(running_machine &machine);
+	void handle_dma_bits();
 
-	UINT16 get_hposition(running_machine &machine);
-	UINT16 megadriv_read_hv_counters(running_machine &machine);
+	UINT16 get_hposition();
+	UINT16 megadriv_read_hv_counters();
 
-	UINT16 megadriv_vdp_ctrl_port_r(running_machine &machine);
-	UINT16 megadriv_vdp_data_port_r(running_machine &machine);
-	void megadriv_vdp_data_port_w(running_machine &machine, int data);
-	void megadriv_vdp_ctrl_port_w(running_machine &machine, int data);
+	UINT16 megadriv_vdp_ctrl_port_r();
+	UINT16 megadriv_vdp_data_port_r();
+	void megadriv_vdp_data_port_w(int data);
+	void megadriv_vdp_ctrl_port_w(int data);
 	void update_m_vdp_code_and_address(void);
 
 
 	void genesis_render_spriteline_to_spritebuffer(int scanline);
 	void genesis_render_videoline_to_videobuffer(int scanline);
-	void genesis_render_videobuffer_to_screenbuffer(running_machine &machine, int scanline);
+	void genesis_render_videobuffer_to_screenbuffer(int scanline);
 
 	/* variables used during emulation - not saved */
 	UINT8* m_sprite_renderline;

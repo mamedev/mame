@@ -1216,15 +1216,15 @@ GFXDECODE_END
 
 
 // are any of the VDP interrupt lines hooked up to anything?
-void genesis_vdp_sndirqline_callback_segas18(running_machine &machine, bool state)
+WRITE_LINE_MEMBER(segas18_state::genesis_vdp_sndirqline_callback_segas18)
 {
 }
 
-void genesis_vdp_lv6irqline_callback_segas18(running_machine &machine, bool state)
+WRITE_LINE_MEMBER(segas18_state::genesis_vdp_lv6irqline_callback_segas18)
 {
 }
 
-void genesis_vdp_lv4irqline_callback_segas18(running_machine &machine, bool state)
+WRITE_LINE_MEMBER(segas18_state::genesis_vdp_lv4irqline_callback_segas18)
 {
 }
 
@@ -1259,9 +1259,9 @@ static MACHINE_CONFIG_START( system18, segas18_state )
 
 	MCFG_DEVICE_ADD("gen_vdp", SEGA_GEN_VDP, 0)
 	MCFG_DEVICE_CONFIG( sms_vdp_ntsc_intf )
-	sega_genesis_vdp_device::set_genesis_vdp_sndirqline_callback(*device, genesis_vdp_sndirqline_callback_segas18);
-	sega_genesis_vdp_device::set_genesis_vdp_lv6irqline_callback(*device, genesis_vdp_lv6irqline_callback_segas18);
-	sega_genesis_vdp_device::set_genesis_vdp_lv4irqline_callback(*device, genesis_vdp_lv4irqline_callback_segas18);
+	sega_genesis_vdp_device::set_genesis_vdp_sndirqline_callback(*device, DEVCB2_WRITELINE(segas18_state, genesis_vdp_sndirqline_callback_segas18));
+	sega_genesis_vdp_device::set_genesis_vdp_lv6irqline_callback(*device, DEVCB2_WRITELINE(segas18_state, genesis_vdp_lv6irqline_callback_segas18));
+	sega_genesis_vdp_device::set_genesis_vdp_lv4irqline_callback(*device, DEVCB2_WRITELINE(segas18_state, genesis_vdp_lv4irqline_callback_segas18));
 	sega_genesis_vdp_device::set_genesis_vdp_alt_timing(*device, 1);
 	sega_genesis_vdp_device::set_genesis_vdp_palwrite_base(*device, 0x2000);
 

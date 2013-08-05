@@ -598,15 +598,14 @@ WRITE8_MEMBER(dynax_state::hjingi_hopper_w)
 	m_hopper = data & 0x01;
 }
 
-static UINT8 hjingi_hopper_bit( running_machine &machine )
+UINT8 dynax_state::hjingi_hopper_bit()
 {
-	dynax_state *state = machine.driver_data<dynax_state>();
-	return (state->m_hopper && !(machine.primary_screen->frame_number() % 10)) ? 0 : (1 << 6);
+	return (m_hopper && !(m_screen->frame_number() % 10)) ? 0 : (1 << 6);
 }
 
 READ8_MEMBER(dynax_state::hjingi_keyboard_0_r)
 {
-	return hanamai_keyboard_0_r(space, 0) | hjingi_hopper_bit(machine());
+	return hanamai_keyboard_0_r(space, 0) | hjingi_hopper_bit();
 }
 
 READ8_MEMBER(dynax_state::hjingi_keyboard_1_r)

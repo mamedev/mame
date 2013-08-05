@@ -54,6 +54,7 @@ public:
 	int m_beamyadd;
 	int m_palette_bank;
 	UINT8 m_gunx[2];
+	void get_crosshair_xy(int player, int &x, int &y);
 	DECLARE_WRITE16_MEMBER(rapidfir_transparent_w);
 	DECLARE_READ16_MEMBER(rapidfir_transparent_r);
 	DECLARE_WRITE16_MEMBER(tickee_control_w);
@@ -89,12 +90,12 @@ protected:
  *
  *************************************/
 
-INLINE void get_crosshair_xy(running_machine &machine, int player, int *x, int *y)
+inline void tickee_state::get_crosshair_xy(int player, int &x, int &y)
 {
-	const rectangle &visarea = machine.primary_screen->visible_area();
+	const rectangle &visarea = m_screen->visible_area();
 
-	*x = (((machine.root_device().ioport(player ? "GUNX2" : "GUNX1")->read() & 0xff) * visarea.width()) >> 8) + visarea.min_x;
-	*y = (((machine.root_device().ioport(player ? "GUNY2" : "GUNY1")->read() & 0xff) * visarea.height()) >> 8) + visarea.min_y;
+	x = (((ioport(player ? "GUNX2" : "GUNX1")->read() & 0xff) * visarea.width()) >> 8) + visarea.min_x;
+	y = (((ioport(player ? "GUNY2" : "GUNY1")->read() & 0xff) * visarea.height()) >> 8) + visarea.min_y;
 }
 
 
@@ -157,12 +158,12 @@ TIMER_CALLBACK_MEMBER(tickee_state::setup_gun_interrupts)
 			return;
 
 	/* generate interrupts for player 1's gun */
-	get_crosshair_xy(machine(), 0, &beamx, &beamy);
+	get_crosshair_xy(0, beamx, beamy);
 	timer_set(m_screen->time_until_pos(beamy + m_beamyadd, beamx + m_beamxadd), TIMER_TRIGGER_GUN_INTERRUPT, 0);
 	timer_set(m_screen->time_until_pos(beamy + m_beamyadd + 1, beamx + m_beamxadd), TIMER_CLEAR_GUN_INTERRUPT, 0);
 
 	/* generate interrupts for player 2's gun */
-	get_crosshair_xy(machine(), 1, &beamx, &beamy);
+	get_crosshair_xy(1, beamx, beamy);
 	timer_set(m_screen->time_until_pos(beamy + m_beamyadd, beamx + m_beamxadd), TIMER_TRIGGER_GUN_INTERRUPT, 1);
 	timer_set(m_screen->time_until_pos(beamy + m_beamyadd + 1, beamx + m_beamxadd), TIMER_CLEAR_GUN_INTERRUPT, 1);
 }

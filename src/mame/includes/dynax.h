@@ -191,6 +191,7 @@ public:
 	DECLARE_WRITE8_MEMBER(hjingi_bank_w);
 	DECLARE_WRITE8_MEMBER(hjingi_lockout_w);
 	DECLARE_WRITE8_MEMBER(hjingi_hopper_w);
+	UINT8 hjingi_hopper_bit();
 	DECLARE_READ8_MEMBER(hjingi_keyboard_0_r);
 	DECLARE_READ8_MEMBER(hjingi_keyboard_1_r);
 	DECLARE_WRITE8_MEMBER(yarunara_input_w);

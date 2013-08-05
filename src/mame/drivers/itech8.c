@@ -1650,12 +1650,12 @@ static const ay8910_interface ay8910_config =
  *
  *************************************/
 
-static void generate_interrupt(running_machine &machine, int state_num)
+void itech8_state::static_generate_interrupt(running_machine &machine, int state_num) { machine.driver_data<itech8_state>()->generate_interrupt(state_num); }
+void itech8_state::generate_interrupt(int state_num)
 {
-	itech8_state *state = machine.driver_data<itech8_state>();
-	state->itech8_update_interrupts(-1, state_num, -1);
+	itech8_update_interrupts(-1, state_num, -1);
 
-	if (FULL_LOGGING && state_num) logerror("------------ DISPLAY INT (%d) --------------\n", machine.primary_screen->vpos());
+	if (FULL_LOGGING && state_num) logerror("------------ DISPLAY INT (%d) --------------\n", m_screen->vpos());
 }
 
 
@@ -1663,7 +1663,7 @@ static const struct tms34061_interface tms34061intf =
 {
 	8,                      /* VRAM address is (row << rowshift) | col */
 	0x40000,                /* size of video RAM */
-	generate_interrupt      /* interrupt gen callback */
+	&itech8_state::static_generate_interrupt      /* interrupt gen callback */
 };
 
 

@@ -526,7 +526,7 @@ void m10_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 INTERRUPT_GEN_MEMBER(m10_state::m11_interrupt)
 {
 	device.execute().set_input_line(0, ASSERT_LINE);
-	//timer_set(machine.primary_screen->time_until_pos(IREMM10_VBEND), TIMER_INTERRUPT, -1);
+	//timer_set(m_screen->time_until_pos(IREMM10_VBEND), TIMER_INTERRUPT, -1);
 }
 
 INTERRUPT_GEN_MEMBER(m10_state::m10_interrupt)
