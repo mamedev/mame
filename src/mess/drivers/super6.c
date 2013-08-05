@@ -547,10 +547,6 @@ void super6_state::machine_start()
 }
 
 
-//-------------------------------------------------
-//  MACHINE_RESET( super6 )
-//-------------------------------------------------
-
 void super6_state::machine_reset()
 {
 	m_bank0 = m_bank1 = 0;

@@ -425,10 +425,6 @@ void superslave_state::machine_start()
 }
 
 
-//-------------------------------------------------
-//  MACHINE_RESET( superslave )
-//-------------------------------------------------
-
 void superslave_state::machine_reset()
 {
 	m_memctrl = 0x01;

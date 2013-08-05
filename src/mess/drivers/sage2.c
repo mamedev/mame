@@ -547,10 +547,6 @@ void sage2_state::machine_start()
 }
 
 
-//-------------------------------------------------
-//  MACHINE_RESET( sage2 )
-//-------------------------------------------------
-
 void sage2_state::machine_reset()
 {
 	m_reset = 1;

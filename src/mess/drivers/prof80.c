@@ -574,10 +574,6 @@ void prof80_state::machine_start()
 }
 
 
-//-------------------------------------------------
-//  MACHINE_RESET( prof80 )
-//-------------------------------------------------
-
 void prof80_state::machine_reset()
 {
 	int i;

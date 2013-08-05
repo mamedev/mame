@@ -94,8 +94,8 @@ struct VDP
 	UINT8 timer_vblank_mode;        /* Vertical blank timer mode */
 	UINT16 timer_vblank_reload;     /* Vertical blank timer reload value */
 	UINT16 timer_vblank_count;      /* Vertical blank timer counter value */
-	UINT8 *vram;                /* pointer to start of ram/vram (set by MACHINE_RESET) */
-	UINT8 *palette_vram;            /* pointer to start of palette area in ram/vram (set by MACHINE_RESET), WSC only */
+	UINT8 *vram;                /* pointer to start of ram/vram (set by machine_reset) */
+	UINT8 *palette_vram;            /* pointer to start of palette area in ram/vram (set by machine_reset), WSC only */
 	int main_palette[8];
 	emu_timer *timer;
 };

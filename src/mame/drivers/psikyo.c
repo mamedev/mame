@@ -609,7 +609,7 @@ static INPUT_PORTS_START( sngkace )
 	    1 1 1 0 Taiwan
 
 	************************************************/
-#if 0 // See Patch in MACHINE_RESET, only text not logo
+#if 0 // See Patch in machine_reset, only text not logo
 	PORT_CONFNAME( 0x000000ff, 0x000000ff, DEF_STR( Region ) )
 	PORT_CONFSETTING(          0x000000ff, DEF_STR( Japan ) )
 	PORT_CONFSETTING(          0x000000ef, "USA & Canada" )

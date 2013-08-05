@@ -763,10 +763,6 @@ void sf7000_state::machine_start()
 	membank("bank2")->configure_entry(0, m_ram->pointer());
 }
 
-/*-------------------------------------------------
-    MACHINE_RESET( sf7000 )
--------------------------------------------------*/
-
 void sf7000_state::machine_reset()
 {
 	membank("bank1")->set_entry(0);

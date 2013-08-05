@@ -503,10 +503,6 @@ void ep64_state::machine_start()
 }
 
 
-//-------------------------------------------------
-//  MACHINE_RESET( ep64 )
-//-------------------------------------------------
-
 void ep64_state::machine_reset()
 {
 	m_dave->reset();

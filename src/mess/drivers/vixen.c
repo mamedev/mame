@@ -769,10 +769,6 @@ void vixen_state::machine_start()
 }
 
 
-//-------------------------------------------------
-//  MACHINE_RESET( vixen )
-//-------------------------------------------------
-
 void vixen_state::machine_reset()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);

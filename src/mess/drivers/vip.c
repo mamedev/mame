@@ -670,10 +670,6 @@ void vip_state::machine_start()
 }
 
 
-//-------------------------------------------------
-//  MACHINE_RESET( vip )
-//-------------------------------------------------
-
 void vip_state::machine_reset()
 {
 	// reset the VDC

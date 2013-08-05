@@ -2152,7 +2152,7 @@ MACHINE_START_MEMBER(bbc_state,bbcb)
 {
 	m_mc6850_clock = 0;
 	//removed from here because MACHINE_START can no longer read DIP swiches.
-	//put in MACHINE_RESET instead.
+	//put in machine_reset instead.
 	//m_DFSType=  (ioport("BBCCONFIG")->read()>>0)&0x07;
 	//m_SWRAMtype=(ioport("BBCCONFIG")->read()>>3)&0x03;
 	//m_RAMSize=  (ioport("BBCCONFIG")->read()>>5)&0x01;

@@ -2087,10 +2087,6 @@ MACHINE_START_MEMBER( p500_state, p500_pal )
 }
 
 
-//-------------------------------------------------
-//  MACHINE_RESET( cbm2 )
-//-------------------------------------------------
-
 MACHINE_RESET_MEMBER( cbm2_state, cbm2 )
 {
 	m_dramon = 1;
@@ -2115,10 +2111,6 @@ m_ext_cia_pb = 0xff;
 	m_ieee->reset();
 }
 
-
-//-------------------------------------------------
-//  MACHINE_RESET( p500 )
-//-------------------------------------------------
 
 MACHINE_RESET_MEMBER( p500_state, p500 )
 {

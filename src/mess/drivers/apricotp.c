@@ -584,10 +584,6 @@ void fp_state::machine_start()
 }
 
 
-//-------------------------------------------------
-//  MACHINE_RESET( fp )
-//-------------------------------------------------
-
 void fp_state::machine_reset()
 {
 	m_video = 0;

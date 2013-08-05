@@ -750,10 +750,6 @@ void mm1_state::machine_start()
 }
 
 
-//-------------------------------------------------
-//  MACHINE_RESET( mm1 )
-//-------------------------------------------------
-
 void mm1_state::machine_reset()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);

@@ -221,7 +221,7 @@ void sega_genesis_vdp_device::device_reset()
 void sega_genesis_vdp_device::device_reset_old()
 {
 	// other stuff, are we sure we want to set some of these every reset?
-	// it's called from MACHINE_RESET( megadriv )
+	// it's called from machine_reset
 	megadrive_total_scanlines = 262;
 	m_visible_scanlines = 224;
 	m_irq6_scanline = 224;

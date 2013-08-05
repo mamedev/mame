@@ -547,10 +547,6 @@ void vidbrain_state::machine_start()
 }
 
 
-//-------------------------------------------------
-//  MACHINE_RESET( vidbrain )
-//-------------------------------------------------
-
 void vidbrain_state::machine_reset()
 {
 	m_int_enable = 0;

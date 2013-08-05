@@ -397,10 +397,6 @@ MACHINE_START_MEMBER(mtx_state,mtx512)
 	membank("bank4")->configure_entries(0, messram->size()/0x4000/2, messram->pointer() + messram->size()/2, 0x4000);
 }
 
-/*-------------------------------------------------
-    MACHINE_RESET( mtx512 )
--------------------------------------------------*/
-
 MACHINE_RESET_MEMBER(mtx_state,mtx512)
 {
 	/* bank switching */

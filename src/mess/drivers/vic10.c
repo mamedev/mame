@@ -579,10 +579,6 @@ void vic10_state::machine_start()
 }
 
 
-//-------------------------------------------------
-//  MACHINE_RESET( vic10 )
-//-------------------------------------------------
-
 void vic10_state::machine_reset()
 {
 	m_maincpu->reset();

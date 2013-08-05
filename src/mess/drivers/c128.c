@@ -1375,10 +1375,6 @@ void c128_state::machine_start()
 }
 
 
-//-------------------------------------------------
-//  MACHINE_RESET( c128 )
-//-------------------------------------------------
-
 void c128_state::machine_reset()
 {
 	m_maincpu->reset();

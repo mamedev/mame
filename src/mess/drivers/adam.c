@@ -1074,10 +1074,6 @@ void adam_state::machine_start()
 }
 
 
-//-------------------------------------------------
-//  MACHINE_RESET( adam )
-//-------------------------------------------------
-
 void adam_state::machine_reset()
 {
 	device_image_interface *image = dynamic_cast<device_image_interface *>(machine().device("cart"));

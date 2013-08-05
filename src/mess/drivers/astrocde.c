@@ -267,7 +267,7 @@ static MACHINE_CONFIG_START( astrocde, astrocde_mess_state )
 	MCFG_SOUND_ADD("astrocade1", ASTROCADE, ASTROCADE_CLOCK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	/* optional expansion ram (installed in MACHINE_RESET)*/
+	/* optional expansion ram (installed in machine_reset)*/
 	MCFG_RAM_ADD("ram_tag")
 	MCFG_RAM_DEFAULT_SIZE("32k")
 

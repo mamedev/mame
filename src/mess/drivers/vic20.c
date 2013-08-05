@@ -637,10 +637,6 @@ void vic20_state::machine_start()
 }
 
 
-//-------------------------------------------------
-//  MACHINE_RESET( vic20 )
-//-------------------------------------------------
-
 void vic20_state::machine_reset()
 {
 	m_maincpu->reset();

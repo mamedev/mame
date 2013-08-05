@@ -278,7 +278,7 @@ MACHINE_RESET_MEMBER(z80ne_state,z80ne_base)
 {
 	int i;
 
-	LOG(("In MACHINE_RESET z80ne_base\n"));
+	LOG(("In machine_reset z80ne_base\n"));
 
 	for ( i=0; i<LX383_KEYS; i++)
 		m_lx383_key[i] = 0xf0 | i;
@@ -329,28 +329,28 @@ MACHINE_RESET_MEMBER(z80ne_state,z80ne_base)
 
 MACHINE_RESET_MEMBER(z80ne_state,z80ne)
 {
-	LOG(("In MACHINE_RESET z80ne\n"));
+	LOG(("In machine_reset z80ne\n"));
 	reset_lx382_banking();
 	MACHINE_RESET_CALL_MEMBER( z80ne_base );
 }
 
 MACHINE_RESET_MEMBER(z80ne_state,z80net)
 {
-	LOG(("In MACHINE_RESET z80net\n"));
+	LOG(("In machine_reset z80net\n"));
 	MACHINE_RESET_CALL_MEMBER( z80ne );
 	reset_lx388();
 }
 
 MACHINE_RESET_MEMBER(z80ne_state,z80netb)
 {
-	LOG(("In MACHINE_RESET z80netb\n"));
+	LOG(("In machine_reset z80netb\n"));
 	MACHINE_RESET_CALL_MEMBER( z80ne_base );
 	reset_lx388();
 }
 
 MACHINE_RESET_MEMBER(z80ne_state,z80netf)
 {
-	LOG(("In MACHINE_RESET z80netf\n"));
+	LOG(("In machine_reset z80netf\n"));
 	reset_lx390_banking();
 	MACHINE_RESET_CALL_MEMBER( z80ne_base );
 	reset_lx388();

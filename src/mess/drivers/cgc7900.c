@@ -401,10 +401,6 @@ void cgc7900_state::machine_start()
 	save_pointer(NAME(m_overlay_ram.target()), 0x4000);
 }
 
-/*-------------------------------------------------
-    MACHINE_RESET( cgc7900 )
--------------------------------------------------*/
-
 void cgc7900_state::machine_reset()
 {
 }

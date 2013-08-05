@@ -650,10 +650,6 @@ void comx35_state::machine_start()
 }
 
 
-//-------------------------------------------------
-//  MACHINE_RESET( comx35 )
-//-------------------------------------------------
-
 void comx35_state::machine_reset()
 {
 	m_exp->reset();

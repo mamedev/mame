@@ -307,10 +307,6 @@ void ob68k1a_state::machine_start()
 }
 
 
-//-------------------------------------------------
-//  MACHINE_RESET( ob68k1a )
-//-------------------------------------------------
-
 void ob68k1a_state::machine_reset()
 {
 	// initialize COM8116

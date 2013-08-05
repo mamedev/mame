@@ -1209,10 +1209,6 @@ void pc1512_state::machine_start()
 }
 
 
-//-------------------------------------------------
-//  MACHINE_RESET( pc1512 )
-//-------------------------------------------------
-
 void pc1512_state::machine_reset()
 {
 	m_nmi_enable = 0;
@@ -1271,10 +1267,6 @@ void pc1640_state::machine_start()
 	save_item(NAME(m_speaker_drive));
 }
 
-
-//-------------------------------------------------
-//  MACHINE_RESET( pc1640 )
-//-------------------------------------------------
 
 void pc1640_state::machine_reset()
 {

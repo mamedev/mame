@@ -1326,10 +1326,6 @@ MACHINE_START_MEMBER( pet_state, pet2001 )
 }
 
 
-//-------------------------------------------------
-//  MACHINE_RESET( pet )
-//-------------------------------------------------
-
 MACHINE_RESET_MEMBER( pet_state, pet )
 {
 	m_maincpu->reset();
@@ -1356,10 +1352,6 @@ MACHINE_START_MEMBER( pet80_state, pet80 )
 }
 
 
-//-------------------------------------------------
-//  MACHINE_RESET( pet80 )
-//-------------------------------------------------
-
 MACHINE_RESET_MEMBER( pet80_state, pet80 )
 {
 	MACHINE_RESET_CALL_MEMBER(pet);
@@ -1381,10 +1373,6 @@ MACHINE_START_MEMBER( cbm8296_state, cbm8296 )
 	save_item(NAME(m_via_pa));
 }
 
-
-//-------------------------------------------------
-//  MACHINE_RESET( cbm8296 )
-//-------------------------------------------------
 
 MACHINE_RESET_MEMBER( cbm8296_state, cbm8296 )
 {

@@ -2119,7 +2119,7 @@ VIDEO_START_MEMBER(cps_state,cps)
 	m_cps_a_regs[CPS1_SCROLL3_BASE] = 0x9080;
 	m_cps_a_regs[CPS1_OTHER_BASE]   = 0x9100;
 
-	/* This should never be hit, since game_config is set in MACHINE_RESET */
+	/* This should never be hit, since game_config is set in machine_reset */
 	assert_always(m_game_config, "state_game_config hasn't been set up yet");
 
 

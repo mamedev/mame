@@ -696,10 +696,6 @@ void mpz80_state::machine_start()
 }
 
 
-//-------------------------------------------------
-//  MACHINE_RESET( mpz80 )
-//-------------------------------------------------
-
 void mpz80_state::machine_reset()
 {
 	m_trap_reset = 0;

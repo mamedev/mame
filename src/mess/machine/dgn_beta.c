@@ -999,7 +999,7 @@ void dgn_beta_state::machine_reset()
 	pia6821_device *pia_1 = machine().device<pia6821_device>( PIA_1_TAG );
 	pia6821_device *pia_2 = machine().device<pia6821_device>( PIA_2_TAG );
 
-	logerror("MACHINE_RESET( dgnbeta )\n");
+	logerror("dgn_beta_state::machine_reset()\n");
 
 	m_system_rom = memregion(MAINCPU_TAG)->base();
 

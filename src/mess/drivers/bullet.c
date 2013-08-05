@@ -1180,10 +1180,6 @@ void bulletf_state::machine_start()
 }
 
 
-//-------------------------------------------------
-//  MACHINE_RESET( bullet )
-//-------------------------------------------------
-
 void bullet_state::machine_reset()
 {
 	// memory banking
@@ -1222,10 +1218,6 @@ void bullet_state::machine_reset()
 	}
 }
 
-
-//-------------------------------------------------
-//  MACHINE_RESET( bulletf )
-//-------------------------------------------------
 
 void bulletf_state::machine_reset()
 {

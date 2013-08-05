@@ -855,7 +855,7 @@ void thomson_state::to7_modem_reset()
 	LOG (( "to7_modem_reset called\n" ));
 	m_to7_modem_rx = 0;
 	m_to7_modem_tx = 0;
-	/* pia_reset() is called in MACHINE_RESET */
+	/* pia_reset() is called in machine_reset */
 	/* acia_6850 has no reset (?) */
 }
 

@@ -1138,10 +1138,6 @@ void wangpc_state::machine_start()
 }
 
 
-//-------------------------------------------------
-//  MACHINE_RESET( wangpc )
-//-------------------------------------------------
-
 void wangpc_state::machine_reset()
 {
 	// initialize UART
