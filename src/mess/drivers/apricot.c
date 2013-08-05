@@ -38,9 +38,12 @@ public:
 	m_pic(*this, "ic31"),
 	m_pit(*this, "ic16"),
 	m_z80sio(*this, "ic15"),
-	m_fdc(*this, "ic68")
-	,
-		m_screen_buffer(*this, "screen_buffer"){ }
+	m_fdc(*this, "ic68"),
+	m_screen_buffer(*this, "screen_buffer"),
+	m_video_mode(0),
+	m_display_on(1),
+	m_display_enabled(0)
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
@@ -51,22 +54,27 @@ public:
 	required_device<pit8253_device> m_pit;
 	required_device<z80sio0_device> m_z80sio;
 	required_device<wd2793_device> m_fdc;
+
+	required_shared_ptr<UINT16> m_screen_buffer;
+
 	DECLARE_READ8_MEMBER(apricot_sysctrl_r);
 	DECLARE_WRITE8_MEMBER(apricot_sysctrl_w);
 	DECLARE_WRITE_LINE_MEMBER(apricot_pit8253_out1);
 	DECLARE_WRITE_LINE_MEMBER(apricot_pit8253_out2);
 	DECLARE_WRITE_LINE_MEMBER(apricot_wd2793_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(apricot_wd2793_drq_w);
-	DECLARE_WRITE_LINE_MEMBER(apricot_mc6845_de);
+	DECLARE_WRITE_LINE_MEMBER(apricot_mc6845_de) { m_display_enabled = state; };
+
+	virtual void machine_start();
+
+	IRQ_CALLBACK_MEMBER( irq_callback ) { return m_pic->inta_r(); }
+
 	bool m_video_mode;
 	bool m_display_on;
-	bool m_display_enabled;
-	required_shared_ptr<UINT16> m_screen_buffer;
-	DECLARE_DRIVER_INIT(apricot);
-	virtual void palette_init();
+
+	int m_display_enabled;
+
 	UINT32 screen_update_apricot(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(apricot_sio_irq_w);
-	IRQ_CALLBACK_MEMBER(apricot_irq_ack);
 };
 
 
@@ -123,22 +131,12 @@ static const struct pit8253_interface apricot_pit8253_intf =
 	}
 };
 
-WRITE_LINE_MEMBER(apricot_state::apricot_sio_irq_w)
-{
-	m_pic->ir5_w(state);
-}
-
 static Z80SIO_INTERFACE( apricot_z80sio_intf )
 {
-	0, 0, 0, 0,
+	0, 0,
+	XTAL_4MHz / 16, XTAL_4MHz / 16,
 
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
+	// channel a
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -146,18 +144,21 @@ static Z80SIO_INTERFACE( apricot_z80sio_intf )
 	DEVCB_NULL,
 	DEVCB_NULL,
 
-	DEVCB_DRIVER_LINE_MEMBER(apricot_state, apricot_sio_irq_w)
+	// channel b
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+
+	DEVCB_DEVICE_LINE_MEMBER("ic31", pic8259_device, ir5_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
-
-/***************************************************************************
-    INTERRUPTS
-***************************************************************************/
-
-IRQ_CALLBACK_MEMBER(apricot_state::apricot_irq_ack)
-{
-	return m_pic->inta_r();
-}
 
 /***************************************************************************
     FLOPPY
@@ -192,7 +193,7 @@ UINT32 apricot_state::screen_update_apricot(screen_device &screen, bitmap_rgb32 
 	if (!m_display_on)
 		m_crtc->screen_update( screen, bitmap, cliprect);
 	else
-		bitmap.fill(0, cliprect);
+		bitmap.fill(RGB_BLACK, cliprect);
 
 	return 0;
 }
@@ -200,7 +201,6 @@ UINT32 apricot_state::screen_update_apricot(screen_device &screen, bitmap_rgb32 
 static MC6845_UPDATE_ROW( apricot_update_row )
 {
 	apricot_state *state = device->machine().driver_data<apricot_state>();
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	UINT8 *ram = state->m_ram->pointer();
 	int i, x;
 
@@ -222,7 +222,7 @@ static MC6845_UPDATE_ROW( apricot_update_row )
 			{
 				int color = fill ? 1 : BIT(data, x);
 				if (BIT(code, 15)) color = !color; /* reverse? */
-				bitmap.pix32(y, x + i*10) = palette[color ? 1 + BIT(code, 14) : 0];
+				bitmap.pix32(y, x + i*10) = RGB_MONOCHROME_GREEN_HIGHLIGHT[color ? 1 + BIT(code, 14) : 0];
 			}
 		}
 	}
@@ -232,12 +232,6 @@ static MC6845_UPDATE_ROW( apricot_update_row )
 		fatalerror("Graphics mode not implemented!\n");
 	}
 }
-
-WRITE_LINE_MEMBER( apricot_state::apricot_mc6845_de )
-{
-	m_display_enabled = state;
-}
-
 
 static MC6845_INTERFACE( apricot_mc6845_intf )
 {
@@ -255,23 +249,13 @@ static MC6845_INTERFACE( apricot_mc6845_intf )
 
 
 /***************************************************************************
-    DRIVER INIT
+    MACHINE EMULATION
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(apricot_state,apricot)
+void apricot_state::machine_start()
 {
-	address_space &prg = m_maincpu->space(AS_PROGRAM);
-
-	UINT8 *ram = m_ram->pointer();
-	UINT32 ram_size = m_ram->size();
-
-	prg.unmap_readwrite(0x40000, 0xeffff);
-	prg.install_ram(0x00000, ram_size - 1, ram);
-
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(apricot_state::apricot_irq_ack),this));
-
-	m_video_mode = 0;
-	m_display_on = 1;
+	m_maincpu->space(AS_PROGRAM).install_ram(0x00000, m_ram->size() - 1, m_ram->pointer());
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(apricot_state::irq_callback), this));
 }
 
 
@@ -280,8 +264,8 @@ DRIVER_INIT_MEMBER(apricot_state,apricot)
 ***************************************************************************/
 
 static ADDRESS_MAP_START( apricot_mem, AS_PROGRAM, 16, apricot_state )
-	AM_RANGE(0x00000, 0x3ffff) AM_RAMBANK("standard_ram")
-	AM_RANGE(0x40000, 0xeffff) AM_RAMBANK("expansion_ram")
+//	AM_RANGE(0x00000, 0x3ffff) AM_RAMBANK("standard_ram")
+//	AM_RANGE(0x40000, 0xeffff) AM_RAMBANK("expansion_ram")
 	AM_RANGE(0xf0000, 0xf0fff) AM_MIRROR(0x7000) AM_RAM AM_SHARE("screen_buffer")
 	AM_RANGE(0xfc000, 0xfffff) AM_MIRROR(0x4000) AM_ROM AM_REGION("bootstrap", 0)
 ADDRESS_MAP_END
@@ -307,18 +291,6 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( apricot )
 INPUT_PORTS_END
-
-
-/***************************************************************************
-    PALETTE
-***************************************************************************/
-
-void apricot_state::palette_init()
-{
-	palette_set_color(machine(), 0, MAKE_RGB(0x00, 0x00, 0x00)); /* black */
-	palette_set_color(machine(), 1, MAKE_RGB(0x00, 0x7f, 0x00)); /* low intensity */
-	palette_set_color(machine(), 2, MAKE_RGB(0x00, 0xff, 0x00)); /* high intensitiy */
-}
 
 
 /***************************************************************************
@@ -380,7 +352,6 @@ static MACHINE_CONFIG_START( apricot, apricot_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 800-1, 0, 400-1)
 	MCFG_SCREEN_REFRESH_RATE(72)
 	MCFG_SCREEN_UPDATE_DRIVER(apricot_state, screen_update_apricot)
-	MCFG_PALETTE_LENGTH(3)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -396,9 +367,9 @@ static MACHINE_CONFIG_START( apricot, apricot_state )
 	/* Devices */
 	MCFG_MC6845_ADD("ic30", MC6845, "screen", XTAL_15MHz / 10, apricot_mc6845_intf)
 	MCFG_I8255A_ADD("ic17", apricot_i8255a_intf)
-	MCFG_PIC8259_ADD("ic31", INPUTLINE("maincpu",0), VCC, NULL)
+	MCFG_PIC8259_ADD("ic31", INPUTLINE("maincpu", 0), VCC, NULL)
 	MCFG_PIT8253_ADD("ic16", apricot_pit8253_intf)
-	MCFG_Z80SIO0_ADD("ic15", 0, apricot_z80sio_intf)
+	MCFG_Z80SIO0_ADD("ic15", XTAL_15MHz / 6, apricot_z80sio_intf)
 
 	/* floppy */
 	MCFG_WD2793_ADD("ic68", apricot_wd17xx_intf)
@@ -430,6 +401,6 @@ ROM_END
     GAME DRIVERS
 ***************************************************************************/
 
-/*    YEAR  NAME       PARENT   COMPAT  MACHINE    INPUT    INIT     COMPANY  FULLNAME      FLAGS */
-COMP( 1983, apricot,   0,       0,      apricot,   apricot, apricot_state, apricot, "ACT",   "Apricot PC", GAME_NOT_WORKING )
-COMP( 1984, apricotxi, apricot, 0,      apricotxi, apricot, apricot_state, apricot, "ACT",   "Apricot Xi", GAME_NOT_WORKING )
+/*    YEAR  NAME       PARENT   COMPAT  MACHINE    INPUT    CLASS          INIT  COMPANY  FULLNAME      FLAGS */
+COMP( 1983, apricot,   0,       0,      apricot,   apricot, driver_device, 0,    "ACT",   "Apricot PC", GAME_NOT_WORKING )
+COMP( 1984, apricotxi, apricot, 0,      apricotxi, apricot, driver_device, 0,    "ACT",   "Apricot Xi", GAME_NOT_WORKING )
