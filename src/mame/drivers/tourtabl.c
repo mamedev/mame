@@ -11,7 +11,6 @@
 #include "cpu/m6502/m6502.h"
 #include "sound/tiaintf.h"
 #include "video/tia.h"
-#include "drivlgcy.h"
 
 
 class tourtabl_state : public driver_device
@@ -189,7 +188,7 @@ static MACHINE_CONFIG_START( tourtabl, tourtabl_state )
 	MCFG_SCREEN_UPDATE_DEVICE("tia_video", tia_video_device, screen_update)
 
 	MCFG_PALETTE_LENGTH(TIA_PALETTE_LENGTH)
-	MCFG_PALETTE_INIT(tia_NTSC)
+	MCFG_PALETTE_INIT_OVERRIDE(tia_video_device, tia_ntsc)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

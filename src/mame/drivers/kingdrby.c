@@ -1144,7 +1144,7 @@ ROM_START( kingdrbb ) // has 'Made in Taiwan' on the PCB.
 	ROM_REGION( 0x4000, "raw_prom", 0 )
 	ROM_LOAD( "kingdrbb_u1.bin", 0x0000, 0x4000, CRC(97931952) SHA1(a0ef3be105f2ed7f744c73e92c583d25bb322e6a) ) // palette but in a normal rom?
 
-	ROM_REGION( 0x200, "proms", ROMREGION_ERASE00 ) // address shuffled, decoded inside PALETTE_INIT
+	ROM_REGION( 0x200, "proms", ROMREGION_ERASE00 ) // address shuffled, decoded inside palette_init
 //  ROM_COPY( "raw_prom", 0x1000, 0x000, 0x200 )
 //  ROM_COPY( "raw_prom", 0x3000, 0x200, 0x200 ) //identical to 0x1000 bank
 

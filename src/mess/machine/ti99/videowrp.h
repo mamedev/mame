@@ -168,7 +168,7 @@ protected:
 	MCFG_SCREEN_SIZE(_x, _y)                                                \
 	MCFG_SCREEN_VISIBLE_AREA(0, _x - 1, 0, _y - 1)                          \
 	MCFG_PALETTE_LENGTH(512)                                                \
-	MCFG_PALETTE_INIT(v9938)
+	MCFG_PALETTE_INIT_OVERRIDE(v9938_device, v9938)
 
 #define MCFG_TI_SOUND_94624_ADD(_tag, _conf)            \
 	MCFG_DEVICE_ADD(_tag, TISOUND_94624, 0) \

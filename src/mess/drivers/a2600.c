@@ -19,7 +19,6 @@ TODO:
 #include "video/tia.h"
 #include "machine/vcsctrl.h"
 #include "hashfile.h"
-#include "drivlgcy.h"
 
 #define CONTROL1_TAG    "joyport1"
 #define CONTROL2_TAG    "joyport2"
@@ -1942,7 +1941,7 @@ static MACHINE_CONFIG_START( a2600, a2600_state )
 	MCFG_SCREEN_UPDATE_DEVICE("tia_video", tia_video_device, screen_update)
 
 	MCFG_PALETTE_LENGTH( TIA_PALETTE_LENGTH )
-	MCFG_PALETTE_INIT(tia_NTSC)
+	MCFG_PALETTE_INIT_OVERRIDE(tia_video_device, tia_ntsc)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1979,7 +1978,7 @@ static MACHINE_CONFIG_START( a2600p, a2600_state )
 	MCFG_SCREEN_UPDATE_DEVICE("tia_video", tia_video_device, screen_update)
 
 	MCFG_PALETTE_LENGTH( TIA_PALETTE_LENGTH )
-	MCFG_PALETTE_INIT(tia_PAL)
+	MCFG_PALETTE_INIT_OVERRIDE(tia_video_device, tia_pal)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

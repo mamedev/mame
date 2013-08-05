@@ -198,7 +198,6 @@
 #include "video/v9938.h"
 #include "machine/ticket.h"
 #include "machine/nvram.h"
-#include "drivlgcy.h"
 
 class kurukuru_state : public driver_device
 {
@@ -590,7 +589,7 @@ static MACHINE_CONFIG_START( kurukuru, kurukuru_state )
 	MCFG_SCREEN_UPDATE_DEVICE("v9938", v9938_device, screen_update)
 
 	MCFG_PALETTE_LENGTH(512)
-	MCFG_PALETTE_INIT( v9938 )
+	MCFG_PALETTE_INIT_OVERRIDE(v9938_device, v9938)
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(HOPPER_PULSE), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW )
 

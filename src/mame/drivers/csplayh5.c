@@ -24,7 +24,6 @@
 #include "cpu/z80/z80daisy.h"
 #include "machine/nvram.h"
 #include "cpu/h83002/h8.h"
-#include "drivlgcy.h"
 
 
 class csplayh5_state : public driver_device
@@ -665,7 +664,7 @@ static MACHINE_CONFIG_START( csplayh5, csplayh5_state )
 	MCFG_SCREEN_UPDATE_DEVICE("v9958", v9958_device, screen_update)
 
 	MCFG_PALETTE_LENGTH(512)
-	MCFG_PALETTE_INIT( v9958 )
+	MCFG_PALETTE_INIT_OVERRIDE(v9958_device, v9958)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

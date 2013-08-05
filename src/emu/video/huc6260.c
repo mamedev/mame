@@ -23,7 +23,7 @@
 #define HUC6260_HSYNC_START     ( HUC6260_WPF - HUC6260_HSYNC_LENGTH )
 
 
-PALETTE_INIT( huc6260 )
+void huc6260_device::palette_init()
 {
 	int i;
 
@@ -34,8 +34,8 @@ PALETTE_INIT( huc6260 )
 		int b = pal3bit( ( i      ) & 7 );
 		int y = ( ( 66 * r + 129 * g + 25 * b + 128 ) >> 8 ) + 16;
 
-		palette_set_color_rgb( machine, i, r, g, b );
-		palette_set_color_rgb( machine, 512 + i, y, y, y );
+		palette_set_color_rgb( machine(), i, r, g, b );
+		palette_set_color_rgb( machine(), 512 + i, y, y, y );
 	}
 }
 

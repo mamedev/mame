@@ -45,7 +45,7 @@ static void extend_palette(running_machine &machine) {
 	}
 }
 
-PALETTE_INIT( tia_NTSC )
+PALETTE_INIT_MEMBER(tia_video_device, tia_ntsc)
 {
 	int i, j;
 
@@ -94,17 +94,17 @@ PALETTE_INIT( tia_NTSC )
 			if (G > 1) G = 1;
 			if (B > 1) B = 1;
 
-			palette_set_color_rgb(machine,8 * i + j,
+			palette_set_color_rgb(machine(),8 * i + j,
 				(UINT8) (255 * R + 0.5),
 				(UINT8) (255 * G + 0.5),
 				(UINT8) (255 * B + 0.5));
 		}
 	}
-	extend_palette( machine );
+	extend_palette( machine() );
 }
 
 
-PALETTE_INIT( tia_PAL )
+PALETTE_INIT_MEMBER(tia_video_device, tia_pal)
 {
 	int i, j;
 
@@ -153,13 +153,13 @@ PALETTE_INIT( tia_PAL )
 			if (G > 1) G = 1;
 			if (B > 1) B = 1;
 
-			palette_set_color_rgb(machine,8 * i + j,
+			palette_set_color_rgb(machine(),8 * i + j,
 				(UINT8) (255 * R + 0.5),
 				(UINT8) (255 * G + 0.5),
 				(UINT8) (255 * B + 0.5));
 		}
 	}
-	extend_palette( machine );
+	extend_palette( machine() );
 }
 
 // device type definition

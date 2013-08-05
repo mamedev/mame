@@ -60,6 +60,9 @@ public:
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
+	
+	DECLARE_PALETTE_INIT(tia_ntsc);
+	DECLARE_PALETTE_INIT(tia_pal);
 
 protected:
 	// device-level overrides
@@ -207,8 +210,5 @@ private:
 
 // device type definition
 extern const device_type TIA_VIDEO;
-
-PALETTE_INIT( tia_NTSC );
-PALETTE_INIT( tia_PAL );
 
 #endif /* _VIDEO_TIA_H_ */

@@ -63,7 +63,6 @@ Super System Card:
 #include "sound/msm5205.h"
 #include "video/huc6270.h"
 #include "video/huc6202.h"
-#include "drivlgcy.h"
 
 /* todo: alternate forms of input (multitap, mouse, etc.) */
 static INPUT_PORTS_START( pce )
@@ -381,7 +380,6 @@ static MACHINE_CONFIG_START( pce_common, pce_state )
 	MCFG_SCREEN_UPDATE_DRIVER( pce_state, screen_update )
 
 	MCFG_PALETTE_LENGTH( HUC6260_PALETTE_SIZE )
-	MCFG_PALETTE_INIT( huc6260 )
 
 	MCFG_HUC6260_ADD( "huc6260", MAIN_CLOCK, pce_huc6260_config )
 	MCFG_HUC6270_ADD( "huc6270", pce_huc6270_config )
@@ -426,7 +424,6 @@ static MACHINE_CONFIG_START( sgx, pce_state )
 	MCFG_SCREEN_UPDATE_DRIVER( pce_state, screen_update )
 
 	MCFG_PALETTE_LENGTH( HUC6260_PALETTE_SIZE )
-	MCFG_PALETTE_INIT( huc6260 )
 
 	MCFG_HUC6260_ADD( "huc6260", MAIN_CLOCK, sgx_huc6260_config )
 	MCFG_HUC6270_ADD( "huc6270_0", sgx_huc6270_0_config )

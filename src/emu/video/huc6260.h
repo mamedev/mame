@@ -18,9 +18,6 @@
 #define HUC6260_LPF         263     /* max number of lines in a single frame */
 
 
-PALETTE_INIT( huc6260 );
-
-
 #define MCFG_HUC6260_ADD( _tag, clock, _intrf ) \
 	MCFG_DEVICE_ADD( _tag, HUC6260, clock )     \
 	MCFG_DEVICE_CONFIG( _intrf )
@@ -61,6 +58,7 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void palette_init();
 
 private:
 	int     m_last_h;

@@ -306,7 +306,6 @@ covert megatech / megaplay drivers to use new code etc. etc.
 #include "machine/segacrp2.h"
 #include "video/315_5124.h"
 #include "includes/segaipt.h"
-#include "drivlgcy.h"
 
 
 class systeme_state : public driver_device
@@ -1119,7 +1118,7 @@ static MACHINE_CONFIG_START( systeme, systeme_state )
 	MCFG_SCREEN_UPDATE_DRIVER(systeme_state, screen_update_systeme)
 
 	MCFG_PALETTE_LENGTH(SEGA315_5124_PALETTE_SIZE)
-	MCFG_PALETTE_INIT(sega315_5124)
+	MCFG_PALETTE_INIT_OVERRIDE(sega315_5124_device, sega315_5124)
 
 	MCFG_SEGA315_5124_ADD("vdp1", _315_5124_1_intf)
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, vdp1_map)

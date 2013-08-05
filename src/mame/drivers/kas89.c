@@ -196,7 +196,6 @@
 #include "sound/ay8910.h"
 #include "video/v9938.h"
 #include "machine/nvram.h"
-#include "drivlgcy.h"
 #include "kas89.lh"
 
 
@@ -800,7 +799,7 @@ static MACHINE_CONFIG_START( kas89, kas89_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 544 - 1, 0, 480 - 1)
 
 	MCFG_PALETTE_LENGTH(512)
-	MCFG_PALETTE_INIT(v9938)
+	MCFG_PALETTE_INIT_OVERRIDE(v9938_device, v9938)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

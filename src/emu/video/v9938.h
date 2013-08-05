@@ -59,8 +59,6 @@ class v99x8_device : 	public device_t,
 						public device_memory_interface,
 						public device_video_interface
 {
-	friend PALETTE_INIT( v9958 );
-
 protected:
 	// construction/destruction
 	v99x8_device(const machine_config &mconfig, device_type type, const char *name, const char *shortname, const char *tag, device_t *owner, UINT32 clock);
@@ -79,6 +77,9 @@ public:
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
+	
+	DECLARE_PALETTE_INIT(v9938);
+	DECLARE_PALETTE_INIT(v9958);
 
 	UINT8 vram_r();
 	UINT8 status_r();
@@ -251,9 +252,6 @@ class v9958_device : public v99x8_device
 public:
 	v9958_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
-
-PALETTE_INIT( v9938 );
-PALETTE_INIT( v9958 );
 
 
 #endif

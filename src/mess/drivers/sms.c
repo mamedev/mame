@@ -220,7 +220,6 @@ DC00      - Selection buttons #2, 9-16 (R)
 #include "imagedev/cartslot.h"
 #include "includes/sms.h"
 #include "machine/sega8_rom.h"
-#include "drivlgcy.h"
 
 #include "sms1.lh"
 
@@ -528,7 +527,7 @@ static MACHINE_CONFIG_DERIVED( sms2_ntsc, sms_ntsc_base )
 	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms)
 
 	MCFG_PALETTE_LENGTH(SEGA315_5124_PALETTE_SIZE)
-	MCFG_PALETTE_INIT(sega315_5124)
+	MCFG_PALETTE_INIT_OVERRIDE(sega315_5124_device, sega315_5124)
 
 	MCFG_SEGA315_5246_ADD("sms_vdp", _315_5124_ntsc_intf)
 	MCFG_SEGA315_5246_SET_SCREEN("screen")
@@ -564,7 +563,7 @@ static MACHINE_CONFIG_DERIVED( sms1_ntsc, sms_ntsc_base )
 	MCFG_DEFAULT_LAYOUT(layout_sms1)
 
 	MCFG_PALETTE_LENGTH(SEGA315_5124_PALETTE_SIZE)
-	MCFG_PALETTE_INIT(sega315_5124)
+	MCFG_PALETTE_INIT_OVERRIDE(sega315_5124_device, sega315_5124)
 
 	MCFG_VIDEO_START_OVERRIDE(sms_state,sms1)
 	MCFG_VIDEO_RESET_OVERRIDE(sms_state,sms1)
@@ -602,7 +601,7 @@ static MACHINE_CONFIG_START( sms_sdisp, smssdisp_state )
 	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms)
 
 	MCFG_PALETTE_LENGTH(SEGA315_5124_PALETTE_SIZE)
-	MCFG_PALETTE_INIT(sega315_5124)
+	MCFG_PALETTE_INIT_OVERRIDE(sega315_5124_device, sega315_5124)
 
 	MCFG_SEGA315_5246_ADD("sms_vdp", sms_store_intf)
 	MCFG_SEGA315_5246_SET_SCREEN("screen")
@@ -697,7 +696,7 @@ static MACHINE_CONFIG_DERIVED( sms2_pal, sms_pal_base )
 	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms)
 
 	MCFG_PALETTE_LENGTH(SEGA315_5124_PALETTE_SIZE)
-	MCFG_PALETTE_INIT(sega315_5124)
+	MCFG_PALETTE_INIT_OVERRIDE(sega315_5124_device, sega315_5124)
 
 	MCFG_SEGA315_5246_ADD("sms_vdp", _315_5124_pal_intf)
 	MCFG_SEGA315_5246_SET_SCREEN("screen")
@@ -733,7 +732,7 @@ static MACHINE_CONFIG_DERIVED( sms1_pal, sms_pal_base )
 	MCFG_DEFAULT_LAYOUT(layout_sms1)
 
 	MCFG_PALETTE_LENGTH(SEGA315_5124_PALETTE_SIZE)
-	MCFG_PALETTE_INIT(sega315_5124)
+	MCFG_PALETTE_INIT_OVERRIDE(sega315_5124_device, sega315_5124)
 
 	MCFG_VIDEO_START_OVERRIDE(sms_state,sms1)
 	MCFG_VIDEO_RESET_OVERRIDE(sms_state,sms1)
@@ -786,7 +785,7 @@ static MACHINE_CONFIG_START( gamegear, sms_state )
 	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_gamegear)
 
 	MCFG_PALETTE_LENGTH(SEGA315_5378_PALETTE_SIZE)
-	MCFG_PALETTE_INIT(sega315_5378)
+	MCFG_PALETTE_INIT_OVERRIDE(sega315_5378_device, sega315_5378)
 
 	MCFG_VIDEO_START_OVERRIDE(sms_state,gamegear)
 

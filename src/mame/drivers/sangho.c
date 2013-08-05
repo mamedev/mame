@@ -46,7 +46,6 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "video/v9938.h"
 #include "sound/2413intf.h"
-#include "drivlgcy.h"
 
 
 class sangho_state : public driver_device
@@ -441,11 +440,10 @@ static MACHINE_CONFIG_START( pzlestar, sangho_state )
 	MCFG_SCREEN_SIZE(512 + 32, (212 + 28) * 2)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512 + 32 - 1, 0, (212 + 28) * 2 - 1)
 
-	MCFG_PALETTE_LENGTH(19268)
-
 	MCFG_MACHINE_RESET_OVERRIDE(sangho_state,pzlestar)
 
-	MCFG_PALETTE_INIT( v9958 )
+	MCFG_PALETTE_LENGTH(19268)
+	MCFG_PALETTE_INIT_OVERRIDE(v9958_device, v9958)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ymsnd", YM2413, 3580000)
@@ -473,11 +471,10 @@ static MACHINE_CONFIG_START( sexyboom, sangho_state )
 	MCFG_SCREEN_SIZE(512 + 32, (212 + 28) * 2)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512 + 32 - 1, 0, (212 + 28) * 2 - 1)
 
-	MCFG_PALETTE_LENGTH(19268)
-
 	MCFG_MACHINE_RESET_OVERRIDE(sangho_state,sexyboom)
 
-	MCFG_PALETTE_INIT( v9958 )
+	MCFG_PALETTE_LENGTH(19268)
+	MCFG_PALETTE_INIT_OVERRIDE(v9958_device, v9958)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ymsnd", YM2413, 3580000)

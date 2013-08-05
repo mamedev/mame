@@ -243,13 +243,13 @@ b0 is set if b2 and b1 are set (remember, color bus is 3 bits)
 
 */
 
-PALETTE_INIT( v9938 )
+PALETTE_INIT_MEMBER(v99x8_device, v9938)
 {
 	int i;
 
 	// create the full 512 colour palette
 	for (i=0;i<512;i++)
-		palette_set_color_rgb(machine, i, pal3bit(i >> 6), pal3bit(i >> 3), pal3bit(i >> 0));
+		palette_set_color_rgb(machine(), i, pal3bit(i >> 6), pal3bit(i >> 3), pal3bit(i >> 0));
 }
 
 /*
@@ -265,16 +265,16 @@ to emulate this. Also it keeps the palette a reasonable size. :)
 
 UINT16 *v99x8_device::s_pal_indYJK;
 
-PALETTE_INIT( v9958 )
+PALETTE_INIT_MEMBER(v99x8_device, v9958)
 {
 	int r,g,b,y,j,k,i,k0,j0,n;
 	UINT8 pal[19268*3];
 
 	// init v9938 512-color palette
-	PALETTE_INIT_CALL(v9938);
+	PALETTE_INIT_CALL_MEMBER(v9938);
 
 	if (v99x8_device::s_pal_indYJK == NULL)
-		v99x8_device::s_pal_indYJK = auto_alloc_array(machine,UINT16, 0x20000);
+		v99x8_device::s_pal_indYJK = auto_alloc_array(machine(),UINT16, 0x20000);
 
 	// set up YJK table
 	LOG(("Building YJK table for V9958 screens, may take a while ... \n"));
@@ -312,7 +312,7 @@ PALETTE_INIT( v9958 )
 			pal[i*3+0] = r;
 			pal[i*3+1] = g;
 			pal[i*3+2] = b;
-			palette_set_color(machine, i+512, MAKE_RGB(r, g, b));
+			palette_set_color(machine(), i+512, MAKE_RGB(r, g, b));
 			v99x8_device::s_pal_indYJK[y | j << 5 | k << (5 + 6)] = i + 512;
 			i++;
 		}

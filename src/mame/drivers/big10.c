@@ -61,7 +61,6 @@
 #include "sound/ay8910.h"
 #include "video/v9938.h"
 #include "machine/nvram.h"
-#include "drivlgcy.h"
 
 
 class big10_state : public driver_device
@@ -268,7 +267,7 @@ static MACHINE_CONFIG_START( big10, big10_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512 + 32 - 1, 0, (212 + 28) * 2 - 1)
 
 	MCFG_PALETTE_LENGTH(512)
-	MCFG_PALETTE_INIT(v9938)
+	MCFG_PALETTE_INIT_OVERRIDE(v9938_device, v9938)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

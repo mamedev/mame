@@ -176,7 +176,6 @@ Not all regional versions are available for each Megatouch series
 #include "machine/ins8250.h"
 #include "machine/microtch.h"
 #include "machine/nvram.h"
-#include "drivlgcy.h"
 
 
 struct ds1204_t
@@ -1255,10 +1254,9 @@ static MACHINE_CONFIG_START( meritm_crt250, meritm_state )
 	MCFG_SCREEN_SIZE(MSX2_TOTAL_XRES_PIXELS, 262*2)
 	MCFG_SCREEN_VISIBLE_AREA(MSX2_XBORDER_PIXELS - MSX2_VISIBLE_XBORDER_PIXELS, MSX2_TOTAL_XRES_PIXELS - MSX2_XBORDER_PIXELS + MSX2_VISIBLE_XBORDER_PIXELS - 1, MSX2_YBORDER_PIXELS - MSX2_VISIBLE_YBORDER_PIXELS, MSX2_TOTAL_YRES_PIXELS - MSX2_YBORDER_PIXELS + MSX2_VISIBLE_YBORDER_PIXELS - 1)
 	MCFG_SCREEN_UPDATE_DRIVER(meritm_state, screen_update_meritm)
+
 	MCFG_PALETTE_LENGTH(512)
-
-	MCFG_PALETTE_INIT( v9938 )
-
+	MCFG_PALETTE_INIT_OVERRIDE(v9938_device, v9938)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

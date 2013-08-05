@@ -89,7 +89,7 @@ const device_type SEGA315_5246 = &device_creator<sega315_5246_device>;
 const device_type SEGA315_5378 = &device_creator<sega315_5378_device>;
 
 
-PALETTE_INIT( sega315_5124 )
+PALETTE_INIT_MEMBER(sega315_5124_device, sega315_5124)
 {
 	int i;
 	for (i = 0; i < 64; i++)
@@ -97,29 +97,29 @@ PALETTE_INIT( sega315_5124 )
 		int r = i & 0x03;
 		int g = (i & 0x0c) >> 2;
 		int b = (i & 0x30) >> 4;
-		palette_set_color_rgb(machine, i, pal2bit(r), pal2bit(g), pal2bit(b));
+		palette_set_color_rgb(machine(), i, pal2bit(r), pal2bit(g), pal2bit(b));
 	}
 	/* TMS9918 palette */
-	palette_set_color_rgb(machine, 64+ 0,   0,   0,   0);
-	palette_set_color_rgb(machine, 64+ 1,   0,   0,   0);
-	palette_set_color_rgb(machine, 64+ 2,  33, 200,  66);
-	palette_set_color_rgb(machine, 64+ 3,  94, 220, 120);
-	palette_set_color_rgb(machine, 64+ 4,  84,  85, 237);
-	palette_set_color_rgb(machine, 64+ 5, 125, 118, 252);
-	palette_set_color_rgb(machine, 64+ 6, 212,  82,  77);
-	palette_set_color_rgb(machine, 64+ 7,  66, 235, 245);
-	palette_set_color_rgb(machine, 64+ 8, 252,  85,  84);
-	palette_set_color_rgb(machine, 64+ 9, 255, 121, 120);
-	palette_set_color_rgb(machine, 64+10, 212, 193,  84);
-	palette_set_color_rgb(machine, 64+11, 230, 206, 128);
-	palette_set_color_rgb(machine, 64+12,  33, 176,  59);
-	palette_set_color_rgb(machine, 64+13, 201,  91, 186);
-	palette_set_color_rgb(machine, 64+14, 204, 204, 204);
-	palette_set_color_rgb(machine, 64+15, 255, 255, 255);
+	palette_set_color_rgb(machine(), 64+ 0,   0,   0,   0);
+	palette_set_color_rgb(machine(), 64+ 1,   0,   0,   0);
+	palette_set_color_rgb(machine(), 64+ 2,  33, 200,  66);
+	palette_set_color_rgb(machine(), 64+ 3,  94, 220, 120);
+	palette_set_color_rgb(machine(), 64+ 4,  84,  85, 237);
+	palette_set_color_rgb(machine(), 64+ 5, 125, 118, 252);
+	palette_set_color_rgb(machine(), 64+ 6, 212,  82,  77);
+	palette_set_color_rgb(machine(), 64+ 7,  66, 235, 245);
+	palette_set_color_rgb(machine(), 64+ 8, 252,  85,  84);
+	palette_set_color_rgb(machine(), 64+ 9, 255, 121, 120);
+	palette_set_color_rgb(machine(), 64+10, 212, 193,  84);
+	palette_set_color_rgb(machine(), 64+11, 230, 206, 128);
+	palette_set_color_rgb(machine(), 64+12,  33, 176,  59);
+	palette_set_color_rgb(machine(), 64+13, 201,  91, 186);
+	palette_set_color_rgb(machine(), 64+14, 204, 204, 204);
+	palette_set_color_rgb(machine(), 64+15, 255, 255, 255);
 }
 
 
-PALETTE_INIT( sega315_5378 )
+PALETTE_INIT_MEMBER(sega315_5124_device, sega315_5378)
 {
 	int i;
 	for (i = 0; i < 4096; i++)
@@ -127,7 +127,7 @@ PALETTE_INIT( sega315_5378 )
 		int r = i & 0x000f;
 		int g = (i & 0x00f0) >> 4;
 		int b = (i & 0x0f00) >> 8;
-		palette_set_color_rgb(machine, i, pal4bit(r), pal4bit(g), pal4bit(b));
+		palette_set_color_rgb(machine(), i, pal4bit(r), pal4bit(g), pal4bit(b));
 	}
 }
 

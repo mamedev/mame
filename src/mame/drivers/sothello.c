@@ -40,7 +40,6 @@ OSC  : 8.0000MHz(X1)   21.477 MHz(X2)   384kHz(X3)
 #include "sound/2203intf.h"
 #include "sound/msm5205.h"
 #include "video/v9938.h"
-#include "drivlgcy.h"
 
 
 class sothello_state : public driver_device
@@ -391,7 +390,7 @@ static MACHINE_CONFIG_START( sothello, sothello_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512 + 32 - 1, 0, (212 + 28) * 2 - 1)
 
 	MCFG_PALETTE_LENGTH(512)
-	MCFG_PALETTE_INIT( v9938 )
+	MCFG_PALETTE_INIT_OVERRIDE(v9938_device, v9938)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

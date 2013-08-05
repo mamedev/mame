@@ -1598,7 +1598,7 @@ static GFXDECODE_START( dfeveron )
 	/* There are only $800 colors here, the first half for sprites
 	   the second half for tiles. We use $8000 virtual colors instead
 	   for consistency with games having $8000 real colors.
-	   A PALETTE_INIT function is thus needed for sprites */
+	   A palette_init function is thus needed for sprites */
 
 //  "sprites"
 	GFXDECODE_ENTRY( "layer0", 0, layout_8x8x4, 0x4400, 0x40 ) // [0] Layer 0
@@ -1611,7 +1611,7 @@ GFXDECODE_END
 
 static GFXDECODE_START( ddonpach )
 	/* Layers 01 are 4 bit deep and use the first 16 of every 256
-	   colors for any given color code (a PALETTE_INIT function
+	   colors for any given color code (a palette_init function
 	   is provided for these layers, filling the 8000-83ff entries
 	   in the color table). Layer 2 uses the whole 256 for any given
 	   color code and the 4000-7fff range in the color table.   */
@@ -1630,7 +1630,7 @@ static GFXDECODE_START( donpachi )
 	/* There are only $800 colors here, the first half for sprites
 	   the second half for tiles. We use $8000 virtual colors instead
 	   for consistency with games having $8000 real colors.
-	   A PALETTE_INIT function is thus needed for sprites */
+	   A palette_init function is thus needed for sprites */
 
 //  "sprites"
 	GFXDECODE_ENTRY( "layer0", 0, layout_8x8x4, 0x4400, 0x40 ) // [0] Layer 0
@@ -1657,7 +1657,7 @@ static GFXDECODE_START( hotdogst )
 	/* There are only $800 colors here, the first half for sprites
 	   the second half for tiles. We use $8000 virtual colors instead
 	   for consistency with games having $8000 real colors.
-	   A PALETTE_INIT function is needed for sprites */
+	   A palette_init function is needed for sprites */
 
 //  "sprites"
 	GFXDECODE_ENTRY( "layer0", 0, layout_8x8x4, 0x4000, 0x40 ) // [0] Layer 0
@@ -1685,7 +1685,7 @@ static GFXDECODE_START( mazinger )
 	    first 16 colors of each palette, Indeed, the gfx data in ROM
 	    is empty in the top 4 bits. Additionally even if there are
 	    $40 color codes, only $400 colors are addressable.
-	    A PALETTE_INIT function is thus needed for sprites and layer 0.   */
+	    A palette_init function is thus needed for sprites and layer 0.   */
 
 //  "sprites"
 	GFXDECODE_ENTRY( "layer0", 0, layout_8x8x4, 0x4000, 0x40 ) // [0] Layer 0
