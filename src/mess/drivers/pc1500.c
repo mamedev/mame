@@ -40,7 +40,7 @@ public:
 	DECLARE_READ8_MEMBER( port_b_r );
 	DECLARE_WRITE8_MEMBER( port_c_w );
 
-	static UINT8 pc1500_kb_r(device_t *device);
+	DECLARE_READ8_MEMBER( pc1500_kb_r );
 	virtual void palette_init();
 };
 
@@ -60,29 +60,28 @@ static ADDRESS_MAP_START( pc1500_mem_io , AS_IO, 8, pc1500_state)
 	AM_RANGE( 0xf000, 0xf00f) AM_DEVREADWRITE("lh5810", lh5810_device, data_r, data_w)
 ADDRESS_MAP_END
 
-UINT8 pc1500_state::pc1500_kb_r(device_t *device)
+READ8_MEMBER( pc1500_state::pc1500_kb_r )
 {
-	pc1500_state *state = device->machine().driver_data<pc1500_state>();
 	UINT8 data = 0xff;
 
-	if (!device->started()) return 0;
+	if (!started()) return 0;
 
-	if (!(state->m_kb_matrix & 0x01))
-		data &= state->ioport("KEY0")->read();
-	if (!(state->m_kb_matrix & 0x02))
-		data &= state->ioport("KEY1")->read();
-	if (!(state->m_kb_matrix & 0x04))
-		data &= state->ioport("KEY2")->read();
-	if (!(state->m_kb_matrix & 0x08))
-		data &= state->ioport("KEY3")->read();
-	if (!(state->m_kb_matrix & 0x10))
-		data &= state->ioport("KEY4")->read();
-	if (!(state->m_kb_matrix & 0x20))
-		data &= state->ioport("KEY5")->read();
-	if (!(state->m_kb_matrix & 0x40))
-		data &= state->ioport("KEY6")->read();
-	if (!(state->m_kb_matrix & 0x80))
-		data &= state->ioport("KEY7")->read();
+	if (!(m_kb_matrix & 0x01))
+		data &= ioport("KEY0")->read();
+	if (!(m_kb_matrix & 0x02))
+		data &= ioport("KEY1")->read();
+	if (!(m_kb_matrix & 0x04))
+		data &= ioport("KEY2")->read();
+	if (!(m_kb_matrix & 0x08))
+		data &= ioport("KEY3")->read();
+	if (!(m_kb_matrix & 0x10))
+		data &= ioport("KEY4")->read();
+	if (!(m_kb_matrix & 0x20))
+		data &= ioport("KEY5")->read();
+	if (!(m_kb_matrix & 0x40))
+		data &= ioport("KEY6")->read();
+	if (!(m_kb_matrix & 0x80))
+		data &= ioport("KEY7")->read();
 
 	return data;
 }
@@ -263,11 +262,6 @@ void pc1500_state::palette_init()
 	palette_set_color(machine(), 1, MAKE_RGB(92, 83, 88));
 }
 
-static const lh5801_cpu_core lh5801_pc1500_config =
-{
-	pc1500_state::pc1500_kb_r
-};
-
 static const lh5810_interface lh5810_pc1500_config =
 {
 	DEVCB_DRIVER_MEMBER(pc1500_state, port_a_r),        //port A read
@@ -282,7 +276,7 @@ static MACHINE_CONFIG_START( pc1500, pc1500_state )
 	MCFG_CPU_ADD("maincpu", LH5801, 1300000)            //1.3 MHz
 	MCFG_CPU_PROGRAM_MAP( pc1500_mem )
 	MCFG_CPU_IO_MAP( pc1500_mem_io )
-	MCFG_CPU_CONFIG( lh5801_pc1500_config )
+	MCFG_LH5801_IN(READ8(pc1500_state,pc1500_kb_r))
 
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(50)
