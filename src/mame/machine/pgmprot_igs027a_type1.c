@@ -559,8 +559,9 @@ void pgm_arm_type1_state::command_handler_ddp3(int pc)
 
 
 		case 0x99: // reset?
+			m_simregion = 0;//ioport("Region")->read();
 			m_valuekey = 0x100;
-			m_valueresponse = 0x00880000;
+			m_valueresponse = 0x00880000 | m_simregion << 8;
 			break;
 
 	}
@@ -604,6 +605,7 @@ UINT8 puzzli2_level_decode[256] = {
     0xfb, 0x89, 0x06, 0xcf, 0xfe, 0x33, 0xd5, 0x28, 0x1f, 0x19, 0x4a, 0xb1, 0x83, 0xf2, 0x72, 0x26, // 0xf
 //   x  ,  x  ,  1  ,  1  ,  1  ,  1  ,  1  ,  1  ,  x  ,  0  ,  1  ,  1  ,  1  ,  1  ,  1  ,  1  , 
 };
+
 
 
 
@@ -740,7 +742,8 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 				// todo, responses when uploading the startup values are different
 				printf("%08x: %02x %04x (for z80 address?)\n ",pc, m_ddp3lastcommand, m_value0);
 
-				m_valueresponse = 0x00d20000;
+				m_valueresponse = 0x00d20000 | p2_31_retcounter;
+				p2_31_retcounter++; // returns 0xc for the first one, 0x19 for the last one
 			}
 
 		}
@@ -800,10 +803,11 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 
 		case 0x38: // Reset
 			printf("%08x: %02x %04x (RESET)\n",pc, m_ddp3lastcommand, m_value0);
-
-			m_valueresponse = 0x78<<16;
+			m_simregion = ioport("Region")->read();
+			m_valueresponse = 0x780000 | m_simregion<<8; // this must also return the cart region or the game will act in odd ways when inserting a coin on continue, or during the game on later levels
 			m_valuekey = 0x100;
 			m_puzzli_54_trigger = 0;
+			
 		break;
 
 
@@ -863,6 +867,7 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 			command_31_write_type = 1;
 
 			m_valueresponse = 0x36<<16;
+			p2_31_retcounter = 0xc;
 		break;
 
 		case 0x41: // ASIC status?
@@ -871,7 +876,8 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 			// this command is written after the values used to decrypt the z80 addresses (assumed) are uploaded with command 31
 			command_31_write_type = 0;
 
-			m_valueresponse = 0x74<<16;
+			//m_valueresponse = 0x74<<16;
+			m_valueresponse = 0x740061;
 		break;
 
 		case 0x54: // ??
@@ -1078,8 +1084,10 @@ void pgm_arm_type1_state::command_handler_py2k2(int pc)
 		break;
 
 		case 0x99: // reset?
+			m_simregion = ioport("Region")->read();
 			m_valuekey = 0x100;
-			m_valueresponse = 0x00880000;
+			m_valueresponse = 0x00880000 | m_simregion<<8;
+			
 			break;
 	}
 }
@@ -1187,8 +1195,10 @@ void pgm_arm_type1_state::command_handler_pstars(int pc)
 	switch (m_ddp3lastcommand)
 	{
 		case 0x99:
+			m_simregion = ioport("Region")->read();
 			m_valuekey = 0x100;
-			m_valueresponse = 0x880000;
+			m_valueresponse = 0x00880000 | m_simregion<<8;
+
 			break;
 
 		case 0xe0:
@@ -1306,7 +1316,8 @@ void pgm_arm_type1_state::command_handler_kov(int pc)
 		break;
 
 		case 0x99: // Reset
-			m_valueresponse = 0x880000;
+			m_simregion = ioport("Region")->read();
+			m_valueresponse = 0x880000 | m_simregion<<8;
 			m_valuekey = 0x100;
 		break;
 
@@ -1580,8 +1591,10 @@ void pgm_arm_type1_state::command_handler_oldsplus(int pc)
 	switch (m_ddp3lastcommand)
 	{
 		case 0x88:
+			m_simregion = ioport("Region")->read();
 			m_valuekey = 0x100;
-			m_valueresponse = 0x990000;
+			m_valueresponse = 0x00990000 | m_simregion<<8;
+
 			break;
 
 		case 0xd0:
@@ -1784,7 +1797,7 @@ WRITE16_MEMBER(pgm_arm_type1_state::pgm_arm7_type1_sim_w )
 READ16_MEMBER(pgm_arm_type1_state::pgm_arm7_type1_sim_protram_r )
 {
 	if (offset == 4)
-		return ioport("Region")->read();
+		return m_simregion;
 
 	return 0x0000;
 }
@@ -2269,8 +2282,27 @@ DRIVER_INIT_MEMBER(pgm_arm_type1_state,puzzli2)
 	src3[0x17b290 ^1] = 0x42;
 	src3[0x17b291 ^1] = 0x40;
 	}
-#endif
 
+
+	pgm_puzzli2_decrypt(machine());
+
+	{
+		UINT8 *ROM = (UINT8*)memregion("maincpu")->base();
+
+		FILE *fp;
+		char filename[256];
+		sprintf(filename,"trojan_%s", machine().system().name);
+		fp=fopen(filename, "w+b");
+		if (fp)
+		{
+			fwrite(ROM+0x100000, 0x200000, 1, fp);
+			fclose(fp);
+		}
+	}
+
+
+	pgm_puzzli2_decrypt(machine());
+#endif
 }
 
 DRIVER_INIT_MEMBER(pgm_arm_type1_state,py2k2)
