@@ -688,10 +688,6 @@ void px8_state::palette_init()
 	palette_set_color_rgb(machine(), 1, 0x31, 0x39, 0x10);
 }
 
-/*-------------------------------------------------
-    SCREEN_UPDATE_IND16( px8 )
--------------------------------------------------*/
-
 UINT32 px8_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;

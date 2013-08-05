@@ -548,10 +548,6 @@ void pc1512_state::video_start()
 }
 
 
-//-------------------------------------------------
-//  SCREEN_UPDATE_RGB32( pc1512 )
-//-------------------------------------------------
-
 UINT32 pc1512_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	if (m_vdu_mode & MODE_ENABLE_VIDEO)

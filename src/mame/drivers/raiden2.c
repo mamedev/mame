@@ -1001,7 +1001,7 @@ VIDEO_START_MEMBER(raiden2_state,raiden2)
 	text_layer->set_transparent_pen(15);
 }
 
-/* SCREEN_UPDATE_IND16 (move to video file) */
+/* screen_update_raiden2 (move to video file) */
 
 UINT32 raiden2_state::screen_update_raiden2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {

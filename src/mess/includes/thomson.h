@@ -414,7 +414,7 @@ protected:
 	INT16 m_thom_border_l[THOM_TOTAL_HEIGHT+1];
 	INT16 m_thom_border_r[THOM_TOTAL_HEIGHT+1];
 	/* active area, updated one scan-line at a time every 64us,
-	   then blitted in SCREEN_UPDATE_IND16
+	   then blitted in screen_update
 	*/
 	UINT16 m_thom_vbody[640*200];
 	UINT8 m_thom_vmode; /* current vide mode */

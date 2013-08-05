@@ -178,10 +178,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(cgc7900_state::blink_tick)
 	m_blink = !m_blink;
 }
 
-/*-------------------------------------------------
-    SCREEN_UPDATE_IND16( cgc7900 )
--------------------------------------------------*/
-
 UINT32 cgc7900_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	update_clut();

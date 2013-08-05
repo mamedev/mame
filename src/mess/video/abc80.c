@@ -184,10 +184,6 @@ void abc80_state::video_start()
 }
 
 
-//-------------------------------------------------
-//  SCREEN_UPDATE_IND16( abc80 )
-//-------------------------------------------------
-
 UINT32 abc80_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	update_screen(bitmap, cliprect);

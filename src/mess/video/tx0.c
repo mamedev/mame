@@ -62,7 +62,7 @@ void tx0_state::tx0_plot(int x, int y)
 
 
 /*
-    SCREEN_UPDATE_IND16( tx0 ): effectively redraw the screen
+    screen_update_tx0: effectively redraw the screen
 */
 UINT32 tx0_state::screen_update_tx0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {

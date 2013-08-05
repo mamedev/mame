@@ -7,7 +7,7 @@
   Krzysztof Strzecha
 
   All video modes are emulated but not fully tested yet.
-  SCREEN_UPDATE_IND16 function needs strong cleanup and optimalisation.
+  dai_state::screen_update_dai() function needs strong cleanup and optimalisation.
 
 
 ***************************************************************************/

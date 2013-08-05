@@ -488,10 +488,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(ace_state::clear_irq)
 }
 
 
-//-------------------------------------------------
-//  SCREEN_UPDATE_IND16( ace )
-//-------------------------------------------------
-
 UINT32 ace_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT8 y,ra,chr,gfx;

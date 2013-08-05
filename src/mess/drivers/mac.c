@@ -84,7 +84,7 @@
 #define C15M    (C7M*2)
 #define C32M    (C15M*2)
 
-// do this here - SCREEN_UPDATE_IND16 is called each scanline when stepping in the
+// do this here - screen_update is called each scanline when stepping in the
 // debugger, which means you can't escape the VIA2 IRQ handler
 //
 // RBV/MDU bits in IER/IFR:

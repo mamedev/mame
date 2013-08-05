@@ -4030,7 +4030,7 @@ UINT32 ddenlovr_state::screen_update_htengoku(screen_device &screen, bitmap_ind1
 	int layer, x, y;
 
 	// render the layers, one by one, "dynax.c" style. Then convert the pixmaps to "ddenlovr.c"
-	// format and let SCREEN_UPDATE_IND16(ddenlovr) do the final compositing (priorities + palettes)
+	// format and let screen_update_ddenlovr() do the final compositing (priorities + palettes)
 	for (layer = 0; layer < 4; layer++)
 	{
 		bitmap.fill(0, cliprect);

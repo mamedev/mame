@@ -181,7 +181,7 @@ WRITE16_MEMBER(toaplan2_state::toaplan2_txvideoram16_w)
 WRITE16_MEMBER(toaplan2_state::toaplan2_txvideoram16_offs_w)
 {
 	// FIXME: implement line select and per-line flipping for all games
-	// see SCREEN_UPDATE_IND16( batrider )
+	// see toaplan2_state::screen_update_batrider()
 
 	UINT16 oldword = m_txvideoram16_offs[offset];
 

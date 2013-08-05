@@ -81,10 +81,6 @@ static UPD7220_INTERFACE( hgdc_intf )
 };
 
 
-//-------------------------------------------------
-//  SCREEN_UPDATE_IND16( mm1 )
-//-------------------------------------------------
-
 UINT32 mm1_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	/* text */

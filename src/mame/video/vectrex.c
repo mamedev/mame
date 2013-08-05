@@ -132,7 +132,7 @@ WRITE8_MEMBER(vectrex_state::vectrex_via_w)
 TIMER_CALLBACK_MEMBER(vectrex_state::vectrex_refresh)
 {
 	/* Refresh only marks the range of vectors which will be drawn
-	 * during the next SCREEN_UPDATE_RGB32. */
+	 * during the next screen_update. */
 	m_display_start = m_display_end;
 	m_display_end = m_point_index;
 }

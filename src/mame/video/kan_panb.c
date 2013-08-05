@@ -1,7 +1,6 @@
 /* bootlegs of Kaneko Pandora chip, with modifications */
 
 #include "emu.h"
-#include "kan_panb.h"
 #include "includes/snowbros.h"
 
 UINT32 snowbros_state::screen_update_honeydol(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

@@ -6,8 +6,6 @@
 #ifndef __VIDHRDW_NEWPORT__
 #define __VIDHRDW_NEWPORT__
 
-extern SCREEN_UPDATE_RGB32( newport );
-
 struct VC2_t
 {
 	UINT16 nRegister[0x21];

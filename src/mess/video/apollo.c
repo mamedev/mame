@@ -2097,7 +2097,7 @@ static void register_vblank_callback(device_t *device)
 			FUNC(vblank_state_changed),device) );
 }
 
-SCREEN_UPDATE_RGB32( apollo_screen )
+static SCREEN_UPDATE_RGB32( apollo_screen )
 {
 	// FIXME: omit using APOLLO_SCREEN_TAG
 	device_t *apollo_screen = screen.machine().device(APOLLO_SCREEN_TAG);

@@ -70,7 +70,6 @@ out of the sprite list at that point.. (verify on real hw)
 #include "sound/2151intf.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
-#include "video/kan_panb.h" // for bootlegs / non-original hw
 #include "cpu/mcs51/mcs51.h" // for semicom mcu
 
 

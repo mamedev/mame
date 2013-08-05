@@ -228,7 +228,7 @@ UINT32 namcos21_state::screen_update_namcos21(screen_device &screen, bitmap_ind1
 		}
 	} /* winrun bitmap layer */
 	return 0;
-} /* SCREEN_UPDATE_IND16( namcos21 ) */
+}
 
 /*********************************************************************************************/
 

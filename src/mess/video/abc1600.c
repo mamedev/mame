@@ -1077,10 +1077,6 @@ void abc1600_state::video_start()
 }
 
 
-//-------------------------------------------------
-//  SCREEN_UPDATE_IND16( abc1600 )
-//-------------------------------------------------
-
 UINT32 abc1600_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// HACK expand visible area to workaround MC6845
