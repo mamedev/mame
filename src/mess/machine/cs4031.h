@@ -206,9 +206,7 @@ private:
 	void update_dma_clock();
 
 	void nmi();
-
-	// gate a20, various sources are ored
-	void a20m()	{ m_write_a20m(m_fast_gatea20 | m_ext_gatea20 | m_emu_gatea20); }
+	void a20m();
 
 	void emulated_kbreset(int state);
 	void emulated_gatea20(int state);

@@ -601,6 +601,7 @@ WRITE8_MEMBER( cs4031_device::config_data_w )
 			break;
 
 		case SOFT_RESET_AND_GATEA20:
+			a20m();
 			break;
 		}
 	}
@@ -710,6 +711,15 @@ void cs4031_device::update_write_regions()
 //**************************************************************************
 //  KEYBOARD / 8042
 //**************************************************************************
+
+void cs4031_device::a20m()
+{
+	// external signal is ignored when emulation is on
+	if (BIT(m_registers[SOFT_RESET_AND_GATEA20], 5))
+		m_write_a20m(m_fast_gatea20 | m_emu_gatea20);
+	else
+		m_write_a20m(m_fast_gatea20 | m_ext_gatea20);
+}
 
 void cs4031_device::emulated_kbreset(int state)
 {
@@ -872,11 +882,15 @@ WRITE_LINE_MEMBER( cs4031_device::kbrst_w )
 	// convert to active low signal (gets inverted in at_keybc.c)
 	state = (state == ASSERT_LINE ? 0 : 1);
 
-	// detect transition
-	if (m_kbrst == 1 && state == 0)
+	// external kbreset is ignored when emulation enabled
+	if (!BIT(m_registers[SOFT_RESET_AND_GATEA20], 4))
 	{
-		m_write_cpureset(1);
-		m_write_cpureset(0);
+		// detect transition
+		if (m_kbrst == 1 && state == 0)
+		{
+			m_write_cpureset(1);
+			m_write_cpureset(0);
+		}
 	}
 
 	m_kbrst = state;
