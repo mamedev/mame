@@ -1141,7 +1141,7 @@ static void show_tiles(struct sms_vdp* chip)
 	Even though some games set bit 7, it does nothing.
 	*/
 
-static void end_of_frame(running_machine &machine, struct sms_vdp *chip)
+static void end_of_frame(screen_device &screen, struct sms_vdp *chip)
 {
 	UINT8 m1 = (chip->regs[0x1]&0x10)>>4;
 	UINT8 m2 = (chip->regs[0x0]&0x02)>>1;
@@ -1154,14 +1154,14 @@ static void end_of_frame(running_machine &machine, struct sms_vdp *chip)
 	{
 		rectangle visarea(0, 256-1, 0, sms_mode_table[chip->screen_mode].sms2_height-1);
 
-		if (chip->chip_id==3) machine.primary_screen->configure(256, 256, visarea, HZ_TO_ATTOSECONDS(chip->sms_framerate));
+		if (chip->chip_id==3) screen.configure(256, 256, visarea, HZ_TO_ATTOSECONDS(chip->sms_framerate));
 
 	}
 	else /* 160x144 */
 	{
 		rectangle visarea((256-160)/2, (256-160)/2+160-1, (192-144)/2, (192-144)/2+144-1);
 
-		machine.primary_screen->configure(256, 256, visarea, HZ_TO_ATTOSECONDS(chip->sms_framerate));
+		screen.configure(256, 256, visarea, HZ_TO_ATTOSECONDS(chip->sms_framerate));
 	}
 
 
@@ -1179,7 +1179,7 @@ SCREEN_VBLANK(sms)
 	// rising edge
 	if (vblank_on)
 	{
-		end_of_frame(screen.machine(), md_sms_vdp);
+		end_of_frame(screen, md_sms_vdp);
 
 		// the SMS has a 'RESET' button on the machine, it generates an NMI
 		if (screen.machine().root_device().ioport("PAUSE")->read_safe(0x00))
@@ -1245,8 +1245,8 @@ SCREEN_VBLANK(systeme)
 	// rising edge
 	if (vblank_on)
 	{
-		end_of_frame(screen.machine(), vdp1);
-		end_of_frame(screen.machine(), vdp2);
+		end_of_frame(screen, vdp1);
+		end_of_frame(screen, vdp2);
 	}
 }
 
@@ -1255,14 +1255,14 @@ SCREEN_VBLANK(megatech_md_sms)
 {
 	// rising edge
 	if (vblank_on)
-		end_of_frame(screen.machine(), md_sms_vdp);
+		end_of_frame(screen, md_sms_vdp);
 }
 
 SCREEN_VBLANK(megatech_bios)
 {
 	// rising edge
 	if (vblank_on)
-		end_of_frame(screen.machine(), vdp1);
+		end_of_frame(screen, vdp1);
 }
 
 SCREEN_UPDATE_RGB32(megatech_md_sms)

@@ -353,18 +353,18 @@ struct cobra_polydata
 class cobra_renderer : public poly_manager<float, cobra_polydata, 8, 10000>
 {
 public:
-	cobra_renderer(running_machine &machine)
-		: poly_manager<float, cobra_polydata, 8, 10000>(machine)
+	cobra_renderer(screen_device &screen)
+		: poly_manager<float, cobra_polydata, 8, 10000>(screen)
 	{
-		m_texture_ram = auto_alloc_array(machine, UINT32, 0x100000);
+		m_texture_ram = auto_alloc_array(machine(), UINT32, 0x100000);
 
-		m_framebuffer = auto_bitmap_rgb32_alloc(machine, 1024, 1024);
-		m_backbuffer = auto_bitmap_rgb32_alloc(machine, 1024, 1024);
-		m_overlay = auto_bitmap_rgb32_alloc(machine, 1024, 1024);
-		m_zbuffer = auto_bitmap_ind32_alloc(machine, 1024, 1024);
-		m_stencil = auto_bitmap_ind32_alloc(machine, 1024, 1024);
+		m_framebuffer = auto_bitmap_rgb32_alloc(machine(), 1024, 1024);
+		m_backbuffer = auto_bitmap_rgb32_alloc(machine(), 1024, 1024);
+		m_overlay = auto_bitmap_rgb32_alloc(machine(), 1024, 1024);
+		m_zbuffer = auto_bitmap_ind32_alloc(machine(), 1024, 1024);
+		m_stencil = auto_bitmap_ind32_alloc(machine(), 1024, 1024);
 
-		m_gfx_regmask = auto_alloc_array(machine, UINT32, 0x100);
+		m_gfx_regmask = auto_alloc_array(machine(), UINT32, 0x100);
 		for (int i=0; i < 0x100; i++)
 		{
 			UINT32 mask = 0;
@@ -386,7 +386,7 @@ public:
 	void draw_point(const rectangle &visarea, vertex_t &v, UINT32 color);
 	void draw_line(const rectangle &visarea, vertex_t &v1, vertex_t &v2);
 
-	void gfx_init(running_machine &machine);
+	void gfx_init();
 	void gfx_exit(running_machine &machine);
 	void gfx_reset(running_machine &machine);
 	void gfx_fifo_exec(running_machine &machine);
@@ -999,8 +999,8 @@ void cobra_state::video_start()
 {
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(cobra_state::cobra_video_exit), this));
 
-	m_renderer = auto_alloc(machine(), cobra_renderer(machine()));
-	m_renderer->gfx_init(machine());
+	m_renderer = auto_alloc(machine(), cobra_renderer(*m_screen));
+	m_renderer->gfx_init();
 }
 
 UINT32 cobra_state::screen_update_cobra(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -2017,13 +2017,13 @@ void cobra_renderer::display(bitmap_rgb32 *bitmap, const rectangle &cliprect)
 	}
 }
 
-void cobra_renderer::gfx_init(running_machine &machine)
+void cobra_renderer::gfx_init()
 {
-	const rectangle& visarea = machine.primary_screen->visible_area();
+	const rectangle& visarea = screen().visible_area();
 
-	m_gfx_gram = auto_alloc_array(machine, UINT32, 0x40000);
+	m_gfx_gram = auto_alloc_array(machine(), UINT32, 0x40000);
 
-	m_gfx_register = auto_alloc_array(machine, UINT64, 0x3000);
+	m_gfx_register = auto_alloc_array(machine(), UINT64, 0x3000);
 	m_gfx_register_select = 0;
 
 	float zvalue = 10000000.0f;
@@ -2134,7 +2134,7 @@ void cobra_renderer::gfx_write_reg(running_machine &machine, UINT64 data)
 	{
 		case 0x0000:
 		{
-			const rectangle& visarea = machine.primary_screen->visible_area();
+			const rectangle& visarea = screen().visible_area();
 
 			copybitmap_trans(*m_framebuffer, *m_backbuffer, 0, 0, 0, 0, visarea, 0);
 			m_backbuffer->fill(0xff000000, visarea);
@@ -2155,7 +2155,7 @@ void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 	if (cobra->m_gfx_fifo_loopback != 0)
 		return;
 
-	const rectangle& visarea = machine.primary_screen->visible_area();
+	const rectangle& visarea = screen().visible_area();
 	vertex_t vert[32];
 
 	cobra_fifo *fifo_in = cobra->m_gfxfifo_in;

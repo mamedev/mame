@@ -120,10 +120,12 @@ public:
 
 	// construction/destruction
 	poly_manager(running_machine &machine, UINT8 flags = 0);
+	poly_manager(screen_device &screen, UINT8 flags = 0);
 	virtual ~poly_manager();
 
 	// getters
 	running_machine &machine() const { return m_machine; }
+	screen_device &screen() const { assert(m_screen != NULL); return *m_screen; }
 
 	// synchronization
 	void wait(const char *debug_reason = "general");
@@ -247,6 +249,7 @@ private:
 
 	// queue management
 	running_machine &   m_machine;
+	screen_device *		m_screen;
 	osd_work_queue *    m_queue;                    // work queue
 
 	// arrays
@@ -279,6 +282,7 @@ private:
 template<typename _BaseType, class _ObjectData, int _MaxParams, int _MaxPolys>
 poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::poly_manager(running_machine &machine, UINT8 flags)
 	: m_machine(machine),
+		m_screen(NULL),
 		m_queue(NULL),
 		m_polygon(machine, *this),
 		m_object(machine, *this),
@@ -299,6 +303,33 @@ poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::poly_manager(runnin
 
 	// request a pre-save callback for synchronization
 	machine.save().register_presave(save_prepost_delegate(FUNC(poly_manager::presave), this));
+}
+
+
+template<typename _BaseType, class _ObjectData, int _MaxParams, int _MaxPolys>
+poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::poly_manager(screen_device &screen, UINT8 flags)
+	: m_machine(screen.machine()),
+		m_screen(&screen),
+		m_queue(NULL),
+		m_polygon(screen.machine(), *this),
+		m_object(screen.machine(), *this),
+		m_unit(screen.machine(), *this),
+		m_flags(flags),
+		m_triangles(0),
+		m_quads(0),
+		m_pixels(0)
+{
+#if KEEP_STATISTICS
+	memset(m_conflicts, 0, sizeof(m_conflicts));
+	memset(m_resolved, 0, sizeof(m_resolved));
+#endif
+
+	// create the work queue
+	if (!(flags & POLYFLAG_NO_WORK_QUEUE))
+		m_queue = osd_work_queue_alloc(WORK_QUEUE_FLAG_MULTI | WORK_QUEUE_FLAG_HIGH_FREQ);
+
+	// request a pre-save callback for synchronization
+	machine().save().register_presave(save_prepost_delegate(FUNC(poly_manager::presave), this));
 }
 
 

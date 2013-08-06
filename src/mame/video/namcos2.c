@@ -347,7 +347,7 @@ WRITE16_MEMBER( namcos2_state::paletteram_word_w )
 			/*case 0x180a:*/ case 0x180b:
 				if (data^m_paletteram[offset]) {
 					m_paletteram[offset] = data;
-					namcos2_adjust_posirq_timer(machine(),get_pos_irq_scanline());
+					adjust_posirq_timer(get_pos_irq_scanline());
 				}
 				break;
 

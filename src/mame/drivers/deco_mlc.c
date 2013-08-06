@@ -206,7 +206,7 @@ WRITE32_MEMBER(deco_mlc_state::avengrs_palette_w)
 
 TIMER_DEVICE_CALLBACK_MEMBER(deco_mlc_state::interrupt_gen)
 {
-//  logerror("hit scanline IRQ %d (%08x)\n", machine.primary_screen->vpos(), info.i);
+//  logerror("hit scanline IRQ %d (%08x)\n", m_screen->vpos(), info.i);
 	m_maincpu->set_input_line(m_mainCpuIsArm ? ARM_IRQ_LINE : 1, HOLD_LINE);
 }
 

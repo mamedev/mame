@@ -1134,7 +1134,7 @@ void snes_state::machine_reset()
 	/* Set STAT78 to NTSC or PAL */
 	if (ATTOSECONDS_TO_HZ(m_screen->frame_period().attoseconds) >= 59.0f)
 		m_ppu.m_stat78 = SNES_NTSC;
-	else /* if (ATTOSECONDS_TO_HZ(machine.primary_screen->frame_period().attoseconds) == 50.0f) */
+	else /* if (ATTOSECONDS_TO_HZ(m_screen->frame_period().attoseconds) == 50.0f) */
 		m_ppu.m_stat78 = SNES_PAL;
 
 	// reset does this to these registers

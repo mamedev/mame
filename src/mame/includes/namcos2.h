@@ -196,6 +196,7 @@ public:
 	INTERRUPT_GEN_MEMBER(namcos2_68k_slave_vblank);
 	INTERRUPT_GEN_MEMBER(namcos2_68k_gpu_vblank);
 	TIMER_CALLBACK_MEMBER(namcos2_posirq_tick);
+	void adjust_posirq_timer( int scanline );
 
 	DECLARE_WRITE8_MEMBER( namcos2_68k_eeprom_w );
 	DECLARE_READ8_MEMBER( namcos2_68k_eeprom_r );
@@ -365,8 +366,6 @@ extern void (*namcos2_kickstart)(running_machine &machine, int internal);
 #define NAMCOS2_C148_POSIRQ     5       /* 0x1ca000 */
 #define NAMCOS2_C148_SERIRQ     6       /* 0x1cc000 */
 #define NAMCOS2_C148_VBLANKIRQ  7       /* 0x1ce000 */
-
-void namcos2_adjust_posirq_timer( running_machine &machine, int scanline );
 
 /**************************************************************/
 /* MASTER CPU RAM MEMORY                                      */
