@@ -5,7 +5,6 @@
 /*************************************************************/
 
 #include "emu.h"
-#include "sound/s2636.h"
 #include "includes/zac2650.h"
 
 
@@ -35,7 +34,7 @@ WRITE8_MEMBER(zac2650_state::zac_s2636_w)
 	machine().gfx[2]->mark_dirty(offset/8);
 	if (offset == 0xc7)
 	{
-		s2636_soundport_w(machine().device("s2636snd"), 0, data);
+		m_s2636_sound->soundport_w(0, data);
 	}
 }
 

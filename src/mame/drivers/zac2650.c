@@ -10,7 +10,6 @@
 
 #include "emu.h"
 #include "cpu/s2650/s2650.h"
-#include "sound/s2636.h"
 
 #include "tinv2650.lh"
 #include "includes/zac2650.h"

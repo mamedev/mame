@@ -14,10 +14,10 @@ class s2636_sound_device : public device_t,
 {
 public:
 	s2636_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~s2636_sound_device() { global_free(m_token); }
+	~s2636_sound_device() {}
 
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
+	void soundport_w (int mode, int data);
+	
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -25,14 +25,17 @@ protected:
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+
 private:
 	// internal state
-	void *m_token;
+	sound_stream *m_channel;
+	UINT8 m_reg[1];
+	int m_size;
+	int m_pos;
+	unsigned m_level;
 };
 
 extern const device_type S2636_SOUND;
 
-void s2636_soundport_w (device_t *device, int mode, int data);
 
-
-#endif /* VC4000_H_ */
+#endif /* S2636_SOUND_H_ */

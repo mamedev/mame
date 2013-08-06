@@ -6,89 +6,19 @@
 
 #include "emu.h"
 #include "sound/s2636.h"
-#include "devlegcy.h"
-
-
-struct s2636_sound
-{
-	sound_stream *channel;
-	UINT8 reg[1];
-	int size, pos;
-	unsigned level;
-};
-
-
-static s2636_sound *get_token(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == S2636_SOUND);
-	return (s2636_sound *) downcast<s2636_sound_device *>(device)->token();
-}
-
-
-void s2636_soundport_w (device_t *device, int offset, int data)
-{
-	s2636_sound *token = get_token(device);
-
-	token->channel->update();
-	token->reg[offset] = data;
-	switch (offset)
-	{
-		case 0:
-			token->pos = 0;
-			token->level = TRUE;
-			// frequency 7874/(data+1)
-			token->size = device->machine().sample_rate() * (data + 1) /7874;
-			break;
-	}
-}
-
-
-
-/************************************/
-/* Sound handler update             */
-/************************************/
-
-static STREAM_UPDATE( s2636_update )
-{
-	int i;
-	s2636_sound *token = get_token(device);
-	stream_sample_t *buffer = outputs[0];
-
-	for (i = 0; i < samples; i++, buffer++)
-	{
-		*buffer = 0;
-		if (token->reg[0] && token->pos <= token->size / 2)
-		{
-			*buffer = 0x7fff;
-		}
-		if (token->pos <= token->size)
-			token->pos++;
-		if (token->pos > token->size)
-			token->pos = 0;
-	}
-}
-
-
-
-/************************************/
-/* Sound handler start              */
-/************************************/
-
-static DEVICE_START(s2636_sound)
-{
-	s2636_sound *token = get_token(device);
-	memset(token, 0, sizeof(*token));
-	token->channel = device->machine().sound().stream_alloc(*device, 0, 1, device->machine().sample_rate(), 0, s2636_update);
-}
 
 const device_type S2636_SOUND = &device_creator<s2636_sound_device>;
 
 s2636_sound_device::s2636_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, S2636_SOUND, "S2636", tag, owner, clock, "s2636", __FILE__),
-		device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this),
+		m_channel(NULL),
+		m_size(0),
+		m_pos(0),
+		m_level(0)
 {
-	m_token = global_alloc_clear(s2636_sound);
+	for (int i = 0; i < 1; i++)
+	m_reg[i] = 0;
 }
 
 //-------------------------------------------------
@@ -107,8 +37,31 @@ void s2636_sound_device::device_config_complete()
 
 void s2636_sound_device::device_start()
 {
-	DEVICE_START_NAME( s2636_sound )(this);
+	m_channel = machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate(), this);
+	save_item(NAME(m_size));
+	save_item(NAME(m_pos));
+	save_item(NAME(m_level));
+	
+	for (int i = 0; i < 1; i++)
+	save_item(NAME(m_reg[i]), i);
 }
+
+
+void s2636_sound_device::soundport_w (int offset, int data)
+{
+	m_channel->update();
+	m_reg[offset] = data;
+	switch (offset)
+	{
+		case 0:
+			m_pos = 0;
+			m_level = TRUE;
+			// frequency 7874/(data+1)
+			m_size = machine().sample_rate() * (data + 1) /7874;
+			break;
+	}
+}
+
 
 //-------------------------------------------------
 //  sound_stream_update - handle a stream update
@@ -116,6 +69,19 @@ void s2636_sound_device::device_start()
 
 void s2636_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	// should never get here
-	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+	int i;
+	stream_sample_t *buffer = outputs[0];
+
+	for (i = 0; i < samples; i++, buffer++)
+	{
+		*buffer = 0;
+		if (m_reg[0] && m_pos <= m_size / 2)
+		{
+			*buffer = 0x7fff;
+		}
+		if (m_pos <= m_size)
+			m_pos++;
+		if (m_pos > m_size)
+			m_pos = 0;
+	}
 }

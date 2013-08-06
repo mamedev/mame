@@ -319,7 +319,7 @@ WRITE8_DEVICE_HANDLER( s2636_work_ram_w )
 		const s2636_interface *intf = get_interface(device);
 		if ( intf->sound && *intf->sound )
 		{
-			s2636_soundport_w(device->machine().device(intf->sound), 0, data);
+			device->machine().device<s2636_sound_device>(intf->sound)->soundport_w(0, data);
 		}
 	}
 

@@ -1,3 +1,5 @@
+#include "sound/s2636.h"
+
 class zac2650_state : public driver_device
 {
 public:
@@ -5,10 +7,15 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_s2636_0_ram(*this, "s2636_0_ram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_s2636_sound(*this, "s2636snd") { }
 
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_s2636_0_ram;
+	
+	required_device<cpu_device> m_maincpu;
+	required_device<s2636_sound_device> m_s2636_sound;
+	
 	bitmap_ind16 m_bitmap;
 	bitmap_ind16 m_spritebitmap;
 	int m_CollisionBackground;
@@ -25,5 +32,4 @@ public:
 	UINT32 screen_update_tinvader(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	int SpriteCollision(int first,int second);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
 };
