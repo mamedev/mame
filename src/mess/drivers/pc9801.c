@@ -316,7 +316,7 @@
 
 ====
 
-Documentation notes (for unemulated stuff, provided by ):
+Documentation notes (for unemulated stuff, courtesy of T. Kodaka and T. Kono):
 
 IDE:
 (r/w)
@@ -339,6 +339,35 @@ IDE:
 0x074C      |BYTE| R |Alternate Status Register    |03F6h
 0x074C      |BYTE| W |Digital Output Register      |03F6h
 0x074E      |BYTE| R |Digital Input Register       |03F7h
+
+Video F/F (i/o 0x68):
+KAC mode (video ff = 5) is basically how the kanji ROM could be accessed, 1=thru the CG window ports, 0=thru the kanji
+window RAM at 0xa4***.
+My guess is that the system locks up or doesn't have any data if the wrong port is being accessed.
+
+Ext Video F/F (i/o 0x6a):
+0000 011x enables EGC
+0000 111x enables PC-98GS
+0010 000x enables multicolor (a.k.a. 256 colors mode)
+0010 001x enables 65'536 colors
+0010 010x 64k color palette related (?)
+0010 011x full screen reverse (?)
+0010 100x text and gfxs synthesis (?)
+0010 101x 256 color palette registers fast write (?)
+0010 110x 256 color overscan (?)
+0100 000x (0) CRT (1) Plasma/LCD
+0100 001x text and gfxs right shifted one dot (undocumented behaviour)
+0100 010x hi-res mode in PC-9821
+0110 000x EEGC mode
+0110 001x VRAM config (0) plain (1) packed
+0110 011x AGDC mode
+0110 100x 480 lines
+0110 110x VRAM bitmap orientation (0) MSB left-to-right LSB (1) LSB left-to-right MSB
+1000 001x CHR GDC clock (0) 2,5 MHz (1) 5 MHz
+1000 010x BMP GDC clock
+1000 111x related to GFX accelerator cards (like Vision864)
+1100 010x chart GDC operating mode (?)
+(everything else is undocumented / unknown)
 
 ****************************************************************************************************/
 
@@ -2262,7 +2291,6 @@ WRITE8_MEMBER(pc9801_state::pc9801rs_ide_io_0_w)
 /* TODO: is mapping correct? */
 READ16_MEMBER(pc9801_state::pc9801rs_ide_io_1_r)
 {
-
 	return m_ide->read_cs0(space, offset >> 1, offset & 1 ? 0xff00 : 0x00ff) >> 8;
 }
 
