@@ -9,14 +9,16 @@
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
+#include "machine/ram.h"
 #include "machine/pit8253.h"
 #include "machine/i8255.h"
 #include "machine/pic8259.h"
 #include "machine/z80dart.h"
+#include "machine/serial.h"
+#include "machine/ctronics.h"
 #include "machine/wd17xx.h"
-#include "sound/sn76496.h"
 #include "video/mc6845.h"
-#include "machine/ram.h"
+#include "sound/sn76496.h"
 #include "imagedev/flopdrv.h"
 #include "formats/apridisk.h"
 
@@ -37,9 +39,13 @@ public:
 	m_ppi(*this, "ic17"),
 	m_pic(*this, "ic31"),
 	m_pit(*this, "ic16"),
-	m_z80sio(*this, "ic15"),
+	m_sio(*this, "ic15"),
+	m_rs232(*this, "rs232"),
+	m_centronics(*this, "centronics"),
 	m_fdc(*this, "ic68"),
 	m_screen_buffer(*this, "screen_buffer"),
+	m_data_selector_dtr(1),
+	m_data_selector_rts(1),
 	m_video_mode(0),
 	m_display_on(1),
 	m_display_enabled(0)
@@ -52,22 +58,30 @@ public:
 	required_device<i8255_device> m_ppi;
 	required_device<pic8259_device> m_pic;
 	required_device<pit8253_device> m_pit;
-	required_device<z80sio0_device> m_z80sio;
+	required_device<z80sio0_device> m_sio;
+	required_device<rs232_port_device> m_rs232;
+	required_device<centronics_device> m_centronics;
 	required_device<wd2793_device> m_fdc;
 
 	required_shared_ptr<UINT16> m_screen_buffer;
 
-	DECLARE_READ8_MEMBER(apricot_sysctrl_r);
-	DECLARE_WRITE8_MEMBER(apricot_sysctrl_w);
-	DECLARE_WRITE_LINE_MEMBER(apricot_pit8253_out1);
-	DECLARE_WRITE_LINE_MEMBER(apricot_pit8253_out2);
-	DECLARE_WRITE_LINE_MEMBER(apricot_wd2793_intrq_w);
-	DECLARE_WRITE_LINE_MEMBER(apricot_wd2793_drq_w);
-	DECLARE_WRITE_LINE_MEMBER(apricot_mc6845_de) { m_display_enabled = state; };
+	DECLARE_READ8_MEMBER( apricot_sysctrl_r );
+	DECLARE_WRITE8_MEMBER( apricot_sysctrl_w );
+	DECLARE_WRITE_LINE_MEMBER( timer_out1 );
+	DECLARE_WRITE_LINE_MEMBER( timer_out2 );
+	DECLARE_WRITE_LINE_MEMBER( apricot_wd2793_intrq_w );
+	DECLARE_WRITE_LINE_MEMBER( apricot_wd2793_drq_w );
+	DECLARE_WRITE_LINE_MEMBER( apricot_mc6845_de ) { m_display_enabled = state; };
+
+	DECLARE_WRITE_LINE_MEMBER( data_selector_dtr_w ) { m_data_selector_dtr = state; };
+	DECLARE_WRITE_LINE_MEMBER( data_selector_rts_w ) { m_data_selector_rts = state; };
 
 	virtual void machine_start();
 
 	IRQ_CALLBACK_MEMBER( irq_callback ) { return m_pic->inta_r(); }
+
+	int m_data_selector_dtr;
+	int m_data_selector_rts;
 
 	bool m_video_mode;
 	bool m_display_on;
@@ -104,30 +118,41 @@ WRITE8_MEMBER( apricot_state::apricot_sysctrl_w )
 
 static const i8255_interface apricot_i8255a_intf =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_DEVICE_MEMBER("centronics", centronics_device, read),
+	DEVCB_DEVICE_MEMBER("centronics", centronics_device, write),
 	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(apricot_state, apricot_sysctrl_w),
 	DEVCB_DRIVER_MEMBER(apricot_state, apricot_sysctrl_r),
 	DEVCB_NULL
 };
 
-WRITE_LINE_MEMBER( apricot_state::apricot_pit8253_out1 )
+WRITE_LINE_MEMBER( apricot_state::timer_out1 )
 {
-	/* connected to the rs232c interface */
+	// receive clock via timer 1
+	if (m_data_selector_rts == 0 && m_data_selector_dtr == 0)
+		m_sio->rxca_w(state);
 }
 
-WRITE_LINE_MEMBER( apricot_state::apricot_pit8253_out2 )
+WRITE_LINE_MEMBER( apricot_state::timer_out2 )
 {
-	/* connected to the rs232c interface */
+	// transmit clock via timer 2
+	if (m_data_selector_rts == 0 && m_data_selector_dtr == 0)
+		m_sio->txca_w(state);
+
+	// transmit and receive clock via timer 2
+	if (m_data_selector_rts == 1 && m_data_selector_dtr == 0)
+	{
+		m_sio->txca_w(state);
+		m_sio->rxca_w(state);
+	}
 }
 
 static const struct pit8253_interface apricot_pit8253_intf =
 {
 	{
-		{ XTAL_4MHz / 16,      DEVCB_LINE_VCC, DEVCB_DEVICE_LINE_MEMBER("ic31", pic8259_device, ir6_w) },
-		{ 0 /*XTAL_4MHz / 2*/, DEVCB_LINE_VCC, DEVCB_DRIVER_LINE_MEMBER(apricot_state, apricot_pit8253_out1) },
-		{ 0 /*XTAL_4MHz / 2*/, DEVCB_LINE_VCC, DEVCB_DRIVER_LINE_MEMBER(apricot_state, apricot_pit8253_out2) }
+		{ XTAL_4MHz / 16, DEVCB_LINE_VCC, DEVCB_DEVICE_LINE_MEMBER("ic31", pic8259_device, ir6_w) },
+		{ XTAL_4MHz / 2,  DEVCB_LINE_VCC, DEVCB_DRIVER_LINE_MEMBER(apricot_state, timer_out1) },
+		{ XTAL_4MHz / 2,  DEVCB_LINE_VCC, DEVCB_DRIVER_LINE_MEMBER(apricot_state, timer_out2) }
 	}
 };
 
@@ -137,18 +162,18 @@ static Z80SIO_INTERFACE( apricot_z80sio_intf )
 	XTAL_4MHz / 16, XTAL_4MHz / 16,
 
 	// channel a
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER("rs232", serial_port_device, rx),
+	DEVCB_DEVICE_LINE_MEMBER("rs232", serial_port_device, tx),
+	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, dtr_w),
+	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, rts_w),
+	DEVCB_NULL, //  wait/ready: i8089 data request channel 2
 	DEVCB_NULL,
 
 	// channel b
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_DRIVER_LINE_MEMBER(apricot_state, data_selector_dtr_w),
+	DEVCB_DRIVER_LINE_MEMBER(apricot_state, data_selector_rts_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 
@@ -156,6 +181,25 @@ static Z80SIO_INTERFACE( apricot_z80sio_intf )
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+// note: missing a receive clock callback to support external clock mode
+// (m_data_selector_rts == 1 and m_data_selector_dtr == 0)
+static const rs232_port_interface rs232_intf =
+{
+	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER("ic15", z80dart_device, dcda_w),
+	DEVCB_DEVICE_LINE_MEMBER("ic15", z80dart_device, synca_w),
+	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER("ic15", z80dart_device, ctsa_w)
+};
+
+// note: fault output should be connected to syncb input of the sio
+static const centronics_interface apricot_centronics_intf =
+{
+	DEVCB_DEVICE_LINE_MEMBER("ic15", z80dart_device, ctsb_w),
+	DEVCB_DEVICE_LINE_MEMBER("ic15", z80dart_device, dcdb_w),
 	DEVCB_NULL
 };
 
@@ -183,6 +227,31 @@ static const wd17xx_interface apricot_wd17xx_intf =
 	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
 };
 
+static LEGACY_FLOPPY_OPTIONS_START( apricot )
+	LEGACY_FLOPPY_OPTION
+	(
+		apridisk, "dsk", "ACT Apricot disk image", apridisk_identify, apridisk_construct, NULL,
+		HEADS(1-[2])
+		TRACKS(70/[80])
+		SECTORS([9]/18)
+		SECTOR_LENGTH([512])
+		FIRST_SECTOR_ID([1])
+	)
+LEGACY_FLOPPY_OPTIONS_END
+
+static const floppy_interface apricot_floppy_interface =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	FLOPPY_STANDARD_3_5_DSDD,
+	LEGACY_FLOPPY_OPTIONS_NAME(apricot),
+	"floppy_3_5",
+	NULL
+};
+
 
 /***************************************************************************
     VIDEO EMULATION
@@ -191,7 +260,7 @@ static const wd17xx_interface apricot_wd17xx_intf =
 UINT32 apricot_state::screen_update_apricot(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	if (!m_display_on)
-		m_crtc->screen_update( screen, bitmap, cliprect);
+		m_crtc->screen_update(screen, bitmap, cliprect);
 	else
 		bitmap.fill(RGB_BLACK, cliprect);
 
@@ -286,92 +355,53 @@ ADDRESS_MAP_END
 
 
 /***************************************************************************
-    INPUT PORTS
+    MACHINE DRIVERS
 ***************************************************************************/
-
-static INPUT_PORTS_START( apricot )
-INPUT_PORTS_END
-
-
-/***************************************************************************
-    SOUND INTERFACE
- **************************************************************************/
-
-
-//-------------------------------------------------
-//  sn76496_config psg_intf
-//-------------------------------------------------
 
 static const sn76496_config psg_intf =
 {
 	DEVCB_NULL
 };
 
-
-/***************************************************************************
-    MACHINE DRIVERS
-***************************************************************************/
-
-static LEGACY_FLOPPY_OPTIONS_START( apricot )
-	LEGACY_FLOPPY_OPTION
-	(
-		apridisk, "dsk", "ACT Apricot disk image", apridisk_identify, apridisk_construct, NULL,
-		HEADS(1-[2])
-		TRACKS(70/[80])
-		SECTORS([9]/18)
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([1])
-	)
-LEGACY_FLOPPY_OPTIONS_END
-
-static const floppy_interface apricot_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_3_5_DSDD,
-	LEGACY_FLOPPY_OPTIONS_NAME(apricot),
-	"floppy_3_5",
-	NULL
-};
-
 static MACHINE_CONFIG_START( apricot, apricot_state )
-
-	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8086, XTAL_15MHz / 3)
 	MCFG_CPU_PROGRAM_MAP(apricot_mem)
 	MCFG_CPU_IO_MAP(apricot_io)
 
 //  MCFG_CPU_ADD("ic71", I8089, XTAL_15MHz / 3)
 
-	/* video hardware */
+	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_SIZE(800, 400)
 	MCFG_SCREEN_VISIBLE_AREA(0, 800-1, 0, 400-1)
 	MCFG_SCREEN_REFRESH_RATE(72)
 	MCFG_SCREEN_UPDATE_DRIVER(apricot_state, screen_update_apricot)
 
-	/* sound hardware */
+	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ic7", SN76489, XTAL_4MHz / 2)
 	MCFG_SOUND_CONFIG(psg_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	/* internal ram */
+	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("256k")
 	MCFG_RAM_EXTRA_OPTIONS("384k,512k") /* with 1 or 2 128k expansion boards */
 
-	/* Devices */
+	// devices
 	MCFG_MC6845_ADD("ic30", MC6845, "screen", XTAL_15MHz / 10, apricot_mc6845_intf)
 	MCFG_I8255A_ADD("ic17", apricot_i8255a_intf)
 	MCFG_PIC8259_ADD("ic31", INPUTLINE("maincpu", 0), VCC, NULL)
 	MCFG_PIT8253_ADD("ic16", apricot_pit8253_intf)
 	MCFG_Z80SIO0_ADD("ic15", XTAL_15MHz / 6, apricot_z80sio_intf)
 
-	/* floppy */
+	// rs232 port
+	MCFG_RS232_PORT_ADD("rs232", rs232_intf, default_rs232_devices, NULL)
+
+	// centronics printer
+	MCFG_CENTRONICS_PRINTER_ADD("centronics", apricot_centronics_intf)
+
+	// floppy
 	MCFG_WD2793_ADD("ic68", apricot_wd17xx_intf)
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(apricot_floppy_interface)
 MACHINE_CONFIG_END
@@ -401,6 +431,6 @@ ROM_END
     GAME DRIVERS
 ***************************************************************************/
 
-/*    YEAR  NAME       PARENT   COMPAT  MACHINE    INPUT    CLASS          INIT  COMPANY  FULLNAME      FLAGS */
-COMP( 1983, apricot,   0,       0,      apricot,   apricot, driver_device, 0,    "ACT",   "Apricot PC", GAME_NOT_WORKING )
-COMP( 1984, apricotxi, apricot, 0,      apricotxi, apricot, driver_device, 0,    "ACT",   "Apricot Xi", GAME_NOT_WORKING )
+/*    YEAR  NAME       PARENT   COMPAT  MACHINE    INPUT  CLASS          INIT  COMPANY  FULLNAME      FLAGS */
+COMP( 1983, apricot,   0,       0,      apricot,   0,     driver_device, 0,    "ACT",   "Apricot PC", GAME_NOT_WORKING )
+COMP( 1984, apricotxi, apricot, 0,      apricotxi, 0,     driver_device, 0,    "ACT",   "Apricot Xi", GAME_NOT_WORKING )
