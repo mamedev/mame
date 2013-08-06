@@ -65,8 +65,6 @@
 	driver_device::static_set_callback(*owner, driver_device::CB_VIDEO_START, VIDEO_START_NAME(_func));
 
 
-#define PALETTE_INIT_CALL(name)     PALETTE_INIT_NAME(name)(machine)
-
 #define VIDEO_START_CALL(name)      VIDEO_START_NAME(name)(machine)
 
 #endif  /* __DRIVLGCY_H__ */
