@@ -39,6 +39,7 @@
 #define __CDP1864__
 
 #include "emu.h"
+#include "video/resnet.h"
 
 
 
