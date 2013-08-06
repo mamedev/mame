@@ -13,7 +13,7 @@
 .\" and updated by Andrew Burton <burtona@gol.com>, July 2003
 .\"
 .\"
-.TH MAME 6 2013-01-28 0.148u1 "MAME \- The Multiple Arcade Machine Emulator"
+.TH MAME 6 2013-06-12 0.149 "MAME \- The Multiple Arcade Machine Emulator"
 .\"
 .\"
 .\" NAME chapter
@@ -155,17 +155,24 @@ Output the list of available media for the system.
 .B \-listsoftware, \-lsoft
 Output the list of known software for the system.
 .TP
-.B \-verifysoftware, \-vsoft
-Verify known software for the system.
+.B \-verifysoftware, \-vsoft \fR[\fIgamename\fR|\fIwildcard\fR]
+Checks for invalid or missing ROM images in your software lists.
+By default all drivers that have valid ZIP files or directories
+in the rompath are verified; however, you can limit this list by
+specifying a specific driver name or wildcard.
 .TP
 .B \-getsoftlist, \-glist
 Retrieve software list by name.
 .TP
-.B \-verifysoftlist, \-vlist
-Verify software list by name.
+.B \-verifysoftlist, \-vlist \fR[\fIsoftwarelistname\fR]
+Checks a specified software list for missing ROM images if files exist
+for issued softwarelistname. By default, all drivers that have valid
+ZIP files or directories in the rompath are verified; however, you can
+limit this list by specifying a specific softwarelistname (without .XML).
 .TP
 .B \-listmidi, \-mlist
-List available MIDI I/O devices.
+Create a list of list available MIDI I/O devices for use with emulation.
+
 .\"
 .\" *******************************************************
 .SS Configuration options
@@ -179,7 +186,7 @@ Enables or disables the reading of the config files. When enabled
 .br
 the main configuration file
 .br
-2. \fI[name]\fB.ini\fR
+2. \fIname\fB.ini\fR
 .br
 where \fIname\fR is your executable name, i.e. mame unless you changed it
 (e.g. if you renamed mame to mame0137, the parsed file will be
@@ -361,18 +368,21 @@ consistent, you should only record and playback with all configuration
 (.cfg), NVRAM (.nv), and memory card files deleted. The default is NULL
 (no recording).
 .TP
-.B \-snapname \fIname
-Describes how MAME should name files for snapshots. \fIname\fP is a string
-that provides a template that is used to generate a filename. Three
+.B \-snapname \fIstring
+Describes how MAME should name files for snapshots. \fIstring\fP
+provides a template that is used to generate a filename. Three
 simple substitutions are provided: the / character represents the
-path separator on any target platform (even Windows); the string \fI%g\fP
-represents the driver name of the current game; and the string \fI%i\fP
-represents an incrementing index. If \fI%i\fP is omitted, then each
+path separator on any target platform (even Windows); the literal \fB%g\fP
+represents the driver name of the current game; and the literal \fB%i\fP
+represents an incrementing index. If \fB%i\fP is omitted, then each
 snapshot taken will overwrite the previous one; otherwise, MAME will
-find the next empty value for \fI%i\fP and use that for a filename. The
-default is \fI%g/%i\fP, which creates a separate folder for each game,
+find the next empty value for \fB%i\fP and use that for a filename. The
+default is \fB%g/%i\fP, which creates a separate folder for each game,
 and names the snapshots under it starting with 0000 and increasing
-from there.
+from there. Example: if you use
+.B mame robby \-snapname foo/%g%i
+snapshots will be saved as \fBsnaps/foo/robby0000.png\fP,
+\fBsnaps/foo/robby0001.png\fP and so on.
 .TP
 .B \-snapsize \fIwidth\fPx\fIheight
 Hard\-codes the size for snapshots and movie recording. By default,
@@ -395,6 +405,17 @@ specified by \fIviewname\fP. For example, \-snapview native will match the
 "Native (15:14)" view even though it is not a perfect match. 
 \fIviewname\fP can also be 'auto', which selects the first view with all
 screens present. The default value is 'internal'.
+.TP
+.B \-statename \fIstring
+Describes how MAME should store save state files, relative to the
+state_directory path. \fIstring\fP provides a template that
+is used to generate a relative path. Two simple substitutions are
+provided: the / character represents the path separator on any target
+platform (even Windows); the literal \fB%g\fP represents the driver name of
+the current game. The default is '%g', which creates a separate folder
+for each game. Example: if you use
+.B mame robby \-statename foo/%g
+save states will be stored inside \fBsta/foo/robby/\fP. 
 .TP
 .B \-mngwrite \fIfilename
 Writes each video frame to the given \fIfilename\fP in MNG format, producing
@@ -913,7 +934,10 @@ the maximum range. This option expects a float in the range of 0.0 to
 The default is 0.85.
 .TP
 .B \-natural, \-nat
-Specifies whether to use a natural keyboard or not.
+Allows user to specify whether or not to use a natural keyboard.
+This allows you to start your game or system in a 'native' mode, depending
+on your region, allowing compatability for non\-"QWERTY" style keyboards.
+The default is OFF (-nonatural).
 .TP
 .B \-joystick_contradictory
 Enable contradictory direction digital joystick input at the same time.
@@ -1055,6 +1079,20 @@ Display confirm quit screen on exit.
 .TP
 .B \-ui_mouse
 Display UI mouse cursor.
+.TP
+.B \-autoboot_command, \-ab \fIcommand
+Command string to execute after machine boot (in quotes "").  To issue
+a quote to the emulation, use \fB"""\fP in the string.
+Using \fB\\n\fP will issue a create a new line, issuing what was
+typed prior as a command. Example:
+\fB\-autoboot_command "load """$""",8,1\\n"\fP.
+.TP
+.B \-autoboot_delay \fR[\fIseconds\fP]
+Timer delay (in seconds) to trigger command execution on autoboot.
+Default is 2.
+.TP
+.B \-autoboot_script, \-script \fR[\fIfilename.lua\fP]
+File containing scripting to execute after machine boot.
 .\" +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 .\" SDL specific
 .\" +++++++++++++++++++++++++++++++++++++++++++++++++++++++
