@@ -62,8 +62,8 @@ public:
 	} m_blit;
 
 
-	void (*m_get_sprite_info)(running_machine &machine);
-	void (*m_sprite_draw)(running_machine &machine, int priority);
+	void (cave_state::*m_get_sprite_info)();
+	void (cave_state::*m_sprite_draw)(int priority);
 
 	tilemap_t    *m_tilemap[4];
 	int          m_tiledim[4];
@@ -213,4 +213,20 @@ public:
 private:
 	inline void get_tile_info( tile_data &tileinfo, int tile_index, int GFX );
 	inline void tilemap_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32 flags, UINT32 priority, UINT32 priority2, int GFX );
+	inline void vram_w( address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 data, ATTR_UNUSED UINT16 mem_mask, int GFX );
+	inline void vram_8x8_w( address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 data, ATTR_UNUSED UINT16 mem_mask, int GFX );
+	void set_pens();
+	void cave_vh_start( int num );
+	void get_sprite_info_cave();
+	void get_sprite_info_donpachi();
+	void sprite_init_cave();
+	void cave_sprite_check(screen_device &screen, const rectangle &clip);
+	void do_blit_zoom16_cave(const struct sprite_cave *sprite);
+	void do_blit_zoom16_cave_zb( const struct sprite_cave *sprite );
+	void do_blit_16_cave( const struct sprite_cave *sprite );
+	void do_blit_16_cave_zb( const struct sprite_cave *sprite );
+	void sprite_draw_cave( int priority );
+	void sprite_draw_cave_zbuf( int priority );
+	void sprite_draw_donpachi( int priority );
+	void sprite_draw_donpachi_zbuf( int priority );
 };
