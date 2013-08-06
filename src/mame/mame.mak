@@ -2674,7 +2674,6 @@ $(MACHINE)/megacd.o:  $(LAYOUT)/megacd.lh
 # misc dependencies
 #-------------------------------------------------
 
-$(DRIVERS)/galaxian.o:  $(MAMESRC)/drivers/galaxian.inc
 $(DRIVERS)/neogeo.o:    $(MAMESRC)/drivers/neogeo.inc
 $(VIDEO)/jaguar.o:  $(MAMESRC)/video/jagobj.inc \
 			$(MAMESRC)/video/jagblit.inc

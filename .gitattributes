@@ -3087,7 +3087,6 @@ src/mame/drivers/galastrm.c svneol=native#text/plain
 src/mame/drivers/galaxi.c svneol=native#text/plain
 src/mame/drivers/galaxia.c svneol=native#text/plain
 src/mame/drivers/galaxian.c svneol=native#text/plain
-src/mame/drivers/galaxian.inc svneol=native#text/plain
 src/mame/drivers/galaxold.c svneol=native#text/plain
 src/mame/drivers/galgame.c svneol=native#text/plain
 src/mame/drivers/galivan.c svneol=native#text/plain
