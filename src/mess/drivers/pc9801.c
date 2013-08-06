@@ -2262,22 +2262,23 @@ WRITE8_MEMBER(pc9801_state::pc9801rs_ide_io_0_w)
 /* TODO: is mapping correct? */
 READ16_MEMBER(pc9801_state::pc9801rs_ide_io_1_r)
 {
-	return m_ide->read_cs0(space, offset >> 1, offset & 1 ? 0xff00 : 0x00ff);
+
+	return m_ide->read_cs0(space, offset >> 1, offset & 1 ? 0xff00 : 0x00ff) >> 8;
 }
 
 WRITE16_MEMBER(pc9801_state::pc9801rs_ide_io_1_w)
 {
-	m_ide->write_cs0(space, offset >> 1, offset & 1 ? 0xff00 : 0x00ff);
+	m_ide->write_cs0(space, offset >> 1, data >> 8, offset & 1 ? 0xff00 : 0x00ff);
 }
 
 READ16_MEMBER(pc9801_state::pc9801rs_ide_io_2_r)
 {
-	return m_ide->read_cs1(space, ((offset+6) >> 1), offset & 1 ? 0xff00 : 0x00ff);
+	return m_ide->read_cs1(space, ((offset+6) >> 1), offset & 1 ? 0xff00 : 0x00ff) >> 8;
 }
 
 WRITE16_MEMBER(pc9801_state::pc9801rs_ide_io_2_w)
 {
-	m_ide->write_cs1(space, ((offset+6) >> 1), offset & 1 ? 0xff00 : 0x00ff);
+	m_ide->write_cs1(space, ((offset+6) >> 1), data >> 8, offset & 1 ? 0xff00 : 0x00ff);
 }
 
 static ADDRESS_MAP_START( pc9801rs_map, AS_PROGRAM, 32, pc9801_state )
