@@ -1185,6 +1185,7 @@ $(MESSOBJ)/cbm.a:               \
 	$(MESS_MACHINE)/d9060.o     \
 	$(MESS_MACHINE)/d9060hd.o   \
 	$(MESS_MACHINE)/serialbox.o \
+	$(MESS_MACHINE)/c64_nl10.o \
 	$(MESS_MACHINE)/softbox.o   \
 	$(MESS_MACHINE)/hardbox.o   \
 	$(MESS_MACHINE)/cmdhd.o     \

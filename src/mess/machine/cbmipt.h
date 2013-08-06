@@ -73,6 +73,7 @@
 #include "machine/c64/xl80.h"
 #include "machine/c64/zaxxon.h"
 #include "machine/c128_comal80.h"
+#include "machine/c64_nl10.h"
 #include "machine/cbm2_std.h"
 #include "machine/cbm2_24k.h"
 #include "machine/cbm2_graphic.h"
