@@ -932,7 +932,7 @@ READ8_MEMBER(decocass_state::decocass_e5xx_r)
 	/* E5x2-E5x3 and mirrors */
 	if (2 == (offset & E5XX_MASK))
 	{
-		UINT8 bot_eot = (tape_get_status_bits(m_cassette) >> 5) & 1;
+		UINT8 bot_eot = (m_cassette->get_status_bits() >> 5) & 1;
 
 		data =
 			(BIT(m_i8041_p1, 7)   << 0) |   /* D0 = P17 - REQ/ */
@@ -942,7 +942,7 @@ READ8_MEMBER(decocass_state::decocass_e5xx_r)
 			((bot_eot)            << 4) |   /* D4 = BOT/EOT (direct from drive) */
 			(1                    << 5) |   /* D5 floating input */
 			(1                    << 6) |   /* D6 floating input */
-			(!tape_is_present(m_cassette) << 7);    /* D7 = cassette present */
+			(!m_cassette->is_present() << 7);    /* D7 = cassette present */
 
 		LOG(4,("%10s 6502-PC: %04x decocass_e5xx_r(%02x): $%02x <- STATUS (%s%s%s%s%s%s%s%s)\n",
 			space.machine().time().as_string(6),
@@ -1468,7 +1468,7 @@ WRITE8_MEMBER(decocass_state::i8041_p1_w)
 			newspeed = (data & 0x04) ? -1 : -7;
 		else if ((data & 0x30) == 0x10)
 			newspeed = (data & 0x04) ? 1 : 7;
-		tape_change_speed(m_cassette, newspeed);
+		m_cassette->change_speed(newspeed);
 	}
 
 	m_i8041_p1 = data;
@@ -1522,7 +1522,7 @@ READ8_MEMBER(decocass_state::i8041_p2_r)
 {
 	UINT8 data;
 
-	data = (m_i8041_p2 & ~0xe0) | tape_get_status_bits(m_cassette);
+	data = (m_i8041_p2 & ~0xe0) | m_cassette->get_status_bits();
 
 	if (data != m_i8041_p2_read_latch)
 	{
