@@ -378,6 +378,8 @@ IDE:
 #include "machine/pc9801_cbus.h"
 #include "machine/pc9801_kbd.h"
 
+#include "machine/idectrl.h"
+
 
 #define UPD1990A_TAG "upd1990a"
 #define UPD8251_TAG  "upd8251"
@@ -400,6 +402,7 @@ public:
 		m_hgdc1(*this, "upd7220_chr"),
 		m_hgdc2(*this, "upd7220_btm"),
 		m_sasibus(*this, SASIBUS_TAG ":host"),
+		m_ide(*this, "ide"),
 		m_video_ram_1(*this, "video_ram_1"),
 		m_video_ram_2(*this, "video_ram_2"),
 		m_beeper(*this, "beeper"),
@@ -417,6 +420,7 @@ public:
 	required_device<upd7220_device> m_hgdc1;
 	required_device<upd7220_device> m_hgdc2;
 	optional_device<scsicb_device> m_sasibus;
+	optional_device<ide_controller_device> m_ide;
 	required_shared_ptr<UINT8> m_video_ram_1;
 	required_shared_ptr<UINT8> m_video_ram_2;
 	required_device<beep_device> m_beeper;
@@ -582,11 +586,11 @@ public:
 	DECLARE_WRITE8_MEMBER(pic_w);
 
 	DECLARE_READ8_MEMBER(pc9801rs_ide_io_0_r);
-	DECLARE_READ8_MEMBER(pc9801rs_ide_io_1_r);
-	DECLARE_READ8_MEMBER(pc9801rs_ide_io_2_r);
+	DECLARE_READ16_MEMBER(pc9801rs_ide_io_1_r);
+	DECLARE_READ16_MEMBER(pc9801rs_ide_io_2_r);
 	DECLARE_WRITE8_MEMBER(pc9801rs_ide_io_0_w);
-	DECLARE_WRITE8_MEMBER(pc9801rs_ide_io_1_w);
-	DECLARE_WRITE8_MEMBER(pc9801rs_ide_io_2_w);
+	DECLARE_WRITE16_MEMBER(pc9801rs_ide_io_1_w);
+	DECLARE_WRITE16_MEMBER(pc9801rs_ide_io_2_w);
 
 	DECLARE_READ8_MEMBER(sdip_0_r);
 	DECLARE_READ8_MEMBER(sdip_1_r);
@@ -2230,35 +2234,50 @@ WRITE8_MEMBER(pc9801_state::pc9801rs_pit_mirror_w)
 
 READ8_MEMBER(pc9801_state::pc9801rs_ide_io_0_r)
 {
+	printf("IDE r %02x\n",offset);
 	return 0;
 }
 
 WRITE8_MEMBER(pc9801_state::pc9801rs_ide_io_0_w)
 {
+	/*
+	[0x430]
+	[Read/write]
+		bit 7-0: unknown
+		00 h = IDE Bank # 1
+		01 h = IDE Bank # 2
+
+	[0x432]
+		bit 7-0: Bank select
+		80 h = readout for dummy (only [WRITE])
+		00 h = IDE Bank # 1 choice
+		01 h = IDE Bank # 2 selection
+	*/
+
+	printf("IDE w %02x %02x\n",offset,data);
+
 	// ...
 }
 
-READ8_MEMBER(pc9801_state::pc9801rs_ide_io_1_r)
+/* TODO: is mapping correct? */
+READ16_MEMBER(pc9801_state::pc9801rs_ide_io_1_r)
 {
-	if(offset == 0xe/2)
-		return 0x50;
-
-	return 0xff;
+	return m_ide->read_cs0(space, offset >> 1, offset & 1 ? 0xff00 : 0x00ff);
 }
 
-WRITE8_MEMBER(pc9801_state::pc9801rs_ide_io_1_w)
+WRITE16_MEMBER(pc9801_state::pc9801rs_ide_io_1_w)
 {
-	// ...
+	m_ide->write_cs0(space, offset >> 1, offset & 1 ? 0xff00 : 0x00ff);
 }
 
-READ8_MEMBER(pc9801_state::pc9801rs_ide_io_2_r)
+READ16_MEMBER(pc9801_state::pc9801rs_ide_io_2_r)
 {
-	return 0x50; // status
+	return m_ide->read_cs1(space, ((offset+6) >> 1), offset & 1 ? 0xff00 : 0x00ff);
 }
 
-WRITE8_MEMBER(pc9801_state::pc9801rs_ide_io_2_w)
+WRITE16_MEMBER(pc9801_state::pc9801rs_ide_io_2_w)
 {
-	// ...
+	m_ide->write_cs1(space, ((offset+6) >> 1), offset & 1 ? 0xff00 : 0x00ff);
 }
 
 static ADDRESS_MAP_START( pc9801rs_map, AS_PROGRAM, 32, pc9801_state )
@@ -2290,8 +2309,8 @@ static ADDRESS_MAP_START( pc9801rs_io, AS_IO, 32, pc9801_state )
 	AM_RANGE(0x0438, 0x043b) AM_READWRITE8(pc9801rs_access_ctrl_r,pc9801rs_access_ctrl_w,0xffffffff)
 	AM_RANGE(0x043c, 0x043f) AM_WRITE8(pc9801rs_bank_w,    0xffffffff) //ROM/RAM bank
 
-	AM_RANGE(0x0640, 0x064f) AM_READWRITE8(pc9801rs_ide_io_1_r,  pc9801rs_ide_io_1_w,0x00ff00ff)
-	AM_RANGE(0x074c, 0x074f) AM_READWRITE8(pc9801rs_ide_io_2_r,  pc9801rs_ide_io_2_w,0x00ff00ff)
+	AM_RANGE(0x0640, 0x064f) AM_READWRITE16(pc9801rs_ide_io_1_r,  pc9801rs_ide_io_1_w,0xffffffff)
+	AM_RANGE(0x074c, 0x074f) AM_READWRITE16(pc9801rs_ide_io_2_r,  pc9801rs_ide_io_2_w,0xffffffff)
 
 	AM_RANGE(0x3fd8, 0x3fdf) AM_READWRITE8(pc9801rs_pit_mirror_r,        pc9801rs_pit_mirror_w,        0xffffffff) // <undefined> / pit mirror ports
 	AM_RANGE(0x7fd8, 0x7fdf) AM_READWRITE8(pc9801_mouse_r,     pc9801_mouse_w,     0xffffffff) // <undefined> / mouse ppi8255 ports
@@ -2662,8 +2681,8 @@ static ADDRESS_MAP_START( pc9821_io, AS_IO, 32, pc9801_state )
 	AM_RANGE(0x0460, 0x0463) AM_READWRITE8(pc9821_window_bank_r,pc9821_window_bank_w, 0xffffffff)
 //  AM_RANGE(0x04a0, 0x04af) EGC
 //  AM_RANGE(0x04be, 0x04be) FDC "RPM" register
-	AM_RANGE(0x0640, 0x064f) AM_READWRITE8(pc9801rs_ide_io_1_r,  pc9801rs_ide_io_1_w,0x00ff00ff) // IDE registers / <undefined>
-	AM_RANGE(0x074c, 0x074f) AM_READWRITE8(pc9801rs_ide_io_2_r,  pc9801rs_ide_io_2_w,0x00ff00ff) // IDE status (r) - IDE control registers (w) / <undefined>
+	AM_RANGE(0x0640, 0x064f) AM_READWRITE16(pc9801rs_ide_io_1_r,  pc9801rs_ide_io_1_w,0xffffffff) // IDE registers / <undefined>
+	AM_RANGE(0x074c, 0x074f) AM_READWRITE16(pc9801rs_ide_io_2_r,  pc9801rs_ide_io_2_w,0xffffffff) // IDE status (r) - IDE control registers (w) / <undefined>
 //  AM_RANGE(0x08e0, 0x08ea) <undefined> / EMM SIO registers
 	AM_RANGE(0x09a0, 0x09a3) AM_READWRITE8(pc9821_ext2_video_ff_r, pc9821_ext2_video_ff_w, 0xffffffff) // GDC extended register r/w
 //  AM_RANGE(0x09a8, 0x09a8) GDC 31KHz register r/w
@@ -2968,7 +2987,7 @@ ir7 slave irq
 
 8259 slave:
 ir0 printer
-ir1
+ir1 IDE?
 ir2 2dd floppy irq
 ir3 2hd floppy irq
 ir4 opn
@@ -3617,6 +3636,13 @@ static MACHINE_CONFIG_FRAGMENT( pc9801_sasi )
 	MCFG_SCSICB_IO_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, pc9801_state, sasi_io_w))
 MACHINE_CONFIG_END
 
+
+static MACHINE_CONFIG_FRAGMENT( pc9801_ide )
+	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", NULL, false)
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_slave", pic8259_device, ir1_w))
+MACHINE_CONFIG_END
+
+
 static MACHINE_CONFIG_START( pc9801, pc9801_state )
 	MCFG_CPU_ADD("maincpu", I8086, 5000000) //unknown clock
 	MCFG_CPU_PROGRAM_MAP(pc9801_map)
@@ -3704,6 +3730,7 @@ static MACHINE_CONFIG_START( pc9801rs, pc9801_state )
 	MCFG_I8255_ADD( "ppi8255_fdd", ppi_fdd_intf )
 	MCFG_FRAGMENT_ADD(pc9801_keyboard)
 	MCFG_FRAGMENT_ADD(pc9801_mouse)
+	MCFG_FRAGMENT_ADD(pc9801_ide)
 	MCFG_UPD1990A_ADD("upd1990a", XTAL_32_768kHz, NULL, NULL)
 	MCFG_I8251_ADD(UPD8251_TAG, pc9801_uart_interface)
 
@@ -3781,6 +3808,7 @@ static MACHINE_CONFIG_START( pc9821, pc9801_state )
 	MCFG_I8255_ADD( "ppi8255_fdd", ppi_fdd_intf )
 	MCFG_FRAGMENT_ADD(pc9801_keyboard)
 	MCFG_FRAGMENT_ADD(pc9801_mouse)
+	MCFG_FRAGMENT_ADD(pc9801_ide)
 	MCFG_UPD1990A_ADD("upd1990a", XTAL_32_768kHz, NULL, NULL)
 	MCFG_I8251_ADD(UPD8251_TAG, pc9801_uart_interface)
 

@@ -10770,7 +10770,7 @@ other two disks
 		</part>
 	</software>
 
-<!-- PC-9821 specific, requires CD-Rom too -->
+<!-- PC-9821 specific, requires DOS and CD-ROM drive -->
 	<software name="policena" supported="no">
 		<description>Policenauts</description>
 		<year>19??</year>
@@ -10780,7 +10780,7 @@ other two disks
 				<rom name="system.fdi" size="1265664" crc="ef3e4428" sha1="246b674a48903ff7e3fe90292b1236d75a8d6c23" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1478656">
 				<rom name="user.fdi" size="1478656" crc="fc89da2f" sha1="d782340f5523a405558365367494d73264255379" offset="0" status="baddump" />
 			</dataarea>
