@@ -91,8 +91,8 @@ public:
 		op_src_dst_t src;
 		op_src_dst_t dst;
 		bool accumulate;
-		INT64 cValue;
-		INT64 dValue;
+		INT32 cValue;
+		INT32 dValue;
 		INT64 product;
 		INT64 result;
 		bool write_result;
@@ -111,6 +111,15 @@ public:
 	void run_once();
 	void list_program(void(p)(const char *, ...));
 
+	// for testing purposes
+	UINT64 &_instr(int pc) { return instr[pc % 160]; }
+	INT16 &_dram(int addr) { return dram[addr & 0xfffff]; }
+
+	// publicly visible for testing purposes
+	INT32 read_reg(UINT8 reg);
+	void write_reg(UINT8 reg, INT32 value);
+	void write_to_dol(INT32 value);
+
 protected:
 	virtual void device_start();
 	virtual void device_reset();
@@ -126,10 +135,6 @@ protected:
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
 	virtual void execute_set_input(int linenum, int state);
 
-	INT32 read_reg(UINT8 reg);
-	void write_reg(UINT8 reg, INT32 value);
-	void write_to_dol(INT32 value);
-
 	INT32 alu_operation(UINT8 op, INT32 aValue, INT32 bValue, UINT8 &flags);
 	void alu_operation_end();
 
@@ -138,16 +143,17 @@ private:
 	bool halt_asserted;
 	UINT8 pc;
 	state_t state;
-	INT32 gpr[0xc0];     // 24 bits, right justified and sign extended
-	INT32 ser0r;
-	INT32 ser0l;
-	INT32 ser1r;
-	INT32 ser1l;
-	INT32 ser2r;
-	INT32 ser2l;
-	INT32 ser3r;
-	INT32 ser3l;
-	INT64 machl;      // 48 bits, right justified and sign extended
+	INT32 gpr[0xc0];     // 24 bits, right justified
+	INT16 ser0r;
+	INT16 ser0l;
+	INT16 ser1r;
+	INT16 ser1l;
+	INT16 ser2r;
+	INT16 ser2l;
+	INT16 ser3r;
+	INT16 ser3l;
+	INT64 machl;		// 48 bits, right justified and sign extended
+	bool mac_overflow;	// whether reading the MAC register should return a saturated replacement value
 	INT32 dil;
 	INT32 memsiz;
 	INT32 memmask;
@@ -159,13 +165,13 @@ private:
 	INT32 dbase;
 	INT32 sigreg;
 	int mulshift;
-	INT8 ccr;         // really, 5 bits, left justified
-	INT8 cmr;         // really, 6 bits, left justified
+	INT8 ccr;			// really, 5 bits, left justified
+	INT8 cmr;			// really, 6 bits, left justified
 	INT32 dol[2];
 	int dol_count;
 
 	UINT64 instr[160];    // 48 bits, right justified
-	UINT16 dram[1<<20];   // there are up to 20 address bits (at least 16 expected), left justified within the 24 bits of a gpr or dadr; we preallocate all of it.
+	INT16 dram[1<<20];   // there are up to 20 address bits (at least 16 expected), left justified within the 24 bits of a gpr or dadr; we preallocate all of it.
 
 	// latch registers for host interaction
 	INT32  dol_latch;     // 24 bits

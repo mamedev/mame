@@ -143,9 +143,11 @@ void print_to_stderr(const char *format, ...)
 	va_end(arg);
 }
 
-#define PUMP_DETECT_SILENCE 1
+#define PUMP_DETECT_SILENCE 0
 #define PUMP_TRACK_SAMPLES 0
-#define PUMP_FAKE_ESP_PROCESSING 1
+#define PUMP_FAKE_ESP_PROCESSING 0
+#define PUMP_REPLACE_ESP_PROGRAM 0
+
 class esq_5505_5510_pump : public device_t,
 	public device_sound_interface
 {
@@ -158,7 +160,43 @@ public:
 		m_esp_halted = esp_halted;
 		logerror("ESP-halted -> %d\n", m_esp_halted);
 		if (!esp_halted) {
-			m_esp->list_program(print_to_stderr);
+
+#if PUMP_REPLACE_ESP_PROGRAM
+			m_esp->write_reg(245, 0x1d0f << 8); // dlength = 0x3fff, 16-sample delay
+			
+			int pc = 0;
+			for (pc = 0; pc < 0xc0; pc++) {
+				m_esp->write_reg(pc, 0);
+			}
+			pc = 0;
+			// replace the ESP program with a simple summing & single-sample delay
+			m_esp->_instr(pc++) = 0xffffeaa09000; // MOV SER0R > grp_a0
+			m_esp->_instr(pc++) = 0xffffeba00000; // ADD SER0L, gpr_a0 > gpr_a0
+			m_esp->_instr(pc++) = 0xffffeca00000; // ADD SER1R, gpr_a0 > gpr_a0
+			m_esp->_instr(pc++) = 0xffffeda00000; // ADD SER1L, gpr_a0 > gpr_a0
+			m_esp->_instr(pc++) = 0xffffeea00000; // ADD SER2R, gpr_a0 > gpr_a0
+
+			m_esp->_instr(pc  ) = 0xffffefa00000; // ADD SER2L, gpr_a0 > gpr_a0; prepare to read from delay 2 instructions from now, offset = 0
+            m_esp->write_reg(pc++, 0); //offset into delay
+
+			m_esp->_instr(pc  ) = 0xffffa0a09508; // MOV gpr_a0 > delay + offset
+			m_esp->write_reg(pc++, 1 << 8); // offset into delay - -1 samples
+
+			m_esp->_instr(pc++) = 0xffff00a19928; // MOV DIL > gpr_a1; read Delay and dump FIFO (so that the value gets written)
+
+			m_esp->_instr(pc++) = 0xffffa1f09000; // MOV gpr_a1 > SER3R
+			m_esp->_instr(pc++) = 0xffffa1f19000; // MOV gpr_a1 > SER3L
+
+			m_esp->_instr(pc++) = 0xffffffff0000; // NO-OP
+			m_esp->_instr(pc++) = 0xffffffff0000; // NO-OP
+			m_esp->_instr(pc++) = 0xfffffffff000; // END
+
+			while (pc < 160) {
+				m_esp->_instr(pc++) = 0xffffffffffff; // no-op
+			}
+#endif
+
+			// m_esp->list_program(print_to_stderr);
 		}
 	}
 	bool get_esp_halted() {
@@ -174,7 +212,7 @@ protected:
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
-	// timer callback overridea
+	// timer callback overrides
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 private:
@@ -209,6 +247,11 @@ private:
 	osd_ticks_t last_ticks;
 	osd_ticks_t next_report_ticks;
 #endif
+
+#if !PUMP_FAKE_ESP_PROCESSING && PUMP_REPLACE_ESP_PROGRAM
+	INT16 e[0x4000];
+	int ei;
+#endif
 };
 
 const device_type ESQ_5505_5510_PUMP = &device_creator<esq_5505_5510_pump>;
@@ -222,14 +265,11 @@ esq_5505_5510_pump::esq_5505_5510_pump(const machine_config &mconfig, const char
 
 void esq_5505_5510_pump::device_start()
 {
-	INT64 nsec_per_sample = 100 * 16 * 21;
-	attotime sample_time(0, 1000000000 * nsec_per_sample);
-	attotime initial_delay(0, 0);
 	logerror("Clock = %d\n", clock());
+
 	m_stream = machine().sound().stream_alloc(*this, 8, 2, clock(), this);
 	m_timer = timer_alloc(0);
-	m_timer->adjust(initial_delay, 0, sample_time);
-	m_timer->enable(true);
+	m_timer->enable(false);
 
 #if PUMP_DETECT_SILENCE
 	silent_for = 500;
@@ -244,6 +284,11 @@ void esq_5505_5510_pump::device_start()
 	last_ticks = osd_ticks();
 	next_report_ticks = last_ticks + osd_ticks_per_second();
 #endif
+
+#if !PUMP_FAKE_ESP_PROCESSING && PUMP_REPLACE_ESP_PROGRAM
+	memset(e, 0, 0x4000 * sizeof(e[0]));
+	ei = 0;
+#endif
 }
 
 void esq_5505_5510_pump::device_stop()
@@ -253,6 +298,12 @@ void esq_5505_5510_pump::device_stop()
 
 void esq_5505_5510_pump::device_reset()
 {
+	INT64 nsec_per_sample = 100 * 16 * 21;
+	attotime sample_time(0, 1000000000 * nsec_per_sample);
+	attotime initial_delay(0, 0);
+
+	m_timer->adjust(initial_delay, 0, sample_time);
+	m_timer->enable(true);
 }
 
 void esq_5505_5510_pump::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
@@ -264,9 +315,9 @@ void esq_5505_5510_pump::sound_stream_update(sound_stream &stream, stream_sample
 	stream_sample_t *left = outputs[0], *right = outputs[1];
 	for (int i = 0; i < samples; i++)
 	{
-		// anything for the 'aux' output?
-		INT32 l = inputs[0][i] >> 4;
-		INT32 r = inputs[1][i] >> 4;
+	    // anything for the 'aux' output?
+		INT16 l = inputs[0][i] >> 4;
+		INT16 r = inputs[1][i] >> 4;
 
 		// push the samples into the ESP
 		m_esp->ser_w(0, inputs[2][i] >> 4);
@@ -275,9 +326,6 @@ void esq_5505_5510_pump::sound_stream_update(sound_stream &stream, stream_sample
 		m_esp->ser_w(3, inputs[5][i] >> 4);
 		m_esp->ser_w(4, inputs[6][i] >> 4);
 		m_esp->ser_w(5, inputs[7][i] >> 4);
-
-		m_esp->ser_w(6, 0);
-		m_esp->ser_w(7, 0);
 
 #if PUMP_FAKE_ESP_PROCESSING
 		m_esp->ser_w(6, m_esp->ser_r(0) + m_esp->ser_r(2) + m_esp->ser_r(4));
@@ -294,8 +342,23 @@ void esq_5505_5510_pump::sound_stream_update(sound_stream &stream, stream_sample
 #endif
 
 		// read the processed result from the ESP and add to the saved AUX data
-		l += m_esp->ser_r(6);
-		r += m_esp->ser_r(7);
+		INT16 ll = m_esp->ser_r(6);
+		INT16 rr = m_esp->ser_r(7);
+		l += ll;
+		r += rr;
+
+#if !PUMP_FAKE_ESP_PROCESSING && PUMP_REPLACE_ESP_PROGRAM
+		// if we're processing the fake program through the ESP, the result should just be that of adding the inputs
+		INT32 el = (inputs[2][i]) + (inputs[4][i]) + (inputs[6][i]);
+		INT32 er = (inputs[3][i]) + (inputs[5][i]) + (inputs[7][i]);
+		INT32 e_next = el + er;
+		e[(ei + 0x1d0f) % 0x4000] = e_next;
+		
+		if (l != e[ei]) {
+			fprintf(stderr, "expected (%d) but have (%d)\n", e[ei], l);
+		}
+		ei = (ei + 1) % 0x4000;
+#endif
 
 		// write the combined data to the output
 		*left++  = l;
@@ -876,8 +939,8 @@ static MACHINE_CONFIG_START( vfx, esq5505_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("pump", ESQ_5505_5510_PUMP, XTAL_10MHz / (16 * 21))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 2.0)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	MCFG_SOUND_ADD("otis", ES5505, XTAL_10MHz)
 	MCFG_SOUND_CONFIG(es5505_config)
@@ -930,8 +993,8 @@ static MACHINE_CONFIG_START(vfx32, esq5505_state)
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("pump", ESQ_5505_5510_PUMP, XTAL_30_4761MHz / (2 * 16 * 32))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 2.0)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	MCFG_SOUND_ADD("otis", ES5505, XTAL_30_4761MHz / 2)
 	MCFG_SOUND_CONFIG(es5505_config)

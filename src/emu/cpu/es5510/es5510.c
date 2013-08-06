@@ -14,9 +14,25 @@
 #define VERBOSE 0
 
 #if VERBOSE
-#define LOG(x) do { logerror x; } while(0)
+void log_to_stderr(const char *format, ...) {
+	va_list ap;
+	va_start(ap, format);
+	vfprintf(stderr, format, ap);
+	va_end(ap);
+}
+
+#define LOG(x) do { log_to_stderr x; } while(0)
 #else
 #define LOG(x)
+#endif
+
+#define VERBOSE_EXEC 0
+
+#if VERBOSE_EXEC
+static int exec_cc = 0;
+#define LOG_EXEC(x) do { if (!exec_cc) LOG(x); } while(0)
+#else
+#define LOG_EXEC(x)
 #endif
 
 const device_type ES5510 = &device_creator<es5510_device>;
@@ -54,7 +70,7 @@ inline static bool isFlagSet(UINT8 ccr, UINT8 flag) {
 
 inline static INT32 add(INT32 a, INT32 b, UINT8 &flags) {
 	INT32 aSign = a & 0x00800000;
-	INT32 bSign = (b & 0x00800000) == 0;
+	INT32 bSign = b & 0x00800000;
 	INT32 result = a + b;
 	INT32 resultSign = result & 0x00800000;
 	bool overflow = (aSign == bSign) && (aSign != resultSign);
@@ -89,7 +105,6 @@ inline static INT32 asl(INT32 value, int shift, UINT8 &flags) {
 	flags = setFlagTo(flags, FLAG_V, overflow);
 	return saturate(result, flags);
 }
-
 
 es5510_device::es5510_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 : cpu_device(mconfig, ES5510, "ES5510", tag, owner, clock, "es5510", __FILE__)
@@ -135,7 +150,8 @@ es5510_device::es5510_device(const machine_config &mconfig, const char *tag, dev
 	instr_latch = 0;
 	ram_sel = 0;
 	host_control = 0;
-
+   
+	pc = 0;
 	memset(&alu, 0, sizeof(alu));
 	memset(&mulacc, 0, sizeof(mulacc));
 }
@@ -146,8 +162,8 @@ typedef es5510_device::op_src_dst_t op_src_dst_t;
 
 static inline INT32 SX(INT32 x) { return (x & 0x00800000) ? x | 0xff000000 : x & 0x00ffffff; }
 static inline INT32 SC(INT32 x) { return x & 0x00ffffff; }
-static inline INT64 SX64(INT64 x) { return (x & U64(0x0000800000000000)) ? x | U64(0xffff000000000000) : x & U64(0x0000ffffffffffff); }
-static inline INT64 SC64(INT64 x) { return x & U64(0x0000ffffffffffff); }
+static inline INT64 SX64(INT64 x) { return (x & S64(0x0000800000000000)) ? x | S64(0xffff000000000000) : x & S64(0x0000ffffffffffff); }
+static inline INT64 SC64(INT64 x) { return x & S64(0x0000ffffffffffff); }
 
 static inline const char * const REGNAME(UINT8 r) {
 	static char rn[8];
@@ -179,8 +195,12 @@ static inline const char * const REGNAME(UINT8 r) {
 	return NULL;
 }
 
-static inline char * DESCRIBE_REG(char *s, UINT8 r) {
-	return stpcpy_int(s, REGNAME(r));
+static inline char * DESCRIBE_REG(char *s, UINT8 r, const char *name) {
+	if (name) {
+		return s + sprintf(s, "%s/%s", REGNAME(r), name);
+	} else {
+		return stpcpy_int(s, REGNAME(r));
+	}
 }
 
 const alu_op_t es5510_device::ALU_OPS[16] = {
@@ -224,14 +244,14 @@ const op_select_t es5510_device::OPERAND_SELECT[16] = {
 	{ es5510_device::SRC_DST_DELAY, es5510_device::SRC_DST_BOTH, es5510_device::SRC_DST_DELAY, es5510_device::SRC_DST_REG },
 };
 
-static inline char * DESCRIBE_SRC_DST(char *s, UINT8 reg, op_src_dst_t src_dst) {
+static inline char * DESCRIBE_SRC_DST(char *s, UINT8 reg, const char *regname, op_src_dst_t src_dst) {
 	switch (src_dst) {
 	case es5510_device::SRC_DST_REG:
-		return DESCRIBE_REG(s, reg);
+		return DESCRIBE_REG(s, reg, regname);
 	case es5510_device::SRC_DST_DELAY:
 		return stpcpy_int(s, "Delay");
 	case es5510_device::SRC_DST_BOTH:
-		s = DESCRIBE_REG(s, reg);
+		s = DESCRIBE_REG(s, reg, regname);
 		return stpcpy_int(s, ",Delay");
 	}
 	// should never happen!
@@ -245,15 +265,15 @@ const es5510_device::ram_control_t es5510_device::RAM_CONTROL[8] = {
 	{ es5510_device::RAM_CYCLE_WRITE,     es5510_device::RAM_CONTROL_TABLE_A, "Write Table A+%06x" },
 	{ es5510_device::RAM_CYCLE_READ,      es5510_device::RAM_CONTROL_TABLE_B, "Read Table B+%06x" },
 	{ es5510_device::RAM_CYCLE_DUMP_FIFO, es5510_device::RAM_CONTROL_DELAY,   "Read Delay+%06x and Dump FIFO" },
-	{ es5510_device::RAM_CYCLE_READ,      es5510_device::RAM_CONTROL_IO,      "Read I/O at %06x" },
-	{ es5510_device::RAM_CYCLE_WRITE,     es5510_device::RAM_CONTROL_IO,      "Write I/o %06x" },
+	{ es5510_device::RAM_CYCLE_READ,      es5510_device::RAM_CONTROL_IO,      "Read from I/O at %06x" },
+	{ es5510_device::RAM_CYCLE_WRITE,     es5510_device::RAM_CONTROL_IO,      "Write to I/O at %06x" },
 };
 
 static inline char * DESCRIBE_RAM(char *s, UINT8 ramControl, UINT32 gprContents) {
 	return s + sprintf(s, es5510_device::RAM_CONTROL[ramControl].description, SC(gprContents));
 }
 
-static inline char * DESCRIBE_ALU(char *s, UINT8 opcode, UINT8 aReg, UINT8 bReg, const op_select_t &opSelect) {
+static inline char * DESCRIBE_ALU(char *s, UINT8 opcode, UINT8 aReg, const char *aName, UINT8 bReg, const char *bName, const op_select_t &opSelect) {
 	const alu_op_t &op = es5510_device::ALU_OPS[opcode];
 
 	switch (op.operands) {
@@ -261,32 +281,36 @@ static inline char * DESCRIBE_ALU(char *s, UINT8 opcode, UINT8 aReg, UINT8 bReg,
 		return stpcpy_int(s, op.opcode);
 
 	case 1:
-		s += sprintf(s, "%s %s >", op.opcode, REGNAME(bReg));
-		return DESCRIBE_SRC_DST(s, aReg, opSelect.alu_dst);
+		s += sprintf(s, "%s ", op.opcode);
+		s = DESCRIBE_SRC_DST(s, bReg, bName, opSelect.alu_src);
+		s += sprintf(s, " >");
+		return DESCRIBE_SRC_DST(s, aReg, aName, opSelect.alu_dst);
 
 	case 2:
-		s += sprintf(s, "%s %s,", op.opcode, REGNAME(bReg));
-		s = DESCRIBE_SRC_DST(s, aReg, opSelect.alu_src);
+		s += sprintf(s, "%s ", op.opcode);
+		s = DESCRIBE_REG(s, bReg, bName);
+		s += sprintf(s, " ");
+		s = DESCRIBE_SRC_DST(s, aReg, aName, opSelect.alu_src);
 		s += sprintf(s, " >");
-		return DESCRIBE_SRC_DST(s, aReg, opSelect.alu_dst);
+		return DESCRIBE_SRC_DST(s, aReg, aName, opSelect.alu_dst);
 	}
 	return s;
 }
 
-static inline char * DESCRIBE_MAC(char *s, UINT8 mac, UINT8 cReg, UINT8 dReg, const op_select_t &opSelect)
+static inline char * DESCRIBE_MAC(char *s, UINT8 mac, UINT8 cReg, const char *cName, UINT8 dReg, const char *dName, const op_select_t &opSelect)
 {
 	if (mac)
 	{
 		s += sprintf(s, "MAC + ");
 	}
-	s = DESCRIBE_REG(s, dReg);
+	s = DESCRIBE_REG(s, dReg, dName);
 	s += sprintf(s, " * ");
-	s = DESCRIBE_SRC_DST(s, cReg, opSelect.mac_src);
+	s = DESCRIBE_SRC_DST(s, cReg, cName, opSelect.mac_src);
 	s += sprintf(s, " >");
-	return DESCRIBE_SRC_DST(s, cReg, opSelect.mac_dst);
+	return DESCRIBE_SRC_DST(s, cReg, cName, opSelect.mac_dst);
 }
 
-static inline char * DESCRIBE_INSTR(char *s, UINT64 instr, UINT32 gpr)
+static inline char * DESCRIBE_INSTR(char *s, UINT64 instr, UINT32 gpr, const char *aName, const char *bName, const char *cName, const char *dName)
 {
 	UINT8 dReg = (UINT8)((instr >> 40) & 0xff);
 	UINT8 cReg = (UINT8)((instr >> 32) & 0xff);
@@ -300,9 +324,9 @@ static inline char * DESCRIBE_INSTR(char *s, UINT64 instr, UINT32 gpr)
 
 	const op_select_t &opSelect = es5510_device::OPERAND_SELECT[operandSelect];
 
-	s = DESCRIBE_ALU(s, aluOpcode, aReg, bReg, opSelect);
+	s = DESCRIBE_ALU(s, aluOpcode, aReg, aName, bReg, bName, opSelect);
 	s += sprintf(s, "; ");
-	s = DESCRIBE_MAC(s, mac, cReg, dReg, opSelect);
+	s = DESCRIBE_MAC(s, mac, cReg, cName, dReg, dName, opSelect);
 	s += sprintf(s, "; ");
 	s = DESCRIBE_RAM(s, ramControl, gpr);
 	if (skip) {
@@ -341,11 +365,11 @@ READ8_MEMBER(es5510_device::host_r)
 
 	case 0x09: LOG(("ES5510: Host Read DIL latch[2]: %02x\n", (dil_latch >> 16) & 0xff)); return (dil_latch >> 16) & 0xff;
 	case 0x0a: LOG(("ES5510: Host Read DIL latch[1]: %02x\n", (dil_latch >>  8) & 0xff)); return (dil_latch >>  8) & 0xff;
-	case 0x0b: LOG(("ES5510: Host Read DIL latch[0]: %02x\n", (dil_latch >>  0) & 0xff)); return (dil_latch >>  0) & 0xff; //TODO: docs says that this always returns 0
+	case 0x0b: LOG(("ES5510: Host Read DIL latch[0]: %02x\n", 0)); return 0;
 
 	case 0x0c: LOG(("ES5510: Host Read DOL latch[2]: %02x\n", (dol_latch >> 16) & 0xff)); return (dol_latch >> 16) & 0xff;
 	case 0x0d: LOG(("ES5510: Host Read DOL latch[1]: %02x\n", (dol_latch >>  8) & 0xff)); return (dol_latch >>  8) & 0xff;
-	case 0x0e: LOG(("ES5510: Host Read DOL latch[0]: %02x\n", (dol_latch >>  0) & 0xff)); return (dol_latch >>  0) & 0xff; //TODO: docs says that this always returns 0
+	case 0x0e: LOG(("ES5510: Host Read DOL latch[0]: %02x\n", 0xff)); return 0xff;
 
 	case 0x0f: LOG(("ES5510: Host Read DADR latch[2]: %02x\n", (dadr_latch >> 16) & 0xff)); return (dadr_latch >> 16) & 0xff;
 	case 0x10: LOG(("ES5510: Host Read DADR latch[1]: %02x\n", (dadr_latch >>  8) & 0xff)); return (dadr_latch >>  8) & 0xff;
@@ -397,11 +421,11 @@ WRITE8_MEMBER(es5510_device::host_w)
 		dadr_latch = (dadr_latch&0x00ffff) | ((data&0xff)<<16);
 		if (ram_sel)
 		{
-			dil_latch = dram[dadr_latch];
+			dil_latch = dram[dadr_latch] << 8;
 		}
 		else
 		{
-			dram[dadr_latch] = dol_latch;
+			dram[dadr_latch] = dol_latch >> 8;
 		}
 		break;
 
@@ -455,7 +479,7 @@ WRITE8_MEMBER(es5510_device::host_w)
 
 	case 0xc0: /* Write select - INSTR */
 #if VERBOSE
-		DESCRIBE_INSTR(buf, instr_latch, gpr[data]);
+		DESCRIBE_INSTR(buf, instr_latch, gpr[data], NULL, NULL, NULL, NULL);
 		LOG(("ES5510: Host Write INSTR %02x %012" I64FMT "x: %s\n", data, instr_latch&U64(0xffffffffffff), buf));
 #endif
 		if (data < 0xa0) {
@@ -465,7 +489,7 @@ WRITE8_MEMBER(es5510_device::host_w)
 
 	case 0xe0: /* Write select - GPR + INSTR */
 #if VERBOSE
-		DESCRIBE_INSTR(buf, instr_latch, gpr_latch);
+		DESCRIBE_INSTR(buf, instr_latch, gpr_latch, NULL, NULL, NULL, NULL);
 		LOG(("ES5510: Host Write INSTR+GPR %02x (%s): %012" I64FMT "x %06x (%d): %s\n", data, REGNAME(data&0xff), instr_latch, gpr_latch, SX(gpr_latch), buf));
 #endif
 		if (data < 0xa0) {
@@ -560,14 +584,83 @@ void es5510_device::execute_set_input(int linenum, int state) {
 void es5510_device::list_program(void(p)(const char *, ...)) {
 	LOG(("ES5501: Starting!\n"));
 
-	UINT8 addr;
 	char buf[1024];
+	bool is_written[0xff], is_read[0xff];
+	char name[0xff][16];
+	int addr;
+
+	for (int i = 0; i < 0x100; i++) {
+		is_written[i] = is_read[i] = false;
+		name[i][0] = '\0';
+	}
+	
 	for (addr = 0; addr < 0xa0; addr++) {
-		DESCRIBE_INSTR(buf, instr[addr], gpr[addr]);
-		p("%02x: %012" I64FMT "x %06x  %s\n", addr, instr[addr], gpr[addr]&0xffffff, buf);
+		DESCRIBE_INSTR(buf, instr[addr], gpr[addr], NULL, NULL, NULL, NULL);
+		UINT64 inst = instr[addr];
+		UINT8 aReg = (UINT8)((inst >> 16) & 0xff);
+		UINT8 bReg = (UINT8)((inst >> 24) & 0xff);
+		UINT8 cReg = (UINT8)((inst >> 32) & 0xff);
+		UINT8 dReg = (UINT8)((inst >> 40) & 0xff);
+		UINT8 alu_op = (inst >> 12) & 0x0f;
+		if (alu_op == 0x0f) {
+			// END!
+			break;
+		}
+
+		UINT8 operandSelect = (UINT8)((inst >> 8) & 0x0f);
+		const op_select_t &opSelect = OPERAND_SELECT[operandSelect];		
+
+		if (opSelect.mac_src == SRC_DST_REG) {
+			is_read[cReg] = true;
+		}
+		is_read[dReg] = true;
+		if (opSelect.mac_dst != SRC_DST_DELAY) { // either REG or BOTH
+			is_written[cReg] = true;
+		}
+		
+		alu_op_t aluOp = ALU_OPS[alu_op];
+		if (aluOp.operands == 1) {
+			if (opSelect.alu_src == SRC_DST_REG) {
+				is_read[bReg] = true;
+			}
+		} else if (aluOp.operands == 2) {
+			if (opSelect.alu_src == SRC_DST_REG) {
+				is_read[aReg] = true;
+			}
+			is_read[bReg] = true;
+		}
+		if (opSelect.mac_dst != SRC_DST_DELAY) { // either REG or BOTH
+			is_written[aReg] = true;
+		}
+	}
+
+	int varIndex = 1;
+	int constIndex = 1;
+	for (int i = 0; i < 0xc0; i++) {
+		if (is_written[i]) {
+			// this is a variable
+			sprintf(name[i], "v_%03d", varIndex++);
+		} else if (is_read[i]) {
+			// this is only read, so a constant - or possibly something updated by the CPU
+			sprintf(name[i], "c_%03d", constIndex++);
+		} else {
+			name[i][0] = 0;
+		}
+	}
+	for (int i = 0xc0; i < 0x100; i++) {
+		name[i][0] = 0;
+	}
+	
+	for (addr = 0; addr < 0xa0; addr++) {
+		UINT8 aReg = (UINT8)((instr[addr] >> 16) & 0xff);
+		UINT8 bReg = (UINT8)((instr[addr] >> 24) & 0xff);
+		UINT8 cReg = (UINT8)((instr[addr] >> 32) & 0xff);
+		UINT8 dReg = (UINT8)((instr[addr] >> 40) & 0xff);
+		DESCRIBE_INSTR(buf, instr[addr], gpr[addr], name[aReg], name[bReg], name[cReg], name[dReg]);
+		p("%02x: %012" I64FMT "x %06x (%8d) %s\n", addr, instr[addr], gpr[addr]&0xffffff, SX(gpr[addr]&0xffffff), buf);
 	}
 	for (; addr < 0xc0; addr++) {
-		p("%02x: %06x (%d)\n", addr, gpr[addr]&0xffffff, gpr[addr]);
+		p("%02x: %06x (%d)\n", addr, gpr[addr]&0xffffff, SX(gpr[addr]&0xffffff));
 	}
 }
 
@@ -587,14 +680,16 @@ void es5510_device::execute_run() {
 		} else {
 			// currently running, execute one instruction.
 
-#if VERBOSE
+#if VERBOSE_EXEC
 			char buf[1024];
-			DESCRIBE_INSTR(buf, instr[pc], gpr[pc]);
-			LOG(("%02x: %012" I64FMT "x %06x  %s\n", pc, instr[pc], gpr[pc]&0xffffff, buf));
+			DESCRIBE_INSTR(buf, instr[pc], gpr[pc], NULL, NULL, NULL, NULL);
+			LOG_EXEC(("EXECUTING %02x: %012" I64FMT "x %06x  %s\n", pc, instr[pc], gpr[pc]&0xffffff, buf));
 #endif
 
 			ram_pp = ram_p;
 			ram_p = ram;
+
+			LOG_EXEC(("- T0\n"));
 
 			// *** T0, clock high
 			// --- nothing to do!
@@ -608,7 +703,8 @@ void es5510_device::execute_run() {
 				if (ram_pp.io) { // read from I/O and store into DIL
 					dil = 0; // read_io(ram_pp.address);;
 				} else { // read from DRAM and store into DIL
-					dil = dram[ram_pp.address];
+					dil = dram[ram_pp.address] << 8;
+					LOG_EXEC(("  . RAM: read %x (%d) from address %x\n", dil, dil, ram_pp.address));
 				}
 			}
 
@@ -621,16 +717,20 @@ void es5510_device::execute_run() {
 			INT32 offset = gpr[pc];
 			switch(ramControl.access) {
 			case RAM_CONTROL_DELAY:
-				ram.address = (((dbase + offset) % (dlength + 1)) & memmask) >> memshift;
+				ram.address = (((dbase + offset) % (dlength + memincrement)) & memmask) >> memshift;
+				LOG_EXEC((". Ram Control: Delay, base=%x, offset=%x, length=%x => address=%x\n", dbase >> memshift, offset >> memshift, (dlength + memincrement) >> memshift, ram.address));
 				break;
 			case RAM_CONTROL_TABLE_A:
 				ram.address = ((abase + offset) & memmask) >> memshift;
+				LOG_EXEC((". Ram Control: table A = %x, offset=%x => address=%x\n", abase >> memshift, offset >> memshift, ram.address));
 				break;
 			case RAM_CONTROL_TABLE_B:
 				ram.address = ((bbase + offset) & memmask) >> memshift;
+				LOG_EXEC((". Ram Control: table B = %x, offset=%x => address=%x\n", bbase >> memshift, offset >> memshift, ram.address));
 				break;
 			case RAM_CONTROL_IO:
 				ram.address = offset & 0x00fffff0; // mask off the low 4 bits
+				LOG_EXEC((". Ram Control: I/O at address=%x\n", ram.address));
 				break;
 			}
 
@@ -638,25 +738,56 @@ void es5510_device::execute_run() {
 			// --- Decode instruction N;
 			//     we will do this both here and in stages as the different parts of the instruction complete & recommence.
 
+			LOG_EXEC(("- T1.1\n"));
+
 			UINT8 operandSelect = (UINT8)((instr >> 8) & 0x0f);
 			const op_select_t &opSelect = OPERAND_SELECT[operandSelect];
-			bool skip = false;
-			bool skippable = ((instr >> 7) & 0x01) != 0; // aka the 'SKIP' bit in the instruction word
+			bool skip;
+			bool skippable = (instr & (0x01 << 7)) != 0; // aka the 'SKIP' bit in the instruction word
 			if (skippable) {
 				bool skipConditionSatisfied = (ccr & cmr & FLAG_MASK) != 0;
 				if (isFlagSet(cmr, FLAG_NOT)) {
 					skipConditionSatisfied = !skipConditionSatisfied;
 				}
 				skip = skipConditionSatisfied;
+				LOG_EXEC((". skippable: %x vs %x => skippable = %d\n", ccr, cmr, skip));
+			} else {
+				skip = false;
 			}
 
 			// --- Write Multiplier result N-1
+			LOG_EXEC((". write mulacc:\n"));
 			if (mulacc.write_result) {
-				mulacc.product = (mulacc.cValue * mulacc.dValue) << mulshift;
-				mulacc.result = (mulacc.accumulate ? machl : 0) + mulacc.product;
-				INT32 tmp = (mulacc.result & U64(0x0000ffffff000000)) >> 24;
+				mulacc.product = ((INT64)SX(mulacc.cValue) * (INT64)SX(mulacc.dValue)) << mulshift;
+				if (mulacc.accumulate) {
+					mulacc.result = mulacc.product + machl;
+				} else {
+					mulacc.result = mulacc.product;
+				}
+
+				INT64 result_min = ~0LL << 47;
+				INT64 result_max = (1LL << 48) - 1;
+
+				if (mulacc.result < result_min || mulacc.result > result_max) {
+					mac_overflow = true;
+				} else {
+					mac_overflow = false;
+				}
+#if VERBOSE_EXEC
+				if (mulacc.cValue || mulacc.dValue || (mulacc.accumulate && machl)) {
+					LOG_EXEC((". mulacc: %x (%d) * %x (%d) << %d", SX(mulacc.cValue), SX(mulacc.cValue), SX(mulacc.dValue), SX(mulacc.dValue), mulshift));
+					if (mulacc.accumulate) LOG_EXEC((" + %llx (%lld) ", machl, machl));
+					LOG_EXEC((" = %llx (%lld)", mulacc.result, mulacc.result));
+					if (mac_overflow) {
+						LOG_EXEC((" overflow!\n"));
+					} else {
+						LOG_EXEC(("\n"));
+					}
+				}
+#endif
+				machl = mulacc.result;
+				INT32 tmp = mac_overflow ? (machl < 0 ? 0x00800000 : 0x007fffff) : (mulacc.result & U64(0x0000ffffff000000)) >> 24;
 				if (mulacc.dst & SRC_DST_REG) {
-					machl = mulacc.result;
 					write_reg(mulacc.cReg, tmp);
 				}
 				if (mulacc.dst & SRC_DST_DELAY) {
@@ -665,7 +796,11 @@ void es5510_device::execute_run() {
 			}
 
 			// *** T1, clock low
+
+			LOG_EXEC(("- T1.0\n"));
+
 			// --- Start of multiplier cycle N
+			LOG_EXEC((". start mulacc:\n"));
 			mulacc.cReg = (UINT8)((instr >> 32) & 0xff);
 			mulacc.dReg = (UINT8)((instr >> 40) & 0xff);
 			mulacc.src = opSelect.mac_src;
@@ -677,12 +812,17 @@ void es5510_device::execute_run() {
 			if (mulacc.src == SRC_DST_REG) {
 				mulacc.cValue = read_reg(mulacc.cReg);
 			} else { // must be SRC_DST_DELAY
+				LOG_EXEC(("  . reading %x (%d) from dil\n", dil, SX(dil)));
 				mulacc.cValue = dil;
 			}
 			mulacc.dValue = read_reg(mulacc.dReg);
 
 			// *** T2, clock high
+
+			LOG_EXEC(("- T2.1\n"));
+		  
 			// --- Write ALU Result N-1
+			LOG_EXEC((". write ALU:\n"));
 			if (alu.write_result) {
 				UINT8 flags = ccr;
 				alu.result = alu_operation(alu.op, alu.aValue, alu.bValue, flags);
@@ -698,7 +838,11 @@ void es5510_device::execute_run() {
 			}
 
 			// *** T2, clock low
+
+			LOG_EXEC(("- T2.0\n"));
+
 			// --- Start of ALU cycle N
+			LOG_EXEC((". start ALU:\n"));
 			alu.aReg = (instr >> 16) & 0xff;
 			alu.bReg = (instr >> 24) & 0xff;
 			alu.op = (instr >> 12) & 0x0f;
@@ -712,14 +856,18 @@ void es5510_device::execute_run() {
 			} else {
 				// --- Read ALU Operands N
 				alu_op_t aluOp = ALU_OPS[alu.op];
-				if (aluOp.operands == 2) {
+				if (aluOp.operands == 1) {
+					if (alu.src == SRC_DST_REG) {
+						alu.bValue = read_reg(alu.bReg);
+					} else { // must be SRC_DST_DELAY
+						alu.bValue = dil;
+					}
+				} else {
 					if (alu.src == SRC_DST_REG) {
 						alu.aValue = read_reg(alu.aReg);
 					} else { // must be SRC_DST_DELAY
 						alu.aValue = dil;
 					}
-				}
-				if (aluOp.operands >= 1) {
 					alu.bValue = read_reg(alu.bReg);
 				}
 			}
@@ -731,14 +879,26 @@ void es5510_device::execute_run() {
 					if (ram_p.io) {
 						// write_io(ram_p.io, dol[0]);
 					} else {
-						dram[ram_p.address] = dol[0];
+						dram[ram_p.address] = dol[0] >> 8;
+						LOG_EXEC(("  . RAM: writing %x (%d) [of %x (%d)] to address %x\n", dol[0]&0xffff00, SX(dol[0]&0xffff00), dol[0], SX(dol[0]), ram_p.address));
 					}
 				}
 				// If this is a Write or Dump cycle, eject the frontmost DL value.
+#if VERBOSE_EXEC
+				LOG_EXEC(("  . ejecting from DOL: [ "));
+				if (dol_count >= 1) LOG_EXEC(("{ %x (%d) }", dol[0], SX(dol[0])));
+				if (dol_count == 2) LOG_EXEC((", { %x (%d) }", dol[1], SX(dol[1])));
+				LOG_EXEC((" ] -> [ "));
+#endif
 				dol[0] = dol[1];
 				if (dol_count > 0) {
 					--dol_count;
 				}
+#if VERBOSE_EXEC
+				if (dol_count >= 1) LOG_EXEC(("{ %x (%d) }", dol[0], SX(dol[0])));
+				if (dol_count == 2) LOG_EXEC((", { %x (%d) }", dol[1], SX(dol[1])));
+				LOG_EXEC((" ]\n"));
+#endif
 			}
 
 			++pc;
@@ -762,38 +922,48 @@ offs_t es5510_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *o
 	return pc;
 }
 
+#if VERBOSE_EXEC
+#define RETURN_GPR(r, x) do { INT32 v = (x); LOG_EXEC(("  . reading %x (%d) from gpr_%02x\n", v, SX(v), r)); return v; } while(0)
+#define RETURN(r, x) do { INT32 v = (x); LOG_EXEC(("  . reading %x (%d) from " #r "\n", v, SX(v))); return v; } while(0)
+#define RETURN16(r, x) do { INT16 vv = (x); INT32 v = vv << 8; LOG_EXEC(("  . reading %x (%d) as %x (%d) from " #r "\n", vv, vv, v, SX(v))); return v; } while(0)
+#else
+#define RETURN_GPR(r, x) return x
+#define RETURN(r, x) return x
+#define RETURN16(r, x) return (x) << 8
+#endif
+
 INT32 es5510_device::read_reg(UINT8 reg)
 {
 	if (reg < 0xc0) {
-		return gpr[reg];
+		RETURN_GPR(reg, gpr[reg]);
 	} else {
 		switch(reg)
 		{
-		case 234: return ser0r;
-		case 235: return ser0l;
-		case 236: return ser1r;
-		case 237: return ser1l;
-		case 238: return ser2r;
-		case 239: return ser2l;
-		case 240: return ser3r;
-		case 241: return ser3l;
-		case 242: return (machl >>  0) & 0x00ffffff;
-		case 243: return (machl >> 24) & 0x00ffffff;
-		case 244: return dil; // DIL when reading
-		case 245: return dlength;
-		case 246: return abase;
-		case 247: return bbase;
-		case 248: return dbase;
-		case 249: return sigreg;
-		case 250: return ccr;
-		case 251: return cmr;
-		case 252: return 0x00ffffff;
-		case 253: return 0x00800000;
-		case 254: return 0x007fffff;
-		case 255: return 0x00000000;
+		case 234: RETURN16(ser0r, ser0r);
+		case 235: RETURN16(ser0l, ser0l);
+		case 236: RETURN16(ser1r, ser1r);
+		case 237: RETURN16(ser1l, ser1l);
+		case 238: RETURN16(ser2r, ser2r);
+		case 239: RETURN16(ser2l, ser2l);
+		case 240: RETURN16(ser3r, ser3r);
+		case 241: RETURN16(ser3l, ser3l);
+		case 242: /* macl */ RETURN(macl, mac_overflow ? (machl < 0 ? 0x00fffffe : 0x00000000) : (machl >>  0) & 0x00ffffff);
+		case 243: /* mach */ RETURN(mach, mac_overflow ? (machl < 0 ? 0x007fffff : 0x00800000) : (machl >> 24) & 0x00ffffff);
+		case 244: RETURN(dil, dil); // DIL when reading
+		case 245: RETURN(dlength, dlength);
+		case 246: RETURN(abase, abase);
+		case 247: RETURN(bbase, bbase);
+		case 248: RETURN(dbase, dbase);
+		case 249: RETURN(sigreg, sigreg);
+		case 250: RETURN(ccr, ccr);
+		case 251: RETURN(cmr, cmr);
+		case 252: RETURN(minus_one, 0x00ffffff);
+		case 253: RETURN(min, 0x00800000);
+		case 254: RETURN(max, 0x007fffff);
+		case 255: RETURN(zero, 0x00000000);
 		default:
 			// unknown SPR
-			return 0;
+			RETURN(unknown, 0);;
 		}
 	}
 }
@@ -826,61 +996,95 @@ INT8 countLowOnes(INT32 x) {
 	return n;
 }
 
+#if VERBOSE_EXEC
+#define WRITE_REG(r, x) do { r = value; LOG_EXEC(("  . writing %x (%d) to " #r "\n", r, SX(r))); } while(0)
+#define WRITE_REG16(r, x) do { r = ((value >> 8) & 0xffff); LOG_EXEC(("  . writing %x (%d) as %x (%d) to " #r "\n", value, SX(value), r, r)); } while(0)
+#else
+#define WRITE_REG(r, x) do { r = value; } while(0)
+#define WRITE_REG16(r, x) do { r = ((value >> 8) & 0xffff); } while(0)
+#endif
+
 void es5510_device::write_reg(UINT8 reg, INT32 value)
 {
+	#if VERBOSE_EXEC
+	INT64 old;
+	#endif
 	value &= 0x00ffffff;
 	if (reg < 0xc0) {
+		LOG_EXEC(("  . writing %x (%d) to gpr_%02x\n", value, SX(value), reg));
 		gpr[reg] = value;
 	} else {
 		switch(reg)
 		{
-		case 234: ser0r = value;
+		case 234: WRITE_REG16(ser0r, value);
 			break;
-		case 235: ser0l = value;
+		case 235: WRITE_REG16(ser0l, value);
 			break;
-		case 236: ser1r = value;
+		case 236: WRITE_REG16(ser1r, value);
 			break;
-		case 237: ser1l = value;
+		case 237: WRITE_REG16(ser1l, value);
 			break;
-		case 238: ser2r = value;
+		case 238: WRITE_REG16(ser2r, value);
 			break;
-		case 239: ser2l = value;
+		case 239: WRITE_REG16(ser2l, value);
 			break;
-		case 240: ser3r = value;
+		case 240: WRITE_REG16(ser3r, value);
 			break;
-		case 241: ser3l = value;
+		case 241: WRITE_REG16(ser3l, value);
 			break;
-		case 242: machl = (machl & ~((INT64)0x00ffffff <<  0)) | (value <<  0);
+		case 242: /* macl */ {
+			#if VERBOSE_EXEC
+			old = machl;
+			#endif
+			INT64 masked = machl & (S64(0x00ffffff) << 24);
+			INT64 shifted = (INT64)(value & 0x00ffffff) << 0;
+			machl = SX64(masked | shifted);
+			#if VERBOSE_EXEC
+			LOG_EXEC(("  . writing machl: l -> %06x => %llx -> %llx\n", value, old, machl));
+			#endif
 			break;
-		case 243: machl = (machl & ~((INT64)0x00ffffff << 24)) | (value << 24);
+		}
+		case 243: /* mach */ {
+			#if VERBOSE_EXEC
+			old = machl;
+			#endif
+			INT64 masked = machl & (S64(0x00ffffff) << 0);
+			INT64 shifted = (INT64)(value & 0x00ffffff) << 24;
+			machl = SX64(masked | shifted);
+			mac_overflow = false;
+			#if VERBOSE_EXEC
+			LOG_EXEC(("  . writing machl: h -> %06x => %llx -> %llx\n", value, old, machl));
+			#endif
 			break;
-		case 244:
+		}
+		case 244: /* MEMSIZ when writing */
 			memshift = countLowOnes(value);
 			memsiz = 0x00ffffff >> (24 - memshift);
 			memmask = 0x00ffffff & ~memsiz;
 			memincrement = 1 << memshift;
+			LOG_EXEC(("  . writing %x (%d) to memsiz => memsiz=%x, shift=%d, mask=%x, increment=%x\n", value, SX(value), memsiz, memshift, memmask, memincrement));
 			break;
-		case 245: dlength = value;
+		case 245: WRITE_REG(dlength, value);
 			break;
-		case 246: abase = value;
+		case 246: WRITE_REG(abase, value);
 			break;
-		case 247: bbase = value;
+		case 247: WRITE_REG(bbase, value);
 			break;
-		case 248: dbase = value;
+		case 248: WRITE_REG(dbase, value);
 			break;
-		case 249: sigreg = (value != 0);
+		case 249: WRITE_REG(sigreg, (value != 0));
 			break;
-		case 250: ccr = (value >> 16) & FLAG_MASK;
+		case 250: WRITE_REG(ccr, (value >> 16) & FLAG_MASK);
 			break;
-		case 251: cmr = (value >> 16) & (FLAG_MASK | FLAG_NOT);
+		case 251: WRITE_REG(cmr, (value >> 16) & (FLAG_MASK | FLAG_NOT));
 			break;
-		case 252: // no-op
+		case 252: LOG_EXEC((". not writing %x (%d) to minus_one\n", value, SX(value))); // no-op
 			break;
-		case 253: // no-op
+		case 253: LOG_EXEC((". not writing %x (%d) to min\n", value, SX(value))); // no-op
 			break;
-		case 254: // no-op
+		case 254: LOG_EXEC((". not writing %x (%d) to max\n", value, SX(value))); // no-op
 			break;
-		case 255: // no-op
+		case 255: LOG_EXEC((". not writing %x (%d) to zero\n", value, SX(value))); // no-op
 			break;
 		default: // unknown register
 			break;
@@ -889,17 +1093,28 @@ void es5510_device::write_reg(UINT8 reg, INT32 value)
 }
 
 void es5510_device::write_to_dol(INT32 value) {
+#if VERBOSE_EXEC
+	LOG_EXEC((". writing %x (%d) to DOL: [ ", value, value));
+	if (dol_count >= 1) LOG_EXEC(("{ %x (%d) }", dol[0], SX(dol[0])));
+	if (dol_count == 2) LOG_EXEC((", { %x (%d) }", dol[1], SX(dol[1])));
+	LOG_EXEC((" ] -> [ "));
+#endif
 	if (dol_count >= 2) {
 		dol[0] = dol[1];
 		dol[1] = value;
 	} else {
 		dol[dol_count++] = value;
 	}
+#if VERBOSE_EXEC
+	LOG_EXEC(("{%x (%d)}", dol[0], SX(dol[0])));
+	if (dol_count == 2) LOG_EXEC((", {%x (%d)}", dol[1], SX(dol[1])));
+	LOG_EXEC((" ]\n"));
+#endif
 }
 
 void es5510_device::alu_operation_end() {
 	// Handle the END instruction separately
-	LOG(("ES5510: END\n"));
+	LOG_EXEC(("ES5510: END\n"));
 	// sample the HALT line
 	if (halt_asserted) {
 		// halt
@@ -911,15 +1126,27 @@ void es5510_device::alu_operation_end() {
 	if (dbase < 0) {
 		dbase = dlength;
 	}
+	// Possibly reset the PC
+	if (state == STATE_RUNNING) {
+		pc = 0;
+	}
+
+#if VERBOSE_EXEC
+	// update the verbose-execution counter.
+	exec_cc = (exec_cc + 1) % 10000;
+#endif
 }
 
 INT32 es5510_device::alu_operation(UINT8 op, INT32 a, INT32 b, UINT8 &flags) {
+	INT32 tmp;
 	switch(op) {
 	case 0x0: // ADD
-		return saturate(add(a, b, flags), flags);
+		tmp = add(a, b, flags);
+		return saturate(tmp, flags);
 
 	case 0x1: // SUB
-		return saturate(add(a, negate(b), flags), flags);
+		tmp = add(a, negate(b), flags);
+		return saturate(tmp, flags);
 
 	case 0x2: // ADDU
 		return add(a, b, flags);
@@ -954,10 +1181,7 @@ INT32 es5510_device::alu_operation(UINT8 op, INT32 a, INT32 b, UINT8 &flags) {
 		clearFlag(flags, FLAG_N);
 		bool isNegative = (a & 0x00800000) != 0;
 		setFlagTo(flags, FLAG_C, isNegative);
-		if (isNegative) {
-			a = (a ^ 0x00ffffff) + 1;
-		}
-		return a;
+		return isNegative ? negate(a) : a;
 	}
 
 	case 0x9: // MOV
