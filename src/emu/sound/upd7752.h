@@ -9,6 +9,11 @@ Template for skeleton device
 #ifndef __UPD7752DEV_H__
 #define __UPD7752DEV_H__
 
+/* status flags */
+#define BSY 1<<7
+#define REQ 1<<6
+#define EXT 1<<5
+#define ERR 1<<4
 
 
 //**************************************************************************
@@ -48,6 +53,12 @@ protected:
 private:
 	sound_stream  *m_stream;
 	const address_space_config      m_space_config;
+	UINT8 m_status;
+	UINT16 m_ram_addr;
+	UINT8 m_mode;
+	void status_change(UINT8 flag,bool type);
+	inline UINT8 readbyte(offs_t address);
+	inline void writebyte(offs_t address, UINT8 data);
 };
 
 

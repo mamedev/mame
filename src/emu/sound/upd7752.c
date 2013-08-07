@@ -1,6 +1,8 @@
 /***************************************************************************
 
-Template for skeleton device
+NEC uPD7752 Voice Synthesizing LSI
+
+skeleton device
 
 ***************************************************************************/
 
@@ -16,8 +18,9 @@ Template for skeleton device
 // device type definition
 const device_type UPD7752 = &device_creator<upd7752_device>;
 
+/* TODO: unknown exact size */
 static ADDRESS_MAP_START( upd7752_ram, AS_0, 8, upd7752_device )
-	AM_RANGE(0x00000, 0x3ffff) AM_RAM
+	AM_RANGE(0x00000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 //**************************************************************************
@@ -32,7 +35,7 @@ upd7752_device::upd7752_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, UPD7752, "uPD7752", tag, owner, clock, "upd7752", __FILE__),
 	  device_sound_interface(mconfig, *this),
 	  device_memory_interface(mconfig, *this),
-	  m_space_config("ram", ENDIANNESS_LITTLE, 8, 18, 0, NULL, *ADDRESS_MAP_NAME(upd7752_ram))
+	  m_space_config("ram", ENDIANNESS_LITTLE, 8, 16, 0, NULL, *ADDRESS_MAP_NAME(upd7752_ram))
 {
 }
 
@@ -56,6 +59,8 @@ void upd7752_device::device_start()
 {
 	/* TODO: clock */
 	m_stream = stream_alloc(0, 1, clock() / 64);
+
+	m_status = 0;
 }
 
 
@@ -85,10 +90,35 @@ void upd7752_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 {
 }
 
+//**************************************************************************
+//  INLINE HELPERS
+//**************************************************************************
+
+inline UINT8 upd7752_device::readbyte(offs_t address)
+{
+	return space().read_byte(address);
+}
+
+//-------------------------------------------------
+//  writebyte - write a byte at the given address
+//-------------------------------------------------
+
+inline void upd7752_device::writebyte(offs_t address, UINT8 data)
+{
+	space().write_byte(address, data);
+}
 
 //**************************************************************************
 //  READ/WRITE HANDLERS
 //**************************************************************************
+
+void upd7752_device::status_change(UINT8 flag,bool type)
+{
+	if(type == true)
+		m_status |= flag;
+	else
+		m_status &= ~flag;
+}
 
 READ8_MEMBER( upd7752_device::read )
 {
@@ -99,7 +129,7 @@ READ8_MEMBER( upd7752_device::read )
 		//-x-- ---- REQ audio parameter (1) input request (0) prohibited (???)
 		//--x- ---- ~INT / EXT message data (1) Outside (0) Inside
 		//---x ---- ERR error flag
-		case 0x00: return 0x60;
+		case 0x00: return m_status;
 		//[0x02]: port 0xe2 latch?
 		case 0x02: return 0xff;
 		//[0x03]: port 0xe3 latch?
@@ -113,6 +143,26 @@ WRITE8_MEMBER( upd7752_device::write )
 	switch(offset & 3)
 	{
 		// [0x00]: audio parameter transfer
+		case 0x00:
+			if(m_status & EXT)
+			{
+				/*
+				[0] xxxx x--- number of frames (times) to apply next table (N1)
+				    ---- -x-- Quantized Magnification Data (QMAG)
+				    ---- --x- Selective Interpolation Data (SI)
+				    ---- ---x Voicing/Unvoicing Data (VU)
+				[1] xxxx ---- amp Voice source amplitude
+				    ---- x--- Fricative Voice data
+				    ---- -xxx Pitch
+					(repeat for N1 times)
+				if [0] & 0xf8 == 0 then command stop
+				*/
+				writebyte(m_ram_addr++,data);
+			}
+			//else
+			// ...
+
+		break;
 
 		// [0x02]: mode set
 		// ---- -x-- Frame periodic analysis (0) 10 ms / frame (1) 20 ms / frame
@@ -122,8 +172,22 @@ WRITE8_MEMBER( upd7752_device::write )
 		//        10 : FAST SPEED
 		//        11 : Setting prohibited
 
-		// case 0x02:
+		case 0x02:
+			m_mode = data & 7;
+			break;
 
-		// case 0x03: command set
+		case 0x03: //command set
+			switch(data)
+			{
+				case 0xfe: // external message select cmd
+					status_change(EXT,true);
+					status_change(REQ,true);
+					//TODO: BSY flag too
+					m_ram_addr = 0;
+					break;
+			}
+
+			break;
+
 	}
 }
