@@ -8856,3 +8856,16 @@ src/ume/ume.c svneol=native#text/plain
 src/ume/ume.lst svneol=native#text/plain
 src/ume/ume.mak svneol=native#text/plain
 src/version.c svneol=native#text/plain
+web/css/default.ultimate.css svneol=native#text/css
+web/css/dropdown.css svneol=native#text/css
+web/css/main.css svneol=native#text/css
+web/favicon.ico -text
+web/images/comnav-arrowon.png -text svneol=unset#image/png
+web/images/comnav-arrowover.png -text svneol=unset#image/png
+web/images/comnav-arrowover2.png -text svneol=unset#image/png
+web/images/grad1.png -text svneol=unset#image/png
+web/images/logo-mame-small.png -text svneol=unset#image/png
+web/images/nav-arrow-right.png -text svneol=unset#image/png
+web/images/nav-arrow-right2.png -text svneol=unset#image/png
+web/images/nav-sub-press.png -text svneol=unset#image/png
+web/index.html svneol=native#text/html
