@@ -79,9 +79,10 @@ const pc98_format::format pc98_format::formats[] = {
 	},
 	{
 		floppy_image::FF_525,  floppy_image::DSHD, floppy_image::MFM,
-		1200, 16, 77, 2, 512, {}, 1, {}, 80, 50, 22, 84
+		1200, 8, 77, 2, 1024, {}, 1, {}, 80, 50, 22, 84
 	},
 	{}
 };
+
 
 const floppy_format_type FLOPPY_PC98_FORMAT = &floppy_image_format_creator<pc98_format>;
