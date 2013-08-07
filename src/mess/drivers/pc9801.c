@@ -461,7 +461,7 @@ public:
 	required_device<upd7220_device> m_hgdc1;
 	required_device<upd7220_device> m_hgdc2;
 	optional_device<scsicb_device> m_sasibus;
-	optional_device<ide_controller_device> m_ide;
+	optional_device<ata_interface_device> m_ide;
 	required_shared_ptr<UINT8> m_video_ram_1;
 	required_shared_ptr<UINT8> m_video_ram_2;
 	required_device<beep_device> m_beeper;
@@ -477,6 +477,7 @@ public:
 	UINT8 *m_char_rom;
 	UINT8 *m_kanji_rom;
 	UINT8 *m_ide_rom;
+	UINT8 m_ide_bank[2];
 
 	UINT8 m_portb_tmp;
 	UINT8 m_dma_offset[4];
@@ -2276,7 +2277,7 @@ WRITE8_MEMBER(pc9801_state::pc9801rs_pit_mirror_w)
 READ8_MEMBER(pc9801_state::pc9801rs_ide_io_0_r)
 {
 	printf("IDE r %02x\n",offset);
-	return 0;
+	return m_ide_bank[offset];
 }
 
 WRITE8_MEMBER(pc9801_state::pc9801rs_ide_io_0_w)
@@ -2297,28 +2298,29 @@ WRITE8_MEMBER(pc9801_state::pc9801rs_ide_io_0_w)
 
 	printf("IDE w %02x %02x\n",offset,data);
 
-	// ...
+	if(!data & 0x80)
+		m_ide_bank[offset] = data & 0x7f;
 }
 
 /* TODO: is mapping correct? */
 READ16_MEMBER(pc9801_state::pc9801rs_ide_io_1_r)
 {
-	return m_ide->read_cs0(space, offset >> 1, offset & 1 ? 0xff00 : 0x00ff) >> 8;
+	return m_ide->read_cs0(space, offset, mem_mask);
 }
 
 WRITE16_MEMBER(pc9801_state::pc9801rs_ide_io_1_w)
 {
-	m_ide->write_cs0(space, offset >> 1, data >> 8, offset & 1 ? 0xff00 : 0x00ff);
+	m_ide->write_cs0(space, offset, mem_mask);
 }
 
 READ16_MEMBER(pc9801_state::pc9801rs_ide_io_2_r)
 {
-	return m_ide->read_cs1(space, ((offset+6) >> 1), offset & 1 ? 0xff00 : 0x00ff) >> 8;
+	return m_ide->read_cs1(space, offset + 6, mem_mask);
 }
 
 WRITE16_MEMBER(pc9801_state::pc9801rs_ide_io_2_w)
 {
-	m_ide->write_cs1(space, ((offset+6) >> 1), data >> 8, offset & 1 ? 0xff00 : 0x00ff);
+	m_ide->write_cs1(space, offset + 6, mem_mask);
 }
 
 static ADDRESS_MAP_START( pc9801rs_map, AS_PROGRAM, 32, pc9801_state )
@@ -3680,7 +3682,7 @@ MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_FRAGMENT( pc9801_ide )
-	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", NULL, false)
+	MCFG_ATA_INTERFACE_ADD("ide", ata_devices, "hdd", NULL, false)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_slave", pic8259_device, ir1_w))
 MACHINE_CONFIG_END
 
