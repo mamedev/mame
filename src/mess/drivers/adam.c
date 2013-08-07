@@ -931,7 +931,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( m6801_mem, AS_PROGRAM, 8, adam_state )
-	AM_RANGE(0x0000, 0x001f) AM_READWRITE_LEGACY(m6801_io_r, m6801_io_w)
+	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE(M6801_TAG, m6801_cpu_device, m6801_io_r, m6801_io_w)
 	AM_RANGE(0x0080, 0x00ff) AM_RAM
 	AM_RANGE(0xf800, 0xffff) AM_ROM AM_REGION(M6801_TAG, 0)
 ADDRESS_MAP_END
@@ -1010,11 +1010,6 @@ WRITE_LINE_MEMBER( adam_state::os3_w )
 		}
 	}
 }
-
-static M6801_INTERFACE( m6801_intf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(adam_state, os3_w)
-};
 
 
 //-------------------------------------------------
@@ -1116,7 +1111,7 @@ static MACHINE_CONFIG_START( adam, adam_state )
 	MCFG_CPU_ADD(M6801_TAG, M6801, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(m6801_mem)
 	MCFG_CPU_IO_MAP(m6801_io)
-	MCFG_CPU_CONFIG(m6801_intf)
+	MCFG_M6801_SC2(WRITELINE(adam_state, os3_w))
 	MCFG_QUANTUM_PERFECT_CPU(M6801_TAG)
 
 	// video hardware

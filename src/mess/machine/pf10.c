@@ -26,7 +26,7 @@ const device_type EPSON_PF10 = &device_creator<epson_pf10_device>;
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( cpu_mem, AS_PROGRAM, 8, epson_pf10_device )
-	AM_RANGE(0x0000, 0x001f) AM_READWRITE_LEGACY(m6801_io_r, m6801_io_w)
+	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE("maincpu", hd6303y_cpu_device, m6801_io_r, m6801_io_w)
 	AM_RANGE(0x0040, 0x00ff) AM_RAM /* 192 bytes internal ram */
 	AM_RANGE(0x0800, 0x0fff) AM_RAM /* external 2k ram */
 	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("maincpu", 0)

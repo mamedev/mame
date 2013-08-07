@@ -51,7 +51,7 @@ const rom_entry *adam_keyboard_device::device_rom_region() const
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( adam_kb_mem, AS_PROGRAM, 8, adam_keyboard_device )
-	AM_RANGE(0x0000, 0x001f) AM_READWRITE_LEGACY(m6801_io_r, m6801_io_w)
+	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE(M6801_TAG, m6801_cpu_device, m6801_io_r, m6801_io_w)
 	AM_RANGE(0x0080, 0x00ff) AM_RAM
 	AM_RANGE(0xf800, 0xffff) AM_ROM AM_REGION(M6801_TAG, 0)
 ADDRESS_MAP_END

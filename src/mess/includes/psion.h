@@ -30,7 +30,7 @@ public:
 			m_sys_register(*this, "sys_register"),
 			m_ram(*this, "ram"){ }
 
-	required_device<cpu_device> m_maincpu;
+	required_device<hd63701_cpu_device> m_maincpu;
 	required_device<hd44780_device> m_lcdc;
 	required_device<beep_device> m_beep;
 	required_device<datapack_device> m_pack1;

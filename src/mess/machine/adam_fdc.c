@@ -68,7 +68,7 @@ const rom_entry *adam_fdc_device::device_rom_region() const
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( adam_fdc_mem, AS_PROGRAM, 8, adam_fdc_device )
-	AM_RANGE(0x0000, 0x001f) AM_READWRITE_LEGACY(m6801_io_r, m6801_io_w)
+	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE(M6801_TAG, m6801_cpu_device, m6801_io_r, m6801_io_w)
 	AM_RANGE(0x0080, 0x00ff) AM_RAM
 	AM_RANGE(0x0400, 0x07ff) AM_RAM AM_WRITEONLY AM_SHARE("ram")
 	AM_RANGE(0x0800, 0x0800) AM_MIRROR(0xff) AM_DEVREAD(WD2793_TAG, wd2793_t, status_r)

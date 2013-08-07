@@ -537,7 +537,7 @@ WRITE8_MEMBER( hx20_state::slave_p4_w )
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( hx20_mem, AS_PROGRAM, 8, hx20_state )
-	AM_RANGE(0x0000, 0x001f) AM_READWRITE_LEGACY(m6801_io_r, m6801_io_w)
+	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE(HD6301V1_MAIN_TAG, hd63701_cpu_device, m6801_io_r, m6801_io_w)
 	AM_RANGE(0x0020, 0x0020) AM_WRITE(ksc_w)
 	AM_RANGE(0x0022, 0x0022) AM_READ(krtn07_r)
 	AM_RANGE(0x0026, 0x0026) AM_WRITE(lcd_cs_w)
@@ -568,7 +568,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( hx20_sub_mem, AS_PROGRAM, 8, hx20_state )
-	AM_RANGE(0x0000, 0x001f) AM_READWRITE_LEGACY(m6801_io_r, m6801_io_w)
+	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE(HD6301V1_SLAVE_TAG, hd63701_cpu_device, m6801_io_r, m6801_io_w)
 	AM_RANGE(0x0080, 0x00ff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION(HD6301V1_SLAVE_TAG, 0)
 ADDRESS_MAP_END

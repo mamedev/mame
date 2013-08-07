@@ -47,7 +47,7 @@ public:
 	m_printer(*this, "printer")
 	{ }
 
-	required_device<cpu_device> m_maincpu;
+	required_device<m6803_cpu_device> m_maincpu;
 	optional_device<mc6847_base_device> m_mc6847;
 	optional_device<ef9345_device> m_ef9345;
 	required_device<dac_device> m_dac;
@@ -260,7 +260,7 @@ DRIVER_INIT_MEMBER(mc10_state,mc10)
 
 	//for alice32 force port4 DDR to 0xff at startup
 	if (!strcmp(machine().system().name, "alice32") || !strcmp(machine().system().name, "alice90"))
-		m6801_io_w(prg, 0x05, 0xff);
+		m_maincpu->m6801_io_w(prg, 0x05, 0xff);
 }
 
 

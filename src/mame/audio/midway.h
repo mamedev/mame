@@ -295,7 +295,7 @@ protected:
 
 private:
 	// devices
-	required_device<m6802_device> m_cpu;
+	required_device<m6802_cpu_device> m_cpu;
 	required_device<pia6821_device> m_pia0;
 	required_device<pia6821_device> m_pia1;
 	optional_device<tms5200_device> m_tms5200;

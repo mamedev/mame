@@ -251,7 +251,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, pacland_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, pacland_state )
-	AM_RANGE(0x0000, 0x001f) AM_READWRITE_LEGACY(m6801_io_r, m6801_io_w)
+	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE("mcu", hd63701_cpu_device, m6801_io_r, m6801_io_w)
 	AM_RANGE(0x0080, 0x00ff) AM_RAM
 	AM_RANGE(0x1000, 0x13ff) AM_DEVREADWRITE("namco", namco_cus30_device, namcos1_cus30_r, namcos1_cus30_w)      /* PSG device, shared RAM */
 	AM_RANGE(0x2000, 0x3fff) AM_WRITE(watchdog_reset_w)     /* watchdog? */

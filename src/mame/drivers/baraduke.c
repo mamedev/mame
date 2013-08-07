@@ -177,7 +177,7 @@ READ8_MEMBER(baraduke_state::soundkludge_r)
 }
 
 static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, baraduke_state )
-	AM_RANGE(0x0000, 0x001f) AM_READWRITE_LEGACY(m6801_io_r,m6801_io_w)/* internal registers */
+	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE("mcu", hd63701_cpu_device, m6801_io_r,m6801_io_w)/* internal registers */
 	AM_RANGE(0x0080, 0x00ff) AM_RAM                             /* built in RAM */
 	AM_RANGE(0x1105, 0x1105) AM_READ(soundkludge_r)             /* cures speech */
 	AM_RANGE(0x1000, 0x13ff) AM_DEVREADWRITE("namco", namco_cus30_device, namcos1_cus30_r, namcos1_cus30_w) /* PSG device, shared RAM */

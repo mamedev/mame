@@ -1183,7 +1183,7 @@ WRITE16_MEMBER( stbook_state::lcd_control_w )
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( ikbd_map, AS_PROGRAM, 8, st_state )
-	AM_RANGE(0x0000, 0x001f) AM_READWRITE_LEGACY(m6801_io_r, m6801_io_w)
+	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE(HD6301V1_TAG, hd6301_cpu_device, m6801_io_r, m6801_io_w)
 	AM_RANGE(0x0080, 0x00ff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION(HD6301V1_TAG, 0)
 ADDRESS_MAP_END
