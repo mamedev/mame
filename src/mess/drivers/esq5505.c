@@ -1011,7 +1011,7 @@ static MACHINE_CONFIG_START(vfx32, esq5505_state)
 	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", ensoniq_floppies, "35dd", esq5505_state::floppy_formats)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED(sq1, vfx32)
+static MACHINE_CONFIG_DERIVED(sq1, vfx)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(sq1_map)
 
