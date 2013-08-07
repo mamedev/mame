@@ -37,7 +37,7 @@
     - Presumably one ROM is undumped?
 
     floppy issues TODO (certain fail)
-    - Unsupported disk types: *.dsk, *.nfd, *.fdd, *.nhd
+    - Unsupported disk types: *.nfd, *.fdd, *.nhd
     - 46 Okunen Monogatari - The Shinkaron
     - AD&D Champions of Krynn
     - AI Shougi (asserts upon loading, 3'5 image?)
@@ -59,7 +59,6 @@
 
     - Bokosuka Wars
     - Jangou 2: floppy fails to load after the title screen;
-    - Mobile Suit Gundam - Advanced Operation: error: Device 5.25" high density floppy drive load failed: Unable to identify the image format [for msdos.fdi]
 
     List of per-game TODO:
     - 38 Man Kilo no Kokuu: doesn't seem possible to skip the intro?

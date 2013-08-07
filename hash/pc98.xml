@@ -8627,6 +8627,7 @@ TODO: other two disks, in .nfd format
 		</part>
 	</software>
 
+<!-- TODO: check master floppy, size looks suspicious -->
 	<software name="marchen2" supported="no">
 		<description>Marchen Veil 2</description>
 		<year>19??</year>
@@ -9222,33 +9223,28 @@ Omake disk?
 	</software>
 
 <!-- 
-How to load this?
+Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 -->
-	<software name="gundamao">
+	<software name="gundamao" supported="no">
 		<description>Mobile Suit Gundam - Advanced Operation</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1261568">
-				<rom name="ms-dos.dsk" size="1261568" crc="d5e70ca1" sha1="bc5fb43463849b66ded3a568d82d44252759eb80" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_a.fdi" size="1265664" crc="60a2e749" sha1="69c1a4db8f6b8e00ec247d25de15c6e4760561d0" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop3" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_b.fdi" size="1265664" crc="74866a5e" sha1="f378b80fcf7a480be349b9da7f7303219a3089f4" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop4" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_c.fdi" size="1265664" crc="06b3a75d" sha1="cdae2e8f86029c5fecd05c5bb1b3913e10a24b69" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop5" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_d.fdi" size="1265664" crc="547a0e8d" sha1="0d78012bcc392c47cacf0c7b6ad7e7d28a6d1ad0" offset="0" />
 			</dataarea>
@@ -16545,7 +16541,6 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
 		</part>
 	</software>
 
-<!-- ".dsk" format might be something else, shrug -->
 	<software name="ash" supported="no">
 		<description>Ash</description>
 		<year>19??</year>
