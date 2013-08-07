@@ -29,7 +29,7 @@ const char *pc98_format::description() const
 
 const char *pc98_format::extensions() const
 {
-	return "dsk,ima,img,ufi,360";
+	return "dsk,ima,img,ufi,360,hdm";
 }
 
 const pc98_format::format pc98_format::formats[] = {
