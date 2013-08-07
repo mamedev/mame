@@ -181,7 +181,12 @@ typedef unsigned int  uint32_t;
 typedef unsigned short  uint16_t;
 typedef unsigned __int64 uint64_t;
 typedef __int64   int64_t;
-#define INT64_MAX  9223372036854775807
+#if defined(__GNUC__) || defined(_MSC_VER)
+#define U64(val) val##ULL
+#else
+#define U64(val) val
+#endif
+#define INT64_MAX  U64(9223372036854775807)
 #endif // HAVE_STDINT
 
 // POSIX dirent interface
@@ -4302,11 +4307,11 @@ int mg_upload(struct mg_connection *conn, const char *destination_dir) {
     // there is no other thread can save into the same file simultaneously.
     fp = NULL;
     // Construct destination file name. Do not allow paths to have slashes.
-    if ((s = strrchr(fname, '/')) == NULL && 
+    if ((s = strrchr(fname, '/')) == NULL &&
 		(s = strrchr(fname, '\\')) == NULL) {
             s = fname;
     }
-    
+
     // Open file in binary mode. TODO: set an exclusive lock.
     snprintf(path, sizeof(path), "%s/%s", destination_dir, s);
     if ((fp = fopen(path, "wb")) == NULL) {
