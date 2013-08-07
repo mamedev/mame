@@ -434,6 +434,7 @@ enum tilemap_standard_mapper
 	MCFG_TILEMAP_TRANSPARENT_PEN(_transpen)
 
 
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -485,73 +486,6 @@ typedef device_delegate<void (tilemap_t &, tile_data &, tilemap_memory_index)> t
 typedef device_delegate<tilemap_memory_index (UINT32, UINT32, UINT32, UINT32)> tilemap_mapper_delegate;
 
 
-// ======================> tilemap_memory
-
-// memory information
-class tilemap_memory
-{
-	friend class tilemap_t;
-
-	// construction/destruction
-	tilemap_memory();
-
-public:
-	// configuration
-	void set(void *base, UINT32 bytes, int membits, endianness_t endianness, int bpe);
-	void set(const address_space &space, void *base, UINT32 bytes, int bpe);
-	void set(const memory_share &share, int bpe);
-	void set(const tilemap_memory &helper);
-
-	// getters
-	void *base() const { return m_base; }
-	UINT32 bytes() const { return m_bytes; }
-	int membits() const { return m_membits; }
-	endianness_t endianness() const { return m_endianness; }
-	int bytes_per_entry() const { return m_bytes_per_entry; }
-
-private:
-	// readers and writers
-	UINT32 read(int index) { return (this->*m_reader)(index); }
-	void write(int index, UINT32 data) { (this->*m_writer)(index, data); }
-
-	// internal read/write helpers for 1 byte entries
-	UINT32 read8_from_8(int index);     void write8_to_8(int index, UINT32 data);
-	UINT32 read8_from_16le(int index);  void write8_to_16le(int index, UINT32 data);
-	UINT32 read8_from_16be(int index);  void write8_to_16be(int index, UINT32 data);
-	UINT32 read8_from_32le(int index);  void write8_to_32le(int index, UINT32 data);
-	UINT32 read8_from_32be(int index);  void write8_to_32be(int index, UINT32 data);
-	UINT32 read8_from_64le(int index);  void write8_to_64le(int index, UINT32 data);
-	UINT32 read8_from_64be(int index);  void write8_to_64be(int index, UINT32 data);
-
-	// internal read/write helpers for 2 byte entries
-	UINT32 read16_from_8le(int index);  void write16_to_8le(int index, UINT32 data);
-	UINT32 read16_from_8be(int index);  void write16_to_8be(int index, UINT32 data);
-	UINT32 read16_from_16(int index);   void write16_to_16(int index, UINT32 data);
-	UINT32 read16_from_32le(int index); void write16_to_32le(int index, UINT32 data);
-	UINT32 read16_from_32be(int index); void write16_to_32be(int index, UINT32 data);
-	UINT32 read16_from_64le(int index); void write16_to_64le(int index, UINT32 data);
-	UINT32 read16_from_64be(int index); void write16_to_64be(int index, UINT32 data);
-
-	// internal read/write helpers for 4 byte entries
-	UINT32 read32_from_8le(int index);  void write32_to_8le(int index, UINT32 data);
-	UINT32 read32_from_8be(int index);  void write32_to_8be(int index, UINT32 data);
-	UINT32 read32_from_16le(int index); void write32_to_16le(int index, UINT32 data);
-	UINT32 read32_from_16be(int index); void write32_to_16be(int index, UINT32 data);
-	UINT32 read32_from_32(int index);   void write32_to_32(int index, UINT32 data);
-	UINT32 read32_from_64le(int index); void write32_to_64le(int index, UINT32 data);
-	UINT32 read32_from_64be(int index); void write32_to_64be(int index, UINT32 data);
-
-	// internal state
-	void *              m_base;
-	UINT32              m_bytes;
-	int                 m_membits;
-	endianness_t        m_endianness;
-	int                 m_bytes_per_entry;
-	UINT32 (tilemap_memory::*m_reader)(int);
-	void (tilemap_memory::*m_writer)(int, UINT32);
-};
-
-
 // ======================> tilemap_t
 
 // core tilemap structure
@@ -589,8 +523,8 @@ public:
 	tilemap_device *device() const { return m_device; }
 	tilemap_t *next() const { return m_next; }
 	void *user_data() const { return m_user_data; }
-	tilemap_memory &basemem() { return m_basemem; }
-	tilemap_memory &extmem() { return m_extmem; }
+	memory_array &basemem() { return m_basemem; }
+	memory_array &extmem() { return m_extmem; }
 	UINT32 width() const { return m_width; }
 	UINT32 height() const { return m_height; }
 	bool enabled() const { return m_enable; }
@@ -712,8 +646,8 @@ private:
 	void *                      m_user_data;            // user data value
 
 	// optional memory info
-	tilemap_memory              m_basemem;              // info about base memory
-	tilemap_memory              m_extmem;               // info about extension memory
+	memory_array                m_basemem;              // info about base memory
+	memory_array                m_extmem;               // info about extension memory
 
 	// basic tilemap metrics
 	UINT32                      m_rows;                 // number of tile rows

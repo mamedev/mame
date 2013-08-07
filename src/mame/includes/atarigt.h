@@ -21,6 +21,7 @@ public:
 			m_colorram(*this, "colorram", 32),
 			m_playfield_tilemap(*this, "playfield"),
 			m_alpha_tilemap(*this, "alpha"),
+			m_rle(*this, "rle"),
 			m_mo_command(*this, "mo_command") { }
 
 	UINT8           m_is_primrage;
@@ -28,6 +29,7 @@ public:
 
 	required_device<tilemap_device> m_playfield_tilemap;
 	required_device<tilemap_device> m_alpha_tilemap;
+	required_device<atari_rle_objects_device> m_rle;
 
 	bitmap_ind16 *      m_pf_bitmap;
 	bitmap_ind16 *      m_an_bitmap;
@@ -52,7 +54,6 @@ public:
 	UINT16          m_protresult;
 	UINT8           m_protdata[0x800];
 
-	device_t *      m_rle;
 	virtual void update_interrupts();
 	virtual void scanline_update(screen_device &screen, int scanline);
 	DECLARE_READ32_MEMBER(special_port2_r);
@@ -79,7 +80,6 @@ public:
 	DECLARE_MACHINE_RESET(atarigt);
 	DECLARE_VIDEO_START(atarigt);
 	UINT32 screen_update_atarigt(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void screen_eof_atarigt(screen_device &screen, bool state);
 private:
 	void tmek_update_mode(offs_t offset);
 	void tmek_protection_w(address_space &space, offs_t offset, UINT16 data);

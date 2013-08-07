@@ -58,19 +58,10 @@ MACHINE_RESET_MEMBER(atarig1_state,atarig1)
  *
  *************************************/
 
-WRITE16_MEMBER(atarig1_state::mo_control_w)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		atarirle_control_w(m_rle, data & 7);
-	}
-}
-
-
 WRITE16_MEMBER(atarig1_state::mo_command_w)
 {
 	COMBINE_DATA(m_mo_command);
-	atarirle_command_w(m_rle, (data == 0 && m_is_pitfight) ? ATARIRLE_COMMAND_CHECKSUM : ATARIRLE_COMMAND_DRAW);
+	m_rle->command_write(space, offset, (data == 0 && m_is_pitfight) ? ATARIRLE_COMMAND_CHECKSUM : ATARIRLE_COMMAND_DRAW);
 }
 
 
@@ -203,7 +194,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, atarig1_state )
 	AM_RANGE(0xf88000, 0xf8ffff) AM_WRITE(eeprom_enable_w)
 	AM_RANGE(0xf90000, 0xf90001) AM_DEVWRITE8("jsa", atari_jsa_ii_device, main_command_w, 0xff00)
 	AM_RANGE(0xf98000, 0xf98001) AM_DEVWRITE("jsa", atari_jsa_ii_device, sound_reset_w)
-	AM_RANGE(0xfa0000, 0xfa0001) AM_WRITE(mo_control_w)
+	AM_RANGE(0xfa0000, 0xfa0001) AM_DEVWRITE8("rle", atari_rle_objects_device, control_write, 0x00ff)
 	AM_RANGE(0xfb0000, 0xfb0001) AM_WRITE(video_int_ack_w)
 	AM_RANGE(0xfc0000, 0xfc0001) AM_READ(special_port0_r)
 	AM_RANGE(0xfc8000, 0xfc8007) AM_READWRITE(a2d_data_r, a2d_select_w)
@@ -211,7 +202,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, atarig1_state )
 	AM_RANGE(0xfd8000, 0xfdffff) AM_READWRITE(eeprom_r, eeprom_w) AM_SHARE("eeprom")
 /*  AM_RANGE(0xfe0000, 0xfe7fff) AM_READ(from_r)*/
 	AM_RANGE(0xfe8000, 0xfe89ff) AM_RAM_WRITE(paletteram_666_w) AM_SHARE("paletteram")
-	AM_RANGE(0xff0000, 0xff0fff) AM_DEVREADWRITE_LEGACY("rle", atarirle_spriteram_r, atarirle_spriteram_w)
+	AM_RANGE(0xff0000, 0xff0fff) AM_RAM AM_SHARE("rle")
 	AM_RANGE(0xff2000, 0xff2001) AM_WRITE(mo_command_w) AM_SHARE("mo_command")
 	AM_RANGE(0xff4000, 0xff5fff) AM_DEVWRITE("playfield", tilemap_device, write) AM_SHARE("playfield")
 	AM_RANGE(0xff6000, 0xff6fff) AM_DEVWRITE("alpha", tilemap_device, write) AM_SHARE("alpha")
@@ -388,15 +379,11 @@ GFXDECODE_END
 
 
 
-static const atarirle_desc modesc_hydra =
+static const atari_rle_objects_config modesc_hydra =
 {
-	"gfx3",     /* region where the GFX data lives */
-	256,        /* number of entries in sprite RAM */
 	0,          /* left clip coordinate */
 	255,        /* right clip coordinate */
-
 	0x200,      /* base palette entry */
-	0x100,      /* maximum number of colors */
 
 	{{ 0x7fff,0,0,0,0,0,0,0 }}, /* mask for the code index */
 	{{ 0,0x00f0,0,0,0,0,0,0 }}, /* mask for the color */
@@ -409,15 +396,11 @@ static const atarirle_desc modesc_hydra =
 	{{ 0 }}                     /* mask for the VRAM target */
 };
 
-static const atarirle_desc modesc_pitfight =
+static const atari_rle_objects_config modesc_pitfight =
 {
-	"gfx3",     /* region where the GFX data lives */
-	256,        /* number of entries in sprite RAM */
 	40,         /* left clip coordinate */
 	295,        /* right clip coordinate */
-
 	0x200,      /* base palette entry */
-	0x100,      /* maximum number of colors */
 
 	{{ 0x7fff,0,0,0,0,0,0,0 }}, /* mask for the code index */
 	{{ 0,0x00f0,0,0,0,0,0,0 }}, /* mask for the color */
@@ -460,7 +443,6 @@ static MACHINE_CONFIG_START( atarig1, atarig1_state )
 	/* note: these parameters are from published specs, not derived */
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(atarig1_state, screen_update_atarig1)
-	MCFG_SCREEN_VBLANK_DRIVER(atarig1_state, screen_eof_atarig1)
 
 	MCFG_VIDEO_START_OVERRIDE(atarig1_state,atarig1)
 
@@ -473,11 +455,11 @@ static MACHINE_CONFIG_START( atarig1, atarig1_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( hydra, atarig1 )
-	MCFG_ATARIRLE_ADD( "rle", modesc_hydra )
+	MCFG_ATARIRLE_ADD("rle", modesc_hydra)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pitfight, atarig1 )
-	MCFG_ATARIRLE_ADD( "rle", modesc_pitfight )
+	MCFG_ATARIRLE_ADD("rle", modesc_pitfight)
 MACHINE_CONFIG_END
 
 
@@ -517,7 +499,7 @@ ROM_START( hydra )
 	ROM_REGION( 0x020000, "gfx2", 0 )
 	ROM_LOAD( "136079-1027.bin",  0x000000, 0x20000, CRC(f9135b9b) SHA1(48c0ad0d3e592d191d1385e30530bdb69a095452) ) /* alphanumerics */
 
-	ROM_REGION16_BE( 0x100000, "gfx3", 0 )
+	ROM_REGION16_BE( 0x100000, "rle", 0 )
 	ROM_LOAD16_BYTE( "136079-1001.bin", 0x00001, 0x10000, CRC(3f757a53) SHA1(be2b7f8b907ef9ea24b24b7210ead70cdbad3506) )
 	ROM_LOAD16_BYTE( "136079-1002.bin", 0x00000, 0x10000, CRC(a1169469) SHA1(b5ab65ca9d98ef1e79518eaa519fba0cee92c86e) )
 	ROM_LOAD16_BYTE( "136079-1003.bin", 0x20001, 0x10000, CRC(aa21ec33) SHA1(dec65b670c64b3630f6ccbbcc3212f6771908de9) )
@@ -577,7 +559,7 @@ ROM_START( hydrap )
 	ROM_REGION( 0x020000, "gfx2", 0 )
 	ROM_LOAD( "hydalph.bin",   0x000000, 0x20000, CRC(7dd2b062) SHA1(789b35b1e8cce73e2314d1b6688b5066df91b604) ) /* alphanumerics */
 
-	ROM_REGION16_BE( 0x100000, "gfx3", 0 )
+	ROM_REGION16_BE( 0x100000, "rle", 0 )
 	ROM_LOAD16_BYTE( "hydmhi0.bin", 0x00001, 0x10000, CRC(3c83b42d) SHA1(3c6de7e6aab08a673227f06b04e000714a9111b1) )
 	ROM_LOAD16_BYTE( "hydmlo0.bin", 0x00000, 0x10000, CRC(6d49650c) SHA1(97f9dbdfa5cc620705eec1da2398b2ac63cef30f) )
 	ROM_LOAD16_BYTE( "hydmhi1.bin", 0x20001, 0x10000, CRC(689b3376) SHA1(85ffa31f10483317db615cf8e520a8c8a40d6013) )
@@ -637,7 +619,7 @@ ROM_START( hydrap2 )
 	ROM_REGION( 0x020000, "gfx2", 0 )
 	ROM_LOAD( "136079-1027.bin",  0x000000, 0x20000, CRC(f9135b9b) SHA1(48c0ad0d3e592d191d1385e30530bdb69a095452) ) /* alphanumerics */
 
-	ROM_REGION16_BE( 0x100000, "gfx3", 0 )
+	ROM_REGION16_BE( 0x100000, "rle", 0 )
 	ROM_LOAD16_BYTE( "136079-1001.bin", 0x00001, 0x10000, BAD_DUMP CRC(3f757a53) SHA1(be2b7f8b907ef9ea24b24b7210ead70cdbad3506) ) // not dumped from this pcb, rom taken from another set instead
 	ROM_LOAD16_BYTE( "136079-1002.bin", 0x00000, 0x10000, BAD_DUMP CRC(a1169469) SHA1(b5ab65ca9d98ef1e79518eaa519fba0cee92c86e) ) // "
 	ROM_LOAD16_BYTE( "136079-1003.bin", 0x20001, 0x10000, BAD_DUMP CRC(aa21ec33) SHA1(dec65b670c64b3630f6ccbbcc3212f6771908de9) ) // "
@@ -721,7 +703,7 @@ ROM_START( pitfight )
 	ROM_REGION( 0x020000, "gfx2", 0 )
 	ROM_LOAD( "136081-1027.15l",  0x000000, 0x10000, CRC(a59f381d) SHA1(b14e878340ad2adbf4f6d4fc331c58f62037c7c7) ) /* alphanumerics */
 
-	ROM_REGION16_BE( 0x200000, "gfx3", 0 )
+	ROM_REGION16_BE( 0x200000, "rle", 0 )
 	ROM_LOAD16_BYTE( "136081-1001.65r",  0x000001, 0x20000, CRC(3af31444) SHA1(91fc02786b82abdf12ebdbaacdd1f158f8ce6d06) )
 	ROM_LOAD16_BYTE( "136081-1002.65n",  0x000000, 0x20000, CRC(f1d76a4c) SHA1(ca769d2cdd096f4a54f7bcaa4840fc9ffaabf499) )
 	ROM_LOAD16_BYTE( "136081-1003.70r",  0x040001, 0x20000, CRC(28c41c2a) SHA1(75cd527f98c8475e3b880f53c5a355d6c3bd8766) )
@@ -817,7 +799,7 @@ ROM_START( pitfight7 )
 	ROM_REGION( 0x020000, "gfx2", 0 )
 	ROM_LOAD( "136081-1027.15l",  0x000000, 0x10000, CRC(a59f381d) SHA1(b14e878340ad2adbf4f6d4fc331c58f62037c7c7) ) /* alphanumerics */
 
-	ROM_REGION16_BE( 0x200000, "gfx3", 0 )
+	ROM_REGION16_BE( 0x200000, "rle", 0 )
 	ROM_LOAD16_BYTE( "136081-1001.65r",  0x000001, 0x20000, CRC(3af31444) SHA1(91fc02786b82abdf12ebdbaacdd1f158f8ce6d06) )
 	ROM_LOAD16_BYTE( "136081-1002.65n",  0x000000, 0x20000, CRC(f1d76a4c) SHA1(ca769d2cdd096f4a54f7bcaa4840fc9ffaabf499) )
 	ROM_LOAD16_BYTE( "136081-1003.70r",  0x040001, 0x20000, CRC(28c41c2a) SHA1(75cd527f98c8475e3b880f53c5a355d6c3bd8766) )
@@ -880,7 +862,7 @@ ROM_START( pitfight6 )
 	ROM_REGION( 0x020000, "gfx2", 0 )
 	ROM_LOAD( "136081-1027.15l",  0x000000, 0x10000, CRC(a59f381d) SHA1(b14e878340ad2adbf4f6d4fc331c58f62037c7c7) ) /* alphanumerics */
 
-	ROM_REGION16_BE( 0x200000, "gfx3", 0 )
+	ROM_REGION16_BE( 0x200000, "rle", 0 )
 	ROM_LOAD16_BYTE( "136081-1065.65r", 0x000001, 0x80000, CRC(6d3a834f) SHA1(6e153fee39b6a932aeb101e69e3557355a637c76) ) /* Same data as other sets, but in four mask roms */
 	ROM_LOAD16_BYTE( "136081-1066.65n", 0x000000, 0x80000, CRC(0f7f5117) SHA1(e9d3d0db388a5f7d76de363018d92fa59bf8113a) )
 	ROM_LOAD16_BYTE( "136081-1067.70r", 0x100001, 0x80000, CRC(ca4f75a8) SHA1(f8b8b03df4ad043a48970a0f8a4c3b85c7140493) )
@@ -931,7 +913,7 @@ ROM_START( pitfight5 )
 	ROM_REGION( 0x020000, "gfx2", 0 )
 	ROM_LOAD( "136081-1027.15l",  0x000000, 0x10000, CRC(a59f381d) SHA1(b14e878340ad2adbf4f6d4fc331c58f62037c7c7) ) /* alphanumerics */
 
-	ROM_REGION16_BE( 0x200000, "gfx3", 0 )
+	ROM_REGION16_BE( 0x200000, "rle", 0 )
 	ROM_LOAD16_BYTE( "136081-1065.65r", 0x000001, 0x80000, CRC(6d3a834f) SHA1(6e153fee39b6a932aeb101e69e3557355a637c76) ) /* Same data as other sets, but in four mask roms */
 	ROM_LOAD16_BYTE( "136081-1066.65n", 0x000000, 0x80000, CRC(0f7f5117) SHA1(e9d3d0db388a5f7d76de363018d92fa59bf8113a) )
 	ROM_LOAD16_BYTE( "136081-1067.70r", 0x100001, 0x80000, CRC(ca4f75a8) SHA1(f8b8b03df4ad043a48970a0f8a4c3b85c7140493) )
@@ -982,7 +964,7 @@ ROM_START( pitfight4 )
 	ROM_REGION( 0x020000, "gfx2", 0 )
 	ROM_LOAD( "136081-1027.15l",  0x000000, 0x10000, CRC(a59f381d) SHA1(b14e878340ad2adbf4f6d4fc331c58f62037c7c7) ) /* alphanumerics */
 
-	ROM_REGION16_BE( 0x200000, "gfx3", 0 )
+	ROM_REGION16_BE( 0x200000, "rle", 0 )
 	ROM_LOAD16_BYTE( "136081-1001.65r",  0x000001, 0x20000, CRC(3af31444) SHA1(91fc02786b82abdf12ebdbaacdd1f158f8ce6d06) )
 	ROM_LOAD16_BYTE( "136081-1002.65n",  0x000000, 0x20000, CRC(f1d76a4c) SHA1(ca769d2cdd096f4a54f7bcaa4840fc9ffaabf499) )
 	ROM_LOAD16_BYTE( "136081-1003.70r",  0x040001, 0x20000, CRC(28c41c2a) SHA1(75cd527f98c8475e3b880f53c5a355d6c3bd8766) )
@@ -1045,7 +1027,7 @@ ROM_START( pitfight3 )
 	ROM_REGION( 0x020000, "gfx2", 0 )
 	ROM_LOAD( "136081-1027.15l",  0x000000, 0x10000, CRC(a59f381d) SHA1(b14e878340ad2adbf4f6d4fc331c58f62037c7c7) ) /* alphanumerics */
 
-	ROM_REGION16_BE( 0x200000, "gfx3", 0 )
+	ROM_REGION16_BE( 0x200000, "rle", 0 )
 	ROM_LOAD16_BYTE( "136081-1001.65r",  0x000001, 0x20000, CRC(3af31444) SHA1(91fc02786b82abdf12ebdbaacdd1f158f8ce6d06) )
 	ROM_LOAD16_BYTE( "136081-1002.65n",  0x000000, 0x20000, CRC(f1d76a4c) SHA1(ca769d2cdd096f4a54f7bcaa4840fc9ffaabf499) )
 	ROM_LOAD16_BYTE( "136081-1003.70r",  0x040001, 0x20000, CRC(28c41c2a) SHA1(75cd527f98c8475e3b880f53c5a355d6c3bd8766) )
@@ -1108,7 +1090,7 @@ ROM_START( pitfightj )
 	ROM_REGION( 0x020000, "gfx2", 0 )
 	ROM_LOAD( "136081-1427.dat",  0x000000, 0x20000, CRC(b2c51dff) SHA1(7ad82a6a55d3a68e39d113c92f9e89a43408b5b2) ) /* alphanumerics */
 
-	ROM_REGION16_BE( 0x200000, "gfx3", 0 )
+	ROM_REGION16_BE( 0x200000, "rle", 0 )
 	ROM_LOAD16_BYTE( "136081-1001.65r",  0x000001, 0x20000, CRC(3af31444) SHA1(91fc02786b82abdf12ebdbaacdd1f158f8ce6d06) )
 	ROM_LOAD16_BYTE( "136081-1002.65n",  0x000000, 0x20000, CRC(f1d76a4c) SHA1(ca769d2cdd096f4a54f7bcaa4840fc9ffaabf499) )
 	ROM_LOAD16_BYTE( "136081-1003.70r",  0x040001, 0x20000, CRC(28c41c2a) SHA1(75cd527f98c8475e3b880f53c5a355d6c3bd8766) )
@@ -1171,7 +1153,7 @@ ROM_START( pitfightb )
 	ROM_REGION( 0x020000, "gfx2", 0 )
 	ROM_LOAD( "136081-1027.15l",  0x000000, 0x10000, CRC(a59f381d) SHA1(b14e878340ad2adbf4f6d4fc331c58f62037c7c7) ) /* alphanumerics */
 
-	ROM_REGION16_BE( 0x200000, "gfx3", 0 )
+	ROM_REGION16_BE( 0x200000, "rle", 0 )
 	ROM_LOAD16_BYTE( "136081-1001.65r",  0x000001, 0x20000, CRC(3af31444) SHA1(91fc02786b82abdf12ebdbaacdd1f158f8ce6d06) )
 	ROM_LOAD16_BYTE( "136081-1002.65n",  0x000000, 0x20000, CRC(f1d76a4c) SHA1(ca769d2cdd096f4a54f7bcaa4840fc9ffaabf499) )
 	ROM_LOAD16_BYTE( "136081-1003.70r",  0x040001, 0x20000, CRC(28c41c2a) SHA1(75cd527f98c8475e3b880f53c5a355d6c3bd8766) )

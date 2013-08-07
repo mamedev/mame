@@ -17,6 +17,7 @@ public:
 			m_jsa(*this, "jsa"),
 			m_playfield_tilemap(*this, "playfield"),
 			m_alpha_tilemap(*this, "alpha"),
+			m_rle(*this, "rle"),
 			m_mo_command(*this, "mo_command") { }
 
 	required_device<cpu_device> m_maincpu;
@@ -24,6 +25,7 @@ public:
 
 	required_device<tilemap_device> m_playfield_tilemap;
 	required_device<tilemap_device> m_alpha_tilemap;
+	required_device<atari_rle_objects_device> m_rle;
 
 	UINT16          m_playfield_base;
 
@@ -42,7 +44,6 @@ public:
 	int             m_sloop_state;
 	UINT16 *        m_sloop_base;
 
-	device_t *      m_rle;
 	UINT32          m_last_accesses[8];
 	virtual void update_interrupts();
 	virtual void scanline_update(screen_device &screen, int scanline);

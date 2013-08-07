@@ -82,9 +82,6 @@ VIDEO_START_MEMBER(atarigt_state,atarigt)
 	/* blend the playfields and free the temporary one */
 	blend_gfx(0, 2, 0x0f, 0x30);
 
-	/* initialize the motion objects */
-	m_rle = machine().device("rle");
-
 	/* allocate temp bitmaps */
 	width = m_screen->width();
 	height = m_screen->height();
@@ -499,8 +496,8 @@ PrimRage GALs:
 
 UINT32 atarigt_state::screen_update_atarigt(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap_ind16 *mo_bitmap = atarirle_get_vram(m_rle, 0);
-	bitmap_ind16 *tm_bitmap = atarirle_get_vram(m_rle, 1);
+	bitmap_ind16 &mo_bitmap = m_rle->vram(0);
+	bitmap_ind16 &tm_bitmap = m_rle->vram(1);
 	UINT16 *cram, *tram;
 	int color_latch;
 	UINT32 *mram;
@@ -523,8 +520,8 @@ UINT32 atarigt_state::screen_update_atarigt(screen_device &screen, bitmap_rgb32 
 	{
 		UINT16 *an = &m_an_bitmap->pix16(y);
 		UINT16 *pf = &m_pf_bitmap->pix16(y);
-		UINT16 *mo = &mo_bitmap->pix16(y);
-		UINT16 *tm = &tm_bitmap->pix16(y);
+		UINT16 *mo = &mo_bitmap.pix16(y);
+		UINT16 *tm = &tm_bitmap.pix16(y);
 		UINT32 *dst = &bitmap.pix32(y);
 
 		/* Primal Rage: no TRAM, slightly different priorities */
@@ -620,13 +617,4 @@ UINT32 atarigt_state::screen_update_atarigt(screen_device &screen, bitmap_rgb32 
 		}
 	}
 	return 0;
-}
-
-void atarigt_state::screen_eof_atarigt(screen_device &screen, bool state)
-{
-	// rising edge
-	if (state)
-	{
-		atarirle_eof(m_rle);
-	}
 }

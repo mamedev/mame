@@ -70,9 +70,6 @@ VIDEO_START_MEMBER(atarig42_state,atarig42)
 	/* blend the playfields and free the temporary one */
 	blend_gfx(0, 2, 0x0f, 0x30);
 
-	/* initialize the motion objects */
-	m_rle = machine().device("rle");
-
 	/* save states */
 	save_item(NAME(m_current_control));
 	save_item(NAME(m_playfield_tile_bank));
@@ -174,7 +171,7 @@ UINT32 atarig42_state::screen_update_atarig42(screen_device &screen, bitmap_ind1
 
 	/* copy the motion objects on top */
 	{
-		bitmap_ind16 *mo_bitmap = atarirle_get_vram(m_rle, 0);
+		bitmap_ind16 &mo_bitmap = m_rle->vram(0);
 		int left    = cliprect.min_x;
 		int top     = cliprect.min_y;
 		int right   = cliprect.max_x + 1;
@@ -185,7 +182,7 @@ UINT32 atarig42_state::screen_update_atarig42(screen_device &screen, bitmap_ind1
 		for (y = top; y < bottom; y++)
 		{
 			UINT16 *pf = &bitmap.pix16(y);
-			UINT16 *mo = &mo_bitmap->pix16(y);
+			UINT16 *mo = &mo_bitmap.pix16(y);
 			UINT8 *pri = &priority_bitmap.pix8(y);
 			for (x = left; x < right; x++)
 				if (mo[x])
@@ -201,13 +198,4 @@ UINT32 atarig42_state::screen_update_atarig42(screen_device &screen, bitmap_ind1
 	/* add the alpha on top */
 	m_alpha_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
-}
-
-void atarig42_state::screen_eof_atarig42(screen_device &screen, bool state)
-{
-	// rising edge
-	if (state)
-	{
-		atarirle_eof(m_rle);
-	}
 }

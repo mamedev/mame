@@ -89,6 +89,7 @@ EMUOBJS = \
 	$(EMUOBJ)/mame.o \
 	$(EMUOBJ)/machine.o \
 	$(EMUOBJ)/mconfig.o \
+	$(EMUOBJ)/memarray.o \
 	$(EMUOBJ)/memory.o \
 	$(EMUOBJ)/network.o \
 	$(EMUOBJ)/output.o \
