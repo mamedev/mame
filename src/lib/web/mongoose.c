@@ -18,6 +18,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+#define NO_SSL
+
 #if defined(_WIN32)
 #define SETSOCKOPT_CAST const char *
 #else
