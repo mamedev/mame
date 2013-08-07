@@ -8986,16 +8986,12 @@ ROM_END
 ****************************************************************************/
 
 
-static INPUT_PORTS_START( svcpcb )
-	STANDARD_IN0
+static INPUT_PORTS_START( ms5pcb )
+	PORT_INCLUDE( neogeo )
 
-	STANDARD_IN1
-
-	STANDARD_IN2
-
-	STANDARD_IN3
-
-	STANDARD_IN4
+	PORT_MODIFY("SYSTEM")
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	/* the rom banking is tied directly to the dipswitch?, or is there a bank write somewhere? */
 	PORT_START("HARDDIP")
@@ -9005,35 +9001,17 @@ static INPUT_PORTS_START( svcpcb )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( ms5pcb )
-	STANDARD_IN0
+static INPUT_PORTS_START( kf2k3pcb )
+	PORT_INCLUDE( neogeo )
 
-	STANDARD_IN1
-
-	STANDARD_IN2
-
-	STANDARD_IN3
-
-	STANDARD_IN4
-
-	/* the rom banking is tied directly to the dipswitch?, or is there a bank write somewhere? */
-	PORT_START("HARDDIP")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Region ) ) PORT_DIPLOCATION("HARDDIP:3")
-	PORT_DIPSETTING(    0x00, DEF_STR( Asia ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Japan ) )
+	PORT_MODIFY("SYSTEM")
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( kog )
-	STANDARD_IN0
-
-	STANDARD_IN1
-
-	STANDARD_IN2
-
-	STANDARD_IN3
-
-	STANDARD_IN4
+	PORT_INCLUDE( neogeo )
 
 	/* a jumper on the pcb overlays a ROM address, very strange but that's how it works. */
 	PORT_START("JUMPER")
@@ -9046,39 +9024,13 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( mjneogeo )
-	PORT_START("IN0")
-	PORT_DIPNAME( 0x0001, 0x0001, "Test Switch" ) PORT_DIPLOCATION("SW:1")
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, "Coin Chutes?" ) PORT_DIPLOCATION("SW:2")
-	PORT_DIPSETTING(      0x0000, "1?" )
-	PORT_DIPSETTING(      0x0002, "2?" )
+	PORT_INCLUDE( neogeo )
+
+	PORT_MODIFY("P1/DSW")
 	PORT_DIPNAME( 0x0004, 0x0000, "Mahjong Control Panel" ) PORT_DIPLOCATION("SW:3")
 	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0018, 0x0018, "COMM Setting (Cabinet No.)" ) PORT_DIPLOCATION("SW:4,5")
-	PORT_DIPSETTING(      0x0018, "1" )
-	PORT_DIPSETTING(      0x0008, "2" )
-	PORT_DIPSETTING(      0x0010, "3" )
-	PORT_DIPSETTING(      0x0000, "4" )
-	PORT_DIPNAME( 0x0020, 0x0020, "COMM Setting (Link Enable)" ) PORT_DIPLOCATION("SW:6")
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Free_Play ) ) PORT_DIPLOCATION("SW:7")
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, "Freeze" ) PORT_DIPLOCATION("SW:8")
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state,mahjong_controller_r, NULL)
-
-	STANDARD_IN1
-
-	STANDARD_IN2
-
-	STANDARD_IN3
-
-	STANDARD_IN4
 
 	PORT_START("MAHJONG1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_A )
@@ -9127,38 +9079,23 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( irrmaze )
-	PORT_START("IN0")
-	STANDARD_DIPS
+	PORT_INCLUDE( neogeo )
+
+	PORT_MODIFY("P1/DSW")
 	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state,multiplexed_controller_r, (void *)0)
 
-	PORT_START("IN1")
+	PORT_MODIFY("P2")
 	PORT_BIT( 0x0fff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 
-	PORT_START("IN2")
-	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_MODIFY("SYSTEM")
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x7000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state,get_memcard_status, NULL)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	STANDARD_IN3
-
-	PORT_START("IN4")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNKNOWN )  /* this bit is used.. */
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Enter BIOS") PORT_CODE(KEYCODE_F2)
-	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-0")
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(10) PORT_KEYDELTA(20) PORT_REVERSE
@@ -9169,19 +9106,13 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( popbounc )
-	PORT_START("IN0")
-	STANDARD_DIPS
+	PORT_INCLUDE( neogeo )
+
+	PORT_MODIFY("P1/DSW")
 	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state,multiplexed_controller_r, (void *)0)
 
-	PORT_START("IN1")
-	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_MODIFY("P2")
 	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state,multiplexed_controller_r, (void *)1)
-
-	STANDARD_IN2
-
-	STANDARD_IN3
-
-	STANDARD_IN4
 
 	/* Fake inputs read by CUSTOM_INPUT handlers */
 	PORT_START("IN0-0")
@@ -9211,35 +9142,25 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( vliner )
-	PORT_START("IN0")
-	STANDARD_DIPS
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_INCLUDE( neogeo )
+
+	PORT_MODIFY("P1/DSW")
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("View Payout Table/Big")
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Bet/Small")
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Stop/Double Up")
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Start/Collect")
 
-	PORT_START("IN1")
+	PORT_MODIFY("P2")
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN2")
-	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_MODIFY("SYSTEM")
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* this bit is used.. */
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* this bit is used.. */
-	PORT_BIT( 0x7000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state,get_memcard_status, NULL)
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN3")
+	PORT_MODIFY("AUDIO/COIN")
 	PORT_BIT( 0x003f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00c0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state,get_calendar_status, NULL)
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state,get_audio_result, NULL)
-
-	STANDARD_IN4
 
 	PORT_START("IN5")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -9260,22 +9181,11 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( jockeygp )
-	STANDARD_IN0
+	PORT_INCLUDE( neogeo )
 
-	STANDARD_IN1
-
-	PORT_START("IN2")
-	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_MODIFY("SYSTEM")
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* game freezes with this bit enabled */
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Next Game") PORT_CODE(KEYCODE_7)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* game freezes with this bit enabled */
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Previous Game") PORT_CODE(KEYCODE_8)
-	PORT_BIT( 0x7000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state,get_memcard_status, NULL)
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	STANDARD_IN3
-
-	STANDARD_IN4
 INPUT_PORTS_END
 
 
@@ -10157,8 +10067,8 @@ GAME( 2003, mslug5,     neogeo,   neogeo,   neogeo, neogeo_state,   mslug5,   RO
 GAME( 2003, mslug5h,    mslug5,   neogeo,   neogeo, neogeo_state,   mslug5,   ROT0, "SNK Playmore", "Metal Slug 5 (NGH-2680)", GAME_SUPPORTS_SAVE ) /* Also found in later MVS carts */
 GAME( 2003, ms5pcb,     0,        neogeo,   ms5pcb, neogeo_state,   ms5pcb,   ROT0, "SNK Playmore", "Metal Slug 5 (JAMMA PCB)", GAME_SUPPORTS_SAVE )
 GAME( 2003, ms5plus,    mslug5,   neogeo,   neogeo, neogeo_state,   ms5plus,  ROT0, "bootleg", "Metal Slug 5 Plus (bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 2003, svcpcb,     0,        neogeo,   svcpcb, neogeo_state,   svcpcb,   ROT0, "SNK Playmore", "SNK vs. Capcom - SVC Chaos (JAMMA PCB, set 1)", GAME_SUPPORTS_SAVE ) // not a clone of neogeo because it's NOT a neogeo cart.
-GAME( 2003, svcpcba,    svcpcb,   neogeo,   svcpcb, neogeo_state,   svcpcb,   ROT0, "SNK Playmore", "SNK vs. Capcom - SVC Chaos (JAMMA PCB, set 2)" , GAME_SUPPORTS_SAVE ) /* Encrypted Code */
+GAME( 2003, svcpcb,     0,        neogeo,   ms5pcb, neogeo_state,   svcpcb,   ROT0, "SNK Playmore", "SNK vs. Capcom - SVC Chaos (JAMMA PCB, set 1)", GAME_SUPPORTS_SAVE ) // not a clone of neogeo because it's NOT a neogeo cart.
+GAME( 2003, svcpcba,    svcpcb,   neogeo,   ms5pcb, neogeo_state,   svcpcb,   ROT0, "SNK Playmore", "SNK vs. Capcom - SVC Chaos (JAMMA PCB, set 2)" , GAME_SUPPORTS_SAVE ) /* Encrypted Code */
 GAME( 2003, svc,        neogeo,   neogeo,   neogeo, neogeo_state,   svc,      ROT0, "SNK Playmore", "SNK vs. Capcom - SVC Chaos (NGM-2690)(NGH-2690)", GAME_SUPPORTS_SAVE )
 GAME( 2003, svcboot,    svc,      neogeo,   neogeo, neogeo_state,   svcboot,  ROT0, "bootleg", "SNK vs. Capcom - SVC Chaos (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 2003, svcplus,    svc,      neogeo,   neogeo, neogeo_state,   svcplus,  ROT0, "bootleg", "SNK vs. Capcom - SVC Chaos Plus (bootleg set 1)", GAME_SUPPORTS_SAVE )
@@ -10167,7 +10077,7 @@ GAME( 2003, svcsplus,   svc,      neogeo,   neogeo, neogeo_state,   svcsplus, RO
 GAME( 2003, samsho5,    neogeo,   neogeo,   neogeo, neogeo_state,   samsho5,  ROT0, "Yuki Enterprise / SNK Playmore", "Samurai Shodown V / Samurai Spirits Zero (NGM-2700)", GAME_SUPPORTS_SAVE )
 GAME( 2003, samsho5h,   samsho5,  neogeo,   neogeo, neogeo_state,   samsho5,  ROT0, "Yuki Enterprise / SNK Playmore", "Samurai Shodown V / Samurai Spirits Zero (NGH-2700)", GAME_SUPPORTS_SAVE )
 GAME( 2003, samsho5b,   samsho5,  neogeo,   neogeo, neogeo_state,   samsho5b, ROT0, "bootleg", "Samurai Shodown V / Samurai Spirits Zero (bootleg)", GAME_SUPPORTS_SAVE ) // different program scrambling
-GAME( 2003, kf2k3pcb,   0,        neogeo,   neogeo, neogeo_state,   kf2k3pcb, ROT0, "SNK Playmore", "The King of Fighters 2003 (Japan, JAMMA PCB)", GAME_SUPPORTS_SAVE ) // not a clone of neogeo because it's NOT a neogeo cart.
+GAME( 2003, kf2k3pcb,   0,        neogeo,   kf2k3pcb, neogeo_state, kf2k3pcb, ROT0, "SNK Playmore", "The King of Fighters 2003 (Japan, JAMMA PCB)", GAME_SUPPORTS_SAVE ) // not a clone of neogeo because it's NOT a neogeo cart.
 GAME( 2003, kof2003,    neogeo,   neogeo,   neogeo, neogeo_state,   kof2003,  ROT0, "SNK Playmore", "The King of Fighters 2003 (NGM-2710)", GAME_SUPPORTS_SAVE )
 GAME( 2003, kof2003h,   kof2003,  neogeo,   neogeo, neogeo_state,   kof2003h, ROT0, "SNK Playmore", "The King of Fighters 2003 (NGH-2710)", GAME_SUPPORTS_SAVE )
 GAME( 2003, kf2k3bl,    kof2003,  neogeo,   neogeo, neogeo_state,   kf2k3bl , ROT0, "bootleg", "The King of Fighters 2003 (bootleg set 1)", GAME_SUPPORTS_SAVE ) // zooming is wrong because its a bootleg of the pcb version on a cart (unless it was a bootleg pcb with the new bios?)

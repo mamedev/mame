@@ -453,7 +453,7 @@ WRITE16_MEMBER(ng_aes_state::neocd_control_w)
 		case 0x0140:
 //          bprintf(PRINT_NORMAL, _T("  - NGCD OBJ BUSREQ -> 0 (PC: 0x%06X)\n"), SekGetPC(-1));
 			m_has_sprite_bus = true;
-			video_reset();
+			optimize_sprite_data();
 			break;
 		case 0x0142:
 //          bprintf(PRINT_NORMAL, _T("  - NGCD PCM BUSREQ -> 0 (PC: 0x%06X)\n"), SekGetPC(-1));
@@ -468,7 +468,6 @@ WRITE16_MEMBER(ng_aes_state::neocd_control_w)
 		case 0x0148:
 //          bprintf(PRINT_NORMAL, _T("  - NGCD FIX BUSREQ -> 0 (PC: 0x%06X)\n"), SekGetPC(-1));
 			m_has_text_bus = true;
-			video_reset();
 			break;
 
 		// CD mechanism communication
@@ -1223,7 +1222,7 @@ static ADDRESS_MAP_START( aes_main_map, AS_PROGRAM, 16, ng_aes_state )
 	AM_RANGE(0x2ffff0, 0x2fffff) AM_WRITE(main_cpu_bank_select_w)
 	AM_RANGE(0x300000, 0x300001) AM_MIRROR(0x01ff7e) AM_READ(aes_in0_r)
 	AM_RANGE(0x300080, 0x300081) AM_MIRROR(0x01ff7e) AM_READ_PORT("IN4")
-	AM_RANGE(0x300000, 0x300001) AM_MIRROR(0x01ffe0) AM_READ(neogeo_unmapped_r) AM_WRITENOP // AES has no watchdog
+	AM_RANGE(0x300000, 0x300001) AM_MIRROR(0x01ffe0) AM_WRITENOP // AES has no watchdog
 	AM_RANGE(0x320000, 0x320001) AM_MIRROR(0x01fffe) AM_READ_PORT("IN3") AM_WRITE(audio_command_w)
 	AM_RANGE(0x340000, 0x340001) AM_MIRROR(0x01fffe) AM_READ(aes_in1_r)
 	AM_RANGE(0x360000, 0x37ffff) AM_READ(neogeo_unmapped_r)
@@ -1312,38 +1311,13 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-#define STANDARD_DIPS                                                                       \
-	PORT_DIPNAME( 0x0001, 0x0001, "Test Switch" ) PORT_DIPLOCATION("SW:1")                  \
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )                                          \
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )                                           \
-	PORT_DIPNAME( 0x0002, 0x0002, "Coin Chutes?" ) PORT_DIPLOCATION("SW:2")                 \
-	PORT_DIPSETTING(      0x0000, "1?" )                                                    \
-	PORT_DIPSETTING(      0x0002, "2?" )                                                    \
-	PORT_DIPNAME( 0x0004, 0x0004, "Autofire (in some games)" ) PORT_DIPLOCATION("SW:3")     \
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )                                          \
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )                                           \
-	PORT_DIPNAME( 0x0018, 0x0018, "COMM Setting (Cabinet No.)" ) PORT_DIPLOCATION("SW:4,5") \
-	PORT_DIPSETTING(      0x0018, "1" )                                                     \
-	PORT_DIPSETTING(      0x0008, "2" )                                                     \
-	PORT_DIPSETTING(      0x0010, "3" )                                                     \
-	PORT_DIPSETTING(      0x0000, "4" )                                                     \
-	PORT_DIPNAME( 0x0020, 0x0020, "COMM Setting (Link Enable)" ) PORT_DIPLOCATION("SW:6")   \
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )                                          \
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )                                           \
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Free_Play ) ) PORT_DIPLOCATION("SW:7")           \
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )                                          \
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )                                           \
-	PORT_DIPNAME( 0x0080, 0x0080, "Freeze" ) PORT_DIPLOCATION("SW:8")                       \
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )                                          \
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-
-#define STANDARD_IN2                                                                                \
-	PORT_START("IN2")                                                                               \
-	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )                                                   \
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )                                   \
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON5) PORT_NAME("1P Select") PORT_CODE(KEYCODE_5) PORT_PLAYER(1)    \
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START2 )                                   \
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON5) PORT_NAME("2P Select") PORT_CODE(KEYCODE_6) PORT_PLAYER(2)    \
+#define STANDARD_IN2                                              \
+	PORT_START("IN2")                                             \
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )                 \
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START ) PORT_PLAYER(1)   \
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_SELECT ) PORT_PLAYER(1)  \
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START ) PORT_PLAYER(2)   \
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_SELECT ) PORT_PLAYER(2)  \
 	PORT_BIT( 0x7000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ng_aes_state, get_memcard_status, NULL)         \
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNKNOWN )  /* Matrimelee expects this bit to be active high when on an AES */
 
@@ -1482,7 +1456,6 @@ static INPUT_PORTS_START( mjpanel )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( aes )
