@@ -1456,7 +1456,7 @@
 
 	<software name="ballblst">
 		<description>Ball Blaster</description>
-		<year>&lt;unknown&gt;</year>
+		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
 		<part name="flop11" interface="floppy_5_25">
@@ -2004,7 +2004,7 @@
 
 	<software name="battcmdr">
 		<description>Battalion Commander</description>
-		<year>&lt;unknown&gt;</year>
+		<year>19??</year>
 		<publisher>Strategic Simulations, Inc.</publisher>
 
 		<part name="flop11" interface="floppy_5_25">
@@ -2033,7 +2033,7 @@
 
 	<software name="bbcstlwf">
 		<description>Beyond Beyond Castle Wolfenstein</description>
-		<year>&lt;unknown&gt;</year>
+		<year>19??</year>
 		<publisher>Mindscape</publisher>
 
 		<part name="flop11" interface="floppy_5_25">
@@ -2158,7 +2158,7 @@
 
 	<software name="beerrun">
 		<description>Beer Run (crack)</description>
-		<year>&lt;unknown&gt;</year>
+		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
 		<part name="flop11" interface="floppy_5_25">
@@ -2235,7 +2235,7 @@
 
 	<software name="betedugv">
 		<description>La Bete du Gevaudan (crack)</description>
-		<year>&lt;unknown&gt;</year>
+		<year>19??</year>
 		<publisher>Cil</publisher>
 
 		<part name="flop11" interface="floppy_5_25">
@@ -2257,7 +2257,7 @@
 
 	<software name="bigmac2e">
 		<description>Big Mac IIe</description>
-		<year>&lt;unknown&gt;</year>
+		<year>19??</year>
 		<publisher>Apple Pugetsound Program Library Exchange</publisher>
 
 		<part name="flop11" interface="floppy_5_25">
@@ -2293,7 +2293,7 @@
 
 	<software name="bilestod">
 		<description>The Bilestoad (crack)</description>
-		<year>&lt;unknown&gt;</year>
+		<year>19??</year>
 		<publisher>Mangrove Earthshoe</publisher>
 
 		<part name="flop11" interface="floppy_5_25">
@@ -2318,7 +2318,7 @@
 	<software name="blackblt">
 		<description>Black Belt (crack)</description>
 		<year>1984</year>
-		<publisher></publisher>
+		<publisher>Earthware</publisher>
 
 		<part name="flop11" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
@@ -2358,7 +2358,7 @@
 
 	<software name="bldqstcr">
 		<description>Blood Quest (crack)</description>
-		<year>&lt;unknown&gt;</year>
+		<year>19??</year>
 		<publisher>Questware</publisher>
 
 		<part name="flop11" interface="floppy_5_25">
@@ -2394,7 +2394,7 @@
 
 	<software name="bldrdsh2">
 		<description>Boulder Dash II</description>
-		<year>&lt;unknown&gt;</year>
+		<year>19??</year>
 		<publisher>Micro Fun</publisher>
 
 		<part name="flop11" interface="floppy_5_25">
@@ -2570,7 +2570,7 @@
 
 	<software name="bombaly">
 		<description>Bomb Alley</description>
-		<year>&lt;unknown&gt;</year>
+		<year>19??</year>
 		<publisher>Strategic Simulations, Inc.</publisher>
 
 		<part name="flop11" interface="floppy_5_25">
@@ -2582,7 +2582,7 @@
 
 	<software name="bonsbais">
 		<description>Bons Baisers D'outre Tombe</description>
-		<year>&lt;unknown&gt;</year>
+		<year>19??</year>
 		<publisher>Timothee Herpin - Oliver Gisselbrecht</publisher>
 
 		<part name="flop11" interface="floppy_5_25">
@@ -2623,7 +2623,7 @@
 
 	<software name="bothbrls">
 		<description>Both Barrels</description>
-		<year>&lt;unknown&gt;</year>
+		<year>19??</year>
 		<publisher>Sirius Software</publisher>
 
 		<part name="flop11" interface="floppy_5_25">
@@ -2647,7 +2647,7 @@
 
 	<software name="bpgscr">
 		<description>Blue Powder, Grey Smoke (crack)</description>
-		<year>&lt;unknown&gt;</year>
+		<year>19??</year>
 		<publisher>Garde</publisher>
 
 		<part name="flop11" interface="floppy_5_25">
@@ -2765,7 +2765,7 @@
 
 	<software name="breakout">
 		<description>Breakout</description>
-		<year>&lt;unknown&gt;</year>
+		<year>19??</year>
 		<publisher>Apple Computer, Inc.</publisher>	<!-- programmed by Steve Wozniak -->
 
 		<part name="flop11" interface="floppy_5_25">
@@ -2840,7 +2840,7 @@
 
 	<software name="brktrgha">
 		<description>Breaktrough (alt)</description>
-		<year>&lt;unknown&gt;</year>
+		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
 		<part name="flop11" interface="floppy_5_25">
@@ -2852,7 +2852,7 @@
 
 	<software name="brktrgh">
 		<description>Breaktrough</description>
-		<year>&lt;unknown&gt;</year>
+		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
 		<part name="flop11" interface="floppy_5_25">
@@ -3162,7 +3162,7 @@
 
 	<software name="byfloppy">
 		<description>Beyond Floppy</description>
-		<year>&lt;unknown&gt;</year>
+		<year>19??</year>
 		<publisher>Greg Hale - Ted Cohn</publisher>
 
 		<part name="flop11" interface="floppy_5_25">
