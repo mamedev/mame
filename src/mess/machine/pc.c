@@ -1559,15 +1559,31 @@ DEVICE_IMAGE_LOAD_MEMBER( pc_state, pcjr_cartridge )
 	{
 		UINT8   header[0x200];
 
+		unsigned header_size = 0;
 		unsigned image_size = image.length();
 
-		/* Check for supported image sizes */
-		switch( image_size )
+		/* Check for supported header sizes */
+		switch( image_size & 0x3ff )
 		{
-		case 0x2200:
-		case 0x4200:
-		case 0x8200:
-		case 0x10200:
+		case 0x80:
+			header_size = 0x80;
+			break;
+		case 0x200:
+			header_size = 0x200;
+			break;
+		default:
+			image.seterror(IMAGE_ERROR_UNSUPPORTED, "Invalid header size" );
+			return IMAGE_INIT_FAIL;
+		}
+
+		/* Check for supported image sizes */
+		switch( image_size - header_size )
+		{
+		case 0x2000:
+		case 0x4000:
+		case 0x8000:
+		case 0xa000:
+		case 0x10000:
 			break;
 		default:
 			image.seterror(IMAGE_ERROR_UNSUPPORTED, "Invalid rom file size" );
@@ -1575,14 +1591,14 @@ DEVICE_IMAGE_LOAD_MEMBER( pc_state, pcjr_cartridge )
 		}
 
 		/* Read and verify the header */
-		if ( 512 != image.fread( header, 512 ) )
+		if ( header_size != image.fread( header, header_size ) )
 		{
 			image.seterror(IMAGE_ERROR_UNSUPPORTED, "Unable to read header" );
 			return IMAGE_INIT_FAIL;
 		}
 
 		/* Read the cartridge contents */
-		if ( ( image_size - 0x200 ) != image.fread(memregion("maincpu")->base() + address, image_size - 0x200 ) )
+		if ( ( image_size - header_size ) != image.fread(memregion("maincpu")->base() + address, image_size - header_size ) )
 		{
 			image.seterror(IMAGE_ERROR_UNSUPPORTED, "Unable to read cartridge contents" );
 			return IMAGE_INIT_FAIL;
