@@ -69,13 +69,17 @@ class visicom_state : public studio2_state
 public:
 	visicom_state(const machine_config &mconfig, device_type type, const char *tag)
 		: studio2_state(mconfig, type, tag),
-			m_color_ram(*this, "color_ram"),
-			m_color_ram1(*this, "color_ram1")
+			m_color0_ram(*this, "color0_ram"),
+			m_color1_ram(*this, "color1_ram")
 	{ }
 
-	required_shared_ptr<UINT8> m_color_ram;
-	required_shared_ptr<UINT8> m_color_ram1;
+	virtual UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	required_shared_ptr<UINT8> m_color0_ram;
+	required_shared_ptr<UINT8> m_color1_ram;
+
+	DECLARE_WRITE8_MEMBER( dma_w );
+	
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( visicom_cart_load );
 };
 

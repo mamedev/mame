@@ -177,8 +177,6 @@ Notes:
 
     TODO:
 
-    - mpt02 clones' colors
-    - visicom colors
     - NE555 discrete sound
 
 */
@@ -299,8 +297,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( visicom_map, AS_PROGRAM, 8, visicom_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1000, 0x10ff) AM_RAM
-	AM_RANGE(0x1100, 0x11ff) AM_RAM AM_SHARE("color_ram")
-	AM_RANGE(0x1300, 0x13ff) AM_RAM AM_SHARE("color_ram1")
+	AM_RANGE(0x1100, 0x11ff) AM_RAM AM_SHARE("color0_ram")
+	AM_RANGE(0x1300, 0x13ff) AM_RAM AM_SHARE("color1_ram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( visicom_io_map, AS_IO, 8, visicom_state )
@@ -364,11 +362,20 @@ INPUT_PORTS_END
 
 static const rgb_t VISICOM_PALETTE[] =
 {
-	MAKE_RGB(0x00, 0x80, 0x00),
-	MAKE_RGB(0x00, 0x00, 0xff),
-	MAKE_RGB(0x00, 0xff, 0x00),
-	MAKE_RGB(0xff, 0x00, 0x00)
+	MAKE_RGB(0x00, 0x40, 0x00),
+	MAKE_RGB(0xaf, 0xdf, 0xe4),
+	MAKE_RGB(0xb9, 0xc4, 0x2f),
+	MAKE_RGB(0xef, 0x45, 0x4a)
 };
+
+UINT32 visicom_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	m_vdc->screen_update(screen, bitmap, cliprect);
+
+	m_vdc->m_bitmap.fill(VISICOM_PALETTE[0], cliprect);
+
+	return 0;
+}
 
 READ_LINE_MEMBER( mpt02_state::rdata_r )
 {
@@ -418,6 +425,40 @@ static COSMAC_INTERFACE( studio2_cosmac_intf )
 	DEVCB_DRIVER_LINE_MEMBER(studio2_state, q_w),
 	DEVCB_NULL,
 	DEVCB_DEVICE_MEMBER(CDP1861_TAG, cdp1861_device, dma_w),
+	NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+WRITE8_MEMBER( visicom_state::dma_w )
+{
+	int sx = m_screen->hpos() + 4;
+	int y = m_screen->vpos();
+	
+	UINT8 addr = offset & 0xff;
+	UINT8 color0 = m_color0_ram[addr];
+	UINT8 color1 = m_color1_ram[addr];
+
+	for (int x = 0; x < 8; x++)
+	{
+		int color = (BIT(color1, 7) << 1) | BIT(color0, 7);
+		m_vdc->m_bitmap.pix32(y, sx + x) = VISICOM_PALETTE[color];
+		color0 <<= 1;
+		color1 <<= 1;
+	}
+}
+
+static COSMAC_INTERFACE( visicom_cosmac_intf )
+{
+	DEVCB_LINE_VCC,
+	DEVCB_DRIVER_LINE_MEMBER(studio2_state, clear_r),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DRIVER_LINE_MEMBER(studio2_state, ef3_r),
+	DEVCB_DRIVER_LINE_MEMBER(studio2_state, ef4_r),
+	DEVCB_DRIVER_LINE_MEMBER(studio2_state, q_w),
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(visicom_state, dma_w),
 	NULL,
 	DEVCB_NULL,
 	DEVCB_NULL
@@ -511,7 +552,7 @@ DEVICE_IMAGE_LOAD_MEMBER( visicom_state, visicom_cart_load )
 	else
 	{
 		size_t size = image.get_software_region_length("rom");
-		if (size) memcpy(ptr, image.get_software_region("rom_800"), MAX(size, 0x800));
+		if (size) memcpy(ptr, image.get_software_region("rom"), MAX(size, 0x800));
 	}
 
 	return IMAGE_INIT_PASS;
@@ -554,11 +595,12 @@ static MACHINE_CONFIG_START( visicom, visicom_state )
 	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_3_579545MHz/2)
 	MCFG_CPU_PROGRAM_MAP(visicom_map)
 	MCFG_CPU_IO_MAP(visicom_io_map)
-	MCFG_CPU_CONFIG(studio2_cosmac_intf)
+	MCFG_CPU_CONFIG(visicom_cosmac_intf)
 
 	/* video hardware */
 	MCFG_CDP1861_SCREEN_ADD(CDP1861_TAG, SCREEN_TAG, XTAL_3_579545MHz/2)
-	MCFG_CDP1861_ADD(CDP1861_TAG, SCREEN_TAG, XTAL_3_579545MHz/2/8, INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_INT), INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_DMAOUT), INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_EF1))
+	MCFG_SCREEN_UPDATE_DRIVER(visicom_state, screen_update)
+	MCFG_CDP1861_ADD(CDP1861_TAG, SCREEN_TAG, XTAL_3_579545MHz/2, INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_INT), INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_DMAOUT), INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_EF1))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -653,12 +695,12 @@ DRIVER_INIT_MEMBER(studio2_state,studio2)
 
 /* Game Drivers */
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        COMPANY   FULLNAME */
-CONS( 1977, studio2,    0,      0,      studio2,    studio2, studio2_state, studio2,    "RCA",      "Studio II", GAME_SUPPORTS_SAVE )
-CONS( 1978, visicom,    studio2,0,      visicom,    studio2, studio2_state, studio2,    "Toshiba",  "Visicom COM-100 (Japan)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-CONS( 1978, mpt02,      studio2,0,      mpt02,      studio2, studio2_state, studio2,    "Soundic",  "Victory MPT-02 Home TV Programmer (Austria)", GAME_SUPPORTS_SAVE )
-CONS( 1978, mpt02h,     studio2,0,      mpt02,      studio2, studio2_state, studio2,    "Hanimex",  "MPT-02 Jeu TV Programmable (France)", GAME_SUPPORTS_SAVE)
-CONS( 1978, mtc9016,    studio2,0,      mpt02,      studio2, studio2_state, studio2,    "Mustang",  "9016 Telespiel Computer (Germany)", GAME_SUPPORTS_SAVE )
-CONS( 1978, shmc1200,   studio2,0,      mpt02,      studio2, studio2_state, studio2,    "Sheen",    "1200 Micro Computer (Australia)", GAME_SUPPORTS_SAVE )
-CONS( 1978, cm1200,     studio2,0,      mpt02,      studio2, studio2_state, studio2,    "Conic",    "M-1200 (?)", GAME_SUPPORTS_SAVE )
-CONS( 1978, apollo80,   studio2,0,      mpt02,      studio2, studio2_state, studio2,    "Academy",  "Apollo 80 (Germany)", GAME_SUPPORTS_SAVE )
+//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT    INIT                       COMPANY    FULLNAME											FLAGS
+CONS( 1977, studio2,    0,      0,      studio2,    studio2, studio2_state, studio2,    "RCA",      "Studio II", 									GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+CONS( 1978, visicom,    studio2,0,      visicom,    studio2, studio2_state, studio2,    "Toshiba",  "Visicom COM-100 (Japan)", 						GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+CONS( 1978, mpt02,      studio2,0,      mpt02,      studio2, studio2_state, studio2,    "Soundic",  "Victory MPT-02 Home TV Programmer (Austria)",	GAME_SUPPORTS_SAVE )
+CONS( 1978, mpt02h,     studio2,0,      mpt02,      studio2, studio2_state, studio2,    "Hanimex",  "MPT-02 Jeu TV Programmable (France)", 			GAME_SUPPORTS_SAVE )
+CONS( 1978, mtc9016,    studio2,0,      mpt02,      studio2, studio2_state, studio2,    "Mustang",  "9016 Telespiel Computer (Germany)", 			GAME_SUPPORTS_SAVE )
+CONS( 1978, shmc1200,   studio2,0,      mpt02,      studio2, studio2_state, studio2,    "Sheen",    "1200 Micro Computer (Australia)", 				GAME_SUPPORTS_SAVE )
+CONS( 1978, cm1200,     studio2,0,      mpt02,      studio2, studio2_state, studio2,    "Conic",    "M-1200 (?)", 									GAME_SUPPORTS_SAVE )
+CONS( 1978, apollo80,   studio2,0,      mpt02,      studio2, studio2_state, studio2,    "Academy",  "Apollo 80 (Germany)", 							GAME_SUPPORTS_SAVE )

@@ -102,6 +102,8 @@ public:
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	bitmap_rgb32 m_bitmap;
+
 protected:
 	// device-level overrides
 	virtual void device_start();
@@ -119,8 +121,6 @@ private:
 	devcb2_write_line m_write_irq;
 	devcb2_write_line m_write_dma_out;
 	devcb2_write_line m_write_efx;
-
-	bitmap_rgb32 m_bitmap;          // bitmap
 
 	int m_disp;                     // display enabled
 	int m_dispon;                   // display on latch

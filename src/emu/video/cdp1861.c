@@ -44,7 +44,11 @@ cdp1861_device::cdp1861_device(const machine_config &mconfig, const char *tag, d
 		device_video_interface(mconfig, *this),
 		m_write_irq(*this),
 		m_write_dma_out(*this),
-		m_write_efx(*this)
+		m_write_efx(*this),
+		m_disp(0),
+		m_dispon(0),
+		m_dispoff(0),
+		m_dmaout(CLEAR_LINE)
 {
 }
 
@@ -165,7 +169,7 @@ void cdp1861_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 			m_dma_timer->adjust(clocks_to_attotime(CDP1861_CYCLES_DMA_WAIT));
 
-			m_dmaout = 0;
+			m_dmaout = CLEAR_LINE;
 		}
 		else
 		{
@@ -179,7 +183,7 @@ void cdp1861_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 			m_dma_timer->adjust(clocks_to_attotime(CDP1861_CYCLES_DMA_ACTIVE));
 
-			m_dmaout = 1;
+			m_dmaout = ASSERT_LINE;
 		}
 		break;
 	}
