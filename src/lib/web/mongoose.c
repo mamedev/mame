@@ -266,9 +266,11 @@ typedef int SOCKET;
 
 #ifdef _WIN32
 static CRITICAL_SECTION global_log_file_lock;
+#if !defined(NO_SSL)
 static pthread_t pthread_self(void) {
   return GetCurrentThreadId();
 }
+#endif
 #endif // _WIN32
 
 #ifdef DEBUG_TRACE
@@ -1272,13 +1274,14 @@ int mg_start_thread(mg_thread_func_t f, void *p) {
   return (long)_beginthread((void (__cdecl *)(void *)) f, 0, p) == -1L ? -1 : 0;
 }
 
+#if !defined(NO_SSL)
 static HANDLE dlopen(const char *dll_name, int flags) {
   wchar_t wbuf[PATH_MAX];
   (void) flags;
   to_unicode(dll_name, wbuf, ARRAY_SIZE(wbuf));
   return LoadLibraryW(wbuf);
 }
-
+#endif
 #if !defined(NO_CGI)
 #define SIGKILL 0
 static int kill(pid_t pid, int sig_num) {
