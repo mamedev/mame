@@ -9230,7 +9230,7 @@ How to load this?
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
-				<rom name="ms-dos.fdi" size="1261568" crc="d5e70ca1" sha1="bc5fb43463849b66ded3a568d82d44252759eb80" offset="0" />
+				<rom name="ms-dos.dsk" size="1261568" crc="d5e70ca1" sha1="bc5fb43463849b66ded3a568d82d44252759eb80" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">

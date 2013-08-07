@@ -163,6 +163,7 @@ FORMATSOBJS = \
 	$(LIBOBJ)/formats/p6001_cas.o   \
 	$(LIBOBJ)/formats/pasti_dsk.o   \
 	$(LIBOBJ)/formats/pc_dsk.o      \
+	$(LIBOBJ)/formats/pc98_dsk.o    \
 	$(LIBOBJ)/formats/pc98fdi_dsk.o \
 	$(LIBOBJ)/formats/pmd_cas.o     \
 	$(LIBOBJ)/formats/primoptp.o    \

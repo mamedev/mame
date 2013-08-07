@@ -411,6 +411,7 @@ Keyboard TX commands:
 
 #include "machine/ram.h"
 
+#include "formats/pc98_dsk.h"
 #include "formats/pc98fdi_dsk.h"
 
 #include "machine/pc9801_26.h"
@@ -3624,6 +3625,7 @@ INTERRUPT_GEN_MEMBER(pc9801_state::pc9801_vrtc_irq)
 
 
 FLOPPY_FORMATS_MEMBER( pc9801_state::floppy_formats )
+	FLOPPY_PC98_FORMAT,
 	FLOPPY_PC98FDI_FORMAT
 FLOPPY_FORMATS_END
 
