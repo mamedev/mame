@@ -25,6 +25,7 @@ OBJDIRS += \
 	$(LIBOBJ)/portmidi \
 	$(LIBOBJ)/lua \
 	$(LIBOBJ)/web \
+	$(LIBOBJ)/web/json \
 
 
 #-------------------------------------------------
@@ -493,5 +494,12 @@ $(LIBOBJ)/lua/%.o: $(LIBSRC)/lua/%.c | $(OSPREBUILD)
 
 WEBOBJS = \
 	$(LIBOBJ)/web/mongoose.o \
+	$(LIBOBJ)/web/json/json_reader.o \
+	$(LIBOBJ)/web/json/json_value.o \
+	$(LIBOBJ)/web/json/json_writer.o \
 
 $(OBJ)/libweb.a: $(WEBOBJS)
+
+$(LIBOBJ)/web/%.o: $(LIBSRC)/web/%.cpp | $(OSPREBUILD)
+	@echo Compiling $<...
+	$(CC) $(CDEFS) $(CFLAGS) -I$(LIBSRC)/web -c $< -o $@

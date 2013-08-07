@@ -85,6 +85,7 @@
 #include "validity.h"
 #include "debug/debugcon.h"
 #include "web/mongoose.h"
+#include "web/json/json.h"
 #include <time.h>
 
 
@@ -131,7 +132,33 @@ int mame_is_valid_machine(running_machine &machine)
 	return (&machine == global_machine);
 }
 
+// This function will be called by mongoose on every new request.
+static int begin_request_handler(struct mg_connection *conn) {
+	const struct mg_request_info *request_info = mg_get_request_info(conn);
+	if (!strcmp(request_info->uri, "/hello")) {
+		Json::Value data;
+		data["key1"] = "data1";
+		data["key2"] = "data2";
+		data["key3"] = "data3";
+		data["key4"] = "data4";
+		
+		Json::FastWriter writer;
+		const char *json = writer.write(data).c_str();
+	  // Send HTTP reply to the client
+		mg_printf(conn,
+				"HTTP/1.1 200 OK\r\n"
+				"Content-Type: text/plain\r\n"
+				"Content-Length: %d\r\n"        // Always set Content-Length
+				"\r\n"
+				"%s",
+				(int)strlen(json), json);
 
+		// Returning non-zero tells mongoose that our function has replied to
+		// the client, and mongoose should not send client any more data.
+		return 1;
+	}
+	return 0;
+} 
 /*-------------------------------------------------
     mame_execute - run the core emulation
 -------------------------------------------------*/
@@ -157,6 +184,7 @@ int mame_execute(emu_options &options, osd_interface &osd)
 
 	// Prepare callbacks structure. 
 	memset(&callbacks, 0, sizeof(callbacks));
+	callbacks.begin_request = begin_request_handler;
 
 	// Start the web server.
 	if (options.http())
