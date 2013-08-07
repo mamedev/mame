@@ -20,7 +20,8 @@ const device_type UPD7752 = &device_creator<upd7752_device>;
 
 /* TODO: unknown exact size */
 static ADDRESS_MAP_START( upd7752_ram, AS_0, 8, upd7752_device )
-	AM_RANGE(0x00000, 0xffff) AM_RAM
+//	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x0000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 //**************************************************************************
