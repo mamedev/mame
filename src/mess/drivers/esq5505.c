@@ -640,7 +640,6 @@ static ADDRESS_MAP_START( sq1_map, AS_PROGRAM, 16, esq5505_state )
 	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE_LEGACY("otis", es5505_r, es5505_w)
 	AM_RANGE(0x260000, 0x2601ff) AM_DEVREADWRITE8("esp", es5510_device, host_r, host_w, 0x0ff)
 	AM_RANGE(0x280000, 0x28001f) AM_DEVREADWRITE8("duart", duartn68681_device, read, write, 0x00ff)
-	AM_RANGE(0x2c0000, 0x2c0007) AM_DEVREADWRITE8("wd1772", wd1772_t, read, write, 0x00ff)
 	AM_RANGE(0x330000, 0x3bffff) AM_RAM // sequencer memory?
 	AM_RANGE(0xc00000, 0xc3ffff) AM_ROM AM_REGION("osrom", 0)
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("osram")
