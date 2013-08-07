@@ -25,6 +25,10 @@ a physical DSW B but only read when SWA:3,4 are both set to OFF. Currently,
 * In devzone, setting SWA:3,4 on anything but OFF,OFF results in no coins
     accepted at all
 
+cosmicg - background should be blue
+cosmicg - board can operate in b&w mode if there is no PROM, in this case
+          a colour overlay should be used.
+
 ***************************************************************************/
 
 
@@ -1354,6 +1358,23 @@ ROM_START( cosmicg )
 	ROM_LOAD( "cosmicg9.bin", 0x0000, 0x0400, CRC(689c2c96) SHA1(ddfdc3fd29c56fdebd3b1c3443a7c39f567d5355) )
 ROM_END
 
+
+ROM_START( cosmicgi )
+	ROM_REGION( 0x10000, "maincpu", 0 )  /* 8k for code */
+	ROM_LOAD( "1g118.2h", 0x0000, 0x0400, CRC(4bda1711) SHA1(746fd15dbe08c9e2af74547c19a55a84f7b65303) )
+	ROM_LOAD( "2g118.3h", 0x0400, 0x0400, CRC(3c10b2ba) SHA1(127a950d90420417a91aa3c8fabec7d7e7d526f5) )
+	ROM_LOAD( "3.4h",     0x0800, 0x0400, CRC(82a49b48) SHA1(4cf9f684f3eb18b99a88ca879bb7083b1334f0cc) )
+	ROM_LOAD( "4g118.5h", 0x0c00, 0x0400, CRC(42bb0611) SHA1(3894e4372f1443402ea7145b1101e1219fe2cde2) ) // changes in here cause trails when you move the ship, PCB does the same and ROM gives the same read every time, possible a bit has been flipped tho. check
+	ROM_LOAD( "5.6h",     0x1000, 0x0400, CRC(b1c00fbf) SHA1(136267f75e2d5b445695cabef4538f986e6f1b10) )
+	ROM_LOAD( "6.7h",     0x1400, 0x0400, CRC(f03454ce) SHA1(32c87f369475c7154fe3243d2c7be4a25444e530) )
+	ROM_LOAD( "7.8h",     0x1800, 0x0400, CRC(84656c97) SHA1(2180faa07dd5bc618c80ae033babfc1191a0b890) ) // standard label but different anyway?
+	ROM_LOAD( "8g128.9h", 0x1c00, 0x0400, CRC(7f48307c) SHA1(5929c131d790b0c8f9113730715531809c6840e2) )
+
+	ROM_REGION( 0x0400, "user1", 0 ) /* color map */ // population of this is optional, board runs as b&w without (this board didn't have it populated)
+	ROM_LOAD( "cosmicg9.bin", 0x0000, 0x0400, CRC(689c2c96) SHA1(ddfdc3fd29c56fdebd3b1c3443a7c39f567d5355) )
+ROM_END
+
+
 /* rom 9 not dumped according to readme? */
 ROM_START( magspot )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -1549,6 +1570,7 @@ DRIVER_INIT_MEMBER(cosmic_state,panic)
 
 
 GAME( 1979, cosmicg,  0,       cosmicg,  cosmicg, cosmic_state,  cosmicg, ROT270, "Universal", "Cosmic Guerilla", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1979, cosmicgi, cosmicg, cosmicg,  cosmicg, cosmic_state,  cosmicg, ROT270, "bootleg (Inder)", "Cosmic Guerilla (Spanish bootleg)", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1979, cosmica,  0,       cosmica,  cosmica, cosmic_state,  cosmica, ROT270, "Universal", "Cosmic Alien (version II)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1979, cosmica1, cosmica, cosmica,  cosmica, cosmic_state,  cosmica, ROT270, "Universal", "Cosmic Alien (first version)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1979, cosmica2, cosmica, cosmica,  cosmica, cosmic_state,  cosmica, ROT270, "Universal", "Cosmic Alien (early version II?)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

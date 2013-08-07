@@ -7513,7 +7513,7 @@ ROM_START( pajaroes ) // VERY similar to the asideral set
 	ROM_LOAD( "pe05.rom", 0x2000, 0x0800, CRC(cb461871) SHA1(3865f3b7f47f314a097dddfcc49929bb63afd4fc) )
 	ROM_LOAD( "pe04.rom", 0x2800, 0x0800, CRC(f157a8db) SHA1(75fa76d5dad149502c25d191053041a52dd1562e) )
 	ROM_LOAD( "pe03.rom", 0x3000, 0x0800, CRC(75085cb6) SHA1(92c4f375352685ec670b0aa96becce064c5d9bce) )
-	ROM_LOAD( "pe02.rom", 0x3800, 0x0800, BAD_DUMP CRC(797d45c7) SHA1(76fb8b45fcce3622c59c04af32cfa001ef7bf71d) ) // was missing, assuming it's the same as asideral for now
+	ROM_LOAD( "pe02.rom", 0x3800, 0x0800, CRC(797d45c7) SHA1(76fb8b45fcce3622c59c04af32cfa001ef7bf71d) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "pe07.rom",    0x0000, 0x0800, CRC(012941e0) SHA1(4f7ec4d95939cb7c4086bb7df43759ac504ae47c) )
