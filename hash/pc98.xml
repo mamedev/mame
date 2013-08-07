@@ -3251,7 +3251,7 @@ TODO:
 				<rom name="carat_a.fdi" size="1265664" crc="b5170cdf" sha1="d40bca585a3de046e8c77bf9dd7b62a5364dc5f1" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="carat_b.fdi" size="1265664" crc="67cd392c" sha1="48fcb06680d6933ac23e9da18f320e86e1e0c8ed" offset="0" />
 			</dataarea>
@@ -3318,7 +3318,7 @@ TODO:
 		</part>
 	</software>
 
-	<software name="carmensan">
+	<software name="carmensj">
 		<description>Carmen Sandiego in Japan - Hannin Sagashite Nihon Zenkoku</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -3343,7 +3343,7 @@ TODO:
 				<rom name="disk_1.fdi" size="1265664" crc="d7983b5f" sha1="c0f8818486365c68418d89b725b2a1ffc0eb5d66" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_2.fdi" size="1265664" crc="5a0e31ed" sha1="63996918733bd5a6ee8bbd3d1aa20289a2fa68f9" offset="0" />
 			</dataarea>
@@ -3750,7 +3750,7 @@ TODO:
 				<rom name="zoubbb_a.fdi" size="1265664" crc="8e1d4efb" sha1="b5b0c25e411146502f397a120af0d1e2eea2ee57" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="zoubbb_b.fdi" size="1265664" crc="eaa0a18e" sha1="c9e31fba1007ab24d9e05b8ba6f1f2c0e8ffa4ca" offset="0" />
 			</dataarea>
@@ -4825,7 +4825,7 @@ Presumably copy protection floppy, to be used with CD-Rom
 				<rom name="disk2.fdi" size="1265664" crc="c55ca0bb" sha1="a43b194c6706cdb6f371a54bdf9830bfb74b58a9" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk3.fdi" size="1265664" crc="f1eaf8bc" sha1="20c5f4ac8c3df6ac68eb23329c72da3156d62f76" offset="0" />
 			</dataarea>
@@ -4926,7 +4926,7 @@ Presumably copy protection floppy, to be used with CD-Rom
 				<rom name="rude breaker.fdi" size="1265664" crc="d67d099f" sha1="b44b087c0de4a293c4ea759433899c3d9c9b8604" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="runner's high.fdi" size="1265664" crc="63051378" sha1="f2c4a4bc96673d7632201ba16d1d2ff11f8e8955" offset="0" />
 			</dataarea>
@@ -6237,7 +6237,7 @@ TODO: missing install disks
 				<rom name="gendai daisenryaku ex (19xx)(system soft)(disk 1 of 2).fdi" size="1265664" crc="83465c26" sha1="95a149f3c4f9cbc787e76bd1407e93cd20bdb7b6" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="gendai daisenryaku ex (19xx)(system soft)(disk 2 of 2).fdi" size="1265664" crc="654a8aa0" sha1="e7bc58f81d98585bec8206f923eb8615b6977bca" offset="0" />
 			</dataarea>
@@ -8203,7 +8203,7 @@ TODO: other two disks, in .nfd format
 				<rom name="m1tank_a.fdi" size="1265664" crc="52b66a24" sha1="0d2433edb86de80cff48ba21443bc73995ad550e" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="m1tank_b.fdi" size="1265664" crc="4677c948" sha1="2df1d76751913f43ab724c2d52edb1fccac68a35" offset="0" />
 			</dataarea>
@@ -9343,7 +9343,7 @@ How to load this?
 				<rom name="mon mon gurafikku 1&amp;2 (j) a.fdi" size="1265664" crc="15b2fd3d" sha1="ac47529df49005a6b72965f97a114229ae91d4ef" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="mon mon gurafikku 1&amp;2 (j) b.fdi" size="1265664" crc="385af9c2" sha1="65ae65336bb842f9ac5b8d571a4e7dc08d17b14b" offset="0" />
 			</dataarea>
@@ -10328,7 +10328,7 @@ other two disks
 				<rom name="osioki21.fdi" size="1265664" crc="7de3cdac" sha1="3faf71ba4c8bd63117bba694b8a6132c264833a3" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="osioki22.fdi" size="1265664" crc="4c7b6bcf" sha1="78ff01efd688adbb8003a0ad8c938901fa6646dd" offset="0" />
 			</dataarea>
@@ -11787,7 +11787,7 @@ other two disks
 				<rom name="red_eye1.fdi" size="1265664" crc="c4dec388" sha1="cc6fcb21746c5157c382378a7ec8e8c7d96bc534" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="red_eye2.fdi" size="1265664" crc="2ed2815e" sha1="6b5e185e537d6d269728183e8170ba517a9416b8" offset="0" />
 			</dataarea>
@@ -12456,7 +12456,7 @@ other two disks
 				<rom name="sapfilea.fdi" size="1265664" crc="3a79df44" sha1="69303eeb1d75a24675dae017fecc62ebf77cd72f" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="sapfileb.fdi" size="1265664" crc="d4df7855" sha1="c9d1e1ea1d009ce053859205fcc9576dccb53425" offset="0" />
 			</dataarea>
@@ -13880,12 +13880,12 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
 				<rom name="disk_3.fdi" size="1265664" crc="d5b5e669" sha1="f38e6bdbc5316295a8b94e21c68ba3cec4960280" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop3" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_4.fdi" size="1265664" crc="27fda1bf" sha1="11d888f171184c4991046dc87b610838a126e737" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop4" interface="floppy_5_25">
+		<part name="flop5" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_5.fdi" size="1265664" crc="3b4a96ca" sha1="6bbfb07b0b4584930ea4ead09e969acb26b20f2c" offset="0" />
 			</dataarea>
@@ -14788,7 +14788,7 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
 				<rom name="1.fdi" size="1265664" crc="2be7d1c5" sha1="eefd01c588c1853e126e95c8ae74da7c8ced97d7" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="2.fdi" size="1265664" crc="51c388f9" sha1="d00fc841a1dd18f177aa54d962fad42c23fa10f7" offset="0" />
 			</dataarea>
@@ -15522,7 +15522,7 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
 				<rom name="disk_1.fdi" size="1265664" crc="106d2d5f" sha1="47a728add59f9740bd0af554bb590f2aa4848ac7" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_2.fdi" size="1265664" crc="197e1086" sha1="2800c3e766fa31455c457ef5ae977d8dc3090a98" offset="0" />
 			</dataarea>
@@ -15555,7 +15555,7 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
 				<rom name="wiz7_a.fdi" size="1265664" crc="ffab3284" sha1="ad3f73eae15e3fadf33fa988ae09ce4bcba514f5" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="wiz7_b.fdi" size="1265664" crc="9511bf65" sha1="9e90d37031491c39c1f66dd69a68eb768840a214" offset="0" />
 			</dataarea>
@@ -16320,7 +16320,7 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
 		</part>
 	</software>
 
-	<software name="albatro2m">
+	<software name="albatr2m">
 		<description>Albatross 2 Masters History</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
