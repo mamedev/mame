@@ -24,6 +24,7 @@ OBJDIRS += \
 	$(LIBOBJ)/lib7z \
 	$(LIBOBJ)/portmidi \
 	$(LIBOBJ)/lua \
+	$(LIBOBJ)/web \
 
 
 #-------------------------------------------------
@@ -485,3 +486,12 @@ endif
 $(LIBOBJ)/lua/%.o: $(LIBSRC)/lua/%.c | $(OSPREBUILD)
 	@echo Compiling $<...
 	$(CC) $(CDEFS) $(CCOMFLAGS) $(CONLYFLAGS) -DLUA_COMPAT_ALL $(LUA_FLAGS) -c $< -o $@
+
+#-------------------------------------------------
+# web library objects
+#-------------------------------------------------
+
+WEBOBJS = \
+	$(LIBOBJ)/web/mongoose.o \
+
+$(OBJ)/libweb.a: $(WEBOBJS)

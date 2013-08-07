@@ -84,7 +84,7 @@
 #include "crsshair.h"
 #include "validity.h"
 #include "debug/debugcon.h"
-
+#include "web/mongoose.h"
 #include <time.h>
 
 
@@ -145,6 +145,23 @@ int mame_execute(emu_options &options, osd_interface &osd)
 	if (options.verbose())
 		print_verbose = true;
 
+	struct mg_context *ctx = NULL;
+	struct mg_callbacks callbacks;
+
+	// List of options. Last element must be NULL.
+	const char *web_options[] = {
+		"listening_ports", options.http_port(), 
+		"document_root", options.http_path(),
+		NULL
+	};
+
+	// Prepare callbacks structure. 
+	memset(&callbacks, 0, sizeof(callbacks));
+
+	// Start the web server.
+	if (options.http())
+		ctx = mg_start(&callbacks, NULL, web_options);
+	
 	// loop across multiple hard resets
 	bool exit_pending = false;
 	int error = MAMERR_NONE;
@@ -203,6 +220,9 @@ int mame_execute(emu_options &options, osd_interface &osd)
 		global_machine = NULL;
 	}
 
+	// Stop the server.
+	if (options.http())
+		mg_stop(ctx);
 	// return an error
 	return error;
 }
