@@ -28,6 +28,8 @@ public:
 	DECLARE_READ8_MEMBER( vram_read );
 	DECLARE_WRITE8_MEMBER( vram_write );
 	
+	DECLARE_PALETTE_INIT(k1ge);
+	
 	void update( bitmap_ind16 &bitmap, const rectangle &cliprect );
 
 	// Static methods
@@ -39,7 +41,6 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();	
-	virtual void palette_init();
 
 	devcb2_write_line m_vblank_pin_w;
 	devcb2_write_line m_hblank_pin_w;
@@ -64,10 +65,9 @@ class k2ge_device : public k1ge_device
 {
 public:
 	k2ge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
+	
+	DECLARE_PALETTE_INIT(k2ge);
 protected:
-	virtual void palette_init();
-
 	virtual void draw(int line);
 
 	void draw_scroll_plane( UINT16 *p, UINT16 base, int line, int scroll_x, int scroll_y, UINT16 pal_base );

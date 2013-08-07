@@ -23,6 +23,8 @@ public:
 	asr733_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~asr733_device() { global_free(m_token); }
 
+	DECLARE_PALETTE_INIT(asr733);
+	
 	// access to legacy token
 	void *token() const { assert(m_token != NULL); return m_token; }
 protected:
@@ -30,7 +32,6 @@ protected:
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void palette_init();
 private:
 	// internal state
 	void *m_token;

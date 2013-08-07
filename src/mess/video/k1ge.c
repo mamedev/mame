@@ -11,7 +11,7 @@ used in the Neogeo pocket color.
 #include "k1ge.h"
 
 
-void k1ge_device::palette_init()
+PALETTE_INIT_MEMBER(k1ge_device, k1ge)
 {
 	int i;
 
@@ -24,7 +24,7 @@ void k1ge_device::palette_init()
 }
 
 
-void k2ge_device::palette_init()
+PALETTE_INIT_MEMBER(k2ge_device, k2ge)
 {
 	int r,g,b;
 

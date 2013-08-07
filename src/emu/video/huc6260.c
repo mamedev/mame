@@ -23,7 +23,7 @@
 #define HUC6260_HSYNC_START     ( HUC6260_WPF - HUC6260_HSYNC_LENGTH )
 
 
-void huc6260_device::palette_init()
+PALETTE_INIT_MEMBER(huc6260_device, huc6260)
 {
 	int i;
 

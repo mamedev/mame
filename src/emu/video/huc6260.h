@@ -51,6 +51,7 @@ public:
 	void video_update(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
+	DECLARE_PALETTE_INIT(huc6260);
 
 protected:
 	// device-level overrides
@@ -58,7 +59,6 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	virtual void palette_init();
 
 private:
 	int     m_last_h;

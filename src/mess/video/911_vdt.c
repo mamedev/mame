@@ -131,7 +131,7 @@ static TIMER_CALLBACK(beep_callback);
 /*
     Initialize vdt911 palette
 */
-void vdt911_device::palette_init()
+PALETTE_INIT_MEMBER(vdt911_device, vdt911)
 {
 	UINT8 i, r, g, b;
 

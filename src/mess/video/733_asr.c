@@ -93,7 +93,7 @@ GFXDECODE_START( asr733 )
 	GFXDECODE_ENTRY( asr733_chr_region, 0, fontlayout, 0, 1 )
 GFXDECODE_END
 
-void asr733_device::palette_init()
+PALETTE_INIT_MEMBER(asr733_device, asr733)
 {
 	palette_set_color(machine(),0,RGB_WHITE); /* white */
 	palette_set_color(machine(),1,RGB_BLACK); /* black */
