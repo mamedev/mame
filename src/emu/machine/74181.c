@@ -1,164 +1,146 @@
-/*
- * 74181
- *
- * 4-bit arithmetic Logic Unit
- *
- */
+/***************************************************************************
 
-#include "emu.h"
+    74181
+
+    4-Bit Arithmetic Logic Unit
+
+***************************************************************************/
+
 #include "74181.h"
 
 
+//**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
 
-#define TTL74181_MAX_CHIPS      (2)
-#define TTL74181_INPUT_TOTAL    (14)
-#define TTL74181_OUTPUT_TOTAL   (8)
+const device_type TTL74181 = &device_creator<ttl74181_device>;
 
 
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
 
-struct TTL74181_state
+//-------------------------------------------------
+//  ttl74181_device - constructor
+//-------------------------------------------------
+
+ttl74181_device::ttl74181_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, TTL74181, "TTL74181", tag, owner, clock, "ttl74181", __FILE__),
+	m_a(0),
+	m_b(0),
+	m_s(0),
+	m_m(0),
+	m_c(0)
 {
-	UINT8 inputs[TTL74181_INPUT_TOTAL];
-	UINT8 outputs[TTL74181_OUTPUT_TOTAL];
-	UINT8 dirty;
-};
+}
 
-static TTL74181_state chips[TTL74181_MAX_CHIPS];
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
 
-
-void TTL74181_config(running_machine &machine, int which, void *intf)
+void ttl74181_device::device_start()
 {
-	TTL74181_state *c;
+	// register for state saving
+	save_item(NAME(m_a));
+	save_item(NAME(m_b));
+	save_item(NAME(m_s));
+	save_item(NAME(m_m));
+	save_item(NAME(m_c));
+}
 
-	assert_always(machine.phase() == MACHINE_PHASE_INIT, "Can only call at init time!");
-	assert_always(intf == 0, "Interface must be NULL");
-	assert_always((which >= 0) && (which < TTL74181_MAX_CHIPS), "Exceeded maximum number of 74181 chips");
+//-------------------------------------------------
+//  device_post_load - called after loading a saved state
+//-------------------------------------------------
 
-	c = &chips[which];
-
-	c->dirty = 1;
-
-	state_save_register_item_array(machine, "TTL74181", NULL, which, c->inputs);
-	state_save_register_item_array(machine, "TTL74181", NULL, which, c->outputs);
-	state_save_register_item      (machine, "TTL74181", NULL, which, c->dirty);
+void ttl74181_device::device_post_load()
+{
+	// after loading a state re-initialize our output lines
+	update();
 }
 
 
-void TTL74181_reset(int which)
+//**************************************************************************
+//  ARITHMETHIC UNIT
+//**************************************************************************
+
+void ttl74181_device::update()
 {
-	/* nothing to do */
+	// inputs
+	int a0 = BIT(m_a, 0), a1 = BIT(m_a, 1), a2 = BIT(m_a, 2), a3 = BIT(m_a, 3);
+	int b0 = BIT(m_b, 0), b1 = BIT(m_b, 1), b2 = BIT(m_b, 2), b3 = BIT(m_b, 3);
+	int s0 = BIT(m_s, 0), s1 = BIT(m_s, 1), s2 = BIT(m_s, 2), s3 = BIT(m_s, 3);
+	int mp = !m_m;
+
+	// intermediate calculations
+	int ap0 = !(a0 | (b0 & s0) | (s1 & !b0));
+	int bp0 = !(((!b0) & s2 & a0) | (a0 & b0 & s3));
+	int ap1 = !(a1 | (b1 & s0) | (s1 & !b1));
+	int bp1 = !(((!b1) & s2 & a1) | (a1 & b1 & s3));
+	int ap2 = !(a2 | (b2 & s0) | (s1 & !b2));
+	int bp2 = !(((!b2) & s2 & a2) | (a2 & b2 & s3));
+	int ap3 = !(a3 | (b3 & s0) | (s1 & !b3));
+	int bp3 = !(((!b3) & s2 & a3) | (a3 & b3 & s3));
+
+	int fp0 = !(m_c & mp) ^ ((!ap0) & bp0);
+	int fp1 = (!((mp & ap0) | (mp & bp0 & m_c))) ^ ((!ap1) & bp1);
+	int fp2 = (!((mp & ap1) | (mp & ap0 & bp1) | (mp & m_c & bp0 & bp1))) ^ ((!ap2) & bp2);
+	int fp3 = (!((mp & ap2) | (mp & ap1 & bp2) | (mp & ap0 & bp1 & bp2) | (mp & m_c & bp0 & bp1 & bp2))) ^ ((!ap3) & bp3);
+
+	// outputs
+	m_f = fp0 | fp1 << 1 | fp2 << 2 | fp3 << 3;
+	m_equals = fp0 & fp1 & fp2 & fp3;
+	m_p = !(bp0 & bp1 & bp2 & bp3);
+	m_g = !((ap0 & bp1 & bp2 & bp3) | (ap1 & bp2 & bp3) | (ap2 & bp3) | ap3);
+	m_cn = (!(m_c & bp0 & bp1 & bp2 & bp3)) | m_g;
 }
 
-
-static void TTL74181_update(int which)
+void ttl74181_device::input_a_w(UINT8 data)
 {
-	TTL74181_state *c = &chips[which];
+	data &= 0x0f;
 
-	UINT8 a0 =  c->inputs[TTL74181_INPUT_A0];
-	UINT8 a1 =  c->inputs[TTL74181_INPUT_A1];
-	UINT8 a2 =  c->inputs[TTL74181_INPUT_A2];
-	UINT8 a3 =  c->inputs[TTL74181_INPUT_A3];
-
-	UINT8 b0 =  c->inputs[TTL74181_INPUT_B0];
-	UINT8 b1 =  c->inputs[TTL74181_INPUT_B1];
-	UINT8 b2 =  c->inputs[TTL74181_INPUT_B2];
-	UINT8 b3 =  c->inputs[TTL74181_INPUT_B3];
-
-	UINT8 s0 =  c->inputs[TTL74181_INPUT_S0];
-	UINT8 s1 =  c->inputs[TTL74181_INPUT_S1];
-	UINT8 s2 =  c->inputs[TTL74181_INPUT_S2];
-	UINT8 s3 =  c->inputs[TTL74181_INPUT_S3];
-
-	UINT8 cp =  c->inputs[TTL74181_INPUT_C];
-	UINT8 mp = !c->inputs[TTL74181_INPUT_M];
-
-	UINT8 ap0 = !(a0 | (b0 & s0) | (s1 & !b0));
-	UINT8 bp0 = !(((!b0) & s2 & a0) | (a0 & b0 & s3));
-	UINT8 ap1 = !(a1 | (b1 & s0) | (s1 & !b1));
-	UINT8 bp1 = !(((!b1) & s2 & a1) | (a1 & b1 & s3));
-	UINT8 ap2 = !(a2 | (b2 & s0) | (s1 & !b2));
-	UINT8 bp2 = !(((!b2) & s2 & a2) | (a2 & b2 & s3));
-	UINT8 ap3 = !(a3 | (b3 & s0) | (s1 & !b3));
-	UINT8 bp3 = !(((!b3) & s2 & a3) | (a3 & b3 & s3));
-
-	UINT8 fp0 = !(cp & mp) ^ ((!ap0) & bp0);
-	UINT8 fp1 = (!((mp & ap0) | (mp & bp0 & cp))) ^ ((!ap1) & bp1);
-	UINT8 fp2 = (!((mp & ap1) | (mp & ap0 & bp1) | (mp & cp & bp0 & bp1))) ^ ((!ap2) & bp2);
-	UINT8 fp3 = (!((mp & ap2) | (mp & ap1 & bp2) | (mp & ap0 & bp1 & bp2) | (mp & cp & bp0 & bp1 & bp2))) ^ ((!ap3) & bp3);
-
-	UINT8 aeqb = fp0 & fp1 & fp2 & fp3;
-	UINT8 pp = !(bp0 & bp1 & bp2 & bp3);
-	UINT8 gp = !((ap0 & bp1 & bp2 & bp3) | (ap1 & bp2 & bp3) | (ap2 & bp3) | ap3);
-	UINT8 cn4 = (!(cp & bp0 & bp1 & bp2 & bp3)) | gp;
-
-	c->outputs[TTL74181_OUTPUT_F0]   = fp0;
-	c->outputs[TTL74181_OUTPUT_F1]   = fp1;
-	c->outputs[TTL74181_OUTPUT_F2]   = fp2;
-	c->outputs[TTL74181_OUTPUT_F3]   = fp3;
-	c->outputs[TTL74181_OUTPUT_AEQB] = aeqb;
-	c->outputs[TTL74181_OUTPUT_P]    = pp;
-	c->outputs[TTL74181_OUTPUT_G]    = gp;
-	c->outputs[TTL74181_OUTPUT_CN4]  = cn4;
-}
-
-
-void TTL74181_write(int which, int startline, int lines, UINT8 data)
-{
-	int line;
-	TTL74181_state *c;
-
-	assert_always((which >= 0) && (which < TTL74181_MAX_CHIPS), "Chip index out of range");
-
-	c = &chips[which];
-
-	assert_always(c != NULL, "Invalid index - chip has not been configured");
-	assert_always(lines >= 1, "Must set at least one line");
-	assert_always(lines <= 4, "Can't set more than 4 lines at once");
-	assert_always((startline + lines) <= TTL74181_INPUT_TOTAL, "Input line index out of range");
-
-	for (line = 0; line < lines; line++)
+	if (m_a != data)
 	{
-		UINT8 input = (data >> line) & 0x01;
-
-		if (c->inputs[startline + line] != input)
-		{
-			c->inputs[startline + line] = input;
-
-			c->dirty = 1;
-		}
+		m_a = data;
+		update();
 	}
 }
 
-
-UINT8 TTL74181_read(int which, int startline, int lines)
+void ttl74181_device::input_b_w(UINT8 data)
 {
-	int line;
-	UINT8 data;
-	TTL74181_state *c;
+	data &= 0x0f;
 
-	assert_always((which >= 0) && (which < TTL74181_MAX_CHIPS), "Chip index out of range");
-
-	c = &chips[which];
-
-	assert_always(c != NULL, "Invalid index - chip has not been configured");
-	assert_always(lines >= 1, "Must read at least one line");
-	assert_always(lines <= 4, "Can't read more than 4 lines at once");
-	assert_always((startline + lines) <= TTL74181_OUTPUT_TOTAL, "Output line index out of range");
-
-	if (c->dirty)
+	if (m_b != data)
 	{
-		TTL74181_update(which);
-
-		c->dirty = 0;
+		m_b = data;
+		update();
 	}
+}
 
+void ttl74181_device::select_w(UINT8 data)
+{
+	m_s &= data & 0x0f;
 
-	data = 0;
-
-	for (line = 0; line < lines; line++)
+	if (m_s != data)
 	{
-		data = data | (c->outputs[startline + line] << line);
+		m_s = data;
+		update();
 	}
+}
 
-	return data;
+WRITE_LINE_MEMBER( ttl74181_device::mode_w )
+{
+	if (m_m != state)
+	{
+		m_m = state;
+		update();
+	}
+}
+
+WRITE_LINE_MEMBER( ttl74181_device::carry_w )
+{
+	if (m_c != state)
+	{
+		m_c = state;
+		update();
+	}
 }

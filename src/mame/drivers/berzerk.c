@@ -27,6 +27,8 @@ public:
 		m_colorram(*this, "colorram"),
 		m_maincpu(*this, "maincpu"),
 		m_s14001a(*this, "speech"),
+		m_ls181_10c(*this, "ls181_10c"),
+		m_ls181_12c(*this, "ls181_12c"),
 		m_custom(*this, "exidy") { }
 
 	required_shared_ptr<UINT8> m_videoram;
@@ -34,6 +36,8 @@ public:
 	
 	required_device<cpu_device> m_maincpu;
 	required_device<s14001a_device> m_s14001a;
+	required_device<ttl74181_device> m_ls181_10c;
+	required_device<ttl74181_device> m_ls181_12c;
 	required_device<exidy_sound_device> m_custom;
 		
 	UINT8 m_magicram_control;
@@ -360,17 +364,11 @@ void berzerk_state::machine_reset()
 
 #define NUM_PENS    (0x10)
 
-#define LS181_12C   (0)
-#define LS181_10C   (1)
-
 
 void berzerk_state::video_start()
 {
-	TTL74181_config(machine(), LS181_12C, 0);
-	TTL74181_write(LS181_12C, TTL74181_INPUT_M, 1, 1);
-
-	TTL74181_config(machine(), LS181_10C, 0);
-	TTL74181_write(LS181_10C, TTL74181_INPUT_M, 1, 1);
+	m_ls181_10c->mode_w(1);
+	m_ls181_12c->mode_w(1);
 }
 
 
@@ -395,15 +393,14 @@ WRITE8_MEMBER(berzerk_state::magicram_w)
 		m_intercept = 0;
 
 	/* perform ALU step */
-	TTL74181_write(LS181_12C, TTL74181_INPUT_A0, 4, shift_flop_output & 0x0f);
-	TTL74181_write(LS181_10C, TTL74181_INPUT_A0, 4, shift_flop_output >> 4);
-	TTL74181_write(LS181_12C, TTL74181_INPUT_B0, 4, current_video_data & 0x0f);
-	TTL74181_write(LS181_10C, TTL74181_INPUT_B0, 4, current_video_data >> 4);
-	TTL74181_write(LS181_12C, TTL74181_INPUT_S0, 4, m_magicram_control >> 4);
-	TTL74181_write(LS181_10C, TTL74181_INPUT_S0, 4, m_magicram_control >> 4);
+	m_ls181_12c->input_a_w(shift_flop_output >> 0);
+	m_ls181_10c->input_a_w(shift_flop_output >> 4);
+	m_ls181_12c->input_b_w(current_video_data >> 0);
+	m_ls181_10c->input_b_w(current_video_data >> 4);
+	m_ls181_12c->select_w(m_magicram_control >> 4);
+	m_ls181_10c->select_w(m_magicram_control >> 4);
 
-	alu_output = (TTL74181_read(LS181_10C, TTL74181_OUTPUT_F0, 4) << 4) |
-					(TTL74181_read(LS181_12C, TTL74181_OUTPUT_F0, 4) << 0);
+	alu_output = m_ls181_10c->function_r() << 4 | m_ls181_12c->function_r();
 
 	m_videoram[offset] = alu_output ^ 0xff;
 
@@ -1093,8 +1090,10 @@ static MACHINE_CONFIG_START( berzerk, berzerk_state )
 	MCFG_CPU_PROGRAM_MAP(berzerk_map)
 	MCFG_CPU_IO_MAP(berzerk_io_map)
 
-
 	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	MCFG_TTL74181_ADD("ls181_10c")
+	MCFG_TTL74181_ADD("ls181_12c")
 
 	/* video hardware */
 
