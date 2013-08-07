@@ -42,6 +42,7 @@ WRITE8_MEMBER( eti660_state::colorram_w )
 static ADDRESS_MAP_START( eti660_map, AS_PROGRAM, 8, eti660_state )
 	AM_RANGE(0x0000, 0x03ff) AM_ROM
 	AM_RANGE(0x0400, 0x0fff) AM_RAM
+	AM_RANGE(0x0c00, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( eti660_io_map, AS_IO, 8, eti660_state )
@@ -131,7 +132,7 @@ WRITE_LINE_MEMBER( eti660_state::q_w )
 
 WRITE8_MEMBER( eti660_state::dma_w )
 {
-	UINT8 colorram_offset = ((offset & 0xf8) >> 1) || (offset & 0x03);
+	UINT8 colorram_offset = ((offset & 0xf8) >> 1) | (offset & 0x03);
 
 	m_color = m_color_ram[colorram_offset];
 
@@ -265,4 +266,4 @@ ROM_START( eti660 )
 ROM_END
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        COMPANY                             FULLNAME                FLAGS */
-COMP( 1981, eti660,     0,      0,      eti660,     eti660, driver_device,      0,          "Electronics Today International",  "ETI-660 (Australia)",  GAME_NOT_WORKING )
+COMP( 1981, eti660,     0,      0,      eti660,     eti660, driver_device,      0,          "Electronics Today International",  "ETI-660",  GAME_NOT_WORKING )
