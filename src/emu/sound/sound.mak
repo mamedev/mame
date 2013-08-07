@@ -728,6 +728,15 @@ SOUNDOBJS += $(SOUNDOBJ)/tc8830f.o
 endif
 
 
+#-------------------------------------------------
+# NEC uPD7752 
+#@src/emu/sound/upd7752.h,SOUNDS += UPD7752
+#-------------------------------------------------
+
+ifneq ($(filter UPD7752,$(SOUNDS)),)
+SOUNDOBJS += $(SOUNDOBJ)/upd7752.o
+endif
+
 
 #-------------------------------------------------
 # VLM5030 speech synthesizer

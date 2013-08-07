@@ -128,6 +128,7 @@ irq vector 0x26:                                                                
 #include "machine/i8251.h"
 #include "video/mc6847.h"
 #include "sound/ay8910.h"
+#include "sound/upd7752.h"
 #include "sound/wave.h"
 
 #include "imagedev/cassette.h"
@@ -217,8 +218,6 @@ public:
 	DECLARE_WRITE8_MEMBER(pc6001m2_system_latch_w);
 	DECLARE_WRITE8_MEMBER(pc6001m2_vram_bank_w);
 	DECLARE_WRITE8_MEMBER(pc6001m2_col_bank_w);
-	DECLARE_READ8_MEMBER(upd7752_reg_r);
-	DECLARE_WRITE8_MEMBER(upd7752_reg_w);
 	DECLARE_WRITE8_MEMBER(pc6001m2_0xf3_w);
 	DECLARE_WRITE8_MEMBER(pc6001m2_timer_adj_w);
 	DECLARE_WRITE8_MEMBER(pc6001m2_timer_irqv_w);
@@ -1355,44 +1354,6 @@ WRITE8_MEMBER(pc6001_state::pc6001m2_col_bank_w)
 	m_bgcol_bank = (data & 7);
 }
 
-/* voice synth is a NEC uPD7752 sound chip (currently unemulated) */
-READ8_MEMBER(pc6001_state::upd7752_reg_r)
-{
-	switch(offset & 3)
-	{
-		//[0x00]: status register
-		//x--- ---- BSY busy status (1) processing (0) stopped
-		//-x-- ---- REQ audio parameter (1) input request (0) prohibited (???)
-		//--x- ---- ~INT / EXT message data (1) Outside (0) Inside
-		//---x ---- ERR error flag
-		case 0x00: return 0x60;
-		//[0x02]: port 0xe2 latch?
-		case 0x02: return 0xff;
-		//[0x03]: port 0xe3 latch?
-		case 0x03: return 0xff;
-	}
-	return 0xff;
-}
-
-WRITE8_MEMBER(pc6001_state::upd7752_reg_w)
-{
-	switch(offset & 3)
-	{
-		// [0x00]: audio parameter transfer
-
-		// [0x02]: mode set
-		// ---- -x-- Frame periodic analysis (0) 10 ms / frame (1) 20 ms / frame
-		// ---- --xx Utterance (tempo?) speed
-		//        00 : NORMAL SPEED
-		//        01 : SLOW SPEED
-		//        10 : FAST SPEED
-		//        11 : Setting prohibited
-
-		// case 0x02:
-
-		// case 0x03: command set
-	}
-}
 
 WRITE8_MEMBER(pc6001_state::pc6001m2_0xf3_w)
 {
@@ -1480,7 +1441,7 @@ static ADDRESS_MAP_START( pc6001m2_io , AS_IO, 8, pc6001_state )
 
 	AM_RANGE(0xd0, 0xd3) AM_MIRROR(0x0c) AM_NOP // disk device
 
-	AM_RANGE(0xe0, 0xe3) AM_MIRROR(0x0c) AM_READWRITE(upd7752_reg_r,upd7752_reg_w)
+	AM_RANGE(0xe0, 0xe3) AM_MIRROR(0x0c) AM_DEVREADWRITE("upd7752", upd7752_device, read, write)
 
 	AM_RANGE(0xf0, 0xf0) AM_READWRITE(pc6001m2_bank_r0_r,pc6001m2_bank_r0_w)
 	AM_RANGE(0xf1, 0xf1) AM_READWRITE(pc6001m2_bank_r1_r,pc6001m2_bank_r1_w)
@@ -1527,7 +1488,7 @@ static ADDRESS_MAP_START( pc6601_io , AS_IO, 8, pc6001_state )
 
 	AM_RANGE(0xd0, 0xdf) AM_READWRITE(pc6601_fdc_r,pc6601_fdc_w) // disk device
 
-	AM_RANGE(0xe0, 0xe3) AM_MIRROR(0x0c) AM_READWRITE(upd7752_reg_r,upd7752_reg_w)
+	AM_RANGE(0xe0, 0xe3) AM_MIRROR(0x0c) AM_DEVREADWRITE("upd7752", upd7752_device, read, write)
 
 	AM_RANGE(0xf0, 0xf0) AM_READWRITE(pc6001m2_bank_r0_r,pc6001m2_bank_r0_w)
 	AM_RANGE(0xf1, 0xf1) AM_READWRITE(pc6001m2_bank_r1_r,pc6001m2_bank_r1_w)
@@ -1731,7 +1692,7 @@ static ADDRESS_MAP_START( pc6001sr_io , AS_IO, 8, pc6001_state )
 
 	AM_RANGE(0xd0, 0xdf) AM_READWRITE(pc6601_fdc_r,pc6601_fdc_w) // disk device
 
-	AM_RANGE(0xe0, 0xe3) AM_MIRROR(0x0c) AM_READWRITE(upd7752_reg_r,upd7752_reg_w)
+	AM_RANGE(0xe0, 0xe3) AM_MIRROR(0x0c) AM_DEVREADWRITE("upd7752", upd7752_device, read, write)
 
 //  AM_RANGE(0xf0, 0xf0) AM_READWRITE(pc6001m2_bank_r0_r,pc6001m2_bank_r0_w)
 //  AM_RANGE(0xf1, 0xf1) AM_READWRITE(pc6001m2_bank_r1_r,pc6001m2_bank_r1_w)
@@ -2424,6 +2385,9 @@ static MACHINE_CONFIG_DERIVED( pc6001m2, pc6001 )
 	MCFG_CPU_IO_MAP(pc6001m2_io)
 
 	MCFG_GFXDECODE(pc6001m2)
+
+	MCFG_SOUND_ADD("upd7752", UPD7752, PC6001_MAIN_CLOCK/4)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 MACHINE_CONFIG_END
 
