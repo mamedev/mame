@@ -93,16 +93,49 @@ Notes:
 
 /*
 
+	Using the hard disk
+	-------------------
+
+	Use the chdman utility to create a Tandon TM501 (5MB) or CMI CM-5412 (10MB) hard disk image:
+
+    $ chdman createhd -chs 306,2,32 -ss 256 -o tm501.chd
+	$ chdman createhd -chs 306,4,32 -ss 256 -o cm5412.chd
+
+	Start the Visual 1050 emulator with the floppy and hard disk images mounted:
+
+	$ mess v1050 -flop1 cpm3:flop2 -hard cm5412.chd
+
+	Start the Winchester Format Program from the CP/M prompt:
+
+	A>fmtwinch
+
+	Enter Y to continue.
+	Ener A for 5MB, or B for 10MB hard disk.
+	Enter C to start formatting.
+
+	Once the formatting is complete, the CP/M system files need to be copied over to the hard disk:
+
+	A>copysys
+
+	Enter source drive name "a" and press RETURN.
+	Enter target drive name "c" and press RETURN.
+	Enter "y" at the prompt for CPM3.SYS.
+	Enter "y" at the prompt for CCP.COM.
+	Press RETURN to return to CP/M.
+
+	The hard disk can now be booted from with the following command line:
+
+	$ mess v1050 -hard cm5412.chd
+
+*/
+
+/*
+
     TODO:
 
-    - floppy broken
     - write to banked RAM at 0x0000-0x1fff when ROM is active
     - real keyboard w/i8049
     - keyboard beeper (NE555 wired in strange mix of astable/monostable modes)
-    - Winchester (Tandon TM501/CMI CM-5412 10MB drive on Xebec S1410 controller)
-
-        chdman createhd -chs 306,2,32 -ss 256 -o tm501.chd
-        chdman createhd -chs 306,4,32 -ss 256 -o cm5412.chd
 
 */
 
@@ -1145,4 +1178,4 @@ ROM_END
 // System Drivers
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY                     FULLNAME        FLAGS
-COMP( 1983, v1050,  0,      0,      v1050,  v1050, driver_device,   0,      "Visual Technology Inc",    "Visual 1050", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE | GAME_NO_SOUND | GAME_IMPERFECT_KEYBOARD )
+COMP( 1983, v1050,  0,      0,      v1050,  v1050, driver_device,   0,      "Visual Technology Inc",    "Visual 1050", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE | GAME_NO_SOUND | GAME_IMPERFECT_KEYBOARD )

@@ -35,7 +35,7 @@
     - pc8201 NEC PC-8241A video interface (TMS9918, 16K videoRAM, 8K ROM)
     - pc8201 NEC PC-8233 floppy controller
     - pc8201 NEC floppy disc drives (PC-8031-1W, PC-8031-2W, PC-80S31)
-    - trsm100 Tandy Portable Disk Drive (TPDD: 100k 3?", TPDD2: 200k 3?") (undumped HD63A01V1 MCU + full custom uPD65002, serial comms via the missing IM6042, not going to happen anytime soon)
+    - trsm100 Tandy Portable Disk Drive (TPDD: 100k 3?", TPDD2: 200k 3?") (undumped HD63A01V1 MCU + full custom uPD65002, serial comms via IM6042)
     - trsm100 Chipmunk disk drive (384k 3?") (full custom logic, not going to happen)
     - trsm100 RS232/modem select
     - tandy200 RTC alarm
@@ -162,7 +162,7 @@ WRITE8_MEMBER( pc8201_state::bank_w )
 	    7
 
 	*/
-
+printf("bank %02x\n",data);
 	bankswitch(data);
 }
 
@@ -732,6 +732,60 @@ static INPUT_PORTS_START( kc85 )
 	PORT_CONFNAME( 0x01, 0x01, "Battery Status" )
 	PORT_CONFSETTING( 0x01, DEF_STR( Normal ) )
 	PORT_CONFSETTING( 0x00, "Low Battery" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( pc8201 )
+	PORT_INCLUDE( kc85 )
+
+	PORT_MODIFY("Y3")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(']') PORT_CHAR('}')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('\\') PORT_CHAR('|')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('@') PORT_CHAR('^')
+
+	PORT_MODIFY("Y4")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('\'')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('&')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('"')
+
+	PORT_MODIFY("Y5")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("PAST INS") PORT_CODE(KEYCODE_INSERT) PORT_CHAR(UCHAR_MAMEKEY(INSERT))
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SPACE") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_RALT) PORT_CHAR('[') PORT_CHAR('{')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('=')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(':') PORT_CHAR('*')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR('+')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR('_')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR(')')
+
+	PORT_MODIFY("Y6")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("ESC") PORT_CODE(KEYCODE_ESC)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x92|") PORT_CODE(KEYCODE_TAB)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_RIGHT) PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_LEFT) PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_DOWN) PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_UP) PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("DEL BKSP") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
+
+	PORT_MODIFY("Y7")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("STOP") PORT_CODE(KEYCODE_F8) PORT_CHAR(UCHAR_MAMEKEY(F8))
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("f.5") PORT_CODE(KEYCODE_F5) PORT_CHAR(UCHAR_MAMEKEY(F5))
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("f.4") PORT_CODE(KEYCODE_F4) PORT_CHAR(UCHAR_MAMEKEY(F4))
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("f.3") PORT_CODE(KEYCODE_F3) PORT_CHAR(UCHAR_MAMEKEY(F3))
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("f.2") PORT_CODE(KEYCODE_F2) PORT_CHAR(UCHAR_MAMEKEY(F2))
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("f.1") PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1))
+
+	PORT_MODIFY("Y8")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CAPS LOCK") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pc8201a )
@@ -1403,6 +1457,12 @@ static MACHINE_CONFIG_START( pc8201, pc8201_state )
 	MCFG_RAM_EXTRA_OPTIONS("32K,64K,96K")
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( pc8300, pc8201 )
+	MCFG_RAM_MODIFY(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("32K")
+	MCFG_RAM_EXTRA_OPTIONS("64K,96K")
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_START( trsm100, trsm100_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(I8085_TAG, I8085A, XTAL_4_9152MHz)
@@ -1536,7 +1596,6 @@ ROM_START( npc8300 )
 	ROM_CART_LOAD("cart2", 0x0000, 0x20000, ROM_MIRROR | ROM_OPTIONAL)
 ROM_END
 
-
 ROM_START( trsm100 )
 	/*
 	    Board Code  ROM type            ROM Code            Comment
@@ -1583,13 +1642,14 @@ ROM_START( tandy200 )
 ROM_END
 
 /* System Drivers */
+
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    COMPANY                 FULLNAME */
-COMP( 1983, kc85,       0,      0,      kc85,       kc85, driver_device,        0,      "Kyosei",               "Kyotronic 85 (Japan)", 0 )
-COMP( 1983, m10,        kc85,   0,      kc85,       olivm10, driver_device, 0,      "Olivetti",             "M-10", 0 )
-//COMP( 1983, m10m,     kc85,   0,      kc85,       olivm10, driver_device,    0,      "Olivetti",             "M-10 Modem (US)", 0 )
-COMP( 1983, trsm100,    0,      0,      trsm100,    kc85, driver_device,        0,      "Tandy Radio Shack",    "TRS-80 Model 100", 0 )
-COMP( 1986, tandy102,   trsm100,0,      tandy102,   kc85, driver_device,        0,      "Tandy Radio Shack",    "Tandy 102", 0 )
-COMP( 1983, pc8201,     0,      0,      pc8201,     pc8201a, driver_device,    0,      "Nippon Electronic Company",                  "PC-8201 (Japan)", GAME_NOT_WORKING ) // keyboard layout wrong
-COMP( 1983, pc8201a,    pc8201, 0,      pc8201,     pc8201a, driver_device, 0,      "Nippon Electronic Company",                    "PC-8201A", 0 )
-COMP( 1987, npc8300,    pc8201, 0,      pc8201,     pc8201a, driver_device,    0,      "Nippon Electronic Company",                  "PC-8300", GAME_NOT_WORKING )
-COMP( 1984, tandy200,   0,      0,      tandy200,   kc85, driver_device,        0,      "Tandy Radio Shack",    "Tandy 200", 0 )
+COMP( 1983, kc85,       0,      0,      kc85,       kc85, 		driver_device, 0,      "Kyosei",               		"Kyotronic 85 (Japan)", 	0 )
+COMP( 1983, m10,        kc85,   0,      kc85,       olivm10, 	driver_device, 0,      "Olivetti",             		"M-10", 					0 )
+//COMP( 1983, m10m,     kc85,   0,      kc85,       olivm10, 	driver_device, 0,      "Olivetti",             		"M-10 Modem (US)", 			0 )
+COMP( 1983, trsm100,    0,      0,      trsm100,    kc85, 		driver_device, 0,      "Tandy Radio Shack",    		"TRS-80 Model 100", 		0 )
+COMP( 1986, tandy102,   trsm100,0,      tandy102,   kc85, 		driver_device, 0,      "Tandy Radio Shack",    		"Tandy 102", 				0 )
+COMP( 1983, pc8201,     0,      0,      pc8201,     pc8201, 	driver_device, 0,      "Nippon Electronic Company", "PC-8201 (Japan)", 			GAME_NOT_WORKING ) // keyboard layout wrong
+COMP( 1983, pc8201a,    pc8201, 0,      pc8201,     pc8201a, 	driver_device, 0,      "Nippon Electronic Company", "PC-8201A", 				0 )
+COMP( 1987, npc8300,    pc8201, 0,      pc8300,     pc8201a, 	driver_device, 0,      "Nippon Electronic Company", "PC-8300", 					GAME_NOT_WORKING )
+COMP( 1984, tandy200,   0,      0,      tandy200,   kc85, 		driver_device, 0,      "Tandy Radio Shack",    		"Tandy 200", 				0 )

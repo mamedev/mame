@@ -666,18 +666,10 @@ ADDRESS_MAP_END
 
 INPUT_PORTS_START( bullet )
 	PORT_START("SW1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW1:1")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW1:2")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW1:3")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW1:4")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x01, IP_ACTIVE_LOW, "SW1:1" )
+	PORT_DIPUNUSED_DIPLOC( 0x02, IP_ACTIVE_LOW, "SW1:2" )
+	PORT_DIPUNUSED_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW1:3" )
+	PORT_DIPUNUSED_DIPLOC( 0x08, IP_ACTIVE_LOW, "SW1:4" )
 	PORT_DIPNAME( 0xf0, 0x50, "Floppy Type" ) PORT_DIPLOCATION("SW1:5,6,7,8")
 	PORT_DIPSETTING(    0xf0, "5.25\" SD" )
 	PORT_DIPSETTING(    0x50, "5.25\" DD" )
@@ -695,12 +687,8 @@ INPUT_PORTS_START( bulletf )
 	PORT_DIPNAME( 0x01, 0x01, "SCSI Bus Termination" ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW1:2")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW1:3")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x02, IP_ACTIVE_LOW, "SW1:2" )
+	PORT_DIPUNUSED_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW1:3" )
 	PORT_DIPNAME( 0x08, 0x08, "Boot ROM Device" ) PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x00, "Onboard" )
 	PORT_DIPSETTING(    0x08, "EPROM" )
@@ -742,10 +730,10 @@ WRITE_LINE_MEMBER( bullet_state::dart_rxtxca_w )
 
 static Z80CTC_INTERFACE( ctc_intf )
 {
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),     // interrupt handler
-	DEVCB_DRIVER_LINE_MEMBER(bullet_state, dart_rxtxca_w),      // ZC/TO0 callback
-	DEVCB_DEVICE_LINE_MEMBER(Z80DART_TAG, z80dart_device, rxtxcb_w),   // ZC/TO1 callback
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, z80ctc_device, trg3)                          // ZC/TO2 callback
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
+	DEVCB_DRIVER_LINE_MEMBER(bullet_state, dart_rxtxca_w),
+	DEVCB_DEVICE_LINE_MEMBER(Z80DART_TAG, z80dart_device, rxtxcb_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, z80ctc_device, trg3)
 };
 
 
@@ -849,16 +837,13 @@ WRITE8_MEMBER( bullet_state::dma_mreq_w )
 
 READ8_MEMBER(bullet_state::io_read_byte)
 {
-	address_space& prog_space = m_maincpu->space(AS_IO);
-	return prog_space.read_byte(offset);
+	return m_maincpu->space(AS_IO).read_byte(offset);
 }
 
 WRITE8_MEMBER(bullet_state::io_write_byte)
 {
-	address_space& prog_space = m_maincpu->space(AS_IO);
-	return prog_space.write_byte(offset, data);
+	m_maincpu->space(AS_IO).write_byte(offset, data);
 }
-
 
 static Z80DMA_INTERFACE( dma_intf )
 {
@@ -882,7 +867,7 @@ void bulletf_state::update_dma_rdy()
 
 	if (BIT(m_xdma0, 0))
 	{
-		rdy = m_wack | m_wrdy;
+		rdy = m_wack || m_wrdy;
 	}
 	else
 	{
@@ -937,16 +922,10 @@ READ8_MEMBER( bullet_state::pio_pb_r )
 
 	UINT8 data = 0;
 
-	// centronics busy
+	// centronics
 	data |= m_centronics->busy_r();
-
-	// centronics paper end
 	data |= m_centronics->pe_r() << 1;
-
-	// centronics selected
 	data |= m_centronics->vcc_r() << 2;
-
-	// centronics fault
 	data |= m_centronics->fault_r() << 3;
 
 	return data;

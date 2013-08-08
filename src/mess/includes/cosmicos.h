@@ -3,7 +3,6 @@
 #ifndef __COSMICOS__
 #define __COSMICOS__
 
-
 #include "emu.h"
 #include "cpu/cosmac/cosmac.h"
 #include "imagedev/cassette.h"
@@ -76,6 +75,8 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ8_MEMBER( video_off_r );
 	DECLARE_READ8_MEMBER( video_on_r );
 	DECLARE_WRITE8_MEMBER( audio_latch_w );
@@ -105,13 +106,11 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER( clear_data );
 	DECLARE_INPUT_CHANGED_MEMBER( memory_protect );
 	DECLARE_INPUT_CHANGED_MEMBER( memory_disable );
-	DECLARE_DIRECT_UPDATE_MEMBER(cosmicos_direct_update_handler);
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER( cosmicos );
 
 	void set_cdp1802_mode(int mode);
 	void clear_input_data();
-	void set_ram_mode();
 
 	/* CPU state */
 	int m_wait;

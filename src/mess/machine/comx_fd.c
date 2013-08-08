@@ -42,6 +42,14 @@ Notes:
 
 */
 
+/*
+
+	TODO:
+
+	- floppy broken (wd1770 digital PLL FM mode incomplete)
+
+*/
+
 #include "comx_fd.h"
 
 

@@ -21,7 +21,6 @@
 
     TODO:
 
-    - fix direct update handler to make system work again
     - display interface INH
     - 2 segment display
     - single step
@@ -44,6 +43,42 @@ enum
 };
 
 /* Read/Write Handlers */
+
+READ8_MEMBER( cosmicos_state::read )
+{
+	if (m_boot) offset |= 0xc0c0;
+
+	UINT8 data = 0;
+
+	if (offset < 0xc000)
+	{
+		// TODO
+	}
+	else if (offset < 0xd000)
+	{
+		data = m_rom->base()[offset & 0xfff];
+	}
+	else if (!m_ram_disable && (offset >= 0xff00))
+	{
+		data = m_ram->pointer()[offset & 0xff];
+	}
+
+	return data;
+}
+
+WRITE8_MEMBER( cosmicos_state::write )
+{
+	if (m_boot) offset |= 0xc0c0;
+	
+	if (offset < 0xc000)
+	{
+		// TODO
+	}
+	else if (!m_ram_disable && !m_ram_protect && (offset >= 0xff00))
+	{
+		m_ram->pointer()[offset & 0xff] = data;
+	}	
+}
 
 READ8_MEMBER( cosmicos_state::video_off_r )
 {
@@ -138,9 +173,7 @@ WRITE8_MEMBER( cosmicos_state::display_w )
 /* Memory Maps */
 
 static ADDRESS_MAP_START( cosmicos_mem, AS_PROGRAM, 8, cosmicos_state )
-	AM_RANGE(0x0000, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xcfff) AM_ROM AM_REGION(CDP1802_TAG, 0)
-	AM_RANGE(0xff00, 0xffff) AM_RAM
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cosmicos_io, AS_IO, 8, cosmicos_state )
@@ -249,40 +282,14 @@ INPUT_CHANGED_MEMBER( cosmicos_state::clear_data )
 	clear_input_data();
 }
 
-void cosmicos_state::set_ram_mode()
-{
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-	UINT8 *ram = m_ram->pointer();
-
-	if (m_ram_disable)
-	{
-		program.unmap_readwrite(0xff00, 0xffff);
-	}
-	else
-	{
-		if (m_ram_protect)
-		{
-			program.install_rom(0xff00, 0xffff, ram);
-		}
-		else
-		{
-			program.install_ram(0xff00, 0xffff, ram);
-		}
-	}
-}
-
 INPUT_CHANGED_MEMBER( cosmicos_state::memory_protect )
 {
 	m_ram_protect = newval;
-
-	set_ram_mode();
 }
 
 INPUT_CHANGED_MEMBER( cosmicos_state::memory_disable )
 {
 	m_ram_disable = newval;
-
-	set_ram_mode();
 }
 
 static INPUT_PORTS_START( cosmicos )
@@ -463,24 +470,8 @@ static COSMAC_INTERFACE( cosmicos_config )
 
 void cosmicos_state::machine_start()
 {
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-
 	/* initialize LED display */
 	m_led->rbi_w(1);
-
-	/* setup memory banking */
-	switch (m_ram->size())
-	{
-	case 256:
-		program.unmap_readwrite(0x0000, 0xbfff);
-		break;
-
-	case 4*1024:
-		program.unmap_readwrite(0x1000, 0xbfff);
-		break;
-	}
-
-	set_ram_mode();
 
 	// find keyboard rows
 	m_key_row[0] = m_y1;
@@ -592,22 +583,5 @@ ROM_END
 
 /* System Drivers */
 
-DIRECT_UPDATE_MEMBER(cosmicos_state::cosmicos_direct_update_handler)
-{
-	if (m_boot)
-	{
-		/* force A6 and A7 high */
-		direct.explicit_configure(0x0000, 0xffff, 0x3f3f, m_rom->base() + 0xc0);
-		return ~0;
-	}
-
-	return address;
-}
-
-DRIVER_INIT_MEMBER(cosmicos_state,cosmicos)
-{
-	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(cosmicos_state::cosmicos_direct_update_handler), this));
-}
-
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        COMPANY             FULLNAME    FLAGS */
-COMP( 1979, cosmicos,   0,      0,      cosmicos,   cosmicos, cosmicos_state,   cosmicos,   "Radio Bulletin",   "Cosmicos", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
+COMP( 1979, cosmicos,   0,      0,      cosmicos,   cosmicos, driver_device,   0,   "Radio Bulletin",   "Cosmicos", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )

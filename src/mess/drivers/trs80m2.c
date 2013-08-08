@@ -10,7 +10,7 @@
 
     TODO:
 
-    - floppy broken
+    - CP/M won't load prompt (z80dma_do_operation: invalid mode 0 when reading track 0)
     - keyboard CPU ROM
     - graphics board
     - Tandy 6000 HD
@@ -141,9 +141,6 @@ WRITE8_MEMBER( trs80m2_state::drvslt_w )
 	{
 		// side select
 		m_floppy->ss_w(!BIT(data, 6));
-
-		// motor
-		m_floppy->mon_w(0);
 	}
 
 	// FM/MFM
@@ -843,8 +840,8 @@ static MACHINE_CONFIG_START( trs80m2, trs80m2_state )
 
 	// internal RAM
 	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("32K")
-	MCFG_RAM_EXTRA_OPTIONS("64K,96K,128K,160K,192K,224K,256K,288K,320K,352K,384K,416K,448K,480K,512K")
+	MCFG_RAM_DEFAULT_SIZE("64K")
+	MCFG_RAM_EXTRA_OPTIONS("32K,96K,128K,160K,192K,224K,256K,288K,320K,352K,384K,416K,448K,480K,512K")
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "trs80m2")
@@ -884,7 +881,7 @@ static MACHINE_CONFIG_START( trs80m16, trs80m16_state )
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_8MHz/2, pio_intf)
 	MCFG_Z80SIO0_ADD(Z80SIO_TAG, XTAL_8MHz/2, sio_intf)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
-	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":0", trs80m2_floppies, "8ssdd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":0", trs80m2_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":1", trs80m2_floppies, NULL,    floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":2", trs80m2_floppies, NULL,    floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":3", trs80m2_floppies, NULL,    floppy_image_device::default_floppy_formats)
@@ -977,8 +974,8 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT     COMPANY             FULLNAME        FLAGS
-COMP( 1979, trs80m2,    0,          0,      trs80m2,    trs80m2, driver_device,     0,      "Tandy Radio Shack",    "TRS-80 Model II",  GAME_NO_SOUND_HW | GAME_NOT_WORKING | GAME_IMPERFECT_KEYBOARD )
-COMP( 1982, trs80m16,   trs80m2,    0,      trs80m16,   trs80m2, driver_device,     0,      "Tandy Radio Shack",    "TRS-80 Model 16",  GAME_NO_SOUND_HW | GAME_NOT_WORKING | GAME_IMPERFECT_KEYBOARD )
-//COMP( 1983, trs80m12, trs80m2,    0,      trs80m16,   trs80m2, driver_device,     0,      "Tandy Radio Shack",    "TRS-80 Model 12",  GAME_NO_SOUND_HW | GAME_NOT_WORKING | GAME_IMPERFECT_KEYBOARD )
-//COMP( 1984, trs80m16b,trs80m2,    0,      trs80m16,   trs80m2, driver_device,     0,      "Tandy Radio Shack",    "TRS-80 Model 16B", GAME_NO_SOUND_HW | GAME_NOT_WORKING | GAME_IMPERFECT_KEYBOARD )
-//COMP( 1985, tandy6k,  trs80m2,    0,      tandy6k,    trs80m2, driver_device,     0,      "Tandy Radio Shack",    "Tandy 6000 HD",    GAME_NO_SOUND_HW | GAME_NOT_WORKING | GAME_IMPERFECT_KEYBOARD )
+COMP( 1979, trs80m2,    0,          0,      trs80m2,    trs80m2, driver_device,     0,      "Tandy Radio Shack",    "TRS-80 Model II",  GAME_NO_SOUND_HW | GAME_IMPERFECT_KEYBOARD )
+COMP( 1982, trs80m16,   trs80m2,    0,      trs80m16,   trs80m2, driver_device,     0,      "Tandy Radio Shack",    "TRS-80 Model 16",  GAME_NOT_WORKING | GAME_NO_SOUND_HW | GAME_IMPERFECT_KEYBOARD )
+//COMP( 1983, trs80m12, trs80m2,    0,      trs80m16,   trs80m2, driver_device,     0,      "Tandy Radio Shack",    "TRS-80 Model 12",  GAME_NOT_WORKING | GAME_NO_SOUND_HW | GAME_IMPERFECT_KEYBOARD )
+//COMP( 1984, trs80m16b,trs80m2,    0,      trs80m16,   trs80m2, driver_device,     0,      "Tandy Radio Shack",    "TRS-80 Model 16B", GAME_NOT_WORKING | GAME_NO_SOUND_HW | GAME_IMPERFECT_KEYBOARD )
+//COMP( 1985, tandy6k,  trs80m2,    0,      tandy6k,    trs80m2, driver_device,     0,      "Tandy Radio Shack",    "Tandy 6000 HD",    GAME_NOT_WORKING | GAME_NO_SOUND_HW | GAME_IMPERFECT_KEYBOARD )
