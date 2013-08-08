@@ -530,15 +530,15 @@ MICROPROGRAM(divide_signed_mp)
 {
 	OPERAND_ADDR,           // Address of divisor S in Q=W1W2/S
 	MEMORY_READ,            // Get S
-	ALU_DIV,
+	ALU_DIVS,
 	MEMORY_READ,            // Get W1
-	ALU_DIV,                //
+	ALU_DIVS,               //
 	MEMORY_READ,            // Get W2
-	ALU_DIV,                // Check for overflow, skip next instruction if not
+	ALU_DIVS,               // Check for overflow, skip next instruction if not
 	ABORT,
-	ALU_DIV,                // Calculate quotient
+	ALU_DIVS,               // Calculate quotient
 	MEMORY_WRITE,           // Write quotient to &W1
-	ALU_DIV,
+	ALU_DIVS,
 	PREFETCH,
 	MEMORY_WRITE,           // Write remainder to &W2
 	END
@@ -1218,9 +1218,16 @@ void tms9995_device::set_ready(int state)
 	m_ready_state = (state==ASSERT_LINE);
 }
 
+/*
+    When the divide operations fail, we get to this operation.
+*/
 void tms9995_device::abort_operation()
 {
-	command_completed();
+	int_prefetch_and_decode(); // do not forget to prefetch
+	// And don't forget that prefetch is a 2-pass operation, so this method
+	// will be called a second time. Only when the lowbyte has been fetched,
+	// continue with the next step
+	if (!m_lowbyte) command_completed();
 }
 
 /*
@@ -2384,8 +2391,9 @@ void tms9995_device::alu_divide_signed()
 {
 	int n=1;
 	bool overflow = true;
-	UINT16 w1, w2, d;
-	INT32 w;
+	UINT16 w1, w2, dwait;
+	INT16 divisor;
+	INT32 dividend;
 
 	switch (m_instruction->state)
 	{
@@ -2406,93 +2414,59 @@ void tms9995_device::alu_divide_signed()
 
 		w1 = m_value_copy;
 		w2 = m_current_value;
-		d = m_source_value;
+		divisor = m_source_value;
+		dividend = w1 << 16 | w2;
 
 		// Now check for overflow
-		// Seems a bit complex, and don't ask me how they did it in the chip.
-		// The basic idea is that the division of a 32-bit number by a 16-bit
-		// number must result in a 16-bit quotient and a remainder, AND the
-		// quotient must have positive sign when the signs of the dividend and
-		// the divisor are equal. When any of these conditions are not met, an
-		// overflow is indicated.
-
-		// Unlike with the unsigned division we cannot tell whether we will
-		// run into an overflow before we have the complete dividend value.
-		// It might be easier to just try and divide, but the real machine
-		// requires much less cycles when there is an overflow, so it seems as
-		// if this is tested before the algorithm starts.
-
-		if ((w1 & 0x8000)==0)       // positive dividend
+		// We need to go for four cases
+		// if the divisor is not 0 anyway
+		if (divisor != 0)
 		{
-			if ((d & 0x8000)==0)    // positive divisor
+			if (dividend >= 0)
 			{
-				if ((d & 1)==0)     // even divisor
+				if (divisor > 0)
 				{
-					if (w1 < d/2) overflow = false;
+					overflow = (dividend > ((divisor<<15) - 1));
 				}
-				else                // odd divisor
+				else
 				{
-					if ((w1 < (d-1)/2) || (w1 == (d-1)/2 && w2 < 0x8000)) overflow = false;
+					overflow = (dividend > (((-divisor)<<15) + (-divisor) - 1));
 				}
 			}
-			else                    // negative divisor
+			else
 			{
-				d = -d;
-				if ((d & 1)==0)     // even divisor
+				if (divisor > 0)
 				{
-					if ((w1 < d/2) || (w1 == d/2 && w2 < d)) overflow = false;
+					overflow = ((-dividend) > ((divisor<<15) + divisor - 1));
 				}
-				else                // odd divisor
+				else
 				{
-					if ((w1 < (d+1)/2) || (w1 == (d+1)/2 && w2 < 0x8000+d)) overflow = false;
+					overflow = ((-dividend) > (((-divisor)<<15) - 1));
 				}
 			}
 		}
-		else                        // negative dividend
+		else
 		{
-			w1 = -w1;
-			if ((d & 0x8000)==0)    // positive divisor
-			{
-				if ((d & 1)==0)     // even divisor
-				{
-					if ((w1 < d/2+1) || (w1 == d/2+1 && w2 > (-d))) overflow = false;
-				}
-				else                // odd divisor
-				{
-					if ((w1 < (d+1)/2) || (w1 == (d+1)/2 && w2 > 0x8000-d)) overflow = false;
-				}
-			}
-			else                    // negative divisor
-			{
-				d = -d;
-				if ((d & 1)==0)     // even divisor
-				{
-					if ((w1 < d/2) || (w1 == d/2 && w2 > 0)) overflow = false;
-				}
-				else                // odd divisor
-				{
-					if ((w1 < (d+1)/2) || (w1 == (d+1)/2 && w2 > 0x8000)) overflow = false;
-				}
-			}
+			overflow = true; // divisor is 0
 		}
 		set_status_bit(ST_OV, overflow);
 		if (!overflow) MPC++;       // Skip the next microinstruction when there is no overflow
 		break;
 	case 3:
 		// We are here because there was no overflow
-		w = (m_value_copy << 16) |  m_current_value;
+		dividend = m_value_copy << 16 | m_current_value;
 		// Do the calculation
-		m_current_value =  (UINT16)(w / (INT16)m_source_value);
-		m_value_copy = (UINT16)(w % (INT16)m_source_value);
+		m_current_value =  (UINT16)(dividend / (INT16)m_source_value);
+		m_value_copy = (UINT16)(dividend % (INT16)m_source_value);
 		m_address = WP;
 
 		// As we have not implemented the real division algorithm we must
 		// simulate the number of steps required for calculating the result.
 		// This is just a guess.
-		d = m_value_copy;
-		while (d != 0)
+		dwait = m_value_copy;
+		while (dwait != 0)
 		{
-			d = (d >> 1) & 0xffff;
+			dwait = (dwait >> 1) & 0xffff;
 			n++;
 		}
 		// go write the quotient into R0
