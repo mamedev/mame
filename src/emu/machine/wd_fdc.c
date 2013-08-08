@@ -121,7 +121,8 @@ void wd_fdc_t::set_floppy(floppy_image_device *_floppy)
 	int prev_ready = floppy ? floppy->ready_r() : 1;
 
 	if(floppy) {
-		floppy->mon_w(1);
+		if(motor_control)
+			floppy->mon_w(1);
 		floppy->setup_index_pulse_cb(floppy_image_device::index_pulse_cb());
 		floppy->setup_ready_cb(floppy_image_device::ready_cb());
 	}
