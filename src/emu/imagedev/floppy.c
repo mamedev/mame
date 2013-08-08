@@ -1467,7 +1467,7 @@ void floppy_8_dsdd::handled_variants(UINT32 *variants, int &var_count) const
 //-------------------------------------------------
 
 sony_oa_d31v::sony_oa_d31v(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	floppy_image_device(mconfig, SONY_OA_D31V, "Sony OA-D31V Micro Floppydisk Drive ", tag, owner, clock, "sony_oa_d31v", __FILE__)
+	floppy_image_device(mconfig, SONY_OA_D31V, "Sony OA-D31V Micro Floppydisk Drive", tag, owner, clock, "sony_oa_d31v", __FILE__)
 {
 }
 
@@ -1502,7 +1502,7 @@ void sony_oa_d31v::handled_variants(UINT32 *variants, int &var_count) const
 //-------------------------------------------------
 
 sony_oa_d32w::sony_oa_d32w(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	floppy_image_device(mconfig, SONY_OA_D32W, "Sony OA-D32W Micro Floppydisk Drive ", tag, owner, clock, "sony_oa_d32w", __FILE__)
+	floppy_image_device(mconfig, SONY_OA_D32W, "Sony OA-D32W Micro Floppydisk Drive", tag, owner, clock, "sony_oa_d32w", __FILE__)
 {
 }
 
@@ -1538,7 +1538,7 @@ void sony_oa_d32w::handled_variants(UINT32 *variants, int &var_count) const
 //-------------------------------------------------
 
 sony_oa_d32v::sony_oa_d32v(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	floppy_image_device(mconfig, SONY_OA_D32V, "Sony OA-D32V Micro Floppydisk Drive ", tag, owner, clock, "sony_oa_d32v", __FILE__)
+	floppy_image_device(mconfig, SONY_OA_D32V, "Sony OA-D32V Micro Floppydisk Drive", tag, owner, clock, "sony_oa_d32v", __FILE__)
 {
 }
 

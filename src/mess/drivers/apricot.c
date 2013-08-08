@@ -16,7 +16,7 @@
 #include "machine/z80dart.h"
 #include "machine/serial.h"
 #include "machine/ctronics.h"
-#include "machine/wd17xx.h"
+#include "machine/wd_fdc.h"
 #include "video/mc6845.h"
 #include "sound/sn76496.h"
 #include "imagedev/flopdrv.h"
@@ -43,6 +43,8 @@ public:
 	m_rs232(*this, "rs232"),
 	m_centronics(*this, "centronics"),
 	m_fdc(*this, "ic68"),
+	m_floppy0(*this, "ic68:0"),
+	m_floppy1(*this, "ic68:1"),
 	m_screen_buffer(*this, "screen_buffer"),
 	m_data_selector_dtr(1),
 	m_data_selector_rts(1),
@@ -61,7 +63,9 @@ public:
 	required_device<z80sio0_device> m_sio;
 	required_device<rs232_port_device> m_rs232;
 	required_device<centronics_device> m_centronics;
-	required_device<wd2793_device> m_fdc;
+	required_device<wd2793_t> m_fdc;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
 
 	required_shared_ptr<UINT16> m_screen_buffer;
 
@@ -69,8 +73,8 @@ public:
 	DECLARE_WRITE8_MEMBER( apricot_sysctrl_w );
 	DECLARE_WRITE_LINE_MEMBER( timer_out1 );
 	DECLARE_WRITE_LINE_MEMBER( timer_out2 );
-	DECLARE_WRITE_LINE_MEMBER( apricot_wd2793_intrq_w );
-	DECLARE_WRITE_LINE_MEMBER( apricot_wd2793_drq_w );
+	void wd2793_intrq_w(bool state);
+	void wd2793_drq_w(bool state);
 	DECLARE_WRITE_LINE_MEMBER( apricot_mc6845_de ) { m_display_enabled = state; };
 
 	DECLARE_WRITE_LINE_MEMBER( data_selector_dtr_w ) { m_data_selector_dtr = state; };
@@ -109,7 +113,9 @@ WRITE8_MEMBER( apricot_state::apricot_sysctrl_w )
 {
 	m_display_on = BIT(data, 3);
 	m_video_mode = BIT(data, 4);
-	if (!BIT(data, 5)) wd17xx_set_drive(m_fdc, BIT(data, 6));
+
+	if (!BIT(data, 5))
+		m_fdc->set_floppy(BIT(data, 6) ? m_floppy1->get_device() : m_floppy0->get_device());
 
 	/* switch video modes */
 	m_crtc->set_clock( m_video_mode ? XTAL_15MHz / 10 : XTAL_15MHz / 16);
@@ -208,49 +214,21 @@ static const centronics_interface apricot_centronics_intf =
     FLOPPY
 ***************************************************************************/
 
-WRITE_LINE_MEMBER( apricot_state::apricot_wd2793_intrq_w )
+void apricot_state::wd2793_intrq_w(bool state)
 {
 	m_pic->ir4_w(state);
 //  i8089 external terminate channel 1
 }
 
-WRITE_LINE_MEMBER( apricot_state::apricot_wd2793_drq_w )
+void apricot_state::wd2793_drq_w(bool state)
 {
 //  i8089 data request channel 1
 }
 
-static const wd17xx_interface apricot_wd17xx_intf =
-{
-	DEVCB_LINE_GND,
-	DEVCB_DRIVER_LINE_MEMBER(apricot_state, apricot_wd2793_intrq_w),
-	DEVCB_DRIVER_LINE_MEMBER(apricot_state, apricot_wd2793_drq_w),
-	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
-};
-
-static LEGACY_FLOPPY_OPTIONS_START( apricot )
-	LEGACY_FLOPPY_OPTION
-	(
-		apridisk, "dsk", "ACT Apricot disk image", apridisk_identify, apridisk_construct, NULL,
-		HEADS(1-[2])
-		TRACKS(70/[80])
-		SECTORS([9]/18)
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([1])
-	)
-LEGACY_FLOPPY_OPTIONS_END
-
-static const floppy_interface apricot_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_3_5_DSDD,
-	LEGACY_FLOPPY_OPTIONS_NAME(apricot),
-	"floppy_3_5",
-	NULL
-};
+static SLOT_INTERFACE_START( apricot_floppies )
+	SLOT_INTERFACE( "d31v", SONY_OA_D31V )
+	SLOT_INTERFACE( "d32w", SONY_OA_D32W )
+SLOT_INTERFACE_END
 
 
 /***************************************************************************
@@ -325,6 +303,13 @@ void apricot_state::machine_start()
 {
 	m_maincpu->space(AS_PROGRAM).install_ram(0x00000, m_ram->size() - 1, m_ram->pointer());
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(apricot_state::irq_callback), this));
+
+	m_fdc->setup_intrq_cb(wd2793_t::line_cb(FUNC(apricot_state::wd2793_intrq_w), this));
+	m_fdc->setup_drq_cb(wd2793_t::line_cb(FUNC(apricot_state::wd2793_drq_w), this));
+
+	// motor on is connected to gnd
+	m_floppy0->get_device()->mon_w(0);
+	m_floppy1->get_device()->mon_w(0);
 }
 
 
@@ -341,7 +326,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( apricot_io, AS_IO, 16, apricot_state )
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE8("ic31", pic8259_device, read, write, 0x00ff)
-	AM_RANGE(0x40, 0x47) AM_DEVREADWRITE8_LEGACY("ic68", wd17xx_r, wd17xx_w, 0x00ff)
+	AM_RANGE(0x40, 0x47) AM_DEVREADWRITE8("ic68", wd2793_t, read, write, 0x00ff)
 	AM_RANGE(0x48, 0x4f) AM_DEVREADWRITE8("ic17", i8255_device, read, write, 0x00ff)
 	AM_RANGE(0x50, 0x51) AM_MIRROR(0x06) AM_DEVWRITE8("ic7", sn76489_device, write, 0x00ff)
 	AM_RANGE(0x58, 0x5f) AM_DEVREADWRITE8("ic16", pit8253_device, read, write, 0x00ff)
@@ -402,8 +387,9 @@ static MACHINE_CONFIG_START( apricot, apricot_state )
 	MCFG_CENTRONICS_PRINTER_ADD("centronics", apricot_centronics_intf)
 
 	// floppy
-	MCFG_WD2793_ADD("ic68", apricot_wd17xx_intf)
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(apricot_floppy_interface)
+	MCFG_WD2793x_ADD("ic68", XTAL_4MHz / 2)
+	MCFG_FLOPPY_DRIVE_ADD("ic68:0", apricot_floppies, "d32w", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("ic68:1", apricot_floppies, "d32w", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( apricotxi, apricot )
