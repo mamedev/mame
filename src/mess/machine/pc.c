@@ -1545,7 +1545,7 @@ DEVICE_IMAGE_LOAD_MEMBER( pc_state, pcjr_cartridge )
 	UINT32  address;
 	UINT32  size;
 
-	address = (!strcmp(":cart2", image.device().tag())) ? 0xd0000 : 0xe6000;
+	address = (!strcmp(":cart2", image.device().tag())) ? 0xd0000 : 0xe0000;
 
 	if ( image.software_entry() )
 	{
@@ -1561,6 +1561,7 @@ DEVICE_IMAGE_LOAD_MEMBER( pc_state, pcjr_cartridge )
 
 		unsigned header_size = 0;
 		unsigned image_size = image.length();
+		bool imagic_hack = false;
 
 		/* Check for supported header sizes */
 		switch( image_size & 0x3ff )
@@ -1579,10 +1580,11 @@ DEVICE_IMAGE_LOAD_MEMBER( pc_state, pcjr_cartridge )
 		/* Check for supported image sizes */
 		switch( image_size - header_size )
 		{
+		case 0xa000:
+			imagic_hack = true;
 		case 0x2000:
 		case 0x4000:
 		case 0x8000:
-		case 0xa000:
 		case 0x10000:
 			break;
 		default:
@@ -1602,6 +1604,19 @@ DEVICE_IMAGE_LOAD_MEMBER( pc_state, pcjr_cartridge )
 		{
 			image.seterror(IMAGE_ERROR_UNSUPPORTED, "Unable to read cartridge contents" );
 			return IMAGE_INIT_FAIL;
+		}
+
+		if (imagic_hack)
+		{
+			UINT8 *cart_area = memregion("maincpu")->base() + address;
+
+			memcpy( cart_area + 0xe000, cart_area + 0x2000, 0x2000 );
+			memcpy( cart_area + 0xc000, cart_area + 0x2000, 0x2000 );
+			memcpy( cart_area + 0xa000, cart_area + 0x2000, 0x2000 );
+			memcpy( cart_area + 0x8000, cart_area + 0x2000, 0x2000 );
+			memcpy( cart_area + 0x6000, cart_area, 0x2000 );
+			memcpy( cart_area + 0x4000, cart_area, 0x2000 );
+			memcpy( cart_area + 0x2000, cart_area, 0x2000 );
 		}
 	}
 
