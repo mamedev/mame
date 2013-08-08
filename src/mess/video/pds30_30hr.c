@@ -69,17 +69,19 @@ const rom_entry *nubus_xceed30hr_device::device_rom_region() const
 nubus_xceed30hr_device::nubus_xceed30hr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, PDS030_XCEED30HR, "Micron/XCEED Technology Color 30HR", tag, owner, clock, "pd3_30hr", __FILE__),
 		device_video_interface(mconfig, *this),
-		device_nubus_card_interface(mconfig, *this)
+		device_nubus_card_interface(mconfig, *this),
+		m_assembled_tag(tag, ":", XCEED30HR_SCREEN_NAME)
 {
-	m_screen_tag = XCEED30HR_SCREEN_NAME;
+	m_screen_tag = m_assembled_tag;
 }
 
 nubus_xceed30hr_device::nubus_xceed30hr_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_video_interface(mconfig, *this),
-		device_nubus_card_interface(mconfig, *this)
+		device_nubus_card_interface(mconfig, *this),
+		m_assembled_tag(tag, ":", XCEED30HR_SCREEN_NAME)
 {
-	m_screen_tag = XCEED30HR_SCREEN_NAME;
+	m_screen_tag = m_assembled_tag;
 }
 
 //-------------------------------------------------

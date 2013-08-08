@@ -62,17 +62,19 @@ const rom_entry *nubus_cb264se30_device::device_rom_region() const
 nubus_cb264se30_device::nubus_cb264se30_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, PDS030_CB264SE30, "RasterOps Colorboard 264/SE30", tag, owner, clock, "pd3_c264", __FILE__),
 		device_video_interface(mconfig, *this),
-		device_nubus_card_interface(mconfig, *this)
+		device_nubus_card_interface(mconfig, *this),
+		m_assembled_tag(tag, ":", CB264SE30_SCREEN_NAME)
 {
-	m_screen_tag = CB264SE30_SCREEN_NAME;
+	m_screen_tag = m_assembled_tag;
 }
 
 nubus_cb264se30_device::nubus_cb264se30_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_video_interface(mconfig, *this),
-		device_nubus_card_interface(mconfig, *this)
+		device_nubus_card_interface(mconfig, *this),
+		m_assembled_tag(tag, ":", CB264SE30_SCREEN_NAME)
 {
-	m_screen_tag = CB264SE30_SCREEN_NAME;
+	m_screen_tag = m_assembled_tag;
 }
 
 //-------------------------------------------------

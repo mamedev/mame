@@ -66,17 +66,19 @@ const rom_entry *nubus_m2hires_device::device_rom_region() const
 nubus_m2hires_device::nubus_m2hires_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, NUBUS_M2HIRES, "Macintosh II Hi-Resolution video card", tag, owner, clock, "nb_m2hr", __FILE__),
 		device_video_interface(mconfig, *this),
-		device_nubus_card_interface(mconfig, *this)
+		device_nubus_card_interface(mconfig, *this),
+		m_assembled_tag(tag, ":", M2HIRES_SCREEN_NAME)
 {
-	m_screen_tag = M2HIRES_SCREEN_NAME;
+	m_screen_tag = m_assembled_tag;
 }
 
 nubus_m2hires_device::nubus_m2hires_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_video_interface(mconfig, *this),
-		device_nubus_card_interface(mconfig, *this)
+		device_nubus_card_interface(mconfig, *this),
+		m_assembled_tag(tag, ":", M2HIRES_SCREEN_NAME)
 {
-	m_screen_tag = M2HIRES_SCREEN_NAME;
+	m_screen_tag = m_assembled_tag;
 }
 
 //-------------------------------------------------
