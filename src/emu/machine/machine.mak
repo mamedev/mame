@@ -420,11 +420,13 @@ endif
 #
 #@src/emu/machine/eeprom.h,MACHINES += EEPROMDEV
 #@src/emu/machine/eepromser.h,MACHINES += EEPROMDEV
+#@src/emu/machine/eeprompar.h,MACHINES += EEPROMDEV
 #-------------------------------------------------
 
 ifneq ($(filter EEPROMDEV,$(MACHINES)),)
 MACHINEOBJS += $(MACHINEOBJ)/eeprom.o
 MACHINEOBJS += $(MACHINEOBJ)/eepromser.o
+MACHINEOBJS += $(MACHINEOBJ)/eeprompar.o
 endif
 
 #-------------------------------------------------

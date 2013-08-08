@@ -285,7 +285,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, gauntlet_state )
 
 	/* MBUS */
 	AM_RANGE(0x800000, 0x801fff) AM_MIRROR(0x2fc000) AM_RAM
-	AM_RANGE(0x802000, 0x802fff) AM_MIRROR(0x2fc000) AM_READWRITE(eeprom_r, eeprom_w) AM_SHARE("eeprom")
+	AM_RANGE(0x802000, 0x802fff) AM_MIRROR(0x2fc000) AM_DEVREADWRITE8("eeprom", atari_eeprom_device, read, write, 0x00ff)
 	AM_RANGE(0x803000, 0x803001) AM_MIRROR(0x2fcef0) AM_READ_PORT("803000")
 	AM_RANGE(0x803002, 0x803003) AM_MIRROR(0x2fcef0) AM_READ_PORT("803002")
 	AM_RANGE(0x803004, 0x803005) AM_MIRROR(0x2fcef0) AM_READ_PORT("803004")
@@ -295,7 +295,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, gauntlet_state )
 	AM_RANGE(0x803100, 0x803101) AM_MIRROR(0x2fce8e) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x803120, 0x803121) AM_MIRROR(0x2fce8e) AM_DEVWRITE("soundcomm", atari_sound_comm_device, sound_reset_w)
 	AM_RANGE(0x803140, 0x803141) AM_MIRROR(0x2fce8e) AM_WRITE(video_int_ack_w)
-	AM_RANGE(0x803150, 0x803151) AM_MIRROR(0x2fce8e) AM_WRITE(eeprom_enable_w)
+	AM_RANGE(0x803150, 0x803151) AM_MIRROR(0x2fce8e) AM_DEVWRITE("eeprom", atari_eeprom_device, unlock_write)
 	AM_RANGE(0x803170, 0x803171) AM_MIRROR(0x2fce8e) AM_DEVWRITE8("soundcomm", atari_sound_comm_device, main_command_w, 0x00ff)
 
 	/* VBUS */
@@ -502,7 +502,8 @@ static MACHINE_CONFIG_START( gauntlet, gauntlet_state )
 
 	MCFG_MACHINE_START_OVERRIDE(gauntlet_state,gauntlet)
 	MCFG_MACHINE_RESET_OVERRIDE(gauntlet_state,gauntlet)
-	MCFG_NVRAM_ADD_1FILL("eeprom")
+
+	MCFG_ATARI_EEPROM_2804_ADD("eeprom")
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -1621,7 +1622,6 @@ void gauntlet_state::swap_memory(void *ptr1, void *ptr2, int bytes)
 void gauntlet_state::common_init(int slapstic, int vindctr2)
 {
 	UINT8 *rom = memregion("maincpu")->base();
-	m_eeprom_default = NULL;
 	slapstic_configure(*m_maincpu, 0x038000, 0, slapstic);
 
 	/* swap the top and bottom halves of the main CPU ROM images */

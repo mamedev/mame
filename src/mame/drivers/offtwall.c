@@ -232,7 +232,7 @@ READ16_MEMBER(offtwall_state::unknown_verify_r)
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, offtwall_state )
 	AM_RANGE(0x000000, 0x037fff) AM_ROM
 	AM_RANGE(0x038000, 0x03ffff) AM_READ(bankrom_r) AM_REGION("maincpu", 0x38000) AM_SHARE("bankrom_base")
-	AM_RANGE(0x120000, 0x120fff) AM_READWRITE(eeprom_r, eeprom_w) AM_SHARE("eeprom")
+	AM_RANGE(0x120000, 0x120fff) AM_DEVREADWRITE8("eeprom", atari_eeprom_device, read, write, 0x00ff)
 	AM_RANGE(0x260000, 0x260001) AM_READ_PORT("260000")
 	AM_RANGE(0x260002, 0x260003) AM_READ_PORT("260002")
 	AM_RANGE(0x260010, 0x260011) AM_READ_PORT("260010")
@@ -243,7 +243,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, offtwall_state )
 	AM_RANGE(0x260030, 0x260031) AM_DEVREAD8("jsa", atari_jsa_iii_device, main_response_r, 0x00ff)
 	AM_RANGE(0x260040, 0x260041) AM_DEVWRITE8("jsa", atari_jsa_iii_device, main_command_w, 0x00ff)
 	AM_RANGE(0x260050, 0x260051) AM_WRITE(io_latch_w)
-	AM_RANGE(0x260060, 0x260061) AM_WRITE(eeprom_enable_w)
+	AM_RANGE(0x260060, 0x260061) AM_DEVWRITE("eeprom", atari_eeprom_device, unlock_write)
 	AM_RANGE(0x2a0000, 0x2a0001) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x3e0000, 0x3e0fff) AM_RAM_WRITE(paletteram_666_w) AM_SHARE("paletteram")
 	AM_RANGE(0x3effc0, 0x3effff) AM_DEVREADWRITE("vad", atari_vad_device, control_read, control_write)
@@ -362,7 +362,8 @@ static MACHINE_CONFIG_START( offtwall, offtwall_state )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(offtwall_state,offtwall)
-	MCFG_NVRAM_ADD_1FILL("eeprom")
+	
+	MCFG_ATARI_EEPROM_2816_ADD("eeprom")
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -415,8 +416,8 @@ ROM_START( offtwall )
 	ROM_LOAD( "otw1017.bin", 0x080000, 0x20000, CRC(7f7f8012) SHA1(1123ea3c6cd2c73617a87d6a5bbb26fca8941af3) )
 	ROM_LOAD( "otw1019.bin", 0x0a0000, 0x20000, CRC(9efe511b) SHA1(db1f1d8792bf497bc9ad652b0b7d78c3abf0e817) )
 
-	ROM_REGION( 0x1000, "eeprom", 0 )
-	ROM_LOAD( "offtwall-eeprom.bin", 0x0000, 0x1000, CRC(73dc2139) SHA1(28ee9be4b5a65708a4f3e7d88e98af15cd9badca) )
+	ROM_REGION( 0x800, "eeprom:eeprom", 0 )
+	ROM_LOAD( "offtwall-eeprom.bin", 0x0000, 0x800, CRC(5eaf2d5b) SHA1(934a76a23960e6ed2cc33c359f9735caee762145) )
 ROM_END
 
 
@@ -437,8 +438,8 @@ ROM_START( offtwallc )
 	ROM_LOAD( "090-1617.rom", 0x080000, 0x20000, CRC(15208a89) SHA1(124484ab54959a1e6d9022a4f3ee4288a79c768b) )
 	ROM_LOAD( "090-1619.rom", 0x0a0000, 0x20000, CRC(8a5d79b3) SHA1(0a202d20e6c86989ce2223e10eadf9009dd6ca8e) )
 
-	ROM_REGION( 0x1000, "eeprom", 0 )
-	ROM_LOAD( "offtwall-eeprom.bin", 0x0000, 0x1000, CRC(73dc2139) SHA1(28ee9be4b5a65708a4f3e7d88e98af15cd9badca) )
+	ROM_REGION( 0x800, "eeprom:eeprom", 0 )
+	ROM_LOAD( "offtwall-eeprom.bin", 0x0000, 0x800, CRC(5eaf2d5b) SHA1(934a76a23960e6ed2cc33c359f9735caee762145) )
 ROM_END
 
 

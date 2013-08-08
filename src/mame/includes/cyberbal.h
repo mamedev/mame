@@ -29,6 +29,8 @@ public:
 			m_playfield2_tilemap(*this, "playfield2"),
 			m_alpha2_tilemap(*this, "alpha2"),
 			m_mob2(*this, "mob2"),
+			m_lscreen(*this, "lscreen"),
+			m_rscreen(*this, "rscreen"),
 			m_paletteram_0(*this, "paletteram_0"),
 			m_paletteram_1(*this, "paletteram_1") { }
 
@@ -45,6 +47,8 @@ public:
 	optional_device<tilemap_device> m_playfield2_tilemap;
 	optional_device<tilemap_device> m_alpha2_tilemap;
 	optional_device<atari_motion_objects_device> m_mob2;
+	optional_device<screen_device> m_lscreen;
+	optional_device<screen_device> m_rscreen;
 	optional_shared_ptr<UINT16> m_paletteram_0;
 	optional_shared_ptr<UINT16> m_paletteram_1;
 	UINT16          m_current_slip[2];

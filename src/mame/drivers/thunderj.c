@@ -114,9 +114,9 @@ WRITE16_MEMBER(thunderj_state::latch_w)
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, thunderj_state )
 	AM_RANGE(0x000000, 0x09ffff) AM_ROM
-	AM_RANGE(0x0e0000, 0x0e0fff) AM_READWRITE(eeprom_r, eeprom_w) AM_SHARE("eeprom")
+	AM_RANGE(0x0e0000, 0x0e0fff) AM_DEVREADWRITE8("eeprom", atari_eeprom_device, read, write, 0x00ff)
 	AM_RANGE(0x160000, 0x16ffff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x1f0000, 0x1fffff) AM_WRITE(eeprom_enable_w)
+	AM_RANGE(0x1f0000, 0x1fffff) AM_DEVWRITE("eeprom", atari_eeprom_device, unlock_write)
 	AM_RANGE(0x260000, 0x26000f) AM_READ_PORT("260000")
 	AM_RANGE(0x260010, 0x260011) AM_READ_PORT("260010")
 	AM_RANGE(0x260012, 0x260013) AM_READ(special_port2_r)
@@ -254,7 +254,8 @@ static MACHINE_CONFIG_START( thunderj, thunderj_state )
 
 	MCFG_MACHINE_START_OVERRIDE(thunderj_state,thunderj)
 	MCFG_MACHINE_RESET_OVERRIDE(thunderj_state,thunderj)
-	MCFG_NVRAM_ADD_1FILL("eeprom")
+	
+	MCFG_ATARI_EEPROM_2816_ADD("eeprom")
 
 	/* perfect synchronization due to shared RAM */
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")

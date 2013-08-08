@@ -102,8 +102,8 @@ READ16_MEMBER(shuuz_state::special_port0_r)
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, shuuz_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100fff) AM_READWRITE(eeprom_r, eeprom_w) AM_SHARE("eeprom")
-	AM_RANGE(0x101000, 0x101fff) AM_WRITE(eeprom_enable_w)
+	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE8("eeprom", atari_eeprom_device, read, write, 0x00ff)
+	AM_RANGE(0x101000, 0x101fff) AM_DEVWRITE("eeprom", atari_eeprom_device, unlock_write)
 	AM_RANGE(0x102000, 0x102001) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x103000, 0x103003) AM_READ(leta_r)
 	AM_RANGE(0x105000, 0x105001) AM_READWRITE(special_port0_r, latch_w)
@@ -227,7 +227,7 @@ static MACHINE_CONFIG_START( shuuz, shuuz_state )
 	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
-	MCFG_NVRAM_ADD_1FILL("eeprom")
+	MCFG_ATARI_EEPROM_2816_ADD("eeprom")
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)

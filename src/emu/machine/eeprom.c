@@ -56,11 +56,11 @@
 //**************************************************************************
 
 static ADDRESS_MAP_START( eeprom_map8, AS_PROGRAM, 8, eeprom_base_device )
-	AM_RANGE(0x0000, 0x0fff) AM_RAM
+	AM_RANGE(0x00000, 0xfffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( eeprom_map16, AS_PROGRAM, 16, eeprom_base_device )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
+	AM_RANGE(0x00000, 0x7ffff) AM_RAM
 ADDRESS_MAP_END
 
 
@@ -306,6 +306,8 @@ void eeprom_base_device::nvram_default()
 
 	// handle hard-coded data from the driver
 	if (m_default_data.u8 != NULL)
+	{
+		mame_printf_verbose("Warning: Driver-specific EEPROM defaults are going away soon.\n");
 		for (offs_t offs = 0; offs < m_default_data_size; offs++) 
 		{
 			if (m_data_bits == 8)
@@ -313,6 +315,7 @@ void eeprom_base_device::nvram_default()
 			else
 				m_addrspace[0]->write_word(offs * 2, m_default_data.u16[offs]);
 		}
+	}
 
 	// populate from a memory region if present
 	if (m_region != NULL)
@@ -323,6 +326,7 @@ void eeprom_base_device::nvram_default()
 			fatalerror("eeprom region '%s' needs to be an 8-bit region\n", tag());
 		if (m_data_bits == 16 && (m_region->width() != 2 || m_region->endianness() != ENDIANNESS_BIG))
 			fatalerror("eeprom region '%s' needs to be a 16-bit big-endian region\n", tag());
+		mame_printf_verbose("Loading data from EEPROM region '%s'\n", tag());
 
 		for (offs_t offs = 0; offs < eeprom_length; offs++)
 			if (m_data_bits == 8)

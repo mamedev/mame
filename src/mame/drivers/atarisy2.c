@@ -795,7 +795,7 @@ ADDRESS_MAP_END
 /* full memory map derived from schematics */
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, atarisy2_state )
 	AM_RANGE(0x0000, 0x0fff) AM_MIRROR(0x2000) AM_RAM
-	AM_RANGE(0x1000, 0x17ff) AM_MIRROR(0x2000) AM_RAM AM_SHARE("eeprom")
+	AM_RANGE(0x1000, 0x17ff) AM_MIRROR(0x2000) AM_DEVREADWRITE("eeprom", eeprom_parallel_28xx_device, read, write)
 	AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x2780) AM_DEVREADWRITE("pokey1", pokey_device, read, write)
 	AM_RANGE(0x1810, 0x1813) AM_MIRROR(0x278c) AM_READ(leta_r)
 	AM_RANGE(0x1830, 0x183f) AM_MIRROR(0x2780) AM_DEVREADWRITE("pokey2", pokey_device, read, write)
@@ -1235,7 +1235,8 @@ static MACHINE_CONFIG_START( atarisy2, atarisy2_state )
 
 	MCFG_MACHINE_START_OVERRIDE(atarisy2_state,atarisy2)
 	MCFG_MACHINE_RESET_OVERRIDE(atarisy2_state,atarisy2)
-	MCFG_NVRAM_ADD_1FILL("eeprom")
+	
+	MCFG_EEPROM_2804_ADD("eeprom")
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -1327,8 +1328,8 @@ ROM_START( paperboy )
 	ROM_REGION( 0x2000, "gfx3", 0 )
 	ROM_LOAD( "vid_t06.rv1", 0x000000, 0x002000, CRC(60d7aebb) SHA1(ad74221c4270496ebcfedd46ea16dca2cda1b4be) )
 
-	ROM_REGION( 0x800, "eeprom", 0 )
-	ROM_LOAD( "paperboy-eeprom.bin", 0x0000, 0x0800, CRC(0a0e057b) SHA1(a7cd245e826580ff54a490b421f65a72de5a2ed2) )
+	ROM_REGION( 0x200, "eeprom", 0 )
+	ROM_LOAD( "paperboy-eeprom.bin", 0x0000, 0x0200, CRC(756b90cc) SHA1(b78762e354f1316087f9de4005734c343356c8ef) )
 ROM_END
 
 
@@ -1369,8 +1370,8 @@ ROM_START( paperboyr2 )
 	ROM_REGION( 0x2000, "gfx3", 0 )
 	ROM_LOAD( "vid_t06.rv1", 0x000000, 0x002000, CRC(60d7aebb) SHA1(ad74221c4270496ebcfedd46ea16dca2cda1b4be) )
 
-	ROM_REGION( 0x800, "eeprom", 0 )
-	ROM_LOAD( "paperboy-eeprom.bin", 0x0000, 0x0800, CRC(0a0e057b) SHA1(a7cd245e826580ff54a490b421f65a72de5a2ed2) )
+	ROM_REGION( 0x200, "eeprom", 0 )
+	ROM_LOAD( "paperboy-eeprom.bin", 0x0000, 0x0200, CRC(756b90cc) SHA1(b78762e354f1316087f9de4005734c343356c8ef) )
 ROM_END
 
 
@@ -1411,8 +1412,8 @@ ROM_START( paperboyr1 )
 	ROM_REGION( 0x2000, "gfx3", 0 )
 	ROM_LOAD( "vid_t06.rv1", 0x000000, 0x002000, CRC(60d7aebb) SHA1(ad74221c4270496ebcfedd46ea16dca2cda1b4be) )
 
-	ROM_REGION( 0x800, "eeprom", 0 )
-	ROM_LOAD( "paperboy-eeprom.bin", 0x0000, 0x0800, CRC(0a0e057b) SHA1(a7cd245e826580ff54a490b421f65a72de5a2ed2) )
+	ROM_REGION( 0x200, "eeprom", 0 )
+	ROM_LOAD( "paperboy-eeprom.bin", 0x0000, 0x0200, CRC(756b90cc) SHA1(b78762e354f1316087f9de4005734c343356c8ef) )
 ROM_END
 
 
@@ -1479,8 +1480,8 @@ ROM_START( 720 )
 	ROM_REGION( 0x4000, "gfx3", 0 )
 	ROM_LOAD( "136047-1125.4t",  0x000000, 0x004000, CRC(6b7e2328) SHA1(cc9a315ccafe7228951b7c32cf3b31caa89ae7d3) )
 
-	ROM_REGION( 0x800, "eeprom", 0 )
-	ROM_LOAD( "720-eeprom.bin", 0x0000, 0x0800, CRC(a13090e3) SHA1(bc827ef76a3f9d96ffbd20a4099507c05bb46de4) )
+	ROM_REGION( 0x200, "eeprom", 0 )
+	ROM_LOAD( "720-eeprom.bin", 0x0000, 0x0200, CRC(cfe1c24e) SHA1(5f7623b0a2ff0d99ffa8e6420a5bc03e0c55250d) )
 ROM_END
 
 
@@ -1547,8 +1548,8 @@ ROM_START( 720r3 )
 	ROM_REGION( 0x4000, "gfx3", 0 )
 	ROM_LOAD( "136047-1125.4t",  0x000000, 0x004000, CRC(6b7e2328) SHA1(cc9a315ccafe7228951b7c32cf3b31caa89ae7d3) )
 
-	ROM_REGION( 0x800, "eeprom", 0 )
-	ROM_LOAD( "720-eeprom.bin", 0x0000, 0x0800, CRC(a13090e3) SHA1(bc827ef76a3f9d96ffbd20a4099507c05bb46de4) )
+	ROM_REGION( 0x200, "eeprom", 0 )
+	ROM_LOAD( "720-eeprom.bin", 0x0000, 0x0200, CRC(cfe1c24e) SHA1(5f7623b0a2ff0d99ffa8e6420a5bc03e0c55250d) )
 ROM_END
 
 
@@ -1615,8 +1616,8 @@ ROM_START( 720r2 )
 	ROM_REGION( 0x4000, "gfx3", 0 )
 	ROM_LOAD( "136047-1125.4t",  0x000000, 0x004000, CRC(6b7e2328) SHA1(cc9a315ccafe7228951b7c32cf3b31caa89ae7d3) )
 
-	ROM_REGION( 0x800, "eeprom", 0 )
-	ROM_LOAD( "720-eeprom.bin", 0x0000, 0x0800, CRC(a13090e3) SHA1(bc827ef76a3f9d96ffbd20a4099507c05bb46de4) )
+	ROM_REGION( 0x200, "eeprom", 0 )
+	ROM_LOAD( "720-eeprom.bin", 0x0000, 0x0200, CRC(cfe1c24e) SHA1(5f7623b0a2ff0d99ffa8e6420a5bc03e0c55250d) )
 ROM_END
 
 
@@ -1683,8 +1684,8 @@ ROM_START( 720r1 )
 	ROM_REGION( 0x4000, "gfx3", 0 )
 	ROM_LOAD( "136047-1125.4t",  0x000000, 0x004000, CRC(6b7e2328) SHA1(cc9a315ccafe7228951b7c32cf3b31caa89ae7d3) )
 
-	ROM_REGION( 0x800, "eeprom", 0 )
-	ROM_LOAD( "720-eeprom.bin", 0x0000, 0x0800, CRC(a13090e3) SHA1(bc827ef76a3f9d96ffbd20a4099507c05bb46de4) )
+	ROM_REGION( 0x200, "eeprom", 0 )
+	ROM_LOAD( "720-eeprom.bin", 0x0000, 0x0200, CRC(cfe1c24e) SHA1(5f7623b0a2ff0d99ffa8e6420a5bc03e0c55250d) )
 ROM_END
 
 
@@ -1751,8 +1752,8 @@ ROM_START( 720g )
 	ROM_REGION( 0x4000, "gfx3", 0 )
 	ROM_LOAD( "136047-1225.4t",  0x000000, 0x004000, CRC(264eda88) SHA1(f0f5fe87741e0e17117085cf45f700090a02cb94) )
 
-	ROM_REGION( 0x800, "eeprom", 0 )
-	ROM_LOAD( "720-eeprom.bin", 0x0000, 0x0800, CRC(a13090e3) SHA1(bc827ef76a3f9d96ffbd20a4099507c05bb46de4) )
+	ROM_REGION( 0x200, "eeprom", 0 )
+	ROM_LOAD( "720-eeprom.bin", 0x0000, 0x0200, CRC(cfe1c24e) SHA1(5f7623b0a2ff0d99ffa8e6420a5bc03e0c55250d) )
 ROM_END
 
 
@@ -1819,8 +1820,8 @@ ROM_START( 720gr1 )
 	ROM_REGION( 0x4000, "gfx3", 0 )
 	ROM_LOAD( "136047-1225.4t",  0x000000, 0x004000, CRC(264eda88) SHA1(f0f5fe87741e0e17117085cf45f700090a02cb94) )
 
-	ROM_REGION( 0x800, "eeprom", 0 )
-	ROM_LOAD( "720-eeprom.bin", 0x0000, 0x0800, CRC(a13090e3) SHA1(bc827ef76a3f9d96ffbd20a4099507c05bb46de4) )
+	ROM_REGION( 0x200, "eeprom", 0 )
+	ROM_LOAD( "720-eeprom.bin", 0x0000, 0x0200, CRC(cfe1c24e) SHA1(5f7623b0a2ff0d99ffa8e6420a5bc03e0c55250d) )
 ROM_END
 
 
@@ -1867,8 +1868,8 @@ ROM_START( ssprint )
 	ROM_REGION( 0x4000, "gfx3", 0 )
 	ROM_LOAD( "136042-118.6t",   0x000000, 0x004000, CRC(8489d113) SHA1(f8ead7954d9be95792fd7e9d2487957d1e194641) )
 
-	ROM_REGION( 0x800, "eeprom", 0 )
-	ROM_LOAD( "ssprint-eeprom.bin", 0x0000, 0x0800, CRC(dfcd40de) SHA1(c68f0fd876b5edfd751bfa6c5967dc2a1e679b19) )
+	ROM_REGION( 0x200, "eeprom", 0 )
+	ROM_LOAD( "ssprint-eeprom.bin", 0x0000, 0x0200, CRC(9301ed27) SHA1(5edd9688ce36520ab79e1388d489b72525a686ff) )
 ROM_END
 
 
@@ -1914,8 +1915,8 @@ ROM_START( ssprints )
 	ROM_REGION( 0x4000, "gfx3", 0 )
 	ROM_LOAD( "136042-218.6t",   0x000000, 0x004000, CRC(8e500be1) SHA1(f21799bf97c8bf82328999cb912ad5f293035d55) )
 
-	ROM_REGION( 0x800, "eeprom", 0 )
-	ROM_LOAD( "ssprint1-eeprom.bin", 0x0000, 0x0800, CRC(62921dcc) SHA1(d394f53d8ad97b597d618238ff9b69ea48e86851) )
+	ROM_REGION( 0x200, "eeprom", 0 )
+	ROM_LOAD( "ssprint1-eeprom.bin", 0x0000, 0x0200, CRC(62921dcc) SHA1(d394f53d8ad97b597d618238ff9b69ea48e86851) )
 ROM_END
 
 
@@ -1961,8 +1962,8 @@ ROM_START( ssprintf )
 	ROM_REGION( 0x4000, "gfx3", 0 )
 	ROM_LOAD( "136042-218.6t",   0x000000, 0x004000, CRC(8e500be1) SHA1(f21799bf97c8bf82328999cb912ad5f293035d55) )
 
-	ROM_REGION( 0x800, "eeprom", 0 )
-	ROM_LOAD( "ssprint1-eeprom.bin", 0x0000, 0x0800, CRC(62921dcc) SHA1(d394f53d8ad97b597d618238ff9b69ea48e86851) )
+	ROM_REGION( 0x200, "eeprom", 0 )
+	ROM_LOAD( "ssprint1-eeprom.bin", 0x0000, 0x0200, CRC(62921dcc) SHA1(d394f53d8ad97b597d618238ff9b69ea48e86851) )
 ROM_END
 
 
@@ -2008,8 +2009,8 @@ ROM_START( ssprintg )
 	ROM_REGION( 0x4000, "gfx3", 0 )
 	ROM_LOAD( "136042-118.6t",   0x000000, 0x004000, CRC(8489d113) SHA1(f8ead7954d9be95792fd7e9d2487957d1e194641) )
 
-	ROM_REGION( 0x800, "eeprom", 0 )
-	ROM_LOAD( "ssprint1-eeprom.bin", 0x0000, 0x0800, CRC(62921dcc) SHA1(d394f53d8ad97b597d618238ff9b69ea48e86851) )
+	ROM_REGION( 0x200, "eeprom", 0 )
+	ROM_LOAD( "ssprint1-eeprom.bin", 0x0000, 0x0200, CRC(62921dcc) SHA1(d394f53d8ad97b597d618238ff9b69ea48e86851) )
 ROM_END
 
 
@@ -2055,8 +2056,8 @@ ROM_START( ssprint3 )
 	ROM_REGION( 0x4000, "gfx3", 0 )
 	ROM_LOAD( "136042-118.6t",   0x000000, 0x004000, CRC(8489d113) SHA1(f8ead7954d9be95792fd7e9d2487957d1e194641) )
 
-	ROM_REGION( 0x800, "eeprom", 0 )
-	ROM_LOAD( "ssprint1-eeprom.bin", 0x0000, 0x0800, CRC(62921dcc) SHA1(d394f53d8ad97b597d618238ff9b69ea48e86851) )
+	ROM_REGION( 0x200, "eeprom", 0 )
+	ROM_LOAD( "ssprint1-eeprom.bin", 0x0000, 0x0200, CRC(62921dcc) SHA1(d394f53d8ad97b597d618238ff9b69ea48e86851) )
 ROM_END
 
 
@@ -2102,8 +2103,8 @@ ROM_START( ssprintg1 )
 	ROM_REGION( 0x4000, "gfx3", 0 )
 	ROM_LOAD( "136042-118.6t",   0x000000, 0x004000, CRC(8489d113) SHA1(f8ead7954d9be95792fd7e9d2487957d1e194641) )
 
-	ROM_REGION( 0x800, "eeprom", 0 )
-	ROM_LOAD( "ssprint1-eeprom.bin", 0x0000, 0x0800, CRC(62921dcc) SHA1(d394f53d8ad97b597d618238ff9b69ea48e86851) )
+	ROM_REGION( 0x200, "eeprom", 0 )
+	ROM_LOAD( "ssprint1-eeprom.bin", 0x0000, 0x0200, CRC(62921dcc) SHA1(d394f53d8ad97b597d618238ff9b69ea48e86851) )
 ROM_END
 
 
@@ -2149,8 +2150,8 @@ ROM_START( ssprint1 )
 	ROM_REGION( 0x4000, "gfx3", 0 )
 	ROM_LOAD( "136042-118.6t",   0x000000, 0x004000, CRC(8489d113) SHA1(f8ead7954d9be95792fd7e9d2487957d1e194641) )
 
-	ROM_REGION( 0x800, "eeprom", 0 )
-	ROM_LOAD( "ssprint1-eeprom.bin", 0x0000, 0x0800, CRC(62921dcc) SHA1(d394f53d8ad97b597d618238ff9b69ea48e86851) )
+	ROM_REGION( 0x200, "eeprom", 0 )
+	ROM_LOAD( "ssprint1-eeprom.bin", 0x0000, 0x0200, CRC(62921dcc) SHA1(d394f53d8ad97b597d618238ff9b69ea48e86851) )
 ROM_END
 
 
@@ -2194,8 +2195,8 @@ ROM_START( csprints )
 	ROM_REGION( 0x4000, "gfx3", 0 )
 	ROM_LOAD( "136045-1117.6t",  0x000000, 0x004000, CRC(82da786d) SHA1(929cc4ebac3d4404e1a8b22b80aae975e0c9da85) )
 
-	ROM_REGION( 0x800, "eeprom", 0 )
-	ROM_LOAD( "csprint-eeprom.bin", 0x0000, 0x0800, CRC(064a6c9c) SHA1(b8867a554d97094ac9ec800a1d665cdb5a029b12) )
+	ROM_REGION( 0x200, "eeprom", 0 )
+	ROM_LOAD( "csprint-eeprom.bin", 0x0000, 0x0200, CRC(ce1c7319) SHA1(a12926efd898cda2a05cf23fd9cd6674b9ffc702) )
 ROM_END
 
 
@@ -2239,8 +2240,8 @@ ROM_START( csprint )
 	ROM_REGION( 0x4000, "gfx3", 0 )
 	ROM_LOAD( "136045-1117.6t",  0x000000, 0x004000, CRC(82da786d) SHA1(929cc4ebac3d4404e1a8b22b80aae975e0c9da85) )
 
-	ROM_REGION( 0x800, "eeprom", 0 )
-	ROM_LOAD( "csprint-eeprom.bin", 0x0000, 0x0800, CRC(064a6c9c) SHA1(b8867a554d97094ac9ec800a1d665cdb5a029b12) )
+	ROM_REGION( 0x200, "eeprom", 0 )
+	ROM_LOAD( "csprint-eeprom.bin", 0x0000, 0x0200, CRC(ce1c7319) SHA1(a12926efd898cda2a05cf23fd9cd6674b9ffc702) )
 ROM_END
 
 
@@ -2284,8 +2285,8 @@ ROM_START( csprints1 )
 	ROM_REGION( 0x4000, "gfx3", 0 )
 	ROM_LOAD( "136045-1117.6t",  0x000000, 0x004000, CRC(82da786d) SHA1(929cc4ebac3d4404e1a8b22b80aae975e0c9da85) )
 
-	ROM_REGION( 0x800, "eeprom", 0 )
-	ROM_LOAD( "csprint-eeprom.bin", 0x0000, 0x0800, CRC(064a6c9c) SHA1(b8867a554d97094ac9ec800a1d665cdb5a029b12) )
+	ROM_REGION( 0x200, "eeprom", 0 )
+	ROM_LOAD( "csprint-eeprom.bin", 0x0000, 0x0200, CRC(ce1c7319) SHA1(a12926efd898cda2a05cf23fd9cd6674b9ffc702) )
 ROM_END
 
 
@@ -2329,8 +2330,8 @@ ROM_START( csprintf )
 	ROM_REGION( 0x4000, "gfx3", 0 )
 	ROM_LOAD( "136045-1117.6t",  0x000000, 0x004000, CRC(82da786d) SHA1(929cc4ebac3d4404e1a8b22b80aae975e0c9da85) )
 
-	ROM_REGION( 0x800, "eeprom", 0 )
-	ROM_LOAD( "csprint-eeprom.bin", 0x0000, 0x0800, CRC(064a6c9c) SHA1(b8867a554d97094ac9ec800a1d665cdb5a029b12) )
+	ROM_REGION( 0x200, "eeprom", 0 )
+	ROM_LOAD( "csprint-eeprom.bin", 0x0000, 0x0200, CRC(ce1c7319) SHA1(a12926efd898cda2a05cf23fd9cd6674b9ffc702) )
 ROM_END
 
 
@@ -2374,8 +2375,8 @@ ROM_START( csprintg )
 	ROM_REGION( 0x4000, "gfx3", 0 )
 	ROM_LOAD( "136045-1117.6t",  0x000000, 0x004000, CRC(82da786d) SHA1(929cc4ebac3d4404e1a8b22b80aae975e0c9da85) )
 
-	ROM_REGION( 0x800, "eeprom", 0 )
-	ROM_LOAD( "csprint-eeprom.bin", 0x0000, 0x0800, CRC(064a6c9c) SHA1(b8867a554d97094ac9ec800a1d665cdb5a029b12) )
+	ROM_REGION( 0x200, "eeprom", 0 )
+	ROM_LOAD( "csprint-eeprom.bin", 0x0000, 0x0200, CRC(ce1c7319) SHA1(a12926efd898cda2a05cf23fd9cd6674b9ffc702) )
 ROM_END
 
 
@@ -2419,8 +2420,8 @@ ROM_START( csprint2 )
 	ROM_REGION( 0x4000, "gfx3", 0 )
 	ROM_LOAD( "136045-1117.6t",  0x000000, 0x004000, CRC(82da786d) SHA1(929cc4ebac3d4404e1a8b22b80aae975e0c9da85) )
 
-	ROM_REGION( 0x800, "eeprom", 0 )
-	ROM_LOAD( "csprint-eeprom.bin", 0x0000, 0x0800, CRC(064a6c9c) SHA1(b8867a554d97094ac9ec800a1d665cdb5a029b12) )
+	ROM_REGION( 0x200, "eeprom", 0 )
+	ROM_LOAD( "csprint-eeprom.bin", 0x0000, 0x0200, CRC(ce1c7319) SHA1(a12926efd898cda2a05cf23fd9cd6674b9ffc702) )
 ROM_END
 
 
@@ -2464,8 +2465,8 @@ ROM_START( csprintg1 )
 	ROM_REGION( 0x4000, "gfx3", 0 )
 	ROM_LOAD( "136045-1117.6t",  0x000000, 0x004000, CRC(82da786d) SHA1(929cc4ebac3d4404e1a8b22b80aae975e0c9da85) )
 
-	ROM_REGION( 0x800, "eeprom", 0 )
-	ROM_LOAD( "csprint-eeprom.bin", 0x0000, 0x0800, CRC(064a6c9c) SHA1(b8867a554d97094ac9ec800a1d665cdb5a029b12) )
+	ROM_REGION( 0x200, "eeprom", 0 )
+	ROM_LOAD( "csprint-eeprom.bin", 0x0000, 0x0200, CRC(ce1c7319) SHA1(a12926efd898cda2a05cf23fd9cd6674b9ffc702) )
 ROM_END
 
 
@@ -2509,8 +2510,8 @@ ROM_START( csprint1 )
 	ROM_REGION( 0x4000, "gfx3", 0 )
 	ROM_LOAD( "136045-1117.6t",  0x000000, 0x004000, CRC(82da786d) SHA1(929cc4ebac3d4404e1a8b22b80aae975e0c9da85) )
 
-	ROM_REGION( 0x800, "eeprom", 0 )
-	ROM_LOAD( "csprint-eeprom.bin", 0x0000, 0x0800, CRC(064a6c9c) SHA1(b8867a554d97094ac9ec800a1d665cdb5a029b12) )
+	ROM_REGION( 0x200, "eeprom", 0 )
+	ROM_LOAD( "csprint-eeprom.bin", 0x0000, 0x0200, CRC(ce1c7319) SHA1(a12926efd898cda2a05cf23fd9cd6674b9ffc702) )
 ROM_END
 
 

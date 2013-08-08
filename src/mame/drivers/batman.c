@@ -95,14 +95,14 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, batman_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fffff)
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_MIRROR(0x010000) AM_RAM
-	AM_RANGE(0x120000, 0x120fff) AM_MIRROR(0x01f000) AM_READWRITE(eeprom_r, eeprom_w) AM_SHARE("eeprom")
+	AM_RANGE(0x120000, 0x120fff) AM_MIRROR(0x01f000) AM_DEVREADWRITE8("eeprom", atari_eeprom_device, read, write, 0x00ff)
 	AM_RANGE(0x260000, 0x260001) AM_MIRROR(0x11ff8c) AM_READ_PORT("260000")
 	AM_RANGE(0x260002, 0x260003) AM_MIRROR(0x11ff8c) AM_READ_PORT("260002")
 	AM_RANGE(0x260010, 0x260011) AM_MIRROR(0x11ff8e) AM_READ_PORT("260010")
 	AM_RANGE(0x260030, 0x260031) AM_MIRROR(0x11ff8e) AM_DEVREAD8("jsa", atari_jsa_iii_device, main_response_r, 0x00ff)
 	AM_RANGE(0x260040, 0x260041) AM_MIRROR(0x11ff8e) AM_DEVWRITE8("jsa", atari_jsa_iii_device, main_command_w, 0x00ff)
 	AM_RANGE(0x260050, 0x260051) AM_MIRROR(0x11ff8e) AM_WRITE(latch_w)
-	AM_RANGE(0x260060, 0x260061) AM_MIRROR(0x11ff8e) AM_WRITE(eeprom_enable_w)
+	AM_RANGE(0x260060, 0x260061) AM_MIRROR(0x11ff8e) AM_DEVWRITE("eeprom", atari_eeprom_device, unlock_write)
 	AM_RANGE(0x2a0000, 0x2a0001) AM_MIRROR(0x11fffe) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x3e0000, 0x3e0fff) AM_MIRROR(0x100000) AM_RAM_WRITE(paletteram_666_w) AM_SHARE("paletteram")
 	AM_RANGE(0x3effc0, 0x3effff) AM_MIRROR(0x100000) AM_DEVREADWRITE("vad", atari_vad_device, control_read, control_write)
@@ -200,7 +200,8 @@ static MACHINE_CONFIG_START( batman, batman_state )
 
 	MCFG_MACHINE_START_OVERRIDE(batman_state,batman)
 	MCFG_MACHINE_RESET_OVERRIDE(batman_state,batman)
-	MCFG_NVRAM_ADD_1FILL("eeprom")
+	
+	MCFG_ATARI_EEPROM_2816_ADD("eeprom")
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -279,8 +280,8 @@ ROM_START( batman )
 	ROM_LOAD( "136085-1043.15e",  0x40000, 0x20000, CRC(51812d3b) SHA1(6748fecef753179a9257c0da5a7b7c9648437208) )
 	ROM_LOAD( "136085-1044.12e",  0x60000, 0x20000, CRC(5e2d7f31) SHA1(737c7204d91f5dd5c9ed0321fc6c0d6194a18f8a) )
 
-	ROM_REGION( 0x1000, "eeprom", 0 )
-	ROM_LOAD( "batman-eeprom.bin", 0x0000, 0x1000, CRC(ac2f665e) SHA1(557ffea1187a5bd96dc6efc80cf6a27e4dbc84fd) )
+	ROM_REGION( 0x800, "eeprom:eeprom", 0 )
+	ROM_LOAD( "batman-eeprom.bin", 0x0000, 0x800, CRC(c859b535) SHA1(b7f37aab1e869e92fbcc69af98a9c14f7cf2b418) )
 
 	ROM_REGION( 0x1000, "plds", 0 )
 	ROM_LOAD( "gal16v8a-136085-1001.m9",  0x0000, 0x0117, CRC(45dfc0cf) SHA1(39cbb27e504e09d97caea144bfdec2247a39caf9) )

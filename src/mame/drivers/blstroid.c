@@ -65,7 +65,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, blstroid_state )
 	AM_RANGE(0xff8000, 0xff8001) AM_MIRROR(0x7f81fe) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0xff8200, 0xff8201) AM_MIRROR(0x7f81fe) AM_WRITE(scanline_int_ack_w)
 	AM_RANGE(0xff8400, 0xff8401) AM_MIRROR(0x7f81fe) AM_WRITE(video_int_ack_w)
-	AM_RANGE(0xff8600, 0xff8601) AM_MIRROR(0x7f81fe) AM_WRITE(eeprom_enable_w)
+	AM_RANGE(0xff8600, 0xff8601) AM_MIRROR(0x7f81fe) AM_DEVWRITE("eeprom", atari_eeprom_device, unlock_write)
 	AM_RANGE(0xff8800, 0xff89ff) AM_MIRROR(0x7f8000) AM_WRITEONLY AM_SHARE("priorityram")
 	AM_RANGE(0xff8a00, 0xff8a01) AM_MIRROR(0x7f81fe) AM_DEVWRITE8("jsa", atari_jsa_i_device, main_command_w, 0x00ff)
 	AM_RANGE(0xff8c00, 0xff8c01) AM_MIRROR(0x7f81fe) AM_DEVWRITE("jsa", atari_jsa_i_device, sound_reset_w)
@@ -76,7 +76,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, blstroid_state )
 	AM_RANGE(0xff9c00, 0xff9c01) AM_MIRROR(0x7f83fc) AM_READ_PORT("IN0")
 	AM_RANGE(0xff9c02, 0xff9c03) AM_MIRROR(0x7f83fc) AM_READ_PORT("IN1")
 	AM_RANGE(0xffa000, 0xffa3ff) AM_MIRROR(0x7f8c00) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0xffb000, 0xffb3ff) AM_MIRROR(0x7f8c00) AM_READWRITE(eeprom_r, eeprom_w) AM_SHARE("eeprom")
+	AM_RANGE(0xffb000, 0xffb3ff) AM_MIRROR(0x7f8c00) AM_DEVREADWRITE8("eeprom", atari_eeprom_device, read, write, 0x00ff)
 	AM_RANGE(0xffc000, 0xffcfff) AM_MIRROR(0x7f8000) AM_RAM_DEVWRITE("playfield", tilemap_device, write) AM_SHARE("playfield")
 	AM_RANGE(0xffd000, 0xffdfff) AM_MIRROR(0x7f8000) AM_RAM AM_SHARE("mob")
 	AM_RANGE(0xffe000, 0xffffff) AM_MIRROR(0x7f8000) AM_RAM
@@ -176,7 +176,8 @@ static MACHINE_CONFIG_START( blstroid, blstroid_state )
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", atarigen_state, video_int_gen)
 
 	MCFG_MACHINE_RESET_OVERRIDE(blstroid_state,blstroid)
-	MCFG_NVRAM_ADD_1FILL("eeprom")
+	
+	MCFG_ATARI_EEPROM_2804_ADD("eeprom")
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)

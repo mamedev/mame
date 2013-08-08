@@ -849,6 +849,132 @@ void atari_vad_device::eof_update(emu_timer &timer)
 
 
 
+//**************************************************************************
+//  EEPROM INTERFACE DEVICE
+//**************************************************************************
+
+// device type definition
+const device_type ATARI_EEPROM_2804 = &device_creator<atari_eeprom_2804_device>;
+const device_type ATARI_EEPROM_2816 = &device_creator<atari_eeprom_2816_device>;
+
+//-------------------------------------------------
+//  atari_eeprom_device - constructor
+//-------------------------------------------------
+
+atari_eeprom_device::atari_eeprom_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, const char *shortname, const char *file)
+	: device_t(mconfig, devtype, name, tag, owner, 0, shortname, file),
+		m_eeprom(*this, "eeprom"),
+		m_unlocked(false)
+{
+}
+
+
+//-------------------------------------------------
+//  unlock_read/unlock_write - unlock read/write
+//	handlers
+//-------------------------------------------------
+
+READ8_MEMBER(atari_eeprom_device::unlock_read) { m_unlocked = true; return space.unmap(); }
+WRITE8_MEMBER(atari_eeprom_device::unlock_write) { m_unlocked = true; }
+READ16_MEMBER(atari_eeprom_device::unlock_read) { m_unlocked = true; return space.unmap(); }
+WRITE16_MEMBER(atari_eeprom_device::unlock_write) { m_unlocked = true; }
+READ32_MEMBER(atari_eeprom_device::unlock_read) { m_unlocked = true; return space.unmap(); }
+WRITE32_MEMBER(atari_eeprom_device::unlock_write) { m_unlocked = true; }
+
+
+//-------------------------------------------------
+//  read/write - data read/write handlers
+//-------------------------------------------------
+
+READ8_MEMBER(atari_eeprom_device::read)
+{
+	return m_eeprom->read(space, offset);
+}
+
+WRITE8_MEMBER(atari_eeprom_device::write)
+{
+	if (m_unlocked)
+		m_eeprom->write(space, offset, data, mem_mask);
+	else
+		logerror("%s: Attemptedt to write to EEPROM while not unlocked\n", machine().describe_context());
+	m_unlocked = false;
+}
+
+
+//-------------------------------------------------
+//  device_start: Start up the device
+//-------------------------------------------------
+
+void atari_eeprom_device::device_start()
+{
+	// register for save states
+	save_item(NAME(m_unlocked));
+}
+
+
+//-------------------------------------------------
+//  device_reset: Handle a device reset by
+//  clearing the interrupt lines and states
+//-------------------------------------------------
+
+void atari_eeprom_device::device_reset()
+{
+	// reset unlocked state
+	m_unlocked = false;
+}
+
+
+//-------------------------------------------------
+//  atari_eeprom_2804_device - constructor
+//-------------------------------------------------
+
+atari_eeprom_2804_device::atari_eeprom_2804_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: atari_eeprom_device(mconfig, ATARI_EEPROM_2804, "Atari EEPROM Interface", tag, owner, "atari2804", __FILE__)
+{
+}
+
+
+//-------------------------------------------------
+//  device_mconfig_additions - return machine
+//	config fragment
+//-------------------------------------------------
+
+MACHINE_CONFIG_FRAGMENT(atari_eeprom_2804_config)
+	MCFG_EEPROM_2804_ADD("eeprom")
+MACHINE_CONFIG_END
+
+machine_config_constructor atari_eeprom_2804_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME(atari_eeprom_2804_config);
+}
+
+
+//-------------------------------------------------
+//  atari_eeprom_2816_device - constructor
+//-------------------------------------------------
+
+atari_eeprom_2816_device::atari_eeprom_2816_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: atari_eeprom_device(mconfig, ATARI_EEPROM_2816, "Atari EEPROM Interface", tag, owner, "atari2816", __FILE__)
+{
+}
+
+
+//-------------------------------------------------
+//  device_mconfig_additions - return machine
+//	config fragment
+//-------------------------------------------------
+
+MACHINE_CONFIG_FRAGMENT(atari_eeprom_2816_config)
+	MCFG_EEPROM_2816_ADD("eeprom")
+MACHINE_CONFIG_END
+
+machine_config_constructor atari_eeprom_2816_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME(atari_eeprom_2816_config);
+}
+
+
+
 /***************************************************************************
     OVERALL INIT
 ***************************************************************************/
@@ -858,15 +984,11 @@ atarigen_state::atarigen_state(const machine_config &mconfig, device_type type, 
 		m_earom(*this, "earom"),
 		m_earom_data(0),
 		m_earom_control(0),
-		m_eeprom(*this, "eeprom"),
-		m_eeprom32(*this, "eeprom"),
 		m_scanline_int_state(0),
 		m_sound_int_state(0),
 		m_video_int_state(0),
-		m_eeprom_default(NULL),
 		m_xscroll(*this, "xscroll"),
 		m_yscroll(*this, "yscroll"),
-		m_eeprom_unlocked(false),
 		m_slapstic_num(0),
 		m_slapstic(NULL),
 		m_slapstic_bank(0),
@@ -901,8 +1023,6 @@ void atarigen_state::machine_start()
 	save_item(NAME(m_sound_int_state));
 	save_item(NAME(m_video_int_state));
 
-	save_item(NAME(m_eeprom_unlocked));
-
 	save_item(NAME(m_slapstic_num));
 	save_item(NAME(m_slapstic_bank));
 	save_item(NAME(m_slapstic_last_pc));
@@ -923,11 +1043,6 @@ void atarigen_state::machine_reset()
 	// reset the control latch on the EAROM, if present
 	if (m_earom != NULL)
 		m_earom->set_control(0, 1, 1, 0, 0);
-
-	// reset the EEPROM
-	m_eeprom_unlocked = false;
-	if (m_eeprom == NULL && m_eeprom32 != NULL)
-		m_eeprom.set_target(reinterpret_cast<UINT16 *>(m_eeprom32.target()), m_eeprom32.bytes());
 
 	// reset the slapstic
 	if (m_slapstic_num != 0)
@@ -1075,68 +1190,6 @@ WRITE16_MEMBER(atarigen_state::video_int_ack_w)
 {
 	m_video_int_state = 0;
 	update_interrupts();
-}
-
-
-
-/***************************************************************************
-    EEPROM HANDLING
-***************************************************************************/
-
-//-------------------------------------------------
-//  eeprom_enable_w: Any write to this handler will
-//  allow one byte to be written to the EEPROM data area the
-//  next time.
-//-------------------------------------------------
-
-WRITE16_MEMBER(atarigen_state::eeprom_enable_w)
-{
-	m_eeprom_unlocked = true;
-}
-
-
-//-------------------------------------------------
-//  eeprom_w: Writes a "word" to the EEPROM, which is
-//  almost always accessed via the low byte of the word only.
-//  If the EEPROM hasn't been unlocked, the write attempt is
-//  ignored.
-//-------------------------------------------------
-
-WRITE16_MEMBER(atarigen_state::eeprom_w)
-{
-	if (!m_eeprom_unlocked)
-		return;
-
-	COMBINE_DATA(&m_eeprom[offset]);
-	m_eeprom_unlocked = false;
-}
-
-WRITE32_MEMBER(atarigen_state::eeprom32_w)
-{
-	if (!m_eeprom_unlocked)
-		return;
-
-	COMBINE_DATA(&m_eeprom[offset * 2 + 1]);
-	data >>= 16;
-	mem_mask >>= 16;
-	COMBINE_DATA(&m_eeprom[offset * 2]);
-	m_eeprom_unlocked = false;
-}
-
-
-//-------------------------------------------------
-//  eeprom_r: Reads a "word" from the EEPROM, which is
-//  almost always accessed via the low byte of the word only.
-//-------------------------------------------------
-
-READ16_MEMBER(atarigen_state::eeprom_r)
-{
-	return m_eeprom[offset] | 0xff00;
-}
-
-READ32_MEMBER(atarigen_state::eeprom_upper32_r)
-{
-	return (m_eeprom[offset * 2] << 16) | m_eeprom[offset * 2 + 1] | 0x00ff00ff;
 }
 
 

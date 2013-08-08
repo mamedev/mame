@@ -460,7 +460,7 @@ WRITE16_HANDLER( hdc68k_wheel_edge_reset_w )
 READ16_HANDLER( hd68k_zram_r )
 {
 	harddriv_state *state = space.machine().driver_data<harddriv_state>();
-	return state->m_eeprom[offset];
+	return state->m_zram[offset];
 }
 
 
@@ -468,7 +468,7 @@ WRITE16_HANDLER( hd68k_zram_w )
 {
 	harddriv_state *state = space.machine().driver_data<harddriv_state>();
 	if (state->m_m68k_zp1 == 0 && state->m_m68k_zp2 == 1)
-		COMBINE_DATA(&state->m_eeprom[offset]);
+		COMBINE_DATA(&state->m_zram[offset]);
 }
 
 

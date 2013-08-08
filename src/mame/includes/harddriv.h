@@ -36,6 +36,7 @@ public:
 			m_ds3dac2(*this, "ds3dac2"),
 			m_jsa(*this, "jsa"),
 			m_msp_ram(*this, "msp_ram"),
+			m_zram(*this, "zram"),
 			m_adsp_data_memory(*this, "adsp_data"),
 			m_adsp_pgm_memory(*this, "adsp_pgm_memory"),
 			m_ds3sdsp_data_memory(*this, "ds3sdsp_data"),
@@ -75,6 +76,8 @@ public:
 	UINT16 *                m_dsk_zram;
 	UINT16 *                m_m68k_slapstic_base;
 	UINT16 *                m_m68k_sloop_alt_base;
+	
+	required_shared_ptr<UINT16> m_zram;
 
 	optional_shared_ptr<UINT16> m_adsp_data_memory;
 	optional_shared_ptr<UINT32> m_adsp_pgm_memory;

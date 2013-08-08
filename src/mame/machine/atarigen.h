@@ -42,6 +42,7 @@
 
 #include "machine/nvram.h"
 #include "machine/er2055.h"
+#include "machine/eeprompar.h"
 #include "video/atarimo.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/okim6295.h"
@@ -66,6 +67,8 @@
 	MCFG_DEVICE_ADD(_tag, ATARI_SOUND_COMM, 0) \
 	atari_sound_comm_device::static_set_sound_cpu(*device, _soundcpu); \
 	devcb = &atari_sound_comm_device::static_set_main_int_cb(*device, DEVCB2_##_intcb);
+
+
 
 #define MCFG_ATARI_VAD_ADD(_tag, _screen, _intcb) \
 	MCFG_DEVICE_ADD(_tag, ATARI_VAD, 0) \
@@ -100,6 +103,15 @@
 #define MCFG_ATARI_VAD_MOB(_config) \
 	{ astring fulltag(device->tag(), ":mob"); device_t *device; \
 	MCFG_ATARI_MOTION_OBJECTS_ADD(fulltag, "^^screen", _config) } \
+
+
+
+#define MCFG_ATARI_EEPROM_2804_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, ATARI_EEPROM_2804, 0)
+
+#define MCFG_ATARI_EEPROM_2816_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, ATARI_EEPROM_2816, 0)
+
 
 
 /***************************************************************************
@@ -266,6 +278,66 @@ private:
 };
 
 
+// ======================> atari_eeprom_device
+
+// device type definition
+extern const device_type ATARI_EEPROM_2804;
+extern const device_type ATARI_EEPROM_2816;
+
+class atari_eeprom_device : public device_t
+{
+protected:
+	// construction/destruction
+	atari_eeprom_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, const char *shortname, const char *file);
+
+public:
+	// unlock controls
+	DECLARE_READ8_MEMBER(unlock_read);
+	DECLARE_WRITE8_MEMBER(unlock_write);
+	DECLARE_READ16_MEMBER(unlock_read);
+	DECLARE_WRITE16_MEMBER(unlock_write);
+	DECLARE_READ32_MEMBER(unlock_read);
+	DECLARE_WRITE32_MEMBER(unlock_write);
+	
+	// EEPROM read/write
+	DECLARE_READ8_MEMBER(read);
+	DECLARE_WRITE8_MEMBER(write);
+
+protected:
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
+
+	// internal state
+	required_device<eeprom_parallel_28xx_device> m_eeprom;
+	
+	// live state
+	bool		m_unlocked;
+};
+
+class atari_eeprom_2804_device : public atari_eeprom_device
+{
+public:
+	// construction/destruction
+	atari_eeprom_2804_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	// device-level overrides
+	virtual machine_config_constructor device_mconfig_additions() const;
+};
+
+class atari_eeprom_2816_device : public atari_eeprom_device
+{
+public:
+	// construction/destruction
+	atari_eeprom_2816_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	// device-level overrides
+	virtual machine_config_constructor device_mconfig_additions() const;
+};
+
+	
 
 /***************************************************************************
     TYPES & STRUCTURES
@@ -307,13 +379,6 @@ public:
 
 	INTERRUPT_GEN_MEMBER(video_int_gen);
 	DECLARE_WRITE16_MEMBER(video_int_ack_w);
-
-	// EEPROM helpers
-	WRITE16_MEMBER(eeprom_enable_w);
-	WRITE16_MEMBER(eeprom_w);
-	WRITE32_MEMBER(eeprom32_w);
-	READ16_MEMBER(eeprom_r);
-	READ32_MEMBER(eeprom_upper32_r);
 
 	// slapstic helpers
 	void slapstic_configure(cpu_device &device, offs_t base, offs_t mirror, int chipnum);
@@ -363,21 +428,14 @@ public:
 	UINT8               m_earom_data;
 	UINT8               m_earom_control;
 
-	optional_shared_ptr<UINT16> m_eeprom;
-	optional_shared_ptr<UINT32> m_eeprom32;
-
 	UINT8               m_scanline_int_state;
 	UINT8               m_sound_int_state;
 	UINT8               m_video_int_state;
-
-	const UINT16 *      m_eeprom_default;
 
 	optional_shared_ptr<UINT16> m_xscroll;
 	optional_shared_ptr<UINT16> m_yscroll;
 
 	/* internal state */
-	bool                    m_eeprom_unlocked;
-
 	UINT8                   m_slapstic_num;
 	UINT16 *                m_slapstic;
 	UINT8                   m_slapstic_bank;

@@ -134,8 +134,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, rampart_state )
 	AM_RANGE(0x3e3f80, 0x3effff) AM_MIRROR(0x010000) AM_RAM
 	AM_RANGE(0x460000, 0x460001) AM_MIRROR(0x019ffe) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0xff00)
 	AM_RANGE(0x480000, 0x480003) AM_MIRROR(0x019ffc) AM_DEVWRITE8("ymsnd", ym2413_device, write, 0xff00)
-	AM_RANGE(0x500000, 0x500fff) AM_MIRROR(0x019000) AM_READWRITE(eeprom_r, eeprom_w) AM_SHARE("eeprom")
-	AM_RANGE(0x5a6000, 0x5a6001) AM_MIRROR(0x019ffe) AM_WRITE(eeprom_enable_w)
+	AM_RANGE(0x500000, 0x500fff) AM_MIRROR(0x019000) AM_DEVREADWRITE8("eeprom", atari_eeprom_device, read, write, 0x00ff)
+	AM_RANGE(0x5a6000, 0x5a6001) AM_MIRROR(0x019ffe) AM_DEVWRITE("eeprom", atari_eeprom_device, unlock_write)
 	AM_RANGE(0x640000, 0x640001) AM_MIRROR(0x019ffe) AM_WRITE(latch_w)
 	AM_RANGE(0x640000, 0x640001) AM_MIRROR(0x019ffc) AM_READ_PORT("IN0")
 	AM_RANGE(0x640002, 0x640003) AM_MIRROR(0x019ffc) AM_READ_PORT("IN1")
@@ -338,7 +338,9 @@ static MACHINE_CONFIG_START( rampart, rampart_state )
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", atarigen_state, video_int_gen)
 
 	MCFG_MACHINE_RESET_OVERRIDE(rampart_state,rampart)
-	MCFG_NVRAM_ADD_1FILL("eeprom")
+	
+	MCFG_ATARI_EEPROM_2816_ADD("eeprom")
+
 	MCFG_WATCHDOG_VBLANK_INIT(8)
 
 	/* video hardware */
@@ -388,8 +390,8 @@ ROM_START( rampart )
 	ROM_LOAD( "136082-1007.2d", 0x00000, 0x20000, CRC(c96a0fc3) SHA1(6e7e242d0afa4714ca31d77ccbf8ee487bbdb1e4) )
 	ROM_LOAD( "136082-1008.1d", 0x20000, 0x20000, CRC(518218d9) SHA1(edf1b11579dcfa9a872fa4bd866dc2f95fac767d) )
 
-	ROM_REGION( 0x1000, "eeprom", 0 )
-	ROM_LOAD( "rampart-eeprom.bin", 0x0000, 0x1000, CRC(9ab4a6a1) SHA1(ff6ffc4b6508dfe0e431d1b3329f3bd14c796e38) )
+	ROM_REGION( 0x800, "eeprom:eeprom", 0 )
+	ROM_LOAD( "rampart-eeprom.bin", 0x0000, 0x800, CRC(0be57615) SHA1(bd1f9eef410c78c091d2c925d6275427c77c7ecd) )
 
 	ROM_REGION( 0x0c00, "plds", 0 )
 	ROM_LOAD( "gal16v8-136082-1000.1j",  0x0000, 0x0117, CRC(18f82b38) SHA1(2ffd43a143396617704ced51da78fec2cf12cced) )
@@ -415,8 +417,8 @@ ROM_START( rampart2p )
 	ROM_LOAD( "136082-1007.2d", 0x00000, 0x20000, CRC(c96a0fc3) SHA1(6e7e242d0afa4714ca31d77ccbf8ee487bbdb1e4) )
 	ROM_LOAD( "136082-1008.1d", 0x20000, 0x20000, CRC(518218d9) SHA1(edf1b11579dcfa9a872fa4bd866dc2f95fac767d) )
 
-	ROM_REGION( 0x1000, "eeprom", 0 )
-	ROM_LOAD( "rampart-eeprom.bin", 0x0000, 0x1000, CRC(9ab4a6a1) SHA1(ff6ffc4b6508dfe0e431d1b3329f3bd14c796e38) )
+	ROM_REGION( 0x800, "eeprom:eeprom", 0 )
+	ROM_LOAD( "rampart-eeprom.bin", 0x0000, 0x800, CRC(0be57615) SHA1(bd1f9eef410c78c091d2c925d6275427c77c7ecd) )
 
 	ROM_REGION( 0x0c00, "plds", 0 )
 	ROM_LOAD( "gal16v8-136082-1000.1j",  0x0000, 0x0117, CRC(18f82b38) SHA1(2ffd43a143396617704ced51da78fec2cf12cced) )
@@ -446,8 +448,8 @@ ROM_START( rampartj )
 	ROM_LOAD( "136082-1007.2d", 0x00000, 0x20000, CRC(c96a0fc3) SHA1(6e7e242d0afa4714ca31d77ccbf8ee487bbdb1e4) )
 	ROM_LOAD( "136082-1008.1d", 0x20000, 0x20000, CRC(518218d9) SHA1(edf1b11579dcfa9a872fa4bd866dc2f95fac767d) )
 
-	ROM_REGION( 0x1000, "eeprom", 0 )
-	ROM_LOAD( "rampart-eeprom.bin", 0x0000, 0x1000, CRC(9ab4a6a1) SHA1(ff6ffc4b6508dfe0e431d1b3329f3bd14c796e38) )
+	ROM_REGION( 0x800, "eeprom:eeprom", 0 )
+	ROM_LOAD( "rampartj-eeprom.bin", 0x0000, 0x800, CRC(096cacdc) SHA1(48328a27ce1975a27d9a83ae05d068cee7556a90) )
 
 	ROM_REGION( 0x0c00, "plds", 0 )
 	ROM_LOAD( "gal16v8-136082-1000.1j",  0x0000, 0x0117, CRC(18f82b38) SHA1(2ffd43a143396617704ced51da78fec2cf12cced) )

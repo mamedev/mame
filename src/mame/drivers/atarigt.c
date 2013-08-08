@@ -616,8 +616,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, atarigt_state )
 	AM_RANGE(0xc00000, 0xc00003) AM_READWRITE(sound_data_r, sound_data_w)
 	AM_RANGE(0xd00014, 0xd00017) AM_READ(analog_port0_r)
 	AM_RANGE(0xd0001c, 0xd0001f) AM_READ(analog_port1_r)
-	AM_RANGE(0xd20000, 0xd20fff) AM_READWRITE(eeprom_upper32_r, eeprom32_w) AM_SHARE("eeprom")
-	AM_RANGE(0xd40000, 0xd4ffff) AM_WRITE16(eeprom_enable_w, 0xffffffff)
+	AM_RANGE(0xd20000, 0xd20fff) AM_DEVREADWRITE8("eeprom", atari_eeprom_device, read, write, 0xff00ff00)
+	AM_RANGE(0xd40000, 0xd4ffff) AM_DEVWRITE("eeprom", atari_eeprom_device, unlock_write)
 	AM_RANGE(0xd72000, 0xd75fff) AM_DEVWRITE("playfield", tilemap_device, write) AM_SHARE("playfield")
 	AM_RANGE(0xd76000, 0xd76fff) AM_DEVWRITE("alpha", tilemap_device, write) AM_SHARE("alpha")
 	AM_RANGE(0xd78000, 0xd78fff) AM_RAM AM_SHARE("rle")
@@ -824,7 +824,8 @@ static MACHINE_CONFIG_START( atarigt, atarigt_state )
 	MCFG_CPU_PERIODIC_INT_DRIVER(atarigen_state, scanline_int_gen, 250)
 
 	MCFG_MACHINE_RESET_OVERRIDE(atarigt_state,atarigt)
-	MCFG_NVRAM_ADD_1FILL("eeprom")
+	
+	MCFG_ATARI_EEPROM_2816_ADD("eeprom")
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -1302,7 +1303,6 @@ WRITE32_MEMBER(atarigt_state::tmek_pf_w)
 
 DRIVER_INIT_MEMBER(atarigt_state,tmek)
 {
-	m_eeprom_default = NULL;
 	m_is_primrage = 0;
 
 	cage_init(machine(), 0x4fad);
@@ -1319,7 +1319,6 @@ DRIVER_INIT_MEMBER(atarigt_state,tmek)
 
 void atarigt_state::primrage_init_common(offs_t cage_speedup)
 {
-	m_eeprom_default = NULL;
 	m_is_primrage = 1;
 
 	cage_init(machine(), cage_speedup);
