@@ -218,20 +218,20 @@ protected:
 	virtual void setup_characteristics();
 };
 
-class floppy_35_dd : public floppy_image_device {
+class floppy_35_ssdd : public floppy_image_device {
 public:
-	floppy_35_dd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual ~floppy_35_dd();
+	floppy_35_ssdd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	virtual ~floppy_35_ssdd();
 	virtual void handled_variants(UINT32 *variants, int &var_count) const;
 	virtual const char *image_interface() const { return "floppy_3_5"; }
 protected:
 	virtual void setup_characteristics();
 };
 
-class floppy_35_dd_nosd : public floppy_image_device {
+class floppy_35_dd : public floppy_image_device {
 public:
-	floppy_35_dd_nosd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual ~floppy_35_dd_nosd();
+	floppy_35_dd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	virtual ~floppy_35_dd();
 	virtual void handled_variants(UINT32 *variants, int &var_count) const;
 	virtual const char *image_interface() const { return "floppy_3_5"; }
 protected:
@@ -388,6 +388,36 @@ protected:
 	virtual void setup_characteristics();
 };
 
+class sony_oa_d31v : public floppy_image_device {
+public:
+	sony_oa_d31v(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	virtual ~sony_oa_d31v();
+	virtual void handled_variants(UINT32 *variants, int &var_count) const;
+	virtual const char *image_interface() const { return "floppy_3_5"; }
+protected:
+	virtual void setup_characteristics();
+};
+
+class sony_oa_d32w : public floppy_image_device {
+public:
+	sony_oa_d32w(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	virtual ~sony_oa_d32w();
+	virtual void handled_variants(UINT32 *variants, int &var_count) const;
+	virtual const char *image_interface() const { return "floppy_3_5"; }
+protected:
+	virtual void setup_characteristics();
+};
+
+class sony_oa_d32v : public floppy_image_device {
+public:
+	sony_oa_d32v(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	virtual ~sony_oa_d32v();
+	virtual void handled_variants(UINT32 *variants, int &var_count) const;
+	virtual const char *image_interface() const { return "floppy_3_5"; }
+protected:
+	virtual void setup_characteristics();
+};
+
 class floppy_connector: public device_t,
 						public device_slot_interface
 {
@@ -411,8 +441,8 @@ private:
 extern const device_type FLOPPY_CONNECTOR;
 extern const device_type FLOPPY_3_SSDD;
 extern const device_type FLOPPY_3_DSDD;
+extern const device_type FLOPPY_35_SSDD;
 extern const device_type FLOPPY_35_DD;
-extern const device_type FLOPPY_35_DD_NOSD;
 extern const device_type FLOPPY_35_HD;
 extern const device_type FLOPPY_35_ED;
 extern const device_type FLOPPY_525_SSSD_35T;
@@ -428,5 +458,8 @@ extern const device_type FLOPPY_8_SSSD;
 extern const device_type FLOPPY_8_DSSD;
 extern const device_type FLOPPY_8_SSDD;
 extern const device_type FLOPPY_8_DSDD;
+extern const device_type SONY_OA_D31V;
+extern const device_type SONY_OA_D32W;
+extern const device_type SONY_OA_D32V;
 
 #endif /* FLOPPY_H */
