@@ -383,7 +383,7 @@ void tceptor_state::video_start()
 	decode_sprite32("gfx4");
 
 	/* allocate temp bitmaps */
-	m_screen->register_screen_bitmap(m_temp_bitmap);
+	m_2dscreen->register_screen_bitmap(m_temp_bitmap);
 
 	m_c45_road->set_transparent_color(colortable_entry_get_value(machine().colortable, 0xfff));
 

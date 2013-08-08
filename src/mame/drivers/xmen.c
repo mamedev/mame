@@ -392,7 +392,7 @@ static MACHINE_CONFIG_START( xmen6p, xmen_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* ? */
 	MCFG_CPU_PROGRAM_MAP(6p_main_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", xmen_state, xmen_scanline, "lscreen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", xmen_state, xmen_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80,8000000)   /* verified with M1, guessed but accurate */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -405,14 +405,14 @@ static MACHINE_CONFIG_START( xmen6p, xmen_state )
 	MCFG_PALETTE_LENGTH(2048)
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
-	MCFG_SCREEN_ADD("lscreen", RASTER)
+	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(12*8, 48*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(xmen_state, screen_update_xmen6p_left)
 
-	MCFG_SCREEN_ADD("rscreen", RASTER)
+	MCFG_SCREEN_ADD("screen2", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
@@ -424,7 +424,7 @@ static MACHINE_CONFIG_START( xmen6p, xmen_state )
 
 	MCFG_K052109_ADD("k052109", xmen_k052109_intf)
 	MCFG_K053246_ADD("k053246", xmen6p_k053246_intf)
-	MCFG_K053246_SET_SCREEN("lscreen")
+	MCFG_K053246_SET_SCREEN("screen")
 	MCFG_K053251_ADD("k053251")
 
 	/* sound hardware */

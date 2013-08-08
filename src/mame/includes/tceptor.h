@@ -15,7 +15,8 @@ public:
 		m_bg_ram(*this, "bg_ram"),
 		m_m68k_shared_ram(*this, "m68k_shared_ram"),
 		m_sprite_ram(*this, "sprite_ram"),
-		m_c45_road(*this, "c45_road") { }
+		m_c45_road(*this, "c45_road"),
+		m_2dscreen(*this, "2dscreen") { }
 
 	UINT8 m_m6809_irq_enable;
 	UINT8 m_m68k_irq_enable;
@@ -61,6 +62,7 @@ public:
 	DECLARE_WRITE8_MEMBER(voice_w);
 
 	optional_device<namco_c45_road_device> m_c45_road;
+	required_device<screen_device> m_2dscreen;
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg2_tile_info);

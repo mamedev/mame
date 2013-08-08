@@ -37,6 +37,7 @@ public:
 	zn_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_gpu(*this, "gpu"),
+		m_gpu_screen(*this, "gpu:screen"),
 		m_znsec0(*this,"maincpu:sio0:znsec0"),
 		m_znsec1(*this,"maincpu:sio0:znsec1"),
 		m_zndip(*this,"maincpu:sio0:zndip"),
@@ -123,6 +124,7 @@ private:
 	UINT16 vt83c461_latch;
 
 	required_device<psxgpu_device> m_gpu;
+	required_device<screen_device> m_gpu_screen;
 	required_device<znsec_device> m_znsec0;
 	required_device<znsec_device> m_znsec1;
 	required_device<zndip_device> m_zndip;
@@ -359,7 +361,7 @@ READ8_MEMBER(zn_state::boardconfig_r)
 
 	int boardconfig = 64 | 32;
 
-	if( m_screen->height() == 1024 )
+	if( m_gpu_screen->height() == 1024 )
 	{
 		boardconfig |= 8;
 	}
