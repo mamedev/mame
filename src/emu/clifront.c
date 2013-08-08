@@ -587,6 +587,13 @@ void cli_frontend::listsamples(const char *gamename)
 //  referenced by a given game or set of games
 //-------------------------------------------------
 
+int cli_frontend::compare_devices(const void *i1, const void *i2)
+{
+	device_t *dev1 = *(device_t **)i1;
+	device_t *dev2 = *(device_t **)i2;
+	return strcmp(dev1->tag(), dev2->tag());
+}
+
 void cli_frontend::listdevices(const char *gamename)
 {
 	// determine which drivers to output; return an error if none found
@@ -604,12 +611,44 @@ void cli_frontend::listdevices(const char *gamename)
 		first = false;
 		printf("Driver %s (%s):\n", drivlist.driver().name, drivlist.driver().description);
 
-		// iterate through devices
+		// build a list of devices
 		device_iterator iter(drivlist.config().root_device());
-		for (const device_t *device = iter.first(); device != NULL; device = iter.next())
-		{
-			printf("   %s ('%s')", device->name(), device->tag());
+		dynamic_array<device_t *> device_list;
+		for (device_t *device = iter.first(); device != NULL; device = iter.next())
+			device_list.append(device);
 
+		// sort them by tag
+		qsort(&device_list[0], device_list.count(), sizeof(device_list[0]), compare_devices);
+		
+		// dump the results
+		for (int index = 0; index < device_list.count(); index++)
+		{
+			device_t *device = device_list[index];
+
+			// extract the tag, stripping the leading colon
+			const char *tag = device->tag();
+			if (*tag == ':')
+				tag++;
+			
+			// determine the depth
+			int depth = 1;
+			if (*tag == 0)
+			{
+				tag = "<root>";
+				depth = 0;
+			}
+			else
+			{
+				for (const char *c = tag; *c != 0; c++)
+					if (*c == ':')
+					{
+						tag = c + 1;
+						depth++;
+					}
+			}
+			printf("   %*s%-*s%s", depth * 2, "", 24 - depth * 2, tag, device->name());
+
+			// add more information
 			UINT32 clock = device->clock();
 			if (clock >= 1000000000)
 				printf(" @ %d.%02d GHz\n", clock / 1000000000, (clock / 10000000) % 100);
