@@ -8,48 +8,48 @@
     Meaning of Diagnostics LEDs (from PC100ESV1.PDF found, e.g.,
     on ftp://ftp.update.uu.se/pub/rainbow/doc/rainbow-docs/
 
-    Internal Diagnostic Messages
-    Msg Message                             Lights Display
-    No.                                     * = on o = off
-                                            - = on or off
-                                            1 2 3 4 5 6 7
+    Internal Diagnostic Messages                               F 
+    Msg Message                               Lights Display   A
+    No.                                       * = on o = off   T
+                                              - = on or off    A
+                                              1 2 3 4 5 6 7    L 
     --------------------------------------------------------------
-     1  Main Board (Video)                  o * * o * o *
-     2  Main Board* (unsolicited interrupt) * * * * o * o
-     3  Drive A or B (index)                o o * o o * *
-     4  Drive A or B (motor)                * * o o o * *
-     5  Drive A or B (seek)                 o * o o o * *
-     6  Drive A or B (read)                 * o o o o * *
-     7  Drive A or B (restore)              o * * o o * *
-     8  Drive A or B (step)                 * o * o o * *
-     9  System Load incomplete+ (System Load)   o o o o o o o
-    10  Main Board (video, vfr)             * * * o * o *
-    11  System Load incomplete+ (Boot Load) o o o o o o o
-    12  Drive A or B (not ready)            o o o o o * *
-    13  Keyboard                            * * o * o * o
-    14  Main Board (nvm data)               * * * * o * *
+     1  Main Board (Video)                    o * * o * o *   Yes
+     2  Main Board* (unsolicited interrupt)   * * * * o * o   Yes
+     3  Drive A or B (index)                  o o * o o * *
+     4  Drive A or B (motor)                  * * o o o * *
+     5  Drive A or B (seek)                   o * o o o * *
+     6  Drive A or B (read)                   * o o o o * *
+     7  Drive A or B (restore)                o * * o o * *
+     8  Drive A or B (step)                   * o * o o * *
+     9  System Load incomplete+ (System Load) o o o o o o o
+    10  Main Board (video, vfr)               * * * o * o *   Yes
+    11  System Load incomplete+ (Boot Load)   o o o o o o o
+    12  Drive A or B (not ready)              o o o o o * *
+    13  Keyboard                              * * o * o * o   Yes
+    14  Main Board (nvm data)                 * * * * o * *
     15  (no msg. 15 in that table)
-    16  Interrupts off*                     * * * o o o o
-    17  Main Board (video RAM)              * * * o * * o
-    18  Main Board (Z80 crc)                * * * * o o *
-    19  Main Board RAM (0-64K)              - - - * * o *
-    20  Main Board (unsolicited int., Z80)  * * * * o o o *
-    21  Drive Not Ready+                    o o o o o o o
-    22  Remove Card or Diskette             o * * o o o *
-    23  Non-System Diskette+                o o o o o o o
-    24  new memory size = nnnK              o o o o o o o
-    25  Set Up Defaults stored              o o o o o o o
-    26  Main Board (RAM arbitration)        * * * o * o o
-    27  Main Board (RAM option)             - - - * * o o
-    28  RX50 controller board               * * * o o * *
-    29  Main Board* (Z80 response)          * * * * o o o
-    30  Main Board (ROM crc, ROM 0)         * * * * * * *
-    31  Main Board (ROM crc, ROM 1)         * * * * * * o
-    -   Main Board (ROM crc, ROM 2)         * * * o * * *
-    33  Main Board (contention)             o o o o o * o
-    40  Main Board (printer port)           * o * * o * o
-    50  Main Board (keyboard port)          o o * * o * o
-    60  Main Board (comm port)              o * * * o * o
+    16  Interrupts off*                       * * * o o o o   Cond.
+    17  Main Board (video RAM)                * * * o * * o   Yes
+    18  Main Board (Z80 crc)                  * * * * o o *   Yes
+    19  Main Board RAM (0-64K)                - - - * * o *   Yes
+    20  Main Board (unsolicited int., Z80)    * * * o o o *   Yes
+    21  Drive Not Ready+                      o o o o o o o
+    22  Remove Card or Diskette               o * * o o o *
+    23  Non-System Diskette+                  o o o o o o o
+    24  new memory size = nnnK                o o o o o o o
+    25  Set Up Defaults stored                o o o o o o o
+    26  Main Board (RAM arbitration)          * * * o * o o   Yes
+    27  Main Board (RAM option)               - - - * * o o
+    28  RX50 controller board                 * * * o o * *
+    29  Main Board* (Z80 response)            * * * * o o o
+    30  Main Board (ROM crc, ROM 0)           * * * * * * *   Yes
+    31  Main Board (ROM crc, ROM 1)           * * * * * * o   Yes
+    -   Main Board (ROM crc, ROM 2)           * * * o * * *   Yes
+    33  Main Board (contention)               o o o o o * o   Yes
+    40  Main Board (printer port)             * o * * o * o
+    50  Main Board (keyboard port)            o o * * o * o   Yes
+    60  Main Board (comm port)                o * * * o * o
 
     --------------------------------------------------------------
     *   These errors can occur at any time because the circuits
@@ -57,6 +57,40 @@
     +   These messages may occur during power-up if auto boot is
         selected
 
+PCB layout
+----------
+
+DEC-100 model B 
+
+PCB # 5416206 / 5016205-01C1:
+
+         DIAGNOSTIC-
+|----------- LED --|VIDEO|-|PRINTER|-|SERIAL|----|
+|  2 x 64 K                                      |
+|  R  A  M         NEC D7201C            |P| [??]|
+|                                        |O|     |
+|     23-020e5-00  INTEL 8088            |W|     |
+|                                        |E|     |
+|     23-022e5-00                        |R|     |
+|     -BOOT EPROM                                |
+|                                                |
+|     INTEL 8251A   ZILOG Z 80                   |
+|                [W18 ??]                        |
+| A  4x                74 LS 244                 |
+| M  S           [W15]                           |
+| 9  -   DEC_011C      74 LS 245                 |
+| 1  R           [W14]                           |
+| 2  A                  [W13]                    |
+| 8  M   CHARGEN.-                               |
+|        ROM (4K)                                |
+|------------PCB# 5416206 / 5016205-01C1---------|
+NOTES
+[??] indicates an untested jumper or 2-pin connector
+
+W18 pulls DSR to ground and affects 8251A - port $11 (bit 7).
+W18 jumper location is unverified. There is no code to pull DSR yet!
+
+W13 - W15 affect diagnostic read register (port $0a)
 ****************************************************************************/
 
 #include "emu.h"
@@ -73,6 +107,11 @@ class rainbow_state : public driver_device
 public:
 	rainbow_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+			m_inp1(*this, "W13"),
+			m_inp2(*this, "W14"),
+			m_inp3(*this, "W15"),
+			m_inp4(*this, "W18"),
+
 		m_crtc(*this, "vt100_video"),
 		m_i8088(*this, "maincpu"),
 		m_z80(*this, "subcpu"),
@@ -83,6 +122,10 @@ public:
 		m_shared(*this, "sh_ram"),
 		m_maincpu(*this, "maincpu") { }
 
+	required_ioport m_inp1;
+	required_ioport m_inp2;
+	required_ioport m_inp3;
+	required_ioport m_inp4;
 
 	required_device<rainbow_video_device> m_crtc;
 	required_device<cpu_device> m_i8088;
@@ -193,6 +236,22 @@ ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( rainbow )
+	PORT_START("W13")
+	    PORT_DIPNAME( 0x02, 0x02, "W13") PORT_TOGGLE
+		PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+		PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_START("W14")
+	    PORT_DIPNAME( 0x04, 0x04, "W14") PORT_TOGGLE
+		PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+		PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_START("W15")
+	    PORT_DIPNAME( 0x08, 0x08, "W15") PORT_TOGGLE
+		PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+		PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_START("W18")
+	    PORT_DIPNAME( 0x80, 0x80, "W18") PORT_TOGGLE
+		PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+		PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -329,7 +388,11 @@ WRITE8_MEMBER( rainbow_state::clear_video_interrupt )
 
 READ8_MEMBER( rainbow_state::diagnostic_r )
 {
-	return m_diagnostic | 0x0e;
+//    printf("%02x DIP value ORed to diagnostic\n", ( m_inp1->read() | m_inp2->read() | m_inp3->read()   )  );
+
+	return m_diagnostic | ( m_inp1->read() |
+                                m_inp2->read() | 
+                                m_inp3->read()   );
 }
 
 WRITE8_MEMBER( rainbow_state::diagnostic_w )
