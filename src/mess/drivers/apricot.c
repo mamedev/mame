@@ -10,6 +10,7 @@
 #include "emu.h"
 #include "cpu/i86/i86.h"
 #include "machine/ram.h"
+#include "machine/i8089.h"
 #include "machine/pit8253.h"
 #include "machine/i8255.h"
 #include "machine/pic8259.h"
@@ -34,6 +35,7 @@ public:
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_ram(*this, RAM_TAG),
+	m_iop(*this, "ic71"),
 	m_sn(*this, "ic7"),
 	m_crtc(*this, "ic30"),
 	m_ppi(*this, "ic17"),
@@ -55,6 +57,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
+	required_device<i8089_device> m_iop;
 	required_device<sn76489_device> m_sn;
 	required_device<mc6845_device> m_crtc;
 	required_device<i8255_device> m_ppi;
@@ -69,6 +72,8 @@ public:
 
 	required_shared_ptr<UINT16> m_screen_buffer;
 
+	DECLARE_WRITE8_MEMBER( i8089_ca1_w );
+	DECLARE_WRITE8_MEMBER( i8089_ca2_w );
 	DECLARE_READ8_MEMBER( apricot_sysctrl_r );
 	DECLARE_WRITE8_MEMBER( apricot_sysctrl_w );
 	DECLARE_WRITE_LINE_MEMBER( timer_out1 );
@@ -99,6 +104,20 @@ public:
 /***************************************************************************
     I/O
 ***************************************************************************/
+
+WRITE8_MEMBER( apricot_state::i8089_ca1_w )
+{
+	m_iop->sel_w(0);
+	m_iop->ca_w(1);
+	m_iop->ca_w(0);
+}
+
+WRITE8_MEMBER( apricot_state::i8089_ca2_w )
+{
+	m_iop->sel_w(1);
+	m_iop->ca_w(1);
+	m_iop->ca_w(0);
+}
 
 READ8_MEMBER( apricot_state::apricot_sysctrl_r )
 {
@@ -172,7 +191,7 @@ static Z80SIO_INTERFACE( apricot_z80sio_intf )
 	DEVCB_DEVICE_LINE_MEMBER("rs232", serial_port_device, tx),
 	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, dtr_w),
 	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, rts_w),
-	DEVCB_NULL, //  wait/ready: i8089 data request channel 2
+	DEVCB_DEVICE_LINE_MEMBER("ic71", i8089_device, drq2_w),
 	DEVCB_NULL,
 
 	// channel b
@@ -217,12 +236,12 @@ static const centronics_interface apricot_centronics_intf =
 void apricot_state::wd2793_intrq_w(bool state)
 {
 	m_pic->ir4_w(state);
-//  i8089 external terminate channel 1
+	m_iop->ext1_w(state);
 }
 
 void apricot_state::wd2793_drq_w(bool state)
 {
-//  i8089 data request channel 1
+	m_iop->drq1_w(state);
 }
 
 static SLOT_INTERFACE_START( apricot_floppies )
@@ -333,8 +352,8 @@ static ADDRESS_MAP_START( apricot_io, AS_IO, 16, apricot_state )
 	AM_RANGE(0x60, 0x67) AM_DEVREADWRITE8("ic15", z80sio0_device, ba_cd_r, ba_cd_w, 0x00ff)
 	AM_RANGE(0x68, 0x69) AM_MIRROR(0x04) AM_DEVWRITE8("ic30", mc6845_device, address_w, 0x00ff)
 	AM_RANGE(0x6a, 0x6b) AM_MIRROR(0x04) AM_DEVREADWRITE8("ic30", mc6845_device, register_r, register_w, 0x00ff)
-//  AM_RANGE(0x70, 0x71) AM_MIRROR(0x04) 8089 channel attention 1
-//  AM_RANGE(0x72, 0x73) AM_MIRROR(0x04) 8089 channel attention 2
+	AM_RANGE(0x70, 0x71) AM_MIRROR(0x04) AM_WRITE8(i8089_ca1_w, 0x00ff)
+	AM_RANGE(0x72, 0x73) AM_MIRROR(0x04) AM_WRITE8(i8089_ca2_w, 0x00ff)
 	AM_RANGE(0x78, 0x7f) AM_NOP /* unavailable */
 ADDRESS_MAP_END
 
@@ -353,7 +372,9 @@ static MACHINE_CONFIG_START( apricot, apricot_state )
 	MCFG_CPU_PROGRAM_MAP(apricot_mem)
 	MCFG_CPU_IO_MAP(apricot_io)
 
-//  MCFG_CPU_ADD("ic71", I8089, XTAL_15MHz / 3)
+	MCFG_I8089_ADD("ic71", XTAL_15MHz / 3, "maincpu")
+	MCFG_I8089_SINTR1(DEVWRITELINE("ic31", pic8259_device, ir0_w))
+	MCFG_I8089_SINTR2(DEVWRITELINE("ic31", pic8259_device, ir1_w))
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
