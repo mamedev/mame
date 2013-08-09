@@ -751,7 +751,7 @@ void tms32082_mp_device::execute_reg_long_imm()
 		{
 			UINT32 data = has_imm ? imm32 : m_reg[OP_SRC1()];
 
-			printf("CMND %08X\n", data);
+			processor_command(data);
 			break;
 		}
 

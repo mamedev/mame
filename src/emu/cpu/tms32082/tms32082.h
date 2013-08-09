@@ -51,7 +51,17 @@ public:
 		MP_ACC3,
 		MP_IN0P,
 		MP_IN1P,
-		MP_OUTP
+		MP_OUTP,
+		MP_IE,
+		MP_INTPEN,
+	};
+
+	enum
+	{
+		INPUT_X1		= 1,
+		INPUT_X2		= 2,
+		INPUT_X3		= 3,
+		INPUT_X4		= 4,
 	};
 
 	DECLARE_READ32_MEMBER(mp_param_r);
@@ -68,6 +78,7 @@ protected:
 	virtual UINT32 execute_max_cycles() const { return 1; }
 	virtual UINT32 execute_input_lines() const { return 0; }
 	virtual void execute_run();
+	virtual void execute_set_input(int inputnum, int state);
 
 	// device_memory_interface overrides
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const
@@ -109,6 +120,10 @@ protected:
 	UINT32 m_in0p;
 	UINT32 m_in1p;
 	UINT32 m_outp;
+	UINT32 m_ie;
+	UINT32 m_intpen;
+	UINT32 m_epc;
+	UINT32 m_eip;
 
 	UINT32 *m_param_ram;
 
@@ -117,6 +132,8 @@ protected:
 	address_space *m_program;
 	direct_read_data* m_direct;
 
+	void check_interrupts();
+	void processor_command(UINT32 command);
 	UINT32 fetch();
 	void delay_slot();
 	void execute();

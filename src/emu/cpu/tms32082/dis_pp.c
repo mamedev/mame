@@ -83,10 +83,14 @@ static char *format_address_mode(int mode, int areg, int s, int limx)
 
 static void format_transfer(UINT64 op)
 {
+	char buffer[128];
+	char *b = buffer;
 	int lmode = (op >> 35) & 0xf;
 	int gmode = (op >> 13) & 0xf;
 
-	print(" || ");
+	bool is_nop = false;
+
+	memset(buffer, 0, sizeof(char)*128);
 
 	switch (lmode)
 	{
@@ -109,8 +113,8 @@ static void format_transfer(UINT64 op)
 					int dreg = (dstbank << 3) | dst;
 					int sreg = (srcbank << 3) | src;
 
-					print("%s", CONDITION_CODES[cond]);
-					print("%s = %s", REG_NAMES[dreg], REG_NAMES[sreg]);
+					b += sprintf(b, "%s", CONDITION_CODES[cond]);
+					b += sprintf(b, "%s = %s", REG_NAMES[dreg], REG_NAMES[sreg]);
 					break;
 				}
 				case 0x01:										// Format 8: Conditional DU ||Conditional Field Move
@@ -125,8 +129,8 @@ static void format_transfer(UINT64 op)
 					int dreg = (dstbank << 3) | dst;
 					int sreg = (4 << 3) | src;
 
-					print("%s", CONDITION_CODES[cond]);
-					print("%s = [%s:%d]%s", REG_NAMES[dreg], TRANSFER_SIZE[size], itm, REG_NAMES[sreg]);
+					b += sprintf(b, "%s", CONDITION_CODES[cond]);
+					b += sprintf(b, "%s = [%s%d]%s", REG_NAMES[dreg], TRANSFER_SIZE[size], itm, REG_NAMES[sreg]);
 					break;
 				}
 				case 0x02: case 0x03:							// Format 10: Conditional Non-D Data Unit
@@ -139,14 +143,14 @@ static void format_transfer(UINT64 op)
 					int dreg = (adstbank << 3) | dst;
 					int sreg = (as1bank << 3) | src;
 
-					if (dreg == 0x20 && sreg == 0x20)
+					if (dreg == sreg)
 					{
-						print("nop");
+						is_nop = true;
 					}
 					else
 					{
-						print("%s", CONDITION_CODES[cond]);
-						print("%s = %s", REG_NAMES[dreg], REG_NAMES[sreg]);
+						b += sprintf(b, "%s", CONDITION_CODES[cond]);
+						b += sprintf(b, "%s = %s", REG_NAMES[dreg], REG_NAMES[sreg]);
 					}
 					break;
 				}
@@ -154,8 +158,25 @@ static void format_transfer(UINT64 op)
 				{
 					if (op & 0x4)								// Format 9: Conditional DU || Conditional Global
 					{
-						print("%s", CONDITION_CODES[cond]);
-						print("cond du||cond global");
+						int bank = (op >> 18) & 0xf;
+						int le = ((op >> 16) & 2) | ((op >> 9) & 1);
+						int size = (op >> 7) & 0x3;
+						int s = (op & (1 << 6));
+						int reg = (op >> 10) & 0x7;
+						int ga = (op >> 3) & 0x7;
+						int gimx = (op >> 22) & 0x7;
+
+						int greg = (bank << 3) | reg;
+
+						b += sprintf(b, "%s", CONDITION_CODES[cond]);
+
+						switch (le)
+						{
+							case 0: b += sprintf(b, "&%s%s = %s", TRANSFER_SIZE[size], format_address_mode(gmode, ga, s, gimx), REG_NAMES[greg]); break;
+							case 1: b += sprintf(b, "%s = %s", REG_NAMES[greg], format_address_mode(gmode, ga, s, gimx)); break;
+							case 2: b += sprintf(b, "%s = &%s%s", REG_NAMES[greg], TRANSFER_SIZE[size], format_address_mode(gmode, ga, s, gimx)); break;
+							case 3: b += sprintf(b, "%s = &%s%s", REG_NAMES[greg], TRANSFER_SIZE[size], format_address_mode(gmode, ga, s, gimx)); break;
+						}
 					}
 					else										// Format 5: Global (Long Offset)
 					{
@@ -176,10 +197,10 @@ static void format_transfer(UINT64 op)
 						
 						switch (le)
 						{
-							case 0: print("&%s%s = %s", TRANSFER_SIZE[size], format_address_mode(gmode, ga, s, offset), REG_NAMES[greg]); break;
-							case 1: print("%s = %s", REG_NAMES[greg], format_address_mode(gmode, ga, s, offset)); break;
-							case 2: print("%s = &%s%s", REG_NAMES[greg], TRANSFER_SIZE[size], format_address_mode(gmode, ga, s, offset)); break;
-							case 3: print("%s = &%s%s", REG_NAMES[greg], TRANSFER_SIZE[size], format_address_mode(gmode, ga, s, offset)); break;
+							case 0: b += sprintf(b, "&%s%s = %s", TRANSFER_SIZE[size], format_address_mode(gmode, ga, s, offset), REG_NAMES[greg]); break;
+							case 1: b += sprintf(b, "%s = %s", REG_NAMES[greg], format_address_mode(gmode, ga, s, offset)); break;
+							case 2: b += sprintf(b, "%s = &%s%s", REG_NAMES[greg], TRANSFER_SIZE[size], format_address_mode(gmode, ga, s, offset)); break;
+							case 3: b += sprintf(b, "%s = &%s%s", REG_NAMES[greg], TRANSFER_SIZE[size], format_address_mode(gmode, ga, s, offset)); break;
 						}
 					}
 					break;
@@ -196,17 +217,32 @@ static void format_transfer(UINT64 op)
 			{
 				case 0x00:										// Format 2: Move || Local
 				{
-					print("move||local");
+					b += sprintf(b, "move||local <TODO>");
 					break;
 				}
 				case 0x01:										// Format 3: Field Move || Local
 				{
-					print("field move||local");
+					b += sprintf(b, "field move||local <TODO>");
 					break;
 				}
 				case 0x02: case 0x03:							// Format 6: Non-D DU || Local
 				{
-					print("non-d du||local");
+					int d = (op >> 32) & 0x7;
+					int s = (op & (1 << 28));
+					int size = (op >> 29) & 0x3;
+					int le = ((op >> 16) & 2) | ((op >> 31) & 1);
+					int la = (op >> 25) & 0x7;
+					int limx = op & 0x7;
+
+					int reg = (4 << 3) | d;
+
+					switch (le)
+					{
+						case 0: b += sprintf(b, "&%s%s = %s", TRANSFER_SIZE[size], format_address_mode(lmode, la, s, limx), REG_NAMES[reg]); break;
+						case 1: b += sprintf(b, "%s = %s", REG_NAMES[reg], format_address_mode(lmode, la, s, limx)); break;
+						case 2: b += sprintf(b, "%s = &%s%s", REG_NAMES[reg], TRANSFER_SIZE[size], format_address_mode(lmode, la, s, limx)); break;
+						case 3: b += sprintf(b, "%s = &%s%s", REG_NAMES[reg], TRANSFER_SIZE[size], format_address_mode(lmode, la, s, limx)); break;
+					}
 					break;
 				}
 				case 0x10: case 0x11: case 0x12: case 0x13:		// Format 4: Local (Long Offset)
@@ -234,10 +270,10 @@ static void format_transfer(UINT64 op)
 
 					switch (le)
 					{
-						case 0: print("&%s%s = %s", TRANSFER_SIZE[size], format_address_mode(lmode, la, s, offset), REG_NAMES[reg]); break;
-						case 1: print("%s = %s", REG_NAMES[reg], format_address_mode(lmode, la, s, offset)); break;
-						case 2: print("%s = &%s%s", REG_NAMES[reg], TRANSFER_SIZE[size], format_address_mode(lmode, la, s, offset)); break;
-						case 3: print("%s = &%s%s", REG_NAMES[reg], TRANSFER_SIZE[size], format_address_mode(lmode, la, s, offset)); break;
+						case 0: b += sprintf(b, "&%s%s = %s", TRANSFER_SIZE[size], format_address_mode(lmode, la, s, offset), REG_NAMES[reg]); break;
+						case 1: b += sprintf(b, "%s = %s", REG_NAMES[reg], format_address_mode(lmode, la, s, offset)); break;
+						case 2: b += sprintf(b, "%s = &%s%s", REG_NAMES[reg], TRANSFER_SIZE[size], format_address_mode(lmode, la, s, offset)); break;
+						case 3: b += sprintf(b, "%s = &%s%s", REG_NAMES[reg], TRANSFER_SIZE[size], format_address_mode(lmode, la, s, offset)); break;
 					}
 					break;
 				}
@@ -265,10 +301,10 @@ static void format_transfer(UINT64 op)
 					// local transfer
 					switch (local_le)
 					{
-						case 0: print("&%s%s = %s", TRANSFER_SIZE[local_size], format_address_mode(lmode, la, local_s, local_imx), REG_NAMES[lreg]); break;
-						case 1: print("%s = %s", REG_NAMES[lreg], format_address_mode(lmode, la, local_s, local_imx)); break;
-						case 2: print("%s = &%s%s", REG_NAMES[lreg], TRANSFER_SIZE[local_size], format_address_mode(lmode, la, local_s, local_imx)); break;
-						case 3: print("%s = &%s%s", REG_NAMES[lreg], TRANSFER_SIZE[local_size], format_address_mode(lmode, la, local_s, local_imx)); break;
+						case 0: b += sprintf(b, "&%s%s = %s", TRANSFER_SIZE[local_size], format_address_mode(lmode, la, local_s, local_imx), REG_NAMES[lreg]); break;
+						case 1: b += sprintf(b, "%s = %s", REG_NAMES[lreg], format_address_mode(lmode, la, local_s, local_imx)); break;
+						case 2: b += sprintf(b, "%s = &%s%s", REG_NAMES[lreg], TRANSFER_SIZE[local_size], format_address_mode(lmode, la, local_s, local_imx)); break;
+						case 3: b += sprintf(b, "%s = &%s%s", REG_NAMES[lreg], TRANSFER_SIZE[local_size], format_address_mode(lmode, la, local_s, local_imx)); break;
 					}
 
 					print(", ");
@@ -276,16 +312,19 @@ static void format_transfer(UINT64 op)
 					// global transfer
 					switch (global_le)
 					{
-						case 0: print("&%s%s = %s", TRANSFER_SIZE[global_size], format_address_mode(gmode, ga, global_s, global_imx), REG_NAMES[greg]); break;
-						case 1: print("%s = %s", REG_NAMES[greg], format_address_mode(gmode, ga, global_s, global_imx)); break;
-						case 2: print("%s = &%s%s", REG_NAMES[greg], TRANSFER_SIZE[global_size], format_address_mode(gmode, ga, global_s, global_imx)); break;
-						case 3: print("%s = &%s%s", REG_NAMES[greg], TRANSFER_SIZE[global_size], format_address_mode(gmode, ga, global_s, global_imx)); break;
+						case 0: b += sprintf(b, "&%s%s = %s", TRANSFER_SIZE[global_size], format_address_mode(gmode, ga, global_s, global_imx), REG_NAMES[greg]); break;
+						case 1: b += sprintf(b, "%s = %s", REG_NAMES[greg], format_address_mode(gmode, ga, global_s, global_imx)); break;
+						case 2: b += sprintf(b, "%s = &%s%s", REG_NAMES[greg], TRANSFER_SIZE[global_size], format_address_mode(gmode, ga, global_s, global_imx)); break;
+						case 3: b += sprintf(b, "%s = &%s%s", REG_NAMES[greg], TRANSFER_SIZE[global_size], format_address_mode(gmode, ga, global_s, global_imx)); break;
 					}
 					break;
 				}
 			}
 		}
 	}
+
+	if (!is_nop)
+		print(" || %s", buffer);
 }
 
 static void format_alu_op(int aluop, int a, const char *dst_text, const char *a_text, const char *b_text, const char *c_text)
@@ -366,6 +405,10 @@ static void format_alu_op(int aluop, int a, const char *dst_text, const char *a_
 				print("%s = %s | %s", dst_text, a_text, b_text);
 				break;
 
+			case 0x44:		// ~A &  B &  C | ~A &  B & ~C                             = ~A & B
+				print("%s = ~%s & %s", dst_text, a_text, b_text);
+				break;
+
 			default:
 				print("%s = b%02X(%s, %s, %s)", dst_text, aluop, a_text, b_text, c_text);
 				break;
@@ -386,7 +429,7 @@ static offs_t tms32082_disasm_pp(char *buffer, offs_t pc, const UINT8 *oprom)
 		case 0x6:
 		case 0x7:			// Six-operand
 		{
-			print("A: six operand");
+			print("A: six operand <TODO>");
 			break;
 		}
 
@@ -435,8 +478,22 @@ static offs_t tms32082_disasm_pp(char *buffer, offs_t pc, const UINT8 *oprom)
 						int aluop = (op >> 51) & 0xff;
 						int a = (op >> 59) & 1;
 
-						int s1reg = src1 | (0x4 << 3);
-						int dreg = dst | (0x4 << 3);
+						int adstbank;
+						int as1bank;
+
+						if ((op & 0x0101c000) == 0x00004000)
+						{
+							adstbank = (op >> 18) & 0xf;
+							as1bank = (op >> 6) & 0xf;
+						}
+						else
+						{
+							adstbank = 4;
+							as1bank = 4;
+						}
+
+						int s1reg = src1 | (as1bank << 3);
+						int dreg = dst | (adstbank << 3);
 						int dstcreg = dst | (0x4 << 3);
 
 						sprintf(dst_text, "%s", REG_NAMES[dreg]);
@@ -500,10 +557,24 @@ static offs_t tms32082_disasm_pp(char *buffer, offs_t pc, const UINT8 *oprom)
 						int aluop = (op >> 51) & 0xff;
 						int a = (op >> 59) & 1;
 
-						int s1reg = src1 | (0x4 << 3);
+						int adstbank;
+						int as1bank;
+
+						if ((op & 0x0101c000) == 0x00004000)
+						{
+							adstbank = (op >> 18) & 0xf;
+							as1bank = (op >> 6) & 0xf;
+						}
+						else
+						{
+							adstbank = 4;
+							as1bank = 4;
+						}
+
+						int s1reg = src1 | (as1bank << 3);
 						int s2reg = src2 | (0x4 << 3);
 						int dstcreg = dst | (0x4 << 3);
-						int dreg = dst | (0x4 << 3);
+						int dreg = dst | (adstbank << 3);
 
 						sprintf(dst_text, "%s", REG_NAMES[dreg]);
 						switch (cl)

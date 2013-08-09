@@ -135,6 +135,12 @@ void tms32082_mp_device::device_start()
 	save_item(NAME(m_fetchpc));
 	save_item(NAME(m_reg));
 	save_item(NAME(m_acc));
+	
+	save_item(NAME(m_in0p));
+	save_item(NAME(m_in1p));
+	save_item(NAME(m_outp));
+	save_item(NAME(m_ie));
+	save_item(NAME(m_intpen));
 
 	// Register state for debugger
 	state_add(MP_PC, "pc", m_pc).formatstr("%08X");
@@ -180,6 +186,8 @@ void tms32082_mp_device::device_start()
 	state_add(MP_IN0P, "in0p", m_in0p).formatstr("%08X");
 	state_add(MP_IN1P, "in1p", m_in1p).formatstr("%08X");
 	state_add(MP_OUTP, "outp", m_outp).formatstr("%08X");
+	state_add(MP_IE, "ie", m_ie).formatstr("%08X");
+	state_add(MP_INTPEN, "intpen", m_intpen).formatstr("%08X");
 
 	state_add(STATE_GENPC, "curpc", m_pc).noshow();
 
@@ -215,12 +223,74 @@ void tms32082_mp_device::device_reset()
 	m_acc[1] = 0;
 	m_acc[2] = 0;
 	m_acc[3] = 0;
+
+	m_in0p = 0;
+	m_in1p = 0;
+	m_outp = 0;
+
+	m_intpen = 0;
+	m_ie = 0;
+}
+
+void tms32082_mp_device::processor_command(UINT32 command)
+{
+	printf("MP CMND %08X: ", command);
+
+	if (command & 0x80000000)
+		printf("Reset ");
+	if (command & 0x40000000)
+		printf("Halt ");
+	if (command & 0x20000000)
+		printf("Unhalt ");
+	if (command & 0x10000000)
+		printf("ICR ");
+	if (command & 0x08000000)
+		printf("DCR ");
+	if (command & 0x00004000)
+		printf("Task ");
+	if (command & 0x00002000)
+		printf("Msg ");
+	
+	printf("to: ");
+
+	if (command & 0x00000400)
+		printf("VC ");
+	if (command & 0x00000200)
+		printf("TC ");
+	if (command & 0x00000100)
+		printf("MP ");
+	if (command & 0x00000008)
+		printf("PP3 ");
+	if (command & 0x00000004)
+		printf("PP2 ");
+	if (command & 0x00000002)
+		printf("PP1 ");
+	if (command & 0x00000001)
+		printf("PP0 ");
+
+	printf("\n");
+
+	// PP0
+	if (command & 1)
+	{
+		if (command & 0x20004000)
+		{
+			// simulate PP behavior for now...
+			m_program->write_dword(0x00000084, 3);
+		}
+	}
 }
 
 UINT32 tms32082_mp_device::read_creg(int reg)
 {
 	switch (reg)
 	{
+		case 0x4:			// INTPEN
+			return m_intpen;
+
+		case 0x6:			// IE
+			return m_ie;
+
 		case 0xa:           // PPERROR
 			return 0xe0000;
 
@@ -244,6 +314,21 @@ void tms32082_mp_device::write_creg(int reg, UINT32 data)
 {
 	switch (reg)
 	{
+		case 0x4:			// INTPEN
+		{
+			for (int i=0; i < 32; i++)
+			{
+				if (data & (1 << i))
+					m_intpen &= ~(1 << i);
+			}
+			break;
+		}
+
+		case 0x6:			// IE
+			m_ie = data;
+			printf("IE = %08X\n", data);
+			break;
+
 		case 0x4000:		// IN0P
 			m_in0p = data;
 			break;
@@ -259,6 +344,54 @@ void tms32082_mp_device::write_creg(int reg, UINT32 data)
 		default:
 			printf("write_creg(): %08X, %08X\n", reg, data);
 			break;
+	}
+}
+
+void tms32082_mp_device::check_interrupts()
+{
+	if (m_ie & 1)		// global interrupt mask
+	{
+		for (int i=1; i < 32; i++)
+		{
+			if (m_ie & m_intpen & (1 << i))
+			{
+				m_epc = (m_fetchpc & ~3);
+				m_epc |= (m_ie & 1);		// save global interrupt mask
+				// TODO: user mode bit to EPC
+
+				m_eip = m_pc;
+
+				m_ie &= ~1;					// clear global interrupt mask
+
+				// get new pc from vector table
+				m_fetchpc = m_pc = m_program->read_dword(0x01010180 + (i * 4));
+				return;
+			}
+		}
+	}
+}
+
+void tms32082_mp_device::execute_set_input(int inputnum, int state)
+{
+	if (state == ASSERT_LINE)
+	{
+		switch (inputnum)
+		{
+			case INPUT_X1:
+				m_intpen |= (1 << 11);
+				break;
+			case INPUT_X2:
+				m_intpen |= (1 << 12);
+				break;
+			case INPUT_X3:
+				m_intpen |= (1 << 29);
+				break;
+			case INPUT_X4:
+				m_intpen |= (1 << 30);
+				break;
+			default:
+				break;
+		}
 	}
 }
 
@@ -283,6 +416,9 @@ void tms32082_mp_device::execute_run()
 	while (m_icount > 0)
 	{
 		m_pc = m_fetchpc;
+		
+		check_interrupts();
+
 		debugger_instruction_hook(this, m_pc);
 
 		m_ir = fetch();
@@ -346,7 +482,7 @@ void tms32082_pp_device::state_string_export(const device_state_entry &entry, as
 void tms32082_pp_device::device_reset()
 {
 	m_pc = 0;
-	m_fetchpc = 0;
+	m_fetchpc = 0x400010a0;
 }
 
 void tms32082_pp_device::execute_run()
