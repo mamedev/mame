@@ -929,7 +929,7 @@ void atari_eeprom_device::device_reset()
 //-------------------------------------------------
 
 atari_eeprom_2804_device::atari_eeprom_2804_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: atari_eeprom_device(mconfig, ATARI_EEPROM_2804, "Atari EEPROM Interface", tag, owner, "atari2804", __FILE__)
+	: atari_eeprom_device(mconfig, ATARI_EEPROM_2804, "Atari EEPROM Interface (2804)", tag, owner, "atari2804", __FILE__)
 {
 }
 
@@ -954,7 +954,7 @@ machine_config_constructor atari_eeprom_2804_device::device_mconfig_additions() 
 //-------------------------------------------------
 
 atari_eeprom_2816_device::atari_eeprom_2816_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: atari_eeprom_device(mconfig, ATARI_EEPROM_2816, "Atari EEPROM Interface", tag, owner, "atari2816", __FILE__)
+	: atari_eeprom_device(mconfig, ATARI_EEPROM_2816, "Atari EEPROM Interface (2816)", tag, owner, "atari2816", __FILE__)
 {
 }
 
