@@ -237,10 +237,10 @@ void tms9995_device::state_import(const device_state_entry &entry)
 			// bits of the STATUS register
 			break;
 		case TMS9995_PC:
-			PC = (UINT16)m_state_any;
+			PC = (UINT16)m_state_any & 0xfffe;
 			break;
 		case TMS9995_WP:
-			WP = (UINT16)m_state_any;
+			WP = (UINT16)m_state_any & 0xfffe;
 			break;
 		case TMS9995_STATUS:
 			ST = (UINT16)m_state_any;
@@ -2229,7 +2229,7 @@ void tms9995_device::alu_add_s_sxc()
 void tms9995_device::alu_b()
 {
 	m_current_value = PC;
-	PC = m_address;
+	PC = m_address & 0xfffe;
 	m_address = WP + 22;
 }
 
@@ -2245,7 +2245,7 @@ void tms9995_device::alu_blwp()
 	case 0:
 		// new WP in m_current_value
 		m_value_copy = WP;
-		WP = m_current_value;
+		WP = m_current_value & 0xfffe;
 		m_address_saved = m_address + 2;
 		m_address = WP + 30;
 		m_current_value = ST;
@@ -2262,7 +2262,7 @@ void tms9995_device::alu_blwp()
 		m_address = m_address_saved;
 		break;
 	case 4:
-		PC = m_current_value;
+		PC = m_current_value & 0xfffe;
 		n = 0;
 		if (VERBOSE>5) LOG("tms9995: Context switch complete; WP=%04x, PC=%04x, ST=%04x\n", WP, PC, ST);
 		break;
@@ -2653,7 +2653,7 @@ void tms9995_device::alu_jump()
 	else
 	{
 		if (VERBOSE>7) LOG("tms9995: Jump condition true\n");
-		PC = PC + (displacement<<1);
+		PC = (PC + (displacement<<1)) & 0xfffe;
 	}
 	pulse_clock(1);
 }
@@ -2716,7 +2716,7 @@ void tms9995_device::alu_limi_lwpi()
 	}
 	else
 	{
-		WP = m_current_value;
+		WP = m_current_value & 0xfffe;
 		if (VERBOSE>7) LOG("tms9995: new WP = %04x\n", WP);
 	}
 }
@@ -2735,7 +2735,7 @@ void tms9995_device::alu_lst_lwp()
 	}
 	else
 	{
-		WP = m_current_value;
+		WP = m_current_value & 0xfffe;
 		if (VERBOSE>7) LOG("tms9995: new WP = %04x\n", WP);
 	}
 }
@@ -2838,11 +2838,11 @@ void tms9995_device::alu_rtwp()
 		m_address -= 2;             // R14
 		break;
 	case 2:
-		PC = m_current_value;
+		PC = m_current_value & 0xfffe;
 		m_address -= 2;             // R13
 		break;
 	case 3:
-		WP = m_current_value;
+		WP = m_current_value & 0xfffe;
 		n = 1;
 		break;
 	}
@@ -3154,7 +3154,7 @@ void tms9995_device::alu_xop()
 	case 1:
 		// m_current_value is new WP
 		m_value_copy = WP;  // store this for later
-		WP = m_current_value;
+		WP = m_current_value & 0xfffe;
 		m_address = WP + 0x0016; // Address of new R11
 		m_current_value = m_address_saved;
 		break;
@@ -3174,7 +3174,7 @@ void tms9995_device::alu_xop()
 		m_address = 0x0042 + ((m_instruction->IR & 0x03c0)>>4);
 		break;
 	case 6:
-		PC = m_current_value;
+		PC = m_current_value & 0xfffe;
 		set_status_bit(ST_X, true);
 		n = 0;
 		break;
@@ -3201,7 +3201,7 @@ void tms9995_device::alu_int()
 	case 1:
 		pulse = 2;                  // two cycles (with the one at the end)
 		m_source_value = WP;        // old WP
-		WP = m_current_value;       // new WP
+		WP = m_current_value & 0xfffe;       // new WP
 		m_current_value = ST;
 		m_address = (WP + 30)&0xfffe;
 		if (VERBOSE>7) LOG("tms9995: interrupt service (1): Read new WP = %04x, save ST to %04x\n", WP, m_address);
@@ -3221,7 +3221,7 @@ void tms9995_device::alu_int()
 		if (VERBOSE>7) LOG("tms9995: interrupt service (4): Read PC from %04x\n", m_address);
 		break;
 	case 5:
-		PC = m_current_value;
+		PC = m_current_value & 0xfffe;
 		ST = (ST & 0xfe00) | m_intmask;
 		if (VERBOSE>5) LOG("tms9995: interrupt service (5): Context switch complete; WP=%04x, PC=%04x, ST=%04x\n", WP, PC, ST);
 

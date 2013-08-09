@@ -242,10 +242,10 @@ void tms99xx_device::state_import(const device_state_entry &entry)
 			// bits of the STATUS register
 			break;
 		case TMS9900_PC:
-			PC = (UINT16)(m_state_any & m_prgaddr_mask);
+			PC = (UINT16)(m_state_any & m_prgaddr_mask & 0xfffe);
 			break;
 		case TMS9900_WP:
-			WP = (UINT16)(m_state_any & m_prgaddr_mask);
+			WP = (UINT16)(m_state_any & m_prgaddr_mask & 0xfffe);
 			break;
 		case TMS9900_STATUS:
 			ST = (UINT16)m_state_any;
@@ -1942,7 +1942,7 @@ void tms99xx_device::alu_xop()
 		break;
 	case 1:
 		m_value_copy = WP;                      // save the old WP
-		WP = m_current_value & m_prgaddr_mask;  // the new WP has been read in the previous microoperation
+		WP = m_current_value & m_prgaddr_mask & 0xfffe;  // the new WP has been read in the previous microoperation
 		m_current_value = m_address_saved;      // we saved the address of the source operand; retrieve it
 		m_address = WP + 0x0016;                // Next register is R11
 		break;
@@ -1963,7 +1963,7 @@ void tms99xx_device::alu_xop()
 		set_status_bit(ST_X, true);
 		break;
 	case 6:
-		PC = m_current_value & m_prgaddr_mask;
+		PC = m_current_value & m_prgaddr_mask & 0xfffe;
 		break;
 	}
 	pulse_clock(2);
@@ -2087,7 +2087,7 @@ void tms99xx_device::alu_b()
 	// retrieves the value at 0xa000, but in fact it will load the PC
 	// with the address 0xa000
 	m_current_value = PC;
-	PC = m_address & m_prgaddr_mask;
+	PC = m_address & m_prgaddr_mask & 0xfffe;
 	m_address = WP + 22;
 	if (VERBOSE>7) LOG("tms99xx: Set new PC = %04x\n", PC);
 	pulse_clock(2);
@@ -2099,7 +2099,7 @@ void tms99xx_device::alu_blwp()
 	{
 	case 0:
 		m_value_copy = WP;
-		WP = m_current_value & m_prgaddr_mask;              // set new WP (*m_destination)
+		WP = m_current_value & m_prgaddr_mask & 0xfffe;              // set new WP (*m_destination)
 		m_address_saved = (m_address + 2) & m_prgaddr_mask; // Save the location of the WP
 		m_address = WP + 30;
 		m_current_value = ST;                           // get status register
@@ -2116,7 +2116,7 @@ void tms99xx_device::alu_blwp()
 		m_address = m_address_saved;                    // point to PC component of branch vector
 		break;
 	case 4:
-		PC = m_current_value & m_prgaddr_mask;
+		PC = m_current_value & m_prgaddr_mask & 0xfffe;
 		if (VERBOSE>5) LOG("tms9900: Context switch complete; WP=%04x, PC=%04x, ST=%04x\n", WP, PC, ST);
 		break;
 	}
@@ -2316,7 +2316,7 @@ void tms99xx_device::alu_jmp()
 	else
 	{
 		displacement = (IR & 0xff);
-		PC = (PC + (displacement<<1)) & m_prgaddr_mask;
+		PC = (PC + (displacement<<1)) & m_prgaddr_mask & 0xfffe;
 		pulse_clock(2);
 	}
 	m_state++;
@@ -2437,7 +2437,7 @@ void tms99xx_device::alu_li()
 
 void tms99xx_device::alu_lwpi()
 {
-	WP = m_current_value & m_prgaddr_mask;
+	WP = m_current_value & m_prgaddr_mask & 0xfffe;
 	pulse_clock(2);
 }
 
@@ -2486,11 +2486,11 @@ void tms99xx_device::alu_rtwp()
 		m_address -= 2;             // R14
 		break;
 	case 2:
-		PC = m_current_value & m_prgaddr_mask;
+		PC = m_current_value & m_prgaddr_mask & 0xfffe;
 		m_address -= 2;             // R13
 		break;
 	case 3:
-		WP = m_current_value & m_prgaddr_mask;
+		WP = m_current_value & m_prgaddr_mask & 0xfffe;
 		break;
 	}
 	m_state++;
@@ -2521,7 +2521,7 @@ void tms99xx_device::alu_int()
 	case 1:
 		m_address_copy = m_address;
 		m_value_copy = WP;                          // old WP
-		WP = m_current_value & m_prgaddr_mask;      // new WP
+		WP = m_current_value & m_prgaddr_mask & 0xfffe;      // new WP
 		m_current_value = ST;
 		m_address = (WP + 30) & m_prgaddr_mask;
 		break;
@@ -2538,7 +2538,7 @@ void tms99xx_device::alu_int()
 		if (VERBOSE>7) LOG("tms99xx: read from %04x\n", m_address);
 		break;
 	case 5:
-		PC = m_current_value & m_prgaddr_mask;
+		PC = m_current_value & m_prgaddr_mask & 0xfffe;
 		if (m_irq_level > 0 )
 		{
 			ST = (ST & 0xfff0) | (m_irq_level - 1);
