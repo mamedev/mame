@@ -265,7 +265,7 @@ to emulate this. Also it keeps the palette a reasonable size. :)
 
 UINT16 *v99x8_device::s_pal_indYJK;
 
-PALETTE_INIT_MEMBER(v99x8_device, v9958)
+PALETTE_INIT_MEMBER(v9958_device, v9958)
 {
 	int r,g,b,y,j,k,i,k0,j0,n;
 	UINT8 pal[19268*3];
@@ -3192,4 +3192,32 @@ void v99x8_device::update_command()
 		m_vdp_ops_count=13662;
 		if(m_vdp_engine) (this->*m_vdp_engine)();
 	}
+}
+
+static MACHINE_CONFIG_FRAGMENT( v9938 )
+	MCFG_PALETTE_INIT_OVERRIDE(v9938_device, v9938)
+MACHINE_CONFIG_END
+
+//-------------------------------------------------
+//  machine_config_additions - return a pointer to
+//  the device's machine fragment
+//-------------------------------------------------
+
+machine_config_constructor v9938_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( v9938 );
+}
+
+static MACHINE_CONFIG_FRAGMENT( v9958 )
+	MCFG_PALETTE_INIT_OVERRIDE(v9958_device, v9958)
+MACHINE_CONFIG_END
+
+//-------------------------------------------------
+//  machine_config_additions - return a pointer to
+//  the device's machine fragment
+//-------------------------------------------------
+
+machine_config_constructor v9958_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( v9958 );
 }

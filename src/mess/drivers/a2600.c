@@ -1934,14 +1934,13 @@ static MACHINE_CONFIG_START( a2600, a2600_state )
 	MCFG_MACHINE_START_OVERRIDE(a2600_state,a2600)
 
 	/* video hardware */
-	MCFG_TIA_VIDEO_ADD("tia_video", a2600_tia_interface)
+	MCFG_TIA_NTSC_VIDEO_ADD("tia_video", a2600_tia_interface)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS( MASTER_CLOCK_NTSC, 228, 26, 26 + 160 + 16, 262, 24 , 24 + 192 + 31 )
 	MCFG_SCREEN_UPDATE_DEVICE("tia_video", tia_video_device, screen_update)
 
 	MCFG_PALETTE_LENGTH( TIA_PALETTE_LENGTH )
-	MCFG_PALETTE_INIT_OVERRIDE(tia_video_device, tia_ntsc)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1971,14 +1970,13 @@ static MACHINE_CONFIG_START( a2600p, a2600_state )
 	MCFG_MACHINE_START_OVERRIDE(a2600_state,a2600)
 
 	/* video hardware */
-	MCFG_TIA_VIDEO_ADD("tia_video", a2600_tia_interface_pal)
+	MCFG_TIA_PAL_VIDEO_ADD("tia_video", a2600_tia_interface_pal)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS( MASTER_CLOCK_PAL, 228, 26, 26 + 160 + 16, 312, 32, 32 + 228 + 31 )
 	MCFG_SCREEN_UPDATE_DEVICE("tia_video", tia_video_device, screen_update)
 
 	MCFG_PALETTE_LENGTH( TIA_PALETTE_LENGTH )
-	MCFG_PALETTE_INIT_OVERRIDE(tia_video_device, tia_pal)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

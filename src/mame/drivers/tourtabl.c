@@ -181,14 +181,13 @@ static MACHINE_CONFIG_START( tourtabl, tourtabl_state )
 	MCFG_RIOT6532_ADD("riot1", MASTER_CLOCK / 3, r6532_interface_0)
 	MCFG_RIOT6532_ADD("riot2", MASTER_CLOCK / 3, r6532_interface_1)
 
-	MCFG_TIA_VIDEO_ADD("tia_video", tourtabl_tia_interface)
+	MCFG_TIA_NTSC_VIDEO_ADD("tia_video", tourtabl_tia_interface)
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS( MASTER_CLOCK, 228, 34, 34 + 160, 262, 46, 46 + 200 )
 	MCFG_SCREEN_UPDATE_DEVICE("tia_video", tia_video_device, screen_update)
 
 	MCFG_PALETTE_LENGTH(TIA_PALETTE_LENGTH)
-	MCFG_PALETTE_INIT_OVERRIDE(tia_video_device, tia_ntsc)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

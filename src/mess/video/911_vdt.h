@@ -55,6 +55,7 @@ protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
+	virtual machine_config_constructor device_mconfig_additions() const;
 private:
 	// internal state
 	void *m_token;

@@ -79,8 +79,7 @@ public:
 	DECLARE_WRITE8_MEMBER( write );
 	
 	DECLARE_PALETTE_INIT(v9938);
-	DECLARE_PALETTE_INIT(v9958);
-
+	
 	UINT8 vram_r();
 	UINT8 status_r();
 	void palette_w(UINT8 data);
@@ -237,6 +236,7 @@ private:
 	} ;
 	static const v99x8_mode s_modes[];
 
+protected:
 	static UINT16 *s_pal_indYJK;
 };
 
@@ -245,12 +245,20 @@ class v9938_device : public v99x8_device
 {
 public:
 	v9938_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	
+protected:
+	virtual machine_config_constructor device_mconfig_additions() const;
 };
 
 class v9958_device : public v99x8_device
 {
 public:
 	v9958_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	
+	DECLARE_PALETTE_INIT(v9958);	
+	
+protected:
+	virtual machine_config_constructor device_mconfig_additions() const;
 };
 
 

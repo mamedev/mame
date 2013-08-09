@@ -887,10 +887,38 @@ k1ge_device::k1ge_device(const machine_config &mconfig, device_type type, const 
 {
 }
 
+static MACHINE_CONFIG_FRAGMENT( k1ge )
+	MCFG_PALETTE_INIT_OVERRIDE(k1ge_device, k1ge)
+MACHINE_CONFIG_END
+
+//-------------------------------------------------
+//  machine_config_additions - return a pointer to
+//  the device's machine fragment
+//-------------------------------------------------
+
+machine_config_constructor k1ge_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( k1ge );
+}
+
 
 const device_type K2GE = &device_creator<k2ge_device>;
 
 k2ge_device::k2ge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: k1ge_device(mconfig, K2GE, "K2GE Color Graphics + LCD", tag, owner, clock, "k2ge", __FILE__)
 {
+}
+
+static MACHINE_CONFIG_FRAGMENT( k2ge )
+	MCFG_PALETTE_INIT_OVERRIDE(k2ge_device, k2ge)
+MACHINE_CONFIG_END
+
+//-------------------------------------------------
+//  machine_config_additions - return a pointer to
+//  the device's machine fragment
+//-------------------------------------------------
+
+machine_config_constructor k2ge_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( k2ge );
 }

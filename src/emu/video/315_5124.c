@@ -119,7 +119,7 @@ PALETTE_INIT_MEMBER(sega315_5124_device, sega315_5124)
 }
 
 
-PALETTE_INIT_MEMBER(sega315_5124_device, sega315_5378)
+PALETTE_INIT_MEMBER(sega315_5378_device, sega315_5378)
 {
 	int i;
 	for (i = 0; i < 4096; i++)
@@ -1796,9 +1796,37 @@ void sega315_5124_device::device_reset()
 	memset(m_line_buffer, 0, 256 * 5 * sizeof(int));
 }
 
+static MACHINE_CONFIG_FRAGMENT( sega315_5124 )
+	MCFG_PALETTE_INIT_OVERRIDE(sega315_5124_device, sega315_5124)
+MACHINE_CONFIG_END
+
+//-------------------------------------------------
+//  machine_config_additions - return a pointer to
+//  the device's machine fragment
+//-------------------------------------------------
+
+machine_config_constructor sega315_5124_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( sega315_5124 );
+}
+
 
 void sega315_5378_device::device_reset()
 {
 	sega315_5124_device::device_reset();
 	m_draw_time = DRAW_TIME_GG;
+}
+
+static MACHINE_CONFIG_FRAGMENT( sega315_5378 )
+	MCFG_PALETTE_INIT_OVERRIDE(sega315_5378_device, sega315_5378)
+MACHINE_CONFIG_END
+
+//-------------------------------------------------
+//  machine_config_additions - return a pointer to
+//  the device's machine fragment
+//-------------------------------------------------
+
+machine_config_constructor sega315_5378_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( sega315_5378 );
 }

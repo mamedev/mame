@@ -292,3 +292,17 @@ void huc6260_device::device_reset()
 	m_last_h = m_screen->hpos();
 	m_timer->adjust( m_screen->time_until_pos( ( m_screen->vpos() + 1 ) % 263, 0 ) );
 }
+
+static MACHINE_CONFIG_FRAGMENT( huc6260 )
+	MCFG_PALETTE_INIT_OVERRIDE(huc6260_device, huc6260)
+MACHINE_CONFIG_END
+
+//-------------------------------------------------
+//  machine_config_additions - return a pointer to
+//  the device's machine fragment
+//-------------------------------------------------
+
+machine_config_constructor huc6260_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( huc6260 );
+}

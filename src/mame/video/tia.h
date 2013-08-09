@@ -28,8 +28,12 @@ struct player_gfx {
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_TIA_VIDEO_ADD(_tag, _config) \
-	MCFG_DEVICE_ADD(_tag, TIA_VIDEO, 0) \
+#define MCFG_TIA_PAL_VIDEO_ADD(_tag, _config) \
+	MCFG_DEVICE_ADD(_tag, TIA_PAL_VIDEO, 0) \
+	MCFG_DEVICE_CONFIG(_config)
+	
+#define MCFG_TIA_NTSC_VIDEO_ADD(_tag, _config) \
+	MCFG_DEVICE_ADD(_tag, TIA_NTSC_VIDEO, 0) \
 	MCFG_DEVICE_CONFIG(_config)
 
 //**************************************************************************
@@ -53,18 +57,15 @@ class tia_video_device :    public device_t,
 							public tia_interface
 {
 public:
-	// construction/destruction
-	tia_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 	
-	DECLARE_PALETTE_INIT(tia_ntsc);
-	DECLARE_PALETTE_INIT(tia_pal);
-
 protected:
+	// construction/destruction
+	tia_video_device(const machine_config &mconfig, device_type type, const char *name, const char *shortname, const char *tag, device_t *owner, UINT32 clock);
+
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
@@ -204,11 +205,33 @@ private:
 	bitmap_ind16 *helper[3];
 
 	UINT16 screen_height;
+};
 
+class tia_pal_video_device : public tia_video_device
+{
+public:
+	tia_pal_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	
+	DECLARE_PALETTE_INIT(tia_pal);
+	
+protected:
+	virtual machine_config_constructor device_mconfig_additions() const;
+};
+
+class tia_ntsc_video_device : public tia_video_device
+{
+public:
+	tia_ntsc_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	
+	DECLARE_PALETTE_INIT(tia_ntsc);
+	
+protected:
+	virtual machine_config_constructor device_mconfig_additions() const;
 };
 
 
 // device type definition
-extern const device_type TIA_VIDEO;
+extern const device_type TIA_PAL_VIDEO;
+extern const device_type TIA_NTSC_VIDEO;
 
 #endif /* _VIDEO_TIA_H_ */

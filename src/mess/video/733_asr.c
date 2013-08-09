@@ -763,3 +763,17 @@ void asr733_keyboard(device_t *device)
 		}
 	}
 }
+
+static MACHINE_CONFIG_FRAGMENT( asr733 )
+	MCFG_PALETTE_INIT_OVERRIDE(asr733_device, asr733)
+MACHINE_CONFIG_END
+
+//-------------------------------------------------
+//  machine_config_additions - return a pointer to
+//  the device's machine fragment
+//-------------------------------------------------
+
+machine_config_constructor asr733_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( asr733 );
+}

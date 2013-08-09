@@ -708,3 +708,17 @@ void vdt911_keyboard(device_t *device)
 		}
 	}
 }
+
+static MACHINE_CONFIG_FRAGMENT( vdt911 )
+	MCFG_PALETTE_INIT_OVERRIDE(vdt911_device, vdt911)
+MACHINE_CONFIG_END
+
+//-------------------------------------------------
+//  machine_config_additions - return a pointer to
+//  the device's machine fragment
+//-------------------------------------------------
+
+machine_config_constructor vdt911_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( vdt911 );
+}

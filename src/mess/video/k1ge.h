@@ -40,7 +40,8 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start();
-	virtual void device_reset();	
+	virtual void device_reset();
+	virtual machine_config_constructor device_mconfig_additions() const;
 
 	devcb2_write_line m_vblank_pin_w;
 	devcb2_write_line m_hblank_pin_w;
@@ -68,6 +69,8 @@ public:
 	
 	DECLARE_PALETTE_INIT(k2ge);
 protected:
+	virtual machine_config_constructor device_mconfig_additions() const;
+
 	virtual void draw(int line);
 
 	void draw_scroll_plane( UINT16 *p, UINT16 base, int line, int scroll_x, int scroll_y, UINT16 pal_base );

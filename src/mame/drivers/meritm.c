@@ -1256,7 +1256,6 @@ static MACHINE_CONFIG_START( meritm_crt250, meritm_state )
 	MCFG_SCREEN_UPDATE_DRIVER(meritm_state, screen_update_meritm)
 
 	MCFG_PALETTE_LENGTH(512)
-	MCFG_PALETTE_INIT_OVERRIDE(v9938_device, v9938)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

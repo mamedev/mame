@@ -78,7 +78,6 @@ public:
 	DECLARE_READ8_MEMBER( hcount_read );
 	
 	DECLARE_PALETTE_INIT( sega315_5124 );
-	DECLARE_PALETTE_INIT( sega315_5378 );
 
 	void hcount_latch() { hcount_latch_at_hpos( m_screen->hpos() ); };
 	void hcount_latch_at_hpos( int hpos );
@@ -110,6 +109,7 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual machine_config_constructor device_mconfig_additions() const;
 
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == AS_0) ? &m_space_config : NULL; }
 
@@ -184,11 +184,14 @@ class sega315_5378_device : public sega315_5124_device
 public:
 	sega315_5378_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual void device_reset();
+	DECLARE_PALETTE_INIT( sega315_5378 );
 
 	virtual void set_sega315_5124_compatibility_mode( bool sega315_5124_compatibility_mode );
 
 protected:
+	virtual void device_reset();
+	virtual machine_config_constructor device_mconfig_additions() const;
+
 	virtual void update_palette();
 	virtual void draw_scanline( int pixel_offset_x, int pixel_plot_y, int line );
 	virtual UINT16 get_name_table_address();

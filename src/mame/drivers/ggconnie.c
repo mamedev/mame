@@ -270,7 +270,6 @@ static MACHINE_CONFIG_START( ggconnie, ggconnie_state )
 	MCFG_SCREEN_UPDATE_DRIVER( ggconnie_state, screen_update )
 
 	MCFG_PALETTE_LENGTH( HUC6260_PALETTE_SIZE )
-	MCFG_PALETTE_INIT_OVERRIDE(huc6260_device, huc6260);
 
 	MCFG_HUC6260_ADD( "huc6260", PCE_MAIN_CLOCK/3, sgx_huc6260_config )
 	MCFG_HUC6270_ADD( "huc6270_0", sgx_huc6270_0_config )

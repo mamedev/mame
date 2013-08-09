@@ -45,7 +45,7 @@ static void extend_palette(running_machine &machine) {
 	}
 }
 
-PALETTE_INIT_MEMBER(tia_video_device, tia_ntsc)
+PALETTE_INIT_MEMBER(tia_ntsc_video_device, tia_ntsc)
 {
 	int i, j;
 
@@ -104,7 +104,7 @@ PALETTE_INIT_MEMBER(tia_video_device, tia_ntsc)
 }
 
 
-PALETTE_INIT_MEMBER(tia_video_device, tia_pal)
+PALETTE_INIT_MEMBER(tia_pal_video_device, tia_pal)
 {
 	int i, j;
 
@@ -162,19 +162,63 @@ PALETTE_INIT_MEMBER(tia_video_device, tia_pal)
 	extend_palette( machine() );
 }
 
-// device type definition
-const device_type TIA_VIDEO = &device_creator<tia_video_device>;
-
-//-------------------------------------------------
-//  tia_video_device - constructor
-//-------------------------------------------------
-
-tia_video_device::tia_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TIA_VIDEO, "TIA Video", tag, owner, clock, "tia_video", __FILE__),
+tia_video_device::tia_video_device(const machine_config &mconfig, device_type type, const char *name, const char *shortname, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
 	  device_video_interface(mconfig, *this)
 {
 }
 
+// device type definition
+const device_type TIA_PAL_VIDEO = &device_creator<tia_pal_video_device>;
+
+//-------------------------------------------------
+//  tia_pal_video_device - constructor
+//-------------------------------------------------
+
+tia_pal_video_device::tia_pal_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: tia_video_device(mconfig, TIA_PAL_VIDEO, "TIA Video (PAL)", "tia_pal_video", tag, owner, clock)
+{
+}
+
+static MACHINE_CONFIG_FRAGMENT( tia_pal )
+	MCFG_PALETTE_INIT_OVERRIDE(tia_pal_video_device, tia_pal)
+MACHINE_CONFIG_END
+
+//-------------------------------------------------
+//  machine_config_additions - return a pointer to
+//  the device's machine fragment
+//-------------------------------------------------
+
+machine_config_constructor tia_pal_video_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( tia_pal );
+}
+
+// device type definition
+const device_type TIA_NTSC_VIDEO = &device_creator<tia_ntsc_video_device>;
+
+//-------------------------------------------------
+//  tia_ntsc_video_device - constructor
+//-------------------------------------------------
+
+tia_ntsc_video_device::tia_ntsc_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: tia_video_device(mconfig, TIA_NTSC_VIDEO, "TIA Video (NTSC)", "tia_ntsc_video", tag, owner, clock)
+{
+}
+
+static MACHINE_CONFIG_FRAGMENT( tia_ntsc )
+	MCFG_PALETTE_INIT_OVERRIDE(tia_ntsc_video_device, tia_ntsc)
+MACHINE_CONFIG_END
+
+//-------------------------------------------------
+//  machine_config_additions - return a pointer to
+//  the device's machine fragment
+//-------------------------------------------------
+
+machine_config_constructor tia_ntsc_video_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( tia_ntsc );
+}
 
 //-------------------------------------------------
 //  device_config_complete - perform any
