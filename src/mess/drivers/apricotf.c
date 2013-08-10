@@ -122,14 +122,15 @@ WRITE8_MEMBER( f1_state::system_w )
 		break;
 
 	case 1: // drive select
-		wd17xx_set_drive(m_fdc, !BIT(data, 0));
+		m_fdc->set_floppy(BIT(data, 0) ? m_floppy0->get_device() : m_floppy1->get_device());
 		break;
 
 	case 3: // drive head load
 		break;
 
 	case 5: // drive motor on
-		floppy_mon_w(m_floppy0, !BIT(data, 0));
+		m_floppy0->get_device()->mon_w(!BIT(data, 0));
+		m_floppy1->get_device()->mon_w(!BIT(data, 0));
 		break;
 
 	case 7: // video lines (1=200, 0=256)
@@ -150,6 +151,13 @@ WRITE8_MEMBER( f1_state::system_w )
 		m_centronics->strobe_w(!BIT(data, 0));
 		break;
 	}
+}
+
+
+void f1_state::machine_start()
+{
+	m_fdc->setup_intrq_cb(wd2793_t::line_cb(FUNC(f1_state::wd2797_intrq_w), this));
+	m_fdc->setup_drq_cb(wd2793_t::line_cb(FUNC(f1_state::wd2797_drq_w), this));
 }
 
 
@@ -182,7 +190,7 @@ static ADDRESS_MAP_START( act_f1_io, AS_IO, 16, f1_state )
 	AM_RANGE(0x0010, 0x0017) AM_DEVREADWRITE8(Z80CTC_TAG, z80ctc_device, read, write, 0x00ff)
 	AM_RANGE(0x0020, 0x0027) AM_DEVREADWRITE8(Z80SIO2_TAG, z80sio2_device, ba_cd_r, ba_cd_w, 0x00ff)
 //  AM_RANGE(0x0030, 0x0031) AM_WRITE8(ctc_ack_w, 0x00ff)
-	AM_RANGE(0x0040, 0x0047) AM_DEVREADWRITE8_LEGACY(WD2797_TAG, wd17xx_r, wd17xx_w, 0x00ff)
+	AM_RANGE(0x0040, 0x0047) AM_DEVREADWRITE8(WD2797_TAG, wd2797_t, read, write, 0x00ff)
 //  AM_RANGE(0x01e0, 0x01ff) winchester
 ADDRESS_MAP_END
 
@@ -280,38 +288,22 @@ static Z80CTC_INTERFACE( ctc_intf )
 
 
 //-------------------------------------------------
-//  wd17xx_interface fdc_intf
+//  floppy
 //-------------------------------------------------
 
-static LEGACY_FLOPPY_OPTIONS_START( act )
-	LEGACY_FLOPPY_OPTION( img2hd, "dsk", "2HD disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([2])
-		TRACKS([80])
-		SECTORS([16])
-		SECTOR_LENGTH([256])
-		FIRST_SECTOR_ID([1]))
-LEGACY_FLOPPY_OPTIONS_END
-
-static const floppy_interface act_floppy_interface =
+void f1_state::wd2797_intrq_w(bool state)
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_3_5_DSDD, // Sony OA-D32W
-	LEGACY_FLOPPY_OPTIONS_NAME(act),
-	"floppy_3_5",
-	NULL
-};
+	m_maincpu->set_input_line(INPUT_LINE_NMI, state);}
 
-static const wd17xx_interface fdc_intf =
+void f1_state::wd2797_drq_w(bool state)
 {
-	DEVCB_NULL,
-	DEVCB_CPU_INPUT_LINE(I8086_TAG, INPUT_LINE_NMI),
-	DEVCB_CPU_INPUT_LINE(I8086_TAG, INPUT_LINE_TEST), // TODO inverted?
-	{ FLOPPY_0, NULL, NULL, NULL }
-};
+	m_maincpu->set_input_line(INPUT_LINE_TEST, state);
+}
+
+static SLOT_INTERFACE_START( apricotf_floppies )
+	SLOT_INTERFACE( "d31v", SONY_OA_D31V )
+	SLOT_INTERFACE( "d32w", SONY_OA_D32W )
+SLOT_INTERFACE_END
 
 
 //-------------------------------------------------
@@ -355,9 +347,12 @@ static MACHINE_CONFIG_START( act_f1, f1_state )
 	MCFG_APRICOT_KEYBOARD_ADD(kb_intf)
 	MCFG_Z80SIO2_ADD(Z80SIO2_TAG, 2500000, sio_intf)
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, 2500000, ctc_intf)
-	MCFG_WD2797_ADD(WD2797_TAG, fdc_intf)
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(act_floppy_interface)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
+
+	// floppy
+	MCFG_WD2797x_ADD(WD2797_TAG, XTAL_4MHz / 2 /* ? */)
+	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":0", apricotf_floppies, "d32w", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":1", apricotf_floppies, "d32w", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
 
 
