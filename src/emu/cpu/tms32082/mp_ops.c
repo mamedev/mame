@@ -186,6 +186,14 @@ void tms32082_mp_device::execute_short_imm()
 {
 	switch ((m_ir >> 15) & 0x7f)
 	{
+		case 0x02:			// cmnd
+		{
+			UINT32 data = OP_UIMM15();
+
+			processor_command(data);
+			break;
+		}
+
 		case 0x04:          // rdcr
 		{
 			int rd = OP_RD();
@@ -209,6 +217,25 @@ void tms32082_mp_device::execute_short_imm()
 				m_reg[rd] = r;
 
 			write_creg(imm, m_reg[rs]);
+			break;
+		}
+
+		case 0x06:			// brcr
+		{
+			int cr = OP_UIMM15();
+
+			if (cr == 0x0001)
+			{
+				// ignore jump to EIP because of how we emulate the pipeline
+			}
+			else
+			{
+				UINT32 data = read_creg(cr);
+
+				m_fetchpc = data & ~3;
+				m_ie = (m_ie & ~1) | (data & 1);		// global interrupt mask from creg
+				// TODO: user/supervisor latch from creg
+			}
 			break;
 		}
 
@@ -296,6 +323,36 @@ void tms32082_mp_device::execute_short_imm()
 			else        // left
 			{
 				res = ROTATE_L(source, rot) & compmask;
+			}
+
+			if (rd)
+				m_reg[rd] = res;
+			break;
+		}
+
+		case 0x0c:			// shift.em
+		{
+			int r = (m_ir & (1 << 10));
+			int inv = (m_ir & (1 << 11));
+			int rot = OP_ROTATE();
+			int end = OP_ENDMASK();
+			UINT32 source = m_reg[OP_RS()];
+			int rd = OP_RD();
+
+			UINT32 endmask = SHIFT_MASK[end ? end : 32];
+			if (inv) endmask = ~endmask;
+
+			UINT32 shiftmask = SHIFT_MASK[r ? 32-rot : rot];
+			UINT32 compmask = endmask & shiftmask;
+
+			UINT32 res = 0;
+			if (r)		// right
+			{
+				res = (ROTATE_R(source, rot) & compmask) | (m_reg[rd] & ~compmask);
+			}
+			else		// left
+			{
+				res = (ROTATE_L(source, rot) & compmask) | (m_reg[rd] & ~compmask);
 			}
 
 			if (rd)
@@ -654,6 +711,24 @@ void tms32082_mp_device::execute_short_imm()
 			break;
 		}
 
+		case 0x4a:			// bbo
+		{
+			int bitnum = OP_BITNUM() ^ 0x1f;
+			INT32 offset = OP_SIMM15();
+			int rs = OP_RS();
+
+			if ((m_reg[rs] & (1 << bitnum)) != 0)
+			{
+				UINT32 address = m_pc + (offset * 4);
+
+				m_pc = m_fetchpc;
+				delay_slot();
+
+				m_fetchpc = address;
+			}
+			break;
+		}
+
 		case 0x4b:          // bbo.a
 		{
 			int bitnum = OP_BITNUM() ^ 0x1f;
@@ -709,6 +784,19 @@ void tms32082_mp_device::execute_short_imm()
 			break;
 		}
 
+		case 0x58:			// add
+		{
+			INT32 imm = OP_SIMM15();
+			int rd = OP_RD();
+			int rs = OP_RS();
+
+			if (rd)
+				m_reg[rd] = m_reg[rs] + imm;
+
+			// TODO: integer overflow exception
+			break;
+		}
+
 		case 0x59:          // addu
 		{
 			INT32 imm = OP_SIMM15();
@@ -717,6 +805,19 @@ void tms32082_mp_device::execute_short_imm()
 
 			if (rd)
 				m_reg[rd] = m_reg[rs] + imm;
+			break;
+		}
+
+		case 0x5a:			// sub
+		{
+			INT32 imm = OP_SIMM15();
+			int rd = OP_RD();
+			int rs = OP_RS();
+
+			if (rd)
+				m_reg[rd] = imm - m_reg[rs];
+
+			// TODO: integer overflow exception
 			break;
 		}
 
@@ -950,6 +1051,26 @@ void tms32082_mp_device::execute_reg_long_imm()
 			break;
 		}
 
+		case 0x58:
+		case 0x59:
+		case 0x50:
+		case 0x51:			// ld.ub
+		{
+			int m = m_ir & (1 << 15);
+			int base = OP_BASE();
+			int rd = OP_RD();
+
+			UINT32 address = m_reg[base] + (has_imm ? imm32 : m_reg[OP_SRC1()]);
+			UINT32 r = (UINT8)(m_program->read_byte(address));
+
+			if (rd)
+				m_reg[rd] = r;
+
+			if (m && base)
+				m_reg[base] = address;
+			break;
+		}
+
 		case 0x5a:
 		case 0x5b:
 		case 0x52:
@@ -1175,8 +1296,8 @@ void tms32082_mp_device::execute_reg_long_imm()
 			else
 			{
 				// destination accumulator
-				if (pd != 3)
-					fatalerror("vrnd pd = %d\n", pd);
+				if (pd != 1)
+					fatalerror("vrnd pd = %d at %08X\n", pd, m_pc);
 
 				m_facc[acc] = source;
 			}

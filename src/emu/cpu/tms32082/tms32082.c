@@ -22,6 +22,12 @@ const device_type TMS32082_PP = &device_creator<tms32082_pp_device>;
 
 // internal memory map
 static ADDRESS_MAP_START(mp_internal_map, AS_PROGRAM, 32, tms32082_mp_device)
+	AM_RANGE(0x00000000, 0x00000fff) AM_RAM	AM_SHARE("pp0_data0")
+	AM_RANGE(0x00001000, 0x00001fff) AM_RAM AM_SHARE("pp1_data0")
+	AM_RANGE(0x00008000, 0x00008fff) AM_RAM AM_SHARE("pp0_data1")
+	AM_RANGE(0x00009000, 0x00009fff) AM_RAM AM_SHARE("pp1_data1")
+	AM_RANGE(0x01000000, 0x01000fff) AM_RAM AM_SHARE("pp0_param")
+	AM_RANGE(0x01001000, 0x01001fff) AM_RAM AM_SHARE("pp1_param")
 	AM_RANGE(0x01010000, 0x010107ff) AM_READWRITE(mp_param_r, mp_param_w)
 ADDRESS_MAP_END
 
@@ -273,10 +279,19 @@ void tms32082_mp_device::processor_command(UINT32 command)
 	// PP0
 	if (command & 1)
 	{
-		if (command & 0x20004000)
+		if (command & 0x00004000)
 		{
 			// simulate PP behavior for now...
 			m_program->write_dword(0x00000084, 3);
+		}
+	}
+	// PP1
+	if (command & 2)
+	{
+		if (command & 0x00004000)
+		{
+			// simulate PP behavior for now...
+			m_program->write_dword(0x00001014, 3);
 		}
 	}
 }
@@ -285,6 +300,12 @@ UINT32 tms32082_mp_device::read_creg(int reg)
 {
 	switch (reg)
 	{
+		case 0x0:			// EPC
+			return m_epc;
+
+		case 0x1:			// EIP
+			return m_eip;
+
 		case 0x4:			// INTPEN
 			return m_intpen;
 
@@ -314,6 +335,14 @@ void tms32082_mp_device::write_creg(int reg, UINT32 data)
 {
 	switch (reg)
 	{
+		case 0x0:			// EPC
+			m_epc = data;
+			break;
+
+		case 0x1:			// EIP
+			m_eip = data;
+			break;
+
 		case 0x4:			// INTPEN
 		{
 			for (int i=0; i < 32; i++)
@@ -437,6 +466,12 @@ void tms32082_mp_device::execute_run()
 
 // internal memory map
 static ADDRESS_MAP_START(pp_internal_map, AS_PROGRAM, 32, tms32082_pp_device)
+	AM_RANGE(0x00000000, 0x00000fff) AM_RAM	AM_SHARE("pp0_data0")
+	AM_RANGE(0x00001000, 0x00001fff) AM_RAM AM_SHARE("pp1_data0")
+	AM_RANGE(0x00008000, 0x00008fff) AM_RAM AM_SHARE("pp0_data1")
+	AM_RANGE(0x00009000, 0x00009fff) AM_RAM AM_SHARE("pp1_data1")
+	AM_RANGE(0x01000000, 0x01000fff) AM_RAM AM_SHARE("pp0_param")
+	AM_RANGE(0x01001000, 0x01001fff) AM_RAM AM_SHARE("pp1_param")
 ADDRESS_MAP_END
 
 tms32082_pp_device::tms32082_pp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
