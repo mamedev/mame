@@ -11,7 +11,25 @@
 #include "es5510.h"
 #include "cpu/m68000/m68000.h"
 
+static const INT32 MIN_24 = -(1 << 23);
+static const INT32 MAX_24 = (1 << 23) - 1;
+
+static const INT64 MIN_48 = -(S64(1) << 47);
+static const INT64 MAX_48 = (S64(1) << 47) - 1;
+
+#define SIGN_BIT_24 (0x00800000)
+#define GET_SIGN_BIT_24(x) ((x) & SIGN_BIT_24)
+#define IS_NEGATIVE(x) (((x) & SIGN_BIT_24) != 0)
+
+#define CARRY_OUT_24 (0x01000000)
+
+static inline INT32 SX(INT32 x) { return IS_NEGATIVE(x) ? x | 0xff000000 : x & 0x00ffffff; }
+static inline INT32 SC(INT32 x) { return x & 0x00ffffff; }
+static inline INT64 SX64(INT64 x) { return (x & S64(0x0000800000000000)) ? x | S64(0xffff000000000000) : x & S64(0x0000ffffffffffff); }
+static inline INT64 SC64(INT64 x) { return x & S64(0x0000ffffffffffff); }
+
 #define VERBOSE 0
+#define VERBOSE_EXEC 0
 
 #if VERBOSE
 void log_to_stderr(const char *format, ...) {
@@ -26,7 +44,6 @@ void log_to_stderr(const char *format, ...) {
 #define LOG(x)
 #endif
 
-#define VERBOSE_EXEC 0
 
 #if VERBOSE_EXEC
 static int exec_cc = 0;
@@ -69,12 +86,12 @@ inline static bool isFlagSet(UINT8 ccr, UINT8 flag) {
 }
 
 inline static INT32 add(INT32 a, INT32 b, UINT8 &flags) {
-	INT32 aSign = a & 0x00800000;
-	INT32 bSign = b & 0x00800000;
+	INT32 aSign = a & SIGN_BIT_24;
+	INT32 bSign = b & SIGN_BIT_24;
 	INT32 result = a + b;
-	INT32 resultSign = result & 0x00800000;
+	INT32 resultSign = result & SIGN_BIT_24;
 	bool overflow = (aSign == bSign) && (aSign != resultSign);
-	bool carry = result & 0x01000000;
+	bool carry = result & CARRY_OUT_24;
 	bool negative = resultSign != 0;
 	bool lessThan = (overflow && !negative) || (!overflow && negative);
 	flags = setFlagTo(flags, FLAG_C, carry);
@@ -82,28 +99,29 @@ inline static INT32 add(INT32 a, INT32 b, UINT8 &flags) {
 	flags = setFlagTo(flags, FLAG_Z, result == 0);
 	flags = setFlagTo(flags, FLAG_V, overflow);
 	flags = setFlagTo(flags, FLAG_LT, lessThan);
-	return result;
+	return SC(result);
 }
 
-inline static INT32 saturate(INT32 value, UINT8 &flags) {
+inline static INT32 saturate(INT32 value, UINT8 &flags, bool negative) {
 	if (isFlagSet(flags, FLAG_V)) {
-		return isFlagSet(flags, FLAG_N) ? 0x00800000 : 0x007fffff;
+		setFlagTo(flags, FLAG_N, negative);
+		return negative ? MIN_24 : MAX_24;
 	} else {
 		return value;
 	}
 }
 
 inline static INT32 negate(INT32 value) {
-	return (value ^ 0x00ffffff) + 1;
+	return ((value ^ 0x00ffffff) + 1) & 0x00ffffff;
 }
 
 inline static INT32 asl(INT32 value, int shift, UINT8 &flags) {
-	INT32 signBefore = value & 0x00800000;
-	INT32 result = (value << shift) & 0x00ffffff;
-	INT32 signAfter = result & 0x00800000;
+	INT32 signBefore = value & SIGN_BIT_24;
+	INT32 result = value << shift;
+	INT32 signAfter = result & SIGN_BIT_24;
 	bool overflow = signBefore != signAfter;
 	flags = setFlagTo(flags, FLAG_V, overflow);
-	return saturate(result, flags);
+	return saturate(result, flags, signBefore != 0);
 }
 
 es5510_device::es5510_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -160,11 +178,6 @@ typedef es5510_device::alu_op_t alu_op_t;
 typedef es5510_device::op_select_t op_select_t;
 typedef es5510_device::op_src_dst_t op_src_dst_t;
 
-static inline INT32 SX(INT32 x) { return (x & 0x00800000) ? x | 0xff000000 : x & 0x00ffffff; }
-static inline INT32 SC(INT32 x) { return x & 0x00ffffff; }
-static inline INT64 SX64(INT64 x) { return (x & S64(0x0000800000000000)) ? x | S64(0xffff000000000000) : x & S64(0x0000ffffffffffff); }
-static inline INT64 SC64(INT64 x) { return x & S64(0x0000ffffffffffff); }
-
 static inline const char * const REGNAME(UINT8 r) {
 	static char rn[8];
 	if (r < 234) { sprintf(rn, "GPR_%02x", r); return rn; }
@@ -196,7 +209,7 @@ static inline const char * const REGNAME(UINT8 r) {
 }
 
 static inline char * DESCRIBE_REG(char *s, UINT8 r, const char *name) {
-	if (name) {
+	if (name && *name) {
 		return s + sprintf(s, "%s/%s", REGNAME(r), name);
 	} else {
 		return stpcpy_int(s, REGNAME(r));
@@ -217,7 +230,7 @@ const alu_op_t es5510_device::ALU_OPS[16] = {
 	{ 1, "ASL2" },
 	{ 1, "ASL8" },
 	{ 1, "LS15" },
-	{ 2, "DIFF" },
+	{ 1, "DIFF" },
 	{ 1, "ASR" },
 	{ 0, "END" },
 };
@@ -288,9 +301,9 @@ static inline char * DESCRIBE_ALU(char *s, UINT8 opcode, UINT8 aReg, const char 
 
 	case 2:
 		s += sprintf(s, "%s ", op.opcode);
-		s = DESCRIBE_REG(s, bReg, bName);
-		s += sprintf(s, " ");
 		s = DESCRIBE_SRC_DST(s, aReg, aName, opSelect.alu_src);
+		s += sprintf(s, " ");
+		s = DESCRIBE_REG(s, bReg, bName);
 		s += sprintf(s, " >");
 		return DESCRIBE_SRC_DST(s, aReg, aName, opSelect.alu_dst);
 	}
@@ -303,9 +316,9 @@ static inline char * DESCRIBE_MAC(char *s, UINT8 mac, UINT8 cReg, const char *cN
 	{
 		s += sprintf(s, "MAC + ");
 	}
-	s = DESCRIBE_REG(s, dReg, dName);
-	s += sprintf(s, " * ");
 	s = DESCRIBE_SRC_DST(s, cReg, cName, opSelect.mac_src);
+	s += sprintf(s, " * ");
+	s = DESCRIBE_REG(s, dReg, dName);
 	s += sprintf(s, " >");
 	return DESCRIBE_SRC_DST(s, cReg, cName, opSelect.mac_dst);
 }
@@ -765,10 +778,7 @@ void es5510_device::execute_run() {
 					mulacc.result = mulacc.product;
 				}
 
-				INT64 result_min = ~0LL << 47;
-				INT64 result_max = (1LL << 48) - 1;
-
-				if (mulacc.result < result_min || mulacc.result > result_max) {
+				if (mulacc.result < MIN_48 || mulacc.result > MAX_48) {
 					mac_overflow = true;
 				} else {
 					mac_overflow = false;
@@ -786,7 +796,7 @@ void es5510_device::execute_run() {
 				}
 #endif
 				machl = mulacc.result;
-				INT32 tmp = mac_overflow ? (machl < 0 ? 0x00800000 : 0x007fffff) : (mulacc.result & U64(0x0000ffffff000000)) >> 24;
+				INT32 tmp = mac_overflow ? (machl < 0 ? MIN_24 : MAX_24) : (mulacc.result & U64(0x0000ffffff000000)) >> 24;
 				if (mulacc.dst & SRC_DST_REG) {
 					write_reg(mulacc.cReg, tmp);
 				}
@@ -947,8 +957,8 @@ INT32 es5510_device::read_reg(UINT8 reg)
 		case 239: RETURN16(ser2l, ser2l);
 		case 240: RETURN16(ser3r, ser3r);
 		case 241: RETURN16(ser3l, ser3l);
-		case 242: /* macl */ RETURN(macl, mac_overflow ? (machl < 0 ? 0x00fffffe : 0x00000000) : (machl >>  0) & 0x00ffffff);
-		case 243: /* mach */ RETURN(mach, mac_overflow ? (machl < 0 ? 0x007fffff : 0x00800000) : (machl >> 24) & 0x00ffffff);
+		case 242: /* macl */ RETURN(macl, mac_overflow ? (machl < 0 ? 0x00ffffff : 0x00000000) : (machl >>  0) & 0x00ffffff);
+		case 243: /* mach */ RETURN(mach, mac_overflow ? (machl < 0 ? MIN_24 : MAX_24) : (machl >> 24) & 0x00ffffff);
 		case 244: RETURN(dil, dil); // DIL when reading
 		case 245: RETURN(dlength, dlength);
 		case 246: RETURN(abase, abase);
@@ -958,12 +968,12 @@ INT32 es5510_device::read_reg(UINT8 reg)
 		case 250: RETURN(ccr, ccr);
 		case 251: RETURN(cmr, cmr);
 		case 252: RETURN(minus_one, 0x00ffffff);
-		case 253: RETURN(min, 0x00800000);
-		case 254: RETURN(max, 0x007fffff);
-		case 255: RETURN(zero, 0x00000000);
+		case 253: RETURN(min, MIN_24);
+		case 254: RETURN(max, MAX_24);
+		case 255: RETURN(zero, 0);
 		default:
 			// unknown SPR
-			RETURN(unknown, 0);;
+			RETURN(unknown, 0);
 		}
 	}
 }
@@ -1133,7 +1143,7 @@ void es5510_device::alu_operation_end() {
 
 #if VERBOSE_EXEC
 	// update the verbose-execution counter.
-	exec_cc = (exec_cc + 1) % 10000;
+	exec_cc = (exec_cc + 1) % 30000;
 #endif
 }
 
@@ -1142,11 +1152,11 @@ INT32 es5510_device::alu_operation(UINT8 op, INT32 a, INT32 b, UINT8 &flags) {
 	switch(op) {
 	case 0x0: // ADD
 		tmp = add(a, b, flags);
-		return saturate(tmp, flags);
+		return saturate(tmp, flags, (a & 0x00800000) != 0);
 
 	case 0x1: // SUB
 		tmp = add(a, negate(b), flags);
-		return saturate(tmp, flags);
+		return saturate(tmp, flags, (a & 0x00800000) != 0);
 
 	case 0x2: // ADDU
 		return add(a, b, flags);
@@ -1155,6 +1165,7 @@ INT32 es5510_device::alu_operation(UINT8 op, INT32 a, INT32 b, UINT8 &flags) {
 		return add(a, negate(b), flags);
 
 	case 0x4: // CMP
+		// perform the subtraction, only for its effect on the flags
 		add(a, negate(b), flags);
 		return a;
 
@@ -1181,7 +1192,8 @@ INT32 es5510_device::alu_operation(UINT8 op, INT32 a, INT32 b, UINT8 &flags) {
 		clearFlag(flags, FLAG_N);
 		bool isNegative = (a & 0x00800000) != 0;
 		setFlagTo(flags, FLAG_C, isNegative);
-		return isNegative ? negate(a) : a;
+		// Note: the absolute value is calculated by one's complement!
+		return isNegative ? (0x00ffffff ^ a) : a;
 	}
 
 	case 0x9: // MOV

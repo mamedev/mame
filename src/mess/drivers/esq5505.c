@@ -315,17 +315,18 @@ void esq_5505_5510_pump::sound_stream_update(sound_stream &stream, stream_sample
 	stream_sample_t *left = outputs[0], *right = outputs[1];
 	for (int i = 0; i < samples; i++)
 	{
+#define SAMPLE_SHIFT 4
 	    // anything for the 'aux' output?
-		INT16 l = inputs[0][i] >> 4;
-		INT16 r = inputs[1][i] >> 4;
+		INT16 l = inputs[0][i] >> SAMPLE_SHIFT;
+		INT16 r = inputs[1][i] >> SAMPLE_SHIFT;
 
 		// push the samples into the ESP
-		m_esp->ser_w(0, inputs[2][i] >> 4);
-		m_esp->ser_w(1, inputs[3][i] >> 4);
-		m_esp->ser_w(2, inputs[4][i] >> 4);
-		m_esp->ser_w(3, inputs[5][i] >> 4);
-		m_esp->ser_w(4, inputs[6][i] >> 4);
-		m_esp->ser_w(5, inputs[7][i] >> 4);
+		m_esp->ser_w(0, inputs[2][i] >> SAMPLE_SHIFT);
+		m_esp->ser_w(1, inputs[3][i] >> SAMPLE_SHIFT);
+		m_esp->ser_w(2, inputs[4][i] >> SAMPLE_SHIFT);
+		m_esp->ser_w(3, inputs[5][i] >> SAMPLE_SHIFT);
+		m_esp->ser_w(4, inputs[6][i] >> SAMPLE_SHIFT);
+		m_esp->ser_w(5, inputs[7][i] >> SAMPLE_SHIFT);
 
 #if PUMP_FAKE_ESP_PROCESSING
 		m_esp->ser_w(6, m_esp->ser_r(0) + m_esp->ser_r(2) + m_esp->ser_r(4));
