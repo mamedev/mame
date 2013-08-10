@@ -18,7 +18,7 @@
 
 #define MCFG_I8089_ADD(_tag, _clock, _cputag) \
 	MCFG_DEVICE_ADD(_tag, I8089, _clock) \
-	i8089_device::static_set_cputag(*device, _cputag); \
+	i8089_device::static_set_cputag(*device, _cputag);
 
 #define MCFG_I8089_SINTR1(_sintr1) \
 	downcast<i8089_device *>(device)->set_sintr1_callback(DEVCB2_##_sintr1);
@@ -30,6 +30,9 @@
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
+
+// forward declaration
+class i8089_channel;
 
 // ======================> i8089_device
 
@@ -59,12 +62,38 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 
+	// optional information overrides
+	virtual machine_config_constructor device_mconfig_additions() const;
+
 private:
+	required_device<i8089_channel> m_ch1;
+	required_device<i8089_channel> m_ch2;
+
 	devcb2_write_line m_write_sintr1;
 	devcb2_write_line m_write_sintr2;
 
+	void initialize();
+	UINT16 read_word(offs_t address);
+
 	// internal state
 	const char *m_cputag;
+
+	address_space *m_mem;
+	address_space *m_io;
+
+	// system configuration
+	bool m_initialized;
+	bool m_16bit_system;
+	bool m_16bit_remote;
+	bool m_master;
+	bool m_request_grant;
+
+	// control block location
+	offs_t m_control_block;
+
+	// state of input pins
+	int m_ca;
+	int m_sel;
 };
 
 
