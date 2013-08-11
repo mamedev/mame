@@ -111,6 +111,8 @@ C = MB3514 / 9325 M36
 #include "machine/md_slot.h"
 #include "machine/md_rom.h"
 #include "includes/md_cons.h"
+#include "sound/upd7759.h"
+
 
 #define PICO_PENX   1
 #define PICO_PENY   2
@@ -119,7 +121,10 @@ class pico_base_state : public md_cons_state
 {
 public:
 	pico_base_state(const machine_config &mconfig, device_type type, const char *tag)
-		: md_cons_state(mconfig, type, tag) { }
+		: md_cons_state(mconfig, type, tag), 
+	m_upd7759(*this, "7759") { }
+
+	optional_device<upd7759_device> m_upd7759;
 
 	ioport_port *m_io_page;
 	ioport_port *m_io_pad;
@@ -239,10 +244,33 @@ READ16_MEMBER(pico_base_state::pico_68k_io_read )
 	return retdata | retdata << 8;
 }
 
+
+static void sound_cause_irq( device_t *device, int chip )
+{
+//	pico_base_state *state = device->machine().driver_data<pico_base_state>();
+	printf("sound irq\n");
+	/* upd7759 callback */
+//	state->m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+}
+
+
+const upd775x_interface pico_upd7759_interface  =
+{
+	sound_cause_irq
+};
+
+
 WRITE16_MEMBER(pico_base_state::pico_68k_io_write )
 {
+	printf("pico_68k_io_write %04x %04x %04x\n", offset*2, data, mem_mask);
+
 	switch (offset)
 	{
+		case 0x12/2: // guess
+			if (mem_mask&0x00ff) m_upd7759->port_w(space,0,data&0xff);
+			if (mem_mask&0xff00) m_upd7759->port_w(space,0,(data>>8)&0xff);
+
+			break;
 	}
 }
 
@@ -294,6 +322,11 @@ MACHINE_START_MEMBER(pico_state,pico)
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa13000, 0xa130ff, read16_delegate(FUNC(base_md_cart_slot_device::read_a13),(base_md_cart_slot_device*)m_picocart), write16_delegate(FUNC(base_md_cart_slot_device::write_a13),(base_md_cart_slot_device*)m_picocart));
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa15000, 0xa150ff, read16_delegate(FUNC(base_md_cart_slot_device::read_a15),(base_md_cart_slot_device*)m_picocart), write16_delegate(FUNC(base_md_cart_slot_device::write_a15),(base_md_cart_slot_device*)m_picocart));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa14000, 0xa14003, write16_delegate(FUNC(base_md_cart_slot_device::write_tmss_bank),(base_md_cart_slot_device*)m_picocart));
+
+	m_upd7759->reset_w(0);
+	m_upd7759->start_w(0);
+	m_upd7759->reset_w(1);
+	m_upd7759->start_w(1);
 }
 
 static MACHINE_CONFIG_START( pico, pico_state )
@@ -309,6 +342,11 @@ static MACHINE_CONFIG_START( pico, pico_state )
 
 	MCFG_PICO_CARTRIDGE_ADD("picoslot", pico_cart, NULL)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","pico")
+
+	MCFG_SOUND_ADD("7759", UPD7759, UPD7759_STANDARD_CLOCK)
+	MCFG_SOUND_CONFIG(pico_upd7759_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.48)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.48)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( picopal, pico_state )
@@ -324,6 +362,11 @@ static MACHINE_CONFIG_START( picopal, pico_state )
 
 	MCFG_PICO_CARTRIDGE_ADD("picoslot", pico_cart, NULL)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","pico")
+
+	MCFG_SOUND_ADD("7759", UPD7759, UPD7759_STANDARD_CLOCK)
+	MCFG_SOUND_CONFIG(pico_upd7759_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.48)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.48)
 MACHINE_CONFIG_END
 
 
@@ -468,6 +511,12 @@ MACHINE_START_MEMBER(copera_state,copera)
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa13000, 0xa130ff, read16_delegate(FUNC(base_md_cart_slot_device::read_a13),(base_md_cart_slot_device*)m_picocart), write16_delegate(FUNC(base_md_cart_slot_device::write_a13),(base_md_cart_slot_device*)m_picocart));
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa15000, 0xa150ff, read16_delegate(FUNC(base_md_cart_slot_device::read_a15),(base_md_cart_slot_device*)m_picocart), write16_delegate(FUNC(base_md_cart_slot_device::write_a15),(base_md_cart_slot_device*)m_picocart));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa14000, 0xa14003, write16_delegate(FUNC(base_md_cart_slot_device::write_tmss_bank),(base_md_cart_slot_device*)m_picocart));
+
+	m_upd7759->reset_w(0);
+	m_upd7759->start_w(0);
+	m_upd7759->reset_w(1);
+	m_upd7759->start_w(1);
+
 }
 
 static MACHINE_CONFIG_START( copera, copera_state )
@@ -483,6 +532,11 @@ static MACHINE_CONFIG_START( copera, copera_state )
 
 	MCFG_COPERA_CARTRIDGE_ADD("coperaslot", copera_cart, NULL)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","copera")
+
+	MCFG_SOUND_ADD("7759", UPD7759, UPD7759_STANDARD_CLOCK)
+	MCFG_SOUND_CONFIG(pico_upd7759_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.48)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.48)
 MACHINE_CONFIG_END
 
 
