@@ -15,4 +15,43 @@
 		</part>
 	</software>
 
+	<software name="doremi">
+		<description>Do Re Mi Fa Densetsu</description>
+		<year>1993</year>
+		<publisher>Yamaha</publisher>
+		<info name="serial" value="MMGS-2"/>
+		<part name="cart" interface="copera_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="mp4-16164.ic1" size="1048576" crc="24aa1251" sha1="1a7d5156aa3f2ffba168bce1bbd9436cb0c11510" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="timemach">
+		<description>Copera no Time Machine</description>
+		<year>1993</year>
+		<publisher>Yamaha</publisher>
+		<info name="serial" value="MMGS-3"/>
+		<part name="cart" interface="copera_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-16162.ic1" size="1048576" crc="a7d33072" sha1="081c61e35478ffdda6eda58f40be056732f35595" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ottokata">
+		<description>Otto Katachitchi</description>
+		<year>1993</year>
+		<publisher>Yamaha</publisher>
+		<info name="serial" value="MMGS-4"/>
+		<part name="cart" interface="copera_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-16600.ic1" size="1048576" crc="d1aee834" sha1="93c825160286b483904428eece2b14e521c20d15" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+  
+  <!-- Not Dumped-->
+  <!-- MMGS-5 - Outa no Canvas (Japan) (Mixed Book Player) -->
+
 </softwarelist>
