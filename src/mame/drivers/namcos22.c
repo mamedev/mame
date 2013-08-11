@@ -1558,7 +1558,7 @@ WRITE32_MEMBER(namcos22_state::namcos22s_nvmem_w)
 
 READ32_MEMBER(namcos22_state::namcos22_dspram_r)
 {
-	return signed24(m_polygonram[offset]); // only d0-23 are connected
+	return m_polygonram[offset] | 0xff000000; // only d0-23 are connected
 }
 
 WRITE32_MEMBER(namcos22_state::namcos22_dspram_w)

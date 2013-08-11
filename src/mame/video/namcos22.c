@@ -1438,91 +1438,6 @@ void namcos22_state::draw_polygons(bitmap_rgb32 &bitmap)
 
 /*********************************************************************************************/
 
-WRITE32_MEMBER(namcos22_state::namcos22s_czram_w)
-{
-	int bank = nthword(m_czattr, 0xa/2) & 3;
-	UINT32 prev = (m_banked_czram[bank][offset * 2] << 16) | m_banked_czram[bank][offset * 2 + 1];
-	UINT32 temp = prev;
-	COMBINE_DATA(&temp);
-	data = temp;
-	m_banked_czram[bank][offset * 2] = data >> 16;
-	m_banked_czram[bank][offset * 2 + 1] = data & 0xffff;
-	m_cz_was_written[bank] |= (prev ^ data);
-}
-
-READ32_MEMBER(namcos22_state::namcos22s_czram_r)
-{
-	int bank = nthword(m_czattr, 0xa/2) & 3;
-	return (m_banked_czram[bank][offset * 2] << 16) | m_banked_czram[bank][offset * 2 + 1];
-}
-
-void namcos22_state::recalc_czram()
-{
-	for (int table = 0; table < 4; table++)
-	{
-		// as documented above, ss22 czram is 'just' a big compare table
-		// this is very slow when emulating, so let's recalculate it to a simpler lookup table
-		if (m_cz_was_written[table])
-		{
-			int small_val = 0x2000;
-			int small_offset = 0;
-			int large_val = 0;
-			int large_offset = 0;
-			int prev = 0x2000;
-
-			for (int i = 0; i < 0x100; i++)
-			{
-				int val = m_banked_czram[table][i];
-
-				// discard if larger than 1fff
-				if (val > 0x1fff) val = prev;
-				if (prev > 0x1fff)
-				{
-					prev = val;
-					continue;
-				}
-
-				int start = prev;
-				int end = val;
-				if (start > end)
-				{
-					start = val;
-					end = prev;
-				}
-				prev = val;
-
-				// fill range
-				for (int j = start; j < end; j++)
-					m_recalc_czram[table][j] = i;
-
-				// remember largest/smallest for later
-				if (val < small_val)
-				{
-					small_val = val;
-					small_offset = i;
-				}
-				if (val > large_val)
-				{
-					large_val = val;
-					large_offset = i;
-				}
-			}
-
-			// fill possible leftover ranges
-			for (int j = 0; j < small_val; j++)
-				m_recalc_czram[table][j] = small_offset;
-			for (int j = large_val; j < 0x2000; j++)
-				m_recalc_czram[table][j] = large_offset;
-
-			m_cz_was_written[table] = 0;
-		}
-	}
-}
-
-
-
-/*********************************************************************************************/
-
 void namcos22_state::draw_sprite_group(bitmap_rgb32 &bitmap, const rectangle &cliprect, const UINT32 *src, const UINT32 *attr, int num_sprites, int deltax, int deltay, int y_lowres)
 {
 	for (int i = 0; i < num_sprites; i++)
@@ -2137,6 +2052,88 @@ void namcos22_state::update_palette()
 }
 
 
+WRITE32_MEMBER(namcos22_state::namcos22s_czram_w)
+{
+	int bank = nthword(m_czattr, 0xa/2) & 3;
+	UINT32 prev = (m_banked_czram[bank][offset * 2] << 16) | m_banked_czram[bank][offset * 2 + 1];
+	UINT32 temp = prev;
+	COMBINE_DATA(&temp);
+	data = temp;
+	m_banked_czram[bank][offset * 2] = data >> 16;
+	m_banked_czram[bank][offset * 2 + 1] = data & 0xffff;
+	m_cz_was_written[bank] |= (prev ^ data);
+}
+
+READ32_MEMBER(namcos22_state::namcos22s_czram_r)
+{
+	int bank = nthword(m_czattr, 0xa/2) & 3;
+	return (m_banked_czram[bank][offset * 2] << 16) | m_banked_czram[bank][offset * 2 + 1];
+}
+
+void namcos22_state::recalc_czram()
+{
+	for (int table = 0; table < 4; table++)
+	{
+		// as documented above, ss22 czram is 'just' a big compare table
+		// this is very slow when emulating, so let's recalculate it to a simpler lookup table
+		if (m_cz_was_written[table])
+		{
+			int small_val = 0x2000;
+			int small_offset = 0;
+			int large_val = 0;
+			int large_offset = 0;
+			int prev = 0x2000;
+
+			for (int i = 0; i < 0x100; i++)
+			{
+				int val = m_banked_czram[table][i];
+
+				// discard if larger than 1fff
+				if (val > 0x1fff) val = prev;
+				if (prev > 0x1fff)
+				{
+					prev = val;
+					continue;
+				}
+
+				int start = prev;
+				int end = val;
+				if (start > end)
+				{
+					start = val;
+					end = prev;
+				}
+				prev = val;
+
+				// fill range
+				for (int j = start; j < end; j++)
+					m_recalc_czram[table][j] = i;
+
+				// remember largest/smallest for later
+				if (val < small_val)
+				{
+					small_val = val;
+					small_offset = i;
+				}
+				if (val > large_val)
+				{
+					large_val = val;
+					large_offset = i;
+				}
+			}
+
+			// fill possible leftover ranges
+			for (int j = 0; j < small_val; j++)
+				m_recalc_czram[table][j] = small_offset;
+			for (int j = large_val; j < 0x2000; j++)
+				m_recalc_czram[table][j] = large_offset;
+
+			m_cz_was_written[table] = 0;
+		}
+	}
+}
+
+
 void namcos22_state::update_mixer()
 {
 	int i;
@@ -2267,6 +2264,9 @@ void namcos22_state::update_mixer()
 	}
 }
 
+
+
+/*********************************************************************************************/
 
 UINT32 namcos22_state::screen_update_namcos22s(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
