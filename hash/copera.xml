@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="pico" description="Yamaha / Sega Copera cartridges">
+
+
+	<software name="melody">
+		<description>Melody Land</description>
+		<year>1993</year>
+		<publisher>Yamaha</publisher>
+		<info name="serial" value="MMGS-1"/>
+		<part name="cart" interface="copera_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-16163.ic1" size="1048576" crc="9b05acc9" sha1="cd4f3260309a1236f6f0d491f385d4dececa349e" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
