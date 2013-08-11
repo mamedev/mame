@@ -235,6 +235,7 @@ static const struct
 	{ "sfexp",    cp01, cp04 }, /* OK */
 	{ "sfexpu1",  cp01, cp04 }, /* OK */
 	{ "sfexpj",   cp01, cp04 }, /* OK */
+	{ "sfexpj1",  cp01, cp04 }, /* OK */
 	{ "glpracr",  cp01, cp05 }, /* OK */
 	{ "rvschool", cp10, cp06 }, /* OK */
 	{ "rvschoolu",cp10, cp06 }, /* OK */
@@ -2975,6 +2976,30 @@ ROM_START( sfexpj )
 	CPZN1_BIOS
 
 	ROM_REGION32_LE( 0x80000, "countryrom", 0 )
+	ROM_LOAD( "sfpj_04a.2h", 0x0000000, 0x080000, CRC(6e99a0f7) SHA1(8f22bc545dd0e3eff24ab62ce5af1998d48d3770) )
+
+	ROM_REGION32_LE( 0x2400000, "maskroms", 0 )
+	ROM_LOAD( "sfp-05m.3h", 0x0000000, 0x400000, CRC(ac7dcc5e) SHA1(216de2de691a9bd7982d5d6b5b1e3e35ff381a2f) )
+	ROM_LOAD( "sfp-06m.4h", 0x0400000, 0x400000, CRC(1d504758) SHA1(bd56141aba35dbb5b318445ba5db12eff7442221) )
+	ROM_LOAD( "sfp-07m.5h", 0x0800000, 0x400000, CRC(0f585f30) SHA1(24ffdbc360f8eddb702905c99d315614327861a7) )
+	ROM_LOAD( "sfp-08m.2k", 0x0c00000, 0x400000, CRC(65eabc61) SHA1(bbeb3bcd8dd8f7f88ed82412a81134a3d6f6ffd9) )
+	ROM_LOAD( "sfp-09m.3k", 0x1000000, 0x400000, CRC(15f8b71e) SHA1(efb28fbe750f443550ee9718385355aae7e858c9) )
+	ROM_LOAD( "sfp-10m.4k", 0x1400000, 0x400000, CRC(c1ecf652) SHA1(616e14ff63d38272730c810b933a6b3412e2da17) )
+
+	ROM_REGION( 0x50000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "sfe_02.2e",  0x00000, 0x08000, CRC(1908475c) SHA1(99f68cff2d92f5697eec0846201f6fb317d5dc08) )
+	ROM_CONTINUE(           0x10000, 0x18000 )
+	ROM_LOAD( "sfe_03.3e",  0x28000, 0x20000, CRC(95c1e2e0) SHA1(383bbe9613798a3ac6944d18768280a840994e40) )
+
+	ROM_REGION( 0x400000, "qsound", 0 ) /* Q Sound Samples */
+	ROM_LOAD16_WORD_SWAP( "sfe-01m.3b", 0x0000000, 0x400000, CRC(f5afff0d) SHA1(7f9ac32ba0a3d9c6fef367e36a92d47c9ac1feb3) )
+ROM_END
+
+/* 95681-2 */
+ROM_START( sfexpj1 )
+	CPZN1_BIOS
+
+	ROM_REGION32_LE( 0x80000, "countryrom", 0 )
 	ROM_LOAD( "sfpj_04.2h", 0x0000000, 0x080000, CRC(18d043f5) SHA1(9e6e24a722d13888fbfd391ddb1a5045b162488c) )
 
 	ROM_REGION32_LE( 0x2400000, "maskroms", 0 )
@@ -4600,7 +4625,8 @@ GAME( 1996, sfexa,     sfex,     coh1002c, zn6b, zn_state, coh1000c, ROT0, "Capc
 GAME( 1996, sfexj,     sfex,     coh1002c, zn6b, zn_state, coh1000c, ROT0, "Capcom / Arika", "Street Fighter EX (Japan 961130)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1997, sfexp,     cpzn1,    coh1002c, zn6b, zn_state, coh1000c, ROT0, "Capcom / Arika", "Street Fighter EX Plus (USA 970407)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1997, sfexpu1,   sfexp,    coh1002c, zn6b, zn_state, coh1000c, ROT0, "Capcom / Arika", "Street Fighter EX Plus (USA 970311)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1997, sfexpj,    sfexp,    coh1002c, zn6b, zn_state, coh1000c, ROT0, "Capcom / Arika", "Street Fighter EX Plus (Japan 970311)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1997, sfexpj,    sfexp,    coh1002c, zn6b, zn_state, coh1000c, ROT0, "Capcom / Arika", "Street Fighter EX Plus (Japan 970407)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1997, sfexpj1,   sfexp,    coh1002c, zn6b, zn_state, coh1000c, ROT0, "Capcom / Arika", "Street Fighter EX Plus (Japan 970311)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 
 /* Capcom ZN2 */
 
