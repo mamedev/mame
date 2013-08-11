@@ -6274,6 +6274,7 @@ src/mess/drivers/glasgow.c svneol=native#text/plain
 src/mess/drivers/gmaster.c svneol=native#text/plain
 src/mess/drivers/gp2x.c svneol=native#text/plain
 src/mess/drivers/gp32.c svneol=native#text/plain
+src/mess/drivers/grfd2301.c svneol=native#text/plain
 src/mess/drivers/h19.c svneol=native#text/plain
 src/mess/drivers/h8.c svneol=native#text/plain
 src/mess/drivers/h89.c svneol=native#text/plain
