@@ -38,6 +38,8 @@ class i8089_channel;
 
 class i8089_device : public device_t
 {
+	friend class i8089_channel;
+
 public:
 	// construction/destruction
 	i8089_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -48,11 +50,15 @@ public:
 
 	// input lines
 	DECLARE_WRITE_LINE_MEMBER( ca_w );
-	DECLARE_WRITE_LINE_MEMBER( sel_w );
+	DECLARE_WRITE_LINE_MEMBER( sel_w ) { m_sel = state; }
 	DECLARE_WRITE_LINE_MEMBER( drq1_w );
 	DECLARE_WRITE_LINE_MEMBER( drq2_w );
 	DECLARE_WRITE_LINE_MEMBER( ext1_w );
 	DECLARE_WRITE_LINE_MEMBER( ext2_w );
+
+	// internal communication
+	DECLARE_WRITE_LINE_MEMBER( ch1_sintr_w ) { m_write_sintr1(state); }
+	DECLARE_WRITE_LINE_MEMBER( ch2_sintr_w ) { m_write_sintr2(state); }
 
 	// inline configuration
 	static void static_set_cputag(device_t &device, const char *tag);
@@ -66,6 +72,11 @@ protected:
 	virtual machine_config_constructor device_mconfig_additions() const;
 
 private:
+	UINT8 read_byte(offs_t address);
+	UINT16 read_word(offs_t address);
+	void write_byte(offs_t address, UINT8 data);
+	void write_word(offs_t address, UINT16 data);
+
 	required_device<i8089_channel> m_ch1;
 	required_device<i8089_channel> m_ch2;
 
@@ -73,7 +84,6 @@ private:
 	devcb2_write_line m_write_sintr2;
 
 	void initialize();
-	UINT16 read_word(offs_t address);
 
 	// internal state
 	const char *m_cputag;
@@ -87,9 +97,6 @@ private:
 	bool m_16bit_remote;
 	bool m_master;
 	bool m_request_grant;
-
-	// control block location
-	offs_t m_control_block;
 
 	// state of input pins
 	int m_ca;
