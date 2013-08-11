@@ -220,10 +220,22 @@ public:
 	virtual const char *file_extensions() const { return "bin,md"; }
 };
 
+// ======================> copera_cart_slot_device
+
+class copera_cart_slot_device :  public base_md_cart_slot_device
+{
+public:
+	// construction/destruction
+	copera_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	virtual const char *image_interface() const { return "copera_cart"; }
+	virtual const char *file_extensions() const { return "bin,md"; }
+};
+
 
 // device type definition
 extern const device_type MD_CART_SLOT;
 extern const device_type PICO_CART_SLOT;
+extern const device_type COPERA_CART_SLOT;
 
 
 /***************************************************************************
@@ -237,6 +249,12 @@ extern const device_type PICO_CART_SLOT;
 #define MCFG_PICO_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
 	MCFG_DEVICE_ADD(_tag, PICO_CART_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
+
+#define MCFG_COPERA_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
+	MCFG_DEVICE_ADD(_tag, COPERA_CART_SLOT, 0) \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
+
+
 
 #define MCFG_MD_CARTRIDGE_NOT_MANDATORY                                     \
 	static_cast<md_cart_slot_device *>(device)->set_must_be_loaded(FALSE);

@@ -1937,6 +1937,7 @@ $(MESSOBJ)/sega.a:              \
 	$(MESS_MACHINE)/md_stm95.o  \
 	$(MESS_MACHINE)/md_svp.o    \
 	$(MESS_DRIVERS)/megadriv.o  \
+	$(MESS_DRIVERS)/segapico.o  \
 	$(MESS_DRIVERS)/dccons.o    \
 	$(MAME_MACHINE)/gdrom.o     \
 	$(MESS_MACHINE)/dccons.o    \

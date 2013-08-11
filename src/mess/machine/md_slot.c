@@ -51,7 +51,7 @@
 
 const device_type MD_CART_SLOT = &device_creator<md_cart_slot_device>;
 const device_type PICO_CART_SLOT = &device_creator<pico_cart_slot_device>;
-
+const device_type COPERA_CART_SLOT = &device_creator<copera_cart_slot_device>;
 
 //**************************************************************************
 //    MD cartridges Interface
@@ -181,6 +181,11 @@ md_cart_slot_device::md_cart_slot_device(const machine_config &mconfig, const ch
 
 pico_cart_slot_device::pico_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 						base_md_cart_slot_device(mconfig, PICO_CART_SLOT, "Pico Cartridge Slot", tag, owner, clock, "pico_cart_slot", __FILE__)
+{
+}
+
+copera_cart_slot_device::copera_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+						base_md_cart_slot_device(mconfig, COPERA_CART_SLOT, "Copera Cartridge Slot", tag, owner, clock, "copera_cart_slot", __FILE__)
 {
 }
 
