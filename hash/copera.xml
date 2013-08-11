@@ -18,7 +18,7 @@ not dumped?
 
   --> 
   
- <softwarelist name="pico" description="Yamaha / Sega Copera cartridges">
+ <softwarelist name="copera" description="Yamaha / Sega Copera cartridges">
 
 
 	<software name="melody">
