@@ -102,6 +102,7 @@ Street Fighter II: The World Warrior (USA 911101)                  90629B-3   ST
 Street Fighter II: The World Warrior (Japan 910214)                90629B-2   STF29            IOB1  90632C-1     CPS-B-17  DL-0411-10012  C632
 Street Fighter II: The World Warrior (Japan 910306)                90629B-3   STF29            IOB1  90632C-1     CPS-B-12  DL-0411-10007  C632
 Street Fighter II: The World Warrior (Japan 911210)                90629B-?   STF29            IOB1  ?            CPS-B-13  DL-0411-10008  C632
+Street Fighter II: The World Warrior (Japan 920312)                90629B-2   STF29            IOB1  90632C-1     CPS-B-17  DL-0411-10012  C632
 
 Three Wonders* (World 910513)                                1991  89624B-3   RT24B            IOB1  90630C-4     CPS-B-21  DL-0921-10014          IOC1
 Three Wonders* (World 910520)                                      89624B-3   RT24B            IOB1  90630C-4     CPS-B-21  DL-0921-10014          IOC1
@@ -1340,6 +1341,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"sf2j",        CPS_B_13,     mapper_STF29,  0x36 },
 	{"sf2ja",       CPS_B_17,     mapper_STF29,  0x36 },
 	{"sf2jc",       CPS_B_12,     mapper_STF29,  0x36 },
+	{"sf2jl",       CPS_B_17,     mapper_STF29,  0x36 },
 	{"sf2qp1",      CPS_B_17,     mapper_STF29,  0x36 },
 	{"sf2thndr",    CPS_B_17,     mapper_STF29,  0x36 },
 
