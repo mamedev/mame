@@ -22,9 +22,18 @@ the game back to normal version as current set on the PCB
 has adult graphics (sets provided are 'Normal' and 'Enterprise')
 
 Notes:
- Casanova: Using 1C/2C and inserting 5 coins causes graphics corruption as
-           as the game places the "11" character on screen, but there really
-           isn't. Sould only be "0" through "9"
+ Casanova: The game code has several minor bugs / glitches such as:
+
+     * Using 1C/2C and inserting 5 coins causes graphics corruption as the
+       game places data on the screen beyond the defined character data
+       used for the numbers 0 through 9
+     * On the intro, parts of the tilemaps are not being copied correctly
+       causing bits of the charcter's hat to vanish
+     * Background colors inexplicably change in certain places between frames
+     * Dipswitch descriptions on the DIP INFO page do not match atcual effects
+       of said dipswitches
+
+  These are not emulation bugs and have been verified on a real PCB
 
 ***************************************************************************/
 
