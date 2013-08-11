@@ -2154,11 +2154,14 @@ static MACHINE_CONFIG_START( htchctch, tumbleb_state )
 	/* sound hardware - same as hyperpac */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", 3427190)
+	/* on at least hatch catch, cookie & bibi and choky choky the YM2151 clock is connected
+           directly to the Z80 clock so the speed should match */
+        MCFG_YM2151_ADD("ymsnd", 15000000/4)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.10)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.10)
 
+	/* correct for cookie & bibi and hatch catch, (4096000/4) */
 	MCFG_OKIM6295_ADD("oki", 1024000, OKIM6295_PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
@@ -2167,6 +2170,12 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( cookbib, htchctch )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(tumbleb_state, screen_update_semicom_altoffsets)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( chokchok, htchctch )
+        MCFG_OKIM6295_REPLACE("oki", 3579545/4, OKIM6295_PIN7_HIGH)
+        MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+        MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( cookbib_mcu, htchctch )
@@ -2692,10 +2701,10 @@ PCB Layout
 
 Notes:
         68k clock: 15MHz
-        Z80 clock: 3.42719MHz  <-- strange clock, but verified correct.
+        Z80 clock: 3.42719MHz  <-- should be 3.75
       M6295 clock: 1.024MHz, sample rate = /132
       87C52 clock: 15MHz
-     YM2151 clock: 3.42719MHz
+     YM2151 clock: 3.42719MHz  <-- should be 3.75
             VSync: 60Hz
 
 Interrupts:
@@ -3397,7 +3406,7 @@ GAME( 1996, fncywld,  0,       fncywld,     fncywld, tumbleb_state,  fncywld,  R
 /* First Amusement / Mijin / SemiCom hardware (MCU protected) */
 GAME( 1994, metlsavr, 0,       metlsavr,    metlsavr, tumbleb_state, chokchok, ROT0, "First Amusement", "Metal Saver", GAME_SUPPORTS_SAVE )
 GAME( 1994, magicbal, 0,       metlsavr,    magicbal, tumbleb_state, chokchok, ROT0, "SemiCom", "Magicball Fighting (Korea)", GAME_SUPPORTS_SAVE) // also still has the Metal Saver (c)1994 First Amusement tiles in the GFX
-GAME( 1995, chokchok, 0,       cookbib,     chokchok, tumbleb_state, chokchok, ROT0, "SemiCom", "Choky! Choky!", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE  )
+GAME( 1995, chokchok, 0,       chokchok,    chokchok, tumbleb_state, chokchok, ROT0, "SemiCom", "Choky! Choky!", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE  )
 GAME( 1995, wlstar,   0,       cookbib_mcu, wlstar, tumbleb_state,   wlstar,   ROT0, "Mijin",   "Wonder League Star - Sok-Magicball Fighting (Korea)", GAME_SUPPORTS_SAVE ) // translates to 'Wonder League Star - Return of Magicball Fighting'
 GAME( 1995, htchctch, 0,       htchctch,    htchctch, tumbleb_state, htchctch, ROT0, "SemiCom", "Hatch Catch" , GAME_SUPPORTS_SAVE ) // not 100% sure about gfx offsets
 GAME( 1995, cookbib,  0,       cookbib,     cookbib, tumbleb_state,  htchctch, ROT0, "SemiCom", "Cookie & Bibi" , GAME_SUPPORTS_SAVE ) // not 100% sure about gfx offsets

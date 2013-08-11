@@ -606,13 +606,13 @@ WRITE_LINE_MEMBER(splash_state::adpcm_int2)
 static const msm5205_interface msm_interface1 =
 {
 	DEVCB_DRIVER_LINE_MEMBER(splash_state,adpcm_int1),         /* interrupt function */
-	MSM5205_S64_4B  /* 1 / 96 = 3906.25Hz playback  - guess */
+	MSM5205_S48_4B  /* 1 / 48 */
 };
 
 static const msm5205_interface msm_interface2 =
 {
 	DEVCB_DRIVER_LINE_MEMBER(splash_state,adpcm_int2),         /* interrupt function */
-	MSM5205_S96_4B  /* 1 / 96 = 3906.25Hz playback  - guess */
+	MSM5205_S96_4B  /* 1 / 96 */
 };
 
 static MACHINE_CONFIG_START( funystrp, splash_state )
