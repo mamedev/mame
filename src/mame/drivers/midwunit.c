@@ -938,10 +938,10 @@ ROM_END
 
 ROM_START( openice )
 	ROM_REGION16_LE( 0x800000, "dcs", ROMREGION_ERASEFF )   /* sound data */
-	ROM_LOAD16_BYTE( "open_ice_l1.u2", 0x000000, 0x100000, CRC(8adb5aab) SHA1(4c25bc051c90947f3366f83ac5ca8dc78e26b8a4) ) /* These 4 are labeled as L1 */
-	ROM_LOAD16_BYTE( "open_ice_l1.u3", 0x200000, 0x100000, CRC(11c61ad6) SHA1(324621d6b486399b6d5ede1fed39d4e448cdeb32) )
-	ROM_LOAD16_BYTE( "open_ice_l1.u4", 0x400000, 0x100000, CRC(04279290) SHA1(daf1e57137ae1c3434194054e69809bfe3ed1fc3) )
-	ROM_LOAD16_BYTE( "open_ice_l1.u5", 0x600000, 0x100000, CRC(e90ad61f) SHA1(59eeabcae7e0e70cdb4472cde64b8a28b07ede98) )
+	ROM_LOAD16_BYTE( "open_ice_l1.2.u2", 0x000000, 0x100000, CRC(8adb5aab) SHA1(4c25bc051c90947f3366f83ac5ca8dc78e26b8a4) ) /* This one labeled as L1.2 */
+	ROM_LOAD16_BYTE( "open_ice_l1.u3",   0x200000, 0x100000, CRC(11c61ad6) SHA1(324621d6b486399b6d5ede1fed39d4e448cdeb32) ) /* This one labeled as L1 */
+	ROM_LOAD16_BYTE( "open_ice_l1.u4",   0x400000, 0x100000, CRC(04279290) SHA1(daf1e57137ae1c3434194054e69809bfe3ed1fc3) ) /* This one labeled as L1 */
+	ROM_LOAD16_BYTE( "open_ice_l1.u5",   0x600000, 0x100000, CRC(e90ad61f) SHA1(59eeabcae7e0e70cdb4472cde64b8a28b07ede98) ) /* This one labeled as L1 */
 
 	ROM_REGION16_LE( 0x100000, "maincpu", 0 )   /* 34010 code */
 	ROM_LOAD16_BYTE( "open_ice_l1.21.u54", 0x00000, 0x80000, CRC(e4225284) SHA1(d5e267cf35826c106bb0a800363849ed4d489e56) ) /* Labeled as L1.21 */
