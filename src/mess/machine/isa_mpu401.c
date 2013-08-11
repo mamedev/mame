@@ -11,6 +11,12 @@
 #include "isa_mpu401.h"
 #include "machine/pic8259.h"
 
+#define MPU_CORE_TAG "mpu401"
+
+MACHINE_CONFIG_FRAGMENT( isa8mpu401 )
+	MCFG_MPU401_ADD(MPU_CORE_TAG, WRITELINE(isa8_mpu401_device, mpu_irq_out))
+MACHINE_CONFIG_END
+
 /*
 DIP-SWs
 1-2-3-4
@@ -29,40 +35,8 @@ DIP-SWs
       1  irq7
 */
 
-READ8_MEMBER( isa8_mpu401_device::mpu401_r )
+WRITE_LINE_MEMBER( isa8_mpu401_device::mpu_irq_out )
 {
-	UINT8 res;
-
-	if(offset == 0) // data
-	{
-		res = 0xff;
-	}
-	else // status
-	{
-		res = 0x3f | 0x80; // bit 7 queue empty (DSR), bit 6 DRR (Data Receive Ready?)
-	}
-
-	return res;
-}
-
-WRITE8_MEMBER( isa8_mpu401_device::mpu401_w )
-{
-	if(offset == 0) // data
-	{
-		printf("%02x %02x\n",offset,data);
-	}
-	else // command
-	{
-		printf("%02x %02x\n",offset,data);
-
-		switch(data)
-		{
-			case 0xff: // reset
-				//m_isa->irq2_w(1);
-				break;
-		}
-	}
-
 }
 
 //**************************************************************************
@@ -70,6 +44,16 @@ WRITE8_MEMBER( isa8_mpu401_device::mpu401_w )
 //**************************************************************************
 
 const device_type ISA8_MPU401 = &device_creator<isa8_mpu401_device>;
+
+//-------------------------------------------------
+//  machine_config_additions - device-specific
+//  machine configurations
+//-------------------------------------------------
+
+machine_config_constructor isa8_mpu401_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( isa8mpu401 );
+}
 
 
 //**************************************************************************
@@ -81,8 +65,9 @@ const device_type ISA8_MPU401 = &device_creator<isa8_mpu401_device>;
 //-------------------------------------------------
 
 isa8_mpu401_device::isa8_mpu401_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: device_t(mconfig, ISA8_MPU401, "Roland MPU-401 Sound Card", tag, owner, clock, "isa_mpu401", __FILE__),
-		device_isa8_card_interface( mconfig, *this )
+		: device_t(mconfig, ISA8_MPU401, "Roland MPU-401 MIDI Interface", tag, owner, clock, "isa_mpu401", __FILE__),
+		device_isa8_card_interface( mconfig, *this ),
+		m_mpu401(*this, MPU_CORE_TAG)
 {
 }
 
@@ -93,7 +78,8 @@ isa8_mpu401_device::isa8_mpu401_device(const machine_config &mconfig, const char
 void isa8_mpu401_device::device_start()
 {
 	set_isa_device();
-	m_isa->install_device(0x330, 0x0331, 0, 0, read8_delegate(FUNC(isa8_mpu401_device::mpu401_r), this), write8_delegate(FUNC(isa8_mpu401_device::mpu401_w), this));
+
+	m_isa->install_device(0x330, 0x0331, 0, 0, READ8_DEVICE_DELEGATE(m_mpu401, mpu401_device, mpu_r), WRITE8_DEVICE_DELEGATE(m_mpu401, mpu401_device, mpu_w));
 }
 
 //-------------------------------------------------

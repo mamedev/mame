@@ -751,6 +751,7 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/midiinport.o    \
 	$(MESS_MACHINE)/midioutport.o   \
 	$(MESS_MACHINE)/mpc105.o    \
+	$(MESS_MACHINE)/mpu401.o \
 	$(MESS_MACHINE)/msm6222b.o  \
 	$(MESS_MACHINE)/ncr5380.o   \
 	$(MESS_MACHINE)/ncr5380n.o  \
@@ -791,7 +792,7 @@ $(MESSOBJ)/isa.a: \
 	$(MESS_MACHINE)/isa_gus.o   \
 	$(MESS_MACHINE)/isa_hdc.o   \
 	$(MESS_MACHINE)/isa_ibm_mfc.o   \
-	$(MESS_MACHINE)/isa_mpu401.o\
+	$(MESS_MACHINE)/isa_mpu401.o \
 	$(MESS_MACHINE)/isa_sblaster.o  \
 	$(MESS_MACHINE)/isa_stereo_fx.o \
 	$(MESS_MACHINE)/isa_ssi2001.o   \
