@@ -144,16 +144,6 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 * 左脳開発シリーズ 探索・感性・記憶 - Sanou Kaihatsu Series Tansaku-Kansei-Kioku (Imagineer - Existence unconfirmed!)
 
 
-Games for the MIXT BOOK PLAYER COPERA
-
-* メロディランド - Melody Land (Yamaha - 199312xx - MMGS-1)
-* ドレミファ伝説 - Doremifa Densetsu (Yamaha - 199312xx - MMGS-2)
-* コペラのタイムマシン - Copera no Time Machine (Yamaha - ???? - MMGS-3)
-* おっとカタチッチ - Otto Katachicchi (Yamaha - ???? - MMGS-4)
-* おしゃれの国のアリス - Oshare no Kuni no Alice (Yamaha - ???? - MMGS-8)
-* コペラのちきゅうだいすき - Copera no Chikyuu Daisuki (Yamaha - ???? - MMGS-9)
-* 冒険!メロリン島 - Bouken! Merorin Shima (Yamaha - ???? - MMGS-10)
-
 -->
 
 <!-- Releases -->
@@ -470,21 +460,6 @@ Games for the MIXT BOOK PLAYER COPERA
 			<feature name="ic1" value="MPR-18117-H" />
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-18117-h.ic1" size="524288" crc="c81acb46" sha1="d4a51f8894157dc8ef845931366d2ab482d43839" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="copekono">
-		<description>Copera no Kono Otonaani (Jpn)</description>
-		<year>1994</year>
-		<publisher>Yamaha</publisher>
-		<info name="serial" value="MMGS-6"/>
-		<info name="alt_title" value="コペラのこのおとなあに"/>
-		<part name="cart" interface="pico_cart">
-			<feature name="pcb" value="171-6586A" />
-			<feature name="ic1" value="MPR-17438 J11" />
-			<dataarea name="rom" size="1048576">
-				<rom name="mpr-17438 j11.ic1" size="1048576" crc="1041e52a" sha1="422f46d670a5f8094267984051ed6f90babe2dce" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1765,20 +1740,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
-	<software name="mikeatmw">
-		<description>Mike to Asobou Tobidase Milky Way (Jpn)</description>
-		<year>1994</year>
-		<publisher>Yamaha</publisher>
-		<info name="serial" value="MMGS-7"/>
-		<info name="alt_title" value="マイクとあそぼう とびだせミルキーウェイ"/>
-		<part name="cart" interface="pico_cart">
-			<feature name="pcb" value="171-6586A" />
-			<feature name="ic1" value="MPR-17509 J12" />
-			<dataarea name="rom" size="1048576">
-				<rom name="mpr-17509 j12.ic1" size="1048576" crc="0cb5727d" sha1="5f271c69f574a761f2c83f8005978dcb0635e81b" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
+
 
 	<software name="minimoea">
 		<description>Mini Moni. - Eigo de Asobundapyon! (Jpn)</description>
@@ -1946,21 +1908,6 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 			<feature name="ic4" value="HC125" />
 			<dataarea name="rom" size="2097152">
 				<rom name="9k0-0025-rv.ic1" size="2097152" crc="376cfa05" sha1="ff7b03a62620ea668ab41fe731af07b78db984fc" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="outacanv">
-		<description>Outa no Canvas (Jpn)</description>
-		<year>1994</year>
-		<publisher>Yamaha</publisher>
-		<info name="serial" value="MMGS-5"/>
-		<info name="alt_title" value="おうたのキャンバス"/>
-		<part name="cart" interface="pico_cart">
-			<feature name="pcb" value="171-6434C" />
-			<feature name="ic1" value="MPR-17017-H" />
-			<dataarea name="rom" size="1048576">
-				<rom name="mpr-17017-h.ic1" size="1048576" crc="b25e7134" sha1="0578314e66b2385e0520a421af695ccfef44f076" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
