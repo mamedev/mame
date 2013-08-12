@@ -2298,7 +2298,7 @@ WRITE8_MEMBER(pc9801_state::pc9801rs_ide_io_0_w)
 
 	printf("IDE w %02x %02x\n",offset,data);
 
-	if(!data & 0x80)
+	if ((data & 0x80) == 0x00)
 		m_ide_bank[offset] = data & 0x7f;
 }
 
