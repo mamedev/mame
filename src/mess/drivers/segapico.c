@@ -2,7 +2,16 @@
 /****************************************** PICO emulation ****************************************/
 
 /* todo, make this more independent of the Genesis emulation, it's really only the same CPU + VDP
-   and doesn't need to be connected to the Genesis at all. */
+   and doesn't need to be connected to the Genesis at all.
+
+   sound is the 315-5641 / D77591, should be compatible with the 7759? but probably wants us to maintain
+   an external buffer of at least 0x40 bytes and feed it on a timer in sync with the timer in the chip?
+
+   currently no way to select (or display) the story book area of the games? (will require layout and
+   external artwork)
+
+*/
+
 
 /*
 
@@ -229,16 +238,30 @@ READ16_MEMBER(pico_base_state::pico_68k_io_read )
 				retdata = m_page_register;
 				break;
 			}
-		case 7:
+
+
+
+		case 8: // toy story 2 checks this for 0x3f (is that 'empty'?)
 			/* Returns free bytes left in the PCM FIFO buffer */
-			retdata = 0x00;
+			retdata = 0x3f;
 			break;
-		case 8:
+		case 9:
 		/*
 		   For reads, if bit 15 is cleared, it means PCM is 'busy' or
 		   something like that, as games sometimes wait for it to become 1.
 		*/
-			retdata = 0x00;
+			return (m_upd7759->busy_r()^1) << 15;
+
+
+		case 7:
+		case 10:
+		case 11:
+		case 12:
+		case 13:
+		case 14:
+		case 15:
+			logerror("pico_68k_io_read %d\n", offset);
+
 	}
 
 	return retdata | retdata << 8;
@@ -247,10 +270,10 @@ READ16_MEMBER(pico_base_state::pico_68k_io_read )
 
 static void sound_cause_irq( device_t *device, int chip )
 {
-//	pico_base_state *state = device->machine().driver_data<pico_base_state>();
-	printf("sound irq\n");
+	pico_base_state *state = device->machine().driver_data<pico_base_state>();
+//	printf("sound irq\n");
 	/* upd7759 callback */
-//	state->m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	state->m_maincpu->set_input_line(3, HOLD_LINE);
 }
 
 
@@ -262,11 +285,17 @@ const upd775x_interface pico_upd7759_interface  =
 
 WRITE16_MEMBER(pico_base_state::pico_68k_io_write )
 {
-	printf("pico_68k_io_write %04x %04x %04x\n", offset*2, data, mem_mask);
+//	printf("pico_68k_io_write %04x %04x %04x\n", offset*2, data, mem_mask);
 
 	switch (offset)
 	{
+
 		case 0x12/2: // guess
+			m_upd7759->reset_w(0);
+			m_upd7759->start_w(0);
+			m_upd7759->reset_w(1);
+			m_upd7759->start_w(1);
+
 			if (mem_mask&0x00ff) m_upd7759->port_w(space,0,data&0xff);
 			if (mem_mask&0xff00) m_upd7759->port_w(space,0,(data>>8)&0xff);
 
@@ -323,10 +352,7 @@ MACHINE_START_MEMBER(pico_state,pico)
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa15000, 0xa150ff, read16_delegate(FUNC(base_md_cart_slot_device::read_a15),(base_md_cart_slot_device*)m_picocart), write16_delegate(FUNC(base_md_cart_slot_device::write_a15),(base_md_cart_slot_device*)m_picocart));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa14000, 0xa14003, write16_delegate(FUNC(base_md_cart_slot_device::write_tmss_bank),(base_md_cart_slot_device*)m_picocart));
 
-	m_upd7759->reset_w(0);
-	m_upd7759->start_w(0);
-	m_upd7759->reset_w(1);
-	m_upd7759->start_w(1);
+
 }
 
 static MACHINE_CONFIG_START( pico, pico_state )
