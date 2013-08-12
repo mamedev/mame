@@ -46,6 +46,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start();
+	virtual void device_reset();
 	virtual void execute_run();
 
 	int m_icount;
@@ -53,9 +54,59 @@ protected:
 private:
 
 	// opcodes
+	void add_rm(int r, int m, int o = 0);
+	void add_mr(int m, int r, int o = 0);
+	void addb_rm(int r, int m, int o = 0);
+	void addb_mr(int m, int r, int o = 0);
+	void addbi_ri(int r, int i);
+	void addbi_mi(int m, int i, int o = 0);
+	void addi_ri(int r, int i);
+	void addi_mi(int m, int i, int o = 0);
+	void and_rm(int r, int m, int o = 0);
+	void and_mr(int m, int r, int o = 0);
+	void andb_rm(int r, int m, int o = 0);
+	void andb_mr(int m, int r, int o = 0);
+	void andbi_ri(int r, int i);
+	void andbi_mi(int m, int i, int o = 0);
+	void andi_ri(int r, int i);
+	void andi_mi(int m, int i, int o = 0);
+	void call(int m, int d, int o = 0);
+	void clr(int m, int b, int o = 0);
+	void dec_r(int r);
+	void dec_m(int m, int o = 0);
+	void decb(int m, int o = 0);
 	void hlt();
+	void inc_r(int r);
+	void inc_m(int m, int o = 0);
+	void incb(int m, int o = 0);
+	void jbt(int m, int b, int d, int o = 0);
+	void jmce(int m, int d, int o = 0);
+	void jmcne(int m, int d, int o = 0);
+	void jmp(int d);
+	void jnbt(int m, int b, int d, int o = 0);
+	void jnz_r(int r, int d);
+	void jnz_m(int m, int d, int o = 0);
+	void jnzb(int m, int d, int o = 0);
+	void jz_r(int r, int d);
+	void jz_m(int m, int d, int o = 0);
+	void jzb(int m, int d, int o = 0);
+	void lcall(int m, int d, int o = 0);
+	void ljbt(int m, int b, int d, int o = 0);
+	void ljmce(int m, int d, int o = 0);
+	void ljmcne(int m, int d, int o = 0);
+	void ljmp(int d);
+	void ljnbt(int m, int b, int d, int o = 0);
+	void ljnz_r(int r, int d);
+	void ljnz_m(int m, int d, int o = 0);
+	void ljnzb(int m, int d, int o = 0);
+	void ljz_r(int r, int d);
+	void ljz_m(int m, int d, int o = 0);
+	void ljzb(int m, int d, int o = 0);
 	void lpd(int p, int m, int o = 0);
 	void lpdi(int p, int i, int o = 0);
+	void mov_mr(int m, int r, int o = 0);
+	void mov_rm(int r, int m, int o = 0);
+	void mov_mm(int m1, int m2, int o1 = 0, int o2 = 0);
 	void movb_mr(int m, int r, int o = 0);
 	void movb_rm(int r, int m, int o = 0);
 	void movb_mm(int m1, int m2, int o1 = 0, int o2 = 0);
@@ -66,24 +117,37 @@ private:
 	void movp_mp(int m, int p, int o = 0);
 	void movp_pm(int p, int m, int o = 0);
 	void nop();
+	void not_r(int r);
+	void not_m(int m, int o = 0);
+	void not_rm(int r, int m, int o = 0);
+	void notb_m(int m, int o = 0);
+	void notb_rm(int r, int m, int o = 0);
+	void or_rm(int r, int m, int o = 0);
+	void or_mr(int m, int r, int o = 0);
+	void orb_rm(int r, int m, int o = 0);
+	void orb_mr(int m, int r, int o = 0);
+	void orbi_ri(int r, int i);
+	void orbi_mi(int m, int i, int o = 0);
+	void ori_ri(int r, int i);
+	void ori_mi(int m, int i, int o = 0);
+	void setb(int m, int b, int o = 0);
 	void sintr();
+	void tsl(int m, int i, int d, int o = 0);
+	void wid(int s, int d);
+	void xfer();
+	void invalid(int opc);
+
+	// instruction fetch
+	UINT16 displacement(int wb);
+	UINT8 offset(int aa);
+	UINT8 imm8();
+	UINT16 imm16();
 
 	void examine_ccw(UINT8 ccw);
 
 	devcb2_write_line m_write_sintr;
 
-	enum
-	{
-		STATE_IDLE,
-		STATE_EXECUTING,
-		STATE_DMA
-	};
-
 	i8089_device *m_iop;
-
-	int m_state;
-
-	bool m_interrupts_enabled;
 
 	// register
 	enum
@@ -115,9 +179,7 @@ i8089_channel::i8089_channel(const machine_config &mconfig, const char *tag, dev
 	device_t(mconfig, I8089_CHANNEL, "Intel 8089 I/O Channel", tag, owner, clock, "i8089_channel", __FILE__),
 	device_execute_interface(mconfig, *this),
 	m_icount(0),
-	m_write_sintr(*this),
-	m_state(STATE_IDLE),
-	m_interrupts_enabled(true)
+	m_write_sintr(*this)
 {
 }
 
@@ -133,9 +195,6 @@ void i8089_channel::device_start()
 	m_write_sintr.resolve_safe();
 
 	// register for save states
-	save_item(NAME(m_state));
-	save_item(NAME(m_interrupts_enabled));
-
 	for (int i = 0; i < ARRAY_LENGTH(m_r); i++)
 	{
 		save_item(NAME(m_r[i].w), i);
@@ -143,23 +202,207 @@ void i8089_channel::device_start()
 	}
 }
 
+void i8089_channel::device_reset()
+{
+	// initialize registers
+	for (int i = 0; i < ARRAY_LENGTH(m_r); i++)
+	{
+		m_r[i].w = 0;
+		m_r[i].t = 0;
+	}
+}
+
+
+//**************************************************************************
+//  IMPLEMENTATION
+//**************************************************************************
+
+UINT16 i8089_channel::displacement(int wb)
+{
+	UINT16 displacement = 0;
+
+	if (wb == 1)
+	{
+		displacement = m_iop->read_byte(m_r[TP].w);
+		m_r[TP].w++;
+	}
+	else if (wb == 2)
+	{
+		displacement = m_iop->read_word(m_r[TP].w);
+		m_r[TP].w += 2;
+	}
+
+	return displacement;
+}
+
+UINT8 i8089_channel::offset(int aa)
+{
+	UINT8 offset = 0;
+
+	if (aa == 1)
+	{
+		offset = m_iop->read_byte(m_r[TP].w);
+		m_r[TP].w++;
+	}
+
+	return offset;
+}
+
+UINT8 i8089_channel::imm8()
+{
+	UINT8 imm8 = m_iop->read_byte(m_r[TP].w);
+	m_r[TP].w++;
+	return imm8;
+}
+
+UINT16 i8089_channel::imm16()
+{
+	UINT8 imm16 = m_iop->read_word(m_r[TP].w);
+	m_r[TP].w += 2;
+	return imm16;
+}
+
 void i8089_channel::execute_run()
 {
 	do
 	{
-		switch (m_state)
+		// active transfer?
+		if (BIT(m_r[PSW].w, 6))
 		{
-		case STATE_IDLE:
 			m_icount = 0;
-			break;
+		}
 
-		case STATE_DMA:
-			m_icount = 0;
-			break;
+		// executing task block instructions?
+		else if (BIT(m_r[PSW].w, 2))
+		{
+			// fetch first two instruction bytes
+			UINT16 op = m_iop->read_word(m_r[TP].w);
+			m_r[TP].w += 2;
 
-		case STATE_EXECUTING:
+			// extract parameters
+			UINT8 params = op & 0xff;
+			UINT8 opcode = (op >> 8) & 0xff;
+
+			int brp = (params >> 5) & 0x07;
+			int wb  = (params >> 3) & 0x03;
+			int aa  = (params >> 1) & 0x03;
+			int w   = (params >> 0) & 0x01;
+			int opc = (opcode >> 2) & 0x3f;
+			int mm  = (opcode >> 0) & 0x03;
+
+			// fix-up so we can use our register array
+			if (mm == BC) mm = PP;
+
+			UINT8 o;
+			UINT16 off, seg;
+
+			switch (opc)
+			{
+			case 0x00: // control
+				switch (brp)
+				{
+				case 0: nop(); break;
+				case 1: invalid(opc); break;
+				case 2: sintr(); break;
+				case 3: xfer(); break;
+				default:
+					if (BIT(brp, 2))
+						wid(BIT(brp, 1), BIT(brp, 0));
+				}
+				break;
+
+			case 0x02: // lpdi
+				off = imm16();
+				seg = imm16();
+				lpdi(brp, seg, off);
+				break;
+
+			case 0x08: // add(b)i r, i
+				if (w) addi_ri(brp, imm16());
+				else   addbi_ri(brp, imm8());
+				break;
+
+			case 0x0a: // and(b)i r, i
+				if (w) andi_ri(brp, imm16());
+				else   andbi_ri(brp, imm8());
+				break;
+
+			case 0x0c: // mov(b)i r, i
+				if (w) movi_ri(brp, imm16());
+				else   movbi_ri(brp, imm8());
+				break;
+
+			case 0x0f: // dec r
+				dec_r(brp);
+				break;
+
+			case 0x12: // hlt
+				if (BIT(brp, 0))
+					hlt();
+				break;
+
+			case 0x22: // lpd
+				o = offset(aa);
+				lpd(brp, mm, o);
+				break;
+
+			case 0x28: // add(b) r, m
+				if (w) add_rm(brp, mm, offset(aa));
+				else   addb_rm(brp, mm, offset(aa));
+				break;
+
+			case 0x2a: // and(b) r, m
+				if (w) and_rm(brp, mm, offset(aa));
+				else   andb_rm(brp, mm, offset(aa));
+				break;
+
+			case 0x27: // call
+				o = offset(aa);
+				call(mm, displacement(wb), o);
+				break;
+
+			case 0x30: // add(b)i m, i
+				o = offset(aa);
+				if (w) addi_mi(mm, imm16(), o);
+				else   addbi_mi(mm, imm8(), o);
+				break;
+
+			case 0x32: // and(b)i m, i
+				o = offset(aa);
+				if (w) andi_mi(mm, imm16());
+				else   andbi_mi(mm, imm8());
+				break;
+
+			case 0x34: // add(b) m, r
+				if (w) add_mr(mm, brp, offset(aa));
+				else   addb_mr(mm, brp, offset(aa));
+				break;
+
+			case 0x36: // and(b) m, r
+				if (w) and_mr(mm, brp, offset(aa));
+				else   andb_mr(mm, brp, offset(aa));
+				break;
+
+			case 0x3b: // dec(b) m
+				if (w) dec_m(mm, offset(aa));
+				else   decb(mm, offset(aa));
+				break;
+
+			case 0x3e: // clr
+				clr(mm, brp, offset(aa));
+				break;
+
+			default:
+				invalid(opc);
+			}
+
 			m_icount--;
-			break;
+		}
+
+		// nothing to do
+		else
+		{
+			m_icount--;
 		}
 	}
 	while (m_icount > 0);
@@ -172,47 +415,33 @@ void i8089_channel::set_control_block(offs_t address)
 
 bool i8089_channel::bus_load_limit()
 {
-	return BIT(m_r[CP].w, 5);
+	return BIT(m_r[PSW].w, 5);
 }
 
 bool i8089_channel::priority()
 {
-	return BIT(m_r[CP].w, 7);
+	return BIT(m_r[PSW].w, 7);
 }
 
 void i8089_channel::examine_ccw(UINT8 ccw)
 {
-	// interrupt control field
-	switch ((ccw >> 3) & 0x03)
-	{
-	// no effect
-	case 0:
-		break;
+	// priority and bus load limit, bit 7 and 5
+	m_r[PSW].w = (m_r[PSW].w & 0x5f) | (ccw & 0xa0);
 
 	// acknowledge interrupt
-	case 1:
-		if (VERBOSE)
-			logerror("%s('%s'): acknowledge interrupt\n", shortname(), tag());
-
+	if (BIT(ccw, 4))
+	{
 		m_write_sintr(0);
-		break;
+		m_r[PSW].w &= ~(1 << 5);
+	}
 
-	// enable interrupts
-	case 2:
-		if (VERBOSE)
-			logerror("%s('%s'): interrupts enabled\n", shortname(), tag());
-
-		m_interrupts_enabled = true;
-		break;
-
-	// disable interrupts
-	case 3:
-		if (VERBOSE)
-			logerror("%s('%s'): interrupts disabled\n", shortname(), tag());
-
-		m_write_sintr(0);
-		m_interrupts_enabled = false;
-		break;
+	// interrupt enable
+	if (BIT(ccw, 5))
+	{
+		if (BIT(ccw, 4))
+			m_r[PSW].w &= ~(1 << 4);
+		else
+			m_r[PSW].w |= 1 << 4;
 	}
 }
 
@@ -226,7 +455,7 @@ void i8089_channel::attention()
 	// no channel command
 	case 0:
 		if (VERBOSE)
-			logerror("%s('%s'): command received: no channel command\n", shortname(), tag());
+			logerror("%s('%s'): command received: update psw\n", shortname(), tag());
 
 		examine_ccw(ccw);
 		break;
@@ -242,7 +471,7 @@ void i8089_channel::attention()
 		movp_pm(TP, PP);
 		movbi_mi(CP, 0xff, 1);
 
-		m_state = STATE_EXECUTING;
+		m_r[PSW].w |= 1 << 2;
 
 		break;
 
@@ -264,7 +493,7 @@ void i8089_channel::attention()
 		lpd(TP, PP);
 		movbi_mi(CP, 0xff, 1);
 
-		m_state = STATE_EXECUTING;
+		m_r[PSW].w |= 1 << 2;
 
 		if (VERBOSE)
 		{
@@ -290,6 +519,14 @@ void i8089_channel::attention()
 		movp_pm(TP, PP);
 		movb_rm(PSW, PP, 3);
 		movbi_mi(CP, 0xff, 1);
+
+		m_r[PSW].w |= 1 << 2;
+
+		if (VERBOSE)
+		{
+			logerror("%s('%s'): ---- continuing channel ----\n", shortname(), tag());
+			logerror("%s('%s'): task pointer: %06x\n", shortname(), tag(), m_r[TP].w);
+		}
 
 		break;
 
@@ -333,19 +570,71 @@ WRITE_LINE_MEMBER( i8089_channel::drq_w )
 //  OPCODES
 //**************************************************************************
 
+#define UNIMPLEMENTED logerror("%s('%s'): unimplemented opcode: %s\n", shortname(), tag(), __FUNCTION__);
+
+void i8089_channel::add_rm(int r, int m, int o) { UNIMPLEMENTED }
+void i8089_channel::add_mr(int m, int r, int o) { UNIMPLEMENTED }
+void i8089_channel::addb_rm(int r, int m, int o) { UNIMPLEMENTED }
+void i8089_channel::addb_mr(int m, int r, int o) { UNIMPLEMENTED }
+void i8089_channel::addbi_ri(int r, int i) { UNIMPLEMENTED }
+void i8089_channel::addbi_mi(int m, int i, int o) { UNIMPLEMENTED }
+void i8089_channel::addi_ri(int r, int i) { UNIMPLEMENTED }
+void i8089_channel::addi_mi(int m, int i, int o) { UNIMPLEMENTED }
+void i8089_channel::and_rm(int r, int m, int o) { UNIMPLEMENTED }
+void i8089_channel::and_mr(int m, int r, int o) { UNIMPLEMENTED }
+void i8089_channel::andb_rm(int r, int m, int o) { UNIMPLEMENTED }
+void i8089_channel::andb_mr(int m, int r, int o) { UNIMPLEMENTED }
+void i8089_channel::andbi_ri(int r, int i) { UNIMPLEMENTED }
+void i8089_channel::andbi_mi(int m, int i, int o) { UNIMPLEMENTED }
+void i8089_channel::andi_ri(int r, int i) { UNIMPLEMENTED }
+void i8089_channel::andi_mi(int m, int i, int o) { UNIMPLEMENTED }
+void i8089_channel::call(int m, int d, int o) { UNIMPLEMENTED }
+void i8089_channel::clr(int m, int b, int o) { UNIMPLEMENTED }
+void i8089_channel::dec_r(int r) { UNIMPLEMENTED }
+void i8089_channel::dec_m(int m, int o) { UNIMPLEMENTED }
+void i8089_channel::decb(int m, int o) { UNIMPLEMENTED }
+
 // halt
 void i8089_channel::hlt()
 {
 	movbi_mi(CP, 0x00, 1);
-	m_state = STATE_IDLE;
+	m_r[PSW].w &= ~(1 << 2);
 }
+
+void i8089_channel::inc_r(int r) { UNIMPLEMENTED }
+void i8089_channel::inc_m(int m, int o) { UNIMPLEMENTED }
+void i8089_channel::incb(int m, int o) { UNIMPLEMENTED }
+void i8089_channel::jbt(int m, int b, int d, int o) { UNIMPLEMENTED }
+void i8089_channel::jmce(int m, int d, int o) { UNIMPLEMENTED }
+void i8089_channel::jmcne(int m, int d, int o) { UNIMPLEMENTED }
+void i8089_channel::jmp(int d) { UNIMPLEMENTED }
+void i8089_channel::jnbt(int m, int b, int d, int o) { UNIMPLEMENTED }
+void i8089_channel::jnz_r(int r, int d) { UNIMPLEMENTED }
+void i8089_channel::jnz_m(int m, int d, int o) { UNIMPLEMENTED }
+void i8089_channel::jnzb(int m, int d, int o) { UNIMPLEMENTED }
+void i8089_channel::jz_r(int r, int d) { UNIMPLEMENTED }
+void i8089_channel::jz_m(int m, int d, int o) { UNIMPLEMENTED }
+void i8089_channel::jzb(int m, int d, int o) { UNIMPLEMENTED }
+void i8089_channel::lcall(int m, int d, int o) { UNIMPLEMENTED }
+void i8089_channel::ljbt(int m, int b, int d, int o) { UNIMPLEMENTED }
+void i8089_channel::ljmce(int m, int d, int o) { UNIMPLEMENTED }
+void i8089_channel::ljmcne(int m, int d, int o) { UNIMPLEMENTED }
+void i8089_channel::ljmp(int d) { UNIMPLEMENTED }
+void i8089_channel::ljnbt(int m, int b, int d, int o) { UNIMPLEMENTED }
+void i8089_channel::ljnz_r(int r, int d) { UNIMPLEMENTED }
+void i8089_channel::ljnz_m(int m, int d, int o) { UNIMPLEMENTED }
+void i8089_channel::ljnzb(int m, int d, int o) { UNIMPLEMENTED }
+void i8089_channel::ljz_r(int r, int d) { UNIMPLEMENTED }
+void i8089_channel::ljz_m(int m, int d, int o) { UNIMPLEMENTED }
+void i8089_channel::ljzb(int m, int d, int o) { UNIMPLEMENTED }
 
 // load pointer from memory
 void i8089_channel::lpd(int p, int m, int o)
 {
 	UINT16 offset = m_iop->read_word(m_r[m].w + o);
 	UINT16 segment = m_iop->read_word(m_r[m].w + o + 2);
-	m_r[p].w = (segment << 4) + (offset & 0xfffff);
+
+	m_r[p].w = ((segment << 4) + offset) & 0xfffff;
 	m_r[p].t = 0;
 }
 
@@ -355,6 +644,10 @@ void i8089_channel::lpdi(int p, int i, int o)
 	m_r[p].w = (o << 4) + (i & 0xffff);
 	m_r[p].t = 0;
 }
+
+void i8089_channel::mov_mr(int m, int r, int o) { UNIMPLEMENTED }
+void i8089_channel::mov_rm(int r, int m, int o) { UNIMPLEMENTED }
+void i8089_channel::mov_mm(int m1, int m2, int o1, int o2) { UNIMPLEMENTED }
 
 // move register to memory byte
 void i8089_channel::movb_mr(int m, int r, int o)
@@ -414,9 +707,9 @@ void i8089_channel::movp_mp(int m, int p, int o)
 void i8089_channel::movp_pm(int p, int m, int o)
 {
 	UINT16 offset = m_iop->read_word(m_r[m].w + o);
-	UINT16 segment = m_iop->read_word(m_r[m].w +o + 2);
+	UINT16 segment = m_iop->read_word(m_r[m].w + o + 2);
 
-	m_r[p].w = ((segment << 4) + offset) & 0x0fffff;
+	m_r[p].w = ((segment << 4) + offset) & 0xfffff;
 	m_r[p].t = segment >> 3 & 0x01;
 }
 
@@ -425,11 +718,46 @@ void i8089_channel::nop()
 {
 }
 
+void i8089_channel::not_r(int r) { UNIMPLEMENTED }
+void i8089_channel::not_m(int m, int o) { UNIMPLEMENTED }
+void i8089_channel::not_rm(int r, int m, int o) { UNIMPLEMENTED }
+void i8089_channel::notb_m(int m, int o) { UNIMPLEMENTED }
+void i8089_channel::notb_rm(int r, int m, int o) { UNIMPLEMENTED }
+void i8089_channel::or_rm(int r, int m, int o) { UNIMPLEMENTED }
+void i8089_channel::or_mr(int m, int r, int o) { UNIMPLEMENTED }
+void i8089_channel::orb_rm(int r, int m, int o) { UNIMPLEMENTED }
+void i8089_channel::orb_mr(int m, int r, int o) { UNIMPLEMENTED }
+void i8089_channel::orbi_ri(int r, int i) { UNIMPLEMENTED }
+void i8089_channel::orbi_mi(int m, int i, int o) { UNIMPLEMENTED }
+void i8089_channel::ori_ri(int r, int i) { UNIMPLEMENTED }
+void i8089_channel::ori_mi(int m, int i, int o) { UNIMPLEMENTED }
+void i8089_channel::setb(int m, int b, int o) { UNIMPLEMENTED }
+
 // set interrupt service flip-flop
 void i8089_channel::sintr()
 {
-	if (m_interrupts_enabled)
+	if (BIT(m_r[PSW].w, 4))
+	{
+		m_r[PSW].w |= 1 << 5;
 		m_write_sintr(1);
+	}
+}
+
+void i8089_channel::tsl(int m, int i, int d, int o) { UNIMPLEMENTED }
+
+// set source and destination logical widths
+void i8089_channel::wid(int s, int d)
+{
+	m_r[PSW].w &= 0x3f;
+	m_r[PSW].w |= d << 0;
+	m_r[PSW].w |= s << 1;
+}
+
+void i8089_channel::xfer() { UNIMPLEMENTED }
+
+void i8089_channel::invalid(int opc)
+{
+	logerror("%s('%s'): invalid opcode: %02x\n", shortname(), tag(), opc);
 }
 
 
@@ -600,7 +928,7 @@ UINT16 i8089_device::read_word(offs_t address)
 
 	UINT16 data = 0xffff;
 
-	if (m_16bit_system)
+	if (m_16bit_system && !(address & 1))
 	{
 		data = m_mem->read_word(address);
 	}
@@ -623,7 +951,7 @@ void i8089_device::write_word(offs_t address, UINT16 data)
 {
 	assert(m_initialized);
 
-	if (m_16bit_system)
+	if (m_16bit_system && !(address & 1))
 	{
 		m_mem->write_word(address, data);
 	}
