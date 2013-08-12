@@ -40,6 +40,8 @@
 
 #define M6801_TAG	"mpu6801"
 #define ROM_TAG		"mpurom"
+#define MIDIIN_TAG	"mdin"
+#define MIDIOUT_TAG	"mdout"
 
 #define P2_SYNC_OUT	(0x01)
 #define P2_SYNC_IN	(0x02)
@@ -64,10 +66,32 @@ static ADDRESS_MAP_START( mpu401_io_map, AS_IO, 8, mpu401_device )
 	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READWRITE(port2_r, port2_w)
 ADDRESS_MAP_END
 
+static SLOT_INTERFACE_START(midiin_slot)
+	SLOT_INTERFACE("midiin", MIDIIN_PORT)
+SLOT_INTERFACE_END
+
+static const serial_port_interface midiin_intf =
+{
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, mpu401_device, midi_rx_w)
+};
+
+static SLOT_INTERFACE_START(midiout_slot)
+	SLOT_INTERFACE("midiout", MIDIOUT_PORT)
+SLOT_INTERFACE_END
+
+static const serial_port_interface midiout_intf =
+{
+	DEVCB_NULL  // midi out ports don't transmit inward
+};
+
 MACHINE_CONFIG_FRAGMENT( mpu401 )
 	MCFG_CPU_ADD(M6801_TAG, M6801, 4000000)	/* 4 MHz as per schematics */
 	MCFG_CPU_PROGRAM_MAP(mpu401_map)
 	MCFG_CPU_IO_MAP(mpu401_io_map)
+	MCFG_M6801_SER_TX(WRITELINE(mpu401_device, mpu401_midi_tx))
+
+	MCFG_SERIAL_PORT_ADD(MIDIIN_TAG, midiin_intf, midiin_slot, "midiin")
+	MCFG_SERIAL_PORT_ADD(MIDIOUT_TAG, midiout_intf, midiout_slot, "midiout")
 MACHINE_CONFIG_END
 
 ROM_START( mpu401 )
@@ -109,8 +133,9 @@ const rom_entry *mpu401_device::device_rom_region() const
 //-------------------------------------------------
 
 mpu401_device::mpu401_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, MPU401, "Roland MPU-401", tag, owner, clock, "mpu401", __FILE__),
+	device_t(mconfig, MPU401, "Roland MPU-401 I/O box", tag, owner, clock, "mpu401", __FILE__),
 	m_ourcpu(*this, M6801_TAG),
+	m_mdout(*this, MIDIOUT_TAG),
 	write_irq(*this)
 {
 }
@@ -122,6 +147,7 @@ mpu401_device::mpu401_device(const machine_config &mconfig, const char *tag, dev
 void mpu401_device::device_start()
 {
 	write_irq.resolve_safe();
+	m_timer = timer_alloc(0, NULL);
 }
 
 //-------------------------------------------------
@@ -130,10 +156,21 @@ void mpu401_device::device_start()
 
 void mpu401_device::device_reset()
 {
-	m_port2 = 0xff & ~P2_SRCK_OUT;
+	m_port2 = 0xff & ~(P2_SRCK_OUT | P2_MIDI_IN);	// prevent spurious reception
 	m_command = 0;
 	m_mpudata = 0;
 	m_gatearrstat = 0;
+
+	m_timer->adjust(attotime::zero, 0, attotime::from_hz(31250*8));
+}
+
+//-------------------------------------------------
+//  device_timer - called when our device timer expires
+//-------------------------------------------------
+
+void mpu401_device::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
+{
+	m_ourcpu->m6801_clock_serial();
 }
 
 READ8_MEMBER(mpu401_device::regs_mode2_r)
@@ -179,18 +216,18 @@ READ8_MEMBER(mpu401_device::port1_r)
 
 WRITE8_MEMBER(mpu401_device::port1_w)
 {
-	printf("port1_w: %02x met %x syncout %x DSRD %d DRRD %d\n", data, data & 3, (data>>3) & 3, (data>>6) & 1, (data>>7) & 1);
+//	printf("port1_w: %02x met %x syncout %x DSRD %d DRRD %d\n", data, data & 3, (data>>3) & 3, (data>>6) & 1, (data>>7) & 1);
 }
 
 READ8_MEMBER(mpu401_device::port2_r)
 {
-	printf("Read P2 (PC=%x)\n", space.device().safe_pc());
+//	printf("Read P2 (PC=%x)\n", space.device().safe_pc());
 	return m_port2;
 }
 
 WRITE8_MEMBER(mpu401_device::port2_w)
 {
-	printf("port2_w: %02x SYCOUT %d SYCIN %d SRCK %d MIDI OUT %d\n", data, (data & 1), (data>>1) & 1, (data>>2) & 1, (data>>4) & 1);
+//	printf("port2_w: %02x SYCOUT %d SYCIN %d SRCK %d MIDI OUT %d\n", data, (data & 1), (data>>1) & 1, (data>>2) & 1, (data>>4) & 1);
 }
 
 READ8_MEMBER(mpu401_device::mpu_r)
@@ -219,6 +256,10 @@ WRITE8_MEMBER(mpu401_device::mpu_w)
 	{
 		m_gatearrstat |= STAT_CMD_PORT;
 	}
+	else
+	{
+		m_gatearrstat &= ~STAT_CMD_PORT;
+	}
 }
 
 READ8_MEMBER(mpu401_device::asic_r)
@@ -246,5 +287,24 @@ WRITE8_MEMBER(mpu401_device::asic_w)
 		m_gatearrstat &= ~STAT_RX_EMPTY;
 		write_irq(ASSERT_LINE);
 	}
+}
+
+// MIDI receive
+WRITE_LINE_MEMBER( mpu401_device::midi_rx_w )
+{
+	if (state == ASSERT_LINE)
+	{
+		m_port2 |= P2_MIDI_IN;
+	}
+	else
+	{
+		m_port2 &= ~P2_MIDI_IN;
+	}
+}
+
+// MIDI send
+WRITE_LINE_MEMBER(mpu401_device::mpu401_midi_tx)
+{
+	m_mdout->tx(state);
 }
 
