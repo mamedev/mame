@@ -39,6 +39,7 @@
 #define __CDP1864__
 
 #include "emu.h"
+#include "machine/rescap.h"
 #include "video/resnet.h"
 
 
@@ -150,8 +151,6 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
 private:
-	inline void initialize_palette();
-
 	enum
 	{
 		TIMER_INT,
@@ -159,6 +158,10 @@ private:
 		TIMER_DMA,
 		TIMER_HSYNC
 	};
+	
+	void initialize_palette();
+
+	static const int bckgnd[];
 
 	devcb2_read_line        m_read_inlace;
 	devcb2_read_line        m_read_rdata;
