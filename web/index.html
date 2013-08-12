@@ -11,6 +11,31 @@
 	<link href="css/default.ultimate.css" media="screen" rel="stylesheet" type="text/css" />
 </head>
 <body>
+<script language="javascript" type="text/javascript">
+
+  var writeToScreen = function(message) {
+    var div = document.createElement('div');
+    div.innerHTML = message;
+    document.getElementById('output').appendChild(div);
+  };
+  window.onload = function() {
+    var url = 'ws://localhost:8080/foo';
+    websocket = new WebSocket(url);
+    websocket.onopen = function(ev) {
+	  writeToScreen('<span style="color: green;">CONNECTED</span>');
+    };
+    websocket.onclose = function(ev) {      
+      writeToScreen('<span style="color: white;">DISCONNECTED</span>');
+    };
+    websocket.onmessage = function(ev) {
+      writeToScreen('<span style="color: blue;">RESPONSE: ' + ev.data +
+                    ' </span>');
+    };
+    websocket.onerror = function(ev) {
+      writeToScreen('<span style="color: red; ">ERROR: </span> ' + ev.data);
+    };
+  };
+</script>
 <div data-role="page">
     <div data-role="header">
 		<img src="images/logo-mame-small.png"/>
@@ -46,6 +71,7 @@
 	</li>
 	<li id="n-debugger"><a href="./">Debugger</a></li>
 </ul>
+<br/><br/><div id="output"></div>
 </div>
 </body>
 </html>

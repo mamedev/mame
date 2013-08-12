@@ -19,6 +19,7 @@
 // THE SOFTWARE.
 
 #define NO_SSL
+#define USE_WEBSOCKET
 
 #if defined(_WIN32)
 #define SETSOCKOPT_CAST const char *
@@ -4052,7 +4053,7 @@ static void read_websocket(struct mg_connection *conn) {
     if (header_len > 0) {
       // Allocate space to hold websocket payload
       data = mem;
-      if (data_len > sizeof(mem) && (data = malloc(data_len)) == NULL) {
+      if (data_len > sizeof(mem) && (data = (char*)malloc(data_len)) == NULL) {
         // Allocation failed, exit the loop and then close the connection
         // TODO: notify user about the failure
         break;

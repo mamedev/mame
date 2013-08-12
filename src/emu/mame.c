@@ -84,8 +84,7 @@
 #include "crsshair.h"
 #include "validity.h"
 #include "debug/debugcon.h"
-#include "web/mongoose.h"
-#include "web/json/json.h"
+#include "webengine.h"
 #include <time.h>
 
 
@@ -132,33 +131,6 @@ int mame_is_valid_machine(running_machine &machine)
 	return (&machine == global_machine);
 }
 
-// This function will be called by mongoose on every new request.
-static int begin_request_handler(struct mg_connection *conn) {
-	const struct mg_request_info *request_info = mg_get_request_info(conn);
-	if (!strcmp(request_info->uri, "/hello")) {
-		Json::Value data;
-		data["key1"] = "data1";
-		data["key2"] = "data2";
-		data["key3"] = "data3";
-		data["key4"] = "data4";
-		
-		Json::FastWriter writer;
-		const char *json = writer.write(data).c_str();
-	  // Send HTTP reply to the client
-		mg_printf(conn,
-				"HTTP/1.1 200 OK\r\n"
-				"Content-Type: application/json\r\n"
-				"Content-Length: %d\r\n"        // Always set Content-Length
-				"\r\n"
-				"%s",
-				(int)strlen(json), json);
-
-		// Returning non-zero tells mongoose that our function has replied to
-		// the client, and mongoose should not send client any more data.
-		return 1;
-	}
-	return 0;
-} 
 /*-------------------------------------------------
     mame_execute - run the core emulation
 -------------------------------------------------*/
@@ -172,27 +144,12 @@ int mame_execute(emu_options &options, osd_interface &osd)
 	if (options.verbose())
 		print_verbose = true;
 
-	struct mg_context *ctx = NULL;
-	struct mg_callbacks callbacks;
-
-	// List of options. Last element must be NULL.
-	const char *web_options[] = {
-		"listening_ports", options.http_port(), 
-		"document_root", options.http_path(),
-		NULL
-	};
-
-	// Prepare callbacks structure. 
-	memset(&callbacks, 0, sizeof(callbacks));
-	callbacks.begin_request = begin_request_handler;
-
-	// Start the web server.
-	if (options.http())
-		ctx = mg_start(&callbacks, NULL, web_options);
-	
 	// loop across multiple hard resets
 	bool exit_pending = false;
 	int error = MAMERR_NONE;
+	
+	web_engine web(options);
+	
 	while (error == MAMERR_NONE && !exit_pending)
 	{
 		// if no driver, use the internal empty driver
@@ -230,7 +187,9 @@ int mame_execute(emu_options &options, osd_interface &osd)
 
 		// looooong term: remove this
 		global_machine = &machine;
-
+		
+		web.set_machine(machine);
+		web.push_message("update_machine");		
 		// run the machine
 		error = machine.run(firstrun);
 		firstrun = false;
@@ -247,10 +206,6 @@ int mame_execute(emu_options &options, osd_interface &osd)
 		// machine will go away when we exit scope
 		global_machine = NULL;
 	}
-
-	// Stop the server.
-	if (options.http())
-		mg_stop(ctx);
 	// return an error
 	return error;
 }
