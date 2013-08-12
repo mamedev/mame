@@ -1064,13 +1064,6 @@ MULD:
 	@m_temp.b.h = read_operand(0);
 	@m_temp.b.l = read_operand(1);
 	muld();
-	{
-		PAIR result;
-		result.d = ((INT16) m_d.w) * ((INT16) m_temp.w);
-		m_d.w = set_flags<UINT16>(CC_NZ, result.w.h);
-		m_w.w = result.w.l;
-		m_cc &= ~CC_VC;
-	}
 	return;
 
 DIVQ:
