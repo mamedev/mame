@@ -11109,7 +11109,7 @@ GAME( 1991, captcommr1,  captcomm, cps1_10MHz, captcomm, cps_state,   cps1,     
 GAME( 1991, captcommu,   captcomm, cps1_10MHz, captcomm, cps_state,   cps1,     ROT0,   "Capcom", "Captain Commando (USA 910928)", GAME_SUPPORTS_SAVE )
 GAME( 1991, captcommj,   captcomm, cps1_10MHz, captcomm, cps_state,   cps1,     ROT0,   "Capcom", "Captain Commando (Japan 911202)", GAME_SUPPORTS_SAVE )
 GAME( 1991, captcommjr1, captcomm, cps1_10MHz, captcomm, cps_state,   cps1,     ROT0,   "Capcom", "Captain Commando (Japan 910928)", GAME_SUPPORTS_SAVE )
-GAME( 1991, captcommb,   captcomm, cps1_10MHz, captcomm, cps_state,   cps1,     ROT0,   "bootleg", "Captain Commando (bootleg)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )    // 911014 - based on World version
+GAME( 1991, captcommb,   captcomm, cps1_10MHz, captcomm, cps_state,   cps1,     ROT0,   "bootleg", "Captain Commando (bootleg)", GAME_SUPPORTS_SAVE )    // 911014 - based on World version
 GAME( 1991, knights,     0,        cps1_10MHz, knights,  cps_state,   cps1,     ROT0,   "Capcom", "Knights of the Round (World 911127)", GAME_SUPPORTS_SAVE )   // "ETC"
 GAME( 1991, knightsu,    knights,  cps1_10MHz, knights,  cps_state,   cps1,     ROT0,   "Capcom", "Knights of the Round (USA 911127)", GAME_SUPPORTS_SAVE )
 GAME( 1991, knightsj,    knights,  cps1_10MHz, knights,  cps_state,   cps1,     ROT0,   "Capcom", "Knights of the Round (Japan 911127, B-Board 91634B-2)", GAME_SUPPORTS_SAVE )

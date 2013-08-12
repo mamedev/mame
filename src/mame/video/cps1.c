@@ -1364,7 +1364,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"captcommu",   CPS_B_21_BT3, mapper_CC63B,  0x36, 0x38, 0x34 },
 	{"captcommj",   CPS_B_21_BT3, mapper_CC63B,  0x36, 0x38, 0x34 },
 	{"captcommjr1", CPS_B_21_BT3, mapper_CC63B,  0x36, 0x38, 0x34 },
-	{"captcommb",   CPS_B_21_BT3, mapper_CC63B,  0x36, 0x38, 0x34 },
+	{"captcommb",   CPS_B_21_BT3, mapper_CC63B,  0x36, 0x38, 0x34, 3 },
 	{"knights",     CPS_B_21_BT4, mapper_KR63B,  0x36, 0, 0x34 },
 	{"knightsu",    CPS_B_21_BT4, mapper_KR63B,  0x36, 0, 0x34 },
 	{"knightsj",    CPS_B_21_BT4, mapper_KR63B,  0x36, 0, 0x34 },
@@ -1841,6 +1841,13 @@ void cps_state::cps1_get_video_base()
 		scroll2xoff = -0x10;
 		scroll3xoff = -0x10;
 	}
+	else
+	if (m_game_config->bootleg_kludge == 3)
+	{
+		scroll1xoff = -0x08;
+		scroll2xoff = -0x0b;
+		scroll3xoff = -0x0c;
+	}
 
 	m_obj = cps1_base(machine(), CPS1_OBJ_BASE, m_obj_size);
 	m_other = cps1_base(machine(), CPS1_OTHER_BASE, m_other_size);
@@ -2269,12 +2276,25 @@ void cps_state::cps1_find_last_sprite()    /* Find the offset of last sprite */
 	/* Locate the end of table marker */
 	while (offset < m_obj_size / 2)
 	{
-		int colour = m_buffered_obj[offset + 3];
-		if ((colour & 0xff00) == 0xff00)
+		if (m_game_config->bootleg_kludge == 3) {
+			/* captcommb - same end of sprite marker as CPS-2 */
+			int colour = m_buffered_obj[offset + 1];
+			if (colour >= 0x8000)
+			{
+				/* Marker found. This is the last sprite. */
+				m_last_sprite_offset = offset - 4;
+				return;
+			}
+		}
+		else
 		{
-			/* Marker found. This is the last sprite. */
-			m_last_sprite_offset = offset - 4;
-			return;
+			int colour = m_buffered_obj[offset + 3];
+			if ((colour & 0xff00) == 0xff00)
+			{
+				/* Marker found. This is the last sprite. */
+				m_last_sprite_offset = offset - 4;
+				return;
+			}
 		}
 
 		offset += 4;
@@ -2309,7 +2329,7 @@ void cps_state::cps1_render_sprites( screen_device &screen, bitmap_ind16 &bitmap
 	UINT16 *base = m_buffered_obj;
 
 	/* some sf2 hacks draw the sprites in reverse order */
-	if ((m_game_config->bootleg_kludge == 1) || (m_game_config->bootleg_kludge == 2))
+	if ((m_game_config->bootleg_kludge == 1) || (m_game_config->bootleg_kludge == 2) || (m_game_config->bootleg_kludge == 3))
 	{
 		base += m_last_sprite_offset;
 		baseadd = -4;
