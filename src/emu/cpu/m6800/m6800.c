@@ -536,6 +536,7 @@ m6800_cpu_device::m6800_cpu_device(const machine_config &mconfig, const char *ta
 	, m_io_config("io", ENDIANNESS_BIG, 8, 9, 0)
 	, m_has_io(false)
 	, m_out_sc2_func(*this)
+	, m_out_sertx_func(*this)
 	, m_insn(m6800_insn)
 	, m_cycles(cycles_6800)
 {
@@ -548,6 +549,7 @@ m6800_cpu_device::m6800_cpu_device(const machine_config &mconfig, device_type ty
 	, m_io_config("io", ENDIANNESS_BIG, 8, 9, 0)
 	, m_has_io(has_io)
 	, m_out_sc2_func(*this)
+	, m_out_sertx_func(*this)
 	, m_insn(insn)
 	, m_cycles(cycles)
 {
@@ -730,6 +732,15 @@ void m6800_cpu_device::check_timer_event()
 			m_wai_state &= ~M6800_SLP;
 		if ( !(CC & 0x10) && (m_tcsr & TCSR_EOCI))
 			TAKE_OCI;
+
+		// if output on P21 is enabled, let's do it
+		if (m_port2_ddr & 2)
+		{
+			m_port2_data &= ~2;
+			m_port2_data |= (m_tcsr & TCSR_OLVL) << 1;
+			m_port2_written = 1;
+			write_port2();
+		}
 	}
 	/* TOI */
 	if( CTD >= TOD)
@@ -767,7 +778,12 @@ void m6800_cpu_device::set_rmcr(UINT8 data)
 	switch ((m_rmcr & M6800_RMCR_CC_MASK) >> 2)
 	{
 	case 0:
-	case 3: // not implemented
+		m_sci_timer->enable(false);
+		m_use_ext_serclock = false;
+		break;
+
+	case 3: // external clock
+		m_use_ext_serclock = true;
 		m_sci_timer->enable(false);
 		break;
 
@@ -778,6 +794,7 @@ void m6800_cpu_device::set_rmcr(UINT8 data)
 			int clock = m_clock / m_clock_divider;
 
 			m_sci_timer->adjust(attotime::from_hz(clock / divisor), 0, attotime::from_hz(clock / divisor));
+			m_use_ext_serclock = false;
 		}
 		break;
 	}
@@ -844,8 +861,8 @@ void m6800_cpu_device::serial_transmit()
 			case M6800_SERIAL_START:
 				if (m_trcsr & M6800_TRCSR_TDRE)
 				{
-					// transmit buffer is empty, send consecutive '1's
-					m_tx = 1;
+					// transmit buffer is empty, send nothing
+					return;
 				}
 				else
 				{
@@ -892,6 +909,7 @@ void m6800_cpu_device::serial_transmit()
 			break;
 		}
 
+		m_out_sertx_func((m_tx == 1) ? ASSERT_LINE : CLEAR_LINE);
 		m_port2_written = 1;
 		write_port2();
 	}
@@ -1023,6 +1041,7 @@ void m6800_cpu_device::device_start()
 		m_io = &space(AS_IO);
 
 	m_out_sc2_func.resolve_safe();
+	m_out_sertx_func.resolve_safe();
 	m_sci_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m6800_cpu_device::sci_tick),this));
 
 	save_item(NAME(m_ppc.w.l));
@@ -1144,6 +1163,8 @@ void m6800_cpu_device::device_reset()
 	m_trcsr_read_tdre = 0;
 	m_trcsr_read_orfe = 0;
 	m_trcsr_read_rdrf = 0;
+	m_ext_serclock = 0;
+	m_use_ext_serclock = false;
 
 	set_rmcr(0);
 }
@@ -1479,9 +1500,6 @@ WRITE8_MEMBER( m6800_cpu_device::m6801_io_w )
 		{
 			m_port2_ddr = data;
 			write_port2();
-
-			if (m_port2_ddr & 2)
-				logerror("CPU '%s' PC %04x: warning - port 2 bit 1 set as output (OLVL) - not supported\n",space.device().tag(),space.device().safe_pc());
 		}
 		break;
 
@@ -1683,6 +1701,20 @@ WRITE8_MEMBER( m6800_cpu_device::m6801_io_w )
 	}
 }
 
+void m6801_cpu_device::m6801_clock_serial() 
+{ 
+	if (m_use_ext_serclock)
+	{
+		m_ext_serclock++; 
+
+		if (m_ext_serclock >= 8)
+		{ 
+			m_ext_serclock = 0; 
+			serial_transmit(); 
+			serial_receive(); 
+		}
+	}
+}
 
 offs_t m6800_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
 {
@@ -1738,5 +1770,4 @@ offs_t nsc8105_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UIN
 	extern CPU_DISASSEMBLE( nsc8105 );
 	return CPU_DISASSEMBLE_NAME(nsc8105)(this, buffer, pc, oprom, opram, options);
 }
-
 

@@ -46,7 +46,8 @@ enum
 
 #define MCFG_M6801_SC2(_devcb) \
 	m6800_cpu_device::set_out_sc2_func(*device, DEVCB2_##_devcb);
-
+#define MCFG_M6801_SER_TX(_devcb) \
+	m6800_cpu_device::set_out_sertx_func(*device, DEVCB2_##_devcb);
 
 class m6800_cpu_device :  public cpu_device
 {
@@ -59,6 +60,7 @@ public:
 
 	// static configuration helpers
 	template<class _Object> static devcb2_base &set_out_sc2_func(device_t &device, _Object object) { return downcast<m6800_cpu_device &>(device).m_out_sc2_func.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_sertx_func(device_t &device, _Object object) { return downcast<m6800_cpu_device &>(device).m_out_sertx_func.set_callback(object); }
 
 	DECLARE_READ8_MEMBER( m6801_io_r );
 	DECLARE_WRITE8_MEMBER( m6801_io_w );
@@ -92,6 +94,7 @@ protected:
 	bool m_has_io;
 
 	devcb2_write_line m_out_sc2_func;
+	devcb2_write_line m_out_sertx_func;
 
 	PAIR    m_ppc;            /* Previous program counter */
 	PAIR    m_pc;             /* Program counter */
@@ -135,7 +138,8 @@ protected:
 
 	int     m_clock_divider;
 	UINT8   m_trcsr, m_rmcr, m_rdr, m_tdr, m_rsr, m_tsr;
-	int     m_rxbits, m_txbits, m_txstate, m_trcsr_read_tdre, m_trcsr_read_orfe, m_trcsr_read_rdrf, m_tx;
+	int     m_rxbits, m_txbits, m_txstate, m_trcsr_read_tdre, m_trcsr_read_orfe, m_trcsr_read_rdrf, m_tx, m_ext_serclock;
+	bool	m_use_ext_serclock;
 	int     m_port2_written;
 
 	int     m_icount;
@@ -424,6 +428,8 @@ class m6801_cpu_device : public m6800_cpu_device
 public:
 	m6801_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	m6801_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, const m6800_cpu_device::op_func *insn, const UINT8 *cycles, address_map_constructor internal = NULL);
+
+	void m6801_clock_serial();
 
 protected:
 	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const { return (clocks + 4 - 1) / 4; }
