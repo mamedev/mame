@@ -117,7 +117,8 @@ void *web_engine::websocket_keepalive()
 			m_lastupdatetime = curtime;
 			for (simple_list_wrapper<mg_connection> *curitem = m_websockets.first(); curitem != NULL; curitem = curitem->next())
 			{
-				mg_websocket_write(curitem->object(), WEBSOCKET_OPCODE_PING, NULL, 0);		
+				int status = mg_websocket_write(curitem->object(), WEBSOCKET_OPCODE_PING, NULL, 0);		
+				if (status==0) m_websockets.remove(*curitem); // remove inactive clients
 			}
 		}
 		osd_sleep(osd_ticks_per_second()/5);
