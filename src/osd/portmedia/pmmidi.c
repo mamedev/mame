@@ -291,6 +291,14 @@ void osd_write_midi_channel(osd_midi_device *dev, UINT8 data)
 	PmEvent ev;
 	ev.timestamp = 0;   // use the current time
 
+//	printf("write: %02x (%d)\n", data, dev->xmit_cnt);
+
+	if (dev->xmit_cnt >= 4)
+	{
+		printf("MIDI out: packet assembly overflow, contact MAMEdev!\n");
+		return;
+	}
+
 	// handle sysex
 	if (dev->last_status == MIDI_SYSEX)
 	{
@@ -299,7 +307,7 @@ void osd_write_midi_channel(osd_midi_device *dev, UINT8 data)
 		// if we get a status that isn't sysex, assume it's system common
 		if ((data & 0x80) && (data != MIDI_EOX))
 		{
-//          printf("common during sysex!\n");
+//			printf("common during sysex!\n");
 			ev.message = Pm_Message(data, 0, 0);
 			Pm_Write(dev->pmStream, &ev, 1);
 			return;
@@ -315,7 +323,7 @@ void osd_write_midi_channel(osd_midi_device *dev, UINT8 data)
 			dev->xmit_in[0] = dev->xmit_in[1] = dev->xmit_in[2] = dev->xmit_in[3] = 0;
 			dev->xmit_cnt = 0;
 
-//          printf("SysEx packet: %08x\n", ev.message);
+//			printf("SysEx packet: %08x\n", ev.message);
 
 			// if this is EOX, kill the running status
 			if (data == MIDI_EOX)
@@ -327,8 +335,8 @@ void osd_write_midi_channel(osd_midi_device *dev, UINT8 data)
 		return;
 	}
 
-	// handle running status
-	if ((dev->xmit_cnt == 0) && (data & 0x80))
+	// handle running status.  don't allow system real-time messages to be considered as running status.
+	if ((dev->xmit_cnt == 0) && (data & 0x80) && (data < 0xf8))
 	{
 		dev->last_status = data;
 	}
@@ -337,20 +345,23 @@ void osd_write_midi_channel(osd_midi_device *dev, UINT8 data)
 	{
 		dev->xmit_in[dev->xmit_cnt++] = dev->last_status;
 		dev->xmit_in[dev->xmit_cnt++] = data;
+//		printf("\trunning status: [%d] = %02x, [%d] = %02x, last_status = %02x\n", dev->xmit_cnt-2, dev->last_status, dev->xmit_cnt-1, data, dev->last_status);
 	}
 	else
 	{
 		dev->xmit_in[dev->xmit_cnt++] = data;
+//		printf("\tNRS: [%d] = %02x\n", dev->xmit_cnt-1, data);
 	}
 
 	if ((dev->xmit_cnt == 1) && (dev->xmit_in[0] == MIDI_SYSEX))
 	{
-//      printf("Start SysEx!\n");
+//		printf("Start SysEx!\n");
 		dev->last_status = MIDI_SYSEX;
 		return;
 	}
 
 	// are we there yet?
+//	printf("status check: %02x\n", dev->xmit_in[0]);
 	switch ((dev->xmit_in[0]>>4) & 0xf)
 	{
 		case 0xc:   // 2-byte messages
