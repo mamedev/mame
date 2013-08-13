@@ -1131,12 +1131,11 @@
  */
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
 #include "includes/namcos22.h"
+#include "cpu/m68000/m68000.h"
 #include "cpu/tms32025/tms32025.h"
 #include "cpu/m37710/m37710.h"
 #include "sound/c352.h"
-#include "mcfglgcy.h"
 
 #define SS22_MASTER_CLOCK   (XTAL_49_152MHz)    /* info from Guru */
 
@@ -1550,10 +1549,14 @@ READ8_MEMBER(namcos22_state::namcos22_system_controller_r)
 }
 
 
-WRITE32_MEMBER(namcos22_state::namcos22s_nvmem_w)
+WRITE8_MEMBER(namcos22_state::namcos22_nvmem_w)
 {
-	mem_mask &= 0xff00ff00; // 8KB RAM over 16KB address &space
-	COMBINE_DATA(&m_nvmem[offset]);
+	m_nvmem[offset] = data;
+}
+
+READ8_MEMBER(namcos22_state::namcos22_nvmem_r)
+{
+	return m_nvmem[offset];
 }
 
 READ32_MEMBER(namcos22_state::namcos22_dspram_r)
@@ -1748,7 +1751,7 @@ static ADDRESS_MAP_START( namcos22_am, AS_PROGRAM, 32, namcos22_state )
 	 * Mounted position: CPU 9E
 	 * Known chip type: HN58C65P-25 (8k x 8bit EEPROM)
 	 */
-	AM_RANGE(0x58000000, 0x58001fff) AM_RAM AM_SHARE("nvmem")
+	AM_RANGE(0x58000000, 0x58001fff) AM_READWRITE8(namcos22_nvmem_r, namcos22_nvmem_w, 0xffffffff)
 
 	/**
 	 * C74 (Mitsubishi M37702 MCU) Shared RAM (0x60004000 - 0x6000bfff)
@@ -1862,7 +1865,7 @@ static ADDRESS_MAP_START( namcos22s_am, AS_PROGRAM, 32, namcos22_state )
 	AM_RANGE(0x420000, 0x42000f) AM_READ(namcos22_sci_r) AM_WRITEONLY /* C139 SCI registers */
 	AM_RANGE(0x440000, 0x440003) AM_READWRITE16(namcos22_dipswitch_r, namcos22_cpuleds_w, 0xffffffff)
 	AM_RANGE(0x450008, 0x45000b) AM_READWRITE16(namcos22_portbit_r, namcos22_portbit_w, 0xffffffff)
-	AM_RANGE(0x460000, 0x463fff) AM_RAM_WRITE(namcos22s_nvmem_w) AM_SHARE("nvmem")
+	AM_RANGE(0x460000, 0x463fff) AM_READWRITE8(namcos22_nvmem_r, namcos22_nvmem_w, 0xff00ff00)
 	AM_RANGE(0x700000, 0x70001f) AM_READWRITE8(namcos22_system_controller_r, namcos22s_system_controller_w, 0xffffffff)
 	AM_RANGE(0x800000, 0x800003) AM_WRITE(namcos22s_chipselect_w)
 	AM_RANGE(0x810000, 0x81000f) AM_RAM AM_SHARE("czattr")
@@ -3659,49 +3662,6 @@ static GFXDECODE_START( super )
 GFXDECODE_END
 
 
-static NVRAM_HANDLER( namcos22 )
-{
-	namcos22_state *state = machine.driver_data<namcos22_state>();
-	int i;
-	UINT8 data[4];
-	if (read_or_write)
-	{
-		for (i = 0; i < state->m_nvmem.bytes() / 4; i++)
-		{
-			UINT32 dword = state->m_nvmem[i];
-			data[0] = dword>>24;
-			data[1] = (dword&0x00ff0000)>>16;
-			data[2] = (dword&0x0000ff00)>>8;
-			data[3] = dword&0xff;
-			file->write(data, 4);
-		}
-	}
-	else
-	{
-		if (file)
-		{
-			for (i = 0; i < state->m_nvmem.bytes() / 4; i++)
-			{
-				file->read(data, 4);
-				state->m_nvmem[i] = (data[0]<<24)|(data[1]<<16)|(data[2]<<8)|data[3];
-			}
-		}
-		else
-		{
-			memset(state->m_nvmem, 0x00, state->m_nvmem.bytes());
-			if (machine.root_device().memregion("nvram")->bytes() == state->m_nvmem.bytes())
-			{
-				UINT8* nvram = machine.root_device().memregion("nvram")->base();
-
-				for (i = 0; i < state->m_nvmem.bytes() / 4; i++)
-				{
-					state->m_nvmem[i] = (nvram[0+i*4]<<24)|(nvram[1+i*4]<<16)|(nvram[2+i*4]<<8)|nvram[3+i*4];
-				}
-			}
-		}
-	}
-}
-
 void namcos22_state::machine_reset()
 {
 	m_master->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
@@ -3748,7 +3708,7 @@ static MACHINE_CONFIG_START( namcos22, namcos22_state )
 
 //  MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 
-	MCFG_NVRAM_HANDLER(namcos22)
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3799,7 +3759,7 @@ static MACHINE_CONFIG_START( namcos22s, namcos22_state )
 //  MCFG_QUANTUM_PERFECT_CPU("maincpu")
 //  MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 
-	MCFG_NVRAM_HANDLER(namcos22)
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -4838,8 +4798,8 @@ ROM_START( cybrcycc )
 	ROM_LOAD( "cb1wavea.2l", 0x000000, 0x400000, CRC(b79a624d) SHA1(c0ee358a183ba6d0835731dbdd191b64718fde6e) )
 	ROM_LOAD( "cb1waveb.1l", 0x800000, 0x200000, CRC(33bf08f6) SHA1(bf9d68b26a8158ea1abfe8428b7454cac25242c5) )
 
-	ROM_REGION( 0x4000, "nvram", 0 ) // default eeprom
-	ROM_LOAD( "cybrcycc_defaults.nv", 0x0000, 0x4000, CRC(1ef95c25) SHA1(26b8bead9d62a420ee0ff770df83c4207a963065) )
+	ROM_REGION( 0x2000, "nvram", 0 ) // default eeprom
+	ROM_LOAD( "cybrcycc_defaults.nv", 0x0000, 0x2000, CRC(57fbd7d3) SHA1(c93e0d7875f5e66a661aed757fb4a314fe2025c2) )
 ROM_END
 
 
@@ -4896,8 +4856,8 @@ ROM_START( alpinerd )
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
 	ROM_LOAD( "ar1wavea.2l", 0, 0x200000, CRC(dbf64562) SHA1(454fd7d5b860f0e5557d8900393be95d6c992ad1) )
 
-	ROM_REGION( 0x4000, "nvram", 0 ) // default eeprom
-	ROM_LOAD( "alpiner_defaults.nv", 0x0000, 0x4000, CRC(46c06e51) SHA1(df3a16fe3a0858b14c51d48539d9ab3eb3a213de) )
+	ROM_REGION( 0x2000, "nvram", 0 ) // default eeprom
+	ROM_LOAD( "alpiner_defaults.nv", 0x0000, 0x2000, CRC(efbef3d8) SHA1(459035600655cd83780db6c59aba044981cdcdc4) )
 ROM_END
 
 ROM_START( alpinerc )
@@ -4953,8 +4913,8 @@ ROM_START( alpinerc )
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
 	ROM_LOAD( "ar1wavea.2l", 0, 0x200000, CRC(dbf64562) SHA1(454fd7d5b860f0e5557d8900393be95d6c992ad1) )
 
-	ROM_REGION( 0x4000, "nvram", 0 ) // default eeprom
-	ROM_LOAD( "alpiner_defaults.nv", 0x0000, 0x4000, CRC(46c06e51) SHA1(df3a16fe3a0858b14c51d48539d9ab3eb3a213de) )
+	ROM_REGION( 0x2000, "nvram", 0 ) // default eeprom
+	ROM_LOAD( "alpiner_defaults.nv", 0x0000, 0x2000, CRC(efbef3d8) SHA1(459035600655cd83780db6c59aba044981cdcdc4) )
 ROM_END
 
 
@@ -5009,8 +4969,8 @@ ROM_START( alpinr2b )
 	ROM_LOAD( "ars1wavea.2l", 0x000000, 0x400000, CRC(f8d107e9) SHA1(5c418691f0b35403553f21f5570eda8bbb66890f) )
 	ROM_LOAD( "ars2waveb.1l", 0x800000, 0x400000, CRC(deab4ad1) SHA1(580ad88d516280baaf6cc92b2e07cdc0cfc486f3) )
 
-	ROM_REGION( 0x4000, "nvram", 0 ) // default eeprom
-	ROM_LOAD( "alpiner2_defaults.nv", 0x0000, 0x4000, CRC(1d660b8b) SHA1(e6047ad2d61fa55e8f054813f5c705fd7d145a73) )
+	ROM_REGION( 0x2000, "nvram", 0 ) // default eeprom
+	ROM_LOAD( "alpiner2_defaults.nv", 0x0000, 0x2000, CRC(1f21154e) SHA1(a141d7d235955d042c60d013a89619d35c02308f) )
 ROM_END
 
 ROM_START( alpinr2a )
@@ -5064,8 +5024,8 @@ ROM_START( alpinr2a )
 	ROM_LOAD( "ars1wavea.2l", 0x000000, 0x400000, CRC(f8d107e9) SHA1(5c418691f0b35403553f21f5570eda8bbb66890f) )
 	ROM_LOAD( "ars2waveb.1l", 0x800000, 0x400000, CRC(deab4ad1) SHA1(580ad88d516280baaf6cc92b2e07cdc0cfc486f3) )
 
-	ROM_REGION( 0x4000, "nvram", 0 ) // default eeprom
-	ROM_LOAD( "alpiner2_defaults.nv", 0x0000, 0x4000, CRC(1d660b8b) SHA1(e6047ad2d61fa55e8f054813f5c705fd7d145a73) )
+	ROM_REGION( 0x2000, "nvram", 0 ) // default eeprom
+	ROM_LOAD( "alpiner2_defaults.nv", 0x0000, 0x2000, CRC(1f21154e) SHA1(a141d7d235955d042c60d013a89619d35c02308f) )
 ROM_END
 
 
@@ -5110,8 +5070,8 @@ ROM_START( alpinesa )
 	ROM_REGION( 0x1000000, "c352", 0 ) /* sound samples */
 	ROM_LOAD( "af1wavea.2l",  0x000000, 0x400000, CRC(28cca494) SHA1(4ff87ab85fd17bf8dbee5b03d99cc5c31dd6349a) )
 
-	ROM_REGION( 0x4000, "nvram", 0 ) // default eeprom
-	ROM_LOAD( "alpinesa_defaults.nv", 0x0000, 0x4000, CRC(9744207c) SHA1(bbd34ee138c116d281c718f14740e2883a5cdf49) )
+	ROM_REGION( 0x2000, "nvram", 0 ) // default eeprom
+	ROM_LOAD( "alpinesa_defaults.nv", 0x0000, 0x2000, CRC(d9e74daa) SHA1(aa2ddec61d8e9ae69726bab8ed5701e4c41b833b) )
 ROM_END
 
 
@@ -5273,8 +5233,8 @@ ROM_START( tokyowar )
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
 	ROM_LOAD( "tw1wavea.2l",  0x000000, 0x400000, CRC(ebce6366) SHA1(44ebe90ff3c7af5bebbf1baba3b7a2b1863daebb) )
 
-	ROM_REGION( 0x4000, "nvram", 0 ) // default eeprom
-	ROM_LOAD( "tokyowar_defaults.nv", 0x0000, 0x4000, CRC(a1fe05e4) SHA1(39a20b35394a43e12c66a6c0f5ecb204148c58de) )
+	ROM_REGION( 0x2000, "nvram", 0 ) // default eeprom
+	ROM_LOAD( "tokyowar_defaults.nv", 0x0000, 0x2000, CRC(e8bd7d09) SHA1(7e59017b9d5eb78984b4f177b50a4727ad72a623) )
 ROM_END
 
 
@@ -5380,8 +5340,8 @@ ROM_START( aquajet )
 	ROM_LOAD( "aj1wavea.2l",  0x000000, 0x400000, CRC(8c72ea59) SHA1(3ae8dbd8baae08f1daab2b218932ba9d9451231d) )
 	ROM_LOAD( "aj1waveb.1l",  0x800000, 0x400000, CRC(ab5a457f) SHA1(c34531fd574eb0c3e78fc31a9af8658df3446adc) )
 
-	ROM_REGION( 0x4000, "nvram", 0 ) // default eeprom
-	ROM_LOAD( "aquajet_defaults.nv", 0x0000, 0x4000, CRC(7d03893c) SHA1(f75ca5d996a94da4136ed0a4f0f4c869f1412e38) )
+	ROM_REGION( 0x2000, "nvram", 0 ) // default eeprom
+	ROM_LOAD( "aquajet_defaults.nv", 0x0000, 0x2000, CRC(a00b3e44) SHA1(6bdbb46f4176314b61bd5063ecc968189212cb4c) )
 ROM_END
 
 
@@ -5448,8 +5408,6 @@ ROM_START( adillor )
 	ROM_REGION( 0x1000000, "c352", 0 ) /* sound samples */
 	ROM_LOAD( "am1wavea.2l",  0x000000, 0x400000, CRC(48f8c20c) SHA1(48b4fbcb7e9dbbb70a542ef7cb7ee0e46fad23fc) )
 	ROM_LOAD( "am1waveb.1l",  0x800000, 0x400000, CRC(fd8e7384) SHA1(91e53ab0293f81f8357645fd319249abc128b78e) )
-
-	ROM_REGION( 0x4000, "nvram", ROMREGION_ERASE00 ) // default eeprom
 ROM_END
 
 
@@ -5522,6 +5480,9 @@ void namcos22_state::install_141_speedup()
 
 void namcos22_state::namcos22_init(int game_type)
 {
+	m_nvmem = auto_alloc_array_clear(machine(), UINT8, 0x2000);
+	m_nvram->set_base(m_nvmem, 0x2000);
+
 	m_gametype = game_type;
 
 	m_keycus_id = 0;
@@ -5620,7 +5581,7 @@ DRIVER_INIT_MEMBER(namcos22_state,propcycl)
 	UINT32 *ROM = (UINT32 *)memregion("maincpu")->base();
 
 	/* patch out strange routine (uninitialized-eprom related?) */
-	ROM[0x1992C/4] = 0x4E754E75;
+	ROM[0x1992C/4] = 0x4e754e75;
 
 	/**
 	 * The dipswitch reading routine in Prop Cycle polls the

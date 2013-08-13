@@ -38,8 +38,6 @@
  *******************************/
 
 #include "emu.h"
-#include "video/rgbutil.h"
-#include "video/polynew.h"
 #include "includes/namcos22.h"
 
 

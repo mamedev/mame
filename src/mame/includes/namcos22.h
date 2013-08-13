@@ -1,3 +1,4 @@
+#include "machine/nvram.h"
 #include "video/rgbutil.h"
 #include "video/polynew.h"
 
@@ -171,7 +172,7 @@ public:
 		m_iomcu(*this, "iomcu"),
 		m_spriteram(*this, "spriteram"),
 		m_shareram(*this, "shareram"),
-		m_nvmem(*this, "nvmem"),
+		m_nvram(*this, "nvram"),
 		m_pSlaveExternalRAM(*this, "slaveextram"),
 		m_pMasterExternalRAM(*this, "masterextram"),
 		m_paletteram(*this, "paletteram"),
@@ -196,7 +197,7 @@ public:
 	optional_device<cpu_device> m_iomcu;
 	optional_shared_ptr<UINT32> m_spriteram;
 	required_shared_ptr<UINT32> m_shareram;
-	required_shared_ptr<UINT32> m_nvmem;
+	required_device<nvram_device> m_nvram;
 	required_shared_ptr<UINT16> m_pSlaveExternalRAM;
 	required_shared_ptr<UINT16> m_pMasterExternalRAM;
 	required_shared_ptr<UINT32> m_paletteram;
@@ -213,6 +214,7 @@ public:
 	optional_device<timer_device> m_motor_timer;
 	optional_device<timer_device> m_pc_pedal_interrupt;
 
+	UINT8* m_nvmem;
 	UINT8 m_syscontrol[0x20];
 	bool m_dsp_irq_enabled;
 	emu_timer *m_ar_tb_interrupt[2];
@@ -366,7 +368,8 @@ public:
 	DECLARE_WRITE16_MEMBER(namcos22_cpuleds_w);
 	DECLARE_READ32_MEMBER(alpinesa_prot_r);
 	DECLARE_WRITE32_MEMBER(alpinesa_prot_w);
-	DECLARE_WRITE32_MEMBER(namcos22s_nvmem_w);
+	DECLARE_WRITE8_MEMBER(namcos22_nvmem_w);
+	DECLARE_READ8_MEMBER(namcos22_nvmem_r);
 	DECLARE_WRITE32_MEMBER(namcos22s_chipselect_w);
 	DECLARE_READ16_MEMBER(s22mcu_shared_r);
 	DECLARE_WRITE16_MEMBER(s22mcu_shared_w);
