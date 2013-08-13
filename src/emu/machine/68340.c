@@ -142,6 +142,8 @@ void m68340cpu_device::device_start()
 	m68340SERIAL->reset();
 	m68340TIMER->reset();
 
+	start_68340_sim();
+
 	m68340_base = 0x00000000;
 
 	internal = &this->space(AS_PROGRAM);

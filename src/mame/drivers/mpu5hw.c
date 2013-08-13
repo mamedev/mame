@@ -54,6 +54,11 @@ public:
 	DECLARE_READ32_MEMBER(mpu5_mem_r);
 	DECLARE_WRITE32_MEMBER(mpu5_mem_w);
 
+	DECLARE_READ32_MEMBER(asic_r32);
+	DECLARE_READ8_MEMBER(asic_r8);
+	DECLARE_WRITE32_MEMBER(asic_w32);
+	DECLARE_WRITE8_MEMBER(asic_w8);
+
 protected:
 
 	// devices
@@ -61,14 +66,44 @@ protected:
 	virtual void machine_start();
 };
 
+READ8_MEMBER(mpu5_state::asic_r8)
+{
+	int pc = space.device().safe_pc();
+	logerror("%08x maincpu read from ASIC - offset %01x\n", pc, offset);
+	return 0;
+}
+
+
+READ32_MEMBER(mpu5_state::asic_r32)
+{
+	UINT32 retdata = 0;
+	if (mem_mask&0xff000000) retdata |= asic_r8(space,(offset*4)+0) <<24;
+	if (mem_mask&0x00ff0000) retdata |= asic_r8(space,(offset*4)+1) <<16;
+	if (mem_mask&0x0000ff00) retdata |= asic_r8(space,(offset*4)+2) <<8;
+	if (mem_mask&0x000000ff) retdata |= asic_r8(space,(offset*4)+3) <<0;
+	return retdata;
+}
 
 READ32_MEMBER(mpu5_state::mpu5_mem_r)
 {
 	int pc = space.device().safe_pc();
-	int cs = m68340_get_cs(m_maincpu, offset * 4);
+	int addr = offset *4;
+	int cs = m68340_get_cs(m_maincpu, addr);
 
 	switch ( cs )
 	{
+
+		case 2:
+			if ((addr & 0xf0) == 0xf0)
+			{
+				return asic_r32(space, offset&3,mem_mask);
+			}
+			else
+			{
+				logerror("%08x maincpu read access offset %08x mem_mask %08x cs %d\n", pc, offset*4, mem_mask, cs);
+			}
+			break;
+
 		case 4:
 			offset &=0x3fff;
 			return (m_mainram[offset]);
@@ -85,13 +120,43 @@ READ32_MEMBER(mpu5_state::mpu5_mem_r)
 	return 0x0000;
 }
 
+
+WRITE8_MEMBER(mpu5_state::asic_w8)
+{
+	int pc = space.device().safe_pc();
+	logerror("%08x maincpu write to ASIC - offset %01x data %02x\n", pc, offset, data);
+}
+
+
+WRITE32_MEMBER(mpu5_state::asic_w32)
+{
+	if (mem_mask&0xff000000) asic_w8(space,(offset*4)+0, (data>>24)&0xff);
+	if (mem_mask&0x00ff0000) asic_w8(space,(offset*4)+1, (data>>16)&0xff);
+	if (mem_mask&0x0000ff00) asic_w8(space,(offset*4)+2, (data>>8) &0xff);
+	if (mem_mask&0x000000ff) asic_w8(space,(offset*4)+3, (data>>0) &0xff);
+}
+
 WRITE32_MEMBER(mpu5_state::mpu5_mem_w)
 {
 	int pc = space.device().safe_pc();
-	int cs = m68340_get_cs(m_maincpu, offset * 4);
+	int addr = offset *4;
+	int cs = m68340_get_cs(m_maincpu, addr);
 
 	switch ( cs )
 	{
+
+		case 2:
+			if ((addr & 0xf0) == 0xf0)
+			{
+				asic_w32(space, offset&3,data,mem_mask);
+			}
+			else
+			{
+				logerror("%08x maincpu write access offset %08x data %08x mem_mask %08x cs %d\n", pc, offset*4, data, mem_mask, cs);
+			}
+			break;
+
+
 		case 4:
 			offset &=0x3fff;
 			COMBINE_DATA(&m_mainram[offset]);

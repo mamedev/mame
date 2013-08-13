@@ -32,7 +32,9 @@ public:
 
 	UINT32 m68340_base;
 
-
+	UINT16 m_avr;
+	UINT16 m_picr;
+	UINT16 m_pitr;
 
 	READ32_MEMBER( m68340_internal_base_r );
 	WRITE32_MEMBER( m68340_internal_base_w );
@@ -49,7 +51,10 @@ public:
 	READ32_MEMBER( m68340_internal_timer_r );
 	WRITE32_MEMBER( m68340_internal_timer_w );
 
-
+	emu_timer *m_irq_timer;
+	TIMER_CALLBACK_MEMBER(periodic_interrupt_timer_callback);
+	void start_68340_sim(void);
+	void do_timer_irq(void);
 protected:
 
 	virtual void device_start();

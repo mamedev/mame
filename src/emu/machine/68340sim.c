@@ -4,6 +4,7 @@
 #include "68340.h"
 
 
+
 READ16_MEMBER( m68340cpu_device::m68340_internal_sim_r )
 {
 	m68340cpu_device *m68k = this;
@@ -164,6 +165,7 @@ WRITE16_MEMBER( m68340cpu_device::m68340_internal_sim_w )
 
 			case m68340SIM_AVR_RSR:
 				logerror("%08x m68340_internal_sim_w %04x, %04x (%04x) (AVR, RSR - Auto Vector Register, Reset Status Register)\n", pc, offset*2,data,mem_mask);
+				COMBINE_DATA(&m_avr);
 				break;
 
 			case m68340SIM_SWIV_SYPCR:
@@ -172,10 +174,18 @@ WRITE16_MEMBER( m68340cpu_device::m68340_internal_sim_w )
 
 			case m68340SIM_PICR:
 				logerror("%08x m68340_internal_sim_w %04x, %04x (%04x) (PICR - Periodic Interrupt Control Register)\n", pc, offset*2,data,mem_mask);
+				COMBINE_DATA(&m_picr);
 				break;
 
 			case m68340SIM_PITR:
 				logerror("%08x m68340_internal_sim_w %04x, %04x (%04x) (PITR - Periodic Interrupt Timer Register)\n", pc, offset*2,data,mem_mask);
+				COMBINE_DATA(&m_pitr);
+				if (m_pitr !=0 ) // hack
+				{
+					//logerror("timer set\n");
+					m_irq_timer->adjust(cycles_to_attotime(20000)); // hack
+				}
+
 				break;
 
 			case m68340SIM_SWSR:
@@ -297,6 +307,40 @@ WRITE32_MEMBER( m68340cpu_device::m68340_internal_sim_cs_w )
 
 }
 
+void m68340cpu_device::do_timer_irq(void)
+{
+	//logerror("do_timer_irq\n");
+	int timer_irq_level  = (m_picr & 0x0700)>>8;
+	int timer_irq_vector = (m_picr & 0x00ff)>>0;
+
+	if (timer_irq_level) // 0 is irq disabled
+	{
+		int use_autovector = (m_avr >> timer_irq_level)&1;
+
+		if (use_autovector)
+		{
+			//logerror("irq with autovector\n");
+			set_input_line(timer_irq_level, HOLD_LINE);
+		}
+		else
+		{
+			//logerror("irq without autovector\n");
+			set_input_line_and_vector(timer_irq_level, HOLD_LINE, timer_irq_vector);
+		}
+
+	}
+}
+
+TIMER_CALLBACK_MEMBER(m68340cpu_device::periodic_interrupt_timer_callback)
+{
+	do_timer_irq();
+	m_irq_timer->adjust(cycles_to_attotime(20000)); // hack
+}
+
+void m68340cpu_device::start_68340_sim(void)
+{
+	m_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m68340cpu_device::periodic_interrupt_timer_callback),this));
+}
 
 void m68340_sim::reset(void)
 {
