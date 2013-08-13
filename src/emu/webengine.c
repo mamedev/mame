@@ -99,7 +99,6 @@ int web_engine::begin_request_handler(struct mg_connection *conn)
 
 			// Returning non-zero tells mongoose that our function has replied to
 			// the client, and mongoose should not send client any more data.
-			mg_close_connection(conn);
 			return 1;
 		}		
 	}
