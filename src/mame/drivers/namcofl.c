@@ -182,7 +182,7 @@ READ32_MEMBER(namcofl_state::namcofl_sysreg_r)
 
 WRITE32_MEMBER(namcofl_state::namcofl_sysreg_w)
 {
-	if ((offset == 2) && ACCESSING_BITS_0_7)  // address &space configuration
+	if ((offset == 2) && ACCESSING_BITS_0_7)  // address space configuration
 	{
 		if (data == 0)  // RAM at 00000000, ROM at 10000000
 		{

@@ -60,7 +60,7 @@ WRITE16_MEMBER(toaplan1_state::demonwld_dsp_addrsel_w)
 	/*  read/write, via the DSP IO port 0 */
 	/* Top three bits of data need to be shifted left 9 places */
 	/*  to select which memory bank from main CPU address */
-	/*  &space to use */
+	/*  space to use */
 	/* Lower thirteen bits of this data is shifted left one position */
 	/*  to move it to an even address word boundary */
 
@@ -331,7 +331,7 @@ WRITE8_MEMBER(toaplan1_state::toaplan1_coin_w)
 	logerror("Z80 writing %02x to coin control\n",data);
 	/* This still isnt too clear yet. */
 	/* Coin C has no coin lock ? */
-	/* Are some outputs for lights ? (no &space on JAMMA for it though) */
+	/* Are some outputs for lights ? (no space on JAMMA for it though) */
 
 	switch (data) {
 		case 0xee: coin_counter_w(machine(), 1,1); coin_counter_w(machine(), 1,0); break; /* Count slot B */

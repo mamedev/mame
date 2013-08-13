@@ -105,10 +105,10 @@ WRITE8_MEMBER(starshp1_state::starshp1_ssadd_w)
 {
 	/*
 	 * The range of sprite position values doesn't suffice to
-	 * move the zoomed &spaceship sprite over the top and left
+	 * move the zoomed spaceship sprite over the top and left
 	 * edges of the screen. These additional values are used
 	 * to compensate for this. Technically, they cut off the
-	 * first columns and rows of the &spaceship sprite, but in
+	 * first columns and rows of the spaceship sprite, but in
 	 * practice they work like offsets in zoomed pixels.
 	 */
 

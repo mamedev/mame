@@ -159,7 +159,7 @@ WRITE16_MEMBER(tatsumi_state::roundup_v30_z80_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		if (m_control_word & 0x20)
-			offset += 0x8000; /* Upper half of Z80 address &space */
+			offset += 0x8000; /* Upper half of Z80 address space */
 
 		targetspace.write_byte(offset, data & 0xff);
 	}

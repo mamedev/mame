@@ -1041,7 +1041,7 @@ WRITE8_MEMBER(vicdual_state::invds_io_w)
 WRITE8_MEMBER(vicdual_state::sspacaho_io_w)
 {
 	if (offset & 0x01)  invho2_audio_w(space, 0, data);
-	if (offset & 0x02) { /* s&spaceatt_audio_w(space, 0, data) */ }
+	if (offset & 0x02) { /* sspaceatt_audio_w(space, 0, data) */ }
 	if (offset & 0x08)  assert_coin_status();
 	if (offset & 0x40)  vicdual_palette_bank_w(space, 0, data);
 }
@@ -1057,8 +1057,8 @@ WRITE8_MEMBER(vicdual_state::tranqgun_io_w)
 
 WRITE8_MEMBER(vicdual_state::spacetrk_io_w)
 {
-	if (offset & 0x01) { /* &spacetrk_audio_w(space, 0, data) */ }
-	if (offset & 0x02) { /* &spacetrk_audio_w(space, 0, data) */ }
+	if (offset & 0x01) { /* spacetrk_audio_w(space, 0, data) */ }
+	if (offset & 0x02) { /* spacetrk_audio_w(space, 0, data) */ }
 	if (offset & 0x08)  assert_coin_status();
 	if (offset & 0x40)  vicdual_palette_bank_w(space, 0, data);
 }

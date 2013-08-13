@@ -44,7 +44,7 @@ WRITE8_MEMBER(spacefb_state::spacefb_port_1_w)
 	 *
 	 *  Actual sample has a bit of attack at the start, but these doesn't seem to be an easy way
 	 *  to play the attack part, then loop the middle bit until the sample is turned off
-	 *  Fortunately it seems like the recorded sample of the &spaceship death is the longest the sample plays for.
+	 *  Fortunately it seems like the recorded sample of the spaceship death is the longest the sample plays for.
 	 *  We loop it just in case it runs out
 	 */
 	if ((data & 0x80) != (m_sound_latch & 0x80))

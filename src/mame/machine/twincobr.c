@@ -37,7 +37,7 @@ WRITE16_MEMBER(twincobr_state::twincobr_dsp_addrsel_w)
 	/*  read/write, via the DSP IO port 0 */
 	/* Top three bits of data need to be shifted left 3 places */
 	/*  to select which memory bank from main CPU address */
-	/*  &space to use */
+	/*  space to use */
 	/* Lower thirteen bits of this data is shifted left one position */
 	/*  to move it to an even address word boundary */
 

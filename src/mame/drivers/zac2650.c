@@ -258,7 +258,7 @@ MACHINE_CONFIG_END
 
 WRITE8_MEMBER(zac2650_state::tinvader_sound_w)
 {
-	/* sounds are NOT the same as &space invaders */
+	/* sounds are NOT the same as space invaders */
 
 	logerror("Register %x = Data %d\n",data & 0xfe,data & 0x01);
 

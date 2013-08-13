@@ -516,9 +516,9 @@ READ32_MEMBER(apollo_state::apollo_unmapped_r)
 	if ((address & 0xfff00000) == 0xfa800000 && VERBOSE < 2) {
 		// ?
 	} else if ((address & 0xfff00ff7) == 0xfd800000 && VERBOSE < 2) {
-		// omit logging for memory sizing in FPA address &space
+		// omit logging for memory sizing in FPA address space
 		// strange: MD seems to search for the 3C505 Boot ROM
-		// note (6.10.2010): might be color7 address &space (!?!)
+		// note (6.10.2010): might be color7 address space (!?!)
 	} else if ((address & 0xfc03ffff) == 0x00000000 && VERBOSE < 2) {
 		// omit logging for memory sizing in standalone utilities
 	} else if (address == 0xfff90000 && VERBOSE < 2) {

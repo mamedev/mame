@@ -399,7 +399,7 @@ WRITE8_MEMBER(astrocde_state::profpac_banksw_w)
 {
 	int bank = (data >> 5) & 3;
 
-	/* this is accessed from I/O &space but modifies program &space, so we normalize here */
+	/* this is accessed from I/O space but modifies program space, so we normalize here */
 	address_space &prog_space = space.device().memory().space(AS_PROGRAM);
 
 	/* remember the banking bits for save state support */

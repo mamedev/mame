@@ -550,7 +550,7 @@ WRITE8_MEMBER(system1_state::mcu_control_w)
 	    Bit 7 -> connects to TD62003 pins 5 & 6 @ IC151
 	    Bit 6 -> via PLS153, when high, asserts the BUSREQ signal, halting the Z80
 	    Bit 5 -> n/c
-	    Bit 4 -> (with bit 3) Memory select: 0=Z80 program &space, 1=banked ROM, 2=Z80 I/O &space, 3=watchdog?
+	    Bit 4 -> (with bit 3) Memory select: 0=Z80 program space, 1=banked ROM, 2=Z80 I/O space, 3=watchdog?
 	    Bit 3 ->
 	    Bit 2 -> n/c
 	    Bit 1 -> n/c

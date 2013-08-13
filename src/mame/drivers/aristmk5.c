@@ -250,7 +250,7 @@ WRITE32_MEMBER(aristmk5_state::sram_banksel_w)
 	checked against the other to verify that the stored data is correct.
 	Each chip is mapped to the same address, and the chip selected depends on the bank
 	select register. Access is mutually exclusive, increasing security with only one chip
-	visible in the CPU address &space at a time. If the CPU crashes and overwrites
+	visible in the CPU address space at a time. If the CPU crashes and overwrites
 	memory only one of the three devices can be corrupted. On reset the bank select
 	register selects bank 0, which does not exist. The SRAMs are at banks 1,2,3.
 	Each of the SRAM chips may be powered from a separate battery, further reducing

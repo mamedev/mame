@@ -235,7 +235,7 @@ WRITE8_MEMBER(midyunit_state::cvsd_protection_w)
 {
 	/* because the entire CVSD ROM is banked, we have to make sure that writes */
 	/* go to the proper location (i.e., bank 0); currently bank 0 always lives */
-	/* in the 0x10000-0x17fff &space, so we just need to add 0x8000 to get the  */
+	/* in the 0x10000-0x17fff space, so we just need to add 0x8000 to get the  */
 	/* proper offset */
 	m_cvsd_protection_base[offset] = data;
 }
@@ -470,7 +470,7 @@ DRIVER_INIT_MEMBER(midyunit_state,mkyawdim)
 
 READ16_MEMBER(midyunit_state::mkturbo_prot_r)
 {
-	/* the security GAL overlays a counter of some sort at 0xfffff400 in ROM &space.
+	/* the security GAL overlays a counter of some sort at 0xfffff400 in ROM space.
 	 * A startup protection check expects to read back two different values in succession */
 	return machine().rand();
 }

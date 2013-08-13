@@ -416,7 +416,7 @@ WRITE8_MEMBER(dwarfd_state::i8275_preg_w)//param reg
 					}
 					if (m_i8275SpacedRows & 1)
 					{
-						logerror("i8275 &spaced rows\n");
+						logerror("i8275 spaced rows\n");
 					}
 					else
 					{

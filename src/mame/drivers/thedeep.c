@@ -101,9 +101,9 @@ WRITE8_MEMBER(thedeep_state::thedeep_protection_w)
 			if ( m_protection_index < 0x19b )
 // d000-d00c:   hl += a * b
 // d00d-d029:   input a (e.g. $39) output hl (e.g. h=$03 l=$09).
-//              Replace trainling 0's with &space ($10). 00 -> '  '
+//              Replace trainling 0's with space ($10). 00 -> '  '
 // d02a-d039:   input a (e.g. $39) output hl (e.g. h=$03 l=$09).
-//              Replace trainling 0's with &space ($10). 00 -> ' 0'
+//              Replace trainling 0's with space ($10). 00 -> ' 0'
 // d03a-d046:   input a (e.g. $39) output hl (e.g. h=$03 l=$09). 00 -> '00'
 // d047-d086:   a /= e (e can be 0!)
 // d087-d0a4:   print ASCII string from HL to IX (sub $30 to every char)

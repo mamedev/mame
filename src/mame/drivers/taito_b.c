@@ -445,7 +445,7 @@ WRITE16_MEMBER(taitob_state::spacedxo_tc0220ioc_w)
 		m_tc0220ioc->write(space, offset, data & 0xff);
 	else
 	{
-		/* &spacedxo also writes here - bug? */
+		/* spacedxo also writes here - bug? */
 		m_tc0220ioc->write(space, offset, (data >> 8) & 0xff);
 	}
 }
