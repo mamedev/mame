@@ -9,36 +9,47 @@
 	<link href="css/main.css" media="screen" rel="stylesheet" type="text/css" />
 	<link href="css/dropdown.css" media="screen" rel="stylesheet" type="text/css" />
 	<link href="css/default.ultimate.css" media="screen" rel="stylesheet" type="text/css" />
+	<script src="js/jquery.js"></script>
 </head>
 <body>
 <script language="javascript" type="text/javascript">
 
   var writeToScreen = function(message) {
-    var div = document.createElement('div');
-    div.innerHTML = message;
-    document.getElementById('output').appendChild(div);
+    document.getElementById('output').innerHTML = message;
   };
   window.onload = function() {
     var url = 'ws://localhost:8080/foo';
     websocket = new WebSocket(url);
     websocket.onopen = function(ev) {
-	  writeToScreen('<span style="color: green;">CONNECTED</span>');
+	  writeToScreen('<b style="color: green;">Connected</b>');
     };
     websocket.onclose = function(ev) {      
-      writeToScreen('<span style="color: white;">DISCONNECTED</span>');
+      writeToScreen('<b style="color: white;">disconnected</b>');
     };
     websocket.onmessage = function(ev) {
-      writeToScreen('<span style="color: blue;">RESPONSE: ' + ev.data +
-                    ' </span>');
+	if (ev.data=='update_machine') 
+	{
+		$.getJSON('json/game', function(data) {
+			var items = [];
+			if(data.name =='___empty') {
+				items.push('No driver running');
+			} else {
+				items.push('<h1>Currently running : ' + data.description + ' [' + data.manufacturer+']</h1>');
+
+			}
+			document.getElementById('current').innerHTML = items.join('');
+		});
+	}
+
     };
     websocket.onerror = function(ev) {
-      writeToScreen('<span style="color: red; ">ERROR: </span> ' + ev.data);
+      writeToScreen('<b style="color: red; ">Error</b>');
     };
   };
 </script>
 <div data-role="page">
     <div data-role="header">
-		<img src="images/logo-mame-small.png"/>
+		<img src="images/logo-mame-small.png"/><div id="output" style="display: inline;"><b style="color:white;">Connecting...</b></div>
     </div>
 
 <ul id="nav" class="dropdown dropdown-horizontal">
@@ -71,7 +82,8 @@
 	</li>
 	<li id="n-debugger"><a href="./">Debugger</a></li>
 </ul>
-<br/><br/><div id="output"></div>
+<br/><br/><br/><br/>
+<div id="current"></div>
 </div>
 </body>
 </html>

@@ -8901,3 +8901,4 @@ web/images/nav-arrow-right.png -text svneol=unset#image/png
 web/images/nav-arrow-right2.png -text svneol=unset#image/png
 web/images/nav-sub-press.png -text svneol=unset#image/png
 web/index.html svneol=native#text/html
+web/js/jquery.js svneol=native#text/javascript
