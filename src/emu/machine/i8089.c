@@ -11,7 +11,20 @@
 //  MACROS/CONSTANTS
 //**************************************************************************
 
-#define VERBOSE 1
+#define VERBOSE      1
+#define VERBOSE_DMA  1
+
+// channel control register fields
+#define CC_TMC     ((m_r[CC].w >>  0) & 0x07)	// terminate on masked compare
+#define CC_TBC     ((m_r[CC].w >>  3) & 0x03)	// terminate on byte count
+#define CC_TX      ((m_r[CC].w >>  5) & 0x03)	// terminate on external signal
+#define CC_TS      ((m_r[CC].w >>  7) & 0x01)	// terminate on single transfer
+#define CC_CHAIN   ((m_r[CC].w >>  8) & 0x01)	// chaining
+#define CC_LOCK    ((m_r[CC].w >>  9) & 0x01)	// actuate lock
+#define CC_SOURCE  ((m_r[CC].w >> 10) & 0x01)	// source register
+#define CC_SYNC    ((m_r[CC].w >> 11) & 0x03)	// synchronization
+#define CC_TRANS   ((m_r[CC].w >> 13) & 0x01)	// translation
+#define CC_FUNC    ((m_r[CC].w >> 14) & 0x03)	// function
 
 
 //**************************************************************************
@@ -149,6 +162,27 @@ private:
 
 	i8089_device *m_iop;
 
+	// dma
+	void terminate_dma(int offset);
+
+	bool m_xfer_pending;
+	UINT16 m_dma_value;
+	int m_dma_state;
+
+	// dma state
+	enum
+	{
+		DMA_IDLE,
+		DMA_WAIT_FOR_SOURCE_DRQ,
+		DMA_FETCH,
+		DMA_TRANSLATE,
+		DMA_WAIT_FOR_DEST_DRQ,
+		DMA_STORE,
+		DMA_STORE_BYTE_HIGH,
+		DMA_COMPARE,
+		DMA_TERMINATE
+	};
+
 	// register
 	enum
 	{
@@ -179,7 +213,10 @@ i8089_channel::i8089_channel(const machine_config &mconfig, const char *tag, dev
 	device_t(mconfig, I8089_CHANNEL, "Intel 8089 I/O Channel", tag, owner, clock, "i8089_channel", __FILE__),
 	device_execute_interface(mconfig, *this),
 	m_icount(0),
-	m_write_sintr(*this)
+	m_write_sintr(*this),
+	m_xfer_pending(false),
+	m_dma_value(0),
+	m_dma_state(DMA_IDLE)
 {
 }
 
@@ -195,6 +232,10 @@ void i8089_channel::device_start()
 	m_write_sintr.resolve_safe();
 
 	// register for save states
+	save_item(NAME(m_xfer_pending));
+	save_item(NAME(m_dma_value));
+	save_item(NAME(m_dma_state));
+
 	for (int i = 0; i < ARRAY_LENGTH(m_r); i++)
 	{
 		save_item(NAME(m_r[i].w), i);
@@ -204,6 +245,8 @@ void i8089_channel::device_start()
 
 void i8089_channel::device_reset()
 {
+	m_xfer_pending = false;
+
 	// initialize registers
 	for (int i = 0; i < ARRAY_LENGTH(m_r); i++)
 	{
@@ -257,9 +300,19 @@ UINT8 i8089_channel::imm8()
 
 UINT16 i8089_channel::imm16()
 {
-	UINT8 imm16 = m_iop->read_word(m_r[TP].w);
+	UINT16 imm16 = m_iop->read_word(m_r[TP].w);
 	m_r[TP].w += 2;
 	return imm16;
+}
+
+// adjust task pointer and continue execution
+void i8089_channel::terminate_dma(int offset)
+{
+	logerror("%s('%s'): terminating dma transfer\n", shortname(), tag());
+	m_r[TP].w += offset;
+	m_r[PSW].w |= 1 << 2;
+	m_r[PSW].w &= ~(1 << 6);
+	m_dma_state = DMA_IDLE;
 }
 
 void i8089_channel::execute_run()
@@ -269,12 +322,187 @@ void i8089_channel::execute_run()
 		// active transfer?
 		if (BIT(m_r[PSW].w, 6))
 		{
-			m_icount = 0;
+			// new transfer?
+			if (BIT(m_r[PSW].w, 2))
+			{
+				// we are no longer executing task blocks
+				m_r[PSW].w &= ~(1 << 2);
+				m_xfer_pending = false;
+
+				if (VERBOSE)
+				{
+					logerror("%s('%s'): ---- starting dma transfer ----\n", shortname(), tag());
+					logerror("%s('%s'): ga = %06x, gb = %06x, gc = %06x\n", shortname(), tag(), m_r[GA].w, m_r[GB].w, m_r[GC].w);
+					logerror("%s('%s'): bc = %04x, cc = %04x, mc = %04x\n", shortname(), tag(), m_r[BC].w, m_r[CC].w, m_r[MC].w);
+				}
+			}
+
+			// todo: port transfers
+			if (CC_FUNC != 0x03)
+				fatalerror("%s('%s'): port transfer\n", shortname(), tag());
+
+			switch (m_dma_state)
+			{
+			case DMA_IDLE:
+				if (VERBOSE_DMA)
+					logerror("%s('%s'): entering state: DMA_IDLE (bc = %04x)\n", shortname(), tag(), m_r[BC].w);
+
+				// synchronize on source?
+				if (CC_SYNC == 0x01)
+					m_dma_state = DMA_WAIT_FOR_SOURCE_DRQ;
+				else
+					m_dma_state = DMA_FETCH;
+				break;
+
+			case DMA_WAIT_FOR_SOURCE_DRQ:
+				fatalerror("%s('%s'): wait for source drq not supported\n", shortname(), tag());
+				break;
+
+			case DMA_FETCH:
+				if (VERBOSE_DMA)
+					logerror("%s('%s'): entering state: DMA_FETCH", shortname(), tag());
+
+				// source is 16-bit?
+				if (BIT(m_r[PSW].w, 1))
+				{
+					m_dma_value = m_iop->read_word(m_r[GA + CC_SOURCE].w);
+					m_r[GA + CC_SOURCE].w += 2;
+					m_r[BC].w -= 2;
+				}
+				// destination is 16-bit, byte count is even
+				else if (BIT(m_r[PSW].w, 0) && !(m_r[BC].w & 1))
+				{
+					m_dma_value = m_iop->read_byte(m_r[GA + CC_SOURCE].w);
+					m_r[GA + CC_SOURCE].w++;
+					m_r[BC].w--;
+				}
+				// destination is 16-bit, byte count is odd
+				else if (BIT(m_r[PSW].w, 0) && (m_r[BC].w & 1))
+				{
+					m_dma_value |= m_iop->read_byte(m_r[GA + CC_SOURCE].w) << 8;
+					m_r[GA + CC_SOURCE].w++;
+					m_r[BC].w--;
+				}
+				// 8-bit transfer
+				else
+				{
+					m_dma_value = m_iop->read_byte(m_r[GA + CC_SOURCE].w);
+					m_r[GA + CC_SOURCE].w++;
+					m_r[BC].w--;
+				}
+
+				if (VERBOSE_DMA)
+					logerror("[ %04x ]\n", m_dma_value);
+
+				if (BIT(m_r[PSW].w, 0) && (m_r[BC].w & 1))
+					m_dma_state = DMA_FETCH;
+				else if (CC_TRANS)
+					m_dma_state = DMA_TRANSLATE;
+				else if (CC_SYNC == 0x02)
+					m_dma_state = DMA_WAIT_FOR_DEST_DRQ;
+				else
+					m_dma_state = DMA_STORE;
+
+				break;
+
+			case DMA_TRANSLATE:
+				fatalerror("%s('%s'): dma translate requested\n", shortname(), tag());
+				break;
+
+			case DMA_WAIT_FOR_DEST_DRQ:
+				fatalerror("%s('%s'): wait for destination drq not supported\n", shortname(), tag());
+				break;
+
+			case DMA_STORE:
+				if (VERBOSE_DMA)
+					logerror("%s('%s'): entering state: DMA_STORE", shortname(), tag());
+
+				// destination is 16-bit?
+				if (BIT(m_r[PSW].w, 0))
+				{
+					m_iop->write_word(m_r[GB - CC_SOURCE].w, m_dma_value);
+					m_r[GB - CC_SOURCE].w += 2;
+
+					if (VERBOSE_DMA)
+						logerror("[ %04x ]\n", m_dma_value);
+				}
+				// destination is 8-bit
+				else
+				{
+					m_iop->write_byte(m_r[GB - CC_SOURCE].w, m_dma_value & 0xff);
+					m_r[GB - CC_SOURCE].w++;
+
+					if (VERBOSE_DMA)
+						logerror("[ %02x ]\n", m_dma_value & 0xff);
+				}
+
+				if (CC_TMC & 0x03)
+					m_dma_state = DMA_COMPARE;
+				else
+					m_dma_state = DMA_TERMINATE;
+
+				break;
+
+			case DMA_COMPARE:
+				fatalerror("%s('%s'): dma compare requested\n", shortname(), tag());
+				break;
+
+			case DMA_TERMINATE:
+				if (VERBOSE_DMA)
+					logerror("%s('%s'): entering state: DMA_TERMINATE\n", shortname(), tag());
+
+				// terminate on masked compare?
+				if (CC_TMC & 0x03)
+					fatalerror("%s('%s'): terminate on masked compare not supported\n", shortname(), tag());
+
+				// terminate on byte count?
+				else if (CC_TBC && m_r[BC].w == 0)
+					terminate_dma((CC_TBC - 1) * 4);
+
+				// terminate on external signal
+				else if (CC_TX)
+					fatalerror("%s('%s'): terminate on external signal not supported\n", shortname(), tag());
+
+				// terminate on single transfer
+				else if (CC_TS)
+					fatalerror("%s('%s'): terminate on single transfer not supported\n", shortname(), tag());
+
+				// not terminated, continue transfer
+				else
+					// do we need to read another byte?
+					if (BIT(m_r[PSW].w, 1) && !BIT(m_r[PSW].w, 0))
+						if (CC_SYNC == 0x02)
+							m_dma_state = DMA_WAIT_FOR_DEST_DRQ;
+						else
+							m_dma_state = DMA_STORE_BYTE_HIGH;
+
+					// transfer done
+					else
+						m_dma_state = DMA_IDLE;
+
+				break;
+
+			case DMA_STORE_BYTE_HIGH:
+				if (VERBOSE_DMA)
+					logerror("%s('%s'): entering state: DMA_STORE_BYTE_HIGH[ %02x ]\n", shortname(), tag(), (m_dma_value >> 8) & 0xff);
+
+				m_iop->write_byte(m_r[GB - CC_SOURCE].w, (m_dma_value >> 8) & 0xff);
+				m_r[GB - CC_SOURCE].w++;
+				m_dma_state = DMA_TERMINATE;
+
+				break;
+			}
+
+			m_icount--;
 		}
 
 		// executing task block instructions?
 		else if (BIT(m_r[PSW].w, 2))
 		{
+			// dma transfer pending?
+			if (m_xfer_pending)
+				m_r[PSW].w |= 1 << 6;
+
 			// fetch first two instruction bytes
 			UINT16 op = m_iop->read_word(m_r[TP].w);
 			m_r[TP].w += 2;
@@ -296,6 +524,8 @@ void i8089_channel::execute_run()
 			UINT8 o;
 			UINT16 off, seg;
 
+			logerror("%s('%s'): executing %x %x %x %x %02x %x\n", shortname(), tag(), brp, wb, aa, w, opc, mm);
+
 			switch (opc)
 			{
 			case 0x00: // control
@@ -305,9 +535,7 @@ void i8089_channel::execute_run()
 				case 1: invalid(opc); break;
 				case 2: sintr(); break;
 				case 3: xfer(); break;
-				default:
-					if (BIT(brp, 2))
-						wid(BIT(brp, 1), BIT(brp, 0));
+				default: wid(BIT(brp, 1), BIT(brp, 0));
 				}
 				break;
 
@@ -659,7 +887,7 @@ void i8089_channel::movb_mr(int m, int r, int o)
 void i8089_channel::movb_rm(int r, int m, int o)
 {
 	UINT8 byte = m_iop->read_byte(m_r[m].w + o);
-	m_r[r].w = (BIT(byte, 7) ? 0xffff0 : 0x00000) | byte;
+	m_r[r].w = (BIT(byte, 7) ? 0xfff00 : 0x00000) | byte;
 	m_r[r].t = 1;
 }
 
@@ -673,7 +901,7 @@ void i8089_channel::movb_mm(int m1, int m2, int o1, int o2)
 // move immediate byte to register
 void i8089_channel::movbi_ri(int r, int i)
 {
-	m_r[r].w = (BIT(i, 7) ? 0xffff0 : 0x00000) | (i & 0xff);
+	m_r[r].w = (BIT(i, 7) ? 0xfff00 : 0x00000) | (i & 0xff);
 	m_r[r].t = 1;
 }
 
@@ -686,14 +914,14 @@ void i8089_channel::movbi_mi(int m, int i, int o)
 // move immediate word to register
 void i8089_channel::movi_ri(int r, int i)
 {
-	m_r[r].w = (BIT(i, 15) ? 0xffff0 : 0x00000) | (i & 0xffff);
+	m_r[r].w = (BIT(i, 15) ? 0xf0000 : 0x00000) | (i & 0xffff);
 	m_r[r].t = 1;
 }
 
 // move immediate word to memory word
 void i8089_channel::movi_mi(int m, int i, int o)
 {
-	m_iop->write_word(m_r[m].w + o, (BIT(i, 15) ? 0xffff0 : 0x00000) | (i & 0xffff));
+	m_iop->write_word(m_r[m].w + o, (BIT(i, 15) ? 0xf0000 : 0x00000) | (i & 0xffff));
 }
 
 // move pointer to memory (store)
@@ -753,7 +981,11 @@ void i8089_channel::wid(int s, int d)
 	m_r[PSW].w |= s << 1;
 }
 
-void i8089_channel::xfer() { UNIMPLEMENTED }
+// enter dma transfer mode after next instruction
+void i8089_channel::xfer()
+{
+	m_xfer_pending = true;
+}
 
 void i8089_channel::invalid(int opc)
 {
