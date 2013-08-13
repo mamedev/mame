@@ -31,8 +31,7 @@ the sound board should be fully discrete.
 
 #include "emu.h"
 #include "cpu/s2650/s2650.h"
-#include "sound/s2636.h"
-#include "video/s2636.h"
+#include "machine/s2636.h"
 #include "video/dm9368.h"
 #include "seabattl.lh"
 
@@ -471,7 +470,7 @@ static const s2636_interface s2636_config =
 {
 	0x100,
 	3, -21,
-	"s2636snd"
+	//"s2636snd"
 };
 
 static DM9368_INTERFACE( digit_score_thousand_intf )
@@ -525,7 +524,8 @@ static MACHINE_CONFIG_START( seabattl, seabattl_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", seabattl_state, seabattl_interrupt)
 
 	MCFG_S2636_ADD("s2636", s2636_config)
-
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	
 	MCFG_DM9368_ADD("sc_thousand", digit_score_thousand_intf)
 	MCFG_DM9368_ADD("sc_hundred", digit_score_hundred_intf)
 	MCFG_DM9368_ADD("sc_half", digit_score_half_a_score_intf)
@@ -547,8 +547,6 @@ static MACHINE_CONFIG_START( seabattl, seabattl_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("s2636snd", S2636_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	/* discrete sound */
 MACHINE_CONFIG_END

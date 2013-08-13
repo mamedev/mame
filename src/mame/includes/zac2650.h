@@ -1,4 +1,4 @@
-#include "sound/s2636.h"
+#include "machine/s2636.h"
 
 class zac2650_state : public driver_device
 {
@@ -14,7 +14,7 @@ public:
 	required_shared_ptr<UINT8> m_s2636_0_ram;
 	
 	required_device<cpu_device> m_maincpu;
-	required_device<s2636_sound_device> m_s2636_sound;
+	required_device<s2636_device> m_s2636_sound;
 	
 	bitmap_ind16 m_bitmap;
 	bitmap_ind16 m_spritebitmap;

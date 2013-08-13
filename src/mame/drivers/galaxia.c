@@ -61,7 +61,7 @@ TODO:
 */
 
 #include "emu.h"
-#include "sound/s2636.h"
+#include "machine/s2636.h"
 #include "cpu/s2650/s2650.h"
 #include "includes/galaxia.h"
 
@@ -276,16 +276,15 @@ GFXDECODE_END
 
 static const s2636_interface galaxia_s2636_config[3] =
 {
-	{ 0x100, 3, -26, "s2636snd_0" },
-	{ 0x100, 3, -26, "s2636snd_1" },
-	{ 0x100, 3, -26, "s2636snd_2" }
+	{ 0x100, 3, -26 },
+	{ 0x100, 3, -26 },
+	{ 0x100, 3, -26 }
 };
 
 static const s2636_interface astrowar_s2636_config =
 {
 	0x100,
-	3, 0,
-	"s2636snd_0"
+	3, 0
 };
 
 
@@ -312,20 +311,15 @@ static MACHINE_CONFIG_START( galaxia, galaxia_state )
 	MCFG_VIDEO_START_OVERRIDE(galaxia_state,galaxia)
 
 	MCFG_S2636_ADD("s2636_0", galaxia_s2636_config[0])
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_S2636_ADD("s2636_1", galaxia_s2636_config[1])
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_S2636_ADD("s2636_2", galaxia_s2636_config[2])
-
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("s2636snd_0", S2636_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-
-	MCFG_SOUND_ADD("s2636snd_1", S2636_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-
-	MCFG_SOUND_ADD("s2636snd_2", S2636_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 
@@ -352,12 +346,12 @@ static MACHINE_CONFIG_START( astrowar, galaxia_state )
 	MCFG_VIDEO_START_OVERRIDE(galaxia_state,astrowar)
 
 	MCFG_S2636_ADD("s2636_0", astrowar_s2636_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("s2636snd_0", S2636_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
 MACHINE_CONFIG_END
 
 

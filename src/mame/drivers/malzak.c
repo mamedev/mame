@@ -65,7 +65,6 @@
 #include "emu.h"
 #include "cpu/s2650/s2650.h"
 #include "sound/sn76477.h"
-#include "sound/s2636.h"
 #include "video/saa5050.h"
 #include "machine/nvram.h"
 #include "includes/malzak.h"
@@ -303,15 +302,13 @@ static const sn76477_interface sn76477_intf =
 static const s2636_interface malzac_s2636_0_config =
 {
 	0x100,
-	0, -16, /* -8, -16 */
-	"s2636snd_0"
+	0, -16 /* -8, -16 */
 };
 
 static const s2636_interface malzac_s2636_1_config =
 {
 	0x100,
-	0, -16, /* -9, -16 */
-	"s2636snd_1"
+	0, -16 /* -9, -16 */
 };
 
 READ8_MEMBER(malzak_state::videoram_r)
@@ -364,8 +361,10 @@ static MACHINE_CONFIG_START( malzak, malzak_state )
 	MCFG_PALETTE_LENGTH(128)
 
 	MCFG_S2636_ADD("s2636_0", malzac_s2636_0_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_S2636_ADD("s2636_1", malzac_s2636_1_config)
-
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	
 	MCFG_SAA5050_ADD("saa5050", 6000000, malzac_saa5050_intf)
 
 	/* sound hardware */
@@ -379,11 +378,6 @@ static MACHINE_CONFIG_START( malzak, malzak_state )
 	MCFG_SOUND_CONFIG(sn76477_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("s2636snd_0", S2636_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-
-	MCFG_SOUND_ADD("s2636snd_1", S2636_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( malzak2, malzak )

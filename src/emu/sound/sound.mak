@@ -504,17 +504,6 @@ endif
 
 
 #-------------------------------------------------
-# S2636 wave generator
-#@src/emu/sound/s2636.h,SOUNDS += S2636
-#-------------------------------------------------
-
-ifneq ($(filter S2636,$(SOUNDS)),)
-SOUNDOBJS += $(SOUNDOBJ)/s2636.o
-endif
-
-
-
-#-------------------------------------------------
 # Sega custom sound chips
 #@src/emu/sound/segapcm.h,SOUNDS += SEGAPCM
 #@src/emu/sound/multipcm.h,SOUNDS += MULTIPCM

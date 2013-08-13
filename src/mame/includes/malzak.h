@@ -4,7 +4,7 @@
 
 *************************************************************************/
 
-#include "video/s2636.h"
+#include "machine/s2636.h"
 #include "video/saa5050.h"
 
 class malzak_state : public driver_device

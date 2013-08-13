@@ -6,7 +6,7 @@
 
 #include "machine/6821pia.h"
 #include "sound/ay8910.h"
-#include "video/s2636.h"
+#include "machine/s2636.h"
 
 class laserbat_state : public driver_device
 {

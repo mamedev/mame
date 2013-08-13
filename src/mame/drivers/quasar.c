@@ -274,22 +274,19 @@ INTERRUPT_GEN_MEMBER(quasar_state::quasar_interrupt)
 static const s2636_interface s2636_0_config =
 {
 	0x100,
-	CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET,
-	NULL
+	CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET
 };
 
 static const s2636_interface s2636_1_config =
 {
 	0x100,
-	CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET,
-	NULL
+	CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET
 };
 
 static const s2636_interface s2636_2_config =
 {
 	0x100,
-	CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET,
-	NULL
+	CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET
 };
 
 // ****************************************

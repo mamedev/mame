@@ -6,7 +6,7 @@
 
 #include "sound/dac.h"
 #include "sound/tms5110.h"
-#include "video/s2636.h"
+#include "machine/s2636.h"
 
 #define CVS_S2636_Y_OFFSET     (3)
 #define CVS_S2636_X_OFFSET     (-26)
