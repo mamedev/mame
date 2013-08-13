@@ -1,3 +1,9 @@
+/***************************************************************************
+
+    Namco System 22 / Super System 22 hardware
+
+***************************************************************************/
+
 #include "machine/nvram.h"
 #include "video/rgbutil.h"
 #include "video/polynew.h"
