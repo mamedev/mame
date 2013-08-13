@@ -132,7 +132,7 @@ void *web_engine::websocket_keepalive()
 static void websocket_ready_handler_static(struct mg_connection *conn)
 {
 	const struct mg_request_info *request_info = mg_get_request_info(conn);
-    web_engine *engine = downcast<web_engine *>(request_info->user_data);
+    web_engine *engine = static_cast<web_engine *>(request_info->user_data);
 	engine->websocket_ready_handler(conn);
 }
 
@@ -140,20 +140,20 @@ static int websocket_data_handler_static(struct mg_connection *conn, int flags,
                                   char *data, size_t data_len) 
 {
 	const struct mg_request_info *request_info = mg_get_request_info(conn);
-    web_engine *engine = downcast<web_engine *>(request_info->user_data);
+    web_engine *engine = static_cast<web_engine *>(request_info->user_data);
 	return engine->websocket_data_handler(conn, flags, data, data_len);
 }
 
 static int begin_request_handler_static(struct mg_connection *conn) 
 {
 	const struct mg_request_info *request_info = mg_get_request_info(conn);	
-    web_engine *engine = downcast<web_engine *>(request_info->user_data);
+    web_engine *engine = static_cast<web_engine *>(request_info->user_data);
 	return engine->begin_request_handler(conn);
 }
 
 static void *websocket_keepalive_static(void *thread_func_param) 
 {
-	web_engine *engine = downcast<web_engine *>(thread_func_param);
+	web_engine *engine = static_cast<web_engine *>(thread_func_param);
 	return engine->websocket_keepalive();
 }
 
@@ -225,6 +225,7 @@ void web_engine::push_message(const char *message)
 {
 	for (simple_list_wrapper<mg_connection> *curitem = m_websockets.first(); curitem != NULL; curitem = curitem->next())
 	{		
-		mg_websocket_write(curitem->object(), WEBSOCKET_OPCODE_TEXT, message, strlen(message));
+		int status = mg_websocket_write(curitem->object(), WEBSOCKET_OPCODE_TEXT, message, strlen(message));
+		if (status==0) m_websockets.remove(*curitem); // remove inactive clients
 	}
 }
