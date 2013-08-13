@@ -24,21 +24,27 @@
 	  writeToScreen('<b style="color: green;">Connected</b>');
     };
     websocket.onclose = function(ev) {      
-      writeToScreen('<b style="color: white;">disconnected</b>');
+      writeToScreen('<b style="color: white;">Disconnected</b>');
     };
     websocket.onmessage = function(ev) {
 	if (ev.data=='update_machine') 
 	{
-		$.getJSON('json/game', function(data) {
+		$.ajax({
+		  url: "json/game",
+		  cache: false,
+		  dataType: "json",
+		  success: function(data) {
 			var items = [];
-			if(data.name =='___empty') {
+			if(data.name =='__empty') {
 				items.push('No driver running');
 			} else {
 				items.push('<h1>Currently running : ' + data.description + ' [' + data.manufacturer+']</h1>');
 
 			}
 			document.getElementById('current').innerHTML = items.join('');
-		});
+		  },
+		  error: function (request, status, error) { alert(status + ", " + error); }
+		});	
 	}
 
     };
