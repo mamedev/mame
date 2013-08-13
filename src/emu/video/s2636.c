@@ -78,7 +78,68 @@
 #include "emu.h"
 #include "video/s2636.h"
 #include "sound/s2636.h"
-#include "devlegcy.h"
+
+
+
+/*************************************
+ *
+ *  Device interface
+ *
+ *************************************/
+
+const device_type S2636 = &device_creator<s2636_device>;
+
+s2636_device::s2636_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, S2636, "Signetics 2636", tag, owner, clock, "s2636", __FILE__),
+		device_video_interface(mconfig, *this),
+		m_work_ram(NULL),
+		m_bitmap(NULL),
+		m_collision_bitmap(NULL)
+{
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void s2636_device::device_config_complete()
+{
+	// inherit a copy of the static data
+	const s2636_interface *intf = reinterpret_cast<const s2636_interface *>(static_config());
+	if (intf != NULL)
+		*static_cast<s2636_interface *>(this) = *intf;
+
+	// or initialize to defaults if none provided
+	else
+	{
+		m_work_ram_size = 0;
+		m_y_offset = 0;
+		m_x_offset = 0;
+		m_sound_tag = "";
+	}
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void s2636_device::device_start()
+{
+	int width = m_screen->width();
+	int height = m_screen->height();
+
+	m_work_ram = auto_alloc_array_clear(machine(), UINT8, m_work_ram_size);
+	m_bitmap = auto_bitmap_ind16_alloc(machine(), width, height);
+	m_collision_bitmap = auto_bitmap_ind16_alloc(machine(), width, height);
+
+	save_item(NAME(m_x_offset));
+	save_item(NAME(m_y_offset));
+	save_pointer(NAME(m_work_ram), m_work_ram_size);
+	save_item(NAME(*m_bitmap));
+	save_item(NAME(*m_collision_bitmap));
+}
 
 /*************************************
  *
@@ -91,43 +152,7 @@
 
 static const int sprite_offsets[4] = { 0x00, 0x10, 0x20, 0x40 };
 
-/*************************************
- *
- *  Internal S2636 data structure
- *
- *************************************/
 
-struct s2636_state
-{
-	UINT8     *work_ram;
-	int       work_ram_size;
-	int       y_offset;
-	int       x_offset;
-
-	bitmap_ind16 *bitmap;
-	bitmap_ind16 *collision_bitmap;
-};
-
-/*************************************
- *
- *  Inline functions
- *
- *************************************/
-
-INLINE s2636_state *get_safe_token( device_t *device )
-{
-	assert(device != NULL);
-	assert(device->type() == S2636);
-
-	return (s2636_state *)downcast<s2636_device *>(device)->token();
-}
-
-INLINE const s2636_interface *get_interface( device_t *device )
-{
-	assert(device != NULL);
-	assert((device->type() == S2636));
-	return (const s2636_interface *) device->static_config();
-}
 
 
 /*************************************
@@ -187,32 +212,31 @@ static void draw_sprite( UINT8 *gfx, int color, int y, int x, int expand, int or
  *
  *************************************/
 
-static int check_collision( device_t *device, int spriteno1, int spriteno2, const rectangle &cliprect )
+int s2636_device::check_collision( int spriteno1, int spriteno2, const rectangle &cliprect )
 {
-	s2636_state *s2636 = get_safe_token(device);
 	int checksum = 0;
 
-	UINT8* attr1 = &s2636->work_ram[sprite_offsets[spriteno1]];
-	UINT8* attr2 = &s2636->work_ram[sprite_offsets[spriteno2]];
+	UINT8* attr1 = &m_work_ram[sprite_offsets[spriteno1]];
+	UINT8* attr2 = &m_work_ram[sprite_offsets[spriteno2]];
 
 	/* TODO: does not check shadow sprites yet */
 
-	s2636->collision_bitmap->fill(0, cliprect);
+	m_collision_bitmap->fill(0, cliprect);
 
 	if ((attr1[0x0a] != 0xff) && (attr2[0x0a] != 0xff))
 	{
 		int x, y;
 
-		int x1 = attr1[0x0a] + s2636->x_offset;
-		int y1 = attr1[0x0c] + s2636->y_offset;
-		int x2 = attr2[0x0a] + s2636->x_offset;
-		int y2 = attr2[0x0c] + s2636->y_offset;
+		int x1 = attr1[0x0a] + m_x_offset;
+		int y1 = attr1[0x0c] + m_y_offset;
+		int x2 = attr2[0x0a] + m_x_offset;
+		int y2 = attr2[0x0c] + m_y_offset;
 
-		int expand1 = (s2636->work_ram[0xc0] >> (spriteno1 << 1)) & 0x03;
-		int expand2 = (s2636->work_ram[0xc0] >> (spriteno2 << 1)) & 0x03;
+		int expand1 = (m_work_ram[0xc0] >> (spriteno1 << 1)) & 0x03;
+		int expand2 = (m_work_ram[0xc0] >> (spriteno2 << 1)) & 0x03;
 
 		/* draw first sprite */
-		draw_sprite(attr1, 1, y1, x1, expand1, FALSE, *s2636->collision_bitmap, cliprect);
+		draw_sprite(attr1, 1, y1, x1, expand1, FALSE, *m_collision_bitmap, cliprect);
 
 		/* get fingerprint */
 		for (x = x1; x < x1 + SPRITE_WIDTH; x++)
@@ -221,11 +245,11 @@ static int check_collision( device_t *device, int spriteno1, int spriteno2, cons
 				if (!cliprect.contains(x, y))
 					continue;
 
-				checksum = checksum + s2636->collision_bitmap->pix16(y, x);
+				checksum = checksum + m_collision_bitmap->pix16(y, x);
 			}
 
 		/* black out second sprite */
-		draw_sprite(attr2, 0, y2, x2, expand2, FALSE, *s2636->collision_bitmap, cliprect);
+		draw_sprite(attr2, 0, y2, x2, expand2, FALSE, *m_collision_bitmap, cliprect);
 
 		/* remove fingerprint */
 		for (x = x1; x < x1 + SPRITE_WIDTH; x++)
@@ -234,7 +258,7 @@ static int check_collision( device_t *device, int spriteno1, int spriteno2, cons
 				if (!cliprect.contains(x, y))
 					continue;
 
-				checksum = checksum - s2636->collision_bitmap->pix16(y, x);
+				checksum = checksum - m_collision_bitmap->pix16(y, x);
 			}
 	}
 
@@ -249,56 +273,55 @@ static int check_collision( device_t *device, int spriteno1, int spriteno2, cons
  *
  *************************************/
 
-bitmap_ind16 &s2636_update( device_t *device, const rectangle &cliprect )
+bitmap_ind16 &s2636_device::update( const rectangle &cliprect )
 {
-	s2636_state *s2636 = get_safe_token(device);
 	UINT8 collision = 0;
 	int spriteno;
 
-	s2636->bitmap->fill(0, cliprect);
+	m_bitmap->fill(0, cliprect);
 
 	for (spriteno = 0; spriteno < 4; spriteno++)
 	{
 		int color, expand, x, y;
-		UINT8* attr = &s2636->work_ram[sprite_offsets[spriteno]];
+		UINT8* attr = &m_work_ram[sprite_offsets[spriteno]];
 
 		/* get out if sprite is turned off */
 		if (attr[0x0a] == 0xff)
 			continue;
 
-		x = attr[0x0a] + s2636->x_offset;
-		y = attr[0x0c] + s2636->y_offset;
+		x = attr[0x0a] + m_x_offset;
+		y = attr[0x0c] + m_y_offset;
 
-		color = (s2636->work_ram[0xc1 + (spriteno >> 1)] >> ((spriteno & 1) ? 0 : 3)) & 0x07;
-		expand = (s2636->work_ram[0xc0] >> (spriteno << 1)) & 0x03;
+		color = (m_work_ram[0xc1 + (spriteno >> 1)] >> ((spriteno & 1) ? 0 : 3)) & 0x07;
+		expand = (m_work_ram[0xc0] >> (spriteno << 1)) & 0x03;
 
-		draw_sprite(attr, color, y, x, expand, TRUE, *s2636->bitmap, cliprect);
+		draw_sprite(attr, color, y, x, expand, TRUE, *m_bitmap, cliprect);
 
 		/* bail if no shadow sprites */
 		if ((attr[0x0b] == 0xff) || (attr[0x0d] == 0xfe))
 			continue;
 
-		x = attr[0x0b] + s2636->x_offset;
+		x = attr[0x0b] + m_x_offset;
 
 		while (y < 0xff)
 		{
 			y = y + SPRITE_HEIGHT + attr[0x0d];
 
-			draw_sprite(attr, color, y, x, expand, TRUE, *s2636->bitmap, cliprect);
+			draw_sprite(attr, color, y, x, expand, TRUE, *m_bitmap, cliprect);
 		}
 	}
 
 	/* collision detection */
-	if (check_collision(device, 0, 1, cliprect))  collision |= 0x20;
-	if (check_collision(device, 0, 2, cliprect))  collision |= 0x10;
-	if (check_collision(device, 0, 3, cliprect))  collision |= 0x08;
-	if (check_collision(device, 1, 2, cliprect))  collision |= 0x04;
-	if (check_collision(device, 1, 3, cliprect))  collision |= 0x02;
-	if (check_collision(device, 2, 3, cliprect))  collision |= 0x01;
+	if (check_collision(0, 1, cliprect))  collision |= 0x20;
+	if (check_collision(0, 2, cliprect))  collision |= 0x10;
+	if (check_collision(0, 3, cliprect))  collision |= 0x08;
+	if (check_collision(1, 2, cliprect))  collision |= 0x04;
+	if (check_collision(1, 3, cliprect))  collision |= 0x02;
+	if (check_collision(2, 3, cliprect))  collision |= 0x01;
 
-	s2636->work_ram[0xcb] = collision;
+	m_work_ram[0xcb] = collision;
 
-	return *s2636->bitmap;
+	return *m_bitmap;
 }
 
 
@@ -308,86 +331,25 @@ bitmap_ind16 &s2636_update( device_t *device, const rectangle &cliprect )
  *
  *************************************/
 
-WRITE8_DEVICE_HANDLER( s2636_work_ram_w )
+WRITE8_MEMBER( s2636_device::work_ram_w )
 {
-	s2636_state *s2636 = get_safe_token(device);
-
-	assert(offset < s2636->work_ram_size);
+	assert(offset < m_work_ram_size);
 
 	if ( offset == 0xc7 )
 	{
-		const s2636_interface *intf = get_interface(device);
-		if ( intf->sound && *intf->sound )
+		if ( m_sound_tag && *m_sound_tag )
 		{
-			device->machine().device<s2636_sound_device>(intf->sound)->soundport_w(0, data);
+			machine().device<s2636_sound_device>(m_sound_tag)->soundport_w(0, data);
 		}
 	}
 
-	s2636->work_ram[offset] = data;
+	m_work_ram[offset] = data;
 }
 
 
-READ8_DEVICE_HANDLER( s2636_work_ram_r )
+READ8_MEMBER( s2636_device::work_ram_r )
 {
-	s2636_state *s2636 = get_safe_token(device);
+	assert(offset < m_work_ram_size);
 
-	assert(offset < s2636->work_ram_size);
-
-	return s2636->work_ram[offset];
-}
-
-/*************************************
- *
- *  Device interface
- *
- *************************************/
-
-static DEVICE_START( s2636 )
-{
-	s2636_state *s2636 = get_safe_token(device);
-	const s2636_interface *intf = get_interface(device);
-	screen_device *screen = downcast<screen_device *>(device->machine().device(intf->screen));
-	int width = screen->width();
-	int height = screen->height();
-
-	s2636->work_ram_size = intf->work_ram_size;
-	s2636->x_offset = intf->x_offset;
-	s2636->y_offset = intf->y_offset;
-
-	s2636->work_ram = auto_alloc_array_clear(device->machine(), UINT8, intf->work_ram_size);
-	s2636->bitmap = auto_bitmap_ind16_alloc(device->machine(), width, height);
-	s2636->collision_bitmap = auto_bitmap_ind16_alloc(device->machine(), width, height);
-
-	device->save_item(NAME(s2636->x_offset));
-	device->save_item(NAME(s2636->y_offset));
-	device->save_pointer(NAME(s2636->work_ram), s2636->work_ram_size);
-	device->save_item(NAME(*s2636->bitmap));
-	device->save_item(NAME(*s2636->collision_bitmap));
-}
-
-const device_type S2636 = &device_creator<s2636_device>;
-
-s2636_device::s2636_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, S2636, "Signetics 2636", tag, owner, clock, "s2636", __FILE__)
-{
-	m_token = global_alloc_clear(s2636_state);
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void s2636_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void s2636_device::device_start()
-{
-	DEVICE_START_NAME( s2636 )(this);
+	return m_work_ram[offset];
 }

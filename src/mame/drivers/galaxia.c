@@ -61,7 +61,6 @@ TODO:
 */
 
 #include "emu.h"
-#include "video/s2636.h"
 #include "sound/s2636.h"
 #include "cpu/s2650/s2650.h"
 #include "includes/galaxia.h"
@@ -123,9 +122,9 @@ READ8_MEMBER(galaxia_state::galaxia_collision_clear)
 static ADDRESS_MAP_START( galaxia_mem_map, AS_PROGRAM, 8, galaxia_state )
 	AM_RANGE(0x0000, 0x13ff) AM_ROM
 	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_RAM AM_SHARE("bullet_ram")
-	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_DEVREADWRITE_LEGACY("s2636_0", s2636_work_ram_r, s2636_work_ram_w)
-	AM_RANGE(0x1600, 0x16ff) AM_MIRROR(0x6000) AM_DEVREADWRITE_LEGACY("s2636_1", s2636_work_ram_r, s2636_work_ram_w)
-	AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x6000) AM_DEVREADWRITE_LEGACY("s2636_2", s2636_work_ram_r, s2636_work_ram_w)
+	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_0", s2636_device, work_ram_r, work_ram_w)
+	AM_RANGE(0x1600, 0x16ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_1", s2636_device, work_ram_r, work_ram_w)
+	AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_2", s2636_device, work_ram_r, work_ram_w)
 	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x6000) AM_READ(cvs_video_or_color_ram_r) AM_WRITE(galaxia_video_w) AM_SHARE("video_ram")
 	AM_RANGE(0x1c00, 0x1fff) AM_MIRROR(0x6000) AM_RAM
 	AM_RANGE(0x2000, 0x33ff) AM_ROM
@@ -135,7 +134,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( astrowar_mem_map, AS_PROGRAM, 8, galaxia_state )
 	AM_RANGE(0x0000, 0x13ff) AM_ROM
 	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_RAM
-	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_DEVREADWRITE_LEGACY("s2636_0", s2636_work_ram_r, s2636_work_ram_w)
+	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_0", s2636_device, work_ram_r, work_ram_w)
 	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x6000) AM_READ(cvs_video_or_color_ram_r) AM_WRITE(galaxia_video_w)  AM_SHARE("video_ram")
 	AM_RANGE(0x1c00, 0x1cff) AM_MIRROR(0x6000) AM_RAM AM_SHARE("bullet_ram")
 	AM_RANGE(0x2000, 0x33ff) AM_ROM
@@ -277,14 +276,13 @@ GFXDECODE_END
 
 static const s2636_interface galaxia_s2636_config[3] =
 {
-	{ "screen", 0x100, 3, -26, "s2636snd_0" },
-	{ "screen", 0x100, 3, -26, "s2636snd_1" },
-	{ "screen", 0x100, 3, -26, "s2636snd_2" }
+	{ 0x100, 3, -26, "s2636snd_0" },
+	{ 0x100, 3, -26, "s2636snd_1" },
+	{ 0x100, 3, -26, "s2636snd_2" }
 };
 
 static const s2636_interface astrowar_s2636_config =
 {
-	"screen",
 	0x100,
 	3, 0,
 	"s2636snd_0"

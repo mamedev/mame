@@ -4,6 +4,7 @@
 
 *************************************************************************/
 
+#include "video/s2636.h"
 #include "video/saa5050.h"
 
 class malzak_state : public driver_device
@@ -11,10 +12,15 @@ class malzak_state : public driver_device
 public:
 	malzak_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+			m_maincpu(*this, "maincpu"),
+			m_s2636_0(*this, "s2636_0"),
+			m_s2636_1(*this, "s2636_1"),
 			m_trom(*this, "saa5050"),
-			m_videoram(*this, "videoram"),
-		m_maincpu(*this, "maincpu") { }
+			m_videoram(*this, "videoram") { }
 
+	required_device<cpu_device> m_maincpu;
+	required_device<s2636_device> m_s2636_0;
+	required_device<s2636_device> m_s2636_1;
 	required_device<saa5050_device> m_trom;
 	required_shared_ptr<UINT8> m_videoram;
 
@@ -27,8 +33,6 @@ public:
 	int m_collision_counter;
 
 	/* devices */
-	device_t *m_s2636_0;
-	device_t *m_s2636_1;
 	device_t *m_saa5050;
 	DECLARE_READ8_MEMBER(fake_VRLE_r);
 	DECLARE_READ8_MEMBER(s2636_portA_r);
@@ -43,5 +47,4 @@ public:
 	virtual void machine_reset();
 	virtual void palette_init();
 	UINT32 screen_update_malzak(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
 };

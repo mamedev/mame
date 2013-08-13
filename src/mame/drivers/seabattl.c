@@ -52,6 +52,7 @@ public:
 		m_digit3(*this, "sc_unity"),
 		m_digit4(*this, "tm_half"),
 		m_digit5(*this, "tm_unity"),
+		m_s2636(*this, "s2636"),
 		m_waveenable(false),
 		m_collision(0)
 	{
@@ -67,6 +68,7 @@ public:
 	required_device<dm9368_device> m_digit3;
 	required_device<dm9368_device> m_digit4;
 	required_device<dm9368_device> m_digit5;
+	required_device<s2636_device> m_s2636;
 
 	tilemap_t *m_bg_tilemap;
 	bitmap_ind16 m_collision_bg;
@@ -181,7 +183,7 @@ UINT32 seabattl_state::screen_update_seabattl(screen_device &screen, bitmap_ind1
 		}
 	}
 
-	bitmap_ind16 &s2636_0_bitmap = s2636_update(machine().device("s2636"), cliprect);
+	bitmap_ind16 &s2636_0_bitmap = m_s2636->update(cliprect);
 
 	// collisions
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
@@ -252,7 +254,7 @@ static ADDRESS_MAP_START( seabattl_map, AS_PROGRAM, 8, seabattl_state )
 	AM_RANGE(0x1e06, 0x1e06) AM_MIRROR(0x20f0) AM_READ_PORT("DIPS1") AM_WRITE(sound_w)
 	AM_RANGE(0x1e07, 0x1e07) AM_MIRROR(0x20f0) AM_READ_PORT("DIPS0") AM_WRITE(sound2_w)
 	AM_RANGE(0x1fcc, 0x1fcc) AM_MIRROR(0x2000) AM_READ_PORT("IN1")
-	AM_RANGE(0x1f00, 0x1fff) AM_MIRROR(0x2000) AM_DEVREADWRITE_LEGACY("s2636", s2636_work_ram_r, s2636_work_ram_w)
+	AM_RANGE(0x1f00, 0x1fff) AM_MIRROR(0x2000) AM_DEVREADWRITE("s2636", s2636_device, work_ram_r, work_ram_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( seabattl_io_map, AS_IO, 8, seabattl_state )
@@ -467,7 +469,6 @@ GFXDECODE_END
 
 static const s2636_interface s2636_config =
 {
-	"screen",
 	0x100,
 	3, -21,
 	"s2636snd"

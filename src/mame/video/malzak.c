@@ -13,7 +13,6 @@
 
 
 #include "emu.h"
-#include "video/s2636.h"
 #include "video/saa5050.h"
 #include "includes/malzak.h"
 
@@ -43,8 +42,8 @@ UINT32 malzak_state::screen_update_malzak(screen_device &screen, bitmap_rgb32 &b
 		}
 
 	/* update the S2636 chips */
-	bitmap_ind16 &s2636_0_bitmap = s2636_update(m_s2636_0, cliprect);
-	bitmap_ind16 &s2636_1_bitmap = s2636_update(m_s2636_1, cliprect);
+	bitmap_ind16 &s2636_0_bitmap = m_s2636_0->update(cliprect);
+	bitmap_ind16 &s2636_1_bitmap = m_s2636_1->update(cliprect);
 
 	/* copy the S2636 images into the main bitmap */
 	{

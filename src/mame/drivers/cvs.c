@@ -92,8 +92,6 @@ Todo & FIXME:
 
 #include "emu.h"
 #include "cpu/s2650/s2650.h"
-#include "sound/dac.h"
-#include "video/s2636.h"
 #include "includes/cvs.h"
 
 
@@ -150,7 +148,7 @@ READ8_MEMBER(cvs_state::cvs_s2636_0_or_character_ram_r)
 	if (*m_fo_state)
 		return m_character_ram[(0 * 0x800) | 0x400 | m_character_ram_page_start | offset];
 	else
-		return s2636_work_ram_r(m_s2636_0, space, offset);
+		return m_s2636_0->work_ram_r(space, offset);
 }
 
 WRITE8_MEMBER(cvs_state::cvs_s2636_0_or_character_ram_w)
@@ -162,7 +160,7 @@ WRITE8_MEMBER(cvs_state::cvs_s2636_0_or_character_ram_w)
 		machine().gfx[1]->mark_dirty((offset / 8) % 256);
 	}
 	else
-		s2636_work_ram_w(m_s2636_0, space, offset, data);
+		m_s2636_0->work_ram_w(space, offset, data);
 }
 
 
@@ -171,7 +169,7 @@ READ8_MEMBER(cvs_state::cvs_s2636_1_or_character_ram_r)
 	if (*m_fo_state)
 		return m_character_ram[(1 * 0x800) | 0x400 | m_character_ram_page_start | offset];
 	else
-		return s2636_work_ram_r(m_s2636_1, space, offset);
+		return m_s2636_1->work_ram_r(space, offset);
 }
 
 WRITE8_MEMBER(cvs_state::cvs_s2636_1_or_character_ram_w)
@@ -183,7 +181,7 @@ WRITE8_MEMBER(cvs_state::cvs_s2636_1_or_character_ram_w)
 		machine().gfx[1]->mark_dirty((offset / 8) % 256);
 	}
 	else
-		s2636_work_ram_w(m_s2636_1, space, offset, data);
+		m_s2636_1->work_ram_w(space, offset, data);
 }
 
 
@@ -192,7 +190,7 @@ READ8_MEMBER(cvs_state::cvs_s2636_2_or_character_ram_r)
 	if (*m_fo_state)
 		return m_character_ram[(2 * 0x800) | 0x400 | m_character_ram_page_start | offset];
 	else
-		return s2636_work_ram_r(m_s2636_2, space, offset);
+		return m_s2636_2->work_ram_r(space, offset);
 }
 
 WRITE8_MEMBER(cvs_state::cvs_s2636_2_or_character_ram_w)
@@ -204,7 +202,7 @@ WRITE8_MEMBER(cvs_state::cvs_s2636_2_or_character_ram_w)
 		machine().gfx[1]->mark_dirty((offset / 8) % 256);
 	}
 	else
-		s2636_work_ram_w(m_s2636_2, space, offset, data);
+		m_s2636_2->work_ram_w(space, offset, data);
 }
 
 
@@ -945,7 +943,6 @@ GFXDECODE_END
 
 static const s2636_interface s2636_0_config =
 {
-	"screen",
 	0x100,
 	CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET,
 	NULL
@@ -953,7 +950,6 @@ static const s2636_interface s2636_0_config =
 
 static const s2636_interface s2636_1_config =
 {
-	"screen",
 	0x100,
 	CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET,
 	NULL
@@ -961,7 +957,6 @@ static const s2636_interface s2636_1_config =
 
 static const s2636_interface s2636_2_config =
 {
-	"screen",
 	0x100,
 	CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET,
 	NULL
@@ -978,9 +973,6 @@ MACHINE_START_MEMBER(cvs_state,cvs)
 
 	/* set devices */
 	m_speech = machine().device("speech");
-	m_s2636_0 = machine().device("s2636_0");
-	m_s2636_1 = machine().device("s2636_1");
-	m_s2636_2 = machine().device("s2636_2");
 
 	/* register state save */
 	save_item(NAME(m_color_ram));

@@ -22,7 +22,6 @@ TODO:
 #include "machine/6821pia.h"
 #include "sound/sn76477.h"
 #include "sound/tms3615.h"
-#include "video/s2636.h"
 #include "includes/laserbat.h"
 
 
@@ -165,9 +164,9 @@ static ADDRESS_MAP_START( laserbat_map, AS_PROGRAM, 8, laserbat_state )
 	AM_RANGE(0x7800, 0x7bff) AM_ROM
 
 	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_WRITENOP // always 0 (bullet ram in Quasar)
-	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_DEVREADWRITE_LEGACY("s2636_1", s2636_work_ram_r, s2636_work_ram_w)
-	AM_RANGE(0x1600, 0x16ff) AM_MIRROR(0x6000) AM_DEVREADWRITE_LEGACY("s2636_2", s2636_work_ram_r, s2636_work_ram_w)
-	AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x6000) AM_DEVREADWRITE_LEGACY("s2636_3", s2636_work_ram_r, s2636_work_ram_w)
+	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_1", s2636_device, work_ram_r, work_ram_w)
+	AM_RANGE(0x1600, 0x16ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_2", s2636_device, work_ram_r, work_ram_w)
+	AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_3", s2636_device, work_ram_r, work_ram_w)
 	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x6000) AM_WRITE(laserbat_videoram_w)
 	AM_RANGE(0x1c00, 0x1fff) AM_MIRROR(0x6000) AM_RAM
 ADDRESS_MAP_END
@@ -498,9 +497,9 @@ UINT32 laserbat_state::screen_update_laserbat(screen_device &screen, bitmap_ind1
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* update the S2636 chips */
-	bitmap_ind16 &s2636_1_bitmap = s2636_update(m_s2636_1, cliprect);
-	bitmap_ind16 &s2636_2_bitmap = s2636_update(m_s2636_2, cliprect);
-	bitmap_ind16 &s2636_3_bitmap = s2636_update(m_s2636_3, cliprect);
+	bitmap_ind16 &s2636_1_bitmap = m_s2636_1->update(cliprect);
+	bitmap_ind16 &s2636_2_bitmap = m_s2636_2->update(cliprect);
+	bitmap_ind16 &s2636_3_bitmap = m_s2636_3->update(cliprect);
 
 	/* copy the S2636 images into the main bitmap */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
@@ -657,7 +656,6 @@ INTERRUPT_GEN_MEMBER(laserbat_state::zaccaria_cb1_toggle)
 
 static const s2636_interface s2636_1_config =
 {
-	"screen",
 	0x100,
 	0, -19,
 	NULL
@@ -665,7 +663,6 @@ static const s2636_interface s2636_1_config =
 
 static const s2636_interface s2636_2_config =
 {
-	"screen",
 	0x100,
 	0, -19,
 	NULL
@@ -673,7 +670,6 @@ static const s2636_interface s2636_2_config =
 
 static const s2636_interface s2636_3_config =
 {
-	"screen",
 	0x100,
 	0, -19,
 	NULL
@@ -681,9 +677,6 @@ static const s2636_interface s2636_3_config =
 
 void laserbat_state::machine_start()
 {
-	m_s2636_1 = machine().device("s2636_1");
-	m_s2636_2 = machine().device("s2636_2");
-	m_s2636_3 = machine().device("s2636_3");
 	m_pia = machine().device<pia6821_device>("pia");
 	m_sn = machine().device("snsnd");
 	m_tms1 = machine().device<tms3615_device>("tms1");

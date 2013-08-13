@@ -20,11 +20,10 @@
 
 struct s2636_interface
 {
-	const char *screen;
-	int        work_ram_size;
-	int        y_offset;
-	int        x_offset;
-	const char *sound;
+	int        m_work_ram_size;
+	int        m_y_offset;
+	int        m_x_offset;
+	const char *m_sound_tag;
 };
 
 /*************************************
@@ -33,21 +32,34 @@ struct s2636_interface
  *
  *************************************/
 
-class s2636_device : public device_t
+class s2636_device : public device_t,
+				public device_video_interface,
+				public s2636_interface
 {
 public:
 	s2636_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~s2636_device() { global_free(m_token); }
+	~s2636_device() {}
 
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
+	/* returns a BITMAP_FORMAT_IND16 bitmap the size of the screen
+	   D0-D2 of each pixel is the pixel color
+	   D3 indicates whether the S2636 drew this pixel - 0 = not drawn, 1 = drawn */
+
+	bitmap_ind16 &update( const rectangle &cliprect );
+	DECLARE_WRITE8_MEMBER( work_ram_w );
+	DECLARE_READ8_MEMBER( work_ram_r );
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
+
 private:
 	// internal state
-	void *m_token;
+	UINT8     *m_work_ram;
+	bitmap_ind16 *m_bitmap;
+	bitmap_ind16 *m_collision_bitmap;
+	
+	int check_collision( int spriteno1, int spriteno2, const rectangle &cliprect );
 };
 
 extern const device_type S2636;
@@ -56,22 +68,6 @@ extern const device_type S2636;
 #define MCFG_S2636_ADD(_tag, _interface) \
 	MCFG_DEVICE_ADD(_tag, S2636, 0) \
 	MCFG_DEVICE_CONFIG(_interface)
-
-
-/*************************************
- *
- *  Device I/O functions
- *
- *************************************/
-
-
-/* returns a BITMAP_FORMAT_IND16 bitmap the size of the screen
-   D0-D2 of each pixel is the pixel color
-   D3 indicates whether the S2636 drew this pixel - 0 = not drawn, 1 = drawn */
-
-bitmap_ind16 &s2636_update( device_t *device, const rectangle &cliprect );
-DECLARE_WRITE8_DEVICE_HANDLER( s2636_work_ram_w );
-DECLARE_READ8_DEVICE_HANDLER( s2636_work_ram_r );
 
 
 #endif /* __S2636_H__ */

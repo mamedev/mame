@@ -15,7 +15,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/s2636.h"
 #include "cpu/s2650/s2650.h"
 #include "includes/quasar.h"
 
@@ -144,9 +143,9 @@ UINT32 quasar_state::screen_update_quasar(screen_device &screen, bitmap_ind16 &b
 	}
 
 	/* update the S2636 chips */
-	bitmap_ind16 &s2636_0_bitmap = s2636_update(m_s2636_0, cliprect);
-	bitmap_ind16 &s2636_1_bitmap = s2636_update(m_s2636_1, cliprect);
-	bitmap_ind16 &s2636_2_bitmap = s2636_update(m_s2636_2, cliprect);
+	bitmap_ind16 &s2636_0_bitmap = m_s2636_0->update(cliprect);
+	bitmap_ind16 &s2636_1_bitmap = m_s2636_1->update(cliprect);
+	bitmap_ind16 &s2636_2_bitmap = m_s2636_2->update(cliprect);
 
 	/* Bullet Hardware */
 	for (offs = 8; offs < 256; offs++ )

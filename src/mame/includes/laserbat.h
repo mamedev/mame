@@ -6,6 +6,7 @@
 
 #include "machine/6821pia.h"
 #include "sound/ay8910.h"
+#include "video/s2636.h"
 
 class laserbat_state : public driver_device
 {
@@ -16,7 +17,10 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_fo_state(*this, "fo_state"),
 		m_ay1(*this, "ay1"),
-		m_ay2(*this, "ay2")
+		m_ay2(*this, "ay2"),
+		m_s2636_1(*this, "s2636_1"),
+		m_s2636_2(*this, "s2636_2"),
+		m_s2636_3(*this, "s2636_3")
 	{
 	}
 
@@ -25,6 +29,9 @@ public:
 	required_shared_ptr<UINT8> m_fo_state;
 	optional_device<ay8910_device> m_ay1;
 	optional_device<ay8910_device> m_ay2;
+	required_device<s2636_device> m_s2636_1;
+	required_device<s2636_device> m_s2636_2;
+	required_device<s2636_device> m_s2636_3;
 
 	/* video-related */
 	tilemap_t    *m_bg_tilemap;
@@ -56,9 +63,6 @@ public:
 	int        m_bit14;
 
 	/* device */
-	device_t *m_s2636_1;
-	device_t *m_s2636_2;
-	device_t *m_s2636_3;
 	pia6821_device *m_pia;
 	device_t *m_sn;
 	tms3615_device *m_tms1;

@@ -66,7 +66,6 @@
 #include "cpu/s2650/s2650.h"
 #include "sound/sn76477.h"
 #include "sound/s2636.h"
-#include "video/s2636.h"
 #include "video/saa5050.h"
 #include "machine/nvram.h"
 #include "includes/malzak.h"
@@ -74,7 +73,7 @@
 
 READ8_MEMBER(malzak_state::fake_VRLE_r)
 {
-	return (s2636_work_ram_r(m_s2636_0, space, 0xcb) & 0x3f) + (m_screen->vblank() * 0x40);
+	return (m_s2636_0->work_ram_r(space, 0xcb) & 0x3f) + (m_screen->vblank() * 0x40);
 }
 
 READ8_MEMBER(malzak_state::s2636_portA_r)
@@ -106,8 +105,8 @@ static ADDRESS_MAP_START( malzak_map, AS_PROGRAM, 8, malzak_state )
 	AM_RANGE(0x1200, 0x12ff) AM_MIRROR(0x6000) AM_RAM
 	AM_RANGE(0x1300, 0x13ff) AM_MIRROR(0x6000) AM_RAM
 	AM_RANGE(0x14cb, 0x14cb) AM_MIRROR(0x6000) AM_READ(fake_VRLE_r)
-	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_DEVREADWRITE_LEGACY("s2636_0", s2636_work_ram_r, s2636_work_ram_w)
-	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_DEVREADWRITE_LEGACY("s2636_1", s2636_work_ram_r, s2636_work_ram_w)
+	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_0", s2636_device, work_ram_r, work_ram_w)
+	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_1", s2636_device, work_ram_r, work_ram_w)
 	AM_RANGE(0x1600, 0x16ff) AM_MIRROR(0x6000) AM_RAM_WRITE(malzak_playfield_w)
 	AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x6000) AM_RAM
 	AM_RANGE(0x1800, 0x1fff) AM_MIRROR(0x6000) AM_RAM AM_SHARE("videoram")
@@ -127,8 +126,8 @@ static ADDRESS_MAP_START( malzak2_map, AS_PROGRAM, 8, malzak_state )
 	AM_RANGE(0x1300, 0x13ff) AM_MIRROR(0x6000) AM_RAM
 	AM_RANGE(0x14cb, 0x14cb) AM_MIRROR(0x6000) AM_READ(fake_VRLE_r)
 	AM_RANGE(0x14cc, 0x14cc) AM_MIRROR(0x6000) AM_READ(s2636_portA_r)
-	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_DEVREADWRITE_LEGACY("s2636_0", s2636_work_ram_r, s2636_work_ram_w)
-	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_DEVREADWRITE_LEGACY("s2636_1", s2636_work_ram_r, s2636_work_ram_w)
+	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_0", s2636_device, work_ram_r, work_ram_w)
+	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_1", s2636_device, work_ram_r, work_ram_w)
 	AM_RANGE(0x1600, 0x16ff) AM_MIRROR(0x6000) AM_RAM_WRITE(malzak_playfield_w)
 	AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x6000) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x1800, 0x1fff) AM_MIRROR(0x6000) AM_RAM AM_SHARE("videoram")
@@ -303,7 +302,6 @@ static const sn76477_interface sn76477_intf =
 
 static const s2636_interface malzac_s2636_0_config =
 {
-	"screen",
 	0x100,
 	0, -16, /* -8, -16 */
 	"s2636snd_0"
@@ -311,7 +309,6 @@ static const s2636_interface malzac_s2636_0_config =
 
 static const s2636_interface malzac_s2636_1_config =
 {
-	"screen",
 	0x100,
 	0, -16, /* -9, -16 */
 	"s2636snd_1"
@@ -332,8 +329,6 @@ void malzak_state::machine_start()
 {
 	membank("bank1")->configure_entries(0, 2, memregion("user2")->base(), 0x400);
 
-	m_s2636_0 = machine().device("s2636_0");
-	m_s2636_1 = machine().device("s2636_1");
 	m_saa5050 = machine().device("saa5050");
 
 	save_item(NAME(m_playfield_code));
