@@ -85,7 +85,8 @@ public:
 	required_device<t5182_device> m_t5182;
 
 	tilemap_t *m_bgtilemap;
-	tilemap_t *m_infotilemap;
+	tilemap_t *m_infotilemap_2;
+
 	tilemap_t *m_txttilemap;
 	int m_scrollx;
 
@@ -99,12 +100,21 @@ public:
 	DECLARE_DRIVER_INIT(panicr);
 	TILE_GET_INFO_MEMBER(get_bgtile_info);
 	TILE_GET_INFO_MEMBER(get_infotile_info);
+	TILE_GET_INFO_MEMBER(get_infotile_info_2);
+	TILE_GET_INFO_MEMBER(get_infotile_info_3);
+	TILE_GET_INFO_MEMBER(get_infotile_info_4);
+
 	TILE_GET_INFO_MEMBER(get_txttile_info);
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_panicr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(panicr_scanline);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect );
+
+	bitmap_ind16 *m_temprender;
+
+	bitmap_ind16 *m_tempbitmap_1;
+	rectangle m_tempbitmap_clip;
 };
 
 
@@ -190,7 +200,9 @@ TILE_GET_INFO_MEMBER(panicr_state::get_bgtile_info)
 		0);
 }
 
-TILE_GET_INFO_MEMBER(panicr_state::get_infotile_info)
+
+
+TILE_GET_INFO_MEMBER(panicr_state::get_infotile_info_2)
 {
 	int code,attr;
 
@@ -198,11 +210,14 @@ TILE_GET_INFO_MEMBER(panicr_state::get_infotile_info)
 	attr=memregion("user2")->base()[tile_index];
 	code+=((attr&7)<<8);
 	SET_TILE_INFO_MEMBER(
-		2,
+		3,
 		code,
-		(attr & 0xf0) >> 4,
+		0,
 		0);
 }
+
+
+
 
 TILE_GET_INFO_MEMBER(panicr_state::get_txttile_info)
 {
@@ -223,7 +238,7 @@ TILE_GET_INFO_MEMBER(panicr_state::get_txttile_info)
 void panicr_state::video_start()
 {
 	m_bgtilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(panicr_state::get_bgtile_info),this),TILEMAP_SCAN_ROWS,16,16,1024,16 );
-	m_infotilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(panicr_state::get_infotile_info),this),TILEMAP_SCAN_ROWS,16,16,1024,16 ); // 3 more bitplanes, contains collision and priority data
+	m_infotilemap_2 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(panicr_state::get_infotile_info_2),this),TILEMAP_SCAN_ROWS,16,16,1024,16 );
 
 	m_txttilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(panicr_state::get_txttile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32 );
 	colortable_configure_tilemap_groups(machine().colortable, m_txttilemap, machine().gfx[0], 0);
@@ -245,20 +260,60 @@ void panicr_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect )
 		color = spriteram[offs+1] & 0x0f;
 		sprite = spriteram[offs+0] | (*m_spritebank << 8);
 
-		drawgfx_transmask(bitmap,cliprect,machine().gfx[3],
+		drawgfx_transmask(bitmap,cliprect,machine().gfx[2],
 				sprite,
 				color,flipx,flipy,x,y,
-				colortable_get_transpen_mask(machine().colortable, machine().gfx[3], color, 0));
+				colortable_get_transpen_mask(machine().colortable, machine().gfx[2], color, 0));
 	}
 }
 
 UINT32 panicr_state::screen_update_panicr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	m_bgtilemap->set_scrollx(0, m_scrollx);
+	m_bgtilemap->draw(screen, *m_temprender, m_tempbitmap_clip, 0,0);
+
+//	m_infotilemap_2->set_scrollx(0, m_scrollx);
+//	m_infotilemap_2->draw(screen, *m_temprender, m_tempbitmap_clip, 0,0);
+
+
 	bitmap.fill(get_black_pen(machine()), cliprect);
 	m_txttilemap->mark_all_dirty();
-	m_bgtilemap->set_scrollx(0, m_scrollx);
-	m_bgtilemap->draw(screen, bitmap, cliprect, 0,0);
+
+
+
+	for (int y=0;y<256;y++)
+	{
+		UINT16* srcline = &m_temprender->pix16(y);
+		UINT16* dstline = &bitmap.pix16(y);
+
+		for (int x=0;x<256;x++)
+		{
+			UINT16 dat = srcline[x];
+
+			dstline[x] = ((dat & 0x00f) | ((dat & 0x1e0)>>1)) + 0x100;
+
+		}
+
+	}
+
 	draw_sprites(bitmap,cliprect);
+
+	for (int y=0;y<256;y++)
+	{
+		UINT16* srcline = &m_temprender->pix16(y);
+		UINT16* dstline = &bitmap.pix16(y);
+
+		for (int x=0;x<256;x++)
+		{
+			UINT16 dat = srcline[x];
+			if (dat & 0x10)
+				dstline[x] = ((dat & 0x00f) | ((dat & 0x1e0)>>1)) + 0x100;
+
+		}
+
+	}
+
+
 	m_txttilemap->draw(screen, bitmap, cliprect, 0,0);
 
 	return 0;
@@ -273,23 +328,36 @@ UINT32 panicr_state::screen_update_panicr(screen_device &screen, bitmap_ind16 &b
 
 READ8_MEMBER(panicr_state::panicr_collision_r)
 {
-	// 0x40 bytes per line, 2 bits per x
-	// implementation is still wrong though :(
-	const bitmap_ind16 &src_bitmap = m_infotilemap->pixmap();
-	int width_mask = src_bitmap.width() - 1;
-	int height_mask = src_bitmap.height() - 1;
-	int y = offset >> 6;
-	int x = (offset & 0x3f) * 4;
-	UINT8 data = 0;
+	// re-render the collision data here
+	// collisions are based on 2 bits from the rendered tile data, relative to a page of tiles
 
-	for (int i = 0; i < 4; i++)
-	{
-		int p = src_bitmap.pix16(y & height_mask, (i + x + m_scrollx) & width_mask);
-		data <<= 2;
-		data |= p&3;
-	}
+	// it definitely can't be using the lower scroll bits here because the requested offset moves relative
+	// to a page, not relative to the screen scroll, maybe there is a page select register and we shouldn't
+	// be using the scroll bits at all.
+	m_infotilemap_2->set_scrollx(0, m_scrollx & 0xff00);
+	m_infotilemap_2->draw(m_screen, *m_tempbitmap_1, m_tempbitmap_clip, 0,0);
 
-	return data;
+
+	int actual_column = offset&0x3f;
+	int actual_line = offset >> 6;
+
+	actual_column = actual_column * 4;
+
+	UINT8 ret = 0;
+	UINT16* srcline = &m_tempbitmap_1->pix16(actual_line);
+
+	
+	ret |= (srcline[actual_column+0]&3) << 6;
+	ret |= (srcline[actual_column+1]&3) << 4;
+	ret |= (srcline[actual_column+2]&3) << 2;
+	ret |= (srcline[actual_column+3]&3) << 0;
+
+//	printf("read %d %d\n", actual_line, actual_column);
+
+
+	return ret;
+
+
 }
 
 
@@ -300,7 +368,7 @@ WRITE8_MEMBER(panicr_state::panicr_scrollx_lo_w)
 
 WRITE8_MEMBER(panicr_state::panicr_scrollx_hi_w)
 {
-	m_scrollx = (m_scrollx & 0xff) | (data << 4 & 0x0f00) | (data << 12 & 0xf000);
+	m_scrollx = (m_scrollx & 0xff) | ((data &0xf0) << 4) | ((data & 0x0f) << 12);
 }
 
 WRITE8_MEMBER(panicr_state::panicr_output_w)
@@ -451,8 +519,8 @@ static const gfx_layout bgtilelayout =
 {
 	16,16,
 	RGN_FRAC(1,4),
-	4,
-	{ RGN_FRAC(2,4)+0, RGN_FRAC(2,4)+4, RGN_FRAC(3,4)+0, RGN_FRAC(3,4)+4 },
+	5,
+	{  /* priority bit -> */ RGN_FRAC(1,4)+0 , /* colour bits -> */ RGN_FRAC(2,4)+0, RGN_FRAC(2,4)+4, RGN_FRAC(3,4)+0, RGN_FRAC(3,4)+4},
 	{ 0, 1, 2, 3, 8+0, 8+1, 8+2, 8+3,
 			16+0, 16+1, 16+2, 16+3, 24+0, 24+1, 24+2, 24+3 },
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
@@ -460,18 +528,22 @@ static const gfx_layout bgtilelayout =
 	32*16
 };
 
-static const gfx_layout infotilelayout =
+
+static const gfx_layout infotilelayout_2 =
 {
 	16,16,
 	RGN_FRAC(1,4),
-	4,
-	{ 0, 4, RGN_FRAC(1,4)+0, RGN_FRAC(1,4)+4 },
+	2,
+	{ /* collision bits -> */ RGN_FRAC(1,4)+4, 4  },
 	{ 0, 1, 2, 3, 8+0, 8+1, 8+2, 8+3,
 			16+0, 16+1, 16+2, 16+3, 24+0, 24+1, 24+2, 24+3 },
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
 			8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
 	32*16
 };
+
+
+
 
 static const gfx_layout spritelayout =
 {
@@ -488,9 +560,10 @@ static const gfx_layout spritelayout =
 
 static GFXDECODE_START( panicr )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0x000,  8 )
-	GFXDECODE_ENTRY( "gfx2", 0, bgtilelayout,   0x100, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, infotilelayout, 0x100, 16 ) // palette is just to make it viewable with F4
+	GFXDECODE_ENTRY( "gfx2", 0, bgtilelayout,   0x000, 32 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,   0x200, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, infotilelayout_2, 0x100, 16 ) // palette is just to make it viewable with F4
+
 GFXDECODE_END
 
 
@@ -517,7 +590,7 @@ static MACHINE_CONFIG_START( panicr, panicr_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(panicr_state, screen_update_panicr)
 
 	MCFG_GFXDECODE(panicr)
@@ -721,6 +794,13 @@ DRIVER_INIT_MEMBER(panicr_state,panicr)
 	}
 
 	auto_free(machine(), buf);
+
+	m_tempbitmap_1 = auto_bitmap_ind16_alloc(machine(),256,256);
+	m_temprender = auto_bitmap_ind16_alloc(machine(),256,256);
+	m_tempbitmap_clip.set(0, 256-1, 0, 256-1);
+
+	m_tempbitmap_1->fill(0, m_tempbitmap_clip);
+
 }
 
 
