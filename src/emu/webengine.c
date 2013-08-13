@@ -118,7 +118,7 @@ void *web_engine::websocket_keepalive()
 			for (simple_list_wrapper<mg_connection> *curitem = m_websockets.first(); curitem != NULL; curitem = curitem->next())
 			{
 				int status = mg_websocket_write(curitem->object(), WEBSOCKET_OPCODE_PING, NULL, 0);		
-				if (status==0) m_websockets.remove(*curitem); // remove inactive clients
+				if (status==0) m_websockets.detach(*curitem); // remove inactive clients
 			}
 		}
 		osd_sleep(osd_ticks_per_second()/5);
@@ -226,6 +226,6 @@ void web_engine::push_message(const char *message)
 	for (simple_list_wrapper<mg_connection> *curitem = m_websockets.first(); curitem != NULL; curitem = curitem->next())
 	{		
 		int status = mg_websocket_write(curitem->object(), WEBSOCKET_OPCODE_TEXT, message, strlen(message));
-		if (status==0) m_websockets.remove(*curitem); // remove inactive clients
+		if (status==0) m_websockets.detach(*curitem); // remove inactive clients
 	}
 }
