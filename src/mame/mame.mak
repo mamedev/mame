@@ -1814,7 +1814,6 @@ $(MAMEOBJ)/technos.a: \
 	$(DRIVERS)/tagteam.o $(VIDEO)/tagteam.o \
 	$(DRIVERS)/vball.o $(VIDEO)/vball.o \
 	$(DRIVERS)/wwfsstar.o $(VIDEO)/wwfsstar.o \
-	$(DRIVERS)/wwfwfest.o $(VIDEO)/wwfwfest.o \
 	$(DRIVERS)/xain.o $(VIDEO)/xain.o \
 
 $(MAMEOBJ)/tehkan.a: \
