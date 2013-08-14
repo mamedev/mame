@@ -1813,7 +1813,7 @@ void c2040_device::on_disk0_change(device_image_interface &image)
 
 
 //-------------------------------------------------
-//  on_disk_change -
+//  on_disk1_change -
 //-------------------------------------------------
 
 void c2040_device::on_disk1_change(device_image_interface &image)
