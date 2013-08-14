@@ -36,7 +36,8 @@ class i8089_channel;
 
 // ======================> i8089_device
 
-class i8089_device : public device_t
+class i8089_device : public device_t,
+                     public device_execute_interface
 {
 	friend class i8089_channel;
 
@@ -67,6 +68,11 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
+
+	// device_execute_interface overrides
+	virtual void execute_run();
+
+	int m_icount;
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
