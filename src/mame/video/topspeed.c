@@ -4,6 +4,108 @@
 
 /****************************************************************************
 
+                                     NOTES
+
+Raster line color control
+-------------------------
+
+Used to make the road move. Each word controls one pixel row.
+
+0x800000 - 0x1ff  raster color control for one road tilemap
+0x800200 - 0x3ff  raster color control for the other
+
+Road tile colors are (all?) in the range 0x100-103. Top road section
+(tilemap at 0xa08000) uses 0x100 and 0x101. Bottom section
+(tilemap at 0xb00000) uses 0x102 and 0x103. This would allow colors
+on left and right side of road to be different. In practice it seems
+Taito didn't take advantage of this.
+
+Each tilemap is usually all one color value. Every now and then (10s
+or so) the value alternates. This seems to be determined by whether
+the current section of road has white lines in the middle. (0x101/3
+gives white lines.)
+
+The raster line color control area has groups of four values which
+cascade down through it so the road colors cascade down the screen.
+
+There are three known groups (start is arbitrary; the cycles repeat ad
+infinitum or until a different cycle starts; values given are from bottom
+to top of screen):
+
+(i) White lines in center of road
+
+12  %10010
+1f  %11111
+00  %00000
+0d  %01101
+
+(ii) No lines in center of road
+
+08  %01000
+0c  %01100
+1a  %11010
+1e  %11110
+
+(iii) Under bridge or in tunnel [note almost identical to (i)]
+
+ffe0    %00000
+ffed    %01101
+fff2    %10010
+ffef    %01111
+
+(iv) Unknown 4th group for tunnels in later parts of the game that have
+no white lines, analogous to (ii) ?
+
+
+Correlating with screenshots suggests that these bits refer to:
+
+x....  road body ?
+.x...  lines in road center and inner edge
+..x..  lines at road outer edge
+...x.  outside road ?
+....x  ???
+
+
+Actual gfx tiles used for the road only use colors 1-5. Palette offsets:
+
+(0 = transparency)
+1 = lines in road center
+2 = road edge (inner)
+3 = road edge (outer)
+4 = road body
+5 = outside road
+
+Each palette block contains three possible sets of 5 colors. Entries 1-5
+(standard), 6-10 (alternate), 11-15 (tunnels).
+
+In tunnels only 11-15 are used. Outside tunnels there is a choice between
+the standard colors and the alternate colors. The road body could in theory
+take a standard color while 'outside the road' took on an alternate. But
+in practice the game is using a very limited choice of raster control words,
+so we don't know.
+
+Need to test whether sections of the road with unknown raster control words
+(tunnels late in the game without central white lines) are correct against
+a real machine.
+
+Also are the 'prelines' shortly before white road lines appear correct?
+
+
+
+CHECK screen inits at $1692
+
+These suggest that rowscroll areas are all 0x1000 long and there are TWO
+for each tilemap layer.
+
+256 rows => 256 words => 0x200 bytes. So probably the inits are far too long.
+
+Maybe the second area for each layer contains colscroll ?
+
+****************************************************************************/
+
+
+/****************************************************************************
+
                                      SPRITES
 
     Layout 8 bytes per sprite
@@ -36,7 +138,7 @@ void topspeed_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, 
 	static const int primasks[2] = { 0xff00, 0xfffc };  /* Sprites are over bottom layer or under top layer */
 
 	/* Most of spriteram is not used by the 68000: rest is scratch space for the h/w perhaps ? */
-	for (offs = 0; offs < (0x2c0 / 2); offs += 4)
+	for (offs = 0; offs < m_spriteram.bytes() / 2; offs += 4)
 	{
 		data = spriteram[offs + 2];
 
@@ -51,8 +153,9 @@ void topspeed_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, 
 		priority = (data & 0x8000) >> 15;
 //      unknown = (data & 0x2000) >> 13;
 
+		/* End of sprite list */
 		if (y == 0x180)
-			continue;   /* dead sprite */
+			break;
 
 		map_offset = tilenum << 7;
 
