@@ -164,24 +164,27 @@ void panicr_state::palette_init()
 	}
 
 	// tile lookup table
-	for (i = 0x100; i < 0x200; i++)
+	for (i = 0x000; i < 0x100; i++)
 	{
-		UINT8 ctabentry = (color_prom[i] & 0x3f) | 0x00;
+		UINT8 ctabentry = (color_prom[i+0x100] & 0x3f) | 0x00;
 
-		colortable_entry_set_value(machine().colortable, i, ctabentry);
+		colortable_entry_set_value(machine().colortable, ((i&0x0f) + ((i&0xf0)<<1))  +0x200, ctabentry);
+		colortable_entry_set_value(machine().colortable, ((i&0x0f) + ((i&0xf0)<<1))  +0x210, ctabentry);
+
 	}
 
 	// sprite lookup table
-	for (i = 0x200; i < 0x300; i++)
+	for (i = 0x000; i < 0x100; i++)
 	{
 		UINT8 ctabentry;
 
-		if (color_prom[i] & 0x40)
+		if (color_prom[i+0x200] & 0x40)
 			ctabentry = 0;
 		else
-			ctabentry = (color_prom[i] & 0x3f) | 0x40;
+			ctabentry = (color_prom[i+0x200] & 0x3f) | 0x40;
 
-		colortable_entry_set_value(machine().colortable, i, ctabentry);
+		colortable_entry_set_value(machine().colortable, i+0x100, ctabentry);
+
 	}
 }
 
@@ -290,7 +293,7 @@ UINT32 panicr_state::screen_update_panicr(screen_device &screen, bitmap_ind16 &b
 		{
 			UINT16 dat = srcline[x];
 
-			dstline[x] = ((dat & 0x00f) | ((dat & 0x1e0)>>1)) + 0x100;
+			dstline[x] = ((dat & 0x00f) | ((dat & 0x1e0)>>0)) + 0x200;
 
 		}
 
@@ -307,7 +310,7 @@ UINT32 panicr_state::screen_update_panicr(screen_device &screen, bitmap_ind16 &b
 		{
 			UINT16 dat = srcline[x];
 			if (dat & 0x10)
-				dstline[x] = ((dat & 0x00f) | ((dat & 0x1e0)>>1)) + 0x100;
+				dstline[x] = ((dat & 0x00f) | ((dat & 0x1e0)>>0)) + 0x200;
 
 		}
 
@@ -337,31 +340,30 @@ READ8_MEMBER(panicr_state::panicr_collision_r)
 	//
 	// there is a 3rd additional bit that is used as priority, we're not concerned about that here
 
-	// it definitely can't be using the lower scroll bits here because the requested offset moves relative
-	// to a page, not relative to the screen scroll, maybe there is a page select register and we shouldn't
-	// be using the scroll bits at all.#
-	
-	// the problem with this setup is obviously the collision map isn't going to represent what is on the
-	// screen once you start scrolling, but I can't find a collision page select independent of the scroll
-	m_infotilemap_2->set_scrollx(0, m_scrollx & 0xff00);
+	m_infotilemap_2->set_scrollx(0, m_scrollx & 0xffff);
 	m_infotilemap_2->draw(m_screen, *m_tempbitmap_1, m_tempbitmap_clip, 0,0);
 
 
 	int actual_column = offset&0x3f;
 	int actual_line = offset >> 6;
 
+
 	actual_column = actual_column * 4;
+
+	actual_column -= m_scrollx;
+	actual_column &= 0xff;
+
 
 	UINT8 ret = 0;
 	UINT16* srcline = &m_tempbitmap_1->pix16(actual_line);
 
 	
-	ret |= (srcline[actual_column+0]&3) << 6;
-	ret |= (srcline[actual_column+1]&3) << 4;
-	ret |= (srcline[actual_column+2]&3) << 2;
-	ret |= (srcline[actual_column+3]&3) << 0;
+	ret |= (srcline[(actual_column+0)&0xff]&3) << 6;
+	ret |= (srcline[(actual_column+1)&0xff]&3) << 4;
+	ret |= (srcline[(actual_column+2)&0xff]&3) << 2;
+	ret |= (srcline[(actual_column+3)&0xff]&3) << 0;
 
-//	printf("%06x: (scroll x upper bits is %04x (full %04x)) read %d %d\n", space.device().safe_pc(), (m_scrollx&0xff00)>>8, m_scrollx,  actual_line, actual_column);
+	logerror("%06x: (scroll x upper bits is %04x (full %04x)) read %d %d\n", space.device().safe_pc(), (m_scrollx&0xff00)>>8, m_scrollx,  actual_line, actual_column);
 
 
 	return ret;
@@ -372,11 +374,13 @@ READ8_MEMBER(panicr_state::panicr_collision_r)
 
 WRITE8_MEMBER(panicr_state::panicr_scrollx_lo_w)
 {
+	logerror("panicr_scrollx_lo_w %02x\n", data);
 	m_scrollx = (m_scrollx & 0xff00) | (data << 1 & 0xfe) | (data >> 7 & 0x01);
 }
 
 WRITE8_MEMBER(panicr_state::panicr_scrollx_hi_w)
 {
+	logerror("panicr_scrollx_hi_w %02x\n", data);
 	m_scrollx = (m_scrollx & 0xff) | ((data &0xf0) << 4) | ((data & 0x0f) << 12);
 }
 
@@ -385,6 +389,8 @@ WRITE8_MEMBER(panicr_state::panicr_output_w)
 	// d6, d7: play counter? (it only triggers on 1st coin)
 	coin_counter_w(machine(), 0, (data & 0x40) ? 1 : 0);
 	coin_counter_w(machine(), 1, (data & 0x80) ? 1 : 0);
+
+	logerror("panicr_output_w %02x\n", data);
 
 	// other bits: ?
 }
@@ -569,8 +575,8 @@ static const gfx_layout spritelayout =
 
 static GFXDECODE_START( panicr )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0x000,  8 )
-	GFXDECODE_ENTRY( "gfx2", 0, bgtilelayout,   0x000, 32 )
-	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,   0x200, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, bgtilelayout,   0x200, 32 )
+	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,   0x100, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, infotilelayout_2, 0x100, 16 ) // palette is just to make it viewable with F4
 
 GFXDECODE_END
@@ -605,7 +611,7 @@ static MACHINE_CONFIG_START( panicr, panicr_state )
 	MCFG_SCREEN_UPDATE_DRIVER(panicr_state, screen_update_panicr)
 
 	MCFG_GFXDECODE(panicr)
-	MCFG_PALETTE_LENGTH(256*3)
+	MCFG_PALETTE_LENGTH(256*4)
 
 
 	/* sound hardware */
