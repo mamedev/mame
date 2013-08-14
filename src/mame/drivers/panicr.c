@@ -329,11 +329,20 @@ UINT32 panicr_state::screen_update_panicr(screen_device &screen, bitmap_ind16 &b
 READ8_MEMBER(panicr_state::panicr_collision_r)
 {
 	// re-render the collision data here
-	// collisions are based on 2 bits from the rendered tile data, relative to a page of tiles
+	// collisions are based on 2 bits from the tile data, relative to a page of tiles
+	//
+	// the 2 collision bits represent
+	// solid areas of the playfield
+	// areas where flippers affect the ball
+	//
+	// there is a 3rd additional bit that is used as priority, we're not concerned about that here
 
 	// it definitely can't be using the lower scroll bits here because the requested offset moves relative
 	// to a page, not relative to the screen scroll, maybe there is a page select register and we shouldn't
-	// be using the scroll bits at all.
+	// be using the scroll bits at all.#
+	
+	// the problem with this setup is obviously the collision map isn't going to represent what is on the
+	// screen once you start scrolling, but I can't find a collision page select independent of the scroll
 	m_infotilemap_2->set_scrollx(0, m_scrollx & 0xff00);
 	m_infotilemap_2->draw(m_screen, *m_tempbitmap_1, m_tempbitmap_clip, 0,0);
 
@@ -352,7 +361,7 @@ READ8_MEMBER(panicr_state::panicr_collision_r)
 	ret |= (srcline[actual_column+2]&3) << 2;
 	ret |= (srcline[actual_column+3]&3) << 0;
 
-//	printf("read %d %d\n", actual_line, actual_column);
+//	printf("%06x: (scroll x upper bits is %04x (full %04x)) read %d %d\n", space.device().safe_pc(), (m_scrollx&0xff00)>>8, m_scrollx,  actual_line, actual_column);
 
 
 	return ret;
@@ -590,7 +599,9 @@ static MACHINE_CONFIG_START( panicr, panicr_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
+//	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+
 	MCFG_SCREEN_UPDATE_DRIVER(panicr_state, screen_update_panicr)
 
 	MCFG_GFXDECODE(panicr)
