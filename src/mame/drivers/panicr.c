@@ -3,8 +3,8 @@ Panic Road
 ----------
 
 TODO:
-- problems with bg collision
-- high priority tiles
+ - are collisions 100%, need to find reference videos of game being played properly to check things look ok (I think they are..)
+ - are priorities with sprites 100%, sprite-sprite priorities are ugly in many places, maybe the SEI0010BU are 3 sprite chips?
 
 --
 
@@ -252,13 +252,27 @@ void panicr_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect )
 	UINT8 *spriteram = m_spriteram;
 	int offs,flipx,flipy,x,y,color,sprite;
 
-	for (offs = 0; offs<0x1000; offs+=16)
+
+	// ssss ssss | Fx-- cccc | yyyy yyyy | xxxx xxxx
+
+	for (offs = 0; offs<0x1d00; offs+=16)
 	{
 		flipx = 0;
 		flipy = spriteram[offs+1] & 0x80;
 		y = spriteram[offs+2];
 		x = spriteram[offs+3];
 		if (spriteram[offs+1] & 0x40) x -= 0x100;
+
+		if (spriteram[offs+1] & 0x20)
+		{
+			// often set
+		}
+
+		if (spriteram[offs+1] & 0x10)
+		{
+			popmessage("(spriteram[offs+1] & 0x10) %02x\n", (spriteram[offs+1] & 0x10));
+		}
+
 
 		color = spriteram[offs+1] & 0x0f;
 		sprite = spriteram[offs+0] | (*m_spritebank << 8);
@@ -412,8 +426,8 @@ WRITE8_MEMBER(panicr_state::t5182shared_w)
 
 static ADDRESS_MAP_START( panicr_map, AS_PROGRAM, 8, panicr_state )
 	AM_RANGE(0x00000, 0x01fff) AM_RAM AM_SHARE("mainram")
-	AM_RANGE(0x02000, 0x02fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x03000, 0x03fff) AM_RAM
+	AM_RANGE(0x02000, 0x03cff) AM_RAM AM_SHARE("spriteram") // how big is sprite ram, some places definitely have sprites at 3000+
+	AM_RANGE(0x03d00, 0x03fff) AM_RAM
 	AM_RANGE(0x08000, 0x0bfff) AM_READ(panicr_collision_r)
 	AM_RANGE(0x0c000, 0x0cfff) AM_RAM AM_SHARE("textram")
 	AM_RANGE(0x0d000, 0x0d000) AM_DEVWRITE("t5182", t5182_device, sound_irq_w)
@@ -821,5 +835,5 @@ DRIVER_INIT_MEMBER(panicr_state,panicr)
 }
 
 
-GAME( 1986, panicr,  0,      panicr,  panicr, panicr_state,  panicr, ROT270, "Seibu Kaihatsu (Taito license)", "Panic Road (Japan)", GAME_NOT_WORKING )
-GAME( 1986, panicrg, panicr, panicr,  panicr, panicr_state,  panicr, ROT270, "Seibu Kaihatsu (Tuning license)", "Panic Road (Germany)", GAME_NOT_WORKING )
+GAME( 1986, panicr,  0,      panicr,  panicr, panicr_state,  panicr, ROT270, "Seibu Kaihatsu (Taito license)", "Panic Road (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1986, panicrg, panicr, panicr,  panicr, panicr_state,  panicr, ROT270, "Seibu Kaihatsu (Tuning license)", "Panic Road (Germany)", GAME_IMPERFECT_GRAPHICS )
