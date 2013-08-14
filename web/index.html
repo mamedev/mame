@@ -1,23 +1,27 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-	<title>MAME</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta charset="utf-8">
 	<meta http-equiv="pragma" content="no-cache">
-	<meta http-equiv="expires" content="-1">
-	<link rel="shortcut icon" href="favicon.ico">
-	<link href="css/main.css" media="screen" rel="stylesheet" type="text/css" />
-	<link href="css/dropdown.css" media="screen" rel="stylesheet" type="text/css" />
-	<link href="css/default.ultimate.css" media="screen" rel="stylesheet" type="text/css" />
+	<meta http-equiv="expires" content="-1">  
+	<meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<title>MAME</title>
+	<link rel="shortcut icon" href="favicon.ico">  
+	<link rel="stylesheet" href="css/jquery.mobile.css">    
+	<!-- jQuery and jQuery Mobile -->
 	<script src="js/jquery.js"></script>
+	<script src="js/jquery.mobile.js"></script>   
 </head>
 <body>
 <script language="javascript" type="text/javascript">
 
   var writeToScreen = function(message) {
-    document.getElementById('output').innerHTML = message;
+    document.getElementById('current').innerHTML = message;
   };
-  window.onload = function() {
+  
+  function startWebSocket() {
     var url = 'ws://localhost:8080/foo';
     websocket = new WebSocket(url);
     websocket.onopen = function(ev) {
@@ -38,7 +42,7 @@
 			if(data.name =='__empty') {
 				items.push('No driver running');
 			} else {
-				items.push('<h1>Currently running : ' + data.description + ' [' + data.manufacturer+']</h1>');
+				items.push('Currently running : ' + data.description + ' [' + data.manufacturer+']');
 
 			}
 			document.getElementById('current').innerHTML = items.join('');
@@ -51,45 +55,47 @@
     websocket.onerror = function(ev) {
       writeToScreen('<b style="color: red; ">Error</b>');
     };
+  }
+
+  window.onload = function() {
+	startWebSocket();
   };
 </script>
-<div data-role="page">
-    <div data-role="header">
-		<img src="images/logo-mame-small.png"/><div id="output" style="display: inline;"><b style="color:white;">Connecting...</b></div>
+<!-- Home -->
+<div data-role="page" id="page1">
+    <div data-theme="a" data-role="header">
+        <div style="width: 320px; height: 120px; position: relative;">
+            <img src="images/logo-mame-small.png" alt="image" style="position: absolute; top: 50%; left: 50%; margin-left: 0px; margin-top: -50px">
+        </div>
+        <a data-role="button" href="#page1" data-icon="home" data-iconpos="left" class="ui-btn-right">Home </a>
+        <div data-role="navbar" data-iconpos="top">
+            <ul>
+                <li>
+                    <a href="#page1" data-transition="fade" data-icon="bars">Driver</a>
+                </li>
+                <li>
+                    <a href="#page1" data-transition="fade" data-icon="gear">Options</a>
+                </li>
+                <li>
+                    <a href="#page1" data-transition="fade" data-icon="grid">Image</a>
+                </li>
+                <li>
+                    <a href="#page1" data-transition="fade" data-icon="info">Info</a>
+                </li>
+                <li>
+                    <a href="#page1" data-transition="fade" data-icon="check">Logs</a>
+                </li>
+            </ul>
+        </div>
     </div>
-
-<ul id="nav" class="dropdown dropdown-horizontal">
-	<li id="n-home"><a href="./">Home</a></li>
-	<li id="n-logs"><a href="./" class="dir">Logs</a>
-		<ul>
-			<li class="first"><a href="./"><strong>OS log</strong></a></li>
-			<li><a href="./">Verbose</a></li>
-			<li><a href="./">Driver log</a></li>
-		</ul>
-	</li>
-	<li id="n-options"><a href="./" class="dir">Options</a>
-		<ul>
-			<li class="first"><span class="dir">Video</span>
-				<ul>
-					<li class="first"><a href="./">Option 1</a></li>
-					<li><a href="./">Option 2</a></li>
-					<li><a href="./">Option 3</a></li>
-					<li><a href="./">Option 4</a></li>
-					<li><a href="./">Option 5</a></li>
-				</ul>
-			</li>
-			<li><span class="dir">Sound</span>
-				<ul>
-					<li class="first"><a href="./">Option 1</a></li>
-					<li><a href="./">Option 2</a></li>
-				</ul>
-			</li>
-		</ul>
-	</li>
-	<li id="n-debugger"><a href="./">Debugger</a></li>
-</ul>
-<br/><br/><br/><br/>
-<div id="current"></div>
+    <div data-role="content">		
+    </div>
+    <div data-theme="a" data-role="footer" data-position="fixed">
+        <h3>
+            <div id="current"></div>
+        </h3>
+		<a data-role="button" href="javascript:startWebSocket();" data-icon="refresh" data-iconpos="left" class="ui-btn-right">Reconnect</a>
+    </div>
 </div>
 </body>
 </html>
