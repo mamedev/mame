@@ -1975,6 +1975,7 @@ void taitob_state::machine_reset()
 	m_coin_word = 0;
 }
 
+
 static MACHINE_CONFIG_START( rastsag2, taitob_state )
 
 	/* basic machine hardware */
@@ -2016,6 +2017,66 @@ static MACHINE_CONFIG_START( rastsag2, taitob_state )
 	MCFG_SOUND_ROUTE(2, "mono", 1.0)
 
 	MCFG_TC0140SYT_ADD("tc0140syt", taitob_tc0140syt_intf)
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_START( masterw, taitob_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
+	MCFG_CPU_PROGRAM_MAP(masterw_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitob_state,  masterw_interrupt)
+
+	MCFG_CPU_ADD("audiocpu", Z80, 4000000)  /* 4 MHz */
+	MCFG_CPU_PROGRAM_MAP(masterw_sound_map)
+
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+
+
+	MCFG_TC0220IOC_ADD("tc0220ioc", taitob_io_intf)
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
+	MCFG_SCREEN_VBLANK_DRIVER(taitob_state, screen_eof_taitob)
+
+	MCFG_GFXDECODE(taito_b)
+	MCFG_PALETTE_LENGTH(4096)
+
+	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order2)
+
+	MCFG_TC0180VCU_ADD("tc0180vcu", color2_tc0180vcu_intf)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("ymsnd", YM2203, 3000000)
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE(taitob_state, irqhandler))
+	MCFG_YM2203_AY8910_INTF(&ay8910_config)
+	MCFG_SOUND_ROUTE(0, "mono", 0.25)
+	MCFG_SOUND_ROUTE(1, "mono", 0.25)
+	MCFG_SOUND_ROUTE(2, "mono", 0.25)
+	MCFG_SOUND_ROUTE(3, "mono", 0.80)
+
+	MCFG_TC0140SYT_ADD("tc0140syt", taitob_tc0140syt_intf)
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( tetrist, rastsag2 ) /* Nastar conversion kit with slightly different memory map */
+
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(tetrist_map)
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( tetrista, masterw ) /* Master of Weapon conversion kit with slightly different memory map */
+
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(tetrista_map)
 MACHINE_CONFIG_END
 
 
@@ -2106,94 +2167,6 @@ static MACHINE_CONFIG_START( crimec, taitob_state )
 	MCFG_TC0140SYT_ADD("tc0140syt", taitob_tc0140syt_intf)
 MACHINE_CONFIG_END
 
-
-static MACHINE_CONFIG_START( tetrist, taitob_state )
-
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz ???*/
-	MCFG_CPU_PROGRAM_MAP(tetrist_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitob_state,  rastansaga2_interrupt)
-
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000)  /* 4 MHz */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
-
-
-	MCFG_TC0220IOC_ADD("tc0220ioc", taitob_io_intf)
-
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_DRIVER(taitob_state, screen_eof_taitob)
-
-	MCFG_GFXDECODE(taito_b)
-	MCFG_PALETTE_LENGTH(4096)
-
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order0)
-
-	MCFG_TC0180VCU_ADD("tc0180vcu", color0_tc0180vcu_intf)
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitob_state, irqhandler))
-	MCFG_SOUND_ROUTE(0, "mono", 0.25)
-	MCFG_SOUND_ROUTE(1, "mono", 1.0)
-	MCFG_SOUND_ROUTE(2, "mono", 1.0)
-
-	MCFG_TC0140SYT_ADD("tc0140syt", taitob_tc0140syt_intf)
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_START( tetrista, taitob_state )
-
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
-	MCFG_CPU_PROGRAM_MAP(tetrista_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitob_state,  masterw_interrupt)
-
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000)  /* 4 MHz */
-	MCFG_CPU_PROGRAM_MAP(masterw_sound_map)
-
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
-
-
-	MCFG_TC0220IOC_ADD("tc0220ioc", taitob_io_intf)
-
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_DRIVER(taitob_state, screen_eof_taitob)
-
-	MCFG_GFXDECODE(taito_b)
-	MCFG_PALETTE_LENGTH(4096)
-
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order2)
-
-	MCFG_TC0180VCU_ADD("tc0180vcu", color2_tc0180vcu_intf)
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_SOUND_ADD("ymsnd", YM2203, 3000000)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(taitob_state, irqhandler))
-	MCFG_YM2203_AY8910_INTF(&ay8910_config)
-	MCFG_SOUND_ROUTE(0, "mono", 0.25)
-	MCFG_SOUND_ROUTE(1, "mono", 0.25)
-	MCFG_SOUND_ROUTE(2, "mono", 0.25)
-	MCFG_SOUND_ROUTE(3, "mono", 0.80)
-
-	MCFG_TC0140SYT_ADD("tc0140syt", taitob_tc0140syt_intf)
-MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( hitice, taitob_state )
 
@@ -2331,6 +2304,7 @@ static MACHINE_CONFIG_START( rambo3, taitob_state )
 
 	MCFG_TC0140SYT_ADD("tc0140syt", taitob_tc0140syt_intf)
 MACHINE_CONFIG_END
+
 
 static MACHINE_CONFIG_START( pbobble, taitob_state )
 
@@ -2564,51 +2538,6 @@ static MACHINE_CONFIG_START( viofight, taitob_state )
 
 	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MCFG_TC0140SYT_ADD("tc0140syt", taitob_tc0140syt_intf)
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_START( masterw, taitob_state )
-
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
-	MCFG_CPU_PROGRAM_MAP(masterw_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitob_state,  masterw_interrupt)
-
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000)  /* 4 MHz */
-	MCFG_CPU_PROGRAM_MAP(masterw_sound_map)
-
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
-
-
-	MCFG_TC0220IOC_ADD("tc0220ioc", taitob_io_intf)
-
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_DRIVER(taitob_state, screen_eof_taitob)
-
-	MCFG_GFXDECODE(taito_b)
-	MCFG_PALETTE_LENGTH(4096)
-
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order2)
-
-	MCFG_TC0180VCU_ADD("tc0180vcu", color2_tc0180vcu_intf)
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_SOUND_ADD("ymsnd", YM2203, 3000000)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(taitob_state, irqhandler))
-	MCFG_YM2203_AY8910_INTF(&ay8910_config)
-	MCFG_SOUND_ROUTE(0, "mono", 0.25)
-	MCFG_SOUND_ROUTE(1, "mono", 0.25)
-	MCFG_SOUND_ROUTE(2, "mono", 0.25)
-	MCFG_SOUND_ROUTE(3, "mono", 0.80)
 
 	MCFG_TC0140SYT_ADD("tc0140syt", taitob_tc0140syt_intf)
 MACHINE_CONFIG_END
