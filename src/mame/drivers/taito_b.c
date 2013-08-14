@@ -3047,7 +3047,7 @@ ROM_START( ashurau )
 	ROM_LOAD( "c43-01",  0x00000, 0x80000, CRC(db953f37) SHA1(252591b676366d4828acb20c77aa9960ad9b367e) )
 ROM_END
 
-ROM_START( tetrist )
+ROM_START( tetrist ) // Rastan conversion with graphics and sound ROMs left in place
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 512k for 68000 code */
 	ROM_LOAD16_BYTE( "c12-03.bin", 0x000000, 0x020000, CRC(38f1ed41) SHA1(d11194dd6686e6eba8c481bb0f9662041ca396ed) )
 	ROM_LOAD16_BYTE( "c12-02.bin", 0x000001, 0x020000, CRC(ed9530bc) SHA1(84c324e4ef0c5c3af04ea000ad3e9c319bd9f2a2) )
@@ -3059,16 +3059,25 @@ ROM_START( tetrist )
 	ROM_CONTINUE(           0x10000, 0xc000 ) /* banked stuff */
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_ERASE00 )
-	/* empty (uses only pixel layer) */
 
-	ROM_REGION( 0x80000, "ymsnd", ROMREGION_ERASE00 )   /* ADPCM samples */
-	/* empty */
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	/* b81-03.14 & b81-04.15 are present on the original board and are actually from Rastan
+	  the game doesn't use any tiles from here but the roms must be present on the board to avoid
+	  tile 0 being solid and obscuring the bitmap (however if we load them in the correct region
+	  unwanted tiles from here are shown after gameover which is wrong) - There is an undumped PAL
+          C12-01 that controls this effect.
+	 */
+	ROM_LOAD( "b81-03.14", 0x000000, 0x080000, CRC(551b75e6) SHA1(5b8388ee2c6262f359c9e6d04c951ea8dc3901c9) )
+	ROM_LOAD( "b81-04.15", 0x080000, 0x080000, CRC(cf734e12) SHA1(4201a74468058761454515738fbf3a7b22a66e00) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", ROMREGION_ERASE00 )    /* DELTA-T samples */
-	/* empty */
+	ROM_REGION( 0x80000, "ymsnd", 0 )
+	ROM_LOAD( "b81-02.2", 0x00000, 0x80000, CRC(20ec3b86) SHA1(fcdcc7f0a09feb824d8d73b1af0aae7ec30fd1ed) )
+
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )
+	ROM_LOAD( "b81-01.1", 0x00000, 0x80000, CRC(b33f796b) SHA1(6cdb32f56283acdf20eb46a1e658e3bd7c97978c) )
 ROM_END
 
-ROM_START( tetrista ) // Master of Weapon conversion
+ROM_START( tetrista ) // Master of Weapon conversion with graphics ROMs left in place
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 512k for 68000 code */
 	ROM_LOAD16_BYTE( "c35-04.33", 0x000000, 0x020000, CRC(fa6e42ff) SHA1(1c586243aaf57b46338f22ae0fcdba2897ccb98a) )
 	ROM_LOAD16_BYTE( "c35-03.24", 0x000001, 0x020000, CRC(aebd8539) SHA1(5230c0513581513ba971da55c04da8ba451a16e2) )
@@ -3077,16 +3086,16 @@ ROM_START( tetrista ) // Master of Weapon conversion
 
 	ROM_REGION( 0x1c000, "audiocpu", 0 )     /* 64k for Z80 code */
 	ROM_LOAD( "c35-05.30", 0x00000, 0x4000, CRC(785c63fb) SHA1(13db76d8ce52ff21bfda0866c9c6b52147c6fc9d) )
-	ROM_CONTINUE(           0x10000, 0xc000 ) /* banked stuff */
+	ROM_CONTINUE(          0x10000, 0xc000 ) /* banked stuff */
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x100000, "gfx2", 0 )
-	/* these roms (present on the original board) are actually from Master of Weapon (Japan)
-	 b72-01.rom              mow-m01.rom             IDENTICAL
-	 b72-02.rom              mow-m02.rom             IDENTICAL
+	/* b72-01.5 & b72-02.6 are present on the original board and are actually from Master of Weapon
 	  the game doesn't use any tiles from here but the roms must be present on the board to avoid
 	  tile 0 being solid and obscuring the bitmap (however if we load them in the correct region
-	  unwanted tiles from here are shown after gameover which is wrong)
+	  unwanted tiles from here are shown after gameover which is wrong) - There is an undumped PAL
+          C35-06 that controls this effect.
 	 */
 	ROM_LOAD( "b72-02.6", 0x000000, 0x080000, CRC(843444eb) SHA1(2b466045f882996c80e0090009ee957e11d32825) )
 	ROM_LOAD( "b72-01.5", 0x080000, 0x080000, CRC(a24ac26e) SHA1(895715a2bb0cb15334cba2283bd228b4fc08cd0c) )
