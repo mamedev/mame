@@ -3418,6 +3418,62 @@ DRIVER_INIT_MEMBER(segas1x_bootleg_state,fpointbl)
 	m_fore_yscroll = 2;
 }
 
+WRITE16_MEMBER(segas1x_bootleg_state::altbeastbl_gfx_w)
+{
+	switch (offset) {
+		case 0x00: {
+			m_bg_scrolly = data + 1;
+			break;
+		}
+	
+		case 0x04: {
+			m_bg_scrollx = ((data ^ 0xffff) & 0x3ff) + 2;
+			break;
+		}
+		
+		case 0x08: {
+			m_fg_scrolly = data + 1;
+			break;
+		}
+		
+		case 0x0c: {
+			m_fg_scrollx = ((data ^ 0xffff) & 0x3ff) + 4;
+			break;
+		}
+		
+		case 0x10: {
+			m_bg_page[0] = (data >> 0) & 0x0f;
+			m_fg_page[0] = (data >> 4) & 0x0f;
+			break;
+		}
+		
+		case 0x11: {
+			m_bg_page[1] = (data >> 0) & 0x0f;
+			m_fg_page[1] = (data >> 4) & 0x0f;
+			break;
+		}
+		
+		case 0x12: {
+			m_bg_page[2] = (data >> 0) & 0x0f;
+			m_fg_page[2] = (data >> 4) & 0x0f;
+			break;
+		}
+		
+		case 0x13: {
+			m_bg_page[3] = (data >> 0) & 0x0f;
+			m_fg_page[3] = (data >> 4) & 0x0f;
+			break;
+		}
+	}
+}
+
+DRIVER_INIT_MEMBER(segas1x_bootleg_state,altbeastbl)
+{
+	DRIVER_INIT_CALL(common);
+	
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x418000, 0x418029, write16_delegate(FUNC(segas1x_bootleg_state::altbeastbl_gfx_w),this));
+}
+
 /* Tetris-based */
 DRIVER_INIT_MEMBER(segas1x_bootleg_state,beautyb)
 {
@@ -3512,7 +3568,7 @@ GAME( 1989, goldnaxeb1,  goldnaxe,  goldnaxeb1,  goldnaxe, segas1x_bootleg_state
 GAME( 1989, goldnaxeb2,  goldnaxe,  goldnaxeb2,  goldnaxe, segas1x_bootleg_state,  goldnaxeb2, ROT0,   "bootleg", "Golden Axe (bootleg)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 1989, tturfbl,     tturf,     tturfbl,     tturf, segas1x_bootleg_state,     tturfbl,    ROT0,   "bootleg (Datsu)", "Tough Turf (Datsu bootleg)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1989, dduxbl,      ddux,      dduxbl,      ddux, segas1x_bootleg_state,      dduxbl,     ROT0,   "bootleg (Datsu)", "Dynamite Dux (Datsu bootleg)", GAME_NOT_WORKING )
-GAME( 1988, altbeastbl,  altbeast,  tetrisbl,    tetris, segas1x_bootleg_state,    dduxbl,     ROT0,   "bootleg (Datsu)", "Altered Beast (Datsu bootleg)", GAME_NOT_WORKING )
+GAME( 1988, altbeastbl,  altbeast,  tetrisbl,    tetris, segas1x_bootleg_state,    altbeastbl, ROT0,   "bootleg (Datsu)", "Altered Beast (Datsu bootleg)", GAME_NOT_WORKING )
 GAME( 1989, eswatbl,     eswat,     eswatbl,     eswat, segas1x_bootleg_state,     eswatbl,    ROT0,   "bootleg", "E-Swat - Cyber Police (bootleg)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
 GAME( 1989, fpointbl,    fpoint,    fpointbl,    fpointbl, segas1x_bootleg_state,  fpointbl,   ROT0,   "bootleg (Datsu)", "Flash Point (World, bootleg)", GAME_NOT_WORKING )
 GAME( 1989, fpointbj,    fpoint,    fpointbl,    fpointbl, segas1x_bootleg_state,  fpointbl,   ROT0,   "bootleg (Datsu)", "Flash Point (Japan, bootleg)", GAME_NOT_WORKING )

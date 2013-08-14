@@ -146,6 +146,7 @@ public:
 	DECLARE_WRITE16_MEMBER(goldnaxeb2_fgpage_w);
 	DECLARE_WRITE16_MEMBER(goldnaxeb2_bgpage_w);
 	DECLARE_WRITE16_MEMBER(eswat_tilebank0_w);
+	DECLARE_WRITE16_MEMBER(altbeastbl_gfx_w);
 	DECLARE_READ16_MEMBER(beautyb_unkx_r);
 	DECLARE_WRITE16_MEMBER(sys18_refreshenable_w);
 	DECLARE_WRITE16_MEMBER(sys18_tilebank_w);
@@ -171,6 +172,7 @@ public:
 	DECLARE_DRIVER_INIT(astormbl);
 	DECLARE_DRIVER_INIT(shdancbl);
 	DECLARE_DRIVER_INIT(dduxbl);
+	DECLARE_DRIVER_INIT(altbeastbl);
 	DECLARE_DRIVER_INIT(goldnaxeb2);
 	DECLARE_DRIVER_INIT(bayrouteb1);
 	DECLARE_DRIVER_INIT(beautyb);
