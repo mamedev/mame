@@ -2359,6 +2359,7 @@ $(MESSOBJ)/skeleton.a:          \
 	$(MESS_DRIVERS)/chaos.o     \
 	$(MESS_DRIVERS)/chesstrv.o  \
 	$(MESS_DRIVERS)/cd2650.o    \
+	$(MESS_DRIVERS)/cdc721.o    \
 	$(MESS_DRIVERS)/codata.o    \
 	$(MESS_DRIVERS)/cortex.o    \
 	$(MESS_DRIVERS)/cosmicos.o  \

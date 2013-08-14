@@ -6187,6 +6187,7 @@ src/mess/drivers/cbm2.c svneol=native#text/plain
 src/mess/drivers/ccs2422.c svneol=native#text/plain
 src/mess/drivers/ccs2810.c svneol=native#text/plain
 src/mess/drivers/cd2650.c svneol=native#text/plain
+src/mess/drivers/cdc721.c svneol=native#text/plain
 src/mess/drivers/cfx9850.c svneol=native#text/plain
 src/mess/drivers/cgc7900.c svneol=native#text/plain
 src/mess/drivers/cgenie.c svneol=native#text/plain
