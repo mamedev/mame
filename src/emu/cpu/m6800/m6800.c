@@ -1044,6 +1044,13 @@ void m6800_cpu_device::device_start()
 	m_out_sertx_func.resolve_safe();
 	m_sci_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m6800_cpu_device::sci_tick),this));
 
+	m_port4_ddr = 0;
+	m_port4_data = 0;
+	m_input_capture = 0;
+	m_rdr = 0;
+	m_tdr = 0;
+	m_ram_ctrl = 0;
+
 	save_item(NAME(m_ppc.w.l));
 	save_item(NAME(m_pc.w.l));
 	save_item(NAME(m_s.w.l));
