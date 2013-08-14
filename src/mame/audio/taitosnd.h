@@ -36,18 +36,18 @@ protected:
 	virtual void device_reset();
 
 public:
-	// MASTER (8bit bus) control functions
+	// MASTER (4-bit bus) control functions
 	DECLARE_WRITE8_MEMBER( tc0140syt_port_w );
 	DECLARE_WRITE8_MEMBER( tc0140syt_comm_w );
 	DECLARE_READ8_MEMBER( tc0140syt_comm_r );
 
-	// SLAVE (8bit bus) control functions ONLY
+	// SLAVE (4-bit bus) control functions ONLY
 	DECLARE_WRITE8_MEMBER( tc0140syt_slave_port_w );
 	DECLARE_READ8_MEMBER( tc0140syt_slave_comm_r );
 	DECLARE_WRITE8_MEMBER( tc0140syt_slave_comm_w );
 
 private:
-	void interrupt_controller();
+	void update_nmi();
 
 private:
 	UINT8     m_slavedata[4];  /* Data on master->slave port (4 nibbles) */
@@ -56,7 +56,6 @@ private:
 	UINT8     m_submode;       /* Access mode on slave cpu side */
 	UINT8     m_status;        /* Status data */
 	UINT8     m_nmi_enabled;   /* 1 if slave cpu has nmi's enabled */
-	UINT8     m_nmi_req;       /* 1 if slave cpu has a pending nmi */
 
 	device_t *m_mastercpu;     /* this is the maincpu */
 	device_t *m_slavecpu;      /* this is the audiocpu */
