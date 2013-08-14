@@ -3047,7 +3047,7 @@ ROM_START( ashurau )
 	ROM_LOAD( "c43-01",  0x00000, 0x80000, CRC(db953f37) SHA1(252591b676366d4828acb20c77aa9960ad9b367e) )
 ROM_END
 
-ROM_START( tetrist ) // Rastan conversion with graphics and sound ROMs left in place
+ROM_START( tetrist ) // Nastar / Nastar Warrior / Rastan Saga 2 conversion with graphics and sound ROMs left in place
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 512k for 68000 code */
 	ROM_LOAD16_BYTE( "c12-03.bin", 0x000000, 0x020000, CRC(38f1ed41) SHA1(d11194dd6686e6eba8c481bb0f9662041ca396ed) )
 	ROM_LOAD16_BYTE( "c12-02.bin", 0x000001, 0x020000, CRC(ed9530bc) SHA1(84c324e4ef0c5c3af04ea000ad3e9c319bd9f2a2) )
@@ -3635,7 +3635,7 @@ GAME( 1989, rambo3p,  rambo3,  rambo3p,  rambo3p, taitob_state,  taito_b, ROT0, 
 GAME( 1989, crimec,   0,       crimec,   crimec, taitob_state,   taito_b, ROT0,   "Taito Corporation Japan", "Crime City (World)", GAME_SUPPORTS_SAVE )
 GAME( 1989, crimecu,  crimec,  crimec,   crimecu, taitob_state,  taito_b, ROT0,   "Taito America Corporation", "Crime City (US)", GAME_SUPPORTS_SAVE )
 GAME( 1989, crimecj,  crimec,  crimec,   crimecj, taitob_state,  taito_b, ROT0,   "Taito Corporation", "Crime City (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1988, tetrist,  tetris,  tetrist,  tetrist, taitob_state,  taito_b, ROT0,   "Sega", "Tetris (Japan, Taito B-System, Rastan Conversion Kit)", GAME_SUPPORTS_SAVE )
+GAME( 1988, tetrist,  tetris,  tetrist,  tetrist, taitob_state,  taito_b, ROT0,   "Sega", "Tetris (Japan, Taito B-System, Nastar Conversion Kit)", GAME_SUPPORTS_SAVE )
 GAME( 1988, tetrista, tetris,  tetrista, tetrist, taitob_state,  taito_b, ROT0,   "Sega", "Tetris (Japan, Taito B-System, Master of Weapon Conversion Kit)", GAME_SUPPORTS_SAVE )
 GAME( 1989, viofight, 0,       viofight, viofight, taitob_state, taito_b, ROT0,   "Taito Corporation Japan", "Violence Fight (World)", GAME_SUPPORTS_SAVE )
 GAME( 1989, viofightu,viofight,viofight, viofightu, taitob_state,taito_b, ROT0,   "Taito America Corporation", "Violence Fight (US)", GAME_SUPPORTS_SAVE )
