@@ -102,6 +102,32 @@ int web_engine::begin_request_handler(struct mg_connection *conn)
 			return 1;
 		}		
 	}
+	if (!strncmp(request_info->uri, "/screenshot.png",15)) 
+	{
+		screen_device_iterator iter(m_machine->root_device());
+		screen_device *screen = iter.first();
+
+		if (screen == NULL)
+		{
+			return 0;
+		}
+
+		astring fname("screenshot.png");
+		emu_file file(m_machine->options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+		file_error filerr = file.open(fname);
+
+		if (filerr != FILERR_NONE)
+		{
+			return 0;
+		}
+
+		m_machine->video().save_snapshot(screen, file);
+		astring fullpath(file.fullpath());
+		file.close();
+		
+		mg_send_file(conn,fullpath);
+		return 1;
+	}
 	return 0;
 } 
 

@@ -21,6 +21,11 @@
     document.getElementById('current').innerHTML = message;
   };
   
+  function takeScreenshot()
+  {
+	document.getElementById('content').innerHTML = '<center><img src="/screenshot.png"/></center>';
+  }
+  
   function startWebSocket() {
     var url = 'ws://localhost:8080/foo';
     websocket = new WebSocket(url);
@@ -28,7 +33,7 @@
 	  writeToScreen('<b style="color: green;">Connected</b>');
     };
     websocket.onclose = function(ev) {      
-      writeToScreen('<b style="color: white;">Disconnected</b>');
+      writeToScreen('<b style="color: red;">Disconnected</b>');
     };
     websocket.onmessage = function(ev) {
 	if (ev.data=='update_machine') 
@@ -80,21 +85,33 @@
                     <a href="#page1" data-transition="fade" data-icon="grid">Image</a>
                 </li>
                 <li>
-                    <a href="#page1" data-transition="fade" data-icon="info">Info</a>
-                </li>
-                <li>
-                    <a href="#page1" data-transition="fade" data-icon="check">Logs</a>
+                    <a href="#page1" data-transition="fade" data-icon="star">Commands</a>
                 </li>
             </ul>
         </div>
     </div>
-    <div data-role="content">		
+    <div data-role="content" id ="content">		
     </div>
     <div data-theme="a" data-role="footer" data-position="fixed">
-        <h3>
-            <div id="current"></div>
-        </h3>
-		<a data-role="button" href="javascript:startWebSocket();" data-icon="refresh" data-iconpos="left" class="ui-btn-right">Reconnect</a>
+		<div  data-role="navbar" data-iconpos="top">
+			<ul>
+				<li>
+					<a href="#page1" data-transition="fade" data-icon="info">Info</a>
+				</li>
+				<li>
+					<a href="#page1" data-transition="fade" data-icon="check">Logs</a>
+				</li>
+				<li>
+					<a href="javascript:takeScreenshot();" data-transition="fade" data-icon="search">Screenshot</a>
+				</li>
+				<li>
+					<a href="javascript:startWebSocket();" data-transition="fade" data-icon="refresh">Reconnect</a>
+				</li>
+			</ul>
+		</div>
+		<h3>
+			<div id="current"></div>
+		</h3>
     </div>
 </div>
 </body>
