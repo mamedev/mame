@@ -2978,19 +2978,19 @@ ROM_END
 
 ROM_START( tetrist ) // Nastar / Nastar Warrior / Rastan Saga 2 conversion with graphics and sound ROMs left in place
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 512k for 68000 code */
-	ROM_LOAD16_BYTE( "c12-03.bin", 0x000000, 0x020000, CRC(38f1ed41) SHA1(d11194dd6686e6eba8c481bb0f9662041ca396ed) )
-	ROM_LOAD16_BYTE( "c12-02.bin", 0x000001, 0x020000, CRC(ed9530bc) SHA1(84c324e4ef0c5c3af04ea000ad3e9c319bd9f2a2) )
-	ROM_LOAD16_BYTE( "c12-05.bin", 0x040000, 0x020000, CRC(128e9927) SHA1(227b4a43074b66c9ba6f4497eb329fbcc5e3f52b) )
-	ROM_LOAD16_BYTE( "c12-04.bin", 0x040001, 0x020000, CRC(5da7a319) SHA1(0c903b3274f6eafe24c8b5ef476dc5e8e3131b20) )
+	ROM_LOAD16_BYTE( "c12-03.50", 0x000000, 0x020000, CRC(38f1ed41) SHA1(d11194dd6686e6eba8c481bb0f9662041ca396ed) )
+	ROM_LOAD16_BYTE( "c12-02.31", 0x000001, 0x020000, CRC(ed9530bc) SHA1(84c324e4ef0c5c3af04ea000ad3e9c319bd9f2a2) )
+	ROM_LOAD16_BYTE( "c12-05.49", 0x040000, 0x020000, CRC(128e9927) SHA1(227b4a43074b66c9ba6f4497eb329fbcc5e3f52b) )
+	ROM_LOAD16_BYTE( "c12-04.30", 0x040001, 0x020000, CRC(5da7a319) SHA1(0c903b3274f6eafe24c8b5ef476dc5e8e3131b20) )
 
 	ROM_REGION( 0x1c000, "audiocpu", 0 )     /* 64k for Z80 code */
-	ROM_LOAD( "c12-06.bin", 0x00000, 0x4000, CRC(f2814b38) SHA1(846d3cc7a6f1cfbfd5661d6942f24330d21f91f0) )
-	ROM_CONTINUE(           0x10000, 0xc000 ) /* banked stuff */
+	ROM_LOAD( "c12-06.37", 0x00000, 0x4000, CRC(f2814b38) SHA1(846d3cc7a6f1cfbfd5661d6942f24330d21f91f0) )
+	ROM_CONTINUE(          0x10000, 0xc000 ) /* banked stuff */
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )
-	/* b81-03.14 & b81-04.15 are present on the original board and are actually from Rastan
+	/* b81-03.14 & b81-04.15 are present on the original board and are actually from Nastar
 	  the game doesn't use any tiles from here but the roms must be present on the board to avoid
 	  tile 0 being solid and obscuring the bitmap (however if we load them in the correct region
 	  unwanted tiles from here are shown after gameover which is wrong) - There is an undumped PAL
@@ -3552,38 +3552,38 @@ DRIVER_INIT_MEMBER(taitob_state,taito_b)
 	membank("bank1")->configure_entries(0, 4, memregion("audiocpu")->base() + 0x10000, 0x4000);
 }
 
-GAME( 1989, masterw,  0,       masterw,  masterw, taitob_state,  taito_b, ROT270, "Taito Corporation Japan", "Master of Weapon (World)", GAME_SUPPORTS_SAVE )
-GAME( 1989, masterwu, masterw, masterw,  masterwu, taitob_state, taito_b, ROT270, "Taito America Corporation", "Master of Weapon (US)", GAME_SUPPORTS_SAVE )
-GAME( 1989, masterwj, masterw, masterw,  masterwj, taitob_state, taito_b, ROT270, "Taito Corporation", "Master of Weapon (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1988, nastar,   0,       rastsag2, nastar, taitob_state,   taito_b, ROT0,   "Taito Corporation Japan", "Nastar (World)", GAME_SUPPORTS_SAVE )
-GAME( 1988, nastarw,  nastar,  rastsag2, nastarw, taitob_state,  taito_b, ROT0,   "Taito America Corporation", "Nastar Warrior (US)", GAME_SUPPORTS_SAVE )
-GAME( 1988, rastsag2, nastar,  rastsag2, rastsag2, taitob_state, taito_b, ROT0,   "Taito Corporation", "Rastan Saga 2 (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1989, rambo3,   0,       rambo3,   rambo3, taitob_state,   taito_b, ROT0,   "Taito Europe Corporation", "Rambo III (Europe)", GAME_SUPPORTS_SAVE )
-GAME( 1989, rambo3u,  rambo3,  rambo3,   rambo3u, taitob_state,  taito_b, ROT0,   "Taito America Corporation", "Rambo III (US)", GAME_SUPPORTS_SAVE )
-GAME( 1989, rambo3p,  rambo3,  rambo3p,  rambo3p, taitob_state,  taito_b, ROT0,   "Taito Europe Corporation", "Rambo III (Europe, Proto?)", GAME_SUPPORTS_SAVE )
-GAME( 1989, crimec,   0,       crimec,   crimec, taitob_state,   taito_b, ROT0,   "Taito Corporation Japan", "Crime City (World)", GAME_SUPPORTS_SAVE )
-GAME( 1989, crimecu,  crimec,  crimec,   crimecu, taitob_state,  taito_b, ROT0,   "Taito America Corporation", "Crime City (US)", GAME_SUPPORTS_SAVE )
-GAME( 1989, crimecj,  crimec,  crimec,   crimecj, taitob_state,  taito_b, ROT0,   "Taito Corporation", "Crime City (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1988, tetrist,  tetris,  tetrist,  tetrist, taitob_state,  taito_b, ROT0,   "Sega", "Tetris (Japan, Taito B-System, Nastar Conversion Kit)", GAME_SUPPORTS_SAVE )
-GAME( 1988, tetrista, tetris,  tetrista, tetrist, taitob_state,  taito_b, ROT0,   "Sega", "Tetris (Japan, Taito B-System, Master of Weapon Conversion Kit)", GAME_SUPPORTS_SAVE )
-GAME( 1989, viofight, 0,       viofight, viofight, taitob_state, taito_b, ROT0,   "Taito Corporation Japan", "Violence Fight (World)", GAME_SUPPORTS_SAVE )
-GAME( 1989, viofightu,viofight,viofight, viofightu, taitob_state,taito_b, ROT0,   "Taito America Corporation", "Violence Fight (US)", GAME_SUPPORTS_SAVE )
-GAME( 1989, viofightj,viofight,viofight, viofightj, taitob_state,taito_b, ROT0,   "Taito Corporation", "Violence Fight (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1990, ashura,   0,       ashura,   ashura, taitob_state,   taito_b, ROT270, "Taito Corporation Japan", "Ashura Blaster (World)", GAME_SUPPORTS_SAVE )
-GAME( 1990, ashuraj,  ashura,  ashura,   ashuraj, taitob_state,  taito_b, ROT270, "Taito Corporation", "Ashura Blaster (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1990, ashurau,  ashura,  ashura,   ashurau, taitob_state,  taito_b, ROT270, "Taito America Corporation", "Ashura Blaster (US)", GAME_SUPPORTS_SAVE )
-GAME( 1990, hitice,   0,       hitice,   hitice, taitob_state,   taito_b, ROT0,   "Taito Corporation (Williams license)", "Hit the Ice (US)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1990, hiticej,  hitice,  hitice,   hiticej, taitob_state,  taito_b, ROT0,   "Taito Corporation (licensed from Midway)", "Hit the Ice (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1991, selfeena, 0,       selfeena, selfeena, taitob_state, taito_b, ROT0,   "East Technology", "Sel Feena", GAME_SUPPORTS_SAVE )
-GAME( 1992, silentd,  0,       silentd,  silentd, taitob_state,  taito_b, ROT0,   "Taito Corporation Japan", "Silent Dragon (World)", GAME_SUPPORTS_SAVE )
-GAME( 1992, silentdj, silentd, silentd,  silentdj, taitob_state, taito_b, ROT0,   "Taito Corporation", "Silent Dragon (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1992, silentdu, silentd, silentd,  silentdu, taitob_state, taito_b, ROT0,   "Taito America Corporation", "Silent Dragon (US)", GAME_SUPPORTS_SAVE )
-GAME( 1993, ryujin,   0,       ryujin,   ryujin, taitob_state,   taito_b, ROT270, "Taito Corporation", "Ryu Jin (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1993, qzshowby, 0,       qzshowby, qzshowby, taitob_state, taito_b, ROT0,   "Taito Corporation", "Quiz Sekai wa SHOW by shobai (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1994, pbobble,  0,       pbobble,  pbobble, taitob_state,  taito_b, ROT0,   "Taito Corporation", "Puzzle Bobble (Japan, B-System)", GAME_SUPPORTS_SAVE )
-GAME( 1994, spacedx,  0,       spacedx,  pbobble, taitob_state,  taito_b, ROT0,   "Taito Corporation", "Space Invaders DX (US, v2.1)", GAME_SUPPORTS_SAVE )
-GAME( 1994, spacedxj, spacedx, spacedx,  pbobble, taitob_state,  taito_b, ROT0,   "Taito Corporation", "Space Invaders DX (Japan, v2.1)", GAME_SUPPORTS_SAVE )
-GAME( 1994, spacedxo, spacedx, spacedxo, spacedxo, taitob_state, taito_b, ROT0,   "Taito Corporation", "Space Invaders DX (Japan, v2.0)", GAME_SUPPORTS_SAVE )
+GAME( 1989, masterw,  0,       masterw,  masterw,   taitob_state, taito_b, ROT270, "Taito Corporation Japan", "Master of Weapon (World)", GAME_SUPPORTS_SAVE )
+GAME( 1989, masterwu, masterw, masterw,  masterwu,  taitob_state, taito_b, ROT270, "Taito America Corporation", "Master of Weapon (US)", GAME_SUPPORTS_SAVE )
+GAME( 1989, masterwj, masterw, masterw,  masterwj,  taitob_state, taito_b, ROT270, "Taito Corporation", "Master of Weapon (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1988, nastar,   0,       rastsag2, nastar,    taitob_state, taito_b, ROT0,   "Taito Corporation Japan", "Nastar (World)", GAME_SUPPORTS_SAVE )
+GAME( 1988, nastarw,  nastar,  rastsag2, nastarw,   taitob_state, taito_b, ROT0,   "Taito America Corporation", "Nastar Warrior (US)", GAME_SUPPORTS_SAVE )
+GAME( 1988, rastsag2, nastar,  rastsag2, rastsag2,  taitob_state, taito_b, ROT0,   "Taito Corporation", "Rastan Saga 2 (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1989, rambo3,   0,       rambo3,   rambo3,    taitob_state, taito_b, ROT0,   "Taito Europe Corporation", "Rambo III (Europe)", GAME_SUPPORTS_SAVE )
+GAME( 1989, rambo3u,  rambo3,  rambo3,   rambo3u,   taitob_state, taito_b, ROT0,   "Taito America Corporation", "Rambo III (US)", GAME_SUPPORTS_SAVE )
+GAME( 1989, rambo3p,  rambo3,  rambo3p,  rambo3p,   taitob_state, taito_b, ROT0,   "Taito Europe Corporation", "Rambo III (Europe, Proto?)", GAME_SUPPORTS_SAVE )
+GAME( 1989, crimec,   0,       crimec,   crimec,    taitob_state, taito_b, ROT0,   "Taito Corporation Japan", "Crime City (World)", GAME_SUPPORTS_SAVE )
+GAME( 1989, crimecu,  crimec,  crimec,   crimecu,   taitob_state, taito_b, ROT0,   "Taito America Corporation", "Crime City (US)", GAME_SUPPORTS_SAVE )
+GAME( 1989, crimecj,  crimec,  crimec,   crimecj,   taitob_state, taito_b, ROT0,   "Taito Corporation", "Crime City (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1988, tetrist,  tetris,  tetrist,  tetrist,   taitob_state, taito_b, ROT0,   "Sega", "Tetris (Japan, Taito B-System, Nastar Conversion Kit)", GAME_SUPPORTS_SAVE )
+GAME( 1988, tetrista, tetris,  tetrista, tetrist,   taitob_state, taito_b, ROT0,   "Sega", "Tetris (Japan, Taito B-System, Master of Weapon Conversion Kit)", GAME_SUPPORTS_SAVE )
+GAME( 1989, viofight, 0,       viofight, viofight,  taitob_state, taito_b, ROT0,   "Taito Corporation Japan", "Violence Fight (World)", GAME_SUPPORTS_SAVE )
+GAME( 1989, viofightu,viofight,viofight, viofightu, taitob_state, taito_b, ROT0,   "Taito America Corporation", "Violence Fight (US)", GAME_SUPPORTS_SAVE )
+GAME( 1989, viofightj,viofight,viofight, viofightj, taitob_state, taito_b, ROT0,   "Taito Corporation", "Violence Fight (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1990, ashura,   0,       ashura,   ashura,    taitob_state, taito_b, ROT270, "Taito Corporation Japan", "Ashura Blaster (World)", GAME_SUPPORTS_SAVE )
+GAME( 1990, ashuraj,  ashura,  ashura,   ashuraj,   taitob_state, taito_b, ROT270, "Taito Corporation", "Ashura Blaster (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1990, ashurau,  ashura,  ashura,   ashurau,   taitob_state, taito_b, ROT270, "Taito America Corporation", "Ashura Blaster (US)", GAME_SUPPORTS_SAVE )
+GAME( 1990, hitice,   0,       hitice,   hitice,    taitob_state, taito_b, ROT0,   "Taito Corporation (Williams license)", "Hit the Ice (US)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1990, hiticej,  hitice,  hitice,   hiticej,   taitob_state, taito_b, ROT0,   "Taito Corporation (licensed from Midway)", "Hit the Ice (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1991, selfeena, 0,       selfeena, selfeena,  taitob_state, taito_b, ROT0,   "East Technology", "Sel Feena", GAME_SUPPORTS_SAVE )
+GAME( 1992, silentd,  0,       silentd,  silentd,   taitob_state, taito_b, ROT0,   "Taito Corporation Japan", "Silent Dragon (World)", GAME_SUPPORTS_SAVE )
+GAME( 1992, silentdj, silentd, silentd,  silentdj,  taitob_state, taito_b, ROT0,   "Taito Corporation", "Silent Dragon (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1992, silentdu, silentd, silentd,  silentdu,  taitob_state, taito_b, ROT0,   "Taito America Corporation", "Silent Dragon (US)", GAME_SUPPORTS_SAVE )
+GAME( 1993, ryujin,   0,       ryujin,   ryujin,    taitob_state, taito_b, ROT270, "Taito Corporation", "Ryu Jin (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1993, qzshowby, 0,       qzshowby, qzshowby,  taitob_state, taito_b, ROT0,   "Taito Corporation", "Quiz Sekai wa SHOW by shobai (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1994, pbobble,  0,       pbobble,  pbobble,   taitob_state, taito_b, ROT0,   "Taito Corporation", "Puzzle Bobble (Japan, B-System)", GAME_SUPPORTS_SAVE )
+GAME( 1994, spacedx,  0,       spacedx,  pbobble,   taitob_state, taito_b, ROT0,   "Taito Corporation", "Space Invaders DX (US, v2.1)", GAME_SUPPORTS_SAVE )
+GAME( 1994, spacedxj, spacedx, spacedx,  pbobble,   taitob_state, taito_b, ROT0,   "Taito Corporation", "Space Invaders DX (Japan, v2.1)", GAME_SUPPORTS_SAVE )
+GAME( 1994, spacedxo, spacedx, spacedxo, spacedxo,  taitob_state, taito_b, ROT0,   "Taito Corporation", "Space Invaders DX (Japan, v2.0)", GAME_SUPPORTS_SAVE )
 /*
     Sonic Blast Man is a ticket dispensing game.
     (Japanese version however does not dispense them, only US does - try the "sbm_patch" in the machine_config).
@@ -3591,5 +3591,5 @@ GAME( 1994, spacedxo, spacedx, spacedxo, spacedxo, taitob_state, taito_b, ROT0, 
     in that it has a punching pad that player needs to punch to hit
     the enemy.
 */
-GAME( 1990, sbm,      0,       sbm,      sbm, taitob_state,      taito_b, ROT0,   "Taito Corporation", "Sonic Blast Man (Japan)", GAME_SUPPORTS_SAVE | GAME_MECHANICAL )
+GAME( 1990, sbm,      0,       sbm,      sbm,      taitob_state, taito_b, ROT0,   "Taito Corporation", "Sonic Blast Man (Japan)", GAME_SUPPORTS_SAVE | GAME_MECHANICAL )
 GAME( 1994, realpunc, 0,       realpunc, realpunc, taitob_state, taito_b, ROT0,   "Taito Corporation Japan", "Real Puncher",       GAME_SUPPORTS_SAVE | GAME_MECHANICAL )
