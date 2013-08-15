@@ -6624,6 +6624,7 @@ src/mess/drivers/z80dev.c svneol=native#text/plain
 src/mess/drivers/z80ne.c svneol=native#text/plain
 src/mess/drivers/z88.c svneol=native#text/plain
 src/mess/drivers/z9001.c svneol=native#text/plain
+src/mess/drivers/zaurus.c svneol=native#text/plain
 src/mess/drivers/zexall.c svneol=native#text/plain
 src/mess/drivers/zrt80.c svneol=native#text/plain
 src/mess/drivers/zsbc3.c svneol=native#text/plain
