@@ -80,7 +80,7 @@ public:
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_textram;
 	required_shared_ptr<UINT8> m_spritebank;
-	
+
 	required_device<cpu_device> m_maincpu;
 	required_device<t5182_device> m_t5182;
 
@@ -255,7 +255,7 @@ void panicr_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect )
 
 	// ssss ssss | Fx-- cccc | yyyy yyyy | xxxx xxxx
 
-	for (offs = 0; offs<0x1d00; offs+=16)
+	for (offs = m_spriteram.bytes() - 16; offs>=0; offs-=16)
 	{
 		flipx = 0;
 		flipy = spriteram[offs+1] & 0x80;
@@ -371,7 +371,7 @@ READ8_MEMBER(panicr_state::panicr_collision_r)
 	UINT8 ret = 0;
 	UINT16* srcline = &m_tempbitmap_1->pix16(actual_line);
 
-	
+
 	ret |= (srcline[(actual_column+0)&0xff]&3) << 6;
 	ret |= (srcline[(actual_column+1)&0xff]&3) << 4;
 	ret |= (srcline[(actual_column+2)&0xff]&3) << 2;
@@ -611,7 +611,7 @@ static MACHINE_CONFIG_START( panicr, panicr_state )
 	MCFG_CPU_ADD("maincpu", V20,MASTER_CLOCK/2) /* Sony 8623h9 CXQ70116D-8 (V20 compatible) */
 	MCFG_CPU_PROGRAM_MAP(panicr_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", panicr_state, panicr_scanline, "screen", 0, 1)
-	
+
 	MCFG_T5182_ADD("t5182")
 	MCFG_FRAGMENT_ADD(t5182)
 

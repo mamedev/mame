@@ -124,7 +124,6 @@ public:
 	virtual void palette_init();
 	DECLARE_MACHINE_RESET(cshooter);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_cshooter(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_airraid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(cshooter_scanline);
 };
@@ -187,27 +186,6 @@ void cshooter_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		drawgfx_transpen(bitmap,cliprect,machine().gfx[0], tile_low << 1, m_spriteram[i+1], 0, 0, m_spriteram[i+3]+8,m_spriteram[i+2]+8,0);
 		drawgfx_transpen(bitmap,cliprect,machine().gfx[0], tile_low << 1, m_spriteram[i+1], 0, 0, m_spriteram[i+3],m_spriteram[i+2]+8,0);
 	}
-}
-
-UINT32 cshooter_state::screen_update_cshooter(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	// set palette
-	for (int i = 0; i < 0x100; i++)
-	{
-		int r = m_generic_paletteram_8[i] >> 4;
-		int g = m_generic_paletteram_8[i] & 0xf;
-		int b = m_generic_paletteram2_8[i] & 0xf;
-
-		rgb_t color = MAKE_RGB(pal4bit(r), pal4bit(g), pal4bit(b));
-		colortable_palette_set_color(machine().colortable, i, color);
-	}
-
-	bitmap.fill(0x80, cliprect); // temp
-
-	//draw_sprites(bitmap, cliprect);
-
-	m_txtilemap->draw(screen, bitmap, cliprect, 0,0);
-	return 0;
 }
 
 UINT32 cshooter_state::screen_update_airraid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -450,39 +428,6 @@ static const gfx_layout cshooter_charlayout =
 static GFXDECODE_START( cshooter )
 	GFXDECODE_ENTRY( "gfx1", 0,     cshooter_charlayout, 0, 16  )
 GFXDECODE_END
-
-#if 0
-static MACHINE_CONFIG_START( cshooter, cshooter_state )
-
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,XTAL_12MHz/2)        /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(cshooter_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", cshooter_state, cshooter_scanline, "screen", 0, 1)
-
-	MCFG_CPU_ADD("audiocpu", Z80,XTAL_14_31818MHz/4)         /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
-
-	MCFG_MACHINE_RESET_OVERRIDE(cshooter_state,cshooter)
-	
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-1-16)
-	MCFG_SCREEN_UPDATE_DRIVER(cshooter_state, screen_update_cshooter)
-
-	MCFG_GFXDECODE(cshooter)
-	MCFG_PALETTE_LENGTH(0x100)
-
-	/* sound hardware */
-	/* YM2151 and ym3931 seibu custom cpu running at XTAL_14_31818MHz/4 */
-	MCFG_SEIBU_SOUND_ADD("seibu_sound")
-	
-MACHINE_CONFIG_END
-#endif
 
 static MACHINE_CONFIG_START( airraid, cshooter_state )
 
