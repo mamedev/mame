@@ -389,8 +389,6 @@ public:
 	const UINT8 (*m_kb_source_data)[0xec];
 	INT32 m_kb_source_data_offset;
 
-	DECLARE_WRITE16_MEMBER( killbld_mainram_w ); // debug
-
 	UINT32 m_kb_game_id;
 
 	UINT16        m_kb_prot_hold;

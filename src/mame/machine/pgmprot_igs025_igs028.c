@@ -14,7 +14,6 @@
  IGS025 is some kind of state machine, bitswaps etc.
 
  Simulation is incomplete
- - Register simulation incomplete
  - DMA Mode 0 decryption unknown
 
  ***********************************************************************/
@@ -23,8 +22,12 @@
 #include "includes/pgm.h"
 
 // tables are xored by table at $1998dc
-static const UINT8 olds_source_data[7][0xec] = // table addresses $2951CA
+// tables are the same as drgw3 and drgw2
+static const UINT8 olds_source_data[8][0xec] = // table addresses $2951CA
 {
+	{ // region 0, unused...
+		0,
+	},
 	{ // region 1, $1A669A
 		0x67, 0x51, 0xf3, 0x19, 0xa0, 0x11, 0xe1, 0x11, 0x10, 0xee, 0xe3, 0xf6, 0xbe, 0x81, 0x35, 0xe3,
 		0xfb, 0xe6, 0xef, 0xdf, 0x61, 0x01, 0xfa, 0x22, 0x5d, 0x43, 0x01, 0xa5, 0x3b, 0x17, 0xd4, 0x74,
@@ -183,7 +186,7 @@ void pgm_028_025_state::IGS028_do_dma(UINT16 src, UINT16 dst, UINT16 size, UINT1
 	UINT16 param = mode >> 8;
 	UINT16 *PROTROM = (UINT16*)memregion("user1")->base();
 
-//  logerror ("mode: %2.2x, src: %4.4x, dst: %4.4x, size: %4.4x, data: %4.4x\n", (mode &0xf), src, dst, size, mode);
+//	logerror ("mode: %2.2x, src: %4.4x, dst: %4.4x, size: %4.4x, data: %4.4x\n", (mode &0xf), src, dst, size, mode);
 
 	mode &= 0x0f;
 
@@ -211,7 +214,7 @@ void pgm_028_025_state::IGS028_do_dma(UINT16 src, UINT16 dst, UINT16 size, UINT1
 				if (mode==0) dat2 = 0x4e75; // hack
 				if (mode==1) dat2  = ((dat2 & 0xf000) >> 12) | ((dat2 & 0x0f00) >> 4) | ((dat2 & 0x00f0) << 4) | ((dat2 & 0x000f) << 12);
 				if (mode==2) dat2 ^= extraxor;
-				//if (mode==5) dat2  = dat2;
+			//	if (mode==5) dat2  = dat2;
 				if (mode==6) dat2 += extraxor;
 
 				if (mode==2 || mode==6) dat2 = (dat2<<8)|(dat2>>8);
@@ -221,8 +224,8 @@ void pgm_028_025_state::IGS028_do_dma(UINT16 src, UINT16 dst, UINT16 size, UINT1
 		}
 		break;
 
-		//default:
-		//  logerror ("DMA mode unknown!!!\nsrc:%4.4x, dst: %4.4x, size: %4.4x, mode: %4.4x\n", src, dst, size, mode);
+	//	default:
+	//		logerror ("DMA mode unknown!!!\nsrc:%4.4x, dst: %4.4x, size: %4.4x, mode: %4.4x\n", src, dst, size, mode);
 	}
 }
 
@@ -250,7 +253,7 @@ void pgm_028_025_state::olds_protection_calculate_hilo() // calculated in routin
 		m_olds_prot_hilo_select = 0;
 	}
 
-	source = olds_source_data[ioport("Region")->read() - 1][m_olds_prot_hilo_select];
+	source = olds_source_data[ioport("Region")->read()][m_olds_prot_hilo_select];
 
 	if (m_olds_prot_hilo_select & 1)    // $8178fa
 	{
@@ -299,15 +302,42 @@ WRITE16_MEMBER(pgm_028_025_state::olds_w )
 					}
 					break;
 
-					case 0x64: // incomplete...
+					case 0x64: // incomplete?
 					{
-						UINT16 p1 = m_sharedprotram[0x3050 / 2];
-						UINT16 p2 = m_sharedprotram[0x3082 / 2];
+					        UINT16 p1 = m_sharedprotram[0x3050 / 2];
+					        UINT16 p2 = m_sharedprotram[0x3082 / 2];
+					        UINT16 p3 = m_sharedprotram[0x3054 / 2];
+					        UINT16 p4 = m_sharedprotram[0x3088 / 2];
 
-					//  logerror ("p1: %4.4x, p2: %4.4x\n", p1, p2);
+					        if (p2  == 0x02)
+					                olds_write_reg(p1, olds_read_reg(p1) + 0x10000);
 
-						if (p2  == 0x02)
-							olds_write_reg(p1, olds_read_reg(p1) + 0x10000);
+					        switch (p4)
+					        {
+					                case 0xd:
+					                        olds_write_reg(p1,olds_read_reg(p3));
+					                        break;
+					                case 0x0:
+					                        olds_write_reg(p3,(olds_read_reg(p2))^(olds_read_reg(p1)));
+					                        break;
+					                case 0xe:
+					                        olds_write_reg(p3,olds_read_reg(p3)+0x10000);
+					                        break;
+					                case 0x2:
+					                        olds_write_reg(p1,(olds_read_reg(p2))+(olds_read_reg(p3)));
+					                        break;
+					                case 0x6:
+					                        olds_write_reg(p3,(olds_read_reg(p2))&(olds_read_reg(p1)));
+					                        break;
+					                case 0x1:
+					                        olds_write_reg(p2,olds_read_reg(p1)+0x10000);
+					                        break;
+					                case 0x7:
+					                        olds_write_reg(p3,olds_read_reg(p1));
+					                        break;
+					                default:
+					                        break;
+					        }
 					}
 					break;
 
@@ -335,8 +365,8 @@ WRITE16_MEMBER(pgm_028_025_state::olds_w )
 				olds_protection_calculate_hold(m_olds_cmd & 0x0f, data & 0xff);
 			break;
 
-		//  default:
-		//      logerror ("unemulated write mode!\n");
+		//	default:
+		//		logerror ("unemulated write mode!\n");
 		}
 	}
 }
@@ -390,26 +420,13 @@ MACHINE_RESET_MEMBER(pgm_028_025_state,olds)
 {
 	MACHINE_RESET_CALL_MEMBER(pgm);
 
-//  written by protection device
-//  there seems to be an auto-dma that writes from $401000-402573?
+//	written by protection device
+//	there seems to be an auto-dma that writes from $401000-402573?
 	m_sharedprotram[0x1000/2] = 0x4749; // 'IGS.28'
 	m_sharedprotram[0x1002/2] = 0x2E53;
 	m_sharedprotram[0x1004/2] = 0x3832;
-	m_sharedprotram[0x3064/2] = 0xB315; // crc or status check?
 
-//  Should these be written by command 64??
-//  m_sharedprotram[0x2a00/2] = 0x0000; // ?
-//  m_sharedprotram[0x2a02/2] = 0x0000; // ?
-	m_sharedprotram[0x2a04/2] = 0x0002; // ?
-//  m_sharedprotram[0x2a06/2] = 0x0000; // ?
-//  m_sharedprotram[0x2ac0/2] = 0x0000; // ?
-	m_sharedprotram[0x2ac2/2] = 0x0001; // ?
-//  m_sharedprotram[0x2e00/2] = 0x0000; // ?
-//  m_sharedprotram[0x2e02/2] = 0x0000; // ?
-//  m_sharedprotram[0x2e04/2] = 0x0000; // ?
-	m_sharedprotram[0x2e06/2] = 0x0009; // seconds on char. select timer
-//  m_sharedprotram[0x2e08/2] = 0x0000; // ?
-	m_sharedprotram[0x2e0a/2] = 0x0006; // ?
+	m_sharedprotram[0x3064/2] = 0xB315; // crc?
 }
 
 DRIVER_INIT_MEMBER(pgm_028_025_state,olds)

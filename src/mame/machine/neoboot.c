@@ -318,20 +318,19 @@ void neogeo_state::decrypt_kf2k5uni()
 /* The King of Fighters 2002 (bootleg) */
 
 
-// Thanks to IQ_132 for the info
 void neogeo_state::kof2002b_gfx_decrypt(UINT8 *src, int size)
 {
 	int i, j;
 	int t[ 8 ][ 10 ] =
 	{
-		{ 0, 8, 7, 3, 4, 5, 6, 2, 1 },
-		{ 1, 0, 8, 4, 5, 3, 7, 6, 2 },
-		{ 2, 1, 0, 3, 4, 5, 8, 7, 6 },
-		{ 6, 2, 1, 5, 3, 4, 0, 8, 7 },
-		{ 7, 6, 2, 5, 3, 4, 1, 0, 8 },
-		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 },
-		{ 2, 1, 0, 4, 5, 3, 6, 7, 8 },
-		{ 8, 0, 7, 3, 4, 5, 6, 2, 1 },
+		{ 0, 8, 7, 6, 2, 1 },
+		{ 1, 0, 8, 7, 6, 2 },
+		{ 2, 1, 0, 8, 7, 6 },
+		{ 6, 2, 1, 0, 8, 7 },
+		{ 7, 6, 2, 1, 0, 8 },
+		{ 0, 1, 2, 6, 7, 8 },
+		{ 2, 1, 0, 6, 7, 8 },
+		{ 8, 0, 7, 6, 2, 1 },
 	};
 
 	UINT8 *dst = auto_alloc_array(machine(), UINT8,  0x10000 );
@@ -342,9 +341,8 @@ void neogeo_state::kof2002b_gfx_decrypt(UINT8 *src, int size)
 
 		for ( j = 0; j < 0x200; j++ )
 		{
-			int n = (( j % 0x40) / 8 );
-			int ofst = BITSWAP16(j, 15, 14, 13, 12, 11, 10, 9, t[n][0], t[n][1], t[n][2],
-									t[n][3], t[n][4], t[n][5], t[n][6], t[n][7], t[n][8]);
+			int n = (j & 0x38) >> 3;
+			int ofst = BITSWAP16(j, 15, 14, 13, 12, 11, 10, 9, t[n][0], t[n][1], t[n][2], 5, 4, 3, t[n][3], t[n][4], t[n][5]);
 			memcpy( src+i+ofst*128, dst+j*128, 128 );
 		}
 	}

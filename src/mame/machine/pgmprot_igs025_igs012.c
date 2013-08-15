@@ -42,6 +42,7 @@ void pgm_012_025_state::pgm_drgw2_decrypt()
 }
 
 // All tables all xored by 'warning' information at $1354ee (drgw2)
+// tables are the same as drgw3 and olds
 static const UINT8 drgw2_source_data[0x08][0xec] =
 {
 	{ 0, }, // Region 0, not used
@@ -142,7 +143,7 @@ READ16_MEMBER(pgm_012_025_state::drgw2_d80000_protection_r )
 {
 	switch (m_drgw2_cmd)
 	{
-			case 0x05:
+		case 0x05:
 		{
 			switch (m_drgw2_ptr)
 			{

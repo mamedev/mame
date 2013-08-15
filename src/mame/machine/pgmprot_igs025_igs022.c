@@ -186,6 +186,7 @@ static const UINT8 killbld_source_data[0x0c][0xec] =  // offsets to these tables
 };
 
 // all tables xored with data from $149c4c
+// tables are the same as olds and drgw2
 static const UINT8 dw3_source_data[0x07][0xec] =
 {
 	{ // region 1, $14c21a
