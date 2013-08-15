@@ -2420,6 +2420,7 @@ $(MESSOBJ)/skeleton.a:          \
 	$(MESS_DRIVERS)/rvoice.o    \
 	$(MESS_DRIVERS)/sacstate.o  \
 	$(MESS_DRIVERS)/sage2.o     \
+	$(MESS_DRIVERS)/seattle.o   \
 	$(MESS_DRIVERS)/softbox.o   \
 	$(MESS_DRIVERS)/swtpc.o     \
 	$(MESS_DRIVERS)/sys2900.o   \

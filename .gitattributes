@@ -6502,6 +6502,7 @@ src/mess/drivers/scorpion.c svneol=native#text/plain
 src/mess/drivers/scv.c svneol=native#text/plain
 src/mess/drivers/sdk85.c svneol=native#text/plain
 src/mess/drivers/sdk86.c svneol=native#text/plain
+src/mess/drivers/seattle.c svneol=native#text/plain
 src/mess/drivers/segapico.c svneol=native#text/plain
 src/mess/drivers/selz80.c svneol=native#text/plain
 src/mess/drivers/sg1000.c svneol=native#text/plain
