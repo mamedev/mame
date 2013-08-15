@@ -936,13 +936,13 @@ void i8085a_cpu_device::init_tables()
 
 void i8085a_cpu_device::device_start()
 {
-	m_PC.w.l = 0;
-	m_SP.w.l = 0;
-	m_AF.w.l = 0;
-	m_BC.w.l = 0;
-	m_DE.w.l = 0;
-	m_HL.w.l = 0;
-	m_WZ.w.l = 0;
+	m_PC.d = 0;
+	m_SP.d = 0;
+	m_AF.d = 0;
+	m_BC.d = 0;
+	m_DE.d = 0;
+	m_HL.d = 0;
+	m_WZ.d = 0;
 	m_HALT = 0;
 	m_IM = 0;
 	m_STATUS = 0;
