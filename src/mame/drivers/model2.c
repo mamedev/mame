@@ -1828,10 +1828,10 @@ static ADDRESS_MAP_START( model1_snd, AS_PROGRAM, 16, model2_state )
 	AM_RANGE(0x080000, 0x0bffff) AM_ROM AM_REGION("audiocpu", 0x20000)  // mirror of second program ROM
 	AM_RANGE(0xc20000, 0xc20001) AM_READWRITE(m1_snd_68k_latch_r, m1_snd_68k_latch1_w )
 	AM_RANGE(0xc20002, 0xc20003) AM_READWRITE(m1_snd_v60_ready_r, m1_snd_68k_latch2_w )
-	AM_RANGE(0xc40000, 0xc40007) AM_DEVREADWRITE8_LEGACY("sega1", multipcm_r, multipcm_w, 0x00ff )
+	AM_RANGE(0xc40000, 0xc40007) AM_DEVREADWRITE8("sega1", multipcm_device, read, write, 0x00ff )
 	AM_RANGE(0xc40012, 0xc40013) AM_WRITENOP
 	AM_RANGE(0xc50000, 0xc50001) AM_WRITE(m1_snd_mpcm_bnk1_w )
-	AM_RANGE(0xc60000, 0xc60007) AM_DEVREADWRITE8_LEGACY("sega2", multipcm_r, multipcm_w, 0x00ff )
+	AM_RANGE(0xc60000, 0xc60007) AM_DEVREADWRITE8("sega2", multipcm_device, read, write, 0x00ff )
 	AM_RANGE(0xc70000, 0xc70001) AM_WRITE(m1_snd_mpcm_bnk2_w )
 	AM_RANGE(0xd00000, 0xd00007) AM_DEVREADWRITE8("ymsnd", ym3438_device, read, write, 0x00ff )
 	AM_RANGE(0xf00000, 0xf0ffff) AM_RAM
