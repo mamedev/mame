@@ -87,7 +87,7 @@
 */
 
 #include "emu.h"
-#include "machine/eeprom.h"
+#include "machine/eepromser.h"
 #include "machine/nvram.h"
 #include "video/segaic24.h"
 #include "cpu/i960/i960.h"
@@ -96,7 +96,6 @@
 #include "cpu/mb86233/mb86233.h"
 #include "cpu/z80/z80.h"
 #include "sound/scsp.h"
-#include "sound/multipcm.h"
 #include "sound/2612intf.h"
 #include "includes/model2.h"
 
@@ -184,7 +183,7 @@ static UINT32 copro_fifoout_pop(address_space &space)
 	if (state->m_copro_fifoout_num == 0)
 	{
 		/* Reading from empty FIFO causes the i960 to enter wait state */
-		i960_stall(&space.device());
+		downcast<i960_cpu_device &>(space.device()).i960_stall();
 
 		/* spin the main cpu and let the TGP catch up */
 		space.device().execute().spin_until_time(attotime::from_usec(100));
@@ -260,7 +259,7 @@ static void copro_fifoout_push(device_t *device, UINT32 data)
 /* Timers - these count down at 25 MHz and pull IRQ2 when they hit 0 */
 READ32_MEMBER(model2_state::timers_r)
 {
-	i960_noburst(&space.device());
+	m_maincpu->i960_noburst();
 
 	// if timer is running, calculate current value
 	if (m_timerrun[offset])
@@ -279,7 +278,7 @@ WRITE32_MEMBER(model2_state::timers_w)
 {
 	attotime period;
 
-	i960_noburst(&space.device());
+	m_maincpu->i960_noburst();
 	COMBINE_DATA(&m_timervals[offset]);
 
 	m_timerorig[offset] = m_timervals[offset];
@@ -413,9 +412,9 @@ WRITE32_MEMBER(model2_state::ctrl0_w)
 	if(ACCESSING_BITS_0_7)
 	{
 		m_ctrlmode = data & 0x01;
-		m_eeprom->write_bit(data & 0x20);
-		m_eeprom->set_clock_line((data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
-		m_eeprom->set_cs_line((data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+		m_eeprom->di_write((data & 0x20) >> 5);
+		m_eeprom->clk_write((data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
+		m_eeprom->cs_write((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -440,7 +439,7 @@ READ32_MEMBER(model2_state::fifoctl_r)
 
 READ32_MEMBER(model2_state::videoctl_r)
 {
-	return (machine().primary_screen->frame_number() & 1) << 2;
+	return (m_screen->frame_number() & 1) << 2;
 }
 
 CUSTOM_INPUT_MEMBER(model2_state::_1c00000_r)
@@ -454,7 +453,7 @@ CUSTOM_INPUT_MEMBER(model2_state::_1c00000_r)
 	else
 	{
 		ret &= ~0x0030;
-		return ret | 0x00d0 | (m_eeprom->read_bit() << 5);
+		return ret | 0x00d0 | (m_eeprom->do_read() << 5);
 	}
 }
 
@@ -936,7 +935,7 @@ READ32_MEMBER(model2_state::desert_unk_r)
 
 READ32_MEMBER(model2_state::model2_irq_r)
 {
-	i960_noburst(&space.device());
+	m_maincpu->i960_noburst();
 
 	if (offset)
 	{
@@ -948,7 +947,7 @@ READ32_MEMBER(model2_state::model2_irq_r)
 
 WRITE32_MEMBER(model2_state::model2_irq_w)
 {
-	i960_noburst(&space.device());
+	m_maincpu->i960_noburst();
 
 	if (offset)
 	{
@@ -1808,14 +1807,12 @@ READ16_MEMBER(model2_state::m1_snd_v60_ready_r)
 
 WRITE16_MEMBER(model2_state::m1_snd_mpcm_bnk1_w)
 {
-	device_t *device = machine().device("sega1");
-	multipcm_set_bank(device, 0x100000 * (data & 0xf), 0x100000 * (data & 0xf));
+	m_multipcm_1->set_bank(0x100000 * (data & 0xf), 0x100000 * (data & 0xf));
 }
 
 WRITE16_MEMBER(model2_state::m1_snd_mpcm_bnk2_w)
 {
-	device_t *device = machine().device("sega2");
-	multipcm_set_bank(device, 0x100000 * (data & 0xf), 0x100000 * (data & 0xf));
+	m_multipcm_2->set_bank(0x100000 * (data & 0xf), 0x100000 * (data & 0xf));
 }
 
 WRITE16_MEMBER(model2_state::m1_snd_68k_latch1_w)
@@ -1979,7 +1976,7 @@ static MACHINE_CONFIG_START( model2o, model2_state )
 	MCFG_MACHINE_START_OVERRIDE(model2_state,model2)
 	MCFG_MACHINE_RESET_OVERRIDE(model2_state,model2o)
 
-	MCFG_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_NVRAM_ADD_1FILL("backup1")
 	MCFG_NVRAM_ADD_1FILL("backup2")
 
@@ -2038,7 +2035,7 @@ static MACHINE_CONFIG_START( model2a, model2_state )
 	MCFG_MACHINE_START_OVERRIDE(model2_state,model2)
 	MCFG_MACHINE_RESET_OVERRIDE(model2_state,model2)
 
-	MCFG_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_NVRAM_ADD_1FILL("backup1")
 
 	MCFG_TIMER_DRIVER_ADD("timer0", model2_state, model2_timer_cb)
@@ -2141,7 +2138,7 @@ static MACHINE_CONFIG_START( model2b, model2_state )
 	MCFG_MACHINE_START_OVERRIDE(model2_state,model2)
 	MCFG_MACHINE_RESET_OVERRIDE(model2_state,model2b)
 
-	MCFG_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_NVRAM_ADD_1FILL("backup1")
 
 	MCFG_TIMER_DRIVER_ADD("timer0", model2_state, model2_timer_cb)
@@ -2188,7 +2185,7 @@ static MACHINE_CONFIG_START( model2c, model2_state )
 	MCFG_MACHINE_START_OVERRIDE(model2_state,model2)
 	MCFG_MACHINE_RESET_OVERRIDE(model2_state,model2c)
 
-	MCFG_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_NVRAM_ADD_1FILL("backup1")
 
 	MCFG_TIMER_DRIVER_ADD("timer0", model2_state, model2_timer_cb)
