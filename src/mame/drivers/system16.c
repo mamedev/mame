@@ -941,11 +941,13 @@ static ADDRESS_MAP_START( beautyb_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("sprites")
 	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
 
-	AM_RANGE(0xC41000, 0xC41001) AM_READ(beautyb_unkx_r )
-	AM_RANGE(0xC41002, 0xC41003) AM_READ(beautyb_unkx_r )
+	AM_RANGE(0xc41000, 0xc41001) AM_READ_PORT("SERVICE")
+	AM_RANGE(0xc41002, 0xc41003) AM_READ_PORT("P1")
+	AM_RANGE(0xc41004, 0xc41005) AM_READ_PORT("P2")
+	AM_RANGE(0xc42006, 0xc42007) AM_WRITE(sound_command_w)
 
 	AM_RANGE(0xc40000, 0xc40001) AM_WRITENOP
-	AM_RANGE(0xc80000, 0xc80001) AM_WRITENOP
+	AM_RANGE(0xc80000, 0xc80001) AM_WRITENOP // vblank irq ack
 
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM // work ram
 ADDRESS_MAP_END
@@ -2001,7 +2003,7 @@ static MACHINE_CONFIG_START( system16, segas1x_bootleg_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 28*8)
+	MCFG_SCREEN_SIZE(40*8, 36*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(segas1x_bootleg_state, screen_update_system16)
 
@@ -3425,40 +3427,40 @@ WRITE16_MEMBER(segas1x_bootleg_state::altbeastbl_gfx_w)
 			m_bg_scrolly = data + 1;
 			break;
 		}
-	
+
 		case 0x04: {
 			m_bg_scrollx = ((data ^ 0xffff) & 0x3ff) + 2;
 			break;
 		}
-		
+
 		case 0x08: {
 			m_fg_scrolly = data + 1;
 			break;
 		}
-		
+
 		case 0x0c: {
 			m_fg_scrollx = ((data ^ 0xffff) & 0x3ff) + 4;
 			break;
 		}
-		
+
 		case 0x10: {
 			m_bg_page[0] = (data >> 0) & 0x0f;
 			m_fg_page[0] = (data >> 4) & 0x0f;
 			break;
 		}
-		
+
 		case 0x11: {
 			m_bg_page[1] = (data >> 0) & 0x0f;
 			m_fg_page[1] = (data >> 4) & 0x0f;
 			break;
 		}
-		
+
 		case 0x12: {
 			m_bg_page[2] = (data >> 0) & 0x0f;
 			m_fg_page[2] = (data >> 4) & 0x0f;
 			break;
 		}
-		
+
 		case 0x13: {
 			m_bg_page[3] = (data >> 0) & 0x0f;
 			m_fg_page[3] = (data >> 4) & 0x0f;
@@ -3470,7 +3472,7 @@ WRITE16_MEMBER(segas1x_bootleg_state::altbeastbl_gfx_w)
 DRIVER_INIT_MEMBER(segas1x_bootleg_state,altbeastbl)
 {
 	DRIVER_INIT_CALL(common);
-	
+
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x418000, 0x418029, write16_delegate(FUNC(segas1x_bootleg_state::altbeastbl_gfx_w),this));
 }
 

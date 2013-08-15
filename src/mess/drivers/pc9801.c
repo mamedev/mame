@@ -1803,7 +1803,7 @@ WRITE8_MEMBER( pc9801_state::sasi_ctrl_w )
 	    ---- ---x irq enable
 	*/
 
-	m_scsibus->scsi_sel_w(BIT(data, 5));
+	m_sasibus->scsi_sel_w(BIT(data, 5));
 
 	if(m_sasi.ctrl & 8 && ((data & 8) == 0)) // 1 -> 0 transition
 	{
