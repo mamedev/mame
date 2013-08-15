@@ -8885,6 +8885,7 @@ src/ume/ume.c svneol=native#text/plain
 src/ume/ume.lst svneol=native#text/plain
 src/ume/ume.mak svneol=native#text/plain
 src/version.c svneol=native#text/plain
+web/commands.html svneol=native#text/html
 web/css/images/ajax-loader.gif -text
 web/css/images/icons-18-black.png -text svneol=unset#image/png
 web/css/images/icons-18-white.png -text svneol=unset#image/png

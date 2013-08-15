@@ -69,6 +69,12 @@ int web_engine::websocket_data_handler(struct mg_connection *conn, int flags,
 	return memcmp(data, "exit", 4);
 } 
 
+static void get_qsvar(const struct mg_request_info *request_info,
+                      const char *name, char *dst, size_t dst_len) {
+  const char *qs = request_info->query_string;
+  mg_get_var(qs, strlen(qs == NULL ? "" : qs), name, dst, dst_len);
+}
+
 // This function will be called by mongoose on every new request.
 int web_engine::begin_request_handler(struct mg_connection *conn) 
 {
@@ -102,7 +108,37 @@ int web_engine::begin_request_handler(struct mg_connection *conn)
 			return 1;
 		}		
 	}
-	if (!strncmp(request_info->uri, "/screenshot.png",15)) 
+	else if (!strncmp(request_info->uri, "/cmd",4)) 
+	{
+		char cmd_name[64];
+		get_qsvar(request_info, "name", cmd_name, sizeof(cmd_name));
+		
+		if(!strcmp(cmd_name,"softreset"))
+		{
+			m_machine->schedule_soft_reset();
+		} 
+		else if(!strcmp(cmd_name,"hardreset"))
+		{
+			m_machine->schedule_hard_reset();
+		}
+		else if(!strcmp(cmd_name,"exit"))
+		{
+			m_machine->schedule_exit();
+		}		
+		
+		// Send HTTP reply to the client
+		mg_printf(conn,
+				"HTTP/1.1 200 OK\r\n"
+				"Content-Type: text/plain\r\n"
+				"Content-Length: 2\r\n"        // Always set Content-Length
+				"\r\n"
+				"OK");
+
+		// Returning non-zero tells mongoose that our function has replied to
+		// the client, and mongoose should not send client any more data.
+		return 1;
+	}
+	else if (!strncmp(request_info->uri, "/screenshot.png",15)) 
 	{
 		screen_device_iterator iter(m_machine->root_device());
 		screen_device *screen = iter.first();

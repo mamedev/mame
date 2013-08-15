@@ -23,8 +23,27 @@
   
   function takeScreenshot()
   {
-	document.getElementById('content').innerHTML = '<center><img src="/screenshot.png"/></center>';
+	document.getElementById('main').innerHTML = '<center><img src="/screenshot.png"/></center>';
   }
+  
+  function loadCommands()
+  {  
+	$("#main").load('commands.html', function () {
+		$(this).trigger('create');
+	});
+  }
+  function executeCommands(command)
+  {
+	$.ajax({
+	  url: "/cmd?name="+command,
+	  cache: false,
+	  dataType: "text",
+	  success: function(data) {
+	  },
+	  error: function (request, status, error) { alert(status + ", " + error); }
+	});	
+  }
+
   
   function startWebSocket() {
     var url = 'ws://localhost:8080/foo';
@@ -85,12 +104,12 @@
                     <a href="#page1" data-transition="fade" data-icon="grid">Image</a>
                 </li>
                 <li>
-                    <a href="#page1" data-transition="fade" data-icon="star">Commands</a>
+                    <a href="javascript:loadCommands();" data-transition="fade" data-icon="star">Commands</a>
                 </li>
             </ul>
         </div>
     </div>
-    <div data-role="content" id ="content">		
+    <div data-role="content" id ="main">		
     </div>
     <div data-theme="a" data-role="footer" data-position="fixed">
 		<div  data-role="navbar" data-iconpos="top">
