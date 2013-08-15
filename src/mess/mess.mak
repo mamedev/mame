@@ -2002,6 +2002,7 @@ $(MESSOBJ)/sharp.a:             \
 	$(MESS_DRIVERS)/pce220.o    \
 	$(MESS_MACHINE)/pce220_ser.o\
 	$(MESS_DRIVERS)/mz6500.o    \
+	$(MESS_DRIVERS)/zaurus.o    \
 
 $(MESSOBJ)/sinclair.a:          \
 	$(MESS_VIDEO)/spectrum.o    \

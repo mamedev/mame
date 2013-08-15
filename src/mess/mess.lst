@@ -948,6 +948,13 @@ x68ksupr // Sharp X68000 Super (1990)
 x68kxvi   // Sharp X68000 XVI (1991)
 x68030  // Sharp X68030 (1993)
 
+zsl5500  // Sharp Zaurus SL-5500 "Collie"
+zsl5600  // Sharp Zaurus SL-5600 / SL-B500 "Poodle"
+zslc750  // Sharp Zaurus SL-C750 "Shepherd"
+zslc760  // Sharp Zaurus SL-C760 "Husky"
+zslc3000 // Sharp Zaurus SL-C3000 "Spitz"
+zslc1000 // Sharp Zaurus SL-C1000 "Akita"
+
 // Silicon Graphics
 sgi_ip2 // IP2: IRIS 2x00, 68020, 16MHz
 sgi_ip6   // IP6: 4D/PI, R2000, 20MHz

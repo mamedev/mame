@@ -140,6 +140,9 @@ READ8_MEMBER( ym3812_device::read )
 
 WRITE8_MEMBER( ym3812_device::write )
 {
+	printf("%02x ",data);
+	if(offset)
+		printf("\n");
 	ym3812_write(m_chip, offset & 1, data);
 }
 

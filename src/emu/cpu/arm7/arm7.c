@@ -920,6 +920,9 @@ READ32_MEMBER( arm7_cpu_device::arm7_rt_r_callback )
 							data |= (4<<16);    // v5T
 						}
 					}
+
+					/* ID from PXA-250 manual */
+					//data = 0x69052100;
 					break;
 
 				case 6: // ARM11
@@ -941,7 +944,7 @@ READ32_MEMBER( arm7_cpu_device::arm7_rt_r_callback )
 			data = 0;
 			break;
 		}
-			LOG( ( "arm7_rt_r_callback, ID\n" ) );
+			LOG( ( "arm7_rt_r_callback, ID %02x (%02x) -> %08x (PC=%08x)\n",op2,m_archRev,data,GET_PC ) );
 			break;
 		case 1:             // Control
 			data = COPRO_CTRL | 0x70;   // bits 4-6 always read back as "1" (bit 3 too in XScale)
