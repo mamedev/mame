@@ -1795,9 +1795,15 @@ READ8_MEMBER( pc9801_state::sasi_status_r )
 WRITE8_MEMBER( pc9801_state::sasi_ctrl_w )
 {
 	/*
-	    ---- ----
+	    x--- ---- channel enable
+	    -x-- ---- read switch
+	    --x- ---- sel
 	    ---- x--- reset line
+	    ---- --x- dma enable
+	    ---- ---x irq enable
 	*/
+
+	m_scsibus->scsi_sel_w(BIT(data, 5));
 
 	if(m_sasi.ctrl & 8 && ((data & 8) == 0)) // 1 -> 0 transition
 	{
