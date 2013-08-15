@@ -72,6 +72,7 @@ private:
 	void output_sound(device_t &device);
 	void output_input(const ioport_list &portlist);
 	void output_switches(const ioport_list &portlist, const char *root_tag, int type, const char *outertag, const char *innertag);
+	void output_ports(const ioport_list &portlist);
 	void output_adjusters(const ioport_list &portlist);
 	void output_driver();
 	void output_images(device_t &device, const char *root_tag);

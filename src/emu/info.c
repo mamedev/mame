@@ -153,6 +153,10 @@ const char info_xml_creator::s_dtd_string[] =
 "\t\t\t\t<!ATTLIST confsetting name CDATA #REQUIRED>\n"
 "\t\t\t\t<!ATTLIST confsetting value CDATA #REQUIRED>\n"
 "\t\t\t\t<!ATTLIST confsetting default (yes|no) \"no\">\n"
+"\t\t<!ELEMENT port (portbit*)>\n"
+"\t\t\t<!ATTLIST port tag CDATA #REQUIRED>\n"
+"\t\t\t<!ELEMENT analog EMPTY>\n"
+"\t\t\t\t<!ATTLIST analog mask CDATA #REQUIRED>\n"
 "\t\t<!ELEMENT adjuster EMPTY>\n"
 "\t\t\t<!ATTLIST adjuster name CDATA #REQUIRED>\n"
 "\t\t\t<!ATTLIST adjuster default CDATA #REQUIRED>\n"
@@ -324,6 +328,7 @@ void info_xml_creator::output_one()
 	output_input(portlist);
 	output_switches(portlist, "", IPT_DIPSWITCH, "dipswitch", "dipvalue");
 	output_switches(portlist, "", IPT_CONFIG, "configuration", "confsetting");
+	output_ports(portlist);
 	output_adjusters(portlist);
 	output_driver();
 	output_images(m_drivlist.config().root_device(), "");
@@ -1122,6 +1127,26 @@ void info_xml_creator::output_switches(const ioport_list &portlist, const char *
 			}
 }
 
+//-------------------------------------------------
+//  output_ports - print the structure of input
+//  ports in the driver
+//-------------------------------------------------
+void info_xml_creator::output_ports(const ioport_list &portlist)
+{
+	// cycle through ports
+	for (ioport_port *port = portlist.first(); port != NULL; port = port->next())
+	{
+		fprintf(m_output,"\t\t<port tag=\"%s\">\n",port->tag());
+		for (ioport_field *field = port->first_field(); field != NULL; field = field->next())
+		{
+			if(field->is_analog())
+				fprintf(m_output,"\t\t\t<analog mask=\"%u\"/>\n",field->mask());
+		}
+		// close element
+		fprintf(m_output,"\t\t</port>\n");
+	}
+
+}
 
 //-------------------------------------------------
 //  output_adjusters - print the Analog
