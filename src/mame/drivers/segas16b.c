@@ -3829,6 +3829,9 @@ ROM_END
 //  Jyuohki (Altered Beast), Sega System 16B
 //  CPU: FD1094 (317-0068)
 //  ROM Board type: 171-5521
+//  Sega game ID: 833-6660-05
+//    Main board: 837-6662-03
+//     ROM board: 834-6661-05
 //
 ROM_START( altbeastj3 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
