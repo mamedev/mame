@@ -25,7 +25,6 @@ public:
 		m_maincpu(*this,"maincpu"),
 		m_dsbz80(*this, DSBZ80_TAG),
 		m_audiocpu(*this, "audiocpu"),
-		m_audiocpum1(*this, "audiocpum1"),
 		m_multipcm_1(*this, "sega1"),
 		m_multipcm_2(*this, "sega2"),
 		m_tgp(*this, "tgp"),
@@ -45,8 +44,7 @@ public:
 	
 	required_device<i960_cpu_device> m_maincpu;
 	optional_device<dsbz80_device> m_dsbz80;    // Z80-based MPEG Digital Sound Board
-	optional_device<cpu_device> m_audiocpu;
-	optional_device<cpu_device> m_audiocpum1;
+	required_device<cpu_device> m_audiocpu;
 	optional_device<multipcm_device> m_multipcm_1;
 	optional_device<multipcm_device> m_multipcm_2;
 	optional_device<cpu_device> m_tgp;
