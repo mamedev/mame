@@ -169,10 +169,10 @@ ADDRESS_MAP_END
     Write:0000 - 01ff corresponds to bit 0 of base address 0000 - 03fe
 */
 static ADDRESS_MAP_START(cru_map, AS_IO, 8, ti99_4x_state)
-	AM_RANGE(0x0000, 0x003f) AM_DEVREAD(TMS9901_TAG, tms9901_device, read)
+	AM_RANGE(0x0000, 0x0003) AM_MIRROR(0x003c) AM_DEVREAD(TMS9901_TAG, tms9901_device, read)
 	AM_RANGE(0x0000, 0x01ff) AM_READ(cruread)
 
-	AM_RANGE(0x0000, 0x01ff) AM_DEVWRITE(TMS9901_TAG, tms9901_device, write)
+	AM_RANGE(0x0000, 0x001f) AM_MIRROR(0x01e0) AM_DEVWRITE(TMS9901_TAG, tms9901_device, write)
 	AM_RANGE(0x0000, 0x0fff) AM_WRITE(cruwrite)
 ADDRESS_MAP_END
 
