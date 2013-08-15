@@ -1958,6 +1958,48 @@ ROM_START( bublbob2 )
 	ROM_LOAD16_BYTE("d90-05", 0x400000, 0x200000, CRC(c192331f) SHA1(ebab05b3681c70b373bc06c1826be1cc397d3af7) )    // CC CD -std-
 ROM_END
 
+/* Very early revision protoype boardset & roms */
+// todo, transfer information on PCB differences from http://forum.arcadeotaku.com/viewtopic.php?f=2&t=24965
+ROM_START( bublbob2p )
+	ROM_REGION(0x200000, "maincpu", 0) /* 68020 code */
+	ROM_LOAD32_BYTE("soft-3-8c9b.ic60", 0x000000, 0x40000, CRC(15d0594e) SHA1(7556377355860c3f7f600c2c352e5291da6a62f1) )
+	ROM_LOAD32_BYTE("soft-2-0587.ic61", 0x000001, 0x40000, CRC(d1a5231f) SHA1(1e9ccac78f690ef79f933743ce7c4d6fa42f5acd) )
+	ROM_LOAD32_BYTE("soft-1-9a9c.ic62", 0x000002, 0x40000, CRC(c11a4d26) SHA1(b327413f5420608f1ccbbac2e8941a82862377c5) )
+	ROM_LOAD32_BYTE("soft-0-a523.ic63", 0x000003, 0x40000, CRC(58131f9e) SHA1(d07d34bf079277a48151ef9e5e7c1240a36d1bdb) )
+
+	ROM_REGION(0x200000, "gfx1" , ROMREGION_ERASE00 ) /* Sprites */
+	ROM_LOAD16_BYTE       ("cq80-obj-0l-c166.ic8",  0x000000, 0x80000, CRC(9bff223b) SHA1(acf22731d91d61aefc3373f78006fd310bb89edf) )
+	ROM_LOAD16_BYTE       ("cq80-obj-0m-24f4.ic30", 0x000001, 0x80000, CRC(ee71f643) SHA1(7a2042c6fad8f1b7e0a3ad077d054dc163a22230) )
+	ROM_LOAD			  ("cq80-obj-0h-990d.ic32", 0x180000, 0x80000, CRC(4d3a78e0) SHA1(b19fb66e6082a68dc8600b8882ba50a3afce27c3) )
+
+	ROM_REGION(0x400000, "gfx2" , ROMREGION_ERASE00 ) /* Tiles */
+	ROM_LOAD32_BYTE("cq80-scr0-5ba4.ic7", 0x000000, 0x080000, CRC(044dc38b) SHA1(0bb715c9ae8298c6852c6309d69f769e87ab2fdc) )
+	ROM_LOAD32_BYTE("cq80-scr1-a5f3.ic6", 0x000002, 0x080000, CRC(3cf3a3ba) SHA1(da7282104fbd9108bae12fa6722e077d80107d6d) )
+	ROM_LOAD32_BYTE("cq80-scr2-cc11.ic5", 0x000001, 0x080000, CRC(b81aa2c7) SHA1(4650c431dc2ed73f1e71337f3e7d4c1837b65bcf) )
+	ROM_LOAD32_BYTE("cq80-scr3-4266.ic4", 0x000003, 0x080000, CRC(c114583f) SHA1(ec85e8f4135e48607bb84b810d57d570ef56b228) )
+	ROM_LOAD16_BYTE("cq80-scr4-7fe1.ic3", 0x300000, 0x080000, CRC(2bba1728) SHA1(cdd2e651c233a185fcbb3fd8f5eabee2af30f781) )
+
+	ROM_REGION(0x180000, "audiocpu", 0) /* sound CPU */
+	ROM_LOAD16_BYTE("snd-h-348f.ic66", 0x100000, 0x20000, CRC(f66e60f2) SHA1(b94c97ccde179a69811137c77730c91924236bfe))
+	ROM_LOAD16_BYTE("snd-l-4ec1.ic65", 0x100001, 0x20000, CRC(d302d8bc) SHA1(02a2e69d0f4406578b12b05ab25d2abdf5bbba3c) )
+
+	ROM_REGION16_BE(0x800000, "ensoniq.0" , ROMREGION_ERASE00 )
+	ROM_LOAD16_BYTE("cq80-snd-data0-7b5f.ic43", 0x000000, 0x080000, CRC(bf8f26d3) SHA1(b165fc62ed30ae56d27caffbb0b16321d3c5ef8b) )    // C8
+	ROM_LOAD16_BYTE("cq80-snd-data1-933b.ic44", 0x100000, 0x080000, CRC(62b00475) SHA1(d2b44940cefca76897b291d83b5ca8ec18dbe1fa) )    // C9
+
+	ROM_LOAD16_BYTE("cq80-snd3-std5-3a9c.ic10", 0x600000, 0x080000, CRC(26312451) SHA1(9f947a11592fd8420fc581914bf16e7ade75390c) )    // -std-
+	ROM_LOAD16_BYTE("cq80-snd2-std6-a148.ic11", 0x700000, 0x080000, CRC(2edaa9dc) SHA1(72fead505c4f44e5736ff7d545d72dfa37d613e2) )    // -std-
+
+	ROM_REGION(0x180000, "pals", 0)
+	ROM_LOAD("pal20l10a.ic12.bin", 0x000, 0xcc, CRC(5d695690) SHA1(713cdbb894861eb5a6361026af8618df7e7db467) )
+	ROM_LOAD("pal20l10a.ic24.bin", 0x000, 0xcc, CRC(5d695690) SHA1(713cdbb894861eb5a6361026af8618df7e7db467) )
+	ROM_LOAD("pal16l8b.ic57.bin", 0x000, 0x104, CRC(74b4d8be) SHA1(23ba316bc5550dd69f07f9a0f697927656a35e5a) )
+	ROM_LOAD("pal16l8b.ic58.bin", 0x000, 0x104, CRC(17e2c9b8) SHA1(841b290ee3a3089a975456b20018c04e6afb2257) )
+	ROM_LOAD("pal16l8b.ic59.bin", 0x000, 0x104, CRC(dc0db200) SHA1(9f46e7edf053ad9ee3a4a6dd00f9f6996203fc60) )
+	ROM_LOAD("pal16l8b.ic64.bin", 0x000, 0x104, CRC(3aed3d98) SHA1(8f0b02baad87aeda1767f0e95aa1a84545376076) )
+ROM_END
+
+
 ROM_START( bubsymphe )
 	ROM_REGION(0x200000, "maincpu", 0) /* 68020 code */
 	ROM_LOAD32_BYTE("d90-12", 0x000000, 0x40000, CRC(9e523996) SHA1(c49a426f9865f96e8021c8ed9a6ac094c5e586b1) )
@@ -4014,6 +4056,7 @@ GAME( 1994, dariusgj, dariusg,  f3,      f3, taito_f3_state, dariusg,  ROT0,   "
 GAME( 1994, dariusgu, dariusg,  f3,      f3, taito_f3_state, dariusg,  ROT0,   "Taito America Corporation", "Darius Gaiden - Silver Hawk (Ver 2.5A 1994/09/19)", 0 )
 GAME( 1994, dariusgx, dariusg,  f3,      f3, taito_f3_state, dariusg,  ROT0,   "Taito Corporation",         "Darius Gaiden - Silver Hawk Extra Version (Ver 2.7J 1995/03/06) (Official Hack)", 0 )
 GAME( 1994, bublbob2, 0,        f3_224a, f3, taito_f3_state, bubsymph, ROT0,   "Taito Corporation Japan",   "Bubble Bobble II (Ver 2.5O 1994/10/05)", 0 )
+GAME( 1994, bublbob2p,bublbob2, f3_224a, f3, taito_f3_state, bubsymph, ROT0,   "Taito Corporation Japan",   "Bubble Bobble II (Ver 0.0J 1993/12/13, prototype)", 0 )
 GAME( 1994, bubsymphe,bublbob2, f3_224a, f3, taito_f3_state, bubsymph, ROT0,   "Taito Corporation Japan",   "Bubble Symphony (Ver 2.5O 1994/10/05)", 0 )
 GAME( 1994, bubsymphu,bublbob2, f3_224a, f3, taito_f3_state, bubsymph, ROT0,   "Taito America Corporation", "Bubble Symphony (Ver 2.5A 1994/10/05)", 0 )
 GAME( 1994, bubsymphj,bublbob2, f3_224a, f3, taito_f3_state, bubsymph, ROT0,   "Taito Corporation",         "Bubble Symphony (Ver 2.5J 1994/10/05)", 0 )
