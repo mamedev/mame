@@ -5,7 +5,7 @@ one serial and 2 parallel connections.
 
 2013-08-14 Skeleton driver.
 
-When started you must press Enter before anything happens.
+When started you must press Enter twice before anything happens.
 
 All commands must be in UPPER case.
 

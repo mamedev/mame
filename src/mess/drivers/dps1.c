@@ -11,6 +11,7 @@ public:
 
 static ADDRESS_MAP_START( dps1_mem, AS_PROGRAM, 8, dps1_state )
 	AM_RANGE(0x0000, 0x03ff) AM_ROM AM_REGION("maincpu", 0)
+	AM_RANGE(0x2000, 0x2fff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dps1_io, AS_IO, 8, dps1_state )
@@ -34,4 +35,4 @@ ROM_START( dps1 )
 	ROM_LOAD( "boot 1280", 0x000, 0x400, CRC(9c2e98fa) SHA1(78e6c9d00aa6e8f6c4d3c65984cfdf4e99434c66) ) // actually on the FDC-2 board
 ROM_END
 
-COMP( 1979, dps1,    0,      0,      dps1,        dps1, driver_device, 0,      "Ithaca InterSystems",  "DPS-1",  GAME_NOT_WORKING | GAME_NO_SOUND_HW )
+COMP( 1979, dps1, 0, 0, dps1, dps1, driver_device, 0, "Ithaca InterSystems", "DPS-1", GAME_NOT_WORKING | GAME_NO_SOUND_HW )

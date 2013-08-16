@@ -7,7 +7,7 @@ Genrad Futuredata 2301 Network Control Processor
 Has a number of plug-in daughter boards, some of which are:
 - CPU board: Mostek Z80 CPU, 24MHz crystal, 2 eproms (U2.PB72.2300.4039 1.0 ; U23.N.C.P.2300.4023 3.0)
 - IO board: 5.0688MHz crystal, D8253C, 2x S2651
-- Memory board: 16 static ram consisting of 32x TMS2147H-7 chips, 1 prom? with sticker U36.2300.4035 1.0
+- Memory board: 16k static ram consisting of 32x TMS2147H-7 chips, 1 prom? with sticker U36.2300.4035 1.0
 - 2301 board: 2x D8253C, 4x S2651
 
 Back panel has a number of DB25 sockets, labelled thus:
