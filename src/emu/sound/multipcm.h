@@ -57,7 +57,8 @@ struct SLOT
 };
 
 class multipcm_device : public device_t,
-									public device_sound_interface
+						public device_sound_interface,
+						public device_memory_interface
 {
 public:
 	multipcm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -76,6 +77,11 @@ protected:
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
+	// device_memory_interface overrides
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+
+	const address_space_config  m_space_config;
+
 private:
 	// internal state
 	sound_stream * m_stream;
@@ -85,7 +91,6 @@ private:
 	unsigned int m_Address;
 	unsigned int m_BankR, m_BankL;
 	float m_Rate;
-	INT8 *m_ROM;
 	//I include these in the chip because they depend on the chip clock
 	unsigned int m_ARStep[0x40], m_DRStep[0x40]; //Envelope step table
 	unsigned int m_FNS_Table[0x400];      //Frequency step table
@@ -93,6 +98,8 @@ private:
 	void EG_Calc(SLOT *slot);
 	void LFO_ComputeStep(LFO_t *LFO,UINT32 LFOF,UINT32 LFOS,int ALFO);
 	void WriteSlot(SLOT *slot,int reg,unsigned char data);
+
+	direct_read_data *m_direct;
 };
 
 extern const device_type MULTIPCM;

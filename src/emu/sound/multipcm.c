@@ -381,9 +381,16 @@ void multipcm_device::set_bank(UINT32 leftoffs, UINT32 rightoffs)
 
 const device_type MULTIPCM = &device_creator<multipcm_device>;
 
+// default address map
+static ADDRESS_MAP_START( multipcm, AS_0, 8, multipcm_device )
+	AM_RANGE(0x000000, 0x3fffff) AM_ROM
+ADDRESS_MAP_END
+
 multipcm_device::multipcm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MULTIPCM, "Sega/Yamaha 315-5560", tag, owner, clock, "multipcm", __FILE__),
 		device_sound_interface(mconfig, *this),
+		device_memory_interface(mconfig, *this),
+		m_space_config("mpcm_samples", ENDIANNESS_LITTLE, 8, 24, 0, NULL, *ADDRESS_MAP_NAME(multipcm)),
 		m_stream(NULL),
 		//m_Samples(0x200),
 		//m_Slots[28],
@@ -391,12 +398,21 @@ multipcm_device::multipcm_device(const machine_config &mconfig, const char *tag,
 		m_Address(0),
 		m_BankR(0),
 		m_BankL(0),
-		m_Rate(0),
-		m_ROM(NULL)
+		m_Rate(0)
 		//m_ARStep(0),
 		//m_DRStep(0),
 		//m_FNS_Table(0)
 {
+}
+
+//-------------------------------------------------
+//  memory_space_config - return a description of
+//  any address spaces owned by this device
+//-------------------------------------------------
+
+const address_space_config *multipcm_device::memory_space_config(address_spacenum spacenum) const
+{
+	return (spacenum == 0) ? &m_space_config : NULL;
 }
 
 //-------------------------------------------------
@@ -417,7 +433,9 @@ void multipcm_device::device_start()
 {
 		int i;
 
-	m_ROM=*region();
+	// find our direct access
+	m_direct = &space().direct();
+
 	m_Rate=(float) clock() / MULTIPCM_CLOCKDIV;
 
 	m_stream = machine().sound().stream_alloc(*this, 0, 2, m_Rate, this);
@@ -509,7 +527,13 @@ void multipcm_device::device_start()
 
 	for(i=0;i<512;++i)
 	{
-		UINT8 *ptSample=(UINT8 *) m_ROM+i*12;
+		UINT8 ptSample[12];
+
+		for (int j = 0; j < 12; j++)
+		{
+			ptSample[j] = (UINT8)m_direct->read_raw_byte((i*12) + j);
+		}
+
 		m_Samples[i].Start=(ptSample[0]<<16)|(ptSample[1]<<8)|(ptSample[2]<<0);
 		m_Samples[i].Loop=(ptSample[3]<<8)|(ptSample[4]<<0);
 		m_Samples[i].End=0xffff-((ptSample[5]<<8)|(ptSample[6]<<0));
@@ -576,7 +600,6 @@ void multipcm_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 	memset(datap[0], 0, sizeof(*datap[0])*samples);
 	memset(datap[1], 0, sizeof(*datap[1])*samples);
 
-
 	for(i=0;i<samples;++i)
 	{
 		signed int smpl=0;
@@ -590,7 +613,7 @@ void multipcm_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 				unsigned int adr=slot->offset>>SHIFT;
 				signed int sample;
 				unsigned int step=slot->step;
-				signed int csample=(signed short) (m_ROM[slot->Base+adr]<<8);
+				signed int csample=(signed short) (m_direct->read_raw_byte(slot->Base+adr)<<8);
 				signed int fpart=slot->offset&((1<<SHIFT)-1);
 				sample=(csample*fpart+slot->Prev*((1<<SHIFT)-fpart))>>SHIFT;
 
