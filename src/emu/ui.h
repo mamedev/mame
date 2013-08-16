@@ -122,6 +122,9 @@ struct slider_state
 /* main init/exit routines */
 int ui_init(running_machine &machine);
 
+/* initialize ui lists */
+void ui_initialize(running_machine &machine);
+
 /* display the startup screens */
 int ui_display_startup_screens(running_machine &machine, int first_time, int show_disclaimer);
 

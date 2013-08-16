@@ -60,7 +60,13 @@ public:
 	void websocket_ready_handler(struct mg_connection *conn);
 	int websocket_data_handler(struct mg_connection *conn, int flags, char *data, size_t data_len);
 	int begin_request_handler(struct mg_connection *conn);	
-	void *websocket_keepalive();
+	void *websocket_keepalive();	
+protected:
+	// getters
+	running_machine &machine() const { return *m_machine; }
+	
+	int json_game_handler(struct mg_connection *conn);
+	int json_slider_handler(struct mg_connection *conn);
 private:
 	// internal state
 	emu_options &		m_options;

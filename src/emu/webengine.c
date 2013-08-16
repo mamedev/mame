@@ -39,6 +39,7 @@
 
 #include "emu.h"
 #include "emuopts.h"
+#include "ui.h"
 #include "webengine.h"
 #include "web/mongoose.h"
 #include "web/json/json.h"
@@ -75,6 +76,69 @@ static void get_qsvar(const struct mg_request_info *request_info,
   mg_get_var(qs, strlen(qs == NULL ? "" : qs), name, dst, dst_len);
 }
 
+int web_engine::json_game_handler(struct mg_connection *conn) 
+{
+	Json::Value data;
+	data["name"] = m_machine->system().name;
+	data["description"] = m_machine->system().description;
+	data["year"] = m_machine->system().year;
+	data["manufacturer"] = m_machine->system().manufacturer;
+	data["parent"] = m_machine->system().parent;
+	data["source_file"] = m_machine->system().source_file;
+	data["flags"] = m_machine->system().flags;
+
+	Json::FastWriter writer;
+	const char *json = writer.write(data).c_str();
+	// Send HTTP reply to the client
+	mg_printf(conn,
+			"HTTP/1.1 200 OK\r\n"
+			"Content-Type: application/json\r\n"
+			"Content-Length: %d\r\n"        // Always set Content-Length
+			"\r\n"
+			"%s",
+			(int)strlen(json), json);
+
+	// Returning non-zero tells mongoose that our function has replied to
+	// the client, and mongoose should not send client any more data.
+	return 1;
+}
+
+int web_engine::json_slider_handler(struct mg_connection *conn) 
+{
+	const slider_state *curslider;
+	astring tempstring;
+
+	/* add all sliders */
+	for (curslider = ui_get_slider_list(); curslider != NULL; curslider = curslider->next)
+	{
+		INT32 curval = (*curslider->update)(machine(), curslider->arg, &tempstring, SLIDER_NOCHANGE);
+		printf("%d\n",curval);
+/*		UINT32 flags = 0;
+		if (curval > curslider->minval)
+			flags |= MENU_FLAG_LEFT_ARROW;
+		if (curval < curslider->maxval)
+			flags |= MENU_FLAG_RIGHT_ARROW;
+		item_append(curslider->description, tempstring, flags, (void *)curslider);
+
+		if (menuless_mode)
+			break;*/
+	}
+
+	/* add all sliders */
+	for (curslider = (slider_state*)machine().osd().get_slider_list(); curslider != NULL; curslider = curslider->next)
+	{
+		INT32 curval = (*curslider->update)(machine(), curslider->arg, &tempstring, SLIDER_NOCHANGE);
+		printf("%d\n",curval);
+		/*UINT32 flags = 0;
+		if (curval > curslider->minval)
+			flags |= MENU_FLAG_LEFT_ARROW;
+		if (curval < curslider->maxval)
+			flags |= MENU_FLAG_RIGHT_ARROW;
+		item_append(curslider->description, tempstring, flags, (void *)curslider);*/
+	}
+	return 1;
+}
+
 // This function will be called by mongoose on every new request.
 int web_engine::begin_request_handler(struct mg_connection *conn) 
 {
@@ -83,29 +147,11 @@ int web_engine::begin_request_handler(struct mg_connection *conn)
 	{
 		if (!strcmp(request_info->uri, "/json/game")) 
 		{
-			Json::Value data;
-			data["name"] = m_machine->system().name;
-			data["description"] = m_machine->system().description;
-			data["year"] = m_machine->system().year;
-			data["manufacturer"] = m_machine->system().manufacturer;
-			data["parent"] = m_machine->system().parent;
-			data["source_file"] = m_machine->system().source_file;
-			data["flags"] = m_machine->system().flags;
-		
-			Json::FastWriter writer;
-			const char *json = writer.write(data).c_str();
-			// Send HTTP reply to the client
-			mg_printf(conn,
-					"HTTP/1.1 200 OK\r\n"
-					"Content-Type: application/json\r\n"
-					"Content-Length: %d\r\n"        // Always set Content-Length
-					"\r\n"
-					"%s",
-					(int)strlen(json), json);
-
-			// Returning non-zero tells mongoose that our function has replied to
-			// the client, and mongoose should not send client any more data.
-			return 1;
+			return json_game_handler(conn);
+		}		
+		if (!strcmp(request_info->uri, "/json/slider")) 
+		{
+			return json_slider_handler(conn);
 		}		
 	}
 	else if (!strncmp(request_info->uri, "/cmd",4)) 

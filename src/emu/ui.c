@@ -305,6 +305,16 @@ static void ui_exit(running_machine &machine)
 
 
 /*-------------------------------------------------
+    ui_initialize - initialize ui lists
+-------------------------------------------------*/
+
+void ui_initialize(running_machine &machine)
+{
+	/* initialize the on-screen display system */
+	slider_list = slider_current = slider_init(machine);
+}
+
+/*-------------------------------------------------
     ui_display_startup_screens - display the
     various startup screens
 -------------------------------------------------*/
@@ -321,9 +331,6 @@ int ui_display_startup_screens(running_machine &machine, int first_time, int sho
 	   or if we are debugging */
 	if (!first_time || (str > 0 && str < 60*5) || &machine.system() == &GAME_NAME(___empty) || (machine.debug_flags & DEBUG_FLAG_ENABLED) != 0)
 		show_gameinfo = show_warnings = show_disclaimer = FALSE;
-
-	/* initialize the on-screen display system */
-	slider_list = slider_current = slider_init(machine);
 
 	/* loop over states */
 	ui_set_handler(handler_ingame, 0);
