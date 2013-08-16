@@ -32,10 +32,10 @@ There is a 4MHz crystal connected to the 9513.
 #include "machine/terminal.h"
 
 
-class seattle_state : public driver_device
+class seattle_comp_state : public driver_device
 {
 public:
-	seattle_state(const machine_config &mconfig, device_type type, const char *tag)
+	seattle_comp_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_terminal(*this, TERMINAL_TAG)
@@ -53,13 +53,13 @@ private:
 };
 
 
-static ADDRESS_MAP_START(seattle_mem, AS_PROGRAM, 16, seattle_state)
+static ADDRESS_MAP_START(seattle_mem, AS_PROGRAM, 16, seattle_comp_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000,0xff7ff) AM_RAM
 	AM_RANGE(0xff800,0xfffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(seattle_io, AS_IO, 16, seattle_state)
+static ADDRESS_MAP_START(seattle_io, AS_IO, 16, seattle_comp_state)
 	//ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf6,0xf7) AM_READWRITE(read, write)
@@ -71,14 +71,14 @@ static ADDRESS_MAP_START(seattle_io, AS_IO, 16, seattle_state)
 	//AM_RANGE(0xfe, 0xff) Eprom disable bit, read sense switches (bank of 8 dipswitches)
 ADDRESS_MAP_END
 
-READ16_MEMBER( seattle_state::read )
+READ16_MEMBER( seattle_comp_state::read )
 {
 	UINT16 status = (m_key_available) ? 0x300 : 0x100;
 	m_key_available = 0;
 	return m_term_data | status;
 }
 
-WRITE16_MEMBER( seattle_state::write )
+WRITE16_MEMBER( seattle_comp_state::write )
 {
 	m_terminal->write(space, 0, data&0x7f);
 }
@@ -88,13 +88,13 @@ static INPUT_PORTS_START( seattle )
 INPUT_PORTS_END
 
 
-void seattle_state::machine_reset()
+void seattle_comp_state::machine_reset()
 {
 	m_key_available = 0;
 	m_term_data = 0;
 }
 
-WRITE8_MEMBER( seattle_state::kbd_put )
+WRITE8_MEMBER( seattle_comp_state::kbd_put )
 {
 	m_term_data = data;
 	m_key_available = 1;
@@ -102,10 +102,10 @@ WRITE8_MEMBER( seattle_state::kbd_put )
 
 static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 {
-	DEVCB_DRIVER_MEMBER(seattle_state, kbd_put)
+	DEVCB_DRIVER_MEMBER(seattle_comp_state, kbd_put)
 };
 
-static MACHINE_CONFIG_START( seattle, seattle_state )
+static MACHINE_CONFIG_START( seattle, seattle_comp_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8086, 4000000) // no idea
 	MCFG_CPU_PROGRAM_MAP(seattle_mem)
