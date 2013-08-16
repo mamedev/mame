@@ -5297,6 +5297,7 @@ static void free_context(struct mg_context *ctx) {
 }
 
 void mg_stop(struct mg_context *ctx) {
+	if (!ctx) return;
   ctx->stop_flag = 1;
 
   // Wait until mg_fini() stops
