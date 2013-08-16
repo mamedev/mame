@@ -3,7 +3,6 @@
 Taito Air System
 ----------------
 
-Midnight Landing        *** not dumped, 1987? ***
 Top Landing             (c) 1988 Taito
 Air Inferno             (c) 1990 Taito
 
