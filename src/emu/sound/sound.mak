@@ -154,6 +154,15 @@ SOUNDOBJS += $(SOUNDOBJ)/es5506.o
 endif
 
 
+#-------------------------------------------------
+# Ensoniq "pump" device, interfaces 5505/5506 with 5510
+#@src/emu/sound/esqpump.h,SOUNDS += ESQPUMP
+#-------------------------------------------------
+
+ifneq ($(filter ESQPUMP,$(SOUNDS)),)
+SOUNDOBJS += $(SOUNDOBJ)/esqpump.o
+endif
+
 
 #-------------------------------------------------
 # Excellent Systems ADPCM sound chip

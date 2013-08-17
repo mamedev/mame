@@ -249,6 +249,7 @@ SOUNDS += AWACS
 #SOUNDS += YMZ770
 SOUNDS += T6721A
 SOUNDS += MOS7360
+SOUNDS += ESQPUMP
 
 #-------------------------------------------------
 # specify available video cores
