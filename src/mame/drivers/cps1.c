@@ -6503,8 +6503,8 @@ ROM_END
 /* B-Board 90629B-2 */
 ROM_START( sf2jl )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
-	ROM_LOAD16_BYTE( "sf-2_30l.11e", 0x00000, 0x20000, CRC(34a1ce02) SHA1(6875813c49a92b8650f444c1857459adc86bc0d0) )   // Verified "SF-2" without "J" for Japan region
-	ROM_LOAD16_BYTE( "sf-2_37l.11f", 0x00001, 0x20000, CRC(5b630ed2) SHA1(b14ef94b86f55c82391db8aca4d6f9487b9758a7) )
+	ROM_LOAD16_BYTE( "sf-2_30l.11e", 0x00000, 0x20000, CRC(34a1ce02) SHA1(6875813c49a92b8650f444c1857459adc86bc0d0) )   // These "L" revision roms are verified as being
+	ROM_LOAD16_BYTE( "sf-2_37l.11f", 0x00001, 0x20000, CRC(5b630ed2) SHA1(b14ef94b86f55c82391db8aca4d6f9487b9758a7) )   // labeled "SF-2" without "J" for Japan region
 	ROM_LOAD16_BYTE( "sf-2_31l.12e", 0x40000, 0x20000, CRC(64ebc8d2) SHA1(1817de5dcca47a1bb94838d26a9a3adf6b75c911) )
 	ROM_LOAD16_BYTE( "sf-2_38l.12f", 0x40001, 0x20000, CRC(73847443) SHA1(72fb5472a04061e4a50cb57e4f65ba8ec022a965) )
 	ROM_LOAD16_BYTE( "sf-2_28l.9e",  0x80000, 0x20000, CRC(eee2b426) SHA1(1d7b5073b9473d3c92fc95c0d0625716c82fc944) )
