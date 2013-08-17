@@ -295,305 +295,6 @@ TIMER_CALLBACK_MEMBER(dc_cons_state::atapi_xfer_end )
 	printf( "atapi_xfer_end: %d %d\n", atapi_xferlen, atapi_xfermod );
 }
 
-READ32_MEMBER(dc_cons_state::atapi_r )
-{
-	int reg, data;
-
-	if (mem_mask == 0x0000ffff) // word-wide command read
-	{
-//      mame_printf_debug("ATAPI: packet read = %04x\n", atapi_data[atapi_data_ptr]);
-
-		// assert IRQ and drop DRQ
-		if (atapi_data_ptr == 0 && atapi_data_len == 0)
-		{
-			// get the data from the device
-			if( atapi_xferlen > 0 )
-			{
-				gdrom->ReadData( atapi_data, atapi_xferlen );
-				atapi_data_len = atapi_xferlen;
-			}
-
-			if (atapi_xfermod > MAX_TRANSFER_SIZE)
-			{
-				atapi_xferlen = MAX_TRANSFER_SIZE;
-				atapi_xfermod = atapi_xfermod - MAX_TRANSFER_SIZE;
-			}
-			else
-			{
-				atapi_xferlen = atapi_xfermod;
-				atapi_xfermod = 0;
-			}
-
-//          printf( "atapi_r: atapi_xferlen=%d\n", atapi_xferlen );
-			if( atapi_xferlen != 0 )
-			{
-				//atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ | ATAPI_STAT_SERVDSC;
-				//atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO;
-			}
-			else
-			{
-				printf("ATAPI: dropping DRQ\n");
-				//atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
-				//atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO;
-			}
-
-			atapi_regs[ATAPI_REG_COUNTLOW] = atapi_xferlen & 0xff;
-			atapi_regs[ATAPI_REG_COUNTHIGH] = (atapi_xferlen>>8)&0xff;
-
-			gdrom_raise_irq();
-		}
-
-		if( atapi_data_ptr < atapi_data_len )
-		{
-			data = atapi_data[atapi_data_ptr++];
-			data |= ( atapi_data[atapi_data_ptr++] << 8 );
-			if( atapi_data_ptr >= atapi_data_len )
-			{
-//              printf( "atapi_r: read all bytes\n" );
-				atapi_data_ptr = 0;
-				atapi_data_len = 0;
-
-				if( atapi_xferlen == 0 )
-				{
-					atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
-					atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO;
-					gdrom_raise_irq();
-				}
-			}
-		}
-		else
-		{
-			data = 0;
-		}
-	}
-	else
-	{
-		reg = offset;
-
-		// get read-only side of read-only/write-only registers from elsewhere
-		if (reg == ATAPI_REG_FEATURES)
-		{
-			reg = ATAPI_REG_ERROR;
-		}
-		if (reg == ATAPI_REG_CMDSTATUS)
-		{
-			dc_sysctrl_regs[SB_ISTEXT] &= ~IST_EXT_GDROM;
-			dc_update_interrupt_status();
-		}
-		data = atapi_regs[reg];
-
-		#if 0
-		switch( reg )
-		{
-		case ATAPI_REG_DATA:
-			printf( "atapi_r: data=%02x\n", data );
-			break;
-		case ATAPI_REG_ERROR:
-			printf( "atapi_r: error=%02x\n", data );
-			break;
-		case ATAPI_REG_INTREASON:
-			printf( "atapi_r: intreason=%02x\n", data );
-			break;
-		case ATAPI_REG_SAMTAG:
-			printf( "atapi_r: samtag=%02x\n", data );
-			break;
-		case ATAPI_REG_COUNTLOW:
-			printf( "atapi_r: countlow=%02x\n", data );
-			break;
-		case ATAPI_REG_COUNTHIGH:
-			printf( "atapi_r: counthigh=%02x\n", data );
-			break;
-		case ATAPI_REG_DRIVESEL:
-			printf( "atapi_r: drivesel=%02x\n", data );
-			break;
-		case ATAPI_REG_CMDSTATUS:
-			printf( "atapi_r: cmdstatus=%02x\n", data );
-			break;
-		}
-		#endif
-
-		mame_printf_debug("ATAPI: read reg %d = %x (PC=%x)\n", reg, data, space.device().safe_pc());
-	}
-
-//  printf( "atapi_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
-	return data;
-}
-
-WRITE32_MEMBER(dc_cons_state::atapi_w )
-{
-	int reg;
-
-//  printf( "atapi_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
-
-	if (mem_mask == 0x0000ffff) // word-wide command write
-	{
-//      printf("atapi_w: data=%04x\n", data );
-
-//      printf("ATAPI: packet write %04x\n", data);
-		atapi_data[atapi_data_ptr++] = data & 0xff;
-		atapi_data[atapi_data_ptr++] = data >> 8;
-
-		//printf("%02x %02x %d\n",data & 0xff, data >> 8,atapi_data_ptr);
-
-		if (atapi_cdata_wait)
-		{
-//                  printf("ATAPI: waiting, ptr %d wait %d\n", atapi_data_ptr, atapi_cdata_wait);
-			if (atapi_data_ptr == atapi_cdata_wait)
-			{
-				// send it to the device
-				gdrom->WriteData( atapi_data, atapi_cdata_wait );
-
-				// assert IRQ
-				gdrom_raise_irq();
-
-				// not sure here, but clear DRQ at least?
-				atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
-				printf("cdata wait status\n");
-			}
-		}
-
-		else if ( atapi_data_ptr == 12 )
-		{
-			int phase;
-
-//          printf("atapi_w: command %02x\n", atapi_data[0]&0xff );
-
-			// reset data pointer for reading SCSI results
-			atapi_data_ptr = 0;
-			atapi_data_len = 0;
-
-			// send it to the SCSI device
-			gdrom->SetCommand( atapi_data, 12 );
-			gdrom->ExecCommand( &atapi_xferlen );
-			gdrom->GetPhase( &phase );
-
-			if (atapi_xferlen != -1)
-			{
-				printf("ATAPI: SCSI command %02x returned %d bytes from the device\n", atapi_data[0]&0xff, atapi_xferlen);
-
-				// store the returned command length in the ATAPI regs, splitting into
-				// multiple transfers if necessary
-				atapi_xfermod = 0;
-				if (atapi_xferlen > MAX_TRANSFER_SIZE)
-				{
-					atapi_xfermod = atapi_xferlen - MAX_TRANSFER_SIZE;
-					atapi_xferlen = MAX_TRANSFER_SIZE;
-				}
-
-				atapi_regs[ATAPI_REG_COUNTLOW] = atapi_xferlen & 0xff;
-				atapi_regs[ATAPI_REG_COUNTHIGH] = (atapi_xferlen>>8)&0xff;
-
-				if (atapi_xferlen == 0)
-				{
-					// if no data to return, set the registers properly
-					//atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRDY;
-					gdrom_set_status(ATAPI_STAT_DRDY,true);
-					gdrom_set_status(ATAPI_STAT_DRQ,false);
-					atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO|ATAPI_INTREASON_COMMAND;
-				}
-				else
-				{
-					printf("ATAPI features %02x\n",atapi_regs[ATAPI_REG_FEATURES]);
-					// indicate data ready: set DRQ and DMA ready, and IO in INTREASON
-					if (atapi_regs[ATAPI_REG_FEATURES] & 0x01)  // DMA feature
-					{
-						//gdrom_set_status(ATAPI_STAT_BSY | ATAPI_STAT_DRDY | ATAPI_STAT_SERVDSC,true);
-						//atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_BSY | ATAPI_STAT_DRDY | ATAPI_STAT_SERVDSC;
-					}
-					else
-					{
-						//gdrom_set_status(ATAPI_STAT_SERVDSC,true);
-						/* Ok? */
-						gdrom_set_status(ATAPI_STAT_DRQ,false);
-						//atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ | ATAPI_STAT_SERVDSC | ATAPI_STAT_DRQ;
-					}
-					atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO;
-				}
-
-				switch( phase )
-				{
-				case SCSI_PHASE_DATAOUT:
-					atapi_cdata_wait = atapi_xferlen;
-					break;
-				}
-
-				// perform special ATAPI processing of certain commands
-				switch (atapi_data[0]&0xff)
-				{
-					case 0x00: // BUS RESET / TEST UNIT READY
-					case 0xbb: // SET CDROM SPEED
-						//atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
-						break;
-
-					case 0x45: // PLAY
-						gdrom_set_status(ATAPI_STAT_BSY,true);
-						atapi_timer->adjust( downcast<cpu_device *>(&space.device())->cycles_to_attotime(ATAPI_CYCLES_PER_SECTOR ) );
-						break;
-				}
-
-				// assert IRQ
-				gdrom_raise_irq();
-			}
-			else
-			{
-				printf("ATAPI: SCSI device returned error!\n");
-
-				//atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ | ATAPI_STAT_CHECK;
-				//atapi_regs[ATAPI_REG_ERROR] = 0x50; // sense key = ILLEGAL REQUEST
-				atapi_regs[ATAPI_REG_COUNTLOW] = 0;
-				atapi_regs[ATAPI_REG_COUNTHIGH] = 0;
-			}
-		}
-	}
-	else
-	{
-		reg = offset;
-#if 0
-		switch( reg )
-		{
-			case ATAPI_REG_DATA:
-			printf( "atapi_w: data=%02x\n", data );
-				break;
-			case ATAPI_REG_FEATURES:
-			printf( "atapi_w: features=%02x\n", data );
-				break;
-			case ATAPI_REG_INTREASON:
-			printf( "atapi_w: intreason=%02x\n", data );
-				break;
-			case ATAPI_REG_SAMTAG:
-			printf( "atapi_w: samtag=%02x\n", data );
-				break;
-			case ATAPI_REG_COUNTLOW:
-			printf( "atapi_w: countlow=%02x\n", data );
-				break;
-			case ATAPI_REG_COUNTHIGH:
-			printf( "atapi_w: counthigh=%02x\n", data );
-				break;
-			case ATAPI_REG_DRIVESEL:
-			printf( "atapi_w: drivesel=%02x\n", data );
-				break;
-			case ATAPI_REG_CMDSTATUS:
-			printf( "atapi_w: cmdstatus=%02x\n", data );
-			break;
-		}
-#endif
-		atapi_regs[reg] = data;
-//      mame_printf_debug("ATAPI: reg %d = %x (offset %x mask %x PC=%x)\n", reg, data, offset, mem_mask, space.device().safe_pc());
-
-		if (reg == ATAPI_REG_CMDSTATUS)
-		{
-			printf("ATAPI command %x issued! (PC=%x)\n", data, space.device().safe_pc());
-
-			gdrom_set_status(ATAPI_STAT_BSY,true);
-			gdrom_set_status(ATAPI_STAT_DRQ,false);
-			gdrom_set_status(ATAPI_STAT_DRDY,false);
-			cur_atapi_cmd = data;
-			/* TODO: timing of this */
-			atapi_cmd_timer->adjust(m_maincpu->cycles_to_attotime(ATAPI_CYCLES_PER_SECTOR));
-		}
-	}
-}
-
 void dc_cons_state::dreamcast_atapi_init()
 {
 	xfer_mode = ATAPI_XFER_PIO;
@@ -665,56 +366,261 @@ c000776 - DMA triggered to c008000
 
 */
 
-READ64_MEMBER(dc_cons_state::dc_mess_gdrom_r )
+READ32_MEMBER(dc_cons_state::dc_mess_gdrom_r)
 {
-	UINT32 off;
-
-	if ((int)~mem_mask & 1)
-	{
-		off=(offset << 1) | 1;
-	}
-	else
-	{
-		off=offset << 1;
-	}
-
 //  printf("gdrom_r: @ %x (off %x), mask %llx (PC %x)\n", offset, off, mem_mask, space.device().safe_pc());
 
-	if (offset == 3)
+	switch(offset)
 	{
-		//debugger_break(machine());
-		//printf("%08x\n",atapi_regs[ATAPI_REG_CMDSTATUS]);
-		return atapi_regs[ATAPI_REG_CMDSTATUS];
-	}
-	else if (off >= 0x20)
-	{
-		return atapi_r(space, off-0x20, 0xff);
+		case 0x18/4:
+			return atapi_regs[ATAPI_REG_CMDSTATUS];
+		case 0x80/4:
+			UINT32 data;
+			if (atapi_data_ptr == 0 && atapi_data_len == 0)
+			{
+				// get the data from the device
+				if( atapi_xferlen > 0 )
+				{
+					gdrom->ReadData( atapi_data, atapi_xferlen );
+					atapi_data_len = atapi_xferlen;
+				}
+
+				if (atapi_xfermod > MAX_TRANSFER_SIZE)
+				{
+					atapi_xferlen = MAX_TRANSFER_SIZE;
+					atapi_xfermod = atapi_xfermod - MAX_TRANSFER_SIZE;
+				}
+				else
+				{
+					atapi_xferlen = atapi_xfermod;
+					atapi_xfermod = 0;
+				}
+
+//			    printf( "atapi_r: atapi_xferlen=%d\n", atapi_xferlen );
+				if( atapi_xferlen != 0 )
+				{
+					//atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ | ATAPI_STAT_SERVDSC;
+					//atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO;
+				}
+				else
+				{
+					printf("ATAPI: dropping DRQ\n");
+					//atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
+					//atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO;
+				}
+
+				atapi_regs[ATAPI_REG_COUNTLOW] = atapi_xferlen & 0xff;
+				atapi_regs[ATAPI_REG_COUNTHIGH] = (atapi_xferlen>>8)&0xff;
+
+				gdrom_raise_irq();
+			}
+
+			if( atapi_data_ptr < atapi_data_len )
+			{
+				data = atapi_data[atapi_data_ptr++];
+				data |= ( atapi_data[atapi_data_ptr++] << 8 );
+				if( atapi_data_ptr >= atapi_data_len )
+				{
+//					printf( "atapi_r: read all bytes\n" );
+					atapi_data_ptr = 0;
+					atapi_data_len = 0;
+
+					if( atapi_xferlen == 0 )
+					{
+						atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
+						atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO;
+						gdrom_raise_irq();
+					}
+				}
+			}
+			else
+			{
+				data = 0;
+			}
+
+			return data;
+		case 0x84/4:
+			return atapi_regs[ATAPI_REG_ERROR];
+		case 0x88/4:
+			return atapi_regs[ATAPI_REG_INTREASON];
+		case 0x8c/4:
+			return atapi_regs[ATAPI_REG_SAMTAG];
+		case 0x90/4:
+			return atapi_regs[ATAPI_REG_COUNTLOW];
+		case 0x94/4:
+			return atapi_regs[ATAPI_REG_COUNTHIGH];
+		case 0x98/4:
+			return atapi_regs[ATAPI_REG_DRIVESEL];
+		case 0x9c/4:
+			dc_sysctrl_regs[SB_ISTEXT] &= ~IST_EXT_GDROM;
+			dc_update_interrupt_status();
+			return atapi_regs[ATAPI_REG_CMDSTATUS];
 	}
 
 	return 0;
 }
 
-WRITE64_MEMBER(dc_cons_state::dc_mess_gdrom_w )
+WRITE32_MEMBER(dc_cons_state::dc_mess_gdrom_w )
 {
-	UINT32 dat,off;
-
-	if ((int)~mem_mask & 1)
+	switch(offset)
 	{
-		dat=(UINT32)(data >> 32);
-		off=(offset << 1) | 1;
-	}
-	else
-	{
-		dat=(UINT32)data;
-		off=offset << 1;
+		case 0x18/4:
+			/* Device Control */
+			//COMBINE_DATA(&atapi_regs[ATAPI_REG_CMDSTATUS]);
+			return;
+		/* TODO: move this behind a timer */
+		case 0x80/4:
+		{
+//      	printf("atapi_w: data=%04x\n", data );
+
+//      	printf("ATAPI: packet write %04x\n", data);
+			atapi_data[atapi_data_ptr++] = data & 0xff;
+			atapi_data[atapi_data_ptr++] = data >> 8;
+
+		//printf("%02x %02x %d\n",data & 0xff, data >> 8,atapi_data_ptr);
+
+			if (atapi_cdata_wait)
+			{
+//      	    printf("ATAPI: waiting, ptr %d wait %d\n", atapi_data_ptr, atapi_cdata_wait);
+				if (atapi_data_ptr == atapi_cdata_wait)
+				{
+					// send it to the device
+					gdrom->WriteData( atapi_data, atapi_cdata_wait );
+
+					// assert IRQ
+					gdrom_raise_irq();
+
+					// not sure here, but clear DRQ at least?
+					atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
+					printf("cdata wait status\n");
+				}
+			}
+			else if ( atapi_data_ptr == 12 )
+			{
+				int phase;
+
+//      	    printf("atapi_w: command %02x\n", atapi_data[0]&0xff );
+
+				// reset data pointer for reading SCSI results
+				atapi_data_ptr = 0;
+				atapi_data_len = 0;
+
+				// send it to the SCSI device
+				gdrom->SetCommand( atapi_data, 12 );
+				gdrom->ExecCommand( &atapi_xferlen );
+				gdrom->GetPhase( &phase );
+
+				if (atapi_xferlen != -1)
+				{
+					printf("ATAPI: SCSI command %02x returned %d bytes from the device\n", atapi_data[0]&0xff, atapi_xferlen);
+
+					// store the returned command length in the ATAPI regs, splitting into
+					// multiple transfers if necessary
+					atapi_xfermod = 0;
+					if (atapi_xferlen > MAX_TRANSFER_SIZE)
+					{
+						atapi_xfermod = atapi_xferlen - MAX_TRANSFER_SIZE;
+						atapi_xferlen = MAX_TRANSFER_SIZE;
+					}
+
+					atapi_regs[ATAPI_REG_COUNTLOW] = atapi_xferlen & 0xff;
+					atapi_regs[ATAPI_REG_COUNTHIGH] = (atapi_xferlen>>8)&0xff;
+
+					if (atapi_xferlen == 0)
+					{
+						// if no data to return, set the registers properly
+						//atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRDY;
+						gdrom_set_status(ATAPI_STAT_DRDY,true);
+						gdrom_set_status(ATAPI_STAT_DRQ,false);
+						atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO|ATAPI_INTREASON_COMMAND;
+					}
+					else
+					{
+						printf("ATAPI features %02x\n",atapi_regs[ATAPI_REG_FEATURES]);
+						// indicate data ready: set DRQ and DMA ready, and IO in INTREASON
+						if (atapi_regs[ATAPI_REG_FEATURES] & 0x01)  // DMA feature
+						{
+							//gdrom_set_status(ATAPI_STAT_BSY | ATAPI_STAT_DRDY | ATAPI_STAT_SERVDSC,true);
+							//atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_BSY | ATAPI_STAT_DRDY | ATAPI_STAT_SERVDSC;
+						}
+						else
+						{
+							//gdrom_set_status(ATAPI_STAT_SERVDSC,true);
+							/* Ok? */
+							gdrom_set_status(ATAPI_STAT_DRQ,false);
+							//atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ | ATAPI_STAT_SERVDSC | ATAPI_STAT_DRQ;
+						}
+						atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO;
+					}
+
+					switch( phase )
+					{
+					case SCSI_PHASE_DATAOUT:
+						atapi_cdata_wait = atapi_xferlen;
+						break;
+					}
+
+					// perform special ATAPI processing of certain commands
+					switch (atapi_data[0]&0xff)
+					{
+						case 0x00: // BUS RESET / TEST UNIT READY
+						case 0xbb: // SET CDROM SPEED
+							//atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
+							break;
+
+						case 0x45: // PLAY
+							gdrom_set_status(ATAPI_STAT_BSY,true);
+							atapi_timer->adjust( downcast<cpu_device *>(&space.device())->cycles_to_attotime(ATAPI_CYCLES_PER_SECTOR ) );
+							break;
+					}
+
+					// assert IRQ
+					gdrom_raise_irq();
+				}
+				else
+				{
+					printf("ATAPI: SCSI device returned error!\n");
+
+					//atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ | ATAPI_STAT_CHECK;
+					//atapi_regs[ATAPI_REG_ERROR] = 0x50; // sense key = ILLEGAL REQUEST
+					atapi_regs[ATAPI_REG_COUNTLOW] = 0;
+					atapi_regs[ATAPI_REG_COUNTHIGH] = 0;
+				}
+			}
+		}
+		return;
+		case 0x84/4:
+			COMBINE_DATA(&atapi_regs[ATAPI_REG_FEATURES]);
+			return;
+		case 0x88/4:
+			COMBINE_DATA(&atapi_regs[ATAPI_REG_INTREASON]);
+			return;
+		case 0x8c/4:
+			COMBINE_DATA(&atapi_regs[ATAPI_REG_SAMTAG]);
+			return;
+		case 0x90/4:
+			COMBINE_DATA(&atapi_regs[ATAPI_REG_COUNTLOW]);
+			return;
+		case 0x94/4:
+			COMBINE_DATA(&atapi_regs[ATAPI_REG_COUNTHIGH]);
+			return;
+		case 0x98/4:
+			COMBINE_DATA(&atapi_regs[ATAPI_REG_DRIVESEL]);
+			return;
+		case 0x9c/4:
+			{
+				printf("ATAPI command %x issued! (PC=%x)\n", data, space.device().safe_pc());
+
+				gdrom_set_status(ATAPI_STAT_BSY,true);
+				gdrom_set_status(ATAPI_STAT_DRQ,false);
+				gdrom_set_status(ATAPI_STAT_DRDY,false);
+				cur_atapi_cmd = data;
+				/* TODO: timing of this */
+				atapi_cmd_timer->adjust(m_maincpu->cycles_to_attotime(ATAPI_CYCLES_PER_SECTOR));
+			}
+			return;
 	}
 
-//  printf("GDROM: [%08x=%x]write %llx to %x, mask %llx (PC %x)\n", 0x5f7000+off*4, dat, data, offset, mem_mask, space.device().safe_pc());
-
-	if (off >= 0x20)
-	{
-		atapi_w(space, off-0x20, dat, (UINT32)mem_mask);
-	}
 }
 
 // register decode helpers

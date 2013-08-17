@@ -33,13 +33,11 @@ public:
 	void atapi_cmd_identify_packet();
 	void atapi_cmd_set_features();
 
-	READ32_MEMBER( atapi_r );
-	WRITE32_MEMBER( atapi_w );
 	void dreamcast_atapi_init();
 	void dreamcast_atapi_reset();
 	inline int decode_reg32_64(UINT32 offset, UINT64 mem_mask, UINT64 *shift);
-	READ64_MEMBER( dc_mess_gdrom_r );
-	WRITE64_MEMBER( dc_mess_gdrom_w );
+	READ32_MEMBER( dc_mess_gdrom_r );
+	WRITE32_MEMBER( dc_mess_gdrom_w );
 	READ32_MEMBER( dc_mess_g1_ctrl_r );
 	WRITE32_MEMBER( dc_mess_g1_ctrl_w );
 

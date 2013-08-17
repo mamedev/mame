@@ -115,7 +115,7 @@ static ADDRESS_MAP_START( dc_map, AS_PROGRAM, 64, dc_cons_state )
 	AM_RANGE(0x00200000, 0x0021ffff) AM_ROM AM_REGION("maincpu", 0x200000)  // flash
 	AM_RANGE(0x005f6800, 0x005f69ff) AM_READWRITE(dc_sysctrl_r, dc_sysctrl_w )
 	AM_RANGE(0x005f6c00, 0x005f6cff) AM_DEVICE32( "maple_dc", maple_dc_device, amap, U64(0xffffffffffffffff) )
-	AM_RANGE(0x005f7000, 0x005f70ff) AM_READWRITE(dc_mess_gdrom_r, dc_mess_gdrom_w )
+	AM_RANGE(0x005f7000, 0x005f70ff) AM_READWRITE32(dc_mess_gdrom_r, dc_mess_gdrom_w, U64(0xffffffffffffffff) )
 	AM_RANGE(0x005f7400, 0x005f74ff) AM_READWRITE32(dc_mess_g1_ctrl_r, dc_mess_g1_ctrl_w, U64(0xffffffffffffffff) )
 	AM_RANGE(0x005f7800, 0x005f78ff) AM_READWRITE(dc_g2_ctrl_r, dc_g2_ctrl_w )
 	AM_RANGE(0x005f7c00, 0x005f7cff) AM_DEVICE32("powervr2", powervr2_device, pd_dma_map, U64(0xffffffffffffffff))
