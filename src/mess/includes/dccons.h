@@ -22,7 +22,17 @@ public:
 	DECLARE_WRITE64_MEMBER(dc_arm_w);
 	DECLARE_WRITE_LINE_MEMBER(aica_irq);
 	void gdrom_raise_irq();
+	void gdrom_set_status(UINT8 flag,bool state);
+	void gdrom_set_error(UINT8 flag,bool state);
+
 	TIMER_CALLBACK_MEMBER( atapi_xfer_end );
+	TIMER_CALLBACK_MEMBER( atapi_cmd_exec );
+	UINT8 cur_atapi_cmd;
+	void atapi_cmd_nop();
+	void atapi_cmd_packet();
+	void atapi_cmd_identify_packet();
+	void atapi_cmd_set_features();
+
 	READ32_MEMBER( atapi_r );
 	WRITE32_MEMBER( atapi_w );
 	void dreamcast_atapi_init();
@@ -37,10 +47,9 @@ private:
 	UINT64 PDTRA, PCTRA;
 
 	UINT8 *atapi_regs;
-	emu_timer *atapi_timer;
+	emu_timer *atapi_timer,*atapi_cmd_timer;
 	gdrom_device *gdrom;
 	UINT8 *atapi_data;
 	int atapi_data_ptr, atapi_data_len, atapi_xferlen, atapi_xferbase, atapi_cdata_wait, atapi_xfermod;
-	UINT32 gdrom_alt_status;
 	UINT8 xfer_mode;
 };

@@ -34,6 +34,8 @@
 #define ATAPI_STAT_CORR    0x04
 #define ATAPI_STAT_CHECK   0x01
 
+#define ATAPI_ERR_ABORT 0x04
+
 #define ATAPI_INTREASON_COMMAND 0x01
 #define ATAPI_INTREASON_IO      0x02
 #define ATAPI_INTREASON_RELEASE 0x04
@@ -59,10 +61,167 @@
 
 #define MAX_TRANSFER_SIZE ( 63488 )
 
+void dc_cons_state::gdrom_set_status(UINT8 flag,bool state)
+{
+	if(flag & ATAPI_STAT_DRQ)
+		printf("DRQ %02x\n",state);
+
+	if(state)
+		atapi_regs[ATAPI_REG_CMDSTATUS] |= flag;
+	else
+		atapi_regs[ATAPI_REG_CMDSTATUS] &= ~flag;
+}
+
+void dc_cons_state::gdrom_set_error(UINT8 flag,bool state)
+{
+	if(state)
+		atapi_regs[ATAPI_REG_ERROR] |= flag;
+	else
+		atapi_regs[ATAPI_REG_ERROR] &= ~flag;
+}
+
+
 void dc_cons_state::gdrom_raise_irq()
 {
 	dc_sysctrl_regs[SB_ISTEXT] |= IST_EXT_GDROM;
 	dc_update_interrupt_status();
+}
+
+void dc_cons_state::atapi_cmd_nop()
+{
+	gdrom_set_status(ATAPI_STAT_BSY,false);
+	gdrom_set_status(ATAPI_STAT_DRDY,true);
+
+	gdrom_set_status(ATAPI_STAT_CHECK,true);
+	gdrom_set_error(ATAPI_ERR_ABORT,true);
+
+	atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_COMMAND;
+	gdrom_raise_irq();
+}
+
+void dc_cons_state::atapi_cmd_packet()
+{
+	atapi_data_ptr = 0;
+	atapi_data_len = 0;
+
+	/* we have no data */
+	atapi_xferlen = 0;
+	atapi_xfermod = 0;
+	atapi_cdata_wait = 0;
+
+	gdrom_set_status(ATAPI_STAT_BSY,false);
+	gdrom_set_status(ATAPI_STAT_DRQ,true);
+	atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_COMMAND;
+	/* TODO: raise irq? */
+}
+
+void dc_cons_state::atapi_cmd_identify_packet()
+{
+	atapi_data_ptr = 0;
+	atapi_data_len = 512;
+	/* we have no data */
+	atapi_xferlen = 0;
+	atapi_xfermod = 0;
+
+	memset( atapi_data, 0, atapi_data_len );
+
+	atapi_data[ 0 ^ 1 ] = 0x86; // ATAPI device, cmd set 6 compliant, DRQ within 3 ms of PACKET command
+	atapi_data[ 1 ^ 1 ] = 0x00;
+
+	memset( &atapi_data[ 46 ], ' ', 8 );
+	atapi_data[ 46 ^ 1 ] = 'S';
+	atapi_data[ 47 ^ 1 ] = 'E';
+
+	memset( &atapi_data[ 54 ], ' ', 40 );
+	atapi_data[ 54 ^ 1 ] = 'C';
+	atapi_data[ 55 ^ 1 ] = 'D';
+	atapi_data[ 56 ^ 1 ] = '-';
+	atapi_data[ 57 ^ 1 ] = 'R';
+	atapi_data[ 58 ^ 1 ] = 'O';
+	atapi_data[ 59 ^ 1 ] = 'M';
+	atapi_data[ 60 ^ 1 ] = ' ';
+	atapi_data[ 61 ^ 1 ] = 'D';
+	atapi_data[ 62 ^ 1 ] = 'R';
+	atapi_data[ 63 ^ 1 ] = 'I';
+	atapi_data[ 64 ^ 1 ] = 'V';
+	atapi_data[ 65 ^ 1 ] = 'E';
+	atapi_data[ 66 ^ 1 ] = ' ';
+	atapi_data[ 67 ^ 1 ] = ' ';
+	atapi_data[ 68 ^ 1 ] = ' ';
+	atapi_data[ 69 ^ 1 ] = ' ';
+	atapi_data[ 70 ^ 1 ] = '6';
+	atapi_data[ 71 ^ 1 ] = '.';
+	atapi_data[ 72 ^ 1 ] = '4';
+	atapi_data[ 73 ^ 1 ] = '2';
+
+	atapi_data[ 98 ^ 1 ] = 0x04; // IORDY may be disabled
+	atapi_data[ 99 ^ 1 ] = 0x00;
+
+	atapi_regs[ATAPI_REG_COUNTLOW] = 0;
+	atapi_regs[ATAPI_REG_COUNTHIGH] = 2;
+
+	gdrom_set_status(ATAPI_STAT_BSY,false);
+	gdrom_set_status(ATAPI_STAT_DRQ,true);
+	atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO; /* ok? */
+	gdrom_raise_irq();
+}
+
+void dc_cons_state::atapi_cmd_set_features()
+{
+	//TODO: error ABORT flag clear
+
+	// set xfer mode?
+	if (atapi_regs[ATAPI_REG_FEATURES] == 0x03)
+	{
+		printf("Set transfer mode to %x\n", atapi_regs[ATAPI_REG_COUNTLOW] & 0xf8);
+		xfer_mode = atapi_regs[ATAPI_REG_COUNTLOW] & 0xf8;
+	}
+	else
+	{
+		printf("ATAPI: Unknown set features %x\n", atapi_regs[ATAPI_REG_FEATURES]);
+	}
+
+	gdrom_set_status(ATAPI_STAT_BSY,false);
+	gdrom_set_status(ATAPI_STAT_SERVDSC,false);
+	gdrom_set_status(ATAPI_STAT_DMARDDF,false);
+	gdrom_set_status(ATAPI_STAT_CHECK,false);
+	gdrom_set_status(ATAPI_STAT_DRDY,true);
+
+	atapi_data_ptr = 0;
+	atapi_data_len = 0;
+
+	gdrom_raise_irq();
+}
+
+TIMER_CALLBACK_MEMBER(dc_cons_state::atapi_cmd_exec )
+{
+	atapi_cmd_timer->adjust(attotime::never);
+
+	gdrom_set_status(ATAPI_STAT_CHECK,false);
+	gdrom_set_error(ATAPI_ERR_ABORT,false);
+
+	switch (cur_atapi_cmd)
+	{
+		case 0x00:
+			atapi_cmd_nop();
+			break;
+
+		case 0xa0:  // PACKET
+			atapi_cmd_packet();
+			break;
+
+		case 0xa1:  // IDENTIFY PACKET DEVICE
+			atapi_cmd_identify_packet();
+			break;
+
+		case 0xef:  // SET FEATURES
+			atapi_cmd_set_features();
+			break;
+
+		default:
+			mame_printf_debug("ATAPI: Unknown IDE command %x\n", cur_atapi_cmd);
+			break;
+	}
 }
 
 TIMER_CALLBACK_MEMBER(dc_cons_state::atapi_xfer_end )
@@ -121,7 +280,6 @@ TIMER_CALLBACK_MEMBER(dc_cons_state::atapi_xfer_end )
 	{
 		printf("ATAPI: Transfer completed, dropping DRQ\n");
 		atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRDY;
-		gdrom_alt_status = ATAPI_STAT_DRDY;
 		atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO | ATAPI_INTREASON_COMMAND;
 
 		g1bus_regs[SB_GDST]=0;
@@ -166,16 +324,14 @@ READ32_MEMBER(dc_cons_state::atapi_r )
 //          printf( "atapi_r: atapi_xferlen=%d\n", atapi_xferlen );
 			if( atapi_xferlen != 0 )
 			{
-				atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ | ATAPI_STAT_SERVDSC;
-				gdrom_alt_status = ATAPI_STAT_DRQ | ATAPI_STAT_SERVDSC;
-				atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO;
+				//atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ | ATAPI_STAT_SERVDSC;
+				//atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO;
 			}
 			else
 			{
-				//mame_printf_debug("ATAPI: dropping DRQ\n");
-				atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
-				gdrom_alt_status = 0;
-				atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO;
+				printf("ATAPI: dropping DRQ\n");
+				//atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
+				//atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO;
 			}
 
 			atapi_regs[ATAPI_REG_COUNTLOW] = atapi_xferlen & 0xff;
@@ -197,7 +353,6 @@ READ32_MEMBER(dc_cons_state::atapi_r )
 				if( atapi_xferlen == 0 )
 				{
 					atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
-					gdrom_alt_status = 0;
 					atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO;
 					gdrom_raise_irq();
 				}
@@ -290,6 +445,7 @@ WRITE32_MEMBER(dc_cons_state::atapi_w )
 
 				// not sure here, but clear DRQ at least?
 				atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
+				printf("cdata wait status\n");
 			}
 		}
 
@@ -324,24 +480,29 @@ WRITE32_MEMBER(dc_cons_state::atapi_w )
 				atapi_regs[ATAPI_REG_COUNTLOW] = atapi_xferlen & 0xff;
 				atapi_regs[ATAPI_REG_COUNTHIGH] = (atapi_xferlen>>8)&0xff;
 
-				gdrom_alt_status = 0;   // (I guess?)
-
 				if (atapi_xferlen == 0)
 				{
 					// if no data to return, set the registers properly
-					atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRDY;
+					//atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRDY;
+					gdrom_set_status(ATAPI_STAT_DRDY,true);
+					gdrom_set_status(ATAPI_STAT_DRQ,false);
 					atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO|ATAPI_INTREASON_COMMAND;
 				}
 				else
 				{
+					printf("ATAPI features %02x\n",atapi_regs[ATAPI_REG_FEATURES]);
 					// indicate data ready: set DRQ and DMA ready, and IO in INTREASON
 					if (atapi_regs[ATAPI_REG_FEATURES] & 0x01)  // DMA feature
 					{
-						atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_BSY | ATAPI_STAT_DRDY | ATAPI_STAT_SERVDSC;
+						//gdrom_set_status(ATAPI_STAT_BSY | ATAPI_STAT_DRDY | ATAPI_STAT_SERVDSC,true);
+						//atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_BSY | ATAPI_STAT_DRDY | ATAPI_STAT_SERVDSC;
 					}
 					else
 					{
-						atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ | ATAPI_STAT_SERVDSC | ATAPI_STAT_DRQ;
+						//gdrom_set_status(ATAPI_STAT_SERVDSC,true);
+						/* Ok? */
+						gdrom_set_status(ATAPI_STAT_DRQ,false);
+						//atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ | ATAPI_STAT_SERVDSC | ATAPI_STAT_DRQ;
 					}
 					atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO;
 				}
@@ -358,11 +519,11 @@ WRITE32_MEMBER(dc_cons_state::atapi_w )
 				{
 					case 0x00: // BUS RESET / TEST UNIT READY
 					case 0xbb: // SET CDROM SPEED
-						atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
+						//atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
 						break;
 
 					case 0x45: // PLAY
-						atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_BSY;
+						gdrom_set_status(ATAPI_STAT_BSY,true);
 						atapi_timer->adjust( downcast<cpu_device *>(&space.device())->cycles_to_attotime(ATAPI_CYCLES_PER_SECTOR ) );
 						break;
 				}
@@ -372,10 +533,10 @@ WRITE32_MEMBER(dc_cons_state::atapi_w )
 			}
 			else
 			{
-						printf("ATAPI: SCSI device returned error!\n");
+				printf("ATAPI: SCSI device returned error!\n");
 
-				atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ | ATAPI_STAT_CHECK;
-				atapi_regs[ATAPI_REG_ERROR] = 0x50; // sense key = ILLEGAL REQUEST
+				//atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ | ATAPI_STAT_CHECK;
+				//atapi_regs[ATAPI_REG_ERROR] = 0x50; // sense key = ILLEGAL REQUEST
 				atapi_regs[ATAPI_REG_COUNTLOW] = 0;
 				atapi_regs[ATAPI_REG_COUNTHIGH] = 0;
 			}
@@ -420,99 +581,12 @@ WRITE32_MEMBER(dc_cons_state::atapi_w )
 		{
 			printf("ATAPI command %x issued! (PC=%x)\n", data, space.device().safe_pc());
 
-			switch (data)
-			{
-				case 0xa0:  // PACKET
-					atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ;
-					gdrom_alt_status = ATAPI_STAT_DRQ;
-					atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_COMMAND;
-
-					atapi_data_ptr = 0;
-					atapi_data_len = 0;
-
-					/* we have no data */
-					atapi_xferlen = 0;
-					atapi_xfermod = 0;
-
-					atapi_cdata_wait = 0;
-					break;
-
-				case 0xa1:  // IDENTIFY PACKET DEVICE
-					atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ;
-					gdrom_alt_status = ATAPI_STAT_DRQ;
-
-					atapi_data_ptr = 0;
-					atapi_data_len = 512;
-
-					/* we have no data */
-					atapi_xferlen = 0;
-					atapi_xfermod = 0;
-
-					memset( atapi_data, 0, atapi_data_len );
-
-					atapi_data[ 0 ^ 1 ] = 0x86; // ATAPI device, cmd set 6 compliant, DRQ within 3 ms of PACKET command
-					atapi_data[ 1 ^ 1 ] = 0x00;
-
-					memset( &atapi_data[ 46 ], ' ', 8 );
-					atapi_data[ 46 ^ 1 ] = 'S';
-					atapi_data[ 47 ^ 1 ] = 'E';
-
-					memset( &atapi_data[ 54 ], ' ', 40 );
-					atapi_data[ 54 ^ 1 ] = 'C';
-					atapi_data[ 55 ^ 1 ] = 'D';
-					atapi_data[ 56 ^ 1 ] = '-';
-					atapi_data[ 57 ^ 1 ] = 'R';
-					atapi_data[ 58 ^ 1 ] = 'O';
-					atapi_data[ 59 ^ 1 ] = 'M';
-					atapi_data[ 60 ^ 1 ] = ' ';
-					atapi_data[ 61 ^ 1 ] = 'D';
-					atapi_data[ 62 ^ 1 ] = 'R';
-					atapi_data[ 63 ^ 1 ] = 'I';
-					atapi_data[ 64 ^ 1 ] = 'V';
-					atapi_data[ 65 ^ 1 ] = 'E';
-					atapi_data[ 66 ^ 1 ] = ' ';
-					atapi_data[ 67 ^ 1 ] = ' ';
-					atapi_data[ 68 ^ 1 ] = ' ';
-					atapi_data[ 69 ^ 1 ] = ' ';
-					atapi_data[ 70 ^ 1 ] = '6';
-					atapi_data[ 71 ^ 1 ] = '.';
-					atapi_data[ 72 ^ 1 ] = '4';
-					atapi_data[ 73 ^ 1 ] = '2';
-
-					atapi_data[ 98 ^ 1 ] = 0x04; // IORDY may be disabled
-					atapi_data[ 99 ^ 1 ] = 0x00;
-
-					atapi_regs[ATAPI_REG_COUNTLOW] = 0;
-					atapi_regs[ATAPI_REG_COUNTHIGH] = 2;
-
-					gdrom_raise_irq();
-					break;
-
-				case 0xef:  // SET FEATURES
-					// set xfer mode?
-					if (atapi_regs[ATAPI_REG_FEATURES] == 0x03)
-					{
-						printf("Set transfer mode to %x\n", atapi_regs[ATAPI_REG_COUNTLOW] & 0xf8);
-						xfer_mode = atapi_regs[ATAPI_REG_COUNTLOW] & 0xf8;
-					}
-					else
-					{
-						printf("ATAPI: Unknown set features %x\n", atapi_regs[ATAPI_REG_FEATURES]);
-					}
-
-					atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
-					gdrom_alt_status = 0;   // is this correct?
-
-					atapi_data_ptr = 0;
-					atapi_data_len = 0;
-
-					gdrom_raise_irq();
-					break;
-
-				default:
-					mame_printf_debug("ATAPI: Unknown IDE command %x\n", data);
-					break;
-			}
+			gdrom_set_status(ATAPI_STAT_BSY,true);
+			gdrom_set_status(ATAPI_STAT_DRQ,false);
+			gdrom_set_status(ATAPI_STAT_DRDY,false);
+			cur_atapi_cmd = data;
+			/* TODO: timing of this */
+			atapi_cmd_timer->adjust(m_maincpu->cycles_to_attotime(ATAPI_CYCLES_PER_SECTOR));
 		}
 	}
 }
@@ -534,6 +608,8 @@ void dc_cons_state::dreamcast_atapi_init()
 
 	atapi_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dc_cons_state::atapi_xfer_end),this));
 	atapi_timer->adjust(attotime::never);
+	atapi_cmd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dc_cons_state::atapi_cmd_exec),this));
+	atapi_cmd_timer->adjust(attotime::never);
 
 	gdrom = NULL;
 
@@ -605,7 +681,7 @@ READ64_MEMBER(dc_cons_state::dc_mess_gdrom_r )
 	{
 		//debugger_break(machine());
 		//printf("%08x\n",atapi_regs[ATAPI_REG_CMDSTATUS]);
-		return gdrom_alt_status;
+		return atapi_regs[ATAPI_REG_CMDSTATUS];
 	}
 	else if (off >= 0x20)
 	{
