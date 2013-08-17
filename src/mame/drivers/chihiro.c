@@ -520,6 +520,7 @@ public:
 	UINT32 geforce_object_offset(UINT32 handle);
 	void geforce_read_dma_object(UINT32 handle,UINT32 &offset,UINT32 &size);
 	void geforce_exec_method(address_space &space,UINT32 channel,UINT32 subchannel,UINT32 method,UINT32 address,int &countlen);
+	UINT32 texture_get_texel(int number,int x,int y);
 	void combiner_initialize_registers(UINT32 argb8[6]);
 	void combiner_initialize_stage(int stage_number);
 	void combiner_initialize_final();
@@ -568,6 +569,7 @@ public:
 		int sizew;
 		int dilate;
 		int format;
+		int rectangle_pitch;
 		void *buffer;
 	} texture[4];
 	struct {
@@ -1213,11 +1215,166 @@ void nv2a_renderer::geforce_read_dma_object(UINT32 handle,UINT32 &offset,UINT32 
     }
 }*/
 
+UINT32 convert_a4r4g4b4_a8r8g8b8(UINT32 a4r4g4b4)
+{
+	UINT32 a8r8g8b8;
+	int ca,cr,cg,cb;
+
+	cb=pal4bit(a4r4g4b4 & 0x000f);
+	cg=pal4bit((a4r4g4b4 & 0x00f0) >> 4);
+	cr=pal4bit((a4r4g4b4 & 0x0f00) >> 8);
+	ca=pal4bit((a4r4g4b4 & 0xf000) >> 12);
+	a8r8g8b8=(ca<<24)|(cr<<16)|(cg<<8)|(cb); // color converted to 8 bits per component
+	return a8r8g8b8;
+}
+
+UINT32 convert_a1r5g5b5_a8r8g8b8(UINT32 a1r5g5b5)
+{
+	UINT32 a8r8g8b8;
+	int ca,cr,cg,cb;
+
+	cb=pal5bit(a1r5g5b5 & 0x001f);
+	cg=pal5bit((a1r5g5b5 & 0x03e0) >> 5);
+	cr=pal5bit((a1r5g5b5 & 0x7c00) >> 10);
+	ca=a1r5g5b5 & 0x8000 ? 0xff : 0;
+	a8r8g8b8=(ca<<24)|(cr<<16)|(cg<<8)|(cb); // color converted to 8 bits per component
+	return a8r8g8b8;
+}
+
+UINT32 convert_r5g6b5_r8g8b8(UINT32 r5g6b5)
+{
+	UINT32 r8g8b8;
+	int cr,cg,cb;
+
+	cb=pal5bit(r5g6b5 & 0x001f);
+	cg=pal6bit((r5g6b5 & 0x07e0) >> 5);
+	cr=pal5bit((r5g6b5 & 0xf800) >> 11);
+	r8g8b8=(cr<<16)|(cg<<8)|(cb); // color converted to 8 bits per component
+	return r8g8b8;
+}
+
+UINT32 nv2a_renderer::texture_get_texel(int number,int x,int y)
+{
+	UINT32 to,s,c,sa,ca;
+	UINT32 a4r4g4b4,a1r5g5b5,r5g6b5;
+	int bx,by;
+	int color0,color1,color0m2,color1m2;
+	UINT32 codes;
+	UINT64 alphas;
+	int cr,cg,cb;
+
+	switch (texture[number].format) {
+		case A8R8G8B8:
+			to=dilated0[texture[number].dilate][x]+dilated1[texture[number].dilate][y]; // offset of texel in texture memory
+			return *(((UINT32 *)texture[number].buffer)+to); // get texel color
+		case DXT1:
+			bx=x >> 2;
+			by=y >> 2;
+			x=x & 3;
+			y=y & 3;
+			//to=dilated0[texture[number].dilate][bx]+dilated1[texture[number].dilate][by]; // swizzle 4x4 blocks ?
+			to=bx+by*(texture[number].sizeu >> 2);
+			color0=*((UINT16 *)(((UINT64 *)texture[number].buffer)+to)+0);
+			color1=*((UINT16 *)(((UINT64 *)texture[number].buffer)+to)+1);
+			codes=*((UINT32 *)(((UINT64 *)texture[number].buffer)+to)+1);
+			s=(y << 3)+(x << 1);
+			c=(codes >> s) & 3;
+			c=c+(color0 > color1 ? 0 : 4);
+			color0m2=color0 << 1;
+			color1m2=color1 << 1;
+			switch (c) {
+				case 0:
+					return 0xff000000+convert_r5g6b5_r8g8b8(color0);
+					break;
+				case 1:
+					return 0xff000000+convert_r5g6b5_r8g8b8(color1);
+					break;
+				case 2:
+					cb=pal5bit(((color0m2 & 0x003e)+(color1 & 0x001f))/3);
+					cg=pal6bit(((color0m2 & 0x0fc0)+(color1 & 0x07e0))/3 >> 5);
+					cr=pal5bit(((color0m2 & 0x1f000)+color1)/3 >> 11);
+					return 0xff000000|(cr<<16)|(cg<<8)|(cb);
+					break;
+				case 3:
+					cb=pal5bit(((color1m2 & 0x003e)+(color0 & 0x001f))/3);
+					cg=pal6bit(((color1m2 & 0x0fc0)+(color0 & 0x07e0))/3 >> 5);
+					cr=pal5bit(((color1m2 & 0x1f000)+color0)/3 >> 11);
+					return 0xff000000|(cr<<16)|(cg<<8)|(cb);
+					break;
+				case 4:
+					return 0xff000000+convert_r5g6b5_r8g8b8(color0);
+					break;
+				case 5:
+					return 0xff000000+convert_r5g6b5_r8g8b8(color1);
+					break;
+				case 6:
+					cb=pal5bit(((color0 & 0x001f)+(color1 & 0x001f))/2);
+					cg=pal6bit(((color0 & 0x07e0)+(color1 & 0x07e0))/2 >> 5);
+					cr=pal5bit((color0+color1)/2 >> 11);
+					return 0xff000000|(cr<<16)|(cg<<8)|(cb);
+					break;
+				default:
+					return 0xff000000;
+					break;
+			}
+		case DXT3:
+			bx=x >> 2;
+			by=y >> 2;
+			x=x & 3;
+			y=y & 3;
+			//to=(dilated0[texture[number].dilate][bx]+dilated1[texture[number].dilate][by]) << 1; // swizzle 4x4 blocks ?
+			to=(bx+by*(texture[number].sizeu >> 2)) << 1;
+			color0=*((UINT16 *)(((UINT64 *)texture[number].buffer)+to)+4);
+			color1=*((UINT16 *)(((UINT64 *)texture[number].buffer)+to)+5);
+			codes=*((UINT32 *)(((UINT64 *)texture[number].buffer)+to)+3);
+			alphas=*(((UINT64 *)texture[number].buffer)+to);
+			s=(y << 3)+(x << 1);
+			sa=((y << 2)+x) << 2;
+			c=(codes >> s) & 3;
+			ca=(alphas >> sa) & 15;
+			switch (c) {
+				case 0:
+					return ((ca+(ca << 4)) << 24)+convert_r5g6b5_r8g8b8(color0);
+					break;
+				case 1:
+					return ((ca+(ca << 4)) << 24)+convert_r5g6b5_r8g8b8(color1);
+					break;
+				case 2:
+					cb=pal5bit(((color0 & 0x001f)+(color1 & 0x001f))/2);
+					cg=pal6bit(((color0 & 0x07e0)+(color1 & 0x07e0))/2 >> 5);
+					cr=pal5bit((color0+color1)/2 >> 11);
+					return ((ca+(ca << 4)) << 24)|(cr<<16)|(cg<<8)|(cb);
+					break;
+				default:
+					return (ca+(ca << 4)) << 24;
+					break;
+			}
+			break;
+		case A4R4G4B4:
+			to=dilated0[texture[number].dilate][x]+dilated1[texture[number].dilate][y]; // offset of texel in texture memory
+			a4r4g4b4=*(((UINT16 *)texture[number].buffer)+to); // get texel color
+			return convert_a4r4g4b4_a8r8g8b8(a4r4g4b4);
+		case A1R5G5B5:
+			to=dilated0[texture[number].dilate][x]+dilated1[texture[number].dilate][y]; // offset of texel in texture memory
+			a1r5g5b5=*(((UINT16 *)texture[number].buffer)+to); // get texel color
+			return convert_a1r5g5b5_a8r8g8b8(a1r5g5b5);
+		case R5G6B5:
+			to=dilated0[texture[number].dilate][x]+dilated1[texture[number].dilate][y]; // offset of texel in texture memory
+			r5g6b5=*(((UINT16 *)texture[number].buffer)+to); // get texel color
+			return 0xff000000+convert_r5g6b5_r8g8b8(r5g6b5);
+		case R8G8B8_RECT:
+			to=texture[number].rectangle_pitch*y+(x << 2);
+			return *((UINT32 *)(((UINT8 *)texture[number].buffer)+to));
+		default:
+			return 0xff00ff00;
+	}
+}
+
 void nv2a_renderer::render_color(INT32 scanline, const extent_t &extent, const nvidia_object_data &objectdata, int threadid)
 {
 	int x;
 
-	x=extent.stopx-extent.startx; // number of pixels to draw
+	x=extent.stopx-extent.startx-1; // number of pixels to draw
 	while (x >= 0) {
 		UINT32 a8r8g8b8;
 		int ca,cr,cg,cb;
@@ -1233,19 +1390,6 @@ void nv2a_renderer::render_color(INT32 scanline, const extent_t &extent, const n
 	}
 }
 
-UINT32 convert_a4r4g4b4_a8r8g8b8(UINT32 a4r4g4b4)
-{
-	UINT32 a8r8g8b8;
-	int ca,cr,cg,cb;
-
-	cb=pal4bit(a4r4g4b4 & 0x000f);//(a4r4g4b4 & 0xf)*17; // ((a4r4g4b4 & 0xf)*255)/15
-	cg=pal4bit((a4r4g4b4 & 0x00f0) >> 4);//((a4r4g4b4 & 0xf0)*816)/3; // (((a4r4g4b4 & 0xf0) >> 4)*255)/15) << 8
-	cr=pal4bit((a4r4g4b4 & 0x0f00) >> 8);//(a4r4g4b4 & 0xf00)*17*256; // (((a4r4g4b4 & 0xf00) >> 8)*255)/15) << 16
-	ca=pal4bit((a4r4g4b4 & 0xf000) >> 12);//(a4r4g4b4 & 0xf000)*4096*17; //((a4r4g4b4 & 0xf000) >> 12)*255/15 << 24
-	a8r8g8b8=(ca<<24)|(cr<<16)|(cg<<8)|(cb); // color converted to 8 bits per component
-	return a8r8g8b8;
-}
-
 void nv2a_renderer::render_texture_simple(INT32 scanline, const extent_t &extent, const nvidia_object_data &objectdata, int threadid)
 {
 	int x;
@@ -1253,22 +1397,14 @@ void nv2a_renderer::render_texture_simple(INT32 scanline, const extent_t &extent
 	if (!objectdata.data->texture[0].enabled) {
 		return;
 	}
-	x=extent.stopx-extent.startx;
+	x=extent.stopx-extent.startx-1;
 	while (x >= 0) {
-		int to;
-		UINT32 a4r4g4b4;
 		int up,vp;
 		int xp=extent.startx+x; // x coordinate of current pixel
 
 		up=(extent.param[4].start+(float)x*extent.param[4].dpdx)*(float)(objectdata.data->texture[0].sizeu-1); // x coordinate of texel in texture
 		vp=extent.param[5].start*(float)(objectdata.data->texture[0].sizev-1); // y coordinate of texel in texture
-		to=(objectdata.data->dilated0[objectdata.data->texture[0].dilate][up]+objectdata.data->dilated1[objectdata.data->texture[0].dilate][vp]); // offset of texel in texture memory
-		if (objectdata.data->texture[0].format == 6) {
-			*((UINT32 *)objectdata.data->fb.raw_pixptr(scanline,xp))=*(((UINT32 *)objectdata.data->texture[0].buffer)+to); // get texel color
-		} else {
-			a4r4g4b4=*(((UINT16 *)objectdata.data->texture[0].buffer)+to); // get texel color
-			*((UINT32 *)objectdata.data->fb.raw_pixptr(scanline,xp))=convert_a4r4g4b4_a8r8g8b8(a4r4g4b4);
-		}
+		*((UINT32 *)fb.raw_pixptr(scanline,xp))=texture_get_texel(0, up, vp);
 		x--;
 	}
 }
@@ -1276,7 +1412,6 @@ void nv2a_renderer::render_texture_simple(INT32 scanline, const extent_t &extent
 void nv2a_renderer::render_register_combiners(INT32 scanline, const extent_t &extent, const nvidia_object_data &objectdata, int threadid)
 {
 	int x,xp;
-	int to;
 	int up,vp;
 	int ca,cr,cg,cb;
 	UINT32 color[6];
@@ -1286,7 +1421,7 @@ void nv2a_renderer::render_register_combiners(INT32 scanline, const extent_t &ex
 	color[0] = color[1] = color[2] = color[3] = color[4] = color[5] = 0;
 
 	osd_lock_acquire(combiner.lock); // needed since multithreading is not supported yet
-	x=extent.stopx-extent.startx; // number of pixels to draw
+	x=extent.stopx-extent.startx-1; // number of pixels to draw
 	while (x >= 0) {
 		xp=extent.startx+x;
 		// 1: fetch data
@@ -1302,13 +1437,7 @@ void nv2a_renderer::render_register_combiners(INT32 scanline, const extent_t &ex
 			if (texture[n].enabled) {
 				up=(extent.param[4+n*2].start+(float)x*extent.param[4+n*2].dpdx)*(float)(objectdata.data->texture[n].sizeu-1);
 				vp=extent.param[5+n*2].start*(float)(objectdata.data->texture[n].sizev-1);
-				to=(objectdata.data->dilated0[objectdata.data->texture[n].dilate][up]+objectdata.data->dilated1[objectdata.data->texture[n].dilate][vp]);
-				if (texture[n].format == 6) {
-					color[n+2]=*(((UINT32 *)objectdata.data->texture[n].buffer)+to);
-				} else {
-					color[n+2]=*(((UINT16 *)objectdata.data->texture[n].buffer)+to);
-					color[n+2]=convert_a4r4g4b4_a8r8g8b8(color[n+2]);
-				}
+				color[n+2]=texture_get_texel(n, up, vp);
 			}
 		}
 		// 2: compute
@@ -1334,7 +1463,7 @@ void nv2a_renderer::render_register_combiners(INT32 scanline, const extent_t &ex
 		// 3: write pixel
 		*((UINT32 *)objectdata.data->fb.raw_pixptr(scanline,xp))=a8r8g8b8;
 		x--;
-		}
+	}
 	osd_lock_release(combiner.lock);
 }
 
@@ -1560,7 +1689,6 @@ void nv2a_renderer::geforce_exec_method(address_space & space,UINT32 chanel,UINT
 				}
 
 				render_polygon<4>(fb.cliprect(),renderspans,4+4*2,xy); // 4 rgba, 4 texture units 2 uv
-				wait();
 				/*myline(fb,xy[0].x,xy[0].y,xy[1].x,xy[1].y);
 				myline(fb,xy[1].x,xy[1].y,xy[2].x,xy[2].y);
 				myline(fb,xy[2].x,xy[2].y,xy[3].x,xy[3].y);
@@ -1569,6 +1697,7 @@ void nv2a_renderer::geforce_exec_method(address_space & space,UINT32 chanel,UINT
 				printf(" (%f,%f,%f)-(%f,%f,%f)-(%f,%f,%f)-(%f,%f,%f)\n\r",xy[0].x,xy[0].y,z[0],xy[1].x,xy[1].y,z[1],xy[2].x,xy[2].y,z[2],xy[3].x,xy[3].y,z[3]);
 #endif
 			}
+			wait();
 		} else if (type == nv2a_renderer::TRIANGLE_STRIP) {
 			vertex_t xy[3];
 			float z[3],w[3];
@@ -1616,7 +1745,6 @@ void nv2a_renderer::geforce_exec_method(address_space & space,UINT32 chanel,UINT
 				}
 				// draw triangle
 				render_triangle(fb.cliprect(),renderspans,4+4*2,xy[n & 1],xy[~n & 1],xy[2]); // 012,102,012,102...
-				wait();
 				// move elements 1,2 to 0,1
 				xy[0]=xy[1];
 				xy[1]=xy[2];
@@ -1625,6 +1753,7 @@ void nv2a_renderer::geforce_exec_method(address_space & space,UINT32 chanel,UINT
 				w[0]=w[1];
 				w[1]=w[2];
 			}
+			wait();
 		} else {
 			logerror("Unsupported primitive %d for method 0x1810\n",type);
 		}
@@ -1722,16 +1851,207 @@ void nv2a_renderer::geforce_exec_method(address_space & space,UINT32 chanel,UINT
 				if (countlen < 0) {
 					logerror("Method 0x1818 missing %d words to draw a complete primitive\n",-countlen);
 					countlen=0;
-					return;
+					break;
 				}
 				// draw triangle
 				render_triangle(fb.cliprect(),renderspans,4+4*2,xy[0],xy[1],xy[2]); // 012
-				wait();
 				// move element 2 to 1
 				xy[1]=xy[2];
 				z[1]=z[2];
 				w[1]=w[2];
 			}
+			wait();
+		} else if (type == nv2a_renderer::TRIANGLE_STRIP) {
+			vertex_t xy[3];
+			float z[3],w[3];
+			UINT32 c[3];
+
+			// put first 2 vertices data in elements 0,1 of arrays
+			for (m=0;m < 2;m++) {
+				// consider only attributes: position,color0,texture 0-3
+				// position
+				*((UINT32 *)(&xy[m].x))=space.read_dword(address+vattrpos[0]*4+0);
+				*((UINT32 *)(&xy[m].y))=space.read_dword(address+vattrpos[0]*4+4);
+				*((UINT32 *)(&z[m]))=space.read_dword(address+vattrpos[0]*4+8);
+				*((UINT32 *)(&w[m]))=space.read_dword(address+vattrpos[0]*4+12);
+				// color
+				c[m]=space.read_dword(address+vattrpos[3]*4+0); // color
+				xy[m].p[0]=c[m] & 0xff; // b
+				xy[m].p[1]=(c[m] & 0xff00) >> 8;  // g
+				xy[m].p[2]=(c[m] & 0xff0000) >> 16;  // r
+				xy[m].p[3]=(c[m] & 0xff000000) >> 24;  // a
+				// texture 0-3
+				for (u=0;u < 4;u++) {
+					xy[m].p[4+u*2]=0;
+					xy[m].p[5+u*2]=0;
+					if (texture[u].enabled) {
+						*((UINT32 *)(&xy[m].p[4+u*2]))=space.read_dword(address+vattrpos[9+u]*4+0);
+						*((UINT32 *)(&xy[m].p[5+u*2]))=space.read_dword(address+vattrpos[9+u]*4+4);
+					}
+				}
+				address=address+vwords*4;
+				countlen=countlen-vwords;
+			}
+			if (countlen <= 0) {
+				logerror("Method 0x1818 missing %d words to draw a complete primitive\n",-countlen+vwords);
+				countlen=0;
+				return;
+			}
+			for (n=2;countlen > 0;n++) {
+				// put vertex n data in element 2 of arrays
+				// put vertex n data in element 2 of arrays
+				// position
+				*((UINT32 *)(&xy[2].x))=space.read_dword(address+vattrpos[0]*4+0);
+				*((UINT32 *)(&xy[2].y))=space.read_dword(address+vattrpos[0]*4+4);
+				*((UINT32 *)(&z[2]))=space.read_dword(address+vattrpos[0]*4+8);
+				*((UINT32 *)(&w[2]))=space.read_dword(address+vattrpos[0]*4+12);
+				// color
+				c[2]=space.read_dword(address+vattrpos[3]*4+0); // color
+				xy[2].p[0]=c[2] & 0xff; // b
+				xy[2].p[1]=(c[2] & 0xff00) >> 8;  // g
+				xy[2].p[2]=(c[2] & 0xff0000) >> 16;  // r
+				xy[2].p[3]=(c[2] & 0xff000000) >> 24;  // a
+				// texture 0-3
+				for (u=0;u < 4;u++) {
+					xy[2].p[4+u*2]=0;
+					xy[2].p[5+u*2]=0;
+					if (texture[u].enabled) {
+						*((UINT32 *)(&xy[2].p[4+u*2]))=space.read_dword(address+vattrpos[9+u]*4+0);
+						*((UINT32 *)(&xy[2].p[5+u*2]))=space.read_dword(address+vattrpos[9+u]*4+4);
+					}
+				}
+				address=address+vwords*4;
+				countlen=countlen-vwords;
+				if (countlen < 0) {
+					logerror("Method 0x1818 missing %d words to draw a complete primitive\n",-countlen);
+					countlen=0;
+					break;
+				}
+				// draw triangle
+				render_triangle(fb.cliprect(),renderspans,4+4*2,xy[n & 1],xy[~n & 1],xy[2]); // 012,102,012,102...
+				// move elements 1,2 to 0,1
+				xy[0]=xy[1];
+				xy[1]=xy[2];
+				z[0]=z[1];
+				z[1]=z[2];
+				w[0]=w[1];
+				w[1]=w[2];
+			}
+			wait();
+		} else if (type == nv2a_renderer::QUADS) {
+			vertex_t xy[4];
+			float z[4],w[4];
+			UINT32 c[4];
+
+			for (n=0;countlen > 0;n+=4) {
+				for (m=0;m < 4;m++) {
+					// consider only attributes: position,color0,texture 0-3
+					// position
+					*((UINT32 *)(&xy[m].x))=space.read_dword(address+vattrpos[0]*4+0);
+					*((UINT32 *)(&xy[m].y))=space.read_dword(address+vattrpos[0]*4+4);
+					*((UINT32 *)(&z[m]))=space.read_dword(address+vattrpos[0]*4+8);
+					*((UINT32 *)(&w[m]))=space.read_dword(address+vattrpos[0]*4+12);
+					// color
+					c[m]=space.read_dword(address+vattrpos[3]*4+0); // color
+					xy[m].p[0]=c[m] & 0xff; // b
+					xy[m].p[1]=(c[m] & 0xff00) >> 8;  // g
+					xy[m].p[2]=(c[m] & 0xff0000) >> 16;  // r
+					xy[m].p[3]=(c[m] & 0xff000000) >> 24;  // a
+					// texture 0-3
+					for (u=0;u < 4;u++) {
+						xy[m].p[4+u*2]=0;
+						xy[m].p[5+u*2]=0;
+						if (texture[u].enabled) {
+							*((UINT32 *)(&xy[m].p[4+u*2]))=space.read_dword(address+vattrpos[9+u]*4+0);
+							*((UINT32 *)(&xy[m].p[5+u*2]))=space.read_dword(address+vattrpos[9+u]*4+4);
+						}
+					}
+					address=address+vwords*4;
+					countlen=countlen-vwords;
+				}
+				if (countlen < 0) {
+					countlen=0;
+					break;
+				}
+
+				render_polygon<4>(fb.cliprect(),renderspans,4+4*2,xy); // 4 rgba, 4 texture units 2 uv
+			}
+			wait();
+		} else if (type == nv2a_renderer::QUAD_STRIP) {
+			vertex_t xy[4];
+			float z[4],w[4];
+			UINT32 c[4];
+
+			// put first 2 vertices data in elements 0,1 of arrays
+			for (m=0;m < 2;m++) {
+				// consider only attributes: position,color0,texture 0-3
+				// position
+				*((UINT32 *)(&xy[m].x))=space.read_dword(address+vattrpos[0]*4+0);
+				*((UINT32 *)(&xy[m].y))=space.read_dword(address+vattrpos[0]*4+4);
+				*((UINT32 *)(&z[m]))=space.read_dword(address+vattrpos[0]*4+8);
+				*((UINT32 *)(&w[m]))=space.read_dword(address+vattrpos[0]*4+12);
+				// color
+				c[m]=space.read_dword(address+vattrpos[3]*4+0); // color
+				xy[m].p[0]=c[m] & 0xff; // b
+				xy[m].p[1]=(c[m] & 0xff00) >> 8;  // g
+				xy[m].p[2]=(c[m] & 0xff0000) >> 16;  // r
+				xy[m].p[3]=(c[m] & 0xff000000) >> 24;  // a
+				// texture 0-3
+				for (u=0;u < 4;u++) {
+					xy[m].p[4+u*2]=0;
+					xy[m].p[5+u*2]=0;
+					if (texture[u].enabled) {
+						*((UINT32 *)(&xy[m].p[4+u*2]))=space.read_dword(address+vattrpos[9+u]*4+0);
+						*((UINT32 *)(&xy[m].p[5+u*2]))=space.read_dword(address+vattrpos[9+u]*4+4);
+					}
+				}
+				address=address+vwords*4;
+				countlen=countlen-vwords;
+			}
+			if (countlen <= 0) {
+				countlen=0;
+				return;
+			}
+			for (n=2;countlen > 0;n+=2) {
+				// put vertices n,n+1 data in elements 3,2 of arrays
+				for (m=3;m >= 2;m--) {
+					// position
+					*((UINT32 *)(&xy[m].x))=space.read_dword(address+vattrpos[0]*4+0);
+					*((UINT32 *)(&xy[m].y))=space.read_dword(address+vattrpos[0]*4+4);
+					*((UINT32 *)(&z[m]))=space.read_dword(address+vattrpos[0]*4+8);
+					*((UINT32 *)(&w[m]))=space.read_dword(address+vattrpos[0]*4+12);
+					// color
+					c[m]=space.read_dword(address+vattrpos[3]*4+0); // color
+					xy[m].p[0]=c[m] & 0xff; // b
+					xy[m].p[1]=(c[m] & 0xff00) >> 8;  // g
+					xy[m].p[2]=(c[m] & 0xff0000) >> 16;  // r
+					xy[m].p[3]=(c[m] & 0xff000000) >> 24;  // a
+					// texture 0-3
+					for (u=0;u < 4;u++) {
+						xy[m].p[4+u*2]=0;
+						xy[m].p[5+u*2]=0;
+						if (texture[u].enabled) {
+							*((UINT32 *)(&xy[m].p[4+u*2]))=space.read_dword(address+vattrpos[9+u]*4+0);
+							*((UINT32 *)(&xy[m].p[5+u*2]))=space.read_dword(address+vattrpos[9+u]*4+4);
+						}
+					}
+					address=address+vwords*4;
+					countlen=countlen-vwords;
+				}
+				if (countlen < 0) {
+					countlen=0;
+					break;
+				}
+				render_polygon<4>(fb.cliprect(),renderspans,4+4*2,xy); // 4 rgba, 4 texture units 2 uv
+				// copy elements 3,2 of arrays to elements 0,1 of arrays
+				xy[0]=xy[3];
+				z[0]=z[3];
+				w[0]=w[3];
+				xy[1]=xy[2];
+				z[1]=z[2];
+				w[1]=w[2];
+			}
+			wait();
 		} else {
 			logerror("Unsupported primitive %d for method 0x1818\n",type);
 		}
@@ -1810,6 +2130,9 @@ void nv2a_renderer::geforce_exec_method(address_space & space,UINT32 chanel,UINT
 
 			enable=(data >> 30) & 1;
 			texture[unit].enabled=enable;
+		}
+		if (maddress == 0x1b10) {
+			texture[unit].rectangle_pitch=data >> 16;
 		}
 		countlen--;
 	}
@@ -2980,6 +3303,9 @@ READ32_MEMBER( chihiro_state::usbctrl_r )
 			chihiro_devs.pic8259_1->machine().firstcpu->space(0).write_byte(0x47aa4,0x00);
 			chihiro_devs.pic8259_1->machine().firstcpu->space(0).write_byte(0x14f2b6,0x84);
 			chihiro_devs.pic8259_1->machine().firstcpu->space(0).write_byte(0x14f2d1,0x75);
+			chihiro_devs.pic8259_1->machine().firstcpu->space(0).write_byte(0x8732f,0x7d);
+			chihiro_devs.pic8259_1->machine().firstcpu->space(0).write_byte(0x87384,0x7d);
+			chihiro_devs.pic8259_1->machine().firstcpu->space(0).write_byte(0x87388,0xeb);
 		}
 		usbhack_counter++;
 	}
