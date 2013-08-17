@@ -182,6 +182,7 @@ void dc_cons_state::atapi_cmd_set_features()
 	}
 
 	gdrom_set_status(ATAPI_STAT_BSY,false);
+	gdrom_set_error(ATAPI_ERR_ABORT,false);
 	gdrom_set_status(ATAPI_STAT_SERVDSC,false);
 	gdrom_set_status(ATAPI_STAT_DMARDDF,false);
 	gdrom_set_status(ATAPI_STAT_CHECK,false);
@@ -279,7 +280,9 @@ TIMER_CALLBACK_MEMBER(dc_cons_state::atapi_xfer_end )
 	else
 	{
 		printf("ATAPI: Transfer completed, dropping DRQ\n");
-		atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRDY;
+		gdrom_set_status(ATAPI_STAT_DRDY,true);
+		gdrom_set_status(ATAPI_STAT_DRQ,false);
+		gdrom_set_status(ATAPI_STAT_BSY,false);
 		atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO | ATAPI_INTREASON_COMMAND;
 
 		g1bus_regs[SB_GDST]=0;
