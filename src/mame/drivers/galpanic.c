@@ -796,7 +796,7 @@ ROM_START( newfant )
 	ROM_LOAD16_BYTE( "iscr7.06", 0x400001, 0x80000, CRC(2dee0c31) SHA1(1097006e6e5d16b24fb71615b6c0754fe0ecbe33) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )    /* sprites */
-	ROM_LOAD( "obj1.13",  0x00000, 0x80000, CRC(832cd451) SHA1(29dfab1d4b7a15f3fe9fbedef41d405a40235a77) )
+        ROM_LOAD( "nf95obj1.13",  0x00000, 0x80000, CRC(e6d1bc71) SHA1(df0b6c1742c01991196659bab2691230323e7b8d) )
 
 	ROM_REGION( 0x140000, "oki", 0 )    /* OKIM6295 samples */
 	/* 00000-2ffff is fixed, 30000-3ffff is bank switched from all the ROMs */
@@ -819,7 +819,7 @@ ROM_START( newfanta )
         ROM_LOAD16_BYTE( "iscr7.06", 0x400001, 0x80000, CRC(2dee0c31) SHA1(1097006e6e5d16b24fb71615b6c0754fe0ecbe33) )
 
         ROM_REGION( 0x80000, "gfx1", 0 )    /* sprites */
-        ROM_LOAD( "nf95obj1.13",  0x00000, 0x80000, CRC(e6d1bc71) SHA1(df0b6c1742c01991196659bab2691230323e7b8d) )
+	ROM_LOAD( "obj1.13",  0x00000, 0x80000, CRC(832cd451) SHA1(29dfab1d4b7a15f3fe9fbedef41d405a40235a77) )
 
         ROM_REGION( 0x140000, "oki", 0 )    /* OKIM6295 samples */
         /* 00000-2ffff is fixed, 30000-3ffff is bank switched from all the ROMs */
@@ -973,7 +973,7 @@ ROM_START( zipzap )
 	ROM_LOAD16_BYTE( "ud17.bin", 0x000001, 0x40000, BAD_DUMP CRC(2901fae1) SHA1(0d6ca6d48c5586c05f3c02aee51a95da38b3751f) )
 	ROM_LOAD16_BYTE( "ue17.bin", 0x000000, 0x40000, BAD_DUMP CRC(da6c3fc8) SHA1(4bc01bc6f62553f6ac4f7252f7d9bf0d639f6935) )
 	/* gfx bitmaps */
-	ROM_LOAD16_BYTE( "938.bin",  0x400000, 0x80000, CRC(61c06b60) SHA1(b3abae020009a48b99862766e0981e1118159a47) ) // good title backgruond
+	ROM_LOAD16_BYTE( "938.bin",  0x400000, 0x80000, CRC(61c06b60) SHA1(b3abae020009a48b99862766e0981e1118159a47) ) // good title background
 	ROM_LOAD16_BYTE( "942.bin",  0x400001, 0x80000, CRC(282413b8) SHA1(e2ecaaa3c5b2355eadc016b73d7d658f25e1e0db) ) // (and corrupt gfx on select mode screen)
 
 	ROM_LOAD16_BYTE( "934.bin",  0x300000, 0x80000, CRC(1e65988a) SHA1(64d6f8cbdb28755515d9bbf52f589ce1176fed58) ) // good, girls
@@ -1017,16 +1017,16 @@ ROM_START( supmodel )
 	ROM_LOAD( "music2.2", 0xc0000, 0x80000, CRC(cccae65a) SHA1(5e4e2e51884eaf191f103aa189ff33371fc91d6d) )
 ROM_END
 
-GAME( 1990, galpanic, 0,        galpanic, galpanic, driver_device, 0, ROT90, "Kaneko", "Gals Panic (Unprotected)", GAME_NO_COCKTAIL )
-GAME( 1990, galpanica,galpanic, galpanica,galpanica, driver_device,0, ROT90, "Kaneko", "Gals Panic (MCU Protected)", GAME_NO_COCKTAIL )
-GAME( 1994, supmodel, 0,        supmodel, fantasia, driver_device, 0, ROT90, "Comad & New Japan System", "Super Model",GAME_NO_COCKTAIL )
-GAME( 1994, newfant,  0,        comad,    fantasia, driver_device, 0, ROT90, "Comad & New Japan System", "New Fantasia", GAME_NO_COCKTAIL )
-GAME( 1995, newfanta, newfant,  comad,    fantasia, driver_device, 0, ROT90, "Comad & New Japan System", "New Fantasia (set 2)", GAME_NO_COCKTAIL )
-GAME( 1995, fantsy95, newfant,  comad,    fantasia, driver_device, 0, ROT90, "Hi-max Technology Inc.", "Fantasy '95", GAME_NO_COCKTAIL )
-GAME( 1996, missw96,  0,        comad,    missw96, driver_device,  0, ROT0,  "Comad", "Miss World '96 (Nude)", GAME_NO_COCKTAIL )
-GAME( 1996, missmw96, missw96,  comad,    missw96, driver_device,  0, ROT0,  "Comad", "Miss Mister World '96 (Nude)", GAME_NO_COCKTAIL )
-GAME( 1997, fantsia2, 0,        fantsia2, missw96, driver_device,  0, ROT0,  "Comad", "Fantasia II (Explicit)", GAME_NO_COCKTAIL )
-GAME( 1997, fantsia2a,fantsia2, fantsia2, missw96, driver_device,  0, ROT0,  "Comad", "Fantasia II (Less Explicit)", GAME_NO_COCKTAIL )
-GAME( 2002, wownfant, 0,        fantsia2, missw96, driver_device,  0, ROT0,  "Comad", "WOW New Fantasia", GAME_NO_COCKTAIL )
-GAME( 1997, galhustl, 0,        galhustl, galhustl, driver_device, 0, ROT0,  "ACE International", "Gals Hustler", 0 )
-GAME( 1995, zipzap,   0,        zipzap,   zipzap, driver_device,   0, ROT90, "Barko Corp", "Zip & Zap", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
+GAME( 1990, galpanic, 0,        galpanic, galpanic,  driver_device, 0, ROT90, "Kaneko",                   "Gals Panic (Unprotected)", GAME_NO_COCKTAIL )
+GAME( 1990, galpanica,galpanic, galpanica,galpanica, driver_device, 0, ROT90, "Kaneko",                   "Gals Panic (MCU Protected)", GAME_NO_COCKTAIL )
+GAME( 1994, supmodel, 0,        supmodel, fantasia,  driver_device, 0, ROT90, "Comad & New Japan System", "Super Model",GAME_NO_COCKTAIL )
+GAME( 1995, newfant,  0,        comad,    fantasia,  driver_device, 0, ROT90, "Comad & New Japan System", "New Fantasia (set 1)", GAME_NO_COCKTAIL )
+GAME( 1994, newfanta, newfant,  comad,    fantasia,  driver_device, 0, ROT90, "Comad & New Japan System", "New Fantasia (set 2)", GAME_NO_COCKTAIL )
+GAME( 1995, fantsy95, newfant,  comad,    fantasia,  driver_device, 0, ROT90, "Hi-max Technology Inc.",   "Fantasy '95", GAME_NO_COCKTAIL )
+GAME( 1996, missw96,  0,        comad,    missw96,   driver_device, 0, ROT0,  "Comad",                    "Miss World '96 (Nude)", GAME_NO_COCKTAIL )
+GAME( 1996, missmw96, missw96,  comad,    missw96,   driver_device, 0, ROT0,  "Comad",                    "Miss Mister World '96 (Nude)", GAME_NO_COCKTAIL )
+GAME( 1997, fantsia2, 0,        fantsia2, missw96,   driver_device, 0, ROT0,  "Comad",                    "Fantasia II (Explicit)", GAME_NO_COCKTAIL )
+GAME( 1997, fantsia2a,fantsia2, fantsia2, missw96,   driver_device, 0, ROT0,  "Comad",                    "Fantasia II (Less Explicit)", GAME_NO_COCKTAIL )
+GAME( 2002, wownfant, 0,        fantsia2, missw96,   driver_device, 0, ROT0,  "Comad",                    "WOW New Fantasia", GAME_NO_COCKTAIL )
+GAME( 1997, galhustl, 0,        galhustl, galhustl,  driver_device, 0, ROT0,  "ACE International",        "Gals Hustler", 0 )
+GAME( 1995, zipzap,   0,        zipzap,   zipzap,    driver_device, 0, ROT90, "Barko Corp",               "Zip & Zap", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
