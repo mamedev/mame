@@ -50,6 +50,17 @@
 #define ATAPI_REG_CMDSTATUS 7
 #define ATAPI_REG_ERROR     16  // read-only ERROR (write is FEATURES)
 
+#define GDROM_BUSY_STATE 	0x00
+#define GDROM_PAUSE_STATE   0x01
+#define GDROM_STANDBY_STATE 0x02
+#define GDROM_PLAY_STATE    0x03
+#define GDROM_SEEK_STATE    0x04
+#define GDROM_SCAN_STATE	0x05
+#define GDROM_OPEN_STATE    0x06
+#define GDROM_NODISC_STATE  0x07
+#define GDROM_RETRY_STATE   0x08
+#define GDROM_ERROR_STATE   0x09
+
 #define ATAPI_REG_MAX 24
 
 #define ATAPI_XFER_PIO      0x00
@@ -284,6 +295,7 @@ TIMER_CALLBACK_MEMBER(dc_cons_state::atapi_xfer_end )
 		gdrom_set_status(ATAPI_STAT_DRQ,false);
 		gdrom_set_status(ATAPI_STAT_BSY,false);
 		atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO | ATAPI_INTREASON_COMMAND;
+		atapi_regs[ATAPI_REG_SAMTAG] = GDROM_PAUSE_STATE | 0x80;
 
 		g1bus_regs[SB_GDST]=0;
 		dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_GDROM;
@@ -681,6 +693,7 @@ WRITE32_MEMBER(dc_cons_state::dc_mess_g1_ctrl_w )
 
 			atapi_xferbase = g1bus_regs[SB_GDSTAR];
 			atapi_timer->adjust(m_maincpu->cycles_to_attotime((ATAPI_CYCLES_PER_SECTOR * (atapi_xferlen/2048))));
+			atapi_regs[ATAPI_REG_SAMTAG] = GDROM_PAUSE_STATE | 0x80;
 		}
 		break;
 	}
