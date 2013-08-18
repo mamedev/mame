@@ -386,7 +386,7 @@ READ32_MEMBER(dc_cons_state::dc_mess_gdrom_r)
 	switch(offset)
 	{
 		case 0x18/4:
-			return atapi_regs[ATAPI_REG_CMDSTATUS];
+			return atapi_regs[ATAPI_REG_CMDSTATUS] | 0x10;
 		case 0x80/4:
 			UINT32 data;
 			if (atapi_data_ptr == 0 && atapi_data_len == 0)
@@ -467,7 +467,7 @@ READ32_MEMBER(dc_cons_state::dc_mess_gdrom_r)
 		case 0x9c/4:
 			dc_sysctrl_regs[SB_ISTEXT] &= ~IST_EXT_GDROM;
 			dc_update_interrupt_status();
-			return atapi_regs[ATAPI_REG_CMDSTATUS];
+			return atapi_regs[ATAPI_REG_CMDSTATUS] | 0x10;
 	}
 
 	return 0;

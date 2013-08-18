@@ -2624,11 +2624,11 @@ void powervr2_device::pvr_drawframebuffer(bitmap_rgb32 &bitmap,const rectangle &
 					for (x=0;x < xi;x++)
 					{
 						fbaddr=&bitmap.pix32(y, x*2+0);
-						c=*((reinterpret_cast<UINT16 *>(dc_framebuffer_ram)) + (WORD2_XOR_LE(addrp) >> 1));
+						c =*((reinterpret_cast<UINT32 *>(dc_framebuffer_ram)) + (WORD2_XOR_LE(addrp) >> 2));
 
-						b = (c & 0x001f) << 3;
-						g = (c & 0x07e0) >> 3;
-						r = (c & 0xf800) >> 8;
+						b = (c & 0x0000ff) >> 0;
+						g = (c & 0x00ff00) >> 8;
+						r = (c & 0xff0000) >> 16;
 
 						if (y<=cliprect.max_y)
 							*fbaddr = b | (g<<8) | (r<<16);
@@ -2637,7 +2637,7 @@ void powervr2_device::pvr_drawframebuffer(bitmap_rgb32 &bitmap,const rectangle &
 						if (y<=cliprect.max_y)
 							*fbaddr = b | (g<<8) | (r<<16);
 
-						addrp+=2;
+						addrp+=4;
 					}
 				}
 				else
@@ -2645,15 +2645,15 @@ void powervr2_device::pvr_drawframebuffer(bitmap_rgb32 &bitmap,const rectangle &
 					for (x=0;x < xi;x++)
 					{
 						fbaddr=&bitmap.pix32(y, x);
-						c=*((reinterpret_cast<UINT16 *>(dc_framebuffer_ram)) + (WORD2_XOR_LE(addrp) >> 1));
+						c =*((reinterpret_cast<UINT32 *>(dc_framebuffer_ram)) + (WORD2_XOR_LE(addrp) >> 2));
 
-						b = (c & 0x001f) << 3;
-						g = (c & 0x07e0) >> 3;
-						r = (c & 0xf800) >> 8;
+						b = (c & 0x0000ff) >> 0;
+						g = (c & 0x00ff00) >> 8;
+						r = (c & 0xff0000) >> 16;
 
 						if (y<=cliprect.max_y)
 							*fbaddr = b | (g<<8) | (r<<16);
-						addrp+=2;
+						addrp+=4;
 					}
 				}
 			}

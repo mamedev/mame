@@ -9,6 +9,7 @@
 #include "cdrom.h"
 #include "imagedev/chd_cd.h"
 #include "gdrom.h"
+#include "debugger.h"
 
 static const UINT8 GDROM_Cmd11_Reply[32] =
 {
@@ -125,6 +126,7 @@ void gdrom_device::ExecCommand( int *transferLength )
 
 		case 0x12: // INQUIRY
 			logerror("GDROM: REQUEST SENSE\n");
+			debugger_break(machine());
 			SetPhase( SCSI_PHASE_DATAIN );
 			transferOffset = command[2];
 			*transferLength = SCSILengthFromUINT8( &command[ 4 ] );
@@ -271,6 +273,7 @@ void gdrom_device::ExecCommand( int *transferLength )
 
 			SetPhase( SCSI_PHASE_DATAIN );
 			*transferLength = length;
+			debugger_break(machine());
 			break;
 		}
 		case 0x45: // PLAY AUDIO(10)
