@@ -79,7 +79,7 @@ READ64_MEMBER(dc_cons_state::dc_pdtra_r )
 	// if both bits are inputs
 	if (!(PCTRA & 0x5))
 	{
-		out |= 3;
+		out |= 0x03;
 	}
 
 	// one's input one's output, always pull up both bits
@@ -87,9 +87,15 @@ READ64_MEMBER(dc_cons_state::dc_pdtra_r )
 	{
 		if (PDTRA & 3)
 		{
-			out |= 3;
+			out |= 0x03;
 		}
 	}
+
+	/*
+	cable setting, (0-1) VGA, (2) TV RGB (3) TV VBS/Y + S/C.
+	Note: several games doesn't like VGA setting (i.e. Idol Janshi wo Tsukucchaou, Airforce Delta), so hard-wire it to most common setting for now.
+	*/
+	out |= 0x02 << 8;
 
 	return out;
 }
