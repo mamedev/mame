@@ -1496,6 +1496,47 @@ ROM_START( excelsr )
 	ROM_COPY( "user2", 0x060000, 0x0a0000, 0x020000)
 ROM_END
 
+ROM_START( excelsra )
+	ROM_REGION( 0x300000, "maincpu", 0 )    /* 68000 code */
+	ROM_LOAD16_BYTE( "22(__excelsra).u301", 0x000001, 0x80000, CRC(55dca2da) SHA1(b16ce3c12f635e165740b0a72a6cfd838e4ce701) )
+	ROM_LOAD16_BYTE( "19(__excelsra).u302", 0x000000, 0x80000, CRC(d13990a8) SHA1(4f002c4a9003af9963a601c78be446815e9bae92) )
+	ROM_LOAD16_BYTE( "21.u303", 0x100001, 0x80000, CRC(fdf9bd64) SHA1(783e3b8b70f8751915715e2455990c1c8eec6a71) )
+	ROM_LOAD16_BYTE( "18.u304", 0x100000, 0x80000, CRC(fe517e0e) SHA1(fa074c3848046b59f1026f9ce1f264b49560668d) )
+	ROM_LOAD16_BYTE( "20.u305", 0x200001, 0x80000, CRC(8692afe9) SHA1(b4411bad64a9a6efd8eb13dcf7c5eebfb5681f3d) )
+	ROM_LOAD16_BYTE( "17.u306", 0x200000, 0x80000, CRC(978f9a6b) SHA1(9514b97f071fd20740218a58af877765beffedad) )
+
+	ROM_REGION( 0x1000, "audiocpu", ROMREGION_ERASE00 ) /* sound (PIC16C57) */
+	/* ROM will be copied here by the init code from "user1" */
+
+	ROM_REGION( 0x3000, "user1", 0 )
+	ROM_LOAD( "pic16c57-hs.i015", 0x0000, 0x2d4c, CRC(022c6941) SHA1(8ead40bfa7aa783b1ce62bd6cfa673cb876e29e7) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_LOAD( "26.u311",      0x000000, 0x80000, CRC(c171c059) SHA1(7bc45ef1d588f5f55a461adb91bca382155c1059) )
+	ROM_LOAD( "30.u312",      0x080000, 0x80000, CRC(b4a4c510) SHA1(07951a4c18bb25b10f650fd85b6bab566d0ef971) )
+	ROM_LOAD( "25.u313",      0x100000, 0x80000, CRC(667eec1b) SHA1(9e5ed82a4966244a97d18c27466179771012b305) )
+	ROM_LOAD( "29.u314",      0x180000, 0x80000, CRC(4acb0745) SHA1(6b5feaa5aa088f0cc5799f73ee5f90ed390165a9) )
+
+	ROM_REGION( 0x200000, "gfx2", 0 )
+	ROM_LOAD( "24.u321",      0x000000, 0x80000, CRC(17f46825) SHA1(6ac0e71498ac668641c0b7134ddd19cc4cc97005) )
+	ROM_LOAD( "28.u322",      0x080000, 0x80000, CRC(a823f2bd) SHA1(c7f1b1ee8f7069522787b6916b8c6e4591b55782) )
+	ROM_LOAD( "23.u323",      0x100000, 0x80000, CRC(d8e1453b) SHA1(a3edb05abe486d4cce30f5caf14be619b6886f7c) )
+	ROM_LOAD( "27.u324",      0x180000, 0x80000, CRC(eca2c079) SHA1(a07957b427d55c8ca1efb0e83ee3b603f06bed58) )
+
+	ROM_REGION( 0x80000, "user2", 0 )   /* OKIM6295 samples */
+	ROM_LOAD( "16.i013",      0x000000, 0x80000, CRC(7ed9da5d) SHA1(352f1e89613feb1902b6d87adb996ed1c1d8108e) )
+
+	/* $00000-$20000 stays the same in all sound banks, */
+	/* the second half of the bank is what gets switched */
+	ROM_REGION( 0xc0000, "oki", 0 ) /* Samples */
+	ROM_COPY( "user2", 0x000000, 0x000000, 0x020000)
+	ROM_COPY( "user2", 0x020000, 0x020000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x040000, 0x020000)
+	ROM_COPY( "user2", 0x040000, 0x060000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x080000, 0x020000)
+	ROM_COPY( "user2", 0x060000, 0x0a0000, 0x020000)
+ROM_END
+
 /*
 
 Hot Mind
@@ -1753,7 +1794,8 @@ GAME( 1995, bigtwinb,  bigtwin,  bigtwinb, bigtwinb, playmark_state, bigtwin, RO
 GAME( 1995, wbeachvl,  0,        wbeachvl, wbeachvl, driver_device,  0,       ROT0, "Playmark", "World Beach Volley (set 1)", GAME_NO_COCKTAIL | GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1995, wbeachvl2, wbeachvl, wbeachvl, wbeachvl, driver_device,  0,       ROT0, "Playmark", "World Beach Volley (set 2)",  GAME_NO_COCKTAIL | GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1995, wbeachvl3, wbeachvl, wbeachvl, wbeachvl, driver_device,  0,       ROT0, "Playmark", "World Beach Volley (set 3)",  GAME_NO_COCKTAIL | GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1996, excelsr,   0,        excelsr,  excelsr,  playmark_state, bigtwin, ROT0, "Playmark", "Excelsior", GAME_SUPPORTS_SAVE )
+GAME( 1996, excelsr,   0,        excelsr,  excelsr,  playmark_state, bigtwin, ROT0, "Playmark", "Excelsior (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1996, excelsra,  excelsr,  excelsr,  excelsr,  playmark_state, bigtwin, ROT0, "Playmark", "Excelsior (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1995, hotmind,   0,        hotmind,  hotmind,  playmark_state, bigtwin, ROT0, "Playmark", "Hot Mind (Hard Times hardware)", GAME_SUPPORTS_SAVE )
 GAME( 1995, luckboomh, luckboom, luckboomh,hotmind,  playmark_state, bigtwin, ROT0, "Playmark", "Lucky Boom (Hard Times hardware)", GAME_NOT_WORKING )
 GAME( 1994, hrdtimes,  0,        hrdtimes, hrdtimes, driver_device,  0,       ROT0, "Playmark", "Hard Times (set 1)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
