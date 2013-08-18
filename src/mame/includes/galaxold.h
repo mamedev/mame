@@ -143,6 +143,7 @@ public:
 	DECLARE_DRIVER_INIT(ladybugg);
 	DECLARE_DRIVER_INIT(4in1);
 	DECLARE_DRIVER_INIT(guttangt);
+	DECLARE_DRIVER_INIT(ckonggx);
 	TILE_GET_INFO_MEMBER(drivfrcg_get_tile_info);
 	TILE_GET_INFO_MEMBER(racknrol_get_tile_info);
 	TILE_GET_INFO_MEMBER(dambustr_get_tile_info2);

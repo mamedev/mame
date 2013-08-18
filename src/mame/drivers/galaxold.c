@@ -1251,6 +1251,98 @@ static INPUT_PORTS_START( ckongmc )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( ckonggx )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_4WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_DIPNAME( 0x20, 0x20, "IN0:20" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "IN0:40" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "IN0:80" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_4WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )    PORT_4WAY
+	PORT_DIPNAME( 0x10, 0x10, "IN0:10" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "IN0:20" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "IN0:40" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "IN0:80" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x01, 0x00, "IN1:01" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, "IN1:02" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, "IN1:04" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, "IN1:08" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, "IN1:10" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, "IN1:20" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, "IN1:40" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, "IN1:80" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	PORT_START("COINAGE")
+	PORT_DIPNAME( 0x01, 0x00, "IN2:01" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, "IN2:02" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, "IN2:04" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, "IN2:08" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, "IN2:10" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, "IN2:20" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, "IN2:40" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, "IN2:80" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+INPUT_PORTS_END
+
+
 /* verified from Z80 code */
 static INPUT_PORTS_START( scramblb )
 	PORT_START("IN0")
@@ -2741,6 +2833,55 @@ ROM_START( ckongmc )
 	ROM_LOAD( "ck_cp.bin",     0x0000, 0x0020, CRC(7e0b79cb) SHA1(72ef3eb5f09e10c13dcf6fd568a6d16658055a16) )
 ROM_END
 
+
+DRIVER_INIT_MEMBER(galaxold_state,ckonggx)
+{
+	UINT16 ckonggx_remap[88] = {
+		0x5000, 0x0d00, 0x0e00, 0x0f00, 0x0c00, 0x0100, 0x0200, 0x0300, 0x0400, 0x0500, 0x0600, 0x0700, 0x0800, 0x0900, 0x0a00, 0x0b00,
+		0x1400, 0x1500, 0x1600, 0x1700, 0x1800, 0x1900, 0x1a00, 0x1b00, 0x1c00, 0x1d00, 0x1e00, 0x1f00, 0x1000, 0x1100, 0x1200, 0x1300,
+		0x2400, 0x2500, 0x2600, 0x2700, 0x2800, 0x2900, 0x2a00, 0x2b00, 0x2c00, 0x2d00, 0x2e00, 0x2f00, 0x2000, 0x2100, 0x2200, 0x2300,
+		0x3400, 0x3500, 0x3600, 0x3700, 0x3800, 0x3900, 0x3a00, 0x3b00, 0x3c00, 0x3d00, 0x3e00, 0x3f00, 0x3000, 0x3100, 0x3200, 0x3300,
+		0x4400, 0x4500, 0x4600, 0x4700, 0x4800, 0x4900, 0x4a00, 0x4b00, 0x4c00, 0x4d00, 0x4e00, 0x4f00, 0x4000, 0x4100, 0x4200, 0x4300,
+		0x0000, 0x5100, 0x5200, 0x5300, 0x0000, 0x5100, 0x5200, 0x5300
+		/*^ at 0x0000 there is alt startup code? does it get banked in? */
+	};
+
+	UINT8 *rom = memregion("maincpu")->base();
+	UINT8 *buffer = auto_alloc_array(machine(), UINT8, 0x5800);
+
+	for (int i=0;i<88;i++)
+	{
+		memcpy(buffer+i*0x100, rom+ckonggx_remap[i], 0x100);
+
+	}
+	
+	memcpy(rom, buffer, 0x5800);
+	auto_free(machine(), buffer);
+}
+
+
+
+
+
+ROM_START( ckonggx )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "kk1.bin",  0x0000, 0x0800, CRC(615c1ddb) SHA1(68e8393da9041cf94692fc4b53b58c17086e4ebc) ) 
+	ROM_LOAD( "kk2.bin",  0x0800, 0x0800, CRC(72f259bc) SHA1(0afa349926f70b6c35da1dbb380ad2018f003d56) )
+	ROM_LOAD( "kk3.bin",  0x1000, 0x0800, CRC(17f5e9ac) SHA1(17218ca3582ff4498e0b2684781db24d528bff71) )
+	ROM_LOAD( "kk4.bin",  0x1800, 0x0800, CRC(7aeafd74) SHA1(b9382322367b3953498e8fbbe81b26b18cd7a745) )
+	ROM_LOAD( "kk5.bin",  0x2000, 0x1000, CRC(184b9d7e) SHA1(80159ab19233ce95e9c74d039b6777d01b32e959) )
+	ROM_LOAD( "kk6.bin",  0x3000, 0x1000, CRC(1324aeec) SHA1(22c9c2d3bc691dde05750c285d68c9b6857a2e13) )
+	ROM_LOAD( "kk7.bin",  0x4000, 0x1000, CRC(d9db69b8) SHA1(4b82ee73f7c7ccc9817f70ac4bcfe853e1a7618a) )
+	ROM_LOAD( "kk8.bin",  0x5000, 0x0800, CRC(8cd4bc17) SHA1(43c3f2575182c8f5233b9c6160aa9f41d772bb9d) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "kk10.bin",    0x0000, 0x1000, CRC(7311a101) SHA1(49d54c8b94cae4ba81d7a7684eaa4e87815bb4da) )
+	ROM_LOAD( "kk9.bin",     0x1000, 0x1000, CRC(7866d2cb) SHA1(62dd8b80bc0459c7337d8a8cb83e53b999e7f4a9) )
+
+	ROM_REGION( 0x0020, "proms", 0 ) // had the standard PROM and ugly colours
+	ROM_LOAD( "6l.bpr",       0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
+ROM_END
+
 ROM_START( scramblb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "scramble.1k",  0x0000, 0x0800, CRC(9e025c4a) SHA1(a8cc9391bdd01a5a2fe7f0c4e889b4e2495df891) )
@@ -3037,30 +3178,19 @@ www.andys-arcade.com
            - rom at 51xx seems to be missing.
            - needs its own memory map
            - somehow execution needs to get to 0294 which sets SP and memory */
+
+// this is scrambled in the same was as ckonggx, but I guess there is a rom missing?
 ROM_START( vstars )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "c-k2.bin",       0x0000, 0x0100, CRC(b0fcf6c1) SHA1(7dc8a7b99977ea9582c1ed36fa9f1fa502a70c6e) )
-	ROM_CONTINUE(               0x0500, 0x0300)
-	ROM_CONTINUE(               0x0800, 0x0400)
-	ROM_LOAD( "c-k1.bin",       0x0c00, 0x0400, CRC(ea9603b2) SHA1(f72202f17f862c7ea81e556690f8fcb9ee926e7f) )
-	ROM_CONTINUE(               0x0400, 0x0100)
-	ROM_CONTINUE(               0x0100, 0x0300)
-	ROM_LOAD( "c-k4.bin",       0x1c00, 0x0400, CRC(f5743990) SHA1(defd1577b935e3597eba74344dca5626ec2993dd) )
-	ROM_CONTINUE(               0x1000, 0x0400)
-	ROM_LOAD( "c-k3.bin",       0x1400, 0x0400, CRC(c4338a77) SHA1(b1ca2d43340b671ef33f3a96ce8e1c286a3e6d80) )
-	ROM_CONTINUE(               0x1800, 0x0400)
-	ROM_LOAD( "c-k6.bin",       0x2c00, 0x0400, CRC(184b9d7e) SHA1(80159ab19233ce95e9c74d039b6777d01b32e959) )
-	ROM_CONTINUE(               0x2000, 0x0400)
-	ROM_CONTINUE(               0x2400, 0x0400)
-	ROM_CONTINUE(               0x2800, 0x0400)
-	ROM_LOAD( "c-k5.bin",       0x3c00, 0x0400, CRC(d8df2ec4) SHA1(bef1d4b404cddb8a5f9d4e3f30ee09915c602f56) )
-	ROM_CONTINUE(               0x3000, 0x0400)
-	ROM_CONTINUE(               0x3400, 0x0400)
-	ROM_CONTINUE(               0x3800, 0x0400)
-	ROM_LOAD( "c-k7.bin",       0x4c00, 0x0400, CRC(9ddcc06f) SHA1(63bc77d8b3273681ca4e681105a117d19a0f23a5) )
-	ROM_CONTINUE(               0x4000, 0x0400)
-	ROM_CONTINUE(               0x4400, 0x0400)
-	ROM_CONTINUE(               0x4800, 0x0400)
+	ROM_LOAD( "c-k1.bin",       0x0000, 0x0800, CRC(ea9603b2) SHA1(f72202f17f862c7ea81e556690f8fcb9ee926e7f) )
+	ROM_RELOAD(0x5000,0x800)
+	ROM_LOAD( "c-k2.bin",       0x0800, 0x0800, CRC(b0fcf6c1) SHA1(7dc8a7b99977ea9582c1ed36fa9f1fa502a70c6e) )
+	ROM_LOAD( "c-k3.bin",       0x1000, 0x0800, CRC(c4338a77) SHA1(b1ca2d43340b671ef33f3a96ce8e1c286a3e6d80) )
+	ROM_LOAD( "c-k4.bin",       0x1800, 0x0800, CRC(f5743990) SHA1(defd1577b935e3597eba74344dca5626ec2993dd) )
+	ROM_LOAD( "c-k6.bin",       0x2000, 0x1000, CRC(184b9d7e) SHA1(80159ab19233ce95e9c74d039b6777d01b32e959) )
+	ROM_LOAD( "c-k5.bin",       0x3000, 0x1000, CRC(d8df2ec4) SHA1(bef1d4b404cddb8a5f9d4e3f30ee09915c602f56) )
+	ROM_LOAD( "c-k7.bin",       0x4000, 0x1000, CRC(9ddcc06f) SHA1(63bc77d8b3273681ca4e681105a117d19a0f23a5) )
+	/* rom 8? */
 
 	/* Crazy Kong gfx?! */
 	ROM_REGION( 0x2000, "gfx1", 0 )
@@ -3350,6 +3480,7 @@ GAME( 1981, vpool,    hustler,  mooncrst, vpool,    driver_device,  0,        RO
 GAME( 1981, rockclim, 0,        rockclim, rockclim, driver_device,  0,        ROT180, "Taito", "Rock Climber", GAME_SUPPORTS_SAVE )
 GAME( 1981, ckongg,   ckong,    ckongg,   ckongg,   driver_device,  0,        ROT90,  "bootleg", "Crazy Kong (bootleg on Galaxian hardware)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1981, ckongmc,  ckong,    ckongmc,  ckongmc,  driver_device,  0,        ROT90,  "bootleg", "Crazy Kong (bootleg on Moon Cresta hardware)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE ) // set was marked as 'King Kong on Galaxian'
+GAME( 1981, ckonggx,  ckong,    ckongg,   ckonggx,  galaxold_state,  ckonggx, ROT90,  "bootleg", "Crazy Kong (bootleg on Galaxian hardware, encrypted)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1981, scramblb, scramble, scramblb, scramblb, driver_device,  0,        ROT90,  "bootleg", "Scramble (bootleg on Galaxian hardware)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1981, scramb2,  scramble, scramb2,  scramb2,  driver_device,  0,        ROT90,  "bootleg", "Scramble (bootleg)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1981, scrambler,scramble,scrambler,scrambler, driver_device,  0,        ROT90,  "bootleg (Reben S.A.)", "Scramble (Reben S.A. Spanish bootleg)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
@@ -3362,7 +3493,7 @@ GAME( 1982, tazzmang, tazmania, tazzmang, tazzmang, driver_device,  0,        RO
 GAME( 1983, bongo,    0,        bongo,    bongo,    driver_device,  0,        ROT90,  "Jetsoft", "Bongo", GAME_SUPPORTS_SAVE )
 GAME( 1983, ozon1,    0,        ozon1,    ozon1,    driver_device,  0,        ROT90,  "Proma", "Ozon I", GAME_SUPPORTS_SAVE )
 GAME( 1983, ladybugg, ladybug,  batman2,  ladybugg, galaxold_state, ladybugg, ROT270, "bootleg", "Lady Bug (bootleg on Galaxian hardware)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1982, vstars,   0,        mooncrst, porter,   driver_device,  0,        ROT90,  "Competitive Video?", "Video Stars", GAME_NOT_WORKING )
+GAME( 1982, vstars,   0,        ckongg,  ckongmc,   galaxold_state, ckonggx,  ROT90,  "Competitive Video?", "Video Stars", GAME_NOT_WORKING )
 GAME( 1982, guttangt, locomotn, guttang,  guttangt, galaxold_state, guttangt, ROT270, "bootleg (Recreativos Franco?)", "Guttang Gottong (bootleg on Galaxian type hardware)", GAME_NOT_WORKING | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE ) // or by 'Tren' ?
 
 /* S2650 games */
