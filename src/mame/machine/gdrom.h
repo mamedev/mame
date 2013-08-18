@@ -47,6 +47,7 @@ private:
 	cdrom_file *cdrom;
 	optional_device<cdda_device> m_cdda;
 	bool is_file;
+	UINT8 GDROM_Cmd11_Reply[32];
 };
 
 // device type definition

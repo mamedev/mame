@@ -440,7 +440,9 @@ READ32_MEMBER(dc_cons_state::dc_mess_gdrom_r)
 
 					if( atapi_xferlen == 0 )
 					{
-						atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
+						printf("Read from SCSI\n");
+						//debugger_break(machine());
+						gdrom_set_status(ATAPI_STAT_DRQ,false);
 						atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO;
 						gdrom_raise_irq();
 					}
@@ -449,6 +451,7 @@ READ32_MEMBER(dc_cons_state::dc_mess_gdrom_r)
 			else
 			{
 				data = 0;
+				printf("Read from empty SCSI queue\n");
 			}
 
 			return data;
@@ -504,7 +507,7 @@ WRITE32_MEMBER(dc_cons_state::dc_mess_gdrom_w )
 					gdrom_raise_irq();
 
 					// not sure here, but clear DRQ at least?
-					atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
+					gdrom_set_status(ATAPI_STAT_DRQ,false);
 					printf("cdata wait status\n");
 				}
 			}
@@ -560,7 +563,7 @@ WRITE32_MEMBER(dc_cons_state::dc_mess_gdrom_w )
 						{
 							//gdrom_set_status(ATAPI_STAT_SERVDSC,true);
 							/* Ok? */
-							gdrom_set_status(ATAPI_STAT_DRQ,false);
+							gdrom_set_status(ATAPI_STAT_DRQ,true);
 							//atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ | ATAPI_STAT_SERVDSC | ATAPI_STAT_DRQ;
 						}
 						atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO;

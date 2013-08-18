@@ -11,12 +11,6 @@
 #include "gdrom.h"
 #include "debugger.h"
 
-static const UINT8 GDROM_Cmd11_Reply[32] =
-{
-	0x00, 0x00, 0x00, 0x00, 0x00, 0xB4, 0x19, 0x00, 0x00, 0x08, 0x53, 0x45, 0x20, 0x20, 0x20, 0x20,
-	0x20, 0x20, 0x52, 0x65, 0x76, 0x20, 0x36, 0x2E, 0x34, 0x32, 0x39, 0x39, 0x30, 0x33, 0x31, 0x36
-};
-
 static void phys_frame_to_msf(int phys_frame, int *m, int *s, int *f)
 {
 	*m = phys_frame / (60*75);
@@ -48,6 +42,15 @@ void gdrom_device::device_start()
 void gdrom_device::device_reset()
 {
 	scsihle_device::device_reset();
+
+	static const UINT8 GDROM_Def_Cmd11_Reply[32] =
+	{
+		0x00, 0x00, 0x00, 0x00, 0x00, 0xB4, 0x19, 0x00, 0x00, 0x08, 0x53, 0x45, 0x20, 0x20, 0x20, 0x20,
+		0x20, 0x20, 0x52, 0x65, 0x76, 0x20, 0x36, 0x2E, 0x34, 0x32, 0x39, 0x39, 0x30, 0x33, 0x31, 0x36
+	};
+
+	for(int i = 0;i<32;i++)
+		GDROM_Cmd11_Reply[i] = GDROM_Def_Cmd11_Reply[i];
 
 	is_file = TRUE;
 	cdrom = subdevice<cdrom_image_device>("image")->get_cdrom_file();
@@ -126,10 +129,12 @@ void gdrom_device::ExecCommand( int *transferLength )
 
 		case 0x12: // INQUIRY
 			logerror("GDROM: REQUEST SENSE\n");
-			debugger_break(machine());
-			SetPhase( SCSI_PHASE_DATAIN );
-			transferOffset = command[2];
+			SetPhase( SCSI_PHASE_DATAOUT );
+			//transferOffset = command[2];
 			*transferLength = SCSILengthFromUINT8( &command[ 4 ] );
+			printf("SET_MODE %02x %02x\n",command[2],command[4]);
+			//for(int i=command[2];i<command[2]+command[4];i++)
+			//	GDROM_Cmd11_Reply[i] = command[i];
 			break;
 
 		case 0x15: // MODE SELECT(6)
@@ -273,7 +278,7 @@ void gdrom_device::ExecCommand( int *transferLength )
 
 			SetPhase( SCSI_PHASE_DATAIN );
 			*transferLength = length;
-			debugger_break(machine());
+			//debugger_break(machine());
 			break;
 		}
 		case 0x45: // PLAY AUDIO(10)
