@@ -152,7 +152,9 @@ As for prototypes/dev cat machines, a few minor variants exist:
 Canon Cat:
 <insert guru-diagram here once drawn>
 Crystals:
-X1: 19.968Mhz, used by GA2 (plus a PLL to multiply by 2?), and divide by 4 for cpuclk, divide by 8 for 2.5mhz and divide by 5.5 for 3.63mhz (is this suposed to be divide by 6? there may not be a pll if it is...)
+X1: 19.968Mhz, used by GA2 (plus a PLL to multiply by 2?), and divide by 4 for
+    cpuclk, divide by 8 for 2.5mhz and divide by 5.5 for 3.63mhz (is this
+	suposed to be divide by 6? there may not be a pll if it is...)
 X2: 3.579545Mhz, used by the DTMF generator chip AMI S2579 at IC40
 X3: 2.4576Mhz, used by the modem chip AMI S35213 at IC37
 
@@ -184,14 +186,21 @@ ToDo:
 - Centronics port
 - RS232C port and Modem "port" connected to the DUART's two ports
 - DTMF generator chip (connected to DUART 'user output' pins OP4,5,6,7)
-- Correctly hook the duart interrupt to the 68k, including autovector using the vector register on the duart
+- Correctly hook the duart interrupt to the 68k, including autovector using
+  the vector register on the duart
+  (the actual duart code is too buggy for this to work right now 8/18/2013)
 - Watchdog timer/powerfail at 0x85xxxx
-- Canon Cat released versions known: 1.74 US (dumped), 2.40 US (dumped; is this actually original, or compiled from the released source code?), 2.42 (NEED DUMP)
-  It is possible a few prototype UK 1.74 or 2.40 units were produced; the code roms of these will differ (they contain different spellcheck "core" code) as well as the spellcheck roms, the keyboard id and the keycaps.
+- Canon Cat released versions known: 1.74 US (dumped), 2.40 US (dumped both
+  original compile, and Dwight's recompile from the released source code),
+  2.42 (NEED DUMP)
+  It is possible a few prototype UK 1.74 or 2.40 units were produced; the code
+  roms of these will differ (they contain different spellcheck "core" code) as
+  well as the spellcheck roms, the keyboard id and the keycaps.
 - Known Spellcheck roms: NH7-0684 (US, dumped); NH7-0724 (UK, NEED DUMP);
   NH7-0813/0814 (Quebec/France, NEED DUMP); NH7-1019/1020/1021 (Germany, NEED DUMP)
   It is possible the non-US roms were never officially released.
-  Wordlist sources: American Heritage (US and UK), Librarie Larousse (FR), Langenscheidt (DE)
+  Wordlist sources: American Heritage (US and UK), Librarie Larousse (FR),
+  Langenscheidt (DE)
 - (would-be-really-nice-but-totally-unnecessary feature): due to open bus, the
   svrom1 and svrom2 checksums in diagnostics read as 01A80000 and 01020000
   respectively on a real machine (and hence appear inverted/'fail'-state).
@@ -200,12 +209,14 @@ ToDo:
   happens inside an asic) for the SVROMS (or the svram or the code roms, for
   that matter!)
 - Hook Battery Low input to a dipswitch.
-- Hook the floppy control register readback up properly, things seem to get confused.
+- Hook the floppy control register readback up properly, things seem to get
+  confused.
 
 
 * Swyft
 - Figure out the keyboard (interrupts are involved? or maybe an NMI on a
-  timer/vblank?)
+  timer/vblank? It iss possible this uses the same DUART+IP2 'keyboard read
+  int' stuff as the cat does)
 - Beeper
 - Communications port (Duart? or some other plain UART?)
 - Floppy (probably similar to the Cat)
@@ -1068,10 +1079,10 @@ ROM_START( cat )
 	 * 4 rows populated on a "released" cat.
 	 */
 	ROM_SYSTEM_BIOS( 0, "r240", "Canon Cat V2.40 US Firmware")
-	ROMX_LOAD( "boultl0.ic2", 0x00001, 0x10000, CRC(77b66208) SHA1(9D718C0A521FEFE4F86EF328805B7921BADE9D89), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD( "boulth0.ic4", 0x00000, 0x10000, CRC(f1e1361a) SHA1(0A85385527E2CC55790DE9F9919EB44AC32D7F62), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD( "boultl0.ic2", 0x00001, 0x10000, CRC(77b66208) SHA1(9d718c0a521fefe4f86ef328805b7921bade9d89), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD( "boulth0.ic4", 0x00000, 0x10000, CRC(f1e1361a) SHA1(0a85385527e2cc55790de9f9919eb44ac32d7f62), ROM_SKIP(1) | ROM_BIOS(1))
 	ROMX_LOAD( "boultl1.ic3", 0x20001, 0x10000, CRC(c61dafb0) SHA1(93216c26c2d5fc71412acc548c96046a996ea668), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD( "boulth1.ic5", 0x20000, 0x10000, CRC(bed1f761) SHA1(D177E1D3A39B005DD94A6BDA186221D597129AF4), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD( "boulth1.ic5", 0x20000, 0x10000, CRC(bed1f761) SHA1(d177e1d3a39b005dd94a6bda186221d597129af4), ROM_SKIP(1) | ROM_BIOS(1))
 	/* This 2.40 code was compiled by Dwight Elvey based on the v2.40 source
 	 * code disks recovered around 2004. It does NOT exactly match the above
 	 * set exactly but has a few small differences.
@@ -1093,6 +1104,8 @@ ROM_START( cat )
 	ROMX_LOAD( "r74__0h__75a6.yellow.ic4", 0x00000, 0x10000, CRC(75281f77) SHA1(ed8b5e37713892ee83413d23c839d09e2fd2c1a9), ROM_SKIP(1) | ROM_BIOS(3))
 	ROMX_LOAD( "r74__1l__c8a3.green.ic3", 0x20001, 0x10000, CRC(93275558) SHA1(f690077a87076fd51ae385ac5a455804cbc43c8f), ROM_SKIP(1) | ROM_BIOS(3))
 	ROMX_LOAD( "r74__1h__3c37.white.ic5", 0x20000, 0x10000, CRC(5d7c3962) SHA1(8335993583fdd30b894c01c1a7a6aca61cd81bb4), ROM_SKIP(1) | ROM_BIOS(3))
+	// According to Sandy Bumgarner, there should be a 2.42 version which fixes some bugs in the calc command vs 2.40
+	// According to the Cat Repair Manual page 4-20, there should be a version called B91U0x (maybe 1.91 or 0.91?) with sum16s of 9F1F, FF0A, 79BF and 03FF
 
 	ROM_REGION( 0x80000, "svrom", ROMREGION_ERASE00 )
 	// SPELLING VERIFICATION ROM (SVROM)
@@ -1109,11 +1122,12 @@ ROM_START( cat )
 	 * 'open bus' once the mame/mess core supports that.
 	 * NOTE: there are at least 6 more SVROMS which existed (possibly in
 	 * limited form), and are not dumped:
-	 * UK (1 rom)
-	 * French (2 roms)
-	 * German (3 roms)
+	 * UK (1 rom, NH7-0724)
+	 * French/Quebec (2 roms, NH7-0813/0814)
+	 * German (3 roms, NH7-1019/1020/1021)
 	 * Each of these will also have its own code romset as well.
 	 */
+	// NH7-0684 (US, dumped):
 	ROMX_LOAD( "uv1__nh7-0684__hn62301apc11__7h1.ic6", 0x00000, 0x20000, CRC(229ca210) SHA1(564b57647a34acdd82159993a3990a412233da14), ROM_SKIP(1)) // this is a 28pin tc531000 mask rom, 128KB long; "US" SVROM
 
 	/* There is an unpopulated PAL16L8 at IC9 whose original purpose (based
