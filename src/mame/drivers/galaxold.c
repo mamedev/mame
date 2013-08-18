@@ -2879,7 +2879,7 @@ ROM_START( ckonggx )
 	ROM_LOAD( "kk9.bin",     0x1000, 0x1000, CRC(7866d2cb) SHA1(62dd8b80bc0459c7337d8a8cb83e53b999e7f4a9) )
 
 	ROM_REGION( 0x0020, "proms", 0 ) // had the standard PROM and ugly colours
-	ROM_LOAD( "6l.bpr",       0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
+	ROM_LOAD( "(ckonggx__)6l.bpr",       0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 ROM_END
 
 
@@ -2924,7 +2924,7 @@ www.andys-arcade.com
 
 // just seems to be another 'ckonggx' style Crazy Kong bootleg....
 // however maybe the extra startup code at 0 in these roms is more important because we don't have the rom that should map at 5000? (although we're also missing the other 0x300 bytes of data from there too..)
-ROM_START( vstars )
+ROM_START( ckongcv )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "c-k2.bin",       0x0000, 0x0800, CRC(b0fcf6c1) SHA1(7dc8a7b99977ea9582c1ed36fa9f1fa502a70c6e) )
 	ROM_LOAD( "c-k1.bin",       0x0800, 0x0800, CRC(ea9603b2) SHA1(f72202f17f862c7ea81e556690f8fcb9ee926e7f) )
@@ -2948,6 +2948,29 @@ ROM_START( vstars )
 	ROM_LOAD( "k.bin",     0x0000, 0x0020, CRC(d46ed869) SHA1(9c0a11df11b1a24ee933d1aa435337b78c3ca643) )
 ROM_END
 
+// Main Board is an International Scientific Galaxian bootleg PCB
+// this is the same? again no rom to map at 0x5000 so maybe something strange is going on?
+ROM_START( ckongis )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "dk1.bin",       0x0000, 0x0800, CRC(b0fcf6c1) SHA1(7dc8a7b99977ea9582c1ed36fa9f1fa502a70c6e) )
+	ROM_LOAD( "dk2.bin",       0x0800, 0x0800, CRC(ea9603b2) SHA1(f72202f17f862c7ea81e556690f8fcb9ee926e7f) )
+	ROM_LOAD( "dk3.bin",       0x1000, 0x1000, CRC(6dbd515d) SHA1(f02d453e7a1f043efa7b96d525bfec52303091f3) )
+	ROM_LOAD( "dk4.bin",       0x2000, 0x1000, CRC(184b9d7e) SHA1(80159ab19233ce95e9c74d039b6777d01b32e959) )
+	ROM_LOAD( "dk5.bin",       0x3000, 0x1000, CRC(d8df2ec4) SHA1(bef1d4b404cddb8a5f9d4e3f30ee09915c602f56) )
+	ROM_LOAD( "dk6.bin",       0x4000, 0x1000, CRC(9ddcc06f) SHA1(63bc77d8b3273681ca4e681105a117d19a0f23a5) )
+
+//	ROM_LOAD( "kk8.bin",  0x5000, 0x0800, CRC(8cd4bc17) SHA1(43c3f2575182c8f5233b9c6160aa9f41d772bb9d) ) // works if you use this rom from ckonggx but it's definitely not on the PCB
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "1h.bin",   0x0000, 0x1000, CRC(7866d2cb) SHA1(62dd8b80bc0459c7337d8a8cb83e53b999e7f4a9) )
+	ROM_LOAD( "1k.bin",   0x1000, 0x1000, CRC(7311a101) SHA1(49d54c8b94cae4ba81d7a7684eaa4e87815bb4da) )
+
+	ROM_REGION( 0x0020, "proms", 0 ) // wasn't in the dump
+	ROM_LOAD( "6l.bin",     0x0000, 0x0020, CRC(fd81e715) SHA1(eadafe88f26405e6540d4b248b940974e8c31145) )
+
+	ROM_REGION( 0x0020, "proms2", 0 ) // NOT the colour prom?
+	ROM_LOAD( "dkp.bin",     0x0000, 0x0020, CRC(97c473cc) SHA1(1bbb7f17b8d6a3a621e8c22d473eb26d4c1a750b) )
+ROM_END
 
 
 ROM_START( scramblb )
@@ -3485,7 +3508,8 @@ GAME( 1981, rockclim, 0,        rockclim, rockclim, driver_device,  0,        RO
 GAME( 1981, ckongg,   ckong,    ckongg,   ckongg,   driver_device,  0,        ROT90,  "bootleg", "Crazy Kong (bootleg on Galaxian hardware)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1981, ckongmc,  ckong,    ckongmc,  ckongmc,  driver_device,  0,        ROT90,  "bootleg", "Crazy Kong (bootleg on Moon Cresta hardware)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE ) // set was marked as 'King Kong on Galaxian'
 GAME( 1981, ckonggx,  ckong,    ckongg,   ckonggx,  galaxold_state,  ckonggx, ROT90,  "bootleg", "Crazy Kong (bootleg on Galaxian hardware, encrypted, set 1)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1982, vstars,   ckong,    ckongg,   ckonggx,  galaxold_state, ckonggx,  ROT90,  "bootleg", "Crazy Kong (bootleg on Galaxian hardware, encrypted, set 2)", GAME_NOT_WORKING )
+GAME( 1982, ckongcv,   ckong,    ckongg,   ckonggx,  galaxold_state, ckonggx,  ROT90,  "bootleg", "Crazy Kong (bootleg on Galaxian hardware, encrypted, set 2)", GAME_NOT_WORKING )
+GAME( 1982, ckongis,  ckong,    ckongg,   ckonggx,  galaxold_state, ckonggx,  ROT90,  "bootleg", "Crazy Kong (bootleg on Galaxian hardware, encrypted, set 3)", GAME_NOT_WORKING )
 GAME( 1981, scramblb, scramble, scramblb, scramblb, driver_device,  0,        ROT90,  "bootleg", "Scramble (bootleg on Galaxian hardware)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1981, scramb2,  scramble, scramb2,  scramb2,  driver_device,  0,        ROT90,  "bootleg", "Scramble (bootleg)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1981, scrambler,scramble,scrambler,scrambler, driver_device,  0,        ROT90,  "bootleg (Reben S.A.)", "Scramble (Reben S.A. Spanish bootleg)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
