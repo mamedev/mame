@@ -145,7 +145,6 @@ protected:
 	UINT8                   m_maker_id;
 	bool                    m_sector_is_4k;
 	bool                    m_sector_is_16k;
-	bool					m_rmw_type;
 	UINT8                   m_page_size;
 
 	// internal state

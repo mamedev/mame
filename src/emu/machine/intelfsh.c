@@ -162,7 +162,6 @@ intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type
 		m_maker_id(0),
 		m_sector_is_4k(false),
 		m_sector_is_16k(false),
-		m_rmw_type(false),
 		m_status(0x80),
 		m_erase_sector(0),
 		m_flash_mode(FM_NORMAL),
@@ -291,7 +290,6 @@ intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type
 		m_maker_id = MFG_MACRONIX;
 		m_device_id = 0x49;
 		m_sector_is_16k = true;
-		m_rmw_type = true;
 		map = ADDRESS_MAP_NAME( memory_map8_1Mb );
 		break;
 	case FLASH_PANASONIC_MN63F805MNP:
@@ -885,10 +883,7 @@ void intelfsh_device::write_full(UINT32 address, UINT32 data)
 		{
 		case 8:
 			{
-				if(m_rmw_type == true)
-					m_addrspace[0]->write_byte(address, m_addrspace[0]->read_byte(address) & data);
-				else
-					m_addrspace[0]->write_byte(address, data);
+				m_addrspace[0]->write_byte(address, data);
 			}
 			break;
 		default:
