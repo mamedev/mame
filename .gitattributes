@@ -6399,6 +6399,7 @@ src/mess/drivers/octopus.c svneol=native#text/plain
 src/mess/drivers/odyssey2.c svneol=native#text/plain
 src/mess/drivers/okean240.c svneol=native#text/plain
 src/mess/drivers/ondra.c svneol=native#text/plain
+src/mess/drivers/onyx.c svneol=native#text/plain
 src/mess/drivers/orao.c svneol=native#text/plain
 src/mess/drivers/oric.c svneol=native#text/plain
 src/mess/drivers/orion.c svneol=native#text/plain

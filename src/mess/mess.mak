@@ -2406,6 +2406,7 @@ $(MESSOBJ)/skeleton.a:          \
 	$(MESS_DRIVERS)/mstation.o  \
 	$(MESS_DRIVERS)/mycom.o     \
 	$(MESS_DRIVERS)/octopus.o   \
+	$(MESS_DRIVERS)/onyx.o      \
 	$(MESS_DRIVERS)/okean240.o  \
 	$(MESS_DRIVERS)/p8k.o       \
 	$(MESS_DRIVERS)/pegasus.o   \
