@@ -119,12 +119,14 @@ void gdrom_device::ExecCommand( int *transferLength )
 				command[2], command[3],
 				command[4], command[5]);
 //          if (SCSILengthFromUINT8( &command[ 4 ] ) < 32) return -1;
-			*transferLength = 32; //SCSILengthFromUINT8( &command[ 4 ] );
+			transferOffset = command[2];
+			*transferLength = SCSILengthFromUINT8( &command[ 4 ] );
 			break;
 
 		case 0x12: // INQUIRY
 			logerror("GDROM: REQUEST SENSE\n");
 			SetPhase( SCSI_PHASE_DATAIN );
+			transferOffset = command[2];
 			*transferLength = SCSILengthFromUINT8( &command[ 4 ] );
 			break;
 
@@ -460,20 +462,12 @@ void gdrom_device::ReadData( UINT8 *data, int dataLength )
 
 		case 0x11: // REQ_MODE
 			printf("REQ_MODE: dataLength %d\n", dataLength);
-			memcpy(data, &GDROM_Cmd11_Reply[0], (dataLength >= 32) ? 32 : dataLength);
+			memcpy(data, &GDROM_Cmd11_Reply[transferOffset], (dataLength >= 32-transferOffset) ? 32-transferOffset : dataLength);
 			break;
 
 		case 0x12: // INQUIRY
-			memset( data, 0, dataLength );
-			data[0] = 0x05; // device is present, device is CD/DVD (MMC-3)
-			data[1] = 0x80; // media is removable
-			data[2] = 0x05; // device complies with SPC-3 standard
-			data[3] = 0x02; // response data format = SPC-3 standard
-			// some Konami games freak out if this isn't "Sony", so we'll lie
-			// this is the actual drive on my Nagano '98 board
-			strcpy((char *)&data[8], "Sony");
-			strcpy((char *)&data[16], "CDU-76S");
-			strcpy((char *)&data[32], "1.0");
+			//memset( data, 0, dataLength );
+			memcpy(data, &GDROM_Cmd11_Reply[transferOffset], (dataLength >= 32-transferOffset) ? 32-transferOffset : dataLength);
 			break;
 
 		case 0x25: // READ CAPACITY

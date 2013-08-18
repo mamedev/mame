@@ -63,8 +63,9 @@
 
 #define ATAPI_REG_MAX 24
 
-#define ATAPI_XFER_PIO      0x00
-#define ATAPI_XFER_PIO_FLOW 0x08
+#define ATAPI_XFER_PIO          0x00
+#define ATAPI_XFER_PIO_FLOW     0x08
+#define ATAPI_XFER_SINGLE_DMA   0x10
 #define ATAPI_XFER_MULTI_DMA    0x20
 #define ATAPI_XFER_ULTRA_DMA    0x40
 

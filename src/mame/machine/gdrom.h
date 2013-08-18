@@ -43,6 +43,7 @@ private:
 	UINT32 play_err_flag;
 	UINT32 read_type;   // for command 0x30 only
 	UINT32 data_select; // for command 0x30 only
+	UINT32 transferOffset;
 	cdrom_file *cdrom;
 	optional_device<cdda_device> m_cdda;
 	bool is_file;
