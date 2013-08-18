@@ -11,10 +11,10 @@ The C8002 is one of the earliest minicomputers to use Unix as an operating syste
 The system consists of a main CPU (Z8002), and a slave CPU for Mass Storage control (Z80)
 
 The Z80 board contains a 19.6608 and 16 MHz crystals; 2x Z80CTC; 3x Z80SIO/0; Z80DMA; 3x Z80PIO;
-2 eproms marked 459-3 and 460-3, plus 2 proms marked 453 and 454.
+2 eproms marked 459-3 and 460-3, plus 2 proms.
 
 The Z8002 board contains a 16 MHz crystal; 3x Z80CTC; 5x Z80SIO/0; 3x Z80PIO; 2 eproms marked
-466-E and 467E, plus the remaining 6 small proms.
+466-E and 467E, plus the remaining 7 small proms.
 
 The system can handle 8 RS232 terminals, 7 hard drives, a tape cartridge drive, parallel i/o,
 and be connected to a RS422 network.
@@ -24,11 +24,11 @@ and be connected to a RS422 network.
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z8000/z8000.h"
-#include "cpu/z80/z80daisy.h"
-#include "machine/z80ctc.h"
-#include "machine/z80pio.h"
-#include "machine/z80sio.h"
-#include "machine/z80dma.h"
+//#include "cpu/z80/z80daisy.h"
+//#include "machine/z80ctc.h"
+//#include "machine/z80pio.h"
+//#include "machine/z80sio.h"
+//#include "machine/z80dma.h"
 #include "machine/terminal.h"
 
 
