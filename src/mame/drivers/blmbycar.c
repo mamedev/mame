@@ -348,7 +348,7 @@ MACHINE_RESET_MEMBER(blmbycar_state,blmbycar)
 static MACHINE_CONFIG_START( blmbycar, blmbycar_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 10000000)   /* ? */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* 12MHz */
 	MCFG_CPU_PROGRAM_MAP(blmbycar_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", blmbycar_state,  irq1_line_hold)
 
@@ -370,7 +370,7 @@ static MACHINE_CONFIG_START( blmbycar, blmbycar_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_1MHz, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -389,7 +389,7 @@ MACHINE_RESET_MEMBER(blmbycar_state,watrball)
 static MACHINE_CONFIG_START( watrball, blmbycar_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 10000000)   /* ? */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* 12MHz */
 	MCFG_CPU_PROGRAM_MAP(watrball_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", blmbycar_state,  irq1_line_hold)
 
@@ -411,7 +411,7 @@ static MACHINE_CONFIG_START( watrball, blmbycar_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_1MHz, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -430,9 +430,9 @@ MACHINE_CONFIG_END
                                 Blomby Car
 Abm & Gecas, 1990.
 
-CPU : 68000
+CPU : MC68000P12
 SND : Oki M6295 (samples only)
-OSC : 30.000 + 24.000
+OSC : 30.000MHz, 24.000MHz & 1.00MHz resonator
 DSW : 2 x 8
 GFX : TI TPC1020AFN-084
 
@@ -528,6 +528,6 @@ DRIVER_INIT_MEMBER(blmbycar_state,blmbycar)
 
 ***************************************************************************/
 
-GAME( 1994, blmbycar, 0,        blmbycar, blmbycar, blmbycar_state, blmbycar, ROT0, "ABM & Gecas", "Blomby Car", GAME_SUPPORTS_SAVE )
-GAME( 1994, blmbycaru,blmbycar, blmbycar, blmbycar, driver_device, 0,        ROT0, "ABM & Gecas", "Blomby Car (not encrypted)", GAME_SUPPORTS_SAVE )
-GAME( 1996, watrball, 0,        watrball, watrball, driver_device, 0,        ROT0, "ABM", "Water Balls", GAME_SUPPORTS_SAVE )
+GAME( 1994, blmbycar,  0,        blmbycar, blmbycar, blmbycar_state, blmbycar, ROT0, "ABM & Gecas", "Blomby Car", GAME_SUPPORTS_SAVE )
+GAME( 1994, blmbycaru, blmbycar, blmbycar, blmbycar, driver_device,  0,        ROT0, "ABM & Gecas", "Blomby Car (not encrypted)", GAME_SUPPORTS_SAVE )
+GAME( 1996, watrball,  0,        watrball, watrball, driver_device,  0,        ROT0, "ABM",         "Water Balls", GAME_SUPPORTS_SAVE )
