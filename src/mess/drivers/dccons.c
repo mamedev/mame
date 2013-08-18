@@ -116,9 +116,19 @@ WRITE64_MEMBER(dc_cons_state::dc_arm_w )
 	COMBINE_DATA((UINT64 *)dc_sound_ram.target() + offset);
 }
 
+READ8_MEMBER(dc_cons_state::dc_flash_r)
+{
+	return m_dcflash->read(offset);
+}
+
+WRITE8_MEMBER(dc_cons_state::dc_flash_w)
+{
+	m_dcflash->write(offset,data);
+}
+
 static ADDRESS_MAP_START( dc_map, AS_PROGRAM, 64, dc_cons_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_WRITENOP             // BIOS
-	AM_RANGE(0x00200000, 0x0021ffff) AM_ROM AM_REGION("maincpu", 0x200000)  // flash
+	AM_RANGE(0x00200000, 0x0021ffff) AM_READWRITE8(dc_flash_r,dc_flash_w, U64(0xffffffffffffffff))
 	AM_RANGE(0x005f6800, 0x005f69ff) AM_READWRITE(dc_sysctrl_r, dc_sysctrl_w )
 	AM_RANGE(0x005f6c00, 0x005f6cff) AM_DEVICE32( "maple_dc", maple_dc_device, amap, U64(0xffffffffffffffff) )
 	AM_RANGE(0x005f7000, 0x005f70ff) AM_READWRITE32(dc_mess_gdrom_r, dc_mess_gdrom_w, U64(0xffffffffffffffff) )
@@ -128,7 +138,7 @@ static ADDRESS_MAP_START( dc_map, AS_PROGRAM, 64, dc_cons_state )
 	AM_RANGE(0x005f8000, 0x005f9fff) AM_DEVICE32("powervr2", powervr2_device, ta_map, U64(0xffffffffffffffff))
 	AM_RANGE(0x00600000, 0x006007ff) AM_READWRITE(dc_modem_r, dc_modem_w )
 	AM_RANGE(0x00700000, 0x00707fff) AM_READWRITE(dc_aica_reg_r, dc_aica_reg_w )
-	AM_RANGE(0x00710000, 0x0071000f) AM_READWRITE(dc_rtc_r, dc_rtc_w )
+	AM_RANGE(0x00710000, 0x0071000f) AM_MIRROR(0x02000000) AM_READWRITE32(dc_rtc_r, dc_rtc_w, U64(0xffffffffffffffff) )
 	AM_RANGE(0x00800000, 0x009fffff) AM_READWRITE(dc_arm_r, dc_arm_w )
 
 	/* Area 1 */
@@ -198,6 +208,8 @@ static MACHINE_CONFIG_START( dc, dc_cons_state )
 
 	MCFG_MACHINE_RESET_OVERRIDE(dc_cons_state,dc_console )
 
+	MCFG_MACRONIX_29LV160TMC_ADD("dcflash")
+
 	MCFG_MAPLE_DC_ADD( "maple_dc", "maincpu", dc_maple_irq )
 	MCFG_DC_CONTROLLER_ADD("dcctrl0", "maple_dc", 0, ":P1:0", ":P1:1", ":P1:A0", ":P1:A1", ":P1:A2", ":P1:A3", ":P1:A4", ":P1:A5")
 	MCFG_DC_CONTROLLER_ADD("dcctrl1", "maple_dc", 1, ":P2:0", ":P2:1", ":P2:A0", ":P2:A1", ":P2:A2", ":P2:A3", ":P2:A4", ":P2:A5")
@@ -221,37 +233,47 @@ static MACHINE_CONFIG_START( dc, dc_cons_state )
 MACHINE_CONFIG_END
 
 ROM_START(dc)
-	ROM_REGION(0x220000, "maincpu", 0)
-		ROM_LOAD( "dc101d_us.bin", 0x000000, 0x200000, CRC(89f2b1a1) SHA1(8951d1bb219ab2ff8583033d2119c899cc81f18c) )   // BIOS
-		ROM_LOAD( "dcus_ntsc.bin", 0x200000, 0x020000, CRC(c611b498) SHA1(94d44d7f9529ec1642ba3771ed3c5f756d5bc872) )   // Flash
+	ROM_REGION(0x200000, "maincpu", 0)
+	ROM_LOAD( "dc101d_us.bin", 0x000000, 0x200000, CRC(89f2b1a1) SHA1(8951d1bb219ab2ff8583033d2119c899cc81f18c) )   // BIOS
+
+	ROM_REGION(0x020000, "dcflash", 0)
+	ROM_LOAD( "dcus_ntsc.bin", 0x000000, 0x020000, CRC(c611b498) SHA1(94d44d7f9529ec1642ba3771ed3c5f756d5bc872) )   // Flash
 ROM_END
 
 ROM_START( dceu )
-	ROM_REGION(0x220000, "maincpu", 0)
-		ROM_SYSTEM_BIOS(0, "101d", "v1.01d")
-		ROMX_LOAD( "dc101d_eu.bin", 0x000000, 0x200000, CRC(a2564fad) SHA1(edc5d3d70a93c935703d26119b37731fd317d2bf),ROM_BIOS(1))   // BIOS
-		ROM_SYSTEM_BIOS(1, "101c", "v1.01c")
-		ROMX_LOAD( "dc101c_eu.bin", 0x000000, 0x200000, CRC(2f551bc5) SHA1(1ede8d5be49116a4c6f3fe0961175469537a0434),ROM_BIOS(2))   // BIOS
-		ROM_LOAD( "dceu_pal.bin", 0x200000, 0x020000, CRC(b7e5aeeb) SHA1(11e02433e13b793ec7ffe0ae2356750bb8a575b4) )    // Flash
+	ROM_REGION(0x200000, "maincpu", 0)
+	ROM_SYSTEM_BIOS(0, "101d", "v1.01d")
+	ROMX_LOAD( "dc101d_eu.bin", 0x000000, 0x200000, CRC(a2564fad) SHA1(edc5d3d70a93c935703d26119b37731fd317d2bf),ROM_BIOS(1))   // BIOS
+	ROM_SYSTEM_BIOS(1, "101c", "v1.01c")
+	ROMX_LOAD( "dc101c_eu.bin", 0x000000, 0x200000, CRC(2f551bc5) SHA1(1ede8d5be49116a4c6f3fe0961175469537a0434),ROM_BIOS(2))   // BIOS
+
+	ROM_REGION(0x020000, "dcflash", 0)
+	ROM_LOAD( "dceu_pal.bin", 0x000000, 0x020000, CRC(b7e5aeeb) SHA1(11e02433e13b793ec7ffe0ae2356750bb8a575b4) )    // Flash
 ROM_END
 
 ROM_START( dcjp )
-	ROM_REGION(0x220000, "maincpu", 0)
-		ROM_LOAD( "dc1004jp.bin", 0x000000, 0x200000, CRC(5454841f) SHA1(1ea132c0fbbf07ef76789eadc07908045c089bd6) )    // BIOS
-		/* ROM_LOAD( "dcjp_ntsc.bad", 0x200000, 0x020000, BAD_DUMP CRC(307a7035) SHA1(1411423a9d071340ea52c56e19c1aafc4e1309ee) )      // Hacked Flash */
-		ROM_LOAD( "dcjp_ntsc.bin", 0x200000, 0x020000, CRC(5F92BF76) SHA1(BE78B834F512AB2CF3D67B96E377C9F3093FF82A) )  // Flash
+	ROM_REGION(0x200000, "maincpu", 0)
+	ROM_LOAD( "dc1004jp.bin", 0x000000, 0x200000, CRC(5454841f) SHA1(1ea132c0fbbf07ef76789eadc07908045c089bd6) )    // BIOS
+
+	ROM_REGION(0x020000, "dcflash", 0)
+	/* ROM_LOAD( "dcjp_ntsc.bad", 0x000000, 0x020000, BAD_DUMP CRC(307a7035) SHA1(1411423a9d071340ea52c56e19c1aafc4e1309ee) )      // Hacked Flash */
+	ROM_LOAD( "dcjp_ntsc.bin", 0x000000, 0x020000, CRC(5F92BF76) SHA1(BE78B834F512AB2CF3D67B96E377C9F3093FF82A) )  // Flash
 ROM_END
 
 ROM_START( dcdev )
-	ROM_REGION(0x220000, "maincpu", 0)
-		ROM_LOAD( "hkt-0120.bin", 0x000000, 0x200000, CRC(2186E0E5) SHA1(6BD18FB83F8FDB56F1941E079580E5DD672A6DAD) )        // BIOS
-		ROM_LOAD( "hkt-0120-flash.bin", 0x200000, 0x020000, CRC(7784C304) SHA1(31EF57F550D8CD13E40263CBC657253089E53034) )  // Flash
+	ROM_REGION(0x200000, "maincpu", 0)
+	ROM_LOAD( "hkt-0120.bin", 0x000000, 0x200000, CRC(2186E0E5) SHA1(6BD18FB83F8FDB56F1941E079580E5DD672A6DAD) )        // BIOS
+
+	ROM_REGION(0x020000, "dcflash", 0)
+	ROM_LOAD( "hkt-0120-flash.bin", 0x000000, 0x020000, CRC(7784C304) SHA1(31EF57F550D8CD13E40263CBC657253089E53034) )  // Flash
 ROM_END
 
 ROM_START( dcprt )
-	ROM_REGION(0x220000, "maincpu", 0)
+	ROM_REGION(0x200000, "maincpu", 0)
 	ROM_LOAD( "katana-set5-v0.41-98-08-27.bin", 0x000000, 0x200000, CRC(485877bd) SHA1(dc1af1f1248ffa87d57bc5ef2ea41aac95ecfc5e) ) // BIOS
-	ROM_LOAD( "dcjp_ntsc.bin", 0x200000, 0x020000, CRC(5F92BF76) SHA1(BE78B834F512AB2CF3D67B96E377C9F3093FF82A) )  // Flash
+
+	ROM_REGION(0x020000, "dcflash", 0)
+	ROM_LOAD( "dcjp_ntsc.bin", 0x000000, 0x020000, CRC(5F92BF76) SHA1(BE78B834F512AB2CF3D67B96E377C9F3093FF82A) )  // Flash
 ROM_END
 
 static INPUT_PORTS_START( dc )

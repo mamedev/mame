@@ -74,8 +74,8 @@ class dc_state : public driver_device
 	DECLARE_WRITE64_MEMBER( dc_g2_ctrl_w );
 	DECLARE_READ64_MEMBER( dc_modem_r );
 	DECLARE_WRITE64_MEMBER( dc_modem_w );
-	DECLARE_READ64_MEMBER( dc_rtc_r );
-	DECLARE_WRITE64_MEMBER( dc_rtc_w );
+	DECLARE_READ32_MEMBER( dc_rtc_r );
+	DECLARE_WRITE32_MEMBER( dc_rtc_w );
 	DECLARE_WRITE8_MEMBER( g1_irq );
 	DECLARE_WRITE8_MEMBER( pvr_irq );
 

@@ -86,6 +86,8 @@ const device_type FUJITSU_29F016A = &device_creator<fujitsu_29f016a_device>;
 const device_type FUJITSU_29DL16X = &device_creator<fujitsu_29dl16x_device>;
 const device_type INTEL_E28F400 = &device_creator<intel_e28f400_device>;
 const device_type MACRONIX_29L001MC = &device_creator<macronix_29l001mc_device>;
+const device_type MACRONIX_29LV160TMC = &device_creator<macronix_29lv160tmc_device>;
+
 const device_type PANASONIC_MN63F805MNP = &device_creator<panasonic_mn63f805mnp_device>;
 const device_type SANYO_LE26FV10N1TS = &device_creator<sanyo_le26fv10n1ts_device>;
 const device_type SST_28SF040 = &device_creator<sst_28sf040_device>;
@@ -159,6 +161,8 @@ intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type
 		m_device_id(0),
 		m_maker_id(0),
 		m_sector_is_4k(false),
+		m_sector_is_16k(false),
+		m_rmw_type(false),
 		m_status(0x80),
 		m_erase_sector(0),
 		m_flash_mode(FM_NORMAL),
@@ -281,6 +285,15 @@ intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type
 		m_device_id = 0x51;
 		map = ADDRESS_MAP_NAME( memory_map8_1Mb );
 		break;
+	case FLASH_MACRONIX_29LV160TMC:
+		m_bits = 8;
+		m_size = 0x20000;
+		m_maker_id = MFG_MACRONIX;
+		m_device_id = 0x49;
+		m_sector_is_16k = true;
+		m_rmw_type = true;
+		map = ADDRESS_MAP_NAME( memory_map8_1Mb );
+		break;
 	case FLASH_PANASONIC_MN63F805MNP:
 		m_bits = 8;
 		m_size = 0x10000;
@@ -350,6 +363,9 @@ intel_e28f008sa_device::intel_e28f008sa_device(const machine_config &mconfig, co
 
 macronix_29l001mc_device::macronix_29l001mc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: intelfsh8_device(mconfig, MACRONIX_29L001MC, "Macronix 29L001MC Flash", tag, owner, clock, FLASH_MACRONIX_29L001MC, "macronix_29l001mc", __FILE__) { }
+
+macronix_29lv160tmc_device::macronix_29lv160tmc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: intelfsh8_device(mconfig, MACRONIX_29LV160TMC, "Macronix 29LV160TMC Flash", tag, owner, clock, FLASH_MACRONIX_29LV160TMC, "macronix_29lv160tmc", __FILE__) { }
 
 panasonic_mn63f805mnp_device::panasonic_mn63f805mnp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: intelfsh8_device(mconfig, PANASONIC_MN63F805MNP, "Panasonic MN63F805MNP Flash", tag, owner, clock, FLASH_PANASONIC_MN63F805MNP, "panasonic_mn63f805mnp", __FILE__) { }
@@ -820,6 +836,10 @@ void intelfsh_device::write_full(UINT32 address, UINT32 data)
 			{
 				m_timer->adjust( attotime::from_seconds( 1 ) );
 			}
+			else if(m_sector_is_16k)
+			{
+				m_timer->adjust( attotime::from_seconds( 4 ) );
+			}
 			else
 			{
 				m_timer->adjust( attotime::from_seconds( 16 ) );
@@ -836,6 +856,13 @@ void intelfsh_device::write_full(UINT32 address, UINT32 data)
 					m_addrspace[0]->write_byte((base & ~0xfff) + offs, 0xff);
 				m_erase_sector = address & ((m_bits == 16) ? ~0x7ff : ~0xfff);
 				m_timer->adjust( attotime::from_msec( 125 ) );
+			}
+			else if(m_sector_is_16k)
+			{
+				for (offs_t offs = 0; offs < 16 * 1024; offs++)
+					m_addrspace[0]->write_byte((base & ~0x3fff) + offs, 0xff);
+				m_erase_sector = address & ((m_bits == 16) ? ~0x1fff : ~0x3fff);
+				m_timer->adjust( attotime::from_msec( 500 ) );
 			}
 			else
 			{
@@ -858,7 +885,10 @@ void intelfsh_device::write_full(UINT32 address, UINT32 data)
 		{
 		case 8:
 			{
-				m_addrspace[0]->write_byte(address, data);
+				if(m_rmw_type == true)
+					m_addrspace[0]->write_byte(address, m_addrspace[0]->read_byte(address) & data);
+				else
+					m_addrspace[0]->write_byte(address, data);
 			}
 			break;
 		default:

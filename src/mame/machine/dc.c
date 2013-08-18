@@ -643,38 +643,29 @@ WRITE64_MEMBER(dc_state::dc_modem_w )
 	mame_printf_verbose("MODEM: [%08x=%x] write %" I64FMT "x to %x, mask %" I64FMT "x\n", 0x600000+reg*4, dat, data, offset, mem_mask);
 }
 
-READ64_MEMBER(dc_state::dc_rtc_r )
+READ32_MEMBER(dc_state::dc_rtc_r)
 {
-	int reg;
-	UINT64 shift;
-
-	reg = decode_reg3216_64(offset, mem_mask, &shift);
-	mame_printf_verbose("RTC:  Unmapped read %08x\n", 0x710000+reg*4);
-
-	return (UINT64)dc_rtcregister[reg] << shift;
+	return dc_rtcregister[offset];
 }
 
-WRITE64_MEMBER(dc_state::dc_rtc_w )
+WRITE32_MEMBER(dc_state::dc_rtc_w)
 {
-	int reg;
-	UINT64 shift;
-	UINT32 old,dat;
+	UINT32 old;
 
-	reg = decode_reg3216_64(offset, mem_mask, &shift);
-	dat = (UINT32)(data >> shift);
-	old = dc_rtcregister[reg];
-	dc_rtcregister[reg] = dat & 0xFFFF; // 5f6c00+off*4=dat
-	switch (reg)
+	old = dc_rtcregister[offset];
+	COMBINE_DATA(&dc_rtcregister[offset]);
+
+	switch (offset)
 	{
 	case RTC1:
 		if (dc_rtcregister[RTC3])
 			dc_rtcregister[RTC3] = 0;
 		else
-			dc_rtcregister[reg] = old;
+			dc_rtcregister[offset] = old;
 		break;
 	case RTC2:
 		if (dc_rtcregister[RTC3] == 0)
-			dc_rtcregister[reg] = old;
+			dc_rtcregister[offset] = old;
 		else
 			dc_rtc_timer->adjust(attotime::zero, 0, attotime::from_seconds(1));
 		break;
@@ -682,7 +673,7 @@ WRITE64_MEMBER(dc_state::dc_rtc_w )
 		dc_rtcregister[RTC3] &= 1;
 		break;
 	}
-	mame_printf_verbose("RTC: [%08x=%x] write %" I64FMT "x to %x, mask %" I64FMT "x\n", 0x710000 + reg*4, dat, data, offset, mem_mask);
+	//mame_printf_verbose("RTC: [%08x=%x] write %" I64FMT "x to %x, mask %" I64FMT "x\n", 0x710000 + offset*4, data, offset, mem_mask);
 }
 
 TIMER_CALLBACK_MEMBER(dc_state::dc_rtc_increment)
