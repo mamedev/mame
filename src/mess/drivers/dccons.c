@@ -74,7 +74,7 @@ READ64_MEMBER(dc_cons_state::dc_pdtra_r )
 {
 	UINT64 out = PCTRA<<32;
 
-	out |= PDTRA & ~3;
+	out |= PDTRA & ~0x0303;
 
 	// if both bits are inputs
 	if (!(PCTRA & 0x5))
@@ -116,6 +116,7 @@ WRITE64_MEMBER(dc_cons_state::dc_arm_w )
 	COMBINE_DATA((UINT64 *)dc_sound_ram.target() + offset);
 }
 
+#if 0
 READ8_MEMBER(dc_cons_state::dc_flash_r)
 {
 	return m_dcflash->read(offset);
@@ -125,10 +126,11 @@ WRITE8_MEMBER(dc_cons_state::dc_flash_w)
 {
 	m_dcflash->write(offset,data);
 }
+#endif
 
 static ADDRESS_MAP_START( dc_map, AS_PROGRAM, 64, dc_cons_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_WRITENOP             // BIOS
-	AM_RANGE(0x00200000, 0x0021ffff) AM_READWRITE8(dc_flash_r,dc_flash_w, U64(0xffffffffffffffff))
+	AM_RANGE(0x00200000, 0x0021ffff) AM_ROM AM_REGION("dcflash",0)//AM_READWRITE8(dc_flash_r,dc_flash_w, U64(0xffffffffffffffff))
 	AM_RANGE(0x005f6800, 0x005f69ff) AM_READWRITE(dc_sysctrl_r, dc_sysctrl_w )
 	AM_RANGE(0x005f6c00, 0x005f6cff) AM_DEVICE32( "maple_dc", maple_dc_device, amap, U64(0xffffffffffffffff) )
 	AM_RANGE(0x005f7000, 0x005f70ff) AM_READWRITE32(dc_mess_gdrom_r, dc_mess_gdrom_w, U64(0xffffffffffffffff) )
@@ -209,7 +211,7 @@ static MACHINE_CONFIG_START( dc, dc_cons_state )
 
 	MCFG_MACHINE_RESET_OVERRIDE(dc_cons_state,dc_console )
 
-	MCFG_MACRONIX_29LV160TMC_ADD("dcflash")
+//	MCFG_MACRONIX_29LV160TMC_ADD("dcflash")
 
 	MCFG_MAPLE_DC_ADD( "maple_dc", "maincpu", dc_maple_irq )
 	MCFG_DC_CONTROLLER_ADD("dcctrl0", "maple_dc", 0, ":P1:0", ":P1:1", ":P1:A0", ":P1:A1", ":P1:A2", ":P1:A3", ":P1:A4", ":P1:A5")
