@@ -1014,7 +1014,7 @@ void i80186_cpu_device::device_timer(emu_timer &timer, device_timer_id id, int p
 			struct dma_state *d = &m_dma[which];
 
 			d->drq_delay = false;
-			if(d->drq_state);
+			if(d->drq_state)
 				drq_callback(which);
 			break;
 		}
