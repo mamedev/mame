@@ -174,6 +174,9 @@ public:
 //	void internal_timer_sync(int which);
 //	void handle_eoi(int data);
 	void compis_fdc_tc(int state);
+	DECLARE_READ8_MEMBER(fdc_mon_r);
+	DECLARE_WRITE8_MEMBER(fdc_mon_w);
+	bool m_mon;
 
 	void fdc_irq(bool state);
 	void fdc_drq(bool state);

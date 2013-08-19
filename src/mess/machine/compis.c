@@ -192,7 +192,18 @@ void compis_state::fdc_drq(bool state)
 	}
 }
 
+WRITE8_MEMBER(compis_state::fdc_mon_w)
+{
+	m_mon = data & 1;
 
+	m_fdc->subdevice<floppy_connector>("0")->get_device()->mon_w(m_mon);
+	m_fdc->subdevice<floppy_connector>("1")->get_device()->mon_w(m_mon);
+}
+
+READ8_MEMBER(compis_state::fdc_mon_r)
+{
+	return m_mon;
+}
 /*-------------------------------------------------------------------------*/
 /* Bit 0: J5-4                                                             */
 /* Bit 1: J5-5                                                     */
@@ -1293,6 +1304,7 @@ void compis_state::machine_start()
 	/* CPU */
 	compis_cpu_init();
 	m_fdc->setup_intrq_cb(i8272a_device::line_cb(FUNC(compis_state::fdc_irq), this));
+	m_mon = false;
 }
 /*-------------------------------------------------------------------------*/
 /* Name: compis                                                            */

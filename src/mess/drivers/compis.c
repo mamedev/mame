@@ -168,6 +168,7 @@ static ADDRESS_MAP_START( compis_io, AS_IO, 16, compis_state )
 	AM_RANGE( 0x0330, 0x0333) AM_DEVREADWRITE8("upd7220", upd7220_device, read, write, 0x00ff) /* GDC 82720 PCS6:6     */
 	AM_RANGE( 0x0340, 0x0343) AM_DEVICE8("i8272a", i8272a_device, map, 0x00ff)  /* iSBX0 (J8) FDC 8272      */
 	AM_RANGE( 0x0350, 0x0351) AM_DEVREADWRITE8("i8272a", i8272a_device, mdma_r, mdma_w, 0x00ff) /* iSBX0 (J8) DMA ACK       */
+	AM_RANGE( 0x034e, 0x034f) AM_READWRITE8(fdc_mon_r, fdc_mon_w, 0x00ff)
 //{ 0x0100, 0x017e, compis_null_r },    /* RTC              */
 //{ 0x0180, 0x01ff, compis_null_r },    /* PCS3?            */
 //{ 0x0200, 0x027f, compis_null_r },    /* Reserved         */
@@ -349,7 +350,7 @@ static MACHINE_CONFIG_START( compis, compis_state )
 	MCFG_CPU_PROGRAM_MAP(compis_mem)
 	MCFG_CPU_IO_MAP(compis_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", compis_state,  compis_vblank_int)
-	MCFG_80186_IRQ_SLAVE_ACK(DEVREAD8(DEVICE_SELF_OWNER, compis_state, compis_irq_callback))
+	MCFG_80186_IRQ_SLAVE_ACK(DEVREAD8(DEVICE_SELF, compis_state, compis_irq_callback))
 	//MCFG_CPU_CONFIG(i86_address_mask)
 
 	//MCFG_QUANTUM_TIME(attotime::from_hz(60))
@@ -394,7 +395,7 @@ static MACHINE_CONFIG_START( compis2, compis_state )
 	MCFG_CPU_PROGRAM_MAP(compis_mem)
 	MCFG_CPU_IO_MAP(compis_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", compis_state,  compis_vblank_int)
-	MCFG_80186_IRQ_SLAVE_ACK(DEVREAD8(DEVICE_SELF_OWNER, compis_state, compis_irq_callback))
+	MCFG_80186_IRQ_SLAVE_ACK(DEVREAD8(DEVICE_SELF, compis_state, compis_irq_callback))
 	//MCFG_CPU_CONFIG(i86_address_mask)
 
 	//MCFG_QUANTUM_TIME(attotime::from_hz(60))
