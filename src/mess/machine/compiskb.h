@@ -29,12 +29,9 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_COMPIS_KEYBOARD_ADD() \
-	MCFG_DEVICE_ADD(COMPIS_KEYBOARD_TAG, COMPIS_KEYBOARD, 0)
-
-
-#define COMPIS_KEYBOARD_INTERFACE(_name) \
-	const COMPIS_keyboard_interface (_name) =
+#define MCFG_COMPIS_KEYBOARD_ADD(_irq) \
+	MCFG_DEVICE_ADD(COMPIS_KEYBOARD_TAG, COMPIS_KEYBOARD, 0) \
+	downcast<compis_keyboard_device *>(device)->set_irq_callback(DEVCB2_##_irq);
 
 
 
@@ -42,22 +39,15 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> compis_keyboard_interface
-
-struct compis_keyboard_interface
-{
-	devcb_write_line    m_out_int_cb;
-};
-
-
 // ======================> compis_keyboard_device
 
-class compis_keyboard_device :  public device_t,
-								public compis_keyboard_interface
+class compis_keyboard_device :  public device_t
 {
 public:
 	// construction/destruction
 	compis_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	template<class _irq> void set_irq_callback(_irq irq) { m_write_irq.set_callback(irq); }
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
@@ -70,14 +60,13 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 
 private:
-	devcb_resolved_write_line   m_out_int_func;
-
 	required_device<cpu_device> m_maincpu;
+
+	devcb2_write_line   m_write_irq;
 
 	int m_so;
 };

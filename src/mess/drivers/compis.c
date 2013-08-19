@@ -381,7 +381,7 @@ static MACHINE_CONFIG_START( compis, compis_state )
 	MCFG_I8272A_ADD("i8272a", true)
 	MCFG_FLOPPY_DRIVE_ADD("i8272a:0", compis_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("i8272a:1", compis_floppies, "525qd", floppy_image_device::default_floppy_formats)
-	MCFG_COMPIS_KEYBOARD_ADD()
+	MCFG_COMPIS_KEYBOARD_ADD(NULL)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "compis")
@@ -421,7 +421,7 @@ static MACHINE_CONFIG_START( compis2, compis_state )
 	MCFG_I8272A_ADD("i8272a", true)
 	MCFG_FLOPPY_DRIVE_ADD("i8272a:0", compis_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("i8272a:1", compis_floppies, "525qd", floppy_image_device::default_floppy_formats)
-	MCFG_COMPIS_KEYBOARD_ADD()
+	MCFG_COMPIS_KEYBOARD_ADD(NULL)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "compis")

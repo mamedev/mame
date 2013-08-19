@@ -27,27 +27,6 @@ const device_type COMPIS_KEYBOARD = &device_creator<compis_keyboard_device>;
 
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void compis_keyboard_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const compis_keyboard_interface *intf = reinterpret_cast<const compis_keyboard_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<compis_keyboard_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_int_cb, 0, sizeof(m_out_int_cb));
-	}
-}
-
-
-//-------------------------------------------------
 //  ROM( compis_keyboard )
 //-------------------------------------------------
 
@@ -105,7 +84,7 @@ machine_config_constructor compis_keyboard_device::device_mconfig_additions() co
 //-------------------------------------------------
 
 INPUT_PORTS_START( compis_keyboard )
-	PORT_START("X0")
+	PORT_START("Y0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
@@ -115,7 +94,7 @@ INPUT_PORTS_START( compis_keyboard )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
 
-	PORT_START("X1")
+	PORT_START("Y1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
@@ -125,7 +104,7 @@ INPUT_PORTS_START( compis_keyboard )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
 
-	PORT_START("X2")
+	PORT_START("Y2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
@@ -135,7 +114,7 @@ INPUT_PORTS_START( compis_keyboard )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
 
-	PORT_START("X3")
+	PORT_START("Y3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
@@ -145,7 +124,7 @@ INPUT_PORTS_START( compis_keyboard )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
 
-	PORT_START("X4")
+	PORT_START("Y4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
@@ -155,7 +134,7 @@ INPUT_PORTS_START( compis_keyboard )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
 
-	PORT_START("X5")
+	PORT_START("Y5")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
@@ -165,7 +144,7 @@ INPUT_PORTS_START( compis_keyboard )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
 
-	PORT_START("X6")
+	PORT_START("Y6")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
@@ -175,7 +154,7 @@ INPUT_PORTS_START( compis_keyboard )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
 
-	PORT_START("X7")
+	PORT_START("Y7")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
@@ -185,7 +164,7 @@ INPUT_PORTS_START( compis_keyboard )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
 
-	PORT_START("X8")
+	PORT_START("Y8")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
@@ -195,7 +174,7 @@ INPUT_PORTS_START( compis_keyboard )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
 
-	PORT_START("X9")
+	PORT_START("Y9")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
@@ -205,7 +184,7 @@ INPUT_PORTS_START( compis_keyboard )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
 
-	PORT_START("XA")
+	PORT_START("YA")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
@@ -215,7 +194,7 @@ INPUT_PORTS_START( compis_keyboard )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
 
-	PORT_START("XB")
+	PORT_START("YB")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
@@ -225,7 +204,7 @@ INPUT_PORTS_START( compis_keyboard )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
 
-	PORT_START("XC")
+	PORT_START("YC")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
@@ -235,7 +214,7 @@ INPUT_PORTS_START( compis_keyboard )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
 
-	PORT_START("XD")
+	PORT_START("YD")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
@@ -245,7 +224,7 @@ INPUT_PORTS_START( compis_keyboard )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
 
-	PORT_START("XE")
+	PORT_START("YE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
@@ -255,7 +234,7 @@ INPUT_PORTS_START( compis_keyboard )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
 
-	PORT_START("XF")
+	PORT_START("YF")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
@@ -289,6 +268,7 @@ ioport_constructor compis_keyboard_device::device_input_ports() const
 compis_keyboard_device::compis_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, COMPIS_KEYBOARD, "Compis Keyboard", tag, owner, clock, "compiskb", __FILE__),
 		m_maincpu(*this, I8748_TAG),
+		m_write_irq(*this),
 		m_so(1)
 {
 }
@@ -301,7 +281,7 @@ compis_keyboard_device::compis_keyboard_device(const machine_config &mconfig, co
 void compis_keyboard_device::device_start()
 {
 	// resolve callbacks
-	m_out_int_func.resolve(m_out_int_cb, *this);
+	m_write_irq.resolve_safe();
 }
 
 
