@@ -58,12 +58,43 @@
 
 #define M37710_DEBUG    (0) // enables verbose logging for peripherals, etc.
 
-static void m37710_set_irq_line(m37710i_cpu_struct *cpustate, int line, int state);
+
+const device_type M37710 = &device_creator<m37710_cpu_device>;
+const device_type M37702 = &device_creator<m37702_cpu_device>;
+
+
+// On-board RAM and peripherals
+static ADDRESS_MAP_START( m37710_internal_map, AS_PROGRAM, 16, m37710_cpu_device )
+	AM_RANGE(0x000000, 0x00007f) AM_READWRITE(m37710_internal_word_r, m37710_internal_word_w)
+	AM_RANGE(0x000080, 0x00027f) AM_RAM
+ADDRESS_MAP_END
+
+
+m37710_cpu_device::m37710_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: cpu_device(mconfig, M37710, "M37710", tag, owner, clock, "m37710", __FILE__)
+	, m_program_config("program", ENDIANNESS_LITTLE, 16, 24, 0, ADDRESS_MAP_NAME(m37710_internal_map))
+	, m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0)
+{
+}
+
+
+m37710_cpu_device::m37710_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
+	, m_program_config("program", ENDIANNESS_LITTLE, 16, 24, 0, ADDRESS_MAP_NAME(m37710_internal_map))
+	, m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0)
+{
+}
+
+
+m37702_cpu_device::m37702_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: m37710_cpu_device(mconfig, M37702, "M37702", tag, owner, clock, "m37702", __FILE__)
+{
+}
+
 
 /* interrupt control mapping */
 
-extern const int m37710_irq_levels[M37710_LINE_MAX];
-const int m37710_irq_levels[M37710_LINE_MAX] =
+const int m37710_cpu_device::m37710_irq_levels[M37710_LINE_MAX] =
 {
 	// maskable
 	0x70,   // ADC           0
@@ -91,7 +122,7 @@ const int m37710_irq_levels[M37710_LINE_MAX] =
 	0,  // reset
 };
 
-static const int m37710_irq_vectors[M37710_LINE_MAX] =
+const int m37710_cpu_device::m37710_irq_vectors[M37710_LINE_MAX] =
 {
 	// maskable
 	0xffd6, // A-D converter
@@ -121,8 +152,7 @@ static const int m37710_irq_vectors[M37710_LINE_MAX] =
 
 // M37710 internal peripherals
 
-#if M37710_DEBUG
-static const char *const m37710_rnames[128] =
+const char *const m37710_cpu_device::m37710_rnames[128] =
 {
 	"",
 	"",
@@ -254,25 +284,23 @@ static const char *const m37710_rnames[128] =
 	"INT2 IRQ ctrl",
 };
 
-static const char *const m37710_tnames[8] =
+const char *const m37710_cpu_device::m37710_tnames[8] =
 {
 	"A0", "A1", "A2", "A3", "A4", "B0", "B1", "B2"
 };
-#endif
 
-static TIMER_CALLBACK( m37710_timer_cb )
+TIMER_CALLBACK_MEMBER( m37710_cpu_device::m37710_timer_cb )
 {
-	m37710i_cpu_struct *cpustate = (m37710i_cpu_struct *)ptr;
 	int which = param;
 	int curirq = M37710_LINE_TIMERA0 - which;
 
-	cpustate->timers[which]->adjust(cpustate->reload[which], param);
+	m_timers[which]->adjust(m_reload[which], param);
 
-	m37710_set_irq_line(cpustate, curirq, HOLD_LINE);
-	cpustate->device->signal_interrupt_trigger();
+	m37710_set_irq_line(curirq, HOLD_LINE);
+	signal_interrupt_trigger();
 }
 
-static void m37710_external_tick(m37710i_cpu_struct *cpustate, int timer, int state)
+void m37710_cpu_device::m37710_external_tick(int timer, int state)
 {
 	// we only care if the state is "on"
 	if (!state)
@@ -281,18 +309,18 @@ static void m37710_external_tick(m37710i_cpu_struct *cpustate, int timer, int st
 	}
 
 	// check if enabled
-	if (cpustate->m37710_regs[0x40] & (1<<timer))
+	if (m_m37710_regs[0x40] & (1<<timer))
 	{
-		if ((cpustate->m37710_regs[0x56+timer] & 0x3) == 1)
+		if ((m_m37710_regs[0x56+timer] & 0x3) == 1)
 		{
-			if (cpustate->m37710_regs[0x46+(timer*2)] == 0xff)
+			if (m_m37710_regs[0x46+(timer*2)] == 0xff)
 			{
-				cpustate->m37710_regs[0x46+(timer*2)] = 0;
-				cpustate->m37710_regs[0x46+(timer*2)+1]++;
+				m_m37710_regs[0x46+(timer*2)] = 0;
+				m_m37710_regs[0x46+(timer*2)+1]++;
 			}
 			else
 			{
-				cpustate->m37710_regs[0x46+(timer*2)]++;
+				m_m37710_regs[0x46+(timer*2)]++;
 			}
 		}
 		else
@@ -302,41 +330,41 @@ static void m37710_external_tick(m37710i_cpu_struct *cpustate, int timer, int st
 	}
 }
 
-static void m37710_recalc_timer(m37710i_cpu_struct *cpustate, int timer)
+void m37710_cpu_device::m37710_recalc_timer(int timer)
 {
 	int tval;
 	attotime time;
 	static const int tscales[4] = { 2, 16, 64, 512 };
 
 	// check if enabled
-	if (cpustate->m37710_regs[0x40] & (1<<timer))
+	if (m_m37710_regs[0x40] & (1<<timer))
 	{
 		#if M37710_DEBUG
 		logerror("Timer %d (%s) is enabled\n", timer, m37710_tnames[timer]);
 		#endif
 
 		// set the timer's value
-		tval = cpustate->m37710_regs[0x46+(timer*2)] | (cpustate->m37710_regs[0x47+(timer*2)]<<8);
+		tval = m_m37710_regs[0x46+(timer*2)] | (m_m37710_regs[0x47+(timer*2)]<<8);
 
 		// HACK: ignore if timer is 8MHz (MAME slows down to a crawl)
-		if (tval == 0 && (cpustate->m37710_regs[0x56+timer]&0xc0) == 0) return;
+		if (tval == 0 && (m_m37710_regs[0x56+timer]&0xc0) == 0) return;
 
 		// check timer's mode
 		// modes are slightly different between timer groups A and B
 		if (timer < 5)
 		{
-			switch (cpustate->m37710_regs[0x56+timer] & 0x3)
+			switch (m_m37710_regs[0x56+timer] & 0x3)
 			{
 				case 0:         // timer mode
-					time = attotime::from_hz(cpustate->device->unscaled_clock()) * tscales[cpustate->m37710_regs[0x56+timer]>>6];
+					time = attotime::from_hz(unscaled_clock()) * tscales[m_m37710_regs[0x56+timer]>>6];
 					time *= (tval + 1);
 
 					#if M37710_DEBUG
 					logerror("Timer %d in timer mode, %f Hz\n", timer, 1.0 / time.as_double());
 					#endif
 
-					cpustate->timers[timer]->adjust(time, timer);
-					cpustate->reload[timer] = time;
+					m_timers[timer]->adjust(time, timer);
+					m_reload[timer] = time;
 					break;
 
 				case 1:         // event counter mode
@@ -360,18 +388,18 @@ static void m37710_recalc_timer(m37710i_cpu_struct *cpustate, int timer)
 		}
 		else
 		{
-			switch (cpustate->m37710_regs[0x56+timer] & 0x3)
+			switch (m_m37710_regs[0x56+timer] & 0x3)
 			{
 				case 0:         // timer mode
-					time = attotime::from_hz(cpustate->device->unscaled_clock()) * tscales[cpustate->m37710_regs[0x56+timer]>>6];
+					time = attotime::from_hz(unscaled_clock()) * tscales[m_m37710_regs[0x56+timer]>>6];
 					time *= (tval + 1);
 
 					#if M37710_DEBUG
 					logerror("Timer %d in timer mode, %f Hz\n", timer, 1.0 / time.as_double());
 					#endif
 
-					cpustate->timers[timer]->adjust(time, timer);
-					cpustate->reload[timer] = time;
+					m_timers[timer]->adjust(time, timer);
+					m_reload[timer] = time;
 					break;
 
 				case 1:         // event counter mode
@@ -396,7 +424,7 @@ static void m37710_recalc_timer(m37710i_cpu_struct *cpustate, int timer)
 	}
 }
 
-static UINT8 m37710_internal_r(m37710i_cpu_struct *cpustate, int offset)
+UINT8 m37710_cpu_device::m37710_internal_r(int offset)
 {
 	UINT8 d;
 
@@ -409,84 +437,84 @@ static UINT8 m37710_internal_r(m37710i_cpu_struct *cpustate, int offset)
 	{
 		// ports
 		case 0x02: // p0
-			d = cpustate->m37710_regs[0x04];
+			d = m_m37710_regs[0x04];
 			if (d != 0xff)
-				return (cpustate->io->read_byte(M37710_PORT0)&~d) | (cpustate->m37710_regs[offset]&d);
+				return (m_io->read_byte(M37710_PORT0)&~d) | (m_m37710_regs[offset]&d);
 			break;
 		case 0x03: // p1
-			d = cpustate->m37710_regs[0x05];
+			d = m_m37710_regs[0x05];
 			if (d != 0xff)
-				return (cpustate->io->read_byte(M37710_PORT1)&~d) | (cpustate->m37710_regs[offset]&d);
+				return (m_io->read_byte(M37710_PORT1)&~d) | (m_m37710_regs[offset]&d);
 			break;
 		case 0x06: // p2
-			d = cpustate->m37710_regs[0x08];
+			d = m_m37710_regs[0x08];
 			if (d != 0xff)
-				return (cpustate->io->read_byte(M37710_PORT2)&~d) | (cpustate->m37710_regs[offset]&d);
+				return (m_io->read_byte(M37710_PORT2)&~d) | (m_m37710_regs[offset]&d);
 			break;
 		case 0x07: // p3
-			d = cpustate->m37710_regs[0x09];
+			d = m_m37710_regs[0x09];
 			if (d != 0xff)
-				return (cpustate->io->read_byte(M37710_PORT3)&~d) | (cpustate->m37710_regs[offset]&d);
+				return (m_io->read_byte(M37710_PORT3)&~d) | (m_m37710_regs[offset]&d);
 			break;
 		case 0x0a: // p4
-			d = cpustate->m37710_regs[0x0c];
+			d = m_m37710_regs[0x0c];
 			if (d != 0xff)
-				return (cpustate->io->read_byte(M37710_PORT4)&~d) | (cpustate->m37710_regs[offset]&d);
+				return (m_io->read_byte(M37710_PORT4)&~d) | (m_m37710_regs[offset]&d);
 			break;
 		case 0x0b: // p5
-			d = cpustate->m37710_regs[0x0d];
+			d = m_m37710_regs[0x0d];
 			if (d != 0xff)
-				return (cpustate->io->read_byte(M37710_PORT5)&~d) | (cpustate->m37710_regs[offset]&d);
+				return (m_io->read_byte(M37710_PORT5)&~d) | (m_m37710_regs[offset]&d);
 			break;
 		case 0x0e: // p6
-			d = cpustate->m37710_regs[0x10];
+			d = m_m37710_regs[0x10];
 			if (d != 0xff)
-				return (cpustate->io->read_byte(M37710_PORT6)&~d) | (cpustate->m37710_regs[offset]&d);
+				return (m_io->read_byte(M37710_PORT6)&~d) | (m_m37710_regs[offset]&d);
 			break;
 		case 0x0f: // p7
-			d = cpustate->m37710_regs[0x11];
+			d = m_m37710_regs[0x11];
 			if (d != 0xff)
-				return (cpustate->io->read_byte(M37710_PORT7)&~d) | (cpustate->m37710_regs[offset]&d);
+				return (m_io->read_byte(M37710_PORT7)&~d) | (m_m37710_regs[offset]&d);
 			break;
 		case 0x12: // p8
-			d = cpustate->m37710_regs[0x14];
+			d = m_m37710_regs[0x14];
 			if (d != 0xff)
-				return (cpustate->io->read_byte(M37710_PORT8)&~d) | (cpustate->m37710_regs[offset]&d);
+				return (m_io->read_byte(M37710_PORT8)&~d) | (m_m37710_regs[offset]&d);
 			break;
 
 		// A-D regs
 		case 0x20:
-			return cpustate->io->read_byte(M37710_ADC0_L);
+			return m_io->read_byte(M37710_ADC0_L);
 		case 0x21:
-			return cpustate->io->read_byte(M37710_ADC0_H);
+			return m_io->read_byte(M37710_ADC0_H);
 		case 0x22:
-			return cpustate->io->read_byte(M37710_ADC1_L);
+			return m_io->read_byte(M37710_ADC1_L);
 		case 0x23:
-			return cpustate->io->read_byte(M37710_ADC1_H);
+			return m_io->read_byte(M37710_ADC1_H);
 		case 0x24:
-			return cpustate->io->read_byte(M37710_ADC2_L);
+			return m_io->read_byte(M37710_ADC2_L);
 		case 0x25:
-			return cpustate->io->read_byte(M37710_ADC2_H);
+			return m_io->read_byte(M37710_ADC2_H);
 		case 0x26:
-			return cpustate->io->read_byte(M37710_ADC3_L);
+			return m_io->read_byte(M37710_ADC3_L);
 		case 0x27:
-			return cpustate->io->read_byte(M37710_ADC3_H);
+			return m_io->read_byte(M37710_ADC3_H);
 		case 0x28:
-			return cpustate->io->read_byte(M37710_ADC4_L);
+			return m_io->read_byte(M37710_ADC4_L);
 		case 0x29:
-			return cpustate->io->read_byte(M37710_ADC4_H);
+			return m_io->read_byte(M37710_ADC4_H);
 		case 0x2a:
-			return cpustate->io->read_byte(M37710_ADC5_L);
+			return m_io->read_byte(M37710_ADC5_L);
 		case 0x2b:
-			return cpustate->io->read_byte(M37710_ADC5_H);
+			return m_io->read_byte(M37710_ADC5_H);
 		case 0x2c:
-			return cpustate->io->read_byte(M37710_ADC6_L);
+			return m_io->read_byte(M37710_ADC6_L);
 		case 0x2d:
-			return cpustate->io->read_byte(M37710_ADC6_H);
+			return m_io->read_byte(M37710_ADC6_H);
 		case 0x2e:
-			return cpustate->io->read_byte(M37710_ADC7_L);
+			return m_io->read_byte(M37710_ADC7_L);
 		case 0x2f:
-			return cpustate->io->read_byte(M37710_ADC7_H);
+			return m_io->read_byte(M37710_ADC7_H);
 
 		// UART control (not hooked up yet)
 		case 0x34: case 0x3c:
@@ -496,16 +524,16 @@ static UINT8 m37710_internal_r(m37710i_cpu_struct *cpustate, int offset)
 
 		// A-D IRQ control (also not properly hooked up yet)
 		case 0x70:
-			return cpustate->m37710_regs[offset] | 8;
+			return m_m37710_regs[offset] | 8;
 
 		default:
-			return cpustate->m37710_regs[offset];
+			return m_m37710_regs[offset];
 	}
 
-	return cpustate->m37710_regs[offset];
+	return m_m37710_regs[offset];
 }
 
-static void m37710_internal_w(m37710i_cpu_struct *cpustate, int offset, UINT8 data)
+void m37710_cpu_device::m37710_internal_w(int offset, UINT8 data)
 {
 	int i;
 	UINT8 prevdata;
@@ -513,80 +541,80 @@ static void m37710_internal_w(m37710i_cpu_struct *cpustate, int offset, UINT8 da
 
 	#if M37710_DEBUG
 	if (offset != 0x60) // filter out watchdog
-	logerror("m37710_internal_w %x to %02x: %s = %x\n", data, (int)offset, m37710_rnames[(int)offset], cpustate->m37710_regs[offset]);
+	logerror("m37710_internal_w %x to %02x: %s = %x\n", data, (int)offset, m37710_rnames[(int)offset], m_m37710_regs[offset]);
 	#endif
 
-	prevdata = cpustate->m37710_regs[offset];
-	cpustate->m37710_regs[offset] = data;
+	prevdata = m_m37710_regs[offset];
+	m_m37710_regs[offset] = data;
 
 	switch(offset)
 	{
 		// ports
 		case 0x02: // p0
-			d = cpustate->m37710_regs[0x04];
+			d = m_m37710_regs[0x04];
 			if (d != 0)
-				cpustate->io->write_byte(M37710_PORT0, data&d);
+				m_io->write_byte(M37710_PORT0, data&d);
 			break;
 		case 0x03: // p1
-			d = cpustate->m37710_regs[0x05];
+			d = m_m37710_regs[0x05];
 			if (d != 0)
-				cpustate->io->write_byte(M37710_PORT1, data&d);
+				m_io->write_byte(M37710_PORT1, data&d);
 			break;
 		case 0x06: // p2
-			d = cpustate->m37710_regs[0x08];
+			d = m_m37710_regs[0x08];
 			if (d != 0)
-				cpustate->io->write_byte(M37710_PORT2, data&d);
+				m_io->write_byte(M37710_PORT2, data&d);
 			break;
 		case 0x07: // p3
-			d = cpustate->m37710_regs[0x09];
+			d = m_m37710_regs[0x09];
 			if (d != 0)
-				cpustate->io->write_byte(M37710_PORT3, data&d);
+				m_io->write_byte(M37710_PORT3, data&d);
 			break;
 		case 0x0a: // p4
-			d = cpustate->m37710_regs[0x0c];
+			d = m_m37710_regs[0x0c];
 			if (d != 0)
-				cpustate->io->write_byte(M37710_PORT4, data&d);
+				m_io->write_byte(M37710_PORT4, data&d);
 			break;
 		case 0x0b: // p5
-			d = cpustate->m37710_regs[0x0d];
+			d = m_m37710_regs[0x0d];
 			if (d != 0)
-				cpustate->io->write_byte(M37710_PORT5, data&d);
+				m_io->write_byte(M37710_PORT5, data&d);
 			break;
 		case 0x0e: // p6
-			d = cpustate->m37710_regs[0x10];
+			d = m_m37710_regs[0x10];
 			if (d != 0)
-				cpustate->io->write_byte(M37710_PORT6, data&d);
+				m_io->write_byte(M37710_PORT6, data&d);
 			break;
 		case 0x0f: // p7
-			d = cpustate->m37710_regs[0x11];
+			d = m_m37710_regs[0x11];
 			if (d != 0)
-				cpustate->io->write_byte(M37710_PORT7, data&d);
+				m_io->write_byte(M37710_PORT7, data&d);
 			break;
 		case 0x12: // p8
-			d = cpustate->m37710_regs[0x14];
+			d = m_m37710_regs[0x14];
 			if (d != 0)
-				cpustate->io->write_byte(M37710_PORT8, data&d);
+				m_io->write_byte(M37710_PORT8, data&d);
 			break;
 
 		case 0x40:  // count start
 			for (i = 0; i < 8; i++)
 			{
 				if ((data & (1<<i)) && !(prevdata & (1<<i)))
-					m37710_recalc_timer(cpustate, i);
+					m37710_recalc_timer(i);
 			}
 			break;
 
 		// internal interrupt control
 		case 0x70: case 0x71: case 0x72: case 0x73: case 0x74: case 0x75:
 		case 0x76: case 0x77: case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c:
-			m37710_set_irq_line(cpustate, offset, (data & 8) ? HOLD_LINE : CLEAR_LINE);
-			m37710i_update_irqs(cpustate);
+			m37710_set_irq_line(offset, (data & 8) ? HOLD_LINE : CLEAR_LINE);
+			m37710i_update_irqs();
 			break;
 
 		// external interrupt control
 		case 0x7d: case 0x7e: case 0x7f:
-			m37710_set_irq_line(cpustate, offset, (data & 8) ? HOLD_LINE : CLEAR_LINE);
-			m37710i_update_irqs(cpustate);
+			m37710_set_irq_line(offset, (data & 8) ? HOLD_LINE : CLEAR_LINE);
+			m37710i_update_irqs();
 
 			// level-sense interrupts are not implemented yet
 			if (data & 0x20) logerror("error M37710: INT%d level-sense\n",offset-0x7d);
@@ -597,62 +625,28 @@ static void m37710_internal_w(m37710i_cpu_struct *cpustate, int offset, UINT8 da
 	}
 }
 
-static READ16_HANDLER( m37710_internal_word_r )
+READ16_MEMBER( m37710_cpu_device::m37710_internal_word_r )
 {
-	m37710i_cpu_struct *cpustate = get_safe_token(&space.device());
 	UINT16 ret = 0;
 
 	if (mem_mask & 0x00ff)
-		ret |= m37710_internal_r(cpustate, offset*2);
+		ret |= m37710_internal_r(offset*2);
 	if (mem_mask & 0xff00)
-		ret |= m37710_internal_r(cpustate, offset*2+1)<<8;
+		ret |= m37710_internal_r(offset*2+1)<<8;
 
 	return ret;
 }
 
-static WRITE16_HANDLER( m37710_internal_word_w )
+WRITE16_MEMBER( m37710_cpu_device::m37710_internal_word_w )
 {
-	m37710i_cpu_struct *cpustate = get_safe_token(&space.device());
-
 	if (mem_mask & 0x00ff)
-		m37710_internal_w(cpustate, offset*2, data & 0xff);
+		m37710_internal_w(offset*2, data & 0xff);
 	if (mem_mask & 0xff00)
-		m37710_internal_w(cpustate, offset*2+1, data>>8);
+		m37710_internal_w(offset*2+1, data>>8);
 }
 
-extern void (*const m37710i_opcodes_M0X0[])(m37710i_cpu_struct *cpustate);
-extern void (*const m37710i_opcodes42_M0X0[])(m37710i_cpu_struct *cpustate);
-extern void (*const m37710i_opcodes89_M0X0[])(m37710i_cpu_struct *cpustate);
-extern uint m37710i_get_reg_M0X0(m37710i_cpu_struct *cpustate, int regnum);
-extern void m37710i_set_reg_M0X0(m37710i_cpu_struct *cpustate, int regnum, uint val);
-extern void m37710i_set_line_M0X0(m37710i_cpu_struct *cpustate, int line, int state);
-extern int  m37710i_execute_M0X0(m37710i_cpu_struct *cpustate, int cycles);
 
-extern void (*const m37710i_opcodes_M0X1[])(m37710i_cpu_struct *cpustate);
-extern void (*const m37710i_opcodes42_M0X1[])(m37710i_cpu_struct *cpustate);
-extern void (*const m37710i_opcodes89_M0X1[])(m37710i_cpu_struct *cpustate);
-extern uint m37710i_get_reg_M0X1(m37710i_cpu_struct *cpustate, int regnum);
-extern void m37710i_set_reg_M0X1(m37710i_cpu_struct *cpustate, int regnum, uint val);
-extern void m37710i_set_line_M0X1(m37710i_cpu_struct *cpustate, int line, int state);
-extern int  m37710i_execute_M0X1(m37710i_cpu_struct *cpustate, int cycles);
-
-extern void (*const m37710i_opcodes_M1X0[])(m37710i_cpu_struct *cpustate);
-extern void (*const m37710i_opcodes42_M1X0[])(m37710i_cpu_struct *cpustate);
-extern void (*const m37710i_opcodes89_M1X0[])(m37710i_cpu_struct *cpustate);
-extern uint m37710i_get_reg_M1X0(m37710i_cpu_struct *cpustate, int regnum);
-extern void m37710i_set_reg_M1X0(m37710i_cpu_struct *cpustate, int regnum, uint val);
-extern void m37710i_set_line_M1X0(m37710i_cpu_struct *cpustate, int line, int state);
-extern int  m37710i_execute_M1X0(m37710i_cpu_struct *cpustate, int cycles);
-
-extern void (*const m37710i_opcodes_M1X1[])(m37710i_cpu_struct *cpustate);
-extern void (*const m37710i_opcodes42_M1X1[])(m37710i_cpu_struct *cpustate);
-extern void (*const m37710i_opcodes89_M1X1[])(m37710i_cpu_struct *cpustate);
-extern uint m37710i_get_reg_M1X1(m37710i_cpu_struct *cpustate, int regnum);
-extern void m37710i_set_reg_M1X1(m37710i_cpu_struct *cpustate, int regnum, uint val);
-extern void m37710i_set_line_M1X1(m37710i_cpu_struct *cpustate, int line, int state);
-extern int  m37710i_execute_M1X1(m37710i_cpu_struct *cpustate, int cycles);
-
-void (*const *const m37710i_opcodes[4])(m37710i_cpu_struct *cpustate) =
+const m37710_cpu_device::opcode_func *m37710_cpu_device::m37710i_opcodes[4] =
 {
 	m37710i_opcodes_M0X0,
 	m37710i_opcodes_M0X1,
@@ -660,7 +654,7 @@ void (*const *const m37710i_opcodes[4])(m37710i_cpu_struct *cpustate) =
 	m37710i_opcodes_M1X1,
 };
 
-void (*const *const m37710i_opcodes2[4])(m37710i_cpu_struct *cpustate) =
+const m37710_cpu_device::opcode_func *m37710_cpu_device::m37710i_opcodes2[4] =
 {
 	m37710i_opcodes42_M0X0,
 	m37710i_opcodes42_M0X1,
@@ -668,7 +662,7 @@ void (*const *const m37710i_opcodes2[4])(m37710i_cpu_struct *cpustate) =
 	m37710i_opcodes42_M1X1,
 };
 
-void (*const *const m37710i_opcodes3[4])(m37710i_cpu_struct *cpustate) =
+const m37710_cpu_device::opcode_func *m37710_cpu_device::m37710i_opcodes3[4] =
 {
 	m37710i_opcodes89_M0X0,
 	m37710i_opcodes89_M0X1,
@@ -676,53 +670,53 @@ void (*const *const m37710i_opcodes3[4])(m37710i_cpu_struct *cpustate) =
 	m37710i_opcodes89_M1X1,
 };
 
-uint (*const m37710i_get_reg[4])(m37710i_cpu_struct *cpustate, int regnum) =
+const m37710_cpu_device::get_reg_func m37710_cpu_device::m37710i_get_reg[4] =
 {
-	m37710i_get_reg_M0X0,
-	m37710i_get_reg_M0X1,
-	m37710i_get_reg_M1X0,
-	m37710i_get_reg_M1X1,
+	&m37710_cpu_device::m37710i_get_reg_M0X0,
+	&m37710_cpu_device::m37710i_get_reg_M0X1,
+	&m37710_cpu_device::m37710i_get_reg_M1X0,
+	&m37710_cpu_device::m37710i_get_reg_M1X1,
 };
 
-void (*const m37710i_set_reg[4])(m37710i_cpu_struct *cpustate, int regnum, uint val) =
+const m37710_cpu_device::set_reg_func m37710_cpu_device::m37710i_set_reg[4] =
 {
-	m37710i_set_reg_M0X0,
-	m37710i_set_reg_M0X1,
-	m37710i_set_reg_M1X0,
-	m37710i_set_reg_M1X1,
+	&m37710_cpu_device::m37710i_set_reg_M0X0,
+	&m37710_cpu_device::m37710i_set_reg_M0X1,
+	&m37710_cpu_device::m37710i_set_reg_M1X0,
+	&m37710_cpu_device::m37710i_set_reg_M1X1,
 };
 
-void (*const m37710i_set_line[4])(m37710i_cpu_struct *cpustate, int line, int state) =
+const m37710_cpu_device::set_line_func m37710_cpu_device::m37710i_set_line[4] =
 {
-	m37710i_set_line_M0X0,
-	m37710i_set_line_M0X1,
-	m37710i_set_line_M1X0,
-	m37710i_set_line_M1X1,
+	&m37710_cpu_device::m37710i_set_line_M0X0,
+	&m37710_cpu_device::m37710i_set_line_M0X1,
+	&m37710_cpu_device::m37710i_set_line_M1X0,
+	&m37710_cpu_device::m37710i_set_line_M1X1,
 };
 
-int (*const m37710i_execute[4])(m37710i_cpu_struct *cpustate, int cycles) =
+const m37710_cpu_device::execute_func m37710_cpu_device::m37710i_execute[4] =
 {
-	m37710i_execute_M0X0,
-	m37710i_execute_M0X1,
-	m37710i_execute_M1X0,
-	m37710i_execute_M1X1,
+	&m37710_cpu_device::m37710i_execute_M0X0,
+	&m37710_cpu_device::m37710i_execute_M0X1,
+	&m37710_cpu_device::m37710i_execute_M1X0,
+	&m37710_cpu_device::m37710i_execute_M1X1,
 };
 
 /* internal functions */
 
-INLINE void m37710i_push_8(m37710i_cpu_struct *cpustate, uint value)
+void m37710_cpu_device::m37710i_push_8(UINT32 value)
 {
 	m37710_write_8(REG_S, value);
 	REG_S = MAKE_UINT_16(REG_S-1);
 }
 
-INLINE void m37710i_push_16(m37710i_cpu_struct *cpustate, uint value)
+void m37710_cpu_device::m37710i_push_16(UINT32 value)
 {
-	m37710i_push_8(cpustate, value>>8);
-	m37710i_push_8(cpustate, value&0xff);
+	m37710i_push_8(value>>8);
+	m37710i_push_8(value&0xff);
 }
 
-INLINE uint m37710i_get_reg_p(m37710i_cpu_struct *cpustate)
+UINT32 m37710_cpu_device::m37710i_get_reg_p()
 {
 	return  (FLAG_N&0x80)       |
 			((FLAG_V>>1)&0x40)  |
@@ -734,7 +728,7 @@ INLINE uint m37710i_get_reg_p(m37710i_cpu_struct *cpustate)
 			((FLAG_C>>8)&1);
 }
 
-void m37710i_update_irqs(m37710i_cpu_struct *cpustate)
+void m37710_cpu_device::m37710i_update_irqs()
 {
 	int curirq, pending = LINE_IRQ;
 	int wantedIRQ = -1;
@@ -747,11 +741,11 @@ void m37710i_update_irqs(m37710i_cpu_struct *cpustate)
 			// this IRQ is set
 			if (m37710_irq_levels[curirq])
 			{
-				int control = cpustate->m37710_regs[m37710_irq_levels[curirq]];
+				int control = m_m37710_regs[m37710_irq_levels[curirq]];
 				int thispri = control & 7;
-				// logerror("line %d set, level %x curpri %x IPL %x\n", curirq, thispri, curpri, cpustate->ipl);
+				// logerror("line %d set, level %x curpri %x IPL %x\n", curirq, thispri, curpri, m_ipl);
 				// it's maskable, check if the level works, also make sure it's acceptable for the current CPU level
-				if (!FLAG_I && thispri > curpri && thispri > cpustate->ipl)
+				if (!FLAG_I && thispri > curpri && thispri > m_ipl)
 				{
 					// mark us as the best candidate
 					wantedIRQ = curirq;
@@ -770,26 +764,26 @@ void m37710i_update_irqs(m37710i_cpu_struct *cpustate)
 
 	if (wantedIRQ != -1)
 	{
-		if (INT_ACK) INT_ACK(cpustate->device, wantedIRQ);
+		standard_irq_callback(wantedIRQ);
 
 		// make sure we're running to service the interrupt
 		CPU_STOPPED &= ~STOP_LEVEL_WAI;
 
 		// auto-clear line
-		m37710_set_irq_line(cpustate, wantedIRQ, CLEAR_LINE);
+		m37710_set_irq_line(wantedIRQ, CLEAR_LINE);
 
 		// let's do it...
 		// push PB, then PC, then status
 		CLK(13);
-//      mame_printf_debug("taking IRQ %d: PC = %06x, SP = %04x, IPL %d\n", wantedIRQ, REG_PB | REG_PC, REG_S, cpustate->ipl);
-		m37710i_push_8(cpustate, REG_PB>>16);
-		m37710i_push_16(cpustate, REG_PC);
-		m37710i_push_8(cpustate, cpustate->ipl);
-		m37710i_push_8(cpustate, m37710i_get_reg_p(cpustate));
+//      mame_printf_debug("taking IRQ %d: PC = %06x, SP = %04x, IPL %d\n", wantedIRQ, REG_PB | REG_PC, REG_S, m_ipl);
+		m37710i_push_8(REG_PB>>16);
+		m37710i_push_16(REG_PC);
+		m37710i_push_8(m_ipl);
+		m37710i_push_8(m37710i_get_reg_p());
 
 		// set I to 1, set IPL to the interrupt we're taking
 		FLAG_I = IFLAG_SET;
-		cpustate->ipl = curpri;
+		m_ipl = curpri;
 		// then PB=0, PC=(vector)
 		REG_PB = 0;
 		REG_PC = m37710_read_8(m37710_irq_vectors[wantedIRQ]) |
@@ -801,16 +795,15 @@ void m37710i_update_irqs(m37710i_cpu_struct *cpustate)
 
 /* external functions */
 
-static CPU_RESET( m37710 )
+void m37710_cpu_device::device_reset()
 {
 	int i;
-	m37710i_cpu_struct *cpustate = get_safe_token(device);
 
 	/* Reset MAME timers */
 	for (i = 0; i < 8; i++)
 	{
-		cpustate->timers[i]->reset();
-		cpustate->reload[i] = attotime::zero;
+		m_timers[i]->reset();
+		m_reload[i] = attotime::zero;
 	}
 
 	/* Start the CPU */
@@ -818,48 +811,48 @@ static CPU_RESET( m37710 )
 
 	/* Reset internal registers */
 	// port direction
-	cpustate->m37710_regs[0x04] = 0;
-	cpustate->m37710_regs[0x05] = 0;
-	cpustate->m37710_regs[0x08] = 0;
-	cpustate->m37710_regs[0x09] = 0;
-	cpustate->m37710_regs[0x0c] = 0;
-	cpustate->m37710_regs[0x0d] = 0;
-	cpustate->m37710_regs[0x10] = 0;
-	cpustate->m37710_regs[0x11] = 0;
-	cpustate->m37710_regs[0x14] = 0;
+	m_m37710_regs[0x04] = 0;
+	m_m37710_regs[0x05] = 0;
+	m_m37710_regs[0x08] = 0;
+	m_m37710_regs[0x09] = 0;
+	m_m37710_regs[0x0c] = 0;
+	m_m37710_regs[0x0d] = 0;
+	m_m37710_regs[0x10] = 0;
+	m_m37710_regs[0x11] = 0;
+	m_m37710_regs[0x14] = 0;
 
-	cpustate->m37710_regs[0x1e] &= 7; // A-D control
-	cpustate->m37710_regs[0x1f] |= 3; // A-D sweep
+	m_m37710_regs[0x1e] &= 7; // A-D control
+	m_m37710_regs[0x1f] |= 3; // A-D sweep
 
 	// UART
-	cpustate->m37710_regs[0x30] = 0;
-	cpustate->m37710_regs[0x38] = 0;
-	cpustate->m37710_regs[0x34] = (cpustate->m37710_regs[0x34] & 0xf0) | 8;
-	cpustate->m37710_regs[0x3c] = (cpustate->m37710_regs[0x3c] & 0xf0) | 8;
-	cpustate->m37710_regs[0x35] = 2;
-	cpustate->m37710_regs[0x3d] = 2;
-	cpustate->m37710_regs[0x37]&= 1;
-	cpustate->m37710_regs[0x3f]&= 1;
+	m_m37710_regs[0x30] = 0;
+	m_m37710_regs[0x38] = 0;
+	m_m37710_regs[0x34] = (m_m37710_regs[0x34] & 0xf0) | 8;
+	m_m37710_regs[0x3c] = (m_m37710_regs[0x3c] & 0xf0) | 8;
+	m_m37710_regs[0x35] = 2;
+	m_m37710_regs[0x3d] = 2;
+	m_m37710_regs[0x37]&= 1;
+	m_m37710_regs[0x3f]&= 1;
 
 	// timer
-	cpustate->m37710_regs[0x40] = 0;
-	cpustate->m37710_regs[0x42]&= 0x1f;
-	cpustate->m37710_regs[0x44] = 0;
+	m_m37710_regs[0x40] = 0;
+	m_m37710_regs[0x42]&= 0x1f;
+	m_m37710_regs[0x44] = 0;
 	for (i = 0x56; i < 0x5e; i++)
-		cpustate->m37710_regs[i] = 0;
+		m_m37710_regs[i] = 0;
 
-	cpustate->m37710_regs[0x5e] = 0; // processor mode
-	cpustate->m37710_regs[0x61]&= 1; // watchdog frequency
+	m_m37710_regs[0x5e] = 0; // processor mode
+	m_m37710_regs[0x61]&= 1; // watchdog frequency
 
 	// interrupt control
-	cpustate->m37710_regs[0x7d] &= 0x3f;
-	cpustate->m37710_regs[0x7e] &= 0x3f;
-	cpustate->m37710_regs[0x7f] &= 0x3f;
+	m_m37710_regs[0x7d] &= 0x3f;
+	m_m37710_regs[0x7e] &= 0x3f;
+	m_m37710_regs[0x7f] &= 0x3f;
 	for (i = 0x70; i < 0x7d; i++)
-		cpustate->m37710_regs[i] &= 0xf;
+		m_m37710_regs[i] &= 0xf;
 
 	/* Clear IPL, m, x, D and set I */
-	cpustate->ipl = 0;
+	m_ipl = 0;
 	FLAG_M = MFLAG_CLEAR;
 	FLAG_X = XFLAG_CLEAR;
 	FLAG_D = DFLAG_CLEAR;
@@ -880,334 +873,549 @@ static CPU_RESET( m37710 )
 	REG_BB = REG_BA & 0xff00; REG_BA &= 0xff;
 
 	/* Set the function tables to emulation mode */
-	m37710i_set_execution_mode(cpustate, EXECUTION_MODE_M0X0);
+	m37710i_set_execution_mode(EXECUTION_MODE_M0X0);
 
 	/* Fetch the reset vector */
 	REG_PC = m37710_read_8(0xfffe) | (m37710_read_8(0xffff)<<8);
 	m37710i_jumping(REG_PB | REG_PC);
 }
 
-/* Exit and clean up */
-static CPU_EXIT( m37710 )
-{
-	/* nothing to do yet */
-}
-
 /* Execute some instructions */
-static CPU_EXECUTE( m37710 )
+void m37710_cpu_device::execute_run()
 {
-	m37710i_cpu_struct *m37710 = get_safe_token(device);
+	m37710i_update_irqs();
 
-	m37710i_update_irqs(m37710);
-
-	int clocks = m37710->ICount;
-	m37710->ICount = clocks - m37710->execute(m37710, m37710->ICount);
+	int clocks = m_ICount;
+	m_ICount = clocks - (this->*m_execute)(m_ICount);
 }
 
 
 /* Set the Program Counter */
-static void m37710_set_pc(m37710i_cpu_struct *cpustate, unsigned val)
+void m37710_cpu_device::m37710_set_pc(unsigned val)
 {
 	REG_PC = MAKE_UINT_16(val);
 	m37710_jumping(REG_PB | REG_PC);
 }
 
 /* Get the current Stack Pointer */
-static unsigned m37710_get_sp(m37710i_cpu_struct *cpustate)
+unsigned m37710_cpu_device::m37710_get_sp()
 {
 	return REG_S;
 }
 
 /* Set the Stack Pointer */
-static void m37710_set_sp(m37710i_cpu_struct *cpustate, unsigned val)
+void m37710_cpu_device::m37710_set_sp(unsigned val)
 {
 	REG_S = MAKE_UINT_16(val);
 }
 
 /* Get a register */
-static unsigned m37710_get_reg(m37710i_cpu_struct *cpustate, int regnum)
+unsigned m37710_cpu_device::m37710_get_reg(int regnum)
 {
-	return FTABLE_GET_REG(cpustate, regnum);
+	return (this->*m_get_reg)(regnum);
 }
 
 /* Set a register */
-static void m37710_set_reg(m37710i_cpu_struct *cpustate, int regnum, unsigned value)
+void m37710_cpu_device::m37710_set_reg(int regnum, unsigned value)
 {
-	FTABLE_SET_REG(cpustate, regnum, value);
+	(this->*m_set_reg)(regnum, value);
 }
 
 /* Set an interrupt line */
-static void m37710_set_irq_line(m37710i_cpu_struct *cpustate, int line, int state)
+void m37710_cpu_device::m37710_set_irq_line(int line, int state)
 {
-	FTABLE_SET_LINE(cpustate, line, state);
+	(this->*m_set_line)(line, state);
 }
-
-/* Set the callback that is called when servicing an interrupt */
-#ifdef UNUSED_FUNCTION
-void m37710_set_irq_callback(device_irq_acknowledge_callback callback)
-{
-	INT_ACK = callback;
-}
-#endif
 
 /* Disassemble an instruction */
 #include "m7700ds.h"
 
-static CPU_DISASSEMBLE( m37710 )
-{
-	m37710i_cpu_struct *cpustate = get_safe_token(device);
 
+CPU_DISASSEMBLE( m37710 )
+{
+	return m7700_disassemble(buffer, (pc&0xffff), pc>>16, oprom, 0, 0);
+}
+
+
+offs_t m37710_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+{
 	return m7700_disassemble(buffer, (pc&0xffff), pc>>16, oprom, FLAG_M, FLAG_X);
 }
 
-static void m37710_restore_state(m37710i_cpu_struct *cpustate)
+
+void m37710_cpu_device::m37710_restore_state()
 {
 	// restore proper function pointers
-	m37710i_set_execution_mode(cpustate, (FLAG_M>>4) | (FLAG_X>>4));
+	m37710i_set_execution_mode((FLAG_M>>4) | (FLAG_X>>4));
 
 	// make sure the memory system can keep up
 	m37710i_jumping(REG_PB | REG_PC);
 }
 
-static CPU_INIT( m37710 )
+void m37710_cpu_device::device_start()
 {
-	m37710i_cpu_struct *cpustate = get_safe_token(device);
-	int i;
+	m_a = 0;
+	m_b = 0;
+	m_ba = 0;
+	m_bb = 0;
+	m_x = 0;
+	m_y = 0;
+	m_xh = 0;
+	m_yh = 0;
+	m_s = 0;
+	m_pc = 0;
+	m_ppc = 0;
+	m_pb = 0;
+	m_db = 0;
+	m_d = 0;
+	m_flag_e = 0;
+	m_flag_m = 0;
+	m_flag_x = 0;
+	m_flag_n = 0;
+	m_flag_v = 0;
+	m_flag_d = 0;
+	m_flag_i = 0;
+	m_flag_z = 0;
+	m_flag_c = 0;
+	m_line_irq = 0;
+	m_ipl = 0;
+	m_ir = 0;
+	m_im = 0;
+	m_im2 = 0;
+	m_im3 = 0;
+	m_im4 = 0;
+	m_irq_delay = 0;
+	m_irq_level = 0;
+	m_stopped = 0;
+	memset(m_m37710_regs, 0, sizeof(m_m37710_regs));
 
-	memset(cpustate, 0, sizeof(*cpustate));
+	m_program = &space(AS_PROGRAM);
+	m_io = &space(AS_IO);
 
-	INT_ACK = irqcallback;
-	cpustate->device = device;
-	cpustate->program = &device->space(AS_PROGRAM);
-	cpustate->io = &device->space(AS_IO);
+	m_ICount = 0;
 
-	cpustate->ICount = 0;
+	m_source = 0;
+	m_destination = 0;
 
-	cpustate->source = 0;
-	cpustate->destination = 0;
-
-	for (i = 0; i < 8; i++)
-		cpustate->timers[i] = device->machine().scheduler().timer_alloc(FUNC(m37710_timer_cb), cpustate);
-
-	device->save_item(NAME(cpustate->a));
-	device->save_item(NAME(cpustate->b));
-	device->save_item(NAME(cpustate->ba));
-	device->save_item(NAME(cpustate->bb));
-	device->save_item(NAME(cpustate->x));
-	device->save_item(NAME(cpustate->y));
-	device->save_item(NAME(cpustate->xh));
-	device->save_item(NAME(cpustate->yh));
-	device->save_item(NAME(cpustate->s));
-	device->save_item(NAME(cpustate->pc));
-	device->save_item(NAME(cpustate->ppc));
-	device->save_item(NAME(cpustate->pb));
-	device->save_item(NAME(cpustate->db));
-	device->save_item(NAME(cpustate->d));
-	device->save_item(NAME(cpustate->flag_e));
-	device->save_item(NAME(cpustate->flag_m));
-	device->save_item(NAME(cpustate->flag_x));
-	device->save_item(NAME(cpustate->flag_n));
-	device->save_item(NAME(cpustate->flag_v));
-	device->save_item(NAME(cpustate->flag_d));
-	device->save_item(NAME(cpustate->flag_i));
-	device->save_item(NAME(cpustate->flag_z));
-	device->save_item(NAME(cpustate->flag_c));
-	device->save_item(NAME(cpustate->line_irq));
-	device->save_item(NAME(cpustate->ipl));
-	device->save_item(NAME(cpustate->ir));
-	device->save_item(NAME(cpustate->im));
-	device->save_item(NAME(cpustate->im2));
-	device->save_item(NAME(cpustate->im3));
-	device->save_item(NAME(cpustate->im4));
-	device->save_item(NAME(cpustate->irq_delay));
-	device->save_item(NAME(cpustate->irq_level));
-	device->save_item(NAME(cpustate->stopped));
-	device->save_item(NAME(cpustate->m37710_regs));
-	device->save_item(NAME(cpustate->reload[0]));
-	device->save_item(NAME(cpustate->reload[1]));
-	device->save_item(NAME(cpustate->reload[2]));
-	device->save_item(NAME(cpustate->reload[3]));
-	device->save_item(NAME(cpustate->reload[4]));
-	device->save_item(NAME(cpustate->reload[5]));
-	device->save_item(NAME(cpustate->reload[6]));
-	device->save_item(NAME(cpustate->reload[7]));
-
-	device->machine().save().register_postload(save_prepost_delegate(FUNC(m37710_restore_state), cpustate));
-}
-
-/**************************************************************************
- * Generic set_info
- **************************************************************************/
-
-static CPU_SET_INFO( m37710 )
-{
-	m37710i_cpu_struct *cpustate = get_safe_token(device);
-
-	switch (state)
+	for (int i = 0; i < 8; i++)
 	{
-		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_STATE + M37710_LINE_ADC:     m37710_set_irq_line(cpustate, M37710_LINE_ADC, info->i); break;
-		case CPUINFO_INT_INPUT_STATE + M37710_LINE_IRQ0:    m37710_set_irq_line(cpustate, M37710_LINE_IRQ0, info->i); break;
-		case CPUINFO_INT_INPUT_STATE + M37710_LINE_IRQ1:    m37710_set_irq_line(cpustate, M37710_LINE_IRQ1, info->i); break;
-		case CPUINFO_INT_INPUT_STATE + M37710_LINE_IRQ2:    m37710_set_irq_line(cpustate, M37710_LINE_IRQ2, info->i); break;
-
-		case CPUINFO_INT_INPUT_STATE + M37710_LINE_TIMERA0TICK: m37710_external_tick(cpustate, state - CPUINFO_INT_INPUT_STATE - M37710_LINE_TIMERA0TICK, info->i); break;
-		case CPUINFO_INT_INPUT_STATE + M37710_LINE_TIMERA1TICK: m37710_external_tick(cpustate, state - CPUINFO_INT_INPUT_STATE - M37710_LINE_TIMERA0TICK, info->i); break;
-		case CPUINFO_INT_INPUT_STATE + M37710_LINE_TIMERA2TICK: m37710_external_tick(cpustate, state - CPUINFO_INT_INPUT_STATE - M37710_LINE_TIMERA0TICK, info->i); break;
-		case CPUINFO_INT_INPUT_STATE + M37710_LINE_TIMERA3TICK: m37710_external_tick(cpustate, state - CPUINFO_INT_INPUT_STATE - M37710_LINE_TIMERA0TICK, info->i); break;
-		case CPUINFO_INT_INPUT_STATE + M37710_LINE_TIMERA4TICK: m37710_external_tick(cpustate, state - CPUINFO_INT_INPUT_STATE - M37710_LINE_TIMERA0TICK, info->i); break;
-		case CPUINFO_INT_INPUT_STATE + M37710_LINE_TIMERB0TICK: m37710_external_tick(cpustate, state - CPUINFO_INT_INPUT_STATE - M37710_LINE_TIMERA0TICK, info->i); break;
-		case CPUINFO_INT_INPUT_STATE + M37710_LINE_TIMERB1TICK: m37710_external_tick(cpustate, state - CPUINFO_INT_INPUT_STATE - M37710_LINE_TIMERA0TICK, info->i); break;
-		case CPUINFO_INT_INPUT_STATE + M37710_LINE_TIMERB2TICK: m37710_external_tick(cpustate, state - CPUINFO_INT_INPUT_STATE - M37710_LINE_TIMERA0TICK, info->i); break;
-
-		case CPUINFO_INT_PC:                            REG_PB = info->i & 0xff0000; m37710_set_pc(cpustate, info->i & 0xffff); break;
-		case CPUINFO_INT_SP:                            m37710_set_sp(cpustate, info->i);                   break;
-
-		case CPUINFO_INT_REGISTER + M37710_PC:          m37710_set_reg(cpustate, M37710_PC, info->i);       break;
-		case CPUINFO_INT_REGISTER + M37710_S:           m37710_set_reg(cpustate, M37710_S, info->i);        break;
-		case CPUINFO_INT_REGISTER + M37710_P:           m37710_set_reg(cpustate, M37710_P, info->i&0xff);   cpustate->ipl = (info->i>>8)&0xff;  break;
-		case CPUINFO_INT_REGISTER + M37710_A:           m37710_set_reg(cpustate, M37710_A, info->i);        break;
-		case CPUINFO_INT_REGISTER + M37710_X:           m37710_set_reg(cpustate, M37710_X, info->i);        break;
-		case CPUINFO_INT_REGISTER + M37710_Y:           m37710_set_reg(cpustate, M37710_Y, info->i);        break;
-		case CPUINFO_INT_REGISTER + M37710_PB:          m37710_set_reg(cpustate, M37710_PB, info->i);       break;
-		case CPUINFO_INT_REGISTER + M37710_DB:          m37710_set_reg(cpustate, M37710_DB, info->i);       break;
-		case CPUINFO_INT_REGISTER + M37710_D:           m37710_set_reg(cpustate, M37710_D, info->i);        break;
-		case CPUINFO_INT_REGISTER + M37710_E:           m37710_set_reg(cpustate, M37710_E, info->i);        break;
-		case CPUINFO_INT_REGISTER + M37710_NMI_STATE:   m37710_set_reg(cpustate, M37710_NMI_STATE, info->i); break;
-		case CPUINFO_INT_REGISTER + M37710_IRQ_STATE:   m37710_set_reg(cpustate, M37710_IRQ_STATE, info->i); break;
+		m_timers[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m37710_cpu_device::m37710_timer_cb), this));
+		m_reload[i] = attotime::never;
 	}
+
+	save_item(NAME(m_a));
+	save_item(NAME(m_b));
+	save_item(NAME(m_ba));
+	save_item(NAME(m_bb));
+	save_item(NAME(m_x));
+	save_item(NAME(m_y));
+	save_item(NAME(m_xh));
+	save_item(NAME(m_yh));
+	save_item(NAME(m_s));
+	save_item(NAME(m_pc));
+	save_item(NAME(m_ppc));
+	save_item(NAME(m_pb));
+	save_item(NAME(m_db));
+	save_item(NAME(m_d));
+	save_item(NAME(m_flag_e));
+	save_item(NAME(m_flag_m));
+	save_item(NAME(m_flag_x));
+	save_item(NAME(m_flag_n));
+	save_item(NAME(m_flag_v));
+	save_item(NAME(m_flag_d));
+	save_item(NAME(m_flag_i));
+	save_item(NAME(m_flag_z));
+	save_item(NAME(m_flag_c));
+	save_item(NAME(m_line_irq));
+	save_item(NAME(m_ipl));
+	save_item(NAME(m_ir));
+	save_item(NAME(m_im));
+	save_item(NAME(m_im2));
+	save_item(NAME(m_im3));
+	save_item(NAME(m_im4));
+	save_item(NAME(m_irq_delay));
+	save_item(NAME(m_irq_level));
+	save_item(NAME(m_stopped));
+	save_item(NAME(m_m37710_regs));
+	save_item(NAME(m_reload[0]));
+	save_item(NAME(m_reload[1]));
+	save_item(NAME(m_reload[2]));
+	save_item(NAME(m_reload[3]));
+	save_item(NAME(m_reload[4]));
+	save_item(NAME(m_reload[5]));
+	save_item(NAME(m_reload[6]));
+	save_item(NAME(m_reload[7]));
+
+	machine().save().register_postload(save_prepost_delegate(save_prepost_delegate(FUNC(m37710_cpu_device::m37710_restore_state), this)));
+
+	state_add( M37710_PC,        "PC",  m_pc).formatstr("%04X");
+	state_add( M37710_PB,        "PB",  m_debugger_pb).callimport().callexport().formatstr("%02X");
+	state_add( M37710_DB,        "DB",  m_debugger_db).callimport().callexport().formatstr("%02X");
+	state_add( M37710_D,         "D",   m_d).formatstr("%04X");
+	state_add( M37710_S,         "S",   m_s).formatstr("%04X");
+	state_add( M37710_P,         "P",   m_debugger_p).callimport().callexport().formatstr("%04X");
+	state_add( M37710_E,         "E",   m_flag_e).formatstr("%01X");
+	state_add( M37710_A,         "A",   m_debugger_a).callimport().callexport().formatstr("%04X");
+	state_add( M37710_B,         "B",   m_debugger_b).callimport().callexport().formatstr("%04X");
+	state_add( M37710_X,         "X",   m_x).formatstr("%04X");
+	state_add( M37710_Y,         "Y",   m_y).formatstr("%04X");
+	state_add( M37710_IRQ_STATE, "IRQ", m_line_irq).formatstr("%01X");
+
+	state_add( STATE_GENPC, "GENPC", m_debugger_pc ).callimport().callexport().noshow();
+	state_add( STATE_GENFLAGS, "GENFLAGS", m_debugger_p ).formatstr("%8s").noshow();
+
+	m_icountptr = &m_ICount;
 }
 
-// On-board RAM and peripherals
-static ADDRESS_MAP_START( m37710_internal_map, AS_PROGRAM, 16, legacy_cpu_device )
-	AM_RANGE(0x000000, 0x00007f) AM_READWRITE_LEGACY(m37710_internal_word_r, m37710_internal_word_w)
-	AM_RANGE(0x000080, 0x00027f) AM_RAM
-ADDRESS_MAP_END
 
-/**************************************************************************
- * Generic get_info
- **************************************************************************/
-
-CPU_GET_INFO( m37710 )
+void m37710_cpu_device::state_import(const device_state_entry &entry)
 {
-	m37710i_cpu_struct *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
-
-	switch (state)
+	switch (entry.index())
 	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:                  info->i = sizeof(m37710i_cpu_struct);           break;
-		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:            info->i = 0;                            break;
-		case CPUINFO_INT_ENDIANNESS:                    info->i = ENDIANNESS_LITTLE;                    break;
-		case CPUINFO_INT_CLOCK_MULTIPLIER:              info->i = 1;                            break;
-		case CPUINFO_INT_CLOCK_DIVIDER:                 info->i = 1;                            break;
-		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:         info->i = 1;                            break;
-		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:         info->i = 6;                            break;
-		case CPUINFO_INT_MIN_CYCLES:                    info->i = 1;                            break;
-		case CPUINFO_INT_MAX_CYCLES:                    info->i = 20; /* rough guess */         break;
-		case CPUINFO_INT_INPUT_LINES:                   info->i = M37710_LINE_MAX;              break;
-
-		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:    info->i = 16;                   break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 24;                  break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = 0;                   break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:   info->i = 0;                    break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:   info->i = 0;                    break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:   info->i = 0;                    break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:     info->i = 8;                    break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:     info->i = 16;                   break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:     info->i = 0;                    break;
-
-		case CPUINFO_INT_INPUT_STATE + M37710_LINE_IRQ0:    info->i = 0;                        break;
-		case CPUINFO_INT_INPUT_STATE + M37710_LINE_IRQ1:    info->i = 0;                        break;
-		case CPUINFO_INT_INPUT_STATE + M37710_LINE_IRQ2:    info->i = 0;                        break;
-		case CPUINFO_INT_INPUT_STATE + M37710_LINE_RESET:   info->i = 0;                        break;
-
-		case CPUINFO_INT_PREVIOUSPC:                    info->i = REG_PPC;                      break;
-		case CPUINFO_INT_PC:                            info->i = (REG_PB | REG_PC);            break;
-		case CPUINFO_INT_SP:                            info->i = m37710_get_sp(cpustate);              break;
-
-		case CPUINFO_INT_REGISTER + M37710_PC:          info->i = m37710_get_reg(cpustate, M37710_PC);  break;
-		case CPUINFO_INT_REGISTER + M37710_S:           info->i = m37710_get_reg(cpustate, M37710_S);       break;
-		case CPUINFO_INT_REGISTER + M37710_P:           info->i = m37710_get_reg(cpustate, M37710_P) | (cpustate->ipl<<8); break;
-		case CPUINFO_INT_REGISTER + M37710_A:           info->i = m37710_get_reg(cpustate, M37710_A);       break;
-		case CPUINFO_INT_REGISTER + M37710_B:           info->i = m37710_get_reg(cpustate, M37710_B);       break;
-		case CPUINFO_INT_REGISTER + M37710_X:           info->i = m37710_get_reg(cpustate, M37710_X);       break;
-		case CPUINFO_INT_REGISTER + M37710_Y:           info->i = m37710_get_reg(cpustate, M37710_Y);       break;
-		case CPUINFO_INT_REGISTER + M37710_PB:          info->i = m37710_get_reg(cpustate, M37710_PB);  break;
-		case CPUINFO_INT_REGISTER + M37710_DB:          info->i = m37710_get_reg(cpustate, M37710_DB);  break;
-		case CPUINFO_INT_REGISTER + M37710_D:           info->i = m37710_get_reg(cpustate, M37710_D);       break;
-		case CPUINFO_INT_REGISTER + M37710_E:           info->i = m37710_get_reg(cpustate, M37710_E);       break;
-		case CPUINFO_INT_REGISTER + M37710_NMI_STATE:   info->i = m37710_get_reg(cpustate, M37710_NMI_STATE); break;
-		case CPUINFO_INT_REGISTER + M37710_IRQ_STATE:   info->i = m37710_get_reg(cpustate, M37710_IRQ_STATE); break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_SET_INFO:                      info->setinfo = CPU_SET_INFO_NAME(m37710);      break;
-		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(m37710);             break;
-		case CPUINFO_FCT_RESET:                         info->reset = CPU_RESET_NAME(m37710);               break;
-		case CPUINFO_FCT_EXIT:                          info->exit = CPU_EXIT_NAME(m37710);             break;
-		case CPUINFO_FCT_EXECUTE:                       info->execute = CPU_EXECUTE_NAME(m37710);           break;
-		case CPUINFO_FCT_BURN:                          info->burn = NULL;                      break;
-		case CPUINFO_FCT_DISASSEMBLE:                   info->disassemble = CPU_DISASSEMBLE_NAME(m37710);       break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:           info->icount = &cpustate->ICount;           break;
-
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM: info->internal_map16 = ADDRESS_MAP_NAME(m37710_internal_map); break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:    info->internal_map16 = NULL; break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_IO:      info->internal_map8 = NULL;  break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "M37710");              break;
-		case CPUINFO_STR_FAMILY:                    strcpy(info->s, "M7700");               break;
-		case CPUINFO_STR_VERSION:                   strcpy(info->s, "1.2");                 break;
-		case CPUINFO_STR_SOURCE_FILE:                       strcpy(info->s, __FILE__);              break;
-		case CPUINFO_STR_CREDITS:                   strcpy(info->s, "Copyright R. Belmont, based on G65816 by Karl Stenerud"); break;
-
-		case CPUINFO_STR_FLAGS:
-			sprintf(info->s, "%c%c%c%c%c%c%c%c",
-				cpustate->flag_n & NFLAG_SET ? 'N':'.',
-				cpustate->flag_v & VFLAG_SET ? 'V':'.',
-				cpustate->flag_m & MFLAG_SET ? 'M':'.',
-				cpustate->flag_x & XFLAG_SET ? 'X':'.',
-				cpustate->flag_d & DFLAG_SET ? 'D':'.',
-				cpustate->flag_i & IFLAG_SET ? 'I':'.',
-				cpustate->flag_z == 0        ? 'Z':'.',
-				cpustate->flag_c & CFLAG_SET ? 'C':'.');
+		case M37710_PB:
+			m37710_set_reg(M37710_PB, m_debugger_pb);
 			break;
 
-		case CPUINFO_STR_REGISTER + M37710_PC:          sprintf(info->s, "PC:%04X", cpustate->pc); break;
-		case CPUINFO_STR_REGISTER + M37710_PB:          sprintf(info->s, "PB:%02X", cpustate->pb>>16); break;
-		case CPUINFO_STR_REGISTER + M37710_DB:          sprintf(info->s, "DB:%02X", cpustate->db>>16); break;
-		case CPUINFO_STR_REGISTER + M37710_D:           sprintf(info->s, "D:%04X", cpustate->d); break;
-		case CPUINFO_STR_REGISTER + M37710_S:           sprintf(info->s, "S:%04X", cpustate->s); break;
-		case CPUINFO_STR_REGISTER + M37710_P:           sprintf(info->s, "P:%04X",
-																	(cpustate->flag_n&0x80)     |
-																((cpustate->flag_v>>1)&0x40)    |
-																cpustate->flag_m                |
-																cpustate->flag_x                |
-																cpustate->flag_d                |
-																cpustate->flag_i                |
-																((!cpustate->flag_z)<<1)        |
-																((cpustate->flag_c>>8)&1) | (cpustate->ipl<<8)); break;
-		case CPUINFO_STR_REGISTER + M37710_E:           sprintf(info->s, "E:%d", cpustate->flag_e); break;
-		case CPUINFO_STR_REGISTER + M37710_A:           sprintf(info->s, "A:%04X", cpustate->a | cpustate->b); break;
-		case CPUINFO_STR_REGISTER + M37710_B:           sprintf(info->s, "B:%04X", cpustate->ba | cpustate->bb); break;
-		case CPUINFO_STR_REGISTER + M37710_X:           sprintf(info->s, "X:%04X", cpustate->x); break;
-		case CPUINFO_STR_REGISTER + M37710_Y:           sprintf(info->s, "Y:%04X", cpustate->y); break;
-		case CPUINFO_STR_REGISTER + M37710_IRQ_STATE:   sprintf(info->s, "IRQ:%X", cpustate->line_irq); break;
+		case M37710_DB:
+			m37710_set_reg(M37710_DB, m_debugger_db);
+			break;
+
+		case M37710_P:
+			m37710_set_reg(M37710_P, m_debugger_p&0xff);
+			m_ipl = (m_debugger_p>>8)&0xff;
+			break;
+
+		case M37710_A:
+			m37710_set_reg(M37710_A, m_debugger_a);
+			break;
+
+		case M37710_B:
+			m37710_set_reg(M37710_B, m_debugger_b);
+			break;
+
+		case STATE_GENPC:
+			REG_PB = m_debugger_pc & 0xff0000;
+			m37710_set_pc(m_debugger_pc & 0xffff);
+			break;
 	}
 }
 
-// 37702 is identical except with an internal ROM, so just change the name
-CPU_GET_INFO( m37702 )
+
+void m37710_cpu_device::state_export(const device_state_entry &entry)
 {
-	switch (state)
+	switch (entry.index())
 	{
-		case CPUINFO_STR_NAME: strcpy(info->s, "M37702"); break;
-		default: CPU_GET_INFO_CALL(m37710); break;
-	}
+		case M37710_PB:
+			m_debugger_pb = m_pb >> 16;
+			break;
 
+		case M37710_DB:
+			m_debugger_db = m_db >> 16;
+			break;
+
+		case M37710_P:
+			m_debugger_p = (m_flag_n&0x80) | ((m_flag_v>>1)&0x40) | m_flag_m | m_flag_x | m_flag_d | m_flag_i | ((!m_flag_z)<<1) | ((m_flag_c>>8)&1) | (m_ipl<<8);
+			break;
+
+		case M37710_A:
+			m_debugger_a = m_a | m_b;
+			break;
+
+		case M37710_B:
+			m_debugger_b = m_ba | m_bb;
+			break;
+
+		case STATE_GENPC:
+			m_debugger_pc = (REG_PB | REG_PC);
+			break;
+	}
 }
 
-DEFINE_LEGACY_CPU_DEVICE(M37710, m37710);
-DEFINE_LEGACY_CPU_DEVICE(M37702, m37702);
+
+void m37710_cpu_device::state_string_export(const device_state_entry &entry, astring &string)
+{
+	switch (entry.index())
+	{
+		case STATE_GENFLAGS:
+			string.printf("%c%c%c%c%c%c%c%c",
+				m_flag_n & NFLAG_SET ? 'N':'.',
+				m_flag_v & VFLAG_SET ? 'V':'.',
+				m_flag_m & MFLAG_SET ? 'M':'.',
+				m_flag_x & XFLAG_SET ? 'X':'.',
+				m_flag_d & DFLAG_SET ? 'D':'.',
+				m_flag_i & IFLAG_SET ? 'I':'.',
+				m_flag_z == 0        ? 'Z':'.',
+				m_flag_c & CFLAG_SET ? 'C':'.');
+			break;
+	}
+}
+
+
+void m37710_cpu_device::execute_set_input(int inputnum, int state)
+{
+	switch( inputnum )
+	{
+		case M37710_LINE_ADC:
+		case M37710_LINE_IRQ0:
+		case M37710_LINE_IRQ1:
+		case M37710_LINE_IRQ2:
+			m37710_set_irq_line(inputnum, state);
+			break;
+
+		case M37710_LINE_TIMERA0TICK:
+		case M37710_LINE_TIMERA1TICK:
+		case M37710_LINE_TIMERA2TICK:
+		case M37710_LINE_TIMERA3TICK:
+		case M37710_LINE_TIMERA4TICK:
+		case M37710_LINE_TIMERB0TICK:
+		case M37710_LINE_TIMERB1TICK:
+		case M37710_LINE_TIMERB2TICK:
+			m37710_external_tick(inputnum - M37710_LINE_TIMERA0TICK, state);
+			break;
+	}
+}
+
+
+void m37710_cpu_device::m37710i_set_execution_mode(UINT32 mode)
+{
+	m_opcodes = m37710i_opcodes[mode];
+	m_opcodes42 = m37710i_opcodes2[mode];
+	m_opcodes89 = m37710i_opcodes3[mode];
+	FTABLE_GET_REG = m37710i_get_reg[mode];
+	FTABLE_SET_REG = m37710i_set_reg[mode];
+	FTABLE_SET_LINE = m37710i_set_line[mode];
+	m_execute = m37710i_execute[mode];
+}
+
+
+/* ======================================================================== */
+/* ================================= MEMORY =============================== */
+/* ======================================================================== */
+
+#define ADDRESS_37710(A) ((A)&0xffffff)
+
+UINT32 m37710_cpu_device::m37710i_read_8_normal(UINT32 address)
+{
+	address = ADDRESS_37710(address);
+	return m37710_read_8(address);
+}
+
+UINT32 m37710_cpu_device::m37710i_read_8_immediate(UINT32 address)
+{
+	address = ADDRESS_37710(address);
+	return m37710_read_8_immediate(address);
+}
+
+UINT32 m37710_cpu_device::m37710i_read_8_direct(UINT32 address)
+{
+	address = ADDRESS_37710(address);
+	return m37710_read_8(address);
+}
+
+void m37710_cpu_device::m37710i_write_8_normal(UINT32 address, UINT32 value)
+{
+	address = ADDRESS_37710(address);
+	m37710_write_8(address, MAKE_UINT_8(value));
+}
+
+void m37710_cpu_device::m37710i_write_8_direct(UINT32 address, UINT32 value)
+{
+	address = ADDRESS_37710(address);
+	m37710_write_8(address, MAKE_UINT_8(value));
+}
+
+UINT32 m37710_cpu_device::m37710i_read_16_normal(UINT32 address)
+{
+	address = ADDRESS_37710(address);
+	if (address & 1)
+		return m37710i_read_8_normal(address) | m37710i_read_8_normal(address+1)<<8;
+	else
+		return m37710_read_16(address);
+}
+
+UINT32 m37710_cpu_device::m37710i_read_16_immediate(UINT32 address)
+{
+	address = ADDRESS_37710(address);
+	if (address & 1)
+		return m37710_read_8_immediate(address) | m37710_read_8_immediate(address+1)<<8;
+	else
+		return m37710_read_16(address);
+}
+
+UINT32 m37710_cpu_device::m37710i_read_16_direct(UINT32 address)
+{
+	address = ADDRESS_37710(address);
+	if (address & 1)
+		return m37710_read_8(address) | m37710_read_8((address)+1)<<8;
+	else
+		return m37710_read_16(address);
+}
+
+void m37710_cpu_device::m37710i_write_16_normal(UINT32 address, UINT32 value)
+{
+	address = ADDRESS_37710(address);
+	if (address & 1)
+	{
+		m37710_write_8(address, value);
+		m37710_write_8(address+1, value>>8);
+	}
+	else
+		m37710_write_16(address, value);
+}
+
+void m37710_cpu_device::m37710i_write_16_direct(UINT32 address, UINT32 value)
+{
+	address = ADDRESS_37710(address);
+	if (address & 1)
+	{
+		m37710_write_8(address, value);
+		m37710_write_8(address+1, value>>8);
+	}
+	else
+		m37710_write_16(address, value);
+}
+
+UINT32 m37710_cpu_device::m37710i_read_24_normal(UINT32 address)
+{
+	return   m37710i_read_16_normal(address)       |
+			(m37710i_read_8_normal(address+2)<<16);
+}
+
+UINT32 m37710_cpu_device::m37710i_read_24_immediate(UINT32 address)
+{
+	return   m37710i_read_16_immediate(address)       |
+			(m37710i_read_8_immediate(address+2)<<16);
+}
+
+UINT32 m37710_cpu_device::m37710i_read_24_direct(UINT32 address)
+{
+	return   m37710i_read_16_direct(address)         |
+			(m37710i_read_8_direct(address+2)<<16);
+}
+
+
+
+/* ======================================================================== */
+/* ================================= STACK ================================ */
+/* ======================================================================== */
+
+UINT32 m37710_cpu_device::m37710i_pull_8()
+{
+	REG_S = MAKE_UINT_16(REG_S+1);
+	return m37710i_read_8_normal(REG_S);
+}
+
+UINT32 m37710_cpu_device::m37710i_pull_16()
+{
+	UINT32 res = m37710i_pull_8();
+	return res | (m37710i_pull_8() << 8);
+}
+
+void m37710_cpu_device::m37710i_push_24(UINT32 value)
+{
+	m37710i_push_8(value>>16);
+	m37710i_push_8((value>>8)&0xff);
+	m37710i_push_8(value&0xff);
+}
+
+UINT32 m37710_cpu_device::m37710i_pull_24()
+{
+	UINT32 res = m37710i_pull_8();
+	res |= m37710i_pull_8() << 8;
+	return res | (m37710i_pull_8() << 16);
+}
+
+
+/* ======================================================================== */
+/* ============================ PROGRAM COUNTER =========================== */
+/* ======================================================================== */
+
+void m37710_cpu_device::m37710i_jump_16(UINT32 address)
+{
+	REG_PC = MAKE_UINT_16(address);
+	m37710i_jumping(REG_PC);
+}
+
+void m37710_cpu_device::m37710i_jump_24(UINT32 address)
+{
+	REG_PB = address&0xff0000;
+	REG_PC = MAKE_UINT_16(address);
+	m37710i_jumping(REG_PC);
+}
+
+void m37710_cpu_device::m37710i_branch_8(UINT32 offset)
+{
+	REG_PC = MAKE_UINT_16(REG_PC + MAKE_INT_8(offset));
+	m37710i_branching(REG_PC);
+}
+
+void m37710_cpu_device::m37710i_branch_16(UINT32 offset)
+{
+	REG_PC = MAKE_UINT_16(REG_PC + offset);
+	m37710i_branching(REG_PC);
+}
+
+
+/* ======================================================================== */
+/* ============================ STATUS REGISTER =========================== */
+/* ======================================================================== */
+
+void m37710_cpu_device::m37710i_set_flag_i(UINT32 value)
+{
+	value &= FLAGPOS_I;
+	if(!FLAG_I || value)
+	{
+		FLAG_I = value;
+		return;
+	}
+	FLAG_I = value;
+}
+
+
+void m37710_cpu_device::m37710i_set_reg_ipl(UINT32 value)
+{
+	m_ipl = value & 7;
+}
+
+
+/* ======================================================================== */
+/* =============================== INTERRUPTS ============================= */
+/* ======================================================================== */
+
+void m37710_cpu_device::m37710i_interrupt_software(UINT32 vector)
+{
+	CLK(13);
+	m37710i_push_8(REG_PB>>16);
+	m37710i_push_16(REG_PC);
+	m37710i_push_8(m_ipl);
+	m37710i_push_8(m37710i_get_reg_p());
+	m37710i_set_flag_i(IFLAG_SET);
+	REG_PB = 0;
+	m37710i_jump_16(m37710i_read_16_normal(vector));
+}
+
+
+UINT32 m37710_cpu_device::EA_IMM8()  {REG_PC += 1; return REG_PB | MAKE_UINT_16(REG_PC-1);}
+UINT32 m37710_cpu_device::EA_IMM16() {REG_PC += 2; return REG_PB | MAKE_UINT_16(REG_PC-2);}
+UINT32 m37710_cpu_device::EA_IMM24() {REG_PC += 3; return REG_PB | MAKE_UINT_16(REG_PC-3);}
+UINT32 m37710_cpu_device::EA_D()     {if(MAKE_UINT_8(REG_D)) CLK(1); return MAKE_UINT_16(REG_D + OPER_8_IMM());}
+UINT32 m37710_cpu_device::EA_A()     {return REG_DB | OPER_16_IMM();}
+UINT32 m37710_cpu_device::EA_AL()    {return OPER_24_IMM();}
+UINT32 m37710_cpu_device::EA_DX()    {return MAKE_UINT_16(REG_D + OPER_8_IMM() + REG_X);}
+UINT32 m37710_cpu_device::EA_DY()    {return MAKE_UINT_16(REG_D + OPER_8_IMM() + REG_Y);}
+UINT32 m37710_cpu_device::EA_AX()    {UINT32 tmp = EA_A(); if((tmp^(tmp+REG_X))&0xff00) CLK(1); return tmp + REG_X;}
+UINT32 m37710_cpu_device::EA_ALX()   {return EA_AL() + REG_X;}
+UINT32 m37710_cpu_device::EA_AY()    {UINT32 tmp = EA_A(); if((tmp^(tmp+REG_X))&0xff00) CLK(1); return tmp + REG_Y;}
+UINT32 m37710_cpu_device::EA_DI()    {return REG_DB | OPER_16_D();}
+UINT32 m37710_cpu_device::EA_DLI()   {return OPER_24_D();}
+UINT32 m37710_cpu_device::EA_AI()    {return read_16_A(OPER_16_IMM());}
+UINT32 m37710_cpu_device::EA_ALI()   {return OPER_24_A();}
+UINT32 m37710_cpu_device::EA_DXI()   {return REG_DB | OPER_16_DX();}
+UINT32 m37710_cpu_device::EA_DIY()   {UINT32 tmp = REG_DB | OPER_16_D(); if((tmp^(tmp+REG_X))&0xff00) CLK(1); return tmp + REG_Y;}
+UINT32 m37710_cpu_device::EA_DLIY()  {return OPER_24_D() + REG_Y;}
+UINT32 m37710_cpu_device::EA_AXI()   {return read_16_AXI(MAKE_UINT_16(OPER_16_IMM() + REG_X));}
+UINT32 m37710_cpu_device::EA_S()     {return MAKE_UINT_16(REG_S + OPER_8_IMM());}
+UINT32 m37710_cpu_device::EA_SIY()   {return MAKE_UINT_16(read_16_SIY(REG_S + OPER_8_IMM()) + REG_Y) | REG_DB;}
 
 /* ======================================================================== */
 /* ============================== END OF FILE ============================= */
