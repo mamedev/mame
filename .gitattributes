@@ -8898,8 +8898,13 @@ web/css/images/icons-18-white.png -text svneol=unset#image/png
 web/css/images/icons-36-black.png -text svneol=unset#image/png
 web/css/images/icons-36-white.png -text svneol=unset#image/png
 web/css/jquery.mobile.css svneol=native#text/css
+web/driver.html svneol=native#text/html
 web/favicon.ico -text
+web/image.html svneol=native#text/html
 web/images/logo-mame-small.png -text svneol=unset#image/png
 web/index.html svneol=native#text/html
+web/info.html svneol=native#text/html
 web/js/jquery.js svneol=native#text/javascript
 web/js/jquery.mobile.js svneol=native#text/javascript
+web/logs.html svneol=native#text/html
+web/options.html svneol=native#text/html

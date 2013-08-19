@@ -107,35 +107,46 @@ int web_engine::json_slider_handler(struct mg_connection *conn)
 {
 	const slider_state *curslider;
 	astring tempstring;
-
+	Json::Value array(Json::arrayValue);
+	
 	/* add all sliders */
 	for (curslider = ui_get_slider_list(); curslider != NULL; curslider = curslider->next)
 	{
 		INT32 curval = (*curslider->update)(machine(), curslider->arg, &tempstring, SLIDER_NOCHANGE);
-		printf("%d\n",curval);
-/*		UINT32 flags = 0;
-		if (curval > curslider->minval)
-			flags |= MENU_FLAG_LEFT_ARROW;
-		if (curval < curslider->maxval)
-			flags |= MENU_FLAG_RIGHT_ARROW;
-		item_append(curslider->description, tempstring, flags, (void *)curslider);
-
-		if (menuless_mode)
-			break;*/
+		Json::Value data;
+		data["description"] = curslider->description;
+		data["minval"] = curslider->minval;
+		data["maxval"] = curslider->maxval;
+		data["defval"] = curslider->defval;
+		data["incval"] = curslider->incval;
+		data["curval"] = curval;
+		array.append(data);
 	}
 
 	/* add all sliders */
 	for (curslider = (slider_state*)machine().osd().get_slider_list(); curslider != NULL; curslider = curslider->next)
 	{
 		INT32 curval = (*curslider->update)(machine(), curslider->arg, &tempstring, SLIDER_NOCHANGE);
-		printf("%d\n",curval);
-		/*UINT32 flags = 0;
-		if (curval > curslider->minval)
-			flags |= MENU_FLAG_LEFT_ARROW;
-		if (curval < curslider->maxval)
-			flags |= MENU_FLAG_RIGHT_ARROW;
-		item_append(curslider->description, tempstring, flags, (void *)curslider);*/
+		Json::Value data;
+		data["description"] = curslider->description;
+		data["minval"] = curslider->minval;
+		data["maxval"] = curslider->maxval;
+		data["defval"] = curslider->defval;
+		data["incval"] = curslider->incval;
+		data["curval"] = curval;
+		array.append(data);
 	}
+	Json::FastWriter writer;
+	const char *json = writer.write(array).c_str();
+	// Send HTTP reply to the client
+	mg_printf(conn,
+			"HTTP/1.1 200 OK\r\n"
+			"Content-Type: application/json\r\n"
+			"Content-Length: %d\r\n"        // Always set Content-Length
+			"\r\n"
+			"%s",
+			(int)strlen(json), json);
+
 	return 1;
 }
 

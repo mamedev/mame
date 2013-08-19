@@ -26,9 +26,9 @@
 	document.getElementById('main').innerHTML = '<center><img src="/screenshot.png"/></center>';
   }
   
-  function loadCommands()
+  function loadContent(htmlName)
   {  
-	$("#main").load('commands.html', function () {
+	$("#main").load(htmlName+'.html', function () {
 		$(this).trigger('create');
 	});
   }
@@ -42,6 +42,26 @@
 	  },
 	  error: function (request, status, error) { alert(status + ", " + error); }
 	});	
+  }
+
+  function executeSlider()
+  {
+	$.ajax({
+		  url: "/json/slider",
+		  cache: false,
+		  dataType: "json",
+		  success: function(data) {
+			var items = [];
+			for (var i in data) {
+			   items.push('<label for="slider-mini">'+data[i].description +':</label>');
+			   items.push('<input type="range" name="slider-mini" id="slider-mini" value="'+data[i].curval+'" min="'+data[i].minval+'" max="'+data[i].maxval+'" step=="'+data[i].incval+'" data-highlight="true" data-mini="true" />');
+            }
+			$('#main').html('');
+			$('#main').append(items.join('')).trigger('create'); 
+
+		  },
+		  error: function (request, status, error) { alert(status + ", " + error); }
+		});	
   }
 
   
@@ -95,16 +115,16 @@
         <div data-role="navbar" data-iconpos="top">
             <ul>
                 <li>
-                    <a href="#page1" data-transition="fade" data-icon="bars">Driver</a>
+                    <a href="javascript:loadContent('driver');" data-transition="fade" data-icon="bars">Driver</a>
                 </li>
                 <li>
-                    <a href="#page1" data-transition="fade" data-icon="gear">Options</a>
+                    <a href="javascript:loadContent('options');" data-transition="fade" data-icon="gear">Options</a>
                 </li>
                 <li>
-                    <a href="#page1" data-transition="fade" data-icon="grid">Image</a>
+                    <a href="javascript:loadContent('image');" data-transition="fade" data-icon="grid">Image</a>
                 </li>
                 <li>
-                    <a href="javascript:loadCommands();" data-transition="fade" data-icon="star">Commands</a>
+                    <a href="javascript:loadContent('commands');" data-transition="fade" data-icon="star">Commands</a>
                 </li>
             </ul>
         </div>
@@ -115,10 +135,10 @@
 		<div  data-role="navbar" data-iconpos="top">
 			<ul>
 				<li>
-					<a href="#page1" data-transition="fade" data-icon="info">Info</a>
+					<a href="javascript:loadContent('info');" data-transition="fade" data-icon="info">Info</a>
 				</li>
 				<li>
-					<a href="#page1" data-transition="fade" data-icon="check">Logs</a>
+					<a href="javascript:loadContent('logs');" data-transition="fade" data-icon="check">Logs</a>
 				</li>
 				<li>
 					<a href="javascript:takeScreenshot();" data-transition="fade" data-icon="search">Screenshot</a>
