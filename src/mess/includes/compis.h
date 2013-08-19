@@ -163,8 +163,8 @@ public:
 	DECLARE_READ16_MEMBER(compis_osp_pit_r);
 	DECLARE_WRITE16_MEMBER(compis_osp_pit_w);
 	DECLARE_WRITE_LINE_MEMBER(compis_usart_rxready);
-	DECLARE_WRITE_LINE_MEMBER(compis_pic8259_master_set_int_line);
-	DECLARE_WRITE_LINE_MEMBER(compis_pic8259_slave_set_int_line);
+//	DECLARE_WRITE_LINE_MEMBER(compis_pic8259_master_set_int_line);
+//	DECLARE_WRITE_LINE_MEMBER(compis_pic8259_slave_set_int_line);
 	DECLARE_READ8_MEMBER(get_slave_ack);
 //	i186_state m_i186;
 	TYP_COMPIS m_compis;
@@ -188,7 +188,7 @@ public:
 //	TIMER_CALLBACK_MEMBER(internal_timer_int);
 //	TIMER_CALLBACK_MEMBER(dma_timer_callback);
 //	IRQ_CALLBACK_MEMBER(int_callback);
-//	IRQ_CALLBACK_MEMBER(compis_irq_callback);
+	DECLARE_READ8_MEMBER(compis_irq_callback);
 	void compis_irq_set(UINT8 irq);
 	void compis_keyb_update();
 	void compis_keyb_init();

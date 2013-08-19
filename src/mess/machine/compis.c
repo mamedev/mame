@@ -158,7 +158,7 @@ void compis_state::compis_keyb_init()
 /*-------------------------------------------------------------------------*/
 void compis_state::compis_fdc_reset()
 {
-	machine().device("i8272a")->reset();
+	m_fdc->reset();
 }
 
 void compis_state::compis_fdc_tc(int state)
@@ -1256,7 +1256,7 @@ void compis_state::compis_cpu_init()
  *
  *************************************************************/
 
-WRITE_LINE_MEMBER( compis_state::compis_pic8259_master_set_int_line )
+/*WRITE_LINE_MEMBER( compis_state::compis_pic8259_master_set_int_line )
 {
 //	m_maincpu->set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
 }
@@ -1265,7 +1265,7 @@ WRITE_LINE_MEMBER( compis_state::compis_pic8259_slave_set_int_line )
 {
 	if (m_8259m)
 		m_8259m->ir2_w(state);
-}
+}*/
 
 READ8_MEMBER( compis_state::get_slave_ack )
 {
@@ -1276,10 +1276,10 @@ READ8_MEMBER( compis_state::get_slave_ack )
 }
 
 
-//IRQ_CALLBACK_MEMBER(compis_state::compis_irq_callback)
-//{
-//	return m_8259m->inta_r();
-//}
+READ8_MEMBER(compis_state::compis_irq_callback)
+{
+	return m_8259m->inta_r();
+}
 
 
 DRIVER_INIT_MEMBER(compis_state,compis)
@@ -1292,6 +1292,7 @@ void compis_state::machine_start()
 {
 	/* CPU */
 	compis_cpu_init();
+	m_fdc->setup_intrq_cb(i8272a_device::line_cb(FUNC(compis_state::fdc_irq), this));
 }
 /*-------------------------------------------------------------------------*/
 /* Name: compis                                                            */
