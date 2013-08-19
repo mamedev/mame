@@ -7,18 +7,10 @@
 
 extern const device_type I8086;
 extern const device_type I8088;
-extern const device_type I80186;
-extern const device_type I80188;
 
 #define INPUT_LINE_INT0         INPUT_LINE_IRQ0
-#define INPUT_LINE_INT1         INPUT_LINE_IRQ1
-#define INPUT_LINE_INT2         INPUT_LINE_IRQ2
-#define INPUT_LINE_INT3         INPUT_LINE_IRQ3
 #define INPUT_LINE_TEST         20
-#define INPUT_LINE_DRQ0         21
-#define INPUT_LINE_DRQ1         22
-#define INPUT_LINE_TMRIN0       23
-#define INPUT_LINE_TMRIN1       24
+
 
 enum
 {
@@ -346,7 +338,7 @@ public:
 protected:
 	virtual void execute_run();
 	virtual void device_start();
-	virtual UINT32 execute_input_lines() const { return 2; }
+	virtual UINT32 execute_input_lines() const { return 1; }
 	virtual UINT8 fetch_op();
 	virtual UINT8 fetch();
 	UINT32 pc() { return m_pc = (m_sregs[CS] << 4) + m_ip; }
@@ -361,36 +353,6 @@ class i8088_cpu_device : public i8086_cpu_device
 public:
 	// construction/destruction
 	i8088_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-};
-
-class i80186_cpu_device : public i8086_common_cpu_device
-{
-public:
-	// construction/destruction
-	i80186_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	i80186_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int data_bus_size);
-
-	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : NULL ); }
-
-protected:
-	virtual void execute_run();
-	virtual void device_start();
-	virtual UINT32 execute_input_lines() const { return 9; }
-	virtual UINT8 fetch_op();
-	virtual UINT8 fetch();
-	UINT32 pc() { return m_pc = (m_sregs[CS] << 4) + m_ip; }
-
-	address_space_config m_program_config;
-	address_space_config m_io_config;
-	static const UINT8 m_i80186_timing[200];
-};
-
-class i80188_cpu_device : public i80186_cpu_device
-{
-public:
-	// construction/destruction
-	i80188_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 

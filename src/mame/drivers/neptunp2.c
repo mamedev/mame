@@ -8,7 +8,7 @@
 
 
 #include "emu.h"
-#include "cpu/i86/i86.h"
+#include "cpu/i86/i186.h"
 
 
 class neptunp2_state : public driver_device

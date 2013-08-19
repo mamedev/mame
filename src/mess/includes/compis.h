@@ -13,7 +13,7 @@
 #define COMPIS_H_
 
 #include "emu.h"
-#include "cpu/i86/i86.h"
+#include "cpu/i86/i186.h"
 #include "cpu/mcs48/mcs48.h"
 #include "video/upd7220.h"
 #include "machine/ctronics.h"
@@ -155,8 +155,8 @@ public:
 	required_device<upd7220_device> m_crtc;
 	DECLARE_READ16_MEMBER(compis_usart_r);
 	DECLARE_WRITE16_MEMBER(compis_usart_w);
-	DECLARE_READ16_MEMBER(compis_i186_internal_port_r);
-	DECLARE_WRITE16_MEMBER(compis_i186_internal_port_w);
+//	DECLARE_READ16_MEMBER(compis_i186_internal_port_r);
+//	DECLARE_WRITE16_MEMBER(compis_i186_internal_port_w);
 	DECLARE_WRITE8_MEMBER(vram_w);
 	DECLARE_READ8_MEMBER(compis_ppi_port_b_r);
 	DECLARE_WRITE8_MEMBER(compis_ppi_port_c_w);
@@ -166,13 +166,13 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(compis_pic8259_master_set_int_line);
 	DECLARE_WRITE_LINE_MEMBER(compis_pic8259_slave_set_int_line);
 	DECLARE_READ8_MEMBER(get_slave_ack);
-	i186_state m_i186;
+//	i186_state m_i186;
 	TYP_COMPIS m_compis;
 	UINT8 *m_p_videoram;
-	void update_dma_control(int which, int new_control);
-	void internal_timer_update(int which, int new_count, int new_maxA, int new_maxB, int new_control);
-	void internal_timer_sync(int which);
-	void handle_eoi(int data);
+//	void update_dma_control(int which, int new_control);
+//	void internal_timer_update(int which, int new_count, int new_maxA, int new_maxB, int new_control);
+//	void internal_timer_sync(int which);
+//	void handle_eoi(int data);
 	void compis_fdc_tc(int state);
 
 	void fdc_irq(bool state);
@@ -185,10 +185,10 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_compis2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(compis_vblank_int);
-	TIMER_CALLBACK_MEMBER(internal_timer_int);
-	TIMER_CALLBACK_MEMBER(dma_timer_callback);
-	IRQ_CALLBACK_MEMBER(int_callback);
-	IRQ_CALLBACK_MEMBER(compis_irq_callback);
+//	TIMER_CALLBACK_MEMBER(internal_timer_int);
+//	TIMER_CALLBACK_MEMBER(dma_timer_callback);
+//	IRQ_CALLBACK_MEMBER(int_callback);
+//	IRQ_CALLBACK_MEMBER(compis_irq_callback);
 	void compis_irq_set(UINT8 irq);
 	void compis_keyb_update();
 	void compis_keyb_init();

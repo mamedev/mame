@@ -56,7 +56,7 @@ chdman createhd -o ST125N.chd -chs 407,4,26 -ss 512
 
 #include "emu.h"
 #include "debugger.h"
-#include "cpu/i86/i86.h"
+#include "cpu/i86/i186.h"
 #include "debug/debugcpu.h"
 #include "debug/debugcon.h"
 #include "imagedev/flopdrv.h"
@@ -152,7 +152,6 @@ static const UINT16 def_config[16] =
 
 
 static void execute_debug_irq(running_machine &machine, int ref, int params, const char *param[]);
-static void execute_debug_intmasks(running_machine &machine, int ref, int params, const char *param[]);
 static void nimbus_debug(running_machine &machine, int ref, int params, const char *param[]);
 
 static int instruction_hook(device_t &device, offs_t curpc);
@@ -166,7 +165,7 @@ static void decode_dssi_f_plonk_char(device_t *device,UINT16  ds, UINT16 si, UIN
 static void decode_dssi_f_rw_sectors(device_t *device,UINT16  ds, UINT16 si, UINT8 raw_flag);
 
 
-
+#if 0
 /*************************************
  *
  *  80186 interrupt controller
@@ -1199,11 +1198,39 @@ WRITE16_MEMBER(rmnimbus_state::nimbus_i186_internal_port_w)
 			break;
 	}
 }
+#endif
+
+void rmnimbus_state::external_int(UINT16 intno, UINT8 vector)
+{
+	m_vector = vector;
+	switch(intno)
+	{
+		case 0:
+			m_maincpu->int0_w(1);
+			break;
+		case 1:
+			m_maincpu->int1_w(1);
+			break;
+		case 2:
+			m_maincpu->int2_w(1);
+			break;
+		case 3:
+			m_maincpu->int3_w(1);
+			break;
+		default:
+			return;
+	}
+}
+
+READ8_MEMBER(rmnimbus_state::cascade_callback)
+{
+	return m_vector;
+}
 
 void rmnimbus_state::machine_reset()
 {
 	/* CPU */
-	nimbus_cpu_reset();
+//	nimbus_cpu_reset();
 	iou_reset();
 	fdc_reset();
 	hdc_reset();
@@ -1221,7 +1248,7 @@ DRIVER_INIT_MEMBER(rmnimbus_state,nimbus)
 void rmnimbus_state::machine_start()
 {
 	/* init cpu */
-	nimbus_cpu_init();
+//	nimbus_cpu_init();
 
 	m_keyboard.keyscan_timer=machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(rmnimbus_state::keyscan_callback),this));
 	m_nimbus_mouse.m_mouse_timer=machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(rmnimbus_state::mouse_callback),this));
@@ -1230,7 +1257,6 @@ void rmnimbus_state::machine_start()
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
 		debug_console_register_command(machine(), "nimbus_irq", CMDFLAG_NONE, 0, 0, 2, execute_debug_irq);
-		debug_console_register_command(machine(), "nimbus_intmasks", CMDFLAG_NONE, 0, 0, 0, execute_debug_intmasks);
 		debug_console_register_command(machine(), "nimbus_debug", CMDFLAG_NONE, 0, 0, 1, nimbus_debug);
 
 		/* set up the instruction hook */
@@ -1258,23 +1284,6 @@ static void execute_debug_irq(running_machine &machine, int ref, int params, con
 	{
 		debug_console_printf(machine,"Error, you must supply an intno and vector to trigger\n");
 	}
-}
-
-
-static void execute_debug_intmasks(running_machine &machine, int ref, int params, const char *param[])
-{
-	rmnimbus_state *state = machine.driver_data<rmnimbus_state>();
-	int IntNo;
-
-	debug_console_printf(machine,"i186.intr.priority_mask=%4X\n",state->m_i186.intr.priority_mask);
-	for(IntNo=0; IntNo<4; IntNo++)
-	{
-		debug_console_printf(machine,"extInt%d mask=%4X\n",IntNo,state->m_i186.intr.ext[IntNo]);
-	}
-
-	debug_console_printf(machine,"i186.intr.request   = %04X\n",state->m_i186.intr.request);
-	debug_console_printf(machine,"i186.intr.ack_mask  = %04X\n",state->m_i186.intr.ack_mask);
-	debug_console_printf(machine,"i186.intr.in_service= %04X\n",state->m_i186.intr.in_service);
 }
 
 static void nimbus_debug(running_machine &machine, int ref, int params, const char *param[])
@@ -2220,7 +2229,7 @@ WRITE_LINE_MEMBER(rmnimbus_state::nimbus_fdc_drq_w)
 		logerror("nimbus_drives_drq_w(%d)\n", state);
 
 	if(state && FDC_DRQ_ENABLED())
-		drq_callback(1);
+		m_maincpu->drq1_w(state);
 }
 
 UINT8 rmnimbus_state::fdc_driveno(UINT8 drivesel)
@@ -2406,7 +2415,7 @@ void rmnimbus_state::hdc_drq()
 {
 	if(HDC_DRQ_ENABLED() && m_nimbus_drives.drq_ff)
 	{
-		drq_callback(1);
+		m_maincpu->drq1_w(1);
 	}
 }
 

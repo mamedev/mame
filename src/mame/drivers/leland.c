@@ -42,7 +42,7 @@
 
 
 #include "emu.h"
-#include "cpu/i86/i86.h"
+#include "cpu/i86/i186.h"
 #include "machine/eepromser.h"
 #include "machine/nvram.h"
 #include "cpu/z80/z80.h"
@@ -71,12 +71,16 @@ static ADDRESS_MAP_START( master_map_program, AS_PROGRAM, 8, leland_state )
 	AM_RANGE(0xf800, 0xf801) AM_WRITE(leland_master_video_addr_w)
 ADDRESS_MAP_END
 
-
 static ADDRESS_MAP_START( master_map_io, AS_IO, 8, leland_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0xfd, 0xff) AM_READWRITE(leland_master_analog_key_r, leland_master_analog_key_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( master_redline_map_io, AS_IO, 8, leland_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf0, 0xf0) AM_WRITE(leland_master_alt_bankswitch_w)
-	AM_RANGE(0xf2, 0xf2) AM_DEVREADWRITE_LEGACY("custom", leland_80186_response_r, leland_80186_command_lo_w)
-	AM_RANGE(0xf4, 0xf4) AM_DEVWRITE_LEGACY("custom", leland_80186_command_hi_w)
+	AM_RANGE(0xf2, 0xf2) AM_DEVREADWRITE("custom", leland_80186_sound_device, leland_80186_response_r, leland_80186_command_lo_w)
+	AM_RANGE(0xf4, 0xf4) AM_DEVWRITE("custom", leland_80186_sound_device, leland_80186_command_hi_w)
 	AM_RANGE(0xfd, 0xff) AM_READWRITE(leland_master_analog_key_r, leland_master_analog_key_w)
 ADDRESS_MAP_END
 
@@ -748,7 +752,6 @@ static MACHINE_CONFIG_START( leland, leland_state )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD(leland_video)
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -760,42 +763,44 @@ static MACHINE_CONFIG_START( leland, leland_state )
 	MCFG_SOUND_CONFIG(ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("custom", LELAND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("dac0", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("dac1", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( redline, leland )
 
 	/* basic machine hardware */
+	MCFG_CPU_MODIFY("master")
+	MCFG_CPU_IO_MAP(master_redline_map_io)
 
-	MCFG_CPU_ADD("audiocpu", I80186, MCU_CLOCK)
+	MCFG_CPU_ADD("audiocpu", I80186, MCU_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(leland_80186_map_program)
 	MCFG_CPU_IO_MAP(redline_80186_map_io)
+	MCFG_80186_CHIP_SELECT_CB(DEVWRITE16("custom", leland_80186_sound_device, peripheral_ctrl))
 
 	/* sound hardware */
-	MCFG_SOUND_REPLACE("custom", REDLINE_80186, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_DEVICE_ADD("custom", REDLINE_80186, 0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( quarterb, redline )
 
 	/* basic machine hardware */
-
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_IO_MAP(leland_80186_map_io)
+	MCFG_80186_TMROUT0_HANDLER(DEVWRITELINE("custom", leland_80186_sound_device, i80186_tmr0_w))
 
 	/* sound hardware */
-	MCFG_SOUND_REPLACE("custom", LELAND_80186, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_DEVICE_REPLACE("custom", LELAND_80186, 0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( lelandi, quarterb )
 
 	/* basic machine hardware */
-
 	MCFG_CPU_MODIFY("slave")
 	MCFG_CPU_PROGRAM_MAP(slave_large_map_program)
 MACHINE_CONFIG_END

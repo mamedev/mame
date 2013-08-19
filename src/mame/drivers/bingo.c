@@ -2,7 +2,7 @@
 #include "emu.h"
 #include "cpu/s2650/s2650.h"
 #include "cpu/i8085/i8085.h"
-#include "cpu/i86/i86.h"
+#include "cpu/i86/i186.h"
 
 class bingo_state : public driver_device
 {

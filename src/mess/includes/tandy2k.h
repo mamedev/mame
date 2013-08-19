@@ -3,7 +3,7 @@
 
 
 #include "emu.h"
-#include "cpu/i86/i86.h"
+#include "cpu/i86/i186.h"
 #include "cpu/mcs48/mcs48.h"
 #include "imagedev/harddriv.h"
 #include "machine/ctronics.h"
@@ -63,7 +63,7 @@ public:
 			m_char_ram(*this, "char_ram")
 	{ }
 
-	required_device<cpu_device> m_maincpu;
+	required_device<i80186_cpu_device> m_maincpu;
 	required_device<i8251_device> m_uart;
 	required_device<pit8253_device> m_pit;
 	required_device<i8272a_device> m_fdc;

@@ -467,7 +467,7 @@ WRITE8_MEMBER(leland_state::leland_master_alt_bankswitch_w)
 	(this->*m_update_master_bank)();
 
 	/* sound control is in the rest */
-	leland_80186_control_w(machine().device("custom"), space, offset, data);
+	m_sound->leland_80186_control_w(space, offset, data);
 }
 
 

@@ -121,10 +121,10 @@ WRITE8_MEMBER( tandy2k_state::enable_w )
 		m_fdc->reset();
 
 	// timer 0 enable
-	m_maincpu->set_input_line(INPUT_LINE_TMRIN0, BIT(data, 6));
+	m_maincpu->tmrin0_w(BIT(data, 6));
 
 	// timer 1 enable
-	m_maincpu->set_input_line(INPUT_LINE_TMRIN1, BIT(data, 7));
+	m_maincpu->tmrin1_w(BIT(data, 7));
 }
 
 WRITE8_MEMBER( tandy2k_state::dma_mux_w )
@@ -705,8 +705,8 @@ static MACHINE_CONFIG_START( tandy2k, tandy2k_state )
 	MCFG_I8255A_ADD(I8255A_TAG, ppi_intf)
 	MCFG_I8251_ADD(I8251A_TAG, usart_intf)
 	MCFG_PIT8253_ADD(I8253_TAG, pit_intf)
-	MCFG_PIC8259_ADD(I8259A_0_TAG, INPUTLINE(I80186_TAG, INPUT_LINE_INT0), VCC, NULL)
-	MCFG_PIC8259_ADD(I8259A_1_TAG, INPUTLINE(I80186_TAG, INPUT_LINE_INT1), VCC, NULL)
+	MCFG_PIC8259_ADD(I8259A_0_TAG, DEVWRITELINE(I80186_TAG, i80186_cpu_device, int0_w), VCC, NULL)
+	MCFG_PIC8259_ADD(I8259A_1_TAG, DEVWRITELINE(I80186_TAG, i80186_cpu_device, int1_w), VCC, NULL)
 	MCFG_I8272A_ADD(I8272A_TAG, true)
 	MCFG_FLOPPY_DRIVE_ADD(I8272A_TAG ":0", tandy2k_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(I8272A_TAG ":1", tandy2k_floppies, "525qd", floppy_image_device::default_floppy_formats)

@@ -28,7 +28,7 @@ code doesn't make much sense, wrong mapping? bad?
 
 
 #include "emu.h"
-#include "cpu/i86/i86.h"
+#include "cpu/i86/i186.h"
 
 
 class gambl186_state : public driver_device

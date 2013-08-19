@@ -16,7 +16,7 @@
 
 
 #include "emu.h"
-#include "cpu/i86/i86.h"
+#include "cpu/i86/i186.h"
 
 #define I80188_TAG "i80188"
 #define SCREEN_TAG "screen"

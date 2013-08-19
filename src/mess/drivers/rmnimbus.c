@@ -8,7 +8,7 @@
 */
 
 #include "emu.h"
-#include "cpu/i86/i86.h"
+#include "cpu/i86/i186.h"
 #include "cpu/mcs51/mcs51.h"
 #include "imagedev/flopdrv.h"
 #include "machine/ram.h"
@@ -110,7 +110,7 @@ static ADDRESS_MAP_START(nimbus_io, AS_IO, 16, rmnimbus_state )
 	AM_RANGE( 0x00f0, 0x00f7) AM_DEVREADWRITE8(Z80SIO_TAG, z80sio_device, read, write, 0x00ff)
 	AM_RANGE( 0x0400, 0x041f) AM_READWRITE8(nimbus_disk_r, nimbus_disk_w, 0x00FF)
 	AM_RANGE( 0x0480, 0x049f) AM_DEVREADWRITE8(VIA_TAG, via6522_device, read, write, 0x00FF)
-	AM_RANGE( 0xff00, 0xffff) AM_READWRITE(nimbus_i186_internal_port_r, nimbus_i186_internal_port_w)/* CPU 80186         */
+	//AM_RANGE( 0xff00, 0xffff) AM_READWRITE(nimbus_i186_internal_port_r, nimbus_i186_internal_port_w)/* CPU 80186         */
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( nimbus )
@@ -286,6 +286,7 @@ static MACHINE_CONFIG_START( nimbus, rmnimbus_state )
 	MCFG_CPU_ADD(MAINCPU_TAG, I80186, 10000000)
 	MCFG_CPU_PROGRAM_MAP(nimbus_mem)
 	MCFG_CPU_IO_MAP(nimbus_io)
+	MCFG_80186_IRQ_SLAVE_ACK(DEVREAD8(DEVICE_SELF_OWNER, rmnimbus_state, cascade_callback))
 
 	MCFG_CPU_ADD(IOCPU_TAG, I8031, 11059200)
 	MCFG_CPU_PROGRAM_MAP(nimbus_iocpu_mem)

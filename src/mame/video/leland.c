@@ -29,15 +29,14 @@
 
 TIMER_CALLBACK_MEMBER(leland_state::scanline_callback)
 {
-	device_t *audio = machine().device("custom");
 	int scanline = param;
 
 	/* update the DACs */
 	if (!(m_dac_control & 0x01))
-		leland_dac_update(audio, 0, m_video_ram[(m_last_scanline) * 256 + 160]);
+		m_dac0->write_unsigned8(m_video_ram[(m_last_scanline) * 256 + 160]);
 
 	if (!(m_dac_control & 0x02))
-		leland_dac_update(audio, 1, m_video_ram[(m_last_scanline) * 256 + 161]);
+		m_dac1->write_unsigned8(m_video_ram[(m_last_scanline) * 256 + 161]);
 
 	m_last_scanline = scanline;
 
@@ -65,11 +64,10 @@ VIDEO_START_MEMBER(leland_state,leland)
 
 }
 
-
 VIDEO_START_MEMBER(leland_state,ataxx)
 {
 	/* first do the standard stuff */
-	VIDEO_START_CALL_MEMBER(leland);
+	m_video_ram = auto_alloc_array_clear(machine(), UINT8, VRAM_SIZE);
 
 	/* allocate memory */
 	m_ataxx_qram = auto_alloc_array_clear(machine(), UINT8, QRAM_SIZE);
@@ -526,7 +524,6 @@ MACHINE_CONFIG_FRAGMENT( leland_video )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_UPDATE_DRIVER(leland_state, screen_update_leland)
 MACHINE_CONFIG_END
-
 
 MACHINE_CONFIG_DERIVED( ataxx_video, leland_video )
 	MCFG_VIDEO_START_OVERRIDE(leland_state,ataxx)

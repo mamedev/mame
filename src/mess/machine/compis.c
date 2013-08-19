@@ -339,6 +339,7 @@ WRITE16_MEMBER( compis_state::compis_usart_w )
 	}
 }
 
+#if 0
 /*************************************
  *
  *  80186 interrupt controller
@@ -1226,7 +1227,7 @@ WRITE16_MEMBER( compis_state::compis_i186_internal_port_w )
 			break;
 	}
 }
-
+#endif
 /*-------------------------------------------------------------------------*/
 /* Name: compis                                                            */
 /* Desc: CPU - Initialize the 80186 CPU                                    */
@@ -1234,14 +1235,14 @@ WRITE16_MEMBER( compis_state::compis_i186_internal_port_w )
 void compis_state::compis_cpu_init()
 {
 	/* create timers here so they stick around */
-	m_i186.timer[0].int_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(compis_state::internal_timer_int),this));
-	m_i186.timer[1].int_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(compis_state::internal_timer_int),this));
-	m_i186.timer[2].int_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(compis_state::internal_timer_int),this));
-	m_i186.timer[0].time_timer = machine().scheduler().timer_alloc(FUNC_NULL);
-	m_i186.timer[1].time_timer = machine().scheduler().timer_alloc(FUNC_NULL);
-	m_i186.timer[2].time_timer = machine().scheduler().timer_alloc(FUNC_NULL);
-	m_i186.dma[0].finish_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(compis_state::dma_timer_callback),this));
-	m_i186.dma[1].finish_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(compis_state::dma_timer_callback),this));
+//	m_i186.timer[0].int_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(compis_state::internal_timer_int),this));
+//	m_i186.timer[1].int_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(compis_state::internal_timer_int),this));
+//	m_i186.timer[2].int_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(compis_state::internal_timer_int),this));
+//	m_i186.timer[0].time_timer = machine().scheduler().timer_alloc(FUNC_NULL);
+//	m_i186.timer[1].time_timer = machine().scheduler().timer_alloc(FUNC_NULL);
+//	m_i186.timer[2].time_timer = machine().scheduler().timer_alloc(FUNC_NULL);
+//	m_i186.dma[0].finish_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(compis_state::dma_timer_callback),this));
+//	m_i186.dma[1].finish_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(compis_state::dma_timer_callback),this));
 }
 
 /*-------------------------------------------------------------------------*/
@@ -1257,7 +1258,7 @@ void compis_state::compis_cpu_init()
 
 WRITE_LINE_MEMBER( compis_state::compis_pic8259_master_set_int_line )
 {
-	m_maincpu->set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
+//	m_maincpu->set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER( compis_state::compis_pic8259_slave_set_int_line )
@@ -1275,15 +1276,15 @@ READ8_MEMBER( compis_state::get_slave_ack )
 }
 
 
-IRQ_CALLBACK_MEMBER(compis_state::compis_irq_callback)
-{
-	return m_8259m->inta_r();
-}
+//IRQ_CALLBACK_MEMBER(compis_state::compis_irq_callback)
+//{
+//	return m_8259m->inta_r();
+//}
 
 
 DRIVER_INIT_MEMBER(compis_state,compis)
 {
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(compis_state::compis_irq_callback),this));
+//	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(compis_state::compis_irq_callback),this));
 	memset (&m_compis, 0, sizeof (m_compis) );
 }
 
@@ -1305,7 +1306,7 @@ void compis_state::machine_reset()
 	compis_keyb_init();
 
 	/* OSP PIC 8259 */
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(compis_state::compis_irq_callback),this));
+//	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(compis_state::compis_irq_callback),this));
 }
 
 /*-------------------------------------------------------------------------*/

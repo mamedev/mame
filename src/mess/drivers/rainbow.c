@@ -336,7 +336,7 @@ WRITE8_MEMBER(rainbow_state::share_z80_w)
 READ8_MEMBER(rainbow_state::i8088_latch_r)
 {
 //    printf("Read %02x from 8088 mailbox\n", m_8088_mailbox);
-	m_i8088->set_input_line(INPUT_LINE_INT1, CLEAR_LINE);
+	m_i8088->set_input_line(INPUT_LINE_INT0, CLEAR_LINE);
 	return m_8088_mailbox;
 }
 
@@ -357,7 +357,7 @@ READ8_MEMBER(rainbow_state::z80_latch_r)
 WRITE8_MEMBER(rainbow_state::z80_latch_w)
 {
 //    printf("%02x to 8088 mailbox\n", data);
-	m_i8088->set_input_line_and_vector(INPUT_LINE_INT1, ASSERT_LINE, 0x27);
+	m_i8088->set_input_line_and_vector(INPUT_LINE_INT0, ASSERT_LINE, 0x27);
 	m_8088_mailbox = data;
 }
 
@@ -420,11 +420,11 @@ void rainbow_state::update_kbd_irq()
 {
 	if ((m_kbd_rx_ready) || (m_kbd_tx_ready))
 	{
-		m_i8088->set_input_line_and_vector(INPUT_LINE_INT2, ASSERT_LINE, 0x26);
+		m_i8088->set_input_line_and_vector(INPUT_LINE_INT0, ASSERT_LINE, 0x26);
 	}
 	else
 	{
-		m_i8088->set_input_line(INPUT_LINE_INT2, CLEAR_LINE);
+		m_i8088->set_input_line(INPUT_LINE_INT0, CLEAR_LINE);
 	}
 }
 

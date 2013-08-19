@@ -96,7 +96,7 @@ Game is V30 based, with rom banking (2Mb)
 
 #include "emu.h"
 #include "cpu/nec/nec.h"
-#include "cpu/i86/i86.h"
+#include "cpu/i86/i186.h"
 #include "sound/okim6376.h"
 #include "machine/nvram.h"
 #include "fashion.lh"
@@ -143,6 +143,7 @@ public:
 	UINT32 screen_update_tourvisn(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_brasil(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
+	INTERRUPT_GEN_MEMBER(vblank_irq_80186);
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6376_device> m_okim6376;
 };
@@ -1063,6 +1064,11 @@ INTERRUPT_GEN_MEMBER(highvdeo_state::vblank_irq)
 	device.execute().set_input_line_and_vector(0,HOLD_LINE,0x08/4);
 }
 
+INTERRUPT_GEN_MEMBER(highvdeo_state::vblank_irq_80186)
+{
+	device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+}
+
 static MACHINE_CONFIG_START( tv_vcf, highvdeo_state )
 	MCFG_CPU_ADD("maincpu", V30, XTAL_12MHz/2 ) // ?
 	MCFG_CPU_PROGRAM_MAP(tv_vcf_map)
@@ -1134,14 +1140,14 @@ static MACHINE_CONFIG_DERIVED( ciclone, tv_tcf )
 	MCFG_CPU_ADD("maincpu", I80186, 20000000/2 )    // ?
 	MCFG_CPU_PROGRAM_MAP(tv_tcf_map)
 	MCFG_CPU_IO_MAP(tv_tcf_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", highvdeo_state,  vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", highvdeo_state,  vblank_irq_80186)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( brasil, highvdeo_state )
 	MCFG_CPU_ADD("maincpu", I80186, 20000000 )  // fashion doesn't like 20/2 Mhz
 	MCFG_CPU_PROGRAM_MAP(brasil_map)
 	MCFG_CPU_IO_MAP(brasil_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", highvdeo_state,  vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", highvdeo_state,  vblank_irq_80186)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

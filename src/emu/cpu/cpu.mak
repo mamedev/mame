@@ -798,6 +798,7 @@ $(CPUOBJ)/mcs96/i8xc196.inc: $(CPUSRC)/mcs96/mcs96make.py $(CPUSRC)/mcs96/mcs96o
 ifneq ($(filter I86,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/i86 $(CPUOBJ)/i386
 CPUOBJS += $(CPUOBJ)/i86/i86.o
+CPUOBJS += $(CPUOBJ)/i86/i186.o
 CPUOBJS += $(CPUOBJ)/i86/i286.o
 DASMOBJS += $(CPUOBJ)/i386/i386dasm.o
 endif
@@ -810,6 +811,11 @@ endif
 
 $(CPUOBJ)/i86/i86.o:    $(CPUSRC)/i86/i86.c \
 						$(CPUSRC)/i86/i86.h \
+						$(CPUSRC)/i86/i86inline.h
+
+$(CPUOBJ)/i86/i186.o:   $(CPUSRC)/i86/i186.c \
+						$(CPUSRC)/i86/i86.h \
+						$(CPUSRC)/i86/i186.h \
 						$(CPUSRC)/i86/i86inline.h
 
 $(CPUOBJ)/i86/i286.o:   $(CPUSRC)/i86/i286.c \

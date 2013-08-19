@@ -26,12 +26,11 @@
 
 
 #include "emu.h"
-#include "cpu/i86/i86.h"
+#include "cpu/i86/i186.h"
 #include "machine/eepromser.h"
 #include "machine/nvram.h"
 #include "cpu/z80/z80.h"
 #include "includes/leland.h"
-#include "sound/2151intf.h"
 
 
 #define MASTER_CLOCK        XTAL_28_63636MHz
@@ -56,10 +55,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( master_map_io, AS_IO, 8, leland_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x04, 0x04) AM_DEVREAD_LEGACY("custom", leland_80186_response_r)
-	AM_RANGE(0x05, 0x05) AM_DEVWRITE_LEGACY("custom", leland_80186_command_hi_w)
-	AM_RANGE(0x06, 0x06) AM_DEVWRITE_LEGACY("custom", leland_80186_command_lo_w)
-	AM_RANGE(0x0c, 0x0c) AM_DEVWRITE_LEGACY("custom", ataxx_80186_control_w)
+	AM_RANGE(0x04, 0x04) AM_DEVREAD("custom", leland_80186_sound_device, leland_80186_response_r)
+	AM_RANGE(0x05, 0x05) AM_DEVWRITE("custom", leland_80186_sound_device, leland_80186_command_hi_w)
+	AM_RANGE(0x06, 0x06) AM_DEVWRITE("custom", leland_80186_sound_device, leland_80186_command_lo_w)
+	AM_RANGE(0x0c, 0x0c) AM_DEVWRITE("custom", leland_80186_sound_device, ataxx_80186_control_w)
 	AM_RANGE(0x20, 0x20) AM_READWRITE(ataxx_eeprom_r, ataxx_eeprom_w)
 	AM_RANGE(0xd0, 0xef) AM_READWRITE(ataxx_mvram_port_r, ataxx_mvram_port_w)
 	AM_RANGE(0xf0, 0xff) AM_READWRITE(ataxx_master_input_r, ataxx_master_output_w)
@@ -301,9 +300,11 @@ static MACHINE_CONFIG_START( ataxx, leland_state )
 	MCFG_CPU_PROGRAM_MAP(slave_map_program)
 	MCFG_CPU_IO_MAP(slave_map_io)
 
-	MCFG_CPU_ADD("audiocpu", I80186, XTAL_16MHz)
+	MCFG_CPU_ADD("audiocpu", I80186, XTAL_16MHz/2)
 	MCFG_CPU_PROGRAM_MAP(leland_80186_map_program)
 	MCFG_CPU_IO_MAP(ataxx_80186_map_io)
+	MCFG_80186_CHIP_SELECT_CB(DEVWRITE16("custom", leland_80186_sound_device, peripheral_ctrl))
+	MCFG_80186_TMROUT0_HANDLER(DEVWRITELINE("custom", leland_80186_sound_device, i80186_tmr0_w))
 
 	MCFG_MACHINE_START_OVERRIDE(leland_state,ataxx)
 	MCFG_MACHINE_RESET_OVERRIDE(leland_state,ataxx)
@@ -317,21 +318,16 @@ static MACHINE_CONFIG_START( ataxx, leland_state )
 	MCFG_FRAGMENT_ADD(ataxx_video)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_SOUND_ADD("custom", LELAND_80186, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_DEVICE_ADD("custom", ATAXX_80186, 0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( wsf, ataxx )
+	MCFG_CPU_MODIFY("audiocpu")
+	MCFG_80186_TMROUT1_HANDLER(DEVWRITELINE("custom", leland_80186_sound_device, i80186_tmr1_w))
 
-	/* basic machine hardware */
-
-	/* sound hardware */
-	MCFG_YM2151_ADD("ymsnd", 4000000)
-	MCFG_SOUND_ROUTE(0, "mono", 0.40)
-	MCFG_SOUND_ROUTE(1, "mono", 0.40)
+	MCFG_DEVICE_REMOVE("custom")
+	MCFG_DEVICE_ADD("custom", WSF_80186, 0)
 MACHINE_CONFIG_END
 
 

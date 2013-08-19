@@ -36,7 +36,7 @@ To do:
 
 #include "emu.h"
 #include "cpu/h83002/h8.h"
-#include "cpu/i86/i86.h"
+#include "cpu/i86/i186.h"
 #include "cpu/z180/z180.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"

@@ -168,7 +168,6 @@ static ADDRESS_MAP_START( compis_io, AS_IO, 16, compis_state )
 	AM_RANGE( 0x0330, 0x0333) AM_DEVREADWRITE8("upd7220", upd7220_device, read, write, 0x00ff) /* GDC 82720 PCS6:6     */
 	AM_RANGE( 0x0340, 0x0343) AM_DEVICE8("i8272a", i8272a_device, map, 0x00ff)  /* iSBX0 (J8) FDC 8272      */
 	AM_RANGE( 0x0350, 0x0351) AM_DEVREADWRITE8("i8272a", i8272a_device, mdma_r, mdma_w, 0x00ff) /* iSBX0 (J8) DMA ACK       */
-	AM_RANGE( 0xff00, 0xffff) AM_READWRITE( compis_i186_internal_port_r, compis_i186_internal_port_w)/* CPU 80186         */
 //{ 0x0100, 0x017e, compis_null_r },    /* RTC              */
 //{ 0x0180, 0x01ff, compis_null_r },    /* PCS3?            */
 //{ 0x0200, 0x027f, compis_null_r },    /* Reserved         */
@@ -372,7 +371,7 @@ static MACHINE_CONFIG_START( compis, compis_state )
 	/* Devices */
 	MCFG_PIT8253_ADD( "pit8253", compis_pit8253_config )
 	MCFG_PIT8254_ADD( "pit8254", compis_pit8254_config )
-	MCFG_PIC8259_ADD( "pic8259_master", WRITELINE(compis_state, compis_pic8259_master_set_int_line), VCC, READ8(compis_state, get_slave_ack) )
+	MCFG_PIC8259_ADD( "pic8259_master", DEVWRITELINE("maincpu", i80186_cpu_device, int2_w), VCC, READ8(compis_state, get_slave_ack) )
 	MCFG_PIC8259_ADD( "pic8259_slave", WRITELINE(compis_state, compis_pic8259_slave_set_int_line), GND, NULL )
 	MCFG_I8255_ADD( "ppi8255", compis_ppi_interface )
 	MCFG_UPD7220_ADD("upd7220", XTAL_4_433619MHz/2, hgdc_intf, upd7220_map) //unknown clock
@@ -412,7 +411,7 @@ static MACHINE_CONFIG_START( compis2, compis_state )
 	/* Devices */
 	MCFG_PIT8253_ADD( "pit8253", compis_pit8253_config )
 	MCFG_PIT8254_ADD( "pit8254", compis_pit8254_config )
-	MCFG_PIC8259_ADD( "pic8259_master", WRITELINE(compis_state, compis_pic8259_master_set_int_line), VCC, READ8(compis_state, get_slave_ack) )
+	MCFG_PIC8259_ADD( "pic8259_master", DEVWRITELINE("maincpu", i80186_cpu_device, int2_w), VCC, READ8(compis_state, get_slave_ack) )
 	MCFG_PIC8259_ADD( "pic8259_slave", WRITELINE(compis_state, compis_pic8259_slave_set_int_line), GND, NULL )
 	MCFG_I8255_ADD( "ppi8255", compis_ppi_interface )
 	MCFG_UPD7220_ADD("upd7220", XTAL_4_433619MHz/2, hgdc_intf, upd7220_map) //unknown clock
