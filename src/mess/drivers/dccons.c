@@ -170,6 +170,7 @@ static ADDRESS_MAP_START( dc_port, AS_IO, 64, dc_cons_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dc_audio_map, AS_PROGRAM, 32, dc_cons_state )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("dc_sound_ram")        /* shared with SH-4 */
 	AM_RANGE(0x00800000, 0x00807fff) AM_READWRITE(dc_arm_aica_r, dc_arm_aica_w)
 ADDRESS_MAP_END
@@ -189,7 +190,7 @@ WRITE_LINE_MEMBER(dc_cons_state::aica_irq)
 
 static const aica_interface dc_aica_interface =
 {
-	0,
+	TRUE,
 	0,
 	DEVCB_DRIVER_LINE_MEMBER(dc_cons_state,aica_irq)
 };
@@ -226,8 +227,8 @@ static MACHINE_CONFIG_START( dc, dc_cons_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("aica", AICA, 0)
 	MCFG_SOUND_CONFIG(dc_aica_interface)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
 
 	MCFG_DEVICE_ADD("cdrom", GDROM, 0)
 MACHINE_CONFIG_END
