@@ -615,7 +615,6 @@ UINT32 mplay_state::screen_update_megplay(screen_device &screen, bitmap_rgb32 &b
 }
 
 
-//extern SCREEN_VBLANK(megadriv);
 MACHINE_RESET_MEMBER(mplay_state,megaplay)
 {
 	m_bios_mode = MP_ROM;

@@ -362,7 +362,6 @@ private:
 	UINT32  *m_e_stack;
 	UINT32  *m_o_stack;
 
-	//legacy_cpu_device *m_rotdevice;
 	address_space *m_program;
 	direct_read_data *m_direct;
 	int m_icount;

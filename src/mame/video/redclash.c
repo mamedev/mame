@@ -296,7 +296,7 @@ void ladybug_state::redclash_set_stars_enable(UINT8 on)
 }
 
 /* This sets up which starfield to draw and the offset, */
-/* To be called from SCREEN_VBLANK() */
+/* To be called from screen_eof_*() */
 
 void ladybug_state::redclash_update_stars_state()
 {
