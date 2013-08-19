@@ -3362,6 +3362,8 @@ ROM_START( nslasher )
 	ROM_REGION(0x80000, "oki2", 0 )
 	ROM_LOAD( "mbh-11.16l", 0x000000,  0x80000,  CRC(0ec40b6b) SHA1(9fef44149608ae2a00f6a75a6f77f2efcab6e78e) )
 
+	ROM_REGION(0x200, "prom", 0 )
+	ROM_LOAD( "ln-00.j7", 0x000000,  0x200, CRC(5e83eaf3) SHA1(95f5eb8e56dff6c2dce7c39a6dd458bfc38fe1cf) )
 ROM_END
 
 ROM_START( nslasherj )
@@ -3395,6 +3397,9 @@ ROM_START( nslasherj )
 
 	ROM_REGION(0x80000, "oki2", 0 )
 	ROM_LOAD( "mbh-11.16l", 0x000000,  0x80000,  CRC(0ec40b6b) SHA1(9fef44149608ae2a00f6a75a6f77f2efcab6e78e) )
+
+	ROM_REGION(0x200, "prom", 0 )
+	ROM_LOAD( "ln-00.j7", 0x000000,  0x200, CRC(5e83eaf3) SHA1(95f5eb8e56dff6c2dce7c39a6dd458bfc38fe1cf) )
 ROM_END
 
 ROM_START( nslashers )
@@ -3428,6 +3433,9 @@ ROM_START( nslashers )
 
 	ROM_REGION(0x80000, "oki2", 0 )
 	ROM_LOAD( "mbh-11.16l", 0x000000,  0x80000,  CRC(0ec40b6b) SHA1(9fef44149608ae2a00f6a75a6f77f2efcab6e78e) )
+
+	ROM_REGION(0x200, "prom", 0 )
+	ROM_LOAD( "ln-00.j7", 0x000000,  0x200, CRC(5e83eaf3) SHA1(95f5eb8e56dff6c2dce7c39a6dd458bfc38fe1cf) )
 ROM_END
 
 ROM_START( nslasheru )
@@ -3461,6 +3469,9 @@ ROM_START( nslasheru )
 
 	ROM_REGION(0x80000, "oki2", 0 )
 	ROM_LOAD( "mbh-11.16l", 0x000000,  0x80000,  CRC(0ec40b6b) SHA1(9fef44149608ae2a00f6a75a6f77f2efcab6e78e) )
+
+	ROM_REGION(0x200, "prom", 0 )
+	ROM_LOAD( "ln-00.j7", 0x000000,  0x200, CRC(5e83eaf3) SHA1(95f5eb8e56dff6c2dce7c39a6dd458bfc38fe1cf) )
 ROM_END
 
 DRIVER_INIT_MEMBER(deco32_state,captaven)

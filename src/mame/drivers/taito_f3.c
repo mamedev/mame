@@ -1991,8 +1991,13 @@ ROM_START( bublbob2p )
 	ROM_LOAD16_BYTE("cq80-snd2-std6-a148.ic11", 0x700000, 0x080000, CRC(2edaa9dc) SHA1(72fead505c4f44e5736ff7d545d72dfa37d613e2) )    // -std-
 
 	ROM_REGION(0x180000, "pals", 0)
-	ROM_LOAD("pal20l10a.ic12.bin", 0x000, 0xcc, CRC(5d695690) SHA1(713cdbb894861eb5a6361026af8618df7e7db467) )
-	ROM_LOAD("pal20l10a.ic24.bin", 0x000, 0xcc, CRC(5d695690) SHA1(713cdbb894861eb5a6361026af8618df7e7db467) )
+	// dumped regular way, appear to be protected
+	//ROM_LOAD("pal20l10a.ic12.bin", 0x000, 0xcc, BAD_DUMP CRC(5d695690) SHA1(713cdbb894861eb5a6361026af8618df7e7db467) )
+	//ROM_LOAD("pal20l10a.ic24.bin", 0x000, 0xcc, BAD_DUMP CRC(5d695690) SHA1(713cdbb894861eb5a6361026af8618df7e7db467) )
+	// dumped using ABI Boardmaster, valid data but now in format for a GAL22V10 instead so still marked as BAD_DUMP
+	ROM_LOAD("bb2proto-ic12.bin", 0x000, 0x2e5, BAD_DUMP CRC(acf20b88) SHA1(46ba1bcfd034685c81f597c8d4efdf1cefa5157c) )
+	ROM_LOAD("bb2proto-ic24.bin", 0x000, 0x2e5, BAD_DUMP CRC(d15a4987) SHA1(628899931e71e19a7d574fcde9a7768f2c65a426) )
+	// unprotected?
 	ROM_LOAD("pal16l8b.ic57.bin", 0x000, 0x104, CRC(74b4d8be) SHA1(23ba316bc5550dd69f07f9a0f697927656a35e5a) )
 	ROM_LOAD("pal16l8b.ic58.bin", 0x000, 0x104, CRC(17e2c9b8) SHA1(841b290ee3a3089a975456b20018c04e6afb2257) )
 	ROM_LOAD("pal16l8b.ic59.bin", 0x000, 0x104, CRC(dc0db200) SHA1(9f46e7edf053ad9ee3a4a6dd00f9f6996203fc60) )
@@ -2882,6 +2887,11 @@ ROM_START( tcobra2 )
 	ROM_REGION16_BE(0x800000, "ensoniq.0" , ROMREGION_ERASE00 ) // V2: 4 banks, only 2 populated
 	ROM_LOAD16_BYTE("e15-05.bin", 0x000000, 0x200000, CRC(3e5da5f6) SHA1(da6fc8b26cd02c45cfc0f1aa5292614e4d28cae4) )    // C8 C9 CA CB
 	ROM_LOAD16_BYTE("e15-06.bin", 0x400000, 0x200000, CRC(b182a3e1) SHA1(db8569b069911bb84900b2aa5168c45ba3e985c7) )    // CC CD -std-
+
+	ROM_REGION(0x180000, "pals", 0)
+	ROM_LOAD("palce16v8q.ic37.bin", 0x000, 0x117, CRC(6ccd8168) SHA1(98f85455585ba2f5ab834fa30addec498e94f814) )
+	ROM_LOAD("d77-12.ic48.bin", 0x000, 0x117, CRC(6f93a4d8) SHA1(8c69688cf1159691439ebc4edfba52ab13f645b9) )
+	ROM_LOAD("d77-14.ic21.bin", 0x000, 0x117, CRC(f2264f51) SHA1(6f18bad9e5318fa40dbce32c0a036b7588651660) )
 ROM_END
 
 ROM_START( tcobra2u )
@@ -2912,6 +2922,11 @@ ROM_START( tcobra2u )
 	ROM_REGION16_BE(0x800000, "ensoniq.0" , ROMREGION_ERASE00 ) // V2: 4 banks, only 2 populated
 	ROM_LOAD16_BYTE("e15-05.bin", 0x000000, 0x200000, CRC(3e5da5f6) SHA1(da6fc8b26cd02c45cfc0f1aa5292614e4d28cae4) )    // C8 C9 CA CB
 	ROM_LOAD16_BYTE("e15-06.bin", 0x400000, 0x200000, CRC(b182a3e1) SHA1(db8569b069911bb84900b2aa5168c45ba3e985c7) )    // CC CD -std-
+
+	ROM_REGION(0x180000, "pals", 0)
+	ROM_LOAD("palce16v8q.ic37.bin", 0x000, 0x117, CRC(6ccd8168) SHA1(98f85455585ba2f5ab834fa30addec498e94f814) )
+	ROM_LOAD("d77-12.ic48.bin", 0x000, 0x117, CRC(6f93a4d8) SHA1(8c69688cf1159691439ebc4edfba52ab13f645b9) )
+	ROM_LOAD("d77-14.ic21.bin", 0x000, 0x117, CRC(f2264f51) SHA1(6f18bad9e5318fa40dbce32c0a036b7588651660) )
 ROM_END
 
 ROM_START( ktiger2 )
@@ -2942,6 +2957,11 @@ ROM_START( ktiger2 )
 	ROM_REGION16_BE(0x800000, "ensoniq.0" , ROMREGION_ERASE00 ) // V2: 4 banks, only 2 populated
 	ROM_LOAD16_BYTE("e15-05.bin", 0x000000, 0x200000, CRC(3e5da5f6) SHA1(da6fc8b26cd02c45cfc0f1aa5292614e4d28cae4) )    // C8 C9 CA CB
 	ROM_LOAD16_BYTE("e15-06.bin", 0x400000, 0x200000, CRC(b182a3e1) SHA1(db8569b069911bb84900b2aa5168c45ba3e985c7) )    // CC CD -std-
+
+	ROM_REGION(0x180000, "pals", 0)
+	ROM_LOAD("palce16v8q.ic37.bin", 0x000, 0x117, CRC(6ccd8168) SHA1(98f85455585ba2f5ab834fa30addec498e94f814) )
+	ROM_LOAD("d77-12.ic48.bin", 0x000, 0x117, CRC(6f93a4d8) SHA1(8c69688cf1159691439ebc4edfba52ab13f645b9) )
+	ROM_LOAD("d77-14.ic21.bin", 0x000, 0x117, CRC(f2264f51) SHA1(6f18bad9e5318fa40dbce32c0a036b7588651660) )
 ROM_END
 
 ROM_START( bubblem )
