@@ -202,8 +202,6 @@ void gdrom_device::ExecCommand( int *transferLength )
 			//transferOffset = command[2];
 			*transferLength = SCSILengthFromUINT8( &command[ 4 ] );
 			printf("SET_MODE %02x %02x\n",command[2],command[4]);
-			//for(int i=command[2];i<command[2]+command[4];i++)
-			//	GDROM_Cmd11_Reply[i] = command[i];
 			break;
 
 		case 0x15: // MODE SELECT(6)
@@ -350,6 +348,44 @@ void gdrom_device::ExecCommand( int *transferLength )
 			//debugger_break(machine());
 			break;
 		}
+
+		// READ TOC (GD-ROM ver.)
+		case 0x14:
+		{
+			int start_trk = command[2];// ok?
+			int end_trk = cdrom_get_last_track(cdrom);
+			int length;
+			int allocation_length = SCSILengthFromUINT16( &command[ 3 ] );
+
+			if( start_trk == 0 )
+			{
+				start_trk = 1;
+			}
+			if( start_trk == 0xaa )
+			{
+				end_trk = start_trk;
+			}
+
+			length = 4 + ( 8 * ( ( end_trk - start_trk ) + 1 ) );
+			if( length > allocation_length )
+			{
+				length = allocation_length;
+			}
+			else if( length < 4 )
+			{
+				length = 4;
+			}
+
+			if (m_cdda != NULL)
+			{
+				m_cdda->stop_audio();
+			}
+
+			SetPhase( SCSI_PHASE_DATAIN );
+			*transferLength = length;
+			break;
+		}
+
 		case 0x45: // PLAY AUDIO(10)
 			lba = command[2]<<24 | command[3]<<16 | command[4]<<8 | command[5];
 			blocks = SCSILengthFromUINT16( &command[7] );
@@ -507,6 +543,18 @@ void gdrom_device::ExecCommand( int *transferLength )
 			*transferLength = sizeof(GDROM_Cmd71_Reply);
 			break;
 
+		case 0x40:
+			if(command[1] & 0xf)
+			{
+				SetPhase( SCSI_PHASE_DATAIN );
+				*transferLength = 0xe;
+			}
+			else
+			{
+				printf("command 0x40: unhandled subchannel request\n");
+			}
+			break;
+
 		default:
 			scsihle_device::ExecCommand( transferLength );
 			break;
@@ -549,11 +597,6 @@ void gdrom_device::ReadData( UINT8 *data, int dataLength )
 
 		case 0x11: // REQ_MODE
 			printf("REQ_MODE: dataLength %d\n", dataLength);
-			memcpy(data, &GDROM_Cmd11_Reply[transferOffset], (dataLength >= 32-transferOffset) ? 32-transferOffset : dataLength);
-			break;
-
-		case 0x12: // INQUIRY
-			//memset( data, 0, dataLength );
 			memcpy(data, &GDROM_Cmd11_Reply[transferOffset], (dataLength >= 32-transferOffset) ? 32-transferOffset : dataLength);
 			break;
 
@@ -815,6 +858,83 @@ void gdrom_device::ReadData( UINT8 *data, int dataLength )
 			}
 			break;
 
+		case 0x14: // READ TOC (GD-ROM ver.)
+			/*
+			    Track numbers are problematic here: 0 = lead-in, 0xaa = lead-out.
+			    That makes sense in terms of how real-world CDs are referred to, but
+			    our internal routines for tracks use "0" as track 1.  That probably
+			    should be fixed...
+			*/
+			logerror("GDROM: READ TOC, format = %d time=%d\n", command[2]&0xf,(command[1]>>1)&1);
+			switch (command[1] & 0x0f)
+			{
+				case 0:     // normal
+					{
+						int start_trk;
+						int end_trk;
+						int len;
+						int in_len;
+						int dptr;
+						UINT32 tstart;
+
+						start_trk = command[2];
+						if( start_trk == 0 )
+						{
+							start_trk = 1;
+						}
+
+						end_trk = cdrom_get_last_track(cdrom);
+						len = (end_trk * 8) + 2;
+
+						// the returned TOC DATA LENGTH must be the full amount,
+						// regardless of how much we're able to pass back due to in_len
+						dptr = 0;
+						data[dptr++] = (len>>8) & 0xff;
+						data[dptr++] = (len & 0xff);
+						data[dptr++] = 1;
+						data[dptr++] = end_trk;
+
+						if( start_trk == 0xaa )
+						{
+							end_trk = 0xaa;
+						}
+
+						in_len = command[3]<<8 | command[4];
+
+						for (i = start_trk; i <= end_trk; i++)
+						{
+							int cdrom_track = i;
+							if( cdrom_track != 0xaa )
+							{
+								cdrom_track--;
+							}
+
+							if( dptr >= in_len )
+							{
+								break;
+							}
+
+							data[dptr++] = 0;
+							data[dptr++] = cdrom_get_adr_control(cdrom, cdrom_track);
+							data[dptr++] = i;
+							data[dptr++] = 0;
+
+							tstart = cdrom_get_track_start(cdrom, cdrom_track);
+							if ((command[1]&2)>>1)
+								tstart = lba_to_msf(tstart);
+							data[dptr++] = (tstart>>24) & 0xff;
+							data[dptr++] = (tstart>>16) & 0xff;
+							data[dptr++] = (tstart>>8) & 0xff;
+							data[dptr++] = (tstart & 0xff);
+						}
+					}
+					break;
+				default:
+					logerror("GDROM: Unhandled READ TOC format %d\n", command[2]&0xf);
+					break;
+			}
+			break;
+
 		case 0x1a: // MODE SENSE(6)
 		case 0x5a: // MODE SENSE(10)
 			logerror("GDROM: MODE SENSE page code = %x, PC = %x\n", command[2] & 0x3f, (command[2]&0xc0)>>6);
@@ -845,6 +965,23 @@ void gdrom_device::ReadData( UINT8 *data, int dataLength )
 
 		case 0x71:
 			memcpy(data, &GDROM_Cmd71_Reply[0], sizeof(GDROM_Cmd71_Reply));
+			break;
+
+		case 0x40: // Get Subchannel status
+			data[0] = 0; // Reserved
+			data[1] = 0x15; // Audio Playback status (todo)
+			data[2] = 0;
+			data[3] = 0x0e; // header size
+			data[4] = 0; // ?
+			data[5] = 1; // Track Number
+			data[6] = 1; // gap #1
+			data[7] = 0; // ?
+			data[8] = 0; // ?
+			data[9] = 0; // ?
+			data[0xa] = 0; // ?
+			data[0xb] = 0; // FAD >> 16
+			data[0xc] = 0; // FAD >> 8
+			data[0xd] = 0x96; // FAD >> 0
 			break;
 
 		default:
@@ -889,6 +1026,10 @@ void gdrom_device::WriteData( UINT8 *data, int dataLength )
 					logerror("Ch 3 route: %x vol: %x\n", data[14], data[15]);
 					break;
 			}
+			break;
+
+		case 0x12:
+			memcpy(&GDROM_Cmd11_Reply[transferOffset], data, (dataLength >= 32-transferOffset) ? 32-transferOffset : dataLength);
 			break;
 
 		default:
