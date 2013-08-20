@@ -163,20 +163,12 @@ void compis_state::compis_fdc_reset()
 
 void compis_state::compis_fdc_tc(int state)
 {
-	/* Terminal count if iSBX-218A has DMA enabled */
-	if (ioport("DSW1")->read())
-	{
-		m_fdc->tc_w(state);
-	}
+	m_fdc->tc_w(state);
 }
 
 void compis_state::fdc_irq(bool state)
 {
-	/* No interrupt requests if iSBX-218A has DMA enabled */
-	if (!ioport("DSW1")->read())
-	{
-		m_8259m->ir0_w(state);
-	}
+	m_8259m->ir0_w(state);
 }
 
 void compis_state::fdc_drq(bool state)
@@ -1300,7 +1292,7 @@ void compis_state::machine_start()
 	/* CPU */
 	compis_cpu_init();
 	m_fdc->setup_intrq_cb(i8272a_device::line_cb(FUNC(compis_state::fdc_irq), this));
-	m_mon = false;
+	m_mon = true;
 }
 /*-------------------------------------------------------------------------*/
 /* Name: compis                                                            */
