@@ -116,18 +116,24 @@ enum
 
 #define MCFG_DEVICE_DISABLE() \
 	device_execute_interface::static_set_disable(*device);
+// legacy
 #define MCFG_DEVICE_VBLANK_INT(_tag, _func) \
 	device_execute_interface::static_set_vblank_int(*device, _func, _tag);
 #define MCFG_DEVICE_VBLANK_INT_DRIVER(_tag, _class, _func) \
 	device_execute_interface::static_set_vblank_int(*device, device_interrupt_delegate(&_class::_func, #_class "::" #_func, DEVICE_SELF, (_class *)0), _tag);
 #define MCFG_DEVICE_VBLANK_INT_DEVICE(_tag, _devtag, _class, _func) \
 	device_execute_interface::static_set_vblank_int(*device, device_interrupt_delegate(&_class::_func, #_class "::" #_func, _devtag, (_class *)0), _tag);
+#define MCFG_DEVICE_VBLANK_INT_REMOVE()  \
+	device_execute_interface::static_remove_vblank_int(*device);
+// legacy
 #define MCFG_DEVICE_PERIODIC_INT(_func, _rate)  \
 	device_execute_interface::static_set_periodic_int(*device, _func, attotime::from_hz(_rate));
 #define MCFG_DEVICE_PERIODIC_INT_DRIVER(_class, _func, _rate) \
 	device_execute_interface::static_set_periodic_int(*device, device_interrupt_delegate(&_class::_func, #_class "::" #_func, DEVICE_SELF, (_class *)0), attotime::from_hz(_rate));
 #define MCFG_DEVICE_PERIODIC_INT_DEVICE(_devtag, _class, _func, _rate) \
 	device_execute_interface::static_set_periodic_int(*device, device_interrupt_delegate(&_class::_func, #_class "::" #_func, _devtag, (_class *)0), attotime::from_hz(_rate));
+#define MCFG_DEVICE_PERIODIC_INT_REMOVE()  \
+	device_execute_interface::static_remove_periodic_int(*device);
 
 
 //**************************************************************************
@@ -176,8 +182,10 @@ public:
 	static void static_set_disable(device_t &device);
 	static void static_set_vblank_int(device_t &device, device_interrupt_func function, const char *tag, int rate = 0); // legacy
 	static void static_set_vblank_int(device_t &device, device_interrupt_delegate function, const char *tag, int rate = 0);
+	static void static_remove_vblank_int(device_t &device);
 	static void static_set_periodic_int(device_t &device, device_interrupt_func function, attotime rate); // legacy
 	static void static_set_periodic_int(device_t &device, device_interrupt_delegate function, attotime rate);
+	static void static_remove_periodic_int(device_t &device);
 
 	// execution management
 	bool executing() const;

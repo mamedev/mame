@@ -151,6 +151,20 @@ void device_execute_interface::static_set_vblank_int(device_t &device, device_in
 	exec->m_vblank_interrupt_screen = tag;
 }
 
+//-------------------------------------------------
+//  static_remove_vblank_int - configuration helper
+//  to remove VBLANK interrupts from the device
+//-------------------------------------------------
+
+void device_execute_interface::static_remove_vblank_int(device_t &device)
+{
+	device_execute_interface *exec;
+	if (!device.interface(exec))
+		throw emu_fatalerror("MCFG_DEVICE_VBLANK_INT_REMOVE called on device '%s' with no execute interface", device.tag());
+	exec->m_vblank_interrupt = device_interrupt_delegate();
+	exec->m_vblank_interrupt_legacy = NULL;
+	exec->m_vblank_interrupt_screen = NULL;
+}
 
 //-------------------------------------------------
 //  static_set_periodic_int - configuration helper
@@ -174,6 +188,21 @@ void device_execute_interface::static_set_periodic_int(device_t &device, device_
 	exec->m_timed_interrupt = function;
 	exec->m_timed_interrupt_legacy = NULL;
 	exec->m_timed_interrupt_period = rate;
+}
+
+//-------------------------------------------------
+//  static_remove_periodic_int - configuration helper
+//  to remove periodic interrupts from the device
+//-------------------------------------------------
+
+void device_execute_interface::static_remove_periodic_int(device_t &device)
+{
+	device_execute_interface *exec;
+	if (!device.interface(exec))
+		throw emu_fatalerror("MCFG_DEVICE_PERIODIC_INT_REMOVE called on device '%s' with no execute interface", device.tag());
+	exec->m_timed_interrupt = device_interrupt_delegate();
+	exec->m_timed_interrupt_legacy = NULL;
+	exec->m_timed_interrupt_period = attotime();
 }
 
 

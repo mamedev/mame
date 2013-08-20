@@ -696,7 +696,7 @@ static MACHINE_CONFIG_DERIVED( itaten, dacholer )
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_PROGRAM_MAP(itaten_snd_map)
 	MCFG_CPU_IO_MAP(itaten_snd_io_map)
-	MCFG_CPU_VBLANK_INT(NULL,NULL)
+	MCFG_CPU_VBLANK_INT_REMOVE()
 
 	MCFG_GFXDECODE(itaten)
 

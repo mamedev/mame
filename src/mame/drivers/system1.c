@@ -2156,7 +2156,7 @@ static MACHINE_CONFIG_START( sys1ppi, system1_state )
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK)  /* not really, see notes above */
 	MCFG_CPU_PROGRAM_MAP(system1_map)
 	MCFG_CPU_IO_MAP(system1_ppi_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", system1_state,  irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", system1_state, irq0_line_hold)
 
 	MCFG_CPU_ADD("soundcpu", Z80, SOUND_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -2225,11 +2225,11 @@ static MACHINE_CONFIG_FRAGMENT( mcu )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_VBLANK_INT(NULL, NULL)
+	MCFG_CPU_VBLANK_INT_REMOVE()
 
 	MCFG_CPU_ADD("mcu", I8751, SOUND_CLOCK)
 	MCFG_CPU_IO_MAP(mcu_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", system1_state,  mcu_irq_assert)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", system1_state, mcu_irq_assert)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcu_t0", system1_state, mcu_t0_callback, attotime::from_usec(2500))
 MACHINE_CONFIG_END
