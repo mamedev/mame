@@ -27,11 +27,6 @@ static ADDRESS_MAP_START( bsmt_map, AS_0, 8, decobsmt_device )
 	AM_RANGE(0x000000, 0xffffff) AM_ROM AM_REGION(":bsmt", 0)
 ADDRESS_MAP_END
 
-static INTERRUPT_GEN( decobsmt_firq_interrupt )
-{
-	device->execute().set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
-}
-
 static void bsmt_ready_callback(bsmt2000_device &device)
 {
 	decobsmt_device *decobsmt = device.machine().device<decobsmt_device>(DECOBSMT_TAG);
@@ -41,7 +36,7 @@ static void bsmt_ready_callback(bsmt2000_device &device)
 MACHINE_CONFIG_FRAGMENT( decobsmt )
 	MCFG_CPU_ADD(M6809_TAG, M6809, (3579580/2))
 	MCFG_CPU_PROGRAM_MAP(decobsmt_map)
-	MCFG_CPU_PERIODIC_INT(decobsmt_firq_interrupt, 489) /* Fixed FIRQ of 489Hz as measured on real (pinball) machine */
+	MCFG_CPU_PERIODIC_INT_DRIVER(decobsmt_device, decobsmt_firq_interrupt, 489) /* Fixed FIRQ of 489Hz as measured on real (pinball) machine */
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_BSMT2000_ADD(BSMT_TAG, 24000000)
@@ -140,4 +135,9 @@ WRITE8_MEMBER(decobsmt_device::bsmt_comms_w)
 WRITE_LINE_MEMBER(decobsmt_device::bsmt_reset_line)
 {
 	m_ourcpu->set_input_line(INPUT_LINE_RESET, state);
+}
+
+INTERRUPT_GEN_MEMBER(decobsmt_device::decobsmt_firq_interrupt)
+{
+	device.execute().set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 }
