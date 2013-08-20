@@ -116,9 +116,6 @@ enum
 
 #define MCFG_DEVICE_DISABLE() \
 	device_execute_interface::static_set_disable(*device);
-// legacy
-#define MCFG_DEVICE_VBLANK_INT(_tag, _func) \
-	device_execute_interface::static_set_vblank_int(*device, _func, _tag);
 #define MCFG_DEVICE_VBLANK_INT_DRIVER(_tag, _class, _func) \
 	device_execute_interface::static_set_vblank_int(*device, device_interrupt_delegate(&_class::_func, #_class "::" #_func, DEVICE_SELF, (_class *)0), _tag);
 #define MCFG_DEVICE_VBLANK_INT_DEVICE(_tag, _devtag, _class, _func) \
@@ -180,7 +177,6 @@ public:
 
 	// static inline configuration helpers
 	static void static_set_disable(device_t &device);
-	static void static_set_vblank_int(device_t &device, device_interrupt_func function, const char *tag, int rate = 0); // legacy
 	static void static_set_vblank_int(device_t &device, device_interrupt_delegate function, const char *tag, int rate = 0);
 	static void static_remove_vblank_int(device_t &device);
 	static void static_set_periodic_int(device_t &device, device_interrupt_func function, attotime rate); // legacy
@@ -292,7 +288,6 @@ protected:
 	// configuration
 	bool                    m_disabled;                 // disabled from executing?
 	device_interrupt_delegate m_vblank_interrupt;       // for interrupts tied to VBLANK
-	device_interrupt_func   m_vblank_interrupt_legacy;  // for interrupts tied to VBLANK
 	const char *            m_vblank_interrupt_screen;  // the screen that causes the VBLANK interrupt
 	device_interrupt_delegate m_timed_interrupt;        // for interrupts not tied to VBLANK
 	device_interrupt_func   m_timed_interrupt_legacy;   // for interrupts not tied to VBLANK

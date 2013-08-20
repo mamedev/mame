@@ -73,7 +73,6 @@ const int TRIGGER_SUSPENDTIME   = -4000;
 device_execute_interface::device_execute_interface(const machine_config &mconfig, device_t &device)
 	: device_interface(device),
 		m_disabled(false),
-		m_vblank_interrupt_legacy(NULL),
 		m_vblank_interrupt_screen(NULL),
 		m_timed_interrupt_legacy(NULL),
 		m_timed_interrupt_period(attotime::zero),
@@ -132,22 +131,12 @@ void device_execute_interface::static_set_disable(device_t &device)
 //  to set up VBLANK interrupts on the device
 //-------------------------------------------------
 
-void device_execute_interface::static_set_vblank_int(device_t &device, device_interrupt_func function, const char *tag, int rate)
-{
-	device_execute_interface *exec;
-	if (!device.interface(exec))
-		throw emu_fatalerror("MCFG_DEVICE_VBLANK_INT called on device '%s' with no execute interface", device.tag());
-	exec->m_vblank_interrupt_legacy = function;
-	exec->m_vblank_interrupt_screen = tag;
-}
-
 void device_execute_interface::static_set_vblank_int(device_t &device, device_interrupt_delegate function, const char *tag, int rate)
 {
 	device_execute_interface *exec;
 	if (!device.interface(exec))
 		throw emu_fatalerror("MCFG_DEVICE_VBLANK_INT called on device '%s' with no execute interface", device.tag());
 	exec->m_vblank_interrupt = function;
-	exec->m_vblank_interrupt_legacy = NULL;
 	exec->m_vblank_interrupt_screen = tag;
 }
 
@@ -162,7 +151,6 @@ void device_execute_interface::static_remove_vblank_int(device_t &device)
 	if (!device.interface(exec))
 		throw emu_fatalerror("MCFG_DEVICE_VBLANK_INT_REMOVE called on device '%s' with no execute interface", device.tag());
 	exec->m_vblank_interrupt = device_interrupt_delegate();
-	exec->m_vblank_interrupt_legacy = NULL;
 	exec->m_vblank_interrupt_screen = NULL;
 }
 
@@ -537,7 +525,7 @@ void device_execute_interface::execute_set_input(int linenum, int state)
 void device_execute_interface::interface_validity_check(validity_checker &valid) const
 {
 	// validate the interrupts
-	if (!m_vblank_interrupt.isnull() || m_vblank_interrupt_legacy != NULL)
+	if (!m_vblank_interrupt.isnull())
 	{
 		screen_device_iterator iter(device().mconfig().root_device());
 		if (iter.first() == NULL)
@@ -774,9 +762,7 @@ void device_execute_interface::on_vblank(screen_device &screen, bool vblank_stat
 	// generate the interrupt callback
 	if (!suspended(SUSPEND_REASON_HALT | SUSPEND_REASON_RESET | SUSPEND_REASON_DISABLE | SUSPEND_REASON_CLOCK))
 	{
-		if (m_vblank_interrupt_legacy != NULL)
-			(*m_vblank_interrupt_legacy)(&device());
-		else if (!m_vblank_interrupt.isnull())
+		if (!m_vblank_interrupt.isnull())
 			m_vblank_interrupt(device());
 	}
 }
