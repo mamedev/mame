@@ -133,7 +133,7 @@ public:
 	m_8253(*this, "pit8253"),
 	m_8254(*this, "pit8254"),
 	m_8259m(*this, "pic8259_master"),
-	m_8259s(*this, "pic8259_slave"),
+//	m_8259s(*this, "pic8259_slave"),
 	m_8255(*this, "ppi8255"),
 	m_centronics(*this, "centronics"),
 	m_uart(*this, "uart"),
@@ -146,7 +146,7 @@ public:
 	required_device<pit8253_device> m_8253;
 	required_device<pit8254_device> m_8254;
 	required_device<pic8259_device> m_8259m;
-	required_device<pic8259_device> m_8259s;
+//	required_device<pic8259_device> m_8259s;
 	required_device<i8255_device> m_8255;
 	required_device<centronics_device> m_centronics;
 	required_device<i8251_device> m_uart;
@@ -165,7 +165,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(compis_usart_rxready);
 //	DECLARE_WRITE_LINE_MEMBER(compis_pic8259_master_set_int_line);
 //	DECLARE_WRITE_LINE_MEMBER(compis_pic8259_slave_set_int_line);
-	DECLARE_READ8_MEMBER(get_slave_ack);
+//	DECLARE_READ8_MEMBER(get_slave_ack);
 //	i186_state m_i186;
 	TYP_COMPIS m_compis;
 	UINT8 *m_p_videoram;

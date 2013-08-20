@@ -825,7 +825,7 @@ void i80186_cpu_device::update_interrupt_state()
 					logerror("Int%d priority=%d\n",IntNo,Priority);
 
 				/* if we're already servicing something at this level, don't generate anything new */
-				if (m_intr.in_service & (0x10 << IntNo))
+				if ((m_intr.in_service & (0x10 << IntNo)) && !(m_intr.ext[IntNo] & EXTINT_CTRL_SFNM))
 					return;
 
 				/* if there's something pending, generate an interrupt */

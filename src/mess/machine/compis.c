@@ -173,13 +173,9 @@ void compis_state::compis_fdc_tc(int state)
 void compis_state::fdc_irq(bool state)
 {
 	/* No interrupt requests if iSBX-218A has DMA enabled */
-	if (!ioport("DSW1")->read() && state)
+	if (!ioport("DSW1")->read())
 	{
-		if (m_8259m)
-		{
-			m_8259m->ir0_w(1);
-			m_8259m->ir0_w(0);
-		}
+		m_8259m->ir0_w(state);
 	}
 }
 
@@ -1276,7 +1272,7 @@ WRITE_LINE_MEMBER( compis_state::compis_pic8259_slave_set_int_line )
 {
 	if (m_8259m)
 		m_8259m->ir2_w(state);
-}*/
+}
 
 READ8_MEMBER( compis_state::get_slave_ack )
 {
@@ -1284,7 +1280,7 @@ READ8_MEMBER( compis_state::get_slave_ack )
 		return m_8259s->inta_r();
 	}
 	return 0;
-}
+}*/
 
 
 READ8_MEMBER(compis_state::compis_irq_callback)
