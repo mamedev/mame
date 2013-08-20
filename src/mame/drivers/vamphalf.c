@@ -2387,9 +2387,7 @@ READ16_MEMBER(vamphalf_state::puzlbanga_speedup_r)
 
 READ32_MEMBER(vamphalf_state::wyvernwg_speedup_r)
 {
-	int pc = space.device().safe_pc();
-
-	if(pc == 0x10758)
+	if(space.device().safe_pc() == 0x10758 )
 	{
 		if(irq_active(space))
 			space.device().execute().spin_until_interrupt();
@@ -2402,9 +2400,7 @@ READ32_MEMBER(vamphalf_state::wyvernwg_speedup_r)
 
 READ32_MEMBER(vamphalf_state::wyvernwga_speedup_r)
 {
-	int pc = space.device().safe_pc();
-
-	if(pc == 0x10758)
+	if(space.device().safe_pc() == 0x10758 )
 	{
 		if(irq_active(space))
 			space.device().execute().spin_until_interrupt();
@@ -2501,9 +2497,7 @@ READ16_MEMBER(vamphalf_state::mrdig_speedup_r)
 
 READ16_MEMBER(vamphalf_state::dtfamily_speedup_r)
 {
-	int pc = space.device().safe_pc();
-
-	if (pc == 0x12fa6)
+	if(space.device().safe_pc() == 0x12fa6 )
 		space.device().execute().spin_until_interrupt();
 
 	return m_wram[0xcc2a8 / 2];
