@@ -873,7 +873,6 @@ static MACHINE_CONFIG_START( apexc, apexc_state )
 	MCFG_CPU_IO_MAP(apexc_io_map)
 	/* dummy interrupt: handles the control panel */
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", apexc_state,  apexc_interrupt)
-	/*MCFG_CPU_PERIODIC_INT(func, rate)*/
 
 
 	/* video hardware does not exist, but we display a control panel and the typewriter output */
