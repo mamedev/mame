@@ -6,24 +6,11 @@ Quiz Bisyoujo Senshi Sailor Moon    (c)1997 Banpresto
 Driver by David Haywood
 
 TODO:
-- macrossp: tilemap zoom is wrong, see title screen (misplaced) and level 2 boss
-  (background scrolls faster than sprites)
-- should use VIDEO_RGB_DIRECT for alpha blending to work, but tilemap_draw_roz()
-  doesn't support it.
-- Sprite Zoom on quizmoon title screen isn't right
-- Tilemap zoom effect on macrossp title screen and probably other places
-- Priorities (Sprites & Backgrounds) - see quizmoon attract mode
-- sprite/tilemap priorities might not be 100% correct
-- Sound
-- optimize palette fading in macrossp.quizmoon doesn't use that register.
-- All Other Unused Reads / Writes
-- Correct unknown ports if/as needed
-- Clean Up
-- Flip Screen support (both games have a dipswitch for it's selection)
-
- Notes:
-
- Whats the BIOS rom? should it be in the 68020 map, its different between games.
+ - what is the 'bios' rom for? it appears to be data tables and is very different between games but we don't map it anywhere
+ - priorities
+ - zooming is wrong
+ - is alpha REALLY alpha or sprite flicker?
+ - convert tilemaps to devices?
 
  68020 interrupts
  lev 1 : 0x64 : 0000 084c - unknown..
@@ -397,20 +384,20 @@ static ADDRESS_MAP_START( macrossp_map, AS_PROGRAM, 32, macrossp_state )
 	AM_RANGE(0x800000, 0x802fff) AM_RAM AM_SHARE("spriteram")
 	/* SCR A Layer */
 	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(macrossp_scra_videoram_w) AM_SHARE("scra_videoram")
-	AM_RANGE(0x904200, 0x9043ff) AM_WRITEONLY /* W/O? */
-	AM_RANGE(0x905000, 0x90500b) AM_WRITEONLY AM_SHARE("scra_videoregs") /* W/O? */
+	AM_RANGE(0x904200, 0x9043ff) AM_RAM AM_SHARE("scra_linezoom") /* W/O? */
+	AM_RANGE(0x905000, 0x90500b) AM_RAM AM_SHARE("scra_videoregs") /* W/O? */
 	/* SCR B Layer */
 	AM_RANGE(0x908000, 0x90bfff) AM_RAM_WRITE(macrossp_scrb_videoram_w) AM_SHARE("scrb_videoram")
-	AM_RANGE(0x90c200, 0x90c3ff) AM_WRITEONLY /* W/O? */
-	AM_RANGE(0x90d000, 0x90d00b) AM_WRITEONLY AM_SHARE("scrb_videoregs") /* W/O? */
+	AM_RANGE(0x90c200, 0x90c3ff) AM_RAM AM_SHARE("scrb_linezoom") /* W/O? */
+	AM_RANGE(0x90d000, 0x90d00b) AM_RAM AM_SHARE("scrb_videoregs") /* W/O? */
 	/* SCR C Layer */
 	AM_RANGE(0x910000, 0x913fff) AM_RAM_WRITE(macrossp_scrc_videoram_w) AM_SHARE("scrc_videoram")
-	AM_RANGE(0x914200, 0x9143ff) AM_WRITEONLY /* W/O? */
-	AM_RANGE(0x915000, 0x91500b) AM_WRITEONLY AM_SHARE("scrc_videoregs") /* W/O? */
+	AM_RANGE(0x914200, 0x9143ff) AM_RAM AM_SHARE("scrc_linezoom")/* W/O? */
+	AM_RANGE(0x915000, 0x91500b) AM_RAM AM_SHARE("scrc_videoregs") /* W/O? */
 	/* Text Layer */
 	AM_RANGE(0x918000, 0x91bfff) AM_RAM_WRITE(macrossp_text_videoram_w) AM_SHARE("text_videoram")
-	AM_RANGE(0x91c200, 0x91c3ff) AM_WRITEONLY /* W/O? */
-	AM_RANGE(0x91d000, 0x91d00b) AM_WRITEONLY AM_SHARE("text_videoregs") /* W/O? */
+	AM_RANGE(0x91c200, 0x91c3ff) AM_RAM AM_SHARE("text_linezoom") /* W/O? */
+	AM_RANGE(0x91d000, 0x91d00b) AM_RAM AM_SHARE("text_videoregs") /* W/O? */
 
 	AM_RANGE(0xa00000, 0xa03fff) AM_RAM_WRITE(paletteram32_macrossp_w) AM_SHARE("paletteram")
 

@@ -11,27 +11,42 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
 		m_scra_videoram(*this, "scra_videoram"),
+		m_scra_linezoom(*this, "scra_linezoom"),
 		m_scra_videoregs(*this, "scra_videoregs"),
+
 		m_scrb_videoram(*this, "scrb_videoram"),
+		m_scrb_linezoom(*this, "scrb_linezoom"),
 		m_scrb_videoregs(*this, "scrb_videoregs"),
+	
 		m_scrc_videoram(*this, "scrc_videoram"),
+		m_scrc_linezoom(*this, "scrc_linezoom"),
 		m_scrc_videoregs(*this, "scrc_videoregs"),
+
 		m_text_videoram(*this, "text_videoram"),
+		m_text_linezoom(*this, "text_linezoom"),
 		m_text_videoregs(*this, "text_videoregs"),
+
 		m_paletteram(*this, "paletteram"),
 		m_mainram(*this, "mainram"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"){ }
+		m_audiocpu(*this, "audiocpu")
+	{ 
+	
+	}
 
 	/* memory pointers */
 	required_shared_ptr<UINT32> m_spriteram;
 	required_shared_ptr<UINT32> m_scra_videoram;
+	required_shared_ptr<UINT32> m_scra_linezoom;
 	required_shared_ptr<UINT32> m_scra_videoregs;
 	required_shared_ptr<UINT32> m_scrb_videoram;
+	required_shared_ptr<UINT32> m_scrb_linezoom;
 	required_shared_ptr<UINT32> m_scrb_videoregs;
 	required_shared_ptr<UINT32> m_scrc_videoram;
+	required_shared_ptr<UINT32> m_scrc_linezoom;
 	required_shared_ptr<UINT32> m_scrc_videoregs;
 	required_shared_ptr<UINT32> m_text_videoram;
+	required_shared_ptr<UINT32> m_text_linezoom;
 	required_shared_ptr<UINT32> m_text_videoregs;
 	required_shared_ptr<UINT32> m_paletteram;
 	required_shared_ptr<UINT32> m_mainram;
@@ -76,7 +91,7 @@ public:
 	UINT32 screen_update_macrossp(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_eof_macrossp(screen_device &screen, bool state);
 	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, int priority );
-	void draw_layer( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer );
+	void draw_layer( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, int line );
 	void sortlayers(int *layer,int *pri);
 	void update_colors(  );
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);

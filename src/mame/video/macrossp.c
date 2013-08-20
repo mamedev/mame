@@ -304,10 +304,11 @@ void macrossp_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
 }
 
 
-void macrossp_state::draw_layer( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer )
+void macrossp_state::draw_layer( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, int line )
 {
 	tilemap_t *tm;
 	UINT32 *vr;
+	UINT32 *lr;
 
 	switch (layer)
 	{
@@ -315,34 +316,45 @@ void macrossp_state::draw_layer( screen_device &screen, bitmap_rgb32 &bitmap, co
 		default:
 			tm = m_scra_tilemap;
 			vr = m_scra_videoregs;
+			lr = m_scra_linezoom;
 			break;
 
 		case 1:
 			tm = m_scrb_tilemap;
 			vr = m_scrb_videoregs;
+			lr = m_scrb_linezoom;
 			break;
 
 		case 2:
 			tm = m_scrc_tilemap;
 			vr = m_scrc_videoregs;
+			lr = m_scrc_linezoom;
 			break;
 	}
 
 	if ((vr[2] & 0xf0000000) == 0xe0000000) /* zoom enable (guess, surely wrong) */
 	{
-		int startx, starty, inc;
+		int startx, starty, inc, linc;
 
 		startx = (vr[1] & 0x0000ffff) << 16;
 		starty = (vr[1] & 0xffff0000) >> 0;
-		inc = (vr[2] & 0x00ff0000) >> 6,
+		inc = (vr[2] & 0x00ff0000) >> 6;
+
+		if (line&1)
+			linc = (lr[line/2] & 0x0000ffff)>>0;
+		else
+			linc = (lr[line/2] & 0xffff0000)>>16;
+
+
+		linc <<= 10;
 
 		/* WRONG! */
 		/* scroll register contain position relative to the center of the screen, so adjust */
-		startx -= (368/2) * inc;
+		startx -= (368/2) * linc;
 		starty -= (240/2) * inc;
 
 		tm->draw_roz(screen, bitmap, cliprect,
-				startx,starty,inc,0,0,inc,
+				startx,starty,linc,0,0,inc,
 				1,  /* wraparound */
 				0,0);
 	}
@@ -385,11 +397,34 @@ UINT32 macrossp_state::screen_update_macrossp(screen_device &screen, bitmap_rgb3
 
 	sortlayers(layers, layerpri);
 
-	draw_layer(screen, bitmap, cliprect, layers[0]);
+	rectangle clip;
+	const rectangle &visarea = screen.visible_area();
+	clip = visarea;
+
+	for (int y=0;y<240;y++)
+	{
+		clip.min_y = clip.max_y = y;
+		draw_layer(screen, bitmap, clip, layers[0], y);
+	}
+
 	draw_sprites(bitmap, cliprect, 0);
-	draw_layer(screen, bitmap, cliprect, layers[1]);
+
+	for (int y=0;y<240;y++)
+	{
+		clip.min_y = clip.max_y = y;
+		draw_layer(screen, bitmap, clip, layers[1], y);
+	}
+
+
 	draw_sprites(bitmap, cliprect, 1);
-	draw_layer(screen, bitmap, cliprect, layers[2]);
+
+	for (int y=0;y<240;y++)
+	{
+		clip.min_y = clip.max_y = y;
+		draw_layer(screen, bitmap, clip, layers[2], y);
+	}
+
+
 	draw_sprites(bitmap, cliprect, 2);
 	draw_sprites(bitmap, cliprect, 3);
 	m_text_tilemap->draw(screen, bitmap, cliprect, 0, 0);
