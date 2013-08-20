@@ -163,7 +163,6 @@ public:
 	DECLARE_DRIVER_INIT(luplup);
 	DECLARE_DRIVER_INIT(luplup29);
 	DECLARE_DRIVER_INIT(puzlbang);
-	DECLARE_DRIVER_INIT(puzlbanga);
 	DECLARE_DRIVER_INIT(toyland);
 	DECLARE_DRIVER_INIT(aoh);
 	DECLARE_DRIVER_INIT(finalgdr);
@@ -2594,14 +2593,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,luplup29)
 DRIVER_INIT_MEMBER(vamphalf_state,puzlbang)
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00113f14, 0x00113f17, read16_delegate(FUNC(vamphalf_state::puzlbang_speedup_r), this));
-
-	m_palshift = 8;
-	/* no flipscreen */
-}
-
-DRIVER_INIT_MEMBER(vamphalf_state,puzlbanga)
-{
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00113ecc, 0x00113ecf, read16_delegate(FUNC(vamphalf_state::puzlbang_speedup_r), this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00113ecc, 0x00113ecf, read16_delegate(FUNC(vamphalf_state::puzlbanga_speedup_r), this));
 
 	m_palshift = 8;
 	/* no flipscreen */
@@ -2720,7 +2712,7 @@ GAME( 1999, suplup,   0,        suplup,   common, vamphalf_state,   suplup,   RO
 GAME( 1999, luplup,   suplup,   suplup,   common, vamphalf_state,   luplup,   ROT0,   "Omega System",      "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 3.0 / 990128)", 0 )
 GAME( 1999, luplup29, suplup,   suplup,   common, vamphalf_state,   luplup29, ROT0,   "Omega System",      "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 2.9 / 990108)", 0 )
 GAME( 1999, puzlbang, suplup,   suplup,   common, vamphalf_state,   puzlbang, ROT0,   "Omega System",      "Puzzle Bang Bang (Korea, version 2.9 / 990108)", 0 )
-GAME( 1999, puzlbanga,suplup,   suplup,   common, vamphalf_state,   puzlbanga,ROT0,   "Omega System",      "Puzzle Bang Bang (Korea, version 2.8 / 990106)", 0 )
+GAME( 1999, puzlbanga,suplup,   suplup,   common, vamphalf_state,   puzlbang, ROT0,   "Omega System",      "Puzzle Bang Bang (Korea, version 2.8 / 990106)", 0 )
 GAME( 1999, vamphalf, 0,        vamphalf, common, vamphalf_state,   vamphalf, ROT0,   "Danbi / F2 System", "Vamf x1/2 (Europe)", 0 )
 GAME( 1999, vamphalfk,vamphalf, vamphalf, common, vamphalf_state,   vamphafk, ROT0,   "Danbi / F2 System", "Vamp x1/2 (Korea)", 0 )
 GAME( 2000, dquizgo2, 0,        coolmini, common, vamphalf_state,   dquizgo2, ROT0,   "SemiCom",           "Date Quiz Go Go Episode 2" , 0)
