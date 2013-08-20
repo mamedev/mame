@@ -132,7 +132,7 @@ void vt100_video_device::recompute_parameters()
 	rectangle visarea;
 
 	horiz_pix_total = m_columns * 10;
-	vert_pix_total  = 25 * 10;
+	vert_pix_total  = m_height * 10;
 
 	visarea.set(0, horiz_pix_total - 1, 0, vert_pix_total - 1);
 
@@ -190,11 +190,28 @@ WRITE8_MEMBER( vt100_video_device::dc012_w )
 				// set basic attribute to reverse video
 				m_basic_attribute = 1;
 				m_blink_flip_flop = 0;
+				if (m_height != 25)
+				{
+					m_height = 25;  // -1 = 24 lines (default)
+					recompute_parameters();
+  				}
 				break;
 			case 0x0e:
+			    // (DC12) : not supported 
+				break;
 			case 0x0f:
-				// reserved for future specification
+				// (VT100) : reserved for future specification 
+				
+				// (DEC Rainbow 100) : set basic attribute to reverse video / blink flip-flop off
+				m_basic_attribute = 1;
 				m_blink_flip_flop = 0;
+				
+				// (DEC Rainbow 100) : 48 line display 
+				if (m_height != 49)
+				{
+					m_height = 49;  
+					recompute_parameters();
+				}
 				break;
 		}
 	}
@@ -364,10 +381,20 @@ void vt100_video_device::video_update(bitmap_ind16 &bitmap, const rectangle &cli
 
 }
 
+// 5 possible character states (normal, reverse, bold, blink, underline) are encoded into display_type.
+// TODO: bold not implemented yet -
 void rainbow_video_device::display_char(bitmap_ind16 &bitmap, UINT8 code, int x, int y, UINT8 scroll_region, UINT8 display_type)
 {
 	UINT8 line = 0;
-	int bit = 0, j;
+	int bit = 0, j, invert, blink, underline;
+
+	invert = display_type & 4;     // BIT 2 indicates REVERSE
+//	bold   = display_type & 8;     // BIT 3 indicates BOLD
+	blink  = display_type & 16;    // BIT 4 indicates BLINK
+	underline = display_type & 32; // BIT 5 indicates UNDERLINE
+
+	display_type = display_type & 3;
+
 	int double_width = (display_type == 2) ? 1 : 0;
 
 	for (int i = 0; i < 10; i++)
@@ -387,13 +414,28 @@ void rainbow_video_device::display_char(bitmap_ind16 &bitmap, UINT8 code, int x,
 		if (j == 0) j = 15; else j = j - 1;
 
 		line = m_gfx[code * 16 + j];
-		if (m_basic_attribute == 1)
+		if ( i == 8 ) 
+		{  
+		  if ( underline != 0  ) line = 0xff;
+		}
+		
+		// TODO: test if basic attribute behaves the same on DEC-100 
+		if ( m_basic_attribute == 1 ) 
 		{
-			if ((code & 0x80) == 0x80)
 			{
 				line = line ^ 0xff;
 			}
 		}
+
+	   	if (m_blink_flip_flop > 0)
+		{
+ 		   if ( blink != 0 ) 
+		   {
+			 line = line ^ 0xff;
+		   }
+		}
+		if (invert != 0) 
+			   line = line ^ 0xff;
 
 		for (int b = 0; b < 8; b++)
 		{
@@ -471,7 +513,19 @@ void rainbow_video_device::video_update(bitmap_ind16 &bitmap, const rectangle &c
 			// display regular char
 			if (line >= m_skip_lines)
 			{
-				display_char(bitmap, code, xpos, ypos, scroll_region, display_type);
+				attr_addr = 0x1000 | ( (addr + xpos) & 0x0fff );
+				temp = m_in_ram_func(attr_addr); // get character attribute
+
+				// TODO: check if reverse bit is treated the same way on real hardware 
+				// 1 = display char. in REVERSE   (encoded as 4)
+				// 0 = display char. in BOLD      (encoded as 8)
+				// 0 = display char. w. BLINK     (encoded as 16)
+				// 0 = display char. w. UNDERLINE (encoded as 32).  
+			  display_char(bitmap, code, xpos, ypos, scroll_region, display_type | ( (  (temp & 1)) << 2 )
+											     | ( (2-(temp & 2)) << 2 )
+											     | ( (4-(temp & 4)) << 2 )
+											     | ( (8-(temp & 8)) << 2 )
+				       );
 			}
 			xpos++;
 			if (xpos > m_columns)
