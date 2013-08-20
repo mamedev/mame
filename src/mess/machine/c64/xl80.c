@@ -1,7 +1,7 @@
 /*
 
 XL 80 cartridge
-(c) 1984 20 Data Corporation
+(c) 1984 Data 20 Corporation
 
 PCB Layout
 ----------
