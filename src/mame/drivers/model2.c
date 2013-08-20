@@ -147,6 +147,32 @@ static int copro_fifoin_pop(device_t *device, UINT32 *result)
 	return 1;
 }
 
+READ_LINE_MEMBER(model2_state::copro_tgp_fifoin_pop_ok)
+{
+	if (m_copro_fifoin_num == 0)
+	{
+		return CLEAR_LINE;
+	}
+
+	return ASSERT_LINE;
+}
+
+
+READ32_MEMBER(model2_state::copro_tgp_fifoin_pop)
+{
+	UINT32 r = m_copro_fifoin_data[m_copro_fifoin_rpos++];
+
+	if (m_copro_fifoin_rpos == COPRO_FIFOIN_SIZE)
+	{
+		m_copro_fifoin_rpos = 0;
+	}
+
+	m_copro_fifoin_num--;
+
+	return r;
+}
+
+
 static void copro_fifoin_push(device_t *device, UINT32 data)
 {
 	model2_state *state = device->machine().driver_data<model2_state>();
@@ -254,6 +280,25 @@ static void copro_fifoout_push(device_t *device, UINT32 data)
 			//device->execute().set_input_line(SHARC_INPUT_FLAG1, CLEAR_LINE);
 		}
 	}
+}
+
+WRITE32_MEMBER(model2_state::copro_tgp_fifoout_push)
+{
+	if (m_copro_fifoout_num == COPRO_FIFOOUT_SIZE)
+	{
+		fatalerror("Copro FIFOOUT overflow (at %08X)\n", m_tgp->pc());
+		return;
+	}
+
+//	logerror("COPRO FIFOOUT PUSH %08X, %f, %d\n", data, *(float*)&data,m_copro_fifoout_num);
+
+	m_copro_fifoout_data[m_copro_fifoout_wpos++] = data;
+	if (m_copro_fifoout_wpos == COPRO_FIFOOUT_SIZE)
+	{
+		m_copro_fifoout_wpos = 0;
+	}
+
+	m_copro_fifoout_num++;
 }
 
 /* Timers - these count down at 25 MHz and pull IRQ2 when they hit 0 */
@@ -1951,15 +1996,6 @@ ADDRESS_MAP_END
 
 /*****************************************************************************/
 
-static const mb86233_cpu_core tgp_config =
-{
-	copro_fifoin_pop,
-	copro_fifoout_push,
-	"user5",
-};
-
-
-
 /* original Model 2 */
 static MACHINE_CONFIG_START( model2o, model2_state )
 	MCFG_CPU_ADD("maincpu", I960, 25000000)
@@ -1970,8 +2006,12 @@ static MACHINE_CONFIG_START( model2o, model2_state )
 	MCFG_CPU_PROGRAM_MAP(model1_snd)
 
 	MCFG_CPU_ADD("tgp", MB86233, 16000000)
-	MCFG_CPU_CONFIG(tgp_config)
 	MCFG_CPU_PROGRAM_MAP(copro_tgp_map)
+	MCFG_MB86233_FIFO_READ_CB(READ32(model2_state,copro_tgp_fifoin_pop))
+	MCFG_MB86233_FIFO_READ_OK_CB(READLINE(model2_state,copro_tgp_fifoin_pop_ok))
+	MCFG_MB86233_FIFO_WRITE_CB(WRITE32(model2_state,copro_tgp_fifoout_push))
+	MCFG_MB86233_TABLE_REGION("user5")
+
 
 	MCFG_MACHINE_START_OVERRIDE(model2_state,model2)
 	MCFG_MACHINE_RESET_OVERRIDE(model2_state,model2o)
@@ -2029,8 +2069,12 @@ static MACHINE_CONFIG_START( model2a, model2_state )
 	MCFG_CPU_PROGRAM_MAP(model2_snd)
 
 	MCFG_CPU_ADD("tgp", MB86233, 16000000)
-	MCFG_CPU_CONFIG(tgp_config)
 	MCFG_CPU_PROGRAM_MAP(copro_tgp_map)
+	MCFG_MB86233_FIFO_READ_CB(READ32(model2_state,copro_tgp_fifoin_pop))
+	MCFG_MB86233_FIFO_READ_OK_CB(READLINE(model2_state,copro_tgp_fifoin_pop_ok))
+	MCFG_MB86233_FIFO_WRITE_CB(WRITE32(model2_state,copro_tgp_fifoout_push))
+	MCFG_MB86233_TABLE_REGION("user5")
+
 
 	MCFG_MACHINE_START_OVERRIDE(model2_state,model2)
 	MCFG_MACHINE_RESET_OVERRIDE(model2_state,model2)

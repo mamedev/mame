@@ -1594,8 +1594,11 @@ static MACHINE_CONFIG_START( model1_vr, model1_state )
 	MCFG_CPU_PROGRAM_MAP(model1_snd)
 
 	MCFG_CPU_ADD("tgp", MB86233, 16000000)
-	MCFG_CPU_CONFIG(model1_vr_tgp_config)
 	MCFG_CPU_PROGRAM_MAP(model1_vr_tgp_map)
+	MCFG_MB86233_FIFO_READ_CB(READ32(model1_state,copro_fifoin_pop))
+	MCFG_MB86233_FIFO_READ_OK_CB(READLINE(model1_state,copro_fifoin_pop_ok))
+	MCFG_MB86233_FIFO_WRITE_CB(WRITE32(model1_state,copro_fifoout_push))
+	MCFG_MB86233_TABLE_REGION("user5")
 
 	MCFG_MACHINE_START_OVERRIDE(model1_state,model1)
 	MCFG_MACHINE_RESET_OVERRIDE(model1_state,model1_vr)

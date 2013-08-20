@@ -2047,29 +2047,30 @@ void model1_vr_tgp_reset( running_machine &machine )
 }
 
 /* FIFO */
-static int copro_fifoin_pop(device_t *device, UINT32 *result)
+READ_LINE_MEMBER(model1_state::copro_fifoin_pop_ok)
 {
-	model1_state *state = device->machine().driver_data<model1_state>();
-	UINT32 r;
-
-	if (state->m_copro_fifoin_num == 0)
+	if (m_copro_fifoin_num == 0)
 	{
-		return 0;
+		return CLEAR_LINE;
 	}
 
-	r = state->m_copro_fifoin_data[state->m_copro_fifoin_rpos++];
-
-	if (state->m_copro_fifoin_rpos == FIFO_SIZE)
-	{
-		state->m_copro_fifoin_rpos = 0;
-	}
-
-	state->m_copro_fifoin_num--;
-
-	*result = r;
-
-	return 1;
+	return ASSERT_LINE;
 }
+
+READ32_MEMBER(model1_state::copro_fifoin_pop)
+{
+	UINT32 r = m_copro_fifoin_data[m_copro_fifoin_rpos++];
+
+	if (m_copro_fifoin_rpos == FIFO_SIZE)
+	{
+		m_copro_fifoin_rpos = 0;
+	}
+
+	m_copro_fifoin_num--;
+
+	return r;
+}
+
 
 static void copro_fifoin_push(address_space &space, UINT32 data)
 {
@@ -2117,23 +2118,22 @@ static UINT32 copro_fifoout_pop(address_space &space)
 	return r;
 }
 
-static void copro_fifoout_push(device_t *device, UINT32 data)
+WRITE32_MEMBER(model1_state::copro_fifoout_push)
 {
-	model1_state *state = device->machine().driver_data<model1_state>();
-	if (state->m_copro_fifoout_num == FIFO_SIZE)
+	if (m_copro_fifoout_num == FIFO_SIZE)
 	{
-		fatalerror("Copro FIFOOUT overflow (at %08X)\n", device->safe_pc());
+		fatalerror("Copro FIFOOUT overflow (at %08X)\n", m_tgp->pc());
 		return;
 	}
 
-	state->m_copro_fifoout_data[state->m_copro_fifoout_wpos++] = data;
+	m_copro_fifoout_data[m_copro_fifoout_wpos++] = data;
 
-	if (state->m_copro_fifoout_wpos == FIFO_SIZE)
+	if (m_copro_fifoout_wpos == FIFO_SIZE)
 	{
-		state->m_copro_fifoout_wpos = 0;
+		m_copro_fifoout_wpos = 0;
 	}
 
-	state->m_copro_fifoout_num++;
+	m_copro_fifoout_num++;
 }
 
 READ32_MEMBER(model1_state::copro_ram_r)
@@ -2221,14 +2221,6 @@ WRITE16_MEMBER(model1_state::model1_vr_tgp_w)
 	else
 		m_vr_w = (m_vr_w & 0xffff0000) | data;
 }
-
-/* TGP config */
-const mb86233_cpu_core model1_vr_tgp_config =
-{
-	copro_fifoin_pop,
-	copro_fifoout_push,
-	"user5"
-};
 
 /* TGP memory map */
 ADDRESS_MAP_START( model1_vr_tgp_map, AS_PROGRAM, 32, model1_state )

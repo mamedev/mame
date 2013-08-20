@@ -16,6 +16,7 @@ public:
 		m_multipcm_1(*this, "sega1"),
 		m_multipcm_2(*this, "sega2"),
 		m_dsbz80(*this, DSBZ80_TAG),
+		m_tgp(*this, "tgp"),
 		m_mr2(*this, "mr2"),
 		m_mr(*this, "mr"),
 		m_display_list0(*this, "display_list0"),
@@ -27,6 +28,7 @@ public:
 	required_device<multipcm_device> m_multipcm_1;
 	required_device<multipcm_device> m_multipcm_2;
 	optional_device<dsbz80_device> m_dsbz80;    // Digital Sound Board
+	optional_device<mb86233_cpu_device> m_tgp;
 
 	required_shared_ptr<UINT16> m_mr2;
 	required_shared_ptr<UINT16> m_mr;
@@ -148,12 +150,14 @@ public:
 	void irq_raise(int level);
 	void irq_init();
 	IRQ_CALLBACK_MEMBER(irq_callback);
+	DECLARE_READ_LINE_MEMBER(copro_fifoin_pop_ok);
+	DECLARE_READ32_MEMBER(copro_fifoin_pop);
+	DECLARE_WRITE32_MEMBER(copro_fifoout_push);
 };
 
 
 /*----------- defined in machine/model1.c -----------*/
 
-extern const mb86233_cpu_core model1_vr_tgp_config;
 ADDRESS_MAP_EXTERN( model1_vr_tgp_map, 32 );
 
 void model1_vr_tgp_reset( running_machine &machine );

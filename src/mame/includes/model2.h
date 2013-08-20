@@ -189,6 +189,9 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(model2c_interrupt);
 	void model2_exit();
 	DECLARE_WRITE_LINE_MEMBER(scsp_irq);
+	DECLARE_READ_LINE_MEMBER(copro_tgp_fifoin_pop_ok);
+	DECLARE_READ32_MEMBER(copro_tgp_fifoin_pop);
+	DECLARE_WRITE32_MEMBER(copro_tgp_fifoout_push);
 };
 
 /*----------- defined in video/model2.c -----------*/
