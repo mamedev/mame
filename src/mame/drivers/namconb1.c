@@ -25,7 +25,7 @@ Known games using this hardware:
 - Super World Stadium '95
 - Super World Stadium '96
 - Super World Stadium '97
-- OutFoxies
+- The Outfoxies
 - Mach Breakers
 
 *****************************************************
@@ -194,7 +194,7 @@ Location      Setting       Alt. Setting
 Namco System NB2
 
 Games running on this hardware:
-- Outfoxies
+- The Outfoxies
 - Mach Breakers
 
 Changes from Namcon System NB1 include:
@@ -2031,6 +2031,6 @@ GAME( 1997, sws97,    0,        namconb1, nbsports, namconb1_state, sws97,    RO
 GAME( 1994, vshoot,   0,        namconb1, namconb1, namconb1_state, vshoot,   ROT0,  "Namco", "J-League Soccer V-Shoot (Japan)", GAME_IMPERFECT_SOUND )
 
 /*     YEAR, NAME,     PARENT,   MACHINE,  INPUT,    INIT,     MNTR,  COMPANY, FULLNAME,   FLAGS */
-GAME( 1994, outfxies, 0,        namconb2, outfxies, namconb1_state, outfxies, ROT0, "Namco", "Outfoxies (World, OU2)", GAME_IMPERFECT_SOUND )
-GAME( 1994, outfxiesj,outfxies, namconb2, outfxies, namconb1_state, outfxies, ROT0, "Namco", "Outfoxies (Japan, OU1)", GAME_IMPERFECT_SOUND )
+GAME( 1994, outfxies, 0,        namconb2, outfxies, namconb1_state, outfxies, ROT0, "Namco", "The Outfoxies (World, OU2)", GAME_IMPERFECT_SOUND )
+GAME( 1994, outfxiesj,outfxies, namconb2, outfxies, namconb1_state, outfxies, ROT0, "Namco", "The Outfoxies (Japan, OU1)", GAME_IMPERFECT_SOUND )
 GAME( 1995, machbrkr, 0,        namconb2, namconb1, namconb1_state, machbrkr, ROT0, "Namco", "Mach Breakers - Numan Athletics 2 (Japan)", GAME_IMPERFECT_SOUND )
