@@ -58,6 +58,8 @@
 #define MCFG_MACHINE_RESET_OVERRIDE(_class, _func) \
 	driver_device::static_set_callback(config.root_device(), driver_device::CB_MACHINE_RESET, driver_callback_delegate(&_class::MACHINE_RESET_NAME(_func), #_class "::machine_reset_" #_func, downcast<_class *>(owner)));
 
+#define MCFG_MACHINE_RESET_REMOVE() \
+	driver_device::static_set_callback(config.root_device(), driver_device::CB_MACHINE_RESET, driver_callback_delegate());
 
 // core sound callbacks
 #define MCFG_SOUND_START_OVERRIDE(_class, _func) \

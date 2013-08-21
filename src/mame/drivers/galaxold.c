@@ -370,7 +370,6 @@ Stephh's notes (based on the games Z80 code and some tests) for other games :
 #include "sound/dac.h"
 #include "audio/galaxian.h"
 #include "includes/galaxold.h"
-#include "drivlgcy.h"
 
 
 /*************************************
@@ -2527,7 +2526,7 @@ static MACHINE_CONFIG_DERIVED( ozon1, galaxold_base )
 	MCFG_CPU_IO_MAP(ozon1_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaxold_state,  nmi_line_pulse)
 
-	MCFG_MACHINE_RESET(0)
+	MCFG_MACHINE_RESET_REMOVE()
 
 	MCFG_PALETTE_INIT_OVERRIDE(galaxold_state,rockclim)
 	MCFG_PALETTE_LENGTH(32)
