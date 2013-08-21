@@ -6501,6 +6501,7 @@ src/mess/drivers/sapi1.c svneol=native#text/plain
 src/mess/drivers/saturn.c svneol=native#text/plain
 src/mess/drivers/savia84.c svneol=native#text/plain
 src/mess/drivers/sbc6510.c svneol=native#text/plain
+src/mess/drivers/sbrain.c svneol=native#text/plain
 src/mess/drivers/sc1.c svneol=native#text/plain
 src/mess/drivers/sc2.c svneol=native#text/plain
 src/mess/drivers/scorpion.c svneol=native#text/plain
