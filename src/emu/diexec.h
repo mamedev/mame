@@ -122,9 +122,6 @@ enum
 	device_execute_interface::static_set_vblank_int(*device, device_interrupt_delegate(&_class::_func, #_class "::" #_func, _devtag, (_class *)0), _tag);
 #define MCFG_DEVICE_VBLANK_INT_REMOVE()  \
 	device_execute_interface::static_set_vblank_int(*device, device_interrupt_delegate(), NULL);
-// legacy
-#define MCFG_DEVICE_PERIODIC_INT(_func, _rate)  \
-	device_execute_interface::static_set_periodic_int(*device, _func, attotime::from_hz(_rate));
 #define MCFG_DEVICE_PERIODIC_INT_DRIVER(_class, _func, _rate) \
 	device_execute_interface::static_set_periodic_int(*device, device_interrupt_delegate(&_class::_func, #_class "::" #_func, DEVICE_SELF, (_class *)0), attotime::from_hz(_rate));
 #define MCFG_DEVICE_PERIODIC_INT_DEVICE(_devtag, _class, _func, _rate) \
@@ -143,7 +140,6 @@ class screen_device;
 
 // interrupt callback for VBLANK and timed interrupts
 typedef device_delegate<void (device_t &)> device_interrupt_delegate;
-typedef void (*device_interrupt_func)(device_t *device); // legacy
 
 // IRQ callback to be called by executing devices when an IRQ is actually taken
 typedef device_delegate<int (device_t &, int)> device_irq_acknowledge_delegate;
@@ -179,7 +175,6 @@ public:
 	static void static_set_disable(device_t &device);
 	static void static_set_vblank_int(device_t &device, device_interrupt_delegate function, const char *tag, int rate = 0);
 	static void static_remove_vblank_int(device_t &device);
-	static void static_set_periodic_int(device_t &device, device_interrupt_func function, attotime rate); // legacy
 	static void static_set_periodic_int(device_t &device, device_interrupt_delegate function, attotime rate);
 	static void static_remove_periodic_int(device_t &device);
 
@@ -290,7 +285,6 @@ protected:
 	device_interrupt_delegate m_vblank_interrupt;       // for interrupts tied to VBLANK
 	const char *            m_vblank_interrupt_screen;  // the screen that causes the VBLANK interrupt
 	device_interrupt_delegate m_timed_interrupt;        // for interrupts not tied to VBLANK
-	device_interrupt_func   m_timed_interrupt_legacy;   // for interrupts not tied to VBLANK
 	attotime                m_timed_interrupt_period;   // period for periodic interrupts
 	bool                    m_is_octal;                 // to determine if messages/debugger will show octal or hex
 

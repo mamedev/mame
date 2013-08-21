@@ -74,7 +74,6 @@ device_execute_interface::device_execute_interface(const machine_config &mconfig
 	: device_interface(device),
 		m_disabled(false),
 		m_vblank_interrupt_screen(NULL),
-		m_timed_interrupt_legacy(NULL),
 		m_timed_interrupt_period(attotime::zero),
 		m_is_octal(false),
 		m_nextexec(NULL),
@@ -146,22 +145,12 @@ void device_execute_interface::static_set_vblank_int(device_t &device, device_in
 //  to set up periodic interrupts on the device
 //-------------------------------------------------
 
-void device_execute_interface::static_set_periodic_int(device_t &device, device_interrupt_func function, attotime rate)
-{
-	device_execute_interface *exec;
-	if (!device.interface(exec))
-		throw emu_fatalerror("MCFG_DEVICE_PERIODIC_INT called on device '%s' with no execute interface", device.tag());
-	exec->m_timed_interrupt_legacy = function;
-	exec->m_timed_interrupt_period = rate;
-}
-
 void device_execute_interface::static_set_periodic_int(device_t &device, device_interrupt_delegate function, attotime rate)
 {
 	device_execute_interface *exec;
 	if (!device.interface(exec))
 		throw emu_fatalerror("MCFG_DEVICE_PERIODIC_INT called on device '%s' with no execute interface", device.tag());
 	exec->m_timed_interrupt = function;
-	exec->m_timed_interrupt_legacy = NULL;
 	exec->m_timed_interrupt_period = rate;
 }
 
@@ -506,9 +495,9 @@ void device_execute_interface::interface_validity_check(validity_checker &valid)
 			mame_printf_error("VBLANK interrupt references a non-existant screen tag '%s'\n", m_vblank_interrupt_screen);
 	}
 
-	if ((!m_timed_interrupt.isnull() || m_timed_interrupt_legacy != NULL) && m_timed_interrupt_period == attotime::zero)
+	if (!m_timed_interrupt.isnull() && m_timed_interrupt_period == attotime::zero)
 		mame_printf_error("Timed interrupt handler specified with 0 period\n");
-	else if ((m_timed_interrupt.isnull() && m_timed_interrupt_legacy == NULL) && m_timed_interrupt_period != attotime::zero)
+	else if (m_timed_interrupt.isnull() && m_timed_interrupt_period != attotime::zero)
 		mame_printf_error("No timer interrupt handler specified, but has a non-0 period given\n");
 }
 
@@ -755,9 +744,7 @@ void device_execute_interface::trigger_periodic_interrupt()
 	// bail if there is no routine
 	if (!suspended(SUSPEND_REASON_HALT | SUSPEND_REASON_RESET | SUSPEND_REASON_DISABLE | SUSPEND_REASON_CLOCK))
 	{
-		if (m_timed_interrupt_legacy != NULL)
-			(*m_timed_interrupt_legacy)(&device());
-		else if (!m_timed_interrupt.isnull())
+		if (!m_timed_interrupt.isnull())
 			m_timed_interrupt(device());
 	}
 }
