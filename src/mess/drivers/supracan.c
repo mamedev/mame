@@ -128,6 +128,11 @@ public:
 	DECLARE_WRITE16_MEMBER(supracan_68k_soundram_w);
 	DECLARE_READ8_MEMBER(supracan_6502_soundmem_r);
 	DECLARE_WRITE8_MEMBER(supracan_6502_soundmem_w);
+
+	void supracan_dma_w(address_space &space, int offset, UINT16 data, UINT16 mem_mask, int ch);
+	WRITE16_MEMBER( supracan_dma_channel0_w );
+	WRITE16_MEMBER( supracan_dma_channel1_w );
+
 	DECLARE_WRITE16_MEMBER(supracan_dma_w);
 	DECLARE_READ16_MEMBER(supracan_sound_r);
 	DECLARE_WRITE16_MEMBER(supracan_sound_w);
@@ -984,45 +989,38 @@ UINT32 supracan_state::screen_update_supracan(screen_device &screen, bitmap_ind1
 }
 
 
-WRITE16_MEMBER( supracan_state::supracan_dma_w )
+void supracan_state::supracan_dma_w(address_space &space, int offset, UINT16 data, UINT16 mem_mask, int ch)
 {
 	acan_dma_regs_t *acan_dma_regs = &m_acan_dma_regs;
-	int ch = (offset < 0x10/2) ? 0 : 1;
 	address_space &mem = m_maincpu->space(AS_PROGRAM);
 
 	switch(offset)
 	{
 		case 0x00/2: // Source address MSW
-		case 0x10/2:
 			verboselog("maincpu", 0, "supracan_dma_w: source msw %d: %04x\n", ch, data);
 			acan_dma_regs->source[ch] &= 0x0000ffff;
 			acan_dma_regs->source[ch] |= data << 16;
 			break;
 		case 0x02/2: // Source address LSW
-		case 0x12/2:
 			verboselog("maincpu", 0, "supracan_dma_w: source lsw %d: %04x\n", ch, data);
 			acan_dma_regs->source[ch] &= 0xffff0000;
 			acan_dma_regs->source[ch] |= data;
 			break;
 		case 0x04/2: // Destination address MSW
-		case 0x14/2:
 			verboselog("maincpu", 0, "supracan_dma_w: dest msw %d: %04x\n", ch, data);
 			acan_dma_regs->dest[ch] &= 0x0000ffff;
 			acan_dma_regs->dest[ch] |= data << 16;
 			break;
 		case 0x06/2: // Destination address LSW
-		case 0x16/2:
 			verboselog("maincpu", 0, "supracan_dma_w: dest lsw %d: %04x\n", ch, data);
 			acan_dma_regs->dest[ch] &= 0xffff0000;
 			acan_dma_regs->dest[ch] |= data;
 			break;
 		case 0x08/2: // Byte count
-		case 0x18/2:
 			verboselog("maincpu", 0, "supracan_dma_w: count %d: %04x\n", ch, data);
 			acan_dma_regs->count[ch] = data;
 			break;
 		case 0x0a/2: // Control
-		case 0x1a/2:
 			verboselog("maincpu", 0, "supracan_dma_w: control %d: %04x\n", ch, data);
 			if(data & 0x8800)
 			{
@@ -1060,6 +1058,17 @@ WRITE16_MEMBER( supracan_state::supracan_dma_w )
 			break;
 	}
 }
+
+WRITE16_MEMBER( supracan_state::supracan_dma_channel0_w )
+{
+	supracan_dma_w(space,offset,data,mem_mask,0);
+}
+
+WRITE16_MEMBER( supracan_state::supracan_dma_channel1_w )
+{
+	supracan_dma_w(space,offset,data,mem_mask,1);
+}
+
 
 #if 0
 WRITE16_MEMBER( supracan_state::supracan_pram_w )
@@ -1114,7 +1123,9 @@ static ADDRESS_MAP_START( supracan_mem, AS_PROGRAM, 16, supracan_state )
 	AM_RANGE( 0xe8020c, 0xe8020d ) AM_READ_PORT("P4")
 	AM_RANGE( 0xe80000, 0xe8ffff ) AM_READWRITE( supracan_68k_soundram_r, supracan_68k_soundram_w )
 	AM_RANGE( 0xe90000, 0xe9001f ) AM_READWRITE( supracan_sound_r, supracan_sound_w )
-	AM_RANGE( 0xe90020, 0xe9003f ) AM_WRITE( supracan_dma_w )
+	AM_RANGE( 0xe90020, 0xe9002f ) AM_WRITE( supracan_dma_channel0_w )
+	AM_RANGE( 0xe90030, 0xe9003f ) AM_WRITE( supracan_dma_channel1_w )
+	
 	AM_RANGE( 0xf00000, 0xf001ff ) AM_READWRITE( supracan_video_r, supracan_video_w )
 	AM_RANGE( 0xf00200, 0xf003ff ) AM_RAM AM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE( 0xf40000, 0xf5ffff ) AM_READWRITE(supracan_vram_r, supracan_vram_w)
@@ -1552,6 +1563,9 @@ WRITE16_MEMBER( supracan_state::supracan_video_w )
 	// if any of this changes we need a partial update (see sango fighters intro)
 	machine().primary_screen->update_partial(machine().primary_screen->vpos());
 
+	COMBINE_DATA(&m_video_regs[offset]);
+	data = m_video_regs[offset];
+
 	switch(offset)
 	{
 		case 0x10/2: // Byte count
@@ -1724,7 +1738,7 @@ WRITE16_MEMBER( supracan_state::supracan_video_w )
 			verboselog("maincpu", 0, "supracan_video_w: Unknown register: %08x = %04x & %04x\n", 0xf00000 + (offset << 1), data, mem_mask);
 			break;
 	}
-	m_video_regs[offset] = data;
+//	m_video_regs[offset] = data;
 }
 
 

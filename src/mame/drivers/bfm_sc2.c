@@ -5343,7 +5343,7 @@ ROM_START( sc2cpe3 )
 	ROM_LOAD( "club-public-enemy-no1_std_ac_200pnd_ass.bin", 0x0000, 0x010000, CRC(5704e52d) SHA1(dfae48734794cea2e9a952d808dedb96fd5204b3) )
 
 	ROM_REGION( 0x20000, "matrix", 0 )
-	ROM_LOAD( "matrix.bin", 0x0000, 0x010000, CRC(64014f73) SHA1(67d44db91944738fcadc38bfd0d2b7c0536adb9a) )
+	ROM_LOAD( "matrix.bin", 0x0000, 0x010000, CRC(64014f73) SHA1(67d44db91944738fcadc38bfd0d2b7c0536adb9a) ) // seems to be from a cops+robbers instead, will say 'wrong display prom' during attract cycle
 
 	sc2_cpe_sound_alt2
 ROM_END
@@ -5353,7 +5353,7 @@ ROM_START( sc2cpe3p )
 	ROM_LOAD( "club-public-enemy-no1_dat_ac_200pnd_ass.bin", 0x0000, 0x010000, CRC(fec925a3) SHA1(5ce3b6f1236f511ae8975c7ecd1549e8d427a245) )
 
 	ROM_REGION( 0x20000, "matrix", 0 )
-	ROM_LOAD( "matrix.bin", 0x0000, 0x010000, CRC(64014f73) SHA1(67d44db91944738fcadc38bfd0d2b7c0536adb9a) )
+	ROM_LOAD( "matrix.bin", 0x0000, 0x010000, CRC(64014f73) SHA1(67d44db91944738fcadc38bfd0d2b7c0536adb9a) ) // see above comment
 
 	sc2_cpe_sound_alt2
 ROM_END
@@ -5363,7 +5363,7 @@ ROM_START( sc2cpe4 )
 	ROM_LOAD( "95750273.p1", 0x0000, 0x010000, CRC(950da13c) SHA1(2c544e06112969f7914a5b4fd15e6b0dfedf6b0b) )
 
 	ROM_REGION( 0x20000, "matrix", 0 )
-	ROM_LOAD( "matrix.bin", 0x0000, 0x010000, CRC(64014f73) SHA1(67d44db91944738fcadc38bfd0d2b7c0536adb9a) )
+	ROM_LOAD( "matrix.bin", 0x0000, 0x010000, CRC(64014f73) SHA1(67d44db91944738fcadc38bfd0d2b7c0536adb9a) ) // see above comment
 
 	sc2_cpe_sound_alt2
 ROM_END
@@ -5373,7 +5373,7 @@ ROM_START( sc2cpe4p )
 	ROM_LOAD( "club-public-enemy-no1_dat_fe_ac_200pnd_p65_rot_ass.bin", 0x0000, 0x010000, CRC(8d5ff953) SHA1(bdf6b5e014c46f6abac792a5913e98cb897b2a73) )
 
 	ROM_REGION( 0x20000, "matrix", 0 )
-	ROM_LOAD( "matrix.bin", 0x0000, 0x010000, CRC(64014f73) SHA1(67d44db91944738fcadc38bfd0d2b7c0536adb9a) )
+	ROM_LOAD( "matrix.bin", 0x0000, 0x010000, CRC(64014f73) SHA1(67d44db91944738fcadc38bfd0d2b7c0536adb9a) ) // see above comment
 
 	sc2_cpe_sound_alt2
 ROM_END
