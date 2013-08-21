@@ -11,6 +11,7 @@
 #include "machine/nvram.h"
 #include "machine/68307.h"
 #include "machine/68340.h"
+#include "video/bfm_dm01.h"
 
 // common base class for things shared between sc4 and sc5
 class bfm_sc45_state : public driver_device
@@ -20,6 +21,7 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_duart(*this, "duart68681"),
 			m_vfd0(*this, "vfd0"),
+			m_dm01(*this, "dm01"),
 			m_ymz(*this, "ymz")
 	{
 	}
@@ -28,6 +30,7 @@ public:
 
 	required_device<duart68681_device> m_duart;
 	optional_device<bfm_bda_t> m_vfd0;
+	optional_device<bfmdm01_device> m_dm01;
 	required_device<ymz280b_device> m_ymz;
 
 	// serial vfd

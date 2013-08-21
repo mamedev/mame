@@ -38,7 +38,6 @@
 
 #include "emu.h"
 #include "includes/bfm_sc45.h"
-#include "video/bfm_dm01.h"
 
 
 bool compare_mbus(UINT16* rom)
@@ -188,18 +187,6 @@ int find_project_string(running_machine &machine, int addrxor, int mode)
 
 	return 0;
 }
-
-/* default dmd */
-static void bfmdm01_busy(running_machine &machine, int state)
-{
-	// Must tie back to inputs somehow!
-}
-
-static const bfmdm01_interface dm01_interface =
-{
-	bfmdm01_busy
-};
-
 
 /* default reels */
 static const stepper_interface* default_reel_configs[6] =
@@ -24337,7 +24324,6 @@ static const stepper_interface* sc4crcc_reel_configs[6] =
 
 DRIVER_INIT_MEMBER(sc4_state,sc4crcc)
 {
-	BFM_dm01_config(machine(), &dm01_interface);
 	DRIVER_INIT_CALL(sc4);
 	m_reel_setup = sc4crcc_reel_configs;
 }
@@ -25008,7 +24994,6 @@ static const stepper_interface* sc4fcc_reel_configs[6] =
 
 DRIVER_INIT_MEMBER(sc4_state,sc4fcc)
 {
-	BFM_dm01_config(machine(), &dm01_interface);
 	DRIVER_INIT_CALL(sc4);
 	m_reel_setup = sc4fcc_reel_configs;
 }
@@ -27552,7 +27537,6 @@ static const stepper_interface* sc4pen1_reel_configs[6] =
 
 DRIVER_INIT_MEMBER(sc4_state,sc4pen1)
 {
-//  BFM_dm01_config(machine(), &dm01_interface);
 	DRIVER_INIT_CALL(sc4);
 	m_reel_setup = sc4pen1_reel_configs;
 }
@@ -28714,7 +28698,6 @@ static const stepper_interface* sc4ticlb_reel_configs[6] =
 
 DRIVER_INIT_MEMBER(sc4_state,sc4ticlb)
 {
-	BFM_dm01_config(machine(), &dm01_interface);
 	DRIVER_INIT_CALL(sc4);
 	m_reel_setup = sc4ticlb_reel_configs;
 }
@@ -29206,7 +29189,6 @@ static const stepper_interface* sc4clbtm_reel_configs[6] =
 
 DRIVER_INIT_MEMBER(sc4_state,sc4clbtm)
 {
-	BFM_dm01_config(machine(), &dm01_interface);
 	DRIVER_INIT_CALL(sc4);
 	m_reel_setup = sc4clbtm_reel_configs;
 }

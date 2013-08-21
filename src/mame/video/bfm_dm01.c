@@ -40,7 +40,6 @@ Standard dm01 memorymap
 
 // local vars /////////////////////////////////////////////////////////////
 
-#define DM_BYTESPERROW 9
 #define DM_MAXLINES    21
 
 
@@ -52,57 +51,107 @@ Standard dm01 memorymap
 
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
-struct bfmdm01
+const device_type BF_DM01 = &device_creator<bfmdm01_device>;
+
+bfmdm01_device::bfmdm01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, BF_DM01, "Bellfruit Dotmatrix 01", tag, owner, clock, "bfm_dm01", __FILE__),
+	m_data_avail(0),
+	m_control(0),
+	m_xcounter(0),
+	m_busy(0),
+	m_comdata(0)
 {
-	const bfmdm01_interface *intf;
-	int      data_avail,
-				control,
-				xcounter,
-		segbuffer[65],
-					busy;
+	for (int i = 0; i < 65; i++)
+	m_segbuffer[i] = 0;
+	
+	for (int i = 0; i < DM_BYTESPERROW; i++)
+	m_scanline[i] = 0;
+}
 
-UINT8 scanline[DM_BYTESPERROW],
-		comdata;
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
 
-};
+void bfmdm01_device::device_config_complete()
+{
+	// inherit a copy of the static data
+	const bfmdm01_interface *intf = reinterpret_cast<const bfmdm01_interface *>(static_config());
+	if (intf != NULL)
+		*static_cast<bfmdm01_interface *>(this) = *intf;
 
-static bfmdm01 dm01;
-///////////////////////////////////////////////////////////////////////////
+	// or initialize to defaults if none provided
+	else
+	{
+	}
+}
 
-void BFM_dm01_config(running_machine &machine, const bfmdm01_interface *intf)
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void bfmdm01_device::device_start()
+{
+	save_item(NAME(m_data_avail));
+	save_item(NAME(m_control));
+	save_item(NAME(m_xcounter));
+	save_item(NAME(m_busy));
+	save_item(NAME(m_comdata));
+	for (int i = 0; i < 65; i++)
+	save_item(NAME(m_segbuffer), i);
+	for (int i = 0; i < DM_BYTESPERROW; i++)
+	save_item(NAME(m_scanline), i);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void bfmdm01_device::device_reset()
+{
+	m_busy     = 0;
+	m_control  = 0;
+	m_xcounter = 0;
+	m_data_avail = 0;
+
+	m_busy_func(machine(), m_busy);
+}
+
+/* void BFM_dm01_config(running_machine &machine, const bfmdm01_interface *intf)
 {
 	assert_always(machine.phase() == MACHINE_PHASE_INIT, "Can only call BFM_dm01_config at init time!");
 	assert_always(intf, "BFM_dm01_config called with an invalid interface!");
-	dm01.intf = intf;
+	m_intf = intf;
 	BFM_dm01_reset(machine);
 
-}
+} */
 
 ///////////////////////////////////////////////////////////////////////////
 
-static int read_data(void)
+int bfmdm01_device::read_data(void)
 {
-	int data = dm01.comdata;
+	int data = m_comdata;
 
-	dm01.data_avail = 0;
+	m_data_avail = 0;
 
 	return data;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-static READ8_HANDLER( control_r )
+READ8_MEMBER( bfmdm01_device::control_r )
 {
 	return 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-static WRITE8_HANDLER( control_w )
+WRITE8_MEMBER( bfmdm01_device::control_w )
 {
-	int changed = dm01.control ^ data;
+	int changed = m_control ^ data;
 
-	dm01.control = data;
+	m_control = data;
 
 	if ( changed & 2 )
 	{   // reset horizontal counter
@@ -110,53 +159,53 @@ static WRITE8_HANDLER( control_w )
 		{
 			//int offset = 0;
 
-			dm01.xcounter = 0;
+			m_xcounter = 0;
 		}
 	}
 
 	if ( changed & 8 )
 	{ // bit 3 changed = BUSY line
-		if ( data & 8 )   dm01.busy = 0;
-		else              dm01.busy = 1;
+		if ( data & 8 )   m_busy = 0;
+		else              m_busy = 1;
 
-		dm01.intf->busy_func(space.machine(),dm01.busy);
+		m_busy_func(machine(), m_busy);
 	}
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-static READ8_HANDLER( mux_r )
+READ8_MEMBER( bfmdm01_device::mux_r )
 {
 	return 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-static WRITE8_HANDLER( mux_w )
+WRITE8_MEMBER( bfmdm01_device::mux_w )
 {
-	if ( dm01.xcounter < DM_BYTESPERROW )
+	if ( m_xcounter < DM_BYTESPERROW )
 	{
-		dm01.scanline[dm01.xcounter] = data;
-		dm01.xcounter++;
+		m_scanline[m_xcounter] = data;
+		m_xcounter++;
 	}
-	if ( dm01.xcounter == 9 )
+	if ( m_xcounter == 9 )
 	{
 		int row = ((0xFF^data) & 0x7C) >> 2;    // 7C = 000001111100
-		dm01.scanline[8] &= 0x80;//filter all other bits
+		m_scanline[8] &= 0x80;//filter all other bits
 		if ( (row >= 0)  && (row < DM_MAXLINES) )
 		{
 			int p = 0;
 
 			while ( p < (DM_BYTESPERROW) )
 			{
-				UINT8 d = dm01.scanline[p];
+				UINT8 d = m_scanline[p];
 
 				for (int bitpos=0; bitpos <8; bitpos++)
 				{
 					if (((p*8)+bitpos) <65)
 					{
-						if (d & 1<<(7-bitpos)) dm01.segbuffer[(p*8)+bitpos]=1;
-						else dm01.segbuffer[(p*8)+bitpos]=0;
+						if (d & 1<<(7-bitpos)) m_segbuffer[(p*8)+bitpos]=1;
+						else m_segbuffer[(p*8)+bitpos]=0;
 					}
 				}
 				p++;
@@ -164,7 +213,7 @@ static WRITE8_HANDLER( mux_w )
 
 			for (int pos=0;pos<65;pos++)
 			{
-				output_set_indexed_value("dotmatrix", pos +(65*row), dm01.segbuffer[(pos)]);
+				output_set_indexed_value("dotmatrix", pos +(65*row), m_segbuffer[(pos)]);
 			}
 		}
 	}
@@ -172,16 +221,16 @@ static WRITE8_HANDLER( mux_w )
 
 ///////////////////////////////////////////////////////////////////////////
 
-static READ8_HANDLER( comm_r )
+READ8_MEMBER( bfmdm01_device::comm_r )
 {
 	int result = 0;
 
-	if ( dm01.data_avail )
+	if ( m_data_avail )
 	{
 		result = read_data();
 
 		#ifdef UNUSED_FUNCTION
-		if ( dm01.data_avail() )
+		if ( m_data_avail() )
 		{
 			cpu_set_irq_line(1, M6809_IRQ_LINE, ASSERT_LINE );  // trigger IRQ
 		}
@@ -193,64 +242,54 @@ static READ8_HANDLER( comm_r )
 
 ///////////////////////////////////////////////////////////////////////////
 
-static WRITE8_HANDLER( comm_w )
+WRITE8_MEMBER( bfmdm01_device::comm_w )
 {
 }
 ///////////////////////////////////////////////////////////////////////////
 
-static READ8_HANDLER( unknown_r )
+READ8_MEMBER( bfmdm01_device::unknown_r )
 {
 	return 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-static WRITE8_HANDLER( unknown_w )
+WRITE8_MEMBER( bfmdm01_device::unknown_w )
 {
 	space.machine().device("matrix")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE ); //?
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-ADDRESS_MAP_START( bfm_dm01_memmap, AS_PROGRAM, 8, driver_device )
+ADDRESS_MAP_START( bfm_dm01_memmap, AS_PROGRAM, 8, bfmdm01_device )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM                             // 8k RAM
-	AM_RANGE(0x2000, 0x2000) AM_READWRITE_LEGACY(control_r, control_w)  // control reg
-	AM_RANGE(0x2800, 0x2800) AM_READWRITE_LEGACY(mux_r,mux_w)           // mux
-	AM_RANGE(0x3000, 0x3000) AM_READWRITE_LEGACY(comm_r,comm_w)     //
-	AM_RANGE(0x3800, 0x3800) AM_READWRITE_LEGACY(unknown_r,unknown_w)   // ???
+	AM_RANGE(0x2000, 0x2000) AM_DEVREADWRITE("dm01", bfmdm01_device, control_r, control_w)  // control reg
+	AM_RANGE(0x2800, 0x2800) AM_DEVREADWRITE("dm01", bfmdm01_device, mux_r, mux_w)           // mux
+	AM_RANGE(0x3000, 0x3000) AM_DEVREADWRITE("dm01", bfmdm01_device, comm_r, comm_w)     //
+	AM_RANGE(0x3800, 0x3800) AM_DEVREADWRITE("dm01", bfmdm01_device, unknown_r, unknown_w)   // ???
 	AM_RANGE(0x4000, 0xFfff) AM_ROM                             // 48k  ROM
 ADDRESS_MAP_END
 
 ///////////////////////////////////////////////////////////////////////////
 
-void BFM_dm01_writedata(running_machine &machine, UINT8 data)
+void bfmdm01_device::writedata(UINT8 data)
 {
-	dm01.comdata = data;
-	dm01.data_avail = 1;
+	m_comdata = data;
+	m_data_avail = 1;
 
 	//pulse IRQ line
-	machine.device("matrix")->execute().set_input_line(M6809_IRQ_LINE, HOLD_LINE ); // trigger IRQ
+	machine().device("matrix")->execute().set_input_line(M6809_IRQ_LINE, HOLD_LINE ); // trigger IRQ
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-INTERRUPT_GEN( bfm_dm01_vbl )
-{
-	device->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE );
-}
+//INTERRUPT_GEN_MEMBER( bfmdm01_device::nmi_line_assert )
+//{
+	//device->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE );
+//}
 
 ///////////////////////////////////////////////////////////////////////////
-int BFM_dm01_busy(void)
+int bfmdm01_device::busy(void)
 {
-	return dm01.data_avail;
-}
-
-void BFM_dm01_reset(running_machine &machine)
-{
-	dm01.busy     = 0;
-	dm01.control  = 0;
-	dm01.xcounter = 0;
-	dm01.data_avail = 0;
-
-	dm01.intf->busy_func(machine,dm01.busy);
+	return m_data_avail;
 }
