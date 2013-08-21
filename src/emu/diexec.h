@@ -121,7 +121,7 @@ enum
 #define MCFG_DEVICE_VBLANK_INT_DEVICE(_tag, _devtag, _class, _func) \
 	device_execute_interface::static_set_vblank_int(*device, device_interrupt_delegate(&_class::_func, #_class "::" #_func, _devtag, (_class *)0), _tag);
 #define MCFG_DEVICE_VBLANK_INT_REMOVE()  \
-	device_execute_interface::static_remove_vblank_int(*device);
+	device_execute_interface::static_set_vblank_int(*device, device_interrupt_delegate(), NULL);
 // legacy
 #define MCFG_DEVICE_PERIODIC_INT(_func, _rate)  \
 	device_execute_interface::static_set_periodic_int(*device, _func, attotime::from_hz(_rate));
@@ -130,7 +130,7 @@ enum
 #define MCFG_DEVICE_PERIODIC_INT_DEVICE(_devtag, _class, _func, _rate) \
 	device_execute_interface::static_set_periodic_int(*device, device_interrupt_delegate(&_class::_func, #_class "::" #_func, _devtag, (_class *)0), attotime::from_hz(_rate));
 #define MCFG_DEVICE_PERIODIC_INT_REMOVE()  \
-	device_execute_interface::static_remove_periodic_int(*device);
+	device_execute_interface::static_set_periodic_int(*device, device_interrupt_delegate(), attotime());
 
 
 //**************************************************************************
