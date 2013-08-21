@@ -58,7 +58,6 @@ extern const device_type BF_DM01;
 
 ADDRESS_MAP_EXTERN( bfm_dm01_memmap,8 );
 
-//void BFM_dm01_config(running_machine &machine, const bfmdm01_interface *intf);
 
 #define MCFG_DM01_ADD(_tag, _interface) \
 	MCFG_DEVICE_ADD(_tag, BF_DM01, 0) \

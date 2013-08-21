@@ -98,8 +98,10 @@ void bfmdm01_device::device_start()
 	save_item(NAME(m_xcounter));
 	save_item(NAME(m_busy));
 	save_item(NAME(m_comdata));
+	
 	for (int i = 0; i < 65; i++)
 	save_item(NAME(m_segbuffer), i);
+	
 	for (int i = 0; i < DM_BYTESPERROW; i++)
 	save_item(NAME(m_scanline), i);
 }
@@ -117,15 +119,6 @@ void bfmdm01_device::device_reset()
 
 	m_busy_func(machine(), m_busy);
 }
-
-/* void BFM_dm01_config(running_machine &machine, const bfmdm01_interface *intf)
-{
-	assert_always(machine.phase() == MACHINE_PHASE_INIT, "Can only call BFM_dm01_config at init time!");
-	assert_always(intf, "BFM_dm01_config called with an invalid interface!");
-	m_intf = intf;
-	BFM_dm01_reset(machine);
-
-} */
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -280,13 +273,6 @@ void bfmdm01_device::writedata(UINT8 data)
 	//pulse IRQ line
 	machine().device("matrix")->execute().set_input_line(M6809_IRQ_LINE, HOLD_LINE ); // trigger IRQ
 }
-
-///////////////////////////////////////////////////////////////////////////
-
-//INTERRUPT_GEN_MEMBER( bfmdm01_device::nmi_line_assert )
-//{
-	//device->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE );
-//}
 
 ///////////////////////////////////////////////////////////////////////////
 int bfmdm01_device::busy(void)
