@@ -1875,6 +1875,13 @@ static MACHINE_CONFIG_START( digdug2, mappy_state )
 	MCFG_NAMCO56XX_ADD("namcoio_2", intf1)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( todruaga, digdug2 )
+
+	/* video hardware */
+	MCFG_GFXDECODE(todruaga)
+	MCFG_PALETTE_LENGTH(64*4+64*16)
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_START( motos, mappy_state )
 
 	MCFG_FRAGMENT_ADD(mappy_common)
@@ -2390,9 +2397,9 @@ GAME( 1983, phozon,   0,        phozon,   phozon, mappy_state,   phozon,        
 /* 2x6809, scroling tilemap, 4bpp sprites (Super Pacman type) */
 GAME( 1983, mappy,    0,        mappy,    mappy, mappy_state,   mappy,        ROT90, "Namco", "Mappy (US)", GAME_SUPPORTS_SAVE )
 GAME( 1983, mappyj,   mappy,    mappy,    mappy, mappy_state,   mappy,        ROT90, "Namco", "Mappy (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1984, todruaga, 0,        digdug2,  todruaga, mappy_state,   druaga,        ROT90, "Namco", "The Tower of Druaga (New Ver.)", GAME_SUPPORTS_SAVE )
-GAME( 1984, todruagao,todruaga, digdug2,  todruaga, mappy_state,   druaga,        ROT90, "Namco", "The Tower of Druaga (Old Ver.)", GAME_SUPPORTS_SAVE )
-GAME( 1984, todruagas,todruaga, digdug2,  todruaga, mappy_state,   druaga,        ROT90, "bootleg? (Sidam)", "The Tower of Druaga (Sidam)", GAME_SUPPORTS_SAVE )
+GAME( 1984, todruaga, 0,        todruaga,  todruaga, mappy_state,   druaga,        ROT90, "Namco", "The Tower of Druaga (New Ver.)", GAME_SUPPORTS_SAVE )
+GAME( 1984, todruagao,todruaga, todruaga,  todruaga, mappy_state,   druaga,        ROT90, "Namco", "The Tower of Druaga (Old Ver.)", GAME_SUPPORTS_SAVE )
+GAME( 1984, todruagas,todruaga, todruaga,  todruaga, mappy_state,   druaga,        ROT90, "bootleg? (Sidam)", "The Tower of Druaga (Sidam)", GAME_SUPPORTS_SAVE )
 GAME( 1985, digdug2,  0,        digdug2,  digdug2, mappy_state,  digdug2,  ROT90, "Namco", "Dig Dug II (New Ver.)", GAME_SUPPORTS_SAVE )
 GAME( 1985, digdug2o, digdug2,  digdug2,  digdug2, mappy_state,  digdug2,  ROT90, "Namco", "Dig Dug II (Old Ver.)", GAME_SUPPORTS_SAVE )
 GAME( 1985, motos,    0,        motos,    motos, mappy_state,   motos,        ROT90, "Namco", "Motos", GAME_SUPPORTS_SAVE )
