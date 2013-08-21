@@ -245,7 +245,7 @@ void device_execute_interface::adjust_icount(int delta)
 	if (!executing())
 		return;
 
-	// aply the delta directly
+	// apply the delta directly
 	*m_icountptr += delta;
 }
 
