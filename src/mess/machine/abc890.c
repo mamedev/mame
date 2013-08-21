@@ -118,13 +118,13 @@ abc890_device::abc890_device(const machine_config &mconfig, const char *tag, dev
 }
 
 abc894_device::abc894_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: abc890_device(mconfig, ABC894, "ABC 894", tag, owner, clock, "abc890", __FILE__)
+	: abc890_device(mconfig, ABC894, "ABC 894", tag, owner, clock, "abc894", __FILE__)
 {
 	m_slots = 3;
 }
 
 abc850_device::abc850_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: abc890_device(mconfig, ABC850, "ABC 850", tag, owner, clock, "abc890", __FILE__)
+	: abc890_device(mconfig, ABC850, "ABC 850", tag, owner, clock, "abc850", __FILE__)
 {
 	m_slots = 7;
 }

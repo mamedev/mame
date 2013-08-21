@@ -108,7 +108,7 @@ a2bus_diskii_device::a2bus_diskii_device(const machine_config &mconfig, const ch
 }
 
 a2bus_iwmflop_device::a2bus_iwmflop_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	a2bus_floppy_device(mconfig, A2BUS_IWM_FDC, "Apple IWM floppy card", tag, owner, clock, "a2diskii", __FILE__)
+	a2bus_floppy_device(mconfig, A2BUS_IWM_FDC, "Apple IWM floppy card", tag, owner, clock, "a2iwm_flop", __FILE__)
 {
 }
 

@@ -1087,7 +1087,7 @@ void ay8910_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 const device_type AY8912 = &device_creator<ay8912_device>;
 
 ay8912_device::ay8912_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: ay8910_device(mconfig, AY8912, "AY-3-8912A", tag, owner, clock, "ay8913", __FILE__)
+	: ay8910_device(mconfig, AY8912, "AY-3-8912A", tag, owner, clock, "ay8912", __FILE__)
 {
 }
 
