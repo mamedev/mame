@@ -52,7 +52,7 @@
 
 struct namco_52xx_state
 {
-	device_t *m_cpu;
+	mb88_cpu_device *m_cpu;
 	device_t *m_discrete;
 	int m_basenode;
 	devcb_resolved_read8 m_romread;
@@ -135,7 +135,7 @@ static WRITE8_HANDLER( namco_52xx_O_w )
 static TIMER_CALLBACK( namco_52xx_irq_clear )
 {
 	namco_52xx_state *state = get_safe_token((device_t *)ptr);
-	state->m_cpu->execute().set_input_line(0, CLEAR_LINE);
+	state->m_cpu->set_input_line(0, CLEAR_LINE);
 }
 
 WRITE8_DEVICE_HANDLER( namco_52xx_write )
@@ -144,7 +144,7 @@ WRITE8_DEVICE_HANDLER( namco_52xx_write )
 
 	space.machine().scheduler().synchronize(FUNC(namco_52xx_latch_callback), data, (void *)device);
 
-	state->m_cpu->execute().set_input_line(0, ASSERT_LINE);
+	state->m_cpu->set_input_line(0, ASSERT_LINE);
 
 	// The execution time of one instruction is ~4us, so we must make sure to
 	// give the cpu time to poll the /IRQ input before we clear it.
@@ -161,8 +161,8 @@ WRITE8_DEVICE_HANDLER( namco_52xx_write )
 static TIMER_CALLBACK( external_clock_pulse )
 {
 	namco_52xx_state *state = get_safe_token((device_t *)ptr);
-	mb88_external_clock_w(state->m_cpu, 1);
-	mb88_external_clock_w(state->m_cpu, 0);
+	state->m_cpu->clock_w(ASSERT_LINE);
+	state->m_cpu->clock_w(CLEAR_LINE);
 }
 
 
@@ -205,7 +205,7 @@ static DEVICE_START( namco_52xx )
 	astring tempstring;
 
 	/* find our CPU */
-	state->m_cpu = device->subdevice("mcu");
+	state->m_cpu = device->subdevice<mb88_cpu_device>("mcu");
 	assert(state->m_cpu != NULL);
 
 	/* find the attached discrete sound device */
