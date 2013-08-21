@@ -306,6 +306,11 @@ void supracan_state::supracan_tilemap_get_info_common(int layer, tile_data &tile
 			palette_bank = 0x00;
 			break;
 
+		case 6: // gambling lord
+			tile_bank = 0x0c00;
+			palette_bank = 0x00;
+			break;
+
 		case 4:
 			tile_bank = 0x800;
 			palette_bank = 0x00;
@@ -1474,8 +1479,8 @@ READ16_MEMBER( supracan_state::supracan_video_r )
 			break;
 		case 0x02/2: // Current scanline
 			break;
-		case 0x08/2: // Unknown (not video flags!)
-			data = 0;
+		case 0x08/2: // Unknown (not video flags!) - gambling lord disagrees, it MUST read back what it wrote because it reads it before turning on/off layers and writes it back
+			//data = 0;
 			break;
 		case 0x100/2:
 			if(!mem.debugger_access()) verboselog("maincpu", 0, "read tilemap_flags[0] (%04x)\n", data);
