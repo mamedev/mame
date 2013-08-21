@@ -287,7 +287,6 @@ int hcd62121_cpu_device::check_cond( UINT8 op )
 
 void hcd62121_cpu_device::device_start()
 {
-//  m_irq_callback = irqcallback;
 	m_program = &space(AS_PROGRAM);
 	m_io = &space(AS_IO);
 

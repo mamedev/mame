@@ -141,7 +141,6 @@ struct tms32051_state
 		INT32 treg2;
 	} shadow;
 
-	device_irq_acknowledge_callback irq_callback;
 	legacy_cpu_device *device;
 	address_space *program;
 	direct_read_data *direct;

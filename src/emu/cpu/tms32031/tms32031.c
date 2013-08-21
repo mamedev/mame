@@ -291,7 +291,6 @@ tms3203x_device::tms3203x_device(const machine_config &mconfig, device_type type
 		m_irq_pending(false),
 		m_is_idling(false),
 		m_icount(0),
-		m_irq_callback(0),
 		m_program(0),
 		m_direct(0)
 {

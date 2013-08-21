@@ -115,7 +115,6 @@ protected:
 	UINT32 m_pendingSwi;
 	int m_icount;
 	endianness_t m_endian;
-	device_irq_acknowledge_callback m_irq_callback;
 	address_space *m_program;
 	direct_read_data *m_direct;
 
