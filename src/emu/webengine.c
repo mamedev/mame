@@ -195,6 +195,40 @@ int web_engine::begin_request_handler(struct mg_connection *conn)
 		// the client, and mongoose should not send client any more data.
 		return 1;
 	}
+	else if (!strncmp(request_info->uri, "/slider",7)) 
+	{
+		char cmd_id[64];
+		char cmd_val[64];
+		get_qsvar(request_info, "id", cmd_id, sizeof(cmd_id));
+		get_qsvar(request_info, "val", cmd_val, sizeof(cmd_val));
+		int cnt = 0;
+		int id = atoi(cmd_id);
+		const slider_state *curslider;
+		for (curslider = ui_get_slider_list(); curslider != NULL; curslider = curslider->next)
+		{
+			if (cnt==id) 
+				(*curslider->update)(machine(), curslider->arg, NULL, atoi(cmd_val));
+			cnt++;
+		}
+		for (curslider = (slider_state*)machine().osd().get_slider_list(); curslider != NULL; curslider = curslider->next)
+		{
+			if (cnt==id) 
+				(*curslider->update)(machine(), curslider->arg, NULL, atoi(cmd_val));
+			cnt++;
+		}
+		
+		// Send HTTP reply to the client
+		mg_printf(conn,
+				"HTTP/1.1 200 OK\r\n"
+				"Content-Type: text/plain\r\n"
+				"Content-Length: 2\r\n"        // Always set Content-Length
+				"\r\n"
+				"OK");
+
+		// Returning non-zero tells mongoose that our function has replied to
+		// the client, and mongoose should not send client any more data.
+		return 1;
+	}
 	else if (!strncmp(request_info->uri, "/screenshot.png",15)) 
 	{
 		screen_device_iterator iter(m_machine->root_device());

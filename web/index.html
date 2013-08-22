@@ -53,17 +53,31 @@
 		  success: function(data) {
 			var items = [];
 			for (var i in data) {
-			   items.push('<label for="slider-mini">'+data[i].description +':</label>');
-			   items.push('<input type="range" name="slider-mini" id="slider-mini" value="'+data[i].curval+'" min="'+data[i].minval+'" max="'+data[i].maxval+'" step=="'+data[i].incval+'" data-highlight="true" data-mini="true" />');
+			   items.push('<label for="slider-mini-'+i+'">'+data[i].description +':</label>');
+			   items.push('<input type="range" name="slider-mini-'+i+'" id="slider-mini-'+i+'" value="'+data[i].curval+'" min="'+data[i].minval+'" max="'+data[i].maxval+'" step=="'+data[i].incval+'" data-highlight="true" data-mini="true" />');
             }
 			$('#main').html('');
 			$('#main').append(items.join('')).trigger('create'); 
+			for (var i in data) {
+				$('#slider-mini-' + i).bind( "slidestop", function(event, ui) { setSliderValue($(this).attr('id').replace('slider-mini-',''),$(this).slider().val()); });
+			}
 
 		  },
 		  error: function (request, status, error) { alert(status + ", " + error); }
 		});	
   }
 
+  function setSliderValue(id,val)
+  {
+	$.ajax({
+	  url: "/slider?id="+id+"&val="+val,
+	  cache: false,
+	  dataType: "text",
+	  success: function(data) {
+	  },
+	  error: function (request, status, error) { alert(status + ", " + error); }
+	});	
+  }
   
   function startWebSocket() {
     var url = 'ws://localhost:8080/foo';
