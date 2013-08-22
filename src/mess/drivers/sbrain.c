@@ -17,16 +17,29 @@ The main cpu does a busreq to gain access to the sub cpu's 1k static ram. When t
  necessary to stop the sub cpu because of other handshaking. Our Z80 emulation doesn't
  support the busack signal anyway, so we just assume it is granted immediately.
 
+The schematic in parts is difficult to read. Some assumptions have been made.
+
+To Do:
+- Without a disk in, it should display a message to insert a disk. Doesn't happen.
+  It thinks a disk is in and tries to execute garbage in the disk buffer instead.
+- Port 08 is largely a guess.
+- No work done on the keyboard. Should be able to hook up the generic ascii keyboard.
+- No software available to try.
+- Bug in floppy code means the motor will turn off after a few seconds. It should stay on.
+- Video chips need to be emulated (CRT8002 and DP8350), attributes etc.
+- After each line of characters, an interrupt should be generated. 25 IRQs per screen.
+- Hook the outputs of the baud rate generator to the uarts.
+- Probably lots of other stuff.
 
 *************************************************************************************************************/
 
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-//#include "machine/serial.h"
 #include "machine/wd_fdc.h"
-//#include "machine/i8251.h"
+#include "machine/i8251.h"
 #include "machine/i8255.h"
+#include "machine/com8116.h"
 #include "sound/beep.h"
 
 class sbrain_state : public driver_device
@@ -38,9 +51,9 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_subcpu(*this, "subcpu")
 		, m_beep(*this, "beeper")
-		//, m_brg(*this, "brg")
-		//, m_u0(*this, "uart0")
-		//, m_u1(*this, "uart1")
+		, m_brg(*this, "brg")
+		, m_u0(*this, "uart0")
+		, m_u1(*this, "uart1")
 		, m_ppi(*this, "ppi")
 		, m_fdc (*this, "fdc")
 		, m_floppy0(*this, "fdc:0")
@@ -59,19 +72,22 @@ public:
 	DECLARE_WRITE8_MEMBER(ppi_pb_w);
 	DECLARE_READ8_MEMBER(ppi_pc_r);
 	DECLARE_WRITE8_MEMBER(ppi_pc_w);
+	DECLARE_READ8_MEMBER(port08_r);
+	DECLARE_WRITE8_MEMBER(port08_w);
+	DECLARE_WRITE8_MEMBER(baud_w);
+	DECLARE_WRITE_LINE_MEMBER(fr_w);
+	DECLARE_WRITE_LINE_MEMBER(ft_w);
 private:
-	//floppy_image_device *m_floppy;
-	//void fdc_intrq_w(bool state);
-	//void fdc_drq_w(bool state);
 	UINT8 m_porta;
 	UINT8 m_portb;
 	UINT8 m_portc;
+	UINT8 m_port08;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<beep_device> m_beep;
-	//required_device<com8116_device> m_brg;
-	//required_device<i8251_device> m_uart0;
-	//required_device<i8251_device> m_uart1;
+	required_device<com8116_device> m_brg;
+	required_device<i8251_device> m_u0;
+	required_device<i8251_device> m_u1;
 	required_device<i8255_device> m_ppi;
 	required_device<fd1791_t> m_fdc;
 	required_device<floppy_connector> m_floppy0;
@@ -88,13 +104,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sbrain_io, AS_IO, 8, sbrain_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	//AM_RANGE(0x40, 0x40) AM_MIRROR(6) AM_DEVREADWRITE("uart0", i8251_device, data_r, data_w)
-	//AM_RANGE(0x41, 0x41) AM_MIRROR(6) AM_DEVREADWRITE("uart0", i8251_device, status_r, control_w)
+	AM_RANGE(0x40, 0x40) AM_MIRROR(6) AM_DEVREADWRITE("uart0", i8251_device, data_r, data_w)
+	AM_RANGE(0x41, 0x41) AM_MIRROR(6) AM_DEVREADWRITE("uart0", i8251_device, status_r, control_w)
 	//AM_RANGE(0x48, 0x4f) chr_int_latch
 	//AM_RANGE(0x50, 0x57) key_in
-	//AM_RANGE(0x58, 0x58) AM_MIRROR(6) AM_DEVREADWRITE("uart1", i8251_device, data_r, data_w)
-	//AM_RANGE(0x59, 0x59) AM_MIRROR(6) AM_DEVREADWRITE("uart1", i8251_device, status_r, control_w)
-	//AM_RANGE(0x60, 0x67) AM_WRITE(baud_w)
+	AM_RANGE(0x58, 0x58) AM_MIRROR(6) AM_DEVREADWRITE("uart1", i8251_device, data_r, data_w)
+	AM_RANGE(0x59, 0x59) AM_MIRROR(6) AM_DEVREADWRITE("uart1", i8251_device, status_r, control_w)
+	AM_RANGE(0x60, 0x67) AM_WRITE(baud_w)
 	AM_RANGE(0x68, 0x6b) AM_MIRROR(4) AM_DEVREADWRITE("ppi", i8255_device, read, write)
 ADDRESS_MAP_END
 
@@ -105,15 +121,58 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sbrain_subio, AS_IO, 8, sbrain_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	//AM_RANGE(0x08, 0x08)
+	AM_RANGE(0x08, 0x08) AM_READWRITE(port08_r,port08_w)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("fdc", fd1791_t, read, write)
 ADDRESS_MAP_END
 
-//WRITE8_MEMBER( sbrain_state::baud_w )
-//{
-//	m_brg->str_w(data & 0x0f);
-//	m_brg->stt_w(data >> 4);
-//}
+// bit 0 is wrong, maybe the whole byte is wrong
+READ8_MEMBER( sbrain_state::port08_r )
+{
+	return m_port08;
+}
+
+/* Misc disk functions
+d0 : disk busy?
+d1 : SEL A (drive 0?)
+d2 : SEL B (drive 1?)
+d3 : SEL C
+d4 : SEL D
+d5 : side select
+d6,7 : not used
+*/
+WRITE8_MEMBER( sbrain_state::port08_w )
+{
+	m_port08 = data | 0xc0;
+
+	floppy_image_device *floppy = NULL;
+	if (BIT(m_port08, 1)) floppy = m_floppy0->get_device();
+	if (BIT(m_port08, 2)) floppy = m_floppy1->get_device();
+
+	m_fdc->set_floppy(floppy);
+
+	if (floppy)
+	{
+		floppy->ss_w(BIT(m_port08, 5)); // might need inverting
+	}
+
+	// refresh motor on, hopefully this will keep them turning
+	m_floppy0->get_device()->mon_w(0); // motors run all the time
+	m_floppy1->get_device()->mon_w(0);
+}
+
+WRITE_LINE_MEMBER( sbrain_state::fr_w )
+{
+}
+
+WRITE_LINE_MEMBER( sbrain_state::ft_w )
+{
+}
+
+WRITE8_MEMBER( sbrain_state::baud_w )
+{
+	m_brg->str_w(data & 0x0f);
+	m_brg->stt_w(data >> 4);
+}
 
 READ8_MEMBER( sbrain_state::ppi_pa_r )
 {
@@ -145,7 +204,7 @@ d7 : cpu2 /busak line
 */
 READ8_MEMBER( sbrain_state::ppi_pb_r )
 {
-	return m_portb | 0x50 | ioport("VS")->read() | ((UINT8)BIT(m_portc, 5) << 7);
+	return m_portb | 0x50 | ioport("VS")->read() | (BIT(m_port08, 0) << 5) | ((UINT8)BIT(m_portc, 5) << 7);
 }
 
 WRITE8_MEMBER( sbrain_state::ppi_pb_w )
@@ -169,7 +228,7 @@ d6 : beeper
 d7 : keyboard, 1=enable comms, 0=reset
 */
 WRITE8_MEMBER( sbrain_state::ppi_pc_w )
-{//printf("%X ",data);
+{
 	m_portc = data;
 	m_beep->set_state(BIT(data, 6));
 	membank("bankr0")->set_entry(BIT(data, 2));
@@ -181,14 +240,11 @@ WRITE8_MEMBER( sbrain_state::ppi_pc_w )
 static INPUT_PORTS_START( sbrain )
 	/* vblank */
 	PORT_START("VS")
-	PORT_BIT(0x24, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_VBLANK("screen")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
 DRIVER_INIT_MEMBER( sbrain_state, sbrain )
 {
-	//m_fdc->setup_intrq_cb(fd1791_t::line_cb(FUNC(sbrain_state::fdc_intrq_w), this));
-	//m_fdc->setup_drq_cb(fd1791_t::line_cb(FUNC(sbrain_state::fdc_drq_w), this));
-
 	UINT8 *main = memregion("maincpu")->base();
 	UINT8 *sub = memregion("subcpu")->base();
 
@@ -213,42 +269,32 @@ static I8255_INTERFACE( ppi_intf )
 	DEVCB_DRIVER_MEMBER(sbrain_state, ppi_pc_w),   // Port C write
 };
 
-#if 0
-static const rs232_port_interface rs232_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 static const i8251_interface u0_intf =
 {
-	DEVCB_DEVICE_LINE_MEMBER("rs232", serial_port_device, rx),
-	DEVCB_DEVICE_LINE_MEMBER("rs232", serial_port_device, tx),
-	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, dsr_r),
-	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, dtr_w),
-	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, rts_w),
-	DEVCB_DRIVER_LINE_MEMBER(sbrain_state, sio_rxrdy_w),
-	DEVCB_DRIVER_LINE_MEMBER(sbrain_state, sio_txrdy_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL
 };
 
 static const i8251_interface u1_intf =
 {
-	DEVCB_DEVICE_LINE_MEMBER("rs232", serial_port_device, rx),
-	DEVCB_DEVICE_LINE_MEMBER("rs232", serial_port_device, tx),
-	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, dsr_r),
-	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, dtr_w),
-	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, rts_w),
-	DEVCB_DRIVER_LINE_MEMBER(sbrain_state, sio_rxrdy_w),
-	DEVCB_DRIVER_LINE_MEMBER(sbrain_state, sio_txrdy_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL
 };
-#endif
+
 MACHINE_RESET_MEMBER( sbrain_state, sbrain )
 {
 	m_beep->set_frequency(800);
@@ -290,7 +336,7 @@ UINT32 sbrain_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 				*p++ = BIT(gfx, 0);
 			}
 		}
-		ma+=160;
+		ma+=80;
 	}
 	return 0;
 }
@@ -322,10 +368,9 @@ static MACHINE_CONFIG_START( sbrain, sbrain_state )
 
 	/* Devices */
 	MCFG_I8255_ADD("ppi", ppi_intf)
-	//MCFG_I8251_ADD("uart0", u0_intf)
-	//MCFG_I8251_ADD("uart1", u1_intf)
-	//MCFG_COM8116_ADD("brg", XTAL_5_0688MHz, NULL, WRITELINE(sbrain_state, fr_w), WRITELINE(sbrain_state, ft_w))
-	//MCFG_RS232_PORT_ADD("rs232", rs232_intf, default_rs232_devices, "serial_terminal")
+	MCFG_I8251_ADD("uart0", u0_intf)
+	MCFG_I8251_ADD("uart1", u1_intf)
+	MCFG_COM8116_ADD("brg", XTAL_5_0688MHz, NULL, WRITELINE(sbrain_state, fr_w), WRITELINE(sbrain_state, ft_w))
 	MCFG_FD1791x_ADD("fdc", XTAL_16MHz / 16)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", sbrain_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", sbrain_floppies, "525dd", floppy_image_device::default_floppy_formats)
