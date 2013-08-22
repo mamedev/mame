@@ -659,6 +659,7 @@ READ16_MEMBER(ddealer_state::ddealer_mcu_r)
 {
 	static const int resp[] =
 	{
+		0x00, /* performs a clr.l when doing the ram test, triggering a read here */
 		0x93, 0xc7, 0x00, 0x8000,
 		0x2d, 0x6d, 0x00, 0x8000,
 		0x99, 0xc7, 0x00, 0x8000,
