@@ -37,7 +37,6 @@
 #include "sound/es5506.h"
 #include "audio/taito_en.h"
 #include "sound/okim6295.h"
-#include "drivlgcy.h"
 
 
 /******************************************************************************/
@@ -409,14 +408,6 @@ INTERRUPT_GEN_MEMBER(taito_f3_state::f3_interrupt2)
 	timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(10000), TIMER_F3_INTERRUPT3);
 }
 
-static SOUND_RESET( f3 )
-{
-	taito_f3_state *state = machine.driver_data<taito_f3_state>();
-	SOUND_RESET_CALL( taito_en_soundsystem_reset );
-	state->m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-}
-
-
 static const UINT16 recalh_eeprom[64] = {
 	0x8554,0x0000,0x3000,0x0000,0x0000,0x0000,0x0000,0xf335,
 	0x0001,0x86a0,0x0013,0x0413,0x0000,0xc350,0x0019,0x000a,
@@ -460,7 +451,6 @@ static MACHINE_CONFIG_START( f3, taito_f3_state )
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(taito_en_sound)
-	MCFG_SOUND_RESET(f3)
 MACHINE_CONFIG_END
 
 /* These games reprogram the video output registers to display different scanlines,
