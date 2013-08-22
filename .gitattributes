@@ -4868,6 +4868,7 @@ src/mame/layout/pmroulet.lay -text svneol=native#plain/text
 src/mame/layout/poker41.lay svneol=native#text/plain
 src/mame/layout/pokio.lay svneol=native#text/plain
 src/mame/layout/polepos.lay svneol=native#text/plain
+src/mame/layout/ppsatan.lay svneol=native#text/plain
 src/mame/layout/proconn.lay svneol=native#text/plain
 src/mame/layout/pulltabs.lay svneol=native#text/plain
 src/mame/layout/pyramid.lay svneol=native#text/plain

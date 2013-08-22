@@ -5,6 +5,7 @@
 ***************************************************************************/
 #include "machine/eepromser.h"
 #include "machine/nmk112.h"
+#include "sound/okim6295.h"
 
 struct sprite_cave
 {
@@ -37,20 +38,23 @@ public:
 			m_maincpu(*this, "maincpu"),
 			m_audiocpu(*this, "audiocpu"),
 			m_nmk112(*this, "nmk112"),
+			m_oki(*this, "oki"),
 			m_int_timer(*this, "int_timer"),
+			m_int_timer_left(*this, "int_timer_left"),
+			m_int_timer_right(*this, "int_timer_right"),
 			m_eeprom(*this, "eeprom") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_videoregs;
+	optional_shared_ptr_array<UINT16, 4> m_videoregs;
 	optional_shared_ptr_array<UINT16, 4> m_vram;
 	optional_shared_ptr_array<UINT16, 4> m_vctrl;
-	required_shared_ptr<UINT16> m_spriteram;
-	optional_shared_ptr<UINT16> m_spriteram_2;
-	required_shared_ptr<UINT16> m_paletteram;
+	optional_shared_ptr_array<UINT16, 4> m_spriteram;
+	optional_shared_ptr_array<UINT16, 4> m_spriteram_2;
+	optional_shared_ptr_array<UINT16, 4> m_paletteram;
 
 	/* video-related */
-	struct sprite_cave *m_sprite;
-	struct sprite_cave *m_sprite_table[MAX_PRIORITY][MAX_SPRITE_NUM + 1];
+	struct sprite_cave *m_sprite[4];
+	struct sprite_cave *m_sprite_table[4][MAX_PRIORITY][MAX_SPRITE_NUM + 1];
 
 	struct
 	{
@@ -62,8 +66,8 @@ public:
 	} m_blit;
 
 
-	void (cave_state::*m_get_sprite_info)();
-	void (cave_state::*m_sprite_draw)(int priority);
+	void (cave_state::*m_get_sprite_info)(int chip);
+	void (cave_state::*m_sprite_draw)(int chip, int priority);
 
 	tilemap_t    *m_tilemap[4];
 	int          m_tiledim[4];
@@ -72,18 +76,18 @@ public:
 	bitmap_ind16 m_sprite_zbuf;
 	UINT16       m_sprite_zbuf_baseval;
 
-	int          m_num_sprites;
+	int          m_num_sprites[4];
 
-	int          m_spriteram_bank;
-	int          m_spriteram_bank_delay;
+	int          m_spriteram_bank[4];
+	int          m_spriteram_bank_delay[4];
 
-	UINT16       *m_palette_map;
+	UINT16       *m_palette_map[4];
 
 	int          m_layers_offs_x;
 	int          m_layers_offs_y;
 	int          m_row_effect_offs_n;
 	int          m_row_effect_offs_f;
-	int          m_background_color;
+	int          m_background_pen;
 
 	int          m_spritetype[2];
 	int          m_kludge;
@@ -109,12 +113,17 @@ public:
 	// korokoro
 	UINT16       m_leds[2];
 	int          m_hopper;
+	// ppsatan
+	UINT16       m_ppsatan_io_mux;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<nmk112_device> m_nmk112;
+	optional_device<okim6295_device> m_oki;
 	required_device<timer_device> m_int_timer;
+	optional_device<timer_device> m_int_timer_left;
+	optional_device<timer_device> m_int_timer_right;
 	int m_rasflag;
 	int m_old_rasflag;
 	DECLARE_READ16_MEMBER(cave_irq_cause_r);
@@ -164,6 +173,12 @@ public:
 	DECLARE_WRITE16_MEMBER(korokoro_eeprom_msb_w);
 	DECLARE_READ16_MEMBER(pwrinst2_eeprom_r);
 	DECLARE_WRITE16_MEMBER(tjumpman_eeprom_lsb_w);
+	DECLARE_WRITE16_MEMBER(ppsatan_eeprom_msb_w);
+	DECLARE_WRITE16_MEMBER(ppsatan_io_mux_w);
+	DECLARE_READ16_MEMBER(ppsatan_touch1_r);
+	DECLARE_READ16_MEMBER(ppsatan_touch2_r);
+	DECLARE_WRITE16_MEMBER(ppsatan_out_w);
+	UINT16 ppsatan_touch_r(int player);
 	DECLARE_DRIVER_INIT(uopoko);
 	DECLARE_DRIVER_INIT(donpachi);
 	DECLARE_DRIVER_INIT(mazinger);
@@ -181,6 +196,7 @@ public:
 	DECLARE_DRIVER_INIT(sailormn);
 	DECLARE_DRIVER_INIT(dfeveron);
 	DECLARE_DRIVER_INIT(metmqstr);
+	DECLARE_DRIVER_INIT(ppsatan);
 	TILE_GET_INFO_MEMBER(sailormn_get_tile_info_2);
 	TILE_GET_INFO_MEMBER(get_tile_info_0);
 	TILE_GET_INFO_MEMBER(get_tile_info_1);
@@ -200,33 +216,47 @@ public:
 	DECLARE_PALETTE_INIT(pwrinst2);
 	DECLARE_VIDEO_START(sailormn_3_layers);
 	DECLARE_PALETTE_INIT(sailormn);
-	UINT32 screen_update_cave(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_PALETTE_INIT(ppsatan);
+	UINT32 screen_update_cave(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_ppsatan_core (screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int chip);
+	UINT32 screen_update_ppsatan_top  (screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_ppsatan_left (screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_ppsatan_right(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(cave_interrupt);
+	INTERRUPT_GEN_MEMBER(cave_interrupt_ppsatan);
 	TIMER_CALLBACK_MEMBER(cave_vblank_end);
 	TIMER_DEVICE_CALLBACK_MEMBER(cave_vblank_start);
-	void cave_get_sprite_info();
+	TIMER_DEVICE_CALLBACK_MEMBER(cave_vblank_start_left);
+	TIMER_DEVICE_CALLBACK_MEMBER(cave_vblank_start_right);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_lev2_cb);
+	void cave_get_sprite_info(int chip);
+	void cave_get_sprite_info_all();
 	void sailormn_tilebank_w(int bank);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	DECLARE_WRITE_LINE_MEMBER(sound_irq_gen);
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
+	void update_irq_state();
+	void unpack_sprites(const char *region);
+	void ddonpach_unpack_sprites(const char *region);
+	void esprade_unpack_sprites(const char *region);
 
 private:
 	inline void get_tile_info( tile_data &tileinfo, int tile_index, int GFX );
-	inline void tilemap_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32 flags, UINT32 priority, UINT32 priority2, int GFX );
+	inline void tilemap_draw( int chip, screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT32 flags, UINT32 priority, UINT32 priority2, int GFX );
 	inline void vram_w( address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 data, ATTR_UNUSED UINT16 mem_mask, int GFX );
 	inline void vram_8x8_w( address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 data, ATTR_UNUSED UINT16 mem_mask, int GFX );
-	void set_pens();
+	void set_pens(int chip);
 	void cave_vh_start( int num );
-	void get_sprite_info_cave();
-	void get_sprite_info_donpachi();
+	void get_sprite_info_cave(int chip);
+	void get_sprite_info_donpachi(int chip);
 	void sprite_init_cave();
-	void cave_sprite_check(screen_device &screen, const rectangle &clip);
-	void do_blit_zoom16_cave(const struct sprite_cave *sprite);
-	void do_blit_zoom16_cave_zb( const struct sprite_cave *sprite );
-	void do_blit_16_cave( const struct sprite_cave *sprite );
-	void do_blit_16_cave_zb( const struct sprite_cave *sprite );
-	void sprite_draw_cave( int priority );
-	void sprite_draw_cave_zbuf( int priority );
-	void sprite_draw_donpachi( int priority );
-	void sprite_draw_donpachi_zbuf( int priority );
+	void cave_sprite_check(int chip, screen_device &screen, const rectangle &clip);
+	void do_blit_zoom32_cave( int chip, const struct sprite_cave *sprite );
+	void do_blit_zoom32_cave_zb( int chip, const struct sprite_cave *sprite );
+	void do_blit_32_cave( int chip, const struct sprite_cave *sprite );
+	void do_blit_32_cave_zb( int chip, const struct sprite_cave *sprite );
+	void sprite_draw_cave( int chip, int priority );
+	void sprite_draw_cave_zbuf( int chip, int priority );
+	void sprite_draw_donpachi( int chip, int priority );
+	void sprite_draw_donpachi_zbuf( int chip, int priority );
 };

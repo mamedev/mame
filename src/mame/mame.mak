@@ -2337,6 +2337,8 @@ $(DRIVERS)/bzone.o:     $(LAYOUT)/bzone.lh \
 
 $(DRIVERS)/cardline.o:  $(LAYOUT)/cardline.lh
 
+$(DRIVERS)/cave.o:      $(LAYOUT)/ppsatan.lh
+
 $(DRIVERS)/cdi.o:       $(LAYOUT)/cdi.lh
 
 $(DRIVERS)/chance32.o:  $(LAYOUT)/chance32.lh

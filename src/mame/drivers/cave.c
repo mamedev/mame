@@ -27,6 +27,7 @@ Year + Game           License       PCB         Tilemaps        Sprites         
 96 Air Gallet         Banpresto     BP962A      038 9437WX711   013 9346E7002   Z80
 96 Hotdog Storm       Marble        ASTC9501    038 9341EX702   013             Z80
 96 Pac-Slot           Namco         A0442       038 9444WX010   013 9345E7006
+96 Poka Poka Satan    <unknown>     PPS-MAIN    038 9444WX010   013 9607EX013
 97 Dodonpachi         Atlus         ATC03D2     038             013
 98 Dangun Feveron     Nihon System  CV01        038 9808WX003   013 9807EX004
 98 ESP Ra.De.         Atlus         ATC04       038 9841WX002   013 9838EX002
@@ -93,6 +94,8 @@ Versions known to exist but not dumped:
 #include "sound/okim6295.h"
 #include "sound/ymz280b.h"
 
+#include "ppsatan.lh"
+
 /***************************************************************************
 
 
@@ -103,13 +106,12 @@ Versions known to exist but not dumped:
 
 
 /* Update the IRQ state based on all possible causes */
-static void update_irq_state( running_machine &machine )
+void cave_state::update_irq_state()
 {
-	cave_state *state = machine.driver_data<cave_state>();
-	if (state->m_vblank_irq || state->m_sound_irq || state->m_unknown_irq)
-		state->m_maincpu->set_input_line(state->m_irq_level, ASSERT_LINE);
+	if (m_vblank_irq || m_sound_irq || m_unknown_irq)
+		m_maincpu->set_input_line(m_irq_level, ASSERT_LINE);
 	else
-		state->m_maincpu->set_input_line(state->m_irq_level, CLEAR_LINE);
+		m_maincpu->set_input_line(m_irq_level, CLEAR_LINE);
 }
 
 TIMER_CALLBACK_MEMBER(cave_state::cave_vblank_end)
@@ -117,7 +119,7 @@ TIMER_CALLBACK_MEMBER(cave_state::cave_vblank_end)
 	if (m_kludge == 3)  /* mazinger metmqstr */
 	{
 		m_unknown_irq = 1;
-		update_irq_state(machine());
+		update_irq_state();
 	}
 	m_agallet_vblank_irq = 0;
 }
@@ -125,10 +127,18 @@ TIMER_CALLBACK_MEMBER(cave_state::cave_vblank_end)
 TIMER_DEVICE_CALLBACK_MEMBER(cave_state::cave_vblank_start)
 {
 	m_vblank_irq = 1;
-	update_irq_state(machine());
-	cave_get_sprite_info();
+	update_irq_state();
+	cave_get_sprite_info(0);
 	m_agallet_vblank_irq = 1;
 	machine().scheduler().timer_set(attotime::from_usec(2000), timer_expired_delegate(FUNC(cave_state::cave_vblank_end),this));
+}
+TIMER_DEVICE_CALLBACK_MEMBER(cave_state::cave_vblank_start_left)
+{
+	cave_get_sprite_info(1);
+}
+TIMER_DEVICE_CALLBACK_MEMBER(cave_state::cave_vblank_start_right)
+{
+	cave_get_sprite_info(2);
 }
 
 /* Called once/frame to generate the VBLANK interrupt */
@@ -136,12 +146,18 @@ INTERRUPT_GEN_MEMBER(cave_state::cave_interrupt)
 {
 	m_int_timer->adjust(attotime::from_usec(17376 - m_time_vblank_irq));
 }
+INTERRUPT_GEN_MEMBER(cave_state::cave_interrupt_ppsatan)
+{
+	m_int_timer->adjust      (attotime::from_usec(17376 - m_time_vblank_irq));
+	m_int_timer_left->adjust (attotime::from_usec(17376 - m_time_vblank_irq));
+	m_int_timer_right->adjust(attotime::from_usec(17376 - m_time_vblank_irq));
+}
 
 /* Called by the YMZ280B to set the IRQ state */
 WRITE_LINE_MEMBER(cave_state::sound_irq_gen)
 {
 	m_sound_irq = (state != 0);
-	update_irq_state(machine());
+	update_irq_state();
 }
 
 
@@ -175,7 +191,7 @@ READ16_MEMBER(cave_state::cave_irq_cause_r)
 	if (offset == 6/2)
 		m_unknown_irq = 0;
 
-	update_irq_state(machine());
+	update_irq_state();
 
 /*
     sailormn and agallet wait for bit 2 of $b80001 to go 1 -> 0.
@@ -328,6 +344,27 @@ WRITE16_MEMBER(cave_state::hotdogst_eeprom_msb_w)
 	}
 }
 
+WRITE16_MEMBER(cave_state::ppsatan_eeprom_msb_w)
+{
+	if (data & ~0x000f)
+		logerror("%s: Unknown EEPROM bit written %04X\n",machine().describe_context(),data);
+
+	if (ACCESSING_BITS_0_7)  // odd address
+	{
+		// bit 11?
+
+		// latch the bit
+		m_eeprom->di_write((data & 0x0400) >> 10);
+
+		// reset line asserted: reset.
+		m_eeprom->cs_write((data & 0x0100) ? CLEAR_LINE : ASSERT_LINE);
+
+		// clock line asserted: write latch or select next bit to read
+		m_eeprom->clk_write((data & 0x0200) ? ASSERT_LINE : CLEAR_LINE);
+	}
+}
+
+
 WRITE16_MEMBER(cave_state::cave_eeprom_lsb_w)
 {
 	if (data & ~0x00ef)
@@ -407,15 +444,15 @@ static ADDRESS_MAP_START( dfeveron_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                                                 // ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM                                                                 // RAM
 	AM_RANGE(0x300000, 0x300003) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0x00ff)                   // YMZ280
-/**/AM_RANGE(0x400000, 0x407fff) AM_RAM AM_SHARE("spriteram")       // Sprites
-/**/AM_RANGE(0x408000, 0x40ffff) AM_RAM AM_SHARE("spriteram_2")                         // Sprites?
+/**/AM_RANGE(0x400000, 0x407fff) AM_RAM AM_SHARE("spriteram.0")       // Sprites
+/**/AM_RANGE(0x408000, 0x40ffff) AM_RAM AM_SHARE("spriteram_2.0")                         // Sprites?
 /**/AM_RANGE(0x500000, 0x507fff) AM_RAM_WRITE(cave_vram_0_w) AM_SHARE("vram.0")         // Layer 0
 /**/AM_RANGE(0x600000, 0x607fff) AM_RAM_WRITE(cave_vram_1_w) AM_SHARE("vram.1")         // Layer 1
-/**/AM_RANGE(0x708000, 0x708fff) AM_RAM AM_SHARE("paletteram")  // Palette
+/**/AM_RANGE(0x708000, 0x708fff) AM_RAM AM_SHARE("paletteram.0")  // Palette
 /**/AM_RANGE(0x710000, 0x710bff) AM_READONLY                                                            // ?
 	AM_RANGE(0x710c00, 0x710fff) AM_RAM                                                                 // ?
 	AM_RANGE(0x800000, 0x800007) AM_READ(cave_irq_cause_r)                                              // IRQ Cause
-	AM_RANGE(0x800000, 0x80007f) AM_WRITEONLY AM_SHARE("videoregs")                     // Video Regs
+	AM_RANGE(0x800000, 0x80007f) AM_WRITEONLY AM_SHARE("videoregs.0")                     // Video Regs
 /**/AM_RANGE(0x900000, 0x900005) AM_RAM AM_SHARE("vctrl.0")                             // Layer 0 Control
 /**/AM_RANGE(0xa00000, 0xa00005) AM_RAM AM_SHARE("vctrl.1")                             // Layer 1 Control
 	AM_RANGE(0xb00000, 0xb00001) AM_READ_PORT("IN0")                                                    // Inputs
@@ -432,17 +469,17 @@ static ADDRESS_MAP_START( ddonpach_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                                                 // ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM                                                                 // RAM
 	AM_RANGE(0x300000, 0x300003) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0x00ff)           // YMZ280
-/**/AM_RANGE(0x400000, 0x407fff) AM_RAM AM_SHARE("spriteram")       // Sprites
-/**/AM_RANGE(0x408000, 0x40ffff) AM_RAM AM_SHARE("spriteram_2")                         // Sprites?
+/**/AM_RANGE(0x400000, 0x407fff) AM_RAM AM_SHARE("spriteram.0")       // Sprites
+/**/AM_RANGE(0x408000, 0x40ffff) AM_RAM AM_SHARE("spriteram_2.0")                         // Sprites?
 /**/AM_RANGE(0x500000, 0x507fff) AM_RAM_WRITE(cave_vram_0_w) AM_SHARE("vram.0")         // Layer 0
 /**/AM_RANGE(0x600000, 0x607fff) AM_RAM_WRITE(cave_vram_1_w) AM_SHARE("vram.1")         // Layer 1
 /**/AM_RANGE(0x700000, 0x70ffff) AM_RAM_WRITE(cave_vram_2_8x8_w) AM_SHARE("vram.2")     // Layer 2
 	AM_RANGE(0x800000, 0x800007) AM_READ(cave_irq_cause_r)                                              // IRQ Cause
-	AM_RANGE(0x800000, 0x80007f) AM_WRITEONLY AM_SHARE("videoregs")                     // Video Regs
+	AM_RANGE(0x800000, 0x80007f) AM_WRITEONLY AM_SHARE("videoregs.0")                     // Video Regs
 /**/AM_RANGE(0x900000, 0x900005) AM_RAM AM_SHARE("vctrl.0")                             // Layer 0 Control
 /**/AM_RANGE(0xa00000, 0xa00005) AM_RAM AM_SHARE("vctrl.1")                             // Layer 1 Control
 /**/AM_RANGE(0xb00000, 0xb00005) AM_RAM AM_SHARE("vctrl.2")                             // Layer 2 Control
-/**/AM_RANGE(0xc00000, 0xc0ffff) AM_RAM AM_SHARE("paletteram")  // Palette
+/**/AM_RANGE(0xc00000, 0xc0ffff) AM_RAM AM_SHARE("paletteram.0")  // Palette
 	AM_RANGE(0xd00000, 0xd00001) AM_READ_PORT("IN0")                                                    // Inputs
 	AM_RANGE(0xd00002, 0xd00003) AM_READ_PORT("IN1")                                                    // Inputs + EEPROM
 	AM_RANGE(0xe00000, 0xe00001) AM_WRITE(cave_eeprom_msb_w)                                // EEPROM
@@ -466,31 +503,19 @@ READ16_MEMBER(cave_state::donpachi_videoregs_r)
 	}
 }
 
-#if 0
-WRITE16_MEMBER(cave_state::donpachi_videoregs_w)
-{
-	COMBINE_DATA(&m_videoregs[offset]);
-
-	switch (offset)
-	{
-//      case 0x78/2:    watchdog_reset16_w(0, 0);    break;
-	}
-}
-#endif
-
 static ADDRESS_MAP_START( donpachi_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                                                     // ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM                                                                     // RAM
 	AM_RANGE(0x200000, 0x207fff) AM_RAM_WRITE(cave_vram_1_w) AM_SHARE("vram.1")             // Layer 1
 	AM_RANGE(0x300000, 0x307fff) AM_RAM_WRITE(cave_vram_0_w) AM_SHARE("vram.0")             // Layer 0
 	AM_RANGE(0x400000, 0x407fff) AM_RAM_WRITE(cave_vram_2_8x8_w) AM_SHARE("vram.2")         // Layer 2
-	AM_RANGE(0x500000, 0x507fff) AM_RAM AM_SHARE("spriteram")           // Sprites
-	AM_RANGE(0x508000, 0x50ffff) AM_RAM AM_SHARE("spriteram_2")                             // Sprites?
+	AM_RANGE(0x500000, 0x507fff) AM_RAM AM_SHARE("spriteram.0")           // Sprites
+	AM_RANGE(0x508000, 0x50ffff) AM_RAM AM_SHARE("spriteram_2.0")                             // Sprites?
 /**/AM_RANGE(0x600000, 0x600005) AM_RAM AM_SHARE("vctrl.1")                                 // Layer 1 Control
 /**/AM_RANGE(0x700000, 0x700005) AM_RAM AM_SHARE("vctrl.0")                                 // Layer 0 Control
 /**/AM_RANGE(0x800000, 0x800005) AM_RAM AM_SHARE("vctrl.2")                                 // Layer 2 Control
-	AM_RANGE(0x900000, 0x90007f) AM_RAM_READ(donpachi_videoregs_r) AM_SHARE("videoregs")    // Video Regs
-/**/AM_RANGE(0xa08000, 0xa08fff) AM_RAM AM_SHARE("paletteram")      // Palette
+	AM_RANGE(0x900000, 0x90007f) AM_RAM_READ(donpachi_videoregs_r) AM_SHARE("videoregs.0")    // Video Regs
+/**/AM_RANGE(0xa08000, 0xa08fff) AM_RAM AM_SHARE("paletteram.0")      // Palette
 	AM_RANGE(0xb00000, 0xb00003) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)                 // M6295
 	AM_RANGE(0xb00010, 0xb00013) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)                 //
 	AM_RANGE(0xb00020, 0xb0002f) AM_DEVWRITE("nmk112", nmk112_device, okibank_lsb_w)                             //
@@ -508,17 +533,17 @@ static ADDRESS_MAP_START( esprade_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                                                 // ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM                                                                 // RAM
 	AM_RANGE(0x300000, 0x300003) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0x00ff)           // YMZ280
-/**/AM_RANGE(0x400000, 0x407fff) AM_RAM AM_SHARE("spriteram")       // Sprites
-/**/AM_RANGE(0x408000, 0x40ffff) AM_RAM AM_SHARE("spriteram_2")                         // Sprites?
+/**/AM_RANGE(0x400000, 0x407fff) AM_RAM AM_SHARE("spriteram.0")       // Sprites
+/**/AM_RANGE(0x408000, 0x40ffff) AM_RAM AM_SHARE("spriteram_2.0")                         // Sprites?
 /**/AM_RANGE(0x500000, 0x507fff) AM_RAM_WRITE(cave_vram_0_w) AM_SHARE("vram.0")         // Layer 0
 /**/AM_RANGE(0x600000, 0x607fff) AM_RAM_WRITE(cave_vram_1_w) AM_SHARE("vram.1")         // Layer 1
 /**/AM_RANGE(0x700000, 0x707fff) AM_RAM_WRITE(cave_vram_2_w) AM_SHARE("vram.2")         // Layer 2
 	AM_RANGE(0x800000, 0x800007) AM_READ(cave_irq_cause_r)                                              // IRQ Cause
-	AM_RANGE(0x800000, 0x80007f) AM_WRITEONLY AM_SHARE("videoregs")                     // Video Regs
+	AM_RANGE(0x800000, 0x80007f) AM_WRITEONLY AM_SHARE("videoregs.0")                     // Video Regs
 /**/AM_RANGE(0x900000, 0x900005) AM_RAM AM_SHARE("vctrl.0")                             // Layer 0 Control
 /**/AM_RANGE(0xa00000, 0xa00005) AM_RAM AM_SHARE("vctrl.1")                             // Layer 1 Control
 /**/AM_RANGE(0xb00000, 0xb00005) AM_RAM AM_SHARE("vctrl.2")                             // Layer 2 Control
-/**/AM_RANGE(0xc00000, 0xc0ffff) AM_RAM AM_SHARE("paletteram")  // Palette
+/**/AM_RANGE(0xc00000, 0xc0ffff) AM_RAM AM_SHARE("paletteram.0")  // Palette
 	AM_RANGE(0xd00000, 0xd00001) AM_READ_PORT("IN0" )                                                   // Inputs
 	AM_RANGE(0xd00002, 0xd00003) AM_READ_PORT("IN1" )                                                   // Inputs + EEPROM
 	AM_RANGE(0xe00000, 0xe00001) AM_WRITE(cave_eeprom_msb_w)                                // EEPROM
@@ -533,8 +558,8 @@ static ADDRESS_MAP_START( gaia_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                                                 // ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM                                                                 // RAM
 	AM_RANGE(0x300000, 0x300003) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0x00ff)           // YMZ280
-	AM_RANGE(0x400000, 0x407fff) AM_RAM AM_SHARE("spriteram")       // Sprite bank 1
-	AM_RANGE(0x408000, 0x40ffff) AM_RAM AM_SHARE("spriteram_2")                         // Sprite bank 2
+	AM_RANGE(0x400000, 0x407fff) AM_RAM AM_SHARE("spriteram.0")       // Sprite bank 1
+	AM_RANGE(0x408000, 0x40ffff) AM_RAM AM_SHARE("spriteram_2.0")                         // Sprite bank 2
 	AM_RANGE(0x500000, 0x507fff) AM_RAM_WRITE(cave_vram_0_w) AM_SHARE("vram.0")         // Layer 0
 	AM_RANGE(0x508000, 0x50ffff) AM_RAM                                                                 // More Layer 0, Tested but not used?
 	AM_RANGE(0x600000, 0x607fff) AM_RAM_WRITE(cave_vram_1_w) AM_SHARE("vram.1")         // Layer 1
@@ -542,11 +567,11 @@ static ADDRESS_MAP_START( gaia_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x700000, 0x707fff) AM_RAM_WRITE(cave_vram_2_w) AM_SHARE("vram.2")         // Layer 2
 	AM_RANGE(0x708000, 0x70ffff) AM_RAM                                                                 // More Layer 2, Tested but not used?
 	AM_RANGE(0x800000, 0x800007) AM_READ(cave_irq_cause_r)                                              // IRQ Cause
-	AM_RANGE(0x800000, 0x80007f) AM_WRITEONLY AM_SHARE("videoregs")                     // Video Regs
+	AM_RANGE(0x800000, 0x80007f) AM_WRITEONLY AM_SHARE("videoregs.0")                     // Video Regs
 /**/AM_RANGE(0x900000, 0x900005) AM_RAM AM_SHARE("vctrl.0")                             // Layer 0 Control
 /**/AM_RANGE(0xa00000, 0xa00005) AM_RAM AM_SHARE("vctrl.1")                             // Layer 1 Control
 /**/AM_RANGE(0xb00000, 0xb00005) AM_RAM AM_SHARE("vctrl.2")                             // Layer 2 Control
-	AM_RANGE(0xc00000, 0xc0ffff) AM_RAM AM_SHARE("paletteram")  // Palette
+	AM_RANGE(0xc00000, 0xc0ffff) AM_RAM AM_SHARE("paletteram.0")  // Palette
 	AM_RANGE(0xd00010, 0xd00011) AM_READ_PORT("IN0")                                                    // Inputs
 	AM_RANGE(0xd00010, 0xd00011) AM_WRITE(gaia_coin_lsb_w)                                              // Coin counter only
 	AM_RANGE(0xd00012, 0xd00013) AM_READ_PORT("IN1")                                                    // Inputs
@@ -563,9 +588,9 @@ static ADDRESS_MAP_START( guwange_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                                                 // ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM                                                                 // RAM
 	AM_RANGE(0x300000, 0x300007) AM_READ(cave_irq_cause_r)                                              // IRQ Cause
-	AM_RANGE(0x300000, 0x30007f) AM_WRITEONLY AM_SHARE("videoregs")                     // Video Regs
-/**/AM_RANGE(0x400000, 0x407fff) AM_RAM AM_SHARE("spriteram")       // Sprites
-/**/AM_RANGE(0x408000, 0x40ffff) AM_RAM AM_SHARE("spriteram_2")                         // Sprites?
+	AM_RANGE(0x300000, 0x30007f) AM_WRITEONLY AM_SHARE("videoregs.0")                     // Video Regs
+/**/AM_RANGE(0x400000, 0x407fff) AM_RAM AM_SHARE("spriteram.0")       // Sprites
+/**/AM_RANGE(0x408000, 0x40ffff) AM_RAM AM_SHARE("spriteram_2.0")                         // Sprites?
 /**/AM_RANGE(0x500000, 0x507fff) AM_RAM_WRITE(cave_vram_0_w) AM_SHARE("vram.0")         // Layer 0
 /**/AM_RANGE(0x600000, 0x607fff) AM_RAM_WRITE(cave_vram_1_w) AM_SHARE("vram.1")         // Layer 1
 /**/AM_RANGE(0x700000, 0x707fff) AM_RAM_WRITE(cave_vram_2_w) AM_SHARE("vram.2")         // Layer 2
@@ -573,7 +598,7 @@ static ADDRESS_MAP_START( guwange_map, AS_PROGRAM, 16, cave_state )
 /**/AM_RANGE(0x900000, 0x900005) AM_RAM AM_SHARE("vctrl.0")                             // Layer 0 Control
 /**/AM_RANGE(0xa00000, 0xa00005) AM_RAM AM_SHARE("vctrl.1")                             // Layer 1 Control
 /**/AM_RANGE(0xb00000, 0xb00005) AM_RAM AM_SHARE("vctrl.2")                             // Layer 2 Control
-/**/AM_RANGE(0xc00000, 0xc0ffff) AM_RAM AM_SHARE("paletteram")  // Palette
+/**/AM_RANGE(0xc00000, 0xc0ffff) AM_RAM AM_SHARE("paletteram.0")  // Palette
 	AM_RANGE(0xd00010, 0xd00011) AM_READ_PORT("IN0")                                                    // Inputs
 	AM_RANGE(0xd00010, 0xd00011) AM_WRITE(cave_eeprom_lsb_w)                                // EEPROM
 	AM_RANGE(0xd00012, 0xd00013) AM_READ_PORT("IN1")                                                    // Inputs + EEPROM
@@ -589,14 +614,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( hotdogst_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                                                 // ROM
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM                                                                 // RAM
-/**/AM_RANGE(0x408000, 0x408fff) AM_RAM AM_SHARE("paletteram")  // Palette
+/**/AM_RANGE(0x408000, 0x408fff) AM_RAM AM_SHARE("paletteram.0")  // Palette
 /**/AM_RANGE(0x880000, 0x887fff) AM_RAM_WRITE(cave_vram_0_w) AM_SHARE("vram.0")         // Layer 0
 /**/AM_RANGE(0x900000, 0x907fff) AM_RAM_WRITE(cave_vram_1_w) AM_SHARE("vram.1")         // Layer 1
 /**/AM_RANGE(0x980000, 0x987fff) AM_RAM_WRITE(cave_vram_2_w) AM_SHARE("vram.2")         // Layer 2
 	AM_RANGE(0xa80000, 0xa80007) AM_READ(cave_irq_cause_r)                                              // IRQ Cause
 //  AM_RANGE(0xa8006e, 0xa8006f) AM_READ(soundlatch_ack_r)                                              // From Sound CPU
 	AM_RANGE(0xa8006e, 0xa8006f) AM_WRITE(sound_cmd_w)                                                  // To Sound CPU
-	AM_RANGE(0xa80000, 0xa8007f) AM_WRITEONLY AM_SHARE("videoregs")                     // Video Regs
+	AM_RANGE(0xa80000, 0xa8007f) AM_WRITEONLY AM_SHARE("videoregs.0")                     // Video Regs
 /**/AM_RANGE(0xb00000, 0xb00005) AM_RAM AM_SHARE("vctrl.0")                             // Layer 0 Control
 /**/AM_RANGE(0xb80000, 0xb80005) AM_RAM AM_SHARE("vctrl.1")                             // Layer 1 Control
 /**/AM_RANGE(0xc00000, 0xc00005) AM_RAM AM_SHARE("vctrl.2")                             // Layer 2 Control
@@ -604,8 +629,8 @@ static ADDRESS_MAP_START( hotdogst_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0xc80002, 0xc80003) AM_READ_PORT("IN1")                                                    // Inputs + EEPROM
 	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(hotdogst_eeprom_msb_w)                            // EEPROM
 	AM_RANGE(0xd00002, 0xd00003) AM_WRITENOP                                                            // ???
-/**/AM_RANGE(0xf00000, 0xf07fff) AM_RAM AM_SHARE("spriteram")       // Sprites
-/**/AM_RANGE(0xf08000, 0xf0ffff) AM_RAM AM_SHARE("spriteram_2")                         // Sprites?
+/**/AM_RANGE(0xf00000, 0xf07fff) AM_RAM AM_SHARE("spriteram.0")       // Sprites
+/**/AM_RANGE(0xf08000, 0xf0ffff) AM_RAM AM_SHARE("spriteram_2.0")                         // Sprites?
 ADDRESS_MAP_END
 
 
@@ -679,10 +704,10 @@ static ADDRESS_MAP_START( korokoro_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                                                     // ROM
 	AM_RANGE(0x100000, 0x107fff) AM_WRITE(cave_vram_0_w) AM_SHARE("vram.0")                 // Layer 0
 	AM_RANGE(0x140000, 0x140005) AM_WRITEONLY AM_SHARE("vctrl.0")                           // Layer 0 Control
-	AM_RANGE(0x180000, 0x187fff) AM_WRITEONLY AM_SHARE("spriteram") // Sprites
+	AM_RANGE(0x180000, 0x187fff) AM_WRITEONLY AM_SHARE("spriteram.0") // Sprites
 	AM_RANGE(0x1c0000, 0x1c0007) AM_READ(cave_irq_cause_r)                                                  // IRQ Cause
-	AM_RANGE(0x1c0000, 0x1c007f) AM_WRITEONLY AM_SHARE("videoregs")                         // Video Regs
-	AM_RANGE(0x200000, 0x207fff) AM_WRITEONLY AM_SHARE("paletteram")    // Palette
+	AM_RANGE(0x1c0000, 0x1c007f) AM_WRITEONLY AM_SHARE("videoregs.0")                         // Video Regs
+	AM_RANGE(0x200000, 0x207fff) AM_WRITEONLY AM_SHARE("paletteram.0")    // Palette
 //  AM_RANGE(0x240000, 0x240003) AM_DEVREAD8("ymz", ymz280b_device, read, 0x00ff)                           // YMZ280
 	AM_RANGE(0x240000, 0x240003) AM_DEVWRITE8("ymz", ymz280b_device, write, 0x00ff)                         // YMZ280
 	AM_RANGE(0x280000, 0x280001) AM_READ_PORT("IN0")                                                        // Inputs + ???
@@ -697,8 +722,8 @@ static ADDRESS_MAP_START( crusherm_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                                                     // ROM
 	AM_RANGE(0x100000, 0x107fff) AM_WRITE(cave_vram_0_w) AM_SHARE("vram.0")                 // Layer 0
 	AM_RANGE(0x140000, 0x140005) AM_WRITEONLY AM_SHARE("vctrl.0")                           // Layer 0 Control
-	AM_RANGE(0x180000, 0x187fff) AM_WRITEONLY AM_SHARE("spriteram") // Sprites
-	AM_RANGE(0x200000, 0x207fff) AM_WRITEONLY AM_SHARE("paletteram")    // Palette
+	AM_RANGE(0x180000, 0x187fff) AM_WRITEONLY AM_SHARE("spriteram.0") // Sprites
+	AM_RANGE(0x200000, 0x207fff) AM_WRITEONLY AM_SHARE("paletteram.0")    // Palette
 	AM_RANGE(0x240000, 0x240003) AM_DEVWRITE8("ymz", ymz280b_device, write, 0x00ff)                         // YMZ280
 	AM_RANGE(0x280000, 0x280001) AM_READ_PORT("IN0")                                                        // Inputs + ???
 	AM_RANGE(0x280002, 0x280003) AM_READ_PORT("IN1")                                                        // Inputs + EEPROM
@@ -706,7 +731,7 @@ static ADDRESS_MAP_START( crusherm_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x28000a, 0x28000b) AM_WRITE(korokoro_eeprom_msb_w)                                // EEPROM
 	AM_RANGE(0x28000c, 0x28000d) AM_WRITENOP                                                                // 0 (watchdog?)
 	AM_RANGE(0x300000, 0x300007) AM_READ(cave_irq_cause_r)                                                  // IRQ Cause
-	AM_RANGE(0x300000, 0x30007f) AM_WRITEONLY AM_SHARE("videoregs")                         // Video Regs
+	AM_RANGE(0x300000, 0x30007f) AM_WRITEONLY AM_SHARE("videoregs.0")                         // Video Regs
 	AM_RANGE(0x340000, 0x34ffff) AM_RAM                                                                     // RAM
 ADDRESS_MAP_END
 
@@ -717,12 +742,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mazinger_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                                                 // ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM                                                                 // RAM
-/**/AM_RANGE(0x200000, 0x207fff) AM_RAM AM_SHARE("spriteram")       // Sprites
-/**/AM_RANGE(0x208000, 0x20ffff) AM_RAM AM_SHARE("spriteram_2")                         // Sprites?
+/**/AM_RANGE(0x200000, 0x207fff) AM_RAM AM_SHARE("spriteram.0")       // Sprites
+/**/AM_RANGE(0x208000, 0x20ffff) AM_RAM AM_SHARE("spriteram_2.0")                         // Sprites?
 	AM_RANGE(0x300000, 0x300007) AM_READ(cave_irq_cause_r)                                              // IRQ Cause
 	AM_RANGE(0x300068, 0x300069) AM_WRITE(watchdog_reset16_w)                                           // Watchdog
 	AM_RANGE(0x30006e, 0x30006f) AM_READWRITE(soundlatch_ack_r, sound_cmd_w)                            // From Sound CPU
-	AM_RANGE(0x300000, 0x30007f) AM_WRITEONLY AM_SHARE("videoregs")                     // Video Regs
+	AM_RANGE(0x300000, 0x30007f) AM_WRITEONLY AM_SHARE("videoregs.0")                     // Video Regs
 	AM_RANGE(0x400000, 0x407fff) AM_RAM_WRITE(cave_vram_1_8x8_w) AM_SHARE("vram.1")     // Layer 1
 /**/AM_RANGE(0x500000, 0x507fff) AM_RAM_WRITE(cave_vram_0_8x8_w) AM_SHARE("vram.0")     // Layer 0
 /**/AM_RANGE(0x600000, 0x600005) AM_RAM AM_SHARE("vctrl.1")                             // Layer 1 Control
@@ -730,7 +755,7 @@ static ADDRESS_MAP_START( mazinger_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("IN0")                                                    // Inputs
 	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("IN1")                                                    // Inputs + EEPROM
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(cave_eeprom_msb_w)                                // EEPROM
-/**/AM_RANGE(0xc08000, 0xc0ffff) AM_RAM AM_SHARE("paletteram")  // Palette
+/**/AM_RANGE(0xc08000, 0xc0ffff) AM_RAM AM_SHARE("paletteram.0")  // Palette
 	AM_RANGE(0xd00000, 0xd7ffff) AM_ROM AM_REGION("user1", 0)   // extra data ROM
 ADDRESS_MAP_END
 
@@ -743,7 +768,7 @@ static ADDRESS_MAP_START( metmqstr_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                                                 // ROM
 	AM_RANGE(0x100000, 0x17ffff) AM_ROM                                                                 // ROM
 	AM_RANGE(0x200000, 0x27ffff) AM_ROM                                                                 // ROM
-	AM_RANGE(0x408000, 0x408fff) AM_RAM AM_SHARE("paletteram")  // Palette
+	AM_RANGE(0x408000, 0x408fff) AM_RAM AM_SHARE("paletteram.0")  // Palette
 	AM_RANGE(0x600000, 0x600001) AM_READ(watchdog_reset16_r)                                            // Watchdog?
 	AM_RANGE(0x880000, 0x887fff) AM_RAM_WRITE(cave_vram_2_w) AM_SHARE("vram.2")         // Layer 2
 	AM_RANGE(0x888000, 0x88ffff) AM_RAM                                                                 //
@@ -755,15 +780,138 @@ static ADDRESS_MAP_START( metmqstr_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0xa80068, 0xa80069) AM_WRITE(watchdog_reset16_w)                                           // Watchdog?
 	AM_RANGE(0xa8006c, 0xa8006d) AM_READ(soundflags_ack_r) AM_WRITENOP                                  // Communication
 	AM_RANGE(0xa8006e, 0xa8006f) AM_READWRITE(soundlatch_ack_r, sound_cmd_w)                            // From Sound CPU
-	AM_RANGE(0xa80000, 0xa8007f) AM_WRITEONLY AM_SHARE("videoregs")                     // Video Regs
+	AM_RANGE(0xa80000, 0xa8007f) AM_WRITEONLY AM_SHARE("videoregs.0")                     // Video Regs
 /**/AM_RANGE(0xb00000, 0xb00005) AM_RAM AM_SHARE("vctrl.2")                             // Layer 2 Control
 /**/AM_RANGE(0xb80000, 0xb80005) AM_RAM AM_SHARE("vctrl.1")                             // Layer 1 Control
 /**/AM_RANGE(0xc00000, 0xc00005) AM_RAM AM_SHARE("vctrl.0")                             // Layer 0 Control
 	AM_RANGE(0xc80000, 0xc80001) AM_READ_PORT("IN0")                                                    // Inputs
 	AM_RANGE(0xc80002, 0xc80003) AM_READ_PORT("IN1")                                                    // Inputs + EEPROM
 	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(metmqstr_eeprom_msb_w)                            // EEPROM
-	AM_RANGE(0xf00000, 0xf07fff) AM_RAM AM_SHARE("spriteram")       // Sprites
-	AM_RANGE(0xf08000, 0xf0ffff) AM_RAM AM_SHARE("spriteram_2")                         // RAM
+	AM_RANGE(0xf00000, 0xf07fff) AM_RAM AM_SHARE("spriteram.0")       // Sprites
+	AM_RANGE(0xf08000, 0xf0ffff) AM_RAM AM_SHARE("spriteram_2.0")                         // RAM
+ADDRESS_MAP_END
+
+
+/***************************************************************************
+                               Poka Poka Satan
+***************************************************************************/
+
+WRITE16_MEMBER(cave_state::ppsatan_io_mux_w)
+{
+	COMBINE_DATA(&m_ppsatan_io_mux);
+}
+
+UINT16 cave_state::ppsatan_touch_r(int player)
+{
+	UINT8 ret_x = 0, ret_y = 0;
+
+	UINT16 x = ioport(player ? "TOUCH2_X" : "TOUCH1_X")->read();
+	UINT16 y = ioport(player ? "TOUCH2_Y" : "TOUCH1_Y")->read();
+
+	if (x & 0x8000)	// touching
+	{
+		x &= 0x7fff;
+
+		// x
+		int slot_x = floor( ((320.0f - 1 - x) - 12) / 20 );
+		
+		if (slot_x < 0)
+			slot_x = 0;
+		else if (slot_x > 14)
+			slot_x = 14;
+
+		if ( (m_ppsatan_io_mux & (1 << slot_x)) || ((m_ppsatan_io_mux << 13) & (1 << slot_x)) )
+			ret_x |= 1 << (slot_x % 8);
+
+		// y
+		int slot_y = floor( ((224.0f - 1 - y) - 14) / 18 );
+
+		if (slot_y < 0)
+			slot_y = 0;
+		else if (slot_y > 10)
+			slot_y = 10;
+
+		if ( ((m_ppsatan_io_mux >> 2) & (1 << slot_y)) || ((m_ppsatan_io_mux << 6) & (1 << slot_y)) )
+			ret_y |= 1 << (slot_y % 6);
+
+//		if (!player)	popmessage("TOUCH %03x %03x -> %f -> %d", x, y, ((320.0f - 1 - x) - 12) / 20, slot_x);
+	}
+
+	return ret_x | (ret_y << 8);
+}
+
+READ16_MEMBER(cave_state::ppsatan_touch1_r)
+{
+	return ppsatan_touch_r(0);
+}
+READ16_MEMBER(cave_state::ppsatan_touch2_r)
+{
+	return ppsatan_touch_r(1);
+}
+
+WRITE16_MEMBER(cave_state::ppsatan_out_w)
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		coin_counter_w(machine(), 0, data & 0x0001);
+
+		set_led_status(machine(), 0, data & 0x0010);
+		set_led_status(machine(), 1, data & 0x0020);
+		set_led_status(machine(), 2, data & 0x0040);
+		set_led_status(machine(), 3, data & 0x0080);
+	}
+	if (ACCESSING_BITS_8_15)
+	{
+		set_led_status(machine(), 4, data & 0x0100);
+		set_led_status(machine(), 5, data & 0x0200);
+		set_led_status(machine(), 6, data & 0x0400);	// not tested in service mode 
+		set_led_status(machine(), 7, data & 0x0800);	// not tested in service mode 
+
+		m_oki->set_bank_base((data & 0x8000) ? 0x40000 : 0);
+	}
+
+//	popmessage("OUT %04x", data);
+}
+
+static ADDRESS_MAP_START( ppsatan_map, AS_PROGRAM, 16, cave_state )
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM                                                 // ROM
+	AM_RANGE(0x040000, 0x04ffff) AM_RAM                                                 // RAM
+
+	// Left Screen (Player 2)
+	AM_RANGE(0x080000, 0x080005) AM_RAM AM_SHARE("vctrl.1")                             // Layer Control
+	AM_RANGE(0x100000, 0x107fff) AM_RAM_WRITE(cave_vram_1_w) AM_SHARE("vram.1")         // Layer
+//	AM_RANGE(0x180000, 0x1803ff) AM_RAM                                                 // Palette (Tilemaps)
+//	AM_RANGE(0x187800, 0x188fff) AM_RAM AM_SHARE("paletteram.1")                        // Palette (Sprites)
+	AM_RANGE(0x180000, 0x188fff) AM_RAM AM_SHARE("paletteram.1")                        // Palette
+	AM_RANGE(0x1c0000, 0x1c7fff) AM_RAM AM_SHARE("spriteram.1")                         // Sprites
+	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("SYSTEM" )                                // DSW + (unused) EEPROM
+	AM_RANGE(0x200000, 0x200001) AM_WRITE(ppsatan_out_w)                                // Outputs + OKI banking
+	AM_RANGE(0x200002, 0x200003) AM_READWRITE(ppsatan_touch2_r, ppsatan_eeprom_msb_w)   // Touch Screen + (unused) EEPROM
+	AM_RANGE(0x200004, 0x200005) AM_READWRITE(ppsatan_touch1_r, ppsatan_io_mux_w)       // Touch Screen
+	AM_RANGE(0x200006, 0x200007) AM_WRITENOP                                            // Lev. 2 IRQ Ack?
+	AM_RANGE(0x2c0000, 0x2c0007) AM_READ(cave_irq_cause_r)                              // IRQ Cause
+	AM_RANGE(0x2c0068, 0x2c0069) AM_WRITE(watchdog_reset16_w)                           // Watchdog
+	AM_RANGE(0x2c0000, 0x2c007f) AM_WRITEONLY AM_SHARE("videoregs.1")                   // Video Regs
+
+	AM_RANGE(0x300000, 0x300001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)   // M6295
+
+	// Right Screen (Player 1)
+	AM_RANGE(0x480000, 0x480005) AM_RAM AM_SHARE("vctrl.2")                             // Layer Control
+	AM_RANGE(0x500000, 0x507fff) AM_RAM_WRITE(cave_vram_2_w) AM_SHARE("vram.2")         // Layer
+//	AM_RANGE(0x580000, 0x5803ff) AM_RAM                                                 // Palette (Tilemaps)
+//	AM_RANGE(0x587800, 0x588fff) AM_RAM //AM_SHARE("paletteram.2")                      // Palette (Sprites)
+	AM_RANGE(0x580000, 0x588fff) AM_RAM AM_SHARE("paletteram.2")                        // Palette
+	AM_RANGE(0x5c0000, 0x5c7fff) AM_RAM AM_SHARE("spriteram.2")                         // Sprites
+	AM_RANGE(0x6c0000, 0x6c007f) AM_WRITEONLY AM_SHARE("videoregs.2")                   // Video Regs
+
+	// Top Screen
+	AM_RANGE(0x880000, 0x880005) AM_RAM AM_SHARE("vctrl.0")                             // Layer Control
+	AM_RANGE(0x900000, 0x907fff) AM_RAM_WRITE(cave_vram_0_w) AM_SHARE("vram.0")         // Layer
+//	AM_RANGE(0x980000, 0x9803ff) AM_RAM                                                 // Palette (Tilemaps)
+//	AM_RANGE(0x987800, 0x988fff) AM_RAM AM_SHARE("paletteram.0")                        // Palette (Sprites)
+	AM_RANGE(0x980000, 0x988fff) AM_RAM AM_SHARE("paletteram.0")                        // Palette
+	AM_RANGE(0x9c0000, 0x9c7fff) AM_RAM AM_SHARE("spriteram.0")                         // Sprites
+	AM_RANGE(0xac0000, 0xac007f) AM_WRITEONLY AM_SHARE("videoregs.0")                   // Video Regs
 ADDRESS_MAP_END
 
 
@@ -809,10 +957,10 @@ static ADDRESS_MAP_START( pwrinst2_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x880000, 0x887fff) AM_RAM_WRITE(cave_vram_0_w) AM_SHARE("vram.0")             // Layer 0
 	AM_RANGE(0x900000, 0x907fff) AM_RAM_WRITE(cave_vram_1_w) AM_SHARE("vram.1")             // Layer 1
 	AM_RANGE(0x980000, 0x987fff) AM_RAM_WRITE(cave_vram_3_8x8_w) AM_SHARE("vram.3")         // Layer 3
-	AM_RANGE(0xa00000, 0xa07fff) AM_RAM AM_SHARE("spriteram")           // Sprites
-	AM_RANGE(0xa08000, 0xa0ffff) AM_RAM AM_SHARE("spriteram_2")                             // Sprites?
+	AM_RANGE(0xa00000, 0xa07fff) AM_RAM AM_SHARE("spriteram.0")           // Sprites
+	AM_RANGE(0xa08000, 0xa0ffff) AM_RAM AM_SHARE("spriteram_2.0")                             // Sprites?
 	AM_RANGE(0xa10000, 0xa1ffff) AM_RAM                                                                     // Sprites?
-	AM_RANGE(0xa80000, 0xa8007f) AM_RAM_READ(donpachi_videoregs_r) AM_SHARE("videoregs")    // Video Regs
+	AM_RANGE(0xa80000, 0xa8007f) AM_RAM_READ(donpachi_videoregs_r) AM_SHARE("videoregs.0")    // Video Regs
 /**/AM_RANGE(0xb00000, 0xb00005) AM_RAM_WRITE(pwrinst2_vctrl_2_w) AM_SHARE("vctrl.2")       // Layer 2 Control
 /**/AM_RANGE(0xb80000, 0xb80005) AM_RAM_WRITE(pwrinst2_vctrl_0_w) AM_SHARE("vctrl.0")       // Layer 0 Control
 /**/AM_RANGE(0xc00000, 0xc00005) AM_RAM_WRITE(pwrinst2_vctrl_1_w) AM_SHARE("vctrl.1")       // Layer 1 Control
@@ -820,7 +968,7 @@ static ADDRESS_MAP_START( pwrinst2_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0xd80000, 0xd80001) AM_READ(soundlatch_ack_r)                                                  // ? From Sound CPU
 	AM_RANGE(0xe00000, 0xe00001) AM_WRITE(sound_cmd_w)                                                      // To Sound CPU
 	AM_RANGE(0xe80000, 0xe80001) AM_READ(pwrinst2_eeprom_r)                                 // EEPROM
-	AM_RANGE(0xf00000, 0xf04fff) AM_RAM AM_SHARE("paletteram")      // Palette
+	AM_RANGE(0xf00000, 0xf04fff) AM_RAM AM_SHARE("paletteram.0")      // Palette
 ADDRESS_MAP_END
 
 
@@ -840,11 +988,11 @@ static ADDRESS_MAP_START( sailormn_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x110000, 0x110001) AM_RAM                                                                 // (agallet)
 	AM_RANGE(0x200000, 0x3fffff) AM_ROM                                                                 // ROM
 	AM_RANGE(0x400000, 0x407fff) AM_RAM                                                                 // (agallet)
-	AM_RANGE(0x408000, 0x40bfff) AM_RAM AM_SHARE("paletteram")  // Palette
+	AM_RANGE(0x408000, 0x40bfff) AM_RAM AM_SHARE("paletteram.0")  // Palette
 	AM_RANGE(0x40c000, 0x40ffff) AM_RAM                                                                 // (agallet)
 	AM_RANGE(0x410000, 0x410001) AM_RAM                                                                 // (agallet)
-	AM_RANGE(0x500000, 0x507fff) AM_RAM AM_SHARE("spriteram")       // Sprites
-	AM_RANGE(0x508000, 0x50ffff) AM_RAM AM_SHARE("spriteram_2")                         // Sprites?
+	AM_RANGE(0x500000, 0x507fff) AM_RAM AM_SHARE("spriteram.0")       // Sprites
+	AM_RANGE(0x508000, 0x50ffff) AM_RAM AM_SHARE("spriteram_2.0")                         // Sprites?
 	AM_RANGE(0x510000, 0x510001) AM_RAM                                                                 // (agallet)
 	AM_RANGE(0x600000, 0x600001) AM_READ(sailormn_input0_r)                                             // Inputs + Watchdog!
 	AM_RANGE(0x600002, 0x600003) AM_READ_PORT("IN1")                                                    // Inputs + EEPROM
@@ -860,7 +1008,7 @@ static ADDRESS_MAP_START( sailormn_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0xb8006c, 0xb8006d) AM_READ(soundflags_ack_r)                                              // Communication
 	AM_RANGE(0xb8006e, 0xb8006f) AM_READ(soundlatch_ack_r)                                              // From Sound CPU
 	AM_RANGE(0xb8006e, 0xb8006f) AM_WRITE(sound_cmd_w)                                                  // To Sound CPU
-	AM_RANGE(0xb80000, 0xb8007f) AM_WRITEONLY AM_SHARE("videoregs")                     // Video Regs
+	AM_RANGE(0xb80000, 0xb8007f) AM_WRITEONLY AM_SHARE("videoregs.0")                     // Video Regs
 ADDRESS_MAP_END
 
 
@@ -911,17 +1059,17 @@ CUSTOM_INPUT_MEMBER(cave_state::tjumpman_hopper_r)
 static ADDRESS_MAP_START( tjumpman_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                                                 // ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("nvram")                                               // RAM
-	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_SHARE("spriteram")       // Sprites
-	AM_RANGE(0x208000, 0x20ffff) AM_RAM AM_SHARE("spriteram_2")                         // Sprite bank 2
+	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_SHARE("spriteram.0")       // Sprites
+	AM_RANGE(0x208000, 0x20ffff) AM_RAM AM_SHARE("spriteram_2.0")                         // Sprite bank 2
 	AM_RANGE(0x304000, 0x307fff) AM_WRITE(cave_vram_0_w)                                                // Layer 0 - 16x16 tiles mapped here
 	AM_RANGE(0x300000, 0x307fff) AM_RAM_WRITE(cave_vram_0_w) AM_SHARE("vram.0")         // Layer 0
 	AM_RANGE(0x400000, 0x400005) AM_WRITEONLY AM_SHARE("vctrl.0")                       // Layer 0 Control
-	AM_RANGE(0x500000, 0x50ffff) AM_RAM AM_SHARE("paletteram")  // Palette
+	AM_RANGE(0x500000, 0x50ffff) AM_RAM AM_SHARE("paletteram.0")  // Palette
 	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("IN0")                                                    // Inputs + EEPROM + Hopper
 	AM_RANGE(0x600002, 0x600003) AM_READ_PORT("IN1")                                                    // Inputs
 	AM_RANGE(0x700000, 0x700007) AM_READ(cave_irq_cause_r)                                              // IRQ Cause
 	AM_RANGE(0x700068, 0x700069) AM_WRITE(watchdog_reset16_w)                                           // Watchdog
-	AM_RANGE(0x700000, 0x70007f) AM_WRITEONLY AM_SHARE("videoregs")                     // Video Regs
+	AM_RANGE(0x700000, 0x70007f) AM_WRITEONLY AM_SHARE("videoregs.0")                     // Video Regs
 	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff) // M6295
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(tjumpman_leds_w)                                              // Leds + Hopper
 	AM_RANGE(0xe00000, 0xe00001) AM_WRITE(tjumpman_eeprom_lsb_w)                            // EEPROM
@@ -951,14 +1099,14 @@ WRITE16_MEMBER(cave_state::pacslot_leds_w)
 static ADDRESS_MAP_START( pacslot_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                                                 // ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("nvram")                                               // RAM
-	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_SHARE("spriteram")       // Sprites
-	AM_RANGE(0x208000, 0x20ffff) AM_RAM AM_SHARE("spriteram_2")                         // Sprite bank 2
+	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_SHARE("spriteram.0")       // Sprites
+	AM_RANGE(0x208000, 0x20ffff) AM_RAM AM_SHARE("spriteram_2.0")                         // Sprite bank 2
 	AM_RANGE(0x300000, 0x307fff) AM_RAM_WRITE(cave_vram_0_w) AM_SHARE("vram.0")         // Layer 0
 	AM_RANGE(0x400000, 0x400007) AM_READ(cave_irq_cause_r)                                              // IRQ Cause
 	AM_RANGE(0x400068, 0x400069) AM_WRITE(watchdog_reset16_w)                                           // Watchdog
-	AM_RANGE(0x400000, 0x40007f) AM_WRITEONLY AM_SHARE("videoregs")                     // Video Regs
+	AM_RANGE(0x400000, 0x40007f) AM_WRITEONLY AM_SHARE("videoregs.0")                     // Video Regs
 	AM_RANGE(0x500000, 0x500005) AM_WRITEONLY AM_SHARE("vctrl.0")                       // Layer 0 Control
-	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_SHARE("paletteram")  // Palette
+	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_SHARE("paletteram.0")  // Palette
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("IN0")                                                    // Inputs + EEPROM + Hopper
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("IN1")                                                    // Inputs
 	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff) // M6295
@@ -975,13 +1123,13 @@ static ADDRESS_MAP_START( uopoko_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                                                 // ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM                                                                 // RAM
 	AM_RANGE(0x300000, 0x300003) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0x00ff)                   // YMZ280
-/**/AM_RANGE(0x400000, 0x407fff) AM_RAM AM_SHARE("spriteram")       // Sprites
-/**/AM_RANGE(0x408000, 0x40ffff) AM_RAM AM_SHARE("spriteram_2")                         // Sprites?
+/**/AM_RANGE(0x400000, 0x407fff) AM_RAM AM_SHARE("spriteram.0")       // Sprites
+/**/AM_RANGE(0x408000, 0x40ffff) AM_RAM AM_SHARE("spriteram_2.0")                         // Sprites?
 /**/AM_RANGE(0x500000, 0x507fff) AM_RAM_WRITE(cave_vram_0_w) AM_SHARE("vram.0")         // Layer 0
 	AM_RANGE(0x600000, 0x600007) AM_READ(cave_irq_cause_r)                                              // IRQ Cause
-	AM_RANGE(0x600000, 0x60007f) AM_WRITEONLY AM_SHARE("videoregs")                     // Video Regs
+	AM_RANGE(0x600000, 0x60007f) AM_WRITEONLY AM_SHARE("videoregs.0")                     // Video Regs
 /**/AM_RANGE(0x700000, 0x700005) AM_RAM AM_SHARE("vctrl.0")                             // Layer 0 Control
-/**/AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("paletteram")  // Palette
+/**/AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("paletteram.0")  // Palette
 	AM_RANGE(0x900000, 0x900001) AM_READ_PORT("IN0")                                                    // Inputs
 	AM_RANGE(0x900002, 0x900003) AM_READ_PORT("IN1")                                                    // Inputs + EEPROM
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(cave_eeprom_msb_w)                                // EEPROM
@@ -1507,6 +1655,48 @@ static INPUT_PORTS_START( pacslot )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( ppsatan )
+	PORT_START("SYSTEM")   // $200000
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1    )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 ) // service coin
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE2 )	// advance in service mode
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+
+	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Coinage ) )          PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(      0x0300, "1 Coin/1 1P-Game (2 Coins/1 2P-Game)" )
+	PORT_DIPSETTING(      0x0100, "2 Coins/1 1P-Game (3 Coins/1 2P-Game)" )
+	PORT_DIPSETTING(      0x0200, "2 Coins/1 1P-Game (4 Coins/1 2P-Game)" )
+	PORT_DIPSETTING(      0x0000, "2 Coins/1 1P-Game (4 Coins/1 2P-Game) (duplicate)" )
+	PORT_DIPUNKNOWN(0x0400, 0x0400)                             PORT_DIPLOCATION("SW1:3")
+	PORT_DIPUNKNOWN(0x0800, 0x0800)                             PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x3000, 0x3000, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPSETTING(      0x1000, DEF_STR( Easy ) )    // 15 hits
+	PORT_DIPSETTING(      0x3000, DEF_STR( Normal ) )  // 20 hits
+	PORT_DIPSETTING(      0x0000, DEF_STR( Hard ) )    // 25 hits
+	PORT_DIPSETTING(      0x2000, "Hard (duplicate)" )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION("SW1:7")	// Jingle after "warning" screen (every 3 demo loops)
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( On ) )
+	PORT_SERVICE(0x8000, IP_ACTIVE_LOW)                         PORT_DIPLOCATION("SW1:8")
+
+	PORT_START("TOUCH1_X")
+	PORT_BIT( 0x7fff, 0x20, IPT_LIGHTGUN_X ) PORT_PLAYER(1) PORT_MINMAX(0x000, 0x140-1) PORT_CROSSHAIR(X, 284.0/320.0, 0.0, 0) PORT_SENSITIVITY(35) PORT_KEYDELTA(8)
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_START("TOUCH1_Y")
+	PORT_BIT( 0xffff, 0x18, IPT_LIGHTGUN_Y ) PORT_PLAYER(1) PORT_MINMAX(0x000,  0xe0-1) PORT_CROSSHAIR(Y, 188.0/224.0, 0.0, 0) PORT_SENSITIVITY(35) PORT_KEYDELTA(8)
+
+	PORT_START("TOUCH2_X")
+	PORT_BIT( 0x7fff, 0x20, IPT_LIGHTGUN_X ) PORT_PLAYER(2) PORT_MINMAX(0x000, 0x140-1) PORT_CROSSHAIR(X, 284.0/320.0, 0.0, 0) PORT_SENSITIVITY(35) PORT_KEYDELTA(8)
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_START("TOUCH2_Y")
+	PORT_BIT( 0xffff, 0x18, IPT_LIGHTGUN_Y ) PORT_PLAYER(2) PORT_MINMAX(0x000,  0xe0-1) PORT_CROSSHAIR(Y, 188.0/224.0, 0.0, 0) PORT_SENSITIVITY(35) PORT_KEYDELTA(8)
+INPUT_PORTS_END
+
+
 /***************************************************************************
 
 
@@ -1692,6 +1882,15 @@ static GFXDECODE_START( mazinger )
 	GFXDECODE_ENTRY( "layer1", 0, layout_8x8x6, 0x4400, 0x40 ) // [1] Layer 1
 GFXDECODE_END
 
+/***************************************************************************
+                               Poka Poka Satan
+***************************************************************************/
+
+static GFXDECODE_START( ppsatan )
+	GFXDECODE_ENTRY( "layer0", 0, layout_8x8x4, 0x4000, 0x40 ) // [0] Layer 0
+	GFXDECODE_ENTRY( "layer1", 0, layout_8x8x4, 0x4000, 0x40 ) // [1] Layer 1
+	GFXDECODE_ENTRY( "layer2", 0, layout_8x8x4, 0x4000, 0x40 ) // [2] Layer 2
+GFXDECODE_END
 
 /***************************************************************************
                                 Power Instinct 2
@@ -2309,6 +2508,71 @@ MACHINE_CONFIG_END
 
 
 /***************************************************************************
+                               Poka Poka Satan
+***************************************************************************/
+
+TIMER_DEVICE_CALLBACK_MEMBER( cave_state::timer_lev2_cb )
+{
+	m_maincpu->set_input_line(M68K_IRQ_2, HOLD_LINE);	// ppsatan: read touch screens
+}
+
+static MACHINE_CONFIG_START( ppsatan, cave_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
+	MCFG_CPU_PROGRAM_MAP(ppsatan_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt_ppsatan)
+
+	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(1))  /* a guess, and certainly wrong */
+
+	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
+	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_lev2", cave_state, timer_lev2_cb, attotime::from_hz(60))
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)		// Top
+	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(320, 240)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
+	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_ppsatan_top)
+	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
+
+	MCFG_SCREEN_ADD("screen_left", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(320, 240)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
+	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_ppsatan_left)
+	MCFG_TIMER_DRIVER_ADD("int_timer_left", cave_state, cave_vblank_start_left)
+
+	MCFG_SCREEN_ADD("screen_right", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(320, 240)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
+	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_ppsatan_right)
+	MCFG_TIMER_DRIVER_ADD("int_timer_right", cave_state, cave_vblank_start_right)
+
+	MCFG_GFXDECODE(ppsatan)
+	MCFG_PALETTE_LENGTH(0x8000)
+	MCFG_PALETTE_INIT_OVERRIDE(cave_state,ppsatan)
+	MCFG_DEFAULT_LAYOUT(layout_ppsatan)
+
+	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_3_layers)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_OKIM6295_ADD("oki", XTAL_1_056MHz, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 2.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 2.0)
+MACHINE_CONFIG_END
+
+
+/***************************************************************************
                                 Power Instinct 2
 ***************************************************************************/
 
@@ -2530,10 +2794,10 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 /* 4 bits -> 8 bits. Even and odd pixels are swapped */
-static void unpack_sprites(running_machine &machine)
+void cave_state::unpack_sprites(const char *region)
 {
-	const UINT32 len    =   machine.root_device().memregion("sprites")->bytes();
-	UINT8 *rgn          =   machine.root_device().memregion("sprites")->base();
+	const UINT32 len    =   memregion(region)->bytes();
+	UINT8 *rgn          =   memregion(region)->base();
 	UINT8 *src          =   rgn + len / 2 - 1;
 	UINT8 *dst          =   rgn + len - 1;
 
@@ -2547,10 +2811,10 @@ static void unpack_sprites(running_machine &machine)
 
 
 /* 4 bits -> 8 bits. Even and odd pixels and even and odd words, are swapped */
-static void ddonpach_unpack_sprites(running_machine &machine)
+void cave_state::ddonpach_unpack_sprites(const char *region)
 {
-	const UINT32 len    =   machine.root_device().memregion("sprites")->bytes();
-	UINT8 *rgn          =   machine.root_device().memregion("sprites")->base();
+	const UINT32 len    =   memregion(region)->bytes();
+	UINT8 *rgn          =   memregion(region)->base();
 	UINT8 *src          =   rgn + len / 2 - 1;
 	UINT8 *dst          =   rgn + len - 1;
 
@@ -2571,10 +2835,10 @@ static void ddonpach_unpack_sprites(running_machine &machine)
 
 
 /* 2 pages of 4 bits -> 8 bits */
-static void esprade_unpack_sprites(running_machine &machine)
+void cave_state::esprade_unpack_sprites(const char *region)
 {
-	UINT8 *src      =   machine.root_device().memregion("sprites")->base();
-	UINT8 *dst      =   src + machine.root_device().memregion("sprites")->bytes();
+	UINT8 *src      =   memregion(region)->base();
+	UINT8 *dst      =   src + memregion(region)->bytes();
 
 	while(src < dst)
 	{
@@ -2639,7 +2903,7 @@ BP962A.U77  23C16000    GFX
 	ROM_REGION( 0x80000, "audiocpu", 0 ) \
 	ROM_LOAD( "bp962a.u9",  0x00000, 0x80000, CRC(06caddbe) SHA1(6a3cc50558ba19a31b21b7f3ec6c6e2846244ff1) ) \
 	\
-	ROM_REGION( 0x400000 * 2, "sprites", 0 ) \
+	ROM_REGION( 0x400000 * 2, "sprites0", 0 ) \
 	ROM_LOAD( "bp962a.u76", 0x000000, 0x200000, CRC(858da439) SHA1(33a3d2a3ec3fa3364b00e1e43b405e5030a5b2a3) ) \
 	ROM_LOAD( "bp962a.u77", 0x200000, 0x200000, CRC(ea2ba35e) SHA1(72487f21d44fe7be9a98068ce7f57a43c132945f) ) \
 	\
@@ -2719,7 +2983,7 @@ ROM_START( dfeveron )
 	ROM_LOAD16_BYTE( "cv01-u34.bin", 0x000000, 0x080000, CRC(be87f19d) SHA1(595239245df3835cdf5a99a6c62480465558d8d3) )
 	ROM_LOAD16_BYTE( "cv01-u33.bin", 0x000001, 0x080000, CRC(e53a7db3) SHA1(ddced29f78dc3cc89038757b6577ba2ba0d8b041) )
 
-	ROM_REGION( 0x800000 * 2, "sprites", 0 )        /* Sprites: * 2 */
+	ROM_REGION( 0x800000 * 2, "sprites0", 0 )        /* Sprites: * 2 */
 	ROM_LOAD( "cv01-u25.bin", 0x000000, 0x400000, CRC(a6f6a95d) SHA1(e1eb45cb5d0e6163edfd9d830633b913fb53c6ca) )
 	ROM_LOAD( "cv01-u26.bin", 0x400000, 0x400000, CRC(32edb62a) SHA1(3def74e1316b80cc25a8c3ac162cd7bcb8cc807c) )
 
@@ -2825,7 +3089,7 @@ ROM_START( feversos )
 	ROM_LOAD16_BYTE( "cv01-u34.sos", 0x000000, 0x080000, CRC(24ef3ce6) SHA1(42799eebbb2686a837b8972aec684143deadca59) )
 	ROM_LOAD16_BYTE( "cv01-u33.sos", 0x000001, 0x080000, CRC(64ff73fd) SHA1(7fc3a8469cec2361d373a4dac4a547c13ca5f709) )
 
-	ROM_REGION( 0x800000 * 2, "sprites", 0 )        /* Sprites: * 2 */
+	ROM_REGION( 0x800000 * 2, "sprites0", 0 )        /* Sprites: * 2 */
 	ROM_LOAD( "cv01-u25.bin", 0x000000, 0x400000, CRC(a6f6a95d) SHA1(e1eb45cb5d0e6163edfd9d830633b913fb53c6ca) )
 	ROM_LOAD( "cv01-u26.bin", 0x400000, 0x400000, CRC(32edb62a) SHA1(3def74e1316b80cc25a8c3ac162cd7bcb8cc807c) )
 
@@ -2860,7 +3124,7 @@ ROM_START( ddonpach )
 	ROM_LOAD16_BYTE( "b1.u27", 0x000000, 0x080000, CRC(b5cdc8d3) SHA1(58757b50e21a27e500a82c03f62cf02a85389926) )
 	ROM_LOAD16_BYTE( "b2.u26", 0x000001, 0x080000, CRC(6bbb063a) SHA1(e5de64b9c3efc0a38a2e0e16b78ee393bff63558) )
 
-	ROM_REGION( 0x800000 * 2, "sprites", 0 )        /* Sprites: * 2 */
+	ROM_REGION( 0x800000 * 2, "sprites0", 0 )        /* Sprites: * 2 */
 	ROM_LOAD( "u50.bin", 0x000000, 0x200000, CRC(14b260ec) SHA1(33bda210302428d5500115d0c7a839cdfcb67d17) )
 	ROM_LOAD( "u51.bin", 0x200000, 0x200000, CRC(e7ba8cce) SHA1(ad74a6b7d53760b19587c4a6dbea937daa7e87ce) )
 	ROM_LOAD( "u52.bin", 0x400000, 0x200000, CRC(02492ee0) SHA1(64d9cc64a4ad189a8b03cf6a749ddb732b4a0014) )
@@ -2889,7 +3153,7 @@ ROM_START( ddonpachj )
 	ROM_LOAD16_BYTE( "u27.bin", 0x000000, 0x080000, CRC(2432ff9b) SHA1(fbc826c30553f6553ead40b312b73c049e8f4bf6) )
 	ROM_LOAD16_BYTE( "u26.bin", 0x000001, 0x080000, CRC(4f3a914a) SHA1(ae98eba049f1462aa1145f6959b9f9a32c97278f) )
 
-	ROM_REGION( 0x800000 * 2, "sprites", 0 )        /* Sprites: * 2 */
+	ROM_REGION( 0x800000 * 2, "sprites0", 0 )        /* Sprites: * 2 */
 	ROM_LOAD( "u50.bin", 0x000000, 0x200000, CRC(14b260ec) SHA1(33bda210302428d5500115d0c7a839cdfcb67d17) )
 	ROM_LOAD( "u51.bin", 0x200000, 0x200000, CRC(e7ba8cce) SHA1(ad74a6b7d53760b19587c4a6dbea937daa7e87ce) )
 	ROM_LOAD( "u52.bin", 0x400000, 0x200000, CRC(02492ee0) SHA1(64d9cc64a4ad189a8b03cf6a749ddb732b4a0014) )
@@ -2956,7 +3220,7 @@ ROM_START( donpachi )
 	ROM_REGION( 0x080000, "maincpu", 0 )        /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "prgu.u29",     0x00000, 0x80000, CRC(89c36802) SHA1(7857c726cecca5a4fce282e0d2b873774d2c1b1d) )
 
-	ROM_REGION( 0x400000 * 2, "sprites", 0 )        /* Sprites */
+	ROM_REGION( 0x400000 * 2, "sprites0", 0 )        /* Sprites: * 2 */
 	ROM_LOAD( "atdp.u44", 0x000000, 0x200000, CRC(7189e953) SHA1(53adbe6ea5e01ecb48575e9db82cc3d0dc8a3726) )
 	ROM_LOAD( "atdp.u45", 0x200000, 0x200000, CRC(6984173f) SHA1(625dd6674adeb206815855b8b6a1fba79ed5c4cd) )
 
@@ -2989,7 +3253,7 @@ ROM_START( donpachij )
 	ROM_REGION( 0x080000, "maincpu", 0 )        /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "prg.u29",     0x00000, 0x80000, CRC(6be14af6) SHA1(5b1158071f160efeded816ae4c4edca1d00d6e05) )
 
-	ROM_REGION( 0x400000 * 2, "sprites", 0 )        /* Sprites */
+	ROM_REGION( 0x400000 * 2, "sprites0", 0 )        /* Sprites: * 2 */
 	ROM_LOAD( "atdp.u44", 0x000000, 0x200000, CRC(7189e953) SHA1(53adbe6ea5e01ecb48575e9db82cc3d0dc8a3726) )
 	ROM_LOAD( "atdp.u45", 0x200000, 0x200000, CRC(6984173f) SHA1(625dd6674adeb206815855b8b6a1fba79ed5c4cd) )
 
@@ -3022,7 +3286,7 @@ ROM_START( donpachikr )
 	ROM_REGION( 0x080000, "maincpu", 0 )        /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "prgk.u26",    0x00000, 0x80000, CRC(bbaf4c8b) SHA1(0f9d42c8c4c5b69e3d39bf768bc4b663f66b4f36) )
 
-	ROM_REGION( 0x400000 * 2, "sprites", 0 )        /* Sprites */
+	ROM_REGION( 0x400000 * 2, "sprites0", 0 )        /* Sprites: * 2 */
 	ROM_LOAD( "atdp.u44", 0x000000, 0x200000, CRC(7189e953) SHA1(53adbe6ea5e01ecb48575e9db82cc3d0dc8a3726) )
 	ROM_LOAD( "atdp.u45", 0x200000, 0x200000, CRC(6984173f) SHA1(625dd6674adeb206815855b8b6a1fba79ed5c4cd) )
 
@@ -3055,7 +3319,7 @@ ROM_START( donpachihk )
 	ROM_REGION( 0x080000, "maincpu", 0 )        /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "37.u29",    0x00000, 0x80000, CRC(71f39f30) SHA1(08a028208f21c073d450a29061604f27775786a8) )
 
-	ROM_REGION( 0x400000 * 2, "sprites", 0 )        /* Sprites */
+	ROM_REGION( 0x400000 * 2, "sprites0", 0 )        /* Sprites: * 2 */
 	ROM_LOAD( "atdp.u44", 0x000000, 0x200000, CRC(7189e953) SHA1(53adbe6ea5e01ecb48575e9db82cc3d0dc8a3726) )
 	ROM_LOAD( "atdp.u45", 0x200000, 0x200000, CRC(6984173f) SHA1(625dd6674adeb206815855b8b6a1fba79ed5c4cd) )
 
@@ -3099,7 +3363,7 @@ ROM_START( esprade )
 	ROM_LOAD16_BYTE( "u42.int", 0x000000, 0x080000, CRC(3b510a73) SHA1(ab1666eb826cb4a71588d86831dd18a2ef1c2a33) )
 	ROM_LOAD16_BYTE( "u41.int", 0x000001, 0x080000, CRC(97c1b649) SHA1(37a56b7b9662219a356aee3f4b5cbb774ac4950e) )
 
-	ROM_REGION( 0x1000000, "sprites", 0 )       /* Sprites */
+	ROM_REGION( 0x1000000, "sprites0", 0 )       /* Sprites */
 	ROM_LOAD16_BYTE( "esp_u63.u63", 0x000000, 0x400000, CRC(2f2fe92c) SHA1(9519e365248bcec8419786eabb16fe4aae299af5) )
 	ROM_LOAD16_BYTE( "esp_u64.u64", 0x000001, 0x400000, CRC(491a3da4) SHA1(53549a2bd3edc7b5e73fb46e1421b156bb0c190f) )
 	ROM_LOAD16_BYTE( "esp_u65.u65", 0x800000, 0x400000, CRC(06563efe) SHA1(94e72da1f542b4e0525b4b43994242816b43dbdc) )
@@ -3128,7 +3392,7 @@ ROM_START( espradej )
 	ROM_LOAD16_BYTE( "u42_ver.2", 0x000000, 0x080000, CRC(75d03c42) SHA1(1c176185b6f1531752b633a97f705ffa0cfeb5ad) )
 	ROM_LOAD16_BYTE( "u41_ver.2", 0x000001, 0x080000, CRC(734b3ef0) SHA1(f584227b85c347d62d5f179445011ce0f607bcfd) )
 
-	ROM_REGION( 0x1000000, "sprites", 0 )       /* Sprites */
+	ROM_REGION( 0x1000000, "sprites0", 0 )       /* Sprites */
 	ROM_LOAD16_BYTE( "esp_u63.u63", 0x000000, 0x400000, CRC(2f2fe92c) SHA1(9519e365248bcec8419786eabb16fe4aae299af5) )
 	ROM_LOAD16_BYTE( "esp_u64.u64", 0x000001, 0x400000, CRC(491a3da4) SHA1(53549a2bd3edc7b5e73fb46e1421b156bb0c190f) )
 	ROM_LOAD16_BYTE( "esp_u65.u65", 0x800000, 0x400000, CRC(06563efe) SHA1(94e72da1f542b4e0525b4b43994242816b43dbdc) )
@@ -3157,7 +3421,7 @@ ROM_START( espradejo )
 	ROM_LOAD16_BYTE( "u42.bin", 0x000000, 0x080000, CRC(0718c7e5) SHA1(c7d1f30bd2ef363cad15b6918f9980312a15809a) )
 	ROM_LOAD16_BYTE( "u41.bin", 0x000001, 0x080000, CRC(def30539) SHA1(957ad0b06f06689ae71393572592f6b8f818603a) )
 
-	ROM_REGION( 0x1000000, "sprites", 0 )       /* Sprites */
+	ROM_REGION( 0x1000000, "sprites0", 0 )       /* Sprites */
 	ROM_LOAD16_BYTE( "esp_u63.u63", 0x000000, 0x400000, CRC(2f2fe92c) SHA1(9519e365248bcec8419786eabb16fe4aae299af5) )
 	ROM_LOAD16_BYTE( "esp_u64.u64", 0x000001, 0x400000, CRC(491a3da4) SHA1(53549a2bd3edc7b5e73fb46e1421b156bb0c190f) )
 	ROM_LOAD16_BYTE( "esp_u65.u65", 0x800000, 0x400000, CRC(06563efe) SHA1(94e72da1f542b4e0525b4b43994242816b43dbdc) )
@@ -3227,7 +3491,7 @@ ROM_START( gaia )
 	ROM_LOAD16_BYTE( "prg1.127", 0x000000, 0x080000, CRC(47b904b2) SHA1(58b9b55f59cf00f70b690a0371096e86f4d723c2) )
 	ROM_LOAD16_BYTE( "prg2.128", 0x000001, 0x080000, CRC(469b7794) SHA1(502f855c51005a866900b19c3a0a170d9ea02392) )
 
-	ROM_REGION( 0x1000000, "sprites", 0 )  /* Sprites */
+	ROM_REGION( 0x1000000, "sprites0", 0 )  /* Sprites */
 	ROM_LOAD( "obj1.736", 0x000000, 0x400000, CRC(f4f84e5d) SHA1(8f445dd7a5c8a996939c211e5aec5742121a6e7e) )
 	ROM_LOAD( "obj2.738", 0x400000, 0x400000, CRC(15c2a9ce) SHA1(631eb2968395be86ef2403733e7d4ec769a013b9) )
 
@@ -3289,7 +3553,7 @@ ROM_START( theroes )
 	ROM_LOAD16_BYTE( "t-hero-epm1.u0127", 0x000000, 0x080000, CRC(09db7195) SHA1(6aa5aa80e3b74e405ed8f1b9b801ce4367756986) )
 	ROM_LOAD16_BYTE( "t-hero-epm0.u0129", 0x000001, 0x080000, CRC(2d4e3310) SHA1(7c3284a2adc7943db50933a209d037422f87f80b) )
 
-	ROM_REGION( 0x1000000, "sprites", 0 )  /* Sprites */
+	ROM_REGION( 0x1000000, "sprites0", 0 )  /* Sprites */
 	ROM_LOAD( "t-hero-obj1.u0736", 0x000000, 0x400000, CRC(35090f7c) SHA1(035e6c12a87d9c7241eea34fc7e2170bec842acc) )
 	ROM_LOAD( "t-hero-obj2.u0738", 0x400000, 0x400000, CRC(71605108) SHA1(6070c26d8f22fafc81d97cacfef96ae652e355d0) )
 
@@ -3327,7 +3591,7 @@ ROM_START( guwange )
 	ROM_LOAD16_BYTE( "gu-u0127.bin", 0x000000, 0x080000, CRC(f86b5293) SHA1(f8b1cd77cc25328d5010889850e4b86c27d9e396) )
 	ROM_LOAD16_BYTE( "gu-u0129.bin", 0x000001, 0x080000, CRC(6c0e3b93) SHA1(aaad6569b9a7b6f9a315062f9fedfc95851c1bc6) )
 
-	ROM_REGION( 0x2000000, "sprites", 0 )       /* Sprites */
+	ROM_REGION( 0x2000000, "sprites0", 0 )       /* Sprites */
 	ROM_LOAD16_BYTE( "u083.bin", 0x0000000, 0x800000, CRC(adc4b9c4) SHA1(3f9fb004e19187bbfa87ddfe8cfc69740656a1bd) )
 	ROM_LOAD16_BYTE( "u082.bin", 0x0000001, 0x800000, CRC(3d75876c) SHA1(705b8c2dbdc31e9516f429969f87988beec796d7) )
 	ROM_LOAD16_BYTE( "u086.bin", 0x1000000, 0x400000, CRC(188e4f81) SHA1(626074d81782a6de0b52406331b4b8561d3e36f5) )
@@ -3364,7 +3628,7 @@ ROM_START( guwanges )
 	ROM_LOAD16_BYTE( "gu-u0127b.bin", 0x000000, 0x080000, CRC(64667d2e) SHA1(a5893eb38e309e2bced4a46559f02850ab39afe7) )
 	ROM_LOAD16_BYTE( "gu-u0129b.bin", 0x000001, 0x080000, CRC(a99C6b6c) SHA1(614a3cd1de9b325f73e461eaf250ff9cf773f4a5) )
 
-	ROM_REGION( 0x2000000, "sprites", 0 )       /* Sprites */
+	ROM_REGION( 0x2000000, "sprites0", 0 )       /* Sprites */
 	ROM_LOAD16_BYTE( "u083.bin", 0x0000000, 0x800000, CRC(adc4b9c4) SHA1(3f9fb004e19187bbfa87ddfe8cfc69740656a1bd) )
 	ROM_LOAD16_BYTE( "u082.bin", 0x0000001, 0x800000, CRC(3d75876c) SHA1(705b8c2dbdc31e9516f429969f87988beec796d7) )
 	ROM_LOAD16_BYTE( "u086.bin", 0x1000000, 0x400000, CRC(188e4f81) SHA1(626074d81782a6de0b52406331b4b8561d3e36f5) )
@@ -3453,7 +3717,7 @@ ROM_START( hotdogst )
 	ROM_REGION( 0x40000, "audiocpu", 0 )    /* Z80 code */
 	ROM_LOAD( "mp2.u19", 0x00000, 0x40000, CRC(ff979ebe) SHA1(4cb80086cfdc69a321c7f75455cef89e20488b76) )   // FIRST AND SECOND HALF IDENTICAL
 
-	ROM_REGION( 0x400000 * 2, "sprites", 0 )        /* Sprites: * 2 */
+	ROM_REGION( 0x400000 * 2, "sprites0", 0 )        /* Sprites: * 2 */
 	ROM_LOAD( "mp9.u55", 0x000000, 0x200000, CRC(258d49ec) SHA1(f39e30c82d8f680f248e1eb59d7c5acb479fa277) )
 	ROM_LOAD( "mp8.u54", 0x200000, 0x200000, CRC(bdb4d7b8) SHA1(0dd490988aa84b0e9a21ade5fd606b03eca13f6c) )
 
@@ -3524,7 +3788,7 @@ ROM_START( korokoro )
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 68000 Code */
 	ROM_LOAD16_WORD_SWAP( "mp-001_ver07.u0130", 0x000000, 0x080000, CRC(86c7241f) SHA1(c9f0ab63c4fe36df1300445e9bb0d5c6a1bb733f) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
 
-	ROM_REGION( 0x180000 * 2, "sprites", 0 )        /* Sprites: * 2 */
+	ROM_REGION( 0x180000 * 2, "sprites0", 0 )        /* Sprites: * 2 */
 	ROM_LOAD( "mp-001_ver01.u1066", 0x000000, 0x100000, CRC(c5c6af7e) SHA1(13ac26fd703672a01d629be4e5efe9fb8720a4fb) )
 	ROM_LOAD( "mp-001_ver01.u1051", 0x100000, 0x080000, CRC(fe5e28e8) SHA1(44da1a7d813b149f9bae351bbcbd0bc2d4c70e10) )  // 1xxxxxxxxxxxxxxxxxx = 0xFF
 
@@ -3539,7 +3803,7 @@ ROM_START( crusherm )
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 68000 Code */
 	ROM_LOAD16_WORD_SWAP( "mp-003ver01.u0130", 0x000000, 0x080000, CRC(a4f56e6b) SHA1(1d3af7602c48a6b6c76c376dbc8ad3823b56868a) )
 
-	ROM_REGION( 0x200000 * 2, "sprites", 0 )        /* Sprites: * 2 */
+	ROM_REGION( 0x200000 * 2, "sprites0", 0 )        /* Sprites: * 2 */
 	ROM_LOAD( "mp-003ver01.u1067", 0x000000, 0x100000, CRC(268a4921) SHA1(8bb818466616051af01680b381af53b8b6a18428) )
 	ROM_LOAD( "mp-003ver01.u1066", 0x100000, 0x100000, CRC(79e77a6e) SHA1(9d03dd083769851d628ba6b3d77cfde9603e74f4) )
 
@@ -3588,7 +3852,7 @@ U55
 	ROM_REGION( 0x20000, "audiocpu", 0 ) \
 	ROM_LOAD( "mzs.u21", 0x00000, 0x20000, CRC(c5b4f7ed) SHA1(01f3cd1dd4045029260544e0e1c15dd08817012e) ) \
 	\
-	ROM_REGION( 0x400000 * 2, "sprites", ROMREGION_ERASEFF ) \
+	ROM_REGION( 0x400000 * 2, "sprites0", ROMREGION_ERASEFF ) \
 	ROM_LOAD( "bp943a-2.u56", 0x000000, 0x200000, CRC(97e13959) SHA1(c30b1093aacebafefcae701af767dd36fc55fac7) ) \
 	ROM_LOAD( "bp943a-3.u55", 0x200000, 0x080000, CRC(9c4957dd) SHA1(e775605a01b6cadc318855ac046dad03c4fc5bb4) ) \
 	\
@@ -3670,7 +3934,7 @@ ROM_START( metmqstr )
 	ROM_REGION( 0x40000, "audiocpu", 0 )        /* Z80 code */
 	ROM_LOAD( "bp947a.u20",  0x00000, 0x40000, CRC(a4a36170) SHA1(ae55094518bd968ea0d04613a133c1421e412012) )
 
-	ROM_REGION( 0x800000 * 2, "sprites", 0 )        /* Sprites */
+	ROM_REGION( 0x800000 * 2, "sprites0", 0 )        /* Sprites: * 2 */
 	ROM_LOAD( "bp947a.u49", 0x000000, 0x200000, CRC(09749531) SHA1(6deeed2712241611ec3202c49a66beed28698af8) )
 	ROM_LOAD( "bp947a.u50", 0x200000, 0x200000, CRC(19cea8b2) SHA1(87fb29458074f0e4852237e0184b8b3b44b0eb29) )
 	ROM_LOAD( "bp947a.u51", 0x400000, 0x200000, CRC(c19bed67) SHA1(ac664a15512c0e8c8b701833aede95f53cd46a45) )
@@ -3706,7 +3970,7 @@ ROM_START( nmaster )
 	ROM_REGION( 0x40000, "audiocpu", 0 )        /* Z80 code */
 	ROM_LOAD( "bp947a.u20",  0x00000, 0x40000, CRC(a4a36170) SHA1(ae55094518bd968ea0d04613a133c1421e412012) )
 
-	ROM_REGION( 0x800000 * 2, "sprites", 0 )        /* Sprites */
+	ROM_REGION( 0x800000 * 2, "sprites0", 0 )        /* Sprites: * 2 */
 	ROM_LOAD( "bp947a.u49", 0x000000, 0x200000, CRC(09749531) SHA1(6deeed2712241611ec3202c49a66beed28698af8) )
 	ROM_LOAD( "bp947a.u50", 0x200000, 0x200000, CRC(19cea8b2) SHA1(87fb29458074f0e4852237e0184b8b3b44b0eb29) )
 	ROM_LOAD( "bp947a.u51", 0x400000, 0x200000, CRC(c19bed67) SHA1(ac664a15512c0e8c8b701833aede95f53cd46a45) )
@@ -3757,7 +4021,7 @@ ROM_START( pacslot )
 	ROM_REGION( 0x080000, "maincpu", 0 )        /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "pa1-mprob.u41", 0x00000, 0x80000, CRC(56281370) SHA1(b75a7c5997adac14486cef7be4e41d113c86021f) )
 
-	ROM_REGION( 0x100000 * 2, "sprites", 0 )        /* Sprites */
+	ROM_REGION( 0x100000 * 2, "sprites0", 0 )        /* Sprites: * 2 */
 	ROM_LOAD16_BYTE( "pa1-obj0.u52", 0x00000, 0x80000, CRC(bf9232ce) SHA1(9a887a964e9a75e16c59dcf217c664404e74cc2a) )
 	ROM_LOAD16_BYTE( "pa1-obj1.u53", 0x00001, 0x80000, CRC(6eb76a04) SHA1(66c8e36bee4439c203a02b30898e4f741205d681) )
 
@@ -3775,6 +4039,67 @@ ROM_START( pacslot )
 	ROM_LOAD( "n44u1a.u1",   0x117*0, 0x117, NO_DUMP )  // GAL16V8B-15LP (Protected)
 	ROM_LOAD( "n44u3a.u3",   0x117*1, 0x117, NO_DUMP )  // GAL16V8B-15LP (Protected)
 	ROM_LOAD( "n44u51a.u51", 0x117*2, 0x117, NO_DUMP )  // GAL16V8B-15LP (Protected)
+ROM_END
+
+
+/***************************************************************************
+
+  Poka Poka Satan - wack-a-mole game with one frontal upright screen and two
+                    table-top touch screens to bang on with plastic "hammers"
+
+  PPS-MAIN (Sticker: 96. 4. 5 017)
+
+  TMP 68HC000P-16
+
+  013 9607EX013 x 3
+  038 9444WX010 x 3
+
+  OKI M6295
+
+  DSW8
+  BR93LC46 EEPROM
+
+  16MHz XTAL
+  28MHz XTAL
+
+***************************************************************************/
+
+ROM_START( ppsatan )
+	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASEFF )        /* 68000 Code */
+	ROM_LOAD16_BYTE( "66a5.u79", 0x00000, 0x20000, CRC(60efeed3) SHA1(72095cef77065a8f1089273050f60a2e99582cf1) ) // checksum = 60D5 (OK?). 1xxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD16_BYTE( "43b1.u61", 0x00001, 0x20000, CRC(f14e6287) SHA1(75c0465780a10ec8f533349b008f0d489bf362a5) ) // checksum = 43B1 (OK).  1xxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x200000 * 2, "sprites0", 0 )        /* Sprites: * 2 */
+	ROM_LOAD16_BYTE( "ver1.0.u27", 0x00000, 0x80000, CRC(d1b02639) SHA1(19bbcf951a6ace91da72af9232f3d808afa8416c) )
+	ROM_LOAD16_BYTE( "ver1.0.u17", 0x00001, 0x80000, CRC(c66730ca) SHA1(75c18c80c1d2ced69edd4f013685c4eaf015049c) )
+
+	ROM_REGION( 0x200000 * 2, "sprites1", 0 )        /* Sprites: * 2 */
+	ROM_LOAD16_BYTE( "ver1.0.u13", 0x00000, 0x80000, CRC(24c31e01) SHA1(c2c96bdd0a2a764ac0e1c8d64334d0ab76c46aa5) )
+	ROM_LOAD16_BYTE( "ver1.0.u19", 0x00001, 0x80000, CRC(ffbc6284) SHA1(05a735f3193218d32ad253c5abe21e1d00d1a5ca) )
+
+	ROM_REGION( 0x200000 * 2, "sprites2", 0 )        /* Sprites: * 2 */
+	ROM_LOAD16_BYTE( "ver1.0.u15", 0x00000, 0x80000, CRC(24c31e01) SHA1(c2c96bdd0a2a764ac0e1c8d64334d0ab76c46aa5) )
+	ROM_LOAD16_BYTE( "ver1.0.u23", 0x00001, 0x80000, CRC(ffbc6284) SHA1(05a735f3193218d32ad253c5abe21e1d00d1a5ca) )
+
+	ROM_REGION( 0x80000, "layer0", 0 ) /* Layer 0 */
+	ROM_LOAD( "ver1.0.u57", 0x00000, 0x80000, CRC(5faa697a) SHA1(308ea0a4dee7510b3bdd1b3b3c0a86c6508df40b) ) // 1xxxxxxxxxxxxxxxxxx = 0x00
+
+	ROM_REGION( 0x80000, "layer1", 0 ) /* Layer 1 */
+	ROM_LOAD( "ver1.0.u49", 0x00000, 0x80000, CRC(f21787b0) SHA1(e29ffcf948ef55f8ee11949903e5a363e6c4fa44) ) // 1xxxxxxxxxxxxxxxxxx = 0x00
+
+	ROM_REGION( 0x80000, "layer2", 0 ) /* Layer 2 */
+	ROM_LOAD( "ver1.0.u53", 0x00000, 0x80000, CRC(f21787b0) SHA1(e29ffcf948ef55f8ee11949903e5a363e6c4fa44) ) // 1xxxxxxxxxxxxxxxxxx = 0x00
+
+	ROM_REGION( 0x80000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "7a1f.u83", 0x000000, 0x80000, CRC(2ae77933) SHA1(a5eb0915813efd538b0812a6bbd5239b4b203f4a) )
+
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "u90.u90",   0x000, 0x117, CRC(dae5e82a) SHA1(718ad537a917a0fdc3ef3c2307f04499a0029451) )
+	ROM_LOAD( "u91.u91",   0x000, 0x117, CRC(28382623) SHA1(9fd4b4964f71807ae35a92bd5e81d6d1a5fdf469) )
+	ROM_LOAD( "u92.u92",   0x000, 0x117, CRC(40b16ace) SHA1(1cdf39743713109e9510aeb6323df2bedfddbeb1) )
+	ROM_LOAD( "u94.u94",   0x000, 0x117, CRC(eefe343a) SHA1(c7627d20711c3bf00f5d498d67ff43c8a0962a23) )
+	ROM_LOAD( "u95.u95",   0x000, 0x117, CRC(b1a78112) SHA1(65a4da294c74ce4d36ceead8284b79be6cbb6379) )
+	ROM_LOAD( "u111.u111", 0x000, 0x117, CRC(7f93cbdd) SHA1(7432b21c83249ab53d8f37e0c6fffd28f8de4ef3) )
 ROM_END
 
 
@@ -3805,7 +4130,7 @@ ROM_START( pwrinst2 )
 	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Z80 code */
 	ROM_LOAD( "g02.u3a", 0x00000, 0x20000, CRC(ebea5e1e) SHA1(4d3af9e5f29d0c1b26563f51250039c9e8bd3735) )
 
-	ROM_REGION( 0xe00000 * 2, "sprites", 0 )        /* Sprites */
+	ROM_REGION( 0xe00000 * 2, "sprites0", 0 )        /* Sprites: * 2 */
 	ROM_LOAD( "g02.u61", 0x000000, 0x200000, CRC(91e30398) SHA1(2b59a5e40bed2a988382054fe30d92808dad3348) )
 	ROM_LOAD( "g02.u62", 0x200000, 0x200000, CRC(d9455dd7) SHA1(afa69fe9a540cd78b8cfecf09cffa1401c01141a) )
 	ROM_LOAD( "g02.u63", 0x400000, 0x200000, CRC(4d20560b) SHA1(ceaee8cf0b69cc366b95ddcb689a5594d79e5114) )
@@ -3850,7 +4175,7 @@ ROM_START( pwrinst2j )
 	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Z80 code */
 	ROM_LOAD( "g02j.u3a", 0x00000, 0x20000, CRC(eead01f1) SHA1(0ced6755e471e0303fe397b3d54a5c799762ebd8) )
 
-	ROM_REGION( 0xe00000 * 2, "sprites", 0 )        /* Sprites */
+	ROM_REGION( 0xe00000 * 2, "sprites0", 0 )        /* Sprites: * 2 */
 	ROM_LOAD( "g02.u61", 0x000000, 0x200000, CRC(91e30398) SHA1(2b59a5e40bed2a988382054fe30d92808dad3348) )
 	ROM_LOAD( "g02.u62", 0x200000, 0x200000, CRC(d9455dd7) SHA1(afa69fe9a540cd78b8cfecf09cffa1401c01141a) )
 	ROM_LOAD( "g02.u63", 0x400000, 0x200000, CRC(4d20560b) SHA1(ceaee8cf0b69cc366b95ddcb689a5594d79e5114) )
@@ -3949,7 +4274,7 @@ ROM_START( plegends )
 	ROM_REGION( 0x40000, "audiocpu", 0 )        /* Z80 code */
 	ROM_LOAD( "d19.u3", 0x00000, 0x40000, CRC(47598459) SHA1(4e9dcfebfbd160230768965e8c6e5ed446c1aa7b) ) /* Same as sound.u3 below, but twice the size? */
 
-	ROM_REGION( 0x1000000 * 2, "sprites", 0 )       /* Sprites */
+	ROM_REGION( 0x1000000 * 2, "sprites0", 0 )       /* Sprites: * 2 */
 	ROM_LOAD( "g02.u61", 0x000000, 0x200000, CRC(91e30398) SHA1(2b59a5e40bed2a988382054fe30d92808dad3348) )
 	ROM_LOAD( "g02.u62", 0x200000, 0x200000, CRC(d9455dd7) SHA1(afa69fe9a540cd78b8cfecf09cffa1401c01141a) )
 	ROM_LOAD( "g02.u63", 0x400000, 0x200000, CRC(4d20560b) SHA1(ceaee8cf0b69cc366b95ddcb689a5594d79e5114) )
@@ -3996,7 +4321,7 @@ ROM_START( plegendsj )
 	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Z80 code */
 	ROM_LOAD( "sound.u3", 0x00000, 0x20000, CRC(36f71520) SHA1(11d0a059ddba3e1aa4c54ccdde7b3f5c7bde482f) )
 
-	ROM_REGION( 0x1000000 * 2, "sprites", 0 )       /* Sprites */
+	ROM_REGION( 0x1000000 * 2, "sprites0", 0 )       /* Sprites: * 2 */
 	ROM_LOAD( "g02.u61", 0x000000, 0x200000, CRC(91e30398) SHA1(2b59a5e40bed2a988382054fe30d92808dad3348) )
 	ROM_LOAD( "g02.u62", 0x200000, 0x200000, CRC(d9455dd7) SHA1(afa69fe9a540cd78b8cfecf09cffa1401c01141a) )
 	ROM_LOAD( "g02.u63", 0x400000, 0x200000, CRC(4d20560b) SHA1(ceaee8cf0b69cc366b95ddcb689a5594d79e5114) )
@@ -4088,7 +4413,7 @@ BPSM.U77    23C16000    GFX
 	ROM_REGION( 0x80000, "audiocpu", 0 ) \
 	ROM_LOAD( "bpsm945a.u9",  0x00000, 0x80000, CRC(438de548) SHA1(81a0ca1cd662e2017aa980da162d39cfd0a19f14) ) \
 	\
-	ROM_REGION( 0x400000 * 2, "sprites", 0 ) \
+	ROM_REGION( 0x400000 * 2, "sprites0", 0 ) \
 	ROM_LOAD( "bpsm.u76", 0x000000, 0x200000, CRC(a243a5ba) SHA1(3a32d685e53e0b75977f7acb187cf414a50c7f8b) ) \
 	ROM_LOAD( "bpsm.u77", 0x200000, 0x200000, CRC(5179a4ac) SHA1(ceb8d3d889aae885debb2c9cf2263f60be3f1212) ) \
 	\
@@ -4171,7 +4496,7 @@ ROM_END
 	ROM_REGION( 0x80000, "audiocpu", 0 ) \
 	ROM_LOAD( "bpsm945a.u9",  0x00000, 0x80000, CRC(438de548) SHA1(81a0ca1cd662e2017aa980da162d39cfd0a19f14) ) \
 	\
-	ROM_REGION( 0x400000 * 2, "sprites", 0 ) \
+	ROM_REGION( 0x400000 * 2, "sprites0", 0 ) \
 	ROM_LOAD( "bpsm.u76", 0x000000, 0x200000, CRC(a243a5ba) SHA1(3a32d685e53e0b75977f7acb187cf414a50c7f8b) ) \
 	ROM_LOAD( "bpsm.u77", 0x200000, 0x200000, CRC(5179a4ac) SHA1(ceb8d3d889aae885debb2c9cf2263f60be3f1212) ) \
 	\
@@ -4269,7 +4594,7 @@ ROM_START( tjumpman )
 	ROM_REGION( 0x080000, "maincpu", 0 )        /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "tj1_mpr-0c.u41", 0x00000, 0x80000, CRC(de3030b8) SHA1(5f2165ea039c34cab605ebddc0b61eadc47b1532) )
 
-	ROM_REGION( 0x100000 * 2, "sprites", 0 )        /* Sprites */
+	ROM_REGION( 0x100000 * 2, "sprites0", 0 )        /* Sprites: * 2 */
 	ROM_LOAD16_BYTE( "tj1_obj-0a.u52", 0x00000, 0x80000, CRC(b42cf8e8) SHA1(9ed7fb3574ed163a81f34a0d8cfa7a4661439932) )
 	ROM_LOAD16_BYTE( "tj1_obj-1a.u53", 0x00001, 0x80000, CRC(5f0124d7) SHA1(4d9cfa464159998c176a178c668273d128dedff8) )
 
@@ -4299,7 +4624,7 @@ ROM_START( uopoko )
 	ROM_LOAD16_BYTE( "u26.int", 0x000000, 0x080000, CRC(b445c9ac) SHA1(4dda1c6e19de629ea4d9061560c32a9f0deabd53) )
 	ROM_LOAD16_BYTE( "u25.int", 0x000001, 0x080000, CRC(a1258482) SHA1(7f4adc4a6d069032aaf3d93eb60fde16b59483f8) )
 
-	ROM_REGION( 0x400000 * 2, "sprites", 0 )        /* Sprites: * 2 */
+	ROM_REGION( 0x400000 * 2, "sprites0", 0 )        /* Sprites: * 2 */
 	ROM_LOAD( "u33.bin", 0x000000, 0x400000, CRC(5d142ad2) SHA1(f26abcf7a625a322b83df44fbd6e852bfb03663c) )
 
 	ROM_REGION( 0x400000, "layer0", 0 ) /* Layer 0 */
@@ -4317,7 +4642,7 @@ ROM_START( uopokoj )
 	ROM_LOAD16_BYTE( "u26.bin", 0x000000, 0x080000, CRC(e7eec050) SHA1(cf3a77741029f96dbbec5ca7217a1723e4233cff) )
 	ROM_LOAD16_BYTE( "u25.bin", 0x000001, 0x080000, CRC(68cb6211) SHA1(a6db0bc2e3e54b6992a44b7d52395917e66db49b) )
 
-	ROM_REGION( 0x400000 * 2, "sprites", 0 )        /* Sprites: * 2 */
+	ROM_REGION( 0x400000 * 2, "sprites0", 0 )        /* Sprites: * 2 */
 	ROM_LOAD( "u33.bin", 0x000000, 0x400000, CRC(5d142ad2) SHA1(f26abcf7a625a322b83df44fbd6e852bfb03663c) )
 
 	ROM_REGION( 0x400000, "layer0", 0 ) /* Layer 0 */
@@ -4393,14 +4718,14 @@ DRIVER_INIT_MEMBER(cave_state,agallet)
 
 	sailormn_unpack_tiles(machine(), "layer2");
 
-	unpack_sprites(machine());
+	unpack_sprites("sprites0");
 }
 
 DRIVER_INIT_MEMBER(cave_state,dfeveron)
 {
 	init_cave(machine());
 
-	unpack_sprites(machine());
+	unpack_sprites("sprites0");
 	m_kludge = 2;
 }
 
@@ -4408,7 +4733,7 @@ DRIVER_INIT_MEMBER(cave_state,feversos)
 {
 	init_cave(machine());
 
-	unpack_sprites(machine());
+	unpack_sprites("sprites0");
 	m_kludge = 2;
 }
 
@@ -4416,7 +4741,7 @@ DRIVER_INIT_MEMBER(cave_state,ddonpach)
 {
 	init_cave(machine());
 
-	ddonpach_unpack_sprites(machine());
+	ddonpach_unpack_sprites("sprites0");
 	m_spritetype[0] = 1;    // "different" sprites (no zooming?)
 	m_time_vblank_irq = 90;
 }
@@ -4425,7 +4750,7 @@ DRIVER_INIT_MEMBER(cave_state,donpachi)
 {
 	init_cave(machine());
 
-	ddonpach_unpack_sprites(machine());
+	ddonpach_unpack_sprites("sprites0");
 	m_spritetype[0] = 1;    // "different" sprites (no zooming?)
 	m_time_vblank_irq = 90;
 }
@@ -4435,7 +4760,7 @@ DRIVER_INIT_MEMBER(cave_state,esprade)
 {
 	init_cave(machine());
 
-	esprade_unpack_sprites(machine());
+	esprade_unpack_sprites("sprites0");
 	m_time_vblank_irq = 2000;   /**/
 
 #if 0       //ROM PATCH
@@ -4452,7 +4777,7 @@ DRIVER_INIT_MEMBER(cave_state,gaia)
 
 	/* No EEPROM */
 
-	unpack_sprites(machine());
+	unpack_sprites("sprites0");
 	m_spritetype[0] = 2;    // Normal sprites with different position handling
 	m_time_vblank_irq = 2000;   /**/
 }
@@ -4461,7 +4786,7 @@ DRIVER_INIT_MEMBER(cave_state,guwange)
 {
 	init_cave(machine());
 
-	esprade_unpack_sprites(machine());
+	esprade_unpack_sprites("sprites0");
 	m_time_vblank_irq = 2000;   /**/
 }
 
@@ -4477,7 +4802,7 @@ DRIVER_INIT_MEMBER(cave_state,hotdogst)
 	membank("okibank1")->configure_entries(0, 4, &ROM[0x00000], 0x20000);
 	membank("okibank2")->configure_entries(0, 4, &ROM[0x00000], 0x20000);
 
-	unpack_sprites(machine());
+	unpack_sprites("sprites0");
 	m_spritetype[0] = 2;    // Normal sprites with different position handling
 	m_time_vblank_irq = 2000;   /**/
 }
@@ -4486,8 +4811,8 @@ DRIVER_INIT_MEMBER(cave_state,mazinger)
 {
 	UINT8 *ROM = memregion("audiocpu")->base();
 	UINT8 *buffer;
-	UINT8 *src = memregion("sprites")->base();
-	int len = memregion("sprites")->bytes();
+	UINT8 *src = memregion("sprites0")->base();
+	int len = memregion("sprites0")->bytes();
 
 	init_cave(machine());
 
@@ -4507,12 +4832,11 @@ DRIVER_INIT_MEMBER(cave_state,mazinger)
 		auto_free(machine(), buffer);
 	}
 
-	unpack_sprites(machine());
+	unpack_sprites("sprites0");
 	m_spritetype[0] = 2;    // Normal sprites with different position handling
 	m_kludge = 3;
 	m_time_vblank_irq = 2100;
 }
-
 
 DRIVER_INIT_MEMBER(cave_state,metmqstr)
 {
@@ -4530,19 +4854,33 @@ DRIVER_INIT_MEMBER(cave_state,metmqstr)
 	membank("oki2bank1")->configure_entries(0, 8, &ROM[0x00000], 0x20000);
 	membank("oki2bank2")->configure_entries(0, 8, &ROM[0x00000], 0x20000);
 
-	unpack_sprites(machine());
+	unpack_sprites("sprites0");
 	m_spritetype[0] = 2;    // Normal sprites with different position handling
 	m_kludge = 3;
 	m_time_vblank_irq = 17376;
 }
 
+DRIVER_INIT_MEMBER(cave_state,ppsatan)
+{
+	init_cave(machine());
+
+	unpack_sprites("sprites0");
+	unpack_sprites("sprites1");
+	unpack_sprites("sprites2");
+
+	m_spritetype[0] = 2;
+	m_time_vblank_irq = 2000;   /**/
+
+	m_ppsatan_io_mux = 0;
+	save_item(NAME(m_ppsatan_io_mux));
+}
 
 DRIVER_INIT_MEMBER(cave_state,pwrinst2j)
 {
 	UINT8 *ROM = memregion("audiocpu")->base();
 	UINT8 *buffer;
-	UINT8 *src = memregion("sprites")->base();
-	int len = memregion("sprites")->bytes();
+	UINT8 *src = memregion("sprites0")->base();
+	int len = memregion("sprites0")->bytes();
 	int i, j;
 
 	init_cave(machine());
@@ -4563,7 +4901,7 @@ DRIVER_INIT_MEMBER(cave_state,pwrinst2j)
 		auto_free(machine(), buffer);
 	}
 
-	unpack_sprites(machine());
+	unpack_sprites("sprites0");
 	m_spritetype[0] = 3;
 	m_kludge = 4;
 	m_time_vblank_irq = 2000;   /**/
@@ -4588,8 +4926,8 @@ DRIVER_INIT_MEMBER(cave_state,sailormn)
 {
 	UINT8 *ROM = memregion("audiocpu")->base();
 	UINT8 *buffer;
-	UINT8 *src = memregion("sprites")->base();
-	int len = memregion("sprites")->bytes();
+	UINT8 *src = memregion("sprites0")->base();
+	int len = memregion("sprites0")->bytes();
 
 	init_cave(machine());
 
@@ -4615,7 +4953,7 @@ DRIVER_INIT_MEMBER(cave_state,sailormn)
 
 	sailormn_unpack_tiles( machine(), "layer2" );
 
-	unpack_sprites(machine());
+	unpack_sprites("sprites0");
 	m_spritetype[0] = 2;    // Normal sprites with different position handling
 	m_kludge = 1;
 	m_time_vblank_irq = 2000;
@@ -4628,7 +4966,7 @@ DRIVER_INIT_MEMBER(cave_state,tjumpman)
 {
 	init_cave(machine());
 
-	unpack_sprites(machine());
+	unpack_sprites("sprites0");
 	m_spritetype[0] = 2;    // Normal sprites with different position handling
 	m_kludge = 3;
 	m_time_vblank_irq = 17376;
@@ -4641,7 +4979,7 @@ DRIVER_INIT_MEMBER(cave_state,uopoko)
 {
 	init_cave(machine());
 
-	unpack_sprites(machine());
+	unpack_sprites("sprites0");
 	m_kludge = 2;
 	m_time_vblank_irq = 2000;   /**/
 }
@@ -4652,7 +4990,7 @@ DRIVER_INIT_MEMBER(cave_state,korokoro)
 
 	m_irq_level = 2;
 
-	unpack_sprites(machine());
+	unpack_sprites("sprites0");
 	m_time_vblank_irq = 2000;   /**/
 
 	m_leds[0] = 0;
@@ -4713,6 +5051,8 @@ GAME( 1996, agalleth,   agallet,  sailormn, cave, cave_state,     agallet,  ROT2
 GAME( 1996, hotdogst,   0,        hotdogst, cave, cave_state,     hotdogst, ROT90,  "Marble",                                 "Hotdog Storm (International)", GAME_SUPPORTS_SAVE )
 
 GAME( 1996, pacslot,    0,        pacslot,  pacslot, cave_state,  tjumpman, ROT0,   "Namco",                                  "Pac-Slot", GAME_SUPPORTS_SAVE )
+
+GAME( 1996, ppsatan,    0,        ppsatan,  ppsatan, cave_state,  ppsatan,  ROT0,   "<unknown>",                              "Poka Poka Satan", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
 
 GAME( 1997, ddonpach,   0,        ddonpach, cave, cave_state,     ddonpach, ROT270, "Cave (Atlus license)",                   "DoDonPachi (International, Master Ver. 97/02/05)", GAME_SUPPORTS_SAVE )
 GAME( 1997, ddonpachj,  ddonpach, ddonpach, cave, cave_state,     ddonpach, ROT270, "Cave (Atlus license)",                   "DoDonPachi (Japan, Master Ver. 97/02/05)",         GAME_SUPPORTS_SAVE )
