@@ -106,12 +106,9 @@ void set_led_status(running_machine &machine, int num, int value);
 
 /* ----- interrupt enable and vector helpers ----- */
 
-void generic_pulse_irq_line(device_t *device, int irqline, int cycles); // legacy
+ATTR_DEPRECATED void generic_pulse_irq_line(device_t *device, int irqline, int cycles);
 
 
-// legacy
-INTERRUPT_GEN( irq2_line_hold );
-INTERRUPT_GEN( irq2_line_pulse );
-INTERRUPT_GEN( irq2_line_assert );
+ATTR_DEPRECATED INTERRUPT_GEN( irq2_line_hold );
 
 #endif  /* __MACHINE_GENERIC_H__ */

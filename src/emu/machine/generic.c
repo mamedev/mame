@@ -558,6 +558,4 @@ void generic_pulse_irq_line(device_t *device, int irqline, int cycles) { device-
 
 // legacy
 INTERRUPT_GEN( irq2_line_hold ) { device->machine().driver_data()->irq2_line_hold(*device); }
-INTERRUPT_GEN( irq2_line_pulse ) { device->machine().driver_data()->irq2_line_pulse(*device); }
-INTERRUPT_GEN( irq2_line_assert ) { device->machine().driver_data()->irq2_line_assert(*device); }
 

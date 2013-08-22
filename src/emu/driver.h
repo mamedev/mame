@@ -134,7 +134,7 @@
 typedef delegate<void ()> driver_callback_delegate;
 
 // legacy callback functions
-typedef void   (*legacy_callback_func)(running_machine &machine);
+/*ATTR_DEPRECATED*/ typedef void (*legacy_callback_func)(running_machine &machine);
 
 
 // ======================> driver_device
@@ -166,7 +166,7 @@ public:
 
 	// inline configuration helpers
 	static void static_set_game(device_t &device, const game_driver &game);
-	static void static_set_callback(device_t &device, callback_type type, legacy_callback_func callback);
+	ATTR_DEPRECATED static void static_set_callback(device_t &device, callback_type type, legacy_callback_func callback);
 	static void static_set_callback(device_t &device, callback_type type, driver_callback_delegate callback);
 
 	// generic helpers
