@@ -83,41 +83,11 @@ void compis_state::palette_init()
 	palette_set_color(machine(), 2, MAKE_RGB(0x00, 0xff, 0x00)); // highlight
 }
 
-UINT32 compis_state::screen_update_compis2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)// temporary
+UINT32 compis_state::screen_update_compis2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *m_p_chargen;
-	m_p_chargen = memregion("maincpu")->base()+0xca70; //bios0
-	if (m_p_chargen[0x214] != 0x08) m_p_chargen+= 0x10; //bios1
-	UINT8 y,ra,chr,gfx;
-	UINT16 sy=0,ma=0,x;
+	bitmap.fill(get_black_pen(machine()), cliprect);
 
-	for (y = 0; y < 25; y++)
-	{
-		for (ra = 0; ra < 16; ra++)
-		{
-			UINT16 *p = &bitmap.pix16(sy++);
-
-			for (x = ma; x < ma + 240; x+=3)
-			{
-				chr = m_video_ram[x & 0x1ffff];
-
-				if (chr < 0x20)
-					gfx = 0;
-				else
-					gfx = m_p_chargen[(chr<<4) | ra ];
-
-				*p++ = BIT(gfx, 0);
-				*p++ = BIT(gfx, 1);
-				*p++ = BIT(gfx, 2);
-				*p++ = BIT(gfx, 3);
-				*p++ = BIT(gfx, 4);
-				*p++ = BIT(gfx, 5);
-				*p++ = BIT(gfx, 6);
-				*p++ = BIT(gfx, 7);
-			}
-		}
-		ma+=240;
-	}
+	m_crtc->screen_update(screen, bitmap, cliprect);
 
 	return 0;
 }
@@ -132,11 +102,57 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 		bitmap.pix32(y, x + i) = palette[BIT((gfx >> i), 0)];
 }
 
+static UPD7220_DRAW_TEXT_LINE( hgdc_display_text )
+{
+	compis_state *state = device->machine().driver_data<compis_state>();
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	int x;
+	int xi,yi;
+	int tile;
+	int attr;
+	UINT8 tile_data;
+	UINT8 pen;
+	UINT8 *m_p_chargen = state->memregion("maincpu")->base()+0xca70; //bios0
+	if (m_p_chargen[0x214] != 0x08) m_p_chargen+= 0x10; //bios1
+
+	for( x = 0; x < pitch; x++ )
+	{
+		tile = state->m_video_ram[(addr+x) & 0x1ffff];
+		attr = state->m_video_ram[(addr+x+1) & 0x1ffff];
+
+		for( yi = 0; yi < lr; yi++)
+		{
+			tile_data = (m_p_chargen[tile*8+yi]);
+
+			if(attr & 2)
+				tile_data^=0xff;
+
+			for( xi = 0; xi < 8; xi++)
+			{
+				int res_x,res_y;
+
+				res_x = x * 8 + xi;
+				res_y = y * lr + yi;
+
+				if(!device->machine().primary_screen->visible_area().contains(res_x, res_y))
+					continue;
+
+				if(yi >= 8)
+					pen = 0;
+				else
+					pen = ((tile_data >> xi) & 1) ? 1 : 0;
+
+				if(pen)
+					bitmap.pix32(res_y, res_x) = palette[pen];
+			}
+		}
+	}
+}
 
 static UPD7220_INTERFACE( hgdc_intf )
 {
 	hgdc_display_pixels,
-	NULL,
+	hgdc_display_text,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL
