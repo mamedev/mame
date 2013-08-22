@@ -180,6 +180,11 @@ CCOMFLAGS += /wd4005
 # disable behavior change: 'member1' called instead of 'member2' warning
 CCOMFLAGS += /wd4350
 
+# only show deprecation warnings when enabled
+ifndef DEPRECATED
+CCOMFLAGS += /wd4996
+endif
+
 # explicitly set the entry point for UNICODE builds
 LDFLAGS += /ENTRY:wmainCRTStartup
 

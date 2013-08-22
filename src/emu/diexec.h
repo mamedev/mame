@@ -143,7 +143,7 @@ typedef device_delegate<void (device_t &)> device_interrupt_delegate;
 
 // IRQ callback to be called by executing devices when an IRQ is actually taken
 typedef device_delegate<int (device_t &, int)> device_irq_acknowledge_delegate;
-typedef int (*device_irq_acknowledge_callback)(device_t *device, int irqnum); // legacy
+ATTR_DEPRECATED typedef int (*device_irq_acknowledge_callback)(device_t *device, int irqnum);
 
 
 
@@ -190,7 +190,7 @@ public:
 	void set_input_line_vector(int linenum, int vector) { m_input[linenum].set_vector(vector); }
 	void set_input_line_and_vector(int linenum, int state, int vector) { m_input[linenum].set_state_synced(state, vector); }
 	int input_state(int linenum) { return m_input[linenum].m_curstate; }
-	void set_irq_acknowledge_callback(device_irq_acknowledge_callback callback); // legacy
+	ATTR_DEPRECATED void set_irq_acknowledge_callback(device_irq_acknowledge_callback callback);
 	void set_irq_acknowledge_callback(device_irq_acknowledge_delegate callback);
 
 	// suspend/resume

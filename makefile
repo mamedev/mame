@@ -250,6 +250,9 @@ BUILD_MIDILIB = 1
 # uncomment next line to generate verbose build information
 # VERBOSE = 1
 
+# uncomment next line to generate deprecation warnings during compilation
+# DEPRECATED = 1
+
 # specify the sanitizer to use or leave empty to use none
 # SANITIZE = 
 
@@ -486,6 +489,12 @@ endif
 # add -v if we need verbose build information
 ifdef VERBOSE
 CCOMFLAGS += -v
+endif
+
+# only show deprecation warnings when enabled
+ifndef DEPRECATED
+CCOMFLAGS += \
+	-Wno-deprecated-declarations
 endif
 
 # add profiling information for the compiler

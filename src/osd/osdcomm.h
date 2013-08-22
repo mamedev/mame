@@ -67,6 +67,7 @@
 #define ATTR_CONST              __attribute__((const))
 #define ATTR_FORCE_INLINE       __attribute__((always_inline))
 #define ATTR_NONNULL(...)       __attribute__((nonnull(__VA_ARGS__)))
+#define ATTR_DEPRECATED			__attribute__((deprecated))
 /* not supported in GCC prior to 4.4.x */
 #if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 4)) || (__GNUC__ > 4)
 #define ATTR_HOT                __attribute__((hot))
@@ -88,6 +89,7 @@
 #define ATTR_CONST
 #define ATTR_FORCE_INLINE
 #define ATTR_NONNULL(...)
+#define ATTR_DEPRECATED			__declspec(deprecated)
 #define ATTR_HOT
 #define ATTR_COLD
 #define UNEXPECTED(exp)         (exp)
