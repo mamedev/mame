@@ -82,7 +82,11 @@
 #define SETJMP_GNUC_PROTECT()   (void)__builtin_return_address(1)
 #else
 #define ATTR_UNUSED
+#if defined(_MSC_VER) && (_MSC_VER >= 1200)
+#define ATTR_NORETURN			__declspec(noreturn)
+#else
 #define ATTR_NORETURN
+#endif
 #define ATTR_PRINTF(x,y)
 #define ATTR_MALLOC
 #define ATTR_PURE
@@ -96,14 +100,6 @@
 #define EXPECTED(exp)           (exp)
 #define RESTRICT
 #define SETJMP_GNUC_PROTECT()   do {} while (0)
-#endif
-
-
-/* And some MSVC optimizations/warnings */
-#if defined(_MSC_VER) && (_MSC_VER >= 1200)
-#define DECL_NORETURN           __declspec(noreturn)
-#else
-#define DECL_NORETURN
 #endif
 
 

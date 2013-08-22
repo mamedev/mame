@@ -402,8 +402,8 @@ inline _Dest downcast(_Source &src)
 //  FUNCTION PROTOTYPES
 //**************************************************************************
 
-DECL_NORETURN void fatalerror(const char *format, ...) ATTR_PRINTF(1,2) ATTR_NORETURN;
-DECL_NORETURN void fatalerror_exitcode(running_machine &machine, int exitcode, const char *format, ...) ATTR_PRINTF(3,4) ATTR_NORETURN;
+ATTR_NORETURN void fatalerror(const char *format, ...) ATTR_PRINTF(1,2);
+ATTR_NORETURN void fatalerror_exitcode(running_machine &machine, int exitcode, const char *format, ...) ATTR_PRINTF(3,4);
 
 inline void fatalerror(const char *format, ...)
 {
