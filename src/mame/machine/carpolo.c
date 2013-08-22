@@ -10,7 +10,6 @@
 #include "cpu/m6502/m6502.h"
 #include "machine/6821pia.h"
 #include "machine/7474.h"
-#include "machine/74148.h"
 #include "machine/74153.h"
 #include "includes/carpolo.h"
 
@@ -60,37 +59,34 @@
 
 void carpolo_74148_3s_cb(device_t *device)
 {
-	device->machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, ttl74148_output_valid_r(device) ? CLEAR_LINE : ASSERT_LINE);
+	carpolo_state *state = device->machine().driver_data<carpolo_state>();
+	state->m_maincpu->set_input_line(M6502_IRQ_LINE, state->m_ttl74148_3s->output_valid_r() ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
 /* the outputs of the flip-flops are connected to the priority encoder */
 WRITE_LINE_MEMBER(carpolo_state::carpolo_7474_2s_1_q_cb)
 {
-	device_t *device = machine().device("74148_3s");
-	ttl74148_input_line_w(device, COIN1_PRIORITY_LINE, state);
-	ttl74148_update(device);
+	m_ttl74148_3s->input_line_w(COIN1_PRIORITY_LINE, state);
+	m_ttl74148_3s->update();
 }
 
 WRITE_LINE_MEMBER(carpolo_state::carpolo_7474_2s_2_q_cb)
 {
-	device_t *device = machine().device("74148_3s");
-	ttl74148_input_line_w(device, COIN2_PRIORITY_LINE, state);
-	ttl74148_update(device);
+	m_ttl74148_3s->input_line_w(COIN2_PRIORITY_LINE, state);
+	m_ttl74148_3s->update();
 }
 
 WRITE_LINE_MEMBER(carpolo_state::carpolo_7474_2u_1_q_cb)
 {
-	device_t *device = machine().device("74148_3s");
-	ttl74148_input_line_w(device, COIN3_PRIORITY_LINE, state);
-	ttl74148_update(device);
+	m_ttl74148_3s->input_line_w(COIN3_PRIORITY_LINE, state);
+	m_ttl74148_3s->update();
 }
 
 WRITE_LINE_MEMBER(carpolo_state::carpolo_7474_2u_2_q_cb)
 {
-	device_t *device = machine().device("74148_3s");
-	ttl74148_input_line_w(device, COIN4_PRIORITY_LINE, state);
-	ttl74148_update(device);
+	m_ttl74148_3s->input_line_w(COIN4_PRIORITY_LINE, state);
+	m_ttl74148_3s->update();
 }
 
 
@@ -98,24 +94,24 @@ void carpolo_state::carpolo_generate_ball_screen_interrupt(UINT8 cause)
 {
 	m_ball_screen_collision_cause = cause;
 
-	ttl74148_input_line_w(m_ttl74148_3s, BALL_SCREEN_PRIORITY_LINE, 0);
-	ttl74148_update(m_ttl74148_3s);
+	m_ttl74148_3s->input_line_w(BALL_SCREEN_PRIORITY_LINE, 0);
+	m_ttl74148_3s->update();
 }
 
 void carpolo_state::carpolo_generate_car_car_interrupt(int car1, int car2)
 {
 	m_car_car_collision_cause = ~((1 << (3 - car1)) | (1 << (3 - car2)));
 
-	ttl74148_input_line_w(m_ttl74148_3s, CAR_CAR_PRIORITY_LINE, 0);
-	ttl74148_update(m_ttl74148_3s);
+	m_ttl74148_3s->input_line_w(CAR_CAR_PRIORITY_LINE, 0);
+	m_ttl74148_3s->update();
 }
 
 void carpolo_state::carpolo_generate_car_goal_interrupt(int car, int right_goal)
 {
 	m_car_goal_collision_cause = car | (right_goal ? 0x08 : 0x00);
 
-	ttl74148_input_line_w(m_ttl74148_3s, CAR_GOAL_PRIORITY_LINE, 0);
-	ttl74148_update(m_ttl74148_3s);
+	m_ttl74148_3s->input_line_w(CAR_GOAL_PRIORITY_LINE, 0);
+	m_ttl74148_3s->update();
 }
 
 void carpolo_state::carpolo_generate_car_ball_interrupt(int car, int car_x, int car_y)
@@ -126,8 +122,8 @@ void carpolo_state::carpolo_generate_car_ball_interrupt(int car, int car_x, int 
 
 	m_priority_0_extension = CAR_BALL_EXTRA_BITS;
 
-	ttl74148_input_line_w(m_ttl74148_3s, PRI0_PRIORTITY_LINE, 0);
-	ttl74148_update(m_ttl74148_3s);
+	m_ttl74148_3s->input_line_w(PRI0_PRIORTITY_LINE, 0);
+	m_ttl74148_3s->update();
 }
 
 void carpolo_state::carpolo_generate_car_border_interrupt(int car, int horizontal_border)
@@ -136,8 +132,8 @@ void carpolo_state::carpolo_generate_car_border_interrupt(int car, int horizonta
 
 	m_priority_0_extension = CAR_BORDER_EXTRA_BITS;
 
-	ttl74148_input_line_w(m_ttl74148_3s, PRI0_PRIORTITY_LINE, 0);
-	ttl74148_update(m_ttl74148_3s);
+	m_ttl74148_3s->input_line_w(PRI0_PRIORTITY_LINE, 0);
+	m_ttl74148_3s->update();
 }
 
 
@@ -197,7 +193,7 @@ READ8_MEMBER(carpolo_state::carpolo_car_border_collision_cause_r)
 READ8_MEMBER(carpolo_state::carpolo_interrupt_cause_r)
 {
 	/* the output of the 148 goes to bits 1-3 (which is priority ^ 7) */
-	return (ttl74148_output_r(m_ttl74148_3s) << 1) | m_priority_0_extension;
+	return (m_ttl74148_3s->output_r() << 1) | m_priority_0_extension;
 }
 
 
@@ -208,10 +204,10 @@ INTERRUPT_GEN_MEMBER(carpolo_state::carpolo_timer_interrupt)
 
 
 	/* cause the timer interrupt */
-	ttl74148_input_line_w(m_ttl74148_3s, PRI0_PRIORTITY_LINE, 0);
+	m_ttl74148_3s->input_line_w(PRI0_PRIORTITY_LINE, 0);
 	m_priority_0_extension = TIMER_EXTRA_BITS;
 
-	ttl74148_update(m_ttl74148_3s);
+	m_ttl74148_3s->update();
 
 
 	/* check the coins here as well - they drive the clock of the flip-flops */
@@ -308,38 +304,38 @@ WRITE_LINE_MEMBER(carpolo_state::coin4_interrupt_clear_w)
 
 WRITE8_MEMBER(carpolo_state::carpolo_ball_screen_interrupt_clear_w)
 {
-	ttl74148_input_line_w(m_ttl74148_3s, BALL_SCREEN_PRIORITY_LINE, 1);
-	ttl74148_update(m_ttl74148_3s);
+	m_ttl74148_3s->input_line_w(BALL_SCREEN_PRIORITY_LINE, 1);
+	m_ttl74148_3s->update();
 }
 
 WRITE8_MEMBER(carpolo_state::carpolo_car_car_interrupt_clear_w)
 {
-	ttl74148_input_line_w(m_ttl74148_3s, CAR_CAR_PRIORITY_LINE, 1);
-	ttl74148_update(m_ttl74148_3s);
+	m_ttl74148_3s->input_line_w(CAR_CAR_PRIORITY_LINE, 1);
+	m_ttl74148_3s->update();
 }
 
 WRITE8_MEMBER(carpolo_state::carpolo_car_goal_interrupt_clear_w)
 {
-	ttl74148_input_line_w(m_ttl74148_3s, CAR_GOAL_PRIORITY_LINE, 1);
-	ttl74148_update(m_ttl74148_3s);
+	m_ttl74148_3s->input_line_w(CAR_GOAL_PRIORITY_LINE, 1);
+	m_ttl74148_3s->update();
 }
 
 WRITE8_MEMBER(carpolo_state::carpolo_car_ball_interrupt_clear_w)
 {
-	ttl74148_input_line_w(m_ttl74148_3s, PRI0_PRIORTITY_LINE, 1);
-	ttl74148_update(m_ttl74148_3s);
+	m_ttl74148_3s->input_line_w(PRI0_PRIORTITY_LINE, 1);
+	m_ttl74148_3s->update();
 }
 
 WRITE8_MEMBER(carpolo_state::carpolo_car_border_interrupt_clear_w)
 {
-	ttl74148_input_line_w(m_ttl74148_3s, PRI0_PRIORTITY_LINE, 1);
-	ttl74148_update(m_ttl74148_3s);
+	m_ttl74148_3s->input_line_w(PRI0_PRIORTITY_LINE, 1);
+	m_ttl74148_3s->update();
 }
 
 WRITE8_MEMBER(carpolo_state::carpolo_timer_interrupt_clear_w)
 {
-	ttl74148_input_line_w(m_ttl74148_3s, PRI0_PRIORTITY_LINE, 1);
-	ttl74148_update(m_ttl74148_3s);
+	m_ttl74148_3s->input_line_w(PRI0_PRIORTITY_LINE, 1);
+	m_ttl74148_3s->update();
 }
 
 
@@ -485,7 +481,6 @@ void carpolo_state::machine_start()
 	m_ttl7474_1a_1 = machine().device<ttl7474_device>("7474_1a_1");
 	m_ttl7474_1a_2 = machine().device<ttl7474_device>("7474_1a_2");
 
-	m_ttl74148_3s = machine().device("74148_3s");
 	m_ttl74153_1k = machine().device("74153_1k");
 
 	save_item(NAME(m_ball_screen_collision_cause));
@@ -502,7 +497,7 @@ void carpolo_state::machine_start()
 void carpolo_state::machine_reset()
 {
 	/* set up the priority encoder */
-	ttl74148_enable_input_w(m_ttl74148_3s, 0);  /* always enabled */
+	m_ttl74148_3s->enable_input_w(0);  /* always enabled */
 
 	/* set up the coin handling flip-flops */
 	m_ttl7474_2s_1->d_w     (1);

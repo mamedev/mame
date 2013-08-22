@@ -40,186 +40,22 @@
 
 #include "emu.h"
 #include "machine/74148.h"
-#include "devlegcy.h"
 
-
-struct ttl74148_state
-{
-	/* callback */
-	void (*output_cb)(device_t *device);
-
-	/* inputs */
-	int input_lines[8]; /* pins 1-4,10-13 */
-	int enable_input;   /* pin 5 */
-
-	/* outputs */
-	int output;         /* pins 6,7,9 */
-	int output_valid;   /* pin 14 */
-	int enable_output;  /* pin 15 */
-
-	/* internals */
-	int last_output;
-	int last_output_valid;
-	int last_enable_output;
-};
-
-
-INLINE ttl74148_state *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == TTL74148);
-
-	return (ttl74148_state *)downcast<ttl74148_device *>(device)->token();
-}
-
-void ttl74148_update(device_t *device)
-{
-	ttl74148_state *state = get_safe_token(device);
-
-	if (state->enable_input)
-	{
-		// row 1 in truth table
-		state->output = 0x07;
-		state->output_valid = 1;
-		state->enable_output = 1;
-	}
-	else
-	{
-		int bit0, bit1, bit2;
-
-		/* this comes straight off the data sheet schematics */
-		bit0 = !(((!state->input_lines[1]) &
-					state->input_lines[2] &
-					state->input_lines[4] &
-					state->input_lines[6])  |
-					((!state->input_lines[3]) &
-					state->input_lines[4] &
-					state->input_lines[6])  |
-					((!state->input_lines[5]) &
-					state->input_lines[6])  |
-					(!state->input_lines[7]));
-
-		bit1 = !(((!state->input_lines[2]) &
-					state->input_lines[4] &
-					state->input_lines[5])  |
-					((!state->input_lines[3]) &
-					state->input_lines[4] &
-					state->input_lines[5])  |
-					(!state->input_lines[6])  |
-					(!state->input_lines[7]));
-
-		bit2 = !((!state->input_lines[4])  |
-					(!state->input_lines[5])  |
-					(!state->input_lines[6])  |
-					(!state->input_lines[7]));
-
-		state->output = (bit2 << 2) | (bit1 << 1) | bit0;
-
-		state->output_valid = (state->input_lines[0] &
-										state->input_lines[1] &
-										state->input_lines[2] &
-										state->input_lines[3] &
-										state->input_lines[4] &
-										state->input_lines[5] &
-										state->input_lines[6] &
-										state->input_lines[7]);
-
-		state->enable_output = !state->output_valid;
-	}
-
-
-	/* call callback if any of the outputs changed */
-	if (  state->output_cb &&
-		((state->output        != state->last_output) ||
-			(state->output_valid  != state->last_output_valid) ||
-			(state->enable_output != state->last_enable_output)))
-	{
-		state->last_output = state->output;
-		state->last_output_valid = state->output_valid;
-		state->last_enable_output = state->enable_output;
-
-		state->output_cb(device);
-	}
-}
-
-
-void ttl74148_input_line_w(device_t *device, int input_line, int data)
-{
-	ttl74148_state *state = get_safe_token(device);
-	state->input_lines[input_line] = data ? 1 : 0;
-}
-
-
-void ttl74148_enable_input_w(device_t *device, int data)
-{
-	ttl74148_state *state = get_safe_token(device);
-	state->enable_input = data ? 1 : 0;
-}
-
-
-int ttl74148_output_r(device_t *device)
-{
-	ttl74148_state *state = get_safe_token(device);
-	return state->output;
-}
-
-
-int ttl74148_output_valid_r(device_t *device)
-{
-	ttl74148_state *state = get_safe_token(device);
-	return state->output_valid;
-}
-
-
-int ttl74148_enable_output_r(device_t *device)
-{
-	ttl74148_state *state = get_safe_token(device);
-	return state->enable_output;
-}
-
-
-static DEVICE_START( ttl74148 )
-{
-	ttl74148_config *config = (ttl74148_config *)device->static_config();
-	ttl74148_state *state = get_safe_token(device);
-	state->output_cb = config->output_cb;
-
-	device->save_item(NAME(state->input_lines));
-	device->save_item(NAME(state->enable_input));
-	device->save_item(NAME(state->output));
-	device->save_item(NAME(state->output_valid));
-	device->save_item(NAME(state->enable_output));
-	device->save_item(NAME(state->last_output));
-	device->save_item(NAME(state->last_output_valid));
-	device->save_item(NAME(state->last_enable_output));
-}
-
-
-static DEVICE_RESET( ttl74148 )
-{
-	ttl74148_state *state = get_safe_token(device);
-
-	state->enable_input = 1;
-	state->input_lines[0] = 1;
-	state->input_lines[1] = 1;
-	state->input_lines[2] = 1;
-	state->input_lines[3] = 1;
-	state->input_lines[4] = 1;
-	state->input_lines[5] = 1;
-	state->input_lines[6] = 1;
-	state->input_lines[7] = 1;
-
-	state->last_output = -1;
-	state->last_output_valid = -1;
-	state->last_enable_output = -1;
-}
 
 const device_type TTL74148 = &device_creator<ttl74148_device>;
 
 ttl74148_device::ttl74148_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TTL74148, "74148", tag, owner, clock, "74148", __FILE__)
+	: device_t(mconfig, TTL74148, "74148", tag, owner, clock, "74148", __FILE__),
+	m_enable_input(0),
+	m_output(0),
+	m_output_valid(0),
+	m_enable_output(0),
+	m_last_output(0),
+	m_last_output_valid(0),
+	m_last_enable_output(0)
 {
-	m_token = global_alloc_clear(ttl74148_state);
+	for (int i = 0; i < 8; i++)
+	m_input_lines[i] = 0;
 }
 
 //-------------------------------------------------
@@ -230,6 +66,16 @@ ttl74148_device::ttl74148_device(const machine_config &mconfig, const char *tag,
 
 void ttl74148_device::device_config_complete()
 {
+	// inherit a copy of the static data
+	const ttl74148_config *intf = reinterpret_cast<const ttl74148_config *>(static_config());
+	if (intf != NULL)
+	*static_cast<ttl74148_config *>(this) = *intf;
+	
+	// or initialize to defaults if none provided
+	else
+	{
+	}
+	
 }
 
 //-------------------------------------------------
@@ -238,7 +84,14 @@ void ttl74148_device::device_config_complete()
 
 void ttl74148_device::device_start()
 {
-	DEVICE_START_NAME( ttl74148 )(this);
+	save_item(NAME(m_input_lines));
+	save_item(NAME(m_enable_input));
+	save_item(NAME(m_output));
+	save_item(NAME(m_output_valid));
+	save_item(NAME(m_enable_output));
+	save_item(NAME(m_last_output));
+	save_item(NAME(m_last_output_valid));
+	save_item(NAME(m_last_enable_output));
 }
 
 //-------------------------------------------------
@@ -247,5 +100,117 @@ void ttl74148_device::device_start()
 
 void ttl74148_device::device_reset()
 {
-	DEVICE_RESET_NAME( ttl74148 )(this);
+	
+	m_enable_input = 1;
+	m_input_lines[0] = 1;
+	m_input_lines[1] = 1;
+	m_input_lines[2] = 1;
+	m_input_lines[3] = 1;
+	m_input_lines[4] = 1;
+	m_input_lines[5] = 1;
+	m_input_lines[6] = 1;
+	m_input_lines[7] = 1;
+
+	m_last_output = -1;
+	m_last_output_valid = -1;
+	m_last_enable_output = -1;
+}
+
+
+void ttl74148_device::update()
+{
+	if (m_enable_input)
+	{
+		// row 1 in truth table
+		m_output = 0x07;
+		m_output_valid = 1;
+		m_enable_output = 1;
+	}
+	else
+	{
+		int bit0, bit1, bit2;
+
+		/* this comes straight off the data sheet schematics */
+		bit0 = !(((!m_input_lines[1]) &
+					m_input_lines[2] &
+					m_input_lines[4] &
+					m_input_lines[6])  |
+					((!m_input_lines[3]) &
+					m_input_lines[4] &
+					m_input_lines[6])  |
+					((!m_input_lines[5]) &
+					m_input_lines[6])  |
+					(!m_input_lines[7]));
+
+		bit1 = !(((!m_input_lines[2]) &
+					m_input_lines[4] &
+					m_input_lines[5])  |
+					((!m_input_lines[3]) &
+					m_input_lines[4] &
+					m_input_lines[5])  |
+					(!m_input_lines[6])  |
+					(!m_input_lines[7]));
+
+		bit2 = !((!m_input_lines[4])  |
+					(!m_input_lines[5])  |
+					(!m_input_lines[6])  |
+					(!m_input_lines[7]));
+
+		m_output = (bit2 << 2) | (bit1 << 1) | bit0;
+
+		m_output_valid = (m_input_lines[0] &
+										m_input_lines[1] &
+										m_input_lines[2] &
+										m_input_lines[3] &
+										m_input_lines[4] &
+										m_input_lines[5] &
+										m_input_lines[6] &
+										m_input_lines[7]);
+
+		m_enable_output = !m_output_valid;
+	}
+
+
+	/* call callback if any of the outputs changed */
+	if (  m_output_cb &&
+		((m_output        != m_last_output) ||
+			(m_output_valid  != m_last_output_valid) ||
+			(m_enable_output != m_last_enable_output)))
+	{
+		m_last_output = m_output;
+		m_last_output_valid = m_output_valid;
+		m_last_enable_output = m_enable_output;
+
+		m_output_cb(this);
+	}
+}
+
+
+void ttl74148_device::input_line_w(int input_line, int data)
+{
+	m_input_lines[input_line] = data ? 1 : 0;
+}
+
+
+void ttl74148_device::enable_input_w(int data)
+{
+	m_enable_input = data ? 1 : 0;
+}
+
+
+int ttl74148_device::output_r()
+{
+	return m_output;
+}
+
+
+int ttl74148_device::output_valid_r()
+{
+	return m_output_valid;
+}
+
+
+int ttl74148_device::enable_output_r()
+{
+	return m_enable_output;
 }
