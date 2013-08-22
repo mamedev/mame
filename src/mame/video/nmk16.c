@@ -388,22 +388,19 @@ WRITE16_MEMBER(nmk16_state::bioship_bank_w)
 
 // manybloc uses extra flip bits on the sprites, but these break other games
 
-inline void nmk16_state::nmk16_draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, UINT16 *spr)
+inline void nmk16_state::nmk16_draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 *spr)
 {
-	if ((spr[0] & 0x0001))
-	{
+	if(!(spr[0] & 0x0001))
+		return;
+
 	int sx    = (spr[4] & 0x1FF) + m_videoshift;
 	int sy    =  spr[6] & 0x1FF;
 	int code  =  spr[3];
 	int color =  spr[7];
 	int w     =  spr[1] & 0x00F;
 	int h     = (spr[1] & 0x0F0) >> 4;
-	int pri   = (spr[0] & 0x0C0) >> 6;
 	int xx,yy,x;
 	int delta = 16;
-
-	if(pri != priority)
-		return;
 
 	if (flip_screen())
 	{
@@ -430,28 +427,24 @@ inline void nmk16_state::nmk16_draw_sprite(bitmap_ind16 &bitmap, const rectangle
 
 		sy += delta;
 	} while (--yy >= 0);
-	}
 }
 
-inline void nmk16_state::nmk16_draw_sprite_flipsupported(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, UINT16 *spr)
+inline void nmk16_state::nmk16_draw_sprite_flipsupported(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 *spr)
 {
-	if ((spr[0] & 0x0001))
-	{
+	if(!(spr[0] & 0x0001))
+		return;
+
 	int sx    = (spr[4] & 0x1FF) + m_videoshift;
 	int sy    =  spr[6] & 0x1FF;
 	int code  =  spr[3];
 	int color =  spr[7];
 	int w     =  spr[1] & 0x00F;
 	int h     = (spr[1] & 0x0F0) >> 4;
-	int pri   = (spr[0] & 0x0C0) >> 6;
 	int flipy = (spr[1] & 0x200) >> 9;
 	int flipx = (spr[1] & 0x100) >> 8;
 
 	int xx,yy,x;
 	int delta = 16;
-
-	if(pri != priority)
-		return;
 
 	flipx ^= flip_screen();
 	flipy ^= flip_screen();
@@ -481,61 +474,47 @@ inline void nmk16_state::nmk16_draw_sprite_flipsupported(bitmap_ind16 &bitmap, c
 		} while (--xx >= 0);
 		sy += delta * (flipy ? -1 : 1);
 	} while (--yy >= 0);
-	}
 }
 
 void nmk16_state::nmk16_draw_sprites_swap(bitmap_ind16 &bitmap, const rectangle &cliprect, int *bittbl)
 {
-	int i, prio;
+	int i;
 
-	// Priority level (4 levels, 0x100 sprites)
-	for ( prio = 3; prio >= 0; prio-- )
+	for (i = 0; i < 0x100; i++)
 	{
-		// Sprite
-		for ( i = 0; i < 0x100; i++ )
-		{
-			int spr = BITSWAP8(i, bittbl[0], bittbl[1], bittbl[2], bittbl[3], bittbl[4], bittbl[5], bittbl[6], bittbl[7]);
-			nmk16_draw_sprite(bitmap, cliprect, prio, m_spriteram_old2 + (spr * 8));
-	}
+		int spr = BITSWAP8(i, bittbl[0], bittbl[1], bittbl[2], bittbl[3], bittbl[4], bittbl[5], bittbl[6], bittbl[7]);
+		nmk16_draw_sprite(bitmap, cliprect, m_spriteram_old2 + (spr * 16/2));
 	}
 }
 
 void nmk16_state::nmk16_draw_sprites_swap_flipsupported(bitmap_ind16 &bitmap, const rectangle &cliprect, int *bittbl)
 {
-	int i, prio;
+	int i;
 
-	// Priority level (4 levels, 0x100 sprites)
-	for ( prio = 3; prio >= 0; prio-- )
+	for ( i = 0; i < 0x100; i++ )
 	{
-		// Sprite
-		for ( i = 0; i < 0x100; i++ )
-		{
-			int spr = BITSWAP8(i, bittbl[0], bittbl[1], bittbl[2], bittbl[3], bittbl[4], bittbl[5], bittbl[6], bittbl[7]);
-			nmk16_draw_sprite_flipsupported(bitmap, cliprect, prio, m_spriteram_old2 + (spr * 16/2));
-	}
+		int spr = BITSWAP8(i, bittbl[0], bittbl[1], bittbl[2], bittbl[3], bittbl[4], bittbl[5], bittbl[6], bittbl[7]);
+		nmk16_draw_sprite_flipsupported(bitmap, cliprect, m_spriteram_old2 + (spr * 16/2));
 	}
 }
 
-void nmk16_state::nmk16_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority)
+void nmk16_state::nmk16_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int offs;
 
-	for (offs = 0;offs < 0x1000/2;offs += 8)
+	for (offs = 0; offs < 0x1000/2; offs += 8)
 	{
-		nmk16_draw_sprite(bitmap, cliprect, priority, m_spriteram_old2 + offs);
+		nmk16_draw_sprite(bitmap, cliprect, m_spriteram_old2 + offs);
 	}
 }
 
-void nmk16_state::nmk16_draw_sprites_flipsupported(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority)
+void nmk16_state::nmk16_draw_sprites_flipsupported(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int offs;
 
-	for (offs = 0;offs < 0x1000/2;offs += 8)
+	for (offs = 0; offs < 0x1000/2; offs += 8)
 	{
-		if (m_spriteram_old2[offs] & 0x0001)
-		{
-			nmk16_draw_sprite_flipsupported(bitmap, cliprect, priority, m_spriteram_old2 + offs);
-		}
+		nmk16_draw_sprite_flipsupported(bitmap, cliprect, m_spriteram_old2 + offs);
 	}
 }
 
@@ -553,10 +532,7 @@ int nmk16_state::nmk16_bg_spr_update(screen_device &screen, bitmap_ind16 &bitmap
 
 	m_bg_tilemap0->draw(screen, bitmap, cliprect, 0,0);
 
-	nmk16_draw_sprites(bitmap,cliprect,3);
-	nmk16_draw_sprites(bitmap,cliprect,2);
-	nmk16_draw_sprites(bitmap,cliprect,1);
-	nmk16_draw_sprites(bitmap,cliprect,0);
+	nmk16_draw_sprites(bitmap,cliprect);
 	return 0;
 }
 
@@ -567,10 +543,7 @@ int nmk16_state::nmk16_bg_fg_spr_tx_update(screen_device &screen, bitmap_ind16 &
 	m_bg_tilemap0->draw(screen, bitmap, cliprect, 0,0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0,0);
 
-	nmk16_draw_sprites(bitmap,cliprect,3);
-	nmk16_draw_sprites(bitmap,cliprect,2);
-	nmk16_draw_sprites(bitmap,cliprect,1);
-	nmk16_draw_sprites(bitmap,cliprect,0);
+	nmk16_draw_sprites(bitmap,cliprect);
 
 	m_tx_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
@@ -582,10 +555,7 @@ int nmk16_state::nmk16_bg_spr_tx_update(screen_device &screen, bitmap_ind16 &bit
 
 	m_bg_tilemap0->draw(screen, bitmap, cliprect, 0,0);
 
-	nmk16_draw_sprites(bitmap,cliprect,3);
-	nmk16_draw_sprites(bitmap,cliprect,2);
-	nmk16_draw_sprites(bitmap,cliprect,1);
-	nmk16_draw_sprites(bitmap,cliprect,0);
+	nmk16_draw_sprites(bitmap,cliprect);
 
 	m_tx_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
@@ -597,10 +567,7 @@ int nmk16_state::nmk16_bg_sprflip_tx_update(screen_device &screen, bitmap_ind16 
 
 	m_bg_tilemap0->draw(screen, bitmap, cliprect, 0,0);
 
-	nmk16_draw_sprites_flipsupported(bitmap,cliprect,3);
-	nmk16_draw_sprites_flipsupported(bitmap,cliprect,2);
-	nmk16_draw_sprites_flipsupported(bitmap,cliprect,1);
-	nmk16_draw_sprites_flipsupported(bitmap,cliprect,0);
+	nmk16_draw_sprites_flipsupported(bitmap,cliprect);
 
 	m_tx_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
@@ -649,10 +616,7 @@ int nmk16_state::nmk16_bioshipbg_sprflip_tx_update(screen_device &screen, bitmap
 	copyscrollbitmap(bitmap,*m_background_bitmap,1,&scrollx,1,&scrolly,cliprect);
 	m_bg_tilemap0->draw(screen, bitmap, cliprect, 0,0);
 
-	nmk16_draw_sprites(bitmap,cliprect,3);
-	nmk16_draw_sprites(bitmap,cliprect,2);
-	nmk16_draw_sprites(bitmap,cliprect,1);
-	nmk16_draw_sprites(bitmap,cliprect,0);
+	nmk16_draw_sprites(bitmap,cliprect);
 
 	m_tx_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
@@ -943,10 +907,7 @@ void nmk16_state::video_update(screen_device &screen, bitmap_ind16 &bitmap, cons
 
 	m_bg_tilemap0->draw(screen, bitmap, cliprect, 0,0);
 
-	nmk16_draw_sprites_flipsupported(bitmap,cliprect,3);
-	nmk16_draw_sprites_flipsupported(bitmap,cliprect,2);
-	nmk16_draw_sprites_flipsupported(bitmap,cliprect,1);
-	nmk16_draw_sprites_flipsupported(bitmap,cliprect,0);
+	nmk16_draw_sprites_flipsupported(bitmap,cliprect);
 
 	m_tx_tilemap->draw(screen, bitmap, cliprect, 0,0);
 }
@@ -958,10 +919,7 @@ void nmk16_state::redhawki_video_update(screen_device &screen, bitmap_ind16 &bit
 
 	m_bg_tilemap0->draw(screen, bitmap, cliprect, 0,0);
 
-	nmk16_draw_sprites_flipsupported(bitmap,cliprect,3);
-	nmk16_draw_sprites_flipsupported(bitmap,cliprect,2);
-	nmk16_draw_sprites_flipsupported(bitmap,cliprect,1);
-	nmk16_draw_sprites_flipsupported(bitmap,cliprect,0);
+	nmk16_draw_sprites_flipsupported(bitmap,cliprect);
 }
 
 UINT32 nmk16_state::screen_update_afega(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)   { video_update(screen,bitmap,cliprect, 1, -0x100,+0x000, 0x0001);  return 0; }
@@ -976,11 +934,7 @@ UINT32 nmk16_state::screen_update_firehawk(screen_device &screen, bitmap_ind16 &
 
 	m_bg_tilemap0->draw(screen, bitmap, cliprect, 0,0);
 
-	nmk16_draw_sprites_flipsupported(bitmap,cliprect,3);
-	nmk16_draw_sprites_flipsupported(bitmap,cliprect,2);
-	nmk16_draw_sprites_flipsupported(bitmap,cliprect,1);
-	nmk16_draw_sprites_flipsupported(bitmap,cliprect,0);
+	nmk16_draw_sprites_flipsupported(bitmap,cliprect);
 
 	m_tx_tilemap->draw(screen, bitmap, cliprect, 0,0);
-	return 0;
-}
+	return 0;}

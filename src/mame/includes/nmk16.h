@@ -166,12 +166,12 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(nmk16_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(manybloc_scanline);
 	void nmk16_video_init();
-	inline void nmk16_draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, UINT16 *spr);
-	inline void nmk16_draw_sprite_flipsupported(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, UINT16 *spr);
+	inline void nmk16_draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 *spr);
+	inline void nmk16_draw_sprite_flipsupported(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 *spr);
 	void nmk16_draw_sprites_swap(bitmap_ind16 &bitmap, const rectangle &cliprect, int *bittbl);
 	void nmk16_draw_sprites_swap_flipsupported(bitmap_ind16 &bitmap, const rectangle &cliprect, int *bittbl);
-	void nmk16_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
-	void nmk16_draw_sprites_flipsupported(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
+	void nmk16_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void nmk16_draw_sprites_flipsupported(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	int nmk16_bg_spr_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	int nmk16_bg_fg_spr_tx_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	int nmk16_bg_spr_tx_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
