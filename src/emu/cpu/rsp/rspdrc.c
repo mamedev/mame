@@ -6052,8 +6052,8 @@ CPU_GET_INFO( rsp )
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:           info->icount = &rsp->icount;                break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "RSP");                 break;
-		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "rsp");                 break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "RSP DRC");                 break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "rsp_drc");                 break;
 		case CPUINFO_STR_FAMILY:                    strcpy(info->s, "RSP");                 break;
 		case CPUINFO_STR_VERSION:                   strcpy(info->s, "1.0");                 break;
 		case CPUINFO_STR_SOURCE_FILE:                       strcpy(info->s, __FILE__);              break;

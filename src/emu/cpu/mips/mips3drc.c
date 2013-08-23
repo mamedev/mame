@@ -3716,8 +3716,8 @@ CPU_GET_INFO( vr4300be )
 		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(vr4300be);               break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "VR4300 (big)");            break;
-		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "vr4300be");                 break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "VR4300 (big) DRC");            break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "vr4300be_drc");                 break;
 
 		/* --- everything else is handled generically --- */
 		default:                                        CPU_GET_INFO_CALL(mips3);           break;
@@ -3735,8 +3735,8 @@ CPU_GET_INFO( vr4300le )
 		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(vr4300le);               break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "VR4300 (little)");     break;
-		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "vr4300le");                 break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "VR4300 (little) DRC");     break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "vr4300le_drc");                 break;
 
 		/* --- everything else is handled generically --- */
 		default:                                        CPU_GET_INFO_CALL(mips3);           break;
@@ -3755,8 +3755,8 @@ CPU_GET_INFO( vr4310be )
 		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(vr4300be);               break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "VR4310 (big)");            break;
-		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "vr4310be");                 break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "VR4310 (big) DRC");            break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "vr4310be_drc");                 break;
 
 		/* --- everything else is handled generically --- */
 		default:                                        CPU_GET_INFO_CALL(mips3);           break;
@@ -3774,8 +3774,8 @@ CPU_GET_INFO( vr4310le )
 		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(vr4300le);               break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "VR4310 (little)");     break;
-		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "vr4310le");                 break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "VR4310 (little) DRC");     break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "vr4310le_drc");                 break;
 
 		/* --- everything else is handled generically --- */
 		default:                                        CPU_GET_INFO_CALL(mips3);           break;
@@ -3808,8 +3808,8 @@ CPU_GET_INFO( r4600be )
 		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(r4600be);                break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "R4600 (big)");         break;
-		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "r4600be");                 break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "R4600 (big) DRC");         break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "r4600be_drc");                 break;
 
 		/* --- everything else is handled generically --- */
 		default:                                        CPU_GET_INFO_CALL(mips3);           break;
@@ -3827,8 +3827,8 @@ CPU_GET_INFO( r4600le )
 		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(r4600le);                break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "R4600 (little)");      break;
-		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "r4600le");                 break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "R4600 (little) DRC");      break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "r4600le_drc");                 break;
 		/* --- everything else is handled generically --- */
 		default:                                        CPU_GET_INFO_CALL(mips3);           break;
 	}
@@ -3861,8 +3861,8 @@ CPU_GET_INFO( r4650be )
 		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(r4650be);                break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "IDT R4650 (big)");     break;
-		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "r4650be");                 break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "IDT R4650 (big) DRC");     break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "r4650be_drc");                 break;
 
 		/* --- everything else is handled generically --- */
 		default:                                        CPU_GET_INFO_CALL(mips3);           break;
@@ -3880,8 +3880,8 @@ CPU_GET_INFO( r4650le )
 		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(r4650le);                break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "IDT R4650 (little)");  break;
-		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "r4650le");                 break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "IDT R4650 (little) DRC");  break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "r4650le_drc");                 break;
 
 		/* --- everything else is handled generically --- */
 		default:                                        CPU_GET_INFO_CALL(mips3);           break;
@@ -3915,8 +3915,8 @@ CPU_GET_INFO( r4700be )
 		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(r4700be);                break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "R4700 (big)");         break;
-		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "r4700be");                 break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "R4700 (big) DRC");         break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "r4700be_drc");                 break;
 
 		/* --- everything else is handled generically --- */
 		default:                                        CPU_GET_INFO_CALL(mips3);           break;
@@ -3934,8 +3934,8 @@ CPU_GET_INFO( r4700le )
 		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(r4700le);                break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "R4700 (little)");      break;
-		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "r4700le");                 break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "R4700 (little) DRC");      break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "r4700le_drc");                 break;
 		
 		/* --- everything else is handled generically --- */
 		default:                                        CPU_GET_INFO_CALL(mips3);           break;
@@ -3969,8 +3969,8 @@ CPU_GET_INFO( r5000be )
 		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(r5000be);                break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "R5000 (big)");         break;
-		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "r5000be");                 break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "R5000 (big) DRC");         break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "r5000be_drc");                 break;
 
 		/* --- everything else is handled generically --- */
 		default:                                        CPU_GET_INFO_CALL(mips3);           break;
@@ -3988,8 +3988,8 @@ CPU_GET_INFO( r5000le )
 		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(r5000le);                break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "R5000 (little)");      break;
-		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "r5000le");                 break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "R5000 (little) DRC");      break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "r5000le_drc");                 break;
 
 		/* --- everything else is handled generically --- */
 		default:                                        CPU_GET_INFO_CALL(mips3);           break;
@@ -4023,8 +4023,8 @@ CPU_GET_INFO( qed5271be )
 		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(qed5271be);          break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "QED5271 (big)");       break;
-		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "qed5271be");                 break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "QED5271 (big) DRC");       break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "qed5271be_drc");                 break;
 
 		/* --- everything else is handled generically --- */
 		default:                                        CPU_GET_INFO_CALL(mips3);           break;
@@ -4042,8 +4042,8 @@ CPU_GET_INFO( qed5271le )
 		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(qed5271le);          break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "QED5271 (little)");    break;
-		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "qed5271le");                 break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "QED5271 (little) DRC");    break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "qed5271le_drc");                 break;
 
 		/* --- everything else is handled generically --- */
 		default:                                        CPU_GET_INFO_CALL(mips3);           break;
@@ -4077,8 +4077,8 @@ CPU_GET_INFO( rm7000be )
 		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(rm7000be);               break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "RM7000 (big)");        break;
-		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "rm7000be");        break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "RM7000 (big) DRC");        break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "rm7000be_drc");        break;
 
 		/* --- everything else is handled generically --- */
 		default:                                        CPU_GET_INFO_CALL(mips3);           break;
@@ -4096,8 +4096,8 @@ CPU_GET_INFO( rm7000le )
 		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(rm7000le);               break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "RM7000 (little)");     break;
-		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "rm7000le");        break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "RM7000 (little) DRC");     break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "rm7000le_drc");        break;
 
 		/* --- everything else is handled generically --- */
 		default:                                        CPU_GET_INFO_CALL(mips3);           break;

@@ -3394,8 +3394,8 @@ CPU_GET_INFO( sh2 )
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:           info->icount = &sh2->icount;                break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "SH-2");                break;
-		case CPUINFO_STR_SHORTNAME:                          strcpy(info->s, "sh2");                break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "SH-2 DRC");                break;
+		case CPUINFO_STR_SHORTNAME:                          strcpy(info->s, "sh2_drc");                break;
 		case CPUINFO_STR_FAMILY:                    strcpy(info->s, "Hitachi SuperH RISC");     break;
 		case CPUINFO_STR_VERSION:                   strcpy(info->s, "2.0");             break;
 		case CPUINFO_STR_SOURCE_FILE:                       strcpy(info->s, __FILE__);              break;
@@ -3450,8 +3450,8 @@ CPU_GET_INFO( sh1 )
 		case CPUINFO_FCT_RESET:                     info->reset = CPU_RESET_NAME(sh1);              break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "SH-1");                break;
-		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "sh1");                break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "SH-1 DRC");                break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "sh1_drc");                break;
 
 		default:                            CPU_GET_INFO_CALL(sh2);         break;
 	}
