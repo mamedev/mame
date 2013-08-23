@@ -538,7 +538,7 @@ inline void i8086_common_cpu_device::ExpandFlags(UINT16 f)
 inline void i8086_common_cpu_device::i_insb()
 {
 	UINT32 ea = calc_addr(ES, m_regs.w[DI], 1, I8086_WRITE);
-	write_word(ea, read_port_byte(m_regs.w[DX]));
+	write_byte(ea, read_port_byte(m_regs.w[DX]));
 	m_regs.w[DI] += -2 * m_DF + 1;
 	CLK(IN_IMM8);
 }

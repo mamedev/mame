@@ -102,57 +102,10 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 		bitmap.pix32(y, x + i) = palette[BIT((gfx >> i), 0)];
 }
 
-static UPD7220_DRAW_TEXT_LINE( hgdc_display_text )
-{
-	compis_state *state = device->machine().driver_data<compis_state>();
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
-	int x;
-	int xi,yi;
-	int tile;
-	int attr;
-	UINT8 tile_data;
-	UINT8 pen;
-	UINT8 *m_p_chargen = state->memregion("maincpu")->base()+0xca70; //bios0
-	if (m_p_chargen[0x214] != 0x08) m_p_chargen+= 0x10; //bios1
-
-	for( x = 0; x < pitch; x++ )
-	{
-		tile = state->m_video_ram[(addr+x) & 0x1ffff];
-		attr = state->m_video_ram[(addr+x+1) & 0x1ffff];
-
-		for( yi = 0; yi < lr; yi++)
-		{
-			tile_data = (m_p_chargen[tile*8+yi]);
-
-			if(attr & 2)
-				tile_data^=0xff;
-
-			for( xi = 0; xi < 8; xi++)
-			{
-				int res_x,res_y;
-
-				res_x = x * 8 + xi;
-				res_y = y * lr + yi;
-
-				if(!device->machine().primary_screen->visible_area().contains(res_x, res_y))
-					continue;
-
-				if(yi >= 8)
-					pen = 0;
-				else
-					pen = ((tile_data >> xi) & 1) ? 1 : 0;
-
-				if(pen)
-					bitmap.pix32(res_y, res_x) = palette[pen];
-			}
-		}
-	}
-}
-
 static UPD7220_INTERFACE( hgdc_intf )
 {
 	hgdc_display_pixels,
-	hgdc_display_text,
+	NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL
@@ -170,7 +123,7 @@ static ADDRESS_MAP_START( compis_mem , AS_PROGRAM, 16, compis_state )
 	AM_RANGE( 0x50000, 0x5ffff) AM_RAM
 	AM_RANGE( 0x60000, 0x6ffff) AM_RAM
 	AM_RANGE( 0x70000, 0x7ffff) AM_RAM
-	AM_RANGE( 0xe8000, 0xeffff) AM_ROM AM_REGION("maincpu",0) AM_WRITE8(vram_w, 0xffff)
+	AM_RANGE( 0xe8000, 0xeffff) AM_ROM AM_REGION("maincpu",0)
 	AM_RANGE( 0xf0000, 0xfffff) AM_ROM AM_REGION("maincpu",0) AM_WRITE8(vram_w, 0xffff)
 ADDRESS_MAP_END
 
