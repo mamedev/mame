@@ -1003,37 +1003,6 @@ WRITE32_MEMBER(model2_state::model2_irq_w)
 	m_intreq &= data;
 }
 
-
-static int snd_68k_ready_r(address_space &space)
-{
-	model2_state *state = space.machine().driver_data<model2_state>();
-	int sr = state->m_audiocpu->state_int(M68K_SR);
-
-	if ((sr & 0x0700) > 0x0100)
-	{
-		space.device().execute().spin_until_time(attotime::from_usec(40));
-		return 0;   // not ready yet, interrupts disabled
-	}
-
-	return 0xff;
-}
-
-static void snd_latch_to_68k_w(address_space &space, int data)
-{
-	model2_state *state = space.machine().driver_data<model2_state>();
-	if (!snd_68k_ready_r(space))
-	{
-		space.device().execute().spin_until_time(attotime::from_usec(40));
-	}
-
-	state->m_to_68k = data;
-
-	state->m_audiocpu->set_input_line(2, HOLD_LINE);
-
-	// give the 68k time to notice
-	space.device().execute().spin_until_time(attotime::from_usec(40));
-}
-
 READ32_MEMBER(model2_state::model2_serial_r)
 {
 	if ((offset == 0) && (mem_mask == 0xffff0000))
@@ -1048,7 +1017,15 @@ WRITE32_MEMBER(model2_state::model2o_serial_w)
 {
 	if (mem_mask == 0x0000ffff)
 	{
-		snd_latch_to_68k_w(space, data&0xff);
+		if (!m_m1audio->ready_r(space, 0))
+		{
+			space.device().execute().spin_until_time(attotime::from_usec(40));
+		}
+
+		m_m1audio->write_fifo(data & 0xff);
+
+		// give the 68k time to notice
+		space.device().execute().spin_until_time(attotime::from_usec(40));
 	}
 }
 
@@ -1059,6 +1036,17 @@ WRITE32_MEMBER(model2_state::model2_serial_w)
 		if (m_dsbz80 != NULL)
 		{
 			m_dsbz80->latch_w(space, 0, data&0xff);
+		}
+
+		// for Manx TT DX
+		if (m_m1audio != NULL)
+		{
+			if (!m_m1audio->ready_r(space, 0))
+			{
+				space.device().execute().spin_until_time(attotime::from_usec(40));
+			}
+
+			m_m1audio->write_fifo(data & 0xff);
 		}
 
 		scsp_midi_in(machine().device("scsp"), space, 0, data&0xff, 0);
@@ -1838,50 +1826,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(model2_state::model2c_interrupt)
 	}
 }
 
-/* Model 1 sound board emulation */
-
-READ16_MEMBER(model2_state::m1_snd_68k_latch_r)
-{
-	return m_to_68k;
-}
-
-READ16_MEMBER(model2_state::m1_snd_v60_ready_r)
-{
-	return 1;
-}
-
-WRITE16_MEMBER(model2_state::m1_snd_mpcm_bnk1_w)
-{
-	m_multipcm_1->set_bank(0x100000 * (data & 0xf), 0x100000 * (data & 0xf));
-}
-
-WRITE16_MEMBER(model2_state::m1_snd_mpcm_bnk2_w)
-{
-	m_multipcm_2->set_bank(0x100000 * (data & 0xf), 0x100000 * (data & 0xf));
-}
-
-WRITE16_MEMBER(model2_state::m1_snd_68k_latch1_w)
-{
-}
-
-WRITE16_MEMBER(model2_state::m1_snd_68k_latch2_w)
-{
-}
-
-static ADDRESS_MAP_START( model1_snd, AS_PROGRAM, 16, model2_state )
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x0bffff) AM_ROM AM_REGION("audiocpu", 0x20000)  // mirror of second program ROM
-	AM_RANGE(0xc20000, 0xc20001) AM_READWRITE(m1_snd_68k_latch_r, m1_snd_68k_latch1_w )
-	AM_RANGE(0xc20002, 0xc20003) AM_READWRITE(m1_snd_v60_ready_r, m1_snd_68k_latch2_w )
-	AM_RANGE(0xc40000, 0xc40007) AM_DEVREADWRITE8("sega1", multipcm_device, read, write, 0x00ff )
-	AM_RANGE(0xc40012, 0xc40013) AM_WRITENOP
-	AM_RANGE(0xc50000, 0xc50001) AM_WRITE(m1_snd_mpcm_bnk1_w )
-	AM_RANGE(0xc60000, 0xc60007) AM_DEVREADWRITE8("sega2", multipcm_device, read, write, 0x00ff )
-	AM_RANGE(0xc70000, 0xc70001) AM_WRITE(m1_snd_mpcm_bnk2_w )
-	AM_RANGE(0xd00000, 0xd00007) AM_DEVREADWRITE8("ymsnd", ym3438_device, read, write, 0x00ff )
-	AM_RANGE(0xf00000, 0xf0ffff) AM_RAM
-ADDRESS_MAP_END
-
 /* Model 2 sound board emulation */
 
 WRITE16_MEMBER(model2_state::model2snd_ctrl)
@@ -2002,16 +1946,12 @@ static MACHINE_CONFIG_START( model2o, model2_state )
 	MCFG_CPU_PROGRAM_MAP(model2o_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", model2_state, model2_interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", M68000, 10000000)
-	MCFG_CPU_PROGRAM_MAP(model1_snd)
-
 	MCFG_CPU_ADD("tgp", MB86233, 16000000)
 	MCFG_CPU_PROGRAM_MAP(copro_tgp_map)
 	MCFG_MB86233_FIFO_READ_CB(READ32(model2_state,copro_tgp_fifoin_pop))
 	MCFG_MB86233_FIFO_READ_OK_CB(READLINE(model2_state,copro_tgp_fifoin_pop_ok))
 	MCFG_MB86233_FIFO_WRITE_CB(WRITE32(model2_state,copro_tgp_fifoout_push))
 	MCFG_MB86233_TABLE_REGION("user5")
-
 
 	MCFG_MACHINE_START_OVERRIDE(model2_state,model2)
 	MCFG_MACHINE_RESET_OVERRIDE(model2_state,model2o)
@@ -2044,19 +1984,7 @@ static MACHINE_CONFIG_START( model2o, model2_state )
 
 	MCFG_VIDEO_START_OVERRIDE(model2_state,model2)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
-	MCFG_SOUND_ADD("ymsnd", YM3438, 8000000)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
-
-	MCFG_SOUND_ADD("sega1", MULTIPCM, 8000000)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-
-	MCFG_SOUND_ADD("sega2", MULTIPCM, 8000000)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SEGAM1AUDIO_ADD("m1audio")
 MACHINE_CONFIG_END
 
 /* 2A-CRX */
@@ -2112,6 +2040,10 @@ static MACHINE_CONFIG_START( model2a, model2_state )
 	MCFG_SOUND_CONFIG(scsp_config)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( manxttdx, model2a ) /* Includes a Model 1 Sound board for additional sounds - Deluxe version only */
+	MCFG_SEGAM1AUDIO_ADD("m1audio")
 MACHINE_CONFIG_END
 
 READ8_MEMBER(model2_state::driveio_port_r)
@@ -2819,7 +2751,67 @@ EPR-18763.31 & alt sound CPU code EPR-18924a.30 are dumped
 
 */
 
-ROM_START( manxtt ) /* Manx TT Superbike Twin Revision C, Model 2A */
+ROM_START( manxtt ) /* Manx TT Superbike Twin Revision D, Model 2A - Can be set to Twin or Deluxe - Found in DX setup */
+	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
+	ROM_LOAD32_WORD( "epr-18822d.12", 0x000000, 0x020000, CRC(4f435990) SHA1(0fcf64598384012caea27394280de89a9348a47d) )
+	ROM_LOAD32_WORD( "epr-18823d.13", 0x000002, 0x020000, CRC(b8eddb5c) SHA1(7e3b97e3370e68d92922e8999246064196610270) )
+	ROM_LOAD32_WORD( "epr-18824d.14", 0x040000, 0x020000, CRC(aca9f61f) SHA1(629db70371ea9986ef75557044b5e98329712418) )
+	ROM_LOAD32_WORD( "epr-18825d.15", 0x040002, 0x020000, CRC(5a1d7799) SHA1(bb5e8a5a3b766b5dc4285ecba330094caf8a71e6) )
+
+	ROM_REGION32_LE( 0x2400000, "user1", 0 ) // Data
+	ROM_LOAD32_WORD( "mpr-18751.10", 0x000000, 0x200000, CRC(773ad43d) SHA1(4d1601dc08a08b724e33e7cd90a4f22e18cfed9c) )
+	ROM_LOAD32_WORD( "mpr-18752.11", 0x000002, 0x200000, CRC(4da3719e) SHA1(24007e4ae3ba1a06321328d14e2bd6002fa1936e) )
+	ROM_LOAD32_WORD( "mpr-18749.8", 0x400000, 0x200000, CRC(c3fe0eea) SHA1(ada21405a136935ac4da1a3535c25fccf903f2d1) )
+	ROM_LOAD32_WORD( "mpr-18750.9", 0x400002, 0x200000, CRC(40b55494) SHA1(d98ae5518c5d31b155b1a7c4f7d9d67f44d7beae) )
+	ROM_LOAD32_WORD( "mpr-18747.6", 0x800000, 0x200000, CRC(a65ec1e8) SHA1(92636bdff0ae4cdb43dfc2986fad2d1b59469323) )
+	ROM_LOAD32_WORD( "mpr-18748.7", 0x800002, 0x200000, CRC(375e3748) SHA1(6c2e903dd073b130bcabb347631b876dc868b494) )
+	ROM_LOAD32_WORD( "epr-18862.4", 0xc00000, 0x080000, CRC(9adc3a30) SHA1(029db946338f8e0eccace8590082cc96bdf13e31) )
+	ROM_LOAD32_WORD( "epr-18863.5", 0xc00002, 0x080000, CRC(603742e9) SHA1(f78a5f7e582d313880c734158bb0fa68b256a58a) )
+	ROM_COPY( "user1", 0xc00000, 0xd00000, 0x100000 )
+	ROM_COPY( "user1", 0xc00000, 0xe00000, 0x100000 )
+	ROM_COPY( "user1", 0xc00000, 0xf00000, 0x100000 )
+
+	ROM_REGION( 0x2000000, "user2", 0 ) // Models
+	ROM_LOAD32_WORD( "mpr-18753.16", 0x000000, 0x200000, CRC(33ddaa0d) SHA1(26f643d6b9cecf08bd249290a670a0edea1b5be4) )
+	ROM_LOAD32_WORD( "mpr-18756.20", 0x000002, 0x200000, CRC(28713617) SHA1(fc2a6258387a1bc3fae2109b2dae6dd2a1984ab5) )
+	ROM_LOAD32_WORD( "mpr-18754.17", 0x400000, 0x200000, CRC(09aabde5) SHA1(e50646efb2ca59792833ce91398c4efa861ad6d1) )
+	ROM_LOAD32_WORD( "mpr-18757.21", 0x400004, 0x200000, CRC(25fc92e9) SHA1(226c4c7289b3b6009c1ffea4a171e3fb4e31a67c) )
+	ROM_LOAD32_WORD( "mpr-18755.18", 0x000000, 0x200000, CRC(bf094d9e) SHA1(2cd7130b226a28098191a6caf6fd761bb0bfac7b) )
+	ROM_LOAD32_WORD( "mpr-18758.22", 0x800002, 0x200000, CRC(1b5473d0) SHA1(658e33503f6990f4d9a954c63efad5f53d15f3a4) )
+
+	ROM_REGION( 0x800000, "tgp", 0 ) // TGP program? (COPRO socket)
+	ROM_LOAD32_WORD( "mpr-18761.28", 0x000000, 0x200000, CRC(4e39ec05) SHA1(50696cd320f1a6492e0c193713acbce085d959cd) )
+	ROM_LOAD32_WORD( "mpr-18762.29", 0x000002, 0x200000, CRC(4ab165d8) SHA1(7ff42a4c7236fec76f94f2d0c5537e503bcc98e5) )
+
+	ROM_REGION( 0x1000000, "user3", 0 ) // Textures
+	ROM_LOAD32_WORD( "mpr-18760.25", 0x000000, 0x200000, CRC(4e3a4a89) SHA1(bba6cd2a15b3f963388a3a87880da86b10f6e0a2) )
+	ROM_LOAD32_WORD( "mpr-18759.24", 0x000002, 0x200000, CRC(278d8742) SHA1(5f285fc8cfe88c00ba2bbe1b509b49abd38e00ec) )
+
+	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP( "epr-18924a.30", 0x080000, 0x040000, CRC(ad6f40ec) SHA1(27aa0477dc325162766d459ffe95b61ee65dd28f) ) /* Sound program for DX set */
+
+	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
+	ROM_LOAD( "mpr-18763.31", 0x000000, 0x200000, CRC(1bcb2283) SHA1(a4a8a2f8f0901bfb57778351210ccfc421cacbd4) ) /* Sound sample for DX set */
+	ROM_LOAD( "mpr-18764.32", 0x200000, 0x200000, CRC(0dc6a860) SHA1(cb2ada0f8a592940de11ee781ad4beb5095c3b37) )
+	ROM_LOAD( "mpr-18765.36", 0x400000, 0x200000, CRC(ca4a803c) SHA1(70b59da8f2532a02e980caba5bb86ec13a4d7ab5) )
+	ROM_LOAD( "mpr-18766.37", 0x600000, 0x200000, CRC(e41892ea) SHA1(9ef5e26db4abf0ed36df63fc246b568e1c5d6cfa) )
+
+	ROM_REGION( 0xc0000, M1AUDIO_CPU_REGION, ROMREGION_BE|ROMREGION_16BIT )  /* 68K code */
+	ROM_LOAD16_WORD_SWAP("epr-18742.7", 0x000000, 0x020000, CRC(1b78da74) SHA1(939b0f2413ae3c11fac11b49ab8b0de2c5e35e61) )
+
+	ROM_REGION( 0x400000, M1AUDIO_MPCM1_REGION, 0 ) // Samples
+	ROM_LOAD("mpr-18743.32", 0x000000, 0x200000, CRC(17e84e15) SHA1(8437cddc4c4d729e886a5ab076885a54bb7a30d0) )
+
+	ROM_REGION( 0x400000, M1AUDIO_MPCM2_REGION, ROMREGION_ERASE00 ) // Samples
+
+	ROM_REGION( 0x20000, "cpu4", 0) // Communication program
+	ROM_LOAD16_WORD_SWAP( "epr-18643a.7", 0x000000, 0x020000, CRC(b5e048ec) SHA1(8182e05a2ffebd590a936c1359c81e60caa79c2a) )
+
+	MODEL2_CPU_BOARD
+	MODEL2A_VID_BOARD
+ROM_END
+
+ROM_START( manxttc ) /* Manx TT Superbike Twin Revision C, Model 2A */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD( "epr-18822c.12",  0x000000, 0x020000, CRC(c7b3e45a) SHA1(d3a6910bf6efc138e0e40332219b90dea7d6ea56) )
 	ROM_LOAD32_WORD( "epr-18823c.13",  0x000002, 0x020000, CRC(6b0c1dfb) SHA1(6da5c071e3ce842a99f928f473d4ccf7165785ac) )
@@ -4865,15 +4857,15 @@ ROM_START( daytona ) /* Daytona USA (Japan, Revision A), Original Model 2 w/Mode
 	ROM_REGION( 0x20000, "cpu3", 0) // Communication program
 	ROM_LOAD( "epr-16726.bin", 0x000000, 0x020000, CRC(c179b8c7) SHA1(86d3e65c77fb53b1d380b629348f4ab5b3d39228) )
 
-	ROM_REGION( 0x80000, "audiocpu", 0 ) // Sound program
+	ROM_REGION( 0xc0000, M1AUDIO_CPU_REGION, ROMREGION_BE|ROMREGION_16BIT )  /* 68K code */
 	ROM_LOAD16_WORD_SWAP("epr-16720.7", 0x000000, 0x020000, CRC(8e73cffd) SHA1(9933ccc0757e8c86e0adb938d1c89210b26841ea) )
 	ROM_LOAD16_WORD_SWAP("epr-16721.8", 0x020000, 0x020000, CRC(1bb3b7b7) SHA1(ee2fd1480e535fc37e9932e6fe4e31344559fc87) )
 
-	ROM_REGION( 0x400000, "sega1", 0 ) // Samples
+	ROM_REGION( 0x400000, M1AUDIO_MPCM1_REGION, 0 ) // Samples
 	ROM_LOAD("mpr-16491.32", 0x000000, 0x200000, CRC(89920903) SHA1(06d1d55470ae99f8de0f8c88c694f34c4eb13668) )
 	ROM_LOAD("mpr-16492.33", 0x200000, 0x200000, CRC(459e701b) SHA1(2054f69cecad677eb00c6a3051f5b5d90885e19b) )
 
-	ROM_REGION( 0x400000, "sega2", 0 ) // Samples
+	ROM_REGION( 0x400000, M1AUDIO_MPCM2_REGION, 0 ) // Samples
 	ROM_LOAD("mpr-16493.4", 0x000000, 0x200000, CRC(9990db15) SHA1(ea9a8b45a07dccaae62be7cf095532ce7596a70c) )
 	ROM_LOAD("mpr-16494.5", 0x200000, 0x200000, CRC(600e1d6c) SHA1(d4e246fc57a16ff562bbcbccf6a739b706f58696) )
 
@@ -4926,15 +4918,15 @@ ROM_START( daytonase ) /* Daytona USA (Japan, Revision A), Original Model 2 w/Mo
 	ROM_REGION( 0x20000, "cpu3", 0) // Communication program
 	ROM_LOAD( "epr-16726.bin", 0x000000, 0x020000, CRC(c179b8c7) SHA1(86d3e65c77fb53b1d380b629348f4ab5b3d39228) )
 
-	ROM_REGION( 0x80000, "audiocpu", 0 ) // Sound program
+	ROM_REGION( 0xc0000, M1AUDIO_CPU_REGION, ROMREGION_BE|ROMREGION_16BIT )  /* 68K code */
 	ROM_LOAD16_WORD_SWAP("epr-16720.7", 0x000000, 0x020000, CRC(8e73cffd) SHA1(9933ccc0757e8c86e0adb938d1c89210b26841ea) )
 	ROM_LOAD16_WORD_SWAP("epr-16721.8", 0x020000, 0x020000, CRC(1bb3b7b7) SHA1(ee2fd1480e535fc37e9932e6fe4e31344559fc87) )
 
-	ROM_REGION( 0x400000, "sega1", 0 ) // Samples
+	ROM_REGION( 0x400000, M1AUDIO_MPCM1_REGION, 0 ) // Samples
 	ROM_LOAD("mpr-16491.32", 0x000000, 0x200000, CRC(89920903) SHA1(06d1d55470ae99f8de0f8c88c694f34c4eb13668) )
 	ROM_LOAD("mpr-16492.33", 0x200000, 0x200000, CRC(459e701b) SHA1(2054f69cecad677eb00c6a3051f5b5d90885e19b) )
 
-	ROM_REGION( 0x400000, "sega2", 0 ) // Samples
+	ROM_REGION( 0x400000, M1AUDIO_MPCM2_REGION, 0 ) // Samples
 	ROM_LOAD("mpr-16493.4", 0x000000, 0x200000, CRC(9990db15) SHA1(ea9a8b45a07dccaae62be7cf095532ce7596a70c) )
 	ROM_LOAD("mpr-16494.5", 0x200000, 0x200000, CRC(600e1d6c) SHA1(d4e246fc57a16ff562bbcbccf6a739b706f58696) )
 
@@ -4986,15 +4978,15 @@ ROM_START( daytona93 ) /* Daytona USA Deluxe '93 version (There is said to be a 
 	ROM_REGION( 0x20000, "cpu3", 0) // Communication program
 	ROM_LOAD( "epr-16726.bin", 0x000000, 0x020000, CRC(c179b8c7) SHA1(86d3e65c77fb53b1d380b629348f4ab5b3d39228) )
 
-	ROM_REGION( 0x80000, "audiocpu", 0 ) // Sound program
+	ROM_REGION( 0xc0000, M1AUDIO_CPU_REGION, ROMREGION_BE|ROMREGION_16BIT )  /* 68K code */
 	ROM_LOAD16_WORD_SWAP("epr-16720.7", 0x000000, 0x020000, CRC(8e73cffd) SHA1(9933ccc0757e8c86e0adb938d1c89210b26841ea) )
 	ROM_LOAD16_WORD_SWAP("epr-16721.8", 0x020000, 0x020000, CRC(1bb3b7b7) SHA1(ee2fd1480e535fc37e9932e6fe4e31344559fc87) )
 
-	ROM_REGION( 0x400000, "sega1", 0 ) // Samples
+	ROM_REGION( 0x400000, M1AUDIO_MPCM1_REGION, 0 ) // Samples
 	ROM_LOAD("mpr-16491.32", 0x000000, 0x200000, CRC(89920903) SHA1(06d1d55470ae99f8de0f8c88c694f34c4eb13668) )
 	ROM_LOAD("mpr-16492.33", 0x200000, 0x200000, CRC(459e701b) SHA1(2054f69cecad677eb00c6a3051f5b5d90885e19b) )
 
-	ROM_REGION( 0x400000, "sega2", 0 ) // Samples
+	ROM_REGION( 0x400000, M1AUDIO_MPCM2_REGION, 0 ) // Samples
 	ROM_LOAD("mpr-16493.4", 0x000000, 0x200000, CRC(9990db15) SHA1(ea9a8b45a07dccaae62be7cf095532ce7596a70c) )
 	ROM_LOAD("mpr-16494.5", 0x200000, 0x200000, CRC(600e1d6c) SHA1(d4e246fc57a16ff562bbcbccf6a739b706f58696) )
 
@@ -5047,15 +5039,15 @@ ROM_START( daytonas ) /* Daytona USA (With Saturn Adverts) */
 	ROM_REGION( 0x20000, "cpu3", 0) // Communication program
 	ROM_LOAD( "epr-16726.bin", 0x000000, 0x020000, CRC(c179b8c7) SHA1(86d3e65c77fb53b1d380b629348f4ab5b3d39228) )
 
-	ROM_REGION( 0x80000, "audiocpu", 0 ) // Sound program
+	ROM_REGION( 0xc0000, M1AUDIO_CPU_REGION, ROMREGION_BE|ROMREGION_16BIT )  /* 68K code */
 	ROM_LOAD16_WORD_SWAP("epr-16720.7", 0x000000, 0x020000, CRC(8e73cffd) SHA1(9933ccc0757e8c86e0adb938d1c89210b26841ea) )
 	ROM_LOAD16_WORD_SWAP("epr-16721.8", 0x020000, 0x020000, CRC(1bb3b7b7) SHA1(ee2fd1480e535fc37e9932e6fe4e31344559fc87) )
 
-	ROM_REGION( 0x400000, "sega1", 0 ) // Samples
+	ROM_REGION( 0x400000, M1AUDIO_MPCM1_REGION, 0 ) // Samples
 	ROM_LOAD("mpr-16491.32", 0x000000, 0x200000, CRC(89920903) SHA1(06d1d55470ae99f8de0f8c88c694f34c4eb13668) )
 	ROM_LOAD("mpr-16492.33", 0x200000, 0x200000, CRC(459e701b) SHA1(2054f69cecad677eb00c6a3051f5b5d90885e19b) )
 
-	ROM_REGION( 0x400000, "sega2", 0 ) // Samples
+	ROM_REGION( 0x400000, M1AUDIO_MPCM2_REGION, 0 ) // Samples
 	ROM_LOAD("mpr-16493.4", 0x000000, 0x200000, CRC(9990db15) SHA1(ea9a8b45a07dccaae62be7cf095532ce7596a70c) )
 	ROM_LOAD("mpr-16494.5", 0x200000, 0x200000, CRC(600e1d6c) SHA1(d4e246fc57a16ff562bbcbccf6a739b706f58696) )
 
@@ -5110,15 +5102,15 @@ ROM_START( daytonat )/* Daytona USA (Japan, Turbo hack) */
 	ROM_REGION( 0x20000, "cpu3", 0) // Communication program
 	ROM_LOAD( "epr-16726.bin", 0x000000, 0x020000, CRC(c179b8c7) SHA1(86d3e65c77fb53b1d380b629348f4ab5b3d39228) )
 
-	ROM_REGION( 0x80000, "audiocpu", 0 ) // Sound program
+	ROM_REGION( 0xc0000, M1AUDIO_CPU_REGION, ROMREGION_BE|ROMREGION_16BIT )  /* 68K code */
 	ROM_LOAD16_WORD_SWAP("epr-16720.7", 0x000000, 0x020000, CRC(8e73cffd) SHA1(9933ccc0757e8c86e0adb938d1c89210b26841ea) )
 	ROM_LOAD16_WORD_SWAP("epr-16721.8", 0x020000, 0x020000, CRC(1bb3b7b7) SHA1(ee2fd1480e535fc37e9932e6fe4e31344559fc87) )
 
-	ROM_REGION( 0x400000, "sega1", 0 ) // Samples
+	ROM_REGION( 0x400000, M1AUDIO_MPCM1_REGION, 0 ) // Samples
 	ROM_LOAD("mpr-16491.32", 0x000000, 0x200000, CRC(89920903) SHA1(06d1d55470ae99f8de0f8c88c694f34c4eb13668) )
 	ROM_LOAD("mpr-16492.33", 0x200000, 0x200000, CRC(459e701b) SHA1(2054f69cecad677eb00c6a3051f5b5d90885e19b) )
 
-	ROM_REGION( 0x400000, "sega2", 0 ) // Samples
+	ROM_REGION( 0x400000, M1AUDIO_MPCM2_REGION, 0 ) // Samples
 	ROM_LOAD("mpr-16493.4", 0x000000, 0x200000, CRC(9990db15) SHA1(ea9a8b45a07dccaae62be7cf095532ce7596a70c) )
 	ROM_LOAD("mpr-16494.5", 0x200000, 0x200000, CRC(600e1d6c) SHA1(d4e246fc57a16ff562bbcbccf6a739b706f58696) )
 
@@ -5171,15 +5163,15 @@ ROM_START( daytonata )/* Daytona USA (Japan, Turbo hack) */
 	ROM_REGION( 0x20000, "cpu3", 0) // Communication program
 	ROM_LOAD( "epr-16726.bin", 0x000000, 0x020000, CRC(c179b8c7) SHA1(86d3e65c77fb53b1d380b629348f4ab5b3d39228) )
 
-	ROM_REGION( 0x80000, "audiocpu", 0 ) // Sound program
+	ROM_REGION( 0xc0000, M1AUDIO_CPU_REGION, ROMREGION_BE|ROMREGION_16BIT )  /* 68K code */
 	ROM_LOAD16_WORD_SWAP("epr-16720.7", 0x000000, 0x020000, CRC(8e73cffd) SHA1(9933ccc0757e8c86e0adb938d1c89210b26841ea) )
 	ROM_LOAD16_WORD_SWAP("epr-16721.8", 0x020000, 0x020000, CRC(1bb3b7b7) SHA1(ee2fd1480e535fc37e9932e6fe4e31344559fc87) )
 
-	ROM_REGION( 0x400000, "sega1", 0 ) // Samples
+	ROM_REGION( 0x400000, M1AUDIO_MPCM1_REGION, 0 ) // Samples
 	ROM_LOAD("mpr-16491.32", 0x000000, 0x200000, CRC(89920903) SHA1(06d1d55470ae99f8de0f8c88c694f34c4eb13668) )
 	ROM_LOAD("mpr-16492.33", 0x200000, 0x200000, CRC(459e701b) SHA1(2054f69cecad677eb00c6a3051f5b5d90885e19b) )
 
-	ROM_REGION( 0x400000, "sega2", 0 ) // Samples
+	ROM_REGION( 0x400000, M1AUDIO_MPCM2_REGION, 0 ) // Samples
 	ROM_LOAD("mpr-16493.4", 0x000000, 0x200000, CRC(9990db15) SHA1(ea9a8b45a07dccaae62be7cf095532ce7596a70c) )
 	ROM_LOAD("mpr-16494.5", 0x200000, 0x200000, CRC(600e1d6c) SHA1(d4e246fc57a16ff562bbcbccf6a739b706f58696) )
 
@@ -5243,15 +5235,15 @@ ROM_START( daytonam ) /* Daytona USA (Japan, To The MAXX) */
 	ROM_REGION( 0x20000, "cpu3", 0) // Communication program
 	ROM_LOAD( "epr-16726.bin", 0x000000, 0x020000, CRC(c179b8c7) SHA1(86d3e65c77fb53b1d380b629348f4ab5b3d39228) )
 
-	ROM_REGION( 0x80000, "audiocpu", 0 ) // Sound program
+	ROM_REGION( 0xc0000, M1AUDIO_CPU_REGION, ROMREGION_BE|ROMREGION_16BIT )  /* 68K code */
 	ROM_LOAD16_WORD_SWAP("epr-16720.7", 0x000000, 0x020000, CRC(8e73cffd) SHA1(9933ccc0757e8c86e0adb938d1c89210b26841ea) )
 	ROM_LOAD16_WORD_SWAP("epr-16721.8", 0x020000, 0x020000, CRC(1bb3b7b7) SHA1(ee2fd1480e535fc37e9932e6fe4e31344559fc87) )
 
-	ROM_REGION( 0x400000, "sega1", 0 ) // Samples
+	ROM_REGION( 0x400000, M1AUDIO_MPCM1_REGION, 0 ) // Samples
 	ROM_LOAD("mpr-16491.32", 0x000000, 0x200000, CRC(89920903) SHA1(06d1d55470ae99f8de0f8c88c694f34c4eb13668) )
 	ROM_LOAD("mpr-16492.33", 0x200000, 0x200000, CRC(459e701b) SHA1(2054f69cecad677eb00c6a3051f5b5d90885e19b) )
 
-	ROM_REGION( 0x400000, "sega2", 0 ) // Samples
+	ROM_REGION( 0x400000, M1AUDIO_MPCM2_REGION, 0 ) // Samples
 	ROM_LOAD("mpr-16493.4", 0x000000, 0x200000, CRC(9990db15) SHA1(ea9a8b45a07dccaae62be7cf095532ce7596a70c) )
 	ROM_LOAD("mpr-16494.5", 0x200000, 0x200000, CRC(600e1d6c) SHA1(d4e246fc57a16ff562bbcbccf6a739b706f58696) )
 
@@ -5289,15 +5281,15 @@ ROM_START( vcop ) /* Virtua Cop Revision B, Model 2 */
 	ROM_REGION( 0x20000, "cpu4", 0) // Communication program
 	ROM_LOAD32_WORD( "epr-17181.6", 0x000000, 0x010000, CRC(1add2b82) SHA1(81892251d466f630a96af25bde652c20e47d7ede) )
 
-	ROM_REGION( 0x80000, "audiocpu", 0 ) // Sound program
+	ROM_REGION( 0xc0000, M1AUDIO_CPU_REGION, ROMREGION_BE|ROMREGION_16BIT )  /* 68K code */
 	ROM_LOAD16_WORD_SWAP( "epr-17170.7", 0x000000, 0x020000, CRC(06a38ae2) SHA1(a2c3d14d9266449ebfc6d976a956e0a8a602cfb0) )
 	ROM_LOAD16_WORD_SWAP( "epr-17171.8", 0x020000, 0x020000, CRC(b5e436f8) SHA1(1da3cb52d64f52d03a8de9954afffbc6e1549a5b) )
 
-	ROM_REGION( 0x400000, "sega1", 0 ) // Samples
+	ROM_REGION( 0x400000, M1AUDIO_MPCM1_REGION, 0 ) // Samples
 	ROM_LOAD( "mpr-17172.32", 0x000000, 0x100000, CRC(ab22cac3) SHA1(0e872158faeb8c0404b10cdf0a3fa36f89a5093e) )
 	ROM_LOAD( "mpr-17173.33", 0x200000, 0x100000, CRC(3cb4005c) SHA1(a56f436ea6dfe0968b73ae7bc92bb2f4c612460d) )
 
-	ROM_REGION( 0x400000, "sega2", 0 ) // Samples
+	ROM_REGION( 0x400000, M1AUDIO_MPCM2_REGION, 0 ) // Samples
 	ROM_LOAD( "mpr-17174.4", 0x000000, 0x200000, CRC(a50369cc) SHA1(69807157baf6e3679adc95633c82b0236db01247) )
 	ROM_LOAD( "mpr-17175.5", 0x200000, 0x200000, CRC(9136d43c) SHA1(741f80a8ff8165ffe171dc568e0da4ad0bde4809) )
 
@@ -5332,15 +5324,15 @@ ROM_START( vcopa ) /* Virtua Cop Revision A, Model 2 */
 	ROM_REGION( 0x20000, "cpu4", 0) // Communication program
 	ROM_LOAD32_WORD( "epr-17181.6", 0x000000, 0x010000, CRC(1add2b82) SHA1(81892251d466f630a96af25bde652c20e47d7ede) )
 
-	ROM_REGION( 0x80000, "audiocpu", 0 ) // Sound program
+	ROM_REGION( 0xc0000, M1AUDIO_CPU_REGION, ROMREGION_BE|ROMREGION_16BIT )  /* 68K code */
 	ROM_LOAD16_WORD_SWAP( "epr-17170.7", 0x000000, 0x020000, CRC(06a38ae2) SHA1(a2c3d14d9266449ebfc6d976a956e0a8a602cfb0) )
 	ROM_LOAD16_WORD_SWAP( "epr-17171.8", 0x020000, 0x020000, CRC(b5e436f8) SHA1(1da3cb52d64f52d03a8de9954afffbc6e1549a5b) )
 
-	ROM_REGION( 0x400000, "sega1", 0 ) // Samples
+	ROM_REGION( 0x400000, M1AUDIO_MPCM1_REGION, 0 ) // Samples
 	ROM_LOAD( "mpr-17172.32", 0x000000, 0x100000, CRC(ab22cac3) SHA1(0e872158faeb8c0404b10cdf0a3fa36f89a5093e) )
 	ROM_LOAD( "mpr-17173.33", 0x200000, 0x100000, CRC(3cb4005c) SHA1(a56f436ea6dfe0968b73ae7bc92bb2f4c612460d) )
 
-	ROM_REGION( 0x400000, "sega2", 0 ) // Samples
+	ROM_REGION( 0x400000, M1AUDIO_MPCM2_REGION, 0 ) // Samples
 	ROM_LOAD( "mpr-17174.4", 0x000000, 0x200000, CRC(a50369cc) SHA1(69807157baf6e3679adc95633c82b0236db01247) )
 	ROM_LOAD( "mpr-17175.5", 0x200000, 0x200000, CRC(9136d43c) SHA1(741f80a8ff8165ffe171dc568e0da4ad0bde4809) )
 
@@ -5378,13 +5370,13 @@ ROM_START( desert ) /* Desert Tank, Model 2 */
 
 	ROM_REGION( 0x20000, "cpu4", ROMREGION_ERASE00 ) // Communication program
 
-	ROM_REGION( 0x80000, "audiocpu", 0 ) // Sound program
+	ROM_REGION( 0xc0000, M1AUDIO_CPU_REGION, ROMREGION_BE|ROMREGION_16BIT )  /* 68K code */
 	ROM_LOAD16_WORD_SWAP("epr-16985.7", 0x000000, 0x20000, CRC(8c4d9056) SHA1(785752d761c648d1177c5f0cfa3e9fa44135d6dc) )
 
-	ROM_REGION( 0x400000, "sega1", 0 ) // Samples
+	ROM_REGION( 0x400000, M1AUDIO_MPCM1_REGION, 0 ) // Samples
 	ROM_LOAD("mpr-16986.32", 0x000000, 0x200000, CRC(559612f9) SHA1(33bcaddfc7d8fe899707e663299e8f04e9004d51) )
 
-	ROM_REGION( 0x400000, "sega2", 0 ) // Samples
+	ROM_REGION( 0x400000, M1AUDIO_MPCM2_REGION, 0 ) // Samples
 	ROM_LOAD("mpr-16988.4", 0x000000, 0x200000, CRC(bc705875) SHA1(5351c6bd2d75df57ff92960e7f90493d95d9dfb9) )
 	ROM_LOAD("mpr-16989.5", 0x200000, 0x200000, CRC(1b616b31) SHA1(35bd2bfd08514ba6f235cda2605c171cd51fd78e) )
 
@@ -5506,7 +5498,8 @@ GAME( 1994, vcop,            0, model2o, daytona, driver_device, 0,       ROT0, 
 GAME( 1994, vcopa,           0, model2o, daytona, driver_device, 0,       ROT0, "Sega",   "Virtua Cop (Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 
 // Model 2A-CRX (TGPs, SCSP sound board)
-GAME( 1995, manxtt,          0, model2a, model2,  driver_device, 0,       ROT0, "Sega",   "Manx TT Superbike - Twin (Revision C)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
+GAME( 1995, manxtt, 0, manxttdx,model2, driver_device, 0, ROT0, "Sega", "Manx TT Superbike - DX (Revision D)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
+GAME( 1995, manxttc,         0, model2a, model2,  driver_device, 0,       ROT0, "Sega",   "Manx TT Superbike - Twin (Revision C)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, srallyc,         0, srallyc, srallyc, model2_state,  srallyc, ROT0, "Sega",   "Sega Rally Championship - TWIN (Revision C)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, srallycb,  srallyc, srallyc, srallyc, model2_state,  srallyc, ROT0, "Sega",   "Sega Rally Championship - TWIN (Revision B)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, srallyca,  srallyc, srallyc, srallyc, model2_state,  srallyc, ROT0, "Sega",   "Sega Rally Championship - DX (Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )

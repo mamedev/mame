@@ -602,6 +602,7 @@ $(MAMEOBJ)/shared.a: \
 	$(MACHINE)/ticket.o \
 	$(VIDEO)/avgdvg.o \
 	$(AUDIO)/decobsmt.o \
+	$(AUDIO)/segam1audio.o \
 
 #-------------------------------------------------
 # manufacturer-specific groupings for drivers

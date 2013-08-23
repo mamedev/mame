@@ -1,5 +1,5 @@
 #include "audio/dsbz80.h"
-#include "sound/multipcm.h"
+#include "audio/segam1audio.h"
 
 typedef void (*tgp_func)(running_machine &machine);
 
@@ -12,9 +12,7 @@ public:
 	model1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"),
-		m_multipcm_1(*this, "sega1"),
-		m_multipcm_2(*this, "sega2"),
+		m_m1audio(*this, "m1audio"),
 		m_dsbz80(*this, DSBZ80_TAG),
 		m_tgp(*this, "tgp"),
 		m_mr2(*this, "mr2"),
@@ -24,9 +22,7 @@ public:
 		m_color_xlat(*this, "color_xlat"){ }
 
 	required_device<cpu_device> m_maincpu;      // V60
-	required_device<cpu_device> m_audiocpu;     // sound 68000
-	required_device<multipcm_device> m_multipcm_1;
-	required_device<multipcm_device> m_multipcm_2;
+	required_device<segam1audio_device> m_m1audio;	// Model 1 standard sound board
 	optional_device<dsbz80_device> m_dsbz80;    // Digital Sound Board
 	optional_device<mb86233_cpu_device> m_tgp;
 
@@ -43,11 +39,8 @@ public:
 	struct quad_m1 *m_quadpt;
 	struct quad_m1 **m_quadind;
 	int m_sound_irq;
-	int m_to_68k[8];
 	UINT8 m_last_snd_cmd;
 	int m_snd_cmd_state;
-	int m_fifo_wptr;
-	int m_fifo_rptr;
 	int m_last_irq;
 	int m_dump;
 	offs_t m_pushpc;

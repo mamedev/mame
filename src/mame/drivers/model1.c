@@ -627,9 +627,7 @@ Notes:
 #include "emu.h"
 #include "cpu/v60/v60.h"
 #include "video/segaic24.h"
-#include "cpu/m68000/m68000.h"
 #include "cpu/mb86233/mb86233.h"
-#include "sound/2612intf.h"
 #include "machine/nvram.h"
 #include "includes/model1.h"
 
@@ -742,11 +740,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(model1_state::model1_interrupt)
 	{
 		irq_raise(m_sound_irq);
 
-		// if the FIFO has something in it, signal the 68k too
-		if (m_fifo_rptr != m_fifo_wptr)
-		{
-			m_audiocpu->set_input_line(2, HOLD_LINE);
-		}
+		m_m1audio->check_fifo_irq();
 	}
 }
 
@@ -763,10 +757,6 @@ MACHINE_RESET_MEMBER(model1_state,model1)
 	{
 		m_sound_irq = 3;
 	}
-
-	// init the sound FIFO
-	m_fifo_rptr = m_fifo_wptr = 0;
-	memset(m_to_68k, 0, sizeof(m_to_68k));
 }
 
 MACHINE_RESET_MEMBER(model1_state,model1_vr)
@@ -775,10 +765,6 @@ MACHINE_RESET_MEMBER(model1_state,model1_vr)
 	irq_init();
 	model1_vr_tgp_reset(machine());
 	m_sound_irq = 3;
-
-	// init the sound FIFO
-	m_fifo_rptr = m_fifo_wptr = 0;
-	memset(m_to_68k, 0, sizeof(m_to_68k));
 }
 
 READ16_MEMBER(model1_state::network_ctl_r)
@@ -852,12 +838,10 @@ WRITE16_MEMBER(model1_state::mr2_w)
 
 READ16_MEMBER(model1_state::snd_68k_ready_r)
 {
-	int sr = m_audiocpu->state_int(M68K_SR);
-
-	if ((sr & 0x0700) > 0x0100)
+	if (m_m1audio->ready_r(space, 0) == 0)
 	{
 		space.device().execute().spin_until_time(attotime::from_usec(40));
-		return 0;   // not ready yet, interrupts disabled
+		return 0;
 	}
 
 	return 0xff;
@@ -865,9 +849,7 @@ READ16_MEMBER(model1_state::snd_68k_ready_r)
 
 WRITE16_MEMBER(model1_state::snd_latch_to_68k_w)
 {
-	m_to_68k[m_fifo_wptr] = data;
-	m_fifo_wptr++;
-	if (m_fifo_wptr >= ARRAY_LENGTH(m_to_68k)) m_fifo_wptr = 0;
+	m_m1audio->write_fifo(data);
 
 	if (data == 0xae)
 	{
@@ -891,8 +873,6 @@ WRITE16_MEMBER(model1_state::snd_latch_to_68k_w)
 	m_last_snd_cmd = data;
 	m_snd_cmd_state++;
 
-	// signal the 68000 that there's data waiting
-	m_audiocpu->set_input_line(2, HOLD_LINE);
 	// give the 68k time to reply
 	space.device().execute().spin_until_time(attotime::from_usec(40));
 }
@@ -992,53 +972,6 @@ static ADDRESS_MAP_START( model1_vr_io, AS_IO, 16, model1_state )
 	AM_RANGE(0xd20000, 0xd20003) AM_READ(model1_vr_tgp_ram_r)
 	AM_RANGE(0xd80000, 0xd80003) AM_READ(model1_vr_tgp_r)
 ADDRESS_MAP_END
-
-READ16_MEMBER(model1_state::m1_snd_68k_latch_r)
-{
-	UINT16 retval;
-
-	retval = m_to_68k[m_fifo_rptr];
-
-	m_fifo_rptr++;
-	if (m_fifo_rptr >= ARRAY_LENGTH(m_to_68k)) m_fifo_rptr = 0;
-
-	return retval;
-}
-
-READ16_MEMBER(model1_state::m1_snd_v60_ready_r)
-{
-	return 1;
-}
-
-WRITE16_MEMBER(model1_state::m1_snd_mpcm_bnk1_w)
-{
-	m_multipcm_1->set_bank(0x100000 * (data & 3), 0x100000 * (data & 3));
-}
-WRITE16_MEMBER(model1_state::m1_snd_mpcm_bnk2_w)
-{
-	m_multipcm_2->set_bank(0x100000 * (data & 3), 0x100000 * (data & 3));
-}
-WRITE16_MEMBER(model1_state::m1_snd_68k_latch1_w)
-{
-}
-
-WRITE16_MEMBER(model1_state::m1_snd_68k_latch2_w)
-{
-}
-
-static ADDRESS_MAP_START( model1_snd, AS_PROGRAM, 16, model1_state )
-	AM_RANGE(0x000000, 0x0bffff) AM_ROM
-	AM_RANGE(0xc20000, 0xc20001) AM_READWRITE(m1_snd_68k_latch_r, m1_snd_68k_latch1_w )
-	AM_RANGE(0xc20002, 0xc20003) AM_READWRITE(m1_snd_v60_ready_r, m1_snd_68k_latch2_w )
-	AM_RANGE(0xc40000, 0xc40007) AM_DEVREADWRITE8("sega1", multipcm_device, read, write, 0x00ff )
-	AM_RANGE(0xc40012, 0xc40013) AM_WRITENOP
-	AM_RANGE(0xc50000, 0xc50001) AM_WRITE(m1_snd_mpcm_bnk1_w )
-	AM_RANGE(0xc60000, 0xc60007) AM_DEVREADWRITE8("sega2", multipcm_device, read, write, 0x00ff )
-	AM_RANGE(0xc70000, 0xc70001) AM_WRITE(m1_snd_mpcm_bnk2_w )
-	AM_RANGE(0xd00000, 0xd00007) AM_DEVREADWRITE8("ymsnd", ym3438_device, read, write, 0x00ff )
-	AM_RANGE(0xf00000, 0xf0ffff) AM_RAM
-ADDRESS_MAP_END
-
 
 static INPUT_PORTS_START( vf )
 	PORT_START("IN0")
@@ -1217,16 +1150,16 @@ ROM_START( vf )
 	ROM_LOAD16_BYTE( "mpr-16090.12", 0x1300000, 0x80000, CRC(90c76831) SHA1(5a3c25f2a131cfbb2ad067bef1ab7b1c95645d41) )
 	ROM_LOAD16_BYTE( "mpr-16091.13", 0x1300001, 0x80000, CRC(53115448) SHA1(af798d5b1fcb720d7288a5ac48839d9ace16a2f2) )
 
-	ROM_REGION( 0xc0000, "audiocpu", 0 )  /* 68K code */
+	ROM_REGION( 0xc0000, M1AUDIO_CPU_REGION, ROMREGION_BE|ROMREGION_16BIT )  /* 68K code */
 	ROM_LOAD16_WORD_SWAP( "epr-16120.7", 0x00000, 0x20000, CRC(2bff8378) SHA1(854b08ab983e4e98cb666f2f44de9a6829b1eb52) )
 	ROM_LOAD16_WORD_SWAP( "epr-16121.8", 0x20000, 0x20000, CRC(ff6723f9) SHA1(53498b8c103745883657dfd6efe27edfd48b356f) )
 	ROM_RELOAD( 0x80000, 0x20000)
 
-	ROM_REGION( 0x400000, "sega1", 0 ) /* Samples */
+	ROM_REGION( 0x400000, M1AUDIO_MPCM1_REGION, 0 ) /* Samples */
 	ROM_LOAD( "mpr-16122.32", 0x000000, 0x200000, CRC(568bc64e) SHA1(31fd0ef8319efe258011b4621adebb790b620770) )
 	ROM_LOAD( "mpr-16123.33", 0x200000, 0x200000, CRC(15d78844) SHA1(37c17e38604cf7004a951408024941cd06b1d93e) )
 
-	ROM_REGION( 0x400000, "sega2", 0 ) /* Samples */
+	ROM_REGION( 0x400000, M1AUDIO_MPCM2_REGION, 0 ) /* Samples */
 	ROM_LOAD( "mpr-16124.4", 0x000000, 0x200000, CRC(45520ba1) SHA1(c33e3c12639961016e5fa6b5025d0a67dff28907) )
 	ROM_LOAD( "mpr-16125.5", 0x200000, 0x200000, CRC(9b4998b6) SHA1(0418d9b0acf79f35d0f7575c21f1be9a0ea343da) )
 
@@ -1260,13 +1193,13 @@ ROM_START( vr )
 	ROM_LOAD16_BYTE( "mpr-14888.12", 0x1300000, 0x80000, CRC(04BFDC5B) SHA1(bb8788a761620d0440a62ae51c3b41f70a04b5e4) )
 	ROM_LOAD16_BYTE( "mpr-14889.13", 0x1300001, 0x80000, CRC(C49F0486) SHA1(cc2bb9059c016ba2c4f6e7508bd1687df07b8b48) )
 
-	ROM_REGION( 0xc0000, "audiocpu", 0 )  /* 68K code */
+	ROM_REGION( 0xc0000, M1AUDIO_CPU_REGION, ROMREGION_BE|ROMREGION_16BIT )  /* 68K code */
 	ROM_LOAD16_WORD_SWAP( "epr-14870a.7", 0x00000, 0x20000, CRC(919d9b75) SHA1(27be79881cc9a2b5cf37e18f1e2d87251426b428) )
 
-	ROM_REGION( 0x400000, "sega1", 0 ) /* Samples */
+	ROM_REGION( 0x400000, M1AUDIO_MPCM1_REGION, 0 ) /* Samples */
 	ROM_LOAD( "mpr-14873.32", 0x000000, 0x200000, CRC(b1965190) SHA1(fc47e9ed4a44d48477bd9a35e42c26508c0f4a0c) )
 
-	ROM_REGION( 0x400000, "sega2", 0 ) /* Samples */
+	ROM_REGION( 0x400000, M1AUDIO_MPCM2_REGION, 0 ) /* Samples */
 	ROM_LOAD( "mpr-14876.4", 0x000000, 0x200000, CRC(ba6b2327) SHA1(02285520624a4e612cb4b65510e3458b13b1c6ba) )
 
 	ROM_REGION32_LE( 0x1000000, "user1", 0 ) /* TGP model roms */
@@ -1313,13 +1246,13 @@ ROM_START( vformula )
 	ROM_LOAD16_BYTE( "mpr-14888.12", 0x1300000, 0x80000, CRC(04BFDC5B) SHA1(bb8788a761620d0440a62ae51c3b41f70a04b5e4) )
 	ROM_LOAD16_BYTE( "mpr-14889.13", 0x1300001, 0x80000, CRC(C49F0486) SHA1(cc2bb9059c016ba2c4f6e7508bd1687df07b8b48) )
 
-	ROM_REGION( 0xc0000, "audiocpu", 0 )  /* 68K code */
+	ROM_REGION( 0xc0000, M1AUDIO_CPU_REGION, ROMREGION_BE|ROMREGION_16BIT )  /* 68K code */
 	ROM_LOAD16_WORD_SWAP( "epr-14870a.7", 0x00000, 0x20000, CRC(919d9b75) SHA1(27be79881cc9a2b5cf37e18f1e2d87251426b428) )
 
-	ROM_REGION( 0x400000, "sega1", 0 ) /* Samples */
+	ROM_REGION( 0x400000, M1AUDIO_MPCM1_REGION, 0 ) /* Samples */
 	ROM_LOAD( "mpr-14873.32", 0x000000, 0x200000, CRC(b1965190) SHA1(fc47e9ed4a44d48477bd9a35e42c26508c0f4a0c) )
 
-	ROM_REGION( 0x400000, "sega2", 0 ) /* Samples */
+	ROM_REGION( 0x400000, M1AUDIO_MPCM2_REGION, 0 ) /* Samples */
 	ROM_LOAD( "mpr-14876.4", 0x000000, 0x200000, CRC(ba6b2327) SHA1(02285520624a4e612cb4b65510e3458b13b1c6ba) )
 
 	ROM_REGION32_LE( 0x1000000, "user1", 0 ) /* TGP model roms */
@@ -1357,15 +1290,15 @@ ROM_START( swa )
 	ROM_RELOAD(          0x000000, 0x80000 )
 	ROM_RELOAD(          0x080000, 0x80000 )
 
-	ROM_REGION( 0xc0000, "audiocpu", 0 )  /* 68K code */
+	ROM_REGION( 0xc0000, M1AUDIO_CPU_REGION, ROMREGION_BE|ROMREGION_16BIT )  /* 68K code */
 		ROM_LOAD16_WORD_SWAP( "epr-16470.bin", 0x000000, 0x020000, CRC(7da18cf7) SHA1(bd432d882d217277faee120e2577357a32eb4a6e) )
 	ROM_RELOAD(0x80000, 0x20000)
 
-	ROM_REGION( 0x400000, "sega1", 0 ) /* Samples */
+	ROM_REGION( 0x400000, M1AUDIO_MPCM1_REGION, 0 ) /* Samples */
 		ROM_LOAD( "mpr-16486.bin", 0x000000, 0x200000, CRC(7df50533) SHA1(f2fb876738e37d70eb9005e5629a9ae89aa413a8) )
 		ROM_LOAD( "mpr-16487.bin", 0x200000, 0x200000, CRC(31b28dfa) SHA1(bd1ac11bf2f9161f61f8af3b9ff4c2709b7ee700) )
 
-	ROM_REGION( 0x400000, "sega2", 0 ) /* Samples */
+	ROM_REGION( 0x400000, M1AUDIO_MPCM2_REGION, 0 ) /* Samples */
 		ROM_LOAD( "mpr-16484.bin", 0x000000, 0x200000, CRC(9d4c334d) SHA1(8b4d903f14559fed425d225bb23ccfe8da23cbd3) )
 		ROM_LOAD( "mpr-16485.bin", 0x200000, 0x200000, CRC(95aadcad) SHA1(4276db655db9834692c3843eb96a3e3a89cb7252) )
 
@@ -1412,16 +1345,16 @@ ROM_START( wingwar )
 	ROM_LOAD16_BYTE( "mpr-16734.10", 0x1200000, 0x80000, CRC(f76371c1) SHA1(0ff082db3877383d0dd977dc60c932b725e3d164) )
 	ROM_LOAD16_BYTE( "mpr-16733.11", 0x1200001, 0x80000, CRC(e105847b) SHA1(8489a6c91fd6d1e9ba81e8eaf36c514da30dccbe) )
 
-	ROM_REGION( 0xc0000, "audiocpu", 0 )  /* 68K code */
+	ROM_REGION( 0xc0000, M1AUDIO_CPU_REGION, ROMREGION_BE|ROMREGION_16BIT )  /* 68K code */
 	ROM_LOAD16_WORD_SWAP("epr-17126.7", 0x000000, 0x20000, CRC(50178e40) SHA1(fb01aecfbe4e90adc997de0d45a63c16ef353b37) )
 	ROM_LOAD16_WORD_SWAP("epr-16752.8", 0x020000, 0x20000, CRC(6541c48f) SHA1(9341eff160e31a8574b9545fafc1c4059323fa0c) )
 	ROM_RELOAD(0x80000, 0x20000)
 
-	ROM_REGION( 0x400000, "sega1", 0 ) /* Samples */
+	ROM_REGION( 0x400000, M1AUDIO_MPCM1_REGION, 0 ) /* Samples */
 	ROM_LOAD("mpr-16753.32", 0x000000, 0x200000, CRC(324a8333) SHA1(960342e08db637c6f72615d49cffd9fb0889620b) )
 	ROM_LOAD("mpr-16754.33", 0x200000, 0x200000, CRC(144f3cf5) SHA1(d2f8cc9086affbbc5ef2195272200230f724e5d1) )
 
-	ROM_REGION( 0x400000, "sega2", 0 ) /* Samples */
+	ROM_REGION( 0x400000, M1AUDIO_MPCM2_REGION, 0 ) /* Samples */
 	ROM_LOAD("mpr-16755.4", 0x000000, 0x200000, CRC(4baaf878) SHA1(661d4ea9be6a4952852d0ef94becee7ed42bf4a1) )
 	ROM_LOAD("mpr-16756.5", 0x200000, 0x200000, CRC(d9c40672) SHA1(83e6f1156b30888d3a00103f079dc74f4fca8446) )
 
@@ -1459,16 +1392,16 @@ ROM_START( wingwaru )
 	ROM_LOAD16_BYTE( "mpr-16734.10", 0x1200000, 0x80000, CRC(f76371c1) SHA1(0ff082db3877383d0dd977dc60c932b725e3d164) )
 	ROM_LOAD16_BYTE( "mpr-16733.11", 0x1200001, 0x80000, CRC(e105847b) SHA1(8489a6c91fd6d1e9ba81e8eaf36c514da30dccbe) )
 
-	ROM_REGION( 0xc0000, "audiocpu", 0 )  /* 68K code */
+	ROM_REGION( 0xc0000, M1AUDIO_CPU_REGION, ROMREGION_BE|ROMREGION_16BIT )  /* 68K code */
 	ROM_LOAD16_WORD_SWAP("epr-16751.7", 0x000000, 0x20000, CRC(23ba5ebc) SHA1(b98aab546c5e980baeedbada4e7472eb4c588260) )
 	ROM_LOAD16_WORD_SWAP("epr-16752.8", 0x020000, 0x20000, CRC(6541c48f) SHA1(9341eff160e31a8574b9545fafc1c4059323fa0c) )
 	ROM_RELOAD(0x80000, 0x20000)
 
-	ROM_REGION( 0x400000, "sega1", 0 ) /* Samples */
+	ROM_REGION( 0x400000, M1AUDIO_MPCM1_REGION, 0 ) /* Samples */
 	ROM_LOAD("mpr-16753.32", 0x000000, 0x200000, CRC(324a8333) SHA1(960342e08db637c6f72615d49cffd9fb0889620b) )
 	ROM_LOAD("mpr-16754.33", 0x200000, 0x200000, CRC(144f3cf5) SHA1(d2f8cc9086affbbc5ef2195272200230f724e5d1) )
 
-	ROM_REGION( 0x400000, "sega2", 0 ) /* Samples */
+	ROM_REGION( 0x400000, M1AUDIO_MPCM2_REGION, 0 ) /* Samples */
 	ROM_LOAD("mpr-16755.4", 0x000000, 0x200000, CRC(4baaf878) SHA1(661d4ea9be6a4952852d0ef94becee7ed42bf4a1) )
 	ROM_LOAD("mpr-16756.5", 0x200000, 0x200000, CRC(d9c40672) SHA1(83e6f1156b30888d3a00103f079dc74f4fca8446) )
 
@@ -1506,16 +1439,16 @@ ROM_START( wingwarj )
 	ROM_LOAD16_BYTE( "mpr-16734.10", 0x1200000, 0x80000, CRC(f76371c1) SHA1(0ff082db3877383d0dd977dc60c932b725e3d164) )
 	ROM_LOAD16_BYTE( "mpr-16733.11", 0x1200001, 0x80000, CRC(e105847b) SHA1(8489a6c91fd6d1e9ba81e8eaf36c514da30dccbe) )
 
-	ROM_REGION( 0xc0000, "audiocpu", 0 )  /* 68K code */
+	ROM_REGION( 0xc0000, M1AUDIO_CPU_REGION, ROMREGION_BE|ROMREGION_16BIT )  /* 68K code */
 	ROM_LOAD16_WORD_SWAP("epr-16751.7", 0x000000, 0x20000, CRC(23ba5ebc) SHA1(b98aab546c5e980baeedbada4e7472eb4c588260) )
 	ROM_LOAD16_WORD_SWAP("epr-16752.8", 0x020000, 0x20000, CRC(6541c48f) SHA1(9341eff160e31a8574b9545fafc1c4059323fa0c) )
 	ROM_RELOAD(0x80000, 0x20000)
 
-	ROM_REGION( 0x400000, "sega1", 0 ) /* Samples */
+	ROM_REGION( 0x400000, M1AUDIO_MPCM1_REGION, 0 ) /* Samples */
 	ROM_LOAD("mpr-16753.32", 0x000000, 0x200000, CRC(324a8333) SHA1(960342e08db637c6f72615d49cffd9fb0889620b) )
 	ROM_LOAD("mpr-16754.33", 0x200000, 0x200000, CRC(144f3cf5) SHA1(d2f8cc9086affbbc5ef2195272200230f724e5d1) )
 
-	ROM_REGION( 0x400000, "sega2", 0 ) /* Samples */
+	ROM_REGION( 0x400000, M1AUDIO_MPCM2_REGION, 0 ) /* Samples */
 	ROM_LOAD("mpr-16755.4", 0x000000, 0x200000, CRC(4baaf878) SHA1(661d4ea9be6a4952852d0ef94becee7ed42bf4a1) )
 	ROM_LOAD("mpr-16756.5", 0x200000, 0x200000, CRC(d9c40672) SHA1(83e6f1156b30888d3a00103f079dc74f4fca8446) )
 
@@ -1543,9 +1476,6 @@ static MACHINE_CONFIG_START( model1, model1_state )
 	MCFG_CPU_IO_MAP(model1_io)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", model1_state, model1_interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", M68000, 10000000)  // verified on real h/w
-	MCFG_CPU_PROGRAM_MAP(model1_snd)
-
 	MCFG_MACHINE_START_OVERRIDE(model1_state,model1)
 	MCFG_MACHINE_RESET_OVERRIDE(model1_state,model1)
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -1563,25 +1493,14 @@ static MACHINE_CONFIG_START( model1, model1_state )
 
 	MCFG_VIDEO_START_OVERRIDE(model1_state,model1)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
-	MCFG_SOUND_ADD("ymsnd", YM3438, 8000000)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
-
-	MCFG_SOUND_ADD("sega1", MULTIPCM, 8000000)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-
-	MCFG_SOUND_ADD("sega2", MULTIPCM, 8000000)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SEGAM1AUDIO_ADD("m1audio")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED(swa, model1)
+	MCFG_SPEAKER_STANDARD_STEREO("dleft", "dright")
 	MCFG_DSBZ80_ADD(DSBZ80_TAG)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ROUTE(0, "dleft", 1.0)
+	MCFG_SOUND_ROUTE(1, "dright", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( model1_vr, model1_state )
@@ -1589,9 +1508,6 @@ static MACHINE_CONFIG_START( model1_vr, model1_state )
 	MCFG_CPU_PROGRAM_MAP(model1_vr_mem)
 	MCFG_CPU_IO_MAP(model1_vr_io)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", model1_state, model1_interrupt, "screen", 0, 1)
-
-	MCFG_CPU_ADD("audiocpu", M68000, 10000000)  // verified on real h/w
-	MCFG_CPU_PROGRAM_MAP(model1_snd)
 
 	MCFG_CPU_ADD("tgp", MB86233, 16000000)
 	MCFG_CPU_PROGRAM_MAP(model1_vr_tgp_map)
@@ -1617,19 +1533,7 @@ static MACHINE_CONFIG_START( model1_vr, model1_state )
 
 	MCFG_VIDEO_START_OVERRIDE(model1_state,model1)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
-	MCFG_SOUND_ADD("ymsnd", YM3438, 8000000)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
-
-	MCFG_SOUND_ADD("sega1", MULTIPCM, 8000000)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-
-	MCFG_SOUND_ADD("sega2", MULTIPCM, 8000000)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SEGAM1AUDIO_ADD("m1audio")
 MACHINE_CONFIG_END
 
 GAME( 1993, vf,       0,       model1,    vf, driver_device,       0, ROT0, "Sega", "Virtua Fighter", GAME_IMPERFECT_GRAPHICS )

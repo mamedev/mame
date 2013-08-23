@@ -1,7 +1,7 @@
 #include "video/poly.h"
 #include "audio/dsbz80.h"
+#include "audio/segam1audio.h"
 #include "machine/eepromser.h"
-#include "sound/multipcm.h"
 #include "cpu/i960/i960.h"
 
 struct raster_state;
@@ -24,9 +24,8 @@ public:
 		m_tgp_program(*this, "tgp_program"),
 		m_maincpu(*this,"maincpu"),
 		m_dsbz80(*this, DSBZ80_TAG),
+		m_m1audio(*this, "m1audio"),
 		m_audiocpu(*this, "audiocpu"),
-		m_multipcm_1(*this, "sega1"),
-		m_multipcm_2(*this, "sega2"),
 		m_tgp(*this, "tgp"),
 		m_dsp(*this, "dsp"),
 		m_drivecpu(*this, "drivecpu"),
@@ -44,9 +43,8 @@ public:
 	
 	required_device<i960_cpu_device> m_maincpu;
 	optional_device<dsbz80_device> m_dsbz80;    // Z80-based MPEG Digital Sound Board
-	required_device<cpu_device> m_audiocpu;
-	optional_device<multipcm_device> m_multipcm_1;
-	optional_device<multipcm_device> m_multipcm_2;
+	optional_device<segam1audio_device> m_m1audio;	// Model 1 standard sound board
+	optional_device<cpu_device> m_audiocpu;
 	optional_device<cpu_device> m_tgp;
 	optional_device<cpu_device> m_dsp;
 	optional_device<cpu_device> m_drivecpu;
