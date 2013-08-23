@@ -261,6 +261,9 @@ ROM_START( concept )
 	ROMX_LOAD("cc06h", 0x010000, 0x1000, CRC(66b6b259) SHA1(1199a38ef3e94f695e8da6a7c80c6432da3cb80c), ROM_BIOS(3) | ROM_SKIP(1))
 	ROMX_LOAD("cc06l", 0x010001, 0x1000, CRC(600940d3) SHA1(c3278bf23b3b1c35ea1e3da48a05e877862a8345), ROM_BIOS(3) | ROM_SKIP(1))
 
+	ROM_REGION(0x400, "proms", 0)
+	ROM_LOAD("map04a.bin", 0x000, 0x400, CRC(1ae0db9b) SHA1(cdb6f63bb08072b454b4704e62de51c483ede734) )
+
 #if 0
 	// version 1 lvl 7 release
 	ROM_LOAD16_BYTE("bootl17h", 0x010000, 0x1000, CRC(6dd9718f))    // where does this come from?
