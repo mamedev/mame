@@ -368,19 +368,12 @@ void alphasmart_state::machine_reset()
 	m_port_d = 0;
 }
 
-static const hc11_config alphasmart_hc11_config =
-{
-	0,     // has extended internal I/O
-	0,     // FIXME: should be 192, but the 68hc11 core doesn't handle internal RAM correctly
-	0x00   // registers are at 0-0x3f
-};
-
 static MACHINE_CONFIG_START( alphasmart, alphasmart_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC68HC11, XTAL_8MHz/2)  // MC68HC11D0, XTAL is 8 Mhz, unknown divider
 	MCFG_CPU_PROGRAM_MAP(alphasmart_mem)
 	MCFG_CPU_IO_MAP(alphasmart_io)
-	MCFG_CPU_CONFIG(alphasmart_hc11_config)
+	MCFG_MC68HC11_CONFIG(0, 0, 0x00) // FIXME: internal ram should be 192, but the 68hc11 core doesn't handle internal RAM correctly
 
 	MCFG_KS0066_F05_ADD("ks0066_0")
 	MCFG_HD44780_LCD_SIZE(2, 40)

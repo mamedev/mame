@@ -1248,12 +1248,6 @@ static const tc0640fio_interface taitojc_io_intf =
 	DEVCB_INPUT_PORT("START"), DEVCB_INPUT_PORT("UNUSED"), DEVCB_INPUT_PORT("BUTTONS")
 };
 
-static const hc11_config taitojc_hc11_config =
-{
-	1,      // has extended I/O
-	1280,   // internal RAM size
-	0x00    // INIT defaults to 0x00
-};
 
 static MACHINE_CONFIG_START( taitojc, taitojc_state )
 
@@ -1265,7 +1259,7 @@ static MACHINE_CONFIG_START( taitojc, taitojc_state )
 	MCFG_CPU_ADD("sub", MC68HC11, XTAL_16MHz/2) // 8MHz, MC68HC11M0
 	MCFG_CPU_PROGRAM_MAP(hc11_pgm_map)
 	MCFG_CPU_IO_MAP(hc11_io_map)
-	MCFG_CPU_CONFIG(taitojc_hc11_config)
+	MCFG_MC68HC11_CONFIG( 1, 1280, 0x00 )
 
 	MCFG_CPU_ADD("dsp", TMS32051, XTAL_10MHz*4) // 40MHz, clock source = CY7C991
 	MCFG_CPU_PROGRAM_MAP(tms_program_map)

@@ -36,148 +36,112 @@ enum
 
 static const int div_tab[4] = { 1, 4, 8, 16 };
 
-struct hc11_state
+
+const device_type MC68HC11 = &device_creator<mc68hc11_cpu_device>;
+
+
+mc68hc11_cpu_device::mc68hc11_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: cpu_device(mconfig, MC68HC11, "MC68HC11", tag, owner, clock, "mc68hc11", __FILE__)
+	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0 )
+	, m_io_config("io", ENDIANNESS_LITTLE, 8, 8, 0)
+	/* defaults it to the HC11M0 version for now (I might strip this down on a later date) */
+	, m_has_extended_io(1)
+	, m_internal_ram_size(1280)
+	, m_init_value(0x01)
 {
-	union {
-		struct {
-#ifdef LSB_FIRST
-			UINT8 b;
-			UINT8 a;
-#else
-			UINT8 a;
-			UINT8 b;
-#endif
-		} d8;
-		UINT16 d16;
-	} d;
-
-	UINT16 ix;
-	UINT16 iy;
-	UINT16 sp;
-	UINT16 pc;
-	UINT16 ppc;
-	UINT8 ccr;
-
-	UINT8 adctl;
-	int ad_channel;
-
-	device_irq_acknowledge_callback irq_callback;
-	UINT8 irq_state[2];
-	legacy_cpu_device *device;
-	direct_read_data *direct;
-	address_space *program;
-	address_space *io;
-	int icount;
-
-	int ram_position;
-	int reg_position;
-	UINT8 *internal_ram;
-
-	int has_extended_io; // extended I/O enable flag
-	int internal_ram_size;
-	int init_value;
-
-	UINT8 wait_state,stop_state;
-
-	UINT8 tflg1, tmsk1;
-	UINT16 toc1;
-	UINT16 tcnt;
-//  UINT8 por;
-	UINT8 pr;
-
-	UINT64 frc_base;
-};
-
-INLINE hc11_state *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == MC68HC11);
-	return (hc11_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
-#define HC11OP(XX)      hc11_##XX
+
+offs_t mc68hc11_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+{
+	extern CPU_DISASSEMBLE( hc11 );
+	return CPU_DISASSEMBLE_NAME(hc11)(this, buffer, pc, oprom, opram, options);
+}
+
+
+#define HC11OP(XX)      mc68hc11_cpu_device::hc11_##XX
 
 /*****************************************************************************/
 /* Internal registers */
 
-static UINT8 hc11_regs_r(hc11_state *cpustate, UINT32 address)
+UINT8 mc68hc11_cpu_device::hc11_regs_r(UINT32 address)
 {
 	int reg = address & 0xff;
 
 	switch(reg)
 	{
 		case 0x00:      /* PORTA */
-			return cpustate->io->read_byte(MC68HC11_IO_PORTA);
+			return m_io->read_byte(MC68HC11_IO_PORTA);
 		case 0x01:      /* DDRA */
 			return 0;
 		case 0x02:      /* PIOC */
 			return 0;
 		case 0x03:      /* PORTC */
-			return cpustate->io->read_byte(MC68HC11_IO_PORTC);
+			return m_io->read_byte(MC68HC11_IO_PORTC);
 		case 0x04:      /* PORTB */
-			return cpustate->io->read_byte(MC68HC11_IO_PORTB);
+			return m_io->read_byte(MC68HC11_IO_PORTB);
 		case 0x08:      /* PORTD */
-			return cpustate->io->read_byte(MC68HC11_IO_PORTD);
+			return m_io->read_byte(MC68HC11_IO_PORTD);
 		case 0x09:      /* DDRD */
 			return 0;
 		case 0x0a:      /* PORTE */
-			return cpustate->io->read_byte(MC68HC11_IO_PORTE);
+			return m_io->read_byte(MC68HC11_IO_PORTE);
 		case 0x0e:      /* TCNT */
-			return cpustate->tcnt >> 8;
+			return m_tcnt >> 8;
 		case 0x0f:
-			return cpustate->tcnt & 0xff;
+			return m_tcnt & 0xff;
 		case 0x16:      /* TOC1 */
-			return cpustate->toc1 >> 8;
+			return m_toc1 >> 8;
 		case 0x17:
-			return cpustate->toc1 & 0xff;
+			return m_toc1 & 0xff;
 		case 0x23:
-			return cpustate->tflg1;
+			return m_tflg1;
 		case 0x28:      /* SPCR1 */
 			return 0;
 		case 0x30:      /* ADCTL */
 			return 0x80;
 		case 0x31:      /* ADR1 */
 		{
-			if (cpustate->adctl & 0x10)
+			if (m_adctl & 0x10)
 			{
-				return cpustate->io->read_byte((cpustate->adctl & 0x4) + MC68HC11_IO_AD0);
+				return m_io->read_byte((m_adctl & 0x4) + MC68HC11_IO_AD0);
 			}
 			else
 			{
-				return cpustate->io->read_byte((cpustate->adctl & 0x7) + MC68HC11_IO_AD0);
+				return m_io->read_byte((m_adctl & 0x7) + MC68HC11_IO_AD0);
 			}
 		}
 		case 0x32:      /* ADR2 */
 		{
-			if (cpustate->adctl & 0x10)
+			if (m_adctl & 0x10)
 			{
-				return cpustate->io->read_byte((cpustate->adctl & 0x4) + MC68HC11_IO_AD1);
+				return m_io->read_byte((m_adctl & 0x4) + MC68HC11_IO_AD1);
 			}
 			else
 			{
-				return cpustate->io->read_byte((cpustate->adctl & 0x7) + MC68HC11_IO_AD0);
+				return m_io->read_byte((m_adctl & 0x7) + MC68HC11_IO_AD0);
 			}
 		}
 		case 0x33:      /* ADR3 */
 		{
-			if (cpustate->adctl & 0x10)
+			if (m_adctl & 0x10)
 			{
-				return cpustate->io->read_byte((cpustate->adctl & 0x4) + MC68HC11_IO_AD2);
+				return m_io->read_byte((m_adctl & 0x4) + MC68HC11_IO_AD2);
 			}
 			else
 			{
-				return cpustate->io->read_byte((cpustate->adctl & 0x7) + MC68HC11_IO_AD0);
+				return m_io->read_byte((m_adctl & 0x7) + MC68HC11_IO_AD0);
 			}
 		}
 		case 0x34:      /* ADR4 */
 		{
-			if (cpustate->adctl & 0x10)
+			if (m_adctl & 0x10)
 			{
-				return cpustate->io->read_byte((cpustate->adctl & 0x4) + MC68HC11_IO_AD3);
+				return m_io->read_byte((m_adctl & 0x4) + MC68HC11_IO_AD3);
 			}
 			else
 			{
-				return cpustate->io->read_byte((cpustate->adctl & 0x7) + MC68HC11_IO_AD0);
+				return m_io->read_byte((m_adctl & 0x7) + MC68HC11_IO_AD0);
 			}
 		}
 		case 0x38:      /* OPT2 */
@@ -193,9 +157,9 @@ static UINT8 hc11_regs_r(hc11_state *cpustate, UINT32 address)
 		case 0x74:      /* SCSR1 */
 			return 0x40;
 		case 0x7c:      /* PORTH */
-			return cpustate->io->read_byte(MC68HC11_IO_PORTH);
+			return m_io->read_byte(MC68HC11_IO_PORTH);
 		case 0x7e:      /* PORTG */
-			return cpustate->io->read_byte(MC68HC11_IO_PORTG);
+			return m_io->read_byte(MC68HC11_IO_PORTG);
 		case 0x7f:      /* DDRG */
 			return 0;
 
@@ -204,7 +168,7 @@ static UINT8 hc11_regs_r(hc11_state *cpustate, UINT32 address)
 		case 0x89:      /* SPSR2 */
 			return 0x80;
 		case 0x8a:      /* SPDR2 */
-			return cpustate->io->read_byte(MC68HC11_IO_SPI2_DATA);
+			return m_io->read_byte(MC68HC11_IO_SPI2_DATA);
 
 		case 0x8b:      /* OPT4 */
 			return 0;
@@ -214,32 +178,32 @@ static UINT8 hc11_regs_r(hc11_state *cpustate, UINT32 address)
 	return 0; // Dummy
 }
 
-static void hc11_regs_w(hc11_state *cpustate, UINT32 address, UINT8 value)
+void mc68hc11_cpu_device::hc11_regs_w(UINT32 address, UINT8 value)
 {
 	int reg = address & 0xff;
 
 	switch(reg)
 	{
 		case 0x00:      /* PORTA */
-			cpustate->io->write_byte(MC68HC11_IO_PORTA, value);
+			m_io->write_byte(MC68HC11_IO_PORTA, value);
 			return;
 		case 0x01:      /* DDRA */
 			//mame_printf_debug("HC11: ddra = %02X\n", value);
 			return;
 		case 0x03:      /* PORTC */
-			cpustate->io->write_byte(MC68HC11_IO_PORTC, value);
+			m_io->write_byte(MC68HC11_IO_PORTC, value);
 			return;
 		case 0x04:      /* PORTC */
-			cpustate->io->write_byte(MC68HC11_IO_PORTB, value);
+			m_io->write_byte(MC68HC11_IO_PORTB, value);
 			return;
 		case 0x08:      /* PORTD */
-			cpustate->io->write_byte(MC68HC11_IO_PORTD, value); //mask & 0x3f?
+			m_io->write_byte(MC68HC11_IO_PORTD, value); //mask & 0x3f?
 			return;
 		case 0x09:      /* DDRD */
 			//mame_printf_debug("HC11: ddrd = %02X\n", value);
 			return;
 		case 0x0a:      /* PORTE */
-			cpustate->io->write_byte(MC68HC11_IO_PORTE, value);
+			m_io->write_byte(MC68HC11_IO_PORTE, value);
 			return;
 		case 0x0e:      /* TCNT */
 		case 0x0f:
@@ -247,24 +211,24 @@ static void hc11_regs_w(hc11_state *cpustate, UINT32 address, UINT8 value)
 			return;
 		case 0x16:      /* TOC1 */
 			/* TODO: inhibit for one bus cycle */
-			cpustate->toc1 = (value << 8) | (cpustate->toc1 & 0xff);
+			m_toc1 = (value << 8) | (m_toc1 & 0xff);
 			return;
 		case 0x17:
-			cpustate->toc1 = (value & 0xff) | (cpustate->toc1 & 0xff00);
+			m_toc1 = (value & 0xff) | (m_toc1 & 0xff00);
 			return;
 		case 0x22:      /* TMSK1 */
-			cpustate->tmsk1 = value;
+			m_tmsk1 = value;
 			return;
 		case 0x23:
-			cpustate->tflg1 &= ~value;
+			m_tflg1 &= ~value;
 			return;
 		case 0x24:      /* TMSK2 */
-			cpustate->pr = value & 3;
+			m_pr = value & 3;
 			return;
 		case 0x28:      /* SPCR1 */
 			return;
 		case 0x30:      /* ADCTL */
-			cpustate->adctl = value;
+			m_adctl = value;
 			return;
 		case 0x38:      /* OPT2 */
 			return;
@@ -279,11 +243,11 @@ static void hc11_regs_w(hc11_state *cpustate, UINT32 address, UINT8 value)
 			int ram_page = (value >> 4) & 0xf;
 
 			if (reg_page == ram_page) {
-				cpustate->reg_position = reg_page << 12;
-				cpustate->ram_position = (ram_page << 12) + ((cpustate->has_extended_io) ? 0x100 : 0x80);
+				m_reg_position = reg_page << 12;
+				m_ram_position = (ram_page << 12) + ((m_has_extended_io) ? 0x100 : 0x80);
 			} else {
-				cpustate->reg_position = reg_page << 12;
-				cpustate->ram_position = ram_page << 12;
+				m_reg_position = reg_page << 12;
+				m_ram_position = ram_page << 12;
 			}
 			return;
 		}
@@ -302,16 +266,16 @@ static void hc11_regs_w(hc11_state *cpustate, UINT32 address, UINT8 value)
 		case 0x77:      /* SCDRL */
 			return;
 		case 0x7c:      /* PORTH */
-			cpustate->io->write_byte(MC68HC11_IO_PORTH, value);
+			m_io->write_byte(MC68HC11_IO_PORTH, value);
 			return;
 		case 0x7d:      /* DDRH */
-			//mame_printf_debug("HC11: ddrh = %02X at %04X\n", value, cpustate->pc);
+			//mame_printf_debug("HC11: ddrh = %02X at %04X\n", value, m_pc);
 			return;
 		case 0x7e:      /* PORTG */
-			cpustate->io->write_byte(MC68HC11_IO_PORTG, value);
+			m_io->write_byte(MC68HC11_IO_PORTG, value);
 			return;
 		case 0x7f:      /* DDRG */
-			//mame_printf_debug("HC11: ddrg = %02X at %04X\n", value, cpustate->pc);
+			//mame_printf_debug("HC11: ddrg = %02X at %04X\n", value, m_pc);
 			return;
 
 		case 0x88:      /* SPCR2 */
@@ -319,7 +283,7 @@ static void hc11_regs_w(hc11_state *cpustate, UINT32 address, UINT8 value)
 		case 0x89:      /* SPSR2 */
 			return;
 		case 0x8a:      /* SPDR2 */
-			cpustate->io->write_byte(MC68HC11_IO_SPI2_DATA, value);
+			m_io->write_byte(MC68HC11_IO_SPI2_DATA, value);
 			return;
 
 		case 0x8b:      /* OPT4 */
@@ -332,81 +296,74 @@ static void hc11_regs_w(hc11_state *cpustate, UINT32 address, UINT8 value)
 
 /*****************************************************************************/
 
-INLINE UINT8 FETCH(hc11_state *cpustate)
+UINT8 mc68hc11_cpu_device::FETCH()
 {
-	return cpustate->direct->read_decrypted_byte(cpustate->pc++);
+	return m_direct->read_decrypted_byte(m_pc++);
 }
 
-INLINE UINT16 FETCH16(hc11_state *cpustate)
+UINT16 mc68hc11_cpu_device::FETCH16()
 {
 	UINT16 w;
-	w = (cpustate->direct->read_decrypted_byte(cpustate->pc) << 8) | (cpustate->direct->read_decrypted_byte(cpustate->pc+1));
-	cpustate->pc += 2;
+	w = (m_direct->read_decrypted_byte(m_pc) << 8) | (m_direct->read_decrypted_byte(m_pc+1));
+	m_pc += 2;
 	return w;
 }
 
-INLINE UINT8 READ8(hc11_state *cpustate, UINT32 address)
+UINT8 mc68hc11_cpu_device::READ8(UINT32 address)
 {
-	if(address >= cpustate->reg_position && address < cpustate->reg_position+(cpustate->has_extended_io ? 0x100 : 0x40))
+	if(address >= m_reg_position && address < m_reg_position+(m_has_extended_io ? 0x100 : 0x40))
 	{
-		return hc11_regs_r(cpustate, address);
+		return hc11_regs_r(address);
 	}
-	else if(address >= cpustate->ram_position && address < cpustate->ram_position+cpustate->internal_ram_size)
+	else if(address >= m_ram_position && address < m_ram_position+m_internal_ram_size)
 	{
-		return cpustate->internal_ram[address-cpustate->ram_position];
+		return m_internal_ram[address-m_ram_position];
 	}
-	return cpustate->program->read_byte(address);
+	return m_program->read_byte(address);
 }
 
-INLINE void WRITE8(hc11_state *cpustate, UINT32 address, UINT8 value)
+void mc68hc11_cpu_device::WRITE8(UINT32 address, UINT8 value)
 {
-	if(address >= cpustate->reg_position && address < cpustate->reg_position+(cpustate->has_extended_io ? 0x100 : 0x40))
+	if(address >= m_reg_position && address < m_reg_position+(m_has_extended_io ? 0x100 : 0x40))
 	{
-		hc11_regs_w(cpustate, address, value);
+		hc11_regs_w(address, value);
 		return;
 	}
-	else if(address >= cpustate->ram_position && address < cpustate->ram_position+cpustate->internal_ram_size)
+	else if(address >= m_ram_position && address < m_ram_position+m_internal_ram_size)
 	{
-		cpustate->internal_ram[address-cpustate->ram_position] = value;
+		m_internal_ram[address-m_ram_position] = value;
 		return;
 	}
-	cpustate->program->write_byte(address, value);
+	m_program->write_byte(address, value);
 }
 
-INLINE UINT16 READ16(hc11_state *cpustate, UINT32 address)
+UINT16 mc68hc11_cpu_device::READ16(UINT32 address)
 {
-	return (READ8(cpustate, address) << 8) | (READ8(cpustate, address+1));
+	return (READ8(address) << 8) | (READ8(address+1));
 }
 
-INLINE void WRITE16(hc11_state *cpustate, UINT32 address, UINT16 value)
+void mc68hc11_cpu_device::WRITE16(UINT32 address, UINT16 value)
 {
-	WRITE8(cpustate, address+0, (value >> 8) & 0xff);
-	WRITE8(cpustate, address+1, (value >> 0) & 0xff);
+	WRITE8(address+0, (value >> 8) & 0xff);
+	WRITE8(address+1, (value >> 0) & 0xff);
 }
 
 /*****************************************************************************/
 
-static void (*hc11_optable[256])(hc11_state *cpustate);
-static void (*hc11_optable_page2[256])(hc11_state *cpustate);
-static void (*hc11_optable_page3[256])(hc11_state *cpustate);
-static void (*hc11_optable_page4[256])(hc11_state *cpustate);
 
 #include "hc11ops.c"
 #include "hc11ops.h"
 
-static CPU_INIT( hc11 )
+void mc68hc11_cpu_device::device_start()
 {
-	hc11_state *cpustate = get_safe_token(device);
 	int i;
-
-	const hc11_config *conf = (const hc11_config *)device->static_config();
 
 	/* clear the opcode tables */
 	for(i=0; i < 256; i++) {
-		hc11_optable[i] = HC11OP(invalid);
-		hc11_optable_page2[i] = HC11OP(invalid);
-		hc11_optable_page3[i] = HC11OP(invalid);
-		hc11_optable_page4[i] = HC11OP(invalid);
+		hc11_optable[i] = &HC11OP(invalid);
+		hc11_optable_page2[i] = &HC11OP(invalid);
+		hc11_optable_page3[i] = &HC11OP(invalid);
+		hc11_optable_page4[i] = &HC11OP(invalid);
 	}
 	/* fill the opcode tables */
 	for(i=0; i < sizeof(hc11_opcode_list)/sizeof(hc11_opcode_list_struct); i++)
@@ -428,74 +385,98 @@ static CPU_INIT( hc11 )
 		}
 	}
 
-	if(conf)
-	{
-		cpustate->has_extended_io = conf->has_extended_io;
-		cpustate->internal_ram_size = conf->internal_ram_size;
-		cpustate->init_value = conf->init_value;
-	}
-	else
-	{
-		/* defaults it to the HC11M0 version for now (I might strip this down on a later date) */
-		cpustate->has_extended_io = 1;
-		cpustate->internal_ram_size = 1280;
-		cpustate->init_value = 0x01;
-	}
+	m_internal_ram = auto_alloc_array(machine(), UINT8, m_internal_ram_size);
 
-	cpustate->internal_ram = auto_alloc_array(device->machine(), UINT8, cpustate->internal_ram_size);
+	m_program = &space(AS_PROGRAM);
+	m_direct = &m_program->direct();
+	m_io = &space(AS_IO);
 
-	cpustate->irq_callback = irqcallback;
-	cpustate->device = device;
-	cpustate->program = &device->space(AS_PROGRAM);
-	cpustate->direct = &cpustate->program->direct();
-	cpustate->io = &device->space(AS_IO);
+	save_item(NAME(m_pc));
+	save_item(NAME(m_ix));
+	save_item(NAME(m_iy));
+	save_item(NAME(m_sp));
+	save_item(NAME(m_ppc));
+	save_item(NAME(m_ccr));
+	save_item(NAME(m_d.d8.a));
+	save_item(NAME(m_d.d8.b));
+	save_item(NAME(m_adctl));
+	save_item(NAME(m_ad_channel));
+	save_item(NAME(m_ram_position));
+	save_item(NAME(m_reg_position));
+	save_item(NAME(m_irq_state));
+	save_item(NAME(m_icount));
+	save_item(NAME(m_has_extended_io));
+	save_item(NAME(m_internal_ram_size));
+	save_item(NAME(m_init_value));
+	save_pointer(NAME(m_internal_ram),m_internal_ram_size);
+	save_item(NAME(m_wait_state));
+	save_item(NAME(m_stop_state));
+	save_item(NAME(m_tflg1));
+	save_item(NAME(m_tmsk1));
+	save_item(NAME(m_toc1));
+	save_item(NAME(m_tcnt));
+//  save_item(NAME(m_por));
+	save_item(NAME(m_pr));
+	save_item(NAME(m_frc_base));
 
-	device->save_item(NAME(cpustate->pc));
-	device->save_item(NAME(cpustate->ix));
-	device->save_item(NAME(cpustate->iy));
-	device->save_item(NAME(cpustate->sp));
-	device->save_item(NAME(cpustate->ppc));
-	device->save_item(NAME(cpustate->ccr));
-	device->save_item(NAME(cpustate->d.d8.a));
-	device->save_item(NAME(cpustate->d.d8.b));
-	device->save_item(NAME(cpustate->adctl));
-	device->save_item(NAME(cpustate->ad_channel));
-	device->save_item(NAME(cpustate->ram_position));
-	device->save_item(NAME(cpustate->reg_position));
-	device->save_item(NAME(cpustate->irq_state));
-	device->save_item(NAME(cpustate->icount));
-	device->save_item(NAME(cpustate->has_extended_io));
-	device->save_item(NAME(cpustate->internal_ram_size));
-	device->save_item(NAME(cpustate->init_value));
-	device->save_pointer(NAME(cpustate->internal_ram),cpustate->internal_ram_size);
-	device->save_item(NAME(cpustate->wait_state));
-	device->save_item(NAME(cpustate->stop_state));
-	device->save_item(NAME(cpustate->tflg1));
-	device->save_item(NAME(cpustate->tmsk1));
-	device->save_item(NAME(cpustate->toc1));
-	device->save_item(NAME(cpustate->tcnt));
-//  device->save_item(NAME(cpustate->por));
-	device->save_item(NAME(cpustate->pr));
-	device->save_item(NAME(cpustate->frc_base));
+	state_add( HC11_PC, "PC", m_pc).formatstr("%04X");
+	state_add( HC11_SP, "SP", m_sp).formatstr("%04X");
+	state_add( HC11_A,  "A", m_d.d8.a).formatstr("%02X");
+	state_add( HC11_B,  "B", m_d.d8.b).formatstr("%02X");
+	state_add( HC11_IX, "IX", m_ix).formatstr("%04X");
+	state_add( HC11_IY, "IY", m_iy).formatstr("%04X");
+
+	state_add( STATE_GENPC, "GENPC", m_pc).noshow();
+	state_add( STATE_GENFLAGS, "GENFLAGS", m_ccr).formatstr("%8s").noshow();
+
+	m_d.d16 = 0;
+	m_ix = 0;
+	m_iy = 0;
+	m_sp = 0;
+	m_ppc = 0;
+	m_adctl = 0;
+	m_ad_channel = 0;
+	m_irq_state[0] = m_irq_state[1] = 0;
+	m_ram_position = 0;
+	m_reg_position = 0;
+	m_tflg1 = 0;
+	m_tmsk1 = 0;
+
+	m_icountptr = &m_icount;
 }
 
-static CPU_RESET( hc11 )
+
+void mc68hc11_cpu_device::state_string_export(const device_state_entry &entry, astring &string)
 {
-	hc11_state *cpustate = get_safe_token(device);
-	cpustate->pc = READ16(cpustate, 0xfffe);
-	cpustate->wait_state = 0;
-	cpustate->stop_state = 0;
-	cpustate->ccr = CC_X | CC_I | CC_S;
-	hc11_regs_w(cpustate,0x3d,cpustate->init_value);
-	cpustate->toc1 = 0xffff;
-	cpustate->tcnt = 0xffff;
-//  cpustate->por = 1; // for first timer overflow / compare stuff
-	cpustate->pr = 3; // timer prescale
-	cpustate->frc_base = 0;
+	switch (entry.index())
+	{
+		case STATE_GENFLAGS:
+			string.printf("%c%c%c%c%c%c%c%c",
+				(m_ccr & CC_S) ? 'S' : '.',
+				(m_ccr & CC_X) ? 'X' : '.',
+				(m_ccr & CC_H) ? 'H' : '.',
+				(m_ccr & CC_I) ? 'I' : '.',
+				(m_ccr & CC_N) ? 'N' : '.',
+				(m_ccr & CC_Z) ? 'Z' : '.',
+				(m_ccr & CC_V) ? 'V' : '.',
+				(m_ccr & CC_C) ? 'C' : '.');
+			break;
+	}
 }
 
-static CPU_EXIT( hc11 )
+
+void mc68hc11_cpu_device::device_reset()
 {
+	m_pc = READ16(0xfffe);
+	m_wait_state = 0;
+	m_stop_state = 0;
+	m_ccr = CC_X | CC_I | CC_S;
+	hc11_regs_w(0x3d,m_init_value);
+	m_toc1 = 0xffff;
+	m_tcnt = 0xffff;
+//  m_por = 1; // for first timer overflow / compare stuff
+	m_pr = 3; // timer prescale
+	m_frc_base = 0;
 }
 
 /*
@@ -523,200 +504,95 @@ IRQ table vectors:
 0xfffe: RESET
 */
 
-static void check_irq_lines(hc11_state *cpustate)
+void mc68hc11_cpu_device::check_irq_lines()
 {
-	if( cpustate->irq_state[MC68HC11_IRQ_LINE]!=CLEAR_LINE && (!(cpustate->ccr & CC_I)) )
+	if( m_irq_state[MC68HC11_IRQ_LINE]!=CLEAR_LINE && (!(m_ccr & CC_I)) )
 	{
 		UINT16 pc_vector;
 
-		if(cpustate->wait_state == 0)
+		if(m_wait_state == 0)
 		{
-			PUSH16(cpustate, cpustate->pc);
-			PUSH16(cpustate, cpustate->iy);
-			PUSH16(cpustate, cpustate->ix);
-			PUSH8(cpustate, REG_A);
-			PUSH8(cpustate, REG_B);
-			PUSH8(cpustate, cpustate->ccr);
+			PUSH16(m_pc);
+			PUSH16(m_iy);
+			PUSH16(m_ix);
+			PUSH8(REG_A);
+			PUSH8(REG_B);
+			PUSH8(m_ccr);
 		}
-		pc_vector = READ16(cpustate, 0xfff2);
-		SET_PC(cpustate, pc_vector);
-		cpustate->ccr |= CC_I; //irq taken, mask the flag
-		if(cpustate->wait_state == 1) { cpustate->wait_state = 2; }
-		if(cpustate->stop_state == 1) { cpustate->stop_state = 2; }
-		(void)(*cpustate->irq_callback)(cpustate->device, MC68HC11_IRQ_LINE);
+		pc_vector = READ16(0xfff2);
+		SET_PC(pc_vector);
+		m_ccr |= CC_I; //irq taken, mask the flag
+		if(m_wait_state == 1) { m_wait_state = 2; }
+		if(m_stop_state == 1) { m_stop_state = 2; }
+		standard_irq_callback(MC68HC11_IRQ_LINE);
 	}
 
 	/* check timers here */
 	{
-		int divider = div_tab[cpustate->pr & 3];
-		UINT64 cur_time = cpustate->device->total_cycles();
-		UINT32 add = (cur_time - cpustate->frc_base) / divider;
+		int divider = div_tab[m_pr & 3];
+		UINT64 cur_time = total_cycles();
+		UINT32 add = (cur_time - m_frc_base) / divider;
 
 		if (add > 0)
 		{
 			for(UINT32 i=0;i<add;i++)
 			{
-				cpustate->tcnt++;
-				if(cpustate->tcnt == cpustate->toc1)
+				m_tcnt++;
+				if(m_tcnt == m_toc1)
 				{
-					cpustate->tflg1 |= 0x80;
-					cpustate->irq_state[MC68HC11_TOC1_LINE] = ASSERT_LINE;
+					m_tflg1 |= 0x80;
+					m_irq_state[MC68HC11_TOC1_LINE] = ASSERT_LINE;
 				}
 			}
 
-			cpustate->frc_base = cur_time;
+			m_frc_base = cur_time;
 		}
 	}
 
-	if( cpustate->irq_state[MC68HC11_TOC1_LINE]!=CLEAR_LINE && (!(cpustate->ccr & CC_I)) && cpustate->tmsk1 & 0x80)
+	if( m_irq_state[MC68HC11_TOC1_LINE]!=CLEAR_LINE && (!(m_ccr & CC_I)) && m_tmsk1 & 0x80)
 	{
 		UINT16 pc_vector;
 
-		if(cpustate->wait_state == 0)
+		if(m_wait_state == 0)
 		{
-			PUSH16(cpustate, cpustate->pc);
-			PUSH16(cpustate, cpustate->iy);
-			PUSH16(cpustate, cpustate->ix);
-			PUSH8(cpustate, REG_A);
-			PUSH8(cpustate, REG_B);
-			PUSH8(cpustate, cpustate->ccr);
+			PUSH16(m_pc);
+			PUSH16(m_iy);
+			PUSH16(m_ix);
+			PUSH8(REG_A);
+			PUSH8(REG_B);
+			PUSH8(m_ccr);
 		}
-		pc_vector = READ16(cpustate, 0xffe8);
-		SET_PC(cpustate, pc_vector);
-		cpustate->ccr |= CC_I; //irq taken, mask the flag
-		if(cpustate->wait_state == 1) { cpustate->wait_state = 2; }
-		if(cpustate->stop_state == 1) { cpustate->stop_state = 2; }
-		(void)(*cpustate->irq_callback)(cpustate->device, MC68HC11_TOC1_LINE);
-		cpustate->irq_state[MC68HC11_TOC1_LINE] = CLEAR_LINE; // auto-ack irq
+		pc_vector = READ16(0xffe8);
+		SET_PC(pc_vector);
+		m_ccr |= CC_I; //irq taken, mask the flag
+		if(m_wait_state == 1) { m_wait_state = 2; }
+		if(m_stop_state == 1) { m_stop_state = 2; }
+		standard_irq_callback(MC68HC11_TOC1_LINE);
+		m_irq_state[MC68HC11_TOC1_LINE] = CLEAR_LINE; // auto-ack irq
 	}
 
 }
 
-static void set_irq_line(hc11_state *cpustate, int irqline, int state)
+void mc68hc11_cpu_device::execute_set_input(int inputnum, int state)
 {
-	cpustate->irq_state[irqline] = state;
+	m_irq_state[inputnum] = state;
 	if (state == CLEAR_LINE) return;
-	check_irq_lines(cpustate);
+	check_irq_lines();
 }
 
-static CPU_EXECUTE( hc11 )
+void mc68hc11_cpu_device::execute_run()
 {
-	hc11_state *cpustate = get_safe_token(device);
-
-	while(cpustate->icount > 0)
+	while(m_icount > 0)
 	{
 		UINT8 op;
 
-		check_irq_lines(cpustate);
+		check_irq_lines();
 
-		cpustate->ppc = cpustate->pc;
-		debugger_instruction_hook(device, cpustate->pc);
+		m_ppc = m_pc;
+		debugger_instruction_hook(this, m_pc);
 
-		op = FETCH(cpustate);
-		hc11_optable[op](cpustate);
+		op = FETCH();
+		(this->*hc11_optable[op])();
 	}
 }
 
-/*****************************************************************************/
-
-static CPU_SET_INFO( mc68hc11 )
-{
-	hc11_state *cpustate = get_safe_token(device);
-
-	switch (state)
-	{
-		case CPUINFO_INT_INPUT_STATE + MC68HC11_IRQ_LINE:   set_irq_line(cpustate, MC68HC11_IRQ_LINE, info->i);     break;
-		case CPUINFO_INT_INPUT_STATE + MC68HC11_TOC1_LINE:  set_irq_line(cpustate, MC68HC11_TOC1_LINE, info->i);        break;
-
-		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_PC:                            cpustate->pc = info->i;                     break;
-		case CPUINFO_INT_REGISTER + HC11_PC:            cpustate->pc = info->i;                     break;
-		case CPUINFO_INT_REGISTER + HC11_SP:            cpustate->sp = info->i;                     break;
-		case CPUINFO_INT_REGISTER + HC11_A:             cpustate->d.d8.a = info->i;                 break;
-		case CPUINFO_INT_REGISTER + HC11_B:             cpustate->d.d8.b = info->i;                 break;
-		case CPUINFO_INT_REGISTER + HC11_IX:            cpustate->ix = info->i;                     break;
-		case CPUINFO_INT_REGISTER + HC11_IY:            cpustate->iy = info->i;                     break;
-	}
-}
-
-CPU_GET_INFO( mc68hc11 )
-{
-	hc11_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
-
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:                      info->i = sizeof(hc11_state);   break;
-		case CPUINFO_INT_INPUT_LINES:                       info->i = 1;                    break;
-		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:                info->i = 0;                    break;
-		case CPUINFO_INT_ENDIANNESS:                        info->i = ENDIANNESS_BIG;       break;
-		case CPUINFO_INT_CLOCK_MULTIPLIER:                  info->i = 1;                    break;
-		case CPUINFO_INT_CLOCK_DIVIDER:                     info->i = 1;                    break;
-		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:             info->i = 1;                    break;
-		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:             info->i = 5;                    break;
-		case CPUINFO_INT_MIN_CYCLES:                        info->i = 1;                    break;
-		case CPUINFO_INT_MAX_CYCLES:                        info->i = 41;                   break;
-
-		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:            info->i = 8;                    break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:            info->i = 16;                   break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM:            info->i = 0;                    break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:               info->i = 0;                    break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:               info->i = 0;                    break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:               info->i = 0;                    break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:                 info->i = 8;                    break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:                 info->i = 8;                    break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:                 info->i = 0;                    break;
-
-		case CPUINFO_INT_INPUT_STATE + MC68HC11_IRQ_LINE:   info->i = cpustate->irq_state[MC68HC11_IRQ_LINE]; break;
-		case CPUINFO_INT_INPUT_STATE + MC68HC11_TOC1_LINE:  info->i = cpustate->irq_state[MC68HC11_TOC1_LINE];  break;
-
-		case CPUINFO_INT_PREVIOUSPC:                        /* not implemented */           break;
-
-		case CPUINFO_INT_PC:    /* intentional fallthrough */
-		case CPUINFO_INT_REGISTER + HC11_PC:            info->i = cpustate->pc;             break;
-		case CPUINFO_INT_REGISTER + HC11_SP:            info->i = cpustate->sp;             break;
-		case CPUINFO_INT_REGISTER + HC11_A:             info->i = cpustate->d.d8.a;         break;
-		case CPUINFO_INT_REGISTER + HC11_B:             info->i = cpustate->d.d8.b;         break;
-		case CPUINFO_INT_REGISTER + HC11_IX:            info->i = cpustate->ix;             break;
-		case CPUINFO_INT_REGISTER + HC11_IY:            info->i = cpustate->iy;             break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_SET_INFO:                      info->setinfo = CPU_SET_INFO_NAME(mc68hc11);        break;
-		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(hc11);                   break;
-		case CPUINFO_FCT_RESET:                         info->reset = CPU_RESET_NAME(hc11);             break;
-		case CPUINFO_FCT_EXIT:                          info->exit = CPU_EXIT_NAME(hc11);                   break;
-		case CPUINFO_FCT_EXECUTE:                       info->execute = CPU_EXECUTE_NAME(hc11);         break;
-		case CPUINFO_FCT_BURN:                          info->burn = NULL;                      break;
-		case CPUINFO_FCT_DISASSEMBLE:                   info->disassemble = CPU_DISASSEMBLE_NAME(hc11);     break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:           info->icount = &cpustate->icount;           break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "MC68HC11");            break;
-		case CPUINFO_STR_SHORTNAME:                          strcpy(info->s, "mc68hc11");            break;
-		case CPUINFO_STR_FAMILY:                    strcpy(info->s, "Motorola MC68HC11");   break;
-		case CPUINFO_STR_VERSION:                   strcpy(info->s, "1.0");                 break;
-		case CPUINFO_STR_SOURCE_FILE:                       strcpy(info->s, __FILE__);              break;
-		case CPUINFO_STR_CREDITS:                   strcpy(info->s, "Copyright Ville Linde & Angelo Salese"); break;
-
-		case CPUINFO_STR_FLAGS:
-			sprintf(info->s, "%c%c%c%c%c%c%c%c",
-				(cpustate->ccr & CC_S) ? 'S' : '.',
-				(cpustate->ccr & CC_X) ? 'X' : '.',
-				(cpustate->ccr & CC_H) ? 'H' : '.',
-				(cpustate->ccr & CC_I) ? 'I' : '.',
-				(cpustate->ccr & CC_N) ? 'N' : '.',
-				(cpustate->ccr & CC_Z) ? 'Z' : '.',
-				(cpustate->ccr & CC_V) ? 'V' : '.',
-				(cpustate->ccr & CC_C) ? 'C' : '.');
-			break;
-
-		case CPUINFO_STR_REGISTER + HC11_PC:            sprintf(info->s, "PC: %04X", cpustate->pc); break;
-		case CPUINFO_STR_REGISTER + HC11_SP:            sprintf(info->s, "SP: %04X", cpustate->sp); break;
-		case CPUINFO_STR_REGISTER + HC11_A:             sprintf(info->s, "A: %02X", cpustate->d.d8.a); break;
-		case CPUINFO_STR_REGISTER + HC11_B:             sprintf(info->s, "B: %02X", cpustate->d.d8.b); break;
-		case CPUINFO_STR_REGISTER + HC11_IX:            sprintf(info->s, "IX: %04X", cpustate->ix); break;
-		case CPUINFO_STR_REGISTER + HC11_IY:            sprintf(info->s, "IY: %04X", cpustate->iy); break;
-	}
-}
-
-DEFINE_LEGACY_CPU_DEVICE(MC68HC11, mc68hc11);
