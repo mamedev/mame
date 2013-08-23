@@ -1034,7 +1034,7 @@ void sega_sys16b_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 //-------------------------------------------------
 
 sega_outrun_sprite_device::sega_outrun_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: sega_16bit_sprite_device(mconfig, SEGA_OUTRUN_SPRITES, "Sega Out Run Sprites", tag, owner, "sega_16bit_sprite", __FILE__),
+	: sega_16bit_sprite_device(mconfig, SEGA_OUTRUN_SPRITES, "Sega Out Run Sprites", tag, owner, "sega_outrun_sprite", __FILE__),
 		m_is_xboard(false)
 {
 	set_origin(189, 0x00);

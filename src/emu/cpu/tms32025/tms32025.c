@@ -2424,6 +2424,7 @@ CPU_GET_INFO( tms32026 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "TMS32026");            break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "tms32026");            break;
 
 		default:                                        CPU_GET_INFO_CALL(tms32025);            break;
 	}
