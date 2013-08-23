@@ -641,6 +641,7 @@ CPU_GET_INFO( scmp )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                      strcpy(info->s, "INS 8050 SC/MP");              break;
+		case CPUINFO_STR_SHORTNAME:                 strcpy(info->s, "ins8050");              break;
 		case CPUINFO_STR_FAMILY:                    strcpy(info->s, "National Semiconductor SC/MP");            break;
 		case CPUINFO_STR_VERSION:                   strcpy(info->s, "1.0");                 break;
 		case CPUINFO_STR_SOURCE_FILE:               strcpy(info->s, __FILE__);              break;
@@ -660,6 +661,7 @@ CPU_GET_INFO( ins8060 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "INS 8060 SC/MP II");               break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "ins8060");              break;
 
 		default:                                        CPU_GET_INFO_CALL(scmp);            break;
 	}

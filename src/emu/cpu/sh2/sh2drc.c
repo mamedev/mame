@@ -3395,6 +3395,7 @@ CPU_GET_INFO( sh2 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "SH-2");                break;
+		case CPUINFO_STR_SHORTNAME:                          strcpy(info->s, "sh2");                break;
 		case CPUINFO_STR_FAMILY:                    strcpy(info->s, "Hitachi SuperH RISC");     break;
 		case CPUINFO_STR_VERSION:                   strcpy(info->s, "2.0");             break;
 		case CPUINFO_STR_SOURCE_FILE:                       strcpy(info->s, __FILE__);              break;
@@ -3450,6 +3451,7 @@ CPU_GET_INFO( sh1 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "SH-1");                break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "sh1");                break;
 
 		default:                            CPU_GET_INFO_CALL(sh2);         break;
 	}

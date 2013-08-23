@@ -2727,6 +2727,7 @@ CPU_GET_INFO( z180 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "Z180");                break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "z180");                break;
 		case CPUINFO_STR_FAMILY:                    strcpy(info->s, "Zilog Z8x180");        break;
 		case CPUINFO_STR_VERSION:                   strcpy(info->s, "0.4");                 break;
 		case CPUINFO_STR_SOURCE_FILE:                       strcpy(info->s, __FILE__);              break;

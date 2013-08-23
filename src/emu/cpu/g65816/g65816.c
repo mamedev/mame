@@ -489,6 +489,7 @@ CPU_GET_INFO( g65816 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "G65C816");             break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "g65c816");             break;
 		case CPUINFO_STR_FAMILY:                    strcpy(info->s, "6500");                break;
 		case CPUINFO_STR_VERSION:                   strcpy(info->s, "1.0");             break;
 		case CPUINFO_STR_SOURCE_FILE:                       strcpy(info->s, __FILE__);              break;
@@ -715,6 +716,7 @@ CPU_GET_INFO( _5a22 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "5A22");            break;
+		case CPUINFO_STR_SHORTNAME:                          strcpy(info->s, "5a22");            break;
 		case CPUINFO_INT_REGISTER + _5A22_FASTROM:      info->i = g65816_get_reg(cpustate, _5A22_FASTROM); break;
 		case CPUINFO_STR_REGISTER + _5A22_FASTROM:      sprintf(info->s, "fastROM:%d", cpustate->fastROM & 1 ? 1 : 0); break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM:  info->internal_map8 = ADDRESS_MAP_NAME(_5a22_map); break;

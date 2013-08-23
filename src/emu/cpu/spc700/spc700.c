@@ -1783,6 +1783,7 @@ CPU_GET_INFO( spc700 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                      strcpy(info->s, "SPC700");              break;
+		case CPUINFO_STR_SHORTNAME:                 strcpy(info->s, "spc700");              break;
 		case CPUINFO_STR_FAMILY:                    strcpy(info->s, "Sony SPC700");             break;
 		case CPUINFO_STR_VERSION:                   strcpy(info->s, "1.1");                 break;
 		case CPUINFO_STR_SOURCE_FILE:                   strcpy(info->s, __FILE__);              break;

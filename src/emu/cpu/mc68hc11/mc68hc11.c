@@ -692,6 +692,7 @@ CPU_GET_INFO( mc68hc11 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "MC68HC11");            break;
+		case CPUINFO_STR_SHORTNAME:                          strcpy(info->s, "mc68hc11");            break;
 		case CPUINFO_STR_FAMILY:                    strcpy(info->s, "Motorola MC68HC11");   break;
 		case CPUINFO_STR_VERSION:                   strcpy(info->s, "1.0");                 break;
 		case CPUINFO_STR_SOURCE_FILE:                       strcpy(info->s, __FILE__);              break;

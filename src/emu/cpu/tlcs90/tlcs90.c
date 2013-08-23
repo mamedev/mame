@@ -2856,6 +2856,7 @@ CPU_GET_INFO( tmp90840 )
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 
 		case CPUINFO_STR_NAME:              strcpy(info->s, "TMP90840");            break;
+		case CPUINFO_STR_SHORTNAME:         strcpy(info->s, "tmp90840");            break;
 		case CPUINFO_STR_FAMILY:        strcpy(info->s, "Toshiba TLCS-90"); break;
 		case CPUINFO_STR_VERSION:       strcpy(info->s, "1.0");             break;
 		case CPUINFO_STR_SOURCE_FILE:           strcpy(info->s, __FILE__);          break;
@@ -2902,6 +2903,7 @@ CPU_GET_INFO( tmp90841 )
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 
 		case CPUINFO_STR_NAME:              strcpy(info->s, "TMP90841");            return;
+		case CPUINFO_STR_SHORTNAME:         strcpy(info->s, "tmp90841");            return;
 	}
 
 	CPU_GET_INFO_CALL(tmp90840);
@@ -2918,6 +2920,7 @@ CPU_GET_INFO( tmp91640 )
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 
 		case CPUINFO_STR_NAME:              strcpy(info->s, "TMP91640");            return;
+		case CPUINFO_STR_SHORTNAME:         strcpy(info->s, "tmp91640");            return;
 	}
 
 	CPU_GET_INFO_CALL(tmp90840);
@@ -2934,6 +2937,7 @@ CPU_GET_INFO( tmp91641 )
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 
 		case CPUINFO_STR_NAME:              strcpy(info->s, "TMP91641");            return;
+		case CPUINFO_STR_SHORTNAME:         strcpy(info->s, "tmp91641");            return;
 	}
 
 	CPU_GET_INFO_CALL(tmp90840);

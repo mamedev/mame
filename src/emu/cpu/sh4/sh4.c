@@ -3561,6 +3561,7 @@ CPU_GET_INFO( sh4 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                      strcpy(info->s, "SH-4");                break;
+		case CPUINFO_STR_SHORTNAME:                 strcpy(info->s, "sh4");                break;
 		case CPUINFO_STR_FAMILY:                    strcpy(info->s, "Hitachi SH7750");      break;
 		case CPUINFO_STR_VERSION:                   strcpy(info->s, "1.0");             break;
 		case CPUINFO_STR_SOURCE_FILE:                   strcpy(info->s, __FILE__);              break;

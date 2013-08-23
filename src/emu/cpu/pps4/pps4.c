@@ -436,6 +436,7 @@ CPU_GET_INFO( pps4 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                      strcpy(info->s, "PPS4");                break;
+		case CPUINFO_STR_SHORTNAME:                 strcpy(info->s, "pps4");                break;
 		case CPUINFO_STR_FAMILY:                    strcpy(info->s, "Rockwell PPS-4");          break;
 		case CPUINFO_STR_VERSION:                   strcpy(info->s, "1.0");                 break;
 		case CPUINFO_STR_SOURCE_FILE:               strcpy(info->s, __FILE__);              break;

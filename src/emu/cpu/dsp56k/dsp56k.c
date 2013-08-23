@@ -598,6 +598,7 @@ CPU_GET_INFO( dsp56k )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "DSP56156");            break;
+		case CPUINFO_STR_SHORTNAME:                          strcpy(info->s, "dsp56156");            break;
 		case CPUINFO_STR_FAMILY:                        strcpy(info->s, "Motorola DSP56156");   break;
 		case CPUINFO_STR_VERSION:                       strcpy(info->s, "0.1");                 break;
 		case CPUINFO_STR_SOURCE_FILE:                   strcpy(info->s, __FILE__);              break;

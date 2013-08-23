@@ -2355,6 +2355,7 @@ CPU_GET_INFO( vr4300be )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "VR4300 (big)");            break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "vr4300be");            break;
 
 		/* --- everything else is handled generically --- */
 		default:                                        CPU_GET_INFO_CALL(mips3);           break;
@@ -2373,6 +2374,7 @@ CPU_GET_INFO( vr4300le )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "VR4300 (little)");     break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "vr4300le");            break;
 
 		/* --- everything else is handled generically --- */
 		default:                                        CPU_GET_INFO_CALL(mips3);           break;
@@ -2392,6 +2394,7 @@ CPU_GET_INFO( vr4310be )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "VR4310 (big)");            break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "vr4310be");            break;
 
 		/* --- everything else is handled generically --- */
 		default:                                        CPU_GET_INFO_CALL(mips3);           break;
@@ -2410,6 +2413,7 @@ CPU_GET_INFO( vr4310le )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "VR4310 (little)");     break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "vr4310le");            break;
 
 		/* --- everything else is handled generically --- */
 		default:                                        CPU_GET_INFO_CALL(mips3);           break;
@@ -2445,6 +2449,7 @@ CPU_GET_INFO( r4600be )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "R4600 (big)");         break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "r4600be");            break;
 
 		/* --- everything else is handled generically --- */
 		default:                                        CPU_GET_INFO_CALL(mips3);           break;
@@ -2463,6 +2468,7 @@ CPU_GET_INFO( r4600le )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "R4600 (little)");      break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "r4600le");            break;
 
 		/* --- everything else is handled generically --- */
 		default:                                        CPU_GET_INFO_CALL(mips3);           break;
@@ -2499,6 +2505,7 @@ CPU_GET_INFO( r4650be )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "IDT R4650 (big)");     break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "r4650be");            break;
 
 		/* --- everything else is handled generically --- */
 		default:                                        CPU_GET_INFO_CALL(mips3);           break;
@@ -2517,6 +2524,7 @@ CPU_GET_INFO( r4650le )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "IDT R4650 (little)");  break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "r4650le");            break;
 
 		/* --- everything else is handled generically --- */
 		default:                                        CPU_GET_INFO_CALL(mips3);           break;
@@ -2553,6 +2561,7 @@ CPU_GET_INFO( r4700be )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "R4700 (big)");         break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "r4700be");            break;
 
 		/* --- everything else is handled generically --- */
 		default:                                        CPU_GET_INFO_CALL(mips3);           break;
@@ -2572,6 +2581,7 @@ CPU_GET_INFO( r4700le )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "R4700 (little)");      break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "r4700le");            break;
 
 		/* --- everything else is handled generically --- */
 		default:                                        CPU_GET_INFO_CALL(mips3);           break;
@@ -2608,6 +2618,7 @@ CPU_GET_INFO( r5000be )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "R5000 (big)");         break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "r5000be");            break;
 
 		/* --- everything else is handled generically --- */
 		default:                                        CPU_GET_INFO_CALL(mips3);           break;
@@ -2626,6 +2637,7 @@ CPU_GET_INFO( r5000le )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "R5000 (little)");      break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "r5000le");            break;
 
 		/* --- everything else is handled generically --- */
 		default:                                        CPU_GET_INFO_CALL(mips3);           break;
@@ -2662,6 +2674,7 @@ CPU_GET_INFO( qed5271be )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "QED5271 (big)");       break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "qed5271be");            break;
 
 		/* --- everything else is handled generically --- */
 		default:                                        CPU_GET_INFO_CALL(mips3);           break;
@@ -2680,6 +2693,7 @@ CPU_GET_INFO( qed5271le )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "QED5271 (little)");    break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "qed5271le");            break;
 
 		/* --- everything else is handled generically --- */
 		default:                                        CPU_GET_INFO_CALL(mips3);           break;
@@ -2716,6 +2730,7 @@ CPU_GET_INFO( rm7000be )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "RM7000 (big)");        break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "rm7000be");            break;
 
 		/* --- everything else is handled generically --- */
 		default:                                        CPU_GET_INFO_CALL(mips3);           break;
@@ -2734,6 +2749,7 @@ CPU_GET_INFO( rm7000le )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "RM7000 (little)");     break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "rm7000le");            break;
 
 		/* --- everything else is handled generically --- */
 		default:                                        CPU_GET_INFO_CALL(mips3);           break;

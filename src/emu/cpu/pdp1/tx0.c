@@ -504,6 +504,7 @@ CPU_GET_INFO( tx0_64kw )
 
 	/* --- the following bits of info are returned as NULL-terminated strings --- */
 	case CPUINFO_STR_NAME:                          strcpy(info->s, "TX-0");                        break;
+	case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "tx0_64kw_cpu");                        break;
 	case CPUINFO_STR_FAMILY:                    strcpy(info->s, "TX-0");                        break;
 	case CPUINFO_STR_VERSION:                   strcpy(info->s, "1.0");                         break;
 	case CPUINFO_STR_SOURCE_FILE:                       strcpy(info->s, __FILE__);                      break;
@@ -631,6 +632,7 @@ CPU_GET_INFO( tx0_8kw )
 
 	/* --- the following bits of info are returned as NULL-terminated strings --- */
 	case CPUINFO_STR_NAME:                          strcpy(info->s, "TX-0");    break;
+	case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "tx0_8kw_cpu");                        break;
 	case CPUINFO_STR_FAMILY:                    strcpy(info->s, "TX-0");    break;
 	case CPUINFO_STR_VERSION:                   strcpy(info->s, "1.0"); break;
 	case CPUINFO_STR_SOURCE_FILE:                       strcpy(info->s, __FILE__);  break;

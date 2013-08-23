@@ -1897,6 +1897,7 @@ CPU_GET_INFO( se3208 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "SE3208");              break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "se3208");              break;
 		case CPUINFO_STR_FAMILY:                    strcpy(info->s, "Advanced Digital Chips Inc."); break;
 		case CPUINFO_STR_VERSION:                   strcpy(info->s, "1.00");                break;
 		case CPUINFO_STR_SOURCE_FILE:                       strcpy(info->s, __FILE__);              break;

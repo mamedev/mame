@@ -1112,9 +1112,13 @@ void validity_checker::validate_devices()
 		if (device_map.add(device->tag(), 0, false) == TMERR_DUPLICATE)
 			mame_printf_error("Multiple devices with the same tag '%s' defined\n", device->tag());
 
-		// if we have a ROM region, we must have a shortname
-		if (device->rom_region() != NULL && strcmp(device->shortname(), "") == 0)
-			mame_printf_error("Device has ROM definition but does not have short name defined\n");
+		// all devices must have a shortname
+		if (strcmp(device->shortname(), "") == 0)
+			mame_printf_error("Device does not have short name defined\n");
+
+		// all devices must have a source file defined
+		if (strcmp(device->source(), "") == 0)
+			mame_printf_error("Device does not have source file location defined\n");
 
 		// check for device-specific validity check
 		device->validity_check(*this);

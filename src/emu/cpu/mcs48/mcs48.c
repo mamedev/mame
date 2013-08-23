@@ -1416,7 +1416,7 @@ static CPU_GET_INFO( mcs48 )
     CPU-SPECIFIC CONTEXT ACCESS
 ***************************************************************************/
 
-static void mcs48_generic_get_info(legacy_cpu_device *device, UINT32 state, cpuinfo *info, UINT8 features, int romsize, int ramsize, int cycle_states, const char *name)
+static void mcs48_generic_get_info(legacy_cpu_device *device, UINT32 state, cpuinfo *info, UINT8 features, int romsize, int ramsize, int cycle_states, const char *name, const char *shortname)
 {
 	switch (state)
 	{
@@ -1487,6 +1487,10 @@ static void mcs48_generic_get_info(legacy_cpu_device *device, UINT32 state, cpui
 			strcpy(info->s, name);
 			break;
 
+		case CPUINFO_STR_SHORTNAME:
+			strcpy(info->s, shortname);
+			break;
+
 		/* default case */
 		default:
 			CPU_GET_INFO_CALL(mcs48);
@@ -1496,31 +1500,31 @@ static void mcs48_generic_get_info(legacy_cpu_device *device, UINT32 state, cpui
 
 
 /* Official Intel MCS-48 parts */
-CPU_GET_INFO( i8021 )  { mcs48_generic_get_info(device, state, info, MCS48_FEATURE, 1024,  64, 10, "I8021"); }
-CPU_GET_INFO( i8022 )  { mcs48_generic_get_info(device, state, info, MCS48_FEATURE, 2048, 128, 10, "I8022"); }
-CPU_GET_INFO( i8035 )  { mcs48_generic_get_info(device, state, info, MCS48_FEATURE,    0,  64,  5, "I8035"); }
-CPU_GET_INFO( i8048 )  { mcs48_generic_get_info(device, state, info, MCS48_FEATURE, 1024,  64,  5, "I8048"); }
-CPU_GET_INFO( i8648 )  { mcs48_generic_get_info(device, state, info, MCS48_FEATURE, 1024,  64,  5, "I8648"); }
-CPU_GET_INFO( i8748 )  { mcs48_generic_get_info(device, state, info, MCS48_FEATURE, 1024,  64,  5, "I8748"); }
-CPU_GET_INFO( i8039 )  { mcs48_generic_get_info(device, state, info, MCS48_FEATURE,    0, 128,  5, "I8039"); }
-CPU_GET_INFO( i8049 )  { mcs48_generic_get_info(device, state, info, MCS48_FEATURE, 2048, 128,  5, "I8049"); }
-CPU_GET_INFO( i8749 )  { mcs48_generic_get_info(device, state, info, MCS48_FEATURE, 2048, 128,  5, "I8749"); }
-CPU_GET_INFO( i8040 )  { mcs48_generic_get_info(device, state, info, MCS48_FEATURE,    0, 256,  5, "I8040"); }
-CPU_GET_INFO( i8050 )  { mcs48_generic_get_info(device, state, info, MCS48_FEATURE, 4096, 256,  5, "I8050"); }
-
-
-/* Official Intel UPI-41 parts */
-CPU_GET_INFO( i8041 )  { mcs48_generic_get_info(device, state, info, UPI41_FEATURE, 1024, 128,  5, "I8041"); }
-CPU_GET_INFO( i8741 )  { mcs48_generic_get_info(device, state, info, UPI41_FEATURE, 1024, 128,  5, "I8741"); }
-CPU_GET_INFO( i8042 )  { mcs48_generic_get_info(device, state, info, UPI41_FEATURE, 2048, 256,  5, "I8042"); }
-CPU_GET_INFO( i8242 )  { mcs48_generic_get_info(device, state, info, UPI41_FEATURE, 2048, 256,  5, "I8242"); }
-CPU_GET_INFO( i8742 )  { mcs48_generic_get_info(device, state, info, UPI41_FEATURE, 2048, 256,  5, "I8742"); }
-
-
-/* Clones */
-CPU_GET_INFO( mb8884 ) { mcs48_generic_get_info(device, state, info, MCS48_FEATURE,    0,  64,  5, "MB8884"); }
-CPU_GET_INFO( n7751 )  { mcs48_generic_get_info(device, state, info, MCS48_FEATURE, 1024,  64,  5, "N7751"); }
-CPU_GET_INFO( m58715 ) { mcs48_generic_get_info(device, state, info, MCS48_FEATURE, 2048, 128,  5, "M58715"); }
+CPU_GET_INFO( i8021 )  { mcs48_generic_get_info(device, state, info, MCS48_FEATURE, 1024,  64, 10, "I8021", "i8021"); }
+CPU_GET_INFO( i8022 )  { mcs48_generic_get_info(device, state, info, MCS48_FEATURE, 2048, 128, 10, "I8022", "i8022"); }
+CPU_GET_INFO( i8035 )  { mcs48_generic_get_info(device, state, info, MCS48_FEATURE,    0,  64,  5, "I8035", "i8035"); }
+CPU_GET_INFO( i8048 )  { mcs48_generic_get_info(device, state, info, MCS48_FEATURE, 1024,  64,  5, "I8048", "i8048"); }
+CPU_GET_INFO( i8648 )  { mcs48_generic_get_info(device, state, info, MCS48_FEATURE, 1024,  64,  5, "I8648", "i8648"); }
+CPU_GET_INFO( i8748 )  { mcs48_generic_get_info(device, state, info, MCS48_FEATURE, 1024,  64,  5, "I8748", "i8748"); }
+CPU_GET_INFO( i8039 )  { mcs48_generic_get_info(device, state, info, MCS48_FEATURE,    0, 128,  5, "I8039", "i8039"); }
+CPU_GET_INFO( i8049 )  { mcs48_generic_get_info(device, state, info, MCS48_FEATURE, 2048, 128,  5, "I8049", "i8049"); }
+CPU_GET_INFO( i8749 )  { mcs48_generic_get_info(device, state, info, MCS48_FEATURE, 2048, 128,  5, "I8749", "i8749"); }
+CPU_GET_INFO( i8040 )  { mcs48_generic_get_info(device, state, info, MCS48_FEATURE,    0, 256,  5, "I8040", "i8040"); }
+CPU_GET_INFO( i8050 )  { mcs48_generic_get_info(device, state, info, MCS48_FEATURE, 4096, 256,  5, "I8050", "i8050"); }
+                                                                                                          
+                                                                                                          
+/* Official Intel UPI-41 parts */                                                                         
+CPU_GET_INFO( i8041 )  { mcs48_generic_get_info(device, state, info, UPI41_FEATURE, 1024, 128,  5, "I8041", "i8041"); }
+CPU_GET_INFO( i8741 )  { mcs48_generic_get_info(device, state, info, UPI41_FEATURE, 1024, 128,  5, "I8741", "i8741"); }
+CPU_GET_INFO( i8042 )  { mcs48_generic_get_info(device, state, info, UPI41_FEATURE, 2048, 256,  5, "I8042", "i8042"); }
+CPU_GET_INFO( i8242 )  { mcs48_generic_get_info(device, state, info, UPI41_FEATURE, 2048, 256,  5, "I8242", "i8242"); }
+CPU_GET_INFO( i8742 )  { mcs48_generic_get_info(device, state, info, UPI41_FEATURE, 2048, 256,  5, "I8742", "i8742"); }
+                                                                                                          
+                                                                                                          
+/* Clones */                                                                                              
+CPU_GET_INFO( mb8884 ) { mcs48_generic_get_info(device, state, info, MCS48_FEATURE,    0,  64,  5, "MB8884", "mb8884"); }
+CPU_GET_INFO( n7751 )  { mcs48_generic_get_info(device, state, info, MCS48_FEATURE, 1024,  64,  5, "N7751", "n7751"); }
+CPU_GET_INFO( m58715 ) { mcs48_generic_get_info(device, state, info, MCS48_FEATURE, 2048, 128,  5, "M58715", "m58715"); }
 
 /* Official Intel MCS-48 parts */
 DEFINE_LEGACY_CPU_DEVICE(I8021, i8021);         /* 1k internal ROM,      64 bytes internal RAM */

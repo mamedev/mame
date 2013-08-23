@@ -785,6 +785,7 @@ CPU_GET_INFO( h8_3334 )
 
 		// CPU misc parameters
 	case CPUINFO_STR_NAME:                  strcpy(info->s, "H8/3334");                     break;
+	case CPUINFO_STR_SHORTNAME:             strcpy(info->s, "h8_3334");                     break;
 	case CPUINFO_STR_SOURCE_FILE:               strcpy(info->s, __FILE__);                      break;
 	case CPUINFO_STR_FLAGS:                 strcpy(info->s, h8_get_ccr_str(h8));                break;
 	case CPUINFO_INT_ENDIANNESS:                info->i = ENDIANNESS_BIG;                           break;

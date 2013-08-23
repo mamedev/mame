@@ -1603,6 +1603,7 @@ CPU_GET_INFO( s2650 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "S2650");               break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "s2650");               break;
 		case CPUINFO_STR_FAMILY:                    strcpy(info->s, "Signetics 2650");      break;
 		case CPUINFO_STR_VERSION:                   strcpy(info->s, "1.2");                 break;
 		case CPUINFO_STR_SOURCE_FILE:                       strcpy(info->s, __FILE__);              break;

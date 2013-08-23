@@ -1263,6 +1263,7 @@ CPU_GET_INFO( adsp21062 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "ADSP21062");           break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "adsp21062");           break;
 
 		default:                                        CPU_GET_INFO_CALL(sharc);               break;
 	}

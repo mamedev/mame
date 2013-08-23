@@ -1027,6 +1027,7 @@ CPU_GET_INFO( pdp1 )
 
 	/* --- the following bits of info are returned as NULL-terminated strings --- */
 	case CPUINFO_STR_NAME:                          strcpy(info->s, "PDP1");    break;
+	case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "pdp1_cpu");    break;
 	case CPUINFO_STR_FAMILY:                    strcpy(info->s, "DEC PDP-1");   break;
 	case CPUINFO_STR_VERSION:                   strcpy(info->s, "2.0"); break;
 	case CPUINFO_STR_SOURCE_FILE:                       strcpy(info->s, __FILE__);  break;

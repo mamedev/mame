@@ -863,6 +863,7 @@ static CPU_GET_INFO( z8 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "Z8");                  break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "z8");                  break;
 		case CPUINFO_STR_FAMILY:                        strcpy(info->s, "Zilog Z8");            break;
 		case CPUINFO_STR_VERSION:                       strcpy(info->s, "1.0");                 break;
 		case CPUINFO_STR_SOURCE_FILE:                   strcpy(info->s, __FILE__);              break;
@@ -883,6 +884,7 @@ CPU_GET_INFO( z8601 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "Z8601");                               break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "z8601");                               break;
 
 		default:                                        CPU_GET_INFO_CALL(z8);                                  break;
 	}
@@ -897,6 +899,7 @@ CPU_GET_INFO( ub8830d )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "UB8830D");                             break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "ub8830d");                             break;
 
 		default:                                        CPU_GET_INFO_CALL(z8);                                  break;
 	}
@@ -911,6 +914,7 @@ CPU_GET_INFO( z8611 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "Z8611");                               break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "z8611");                               break;
 
 		default:                                        CPU_GET_INFO_CALL(z8);                                  break;
 	}

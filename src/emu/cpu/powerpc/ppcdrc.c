@@ -4466,6 +4466,7 @@ CPU_GET_INFO( ppc403ga )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "PowerPC 403GA");       break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "ppc403ga");       break;
 
 		/* --- everything else is handled generically --- */
 		default:                                        CPU_GET_INFO_CALL(ppcdrc4xx);       break;
@@ -4501,6 +4502,7 @@ CPU_GET_INFO( ppc403gcx )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "PowerPC 403GCX");      break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "ppc403gcx");       break;
 
 		/* --- everything else is handled generically --- */
 		default:                                        CPU_GET_INFO_CALL(ppcdrc4xx);       break;
@@ -4537,6 +4539,7 @@ CPU_GET_INFO( ppc405gp )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "PowerPC 405GP");       break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "ppc405gp");       break;
 
 		/* --- everything else is handled generically --- */
 		default:                                        CPU_GET_INFO_CALL(ppcdrc4xx);       break;
@@ -4575,6 +4578,7 @@ CPU_GET_INFO( ppc601 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "PowerPC 601");         break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "ppc601");       break;
 
 		/* --- everything else is handled generically --- */
 		default:                                        CPU_GET_INFO_CALL(ppcdrc);          break;
@@ -4609,6 +4613,7 @@ CPU_GET_INFO( ppc602 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "PowerPC 602");         break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "ppc602");       break;
 
 		/* --- everything else is handled generically --- */
 		default:                                        CPU_GET_INFO_CALL(ppcdrc);          break;
@@ -4643,6 +4648,7 @@ CPU_GET_INFO( ppc603 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "PowerPC 603");         break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "ppc603");       break;
 
 		/* --- everything else is handled generically --- */
 		default:                                        CPU_GET_INFO_CALL(ppcdrc);          break;
@@ -4677,6 +4683,7 @@ CPU_GET_INFO( ppc603e )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "PowerPC 603e");        break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "ppc603e");       break;
 
 		/* --- everything else is handled generically --- */
 		default:                                        CPU_GET_INFO_CALL(ppcdrc);          break;
@@ -4711,6 +4718,7 @@ CPU_GET_INFO( ppc603r )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "PowerPC 603R");        break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "ppc603r");       break;
 
 		/* --- everything else is handled generically --- */
 		default:                                        CPU_GET_INFO_CALL(ppcdrc);          break;
@@ -4745,6 +4753,7 @@ CPU_GET_INFO( ppc604 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "PowerPC 604");         break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "ppc604");       break;
 
 		/* --- everything else is handled generically --- */
 		default:                                        CPU_GET_INFO_CALL(ppcdrc);          break;
@@ -4784,6 +4793,7 @@ CPU_GET_INFO( mpc8240 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "PowerPC MPC8240");     break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "mpc8240");       break;
 
 		/* --- everything else is handled generically --- */
 		default:                                        CPU_GET_INFO_CALL(ppcdrc);          break;

@@ -2347,6 +2347,7 @@ CPU_GET_INFO( tms32025 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "TMS32025");            break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "tms32025");            break;
 		case CPUINFO_STR_FAMILY:                    strcpy(info->s, "Texas Instruments TMS320x25"); break;
 		case CPUINFO_STR_VERSION:                   strcpy(info->s, "1.10");                break;
 		case CPUINFO_STR_SOURCE_FILE:                       strcpy(info->s, __FILE__);              break;

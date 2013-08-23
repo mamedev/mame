@@ -631,6 +631,7 @@ CPU_GET_INFO( v20 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "V20");                 break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "v20");                 break;
 
 		default:                                        CPU_GET_INFO_CALL(nec);             break;
 	}
@@ -650,6 +651,7 @@ CPU_GET_INFO( v30 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "V30");                 break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "v30");                 break;
 
 		default:                                        CPU_GET_INFO_CALL(nec);             break;
 	}
@@ -669,6 +671,7 @@ CPU_GET_INFO( v33 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "V33");                 break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "v33");                 break;
 
 		default:                                        CPU_GET_INFO_CALL(nec);             break;
 	}

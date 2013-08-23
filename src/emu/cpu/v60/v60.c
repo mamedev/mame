@@ -667,6 +667,7 @@ CPU_GET_INFO( v60 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "V60");                 break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "v60");                 break;
 		case CPUINFO_STR_FAMILY:                    strcpy(info->s, "NEC V60");             break;
 		case CPUINFO_STR_VERSION:                   strcpy(info->s, "1.0");                 break;
 		case CPUINFO_STR_SOURCE_FILE:                       strcpy(info->s, __FILE__);              break;
@@ -755,6 +756,7 @@ CPU_GET_INFO( v70 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "V70");                 break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "v70");                 break;
 
 		default:                                        CPU_GET_INFO_CALL(v60);                 break;
 	}

@@ -1790,6 +1790,7 @@ CPU_GET_INFO( tms34010 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "TMS34010");        break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "tms34010");        break;
 		case CPUINFO_STR_FAMILY:                    strcpy(info->s, "Texas Instruments 340x0"); break;
 		case CPUINFO_STR_VERSION:                   strcpy(info->s, "1.0");             break;
 		case CPUINFO_STR_SOURCE_FILE:                       strcpy(info->s, __FILE__);          break;
@@ -1815,6 +1816,7 @@ CPU_GET_INFO( tms34020 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "TMS34020");        break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "tms34020");        break;
 
 		default:                                        CPU_GET_INFO_CALL(tms34010);        break;
 	}

@@ -1027,6 +1027,7 @@ CPU_GET_INFO( tms32010 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "TMS32010");                    break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "tms32010");                    break;
 		case CPUINFO_STR_FAMILY:                        strcpy(info->s, "Texas Instruments TMS32010");  break;
 		case CPUINFO_STR_VERSION:                       strcpy(info->s, "1.31");                        break;
 		case CPUINFO_STR_SOURCE_FILE:                   strcpy(info->s, __FILE__);                      break;
@@ -1091,6 +1092,7 @@ CPU_GET_INFO( tms32015 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "TMS32015");    break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "tms32015");    break;
 
 		default:                                        CPU_GET_INFO_CALL(tms32010);    break;
 	}
@@ -1125,6 +1127,7 @@ CPU_GET_INFO( tms32016 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "TMS32016");    break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "tms32016");    break;
 
 		default:                                        CPU_GET_INFO_CALL(tms32010);    break;
 	}

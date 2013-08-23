@@ -813,6 +813,7 @@ CPU_GET_INFO( z8002 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "Z8002");                       break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "z8002");                       break;
 		case CPUINFO_STR_FAMILY:                    strcpy(info->s, "Zilog Z8000");                 break;
 		case CPUINFO_STR_VERSION:                   strcpy(info->s, "1.1");                         break;
 		case CPUINFO_STR_SOURCE_FILE:                       strcpy(info->s, __FILE__);                      break;
@@ -888,6 +889,7 @@ CPU_GET_INFO( z8001 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "Zilog Z8001");         break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "z8001");         break;
 
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:         info->i = 2;                            break;
 		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:         info->i = 8;                            break;

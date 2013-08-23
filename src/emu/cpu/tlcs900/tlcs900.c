@@ -1280,6 +1280,7 @@ CPU_GET_INFO( tlcs900h )
 	case CPUINFO_STR_REGISTER + TLCS900_DMAM3:      sprintf( info->s, "DMAM0:%02x", cpustate->dmam[3].b.l ); break;
 
 	case CPUINFO_STR_NAME:                          strcpy( info->s, "TLCS-900/H" ); break;
+	case CPUINFO_STR_SHORTNAME:                      strcpy( info->s, "tlcs900h" ); break;
 	case CPUINFO_STR_FAMILY:                    strcpy( info->s, "Toshiba TLCS-900" ); break;
 	case CPUINFO_STR_VERSION:                   strcpy( info->s, "0.1" ); break;
 	case CPUINFO_STR_SOURCE_FILE:                       strcpy( info->s, __FILE__ ); break;
@@ -2158,6 +2159,7 @@ CPU_GET_INFO( tmp95c063 )
 	case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM:  info->internal_map8 = ADDRESS_MAP_NAME(tmp95c063_mem); break;
 
 	case CPUINFO_STR_NAME:                          strcpy( info->s, "TMP95C063" ); break;
+	case CPUINFO_STR_SHORTNAME:                     strcpy( info->s, "tmp95c063" ); break;
 
 	default:                                        CPU_GET_INFO_CALL(tlcs900h); break;
 	}

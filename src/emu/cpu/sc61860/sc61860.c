@@ -236,6 +236,7 @@ CPU_GET_INFO( sc61860 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "SC61860"); break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "sc61860"); break;
 		case CPUINFO_STR_FAMILY:                    strcpy(info->s, "SC61860"); break;
 		case CPUINFO_STR_VERSION:                   strcpy(info->s, "1.0beta"); break;
 		case CPUINFO_STR_SOURCE_FILE:                       strcpy(info->s, __FILE__); break;

@@ -3897,6 +3897,7 @@ CPU_GET_INFO( z80 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "Z80");                 break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "z80");                 break;
 		case CPUINFO_STR_FAMILY:                        strcpy(info->s, "Zilog Z80");           break;
 		case CPUINFO_STR_VERSION:                       strcpy(info->s, "3.9");                 break;
 		case CPUINFO_STR_SOURCE_FILE:                   strcpy(info->s, __FILE__);              break;
@@ -3921,6 +3922,7 @@ CPU_GET_INFO( nsc800 )
 		case CPUINFO_FCT_EXECUTE:                       info->execute = CPU_EXECUTE_NAME(nsc800);       break;
 
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "NSC800");                      break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "nsc800");                      break;
 
 		default:                                        CPU_GET_INFO_CALL(z80);                         break;
 	}

@@ -74,7 +74,7 @@ cpu_device::~cpu_device()
 //-------------------------------------------------
 
 legacy_cpu_device::legacy_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, cpu_get_info_func get_info)
-	: cpu_device(mconfig, type, "CPU", tag, owner, clock, "", __FILE__),
+	: cpu_device(mconfig, type, "CPU", tag, owner, clock, "", ""),
 		m_get_info(get_info),
 		m_token(NULL),
 		m_set_info(reinterpret_cast<cpu_set_info_func>(get_legacy_fct(CPUINFO_FCT_SET_INFO))),
@@ -112,6 +112,7 @@ legacy_cpu_device::legacy_cpu_device(const machine_config &mconfig, device_type 
 	// set the real name
 	m_name = get_legacy_string(CPUINFO_STR_NAME);
 	m_shortname = get_legacy_string(CPUINFO_STR_SHORTNAME);
+	m_source = get_legacy_string(CPUINFO_STR_SOURCE_FILE);
 	m_searchpath = m_shortname;
 
 	int tokenbytes = get_legacy_int(CPUINFO_INT_CONTEXT_SIZE);

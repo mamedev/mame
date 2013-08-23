@@ -1049,6 +1049,7 @@ static CPU_GET_INFO( pic16c5x )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "PIC16C5x");                    break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "pic16c5x");                    break;
 		case CPUINFO_STR_FAMILY:                        strcpy(info->s, "Microchip");                   break;
 		case CPUINFO_STR_VERSION:                       strcpy(info->s, "1.14");                        break;
 		case CPUINFO_STR_SOURCE_FILE:                   strcpy(info->s, __FILE__);                      break;
@@ -1143,6 +1144,7 @@ CPU_GET_INFO( pic16c54 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "PIC16C54");            break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "pic16c54");            break;
 
 		default:                                        CPU_GET_INFO_CALL(pic16c5x);            break;
 	}
@@ -1201,6 +1203,7 @@ CPU_GET_INFO( pic16c55 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "PIC16C55");            break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "pic16c55");            break;
 
 		default:                                        CPU_GET_INFO_CALL(pic16c5x);            break;
 	}
@@ -1259,6 +1262,7 @@ CPU_GET_INFO( pic16c56 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "PIC16C56");            break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "pic16c56");            break;
 
 		default:                                        CPU_GET_INFO_CALL(pic16c5x);            break;
 	}
@@ -1319,6 +1323,7 @@ CPU_GET_INFO( pic16c57 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "PIC16C57");            break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "pic16c57");            break;
 
 		default:                                        CPU_GET_INFO_CALL(pic16c5x);            break;
 	}
@@ -1379,6 +1384,7 @@ CPU_GET_INFO( pic16c58 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "PIC16C58");            break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "pic16c58");            break;
 
 		default:                                        CPU_GET_INFO_CALL(pic16c5x);            break;
 	}

@@ -93,18 +93,21 @@ Other references can be found on spies.com:
 	#define TMS99XX_PREFIX ti990_10
 	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( ti990_10l )
 	#define TMS99XX_device_get_name "TI990/10L"
+	#define TMS99XX_device_get_shortname "ti990_10l"
 
 #elif (TMS99XX_MODEL == TMS9900_ID)
 
 	#define TMS99XX_PREFIX tms9900
 	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms9900l )
 	#define TMS99XX_device_get_name "TMS9900L"
+	#define TMS99XX_device_get_shortname "tms9900l"
 
 #elif (TMS99XX_MODEL == TMS9940_ID)
 
 	#define TMS99XX_PREFIX tms9940
 	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms9940l )
 	#define TMS99XX_device_get_name "TMS9940L"
+	#define TMS99XX_device_get_shortname "tms9940l"
 
 	#error "tms9940 is not yet supported"
 
@@ -113,12 +116,14 @@ Other references can be found on spies.com:
 	#define TMS99XX_PREFIX tms9980a
 	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms9980al )
 	#define TMS99XX_device_get_name "TMS9980AL/TMS9981L"
+	#define TMS99XX_device_get_shortname "tms9980al"
 
 #elif (TMS99XX_MODEL == TMS9985_ID)
 
 	#define TMS99XX_PREFIX tms9985
 	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms9985l )
 	#define TMS99XX_device_get_name "TMS9985L"
+	#define TMS99XX_device_get_shortname "tms9985l"
 
 	#error "tms9985 is not yet supported"
 
@@ -127,6 +132,7 @@ Other references can be found on spies.com:
 	#define TMS99XX_PREFIX tms9989
 	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms9989l )
 	#define TMS99XX_device_get_name "TMS9989L"
+	#define TMS99XX_device_get_shortname "tms9989l"
 
 	#error "tms9989 is not yet supported"
 
@@ -135,12 +141,14 @@ Other references can be found on spies.com:
 	#define TMS99XX_PREFIX tms9995
 	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms9995l )
 	#define TMS99XX_device_get_name "TMS9995L"
+	#define TMS99XX_device_get_shortname "tms9995l"
 
 #elif (TMS99XX_MODEL == TMS99000_ID)
 
 	#define TMS99XX_PREFIX tms99000
 	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms99000l )
 	#define TMS99XX_device_get_name "TMS99000L"
+	#define TMS99XX_device_get_shortname "tms99000l"
 
 	#error "tms99000 is not yet supported"
 
@@ -149,6 +157,7 @@ Other references can be found on spies.com:
 	#define TMS99XX_PREFIX tms99105a
 	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms99105al )
 	#define TMS99XX_device_get_name "TMS99105AL"
+	#define TMS99XX_device_get_shortname "tms99105al"
 
 	#error "tms99105a is not yet supported"
 
@@ -157,6 +166,7 @@ Other references can be found on spies.com:
 	#define TMS99XX_PREFIX tms99110a
 	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms99110al )
 	#define TMS99XX_device_get_name "TMS99110AL"
+	#define TMS99XX_device_get_shortname "tms99110al"
 
 	#error "tms99110a is not yet supported"
 
@@ -4770,6 +4780,8 @@ void TMS99XX_GET_INFO(legacy_cpu_device *device, UINT32 state, cpuinfo *info)
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, TMS99XX_device_get_name);       break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, TMS99XX_device_get_shortname);       break;
+		
 		case CPUINFO_STR_FAMILY:                    strcpy(info->s, "Texas Instruments 9900L"); break;
 		case CPUINFO_STR_VERSION:                   strcpy(info->s, "2.0");                 break;
 		case CPUINFO_STR_SOURCE_FILE:                       strcpy(info->s, __FILE__);              break;

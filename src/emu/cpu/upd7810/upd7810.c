@@ -2183,6 +2183,7 @@ CPU_GET_INFO( upd7810 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "uPD7810");             break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "upd7810");             break;
 		case CPUINFO_STR_FAMILY:                    strcpy(info->s, "NEC uPD7810");         break;
 		case CPUINFO_STR_VERSION:                   strcpy(info->s, "0.3");                 break;
 		case CPUINFO_STR_SOURCE_FILE:                       strcpy(info->s, __FILE__);              break;
@@ -2268,6 +2269,7 @@ CPU_GET_INFO( upd7807 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "uPD7807");             break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "upd7807");             break;
 
 		default:                                        CPU_GET_INFO_CALL(upd7810);             break;
 	}
@@ -2279,6 +2281,7 @@ CPU_GET_INFO( upd7801 ) {
 		case CPUINFO_FCT_DISASSEMBLE:                   info->disassemble = CPU_DISASSEMBLE_NAME(upd7801);      break;
 
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "uPD7801");             break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "upd7801");             break;
 
 		default:                                        CPU_GET_INFO_CALL(upd7810);             break;
 	}
@@ -2292,6 +2295,7 @@ CPU_GET_INFO( upd78c05 ) {
 		case CPUINFO_FCT_DISASSEMBLE:                   info->disassemble = CPU_DISASSEMBLE_NAME(upd78c05);     break;
 
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "uPD78C05");            break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "upd78c05");            break;
 
 		/* These registers are not present in the uPD78C05 cpu */
 		case CPUINFO_STR_REGISTER + UPD7810_A2:
@@ -2336,6 +2340,7 @@ CPU_GET_INFO( upd78c06 ) {
 		case CPUINFO_FCT_RESET:                         info->reset = CPU_RESET_NAME(upd78c06);         break;
 
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "uPD78C06");            break;
+		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "upd78c06");            break;
 
 		default:                                        CPU_GET_INFO_CALL(upd78c05);                break;
 	}
