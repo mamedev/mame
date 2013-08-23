@@ -47,7 +47,7 @@ READ8_MEMBER(tnzs_state::mcu_tnzs_r)
 {
 	UINT8 data;
 
-	data = upi41_master_r(m_mcu, offset & 1);
+	data = m_mcu->upi41_master_r(space, offset & 1);
 	space.device().execute().yield();
 
 //  logerror("PC %04x: read %02x from mcu $c00%01x\n", space.device().safe_pcbase(), data, offset);
@@ -59,7 +59,7 @@ WRITE8_MEMBER(tnzs_state::mcu_tnzs_w)
 {
 //  logerror("PC %04x: write %02x to mcu $c00%01x\n", space.device().safe_pcbase(), data, offset);
 
-	upi41_master_w(m_mcu, offset & 1, data);
+	m_mcu->upi41_master_w(space, offset & 1, data);
 }
 
 

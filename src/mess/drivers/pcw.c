@@ -641,14 +641,14 @@ void pcw_state::pcw_printer_fire_pins(UINT16 pins)
 WRITE8_MEMBER(pcw_state::pcw_printer_data_w)
 {
 	m_printer_data = data;
-	upi41_master_w(machine().device("printer_mcu"),0,data);
+	machine().device<upi41_cpu_device>("printer_mcu")->upi41_master_w(space,0,data);
 	logerror("PRN [0xFC]: Sent command %02x\n",data);
 }
 
 WRITE8_MEMBER(pcw_state::pcw_printer_command_w)
 {
 	m_printer_command = data;
-	upi41_master_w(machine().device("printer_mcu"),1,data);
+	machine().device<upi41_cpu_device>("printer_mcu")->upi41_master_w(space,1,data);
 	logerror("PRN [0xFD]: Sent command %02x\n",data);
 }
 
@@ -661,7 +661,7 @@ WRITE8_MEMBER(pcw_state::pcw_printer_command_w)
 // anything else = no printer
 READ8_MEMBER(pcw_state::pcw_printer_data_r)
 {
-	return upi41_master_r(machine().device("printer_mcu"),0);
+	return machine().device<upi41_cpu_device>("printer_mcu")->upi41_master_r(space,0);
 }
 
 // printer status
@@ -675,7 +675,7 @@ READ8_MEMBER(pcw_state::pcw_printer_data_r)
 // bit 0 - controller fault
 READ8_MEMBER(pcw_state::pcw_printer_status_r)
 {
-	return upi41_master_r(machine().device("printer_mcu"),1);
+	return machine().device<upi41_cpu_device>("printer_mcu")->upi41_master_r(space,1);
 }
 
 /* MCU handlers */

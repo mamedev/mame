@@ -10,6 +10,7 @@
 #define __AT_KEYBC_H__
 
 #include "emu.h"
+#include "cpu/mcs48/mcs48.h"
 
 
 //**************************************************************************
@@ -76,7 +77,7 @@ protected:
 	virtual machine_config_constructor device_mconfig_additions() const;
 private:
 	// internal state
-	device_t *m_cpu;
+	upi41_cpu_device *m_cpu;
 
 	devcb_resolved_write_line   m_system_reset_func;
 	devcb_resolved_write_line   m_gate_a20_func;

@@ -108,7 +108,7 @@ void at_keyboard_controller_device::device_config_complete()
 void at_keyboard_controller_device::device_start()
 {
 	// find our cpu
-	m_cpu = downcast<device_t *>(subdevice("at_keybc"));
+	m_cpu = downcast<upi41_cpu_device *>(subdevice("at_keybc"));
 
 	// resolve callbacks
 	m_system_reset_func.resolve(m_system_reset_cb, *this);
@@ -199,22 +199,22 @@ WRITE8_MEMBER( at_keyboard_controller_device::p2_w )
 
 READ8_MEMBER( at_keyboard_controller_device::data_r )
 {
-	return upi41_master_r(m_cpu, 0);
+	return m_cpu->upi41_master_r(space, 0);
 }
 
 WRITE8_MEMBER( at_keyboard_controller_device::data_w )
 {
-	upi41_master_w(m_cpu, 0, data);
+	m_cpu->upi41_master_w(space, 0, data);
 }
 
 READ8_MEMBER( at_keyboard_controller_device::status_r )
 {
-	return upi41_master_r(m_cpu, 1);
+	return m_cpu->upi41_master_r(space, 1);
 }
 
 WRITE8_MEMBER( at_keyboard_controller_device::command_w )
 {
-	upi41_master_w(m_cpu, 1, data);
+	m_cpu->upi41_master_w(space, 1, data);
 }
 
 WRITE_LINE_MEMBER( at_keyboard_controller_device::keyboard_clock_w )

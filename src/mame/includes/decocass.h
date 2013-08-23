@@ -6,6 +6,7 @@
 #define LOG(n,x)  do { if (LOGLEVEL >= n) logerror x; } while (0)
 
 #include "machine/decocass_tape.h"
+#include "cpu/mcs48/mcs48.h"
 
 #define T1PROM 1
 #define T1DIRECT 2
@@ -35,7 +36,7 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	required_device<cpu_device> m_mcu;
+	required_device<upi41_cpu_device> m_mcu;
 	required_device<decocass_tape_device> m_cassette;
 
 	/* memory pointers */

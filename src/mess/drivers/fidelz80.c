@@ -976,22 +976,22 @@ WRITE8_MEMBER(fidelz80_state::digit_w)
 
 WRITE8_MEMBER(fidelz80_state::mcu_data_w)
 {
-	upi41_master_w(m_i8041, 0, data);
+	m_i8041->upi41_master_w(space, 0, data);
 }
 
 WRITE8_MEMBER(fidelz80_state::mcu_command_w)
 {
-	upi41_master_w(m_i8041, 1, data);
+	m_i8041->upi41_master_w(space, 1, data);
 }
 
 READ8_MEMBER(fidelz80_state::mcu_data_r)
 {
-	return upi41_master_r(m_i8041, 0);
+	return m_i8041->upi41_master_r(space, 0);
 }
 
 READ8_MEMBER(fidelz80_state::mcu_status_r)
 {
-	return upi41_master_r(m_i8041, 1);
+	return m_i8041->upi41_master_r(space, 1);
 }
 
 WRITE8_MEMBER( fidelz80_state::bridgec_speech_w )

@@ -249,7 +249,7 @@ READ8_MEMBER(decocass_state::decocass_type1_r)
 	if (1 == (offset & 1))
 	{
 		if (0 == (offset & E5XX_MASK))
-			data = upi41_master_r(m_mcu, 1);
+			data = m_mcu->upi41_master_r(space,1);
 		else
 			data = 0xff;
 
@@ -279,7 +279,7 @@ READ8_MEMBER(decocass_state::decocass_type1_r)
 		}
 
 		if (0 == (offset & E5XX_MASK))
-			data = upi41_master_r(m_mcu, 0);
+			data = m_mcu->upi41_master_r(space,0);
 		else
 			data = 0xff;
 
@@ -426,7 +426,7 @@ READ8_MEMBER(decocass_state::decocass_type2_r)
 	else
 	{
 		if (0 == (offset & E5XX_MASK))
-			data = upi41_master_r(m_mcu, offset);
+			data = m_mcu->upi41_master_r(space,offset);
 		else
 			data = offset & 0xff;
 
@@ -463,7 +463,7 @@ WRITE8_MEMBER(decocass_state::decocass_type2_w)
 			LOG(3,("PROM:%s D2:%d", m_type2_xx_latch ? "on" : "off", m_type2_d2_latch));
 		}
 	}
-	upi41_master_w(m_mcu, offset & 1, data);
+	m_mcu->upi41_master_w(space,offset & 1, data);
 
 #ifdef MAME_DEBUG
 	decocass_fno(offset, data);
@@ -506,7 +506,7 @@ READ8_MEMBER(decocass_state::decocass_type3_r)
 		{
 			if (0 == (offset & E5XX_MASK))
 			{
-				data = upi41_master_r(m_mcu, 1);
+				data = m_mcu->upi41_master_r(space,1);
 				LOG(4,("%10s 6502-PC: %04x decocass_type3_r(%02x): $%02x <- 8041 STATUS\n", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data));
 			}
 			else
@@ -527,7 +527,7 @@ READ8_MEMBER(decocass_state::decocass_type3_r)
 		{
 			if (0 == (offset & E5XX_MASK))
 			{
-				save = upi41_master_r(m_mcu, 0);
+				save = m_mcu->upi41_master_r(space,0);
 				switch (m_type3_swap)
 				{
 				case TYPE3_SWAP_01:
@@ -710,7 +710,7 @@ WRITE8_MEMBER(decocass_state::decocass_type3_w)
 		}
 	}
 	LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data, offset & 1 ? "8041-CMND" : "8041-DATA"));
-	upi41_master_w(m_mcu, offset, data);
+	m_mcu->upi41_master_w(space,offset, data);
 }
 
 /***************************************************************************
@@ -734,7 +734,7 @@ READ8_MEMBER(decocass_state::decocass_type4_r)
 	{
 		if (0 == (offset & E5XX_MASK))
 		{
-			data = upi41_master_r(m_mcu, 1);
+			data = m_mcu->upi41_master_r(space,1);
 			LOG(4,("%10s 6502-PC: %04x decocass_type4_r(%02x): $%02x <- 8041 STATUS\n", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data));
 		}
 		else
@@ -757,7 +757,7 @@ READ8_MEMBER(decocass_state::decocass_type4_r)
 		{
 			if (0 == (offset & E5XX_MASK))
 			{
-				data = upi41_master_r(m_mcu, 0);
+				data = m_mcu->upi41_master_r(space,0);
 				LOG(3,("%10s 6502-PC: %04x decocass_type4_r(%02x): $%02x '%c' <- open bus (D0 replaced with latch)\n", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data, (data >= 32) ? data : '.'));
 			}
 			else
@@ -797,7 +797,7 @@ WRITE8_MEMBER(decocass_state::decocass_type4_w)
 		}
 	}
 	LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data, offset & 1 ? "8041-CMND" : "8041-DATA"));
-	upi41_master_w(m_mcu, offset, data);
+	m_mcu->upi41_master_w(space,offset, data);
 }
 
 /***************************************************************************
@@ -817,7 +817,7 @@ READ8_MEMBER(decocass_state::decocass_type5_r)
 	{
 		if (0 == (offset & E5XX_MASK))
 		{
-			data = upi41_master_r(m_mcu, 1);
+			data = m_mcu->upi41_master_r(space,1);
 			LOG(4,("%10s 6502-PC: %04x decocass_type5_r(%02x): $%02x <- 8041 STATUS\n", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data));
 		}
 		else
@@ -837,7 +837,7 @@ READ8_MEMBER(decocass_state::decocass_type5_r)
 		{
 			if (0 == (offset & E5XX_MASK))
 			{
-				data = upi41_master_r(m_mcu, 0);
+				data = m_mcu->upi41_master_r(space,0);
 				LOG(3,("%10s 6502-PC: %04x decocass_type5_r(%02x): $%02x '%c' <- open bus (D0 replaced with latch)\n", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data, (data >= 32) ? data : '.'));
 			}
 			else
@@ -874,7 +874,7 @@ WRITE8_MEMBER(decocass_state::decocass_type5_w)
 		}
 	}
 	LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data, offset & 1 ? "8041-CMND" : "8041-DATA"));
-	upi41_master_w(m_mcu, offset, data);
+	m_mcu->upi41_master_w(space,offset, data);
 }
 
 /***************************************************************************
@@ -893,7 +893,7 @@ READ8_MEMBER(decocass_state::decocass_nodong_r)
 	{
 		if (0 == (offset & E5XX_MASK))
 		{
-			data = upi41_master_r(m_mcu, 1);
+			data = m_mcu->upi41_master_r(space,1);
 			LOG(4,("%10s 6502-PC: %04x decocass_nodong_r(%02x): $%02x <- 8041 STATUS\n", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data));
 		}
 		else
@@ -906,7 +906,7 @@ READ8_MEMBER(decocass_state::decocass_nodong_r)
 	{
 		if (0 == (offset & E5XX_MASK))
 		{
-			data = upi41_master_r(m_mcu, 0);
+			data = m_mcu->upi41_master_r(space,0);
 			LOG(3,("%10s 6502-PC: %04x decocass_nodong_r(%02x): $%02x '%c' <- open bus (D0 replaced with latch)\n", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data, (data >= 32) ? data : '.'));
 		}
 		else
@@ -978,7 +978,7 @@ WRITE8_MEMBER(decocass_state::decocass_e5xx_w)
 	if (0 == (offset & E5XX_MASK))
 	{
 		LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data, offset & 1 ? "8041-CMND" : "8041-DATA"));
-		upi41_master_w(m_mcu, offset & 1, data);
+		m_mcu->upi41_master_w(space,offset & 1, data);
 #ifdef MAME_DEBUG
 		decocass_fno(offset, data);
 #endif

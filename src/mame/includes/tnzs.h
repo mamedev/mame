@@ -1,6 +1,7 @@
 #include "sound/dac.h"
 #include "sound/samples.h"
 #include "video/seta001.h"
+#include "cpu/mcs48/mcs48.h"
 
 #define MAX_SAMPLES 0x2f        /* max samples */
 
@@ -64,7 +65,7 @@ public:
 	/* devices */
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<cpu_device> m_subcpu;
-	optional_device<cpu_device> m_mcu;
+	optional_device<upi41_cpu_device> m_mcu;
 	DECLARE_WRITE8_MEMBER(tnzsb_sound_command_w);
 	DECLARE_WRITE8_MEMBER(jpopnics_palette_w);
 	DECLARE_WRITE8_MEMBER(jpopnics_subbankswitch_w);

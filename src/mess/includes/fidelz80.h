@@ -27,7 +27,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<s14001a_device> m_speech;
 	optional_device<beep_device> m_beep;
-	optional_device<cpu_device> m_i8041;
+	optional_device<i8041_device> m_i8041;
 	optional_device<i8243_device> m_i8243;
 
 	UINT16 m_kp_matrix;         // keypad/leds matrix
