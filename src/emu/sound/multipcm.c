@@ -390,7 +390,7 @@ multipcm_device::multipcm_device(const machine_config &mconfig, const char *tag,
 	: device_t(mconfig, MULTIPCM, "Sega/Yamaha 315-5560", tag, owner, clock, "multipcm", __FILE__),
 		device_sound_interface(mconfig, *this),
 		device_memory_interface(mconfig, *this),
-		m_space_config("mpcm_samples", ENDIANNESS_LITTLE, 8, 24, 0, NULL, *ADDRESS_MAP_NAME(multipcm)),
+		m_space_config("mpcm_samples", ENDIANNESS_LITTLE, 8, 24, 0, NULL),
 		m_stream(NULL),
 		//m_Samples(0x200),
 		//m_Slots[28],
@@ -403,6 +403,7 @@ multipcm_device::multipcm_device(const machine_config &mconfig, const char *tag,
 		//m_DRStep(0),
 		//m_FNS_Table(0)
 {
+	m_address_map[0] = *ADDRESS_MAP_NAME(multipcm);
 }
 
 //-------------------------------------------------

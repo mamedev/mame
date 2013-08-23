@@ -20,7 +20,7 @@ static ADDRESS_MAP_START( segam1audio_map, AS_PROGRAM, 16, segam1audio_device )
 	AM_RANGE(0xc40000, 0xc40007) AM_DEVREADWRITE8(MULTIPCM_1_TAG, multipcm_device, read, write, 0x00ff )
 	AM_RANGE(0xc40012, 0xc40013) AM_WRITENOP
 	AM_RANGE(0xc50000, 0xc50001) AM_WRITE(m1_snd_mpcm_bnk1_w )
-	AM_RANGE(0xc60000, 0xc60007) AM_DEVREADWRITE8(MULTIPCM_1_TAG, multipcm_device, read, write, 0x00ff )
+	AM_RANGE(0xc60000, 0xc60007) AM_DEVREADWRITE8(MULTIPCM_2_TAG, multipcm_device, read, write, 0x00ff )
 	AM_RANGE(0xc70000, 0xc70001) AM_WRITE(m1_snd_mpcm_bnk2_w )
 	AM_RANGE(0xd00000, 0xd00007) AM_DEVREADWRITE8(YM3438_TAG, ym3438_device, read, write, 0x00ff )
 	AM_RANGE(0xf00000, 0xf0ffff) AM_RAM
