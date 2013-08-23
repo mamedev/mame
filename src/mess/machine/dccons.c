@@ -418,6 +418,7 @@ READ32_MEMBER(dc_cons_state::dc_mess_gdrom_r)
 				else
 				{
 					printf("ATAPI: dropping DRQ\n");
+					//gdrom_set_status(ATAPI_STAT_DRQ,false);
 					//atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
 					//atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO;
 				}
@@ -428,11 +429,12 @@ READ32_MEMBER(dc_cons_state::dc_mess_gdrom_r)
 				gdrom_raise_irq();
 			}
 
-			if( atapi_data_ptr < atapi_data_len )
+			if( atapi_cdata_wait )
 			{
 				data = atapi_data[atapi_data_ptr++];
 				data |= ( atapi_data[atapi_data_ptr++] << 8 );
-				if( atapi_data_ptr >= atapi_data_len )
+				atapi_cdata_wait-=2;
+				if( atapi_cdata_wait == 0 )
 				{
 //					printf( "atapi_r: read all bytes\n" );
 					atapi_data_ptr = 0;
@@ -509,6 +511,7 @@ WRITE32_MEMBER(dc_cons_state::dc_mess_gdrom_w )
 					// not sure here, but clear DRQ at least?
 					gdrom_set_status(ATAPI_STAT_DRQ,false);
 					printf("cdata wait status\n");
+					atapi_cdata_wait = 0;
 				}
 			}
 			else if ( atapi_data_ptr == 12 )
@@ -572,6 +575,7 @@ WRITE32_MEMBER(dc_cons_state::dc_mess_gdrom_w )
 					switch( phase )
 					{
 					case SCSI_PHASE_DATAOUT:
+					case SCSI_PHASE_DATAIN:
 						atapi_cdata_wait = atapi_xferlen;
 						break;
 					}
