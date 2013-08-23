@@ -19,7 +19,6 @@ public:
 	UINT16 m_yscroll;
 	tilemap_t *m_background;
 	tilemap_t *m_foreground;
-	DECLARE_READ16_MEMBER(horekid_IN2_r);
 	DECLARE_WRITE16_MEMBER(amazon_sound_w);
 	DECLARE_READ8_MEMBER(soundlatch_clear_r);
 	DECLARE_READ16_MEMBER(amazon_protection_r);

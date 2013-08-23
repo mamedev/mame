@@ -33,21 +33,19 @@ Stephh's notes (based on the games M68000 code and some tests) :
 
   - Each high-score name is made up of 3 chars.
 
-  - There is a "debug mode" ! To activate it, you need to have cheats ON.
+  - There is a "debug mode" !
     Set "Debug Mode" Dip Switch to ON and be sure that "Cabinet" Dip Switch
     is set to "Upright". Its features (see below) only affect player 1 !
     Features :
       * invulnerability and infinite time :
           . insert a coin
-          . press FAKE button 3 and START1 (player 1 buttons 1 and 2 must NOT be pressed !)
+          . press player 2 button 1 and 2 and START1 (player 1 buttons 1 and 2 must NOT be pressed !)
       * level select (there are 32 levels) :
           . insert a coin
-          . press FAKE button 3 ("00" will be displayed - this is an hex. display)
-          . press FAKE button 3 and player 1 button 1 to increase level
-          . press FAKE button 3 and player 1 button 2 to decrease level
+          . press player 2 button 1 and 2 ("00" will be displayed - this is an hex. display)
+          . press player 2 button 1 and 2 and player 1 button 1 to increase level
+          . press player 2 button 1 and 2 and player 1 button 2 to decrease level
           . press START1 to start a game with the selected level
-    FAKE button 3 is in fact the same as pressing simultaneously player 2 buttons 1 and 2.
-    (I've code this that way because my keyboard doesn't accept too many keys pressed)
 
 
 
@@ -130,19 +128,6 @@ static const UINT16 mHoreKidProtData[] =
 	0x4e75,0x4e75,0x4e75,0x4e75,0x4e75,0x4e75,0x4e75,0x4e75,
 	0x1800 /* checksum */
 };
-
-READ16_MEMBER(terracre_state::horekid_IN2_r)
-{
-	int data = ioport("IN2")->read();
-
-	if (!(data & 0x40))     // FAKE button 3 for "Debug Mode"
-	{
-		data &=  0x40;
-		data |= ~0x30;
-	}
-
-	return data;
-}
 
 WRITE16_MEMBER(terracre_state::amazon_sound_w)
 {
@@ -435,7 +420,7 @@ static INPUT_PORTS_START( horekid )
 	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0xc000, 0xc000, "Debug Mode (Cheat)")
+	PORT_DIPNAME( 0xc000, 0xc000, "Debug Mode" )
 	PORT_DIPSETTING(      0xc000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x8000, DEF_STR( On ) )       // "Cabinet" Dip Switch must be set to "Upright" too !
 //  PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )      // duplicated setting
@@ -458,7 +443,7 @@ static INPUT_PORTS_START( horekid )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME ("P2 Buttons 1+2 (Debug Cheat)")     // fake button for "Debug Mode" (see read handler)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN3")
@@ -617,12 +602,6 @@ static MACHINE_CONFIG_START( ym2203, terracre_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ym1", YM2203, XTAL_16MHz/4)
-	MCFG_SOUND_ROUTE(0, "mono", 0.20)
-	MCFG_SOUND_ROUTE(1, "mono", 0.20)
-	MCFG_SOUND_ROUTE(2, "mono", 0.20)
-	MCFG_SOUND_ROUTE(3, "mono", 0.40)
-
-	MCFG_SOUND_ADD("ym2", YM2203, XTAL_16MHz/4)
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
 	MCFG_SOUND_ROUTE(2, "mono", 0.20)
@@ -1014,7 +993,6 @@ DRIVER_INIT_MEMBER(terracre_state,amatelas)
 DRIVER_INIT_MEMBER(terracre_state,horekid)
 {
 	m_mpProtData = mHoreKidProtData;
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x44004, 0x44005, read16_delegate(FUNC(terracre_state::horekid_IN2_r),this));
 }
 
 /*    YEAR, NAME,   PARENT,     MACHINE, INPUT,    INIT,     MONITOR,  COMPANY,      FULLNAME, FLAGS */
