@@ -111,7 +111,7 @@ DEVICE_ADDRESS_MAP_START(submap, 16, aw_rom_board)
 ADDRESS_MAP_END
 
 aw_rom_board::aw_rom_board(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: naomi_g1_device(mconfig, AW_ROM_BOARD, "AW-ROM-BOARD", tag, owner, clock)
+	: naomi_g1_device(mconfig, AW_ROM_BOARD, "AW-ROM-BOARD", tag, owner, clock, "aw_rom_board", __FILE__)
 {
 	region_is_decrypted = false;
 	keyregion = 0;

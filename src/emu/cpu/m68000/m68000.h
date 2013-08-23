@@ -407,6 +407,7 @@ class m68000_device : public m68000_base_device
 public:
 	// construction/destruction
 	m68000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	m68000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	m68000_device(const machine_config &mconfig, const char *name, const char *tag, device_t *owner, UINT32 clock,
 						const device_type type, UINT32 prg_data_width, UINT32 prg_address_bits, address_map_constructor internal_map, const char *shortname, const char *source);

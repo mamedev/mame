@@ -11,7 +11,7 @@
 class naomi_board : public naomi_g1_device
 {
 public:
-	naomi_board(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	naomi_board(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	static void static_set_eeprom_tag(device_t &device, const char *_eeprom_tag);
 

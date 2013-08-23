@@ -149,7 +149,7 @@ base_gb_cart_slot_device::base_gb_cart_slot_device(const machine_config &mconfig
 }
 
 gb_cart_slot_device::gb_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-						base_gb_cart_slot_device(mconfig, GB_CART_SLOT, "Game Boy Cartridge Slot", tag, owner, clock, "gba_cart_slot", __FILE__)
+						base_gb_cart_slot_device(mconfig, GB_CART_SLOT, "Game Boy Cartridge Slot", tag, owner, clock, "gb_cart_slot", __FILE__)
 {
 }
 

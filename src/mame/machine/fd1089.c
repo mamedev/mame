@@ -214,20 +214,20 @@ const fd1089_base_device::decrypt_parameters fd1089_base_device::s_data_params_a
 //  fd1089_base_device - constructor
 //-------------------------------------------------
 
-fd1089_base_device::fd1089_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
-	: m68000_device(mconfig, tag, owner, clock)
+fd1089_base_device::fd1089_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	: m68000_device(mconfig, tag, owner, clock, shortname, source)
 {
 	// override the name after the m68000 initializes
 	m_name.cpy(name);
 }
 
 fd1089a_device::fd1089a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: fd1089_base_device(mconfig, FD1089A, "FD1089A", tag, owner, clock)
+	: fd1089_base_device(mconfig, FD1089A, "FD1089A", tag, owner, clock, "fd1089a", __FILE__)
 {
 }
 
 fd1089b_device::fd1089b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: fd1089_base_device(mconfig, FD1089B, "FD1089B", tag, owner, clock)
+	: fd1089_base_device(mconfig, FD1089B, "FD1089B", tag, owner, clock, "fd1089b", __FILE__)
 {
 }
 

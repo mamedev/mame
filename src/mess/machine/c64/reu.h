@@ -31,7 +31,7 @@ class c64_reu_cartridge_device : public device_t,
 {
 public:
 	// construction/destruction
-	c64_reu_cartridge_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, int jp1, size_t ram_size);
+	c64_reu_cartridge_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, int jp1, size_t ram_size, const char *shortname, const char *source);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
