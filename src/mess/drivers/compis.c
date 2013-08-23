@@ -96,7 +96,7 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 {
 	compis_state *state = device->machine().driver_data<compis_state>();
 	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
-	UINT8 i,gfx = state->m_video_ram[address & 0x1ffff];
+	UINT8 i,gfx = state->m_video_ram[address];
 
 	for(i=0; i<8; i++)
 		bitmap.pix32(y, x + i) = palette[BIT((gfx >> i), 0)];
@@ -114,7 +114,7 @@ static UPD7220_INTERFACE( hgdc_intf )
 /* TODO: why it writes to ROM region? */
 WRITE8_MEMBER( compis_state::vram_w )
 {
-	m_video_ram[offset] = data;
+	m_video_ram[offset+0x1ffff] = data;
 }
 
 static ADDRESS_MAP_START( compis_mem , AS_PROGRAM, 16, compis_state )
@@ -320,8 +320,8 @@ static SLOT_INTERFACE_START( compis_floppies )
 SLOT_INTERFACE_END
 
 static ADDRESS_MAP_START( upd7220_map, AS_0, 8, compis_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x1ffff)
-	AM_RANGE(0x00000, 0x1ffff) AM_RAM AM_SHARE("video_ram")
+	ADDRESS_MAP_GLOBAL_MASK(0x3ffff)
+	AM_RANGE(0x00000, 0x3ffff) AM_RAM AM_SHARE("video_ram")
 ADDRESS_MAP_END
 
 static MACHINE_CONFIG_START( compis, compis_state )
