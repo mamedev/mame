@@ -139,6 +139,8 @@ Changes:
 
 #include "emu.h"
 #include "cpu/m6502/n2a03.h"
+#include "cpu/z80/z80.h"
+#include "sound/sn76496.h"
 #include "rendlay.h"
 #include "video/ppu2c0x.h"
 #include "sound/dac.h"
@@ -253,6 +255,36 @@ static ADDRESS_MAP_START( vsnes_cpu2_map, AS_PROGRAM, 8, vsnes_state )
 	AM_RANGE(0x4020, 0x4020) AM_WRITE(vsnes_coin_counter_1_w)
 	AM_RANGE(0x6000, 0x7fff) AM_RAMBANK("extra2")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+// likely doesn't have the PSGs
+// they wait on 0x2002 to change, if you toggle that the game runs with no sprites, it does still play music tho
+// but I think the real bootleg board uses the z80 and alt sound hardware instead?
+static ADDRESS_MAP_START( vsnes_cpu1_bootleg_map, AS_PROGRAM, 8, vsnes_state )
+	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_RAM AM_SHARE("work_ram")
+	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu1", ppu2c0x_device, read, write)
+	AM_RANGE(0x4011, 0x4011) AM_DEVWRITE("dac1", dac_device, write_unsigned8)
+	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE_LEGACY("nes1", nes_psg_r, nes_psg_w)
+	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_0_w)
+	AM_RANGE(0x4015, 0x4015) AM_READWRITE(psg1_4015_r, psg1_4015_w) /* PSG status / first control register */
+	AM_RANGE(0x4016, 0x4016) AM_READWRITE(vsnes_in0_r, vsnes_in0_w)
+	AM_RANGE(0x4017, 0x4017) AM_READ(vsnes_in1_r) AM_WRITE(psg1_4017_w) /* IN1 - input port 2 / PSG second control register */
+	AM_RANGE(0x4020, 0x4020) AM_READWRITE(vsnes_coin_counter_r, vsnes_coin_counter_w)
+	AM_RANGE(0x6000, 0x7fff) AM_RAMBANK("extra1")
+	AM_RANGE(0x8000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+READ8_MEMBER( vsnes_state::vsnes_bootleg_z80_latch_r )
+{
+	return 0x00;
+}
+
+static ADDRESS_MAP_START( vsnes_bootleg_z80_map, AS_PROGRAM, 8, vsnes_state )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x2000, 0x23ff) AM_RAM
+
+	AM_RANGE(0x4000, 0x4000) AM_READ( vsnes_bootleg_z80_latch_r )
+
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -1809,6 +1841,59 @@ static MACHINE_CONFIG_START( vsdual, vsnes_state )
 MACHINE_CONFIG_END
 
 
+static const sn76496_config psg_intf =
+{
+	DEVCB_NULL
+};
+
+
+static MACHINE_CONFIG_START( vsnes_bootleg, vsnes_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", M6502,N2A03_DEFAULTCLOCK) // R6502AP
+	MCFG_CPU_PROGRAM_MAP(vsnes_cpu1_bootleg_map)
+								/* some carts also trigger IRQs */
+	MCFG_MACHINE_RESET_OVERRIDE(vsnes_state,vsnes)
+	MCFG_MACHINE_START_OVERRIDE(vsnes_state,vsnes)
+
+	MCFG_CPU_ADD("subcpu", Z80,4000000)         /* ? MHz */ // Z8400APS-Z80CPU
+	MCFG_CPU_PROGRAM_MAP(vsnes_bootleg_z80_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen1", vsnes_state,  irq0_line_hold)
+
+
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen1", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_SIZE(32*8, 262)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(vsnes_state, screen_update_vsnes)
+
+	MCFG_PALETTE_LENGTH(8*4*16)
+
+	MCFG_PALETTE_INIT_OVERRIDE(vsnes_state,vsnes)
+	MCFG_VIDEO_START_OVERRIDE(vsnes_state,vsnes)
+
+	MCFG_PPU2C04_ADD("ppu1", vsnes_ppu_interface_1)
+	MCFG_PPU2C0X_SET_SCREEN("screen1")
+	MCFG_PPU2C0X_SET_NMI(vsnes_state, ppu_irq_1)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("nes1", NES, N2A03_DEFAULTCLOCK)
+	MCFG_SOUND_CONFIG(nes_interface_1)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	MCFG_DAC_ADD("dac1")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	// instead of the above?
+	MCFG_SOUND_ADD("sn1", SN76489A, 4000000) // ?? Mhz
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_CONFIG(psg_intf)
+MACHINE_CONFIG_END
+
 /******************************************************************************/
 
 /*  Palettes were obtained for each RGB PPU type by running a test program
@@ -2716,8 +2801,8 @@ GAME( 1986, rbibb,    0,        vsnes,   rbibb, vsnes_state,    rbibb,    ROT0, 
 GAME( 1986, rbibba,   rbibb,    vsnes,   rbibb, vsnes_state,    rbibb,    ROT0, "Namco",                  "Vs. Atari R.B.I. Baseball (set 2)", 0 )
 GAME( 1986, suprmrio, 0,        vsnes,   suprmrio, vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Super Mario Bros. (set SM4-4 E)", 0 )
 GAME( 1986, suprmrioa,suprmrio, vsnes,   suprmrio, vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Super Mario Bros. (set ?, harder)", 0 )
-GAME( 1986, suprmriobl,suprmrio,vsnes,   suprmrio, vsnes_state, vsnormal, ROT0, "bootleg",                "Vs. Super Mario Bros. (bootleg with Z80, set 1)", GAME_NOT_WORKING )
-GAME( 1986, suprmriobl2,suprmrio,vsnes,  suprmrio, vsnes_state, vsnormal, ROT0, "bootleg",                "Vs. Super Mario Bros. (bootleg with Z80, set 2)", GAME_NOT_WORKING )
+GAME( 1986, suprmriobl,suprmrio,vsnes_bootleg,suprmrio,vsnes_state,vsnormal, ROT0, "bootleg",             "Vs. Super Mario Bros. (bootleg with Z80, set 1)", GAME_NOT_WORKING )
+GAME( 1986, suprmriobl2,suprmrio,vsnes_bootleg,suprmrio,vsnes_state,vsnormal, ROT0, "bootleg",            "Vs. Super Mario Bros. (bootleg with Z80, set 2)", GAME_NOT_WORKING )
 GAME( 1988, skatekds, suprmrio, vsnes,   suprmrio, vsnes_state, vsnormal, ROT0, "hack (Two-Bit Score)",   "Vs. Skate Kids. (Graphic hack of Super Mario Bros.)", 0 )
 GAME( 1985, vsskykid, 0,        vsnes,   vsskykid, vsnes_state, MMC3,     ROT0, "Namco",                  "Vs. Super SkyKid" , 0 )
 GAME( 1987, tkoboxng, 0,        vsnes,   tkoboxng, vsnes_state, tkoboxng, ROT0, "Namco / Data East USA",  "Vs. T.K.O. Boxing", 0 )

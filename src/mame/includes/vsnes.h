@@ -114,6 +114,8 @@ public:
 	void mapper4_irq( int scanline, int vblank, int blanked );
 	void ppu_irq_1(int *ppu_regs);
 	void ppu_irq_2(int *ppu_regs);
+
+	DECLARE_READ8_MEMBER( vsnes_bootleg_z80_latch_r );
 };
 
 /*----------- defined in video/vsnes.c -----------*/
