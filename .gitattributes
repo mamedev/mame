@@ -6297,6 +6297,7 @@ src/mess/drivers/hpz80unk.c svneol=native#text/plain
 src/mess/drivers/ht68k.c svneol=native#text/plain
 src/mess/drivers/huebler.c svneol=native#text/plain
 src/mess/drivers/hx20.c svneol=native#text/plain
+src/mess/drivers/ibm6580.c svneol=native#text/plain
 src/mess/drivers/ibmpc.c svneol=native#text/plain
 src/mess/drivers/ie15.c svneol=native#text/plain
 src/mess/drivers/if800.c svneol=native#text/plain

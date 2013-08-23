@@ -2387,6 +2387,7 @@ $(MESSOBJ)/skeleton.a:          \
 	$(MESS_DRIVERS)/harriet.o   \
 	$(MESS_DRIVERS)/hpz80unk.o  \
 	$(MESS_DRIVERS)/ht68k.o     \
+	$(MESS_DRIVERS)/ibm6580.o   \
 	$(MESS_DRIVERS)/ie15.o      \
 	$(MESS_DRIVERS)/if800.o     \
 	$(MESS_DRIVERS)/indiana.o   \
