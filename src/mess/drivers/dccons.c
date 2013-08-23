@@ -1,7 +1,7 @@
 /*
 
     dc.c - Sega Dreamcast driver
-    by R. Belmont
+    by R. Belmont & Angelo Salese
 
     SH-4 @ 200 MHz
     ARM7DI @ 2.8223 MHz (no T or M extensions)
@@ -16,6 +16,18 @@
 
     PCLKs = 26917135 (NTSC 480 @ 59.94), 26944080 (VGA 480 @ 60.0), 13458568 (NTSC 240 @ 59.94),
             25925600 (PAL 480 @ 50.00), 13462800 (PAL 240 @ 50.00)
+
+    TODO:
+    - DC splash logo: video and audio are off-sync
+    - RTC error always pops up at start-up, tied to the aforementioned?
+    - Only JP games boots so far;
+    - Inputs doesn't work most of the time;
+    - Capcom vs. SNK Pro: asserts after VMU message
+    - F355 Challenge: asserts after Sega logo;
+	- Idol Janshi wo Tsukucchaou: pixel aspect is way wrong (stretched and offsetted horizontally)
+	- Power Stone: hangs at Capcom logo;
+	- Sega GT: hangs at "produced by Sega" screen;
+	- Tetris 4D: has color bugs, hangs at FMV anyway
 
 */
 
@@ -95,7 +107,7 @@ READ64_MEMBER(dc_cons_state::dc_pdtra_r )
 	cable setting, (0-1) VGA, (2) TV RGB (3) TV VBS/Y + S/C.
 	Note: several games doesn't like VGA setting (i.e. Idol Janshi wo Tsukucchaou, Airforce Delta), so hard-wire it to most common setting for now.
 	*/
-	out |= 0x02 << 8;
+	out |= ioport("SCREEN_TYPE")->read() << 8;
 
 	return out;
 }
@@ -221,7 +233,7 @@ static MACHINE_CONFIG_START( dc, dc_cons_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(CPU_CLOCK/2/4, 820, 0, 640, 532, 0, 480) /* TODO: PVR is clocked at 100 MHz, pixel clock is guessed to be /4 so ~57 fps. */
+	MCFG_SCREEN_RAW_PARAMS(13458568*2, 857, 0, 640, 524, 0, 480) /* TODO: where pclk actually comes? */
 	MCFG_SCREEN_UPDATE_DEVICE("powervr2", powervr2_device, screen_update)
 	MCFG_PALETTE_LENGTH(0x1000)
 	MCFG_POWERVR2_ADD("powervr2", WRITE8(dc_state, pvr_irq))
@@ -420,6 +432,13 @@ static INPUT_PORTS_START( dc )
 	PORT_DIPNAME( 0x01, 0x00, "Bilinear Filtering" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+
+	PORT_START("SCREEN_TYPE")
+	PORT_CONFNAME( 0x03, 0x00, "Connection Type" )
+	PORT_CONFSETTING(    0x00, "NTSC" )
+	PORT_CONFSETTING(    0x01, "PAL" )
+	PORT_CONFSETTING(    0x02, "VGA (0)" )
+	PORT_CONFSETTING(    0x03, "VGA (1)" )
 INPUT_PORTS_END
 
 

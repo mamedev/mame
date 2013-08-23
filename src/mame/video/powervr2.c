@@ -1450,12 +1450,16 @@ WRITE32_MEMBER( powervr2_device::palette_w )
 
 void powervr2_device::update_screen_format()
 {
+	INT32 spg_hsize = spg_load & 0x3ff;
+	INT32 spg_vsize = (spg_load >> 16) & 0x3ff;
 	INT32 spg_hbstart = spg_hblank & 0x3ff;
 	INT32 spg_hbend = (spg_hblank >> 16) & 0x3ff;
 	INT32 spg_vbstart = spg_vblank & 0x3ff;
 	INT32 spg_vbend = (spg_vblank >> 16) & 0x3ff;
 	INT32 vo_horz_start_pos = vo_startx & 0x3ff;
 	INT32 vo_vert_start_pos_f1 = vo_starty & 0x3ff;
+
+	attoseconds_t refresh = HZ_TO_ATTOSECONDS(13458568*2) * spg_hsize * spg_vsize;
 
 	rectangle visarea = m_screen->visible_area();
 	/* FIXME: right visible area calculations aren't known yet*/
@@ -1464,7 +1468,7 @@ void powervr2_device::update_screen_format()
 	visarea.min_y = 0;
 	visarea.max_y = ((spg_vbstart - spg_vbend - vo_vert_start_pos_f1) <= 0x100 ? 240 : 480) - 1;
 
-	m_screen->configure(spg_hbstart, spg_vbstart, visarea, m_screen->frame_period().attoseconds );
+	m_screen->configure(spg_hsize, spg_vsize, visarea, refresh );
 }
 
 
@@ -2572,6 +2576,7 @@ void powervr2_device::pvr_drawframebuffer(bitmap_rgb32 &bitmap,const rectangle &
 			break;
 
 		case 0x02: ; // 888 RGB 24-bit - suchie3 - HACKED, see pvr_accumulationbuffer_to_framebuffer!
+			popmessage("888RGB 24-bit mode used, contact MAME/MESSdev");
 			for (y=0;y <= dy;y++)
 			{
 				addrp = fb_r_sof1+y*xi*2;
