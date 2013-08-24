@@ -641,8 +641,8 @@ static MACHINE_CONFIG_START( at586, at586_state )
 	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371ab:isabus","isa3", pc_isa16_cards, NULL, false)
 	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371ab:isabus","isa4", pc_isa16_cards, NULL, false)
 	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371ab:isabus","isa5", pc_isa16_cards, "ide_cd", false) //2nd-ary IDE
-	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL)
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("ide_cd", ide_2nd)
+	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( at586x3, at586_state )
@@ -665,8 +665,8 @@ static MACHINE_CONFIG_START( at586x3, at586_state )
 	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371sb:isabus","isa3", pc_isa16_cards, NULL, false)
 	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371sb:isabus","isa4", pc_isa16_cards, NULL, false)
 	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371sb:isabus","isa5", pc_isa16_cards, "ide_cd", false) //2nd-ary IDE
-	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL)
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("ide_cd", ide_2nd)
+	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( at386sx, atvga )
