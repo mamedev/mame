@@ -1243,8 +1243,8 @@ READ32_MEMBER( powervr2_device::spg_status_r )
 	UINT32 vsync = ((m_screen->vpos() >= spg_vbstart) || (m_screen->vpos() < spg_vbend)) ? 0 : 1;
 	UINT32 hsync = ((m_screen->hpos() >= spg_hbstart) || (m_screen->hpos() < spg_hbend)) ? 0 : 1;
 	/* FIXME: following is just a wild guess */
-	UINT32 blank; = ((m_screen->vpos() >= spg_vbstart) || (m_screen->vpos() < spg_vbend) |
-                     (m_screen->hpos() >= spg_hbstart) || (m_screen->hpos() < spg_hbend)) ? 0 : 1;
+	UINT32 blank = ((m_screen->vpos() >= spg_vbstart) || (m_screen->vpos() < spg_vbend) |
+                    (m_screen->hpos() >= spg_hbstart) || (m_screen->hpos() < spg_hbend)) ? 0 : 1;
 	if(vo_control & 4) { blank^=1; }
 	if(vo_control & 2) { vsync^=1; }
 	if(vo_control & 1) { hsync^=1; }
@@ -2762,6 +2762,7 @@ TIMER_CALLBACK_MEMBER(powervr2_device::vbin)
 {
 	irq_cb(VBL_IN_IRQ);
 
+	//popmessage("VII %d VOI %d VI %d VO %d VS %d",spg_vblank_int & 0x3ff,(spg_vblank_int >> 16) & 0x3ff,spg_vblank & 0x3ff,(spg_vblank >> 16) & 0x3ff,(spg_load >> 16) & 0x3ff);
 	vbin_timer->adjust(m_screen->time_until_pos(spg_vblank_int & 0x3ff));
 }
 

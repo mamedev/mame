@@ -189,108 +189,6 @@ static ADDRESS_MAP_START( dc_audio_map, AS_PROGRAM, 32, dc_cons_state )
 	AM_RANGE(0x00800000, 0x00807fff) AM_READWRITE(dc_arm_aica_r, dc_arm_aica_w)
 ADDRESS_MAP_END
 
-MACHINE_RESET_MEMBER(dc_cons_state,dc_console)
-{
-	device_t *aica = machine().device("aica");
-	dc_state::machine_reset();
-	aica_set_ram_base(aica, dc_sound_ram, 2*1024*1024);
-	dreamcast_atapi_reset();
-}
-
-WRITE_LINE_MEMBER(dc_cons_state::aica_irq)
-{
-	m_soundcpu->set_input_line(ARM7_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-static const aica_interface dc_aica_interface =
-{
-	TRUE,
-	0,
-	DEVCB_DRIVER_LINE_MEMBER(dc_cons_state,aica_irq)
-};
-
-static const struct sh4_config sh4cpu_config = {  1,  0,  1,  0,  0,  0,  1,  1,  0, CPU_CLOCK };
-
-static MACHINE_CONFIG_START( dc, dc_cons_state )
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", SH4LE, CPU_CLOCK)
-	MCFG_CPU_CONFIG(sh4cpu_config)
-	MCFG_CPU_PROGRAM_MAP(dc_map)
-	MCFG_CPU_IO_MAP(dc_port)
-
-	MCFG_CPU_ADD("soundcpu", ARM7, ((XTAL_33_8688MHz*2)/3)/8)   // AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
-	MCFG_CPU_PROGRAM_MAP(dc_audio_map)
-
-	MCFG_MACHINE_RESET_OVERRIDE(dc_cons_state,dc_console )
-
-//	MCFG_MACRONIX_29LV160TMC_ADD("dcflash")
-
-	MCFG_MAPLE_DC_ADD( "maple_dc", "maincpu", dc_maple_irq )
-	MCFG_DC_CONTROLLER_ADD("dcctrl0", "maple_dc", 0, ":P1:0", ":P1:1", ":P1:A0", ":P1:A1", ":P1:A2", ":P1:A3", ":P1:A4", ":P1:A5")
-	MCFG_DC_CONTROLLER_ADD("dcctrl1", "maple_dc", 1, ":P2:0", ":P2:1", ":P2:A0", ":P2:A1", ":P2:A2", ":P2:A3", ":P2:A4", ":P2:A5")
-	MCFG_DC_CONTROLLER_ADD("dcctrl2", "maple_dc", 2, ":P3:0", ":P3:1", ":P3:A0", ":P3:A1", ":P3:A2", ":P3:A3", ":P3:A4", ":P3:A5")
-	MCFG_DC_CONTROLLER_ADD("dcctrl3", "maple_dc", 3, ":P4:0", ":P4:1", ":P4:A0", ":P4:A1", ":P4:A2", ":P4:A3", ":P4:A4", ":P4:A5")
-
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(13458568*2, 857, 0, 640, 524, 0, 480) /* TODO: where pclk actually comes? */
-	MCFG_SCREEN_UPDATE_DEVICE("powervr2", powervr2_device, screen_update)
-	MCFG_PALETTE_LENGTH(0x1000)
-	MCFG_POWERVR2_ADD("powervr2", WRITE8(dc_state, pvr_irq))
-
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("aica", AICA, 0)
-	MCFG_SOUND_CONFIG(dc_aica_interface)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
-
-	MCFG_DEVICE_ADD("cdrom", GDROM, 0)
-MACHINE_CONFIG_END
-
-ROM_START(dc)
-	ROM_REGION(0x200000, "maincpu", 0)
-	ROM_LOAD( "dc101d_us.bin", 0x000000, 0x200000, CRC(89f2b1a1) SHA1(8951d1bb219ab2ff8583033d2119c899cc81f18c) )   // BIOS
-
-	ROM_REGION(0x020000, "dcflash", 0)
-	ROM_LOAD( "dcus_ntsc.bin", 0x000000, 0x020000, CRC(c611b498) SHA1(94d44d7f9529ec1642ba3771ed3c5f756d5bc872) )   // Flash
-ROM_END
-
-ROM_START( dceu )
-	ROM_REGION(0x200000, "maincpu", 0)
-	ROM_SYSTEM_BIOS(0, "101d", "v1.01d")
-	ROMX_LOAD( "dc101d_eu.bin", 0x000000, 0x200000, CRC(a2564fad) SHA1(edc5d3d70a93c935703d26119b37731fd317d2bf),ROM_BIOS(1))   // BIOS
-	ROM_SYSTEM_BIOS(1, "101c", "v1.01c")
-	ROMX_LOAD( "dc101c_eu.bin", 0x000000, 0x200000, CRC(2f551bc5) SHA1(1ede8d5be49116a4c6f3fe0961175469537a0434),ROM_BIOS(2))   // BIOS
-
-	ROM_REGION(0x020000, "dcflash", 0)
-	ROM_LOAD( "dceu_pal.bin", 0x000000, 0x020000, CRC(b7e5aeeb) SHA1(11e02433e13b793ec7ffe0ae2356750bb8a575b4) )    // Flash
-ROM_END
-
-ROM_START( dcjp )
-	ROM_REGION(0x200000, "maincpu", 0)
-	ROM_LOAD( "dc1004jp.bin", 0x000000, 0x200000, CRC(5454841f) SHA1(1ea132c0fbbf07ef76789eadc07908045c089bd6) )    // BIOS
-
-	ROM_REGION(0x020000, "dcflash", 0)
-	/* ROM_LOAD( "dcjp_ntsc.bad", 0x000000, 0x020000, BAD_DUMP CRC(307a7035) SHA1(1411423a9d071340ea52c56e19c1aafc4e1309ee) )      // Hacked Flash */
-	ROM_LOAD( "dcjp_ntsc.bin", 0x000000, 0x020000, CRC(5F92BF76) SHA1(BE78B834F512AB2CF3D67B96E377C9F3093FF82A) )  // Flash
-ROM_END
-
-ROM_START( dcdev )
-	ROM_REGION(0x200000, "maincpu", 0)
-	ROM_LOAD( "hkt-0120.bin", 0x000000, 0x200000, CRC(2186E0E5) SHA1(6BD18FB83F8FDB56F1941E079580E5DD672A6DAD) )        // BIOS
-
-	ROM_REGION(0x020000, "dcflash", 0)
-	ROM_LOAD( "hkt-0120-flash.bin", 0x000000, 0x020000, CRC(7784C304) SHA1(31EF57F550D8CD13E40263CBC657253089E53034) )  // Flash
-ROM_END
-
-ROM_START( dcprt )
-	ROM_REGION(0x200000, "maincpu", 0)
-	ROM_LOAD( "katana-set5-v0.41-98-08-27.bin", 0x000000, 0x200000, CRC(485877bd) SHA1(dc1af1f1248ffa87d57bc5ef2ea41aac95ecfc5e) ) // BIOS
-
-	ROM_REGION(0x020000, "dcflash", 0)
-	ROM_LOAD( "dcjp_ntsc.bin", 0x000000, 0x020000, CRC(5F92BF76) SHA1(BE78B834F512AB2CF3D67B96E377C9F3093FF82A) )  // Flash
-ROM_END
-
 static INPUT_PORTS_START( dc )
 	PORT_START("P1:0")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1) PORT_NAME("P1 RIGHT")
@@ -441,6 +339,107 @@ static INPUT_PORTS_START( dc )
 	PORT_CONFSETTING(    0x03, "VGA (1)" )
 INPUT_PORTS_END
 
+MACHINE_RESET_MEMBER(dc_cons_state,dc_console)
+{
+	device_t *aica = machine().device("aica");
+	dc_state::machine_reset();
+	aica_set_ram_base(aica, dc_sound_ram, 2*1024*1024);
+	dreamcast_atapi_reset();
+}
+
+WRITE_LINE_MEMBER(dc_cons_state::aica_irq)
+{
+	m_soundcpu->set_input_line(ARM7_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+static const aica_interface dc_aica_interface =
+{
+	TRUE,
+	0,
+	DEVCB_DRIVER_LINE_MEMBER(dc_cons_state,aica_irq)
+};
+
+static const struct sh4_config sh4cpu_config = {  1,  0,  1,  0,  0,  0,  1,  1,  0, CPU_CLOCK };
+
+static MACHINE_CONFIG_START( dc, dc_cons_state )
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", SH4LE, CPU_CLOCK)
+	MCFG_CPU_CONFIG(sh4cpu_config)
+	MCFG_CPU_PROGRAM_MAP(dc_map)
+	MCFG_CPU_IO_MAP(dc_port)
+
+	MCFG_CPU_ADD("soundcpu", ARM7, ((XTAL_33_8688MHz*2)/3)/8)   // AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
+	MCFG_CPU_PROGRAM_MAP(dc_audio_map)
+
+	MCFG_MACHINE_RESET_OVERRIDE(dc_cons_state,dc_console )
+
+//	MCFG_MACRONIX_29LV160TMC_ADD("dcflash")
+
+	MCFG_MAPLE_DC_ADD( "maple_dc", "maincpu", dc_maple_irq )
+	MCFG_DC_CONTROLLER_ADD("dcctrl0", "maple_dc", 0, ":P1:0", ":P1:1", ":P1:A0", ":P1:A1", ":P1:A2", ":P1:A3", ":P1:A4", ":P1:A5")
+	MCFG_DC_CONTROLLER_ADD("dcctrl1", "maple_dc", 1, ":P2:0", ":P2:1", ":P2:A0", ":P2:A1", ":P2:A2", ":P2:A3", ":P2:A4", ":P2:A5")
+	MCFG_DC_CONTROLLER_ADD("dcctrl2", "maple_dc", 2, ":P3:0", ":P3:1", ":P3:A0", ":P3:A1", ":P3:A2", ":P3:A3", ":P3:A4", ":P3:A5")
+	MCFG_DC_CONTROLLER_ADD("dcctrl3", "maple_dc", 3, ":P4:0", ":P4:1", ":P4:A0", ":P4:A1", ":P4:A2", ":P4:A3", ":P4:A4", ":P4:A5")
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(13458568*2, 857, 0, 640, 524, 0, 480) /* TODO: where pclk actually comes? */
+	MCFG_SCREEN_UPDATE_DEVICE("powervr2", powervr2_device, screen_update)
+	MCFG_PALETTE_LENGTH(0x1000)
+	MCFG_POWERVR2_ADD("powervr2", WRITE8(dc_state, pvr_irq))
+
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SOUND_ADD("aica", AICA, 0)
+	MCFG_SOUND_CONFIG(dc_aica_interface)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
+
+	MCFG_DEVICE_ADD("cdrom", GDROM, 0)
+MACHINE_CONFIG_END
+
+ROM_START(dc)
+	ROM_REGION(0x200000, "maincpu", 0)
+	ROM_LOAD( "dc101d_us.bin", 0x000000, 0x200000, CRC(89f2b1a1) SHA1(8951d1bb219ab2ff8583033d2119c899cc81f18c) )   // BIOS
+
+	ROM_REGION(0x020000, "dcflash", 0)
+	ROM_LOAD( "dcus_ntsc.bin", 0x000000, 0x020000, CRC(c611b498) SHA1(94d44d7f9529ec1642ba3771ed3c5f756d5bc872) )   // Flash
+ROM_END
+
+ROM_START( dceu )
+	ROM_REGION(0x200000, "maincpu", 0)
+	ROM_SYSTEM_BIOS(0, "101d", "v1.01d")
+	ROMX_LOAD( "dc101d_eu.bin", 0x000000, 0x200000, CRC(a2564fad) SHA1(edc5d3d70a93c935703d26119b37731fd317d2bf),ROM_BIOS(1))   // BIOS
+	ROM_SYSTEM_BIOS(1, "101c", "v1.01c")
+	ROMX_LOAD( "dc101c_eu.bin", 0x000000, 0x200000, CRC(2f551bc5) SHA1(1ede8d5be49116a4c6f3fe0961175469537a0434),ROM_BIOS(2))   // BIOS
+
+	ROM_REGION(0x020000, "dcflash", 0)
+	ROM_LOAD( "dceu_pal.bin", 0x000000, 0x020000, CRC(b7e5aeeb) SHA1(11e02433e13b793ec7ffe0ae2356750bb8a575b4) )    // Flash
+ROM_END
+
+ROM_START( dcjp )
+	ROM_REGION(0x200000, "maincpu", 0)
+	ROM_LOAD( "dc1004jp.bin", 0x000000, 0x200000, CRC(5454841f) SHA1(1ea132c0fbbf07ef76789eadc07908045c089bd6) )    // BIOS
+
+	ROM_REGION(0x020000, "dcflash", 0)
+	/* ROM_LOAD( "dcjp_ntsc.bad", 0x000000, 0x020000, BAD_DUMP CRC(307a7035) SHA1(1411423a9d071340ea52c56e19c1aafc4e1309ee) )      // Hacked Flash */
+	ROM_LOAD( "dcjp_ntsc.bin", 0x000000, 0x020000, CRC(5F92BF76) SHA1(BE78B834F512AB2CF3D67B96E377C9F3093FF82A) )  // Flash
+ROM_END
+
+ROM_START( dcdev )
+	ROM_REGION(0x200000, "maincpu", 0)
+	ROM_LOAD( "hkt-0120.bin", 0x000000, 0x200000, CRC(2186E0E5) SHA1(6BD18FB83F8FDB56F1941E079580E5DD672A6DAD) )        // BIOS
+
+	ROM_REGION(0x020000, "dcflash", 0)
+	ROM_LOAD( "hkt-0120-flash.bin", 0x000000, 0x020000, CRC(7784C304) SHA1(31EF57F550D8CD13E40263CBC657253089E53034) )  // Flash
+ROM_END
+
+ROM_START( dcprt )
+	ROM_REGION(0x200000, "maincpu", 0)
+	ROM_LOAD( "katana-set5-v0.41-98-08-27.bin", 0x000000, 0x200000, CRC(485877bd) SHA1(dc1af1f1248ffa87d57bc5ef2ea41aac95ecfc5e) ) // BIOS
+
+	ROM_REGION(0x020000, "dcflash", 0)
+	ROM_LOAD( "dcjp_ntsc.bin", 0x000000, 0x020000, CRC(5F92BF76) SHA1(BE78B834F512AB2CF3D67B96E377C9F3093FF82A) )  // Flash
+ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT      COMPANY FULLNAME */
 CONS( 1999, dc,     dcjp,   0,      dc,     dc, dc_cons_state,     dcus,   "Sega", "Dreamcast (USA, NTSC)", GAME_NOT_WORKING )
