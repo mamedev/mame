@@ -27,6 +27,7 @@ include $(SRC)/mess/messcore.mak
 CPUS += Z80
 CPUS += Z180
 CPUS += I8085
+CPUS += I8089
 CPUS += M6502
 CPUS += H6280
 CPUS += I86

@@ -131,6 +131,7 @@ CPU_DISASSEMBLE( i8008 );
 CPU_DISASSEMBLE( i8051 );
 CPU_DISASSEMBLE( i8052 );
 CPU_DISASSEMBLE( i8085 );
+CPU_DISASSEMBLE( i8089 );
 CPU_DISASSEMBLE( i80c51 );
 CPU_DISASSEMBLE( i80c52 );
 CPU_DISASSEMBLE( i860 );
@@ -275,6 +276,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "i8051",      _8bit,  0, CPU_DISASSEMBLE_NAME(i8051) },
 	{ "i8052",      _8bit,  0, CPU_DISASSEMBLE_NAME(i8052) },
 	{ "i8085",      _8bit,  0, CPU_DISASSEMBLE_NAME(i8085) },
+	{ "i8089",      _8bit,  0, CPU_DISASSEMBLE_NAME(i8089) },
 	{ "i80c51",     _8bit,  0, CPU_DISASSEMBLE_NAME(i80c51) },
 	{ "i80c52",     _8bit,  0, CPU_DISASSEMBLE_NAME(i80c52) },
 	{ "i860",       _64le,  0, CPU_DISASSEMBLE_NAME(i860) },

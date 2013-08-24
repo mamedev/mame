@@ -718,6 +718,25 @@ $(CPUOBJ)/i8085/i8085.o:    $(CPUSRC)/i8085/i8085.c \
 							$(CPUSRC)/i8085/i8085cpu.h
 
 
+#-------------------------------------------------
+# Intel 8089
+#@src/emu/cpu/i8085/i8089.h,CPUS += I8089
+#-------------------------------------------------
+
+ifneq ($(filter I8089,$(CPUS)),)
+OBJDIRS += $(CPUOBJ)/i8089
+CPUOBJS += $(CPUOBJ)/i8089/i8089.o \
+           $(CPUOBJ)/i8089/i8089_channel.o \
+           $(CPUOBJ)/i8089/i8089_ops.o
+DASMOBJS += $(CPUOBJ)/i8089/i8089_dasm.o
+endif
+
+$(CPUOBJ)/i8089/i8089_ops.o:     $(CPUSRC)/i8089/i8089_channel.h
+$(CPUOBJ)/i8089/i8089_channel.o: $(CPUSRC)/i8089/i8089_channel.h
+
+$(CPUOBJ)/i8089/i8089.o:    $(CPUSRC)/i8089/i8089.c \
+							$(CPUSRC)/i8089/i8089.h
+
 
 #-------------------------------------------------
 # Intel MCS-48 (8039 and derivatives)

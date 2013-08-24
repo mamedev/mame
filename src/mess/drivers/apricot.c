@@ -2,15 +2,15 @@
 
     ACT Apricot PC/Xi
 
-    - Needs Intel 8089 support (I/O processor)
+    - Error 29 (timer failed)
     - Dump of the keyboard MCU ROM needed (can be dumped using test mode)
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
+#include "cpu/i8089/i8089.h"
 #include "machine/ram.h"
-#include "machine/i8089.h"
 #include "machine/pit8253.h"
 #include "machine/i8255.h"
 #include "machine/pic8259.h"
@@ -24,16 +24,16 @@
 #include "formats/apridisk.h"
 
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
 
 class apricot_state : public driver_device
 {
 public:
-	apricot_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
+	apricot_state(const machine_config &mconfig, device_type type, const char *tag) :
+	driver_device(mconfig, type, tag),
+	m_cpu(*this, "ic91"),
 	m_ram(*this, RAM_TAG),
 	m_iop(*this, "ic71"),
 	m_sn(*this, "ic7"),
@@ -55,7 +55,7 @@ public:
 	m_display_enabled(0)
 	{ }
 
-	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_cpu;
 	required_device<ram_device> m_ram;
 	required_device<i8089_device> m_iop;
 	required_device<sn76489_device> m_sn;
@@ -101,9 +101,9 @@ public:
 };
 
 
-/***************************************************************************
-    I/O
-***************************************************************************/
+//**************************************************************************
+//  I/O
+//**************************************************************************
 
 WRITE8_MEMBER( apricot_state::i8089_ca1_w )
 {
@@ -136,7 +136,7 @@ WRITE8_MEMBER( apricot_state::apricot_sysctrl_w )
 	if (!BIT(data, 5))
 		m_fdc->set_floppy(BIT(data, 6) ? m_floppy1->get_device() : m_floppy0->get_device());
 
-	/* switch video modes */
+	// switch video modes
 	m_crtc->set_clock( m_video_mode ? XTAL_15MHz / 10 : XTAL_15MHz / 16);
 	m_crtc->set_hpixels_per_column( m_video_mode ? 10 : 16);
 }
@@ -229,9 +229,9 @@ static const centronics_interface apricot_centronics_intf =
 };
 
 
-/***************************************************************************
-    FLOPPY
-***************************************************************************/
+//**************************************************************************
+//  FLOPPY
+//**************************************************************************
 
 void apricot_state::wd2793_intrq_w(bool state)
 {
@@ -250,9 +250,9 @@ static SLOT_INTERFACE_START( apricot_floppies )
 SLOT_INTERFACE_END
 
 
-/***************************************************************************
-    VIDEO EMULATION
-***************************************************************************/
+//**************************************************************************
+//  VIDEO EMULATION
+//**************************************************************************
 
 UINT32 apricot_state::screen_update_apricot(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
@@ -272,7 +272,7 @@ static MC6845_UPDATE_ROW( apricot_update_row )
 
 	if (state->m_video_mode)
 	{
-		/* text mode */
+		// text mode
 		for (i = 0; i < x_count; i++)
 		{
 			UINT16 code = state->m_screen_buffer[(ma + i) & 0x7ff];
@@ -280,21 +280,21 @@ static MC6845_UPDATE_ROW( apricot_update_row )
 			UINT16 data = ram[offset + 1] << 8 | ram[offset];
 			int fill = 0;
 
-			if (BIT(code, 12) && BIT(data, 14)) fill = 1; /* strike-through? */
-			if (BIT(code, 13) && BIT(data, 15)) fill = 1; /* underline? */
+			if (BIT(code, 12) && BIT(data, 14)) fill = 1; // strike-through?
+			if (BIT(code, 13) && BIT(data, 15)) fill = 1; // underline?
 
-			/* draw 10 pixels of the character */
+			// draw 10 pixels of the character
 			for (x = 0; x <= 10; x++)
 			{
 				int color = fill ? 1 : BIT(data, x);
-				if (BIT(code, 15)) color = !color; /* reverse? */
+				if (BIT(code, 15)) color = !color; // reverse?
 				bitmap.pix32(y, x + i*10) = RGB_MONOCHROME_GREEN_HIGHLIGHT[color ? 1 + BIT(code, 14) : 0];
 			}
 		}
 	}
 	else
 	{
-		/* graphics mode */
+		// graphics mode
 		fatalerror("Graphics mode not implemented!\n");
 	}
 }
@@ -314,15 +314,20 @@ static MC6845_INTERFACE( apricot_mc6845_intf )
 };
 
 
-/***************************************************************************
-    MACHINE EMULATION
-***************************************************************************/
+//**************************************************************************
+//  MACHINE EMULATION
+//**************************************************************************
 
 void apricot_state::machine_start()
 {
-	m_maincpu->space(AS_PROGRAM).install_ram(0x00000, m_ram->size() - 1, m_ram->pointer());
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(apricot_state::irq_callback), this));
+	// install shared memory to the main cpu and the iop
+	m_cpu->space(AS_PROGRAM).install_ram(0x00000, m_ram->size() - 1, m_ram->pointer());
+	m_iop->space(AS_PROGRAM).install_ram(0x00000, m_ram->size() - 1, m_ram->pointer());
 
+	// setup interrupt acknowledge callback for the main cpu
+	m_cpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(apricot_state::irq_callback), this));
+
+	// setup floppy disk controller callbacks
 	m_fdc->setup_intrq_cb(wd2793_t::line_cb(FUNC(apricot_state::wd2793_intrq_w), this));
 	m_fdc->setup_drq_cb(wd2793_t::line_cb(FUNC(apricot_state::wd2793_drq_w), this));
 
@@ -332,9 +337,9 @@ void apricot_state::machine_start()
 }
 
 
-/***************************************************************************
-    ADDRESS MAPS
-***************************************************************************/
+//**************************************************************************
+//  ADDRESS MAPS
+//**************************************************************************
 
 static ADDRESS_MAP_START( apricot_mem, AS_PROGRAM, 16, apricot_state )
 //	AM_RANGE(0x00000, 0x3ffff) AM_RAMBANK("standard_ram")
@@ -354,13 +359,13 @@ static ADDRESS_MAP_START( apricot_io, AS_IO, 16, apricot_state )
 	AM_RANGE(0x6a, 0x6b) AM_MIRROR(0x04) AM_DEVREADWRITE8("ic30", mc6845_device, register_r, register_w, 0x00ff)
 	AM_RANGE(0x70, 0x71) AM_MIRROR(0x04) AM_WRITE8(i8089_ca1_w, 0x00ff)
 	AM_RANGE(0x72, 0x73) AM_MIRROR(0x04) AM_WRITE8(i8089_ca2_w, 0x00ff)
-	AM_RANGE(0x78, 0x7f) AM_NOP /* unavailable */
+	AM_RANGE(0x78, 0x7f) AM_NOP // unavailable
 ADDRESS_MAP_END
 
 
-/***************************************************************************
-    MACHINE DRIVERS
-***************************************************************************/
+//**************************************************************************
+//  MACHINE DRIVERS
+//**************************************************************************
 
 static const sn76496_config psg_intf =
 {
@@ -368,11 +373,16 @@ static const sn76496_config psg_intf =
 };
 
 static MACHINE_CONFIG_START( apricot, apricot_state )
-	MCFG_CPU_ADD("maincpu", I8086, XTAL_15MHz / 3)
+	// main cpu
+	MCFG_CPU_ADD("ic91", I8086, XTAL_15MHz / 3)
 	MCFG_CPU_PROGRAM_MAP(apricot_mem)
 	MCFG_CPU_IO_MAP(apricot_io)
 
-	MCFG_I8089_ADD("ic71", XTAL_15MHz / 3, "maincpu")
+	// i/o cpu
+	MCFG_CPU_ADD("ic71", I8089, XTAL_15MHz / 3)
+	MCFG_CPU_PROGRAM_MAP(apricot_mem)
+	MCFG_CPU_IO_MAP(apricot_io)
+	MCFG_I8089_DATABUS_WIDTH(16)
 	MCFG_I8089_SINTR1(DEVWRITELINE("ic31", pic8259_device, ir0_w))
 	MCFG_I8089_SINTR2(DEVWRITELINE("ic31", pic8259_device, ir1_w))
 
@@ -383,6 +393,8 @@ static MACHINE_CONFIG_START( apricot, apricot_state )
 	MCFG_SCREEN_REFRESH_RATE(72)
 	MCFG_SCREEN_UPDATE_DRIVER(apricot_state, screen_update_apricot)
 
+	MCFG_MC6845_ADD("ic30", MC6845, "screen", XTAL_15MHz / 10, apricot_mc6845_intf)
+
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ic7", SN76489, XTAL_4MHz / 2)
@@ -392,12 +404,11 @@ static MACHINE_CONFIG_START( apricot, apricot_state )
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("256k")
-	MCFG_RAM_EXTRA_OPTIONS("384k,512k") /* with 1 or 2 128k expansion boards */
+	MCFG_RAM_EXTRA_OPTIONS("384k,512k") // with 1 or 2 128k expansion boards
 
 	// devices
-	MCFG_MC6845_ADD("ic30", MC6845, "screen", XTAL_15MHz / 10, apricot_mc6845_intf)
 	MCFG_I8255A_ADD("ic17", apricot_i8255a_intf)
-	MCFG_PIC8259_ADD("ic31", INPUTLINE("maincpu", 0), VCC, NULL)
+	MCFG_PIC8259_ADD("ic31", INPUTLINE("ic91", 0), VCC, NULL)
 	MCFG_PIT8253_ADD("ic16", apricot_pit8253_intf)
 	MCFG_Z80SIO0_ADD("ic15", XTAL_15MHz / 6, apricot_z80sio_intf)
 
@@ -417,9 +428,9 @@ static MACHINE_CONFIG_DERIVED( apricotxi, apricot )
 MACHINE_CONFIG_END
 
 
-/***************************************************************************
-    ROM DEFINITIONS
-***************************************************************************/
+//**************************************************************************
+//  ROM DEFINITIONS
+//**************************************************************************
 
 ROM_START( apricot )
 	ROM_REGION(0x4000, "bootstrap", 0)
@@ -429,15 +440,15 @@ ROM_END
 
 ROM_START( apricotxi )
 	ROM_REGION(0x4000, "bootstrap", 0)
-	ROM_LOAD16_BYTE("lo_ve007.u11", 0x0000, 0x2000, CRC(e74e14d1) SHA1(569133b0266ce3563b21ae36fa5727308797deee)) /* LO Ve007 03.04.84 */
-	ROM_LOAD16_BYTE("hi_ve007.u9",  0x0001, 0x2000, CRC(b04fb83e) SHA1(cc2b2392f1b4c04bb6ec8ee26f8122242c02e572)) /* HI Ve007 03.04.84 */
+	ROM_LOAD16_BYTE("lo_ve007.u11", 0x0000, 0x2000, CRC(e74e14d1) SHA1(569133b0266ce3563b21ae36fa5727308797deee)) // LO Ve007 03.04.84
+	ROM_LOAD16_BYTE("hi_ve007.u9",  0x0001, 0x2000, CRC(b04fb83e) SHA1(cc2b2392f1b4c04bb6ec8ee26f8122242c02e572)) // HI Ve007 03.04.84
 ROM_END
 
 
-/***************************************************************************
-    GAME DRIVERS
-***************************************************************************/
+//**************************************************************************
+//  GAME DRIVERS
+//**************************************************************************
 
-/*    YEAR  NAME       PARENT   COMPAT  MACHINE    INPUT  CLASS          INIT  COMPANY  FULLNAME      FLAGS */
+//    YEAR  NAME       PARENT   COMPAT  MACHINE    INPUT  CLASS          INIT  COMPANY  FULLNAME      FLAGS
 COMP( 1983, apricot,   0,       0,      apricot,   0,     driver_device, 0,    "ACT",   "Apricot PC", GAME_NOT_WORKING )
 COMP( 1984, apricotxi, apricot, 0,      apricotxi, 0,     driver_device, 0,    "ACT",   "Apricot Xi", GAME_NOT_WORKING )
