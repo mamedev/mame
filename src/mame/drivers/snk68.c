@@ -811,11 +811,11 @@ ROM_START( ikari3 )
 	ROM_LOAD16_BYTE( "ik3-3-ver1.c9",  0x000001, 0x20000, CRC(10e38b66) SHA1(28cc82d868f59cd6dde1c4e4c890627012e5e978) ) /* 8-Way Joystick */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )    /* Sound CPU */
-	ROM_LOAD( "ik3-5.bin",  0x000000, 0x10000, CRC(ce6706fc) SHA1(95505b90a9524abf0c8c1ec6b2c40d8f25cb1d92) )
+	ROM_LOAD( "ik3-5.16d",  0x000000, 0x10000, CRC(ce6706fc) SHA1(95505b90a9524abf0c8c1ec6b2c40d8f25cb1d92) )
 
 	ROM_REGION( 0x010000, "gfx1", 0 )   /* characters */
-	ROM_LOAD( "ik3-7.bin",  0x000000, 0x08000, CRC(0b4804df) SHA1(66d16d245bfc404366164823faaea0bfec83e487) )
-	ROM_LOAD( "ik3-8.bin",  0x008000, 0x08000, CRC(10ab4e50) SHA1(dee8416eb720848cf6471e568dadc1cfc6c2e67f) )
+	ROM_LOAD( "ik3-7.16l",  0x000000, 0x08000, CRC(0b4804df) SHA1(66d16d245bfc404366164823faaea0bfec83e487) )
+	ROM_LOAD( "ik3-8.16m",  0x008000, 0x08000, CRC(10ab4e50) SHA1(dee8416eb720848cf6471e568dadc1cfc6c2e67f) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 )   /* sprites */
 	ROM_LOAD16_BYTE( "ik3-23.bin", 0x000000, 0x20000, CRC(d0fd5c77) SHA1(c171c64ad252f0ba5b0bbdf37808102fca37b488) )
@@ -842,7 +842,7 @@ ROM_START( ikari3 )
 	// 340000-3fffff empty
 
 	ROM_REGION( 0x20000, "upd", 0 ) /* UPD7759 samples */
-	ROM_LOAD( "ik3-6.bin",  0x000000, 0x20000, CRC(59d256a4) SHA1(1e7b33329f761c695bc9a817bbc0c5e13386d073) )
+	ROM_LOAD( "ik3-6.18e",  0x000000, 0x20000, CRC(59d256a4) SHA1(1e7b33329f761c695bc9a817bbc0c5e13386d073) )
 
 	ROM_REGION16_BE( 0x40000, "user1", 0 ) /* Extra code bank */
 	ROM_LOAD16_BYTE( "ik3-1.c8",   0x000000, 0x10000, CRC(47e4d256) SHA1(7c6921cf2f1b8c3dae867eb1fc14e3da218cc1e0) )
@@ -855,11 +855,11 @@ ROM_START( ikari3u )
 	ROM_LOAD16_BYTE( "ik3-3.c9",  0x000001, 0x20000, CRC(50f2b83d) SHA1(b1f0c554b262614dd2cff7a3857cb974d361937f) ) /* Rotary Joystick */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )    /* Sound CPU */
-	ROM_LOAD( "ik3-5.bin",  0x000000, 0x10000, CRC(ce6706fc) SHA1(95505b90a9524abf0c8c1ec6b2c40d8f25cb1d92) )
+	ROM_LOAD( "ik3-5.15d",  0x000000, 0x10000, CRC(ce6706fc) SHA1(95505b90a9524abf0c8c1ec6b2c40d8f25cb1d92) )
 
 	ROM_REGION( 0x010000, "gfx1", 0 )   /* characters */
-	ROM_LOAD( "ik3-7.bin",  0x000000, 0x08000, CRC(0b4804df) SHA1(66d16d245bfc404366164823faaea0bfec83e487) )
-	ROM_LOAD( "ik3-8.bin",  0x008000, 0x08000, CRC(10ab4e50) SHA1(dee8416eb720848cf6471e568dadc1cfc6c2e67f) )
+	ROM_LOAD( "ik3-7.16l",  0x000000, 0x08000, CRC(0b4804df) SHA1(66d16d245bfc404366164823faaea0bfec83e487) )
+	ROM_LOAD( "ik3-8.16m",  0x008000, 0x08000, CRC(10ab4e50) SHA1(dee8416eb720848cf6471e568dadc1cfc6c2e67f) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 )   /* sprites */
 	ROM_LOAD16_BYTE( "ik3-23.bin", 0x000000, 0x20000, CRC(d0fd5c77) SHA1(c171c64ad252f0ba5b0bbdf37808102fca37b488) )
@@ -886,7 +886,7 @@ ROM_START( ikari3u )
 	// 340000-3fffff empty
 
 	ROM_REGION( 0x20000, "upd", 0 ) /* UPD7759 samples */
-	ROM_LOAD( "ik3-6.bin",  0x000000, 0x20000, CRC(59d256a4) SHA1(1e7b33329f761c695bc9a817bbc0c5e13386d073) )
+	ROM_LOAD( "ik3-6.18e",  0x000000, 0x20000, CRC(59d256a4) SHA1(1e7b33329f761c695bc9a817bbc0c5e13386d073) )
 
 	ROM_REGION16_BE( 0x40000, "user1", 0 ) /* Extra code bank */
 	ROM_LOAD16_BYTE( "ik3-1.c8",   0x000000, 0x10000, CRC(47e4d256) SHA1(7c6921cf2f1b8c3dae867eb1fc14e3da218cc1e0) )
@@ -899,11 +899,11 @@ ROM_START( ikari3j )
 	ROM_LOAD16_BYTE( "ik3-3-j.c9",  0x000001, 0x20000, CRC(8e6e2aa9) SHA1(e624809c42a79510b34d99d9ca152a38c7051e87) ) /* Rotary Joystick */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )    /* Sound CPU */
-	ROM_LOAD( "ik3-5.bin",  0x000000, 0x10000, CRC(ce6706fc) SHA1(95505b90a9524abf0c8c1ec6b2c40d8f25cb1d92) )
+	ROM_LOAD( "ik3-5.16d",  0x000000, 0x10000, CRC(ce6706fc) SHA1(95505b90a9524abf0c8c1ec6b2c40d8f25cb1d92) )
 
 	ROM_REGION( 0x010000, "gfx1", 0 )   /* characters */
-	ROM_LOAD( "ik3-7.bin",  0x000000, 0x08000, CRC(0b4804df) SHA1(66d16d245bfc404366164823faaea0bfec83e487) )
-	ROM_LOAD( "ik3-8.bin",  0x008000, 0x08000, CRC(10ab4e50) SHA1(dee8416eb720848cf6471e568dadc1cfc6c2e67f) )
+	ROM_LOAD( "ik3-7.16l",  0x000000, 0x08000, CRC(0b4804df) SHA1(66d16d245bfc404366164823faaea0bfec83e487) )
+	ROM_LOAD( "ik3-8.16m",  0x008000, 0x08000, CRC(10ab4e50) SHA1(dee8416eb720848cf6471e568dadc1cfc6c2e67f) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 )   /* sprites */
 	ROM_LOAD16_BYTE( "ik3-23.bin", 0x000000, 0x20000, CRC(d0fd5c77) SHA1(c171c64ad252f0ba5b0bbdf37808102fca37b488) )
@@ -930,7 +930,51 @@ ROM_START( ikari3j )
 	// 340000-3fffff empty
 
 	ROM_REGION( 0x20000, "upd", 0 ) /* UPD7759 samples */
-	ROM_LOAD( "ik3-6.bin",  0x000000, 0x20000, CRC(59d256a4) SHA1(1e7b33329f761c695bc9a817bbc0c5e13386d073) )
+	ROM_LOAD( "ik3-6.18e",  0x000000, 0x20000, CRC(59d256a4) SHA1(1e7b33329f761c695bc9a817bbc0c5e13386d073) )
+
+	ROM_REGION16_BE( 0x40000, "user1", 0 ) /* Extra code bank */
+	ROM_LOAD16_BYTE( "ik3-1.c8",   0x000000, 0x10000, CRC(47e4d256) SHA1(7c6921cf2f1b8c3dae867eb1fc14e3da218cc1e0) )
+	ROM_LOAD16_BYTE( "ik3-4.c12",  0x000001, 0x10000, CRC(a43af6b5) SHA1(1ad3acadbadd21642932028ecd7c282f7fd02856) )
+ROM_END
+
+ROM_START( ikari3k )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "ik3-2k.c10", 0x000000, 0x20000, CRC(a15d2222) SHA1(7f9702516f9c74314b093435937dfecb69495b6c) ) /* 8-Way Joystick */
+	ROM_LOAD16_BYTE( "ik3-3k.c9",  0x000001, 0x20000, CRC(e3fc006e) SHA1(14e8ba1064e9bd168a4f7e5b5cc2a4b1ddbc7e32) ) /* 8-Way Joystick */
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )    /* Sound CPU */
+	ROM_LOAD( "ik3-5.16d",  0x000000, 0x10000, CRC(ce6706fc) SHA1(95505b90a9524abf0c8c1ec6b2c40d8f25cb1d92) )
+
+	ROM_REGION( 0x010000, "gfx1", 0 )   /* characters */
+	ROM_LOAD( "ik3-7k.16l",  0x000000, 0x08000, CRC(8bfb399b) SHA1(f9f9d947a7739d13269e2ab84ab25a7e403aed34) )
+	ROM_LOAD( "ik3-8k.16m",  0x008000, 0x08000, CRC(3f0fe576) SHA1(70f4438e31b06ee0dc4660c04f512ccf3b7fa55f) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 )   /* sprites */
+	ROM_LOAD16_BYTE( "ik3-23.bin", 0x000000, 0x20000, CRC(d0fd5c77) SHA1(c171c64ad252f0ba5b0bbdf37808102fca37b488) ) /* Missing 4M mask ROM dumps from the A7007-SUB4M */
+	ROM_LOAD16_BYTE( "ik3-13.bin", 0x000001, 0x20000, CRC(9a56bd32) SHA1(9301b48f970b71a909fb44514b2e93c3f1516b38) ) /* ROM board. Assumed to be the same data */
+	ROM_LOAD16_BYTE( "ik3-22.bin", 0x040000, 0x20000, CRC(4878d883) SHA1(8cdb541bad00e707fb65399d637b7cc9288ada77) )
+	ROM_LOAD16_BYTE( "ik3-12.bin", 0x040001, 0x20000, CRC(0ce6a10a) SHA1(13a231aa0002b2c5a0d9404ba05a879e212d638e) )
+	ROM_LOAD16_BYTE( "ik3-21.bin", 0x080000, 0x20000, CRC(50d0fbf0) SHA1(9ff5fbea8d35d0f9a38ddd7eb093edcd91d9f874) )
+	ROM_LOAD16_BYTE( "ik3-11.bin", 0x080001, 0x20000, CRC(e4e2be43) SHA1(959d2799708ddae909b017c0696694c46a52697e) )
+	ROM_LOAD16_BYTE( "ik3-20.bin", 0x0c0000, 0x20000, CRC(9a851efc) SHA1(bc7be338ee4da7fbfe6fe44a9c7889817416bc44) )
+	ROM_LOAD16_BYTE( "ik3-10.bin", 0x0c0001, 0x20000, CRC(ac222372) SHA1(8a17e37699d691b962a6d0256a18550cc73ddfef) )
+	ROM_LOAD16_BYTE( "ik3-19.bin", 0x100000, 0x20000, CRC(4ebdba89) SHA1(f3ecfef4c9d2aba58dc3e6aa3cf5813d68686909) )
+	ROM_LOAD16_BYTE( "ik3-9.bin",  0x100001, 0x20000, CRC(c33971c2) SHA1(91f3eb301803f5a7027da1ff7dd2a28bc97e5125) )
+	// 140000-1fffff empty
+	ROM_LOAD16_BYTE( "ik3-14.bin", 0x200000, 0x20000, CRC(453bea77) SHA1(f8f8d0c048fcf32ad99e1de622d9ab635bb86eae) )
+	ROM_LOAD16_BYTE( "ik3-24.bin", 0x200001, 0x20000, CRC(e9b26d68) SHA1(067d582d33157ed4b7980bd87f2f260ab74c347b) )
+	ROM_LOAD16_BYTE( "ik3-15.bin", 0x240000, 0x20000, CRC(781a81fc) SHA1(e08a6cf9c632d1002176afe618605bc06168e8aa) )
+	ROM_LOAD16_BYTE( "ik3-25.bin", 0x240001, 0x20000, CRC(073b03f1) SHA1(b8053139799fa06c7324cee928154c89d4425ab1) )
+	ROM_LOAD16_BYTE( "ik3-16.bin", 0x280000, 0x20000, CRC(80ba400b) SHA1(2cc3e53c45f239516a60c461ad9cfa5955164262) )
+	ROM_LOAD16_BYTE( "ik3-26.bin", 0x280001, 0x20000, CRC(9c613561) SHA1(fc7c9a642b18faa94e6a2ba53f35a4d756a25da3) )
+	ROM_LOAD16_BYTE( "ik3-17.bin", 0x2c0000, 0x20000, CRC(0cc3ce4a) SHA1(7b34435d0bbb089055a183b821ab255170db6bec) )
+	ROM_LOAD16_BYTE( "ik3-27.bin", 0x2c0001, 0x20000, CRC(16dd227e) SHA1(db3b1718dea65bc9a1a736aa62aa2be389313baf) )
+	ROM_LOAD16_BYTE( "ik3-18.bin", 0x300000, 0x20000, CRC(ba106245) SHA1(ac609ec3046c21fe6058f91dd4528c5c6448dc15) )
+	ROM_LOAD16_BYTE( "ik3-28.bin", 0x300001, 0x20000, CRC(711715ae) SHA1(90978c86884ca3d23c138d95b654e2fb3afc6f9a) )
+	// 340000-3fffff empty
+
+	ROM_REGION( 0x20000, "upd", 0 ) /* UPD7759 samples */
+	ROM_LOAD( "ik3-6.18e",  0x000000, 0x20000, CRC(59d256a4) SHA1(1e7b33329f761c695bc9a817bbc0c5e13386d073) )
 
 	ROM_REGION16_BE( 0x40000, "user1", 0 ) /* Extra code bank */
 	ROM_LOAD16_BYTE( "ik3-1.c8",   0x000000, 0x10000, CRC(47e4d256) SHA1(7c6921cf2f1b8c3dae867eb1fc14e3da218cc1e0) )
@@ -1036,15 +1080,16 @@ DRIVER_INIT_MEMBER(snk68_state,searchar)
 
 /******************************************************************************/
 
-GAME( 1988, pow,      0,        pow,      pow, driver_device,      0,        ROT0,  "SNK", "P.O.W. - Prisoners of War (US version 1)", 0 )
-GAME( 1988, powj,     pow,      pow,      powj, driver_device,     0,        ROT0,  "SNK", "Datsugoku - Prisoners of War (Japan)", 0 )
+GAME( 1988, pow,      0,        pow,      pow,      driver_device, 0,        ROT0,  "SNK", "P.O.W. - Prisoners of War (US version 1)", 0 )
+GAME( 1988, powj,     pow,      pow,      powj,     driver_device, 0,        ROT0,  "SNK", "Datsugoku - Prisoners of War (Japan)", 0 )
 GAME( 1989, streetsm, 0,        pow,      streetsm, driver_device, 0,        ROT0,  "SNK", "Street Smart (US version 2)", 0 )
 GAME( 1989, streetsm1,streetsm, searchar, streetsm, driver_device, 0,        ROT0,  "SNK", "Street Smart (US version 1)", 0 )
 GAME( 1989, streetsmw,streetsm, searchar, streetsj, driver_device, 0,        ROT0,  "SNK", "Street Smart (World version 1)", 0 )
 GAME( 1989, streetsmj,streetsm, searchar, streetsj, driver_device, 0,        ROT0,  "SNK", "Street Smart (Japan version 1)", 0 )
-GAME( 1989, ikari3,   0,        searchar, ikari3, snk68_state,   searchar, ROT0,  "SNK", "Ikari III - The Rescue (World, 8-Way Joystick)", 0 )
-GAME( 1989, ikari3u,  ikari3,   searchar, ikari3, snk68_state,   searchar, ROT0,  "SNK", "Ikari III - The Rescue (US, Rotary Joystick)", 0 )
-GAME( 1989, ikari3j,  ikari3,   searchar, ikari3, snk68_state,   searchar, ROT0,  "SNK", "Ikari Three (Japan, Rotary Joystick)", 0 )
-GAME( 1989, searchar, 0,        searchar, searchar, snk68_state, searchar, ROT90, "SNK", "SAR - Search And Rescue (World)", 0 )
-GAME( 1989, searcharu,searchar, searchar, searchar, snk68_state, searchar, ROT90, "SNK", "SAR - Search And Rescue (US)", 0 )
-GAME( 1989, searcharj,searchar, searchar, searchar, snk68_state, searchar, ROT90, "SNK", "SAR - Search And Rescue (Japan)", 0 )
+GAME( 1989, ikari3,   0,        searchar, ikari3,   snk68_state,   searchar, ROT0,  "SNK", "Ikari III - The Rescue (World, 8-Way Joystick)", 0 )
+GAME( 1989, ikari3u,  ikari3,   searchar, ikari3,   snk68_state,   searchar, ROT0,  "SNK", "Ikari III - The Rescue (US, Rotary Joystick)", 0 )
+GAME( 1989, ikari3j,  ikari3,   searchar, ikari3,   snk68_state,   searchar, ROT0,  "SNK", "Ikari Three (Japan, Rotary Joystick)", 0 )
+GAME( 1989, ikari3k,  ikari3,   searchar, ikari3,   snk68_state,   searchar, ROT0,  "SNK", "Ikari III - The Rescue (Korea, 8-Way Joystick)", 0 )
+GAME( 1989, searchar, 0,        searchar, searchar, snk68_state,   searchar, ROT90, "SNK", "SAR - Search And Rescue (World)", 0 )
+GAME( 1989, searcharu,searchar, searchar, searchar, snk68_state,   searchar, ROT90, "SNK", "SAR - Search And Rescue (US)", 0 )
+GAME( 1989, searcharj,searchar, searchar, searchar, snk68_state,   searchar, ROT90, "SNK", "SAR - Search And Rescue (Japan)", 0 )

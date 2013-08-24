@@ -791,8 +791,9 @@ liblrabl        // (c) 1983
 toypop          // (c) 1986
 // Z8000 games
 polepos         // (c) 1982
-poleposa        // 136014   (c) 1982 + Atari license
-polepos1        // 136014   (c) 1982 Atari
+poleposj        // (c) 1982
+poleposa2       // 136014   (c) 1982 + Atari license
+poleposa1       // 136014   (c) 1982 Atari
 topracer        // bootleg
 topracera       // bootleg
 topracern       // bootleg
@@ -7130,6 +7131,7 @@ tdfever2        // A6006 'TD'?(c) 1988
 ikari3          // A7007 'IK3'(c) 1989
 ikari3u         // A7007 'IK3'(c) 1989
 ikari3j         // A7007 'IK3'(c) 1989
+ikari3k         // A7007 'IK3'(c) 1989
 pow             // A7008 'DG' (c) 1988
 powj            // A7008 'DG' (c) 1988
 searchar        // A8007 'BH' (c) 1989
