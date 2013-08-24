@@ -410,9 +410,9 @@ static INPUT_PORTS_START( galpani3 )
 	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) ) // ?
-	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )  // unused
 	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -543,7 +543,7 @@ MACHINE_CONFIG_END
 ROM_START( galpani3 ) /* All game text in English */
 	ROM_REGION( 0x180000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "g3p0e0.u71",  0x000000, 0x080000, CRC(fa681118) SHA1(982b568a77ed620ba5708fec4c186d329d48cb48) )
-	ROM_LOAD16_BYTE( "g3p1j1.u102", 0x000001, 0x080000, CRC(f1150f1b) SHA1(a6fb719937927a9a39c7a4888017c63c47c2dd6c) ) /* Is it really G3P1J1 like below or G3P1J0?? */
+	ROM_LOAD16_BYTE( "g3p1e0.u102", 0x000001, 0x080000, CRC(f1150f1b) SHA1(a6fb719937927a9a39c7a4888017c63c47c2dd6c) )
 
 	ROM_REGION( 0x200000, "gfx1", 0 ) /* Sprites - RLE encoded */
 	ROM_LOAD( "gp320000.1", 0x000000, 0x200000, CRC(a0112827) SHA1(0a6c78d71b75a1d78215aab3104176aa1769b14f) )
@@ -588,8 +588,33 @@ ROM_START( galpani3j ) /* Some game text in Japanese, but no "For use in Japan" 
 	ROM_LOAD16_WORD_SWAP( "g3d0x0.134", 0x000000, 0x020000, CRC(4ace10f9) SHA1(d19e4540d535ce10d23cb0844be03a3239b3402e) )
 ROM_END
 
+ROM_START( galpani3k ) /* Some game text in Korean, but no "For use in Korea" type region notice */
+	ROM_REGION( 0x180000, "maincpu", 0 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "g3p0k0.71",  0x000000, 0x080000, CRC(98147760) SHA1(6db614e1af4e163488ab9675d96db829f45cec22) )
+	ROM_LOAD16_BYTE( "g3p1k0.102", 0x000001, 0x080000, CRC(27416b22) SHA1(dbb3ec78cf70fd9a56e4f51c1c2b65feabc14190) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 ) /* Sprites - RLE encoded */
+	ROM_LOAD( "gp320000.1", 0x000000, 0x200000, CRC(a0112827) SHA1(0a6c78d71b75a1d78215aab3104176aa1769b14f) )
+
+	ROM_REGION( 0x1000000, "gfx2", 0 ) /* Backgrounds - RLE encoded */
+	ROM_LOAD( "gp340000.123", 0x000000, 0x200000, CRC(a58a26b1) SHA1(832d70cce1b4f04fa50fc221962ff6cc4287cb92) )        // 19950414GROMACap
+	ROM_LOAD( "gp340100.122", 0x200000, 0x200000, CRC(746fe4a8) SHA1(a5126ae9e83d556277d31b166296a708c311a902) )        // 19950414GROMBCap
+	ROM_LOAD( "gp340200.121", 0x400000, 0x200000, CRC(e9bc15c8) SHA1(2c6a10e768709d1937d9206970553f4101ce9016) )        // 19950414GROMCCap
+	ROM_LOAD( "gp340300.120", 0x600000, 0x200000, CRC(59062eef) SHA1(936977c20d83540c1e0f65d429c7ebea201ef991) )        // 19950414GROMDCap
+	ROM_LOAD16_BYTE( "g3g0k0.101", 0xe00000, 0x080000, CRC(23d895b0) SHA1(621cc1500e26c3fe4410eefadd325891e7806f85) )   // 19950523GROMECap
+	ROM_LOAD16_BYTE( "g3g1k0.100", 0xe00001, 0x080000, CRC(9b1eac6d) SHA1(1393d42a7ad70af90fa0f48fb8da7e2f9085f98f) )   //
+
+	ROM_REGION( 0x300000, "ymz", 0 ) /* Samples */
+	ROM_LOAD( "gp310100.40", 0x000000, 0x200000, CRC(6a0b1d12) SHA1(11fed80b96d07fddb27599743991c58c12c048e0) )
+	ROM_LOAD( "gp310000.41", 0x200000, 0x100000, CRC(641062ef) SHA1(c8902fc46319eac94b3f95d18afa24bd895078d6) )
+
+	ROM_REGION( 0x20000, "mcudata", 0 ) /* MCU Code? */
+	ROM_LOAD16_WORD_SWAP( "g3d0x0.134", 0x000000, 0x020000, CRC(4ace10f9) SHA1(d19e4540d535ce10d23cb0844be03a3239b3402e) )
+ROM_END
 
 
 
-GAME( 1995, galpani3,  0,        galpani3, galpani3, galpani3_state, galpani3, ROT90, "Kaneko", "Gals Panic 3 (Euro)", GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL )
+
+GAME( 1995, galpani3,  0,        galpani3, galpani3, galpani3_state, galpani3, ROT90, "Kaneko", "Gals Panic 3 (Euro)",  GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL )
 GAME( 1995, galpani3j, galpani3, galpani3, galpani3, galpani3_state, galpani3, ROT90, "Kaneko", "Gals Panic 3 (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL )
+GAME( 1995, galpani3k, galpani3, galpani3, galpani3, galpani3_state, galpani3, ROT90, "Kaneko", "Gals Panic 3 (Korea)", GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL )
