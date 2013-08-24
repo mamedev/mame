@@ -1129,11 +1129,11 @@ WRITE32_MEMBER( powervr2_device::spg_vblank_int_w )
 	COMBINE_DATA(&spg_vblank_int);
 
 	/* clear pending irqs and modify them with the updated ones */
-	vbin_timer->adjust(attotime::never);
-	vbout_timer->adjust(attotime::never);
+//	vbin_timer->adjust(attotime::never);
+//	vbout_timer->adjust(attotime::never);
 
-	vbin_timer->adjust(m_screen->time_until_pos(spg_vblank_int & 0x3ff));
-	vbout_timer->adjust(m_screen->time_until_pos((spg_vblank_int >> 16) & 0x3ff));
+//	vbin_timer->adjust(m_screen->time_until_pos(spg_vblank_int & 0x3ff));
+//	vbout_timer->adjust(m_screen->time_until_pos((spg_vblank_int >> 16) & 0x3ff));
 }
 
 READ32_MEMBER( powervr2_device::spg_hblank_r )
@@ -2763,14 +2763,14 @@ TIMER_CALLBACK_MEMBER(powervr2_device::vbin)
 	irq_cb(VBL_IN_IRQ);
 
 	//popmessage("VII %d VOI %d VI %d VO %d VS %d",spg_vblank_int & 0x3ff,(spg_vblank_int >> 16) & 0x3ff,spg_vblank & 0x3ff,(spg_vblank >> 16) & 0x3ff,(spg_load >> 16) & 0x3ff);
-	vbin_timer->adjust(m_screen->time_until_pos(spg_vblank_int & 0x3ff));
+//	vbin_timer->adjust(m_screen->time_until_pos(spg_vblank_int & 0x3ff));
 }
 
 TIMER_CALLBACK_MEMBER(powervr2_device::vbout)
 {
 	irq_cb(VBL_OUT_IRQ);
 
-	vbout_timer->adjust(m_screen->time_until_pos((spg_vblank_int >> 16) & 0x3ff));
+//	vbout_timer->adjust(m_screen->time_until_pos((spg_vblank_int >> 16) & 0x3ff));
 }
 
 TIMER_CALLBACK_MEMBER(powervr2_device::hbin)
@@ -3006,8 +3006,8 @@ void powervr2_device::device_start()
 
 	computedilated();
 
-	vbout_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(powervr2_device::vbout),this));
-	vbin_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(powervr2_device::vbin),this));
+//	vbout_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(powervr2_device::vbout),this));
+//	vbin_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(powervr2_device::vbin),this));
 	hbin_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(powervr2_device::hbin),this));
 
 	endofrender_timer_isp = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(powervr2_device::endofrender_isp),this));
@@ -3149,8 +3149,8 @@ void powervr2_device::device_reset()
 	renderselect= -1;
 	grabsel=0;
 
-	vbout_timer->adjust(m_screen->time_until_pos((spg_vblank_int >> 16) & 0x3ff));
-	vbin_timer->adjust(m_screen->time_until_pos(spg_vblank_int & 0x3ff));
+//	vbout_timer->adjust(m_screen->time_until_pos((spg_vblank_int >> 16) & 0x3ff));
+//	vbin_timer->adjust(m_screen->time_until_pos(spg_vblank_int & 0x3ff));
 	hbin_timer->adjust(m_screen->time_until_pos(0, ((spg_hblank_int >> 16) & 0x3ff)-1));
 
 	scanline = 0;
@@ -3164,3 +3164,18 @@ void powervr2_device::device_reset()
 	dc_texture_ram = state->dc_texture_ram.target();
 	dc_framebuffer_ram = state->dc_framebuffer_ram.target();
 }
+
+/* called by TIMER_ADD_PERIODIC, in driver sections */
+void powervr2_device::pvr_scanline_timer(int vpos)
+{
+	int vbin_line = spg_vblank_int & 0x3ff;
+	int vbout_line = (spg_vblank_int >> 16) & 0x3ff;
+
+	if(vbin_line == vpos)
+		irq_cb(VBL_IN_IRQ);
+
+	if(vbout_line == vpos)
+		irq_cb(VBL_OUT_IRQ);
+
+}
+

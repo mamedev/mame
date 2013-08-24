@@ -264,6 +264,7 @@ public:
 	TIMER_CALLBACK_MEMBER(pvr_dma_irq);
 
 	void pvr_dma_execute(address_space &space);
+	void pvr_scanline_timer(int vpos);
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:

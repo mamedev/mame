@@ -85,6 +85,7 @@ class dc_state : public driver_device
 	optional_device<naomi_g1_device> m_naomig1;
 
 	void generic_dma(UINT32 main_adr, void *dma_ptr, UINT32 length, UINT32 size, bool to_mainram);
+	TIMER_DEVICE_CALLBACK_MEMBER(dc_scanline);
 };
 
 /*--------- Ch2-DMA Control Registers ----------*/

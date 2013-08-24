@@ -807,3 +807,8 @@ WRITE32_MEMBER(dc_state::dc_arm_aica_w)
 {
 	aica_w(machine().device("aica"), space, offset*2, data, mem_mask&0xffff);
 }
+
+TIMER_DEVICE_CALLBACK_MEMBER(dc_state::dc_scanline)
+{
+	m_powervr2->pvr_scanline_timer(param);
+}

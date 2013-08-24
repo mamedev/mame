@@ -26,7 +26,7 @@
     - F355 Challenge: asserts after Sega logo;
 	- Idol Janshi wo Tsukucchaou: pixel aspect is way wrong (stretched and offsetted horizontally)
 	- Power Stone: hangs at Capcom logo;
-	- Sega GT: hangs at "produced by Sega" screen;
+	- Sega GT: hangs with a white screen after pressing start on attract mode (executes SCSI command 0x20 -> CD-Play);
 	- Tetris 4D: has color bugs, hangs at FMV anyway
 
 	Note:
@@ -369,6 +369,7 @@ static MACHINE_CONFIG_START( dc, dc_cons_state )
 	MCFG_CPU_CONFIG(sh4cpu_config)
 	MCFG_CPU_PROGRAM_MAP(dc_map)
 	MCFG_CPU_IO_MAP(dc_port)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", dc_state, dc_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("soundcpu", ARM7, ((XTAL_33_8688MHz*2)/3)/8)   // AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
 	MCFG_CPU_PROGRAM_MAP(dc_audio_map)
