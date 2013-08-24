@@ -1243,7 +1243,8 @@ READ32_MEMBER( powervr2_device::spg_status_r )
 	UINT32 vsync = ((m_screen->vpos() >= spg_vbstart) || (m_screen->vpos() < spg_vbend)) ? 0 : 1;
 	UINT32 hsync = ((m_screen->hpos() >= spg_hbstart) || (m_screen->hpos() < spg_hbend)) ? 0 : 1;
 	/* FIXME: following is just a wild guess */
-	UINT32 blank = (vsync | hsync) ? 0 : 1;
+	UINT32 blank; = ((m_screen->vpos() >= spg_vbstart) || (m_screen->vpos() < spg_vbend) |
+                     (m_screen->hpos() >= spg_hbstart) || (m_screen->hpos() < spg_hbend)) ? 0 : 1;
 	if(vo_control & 4) { blank^=1; }
 	if(vo_control & 2) { vsync^=1; }
 	if(vo_control & 1) { hsync^=1; }
