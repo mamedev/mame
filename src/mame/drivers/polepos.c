@@ -1853,19 +1853,6 @@ ROM_START( polepos2 )
 
 	/* graphics (P)ROM data */
 	ROM_REGION( 0x1040, "proms", 0 )
-	ROM_LOAD( "pp1_7.8l",    0x0000, 0x0100, CRC(f07ff2ad) SHA1(e1f3cb10a03d23f8c1d422acf271dba4e7b98cb1) )    /* red palette */
-	ROM_LOAD( "pp1_8.9l",    0x0100, 0x0100, CRC(adbde7d7) SHA1(956ac5117c1e310f554ac705aa2dc24a796c36a5) )    /* green palette */
-	ROM_LOAD( "pp1_9.10l",   0x0200, 0x0100, CRC(ddac786a) SHA1(d1860105bf91297533ccc4aa6775987df198d0fa) )    /* blue palette */
-	ROM_LOAD( "pp2_10.2h",   0x0300, 0x0100, CRC(1e8d0491) SHA1(e8bf1db5c1fb04a35763099965cf5c588240bde5) )    /* alpha color */
-	ROM_LOAD( "pp1_11.4d",   0x0400, 0x0100, CRC(0e4fe8a0) SHA1(d330b1e5ebccf5bbefcf71486fd80d816de38196) )    /* background color */
-	ROM_LOAD( "pp1_15.9a",   0x0500, 0x0100, CRC(2d502464) SHA1(682b7dd22e51d5db52c0804b7e27e47641dfa6bd) )    /* vertical position low */
-	ROM_LOAD( "pp1_16.10a",  0x0600, 0x0100, CRC(027aa62c) SHA1(c7030d8b64b80e107c446f6fbdd63f560c0a91c0) )    /* vertical position med */
-	ROM_LOAD( "pp1_17.11a",  0x0700, 0x0100, CRC(1f8d0df3) SHA1(b8f17758f114f5e247b65b3f2922ca2660757e66) )    /* vertical position hi */
-	ROM_LOAD( "pp1_12.3c",   0x0800, 0x0400, CRC(7afc7cfc) SHA1(ba2407f6eff124e881b354f13205a4c058b7cf60) )    /* road color */
-	ROM_LOAD( "pp1_6.6m",    0x0c00, 0x0400, CRC(2f1079ee) SHA1(18a27998a78deff13dd198f3668a7e92f084f467) )    /* sprite color */
-	ROM_LOAD( "pp1_13.8e",   0x1000, 0x0020, CRC(4330a51b) SHA1(9531d18ce2de4eda9913d47ef8c5cd8f05791716) )    /* video RAM address decoder (not used) */
-	ROM_LOAD( "pp1_14.9e",   0x1020, 0x0020, CRC(4330a51b) SHA1(9531d18ce2de4eda9913d47ef8c5cd8f05791716) )    /* video RAM address decoder (not used) */
-
 	ROM_LOAD( "pp4_7.8l",    0x0000, 0x0100, CRC(16d69c31) SHA1(f24b345448e4f4ef4e2f3b057b81d399cf427f88) )    /* red palette */
 	ROM_LOAD( "pp4_8.9l",    0x0100, 0x0100, CRC(07340311) SHA1(3820d1fa99013ed18de5d9400ad376cc446d1217) )    /* green palette */
 	ROM_LOAD( "pp4_9.10l",   0x0200, 0x0100, CRC(1efc84d7) SHA1(6946e1c209eec0a4b75778ae88111e6cb63c63fb) )    /* blue palette */
