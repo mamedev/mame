@@ -29,6 +29,8 @@
 	- Sega GT: hangs at "produced by Sega" screen;
 	- Tetris 4D: has color bugs, hangs at FMV anyway
 
+	Note:
+	- DC US and DC PAL flash ROMs are definitely hacked, they are set to have Chinese instead of Japanese.
 */
 
 #include "emu.h"
@@ -402,7 +404,7 @@ ROM_START(dc)
 	ROM_LOAD( "dc101d_us.bin", 0x000000, 0x200000, CRC(89f2b1a1) SHA1(8951d1bb219ab2ff8583033d2119c899cc81f18c) )   // BIOS
 
 	ROM_REGION(0x020000, "dcflash", 0)
-	ROM_LOAD( "dcus_ntsc.bin", 0x000000, 0x020000, CRC(c611b498) SHA1(94d44d7f9529ec1642ba3771ed3c5f756d5bc872) )   // Flash
+	ROM_LOAD( "dcus_ntsc.bin", 0x000000, 0x020000, BAD_DUMP CRC(c611b498) SHA1(94d44d7f9529ec1642ba3771ed3c5f756d5bc872) )   // Flash
 ROM_END
 
 ROM_START( dceu )
@@ -413,7 +415,7 @@ ROM_START( dceu )
 	ROMX_LOAD( "dc101c_eu.bin", 0x000000, 0x200000, CRC(2f551bc5) SHA1(1ede8d5be49116a4c6f3fe0961175469537a0434),ROM_BIOS(2))   // BIOS
 
 	ROM_REGION(0x020000, "dcflash", 0)
-	ROM_LOAD( "dceu_pal.bin", 0x000000, 0x020000, CRC(b7e5aeeb) SHA1(11e02433e13b793ec7ffe0ae2356750bb8a575b4) )    // Flash
+	ROM_LOAD( "dceu_pal.bin", 0x000000, 0x020000, BAD_DUMP CRC(b7e5aeeb) SHA1(11e02433e13b793ec7ffe0ae2356750bb8a575b4) )    // Flash
 ROM_END
 
 ROM_START( dcjp )
