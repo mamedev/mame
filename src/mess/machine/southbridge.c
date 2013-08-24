@@ -99,8 +99,6 @@ static SLOT_INTERFACE_START(pc_isa_onboard)
 	SLOT_INTERFACE("comat", ISA8_COM_AT)
 	SLOT_INTERFACE("lpt", ISA8_LPT)
 	SLOT_INTERFACE("fdcsmc", ISA8_FDC_SMC)
-	SLOT_INTERFACE("ide", ISA16_IDE)
-	SLOT_INTERFACE("ide_cd", ISA16_IDE_CD)
 SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_FRAGMENT( southbridge )
@@ -116,7 +114,15 @@ static MACHINE_CONFIG_FRAGMENT( southbridge )
 	MCFG_PC_KBDC_ADD("pc_kbdc", pc_kbdc_intf)
 	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL)
 
-	MCFG_MC146818_IRQ_ADD("rtc", MC146818_STANDARD, WRITELINE(southbridge_device, at_mc146818_irq))
+	MCFG_MC146818_IRQ_ADD("rtc", MC146818_STANDARD, DEVWRITELINE("pic8259_slave", pic8259_device, ir0_w))
+
+	MCFG_BUS_MASTER_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", NULL, true)
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_slave", pic8259_device, ir6_w))
+	MCFG_BUS_MASTER_IDE_CONTROLLER_SPACE(":maincpu", AS_PROGRAM)
+
+	MCFG_BUS_MASTER_IDE_CONTROLLER_ADD("ide2", ata_devices, "cdrom", NULL, true)
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_slave", pic8259_device, ir7_w))
+	MCFG_BUS_MASTER_IDE_CONTROLLER_SPACE(":maincpu", AS_PROGRAM)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -127,8 +133,7 @@ static MACHINE_CONFIG_FRAGMENT( southbridge )
 	// on board devices
 	MCFG_ISA16_SLOT_ADD("isabus","board1", pc_isa_onboard, "fdcsmc", true)
 	MCFG_ISA16_SLOT_ADD("isabus","board2", pc_isa_onboard, "comat", true)
-	MCFG_ISA16_SLOT_ADD("isabus","board3", pc_isa_onboard, "ide", true)
-	MCFG_ISA16_SLOT_ADD("isabus","board4", pc_isa_onboard, "lpt", true)
+	MCFG_ISA16_SLOT_ADD("isabus","board3", pc_isa_onboard, "lpt", true)
 MACHINE_CONFIG_END
 
 //-------------------------------------------------
@@ -153,7 +158,9 @@ southbridge_device::southbridge_device(const machine_config &mconfig, device_typ
 	m_isabus(*this, "isabus"),
 	m_speaker(*this, "speaker"),
 	m_mc146818(*this, "rtc"),
-	m_pc_kbdc(*this, "pc_kbdc")
+	m_pc_kbdc(*this, "pc_kbdc"),
+	m_ide(*this, "ide"),
+	m_ide2(*this, "ide2")
 {
 }
 /**********************************************************
@@ -184,6 +191,10 @@ void southbridge_device::device_start()
 	spaceio.install_readwrite_handler(0x0080, 0x009f, read8_delegate(FUNC(southbridge_device::at_page8_r),this), write8_delegate(FUNC(southbridge_device::at_page8_w),this), 0xffffffff);
 	spaceio.install_readwrite_handler(0x00a0, 0x00bf, read8_delegate(FUNC(pic8259_device::read),&(*m_pic8259_slave)), write8_delegate(FUNC(pic8259_device::write),&(*m_pic8259_slave)), 0xffffffff);
 	spaceio.install_readwrite_handler(0x00c0, 0x00df, read8_delegate(FUNC(southbridge_device::at_dma8237_2_r),this), write8_delegate(FUNC(southbridge_device::at_dma8237_2_w),this), 0xffffffff);
+	spaceio.install_readwrite_handler(0x0170, 0x0177, read32_delegate(FUNC(bus_master_ide_controller_device::read_cs0),&(*m_ide2)), write32_delegate(FUNC(bus_master_ide_controller_device::write_cs0), &(*m_ide2)),0xffffffff);
+	spaceio.install_readwrite_handler(0x01f0, 0x01f7, read32_delegate(FUNC(bus_master_ide_controller_device::read_cs0),&(*m_ide)), write32_delegate(FUNC(bus_master_ide_controller_device::write_cs0), &(*m_ide)),0xffffffff);
+	spaceio.install_readwrite_handler(0x0370, 0x0377, read32_delegate(FUNC(bus_master_ide_controller_device::read_cs1),&(*m_ide2)), write32_delegate(FUNC(bus_master_ide_controller_device::write_cs1), &(*m_ide2)),0xffffffff);
+	spaceio.install_readwrite_handler(0x03f0, 0x03f7, read32_delegate(FUNC(bus_master_ide_controller_device::read_cs1),&(*m_ide)), write32_delegate(FUNC(bus_master_ide_controller_device::write_cs1), &(*m_ide)),0xffffffff);
 	spaceio.nop_readwrite(0x00e0, 0x00ef);
 
 
@@ -438,11 +449,6 @@ WRITE8_MEMBER( southbridge_device::at_portb_w )
 	at_speaker_set_spkrdata( BIT(data, 1));
 	m_channel_check = BIT(data, 3);
 	m_isabus->set_nmi_state((m_nmi_enabled==0) && (m_channel_check==0));
-}
-
-WRITE_LINE_MEMBER( southbridge_device::at_mc146818_irq )
-{
-	m_pic8259_slave->ir0_w((state) ? 0 : 1);
 }
 
 READ8_MEMBER( southbridge_device::at_dma8237_2_r )

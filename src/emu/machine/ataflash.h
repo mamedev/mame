@@ -24,7 +24,7 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 
-	virtual bool process_command();
+	virtual void process_command();
 	virtual void process_buffer();
 	virtual bool is_ready();
 

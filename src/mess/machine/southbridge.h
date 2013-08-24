@@ -63,6 +63,8 @@ public:
 		required_device<speaker_sound_device> m_speaker;
 		required_device<mc146818_device> m_mc146818;
 		required_device<pc_kbdc_device> m_pc_kbdc;
+		required_device<bus_master_ide_controller_device> m_ide;
+		required_device<bus_master_ide_controller_device> m_ide2;
 		DECLARE_READ8_MEMBER(at_page8_r);
 		DECLARE_WRITE8_MEMBER(at_page8_w);
 		DECLARE_READ8_MEMBER(at_portb_r);
@@ -100,7 +102,6 @@ public:
 		DECLARE_WRITE8_MEMBER(at_dma8237_2_w);
 		DECLARE_READ8_MEMBER(at_keybc_r);
 		DECLARE_WRITE8_MEMBER(at_keybc_w);
-		DECLARE_WRITE_LINE_MEMBER(at_mc146818_irq);
 		DECLARE_WRITE8_MEMBER(write_rtc);
 		DECLARE_READ8_MEMBER(pc_dma_read_byte);
 		DECLARE_WRITE8_MEMBER(pc_dma_write_byte);

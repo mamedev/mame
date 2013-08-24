@@ -13,6 +13,7 @@
 #include "ataintf.h"
 #include "debugger.h"
 #include "idehd.h"
+#include "atapicdr.h"
 
 void ata_interface_device::set_irq(int state)
 {
@@ -140,6 +141,8 @@ READ16_MEMBER( ata_interface_device::read_cs0 )
 		if (m_slot[i]->dev() != NULL)
 			result &= m_slot[i]->dev()->read_cs0(space, offset, mem_mask);
 
+//	{ static int last_status = -1; if (offset == 7 ) { if( result == last_status ) return last_status; last_status = result; } else last_status = -1; }
+
 //  printf( "read cs0 %04x %04x %04x\n", offset, result, mem_mask );
 
 	return result;
@@ -202,6 +205,7 @@ WRITE_LINE_MEMBER( ata_interface_device::write_dmack )
 
 SLOT_INTERFACE_START(ata_devices)
 	SLOT_INTERFACE("hdd", IDE_HARDDISK)
+	SLOT_INTERFACE("cdrom", ATAPI_CDROM)
 SLOT_INTERFACE_END
 
 ata_interface_device::ata_interface_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :

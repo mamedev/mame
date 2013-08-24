@@ -120,7 +120,7 @@ bool ata_flash_pccard_device::is_ready()
 	return !m_gnetreadlock;
 }
 
-bool ata_flash_pccard_device::process_command()
+void ata_flash_pccard_device::process_command()
 {
 	switch (m_command)
 	{
@@ -131,7 +131,7 @@ bool ata_flash_pccard_device::process_command()
 		m_status |= IDE_STATUS_DRDY;
 
 		set_irq(ASSERT_LINE);
-		return true;
+		break;
 
 	case IDE_COMMAND_TAITO_GNET_UNLOCK_2:
 		//LOGPRINT(("IDE GNET Unlock 2\n"));
@@ -140,7 +140,7 @@ bool ata_flash_pccard_device::process_command()
 		m_status |= IDE_STATUS_DRQ;
 
 		set_irq(ASSERT_LINE);
-		return true;
+		break;
 
 	case IDE_COMMAND_TAITO_GNET_UNLOCK_3:
 		//LOGPRINT(("IDE GNET Unlock 3\n"));
@@ -156,7 +156,7 @@ bool ata_flash_pccard_device::process_command()
 		}
 
 		set_irq(ASSERT_LINE);
-		return true;
+		break;
 
 	default:
 		if (m_gnetreadlock)
@@ -164,10 +164,11 @@ bool ata_flash_pccard_device::process_command()
 			m_status |= IDE_STATUS_ERR;
 			m_error = IDE_ERROR_NONE;
 			m_status &= ~IDE_STATUS_DRDY;
-			return true;
+			break;
 		}
 
-		return ide_hdd_device::process_command();
+		ide_hdd_device::process_command();
+		break;
 	}
 }
 

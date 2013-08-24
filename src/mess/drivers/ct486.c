@@ -137,10 +137,6 @@ static const isa16bus_interface isabus_intf =
 	DEVCB_DEVICE_LINE_MEMBER("cs4031", cs4031_device, dreq7_w),
 };
 
-static DEVICE_INPUT_DEFAULTS_START( ide_2nd )
-	DEVICE_INPUT_DEFAULTS("DSW", 0x01, 0x01)
-DEVICE_INPUT_DEFAULTS_END
-
 static MACHINE_CONFIG_START( ct486, ct486_state )
 	MCFG_CPU_ADD("maincpu", I486, XTAL_25MHz)
 	MCFG_CPU_PROGRAM_MAP(ct486_map)
@@ -178,8 +174,7 @@ static MACHINE_CONFIG_START( ct486, ct486_state )
 	MCFG_ISA16_SLOT_ADD("isabus", "isa2", pc_isa16_cards, NULL, false)
 	MCFG_ISA16_SLOT_ADD("isabus", "isa3", pc_isa16_cards, NULL, false)
 	MCFG_ISA16_SLOT_ADD("isabus", "isa4", pc_isa16_cards, NULL, false)
-	MCFG_ISA16_SLOT_ADD("isabus", "isa5", pc_isa16_cards, "ide_cd", false) //2nd-ary IDE
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("ide_cd", ide_2nd)
+	MCFG_ISA16_SLOT_ADD("isabus", "isa5", pc_isa16_cards, NULL, false)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

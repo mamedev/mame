@@ -530,13 +530,16 @@ endif
 
 #-------------------------------------------------
 #
-#@src/emu/machine/idectrl.h,MACHINES += IDE
-#@src/emu/machine/idehd.h,MACHINES += IDE
+#@src/emu/machine/atadev.h,MACHINES += IDE
+#@src/emu/machine/ataintf.h,MACHINES += IDE
 #-------------------------------------------------
 
 ifneq ($(filter IDE,$(MACHINES)),)
-MACHINEOBJS += $(MACHINEOBJ)/ataintf.o
 MACHINEOBJS += $(MACHINEOBJ)/atadev.o
+MACHINEOBJS += $(MACHINEOBJ)/atahle.o
+MACHINEOBJS += $(MACHINEOBJ)/ataintf.o
+MACHINEOBJS += $(MACHINEOBJ)/atapicdr.o
+MACHINEOBJS += $(MACHINEOBJ)/atapihle.o
 MACHINEOBJS += $(MACHINEOBJ)/idectrl.o
 MACHINEOBJS += $(MACHINEOBJ)/idehd.o
 MACHINEOBJS += $(MACHINEOBJ)/vt83c461.o
