@@ -1235,16 +1235,18 @@ WRITE32_MEMBER( powervr2_device::pal_ram_ctrl_w )
 READ32_MEMBER( powervr2_device::spg_status_r )
 {
 	UINT32 fieldnum = (m_screen->frame_number() & 1) ? 1 : 0;
+	INT32 spg_hbstart = spg_hblank & 0x3ff;
+	INT32 spg_hbend = (spg_hblank >> 16) & 0x3ff;
+	INT32 spg_vbstart = spg_vblank & 0x3ff;
+	INT32 spg_vbend = (spg_vblank >> 16) & 0x3ff;
 
-	UINT32 vsync = m_screen->vblank() ? 1 : 0;
-	if(vo_control & 2) { vsync^=1; }
-
-	UINT32 hsync = m_screen->hblank() ? 1 : 0;
-	if(vo_control & 1) { hsync^=1; }
-
+	UINT32 vsync = ((m_screen->vpos() >= spg_vbstart) || (m_screen->vpos() < spg_vbend)) ? 0 : 1;
+	UINT32 hsync = ((m_screen->hpos() >= spg_hbstart) || (m_screen->hpos() < spg_hbend)) ? 0 : 1;
 	/* FIXME: following is just a wild guess */
-	UINT32 blank = (m_screen->vblank() | m_screen->hblank()) ? 0 : 1;
+	UINT32 blank = (vsync | hsync) ? 0 : 1;
 	if(vo_control & 4) { blank^=1; }
+	if(vo_control & 2) { vsync^=1; }
+	if(vo_control & 1) { hsync^=1; }
 
 	return (vsync << 13) | (hsync << 12) | (blank << 11) | (fieldnum << 10) | (m_screen->vpos() & 0x3ff);
 }
