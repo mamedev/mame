@@ -879,10 +879,18 @@ mtlog_add("drawd3d_window_draw: begin_scene");
 
 void renderer::process_primitives()
 {
-	if (m_line_count && m_shaders->enabled() && d3dintf->post_fx_available)
+	for (render_primitive *prim = m_window->primlist->first(); prim != NULL; prim = prim->next())
 	{
-		batch_vectors();
+		if (prim->type == render_primitive::QUAD)
+		{
+			if (PRIMFLAG_GET_SCREENTEX(prim->flags) || PRIMFLAG_GET_VECTORBUF(prim->flags))
+			{
+				draw_quad(prim);
+			}
+		}
 	}
+
+	batch_vectors();
 
 	// Rotating index for vector time offsets
 	for (render_primitive *prim = m_window->primlist->first(); prim != NULL; prim = prim->next())
@@ -901,17 +909,15 @@ void renderer::process_primitives()
 				break;
 
 			case render_primitive::QUAD:
-				draw_quad(prim);
+				if (!PRIMFLAG_GET_SCREENTEX(prim->flags) && !PRIMFLAG_GET_VECTORBUF(prim->flags))
+				{
+					draw_quad(prim);
+				}
 				break;
 
 			default:
 				throw emu_fatalerror("Unexpected render_primitive type");
 		}
-	}
-
-	if (m_line_count && !(m_shaders->enabled() && d3dintf->post_fx_available))
-	{
-		batch_vectors();
 	}
 }
 
@@ -1265,6 +1271,7 @@ int renderer::device_test_cooperative()
 		mame_printf_verbose("Direct3D: resetting device\n");
 
 		// free all existing resources and call reset on the device
+		//device_delete();
 		device_delete_resources();
 		m_shaders->delete_resources(true);
 		result = (*d3dintf->device.reset)(m_device, &m_presentation);
@@ -1630,6 +1637,17 @@ void renderer::batch_vector(const render_primitive *prim, float line_time)
 		INT32 g = (INT32)(prim->color.g * step->weight * 255.0f);
 		INT32 b = (INT32)(prim->color.b * step->weight * 255.0f);
 		INT32 a = (INT32)(prim->color.a * 255.0f);
+		if (r > 255 || g > 255 || b > 255)
+		{
+			if (r > 2*255 || g > 2*255 || b > 2*255)
+			{
+				r >>= 2; g >>= 2; b >>= 2;
+			}
+			else
+			{
+				r >>= 1; g >>= 1; b >>= 1;
+			}
+		}
 		if (r > 255) r = 255;
 		if (g > 255) g = 255;
 		if (b > 255) b = 255;

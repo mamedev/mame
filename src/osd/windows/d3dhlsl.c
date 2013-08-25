@@ -506,7 +506,7 @@ void shaders::end_avi_recording()
 
 
 //============================================================
-//  shaders::set_texture
+//  shaders::toggle
 //============================================================
 
 void shaders::toggle()
@@ -756,260 +756,72 @@ void shaders::init(base *d3dintf, win_window_info *window)
 	options->params_dirty = true;
 	strcpy(options->shadow_mask_texture, downcast<windows_options &>(window->machine().options()).screen_shadow_mask_texture()); // unsafe
 
-	write_ini = downcast<windows_options &>(window->machine().options()).hlsl_write_ini();
-	read_ini = downcast<windows_options &>(window->machine().options()).hlsl_read_ini();
-
-	if(read_ini)
+	prescale_force_x = winoptions.d3d_hlsl_prescale_x();
+	prescale_force_y = winoptions.d3d_hlsl_prescale_y();
+	if(preset == -1)
 	{
-		emu_file ini_file(downcast<windows_options &>(window->machine().options()).screen_post_fx_dir(), OPEN_FLAG_READ | OPEN_FLAG_CREATE_PATHS);
-		file_error filerr = open_next((renderer*)window->drawdata, ini_file, downcast<windows_options &>(window->machine().options()).hlsl_ini_name(), "ini", 0);
-
-		read_ini = false;
-		if (filerr == FILERR_NONE)
-		{
-			ini_file.seek(0, SEEK_END);
-			if (ini_file.tell() >= 1000)
-			{
-				read_ini = true;
-				ini_file.seek(0, SEEK_SET);
-
-				int en = 0;
-				char buf[1024];
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "hlsl_enable %d\n", &en);
-				master_enable = en == 1;
-
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "hlsl_prescale_x %d\n", &prescale_force_x);
-
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "hlsl_prescale_y %d\n", &prescale_force_y);
-
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "hlsl_preset %d\n", &preset);
-
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "hlsl_snap_width %d\n", &snap_width);
-
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "hlsl_snap_height %d\n", &snap_height);
-
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "shadow_mask_alpha %f\n", &options->shadow_mask_alpha);
-
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "shadow_mask_texture %s\n", options->shadow_mask_texture);
-
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "shadow_mask_x_count %d\n", &options->shadow_mask_count_x);
-
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "shadow_mask_y_count %d\n", &options->shadow_mask_count_y);
-
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "shadow_mask_usize %f\n", &options->shadow_mask_u_size);
-
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "shadow_mask_vsize %f\n", &options->shadow_mask_v_size);
-
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "curvature %f\n", &options->curvature);
-
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "pincushion %f\n", &options->pincushion);
-
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "scanline_alpha %f\n", &options->scanline_alpha);
-
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "scanline_size %f\n", &options->scanline_scale);
-
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "scanline_height %f\n", &options->scanline_height);
-
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "scanline_bright_scale %f\n", &options->scanline_bright_scale);
-
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "scanline_bright_offset %f\n", &options->scanline_bright_offset);
-
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "scanline_jitter %f\n", &options->scanline_offset);
-
-				ini_file.gets(buf, 1024);
-				for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
-				sscanf(buf, "defocus %f %f\n", &options->defocus[0], &options->defocus[1]);
-
-				ini_file.gets(buf, 1024);
-				for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
-				sscanf(buf, "converge_x %f %f %f\n", &options->converge_x[0], &options->converge_x[1], &options->converge_x[2]);
-
-				ini_file.gets(buf, 1024);
-				for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
-				sscanf(buf, "converge_y %f %f %f\n", &options->converge_y[0], &options->converge_y[1], &options->converge_y[2]);
-
-				ini_file.gets(buf, 1024);
-				for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
-				sscanf(buf, "radial_converge_x %f %f %f\n", &options->radial_converge_x[0], &options->radial_converge_x[1], &options->radial_converge_x[2]);
-
-				ini_file.gets(buf, 1024);
-				for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
-				sscanf(buf, "radial_converge_y %f %f %f\n", &options->radial_converge_y[0], &options->radial_converge_y[1], &options->radial_converge_y[2]);
-
-				ini_file.gets(buf, 1024);
-				for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
-				sscanf(buf, "red_ratio %f %f %f\n", &options->red_ratio[0], &options->red_ratio[1], &options->red_ratio[2]);
-
-				ini_file.gets(buf, 1024);
-				for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
-				sscanf(buf, "grn_ratio %f %f %f\n", &options->grn_ratio[0], &options->grn_ratio[1], &options->grn_ratio[2]);
-
-				ini_file.gets(buf, 1024);
-				for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
-				sscanf(buf, "blu_ratio %f %f %f\n", &options->blu_ratio[0], &options->blu_ratio[1], &options->blu_ratio[2]);
-
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "saturation %f\n", &options->saturation);
-
-				ini_file.gets(buf, 1024);
-				for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
-				sscanf(buf, "offset %f %f %f\n", &options->offset[0], &options->offset[1], &options->offset[2]);
-
-				ini_file.gets(buf, 1024);
-				for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
-				sscanf(buf, "scale %f %f %f\n", &options->scale[0], &options->scale[1], &options->scale[2]);
-
-				ini_file.gets(buf, 1024);
-				for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
-				sscanf(buf, "power %f %f %f\n", &options->power[0], &options->power[1], &options->power[2]);
-
-				ini_file.gets(buf, 1024);
-				for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
-				sscanf(buf, "floor %f %f %f\n", &options->floor[0], &options->floor[1], &options->floor[2]);
-
-				ini_file.gets(buf, 1024);
-				for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
-				sscanf(buf, "phosphor_life %f %f %f\n", &options->phosphor[0], &options->phosphor[1], &options->phosphor[2]);
-
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "yiq_enable %d\n", &en);
-				options->yiq_enable = en == 1;
-
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "yiq_cc %f\n", &options->yiq_cc);
-
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "yiq_a %f\n", &options->yiq_a);
-
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "yiq_b %f\n", &options->yiq_b);
-
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "yiq_o %f\n", &options->yiq_o);
-
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "yiq_p %f\n", &options->yiq_p);
-
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "yiq_n %f\n", &options->yiq_n);
-
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "yiq_y %f\n", &options->yiq_y);
-
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "yiq_i %f\n", &options->yiq_i);
-
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "yiq_q %f\n", &options->yiq_q);
-
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "yiq_scan_time %f\n", &options->yiq_scan_time);
-
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "yiq_phase_count %d\n", &options->yiq_phase_count);
-
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "vector_length_scale %f\n", &options->vector_length_scale);
-
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "vector_length_ratio %f\n", &options->vector_length_ratio);
-			}
-		}
+		options->shadow_mask_alpha = winoptions.screen_shadow_mask_alpha();
+		options->shadow_mask_count_x = winoptions.screen_shadow_mask_count_x();
+		options->shadow_mask_count_y = winoptions.screen_shadow_mask_count_y();
+		options->shadow_mask_u_size = winoptions.screen_shadow_mask_u_size();
+		options->shadow_mask_v_size = winoptions.screen_shadow_mask_v_size();
+		options->curvature = winoptions.screen_curvature();
+		options->pincushion = winoptions.screen_pincushion();
+		options->scanline_alpha = winoptions.screen_scanline_amount();
+		options->scanline_scale = winoptions.screen_scanline_scale();
+		options->scanline_height = winoptions.screen_scanline_height();
+		options->scanline_bright_scale = winoptions.screen_scanline_bright_scale();
+		options->scanline_bright_offset = winoptions.screen_scanline_bright_offset();
+		options->scanline_offset = winoptions.screen_scanline_offset();
+		get_vector(winoptions.screen_defocus(), 2, options->defocus, TRUE);
+		get_vector(winoptions.screen_converge_x(), 3, options->converge_x, TRUE);
+		get_vector(winoptions.screen_converge_y(), 3, options->converge_y, TRUE);
+		get_vector(winoptions.screen_radial_converge_x(), 3, options->radial_converge_x, TRUE);
+		get_vector(winoptions.screen_radial_converge_y(), 3, options->radial_converge_y, TRUE);
+		get_vector(winoptions.screen_red_ratio(), 3, options->red_ratio, TRUE);
+		get_vector(winoptions.screen_grn_ratio(), 3, options->grn_ratio, TRUE);
+		get_vector(winoptions.screen_blu_ratio(), 3, options->blu_ratio, TRUE);
+		get_vector(winoptions.screen_offset(), 3, options->offset, TRUE);
+		get_vector(winoptions.screen_scale(), 3, options->scale, TRUE);
+		get_vector(winoptions.screen_power(), 3, options->power, TRUE);
+		get_vector(winoptions.screen_floor(), 3, options->floor, TRUE);
+		get_vector(winoptions.screen_phosphor(), 3, options->phosphor, TRUE);
+		options->saturation = winoptions.screen_saturation();
 	}
 	else
 	{
-		prescale_force_x = winoptions.d3d_hlsl_prescale_x();
-		prescale_force_y = winoptions.d3d_hlsl_prescale_y();
-		if(preset == -1)
-		{
-			options->shadow_mask_alpha = winoptions.screen_shadow_mask_alpha();
-			options->shadow_mask_count_x = winoptions.screen_shadow_mask_count_x();
-			options->shadow_mask_count_y = winoptions.screen_shadow_mask_count_y();
-			options->shadow_mask_u_size = winoptions.screen_shadow_mask_u_size();
-			options->shadow_mask_v_size = winoptions.screen_shadow_mask_v_size();
-			options->curvature = winoptions.screen_curvature();
-			options->pincushion = winoptions.screen_pincushion();
-			options->scanline_alpha = winoptions.screen_scanline_amount();
-			options->scanline_scale = winoptions.screen_scanline_scale();
-			options->scanline_height = winoptions.screen_scanline_height();
-			options->scanline_bright_scale = winoptions.screen_scanline_bright_scale();
-			options->scanline_bright_offset = winoptions.screen_scanline_bright_offset();
-			options->scanline_offset = winoptions.screen_scanline_offset();
-			get_vector(winoptions.screen_defocus(), 2, options->defocus, TRUE);
-			get_vector(winoptions.screen_converge_x(), 3, options->converge_x, TRUE);
-			get_vector(winoptions.screen_converge_y(), 3, options->converge_y, TRUE);
-			get_vector(winoptions.screen_radial_converge_x(), 3, options->radial_converge_x, TRUE);
-			get_vector(winoptions.screen_radial_converge_y(), 3, options->radial_converge_y, TRUE);
-			get_vector(winoptions.screen_red_ratio(), 3, options->red_ratio, TRUE);
-			get_vector(winoptions.screen_grn_ratio(), 3, options->grn_ratio, TRUE);
-			get_vector(winoptions.screen_blu_ratio(), 3, options->blu_ratio, TRUE);
-			get_vector(winoptions.screen_offset(), 3, options->offset, TRUE);
-			get_vector(winoptions.screen_scale(), 3, options->scale, TRUE);
-			get_vector(winoptions.screen_power(), 3, options->power, TRUE);
-			get_vector(winoptions.screen_floor(), 3, options->floor, TRUE);
-			get_vector(winoptions.screen_phosphor(), 3, options->phosphor, TRUE);
-			options->saturation = winoptions.screen_saturation();
-		}
-		else
-		{
-			options = &s_hlsl_presets[preset];
-		}
-
-		options->yiq_enable = winoptions.screen_yiq_enable();
-		options->yiq_cc = winoptions.screen_yiq_cc();
-		options->yiq_a = winoptions.screen_yiq_a();
-		options->yiq_b = winoptions.screen_yiq_b();
-		options->yiq_o = winoptions.screen_yiq_o();
-		options->yiq_p = winoptions.screen_yiq_p();
-		options->yiq_n = winoptions.screen_yiq_n();
-		options->yiq_y = winoptions.screen_yiq_y();
-		options->yiq_i = winoptions.screen_yiq_i();
-		options->yiq_q = winoptions.screen_yiq_q();
-		options->yiq_scan_time = winoptions.screen_yiq_scan_time();
-		options->yiq_phase_count = winoptions.screen_yiq_phase_count();
-		options->vector_length_scale = winoptions.screen_vector_length_scale();
-		options->vector_length_ratio = winoptions.screen_vector_length_ratio();
-		options->vector_bloom_scale = winoptions.screen_vector_bloom_scale();
-		options->raster_bloom_scale = winoptions.screen_raster_bloom_scale();
-		options->bloom_level0_weight = winoptions.screen_bloom_lvl0_weight();
-		options->bloom_level1_weight = winoptions.screen_bloom_lvl1_weight();
-		options->bloom_level2_weight = winoptions.screen_bloom_lvl2_weight();
-		options->bloom_level3_weight = winoptions.screen_bloom_lvl3_weight();
-		options->bloom_level4_weight = winoptions.screen_bloom_lvl4_weight();
-		options->bloom_level5_weight = winoptions.screen_bloom_lvl5_weight();
-		options->bloom_level6_weight = winoptions.screen_bloom_lvl6_weight();
-		options->bloom_level7_weight = winoptions.screen_bloom_lvl7_weight();
-		options->bloom_level8_weight = winoptions.screen_bloom_lvl8_weight();
-		options->bloom_level9_weight = winoptions.screen_bloom_lvl9_weight();
-		options->bloom_level10_weight = winoptions.screen_bloom_lvl10_weight();
+		options = &s_hlsl_presets[preset];
 	}
 
-	options->params_dirty = true;
-	// experimental: load a PNG to use for vector rendering; it is treated
-	// as a brightness map
-	emu_file file(window->machine().options().art_path(), OPEN_FLAG_READ);
+	options->yiq_enable = winoptions.screen_yiq_enable();
+	options->yiq_cc = winoptions.screen_yiq_cc();
+	options->yiq_a = winoptions.screen_yiq_a();
+	options->yiq_b = winoptions.screen_yiq_b();
+	options->yiq_o = winoptions.screen_yiq_o();
+	options->yiq_p = winoptions.screen_yiq_p();
+	options->yiq_n = winoptions.screen_yiq_n();
+	options->yiq_y = winoptions.screen_yiq_y();
+	options->yiq_i = winoptions.screen_yiq_i();
+	options->yiq_q = winoptions.screen_yiq_q();
+	options->yiq_scan_time = winoptions.screen_yiq_scan_time();
+	options->yiq_phase_count = winoptions.screen_yiq_phase_count();
+	options->vector_length_scale = winoptions.screen_vector_length_scale();
+	options->vector_length_ratio = winoptions.screen_vector_length_ratio();
+	options->vector_bloom_scale = winoptions.screen_vector_bloom_scale();
+	options->raster_bloom_scale = winoptions.screen_raster_bloom_scale();
+	options->bloom_level0_weight = winoptions.screen_bloom_lvl0_weight();
+	options->bloom_level1_weight = winoptions.screen_bloom_lvl1_weight();
+	options->bloom_level2_weight = winoptions.screen_bloom_lvl2_weight();
+	options->bloom_level3_weight = winoptions.screen_bloom_lvl3_weight();
+	options->bloom_level4_weight = winoptions.screen_bloom_lvl4_weight();
+	options->bloom_level5_weight = winoptions.screen_bloom_lvl5_weight();
+	options->bloom_level6_weight = winoptions.screen_bloom_lvl6_weight();
+	options->bloom_level7_weight = winoptions.screen_bloom_lvl7_weight();
+	options->bloom_level8_weight = winoptions.screen_bloom_lvl8_weight();
+	options->bloom_level9_weight = winoptions.screen_bloom_lvl9_weight();
+	options->bloom_level10_weight = winoptions.screen_bloom_lvl10_weight();
 
-	render_load_png(shadow_bitmap, file, NULL, options->shadow_mask_texture);
+	options->params_dirty = true;
 
 	g_slider_list = init_slider_list();
 }
@@ -1134,6 +946,9 @@ int shaders::create_resources(bool reset)
 		return 1;
 	}
 	(*d3dintf->texture.get_surface_level)(avi_final_texture, 0, &avi_final_target);
+
+	emu_file file(window->machine().options().art_path(), OPEN_FLAG_READ);
+	render_load_png(shadow_bitmap, file, NULL, options->shadow_mask_texture);
 
 	// experimental: if we have a shadow bitmap, create a texture for it
 	if (shadow_bitmap.valid())
@@ -2457,6 +2272,7 @@ bool shaders::register_prescaled_texture(texture_info *texture)
 //============================================================
 bool shaders::add_cache_target(renderer* d3d, texture_info* info, int width, int height, int xprescale, int yprescale, int screen_index)
 {
+	printf("Adding cache target\n");
 	cache_target* target = (cache_target*)global_alloc_clear(cache_target);
 
 	if (!target->init(d3d, d3dintf, width, height, xprescale, yprescale))
@@ -2673,67 +2489,20 @@ void shaders::delete_resources(bool reset)
 
 	initialized = false;
 
-	if(write_ini && !reset)
+	cache_target *currcache = cachehead;
+	while(cachehead != NULL)
 	{
-		emu_file file(downcast<windows_options &>(window->machine().options()).screen_post_fx_dir(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		file_error filerr = open_next((renderer*)window->drawdata, file, downcast<windows_options &>(window->machine().options()).hlsl_ini_name(), "ini", 0);
-
-		if (filerr != FILERR_NONE)
-			return;
-
-		file.printf("hlsl_enable            %d\n", master_enable ? 1 : 0);
-		file.printf("hlsl_prescale_x        %d\n", prescale_force_x);
-		file.printf("hlsl_prescale_y        %d\n", prescale_force_y);
-		file.printf("hlsl_preset            %d\n", preset);
-		file.printf("hlsl_snap_width        %d\n", snap_width);
-		file.printf("hlsl_snap_height       %d\n", snap_height);
-		file.printf("shadow_mask_alpha      %f\n", options->shadow_mask_alpha);
-		file.printf("shadow_mask_texture    %s\n", options->shadow_mask_texture);
-		file.printf("shadow_mask_x_count    %d\n", options->shadow_mask_count_x);
-		file.printf("shadow_mask_y_count    %d\n", options->shadow_mask_count_y);
-		file.printf("shadow_mask_usize      %f\n", options->shadow_mask_u_size);
-		file.printf("shadow_mask_vsize      %f\n", options->shadow_mask_v_size);
-		file.printf("curvature              %f\n", options->curvature);
-		file.printf("pincushion             %f\n", options->pincushion);
-		file.printf("scanline_alpha         %f\n", options->scanline_alpha);
-		file.printf("scanline_size          %f\n", options->scanline_scale);
-		file.printf("scanline_height        %f\n", options->scanline_height);
-		file.printf("scanline_bright_scale  %f\n", options->scanline_bright_scale);
-		file.printf("scanline_bright_offset %f\n", options->scanline_bright_offset);
-		file.printf("scanline_jitter        %f\n", options->scanline_offset);
-		file.printf("defocus                %f,%f\n", options->defocus[0], options->defocus[1]);
-		file.printf("converge_x             %f,%f,%f\n", options->converge_x[0], options->converge_x[1], options->converge_x[2]);
-		file.printf("converge_y             %f,%f,%f\n", options->converge_y[0], options->converge_y[1], options->converge_y[2]);
-		file.printf("radial_converge_x      %f,%f,%f\n", options->radial_converge_x[0], options->radial_converge_x[1], options->radial_converge_x[2]);
-		file.printf("radial_converge_y      %f,%f,%f\n", options->radial_converge_y[0], options->radial_converge_y[1], options->radial_converge_y[2]);
-		file.printf("red_ratio              %f,%f,%f\n", options->red_ratio[0], options->red_ratio[1], options->red_ratio[2]);
-		file.printf("grn_ratio              %f,%f,%f\n", options->grn_ratio[0], options->grn_ratio[1], options->grn_ratio[2]);
-		file.printf("blu_ratio              %f,%f,%f\n", options->blu_ratio[0], options->blu_ratio[1], options->blu_ratio[2]);
-		file.printf("saturation             %f\n", options->saturation);
-		file.printf("offset                 %f,%f,%f\n", options->offset[0], options->offset[1], options->offset[2]);
-		file.printf("scale                  %f,%f,%f\n", options->scale[0], options->scale[1], options->scale[2]);
-		file.printf("power                  %f,%f,%f\n", options->power[0], options->power[1], options->power[2]);
-		file.printf("floor                  %f,%f,%f\n", options->floor[0], options->floor[1], options->floor[2]);
-		file.printf("phosphor_life          %f,%f,%f\n", options->phosphor[0], options->phosphor[1], options->phosphor[2]);
-		file.printf("yiq_enable             %d\n", options->yiq_enable ? 1 : 0);
-		file.printf("yiq_cc                 %f\n", options->yiq_cc);
-		file.printf("yiq_a                  %f\n", options->yiq_a);
-		file.printf("yiq_b                  %f\n", options->yiq_b);
-		file.printf("yiq_o                  %f\n", options->yiq_o);
-		file.printf("yiq_p                  %f\n", options->yiq_p);
-		file.printf("yiq_n                  %f\n", options->yiq_n);
-		file.printf("yiq_y                  %f\n", options->yiq_y);
-		file.printf("yiq_i                  %f\n", options->yiq_i);
-		file.printf("yiq_q                  %f\n", options->yiq_q);
-		file.printf("yiq_scan_time          %f\n", options->yiq_scan_time);
-		file.printf("yiq_phase_count        %d\n", options->yiq_phase_count);
-		file.printf("vector_length_scale    %f\n", options->vector_length_scale);
-		file.printf("vector_length_ratio    %f\n", options->vector_length_ratio);
+		cachehead = currcache->next;
+		global_free(currcache);
+		currcache = cachehead;
 	}
 
-	while (targethead != NULL)
+	render_target *currtarget = targethead;
+	while(targethead != NULL)
 	{
-		remove_render_target(targethead);
+		targethead = currtarget->next;
+		global_free(currtarget);
+		currtarget = targethead;
 	}
 
 #if (HLSL_VECTOR || CRT_BLOOM)
@@ -2747,7 +2516,17 @@ void shaders::delete_resources(bool reset)
 		(*d3dintf->effect.release)(bloom_effect);
 		bloom_effect = NULL;
 	}
+	if (vector_effect != NULL)
+	{
+		(*d3dintf->effect.release)(vector_effect);
+		vector_effect = NULL;
+	}
 #endif
+	if (backbuffer != NULL)
+	{
+		(*d3dintf->surface.release)(backbuffer);
+		backbuffer = NULL;
+	}
 	if (default_effect != NULL)
 	{
 		(*d3dintf->effect.release)(default_effect);
@@ -2799,6 +2578,11 @@ void shaders::delete_resources(bool reset)
 		yiq_decode_effect = NULL;
 	}
 
+	if (black_surface != NULL)
+	{
+		(*d3dintf->surface.release)(black_surface);
+		black_surface = NULL;
+	}
 	if (black_texture != NULL)
 	{
 		(*d3dintf->texture.release)(black_texture);
