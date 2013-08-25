@@ -411,7 +411,7 @@ void saturn_state::scu_dma_direct(address_space &space, UINT8 dma_ch)
 	if(LOG_SCU) printf("Start Add %04x Destination Add %04x\n",m_scu.src_add[dma_ch],m_scu.dst_add[dma_ch]);
 	}
 
-	/* TODO: Game Basic and World Cup 98 trips this, according to the docs the SCU can't transfer from BIOS area (can't communicate from/to that bus) */
+	/* Game Basic and World Cup 98 trips this, according to the docs the SCU can't transfer from BIOS area (can't communicate from/to that bus) */
 	if(BIOS_BUS(m_scu.src[dma_ch]))
 	{
 		popmessage("Warning: SCU transfer from BIOS area, contact MAMEdev");

@@ -145,7 +145,7 @@ WRITE8_MEMBER(dc_state::pvr_irq)
 		break;
 
 	case powervr2_device::HBL_IN_IRQ:
-		dc_sysctrl_regs[SB_ISTNRM] |= IST_VBL_IN;
+		dc_sysctrl_regs[SB_ISTNRM] |= IST_HBL_IN;
 		break;
 
 	case powervr2_device::EOR_VIDEO_IRQ:
@@ -431,9 +431,9 @@ WRITE64_MEMBER(dc_state::dc_sysctrl_w )
 				else //direct texture path
 					dc_sysctrl_regs[SB_C2DSTAT]=address+ddtdata.length;
 
-				/* 200 usecs breaks sfz3upper */
-				machine().scheduler().timer_set(attotime::from_usec(50), timer_expired_delegate(FUNC(dc_state::ch2_dma_irq),this));
-				/* simulate YUV FIFO processing here */
+				/* TODO: timing is a guess */
+				machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(ddtdata.length/4), timer_expired_delegate(FUNC(dc_state::ch2_dma_irq),this));
+				/* simulate YUV FIFO processing here (HACK! should go inside the YUV FIFO itself) */
 				if((address & 0x1800000) == 0x0800000)
 					machine().scheduler().timer_set(attotime::from_usec(500), timer_expired_delegate(FUNC(dc_state::yuv_fifo_irq),this));
 			}
