@@ -104,6 +104,9 @@ public:
 	int target_width;
 	int target_height;
 
+	int prescale_x;
+	int prescale_y;
+
 	int width;
 	int height;
 

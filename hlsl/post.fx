@@ -116,8 +116,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float2 Ratios = 1.0f / SizeRatio;
 
 	// -- Screen Pincushion Calculation --
-	float2 PinViewpointOffset = float2(0.0f, 0.0f);
-	float2 PinUnitCoord = (Input.TexCoord + PinViewpointOffset) * Ratios * 2.0f - 1.0f;
+	float2 PinUnitCoord = Input.TexCoord * Ratios * 2.0f - 1.0f;
 	float PincushionR2 = pow(length(PinUnitCoord), 2.0f) / pow(length(Ratios), 2.0f);
 	float2 PincushionCurve = PinUnitCoord * PincushionAmount * PincushionR2;
 	float2 BaseCoord = Input.TexCoord;

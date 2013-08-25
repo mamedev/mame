@@ -1483,6 +1483,7 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 
 		vec2f& rawdims = texture->get_rawdims();
 		vec2f delta = texture->get_uvstop() - texture->get_uvstart();
+		vec2f texsize(rt->width, rt->height);
 
 		if(options->yiq_enable)
 		{
@@ -1491,14 +1492,14 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 
 			if(options->params_dirty)
 			{
-				(*d3dintf->effect.set_vector)(curr_effect, "RawDims", 2, &rawdims.c.x);
+				(*d3dintf->effect.set_vector)(curr_effect, "RawDims", 2, &texsize.c.x);
 				(*d3dintf->effect.set_float)(curr_effect, "WidthRatio", 1.0f / delta.c.x);
 				(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", 1.0f / delta.c.y);
-				(*d3dintf->effect.set_float)(curr_effect, "TargetWidth", (float)d3d->get_width());
-				(*d3dintf->effect.set_float)(curr_effect, "TargetHeight", (float)d3d->get_height());
+				(*d3dintf->effect.set_float)(curr_effect, "ScreenWidth", d3d->get_width());
+				(*d3dintf->effect.set_float)(curr_effect, "ScreenHeight", d3d->get_height());
 				(*d3dintf->effect.set_float)(curr_effect, "CCValue", options->yiq_cc);
 				(*d3dintf->effect.set_float)(curr_effect, "AValue", options->yiq_a);
-				(*d3dintf->effect.set_float)(curr_effect, "BValue", (texture->get_cur_frame() == 2) ? 0.0f : ((float)texture->get_cur_frame() * options->yiq_b));
+				(*d3dintf->effect.set_float)(curr_effect, "BValue", options->yiq_b);
 				(*d3dintf->effect.set_float)(curr_effect, "PValue", options->yiq_p);
 				(*d3dintf->effect.set_float)(curr_effect, "NotchHalfWidth", options->yiq_n);
 				(*d3dintf->effect.set_float)(curr_effect, "YFreqResponse", options->yiq_y);
@@ -1533,12 +1534,11 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 			(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", texture->get_finaltex());
 			if(true)//options->params_dirty)
 			{
-				(*d3dintf->effect.set_float)(curr_effect, "RawWidth", rawdims.c.x);
-				(*d3dintf->effect.set_float)(curr_effect, "RawHeight", rawdims.c.y);
+				(*d3dintf->effect.set_vector)(curr_effect, "RawDims", 2, &texsize.c.x);
 				(*d3dintf->effect.set_float)(curr_effect, "WidthRatio", 1.0f / delta.c.x);
 				(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", 1.0f / delta.c.y);
-				(*d3dintf->effect.set_float)(curr_effect, "TargetWidth", (float)d3d->get_width());
-				(*d3dintf->effect.set_float)(curr_effect, "TargetHeight", (float)d3d->get_height());
+				(*d3dintf->effect.set_float)(curr_effect, "ScreenWidth", d3d->get_width());
+				(*d3dintf->effect.set_float)(curr_effect, "ScreenHeight", d3d->get_height());
 				(*d3dintf->effect.set_float)(curr_effect, "CCValue", options->yiq_cc);
 				(*d3dintf->effect.set_float)(curr_effect, "AValue", options->yiq_a);
 				(*d3dintf->effect.set_float)(curr_effect, "BValue", (texture->get_cur_frame() == 2) ? 0.0f : ((float)texture->get_cur_frame() * options->yiq_b));

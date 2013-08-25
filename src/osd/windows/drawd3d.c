@@ -3036,6 +3036,9 @@ bool render_target::init(renderer *d3d, base *d3dintf, int width, int height, in
 		bloom_index++;
 	}
 
+	this->width = width;
+	this->height = height;
+
 	target_width = width * prescale_x;
 	target_height = height * prescale_y;
 

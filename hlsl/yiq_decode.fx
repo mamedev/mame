@@ -55,11 +55,10 @@ struct PS_INPUT
 // YIQ Decode Vertex Shader
 //-----------------------------------------------------------------------------
 
-uniform float TargetWidth;
-uniform float TargetHeight;
+uniform float ScreenWidth;
+uniform float ScreenHeight;
 
-uniform float RawWidth;
-uniform float RawHeight;
+uniform float2 RawDims;
 
 uniform float WidthRatio;
 uniform float HeightRatio;
@@ -69,14 +68,14 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	VS_OUTPUT Output = (VS_OUTPUT)0;
 	
 	Output.Position = float4(Input.Position.xyz, 1.0f);
-	Output.Position.x /= TargetWidth;
-	Output.Position.y /= TargetHeight;
+	Output.Position.x /= ScreenWidth;
+	Output.Position.y /= ScreenHeight;
 	Output.Position.y = 1.0f - Output.Position.y;
 	Output.Position.x -= 0.5f;
 	Output.Position.y -= 0.5f;
 	Output.Position *= float4(2.0f, 2.0f, 1.0f, 1.0f);
 	Output.Coord0.xy = Input.TexCoord;
-	Output.Coord0.zw = float2(1.0f / RawWidth, 0.0f);
+	Output.Coord0.zw = float2(1.0f / RawDims.x, 0.0f);
 
 	return Output;
 }
@@ -97,10 +96,11 @@ uniform float YFreqResponse = 6.0f;
 uniform float IFreqResponse = 1.2f;
 uniform float QFreqResponse = 0.6f;
 
+uniform float PI = 3.141592653589;
+uniform float PI2 = 6.283185307178;
+
 float4 ps_main(PS_INPUT Input) : COLOR
 {
-	float2 RawDims = float2(RawWidth, RawHeight);
-	
 	float4 BaseTexel = tex2D(DiffuseSampler, Input.Coord0.xy + 0.5f / RawDims);
 
 	// YIQ convolution: N coefficients each
@@ -110,41 +110,53 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float MaxC = 2.1183f;
 	float MinC = -1.1183f;
 	float CRange = MaxC - MinC;
-	float Fc_y1 = (CCValue - NotchHalfWidth) * ScanTime / (RawWidth * 4.0f / WidthRatio);
-	float Fc_y2 = (CCValue + NotchHalfWidth) * ScanTime / (RawWidth * 4.0f / WidthRatio);
-	float Fc_y3 = YFreqResponse * ScanTime / (RawWidth * 4.0f / WidthRatio);
-	float Fc_i = IFreqResponse * ScanTime / (RawWidth * 4.0f / WidthRatio);
-	float Fc_q = QFreqResponse * ScanTime / (RawWidth * 4.0f / WidthRatio);
-	float PI = 3.1415926535897932384626433832795;
-	float PI2 = 2.0f * PI;
+	float FrameWidthx4 = RawDims.x * 4.0f / WidthRatio;
+	float Fc_y1 = (CCValue - NotchHalfWidth) * ScanTime / FrameWidthx4;
+	float Fc_y2 = (CCValue + NotchHalfWidth) * ScanTime / FrameWidthx4;
+	float Fc_y3 = YFreqResponse * ScanTime / FrameWidthx4;
+	float Fc_i = IFreqResponse * ScanTime / FrameWidthx4;
+	float Fc_q = QFreqResponse * ScanTime / FrameWidthx4;
+	float Fc_i_2 = Fc_i * 2.0f;
+	float Fc_q_2 = Fc_q * 2.0f;
+	float Fc_y1_2 = Fc_y1 * 2.0f;
+	float Fc_y2_2 = Fc_y2 * 2.0f;
+	float Fc_y3_2 = Fc_y3 * 2.0f;
+	float Fc_i_pi2 = Fc_i * PI2;
+	float Fc_q_pi2 = Fc_q * PI2;
+	float Fc_y1_pi2 = Fc_y1 * PI2;
+	float Fc_y2_pi2 = Fc_y2 * PI2;
+	float Fc_y3_pi2 = Fc_y3 * PI2;
 	float PI2Length = PI2 / 82.0f;
 	float4 NOffset = float4(0.0f, 1.0f, 2.0f, 3.0f);
 	float W = PI2 * CCValue * ScanTime;
+	float4 CoordY = Input.Coord0.y;
+	float4 VPosition = CoordY * (RawDims.x * WidthRatio);
 	for(float n = -41.0f; n < 42.0f; n += 4.0f)
 	{
 		float4 n4 = n + NOffset;
 		float4 CoordX = Input.Coord0.x + Input.Coord0.z * n4 * 0.25f;
-		float4 CoordY = Input.Coord0.y;
 		float2 TexCoord = float2(CoordX.r, CoordY.r);
-		float4 C = tex2D(CompositeSampler, TexCoord + float2(0.625f, 0.4f) / RawDims) * CRange + MinC;
-		float4 WT = W * (CoordX * WidthRatio + AValue * CoordY * 2.0f * (RawHeight / HeightRatio) + BValue) + OValue;
+		float4 C = tex2D(CompositeSampler, TexCoord + float2(0.5f, 0.0f) / RawDims) * CRange + MinC;
+		float4 WT = W * (CoordX * WidthRatio + VPosition + BValue) + OValue;
+		float4 SincKernel = 0.54f + 0.46f * cos(PI2Length * n4);
 
-		float4 SincYIn1 = PI2 * Fc_y1 * n4;
-		float4 SincYIn2 = PI2 * Fc_y2 * n4;
-		float4 SincYIn3 = PI2 * Fc_y3 * n4;
+		float4 SincYIn1 = Fc_y1_pi2 * n4;
+		float4 SincYIn2 = Fc_y2_pi2 * n4;
+		float4 SincYIn3 = Fc_y3_pi2 * n4;
+		float4 SincIIn = Fc_i_pi2 * n4;
+		float4 SincQIn = Fc_q_pi2 * n4;
+
 		float4 SincY1 = ((SincYIn1 != 0.0f) ? (sin(SincYIn1) / SincYIn1) : 1.0f);
 		float4 SincY2 = ((SincYIn2 != 0.0f) ? (sin(SincYIn2) / SincYIn2) : 1.0f);
 		float4 SincY3 = ((SincYIn3 != 0.0f) ? (sin(SincYIn3) / SincYIn3) : 1.0f);
-		float4 IdealY = (2.0f * Fc_y1 * SincY1 - 2.0f * Fc_y2 * SincY2) + 2.0f * Fc_y3 * SincY3;
-		float4 FilterY = (0.54f + 0.46f * cos(PI2Length * n4)) * IdealY;		
-		
-		float4 SincIIn = PI2 * Fc_i * n4;
-		float4 IdealI = 2.0f * Fc_i * ((SincIIn != 0.0f) ? (sin(SincIIn) / SincIIn) : 1.0f);
-		float4 FilterI = (0.54f + 0.46f * cos(PI2Length * n4)) * IdealI;
-		
-		float4 SincQIn = PI2 * Fc_q * n4;
-		float4 IdealQ = 2.0f * Fc_q * ((SincQIn != 0.0f) ? (sin(SincQIn) / SincQIn) : 1.0f);
-		float4 FilterQ = (0.54f + 0.46f * cos(PI2Length * n4)) * IdealQ;
+
+		float4 IdealY = (Fc_y1_2 * SincY1 - Fc_y2_2 * SincY2) + Fc_y3_2 * SincY3;
+		float4 IdealI = Fc_i_2 * ((SincIIn != 0.0f) ? (sin(SincIIn) / SincIIn) : 1.0f);
+		float4 IdealQ = Fc_q_2 * ((SincQIn != 0.0f) ? (sin(SincQIn) / SincQIn) : 1.0f);
+
+		float4 FilterY = SincKernel * IdealY;		
+		float4 FilterI = SincKernel * IdealI;
+		float4 FilterQ = SincKernel * IdealQ;
 		
 		YAccum = YAccum + C * FilterY;
 		IAccum = IAccum + C * cos(WT) * FilterI;
