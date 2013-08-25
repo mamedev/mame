@@ -17,6 +17,61 @@ To Do:
 
 - The layers are offset
 
+
+Gals Panic 2 (Korea)
+Kaneko 1993
+
+PCB Layout (for single large PCB version)
+----------
+
+Z04G2-004
+|--------------------------------------------------------------------|
+|LPF6K  GP2-104.U36* GP2-103.U62*  GP2-203.U102   GP2-201.U171       |
+|PX4460  M6295         424260  34MHz      GP2-202.U121  GP2-200.U189 |
+|   VOL  M6295                 20MHz      G204BK5.U170               |
+| LA4460   GP2-100-K.U61      |------|    G204AK5.U169 GP2-204A.U188*|
+|   DSW2   GP2-101.U60 424260 |KANEKO| 6264                          |
+|   DSW1   GP2-102.U59        |KC-002| 6264            GP2-204B.U187*|
+|                      D42101 |L0002 |                               |
+|                             |------| TMP68HC000N-16    GROM26.U186*|
+|J                                         G000K5.U165               |
+|A          D431000                                      GROM20.U185*|
+|M  MC-1091            62256               G001K5.U164               |
+|M        |------|                                       GROM25.U184*|
+|A        |KANEKO|     62256                                         |
+|   6116  |KC-SHU|                                       GROM24.U183*|
+|   6116  |L0003 |                                                   |
+|         |------|                                      GP2-303B.U182|
+| V-080D                                  62256                      |
+| V-080D                       93C46      62256         GP2-303A.U181|
+| V-080D   |------|            |------| |------| GROM22U.U161        |
+|          |KANEKO|            |KANEKO| |KANEKO|        GP2-302B.U180|
+| |------| |KC-TAS|  27MHz     |KC-SHU| |KC-001| GROM22L.U160        |
+| |KANEKO| |L0005 |      16MHz |L0003 | |L0001 |        GP2-302A.U179|
+| |KC-BYO| |------| |------|   |------| |------| GROM21U.U159        |
+| |L0004 |          |KANEKO|  D431000 |------|        GP2-301B-K.U178|
+| |------|          |KC-YUU|          |KANEKO|   GROM21L.U158        |
+|          |------| |L0006 |          |KC-001|        GP2-301A-K.U177|
+| D431000  |KANEKO| |------|          |L0001 |                       |
+| D431000  |KC-BYO|                   |------|        GP2-300B-K.U176|
+| 6116     |L0004 |                        |------|                  |
+| 6116     |------|                D431000 |KANEKO|   GP2-300A-K.U175|
+|          D431000  TMP68HC000N-16 D431000 |PISCES|                  |
+|          D431000      G002K5.U64         |451   |     GROM10.U174* |
+|          6116 6116    G003K5.U63         |------|                  |
+|--------------------------------------------------------------------|
+Notes:
+           * - These ROMs not populated. Korean-specific ROMs have a K as part of the label text
+       68000 - Clock 13.500MHz [27/2]
+       M6295 - Clock 2.000MHz [16/8]. Pin 7 HIGH
+      V-080D - Custom Kaneko RGB DAC
+     MC-1091 - Custom Kaneko I/O module
+      LFP-6K - Custom Kaneko sound filter/DAC
+      PX4460 - Custom Kaneko sound filter/DAC
+      PISCES - NEC uPD78324 series MCU with 32k internal rom. Clock 13.500MHz [27/2] on pins 51 & 52
+       VSync - 59.1856Hz
+       HSync - 15.625kHz
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -371,7 +426,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( galpani2 )
 	PORT_START("DSW1_P1")   /* 780000.w */
-	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Difficulty ) )		PORT_DIPLOCATION("SW B:8,7,6")
 	PORT_DIPSETTING(      0x0007, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0006, DEF_STR( Very_Easy ) )
 	PORT_DIPSETTING(      0x0005, DEF_STR( Easy ) )
@@ -380,15 +435,15 @@ static INPUT_PORTS_START( galpani2 )
 	PORT_DIPSETTING(      0x0002, DEF_STR( Very_Hard ) )
 	PORT_DIPSETTING(      0x0001, "Ultra Hard" )
 	PORT_DIPSETTING(      0x0000, "God Hands" )
-	PORT_DIPNAME( 0x0008, 0x0008, "Picture Mode" )
+	PORT_DIPNAME( 0x0008, 0x0008, "Picture Mode" )			PORT_DIPLOCATION("SW B:5")
 	PORT_DIPSETTING(      0x0008, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0000, "Adult" )
-	PORT_DIPNAME( 0x0030, 0x0030, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x0030, 0x0030, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW B:4,3")
 	PORT_DIPSETTING(      0x0030, "3" )
 	PORT_DIPSETTING(      0x0020, "1" )
 	PORT_DIPSETTING(      0x0010, "4" )
 	PORT_DIPSETTING(      0x0000, "5" )
-	PORT_DIPNAME( 0x00c0, 0x00c0, "Max Unit of Players" )
+	PORT_DIPNAME( 0x00c0, 0x00c0, "Max Unit of Players" )		PORT_DIPLOCATION("SW B:2,1")
 	PORT_DIPSETTING(      0x00c0, "9" )
 	PORT_DIPSETTING(      0x0080, "1" )
 	PORT_DIPSETTING(      0x0040, "4" )
@@ -404,7 +459,7 @@ static INPUT_PORTS_START( galpani2 )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
 
 	PORT_START("DSW2_P2")   /* 780002.w */
-	PORT_DIPNAME( 0x000f, 0x000f, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x000f, 0x000f, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW A:8,7,6,5")
 	PORT_DIPSETTING(      0x000f, "1 Coin/1 Credit  1/1" )
 	PORT_DIPSETTING(      0x000e, "2 Coin/1 Credit  2/1" )
 	PORT_DIPSETTING(      0x000d, "3 Coin/1 Credit  3/1" )
@@ -421,16 +476,16 @@ static INPUT_PORTS_START( galpani2 )
 	PORT_DIPSETTING(      0x0002, "1 Coin/2 Credit  1/2" )
 	PORT_DIPSETTING(      0x0001, "1 Coin/3 Credit  1/3" )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x0010, 0x0010, "Card Dispenser" )
+	PORT_DIPNAME( 0x0010, 0x0010, "Card Dispenser" )		PORT_DIPLOCATION("SW A:4")
 	PORT_DIPSETTING(      0x0010, "Used" )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Unused ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Flip_Screen ) )		PORT_DIPLOCATION("SW A:3")
 	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Demo_Sounds ) )		PORT_DIPLOCATION("SW A:2")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0040, DEF_STR( On ) )
-	PORT_SERVICE( 0x0080, IP_ACTIVE_LOW )
+	PORT_SERVICE_DIPLOC(  0x0080, IP_ACTIVE_LOW, "SW A:1" )
 
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
@@ -470,29 +525,10 @@ static INPUT_PORTS_START( gp2se )
 	PORT_INCLUDE( galpani2 )
 
 	PORT_MODIFY("DSW1_P1")  /* 780000.w */
-	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(      0x0007, DEF_STR( Normal ) )
-	PORT_DIPSETTING(      0x0006, DEF_STR( Very_Easy ) )
-	PORT_DIPSETTING(      0x0005, DEF_STR( Easy ) )
-	PORT_DIPSETTING(      0x0004, "Normal +" )
-	PORT_DIPSETTING(      0x0003, DEF_STR( Hard ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Very_Hard ) )
-	PORT_DIPSETTING(      0x0001, "Ultra Hard" )
-	PORT_DIPSETTING(      0x0000, "God Hard" )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED ) // picture mode is "normal fix"
-	PORT_DIPNAME( 0x0030, 0x0030, "Initial Player" )
-	PORT_DIPSETTING(      0x0030, "3" )
-	PORT_DIPSETTING(      0x0020, "1" )
-	PORT_DIPSETTING(      0x0010, "4" )
-	PORT_DIPSETTING(      0x0000, "5" )
-	PORT_DIPNAME( 0x00c0, 0x00c0, "Max Player" )
-	PORT_DIPSETTING(      0x00c0, "9" )
-	PORT_DIPSETTING(      0x0080, "1" )
-	PORT_DIPSETTING(      0x0040, "4" )
-	PORT_DIPSETTING(      0x0000, "6" )
+	PORT_DIPUNUSED_DIPLOC( 0x0008, IP_ACTIVE_LOW, "SW B:5" ) // picture mode is "normal fix" and cannot be changed
 
 	PORT_MODIFY("DSW2_P2")  /* 780002.w */
-	PORT_DIPNAME( 0x0010, 0x0010, "Card Dispenser" )
+	PORT_DIPNAME( 0x0010, 0x0010, "Card Dispenser" )		PORT_DIPLOCATION("SW A:4") // Reversed compared to other sets.
 	PORT_DIPSETTING(      0x0000, "Used" )
 	PORT_DIPSETTING(      0x0010, DEF_STR( Unused ) )
 
