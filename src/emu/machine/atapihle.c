@@ -19,6 +19,8 @@ void atapi_hle_device::process_buffer()
 	//      m_buffer[4],m_buffer[5],m_buffer[6],m_buffer[7],
 	//      m_buffer[8],m_buffer[9],m_buffer[10],m_buffer[11]);
 
+		m_error = 0; // HACK: This might not be the right place, but firebeat needs this cleared at some point
+
 		m_scsidev_device->SetCommand( m_buffer, m_buffer_size );
 		m_scsidev_device->ExecCommand( &m_data_size );
 		m_scsidev_device->GetPhase( &phase );

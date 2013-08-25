@@ -31,12 +31,12 @@
     GQ971 PWB(B2) 0000067784 Backplane
     ----------------------------------
         3x PCB Slots with 2x DIN96S connectors (for main and extend PCBs)
-        40-pin ATAPI connector for each slot
+        40-pin ATA connector for each slot
 
     GQ986 PWB(A1) 0000073015 Backplane
     ----------------------------------
         2x PCB Slots with 2x DIN96S connectors (for main and extend PCBs)
-        40-pin ATAPI connector for each slot
+        40-pin ATA connector for each slot
 
     GQ972 PWB(D2) Controller interface on Beatmania III (?)
     GQ972 PWB(G1) Sound Amp (?)
@@ -132,14 +132,13 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/powerpc/ppc.h"
+#include "machine/ataintf.h"
 #include "machine/intelfsh.h"
-#include "machine/scsicd.h"
 #include "machine/rtc65271.h"
 #include "machine/ins8250.h"
 #include "machine/midikbd.h"
 #include "sound/ymz280b.h"
 #include "sound/cdda.h"
-#include "cdrom.h"
 #include "firebeat.lh"
 
 
@@ -178,7 +177,8 @@ public:
 		m_duart_midi(*this, "duart_midi"),
 		m_duart_com(*this, "duart_com"),
 		m_kbd0(*this, "kbd0"),
-		m_kbd1(*this, "kbd1")
+		m_kbd1(*this, "kbd1"),
+		m_ata(*this, "ata")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -190,6 +190,7 @@ public:
 	required_device<pc16552_device> m_duart_com;
 	optional_device<midi_keyboard_device> m_kbd0;
 	optional_device<midi_keyboard_device> m_kbd1;
+	required_device<ata_interface_device> m_ata;
 
 	UINT8 m_extend_board_irq_enable;
 	UINT8 m_extend_board_irq_active;
@@ -197,16 +198,6 @@ public:
 	GCU_REGS m_gcu[2];
 	int m_tick;
 	int m_layer;
-	UINT8 m_atapi_regs[16];
-	scsihle_device *m_atapi_device_data[2];
-	UINT16 m_atapi_data[32*1024];
-	UINT8 m_atapi_scsi_packet[32*1024];
-	int m_atapi_data_ptr;
-	int m_atapi_xferlen;
-	int m_atapi_xfermod;
-	int m_atapi_cdata_wait;
-	int m_atapi_drivesel;
-	UINT8 m_temp_data[64*1024];
 	int m_cab_data_ptr;
 	const int * m_cur_cab_data;
 //  int m_keyboard_state[2];
@@ -235,10 +226,11 @@ public:
 	DECLARE_WRITE32_MEMBER(flashram_w);
 	DECLARE_READ32_MEMBER(soundflash_r);
 	DECLARE_WRITE32_MEMBER(soundflash_w);
-	DECLARE_READ32_MEMBER(atapi_command_r);
-	DECLARE_WRITE32_MEMBER(atapi_command_w);
-	DECLARE_READ32_MEMBER(atapi_control_r);
-	DECLARE_WRITE32_MEMBER(atapi_control_w);
+	DECLARE_WRITE_LINE_MEMBER(ata_interrupt);
+	DECLARE_READ32_MEMBER(ata_command_r);
+	DECLARE_WRITE32_MEMBER(ata_command_w);
+	DECLARE_READ32_MEMBER(ata_control_r);
+	DECLARE_WRITE32_MEMBER(ata_control_w);
 //  DECLARE_READ32_MEMBER(comm_uart_r);
 //  DECLARE_WRITE32_MEMBER(comm_uart_w);
 	DECLARE_READ32_MEMBER(cabinet_r);
@@ -265,14 +257,6 @@ public:
 	UINT32 update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int chip);
 	UINT32 GCU_r(int chip, UINT32 offset, UINT32 mem_mask);
 	void GCU_w(int chip, UINT32 offset, UINT32 data, UINT32 mem_mask);
-	void atapi_cause_irq();
-	void atapi_clear_irq();
-	void atapi_init();
-	void atapi_reset();
-	UINT16 atapi_command_reg_r(int reg);
-	void atapi_command_reg_w(int reg, UINT16 data);
-	UINT16 atapi_control_reg_r(int reg);
-	void atapi_control_reg_w(int reg, UINT16 data);
 	void set_ibutton(UINT8 *data);
 	int ibutton_w(UINT8 data);
 	void init_lights(write32_delegate out1, write32_delegate out2, write32_delegate out3);
@@ -994,408 +978,67 @@ WRITE32_MEMBER(firebeat_state::soundflash_w)
 }
 
 /*****************************************************************************/
-/* ATAPI Interface */
+/* ATA Interface */
 
 #define BYTESWAP16(x)   ((((x) >> 8) & 0xff) | (((x) << 8) & 0xff00))
 
-#if 1
-#define ATAPI_ENDIAN(x) (BYTESWAP16(x))
-#else
-#define ATAPI_ENDIAN(x) (x)
-#endif
-
-#define ATAPI_CYCLES_PER_SECTOR (32000) // plenty of time to allow DMA setup etc.  BIOS requires this be at least 2000, individual games may vary.
-
-
-#define ATAPI_STAT_BSY     0x80
-#define ATAPI_STAT_DRDY    0x40
-#define ATAPI_STAT_DMARDDF 0x20
-#define ATAPI_STAT_SERVDSC 0x10
-#define ATAPI_STAT_DRQ     0x08
-#define ATAPI_STAT_CORR    0x04
-#define ATAPI_STAT_CHECK   0x01
-
-#define ATAPI_INTREASON_COMMAND 0x01
-#define ATAPI_INTREASON_IO      0x02
-#define ATAPI_INTREASON_RELEASE 0x04
-
-#define ATAPI_REG_DATA      0
-#define ATAPI_REG_ERRFEAT   1
-#define ATAPI_REG_INTREASON 2
-#define ATAPI_REG_SAMTAG    3
-#define ATAPI_REG_COUNTLOW  4
-#define ATAPI_REG_COUNTHIGH 5
-#define ATAPI_REG_DRIVESEL  6
-#define ATAPI_REG_CMDSTATUS 7
-
-
-void firebeat_state::atapi_cause_irq()
-{
-	m_maincpu->set_input_line(INPUT_LINE_IRQ4, ASSERT_LINE);
-}
-
-void firebeat_state::atapi_clear_irq()
-{
-	m_maincpu->set_input_line(INPUT_LINE_IRQ4, CLEAR_LINE);
-}
-
-void firebeat_state::atapi_init()
-{
-	memset(m_atapi_regs, 0, sizeof(m_atapi_regs));
-
-	m_atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
-	m_atapi_regs[ATAPI_REG_ERRFEAT] = 1;
-	m_atapi_regs[ATAPI_REG_COUNTLOW] = 0x14;
-	m_atapi_regs[ATAPI_REG_COUNTHIGH] = 0xeb;
-
-	m_atapi_data_ptr = 0;
-	m_atapi_cdata_wait = 0;
-
-	m_atapi_device_data[0] = machine().device<scsihle_device>( "scsi0" );
-	m_atapi_device_data[1] = machine().device<scsihle_device>( "scsi1" );
-}
-
-void firebeat_state::atapi_reset()
-{
-	logerror("ATAPI reset\n");
-
-	m_atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
-	m_atapi_regs[ATAPI_REG_ERRFEAT] = 1;
-	m_atapi_regs[ATAPI_REG_COUNTLOW] = 0x14;
-	m_atapi_regs[ATAPI_REG_COUNTHIGH] = 0xeb;
-
-	m_atapi_data_ptr = 0;
-	m_atapi_cdata_wait = 0;
-}
-
-
-
-UINT16 firebeat_state::atapi_command_reg_r(int reg)
-{
-	int i, data;
-
-//  printf("ATAPI: Command reg read %d\n", reg);
-
-	if (reg == ATAPI_REG_DATA)
-	{
-		// assert IRQ and drop DRQ
-		if (m_atapi_data_ptr == 0)
-		{
-			//printf("ATAPI: dropping DRQ\n");
-			atapi_cause_irq();
-			m_atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
-
-			// get the data from the device
-			m_atapi_device_data[m_atapi_drivesel]->ReadData( m_temp_data, m_atapi_xferlen );
-
-			// fix it up in an endian-safe way
-			for (i = 0; i < m_atapi_xferlen; i += 2)
-			{
-				m_atapi_data[i/2] = m_temp_data[i+0] | m_temp_data[i+1]<<8;
-			}
-		}
-
-		data = m_atapi_data[m_atapi_data_ptr];
-//      printf("ATAPI: %d, packet read = %04x\n", m_atapi_data_ptr, m_atapi_data[m_atapi_data_ptr]);
-		m_atapi_data_ptr++;
-
-		if (m_atapi_xfermod && m_atapi_data_ptr == (m_atapi_xferlen/2))
-		{
-			//printf("ATAPI: DRQ interrupt\n");
-			atapi_cause_irq();
-			m_atapi_regs[ATAPI_REG_CMDSTATUS] |= ATAPI_STAT_DRQ;
-			m_atapi_data_ptr = 0;
-
-			if (m_atapi_xfermod > 63488)
-			{
-				m_atapi_xfermod = m_atapi_xfermod - 63488;
-				m_atapi_xferlen = 63488;
-			}
-			else
-			{
-				m_atapi_xferlen = m_atapi_xfermod;
-				m_atapi_xfermod = 0;
-			}
-
-			//printf("ATAPI Transfer: %d, %d, %d\n", atapi_transfer_length, m_atapi_xfermod, m_atapi_xferlen);
-
-			m_atapi_regs[ATAPI_REG_COUNTLOW] = m_atapi_xferlen & 0xff;
-			m_atapi_regs[ATAPI_REG_COUNTHIGH] = (m_atapi_xferlen>>8)&0xff;
-		}
-		return data;
-	}
-	else
-	{
-		if (reg == ATAPI_REG_CMDSTATUS)
-			atapi_clear_irq();
-		return m_atapi_regs[reg];
-	}
-}
-
-void firebeat_state::atapi_command_reg_w(int reg, UINT16 data)
-{
-	int i;
-
-	if (reg == ATAPI_REG_DATA)
-	{
-//      printf("%s:ATAPI: packet write %04x\n", device->machine().describe_context(), data);
-		m_atapi_data[m_atapi_data_ptr] = data;
-		m_atapi_data_ptr++;
-
-		if (m_atapi_cdata_wait)
-		{
-//          printf("ATAPI: waiting, ptr %d wait %d\n", m_atapi_data_ptr, m_atapi_cdata_wait);
-			if (m_atapi_data_ptr == m_atapi_cdata_wait)
-			{
-				// decompose SCSI packet into proper byte order
-				for (i = 0; i < m_atapi_cdata_wait; i += 2)
-				{
-					m_atapi_scsi_packet[i] = m_atapi_data[i/2]&0xff;
-					m_atapi_scsi_packet[i+1] = m_atapi_data[i/2]>>8;
-				}
-
-				// send it to the device
-				m_atapi_device_data[m_atapi_drivesel]->WriteData( m_atapi_scsi_packet, m_atapi_cdata_wait );
-
-				// assert IRQ
-				atapi_cause_irq();
-
-				// not sure here, but clear DRQ at least?
-				m_atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
-			}
-		}
-
-		if ((!m_atapi_cdata_wait) && (m_atapi_data_ptr == 6))
-		{
-			int phase;
-
-			// reset data pointer for reading SCSI results
-			m_atapi_data_ptr = 0;
-
-			m_atapi_regs[ATAPI_REG_CMDSTATUS] |= ATAPI_STAT_BSY;
-
-			// assert IRQ
-			atapi_cause_irq();
-
-			// decompose SCSI packet into proper byte order
-			for (i = 0; i < 16; i += 2)
-			{
-				m_atapi_scsi_packet[i+0] = m_atapi_data[i/2]&0xff;
-				m_atapi_scsi_packet[i+1] = m_atapi_data[i/2]>>8;
-			}
-
-			// send it to the SCSI device
-			m_atapi_device_data[m_atapi_drivesel]->SetCommand( m_atapi_scsi_packet, 12 );
-			m_atapi_device_data[m_atapi_drivesel]->ExecCommand( &m_atapi_xferlen );
-			m_atapi_device_data[m_atapi_drivesel]->GetPhase( &phase );
-
-			if (m_atapi_xferlen != -1)
-			{
-				logerror("ATAPI: SCSI command %02x returned %d bytes from the device\n", m_atapi_data[0]&0xff, m_atapi_xferlen);
-
-				// store the returned command length in the ATAPI regs, splitting into
-				// multiple transfers if necessary
-
-				m_atapi_xfermod = 0;
-				if (m_atapi_xferlen > 63488)
-				{
-					m_atapi_xfermod = m_atapi_xferlen - 63488;
-					m_atapi_xferlen = 63488;
-				}
-
-//              printf("ATAPI Transfer: %d, %d\n", m_atapi_xfermod, m_atapi_xferlen);
-
-				m_atapi_regs[ATAPI_REG_COUNTLOW] = m_atapi_xferlen & 0xff;
-				m_atapi_regs[ATAPI_REG_COUNTHIGH] = (m_atapi_xferlen>>8)&0xff;
-
-				switch( phase )
-				{
-				case SCSI_PHASE_DATAOUT:
-					m_atapi_data_ptr = 0;
-					m_atapi_cdata_wait = m_atapi_xferlen;
-					logerror("ATAPI: Waiting for %x bytes of data\n", m_atapi_cdata_wait);
-					break;
-				}
-
-				// perform special ATAPI processing of certain commands
-				//if (m_atapi_drivesel==1) logerror("!!!ATAPI COMMAND %x\n", m_atapi_data[0]&0xff);
-				switch (m_atapi_data[0]&0xff)
-				{
-					case 0x55:  // MODE SELECT
-						m_atapi_cdata_wait = m_atapi_data[4]/2;
-						m_atapi_data_ptr = 0;
-						logerror("ATAPI: Waiting for %x bytes of MODE SELECT data\n", m_atapi_cdata_wait);
-						break;
-
-
-					case 0xa8:  // READ (12)
-						// indicate data ready: set DRQ and DMA ready, and IO in INTREASON
-						m_atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ | ATAPI_STAT_SERVDSC;
-						m_atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO;
-
-						fatalerror("ATAPI: DMA read command attempted\n");
-						break;
-
-					case 0x00: // BUS RESET / TEST UNIT READY
-					case 0xbb: // SET CD SPEED
-					case 0xa5: // PLAY AUDIO
-					case 0x1b: // START_STOP_UNIT
-					case 0x4e: // STOPPLAY_SCAN
-						m_atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
-						break;
-				}
-			}
-			else
-			{
-//              printf("ATAPI: SCSI device returned error!\n");
-
-				m_atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ | ATAPI_STAT_CHECK;
-				m_atapi_regs[ATAPI_REG_ERRFEAT] = 0x50;  // sense key = ILLEGAL REQUEST
-				m_atapi_regs[ATAPI_REG_COUNTLOW] = 0;
-				m_atapi_regs[ATAPI_REG_COUNTHIGH] = 0;
-			}
-		}
-	}
-	else
-	{
-		data &= 0xff;
-		m_atapi_regs[reg] = data;
-//      printf("ATAPI: Command reg %d = %02X\n", reg, data);
-
-		switch(reg)
-		{
-			case ATAPI_REG_DRIVESEL:
-				m_atapi_drivesel = (data >> 4) & 0x1;
-				break;
-
-			case ATAPI_REG_CMDSTATUS:
-//              printf("ATAPI: Issued command %02X\n", data);
-
-				switch(data)
-				{
-					case 0x00:      /* NOP */
-						break;
-
-					case 0x08:      /* ATAPI Soft Reset */
-						atapi_reset();
-						break;
-
-					case 0xa0:      /* ATAPI Packet */
-						m_atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_BSY | ATAPI_STAT_DRQ;
-						m_atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_COMMAND;
-
-						m_atapi_data_ptr = 0;
-						m_atapi_cdata_wait = 0;
-						break;
-
-					default:
-						fatalerror("ATAPI: Unknown ATA command %02X\n", data);
-				}
-				break;
-		}
-	}
-}
-
-UINT16 firebeat_state::atapi_control_reg_r(int reg)
-{
-	UINT16 value;
-	switch(reg)
-	{
-		case 0x6:
-		{
-			value = m_atapi_regs[ATAPI_REG_CMDSTATUS];
-			if (m_atapi_regs[ATAPI_REG_CMDSTATUS] & ATAPI_STAT_BSY)
-			{
-				m_atapi_regs[ATAPI_REG_CMDSTATUS] ^= ATAPI_STAT_BSY;
-			}
-			return value;
-		}
-
-		default:
-			fatalerror("ATAPI: Read control reg %d\n", reg);
-			break;
-	}
-
-	return 0;
-}
-
-void firebeat_state::atapi_control_reg_w(int reg, UINT16 data)
-{
-	switch(reg)
-	{
-		case 0x06:      /* Device Control */
-		{
-			if (data & 0x4)
-			{
-				atapi_reset();
-			}
-			break;
-		}
-
-		default:
-			fatalerror("ATAPI: Control reg %d = %02X\n", reg, data);
-	}
-}
-
-
-
-READ32_MEMBER(firebeat_state::atapi_command_r )
+READ32_MEMBER(firebeat_state::ata_command_r )
 {
 	UINT16 r;
-//  printf("atapi_command_r: %08X, %08X\n", offset, mem_mask);
+//  printf("ata_command_r: %08X, %08X\n", offset, mem_mask);
 	if (ACCESSING_BITS_16_31)
 	{
-		r = atapi_command_reg_r(offset*2);
-		return ATAPI_ENDIAN(r) << 16;
+		r = m_ata->read_cs0(space, offset*2, BYTESWAP16((mem_mask >> 16) & 0xffff));
+		return BYTESWAP16(r) << 16;
 	}
 	else
 	{
-		r = atapi_command_reg_r((offset*2) + 1);
-		return ATAPI_ENDIAN(r) << 0;
+		r = m_ata->read_cs0(space, (offset*2) + 1, BYTESWAP16((mem_mask >> 0) & 0xffff));
+		return BYTESWAP16(r) << 0;
 	}
 }
 
-WRITE32_MEMBER(firebeat_state::atapi_command_w )
+WRITE32_MEMBER(firebeat_state::ata_command_w )
 {
-//  printf("atapi_command_w: %08X, %08X, %08X\n", data, offset, mem_mask);
+//  printf("ata_command_w: %08X, %08X, %08X\n", data, offset, mem_mask);
 
 	if (ACCESSING_BITS_16_31)
 	{
-		atapi_command_reg_w(offset*2, ATAPI_ENDIAN((data >> 16) & 0xffff));
+		m_ata->write_cs0(space, offset*2, BYTESWAP16((data >> 16) & 0xffff), BYTESWAP16((mem_mask >> 16) & 0xffff));
 	}
 	else
 	{
-		atapi_command_reg_w((offset*2) + 1, ATAPI_ENDIAN((data >> 0) & 0xffff));
+		m_ata->write_cs0(space, (offset*2) + 1, BYTESWAP16((data >> 0) & 0xffff), BYTESWAP16((mem_mask >> 0) & 0xffff));
 	}
 }
 
 
-READ32_MEMBER(firebeat_state::atapi_control_r )
+READ32_MEMBER(firebeat_state::ata_control_r )
 {
 	UINT16 r;
-//  printf("atapi_control_r: %08X, %08X\n", offset, mem_mask);
+//  printf("ata_control_r: %08X, %08X\n", offset, mem_mask);
 
 	if (ACCESSING_BITS_16_31)
 	{
-		r = atapi_control_reg_r(offset*2);
-		return ATAPI_ENDIAN(r) << 16;
+		r = m_ata->read_cs1(space, offset*2, BYTESWAP16((mem_mask >> 16) & 0xffff));
+		return BYTESWAP16(r) << 16;
 	}
 	else
 	{
-		r = atapi_control_reg_r((offset*2) + 1);
-		return ATAPI_ENDIAN(r) << 0;
+		r = m_ata->read_cs1(space, (offset*2) + 1, BYTESWAP16((mem_mask >> 0) & 0xffff));
+		return BYTESWAP16(r) << 0;
 	}
 }
 
-WRITE32_MEMBER(firebeat_state::atapi_control_w )
+WRITE32_MEMBER(firebeat_state::ata_control_w )
 {
 	if (ACCESSING_BITS_16_31)
 	{
-		atapi_control_reg_w(offset*2, ATAPI_ENDIAN(data >> 16) & 0xff);
+		m_ata->write_cs1(space, offset*2, BYTESWAP16(data >> 16) & 0xffff, BYTESWAP16((mem_mask >> 16) & 0xffff));
 	}
 	else
 	{
-		atapi_control_reg_w((offset*2) + 1, ATAPI_ENDIAN(data >> 0) & 0xff);
+		m_ata->write_cs1(space, (offset*2) + 1, BYTESWAP16(data >> 0) & 0xffff, BYTESWAP16((mem_mask >> 0) & 0xffff));
 	}
 }
 
@@ -1902,8 +1545,8 @@ static ADDRESS_MAP_START( firebeat_map, AS_PROGRAM, 32, firebeat_state )
 	AM_RANGE(0x7e000100, 0x7e00013f) AM_DEVREADWRITE8("rtc", rtc65271_device, xram_r, xram_w, 0xffffffff)
 	AM_RANGE(0x7e800000, 0x7e8000ff) AM_READWRITE(gcu0_r, gcu0_w)
 	AM_RANGE(0x7e800100, 0x7e8001ff) AM_READWRITE(gcu1_r, gcu1_w)
-	AM_RANGE(0x7fe00000, 0x7fe0000f) AM_READWRITE(atapi_command_r, atapi_command_w)
-	AM_RANGE(0x7fe80000, 0x7fe8000f) AM_READWRITE(atapi_control_r, atapi_control_w)
+	AM_RANGE(0x7fe00000, 0x7fe0000f) AM_READWRITE(ata_command_r, ata_command_w)
+	AM_RANGE(0x7fe80000, 0x7fe8000f) AM_READWRITE(ata_control_r, ata_control_w)
 	AM_RANGE(0x7ff80000, 0x7fffffff) AM_ROM AM_REGION("user1", 0)       /* System BIOS */
 ADDRESS_MAP_END
 
@@ -2070,7 +1713,7 @@ INTERRUPT_GEN_MEMBER(firebeat_state::firebeat_interrupt)
 	// IRQ 0: VBlank
 	// IRQ 1: Extend board IRQ
 	// IRQ 2: Main board UART
-	// IRQ 4: ATAPI
+	// IRQ 4: ATA
 
 	device.execute().set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 }
@@ -2084,6 +1727,17 @@ const rtc65271_interface firebeat_rtc =
 {
 	DEVCB_NULL
 };
+
+WRITE_LINE_MEMBER( firebeat_state::ata_interrupt )
+{
+	m_maincpu->set_input_line(INPUT_LINE_IRQ4, state);
+}
+
+static MACHINE_CONFIG_FRAGMENT( cdrom_config )
+	MCFG_DEVICE_MODIFY("device:cdda")
+	MCFG_SOUND_ROUTE(0, "^^^^^lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "^^^^^rspeaker", 1.0)
+MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( firebeat, firebeat_state )
 
@@ -2101,8 +1755,11 @@ static MACHINE_CONFIG_START( firebeat, firebeat_state )
 	MCFG_FUJITSU_29F016A_ADD("flash_snd1")
 	MCFG_FUJITSU_29F016A_ADD("flash_snd2")
 
-	MCFG_DEVICE_ADD("scsi0", SCSICD, 0)
-	MCFG_DEVICE_ADD("scsi1", SCSICD, 0)
+	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "cdrom", "cdrom", true)
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(firebeat_state, ata_interrupt))
+
+	MCFG_DEVICE_MODIFY("ata:1")
+	MCFG_DEVICE_CARD_MACHINE_CONFIG( "cdrom", cdrom_config )
 
 	/* video hardware */
 	MCFG_PALETTE_LENGTH(32768)
@@ -2126,9 +1783,10 @@ static MACHINE_CONFIG_START( firebeat, firebeat_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_SOUND_MODIFY("scsi1:cdda")
-	MCFG_SOUND_ROUTE(0, "^^lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "^^rspeaker", 1.0)
+//	TODO: Hookup cdrom audio
+//	MCFG_SOUND_MODIFY("scsi1:cdda")
+//	MCFG_SOUND_ROUTE(0, "^^lspeaker", 1.0)
+//	MCFG_SOUND_ROUTE(1, "^^rspeaker", 1.0)
 
 	MCFG_PC16552D_ADD("duart_com", firebeat_com0_interface, firebeat_com1_interface, XTAL_19_6608MHz) // pgmd to 9600baud
 	MCFG_PC16552D_ADD("duart_midi", firebeat_midi0_interface, firebeat_midi1_interface, XTAL_24MHz) // in all memory maps, pgmd to 31250baud
@@ -2150,8 +1808,11 @@ static MACHINE_CONFIG_START( firebeat2, firebeat_state )
 	MCFG_FUJITSU_29F016A_ADD("flash_snd1")
 	MCFG_FUJITSU_29F016A_ADD("flash_snd2")
 
-	MCFG_DEVICE_ADD("scsi0", SCSICD, 0)
-	MCFG_DEVICE_ADD("scsi1", SCSICD, 0)
+	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "cdrom", "cdrom", true)
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(firebeat_state, ata_interrupt))
+
+	MCFG_DEVICE_MODIFY("ata:1")
+	MCFG_DEVICE_CARD_MACHINE_CONFIG( "cdrom", cdrom_config )
 
 	/* video hardware */
 	MCFG_PALETTE_LENGTH(32768)
@@ -2181,10 +1842,6 @@ static MACHINE_CONFIG_START( firebeat2, firebeat_state )
 	MCFG_YMZ280B_EXT_READ_HANDLER(READ8(firebeat_state, soundram_r))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-
-	MCFG_SOUND_MODIFY("scsi1:cdda")
-	MCFG_SOUND_ROUTE(0, "^^lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "^^rspeaker", 1.0)
 
 	MCFG_PC16552D_ADD("duart_com", firebeat_com0_interface, firebeat_com1_interface, XTAL_19_6608MHz)
 	MCFG_PC16552D_ADD("duart_midi", firebeat_midi0_interface, firebeat_midi1_interface, XTAL_24MHz)
@@ -2353,8 +2010,6 @@ void firebeat_state::init_firebeat()
 {
 	UINT8 *rom = memregion("user2")->base();
 
-	atapi_init();
-
 //  pc16552d_init(machine(), 0, 19660800, comm_uart_irq_callback, 0);     // Network UART
 //  pc16552d_init(machine(), 1, 24000000, midi_uart_irq_callback, 0);     // MIDI UART
 
@@ -2411,10 +2066,10 @@ ROM_START( ppp )
 	ROM_REGION(0xc0, "user2", 0)    // Security dongle
 	ROM_LOAD("gq977-ja", 0x00, 0xc0, BAD_DUMP CRC(55b5abdb) SHA1(d8da5bac005235480a1815bd0a79c3e8a63ebad1))
 
-	DISK_REGION( "scsi0" )
+	DISK_REGION( "ata:0:cdrom:device" ) // program CD-ROM
 	DISK_IMAGE_READONLY( "977jaa01", 0, BAD_DUMP SHA1(59c03d8eb366167feef741d42d9d8b54bfeb3c1e) )
 
-	DISK_REGION( "scsi1" )
+	DISK_REGION( "ata:1:cdrom:device" ) // audio CD-ROM
 	DISK_IMAGE_READONLY( "977jaa02", 0, SHA1(bd07c25ee3e1edc962997f6a5bb1700897231fb2) )
 ROM_END
 
@@ -2425,10 +2080,10 @@ ROM_START( ppp1mp )
 	ROM_REGION(0xc0, "user2", 0)    // Security dongle
 	ROM_LOAD( "gqa11-ja",     0x000000, 0x0000c0, CRC(2ed8e2ae) SHA1(b8c3410dab643111b2d2027068175ba018a0a67e) )
 
-	DISK_REGION( "scsi0" )
+	DISK_REGION( "ata:0:cdrom:device" ) // program CD-ROM
 	DISK_IMAGE_READONLY( "a11jaa01", 0, SHA1(539ec6f1c1d198b0d6ce5543eadcbb4d9917fa42) )
 
-	DISK_REGION( "scsi1" )
+	DISK_REGION( "ata:1:cdrom:device" ) // audio CD-ROM
 	DISK_IMAGE_READONLY( "a11jaa02", 0, SHA1(575069570cb4a2b58b199a1329d45b189a20fcc9) )
 ROM_END
 
@@ -2439,10 +2094,10 @@ ROM_START( kbm )
 	ROM_REGION(0xc0, "user2", ROMREGION_ERASE00)    // Security dongle
 	ROM_LOAD("gq974-ja", 0x00, 0xc0, BAD_DUMP CRC(4578f29b) SHA1(faaeaf6357c1e86e898e7017566cfd2fc7ee3d6f))
 
-	DISK_REGION( "scsi0" )
+	DISK_REGION( "ata:0:cdrom:device" ) // program CD-ROM
 	DISK_IMAGE_READONLY( "974jac01", 0, BAD_DUMP SHA1(c6145d7090e44c87f71ba626620d2ae2596a75ca) )
 
-	DISK_REGION( "scsi1" )
+	DISK_REGION( "ata:1:cdrom:device" ) // audio CD-ROM
 	DISK_IMAGE_READONLY( "974jaa02", 1, BAD_DUMP SHA1(3b9946083239eb5687f66a49df24568bffa4fbbd) )
 ROM_END
 
@@ -2453,10 +2108,10 @@ ROM_START( kbm2nd )
 	ROM_REGION(0xc0, "user2", ROMREGION_ERASE00)    // Security dongle
 	ROM_LOAD("gca01-ja", 0x00, 0xc0, BAD_DUMP CRC(2bda339d) SHA1(031cb3f44e7a89cd62a9ba948f3d19d53a325abd))
 
-	DISK_REGION( "scsi0" )
+	DISK_REGION( "ata:0:cdrom:device" ) // program CD-ROM
 	DISK_IMAGE_READONLY( "a01jaa01", 0, BAD_DUMP SHA1(37bc3879719b3d3c6bc8a5691abd7aa4aec87d45) )
 
-	DISK_REGION( "scsi1" )
+	DISK_REGION( "ata:1:cdrom:device" ) // audio CD-ROM
 	DISK_IMAGE_READONLY( "a01jaa02", 1, BAD_DUMP SHA1(a3fdeee0f85a7a9718c0fb1cc642ac22d3eff8db) )
 ROM_END
 
@@ -2467,10 +2122,10 @@ ROM_START( kbm3rd )
 	ROM_REGION(0xc0, "user2", 0)    // Security dongle
 	ROM_LOAD("gca12-ja", 0x00, 0xc0, BAD_DUMP CRC(cf01dc15) SHA1(da8d208233487ebe65a0a9826fc72f1f459baa26))
 
-	DISK_REGION( "scsi0" )
+	DISK_REGION( "ata:0:cdrom:device" ) // program CD-ROM
 	DISK_IMAGE_READONLY( "a12jaa01", 0, BAD_DUMP SHA1(10f2284248e51b1adf0fde173df72ad97fe0e5c8) )
 
-	DISK_REGION( "scsi1" )
+	DISK_REGION( "ata:1:cdrom:device" ) // audio CD-ROM
 	DISK_IMAGE_READONLY( "a12jaa02", 1, BAD_DUMP SHA1(1256ce9d71350d355a256f83c7b319f0e6e84525) )
 ROM_END
 
@@ -2484,10 +2139,10 @@ ROM_START( popn4 )
 	ROM_REGION(0x80000, "audiocpu", 0)          // SPU 68K program
 	ROM_LOAD16_WORD_SWAP("a02jaa04.3q", 0x00000, 0x80000, CRC(8c6000dd) SHA1(94ab2a66879839411eac6c673b25143d15836683))
 
-	DISK_REGION( "scsi0" )  // program CD-ROM
+	DISK_REGION( "ata:0:cdrom:device" ) // program CD-ROM
 	DISK_IMAGE_READONLY( "gq986jaa01", 0, SHA1(e5368ac029b0bdf29943ae66677b5521ae1176e1) )
 
-	DISK_REGION( "scsi1" )  // data DVD-ROM
+	DISK_REGION( "ata:1:cdrom:device" ) // data DVD-ROM
 	DISK_IMAGE( "gq986jaa02", 1, SHA1(53367d3d5f91422fe386c42716492a0ae4332390) )
 ROM_END
 
@@ -2501,10 +2156,10 @@ ROM_START( popn5 )
 	ROM_REGION(0x80000, "audiocpu", 0)          // SPU 68K program
 	ROM_LOAD16_WORD_SWAP( "a02jaa04.3q",  0x000000, 0x080000, CRC(8c6000dd) SHA1(94ab2a66879839411eac6c673b25143d15836683) )
 
-	DISK_REGION( "scsi0" )
+	DISK_REGION( "ata:0:cdrom:device" ) // program CD-ROM
 	DISK_IMAGE_READONLY( "a04jaa01", 0, SHA1(87136ddad1d786b4d5f04381fcbf679ab666e6c9) )
 
-	DISK_REGION( "scsi1" )
+	DISK_REGION( "ata:1:cdrom:device" ) // data DVD-ROM
 	DISK_IMAGE_READONLY( "a04jaa02", 1, SHA1(49a017dde76f84829f6e99a678524c40665c3bfd) )
 ROM_END
 
@@ -2518,10 +2173,10 @@ ROM_START( popn6 )
 	ROM_REGION(0x80000, "audiocpu", 0)          // SPU 68K program
 	ROM_LOAD16_WORD_SWAP("a02jaa04.3q", 0x00000, 0x80000, CRC(8c6000dd) SHA1(94ab2a66879839411eac6c673b25143d15836683))
 
-	DISK_REGION( "scsi0" )  // program CD-ROM
+	DISK_REGION( "ata:0:cdrom:device" ) // program CD-ROM
 	DISK_IMAGE_READONLY( "gqa16jaa01", 0, SHA1(7a7e475d06c74a273f821fdfde0743b33d566e4c) )
 
-	DISK_REGION( "scsi1" )  // data DVD-ROM
+	DISK_REGION( "ata:1:cdrom:device" ) // data DVD-ROM
 	DISK_IMAGE( "gqa16jaa02", 1, SHA1(e39067300e9440ff19cb98c1abc234fa3d5b26d1) )
 ROM_END
 
@@ -2535,10 +2190,10 @@ ROM_START( popn7 )
 	ROM_REGION(0x80000, "audiocpu", 0)          // SPU 68K program
 	ROM_LOAD16_WORD_SWAP("a02jaa04.3q", 0x00000, 0x80000, CRC(8c6000dd) SHA1(94ab2a66879839411eac6c673b25143d15836683))
 
-	DISK_REGION( "scsi0" ) // program CD-ROM
+	DISK_REGION( "ata:0:cdrom:device" ) // program CD-ROM
 	DISK_IMAGE_READONLY( "b00jab01", 0, SHA1(259c733ca4d30281205b46b7bf8d60c9d01aa818) )
 
-	DISK_REGION( "scsi1" ) // data DVD-ROM
+	DISK_REGION( "ata:1:cdrom:device" ) // data DVD-ROM
 	DISK_IMAGE_READONLY( "b00jaa02", 1, SHA1(c8ce2f8ee6aeeedef9c110a59e68fcec7b669ad6) )
 ROM_END
 
@@ -2552,10 +2207,10 @@ ROM_START( popn8 )
 	ROM_REGION(0x80000, "audiocpu", 0)          // SPU 68K program
 	ROM_LOAD16_WORD_SWAP("a02jaa04.3q", 0x00000, 0x80000, CRC(8c6000dd) SHA1(94ab2a66879839411eac6c673b25143d15836683))
 
-	DISK_REGION( "scsi0" ) // program CD-ROM
+	DISK_REGION( "ata:0:cdrom:device" ) // program CD-ROM
 	DISK_IMAGE_READONLY( "gqb30jaa01", 0, SHA1(0ff3e40e3717ce23337b3a2438bdaca01cba9e30) )
 
-	DISK_REGION( "scsi1" ) // data DVD-ROM
+	DISK_REGION( "ata:1:cdrom:device" ) // data DVD-ROM
 	DISK_IMAGE_READONLY( "gqb30jaa02", 1, SHA1(f067d502c23efe0267aada5706f5bc7a54605942) )
 ROM_END
 
@@ -2569,10 +2224,10 @@ ROM_START( popnanm2 )
 	ROM_REGION(0x80000, "audiocpu", 0)          // SPU 68K program
 	ROM_LOAD16_WORD_SWAP("a02jaa04.3q", 0x00000, 0x80000, CRC(8c6000dd) SHA1(94ab2a66879839411eac6c673b25143d15836683))
 
-	DISK_REGION( "scsi0" ) // program CD-ROM
+	DISK_REGION( "ata:0:cdrom:device" ) // program CD-ROM
 	DISK_IMAGE_READONLY( "gea02jaa01", 0, SHA1(e81203b6812336c4d00476377193340031ef11b1) )
 
-	DISK_REGION( "scsi1" ) // data DVD-ROM
+	DISK_REGION( "ata:1:cdrom:device" ) // data DVD-ROM
 	DISK_IMAGE_READONLY( "gea02jaa02", 1, SHA1(7212e399779f37a5dcb8317a8f635a3b3f620aa9) )
 ROM_END
 
@@ -2583,10 +2238,10 @@ ROM_START( ppd )
 	ROM_REGION(0xc0, "user2", ROMREGION_ERASE00)    // Security dongle
 	ROM_LOAD("gq977-ko", 0x00, 0xc0, BAD_DUMP CRC(ee743323) SHA1(2042e45879795557ad3cc21b37962f6bf54da60d))
 
-	DISK_REGION( "scsi0" )
+	DISK_REGION( "ata:0:cdrom:device" ) // program CD-ROM
 	DISK_IMAGE_READONLY( "977kaa01", 0, BAD_DUMP SHA1(7af9f4949ffa10ea5fc18b6c88c2abc710df3cf9) )
 
-	DISK_REGION( "scsi1" )
+	DISK_REGION( "ata:1:cdrom:device" ) // audio CD-ROM
 	DISK_IMAGE_READONLY( "977kaa02", 1, SHA1(0feb5ac56269ad4a8401fcfe3bb98b01a0169177) )
 ROM_END
 
@@ -2597,10 +2252,10 @@ ROM_START( ppp11 )
 	ROM_REGION(0xc0, "user2", ROMREGION_ERASE00)    // Security dongle
 	ROM_LOAD("gq977-ja", 0x00, 0xc0, BAD_DUMP CRC(55b5abdb) SHA1(d8da5bac005235480a1815bd0a79c3e8a63ebad1))
 
-	DISK_REGION( "scsi0" )
+	DISK_REGION( "ata:0:cdrom:device" ) // program CD-ROM
 	DISK_IMAGE_READONLY( "gc977jaa01", 0, SHA1(7ed1f4b55105c93fec74468436bfb1d540bce944) )
 
-	DISK_REGION( "scsi1" )
+	DISK_REGION( "ata:1:cdrom:device" ) // audio CD-ROM
 	DISK_IMAGE_READONLY( "gc977jaa02", 1, SHA1(74ce8c90575fd562807def7d561392d0f91f2bc6) )
 ROM_END
 
@@ -2615,10 +2270,10 @@ ROM_START( bm37th )
 	ROM_REGION(0x80000, "audiocpu", 0)          // SPU 68K program
 	ROM_LOAD16_WORD_SWAP("a02jaa04.3q", 0x00000, 0x80000, BAD_DUMP CRC(8c6000dd) SHA1(94ab2a66879839411eac6c673b25143d15836683))
 
-	DISK_REGION( "scsi0" ) // program CD-ROM
+	DISK_REGION( "ata:0:cdrom:device" ) // program CD-ROM
 	DISK_IMAGE_READONLY( "gcb07jca01", 0, SHA1(f906379bdebee314e2ca97c7756259c8c25897fd) )
 
-	DISK_REGION( "scsi1" ) // data HDD
+	DISK_REGION( "ata:1:hdd:image" ) // data HDD
 	DISK_IMAGE_READONLY( "gcb07jca02", 1, SHA1(6b8e17635825a6a43dc8d2721fe2eb0e0f39e940) )
 ROM_END
 
@@ -2632,10 +2287,10 @@ ROM_START( bm3final )
 	ROM_REGION(0x80000, "audiocpu", 0)          // SPU 68K program
 	ROM_LOAD16_WORD_SWAP("a02jaa04.3q", 0x00000, 0x80000, BAD_DUMP CRC(8c6000dd) SHA1(94ab2a66879839411eac6c673b25143d15836683))
 
-	DISK_REGION( "scsi0" ) // program CD-ROM
+	DISK_REGION( "ata:0:cdrom:device" ) // program CD-ROM
 	DISK_IMAGE_READONLY( "gcc01jca01", 0, SHA1(3e7af83670d791591ad838823422959987f7aab9) )
 
-	DISK_REGION( "scsi1" ) // data HDD
+	DISK_REGION( "ata:1:hdd:image" ) // data HDD
 	DISK_IMAGE_READONLY( "gcc01jca02", 1, SHA1(823e29bab11cb67069d822f5ffb2b90b9d3368d2) )
 ROM_END
 
