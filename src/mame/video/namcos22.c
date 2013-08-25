@@ -639,7 +639,7 @@ struct namcos22_scenenode *namcos22_renderer::new_scenenode(running_machine &mac
 {
 	struct namcos22_scenenode *node = &m_scenenode_root;
 	struct namcos22_scenenode *prev = NULL;
-	int hash;
+	int hash = 0;
 	
 	for (int i = 0; i < 24; i += NAMCOS22_RADIX_BITS)
 	{
