@@ -30,6 +30,9 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+// forward declaration
+class i8089_device;
+
 class i8089_channel : public device_t
 {
 public:
