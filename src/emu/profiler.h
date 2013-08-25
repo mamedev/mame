@@ -118,7 +118,14 @@ public:
 	real_profiler_state();
 
 	// getters
-	bool enabled() const { return m_filoptr != NULL; }
+	bool enabled() const
+	{ 
+#ifndef MAME_DEBUG_FAST
+		return m_filoptr != NULL;
+#else
+		return false;
+#endif
+	}
 	const char *text(running_machine &machine);
 
 	// enable/disable
