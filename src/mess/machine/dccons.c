@@ -452,8 +452,43 @@ READ32_MEMBER(dc_cons_state::dc_mess_gdrom_r)
 			}
 			else
 			{
+				/* GD-Rom transfer via PIO, preliminary */
+				UINT8 pio_tr_size;
+
+				if(atapi_pio_ptr == 0)
+				{
+					gdrom->ReadData( pio_sector_buffer, 2048 );
+				}
 				data = 0;
-				printf("Read from empty SCSI queue\n");
+				pio_tr_size = 0;
+
+				for(int i=0;i<4;i++)
+				{
+					if(mem_mask & (0xff << i*8))
+					{
+						data|= pio_sector_buffer[atapi_pio_ptr+pio_tr_size]<<i*8;
+						pio_tr_size++;
+					}
+				}
+
+				printf("Read from PIO SCSI queue %08x %08x %08x\n",atapi_xferlen,atapi_pio_ptr,mem_mask);
+				atapi_xferlen -= pio_tr_size;
+				atapi_pio_ptr += pio_tr_size;
+				atapi_pio_ptr &=0x7ff;
+
+				atapi_regs[ATAPI_REG_COUNTLOW] = atapi_xferlen & 0xff;
+				atapi_regs[ATAPI_REG_COUNTHIGH] = (atapi_xferlen>>8)&0xff;
+				if(atapi_pio_ptr == 0)
+				{
+					gdrom_set_status(ATAPI_STAT_DRDY,true);
+					gdrom_set_status(ATAPI_STAT_DRQ,false);
+					gdrom_set_status(ATAPI_STAT_BSY,false);
+					atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO | ATAPI_INTREASON_COMMAND;
+					atapi_regs[ATAPI_REG_SAMTAG] = GDROM_PAUSE_STATE | 0x80;
+
+//					g1bus_regs[SB_GDST]=0;
+					gdrom_raise_irq();
+				}
 			}
 
 			return data;

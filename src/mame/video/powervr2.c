@@ -3170,7 +3170,6 @@ void powervr2_device::pvr_scanline_timer(int vpos)
 {
 	int vbin_line = spg_vblank_int & 0x3ff;
 	int vbout_line = (spg_vblank_int >> 16) & 0x3ff;
-	int spg_hblank_int & 0x3ff
 
 	if(vbin_line == vpos)
 		irq_cb(VBL_IN_IRQ);

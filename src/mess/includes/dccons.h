@@ -56,4 +56,6 @@ private:
 	UINT8 *atapi_data;
 	int atapi_data_ptr, atapi_data_len, atapi_xferlen, atapi_xferbase, atapi_cdata_wait, atapi_xfermod;
 	UINT8 xfer_mode;
+	int atapi_pio_ptr;
+	UINT8 pio_sector_buffer[2048];
 };
