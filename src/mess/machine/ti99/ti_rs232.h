@@ -49,6 +49,7 @@ public:
 protected:
 	virtual void device_start(void);
 	virtual void device_reset(void);
+	virtual void device_stop(void);
 	virtual const rom_entry *device_rom_region(void) const;
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual ioport_constructor device_input_ports() const;
@@ -66,13 +67,24 @@ private:
 	void        output_exception(int uartind, int param, UINT8 value);
 	void        ctrl_callback(int uartind, int type, UINT8 data);
 
+	// UART chips
 	tms9902_device*             m_uart[2];
+	// Connected images (file or socket connection) that represent the
+	// devices that are connected to the serial adapters
 	ti_rs232_attached_device*   m_serdev[2];
+	// Connected image (file) that represents the device connected to the
+	// parallel interface
 	ti_pio_attached_device*     m_piodev;
 	address_space*              m_space;
 	UINT8*                      m_dsrrom;
 
-	UINT8   m_signals[2];   // Latches the state of the output lines for UART0/UART1
+	// Input buffer for each UART. We have to copy the contents of sdlsocket here
+	// because the buffer in corefile will be lost on the next write operation
+	UINT8*      m_recvbuf[2];
+	int         m_bufpos[2], m_buflen[2];
+
+	// Latches the state of the output lines for UART0/UART1
+	UINT8   m_signals[2];
 	int     m_recv_mode[2];     // May be NORMAL or ESC
 
 	// Baud rate management

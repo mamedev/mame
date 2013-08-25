@@ -684,7 +684,6 @@ void ti_rs232_pio_device::receive_data_or_line_state(int uartind)
 {
 	device_image_interface *serial;
 	UINT8 buffer;
-	int len = 0;
 
 	serial = dynamic_cast<device_image_interface *>(m_serdev[uartind]);
 
@@ -700,8 +699,15 @@ void ti_rs232_pio_device::receive_data_or_line_state(int uartind)
 	// elapsed, we can get a new value.
 	if (m_time_hold[uartind] > 1.0)
 	{
-		len = serial->fread(&buffer, 1);
-		if (len==0) return;
+		// Buffer empty?
+		if (m_bufpos[uartind] == m_buflen[uartind])
+		{
+			// Get all out of sdlsocket
+			m_buflen[uartind] = serial->fread(m_recvbuf[uartind], 512);
+			m_bufpos[uartind] = 0;
+			if (m_buflen[uartind]==0) return;
+		}
+		buffer = m_recvbuf[uartind][m_bufpos[uartind]++];
 	}
 	else
 	{
@@ -1030,6 +1036,15 @@ void ti_rs232_pio_device::device_start()
 	m_serdev[0] = subdevice<ti_rs232_attached_device>("serdev0");
 	m_serdev[1] = subdevice<ti_rs232_attached_device>("serdev1");
 	m_piodev = subdevice<ti_pio_attached_device>("piodev");
+	// Prepare the receive buffers
+	m_recvbuf[0] = (UINT8*)malloc(512);
+	m_recvbuf[1] = (UINT8*)malloc(512);
+}
+
+void ti_rs232_pio_device::device_stop()
+{
+	if (m_recvbuf[0] != NULL) free(m_recvbuf[0]);
+	if (m_recvbuf[1] != NULL) free(m_recvbuf[1]);
 }
 
 void ti_rs232_pio_device::device_reset()
@@ -1046,6 +1061,8 @@ void ti_rs232_pio_device::device_reset()
 	m_pio_write = true;
 	m_recv_mode[0] = RECV_MODE_NORMAL;
 	m_recv_mode[1] = RECV_MODE_NORMAL;
+
+	m_bufpos[0] = m_bufpos[1] = m_buflen[0] = m_buflen[1] = 0;
 
 	if (m_genmod)
 	{
