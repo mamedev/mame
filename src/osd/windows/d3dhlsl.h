@@ -48,8 +48,6 @@
 //  CONSTANTS
 //============================================================
 
-#define HLSL_VECTOR         (1)
-#define CRT_BLOOM           (1)
 
 //============================================================
 //  TYPE DEFINITIONS
@@ -141,7 +139,7 @@ public:
 	bool enabled() { return master_enable; }
 	void toggle();
 
-	bool vector_enabled() { return master_enable && vector_enable && (bool)HLSL_VECTOR; }
+	bool vector_enabled() { return master_enable && vector_enable; }
 	render_target* get_vector_target();
 	void create_vector_target(render_primitive *prim);
 
@@ -207,6 +205,17 @@ private:
 	cache_target *          find_cache_target(UINT32 screen_index, int width, int height);
 	void                    remove_cache_target(cache_target *cache);
 
+	// Shader passes
+	void					ntsc_pass(render_target *rt, texture_info *texture, vec2f &texsize, vec2f &delta);
+	void 					color_convolution_pass(render_target *rt, texture_info *texture, vec2f &texsize, vec2f &delta, vec2f &rawdims);
+	void 					prescale_pass(render_target *rt, texture_info *texture, vec2f &texsize, vec2f &delta, vec2f &rawdims);
+	void 					deconverge_pass(render_target *rt, texture_info *texture, vec2f &texsize, vec2f &delta, vec2f &rawdims);
+	void 					defocus_pass(render_target *rt, texture_info *texture, vec2f &texsize, vec2f &delta, vec2f &rawdims);
+	void 					phosphor_pass(render_target *rt, cache_target *ct, texture_info *texture, vec2f &texsize, vec2f &delta, vec2f &rawdims, bool focus_enable);
+	void 					screen_post_pass(render_target *rt, texture_info *texture, vec2f &texsize, vec2f &delta, vec2f &rawdims, poly_info *poly, int vertnum);
+	void 					avi_post_pass(render_target *rt, texture_info *texture, vec2f &texsize, vec2f &delta, vec2f &rawdims, poly_info *poly, int vertnum);
+	void 					raster_bloom_pass(render_target *rt, texture_info *texture, vec2f &texsize, vec2f &delta, vec2f &rawdims, poly_info *poly, int vertnum);
+
 	base *                  d3dintf;                    // D3D interface
 	win_window_info *       window;                     // D3D window info
 
@@ -269,13 +278,9 @@ private:
 	effect *                color_effect;               // pointer to the color-effect object
 	effect *                yiq_encode_effect;          // pointer to the YIQ encoder effect object
 	effect *                yiq_decode_effect;          // pointer to the YIQ decoder effect object
-#if (HLSL_VECTOR || CRT_BLOOM)
 	effect *                bloom_effect;               // pointer to the bloom composite effect
 	effect *                downsample_effect;          // pointer to the bloom downsample effect
-#endif
-#if (HLSL_VECTOR)
 	effect *                vector_effect;              // pointer to the vector-effect object
-#endif
 	vertex *                fsfx_vertices;              // pointer to our full-screen-quad object
 
 public:
