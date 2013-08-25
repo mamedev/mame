@@ -91,6 +91,10 @@ protected:
 	virtual machine_config_constructor device_mconfig_additions() const;
 
 private:
+	bool sysbus_width() { return BIT(m_sysbus, 0); }
+	bool remotebus_width() { return BIT(m_soc, 0); }
+	bool request_grant() { return BIT(m_soc, 1); }
+
 	UINT8 read_byte(offs_t address);
 	UINT16 read_word(offs_t address);
 	void write_byte(offs_t address, UINT8 data);
@@ -108,12 +112,31 @@ private:
 	address_space *m_mem;
 	address_space *m_io;
 
+	// register indexes for the debugger state
+	enum
+	{
+		SYSBUS,
+		SCB,
+		SOC,
+		DIVIDER1,
+		CH1_GA, CH1_GB, CH1_GC,
+		CH1_TP,	CH1_BC,	CH1_IX,
+		CH1_CC,	CH1_MC,	CH1_CP,
+		CH1_PP,	CH1_PSW,
+		DIVIDER2,
+		CH2_GA,	CH2_GB,	CH2_GC,
+		CH2_TP,	CH2_BC,	CH2_IX,
+		CH2_CC,	CH2_MC,	CH2_CP,
+		CH2_PP,	CH2_PSW
+	};
+
 	// system configuration
+	UINT8 m_sysbus;
+	offs_t m_scb;
+	UINT8 m_soc;
+
 	bool m_initialized;
-	bool m_16bit_system;
-	bool m_16bit_remote;
 	bool m_master;
-	bool m_request_grant;
 
 	// task pointer for the currently executing channel
 	offs_t m_current_tp;

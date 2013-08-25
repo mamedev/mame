@@ -171,7 +171,12 @@ void debug_view_state::recompute()
 
 	// add all registers into it
 	for (const device_state_entry *entry = source.m_stateintf->state_first(); entry != NULL; entry = entry->next())
-		if (entry->visible())
+		if (entry->divider())
+		{
+			*tailptr = auto_alloc(machine(), state_item(REG_DIVIDER, "", 0));
+			tailptr = &(*tailptr)->m_next;
+		}
+		else if (entry->visible())
 		{
 			*tailptr = auto_alloc(machine(), state_item(entry->index(), entry->symbol(), source.m_stateintf->state_string_max_length(entry->index())));
 			tailptr = &(*tailptr)->m_next;

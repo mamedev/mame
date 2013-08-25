@@ -115,6 +115,19 @@ device_state_entry::device_state_entry(int index, const char *symbol, void *data
 		m_symbol.cpy("CURFLAGS");
 }
 
+device_state_entry::device_state_entry(int index)
+	: m_next(NULL),
+		m_index(index),
+		m_dataptr(NULL),
+		m_datamask(0),
+		m_datasize(0),
+		m_flags(DSF_DIVIDER),
+		m_symbol(),
+		m_default_format(true),
+		m_sizemask(0)
+{
+}
+
 
 //-------------------------------------------------
 //  formatstr - specify a format string
@@ -526,6 +539,21 @@ device_state_entry &device_state_interface::state_add(int index, const char *sym
 	return *entry;
 }
 
+//-------------------------------------------------
+//  state_add_divider - add a simple divider
+//  entry
+//-------------------------------------------------
+
+device_state_entry &device_state_interface::state_add_divider(int index)
+{
+	// allocate new entry
+	device_state_entry *entry = global_alloc(device_state_entry(index));
+
+	// append to the end of the list
+	m_state_list.append(*entry);
+
+	return *entry;
+}
 
 //-------------------------------------------------
 //  state_import - called after new state is

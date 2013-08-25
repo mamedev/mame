@@ -78,6 +78,7 @@ class device_state_entry
 private:
 	// construction/destruction
 	device_state_entry(int index, const char *symbol, void *dataptr, UINT8 size);
+	device_state_entry(int index);
 
 public:
 	// post-construction modifiers
@@ -96,6 +97,7 @@ public:
 	void *dataptr() const { return m_dataptr.v; }
 	const char *symbol() const { return m_symbol; }
 	bool visible() const { return ((m_flags & DSF_NOSHOW) == 0); }
+	bool divider() const { return m_flags & DSF_DIVIDER; }
 
 protected:
 	// device state flags
@@ -104,6 +106,7 @@ protected:
 	static const UINT8 DSF_IMPORT_SEXT =    0x04;   // sign-extend the data when writing new data
 	static const UINT8 DSF_EXPORT =         0x08;   // call the export function prior to fetching the data
 	static const UINT8 DSF_CUSTOM_STRING =  0x10;   // set if the format has a custom string
+	static const UINT8 DSF_DIVIDER       =  0x20;   // set if this is a divider entry
 
 	// helpers
 	bool needs_custom_string() const { return ((m_flags & DSF_CUSTOM_STRING) != 0); }
@@ -178,6 +181,9 @@ public: // protected eventually
 		return state_add(index, symbol, &data, sizeof(data));
 	}
 	device_state_entry &state_add(int index, const char *symbol, void *data, UINT8 size);
+
+	// add a new divider entry
+	device_state_entry &state_add_divider(int index);
 
 protected:
 	// derived class overrides
