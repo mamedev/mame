@@ -8,12 +8,16 @@ This was one of the last CP/M-based systems, already out of date when it was rel
 Because it doesn't use the standard Z80 peripherals, it uses a homebrew interrupt controller to make use
  of the Z80's IM2.
 
+The keyboard is an intelligent serial device like the Kaypro's keyboard. They even have the same plug,
+and might be swappable. The keyboard needs to be investigated to find what cpu it uses and maybe get a
+dump of its rom.
+
 ToDo:
 - Add interrupt vector hardware and masking feature
 - Connect devices to the above hardware
 - Fix the unholy mess surrounding the dma and crtc
 - Connect up the PIT
-- Connect up the keyboard - the generic ascii one can be used
+- Replace the ascii keyboard with the real one, if possible
 - Probably lots of other things
 
 Note: because the 8275 isn't working, a generic video handler is being used at this time.
@@ -29,6 +33,7 @@ Note: because the 8275 isn't working, a generic video handler is being used at t
 #include "machine/pit8253.h"
 #include "video/i8275x.h"
 #include "sound/beep.h"
+#include "machine/keyboard.h"
 #include "machine/wd_fdc.h"
 
 class zorba_state : public driver_device
@@ -69,11 +74,10 @@ public:
 	DECLARE_READ8_MEMBER(io_read_byte);
 	DECLARE_WRITE8_MEMBER(io_write_byte);
 	DECLARE_WRITE8_MEMBER(pia0_porta_w);
+	DECLARE_WRITE8_MEMBER(kbd_put);
+	DECLARE_READ8_MEMBER(keyboard_r);
 private:
-	UINT8 m_porta;
-	UINT8 m_portb;
-	UINT8 m_portc;
-	UINT8 m_port08;
+	UINT8 m_term_data;
 	required_device<cpu_device> m_maincpu;
 	required_device<beep_device> m_beep;
 	required_device<z80dma_device> m_dma;
@@ -104,8 +108,9 @@ static ADDRESS_MAP_START( zorba_io, AS_IO, 8, zorba_state )
 	AM_RANGE(0x21, 0x21) AM_DEVREADWRITE("uart0", i8251_device, status_r, control_w)
 	AM_RANGE(0x22, 0x22) AM_DEVREADWRITE("uart1", i8251_device, data_r, data_w)
 	AM_RANGE(0x23, 0x23) AM_DEVREADWRITE("uart1", i8251_device, status_r, control_w)
-	AM_RANGE(0x24, 0x24) AM_DEVREADWRITE("uart2", i8251_device, data_r, data_w)
-	AM_RANGE(0x25, 0x25) AM_DEVREADWRITE("uart2", i8251_device, status_r, control_w)
+	//AM_RANGE(0x24, 0x24) AM_DEVREADWRITE("uart2", i8251_device, data_r, data_w)
+	//AM_RANGE(0x25, 0x25) AM_DEVREADWRITE("uart2", i8251_device, status_r, control_w)
+	AM_RANGE(0x24, 0x25) AM_READ(keyboard_r) AM_WRITENOP
 	AM_RANGE(0x26, 0x26) AM_WRITE(intmask_w)
 	AM_RANGE(0x30, 0x30) AM_DEVREADWRITE_LEGACY("dma", z80dma_r, z80dma_w)
 	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("fdc", fd1793_t, read, write)
@@ -330,7 +335,6 @@ PALETTE_INIT_MEMBER( zorba_state, zorba )
 	palette_set_color_rgb( machine(), 2, 0, 128, 0 );   /* Dimmed */
 }
 
-// need to include highlight attr
 static I8275_DISPLAY_PIXELS( zorba_update_chr )
 {
 	int i;
@@ -406,6 +410,26 @@ UINT32 zorba_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	return 0;
 }
 
+READ8_MEMBER( zorba_state::keyboard_r )
+{
+	if (offset)
+		return (m_term_data) ? 0x87 : 0x85;
+
+	UINT8 data = m_term_data;
+	m_term_data = 0;
+	return data;
+}
+
+WRITE8_MEMBER( zorba_state::kbd_put )
+{
+	m_term_data = data;
+}
+
+static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
+{
+	DEVCB_DRIVER_MEMBER(zorba_state, kbd_put)
+};
+
 static MACHINE_CONFIG_START( zorba, zorba_state )
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz / 6)
@@ -441,6 +465,9 @@ static MACHINE_CONFIG_START( zorba, zorba_state )
 	MCFG_FD1793x_ADD("fdc", XTAL_24MHz / 24)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", zorba_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", zorba_floppies, "525dd", floppy_image_device::default_floppy_formats)
+
+	/* Keyboard */
+	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
 MACHINE_CONFIG_END
 
 ROM_START( zorba )

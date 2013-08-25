@@ -14,7 +14,6 @@
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "video/mc6845.h"
-#include "machine/keyboard.h"
 #include "includes/pasopia.h"
 
 class pasopia_state : public driver_device
