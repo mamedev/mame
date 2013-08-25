@@ -2792,7 +2792,7 @@ TIMER_CALLBACK_MEMBER(powervr2_device::hbin)
 
 	scanline++;
 
-	if(scanline >= (spg_vblank_int & 0x3ff))
+	if(scanline >= ((spg_load >> 16) & 0x3ff))
 	{
 		scanline = 0;
 		next_y = spg_hblank_int & 0x3ff;
