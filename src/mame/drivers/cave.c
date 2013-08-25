@@ -5068,7 +5068,7 @@ GAME( 1998, uopoko,     0,        uopoko,   cave, cave_state,     uopoko,   ROT0
 GAME( 1998, uopokoj,    uopoko,   uopoko,   cave, cave_state,     uopoko,   ROT0,   "Cave (Jaleco license)",                  "Puzzle Uo Poko (Japan)",         GAME_SUPPORTS_SAVE )
 
 GAME( 1999, guwange,    0,        guwange,  guwange, cave_state,  guwange,  ROT270, "Cave (Atlus license)",                   "Guwange (Japan, Master Ver. 99/06/24)",  GAME_SUPPORTS_SAVE )
-GAME( 1999, guwanges,   guwange,  guwange,  guwange, cave_state,  guwange,  ROT270, "Cave (Atlus license)",                   "Guwange (Japan, Special Ver. 00/01/01)", GAME_SUPPORTS_SAVE )
+GAME( 1999, guwanges,   guwange,  guwange,  guwange, cave_state,  guwange,  ROT270, "Cave (Atlus license)",                   "Guwange (Japan, Special Ver. 00/07/07)", GAME_SUPPORTS_SAVE )
 
 GAME( 1999, gaia,       0,        gaia,     gaia, cave_state,     gaia,     ROT0,   "Noise Factory",                          "Gaia Crusaders", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND ) // cuts out occasionally
 
