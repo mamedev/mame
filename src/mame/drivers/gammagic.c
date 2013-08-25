@@ -50,6 +50,7 @@ public:
 static ADDRESS_MAP_START( gammagic_map, AS_PROGRAM, 32, gammagic_state )
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffffffff)
+	AM_RANGE(0x000e0000, 0x000fffff) AM_ROM AM_REGION("user", 0x20000)/* System BIOS */
 	AM_RANGE(0x00100000, 0x07ffffff) AM_RAM
 	AM_RANGE(0x08000000, 0xfffdffff) AM_NOP
 	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("user", 0x20000)/* System BIOS */
