@@ -2444,6 +2444,7 @@ $(MESSOBJ)/skeleton.a:          \
 	$(MESS_DRIVERS)/vta2000.o   \
 	$(MESS_DRIVERS)/xor100.o    \
 	$(MESS_DRIVERS)/z100.o      \
+	$(MESS_DRIVERS)/zorba.o     \
 
 
 
