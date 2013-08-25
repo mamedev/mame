@@ -1407,6 +1407,7 @@ MACHINE_RESET_MEMBER(namcos12_state,namcos12)
 		strcmp( machine().system().name, "tektagtac" ) == 0 ||
 		strcmp( machine().system().name, "tektagtac1" ) == 0 ||
 		strcmp( machine().system().name, "tektagtub" ) == 0 ||
+		strcmp( machine().system().name, "tektagtjc1" ) == 0 ||
 		strcmp( machine().system().name, "tektagtjb" ) == 0 ||
 		strcmp( machine().system().name, "tektagtja" ) == 0 ||
 		strcmp( machine().system().name, "fgtlayer" ) == 0 ||
@@ -2648,16 +2649,16 @@ ROM_START( tektagtac1 )
 
 	ROM_REGION32_LE( 0x3800000, "user2", 0 ) /* main data */
 	ROM_LOAD32_WORD( "teg2roml0",       0x0000000, 0x400000, CRC(cf984e85) SHA1(4d8296998b5f225b3f20bfdcb092a64b6e1fa76e) )
-	ROM_LOAD32_WORD( "teg2romh0",       0x0800000, 0x400000, CRC(ea088657) SHA1(fbacca78832f68a310bafd06188d645e3424e0ed) )
 	ROM_LOAD32_WORD( "teg2roml00.ic13", 0x0000002, 0x400000, CRC(927723a5) SHA1(075aaca1700c9134496eb9a73cbe325ddc74eae1) ) /* located on the opposite side of the ROM PCB */
+	ROM_LOAD32_WORD( "teg2romh0",       0x0800000, 0x400000, CRC(ea088657) SHA1(fbacca78832f68a310bafd06188d645e3424e0ed) )
 	ROM_LOAD32_WORD( "teg2romh00",      0x0800002, 0x400000, CRC(a85aa306) SHA1(07318133c7c48cb61590ed0eceb519a8cc1ca781) )
 	ROM_LOAD32_WORD( "teg2roml1",       0x1000000, 0x400000, CRC(8552f0ef) SHA1(45ed0dacdad94e708260a98b9cd47861543d2b7a) )
-	ROM_LOAD32_WORD( "teg2romh1",       0x1800000, 0x400000, CRC(86eb5abe) SHA1(66a3807a18d81e8291baf56533694f60e31a6367) )
 	ROM_LOAD32_WORD( "teg2roml10.ic14", 0x1000002, 0x400000, CRC(13eb424b) SHA1(59d6c77136050de1e7250e6627636d5b178bb8a8) ) /* located on the opposite side of the ROM PCB */
+	ROM_LOAD32_WORD( "teg2romh1",       0x1800000, 0x400000, CRC(86eb5abe) SHA1(66a3807a18d81e8291baf56533694f60e31a6367) )
 	ROM_LOAD32_WORD( "teg2romh10",      0x1800002, 0x400000, CRC(25131a87) SHA1(77fa236c4879a59323bc2dac26c195b7c47f812c) )
 	ROM_LOAD32_WORD( "teg2roml2",       0x2000000, 0x400000, CRC(abdfc6ca) SHA1(70033becd29ea15611be2fc099a43712181bcbec) )
-	ROM_LOAD32_WORD( "teg2romh2",       0x2800000, 0x400000, CRC(8c03b301) SHA1(f395a4685e2deb8f7e9afc18ce15fa0d392b0cfa) )
 	ROM_LOAD32_WORD( "teg2roml20.ic15", 0x2000002, 0x400000, CRC(ed5ec7f7) SHA1(c91085a64ced95ee6618303987de61893e069742) ) /* located on the opposite side of the ROM PCB */
+	ROM_LOAD32_WORD( "teg2romh2",       0x2800000, 0x400000, CRC(8c03b301) SHA1(f395a4685e2deb8f7e9afc18ce15fa0d392b0cfa) )
 	ROM_LOAD32_WORD( "teg2romh20",      0x2800002, 0x400000, CRC(c873c362) SHA1(d95451a7477b716c0d75ba04e1d8df3d8a4e10dd) )
 	ROM_LOAD32_WORD( "teg2rf4",         0x3000000, 0x400000, CRC(612f6a37) SHA1(bd9597ef802e3c46f891f0ef523a3e0b0fe22672) ) /* Different data?? Second half blank, all 0x00? */
 	ROM_LOAD32_WORD( "teg2rf6",         0x3000002, 0x400000, CRC(0c9292ce) SHA1(664c6ccf18042ed8ebc29b1781ae7454acb05ba1) ) /* Different data?? Second half blank, all 0x00? */
@@ -2670,6 +2671,32 @@ ROM_START( tektagtac1 )
 	ROM_LOAD( "teg2wavel1",          0x0400000, 0x400000, CRC(f5ab70e6) SHA1(cdb62d8eb92ca961be684caf768d1961d98ece22) )
 	ROM_LOAD( "teg2waveh0",          0x0800000, 0x400000, CRC(bc0325bf) SHA1(77059c300a9d53d0e97bb898a06c58076078d7d2) )
 	ROM_LOAD( "teg2waveh1",          0x0c00000, 0x400000, CRC(6c654921) SHA1(3849157b30b4b459956b823511551abda2e4b6e5) )
+ROM_END
+
+ROM_START( tektagtjc1 )
+	ROM_REGION32_LE( 0x00400000, "maincpu:rom", 0 ) /* main prg */
+	ROM_LOAD16_BYTE( "teg1verb.2e", 0x0000000, 0x200000, CRC(1d631391) SHA1(325d211237461af6e105374ddb74441e68b470af) )
+	ROM_LOAD16_BYTE( "teg1verb.2j", 0x0000001, 0x200000, CRC(4ece9b9a) SHA1(7091dadfe3a2954e684fcc9e5a3337ecd26609f6) )
+
+	ROM_REGION32_LE( 0x3800000, "user2", 0 ) /* main data */
+	ROM_LOAD32_WORD( "teg1_rom0e.ic9",  0x0000000, 0x800000, BAD_DUMP CRC(c962a373) SHA1(d662dbd89ef62c5ac3150a018fc2d35ef2ee94ac) ) // These roms were dumped half size,
+	ROM_LOAD32_WORD( "teg1_rom0o.ic13", 0x0000002, 0x800000, BAD_DUMP CRC(badb7dcf) SHA1(8c0bf7f6351c5a2a0996df371a901cf90c68cd8c) ) // it's possible the second half of
+	ROM_LOAD32_WORD( "teg1_rom1e.ic10", 0x1000000, 0x800000, BAD_DUMP CRC(b3d56124) SHA1(4df20c74ba63f7362caf15e9b8949fab655704fb) ) // the japanese roms contains
+	ROM_LOAD32_WORD( "teg1_rom1o.ic14", 0x1000002, 0x800000, BAD_DUMP CRC(2434ceb6) SHA1(f19f1599acbd6fd48793a2ee5a500ca817d9df56) ) // different graphics.
+	ROM_LOAD32_WORD( "teg1_rom2e.ic11", 0x2000000, 0x800000, BAD_DUMP CRC(6e5c3428) SHA1(e3cdb60a4445406877b2e273385f34bfb0974220) ) //
+	ROM_LOAD32_WORD( "teg1_rom2o.ic15", 0x2000002, 0x800000, BAD_DUMP CRC(21ce9dfa) SHA1(f27e8210ee236c327aa3e1ce4dd408abc6580a1b) ) //
+
+	ROM_LOAD32_BYTE( "flel.ic4",        0x3000000, 0x200000, CRC(daa240f8) SHA1(ead16b4686c6a4abfc30022f5c1aa3969907d4cc) ) // tektagt will boot with these
+	ROM_LOAD32_BYTE( "fleu.ic5",        0x3000001, 0x200000, CRC(a8786812) SHA1(40c80db0066f9a1f4e0eb06708344b0485c5e734) ) // but crashes after the
+	ROM_LOAD32_BYTE( "flou.ic6",        0x3000002, 0x200000, CRC(e5b52780) SHA1(ff81278bed4e571f9ed4ee4f7d8aa810f56f9676) ) // character selection
+	ROM_LOAD32_BYTE( "flou.ic7",        0x3000003, 0x200000, CRC(75894a07) SHA1(ee36dded4c78b0bddd4904eceabc0f0f2ca5cf07) ) //
+
+	ROM_REGION( 0x0080000, "sub", 0 ) /* sound prg */
+	ROM_LOAD16_WORD_SWAP( "teg1verb.11s", 0x0000000, 0x080000, BAD_DUMP CRC(0a6e5d6c) SHA1(fd37c190ac99dc9ab2373a43dc39ccf6eca6c178) ) // There is a single bit difference @ 0x1805
+
+	ROM_REGION( 0x1000000, "c352", 0 ) /* samples */
+	ROM_LOAD( "teg1_wave0.ic1",      0x0000000, 0x800000, CRC(4bd99104) SHA1(f76b0576cc28fe49d3c1c402988b933933e52e15) )
+	ROM_LOAD( "teg1_wave1.ic12",     0x0800000, 0x800000, CRC(dbc74fff) SHA1(601b7e7361ea744b34e3fa1fc39d88641de7f4c6) )
 ROM_END
 
 ROM_START( tenkomor )
@@ -2796,6 +2823,7 @@ GAME( 1999, tektagt,   0,        tektagt,  namcos12, namcos12_state, namcos12, R
 GAME( 1999, tektagtac, tektagt,  tektagt,  namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Tekken Tag Tournament (Asia, TEG2/VER.C1, set 1)", GAME_IMPERFECT_SOUND ) /* KC044 */
 GAME( 1999, tektagtac1,tektagt,  tektagt,  namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Tekken Tag Tournament (Asia, TEG2/VER.C1, set 2)", GAME_IMPERFECT_SOUND ) /* KC044 */
 GAME( 1999, tektagtub, tektagt,  tektagt,  namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Tekken Tag Tournament (US, TEG3/VER.B)", GAME_IMPERFECT_SOUND ) /* KC044 */
+GAME( 1999, tektagtjc1,tektagt,  tektagt,  namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Tekken Tag Tournament (Japan, TEG2/VER.C1)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* KC044 */
 GAME( 1999, tektagtjb, tektagt,  tektagt,  namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Tekken Tag Tournament (Japan, TEG1/VER.B)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* KC044 */
 GAME( 1999, tektagtja, tektagt,  tektagt,  namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Tekken Tag Tournament (Japan, TEG1/VER.A3)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* KC044 */
 GAME( 1999, ghlpanic,  0,        ptblank2, ghlpanic, namcos12_state, namcos12, ROT0, "Eighting / Raizing / Namco", "Ghoul Panic (Asia, OB2/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC045 */
