@@ -707,6 +707,10 @@ READ32_MEMBER(dc_cons_state::dc_mess_g1_ctrl_r )
 {
 	switch(offset)
 	{
+		case SB_GDSTARD:
+			printf("G1CTRL: GDSTARD %08x\n", atapi_xferbase); // Hello Kitty reads here
+			debugger_break(machine());
+			return atapi_xferbase;
 		case SB_GDST:
 			break;
 		case SB_GDLEND:
