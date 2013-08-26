@@ -3189,6 +3189,10 @@ void powervr2_device::pvr_scanline_timer(int vpos)
 {
 	int vbin_line = spg_vblank_int & 0x3ff;
 	int vbout_line = (spg_vblank_int >> 16) & 0x3ff;
+	dc_state *state = machine().driver_data<dc_state>();
+
+	if(vbin_line-1 == vpos)
+		state->m_maple->maple_hw_trigger();
 
 	if(vbin_line == vpos)
 		irq_cb(VBL_IN_IRQ);

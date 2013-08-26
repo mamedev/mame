@@ -865,7 +865,7 @@ void gdrom_device::ReadData( UINT8 *data, int dataLength )
 			    our internal routines for tracks use "0" as track 1.  That probably
 			    should be fixed...
 			*/
-			logerror("GDROM: READ TOC, format = %d time=%d\n", command[2]&0xf,(command[1]>>1)&1);
+			printf("GDROM: READ TOC, format = %d time=%d\n", command[2]&0xf,(command[1]>>1)&1);
 			switch (command[1] & 0x0f)
 			{
 				case 0:     // normal

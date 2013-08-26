@@ -7,6 +7,7 @@ const device_type MAPLE_DC = &device_creator<maple_dc_device>;
 
 DEVICE_ADDRESS_MAP_START(amap, 32, maple_dc_device)
 	AM_RANGE(0x04, 0x07) AM_READWRITE(sb_mdstar_r, sb_mdstar_w)
+	AM_RANGE(0x10, 0x13) AM_READWRITE(sb_mdtsel_r, sb_mdtsel_w)
 	AM_RANGE(0x14, 0x17) AM_READWRITE(sb_mden_r, sb_mden_w)
 	AM_RANGE(0x18, 0x1b) AM_READWRITE(sb_mdst_r, sb_mdst_w)
 	AM_RANGE(0x80, 0x83) AM_READWRITE(sb_msys_r, sb_msys_w)
@@ -239,6 +240,16 @@ void maple_dc_device::end_of_reply()
 		logerror("MAPLE: Unexpected end of reply\n");
 }
 
+void maple_dc_device::maple_hw_trigger()
+{
+	if(mdtsel & 1) // HW trigger
+	{
+		dma_adr = mdstar;
+		dma_state = DMA_SEND;
+		dma_step();
+	}
+}
+
 READ32_MEMBER(maple_dc_device::sb_mdstar_r)
 {
 	return mdstar;
@@ -259,6 +270,16 @@ WRITE32_MEMBER(maple_dc_device::sb_mden_w)
 	mden = data & 1;
 }
 
+READ32_MEMBER(maple_dc_device::sb_mdtsel_r)
+{
+	return mdtsel;
+}
+
+WRITE32_MEMBER(maple_dc_device::sb_mdtsel_w)
+{
+	mdtsel = data & 1;
+}
+
 READ32_MEMBER(maple_dc_device::sb_mdst_r)
 {
 	return dma_state != DMA_IDLE ? 1 : 0;
@@ -269,8 +290,7 @@ WRITE32_MEMBER(maple_dc_device::sb_mdst_w)
 	UINT32 old = mdst;
 	mdst = data & 1;
 
-	if(!old && data && (mden & 1)) {
-		// Hardware trigger unhandled.
+	if(!old && data && (mden & 1) && mdtsel == 0) {
 		dma_adr = mdstar;
 		dma_state = DMA_SEND;
 		dma_step();
@@ -290,3 +310,6 @@ WRITE32_MEMBER(maple_dc_device::sb_msys_w)
 WRITE32_MEMBER(maple_dc_device::sb_mdapro_w)
 {
 }
+
+
+

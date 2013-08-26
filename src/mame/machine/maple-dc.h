@@ -19,6 +19,8 @@ public:
 
 	DECLARE_READ32_MEMBER(sb_mdstar_r);  // 5f6c04
 	DECLARE_WRITE32_MEMBER(sb_mdstar_w);
+	DECLARE_READ32_MEMBER(sb_mdtsel_r);    // 5f6c10
+	DECLARE_WRITE32_MEMBER(sb_mdtsel_w);
 	DECLARE_READ32_MEMBER(sb_mden_r);    // 5f6c14
 	DECLARE_WRITE32_MEMBER(sb_mden_w);
 	DECLARE_READ32_MEMBER(sb_mdst_r);    // 5f6c18
@@ -31,6 +33,7 @@ public:
 
 	void end_of_reply();
 	void register_port(int port, maple_device *device);
+	void maple_hw_trigger();
 
 protected:
 	// device-level overrides
@@ -56,6 +59,7 @@ private:
 	emu_timer *timer;
 
 	UINT32 mdstar, mden, mdst, msys;
+	UINT32 mdtsel;
 
 	UINT32 dma_state, dma_adr, dma_port, dma_dest;
 	bool dma_endflag;

@@ -18,15 +18,12 @@
             25925600 (PAL 480 @ 50.00), 13462800 (PAL 240 @ 50.00)
 
     TODO:
-    - DC splash logo: video and audio are off-sync
     - RTC error always pops up at start-up, tied to the aforementioned?
-    - Only JP games boots so far;
     - Inputs doesn't work most of the time;
-    - Capcom vs. SNK Pro: asserts after VMU message
     - F355 Challenge: asserts after Sega logo;
 	- Idol Janshi wo Tsukucchaou: pixel aspect is way wrong (stretched and offsetted horizontally)
 	- Power Stone: hangs at Capcom logo;
-	- Sega GT: hangs with a white screen after pressing start on attract mode (executes SCSI command 0x20 -> CD-Play);
+	- Sega GT: no cursor on main menu;
 	- Tetris 4D: has color bugs, hangs at FMV anyway
 
 	Note:
@@ -41,7 +38,6 @@
 #include "includes/dc.h"
 #include "includes/dccons.h"
 #include "imagedev/chd_cd.h"
-#include "machine/maple-dc.h"
 #include "machine/dc-ctrl.h"
 #include "machine/gdrom.h"
 
