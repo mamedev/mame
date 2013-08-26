@@ -2,7 +2,9 @@
 
         Callan Unistar Terminal
 
-        09/12/2009 Skeleton driver.
+        2009-12-09 Skeleton driver.
+
+        Chips used: i8275, AM9513, i8085, i8237, i8255, 2x 2651. XTAL 20MHz
 
 ****************************************************************************/
 
@@ -19,20 +21,25 @@ public:
 
 	virtual void machine_reset();
 	virtual void video_start();
+	void palette_init_unistar();
 	UINT32 screen_update_unistar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	const UINT8 *m_p_chargen;
+private:
 	required_device<cpu_device> m_maincpu;
 };
 
 
 static ADDRESS_MAP_START(unistar_mem, AS_PROGRAM, 8, unistar_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0xffff) AM_RAM
+	AM_RANGE(0x0000, 0x2fff) AM_ROM
+	AM_RANGE(0x8000, 0x8fff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(unistar_io, AS_IO, 8, unistar_state)
 	//ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	// ports used: 00,02,03(W),08(RW),09,0A,0B,0D,0F(W),80,81(R),82,83(W),84(R),8C,8D(W),94(R),97,98(W),99(RW)
+	// if nonzero returned from port 94, it goes into test mode.
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -42,6 +49,14 @@ INPUT_PORTS_END
 
 void unistar_state::machine_reset()
 {
+	m_p_chargen = memregion("chargen")->base();
+}
+
+PALETTE_INIT_MEMBER( unistar_state, unistar )
+{
+	palette_set_color_rgb( machine(), 0, 0, 0, 0 ); /* Black */
+	palette_set_color_rgb( machine(), 1, 0, 255, 0 );   /* Full */
+	palette_set_color_rgb( machine(), 2, 0, 128, 0 );   /* Dimmed */
 }
 
 void unistar_state::video_start()
@@ -77,7 +92,6 @@ static MACHINE_CONFIG_START( unistar, unistar_state )
 	MCFG_CPU_PROGRAM_MAP(unistar_mem)
 	MCFG_CPU_IO_MAP(unistar_io)
 
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -86,22 +100,22 @@ static MACHINE_CONFIG_START( unistar, unistar_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DRIVER(unistar_state, screen_update_unistar)
 	MCFG_GFXDECODE(unistar)
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
+	MCFG_PALETTE_LENGTH(3)
+	MCFG_PALETTE_INIT_OVERRIDE(unistar_state, unistar)
 MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( unistar )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "callan_video_pgm1.bin", 0x0000, 0x1000, CRC(613ef521) SHA1(a77459e91617d2882778ab2dada74fcb5f44e949))
-	ROM_LOAD( "callan_video_pgm2.bin", 0x1000, 0x1000, CRC(6cc5e704) SHA1(fb93645f51d5ad0635cbc8a9174c61f96799313d))
-	ROM_LOAD( "callan_video_pgm3.bin", 0x2000, 0x1000, CRC(0b9ca5a5) SHA1(20bf4aeacda14ff7a3cf988c7c0bff6ec60406c7))
+	ROM_LOAD( "280010c.u48", 0x0000, 0x1000, CRC(613ef521) SHA1(a77459e91617d2882778ab2dada74fcb5f44e949))
+	ROM_LOAD( "280011c.u49", 0x1000, 0x1000, CRC(6cc5e704) SHA1(fb93645f51d5ad0635cbc8a9174c61f96799313d))
+	ROM_LOAD( "280012c.u50", 0x2000, 0x1000, CRC(0b9ca5a5) SHA1(20bf4aeacda14ff7a3cf988c7c0bff6ec60406c7))
 
 	ROM_REGION( 0x0800, "chargen", ROMREGION_ERASEFF )
-	ROM_LOAD( "callan_video_vid.bin",  0x0000, 0x0800, CRC(a9e1b5b2) SHA1(6f5b597ee1417f1108ac5957b005a927acb5314a))
+	ROM_LOAD( "280014a.u1",  0x0000, 0x0800, CRC(a9e1b5b2) SHA1(6f5b597ee1417f1108ac5957b005a927acb5314a))
 ROM_END
 
 /* Driver */
 
 /*    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT    INIT        COMPANY            FULLNAME              FLAGS */
-COMP( 198?, unistar, 0,      0,       unistar,   unistar, driver_device, 0,  "Callan Data Systems", "Unistar Terminal", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 198?, unistar, 0,      0,       unistar,   unistar, driver_device, 0,  "Callan Data Systems", "Unistar 200 Terminal", GAME_IS_SKELETON )
