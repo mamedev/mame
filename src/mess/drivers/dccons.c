@@ -400,6 +400,54 @@ static MACHINE_CONFIG_START( dc, dc_cons_state )
 	MCFG_DEVICE_ADD("cdrom", GDROM, 0)
 MACHINE_CONFIG_END
 
+/*
+PsyMan notes:
+
+Here's a basic report on the Dreamcast boot files used in MAME (BIOS+Flash pairs):
+
+-----
+
+"dc101d_us.bin", 0x000000, 0x200000, CRC(89f2b1a1) SHA1(8951d1bb219ab2ff8583033d2119c899cc81f18c) )   // BIOS
+This is a proper European and USA BIOS. It's even possible that it was used at a later point for Japanese systems.
+It only has minor differences compared to BIOS 1.01c.
+
+
+"dcus_ntsc.bin", 0x000000, 0x020000, BAD_DUMP CRC(c611b498) SHA1(94d44d7f9529ec1642ba3771ed3c5f756d5bc872) )   // Flash
+Checking at 0x0001A000 and the mirrored data at 0x0001A0A0 gives away that this is hacked from a PAL/European flash file.
+The broadcast (0x0001A004) is also set at 50Hz which is a PAL standard.
+
+
+"dc101d_eu.bin", 0x000000, 0x200000, CRC(a2564fad) SHA1(edc5d3d70a93c935703d26119b37731fd317d2bf),ROM_BIOS(1))   // BIOS
+This BIOS has Chinese language added. So either this is a bad BIOS or Dreamcast was actually officially released there.
+
+
+"dc101c_eu.bin", 0x000000, 0x200000, CRC(2f551bc5) SHA1(1ede8d5be49116a4c6f3fe0961175469537a0434),ROM_BIOS(2))   // BIOS
+This seems to be a proper European and USA BIOS. It's even possible that it was used at a later point for Japanese systems.
+It only has minor differences compared to BIOS 1.01d.
+
+
+
+"dceu_pal.bin", 0x000000, 0x020000, BAD_DUMP CRC(b7e5aeeb) SHA1(11e02433e13b793ec7ffe0ae2356750bb8a575b4) )    // Flash
+This appears to be a valid PAL/European flash. It's unknown if the data at 0x0001A0A0 (from 0x0001A000) should be mirrored there.
+Maybe a game does this mirroring or maybe it's there by default. It's certain that some games wrote to this flash though.
+
+
+"dc1004jp.bin", 0x000000, 0x200000, CRC(5454841f) SHA1(1ea132c0fbbf07ef76789eadc07908045c089bd6) )    // BIOS
+This seems to be a proper Japanese BIOS. This BIOS was used at least by early Japanese Dreamcast models.
+Code-wise, it has major differences compared to later BIOS versions.
+
+
+"dcjp_ntsc.bin", 0x000000, 0x020000, CRC(5F92BF76) SHA1(BE78B834F512AB2CF3D67B96E377C9F3093FF82A) )  // Flash
+Checking at 0x0001A000 and the mirrored data at 0x0001A0A0 gives away that this is hacked from a PAL/European flash file.
+The broadcast (0x0001A004) is also set at 50Hz which is a PAL standard.
+
+-----
+
+
+From all the aforementioned files the only personally verified one is "dc101d_us.bin", CRC(89f2b1a1).
+The resulting file was dumped twice, once from an NTSC/USA system and once from a PAL/EUR system. Both files had a side by side byte match.
+*/
+
 ROM_START(dc)
 	ROM_REGION(0x200000, "maincpu", 0)
 	ROM_LOAD( "dc101d_us.bin", 0x000000, 0x200000, CRC(89f2b1a1) SHA1(8951d1bb219ab2ff8583033d2119c899cc81f18c) )   // BIOS
@@ -425,7 +473,7 @@ ROM_START( dcjp )
 
 	ROM_REGION(0x020000, "dcflash", 0)
 	/* ROM_LOAD( "dcjp_ntsc.bad", 0x000000, 0x020000, BAD_DUMP CRC(307a7035) SHA1(1411423a9d071340ea52c56e19c1aafc4e1309ee) )      // Hacked Flash */
-	ROM_LOAD( "dcjp_ntsc.bin", 0x000000, 0x020000, CRC(5F92BF76) SHA1(BE78B834F512AB2CF3D67B96E377C9F3093FF82A) )  // Flash
+	ROM_LOAD( "dcjp_ntsc.bin", 0x000000, 0x020000, BAD_DUMP CRC(5F92BF76) SHA1(BE78B834F512AB2CF3D67B96E377C9F3093FF82A) )  // Flash
 ROM_END
 
 ROM_START( dcdev )
