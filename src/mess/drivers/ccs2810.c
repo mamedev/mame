@@ -1,9 +1,12 @@
 /***************************************************************************
 
-        CCS Model 2810
+CCS Model 2810
 
-        11/12/2009 Skeleton driver.
-        02/06/2011 Connected to a terminal
+2009-12-11 Skeleton driver.
+2011-06-02 Connected to a terminal
+
+Chips: INS8250N-B, Z80A, uPD2716D, 82S129. Crystals: 16 MHz, 1.8432MHz
+
 
 Press Enter to start the system.
 All commands are in uppercase.
@@ -45,16 +48,17 @@ public:
 	m_terminal(*this, TERMINAL_TAG)
 	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<generic_terminal_device> m_terminal;
 	DECLARE_READ8_MEMBER( ccs2810_20_r );
 	DECLARE_READ8_MEMBER( ccs2810_25_r );
 	DECLARE_READ8_MEMBER( ccs2810_26_r );
 	DECLARE_WRITE8_MEMBER( ccs2810_20_w );
 	DECLARE_WRITE8_MEMBER( kbd_put );
+private:
 	UINT8 m_term_data;
 	UINT8 m_26_count;
 	virtual void machine_reset();
+	required_device<cpu_device> m_maincpu;
+	required_device<generic_terminal_device> m_terminal;
 };
 
 READ8_MEMBER( ccs2810_state::ccs2810_20_r )
@@ -140,10 +144,10 @@ MACHINE_CONFIG_END
 /* ROM definition */
 ROM_START( ccs2810 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "ccs2810_u8.bin", 0xf000, 0x0800, CRC(0c3054ea) SHA1(c554b7c44a61af13decb2785f3c9b33c6fc2bfce))
+	ROM_LOAD( "ccs2810.u8", 0xf000, 0x0800, CRC(0c3054ea) SHA1(c554b7c44a61af13decb2785f3c9b33c6fc2bfce))
 ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    CLASS          INIT     COMPANY                        FULLNAME       FLAGS */
 COMP( 1980, ccs2810,  0,    0,       ccs2810,   ccs2810, driver_device,  0,   "California Computer Systems", "CCS Model 2810", GAME_NO_SOUND_HW)
