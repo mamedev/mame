@@ -883,6 +883,7 @@ WRITE32_MEMBER( powervr2_device::softreset_w )
 
 WRITE32_MEMBER( powervr2_device::startrender_w )
 {
+	dc_state *state = machine().driver_data<dc_state>();
 	g_profiler.start(PROFILER_USER1);
 #if DEBUG_PVRTA
 	logerror("%s: Start render, region=%08x, params=%08x\n", tag(), region_base, param_base);
@@ -904,8 +905,6 @@ WRITE32_MEMBER( powervr2_device::startrender_w )
 			// we've got a request to draw, so, draw to the accumulation buffer!
 			// this should really be done for each tile!
 			render_to_accumulation_buffer(*fake_accumulationbuffer_bitmap,clip);
-
-			endofrender_timer_isp->adjust(attotime::from_usec(4000) ); // hack, make sure render takes some amount of time
 
 			/* copy the tiles to the framebuffer (really the rendering should be in this loop too) */
 			int sizera = fpu_param_cfg & 0x200000 ? 6 : 5;
@@ -948,10 +947,14 @@ WRITE32_MEMBER( powervr2_device::startrender_w )
 				if (st[0] & 0x80000000)
 					break;
 
+				sanitycount++;
 				// prevent infinite loop if asked to process invalid data
-				if(sanitycount>2000)
-					break;
+				//if(sanitycount>2000)
+				//	break;
 			}
+//			printf("ISP START %d %d\n",sanitycount,m_screen->vpos());
+			/* Fire ISP irq after a set amount of time TODO: timing of this */
+			endofrender_timer_isp->adjust(state->m_maincpu->cycles_to_attotime(sanitycount*25));
 			break;
 		}
 	}
@@ -1570,26 +1573,36 @@ WRITE32_MEMBER( powervr2_device::sb_pdapro_w )
 
 TIMER_CALLBACK_MEMBER(powervr2_device::transfer_opaque_list_irq)
 {
+//	printf("OPLST %d\n",m_screen->vpos());
+
 	irq_cb(EOXFER_OPLST_IRQ);
 }
 
 TIMER_CALLBACK_MEMBER(powervr2_device::transfer_opaque_modifier_volume_list_irq)
 {
+//	printf("OPMV %d\n",m_screen->vpos());
+
 	irq_cb(EOXFER_OPMV_IRQ);
 }
 
 TIMER_CALLBACK_MEMBER(powervr2_device::transfer_translucent_list_irq)
 {
+//	printf("TRLST %d\n",m_screen->vpos());
+
 	irq_cb(EOXFER_TRLST_IRQ);
 }
 
 TIMER_CALLBACK_MEMBER(powervr2_device::transfer_translucent_modifier_volume_list_irq)
 {
+//	printf("TRMV %d\n",m_screen->vpos());
+
 	irq_cb(EOXFER_TRMV_IRQ);
 }
 
 TIMER_CALLBACK_MEMBER(powervr2_device::transfer_punch_through_list_irq)
 {
+//	printf("PTLST %d\n",m_screen->vpos());
+
 	irq_cb(EOXFER_PTLST_IRQ);
 }
 
@@ -1677,6 +1690,7 @@ void powervr2_device::process_ta_fifo()
 		#endif
 		/* Process transfer FIFO done irqs here */
 		/* FIXME: timing of these */
+		//printf("%d %d\n",tafifo_listtype,m_screen->vpos());
 		switch (tafifo_listtype)
 		{
 		case 0: machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(powervr2_device::transfer_opaque_list_irq), this)); break;
@@ -2805,24 +2819,28 @@ TIMER_CALLBACK_MEMBER(powervr2_device::hbin)
 
 TIMER_CALLBACK_MEMBER(powervr2_device::endofrender_video)
 {
-	irq_cb(EOR_VIDEO_IRQ); // VIDEO end of render
-	endofrender_timer_video->adjust(attotime::never);
+	printf("VIDEO END %d\n",m_screen->vpos());
+//	endofrender_timer_video->adjust(attotime::never);
 }
 
 TIMER_CALLBACK_MEMBER(powervr2_device::endofrender_tsp)
 {
-	irq_cb(EOR_TSP_IRQ); // TSP end of render
+	printf("TSP END %d\n",m_screen->vpos());
 
-	endofrender_timer_tsp->adjust(attotime::never);
-	endofrender_timer_video->adjust(attotime::from_usec(500) );
+//	endofrender_timer_tsp->adjust(attotime::never);
+//	endofrender_timer_video->adjust(attotime::from_usec(500) );
 }
 
 TIMER_CALLBACK_MEMBER(powervr2_device::endofrender_isp)
 {
 	irq_cb(EOR_ISP_IRQ); // ISP end of render
+	irq_cb(EOR_TSP_IRQ); // TSP end of render
+	irq_cb(EOR_VIDEO_IRQ); // VIDEO end of render
+
+//	printf("ISP END %d\n",m_screen->vpos());
 
 	endofrender_timer_isp->adjust(attotime::never);
-	endofrender_timer_tsp->adjust(attotime::from_usec(500) );
+//	endofrender_timer_tsp->adjust(attotime::from_usec(500) );
 }
 
 UINT32 powervr2_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -2954,6 +2972,7 @@ TIMER_CALLBACK_MEMBER(powervr2_device::pvr_dma_irq)
 
 void powervr2_device::pvr_dma_execute(address_space &space)
 {
+	dc_state *state = machine().driver_data<dc_state>();
 	UINT32 src,dst,size;
 	dst = m_pvr_dma.pvr_addr;
 	src = m_pvr_dma.sys_addr;
@@ -2987,7 +3006,7 @@ void powervr2_device::pvr_dma_execute(address_space &space)
 	}
 	/* Note: do not update the params, since this DMA type doesn't support it. */
 	/* TODO: timing of this */
-	machine().scheduler().timer_set(attotime::from_usec(250), timer_expired_delegate(FUNC(powervr2_device::pvr_dma_irq), this));
+	machine().scheduler().timer_set(state->m_maincpu->cycles_to_attotime(m_pvr_dma.size/4), timer_expired_delegate(FUNC(powervr2_device::pvr_dma_irq), this));
 }
 
 powervr2_device::powervr2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
