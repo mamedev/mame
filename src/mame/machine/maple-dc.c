@@ -56,6 +56,7 @@ void maple_dc_device::device_start()
 	save_item(NAME(mden));
 	save_item(NAME(mdst));
 	save_item(NAME(msys));
+	save_item(NAME(mdtsel));
 	save_item(NAME(dma_state));
 	save_item(NAME(dma_adr));
 	save_item(NAME(dma_port));
@@ -68,6 +69,7 @@ void maple_dc_device::device_reset()
 	mden = 0;
 	mdst = 0;
 	msys = 0;
+	mdtsel = 0;
 	dma_state = DMA_IDLE;
 	dma_adr = 0;
 	dma_port = 0;

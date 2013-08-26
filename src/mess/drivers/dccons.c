@@ -28,6 +28,15 @@
 
 	Note:
 	- DC US and DC PAL flash ROMs are definitely hacked, they are set to have Chinese instead of Japanese.
+	- gdi file for DCLP (a Dreamcast tester) doesn't have first two tracks info, they are:
+	  1 0 4 2048 FILE0001.DUP 0
+      2 1798 0 2352 FILE0002.DUP 0
+	  serial i/o also fails on that, work ram addresses that needs to be patched with 0x0009 (nop) are:
+	  0xc0196da
+	  0xc0196ec
+	FPU test:
+	0xc03fe24 work ram flag check (1=error, 0=ok)
+
 */
 
 #include "emu.h"
