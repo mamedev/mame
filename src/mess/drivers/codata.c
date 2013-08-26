@@ -2,38 +2,51 @@
 
         Contel Codata Corporation Codata
 
-        11/01/2010 Skeleton driver.
+        2010-01-11 Skeleton driver.
+        2013-08-26 Connected to a terminal.
+
+        Chips: uPD7201C, AM9513, SCN68000. Crystal: 16 MHz
 
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/terminal.h"
 
 
 class codata_state : public driver_device
 {
 public:
 	codata_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_p_base(*this, "p_base"),
-		m_maincpu(*this, "maincpu") { }
+		: driver_device(mconfig, type, tag)
+		, m_p_base(*this, "rambase")
+		, m_terminal(*this, TERMINAL_TAG)
+		, m_maincpu(*this, "maincpu")
+	{ }
 
-	required_shared_ptr<UINT16> m_p_base;
+	DECLARE_READ16_MEMBER(keyin_r);
+	DECLARE_READ16_MEMBER(status_r);
+	DECLARE_WRITE8_MEMBER(kbd_put);
+private:
+	UINT8 m_term_data;
 	virtual void machine_reset();
-	virtual void video_start();
-	UINT32 screen_update_codata(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_shared_ptr<UINT16> m_p_base;
+	required_device<generic_terminal_device> m_terminal;
 	required_device<cpu_device> m_maincpu;
 };
 
-
-
 static ADDRESS_MAP_START(codata_mem, AS_PROGRAM, 16, codata_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x0fffff) AM_RAM AM_SHARE("p_base")
+	AM_RANGE(0x000000, 0x0fffff) AM_RAM AM_SHARE("rambase")
 	AM_RANGE(0x200000, 0x203fff) AM_ROM AM_REGION("user1", 0);
 	AM_RANGE(0x400000, 0x403fff) AM_ROM AM_REGION("user1", 0x4000);
-	//AM_RANGE(0x600000, 0x600003) some device
-	//AM_RANGE(0x800000, 0x800003) another device
+	AM_RANGE(0x600000, 0x600001) AM_READ(keyin_r) AM_DEVWRITE8(TERMINAL_TAG, generic_terminal_device, write, 0xff00)
+	AM_RANGE(0x600002, 0x600003) AM_READ(status_r)
+	//AM_RANGE(0x600000, 0x600003) uPD7201 SIO
+	//AM_RANGE(0x800000, 0x800003) AM9513 5 channel timer
+	//AM_RANGE(0xa00000, 0xbfffff) page map (rw)
+	//AM_RANGE(0xc00000, 0xdfffff) segment map (rw), context register (r)
+	//AM_RANGE(0xe00000, 0xffffff) context register (w), 16-bit parallel input port (r)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -41,20 +54,34 @@ static INPUT_PORTS_START( codata )
 INPUT_PORTS_END
 
 
+READ16_MEMBER( codata_state::keyin_r )
+{
+	UINT16 ret = m_term_data;
+	m_term_data = 0;
+	return ret << 8;
+}
+
+READ16_MEMBER( codata_state::status_r )
+{
+	return (m_term_data) ? 0x500 : 0x400;
+}
+
+WRITE8_MEMBER( codata_state::kbd_put )
+{
+	m_term_data = data;
+}
+
+static GENERIC_TERMINAL_INTERFACE( terminal_intf )
+{
+	DEVCB_DRIVER_MEMBER(codata_state, kbd_put)
+};
+
 void codata_state::machine_reset()
 {
 	UINT8* RAM = memregion("user1")->base();
 	memcpy(m_p_base, RAM, 16);
+	m_term_data = 0;
 	m_maincpu->reset();
-}
-
-void codata_state::video_start()
-{
-}
-
-UINT32 codata_state::screen_update_codata(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	return 0;
 }
 
 static MACHINE_CONFIG_START( codata, codata_state )
@@ -62,18 +89,8 @@ static MACHINE_CONFIG_START( codata, codata_state )
 	MCFG_CPU_ADD("maincpu",M68000, XTAL_16MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(codata_mem)
 
-
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_DRIVER(codata_state, screen_update_codata)
-
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
-
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 MACHINE_CONFIG_END
 
 /* ROM definition */
