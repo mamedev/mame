@@ -102,7 +102,6 @@ static ADDRESS_MAP_START( pktgaldx_map, AS_PROGRAM, 16, pktgaldx_state )
 	AM_RANGE(0x161800, 0x16180f) AM_DEVWRITE("tilegen1", deco16ic_device, pf_control_w)
 	AM_RANGE(0x164800, 0x164801) AM_WRITE(pktgaldx_oki_bank_w)
 
-//	AM_RANGE(0x166000, 0x1667ff) AM_READWRITE(pktgaldx_protection_region_c_104_r,pktgaldx_protection_region_c_104_w) /* Protection device - chip select / config bank for it.. */
 	AM_RANGE(0x167800, 0x167fff) AM_READWRITE(pktgaldx_protection_region_f_104_r,pktgaldx_protection_region_f_104_w) AM_SHARE("prot16ram") /* Protection device */
 
 	AM_RANGE(0x170000, 0x17ffff) AM_RAM
