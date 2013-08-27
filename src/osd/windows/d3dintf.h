@@ -77,9 +77,40 @@ struct device;
 struct surface;
 struct texture;
 struct vertex_buffer;
-struct effect;
 typedef D3DXVECTOR4 vector;
 typedef D3DMATRIX matrix;
+
+class effect
+{
+public:
+	effect(device *dev, const char *name, const char *path);
+	~effect();
+
+	void    	begin(UINT *passes, DWORD flags);
+	void    	begin_pass(UINT pass);
+
+	void    	end();
+	void    	end_pass();
+
+	void    	set_technique(const char *name);
+
+	void    	set_vector(D3DXHANDLE param, int count, float *vector);
+	void    	set_float(D3DXHANDLE param, float value);
+	void    	set_int(D3DXHANDLE param, int value);
+	void    	set_matrix(D3DXHANDLE param, matrix *matrix);
+	void    	set_texture(D3DXHANDLE param, texture *tex);
+
+	D3DXHANDLE	get_parameter(D3DXHANDLE param, const char *name);
+
+	ULONG   	release();
+
+	bool		is_valid() { return m_valid; }
+
+private:
+	bool		m_valid;
+	ID3DXEffect *m_effect;
+};
+
 
 
 //============================================================
@@ -237,26 +268,6 @@ struct vertex_buffer_interface
 
 
 //============================================================
-//  Direct3DEffect interfaces
-//============================================================
-
-struct effect_interface
-{
-	void     (*begin)(effect *effect, UINT *passes, DWORD flags);
-	void     (*end)(effect *effect);
-	void     (*begin_pass)(effect *effect, UINT pass);
-	void     (*end_pass)(effect *effect);
-	void     (*set_technique)(effect *effect, const char *name);
-	void     (*set_vector)(effect *effect, const char *name, int count, float *vector);
-	void     (*set_float)(effect *effect, const char *name, float value);
-	void     (*set_int)(effect *effect, const char *name, int value);
-	void     (*set_matrix)(effect *effect, const char *name, matrix *matrix);
-	void     (*set_texture)(effect *effect, const char *name, texture *tex);
-	ULONG    (*release)(effect *effect);
-};
-
-
-//============================================================
 //  Core D3D object
 //============================================================
 
@@ -274,7 +285,6 @@ struct base
 	surface_interface       surface;
 	texture_interface       texture;
 	vertex_buffer_interface vertexbuf;
-	effect_interface        effect;
 };
 
 

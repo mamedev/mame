@@ -42,6 +42,7 @@
 // standard windows headers
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#include <tchar.h>
 #include <d3d9.h>
 #include <d3dx9.h>
 #undef interface
@@ -51,6 +52,7 @@
 
 // MAMEOS headers
 #include "d3dintf.h"
+#include "strconv.h"
 #include "winmain.h"
 
 
@@ -334,7 +336,6 @@ static HRESULT device_create_offscreen_plain_surface(device *dev, UINT width, UI
 	return IDirect3DDevice9_CreateOffscreenPlainSurface(device, width, height, format, pool, (IDirect3DSurface9 **)surface, NULL);
 }
 
-
 static HRESULT device_create_effect(device *dev, const WCHAR *name, effect **effect)
 {
 	IDirect3DDevice9 *device = (IDirect3DDevice9 *)dev;
@@ -346,7 +347,7 @@ static HRESULT device_create_effect(device *dev, const WCHAR *name, effect **eff
 		if(buffer_errors != NULL)
 		{
 			LPVOID compile_errors = buffer_errors->GetBufferPointer();
-			printf("Unable to compile shader: %s\n", (const char*)compile_errors);
+			printf("Unable to compile shader %s:\n%s\n", (const char*)name, (const char*)compile_errors);
 		}
 		else
 		{
@@ -684,45 +685,73 @@ static const vertex_buffer_interface d3d9_vertex_buffer_interface =
 //  Direct3DEffect interfaces
 //============================================================
 
-static void effect_begin(effect *effect, UINT *passes, DWORD flags)
+effect::effect(device *dev, const char *name, const char *path)
 {
-	ID3DXEffect *d3dfx = (ID3DXEffect*)effect;
-	d3dfx->Begin(passes, flags);
+	IDirect3DDevice9 *device = (IDirect3DDevice9 *)dev;
+	LPD3DXBUFFER buffer_errors = NULL;
+
+	m_effect = NULL;
+	m_valid = false;
+
+	char name_cstr[1024];
+	sprintf(name_cstr, "%s\\%s", path, name);
+	TCHAR *effect_name = tstring_from_utf8(name_cstr);
+
+	HRESULT hr = (*g_load_effect)(device, effect_name, NULL, NULL, 0, NULL, &m_effect, &buffer_errors);
+	if(FAILED(hr))
+	{
+		if(buffer_errors != NULL)
+		{
+			LPVOID compile_errors = buffer_errors->GetBufferPointer();
+			printf("Unable to compile shader: %s\n", (const char*)compile_errors);
+		}
+		else
+		{
+			printf("Unable to compile shader (unspecified reason)\n");
+		}
+	}
+	else
+	{
+		m_valid = true;
+	}
+
+	osd_free(effect_name);
 }
 
-
-static void effect_end(effect *effect)
+effect::~effect()
 {
-	ID3DXEffect *d3dfx = (ID3DXEffect*)effect;
-	d3dfx->End();
+	m_effect->Release();
+	m_effect = NULL;
 }
 
-
-static void effect_begin_pass(effect *effect, UINT pass)
+void effect::begin(UINT *passes, DWORD flags)
 {
-	ID3DXEffect *d3dfx = (ID3DXEffect*)effect;
-	d3dfx->BeginPass(pass);
+	m_effect->Begin(passes, flags);
 }
 
-
-static void effect_end_pass(effect *effect)
+void effect::end()
 {
-	ID3DXEffect *d3dfx = (ID3DXEffect*)effect;
-	d3dfx->EndPass();
+	m_effect->End();
 }
 
-
-static void effect_set_technique(effect *effect, const char *name)
+void effect::begin_pass(UINT pass)
 {
-	ID3DXEffect *d3dfx = (ID3DXEffect*)effect;
-	d3dfx->SetTechnique(name);
+	m_effect->BeginPass(pass);
 }
 
+void effect::end_pass()
+{
+	m_effect->EndPass();
+}
 
-static void effect_set_vector(effect *effect, const char *name, int count, float *vector)
+void effect::set_technique(const char *name)
+{
+	m_effect->SetTechnique(name);
+}
+
+void effect::set_vector(D3DXHANDLE param, int count, float *vector)
 {
 	static D3DXVECTOR4 out_vector;
-	ID3DXEffect *d3dfx = (ID3DXEffect*)effect;
 	if (count > 0)
 		out_vector.x = vector[0];
 	if (count > 1)
@@ -731,61 +760,33 @@ static void effect_set_vector(effect *effect, const char *name, int count, float
 		out_vector.z = vector[2];
 	if (count > 3)
 		out_vector.w = vector[3];
-	d3dfx->SetVector(name, &out_vector);
+	m_effect->SetVector(param, &out_vector);
 }
 
-
-static void effect_set_float(effect *effect, const char *name, float value)
+void effect::set_float(D3DXHANDLE param, float value)
 {
-	ID3DXEffect *d3dfx = (ID3DXEffect*)effect;
-	d3dfx->SetFloat(name, value);
+	m_effect->SetFloat(param, value);
 }
 
-
-static void effect_set_int(effect *effect, const char *name, int value)
+void effect::set_int(D3DXHANDLE param, int value)
 {
-	ID3DXEffect *d3dfx = (ID3DXEffect*)effect;
-	d3dfx->SetInt(name, value);
+	m_effect->SetInt(param, value);
 }
 
-
-static void effect_set_matrix(effect *effect, const char *name, matrix *matrix)
+void effect::set_matrix(D3DXHANDLE param, matrix *matrix)
 {
-	ID3DXEffect *d3dfx = (ID3DXEffect*)effect;
-	d3dfx->SetMatrix(name, (D3DXMATRIX*)matrix);
+	m_effect->SetMatrix(param, (D3DXMATRIX*)matrix);
 }
 
-
-static void effect_set_texture(effect *effect, const char *name, texture *tex)
+void effect::set_texture(D3DXHANDLE param, texture *tex)
 {
-	ID3DXEffect *d3dfx = (ID3DXEffect*)effect;
-	d3dfx->SetTexture(name, (IDirect3DTexture9*)tex);
+	m_effect->SetTexture(param, (IDirect3DTexture9*)tex);
 }
 
-
-static ULONG effect_release(effect *effect)
+ULONG effect::release()
 {
-	ID3DXEffect *d3dfx = (ID3DXEffect*)effect;
-	return d3dfx->Release();
+	return m_effect->Release();
 }
-
-
-static const effect_interface d3d9_effect_interface =
-{
-	effect_begin,
-	effect_end,
-	effect_begin_pass,
-	effect_end_pass,
-	effect_set_technique,
-	effect_set_vector,
-	effect_set_float,
-	effect_set_int,
-	effect_set_matrix,
-	effect_set_texture,
-	effect_release
-};
-
-
 
 //============================================================
 //  set_interfaces
@@ -798,7 +799,6 @@ static void set_interfaces(base *d3dptr)
 	d3dptr->surface = d3d9_surface_interface;
 	d3dptr->texture = d3d9_texture_interface;
 	d3dptr->vertexbuf = d3d9_vertex_buffer_interface;
-	d3dptr->effect = d3d9_effect_interface;
 }
 
 };

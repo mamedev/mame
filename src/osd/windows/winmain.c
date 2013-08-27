@@ -377,7 +377,7 @@ const options_entry windows_options::s_option_entries[] =
 	{ WINOPTION_YIQ_CCVALUE";yiqcc",                            "3.59754545",OPTION_FLOAT,      "Color Carrier frequency for NTSC signal processing" },
 	{ WINOPTION_YIQ_AVALUE";yiqa",                              "0.5",       OPTION_FLOAT,      "A value for NTSC signal processing" },
 	{ WINOPTION_YIQ_BVALUE";yiqb",                              "0.5",       OPTION_FLOAT,      "B value for NTSC signal processing" },
-	{ WINOPTION_YIQ_OVALUE";yiqo",                              "0.0",       OPTION_FLOAT,      "Outgoing Color Carrier phase offset for NTSC signal processing" },
+	{ WINOPTION_YIQ_OVALUE";yiqo",                              "1.570796325",OPTION_FLOAT,     "Outgoing Color Carrier phase offset for NTSC signal processing" },
 	{ WINOPTION_YIQ_PVALUE";yiqp",                              "1.0",       OPTION_FLOAT,      "Incoming Pixel Clock scaling value for NTSC signal processing" },
 	{ WINOPTION_YIQ_NVALUE";yiqn",                              "1.0",       OPTION_FLOAT,      "Y filter notch width for NTSC signal processing" },
 	{ WINOPTION_YIQ_YVALUE";yiqy",                              "6.0",       OPTION_FLOAT,      "Y filter cutoff frequency for NTSC signal processing" },
