@@ -41,7 +41,6 @@
     DEBUGGING
 ***************************************************************************/
 
-#define FORCE_C_BACKEND                 (0)
 #define LOG_UML                         (0)
 #define LOG_NATIVE                      (0)
 
@@ -155,8 +154,6 @@ void arm7_cpu_device::arm7_drc_init()
 	m_impstate.cache = cache;
 
 	/* initialize the UML generator */
-	if (FORCE_C_BACKEND)
-		flags |= DRCUML_OPTION_USE_C;
 	if (LOG_UML)
 		flags |= DRCUML_OPTION_LOG_UML;
 	if (LOG_NATIVE)

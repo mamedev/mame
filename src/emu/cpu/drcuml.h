@@ -51,7 +51,6 @@
 //**************************************************************************
 
 // these options are passed into drcuml_alloc() and control global behaviors
-const UINT32 DRCUML_OPTION_USE_C        = 0x0001;       // always use the C back-end
 const UINT32 DRCUML_OPTION_LOG_UML      = 0x0002;       // generate a UML disassembly of each block
 const UINT32 DRCUML_OPTION_LOG_NATIVE   = 0x0004;       // tell the back-end to generate a native disassembly of each block
 

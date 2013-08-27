@@ -37,7 +37,6 @@ extern offs_t rsp_dasm_one(char *buffer, offs_t pc, UINT32 op);
     DEBUGGING
 ***************************************************************************/
 
-#define FORCE_C_BACKEND                 (0)
 #define LOG_UML                         (0)
 #define LOG_NATIVE                      (0)
 
@@ -719,10 +718,6 @@ static CPU_INIT( rsp )
 	rsp->impstate->cache = cache;
 
 	/* initialize the UML generator */
-	if (FORCE_C_BACKEND)
-	{
-		flags |= DRCUML_OPTION_USE_C;
-	}
 	if (LOG_UML)
 	{
 		flags |= DRCUML_OPTION_LOG_UML;

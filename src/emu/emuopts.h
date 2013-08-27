@@ -192,6 +192,7 @@ enum
 
 // core misc options
 #define OPTION_DRC                  "drc"
+#define OPTION_DRC_USE_C            "drc_use_c"
 #define OPTION_BIOS                 "bios"
 #define OPTION_CHEAT                "cheat"
 #define OPTION_SKIP_GAMEINFO        "skip_gameinfo"
@@ -355,6 +356,7 @@ public:
 
 	// core misc options
 	bool drc() const { return bool_value(OPTION_DRC); }
+	bool drc_use_c() const { return bool_value(OPTION_DRC_USE_C); }
 	const char *bios() const { return value(OPTION_BIOS); }
 	bool cheat() const { return bool_value(OPTION_CHEAT); }
 	bool skip_gameinfo() const { return bool_value(OPTION_SKIP_GAMEINFO); }

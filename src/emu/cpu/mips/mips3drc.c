@@ -68,7 +68,6 @@ using namespace uml;
     DEBUGGING
 ***************************************************************************/
 
-#define FORCE_C_BACKEND                 (0)
 #define LOG_UML                         (0)
 #define LOG_NATIVE                      (0)
 
@@ -407,8 +406,6 @@ static void mips3_init(mips3_flavor flavor, int bigendian, legacy_cpu_device *de
 	mips3->impstate->cache = cache;
 
 	/* initialize the UML generator */
-	if (FORCE_C_BACKEND)
-		flags |= DRCUML_OPTION_USE_C;
 	if (LOG_UML)
 		flags |= DRCUML_OPTION_LOG_UML;
 	if (LOG_NATIVE)
