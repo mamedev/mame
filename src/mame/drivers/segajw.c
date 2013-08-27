@@ -60,8 +60,8 @@ UINT32 segajw_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 static ADDRESS_MAP_START( segajw_map, AS_PROGRAM, 16, segajw_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 
-//  AM_RANGE(0x080000, 0x080001) AM_DEVREADWRITE_LEGACY("hd63484", hd63484_status_r, hd63484_address_w)
-//  AM_RANGE(0x080002, 0x080003) AM_DEVREADWRITE_LEGACY("hd63484", hd63484_data_r, hd63484_data_w)
+//  AM_RANGE(0x080000, 0x080001) AM_DEVREADWRITE("hd63484", hd63484_device, status_r, address_w)
+//  AM_RANGE(0x080002, 0x080003) AM_DEVREADWRITE("hd63484", hd63484_device, data_r, data_w)
 
 	AM_RANGE(0x1a000e, 0x1a000f) AM_NOP
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM

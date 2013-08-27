@@ -24,55 +24,120 @@
 
 #define LOG_COMMANDS 0
 
-/* the on-chip FIFO is 16 bytes long, but we use a larger one to simplify */
-/* decoding of long commands. Commands can be up to 64KB long... but Shanghai */
-/* doesn't reach that length. */
+const device_type HD63484 = &device_creator<hd63484_device>;
 
-#define FIFO_LENGTH 256
-
-struct hd63484_state
+hd63484_device::hd63484_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, HD63484, "HD63484", tag, owner, clock, "hd63484", __FILE__),
+	m_ram(NULL),
+	//m_reg[256/2],
+	m_fifo_counter(0),
+	//m_fifo[FIFO_LENGTH],
+	m_readfifo(0),
+	//m_pattern[16],
+	m_org(0),
+	m_org_dpd(0),
+	m_rwp(0),
+	m_cl0(0),
+	m_cl1(0),
+	m_ccmp(0),
+	m_edg(0),
+	m_mask(0),
+	m_ppy(0),
+	m_pzcy(0),
+	m_ppx(0),
+	m_pzcx(0),
+	m_psy(0),
+	m_psx(0),
+	m_pey(0),
+	m_pzy(0),
+	m_pex(0),
+	m_pzx(0),
+	m_xmin(0),
+	m_ymin(0),
+	m_xmax(0),
+	m_ymax(0),
+	m_rwp_dn(0),
+	m_cpx(0),
+	m_cpy(0),
+	m_regno(0)
 {
-	UINT16 *   ram;
-	UINT16 reg[256/2];
-
-	int          fifo_counter;
-	UINT16       fifo[FIFO_LENGTH];
-	UINT16       readfifo;
-
-	UINT16       pattern[16];
-	int          org, org_dpd, rwp;
-	UINT16       cl0, cl1, ccmp, edg, mask, ppy, pzcy, ppx, pzcx, psy, psx, pey, pzy, pex, pzx, xmin, ymin, xmax, ymax, rwp_dn;
-	INT16        cpx, cpy;
-
-	int          regno;
-
-	int          skattva_hack;
-};
-
-/*****************************************************************************
-    INLINE FUNCTIONS
-*****************************************************************************/
-
-INLINE hd63484_state *get_safe_token( device_t *device )
-{
-	assert(device != NULL);
-	assert(device->type() == HD63484);
-
-	return (hd63484_state *)downcast<hd63484_device *>(device)->token();
 }
 
-INLINE const hd63484_interface *get_interface( device_t *device )
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void hd63484_device::device_config_complete()
 {
-	assert(device != NULL);
-	assert(device->type() == HD63484);
-	return (const hd63484_interface *) device->static_config();
+	// inherit a copy of the static data
+	const hd63484_interface *intf = reinterpret_cast<const hd63484_interface *>(static_config());
+	if (intf != NULL)
+		*static_cast<hd63484_interface *>(this) = *intf;
+
+	// or initialize to defaults if none provided
+	else
+	{
+		m_skattva_hack = 0;
+	}
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void hd63484_device::device_start()
+{
+	m_ram = auto_alloc_array_clear(machine(), UINT16, HD63484_RAM_SIZE);
+
+	save_pointer(NAME(m_ram), HD63484_RAM_SIZE);
+	save_item(NAME(m_reg));
+	save_item(NAME(m_fifo_counter));
+	save_item(NAME(m_fifo));
+	save_item(NAME(m_readfifo));
+	save_item(NAME(m_pattern));
+	save_item(NAME(m_org));
+	save_item(NAME(m_org_dpd));
+	save_item(NAME(m_rwp));
+	save_item(NAME(m_cl0));
+	save_item(NAME(m_cl1));
+	save_item(NAME(m_ccmp));
+	save_item(NAME(m_edg));
+	save_item(NAME(m_mask));
+	save_item(NAME(m_ppy));
+	save_item(NAME(m_pzcy));
+	save_item(NAME(m_ppx));
+	save_item(NAME(m_pzcx));
+	save_item(NAME(m_psy));
+	save_item(NAME(m_psx));
+	save_item(NAME(m_pey));
+	save_item(NAME(m_pzy));
+	save_item(NAME(m_pex));
+	save_item(NAME(m_pzx));
+	save_item(NAME(m_xmin));
+	save_item(NAME(m_ymin));
+	save_item(NAME(m_xmax));
+	save_item(NAME(m_ymax));
+	save_item(NAME(m_rwp_dn));
+	save_item(NAME(m_cpx));
+	save_item(NAME(m_cpy));
+	save_item(NAME(m_regno));
+	save_item(NAME(m_skattva_hack));
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void hd63484_device::device_reset()
+{
+	m_fifo_counter = 0;
 }
 
 /*****************************************************************************
     IMPLEMENTATION
 *****************************************************************************/
-
-static int get_pixel(device_t *device, int x, int y);
 
 static const int instruction_length[64] =
 {
@@ -114,9 +179,8 @@ static const char *const instruction_name[64] =
 	"RGCPY","RGCPY","RGCPY","RGCPY"     /* Fx */
 };
 
-static void doclr16( device_t *device, int opcode, UINT16 fill, int *dst, INT16 _ax, INT16 _ay )
+void hd63484_device::doclr16( int opcode, UINT16 fill, int *dst, INT16 _ax, INT16 _ay )
 {
-	hd63484_state *hd63484 = get_safe_token(device);
 	INT16 ax,ay;
 
 	ax = _ax;
@@ -129,16 +193,16 @@ static void doclr16( device_t *device, int opcode, UINT16 fill, int *dst, INT16 
 			switch (opcode & 0x0003)
 			{
 				case 0:
-					hd63484->ram[*dst]  = fill;
+					m_ram[*dst]  = fill;
 					break;
 				case 1:
-					hd63484->ram[*dst] |= fill;
+					m_ram[*dst] |= fill;
 					break;
 				case 2:
-					hd63484->ram[*dst] &= fill;
+					m_ram[*dst] &= fill;
 					break;
 				case 3:
-					hd63484->ram[*dst] ^= fill;
+					m_ram[*dst] ^= fill;
 					break;
 			}
 			if (ax == 0)
@@ -158,14 +222,14 @@ static void doclr16( device_t *device, int opcode, UINT16 fill, int *dst, INT16 
 		ax = _ax;
 		if (_ay < 0)
 		{
-			*dst = (*dst + (hd63484->reg[0xca/2] & 0x0fff) - ax) & (HD63484_RAM_SIZE - 1);
+			*dst = (*dst + (m_reg[0xca/2] & 0x0fff) - ax) & (HD63484_RAM_SIZE - 1);
 			if (ay == 0)
 				break;
 			ay++;
 		}
 		else
 		{
-			*dst = (*dst - (hd63484->reg[0xca/2] & 0x0fff) - ax) & (HD63484_RAM_SIZE - 1);
+			*dst = (*dst - (m_reg[0xca/2] & 0x0fff) - ax) & (HD63484_RAM_SIZE - 1);
 			if (ay == 0)
 				break;
 			ay--;
@@ -173,9 +237,8 @@ static void doclr16( device_t *device, int opcode, UINT16 fill, int *dst, INT16 
 	}
 }
 
-static void docpy16( device_t *device, int opcode, int src, int *dst, INT16 _ax, INT16 _ay )
+void hd63484_device::docpy16( int opcode, int src, int *dst, INT16 _ax, INT16 _ay )
 {
-	hd63484_state *hd63484 = get_safe_token(device);
 	int dstep1,dstep2;
 	int ax = _ax;
 	int ay = _ay;
@@ -183,14 +246,14 @@ static void docpy16( device_t *device, int opcode, int src, int *dst, INT16 _ax,
 	switch (opcode & 0x0700)
 	{
 		default:
-		case 0x0000: dstep1 =  1; dstep2 = -1 * (hd63484->reg[0xca/2] & 0x0fff) - ax * dstep1; break;
-		case 0x0100: dstep1 =  1; dstep2 =      (hd63484->reg[0xca/2] & 0x0fff) - ax * dstep1; break;
-		case 0x0200: dstep1 = -1; dstep2 = -1 * (hd63484->reg[0xca/2] & 0x0fff) + ax * dstep1; break;
-		case 0x0300: dstep1 = -1; dstep2 =      (hd63484->reg[0xca/2] & 0x0fff) + ax * dstep1; break;
-		case 0x0400: dstep1 = -1 * (hd63484->reg[0xca/2] & 0x0fff); dstep2 =  1 - ay * dstep1; break;
-		case 0x0500: dstep1 =      (hd63484->reg[0xca/2] & 0x0fff); dstep2 =  1 - ay * dstep1; break;
-		case 0x0600: dstep1 = -1 * (hd63484->reg[0xca/2] & 0x0fff); dstep2 = -1 + ay * dstep1; break;
-		case 0x0700: dstep1 =      (hd63484->reg[0xca/2] & 0x0fff); dstep2 = -1 + ay * dstep1; break;
+		case 0x0000: dstep1 =  1; dstep2 = -1 * (m_reg[0xca/2] & 0x0fff) - ax * dstep1; break;
+		case 0x0100: dstep1 =  1; dstep2 =      (m_reg[0xca/2] & 0x0fff) - ax * dstep1; break;
+		case 0x0200: dstep1 = -1; dstep2 = -1 * (m_reg[0xca/2] & 0x0fff) + ax * dstep1; break;
+		case 0x0300: dstep1 = -1; dstep2 =      (m_reg[0xca/2] & 0x0fff) + ax * dstep1; break;
+		case 0x0400: dstep1 = -1 * (m_reg[0xca/2] & 0x0fff); dstep2 =  1 - ay * dstep1; break;
+		case 0x0500: dstep1 =      (m_reg[0xca/2] & 0x0fff); dstep2 =  1 - ay * dstep1; break;
+		case 0x0600: dstep1 = -1 * (m_reg[0xca/2] & 0x0fff); dstep2 = -1 + ay * dstep1; break;
+		case 0x0700: dstep1 =      (m_reg[0xca/2] & 0x0fff); dstep2 = -1 + ay * dstep1; break;
 	}
 
 	for (;;)
@@ -200,32 +263,32 @@ static void docpy16( device_t *device, int opcode, int src, int *dst, INT16 _ax,
 			switch (opcode & 0x0007)
 			{
 				case 0:
-					hd63484->ram[*dst]  = hd63484->ram[src];
+					m_ram[*dst]  = m_ram[src];
 					break;
 				case 1:
-					hd63484->ram[*dst] |= hd63484->ram[src];
+					m_ram[*dst] |= m_ram[src];
 					break;
 				case 2:
-					hd63484->ram[*dst] &= hd63484->ram[src];
+					m_ram[*dst] &= m_ram[src];
 					break;
 				case 3:
-					hd63484->ram[*dst] ^= hd63484->ram[src];
+					m_ram[*dst] ^= m_ram[src];
 					break;
 				case 4:
-					if (hd63484->ram[*dst] == (hd63484->ccmp & 0xff))
-						hd63484->ram[*dst] = hd63484->ram[src];
+					if (m_ram[*dst] == (m_ccmp & 0xff))
+						m_ram[*dst] = m_ram[src];
 					break;
 				case 5:
-					if (hd63484->ram[*dst] != (hd63484->ccmp & 0xff))
-						hd63484->ram[*dst] = hd63484->ram[src];
+					if (m_ram[*dst] != (m_ccmp & 0xff))
+						m_ram[*dst] = m_ram[src];
 					break;
 				case 6:
-					if (hd63484->ram[*dst] < hd63484->ram[src])
-						hd63484->ram[*dst] = hd63484->ram[src];
+					if (m_ram[*dst] < m_ram[src])
+						m_ram[*dst] = m_ram[src];
 					break;
 				case 7:
-					if (hd63484->ram[*dst] > hd63484->ram[src])
-						hd63484->ram[*dst] = hd63484->ram[src];
+					if (m_ram[*dst] > m_ram[src])
+						m_ram[*dst] = m_ram[src];
 					break;
 			}
 
@@ -234,13 +297,13 @@ static void docpy16( device_t *device, int opcode, int src, int *dst, INT16 _ax,
 				if (ay == 0) break;
 				if (_ay > 0)
 				{
-					src = (src - (hd63484->reg[0xca/2] & 0x0fff)) & (HD63484_RAM_SIZE - 1);
+					src = (src - (m_reg[0xca/2] & 0x0fff)) & (HD63484_RAM_SIZE - 1);
 					*dst = (*dst + dstep1) & (HD63484_RAM_SIZE - 1);
 					ay--;
 				}
 				else
 				{
-					src = (src + (hd63484->reg[0xca/2] & 0x0fff)) & (HD63484_RAM_SIZE - 1);
+					src = (src + (m_reg[0xca/2] & 0x0fff)) & (HD63484_RAM_SIZE - 1);
 					*dst = (*dst + dstep1) & (HD63484_RAM_SIZE - 1);
 					ay++;
 				}
@@ -268,14 +331,14 @@ static void docpy16( device_t *device, int opcode, int src, int *dst, INT16 _ax,
 			ay = _ay;
 			if (_ax < 0)
 			{
-				src = (src - 1 + ay * (hd63484->reg[0xca/2] & 0x0fff)) & (HD63484_RAM_SIZE - 1);
+				src = (src - 1 + ay * (m_reg[0xca/2] & 0x0fff)) & (HD63484_RAM_SIZE - 1);
 				*dst = (*dst + dstep2) & (HD63484_RAM_SIZE - 1);
 				if (ax == 0) break;
 				ax++;
 			}
 			else
 			{
-				src = (src + 1 - ay * (hd63484->reg[0xca/2] & 0x0fff)) & (HD63484_RAM_SIZE - 1);
+				src = (src + 1 - ay * (m_reg[0xca/2] & 0x0fff)) & (HD63484_RAM_SIZE - 1);
 				*dst = (*dst + dstep2) & (HD63484_RAM_SIZE - 1);
 				if (ax == 0) break;
 				ax--;
@@ -286,14 +349,14 @@ static void docpy16( device_t *device, int opcode, int src, int *dst, INT16 _ax,
 			ax = _ax;
 			if (_ay < 0)
 			{
-				src = (src + (hd63484->reg[0xca/2] & 0x0fff) - ax) & (HD63484_RAM_SIZE - 1);
+				src = (src + (m_reg[0xca/2] & 0x0fff) - ax) & (HD63484_RAM_SIZE - 1);
 				*dst = (*dst + dstep2) & (HD63484_RAM_SIZE - 1);
 				if (ay == 0) break;
 				ay++;
 			}
 			else
 			{
-				src = (src - (hd63484->reg[0xca/2] & 0x0fff) - ax) & (HD63484_RAM_SIZE - 1);
+				src = (src - (m_reg[0xca/2] & 0x0fff) - ax) & (HD63484_RAM_SIZE - 1);
 				*dst = (*dst + dstep2) & (HD63484_RAM_SIZE - 1);
 				if (ay == 0) break;
 				ay--;
@@ -302,10 +365,9 @@ static void docpy16( device_t *device, int opcode, int src, int *dst, INT16 _ax,
 	}
 }
 
-static int org_first_pixel( device_t *device, int _org_dpd )
+int hd63484_device::org_first_pixel( int _org_dpd )
 {
-	hd63484_state *hd63484 = get_safe_token(device);
-	int gbm = (hd63484->reg[0x02/2] & 0x700) >> 8;
+	int gbm = (m_reg[0x02/2] & 0x700) >> 8;
 
 	switch (gbm)
 	{
@@ -326,15 +388,14 @@ static int org_first_pixel( device_t *device, int _org_dpd )
 	}
 }
 
-static void dot( device_t *device, int x, int y, int opm, UINT16 color )
+void hd63484_device::dot( int x, int y, int opm, UINT16 color )
 {
-	hd63484_state *hd63484 = get_safe_token(device);
 	int dst, x_int, x_mod, bpp;
 	UINT16 color_shifted, bitmask, bitmask_shifted;
 
-	x += org_first_pixel(device, hd63484->org_dpd);
+	x += org_first_pixel(m_org_dpd);
 
-	switch ((hd63484->reg[0x02/2] & 0x700) >> 8)
+	switch ((m_reg[0x02/2] & 0x700) >> 8)
 	{
 		case 0:
 			bpp = 1;
@@ -386,48 +447,47 @@ static void dot( device_t *device, int x, int y, int opm, UINT16 color )
 	bitmask_shifted = bitmask << (x_mod * bpp);
 	color_shifted = color << (x_mod * bpp);
 
-	dst = (hd63484->org + x_int - y * (hd63484->reg[0xca/2] & 0x0fff)) & (HD63484_RAM_SIZE - 1);
+	dst = (m_org + x_int - y * (m_reg[0xca/2] & 0x0fff)) & (HD63484_RAM_SIZE - 1);
 
 	switch (opm)
 	{
 		case 0:
-			hd63484->ram[dst] = (hd63484->ram[dst] & ~bitmask_shifted) | color_shifted;
+			m_ram[dst] = (m_ram[dst] & ~bitmask_shifted) | color_shifted;
 			break;
 		case 1:
-			hd63484->ram[dst] = hd63484->ram[dst] | color_shifted;
+			m_ram[dst] = m_ram[dst] | color_shifted;
 			break;
 		case 2:
-			hd63484->ram[dst] = hd63484->ram[dst] & ((hd63484->ram[dst] & ~bitmask_shifted) | color_shifted);
+			m_ram[dst] = m_ram[dst] & ((m_ram[dst] & ~bitmask_shifted) | color_shifted);
 			break;
 		case 3:
-			hd63484->ram[dst] = hd63484->ram[dst] ^ color_shifted;
+			m_ram[dst] = m_ram[dst] ^ color_shifted;
 			break;
 		case 4:
-			if (get_pixel(device, x, y) == (hd63484->ccmp & bitmask))
-				hd63484->ram[dst] = (hd63484->ram[dst] & ~bitmask_shifted) | color_shifted;
+			if (get_pixel(x, y) == (m_ccmp & bitmask))
+				m_ram[dst] = (m_ram[dst] & ~bitmask_shifted) | color_shifted;
 			break;
 		case 5:
-			if (get_pixel(device, x, y) != (hd63484->ccmp & bitmask))
-				hd63484->ram[dst] = (hd63484->ram[dst] & ~bitmask_shifted) | color_shifted;
+			if (get_pixel(x, y) != (m_ccmp & bitmask))
+				m_ram[dst] = (m_ram[dst] & ~bitmask_shifted) | color_shifted;
 			break;
 		case 6:
-			if (get_pixel(device, x, y) < (hd63484->cl0 & bitmask))
-				hd63484->ram[dst] = (hd63484->ram[dst] & ~bitmask_shifted) | color_shifted;
+			if (get_pixel(x, y) < (m_cl0 & bitmask))
+				m_ram[dst] = (m_ram[dst] & ~bitmask_shifted) | color_shifted;
 			break;
 		case 7:
-			if (get_pixel(device, x, y) > (hd63484->cl0 & bitmask))
-				hd63484->ram[dst] = (hd63484->ram[dst] & ~bitmask_shifted) | color_shifted;
+			if (get_pixel(x, y) > (m_cl0 & bitmask))
+				m_ram[dst] = (m_ram[dst] & ~bitmask_shifted) | color_shifted;
 			break;
 	}
 }
 
-static int get_pixel( device_t *device, int x, int y )
+int hd63484_device::get_pixel( int x, int y )
 {
-	hd63484_state *hd63484 = get_safe_token(device);
 	int dst, x_int, x_mod, bpp;
 	UINT16 bitmask, bitmask_shifted;
 
-	switch ((hd63484->reg[0x02/2] & 0x700) >> 8)
+	switch ((m_reg[0x02/2] & 0x700) >> 8)
 	{
 		case 0:
 			bpp = 1;
@@ -472,14 +532,13 @@ static int get_pixel( device_t *device, int x, int y )
 
 	bitmask_shifted = bitmask << (x_mod * bpp);
 
-	dst = (hd63484->org + x_int - y * (hd63484->reg[0xca/2] & 0x0fff)) & (HD63484_RAM_SIZE - 1);
+	dst = (m_org + x_int - y * (m_reg[0xca/2] & 0x0fff)) & (HD63484_RAM_SIZE - 1);
 
-	return ((hd63484->ram[dst] & bitmask_shifted) >> (x_mod * bpp));
+	return ((m_ram[dst] & bitmask_shifted) >> (x_mod * bpp));
 }
 
-static int get_pixel_ptn( device_t *device, int x, int y )
+int hd63484_device::get_pixel_ptn( int x, int y )
 {
-	hd63484_state *hd63484 = get_safe_token(device);
 	int dst, x_int, x_mod, bpp;
 	UINT16 bitmask, bitmask_shifted;
 
@@ -505,13 +564,13 @@ static int get_pixel_ptn( device_t *device, int x, int y )
 
 	dst = (x_int + y * 1);
 
-	if ((hd63484->pattern[dst] & bitmask_shifted) >> (x_mod * bpp))
+	if ((m_pattern[dst] & bitmask_shifted) >> (x_mod * bpp))
 		return 1;
 	else
 		return 0;
 }
 
-static void agcpy( device_t *device, int opcode, int src_x, int src_y, int dst_x, int dst_y, INT16 _ax, INT16 _ay )
+void hd63484_device::agcpy( int opcode, int src_x, int src_y, int dst_x, int dst_y, INT16 _ax, INT16 _ay )
 {
 	int dst_step1_x,dst_step1_y,dst_step2_x,dst_step2_y;
 	int src_step1_x,src_step1_y,src_step2_x,src_step2_y;
@@ -580,7 +639,7 @@ static void agcpy( device_t *device, int opcode, int src_x, int src_y, int dst_x
 	{
 		for (;;)
 		{
-			dot(device, xxd, yyd, opcode & 0x0007, get_pixel(device, xxs, yys));
+			dot(xxd, yyd, opcode & 0x0007, get_pixel(xxs, yys));
 
 			if (opcode & 0x0800)
 			{
@@ -671,9 +730,8 @@ static void agcpy( device_t *device, int opcode, int src_x, int src_y, int dst_x
 	}
 }
 
-static void ptn( device_t *device, int opcode, int src_x, int src_y, INT16 _ax, INT16 _ay )
+void hd63484_device::ptn( int opcode, int src_x, int src_y, INT16 _ax, INT16 _ay )
 {
-	hd63484_state *hd63484 = get_safe_token(device);
 	int dst_step1_x = 0,dst_step1_y = 0,dst_step2_x = 0,dst_step2_y = 0;
 	int src_step1_x,src_step1_y,src_step2_x,src_step2_y;
 	int ax = _ax;
@@ -681,8 +739,8 @@ static void ptn( device_t *device, int opcode, int src_x, int src_y, INT16 _ax, 
 	int ax_neg; //,ay_neg;
 	int xxs = src_x;
 	int yys = src_y;
-	int xxd = hd63484->cpx;
-	int yyd = hd63484->cpy;
+	int xxd = m_cpx;
+	int yyd = m_cpy;
 	int getpixel;
 
 	if (ax < 0)
@@ -727,22 +785,22 @@ static void ptn( device_t *device, int opcode, int src_x, int src_y, INT16 _ax, 
 	{
 		for (;;)
 		{
-			getpixel = get_pixel_ptn(device, xxs, yys);
+			getpixel = get_pixel_ptn(xxs, yys);
 			switch ((opcode & 0x0018) >> 3)
 			{
 				case 0x0000:
 					if (getpixel)
-						dot(device, xxd, yyd, opcode & 0x0007, hd63484->cl1);
+						dot(xxd, yyd, opcode & 0x0007, m_cl1);
 					else
-						dot(device, xxd, yyd, opcode & 0x0007, hd63484->cl0);
+						dot(xxd, yyd, opcode & 0x0007, m_cl0);
 					break;
 				case 0x0001:
 					if (getpixel)
-						dot(device, xxd, yyd, opcode & 0x0007, hd63484->cl1);
+						dot(xxd, yyd, opcode & 0x0007, m_cl1);
 					break;
 				case 0x0002:
 					if (getpixel == 0)
-						dot(device, xxd, yyd, opcode & 0x0007, hd63484->cl0);
+						dot(xxd, yyd, opcode & 0x0007, m_cl0);
 					break;
 				case 0x0003:
 					logerror("PTN: not supported");
@@ -838,9 +896,8 @@ static void ptn( device_t *device, int opcode, int src_x, int src_y, INT16 _ax, 
 	}
 }
 
-static void line( device_t *device, INT16 sx, INT16 sy, INT16 ex, INT16 ey, INT16 col )
+void hd63484_device::line( INT16 sx, INT16 sy, INT16 ex, INT16 ey, INT16 col )
 {
-	hd63484_state *hd63484 = get_safe_token(device);
 	INT16 ax,ay;
 
 	int cpx_t = sx;
@@ -853,7 +910,7 @@ static void line( device_t *device, INT16 sx, INT16 sy, INT16 ex, INT16 ey, INT1
 	{
 		while (ax)
 		{
-			dot(device, cpx_t, cpy_t, col & 7, hd63484->cl0);
+			dot(cpx_t, cpy_t, col & 7, m_cl0);
 
 			if (ax > 0)
 			{
@@ -872,7 +929,7 @@ static void line( device_t *device, INT16 sx, INT16 sy, INT16 ex, INT16 ey, INT1
 	{
 		while (ay)
 		{
-			dot(device, cpx_t, cpy_t, col & 7, hd63484->cl0);
+			dot(cpx_t, cpy_t, col & 7, m_cl0);
 
 			if (ay > 0)
 			{
@@ -890,27 +947,25 @@ static void line( device_t *device, INT16 sx, INT16 sy, INT16 ex, INT16 ey, INT1
 
 }
 
-static void circle( device_t *device, INT16 sx, INT16 sy, UINT16 r, INT16 col )
+void hd63484_device::circle( INT16 sx, INT16 sy, UINT16 r, INT16 col )
 {
 	const float DEG2RAD = 3.14159f/180;
-	hd63484_state *hd63484 = get_safe_token(device);
 	int i;
 
 	for (i = 0; i < 360 * (r / 10); i++)
 	{
 		float degInRad = i * DEG2RAD / (r / 10);
-		dot(device, sx + cos(degInRad) * r,sy + sin(degInRad) * r, col & 7, hd63484->cl0);
+		dot(sx + cos(degInRad) * r,sy + sin(degInRad) * r, col & 7, m_cl0);
 	}
 }
 
-static void paint( device_t *device, int sx, int sy, int col )
+void hd63484_device::paint( int sx, int sy, int col )
 {
-	hd63484_state *hd63484 = get_safe_token(device);
 	int getpixel;
-	dot(device, sx, sy, 0, col);
+	dot(sx, sy, 0, col);
 
-	getpixel = get_pixel(device, sx+1,sy);
-	switch ((hd63484->reg[0x02/2] & 0x700) >> 8)
+	getpixel = get_pixel(sx+1,sy);
+	switch ((m_reg[0x02/2] & 0x700) >> 8)
 	{
 		case 0:
 			break;
@@ -928,15 +983,15 @@ static void paint( device_t *device, int sx, int sy, int col )
 		default:
 			logerror ("Graphic bit mode not supported\n");
 	}
-	if ((getpixel != col) && (getpixel != hd63484->edg))
+	if ((getpixel != col) && (getpixel != m_edg))
 		{
 			sx++;
-			paint(device, sx, sy, col);
+			paint(sx, sy, col);
 			sx--;
 		}
 
-	getpixel = get_pixel(device, sx - 1, sy);
-	switch ((hd63484->reg[0x02/2] & 0x700) >> 8)
+	getpixel = get_pixel(sx - 1, sy);
+	switch ((m_reg[0x02/2] & 0x700) >> 8)
 	{
 		case 0:
 			break;
@@ -954,15 +1009,15 @@ static void paint( device_t *device, int sx, int sy, int col )
 		default:
 			logerror ("Graphic bit mode not supported\n");
 	}
-	if ((getpixel != col) && (getpixel != hd63484->edg))
+	if ((getpixel != col) && (getpixel != m_edg))
 		{
 			sx--;
-			paint(device, sx, sy, col);
+			paint(sx, sy, col);
 			sx++;
 		}
 
-	getpixel = get_pixel(device, sx, sy + 1);
-	switch ((hd63484->reg[0x02/2] & 0x700) >> 8)
+	getpixel = get_pixel(sx, sy + 1);
+	switch ((m_reg[0x02/2] & 0x700) >> 8)
 	{
 		case 0:
 			break;
@@ -980,15 +1035,15 @@ static void paint( device_t *device, int sx, int sy, int col )
 		default:
 			logerror ("Graphic bit mode not supported\n");
 	}
-	if ((getpixel != col) && (getpixel != hd63484->edg))
+	if ((getpixel != col) && (getpixel != m_edg))
 		{
 			sy++;
-			paint(device, sx, sy, col);
+			paint(sx, sy, col);
 			sy--;
 		}
 
-	getpixel = get_pixel(device, sx, sy - 1);
-	switch ((hd63484->reg[0x02/2] & 0x700) >> 8)
+	getpixel = get_pixel(sx, sy - 1);
+	switch ((m_reg[0x02/2] & 0x700) >> 8)
 	{
 		case 0:
 			break;
@@ -1006,302 +1061,301 @@ static void paint( device_t *device, int sx, int sy, int col )
 		default:
 			logerror ("Graphic bit mode not supported\n");
 	}
-	if ((getpixel != col) && (getpixel != hd63484->edg))
+	if ((getpixel != col) && (getpixel != m_edg))
 		{
 			sy--;
-			paint(device, sx, sy, col);
+			paint(sx, sy, col);
 			sy++;
 		}
 }
 
-static void hd63484_command_w(device_t *device, UINT16 cmd)
+void hd63484_device::command_w(UINT16 cmd)
 {
-	hd63484_state *hd63484 = get_safe_token(device);
 	int len;
 
-	hd63484->fifo[hd63484->fifo_counter++] = cmd;
+	m_fifo[m_fifo_counter++] = cmd;
 
-	len = instruction_length[hd63484->fifo[0] >> 10];
+	len = instruction_length[m_fifo[0] >> 10];
 	if (len == -1)
 	{
-		if (hd63484->fifo_counter < 2) return;
-		else len = hd63484->fifo[1] + 2;
+		if (m_fifo_counter < 2) return;
+		else len = m_fifo[1] + 2;
 	}
 	else if (len == -2)
 	{
-		if (hd63484->fifo_counter < 2) return;
-		else len = 2 * hd63484->fifo[1] + 2;
+		if (m_fifo_counter < 2) return;
+		else len = 2 * m_fifo[1] + 2;
 	}
 
-	if (hd63484->fifo_counter >= len)
+	if (m_fifo_counter >= len)
 	{
 #if LOG_COMMANDS
 		int i;
 
-		logerror("%s: HD63484 command %s (%04x) ", device->machine().describe_context(), instruction_name[hd63484->fifo[0] >> 10], hd63484->fifo[0]);
-		for (i = 1; i < hd63484->fifo_counter; i++)
-			logerror("%04x ", hd63484->fifo[i]);
+		logerror("%s: HD63484 command %s (%04x) ", machine().describe_context(), instruction_name[m_fifo[0] >> 10], m_fifo[0]);
+		for (i = 1; i < m_fifo_counter; i++)
+			logerror("%04x ", m_fifo[i]);
 		logerror("\n");
 #endif
 
-		if (hd63484->fifo[0] == 0x0400) { /* ORG */
-			hd63484->org = ((hd63484->fifo[1] & 0x00ff) << 12) | ((hd63484->fifo[2] & 0xfff0) >> 4);
-			hd63484->org_dpd = hd63484->fifo[2] & 0x000f;
+		if (m_fifo[0] == 0x0400) { /* ORG */
+			m_org = ((m_fifo[1] & 0x00ff) << 12) | ((m_fifo[2] & 0xfff0) >> 4);
+			m_org_dpd = m_fifo[2] & 0x000f;
 		}
-		else if ((hd63484->fifo[0] & 0xffe0) == 0x0800) /* WPR */
+		else if ((m_fifo[0] & 0xffe0) == 0x0800) /* WPR */
 		{
-			if (hd63484->fifo[0] == 0x0800)
-				hd63484->cl0 = hd63484->fifo[1];
-			else if (hd63484->fifo[0] == 0x0801)
-				hd63484->cl1 = hd63484->fifo[1];
-			else if (hd63484->fifo[0] == 0x0802)
-				hd63484->ccmp = hd63484->fifo[1];
-			else if (hd63484->fifo[0] == 0x0803)
-				hd63484->edg = hd63484->fifo[1];
-			else if (hd63484->fifo[0] == 0x0804)
-				hd63484->mask = hd63484->fifo[1];
-			else if (hd63484->fifo[0] == 0x0805)
+			if (m_fifo[0] == 0x0800)
+				m_cl0 = m_fifo[1];
+			else if (m_fifo[0] == 0x0801)
+				m_cl1 = m_fifo[1];
+			else if (m_fifo[0] == 0x0802)
+				m_ccmp = m_fifo[1];
+			else if (m_fifo[0] == 0x0803)
+				m_edg = m_fifo[1];
+			else if (m_fifo[0] == 0x0804)
+				m_mask = m_fifo[1];
+			else if (m_fifo[0] == 0x0805)
 				{
-					hd63484->ppy  = (hd63484->fifo[1] & 0xf000) >> 12;
-					hd63484->pzcy = (hd63484->fifo[1] & 0x0f00) >> 8;
-					hd63484->ppx  = (hd63484->fifo[1] & 0x00f0) >> 4;
-					hd63484->pzcx = (hd63484->fifo[1] & 0x000f) >> 0;
+					m_ppy  = (m_fifo[1] & 0xf000) >> 12;
+					m_pzcy = (m_fifo[1] & 0x0f00) >> 8;
+					m_ppx  = (m_fifo[1] & 0x00f0) >> 4;
+					m_pzcx = (m_fifo[1] & 0x000f) >> 0;
 				}
-			else if (hd63484->fifo[0] == 0x0806)
+			else if (m_fifo[0] == 0x0806)
 				{
-					hd63484->psy  = (hd63484->fifo[1] & 0xf000) >> 12;
-					hd63484->psx  = (hd63484->fifo[1] & 0x00f0) >> 4;
+					m_psy  = (m_fifo[1] & 0xf000) >> 12;
+					m_psx  = (m_fifo[1] & 0x00f0) >> 4;
 				}
-			else if (hd63484->fifo[0] == 0x0807)
+			else if (m_fifo[0] == 0x0807)
 				{
-					hd63484->pey  = (hd63484->fifo[1] & 0xf000) >> 12;
-					hd63484->pzy  = (hd63484->fifo[1] & 0x0f00) >> 8;
-					hd63484->pex  = (hd63484->fifo[1] & 0x00f0) >> 4;
-					hd63484->pzx  = (hd63484->fifo[1] & 0x000f) >> 0;
+					m_pey  = (m_fifo[1] & 0xf000) >> 12;
+					m_pzy  = (m_fifo[1] & 0x0f00) >> 8;
+					m_pex  = (m_fifo[1] & 0x00f0) >> 4;
+					m_pzx  = (m_fifo[1] & 0x000f) >> 0;
 				}
-			else if (hd63484->fifo[0] == 0x0808)
-				hd63484->xmin = hd63484->fifo[1];
-			else if (hd63484->fifo[0] == 0x0809)
-				hd63484->ymin = hd63484->fifo[1];
-			else if (hd63484->fifo[0] == 0x080a)
-				hd63484->xmax = hd63484->fifo[1];
-			else if (hd63484->fifo[0] == 0x080b)
-				hd63484->ymax = hd63484->fifo[1];
-			else if (hd63484->fifo[0] == 0x080c)
+			else if (m_fifo[0] == 0x0808)
+				m_xmin = m_fifo[1];
+			else if (m_fifo[0] == 0x0809)
+				m_ymin = m_fifo[1];
+			else if (m_fifo[0] == 0x080a)
+				m_xmax = m_fifo[1];
+			else if (m_fifo[0] == 0x080b)
+				m_ymax = m_fifo[1];
+			else if (m_fifo[0] == 0x080c)
 				{
-					hd63484->rwp = (hd63484->rwp & 0x00fff) | ((hd63484->fifo[1] & 0x00ff) << 12);
-					hd63484->rwp_dn = (hd63484->fifo[1] & 0xc000) >> 14;
+					m_rwp = (m_rwp & 0x00fff) | ((m_fifo[1] & 0x00ff) << 12);
+					m_rwp_dn = (m_fifo[1] & 0xc000) >> 14;
 				}
-			else if (hd63484->fifo[0] == 0x080d)
+			else if (m_fifo[0] == 0x080d)
 				{
-					hd63484->rwp = (hd63484->rwp & 0xff000) | ((hd63484->fifo[1] & 0xfff0) >> 4);
+					m_rwp = (m_rwp & 0xff000) | ((m_fifo[1] & 0xfff0) >> 4);
 				}
 			else
 				logerror("unsupported register\n");
 		}
-		else if ((hd63484->fifo[0] & 0xffe0) == 0x0c00) /* RPR */
+		else if ((m_fifo[0] & 0xffe0) == 0x0c00) /* RPR */
 		{
-			if (hd63484->fifo[0] == 0x0c00)
-				hd63484->fifo[1] = hd63484->cl0;
-			else if (hd63484->fifo[0] == 0x0c01)
-				hd63484->fifo[1] = hd63484->cl1;
-			else if (hd63484->fifo[0] == 0x0c02)
-				hd63484->fifo[1] = hd63484->ccmp;
-			else if (hd63484->fifo[0] == 0x0c03)
-				hd63484->fifo[1] = hd63484->edg;
-			else if (hd63484->fifo[0] == 0x0c04)
-				hd63484->fifo[1] = hd63484->mask;
-			else if (hd63484->fifo[0] == 0x0c05)
+			if (m_fifo[0] == 0x0c00)
+				m_fifo[1] = m_cl0;
+			else if (m_fifo[0] == 0x0c01)
+				m_fifo[1] = m_cl1;
+			else if (m_fifo[0] == 0x0c02)
+				m_fifo[1] = m_ccmp;
+			else if (m_fifo[0] == 0x0c03)
+				m_fifo[1] = m_edg;
+			else if (m_fifo[0] == 0x0c04)
+				m_fifo[1] = m_mask;
+			else if (m_fifo[0] == 0x0c05)
 				{
-					hd63484->fifo[1] = (hd63484->ppy << 12) | (hd63484->pzcy << 8) | (hd63484->ppx << 4) | hd63484->pzcx;
+					m_fifo[1] = (m_ppy << 12) | (m_pzcy << 8) | (m_ppx << 4) | m_pzcx;
 				}
-			else if (hd63484->fifo[0] == 0x0c06)
+			else if (m_fifo[0] == 0x0c06)
 				{
-					hd63484->fifo[1] = (hd63484->psx << 12) | (hd63484->psx << 4);
+					m_fifo[1] = (m_psx << 12) | (m_psx << 4);
 				}
-			else if (hd63484->fifo[0] == 0x0c07)
+			else if (m_fifo[0] == 0x0c07)
 				{
-					hd63484->fifo[1] = (hd63484->pey << 12) | (hd63484->pzy << 8) | (hd63484->pex << 4) | hd63484->pzx;
+					m_fifo[1] = (m_pey << 12) | (m_pzy << 8) | (m_pex << 4) | m_pzx;
 				}
-			else if (hd63484->fifo[0] == 0x0c08)
-				hd63484->fifo[1] = hd63484->xmin;
-			else if (hd63484->fifo[0] == 0x0c09)
-				hd63484->fifo[1] = hd63484->ymin;
-			else if (hd63484->fifo[0] == 0x0c0a)
-				hd63484->fifo[1] = hd63484->xmax;
-			else if (hd63484->fifo[0] == 0x0c0b)
-				hd63484->fifo[1] = hd63484->ymax;
-			else if (hd63484->fifo[0] == 0x0c0c)
+			else if (m_fifo[0] == 0x0c08)
+				m_fifo[1] = m_xmin;
+			else if (m_fifo[0] == 0x0c09)
+				m_fifo[1] = m_ymin;
+			else if (m_fifo[0] == 0x0c0a)
+				m_fifo[1] = m_xmax;
+			else if (m_fifo[0] == 0x0c0b)
+				m_fifo[1] = m_ymax;
+			else if (m_fifo[0] == 0x0c0c)
 				{
-					hd63484->fifo[1] = (hd63484->rwp_dn << 14) | ((hd63484->rwp >> 12) & 0xff);
+					m_fifo[1] = (m_rwp_dn << 14) | ((m_rwp >> 12) & 0xff);
 				}
-			else if (hd63484->fifo[0] == 0x0c0d)
+			else if (m_fifo[0] == 0x0c0d)
 				{
-					hd63484->fifo[1] = (hd63484->rwp & 0x0fff) << 4;
+					m_fifo[1] = (m_rwp & 0x0fff) << 4;
 				}
-			else if (hd63484->fifo[0] == 0x0c10)
+			else if (m_fifo[0] == 0x0c10)
 				{
 					// TODO
 				}
-			else if (hd63484->fifo[0] == 0x0c11)
+			else if (m_fifo[0] == 0x0c11)
 				{
 					// TODO
 				}
-			else if (hd63484->fifo[0] == 0x0c12)
+			else if (m_fifo[0] == 0x0c12)
 				{
-					hd63484->fifo[1] = hd63484->cpx;
+					m_fifo[1] = m_cpx;
 				}
-			else if (hd63484->fifo[0] == 0x0c13)
+			else if (m_fifo[0] == 0x0c13)
 				{
-					hd63484->fifo[1] = hd63484->cpy;
+					m_fifo[1] = m_cpy;
 				}
 			else
 				logerror("unsupported register\n");
 		}
-		else if ((hd63484->fifo[0] & 0xfff0) == 0x1800) /* WPTN */
+		else if ((m_fifo[0] & 0xfff0) == 0x1800) /* WPTN */
 		{
 			int i;
-			int start = hd63484->fifo[0] & 0x000f;
-			int n = hd63484->fifo[1];
+			int start = m_fifo[0] & 0x000f;
+			int n = m_fifo[1];
 			for (i = 0; i < n; i++)
-				hd63484->pattern[start + i] = hd63484->fifo[2 + i];
+				m_pattern[start + i] = m_fifo[2 + i];
 		}
-		else if (hd63484->fifo[0] == 0x4400)    /* RD */
+		else if (m_fifo[0] == 0x4400)    /* RD */
 		{
-			hd63484->readfifo = hd63484->ram[hd63484->rwp];
-			hd63484->rwp = (hd63484->rwp + 1) & (HD63484_RAM_SIZE - 1);
+			m_readfifo = m_ram[m_rwp];
+			m_rwp = (m_rwp + 1) & (HD63484_RAM_SIZE - 1);
 		}
-		else if (hd63484->fifo[0] == 0x4800)    /* WT */
+		else if (m_fifo[0] == 0x4800)    /* WT */
 		{
-			hd63484->ram[hd63484->rwp] = hd63484->fifo[1];
-			hd63484->rwp = (hd63484->rwp + 1) & (HD63484_RAM_SIZE - 1);
+			m_ram[m_rwp] = m_fifo[1];
+			m_rwp = (m_rwp + 1) & (HD63484_RAM_SIZE - 1);
 		}
-		else if (hd63484->fifo[0] == 0x5800)    /* CLR */
+		else if (m_fifo[0] == 0x5800)    /* CLR */
 		{
-			doclr16(device, hd63484->fifo[0], hd63484->fifo[1], &hd63484->rwp, hd63484->fifo[2], hd63484->fifo[3]);
+			doclr16(m_fifo[0], m_fifo[1], &m_rwp, m_fifo[2], m_fifo[3]);
 
 			{
-			int fifo2 = (int)hd63484->fifo[2], fifo3 = (int)hd63484->fifo[3];
+			int fifo2 = (int)m_fifo[2], fifo3 = (int)m_fifo[3];
 			if (fifo2 < 0) fifo2 *= -1;
 			if (fifo3 < 0) fifo3 *= -1;
-			hd63484->rwp += ((fifo2 + 1) * (fifo3 + 1));
+			m_rwp += ((fifo2 + 1) * (fifo3 + 1));
 			}
 
 		}
-		else if ((hd63484->fifo[0] & 0xfffc) == 0x5c00) /* SCLR */
+		else if ((m_fifo[0] & 0xfffc) == 0x5c00) /* SCLR */
 		{
-			doclr16(device, hd63484->fifo[0], hd63484->fifo[1], &hd63484->rwp, hd63484->fifo[2], hd63484->fifo[3]);
+			doclr16(m_fifo[0], m_fifo[1], &m_rwp, m_fifo[2], m_fifo[3]);
 
 			{
-				int fifo2 = (int)hd63484->fifo[2], fifo3 = (int)hd63484->fifo[3];
+				int fifo2 = (int)m_fifo[2], fifo3 = (int)m_fifo[3];
 				if (fifo2 < 0) fifo2 *= -1;
 				if (fifo3 < 0) fifo3 *= -1;
-				hd63484->rwp += ((fifo2 + 1) * (fifo3 + 1));
+				m_rwp += ((fifo2 + 1) * (fifo3 + 1));
 			}
 
 		}
-		else if ((hd63484->fifo[0] & 0xf0ff) == 0x6000) /* CPY */
+		else if ((m_fifo[0] & 0xf0ff) == 0x6000) /* CPY */
 		{
-			docpy16(device, hd63484->fifo[0], ((hd63484->fifo[1] & 0x00ff) << 12) | ((hd63484->fifo[2] & 0xfff0) >> 4), &hd63484->rwp, hd63484->fifo[3], hd63484->fifo[4]);
+			docpy16(m_fifo[0], ((m_fifo[1] & 0x00ff) << 12) | ((m_fifo[2] & 0xfff0) >> 4), &m_rwp, m_fifo[3], m_fifo[4]);
 
 			{
-				int fifo2 = (int)hd63484->fifo[2], fifo3 = (int)hd63484->fifo[3];
+				int fifo2 = (int)m_fifo[2], fifo3 = (int)m_fifo[3];
 				if (fifo2 < 0) fifo2 *= -1;
 				if (fifo3 < 0) fifo3 *= -1;
-				hd63484->rwp += ((fifo2 + 1) * (fifo3 + 1));
+				m_rwp += ((fifo2 + 1) * (fifo3 + 1));
 			}
 
 		}
-		else if ((hd63484->fifo[0] & 0xf0fc) == 0x7000) /* SCPY */
+		else if ((m_fifo[0] & 0xf0fc) == 0x7000) /* SCPY */
 		{
-			docpy16(device, hd63484->fifo[0], ((hd63484->fifo[1] & 0x00ff) << 12) | ((hd63484->fifo[2] & 0xfff0) >> 4), &hd63484->rwp, hd63484->fifo[3], hd63484->fifo[4]);
+			docpy16(m_fifo[0], ((m_fifo[1] & 0x00ff) << 12) | ((m_fifo[2] & 0xfff0) >> 4), &m_rwp, m_fifo[3], m_fifo[4]);
 
 			{
-				int fifo2 = (int)hd63484->fifo[2], fifo3 = (int)hd63484->fifo[3];
+				int fifo2 = (int)m_fifo[2], fifo3 = (int)m_fifo[3];
 				if (fifo2 < 0) fifo2 *= -1;
 				if (fifo3 < 0) fifo3 *= -1;
-				hd63484->rwp += ((fifo2 + 1) * (fifo3 + 1));
+				m_rwp += ((fifo2 + 1) * (fifo3 + 1));
 			}
 
 		}
-		else if (hd63484->fifo[0] == 0x8000)    /* AMOVE */
+		else if (m_fifo[0] == 0x8000)    /* AMOVE */
 		{
-			hd63484->cpx = hd63484->fifo[1];
-			hd63484->cpy = hd63484->fifo[2];
+			m_cpx = m_fifo[1];
+			m_cpy = m_fifo[2];
 		}
-		else if (hd63484->fifo[0] == 0x8400)    /* RMOVE */
+		else if (m_fifo[0] == 0x8400)    /* RMOVE */
 		{
-			hd63484->cpx += (INT16)hd63484->fifo[1];
-			hd63484->cpy += (INT16)hd63484->fifo[2];
+			m_cpx += (INT16)m_fifo[1];
+			m_cpy += (INT16)m_fifo[2];
 		}
-		else if ((hd63484->fifo[0] & 0xff00) == 0x8800) /* ALINE */
+		else if ((m_fifo[0] & 0xff00) == 0x8800) /* ALINE */
 		{
-			line(device, hd63484->cpx, hd63484->cpy, hd63484->fifo[1], hd63484->fifo[2], hd63484->fifo[0] & 0xff);
-			hd63484->cpx = (INT16)hd63484->fifo[1];
-			hd63484->cpy = (INT16)hd63484->fifo[2];
+			line(m_cpx, m_cpy, m_fifo[1], m_fifo[2], m_fifo[0] & 0xff);
+			m_cpx = (INT16)m_fifo[1];
+			m_cpy = (INT16)m_fifo[2];
 		}
-		else if ((hd63484->fifo[0] & 0xff00) == 0x8c00) /* RLINE */
+		else if ((m_fifo[0] & 0xff00) == 0x8c00) /* RLINE */
 		{
-			line(device, hd63484->cpx, hd63484->cpy, hd63484->cpx + (INT16)hd63484->fifo[1], hd63484->cpy + (INT16)hd63484->fifo[2], hd63484->fifo[0] & 0xff);
-			hd63484->cpx += (INT16)hd63484->fifo[1];
-			hd63484->cpy += (INT16)hd63484->fifo[2];
+			line(m_cpx, m_cpy, m_cpx + (INT16)m_fifo[1], m_cpy + (INT16)m_fifo[2], m_fifo[0] & 0xff);
+			m_cpx += (INT16)m_fifo[1];
+			m_cpy += (INT16)m_fifo[2];
 		}
-		else if ((hd63484->fifo[0] & 0xfff8) == 0x9000) /* ARCT */
+		else if ((m_fifo[0] & 0xfff8) == 0x9000) /* ARCT */
 		{
-			line(device, hd63484->cpx, hd63484->cpy, (INT16)hd63484->fifo[1], hd63484->cpy, hd63484->fifo[0] & 0xff);
-			line(device, (INT16)hd63484->fifo[1], hd63484->cpy, (INT16)hd63484->fifo[1], (INT16)hd63484->fifo[2], hd63484->fifo[0] & 0xff);
-			line(device, (INT16)hd63484->fifo[1], (INT16)hd63484->fifo[2], hd63484->cpx, (INT16)hd63484->fifo[2], hd63484->fifo[0] & 0xff);
-			line(device, hd63484->cpx, (INT16)hd63484->fifo[2], hd63484->cpx, hd63484->cpy, hd63484->fifo[0] & 0xff);
-			hd63484->cpx = (INT16)hd63484->fifo[1];
-			hd63484->cpy = (INT16)hd63484->fifo[2];
+			line(m_cpx, m_cpy, (INT16)m_fifo[1], m_cpy, m_fifo[0] & 0xff);
+			line((INT16)m_fifo[1], m_cpy, (INT16)m_fifo[1], (INT16)m_fifo[2], m_fifo[0] & 0xff);
+			line((INT16)m_fifo[1], (INT16)m_fifo[2], m_cpx, (INT16)m_fifo[2], m_fifo[0] & 0xff);
+			line(m_cpx, (INT16)m_fifo[2], m_cpx, m_cpy, m_fifo[0] & 0xff);
+			m_cpx = (INT16)m_fifo[1];
+			m_cpy = (INT16)m_fifo[2];
 		}
-		else if ((hd63484->fifo[0] & 0xfff8) == 0x9400) /* RRCT  added*/
+		else if ((m_fifo[0] & 0xfff8) == 0x9400) /* RRCT  added*/
 		{
-			line(device, hd63484->cpx, hd63484->cpy, hd63484->cpx + (INT16)hd63484->fifo[1], hd63484->cpy, hd63484->fifo[0] & 0xff);
-			line(device, hd63484->cpx + (INT16)hd63484->fifo[1], hd63484->cpy, hd63484->cpx + (INT16)hd63484->fifo[1], hd63484->cpy + (INT16)hd63484->fifo[2], hd63484->fifo[0] & 0xff);
-			line(device, hd63484->cpx + (INT16)hd63484->fifo[1], hd63484->cpy + (INT16)hd63484->fifo[2], hd63484->cpx, hd63484->cpy + (INT16)hd63484->fifo[2], hd63484->fifo[0] & 0xff);
-			line(device, hd63484->cpx, hd63484->cpy + (INT16)hd63484->fifo[2], hd63484->cpx, hd63484->cpy, hd63484->fifo[0] & 0xff);
+			line(m_cpx, m_cpy, m_cpx + (INT16)m_fifo[1], m_cpy, m_fifo[0] & 0xff);
+			line(m_cpx + (INT16)m_fifo[1], m_cpy, m_cpx + (INT16)m_fifo[1], m_cpy + (INT16)m_fifo[2], m_fifo[0] & 0xff);
+			line(m_cpx + (INT16)m_fifo[1], m_cpy + (INT16)m_fifo[2], m_cpx, m_cpy + (INT16)m_fifo[2], m_fifo[0] & 0xff);
+			line(m_cpx, m_cpy + (INT16)m_fifo[2], m_cpx, m_cpy, m_fifo[0] & 0xff);
 
-			hd63484->cpx += (INT16)hd63484->fifo[1];
-			hd63484->cpy += (INT16)hd63484->fifo[2];
+			m_cpx += (INT16)m_fifo[1];
+			m_cpy += (INT16)m_fifo[2];
 		}
-		else if ((hd63484->fifo[0] & 0xfff8) == 0xa400) /* RPLG  added*/
+		else if ((m_fifo[0] & 0xfff8) == 0xa400) /* RPLG  added*/
 		{
 			int nseg, sx, sy, ex, ey;
-			sx = hd63484->cpx;
-			sy = hd63484->cpy;
-			for (nseg = 0; nseg < hd63484->fifo[1]; nseg++)
+			sx = m_cpx;
+			sy = m_cpy;
+			for (nseg = 0; nseg < m_fifo[1]; nseg++)
 			{
-				ex = sx + (INT16)hd63484->fifo[2 + nseg * 2];
-				ey = sy + (INT16)hd63484->fifo[2 + nseg * 2 + 1];
-				line(device, sx, sy, ex, ey, hd63484->fifo[0] & 7);
+				ex = sx + (INT16)m_fifo[2 + nseg * 2];
+				ey = sy + (INT16)m_fifo[2 + nseg * 2 + 1];
+				line(sx, sy, ex, ey, m_fifo[0] & 7);
 				sx = ex;
 				sy = ey;
 			}
-			line(device, sx, sy, hd63484->cpx, hd63484->cpy, hd63484->fifo[0] & 7);
+			line(sx, sy, m_cpx, m_cpy, m_fifo[0] & 7);
 		}
-		else if ((hd63484->fifo[0] & 0xfe00) == 0xa800) /* CRCL  added*/
+		else if ((m_fifo[0] & 0xfe00) == 0xa800) /* CRCL  added*/
 		{
-			circle(device, hd63484->cpx, hd63484->cpy, hd63484->fifo[1] & 0x1fff, hd63484->fifo[0] & 7); // only 13 bit are used for the radius
+			circle(m_cpx, m_cpy, m_fifo[1] & 0x1fff, m_fifo[0] & 7); // only 13 bit are used for the radius
 		}
-		else if ((hd63484->fifo[0] & 0xfff8) == 0xc000) /* AFRCT */
+		else if ((m_fifo[0] & 0xfff8) == 0xc000) /* AFRCT */
 		{
 			INT16 pcx, pcy;
 			INT16 ax, ay, xx, yy;
 
 
-			pcx = hd63484->fifo[1];
-			pcy = hd63484->fifo[2];
-			ax = pcx - hd63484->cpx;
-			ay = pcy - hd63484->cpy;
-			xx = hd63484->cpx;
-			yy = hd63484->cpy;
+			pcx = m_fifo[1];
+			pcy = m_fifo[2];
+			ax = pcx - m_cpx;
+			ay = pcy - m_cpy;
+			xx = m_cpx;
+			yy = m_cpy;
 
 			for (;;)
 			{
 				for (;;)
 				{
-					dot(device, xx, yy, hd63484->fifo[0] & 0x07, hd63484->cl0);
+					dot(xx, yy, m_fifo[0] & 0x07, m_cl0);
 
 					if (ax == 0) break;
 					else if (ax > 0)
@@ -1316,8 +1370,8 @@ static void hd63484_command_w(device_t *device, UINT16 cmd)
 					}
 				}
 
-				ax = pcx - hd63484->cpx;
-				if (pcy < hd63484->cpy)
+				ax = pcx - m_cpx;
+				if (pcy < m_cpy)
 				{
 					yy--;
 					xx -= ax;
@@ -1333,63 +1387,63 @@ static void hd63484_command_w(device_t *device, UINT16 cmd)
 				}
 			}
 		}
-		else if ((hd63484->fifo[0] & 0xfff8) == 0xc400) /* RFRCT  added TODO*/
+		else if ((m_fifo[0] & 0xfff8) == 0xc400) /* RFRCT  added TODO*/
 		{
-			line(device, hd63484->cpx, hd63484->cpy, hd63484->cpx + (INT16)hd63484->fifo[1], hd63484->cpy, hd63484->fifo[0] & 0xff);
-			line(device, hd63484->cpx + hd63484->fifo[1], hd63484->cpy, hd63484->cpx + hd63484->fifo[1], hd63484->cpy + hd63484->fifo[2], hd63484->fifo[0] & 0xff);
-			line(device, hd63484->cpx + hd63484->fifo[1], hd63484->cpy + hd63484->fifo[2], hd63484->cpx, hd63484->cpy + hd63484->fifo[2], hd63484->fifo[0] & 0xff);
-			line(device, hd63484->cpx, hd63484->cpy + hd63484->fifo[2], hd63484->cpx, hd63484->cpy, hd63484->fifo[0] & 0xff);
+			line(m_cpx, m_cpy, m_cpx + (INT16)m_fifo[1], m_cpy, m_fifo[0] & 0xff);
+			line(m_cpx + m_fifo[1], m_cpy, m_cpx + m_fifo[1], m_cpy + m_fifo[2], m_fifo[0] & 0xff);
+			line(m_cpx + m_fifo[1], m_cpy + m_fifo[2], m_cpx, m_cpy + m_fifo[2], m_fifo[0] & 0xff);
+			line(m_cpx, m_cpy + m_fifo[2], m_cpx, m_cpy, m_fifo[0] & 0xff);
 
-			hd63484->cpx = hd63484->cpx + (INT16)hd63484->fifo[1];
-			hd63484->cpy = hd63484->cpy + (INT16)hd63484->fifo[2];
+			m_cpx = m_cpx + (INT16)m_fifo[1];
+			m_cpy = m_cpy + (INT16)m_fifo[2];
 		}
-		else if (hd63484->fifo[0] == 0xc800)    /* PAINT */
+		else if (m_fifo[0] == 0xc800)    /* PAINT */
 		{
-			paint(device, hd63484->cpx, hd63484->cpy, hd63484->cl0);
+			paint(m_cpx, m_cpy, m_cl0);
 		}
-		else if ((hd63484->fifo[0] & 0xfff8) == 0xcc00) /* DOT */
+		else if ((m_fifo[0] & 0xfff8) == 0xcc00) /* DOT */
 		{
-			dot(device, hd63484->cpx, hd63484->cpy, hd63484->fifo[0] & 0xff, hd63484->cl0);
+			dot(m_cpx, m_cpy, m_fifo[0] & 0xff, m_cl0);
 		}
-		else if ((hd63484->fifo[0] & 0xf000) == 0xd000) /* PTN (to do) */
+		else if ((m_fifo[0] & 0xf000) == 0xd000) /* PTN (to do) */
 		{
-			ptn(device, hd63484->fifo[0], hd63484->psx, hd63484->psy, hd63484->pex - hd63484->psx, hd63484->pey - hd63484->psy);
+			ptn(m_fifo[0], m_psx, m_psy, m_pex - m_psx, m_pey - m_psy);
 
-			if ((hd63484->fifo[0] & 0x0800) == 0x0000)
-				switch (hd63484->fifo[0] & 0x0700)
+			if ((m_fifo[0] & 0x0800) == 0x0000)
+				switch (m_fifo[0] & 0x0700)
 				{
 					case 0x0000:
-						if ((hd63484->pey - hd63484->psy) > 0)
-							hd63484->cpy += (hd63484->pey - hd63484->psy);
+						if ((m_pey - m_psy) > 0)
+							m_cpy += (m_pey - m_psy);
 						else
-							hd63484->cpy -= (hd63484->pey - hd63484->psy);
+							m_cpy -= (m_pey - m_psy);
 						break;
 					case 0x0100:
 						// missing
 						break;
 					case 0x0200:
-						if ((hd63484->pey - hd63484->psy) > 0)
-							hd63484->cpx += (hd63484->pey - hd63484->psy);
+						if ((m_pey - m_psy) > 0)
+							m_cpx += (m_pey - m_psy);
 						else
-							hd63484->cpx -= (hd63484->pey - hd63484->psy);
+							m_cpx -= (m_pey - m_psy);
 						break;
 					case 0x0300:
 						// missing
 						break;
 					case 0x0400:
-						if ((hd63484->pey - hd63484->psy) > 0)
-							hd63484->cpy -= (hd63484->pey - hd63484->psy);
+						if ((m_pey - m_psy) > 0)
+							m_cpy -= (m_pey - m_psy);
 						else
-							hd63484->cpy += (hd63484->pey - hd63484->psy);
+							m_cpy += (m_pey - m_psy);
 						break;
 					case 0x0500:
 						// missing
 						break;
 					case 0x0600:
-						if ((hd63484->pey - hd63484->psy) > 0)
-							hd63484->cpx -= (hd63484->pey - hd63484->psy);
+						if ((m_pey - m_psy) > 0)
+							m_cpx -= (m_pey - m_psy);
 						else
-							hd63484->cpx += (hd63484->pey - hd63484->psy);
+							m_cpx += (m_pey - m_psy);
 						break;
 					case 0x0700:
 						// missing
@@ -1400,127 +1454,122 @@ static void hd63484_command_w(device_t *device, UINT16 cmd)
 					// missing
 				}
 		}
-		else if ((hd63484->fifo[0] & 0xf018) == 0xe000) /* agcpy */
+		else if ((m_fifo[0] & 0xf018) == 0xe000) /* agcpy */
 		{
-			agcpy(device, hd63484->fifo[0], (INT16)hd63484->fifo[1], (INT16)hd63484->fifo[2], hd63484->cpx, hd63484->cpy, hd63484->fifo[3], hd63484->fifo[4]);
+			agcpy(m_fifo[0], (INT16)m_fifo[1], (INT16)m_fifo[2], m_cpx, m_cpy, m_fifo[3], m_fifo[4]);
 
-			switch (hd63484->fifo[0] & 0x0700)
+			switch (m_fifo[0] & 0x0700)
 			{
 				case 0x0000:
-					if (hd63484->fifo[4] > 0)
-						hd63484->cpy += hd63484->fifo[4];
+					if (m_fifo[4] > 0)
+						m_cpy += m_fifo[4];
 					else
-						hd63484->cpy -= hd63484->fifo[4];
+						m_cpy -= m_fifo[4];
 					break;
 				case 0x0100:
-					if (hd63484->fifo[4] > 0)
-						hd63484->cpy -= hd63484->fifo[4];
+					if (m_fifo[4] > 0)
+						m_cpy -= m_fifo[4];
 					else
-						hd63484->cpy += hd63484->fifo[4];
+						m_cpy += m_fifo[4];
 					break;
 				case 0x0200:
-					if (hd63484->fifo[4] > 0)
-						hd63484->cpy += hd63484->fifo[4];
+					if (m_fifo[4] > 0)
+						m_cpy += m_fifo[4];
 					else
-						hd63484->cpy -= hd63484->fifo[4];
+						m_cpy -= m_fifo[4];
 					break;
 				case 0x0300:
-					if (hd63484->fifo[4] > 0)
-						hd63484->cpy -= hd63484->fifo[4];
+					if (m_fifo[4] > 0)
+						m_cpy -= m_fifo[4];
 					else
-						hd63484->cpy += hd63484->fifo[4];
+						m_cpy += m_fifo[4];
 					break;
 				case 0x0400:
-					if (hd63484->fifo[3] > 0)
-						hd63484->cpx += hd63484->fifo[3];
+					if (m_fifo[3] > 0)
+						m_cpx += m_fifo[3];
 					else
-						hd63484->cpx -= hd63484->fifo[3];
+						m_cpx -= m_fifo[3];
 					break;
 				case 0x0500:
-					if (hd63484->fifo[3] > 0)
-						hd63484->cpx += hd63484->fifo[3];
+					if (m_fifo[3] > 0)
+						m_cpx += m_fifo[3];
 					else
-						hd63484->cpx -= hd63484->fifo[3];
+						m_cpx -= m_fifo[3];
 					break;
 				case 0x0600:
-					if (hd63484->fifo[3] > 0)
-						hd63484->cpx -= hd63484->fifo[3];
+					if (m_fifo[3] > 0)
+						m_cpx -= m_fifo[3];
 					else
-						hd63484->cpx += hd63484->fifo[3];
+						m_cpx += m_fifo[3];
 					break;
 				case 0x0700:
-					if (hd63484->fifo[3] > 0)
-						hd63484->cpx -= hd63484->fifo[3];
+					if (m_fifo[3] > 0)
+						m_cpx -= m_fifo[3];
 					else
-						hd63484->cpx += hd63484->fifo[3];
+						m_cpx += m_fifo[3];
 					break;
 			}
 		}
 		else
 		{
 			logerror("unsupported command\n");
-			popmessage("unsupported command %s (%04x)", instruction_name[hd63484->fifo[0] >> 10], hd63484->fifo[0]);
+			popmessage("unsupported command %s (%04x)", instruction_name[m_fifo[0] >> 10], m_fifo[0]);
 		}
 
-		hd63484->fifo_counter = 0;
+		m_fifo_counter = 0;
 	}
 }
 
-READ16_DEVICE_HANDLER( hd63484_status_r )
+READ16_MEMBER( hd63484_device::status_r )
 {
 //  if (space.device().safe_pc() != 0xfced6 && space.device().safe_pc() != 0xfe1d6)
 //      logerror("%05x: HD63484 status read\n",space.device().safe_pc());
 
-	return 0xff22 | (device->machine().rand() & 0x0004);    /* write FIFO ready + command end    +  (read FIFO ready or read FIFO not ready) */
+	return 0xff22 | (machine().rand() & 0x0004);    /* write FIFO ready + command end    +  (read FIFO ready or read FIFO not ready) */
 }
 
-WRITE16_DEVICE_HANDLER( hd63484_address_w )
+WRITE16_MEMBER( hd63484_device::address_w )
 {
-	hd63484_state *hd63484 = get_safe_token(device);
-
 	/* only low 8 bits are used */
 	if (ACCESSING_BITS_0_7)
-		hd63484->regno = data;
+		m_regno = data;
 }
 
-WRITE16_DEVICE_HANDLER( hd63484_data_w )
+WRITE16_MEMBER( hd63484_device::data_w )
 {
-	hd63484_state *hd63484 = get_safe_token(device);
+	COMBINE_DATA(&m_reg[m_regno/2]);
 
-	COMBINE_DATA(&hd63484->reg[hd63484->regno/2]);
+	if (m_skattva_hack)
+		m_reg[2/2] = (m_reg[2/2] & 0xf8ff) | 0x0200; // hack to set proper color depth in skattva
 
-	if (hd63484->skattva_hack)
-		hd63484->reg[2/2] = (hd63484->reg[2/2] & 0xf8ff) | 0x0200; // hack to set proper color depth in skattva
-
-	if (hd63484->regno & 0x80)
-		hd63484->regno += 2;    /* autoincrement */
+	if (m_regno & 0x80)
+		m_regno += 2;    /* autoincrement */
 
 #if LOG_COMMANDS
-//  logerror("PC %05x: HD63484 register %02x write %04x\n", space.device().safe_pc(), hd63484->regno, hd63484->reg[hd63484->regno/2]);
+//  logerror("PC %05x: HD63484 register %02x write %04x\n", space.device().safe_pc(), m_regno, m_reg[m_regno/2]);
 #endif
 
-	if (hd63484->regno == 0)    /* FIFO */
-		hd63484_command_w(device, hd63484->reg[0]);
+	if (m_regno == 0)    /* FIFO */
+		command_w(m_reg[0]);
 }
 
-READ16_DEVICE_HANDLER( hd63484_data_r )
+READ16_MEMBER( hd63484_device::data_r )
 {
-	hd63484_state *hd63484 = get_safe_token(device);
 	int res;
 
-	if (hd63484->regno == 0x80)
-		res = device->machine().primary_screen->vpos();
-	else if (hd63484->regno == 0)
+	if (m_regno == 0x80)
+		res = machine().primary_screen->vpos();
+	else if (m_regno == 0)
 	{
 #if LOG_COMMANDS
 //      logerror("%05x: HD63484 read FIFO\n", space.device().safe_pc());
 #endif
-		res = hd63484->readfifo;
+		res = m_readfifo;
 	}
 	else
 	{
 #if LOG_COMMANDS
-//      logerror("%05x: HD63484 read register %02x\n", space.device().safe_pc(), hd63484->regno);
+//      logerror("%05x: HD63484 read register %02x\n", space.device().safe_pc(), m_regno);
 #endif
 		res = 0;
 	}
@@ -1528,87 +1577,22 @@ READ16_DEVICE_HANDLER( hd63484_data_r )
 	return res;
 }
 
-READ16_DEVICE_HANDLER( hd63484_ram_r )
+READ16_MEMBER( hd63484_device::ram_r )
 {
-	hd63484_state *hd63484 = get_safe_token(device);
-
-	return hd63484->ram[offset];
+	return m_ram[offset];
 }
 
-READ16_DEVICE_HANDLER( hd63484_regs_r )
+READ16_MEMBER( hd63484_device::regs_r )
 {
-	hd63484_state *hd63484 = get_safe_token(device);
-
-	return hd63484->reg[offset];
+	return m_reg[offset];
 }
 
-WRITE16_DEVICE_HANDLER( hd63484_ram_w )
+WRITE16_MEMBER( hd63484_device::ram_w )
 {
-	hd63484_state *hd63484 = get_safe_token(device);
-
-	COMBINE_DATA(&hd63484->ram[offset]);
+	COMBINE_DATA(&m_ram[offset]);
 }
 
-WRITE16_DEVICE_HANDLER( hd63484_regs_w )
+WRITE16_MEMBER( hd63484_device::regs_w )
 {
-	hd63484_state *hd63484 = get_safe_token(device);
-
-	COMBINE_DATA(&hd63484->reg[offset]);
-}
-
-
-static DEVICE_START( hd63484 )
-{
-	hd63484_state *hd63484 = get_safe_token(device);
-	const hd63484_interface *intf = get_interface(device);
-
-	hd63484->skattva_hack = intf->skattva_hack;
-	hd63484->ram = auto_alloc_array_clear(device->machine(), UINT16, HD63484_RAM_SIZE);
-
-//  device->save_item(NAME(hd63484->clear_bitmap));
-//  device->save_pointer(NAME(hd63484->spriteram), 0x1000);
-//  device->save_item(NAME(*hd63484->sprites_bitmap));
-}
-
-static DEVICE_RESET( hd63484 )
-{
-	hd63484_state *hd63484 = get_safe_token(device);
-
-	hd63484->fifo_counter = 0;
-}
-
-const device_type HD63484 = &device_creator<hd63484_device>;
-
-hd63484_device::hd63484_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, HD63484, "HD63484", tag, owner, clock, "hd63484", __FILE__)
-{
-	m_token = global_alloc_clear(hd63484_state);
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void hd63484_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void hd63484_device::device_start()
-{
-	DEVICE_START_NAME( hd63484 )(this);
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void hd63484_device::device_reset()
-{
-	DEVICE_RESET_NAME( hd63484 )(this);
+	COMBINE_DATA(&m_reg[offset]);
 }

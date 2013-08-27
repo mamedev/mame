@@ -137,7 +137,8 @@ class sigmab52_state : public driver_device
 public:
 	sigmab52_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_hd63484(*this, "hd63484") { }
 
 	int m_latch;
 	unsigned int m_acrtc_data;
@@ -153,6 +154,7 @@ public:
 	UINT32 screen_update_jwildb52(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(timer_irq);
 	required_device<cpu_device> m_maincpu;
+	required_device<hd63484_device> m_hd63484;
 };
 
 
@@ -170,12 +172,10 @@ void sigmab52_state::video_start()
 
 UINT32 sigmab52_state::screen_update_jwildb52(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	device_t *hd63484 = machine().device("hd63484");
-
 	int x, y, b, src;
 
 	address_space &space = machine().driver_data()->generic_space();
-	b = ((hd63484_regs_r(hd63484, space, 0xcc/2, 0xffff) & 0x000f) << 16) + hd63484_regs_r(hd63484, space, 0xce/2, 0xffff);
+	b = ((m_hd63484->regs_r(space, 0xcc/2, 0xffff) & 0x000f) << 16) + m_hd63484->regs_r(space, 0xce/2, 0xffff);
 
 //save vram to file
 #if 0
@@ -190,9 +190,9 @@ UINT32 sigmab52_state::screen_update_jwildb52(screen_device &screen, bitmap_ind1
 
 	for (y = 0; y < 480; y++)
 	{
-		for (x = 0; x < (hd63484_regs_r(hd63484, space, 0xca/2, 0xffff) & 0x0fff) * 4; x += 4)
+		for (x = 0; x < (m_hd63484->regs_r(space, 0xca/2, 0xffff) & 0x0fff) * 4; x += 4)
 		{
-			src = hd63484_ram_r(hd63484, space, b & (HD63484_RAM_SIZE - 1), 0xffff);
+			src = m_hd63484->ram_r(space, b & (HD63484_RAM_SIZE - 1), 0xffff);
 
 			bitmap.pix16(y, x    ) = ((src & 0x000f) >>  0) << 0;
 			bitmap.pix16(y, x + 1) = ((src & 0x00f0) >>  4) << 0;
@@ -203,24 +203,24 @@ UINT32 sigmab52_state::screen_update_jwildb52(screen_device &screen, bitmap_ind1
 	}
 
 if (!machine().input().code_pressed(KEYCODE_O))
-	if ((hd63484_regs_r(hd63484, space, 0x06/2, 0xffff) & 0x0300) == 0x0300)
+	if ((m_hd63484->regs_r(space, 0x06/2, 0xffff) & 0x0300) == 0x0300)
 	{
-		int sy = (hd63484_regs_r(hd63484, space, 0x94/2, 0xffff) & 0x0fff) - (hd63484_regs_r(hd63484, space, 0x88/2, 0xffff) >> 8);
-		int h = hd63484_regs_r(hd63484, space, 0x96/2, 0xffff) & 0x0fff;
-		int sx = ((hd63484_regs_r(hd63484, space, 0x92/2, 0xffff) >> 8) - (hd63484_regs_r(hd63484, space, 0x84/2, 0xffff) >> 8)) * 4;
-		int w = (hd63484_regs_r(hd63484, space, 0x92/2, 0xffff) & 0xff) * 2;
+		int sy = (m_hd63484->regs_r(space, 0x94/2, 0xffff) & 0x0fff) - (m_hd63484->regs_r(space, 0x88/2, 0xffff) >> 8);
+		int h = m_hd63484->regs_r(space, 0x96/2, 0xffff) & 0x0fff;
+		int sx = ((m_hd63484->regs_r(space, 0x92/2, 0xffff) >> 8) - (m_hd63484->regs_r(space, 0x84/2, 0xffff) >> 8)) * 4;
+		int w = (m_hd63484->regs_r(space, 0x92/2, 0xffff) & 0xff) * 2;
 		if (sx < 0) sx = 0; // not sure about this (shangha2 title screen)
 
-		b = (((hd63484_regs_r(hd63484, space, 0xdc/2, 0xffff) & 0x000f) << 16) + hd63484_regs_r(hd63484, space, 0xde/2, 0xffff));
+		b = (((m_hd63484->regs_r(space, 0xdc/2, 0xffff) & 0x000f) << 16) + m_hd63484->regs_r(space, 0xde/2, 0xffff));
 
 
 		for (y = sy; y <= sy + h && y < 480; y++)
 		{
-			for (x = 0; x < (hd63484_regs_r(hd63484, space, 0xca/2, 0xffff) & 0x0fff)* 4; x += 4)
+			for (x = 0; x < (m_hd63484->regs_r(space, 0xca/2, 0xffff) & 0x0fff)* 4; x += 4)
 			{
-					src = hd63484_ram_r(hd63484, space, b & (HD63484_RAM_SIZE - 1), 0xffff);
+					src = m_hd63484->ram_r(space, b & (HD63484_RAM_SIZE - 1), 0xffff);
 
-				if (x <= w && x + sx >= 0 && x + sx < (hd63484_regs_r(hd63484, space, 0xca/2, 0xffff) & 0x0fff) * 4)
+				if (x <= w && x + sx >= 0 && x + sx < (m_hd63484->regs_r(space, 0xca/2, 0xffff) & 0x0fff) * 4)
 					{
 						bitmap.pix16(y, x + sx    ) = ((src & 0x000f) >>  0) << 0;
 						bitmap.pix16(y, x + sx + 1) = ((src & 0x00f0) >>  4) << 0;
@@ -247,11 +247,10 @@ void sigmab52_state::palette_init()
 
 WRITE8_MEMBER(sigmab52_state::acrtc_w)
 {
-	device_t *hd63484 = machine().device("hd63484");
 	if(!offset)
 	{
 		//address select
-		hd63484_address_w(hd63484, space, 0, data, 0x00ff);
+		m_hd63484->address_w(space, 0, data, 0x00ff);
 		m_latch = 0;
 	}
 	else
@@ -267,7 +266,7 @@ WRITE8_MEMBER(sigmab52_state::acrtc_w)
 			m_acrtc_data <<= 8;
 			m_acrtc_data |= data;
 
-			hd63484_data_w(hd63484, space, 0, m_acrtc_data, 0xffff);
+			m_hd63484->data_w(space, 0, m_acrtc_data, 0xffff);
 		}
 
 		m_latch ^= 1;
@@ -278,13 +277,12 @@ READ8_MEMBER(sigmab52_state::acrtc_r)
 {
 	if(offset&1)
 	{
-		device_t *hd63484 = machine().device("hd63484");
-		return hd63484_data_r(hd63484, space, 0, 0xff);
+		return m_hd63484->data_r(space, 0, 0xff);
 	}
 
 	else
 	{
-		return 0x7b; //fake status read (instead HD63484_status_r(space, 0, 0xff); )
+		return 0x7b; //fake status read (instead m_hd63484->status_r(space, 0, 0xff); )
 	}
 }
 
@@ -323,8 +321,8 @@ static ADDRESS_MAP_START( jwildb52_map, AS_PROGRAM, 8, sigmab52_state )
 	AM_RANGE(0xf710, 0xf710) AM_WRITE(unk_f710_w)
 	AM_RANGE(0xf721, 0xf721) AM_READ(unk_f721_r)
 
-	//AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("hd63484", hd63484_status_r, hd63484_address_w)
-	//AM_RANGE(0x02, 0x03) AM_DEVREADWRITE_LEGACY("hd63484", hd63484_data_r, hd63484_data_w)
+	//AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("hd63484", hd63484_device, status_r, address_w)
+	//AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("hd63484", hd63484_device, data_r, data_w)
 
 	AM_RANGE(0xf730, 0xf731) AM_READWRITE(acrtc_r, acrtc_w)
 	AM_RANGE(0xf740, 0xf740) AM_READ_PORT("IN0")
@@ -569,12 +567,10 @@ void sigmab52_state::machine_start()
 		UINT16 *rom = (UINT16*)memregion("gfx1")->base();
 		int i;
 
-		device_t *hd63484 = machine().device("hd63484");
-
 		address_space &space = generic_space();
 		for(i = 0; i < 0x40000/2; ++i)
 		{
-			hd63484_ram_w(hd63484, space, i + 0x40000/2, rom[i], 0xffff);
+			m_hd63484->ram_w(space, i + 0x40000/2, rom[i], 0xffff);
 		}
 	}
 }

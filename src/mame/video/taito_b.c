@@ -1,5 +1,4 @@
 #include "emu.h"
-#include "video/hd63484.h"
 #include "includes/taito_b.h"
 
 WRITE16_MEMBER(taitob_state::hitice_pixelram_w)
@@ -426,10 +425,8 @@ UINT32 taitob_state::screen_update_realpunc(screen_device &screen, bitmap_rgb32 
 	/* Draw the 15bpp raw CRTC frame buffer directly to the output bitmap */
 	if (m_realpunc_video_ctrl & 0x0002)
 	{
-		device_t *hd63484 = machine().device("hd63484");
-
-		int base = (hd63484_regs_r(hd63484, space, 0xcc/2, 0xffff) << 16) + hd63484_regs_r(hd63484, space, 0xce/2, 0xffff);
-		int stride = hd63484_regs_r(hd63484, space, 0xca/2, 0xffff);
+		int base = (m_hd63484->regs_r(space, 0xcc/2, 0xffff) << 16) + m_hd63484->regs_r(space, 0xce/2, 0xffff);
+		int stride = m_hd63484->regs_r(space, 0xca/2, 0xffff);
 
 //      scrollx = taitob_scroll[0];
 //      scrolly = taitob_scroll[1];
@@ -440,7 +437,7 @@ UINT32 taitob_state::screen_update_realpunc(screen_device &screen, bitmap_rgb32 
 			for (x = 0; x <= cliprect.max_x; x++)
 			{
 				int r, g, b;
-				UINT16 srcpix = hd63484_ram_r(hd63484, space, addr++, 0xffff);
+				UINT16 srcpix = m_hd63484->ram_r(space, addr++, 0xffff);
 
 				r = (BIT(srcpix, 1)) | ((srcpix >> 11) & 0x1e);
 				g = (BIT(srcpix, 2)) | ((srcpix >> 7) & 0x1e);

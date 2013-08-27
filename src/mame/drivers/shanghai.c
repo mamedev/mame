@@ -33,7 +33,8 @@ class shanghai_state : public driver_device
 public:
 	shanghai_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_hd63484(*this, "hd63484")	{ }
 
 	DECLARE_WRITE16_MEMBER(shanghai_coin_w);
 	DECLARE_READ16_MEMBER(kothello_hd63484_status_r);
@@ -42,6 +43,7 @@ public:
 	UINT32 screen_update_shanghai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(shanghai_interrupt);
 	required_device<cpu_device> m_maincpu;
+	required_device<hd63484_device> m_hd63484;
 };
 
 
@@ -81,40 +83,39 @@ void shanghai_state::video_start()
 
 UINT32 shanghai_state::screen_update_shanghai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	device_t *hd63484 = machine().device("hd63484");
 	int x, y, b, src;
 
 	address_space &space = machine().driver_data()->generic_space();
-	b = ((hd63484_regs_r(hd63484, space, 0xcc/2, 0xffff) & 0x000f) << 16) + hd63484_regs_r(hd63484, space, 0xce/2, 0xffff);
+	b = ((m_hd63484->regs_r(space, 0xcc/2, 0xffff) & 0x000f) << 16) + m_hd63484->regs_r(space, 0xce/2, 0xffff);
 	for (y = 0; y < 280; y++)
 	{
-		for (x = 0 ; x < (hd63484_regs_r(hd63484, space, 0xca/2, 0xffff) & 0x0fff) * 2 ; x += 2)
+		for (x = 0 ; x < (m_hd63484->regs_r(space, 0xca/2, 0xffff) & 0x0fff) * 2 ; x += 2)
 		{
 			b &= (HD63484_RAM_SIZE - 1);
-			src = hd63484_ram_r(hd63484, space, b, 0xffff);
+			src = m_hd63484->ram_r(space, b, 0xffff);
 			bitmap.pix16(y, x)     = src & 0x00ff;
 			bitmap.pix16(y, x + 1) = (src & 0xff00) >> 8;
 			b++;
 		}
 	}
 
-	if ((hd63484_regs_r(hd63484, space, 0x06/2, 0xffff) & 0x0300) == 0x0300)
+	if ((m_hd63484->regs_r(space, 0x06/2, 0xffff) & 0x0300) == 0x0300)
 	{
-		int sy = (hd63484_regs_r(hd63484, space, 0x94/2, 0xffff) & 0x0fff) - (hd63484_regs_r(hd63484, space, 0x88/2, 0xffff) >> 8);
-		int h = hd63484_regs_r(hd63484, space, 0x96/2, 0xffff) & 0x0fff;
-		int sx = ((hd63484_regs_r(hd63484, space, 0x92/2, 0xffff) >> 8) - (hd63484_regs_r(hd63484, space, 0x84/2, 0xffff) >> 8)) * 4;
-		int w = (hd63484_regs_r(hd63484, space, 0x92/2, 0xffff) & 0xff) * 4;
+		int sy = (m_hd63484->regs_r(space, 0x94/2, 0xffff) & 0x0fff) - (m_hd63484->regs_r(space, 0x88/2, 0xffff) >> 8);
+		int h = m_hd63484->regs_r(space, 0x96/2, 0xffff) & 0x0fff;
+		int sx = ((m_hd63484->regs_r(space, 0x92/2, 0xffff) >> 8) - (m_hd63484->regs_r(space, 0x84/2, 0xffff) >> 8)) * 4;
+		int w = (m_hd63484->regs_r(space, 0x92/2, 0xffff) & 0xff) * 4;
 		if (sx < 0) sx = 0; // not sure about this (shangha2 title screen)
 
-		b = (((hd63484_regs_r(hd63484, space, 0xdc/2, 0xffff) & 0x000f) << 16) + hd63484_regs_r(hd63484, space, 0xde/2, 0xffff));
+		b = (((m_hd63484->regs_r(space, 0xdc/2, 0xffff) & 0x000f) << 16) + m_hd63484->regs_r(space, 0xde/2, 0xffff));
 
 		for (y = sy ; y <= sy + h && y < 280 ; y++)
 		{
-			for (x = 0 ; x < (hd63484_regs_r(hd63484, space, 0xca/2, 0xffff) & 0x0fff) * 2 ; x += 2)
+			for (x = 0 ; x < (m_hd63484->regs_r(space, 0xca/2, 0xffff) & 0x0fff) * 2 ; x += 2)
 			{
 				b &= (HD63484_RAM_SIZE - 1);
-				src = hd63484_ram_r(hd63484, space, b, 0xffff);
-				if (x <= w && x + sx >= 0 && x + sx < (hd63484_regs_r(hd63484, space, 0xca/2, 0xffff) & 0x0fff) * 2)
+				src = m_hd63484->ram_r(space, b, 0xffff);
+				if (x <= w && x + sx >= 0 && x + sx < (m_hd63484->regs_r(space, 0xca/2, 0xffff) & 0x0fff) * 2)
 				{
 					bitmap.pix16(y, x + sx)     = src & 0x00ff;
 					bitmap.pix16(y, x + sx + 1) = (src & 0xff00) >> 8;
@@ -155,8 +156,8 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( shanghai_portmap, AS_IO, 16, shanghai_state )
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("hd63484", hd63484_status_r, hd63484_address_w)
-	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE_LEGACY("hd63484", hd63484_data_r, hd63484_data_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("hd63484", hd63484_device, status_r, address_w)
+	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("hd63484", hd63484_device, data_r, data_w)
 	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE8("ymsnd", ym2203_device, read, write, 0x00ff)
 	AM_RANGE(0x40, 0x41) AM_READ_PORT("P1")
 	AM_RANGE(0x44, 0x45) AM_READ_PORT("P2")
@@ -169,8 +170,8 @@ static ADDRESS_MAP_START( shangha2_portmap, AS_IO, 16, shanghai_state )
 	AM_RANGE(0x00, 0x01) AM_READ_PORT("P1")
 	AM_RANGE(0x10, 0x11) AM_READ_PORT("P2")
 	AM_RANGE(0x20, 0x21) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x30, 0x31) AM_DEVREADWRITE_LEGACY("hd63484", hd63484_status_r, hd63484_address_w)
-	AM_RANGE(0x32, 0x33) AM_DEVREADWRITE_LEGACY("hd63484", hd63484_data_r, hd63484_data_w)
+	AM_RANGE(0x30, 0x31) AM_DEVREADWRITE("hd63484", hd63484_device, status_r, address_w)
+	AM_RANGE(0x32, 0x33) AM_DEVREADWRITE("hd63484", hd63484_device, data_r, data_w)
 	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE8("ymsnd", ym2203_device, read, write, 0x00ff)
 	AM_RANGE(0x50, 0x51) AM_WRITE(shanghai_coin_w)
 ADDRESS_MAP_END
@@ -182,8 +183,8 @@ READ16_MEMBER(shanghai_state::kothello_hd63484_status_r)
 
 static ADDRESS_MAP_START( kothello_map, AS_PROGRAM, 16, shanghai_state )
 	AM_RANGE(0x00000, 0x07fff) AM_RAM
-	AM_RANGE(0x08010, 0x08011) AM_READ(kothello_hd63484_status_r) AM_DEVWRITE_LEGACY("hd63484", hd63484_address_w)
-	AM_RANGE(0x08012, 0x08013) AM_DEVREADWRITE_LEGACY("hd63484", hd63484_data_r, hd63484_data_w)
+	AM_RANGE(0x08010, 0x08011) AM_READ(kothello_hd63484_status_r) AM_DEVWRITE("hd63484", hd63484_device, address_w)
+	AM_RANGE(0x08012, 0x08013) AM_DEVREADWRITE("hd63484", hd63484_device, data_r, data_w)
 	AM_RANGE(0x09010, 0x09011) AM_READ_PORT("P1")
 	AM_RANGE(0x09012, 0x09013) AM_READ_PORT("P2")
 	AM_RANGE(0x09014, 0x09015) AM_READ_PORT("SYSTEM")
