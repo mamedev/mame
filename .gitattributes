@@ -6363,6 +6363,7 @@ src/mess/drivers/mekd2.c svneol=native#text/plain
 src/mess/drivers/mephisto.c svneol=native#text/plain
 src/mess/drivers/merlin.c svneol=native#text/plain
 src/mess/drivers/mes.c svneol=native#text/plain
+src/mess/drivers/mice.c svneol=native#text/plain
 src/mess/drivers/microdec.c svneol=native#text/plain
 src/mess/drivers/microkit.c svneol=native#text/plain
 src/mess/drivers/micronic.c svneol=native#text/plain

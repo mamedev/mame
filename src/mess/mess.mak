@@ -2397,6 +2397,7 @@ $(MESSOBJ)/skeleton.a:          \
 	$(MESS_DRIVERS)/mbc200.o    \
 	$(MESS_DRIVERS)/mccpm.o     \
 	$(MESS_DRIVERS)/mes.o       \
+	$(MESS_DRIVERS)/mice.o      \
 	$(MESS_DRIVERS)/microdec.o  \
 	$(MESS_DRIVERS)/micronic.o  \
 	$(MESS_DRIVERS)/mini2440.o  \
