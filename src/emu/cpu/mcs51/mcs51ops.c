@@ -976,5 +976,5 @@ OPHANDLER( xrl_a_r )
 //illegal opcodes
 OPHANDLER( illegal )
 {
-	LOG(("i8051 '%s': illegal opcode at 0x%03x: %02x\n", mcs51_state->device->tag(), PC-1, r));
+	LOG(("i8051 '%s': illegal opcode at 0x%03x: %02x\n", tag(), PC-1, r));
 }

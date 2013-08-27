@@ -1512,7 +1512,7 @@ DRIVER_INIT_MEMBER(eolith_state,eolith)
 	init_eolith_speedup(machine());
 
 	// Sound CPU -> QS1000 CPU serial link
-	i8051_set_serial_tx_callback(m_soundcpu, write8_delegate(FUNC(eolith_state::soundcpu_to_qs1000),this));
+	m_soundcpu->i8051_set_serial_tx_callback(write8_delegate(FUNC(eolith_state::soundcpu_to_qs1000),this));
 
 	// Configure the sound ROM banking
 	membank("sound_bank")->configure_entries(0, 16, memregion("sounddata")->base(), 0x8000);

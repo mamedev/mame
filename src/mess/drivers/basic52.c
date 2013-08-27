@@ -47,7 +47,7 @@ public:
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	DECLARE_READ8_MEMBER(unk_r);
 	UINT8 m_term_data;
-	required_device<cpu_device> m_maincpu;
+	required_device<mcs51_cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 	virtual void machine_reset();
 	DECLARE_WRITE8_MEMBER(to_term);
@@ -96,8 +96,8 @@ READ8_MEMBER( basic52_state::unk_r)
 
 void basic52_state::machine_reset()
 {
-	i8051_set_serial_tx_callback(m_maincpu, write8_delegate(FUNC(basic52_state::to_term),this));
-	i8051_set_serial_rx_callback(m_maincpu, read8_delegate(FUNC(basic52_state::from_term),this));
+	m_maincpu->i8051_set_serial_tx_callback(write8_delegate(FUNC(basic52_state::to_term),this));
+	m_maincpu->i8051_set_serial_rx_callback(read8_delegate(FUNC(basic52_state::from_term),this));
 }
 
 WRITE8_MEMBER( basic52_state::kbd_put )

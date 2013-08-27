@@ -250,7 +250,7 @@ public:
 	DECLARE_WRITE8_MEMBER(data_from_i8031);
 	DECLARE_READ8_MEMBER(data_to_i8031);
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_soundcpu;
+	required_device<i8052_device> m_soundcpu;
 	required_device<upd7759_device> m_upd7759;
 };
 
@@ -1018,8 +1018,8 @@ void maygayv1_state::machine_start()
 
 //  duart_68681_init(DUART_CLOCK, duart_irq_handler, duart_tx);
 
-	i8051_set_serial_tx_callback(m_soundcpu, write8_delegate(FUNC(maygayv1_state::data_from_i8031),this));
-	i8051_set_serial_rx_callback(m_soundcpu, read8_delegate(FUNC(maygayv1_state::data_to_i8031),this));
+	m_soundcpu->i8051_set_serial_tx_callback(write8_delegate(FUNC(maygayv1_state::data_from_i8031),this));
+	m_soundcpu->i8051_set_serial_rx_callback(read8_delegate(FUNC(maygayv1_state::data_to_i8031),this));
 }
 
 void maygayv1_state::machine_reset()

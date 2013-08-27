@@ -617,8 +617,8 @@ DRIVER_INIT_MEMBER(micro3d_state,micro3d)
 {
 	address_space &space = m_drmath->space(AS_DATA);
 
-	i8051_set_serial_tx_callback(m_audiocpu, write8_delegate(FUNC(micro3d_state::data_from_i8031),this));
-	i8051_set_serial_rx_callback(m_audiocpu, read8_delegate(FUNC(micro3d_state::data_to_i8031),this));
+	m_audiocpu->i8051_set_serial_tx_callback(write8_delegate(FUNC(micro3d_state::data_from_i8031),this));
+	m_audiocpu->i8051_set_serial_rx_callback(read8_delegate(FUNC(micro3d_state::data_to_i8031),this));
 
 	m_duart68681 = machine().device("duart68681");
 

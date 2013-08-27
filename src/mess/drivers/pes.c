@@ -228,8 +228,8 @@ void pes_state::machine_reset()
 
 DRIVER_INIT_MEMBER(pes_state,pes)
 {
-	i8051_set_serial_tx_callback(m_maincpu, write8_delegate(FUNC(pes_state::data_from_i8031),this));
-	i8051_set_serial_rx_callback(m_maincpu, read8_delegate(FUNC(pes_state::data_to_i8031),this));
+	m_maincpu->i8051_set_serial_tx_callback(write8_delegate(FUNC(pes_state::data_from_i8031),this));
+	m_maincpu->i8051_set_serial_rx_callback(read8_delegate(FUNC(pes_state::data_to_i8031),this));
 }
 
 /******************************************************************************

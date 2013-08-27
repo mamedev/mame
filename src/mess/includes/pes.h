@@ -11,6 +11,7 @@
 
 #include "machine/terminal.h"
 #include "sound/tms5220.h"
+#include "cpu/mcs51/mcs51.h"
 
 class pes_state : public driver_device
 {
@@ -22,7 +23,7 @@ public:
 			m_speech(*this, "tms5220")
 		{ }
 
-	required_device<cpu_device> m_maincpu;
+	required_device<i80c31_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 	required_device<tms5220_device> m_speech;
 

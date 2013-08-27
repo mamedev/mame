@@ -5,6 +5,7 @@
 *************************************************************************/
 
 #include "cpu/tms34010/tms34010.h"
+#include "cpu/mcs51/mcs51.h"
 #include "sound/upd7759.h"
 
 
@@ -132,7 +133,7 @@ public:
 	DECLARE_WRITE8_MEMBER(data_from_i8031);
 	DECLARE_READ8_MEMBER(data_to_i8031);
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
+	required_device<i8051_device> m_audiocpu;
 	required_device<upd7759_device> m_upd7759;
 	required_device<cpu_device> m_drmath;
 	required_device<cpu_device> m_vgb;

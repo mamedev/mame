@@ -234,7 +234,7 @@ void qs1000_device::device_start()
 	m_p2_w_func.resolve(m_out_p2_cb, *this);
 	m_p3_w_func.resolve(m_out_p3_cb, *this);
 
-	i8051_set_serial_rx_callback(m_cpu, read8_delegate(FUNC(qs1000_device::data_to_i8052),this));
+	m_cpu->i8051_set_serial_rx_callback(read8_delegate(FUNC(qs1000_device::data_to_i8052),this));
 
 	// TODO: register state for saving
 }

@@ -1,4 +1,5 @@
 
+#include "cpu/mcs51/mcs51.h"
 #include "sound/qs1000.h"
 
 class eolith_state : public driver_device
@@ -26,7 +27,7 @@ public:
 	UINT8 m_data_to_qs1000;
 
 	required_device<cpu_device> m_maincpu;
-	optional_device<cpu_device> m_soundcpu;
+	optional_device<i8032_device> m_soundcpu;
 	optional_device<qs1000_device> m_qs1000;
 	optional_ioport m_in0; // klondkp doesn't have it
 	optional_ioport m_eepromoutport;

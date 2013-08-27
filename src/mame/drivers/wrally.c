@@ -144,14 +144,6 @@ static ADDRESS_MAP_START( dallas_ram, AS_IO, 8, wrally_state )
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(dallas_share_r, dallas_share_w)   AM_MASK(0x3fff)     /* Shared RAM with the main CPU */
 ADDRESS_MAP_END
 
-/* DS5002FP configuration */
-static const ds5002fp_config dallas_config =
-{
-	0x88,           /* bootstrap loader MCON register */
-	0x00,           /* bootstrap loader RPCTL register */
-	0x80            /* bootstrap loader CRC register */
-};
-
 static INPUT_PORTS_START( wrally )
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Difficulty ) )      PORT_DIPLOCATION("SW2:8,7")
@@ -251,7 +243,7 @@ static MACHINE_CONFIG_START( wrally, wrally_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", wrally_state,  irq6_line_hold)
 
 	MCFG_CPU_ADD("mcu", DS5002FP, XTAL_24MHz/2) /* verified on pcb */
-	MCFG_CPU_CONFIG(dallas_config)
+	MCFG_DS5002FP_CONFIG( 0x88, 0x00, 0x80 )
 	MCFG_CPU_PROGRAM_MAP(dallas_rom)
 	MCFG_CPU_IO_MAP(dallas_ram)
 

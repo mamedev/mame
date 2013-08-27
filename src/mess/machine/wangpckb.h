@@ -72,7 +72,7 @@ protected:
 	virtual void input_callback(UINT8 state);
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<i8051_device> m_maincpu;
 	required_ioport m_y0;
 	required_ioport m_y1;
 	required_ioport m_y2;

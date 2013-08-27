@@ -230,137 +230,209 @@ enum
 	V_PFI   = 0x02b,    /* Power Failure Interrupt */
 };
 
+
+const device_type I8031 = &device_creator<i8031_device>;
+const device_type I8032 = &device_creator<i8032_device>;
+const device_type I8051 = &device_creator<i8051_device>;
+const device_type I8751 = &device_creator<i8751_device>;
+const device_type I8052 = &device_creator<i8052_device>;
+const device_type I8752 = &device_creator<i8752_device>;
+const device_type I80C31 = &device_creator<i80c31_device>;
+const device_type I80C51 = &device_creator<i80c51_device>;
+const device_type I87C51 = &device_creator<i87c51_device>;
+const device_type I80C32 = &device_creator<i80c32_device>;
+const device_type I80C52 = &device_creator<i80c52_device>;
+const device_type I87C52 = &device_creator<i87c52_device>;
+const device_type AT89C4051 = &device_creator<at89c4051_device>;
+const device_type DS5002FP = &device_creator<ds5002fp_device>;
+
+
 /***************************************************************************
-    TYPE DEFINITIONS
+    ADDRESS MAPS
 ***************************************************************************/
 
-struct mcs51_uart
+static ADDRESS_MAP_START(program_12bit, AS_PROGRAM, 8, mcs51_cpu_device)
+	AM_RANGE(0x00, 0x0fff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(program_13bit, AS_PROGRAM, 8, mcs51_cpu_device)
+	AM_RANGE(0x00, 0x1fff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(data_7bit, AS_DATA, 8, mcs51_cpu_device)
+	AM_RANGE(0x0000, 0x007f) AM_RAM
+	AM_RANGE(0x0100, 0x01ff) AM_RAM /* SFR */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(data_8bit, AS_DATA, 8, mcs51_cpu_device)
+	AM_RANGE(0x0000, 0x00ff) AM_RAM
+	AM_RANGE(0x0100, 0x01ff) AM_RAM /* SFR */
+ADDRESS_MAP_END
+
+
+mcs51_cpu_device::mcs51_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, int program_width, int data_width, UINT8 features)
+	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, __FILE__)
+	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0
+		, ( ( program_width == 12 ) ? ADDRESS_MAP_NAME(program_12bit) : ( ( program_width == 13 ) ? ADDRESS_MAP_NAME(program_13bit) : NULL ) ))
+	, m_data_config("data", ENDIANNESS_LITTLE, 8, 9, 0
+		, ( ( data_width == 7 ) ? ADDRESS_MAP_NAME(data_7bit) : ( ( data_width == 8 ) ? ADDRESS_MAP_NAME(data_8bit) : NULL ) ))
+	, m_io_config("io", ENDIANNESS_LITTLE, 8, 18, 0)
+	, m_features(features)
+	, m_ram_mask( (data_width == 8) ? 0xFF : 0x7F )
+	, m_num_interrupts(5)
 {
-	UINT8   data_out;       //Data to send out
-	UINT8   bits_to_send;   //How many bits left to send when transmitting out the serial port
+	m_ds5002fp.mcon = 0;
+	m_ds5002fp.rpctl = 0;
+	m_ds5002fp.crc = 0;
+}
 
-	int     smod_div;       /* signal divided by 2^SMOD */
-	int     rx_clk;         /* rx clock */
-	int     tx_clk;         /* tx clock */
-	UINT8   delay_cycles;   //Gross Hack;
-};
 
-struct mcs51_state_t
+i8031_device::i8031_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: mcs51_cpu_device(mconfig, I8031, "I8031", tag, owner, clock, "i8031", 0, 7)
 {
-	//Internal stuff
-	UINT16  ppc;            //previous pc
-	UINT16  pc;             //current pc
-	UINT16  features;       //features of this cpu
-	UINT8   rwm;            //Signals that the current instruction is a read/write/modify instruction
+}
 
-	int     inst_cycles;        /* cycles for the current instruction */
-	int     ram_mask;           /* second ram bank for indirect access available ? */
-	int     num_interrupts;     /* number of interrupts supported */
-	int     recalc_parity;      /* recalculate parity before next instruction */
-	UINT32  last_line_state;    /* last state of input lines line */
-	int     t0_cnt;             /* number of 0->1 transistions on T0 line */
-	int     t1_cnt;             /* number of 0->1 transistions on T1 line */
-	int     t2_cnt;             /* number of 0->1 transistions on T2 line */
-	int     t2ex_cnt;           /* number of 0->1 transistions on T2EX line */
-	int     cur_irq_prio;       /* Holds value of the current IRQ Priority Level; -1 if no irq */
-	UINT8   irq_active;         /* mask which irq levels are serviced */
-	UINT8   irq_prio[8];        /* interrupt priority */
+i8051_device::i8051_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: mcs51_cpu_device(mconfig, I8051, "I8051", tag, owner, clock, "i8051", 12, 7)
+{
+}
 
-	int     icount;
+i8751_device::i8751_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: mcs51_cpu_device(mconfig, I8751, "I8751", tag, owner, clock, "i8751", 12, 7)
+{
+}
 
-	mcs51_uart uart;            /* internal uart */
+i8052_device::i8052_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, int program_width, int data_width, UINT8 features)
+	: mcs51_cpu_device(mconfig, type, name, tag, owner, clock, shortname, program_width, data_width, features | FEATURE_I8052)
+{
+}
 
-	/* Internal Ram */
-	UINT8   *internal_ram;      /* 128 RAM (8031/51) + 128 RAM in second bank (8032/52) */
-	UINT8   *sfr_ram;           /* 128 SFR - these are in 0x80 - 0xFF */
+i8052_device::i8052_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: mcs51_cpu_device(mconfig, I8052, "I8052", tag, owner, clock, "i8052", 13, 8, FEATURE_I8052)
+{
+	m_num_interrupts = 6;
+}
 
-	/* SFR Callbacks */
-	void    (*sfr_write)(mcs51_state_t *mcs51_state, size_t offset, UINT8 data);
-	UINT8   (*sfr_read)(mcs51_state_t *mcs51_state, size_t offset);
+i8032_device::i8032_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: i8052_device(mconfig, I8032, "I8032", tag, owner, clock, "i8032", 0, 8)
+{
+}
 
-	/* Interrupt Callback */
-	device_irq_acknowledge_callback irq_callback;
-	legacy_cpu_device *device;
+i8752_device::i8752_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: i8052_device(mconfig, I8752, "I8752", tag, owner, clock, "i8752", 13, 8)
+{
+}
 
-	/* Memory spaces */
-	address_space *program;
-	direct_read_data *direct;
-	address_space *data;
-	address_space *io;
+i80c31_device::i80c31_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: i8052_device(mconfig, I80C31, "I80C31", tag, owner, clock, "i80c31", 0, 7)
+{
+}
 
-	/* Serial Port TX/RX Callbacks */
-	// TODO: Move to special port r/w
-	write8_delegate serial_tx_callback;    //Call back funciton when sending data out of serial port
-	read8_delegate serial_rx_callback;    //Call back function to retrieve data when receiving serial port data
+i80c51_device::i80c51_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, int program_width, int data_width, UINT8 features)
+	: mcs51_cpu_device(mconfig, type, name, tag, owner, clock, shortname, program_width, data_width, features | FEATURE_CMOS)
+{
+}
 
-	/* DS5002FP */
-	struct {
-		UINT8   previous_ta;        /* Previous Timed Access value */
-		UINT8   ta_window;          /* Limed Access window */
-		UINT8   range;              /* Memory Range */
-		const ds5002fp_config *config;  /* Bootstrap Configuration */
-	} ds5002fp;
+i80c51_device::i80c51_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: mcs51_cpu_device(mconfig, I80C51, "I80C51", tag, owner, clock, "i80c51", 12, 7)
+{
+}
+
+i87c51_device::i87c51_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: i80c51_device(mconfig, I87C51, "I87C51", tag, owner, clock, "i87c51", 12, 7)
+{
+}
 
 
-};
+i80c52_device::i80c52_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, int program_width, int data_width, UINT8 features)
+	: i8052_device(mconfig, type, name, tag, owner, clock, shortname, program_width, data_width, features | FEATURE_I80C52 | FEATURE_CMOS)
+{
+}
+
+i80c52_device::i80c52_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: i8052_device(mconfig, I80C52, "I80C52", tag, owner, clock, "i80C52", 13, 8, FEATURE_I80C52 | FEATURE_CMOS)
+{
+}
+
+i80c32_device::i80c32_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: i80c52_device(mconfig, I80C32, "I80C32", tag, owner, clock, "i80c32", 0, 8)
+{
+}
+
+
+i87c52_device::i87c52_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: i80c52_device(mconfig, I87C52, "I87C52", tag, owner, clock, "i87c52", 13, 8)
+{
+}
+
+at89c4051_device::at89c4051_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: i80c51_device(mconfig, AT89C4051, "AT89C4051", tag, owner, clock, "at89c4051", 12, 7)
+{
+}
+
+ds5002fp_device::ds5002fp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: mcs51_cpu_device(mconfig, DS5002FP, "DS5002FP", tag, owner, clock, "ds5002fp", 12, 7, FEATURE_DS5002FP | FEATURE_CMOS)
+{
+}
+
 
 /***************************************************************************
     MACROS
 ***************************************************************************/
 
 /* Read Opcode/Opcode Arguments from Program Code */
-#define ROP(pc)         mcs51_state->direct->read_decrypted_byte(pc)
-#define ROP_ARG(pc)     mcs51_state->direct->read_raw_byte(pc)
+#define ROP(pc)         m_direct->read_decrypted_byte(pc)
+#define ROP_ARG(pc)     m_direct->read_raw_byte(pc)
 
 /* Read a byte from External Code Memory (Usually Program Rom(s) Space) */
-#define CODEMEM_R(a)    (UINT8)mcs51_state->program->read_byte(a)
+#define CODEMEM_R(a)    (UINT8)m_program->read_byte(a)
 
 /* Read/Write a byte from/to External Data Memory (Usually RAM or other I/O) */
-#define DATAMEM_R(a)    (UINT8)mcs51_state->io->read_byte(a)
-#define DATAMEM_W(a,v)  mcs51_state->io->write_byte(a, v)
+#define DATAMEM_R(a)    (UINT8)m_io->read_byte(a)
+#define DATAMEM_W(a,v)  m_io->write_byte(a, v)
 
 /* Read/Write a byte from/to the Internal RAM */
 
-#define IRAM_R(a)       iram_read(mcs51_state, a)
-#define IRAM_W(a, d)    iram_write(mcs51_state, a, d)
+#define IRAM_R(a)       iram_read(a)
+#define IRAM_W(a, d)    iram_write(a, d)
 
 /* Read/Write a byte from/to the Internal RAM indirectly */
 /* (called from indirect addressing)                     */
-INLINE UINT8 iram_iread(mcs51_state_t *mcs51_state, offs_t a) { return (a <= mcs51_state->ram_mask) ? mcs51_state->data->read_byte(a) : 0xff; }
-INLINE void iram_iwrite(mcs51_state_t *mcs51_state, offs_t a, UINT8 d) { if (a <= mcs51_state->ram_mask) mcs51_state->data->write_byte(a, d); }
+UINT8 mcs51_cpu_device::iram_iread(offs_t a) { return (a <= m_ram_mask) ? m_data->read_byte(a) : 0xff; }
+void mcs51_cpu_device::iram_iwrite(offs_t a, UINT8 d) { if (a <= m_ram_mask) m_data->write_byte(a, d); }
 
-#define IRAM_IR(a)      iram_iread(mcs51_state, a)
-#define IRAM_IW(a, d)   iram_iwrite(mcs51_state, a, d)
+#define IRAM_IR(a)      iram_iread(a)
+#define IRAM_IW(a, d)   iram_iwrite(a, d)
 
 /* Form an Address to Read/Write to External RAM indirectly */
 /* (called from indirect addressing)                        */
-#define ERAM_ADDR(a,m)  external_ram_iaddr(mcs51_state, a,m)
+#define ERAM_ADDR(a,m)  external_ram_iaddr(a,m)
 
 /* Read/Write a bit from Bit Addressable Memory */
-#define BIT_R(a)        bit_address_r(mcs51_state, a)
-#define BIT_W(a,v)      bit_address_w(mcs51_state, a, v)
+#define BIT_R(a)        bit_address_r(a)
+#define BIT_W(a,v)      bit_address_w(a, v)
 
 /* Input/Output a byte from given I/O port */
-#define IN(port)        ((UINT8)mcs51_state->io->read_byte(port))
-#define OUT(port,value) mcs51_state->io->write_byte(port,value)
+#define IN(port)        ((UINT8)m_io->read_byte(port))
+#define OUT(port,value) m_io->write_byte(port,value)
 
 
 /***************************************************************************
     SHORTCUTS
 ***************************************************************************/
 
-#define PPC     mcs51_state->ppc
-#define PC      mcs51_state->pc
-#define RWM     mcs51_state->rwm
+#define PPC     m_ppc
+#define PC      m_pc
+#define RWM     m_rwm
 
 /* SFR Registers - These are accessed directly for speed on read */
 /* Read accessors                                                */
 
-#define SFR_A(a)        mcs51_state->sfr_ram[(a)]
+#define SFR_A(a)        m_sfr_ram[(a)]
 #define SET_SFR_A(a,v)  do { SFR_A(a) = (v); } while (0)
 
-#define ACC         ((const UINT8) SFR_A(ADDR_ACC))
-#define PSW         ((const UINT8) SFR_A(ADDR_PSW))
+#define ACC         SFR_A(ADDR_ACC)
+#define PSW         SFR_A(ADDR_PSW)
 
 #define P0          ((const UINT8) SFR_A(ADDR_P0))
 #define P1          ((const UINT8) SFR_A(ADDR_P1))
@@ -383,7 +455,7 @@ INLINE void iram_iwrite(mcs51_state_t *mcs51_state, offs_t a, UINT8 d) { if (a <
 #define B           SFR_A(ADDR_B)
 #define SBUF        SFR_A(ADDR_SBUF)
 
-#define R_REG(r)    mcs51_state->internal_ram[(r) | (PSW & 0x18)]
+#define R_REG(r)    m_internal_ram[(r) | (PSW & 0x18)]
 #define DPTR        ((DPH<<8) | DPL)
 
 /* 8052 Only registers */
@@ -442,7 +514,7 @@ INLINE void iram_iwrite(mcs51_state_t *mcs51_state, offs_t a, UINT8 d) { if (a <
 #define SET_SBUF(v) SET_SFR_A(ADDR_SBUF, v)
 
 /* No actions triggered on write */
-#define SET_REG(r, v)   do { mcs51_state->internal_ram[(r) | (PSW & 0x18)] = (v); } while (0)
+#define SET_REG(r, v)   do { m_internal_ram[(r) | (PSW & 0x18)] = (v); } while (0)
 
 #define SET_DPTR(n)     do { DPH = ((n) >> 8) & 0xff; DPL = (n) & 0xff; } while (0)
 
@@ -624,22 +696,16 @@ INLINE void iram_iwrite(mcs51_state_t *mcs51_state, offs_t a, UINT8 d) { if (a <
 
 
 /*Add and Subtract Flag settings*/
-#define DO_ADD_FLAGS(a,d,c) do_add_flags(mcs51_state, a, d, c)
-#define DO_SUB_FLAGS(a,d,c) do_sub_flags(mcs51_state, a, d, c)
+#define DO_ADD_FLAGS(a,d,c) do_add_flags(a, d, c)
+#define DO_SUB_FLAGS(a,d,c) do_sub_flags(a, d, c)
 
-#define SET_PARITY()    do {mcs51_state->recalc_parity |= 1;} while (0)
-#define PUSH_PC()       push_pc(mcs51_state)
-#define POP_PC()        pop_pc(mcs51_state)
+#define SET_PARITY()    do {m_recalc_parity |= 1;} while (0)
+#define PUSH_PC()       push_pc()
+#define POP_PC()        pop_pc()
 
 /* Clear Current IRQ  */
-#define CLEAR_CURRENT_IRQ() clear_current_irq(mcs51_state)
+#define CLEAR_CURRENT_IRQ() clear_current_irq()
 
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-static void check_irqs(mcs51_state_t *mcs51_state);
-INLINE void serial_transmit(mcs51_state_t *mcs51_state, UINT8 data);
 
 /* Hold callback functions so they can be set by caller (before the cpu reset) */
 
@@ -647,49 +713,29 @@ INLINE void serial_transmit(mcs51_state_t *mcs51_state, UINT8 data);
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE mcs51_state_t *get_safe_token(device_t *device)
+void mcs51_cpu_device::clear_current_irq()
 {
-	assert(device != NULL);
-	assert(device->type() == I8031 ||
-			device->type() == I8032 ||
-			device->type() == I8051 ||
-			device->type() == I8751 ||
-			device->type() == I8052 ||
-			device->type() == I8752 ||
-			device->type() == I80C31 ||
-			device->type() == I80C32 ||
-			device->type() == I80C51 ||
-			device->type() == I80C52 ||
-			device->type() == I87C51 ||
-			device->type() == I87C52 ||
-			device->type() == AT89C4051 ||
-			device->type() == DS5002FP);
-	return (mcs51_state_t *)downcast<legacy_cpu_device *>(device)->token();
-}
-
-INLINE void clear_current_irq(mcs51_state_t *mcs51_state)
-{
-	if (mcs51_state->cur_irq_prio >= 0)
-		mcs51_state->irq_active &= ~(1 << mcs51_state->cur_irq_prio);
-	if (mcs51_state->irq_active & 4)
-		mcs51_state->cur_irq_prio = 2;
-	else if (mcs51_state->irq_active & 2)
-		mcs51_state->cur_irq_prio = 1;
-	else if (mcs51_state->irq_active & 1)
-		mcs51_state->cur_irq_prio = 0;
+	if (m_cur_irq_prio >= 0)
+		m_irq_active &= ~(1 << m_cur_irq_prio);
+	if (m_irq_active & 4)
+		m_cur_irq_prio = 2;
+	else if (m_irq_active & 2)
+		m_cur_irq_prio = 1;
+	else if (m_irq_active & 1)
+		m_cur_irq_prio = 0;
 	else
-		mcs51_state->cur_irq_prio = -1;
-	LOG(("New: %d %02x\n", mcs51_state->cur_irq_prio, mcs51_state->irq_active));
+		m_cur_irq_prio = -1;
+	LOG(("New: %d %02x\n", m_cur_irq_prio, m_irq_active));
 }
 
-INLINE UINT8 r_acc(mcs51_state_t *mcs51_state) { return SFR_A(ADDR_ACC); }
+UINT8 mcs51_cpu_device::r_acc() { return SFR_A(ADDR_ACC); }
 
-INLINE UINT8 r_psw(mcs51_state_t *mcs51_state) { return SFR_A(ADDR_PSW); }
+UINT8 mcs51_cpu_device::r_psw() { return SFR_A(ADDR_PSW); }
 
-INLINE void update_ptrs(mcs51_state_t *mcs51_state)
+void mcs51_cpu_device::update_ptrs()
 {
-	mcs51_state->internal_ram = (UINT8 *)mcs51_state->data->get_write_ptr(0x00);
-	mcs51_state->sfr_ram = (UINT8 *)mcs51_state->data->get_write_ptr(0x100);
+	m_internal_ram = (UINT8 *)m_data->get_write_ptr(0x00);
+	m_sfr_ram = (UINT8 *)m_data->get_write_ptr(0x100);
 }
 
 
@@ -724,7 +770,7 @@ INLINE void update_ptrs(mcs51_state_t *mcs51_state)
     0x0000-0xffff -> data memory (the bus used to access it does not matter)
 */
 
-INLINE offs_t external_ram_iaddr(mcs51_state_t *mcs51_state, offs_t offset, offs_t mem_mask)
+offs_t mcs51_cpu_device::external_ram_iaddr(offs_t offset, offs_t mem_mask)
 {
 	/* Memory Range (RG1 and RG0 @ MCON and RPCTL registers) */
 	static const UINT16 ds5002fp_ranges[4] = { 0x1fff, 0x3fff, 0x7fff, 0xffff };
@@ -734,11 +780,11 @@ INLINE offs_t external_ram_iaddr(mcs51_state_t *mcs51_state, offs_t offset, offs
 		0x8000, 0x9000, 0xa000, 0xb000, 0xc000, 0xd000, 0xe000, 0x10000 };
 
 	/* if partition mode is set, adjust offset based on the bus */
-	if (mcs51_state->features & FEATURE_DS5002FP)
+	if (m_features & FEATURE_DS5002FP)
 	{
 		if (!GET_PM) {
 			if (!GET_EXBS) {
-				if ((offset >= ds5002fp_partitions[GET_PA]) && (offset <= ds5002fp_ranges[mcs51_state->ds5002fp.range])) {
+				if ((offset >= ds5002fp_partitions[GET_PA]) && (offset <= ds5002fp_ranges[m_ds5002fp.range])) {
 					offset += 0x10000;
 				}
 			}
@@ -754,21 +800,21 @@ INLINE offs_t external_ram_iaddr(mcs51_state_t *mcs51_state, offs_t offset, offs
 
 /* Internal ram read/write */
 
-INLINE UINT8 iram_read(mcs51_state_t *mcs51_state, size_t offset)
+UINT8 mcs51_cpu_device::iram_read(size_t offset)
 {
-	return (((offset) < 0x80) ? mcs51_state->data->read_byte(offset) : mcs51_state->sfr_read(mcs51_state, offset));
+	return (((offset) < 0x80) ? m_data->read_byte(offset) : sfr_read(offset));
 }
 
-INLINE void iram_write(mcs51_state_t *mcs51_state, size_t offset, UINT8 data)
+void mcs51_cpu_device::iram_write(size_t offset, UINT8 data)
 {
 	if ((offset) < 0x80)
-		mcs51_state->data->write_byte(offset, data);
+		m_data->write_byte(offset, data);
 	else
-		mcs51_state->sfr_write(mcs51_state, offset, data);
+		sfr_write(offset, data);
 }
 
 /*Push the current PC to the stack*/
-INLINE void push_pc(mcs51_state_t *mcs51_state)
+void mcs51_cpu_device::push_pc()
 {
 	UINT8 tmpSP = SP+1;                     //Grab and Increment Stack Pointer
 	IRAM_IW(tmpSP, (PC & 0xff));                //Store low byte of PC to Internal Ram (Use IRAM_IW to store stack above 128 bytes)
@@ -778,7 +824,7 @@ INLINE void push_pc(mcs51_state_t *mcs51_state)
 }
 
 /*Pop the current PC off the stack and into the pc*/
-INLINE void pop_pc(mcs51_state_t *mcs51_state)
+void mcs51_cpu_device::pop_pc()
 {
 	UINT8 tmpSP = SP;                           //Grab Stack Pointer
 	PC = (IRAM_IR(tmpSP--) & 0xff) << 8;        //Store hi byte to PC (must use IRAM_IR to access stack pointing above 128 bytes)
@@ -787,7 +833,7 @@ INLINE void pop_pc(mcs51_state_t *mcs51_state)
 }
 
 //Set the PSW Parity Flag
-INLINE void set_parity(mcs51_state_t *mcs51_state)
+void mcs51_cpu_device::set_parity()
 {
 	//This flag will be set when the accumulator contains an odd # of bits set..
 	UINT8 p = 0;
@@ -802,7 +848,7 @@ INLINE void set_parity(mcs51_state_t *mcs51_state)
 	SET_P(p & 1);
 }
 
-INLINE UINT8 bit_address_r(mcs51_state_t *mcs51_state, UINT8 offset)
+UINT8 mcs51_cpu_device::bit_address_r(UINT8 offset)
 {
 	UINT8   word;
 	UINT8   mask;
@@ -829,7 +875,7 @@ INLINE UINT8 bit_address_r(mcs51_state_t *mcs51_state, UINT8 offset)
 }
 
 
-INLINE void bit_address_w(mcs51_state_t *mcs51_state, UINT8 offset, UINT8 bit)
+void mcs51_cpu_device::bit_address_w(UINT8 offset, UINT8 bit)
 {
 	int word;
 	UINT8   mask;
@@ -861,7 +907,7 @@ INLINE void bit_address_w(mcs51_state_t *mcs51_state, UINT8 offset, UINT8 bit)
 	}
 }
 
-INLINE void do_add_flags(mcs51_state_t *mcs51_state, UINT8 a, UINT8 data, UINT8 c)
+void mcs51_cpu_device::do_add_flags(UINT8 a, UINT8 data, UINT8 c)
 {
 	UINT16 result = a+data+c;
 	INT16 result1 = (INT8)a+(INT8)data+c;
@@ -872,7 +918,7 @@ INLINE void do_add_flags(mcs51_state_t *mcs51_state, UINT8 a, UINT8 data, UINT8 
 	SET_OV(result1 < -128 || result1 > 127);
 }
 
-INLINE void do_sub_flags(mcs51_state_t *mcs51_state, UINT8 a, UINT8 data, UINT8 c)
+void mcs51_cpu_device::do_sub_flags(UINT8 a, UINT8 data, UINT8 c)
 {
 	UINT16 result = a-(data+c);
 	INT16 result1 = (INT8)a-(INT8)(data+c);
@@ -883,50 +929,50 @@ INLINE void do_sub_flags(mcs51_state_t *mcs51_state, UINT8 a, UINT8 data, UINT8 
 	SET_OV((result1 < -128 || result1 > 127));
 }
 
-INLINE void transmit_receive(mcs51_state_t *mcs51_state, int source)
+void mcs51_cpu_device::transmit_receive(int source)
 {
 	int mode = (GET_SM0<<1) | GET_SM1;
 
 	if (source == 1) /* timer1 */
-		mcs51_state->uart.smod_div = (mcs51_state->uart.smod_div + 1) & (2-GET_SMOD);
+		m_uart.smod_div = (m_uart.smod_div + 1) & (2-GET_SMOD);
 
 	switch(mode) {
 		//8 bit shifter ( + start,stop bit ) - baud set by clock freq / 12
 		case 0:
-			mcs51_state->uart.rx_clk += (source == 0) ? 16 : 0; /* clock / 12 */
-			mcs51_state->uart.tx_clk += (source == 0) ? 16 : 0; /* clock / 12 */
+			m_uart.rx_clk += (source == 0) ? 16 : 0; /* clock / 12 */
+			m_uart.tx_clk += (source == 0) ? 16 : 0; /* clock / 12 */
 			break;
 		//8 bit uart ( + start,stop bit ) - baud set by timer1 or timer2
 		case 1:
 		case 3:
 			if (source == 1)
 			{
-				mcs51_state->uart.tx_clk += (GET_TCLK ? 0 : !mcs51_state->uart.smod_div);
-				mcs51_state->uart.rx_clk += (GET_RCLK ? 0 : !mcs51_state->uart.smod_div);
+				m_uart.tx_clk += (GET_TCLK ? 0 : !m_uart.smod_div);
+				m_uart.rx_clk += (GET_RCLK ? 0 : !m_uart.smod_div);
 			}
 			if (source == 2)
 			{
-				mcs51_state->uart.tx_clk += (GET_TCLK ? 1 : 0);
-				mcs51_state->uart.rx_clk += (GET_RCLK ? 1 : 0);
+				m_uart.tx_clk += (GET_TCLK ? 1 : 0);
+				m_uart.rx_clk += (GET_RCLK ? 1 : 0);
 			}
 			break;
 		//9 bit uart
 		case 2:
-			mcs51_state->uart.rx_clk += (source == 0) ? (GET_SMOD ? 6 : 3) : 0; /* clock / 12 * 3 / 8 (16) = clock / 32 (64)*/
-			mcs51_state->uart.tx_clk += (source == 0) ? (GET_SMOD ? 6 : 3) : 0; /* clock / 12 */
+			m_uart.rx_clk += (source == 0) ? (GET_SMOD ? 6 : 3) : 0; /* clock / 12 * 3 / 8 (16) = clock / 32 (64)*/
+			m_uart.tx_clk += (source == 0) ? (GET_SMOD ? 6 : 3) : 0; /* clock / 12 */
 			break;
 	}
 	/* transmit ? */
-	if (mcs51_state->uart.tx_clk >= 16)
+	if (m_uart.tx_clk >= 16)
 	{
-		mcs51_state->uart.tx_clk &= 0x0f;
-		if(mcs51_state->uart.bits_to_send)
+		m_uart.tx_clk &= 0x0f;
+		if(m_uart.bits_to_send)
 		{
-			mcs51_state->uart.bits_to_send--;
-			if(mcs51_state->uart.bits_to_send == 0) {
+			m_uart.bits_to_send--;
+			if(m_uart.bits_to_send == 0) {
 				//Call the callback function
-				if(!mcs51_state->serial_tx_callback.isnull())
-					mcs51_state->serial_tx_callback(*mcs51_state->io, 0, mcs51_state->uart.data_out, 0xff);
+				if(!m_serial_tx_callback.isnull())
+					m_serial_tx_callback(*m_io, 0, m_uart.data_out, 0xff);
 				//Set Interrupt Flag
 				SET_TI(1);
 			}
@@ -934,18 +980,18 @@ INLINE void transmit_receive(mcs51_state_t *mcs51_state, int source)
 
 	}
 	/* receive */
-	if (mcs51_state->uart.rx_clk >= 16)
+	if (m_uart.rx_clk >= 16)
 	{
-		mcs51_state->uart.rx_clk &= 0x0f;
-		if (mcs51_state->uart.delay_cycles>0)
+		m_uart.rx_clk &= 0x0f;
+		if (m_uart.delay_cycles>0)
 		{
-			mcs51_state->uart.delay_cycles--;
-			if (mcs51_state->uart.delay_cycles == 0)
+			m_uart.delay_cycles--;
+			if (m_uart.delay_cycles == 0)
 			{
 				int data = 0;
 				//Call our callball function to retrieve the data
-				if(!mcs51_state->serial_rx_callback.isnull())
-					data = mcs51_state->serial_rx_callback(*mcs51_state->io, 0, 0xff);
+				if(!m_serial_rx_callback.isnull())
+					data = m_serial_rx_callback(*m_io, 0, 0xff);
 				LOG(("RX Deliver %d\n", data));
 				SET_SBUF(data);
 				//Flag the IRQ
@@ -957,7 +1003,7 @@ INLINE void transmit_receive(mcs51_state_t *mcs51_state, int source)
 }
 
 
-INLINE void update_timer_t0(mcs51_state_t *mcs51_state, int cycles)
+void mcs51_cpu_device::update_timer_t0(int cycles)
 {
 	int mode = (GET_M0_1<<1) | GET_M0_0;
 	UINT32 count = 0;
@@ -967,9 +1013,9 @@ INLINE void update_timer_t0(mcs51_state_t *mcs51_state, int cycles)
 		UINT32 delta;
 
 		/* counter / external input */
-		delta = GET_CT0 ? mcs51_state->t0_cnt : cycles;
+		delta = GET_CT0 ? m_t0_cnt : cycles;
 		/* taken, reset */
-		mcs51_state->t0_cnt = 0;
+		m_t0_cnt = 0;
 		/* TODO: Not sure about IE0. The manual specifies INT0=high,
 		 * which in turn means CLEAR_LINE.
 		 * IE0 may be edge triggered depending on IT0 */
@@ -1043,7 +1089,7 @@ switching it into or out of Mode 3 or it can be assigned as a baud rate generato
  * overflow flag
  */
 
-INLINE void update_timer_t1(mcs51_state_t *mcs51_state, int cycles)
+void mcs51_cpu_device::update_timer_t1(int cycles)
 {
 	UINT8 mode = (GET_M1_1<<1) | GET_M1_0;
 	UINT8 mode_0 = (GET_M0_1<<1) | GET_M0_0;
@@ -1057,9 +1103,9 @@ INLINE void update_timer_t1(mcs51_state_t *mcs51_state, int cycles)
 			UINT32 overflow = 0;
 
 			/* counter / external input */
-			delta = GET_CT1 ? mcs51_state->t1_cnt : cycles;
+			delta = GET_CT1 ? m_t1_cnt : cycles;
 			/* taken, reset */
-			mcs51_state->t1_cnt = 0;
+			m_t1_cnt = 0;
 			/* TODO: Not sure about IE0. The manual specifies INT0=high,
 			 * which in turn means CLEAR_LINE. Change to access last_state?
 			 * IE0 may be edge triggered depending on IT0 */
@@ -1098,7 +1144,7 @@ INLINE void update_timer_t1(mcs51_state_t *mcs51_state, int cycles)
 			if (overflow)
 			{
 				SET_TF1(1);
-				transmit_receive(mcs51_state, 1);
+				transmit_receive(1);
 			}
 		}
 	}
@@ -1109,7 +1155,7 @@ INLINE void update_timer_t1(mcs51_state_t *mcs51_state, int cycles)
 
 		delta =  cycles;
 		/* taken, reset */
-		mcs51_state->t1_cnt = 0;
+		m_t1_cnt = 0;
 		switch(mode) {
 			case 0:         /* 13 Bit Timer Mode */
 				count = ((TH1<<5) | ( TL1 & 0x1f ) );
@@ -1141,20 +1187,20 @@ INLINE void update_timer_t1(mcs51_state_t *mcs51_state, int cycles)
 		}
 		if (overflow)
 		{
-			transmit_receive(mcs51_state, 1);
+			transmit_receive(1);
 		}
 	}
 }
 
-INLINE void update_timer_t2(mcs51_state_t *mcs51_state, int cycles)
+void mcs51_cpu_device::update_timer_t2(int cycles)
 {
 	/* Update Timer 2 */
 	if(GET_TR2) {
 		int mode = ((GET_TCLK | GET_RCLK) << 1) | GET_CP;
-		int delta = GET_CT2 ? mcs51_state->t2_cnt : (mode & 2) ? cycles * (12/2) : cycles;
+		int delta = GET_CT2 ? m_t2_cnt : (mode & 2) ? cycles * (12/2) : cycles;
 
 		UINT32 count = ((TH2<<8) | TL2) + delta;
-		mcs51_state->t2_cnt = 0;
+		m_t2_cnt = 0;
 
 		switch (mode)
 		{
@@ -1164,10 +1210,10 @@ INLINE void update_timer_t2(mcs51_state_t *mcs51_state, int cycles)
 					SET_TF2(1);
 					count += ((RCAP2H<<8) | RCAP2L);
 				}
-				else if (GET_EXEN2 && mcs51_state->t2ex_cnt>0)
+				else if (GET_EXEN2 && m_t2ex_cnt>0)
 				{
 					count += ((RCAP2H<<8) | RCAP2L);
-					mcs51_state->t2ex_cnt = 0;
+					m_t2ex_cnt = 0;
 				}
 				TH2 = (count>>8) & 0xff;
 				TL2 =  count & 0xff;
@@ -1178,11 +1224,11 @@ INLINE void update_timer_t2(mcs51_state_t *mcs51_state, int cycles)
 				TH2 = (count>>8) & 0xff;
 				TL2 =  count & 0xff;
 
-				if (GET_EXEN2 && mcs51_state->t2ex_cnt>0)
+				if (GET_EXEN2 && m_t2ex_cnt>0)
 				{
 					RCAP2H = TH2;
 					RCAP2L = TL2;
-					mcs51_state->t2ex_cnt = 0;
+					m_t2ex_cnt = 0;
 				}
 				break;
 			case 2:
@@ -1190,7 +1236,7 @@ INLINE void update_timer_t2(mcs51_state_t *mcs51_state, int cycles)
 				if ( count & 0xffff0000 )
 				{
 					count += ((RCAP2H<<8) | RCAP2L);
-					transmit_receive(mcs51_state, 2);
+					transmit_receive(2);
 				}
 				TH2 = (count>>8) & 0xff;
 				TL2 =  count & 0xff;
@@ -1199,16 +1245,16 @@ INLINE void update_timer_t2(mcs51_state_t *mcs51_state, int cycles)
 	}
 }
 
-INLINE void update_timers(mcs51_state_t *mcs51_state, int cycles)
+void mcs51_cpu_device::update_timers(int cycles)
 {
 	while (cycles--)
 	{
-		update_timer_t0(mcs51_state, 1);
-		update_timer_t1(mcs51_state, 1);
+		update_timer_t0(1);
+		update_timer_t1(1);
 
-		if (mcs51_state->features & FEATURE_I8052)
+		if (m_features & FEATURE_I8052)
 		{
-			update_timer_t2(mcs51_state, 1);
+			update_timer_t2(1);
 		}
 	}
 }
@@ -1216,31 +1262,31 @@ INLINE void update_timers(mcs51_state_t *mcs51_state, int cycles)
 //Set up to transmit data out of serial port
 //NOTE: Enable Serial Port Interrupt bit is NOT required to send/receive data!
 
-INLINE void serial_transmit(mcs51_state_t *mcs51_state, UINT8 data)
+void mcs51_cpu_device::serial_transmit(UINT8 data)
 {
 	int mode = (GET_SM0<<1) | GET_SM1;
 
 	//Flag that we're sending data
-	mcs51_state->uart.data_out = data;
+	m_uart.data_out = data;
 	LOG(("serial_transmit: %x %x\n", mode, data));
 	switch(mode) {
 		//8 bit shifter ( + start,stop bit ) - baud set by clock freq / 12
 		case 0:
-			mcs51_state->uart.bits_to_send = 8+2;
+			m_uart.bits_to_send = 8+2;
 			break;
 		//8 bit uart ( + start,stop bit ) - baud set by timer1 or timer2
 		case 1:
-			mcs51_state->uart.bits_to_send = 8+2;
+			m_uart.bits_to_send = 8+2;
 			break;
 		//9 bit uart
 		case 2:
 		case 3:
-			mcs51_state->uart.bits_to_send = 8+3;
+			m_uart.bits_to_send = 8+3;
 			break;
 	}
 }
 
-INLINE void serial_receive(mcs51_state_t *mcs51_state)
+void mcs51_cpu_device::serial_receive()
 {
 	int mode = (GET_SM0<<1) | GET_SM1;
 
@@ -1248,34 +1294,34 @@ INLINE void serial_receive(mcs51_state_t *mcs51_state)
 		switch(mode) {
 			//8 bit shifter ( + start,stop bit ) - baud set by clock freq / 12
 			case 0:
-				mcs51_state->uart.delay_cycles = 8+2;
+				m_uart.delay_cycles = 8+2;
 				break;
 			//8 bit uart ( + start,stop bit ) - baud set by timer1 or timer2
 			case 1:
-				mcs51_state->uart.delay_cycles = 8+2;
+				m_uart.delay_cycles = 8+2;
 				break;
 			//9 bit uart
 			case 2:
 			case 3:
-				mcs51_state->uart.delay_cycles = 8+3;
+				m_uart.delay_cycles = 8+3;
 				break;
 		}
 	}
 }
 
 /* Check and update status of serial port */
-INLINE void update_serial(mcs51_state_t *mcs51_state, int cycles)
+void mcs51_cpu_device::update_serial(int cycles)
 {
 	while (--cycles>=0)
-		transmit_receive(mcs51_state, 0);
+		transmit_receive(0);
 }
 
 /* Check and update status of serial port */
-INLINE void update_irq_prio(mcs51_state_t *mcs51_state, UINT8 ipl, UINT8 iph)
+void mcs51_cpu_device::update_irq_prio(UINT8 ipl, UINT8 iph)
 {
 	int i;
 	for (i=0; i<8; i++)
-		mcs51_state->irq_prio[i] = ((ipl >> i) & 1) | (((iph >>i ) & 1) << 1);
+		m_irq_prio[i] = ((ipl >> i) & 1) | (((iph >>i ) & 1) << 1);
 }
 
 /***************************************************************************
@@ -1283,46 +1329,44 @@ INLINE void update_irq_prio(mcs51_state_t *mcs51_state, UINT8 ipl, UINT8 iph)
 ***************************************************************************/
 
 
-void i8051_set_serial_tx_callback(device_t *device, write8_delegate tx_func)
+void mcs51_cpu_device::i8051_set_serial_tx_callback(write8_delegate tx_func)
 {
-	mcs51_state_t *mcs51_state = get_safe_token(device);
-	mcs51_state->serial_tx_callback = tx_func;
+	m_serial_tx_callback = tx_func;
 }
 
-void i8051_set_serial_rx_callback(device_t *device, read8_delegate rx_func)
+void mcs51_cpu_device::i8051_set_serial_rx_callback(read8_delegate rx_func)
 {
-	mcs51_state_t *mcs51_state = get_safe_token(device);
-	mcs51_state->serial_rx_callback = rx_func;
+	m_serial_rx_callback = rx_func;
 }
 
 /***************************************************************************
     OPCODES
 ***************************************************************************/
 
-#define OPHANDLER( _name ) INLINE void _name (mcs51_state_t *mcs51_state, UINT8 r)
+#define OPHANDLER( _name ) void mcs51_cpu_device::_name (UINT8 r)
 
 #include "mcs51ops.c"
 
 
-static void execute_op(mcs51_state_t *mcs51_state, UINT8 op)
+void mcs51_cpu_device::execute_op(UINT8 op)
 {
-	if (mcs51_state->recalc_parity)
+	if (m_recalc_parity)
 	{
-		set_parity(mcs51_state);
-		mcs51_state->recalc_parity = 0;
+		set_parity();
+		m_recalc_parity = 0;
 	}
 
 	switch( op )
 	{
-		case 0x00:  nop(mcs51_state, op);                           break;  //NOP
-		case 0x01:  ajmp(mcs51_state, op);                      break;  //AJMP code addr
-		case 0x02:  ljmp(mcs51_state, op);                      break;  //LJMP code addr
-		case 0x03:  rr_a(mcs51_state, op);                      break;  //RR A
-		case 0x04:  inc_a(mcs51_state, op);                     break;  //INC A
-		case 0x05:  RWM=1; inc_mem(mcs51_state, op); RWM=0;     break;  //INC data addr
+		case 0x00:  nop(op);                           break;  //NOP
+		case 0x01:  ajmp(op);                      break;  //AJMP code addr
+		case 0x02:  ljmp(op);                      break;  //LJMP code addr
+		case 0x03:  rr_a(op);                      break;  //RR A
+		case 0x04:  inc_a(op);                     break;  //INC A
+		case 0x05:  RWM=1; inc_mem(op); RWM=0;     break;  //INC data addr
 
 		case 0x06:
-		case 0x07:  inc_ir(mcs51_state,op&1);                       break;  //INC @R0/@R1
+		case 0x07:  inc_ir(op&1);                       break;  //INC @R0/@R1
 
 		case 0x08:
 		case 0x09:
@@ -1331,17 +1375,17 @@ static void execute_op(mcs51_state_t *mcs51_state, UINT8 op)
 		case 0x0c:
 		case 0x0d:
 		case 0x0e:
-		case 0x0f:  inc_r(mcs51_state, op&7);                       break;  //INC R0 to R7
+		case 0x0f:  inc_r(op&7);                       break;  //INC R0 to R7
 
-		case 0x10:  RWM=1; jbc(mcs51_state, op); RWM=0;             break;  //JBC bit addr, code addr
-		case 0x11:  acall(mcs51_state, op);                     break;  //ACALL code addr
-		case 0x12:  lcall(mcs51_state, op);                         break;  //LCALL code addr
-		case 0x13:  rrc_a(mcs51_state, op);                     break;  //RRC A
-		case 0x14:  dec_a(mcs51_state, op);                     break;  //DEC A
-		case 0x15:  RWM=1; dec_mem(mcs51_state, op); RWM=0;     break;  //DEC data addr
+		case 0x10:  RWM=1; jbc(op); RWM=0;             break;  //JBC bit addr, code addr
+		case 0x11:  acall(op);                     break;  //ACALL code addr
+		case 0x12:  lcall(op);                         break;  //LCALL code addr
+		case 0x13:  rrc_a(op);                     break;  //RRC A
+		case 0x14:  dec_a(op);                     break;  //DEC A
+		case 0x15:  RWM=1; dec_mem(op); RWM=0;     break;  //DEC data addr
 
 		case 0x16:
-		case 0x17:  dec_ir(mcs51_state, op&1);                  break;  //DEC @R0/@R1
+		case 0x17:  dec_ir(op&1);                  break;  //DEC @R0/@R1
 
 		case 0x18:
 		case 0x19:
@@ -1350,17 +1394,17 @@ static void execute_op(mcs51_state_t *mcs51_state, UINT8 op)
 		case 0x1c:
 		case 0x1d:
 		case 0x1e:
-		case 0x1f:  dec_r(mcs51_state, op&7);                   break;  //DEC R0 to R7
+		case 0x1f:  dec_r(op&7);                   break;  //DEC R0 to R7
 
-		case 0x20:  jb(mcs51_state, op);                            break;  //JB  bit addr, code addr
-		case 0x21:  ajmp(mcs51_state, op);                      break;  //AJMP code addr
-		case 0x22:  ret(mcs51_state, op);                           break;  //RET
-		case 0x23:  rl_a(mcs51_state, op);                      break;  //RL A
-		case 0x24:  add_a_byte(mcs51_state, op);                    break;  //ADD A, #data
-		case 0x25:  add_a_mem(mcs51_state, op);                 break;  //ADD A, data addr
+		case 0x20:  jb(op);                            break;  //JB  bit addr, code addr
+		case 0x21:  ajmp(op);                      break;  //AJMP code addr
+		case 0x22:  ret(op);                           break;  //RET
+		case 0x23:  rl_a(op);                      break;  //RL A
+		case 0x24:  add_a_byte(op);                    break;  //ADD A, #data
+		case 0x25:  add_a_mem(op);                 break;  //ADD A, data addr
 
 		case 0x26:
-		case 0x27:  add_a_ir(mcs51_state, op&1);                    break;  //ADD A, @R0/@R1
+		case 0x27:  add_a_ir(op&1);                    break;  //ADD A, @R0/@R1
 
 		case 0x28:
 		case 0x29:
@@ -1369,17 +1413,17 @@ static void execute_op(mcs51_state_t *mcs51_state, UINT8 op)
 		case 0x2c:
 		case 0x2d:
 		case 0x2e:
-		case 0x2f:  add_a_r(mcs51_state, op&7);                 break;  //ADD A, R0 to R7
+		case 0x2f:  add_a_r(op&7);                 break;  //ADD A, R0 to R7
 
-		case 0x30:  jnb(mcs51_state, op);                           break;  //JNB bit addr, code addr
-		case 0x31:  acall(mcs51_state, op);                     break;  //ACALL code addr
-		case 0x32:  reti(mcs51_state, op);                      break;  //RETI
-		case 0x33:  rlc_a(mcs51_state, op);                     break;  //RLC A
-		case 0x34:  addc_a_byte(mcs51_state, op);                   break;  //ADDC A, #data
-		case 0x35:  addc_a_mem(mcs51_state, op);                    break;  //ADDC A, data addr
+		case 0x30:  jnb(op);                           break;  //JNB bit addr, code addr
+		case 0x31:  acall(op);                     break;  //ACALL code addr
+		case 0x32:  reti(op);                      break;  //RETI
+		case 0x33:  rlc_a(op);                     break;  //RLC A
+		case 0x34:  addc_a_byte(op);                   break;  //ADDC A, #data
+		case 0x35:  addc_a_mem(op);                    break;  //ADDC A, data addr
 
 		case 0x36:
-		case 0x37:  addc_a_ir(mcs51_state, op&1);                   break;  //ADDC A, @R0/@R1
+		case 0x37:  addc_a_ir(op&1);                   break;  //ADDC A, @R0/@R1
 
 		case 0x38:
 		case 0x39:
@@ -1388,17 +1432,17 @@ static void execute_op(mcs51_state_t *mcs51_state, UINT8 op)
 		case 0x3c:
 		case 0x3d:
 		case 0x3e:
-		case 0x3f:  addc_a_r(mcs51_state, op&7);                    break;  //ADDC A, R0 to R7
+		case 0x3f:  addc_a_r(op&7);                    break;  //ADDC A, R0 to R7
 
-		case 0x40:  jc(mcs51_state, op);                            break;  //JC code addr
-		case 0x41:  ajmp(mcs51_state, op);                      break;  //AJMP code addr
-		case 0x42:  RWM=1; orl_mem_a(mcs51_state, op);  RWM=0;  break;  //ORL data addr, A
-		case 0x43:  RWM=1; orl_mem_byte(mcs51_state, op); RWM=0;    break;  //ORL data addr, #data
-		case 0x44:  orl_a_byte(mcs51_state, op);                    break;
-		case 0x45:  orl_a_mem(mcs51_state, op);                 break;  //ORL A, data addr
+		case 0x40:  jc(op);                            break;  //JC code addr
+		case 0x41:  ajmp(op);                      break;  //AJMP code addr
+		case 0x42:  RWM=1; orl_mem_a(op);  RWM=0;  break;  //ORL data addr, A
+		case 0x43:  RWM=1; orl_mem_byte(op); RWM=0;    break;  //ORL data addr, #data
+		case 0x44:  orl_a_byte(op);                    break;
+		case 0x45:  orl_a_mem(op);                 break;  //ORL A, data addr
 
 		case 0x46:
-		case 0x47:  orl_a_ir(mcs51_state, op&1);                    break;  //ORL A, @RO/@R1
+		case 0x47:  orl_a_ir(op&1);                    break;  //ORL A, @RO/@R1
 
 		case 0x48:
 		case 0x49:
@@ -1407,17 +1451,17 @@ static void execute_op(mcs51_state_t *mcs51_state, UINT8 op)
 		case 0x4c:
 		case 0x4d:
 		case 0x4e:
-		case 0x4f:  orl_a_r(mcs51_state, op&7);                     break;  //ORL A, RO to R7
+		case 0x4f:  orl_a_r(op&7);                     break;  //ORL A, RO to R7
 
-		case 0x50:  jnc(mcs51_state, op);                       break;  //JNC code addr
-		case 0x51:  acall(mcs51_state, op);                     break;  //ACALL code addr
-		case 0x52:  RWM=1; anl_mem_a(mcs51_state, op); RWM=0;       break;  //ANL data addr, A
-		case 0x53:  RWM=1; anl_mem_byte(mcs51_state, op); RWM=0;    break;  //ANL data addr, #data
-		case 0x54:  anl_a_byte(mcs51_state, op);                    break;  //ANL A, #data
-		case 0x55:  anl_a_mem(mcs51_state, op);                 break;  //ANL A, data addr
+		case 0x50:  jnc(op);                       break;  //JNC code addr
+		case 0x51:  acall(op);                     break;  //ACALL code addr
+		case 0x52:  RWM=1; anl_mem_a(op); RWM=0;       break;  //ANL data addr, A
+		case 0x53:  RWM=1; anl_mem_byte(op); RWM=0;    break;  //ANL data addr, #data
+		case 0x54:  anl_a_byte(op);                    break;  //ANL A, #data
+		case 0x55:  anl_a_mem(op);                 break;  //ANL A, data addr
 
 		case 0x56:
-		case 0x57:  anl_a_ir(mcs51_state, op&1);                    break;  //ANL A, @RO/@R1
+		case 0x57:  anl_a_ir(op&1);                    break;  //ANL A, @RO/@R1
 
 		case 0x58:
 		case 0x59:
@@ -1426,17 +1470,17 @@ static void execute_op(mcs51_state_t *mcs51_state, UINT8 op)
 		case 0x5c:
 		case 0x5d:
 		case 0x5e:
-		case 0x5f:  anl_a_r(mcs51_state, op&7);                 break;  //ANL A, RO to R7
+		case 0x5f:  anl_a_r(op&7);                 break;  //ANL A, RO to R7
 
-		case 0x60:  jz(mcs51_state, op);                            break;  //JZ code addr
-		case 0x61:  ajmp(mcs51_state, op);                      break;  //AJMP code addr
-		case 0x62:  RWM=1; xrl_mem_a(mcs51_state, op); RWM=0;       break;  //XRL data addr, A
-		case 0x63:  RWM=1; xrl_mem_byte(mcs51_state, op); RWM=0;    break;  //XRL data addr, #data
-		case 0x64:  xrl_a_byte(mcs51_state, op);                    break;  //XRL A, #data
-		case 0x65:  xrl_a_mem(mcs51_state, op);                 break;  //XRL A, data addr
+		case 0x60:  jz(op);                            break;  //JZ code addr
+		case 0x61:  ajmp(op);                      break;  //AJMP code addr
+		case 0x62:  RWM=1; xrl_mem_a(op); RWM=0;       break;  //XRL data addr, A
+		case 0x63:  RWM=1; xrl_mem_byte(op); RWM=0;    break;  //XRL data addr, #data
+		case 0x64:  xrl_a_byte(op);                    break;  //XRL A, #data
+		case 0x65:  xrl_a_mem(op);                 break;  //XRL A, data addr
 
 		case 0x66:
-		case 0x67:  xrl_a_ir(mcs51_state, op&1);                    break;  //XRL A, @R0/@R1
+		case 0x67:  xrl_a_ir(op&1);                    break;  //XRL A, @R0/@R1
 
 		case 0x68:
 		case 0x69:
@@ -1445,17 +1489,17 @@ static void execute_op(mcs51_state_t *mcs51_state, UINT8 op)
 		case 0x6c:
 		case 0x6d:
 		case 0x6e:
-		case 0x6f:  xrl_a_r(mcs51_state, op&7);                 break;  //XRL A, R0 to R7
+		case 0x6f:  xrl_a_r(op&7);                 break;  //XRL A, R0 to R7
 
-		case 0x70:  jnz(mcs51_state, op);                           break;  //JNZ code addr
-		case 0x71:  acall(mcs51_state, op);                     break;  //ACALL code addr
-		case 0x72:  orl_c_bitaddr(mcs51_state, op);             break;  //ORL C, bit addr
-		case 0x73:  jmp_iadptr(mcs51_state, op);                    break;  //JMP @A+DPTR
-		case 0x74:  mov_a_byte(mcs51_state, op);                    break;  //MOV A, #data
-		case 0x75:  mov_mem_byte(mcs51_state, op);              break;  //MOV data addr, #data
+		case 0x70:  jnz(op);                           break;  //JNZ code addr
+		case 0x71:  acall(op);                     break;  //ACALL code addr
+		case 0x72:  orl_c_bitaddr(op);             break;  //ORL C, bit addr
+		case 0x73:  jmp_iadptr(op);                    break;  //JMP @A+DPTR
+		case 0x74:  mov_a_byte(op);                    break;  //MOV A, #data
+		case 0x75:  mov_mem_byte(op);              break;  //MOV data addr, #data
 
 		case 0x76:
-		case 0x77:  mov_ir_byte(mcs51_state, op&1);             break;  //MOV @R0/@R1, #data
+		case 0x77:  mov_ir_byte(op&1);             break;  //MOV @R0/@R1, #data
 
 		case 0x78:
 		case 0x79:
@@ -1464,17 +1508,17 @@ static void execute_op(mcs51_state_t *mcs51_state, UINT8 op)
 		case 0x7c:
 		case 0x7d:
 		case 0x7e:
-		case 0x7f:  mov_r_byte(mcs51_state, op&7);              break;  //MOV R0 to R7, #data
+		case 0x7f:  mov_r_byte(op&7);              break;  //MOV R0 to R7, #data
 
-		case 0x80:  sjmp(mcs51_state, op);                      break;  //SJMP code addr
-		case 0x81:  ajmp(mcs51_state, op);                      break;  //AJMP code addr
-		case 0x82:  anl_c_bitaddr(mcs51_state, op);             break;  //ANL C, bit addr
-		case 0x83:  movc_a_iapc(mcs51_state, op);                   break;  //MOVC A, @A + PC
-		case 0x84:  div_ab(mcs51_state, op);                        break;  //DIV AB
-		case 0x85:  mov_mem_mem(mcs51_state, op);                   break;  //MOV data addr, data addr
+		case 0x80:  sjmp(op);                      break;  //SJMP code addr
+		case 0x81:  ajmp(op);                      break;  //AJMP code addr
+		case 0x82:  anl_c_bitaddr(op);             break;  //ANL C, bit addr
+		case 0x83:  movc_a_iapc(op);                   break;  //MOVC A, @A + PC
+		case 0x84:  div_ab(op);                        break;  //DIV AB
+		case 0x85:  mov_mem_mem(op);                   break;  //MOV data addr, data addr
 
 		case 0x86:
-		case 0x87:  mov_mem_ir(mcs51_state, op&1);              break;  //MOV data addr, @R0/@R1
+		case 0x87:  mov_mem_ir(op&1);              break;  //MOV data addr, @R0/@R1
 
 		case 0x88:
 		case 0x89:
@@ -1483,17 +1527,17 @@ static void execute_op(mcs51_state_t *mcs51_state, UINT8 op)
 		case 0x8c:
 		case 0x8d:
 		case 0x8e:
-		case 0x8f:  mov_mem_r(mcs51_state, op&7);                   break;  //MOV data addr,R0 to R7
+		case 0x8f:  mov_mem_r(op&7);                   break;  //MOV data addr,R0 to R7
 
-		case 0x90:  mov_dptr_byte(mcs51_state, op);             break;  //MOV DPTR, #data
-		case 0x91:  acall(mcs51_state, op);                     break;  //ACALL code addr
-		case 0x92:  RWM = 1; mov_bitaddr_c(mcs51_state, op); RWM = 0; break;    //MOV bit addr, C
-		case 0x93:  movc_a_iadptr(mcs51_state, op);             break;  //MOVC A, @A + DPTR
-		case 0x94:  subb_a_byte(mcs51_state, op);                   break;  //SUBB A, #data
-		case 0x95:  subb_a_mem(mcs51_state, op);                    break;  //SUBB A, data addr
+		case 0x90:  mov_dptr_byte(op);             break;  //MOV DPTR, #data
+		case 0x91:  acall(op);                     break;  //ACALL code addr
+		case 0x92:  RWM = 1; mov_bitaddr_c(op); RWM = 0; break;    //MOV bit addr, C
+		case 0x93:  movc_a_iadptr(op);             break;  //MOVC A, @A + DPTR
+		case 0x94:  subb_a_byte(op);                   break;  //SUBB A, #data
+		case 0x95:  subb_a_mem(op);                    break;  //SUBB A, data addr
 
 		case 0x96:
-		case 0x97:  subb_a_ir(mcs51_state, op&1);                   break;  //SUBB A, @R0/@R1
+		case 0x97:  subb_a_ir(op&1);                   break;  //SUBB A, @R0/@R1
 
 		case 0x98:
 		case 0x99:
@@ -1502,17 +1546,17 @@ static void execute_op(mcs51_state_t *mcs51_state, UINT8 op)
 		case 0x9c:
 		case 0x9d:
 		case 0x9e:
-		case 0x9f:  subb_a_r(mcs51_state, op&7);                    break;  //SUBB A, R0 to R7
+		case 0x9f:  subb_a_r(op&7);                    break;  //SUBB A, R0 to R7
 
-		case 0xa0:  orl_c_nbitaddr(mcs51_state, op);                break;  //ORL C, /bit addr
-		case 0xa1:  ajmp(mcs51_state, op);                      break;  //AJMP code addr
-		case 0xa2:  mov_c_bitaddr(mcs51_state, op);             break;  //MOV C, bit addr
-		case 0xa3:  inc_dptr(mcs51_state, op);                  break;  //INC DPTR
-		case 0xa4:  mul_ab(mcs51_state, op);                        break;  //MUL AB
-		case 0xa5:  illegal(mcs51_state, op);                       break;  //reserved
+		case 0xa0:  orl_c_nbitaddr(op);                break;  //ORL C, /bit addr
+		case 0xa1:  ajmp(op);                      break;  //AJMP code addr
+		case 0xa2:  mov_c_bitaddr(op);             break;  //MOV C, bit addr
+		case 0xa3:  inc_dptr(op);                  break;  //INC DPTR
+		case 0xa4:  mul_ab(op);                        break;  //MUL AB
+		case 0xa5:  illegal(op);                       break;  //reserved
 
 		case 0xa6:
-		case 0xa7:  mov_ir_mem(mcs51_state, op&1);              break;  //MOV @R0/@R1, data addr
+		case 0xa7:  mov_ir_mem(op&1);              break;  //MOV @R0/@R1, data addr
 
 		case 0xa8:
 		case 0xa9:
@@ -1521,17 +1565,17 @@ static void execute_op(mcs51_state_t *mcs51_state, UINT8 op)
 		case 0xac:
 		case 0xad:
 		case 0xae:
-		case 0xaf:  mov_r_mem(mcs51_state, op&7);                   break;  //MOV R0 to R7, data addr
+		case 0xaf:  mov_r_mem(op&7);                   break;  //MOV R0 to R7, data addr
 
-		case 0xb0:  anl_c_nbitaddr(mcs51_state, op);                break;  //ANL C,/bit addr
-		case 0xb1:  acall(mcs51_state, op);                     break;  //ACALL code addr
-		case 0xb2:  RWM=1; cpl_bitaddr(mcs51_state, op); RWM=0;     break;  //CPL bit addr
-		case 0xb3:  cpl_c(mcs51_state, op);                     break;  //CPL C
-		case 0xb4:  cjne_a_byte(mcs51_state, op);                   break;  //CJNE A, #data, code addr
-		case 0xb5:  cjne_a_mem(mcs51_state, op);                    break;  //CJNE A, data addr, code addr
+		case 0xb0:  anl_c_nbitaddr(op);                break;  //ANL C,/bit addr
+		case 0xb1:  acall(op);                     break;  //ACALL code addr
+		case 0xb2:  RWM=1; cpl_bitaddr(op); RWM=0;     break;  //CPL bit addr
+		case 0xb3:  cpl_c(op);                     break;  //CPL C
+		case 0xb4:  cjne_a_byte(op);                   break;  //CJNE A, #data, code addr
+		case 0xb5:  cjne_a_mem(op);                    break;  //CJNE A, data addr, code addr
 
 		case 0xb6:
-		case 0xb7:  cjne_ir_byte(mcs51_state, op&1);                break;  //CJNE @R0/@R1, #data, code addr
+		case 0xb7:  cjne_ir_byte(op&1);                break;  //CJNE @R0/@R1, #data, code addr
 
 		case 0xb8:
 		case 0xb9:
@@ -1540,17 +1584,17 @@ static void execute_op(mcs51_state_t *mcs51_state, UINT8 op)
 		case 0xbc:
 		case 0xbd:
 		case 0xbe:
-		case 0xbf:  cjne_r_byte(mcs51_state, op&7);                 break;  //CJNE R0 to R7, #data, code addr
+		case 0xbf:  cjne_r_byte(op&7);                 break;  //CJNE R0 to R7, #data, code addr
 
-		case 0xc0:  push(mcs51_state, op);                      break;  //PUSH data addr
-		case 0xc1:  ajmp(mcs51_state, op);                      break;  //AJMP code addr
-		case 0xc2:  RWM=1; clr_bitaddr(mcs51_state, op); RWM=0; break;  //CLR bit addr
-		case 0xc3:  clr_c(mcs51_state, op);                         break;  //CLR C
-		case 0xc4:  swap_a(mcs51_state, op);                        break;  //SWAP A
-		case 0xc5:  xch_a_mem(mcs51_state, op);                 break;  //XCH A, data addr
+		case 0xc0:  push(op);                      break;  //PUSH data addr
+		case 0xc1:  ajmp(op);                      break;  //AJMP code addr
+		case 0xc2:  RWM=1; clr_bitaddr(op); RWM=0; break;  //CLR bit addr
+		case 0xc3:  clr_c(op);                         break;  //CLR C
+		case 0xc4:  swap_a(op);                        break;  //SWAP A
+		case 0xc5:  xch_a_mem(op);                 break;  //XCH A, data addr
 
 		case 0xc6:
-		case 0xc7:  xch_a_ir(mcs51_state, op&1);                    break;  //XCH A, @RO/@R1
+		case 0xc7:  xch_a_ir(op&1);                    break;  //XCH A, @RO/@R1
 
 		case 0xc8:
 		case 0xc9:
@@ -1559,17 +1603,17 @@ static void execute_op(mcs51_state_t *mcs51_state, UINT8 op)
 		case 0xcc:
 		case 0xcd:
 		case 0xce:
-		case 0xcf:  xch_a_r(mcs51_state, op&7);                 break;  //XCH A, RO to R7
+		case 0xcf:  xch_a_r(op&7);                 break;  //XCH A, RO to R7
 
-		case 0xd0:  pop(mcs51_state, op);                           break;  //POP data addr
-		case 0xd1:  acall(mcs51_state, op);                     break;  //ACALL code addr
-		case 0xd2:  RWM=1; setb_bitaddr(mcs51_state, op); RWM=0;    break;  //SETB bit addr
-		case 0xd3:  setb_c(mcs51_state, op);                        break;  //SETB C
-		case 0xd4:  da_a(mcs51_state, op);                      break;  //DA A
-		case 0xd5:  RWM=1; djnz_mem(mcs51_state, op); RWM=0;        break;  //DJNZ data addr, code addr
+		case 0xd0:  pop(op);                           break;  //POP data addr
+		case 0xd1:  acall(op);                     break;  //ACALL code addr
+		case 0xd2:  RWM=1; setb_bitaddr(op); RWM=0;    break;  //SETB bit addr
+		case 0xd3:  setb_c(op);                        break;  //SETB C
+		case 0xd4:  da_a(op);                      break;  //DA A
+		case 0xd5:  RWM=1; djnz_mem(op); RWM=0;        break;  //DJNZ data addr, code addr
 
 		case 0xd6:
-		case 0xd7:  xchd_a_ir(mcs51_state, op&1);                   break;  //XCHD A, @R0/@R1
+		case 0xd7:  xchd_a_ir(op&1);                   break;  //XCHD A, @R0/@R1
 
 		case 0xd8:
 		case 0xd9:
@@ -1578,18 +1622,18 @@ static void execute_op(mcs51_state_t *mcs51_state, UINT8 op)
 		case 0xdc:
 		case 0xdd:
 		case 0xde:
-		case 0xdf:  djnz_r(mcs51_state, op&7);                  break;  //DJNZ R0 to R7,code addr
+		case 0xdf:  djnz_r(op&7);                  break;  //DJNZ R0 to R7,code addr
 
-		case 0xe0:  movx_a_idptr(mcs51_state, op);              break;  //MOVX A,@DPTR
-		case 0xe1:  ajmp(mcs51_state, op);                      break;  //AJMP code addr
+		case 0xe0:  movx_a_idptr(op);              break;  //MOVX A,@DPTR
+		case 0xe1:  ajmp(op);                      break;  //AJMP code addr
 
 		case 0xe2:
-		case 0xe3:  movx_a_ir(mcs51_state, op&1);                   break;  //MOVX A, @R0/@R1
+		case 0xe3:  movx_a_ir(op&1);                   break;  //MOVX A, @R0/@R1
 
-		case 0xe4:  clr_a(mcs51_state, op);                     break;  //CLR A
-		case 0xe5:  mov_a_mem(mcs51_state, op);                 break;  //MOV A, data addr
+		case 0xe4:  clr_a(op);                     break;  //CLR A
+		case 0xe5:  mov_a_mem(op);                 break;  //MOV A, data addr
 		case 0xe6:
-		case 0xe7:  mov_a_ir(mcs51_state, op&1);                    break;  //MOV A,@RO/@R1
+		case 0xe7:  mov_a_ir(op&1);                    break;  //MOV A,@RO/@R1
 
 		case 0xe8:
 		case 0xe9:
@@ -1598,19 +1642,19 @@ static void execute_op(mcs51_state_t *mcs51_state, UINT8 op)
 		case 0xec:
 		case 0xed:
 		case 0xee:
-		case 0xef:  mov_a_r(mcs51_state, op&7);                 break;  //MOV A,R0 to R7
+		case 0xef:  mov_a_r(op&7);                 break;  //MOV A,R0 to R7
 
-		case 0xf0:  movx_idptr_a(mcs51_state, op);              break;  //MOVX @DPTR,A
-		case 0xf1:  acall(mcs51_state, op);                     break;  //ACALL code addr
+		case 0xf0:  movx_idptr_a(op);              break;  //MOVX @DPTR,A
+		case 0xf1:  acall(op);                     break;  //ACALL code addr
 
 		case 0xf2:
-		case 0xf3:  movx_ir_a(mcs51_state, op&1);                   break;  //MOVX @R0/@R1,A
+		case 0xf3:  movx_ir_a(op&1);                   break;  //MOVX @R0/@R1,A
 
-		case 0xf4:  cpl_a(mcs51_state, op);                     break;  //CPL A
-		case 0xf5:  mov_mem_a(mcs51_state, op);                 break;  //MOV data addr, A
+		case 0xf4:  cpl_a(op);                     break;  //CPL A
+		case 0xf5:  mov_mem_a(op);                 break;  //MOV data addr, A
 
 		case 0xf6:
-		case 0xf7:  mov_ir_a(mcs51_state, op&1);                    break;  //MOV @R0/@R1, A
+		case 0xf7:  mov_ir_a(op&1);                    break;  //MOV @R0/@R1, A
 
 		case 0xf8:
 		case 0xf9:
@@ -1619,9 +1663,9 @@ static void execute_op(mcs51_state_t *mcs51_state, UINT8 op)
 		case 0xfc:
 		case 0xfd:
 		case 0xfe:
-		case 0xff:  mov_r_a(mcs51_state, op&7);                 break;  //MOV R0 to R7, A
+		case 0xff:  mov_r_a(op&7);                 break;  //MOV R0 to R7, A
 		default:
-			illegal(mcs51_state, op);
+			illegal(op);
 	}
 }
 
@@ -1630,7 +1674,7 @@ static void execute_op(mcs51_state_t *mcs51_state, UINT8 op)
 ***************************************************************************/
 
 /* # of oscilations each opcode requires*/
-static const UINT8 mcs51_cycles[] = {
+const UINT8 mcs51_cpu_device::mcs51_cycles[256] = {
 	1,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,
 	2,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,
 	2,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,
@@ -1666,7 +1710,7 @@ static const UINT8 mcs51_cycles[] = {
         e) RI+TI
         f) TF2+EXF2
  **********************************************************************************/
-static void check_irqs(mcs51_state_t *mcs51_state)
+void mcs51_cpu_device::check_irqs()
 {
 	UINT8 ints = (GET_IE0 | (GET_TF0<<1) | (GET_IE1<<2) | (GET_TF1<<3)
 			| ((GET_RI|GET_TI)<<4));
@@ -1678,13 +1722,13 @@ static void check_irqs(mcs51_state_t *mcs51_state)
 	//If All Inerrupts Disabled or no pending abort..
 	int_mask = (GET_EA ? IE : 0x00);
 
-	if (mcs51_state->features & FEATURE_I8052)
+	if (m_features & FEATURE_I8052)
 		ints |= ((GET_TF2|GET_EXF2)<<5);
 
-	if (mcs51_state->features & FEATURE_DS5002FP)
+	if (m_features & FEATURE_DS5002FP)
 	{
 		ints |= ((GET_PFW)<<5);
-		mcs51_state->irq_prio[6] = 3;   /* force highest priority */
+		m_irq_prio[6] = 3;   /* force highest priority */
 		/* mask out interrupts not enabled */
 		ints &= ((int_mask & 0x1f) | ((GET_EPFW)<<5));
 	}
@@ -1697,24 +1741,24 @@ static void check_irqs(mcs51_state_t *mcs51_state)
 	if (!ints)  return;
 
 	/* CLear IDL - got enabled interrupt */
-	if (mcs51_state->features & FEATURE_CMOS)
+	if (m_features & FEATURE_CMOS)
 	{
 		/* any interrupt terminates idle mode */
 		SET_IDL(0);
 		/* external interrupt wakes up */
 		if (ints & (GET_IE0 | GET_IE1))
 			/* but not the DS5002FP */
-			if (!(mcs51_state->features & FEATURE_DS5002FP))
+			if (!(m_features & FEATURE_DS5002FP))
 				SET_PD(0);
 	}
 
-	for (i=0; i<mcs51_state->num_interrupts; i++)
+	for (i=0; i<m_num_interrupts; i++)
 	{
 		if (ints & (1<<i))
 		{
-			if (mcs51_state->irq_prio[i] > priority_request)
+			if (m_irq_prio[i] > priority_request)
 			{
-				priority_request = mcs51_state->irq_prio[i];
+				priority_request = m_irq_prio[i];
 				int_vec = (i<<3) | 3;
 			}
 		}
@@ -1725,9 +1769,9 @@ static void check_irqs(mcs51_state_t *mcs51_state)
 	 */
 
 	LOG(("Request: %d\n", priority_request));
-	if (mcs51_state->irq_active && (priority_request <= mcs51_state->cur_irq_prio))
+	if (m_irq_active && (priority_request <= m_cur_irq_prio))
 	{
-		LOG(("higher or equal priority irq (%u) in progress already, skipping ...\n", mcs51_state->cur_irq_prio));
+		LOG(("higher or equal priority irq (%u) in progress already, skipping ...\n", m_cur_irq_prio));
 		return;
 	}
 
@@ -1736,17 +1780,17 @@ static void check_irqs(mcs51_state_t *mcs51_state)
 		PC += 3;
 
 	//Save current pc to stack, set pc to new interrupt vector
-	push_pc(mcs51_state);
+	push_pc();
 	PC = int_vec;
 
 	/* interrupts take 24 cycles */
-	mcs51_state->inst_cycles += 2;
+	m_inst_cycles += 2;
 
 	//Set current Irq & Priority being serviced
-	mcs51_state->cur_irq_prio = priority_request;
-	mcs51_state->irq_active |= (1 << priority_request);
+	m_cur_irq_prio = priority_request;
+	m_irq_active |= (1 << priority_request);
 
-	LOG(("Take: %d %02x\n", mcs51_state->cur_irq_prio, mcs51_state->irq_active));
+	LOG(("Take: %d %02x\n", m_cur_irq_prio, m_irq_active));
 
 	//Clear any interrupt flags that should be cleared since we're servicing the irq!
 	switch(int_vec) {
@@ -1756,8 +1800,7 @@ static void check_irqs(mcs51_state_t *mcs51_state)
 				SET_IE0(0);
 
 			/* indicate we took the external IRQ */
-			if (mcs51_state->irq_callback != NULL)
-				(*mcs51_state->irq_callback)(mcs51_state->device, 0);
+			standard_irq_callback(0);
 
 			break;
 		case V_TF0:
@@ -1769,8 +1812,7 @@ static void check_irqs(mcs51_state_t *mcs51_state)
 			if(GET_IT1)  /* for some reason having this, breaks alving dmd games */
 				SET_IE1(0);
 			/* indicate we took the external IRQ */
-			if (mcs51_state->irq_callback != NULL)
-				(*mcs51_state->irq_callback)(mcs51_state->device, 1);
+			standard_irq_callback(1);
 
 			break;
 		case V_TF1:
@@ -1793,19 +1835,19 @@ static void check_irqs(mcs51_state_t *mcs51_state)
 	}
 }
 
-INLINE void burn_cycles(mcs51_state_t *mcs51_state, int cycles)
+void mcs51_cpu_device::burn_cycles(int cycles)
 {
 	/* Update Timer (if any timers are running) */
-	update_timers(mcs51_state, cycles);
+	update_timers(cycles);
 
 	/* Update Serial (only for mode 0) */
-	update_serial(mcs51_state, cycles);
+	update_serial(cycles);
 
 	/* check_irqs */
-	check_irqs(mcs51_state);
+	check_irqs();
 }
 
-static void mcs51_set_irq_line(mcs51_state_t *mcs51_state, int irqline, int state)
+void mcs51_cpu_device::execute_set_input(int irqline, int state)
 {
 	/* From the manual:
 	 *
@@ -1817,9 +1859,9 @@ static void mcs51_set_irq_line(mcs51_state_t *mcs51_state, int irqline, int stat
 	 * for at least one cycle (12 states)
 	 *
 	 */
-	UINT32 new_state = (mcs51_state->last_line_state & ~(1 << irqline)) | ((state != CLEAR_LINE) << irqline);
+	UINT32 new_state = (m_last_line_state & ~(1 << irqline)) | ((state != CLEAR_LINE) << irqline);
 	/* detect 0->1 transistions */
-	UINT32 tr_state = (~mcs51_state->last_line_state) & new_state;
+	UINT32 tr_state = (~m_last_line_state) & new_state;
 
 	switch( irqline )
 	{
@@ -1865,31 +1907,31 @@ static void mcs51_set_irq_line(mcs51_state_t *mcs51_state, int irqline, int stat
 
 		case MCS51_T0_LINE:
 			if (GET_BIT(tr_state, MCS51_T0_LINE) && GET_TR0)
-				mcs51_state->t0_cnt++;
+				m_t0_cnt++;
 			break;
 
 		case MCS51_T1_LINE:
 			if (GET_BIT(tr_state, MCS51_T1_LINE) && GET_TR1)
-				mcs51_state->t1_cnt++;
+				m_t1_cnt++;
 			break;
 
 		case MCS51_T2_LINE:
-			if (mcs51_state->features & FEATURE_I8052)
+			if (m_features & FEATURE_I8052)
 			{
 				if (GET_BIT(tr_state, MCS51_T2_LINE) && GET_TR1)
-					mcs51_state->t2_cnt++;
+					m_t2_cnt++;
 			}
 			else
 				fatalerror("mcs51: Trying to set T2_LINE on a non I8052 type cpu.\n");
 			break;
 
 		case MCS51_T2EX_LINE:
-			if (mcs51_state->features & FEATURE_I8052)
+			if (m_features & FEATURE_I8052)
 			{
 				if (GET_BIT(tr_state, MCS51_T2EX_LINE))
 				{
 					SET_EXF2(1);
-					mcs51_state->t2ex_cnt++;
+					m_t2ex_cnt++;
 				}
 			}
 			else
@@ -1900,13 +1942,13 @@ static void mcs51_set_irq_line(mcs51_state_t *mcs51_state, int irqline, int stat
 			/* Is the enable flags for this interrupt set? */
 			if (state != CLEAR_LINE)
 			{
-				serial_receive(mcs51_state);
+				serial_receive();
 			}
 			break;
 
 		/* Power Fail Interrupt */
 		case DS5002FP_PFI_LINE:
-			if (mcs51_state->features & FEATURE_DS5002FP)
+			if (m_features & FEATURE_DS5002FP)
 			{
 				/* Need cleared->active line transition? (Logical 1-0 Pulse on the line) - CLEAR->ASSERT Transition since INT1 active lo! */
 				if (GET_BIT(tr_state, MCS51_INT1_LINE))
@@ -1916,39 +1958,38 @@ static void mcs51_set_irq_line(mcs51_state_t *mcs51_state, int irqline, int stat
 				fatalerror("mcs51: Trying to set DS5002FP_PFI_LINE on a non DS5002FP type cpu.\n");
 			break;
 	}
-	mcs51_state->last_line_state = new_state;
+	m_last_line_state = new_state;
 }
 
 /* Execute cycles - returns number of cycles actually run */
-static CPU_EXECUTE( mcs51 )
+void mcs51_cpu_device::execute_run()
 {
-	mcs51_state_t *mcs51_state = get_safe_token(device);
 	UINT8 op;
 
-	update_ptrs(mcs51_state);
+	update_ptrs();
 
 	/* external interrupts may have been set since we last checked */
-	mcs51_state->inst_cycles = 0;
-	check_irqs(mcs51_state);
+	m_inst_cycles = 0;
+	check_irqs();
 
 	/* if in powerdown, just return */
-	if ((mcs51_state->features & FEATURE_CMOS) && GET_PD)
+	if ((m_features & FEATURE_CMOS) && GET_PD)
 	{
-		mcs51_state->icount = 0;
+		m_icount = 0;
 		return;
 	}
 
-	mcs51_state->icount -= mcs51_state->inst_cycles;
-	burn_cycles(mcs51_state, mcs51_state->inst_cycles);
+	m_icount -= m_inst_cycles;
+	burn_cycles(m_inst_cycles);
 
-	if ((mcs51_state->features & FEATURE_CMOS) && GET_IDL)
+	if ((m_features & FEATURE_CMOS) && GET_IDL)
 	{
 		do
 		{
 			/* burn the cycles */
-			mcs51_state->icount--;
-			burn_cycles(mcs51_state, 1);
-		} while( mcs51_state->icount > 0 );
+			m_icount--;
+			burn_cycles(1);
+		} while( m_icount > 0 );
 		return;
 	}
 
@@ -1956,31 +1997,31 @@ static CPU_EXECUTE( mcs51 )
 	{
 		/* Read next opcode */
 		PPC = PC;
-		debugger_instruction_hook(device, PC);
-		op = mcs51_state->direct->read_decrypted_byte(PC++);
+		debugger_instruction_hook(this, PC);
+		op = m_direct->read_decrypted_byte(PC++);
 
 		/* process opcode and count cycles */
-		mcs51_state->inst_cycles = mcs51_cycles[op];
-		execute_op(mcs51_state, op);
+		m_inst_cycles = mcs51_cycles[op];
+		execute_op(op);
 
 		/* burn the cycles */
-		mcs51_state->icount -= mcs51_state->inst_cycles;
+		m_icount -= m_inst_cycles;
 
 		/* if in powerdown, just return */
-		if ((mcs51_state->features & FEATURE_CMOS) && GET_PD)
+		if ((m_features & FEATURE_CMOS) && GET_PD)
 			return;
 
-		burn_cycles(mcs51_state, mcs51_state->inst_cycles);
+		burn_cycles(m_inst_cycles);
 
 		/* decrement the timed access window */
-		if (mcs51_state->features & FEATURE_DS5002FP)
-			mcs51_state->ds5002fp.ta_window = (mcs51_state->ds5002fp.ta_window ? (mcs51_state->ds5002fp.ta_window - 1) : 0x00);
+		if (m_features & FEATURE_DS5002FP)
+			m_ds5002fp.ta_window = (m_ds5002fp.ta_window ? (m_ds5002fp.ta_window - 1) : 0x00);
 
 		/* If the chip entered in idle mode, end the loop */
-		if ((mcs51_state->features & FEATURE_CMOS) && GET_IDL)
+		if ((m_features & FEATURE_CMOS) && GET_IDL)
 			return;
 
-	} while( mcs51_state->icount > 0 );
+	} while( m_icount > 0 );
 }
 
 
@@ -1988,7 +2029,7 @@ static CPU_EXECUTE( mcs51 )
  * MCS51/8051 Section
  ****************************************************************************/
 
-static void mcs51_sfr_write(mcs51_state_t *mcs51_state, size_t offset, UINT8 data)
+void mcs51_cpu_device::sfr_write(size_t offset, UINT8 data)
 {
 	/* update register */
 	assert(offset >= 0x80 && offset <= 0xff);
@@ -1999,10 +2040,10 @@ static void mcs51_sfr_write(mcs51_state_t *mcs51_state, size_t offset, UINT8 dat
 		case ADDR_P1:   OUT(MCS51_PORT_P1,data);            break;
 		case ADDR_P2:   OUT(MCS51_PORT_P2,data);            break;
 		case ADDR_P3:   OUT(MCS51_PORT_P3,data);            break;
-		case ADDR_SBUF: serial_transmit(mcs51_state, data);         break;
+		case ADDR_SBUF: serial_transmit(data);         break;
 		case ADDR_PSW:  SET_PARITY();                       break;
 		case ADDR_ACC:  SET_PARITY();                       break;
-		case ADDR_IP:   update_irq_prio(mcs51_state, data, 0);  break;
+		case ADDR_IP:   update_irq_prio(data, 0);  break;
 		/* R_SBUF = data;        //This register is used only for "Receiving data coming in!" */
 
 		case ADDR_B:
@@ -2020,14 +2061,14 @@ static void mcs51_sfr_write(mcs51_state_t *mcs51_state, size_t offset, UINT8 dat
 		case ADDR_SCON:
 			break;
 		default:
-			LOG(("mcs51 '%s': attemping to write to an invalid/non-implemented SFR address: %x at 0x%04x, data=%x\n", mcs51_state->device->tag(), (UINT32)offset,PC,data));
+			LOG(("mcs51 '%s': attemping to write to an invalid/non-implemented SFR address: %x at 0x%04x, data=%x\n", tag(), (UINT32)offset,PC,data));
 			/* no write in this case according to manual */
 			return;
 	}
-	mcs51_state->data->write_byte((size_t)offset | 0x100, data);
+	m_data->write_byte((size_t)offset | 0x100, data);
 }
 
-static UINT8 mcs51_sfr_read(mcs51_state_t *mcs51_state, size_t offset)
+UINT8 mcs51_cpu_device::sfr_read(size_t offset)
 {
 	assert(offset >= 0x80 && offset <= 0xff);
 
@@ -2057,75 +2098,150 @@ static UINT8 mcs51_sfr_read(mcs51_state_t *mcs51_state, size_t offset)
 		case ADDR_SBUF:
 		case ADDR_IE:
 		case ADDR_IP:
-			return mcs51_state->data->read_byte((size_t) offset | 0x100);
+			return m_data->read_byte((size_t) offset | 0x100);
 		/* Illegal or non-implemented sfr */
 		default:
-			LOG(("mcs51 '%s': attemping to read an invalid/non-implemented SFR address: %x at 0x%04x\n", mcs51_state->device->tag(), (UINT32)offset,PC));
+			LOG(("mcs51 '%s': attemping to read an invalid/non-implemented SFR address: %x at 0x%04x\n", tag(), (UINT32)offset,PC));
 			/* according to the manual, the read may return random bits */
 			return 0xff;
 	}
 }
 
 
-static CPU_INIT( mcs51 )
+void mcs51_cpu_device::device_start()
 {
-	mcs51_state_t *mcs51_state = get_safe_token(device);
-
-	mcs51_state->irq_callback = irqcallback;
-	mcs51_state->device = device;
-
-	mcs51_state->program = &device->space(AS_PROGRAM);
-	mcs51_state->direct = &mcs51_state->program->direct();
-	mcs51_state->data = &device->space(AS_DATA);
-	mcs51_state->io = &device->space(AS_IO);
-
-	mcs51_state->features = FEATURE_NONE;
-	mcs51_state->ram_mask = 0x7F;           /* 128 bytes of ram */
-	mcs51_state->num_interrupts = 5;            /* 5 interrupts */
-	mcs51_state->sfr_read = mcs51_sfr_read;
-	mcs51_state->sfr_write = mcs51_sfr_write;
+	m_program = &space(AS_PROGRAM);
+	m_direct = &m_program->direct();
+	m_data = &space(AS_DATA);
+	m_io = &space(AS_IO);
 
 	/* ensure these pointers are set before get_info is called */
-	update_ptrs(mcs51_state);
+	update_ptrs();
 
 	/* Save states */
 
-	device->save_item(NAME(mcs51_state->ppc));
-	device->save_item(NAME(mcs51_state->pc));
-	device->save_item(NAME(mcs51_state->rwm) );
-	device->save_item(NAME(mcs51_state->cur_irq_prio) );
-	device->save_item(NAME(mcs51_state->last_line_state) );
-	device->save_item(NAME(mcs51_state->t0_cnt) );
-	device->save_item(NAME(mcs51_state->t1_cnt) );
-	device->save_item(NAME(mcs51_state->t2_cnt) );
-	device->save_item(NAME(mcs51_state->t2ex_cnt) );
-	device->save_item(NAME(mcs51_state->recalc_parity) );
-	device->save_item(NAME(mcs51_state->irq_prio) );
-	device->save_item(NAME(mcs51_state->irq_active) );
+	save_item(NAME(m_ppc));
+	save_item(NAME(m_pc));
+	save_item(NAME(m_rwm) );
+	save_item(NAME(m_cur_irq_prio) );
+	save_item(NAME(m_last_line_state) );
+	save_item(NAME(m_t0_cnt) );
+	save_item(NAME(m_t1_cnt) );
+	save_item(NAME(m_t2_cnt) );
+	save_item(NAME(m_t2ex_cnt) );
+	save_item(NAME(m_recalc_parity) );
+	save_item(NAME(m_irq_prio) );
+	save_item(NAME(m_irq_active) );
+	save_item(NAME(m_ds5002fp.previous_ta) );
+	save_item(NAME(m_ds5002fp.ta_window) );
+	save_item(NAME(m_ds5002fp.range) );
+
+	state_add( MCS51_PC,  "PC", m_pc).formatstr("%04X");
+	state_add( MCS51_SP,  "SP", SP).formatstr("%02X");
+	state_add( MCS51_PSW, "PSW", PSW).formatstr("%02X");
+	state_add( MCS51_ACC, "A", ACC).formatstr("%02X");
+	state_add( MCS51_B,   "B", B).formatstr("%02X");
+	state_add( MCS51_DPH, "DPH", DPH).formatstr("%02X");
+	state_add( MCS51_DPL, "DPL", DPL).formatstr("%02X");
+	state_add( MCS51_IE,  "IE", IE).formatstr("%02X");
+	state_add( MCS51_R0,  "R0", m_rtemp).callimport().callexport().formatstr("%02X");
+	state_add( MCS51_R1,  "R1", m_rtemp).callimport().callexport().formatstr("%02X");
+	state_add( MCS51_R2,  "R2", m_rtemp).callimport().callexport().formatstr("%02X");
+	state_add( MCS51_R3,  "R3", m_rtemp).callimport().callexport().formatstr("%02X");
+	state_add( MCS51_R4,  "R4", m_rtemp).callimport().callexport().formatstr("%02X");
+	state_add( MCS51_R5,  "R5", m_rtemp).callimport().callexport().formatstr("%02X");
+	state_add( MCS51_R6,  "R6", m_rtemp).callimport().callexport().formatstr("%02X");
+	state_add( MCS51_R7,  "R7", m_rtemp).callimport().callexport().formatstr("%02X");
+	state_add( MCS51_RB,  "RB", m_rtemp).mask(0x03).callimport().callexport().formatstr("%02X");
+
+	state_add( STATE_GENPC, "GENPC", m_pc ).noshow();
+	state_add( STATE_GENFLAGS, "GENFLAGS", m_rtemp).formatstr("%8s").noshow();
+
+	m_icountptr = &m_icount;
 }
 
-static CPU_INIT( i80c51 )
+
+void mcs51_cpu_device::state_import(const device_state_entry &entry)
 {
-	mcs51_state_t *mcs51_state = get_safe_token(device);
-	CPU_INIT_CALL(mcs51);
-	mcs51_state->features |= FEATURE_CMOS;
+	switch (entry.index())
+	{
+		case MCS51_R0:
+		case MCS51_R1:
+		case MCS51_R2:
+		case MCS51_R3:
+		case MCS51_R4:
+		case MCS51_R5:
+		case MCS51_R6:
+		case MCS51_R7:
+			SET_REG( entry.index() - MCS51_R0, m_rtemp );
+			break;
+
+		case MCS51_RB:
+			SET_RS( m_rtemp );
+			break;
+
+		default:
+			fatalerror("CPU_IMPORT_STATE(mcs48) called for unexpected value\n");
+			break;
+	}
+}
+
+void mcs51_cpu_device::state_export(const device_state_entry &entry)
+{
+	switch (entry.index())
+	{
+		case MCS51_R0:
+		case MCS51_R1:
+		case MCS51_R2:
+		case MCS51_R3:
+		case MCS51_R4:
+		case MCS51_R5:
+		case MCS51_R6:
+		case MCS51_R7:
+			m_rtemp = R_REG(entry.index() - MCS51_R0);
+			break;
+
+		case MCS51_RB:
+			m_rtemp = ((PSW & 0x18)>>3);
+			break;
+
+		default:
+			fatalerror("CPU_EXPORT_STATE(mcs51) called for unexpected value\n");
+			break;
+	}
+}
+
+void mcs51_cpu_device::state_string_export(const device_state_entry &entry, astring &string)
+{
+	switch (entry.index())
+	{
+		case STATE_GENFLAGS:
+			string.printf("%c%c%c%c%c%c%c%c",
+				PSW & 0x80 ? 'C':'.',
+				PSW & 0x40 ? 'A':'.',
+				PSW & 0x20 ? 'F':'.',
+				PSW & 0x10 ? '0':'.',
+				PSW & 0x08 ? '1':'.',
+				PSW & 0x04 ? 'V':'.',
+				PSW & 0x02 ? '?':'.',
+				PSW & 0x01 ? 'P':'.');
+			break;
+	}
 }
 
 /* Reset registers to the initial values */
-static CPU_RESET( mcs51 )
+void mcs51_cpu_device::device_reset()
 {
-	mcs51_state_t *mcs51_state = get_safe_token(device);
+	update_ptrs();
 
-	update_ptrs(mcs51_state);
-
-	mcs51_state->last_line_state = 0;
-	mcs51_state->t0_cnt = 0;
-	mcs51_state->t1_cnt = 0;
-	mcs51_state->t2_cnt = 0;
-	mcs51_state->t2ex_cnt = 0;
+	m_last_line_state = 0;
+	m_t0_cnt = 0;
+	m_t1_cnt = 0;
+	m_t2_cnt = 0;
+	m_t2ex_cnt = 0;
 	/* Flag as NO IRQ in Progress */
-	mcs51_state->irq_active = 0;
-	mcs51_state->cur_irq_prio = -1;
+	m_irq_active = 0;
+	m_cur_irq_prio = -1;
 
 	/* these are all defined reset states */
 	PC = 0;
@@ -2136,7 +2252,7 @@ static CPU_RESET( mcs51 )
 	DPL = 0;
 	B = 0;
 	IP = 0;
-	update_irq_prio(mcs51_state, IP, 0);
+	update_irq_prio(IP, 0);
 	IE = 0;
 	SCON = 0;
 	TCON = 0;
@@ -2153,7 +2269,7 @@ static CPU_RESET( mcs51 )
 	SET_P0(0xff);
 
 	/* 8052 Only registers */
-	if (mcs51_state->features & FEATURE_I8052)
+	if (m_features & FEATURE_I8052)
 	{
 		T2CON = 0;
 		RCAP2L = 0;
@@ -2163,51 +2279,46 @@ static CPU_RESET( mcs51 )
 	}
 
 	/* 80C52 Only registers */
-	if (mcs51_state->features & FEATURE_I80C52)
+	if (m_features & FEATURE_I80C52)
 	{
 		IPH = 0;
-		update_irq_prio(mcs51_state, IP, IPH);
+		update_irq_prio(IP, IPH);
 		SADDR = 0;
 		SADEN = 0;
 	}
 
 	/* DS5002FP Only registers */
-	if (mcs51_state->features & FEATURE_DS5002FP)
+	if (m_features & FEATURE_DS5002FP)
 	{
 		// set initial values (some of them are set using the bootstrap loader)
 		PCON = 0;
-		MCON = mcs51_state->ds5002fp.config->mcon & 0xfb;
-		RPCTL = mcs51_state->ds5002fp.config->rpctl & 0x01;
+		MCON = m_ds5002fp.mcon & 0xfb;
+		RPCTL = m_ds5002fp.rpctl & 0x01;
 		RPS = 0;
 		RNR = 0;
-		CRCR = mcs51_state->ds5002fp.config->crc & 0xf0;
+		CRCR = m_ds5002fp.crc & 0xf0;
 		CRCL = 0;
 		CRCH = 0;
 		TA = 0;
 
 		// set internal CPU state
-		mcs51_state->ds5002fp.previous_ta = 0;
-		mcs51_state->ds5002fp.ta_window = 0;
-		mcs51_state->ds5002fp.range = (GET_RG1 << 1) | GET_RG0;
+		m_ds5002fp.previous_ta = 0;
+		m_ds5002fp.ta_window = 0;
+		m_ds5002fp.range = (GET_RG1 << 1) | GET_RG0;
 	}
 
-	mcs51_state->uart.rx_clk = 0;
-	mcs51_state->uart.tx_clk = 0;
-	mcs51_state->uart.bits_to_send = 0;
-	mcs51_state->uart.delay_cycles = 0;
+	m_uart.rx_clk = 0;
+	m_uart.tx_clk = 0;
+	m_uart.bits_to_send = 0;
+	m_uart.delay_cycles = 0;
 }
 
-/* Shut down CPU core */
-static CPU_EXIT( mcs51 )
-{
-	/* nothing to do */
-}
 
 /****************************************************************************
  * 8052 Section
  ****************************************************************************/
 
-static void i8052_sfr_write(mcs51_state_t *mcs51_state, size_t offset, UINT8 data)
+void i8052_device::sfr_write(size_t offset, UINT8 data)
 {
 	switch (offset)
 	{
@@ -2217,15 +2328,15 @@ static void i8052_sfr_write(mcs51_state_t *mcs51_state, size_t offset, UINT8 dat
 		case ADDR_RCAP2H:
 		case ADDR_TL2:
 		case ADDR_TH2:
-			mcs51_state->data->write_byte((size_t) offset | 0x100, data);
+			m_data->write_byte((size_t) offset | 0x100, data);
 			break;
 
 		default:
-			mcs51_sfr_write(mcs51_state, offset, data);
+			mcs51_cpu_device::sfr_write(offset, data);
 	}
 }
 
-static UINT8 i8052_sfr_read(mcs51_state_t *mcs51_state, size_t offset)
+UINT8 i8052_device::sfr_read(size_t offset)
 {
 	switch (offset)
 	{
@@ -2235,52 +2346,40 @@ static UINT8 i8052_sfr_read(mcs51_state_t *mcs51_state, size_t offset)
 		case ADDR_RCAP2H:
 		case ADDR_TL2:
 		case ADDR_TH2:
-			return mcs51_state->data->read_byte((size_t) offset | 0x100);
+			return m_data->read_byte((size_t) offset | 0x100);
 		default:
-			return mcs51_sfr_read(mcs51_state, offset);
+			return mcs51_cpu_device::sfr_read(offset);
 	}
 }
 
-static CPU_INIT( i8052 )
-{
-	mcs51_state_t *mcs51_state = get_safe_token(device);
-	CPU_INIT_CALL(mcs51);
-
-	mcs51_state->ram_mask = 0xFF;           /* 256 bytes of ram */
-	mcs51_state->num_interrupts = 6;            /* 6 interrupts */
-
-	mcs51_state->features |= FEATURE_I8052;
-	mcs51_state->sfr_read = i8052_sfr_read;
-	mcs51_state->sfr_write = i8052_sfr_write;
-}
 
 /****************************************************************************
  * 80C52 Section
  ****************************************************************************/
 
-static void i80c52_sfr_write(mcs51_state_t *mcs51_state, size_t offset, UINT8 data)
+void i80c52_device::sfr_write(size_t offset, UINT8 data)
 {
 	switch (offset)
 	{
 		/* 80c52 family specific */
 		case ADDR_IP:
-			update_irq_prio(mcs51_state, data, IPH);
+			update_irq_prio(data, IPH);
 			break;
 		case ADDR_IPH:
-			update_irq_prio(mcs51_state, IP, data);
+			update_irq_prio(IP, data);
 			break;
 		case ADDR_SADDR:
 		case ADDR_SADEN:
 			break;
 
 		default:
-			i8052_sfr_write(mcs51_state, offset, data);
+			i8052_device::sfr_write(offset, data);
 			return;
 	}
-	mcs51_state->data->write_byte((size_t) offset | 0x100, data);
+	m_data->write_byte((size_t) offset | 0x100, data);
 }
 
-static UINT8 i80c52_sfr_read(mcs51_state_t *mcs51_state, size_t offset)
+UINT8 i80c52_device::sfr_read(size_t offset)
 {
 	switch (offset)
 	{
@@ -2288,81 +2387,64 @@ static UINT8 i80c52_sfr_read(mcs51_state_t *mcs51_state, size_t offset)
 		case ADDR_IPH:
 		case ADDR_SADDR:
 		case ADDR_SADEN:
-			return mcs51_state->data->read_byte((size_t) offset | 0x100);
+			return m_data->read_byte((size_t) offset | 0x100);
 		default:
-			return i8052_sfr_read(mcs51_state, offset);
+			return i8052_device::sfr_read(offset);
 	}
 }
 
-static CPU_INIT( i80c52 )
-{
-	mcs51_state_t *mcs51_state = get_safe_token(device);
-	CPU_INIT_CALL(i8052);
-
-	mcs51_state->features |= (FEATURE_I80C52 | FEATURE_CMOS);
-	mcs51_state->sfr_read = i80c52_sfr_read;
-	mcs51_state->sfr_write = i80c52_sfr_write;
-}
-
-static CPU_INIT( i80c31 )
-{
-	mcs51_state_t *mcs51_state = get_safe_token(device);
-	CPU_INIT_CALL(i8052);
-
-	mcs51_state->ram_mask = 0x7F;           /* 128 bytes of ram */
-}
 
 /****************************************************************************
  * DS5002FP Section
  ****************************************************************************/
 
 
-#define DS5_LOGW(a, d)  LOG(("ds5002fp '%s': write to  " # a " register at 0x%04x, data=%x\n", mcs51_state->device->tag(), PC, d))
-#define DS5_LOGR(a, d)  LOG(("ds5002fp '%s': read from " # a " register at 0x%04x\n", mcs51_state->device->tag(), PC))
+#define DS5_LOGW(a, d)  LOG(("ds5002fp '%s': write to  " # a " register at 0x%04x, data=%x\n", tag(), PC, d))
+#define DS5_LOGR(a, d)  LOG(("ds5002fp '%s': read from " # a " register at 0x%04x\n", tag(), PC))
 
-INLINE UINT8 ds5002fp_protected(mcs51_state_t *mcs51_state, size_t offset, UINT8 data, UINT8 ta_mask, UINT8 mask)
+UINT8 mcs51_cpu_device::ds5002fp_protected(size_t offset, UINT8 data, UINT8 ta_mask, UINT8 mask)
 {
 	UINT8 is_timed_access;
 
-	is_timed_access = (mcs51_state->ds5002fp.ta_window > 0) && (TA == 0x55);
+	is_timed_access = (m_ds5002fp.ta_window > 0) && (TA == 0x55);
 	if (is_timed_access)
 	{
 		ta_mask = 0xff;
 	}
-	data = (mcs51_state->sfr_ram[offset] & (~ta_mask)) | (data & ta_mask);
-	return (mcs51_state->sfr_ram[offset] & (~mask)) | (data & mask);
+	data = (m_sfr_ram[offset] & (~ta_mask)) | (data & ta_mask);
+	return (m_sfr_ram[offset] & (~mask)) | (data & mask);
 }
 
-static void ds5002fp_sfr_write(mcs51_state_t *mcs51_state, size_t offset, UINT8 data)
+void ds5002fp_device::sfr_write(size_t offset, UINT8 data)
 {
 	switch (offset)
 	{
 		case ADDR_TA:
-			mcs51_state->ds5002fp.previous_ta = TA;
+			m_ds5002fp.previous_ta = TA;
 			/*  init the time window after having wrote 0xaa */
-			if ((data == 0xaa) && (mcs51_state->ds5002fp.ta_window == 0))
+			if ((data == 0xaa) && (m_ds5002fp.ta_window == 0))
 			{
-				mcs51_state->ds5002fp.ta_window = 6; /* 4*12 + 2*12 */
-				LOG(("ds5002fp '%s': TA window initiated at 0x%04x\n", mcs51_state->device->tag(), PC));
+				m_ds5002fp.ta_window = 6; /* 4*12 + 2*12 */
+				LOG(("ds5002fp '%s': TA window initiated at 0x%04x\n", tag(), PC));
 			}
 			break;
-		case ADDR_MCON:     data = ds5002fp_protected(mcs51_state, ADDR_MCON, data, 0x0f, 0xf7);    DS5_LOGW(MCON, data); break;
-		case ADDR_RPCTL:    data = ds5002fp_protected(mcs51_state, ADDR_RPCTL, data, 0xef, 0xfe); DS5_LOGW(RPCTL, data); break;
-		case ADDR_CRCR:     data = ds5002fp_protected(mcs51_state, ADDR_CRCR, data, 0xff, 0x0f);    DS5_LOGW(CRCR, data);   break;
-		case ADDR_PCON:     data = ds5002fp_protected(mcs51_state, ADDR_PCON, data, 0xb9, 0xff); break;
-		case ADDR_IP:       data = ds5002fp_protected(mcs51_state, ADDR_IP, data, 0x7f, 0xff);  break;
+		case ADDR_MCON:     data = ds5002fp_protected(ADDR_MCON, data, 0x0f, 0xf7);    DS5_LOGW(MCON, data); break;
+		case ADDR_RPCTL:    data = ds5002fp_protected(ADDR_RPCTL, data, 0xef, 0xfe); DS5_LOGW(RPCTL, data); break;
+		case ADDR_CRCR:     data = ds5002fp_protected(ADDR_CRCR, data, 0xff, 0x0f);    DS5_LOGW(CRCR, data);   break;
+		case ADDR_PCON:     data = ds5002fp_protected(ADDR_PCON, data, 0xb9, 0xff); break;
+		case ADDR_IP:       data = ds5002fp_protected(ADDR_IP, data, 0x7f, 0xff);  break;
 		case ADDR_CRCL:     DS5_LOGW(CRCL, data);                                   break;
 		case ADDR_CRCH:     DS5_LOGW(CRCH, data);                                   break;
 		case ADDR_RNR:      DS5_LOGW(RNR, data);                                    break;
 		case ADDR_RPS:      DS5_LOGW(RPS, data);                                    break;
 		default:
-			mcs51_sfr_write(mcs51_state, offset, data);
+			mcs51_cpu_device::sfr_write(offset, data);
 			return;
 	}
-	mcs51_state->data->write_byte((size_t) offset | 0x100, data);
+	m_data->write_byte((size_t) offset | 0x100, data);
 }
 
-static UINT8 ds5002fp_sfr_read(mcs51_state_t *mcs51_state, size_t offset)
+UINT8 ds5002fp_device::sfr_read(size_t offset)
 {
 	switch (offset)
 	{
@@ -2376,409 +2458,52 @@ static UINT8 ds5002fp_sfr_read(mcs51_state_t *mcs51_state, size_t offset)
 		case ADDR_RPS:      DS5_LOGR(RPS, data);        break;
 		case ADDR_PCON:
 			SET_PFW(0);     /* reset PFW flag */
-			return mcs51_sfr_read(mcs51_state, offset);
+			return mcs51_cpu_device::sfr_read(offset);
 		default:
-			return mcs51_sfr_read(mcs51_state, offset);
+			return mcs51_cpu_device::sfr_read(offset);
 	}
-	return mcs51_state->data->read_byte((size_t) offset | 0x100);
+	return m_data->read_byte((size_t) offset | 0x100);
 }
 
-static CPU_INIT( ds5002fp )
+
+offs_t mcs51_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
 {
-	/* default configuration */
-	static const ds5002fp_config default_config = { 0x00, 0x00, 0x00 };
-	const ds5002fp_config *sconfig = device->static_config() ? (const ds5002fp_config *)device->static_config() : &default_config;
-	mcs51_state_t *mcs51_state = get_safe_token(device);
-
-	CPU_INIT_CALL( mcs51 );
-
-	mcs51_state->ds5002fp.config = sconfig;
-	mcs51_state->features |= (FEATURE_DS5002FP | FEATURE_CMOS);
-	mcs51_state->sfr_read = ds5002fp_sfr_read;
-	mcs51_state->sfr_write = ds5002fp_sfr_write;
-
-	device->save_item(NAME(mcs51_state->ds5002fp.previous_ta) );
-	device->save_item(NAME(mcs51_state->ds5002fp.ta_window) );
-	device->save_item(NAME(mcs51_state->ds5002fp.range) );
-
+	extern CPU_DISASSEMBLE( i8051 );
+	return CPU_DISASSEMBLE_NAME(i8051)(this, buffer, pc, oprom, opram, options);
 }
 
-/***************************************************************************
-    ADDRESS MAPS
-***************************************************************************/
 
-static ADDRESS_MAP_START(program_12bit, AS_PROGRAM, 8, legacy_cpu_device)
-	AM_RANGE(0x00, 0x0fff) AM_ROM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START(program_13bit, AS_PROGRAM, 8, legacy_cpu_device)
-	AM_RANGE(0x00, 0x1fff) AM_ROM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START(data_7bit, AS_DATA, 8, legacy_cpu_device)
-	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x0100, 0x01ff) AM_RAM /* SFR */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START(data_8bit, AS_DATA, 8, legacy_cpu_device)
-	AM_RANGE(0x0000, 0x00ff) AM_RAM
-	AM_RANGE(0x0100, 0x01ff) AM_RAM /* SFR */
-ADDRESS_MAP_END
-
-
-/**************************************************************************
- * Generic set_info
- **************************************************************************/
-
-static CPU_SET_INFO( mcs51 )
+offs_t i8052_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
 {
-	mcs51_state_t *mcs51_state = get_safe_token(device);
-
-	switch (state)
-	{
-		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_PC:                            PC = info->i;                           break;
-		case CPUINFO_INT_SP:                            SP = info->i;                           break;
-
-		case CPUINFO_INT_INPUT_STATE + MCS51_INT0_LINE: mcs51_set_irq_line(mcs51_state, MCS51_INT0_LINE, info->i); break;
-		case CPUINFO_INT_INPUT_STATE + MCS51_INT1_LINE: mcs51_set_irq_line(mcs51_state, MCS51_INT1_LINE, info->i); break;
-		case CPUINFO_INT_INPUT_STATE + MCS51_T0_LINE:   mcs51_set_irq_line(mcs51_state, MCS51_T0_LINE, info->i); break;
-		case CPUINFO_INT_INPUT_STATE + MCS51_T1_LINE:   mcs51_set_irq_line(mcs51_state, MCS51_T1_LINE, info->i); break;
-		case CPUINFO_INT_INPUT_STATE + MCS51_RX_LINE:   mcs51_set_irq_line(mcs51_state, MCS51_RX_LINE, info->i); break;
-
-		case CPUINFO_INT_REGISTER + MCS51_PC:           PC = info->i;                               break;
-		case CPUINFO_INT_REGISTER + MCS51_SP:           SP = info->i;                           break;
-		case CPUINFO_INT_REGISTER + MCS51_PSW:          SET_PSW(info->i);                           break;
-		case CPUINFO_INT_REGISTER + MCS51_ACC:          SET_ACC(info->i);                           break;
-		case CPUINFO_INT_REGISTER + MCS51_B:            B = info->i;                                break;
-		case CPUINFO_INT_REGISTER + MCS51_DPH:          DPH = info->i;                          break;
-		case CPUINFO_INT_REGISTER + MCS51_DPL:          DPL = info->i;                          break;
-		case CPUINFO_INT_REGISTER + MCS51_IE:           IE = info->i;                           break;
-		case CPUINFO_INT_REGISTER + MCS51_R0:           SET_REG(0, info->i); break;
-		case CPUINFO_INT_REGISTER + MCS51_R1:           SET_REG(1, info->i); break;
-		case CPUINFO_INT_REGISTER + MCS51_R2:           SET_REG(2, info->i); break;
-		case CPUINFO_INT_REGISTER + MCS51_R3:           SET_REG(3, info->i); break;
-		case CPUINFO_INT_REGISTER + MCS51_R4:           SET_REG(4, info->i); break;
-		case CPUINFO_INT_REGISTER + MCS51_R5:           SET_REG(5, info->i); break;
-		case CPUINFO_INT_REGISTER + MCS51_R6:           SET_REG(6, info->i); break;
-		case CPUINFO_INT_REGISTER + MCS51_R7:           SET_REG(7, info->i); break;
-		case CPUINFO_INT_REGISTER + MCS51_RB:           SET_RS(info->i); break;
-	}
+	extern CPU_DISASSEMBLE( i8052 );
+	return CPU_DISASSEMBLE_NAME(i8052)(this, buffer, pc, oprom, opram, options);
 }
 
 
-
-/**************************************************************************
- * Generic get_info
- **************************************************************************/
-
-static CPU_GET_INFO( mcs51 )
+offs_t i80c31_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
 {
-	mcs51_state_t *mcs51_state = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
-
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:                  info->i = sizeof(mcs51_state_t);                break;
-		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:            info->i = 0;                                break;
-		case CPUINFO_INT_ENDIANNESS:                    info->i = ENDIANNESS_LITTLE;                        break;
-		case CPUINFO_INT_CLOCK_MULTIPLIER:              info->i = 1;                                break;
-		case CPUINFO_INT_CLOCK_DIVIDER:                 info->i = 12;                               break;
-		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:         info->i = 1;                                break;
-		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:         info->i = 5;                                break;
-		case CPUINFO_INT_MIN_CYCLES:                    info->i = 1;                                break;
-		case CPUINFO_INT_MAX_CYCLES:                    info->i = 20; /* rough guess */             break;
-		case CPUINFO_INT_INPUT_LINES:                   info->i = 3;                                break;
-
-		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:    info->i = 8;                        break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 16;                      break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = 0;                       break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:   info->i = 8;                        break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:   info->i = 9; /* due to sfr mapping */                   break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:   info->i = 0;                        break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_IO: info->i = 8;                            break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO: info->i = 18; /* 128k for ds5002fp */                           break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO: info->i = 0;                            break;
-
-		case CPUINFO_INT_PREVIOUSPC:                    info->i = PPC;                              break;
-		case CPUINFO_INT_PC:                            info->i = PC;                               break;
-		case CPUINFO_INT_SP:                            info->i = SP;                               break;
-
-		case CPUINFO_INT_REGISTER + MCS51_PC:           info->i = PC;                               break;
-		case CPUINFO_INT_REGISTER + MCS51_SP:           info->i = SP;                               break;
-		case CPUINFO_INT_REGISTER + MCS51_PSW:          info->i = PSW;                              break;
-		case CPUINFO_INT_REGISTER + MCS51_ACC:          info->i = ACC;                              break;
-		case CPUINFO_INT_REGISTER + MCS51_B:            info->i = B;                                break;
-		case CPUINFO_INT_REGISTER + MCS51_DPH:          info->i = DPH;                              break;
-		case CPUINFO_INT_REGISTER + MCS51_DPL:          info->i = DPL;                              break;
-		case CPUINFO_INT_REGISTER + MCS51_IE:           info->i = IE;                               break;
-		case CPUINFO_INT_REGISTER + MCS51_R0:           info->i = R_REG(0);                         break;
-		case CPUINFO_INT_REGISTER + MCS51_R1:           info->i = R_REG(1);                         break;
-		case CPUINFO_INT_REGISTER + MCS51_R2:           info->i = R_REG(2);                         break;
-		case CPUINFO_INT_REGISTER + MCS51_R3:           info->i = R_REG(3);                         break;
-		case CPUINFO_INT_REGISTER + MCS51_R4:           info->i = R_REG(4);                         break;
-		case CPUINFO_INT_REGISTER + MCS51_R5:           info->i = R_REG(5);                         break;
-		case CPUINFO_INT_REGISTER + MCS51_R6:           info->i = R_REG(6);                         break;
-		case CPUINFO_INT_REGISTER + MCS51_R7:           info->i = R_REG(7);                         break;
-		case CPUINFO_INT_REGISTER + MCS51_RB:           info->i = R_REG(8);                         break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_SET_INFO:                      info->setinfo = CPU_SET_INFO_NAME(mcs51);               break;
-		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(mcs51);          break;
-		case CPUINFO_FCT_RESET:                         info->reset = CPU_RESET_NAME(mcs51);        break;
-		case CPUINFO_FCT_EXIT:                          info->exit = CPU_EXIT_NAME(mcs51);          break;
-		case CPUINFO_FCT_EXECUTE:                       info->execute = CPU_EXECUTE_NAME(mcs51);    break;
-		case CPUINFO_FCT_BURN:                          info->burn = NULL;                          break;
-		case CPUINFO_FCT_DISASSEMBLE:                   info->disassemble = CPU_DISASSEMBLE_NAME(i8051);                break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:           info->icount = &mcs51_state->icount;                break;
-
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM: info->internal_map8 = NULL;  break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:    info->internal_map8 = NULL;  break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_IO:      info->internal_map8 = NULL;  break;
-
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "I8051");                   break;
-		case CPUINFO_STR_FAMILY:                    strcpy(info->s, "MCS-51");                  break;
-		case CPUINFO_STR_VERSION:                   strcpy(info->s, "1.0");                     break;
-		case CPUINFO_STR_SOURCE_FILE:                       strcpy(info->s, __FILE__);                  break;
-		case CPUINFO_STR_CREDITS:                   strcpy(info->s, "Copyright Steve Ellenoff"); break;
-
-		case CPUINFO_STR_FLAGS:
-			sprintf(info->s, "%c%c%c%c%c%c%c%c",
-				PSW & 0x80 ? 'C':'.',
-				PSW & 0x40 ? 'A':'.',
-				PSW & 0x20 ? 'F':'.',
-				PSW & 0x10 ? '0':'.',
-				PSW & 0x08 ? '1':'.',
-				PSW & 0x04 ? 'V':'.',
-				PSW & 0x02 ? '?':'.',
-				PSW & 0x01 ? 'P':'.');
-			break;
-
-		case CPUINFO_STR_REGISTER + MCS51_PC:           sprintf(info->s, "PC:%04X", mcs51_state->pc);       break;
-		case CPUINFO_STR_REGISTER + MCS51_SP:           sprintf(info->s, "SP:%02X", SP);            break;
-		case CPUINFO_STR_REGISTER + MCS51_PSW:          sprintf(info->s, "PSW:%02X", PSW);          break;
-		case CPUINFO_STR_REGISTER + MCS51_ACC:          sprintf(info->s, "A:%02X", ACC);            break;
-		case CPUINFO_STR_REGISTER + MCS51_B:            sprintf(info->s, "B:%02X", B);              break;
-		case CPUINFO_STR_REGISTER + MCS51_DPH:          sprintf(info->s, "DPH:%02X", DPH);          break;
-		case CPUINFO_STR_REGISTER + MCS51_DPL:          sprintf(info->s, "DPL:%02X", DPL);          break;
-		case CPUINFO_STR_REGISTER + MCS51_IE:           sprintf(info->s, "IE:%02X", IE);            break;
-		case CPUINFO_STR_REGISTER + MCS51_R0:           sprintf(info->s, "R0:%02X", R_REG(0));      break;
-		case CPUINFO_STR_REGISTER + MCS51_R1:           sprintf(info->s, "R1:%02X", R_REG(1));      break;
-		case CPUINFO_STR_REGISTER + MCS51_R2:           sprintf(info->s, "R2:%02X", R_REG(2));      break;
-		case CPUINFO_STR_REGISTER + MCS51_R3:           sprintf(info->s, "R3:%02X", R_REG(3));      break;
-		case CPUINFO_STR_REGISTER + MCS51_R4:           sprintf(info->s, "R4:%02X", R_REG(4));      break;
-		case CPUINFO_STR_REGISTER + MCS51_R5:           sprintf(info->s, "R5:%02X", R_REG(5));      break;
-		case CPUINFO_STR_REGISTER + MCS51_R6:           sprintf(info->s, "R6:%02X", R_REG(6));      break;
-		case CPUINFO_STR_REGISTER + MCS51_R7:           sprintf(info->s, "R7:%02X", R_REG(7));      break;
-		case CPUINFO_STR_REGISTER + MCS51_RB:           sprintf(info->s, "RB:%02X", ((PSW & 0x18)>>3)); break;
-	}
+	extern CPU_DISASSEMBLE( i80c51 );
+	return CPU_DISASSEMBLE_NAME(i80c51)(this, buffer, pc, oprom, opram, options);
 }
 
-/**************************************************************************
- * Specific get_info
- **************************************************************************/
 
-CPU_GET_INFO( i8031 )
+offs_t i80c51_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
 {
-	switch (state)
-	{
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:    info->internal_map8 = ADDRESS_MAP_NAME(data_7bit);   break;
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "I8031");                   break;
-		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "i8031");                   break;
-		default:                                        CPU_GET_INFO_CALL(mcs51);                   break;
-	}
-	/* --- the following bits of info are returned as NULL-terminated strings --- */
+	extern CPU_DISASSEMBLE( i80c51 );
+	return CPU_DISASSEMBLE_NAME(i80c51)(this, buffer, pc, oprom, opram, options);
 }
 
-CPU_GET_INFO( i8051 )
+
+offs_t i80c52_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
 {
-	switch (state)
-	{
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM: info->internal_map8 = ADDRESS_MAP_NAME(program_12bit);   break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:    info->internal_map8 = ADDRESS_MAP_NAME(data_7bit);   break;
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "I8051");                   break;
-		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "i8051");                   break;
-		default:                                        CPU_GET_INFO_CALL(mcs51);                   break;
-	}
-	/* --- the following bits of info are returned as NULL-terminated strings --- */
+	extern CPU_DISASSEMBLE( i80c52 );
+	return CPU_DISASSEMBLE_NAME(i80c52)(this, buffer, pc, oprom, opram, options);
 }
 
-CPU_GET_INFO( i8032 )
+
+offs_t ds5002fp_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
 {
-	switch (state)
-	{
-		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(i8052);          break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:    info->internal_map8 = ADDRESS_MAP_NAME(data_8bit);   break;
-		case CPUINFO_FCT_DISASSEMBLE:                   info->disassemble = CPU_DISASSEMBLE_NAME(i8052);                break;
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "I8032");                   break;
-		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "i8032");                   break;
-		default:                                        CPU_GET_INFO_CALL(mcs51);                   break;
-	}
+	extern CPU_DISASSEMBLE( ds5002fp );
+	return CPU_DISASSEMBLE_NAME(ds5002fp)(this, buffer, pc, oprom, opram, options);
 }
 
-CPU_GET_INFO( i8052 )
-{
-	switch (state)
-	{
-		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(i8052);          break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM: info->internal_map8 = ADDRESS_MAP_NAME(program_13bit);   break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:    info->internal_map8 = ADDRESS_MAP_NAME(data_8bit);   break;
-		case CPUINFO_FCT_DISASSEMBLE:                   info->disassemble = CPU_DISASSEMBLE_NAME(i8052);                break;
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "I8052");                   break;
-		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "i8052");                   break;		
-		default:                                        CPU_GET_INFO_CALL(mcs51);                   break;
-	}
-}
-
-CPU_GET_INFO( i8751 )
-{
-	switch (state)
-	{
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM: info->internal_map8 = ADDRESS_MAP_NAME(program_12bit);   break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:    info->internal_map8 = ADDRESS_MAP_NAME(data_7bit);   break;
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "I8751");                   break;
-		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "i8751");                   break;
-		default:                                        CPU_GET_INFO_CALL(mcs51);                   break;
-	}
-}
-
-CPU_GET_INFO( i8752 )
-{
-	switch (state)
-	{
-		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(i8052);          break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM: info->internal_map8 = ADDRESS_MAP_NAME(program_13bit);   break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:    info->internal_map8 = ADDRESS_MAP_NAME(data_8bit);   break;
-		case CPUINFO_FCT_DISASSEMBLE:                   info->disassemble = CPU_DISASSEMBLE_NAME(i8052);                break;
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "I8752");                   break;
-		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "i8752");                   break;
-		default:                                        CPU_GET_INFO_CALL(mcs51);                   break;
-	}
-}
-
-/**************************************************************************
- * CMOS get_info
- **************************************************************************/
-
-CPU_GET_INFO( i80c31 )
-{
-	/* according to PHILIPS datasheet this is a stripped down version
-	 * of i80c52 with 128 bytes internal ram */
-	switch (state)
-	{
-		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(i80c31);         break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM: info->internal_map8 = NULL;  break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:    info->internal_map8 = ADDRESS_MAP_NAME(data_7bit);   break;
-		case CPUINFO_FCT_DISASSEMBLE:                   info->disassemble = CPU_DISASSEMBLE_NAME(i80c51);           break;
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "I80C31");                  break;
-		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "i80c31");                   break;		
-		default:                                        CPU_GET_INFO_CALL(i8031);                   break;
-	}
-}
-
-CPU_GET_INFO( i80c51 )
-{
-	switch (state)
-	{
-		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(i80c51);         break;
-		case CPUINFO_FCT_DISASSEMBLE:                   info->disassemble = CPU_DISASSEMBLE_NAME(i80c51);           break;
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "I80C51");                  break;
-		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "i80c51");                   break;		
-		default:                                        CPU_GET_INFO_CALL(i8051);                   break;
-	}
-}
-
-CPU_GET_INFO( i80c32 )
-{
-	switch (state)
-	{
-		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(i80c52);         break;
-		case CPUINFO_FCT_DISASSEMBLE:                   info->disassemble = CPU_DISASSEMBLE_NAME(i80c52);           break;
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "I80C32");                  break;
-		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "i80c32");                   break;		
-		default:                                        CPU_GET_INFO_CALL(i8032);                   break;
-	}
-}
-
-CPU_GET_INFO( i80c52 )
-{
-	switch (state)
-	{
-		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(i80c52);         break;
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "I80C52");                  break;
-		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "i80c52");                   break;		
-		case CPUINFO_FCT_DISASSEMBLE:                   info->disassemble = CPU_DISASSEMBLE_NAME(i80c52);           break;
-		default:                                        CPU_GET_INFO_CALL(i8052);                   break;
-	}
-}
-
-CPU_GET_INFO( i87c51 )
-{
-	switch (state)
-	{
-		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(i80c51);         break;
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "I87C51");                  break;
-		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "i87c51");                   break;		
-		case CPUINFO_FCT_DISASSEMBLE:                   info->disassemble = CPU_DISASSEMBLE_NAME(i80c51);           break;
-		default:                                        CPU_GET_INFO_CALL(i8751);                   break;
-	}
-}
-
-CPU_GET_INFO( i87c52 )
-{
-	switch (state)
-	{
-		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(i80c52);         break;
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "I87C52");                  break;
-		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "i87c52");                   break;		
-		case CPUINFO_FCT_DISASSEMBLE:                   info->disassemble = CPU_DISASSEMBLE_NAME(i80c52);           break;
-		default:                                        CPU_GET_INFO_CALL(i8752);                   break;
-	}
-}
-
-/**************************************************************************
- * Other variants get_info
- **************************************************************************/
-
-CPU_GET_INFO( at89c4051 )
-{
-	switch (state)
-	{
-		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(i80c51);         break;
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "AT89C4051");               break;
-		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "at89c4051");                   break;		
-		case CPUINFO_FCT_DISASSEMBLE:                   info->disassemble = CPU_DISASSEMBLE_NAME(i80c51);           break;
-		default:                                        CPU_GET_INFO_CALL(i8051);                   break;
-	}
-}
-
-CPU_GET_INFO( ds5002fp )
-{
-	switch (state)
-	{
-		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(ds5002fp);       break;
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "DS5002FP");                break;
-		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "ds5002fp");                   break;		
-		case CPUINFO_STR_FAMILY:                    strcpy(info->s, "Dallas");                  break;
-		case CPUINFO_STR_VERSION:                   strcpy(info->s, "1.0");                     break;
-		case CPUINFO_STR_SOURCE_FILE:                       strcpy(info->s, __FILE__);                  break;
-		case CPUINFO_STR_CREDITS:                   strcpy(info->s, "Copyright Manuel Abadia"); break;
-		case CPUINFO_FCT_DISASSEMBLE:                   info->disassemble = CPU_DISASSEMBLE_NAME(ds5002fp);         break;
-		default:                                        CPU_GET_INFO_CALL(i8051);                   break;
-	}
-}
-
-DEFINE_LEGACY_CPU_DEVICE(I8031, i8031);
-DEFINE_LEGACY_CPU_DEVICE(I8032, i8032);
-DEFINE_LEGACY_CPU_DEVICE(I8051, i8051);
-DEFINE_LEGACY_CPU_DEVICE(I8751, i8751);
-DEFINE_LEGACY_CPU_DEVICE(I8052, i8052);
-DEFINE_LEGACY_CPU_DEVICE(I8752, i8752);
-DEFINE_LEGACY_CPU_DEVICE(I80C31, i80c31);
-DEFINE_LEGACY_CPU_DEVICE(I80C51, i80c51);
-DEFINE_LEGACY_CPU_DEVICE(I87C51, i87c51);
-DEFINE_LEGACY_CPU_DEVICE(I80C32, i80c32);
-DEFINE_LEGACY_CPU_DEVICE(I80C52, i80c52);
-DEFINE_LEGACY_CPU_DEVICE(I87C52, i87c52);
-DEFINE_LEGACY_CPU_DEVICE(AT89C4051, at89c4051);
-DEFINE_LEGACY_CPU_DEVICE(DS5002FP, ds5002fp);
