@@ -847,7 +847,7 @@ void sega315_5124_device::select_sprites( int line )
 		if (m_reg[0x01] & 0x01)                         /* Check if MAG is set */
 			m_sprite_height = m_sprite_height * 2;
 
-		for (sprite_index = 0; (sprite_index < 32 * 4) && (m_sprite_count < max_sprites + 1); sprite_index += 4)
+		for (sprite_index = 0; (sprite_index < 32 * 4) && (m_sprite_count <= max_sprites); sprite_index += 4)
 		{
 			int sprite_y = space().read_byte(m_sprite_base + sprite_index);
 			if (sprite_y == 0xd0)
@@ -879,7 +879,7 @@ void sega315_5124_device::select_sprites( int line )
 		m_sprite_height = (m_reg[0x01] & 0x02) ? 16 : 8;
 		m_sprite_zoom = (m_reg[0x01] & 0x01) ? 2 : 1;
 
-		for (sprite_index = 0; (sprite_index < 64) && (m_sprite_count < max_sprites + 1); sprite_index++)
+		for (sprite_index = 0; (sprite_index < 64) && (m_sprite_count <= max_sprites); sprite_index++)
 		{
 			int sprite_y = space().read_byte(m_sprite_base + sprite_index);
 			if (m_y_pixels == 192 && sprite_y == 0xd0)
