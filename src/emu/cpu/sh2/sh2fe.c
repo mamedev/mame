@@ -14,7 +14,6 @@
 #include "sh2comn.h"
 #include "cpu/drcfe.h"
 
-#ifdef USE_SH2DRC
 /***************************************************************************
     INSTRUCTION PARSERS
 ***************************************************************************/
@@ -761,4 +760,4 @@ bool sh2_frontend::describe_group_12(opcode_desc &desc, const opcode_desc *prev,
 
 	return false;
 }
-#endif
+

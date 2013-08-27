@@ -17,8 +17,6 @@
 
 #define ENABLE_OVERFLOWS    0
 
-#ifndef MIPS3_USE_DRC
-
 /***************************************************************************
     HELPER MACROS
 ***************************************************************************/
@@ -158,22 +156,6 @@ static mips3_regs mips3;
 
 #define ROPCODE(pc)     mips3.core.direct->read_decrypted_dword(pc)
 
-
-/***************************************************************************
-    DRC COMPATIBILITY
-***************************************************************************/
-
-void mips3drc_set_options(device_t *device, UINT32 options)
-{
-}
-
-void mips3drc_add_fastram(device_t *device, offs_t start, offs_t end, UINT8 readonly, void *base)
-{
-}
-
-void mips3drc_add_hotspot(device_t *device, offs_t pc, UINT32 opcode, UINT32 cycles)
-{
-}
 
 /***************************************************************************
     EXECEPTION HANDLING
@@ -2343,7 +2325,7 @@ static CPU_INIT( vr4300le )
 	mips3.tlb_table = vtlb_table(mips3.core.vtlb);
 }
 
-CPU_GET_INFO( vr4300be )
+CPU_GET_INFO( vr4300be_int )
 {
 	switch (state)
 	{
@@ -2362,7 +2344,7 @@ CPU_GET_INFO( vr4300be )
 	}
 }
 
-CPU_GET_INFO( vr4300le )
+CPU_GET_INFO( vr4300le_int )
 {
 	switch (state)
 	{
@@ -2382,7 +2364,7 @@ CPU_GET_INFO( vr4300le )
 }
 
 // VR4310 = VR4300 with different speed bin
-CPU_GET_INFO( vr4310be )
+CPU_GET_INFO( vr4310be_int )
 {
 	switch (state)
 	{
@@ -2401,7 +2383,7 @@ CPU_GET_INFO( vr4310be )
 	}
 }
 
-CPU_GET_INFO( vr4310le )
+CPU_GET_INFO( vr4310le_int )
 {
 	switch (state)
 	{
@@ -2437,7 +2419,7 @@ static CPU_INIT( r4600le )
 	mips3.tlb_table = vtlb_table(mips3.core.vtlb);
 }
 
-CPU_GET_INFO( r4600be )
+CPU_GET_INFO( r4600be_int )
 {
 	switch (state)
 	{
@@ -2456,7 +2438,7 @@ CPU_GET_INFO( r4600be )
 	}
 }
 
-CPU_GET_INFO( r4600le )
+CPU_GET_INFO( r4600le_int )
 {
 	switch (state)
 	{
@@ -2493,7 +2475,7 @@ static CPU_INIT( r4650le )
 	mips3.tlb_table = vtlb_table(mips3.core.vtlb);
 }
 
-CPU_GET_INFO( r4650be )
+CPU_GET_INFO( r4650be_int )
 {
 	switch (state)
 	{
@@ -2512,7 +2494,7 @@ CPU_GET_INFO( r4650be )
 	}
 }
 
-CPU_GET_INFO( r4650le )
+CPU_GET_INFO( r4650le_int )
 {
 	switch (state)
 	{
@@ -2549,7 +2531,7 @@ static CPU_INIT( r4700le )
 	mips3.tlb_table = vtlb_table(mips3.core.vtlb);
 }
 
-CPU_GET_INFO( r4700be )
+CPU_GET_INFO( r4700be_int )
 {
 	switch (state)
 	{
@@ -2569,7 +2551,7 @@ CPU_GET_INFO( r4700be )
 }
 
 
-CPU_GET_INFO( r4700le )
+CPU_GET_INFO( r4700le_int )
 {
 	switch (state)
 	{
@@ -2606,7 +2588,7 @@ static CPU_INIT( r5000le )
 	mips3.tlb_table = vtlb_table(mips3.core.vtlb);
 }
 
-CPU_GET_INFO( r5000be )
+CPU_GET_INFO( r5000be_int )
 {
 	switch (state)
 	{
@@ -2625,7 +2607,7 @@ CPU_GET_INFO( r5000be )
 	}
 }
 
-CPU_GET_INFO( r5000le )
+CPU_GET_INFO( r5000le_int )
 {
 	switch (state)
 	{
@@ -2662,7 +2644,7 @@ static CPU_INIT( qed5271le )
 	mips3.tlb_table = vtlb_table(mips3.core.vtlb);
 }
 
-CPU_GET_INFO( qed5271be )
+CPU_GET_INFO( qed5271be_int )
 {
 	switch (state)
 	{
@@ -2681,7 +2663,7 @@ CPU_GET_INFO( qed5271be )
 	}
 }
 
-CPU_GET_INFO( qed5271le )
+CPU_GET_INFO( qed5271le_int )
 {
 	switch (state)
 	{
@@ -2718,7 +2700,7 @@ static CPU_INIT( rm7000le )
 	mips3.tlb_table = vtlb_table(mips3.core.vtlb);
 }
 
-CPU_GET_INFO( rm7000be )
+CPU_GET_INFO( rm7000be_int )
 {
 	switch (state)
 	{
@@ -2737,7 +2719,7 @@ CPU_GET_INFO( rm7000be )
 	}
 }
 
-CPU_GET_INFO( rm7000le )
+CPU_GET_INFO( rm7000le_int )
 {
 	switch (state)
 	{
@@ -2756,27 +2738,42 @@ CPU_GET_INFO( rm7000le )
 	}
 }
 
-DEFINE_LEGACY_CPU_DEVICE(VR4300BE, vr4300be);
-DEFINE_LEGACY_CPU_DEVICE(VR4300LE, vr4300le);
-DEFINE_LEGACY_CPU_DEVICE(VR4310BE, vr4310be);
-DEFINE_LEGACY_CPU_DEVICE(VR4310LE, vr4310le);
+DEFINE_LEGACY_CPU_DEVICE(VR4300BE_INT, vr4300be_int);
+DEFINE_LEGACY_CPU_DEVICE(VR4300LE_INT, vr4300le_int);
+DEFINE_LEGACY_CPU_DEVICE(VR4310BE_INT, vr4310be_int);
+DEFINE_LEGACY_CPU_DEVICE(VR4310LE_INT, vr4310le_int);
 
-DEFINE_LEGACY_CPU_DEVICE(R4600BE, r4600be);
-DEFINE_LEGACY_CPU_DEVICE(R4600LE, r4600le);
+DEFINE_LEGACY_CPU_DEVICE(R4600BE_INT, r4600be_int);
+DEFINE_LEGACY_CPU_DEVICE(R4600LE_INT, r4600le_int);
 
-DEFINE_LEGACY_CPU_DEVICE(R4650BE, r4650be);
-DEFINE_LEGACY_CPU_DEVICE(R4650LE, r4650le);
+DEFINE_LEGACY_CPU_DEVICE(R4650BE_INT, r4650be_int);
+DEFINE_LEGACY_CPU_DEVICE(R4650LE_INT, r4650le_int);
 
-DEFINE_LEGACY_CPU_DEVICE(R4700BE, r4700be);
-DEFINE_LEGACY_CPU_DEVICE(R4700LE, r4700le);
+DEFINE_LEGACY_CPU_DEVICE(R4700BE_INT, r4700be_int);
+DEFINE_LEGACY_CPU_DEVICE(R4700LE_INT, r4700le_int);
 
-DEFINE_LEGACY_CPU_DEVICE(R5000BE, r5000be);
-DEFINE_LEGACY_CPU_DEVICE(R5000LE, r5000le);
+DEFINE_LEGACY_CPU_DEVICE(R5000BE_INT, r5000be_int);
+DEFINE_LEGACY_CPU_DEVICE(R5000LE_INT, r5000le_int);
 
-DEFINE_LEGACY_CPU_DEVICE(QED5271BE, qed5271be);
-DEFINE_LEGACY_CPU_DEVICE(QED5271LE, qed5271le);
+DEFINE_LEGACY_CPU_DEVICE(QED5271BE_INT, qed5271be_int);
+DEFINE_LEGACY_CPU_DEVICE(QED5271LE_INT, qed5271le_int);
 
-DEFINE_LEGACY_CPU_DEVICE(RM7000BE, rm7000be);
-DEFINE_LEGACY_CPU_DEVICE(RM7000LE, rm7000le);
+DEFINE_LEGACY_CPU_DEVICE(RM7000BE_INT, rm7000be_int);
+DEFINE_LEGACY_CPU_DEVICE(RM7000LE_INT, rm7000le_int);
 
-#endif
+const device_type VR4300BE = &legacy_device_creator_drc<vr4300be_int_device, vr4300be_drc_device>;
+const device_type VR4300LE = &legacy_device_creator_drc<vr4300le_int_device, vr4300le_drc_device>;
+const device_type VR4310BE = &legacy_device_creator_drc<vr4310be_int_device, vr4310be_drc_device>;
+const device_type VR4310LE = &legacy_device_creator_drc<vr4310le_int_device, vr4310le_drc_device>;
+const device_type R4600BE = &legacy_device_creator_drc<r4600be_int_device, r4600be_drc_device>;
+const device_type R4600LE = &legacy_device_creator_drc<r4600le_int_device, r4600le_drc_device>;
+const device_type R4650BE = &legacy_device_creator_drc<r4650be_int_device, r4650be_drc_device>;
+const device_type R4650LE = &legacy_device_creator_drc<r4650le_int_device, r4650le_drc_device>;
+const device_type R4700BE = &legacy_device_creator_drc<r4700be_int_device, r4700be_drc_device>;
+const device_type R4700LE = &legacy_device_creator_drc<r4700le_int_device, r4700le_drc_device>;
+const device_type R5000BE = &legacy_device_creator_drc<r5000be_int_device, r5000be_drc_device>;
+const device_type R5000LE = &legacy_device_creator_drc<r5000le_int_device, r5000le_drc_device>;
+const device_type QED5271BE = &legacy_device_creator_drc<qed5271be_int_device, qed5271be_drc_device>;
+const device_type QED5271LE = &legacy_device_creator_drc<qed5271le_int_device, qed5271le_drc_device>;
+const device_type RM7000BE = &legacy_device_creator_drc<rm7000be_int_device, rm7000be_drc_device>;
+const device_type RM7000LE = &legacy_device_creator_drc<rm7000le_int_device, rm7000le_drc_device>;

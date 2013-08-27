@@ -107,12 +107,12 @@ typedef device_t * (*machine_config_constructor)(machine_config &config, device_
 #include "timer.h"
 #include "dinetwork.h"
 
-// timers, CPU and scheduling
-#include "devcpu.h"
-
 // machine and driver configuration
 #include "mconfig.h"
 #include "gamedrv.h"
+
+// timers, CPU and scheduling
+#include "devcpu.h"
 
 // image-related
 #include "softlist.h"

@@ -22,8 +22,6 @@
 #include <tmmintrin.h>
 #endif
 
-#define USE_RSPDRC
-
 /***************************************************************************
     REGISTER ENUMERATION
 ***************************************************************************/
@@ -214,7 +212,10 @@ struct rsp_state
 	devcb_resolved_write32 sp_set_status_func;
 };
 
-DECLARE_LEGACY_CPU_DEVICE(RSP, rsp);
+DECLARE_LEGACY_CPU_DEVICE(RSP_INT, rsp_int);
+DECLARE_LEGACY_CPU_DEVICE(RSP_DRC, rsp_drc);
+
+extern const device_type RSP;
 
 extern offs_t rsp_dasm_one(char *buffer, offs_t pc, UINT32 op);
 

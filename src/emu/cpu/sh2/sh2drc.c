@@ -17,8 +17,6 @@
 CPU_DISASSEMBLE( sh2 );
 extern unsigned DasmSH2(char *buffer, unsigned pc, UINT16 opcode);
 
-#ifdef USE_SH2DRC
-
 using namespace uml;
 
 /***************************************************************************
@@ -134,8 +132,8 @@ static void cfunc_DIV1(void *param);
 INLINE sh2_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SH1 ||
-			device->type() == SH2);
+	assert(device->type() == SH1_DRC ||
+			device->type() == SH2_DRC);
 	return *(sh2_state **)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -668,7 +666,7 @@ static CPU_INIT( sh2 )
 	memset(sh2, 0, sizeof(sh2_state));
 
 	/* initialize the common core parts */
-	sh2_common_init(sh2, device, irqcallback);
+	sh2_common_init(sh2, device, irqcallback,true);
 
 	/* allocate the implementation-specific state from the full cache */
 	sh2->cache = cache;
@@ -3182,6 +3180,7 @@ static int generate_group_12(sh2_state *sh2, drcuml_block *block, compiler_state
 
 void sh2drc_set_options(device_t *device, UINT32 options)
 {
+	if (!device->machine().options().drc()) return;
 	sh2_state *sh2 = get_safe_token(device);
 	sh2->drcoptions = options;
 }
@@ -3194,6 +3193,7 @@ void sh2drc_set_options(device_t *device, UINT32 options)
 
 void sh2drc_add_pcflush(device_t *device, offs_t address)
 {
+	if (!device->machine().options().drc()) return;
 	sh2_state *sh2 = get_safe_token(device);
 
 	if (sh2->pcfsel < ARRAY_LENGTH(sh2->pcflushes))
@@ -3303,7 +3303,7 @@ static CPU_SET_INFO( sh2 )
     given CPU instance
 -------------------------------------------------*/
 
-CPU_GET_INFO( sh2 )
+CPU_GET_INFO( sh2_drc )
 {
 	sh2_state *sh2 = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
@@ -3442,7 +3442,7 @@ CPU_GET_INFO( sh2 )
     given CPU instance
 -------------------------------------------------*/
 
-CPU_GET_INFO( sh1 )
+CPU_GET_INFO( sh1_drc )
 {
 	switch (state)
 	{
@@ -3453,11 +3453,9 @@ CPU_GET_INFO( sh1 )
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "SH-1 DRC");                break;
 		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "sh1_drc");                break;
 
-		default:                            CPU_GET_INFO_CALL(sh2);         break;
+		default:                            CPU_GET_INFO_CALL(sh2_drc);         break;
 	}
 }
 
-DEFINE_LEGACY_CPU_DEVICE(SH1, sh1);
-DEFINE_LEGACY_CPU_DEVICE(SH2, sh2);
-
-#endif  // USE_SH2DRC
+DEFINE_LEGACY_CPU_DEVICE(SH1_DRC, sh1_drc);
+DEFINE_LEGACY_CPU_DEVICE(SH2_DRC, sh2_drc);

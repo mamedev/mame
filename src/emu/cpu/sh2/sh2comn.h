@@ -12,17 +12,14 @@
 #define __SH2COMN_H__
 
 
-#define USE_SH2DRC
 
 // do we use a timer for the DMA, or have it in CPU_EXECUTE
 #define USE_TIMER_FOR_DMA
 
-#ifdef USE_SH2DRC
 #include "cpu/drcfe.h"
 #include "cpu/drcuml.h"
 #include "cpu/drcumlsh.h"
 class sh2_frontend;
-#endif
 
 #define SH2_CODE_XOR(a)     ((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(2,0))
 
@@ -120,6 +117,8 @@ struct sh2_state
 	UINT32  irqsr;              // IRQ-time old SR for DRC
 	UINT32 target;              // target for jmp/jsr/etc so the delay slot can't kill it
 	irq_entry     irq_queue[16];
+	
+	bool isdrc;
 
 	int pcfsel;                 // last pcflush entry set
 	int maxpcfsel;              // highest valid pcflush entry
@@ -166,7 +165,6 @@ struct sh2_state
 
 	void    (*ftcsr_read_callback)(UINT32 data);
 
-#ifdef USE_SH2DRC
 	drc_cache *         cache;                  /* pointer to the DRC code cache */
 	drcuml_state *      drcuml;                 /* DRC UML generator state */
 	sh2_frontend *      drcfe;                  /* pointer to the DRC front-end state */
@@ -199,10 +197,8 @@ struct sh2_state
 	/* fast RAM */
 	UINT32              fastram_select;
 	fast_ram_info       fastram[SH2_MAX_FASTRAM];
-#endif
 };
 
-#ifdef USE_SH2DRC
 class sh2_frontend : public drc_frontend
 {
 public:
@@ -222,9 +218,8 @@ private:
 
 	sh2_state &m_context;
 };
-#endif
 
-void sh2_common_init(sh2_state *sh2, legacy_cpu_device *device, device_irq_acknowledge_callback irqcallback);
+void sh2_common_init(sh2_state *sh2, legacy_cpu_device *device, device_irq_acknowledge_callback irqcallback, bool drc);
 void sh2_recalc_irq(sh2_state *sh2);
 void sh2_set_irq_line(sh2_state *sh2, int irqline, int state);
 void sh2_exception(sh2_state *sh2, const char *message, int irqline);

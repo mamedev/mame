@@ -191,6 +191,7 @@ enum
 #define OPTION_DEBUGSCRIPT          "debugscript"
 
 // core misc options
+#define OPTION_DRC                  "drc"
 #define OPTION_BIOS                 "bios"
 #define OPTION_CHEAT                "cheat"
 #define OPTION_SKIP_GAMEINFO        "skip_gameinfo"
@@ -353,6 +354,7 @@ public:
 	bool update_in_pause() const { return bool_value(OPTION_UPDATEINPAUSE); }
 
 	// core misc options
+	bool drc() const { return bool_value(OPTION_DRC); }
 	const char *bios() const { return value(OPTION_BIOS); }
 	bool cheat() const { return bool_value(OPTION_CHEAT); }
 	bool skip_gameinfo() const { return bool_value(OPTION_SKIP_GAMEINFO); }

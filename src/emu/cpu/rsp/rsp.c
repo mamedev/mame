@@ -11,8 +11,6 @@
 
 CPU_DISASSEMBLE( rsp );
 
-#ifndef USE_RSPDRC
-
 #define LOG_INSTRUCTION_EXECUTION       0
 #define SAVE_DISASM                     0
 #define SAVE_DMEM                       0
@@ -33,7 +31,7 @@ extern offs_t rsp_dasm_one(char *buffer, offs_t pc, UINT32 op);
 INLINE rsp_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
-	assert(device->type() == RSP);
+	assert(device->type() == RSP_INT);
 	return (rsp_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -302,8 +300,8 @@ static CPU_INIT( rsp )
 	rsp->flag[1] = 0;
 	rsp->flag[2] = 0;
 	rsp->flag[3] = 0;
-	rsp->square_root_res = 0;
-	rsp->square_root_high = 0;
+	//rsp->square_root_res = 0;
+	//rsp->square_root_high = 0;
 	rsp->reciprocal_res = 0;
 	rsp->reciprocal_high = 0;
 #endif
@@ -2991,7 +2989,7 @@ static CPU_SET_INFO( rsp )
 	}
 }
 
-CPU_GET_INFO( rsp )
+CPU_GET_INFO( rsp_int )
 {
 	rsp_state *rsp = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
@@ -3123,22 +3121,6 @@ CPU_GET_INFO( rsp )
 	}
 }
 
-void rspdrc_flush_drc_cache(device_t *device)
-{
-}
+DEFINE_LEGACY_CPU_DEVICE(RSP_INT, rsp_int);
 
-void rspdrc_set_options(device_t *device, UINT32 options)
-{
-}
-
-void rspdrc_add_imem(device_t *device, UINT32 *base)
-{
-}
-
-void rspdrc_add_dmem(device_t *device, UINT32 *base)
-{
-}
-
-DEFINE_LEGACY_CPU_DEVICE(RSP, rsp);
-
-#endif // USE_RSPDRC
+const device_type RSP = &legacy_device_creator_drc<rsp_int_device, rsp_drc_device>;

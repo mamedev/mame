@@ -62,8 +62,6 @@
 
 extern unsigned dasmmips3(char *buffer, unsigned pc, UINT32 op);
 
-#ifdef MIPS3_USE_DRC
-
 using namespace uml;
 
 /***************************************************************************
@@ -301,22 +299,22 @@ static const UINT8 fpmode_source[4] =
 INLINE mips3_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
-	assert(device->type() == VR4300BE ||
-			device->type() == VR4300LE ||
-			device->type() == VR4310BE ||
-			device->type() == VR4310LE ||
-			device->type() == R4600BE ||
-			device->type() == R4600LE ||
-			device->type() == R4650BE ||
-			device->type() == R4650LE ||
-			device->type() == R4700BE ||
-			device->type() == R4700LE ||
-			device->type() == R5000BE ||
-			device->type() == R5000LE ||
-			device->type() == QED5271BE ||
-			device->type() == QED5271LE ||
-			device->type() == RM7000BE ||
-			device->type() == RM7000LE);
+	assert(device->type() == VR4300BE_DRC ||
+			device->type() == VR4300LE_DRC ||
+			device->type() == VR4310BE_DRC ||
+			device->type() == VR4310LE_DRC ||
+			device->type() == R4600BE_DRC ||
+			device->type() == R4600LE_DRC ||
+			device->type() == R4650BE_DRC ||
+			device->type() == R4650LE_DRC ||
+			device->type() == R4700BE_DRC ||
+			device->type() == R4700LE_DRC ||
+			device->type() == R5000BE_DRC ||
+			device->type() == R5000LE_DRC ||
+			device->type() == QED5271BE_DRC ||
+			device->type() == QED5271LE_DRC ||
+			device->type() == RM7000BE_DRC ||
+			device->type() == RM7000LE_DRC);
 	return *(mips3_state **)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -639,6 +637,7 @@ static CPU_GET_INFO( mips3 )
 
 void mips3drc_set_options(device_t *device, UINT32 options)
 {
+	if (!device->machine().options().drc()) return;
 	mips3_state *mips3 = get_safe_token(device);
 	mips3->impstate->drcoptions = options;
 }
@@ -651,6 +650,7 @@ void mips3drc_set_options(device_t *device, UINT32 options)
 
 void mips3drc_add_fastram(device_t *device, offs_t start, offs_t end, UINT8 readonly, void *base)
 {
+	if (!device->machine().options().drc()) return;
 	mips3_state *mips3 = get_safe_token(device);
 	if (mips3->impstate->fastram_select < ARRAY_LENGTH(mips3->impstate->fastram))
 	{
@@ -669,6 +669,7 @@ void mips3drc_add_fastram(device_t *device, offs_t start, offs_t end, UINT8 read
 
 void mips3drc_add_hotspot(device_t *device, offs_t pc, UINT32 opcode, UINT32 cycles)
 {
+	if (!device->machine().options().drc()) return;
 	mips3_state *mips3 = get_safe_token(device);
 	if (mips3->impstate->hotspot_select < ARRAY_LENGTH(mips3->impstate->hotspot))
 	{
@@ -3705,7 +3706,7 @@ static CPU_INIT( vr4300le )
 	mips3_init(MIPS3_TYPE_VR4300, FALSE, device, irqcallback);
 }
 
-CPU_GET_INFO( vr4300be )
+CPU_GET_INFO( vr4300be_drc )
 {
 	switch (state)
 	{
@@ -3724,7 +3725,7 @@ CPU_GET_INFO( vr4300be )
 	}
 }
 
-CPU_GET_INFO( vr4300le )
+CPU_GET_INFO( vr4300le_drc )
 {
 	switch (state)
 	{
@@ -3744,7 +3745,7 @@ CPU_GET_INFO( vr4300le )
 }
 
 // VR4310 = VR4300 with different speed bin
-CPU_GET_INFO( vr4310be )
+CPU_GET_INFO( vr4310be_drc )
 {
 	switch (state)
 	{
@@ -3763,7 +3764,7 @@ CPU_GET_INFO( vr4310be )
 	}
 }
 
-CPU_GET_INFO( vr4310le )
+CPU_GET_INFO( vr4310le_drc )
 {
 	switch (state)
 	{
@@ -3797,7 +3798,7 @@ static CPU_INIT( r4600le )
 	mips3_init(MIPS3_TYPE_R4600, FALSE, device, irqcallback);
 }
 
-CPU_GET_INFO( r4600be )
+CPU_GET_INFO( r4600be_drc )
 {
 	switch (state)
 	{
@@ -3816,7 +3817,7 @@ CPU_GET_INFO( r4600be )
 	}
 }
 
-CPU_GET_INFO( r4600le )
+CPU_GET_INFO( r4600le_drc )
 {
 	switch (state)
 	{
@@ -3850,7 +3851,7 @@ static CPU_INIT( r4650le )
 	mips3_init(MIPS3_TYPE_R4650, FALSE, device, irqcallback);
 }
 
-CPU_GET_INFO( r4650be )
+CPU_GET_INFO( r4650be_drc )
 {
 	switch (state)
 	{
@@ -3869,7 +3870,7 @@ CPU_GET_INFO( r4650be )
 	}
 }
 
-CPU_GET_INFO( r4650le )
+CPU_GET_INFO( r4650le_drc )
 {
 	switch (state)
 	{
@@ -3904,7 +3905,7 @@ static CPU_INIT( r4700le )
 	mips3_init(MIPS3_TYPE_R4700, FALSE, device, irqcallback);
 }
 
-CPU_GET_INFO( r4700be )
+CPU_GET_INFO( r4700be_drc )
 {
 	switch (state)
 	{
@@ -3923,7 +3924,7 @@ CPU_GET_INFO( r4700be )
 	}
 }
 
-CPU_GET_INFO( r4700le )
+CPU_GET_INFO( r4700le_drc )
 {
 	switch (state)
 	{
@@ -3958,7 +3959,7 @@ static CPU_INIT( r5000le )
 	mips3_init(MIPS3_TYPE_R5000, FALSE, device, irqcallback);
 }
 
-CPU_GET_INFO( r5000be )
+CPU_GET_INFO( r5000be_drc )
 {
 	switch (state)
 	{
@@ -3977,7 +3978,7 @@ CPU_GET_INFO( r5000be )
 	}
 }
 
-CPU_GET_INFO( r5000le )
+CPU_GET_INFO( r5000le_drc )
 {
 	switch (state)
 	{
@@ -4012,7 +4013,7 @@ static CPU_INIT( qed5271le )
 	mips3_init(MIPS3_TYPE_QED5271, FALSE, device, irqcallback);
 }
 
-CPU_GET_INFO( qed5271be )
+CPU_GET_INFO( qed5271be_drc )
 {
 	switch (state)
 	{
@@ -4031,7 +4032,7 @@ CPU_GET_INFO( qed5271be )
 	}
 }
 
-CPU_GET_INFO( qed5271le )
+CPU_GET_INFO( qed5271le_drc )
 {
 	switch (state)
 	{
@@ -4066,7 +4067,7 @@ static CPU_INIT( rm7000le )
 	mips3_init(MIPS3_TYPE_RM7000, FALSE, device, irqcallback);
 }
 
-CPU_GET_INFO( rm7000be )
+CPU_GET_INFO( rm7000be_drc )
 {
 	switch (state)
 	{
@@ -4085,7 +4086,7 @@ CPU_GET_INFO( rm7000be )
 	}
 }
 
-CPU_GET_INFO( rm7000le )
+CPU_GET_INFO( rm7000le_drc )
 {
 	switch (state)
 	{
@@ -4104,27 +4105,26 @@ CPU_GET_INFO( rm7000le )
 	}
 }
 
-DEFINE_LEGACY_CPU_DEVICE(VR4300BE, vr4300be);
-DEFINE_LEGACY_CPU_DEVICE(VR4300LE, vr4300le);
-DEFINE_LEGACY_CPU_DEVICE(VR4310BE, vr4310be);
-DEFINE_LEGACY_CPU_DEVICE(VR4310LE, vr4310le);
+DEFINE_LEGACY_CPU_DEVICE(VR4300BE_DRC, vr4300be_drc);
+DEFINE_LEGACY_CPU_DEVICE(VR4300LE_DRC, vr4300le_drc);
+DEFINE_LEGACY_CPU_DEVICE(VR4310BE_DRC, vr4310be_drc);
+DEFINE_LEGACY_CPU_DEVICE(VR4310LE_DRC, vr4310le_drc);
 
-DEFINE_LEGACY_CPU_DEVICE(R4600BE, r4600be);
-DEFINE_LEGACY_CPU_DEVICE(R4600LE, r4600le);
+DEFINE_LEGACY_CPU_DEVICE(R4600BE_DRC, r4600be_drc);
+DEFINE_LEGACY_CPU_DEVICE(R4600LE_DRC, r4600le_drc);
 
-DEFINE_LEGACY_CPU_DEVICE(R4650BE, r4650be);
-DEFINE_LEGACY_CPU_DEVICE(R4650LE, r4650le);
+DEFINE_LEGACY_CPU_DEVICE(R4650BE_DRC, r4650be_drc);
+DEFINE_LEGACY_CPU_DEVICE(R4650LE_DRC, r4650le_drc);
 
-DEFINE_LEGACY_CPU_DEVICE(R4700BE, r4700be);
-DEFINE_LEGACY_CPU_DEVICE(R4700LE, r4700le);
+DEFINE_LEGACY_CPU_DEVICE(R4700BE_DRC, r4700be_drc);
+DEFINE_LEGACY_CPU_DEVICE(R4700LE_DRC, r4700le_drc);
 
-DEFINE_LEGACY_CPU_DEVICE(R5000BE, r5000be);
-DEFINE_LEGACY_CPU_DEVICE(R5000LE, r5000le);
+DEFINE_LEGACY_CPU_DEVICE(R5000BE_DRC, r5000be_drc);
+DEFINE_LEGACY_CPU_DEVICE(R5000LE_DRC, r5000le_drc);
 
-DEFINE_LEGACY_CPU_DEVICE(QED5271BE, qed5271be);
-DEFINE_LEGACY_CPU_DEVICE(QED5271LE, qed5271le);
+DEFINE_LEGACY_CPU_DEVICE(QED5271BE_DRC, qed5271be_drc);
+DEFINE_LEGACY_CPU_DEVICE(QED5271LE_DRC, qed5271le_drc);
 
-DEFINE_LEGACY_CPU_DEVICE(RM7000BE, rm7000be);
-DEFINE_LEGACY_CPU_DEVICE(RM7000LE, rm7000le);
+DEFINE_LEGACY_CPU_DEVICE(RM7000BE_DRC, rm7000be_drc);
+DEFINE_LEGACY_CPU_DEVICE(RM7000LE_DRC, rm7000le_drc);
 
-#endif  // MIPS3_USE_DRC

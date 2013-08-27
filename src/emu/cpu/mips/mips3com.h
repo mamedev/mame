@@ -19,8 +19,6 @@
     CONSTANTS
 ***************************************************************************/
 
-#define MIPS3_USE_DRC
-
 /* core parameters */
 #define MIPS3_MIN_PAGE_SHIFT        12
 #define MIPS3_MIN_PAGE_SIZE         (1 << MIPS3_MIN_PAGE_SHIFT)

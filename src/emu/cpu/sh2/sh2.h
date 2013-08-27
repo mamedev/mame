@@ -64,8 +64,13 @@ struct sh2_cpu_core
 	int  (*dma_callback_fifo_data_available)(device_t *device, UINT32 src, UINT32 dst, UINT32 data, int size);
 };
 
-DECLARE_LEGACY_CPU_DEVICE(SH1, sh1);
-DECLARE_LEGACY_CPU_DEVICE(SH2, sh2);
+DECLARE_LEGACY_CPU_DEVICE(SH1_INT, sh1_int);
+DECLARE_LEGACY_CPU_DEVICE(SH2_INT, sh2_int);
+DECLARE_LEGACY_CPU_DEVICE(SH1_DRC, sh1_drc);
+DECLARE_LEGACY_CPU_DEVICE(SH2_DRC, sh2_drc);
+
+extern const device_type SH1;
+extern const device_type SH2;
 
 DECLARE_WRITE32_HANDLER( sh2_internal_w );
 DECLARE_READ32_HANDLER( sh2_internal_r );

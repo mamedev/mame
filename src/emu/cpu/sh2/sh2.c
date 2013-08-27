@@ -112,7 +112,6 @@
 
 CPU_DISASSEMBLE( sh2 );
 
-#ifndef USE_SH2DRC
 
 /* speed up delay loops, bail out of tight loops */
 #define BUSY_LOOP_HACKS     1
@@ -124,8 +123,8 @@ CPU_DISASSEMBLE( sh2 );
 INLINE sh2_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SH1 ||
-			device->type() == SH2);
+	assert(device->type() == SH1_INT ||
+			device->type() == SH2_INT);
 	return (sh2_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -2311,7 +2310,7 @@ static CPU_INIT( sh2 )
 	sh2_state *sh2 = get_safe_token(device);
 
 	/* initialize the common core parts */
-	sh2_common_init(sh2, device, irqcallback);
+	sh2_common_init(sh2, device, irqcallback,false);
 }
 
 /**************************************************************************
@@ -2378,7 +2377,7 @@ static CPU_SET_INFO( sh2 )
  * Generic get_info
  **************************************************************************/
 
-CPU_GET_INFO( sh2 )
+CPU_GET_INFO( sh2_int )
 {
 	sh2_state *sh2 = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
@@ -2507,7 +2506,7 @@ CPU_GET_INFO( sh2 )
 	}
 }
 
-CPU_GET_INFO( sh1 )
+CPU_GET_INFO( sh1_int )
 {
 	switch (state)
 	{
@@ -2518,21 +2517,13 @@ CPU_GET_INFO( sh1 )
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "SH-1");                break;
 		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "sh1");                break;
 
-		default:                            CPU_GET_INFO_CALL(sh2);         break;
+		default:                            CPU_GET_INFO_CALL(sh2_int);         break;
 	}
 }
 
-void sh2drc_set_options(device_t *device, UINT32 options)
-{
-	/* doesn't apply here */
-}
+DEFINE_LEGACY_CPU_DEVICE(SH1_INT, sh1_int);
+DEFINE_LEGACY_CPU_DEVICE(SH2_INT, sh2_int);
 
-void sh2drc_add_pcflush(device_t *device, offs_t address)
-{
-	/* doesn't apply here */
-}
 
-DEFINE_LEGACY_CPU_DEVICE(SH1, sh1);
-DEFINE_LEGACY_CPU_DEVICE(SH2, sh2);
-
-#endif
+const device_type SH1 = &legacy_device_creator_drc<sh1_int_device, sh1_drc_device>;
+const device_type SH2 = &legacy_device_creator_drc<sh2_int_device, sh2_drc_device>;

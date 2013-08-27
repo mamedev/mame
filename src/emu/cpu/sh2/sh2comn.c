@@ -15,12 +15,14 @@
 
 #define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
 
-#ifdef USE_SH2DRC
-#define GET_SH2(dev) *(sh2_state **)downcast<legacy_cpu_device *>(dev)->token()
-#else
-#define GET_SH2(dev) (sh2_state *)downcast<legacy_cpu_device *>(dev)->token()
-#endif
-
+INLINE sh2_state *GET_SH2(device_t *dev)
+{
+  if (dev->machine().options().drc()) {
+	return *(sh2_state **)downcast<legacy_cpu_device *>(dev)->token();
+  } else {
+	return (sh2_state *)downcast<legacy_cpu_device *>(dev)->token();
+  }
+}
 
 static const int div_tab[4] = { 3, 5, 7, 0 };
 
@@ -517,9 +519,9 @@ WRITE32_HANDLER( sh2_internal_w )
 	sh2_state *sh2 = GET_SH2(&space.device());
 	UINT32 old;
 
-#ifdef USE_SH2DRC
-	offset &= 0x7f;
-#endif
+	if (sh2->isdrc)
+		offset &= 0x7f;
+
 
 	old = sh2->m[offset];
 	COMBINE_DATA(sh2->m+offset);
@@ -737,9 +739,9 @@ READ32_HANDLER( sh2_internal_r )
 {
 	sh2_state *sh2 = GET_SH2(&space.device());
 
-#ifdef USE_SH2DRC
+	if (sh2->isdrc)
 	offset &= 0x7f;
-#endif
+
 //  logerror("sh2_internal_r:  Read %08x (%x) @ %08x\n", 0xfffffe00+offset*4, offset, mem_mask);
 	switch( offset )
 	{
@@ -841,9 +843,8 @@ void sh2_set_irq_line(sh2_state *sh2, int irqline, int state)
 
 			sh2_exception(sh2, "Set IRQ line", 16);
 
-			#ifdef USE_SH2DRC
-			sh2->pending_nmi = 1;
-			#endif
+			if (sh2->isdrc)
+				sh2->pending_nmi = 1;			
 		}
 	}
 	else
@@ -861,14 +862,15 @@ void sh2_set_irq_line(sh2_state *sh2, int irqline, int state)
 		{
 			LOG(("SH-2 '%s' assert irq #%d\n", sh2->device->tag(), irqline));
 			sh2->pending_irq |= 1 << irqline;
-			#ifdef USE_SH2DRC
+			if (sh2->isdrc)
+			{
 			sh2->test_irq = 1;
-			#else
+			} else {
 			if(sh2->delay)
 				sh2->test_irq = 1;
 			else
 				CHECK_PENDING_IRQ("sh2_set_irq_line");
-			#endif
+			}
 		}
 	}
 }
@@ -956,7 +958,8 @@ void sh2_exception(sh2_state *sh2, const char *message, int irqline)
 		LOG(("SH-2 '%s' nmi exception (autovector: $%x) after [%s]\n", sh2->device->tag(), vector, message));
 	}
 
-	#ifdef USE_SH2DRC
+	if (sh2->isdrc)
+	{
 	sh2->evec = RL( sh2, sh2->vbr + vector * 4 );
 	sh2->evec &= AM;
 	sh2->irqsr = sh2->sr;
@@ -968,7 +971,7 @@ void sh2_exception(sh2_state *sh2, const char *message, int irqline)
 		sh2->sr = (sh2->sr & ~I) | (irqline << 4);
 
 //  printf("sh2_exception [%s] irqline %x evec %x save SR %x new SR %x\n", message, irqline, sh2->evec, sh2->irqsr, sh2->sr);
-	#else
+	} else {
 	sh2->r[15] -= 4;
 	WL( sh2, sh2->r[15], sh2->sr );     /* push SR onto stack */
 	sh2->r[15] -= 4;
@@ -982,16 +985,17 @@ void sh2_exception(sh2_state *sh2, const char *message, int irqline)
 
 	/* fetch PC */
 	sh2->pc = RL( sh2, sh2->vbr + vector * 4 );
-	#endif
+	}
 
 	if(sh2->sleep_mode == 1) { sh2->sleep_mode = 2; }
 }
 
-void sh2_common_init(sh2_state *sh2, legacy_cpu_device *device, device_irq_acknowledge_callback irqcallback)
+void sh2_common_init(sh2_state *sh2, legacy_cpu_device *device, device_irq_acknowledge_callback irqcallback, bool drc)
 {
 	const sh2_cpu_core *conf = (const sh2_cpu_core *)device->static_config();
 	int i;
 
+	sh2->isdrc = drc;
 	sh2->timer = device->machine().scheduler().timer_alloc(FUNC(sh2_timer_callback), sh2);
 	sh2->timer->adjust(attotime::never);
 
