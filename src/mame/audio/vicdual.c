@@ -6,8 +6,6 @@
 
 #include "emu.h"
 #include "includes/vicdual.h"
-#include "sound/discrete.h"
-#include "sound/samples.h"
 
 
 /************************************************************************
@@ -129,43 +127,40 @@ MACHINE_CONFIG_FRAGMENT( frogs_audio )
 MACHINE_CONFIG_END
 
 
-static TIMER_CALLBACK( frogs_croak_callback )
+TIMER_CALLBACK_MEMBER( vicdual_state::frogs_croak_callback )
 {
-	samples_device *samples = machine.device<samples_device>("samples");
-	samples->stop(2);
+	m_samples->stop(2);
 }
 
 
 MACHINE_START_MEMBER(vicdual_state,frogs_audio)
 {
-	frogs_croak_timer = machine().scheduler().timer_alloc(FUNC(frogs_croak_callback));
+	frogs_croak_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vicdual_state::frogs_croak_callback), this));
 
 	machine_start();
 }
 
 
-WRITE8_HANDLER( frogs_audio_w )
+WRITE8_MEMBER( vicdual_state::frogs_audio_w )
 {
-	samples_device *samples = space.machine().device<samples_device>("samples");
-	device_t *discrete = space.machine().device("discrete");
 	static int last_croak = 0;
 	static int last_buzzz = 0;
 	int new_croak = data & 0x08;
 	int new_buzzz = data & 0x10;
 
-//  discrete_sound_w(discrete, space, FROGS_HOP_EN, data & 0x01);
-//  discrete_sound_w(discrete, space, FROGS_JUMP_EN, data & 0x02);
-	discrete_sound_w(discrete, space, FROGS_TONGUE_EN, data & 0x04);
-//  discrete_sound_w(discrete, space, FROGS_CAPTURE_EN, data & 0x08);
-//  discrete_sound_w(discrete, space, FROGS_FLY_EN, data & 0x10);
-//  discrete_sound_w(discrete, space, FROGS_SPLASH_EN, data & 0x80);
+//  discrete_sound_w(m_discrete, space, FROGS_HOP_EN, data & 0x01);
+//  discrete_sound_w(m_discrete, space, FROGS_JUMP_EN, data & 0x02);
+	discrete_sound_w(m_discrete, space, FROGS_TONGUE_EN, data & 0x04);
+//  discrete_sound_w(m_discrete, space, FROGS_CAPTURE_EN, data & 0x08);
+//  discrete_sound_w(m_discrete, space, FROGS_FLY_EN, data & 0x10);
+//  discrete_sound_w(m_discrete, space, FROGS_SPLASH_EN, data & 0x80);
 
 	if (data & 0x01)
-		samples->start(3, 3);   // Hop
+		m_samples->start(3, 3);   // Hop
 	if (data & 0x02)
-		samples->start(0, 0);   // Boing
+		m_samples->start(0, 0);   // Boing
 	if (new_croak)
-		samples->start(2, 2);   // Croak
+		m_samples->start(2, 2);   // Croak
 	else
 	{
 		if (last_croak)
@@ -188,12 +183,12 @@ WRITE8_HANDLER( frogs_audio_w )
 		 * 12 seconds.
 		 */
 		if (!last_buzzz)
-			samples->start(1, 1, true); // Buzzz
+			m_samples->start(1, 1, true); // Buzzz
 	}
 	else
-		samples->stop(1);
+		m_samples->stop(1);
 	if (data & 0x80)
-		samples->start(4, 4);   // Splash
+		m_samples->start(4, 4);   // Splash
 
 	last_croak = new_croak;
 	last_buzzz = new_buzzz;
@@ -461,33 +456,31 @@ MACHINE_CONFIG_FRAGMENT( headon_audio )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-WRITE8_HANDLER( headon_audio_w )
+WRITE8_MEMBER( vicdual_state::headon_audio_w )
 {
-	device_t *discrete = space.machine().device("discrete");
-	if (discrete == NULL)
+	if (m_discrete == NULL)
 		return;
-	discrete_sound_w(discrete, space, HEADON_HISPEED_PC_EN, data & 0x01);
-	discrete_sound_w(discrete, space, HEADON_SCREECH1_EN, data & 0x02);
-	discrete_sound_w(discrete, space, HEADON_CRASH_EN, data & 0x04);
-	discrete_sound_w(discrete, space, HEADON_HISPEED_CC_EN, data & 0x08);
-	discrete_sound_w(discrete, space, HEADON_SCREECH2_EN, data & 0x10);
-	discrete_sound_w(discrete, space, HEADON_BONUS_EN, data & 0x20);
-	discrete_sound_w(discrete, space, HEADON_CAR_ON_EN, data & 0x40);
+	discrete_sound_w(m_discrete, space, HEADON_HISPEED_PC_EN, data & 0x01);
+	discrete_sound_w(m_discrete, space, HEADON_SCREECH1_EN, data & 0x02);
+	discrete_sound_w(m_discrete, space, HEADON_CRASH_EN, data & 0x04);
+	discrete_sound_w(m_discrete, space, HEADON_HISPEED_CC_EN, data & 0x08);
+	discrete_sound_w(m_discrete, space, HEADON_SCREECH2_EN, data & 0x10);
+	discrete_sound_w(m_discrete, space, HEADON_BONUS_EN, data & 0x20);
+	discrete_sound_w(m_discrete, space, HEADON_CAR_ON_EN, data & 0x40);
 
 }
 
-WRITE8_HANDLER( invho2_audio_w )
+WRITE8_MEMBER( vicdual_state::invho2_audio_w )
 {
-	device_t *discrete = space.machine().device("discrete");
-	if (discrete == NULL)
+	if (m_discrete == NULL)
 		return;
-	discrete_sound_w(discrete, space, HEADON_HISPEED_PC_EN, data & 0x10);
-	discrete_sound_w(discrete, space, HEADON_SCREECH1_EN, data & 0x08);
-	discrete_sound_w(discrete, space, HEADON_CRASH_EN, data & 0x80);
-	discrete_sound_w(discrete, space, HEADON_HISPEED_CC_EN, data & 0x40);
-	discrete_sound_w(discrete, space, HEADON_SCREECH2_EN, data & 0x04);
-	discrete_sound_w(discrete, space, HEADON_BONUS_EN, data & 0x02);
-	discrete_sound_w(discrete, space, HEADON_CAR_ON_EN, data & 0x20);
+	discrete_sound_w(m_discrete, space, HEADON_HISPEED_PC_EN, data & 0x10);
+	discrete_sound_w(m_discrete, space, HEADON_SCREECH1_EN, data & 0x08);
+	discrete_sound_w(m_discrete, space, HEADON_CRASH_EN, data & 0x80);
+	discrete_sound_w(m_discrete, space, HEADON_HISPEED_CC_EN, data & 0x40);
+	discrete_sound_w(m_discrete, space, HEADON_SCREECH2_EN, data & 0x04);
+	discrete_sound_w(m_discrete, space, HEADON_BONUS_EN, data & 0x02);
+	discrete_sound_w(m_discrete, space, HEADON_CAR_ON_EN, data & 0x20);
 
 }
 

@@ -3,7 +3,6 @@
  */
 
 #include "emu.h"
-#include "sound/samples.h"
 #include "includes/vicdual.h"
 
 /* output port 0x02 definitions - sound effect drive outputs */
@@ -62,10 +61,9 @@ enum
 };
 
 
-WRITE8_HANDLER( invinco_audio_w )
+WRITE8_MEMBER( vicdual_state::invinco_audio_w )
 {
 	static int port2State = 0;
-	samples_device *samples = space.machine().device<samples_device>("samples");
 	int bitsChanged;
 	//int bitsGoneHigh;
 	int bitsGoneLow;
@@ -79,32 +77,32 @@ WRITE8_HANDLER( invinco_audio_w )
 
 	if ( bitsGoneLow & OUT_PORT_2_SAUCER )
 	{
-		PLAY( samples, SND_SAUCER, 0 );
+		PLAY( m_samples, SND_SAUCER, 0 );
 	}
 
 	if ( bitsGoneLow & OUT_PORT_2_MOVE1 )
 	{
-		PLAY( samples, SND_MOVE1, 0 );
+		PLAY( m_samples, SND_MOVE1, 0 );
 	}
 
 	if ( bitsGoneLow & OUT_PORT_2_MOVE2 )
 	{
-		PLAY( samples, SND_MOVE2, 0 );
+		PLAY( m_samples, SND_MOVE2, 0 );
 	}
 
 	if ( bitsGoneLow & OUT_PORT_2_FIRE )
 	{
-		PLAY( samples, SND_FIRE, 0 );
+		PLAY( m_samples, SND_FIRE, 0 );
 	}
 
 	if ( bitsGoneLow & OUT_PORT_2_INVHIT )
 	{
-		PLAY( samples, SND_INVHIT, 0 );
+		PLAY( m_samples, SND_INVHIT, 0 );
 	}
 
 	if ( bitsGoneLow & OUT_PORT_2_SHIPHIT )
 	{
-		PLAY( samples, SND_SHIPHIT, 0 );
+		PLAY( m_samples, SND_SHIPHIT, 0 );
 	}
 
 #if 0

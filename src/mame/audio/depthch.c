@@ -3,7 +3,6 @@
  */
 
 #include "emu.h"
-#include "sound/samples.h"
 #include "includes/vicdual.h"
 
 /* output port 0x01 definitions - sound effect drive outputs */
@@ -52,10 +51,9 @@ enum
 };
 
 
-WRITE8_HANDLER( depthch_audio_w )
+WRITE8_MEMBER( vicdual_state::depthch_audio_w )
 {
 	static int port1State = 0;
-	samples_device *samples = space.machine().device<samples_device>("samples");
 	int bitsChanged;
 	int bitsGoneHigh;
 	int bitsGoneLow;
@@ -69,25 +67,25 @@ WRITE8_HANDLER( depthch_audio_w )
 
 	if ( bitsGoneHigh & OUT_PORT_1_LONGEXPL )
 	{
-		PLAY( samples, SND_LONGEXPL, 0 );
+		PLAY( m_samples, SND_LONGEXPL, 0 );
 	}
 
 	if ( bitsGoneHigh & OUT_PORT_1_SHRTEXPL )
 	{
-		PLAY( samples, SND_SHRTEXPL, 0 );
+		PLAY( m_samples, SND_SHRTEXPL, 0 );
 	}
 
 	if ( bitsGoneHigh & OUT_PORT_1_SPRAY )
 	{
-		PLAY( samples, SND_SPRAY, 0 );
+		PLAY( m_samples, SND_SPRAY, 0 );
 	}
 
 	if ( bitsGoneHigh & OUT_PORT_1_SONAR )
 	{
-		PLAY( samples, SND_SONAR, 1 );
+		PLAY( m_samples, SND_SONAR, 1 );
 	}
 	if ( bitsGoneLow & OUT_PORT_1_SONAR )
 	{
-		STOP( samples, SND_SONAR );
+		STOP( m_samples, SND_SONAR );
 	}
 }

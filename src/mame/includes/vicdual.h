@@ -4,8 +4,10 @@
 
 *************************************************************************/
 
+#include "cpu/mcs48/mcs48.h"
+#include "sound/ay8910.h"
 #include "sound/discrete.h"
-
+#include "sound/samples.h"
 
 class vicdual_state : public driver_device
 {
@@ -13,6 +15,10 @@ public:
 	vicdual_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_psg(*this, "psg"),
+		m_samples(*this, "samples"),
+		m_discrete(*this, "discrete"),
 		m_coinstate_timer(*this, "coinstate"),
 		m_nsub_coinage_timer(*this, "nsub_coin"),
 		m_videoram(*this, "videoram"),
@@ -20,6 +26,10 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_audiocpu;
+	optional_device<ay8910_device> m_psg;
+	optional_device<samples_device> m_samples;
+	optional_device<discrete_device> m_discrete;
 	required_device<timer_device> m_coinstate_timer;
 	optional_device<timer_device> m_nsub_coinage_timer;
 	required_shared_ptr<UINT8> m_videoram;
@@ -30,6 +40,10 @@ public:
 	UINT8 m_samurai_protection_data;
 	int m_nsub_coin_counter;
 	int m_nsub_play_counter;
+	
+	int m_port1State;
+	int m_port2State;
+	int m_psgData;
 
 	void coin_in();
 	void assert_coin_status();
@@ -65,6 +79,30 @@ public:
 	DECLARE_READ8_MEMBER(invinco_io_r);
 	DECLARE_WRITE8_MEMBER(invinco_io_w);
 	DECLARE_WRITE8_MEMBER(vicdual_palette_bank_w);
+	
+	/*----------- defined in audio/vicdual.c -----------*/
+	DECLARE_WRITE8_MEMBER( frogs_audio_w );
+	DECLARE_WRITE8_MEMBER( headon_audio_w );
+	DECLARE_WRITE8_MEMBER( invho2_audio_w );
+	TIMER_CALLBACK_MEMBER( frogs_croak_callback );
+
+	
+	/*----------- defined in audio/carnival.c -----------*/
+	DECLARE_WRITE8_MEMBER( carnival_audio_1_w );
+	DECLARE_WRITE8_MEMBER( carnival_audio_2_w );
+	DECLARE_READ8_MEMBER( carnival_music_port_t1_r );
+	DECLARE_WRITE8_MEMBER( carnival_music_port_1_w );
+	DECLARE_WRITE8_MEMBER( carnival_music_port_2_w );
+	
+	/*----------- defined in audio/depthch.c -----------*/
+	DECLARE_WRITE8_MEMBER( depthch_audio_w );
+	
+	/*----------- defined in audio/invinco.c -----------*/
+	DECLARE_WRITE8_MEMBER( invinco_audio_w );
+	
+	/*----------- defined in audio/pulsar.c -----------*/
+	DECLARE_WRITE8_MEMBER( pulsar_audio_1_w );
+	DECLARE_WRITE8_MEMBER( pulsar_audio_2_w );
 
 	DECLARE_CUSTOM_INPUT_MEMBER(vicdual_read_coin_status);
 	DECLARE_CUSTOM_INPUT_MEMBER(vicdual_get_64v);
@@ -94,36 +132,9 @@ public:
 	int vicdual_is_cabinet_color();
 };
 
-
-/*----------- defined in audio/vicdual.c -----------*/
-
+MACHINE_CONFIG_EXTERN( carnival_audio );
+MACHINE_CONFIG_EXTERN( depthch_audio );
 MACHINE_CONFIG_EXTERN( frogs_audio );
 MACHINE_CONFIG_EXTERN( headon_audio );
-DECLARE_WRITE8_HANDLER( frogs_audio_w );
-DECLARE_WRITE8_HANDLER( headon_audio_w );
-DECLARE_WRITE8_HANDLER( invho2_audio_w );
-
-/*----------- defined in audio/depthch.c -----------*/
-
-MACHINE_CONFIG_EXTERN( depthch_audio );
-DECLARE_WRITE8_HANDLER( depthch_audio_w );
-
-
-/*----------- defined in audio/carnival.c -----------*/
-
-MACHINE_CONFIG_EXTERN( carnival_audio );
-DECLARE_WRITE8_HANDLER( carnival_audio_1_w );
-DECLARE_WRITE8_HANDLER( carnival_audio_2_w );
-
-
-/*----------- defined in audio/invinco.c -----------*/
-
 MACHINE_CONFIG_EXTERN( invinco_audio );
-DECLARE_WRITE8_HANDLER( invinco_audio_w );
-
-
-/*----------- defined in audio/pulsar.c -----------*/
-
 MACHINE_CONFIG_EXTERN( pulsar_audio );
-DECLARE_WRITE8_HANDLER( pulsar_audio_1_w );
-DECLARE_WRITE8_HANDLER( pulsar_audio_2_w );

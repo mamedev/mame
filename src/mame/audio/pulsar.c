@@ -6,7 +6,6 @@
  */
 
 #include "emu.h"
-#include "sound/samples.h"
 #include "includes/vicdual.h"
 
 
@@ -83,62 +82,58 @@ enum
 };
 
 
-static int port1State = 0;
-
-WRITE8_HANDLER( pulsar_audio_1_w )
+WRITE8_MEMBER( vicdual_state::pulsar_audio_1_w )
 {
-	samples_device *samples = space.machine().device<samples_device>("samples");
 	int bitsChanged;
 	//int bitsGoneHigh;
 	int bitsGoneLow;
 
 
-	bitsChanged  = port1State ^ data;
+	bitsChanged  = m_port1State ^ data;
 	//bitsGoneHigh = bitsChanged & data;
 	bitsGoneLow  = bitsChanged & ~data;
 
-	port1State = data;
+	m_port1State = data;
 
 	if ( bitsGoneLow & OUT_PORT_1_CLANG )
 	{
-		PLAY( samples, SND_CLANG, 0 );
+		PLAY( m_samples, SND_CLANG, 0 );
 	}
 
 	if ( bitsGoneLow & OUT_PORT_1_KEY )
 	{
-		PLAY( samples, SND_KEY, 0 );
+		PLAY( m_samples, SND_KEY, 0 );
 	}
 
 	if ( bitsGoneLow & OUT_PORT_1_ALIENHIT )
 	{
-		PLAY( samples, SND_ALIENHIT, 0 );
+		PLAY( m_samples, SND_ALIENHIT, 0 );
 	}
 
 	if ( bitsGoneLow & OUT_PORT_1_PHIT )
 	{
-		PLAY( samples, SND_PHIT, 0 );
+		PLAY( m_samples, SND_PHIT, 0 );
 	}
 
 	if ( bitsGoneLow & OUT_PORT_1_ASHOOT )
 	{
-		PLAY( samples, SND_ASHOOT, 0 );
+		PLAY( m_samples, SND_ASHOOT, 0 );
 	}
 
 	if ( bitsGoneLow & OUT_PORT_1_PSHOOT )
 	{
-		PLAY( samples, SND_PSHOOT, 0 );
+		PLAY( m_samples, SND_PSHOOT, 0 );
 	}
 
 	if ( bitsGoneLow & OUT_PORT_1_BONUS )
 	{
-		PLAY( samples, SND_BONUS, 0 );
+		PLAY( m_samples, SND_BONUS, 0 );
 	}
 }
 
 
-WRITE8_HANDLER( pulsar_audio_2_w )
+WRITE8_MEMBER( vicdual_state::pulsar_audio_2_w )
 {
-	samples_device *samples = space.machine().device<samples_device>("samples");
 	static int port2State = 0;
 	int bitsChanged;
 	int bitsGoneHigh;
@@ -153,38 +148,38 @@ WRITE8_HANDLER( pulsar_audio_2_w )
 
 	if ( bitsGoneLow & OUT_PORT_2_SIZZLE )
 	{
-		PLAY( samples, SND_SIZZLE, 0 );
+		PLAY( m_samples, SND_SIZZLE, 0 );
 	}
 
 	if ( bitsGoneLow & OUT_PORT_2_GATE )
 	{
-		samples->start(SND_CLANG, SND_GATE);
+		m_samples->start(SND_CLANG, SND_GATE);
 	}
 	if ( bitsGoneHigh & OUT_PORT_2_GATE )
 	{
-		STOP( samples, SND_CLANG );
+		STOP( m_samples, SND_CLANG );
 	}
 
 	if ( bitsGoneLow & OUT_PORT_2_BIRTH )
 	{
-		PLAY( samples, SND_BIRTH, 0 );
+		PLAY( m_samples, SND_BIRTH, 0 );
 	}
 
 	if ( bitsGoneLow & OUT_PORT_2_HBEAT )
 	{
-		PLAY( samples, SND_HBEAT, 1 );
+		PLAY( m_samples, SND_HBEAT, 1 );
 	}
 	if ( bitsGoneHigh & OUT_PORT_2_HBEAT )
 	{
-		STOP( samples, SND_HBEAT );
+		STOP( m_samples, SND_HBEAT );
 	}
 
 	if ( bitsGoneLow & OUT_PORT_2_MOVMAZE )
 	{
-		PLAY( samples, SND_MOVMAZE, 1 );
+		PLAY( m_samples, SND_MOVMAZE, 1 );
 	}
 	if ( bitsGoneHigh & OUT_PORT_2_MOVMAZE )
 	{
-		STOP( samples, SND_MOVMAZE );
+		STOP( m_samples, SND_MOVMAZE );
 	}
 }

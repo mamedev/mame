@@ -227,9 +227,16 @@ void vicdual_state::machine_start()
 {
 	m_coin_status = 0;
 	m_palette_bank = 0;
+	
+	m_port1State = 0;
+	m_port2State = 0;
+	m_psgData = 0;
 
 	save_item(NAME(m_coin_status));
 	save_item(NAME(m_palette_bank));
+	save_item(NAME(m_port1State));
+	save_item(NAME(m_port2State));
+	save_item(NAME(m_psgData));
 }
 
 void vicdual_state::machine_reset()
