@@ -1061,6 +1061,65 @@ ROM_START( punchout )
 	ROM_LOAD( "chp1-c.6p",    0x0000, 0x4000, CRC(ea0bbb31) SHA1(b1da024cb688341d39791a78d1144fe09acb00cf) )
 ROM_END
 
+ROM_START( punchoutj )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "chp1-c_8l_a.8l", 0x0000, 0x2000, CRC(9735eb5a) SHA1(0c68e91568845ae3cda5eb6f62c2e271f66c79b4) )
+	ROM_LOAD( "chp1-c_8k_a.8k", 0x2000, 0x2000, CRC(98baba41) SHA1(87d6ab86cf593e0098edbee62727b253489bdb47) )
+	ROM_LOAD( "chp1-c_8j_a.8j", 0x4000, 0x2000, CRC(7a7f870e) SHA1(76bb9f3ef0a2fd514db63fb77f35bde12c15c29c) )
+	ROM_LOAD( "chp1-c_8h_a.8h", 0x6000, 0x2000, CRC(5d8123d7) SHA1(04ddfcde969db93ff31e9c8a2af4dde285b82e2e) )
+	ROM_LOAD( "chp1-c_8f_a.8f", 0x8000, 0x4000, CRC(ea52cda1) SHA1(76e50ab9e09ca4cad6e4030f8372121396898b93) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the sound CPU */
+	ROM_LOAD( "chp1-c_4k_a.4k", 0xe000, 0x2000, CRC(cb6ef376) SHA1(503dbcc1b18a497311bf129689d5650860bf96c7) )
+
+	ROM_REGION( 0x04000, "gfx1", ROMREGION_ERASEFF | ROMREGION_INVERT )
+	ROM_LOAD( "chp1-b_4c_a.4c", 0x00000, 0x2000, CRC(e26dc8b3) SHA1(a704d39ef6f5cbad64a478e5c109b18aae427cbc) )   /* chars #1 */
+	ROM_LOAD( "chp1-b_4d_a.4d", 0x02000, 0x2000, CRC(dd1310ca) SHA1(918d2eda000244b692f1da7ac57d7a0edaef95fb) )
+
+	ROM_REGION( 0x04000, "gfx2", ROMREGION_ERASEFF | ROMREGION_INVERT )
+	ROM_LOAD( "chp1-b_4a_a.4a", 0x00000, 0x2000, CRC(20fb4829) SHA1(9f0ce9379eb31c19bfacdc514ac6a28aa4217cbb) )   /* chars #2 */
+	ROM_LOAD( "chp1-b_4b_a.4b", 0x02000, 0x2000, CRC(edc34594) SHA1(fbb4a8b979d60b183dc23bdbb7425100b9325287) )
+
+	ROM_REGION( 0x30000, "gfx3", ROMREGION_ERASEFF )
+	ROM_LOAD( "chp1-v_2r_a.2r", 0x00000, 0x4000, CRC(bd1d4b2e) SHA1(492ae301a9890c2603d564c9048b1b67895052dd) )   /* chars #3 */
+	ROM_LOAD( "chp1-v_2t_a.2t", 0x04000, 0x4000, CRC(dd9a688a) SHA1(fbb98eebfbaab445928da939846a2d07a8046afb) )
+	ROM_LOAD( "chp1-v_2u_a.2u", 0x08000, 0x2000, CRC(da6a3c4b) SHA1(e03469fb6f552f41a9b7f4b3e51c15a52b61cf84) )
+	/* 0a000-0bfff empty (space for 16k ROM) */
+	ROM_LOAD( "chp1-v_2v_a.2v", 0x0c000, 0x2000, CRC(8c734a67) SHA1(d59b5a2517e4890e7ca7da52ca2813a6abc484a3) )
+	/* 0e000-0ffff empty (space for 16k ROM) */
+	ROM_LOAD( "chp1-v_3r_a.3r", 0x10000, 0x4000, CRC(2e74ad1d) SHA1(538b3f9273699106a50887c927f0251537bf0f42) )
+	ROM_LOAD( "chp1-v_3t_a.3t", 0x14000, 0x4000, CRC(630ba9fb) SHA1(36cec8658597239385cada3bc947b940ab66954b) )
+	ROM_LOAD( "chp1-v_3u_a.3u", 0x18000, 0x2000, CRC(6440321d) SHA1(c8c084ad408cb6bf65959ed4db03c4b4cf9b1c1a) )
+	/* 1a000-1bfff empty (space for 16k ROM) */
+	ROM_LOAD( "chp1-v_3v_a.3v", 0x1c000, 0x2000, CRC(bb7b7198) SHA1(64572668d30e008daf4ccaa5689518ecc41f1091) )
+	/* 1e000-1ffff empty (space for 16k ROM) */
+	ROM_LOAD( "chp1-v_4r_a.4r", 0x20000, 0x4000, CRC(4e5b0fe9) SHA1(c5c4fb735cc232b43c49442e62af0ebe99eaab0c) )
+	ROM_LOAD( "chp1-v_4t_a.4t", 0x24000, 0x4000, CRC(37ffc940) SHA1(d555807a6a1025c81637c5db0184b48306aa01ac) )
+	ROM_LOAD( "chp1-v_4u_a.4u", 0x28000, 0x2000, CRC(1a7521d4) SHA1(4e8a8298f2ff8257d2058e5133ad295f92c7deb8) )
+	/* 2a000-2bfff empty (space for 16k ROM) */
+	/* 2c000-2ffff empty (4v doesn't exist, it is seen as a 0xff fill) */
+
+	ROM_REGION( 0x10000, "gfx4", ROMREGION_ERASEFF | ROMREGION_INVERT )
+	ROM_LOAD( "chp1-v_6p_a.6p", 0x00000, 0x2000, CRC(16588f7a) SHA1(1aeaaa5cc2477c3aa4bf80df7d9474cc9ded9f15) )   /* chars #4 */
+	ROM_LOAD( "chp1-v_6n_a.6n", 0x02000, 0x2000, CRC(dc743674) SHA1(660582c76ee68a7267d5686a2f8ea0fd6c2b25fc) )
+	/* 04000-07fff empty (space for 6l and 6k) */
+	ROM_LOAD( "chp1-v_8p_a.8p", 0x08000, 0x2000, CRC(c2db5b4e) SHA1(39d009af597fa28d34af31aec111aa6fe09fea39) )
+	ROM_LOAD( "chp1-v_8n_a.8n", 0x0a000, 0x2000, CRC(e6af390e) SHA1(73984cbdc8fbf667126ada63ab9500609eb25c61) )
+	/* 0c000-0ffff empty (space for 8l and 8k) */
+
+	ROM_REGION( 0x0d00, "proms", 0 )
+	ROM_LOAD( "chp1-b-6e.6e", 0x0000, 0x0200, CRC(e9ca3ac6) SHA1(68d9739d8a0dadc6fe3b3767437526096ca5db98) )    /* R (top monitor) */
+	ROM_LOAD( "chp1-b-6f.6f", 0x0200, 0x0200, CRC(02be56ab) SHA1(a88f332cb26928350ed20ab5f4c04d5324bb516a) )    /* G */
+	ROM_LOAD( "chp1-b-7f.7f", 0x0400, 0x0200, CRC(11de55f1) SHA1(269b82f4bc73fac197e0bb6d9a90a220e77ce478) )    /* B */
+	ROM_LOAD( "chp1-b-7e.7e", 0x0600, 0x0200, CRC(47adf7a2) SHA1(1d37d5207cd37a9c122251c60cc8f43dd680f484) )    /* R (bottom monitor) */
+	ROM_LOAD( "chp1-b-8e.8e", 0x0800, 0x0200, CRC(b0fc15a8) SHA1(a1af09cfea81231240bd94f3b98de1be8235ebe7) )    /* G */
+	ROM_LOAD( "chp1-b-8f.8f", 0x0a00, 0x0200, CRC(1ffd894a) SHA1(9e8c1c28b4c12acf42f814bc109d353729a25652) )    /* B */
+	ROM_LOAD( "chp1-v-2d.2d", 0x0c00, 0x0100, CRC(71dc0d48) SHA1(dd6609f547d74887f520d7e71a1a00317ff181d0) )    /* timing - not used */
+
+	ROM_REGION( 0x4000, "vlm", 0 )  /* 16k for the VLM5030 data */
+	ROM_LOAD( "chp1-c_6p_a.6p",    0x0000, 0x4000, CRC(597955ca) SHA1(e03b1ff1b506d38515d74710ced741d4e50e04b2) )
+ROM_END
+
 /* Italian bootleg set from an original board found in Italy,
    uses new program roms, 2 new gfx roms, and a mix of PunchOut and Super PunchOut graphic roms
    Service mode is diaabled
@@ -1365,8 +1424,9 @@ ROM_END
 
 
 
-GAME( 1984, punchout, 0,        punchout, punchout, punchout_state, punchout, ROT0, "Nintendo", "Punch-Out!!", 0 )
-GAME( 1984, punchita, punchout, punchout, punchout, punchout_state, spnchout, ROT0, "bootleg",  "Punch-Out!! (Italian bootleg)", 0 )
-GAME( 1984, spnchout, 0,        punchout, spnchout, punchout_state, spnchout, ROT0, "Nintendo", "Super Punch-Out!!", 0 )
-GAME( 1984, spnchoutj,spnchout, punchout, spnchout, punchout_state, spnchotj, ROT0, "Nintendo", "Super Punch-Out!! (Japan)", 0 )
-GAME( 1985, armwrest, 0,        armwrest, armwrest, punchout_state, armwrest, ROT0, "Nintendo", "Arm Wrestling", 0 )
+GAME( 1984, punchout,  0,        punchout, punchout, punchout_state, punchout, ROT0, "Nintendo", "Punch-Out!!", 0 )
+GAME( 1984, punchoutj, punchout, punchout, punchout, punchout_state, punchout, ROT0, "Nintendo", "Punch-Out!! (Japan)", 0 )
+GAME( 1984, punchita,  punchout, punchout, punchout, punchout_state, spnchout, ROT0, "bootleg",  "Punch-Out!! (Italian bootleg)", 0 )
+GAME( 1984, spnchout,  0,        punchout, spnchout, punchout_state, spnchout, ROT0, "Nintendo", "Super Punch-Out!!", 0 )
+GAME( 1984, spnchoutj, spnchout, punchout, spnchout, punchout_state, spnchotj, ROT0, "Nintendo", "Super Punch-Out!! (Japan)", 0 )
+GAME( 1985, armwrest,  0,        armwrest, armwrest, punchout_state, armwrest, ROT0, "Nintendo", "Arm Wrestling", 0 )
