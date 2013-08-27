@@ -40,44 +40,52 @@
 
 struct ttl74153_config
 {
-	void (*output_cb)(device_t *device);
+	void (*m_output_cb)(device_t *device);
 };
 
 
-#define MCFG_74153_ADD(_tag, _config) \
-	MCFG_DEVICE_ADD(_tag, TTL74153, 0) \
-	MCFG_DEVICE_CONFIG(_config)
-
-
-
-/* must call TTL74153_update() after setting the inputs */
-void ttl74153_update(device_t *device);
-
-void ttl74153_a_w(device_t *device, int data);
-void ttl74153_b_w(device_t *device, int data);
-void ttl74153_input_line_w(device_t *device, int section, int input_line, int data);
-void ttl74153_enable_w(device_t *device, int section, int data);
-int ttl74153_output_r(device_t *device, int section);
-
-class ttl74153_device : public device_t
+class ttl74153_device : public device_t,
+									public ttl74153_config
 {
 public:
 	ttl74153_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~ttl74153_device() { global_free(m_token); }
+	~ttl74153_device() {}
 
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
+	/* must call update() after setting the inputs */
+	void update();
+
+	void a_w(int data);
+	void b_w(int data);
+	void input_line_w(int section, int input_line, int data);
+	void enable_w(int section, int data);
+	int output_r(int section);
+	
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
+	
 private:
 	// internal state
-	void *m_token;
+
+	/* inputs */
+	int m_a;                  /* pin 14 */
+	int m_b;                  /* pin 2 */
+	int m_input_lines[2][4];  /* pins 3-6,10-13 */
+	int m_enable[2];          /* pins 1,15 */
+
+	/* output */
+	int m_output[2];          /* pins 7,9 */
+
+	/* internals */
+	int m_last_output[2];
 };
 
 extern const device_type TTL74153;
 
+#define MCFG_74153_ADD(_tag, _config) \
+	MCFG_DEVICE_ADD(_tag, TTL74153, 0) \
+	MCFG_DEVICE_CONFIG(_config)
 
 #endif

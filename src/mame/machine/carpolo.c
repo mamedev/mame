@@ -9,8 +9,6 @@
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/6821pia.h"
-#include "machine/7474.h"
-#include "machine/74153.h"
 #include "includes/carpolo.h"
 
 
@@ -260,24 +258,24 @@ INTERRUPT_GEN_MEMBER(carpolo_state::carpolo_timer_interrupt)
 		   how much, resulting in only two different possible levels */
 		if (port_value & 0x01)
 		{
-			ttl74153_input_line_w(m_ttl74153_1k, 0, player, 1);
-			ttl74153_input_line_w(m_ttl74153_1k, 1, player, 0);
+			m_ttl74153_1k->input_line_w(0, player, 1);
+			m_ttl74153_1k->input_line_w(1, player, 0);
 		}
 		else if (port_value & 0x02)
 		{
-			ttl74153_input_line_w(m_ttl74153_1k, 0, player, 1);
-			ttl74153_input_line_w(m_ttl74153_1k, 1, player, 1);
+			m_ttl74153_1k->input_line_w(0, player, 1);
+			m_ttl74153_1k->input_line_w(1, player, 1);
 		}
 		else
 		{
-			ttl74153_input_line_w(m_ttl74153_1k, 0, player, 0);
+			m_ttl74153_1k->input_line_w(0, player, 0);
 			/* the other line is irrelevant */
 		}
 
 		port_value >>= 2;
 	}
 
-	ttl74153_update(m_ttl74153_1k);
+	m_ttl74153_1k->update();
 }
 
 // FIXME: Remove trampolines
@@ -375,10 +373,10 @@ WRITE8_MEMBER(carpolo_state::pia_0_port_b_w)
 	   bit 6 - Select pedal 0
 	   bit 7 - Select pdeal 1 */
 
-	ttl74153_a_w(m_ttl74153_1k, data & 0x40);
-	ttl74153_b_w(m_ttl74153_1k, data & 0x80);
+	m_ttl74153_1k->a_w(data & 0x40);
+	m_ttl74153_1k->b_w(data & 0x80);
 
-	ttl74153_update(m_ttl74153_1k);
+	m_ttl74153_1k->update();
 }
 
 READ8_MEMBER(carpolo_state::pia_0_port_b_r)
@@ -386,8 +384,8 @@ READ8_MEMBER(carpolo_state::pia_0_port_b_r)
 	/* bit 4 - Pedal bit 0
 	   bit 5 - Pedal bit 1 */
 
-	return (ttl74153_output_r(m_ttl74153_1k, 0) << 5) |
-			(ttl74153_output_r(m_ttl74153_1k, 1) << 4);
+	return (m_ttl74153_1k->output_r(0) << 5) |
+			(m_ttl74153_1k->output_r(1) << 4);
 }
 
 
@@ -467,22 +465,6 @@ const pia6821_interface carpolo_pia1_intf =
 
 void carpolo_state::machine_start()
 {
-	/* find flip-flops */
-	m_ttl7474_2s_1 = machine().device<ttl7474_device>("7474_2s_1");
-	m_ttl7474_2s_2 = machine().device<ttl7474_device>("7474_2s_2");
-	m_ttl7474_2u_1 = machine().device<ttl7474_device>("7474_2u_1");
-	m_ttl7474_2u_2 = machine().device<ttl7474_device>("7474_2u_2");
-	m_ttl7474_1f_1 = machine().device<ttl7474_device>("7474_1f_1");
-	m_ttl7474_1f_2 = machine().device<ttl7474_device>("7474_1f_2");
-	m_ttl7474_1d_1 = machine().device<ttl7474_device>("7474_1d_1");
-	m_ttl7474_1d_2 = machine().device<ttl7474_device>("7474_1d_2");
-	m_ttl7474_1c_1 = machine().device<ttl7474_device>("7474_1c_1");
-	m_ttl7474_1c_2 = machine().device<ttl7474_device>("7474_1c_2");
-	m_ttl7474_1a_1 = machine().device<ttl7474_device>("7474_1a_1");
-	m_ttl7474_1a_2 = machine().device<ttl7474_device>("7474_1a_2");
-
-	m_ttl74153_1k = machine().device("74153_1k");
-
 	save_item(NAME(m_ball_screen_collision_cause));
 	save_item(NAME(m_car_ball_collision_x));
 	save_item(NAME(m_car_ball_collision_y));
@@ -540,6 +522,6 @@ void carpolo_state::machine_reset()
 
 
 	/* set up the pedal handling chips */
-	ttl74153_enable_w(m_ttl74153_1k, 0, 0);
-	ttl74153_enable_w(m_ttl74153_1k, 1, 0);
+	m_ttl74153_1k->enable_w(0, 0);
+	m_ttl74153_1k->enable_w(1, 0);
 }

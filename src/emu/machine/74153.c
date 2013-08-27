@@ -35,153 +35,32 @@
 
 #include "emu.h"
 #include "machine/74153.h"
-#include "devlegcy.h"
 
-
-struct ttl74153_state
-{
-	/* callback */
-	void (*output_cb)(device_t *device);
-
-	/* inputs */
-	int a;                  /* pin 14 */
-	int b;                  /* pin 2 */
-	int input_lines[2][4];  /* pins 3-6,10-13 */
-	int enable[2];          /* pins 1,15 */
-
-	/* output */
-	int output[2];          /* pins 7,9 */
-
-	/* internals */
-	int last_output[2];
-};
-
-INLINE ttl74153_state *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == TTL74153);
-
-	return (ttl74153_state *)downcast<ttl74153_device *>(device)->token();
-}
-
-
-
-void ttl74153_update(device_t *device)
-{
-	ttl74153_state *state = get_safe_token(device);
-	int sel;
-	int section;
-
-
-	sel = (state->b << 1) | state->a;
-
-
-	/* process both sections */
-	for (section = 0; section < 2; section++)
-	{
-		if (state->enable[section])
-			state->output[section] = 0; // row 1 in truth table
-		else
-			state->output[section] = state->input_lines[section][sel];
-	}
-
-
-	/* call callback if either of the outputs changed */
-	if (  state->output_cb &&
-		((state->output[0] != state->last_output[0]) ||
-			(state->output[1] != state->last_output[1])))
-	{
-		state->last_output[0] = state->output[0];
-		state->last_output[1] = state->output[1];
-
-		state->output_cb(device);
-	}
-}
-
-
-void ttl74153_a_w(device_t *device, int data)
-{
-	ttl74153_state *state = get_safe_token(device);
-	state->a = data ? 1 : 0;
-}
-
-
-void ttl74153_b_w(device_t *device, int data)
-{
-	ttl74153_state *state = get_safe_token(device);
-	state->b = data ? 1 : 0;
-}
-
-
-void ttl74153_input_line_w(device_t *device, int section, int input_line, int data)
-{
-	ttl74153_state *state = get_safe_token(device);
-	state->input_lines[section][input_line] = data ? 1 : 0;
-}
-
-
-void ttl74153_enable_w(device_t *device, int section, int data)
-{
-	ttl74153_state *state = get_safe_token(device);
-	state->enable[section] = data ? 1 : 0;
-}
-
-
-int ttl74153_output_r(device_t *device, int section)
-{
-	ttl74153_state *state = get_safe_token(device);
-	return state->output[section];
-}
-
-
-static DEVICE_START( ttl74153 )
-{
-	ttl74153_config *config = (ttl74153_config *)device->static_config();
-	ttl74153_state *state = get_safe_token(device);
-	state->output_cb = config->output_cb;
-
-	device->save_item(NAME(state->enable));
-	device->save_item(NAME(state->last_output));
-	device->save_item(NAME(state->input_lines[0][0]));
-	device->save_item(NAME(state->input_lines[0][1]));
-	device->save_item(NAME(state->input_lines[0][2]));
-	device->save_item(NAME(state->input_lines[0][3]));
-	device->save_item(NAME(state->input_lines[1][0]));
-	device->save_item(NAME(state->input_lines[1][1]));
-	device->save_item(NAME(state->input_lines[1][2]));
-	device->save_item(NAME(state->input_lines[1][3]));
-	device->save_item(NAME(state->a));
-	device->save_item(NAME(state->b));
-}
-
-
-static DEVICE_RESET( ttl74153 )
-{
-	ttl74153_state *state = get_safe_token(device);
-
-	state->a = 1;
-	state->b = 1;
-	state->enable[0] = 1;
-	state->enable[1] = 1;
-	state->input_lines[0][0] = 1;
-	state->input_lines[0][1] = 1;
-	state->input_lines[0][2] = 1;
-	state->input_lines[0][3] = 1;
-	state->input_lines[1][0] = 1;
-	state->input_lines[1][1] = 1;
-	state->input_lines[1][2] = 1;
-	state->input_lines[1][3] = 1;
-
-	state->last_output[0] = -1;
-	state->last_output[1] = -1;
-}
 
 const device_type TTL74153 = &device_creator<ttl74153_device>;
 
 ttl74153_device::ttl74153_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TTL74153, "74153", tag, owner, clock, "74153", __FILE__)
+	: device_t(mconfig, TTL74153, "74153", tag, owner, clock, "74153", __FILE__),
+	m_a(0),
+	m_b(0)
 {
-	m_token = global_alloc_clear(ttl74153_state);
+	m_input_lines[0][0] = 0;
+	m_input_lines[0][1] = 0;
+	m_input_lines[0][2] = 0;
+	m_input_lines[0][3] = 0;
+	m_input_lines[1][0] = 0;
+	m_input_lines[1][1] = 0;
+	m_input_lines[1][2] = 0;
+	m_input_lines[1][3] = 0;
+	
+	for (int i = 0; i < 2; i++)
+	m_enable[i] = 0;
+	
+	for (int i = 0; i < 2; i++)
+	m_output[i] = 0;
+	
+	for (int i = 0; i < 2; i++)
+	m_last_output[i] = 0;
 }
 
 //-------------------------------------------------
@@ -192,6 +71,15 @@ ttl74153_device::ttl74153_device(const machine_config &mconfig, const char *tag,
 
 void ttl74153_device::device_config_complete()
 {
+	// inherit a copy of the static data
+	const ttl74153_config *intf = reinterpret_cast<const ttl74153_config *>(static_config());
+	if (intf != NULL)
+	*static_cast<ttl74153_config *>(this) = *intf;
+	
+	// or initialize to defaults if none provided
+	else
+	{
+	}
 }
 
 //-------------------------------------------------
@@ -200,7 +88,18 @@ void ttl74153_device::device_config_complete()
 
 void ttl74153_device::device_start()
 {
-	DEVICE_START_NAME( ttl74153 )(this);
+	save_item(NAME(m_enable));
+	save_item(NAME(m_last_output));
+	save_item(NAME(m_input_lines[0][0]));
+	save_item(NAME(m_input_lines[0][1]));
+	save_item(NAME(m_input_lines[0][2]));
+	save_item(NAME(m_input_lines[0][3]));
+	save_item(NAME(m_input_lines[1][0]));
+	save_item(NAME(m_input_lines[1][1]));
+	save_item(NAME(m_input_lines[1][2]));
+	save_item(NAME(m_input_lines[1][3]));
+	save_item(NAME(m_a));
+	save_item(NAME(m_b));
 }
 
 //-------------------------------------------------
@@ -209,5 +108,81 @@ void ttl74153_device::device_start()
 
 void ttl74153_device::device_reset()
 {
-	DEVICE_RESET_NAME( ttl74153 )(this);
+	m_a = 1;
+	m_b = 1;
+	m_enable[0] = 1;
+	m_enable[1] = 1;
+	m_input_lines[0][0] = 1;
+	m_input_lines[0][1] = 1;
+	m_input_lines[0][2] = 1;
+	m_input_lines[0][3] = 1;
+	m_input_lines[1][0] = 1;
+	m_input_lines[1][1] = 1;
+	m_input_lines[1][2] = 1;
+	m_input_lines[1][3] = 1;
+
+	m_last_output[0] = -1;
+	m_last_output[1] = -1;
+}
+
+
+void ttl74153_device::update()
+{
+	int sel;
+	int section;
+
+
+	sel = (m_b << 1) | m_a;
+
+
+	/* process both sections */
+	for (section = 0; section < 2; section++)
+	{
+		if (m_enable[section])
+			m_output[section] = 0; // row 1 in truth table
+		else
+			m_output[section] = m_input_lines[section][sel];
+	}
+
+
+	/* call callback if either of the outputs changed */
+	if (  m_output_cb &&
+		((m_output[0] != m_last_output[0]) ||
+			(m_output[1] != m_last_output[1])))
+	{
+		m_last_output[0] = m_output[0];
+		m_last_output[1] = m_output[1];
+
+		m_output_cb(this);
+	}
+}
+
+
+void ttl74153_device::a_w(int data)
+{
+	m_a = data ? 1 : 0;
+}
+
+
+void ttl74153_device::b_w(int data)
+{
+	m_b = data ? 1 : 0;
+}
+
+
+void ttl74153_device::input_line_w(int section, int input_line, int data)
+{
+	m_input_lines[section][input_line] = data ? 1 : 0;
+}
+
+
+void ttl74153_device::enable_w(int section, int data)
+{
+	m_enable[section] = data ? 1 : 0;
+}
+
+
+int ttl74153_device::output_r(int section)
+{
+	return m_output[section];
 }

@@ -9,6 +9,7 @@
 #include "machine/6821pia.h"
 #include "machine/7474.h"
 #include "machine/74148.h"
+#include "machine/74153.h"
 
 class carpolo_state : public driver_device
 {
@@ -18,7 +19,21 @@ public:
 		m_alpharam(*this, "alpharam"),
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
-		m_ttl74148_3s (*this, "74148_3s") { }
+		m_ttl74148_3s(*this, "74148_3s"),
+		m_ttl74153_1k(*this, "74153_1k"),
+		m_ttl7474_2s_1(*this, "7474_2s_1"),
+		m_ttl7474_2s_2(*this, "7474_2s_2"),
+		m_ttl7474_2u_1(*this, "7474_2u_1"),
+		m_ttl7474_2u_2(*this, "7474_2u_2"),
+		m_ttl7474_1f_1(*this, "7474_1f_1"),
+		m_ttl7474_1f_2(*this, "7474_1f_2"),
+		m_ttl7474_1d_1(*this, "7474_1d_1"),
+		m_ttl7474_1d_2(*this, "7474_1d_2"),
+		m_ttl7474_1c_1(*this, "7474_1c_1"),
+		m_ttl7474_1c_2(*this, "7474_1c_2"),
+		m_ttl7474_1a_1(*this, "7474_1a_1"),
+		m_ttl7474_1a_2(*this, "7474_1a_2")
+		{}
 
 	required_shared_ptr<UINT8> m_alpharam;
 	required_shared_ptr<UINT8> m_spriteram;
@@ -33,19 +48,19 @@ public:
 	UINT8 m_last_wheel_value[4];
 	required_device<cpu_device> m_maincpu;
 	required_device<ttl74148_device> m_ttl74148_3s;
-	device_t *m_ttl74153_1k;
-	ttl7474_device *m_ttl7474_2s_1;
-	ttl7474_device *m_ttl7474_2s_2;
-	ttl7474_device *m_ttl7474_2u_1;
-	ttl7474_device *m_ttl7474_2u_2;
-	ttl7474_device *m_ttl7474_1f_1;
-	ttl7474_device *m_ttl7474_1f_2;
-	ttl7474_device *m_ttl7474_1d_1;
-	ttl7474_device *m_ttl7474_1d_2;
-	ttl7474_device *m_ttl7474_1c_1;
-	ttl7474_device *m_ttl7474_1c_2;
-	ttl7474_device *m_ttl7474_1a_1;
-	ttl7474_device *m_ttl7474_1a_2;
+	required_device<ttl74153_device> m_ttl74153_1k;
+	required_device<ttl7474_device> m_ttl7474_2s_1;
+	required_device<ttl7474_device> m_ttl7474_2s_2;
+	required_device<ttl7474_device> m_ttl7474_2u_1;
+	required_device<ttl7474_device> m_ttl7474_2u_2;
+	required_device<ttl7474_device> m_ttl7474_1f_1;
+	required_device<ttl7474_device> m_ttl7474_1f_2;
+	required_device<ttl7474_device> m_ttl7474_1d_1;
+	required_device<ttl7474_device> m_ttl7474_1d_2;
+	required_device<ttl7474_device> m_ttl7474_1c_1;
+	required_device<ttl7474_device> m_ttl7474_1c_2;
+	required_device<ttl7474_device> m_ttl7474_1a_1;
+	required_device<ttl7474_device> m_ttl7474_1a_2;
 	bitmap_ind16 *m_sprite_sprite_collision_bitmap1;
 	bitmap_ind16 *m_sprite_sprite_collision_bitmap2;
 	bitmap_ind16 *m_sprite_goal_collision_bitmap1;
