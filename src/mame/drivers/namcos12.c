@@ -2564,6 +2564,32 @@ ROM_START( tektagtub )
 	ROM_LOAD( "teg1wave1.12",        0x0800000, 0x800000, CRC(dbc74fff) SHA1(601b7e7361ea744b34e3fa1fc39d88641de7f4c6) )
 ROM_END
 
+ROM_START( tektagtjc1 )
+	ROM_REGION32_LE( 0x00400000, "maincpu:rom", 0 ) /* main prg */
+	ROM_LOAD16_BYTE( "teg1verc1.2e", 0x0000000, 0x200000, CRC(1d631391) SHA1(325d211237461af6e105374ddb74441e68b470af) )
+	ROM_LOAD16_BYTE( "teg1verc1.2j", 0x0000001, 0x200000, CRC(4ece9b9a) SHA1(7091dadfe3a2954e684fcc9e5a3337ecd26609f6) )
+
+	ROM_REGION32_LE( 0x3800000, "user2", 0 ) /* main data */
+	ROM_LOAD32_WORD( "teg1_rom0e.ic9",  0x0000000, 0x800000, BAD_DUMP CRC(c962a373) SHA1(d662dbd89ef62c5ac3150a018fc2d35ef2ee94ac) ) // These roms were dumped half size,
+	ROM_LOAD32_WORD( "teg1_rom0o.ic13", 0x0000002, 0x800000, BAD_DUMP CRC(badb7dcf) SHA1(8c0bf7f6351c5a2a0996df371a901cf90c68cd8c) ) // it's possible the second half of
+	ROM_LOAD32_WORD( "teg1_rom1e.ic10", 0x1000000, 0x800000, BAD_DUMP CRC(b3d56124) SHA1(4df20c74ba63f7362caf15e9b8949fab655704fb) ) // the japanese roms contains
+	ROM_LOAD32_WORD( "teg1_rom1o.ic14", 0x1000002, 0x800000, BAD_DUMP CRC(2434ceb6) SHA1(f19f1599acbd6fd48793a2ee5a500ca817d9df56) ) // different graphics.
+	ROM_LOAD32_WORD( "teg1_rom2e.ic11", 0x2000000, 0x800000, BAD_DUMP CRC(6e5c3428) SHA1(e3cdb60a4445406877b2e273385f34bfb0974220) ) //
+	ROM_LOAD32_WORD( "teg1_rom2o.ic15", 0x2000002, 0x800000, BAD_DUMP CRC(21ce9dfa) SHA1(f27e8210ee236c327aa3e1ce4dd408abc6580a1b) ) //
+
+	ROM_LOAD32_BYTE( "flel.ic4",        0x3000000, 0x200000, CRC(daa240f8) SHA1(ead16b4686c6a4abfc30022f5c1aa3969907d4cc) ) // tektagt will boot with these
+	ROM_LOAD32_BYTE( "fleu.ic5",        0x3000001, 0x200000, CRC(a8786812) SHA1(40c80db0066f9a1f4e0eb06708344b0485c5e734) ) // but crashes after the
+	ROM_LOAD32_BYTE( "flou.ic6",        0x3000002, 0x200000, CRC(e5b52780) SHA1(ff81278bed4e571f9ed4ee4f7d8aa810f56f9676) ) // character selection
+	ROM_LOAD32_BYTE( "flou.ic7",        0x3000003, 0x200000, CRC(75894a07) SHA1(ee36dded4c78b0bddd4904eceabc0f0f2ca5cf07) ) //
+
+	ROM_REGION( 0x0080000, "sub", 0 ) /* sound prg */
+	ROM_LOAD16_WORD_SWAP( "teg1verb.11s", 0x0000000, 0x080000, BAD_DUMP CRC(0a6e5d6c) SHA1(fd37c190ac99dc9ab2373a43dc39ccf6eca6c178) ) // There is a single bit difference @ 0x1805
+
+	ROM_REGION( 0x1000000, "c352", 0 ) /* samples */
+	ROM_LOAD( "teg1_wave0.ic1",      0x0000000, 0x800000, CRC(4bd99104) SHA1(f76b0576cc28fe49d3c1c402988b933933e52e15) )
+	ROM_LOAD( "teg1_wave1.ic12",     0x0800000, 0x800000, CRC(dbc74fff) SHA1(601b7e7361ea744b34e3fa1fc39d88641de7f4c6) )
+ROM_END
+
 ROM_START( tektagtjb )
 	ROM_REGION32_LE( 0x00400000, "maincpu:rom", 0 ) /* main prg */
 	ROM_LOAD16_BYTE( "teg1verb.2e",  0x0000000, 0x200000, CRC(ca6c305f) SHA1(264a85566b74f544fe63a01332d92c65d23b6608) )
@@ -2671,32 +2697,6 @@ ROM_START( tektagtac1 )
 	ROM_LOAD( "teg2wavel1",          0x0400000, 0x400000, CRC(f5ab70e6) SHA1(cdb62d8eb92ca961be684caf768d1961d98ece22) )
 	ROM_LOAD( "teg2waveh0",          0x0800000, 0x400000, CRC(bc0325bf) SHA1(77059c300a9d53d0e97bb898a06c58076078d7d2) )
 	ROM_LOAD( "teg2waveh1",          0x0c00000, 0x400000, CRC(6c654921) SHA1(3849157b30b4b459956b823511551abda2e4b6e5) )
-ROM_END
-
-ROM_START( tektagtjc1 )
-	ROM_REGION32_LE( 0x00400000, "maincpu:rom", 0 ) /* main prg */
-	ROM_LOAD16_BYTE( "teg1verb.2e", 0x0000000, 0x200000, CRC(1d631391) SHA1(325d211237461af6e105374ddb74441e68b470af) )
-	ROM_LOAD16_BYTE( "teg1verb.2j", 0x0000001, 0x200000, CRC(4ece9b9a) SHA1(7091dadfe3a2954e684fcc9e5a3337ecd26609f6) )
-
-	ROM_REGION32_LE( 0x3800000, "user2", 0 ) /* main data */
-	ROM_LOAD32_WORD( "teg1_rom0e.ic9",  0x0000000, 0x800000, BAD_DUMP CRC(c962a373) SHA1(d662dbd89ef62c5ac3150a018fc2d35ef2ee94ac) ) // These roms were dumped half size,
-	ROM_LOAD32_WORD( "teg1_rom0o.ic13", 0x0000002, 0x800000, BAD_DUMP CRC(badb7dcf) SHA1(8c0bf7f6351c5a2a0996df371a901cf90c68cd8c) ) // it's possible the second half of
-	ROM_LOAD32_WORD( "teg1_rom1e.ic10", 0x1000000, 0x800000, BAD_DUMP CRC(b3d56124) SHA1(4df20c74ba63f7362caf15e9b8949fab655704fb) ) // the japanese roms contains
-	ROM_LOAD32_WORD( "teg1_rom1o.ic14", 0x1000002, 0x800000, BAD_DUMP CRC(2434ceb6) SHA1(f19f1599acbd6fd48793a2ee5a500ca817d9df56) ) // different graphics.
-	ROM_LOAD32_WORD( "teg1_rom2e.ic11", 0x2000000, 0x800000, BAD_DUMP CRC(6e5c3428) SHA1(e3cdb60a4445406877b2e273385f34bfb0974220) ) //
-	ROM_LOAD32_WORD( "teg1_rom2o.ic15", 0x2000002, 0x800000, BAD_DUMP CRC(21ce9dfa) SHA1(f27e8210ee236c327aa3e1ce4dd408abc6580a1b) ) //
-
-	ROM_LOAD32_BYTE( "flel.ic4",        0x3000000, 0x200000, CRC(daa240f8) SHA1(ead16b4686c6a4abfc30022f5c1aa3969907d4cc) ) // tektagt will boot with these
-	ROM_LOAD32_BYTE( "fleu.ic5",        0x3000001, 0x200000, CRC(a8786812) SHA1(40c80db0066f9a1f4e0eb06708344b0485c5e734) ) // but crashes after the
-	ROM_LOAD32_BYTE( "flou.ic6",        0x3000002, 0x200000, CRC(e5b52780) SHA1(ff81278bed4e571f9ed4ee4f7d8aa810f56f9676) ) // character selection
-	ROM_LOAD32_BYTE( "flou.ic7",        0x3000003, 0x200000, CRC(75894a07) SHA1(ee36dded4c78b0bddd4904eceabc0f0f2ca5cf07) ) //
-
-	ROM_REGION( 0x0080000, "sub", 0 ) /* sound prg */
-	ROM_LOAD16_WORD_SWAP( "teg1verb.11s", 0x0000000, 0x080000, BAD_DUMP CRC(0a6e5d6c) SHA1(fd37c190ac99dc9ab2373a43dc39ccf6eca6c178) ) // There is a single bit difference @ 0x1805
-
-	ROM_REGION( 0x1000000, "c352", 0 ) /* samples */
-	ROM_LOAD( "teg1_wave0.ic1",      0x0000000, 0x800000, CRC(4bd99104) SHA1(f76b0576cc28fe49d3c1c402988b933933e52e15) )
-	ROM_LOAD( "teg1_wave1.ic12",     0x0800000, 0x800000, CRC(dbc74fff) SHA1(601b7e7361ea744b34e3fa1fc39d88641de7f4c6) )
 ROM_END
 
 ROM_START( tenkomor )
