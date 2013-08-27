@@ -4030,27 +4030,7 @@ ROM_END
 	ROM_LOAD( "tp-026-4", 0x200000, 0x200000, CRC(b760cb53) SHA1(bc9c5e49e45cdda0f774be0038aa4deb21d4d285) ) \
 	ROM_REGION( 0x40000, "oki", 0 ) \
 	ROM_LOAD( "tp-026-2", 0x00000, 0x40000, CRC(85063f1f) SHA1(1bf4d77494de421c98f6273b9876e60d827a6826) ) \
-	ROM_REGION( 0x80, "eepromdumped", 0 ) \
-	ROM_LOAD16_WORD_SWAP( "93c45.u21", 0x00, 0x80, CRC(40d75df0) SHA1(a22f1cc74ce9bc9bfe53f48f6a43ab60e921052b) )
-// eeprom dumped can't be accepted by the code, but the values can't be a simple bad dump (not fixed bits and the values are present three times)
-// robiza's note: probably between sound cpu and EEPROM there's something that modify the values (PAL?)
-// we can get the eeprom with a value in [00004] address (1XXX dcba) -> then we need a different value in [00004] address (0XXX XXXX)
-// dcba = 0 -> korea
-// dcba = 1 -> korea (taito license)
-// dcba = 2 -> hong kong
-// dcba = 3 -> hong kong (taito license)
-// dcba = 4 -> taiwan
-// dcba = 5 -> taiwan (taito license)
-// dcba = 6 -> southeast asia
-// dcba = 7 -> southeast asia (taito license)
-// dcba = 8 -> europe
-// dcba = 9 -> europe (taito license)
-// dcba = a -> u.s.a.
-// dcba = b -> u.s.a. (taito license)
-// dcba = c -> NO COUNTRY
-// dcba = d -> NO COUNTRY (taito license)
-// dcba = e -> japan
-// dcba = f -> japan (taito license)
+
 
 ROM_START( fixeightkt )
 	ROMS_FIXEIGHT
