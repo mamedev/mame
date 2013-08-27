@@ -209,6 +209,10 @@ int osd_read_midi_channel(osd_midi_device *dev, UINT8 *pOut)
 				{
 					*pOut++ = status;
 					bytesOut++;
+					if (status == MIDI_EOX)
+					{
+						dev->rx_sysex = false;
+					}
 				}
 			}
 			else    // shift out the sysex bytes
@@ -242,17 +246,20 @@ int osd_read_midi_channel(osd_midi_device *dev, UINT8 *pOut)
 					switch (status & 0xf)
 					{
 						case 0: // System Exclusive
+						{
 							*pOut++ = status;   // this should be OK: the shortest legal sysex is F0 tt dd F7, I believe
 							*pOut++ = (dev->rx_evBuf[msg].message>>8) & 0xff;
 							*pOut++ = (dev->rx_evBuf[msg].message>>16) & 0xff;
-							*pOut++ = (dev->rx_evBuf[msg].message>>24) & 0xff;
+							UINT8 last = *pOut++ = (dev->rx_evBuf[msg].message>>24) & 0xff;
 							bytesOut += 4;
-							dev->rx_sysex = true;
+							dev->rx_sysex = (last != MIDI_EOX);
 							break;
+						}
 
 						case 7: // End of System Exclusive
 							*pOut++ = status;
 							bytesOut += 1;
+							dev->rx_sysex = false;
 							break;
 
 						case 2: // song pos
