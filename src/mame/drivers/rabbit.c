@@ -33,9 +33,6 @@ Notes:
     again later, once the chip is better understood.
 
 
-*/
-
-/*
 
 Rabbit PCB Layout
 -----------------
@@ -66,6 +63,9 @@ Notes:
       VSync: 60Hz
 
       Only ROMs positions 60, 50, 40, 02, 03, 10, 11, 01, 00 are populated.
+
+      There is known to exist a version of Rabbit with program rom labels
+      printed as ASIA 3/6 which is currently not dumped.
 
 Tokimeki Mahjong Paradise - Dear My Love Board Notes
 ----------------------------------------------------
