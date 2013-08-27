@@ -3823,6 +3823,20 @@ ROM_START( vspsx )
 	ROM_REGION32_LE( 0x1800000, "bankedroms", ROMREGION_ERASE00 )
 ROM_END
 
+/*
+
+There is known to exist (but not dumped) USA version with hand written labels:
+
+1/8 PROG 0 USA AA9E @ IC5
+1/8 PROG 1 USA 0A1E @ IC6
+1/8 PROG 2 USA C3B3 @ IC7
+1/8 PROG 3 USA E108 @ IC8
+1/8 PROG 4 USA 9127 @ IC9
+
+The SUM16 values differ from both the Japanese and Taiwanese versions.
+
+*/
+
 ROM_START( aerofgts )
 	KN_BIOS
 
