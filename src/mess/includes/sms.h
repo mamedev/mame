@@ -42,6 +42,7 @@ public:
 		m_port_reset(*this, "RESET"),
 		m_port_start(*this, "START"),
 		m_port_scope(*this, "SEGASCOPE"),
+		m_port_scope_binocular(*this, "SSCOPE_BINOCULAR"),
 		m_port_persist(*this, "PERSISTENCE"),
 		m_is_gamegear(0),
 		m_is_region_japan(0),
@@ -67,6 +68,7 @@ public:
 	optional_ioport m_port_reset;
 	optional_ioport m_port_start;
 	optional_ioport m_port_scope;
+	optional_ioport m_port_scope_binocular;
 	optional_ioport m_port_persist;
 
 	device_t *m_left_lcd;

@@ -244,7 +244,14 @@ READ8_MEMBER(sms_state::sms_input_port_dd_r)
 	sms_get_inputs(space);
 
 	// Reset Button
-	m_port_dd_reg &= ~0x10 | (m_port_reset->read_safe(0x01) & 0x01) << 4;
+	if ( m_port_reset )
+	{
+		m_port_dd_reg &= ~0x10 | (m_port_reset->read() & 0x01) << 4;
+	}
+	else
+	{
+		m_port_dd_reg |= 0x10;
+	}
 
 	// Check if TR of controller port 2 is set to output (0)
 	if (!(m_io_ctrl_reg & 0x04))
@@ -298,7 +305,7 @@ WRITE8_MEMBER(sms_state::sms_ym2413_data_port_w)
 {
 	if (m_has_fm)
 	{
-		logerror("data_port_w %x %x\n", offset, data);
+		//logerror("data_port_w %x %x\n", offset, data);
 		m_ym->write(space, 1, data);
 	}
 }
@@ -313,7 +320,7 @@ READ8_MEMBER(sms_state::gg_input_port_2_r)
 
 READ8_MEMBER(sms_state::sms_sscope_r)
 {
-	int sscope = m_port_scope->read_safe(0x00);
+	int sscope = m_port_scope->read();
 
 	if ( sscope )
 	{
@@ -329,7 +336,7 @@ WRITE8_MEMBER(sms_state::sms_sscope_w)
 {
 	m_mainram[0x1FF8 + offset] = data;
 
-	int sscope = m_port_scope->read_safe(0x00);
+	int sscope = m_port_scope->read();
 
 	if ( sscope )
 	{
@@ -969,7 +976,7 @@ VIDEO_RESET_MEMBER(sms_state,sms1)
 {
 	if (m_port_scope->read())
 	{
-		UINT8 sscope_binocular_hack = ioport("SSCOPE_BINOCULAR")->read();
+		UINT8 sscope_binocular_hack = m_port_scope_binocular->read();
 
 		if (sscope_binocular_hack & 0x01)
 			m_prevleft_bitmap.fill(RGB_BLACK);
@@ -1041,7 +1048,7 @@ UINT32 sms_state::screen_update_sms1(screen_device &screen, bitmap_rgb32 &bitmap
 		// save a copy of current bitmap for the binocular hack
 		if (sscope)
 		{
-			sscope_binocular_hack = ioport("SSCOPE_BINOCULAR")->read_safe(0x00);
+			sscope_binocular_hack = m_port_scope_binocular->read();
 
 			if (&screen == m_left_lcd)
 			{
@@ -1061,7 +1068,7 @@ UINT32 sms_state::screen_update_sms1(screen_device &screen, bitmap_rgb32 &bitmap
 		// use the copied bitmap for the binocular hack
 		if (sscope)
 		{
-			sscope_binocular_hack = ioport("SSCOPE_BINOCULAR")->read_safe(0x00);
+			sscope_binocular_hack = m_port_scope_binocular->read();
 
 			if (&screen == m_left_lcd)
 			{
@@ -1080,7 +1087,7 @@ UINT32 sms_state::screen_update_sms1(screen_device &screen, bitmap_rgb32 &bitmap
 				}
 			}
 		}
-		bitmap.fill(RGB_BLACK);
+		bitmap.fill(RGB_BLACK, cliprect);
 	}
 
 	return 0;
