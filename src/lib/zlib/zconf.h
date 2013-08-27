@@ -1,5 +1,5 @@
 /* zconf.h -- configuration of the zlib compression library
- * Copyright (C) 1995-2012 Jean-loup Gailly.
+ * Copyright (C) 1995-2013 Jean-loup Gailly.
  * For conditions of distribution and use, see copyright notice in zlib.h
  */
 
@@ -21,6 +21,7 @@
 #  define _dist_code            z__dist_code
 #  define _length_code          z__length_code
 #  define _tr_align             z__tr_align
+#  define _tr_flush_bits        z__tr_flush_bits
 #  define _tr_flush_block       z__tr_flush_block
 #  define _tr_init              z__tr_init
 #  define _tr_stored_block      z__tr_stored_block
@@ -77,6 +78,7 @@
 #      define gzopen_w              z_gzopen_w
 #    endif
 #    define gzprintf              z_gzprintf
+#    define gzvprintf             z_gzvprintf
 #    define gzputc                z_gzputc
 #    define gzputs                z_gzputs
 #    define gzread                z_gzread
@@ -103,6 +105,7 @@
 #  define inflateReset          z_inflateReset
 #  define inflateReset2         z_inflateReset2
 #  define inflateSetDictionary  z_inflateSetDictionary
+#  define inflateGetDictionary  z_inflateGetDictionary
 #  define inflateSync           z_inflateSync
 #  define inflateSyncPoint      z_inflateSyncPoint
 #  define inflateUndermine      z_inflateUndermine
@@ -257,7 +260,7 @@
  for small objects.
 */
 
-						/* Type declarations */
+                        /* Type declarations */
 
 #ifndef OF /* function prototypes */
 #  ifdef STDC
@@ -283,7 +286,7 @@
  */
 #ifdef SYS16BIT
 #  if defined(M_I86SM) || defined(M_I86MM)
-		/* MSC small or medium model */
+     /* MSC small or medium model */
 #    define SMALL_MEDIUM
 #    ifdef _MSC_VER
 #      define FAR _far
@@ -292,7 +295,7 @@
 #    endif
 #  endif
 #  if (defined(__SMALL__) || defined(__MEDIUM__))
-		/* Turbo C small or medium model */
+     /* Turbo C small or medium model */
 #    define SMALL_MEDIUM
 #    ifdef __BORLANDC__
 #      define FAR _far
@@ -303,9 +306,9 @@
 #endif
 
 #if defined(WINDOWS) || defined(WIN32)
-	/* If building or using zlib as a DLL, define ZLIB_DLL.
-	* This is not mandatory, but it offers a little performance increase.
-	*/
+   /* If building or using zlib as a DLL, define ZLIB_DLL.
+    * This is not mandatory, but it offers a little performance increase.
+    */
 #  ifdef ZLIB_DLL
 #    if defined(WIN32) && (!defined(__BORLANDC__) || (__BORLANDC__ >= 0x500))
 #      ifdef ZLIB_INTERNAL
@@ -315,17 +318,17 @@
 #      endif
 #    endif
 #  endif  /* ZLIB_DLL */
-	/* If building or using zlib with the WINAPI/WINAPIV calling convention,
-	* define ZLIB_WINAPI.
-	* Caution: the standard ZLIB1.DLL is NOT compiled using ZLIB_WINAPI.
-	*/
+   /* If building or using zlib with the WINAPI/WINAPIV calling convention,
+    * define ZLIB_WINAPI.
+    * Caution: the standard ZLIB1.DLL is NOT compiled using ZLIB_WINAPI.
+    */
 #  ifdef ZLIB_WINAPI
 #    ifdef FAR
 #      undef FAR
 #    endif
 #    include <windows.h>
-		/* No need for _export, use ZLIB.DEF instead. */
-		/* For complete Windows compatibility, use WINAPI, not __stdcall. */
+     /* No need for _export, use ZLIB.DEF instead. */
+     /* For complete Windows compatibility, use WINAPI, not __stdcall. */
 #    define ZEXPORT WINAPI
 #    ifdef WIN32
 #      define ZEXPORTVA WINAPIV
@@ -368,10 +371,10 @@ typedef unsigned int   uInt;  /* 16 bits or more */
 typedef unsigned long  uLong; /* 32 bits or more */
 
 #ifdef SMALL_MEDIUM
-	/* Borland C/C++ and some old MSC versions ignore FAR inside typedef */
+   /* Borland C/C++ and some old MSC versions ignore FAR inside typedef */
 #  define Bytef Byte FAR
 #else
-	typedef Byte  FAR Bytef;
+   typedef Byte  FAR Bytef;
 #endif
 typedef char  FAR charf;
 typedef int   FAR intf;
@@ -379,36 +382,30 @@ typedef uInt  FAR uIntf;
 typedef uLong FAR uLongf;
 
 #ifdef STDC
-	typedef void const *voidpc;
-	typedef void FAR   *voidpf;
-	typedef void       *voidp;
+   typedef void const *voidpc;
+   typedef void FAR   *voidpf;
+   typedef void       *voidp;
 #else
-	typedef Byte const *voidpc;
-	typedef Byte FAR   *voidpf;
-	typedef Byte       *voidp;
+   typedef Byte const *voidpc;
+   typedef Byte FAR   *voidpf;
+   typedef Byte       *voidp;
 #endif
-
-/* ./configure may #define Z_U4 here */
 
 #if !defined(Z_U4) && !defined(Z_SOLO) && defined(STDC)
 #  include <limits.h>
 #  if (UINT_MAX == 0xffffffffUL)
 #    define Z_U4 unsigned
-#  else
-#    if (ULONG_MAX == 0xffffffffUL)
-#      define Z_U4 unsigned long
-#    else
-#      if (USHRT_MAX == 0xffffffffUL)
-#        define Z_U4 unsigned short
-#      endif
-#    endif
+#  elif (ULONG_MAX == 0xffffffffUL)
+#    define Z_U4 unsigned long
+#  elif (USHRT_MAX == 0xffffffffUL)
+#    define Z_U4 unsigned short
 #  endif
 #endif
 
 #ifdef Z_U4
-	typedef Z_U4 z_crc_t;
+   typedef Z_U4 z_crc_t;
 #else
-	typedef unsigned long z_crc_t;
+   typedef unsigned long z_crc_t;
 #endif
 
 #ifdef HAVE_UNISTD_H    /* may be set to #if 1 by ./configure */
@@ -425,8 +422,16 @@ typedef uLong FAR uLongf;
 #  endif
 #endif
 
+#if defined(STDC) || defined(Z_HAVE_STDARG_H)
+#  ifndef Z_SOLO
+#    include <stdarg.h>         /* for va_list */
+#  endif
+#endif
+
 #ifdef _WIN32
-#  include <stddef.h>           /* for wchar_t */
+#  ifndef Z_SOLO
+#    include <stddef.h>         /* for wchar_t */
+#  endif
 #endif
 
 /* a little trick to accommodate both "#define _LARGEFILE64_SOURCE" and
@@ -435,7 +440,7 @@ typedef uLong FAR uLongf;
  * both "#undef _LARGEFILE64_SOURCE" and "#define _LARGEFILE64_SOURCE 0" as
  * equivalently requesting no 64-bit operations
  */
-#if defined(LARGEFILE64_SOURCE) && -_LARGEFILE64_SOURCE - -1 == 1
+#if defined(_LARGEFILE64_SOURCE) && -_LARGEFILE64_SOURCE - -1 == 1
 #  undef _LARGEFILE64_SOURCE
 #endif
 
@@ -443,7 +448,7 @@ typedef uLong FAR uLongf;
 #  define Z_HAVE_UNISTD_H
 #endif
 #ifndef Z_SOLO
-#  if defined(Z_HAVE_UNISTD_H) || defined(LARGEFILE64_SOURCE)
+#  if defined(Z_HAVE_UNISTD_H) || defined(_LARGEFILE64_SOURCE)
 #    include <unistd.h>         /* for SEEK_*, off_t, and _LFS64_LARGEFILE */
 #    ifdef VMS
 #      include <unixio.h>       /* for off_t */
@@ -488,19 +493,19 @@ typedef uLong FAR uLongf;
 
 /* MVS linker does not support external names larger than 8 bytes */
 #if defined(__MVS__)
-	#pragma map(deflateInit_,"DEIN")
-	#pragma map(deflateInit2_,"DEIN2")
-	#pragma map(deflateEnd,"DEEND")
-	#pragma map(deflateBound,"DEBND")
-	#pragma map(inflateInit_,"ININ")
-	#pragma map(inflateInit2_,"ININ2")
-	#pragma map(inflateEnd,"INEND")
-	#pragma map(inflateSync,"INSY")
-	#pragma map(inflateSetDictionary,"INSEDI")
-	#pragma map(compressBound,"CMBND")
-	#pragma map(inflate_table,"INTABL")
-	#pragma map(inflate_fast,"INFA")
-	#pragma map(inflate_copyright,"INCOPY")
+  #pragma map(deflateInit_,"DEIN")
+  #pragma map(deflateInit2_,"DEIN2")
+  #pragma map(deflateEnd,"DEEND")
+  #pragma map(deflateBound,"DEBND")
+  #pragma map(inflateInit_,"ININ")
+  #pragma map(inflateInit2_,"ININ2")
+  #pragma map(inflateEnd,"INEND")
+  #pragma map(inflateSync,"INSY")
+  #pragma map(inflateSetDictionary,"INSEDI")
+  #pragma map(compressBound,"CMBND")
+  #pragma map(inflate_table,"INTABL")
+  #pragma map(inflate_fast,"INFA")
+  #pragma map(inflate_copyright,"INCOPY")
 #endif
 
 #endif /* ZCONF_H */

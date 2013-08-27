@@ -215,6 +215,8 @@ ifdef DEBUG
 ZLIBOPTS=-Dverbose=-1
 endif
 
+ZLIBOPTS += -DZLIB_CONST -Wno-strict-prototypes
+
 ZLIBOBJS = \
 	$(LIBOBJ)/zlib/adler32.o \
 	$(LIBOBJ)/zlib/compress.o \
