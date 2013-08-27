@@ -114,6 +114,142 @@
 			NG -> OBJect list pointer Overflow (error)
 		TA_IPINT (0109):
 			NG -> TA: Illegal parameter (error)
+		YUV Converter (0201):
+			NG (I think)
+	DDT i/f TEST:
+		Sort, Normal DMA (1) (0101)
+			hangs (wants Sort DMA irq, of course)
+		Sort, Normal DMA (2)
+			...
+		Through
+			NG, hangs again
+		DC_DEINT (0201)
+			ok
+		DC_SDTEINT (0202)
+			ok
+		DC_SDTERINT (0203)
+			ok (but returns error count ++, think it's a bug in the SW)
+	G2 TEST
+		DMA (0101):
+			G2 EXT AREA DETECT:
+			"!!!! ch00 ERROR DETECT !!!!"
+		Interrupt (0301):
+			G2 EXT AREA DETECT
+			DMA END INT
+				hangs
+		Ext Interrupt (06xx)
+			AICA INT  (0601)
+				error detect
+			Modem INT (0602)
+				error detect
+	AICA TEST
+		Sound RAM (01xx)
+			Pattern R/W check (0101)
+				ok
+		Register (02xx)
+			CH Data (0201)
+				NG
+			EXT Input (0202)
+				ok
+			DSP Data (0203)
+				NG
+		S_Clock (03xx)
+			50MSEC (0301)
+				NG
+			25MSEC (0302)
+				NG
+		Timer (04xx)
+			Timer A (0401)
+				NG
+			Timer B (0402)
+				NG
+			Timer C (0403)
+				NG
+		DMA (05xx)
+			SRAM -> CH Reg (0501)
+				NG
+			SRAM -> Comm Reg (0502)
+				NG
+			SRAM -> DSP Reg (0503)
+				NG
+			CH Reg -> SRAM (0504)
+				NG
+			Comm Reg -> SRAM (0505)
+				NG
+			DSP Reg -> SRAM (0506)
+				NG
+			Clear SRAM (0507(
+				NG
+			Clear CH Reg (0508)
+				NG
+			Clear Comm Reg (0509)
+				NG
+			Clear DSP Reg (050a)
+				NG
+		Interrupt (06xx)
+			Sampling clock (0601)
+				NG
+			Timer A (0602)
+				NG
+			Timer B (0603)
+				NG
+			Timer C (0604)
+				NG
+			DMA End (0605)
+				NG
+			Midi Out (0606)
+				NG
+			Main CPU (0607)
+				NG
+		RTC (07xx)
+			Write Protect (0701)
+				ok
+			RW Comp (0702)
+				NG
+			Clock (0703)
+				NG
+		ARM7 (08xx)
+			Load & Start (0801)
+				NG
+			Timer & Intr (0802)
+				NG
+			DMA (0803)
+				NG
+			Ch-Reg R/W (0804)
+				ok
+			SRAM incr (0805)
+				NG
+			SRAM pattern (0806)
+				ok
+		EG (09xx)
+			LSA-Reg Left (0901)
+				ok/NG
+			LSA-Reg Right (0902)
+				ok/NG
+			LSA-Reg Left & Right (0903)
+				ok/NG
+		MIDI (0axx)
+			OEMP bit (0a01)
+				NG
+			OFLL bit (0a02)
+				NG
+	PVRi/f test
+		DMA (01xx)
+			CPU trig (0101)
+				ok
+			INT trig
+				ok
+		Interrupt (02xx)
+			PVR DMA end Int (0201)
+				ok
+			PVR DMA IA Int (0202)
+				NG
+			PVR DMA end (0203)
+				NG
+	Flash test:
+		(SH-4 jumps to la la land as soon as this is started)
+
+
 */
 
 #include "emu.h"

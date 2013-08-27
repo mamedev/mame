@@ -163,6 +163,10 @@ WRITE8_MEMBER(dc_state::pvr_irq)
 	case powervr2_device::DMA_PVR_IRQ:
 		dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_PVR;
 		break;
+
+	case powervr2_device::ERR_ISP_LIMIT_IRQ:
+		dc_sysctrl_regs[SB_ISTERR] |= IST_ERR_ISP_LIMIT_IRQ;
+		break;
 	}
 	dc_update_interrupt_status();
 }
