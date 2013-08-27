@@ -1346,7 +1346,7 @@ void zn_state::atpsx_dma_read( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_siz
 		return;
 	}
 
-	address_space &space = machine().firstcpu->space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	/* dma size is in 32-bit words, convert to words */
 	n_size <<= 1;
