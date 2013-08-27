@@ -27,60 +27,6 @@
 #include "formats/cpis_dsk.h"
 
 
-struct mem_state
-{
-	UINT16  lower;
-	UINT16  upper;
-	UINT16  middle;
-	UINT16  middle_size;
-	UINT16  peripheral;
-};
-
-struct timer_state
-{
-	UINT16  control;
-	UINT16  maxA;
-	UINT16  maxB;
-	UINT16  count;
-	emu_timer * int_timer;
-	emu_timer * time_timer;
-	UINT8   time_timer_active;
-	attotime    last_time;
-};
-
-struct dma_state
-{
-	UINT32  source;
-	UINT32  dest;
-	UINT16  count;
-	UINT16  control;
-	UINT8   finished;
-	emu_timer * finish_timer;
-};
-
-struct intr_state
-{
-	UINT8   pending;
-	UINT16  ack_mask;
-	UINT16  priority_mask;
-	UINT16  in_service;
-	UINT16  request;
-	UINT16  status;
-	UINT16  poll_status;
-	UINT16  timer;
-	UINT16  dma[2];
-	UINT16  ext[4];
-};
-
-struct i186_state
-{
-	struct timer_state  timer[3];
-	struct dma_state    dma[2];
-	struct intr_state   intr;
-	struct mem_state    mem;
-};
-
-
 /* Keyboard */
 struct TYP_COMPIS_KEYBOARD
 {
@@ -133,7 +79,6 @@ public:
 	m_8253(*this, "pit8253"),
 	m_8254(*this, "pit8254"),
 	m_8259m(*this, "pic8259_master"),
-//	m_8259s(*this, "pic8259_slave"),
 	m_8255(*this, "ppi8255"),
 	m_centronics(*this, "centronics"),
 	m_uart(*this, "uart"),
@@ -146,33 +91,21 @@ public:
 	required_device<pit8253_device> m_8253;
 	required_device<pit8254_device> m_8254;
 	required_device<pic8259_device> m_8259m;
-//	required_device<pic8259_device> m_8259s;
 	required_device<i8255_device> m_8255;
 	required_device<centronics_device> m_centronics;
 	required_device<i8251_device> m_uart;
 	required_device<mm58274c_device> m_rtc;
 	required_device<i8272a_device> m_fdc;
 	required_device<upd7220_device> m_crtc;
-	DECLARE_READ16_MEMBER(compis_usart_r);
-	DECLARE_WRITE16_MEMBER(compis_usart_w);
-//	DECLARE_READ16_MEMBER(compis_i186_internal_port_r);
-//	DECLARE_WRITE16_MEMBER(compis_i186_internal_port_w);
+	DECLARE_READ8_MEMBER(compis_usart_r);
+	DECLARE_WRITE8_MEMBER(compis_usart_w);
 	DECLARE_WRITE8_MEMBER(vram_w);
 	DECLARE_READ8_MEMBER(compis_ppi_port_b_r);
 	DECLARE_WRITE8_MEMBER(compis_ppi_port_c_w);
 	DECLARE_READ16_MEMBER(compis_osp_pit_r);
 	DECLARE_WRITE16_MEMBER(compis_osp_pit_w);
-	DECLARE_WRITE_LINE_MEMBER(compis_usart_rxready);
-//	DECLARE_WRITE_LINE_MEMBER(compis_pic8259_master_set_int_line);
-//	DECLARE_WRITE_LINE_MEMBER(compis_pic8259_slave_set_int_line);
-//	DECLARE_READ8_MEMBER(get_slave_ack);
-//	i186_state m_i186;
 	TYP_COMPIS m_compis;
 	UINT8 *m_p_videoram;
-//	void update_dma_control(int which, int new_control);
-//	void internal_timer_update(int which, int new_count, int new_maxA, int new_maxB, int new_control);
-//	void internal_timer_sync(int which);
-//	void handle_eoi(int data);
 	void compis_fdc_tc(int state);
 	DECLARE_READ8_MEMBER(fdc_mon_r);
 	DECLARE_WRITE8_MEMBER(fdc_mon_w);
@@ -188,16 +121,10 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_compis2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(compis_vblank_int);
-//	TIMER_CALLBACK_MEMBER(internal_timer_int);
-//	TIMER_CALLBACK_MEMBER(dma_timer_callback);
-//	IRQ_CALLBACK_MEMBER(int_callback);
 	DECLARE_READ8_MEMBER(compis_irq_callback);
-	void compis_irq_set(UINT8 irq);
 	void compis_keyb_update();
 	void compis_keyb_init();
 	void compis_fdc_reset();
-	void update_interrupt_state();
-	void compis_cpu_init();
 };
 
 

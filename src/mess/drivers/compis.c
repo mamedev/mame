@@ -114,7 +114,7 @@ static UPD7220_INTERFACE( hgdc_intf )
 /* TODO: why it writes to ROM region? */
 WRITE8_MEMBER( compis_state::vram_w )
 {
-	m_video_ram[offset+0x1ffff] = data;
+	m_video_ram[offset+0x20000] = data;
 }
 
 static ADDRESS_MAP_START( compis_mem , AS_PROGRAM, 16, compis_state )
@@ -133,7 +133,7 @@ static ADDRESS_MAP_START( compis_io, AS_IO, 16, compis_state )
 	AM_RANGE( 0x0100, 0x011b) AM_DEVREADWRITE8("mm58274c", mm58274c_device, read, write, 0xffff)
 	AM_RANGE( 0x0280, 0x0283) AM_DEVREADWRITE8("pic8259_master", pic8259_device, read, write, 0x00ff) /* 80150/80130 */
 	//AM_RANGE( 0x0288, 0x028f) AM_DEVREADWRITE_LEGACY("pit8254", compis_osp_pit_r, compis_osp_pit_w ) /* PIT 8254 (80150/80130)  */
-	AM_RANGE( 0x0310, 0x031f) AM_READWRITE( compis_usart_r, compis_usart_w )    /* USART 8251 Keyboard      */
+	AM_RANGE( 0x0310, 0x031f) AM_READWRITE8( compis_usart_r, compis_usart_w, 0xff00)    /* USART 8251 Keyboard      */
 	AM_RANGE( 0x0330, 0x0333) AM_DEVREADWRITE8("upd7220", upd7220_device, read, write, 0x00ff) /* GDC 82720 PCS6:6     */
 	AM_RANGE( 0x0340, 0x0343) AM_DEVICE8("i8272a", i8272a_device, map, 0x00ff)  /* iSBX0 (J8) FDC 8272      */
 	AM_RANGE( 0x0350, 0x0351) AM_DEVREADWRITE8("i8272a", i8272a_device, mdma_r, mdma_w, 0x00ff) /* iSBX0 (J8) DMA ACK       */
@@ -281,6 +281,7 @@ static INPUT_PORTS_START (compis)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad ,") PORT_CODE(KEYCODE_DEL_PAD) PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad -") PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHAR(UCHAR_MAMEKEY(MINUS_PAD))
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad +") PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHAR(UCHAR_MAMEKEY(PLUS_PAD))
+	PORT_BIT( 0xE000, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("DSW0")
 	PORT_DIPNAME( 0x18, 0x00, "S8 Test mode")
@@ -295,8 +296,6 @@ static INPUT_PORTS_START (compis)
 	PORT_DIPSETTING( 0x00, "Disabled" )
 INPUT_PORTS_END
 
-
-//static const unsigned i86_address_mask = 0x000fffff;
 
 static const mm58274c_interface compis_mm58274c_interface =
 {
@@ -331,7 +330,6 @@ static MACHINE_CONFIG_START( compis, compis_state )
 	MCFG_CPU_IO_MAP(compis_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", compis_state,  compis_vblank_int)
 	MCFG_80186_IRQ_SLAVE_ACK(DEVREAD8(DEVICE_SELF, compis_state, compis_irq_callback))
-	//MCFG_CPU_CONFIG(i86_address_mask)
 
 	//MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
@@ -354,7 +352,6 @@ static MACHINE_CONFIG_START( compis, compis_state )
 	MCFG_PIT8253_ADD( "pit8253", compis_pit8253_config )
 	MCFG_PIT8254_ADD( "pit8254", compis_pit8254_config )
 	MCFG_PIC8259_ADD( "pic8259_master", DEVWRITELINE("maincpu", i80186_cpu_device, int0_w), VCC, NULL )
-	//MCFG_PIC8259_ADD( "pic8259_slave", DEVWRITELINE("pic8259_master", pic8259_device, ir2_w), GND, NULL )
 	MCFG_I8255_ADD( "ppi8255", compis_ppi_interface )
 	MCFG_UPD7220_ADD("upd7220", XTAL_4_433619MHz/2, hgdc_intf, upd7220_map) //unknown clock
 	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
@@ -376,7 +373,6 @@ static MACHINE_CONFIG_START( compis2, compis_state )
 	MCFG_CPU_IO_MAP(compis_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", compis_state,  compis_vblank_int)
 	MCFG_80186_IRQ_SLAVE_ACK(DEVREAD8(DEVICE_SELF, compis_state, compis_irq_callback))
-	//MCFG_CPU_CONFIG(i86_address_mask)
 
 	//MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
@@ -395,7 +391,6 @@ static MACHINE_CONFIG_START( compis2, compis_state )
 	MCFG_PIT8253_ADD( "pit8253", compis_pit8253_config )
 	MCFG_PIT8254_ADD( "pit8254", compis_pit8254_config )
 	MCFG_PIC8259_ADD( "pic8259_master", DEVWRITELINE("maincpu", i80186_cpu_device, int0_w), VCC, NULL )
-	//MCFG_PIC8259_ADD( "pic8259_slave", DEVWRITELINE("pic8259_master", pic8259_device, ir2_w), GND, NULL )
 	MCFG_I8255_ADD( "ppi8255", compis_ppi_interface )
 	MCFG_UPD7220_ADD("upd7220", XTAL_4_433619MHz/2, hgdc_intf, upd7220_map) //unknown clock
 	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
