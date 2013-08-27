@@ -861,7 +861,7 @@ void sega315_5124_device::select_sprites( int line )
 
 			if ((line >= sprite_y) && (line < (sprite_y + m_sprite_height)))
 			{
-				if (m_sprite_count < max_sprites + 1)
+				if (m_sprite_count < max_sprites)
 				{
 					m_selected_sprite[m_sprite_count] = sprite_index;
 				}
@@ -893,7 +893,7 @@ void sega315_5124_device::select_sprites( int line )
 
 			if ((line >= sprite_y) && (line < (sprite_y + m_sprite_height * m_sprite_zoom)))
 			{
-				if (m_sprite_count < max_sprites + 1)
+				if (m_sprite_count < max_sprites)
 				{
 					m_selected_sprite[m_sprite_count] = sprite_index;
 				}
