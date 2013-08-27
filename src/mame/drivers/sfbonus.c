@@ -5538,10 +5538,10 @@ ROM_END
    ROM3   429D
    ROM4   AA27
    ROM5   C409
-   ROM6   59B6
+   ROM6   59B6     
 
-Note: There are at least two graphics roms updated for the "2nd Edition" which are currently undumped.
-      It to correct the misspelling of POINT on the play field, currently it's "PONIT".
+Note: ROM5 & ROM6 graphics roms were updated at some point to correct the misspelling of
+      POINT on the play field, currently it's "PONIT". Theses are currently undumped.
 */
 ROM_START( spooky )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
