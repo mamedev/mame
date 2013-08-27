@@ -34,9 +34,86 @@
 	  serial i/o also fails on that, work ram addresses that needs to be patched with 0x0009 (nop) are:
 	  0xc0196da
 	  0xc0196ec
-	FPU test:
-	0xc03fe24 work ram flag check (1=error, 0=ok)
-
+	SH4 TEST:
+		UBC test (0101):
+			ok
+		FPU test (0201):
+			NG
+		0xc03fe24 work ram flag check (1=error, 0=ok)
+		Cache test (03xx):
+			Cache Read/Write test (0301)
+			NG
+			Cache RAM mode Check (0305)
+			NG
+		MMU test (04xx):
+			asserts
+		TMU test (0501):
+			*_reg check -> ok
+			TCNT* reload -> NG
+			TCNT* underflow irq -> NG
+		MULT test (0601)
+			ok
+		DIVU test (0701)
+			ok
+		Store Queue test (0801):
+			ok
+		SCIF test (0901)
+			NG
+		Private Instruction test (0a01)
+			NG
+		Critical test (0dxx)
+			Critical (Store Queue) test (0d01):
+				ok
+			Critical (Write back) test (0d02):
+				ok
+			Critical (ADD,CMP/EQ) test (0d03):
+				ok
+			Critical (OC_OIX) test (0d04):
+				NG
+			Critical (MAX current) test (0d05):
+				ok (very slow!)
+		 	Critical (IC Cross Talk) test (0d06):
+				NG
+		 	Critical (Cache D-array) test (0d07):
+				NG
+		SH-4 BUG (0exx)
+			SH4_BUG 64bit FMOV
+				ok
+			SH4 BUG FIX (64bitFMOV)
+				ok
+	MEM TEST:
+		AICA (0102)
+			ok
+		Work RAM (0204):
+			ok
+		PV64 area (0303):
+			ok
+		PV32 area (0403):
+			ok
+	CLX TEST:
+		CLX internal RAM (0101):
+			ok
+		<Torus> check (0401):
+			(sets up RGB888 mode 2, assuming it's critically failed)
+	TA TEST:
+		TA_YUVINT (0101):
+			ok -> IST_EOXFER_YUV
+		TA_OENDINT (0102):
+			ok -> IST_EOXFER_OPLST
+		TA_OMENDINT (0103):
+			ok -> IST_EOXFER_OPMV
+		TA_TENDINT (0104):
+			ok -> IST_EOXFER_TRLST
+		TA_TMENDINT (0105):
+			ok -> IST_EOXFER_TRMV
+		TA_PTENDINT (0106):
+			ok -> IST_EOXFER_PTLST
+		TA_ISPINT (0107):
+			NG -> ISP/TSP Parameter Overflow (error)
+		TA_OBJINT (0108):
+			NG -> OBJect list pointer Overflow (error)
+		TA_IPINT (0109):
+			NG -> TA: Illegal parameter (error)
 */
 
 #include "emu.h"
