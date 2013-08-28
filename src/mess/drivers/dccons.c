@@ -167,25 +167,25 @@
 				NG
 		DMA (05xx)
 			SRAM -> CH Reg (0501)
-				NG
+				ok
 			SRAM -> Comm Reg (0502)
-				NG
+				ok
 			SRAM -> DSP Reg (0503)
-				NG
+				ok
 			CH Reg -> SRAM (0504)
-				NG
+				ok
 			Comm Reg -> SRAM (0505)
-				NG
+				ok
 			DSP Reg -> SRAM (0506)
-				NG
-			Clear SRAM (0507(
-				NG
+				ok
+			Clear SRAM (0507)
+				ok
 			Clear CH Reg (0508)
-				NG
+				ok
 			Clear Comm Reg (0509)
-				NG
+				ok
 			Clear DSP Reg (050a)
-				NG
+				ok
 		Interrupt (06xx)
 			Sampling clock (0601)
 				NG

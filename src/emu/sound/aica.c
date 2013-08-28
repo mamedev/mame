@@ -1294,6 +1294,7 @@ static void AICA_DoMasterSamples(aica_state *AICA, int nsamples)
 	}
 }
 
+/* TODO: this needs to be timer-ized */
 static void aica_exec_dma(aica_state *aica,address_space &space)
 {
 	static UINT16 tmp_dma[4];
@@ -1304,13 +1305,14 @@ static void aica_exec_dma(aica_state *aica,address_space &space)
 				"DGATE: %d  DDIR: %d\n",aica->dma.dmea,aica->dma.drga,aica->dma.dlg,aica->dma.dgate,aica->dma.ddir);
 
 	/* Copy the dma values in a temp storage for resuming later */
-		/* (DMA *can't* overwrite his parameters).                  */
+		/* (DMA *can't* overwrite its parameters).                  */
 	if(!(aica->dma.ddir))
 	{
 		for(i=0;i<4;i++)
 			tmp_dma[i] = aica->udata.data[(0x80+(i*4))/2];
 	}
 
+	/* note: we don't use space.read_word / write_word because it can happen that SH-4 enables the DMA instead of ARM like in DCLP tester. */
 	/* TODO: don't know if params auto-updates, I guess not ... */
 	if(aica->dma.ddir)
 	{
