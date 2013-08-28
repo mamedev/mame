@@ -203,19 +203,21 @@ WRITE8_MEMBER(_20pacgal_state::sprite_lookup_w)
 
 // wrong
 static ADDRESS_MAP_START( 25pacman_map, AS_PROGRAM, 8, _25pacman_state )
-//	AM_RANGE(0x00000, 0x3ffff) AM_DEVREAD("flash", sst_39vf020_device, read ) AM_MIRROR( 0x0c0000 ) // (always fall through if nothing else is mapped?)
+
 	AM_RANGE(0x00000, 0x3ffff) AM_ROM AM_REGION("flash", 0)
 
-	AM_RANGE(0xc8000, 0xc9fff) AM_READ_BANK("bank1") AM_WRITE(ram_48000_w)
+	AM_RANGE(0x08000, 0x09fff) AM_READ_BANK("bank1") AM_WRITE(ram_48000_w)
 
 	AM_RANGE(0x04000, 0x047ff) AM_RAM AM_SHARE("video_ram")
 	AM_RANGE(0x04800, 0x05fff) AM_RAM
-	AM_RANGE(0x06000, 0x06fff) AM_RAM AM_SHARE("char_gfx_ram")
-	AM_RANGE(0x0a000, 0x0afff) AM_RAM
+	AM_RANGE(0x06000, 0x06fff) AM_WRITEONLY AM_SHARE("char_gfx_ram")
+	AM_RANGE(0x0a000, 0x0afff) AM_WRITENOP
+	AM_RANGE(0x0ff00, 0x0ffff) AM_WRITENOP
 
-//	AM_RANGE(0x0c000, 0x0dfff) AM_WRITE(sprite_gfx_w)
-//	AM_RANGE(0x0e000, 0x0e17f) AM_WRITE(sprite_ram_w)
+	AM_RANGE(0x0c000, 0x0dfff) AM_WRITE(sprite_gfx_w)
+	AM_RANGE(0x07000, 0x0717f) AM_WRITE(sprite_ram_w)
 
+//	AM_RANGE(0x00000, 0x3ffff) AM_DEVREADWRITE("flash", sst_39vf020_device, read, write )  // (always fall through if nothing else is mapped?)
 
 ADDRESS_MAP_END
 
@@ -244,6 +246,31 @@ ADDRESS_MAP_END
  *  I/O port handlers
  *
  *************************************/
+
+READ8_MEMBER( _25pacman_state::_25pacman_io_87_r )
+{
+	return 0xff;
+}
+
+ static ADDRESS_MAP_START( 25pacman_io_map, AS_IO, 8, _25pacman_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x3f) AM_NOP /* Z180 internal registers */
+	AM_RANGE(0x40, 0x7f) AM_NOP /* Z180 internal registers */
+	AM_RANGE(0x80, 0x80) AM_READ_PORT("P1")
+	AM_RANGE(0x81, 0x81) AM_READ_PORT("P2")
+	AM_RANGE(0x82, 0x82) AM_READ_PORT("SERVICE")
+	AM_RANGE(0x80, 0x80) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x81, 0x81) AM_WRITE(timer_pulse_w)        /* ??? pulsed by the timer irq */
+	AM_RANGE(0x82, 0x82) AM_WRITE(irqack_w)
+	AM_RANGE(0x84, 0x84) AM_NOP /* ?? */
+	AM_RANGE(0x85, 0x86) AM_WRITEONLY AM_SHARE("stars_seed")    /* stars: rng seed (lo/hi) */
+	AM_RANGE(0x87, 0x87) AM_READ( _25pacman_io_87_r ) // not eeprom on this
+	AM_RANGE(0x88, 0x88) AM_WRITE(ram_bank_select_w)
+	AM_RANGE(0x89, 0x89) AM_DEVWRITE("dac", dac_device, write_signed8)
+	AM_RANGE(0x8a, 0x8a) AM_WRITEONLY AM_SHARE("stars_ctrl")    /* stars: bits 3-4 = active set; bit 5 = enable */
+	AM_RANGE(0x8b, 0x8b) AM_WRITEONLY AM_SHARE("flip")
+	AM_RANGE(0x8f, 0x8f) AM_WRITE(_20pacgal_coin_counter_w)
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( 20pacgal_io_map, AS_IO, 8, _20pacgal_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
@@ -389,6 +416,8 @@ static MACHINE_CONFIG_DERIVED_CLASS( 25pacman, 20pacgal, _25pacman_state )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(25pacman_map)
+	MCFG_CPU_IO_MAP(25pacman_io_map)
+
 
 	MCFG_SST_39VF020_ADD("flash") // wrong type, should be AM29LV20
 MACHINE_CONFIG_END

@@ -79,6 +79,8 @@ public:
 		: _20pacgal_state(mconfig, type, tag)
 	{ }
 
+	DECLARE_READ8_MEMBER( _25pacman_io_87_r );
+
 };
 
 /*----------- defined in video/20pacgal.c -----------*/
