@@ -688,20 +688,19 @@ void taitoair_state::machine_reset()
 static MACHINE_CONFIG_START( airsys, taitoair_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,24000000 / 2)        /* 12 MHz ??? */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_12_MHz)	// MC68000P12
 	MCFG_CPU_PROGRAM_MAP(airsys_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitoair_state,  irq5_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,8000000 / 2)           /* 4 MHz ??? */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16_MHz / 4)	// Z8400AB1
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_CPU_ADD("dsp", TMS32025,24000000)          /* 24 MHz ??? *///
+	MCFG_CPU_ADD("dsp", TMS32025, XTAL_36_MHz) // Unverified
 	MCFG_CPU_PROGRAM_MAP(DSP_map_program)
 	MCFG_CPU_DATA_MAP(DSP_map_data)
 	MCFG_CPU_IO_MAP(DSP_map_io)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
-
 
 	MCFG_TC0220IOC_ADD("tc0220ioc", airsys_io_intf)
 
@@ -722,7 +721,7 @@ static MACHINE_CONFIG_START( airsys, taitoair_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
+	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_16_MHz / 2)
 	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitoair_state, irqhandler))
 	MCFG_SOUND_ROUTE(0, "mono", 0.30)
 	MCFG_SOUND_ROUTE(1, "mono", 0.60)
@@ -735,8 +734,10 @@ MACHINE_CONFIG_END
 /*************************************************************
                    DRIVERS
 
-Ainferno may be missing an 0x2000 byte rom from the video
-board - possibly?
+Both games use near-identical CPU boards but different video
+boards. Top Landing has a video board ROM (b62-28.22) which is
+not present on Air Inferno.
+
 *************************************************************/
 
 ROM_START( topland )
@@ -823,9 +824,6 @@ ROM_START( ainferno )
 	ROM_REGION( 0x20000, "ymsnd.deltat", 0 )    /* Delta-T samples */
 	ROM_LOAD( "c45-06.31", 0x00000, 0x20000, CRC(6a7976d4) SHA1(a465f9bb874b1eff08742b33cc3c364703b281ca) )
 
-	ROM_REGION( 0x02000, "user1", 0 )
-	ROM_LOAD( "c45-xx.22", 0x00000, 0x02000, NO_DUMP )  // video board
-
 	ROM_REGION( 0x1c00, "plds", 0 )
 	ROM_LOAD( "pal16l8b-c45-07.ic6",   0x0000, 0x0104, CRC(a139114f) SHA1(d21f0c02c34a59b2cea925a9a417d5c2db27a30e) )
 	ROM_LOAD( "pal16l8b-c45-08.ic62",  0x0200, 0x0104, CRC(6f8ec860) SHA1(25161f6e5a5a76c35e697312567abe995b08b945) )
@@ -878,9 +876,6 @@ ROM_START( ainfernoj )
 
 	ROM_REGION( 0x20000, "ymsnd.deltat", 0 )    /* Delta-T samples */
 	ROM_LOAD( "c45-06.31", 0x00000, 0x20000, CRC(6a7976d4) SHA1(a465f9bb874b1eff08742b33cc3c364703b281ca) )
-
-	ROM_REGION( 0x02000, "user1", 0 )
-	ROM_LOAD( "c45-xx.22", 0x00000, 0x02000, NO_DUMP )  // video board
 
 	ROM_REGION( 0x1c00, "plds", 0 )
 	ROM_LOAD( "pal16l8b-c45-07.ic6",   0x0000, 0x0104, CRC(a139114f) SHA1(d21f0c02c34a59b2cea925a9a417d5c2db27a30e) )
