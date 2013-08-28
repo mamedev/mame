@@ -57,8 +57,8 @@ class dc_state : public driver_device
 	TIMER_CALLBACK_MEMBER(ch2_dma_irq);
 	TIMER_CALLBACK_MEMBER(yuv_fifo_irq);
 	TIMER_CALLBACK_MEMBER(dc_rtc_increment);
-	DECLARE_READ64_MEMBER(dc_aica_reg_r);
-	DECLARE_WRITE64_MEMBER(dc_aica_reg_w);
+	DECLARE_READ32_MEMBER(dc_aica_reg_r);
+	DECLARE_WRITE32_MEMBER(dc_aica_reg_w);
 	DECLARE_READ32_MEMBER(dc_arm_aica_r);
 	DECLARE_WRITE32_MEMBER(dc_arm_aica_w);
 	void wave_dma_execute(address_space &space);

@@ -194,15 +194,22 @@ struct aica_state
 	emu_timer *timerA, *timerB, *timerC;
 
 	// DMA stuff
-	UINT32 aica_dmea;
-	UINT16 aica_drga;
-	UINT16 aica_dtlg;
+	struct{
+		UINT32 dmea;
+		UINT16 drga;
+		UINT16 dlg;
+		UINT8 dgate;
+		UINT8 ddir;
+	}dma;
+
 
 	int ARTABLE[64], DRTABLE[64];
 
 	AICADSP DSP;
 	device_t *device;
 };
+
+static void aica_exec_dma(aica_state *aica,address_space &space);       /*state DMA transfer function*/
 
 static const float SDLT[16]={-1000000.0,-42.0,-39.0,-36.0,-33.0,-30.0,-27.0,-24.0,-21.0,-18.0,-15.0,-12.0,-9.0,-6.0,-3.0,0.0};
 
@@ -712,6 +719,32 @@ static void AICA_UpdateReg(aica_state *AICA, address_space &space, int reg)
 		case 0x16:
 		case 0x17:
 			break;
+
+		case 0x80:
+		case 0x81:
+			AICA->dma.dmea = ((AICA->udata.data[0x80/2] & 0xfe00) << 7) | (AICA->dma.dmea & 0xfffc);
+			/* TODO: $TSCD - MRWINH regs */
+			break;
+
+		case 0x84:
+		case 0x85:
+			AICA->dma.dmea = (AICA->udata.data[0x84/2] & 0xfffc) | (AICA->dma.dmea & 0x7f0000);
+			break;
+
+		case 0x88:
+		case 0x89:
+			AICA->dma.drga = (AICA->udata.data[0x88/2] & 0x7ffc);
+			AICA->dma.dgate = (AICA->udata.data[0x88/2] & 0x8000) >> 15;
+			break;
+
+		case 0x8c:
+		case 0x8d:
+			AICA->dma.dlg = (AICA->udata.data[0x8c/2] & 0x7ffc);
+			AICA->dma.ddir = (AICA->udata.data[0x8c/2] & 0x8000) >> 15;
+			if(AICA->udata.data[0x8c/2] & 1) // dexe
+				aica_exec_dma(AICA,space);
+			break;
+
 		case 0x90:
 		case 0x91:
 			if(AICA->Master)
@@ -920,6 +953,7 @@ static void AICA_w16(aica_state *AICA,address_space &space,unsigned int addr,uns
 //          printf("%x to AICA global @ %x\n", val, addr & 0xff);
 			*((unsigned short *) (AICA->udata.datab+((addr&0xff)))) = val;
 			AICA_UpdateReg(AICA, space, addr&0xff);
+
 		}
 		else if (addr == 0x2d00)
 		{
@@ -985,6 +1019,16 @@ static unsigned short AICA_r16(aica_state *AICA, address_space &space, unsigned 
 		{
 			return AICA->IRQR;
 		}
+	}
+	else
+	{
+		if(addr<0x3200) //COEF
+			v= *((unsigned short *) (AICA->DSP.COEF+(addr-0x3000)/2));
+		else if(addr<0x3400)
+			v= *((unsigned short *) (AICA->DSP.MADRS+(addr-0x3200)/2));
+		else if(addr<0x3c00)
+			v= *((unsigned short *) (AICA->DSP.MPRO+(addr-0x3400)/2));
+
 	}
 //  else if (addr<0x700)
 //      v=AICA->RINGBUF[(addr-0x600)/2];
@@ -1248,6 +1292,85 @@ static void AICA_DoMasterSamples(aica_state *AICA, int nsamples)
 		*bufl++ = ICLIP16(smpl>>3);
 		*bufr++ = ICLIP16(smpr>>3);
 	}
+}
+
+static void aica_exec_dma(aica_state *aica,address_space &space)
+{
+	static UINT16 tmp_dma[4];
+	int i;
+
+	printf("AICA: DMA transfer START\n"
+				"DMEA: %08x DRGA: %08x DLG: %04x\n"
+				"DGATE: %d  DDIR: %d\n",aica->dma.dmea,aica->dma.drga,aica->dma.dlg,aica->dma.dgate,aica->dma.ddir);
+
+	/* Copy the dma values in a temp storage for resuming later */
+		/* (DMA *can't* overwrite his parameters).                  */
+	if(!(aica->dma.ddir))
+	{
+		for(i=0;i<4;i++)
+			tmp_dma[i] = aica->udata.data[(0x80+(i*4))/2];
+	}
+
+	/* TODO: don't know if params auto-updates, I guess not ... */
+	if(aica->dma.ddir)
+	{
+		if(aica->dma.dgate)
+		{
+			for(i=0;i < aica->dma.dlg;i+=2)
+			{
+				aica->AICARAM[aica->dma.dmea] = 0;
+				aica->AICARAM[aica->dma.dmea+1] = 0;
+				aica->dma.dmea+=2;
+			}
+		}
+		else
+		{
+			for(i=0;i < aica->dma.dlg;i+=2)
+			{
+				UINT16 tmp;
+				tmp = AICA_r16(aica, space, aica->dma.drga);;
+				aica->AICARAM[aica->dma.dmea] = tmp & 0xff;
+				aica->AICARAM[aica->dma.dmea+1] = tmp>>8;
+				aica->dma.dmea+=4;
+				aica->dma.drga+=4;
+			}
+		}
+	}
+	else
+	{
+		if(aica->dma.dgate)
+		{
+			for(i=0;i < aica->dma.dlg;i+=2)
+			{
+				AICA_w16(aica, space, aica->dma.drga, 0);
+				aica->dma.drga+=4;
+			}
+		}
+		else
+		{
+			for(i=0;i < aica->dma.dlg;i+=2)
+			{
+				UINT16 tmp;
+				tmp = aica->AICARAM[aica->dma.dmea];
+				tmp|= aica->AICARAM[aica->dma.dmea+1]<<8;
+				AICA_w16(aica, space, aica->dma.drga, tmp);
+				aica->dma.dmea+=4;
+				aica->dma.drga+=4;
+			}
+		}
+	}
+
+	/*Resume the values*/
+	if(!(aica->dma.ddir))
+	{
+		for(i=0;i<4;i++)
+			aica->udata.data[(0x80+(i*4))/2] = tmp_dma[i];
+	}
+
+	/* Job done, clear DEXE */
+	aica->udata.data[0x8c/2] &= ~1;
+	/* request a dma end irq (TBD) */
+	// ...
 }
 
 #ifdef UNUSED_FUNCTION

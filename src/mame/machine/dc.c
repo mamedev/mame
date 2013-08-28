@@ -762,30 +762,18 @@ void dc_state::machine_reset()
 	dc_sysctrl_regs[SB_SBREV] = 0x0b;
 }
 
-READ64_MEMBER(dc_state::dc_aica_reg_r)
+READ32_MEMBER(dc_state::dc_aica_reg_r)
 {
-	//int reg;
-	UINT64 shift;
-
-	/*reg = */decode_reg32_64(offset, mem_mask, &shift);
-
 //  mame_printf_verbose("AICA REG: [%08x] read %" I64FMT "x, mask %" I64FMT "x\n", 0x700000+reg*4, (UINT64)offset, mem_mask);
 
-	return (UINT64) aica_r(machine().device("aica"), space, offset*2, 0xffff)<<shift;
+	return aica_r(machine().device("aica"), space, offset*2, 0xffff);
 }
 
-WRITE64_MEMBER(dc_state::dc_aica_reg_w)
+WRITE32_MEMBER(dc_state::dc_aica_reg_w)
 {
-	int reg;
-	UINT64 shift;
-	UINT32 dat;
-
-	reg = decode_reg32_64(offset, mem_mask, &shift);
-	dat = (UINT32)(data >> shift);
-
-	if (reg == (0x2c00/4))
+	if (offset == (0x2c00/4))
 	{
-		if (dat & 1)
+		if (data & 1)
 		{
 			/* halt the ARM7 */
 			m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
@@ -797,9 +785,9 @@ WRITE64_MEMBER(dc_state::dc_aica_reg_w)
 		}
 	}
 
-	aica_w(machine().device("aica"), space, offset*2, dat, shift ? ((mem_mask>>32)&0xffff) : (mem_mask & 0xffff));
+	aica_w(machine().device("aica"), space, offset*2, data, 0xffff);
 
-//  mame_printf_verbose("AICA REG: [%08x=%x] write %" I64FMT "x to %x, mask %" I64FMT "x\n", 0x700000+reg*4, dat, data, offset, mem_mask);
+//  mame_printf_verbose("AICA REG: [%08x=%x] write %x to %x, mask %" I64FMT "x\n", 0x700000+reg*4, data, offset, mem_mask);
 }
 
 READ32_MEMBER(dc_state::dc_arm_aica_r)
