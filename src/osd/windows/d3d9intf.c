@@ -685,6 +685,124 @@ static const vertex_buffer_interface d3d9_vertex_buffer_interface =
 //  Direct3DEffect interfaces
 //============================================================
 
+uniform::uniform(effect *shader, const char *name, uniform_type type)
+{
+	m_shader = shader;
+	m_type = type;
+	m_next = NULL;
+	m_prev = NULL;
+	m_handle = m_shader->get_parameter(NULL, name);
+	m_ival = 0;
+	memset(m_vec, 0, sizeof(float) * 4);
+	m_mval = NULL;
+	m_texture = NULL;
+
+	switch (type)
+	{
+	case UT_INT:
+	case UT_FLOAT:
+	case UT_MATRIX:
+	case UT_SAMPLER:
+		m_count = 1;
+		break;
+	case UT_VEC2:
+		m_count = 2;
+		break;
+	case UT_VEC3:
+		m_count = 3;
+		break;
+	case UT_VEC4:
+		m_count = 4;
+		break;
+	default:
+		m_count = 1;
+		break;
+	}
+}
+
+void uniform::set_next(uniform *next)
+{
+	m_next->set_prev(next);
+	next->set_next(m_next);
+
+	next->set_prev(this);
+	m_next = next;
+}
+
+void uniform::set_prev(uniform *prev)
+{
+	m_prev->set_next(prev);
+	prev->set_prev(m_prev);
+
+	prev->set_next(this);
+	m_prev = prev;
+}
+
+void uniform::set(float x, float y, float z, float w)
+{
+	m_vec[0] = x;
+	m_vec[1] = y;
+	m_vec[2] = z;
+	m_vec[3] = w;
+}
+
+void uniform::set(float x, float y, float z)
+{
+	m_vec[0] = x;
+	m_vec[1] = y;
+	m_vec[2] = z;
+}
+
+void uniform::set(float x, float y)
+{
+	m_vec[0] = x;
+	m_vec[1] = y;
+}
+
+void uniform::set(float x)
+{
+	m_vec[0] = x;
+}
+
+void uniform::set(int x)
+{
+	m_ival = x;
+}
+
+void uniform::set(matrix *mat)
+{
+	m_mval = mat;
+}
+
+void uniform::set(texture *tex)
+{
+	m_texture = tex;
+}
+
+void uniform::upload()
+{
+	switch(m_type)
+	{
+		case UT_INT:
+			m_shader->set_int(m_handle, m_ival);
+			break;
+		case UT_FLOAT:
+			m_shader->set_float(m_handle, m_vec[0]);
+			break;
+		case UT_VEC2:
+		case UT_VEC3:
+		case UT_VEC4:
+			m_shader->set_vector(m_handle, m_count, m_vec);
+			break;
+		case UT_MATRIX:
+			m_shader->set_matrix(m_handle, m_mval);
+			break;
+		case UT_SAMPLER:
+			m_shader->set_texture(m_handle, m_texture);
+			break;
+	}
+}
+
 effect::effect(device *dev, const char *name, const char *path)
 {
 	IDirect3DDevice9 *device = (IDirect3DDevice9 *)dev;
@@ -781,6 +899,11 @@ void effect::set_matrix(D3DXHANDLE param, matrix *matrix)
 void effect::set_texture(D3DXHANDLE param, texture *tex)
 {
 	m_effect->SetTexture(param, (IDirect3DTexture9*)tex);
+}
+
+D3DXHANDLE effect::get_parameter(D3DXHANDLE param, const char *name)
+{
+	return m_effect->GetParameterByName(param, name);
 }
 
 ULONG effect::release()

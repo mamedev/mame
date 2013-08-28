@@ -1055,8 +1055,8 @@ void shaders::blit(surface *dst, texture *src, surface *new_dst, D3DPRIMITIVETYP
 
 	curr_effect->set_texture("Diffuse", src);
 
-	curr_effect->set_float("TargetWidth", (float)dstw);
-	curr_effect->set_float("TargetHeight", (float)dsth);
+	float dst_dims[2] = { (float)dstw, (float)dsth };
+	curr_effect->set_vector("ScreenDims", 2, dst_dims);
 	curr_effect->set_float("PostPass", 1.0f);
 	curr_effect->set_float("PincushionAmount", options->pincushion);
 	curr_effect->set_float("Brighten", 0.0f);
@@ -1102,8 +1102,8 @@ void shaders::blit(surface *dst, texture *src, surface *new_dst, D3DPRIMITIVETYP
 
 	curr_effect->set_texture("Diffuse", src);
 
-	curr_effect->set_float("TargetWidth", (float)d3d->get_width());
-	curr_effect->set_float("TargetHeight", (float)d3d->get_height());
+	vec2f screendims = d3d->get_dims();
+	curr_effect->set_vector("ScreenDims", 2, &screendims.c.x);
 	curr_effect->set_float("ScreenWidth", (float)d3d->get_width());
 	curr_effect->set_float("ScreenHeight", (float)d3d->get_height());
 	curr_effect->set_float("PostPass", 1.0f);
@@ -1211,8 +1211,8 @@ void shaders::init_effect_info(poly_info *poly)
 			vec2f delta = texture->get_uvstop() - texture->get_uvstart();
 			curr_effect->set_vector("RawDims", 2, &texture->get_rawdims().c.x);
 			curr_effect->set_vector("SizeRatio", 2, &delta.c.x);
-			curr_effect->set_float("TargetWidth", d3d->get_width());
-			curr_effect->set_float("TargetHeight", d3d->get_height());
+			vec2f screendims = d3d->get_dims();
+			curr_effect->set_vector("ScreenDims", 2, &screendims.c.x);
 			curr_effect->set_vector("Floor", 3, options->floor);
 			curr_effect->set_float("SnapX", snap_width);
 			curr_effect->set_float("SnapY", snap_height);
@@ -1316,6 +1316,7 @@ void shaders::ntsc_pass(render_target *rt, texture_info *texture, vec2f &texsize
 			curr_effect->set_float("HeightRatio", 1.0f / delta.c.y);
 			curr_effect->set_float("ScreenWidth", d3d->get_width());
 			curr_effect->set_float("ScreenHeight", d3d->get_height());
+
 			curr_effect->set_float("CCValue", options->yiq_cc);
 			curr_effect->set_float("AValue", options->yiq_a);
 			curr_effect->set_float("BValue", options->yiq_b);
@@ -1358,6 +1359,7 @@ void shaders::ntsc_pass(render_target *rt, texture_info *texture, vec2f &texsize
 			curr_effect->set_float("HeightRatio", 1.0f / delta.c.y);
 			curr_effect->set_float("ScreenWidth", d3d->get_width());
 			curr_effect->set_float("ScreenHeight", d3d->get_height());
+
 			curr_effect->set_float("CCValue", options->yiq_cc);
 			curr_effect->set_float("AValue", options->yiq_a);
 			curr_effect->set_float("BValue", options->yiq_b);
@@ -1406,8 +1408,9 @@ void shaders::color_convolution_pass(render_target *rt, texture_info *texture, v
 	if(options->params_dirty)
 	{
 		curr_effect->set_vector("RawDims", 2, &rawdims.c.x);
-		curr_effect->set_float("TargetWidth", (float)d3d->get_width());
-		curr_effect->set_float("TargetHeight", (float)d3d->get_height());
+		vec2f screendims = d3d->get_dims();
+		curr_effect->set_vector("ScreenDims", 2, &screendims.c.x);
+
 		curr_effect->set_float("YIQEnable", options->yiq_enable ? 1.0f : 0.0f);
 		curr_effect->set_vector("RedRatios", 3, options->red_ratio);
 		curr_effect->set_vector("GrnRatios", 3, options->grn_ratio);
@@ -1447,8 +1450,8 @@ void shaders::prescale_pass(render_target *rt, texture_info *texture, vec2f &tex
 
 	if(options->params_dirty)
 	{
-		curr_effect->set_float("TargetWidth", (float)d3d->get_width());
-		curr_effect->set_float("TargetHeight", (float)d3d->get_height());
+		vec2f screendims = d3d->get_dims();
+		curr_effect->set_vector("ScreenDims", 2, &screendims.c.x);
 		curr_effect->set_vector("RawDims", 2, &rawdims.c.x);
 	}
 
@@ -1481,8 +1484,8 @@ void shaders::deconverge_pass(render_target *rt, texture_info *texture, vec2f &t
 
 	if(options->params_dirty)
 	{
-		curr_effect->set_float("TargetWidth", (float)d3d->get_width());
-		curr_effect->set_float("TargetHeight", (float)d3d->get_height());
+		vec2f screendims = d3d->get_dims();
+		curr_effect->set_vector("ScreenDims", 2, &screendims.c.x);
 		curr_effect->set_vector("RawDims", 2, &rawdims.c.x);
 		curr_effect->set_vector("SizeRatio", 2, &delta.c.x);
 		curr_effect->set_vector("ConvergeX", 3, options->converge_x);
@@ -1520,8 +1523,8 @@ void shaders::defocus_pass(render_target *rt, texture_info *texture, vec2f &texs
 
 	curr_effect->set_texture("Diffuse", rt->render_texture[2]);
 
-	curr_effect->set_float("TargetWidth", (float)d3d->get_width());
-	curr_effect->set_float("TargetHeight", (float)d3d->get_height());
+	vec2f screendims = d3d->get_dims();
+	curr_effect->set_vector("ScreenDims", 2, &screendims.c.x);
 	curr_effect->set_vector("Defocus", 2, &options->defocus[0]);
 
 	curr_effect->begin(&num_passes, 0);
@@ -1546,8 +1549,7 @@ void shaders::defocus_pass(render_target *rt, texture_info *texture, vec2f &texs
 
 	curr_effect->set_texture("Diffuse", rt->render_texture[0]);
 
-	curr_effect->set_float("TargetWidth", (float)d3d->get_width());
-	curr_effect->set_float("TargetHeight", (float)d3d->get_height());
+	curr_effect->set_vector("ScreenDims", 2, &screendims.c.x);
 	curr_effect->set_vector("Defocus", 2, &options->defocus[1]);
 
 	curr_effect->begin(&num_passes, 0);
@@ -1576,8 +1578,8 @@ void shaders::phosphor_pass(render_target *rt, cache_target *ct, texture_info *t
 
 	if(options->params_dirty)
 	{
-		curr_effect->set_float("TargetWidth", (float)d3d->get_width());
-		curr_effect->set_float("TargetHeight", (float)d3d->get_height());
+		vec2f screendims = d3d->get_dims();
+		curr_effect->set_vector("ScreenDims", 2, &screendims.c.x);
 		curr_effect->set_vector("Phosphor", 3, options->phosphor);
 	}
 	curr_effect->set_float("TextureWidth", (float)rt->target_width);
@@ -1637,8 +1639,9 @@ void shaders::avi_post_pass(render_target *rt, texture_info *texture, vec2f &tex
 	UINT num_passes = 0;
 
 	curr_effect = post_effect;
-	curr_effect->set_float("TargetWidth", (float)d3d->get_width());
-	curr_effect->set_float("TargetHeight", (float)d3d->get_height());
+
+	vec2f screendims = d3d->get_dims();
+	curr_effect->set_vector("ScreenDims", 2, &screendims.c.x);
 
 	// Scanlines and shadow mask, at high res for AVI logging
 	if(avi_output_file != NULL)
@@ -1696,19 +1699,15 @@ void shaders::screen_post_pass(render_target *rt, texture_info *texture, vec2f &
 	curr_effect->set_texture("Diffuse", rt->render_texture[0]);
 	curr_effect->set_vector("RawDims", 2, &rawdims.c.x);
 	curr_effect->set_vector("SizeRatio", 2, &delta.c.x);
+	vec2f screendims = d3d->get_dims();
+	curr_effect->set_vector("ScreenDims", 2, &screendims.c.x);
 
 	d3d->set_wrap(D3DTADDRESS_MIRROR);
-
-	curr_effect->set_float("TargetWidth", (float)d3d->get_width());
-	curr_effect->set_float("TargetHeight", (float)d3d->get_height());
 
 	HRESULT result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, rt->target[2]);
 
-	d3d->set_wrap(D3DTADDRESS_MIRROR);
 	result = (*d3dintf->device.clear)(d3d->get_device(), 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(1,0,0,0), 0, 0);
 	if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device clear call\n", (int)result);
-	curr_effect->set_float("TargetWidth", (float)d3d->get_width());
-	curr_effect->set_float("TargetHeight", (float)d3d->get_height());
 
 	curr_effect->begin(&num_passes, 0);
 
@@ -1743,8 +1742,8 @@ void shaders::raster_bloom_pass(render_target *rt, texture_info *texture, vec2f 
 	float prim_width = poly->get_prim_width();
 	float prim_height = poly->get_prim_height();
 	float prim_ratio[2] = { prim_width / bloom_width, prim_height / bloom_height };
-	float screen_size[2] = { d3d->get_width(), d3d->get_height() };
-	curr_effect->set_vector("ScreenSize", 2, screen_size);
+	vec2f screendims = d3d->get_dims();
+	curr_effect->set_vector("ScreenSize", 2, &screendims.c.x);
 	for(; bloom_size >= 2.0f && bloom_index < 11; bloom_size *= 0.5f)
 	{
 		float target_size[2] = { bloom_width, bloom_height };
@@ -1779,8 +1778,7 @@ void shaders::raster_bloom_pass(render_target *rt, texture_info *texture, vec2f 
 
 	curr_effect = bloom_effect;
 
-	float target_size[2] = { d3d->get_width(), d3d->get_height() };
-	curr_effect->set_vector("TargetSize", 2, target_size);
+	curr_effect->set_vector("TargetSize", 2, &screendims.c.x);
 	float weight0123[4] = { options->bloom_level0_weight, options->bloom_level1_weight,
 							options->bloom_level2_weight, options->bloom_level3_weight };
 	float weight4567[4] = { options->bloom_level4_weight, options->bloom_level5_weight,
@@ -1790,7 +1788,7 @@ void shaders::raster_bloom_pass(render_target *rt, texture_info *texture, vec2f 
 	curr_effect->set_vector("Level0123Weight", 4, weight0123);
 	curr_effect->set_vector("Level4567Weight", 4, weight4567);
 	curr_effect->set_vector("Level89AWeight", 3, weight89A);
-	curr_effect->set_vector("TargetSize", 2, target_size);
+	curr_effect->set_vector("ScreenDims", 2, &screendims.c.x);
 
 	curr_effect->set_texture("DiffuseA", rt->render_texture[2]);
 	curr_effect->set_float("DiffuseScaleA", 1.0f);
@@ -1891,8 +1889,8 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 
 		if(options->params_dirty)
 		{
-			curr_effect->set_float("TargetWidth", (float)d3d->get_width());
-			curr_effect->set_float("TargetHeight", (float)d3d->get_height());
+			vec2f screendims = d3d->get_dims();
+			curr_effect->set_vector("ScreenDims", 2, &screendims.c.x);
 		}
 
 		float time_params[2] = { 0.0f, 0.0f };
@@ -2043,8 +2041,8 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 
 		if(options->params_dirty)
 		{
-			curr_effect->set_float("TargetWidth", (float)d3d->get_width());
-			curr_effect->set_float("TargetHeight", (float)d3d->get_height());
+			vec2f screendims = d3d->get_dims();
+			curr_effect->set_vector("ScreenDims", 2, &screendims.c.x);
 			curr_effect->set_vector("Phosphor", 3, options->phosphor);
 		}
 		curr_effect->set_float("TextureWidth", (float)d3d->get_width());
@@ -2088,8 +2086,8 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 	{
 		curr_effect = default_effect;
 
-		curr_effect->set_float("TargetWidth", (float)d3d->get_width());
-		curr_effect->set_float("TargetHeight", (float)d3d->get_height());
+		vec2f screendims = d3d->get_dims();
+		curr_effect->set_vector("ScreenDims", 2, &screendims.c.x);
 		curr_effect->set_float("PostPass", 0.0f);
 
 		curr_effect->begin(&num_passes, 0);

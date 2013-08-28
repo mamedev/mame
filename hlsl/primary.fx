@@ -44,8 +44,7 @@ struct PS_INPUT
 // Simple Vertex Shader
 //-----------------------------------------------------------------------------
 
-uniform float TargetWidth;
-uniform float TargetHeight;
+uniform float2 ScreenDims;
 uniform float PostPass;
 uniform float FixedAlpha;
 uniform float Brighten;
@@ -55,14 +54,12 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	VS_OUTPUT Output = (VS_OUTPUT)0;
 	
 	Output.Position = float4(Input.Position.xyz, 1.0f);
-	Output.Position.x /= TargetWidth;
-	Output.Position.y /= TargetHeight;
+	Output.Position.xy /= ScreenDims;
 	Output.Position.y = 1.0f - Output.Position.y;
-	Output.Position.x -= 0.5f;
-	Output.Position.y -= 0.5f;
+	Output.Position.xy -= 0.5f;
 	Output.Position *= float4(2.0f, 2.0f, 1.0f, 1.0f);
 	Output.Color = Input.Color;
-	Output.TexCoord = lerp(Input.TexCoord, Input.Position.xy / float2(TargetWidth, TargetHeight), PostPass);
+	Output.TexCoord = lerp(Input.TexCoord, Input.Position.xy / ScreenDims, PostPass);
 
 	return Output;
 }

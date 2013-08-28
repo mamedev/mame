@@ -677,6 +677,7 @@ void winwindow_video_window_create(running_machine &machine, int index, win_moni
 
 	// allocate a new window object
 	window = global_alloc_clear(win_window_info(machine));
+	printf("%d, %d\n", config->width, config->height);
 	window->maxwidth = config->width;
 	window->maxheight = config->height;
 	window->refresh = config->refresh;

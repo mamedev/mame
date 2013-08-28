@@ -77,8 +77,53 @@ struct device;
 struct surface;
 struct texture;
 struct vertex_buffer;
+class effect;
 typedef D3DXVECTOR4 vector;
 typedef D3DMATRIX matrix;
+
+class uniform
+{
+public:
+	typedef enum
+	{
+		UT_VEC4,
+		UT_VEC3,
+		UT_VEC2,
+		UT_FLOAT,
+		UT_INT,
+		UT_MATRIX,
+		UT_SAMPLER,
+	} uniform_type;
+
+	uniform(effect *shader, const char *name, uniform_type type);
+
+	void set_next(uniform *next);
+	void set_prev(uniform *prev);
+
+	void set(float x, float y, float z, float w);
+	void set(float x, float y, float z);
+	void set(float x, float y);
+	void set(float x);
+	void set(int x);
+	void set(matrix *mat);
+	void set(texture *tex);
+
+	void upload();
+
+protected:
+	uniform		*m_next;
+	uniform		*m_prev;
+
+	float		m_vec[4];
+	int			m_ival;
+	matrix		*m_mval;
+	texture		*m_texture;
+	int			m_count;
+	uniform_type	m_type;
+
+	effect 		*m_shader;
+	D3DXHANDLE	m_handle;
+};
 
 class effect
 {

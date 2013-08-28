@@ -318,6 +318,7 @@ const options_entry windows_options::s_option_entries[] =
 	{ WINOPTION_WINDOW ";w",                          "0",        OPTION_BOOLEAN,    "enable window mode; otherwise, full screen mode is assumed" },
 	{ WINOPTION_MAXIMIZE ";max",                      "1",        OPTION_BOOLEAN,    "default to maximized windows; otherwise, windows will be minimized" },
 	{ WINOPTION_KEEPASPECT ";ka",                     "1",        OPTION_BOOLEAN,    "constrain to the proper aspect ratio" },
+	{ WINOPTION_UNEVENSTRETCH ";ues",         		  "1",        OPTION_BOOLEAN,    "allow non-integer stretch factors" },
 	{ WINOPTION_PRESCALE,                             "1",        OPTION_INTEGER,    "scale screen rendering by this amount in software" },
 	{ WINOPTION_WAITVSYNC ";vs",                      "0",        OPTION_BOOLEAN,    "enable waiting for the start of VBLANK before flipping screens; reduces tearing effects" },
 	{ WINOPTION_SYNCREFRESH ";srf",                   "0",        OPTION_BOOLEAN,    "enable using the start of VBLANK for throttling instead of the game time" },

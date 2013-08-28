@@ -58,9 +58,7 @@ struct PS_INPUT
 // Simple Vertex Shader
 //-----------------------------------------------------------------------------
 
-uniform float TargetWidth;
-uniform float TargetHeight;
-
+uniform float2 ScreenDims;
 uniform float2 Defocus = float2(0.0f, 0.0f);
 
 float2 Coord0Offset = float2( 0.0f,  0.0f);
@@ -77,17 +75,14 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	VS_OUTPUT Output = (VS_OUTPUT)0;
 	
 	Output.Position = float4(Input.Position.xyz, 1.0f);
-	Output.Position.x /= TargetWidth;
-	Output.Position.y /= TargetHeight;
+	Output.Position.xy /= ScreenDims;
 	Output.Position.y = 1.0f - Output.Position.y;
-	Output.Position.x -= 0.5f;
-	Output.Position.y -= 0.5f;
+	Output.Position.xy -= 0.5f;
 	Output.Position *= float4(2.0f, 2.0f, 1.0f, 1.0f);
 	Output.Color = Input.Color;
 	
-	float2 InvTexSize = float2(1.0f / TargetWidth, 1.0f / TargetHeight);
+	float2 InvTexSize = 1.0f / ScreenDims;
 	float2 TexCoord = Input.TexCoord;
-	TexCoord = TexCoord;// + float2(0.5f, -0.5f) * InvTexSize;
 	Output.TexCoord0 = TexCoord + Coord0Offset * InvTexSize * Defocus;
 	Output.TexCoord1 = TexCoord + Coord1Offset * InvTexSize * Defocus;
 	Output.TexCoord2 = TexCoord + Coord2Offset * InvTexSize * Defocus;

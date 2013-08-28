@@ -66,6 +66,7 @@
 #define WINOPTION_WINDOW                "window"
 #define WINOPTION_MAXIMIZE              "maximize"
 #define WINOPTION_KEEPASPECT            "keepaspect"
+#define WINOPTION_UNEVENSTRETCH			"unevenstretch"
 #define WINOPTION_PRESCALE              "prescale"
 #define WINOPTION_WAITVSYNC             "waitvsync"
 #define WINOPTION_SYNCREFRESH           "syncrefresh"
@@ -193,6 +194,7 @@ public:
 	bool window() const { return bool_value(WINOPTION_WINDOW); }
 	bool maximize() const { return bool_value(WINOPTION_MAXIMIZE); }
 	bool keep_aspect() const { return bool_value(WINOPTION_KEEPASPECT); }
+	bool uneven_stretch() const { return bool_value(WINOPTION_UNEVENSTRETCH); }
 	int prescale() const { return int_value(WINOPTION_PRESCALE); }
 	bool wait_vsync() const { return bool_value(WINOPTION_WAITVSYNC); }
 	bool sync_refresh() const { return bool_value(WINOPTION_SYNCREFRESH); }
