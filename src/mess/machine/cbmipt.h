@@ -42,6 +42,7 @@
 #include "machine/c64/midi_siel.h"
 #include "machine/c64/mikro_assembler.h"
 #include "machine/c64/multiscreen.h"
+#include "machine/c64/music64.h"
 #include "machine/c64/neoram.h"
 #include "machine/c64/ocean.h"
 #include "machine/c64/pagefox.h"

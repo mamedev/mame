@@ -15,4 +15,43 @@
 		</part>
 	</software>
 
+	<software name="cmk49">
+		<description>CMK 49 Computer Musical Keyboard</description>
+		<year>198?</year>
+		<publisher>Siel</publisher>
+		<sharedfeat name="requirement" value="c64_cart:music64"/>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1549572">
+				<rom name="cmk49.tap" size="1549572" crc="8327b982" sha1="99d31d813fba9f9f8d60e101b64741159fcf6ce9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mono64">
+		<description>Mono-64</description>
+		<year>198?</year>
+		<publisher>Novel International</publisher>
+		<sharedfeat name="requirement" value="c64_cart:music64"/>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="398242">
+				<rom name="mono64.tap" size="398242" crc="805c0c1c" sha1="caa44fb66de7fac9b88105bdbe6d56465206ddc0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="poly64">
+		<description>Poly-64</description>
+		<year>198?</year>
+		<publisher>Novel International</publisher>
+		<sharedfeat name="requirement" value="c64_cart:music64"/>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="339731">
+				<rom name="poly64.tap" size="339731" crc="62b6ba45" sha1="5bfd8c63babbf44f8d7d2c81909a1e630b10bea3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

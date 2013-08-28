@@ -6932,4 +6932,16 @@
 		</part>
 	</software>
 
+	<software name="music64">
+		<description>Wersiboard Music 64</description>
+		<year>1985</year>
+		<publisher>Wersi</publisher>
+
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="music64" />
+			<dataarea name="roml" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

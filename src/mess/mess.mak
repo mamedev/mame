@@ -1114,6 +1114,7 @@ $(MESSOBJ)/cbm.a:               \
 	$(MESS_MACHINE)/c64/midi_siel.o   \
 	$(MESS_MACHINE)/c64/mikro_assembler.o   \
 	$(MESS_MACHINE)/c64/multiscreen.o   \
+	$(MESS_MACHINE)/c64/music64.o   \
 	$(MESS_MACHINE)/c64/neoram.o\
 	$(MESS_MACHINE)/c64/ocean.o \
 	$(MESS_MACHINE)/c64/pagefox.o   \
