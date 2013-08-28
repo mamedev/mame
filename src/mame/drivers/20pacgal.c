@@ -201,7 +201,10 @@ WRITE8_MEMBER(_20pacgal_state::sprite_lookup_w)
 	m_sprite_color_lookup[offset] = data;
 }
 
-// wrong
+// this is wrong
+// where does the clut (sprite_lookup_w) get uploaded? even if I set a WP on that data in ROM it isn't hit?
+// likewise the sound table.. is it being uploaded in a different format at 0x0c000?
+// we also need the palette data because there is only a single rom on this pcb?
 static ADDRESS_MAP_START( 25pacman_map, AS_PROGRAM, 8, _25pacman_state )
 
 	AM_RANGE(0x00000, 0x3ffff) AM_ROM AM_REGION("flash", 0)
@@ -211,10 +214,10 @@ static ADDRESS_MAP_START( 25pacman_map, AS_PROGRAM, 8, _25pacman_state )
 	AM_RANGE(0x04000, 0x047ff) AM_RAM AM_SHARE("video_ram")
 	AM_RANGE(0x04800, 0x05fff) AM_RAM
 	AM_RANGE(0x06000, 0x06fff) AM_WRITEONLY AM_SHARE("char_gfx_ram")
-	AM_RANGE(0x0a000, 0x0afff) AM_WRITENOP
-	AM_RANGE(0x0ff00, 0x0ffff) AM_WRITENOP
+	AM_RANGE(0x0a000, 0x0bfff) AM_WRITE(sprite_gfx_w)
+//	AM_RANGE(0x0fffe, 0x0ffff) AM_WRITENOP
 
-	AM_RANGE(0x0c000, 0x0dfff) AM_WRITE(sprite_gfx_w)
+//	AM_RANGE(0x0c000, 0x0dfff) // is this the sound waveforms in a different format?
 	AM_RANGE(0x07000, 0x0717f) AM_WRITE(sprite_ram_w)
 
 //	AM_RANGE(0x00000, 0x3ffff) AM_DEVREADWRITE("flash", sst_39vf020_device, read, write )  // (always fall through if nothing else is mapped?)
@@ -262,7 +265,7 @@ READ8_MEMBER( _25pacman_state::_25pacman_io_87_r )
 	AM_RANGE(0x80, 0x80) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x81, 0x81) AM_WRITE(timer_pulse_w)        /* ??? pulsed by the timer irq */
 	AM_RANGE(0x82, 0x82) AM_WRITE(irqack_w)
-	AM_RANGE(0x84, 0x84) AM_NOP /* ?? */
+//	AM_RANGE(0x84, 0x84) AM_NOP /* ?? */
 	AM_RANGE(0x85, 0x86) AM_WRITEONLY AM_SHARE("stars_seed")    /* stars: rng seed (lo/hi) */
 	AM_RANGE(0x87, 0x87) AM_READ( _25pacman_io_87_r ) // not eeprom on this
 	AM_RANGE(0x88, 0x88) AM_WRITE(ram_bank_select_w)
