@@ -49,7 +49,7 @@ const device_type CRT9021 = &device_creator<crt9021_device>;
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define LOG 1
+#define LOG 0
 
 
 // attributes

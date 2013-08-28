@@ -13,7 +13,6 @@
     - CRT9007
     - CRT9212 Double Row Buffer
     - CRT9021B Attribute Generator
-    - 80186
     - keyboard ROM
     - hires graphics board
     - floppy 720K DSQD
@@ -25,7 +24,6 @@
 */
 
 #include "includes/tandy2k.h"
-#include "formats/mfi_dsk.h"
 
 enum
 {
@@ -654,11 +652,6 @@ void tandy2k_state::machine_start()
 	m_fdc->setup_intrq_cb(i8272a_device::line_cb(FUNC(tandy2k_state::fdc_irq), this));
 	m_fdc->setup_drq_cb(i8272a_device::line_cb(FUNC(tandy2k_state::fdc_drq), this));
 
-	// patch out i186 relocation register check
-	UINT8 *rom = memregion(I80186_TAG)->base();
-	rom[0x1f16] = 0x90;
-	rom[0x1f17] = 0x90;
-
 	// register for state saving
 	save_item(NAME(m_dma_mux));
 	save_item(NAME(m_kbdclk));
@@ -757,5 +750,5 @@ ROM_END
 // System Drivers
 
 //    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY                 FULLNAME        FLAGS
-COMP( 1983, tandy2k,    0,          0,      tandy2k,    tandy2k, driver_device, 0,      "Tandy Radio Shack",    "Tandy 2000",   GAME_NOT_WORKING)
-COMP( 1983, tandy2khd,  tandy2k,    0,      tandy2k_hd, tandy2k, driver_device, 0,      "Tandy Radio Shack",    "Tandy 2000HD", GAME_NOT_WORKING)
+COMP( 1983, tandy2k,    0,          0,      tandy2k,    tandy2k, driver_device, 0,      "Tandy Radio Shack",    "Tandy 2000",   GAME_NOT_WORKING )
+COMP( 1983, tandy2khd,  tandy2k,    0,      tandy2k_hd, tandy2k, driver_device, 0,      "Tandy Radio Shack",    "Tandy 2000HD", GAME_NOT_WORKING )
