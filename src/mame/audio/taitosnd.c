@@ -148,13 +148,7 @@ WRITE8_MEMBER( tc0140syt_device::tc0140syt_comm_w )
 
 		case 0x04: // port status
 			/* this does a hi-lo transition to reset the sound cpu */
-			if (data)
-				m_slavecpu->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-			else
-			{
-				m_slavecpu->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-				m_mastercpu->execute().spin(); /* otherwise no sound in driftout */
-			}
+			m_slavecpu->execute().set_input_line(INPUT_LINE_RESET, data ? ASSERT_LINE : CLEAR_LINE);
 			break;
 
 		default:
@@ -227,7 +221,6 @@ WRITE8_MEMBER( tc0140syt_device::tc0140syt_slave_comm_w )
 		case 0x01: // mode #1
 			m_masterdata[m_submode++] = data;
 			m_status |= TC0140SYT_PORT01_FULL_MASTER;
-			m_slavecpu->execute().spin(); /* writing should take longer than emulated, so spin */
 			break;
 
 		case 0x02: // mode #2
@@ -237,7 +230,6 @@ WRITE8_MEMBER( tc0140syt_device::tc0140syt_slave_comm_w )
 		case 0x03: // mode #3
 			m_masterdata[m_submode++] = data;
 			m_status |= TC0140SYT_PORT23_FULL_MASTER;
-			m_slavecpu->execute().spin(); /* writing should take longer than emulated, so spin */
 			break;
 
 		case 0x04: // port status
