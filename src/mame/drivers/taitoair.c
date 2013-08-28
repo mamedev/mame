@@ -688,14 +688,14 @@ void taitoair_state::machine_reset()
 static MACHINE_CONFIG_START( airsys, taitoair_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_12_MHz)	// MC68000P12
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz)	// MC68000P12
 	MCFG_CPU_PROGRAM_MAP(airsys_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitoair_state,  irq5_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16_MHz / 4)	// Z8400AB1
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz / 4)	// Z8400AB1
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_CPU_ADD("dsp", TMS32025, XTAL_36_MHz) // Unverified
+	MCFG_CPU_ADD("dsp", TMS32025, XTAL_36MHz) // Unverified
 	MCFG_CPU_PROGRAM_MAP(DSP_map_program)
 	MCFG_CPU_DATA_MAP(DSP_map_data)
 	MCFG_CPU_IO_MAP(DSP_map_io)
@@ -721,7 +721,7 @@ static MACHINE_CONFIG_START( airsys, taitoair_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_16_MHz / 2)
+	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_16MHz / 2)
 	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitoair_state, irqhandler))
 	MCFG_SOUND_ROUTE(0, "mono", 0.30)
 	MCFG_SOUND_ROUTE(1, "mono", 0.60)
@@ -737,6 +737,18 @@ MACHINE_CONFIG_END
 Both games use near-identical CPU boards but different video
 boards. Top Landing has a video board ROM (b62-28.22) which is
 not present on Air Inferno.
+
+Air Inferno video customs:
+
+TC0460LRN
+TC0440ENZ
+TC0300FLA
+TC0080VCO
+TC0130LNB
+TC0130LNB
+TC0430GRW
+TC0160ROM
+TC0270MOD
 
 *************************************************************/
 
