@@ -249,7 +249,7 @@ public:
 	DECLARE_READ32_MEMBER(  elan_regs_r );
 	DECLARE_WRITE32_MEMBER( elan_regs_w );
 	DECLARE_WRITE64_MEMBER( ta_fifo_poly_w );
-	DECLARE_WRITE64_MEMBER( ta_fifo_yuv_w );
+	DECLARE_WRITE8_MEMBER( ta_fifo_yuv_w );
 	DECLARE_WRITE64_MEMBER( ta_texture_directpath0_w );
 	DECLARE_WRITE64_MEMBER( ta_texture_directpath1_w );
 
@@ -293,6 +293,10 @@ private:
 	UINT32 ta_ol_base, ta_ol_limit, ta_isp_base, ta_isp_limit;
 	UINT32 ta_next_opb, ta_itp_current, ta_alloc_ctrl, ta_next_opb_init;
 	UINT32 ta_yuv_tex_base, ta_yuv_tex_ctrl, ta_yuv_tex_cnt;
+	UINT32 ta_yuv_index;
+	int ta_yuv_x,ta_yuv_y;
+	int ta_yuv_x_size,ta_yuv_y_size;
+	UINT8 yuv_fifo[384];
 
 	// Other registers
 	UINT32 fog_table[0x80];

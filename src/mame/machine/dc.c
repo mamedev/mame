@@ -187,12 +187,6 @@ TIMER_CALLBACK_MEMBER(dc_state::ch2_dma_irq)
 	dc_update_interrupt_status();
 }
 
-TIMER_CALLBACK_MEMBER(dc_state::yuv_fifo_irq)
-{
-	dc_sysctrl_regs[SB_ISTNRM] |= IST_EOXFER_YUV;
-	dc_update_interrupt_status();
-}
-
 void dc_state::wave_dma_execute(address_space &space)
 {
 	UINT32 src,dst,size;
@@ -437,9 +431,6 @@ WRITE64_MEMBER(dc_state::dc_sysctrl_w )
 
 				/* TODO: timing is a guess */
 				machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(ddtdata.length/4), timer_expired_delegate(FUNC(dc_state::ch2_dma_irq),this));
-				/* simulate YUV FIFO processing here (HACK! should go inside the YUV FIFO itself) */
-				if((address & 0x1800000) == 0x0800000)
-					machine().scheduler().timer_set(attotime::from_usec(500), timer_expired_delegate(FUNC(dc_state::yuv_fifo_irq),this));
 			}
 			break;
 

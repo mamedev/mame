@@ -632,7 +632,7 @@ void powervr2_device::tex_get_info(texinfo *t)
 	t->vqbase = t->address;
 	t->blend = use_alpha ? blend_functions[t->blend_mode] : bl10;
 
-	//  fprintf(stderr, "tex %d %d %d %d\n", t->pf, t->mode, pal_ram_ctrl, t->mipmapped);
+	//fprintf(stderr, "tex %d %d %d %d\n", t->pf, t->mode, pal_ram_ctrl, t->mipmapped);
 
 	switch(t->pf) {
 	case 0: // 1555
@@ -1407,8 +1407,10 @@ WRITE32_MEMBER( powervr2_device::ta_yuv_tex_base_w )
 	COMBINE_DATA(&ta_yuv_tex_base);
 	logerror("%s: ta_yuv_tex_base = %08x\n", tag(), ta_yuv_tex_base);
 
-	// hack, this interrupt is generated after transfering a set amount of data
-	//irq_cb(EOXFER_YUV_IRQ);
+	ta_yuv_index = 0;
+	ta_yuv_x = 0;
+	ta_yuv_y = 0;
+
 }
 
 READ32_MEMBER( powervr2_device::ta_yuv_tex_ctrl_r )
@@ -1419,9 +1421,12 @@ READ32_MEMBER( powervr2_device::ta_yuv_tex_ctrl_r )
 WRITE32_MEMBER( powervr2_device::ta_yuv_tex_ctrl_w )
 {
 	COMBINE_DATA(&ta_yuv_tex_ctrl);
+	ta_yuv_x_size = ((ta_yuv_tex_ctrl & 0x3f)+1)*16;
+	ta_yuv_y_size = (((ta_yuv_tex_ctrl>>8) & 0x3f)+1)*16;
 	logerror("%s: ta_yuv_tex_ctrl = %08x\n", tag(), ta_yuv_tex_ctrl);
 }
 
+/* TODO */
 READ32_MEMBER( powervr2_device::ta_yuv_tex_cnt_r )
 {
 	return ta_yuv_tex_cnt;
@@ -1943,8 +1948,54 @@ WRITE64_MEMBER( powervr2_device::ta_fifo_poly_w )
 
 }
 
-WRITE64_MEMBER( powervr2_device::ta_fifo_yuv_w )
+WRITE8_MEMBER( powervr2_device::ta_fifo_yuv_w )
 {
+	//printf("%08x %08x\n",ta_yuv_index++,ta_yuv_tex_ctrl);
+
+	//popmessage("YUV fifo write %08x %08x",ta_yuv_index,ta_yuv_tex_ctrl);
+
+	yuv_fifo[ta_yuv_index] = data;
+	ta_yuv_index++;
+
+	if(ta_yuv_index == 0x180)
+	{
+		ta_yuv_index = 0;
+		for(int y=0;y<16;y++)
+		{
+			for(int x=0;x<16;x+=2)
+			{
+				int dst_addr;
+				int u,v,y0,y1;
+
+				dst_addr = ta_yuv_tex_base;
+				dst_addr+= (ta_yuv_x+x)*2;
+				dst_addr+= ((ta_yuv_y+y)*320*2);
+
+				u = yuv_fifo[0x00+(x>>1)+((y>>1)*8)];
+				v = yuv_fifo[0x40+(x>>1)+((y>>1)*8)];
+				y0 = yuv_fifo[0x80+((x&8) ? 0x40 : 0x00)+((y&8) ? 0x80 : 0x00)+(x&6)+((y&7)*8)];
+				y1 = yuv_fifo[0x80+((x&8) ? 0x40 : 0x00)+((y&8) ? 0x80 : 0x00)+(x&6)+((y&7)*8)+1];
+
+				*(UINT16 *)((reinterpret_cast<UINT8 *>(dc_texture_ram)) + WORD_XOR_LE(dst_addr)) = u;
+				*(UINT16 *)((reinterpret_cast<UINT8 *>(dc_texture_ram)) + WORD_XOR_LE(dst_addr+1)) = y0;
+				*(UINT16 *)((reinterpret_cast<UINT8 *>(dc_texture_ram)) + WORD_XOR_LE(dst_addr+2)) = v;
+				*(UINT16 *)((reinterpret_cast<UINT8 *>(dc_texture_ram)) + WORD_XOR_LE(dst_addr+3)) = y1;
+			}
+		}
+
+		ta_yuv_x+=16;
+		if(ta_yuv_x == ta_yuv_x_size)
+		{
+			ta_yuv_x = 0;
+			ta_yuv_y+=16;
+			if(ta_yuv_y == ta_yuv_y_size)
+			{
+				ta_yuv_y = 0;
+				/* TODO: timing */
+				irq_cb(EOXFER_YUV_IRQ);
+			}
+		}
+	}
 }
 
 // SB_LMMODE0
