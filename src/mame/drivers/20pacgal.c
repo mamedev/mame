@@ -201,6 +201,24 @@ WRITE8_MEMBER(_20pacgal_state::sprite_lookup_w)
 	m_sprite_color_lookup[offset] = data;
 }
 
+// wrong
+static ADDRESS_MAP_START( 25pacman_map, AS_PROGRAM, 8, _25pacman_state )
+//	AM_RANGE(0x00000, 0x3ffff) AM_DEVREAD("flash", sst_39vf020_device, read ) AM_MIRROR( 0x0c0000 ) // (always fall through if nothing else is mapped?)
+	AM_RANGE(0x00000, 0x3ffff) AM_ROM AM_REGION("flash", 0)
+
+	AM_RANGE(0xc8000, 0xc9fff) AM_READ_BANK("bank1") AM_WRITE(ram_48000_w)
+
+	AM_RANGE(0x04000, 0x047ff) AM_RAM AM_SHARE("video_ram")
+	AM_RANGE(0x04800, 0x05fff) AM_RAM
+	AM_RANGE(0x06000, 0x06fff) AM_RAM AM_SHARE("char_gfx_ram")
+	AM_RANGE(0x0a000, 0x0afff) AM_RAM
+
+//	AM_RANGE(0x0c000, 0x0dfff) AM_WRITE(sprite_gfx_w)
+//	AM_RANGE(0x0e000, 0x0e17f) AM_WRITE(sprite_ram_w)
+
+
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( 20pacgal_map, AS_PROGRAM, 8, _20pacgal_state )
 	AM_RANGE(0x00000, 0x03fff) AM_ROM
 	AM_RANGE(0x04000, 0x07fff) AM_ROM
@@ -219,7 +237,6 @@ static ADDRESS_MAP_START( 20pacgal_map, AS_PROGRAM, 8, _20pacgal_state )
 	AM_RANGE(0x4e180, 0x4feff) AM_WRITENOP
 	AM_RANGE(0x4ff00, 0x4ffff) AM_WRITE(sprite_lookup_w)
 ADDRESS_MAP_END
-
 
 
 /*************************************
@@ -367,6 +384,16 @@ static MACHINE_CONFIG_START( 20pacgal, _20pacgal_state )
 MACHINE_CONFIG_END
 
 
+static MACHINE_CONFIG_DERIVED_CLASS( 25pacman, 20pacgal, _25pacman_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(25pacman_map)
+
+	MCFG_SST_39VF020_ADD("flash") // wrong type, should be AM29LV20
+MACHINE_CONFIG_END
+
+
 
 /*************************************
  *
@@ -379,12 +406,25 @@ MACHINE_CONFIG_END
      Pacman - 25th Anniversary Edition
 */
 
-ROM_START( 25pacman ) /* Revision 2.00 */
+ROM_START( 25pacmano ) /* Revision 2.00 */
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "pacman_25th_rev2.0.u13", 0x00000, 0x40000, CRC(99a52784) SHA1(6222c2eb686e65ba23ca376ff4392be1bc826a03) ) /* Label printed Rev 2.0, program says Rev 2.00 */
 
 	ROM_REGION( 0x8000, "proms", 0 )    /* palette */
 	ROM_LOAD( "pacman_25th.u14", 0x0000, 0x8000, CRC(c19d9ad0) SHA1(002581fbc2c32cdf7cfb0b0f64061591a462ec14) ) /* Same as the MS. Pacman / Galaga graphics rom */
+ROM_END
+
+// guzuta v2.2 PCB
+// this uses the main FLASH rom to save things instead of eeprom (type is AM29LV20)
+// different memory map.. no palette rom
+ROM_START( 25pacman ) /* Revision 3.00 */ 
+	ROM_REGION( 0x40000, "flash", 0 )
+	ROM_LOAD( "pacman25ver3.u1", 0x00000, 0x40000, CRC(55b0076e) SHA1(4544cc193bdd22bfc88d096083ccc4069cac4607) ) /* program says Rev 3.00 */
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x8000, "proms", 0 )    /* palette */
+	// shouldn't be loading this! must be uploaded somewhere
+	ROM_LOAD( "pacman_25th.u14", 0x0000, 0x8000, CRC(c19d9ad0) SHA1(002581fbc2c32cdf7cfb0b0f64061591a462ec14) )
 ROM_END
 
 /*
@@ -440,6 +480,8 @@ ROM_START( 20pacgalr0 ) /* Version 1.00 */
 ROM_END
 
 
+
+
 DRIVER_INIT_MEMBER(_20pacgal_state,20pacgal)
 {
 	m_sprite_pal_base = 0x00<<2;
@@ -458,7 +500,8 @@ DRIVER_INIT_MEMBER(_20pacgal_state,25pacman)
  *
  *************************************/
 
-GAME( 2005, 25pacman,          0, 20pacgal, 25pacman, _20pacgal_state, 25pacman, ROT90, "Namco", "Pac-Man - 25th Anniversary Edition (Rev 2.00)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE)
+GAME( 2006, 25pacman,          0, 25pacman, 25pacman, _20pacgal_state, 25pacman, ROT90, "Namco", "Pac-Man - 25th Anniversary Edition (Rev 3.00)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+GAME( 2005, 25pacmano,  25pacman, 20pacgal, 25pacman, _20pacgal_state, 25pacman, ROT90, "Namco", "Pac-Man - 25th Anniversary Edition (Rev 2.00)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE)
 
 GAME( 2000, 20pacgal,          0, 20pacgal, 20pacgal, _20pacgal_state, 20pacgal, ROT90, "Namco / Cosmodog", "Ms. Pac-Man/Galaga - 20th Anniversary Class of 1981 Reunion (V1.08)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE)
 GAME( 2000, 20pacgalr4, 20pacgal, 20pacgal, 20pacgal, _20pacgal_state, 20pacgal, ROT90, "Namco / Cosmodog", "Ms. Pac-Man/Galaga - 20th Anniversary Class of 1981 Reunion (V1.04)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE)

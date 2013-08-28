@@ -7,6 +7,7 @@
 ***************************************************************************/
 #include "machine/eepromser.h"
 #include "sound/namco.h"
+#include "machine/intelfsh.h"
 
 class _20pacgal_state : public driver_device
 {
@@ -70,6 +71,15 @@ public:
 
 };
 
+
+class _25pacman_state : public _20pacgal_state
+{
+public:
+	_25pacman_state(const machine_config &mconfig, device_type type, const char *tag)
+		: _20pacgal_state(mconfig, type, tag)
+	{ }
+
+};
 
 /*----------- defined in video/20pacgal.c -----------*/
 MACHINE_CONFIG_EXTERN( 20pacgal_video );

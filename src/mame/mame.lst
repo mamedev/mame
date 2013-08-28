@@ -1095,7 +1095,8 @@ gdvsgd
 
 // Misc Namco games
 30test          // (c) 1997
-25pacman        // (c) 2005 Ver 2.0 - Same hardware as 20pacgal
+25pacman		// (c) 2006 Ver 3.0
+25pacmano       // (c) 2005 Ver 2.0 - Same hardware as 20pacgal
 20pacgal        // (c) 2000 Ver 1.08
 20pacgalr4      // (c) 2000 Ver 1.04
 20pacgalr3      // (c) 2000 Ver 1.03
