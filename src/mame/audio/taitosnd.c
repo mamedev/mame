@@ -98,7 +98,7 @@ void tc0140syt_device::device_reset()
 void tc0140syt_device::update_nmi()
 {
 	UINT32 nmi_pending = m_status & (TC0140SYT_PORT23_FULL | TC0140SYT_PORT01_FULL);
-	UINT32 state = nmi_pending && m_nmi_enabled ? ASSERT_LINE : CLEAR_LINE;
+	UINT32 state = (nmi_pending && m_nmi_enabled) ? ASSERT_LINE : CLEAR_LINE;
 
 	m_slavecpu->execute().set_input_line(INPUT_LINE_NMI, state);
 }
@@ -121,6 +121,7 @@ WRITE8_MEMBER( tc0140syt_device::tc0140syt_port_w )
 
 WRITE8_MEMBER( tc0140syt_device::tc0140syt_comm_w )
 {
+	machine().scheduler().synchronize(); // let slavecpu catch up before changing anything
 	data &= 0x0f; /* this is important, otherwise ballbros won't work */
 
 	switch (m_mainmode)
@@ -163,6 +164,7 @@ WRITE8_MEMBER( tc0140syt_device::tc0140syt_comm_w )
 
 READ8_MEMBER( tc0140syt_device::tc0140syt_comm_r )
 {
+	machine().scheduler().synchronize(); // let slavecpu catch up before changing anything
 	UINT8 res = 0;
 
 	switch (m_mainmode)
