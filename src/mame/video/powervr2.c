@@ -51,7 +51,7 @@ DEVICE_ADDRESS_MAP_START(ta_map, 32, powervr2_device)
 // c4 = spg_trigger_pos
 	AM_RANGE(0x00c8, 0x00cb) AM_READWRITE(spg_hblank_int_r,   spg_hblank_int_w)
 	AM_RANGE(0x00cc, 0x00cf) AM_READWRITE(spg_vblank_int_r,   spg_vblank_int_w)
-// d0 = spg_control
+	AM_RANGE(0x00d0, 0x00d3) AM_READWRITE(spg_control_r,      spg_control_w)
 	AM_RANGE(0x00d4, 0x00d7) AM_READWRITE(spg_hblank_r,       spg_hblank_w)
 	AM_RANGE(0x00d8, 0x00db) AM_READWRITE(spg_load_r,         spg_load_w)
 	AM_RANGE(0x00dc, 0x00df) AM_READWRITE(spg_vblank_r,       spg_vblank_w)
@@ -1139,6 +1139,23 @@ WRITE32_MEMBER( powervr2_device::spg_vblank_int_w )
 //	vbout_timer->adjust(m_screen->time_until_pos((spg_vblank_int >> 16) & 0x3ff));
 }
 
+READ32_MEMBER( powervr2_device::spg_control_r )
+{
+	return spg_control;
+}
+
+WRITE32_MEMBER( powervr2_device::spg_control_w )
+{
+	COMBINE_DATA(&spg_control);
+	update_screen_format();
+
+	if((spg_control & 0xc0) == 0xc0)
+		popmessage("SPG undocumented pixel clock mode 11, contact MAME/MESSdev");
+
+	if((spg_control & 0xd0) == 0x10)
+		popmessage("SPG enabled VGA mode with interlace, contact MAME/MESSdev");
+}
+
 READ32_MEMBER( powervr2_device::spg_hblank_r )
 {
 	return spg_hblank;
@@ -1456,6 +1473,8 @@ WRITE32_MEMBER( powervr2_device::palette_w )
 
 void powervr2_device::update_screen_format()
 {
+	/*                        00=VGA    01=NTSC   10=PAL,   11=illegal/undocumented */
+	const int spg_clks[4] = { 26944080, 13458568, 13462800, 26944080 };
 	INT32 spg_hsize = spg_load & 0x3ff;
 	INT32 spg_vsize = (spg_load >> 16) & 0x3ff;
 	INT32 spg_hbstart = spg_hblank & 0x3ff;
@@ -1464,8 +1483,9 @@ void powervr2_device::update_screen_format()
 	INT32 spg_vbend = (spg_vblank >> 16) & 0x3ff;
 	INT32 vo_horz_start_pos = vo_startx & 0x3ff;
 	INT32 vo_vert_start_pos_f1 = vo_starty & 0x3ff;
+	int pclk = spg_clks[(spg_control >> 6) & 3] * (((spg_control & 0x10) >> 4)+1);
 
-	attoseconds_t refresh = HZ_TO_ATTOSECONDS(13458568*2) * spg_hsize * spg_vsize;
+	attoseconds_t refresh = HZ_TO_ATTOSECONDS(pclk) * spg_hsize * spg_vsize;
 
 	rectangle visarea = m_screen->visible_area();
 	/* FIXME: right visible area calculations aren't known yet*/

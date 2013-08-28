@@ -170,6 +170,8 @@ public:
 	DECLARE_WRITE32_MEMBER( spg_hblank_int_w );
 	DECLARE_READ32_MEMBER(  spg_vblank_int_r );
 	DECLARE_WRITE32_MEMBER( spg_vblank_int_w );
+	DECLARE_READ32_MEMBER(  spg_control_r );
+	DECLARE_WRITE32_MEMBER( spg_control_w );
 	DECLARE_READ32_MEMBER(  spg_hblank_r );
 	DECLARE_WRITE32_MEMBER( spg_hblank_w );
 	DECLARE_READ32_MEMBER(  spg_load_r );
@@ -282,7 +284,7 @@ private:
 	UINT32 fb_r_ctrl, fb_w_ctrl, fb_w_linestride, fb_r_sof1, fb_r_sof2, fb_r_size, fb_w_sof1, fb_w_sof2, fb_x_clip, fb_y_clip;
 	UINT32 fpu_param_cfg;
 	UINT32 isp_backgnd_t;
-	UINT32 spg_hblank_int, spg_vblank_int, spg_hblank, spg_load, spg_vblank, spg_width;
+	UINT32 spg_hblank_int, spg_vblank_int, spg_control, spg_hblank, spg_load, spg_vblank, spg_width;
 	UINT32 vo_control, vo_startx, vo_starty;
 	UINT32 text_control;
 	UINT32 pal_ram_ctrl;

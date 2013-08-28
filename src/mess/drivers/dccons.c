@@ -306,7 +306,7 @@ READ64_MEMBER(dc_cons_state::dc_pdtra_r )
 {
 	UINT64 out = PCTRA<<32;
 
-	out |= PDTRA & ~0x0303;
+	out |= PDTRA & ~0x0103;
 
 	// if both bits are inputs
 	if (!(PCTRA & 0x5))
@@ -552,11 +552,9 @@ static INPUT_PORTS_START( dc )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 
 	PORT_START("SCREEN_TYPE")
-	PORT_CONFNAME( 0x03, 0x00, "Connection Type" )
-	PORT_CONFSETTING(    0x00, "NTSC" )
-	PORT_CONFSETTING(    0x01, "PAL" )
-	PORT_CONFSETTING(    0x02, "VGA (0)" )
-	PORT_CONFSETTING(    0x03, "VGA (1)" )
+	PORT_CONFNAME( 0x01, 0x00, "Screen Connection Type" )
+	PORT_CONFSETTING(    0x00, "VGA" )
+	PORT_CONFSETTING(    0x01, "Composite" )
 INPUT_PORTS_END
 
 MACHINE_RESET_MEMBER(dc_cons_state,dc_console)
