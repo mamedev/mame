@@ -1349,20 +1349,44 @@ static void dma_scsp(address_space &space, scsp_state *scsp)
 	/* TODO: don't know if params auto-updates, I guess not ... */
 	if(scsp_ddir)
 	{
-		for(i=0;i < scsp->scsp_dtlg;i+=2)
+		if(scsp_dgate)
 		{
-			space.write_word(scsp->scsp_dmea, space.read_word(0x100000|scsp->scsp_drga));
-			scsp->scsp_dmea+=2;
-			scsp->scsp_drga+=2;
+			popmessage("Check: SCSP DMA DGATE enabled, contact MAME/MESSdev");
+			for(i=0;i < scsp->scsp_dtlg;i+=2)
+			{
+				space.write_word(scsp->scsp_dmea, 0);
+				scsp->scsp_dmea+=2;
+			}
+		}
+		else
+		{
+			for(i=0;i < scsp->scsp_dtlg;i+=2)
+			{
+				space.write_word(scsp->scsp_dmea, space.read_word(0x100000|scsp->scsp_drga));
+				scsp->scsp_dmea+=2;
+				scsp->scsp_drga+=2;
+			}
 		}
 	}
 	else
 	{
-		for(i=0;i < scsp->scsp_dtlg;i+=2)
+		if(scsp_dgate)
 		{
-			space.write_word(0x100000|scsp->scsp_drga,space.read_word(scsp->scsp_dmea));
-			scsp->scsp_dmea+=2;
-			scsp->scsp_drga+=2;
+			popmessage("Check: SCSP DMA DGATE enabled, contact MAME/MESSdev");
+			for(i=0;i < scsp->scsp_dtlg;i+=2)
+			{
+				space.write_word(0x100000|scsp->scsp_drga,0);
+				scsp->scsp_drga+=2;
+			}
+		}
+		else
+		{
+			for(i=0;i < scsp->scsp_dtlg;i+=2)
+			{
+				space.write_word(0x100000|scsp->scsp_drga,space.read_word(scsp->scsp_dmea));
+				scsp->scsp_dmea+=2;
+				scsp->scsp_drga+=2;
+			}
 		}
 	}
 
