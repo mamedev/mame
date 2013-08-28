@@ -2393,6 +2393,7 @@ $(MESSOBJ)/skeleton.a:          \
 	$(MESS_DRIVERS)/indiana.o   \
 	$(MESS_DRIVERS)/itt3030.o   \
 	$(MESS_DRIVERS)/konin.o     \
+	$(MESS_DRIVERS)/lola8a.o     \
 	$(MESS_DRIVERS)/m79152pc.o  \
 	$(MESS_DRIVERS)/mbc200.o    \
 	$(MESS_DRIVERS)/mccpm.o     \

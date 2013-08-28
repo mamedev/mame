@@ -6343,6 +6343,7 @@ src/mess/drivers/lc80.c svneol=native#text/plain
 src/mess/drivers/lcmate2.c svneol=native#text/plain
 src/mess/drivers/lisa.c svneol=native#text/plain
 src/mess/drivers/llc.c svneol=native#text/plain
+src/mess/drivers/lola8a.c svneol=native#text/plain
 src/mess/drivers/lviv.c svneol=native#text/plain
 src/mess/drivers/lx800.c svneol=native#text/plain
 src/mess/drivers/lynx.c svneol=native#text/plain
