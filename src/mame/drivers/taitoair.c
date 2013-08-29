@@ -133,12 +133,15 @@ Video section hung off TaitoH driver, it should be separate.
 hardware which creates the 3d background scenes? It seems
 the TMS320C25 is being used as a co-processor to relieve the
 68000 of 3d calculations... it has direct access to line ram
-along with the 68000. Seems gradiation ram is responsibility
-of 68000. Unless - unlikely IMO - there is banking
-allowing the 32025 to select this area in its address map.
+along with the 68000. 
 
-"Power common ram" is presumably for communication with an MCU
+Gradiation RAM is used to display a rotatable gradient background.
+The rotation is most likely handled by the TC0430GRW ROZ chip.
+
+"Power common ram" is for communication with a processor
 controlling the sit-in-cabinet (deluxe mechanized version only).
+The interface is similar to that used by Midnight Landing
+and though undumped, the motor CPU program may be identical.
 
 [Offer dip-selectable kludge of the analogue stick inputs so that
 keyboard play is possible?]
@@ -394,7 +397,7 @@ static ADDRESS_MAP_START( airsys_map, AS_PROGRAM, 16, taitoair_state )
 	AM_RANGE(0x906000, 0x906007) AM_RAM // DMA?
 	AM_RANGE(0x908000, 0x90ffff) AM_RAM AM_SHARE("line_ram")    /* "line ram" */
 	AM_RANGE(0x910000, 0x91ffff) AM_RAM AM_SHARE("dsp_ram") /* "dsp common ram" (TMS320C25) */
-	AM_RANGE(0x980000, 0x98000f) AM_RAM AM_SHARE("backregs")
+	AM_RANGE(0x980000, 0x98000f) AM_RAM AM_SHARE("backregs") /* TC0430GRW? */
 	AM_RANGE(0xa00000, 0xa00007) AM_READ(stick_input_r)
 	AM_RANGE(0xa00100, 0xa00107) AM_READ(stick2_input_r)
 	AM_RANGE(0xa00200, 0xa0020f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, read, write, 0x00ff) /* other I/O */
@@ -740,13 +743,15 @@ not present on Air Inferno.
 
 Air Inferno video customs:
 
-TC0460LRN
-TC0440ENZ
+TC0460LRN - 3D related?
+TC0440ENZ - 3D related?
+
+[Used also by F2/H/Z System games]
+TC0430GRW - Rotation/Zoom
 TC0300FLA
 TC0080VCO
 TC0130LNB
 TC0130LNB
-TC0430GRW
 TC0160ROM
 TC0270MOD
 
