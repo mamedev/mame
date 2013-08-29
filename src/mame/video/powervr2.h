@@ -124,6 +124,7 @@ public:
 	emu_timer *endofrender_timer_isp;
 	emu_timer *endofrender_timer_tsp;
 	emu_timer *endofrender_timer_video;
+	emu_timer *yuv_timer_end;
 	UINT32 tafifo_buff[32];
 	int scanline;
 	int next_y;
@@ -256,6 +257,7 @@ public:
 	TIMER_CALLBACK_MEMBER(vbin);
 	TIMER_CALLBACK_MEMBER(vbout);
 	TIMER_CALLBACK_MEMBER(hbin);
+	TIMER_CALLBACK_MEMBER(yuv_convert_end);
 	TIMER_CALLBACK_MEMBER(endofrender_video);
 	TIMER_CALLBACK_MEMBER(endofrender_tsp);
 	TIMER_CALLBACK_MEMBER(endofrender_isp);

@@ -1951,8 +1951,16 @@ WRITE64_MEMBER( powervr2_device::ta_fifo_poly_w )
 
 }
 
+TIMER_CALLBACK_MEMBER(powervr2_device::yuv_convert_end)
+{
+	irq_cb(EOXFER_YUV_IRQ);
+	yuv_timer_end->adjust(attotime::never);
+}
+
+
 WRITE8_MEMBER( powervr2_device::ta_fifo_yuv_w )
 {
+	dc_state *state = machine().driver_data<dc_state>();
 	//printf("%08x %08x\n",ta_yuv_index++,ta_yuv_tex_ctrl);
 
 	//popmessage("YUV fifo write %08x %08x",ta_yuv_index,ta_yuv_tex_ctrl);
@@ -1995,7 +2003,7 @@ WRITE8_MEMBER( powervr2_device::ta_fifo_yuv_w )
 			{
 				ta_yuv_y = 0;
 				/* TODO: timing */
-				irq_cb(EOXFER_YUV_IRQ);
+				yuv_timer_end->adjust(state->m_maincpu->cycles_to_attotime(ta_yuv_x_size*ta_yuv_y_size*0x180));
 			}
 		}
 	}
@@ -3008,6 +3016,7 @@ void powervr2_device::pvr_drawframebuffer(bitmap_rgb32 &bitmap,const rectangle &
 			for (y=0;y <= dy;y++)
 			{
 				addrp = fb_r_sof1+y*xi*2;
+
 				if(vo_control & 0x100)
 				{
 					for (x=0;x < xi;x++)
@@ -3042,6 +3051,7 @@ void powervr2_device::pvr_drawframebuffer(bitmap_rgb32 &bitmap,const rectangle &
 
 						if (y<=cliprect.max_y)
 							*fbaddr = b | (g<<8) | (r<<16);
+
 						addrp+=4;
 					}
 				}
@@ -3395,12 +3405,13 @@ void powervr2_device::device_start()
 //	vbout_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(powervr2_device::vbout),this));
 //	vbin_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(powervr2_device::vbin),this));
 	hbin_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(powervr2_device::hbin),this));
+	yuv_timer_end = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(powervr2_device::yuv_convert_end),this));
 
 	endofrender_timer_isp = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(powervr2_device::endofrender_isp),this));
 	endofrender_timer_tsp = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(powervr2_device::endofrender_tsp),this));
 	endofrender_timer_video = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(powervr2_device::endofrender_video),this));
 
-	fake_accumulationbuffer_bitmap = auto_bitmap_rgb32_alloc(machine(),1024,1024);
+	fake_accumulationbuffer_bitmap = auto_bitmap_rgb32_alloc(machine(),2048,2048);
 
 	softreset = 0;
 	param_base = 0;
@@ -3545,6 +3556,7 @@ void powervr2_device::device_reset()
 	endofrender_timer_isp->adjust(attotime::never);
 	endofrender_timer_tsp->adjust(attotime::never);
 	endofrender_timer_video->adjust(attotime::never);
+	yuv_timer_end->adjust(attotime::never);
 
 	dc_state *state = machine().driver_data<dc_state>();
 	dc_texture_ram = state->dc_texture_ram.target();
