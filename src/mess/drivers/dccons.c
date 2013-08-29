@@ -552,7 +552,7 @@ static INPUT_PORTS_START( dc )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 
 	PORT_START("SCREEN_TYPE")
-	PORT_CONFNAME( 0x01, 0x00, "Screen Connection Type" )
+	PORT_CONFNAME( 0x01, 0x01, "Screen Connection Type" )
 	PORT_CONFSETTING(    0x00, "VGA" )
 	PORT_CONFSETTING(    0x01, "Composite" )
 INPUT_PORTS_END
@@ -681,6 +681,7 @@ ROM_START(dc)
 
 	ROM_REGION(0x020000, "dcflash", 0)
 	ROM_LOAD( "dcus_ntsc.bin", 0x000000, 0x020000, BAD_DUMP CRC(c611b498) SHA1(94d44d7f9529ec1642ba3771ed3c5f756d5bc872) )   // Flash
+	ROM_FILL( 0x1a004, 1, 0x30 ) // patch broadcast back to NTSC
 ROM_END
 
 ROM_START( dceu )
@@ -701,6 +702,7 @@ ROM_START( dcjp )
 	ROM_REGION(0x020000, "dcflash", 0)
 	/* ROM_LOAD( "dcjp_ntsc.bad", 0x000000, 0x020000, BAD_DUMP CRC(307a7035) SHA1(1411423a9d071340ea52c56e19c1aafc4e1309ee) )      // Hacked Flash */
 	ROM_LOAD( "dcjp_ntsc.bin", 0x000000, 0x020000, BAD_DUMP CRC(5F92BF76) SHA1(BE78B834F512AB2CF3D67B96E377C9F3093FF82A) )  // Flash
+	ROM_FILL( 0x1a004, 1, 0x30 ) // patch broadcast back to NTSC
 ROM_END
 
 ROM_START( dcdev )
