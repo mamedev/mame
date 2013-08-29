@@ -55,27 +55,21 @@ struct PS_INPUT
 // YIQ Decode Vertex Shader
 //-----------------------------------------------------------------------------
 
-uniform float ScreenWidth;
-uniform float ScreenHeight;
-
-uniform float2 RawDims;
-
-uniform float WidthRatio;
-uniform float HeightRatio;
+uniform float2 ScreenDims;
+uniform float2 SourceDims;
+uniform float2 SourceRect;
 
 VS_OUTPUT vs_main(VS_INPUT Input)
 {
 	VS_OUTPUT Output = (VS_OUTPUT)0;
 	
 	Output.Position = float4(Input.Position.xyz, 1.0f);
-	Output.Position.x /= ScreenWidth;
-	Output.Position.y /= ScreenHeight;
+	Output.Position.xy /= ScreenDims;
 	Output.Position.y = 1.0f - Output.Position.y;
-	Output.Position.x -= 0.5f;
-	Output.Position.y -= 0.5f;
+	Output.Position.xy -= 0.5f;
 	Output.Position *= float4(2.0f, 2.0f, 1.0f, 1.0f);
 	Output.Coord0.xy = Input.TexCoord;
-	Output.Coord0.zw = float2(1.0f / RawDims.x, 0.0f);
+	Output.Coord0.zw = float2(1.0f / SourceDims.x, 0.0f);
 
 	return Output;
 }
@@ -101,7 +95,7 @@ uniform float PI2 = 6.283185307178;
 
 float4 ps_main(PS_INPUT Input) : COLOR
 {
-	float4 BaseTexel = tex2D(DiffuseSampler, Input.Coord0.xy + 0.5f / RawDims);
+	float4 BaseTexel = tex2D(DiffuseSampler, Input.Coord0.xy + 0.5f / SourceDims);
 
 	// YIQ convolution: N coefficients each
 	float4 YAccum = 0.0f;
@@ -110,7 +104,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float MaxC = 2.1183f;
 	float MinC = -1.1183f;
 	float CRange = MaxC - MinC;
-	float FrameWidthx4 = RawDims.x * 4.0f / WidthRatio;
+	float FrameWidthx4 = SourceDims.x * 4.0f / SourceRect.x;
 	float Fc_y1 = (CCValue - NotchHalfWidth) * ScanTime / FrameWidthx4;
 	float Fc_y2 = (CCValue + NotchHalfWidth) * ScanTime / FrameWidthx4;
 	float Fc_y3 = YFreqResponse * ScanTime / FrameWidthx4;
@@ -130,14 +124,14 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float4 NOffset = float4(0.0f, 1.0f, 2.0f, 3.0f);
 	float W = PI2 * CCValue * ScanTime;
 	float4 CoordY = Input.Coord0.y;
-	float4 VPosition = CoordY * (RawDims.x * WidthRatio);
+	float4 VPosition = (CoordY / SourceRect.y) * (SourceDims.x * SourceRect.x);
 	for(float n = -41.0f; n < 42.0f; n += 4.0f)
 	{
 		float4 n4 = n + NOffset;
 		float4 CoordX = Input.Coord0.x + Input.Coord0.z * n4 * 0.25f;
 		float2 TexCoord = float2(CoordX.r, CoordY.r);
-		float4 C = tex2D(CompositeSampler, TexCoord + float2(0.5f, 0.0f) / RawDims) * CRange + MinC;
-		float4 WT = W * (CoordX * WidthRatio + VPosition + BValue) + OValue;
+		float4 C = tex2D(CompositeSampler, TexCoord + float2(0.5f, 0.0f) / SourceDims) * CRange + MinC;
+		float4 WT = W * (CoordX * SourceRect.x + VPosition + BValue) + OValue;
 		float4 SincKernel = 0.54f + 0.46f * cos(PI2Length * n4);
 
 		float4 SincYIn1 = Fc_y1_pi2 * n4;

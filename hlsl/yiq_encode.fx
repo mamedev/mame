@@ -44,19 +44,16 @@ struct PS_INPUT
 // YIQ Encode Vertex Shader
 //-----------------------------------------------------------------------------
 
-uniform float ScreenWidth;
-uniform float ScreenHeight;
+uniform float2 ScreenDims;
 
 VS_OUTPUT vs_main(VS_INPUT Input)
 {
 	VS_OUTPUT Output = (VS_OUTPUT)0;
 	
 	Output.Position = float4(Input.Position.xyz, 1.0f);
-	Output.Position.x /= ScreenWidth;
-	Output.Position.y /= ScreenHeight;
+	Output.Position.xy /= ScreenDims;
 	Output.Position.y = 1.0f - Output.Position.y;
-	Output.Position.x -= 0.5f;
-	Output.Position.y -= 0.5f;
+	Output.Position.xy -= 0.5f;
 	Output.Position *= float4(2.0f, 2.0f, 1.0f, 1.0f);
 	Output.Color = Input.Color;
 	Output.TexCoord = Input.TexCoord;
@@ -74,10 +71,8 @@ uniform float CCValue = 3.04183f;
 uniform float PValue = 1.0f;
 uniform float ScanTime = 52.6f;
 
-uniform float2 RawDims;
-
-uniform float WidthRatio;
-uniform float HeightRatio;
+uniform float2 SourceDims;
+uniform float2 SourceRect;
 
 uniform float4 YDot = float4(0.299f, 0.587f, 0.114f, 0.0f);
 uniform float4 IDot = float4(0.595716f, -0.274453f, -0.321263f, 0.0f);
@@ -93,7 +88,7 @@ uniform float CRange = 3.2366f;
 
 float4 ps_main(PS_INPUT Input) : COLOR
 {
-	float2 InvDims = 1.0f / RawDims;
+	float2 InvDims = 1.0f / SourceDims;
 	float4 CoordX = float4(Input.TexCoord.x + OffsetX * InvDims.x);
 	float4 CoordY = Input.TexCoord.y;
 
@@ -108,8 +103,8 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float4 Q = float4(dot(Texel0, QDot), dot(Texel1, QDot), dot(Texel2, QDot), dot(Texel3, QDot));
 
 	float4 W = PI2 * CCValue * ScanTime;
-	float4 VPosition = CoordY * (RawDims.x * WidthRatio);
-	float4 T = CoordX * WidthRatio + VPosition + BValue;
+	float4 VPosition = (CoordY / SourceRect.y) * (SourceDims.x * SourceRect.x);
+	float4 T = CoordX * SourceRect.x + VPosition + BValue;
 	
 	float4 C = Y + I * cos(T * W) + Q * sin(T * W);
 	C = (C - MinC) / CRange;

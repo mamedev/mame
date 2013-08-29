@@ -42,7 +42,6 @@
 // standard windows headers
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#include <tchar.h>
 #include <d3d9.h>
 #include <d3dx9.h>
 #undef interface
@@ -52,7 +51,6 @@
 
 // MAMEOS headers
 #include "d3dintf.h"
-#include "strconv.h"
 #include "winmain.h"
 
 
@@ -62,10 +60,6 @@
 //============================================================
 
 typedef IDirect3D9 *(WINAPI *direct3dcreate9_ptr)(UINT SDKVersion);
-
-typedef HRESULT (WINAPI *direct3dx9_loadeffect_ptr)(LPDIRECT3DDEVICE9 pDevice, LPCTSTR pSrcFile, const D3DXMACRO *pDefines, LPD3DXINCLUDE pInclude, DWORD Flags, LPD3DXEFFECTPOOL pPool, LPD3DXEFFECT *ppEffect, LPD3DXBUFFER *ppCompilationErrors);
-static direct3dx9_loadeffect_ptr g_load_effect = NULL;
-
 
 namespace d3d
 {
@@ -106,14 +100,10 @@ INLINE void convert_present_params(const present_parameters *params, D3DPRESENT_
 
 base *drawd3d9_init(void)
 {
-	direct3dcreate9_ptr direct3dcreate9;
-	HINSTANCE dllhandle;
-	IDirect3D9 *d3d9;
-	base *d3dptr;
 	bool post_available = true;
 
 	// dynamically grab the create function from d3d9.dll
-	dllhandle = LoadLibrary(TEXT("d3d9.dll"));
+	HINSTANCE dllhandle = LoadLibrary(TEXT("d3d9.dll"));
 	if (dllhandle == NULL)
 	{
 		mame_printf_verbose("Direct3D: Unable to access d3d9.dll\n");
@@ -121,7 +111,7 @@ base *drawd3d9_init(void)
 	}
 
 	// import the create function
-	direct3dcreate9 = (direct3dcreate9_ptr)GetProcAddress(dllhandle, "Direct3DCreate9");
+	direct3dcreate9_ptr direct3dcreate9 = (direct3dcreate9_ptr)GetProcAddress(dllhandle, "Direct3DCreate9");
 	if (direct3dcreate9 == NULL)
 	{
 		mame_printf_verbose("Direct3D: Unable to find Direct3DCreate9\n");
@@ -131,7 +121,7 @@ base *drawd3d9_init(void)
 	}
 
 	// create our core direct 3d object
-	d3d9 = (*direct3dcreate9)(D3D_SDK_VERSION);
+	IDirect3D9 *d3d9 = (*direct3dcreate9)(D3D_SDK_VERSION);
 	if (d3d9 == NULL)
 	{
 		mame_printf_verbose("Direct3D: Error attempting to initialize Direct3D9\n");
@@ -141,39 +131,30 @@ base *drawd3d9_init(void)
 	}
 
 	// dynamically grab the shader load function from d3dx9.dll
-	HINSTANCE fxhandle = LoadLibrary(TEXT("d3dx9_43.dll"));
-	if (fxhandle == NULL)
+	HINSTANCE fxhandle = NULL;
+	for (int idx = 99; idx >= 0; idx--) // a shameful moogle
 	{
-		post_available = false;
-		mame_printf_verbose("Direct3D: Warning - Unable to access d3dx9_43.dll; disabling post-effect rendering\n");
-	}
-
-	// import the create function
-	if(post_available)
-	{
-		g_load_effect = (direct3dx9_loadeffect_ptr)GetProcAddress(fxhandle, "D3DXCreateEffectFromFileW");
-		if (g_load_effect == NULL)
+		wchar_t dllbuf[13];
+		wsprintf(dllbuf, TEXT("d3dx9_%d.dll"), idx);
+		fxhandle = LoadLibrary(dllbuf);
+		if (fxhandle != NULL)
 		{
-			printf("Direct3D: Unable to find D3DXCreateEffectFromFileW\n");
-			FreeLibrary(dllhandle);
-			fxhandle = NULL;
-			dllhandle = NULL;
-			return NULL;
+			break;
 		}
 	}
-	else
+	if (fxhandle == NULL)
 	{
-		g_load_effect = NULL;
+		mame_printf_verbose("Direct3D: Warning - Unable find any D3D9 DLLs; disabling post-effect rendering\n");
 		post_available = false;
-		mame_printf_verbose("Direct3D: Warning - Unable to get a handle to D3DXCreateEffectFromFileW; disabling post-effect rendering\n");
 	}
 
 	// allocate an object to hold our data
-	d3dptr = global_alloc(base);
+	base *d3dptr = global_alloc(base);
 	d3dptr->version = 9;
 	d3dptr->d3dobj = d3d9;
 	d3dptr->dllhandle = dllhandle;
 	d3dptr->post_fx_available = post_available;
+	d3dptr->libhandle = fxhandle;
 	set_interfaces(d3dptr);
 
 	mame_printf_verbose("Direct3D: Using Direct3D 9\n");
@@ -335,29 +316,6 @@ static HRESULT device_create_offscreen_plain_surface(device *dev, UINT width, UI
 	IDirect3DDevice9 *device = (IDirect3DDevice9 *)dev;
 	return IDirect3DDevice9_CreateOffscreenPlainSurface(device, width, height, format, pool, (IDirect3DSurface9 **)surface, NULL);
 }
-
-static HRESULT device_create_effect(device *dev, const WCHAR *name, effect **effect)
-{
-	IDirect3DDevice9 *device = (IDirect3DDevice9 *)dev;
-
-	LPD3DXBUFFER buffer_errors = NULL;
-	HRESULT hr = (*g_load_effect)(device, name, NULL, NULL, 0, NULL, (ID3DXEffect**)effect, &buffer_errors);
-	if(FAILED(hr))
-	{
-		if(buffer_errors != NULL)
-		{
-			LPVOID compile_errors = buffer_errors->GetBufferPointer();
-			printf("Unable to compile shader %s:\n%s\n", (const char*)name, (const char*)compile_errors);
-		}
-		else
-		{
-			printf("Unable to compile shader (unspecified reason)\n");
-		}
-	}
-
-	return hr;
-}
-
 
 static HRESULT device_create_texture(device *dev, UINT width, UINT height, UINT levels, DWORD usage, D3DFORMAT format, D3DPOOL pool, texture **texture)
 {
@@ -546,7 +504,6 @@ static const device_interface d3d9_device_interface =
 	device_begin_scene,
 	device_clear,
 	device_create_offscreen_plain_surface,
-	device_create_effect,
 	device_create_texture,
 	device_create_vertex_buffer,
 	device_create_render_target,
@@ -679,237 +636,6 @@ static const vertex_buffer_interface d3d9_vertex_buffer_interface =
 	vertex_buffer_unlock
 };
 
-
-
-//============================================================
-//  Direct3DEffect interfaces
-//============================================================
-
-uniform::uniform(effect *shader, const char *name, uniform_type type)
-{
-	m_shader = shader;
-	m_type = type;
-	m_next = NULL;
-	m_prev = NULL;
-	m_handle = m_shader->get_parameter(NULL, name);
-	m_ival = 0;
-	memset(m_vec, 0, sizeof(float) * 4);
-	m_mval = NULL;
-	m_texture = NULL;
-
-	switch (type)
-	{
-	case UT_INT:
-	case UT_FLOAT:
-	case UT_MATRIX:
-	case UT_SAMPLER:
-		m_count = 1;
-		break;
-	case UT_VEC2:
-		m_count = 2;
-		break;
-	case UT_VEC3:
-		m_count = 3;
-		break;
-	case UT_VEC4:
-		m_count = 4;
-		break;
-	default:
-		m_count = 1;
-		break;
-	}
-}
-
-void uniform::set_next(uniform *next)
-{
-	m_next->set_prev(next);
-	next->set_next(m_next);
-
-	next->set_prev(this);
-	m_next = next;
-}
-
-void uniform::set_prev(uniform *prev)
-{
-	m_prev->set_next(prev);
-	prev->set_prev(m_prev);
-
-	prev->set_next(this);
-	m_prev = prev;
-}
-
-void uniform::set(float x, float y, float z, float w)
-{
-	m_vec[0] = x;
-	m_vec[1] = y;
-	m_vec[2] = z;
-	m_vec[3] = w;
-}
-
-void uniform::set(float x, float y, float z)
-{
-	m_vec[0] = x;
-	m_vec[1] = y;
-	m_vec[2] = z;
-}
-
-void uniform::set(float x, float y)
-{
-	m_vec[0] = x;
-	m_vec[1] = y;
-}
-
-void uniform::set(float x)
-{
-	m_vec[0] = x;
-}
-
-void uniform::set(int x)
-{
-	m_ival = x;
-}
-
-void uniform::set(matrix *mat)
-{
-	m_mval = mat;
-}
-
-void uniform::set(texture *tex)
-{
-	m_texture = tex;
-}
-
-void uniform::upload()
-{
-	switch(m_type)
-	{
-		case UT_INT:
-			m_shader->set_int(m_handle, m_ival);
-			break;
-		case UT_FLOAT:
-			m_shader->set_float(m_handle, m_vec[0]);
-			break;
-		case UT_VEC2:
-		case UT_VEC3:
-		case UT_VEC4:
-			m_shader->set_vector(m_handle, m_count, m_vec);
-			break;
-		case UT_MATRIX:
-			m_shader->set_matrix(m_handle, m_mval);
-			break;
-		case UT_SAMPLER:
-			m_shader->set_texture(m_handle, m_texture);
-			break;
-	}
-}
-
-effect::effect(device *dev, const char *name, const char *path)
-{
-	IDirect3DDevice9 *device = (IDirect3DDevice9 *)dev;
-	LPD3DXBUFFER buffer_errors = NULL;
-
-	m_effect = NULL;
-	m_valid = false;
-
-	char name_cstr[1024];
-	sprintf(name_cstr, "%s\\%s", path, name);
-	TCHAR *effect_name = tstring_from_utf8(name_cstr);
-
-	HRESULT hr = (*g_load_effect)(device, effect_name, NULL, NULL, 0, NULL, &m_effect, &buffer_errors);
-	if(FAILED(hr))
-	{
-		if(buffer_errors != NULL)
-		{
-			LPVOID compile_errors = buffer_errors->GetBufferPointer();
-			printf("Unable to compile shader: %s\n", (const char*)compile_errors);
-		}
-		else
-		{
-			printf("Unable to compile shader (unspecified reason)\n");
-		}
-	}
-	else
-	{
-		m_valid = true;
-	}
-
-	osd_free(effect_name);
-}
-
-effect::~effect()
-{
-	m_effect->Release();
-	m_effect = NULL;
-}
-
-void effect::begin(UINT *passes, DWORD flags)
-{
-	m_effect->Begin(passes, flags);
-}
-
-void effect::end()
-{
-	m_effect->End();
-}
-
-void effect::begin_pass(UINT pass)
-{
-	m_effect->BeginPass(pass);
-}
-
-void effect::end_pass()
-{
-	m_effect->EndPass();
-}
-
-void effect::set_technique(const char *name)
-{
-	m_effect->SetTechnique(name);
-}
-
-void effect::set_vector(D3DXHANDLE param, int count, float *vector)
-{
-	static D3DXVECTOR4 out_vector;
-	if (count > 0)
-		out_vector.x = vector[0];
-	if (count > 1)
-		out_vector.y = vector[1];
-	if (count > 2)
-		out_vector.z = vector[2];
-	if (count > 3)
-		out_vector.w = vector[3];
-	m_effect->SetVector(param, &out_vector);
-}
-
-void effect::set_float(D3DXHANDLE param, float value)
-{
-	m_effect->SetFloat(param, value);
-}
-
-void effect::set_int(D3DXHANDLE param, int value)
-{
-	m_effect->SetInt(param, value);
-}
-
-void effect::set_matrix(D3DXHANDLE param, matrix *matrix)
-{
-	m_effect->SetMatrix(param, (D3DXMATRIX*)matrix);
-}
-
-void effect::set_texture(D3DXHANDLE param, texture *tex)
-{
-	m_effect->SetTexture(param, (IDirect3DTexture9*)tex);
-}
-
-D3DXHANDLE effect::get_parameter(D3DXHANDLE param, const char *name)
-{
-	return m_effect->GetParameterByName(param, name);
-}
-
-ULONG effect::release()
-{
-	return m_effect->Release();
-}
 
 //============================================================
 //  set_interfaces

@@ -81,83 +81,6 @@ class effect;
 typedef D3DXVECTOR4 vector;
 typedef D3DMATRIX matrix;
 
-class uniform
-{
-public:
-	typedef enum
-	{
-		UT_VEC4,
-		UT_VEC3,
-		UT_VEC2,
-		UT_FLOAT,
-		UT_INT,
-		UT_MATRIX,
-		UT_SAMPLER,
-	} uniform_type;
-
-	uniform(effect *shader, const char *name, uniform_type type);
-
-	void set_next(uniform *next);
-	void set_prev(uniform *prev);
-
-	void set(float x, float y, float z, float w);
-	void set(float x, float y, float z);
-	void set(float x, float y);
-	void set(float x);
-	void set(int x);
-	void set(matrix *mat);
-	void set(texture *tex);
-
-	void upload();
-
-protected:
-	uniform		*m_next;
-	uniform		*m_prev;
-
-	float		m_vec[4];
-	int			m_ival;
-	matrix		*m_mval;
-	texture		*m_texture;
-	int			m_count;
-	uniform_type	m_type;
-
-	effect 		*m_shader;
-	D3DXHANDLE	m_handle;
-};
-
-class effect
-{
-public:
-	effect(device *dev, const char *name, const char *path);
-	~effect();
-
-	void    	begin(UINT *passes, DWORD flags);
-	void    	begin_pass(UINT pass);
-
-	void    	end();
-	void    	end_pass();
-
-	void    	set_technique(const char *name);
-
-	void    	set_vector(D3DXHANDLE param, int count, float *vector);
-	void    	set_float(D3DXHANDLE param, float value);
-	void    	set_int(D3DXHANDLE param, int value);
-	void    	set_matrix(D3DXHANDLE param, matrix *matrix);
-	void    	set_texture(D3DXHANDLE param, texture *tex);
-
-	D3DXHANDLE	get_parameter(D3DXHANDLE param, const char *name);
-
-	ULONG   	release();
-
-	bool		is_valid() { return m_valid; }
-
-private:
-	bool		m_valid;
-	ID3DXEffect *m_effect;
-};
-
-
-
 //============================================================
 //  Abstracted presentation parameters
 //============================================================
@@ -251,7 +174,6 @@ struct device_interface
 	HRESULT (*begin_scene)(device *dev);
 	HRESULT (*clear)(device *dev, DWORD count, const D3DRECT *rects, DWORD flags, D3DCOLOR color, float z, DWORD stencil);
 	HRESULT (*create_offscreen_plain_surface)(device *dev, UINT width, UINT height, D3DFORMAT format, D3DPOOL pool, surface **surface);
-	HRESULT (*create_effect)(device *dev, const WCHAR *name, effect **effect);
 	HRESULT (*create_texture)(device *dev, UINT width, UINT height, UINT levels, DWORD usage, D3DFORMAT format, D3DPOOL pool, texture **texture);
 	HRESULT (*create_vertex_buffer)(device *dev, UINT length, DWORD usage, DWORD fvf, D3DPOOL pool, vertex_buffer **buf);
 	HRESULT (*create_render_target)(device *dev, UINT width, UINT height, D3DFORMAT format, surface **surface);
@@ -323,6 +245,7 @@ struct base
 	void *                      d3dobj;
 	HINSTANCE                   dllhandle;
 	bool                        post_fx_available;
+	HINSTANCE 					libhandle;
 
 	// interface pointers
 	interface               d3d;

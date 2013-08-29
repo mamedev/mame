@@ -42,7 +42,6 @@ struct PS_INPUT
 // Passthrough Vertex Shader
 //-----------------------------------------------------------------------------
 
-uniform float2 RawDims;
 uniform float2 ScreenDims;
 
 VS_OUTPUT vs_main(VS_INPUT Input)

@@ -55,6 +55,101 @@
 
 namespace d3d
 {
+
+class effect;
+
+class uniform
+{
+public:
+	typedef enum
+	{
+		UT_VEC4,
+		UT_VEC3,
+		UT_VEC2,
+		UT_FLOAT,
+		UT_INT,
+		UT_MATRIX,
+		UT_SAMPLER,
+	} uniform_type;
+
+	typedef enum
+	{
+		CU_SCREEN_DIMS,
+		CU_SOURCE_DIMS,
+		CU_SOURCE_RECT,
+		CU_NTSC_CCFREQ,
+		CU_NTSC_A,
+		CU_NTSC_B,
+		CU_NTSC_O,
+		CU_NTSC_P,
+		CU_NTSC_NOTCH,
+		CU_NTSC_YFREQ,
+		CU_NTSC_IFREQ,
+		CU_NTSC_QFREQ,
+		CU_NTSC_HTIME,
+
+	} common_uniform;
+
+	uniform(effect *shader, const char *name, uniform_type type);
+
+	void set_next(uniform *next);
+
+	void set(float x, float y, float z, float w);
+	void set(float x, float y, float z);
+	void set(float x, float y);
+	void set(float x);
+	void set(int x);
+	void set(matrix *mat);
+	void set(texture *tex);
+
+	void upload();
+
+protected:
+	uniform		*m_next;
+
+	float		m_vec[4];
+	int			m_ival;
+	matrix		*m_mval;
+	texture		*m_texture;
+	int			m_count;
+	uniform_type	m_type;
+
+	effect 		*m_shader;
+	D3DXHANDLE	m_handle;
+};
+
+class effect
+{
+public:
+	effect(device *dev, const char *name, const char *path);
+	~effect();
+
+	void    	begin(UINT *passes, DWORD flags);
+	void    	begin_pass(UINT pass);
+
+	void    	end();
+	void    	end_pass();
+
+	void    	set_technique(const char *name);
+
+	void    	set_vector(D3DXHANDLE param, int count, float *vector);
+	void    	set_float(D3DXHANDLE param, float value);
+	void    	set_int(D3DXHANDLE param, int value);
+	void    	set_matrix(D3DXHANDLE param, matrix *matrix);
+	void    	set_texture(D3DXHANDLE param, texture *tex);
+
+	D3DXHANDLE	get_parameter(D3DXHANDLE param, const char *name);
+
+	ULONG   	release();
+
+	bool		is_valid() { return m_valid; }
+
+private:
+	uniform		*m_uniforms;
+	ID3DXEffect *m_effect;
+	bool		m_valid;
+};
+
 class render_target;
 class cache_target;
 class renderer;
@@ -207,14 +302,14 @@ private:
 
 	// Shader passes
 	void					ntsc_pass(render_target *rt, texture_info *texture, vec2f &texsize, vec2f &delta);
-	void 					color_convolution_pass(render_target *rt, texture_info *texture, vec2f &texsize, vec2f &delta, vec2f &rawdims);
-	void 					prescale_pass(render_target *rt, texture_info *texture, vec2f &texsize, vec2f &delta, vec2f &rawdims);
-	void 					deconverge_pass(render_target *rt, texture_info *texture, vec2f &texsize, vec2f &delta, vec2f &rawdims);
-	void 					defocus_pass(render_target *rt, texture_info *texture, vec2f &texsize, vec2f &delta, vec2f &rawdims);
-	void 					phosphor_pass(render_target *rt, cache_target *ct, texture_info *texture, vec2f &texsize, vec2f &delta, vec2f &rawdims, bool focus_enable);
-	void 					screen_post_pass(render_target *rt, texture_info *texture, vec2f &texsize, vec2f &delta, vec2f &rawdims, poly_info *poly, int vertnum);
-	void 					avi_post_pass(render_target *rt, texture_info *texture, vec2f &texsize, vec2f &delta, vec2f &rawdims, poly_info *poly, int vertnum);
-	void 					raster_bloom_pass(render_target *rt, texture_info *texture, vec2f &texsize, vec2f &delta, vec2f &rawdims, poly_info *poly, int vertnum);
+	void 					color_convolution_pass(render_target *rt, texture_info *texture, vec2f &texsize, vec2f &delta, vec2f &sourcedims);
+	void 					prescale_pass(render_target *rt, texture_info *texture, vec2f &texsize, vec2f &delta, vec2f &sourcedims);
+	void 					deconverge_pass(render_target *rt, texture_info *texture, vec2f &texsize, vec2f &delta, vec2f &sourcedims);
+	void 					defocus_pass(render_target *rt, texture_info *texture, vec2f &texsize, vec2f &delta);
+	void 					phosphor_pass(render_target *rt, cache_target *ct, texture_info *texture, vec2f &texsize, vec2f &delta, bool focus_enable);
+	void 					screen_post_pass(render_target *rt, texture_info *texture, vec2f &texsize, vec2f &delta, vec2f &sourcedims, poly_info *poly, int vertnum);
+	void 					avi_post_pass(render_target *rt, texture_info *texture, vec2f &texsize, vec2f &delta, poly_info *poly, int vertnum);
+	void 					raster_bloom_pass(render_target *rt, texture_info *texture, vec2f &texsize, vec2f &delta, poly_info *poly, int vertnum);
 
 	base *                  d3dintf;                    // D3D interface
 	win_window_info *       window;                     // D3D window info
@@ -271,7 +366,6 @@ private:
 	effect *                default_effect;             // pointer to the primary-effect object
 	effect *                prescale_effect;            // pointer to the prescale-effect object
 	effect *                post_effect;                // pointer to the post-effect object
-	effect *                pincushion_effect;          // pointer to the pincushion-effect object
 	effect *                focus_effect;               // pointer to the focus-effect object
 	effect *                phosphor_effect;            // pointer to the phosphor-effect object
 	effect *                deconverge_effect;          // pointer to the deconvergence-effect object

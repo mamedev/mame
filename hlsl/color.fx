@@ -45,8 +45,7 @@ struct PS_INPUT
 //-----------------------------------------------------------------------------
 
 uniform float2 ScreenDims;
-
-uniform float2 RawDims;
+uniform float2 SourceDims;
 
 uniform float YIQEnable;
 
@@ -54,7 +53,7 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 {
 	VS_OUTPUT Output = (VS_OUTPUT)0;
 	
-	float2 invDims = 1.0f / RawDims;
+	float2 invDims = 1.0f / SourceDims;
 	Output.Position = float4(Input.Position.xyz, 1.0f);
 	Output.Position.xy /= ScreenDims;
 	Output.Position.y = 1.0f - Output.Position.y;

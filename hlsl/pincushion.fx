@@ -92,17 +92,14 @@ uniform float PI = 3.14159265f;
 uniform float PincushionAmountX = 0.1f;
 uniform float PincushionAmountY = 0.1f;
 
-uniform float WidthRatio;
-uniform float HeightRatio;
+uniform float2 ActiveArea;
 
 float4 ps_main(PS_INPUT Input) : COLOR
 {
-	float2 Ratios = float2(WidthRatio, HeightRatio);
-
 	// -- Screen Pincushion Calculation --
-	float2 UnitCoord = Input.TexCoord * Ratios * 2.0f - 1.0f;
+	float2 UnitCoord = Input.TexCoord * ActiveArea * 2.0f - 1.0f;
 
-	float PincushionR2 = pow(length(UnitCoord),2.0f) / pow(length(Ratios), 2.0f);
+	float PincushionR2 = pow(length(UnitCoord),2.0f) / pow(length(ActiveArea), 2.0f);
 	float2 PincushionCurve = UnitCoord * PincushionAmountX * PincushionR2;
 	float2 BaseCoord = Input.TexCoord + PincushionCurve;
 

@@ -59,9 +59,9 @@ struct PS_INPUT
 
 uniform float2 ScreenDims;
 
-uniform float2 RawDims;
+uniform float2 SourceDims;
 
-uniform float2 SizeRatio;
+uniform float2 SourceRect;
 
 VS_OUTPUT vs_main(VS_INPUT Input)
 {
@@ -73,7 +73,7 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	Output.Position.xy -= 0.5f;
 	Output.Position *= float4(2.0f, 2.0f, 1.0f, 1.0f);
 	Output.Color = Input.Color;
-	Output.TexCoord = Input.TexCoord + 0.5f / RawDims;
+	Output.TexCoord = Input.TexCoord + 0.5f / SourceDims;
 
 	return Output;
 }
@@ -110,7 +110,7 @@ uniform float3 Floor = float3(0.0f, 0.0f, 0.0f);
 
 float4 ps_main(PS_INPUT Input) : COLOR
 {
-	float2 Ratios = 1.0f / SizeRatio;
+	float2 Ratios = 1.0f / SourceRect;
 
 	// -- Screen Pincushion Calculation --
 	float2 PinUnitCoord = Input.TexCoord * Ratios * 2.0f - 1.0f;
@@ -145,12 +145,12 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float4 BaseTexel = tex2D(DiffuseSampler, BaseCoord);
 
 	// -- Alpha Clipping (1px border in drawd3d does not work for some reason) --
-	clip((BaseCoord < 1.0f / RawDims) ? -1 : 1);
-	clip((BaseCoord > (SizeRatio + 1.0f / RawDims)) ? -1 : 1);
+	clip((BaseCoord < 1.0f / SourceDims) ? -1 : 1);
+	clip((BaseCoord > (SourceRect + 1.0f / SourceDims)) ? -1 : 1);
 
 	// -- Scanline Simulation --
-	float InnerSine = ScanCoord.y * RawDims.y * ScanlineScale;
-	float ScanBrightMod = sin(InnerSine * PI + ScanlineOffset * RawDims.y);
+	float InnerSine = ScanCoord.y * SourceDims.y * ScanlineScale;
+	float ScanBrightMod = sin(InnerSine * PI + ScanlineOffset * SourceDims.y);
 	float3 ScanBrightness = lerp(1.0f, (pow(ScanBrightMod * ScanBrightMod, ScanlineHeight) * ScanlineBrightScale + 1.0f) * 0.5f, ScanlineAmount);
 	float3 Scanned = BaseTexel.rgb * ScanBrightness;
 

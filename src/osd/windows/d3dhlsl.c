@@ -50,6 +50,7 @@
 // standard windows headers
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#include <tchar.h>
 #include <mmsystem.h>
 #include <d3d9.h>
 #include <d3dx9.h>
@@ -74,6 +75,7 @@
 #include "config.h"
 #include "d3dcomm.h"
 #include "drawd3d.h"
+#include "strconv.h"
 
 
 
@@ -189,6 +191,12 @@ hlsl_options shaders::s_hlsl_presets[4] =
 static void get_vector(const char *data, int count, float *out, int report_error);
 
 
+//============================================================
+//  TYPE DEFINITIONS
+//============================================================
+
+typedef HRESULT (WINAPI *direct3dx9_loadeffect_ptr)(LPDIRECT3DDEVICE9 pDevice, LPCTSTR pSrcFile, const D3DXMACRO *pDefines, LPD3DXINCLUDE pInclude, DWORD Flags, LPD3DXEFFECTPOOL pPool, LPD3DXEFFECT *ppEffect, LPD3DXBUFFER *ppCompilationErrors);
+static direct3dx9_loadeffect_ptr g_load_effect = NULL;
 
 //============================================================
 //  shader manager constructor
@@ -717,7 +725,6 @@ void shaders::set_texture(texture_info *texture)
 		yiq_encode_effect->set_texture("Diffuse", (texture == NULL) ? default_texture->get_finaltex() : texture->get_finaltex());
 	else
 		color_effect->set_texture("Diffuse", (texture == NULL) ? default_texture->get_finaltex() : texture->get_finaltex());
-	pincushion_effect->set_texture("Diffuse", (texture == NULL) ? default_texture->get_finaltex() : texture->get_finaltex());
 }
 
 
@@ -729,6 +736,14 @@ void shaders::init(base *d3dintf, win_window_info *window)
 {
 	if (!d3dintf->post_fx_available)
 		return;
+
+	g_load_effect = (direct3dx9_loadeffect_ptr)GetProcAddress(d3dintf->libhandle, "D3DXCreateEffectFromFileW");
+	if (g_load_effect == NULL)
+	{
+		printf("Direct3D: Unable to find D3DXCreateEffectFromFileW\n");
+		d3dintf->post_fx_available = false;
+		return;
+	}
 
 	this->d3dintf = d3dintf;
 	this->window = window;
@@ -970,7 +985,6 @@ int shaders::create_resources(bool reset)
 	default_effect = new effect(d3d->get_device(), "primary.fx", fx_dir);
 	post_effect = new effect(d3d->get_device(), "post.fx", fx_dir);
 	prescale_effect = new effect(d3d->get_device(), "prescale.fx", fx_dir);
-	pincushion_effect = new effect(d3d->get_device(), "pincushion.fx", fx_dir);
 	phosphor_effect = new effect(d3d->get_device(), "phosphor.fx", fx_dir);
 	focus_effect = new effect(d3d->get_device(), "focus.fx", fx_dir);
 	deconverge_effect = new effect(d3d->get_device(), "deconverge.fx", fx_dir);
@@ -984,7 +998,6 @@ int shaders::create_resources(bool reset)
 	if (!default_effect->is_valid()) return 1;
 	if (!post_effect->is_valid()) return 1;
 	if (!prescale_effect->is_valid()) return 1;
-	if (!pincushion_effect->is_valid()) return 1;
 	if (!phosphor_effect->is_valid()) return 1;
 	if (!focus_effect->is_valid()) return 1;
 	if (!deconverge_effect->is_valid()) return 1;
@@ -1016,7 +1029,6 @@ void shaders::begin_draw()
 
 	default_effect->set_technique("TestTechnique");
 	post_effect->set_technique("ScanMaskTechnique");
-	pincushion_effect->set_technique("TestTechnique");
 	phosphor_effect->set_technique("TestTechnique");
 	focus_effect->set_technique("TestTechnique");
 	deconverge_effect->set_technique("DeconvergeTechnique");
@@ -1104,8 +1116,6 @@ void shaders::blit(surface *dst, texture *src, surface *new_dst, D3DPRIMITIVETYP
 
 	vec2f screendims = d3d->get_dims();
 	curr_effect->set_vector("ScreenDims", 2, &screendims.c.x);
-	curr_effect->set_float("ScreenWidth", (float)d3d->get_width());
-	curr_effect->set_float("ScreenHeight", (float)d3d->get_height());
 	curr_effect->set_float("PostPass", 1.0f);
 	curr_effect->set_float("PincushionAmount", options->pincushion);
 	curr_effect->set_float("Brighten", 1.0f);
@@ -1193,11 +1203,7 @@ void shaders::init_effect_info(poly_info *poly)
 		shadow_dims.c.y = 1.0f;
 	}
 
-	if(PRIMFLAG_GET_TEXSHADE(d3d->get_last_texture_flags()))
-	{
-		curr_effect = pincushion_effect;
-	}
-	else if(PRIMFLAG_GET_SCREENTEX(d3d->get_last_texture_flags()) && texture != NULL)
+	if(PRIMFLAG_GET_SCREENTEX(d3d->get_last_texture_flags()) && texture != NULL)
 	{
 		// Plug in all of the shader settings we're going to need
 		// This is extremely slow, but we're not rendering models here,
@@ -1209,8 +1215,8 @@ void shaders::init_effect_info(poly_info *poly)
 		if(options->params_dirty)
 		{
 			vec2f delta = texture->get_uvstop() - texture->get_uvstart();
-			curr_effect->set_vector("RawDims", 2, &texture->get_rawdims().c.x);
-			curr_effect->set_vector("SizeRatio", 2, &delta.c.x);
+			curr_effect->set_vector("SourceDims", 2, &texture->get_rawdims().c.x);
+			curr_effect->set_vector("SourceRect", 2, &delta.c.x);
 			vec2f screendims = d3d->get_dims();
 			curr_effect->set_vector("ScreenDims", 2, &screendims.c.x);
 			curr_effect->set_vector("Floor", 3, options->floor);
@@ -1299,10 +1305,12 @@ cache_target* shaders::find_cache_target(UINT32 screen_index, int width, int hei
 	return curr;
 }
 
-void shaders::ntsc_pass(render_target *rt, texture_info *texture, vec2f &texsize, vec2f &delta)
+void shaders::ntsc_pass(render_target *rt, texture_info *texture, vec2f &sourcedims, vec2f &activearea)
 {
 	renderer *d3d = (renderer *)window->drawdata;
 	UINT num_passes = 0;
+
+	vec2f screendims = d3d->get_dims();
 
 	if(options->yiq_enable)
 	{
@@ -1311,11 +1319,9 @@ void shaders::ntsc_pass(render_target *rt, texture_info *texture, vec2f &texsize
 
 		if(options->params_dirty)
 		{
-			curr_effect->set_vector("RawDims", 2, &texsize.c.x);
-			curr_effect->set_float("WidthRatio", 1.0f / delta.c.x);
-			curr_effect->set_float("HeightRatio", 1.0f / delta.c.y);
-			curr_effect->set_float("ScreenWidth", d3d->get_width());
-			curr_effect->set_float("ScreenHeight", d3d->get_height());
+			curr_effect->set_vector("SourceDims", 2, &sourcedims.c.x);
+			curr_effect->set_vector("SourceRect", 2, &activearea.c.x);
+			curr_effect->set_vector("ScreenDims", 2, &screendims.c.x);
 
 			curr_effect->set_float("CCValue", options->yiq_cc);
 			curr_effect->set_float("AValue", options->yiq_a);
@@ -1354,11 +1360,9 @@ void shaders::ntsc_pass(render_target *rt, texture_info *texture, vec2f &texsize
 		curr_effect->set_texture("Diffuse", texture->get_finaltex());
 		if(true)//options->params_dirty)
 		{
-			curr_effect->set_vector("RawDims", 2, &texsize.c.x);
-			curr_effect->set_float("WidthRatio", 1.0f / delta.c.x);
-			curr_effect->set_float("HeightRatio", 1.0f / delta.c.y);
-			curr_effect->set_float("ScreenWidth", d3d->get_width());
-			curr_effect->set_float("ScreenHeight", d3d->get_height());
+			curr_effect->set_vector("ScreenDims", 2, &screendims.c.x);
+			curr_effect->set_vector("SourceDims", 2, &sourcedims.c.x);
+			curr_effect->set_vector("SourceRect", 2, &activearea.c.x);
 
 			curr_effect->set_float("CCValue", options->yiq_cc);
 			curr_effect->set_float("AValue", options->yiq_a);
@@ -1397,7 +1401,7 @@ void shaders::ntsc_pass(render_target *rt, texture_info *texture, vec2f &texsize
 	}
 }
 
-void shaders::color_convolution_pass(render_target *rt, texture_info *texture, vec2f &texsize, vec2f &delta, vec2f &rawdims)
+void shaders::color_convolution_pass(render_target *rt, texture_info *texture, vec2f &texsize, vec2f &delta, vec2f &sourcedims)
 {
 	renderer *d3d = (renderer *)window->drawdata;
 	UINT num_passes = 0;
@@ -1407,7 +1411,7 @@ void shaders::color_convolution_pass(render_target *rt, texture_info *texture, v
 	// Render the initial color-convolution pass
 	if(options->params_dirty)
 	{
-		curr_effect->set_vector("RawDims", 2, &rawdims.c.x);
+		curr_effect->set_vector("SourceDims", 2, &sourcedims.c.x);
 		vec2f screendims = d3d->get_dims();
 		curr_effect->set_vector("ScreenDims", 2, &screendims.c.x);
 
@@ -1440,7 +1444,7 @@ void shaders::color_convolution_pass(render_target *rt, texture_info *texture, v
 	curr_effect->end();
 }
 
-void shaders::prescale_pass(render_target *rt, texture_info *texture, vec2f &texsize, vec2f &delta, vec2f &rawdims)
+void shaders::prescale_pass(render_target *rt, texture_info *texture, vec2f &texsize, vec2f &delta, vec2f &sourcedims)
 {
 	renderer *d3d = (renderer *)window->drawdata;
 	UINT num_passes = 0;
@@ -1452,7 +1456,7 @@ void shaders::prescale_pass(render_target *rt, texture_info *texture, vec2f &tex
 	{
 		vec2f screendims = d3d->get_dims();
 		curr_effect->set_vector("ScreenDims", 2, &screendims.c.x);
-		curr_effect->set_vector("RawDims", 2, &rawdims.c.x);
+		curr_effect->set_vector("SourceDims", 2, &sourcedims.c.x);
 	}
 
 	curr_effect->begin(&num_passes, 0);
@@ -1474,7 +1478,7 @@ void shaders::prescale_pass(render_target *rt, texture_info *texture, vec2f &tex
 	curr_effect->end();
 }
 
-void shaders::deconverge_pass(render_target *rt, texture_info *texture, vec2f &texsize, vec2f &delta, vec2f &rawdims)
+void shaders::deconverge_pass(render_target *rt, texture_info *texture, vec2f &texsize, vec2f &delta, vec2f &sourcedims)
 {
 	renderer *d3d = (renderer *)window->drawdata;
 	UINT num_passes = 0;
@@ -1486,8 +1490,8 @@ void shaders::deconverge_pass(render_target *rt, texture_info *texture, vec2f &t
 	{
 		vec2f screendims = d3d->get_dims();
 		curr_effect->set_vector("ScreenDims", 2, &screendims.c.x);
-		curr_effect->set_vector("RawDims", 2, &rawdims.c.x);
-		curr_effect->set_vector("SizeRatio", 2, &delta.c.x);
+		curr_effect->set_vector("SourceDims", 2, &sourcedims.c.x);
+		curr_effect->set_vector("SourceRect", 2, &delta.c.x);
 		curr_effect->set_vector("ConvergeX", 3, options->converge_x);
 		curr_effect->set_vector("ConvergeY", 3, options->converge_y);
 		curr_effect->set_vector("RadialConvergeX", 3, options->radial_converge_x);
@@ -1513,7 +1517,7 @@ void shaders::deconverge_pass(render_target *rt, texture_info *texture, vec2f &t
 	curr_effect->end();
 }
 
-void shaders::defocus_pass(render_target *rt, texture_info *texture, vec2f &texsize, vec2f &delta, vec2f &rawdims)
+void shaders::defocus_pass(render_target *rt, texture_info *texture, vec2f &texsize, vec2f &delta)
 {
 	renderer *d3d = (renderer *)window->drawdata;
 	UINT num_passes = 0;
@@ -1569,7 +1573,7 @@ void shaders::defocus_pass(render_target *rt, texture_info *texture, vec2f &texs
 	curr_effect->end();
 }
 
-void shaders::phosphor_pass(render_target *rt, cache_target *ct, texture_info *texture, vec2f &texsize, vec2f &delta, vec2f &rawdims, bool focus_enable)
+void shaders::phosphor_pass(render_target *rt, cache_target *ct, texture_info *texture, vec2f &texsize, vec2f &delta, bool focus_enable)
 {
 	renderer *d3d = (renderer *)window->drawdata;
 	UINT num_passes = 0;
@@ -1633,7 +1637,7 @@ void shaders::phosphor_pass(render_target *rt, cache_target *ct, texture_info *t
 	curr_effect->end();
 }
 
-void shaders::avi_post_pass(render_target *rt, texture_info *texture, vec2f &texsize, vec2f &delta, vec2f &rawdims, poly_info *poly, int vertnum)
+void shaders::avi_post_pass(render_target *rt, texture_info *texture, vec2f &texsize, vec2f &delta, poly_info *poly, int vertnum)
 {
 	renderer *d3d = (renderer *)window->drawdata;
 	UINT num_passes = 0;
@@ -1689,7 +1693,7 @@ void shaders::avi_post_pass(render_target *rt, texture_info *texture, vec2f &tex
 	}
 }
 
-void shaders::screen_post_pass(render_target *rt, texture_info *texture, vec2f &texsize, vec2f &delta, vec2f &rawdims, poly_info *poly, int vertnum)
+void shaders::screen_post_pass(render_target *rt, texture_info *texture, vec2f &texsize, vec2f &delta, vec2f &sourcedims, poly_info *poly, int vertnum)
 {
 	renderer *d3d = (renderer *)window->drawdata;
 	UINT num_passes = 0;
@@ -1697,8 +1701,8 @@ void shaders::screen_post_pass(render_target *rt, texture_info *texture, vec2f &
 	curr_effect = post_effect;
 
 	curr_effect->set_texture("Diffuse", rt->render_texture[0]);
-	curr_effect->set_vector("RawDims", 2, &rawdims.c.x);
-	curr_effect->set_vector("SizeRatio", 2, &delta.c.x);
+	curr_effect->set_vector("SourceDims", 2, &sourcedims.c.x);
+	curr_effect->set_vector("SourceRect", 2, &delta.c.x);
 	vec2f screendims = d3d->get_dims();
 	curr_effect->set_vector("ScreenDims", 2, &screendims.c.x);
 
@@ -1725,7 +1729,7 @@ void shaders::screen_post_pass(render_target *rt, texture_info *texture, vec2f &
 	d3d->set_wrap(PRIMFLAG_GET_TEXWRAP(poly->get_texture()->get_flags()) ? D3DTADDRESS_WRAP : D3DTADDRESS_CLAMP);
 }
 
-void shaders::raster_bloom_pass(render_target *rt, texture_info *texture, vec2f &texsize, vec2f &delta, vec2f &rawdims, poly_info *poly, int vertnum)
+void shaders::raster_bloom_pass(render_target *rt, texture_info *texture, vec2f &texsize, vec2f &delta, poly_info *poly, int vertnum)
 {
 	renderer *d3d = (renderer *)window->drawdata;
 	UINT num_passes = 0;
@@ -1779,12 +1783,9 @@ void shaders::raster_bloom_pass(render_target *rt, texture_info *texture, vec2f 
 	curr_effect = bloom_effect;
 
 	curr_effect->set_vector("TargetSize", 2, &screendims.c.x);
-	float weight0123[4] = { options->bloom_level0_weight, options->bloom_level1_weight,
-							options->bloom_level2_weight, options->bloom_level3_weight };
-	float weight4567[4] = { options->bloom_level4_weight, options->bloom_level5_weight,
-							options->bloom_level6_weight, options->bloom_level7_weight };
-	float weight89A[3] = { options->bloom_level8_weight, options->bloom_level9_weight,
-							options->bloom_level10_weight };
+	float weight0123[4] = { options->bloom_level0_weight, options->bloom_level1_weight, options->bloom_level2_weight, options->bloom_level3_weight };
+	float weight4567[4] = { options->bloom_level4_weight, options->bloom_level5_weight, options->bloom_level6_weight, options->bloom_level7_weight };
+	float weight89A[3]  = { options->bloom_level8_weight, options->bloom_level9_weight, options->bloom_level10_weight };
 	curr_effect->set_vector("Level0123Weight", 4, weight0123);
 	curr_effect->set_vector("Level4567Weight", 4, weight4567);
 	curr_effect->set_vector("Level89AWeight", 3, weight89A);
@@ -1849,25 +1850,26 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 		}
 		cache_target *ct = find_cache_target(rt->screen_index, texture->get_texinfo().width, texture->get_texinfo().height);
 
-		vec2f& rawdims = texture->get_rawdims();
+		vec2f& sourcedims = texture->get_rawdims();
 		vec2f delta = texture->get_uvstop() - texture->get_uvstart();
+		vec2f activearea = vec2f(1.0f / delta.c.x, 1.0f / delta.c.y);
 		vec2f texsize(rt->width, rt->height);
 		float defocus_x = options->defocus[0];
 		float defocus_y = options->defocus[1];
 		bool focus_enable = defocus_x != 0.0f || defocus_y != 0.0f;
 
-		ntsc_pass(rt, texture, texsize, delta);
-		color_convolution_pass(rt, texture, texsize, delta, rawdims);
-		prescale_pass(rt, texture, texsize, delta, rawdims);
-		deconverge_pass(rt, texture, texsize, delta, rawdims);
+		ntsc_pass(rt, texture, sourcedims, activearea);
+		color_convolution_pass(rt, texture, texsize, delta, sourcedims);
+		prescale_pass(rt, texture, texsize, delta, sourcedims);
+		deconverge_pass(rt, texture, texsize, delta, sourcedims);
 		if (focus_enable)
 		{
-			defocus_pass(rt, texture, texsize, delta, rawdims);
+			defocus_pass(rt, texture, texsize, delta);
 		}
-		phosphor_pass(rt, ct, texture, texsize, delta, rawdims, focus_enable);
-		avi_post_pass(rt, texture, texsize, delta, rawdims, poly, vertnum);
-		screen_post_pass(rt, texture, texsize, delta, rawdims, poly, vertnum);
-		raster_bloom_pass(rt, texture, texsize, delta, rawdims, poly, vertnum);
+		phosphor_pass(rt, ct, texture, texsize, delta, focus_enable);
+		avi_post_pass(rt, texture, texsize, delta, poly, vertnum);
+		screen_post_pass(rt, texture, texsize, delta, sourcedims, poly, vertnum);
+		raster_bloom_pass(rt, texture, texsize, delta, poly, vertnum);
 
 		texture->increment_frame_count();
 		texture->mask_frame_count(options->yiq_phase_count);
@@ -2135,7 +2137,6 @@ bool shaders::register_prescaled_texture(texture_info *texture)
 //============================================================
 bool shaders::add_cache_target(renderer* d3d, texture_info* info, int width, int height, int xprescale, int yprescale, int screen_index)
 {
-	printf("Adding cache target\n");
 	cache_target* target = (cache_target*)global_alloc_clear(cache_target);
 
 	if (!target->init(d3d, d3dintf, width, height, xprescale, yprescale))
@@ -2391,11 +2392,6 @@ void shaders::delete_resources(bool reset)
 	{
 		delete prescale_effect;
 		prescale_effect = NULL;
-	}
-	if (pincushion_effect != NULL)
-	{
-		delete pincushion_effect;
-		pincushion_effect = NULL;
 	}
 	if (phosphor_effect != NULL)
 	{
@@ -3041,6 +3037,228 @@ slider_state *shaders::init_slider_list()
 	}
 
 	return listhead;
+}
+
+//============================================================
+//  uniform functions
+//============================================================
+
+uniform::uniform(effect *shader, const char *name, uniform_type type)
+{
+	m_shader = shader;
+	m_type = type;
+	m_next = NULL;
+	m_handle = m_shader->get_parameter(NULL, name);
+	m_ival = 0;
+	memset(m_vec, 0, sizeof(float) * 4);
+	m_mval = NULL;
+	m_texture = NULL;
+
+	switch (type)
+	{
+	case UT_INT:
+	case UT_FLOAT:
+	case UT_MATRIX:
+	case UT_SAMPLER:
+		m_count = 1;
+		break;
+	case UT_VEC2:
+		m_count = 2;
+		break;
+	case UT_VEC3:
+		m_count = 3;
+		break;
+	case UT_VEC4:
+		m_count = 4;
+		break;
+	default:
+		m_count = 1;
+		break;
+	}
+}
+
+void uniform::set_next(uniform *next)
+{
+	next->set_next(m_next);
+	m_next = next;
+}
+
+void uniform::set(float x, float y, float z, float w)
+{
+	m_vec[0] = x;
+	m_vec[1] = y;
+	m_vec[2] = z;
+	m_vec[3] = w;
+}
+
+void uniform::set(float x, float y, float z)
+{
+	m_vec[0] = x;
+	m_vec[1] = y;
+	m_vec[2] = z;
+}
+
+void uniform::set(float x, float y)
+{
+	m_vec[0] = x;
+	m_vec[1] = y;
+}
+
+void uniform::set(float x)
+{
+	m_vec[0] = x;
+}
+
+void uniform::set(int x)
+{
+	m_ival = x;
+}
+
+void uniform::set(matrix *mat)
+{
+	m_mval = mat;
+}
+
+void uniform::set(texture *tex)
+{
+	m_texture = tex;
+}
+
+void uniform::upload()
+{
+	switch(m_type)
+	{
+		case UT_INT:
+			m_shader->set_int(m_handle, m_ival);
+			break;
+		case UT_FLOAT:
+			m_shader->set_float(m_handle, m_vec[0]);
+			break;
+		case UT_VEC2:
+		case UT_VEC3:
+		case UT_VEC4:
+			m_shader->set_vector(m_handle, m_count, m_vec);
+			break;
+		case UT_MATRIX:
+			m_shader->set_matrix(m_handle, m_mval);
+			break;
+		case UT_SAMPLER:
+			m_shader->set_texture(m_handle, m_texture);
+			break;
+	}
+}
+
+//============================================================
+//  effect functions
+//============================================================
+
+effect::effect(device *dev, const char *name, const char *path)
+{
+	IDirect3DDevice9 *device = (IDirect3DDevice9 *)dev;
+	LPD3DXBUFFER buffer_errors = NULL;
+
+	m_uniforms = NULL;
+	m_effect = NULL;
+	m_valid = false;
+
+	char name_cstr[1024];
+	sprintf(name_cstr, "%s\\%s", path, name);
+	TCHAR *effect_name = tstring_from_utf8(name_cstr);
+
+	HRESULT hr = (*g_load_effect)(device, effect_name, NULL, NULL, 0, NULL, &m_effect, &buffer_errors);
+	if(FAILED(hr))
+	{
+		if(buffer_errors != NULL)
+		{
+			LPVOID compile_errors = buffer_errors->GetBufferPointer();
+			printf("Unable to compile shader: %s\n", (const char*)compile_errors); fflush(stdout);
+		}
+		else
+		{
+			printf("Unable to compile shader (unspecified reason)\n"); fflush(stdout);
+		}
+	}
+	else
+	{
+		m_valid = true;
+	}
+
+	osd_free(effect_name);
+}
+
+effect::~effect()
+{
+	m_effect->Release();
+	m_effect = NULL;
+}
+
+void effect::begin(UINT *passes, DWORD flags)
+{
+	m_effect->Begin(passes, flags);
+}
+
+void effect::end()
+{
+	m_effect->End();
+}
+
+void effect::begin_pass(UINT pass)
+{
+	m_effect->BeginPass(pass);
+}
+
+void effect::end_pass()
+{
+	m_effect->EndPass();
+}
+
+void effect::set_technique(const char *name)
+{
+	m_effect->SetTechnique(name);
+}
+
+void effect::set_vector(D3DXHANDLE param, int count, float *vector)
+{
+	static D3DXVECTOR4 out_vector;
+	if (count > 0)
+		out_vector.x = vector[0];
+	if (count > 1)
+		out_vector.y = vector[1];
+	if (count > 2)
+		out_vector.z = vector[2];
+	if (count > 3)
+		out_vector.w = vector[3];
+	m_effect->SetVector(param, &out_vector);
+}
+
+void effect::set_float(D3DXHANDLE param, float value)
+{
+	m_effect->SetFloat(param, value);
+}
+
+void effect::set_int(D3DXHANDLE param, int value)
+{
+	m_effect->SetInt(param, value);
+}
+
+void effect::set_matrix(D3DXHANDLE param, matrix *matrix)
+{
+	m_effect->SetMatrix(param, (D3DXMATRIX*)matrix);
+}
+
+void effect::set_texture(D3DXHANDLE param, texture *tex)
+{
+	m_effect->SetTexture(param, (IDirect3DTexture9*)tex);
+}
+
+D3DXHANDLE effect::get_parameter(D3DXHANDLE param, const char *name)
+{
+	return m_effect->GetParameterByName(param, name);
+}
+
+ULONG effect::release()
+{
+	return m_effect->Release();
 }
 
 };
