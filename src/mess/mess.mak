@@ -2553,7 +2553,6 @@ $(MESS_DRIVERS)/fidelz80.o: $(MESS_LAYOUT)/fidelz80.lh \
 							$(MESS_LAYOUT)/vsc.lh
 $(MESS_DRIVERS)/glasgow.o:  $(MESS_LAYOUT)/glasgow.lh
 $(MESS_DRIVERS)/h8.o:       $(MESS_LAYOUT)/h8.lh
-$(MESS_DRIVERS)/ics8080.o:  $(MESS_LAYOUT)/ics8080.lh
 $(MESS_DRIVERS)/instruct.o: $(MESS_LAYOUT)/instruct.lh
 $(MESS_DRIVERS)/k1003.o:    $(MESS_LAYOUT)/k1003.lh
 $(MESS_DRIVERS)/kim1.o:     $(MESS_LAYOUT)/kim1.lh
