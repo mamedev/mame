@@ -225,7 +225,7 @@ UINT8 c64_sfx_sound_expander_cartridge_device::c64_cd_r(address_space &space, of
 {
 	data = m_exp->cd_r(space, get_offset(offset, 1), data, sphi2, ba, roml, romh, io1, io2);
 
-	if (!io2)
+	if (!io2 && sphi2)
 	{
 		if (BIT(offset, 3))
 		{
@@ -241,7 +241,8 @@ UINT8 c64_sfx_sound_expander_cartridge_device::c64_cd_r(address_space &space, of
 			case 7: data = m_kb7->read(); break;
 			}
 		}
-		else if (BIT(offset, 5))
+
+		if (BIT(offset, 5))
 		{
 			data = m_opl->read(space, BIT(offset, 4));
 		}
@@ -257,7 +258,7 @@ UINT8 c64_sfx_sound_expander_cartridge_device::c64_cd_r(address_space &space, of
 
 void c64_sfx_sound_expander_cartridge_device::c64_cd_w(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
-	if (!io2 && BIT(offset, 5))
+	if (!io2 && sphi2)
 	{
 		m_opl->write(space, BIT(offset, 4), data);
 	}
