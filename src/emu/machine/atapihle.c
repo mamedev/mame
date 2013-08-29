@@ -14,10 +14,10 @@ void atapi_hle_device::process_buffer()
 	{
 		int phase;
 
-	//  printf( "atapi command %02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x\n",
-	//      m_buffer[0],m_buffer[1],m_buffer[2],m_buffer[3],
-	//      m_buffer[4],m_buffer[5],m_buffer[6],m_buffer[7],
-	//      m_buffer[8],m_buffer[9],m_buffer[10],m_buffer[11]);
+		//printf( "atapi command %02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x\n",
+		//    m_buffer[0],m_buffer[1],m_buffer[2],m_buffer[3],
+		//    m_buffer[4],m_buffer[5],m_buffer[6],m_buffer[7],
+		//    m_buffer[8],m_buffer[9],m_buffer[10],m_buffer[11]);
 
 		m_error = 0; // HACK: This might not be the right place, but firebeat needs this cleared at some point
 
@@ -29,7 +29,7 @@ void atapi_hle_device::process_buffer()
 		if (m_buffer_size == 0xffff)
 			m_buffer_size = 0xfffe;
 
-	//  printf("atapi result %08x %08x\n", m_data_size, m_buffer_size);
+		//printf("atapi result %08x %08x\n", m_data_size, m_buffer_size);
 
 		if (m_buffer_size > ATAPI_BUFFER_LENGTH || m_buffer_size == 0)
 			m_buffer_size = ATAPI_BUFFER_LENGTH;
@@ -55,6 +55,8 @@ void atapi_hle_device::process_buffer()
 			{
 				m_sector_count = ATAPI_INTERRUPT_REASON_IO | ATAPI_INTERRUPT_REASON_CD;
 			}
+
+			set_irq(ASSERT_LINE);
 			break;
 
 		case SCSI_PHASE_DATAIN:
@@ -63,11 +65,12 @@ void atapi_hle_device::process_buffer()
 			break;
 
 		default:
+			m_cylinder_low = 0;
+			m_cylinder_high = 0;
 			m_sector_count = ATAPI_INTERRUPT_REASON_IO | ATAPI_INTERRUPT_REASON_CD;
+			set_irq(ASSERT_LINE);
 			break;
 		}
-
-		set_irq(ASSERT_LINE);
 
 		m_packet = 0;
 	}
@@ -133,6 +136,9 @@ void atapi_hle_device::fill_buffer()
 		break;
 
 	case IDE_COMMAND_IDENTIFY_PACKET_DEVICE:
+		m_cylinder_low = 0;
+		m_cylinder_high = 0;
+
 		m_sector_count = ATAPI_INTERRUPT_REASON_IO | ATAPI_INTERRUPT_REASON_CD;
 		set_irq(ASSERT_LINE);
 		break;
@@ -160,18 +166,49 @@ void atapi_hle_device::process_command()
 		soft_reset();
 		break;
 
+	case IDE_COMMAND_SET_FEATURES:
+		//printf("IDE Set features (%02X %02X %02X %02X %02X)\n", m_feature, m_sector_count & 0xff, m_sector_number, m_cylinder_low, m_cylinder_high);
+		set_irq(ASSERT_LINE);
+		break;
+
 	case IDE_COMMAND_PACKET:
 		m_packet = 1;
-		m_buffer_size = 12;
+
+		if (packet_command_length() == PACKET_COMMAND_LENGTH_16)
+		{
+			m_buffer_size = 16;
+		}
+		else
+		{
+			m_buffer_size = 12;
+		}
+
 		m_status |= IDE_STATUS_DRQ;
 		m_sector_count = ATAPI_INTERRUPT_REASON_CD;
-		set_irq(ASSERT_LINE);
+
+		if (packet_command_response() == PACKET_COMMAND_RESPONSE_INTRQ)
+		{
+			set_irq(ASSERT_LINE);
+		}
 		break;
 
 	case IDE_COMMAND_IDENTIFY_PACKET_DEVICE:
 		identify_packet_device();
 
+		for( int w = 0; w < 256; w++ )
+		{
+			m_buffer[w * 2] = m_identify_buffer[ w ] & 0xff;
+			m_buffer[(w * 2) + 1] = m_identify_buffer[ w ] >> 8;
+		}
+
+		m_buffer_size = 512;
+
+		m_error = 0;
+		m_cylinder_low = m_buffer_size & 0xff;
+		m_cylinder_high = m_buffer_size >> 8;
+
 		m_status |= IDE_STATUS_DRQ;
+		m_sector_count = ATAPI_INTERRUPT_REASON_IO;
 		set_irq(ASSERT_LINE);
 		break;
 
@@ -197,4 +234,14 @@ void atapi_hle_device::finished_command()
 		ata_hle_device::finished_command();
 		break;
 	}
+}
+
+atapi_hle_device::packet_command_length_t atapi_hle_device::packet_command_length()
+{
+	return (packet_command_length_t) (m_identify_buffer[0] & 3);
+}
+
+atapi_hle_device::packet_command_response_t atapi_hle_device::packet_command_response()
+{
+	return (packet_command_response_t) ((m_identify_buffer[0] >> 5 ) & 3);
 }

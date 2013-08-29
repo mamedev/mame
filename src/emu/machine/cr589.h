@@ -1,10 +1,27 @@
+/***************************************************************************
+
+    cr589.h
+
+    Matsushita CR589
+
+    Copyright Nicola Salmoria and the MAME Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
+
+***************************************************************************/
+
+#pragma once
+
+#ifndef __CR589_H__
+#define __CR589_H__
+
+#include "atapihle.h"
 #include "scsicd.h"
 
-class cr589_device : public scsicd_device
+class scsi_cr589_device : public scsicd_device
 {
 public:
 	// construction/destruction
-	cr589_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	scsi_cr589_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual void ExecCommand( int *transferLength );
 	virtual void WriteData( UINT8 *data, int dataLength );
@@ -21,4 +38,23 @@ private:
 };
 
 // device type definition
+extern const device_type SCSI_CR589;
+
+class matsushita_cr589_device : public atapi_hle_device
+{
+public:
+	matsushita_cr589_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	// device-level overrides
+	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start();
+
+	virtual void perform_diagnostic();
+	virtual void identify_packet_device();
+};
+
+// device type definition
 extern const device_type CR589;
+
+#endif

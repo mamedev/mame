@@ -20,7 +20,6 @@
   Note 4: Some games require you to press f2 to skip the rtc cleared note.
 
   TODO:
-  * integrate ATAPI code with Aaron's ATA/IDE code
   * emulate memory card board GE885-PWB(A)A ( contains Toshiba tmpr3904af, ram, rom, tranceiver and glue ).
 
   -----------------------------------------------------------------------------------------
@@ -483,6 +482,7 @@ G: gun mania only, drives air soft gun (this game uses real BB bullet)
 #include "cdrom.h"
 #include "cpu/psx/psx.h"
 #include "machine/adc083x.h"
+#include "machine/ataintf.h"
 #include "machine/bankdev.h"
 #include "machine/cr589.h"
 #include "machine/ds2401.h"
@@ -500,33 +500,6 @@ G: gun mania only, drives air soft gun (this game uses real BB bullet)
 
 #define ATAPI_CYCLES_PER_SECTOR (5000)  // plenty of time to allow DMA setup etc.  BIOS requires this be at least 2000, individual games may vary.
 
-#define ATAPI_STAT_BSY     0x80
-#define ATAPI_STAT_DRDY    0x40
-#define ATAPI_STAT_DMARDDF 0x20
-#define ATAPI_STAT_SERVDSC 0x10
-#define ATAPI_STAT_DRQ     0x08
-#define ATAPI_STAT_CORR    0x04
-#define ATAPI_STAT_CHECK   0x01
-
-#define ATAPI_INTREASON_COMMAND 0x01
-#define ATAPI_INTREASON_IO      0x02
-#define ATAPI_INTREASON_RELEASE 0x04
-
-#define ATAPI_REG_DATA      0
-#define ATAPI_REG_ERRFEAT   1
-#define ATAPI_REG_INTREASON 2
-#define ATAPI_REG_SAMTAG    3
-#define ATAPI_REG_COUNTLOW  4
-#define ATAPI_REG_COUNTHIGH 5
-#define ATAPI_REG_DRIVESEL  6
-#define ATAPI_REG_CMDSTATUS 7
-#define ATAPI_REG_MAX 16
-
-#define ATAPI_DATA_SIZE ( 64 * 1024 )
-
-#define MAX_TRANSFER_SIZE ( 63488 )
-
-
 class ksys573_state : public driver_device
 {
 public:
@@ -538,7 +511,7 @@ public:
 		m_analog3(*this, "analog3"),
 		m_pads(*this, "PADS"),
 		m_psxirq(*this, ":maincpu:irq"),
-		m_cr589(*this, ":cdrom"),
+		m_ata(*this, "ata"),
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, "maincpu:ram"),
 		m_flashbank(*this, "flashbank"),
@@ -561,8 +534,6 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(gunmania_cable_holder_sensor);
 	DECLARE_READ16_MEMBER(control_r);
 	DECLARE_WRITE16_MEMBER(control_w);
-	DECLARE_READ16_MEMBER(atapi_r);
-	DECLARE_WRITE16_MEMBER(atapi_w);
 	DECLARE_WRITE16_MEMBER(atapi_reset_w);
 	DECLARE_WRITE16_MEMBER(security_w);
 	DECLARE_READ16_MEMBER(security_r);
@@ -601,6 +572,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(hyperbbc_lamp_strobe1);
 	DECLARE_WRITE_LINE_MEMBER(hyperbbc_lamp_strobe2);
 	DECLARE_WRITE_LINE_MEMBER(hyperbbc_lamp_strobe3);
+	DECLARE_WRITE_LINE_MEMBER(ata_interrupt);
 	TIMER_CALLBACK_MEMBER(atapi_xfer_end);
 	DECLARE_WRITE8_MEMBER(ddr_output_callback);
 	DECLARE_WRITE8_MEMBER(ddrsolo_output_callback);
@@ -624,8 +596,7 @@ protected:
 
 private:
 	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
-	void atapi_init();
-	void update_mode();
+	void update_disc();
 	void gx700pwbf_output( int offset, UINT8 data );
 	void gx700pwfbf_init( void (ksys573_state::*output_callback_func)( address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 data, ATTR_UNUSED UINT8 mem_mask ) );
 	void gn845pwbb_do_w( int offset, int data );
@@ -633,15 +604,11 @@ private:
 
 	required_device<psxirq_device> m_psxirq;
 
-	emu_timer *m_atapi_timer;
-	required_device<scsihle_device> m_cr589;
+	required_device<ata_interface_device> m_ata;
 	cdrom_file *m_available_cdroms[ 2 ];
-	int m_atapi_data_ptr;
-	int m_atapi_data_len;
-	int m_atapi_xferlen;
+	emu_timer *m_atapi_timer;
 	int m_atapi_xferbase;
-	int m_atapi_cdata_wait;
-	int m_atapi_xfermod;
+	int m_atapi_xfersize;
 
 	UINT32 m_control;
 	UINT16 m_n_security_control;
@@ -682,10 +649,6 @@ private:
 
 	UINT32 *m_p_n_psxram;
 
-	/* memory */
-	UINT8 m_atapi_regs[ATAPI_REG_MAX];
-	UINT8 m_atapi_data[ATAPI_DATA_SIZE];
-
 	int m_tank_shutter_position;
 	int m_cable_holder_release;
 
@@ -724,7 +687,7 @@ static ADDRESS_MAP_START( konami573_map, AS_PROGRAM, 32, ksys573_state )
 	AM_RANGE(0x1f400004, 0x1f400007) AM_READ_PORT("IN1")
 	AM_RANGE(0x1f400008, 0x1f40000b) AM_READ_PORT("IN2")
 	AM_RANGE(0x1f40000c, 0x1f40000f) AM_READ_PORT("IN3")
-	AM_RANGE(0x1f480000, 0x1f48000f) AM_READWRITE16(atapi_r, atapi_w, 0xffffffff)    // IDE controller, used mostly in ATAPI mode (only 3 pure IDE commands seen so far)
+	AM_RANGE(0x1f480000, 0x1f48000f) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs0, write_cs0, 0xffffffff)
 	AM_RANGE(0x1f500000, 0x1f500003) AM_READWRITE16(control_r, control_w, 0x0000ffff)    // Konami can't make a game without a "control" register.
 	AM_RANGE(0x1f560000, 0x1f560003) AM_WRITE16(atapi_reset_w, 0x0000ffff)
 	AM_RANGE(0x1f5c0000, 0x1f5c0003) AM_WRITENOP                // watchdog?
@@ -787,454 +750,33 @@ WRITE16_MEMBER(ksys573_state::control_w)
 
 TIMER_CALLBACK_MEMBER(ksys573_state::atapi_xfer_end)
 {
-	UINT32 *p_n_psxram = m_p_n_psxram;
-	int i, n_state;
-	UINT8 sector_buffer[ 4096 ];
+	/// TODO: respect timing of data from ATAPI device.
 
 	m_atapi_timer->adjust(attotime::never);
 
-//  verboselog(2, "atapi_xfer_end( %d ) atapi_xferlen = %d, atapi_xfermod=%d\n", x, atapi_xfermod, atapi_xferlen );
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
-//  mame_printf_debug("ATAPI: xfer_end.  xferlen = %d, atapi_xfermod = %d\n", atapi_xferlen, atapi_xfermod);
-
-	while( m_atapi_xferlen > 0 )
+	while( m_atapi_xfersize > 0 )
 	{
-		// get a sector from the SCSI device
-		m_cr589->ReadData( sector_buffer, 2048 );
-
-		m_atapi_xferlen -= 2048;
-
-		i = 0;
-		n_state = 2048 / 4;
-		while( n_state > 0 )
-		{
-			p_n_psxram[ m_atapi_xferbase / 4 ] =
-				( sector_buffer[ i + 0 ] << 0 ) |
-				( sector_buffer[ i + 1 ] << 8 ) |
-				( sector_buffer[ i + 2 ] << 16 ) |
-				( sector_buffer[ i + 3 ] << 24 );
-			m_atapi_xferbase += 4;
-			i += 4;
-			n_state--;
-		}
-	}
-
-	if (m_atapi_xfermod > MAX_TRANSFER_SIZE)
-	{
-		m_atapi_xferlen = MAX_TRANSFER_SIZE;
-		m_atapi_xfermod = m_atapi_xfermod - MAX_TRANSFER_SIZE;
-	}
-	else
-	{
-		m_atapi_xferlen = m_atapi_xfermod;
-		m_atapi_xfermod = 0;
-	}
-
-
-	if (m_atapi_xferlen > 0)
-	{
-		//mame_printf_debug("ATAPI: starting next piece of multi-part transfer\n");
-		m_atapi_regs[ATAPI_REG_COUNTLOW] = m_atapi_xferlen & 0xff;
-		m_atapi_regs[ATAPI_REG_COUNTHIGH] = (m_atapi_xferlen>>8)&0xff;
-
-		m_atapi_timer->adjust(m_maincpu->cycles_to_attotime((ATAPI_CYCLES_PER_SECTOR * (m_atapi_xferlen/2048))));
-	}
-	else
-	{
-		//mame_printf_debug("ATAPI: Transfer completed, dropping DRQ\n");
-		m_atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRDY;
-		m_atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO | ATAPI_INTREASON_COMMAND;
-	}
-
-	m_psxirq->intin10(1);
-
-	verboselog(2, "atapi_xfer_end: %d %d\n", m_atapi_xferlen, m_atapi_xfermod );
-}
-
-READ16_MEMBER(ksys573_state::atapi_r)
-{
-	int data;
-
-	if (offset == 0 && mem_mask == 0xffff) // word-wide command read
-	{
-//      mame_printf_debug("ATAPI: packet read = %04x\n", atapi_data[atapi_data_ptr]);
-
-		// assert IRQ and drop DRQ
-		if (m_atapi_data_ptr == 0 && m_atapi_data_len == 0)
-		{
-			// get the data from the device
-			if( m_atapi_xferlen > 0 )
-			{
-				m_cr589->ReadData( m_atapi_data, m_atapi_xferlen );
-				m_atapi_data_len = m_atapi_xferlen;
-			}
-
-			if (m_atapi_xfermod > MAX_TRANSFER_SIZE)
-			{
-				m_atapi_xferlen = MAX_TRANSFER_SIZE;
-				m_atapi_xfermod = m_atapi_xfermod - MAX_TRANSFER_SIZE;
-			}
-			else
-			{
-				m_atapi_xferlen = m_atapi_xfermod;
-				m_atapi_xfermod = 0;
-			}
-
-			verboselog(2, "atapi_r: atapi_xferlen=%d\n", m_atapi_xferlen );
-			if( m_atapi_xferlen != 0 )
-			{
-				m_atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ | ATAPI_STAT_SERVDSC;
-				m_atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO;
-			}
-			else
-			{
-				//mame_printf_debug("ATAPI: dropping DRQ\n");
-				m_atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
-				m_atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO;
-			}
-
-			m_atapi_regs[ATAPI_REG_COUNTLOW] = m_atapi_xferlen & 0xff;
-			m_atapi_regs[ATAPI_REG_COUNTHIGH] = (m_atapi_xferlen>>8)&0xff;
-
-			m_psxirq->intin10(1);
-		}
-
-		if( m_atapi_data_ptr < m_atapi_data_len )
-		{
-			data = m_atapi_data[m_atapi_data_ptr++];
-			data |= ( m_atapi_data[m_atapi_data_ptr++] << 8 );
-			if( m_atapi_data_ptr >= m_atapi_data_len )
-			{
-//              verboselog(2, "atapi_r: read all bytes\n" );
-				m_atapi_data_ptr = 0;
-				m_atapi_data_len = 0;
-
-				if( m_atapi_xferlen == 0 )
-				{
-					m_atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
-					m_atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO;
-					m_psxirq->intin10(1);
-				}
-			}
-		}
-		else
-		{
-			data = 0;
-		}
-	}
-	else
-	{
-		data = m_atapi_regs[offset];
-
-		switch( offset )
-		{
-		case ATAPI_REG_DATA:
-			verboselog(1, "atapi_r: data=%02x\n", data );
-			break;
-		case ATAPI_REG_ERRFEAT:
-			verboselog(1, "atapi_r: errfeat=%02x\n", data );
-			break;
-		case ATAPI_REG_INTREASON:
-			verboselog(1, "atapi_r: intreason=%02x\n", data );
-			break;
-		case ATAPI_REG_SAMTAG:
-			verboselog(1, "atapi_r: samtag=%02x\n", data );
-			break;
-		case ATAPI_REG_COUNTLOW:
-			verboselog(1, "atapi_r: countlow=%02x\n", data );
-			break;
-		case ATAPI_REG_COUNTHIGH:
-			verboselog(1, "atapi_r: counthigh=%02x\n", data );
-			break;
-		case ATAPI_REG_DRIVESEL:
-			verboselog(1, "atapi_r: drivesel=%02x\n", data );
-			break;
-		case ATAPI_REG_CMDSTATUS:
-			verboselog(1, "atapi_r: cmdstatus=%02x\n", data );
-			break;
-		}
-
-//      mame_printf_debug("ATAPI: read reg %d = %x (PC=%x)\n", reg, data, m_maincpu->pc());
-	}
-
-	verboselog(2, "atapi_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
-	return data;
-}
-
-WRITE16_MEMBER(ksys573_state::atapi_w)
-{
-	verboselog(2, "atapi_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
-
-	if (offset == 0 && mem_mask == 0xffff) // word-wide command write
-	{
-		verboselog(2, "atapi_w: data=%04x\n", data );
-
-//      mame_printf_debug("ATAPI: packet write %04x\n", data);
-		m_atapi_data[m_atapi_data_ptr++] = data & 0xff;
-		m_atapi_data[m_atapi_data_ptr++] = data >> 8;
-
-		if (m_atapi_cdata_wait)
-		{
-//          mame_printf_debug("ATAPI: waiting, ptr %d wait %d\n", m_atapi_data_ptr, m_atapi_cdata_wait);
-			if (m_atapi_data_ptr == m_atapi_cdata_wait)
-			{
-				// send it to the device
-				m_cr589->WriteData( m_atapi_data, m_atapi_cdata_wait );
-
-				// assert IRQ
-				m_psxirq->intin10(1);
-
-				// not sure here, but clear DRQ at least?
-				m_atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
-			}
-		}
-
-		else if ( m_atapi_data_ptr == 12 )
-		{
-			int phase;
-
-			verboselog(2, "atapi_w: command %02x\n", m_atapi_data[0]&0xff );
-
-			// reset data pointer for reading SCSI results
-			m_atapi_data_ptr = 0;
-			m_atapi_data_len = 0;
-
-			// send it to the SCSI device
-			m_cr589->SetCommand( m_atapi_data, 12 );
-			m_cr589->ExecCommand( &m_atapi_xferlen );
-			m_cr589->GetPhase( &phase );
-
-			if (m_atapi_xferlen != -1)
-			{
-//              mame_printf_debug("ATAPI: SCSI command %02x returned %d bytes from the device\n", m_atapi_data[0]&0xff, m_atapi_xferlen);
-
-				// store the returned command length in the ATAPI regs, splitting into
-				// multiple transfers if necessary
-				m_atapi_xfermod = 0;
-				if (m_atapi_xferlen > MAX_TRANSFER_SIZE)
-				{
-					m_atapi_xfermod = m_atapi_xferlen - MAX_TRANSFER_SIZE;
-					m_atapi_xferlen = MAX_TRANSFER_SIZE;
-				}
-
-				m_atapi_regs[ATAPI_REG_COUNTLOW] = m_atapi_xferlen & 0xff;
-				m_atapi_regs[ATAPI_REG_COUNTHIGH] = (m_atapi_xferlen>>8)&0xff;
-
-				if (m_atapi_xferlen == 0)
-				{
-					// if no data to return, set the registers properly
-					m_atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRDY;
-					m_atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO|ATAPI_INTREASON_COMMAND;
-				}
-				else
-				{
-					// indicate data ready: set DRQ and DMA ready, and IO in INTREASON
-					m_atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ | ATAPI_STAT_SERVDSC;
-					m_atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO;
-				}
-
-				switch( phase )
-				{
-				case SCSI_PHASE_DATAOUT:
-					m_atapi_cdata_wait = m_atapi_xferlen;
-					break;
-				}
-
-				// perform special ATAPI processing of certain commands
-				switch (m_atapi_data[0]&0xff)
-				{
-					case 0x00: // BUS RESET / TEST UNIT READY
-					case 0xbb: // SET CDROM SPEED
-						m_atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
-						break;
-
-					case 0x45: // PLAY
-						m_atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_BSY;
-						m_atapi_timer->adjust( m_maincpu->cycles_to_attotime( ATAPI_CYCLES_PER_SECTOR ) );
-						break;
-				}
-
-				// assert IRQ
-				m_psxirq->intin10(1);
-			}
-			else
-			{
-//              mame_printf_debug("ATAPI: SCSI device returned error!\n");
-
-				m_atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ | ATAPI_STAT_CHECK;
-				m_atapi_regs[ATAPI_REG_ERRFEAT] = 0x50;   // sense key = ILLEGAL REQUEST
-				m_atapi_regs[ATAPI_REG_COUNTLOW] = 0;
-				m_atapi_regs[ATAPI_REG_COUNTHIGH] = 0;
-			}
-		}
-	}
-	else
-	{
-		switch( offset )
-		{
-		case ATAPI_REG_DATA:
-			verboselog(1, "atapi_w: data=%02x\n", data );
-			break;
-		case ATAPI_REG_ERRFEAT:
-			verboselog(1, "atapi_w: errfeat=%02x\n", data );
-			break;
-		case ATAPI_REG_INTREASON:
-			verboselog(1, "atapi_w: intreason=%02x\n", data );
-			break;
-		case ATAPI_REG_SAMTAG:
-			verboselog(1, "atapi_w: samtag=%02x\n", data );
-			break;
-		case ATAPI_REG_COUNTLOW:
-			verboselog(1, "atapi_w: countlow=%02x\n", data );
-			break;
-		case ATAPI_REG_COUNTHIGH:
-			verboselog(1, "atapi_w: counthigh=%02x\n", data );
-			break;
-		case ATAPI_REG_DRIVESEL:
-			verboselog(1, "atapi_w: drivesel=%02x\n", data );
-			break;
-		case ATAPI_REG_CMDSTATUS:
-			verboselog(1, "atapi_w: cmdstatus=%02x\n", data );
-			break;
-		}
-
-		m_atapi_regs[offset] = data;
-//      mame_printf_debug("ATAPI: reg %d = %x (offset %x mask %x PC=%x)\n", reg, data, offset, mem_mask, m_maincpu->pc());
-
-		if (offset == ATAPI_REG_CMDSTATUS)
-		{
-//          mame_printf_debug("ATAPI command %x issued! (PC=%x)\n", data, m_maincpu->pc());
-
-			switch (data)
-			{
-				case 0xa0:  // PACKET
-					m_atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ;
-					m_atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_COMMAND;
-
-					m_atapi_data_ptr = 0;
-					m_atapi_data_len = 0;
-
-					/* we have no data */
-					m_atapi_xferlen = 0;
-					m_atapi_xfermod = 0;
-
-					m_atapi_cdata_wait = 0;
-					break;
-
-				case 0xa1:  // IDENTIFY PACKET DEVICE
-					m_atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ;
-
-					m_atapi_data_ptr = 0;
-					m_atapi_data_len = 512;
-
-					/* we have no data */
-					m_atapi_xferlen = 0;
-					m_atapi_xfermod = 0;
-
-					memset( m_atapi_data, 0, m_atapi_data_len );
-
-					m_atapi_data[ 0 ^ 1 ] = 0x85; // ATAPI device, cmd set 5 compliant, DRQ within 3 ms of PACKET command
-					m_atapi_data[ 1 ^ 1 ] = 0x00;
-
-					memset( &m_atapi_data[ 46 ], ' ', 8 );
-					m_atapi_data[ 46 ^ 1 ] = '1';
-					m_atapi_data[ 47 ^ 1 ] = '.';
-					m_atapi_data[ 48 ^ 1 ] = '0';
-
-					memset( &m_atapi_data[ 54 ], ' ', 40 );
-					m_atapi_data[ 54 ^ 1 ] = 'M';
-					m_atapi_data[ 55 ^ 1 ] = 'A';
-					m_atapi_data[ 56 ^ 1 ] = 'T';
-					m_atapi_data[ 57 ^ 1 ] = 'S';
-					m_atapi_data[ 58 ^ 1 ] = 'H';
-					m_atapi_data[ 59 ^ 1 ] = 'I';
-					m_atapi_data[ 60 ^ 1 ] = 'T';
-					m_atapi_data[ 61 ^ 1 ] = 'A';
-					m_atapi_data[ 62 ^ 1 ] = ' ';
-					m_atapi_data[ 63 ^ 1 ] = 'C';
-					m_atapi_data[ 64 ^ 1 ] = 'R';
-					m_atapi_data[ 65 ^ 1 ] = '-';
-					m_atapi_data[ 66 ^ 1 ] = '5';
-					m_atapi_data[ 67 ^ 1 ] = '8';
-					m_atapi_data[ 68 ^ 1 ] = '9';
-					m_atapi_data[ 69 ^ 1 ] = ' ';
-
-					m_atapi_data[ 98 ^ 1 ] = 0x04; // IORDY may be disabled
-					m_atapi_data[ 99 ^ 1 ] = 0x00;
-
-					m_atapi_regs[ATAPI_REG_COUNTLOW] = 0;
-					m_atapi_regs[ATAPI_REG_COUNTHIGH] = 2;
-
-					m_psxirq->intin10(1);
-					break;
-
-				case 0xef:  // SET FEATURES
-					m_atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
-
-					m_atapi_data_ptr = 0;
-					m_atapi_data_len = 0;
-
-					m_psxirq->intin10(1);
-					break;
-
-				default:
-					mame_printf_debug("ATAPI: Unknown IDE command %x\n", data);
-					break;
-			}
-		}
+		UINT32 d = m_ata->read_cs0(space, (UINT32) 0, (UINT32) 0xffff) << 0;
+		d |= m_ata->read_cs0(space, (UINT32) 0, (UINT32) 0xffff) << 16;
+	
+		m_p_n_psxram[ m_atapi_xferbase / 4 ] = d;
+		m_atapi_xferbase += 4;
+		m_atapi_xfersize--;
 	}
 }
 
-void ksys573_state::atapi_init()
+WRITE_LINE_MEMBER(ksys573_state::ata_interrupt)
 {
-	m_atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
-	m_atapi_regs[ATAPI_REG_ERRFEAT] = 1;
-	m_atapi_regs[ATAPI_REG_COUNTLOW] = 0x14;
-	m_atapi_regs[ATAPI_REG_COUNTHIGH] = 0xeb;
-
-	m_atapi_data_ptr = 0;
-	m_atapi_data_len = 0;
-	m_atapi_cdata_wait = 0;
-
-	m_atapi_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ksys573_state::atapi_xfer_end),this));
-	m_atapi_timer->adjust(attotime::never);
-
-	m_available_cdroms[ 0 ] = cdrom_open( get_disk_handle( machine(), ":cdrom0" ) );
-	m_available_cdroms[ 1 ] = cdrom_open( get_disk_handle( machine(), ":cdrom1" ) );
-
-	save_item( NAME(m_atapi_regs) );
-	save_item( NAME(m_atapi_data) );
-	save_item( NAME(m_atapi_data_ptr) );
-	save_item( NAME(m_atapi_data_len) );
-	save_item( NAME(m_atapi_xferlen) );
-	save_item( NAME(m_atapi_xferbase) );
-	save_item( NAME(m_atapi_cdata_wait) );
-	save_item( NAME(m_atapi_xfermod) );
+	m_psxirq->intin10(state);
 }
 
 WRITE16_MEMBER(ksys573_state::atapi_reset_w)
 {
-	UINT8 *atapi_regs = m_atapi_regs;
-
-	verboselog(2, "atapi_reset_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
-
-	if (data)
+	if (!(data&1))
 	{
-		verboselog(2, "atapi_reset_w: reset\n" );
-
-//      mame_printf_debug("ATAPI reset\n");
-
-		atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
-		atapi_regs[ATAPI_REG_ERRFEAT] = 1;
-		atapi_regs[ATAPI_REG_COUNTLOW] = 0x14;
-		atapi_regs[ATAPI_REG_COUNTHIGH] = 0xeb;
-
-		m_atapi_data_ptr = 0;
-		m_atapi_data_len = 0;
-		m_atapi_cdata_wait = 0;
-
-		m_atapi_xferlen = 0;
-		m_atapi_xfermod = 0;
+		m_ata->reset();
 	}
 }
 
@@ -1252,11 +794,9 @@ void ksys573_state::cdrom_dma_write( UINT32 *ram, UINT32 n_address, INT32 n_size
 //  mame_printf_debug("DMA write: address %08x size %08x\n", n_address, n_size);
 
 	m_atapi_xferbase = n_address;
-
-	verboselog(2, "atapi_xfer_end: %d %d\n", m_atapi_xferlen, m_atapi_xfermod );
-
+	m_atapi_xfersize = n_size;
 	// set a transfer complete timer (Note: CYCLES_PER_SECTOR can't be lower than 2000 or the BIOS ends up "out of order")
-	m_atapi_timer->adjust(m_maincpu->cycles_to_attotime((ATAPI_CYCLES_PER_SECTOR * (m_atapi_xferlen/2048))));
+	m_atapi_timer->adjust(m_maincpu->cycles_to_attotime((ATAPI_CYCLES_PER_SECTOR * (n_size/512))));
 }
 
 WRITE16_MEMBER(ksys573_state::security_w)
@@ -1275,7 +815,7 @@ READ16_MEMBER(ksys573_state::security_r)
 	return data;
 }
 
-void ksys573_state::update_mode()
+void ksys573_state::update_disc()
 {
 	int cd = m_cd->read();
 	cdrom_file *new_cdrom;
@@ -1289,20 +829,28 @@ void ksys573_state::update_mode()
 		new_cdrom = m_available_cdroms[ 0 ];
 	}
 
-	void *current_cdrom;
-	m_cr589->GetDevice( &current_cdrom );
-
-	if( current_cdrom != new_cdrom )
+	scsihle_device *image = machine().device<scsihle_device>("ata:0:cr589:device");
+	if (image != NULL)
 	{
-		current_cdrom = new_cdrom;
+		void *current_cdrom = NULL;
+		image->GetDevice( &current_cdrom );
 
-		m_cr589->SetDevice( new_cdrom );
+		if( current_cdrom != new_cdrom )
+		{
+			current_cdrom = new_cdrom;
+
+			image->SetDevice( new_cdrom );
+		}
 	}
 }
 
 void ksys573_state::driver_start()
 {
-	atapi_init();
+	m_atapi_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ksys573_state::atapi_xfer_end),this));
+	m_atapi_timer->adjust(attotime::never);
+
+	m_available_cdroms[ 0 ] = cdrom_open( get_disk_handle( machine(), ":cdrom0" ) );
+	m_available_cdroms[ 1 ] = cdrom_open( get_disk_handle( machine(), ":cdrom1" ) );
 
 	m_n_security_control = 0;
 	m_control = 0;
@@ -1313,12 +861,12 @@ void ksys573_state::driver_start()
 
 MACHINE_RESET_MEMBER(ksys573_state,konami573)
 {
-	update_mode();
+	update_disc();
 }
 
 void ksys573_state::sys573_vblank(screen_device &screen, bool vblank_state)
 {
-	update_mode();
+	update_disc();
 
 	/// TODO: emulate the memory controller board
 	if( strcmp( machine().system().name, "ddr2ml" ) == 0 )
@@ -1690,7 +1238,7 @@ WRITE8_MEMBER(ksys573_state::ddr_output_callback)
 		break;
 
 	default:
-//        printf( "%d=%d\n", offset, data );
+//      printf( "%d=%d\n", offset, data );
 		break;
 	}
 }
@@ -2548,8 +2096,18 @@ static double analogue_inputs_callback( device_t *device, UINT8 input )
 	return 0;
 }
 
+SLOT_INTERFACE_START(ksys573_ata_devices)
+	SLOT_INTERFACE("cr589", CR589)
+SLOT_INTERFACE_END
+
 SLOT_INTERFACE_START(slot_empty)
 SLOT_INTERFACE_END
+
+static MACHINE_CONFIG_FRAGMENT( cr589_config )
+	MCFG_DEVICE_MODIFY("device:cdda")
+	MCFG_SOUND_ROUTE(0, "^^^^^lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "^^^^^rspeaker", 1.0)
+MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( konami573, ksys573_state )
 	/* basic machine hardware */
@@ -2565,7 +2123,12 @@ static MACHINE_CONFIG_START( konami573, ksys573_state )
 	MCFG_MACHINE_RESET_OVERRIDE(ksys573_state, konami573)
 
 	MCFG_DEVICE_ADD("mb89371", MB89371, 0)
-	MCFG_DEVICE_ADD("cdrom", CR589, 0)
+
+	MCFG_ATA_INTERFACE_ADD("ata", ksys573_ata_devices, "cr589", NULL, true)
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(ksys573_state, ata_interrupt))
+
+	MCFG_DEVICE_MODIFY("ata:0")
+	MCFG_DEVICE_CARD_MACHINE_CONFIG( "cr589", cr589_config )
 
 	MCFG_DEVICE_ADD("maincpu:sio1:cassette", KONAMI573_CASSETTE_SLOT_SERIAL, 0)
 
@@ -2604,10 +2167,6 @@ static MACHINE_CONFIG_START( konami573, ksys573_state )
 	MCFG_SPU_ADD( "spu", XTAL_67_7376MHz/2 )
 	MCFG_SOUND_ROUTE( 0, "lspeaker", 1.0 )
 	MCFG_SOUND_ROUTE( 1, "rspeaker", 1.0 )
-
-	MCFG_SOUND_MODIFY( "cdrom:cdda" )
-	MCFG_SOUND_ROUTE( 0, "^^lspeaker", 1.0 )
-	MCFG_SOUND_ROUTE( 1, "^^rspeaker", 1.0 )
 
 	MCFG_M48T58_ADD( "m48t58" )
 

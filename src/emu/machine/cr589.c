@@ -1,23 +1,19 @@
-/*
- * Matsushita CR-589
- *
- */
-
-#include "emu.h"
+#include "cr589.h"
+#include "scsicd.h"
 #include "machine/cr589.h"
 
 // device type definition
-const device_type CR589 = &device_creator<cr589_device>;
+const device_type SCSI_CR589 = &device_creator<scsi_cr589_device>;
 
-cr589_device::cr589_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: scsicd_device(mconfig, CR589, "CR589", tag, owner, clock, "cr589", __FILE__)
+scsi_cr589_device::scsi_cr589_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: scsicd_device(mconfig, SCSI_CR589, "SCSI CR589", tag, owner, clock, "scsi cr589", __FILE__)
 {
 }
 
 static const int identity_offset = 0x3ab;
 static const char download_identity[] = "MATSHITA CD98Q4 DOWNLOADGS0N";
 
-void cr589_device::device_start()
+void scsi_cr589_device::device_start()
 {
 	scsicd_device::device_start();
 
@@ -29,7 +25,7 @@ void cr589_device::device_start()
 	save_item(NAME(bufferOffset));
 }
 
-void cr589_device::ExecCommand( int *transferLength )
+void scsi_cr589_device::ExecCommand( int *transferLength )
 {
 	switch( command[ 0 ] )
 	{
@@ -55,7 +51,7 @@ void cr589_device::ExecCommand( int *transferLength )
 	}
 }
 
-void cr589_device::ReadData( UINT8 *data, int dataLength )
+void scsi_cr589_device::ReadData( UINT8 *data, int dataLength )
 {
 	switch( command[ 0 ] )
 	{
@@ -83,7 +79,7 @@ void cr589_device::ReadData( UINT8 *data, int dataLength )
 	}
 }
 
-void cr589_device::WriteData( UINT8 *data, int dataLength )
+void scsi_cr589_device::WriteData( UINT8 *data, int dataLength )
 {
 	switch( command[ 0 ] )
 	{
@@ -107,4 +103,72 @@ void cr589_device::WriteData( UINT8 *data, int dataLength )
 			scsicd_device::WriteData( data, dataLength );
 			break;
 	}
+}
+
+// device type definition
+const device_type CR589 = &device_creator<matsushita_cr589_device>;
+
+matsushita_cr589_device::matsushita_cr589_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: atapi_hle_device(mconfig, CR589, "Matsushita CR589", tag, owner, clock, "cr589", __FILE__)
+{
+}
+
+static MACHINE_CONFIG_FRAGMENT( cr589 )
+	MCFG_DEVICE_ADD("device", SCSI_CR589, 0)
+MACHINE_CONFIG_END
+
+//-------------------------------------------------
+//  machine_config_additions - device-specific
+//  machine configurations
+//-------------------------------------------------
+
+machine_config_constructor matsushita_cr589_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( cr589 );
+}
+
+void matsushita_cr589_device::device_start()
+{
+	memset(m_identify_buffer, 0, sizeof(m_identify_buffer));
+
+	m_identify_buffer[ 0 ] = 0x8500; // ATAPI device, cmd set 5 compliant, DRQ within 3 ms of PACKET command
+
+	m_identify_buffer[ 23 ] = ('1' << 8) | '.';
+	m_identify_buffer[ 24 ] = ('0' << 8) | ' ';
+	m_identify_buffer[ 25 ] = (' ' << 8) | ' ';
+	m_identify_buffer[ 26 ] = (' ' << 8) | ' ';
+
+	m_identify_buffer[ 27 ] = ('M' << 8) | 'A';
+	m_identify_buffer[ 28 ] = ('T' << 8) | 'S';
+	m_identify_buffer[ 29 ] = ('H' << 8) | 'I';
+	m_identify_buffer[ 30 ] = ('T' << 8) | 'A';
+	m_identify_buffer[ 31 ] = (' ' << 8) | 'C';
+	m_identify_buffer[ 32 ] = ('R' << 8) | '-';
+	m_identify_buffer[ 33 ] = ('5' << 8) | '8';
+	m_identify_buffer[ 34 ] = ('9' << 8) | ' ';
+	m_identify_buffer[ 35 ] = (' ' << 8) | ' ';
+	m_identify_buffer[ 36 ] = (' ' << 8) | ' ';
+	m_identify_buffer[ 37 ] = (' ' << 8) | ' ';
+	m_identify_buffer[ 38 ] = (' ' << 8) | ' ';
+	m_identify_buffer[ 39 ] = (' ' << 8) | ' ';
+	m_identify_buffer[ 40 ] = (' ' << 8) | ' ';
+	m_identify_buffer[ 41 ] = (' ' << 8) | ' ';
+	m_identify_buffer[ 42 ] = (' ' << 8) | ' ';
+	m_identify_buffer[ 43 ] = (' ' << 8) | ' ';
+	m_identify_buffer[ 44 ] = (' ' << 8) | ' ';
+	m_identify_buffer[ 45 ] = (' ' << 8) | ' ';
+	m_identify_buffer[ 46 ] = (' ' << 8) | ' ';
+
+	m_identify_buffer[ 49 ] = 0x0400; // IORDY may be disabled
+
+	atapi_hle_device::device_start();
+}
+
+void matsushita_cr589_device::perform_diagnostic()
+{
+	m_error = IDE_ERROR_DIAGNOSTIC_PASSED;
+}
+
+void matsushita_cr589_device::identify_packet_device()
+{
 }
