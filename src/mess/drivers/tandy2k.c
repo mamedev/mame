@@ -638,6 +638,11 @@ WRITE_LINE_MEMBER( tandy2k_state::kbddat_w )
 	m_kbddat = state;
 }
 
+READ8_MEMBER( tandy2k_state::irq_callback )
+{
+	return (offset ? m_pic1 : m_pic0)->inta_r();
+}
+
 // Machine Initialization
 
 void tandy2k_state::machine_start()
@@ -675,6 +680,7 @@ static MACHINE_CONFIG_START( tandy2k, tandy2k_state )
 	MCFG_CPU_ADD(I80186_TAG, I80186, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(tandy2k_mem)
 	MCFG_CPU_IO_MAP(tandy2k_io)
+	MCFG_80186_IRQ_SLAVE_ACK(DEVREAD8(DEVICE_SELF, tandy2k_state, irq_callback))
 
 	// video hardware
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)

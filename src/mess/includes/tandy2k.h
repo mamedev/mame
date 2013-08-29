@@ -109,6 +109,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( vac_ld_ht_w );
 	DECLARE_WRITE_LINE_MEMBER( kbdclk_w );
 	DECLARE_WRITE_LINE_MEMBER( kbddat_w );
+	DECLARE_READ8_MEMBER( irq_callback );
 
 	void fdc_irq(bool state);
 	void fdc_drq(bool state);
