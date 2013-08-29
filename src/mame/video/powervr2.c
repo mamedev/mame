@@ -1976,10 +1976,10 @@ WRITE8_MEMBER( powervr2_device::ta_fifo_yuv_w )
 				y0 = yuv_fifo[0x80+((x&8) ? 0x40 : 0x00)+((y&8) ? 0x80 : 0x00)+(x&6)+((y&7)*8)];
 				y1 = yuv_fifo[0x80+((x&8) ? 0x40 : 0x00)+((y&8) ? 0x80 : 0x00)+(x&6)+((y&7)*8)+1];
 
-				*(UINT16 *)((reinterpret_cast<UINT8 *>(dc_texture_ram)) + WORD_XOR_LE(dst_addr)) = u;
-				*(UINT16 *)((reinterpret_cast<UINT8 *>(dc_texture_ram)) + WORD_XOR_LE(dst_addr+1)) = y0;
-				*(UINT16 *)((reinterpret_cast<UINT8 *>(dc_texture_ram)) + WORD_XOR_LE(dst_addr+2)) = v;
-				*(UINT16 *)((reinterpret_cast<UINT8 *>(dc_texture_ram)) + WORD_XOR_LE(dst_addr+3)) = y1;
+				*(UINT8 *)((reinterpret_cast<UINT8 *>(dc_texture_ram)) + BYTE8_XOR_LE(dst_addr)) = u;
+				*(UINT8 *)((reinterpret_cast<UINT8 *>(dc_texture_ram)) + BYTE8_XOR_LE(dst_addr+1)) = y0;
+				*(UINT8 *)((reinterpret_cast<UINT8 *>(dc_texture_ram)) + BYTE8_XOR_LE(dst_addr+2)) = v;
+				*(UINT8 *)((reinterpret_cast<UINT8 *>(dc_texture_ram)) + BYTE8_XOR_LE(dst_addr+3)) = y1;
 			}
 		}
 
