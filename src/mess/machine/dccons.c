@@ -743,7 +743,7 @@ WRITE32_MEMBER(dc_cons_state::dc_mess_g1_ctrl_w )
 			atapi_regs[ATAPI_REG_SAMTAG] = GDROM_PAUSE_STATE | 0x80;
 		}
 		break;
-// The following is required to unlock the GD-ROM. The original Japanese BIOS doen't need it
+// The following is required to unlock the GD-ROM. The original Japanese BIOS doesn't need it
 	case GD_UNLOCK:
 		if (data==0 || data==0x001fffff || data==0x42fe)
 		{

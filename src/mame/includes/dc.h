@@ -273,8 +273,9 @@ class dc_state : public driver_device
 #define IST_EXT_MODEM   0x00000004
 #define IST_EXT_AICA    0x00000002
 #define IST_EXT_GDROM   0x00000001
-
-#define IST_ERR_ISP_LIMIT_IRQ 0x00000004
+/* -------------- error interrupts ------------- */
+#define IST_ERR_ISP_LIMIT        0x00000004
+#define IST_ERR_PVRIF_ILL_ADDR   0x00000040
 
 void dc_maple_irq(running_machine &machine);
 

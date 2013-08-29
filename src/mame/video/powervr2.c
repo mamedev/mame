@@ -2003,7 +2003,7 @@ WRITE8_MEMBER( powervr2_device::ta_fifo_yuv_w )
 			{
 				ta_yuv_y = 0;
 				/* TODO: timing */
-				yuv_timer_end->adjust(state->m_maincpu->cycles_to_attotime(ta_yuv_x_size*ta_yuv_y_size*0x180));
+				yuv_timer_end->adjust(state->m_maincpu->cycles_to_attotime((ta_yuv_x_size/16)*(ta_yuv_y_size/16)*0x180));
 			}
 		}
 	}
@@ -3356,9 +3356,21 @@ void powervr2_device::pvr_dma_execute(address_space &space)
 	size = 0;
 
 	/* used so far by usagui and sprtjam*/
-	//printf("PVR-DMA start\n");
-	//printf("%08x %08x %08x\n",m_pvr_dma.pvr_addr,m_pvr_dma.sys_addr,m_pvr_dma.size);
-	//printf("src %s dst %08x\n",m_pvr_dma.dir ? "->" : "<-",m_pvr_dma.sel);
+	printf("PVR-DMA start\n");
+	printf("%08x %08x %08x\n",m_pvr_dma.pvr_addr,m_pvr_dma.sys_addr,m_pvr_dma.size);
+	printf("src %s dst %08x\n",m_pvr_dma.dir ? "->" : "<-",m_pvr_dma.sel);
+
+	/* Throw illegal address set */
+	#if 0
+	if((m_pvr_dma.sys_addr & 0x1c000000) != 0x0c000000)
+	{
+		/* TODO: timing */
+		irq_cb(ERR_PVRIF_ILL_ADDR_IRQ);
+		m_pvr_dma.start = sb_pdst = 0;
+		printf("Illegal PVR DMA set\n");
+		return;
+	}
+	#endif
 
 	/* 0 rounding size = 16 Mbytes */
 	if(m_pvr_dma.size == 0) { m_pvr_dma.size = 0x100000; }
@@ -3568,9 +3580,16 @@ void powervr2_device::pvr_scanline_timer(int vpos)
 {
 	int vbin_line = spg_vblank_int & 0x3ff;
 	int vbout_line = (spg_vblank_int >> 16) & 0x3ff;
+	UINT8 interlace_on = ((spg_control & 0x10) >> 4);
 	dc_state *state = machine().driver_data<dc_state>();
 
-	if(vbin_line-1 == vpos)
+	if(interlace_on)
+	{
+		vbin_line <<= 1;
+		vbout_line <<= 1;
+	}
+
+	if(vbin_line-(1+interlace_on) == vpos)
 		state->m_maple->maple_hw_trigger();
 
 	if(vbin_line == vpos)

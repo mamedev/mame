@@ -165,7 +165,11 @@ WRITE8_MEMBER(dc_state::pvr_irq)
 		break;
 
 	case powervr2_device::ERR_ISP_LIMIT_IRQ:
-		dc_sysctrl_regs[SB_ISTERR] |= IST_ERR_ISP_LIMIT_IRQ;
+		dc_sysctrl_regs[SB_ISTERR] |= IST_ERR_ISP_LIMIT;
+		break;
+
+	case powervr2_device::ERR_PVRIF_ILL_ADDR_IRQ:
+		dc_sysctrl_regs[SB_ISTERR] |= IST_ERR_PVRIF_ILL_ADDR;
 		break;
 	}
 	dc_update_interrupt_status();

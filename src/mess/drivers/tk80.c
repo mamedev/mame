@@ -48,7 +48,7 @@ ICS8080
 #include "cpu/i8085/i8085.h"
 #include "machine/i8255.h"
 #include "machine/keyboard.h"
-#include "tk80.lh"
+//#include "tk80.lh"
 
 
 class tk80_state : public driver_device
@@ -283,7 +283,7 @@ static MACHINE_CONFIG_START( tk80, tk80_state )
 	MCFG_CPU_IO_MAP(tk80_io)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_tk80)
+//	MCFG_DEFAULT_LAYOUT(layout_tk80)
 
 	/* Devices */
 	MCFG_I8255_ADD( "ppi8255_0", ppi_intf_0 )
