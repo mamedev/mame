@@ -73,6 +73,7 @@ TODO (game-specific):
     - Giant Gram 2: no VMU emulation;
     - Gun Survivor 2: crashes during game loading;
     - Idol Janshi Suchie-Pai 3: returns "i/o board error" msg in game mode;
+    - Lupin the Shooting: "com. error between Naomi BD and i/o BD" after some secs. of gameplay;
     - Monkey Ball: dies when attempts to load the gameplay;
     - Oinori-Daimyoujin Matsuri: reports "B. RAM error" in test mode, inputs doesn't seem to work after that point;
     - OutTrigger: crashes on naomibd_r();
@@ -1544,7 +1545,7 @@ static ADDRESS_MAP_START( naomi_map, AS_PROGRAM, 64, naomi_state )
 	AM_RANGE(0x005f7c00, 0x005f7cff) AM_MIRROR(0x02000000) AM_DEVICE32("powervr2", powervr2_device, pd_dma_map, U64(0xffffffffffffffff))
 	AM_RANGE(0x005f8000, 0x005f9fff) AM_MIRROR(0x02000000) AM_DEVICE32("powervr2", powervr2_device, ta_map, U64(0xffffffffffffffff))
 	AM_RANGE(0x00600000, 0x006007ff) AM_MIRROR(0x02000000) AM_READWRITE(dc_modem_r, dc_modem_w )
-	AM_RANGE(0x00700000, 0x00707fff) AM_MIRROR(0x02000000) AM_READWRITE(dc_aica_reg_r, dc_aica_reg_w )
+	AM_RANGE(0x00700000, 0x00707fff) AM_MIRROR(0x02000000) AM_READWRITE32(dc_aica_reg_r, dc_aica_reg_w, U64(0xffffffffffffffff))
 	AM_RANGE(0x00710000, 0x0071000f) AM_MIRROR(0x02000000) AM_READWRITE32(dc_rtc_r, dc_rtc_w, U64(0xffffffffffffffff) )
 	AM_RANGE(0x00800000, 0x00ffffff) AM_MIRROR(0x02000000) AM_READWRITE(naomi_arm_r, naomi_arm_w )           // sound RAM (8 MB)
 
@@ -1564,7 +1565,7 @@ static ADDRESS_MAP_START( naomi_map, AS_PROGRAM, 64, naomi_state )
 
 	/* Area 4 */
 	AM_RANGE(0x10000000, 0x107fffff) AM_MIRROR(0x02000000) AM_DEVWRITE("powervr2", powervr2_device, ta_fifo_poly_w)
-	AM_RANGE(0x10800000, 0x10ffffff) AM_MIRROR(0x02000000) AM_DEVWRITE("powervr2", powervr2_device, ta_fifo_yuv_w)
+	AM_RANGE(0x10800000, 0x10ffffff) AM_DEVWRITE8("powervr2", powervr2_device, ta_fifo_yuv_w, U64(0xffffffffffffffff))
 	AM_RANGE(0x11000000, 0x11ffffff) AM_DEVWRITE("powervr2", powervr2_device, ta_texture_directpath0_w) // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE0 register - cannot be written directly, only through dma / store queue)
 	/*       0x12000000 -0x13ffffff Mirror area of  0x10000000 -0x11ffffff */
 	AM_RANGE(0x13000000, 0x13ffffff) AM_DEVWRITE("powervr2", powervr2_device, ta_texture_directpath1_w) // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE1 register - cannot be written directly, only through dma / store queue)
@@ -1596,7 +1597,7 @@ static ADDRESS_MAP_START( naomi2_map, AS_PROGRAM, 64, naomi_state )
 	AM_RANGE(0x005f7c00, 0x005f7cff) AM_MIRROR(0x02000000) AM_DEVICE32("powervr2", powervr2_device, pd_dma_map, U64(0xffffffffffffffff))
 	AM_RANGE(0x005f8000, 0x005f9fff) AM_MIRROR(0x02000000) AM_DEVICE32("powervr2", powervr2_device, ta_map, U64(0xffffffffffffffff))
 	AM_RANGE(0x00600000, 0x006007ff) AM_MIRROR(0x02000000) AM_READWRITE(dc_modem_r, dc_modem_w )
-	AM_RANGE(0x00700000, 0x00707fff) AM_MIRROR(0x02000000) AM_READWRITE(dc_aica_reg_r, dc_aica_reg_w )
+	AM_RANGE(0x00700000, 0x00707fff) AM_MIRROR(0x02000000) AM_READWRITE32(dc_aica_reg_r, dc_aica_reg_w, U64(0xffffffffffffffff))
 	AM_RANGE(0x00710000, 0x0071000f) AM_MIRROR(0x02000000) AM_READWRITE32(dc_rtc_r, dc_rtc_w, U64(0xffffffffffffffff) )
 	AM_RANGE(0x00800000, 0x00ffffff) AM_MIRROR(0x02000000) AM_READWRITE(naomi_arm_r, naomi_arm_w )           // sound RAM (8 MB)
 
@@ -1626,7 +1627,7 @@ static ADDRESS_MAP_START( naomi2_map, AS_PROGRAM, 64, naomi_state )
 
 	/* Area 4 */
 	AM_RANGE(0x10000000, 0x107fffff) AM_DEVWRITE("powervr2", powervr2_device, ta_fifo_poly_w)
-	AM_RANGE(0x10800000, 0x10ffffff) AM_DEVWRITE("powervr2", powervr2_device, ta_fifo_yuv_w)
+	AM_RANGE(0x10800000, 0x10ffffff) AM_DEVWRITE8("powervr2", powervr2_device, ta_fifo_yuv_w, U64(0xffffffffffffffff))
 	AM_RANGE(0x11000000, 0x11ffffff) AM_DEVWRITE("powervr2", powervr2_device, ta_texture_directpath0_w) // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE0 register - cannot be written directly, only through dma / store queue)
 	/*       0x12000000 -0x13ffffff Mirror area of  0x10000000 -0x11ffffff */
 	AM_RANGE(0x13000000, 0x13ffffff) AM_DEVWRITE("powervr2", powervr2_device, ta_texture_directpath1_w) // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE1 register - cannot be written directly, only through dma / store queue)
@@ -1749,7 +1750,7 @@ static ADDRESS_MAP_START( aw_map, AS_PROGRAM, 64, naomi_state )
 	AM_RANGE(0x005f7c00, 0x005f7cff) AM_MIRROR(0x02000000) AM_DEVICE32("powervr2", powervr2_device, pd_dma_map, U64(0xffffffffffffffff))
 	AM_RANGE(0x005f8000, 0x005f9fff) AM_MIRROR(0x02000000) AM_DEVICE32("powervr2", powervr2_device, ta_map, U64(0xffffffffffffffff))
 	AM_RANGE(0x00600000, 0x006007ff) AM_READWRITE(aw_modem_r, aw_modem_w )
-	AM_RANGE(0x00700000, 0x00707fff) AM_READWRITE(dc_aica_reg_r, dc_aica_reg_w )
+	AM_RANGE(0x00700000, 0x00707fff) AM_READWRITE32(dc_aica_reg_r, dc_aica_reg_w, U64(0xffffffffffffffff))
 	AM_RANGE(0x00710000, 0x0071000f) AM_MIRROR(0x02000000) AM_READWRITE32(dc_rtc_r, dc_rtc_w, U64(0xffffffffffffffff) )
 	AM_RANGE(0x00800000, 0x00ffffff) AM_READWRITE(naomi_arm_r, naomi_arm_w )           // sound RAM (8 MB)
 
@@ -1774,7 +1775,7 @@ static ADDRESS_MAP_START( aw_map, AS_PROGRAM, 64, naomi_state )
 
 	/* Area 4 - half the texture memory, like dreamcast, not naomi */
 	AM_RANGE(0x10000000, 0x107fffff) AM_MIRROR(0x02000000) AM_DEVWRITE("powervr2", powervr2_device, ta_fifo_poly_w)
-	AM_RANGE(0x10800000, 0x10ffffff) AM_MIRROR(0x02000000) AM_DEVWRITE("powervr2", powervr2_device, ta_fifo_yuv_w)
+	AM_RANGE(0x10800000, 0x10ffffff) AM_DEVWRITE8("powervr2", powervr2_device, ta_fifo_yuv_w, U64(0xffffffffffffffff))
 	AM_RANGE(0x11000000, 0x117fffff) AM_DEVWRITE("powervr2", powervr2_device, ta_texture_directpath0_w) AM_MIRROR(0x00800000)  // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE0 register - cannot be written directly, only through dma / store queue
 	/*       0x12000000 -0x13ffffff Mirror area of  0x10000000 -0x11ffffff */
 	AM_RANGE(0x13000000, 0x137fffff) AM_DEVWRITE("powervr2", powervr2_device, ta_texture_directpath1_w) AM_MIRROR(0x00800000) // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE1 register - cannot be written directly, only through dma / store queue
@@ -8224,7 +8225,7 @@ ROM_END
 /* 0015A */ GAME( 2001, vtennis2, naomigd, naomigd,  naomi,   naomi_state, naomigd, ROT0, "Sega", "Virtua Tennis 2 / Power Smash 2 (Rev A) (GDS-0015A)", GAME_FLAGS )
 /* 0016  */ GAME( 2001, shaktamb, naomigd, naomigd,  shaktamb,naomi_state, naomigd, ROT0, "Sega", "Shakatto Tambourine Cho Powerup Chu 2K1 AUT (GDS-0016)", GAME_FLAGS )
 /* 0017  */ GAME( 2001, keyboard, naomigd, naomigd,  naomi,   naomi_state, naomigd, ROT0, "Sega", "La Keyboard (GDS-0017)", GAME_FLAGS )
-/* 0018  */ GAME( 2001, lupinsho, naomigd, naomigd,  hotd2,   naomi_state, naomigd, ROT0, "Sega", "Lupin The Third - The Shooting (GDS-0018)", GAME_FLAGS )
+/* 0018  */ GAME( 2001, lupinsho, naomigd, naomigd,  hotd2,   naomi_state, naomigd, ROT0, "Sega / Eighting", "Lupin The Third - The Shooting (GDS-0018)", GAME_FLAGS )
 // 0018A Lupin The Third - The Shooting (Rev A)
 /* 0019  */ GAME( 2002, vathlete, naomigd, naomigd,  naomi,   naomi_state, naomigd, ROT0, "Sega", "Virtua Athletics / Virtua Athlete (GDS-0019)", GAME_FLAGS )
 // 0020  Initial D Arcade Stage
