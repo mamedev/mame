@@ -2391,6 +2391,340 @@ void powervr2_device::render_to_accumulation_buffer(bitmap_rgb32 &bitmap,const r
 // also can specify dither etc.
 // basically, just a crude implementation!
 
+/* 0555KRGB = 0 */
+void powervr2_device::fb_convert_0555krgb_to_555rgb(address_space &space, int x,int y)
+{
+	int xcnt,ycnt;
+	for (ycnt=0;ycnt<32;ycnt++)
+	{
+		UINT32 realwriteoffs = 0x05000000 + fb_w_sof1 + (y+ycnt) * (fb_w_linestride<<3) + (x*2);
+		UINT32 *src = &fake_accumulationbuffer_bitmap->pix32(y+ycnt, x);
+
+		for (xcnt=0;xcnt<32;xcnt++)
+		{
+			// data starts in 8888 format, downsample it
+			UINT32 data = src[xcnt];
+			UINT16 newdat = ((((data & 0x000000f8) >> 3)) << 0)   |
+							((((data & 0x0000f800) >> 11)) << 5)  |
+							((((data & 0x00f80000) >> 19)) << 10);
+
+			space.write_word(realwriteoffs+xcnt*2, newdat);
+		}
+	}
+}
+
+void powervr2_device::fb_convert_0555krgb_to_565rgb(address_space &space, int x,int y)
+{
+	int xcnt,ycnt;
+	for (ycnt=0;ycnt<32;ycnt++)
+	{
+		UINT32 realwriteoffs = 0x05000000 + fb_w_sof1 + (y+ycnt) * (fb_w_linestride<<3) + (x*2);
+		UINT32 *src = &fake_accumulationbuffer_bitmap->pix32(y+ycnt, x);
+
+		for (xcnt=0;xcnt<32;xcnt++)
+		{
+			// data starts in 8888 format, downsample it
+			UINT32 data = src[xcnt];
+			UINT16 newdat = ((((data & 0x000000f8) >> 3)) << 0)   |
+							((((data & 0x0000f800) >> 11)) << 5)  |
+							((((data & 0x00f80000) >> 19)) << 11);
+
+			space.write_word(realwriteoffs+xcnt*2, newdat);
+		}
+	}
+}
+
+void powervr2_device::fb_convert_0555krgb_to_888rgb24(address_space &space, int x,int y)
+{
+	int xcnt,ycnt;
+	for (ycnt=0;ycnt<32;ycnt++)
+	{
+		UINT32 realwriteoffs = 0x05000000 + fb_w_sof1 + (y+ycnt) * (fb_w_linestride<<3) + (x*3);
+		UINT32 *src = &fake_accumulationbuffer_bitmap->pix32(y+ycnt, x);
+
+		for (xcnt=0;xcnt<32;xcnt++)
+		{
+			// data starts in 8888 format, downsample it
+			UINT32 data = src[xcnt];
+			UINT32 newdat = (data & 0xf8f8f8);
+
+			space.write_byte(realwriteoffs+xcnt*3+0, newdat >> 0);
+			space.write_byte(realwriteoffs+xcnt*3+1, newdat >> 8);
+			space.write_byte(realwriteoffs+xcnt*3+2, newdat >> 16);
+		}
+	}
+}
+
+void powervr2_device::fb_convert_0555krgb_to_888rgb32(address_space &space, int x,int y)
+{
+	int xcnt,ycnt;
+	for (ycnt=0;ycnt<32;ycnt++)
+	{
+		UINT32 realwriteoffs = 0x05000000 + fb_w_sof1 + (y+ycnt) * (fb_w_linestride<<3) + (x*4);
+		UINT32 *src = &fake_accumulationbuffer_bitmap->pix32(y+ycnt, x);
+
+		for (xcnt=0;xcnt<32;xcnt++)
+		{
+			// data starts in 8888 format, downsample it
+			UINT32 data = src[xcnt];
+			UINT32 newdat = (data & 0xf8f8f8);
+
+			space.write_dword(realwriteoffs+xcnt*4, newdat);
+		}
+	}
+}
+
+/* 0565RGB = 1 */
+void powervr2_device::fb_convert_0565rgb_to_555rgb(address_space &space, int x,int y)
+{
+	int xcnt,ycnt;
+	for (ycnt=0;ycnt<32;ycnt++)
+	{
+		UINT32 realwriteoffs = 0x05000000 + fb_w_sof1 + (y+ycnt) * (fb_w_linestride<<3) + (x*2);
+		UINT32 *src = &fake_accumulationbuffer_bitmap->pix32(y+ycnt, x);
+
+		for (xcnt=0;xcnt<32;xcnt++)
+		{
+			// data starts in 8888 format, downsample it
+			UINT32 data = src[xcnt];
+			UINT16 newdat = ((((data & 0x000000f8) >> 3)) << 0)   |
+							((((data & 0x0000fc00) >> 10)) << 5)  |
+							((((data & 0x00f80000) >> 19)) << 10);
+
+			space.write_word(realwriteoffs+xcnt*2, newdat);
+		}
+	}
+}
+
+void powervr2_device::fb_convert_0565rgb_to_565rgb(address_space &space, int x,int y)
+{
+	int xcnt,ycnt;
+	for (ycnt=0;ycnt<32;ycnt++)
+	{
+		UINT32 realwriteoffs = 0x05000000 + fb_w_sof1 + (y+ycnt) * (fb_w_linestride<<3) + (x*2);
+		UINT32 *src = &fake_accumulationbuffer_bitmap->pix32(y+ycnt, x);
+
+		for (xcnt=0;xcnt<32;xcnt++)
+		{
+			// data starts in 8888 format, downsample it
+			UINT32 data = src[xcnt];
+			UINT16 newdat = ((((data & 0x000000f8) >> 3)) << 0)   |
+							((((data & 0x0000fc00) >> 10)) << 5)  |
+							((((data & 0x00f80000) >> 19)) << 11);
+
+			space.write_word(realwriteoffs+xcnt*2, newdat);
+		}
+	}
+}
+
+void powervr2_device::fb_convert_0565rgb_to_888rgb24(address_space &space, int x,int y)
+{
+	int xcnt,ycnt;
+	for (ycnt=0;ycnt<32;ycnt++)
+	{
+		UINT32 realwriteoffs = 0x05000000 + fb_w_sof1 + (y+ycnt) * (fb_w_linestride<<3) + (x*3);
+		UINT32 *src = &fake_accumulationbuffer_bitmap->pix32(y+ycnt, x);
+
+		for (xcnt=0;xcnt<32;xcnt++)
+		{
+			// data starts in 8888 format, downsample it
+			UINT32 data = src[xcnt];
+			UINT32 newdat = (data & 0xf8fcf8);
+
+			space.write_byte(realwriteoffs+xcnt*3+0, newdat >> 0);
+			space.write_byte(realwriteoffs+xcnt*3+1, newdat >> 8);
+			space.write_byte(realwriteoffs+xcnt*3+2, newdat >> 16);
+		}
+	}
+}
+
+void powervr2_device::fb_convert_0565rgb_to_888rgb32(address_space &space, int x,int y)
+{
+	int xcnt,ycnt;
+	for (ycnt=0;ycnt<32;ycnt++)
+	{
+		UINT32 realwriteoffs = 0x05000000 + fb_w_sof1 + (y+ycnt) * (fb_w_linestride<<3) + (x*4);
+		UINT32 *src = &fake_accumulationbuffer_bitmap->pix32(y+ycnt, x);
+
+		for (xcnt=0;xcnt<32;xcnt++)
+		{
+			// data starts in 8888 format, downsample it
+			UINT32 data = src[xcnt];
+			UINT32 newdat = (data & 0xf8fcf8);
+
+			space.write_dword(realwriteoffs+xcnt*4, newdat);
+		}
+	}
+}
+
+/* 1555ARGB = 3 */
+void powervr2_device::fb_convert_1555argb_to_555rgb(address_space &space, int x,int y)
+{
+	int xcnt,ycnt;
+	for (ycnt=0;ycnt<32;ycnt++)
+	{
+		UINT32 realwriteoffs = 0x05000000 + fb_w_sof1 + (y+ycnt) * (fb_w_linestride<<3) + (x*2);
+		UINT32 *src = &fake_accumulationbuffer_bitmap->pix32(y+ycnt, x);
+
+		for (xcnt=0;xcnt<32;xcnt++)
+		{
+			// data starts in 8888 format, downsample it
+			UINT32 data = src[xcnt];
+			UINT16 newdat = ((((data & 0x000000f8) >> 3)) << 0)   |
+							((((data & 0x0000f800) >> 11)) << 5)  |
+							((((data & 0x00f80000) >> 19)) << 10);
+
+			space.write_word(realwriteoffs+xcnt*2, newdat);
+		}
+	}
+}
+
+void powervr2_device::fb_convert_1555argb_to_565rgb(address_space &space, int x,int y)
+{
+	int xcnt,ycnt;
+	for (ycnt=0;ycnt<32;ycnt++)
+	{
+		UINT32 realwriteoffs = 0x05000000 + fb_w_sof1 + (y+ycnt) * (fb_w_linestride<<3) + (x*2);
+		UINT32 *src = &fake_accumulationbuffer_bitmap->pix32(y+ycnt, x);
+
+		for (xcnt=0;xcnt<32;xcnt++)
+		{
+			// data starts in 8888 format, downsample it
+			UINT32 data = src[xcnt];
+			UINT16 newdat = ((((data & 0x000000f8) >> 3)) << 0)   |
+							((((data & 0x0000f800) >> 11)) << 5)  |
+							((((data & 0x00f80000) >> 19)) << 11);
+
+			space.write_word(realwriteoffs+xcnt*2, newdat);
+		}
+	}
+}
+
+void powervr2_device::fb_convert_1555argb_to_888rgb24(address_space &space, int x,int y)
+{
+	int xcnt,ycnt;
+	for (ycnt=0;ycnt<32;ycnt++)
+	{
+		UINT32 realwriteoffs = 0x05000000 + fb_w_sof1 + (y+ycnt) * (fb_w_linestride<<3) + (x*3);
+		UINT32 *src = &fake_accumulationbuffer_bitmap->pix32(y+ycnt, x);
+
+		for (xcnt=0;xcnt<32;xcnt++)
+		{
+			// data starts in 8888 format, downsample it
+			UINT32 data = src[xcnt];
+			UINT32 newdat = (data & 0xf8f8f8);
+
+			space.write_byte(realwriteoffs+xcnt*3+0, newdat >> 0);
+			space.write_byte(realwriteoffs+xcnt*3+1, newdat >> 8);
+			space.write_byte(realwriteoffs+xcnt*3+2, newdat >> 16);
+		}
+	}
+}
+
+void powervr2_device::fb_convert_1555argb_to_888rgb32(address_space &space, int x,int y)
+{
+	int xcnt,ycnt;
+	for (ycnt=0;ycnt<32;ycnt++)
+	{
+		UINT32 realwriteoffs = 0x05000000 + fb_w_sof1 + (y+ycnt) * (fb_w_linestride<<3) + (x*4);
+		UINT32 *src = &fake_accumulationbuffer_bitmap->pix32(y+ycnt, x);
+
+		for (xcnt=0;xcnt<32;xcnt++)
+		{
+			// data starts in 8888 format, downsample it
+			UINT32 data = src[xcnt];
+			UINT32 newdat = (data & 0xf8f8f8);
+
+			space.write_dword(realwriteoffs+xcnt*4, newdat);
+		}
+	}
+}
+
+
+/* 8888ARGB = 6 */
+void powervr2_device::fb_convert_8888argb_to_555rgb(address_space &space, int x,int y)
+{
+	int xcnt,ycnt;
+	for (ycnt=0;ycnt<32;ycnt++)
+	{
+		UINT32 realwriteoffs = 0x05000000 + fb_w_sof1 + (y+ycnt) * (fb_w_linestride<<3) + (x*2);
+		UINT32 *src = &fake_accumulationbuffer_bitmap->pix32(y+ycnt, x);
+
+		for (xcnt=0;xcnt<32;xcnt++)
+		{
+			// data starts in 8888 format, downsample it
+			UINT32 data = src[xcnt];
+			UINT16 newdat = ((((data & 0x000000f8) >> 3)) << 0)   |
+							((((data & 0x0000f800) >> 11)) << 5)  |
+							((((data & 0x00f80000) >> 16)) << 10);
+
+			space.write_word(realwriteoffs+xcnt*2, newdat);
+		}
+	}
+}
+
+void powervr2_device::fb_convert_8888argb_to_565rgb(address_space &space, int x,int y)
+{
+	int xcnt,ycnt;
+	for (ycnt=0;ycnt<32;ycnt++)
+	{
+		UINT32 realwriteoffs = 0x05000000 + fb_w_sof1 + (y+ycnt) * (fb_w_linestride<<3) + (x*2);
+		UINT32 *src = &fake_accumulationbuffer_bitmap->pix32(y+ycnt, x);
+
+		for (xcnt=0;xcnt<32;xcnt++)
+		{
+			// data starts in 8888 format, downsample it
+			UINT32 data = src[xcnt];
+			UINT16 newdat = ((((data & 0x000000f8) >> 3)) << 0)   |
+							((((data & 0x0000fc00) >> 11)) << 5)  |
+							((((data & 0x00f80000) >> 16)) << 11);
+
+			space.write_word(realwriteoffs+xcnt*2, newdat);
+		}
+	}
+}
+
+void powervr2_device::fb_convert_8888argb_to_888rgb24(address_space &space, int x,int y)
+{
+	int xcnt,ycnt;
+	for (ycnt=0;ycnt<32;ycnt++)
+	{
+		UINT32 realwriteoffs = 0x05000000 + fb_w_sof1 + (y+ycnt) * (fb_w_linestride<<3) + (x*3);
+		UINT32 *src = &fake_accumulationbuffer_bitmap->pix32(y+ycnt, x);
+
+		for (xcnt=0;xcnt<32;xcnt++)
+		{
+			// data starts in 8888 format, downsample it
+			UINT32 data = src[xcnt];
+			UINT32 newdat = (data & 0xffffff);
+
+			space.write_byte(realwriteoffs+xcnt*3+0, newdat >> 0);
+			space.write_byte(realwriteoffs+xcnt*3+1, newdat >> 8);
+			space.write_byte(realwriteoffs+xcnt*3+2, newdat >> 16);
+		}
+	}
+}
+
+void powervr2_device::fb_convert_8888argb_to_888rgb32(address_space &space, int x,int y)
+{
+	int xcnt,ycnt;
+	for (ycnt=0;ycnt<32;ycnt++)
+	{
+		UINT32 realwriteoffs = 0x05000000 + fb_w_sof1 + (y+ycnt) * (fb_w_linestride<<3) + (x*4);
+		UINT32 *src = &fake_accumulationbuffer_bitmap->pix32(y+ycnt, x);
+
+		for (xcnt=0;xcnt<32;xcnt++)
+		{
+			// data starts in 8888 format, downsample it
+			UINT32 data = src[xcnt];
+			UINT32 newdat = (data & 0xffffff);
+
+			space.write_dword(realwriteoffs+xcnt*4, newdat);
+		}
+	}
+}
+
+
 /*
 
 0x0 0555 KRGB 16 bit (default) Bit 15 is the value of fb_kval 7.
@@ -2412,29 +2746,21 @@ void powervr2_device::pvr_accumulationbuffer_to_framebuffer(address_space &space
 	// yes, this means colour data is lost in the conversion
 
 	UINT8 packmode = fb_w_ctrl & 0x7;
+	UINT8 unpackmode = (fb_r_ctrl & 0x0000000c) >>2;  // aka fb_depth
+
+//	popmessage("%02x %02x",packmode,unpackmode);
 
 	switch (packmode)
 	{
 		// used by ringout
 		case 0x00: //0555 KRGB
 		{
-			int xcnt,ycnt;
-			for (ycnt=0;ycnt<32;ycnt++)
+			switch(unpackmode)
 			{
-				UINT32 realwriteoffs = 0x05000000 + fb_w_sof1 + (y+ycnt) * (fb_w_linestride<<3) + (x*2);
-				UINT32 *src = &fake_accumulationbuffer_bitmap->pix32(y+ycnt, x);
-
-
-				for (xcnt=0;xcnt<32;xcnt++)
-				{
-					// data starts in 8888 format, downsample it
-					UINT32 data = src[xcnt];
-					UINT16 newdat = ((((data & 0x000000f8) >> 3)) << 0)   |
-									((((data & 0x0000f800) >> 11)) << 5)  |
-									((((data & 0x00f80000) >> 19)) << 10);
-
-					space.write_word(realwriteoffs+xcnt*2, newdat);
-				}
+				case 0x00: fb_convert_0555krgb_to_555rgb(space,x,y); break;
+				case 0x01: fb_convert_0555krgb_to_565rgb(space,x,y); break;
+				case 0x02: fb_convert_0555krgb_to_888rgb24(space,x,y); break;
+				case 0x03: fb_convert_0555krgb_to_888rgb32(space,x,y); break;
 			}
 		}
 		break;
@@ -2442,23 +2768,12 @@ void powervr2_device::pvr_accumulationbuffer_to_framebuffer(address_space &space
 		// used by cleoftp
 		case 0x01: //565 RGB 16 bit
 		{
-			int xcnt,ycnt;
-			for (ycnt=0;ycnt<32;ycnt++)
+			switch(unpackmode)
 			{
-				UINT32 realwriteoffs = 0x05000000 + fb_w_sof1 + (y+ycnt) * (fb_w_linestride<<3) + (x*2);
-				UINT32 *src = &fake_accumulationbuffer_bitmap->pix32(y+ycnt, x);
-
-
-				for (xcnt=0;xcnt<32;xcnt++)
-				{
-					// data starts in 8888 format, downsample it
-					UINT32 data = src[xcnt];
-					UINT16 newdat = ((((data & 0x000000f8) >> 3)) << 0)   |
-									((((data & 0x0000fc00) >> 10)) << 5)  |
-									((((data & 0x00f80000) >> 19)) << 11);
-
-					space.write_word(realwriteoffs+xcnt*2, newdat);
-				}
+				case 0x00: fb_convert_0565rgb_to_555rgb(space,x,y); break;
+				case 0x01: fb_convert_0565rgb_to_565rgb(space,x,y); break;
+				case 0x02: fb_convert_0565rgb_to_888rgb24(space,x,y); break;
+				case 0x03: fb_convert_0565rgb_to_888rgb32(space,x,y); break;
 			}
 		}
 		break;
@@ -2469,27 +2784,16 @@ void powervr2_device::pvr_accumulationbuffer_to_framebuffer(address_space &space
 
 		case 0x03: // 1555 ARGB 16 bit
 		{
-			int xcnt,ycnt;
-			for (ycnt=0;ycnt<32;ycnt++)
+			switch(unpackmode)
 			{
-				UINT32 realwriteoffs = 0x05000000 + fb_w_sof1 + (y+ycnt) * (fb_w_linestride<<3) + (x*2);
-				UINT32 *src = &fake_accumulationbuffer_bitmap->pix32(y+ycnt, x);
-
-
-				for (xcnt=0;xcnt<32;xcnt++)
-				{
-					// data starts in 8888 format, downsample it
-					UINT32 data = src[xcnt];
-					UINT16 newdat = ((((data & 0x000000f8) >> 3)) << 0)   |
-									((((data & 0x0000f800) >> 11)) << 5)  |
-									((((data & 0x00f80000) >> 19)) << 10);
-					// alpha?
-
-					space.write_word(realwriteoffs+xcnt*2, newdat);
-				}
+				case 0x00: fb_convert_1555argb_to_555rgb(space,x,y); break;
+				case 0x01: fb_convert_1555argb_to_565rgb(space,x,y); break;
+				case 0x02: fb_convert_1555argb_to_888rgb24(space,x,y); break;
+				case 0x03: fb_convert_1555argb_to_888rgb32(space,x,y); break;
 			}
 		}
 		break;
+		popmessage("888RGB 24-bit mode used, contact MAME/MESSdev");
 
 		// used by Suchie3
 		case 0x04: // 888 RGB 24-bit (HACK! should not downconvert and pvr_drawframebuffer should change accordingly)
@@ -2519,25 +2823,14 @@ void powervr2_device::pvr_accumulationbuffer_to_framebuffer(address_space &space
 			printf("pvr_accumulationbuffer_to_framebuffer buffer to tile at %d,%d - unsupported pack mode %02x (0888 KGB 32-bit)\n",x,y,packmode);
 			break;
 
-		case 0x06: // 8888 ARGB 32 bit (HACK! should not downconvert and pvr_drawframebuffer should change accordingly)
+		case 0x06: // 8888 ARGB 32 bit
 		{
-			int xcnt,ycnt;
-			for (ycnt=0;ycnt<32;ycnt++)
+			switch(unpackmode)
 			{
-				UINT32 realwriteoffs = 0x05000000 + fb_w_sof1 + (y+ycnt) * (fb_w_linestride<<3) + (x*2);
-				UINT32 *src = &fake_accumulationbuffer_bitmap->pix32(y+ycnt, x);
-
-
-				for (xcnt=0;xcnt<32;xcnt++)
-				{
-					// data is 8888 format
-					UINT32 data = src[xcnt];
-					UINT16 newdat = ((((data & 0x000000f8) >> 3)) << 0)   |
-									((((data & 0x0000fc00) >> 10)) << 5)  |
-									((((data & 0x00f80000) >> 19)) << 11);
-
-					space.write_word(realwriteoffs+xcnt*2, newdat);
-				}
+				case 0x00: fb_convert_8888argb_to_555rgb(space,x,y); break;
+				case 0x01: fb_convert_8888argb_to_565rgb(space,x,y); break;
+				case 0x02: fb_convert_8888argb_to_888rgb24(space,x,y); break;
+				case 0x03: fb_convert_8888argb_to_888rgb32(space,x,y); break;
 			}
 		}
 		break;
@@ -2708,7 +3001,7 @@ void powervr2_device::pvr_drawframebuffer(bitmap_rgb32 &bitmap,const rectangle &
 			}
 			break;
 
-		case 0x03:        // 0888 ARGB 32-bit - HACKED, see pvr_accumulationbuffer_to_framebuffer!
+		case 0x03:        // 0888 ARGB 32-bit
 			for (y=0;y <= dy;y++)
 			{
 				addrp = fb_r_sof1+y*xi*2;

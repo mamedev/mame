@@ -438,6 +438,28 @@ private:
 	void process_ta_fifo();
 	void debug_paletteram();
 	void update_screen_format();
+
+	void fb_convert_0555krgb_to_555rgb(address_space &space, int x, int y);
+	void fb_convert_0555krgb_to_565rgb(address_space &space, int x, int y);
+	void fb_convert_0555krgb_to_888rgb24(address_space &space, int x, int y);
+	void fb_convert_0555krgb_to_888rgb32(address_space &space, int x, int y);
+
+	void fb_convert_0565rgb_to_555rgb(address_space &space, int x, int y);
+	void fb_convert_0565rgb_to_565rgb(address_space &space, int x, int y);
+	void fb_convert_0565rgb_to_888rgb24(address_space &space, int x, int y);
+	void fb_convert_0565rgb_to_888rgb32(address_space &space, int x, int y);
+
+	void fb_convert_1555argb_to_555rgb(address_space &space, int x, int y);
+	void fb_convert_1555argb_to_565rgb(address_space &space, int x, int y);
+	void fb_convert_1555argb_to_888rgb24(address_space &space, int x, int y);
+	void fb_convert_1555argb_to_888rgb32(address_space &space, int x, int y);
+
+
+	void fb_convert_8888argb_to_555rgb(address_space &space, int x, int y);
+	void fb_convert_8888argb_to_565rgb(address_space &space, int x, int y);
+	void fb_convert_8888argb_to_888rgb24(address_space &space, int x, int y);
+	void fb_convert_8888argb_to_888rgb32(address_space &space, int x, int y);
+
 };
 
 extern const device_type POWERVR2;
