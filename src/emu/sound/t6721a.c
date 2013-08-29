@@ -99,3 +99,13 @@ WRITE8_MEMBER( t6721a_device::write )
 WRITE_LINE_MEMBER( t6721a_device::di_w )
 {
 }
+
+
+//-------------------------------------------------
+//  eos_r - eos read
+//-------------------------------------------------
+
+READ_LINE_MEMBER( t6721a_device::eos_r )
+{
+	return 0;
+}

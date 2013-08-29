@@ -54,4 +54,39 @@
 		</part>
 	</software>
 
+	<software name="getrdyrd">
+		<description>Get Ready to Read with BJ Bear</description>
+		<year>1984</year>
+		<publisher>Commodore</publisher>
+		<sharedfeat name="requirement" value="c64_cart:magicvce"/>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Level 1"/>
+			<dataarea name="cass" size="970430">
+				<rom name="get_ready_to_read_with_bj_bear_level_1.tap" size="970430" crc="a7d4dd62" sha1="f0f6812903bc4dd5911bb539bbe4f2f8cd7587b1" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Level 2"/>
+			<dataarea name="cass" size="1011790">
+				<rom name="get_ready_to_read_with_bj_bear_level_2.tap" size="1011790" crc="1eefb4bc" sha1="02ec52cab63fa236acc44f43de51edad496a438a" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="cass3" interface="cbm_cass">
+			<feature name="part_id" value="Level 3"/>
+			<dataarea name="cass" size="1117066">
+				<rom name="get_ready_to_read_with_bj_bear_level_3.tap" size="1117066" crc="edb07330" sha1="6fed14fc5cc3e27ce658bf1d26713257d4b8a5f0" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="cass4" interface="cbm_cass">
+			<feature name="part_id" value="Level 4"/>
+			<dataarea name="cass" size="1165314">
+				<rom name="get_ready_to_read_with_bj_bear_level_4.tap" size="1165314" crc="411da83e" sha1="ba7f2c3b5e7e77064a208ca89f78284ec35f6787" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

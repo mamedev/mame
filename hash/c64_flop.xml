@@ -587,6 +587,19 @@
 		</part>
 	</software>
 
+	<software name="getrdynu">
+		<description>Get Ready for Number with BJ Bear</description>
+		<year>1984</year>
+		<publisher>Commodore</publisher>
+		<sharedfeat name="requirement" value="c64_cart:magicvce"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="get_ready_for_number_with_bj_bear.d64" size="174848" crc="58c4760d" sha1="7c2165ae9e4322addef6666cdb996c8ad0914c15" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Test/Demo disks -->
 
 	<software name="1541demo">
@@ -794,6 +807,19 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
 				<rom name="sx64-demo.d64" size="174848" crc="99b689fd" sha1="bb270585973317389c2a486f57e5e9646904acbc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mvdemo">
+		<description>Magic Voice Demo Disk</description>
+		<year>198?</year>
+		<publisher>Commodore</publisher>
+		<sharedfeat name="requirement" value="c64_cart:magicvce"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="magicvoicedemo.d64 " size="174848" crc="e33213bf" sha1="e46300be955d64266d20c614aa1549f4c5640517" offset="0" />
 			</dataarea>
 		</part>
 	</software>

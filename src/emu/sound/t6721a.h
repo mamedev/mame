@@ -77,6 +77,8 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( di_w );
 
+	DECLARE_READ_LINE_MEMBER( eos_r );
+
 protected:
 	// device-level overrides
 	virtual void device_start();
