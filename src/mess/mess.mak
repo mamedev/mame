@@ -2210,12 +2210,13 @@ $(MESSOBJ)/trainer.a: \
 	$(MESS_DRIVERS)/babbage.o   \
 	$(MESS_DRIVERS)/bob85.o     \
 	$(MESS_DRIVERS)/cvicny.o    \
-	$(MESS_DRIVERS)/instruct.o  \
 	$(MESS_DRIVERS)/dolphunk.o  \
+	$(MESS_DRIVERS)/instruct.o  \
 	$(MESS_DRIVERS)/mk14.o      \
 	$(MESS_DRIVERS)/pro80.o     \
 	$(MESS_DRIVERS)/savia84.o   \
 	$(MESS_DRIVERS)/selz80.o    \
+	$(MESS_DRIVERS)/tk80.o      \
 
 $(MESSOBJ)/trs.a:               \
 	$(MESS_MACHINE)/6883sam.o   \
@@ -2552,6 +2553,7 @@ $(MESS_DRIVERS)/fidelz80.o: $(MESS_LAYOUT)/fidelz80.lh \
 							$(MESS_LAYOUT)/vsc.lh
 $(MESS_DRIVERS)/glasgow.o:  $(MESS_LAYOUT)/glasgow.lh
 $(MESS_DRIVERS)/h8.o:       $(MESS_LAYOUT)/h8.lh
+$(MESS_DRIVERS)/ics8080.o:  $(MESS_LAYOUT)/ics8080.lh
 $(MESS_DRIVERS)/instruct.o: $(MESS_LAYOUT)/instruct.lh
 $(MESS_DRIVERS)/k1003.o:    $(MESS_LAYOUT)/k1003.lh
 $(MESS_DRIVERS)/kim1.o:     $(MESS_LAYOUT)/kim1.lh
