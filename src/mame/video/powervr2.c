@@ -1426,14 +1426,17 @@ WRITE32_MEMBER( powervr2_device::ta_yuv_tex_ctrl_w )
 	logerror("%s: ta_yuv_tex_ctrl = %08x\n", tag(), ta_yuv_tex_ctrl);
 }
 
+#include "debugger.h"
 /* TODO */
 READ32_MEMBER( powervr2_device::ta_yuv_tex_cnt_r )
 {
+	debugger_break(machine());
 	return ta_yuv_tex_cnt;
 }
 
 WRITE32_MEMBER( powervr2_device::ta_yuv_tex_cnt_w )
 {
+	debugger_break(machine());
 	COMBINE_DATA(&ta_yuv_tex_cnt);
 }
 

@@ -115,7 +115,7 @@
 		TA_IPINT (0109):
 			NG -> TA: Illegal parameter (error)
 		YUV Converter (0201):
-			NG (I think)
+			ok
 	DDT i/f TEST:
 		Sort, Normal DMA (1) (0101)
 			hangs (wants Sort DMA irq, of course)
@@ -148,11 +148,11 @@
 				ok
 		Register (02xx)
 			CH Data (0201)
-				NG
+				ok
 			EXT Input (0202)
 				ok
 			DSP Data (0203)
-				NG
+				NG (ADDR=0xa0704000 W=0xff R=0x00)
 		S_Clock (03xx)
 			50MSEC (0301)
 				NG
@@ -188,19 +188,19 @@
 				ok
 		Interrupt (06xx)
 			Sampling clock (0601)
-				NG
+				NG (irq 0x400)
 			Timer A (0602)
-				NG
+				randomly NG/ok
 			Timer B (0603)
-				NG
+				ok
 			Timer C (0604)
-				NG
+				ok
 			DMA End (0605)
-				NG
+				ok
 			Midi Out (0606)
 				NG
 			Main CPU (0607)
-				NG
+				ok
 		RTC (07xx)
 			Write Protect (0701)
 				ok
@@ -570,11 +570,22 @@ WRITE_LINE_MEMBER(dc_cons_state::aica_irq)
 	m_soundcpu->set_input_line(ARM7_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
+WRITE_LINE_MEMBER(dc_cons_state::sh4_aica_irq)
+{
+	if(state)
+		dc_sysctrl_regs[SB_ISTEXT] |= IST_EXT_AICA;
+	else
+		dc_sysctrl_regs[SB_ISTEXT] &= ~IST_EXT_AICA;
+
+	dc_update_interrupt_status();
+}
+
 static const aica_interface dc_aica_interface =
 {
 	TRUE,
 	0,
-	DEVCB_DRIVER_LINE_MEMBER(dc_cons_state,aica_irq)
+	DEVCB_DRIVER_LINE_MEMBER(dc_cons_state,aica_irq),
+	DEVCB_DRIVER_LINE_MEMBER(dc_cons_state,sh4_aica_irq)
 };
 
 static const struct sh4_config sh4cpu_config = {  1,  0,  1,  0,  0,  0,  1,  1,  0, CPU_CLOCK };

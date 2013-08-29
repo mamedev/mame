@@ -172,6 +172,7 @@ struct aica_state
 	UINT32 AICARAM_LENGTH, RAM_MASK, RAM_MASK16;
 	char Master;
 	devcb_resolved_write_line IntARMCB;
+	devcb_resolved_write_line IntSH4CB;
 	sound_stream * stream;
 
 	INT32 *buffertmpl, *buffertmpr;
@@ -189,6 +190,8 @@ struct aica_state
 
 	int TimPris[3];
 	int TimCnt[3];
+
+	UINT16 mcieb, mcipd;
 
 	// timers
 	emu_timer *timerA, *timerB, *timerC;
@@ -288,16 +291,28 @@ static void CheckPendingIRQ(aica_state *AICA)
 		}
 }
 
+static void CheckPendingIRQ_SH4(aica_state *AICA)
+{
+	if(AICA->mcipd & AICA->mcieb)
+		AICA->IntSH4CB(1);
+
+	if((AICA->mcipd & AICA->mcieb) == 0)
+		AICA->IntSH4CB(0);
+}
+
 static TIMER_CALLBACK( timerA_cb )
 {
 	aica_state *AICA = (aica_state *)ptr;
 
 	AICA->TimCnt[0] = 0xFFFF;
 	AICA->udata.data[0xa0/2]|=0x40;
+	AICA->mcipd |= 0x40;
 	AICA->udata.data[0x90/2]&=0xff00;
 	AICA->udata.data[0x90/2]|=AICA->TimCnt[0]>>8;
 
 	CheckPendingIRQ(AICA);
+	CheckPendingIRQ_SH4(AICA);
+
 }
 
 static TIMER_CALLBACK( timerB_cb )
@@ -306,10 +321,12 @@ static TIMER_CALLBACK( timerB_cb )
 
 	AICA->TimCnt[1] = 0xFFFF;
 	AICA->udata.data[0xa0/2]|=0x80;
+	AICA->mcipd |= 0x80;
 	AICA->udata.data[0x94/2]&=0xff00;
 	AICA->udata.data[0x94/2]|=AICA->TimCnt[1]>>8;
 
 	CheckPendingIRQ(AICA);
+	CheckPendingIRQ_SH4(AICA);
 }
 
 static TIMER_CALLBACK( timerC_cb )
@@ -318,10 +335,12 @@ static TIMER_CALLBACK( timerC_cb )
 
 	AICA->TimCnt[2] = 0xFFFF;
 	AICA->udata.data[0xa0/2]|=0x100;
+	AICA->mcipd |= 0x100;
 	AICA->udata.data[0x98/2]&=0xff00;
 	AICA->udata.data[0x98/2]|=AICA->TimCnt[2]>>8;
 
 	CheckPendingIRQ(AICA);
+	CheckPendingIRQ_SH4(AICA);
 }
 
 static int Get_AR(aica_state *AICA,int base,int R)
@@ -802,6 +821,13 @@ static void AICA_UpdateReg(aica_state *AICA, address_space &space, int reg)
 				}
 			}
 			break;
+
+		case 0x9c: //SCIEB
+		case 0x9d:
+			if(AICA->udata.data[0x9c/2] & 0x631)
+				popmessage("AICA: SCIEB enabled %04x, contact MAME/MESSdev",AICA->udata.data[0x9c/2]);
+			break;
+
 		case 0xa4:  //SCIRE
 		case 0xa5:
 
@@ -840,14 +866,25 @@ static void AICA_UpdateReg(aica_state *AICA, address_space &space, int reg)
 			}
 			break;
 
-		case 0xb4:
+		case 0xb4: //MCIEB
 		case 0xb5:
-		case 0xb6:
-		case 0xb7:
-			if (MCIEB(AICA) & 0x20)
-			{
-				logerror("AICA: Interrupt requested on SH-4!\n");
-			}
+			if(AICA->udata.data[0xb4/2] & 0x7df)
+				popmessage("AICA: MCIEB enabled %04x, contact MAME/MESSdev",AICA->udata.data[0xb4/2]);
+			AICA->mcieb = AICA->udata.data[0xb4/2];
+			CheckPendingIRQ_SH4(AICA);
+			break;
+
+		case 0xb8:
+		case 0xb9:
+			if(AICA->udata.data[0xb8/2] & 0x20)
+				AICA->mcipd |= 0x20;
+			CheckPendingIRQ_SH4(AICA);
+			break;
+
+		case 0xbc:
+		case 0xbd:
+			AICA->mcipd &= ~AICA->udata.data[0xbc/2];
+			CheckPendingIRQ_SH4(AICA);
 			break;
 	}
 }
@@ -923,6 +960,10 @@ static void AICA_UpdateRegR(aica_state *AICA, address_space &space, int reg)
 
 				AICA->udata.data[0x14/2] = CA;
 			}
+			break;
+		case 0xb8:
+		case 0xb9:
+			AICA->udata.data[0xb8/2] = AICA->mcipd;
 			break;
 	}
 }
@@ -1371,8 +1412,9 @@ static void aica_exec_dma(aica_state *aica,address_space &space)
 
 	/* Job done, clear DEXE */
 	aica->udata.data[0x8c/2] &= ~1;
-	/* request a dma end irq (TBD) */
-	// ...
+	/* request a dma end irq */
+	aica->mcipd |= 0x10;
+	CheckPendingIRQ_SH4(aica);
 }
 
 #ifdef UNUSED_FUNCTION
@@ -1406,6 +1448,7 @@ static DEVICE_START( aica )
 	// set up the IRQ callbacks
 	{
 		AICA->IntARMCB.resolve(intf->irq_callback,*device);
+		AICA->IntSH4CB.resolve(intf->master_irq_callback,*device);
 
 		AICA->stream = device->machine().sound().stream_alloc(*device, 0, 2, 44100, AICA, AICA_Update);
 	}

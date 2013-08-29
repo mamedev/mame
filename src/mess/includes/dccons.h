@@ -25,6 +25,7 @@ public:
 	DECLARE_READ64_MEMBER(dc_arm_r);
 	DECLARE_WRITE64_MEMBER(dc_arm_w);
 	DECLARE_WRITE_LINE_MEMBER(aica_irq);
+	DECLARE_WRITE_LINE_MEMBER(sh4_aica_irq);
 	void gdrom_raise_irq();
 	void gdrom_set_status(UINT8 flag,bool state);
 	void gdrom_set_error(UINT8 flag,bool state);

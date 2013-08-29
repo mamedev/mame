@@ -1799,12 +1799,22 @@ WRITE_LINE_MEMBER(naomi_state::aica_irq)
 	m_soundcpu->set_input_line(ARM7_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
+WRITE_LINE_MEMBER(naomi_state::sh4_aica_irq)
+{
+	if(state)
+		dc_sysctrl_regs[SB_ISTEXT] |= IST_EXT_AICA;
+	else
+		dc_sysctrl_regs[SB_ISTEXT] &= ~IST_EXT_AICA;
+
+	dc_update_interrupt_status();
+}
 
 static const aica_interface aica_config =
 {
 	TRUE,
 	0,
-	DEVCB_DRIVER_LINE_MEMBER(naomi_state,aica_irq)
+	DEVCB_DRIVER_LINE_MEMBER(naomi_state,aica_irq),
+	DEVCB_DRIVER_LINE_MEMBER(naomi_state,sh4_aica_irq)
 };
 
 
