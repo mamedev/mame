@@ -1484,6 +1484,33 @@ ROM_START( pigskina ) /* Initial boot screen reports REV 2.0 7/06/90 */
 ROM_END
 
 
+ROM_START( pigskinb ) /* Initial boot screen reports REV 1.1 6/05/90 */
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "pigskin_la1.a5",  0x00000, 0x10000, CRC(6c10028d) SHA1(70080b9aa551a543b7b99d46963862f74b6cbd7a) )
+	ROM_LOAD16_BYTE( "pigskin_la1.b5",  0x00001, 0x10000, CRC(2d03fbad) SHA1(445a161bdd6c09193c576c55c6b12b1c017aa188) )
+	ROM_LOAD16_BYTE( "pigskin_la1.a6",  0x20000, 0x10000, CRC(5fca2c4e) SHA1(6892ba763a0c9847c589514ff989b7f40e09784b) )
+	ROM_LOAD16_BYTE( "pigskin_la1.b6",  0x20001, 0x10000, CRC(778a75fc) SHA1(3199efa34676d5856b33a8810043616e3618229e) )
+
+	ROM_REGION( 0x90000, "cvsd:cpu", 0 )  /* Audio System board */
+	ROM_LOAD( "pigskin_sl1.u4",  0x10000, 0x10000, CRC(6daf2d37) SHA1(4c8098520fe44e36b01389bcfcfe3ad1d027cbde) )
+	ROM_RELOAD(                  0x20000, 0x10000 )
+	ROM_LOAD( "pigskin_sl1.u19", 0x30000, 0x10000, CRC(56fd16a3) SHA1(b91aabdbd3185355f2b7177fc4d3a86fa110f51d) )
+	ROM_RELOAD(                  0x40000, 0x10000 )
+	ROM_LOAD( "pigskin_sl1.u20", 0x50000, 0x10000, CRC(5d032fb8) SHA1(a236cdc64856637e560bec7119b051fac13efbe0) )
+	ROM_RELOAD(                  0x60000, 0x10000 )
+
+	ROM_REGION( 0x20000, "gfx1", ROMREGION_INVERT )
+	ROM_LOAD( "pigskin_la1.e2",  0x00000, 0x10000, CRC(12d5737b) SHA1(73040233bb86eaa42257112e2f0540de1206e310) )
+	ROM_LOAD( "pigskin_la1.e1",  0x10000, 0x10000, CRC(460202a9) SHA1(8c2f7ae3615519e13e750c99b89ccb28e9946bb8) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD( "pigskin_la1.h15", 0x00000, 0x20000, CRC(e43d5d93) SHA1(e7592ba11601f2d20d54d52f436a239671c4d3ac) )
+	ROM_LOAD( "pigskin_la1.h17", 0x20000, 0x20000, CRC(6b780f1e) SHA1(a0689feb38ad31eff5604d80562d9a936b30a011) )
+	ROM_LOAD( "pigskin_la1.h18", 0x40000, 0x20000, CRC(5e50f940) SHA1(c9593b11934fd6da2b6c971859c0581fd92a915f) )
+	ROM_LOAD( "pigskin_la1.h14", 0x60000, 0x20000, CRC(f26279f4) SHA1(9a8cd5aa359f408c93aa7f322b6eac17be52f3d3) )
+ROM_END
+
+
 ROM_START( trisport )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "la3.a5",  0x00000, 0x10000, CRC(fe1e9e37) SHA1(583f18531583e038ca57a592b6a6c305896bf2c5) )
@@ -1659,10 +1686,11 @@ GAME( 1984, zwackery, 0,        zwackery, zwackery, mcr68_state, zwackery, ROT0,
 GAME( 1987, xenophob, 0,        xenophob, xenophob, mcr68_state, xenophob, ROT0,   "Bally Midway", "Xenophobe", GAME_SUPPORTS_SAVE )
 GAME( 1987, spyhunt2, 0,        spyhunt2, spyhunt2, mcr68_state, spyhunt2, ROT0,   "Bally Midway", "Spy Hunter II (rev 2)", GAME_SUPPORTS_SAVE )
 GAME( 1987, spyhunt2a,spyhunt2, spyhunt2, spyhunt2, mcr68_state, spyhunt2, ROT0,   "Bally Midway", "Spy Hunter II (rev 1)", GAME_SUPPORTS_SAVE )
-GAME( 1988, blasted,  0,        xenophob, blasted, mcr68_state,  blasted,  ROT0,   "Bally Midway", "Blasted", GAME_SUPPORTS_SAVE )
+GAME( 1988, blasted,  0,        xenophob, blasted,  mcr68_state, blasted,  ROT0,   "Bally Midway", "Blasted", GAME_SUPPORTS_SAVE )
 GAME( 1987, intlaser, blasted,  intlaser, intlaser, mcr68_state, intlaser, ROT0,   "Bally Midway", "International Team Laser (prototype)", GAME_SUPPORTS_SAVE )
 GAME( 1989, archrivl, 0,        archrivl, archrivl, mcr68_state, archrivl, ROT0,   "Bally Midway", "Arch Rivals (rev 4.0 6/29/89)", GAME_SUPPORTS_SAVE )
 GAME( 1989, archrivl2,archrivl, archrivl, archrivl, mcr68_state, archrivl, ROT0,   "Bally Midway", "Arch Rivals (rev 2.0 5/03/89)", GAME_SUPPORTS_SAVE )
 GAME( 1989, trisport, 0,        trisport, trisport, mcr68_state, trisport, ROT270, "Bally Midway", "Tri-Sports", GAME_SUPPORTS_SAVE )
-GAME( 1990, pigskin,  0,        pigskin,  pigskin, mcr68_state,  pigskin,  ROT0,   "Midway", "Pigskin 621AD (rev 1.1K 8/01/90)", GAME_SUPPORTS_SAVE )
-GAME( 1990, pigskina, pigskin,  pigskin,  pigskin, mcr68_state,  pigskin,  ROT0,   "Midway", "Pigskin 621AD (rev 2.0 7/06/90)", GAME_SUPPORTS_SAVE )
+GAME( 1990, pigskin,  0,        pigskin,  pigskin,  mcr68_state, pigskin,  ROT0,   "Midway",       "Pigskin 621AD (rev 1.1K 8/01/90)", GAME_SUPPORTS_SAVE )
+GAME( 1990, pigskina, pigskin,  pigskin,  pigskin,  mcr68_state, pigskin,  ROT0,   "Midway",       "Pigskin 621AD (rev 2.0 7/06/90)", GAME_SUPPORTS_SAVE )
+GAME( 1990, pigskinb, pigskin,  pigskin,  pigskin,  mcr68_state, pigskin,  ROT0,   "Midway",       "Pigskin 621AD (rev 1.1 6/05/90)", GAME_SUPPORTS_SAVE )
