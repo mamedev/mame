@@ -185,7 +185,7 @@ static void atari_load_proc(device_image_interface &image)
 	ext = image.filetype();
 
 	// hack alert, this means we can only load ATR via the softlist at the moment, image.filetype reutrns NULL :/
-	if (!image.software_entry() == NULL) ext="ATR";
+	if (image.software_entry() != NULL) ext="ATR";
 
 	/* no extension: assume XFD format (no header) */
 	if (!ext)
