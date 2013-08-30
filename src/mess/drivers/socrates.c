@@ -6,6 +6,7 @@
 *
 *  (driver structure copied from vtech1.c)
 TODO:
+    The speech chip is a toshiba tc8802AF running at 800khz clock/10khz output with between 1 and 4 t6684F vsm roms attached; create a sound driver for this!
     fix glitches with keyboard input (double keys still don't work, super painter letter entry still doesn't work)
     hook up hblank
     hook up mouse
