@@ -19,6 +19,7 @@ hash/a5200.hsi svneol=native#text/plain
 hash/a5200.xml svneol=native#text/xml
 hash/a7800.xml svneol=native#text/xml
 hash/a800.xml svneol=native#text/xml
+hash/a800_flop.xml svneol=native#text/plain
 hash/abc1600.xml svneol=native#text/xml
 hash/abc80.xml svneol=native#text/xml
 hash/abc800.xml svneol=native#text/xml

@@ -171,15 +171,22 @@ static void atari_load_proc(device_image_interface &image)
 	}
 
 	size = image.fread(fdc->drv[id].image, MAXSIZE);
+
 	if( size <= 0 )
 	{
 		fdc->drv[id].image = NULL;
 		return;
 	}
+
+
 	/* re allocate the buffer; we don't want to be too lazy ;) */
 	//fdc->drv[id].image = (UINT8*)image.image_realloc(fdc->drv[id].image, size);
 
 	ext = image.filetype();
+
+	// hack alert, this means we can only load ATR via the softlist at the moment, image.filetype reutrns NULL :/
+	if (!image.software_entry() == NULL) ext="ATR";
+
 	/* no extension: assume XFD format (no header) */
 	if (!ext)
 	{
@@ -220,6 +227,7 @@ static void atari_load_proc(device_image_interface &image)
 		fdc->drv[id].header_skip = 0;
 	}
 
+
 	switch (fdc->drv[id].type)
 	{
 	/* XFD or unknown format: find a matching size from the table */
@@ -243,7 +251,6 @@ static void atari_load_proc(device_image_interface &image)
 	case FORMAT_ATR:
 		{
 			int s;
-
 			fdc->drv[id].bseclen = 128;
 			/* get sectors from ATR header */
 			s = (size - 16) / 128;
@@ -781,12 +788,13 @@ static const floppy_interface atari_floppy_interface =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	LEGACY_FLOPPY_OPTIONS_NAME(atari_only),
-	NULL,
+	"floppy_5_25",
 	NULL
 };
 
 static MACHINE_CONFIG_FRAGMENT( atari_fdc )
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(atari_floppy_interface)
+	MCFG_SOFTWARE_LIST_ADD("flop_list","a800_flop")
 MACHINE_CONFIG_END
 
 device_t *atari_floppy_get_device_child(device_t *device,int drive)

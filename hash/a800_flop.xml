@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+
+	Atari 400 / 800 floppies
+	(skeleton list)
+	
+	note: many 'original' floppy images are in .atx format, whereas cracked / unprotected ones are .atr format
+	      .atx is unsupported, although apparently has been reverse engineered (insert info link here)
+		  There are also images in .xex format?
+
+-->
+
+<softwarelist name="a800_flop" description="Atari 400 / 800 floppy disks">
+
+	<software name="jumpman">
+		<description>Jumpman</description>
+		<year>1983</year>
+		<publisher>Epyx</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="92176">
+				<rom name="jumpman.atr" size="92176" crc="290a9e56" sha1="96c411a65cfd0b45ac68603021793701d27244b9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	
+</softwarelist>
