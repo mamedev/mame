@@ -389,6 +389,8 @@ private:
 	static inline UINT32 cv_4444z(UINT16 c);
 	static inline UINT32 cv_yuv(UINT16 c1, UINT16 c2, int x);
 	UINT32 tex_r_yuv_n(texinfo *t, float x, float y);
+	UINT32 tex_r_yuv_tw(texinfo *t, float x, float y);
+//	UINT32 tex_r_yuv_vq(texinfo *t, float x, float y);
 	UINT32 tex_r_1555_n(texinfo *t, float x, float y);
 	UINT32 tex_r_1555_tw(texinfo *t, float x, float y);
 	UINT32 tex_r_1555_vq(texinfo *t, float x, float y);

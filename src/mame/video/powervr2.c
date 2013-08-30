@@ -327,7 +327,6 @@ inline UINT32 powervr2_device::cv_yuv(UINT16 c1, UINT16 c2, int x)
 	return 0xff000000 | (r << 16) | (g << 8) | b;
 }
 
-
 UINT32 powervr2_device::tex_r_yuv_n(texinfo *t, float x, float y)
 {
 	int xt = ((int)x) & (t->sizex-1);
@@ -337,6 +336,29 @@ UINT32 powervr2_device::tex_r_yuv_n(texinfo *t, float x, float y)
 	UINT16 c2 = *(UINT16 *)((reinterpret_cast<UINT8 *>(dc_texture_ram)) + WORD_XOR_LE(addrp+2));
 	return cv_yuv(c1, c2, xt);
 }
+
+UINT32 powervr2_device::tex_r_yuv_tw(texinfo *t, float x, float y)
+{
+	int xt = ((int)x) & (t->sizex-1);
+	int yt = ((int)y) & (t->sizey-1);
+	int addrp = t->address + (dilated1[t->cd][xt & ~1] + dilated0[t->cd][yt])*2;
+	UINT16 c1 = *(UINT16 *)((reinterpret_cast<UINT8 *>(dc_texture_ram)) + WORD_XOR_LE(addrp));
+	UINT16 c2 = *(UINT16 *)((reinterpret_cast<UINT8 *>(dc_texture_ram)) + WORD_XOR_LE(addrp+4));
+	return cv_yuv(c1, c2, xt);
+}
+
+#if 0
+UINT32 powervr2_device::tex_r_yuv_vq(texinfo *t, float x, float y)
+{
+	int xt = ((int)x) & (t->sizex-1);
+	int yt = ((int)y) & (t->sizey-1);
+	int idx = (reinterpret_cast<UINT8 *>(dc_texture_ram))[BYTE_XOR_LE(t->address + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
+	int addrp = t->vqbase + 8*idx + (dilated1[t->cd][xt & 1] + dilated0[t->cd][yt & 1])*2;
+	UINT16 c1 = *(UINT16 *)((reinterpret_cast<UINT8 *>(dc_texture_ram)) + WORD_XOR_LE(addrp));
+	UINT16 c2 = *(UINT16 *)((reinterpret_cast<UINT8 *>(dc_texture_ram)) + WORD_XOR_LE(addrp+4));
+	return cv_yuv(c1, c2, xt);
+}
+#endif
 
 UINT32 powervr2_device::tex_r_1555_n(texinfo *t, float x, float y)
 {
@@ -632,7 +654,7 @@ void powervr2_device::tex_get_info(texinfo *t)
 	t->vqbase = t->address;
 	t->blend = use_alpha ? blend_functions[t->blend_mode] : bl10;
 
-	//fprintf(stderr, "tex %d %d %d %d\n", t->pf, t->mode, pal_ram_ctrl, t->mipmapped);
+//	fprintf(stderr, "tex %d %d %d %d\n", t->pf, t->mode, pal_ram_ctrl, t->mipmapped);
 
 	switch(t->pf) {
 	case 0: // 1555
@@ -676,9 +698,9 @@ void powervr2_device::tex_get_info(texinfo *t)
 
 	case 3: // yuv422
 		switch(t->mode) {
-		case 0:  /*t->r = &powervr2_device::tex_r_yuv_tw*/; miptype = -1; break;
+		case 0:  t->r = &powervr2_device::tex_r_yuv_tw; miptype = -1; break;
 		case 1:  t->r = &powervr2_device::tex_r_yuv_n; miptype = -1; break;
-		default: /*t->r = &powervr2_device::tex_r_yuv_vq*/; miptype = -1; break;
+		//default: t->r = &powervr2_device::tex_r_yuv_vq; miptype = -1; break;
 		}
 		break;
 
