@@ -457,6 +457,11 @@ private:
 	void fb_convert_1555argb_to_888rgb24(address_space &space, int x, int y);
 	void fb_convert_1555argb_to_888rgb32(address_space &space, int x, int y);
 
+	void fb_convert_888rgb_to_555rgb(address_space &space, int x, int y);
+	void fb_convert_888rgb_to_565rgb(address_space &space, int x, int y);
+	void fb_convert_888rgb_to_888rgb24(address_space &space, int x, int y);
+	void fb_convert_888rgb_to_888rgb32(address_space &space, int x, int y);
+
 	void fb_convert_8888argb_to_555rgb(address_space &space, int x, int y);
 	void fb_convert_8888argb_to_565rgb(address_space &space, int x, int y);
 	void fb_convert_8888argb_to_888rgb24(address_space &space, int x, int y);
