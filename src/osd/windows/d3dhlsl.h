@@ -196,7 +196,8 @@ public:
 	bool		is_valid() { return m_valid; }
 
 private:
-	uniform		*m_uniforms;
+	uniform		*m_uniform_head;
+	uniform		*m_uniform_tail;
 	ID3DXEffect *m_effect;
 	shaders		*m_shaders;
 
@@ -226,7 +227,7 @@ struct hlsl_options
 	float                   scanline_bright_scale;
 	float                   scanline_bright_offset;
 	float                   scanline_offset;
-	float                   defocus[4];
+	float                   defocus[2];
 	float                   converge_x[3];
 	float                   converge_y[3];
 	float                   radial_converge_x[3];

@@ -95,7 +95,7 @@ hlsl_options shaders::s_hlsl_presets[4] =
 		0.25f, { "aperture.png" }, 320, 240, 0.09375f, 0.109375f,
 		0.03f, 0.03f,
 		0.5f, 1.0f, 0.5f, 1.0f, 0.0f, 0.0f,
-		{ 0.0f, 0.0f, 0.0f, 0.0f },
+		{ 0.0f, 0.0f },
 		{ 0.0f, 0.0f, 0.0f },
 		{ 0.0f, 0.0f, 0.0f },
 		{ 0.0f, 0.0f, 0.0f },
@@ -118,7 +118,7 @@ hlsl_options shaders::s_hlsl_presets[4] =
 		0.25f, { "aperture.png" }, 320, 240, 0.09375f, 0.109375f,
 		0.03f, 0.03f,
 		0.0f, 1.0f, 0.5f, 1.0f, 0.0f, 0.0f,
-		{ 0.0f, 0.0f, 0.0f, 0.0f },
+		{ 0.0f, 0.0f },
 		{ 0.0f, 0.0f, 0.0f },
 		{ 0.0f, 0.0f, 0.0f },
 		{ 0.0f, 0.0f, 0.0f },
@@ -141,7 +141,7 @@ hlsl_options shaders::s_hlsl_presets[4] =
 		0.25f, { "aperture.png" }, 320, 240, 0.09375f, 0.109375f,
 		0.0f, 0.0f,
 		0.0f, 1.0f, 0.5f, 1.0f, 0.0f, 0.0f,
-		{ 0.0f, 0.0f, 0.0f, 0.0f },
+		{ 0.0f, 0.0f },
 		{ 0.0f, 0.0f, 0.0f },
 		{ 0.0f, 0.0f, 0.0f },
 		{ 0.0f, 0.0f, 0.0f },
@@ -164,7 +164,7 @@ hlsl_options shaders::s_hlsl_presets[4] =
 		0.25f, { "aperture.png" }, 320, 240, 0.09375f, 0.109375f,
 		0.15f, 0.15f,
 		1.0f, 1.0f, 0.5f, 1.0f, 0.0f, 0.5f,
-		{ 3.0f, 3.0f, 3.0f, 3.0f },
+		{ 3.0f, 3.0f },
 		{ 0.5f,-0.33f,0.7f },
 		{ 0.0f,-1.0f, 0.5f },
 		{ 0.0f, 0.2f, 0.3f },
@@ -1008,6 +1008,82 @@ int shaders::create_resources(bool reset)
 	if (!downsample_effect->is_valid()) return 1;
 	if (!vector_effect->is_valid()) return 1;
 
+	yiq_encode_effect->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
+	yiq_encode_effect->add_uniform("SourceDims", uniform::UT_VEC2, uniform::CU_SOURCE_DIMS);
+	yiq_encode_effect->add_uniform("SourceRect", uniform::UT_VEC2, uniform::CU_SOURCE_RECT);
+	yiq_encode_effect->add_uniform("CCValue", uniform::UT_FLOAT, uniform::CU_NTSC_CCFREQ);
+	yiq_encode_effect->add_uniform("AValue", uniform::UT_FLOAT, uniform::CU_NTSC_A);
+	yiq_encode_effect->add_uniform("BValue", uniform::UT_FLOAT, uniform::CU_NTSC_B);
+	yiq_encode_effect->add_uniform("PValue", uniform::UT_FLOAT, uniform::CU_NTSC_P);
+	yiq_encode_effect->add_uniform("NotchHalfWidth", uniform::UT_FLOAT, uniform::CU_NTSC_NOTCH);
+	yiq_encode_effect->add_uniform("YFreqResponse", uniform::UT_FLOAT, uniform::CU_NTSC_YFREQ);
+	yiq_encode_effect->add_uniform("IFreqResponse", uniform::UT_FLOAT, uniform::CU_NTSC_IFREQ);
+	yiq_encode_effect->add_uniform("QFreqResponse", uniform::UT_FLOAT, uniform::CU_NTSC_QFREQ);
+	yiq_encode_effect->add_uniform("ScanTime", uniform::UT_FLOAT, uniform::CU_NTSC_HTIME);
+
+	yiq_decode_effect->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
+	yiq_decode_effect->add_uniform("SourceDims", uniform::UT_VEC2, uniform::CU_SOURCE_DIMS);
+	yiq_decode_effect->add_uniform("SourceRect", uniform::UT_VEC2, uniform::CU_SOURCE_RECT);
+	yiq_decode_effect->add_uniform("CCValue", uniform::UT_FLOAT, uniform::CU_NTSC_CCFREQ);
+	yiq_decode_effect->add_uniform("AValue", uniform::UT_FLOAT, uniform::CU_NTSC_A);
+	yiq_decode_effect->add_uniform("BValue", uniform::UT_FLOAT, uniform::CU_NTSC_B);
+	yiq_decode_effect->add_uniform("OValue", uniform::UT_FLOAT, uniform::CU_NTSC_O);
+	yiq_decode_effect->add_uniform("PValue", uniform::UT_FLOAT, uniform::CU_NTSC_P);
+	yiq_decode_effect->add_uniform("NotchHalfWidth", uniform::UT_FLOAT, uniform::CU_NTSC_NOTCH);
+	yiq_decode_effect->add_uniform("YFreqResponse", uniform::UT_FLOAT, uniform::CU_NTSC_YFREQ);
+	yiq_decode_effect->add_uniform("IFreqResponse", uniform::UT_FLOAT, uniform::CU_NTSC_IFREQ);
+	yiq_decode_effect->add_uniform("QFreqResponse", uniform::UT_FLOAT, uniform::CU_NTSC_QFREQ);
+	yiq_decode_effect->add_uniform("ScanTime", uniform::UT_FLOAT, uniform::CU_NTSC_HTIME);
+
+	color_effect->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
+	color_effect->add_uniform("SourceDims", uniform::UT_VEC2, uniform::CU_SOURCE_DIMS);
+
+	color_effect->add_uniform("YIQEnable", uniform::UT_FLOAT, uniform::CU_NTSC_ENABLE);
+	color_effect->add_uniform("RedRatios", uniform::UT_VEC3, uniform::CU_COLOR_RED_RATIOS);
+	color_effect->add_uniform("GrnRatios", uniform::UT_VEC3, uniform::CU_COLOR_GRN_RATIOS);
+	color_effect->add_uniform("BluRatios", uniform::UT_VEC3, uniform::CU_COLOR_BLU_RATIOS);
+	color_effect->add_uniform("Offset", uniform::UT_VEC3, uniform::CU_COLOR_OFFSET);
+	color_effect->add_uniform("Scale", uniform::UT_VEC3, uniform::CU_COLOR_SCALE);
+	color_effect->add_uniform("Saturation", uniform::UT_FLOAT, uniform::CU_COLOR_SATURATION);
+
+	prescale_effect->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
+	prescale_effect->add_uniform("SourceDims", uniform::UT_VEC2, uniform::CU_SOURCE_DIMS);
+
+	deconverge_effect->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
+	deconverge_effect->add_uniform("SourceDims", uniform::UT_VEC2, uniform::CU_SOURCE_DIMS);
+	deconverge_effect->add_uniform("SourceRect", uniform::UT_VEC2, uniform::CU_SOURCE_RECT);
+	deconverge_effect->add_uniform("ConvergeX", uniform::UT_VEC3, uniform::CU_CONVERGE_LINEAR_X);
+	deconverge_effect->add_uniform("ConvergeY", uniform::UT_VEC3, uniform::CU_CONVERGE_LINEAR_Y);
+	deconverge_effect->add_uniform("RadialConvergeX", uniform::UT_VEC3, uniform::CU_CONVERGE_RADIAL_X);
+	deconverge_effect->add_uniform("RadialConvergeY", uniform::UT_VEC3, uniform::CU_CONVERGE_RADIAL_Y);
+
+	focus_effect->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
+	focus_effect->add_uniform("Defocus", uniform::UT_VEC2, uniform::CU_FOCUS_SIZE);
+
+	phosphor_effect->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
+	phosphor_effect->add_uniform("Phosphor", uniform::UT_VEC3, uniform::CU_PHOSPHOR_LIFE);
+	phosphor_effect->add_uniform("Passthrough", uniform::UT_FLOAT, uniform::CU_PHOSPHOR_IGNORE);
+
+	post_effect->add_uniform("SourceDims", uniform::UT_VEC2, uniform::CU_SOURCE_DIMS);
+	post_effect->add_uniform("SourceRect", uniform::UT_VEC2, uniform::CU_SOURCE_RECT);
+	post_effect->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
+
+	post_effect->add_uniform("PincushionAmount", uniform::UT_FLOAT, uniform::CU_POST_PINCUSHION);
+	post_effect->add_uniform("CurvatureAmount", uniform::UT_FLOAT, uniform::CU_POST_CURVATURE);
+
+	post_effect->add_uniform("ShadowAlpha", uniform::UT_FLOAT, uniform::CU_POST_SHADOW_ALPHA);
+	post_effect->add_uniform("ShadowCount", uniform::UT_VEC2, uniform::CU_POST_SHADOW_COUNT);
+	post_effect->add_uniform("ShadowUV", uniform::UT_VEC2, uniform::CU_POST_SHADOW_UV);
+	post_effect->add_uniform("ShadowDims", uniform::UT_VEC2, uniform::CU_POST_SHADOW_DIMS);
+
+	post_effect->add_uniform("ScanlineAlpha", uniform::UT_FLOAT, uniform::CU_POST_SCANLINE_ALPHA);
+	post_effect->add_uniform("ScanlineScale", uniform::UT_FLOAT, uniform::CU_POST_SCANLINE_SCALE);
+	post_effect->add_uniform("ScanlineHeight", uniform::UT_FLOAT, uniform::CU_POST_SCANLINE_HEIGHT);
+	post_effect->add_uniform("ScanlineBrightScale", uniform::UT_FLOAT, uniform::CU_POST_SCANLINE_BRIGHT_SCALE);
+	post_effect->add_uniform("ScanlineBrightOffset", uniform::UT_FLOAT, uniform::CU_POST_SCANLINE_BRIGHT_OFFSET);
+	post_effect->add_uniform("Power", uniform::UT_VEC3, uniform::CU_POST_POWER);
+	post_effect->add_uniform("Floor", uniform::UT_VEC3, uniform::CU_POST_FLOOR);
+
 	initialized = true;
 
 	return 0;
@@ -1268,29 +1344,11 @@ void shaders::ntsc_pass(render_target *rt, vec2f &sourcedims, vec2f &delta)
 	renderer *d3d = (renderer *)window->drawdata;
 	UINT num_passes = 0;
 
-	vec2f screendims = d3d->get_dims();
-
 	if(options->yiq_enable)
 	{
 		// Convert our signal into YIQ
 		curr_effect = yiq_encode_effect;
-
-		if(options->params_dirty)
-		{
-			curr_effect->set_vector("SourceDims", 2, &sourcedims.c.x);
-			curr_effect->set_vector("SourceRect", 2, &delta.c.x);
-			curr_effect->set_vector("ScreenDims", 2, &screendims.c.x);
-
-			curr_effect->set_float("CCValue", options->yiq_cc);
-			curr_effect->set_float("AValue", options->yiq_a);
-			curr_effect->set_float("BValue", options->yiq_b);
-			curr_effect->set_float("PValue", options->yiq_p);
-			curr_effect->set_float("NotchHalfWidth", options->yiq_n);
-			curr_effect->set_float("YFreqResponse", options->yiq_y);
-			curr_effect->set_float("IFreqResponse", options->yiq_i);
-			curr_effect->set_float("QFreqResponse", options->yiq_q);
-			curr_effect->set_float("ScanTime", options->yiq_scan_time);
-		}
+		curr_effect->update_uniforms();
 
 		HRESULT result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, rt->target[4]);
 
@@ -1316,23 +1374,7 @@ void shaders::ntsc_pass(render_target *rt, vec2f &sourcedims, vec2f &delta)
 
 		curr_effect->set_texture("Composite", rt->render_texture[4]);
 		curr_effect->set_texture("Diffuse", curr_texture->get_finaltex());
-		if(true)//options->params_dirty)
-		{
-			curr_effect->set_vector("ScreenDims", 2, &screendims.c.x);
-			curr_effect->set_vector("SourceDims", 2, &sourcedims.c.x);
-			curr_effect->set_vector("SourceRect", 2, &delta.c.x);
-
-			curr_effect->set_float("CCValue", options->yiq_cc);
-			curr_effect->set_float("AValue", options->yiq_a);
-			curr_effect->set_float("BValue", options->yiq_b);
-			curr_effect->set_float("OValue", options->yiq_o);
-			curr_effect->set_float("PValue", options->yiq_p);
-			curr_effect->set_float("NotchHalfWidth", options->yiq_n);
-			curr_effect->set_float("YFreqResponse", options->yiq_y);
-			curr_effect->set_float("IFreqResponse", options->yiq_i);
-			curr_effect->set_float("QFreqResponse", options->yiq_q);
-			curr_effect->set_float("ScanTime", options->yiq_scan_time);
-		}
+		curr_effect->update_uniforms();
 
 		result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, rt->target[3]);
 
@@ -1365,22 +1407,7 @@ void shaders::color_convolution_pass(render_target *rt, vec2f &texsize, vec2f &s
 	UINT num_passes = 0;
 
 	curr_effect = color_effect;
-
-	// Render the initial color-convolution pass
-	if(options->params_dirty)
-	{
-		curr_effect->set_vector("SourceDims", 2, &sourcedims.c.x);
-		vec2f screendims = d3d->get_dims();
-		curr_effect->set_vector("ScreenDims", 2, &screendims.c.x);
-
-		curr_effect->set_float("YIQEnable", options->yiq_enable ? 1.0f : 0.0f);
-		curr_effect->set_vector("RedRatios", 3, options->red_ratio);
-		curr_effect->set_vector("GrnRatios", 3, options->grn_ratio);
-		curr_effect->set_vector("BluRatios", 3, options->blu_ratio);
-		curr_effect->set_vector("Offset", 3, options->offset);
-		curr_effect->set_vector("Scale", 3, options->scale);
-		curr_effect->set_float("Saturation", options->saturation);
-	}
+	curr_effect->update_uniforms();
 
 	HRESULT result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, rt->smalltarget);
 
@@ -1408,14 +1435,8 @@ void shaders::prescale_pass(render_target *rt, vec2f &texsize, vec2f &sourcedims
 	UINT num_passes = 0;
 
 	curr_effect = prescale_effect;
+	curr_effect->update_uniforms();
 	curr_effect->set_texture("Diffuse", rt->smalltexture);
-
-	if(options->params_dirty)
-	{
-		vec2f screendims = d3d->get_dims();
-		curr_effect->set_vector("ScreenDims", 2, &screendims.c.x);
-		curr_effect->set_vector("SourceDims", 2, &sourcedims.c.x);
-	}
 
 	curr_effect->begin(&num_passes, 0);
 
@@ -1442,20 +1463,8 @@ void shaders::deconverge_pass(render_target *rt, vec2f &texsize, vec2f &delta, v
 	UINT num_passes = 0;
 
 	curr_effect = deconverge_effect;
+	curr_effect->update_uniforms();
 	curr_effect->set_texture("Diffuse", rt->prescaletexture);
-
-	if(options->params_dirty)
-	{
-		vec2f screendims = d3d->get_dims();
-		curr_effect->set_vector("ScreenDims", 2, &screendims.c.x);
-		curr_effect->set_vector("SourceDims", 2, &sourcedims.c.x);
-		curr_effect->set_vector("SourceRect", 2, &delta.c.x);
-
-		curr_effect->set_vector("ConvergeX", 3, options->converge_x);
-		curr_effect->set_vector("ConvergeY", 3, options->converge_y);
-		curr_effect->set_vector("RadialConvergeX", 3, options->radial_converge_x);
-		curr_effect->set_vector("RadialConvergeY", 3, options->radial_converge_y);
-	}
 
 	curr_effect->begin(&num_passes, 0);
 
@@ -1483,12 +1492,8 @@ void shaders::defocus_pass(render_target *rt, vec2f &texsize)
 
 	// Defocus pass 1
 	curr_effect = focus_effect;
-
+	curr_effect->update_uniforms();
 	curr_effect->set_texture("Diffuse", rt->render_texture[2]);
-
-	vec2f screendims = d3d->get_dims();
-	curr_effect->set_vector("ScreenDims", 2, &screendims.c.x);
-	curr_effect->set_vector("Defocus", 2, &options->defocus[0]);
 
 	curr_effect->begin(&num_passes, 0);
 
@@ -1511,9 +1516,6 @@ void shaders::defocus_pass(render_target *rt, vec2f &texsize)
 	// Defocus pass 2
 
 	curr_effect->set_texture("Diffuse", rt->render_texture[0]);
-
-	curr_effect->set_vector("ScreenDims", 2, &screendims.c.x);
-	curr_effect->set_vector("Defocus", 2, &options->defocus[1]);
 
 	curr_effect->begin(&num_passes, 0);
 
@@ -1538,17 +1540,11 @@ void shaders::phosphor_pass(render_target *rt, cache_target *ct, vec2f &texsize,
 	UINT num_passes = 0;
 
 	curr_effect = phosphor_effect;
+	phosphor_passthrough = false;
+	curr_effect->update_uniforms();
 
-	if(options->params_dirty)
-	{
-		vec2f screendims = d3d->get_dims();
-		curr_effect->set_vector("ScreenDims", 2, &screendims.c.x);
-		curr_effect->set_vector("Phosphor", 3, options->phosphor);
-	}
 	float rtsize[2] = { rt->target_width, rt->target_height };
 	curr_effect->set_vector("TargetDims", 2, rtsize);
-	phosphor_passthrough = false;
-	curr_effect->set_float("Passthrough", 0.0f);
 
 	curr_effect->set_texture("Diffuse", focus_enable ? rt->render_texture[1] : rt->render_texture[2]);
 	curr_effect->set_texture("LastPass", ct->last_texture);
@@ -1572,12 +1568,10 @@ void shaders::phosphor_pass(render_target *rt, cache_target *ct, vec2f &texsize,
 	curr_effect->end();
 
 	// Pass along our phosphor'd screen
-	curr_effect = phosphor_effect;
-
+	phosphor_passthrough = true;
+	curr_effect->update_uniforms();
 	curr_effect->set_texture("Diffuse", rt->render_texture[0]);
 	curr_effect->set_texture("LastPass", rt->render_texture[0]);
-	phosphor_passthrough = true;
-	curr_effect->set_float("Passthrough", 1.0f);
 
 	result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, ct->last_target); // Avoid changing targets due to page flipping
 	if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_render_target call 5\n", (int)result);
@@ -1604,45 +1598,8 @@ void shaders::avi_post_pass(render_target *rt, vec2f &texsize, vec2f &delta, vec
 	UINT num_passes = 0;
 
 	curr_effect = post_effect;
-
-	if(options->params_dirty)
-	{
-		vec2f shadow_dims;
-
-		if (shadow_texture)
-		{
-			shadow_dims = shadow_texture->get_rawdims();
-		}
-		else
-		{
-			shadow_dims.c.x = 1.0f;
-			shadow_dims.c.y = 1.0f;
-		}
-
-		curr_effect->set_vector("SourceDims", 2, &sourcedims.c.x);
-		curr_effect->set_vector("SourceRect", 2, &delta.c.x);
-		vec2f screendims = d3d->get_dims();
-		curr_effect->set_vector("ScreenDims", 2, &screendims.c.x);
-
-		curr_effect->set_float("PincushionAmount", options->pincushion);
-		curr_effect->set_float("CurvatureAmount", options->curvature);
-
-		curr_effect->set_texture("ShadowTexture", shadow_texture == NULL ? NULL : shadow_texture->get_finaltex());
-		curr_effect->set_float("ShadowAlpha", shadow_texture == NULL ? 0.0f : options->shadow_mask_alpha);
-		float shadowcount[2] = { options->shadow_mask_count_x, options->shadow_mask_count_y };
-		float shadowuv[2] = { options->shadow_mask_u_size, options->shadow_mask_v_size };
-		curr_effect->set_vector("ShadowCount", 2, shadowcount);
-		curr_effect->set_vector("ShadowUV", 2, shadowuv);
-		curr_effect->set_vector("ShadowDims", 2, &shadow_dims.c.x);
-
-		curr_effect->set_float("ScanlineAlpha", options->scanline_alpha);
-		curr_effect->set_float("ScanlineScale", options->scanline_scale);
-		curr_effect->set_float("ScanlineHeight", options->scanline_height);
-		curr_effect->set_float("ScanlineBrightScale", options->scanline_bright_scale);
-		curr_effect->set_float("ScanlineBrightOffset", options->scanline_bright_offset);
-		curr_effect->set_vector("Power", 3, options->power);
-		curr_effect->set_vector("Floor", 3, options->floor);
-	}
+	curr_effect->update_uniforms();
+	curr_effect->set_texture("ShadowTexture", shadow_texture == NULL ? NULL : shadow_texture->get_finaltex());
 
 	// Scanlines and shadow mask, at high res for AVI logging
 	if(avi_output_file != NULL)
@@ -1696,48 +1653,10 @@ void shaders::screen_post_pass(render_target *rt, vec2f &texsize, vec2f &delta, 
 	UINT num_passes = 0;
 
 	curr_effect = post_effect;
+	curr_effect->update_uniforms();
+	curr_effect->set_texture("ShadowTexture", shadow_texture == NULL ? NULL : shadow_texture->get_finaltex());
 
 	curr_effect->set_texture("DiffuseTexture", rt->render_texture[0]);
-
-	if(options->params_dirty)
-	{
-		vec2f shadow_dims;
-
-		if (shadow_texture)
-		{
-			shadow_dims = shadow_texture->get_rawdims();
-		}
-		else
-		{
-			shadow_dims.c.x = 1.0f;
-			shadow_dims.c.y = 1.0f;
-		}
-
-		curr_effect->set_vector("SourceDims", 2, &sourcedims.c.x);
-		curr_effect->set_vector("SourceRect", 2, &delta.c.x);
-		vec2f screendims = d3d->get_dims();
-		curr_effect->set_vector("ScreenDims", 2, &screendims.c.x);
-
-		curr_effect->set_float("PincushionAmount", options->pincushion);
-		curr_effect->set_float("CurvatureAmount", options->curvature);
-
-		curr_effect->set_texture("ShadowTexture", shadow_texture == NULL ? NULL : shadow_texture->get_finaltex());
-		curr_effect->set_float("ShadowEnable", shadow_texture == NULL ? 0.0f : 1.0f);
-		curr_effect->set_float("ShadowBrightness", options->shadow_mask_alpha);
-		float shadowcount[2] = { options->shadow_mask_count_x, options->shadow_mask_count_y };
-		float shadowuv[2] = { options->shadow_mask_u_size, options->shadow_mask_v_size };
-		curr_effect->set_vector("ShadowCount", 2, shadowcount);
-		curr_effect->set_vector("ShadowUV", 2, shadowuv);
-		curr_effect->set_vector("ShadowDims", 2, &shadow_dims.c.x);
-
-		curr_effect->set_float("ScanlineAmount", options->scanline_alpha);
-		curr_effect->set_float("ScanlineScale", options->scanline_scale);
-		curr_effect->set_float("ScanlineHeight", options->scanline_height);
-		curr_effect->set_float("ScanlineBrightScale", options->scanline_bright_scale);
-		curr_effect->set_float("ScanlineBrightOffset", options->scanline_bright_offset);
-		curr_effect->set_vector("Power", 3, options->power);
-		curr_effect->set_vector("Floor", 3, options->floor);
-	}
 
 	d3d->set_wrap(D3DTADDRESS_MIRROR);
 
@@ -3086,7 +3005,6 @@ uniform::uniform(effect *shader, const char *name, uniform_type type, int id)
 
 void uniform::set_next(uniform *next)
 {
-	next->set_next(m_next);
 	m_next = next;
 }
 
@@ -3361,7 +3279,8 @@ effect::effect(shaders *shadersys, device *dev, const char *name, const char *pa
 	LPD3DXBUFFER buffer_errors = NULL;
 
 	m_shaders = shadersys;
-	m_uniforms = NULL;
+	m_uniform_head = NULL;
+	m_uniform_tail = NULL;
 	m_effect = NULL;
 	m_valid = false;
 
@@ -3394,6 +3313,15 @@ effect::~effect()
 {
 	m_effect->Release();
 	m_effect = NULL;
+	uniform *curr = m_uniform_head;
+	while (curr != NULL)
+	{
+		uniform *next = curr->get_next();
+		delete curr;
+		curr = next;
+	}
+	m_uniform_head = NULL;
+	m_uniform_tail = NULL;
 }
 
 void effect::add_uniform(const char *name, uniform::uniform_type type, int id)
@@ -3404,13 +3332,20 @@ void effect::add_uniform(const char *name, uniform::uniform_type type, int id)
 		return;
 	}
 
-	newuniform->set_next(m_uniforms);
-	m_uniforms = newuniform;
+	if (m_uniform_head == NULL)
+	{
+		m_uniform_head = newuniform;
+	}
+	if (m_uniform_tail != NULL)
+	{
+		m_uniform_tail->set_next(newuniform);
+	}
+	m_uniform_tail = newuniform;
 }
 
 void effect::update_uniforms()
 {
-	uniform *curr = m_uniforms;
+	uniform *curr = m_uniform_head;
 	while(curr != NULL)
 	{
 		curr->update();
