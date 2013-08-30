@@ -13,6 +13,7 @@
 #define __MAGIC_VOICE__
 
 #include "emu.h"
+#include "machine/40105.h"
 #include "machine/6525tpi.h"
 #include "machine/c64/exp.h"
 #include "machine/cbmipt.h"
@@ -43,6 +44,7 @@ public:
 	DECLARE_READ8_MEMBER( tpi_pc_r );
 	DECLARE_WRITE8_MEMBER( tpi_pc_w );
 
+	DECLARE_WRITE_LINE_MEMBER( phi2_w );
 	DECLARE_WRITE_LINE_MEMBER( dtrd_w );
 	DECLARE_WRITE_LINE_MEMBER( apd_w );
 
@@ -60,6 +62,7 @@ private:
 
 	required_device<t6721a_device> m_vslsi;
 	required_device<tpi6525_device> m_tpi;
+	required_device<cmos_40105_device> m_fifo;
 	required_device<c64_expansion_slot_device> m_exp;
 
 	int m_roml2;
@@ -67,6 +70,7 @@ private:
 	int m_eprom;
 	int m_da_ca;
 	UINT8 m_vslsi_data;
+	UINT8 m_pd;
 };
 
 

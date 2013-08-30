@@ -310,6 +310,7 @@ VIDEOS += V9938
 # specify available machine cores
 #-------------------------------------------------
 
+MACHINES += CMOS40105
 MACHINES += NCR53C7XX
 MACHINES += LSI53C810
 MACHINES += 6522VIA

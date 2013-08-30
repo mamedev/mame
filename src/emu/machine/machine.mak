@@ -16,6 +16,16 @@ MACHINEOBJ = $(EMUOBJ)/machine
 
 #-------------------------------------------------
 #
+#@src/emu/machine/40105.h,MACHINES += CMOS40105
+#-------------------------------------------------
+
+ifneq ($(filter CMOS40105,$(MACHINES)),)
+MACHINEOBJS += $(MACHINEOBJ)/40105.o
+endif
+
+
+#-------------------------------------------------
+#
 #@src/emu/machine/53c7xx.h,MACHINES += NCR53C7XX
 #-------------------------------------------------
 

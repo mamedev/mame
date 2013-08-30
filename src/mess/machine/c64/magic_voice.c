@@ -40,8 +40,9 @@ http://www.stefan-uhlmann.de/cbm/MVM/index.html
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define T6721A_TAG  "u5"
-#define MOS6525_TAG "u2"
+#define T6721A_TAG  	"u5"
+#define MOS6525_TAG 	"u2"
+#define CMOS40105_TAG 	"u1"
 
 
 
@@ -77,7 +78,7 @@ READ8_MEMBER( c64_magic_voice_cartridge_device::tpi_pa_r )
 
 	data |= m_exp->game_r(get_offset(0xdf80), 1, 0, 1, 0) << 5;
 	data |= m_vslsi->eos_r() << 6;
-	//data |= m_fifo->dir_r() << 7;
+	data |= m_fifo->dir_r() << 7;
 
 	return data;
 }
@@ -99,8 +100,8 @@ WRITE8_MEMBER( c64_magic_voice_cartridge_device::tpi_pa_w )
 	
 	*/
 
-	//m_fifo->write(data & 0x0f);
-	//m_fifo->si_w(BIT(data, 4));
+	m_fifo->write(data & 0x0f);
+	m_fifo->si_w(BIT(data, 4));
 }
 
 READ8_MEMBER( c64_magic_voice_cartridge_device::tpi_pb_r )
@@ -172,7 +173,7 @@ READ8_MEMBER( c64_magic_voice_cartridge_device::tpi_pc_r )
 	UINT8 data = 0;
 
 	data |= m_vslsi->eos_r() << 2;
-	//data |= m_fifo->dir_r() << 3;
+	data |= m_fifo->dir_r() << 3;
 
 	return data;
 }
@@ -217,14 +218,30 @@ static const tpi6525_interface tpi_intf =
 //  t6721_interface
 //-------------------------------------------------
 
+WRITE_LINE_MEMBER( c64_magic_voice_cartridge_device::phi2_w )
+{
+	if (state)
+	{
+		m_vslsi->di_w(m_pd & 0x01);
+
+		m_pd >>= 1;
+	}	
+}
+
 WRITE_LINE_MEMBER( c64_magic_voice_cartridge_device::dtrd_w )
 {
+	m_fifo->so_w(!state);
 
+	m_pd = m_fifo->read();
 }
 
 WRITE_LINE_MEMBER( c64_magic_voice_cartridge_device::apd_w )
 {
-
+	if (state)
+	{
+		m_fifo->reset();
+		m_pd = 0;
+	}
 }
 
 
@@ -234,10 +251,12 @@ WRITE_LINE_MEMBER( c64_magic_voice_cartridge_device::apd_w )
 
 static MACHINE_CONFIG_FRAGMENT( c64_magic_voice )
 	MCFG_TPI6525_ADD(MOS6525_TAG, tpi_intf)
+	MCFG_40105_ADD(CMOS40105_TAG, DEVWRITELINE(MOS6525_TAG, tpi6525_device, i3_w), NULL)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(T6721A_TAG, T6721A, XTAL_640kHz)
 	MCFG_T6721A_EOS_HANDLER(DEVWRITELINE(MOS6525_TAG, tpi6525_device, i2_w))
+	MCFG_T6721A_PHI2_HANDLER(DEVWRITELINE(DEVICE_SELF, c64_magic_voice_cartridge_device, phi2_w))
 	MCFG_T6721A_DTRD_HANDLER(DEVWRITELINE(DEVICE_SELF, c64_magic_voice_cartridge_device, dtrd_w))
 	MCFG_T6721A_APD_HANDLER(DEVWRITELINE(DEVICE_SELF, c64_magic_voice_cartridge_device, apd_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -271,6 +290,7 @@ c64_magic_voice_cartridge_device::c64_magic_voice_cartridge_device(const machine
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_vslsi(*this, T6721A_TAG),
 	m_tpi(*this, MOS6525_TAG),
+	m_fifo(*this, CMOS40105_TAG),
 	m_exp(*this, C64_EXPANSION_SLOT_TAG),
 	m_roml2(1),
 	m_romh2(1),

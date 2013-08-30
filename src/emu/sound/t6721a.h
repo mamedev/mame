@@ -44,14 +44,17 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_T6721A_EOS_HANDLER(_devcb) \
-	devcb = &t6721a_device::set_eos_handler(*device, DEVCB2_##_devcb);
+#define MCFG_T6721A_EOS_HANDLER(_eos) \
+	downcast<t6721a_device *>(device)->set_eos_callback(DEVCB2_##_eos);
 
-#define MCFG_T6721A_DTRD_HANDLER(_devcb) \
-	devcb = &t6721a_device::set_dtrd_handler(*device, DEVCB2_##_devcb);
+#define MCFG_T6721A_PHI2_HANDLER(_phi2) \
+	downcast<t6721a_device *>(device)->set_phi2_callback(DEVCB2_##_phi2);
 
-#define MCFG_T6721A_APD_HANDLER(_devcb) \
-	devcb = &t6721a_device::set_apd_handler(*device, DEVCB2_##_devcb);
+#define MCFG_T6721A_DTRD_HANDLER(_dtrd) \
+	downcast<t6721a_device *>(device)->set_dtrd_callback(DEVCB2_##_dtrd);
+
+#define MCFG_T6721A_APD_HANDLER(_apd) \
+	downcast<t6721a_device *>(device)->set_apd_callback(DEVCB2_##_apd);
 
 
 
@@ -62,15 +65,16 @@
 // ======================> t6721a_device
 
 class t6721a_device : public device_t,
-						public device_sound_interface
+					  public device_sound_interface
 {
 public:
 	t6721a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb2_base &set_eos_handler(device_t &device, _Object object) { return downcast<t6721a_device &>(device).m_eos_handler.set_callback(object); }
-	template<class _Object> static devcb2_base &set_dtrd_handler(device_t &device, _Object object) { return downcast<t6721a_device &>(device).m_dtrd_handler.set_callback(object); }
-	template<class _Object> static devcb2_base &set_apd_handler(device_t &device, _Object object) { return downcast<t6721a_device &>(device).m_apd_handler.set_callback(object); }
+	template<class _eos> void set_eos_callback(_eos eos) { m_write_eos.set_callback(eos); }
+	template<class _phi2> void set_phi2_callback(_phi2 phi2) { m_write_phi2.set_callback(phi2); }
+	template<class _dtrd> void set_dtrd_callback(_dtrd dtrd) { m_write_dtrd.set_callback(dtrd); }
+	template<class _apd> void set_apd_callback(_apd apd) { m_write_apd.set_callback(apd); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -87,9 +91,26 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
 private:
-	devcb2_write_line m_eos_handler;
-	devcb2_write_line m_dtrd_handler;
-	devcb2_write_line m_apd_handler;
+	enum
+	{
+		CMD_NOP = 0,
+		CMD_STRT,
+		CMD_STOP,
+		CMD_ADLD,
+		CMD_AAGN,
+		CMD_SPLD,
+		CMD_CNDT1,
+		CMD_CNDT2,
+		CMD_RRDM,
+		CMD_SPDN,
+		CMD_APDN,
+		CMD_SAGN
+	};
+
+	devcb2_write_line m_write_eos;
+	devcb2_write_line m_write_phi2;
+	devcb2_write_line m_write_dtrd;
+	devcb2_write_line m_write_apd;
 
 	sound_stream *m_stream;
 };
