@@ -57,6 +57,7 @@ namespace d3d
 {
 
 class effect;
+class shaders;
 
 class uniform
 {
@@ -72,11 +73,12 @@ public:
 		UT_SAMPLER,
 	} uniform_type;
 
-	typedef enum
+	enum
 	{
-		CU_SCREEN_DIMS,
+		CU_SCREEN_DIMS = 0,
 		CU_SOURCE_DIMS,
 		CU_SOURCE_RECT,
+
 		CU_NTSC_CCFREQ,
 		CU_NTSC_A,
 		CU_NTSC_B,
@@ -87,22 +89,63 @@ public:
 		CU_NTSC_IFREQ,
 		CU_NTSC_QFREQ,
 		CU_NTSC_HTIME,
+		CU_NTSC_ENABLE,
 
-	} common_uniform;
+		CU_COLOR_RED_RATIOS,
+		CU_COLOR_GRN_RATIOS,
+		CU_COLOR_BLU_RATIOS,
+		CU_COLOR_OFFSET,
+		CU_COLOR_SCALE,
+		CU_COLOR_SATURATION,
 
-	uniform(effect *shader, const char *name, uniform_type type);
+		CU_CONVERGE_LINEAR_X,
+		CU_CONVERGE_LINEAR_Y,
+		CU_CONVERGE_RADIAL_X,
+		CU_CONVERGE_RADIAL_Y,
 
-	void set_next(uniform *next);
+		CU_FOCUS_SIZE,
 
-	void set(float x, float y, float z, float w);
-	void set(float x, float y, float z);
-	void set(float x, float y);
-	void set(float x);
-	void set(int x);
-	void set(matrix *mat);
-	void set(texture *tex);
+		CU_PHOSPHOR_LIFE,
+		CU_PHOSPHOR_IGNORE,
 
-	void upload();
+		CU_POST_PINCUSHION,
+		CU_POST_CURVATURE,
+		CU_POST_SHADOW_ALPHA,
+		CU_POST_SHADOW_COUNT,
+		CU_POST_SHADOW_UV,
+		CU_POST_SHADOW_DIMS,
+		CU_POST_SCANLINE_ALPHA,
+		CU_POST_SCANLINE_SCALE,
+		CU_POST_SCANLINE_HEIGHT,
+		CU_POST_SCANLINE_BRIGHT_SCALE,
+		CU_POST_SCANLINE_BRIGHT_OFFSET,
+		CU_POST_POWER,
+		CU_POST_FLOOR,
+
+		CU_BLOOM_TARGET_SIZE,
+		CU_BLOOM_RESCALE,
+		CU_BLOOM_LVL0123_WEIGHTS,
+		CU_BLOOM_LVL4567_WEIGHTS,
+		CU_BLOOM_LVL89A_WEIGHTS,
+
+		CU_COUNT,
+	};
+
+	uniform(effect *shader, const char *name, uniform_type type, int id);
+
+	void 		set_next(uniform *next);
+	uniform *	get_next() { return m_next; }
+
+	void 		set(float x, float y, float z, float w);
+	void 		set(float x, float y, float z);
+	void 		set(float x, float y);
+	void 		set(float x);
+	void 		set(int x);
+	void 		set(matrix *mat);
+	void 		set(texture *tex);
+
+	void 		upload();
+	void 		update();
 
 protected:
 	uniform		*m_next;
@@ -113,6 +156,7 @@ protected:
 	texture		*m_texture;
 	int			m_count;
 	uniform_type	m_type;
+	int			m_id;
 
 	effect 		*m_shader;
 	D3DXHANDLE	m_handle;
@@ -120,8 +164,10 @@ protected:
 
 class effect
 {
+	friend class uniform;
+
 public:
-	effect(device *dev, const char *name, const char *path);
+	effect(shaders *shadersys, device *dev, const char *name, const char *path);
 	~effect();
 
 	void    	begin(UINT *passes, DWORD flags);
@@ -138,15 +184,22 @@ public:
 	void    	set_matrix(D3DXHANDLE param, matrix *matrix);
 	void    	set_texture(D3DXHANDLE param, texture *tex);
 
+	void		add_uniform(const char *name, uniform::uniform_type type, int id);
+	void		update_uniforms();
+
 	D3DXHANDLE	get_parameter(D3DXHANDLE param, const char *name);
 
 	ULONG   	release();
+
+	shaders*	get_shaders() { return m_shaders; }
 
 	bool		is_valid() { return m_valid; }
 
 private:
 	uniform		*m_uniforms;
 	ID3DXEffect *m_effect;
+	shaders		*m_shaders;
+
 	bool		m_valid;
 };
 
@@ -224,6 +277,9 @@ struct hlsl_options
 
 class shaders
 {
+	friend class effect;
+	friend class uniform;
+
 public:
 	// construction/destruction
 	shaders();
@@ -301,15 +357,15 @@ private:
 	void                    remove_cache_target(cache_target *cache);
 
 	// Shader passes
-	void					ntsc_pass(render_target *rt, texture_info *texture, vec2f &texsize, vec2f &delta);
-	void 					color_convolution_pass(render_target *rt, texture_info *texture, vec2f &texsize, vec2f &delta, vec2f &sourcedims);
-	void 					prescale_pass(render_target *rt, texture_info *texture, vec2f &texsize, vec2f &delta, vec2f &sourcedims);
-	void 					deconverge_pass(render_target *rt, texture_info *texture, vec2f &texsize, vec2f &delta, vec2f &sourcedims);
-	void 					defocus_pass(render_target *rt, texture_info *texture, vec2f &texsize, vec2f &delta);
-	void 					phosphor_pass(render_target *rt, cache_target *ct, texture_info *texture, vec2f &texsize, vec2f &delta, bool focus_enable);
-	void 					screen_post_pass(render_target *rt, texture_info *texture, vec2f &texsize, vec2f &delta, vec2f &sourcedims, poly_info *poly, int vertnum);
-	void 					avi_post_pass(render_target *rt, texture_info *texture, vec2f &texsize, vec2f &delta, poly_info *poly, int vertnum);
-	void 					raster_bloom_pass(render_target *rt, texture_info *texture, vec2f &texsize, vec2f &delta, poly_info *poly, int vertnum);
+	void					ntsc_pass(render_target *rt, vec2f &texsize, vec2f &delta);
+	void 					color_convolution_pass(render_target *rt, vec2f &texsize, vec2f &sourcedims);
+	void 					prescale_pass(render_target *rt, vec2f &texsize, vec2f &sourcedims);
+	void 					deconverge_pass(render_target *rt, vec2f &texsize, vec2f &delta, vec2f &sourcedims);
+	void 					defocus_pass(render_target *rt, vec2f &texsize);
+	void 					phosphor_pass(render_target *rt, cache_target *ct, vec2f &texsize, bool focus_enable);
+	void 					screen_post_pass(render_target *rt, vec2f &texsize, vec2f &delta, vec2f &sourcedims, poly_info *poly, int vertnum);
+	void 					avi_post_pass(render_target *rt, vec2f &texsize, vec2f &delta, vec2f &sourcedims, poly_info *poly, int vertnum);
+	void 					raster_bloom_pass(render_target *rt, vec2f &texsize, vec2f &delta, poly_info *poly, int vertnum);
 
 	base *                  d3dintf;                    // D3D interface
 	win_window_info *       window;                     // D3D window info
@@ -376,6 +432,10 @@ private:
 	effect *                downsample_effect;          // pointer to the bloom downsample effect
 	effect *                vector_effect;              // pointer to the vector-effect object
 	vertex *                fsfx_vertices;              // pointer to our full-screen-quad object
+
+	texture_info *			curr_texture;
+	bool					phosphor_passthrough;
+	float					target_size[2];
 
 public:
 	render_target *         targethead;

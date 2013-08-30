@@ -165,7 +165,6 @@ struct PS_INPUT
 //-----------------------------------------------------------------------------
 
 uniform float2 TargetSize;
-uniform float2 SourceSize;
 
 VS_OUTPUT vs_main(VS_INPUT Input)
 {
@@ -177,8 +176,7 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	Output.Position.xy -= float2(0.5f, 0.5f);
 	Output.Position.xy *= float2(2.0f, 2.0f);
 	Output.Color = Input.Color;
-	float2 inversePixel = 1.0f / TargetSize;
-	Output.TexCoord = Input.Position.xy * inversePixel - float2(0.5f, 0.5f) * inversePixel;
+	Output.TexCoord = (Input.Position.xy  + 0.5f) / TargetSize;
 
 	return Output;
 }

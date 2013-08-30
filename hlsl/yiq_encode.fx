@@ -103,8 +103,8 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float4 Q = float4(dot(Texel0, QDot), dot(Texel1, QDot), dot(Texel2, QDot), dot(Texel3, QDot));
 
 	float4 W = PI2 * CCValue * ScanTime;
-	float4 VPosition = (CoordY / SourceRect.y) * (SourceDims.x * SourceRect.x);
-	float4 T = CoordX * SourceRect.x + VPosition + BValue;
+	float4 VPosition = (CoordY * SourceRect.y) * (SourceDims.x / SourceRect.x);
+	float4 T = CoordX / SourceRect.x + VPosition + BValue;
 	
 	float4 C = Y + I * cos(T * W) + Q * sin(T * W);
 	C = (C - MinC) / CRange;

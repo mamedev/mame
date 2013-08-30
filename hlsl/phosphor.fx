@@ -61,8 +61,7 @@ struct PS_INPUT
 
 uniform float2 ScreenDims;
 
-uniform float TextureWidth;
-uniform float TextureHeight;
+uniform float2 TargetDims;
 
 uniform float Passthrough;
 
@@ -77,8 +76,7 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	Output.Position *= float4(2.0f, 2.0f, 1.0f, 1.0f);
 	Output.Color = Input.Color;
 	
-	float2 HalfTexOffset = 0.5f / float2(TextureWidth, TextureHeight);
-	Output.TexCoord = Input.TexCoord + HalfTexOffset;
+	Output.TexCoord = Input.TexCoord + 0.5f / TargetDims;
 	Output.PrevCoord = Output.TexCoord;
 	
 	return Output;

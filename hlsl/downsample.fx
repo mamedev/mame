@@ -2,11 +2,11 @@
 // Effect File Variables
 //-----------------------------------------------------------------------------
 
-texture Diffuse;
+texture DiffuseTexture;
 
 sampler DiffuseSampler = sampler_state
 {
-	Texture   = <Diffuse>;
+	Texture   = <DiffuseTexture>;
 	MipFilter = LINEAR;
 	MinFilter = LINEAR;
 	MagFilter = LINEAR;
@@ -48,8 +48,6 @@ struct PS_INPUT
 
 uniform float2 ScreenSize;
 uniform float2 TargetSize;
-uniform float2 SourceSize;
-uniform float2 PrimRatio;
 uniform float BloomRescale;
 
 VS_OUTPUT vs_main(VS_INPUT Input)
@@ -59,14 +57,15 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	Output.Position = float4(Input.Position.xyz, 1.0f);
 	Output.Position.xy /= ScreenSize;
 	Output.Position.y = 1.0f - Output.Position.y;
-	Output.Position.xy -= float2(0.5f, 0.5f);
-	Output.Position.xy *= float2(2.0f, 2.0f);
+	Output.Position.xy -= 0.5f;
+	Output.Position.xy *= 2.0f;
 	Output.Color = Input.Color;
-	float2 inversePixel = 1.0f / ScreenSize;
-	Output.TexCoord01.xy = Input.Position.xy / ScreenSize + float2(0.5f, 0.5f) / TargetSize;
-	Output.TexCoord01.zw = Input.Position.xy / ScreenSize + float2(1.5f, 0.5f) / TargetSize;
-	Output.TexCoord23.xy = Input.Position.xy / ScreenSize + float2(0.5f, 1.5f) / TargetSize;
-	Output.TexCoord23.zw = Input.Position.xy / ScreenSize + float2(1.5f, 1.5f) / TargetSize;
+	float2 InvTargetSize = 1.0f / TargetSize;
+	float2 TexCoord = Input.Position.xy / ScreenSize;
+	Output.TexCoord01.xy = TexCoord + float2(0.5f, 0.5f) * InvTargetSize;
+	Output.TexCoord01.zw = TexCoord + float2(1.5f, 0.5f) * InvTargetSize;
+	Output.TexCoord23.xy = TexCoord + float2(0.5f, 1.5f) * InvTargetSize;
+	Output.TexCoord23.zw = TexCoord + float2(1.5f, 1.5f) * InvTargetSize;
 
 	return Output;
 }

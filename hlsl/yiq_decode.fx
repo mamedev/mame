@@ -104,7 +104,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float MaxC = 2.1183f;
 	float MinC = -1.1183f;
 	float CRange = MaxC - MinC;
-	float FrameWidthx4 = SourceDims.x * 4.0f / SourceRect.x;
+	float FrameWidthx4 = SourceDims.x * 4.0f * SourceRect.x;
 	float Fc_y1 = (CCValue - NotchHalfWidth) * ScanTime / FrameWidthx4;
 	float Fc_y2 = (CCValue + NotchHalfWidth) * ScanTime / FrameWidthx4;
 	float Fc_y3 = YFreqResponse * ScanTime / FrameWidthx4;
@@ -124,14 +124,15 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float4 NOffset = float4(0.0f, 1.0f, 2.0f, 3.0f);
 	float W = PI2 * CCValue * ScanTime;
 	float4 CoordY = Input.Coord0.y;
-	float4 VPosition = (CoordY / SourceRect.y) * (SourceDims.x * SourceRect.x);
+	float4 VPosition = (CoordY * SourceRect.y) * (SourceDims.x / SourceRect.x);
 	for(float n = -41.0f; n < 42.0f; n += 4.0f)
 	{
 		float4 n4 = n + NOffset;
 		float4 CoordX = Input.Coord0.x + Input.Coord0.z * n4 * 0.25f;
 		float2 TexCoord = float2(CoordX.r, CoordY.r);
 		float4 C = tex2D(CompositeSampler, TexCoord + float2(0.5f, 0.0f) / SourceDims) * CRange + MinC;
-		float4 WT = W * (CoordX * SourceRect.x + VPosition + BValue) + OValue;
+		float4 T = (CoordX / SourceRect.x) + VPosition + BValue;
+		float4 WT = W * T + OValue;
 		float4 SincKernel = 0.54f + 0.46f * cos(PI2Length * n4);
 
 		float4 SincYIn1 = Fc_y1_pi2 * n4;
