@@ -57,7 +57,10 @@ public:
 
 	struct texinfo  {
 		UINT32 address, vqbase;
+		UINT32 nontextured_pal_int;
+		UINT8 nontextured_fpal_a,nontextured_fpal_r,nontextured_fpal_g,nontextured_fpal_b;
 		int textured, sizex, sizey, stride, sizes, pf, palette, mode, mipmapped, blend_mode, filter_mode, flip_u, flip_v;
+		int coltype;
 
 		UINT32 (powervr2_device::*r)(struct texinfo *t, float x, float y);
 		UINT32 (*blend)(UINT32 s, UINT32 d);
@@ -109,7 +112,8 @@ public:
 	UINT32 blend_mode, srcselect,dstselect,fogcontrol,colorclamp, use_alpha;
 	UINT32 ignoretexalpha,flipuv,clampuv,filtermode,sstexture,mmdadjust,tsinstruction;
 	UINT32 depthcomparemode,cullingmode,zwritedisable,cachebypass,dcalcctrl,volumeinstruction,mipmapped,vqcompressed,strideselect,paletteselector;
-
+	UINT32 nontextured_pal_int;
+	float nontextured_fpal_a,nontextured_fpal_r,nontextured_fpal_g,nontextured_fpal_b;
 
 	UINT64 *dc_texture_ram;
 	UINT64 *dc_framebuffer_ram;
@@ -416,6 +420,10 @@ private:
 	UINT32 tex_r_p8_4444_vq(texinfo *t, float x, float y);
 	UINT32 tex_r_p8_8888_tw(texinfo *t, float x, float y);
 	UINT32 tex_r_p8_8888_vq(texinfo *t, float x, float y);
+
+	UINT32 tex_r_nt_palint(texinfo *t, float x, float y);
+	UINT32 tex_r_nt_palfloat(texinfo *t, float x, float y);
+
 	UINT32 tex_r_default(texinfo *t, float x, float y);
 	void tex_get_info(texinfo *t);
 

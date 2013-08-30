@@ -435,6 +435,16 @@ UINT32 powervr2_device::tex_r_4444_vq(texinfo *t, float x, float y)
 	return cv_4444(*(UINT16 *)((reinterpret_cast<UINT8 *>(dc_texture_ram)) + WORD_XOR_LE(addrp)));
 }
 
+UINT32 powervr2_device::tex_r_nt_palint(texinfo *t, float x, float y)
+{
+	return t->nontextured_pal_int;
+}
+
+UINT32 powervr2_device::tex_r_nt_palfloat(texinfo *t, float x, float y)
+{
+	return (t->nontextured_fpal_a << 24) | (t->nontextured_fpal_r << 16) | (t->nontextured_fpal_g << 8) | (t->nontextured_fpal_b);
+}
+
 UINT32 powervr2_device::tex_r_p4_1555_tw(texinfo *t, float x, float y)
 {
 	int xt = ((int)x) & (t->sizex-1);
@@ -604,7 +614,7 @@ void powervr2_device::tex_get_info(texinfo *t)
 	t->textured    = texture;
 
 	// not textured, abort.
-	if (!t->textured) return;
+//	if (!t->textured) return;
 
 	t->address     = textureaddress;
 	t->pf          = pixelformat;
@@ -655,7 +665,26 @@ void powervr2_device::tex_get_info(texinfo *t)
 	t->blend = use_alpha ? blend_functions[t->blend_mode] : bl10;
 
 //	fprintf(stderr, "tex %d %d %d %d\n", t->pf, t->mode, pal_ram_ctrl, t->mipmapped);
-
+	if(!t->textured)
+	{
+		t->coltype = coltype;
+		switch(t->coltype) {
+			case 0: // packed color
+				t->nontextured_pal_int = nontextured_pal_int;
+				t->r = &powervr2_device::tex_r_nt_palint;
+				break;
+			case 1: // floating color
+				/* TODO: might be converted even earlier I believe */
+				t->nontextured_fpal_a = (UINT8)(nontextured_fpal_a * 255.0);
+				t->nontextured_fpal_r = (UINT8)(nontextured_fpal_r * 255.0);
+				t->nontextured_fpal_g = (UINT8)(nontextured_fpal_g * 255.0);
+				t->nontextured_fpal_b = (UINT8)(nontextured_fpal_b * 255.0);
+				t->r = &powervr2_device::tex_r_nt_palfloat;
+				break;
+		}
+	}
+	else
+	{
 	switch(t->pf) {
 	case 0: // 1555
 		switch(t->mode) {
@@ -767,6 +796,7 @@ void powervr2_device::tex_get_info(texinfo *t)
 
 	case 9: // reserved
 		break;
+	}
 	}
 
 	if (t->mipmapped)
@@ -1930,7 +1960,18 @@ void powervr2_device::process_ta_fifo()
 					tv->w=u2f(tafifo_buff[3]);
 					tv->u=u2f(tafifo_buff[4]);
 					tv->v=u2f(tafifo_buff[5]);
-
+					if (texture == 0)
+					{
+						if(coltype == 0)
+							nontextured_pal_int=tafifo_buff[6];
+						else if(coltype == 1)
+						{
+							nontextured_fpal_a=u2f(tafifo_buff[4]);
+							nontextured_fpal_r=u2f(tafifo_buff[5]);
+							nontextured_fpal_g=u2f(tafifo_buff[6]);
+							nontextured_fpal_b=u2f(tafifo_buff[7]);
+						}
+					}
 
 					if((!rd->strips_size) ||
 						rd->strips[rd->strips_size-1].evert != -1)
@@ -2120,7 +2161,7 @@ void powervr2_device::render_hline(bitmap_rgb32 &bitmap, texinfo *ti, int y, flo
 	float *wbufline;
 
 	// untextured cases aren't handled
-	if (!ti->textured) return;
+//	if (!ti->textured) return;
 
 	if(xr < 0 || xl >= 640)
 		return;
