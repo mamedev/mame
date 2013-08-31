@@ -1781,7 +1781,7 @@ DRIVER_INIT_MEMBER(playmark_state,bigtwin)
 			data_lo = playmark_asciitohex((playmark_PICROM_HEX[src_pos + 3]));
 			data |= (data_hi << 12) | (data_lo << 8);
 
-			pic16c5x_set_config(m_audiocpu, data);
+			m_audiocpu->pic16c5x_set_config(data);
 
 			src_pos = 0x7fff;       /* Force Exit */
 		}

@@ -1,5 +1,6 @@
 
 #include "sound/okim6295.h"
+#include "cpu/pic16c5x/pic16c5x.h"
 
 class drgnmst_state : public driver_device
 {
@@ -72,5 +73,5 @@ public:
 	void draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect );
 	UINT8 drgnmst_asciitohex( UINT8 data );
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
+	required_device<pic16c55_device> m_audiocpu;
 };

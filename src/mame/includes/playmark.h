@@ -1,5 +1,6 @@
 #include "sound/okim6295.h"
 #include "machine/eepromser.h"
+#include "cpu/pic16c5x/pic16c5x.h"
 
 class playmark_state : public driver_device
 {
@@ -106,5 +107,5 @@ public:
 	void draw_bitmap( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 	UINT8 playmark_asciitohex(UINT8 data);
 	required_device<cpu_device> m_maincpu;
-	optional_device<cpu_device> m_audiocpu;
+	optional_device<pic16c57_device> m_audiocpu;
 };
