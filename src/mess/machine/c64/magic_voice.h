@@ -37,12 +37,15 @@ public:
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
 
+	DECLARE_WRITE_LINE_MEMBER( tpi_irq_w );
 	DECLARE_READ8_MEMBER( tpi_pa_r );
 	DECLARE_WRITE8_MEMBER( tpi_pa_w );
 	DECLARE_READ8_MEMBER( tpi_pb_r );
 	DECLARE_WRITE8_MEMBER( tpi_pb_w );
 	DECLARE_READ8_MEMBER( tpi_pc_r );
 	DECLARE_WRITE8_MEMBER( tpi_pc_w );
+	DECLARE_WRITE_LINE_MEMBER( tpi_ca_w );
+	DECLARE_WRITE_LINE_MEMBER( tpi_cb_w );
 
 	DECLARE_WRITE_LINE_MEMBER( phi2_w );
 	DECLARE_WRITE_LINE_MEMBER( dtrd_w );

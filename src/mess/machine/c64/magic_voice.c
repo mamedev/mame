@@ -57,6 +57,11 @@ const device_type C64_MAGIC_VOICE = &device_creator<c64_magic_voice_cartridge_de
 //  tpi6525_interface tpi_intf
 //-------------------------------------------------
 
+WRITE_LINE_MEMBER( c64_magic_voice_cartridge_device::tpi_irq_w )
+{
+	m_slot->nmi_w(state);
+}
+
 READ8_MEMBER( c64_magic_voice_cartridge_device::tpi_pa_r )
 {
 	/*
@@ -153,64 +158,28 @@ WRITE8_MEMBER( c64_magic_voice_cartridge_device::tpi_pb_w )
 	}
 }
 
-READ8_MEMBER( c64_magic_voice_cartridge_device::tpi_pc_r )
+WRITE_LINE_MEMBER( c64_magic_voice_cartridge_device::tpi_ca_w )
 {
-	/*
-	
-	    bit     description
-	
-	    0       
-	    1       
-	    2       T6721 _EOS
-	    3       FIFO DIR
-	    4       
-	    5       
-	    6       
-	    7       
-	
-	*/
-
-	UINT8 data = 0;
-
-	data |= m_vslsi->eos_r() << 2;
-	data |= m_fifo->dir_r() << 3;
-
-	return data;
+	m_game = !state;
+	m_eprom = !state;
 }
 
-WRITE8_MEMBER( c64_magic_voice_cartridge_device::tpi_pc_w )
+WRITE_LINE_MEMBER( c64_magic_voice_cartridge_device::tpi_cb_w )
 {
-	/*
-	
-	    bit     description
-	
-	    0       
-	    1       
-	    2       
-	    3       
-	    4       
-	    5       P1 _NMI
-	    6       0=RAM 1=EPROM
-	    7       P1 _EXROM
-	
-	*/
-
-	m_slot->nmi_w(BIT(data, 5) ? CLEAR_LINE : ASSERT_LINE);
-	
-	m_exrom = BIT(data, 7);
+	m_exrom = state;
 }
 
 static const tpi6525_interface tpi_intf =
 {
-	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, c64_magic_voice_cartridge_device, tpi_irq_w),
 	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c64_magic_voice_cartridge_device, tpi_pa_r),
 	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c64_magic_voice_cartridge_device, tpi_pa_w),
 	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c64_magic_voice_cartridge_device, tpi_pb_r),
 	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c64_magic_voice_cartridge_device, tpi_pb_w),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c64_magic_voice_cartridge_device, tpi_pc_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c64_magic_voice_cartridge_device, tpi_pc_w),
 	DEVCB_NULL,
-	DEVCB_NULL
+	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, c64_magic_voice_cartridge_device, tpi_ca_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, c64_magic_voice_cartridge_device, tpi_cb_w),
 };
 
 
@@ -342,7 +311,7 @@ UINT8 c64_magic_voice_cartridge_device::c64_cd_r(address_space &space, offs_t of
 		data = m_tpi->read(space, offset & 0x07);
 	}
 
-	if (!m_eprom && sphi2)
+	if (!m_eprom && sphi2 && ((offset >= 0xa000 && offset < 0xc000) || (offset >= 0xe000)))
 	{
 		data = m_romh[(BIT(offset, 14) << 13) | (offset & 0x1fff)];
 	}
