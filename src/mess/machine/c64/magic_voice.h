@@ -59,6 +59,7 @@ protected:
 	// device_c64_expansion_card_interface overrides
 	virtual UINT8 c64_cd_r(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2);
 	virtual void c64_cd_w(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2);
+	virtual int c64_game_r(offs_t offset, int sphi2, int ba, int rw, int hiram);
 
 private:
 	offs_t get_offset(offs_t offset);
@@ -68,10 +69,9 @@ private:
 	required_device<cmos_40105_device> m_fifo;
 	required_device<c64_expansion_slot_device> m_exp;
 
-	int m_roml2;
-	int m_romh2;
 	int m_eprom;
 	int m_da_ca;
+	int m_pb6;
 	UINT8 m_vslsi_data;
 	UINT8 m_pd;
 };
