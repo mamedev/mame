@@ -109,5 +109,5 @@ WRITE_LINE_MEMBER( t6721a_device::di_w )
 
 READ_LINE_MEMBER( t6721a_device::eos_r )
 {
-	return 0;
+	return 1;
 }

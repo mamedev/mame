@@ -32,6 +32,15 @@ http://www.stefan-uhlmann.de/cbm/MVM/index.html
 
 */
 
+/*
+
+	TODO:
+
+	- wow graphics broken
+	- T6721A speech synthesis
+
+*/
+
 #include "magic_voice.h"
 
 
@@ -303,7 +312,7 @@ void c64_magic_voice_cartridge_device::device_reset()
 
 UINT8 c64_magic_voice_cartridge_device::c64_cd_r(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
-	if (!io2 && sphi2 && BIT(offset, 7))
+	if (!io2 && sphi2)
 	{
 		data = m_tpi->read(space, offset & 0x07);
 	}
@@ -328,7 +337,7 @@ UINT8 c64_magic_voice_cartridge_device::c64_cd_r(address_space &space, offs_t of
 
 void c64_magic_voice_cartridge_device::c64_cd_w(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
-	if (!io2 && sphi2 && BIT(offset, 7))
+	if (!io2 && sphi2)
 	{
 		m_tpi->write(space, offset & 0x07, data);
 	}
@@ -346,7 +355,7 @@ void c64_magic_voice_cartridge_device::c64_cd_w(address_space &space, offs_t off
 
 int c64_magic_voice_cartridge_device::c64_game_r(offs_t offset, int sphi2, int ba, int rw, int hiram)
 {
-	return !(sphi2 && m_pb6 && m_eprom && ((offset >= 0xa000 && offset < 0xc000) || (offset >= 0xe000)));
+	return !(m_eprom && ((offset >= 0xa000 && offset < 0xc000) || (offset >= 0xe000)));
 }
 
 
