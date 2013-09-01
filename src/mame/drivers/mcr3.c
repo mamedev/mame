@@ -1376,10 +1376,11 @@ ROM_START( spyhunt )
 	ROM_LOAD( "snd_1sd.a7",   0x1000, 0x1000, CRC(12aaa48e) SHA1(c6b835fc45e4484a4d52b682ce015caa242c8b4f) )
 
 	ROM_REGION( 0x8000, "csd:cpu", 0 )  /* 32k for the Chip Squeak Deluxe */
-	ROM_LOAD16_BYTE( "csd_u7a.u7",   0x00000, 0x2000, CRC(6e689fe7) SHA1(38ad2e9f12b9d389fb2568ebcb32c8bd1ac6879e) )
-	ROM_LOAD16_BYTE( "csd_u17b.u17", 0x00001, 0x2000, CRC(0d9ddce6) SHA1(d955c0e67fc78b517cc229601ab4023cc5a644c2) )
-	ROM_LOAD16_BYTE( "csd_u8c.u8",   0x04000, 0x2000, CRC(35563cd0) SHA1(5708d374dd56758194c95118f096ea51bf12bf64) )
-	ROM_LOAD16_BYTE( "csd_u18d.u18", 0x04001, 0x2000, CRC(63d3f5b1) SHA1(5864a7e9b6bc3d2df6891d40965a7a0efbba6837) )
+	ROM_LOAD16_BYTE( "spy-hunter_c.s._deluxe_u7_a.u7",   0x00000, 0x2000, CRC(6e689fe7) SHA1(38ad2e9f12b9d389fb2568ebcb32c8bd1ac6879e) ) /* Dated 11/18/83 */
+	ROM_LOAD16_BYTE( "spy-hunter_c.s._deluxe_u17_b.u17", 0x00001, 0x2000, CRC(0d9ddce6) SHA1(d955c0e67fc78b517cc229601ab4023cc5a644c2) )
+	ROM_LOAD16_BYTE( "spy-hunter_c.s._deluxe_u8_c.u8",   0x04000, 0x2000, CRC(35563cd0) SHA1(5708d374dd56758194c95118f096ea51bf12bf64) )
+	ROM_LOAD16_BYTE( "spy-hunter_c.s._deluxe_u18_d.u18", 0x04001, 0x2000, CRC(63d3f5b1) SHA1(5864a7e9b6bc3d2df6891d40965a7a0efbba6837) )
+
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "cpu_bg0.3a",   0x00000, 0x2000, CRC(dea34fed) SHA1(cbbb2ba75e087eebdce79a0016118c327c8f0a96) )
@@ -1416,10 +1417,11 @@ ROM_START( spyhuntp )
 	ROM_LOAD( "snd_1sd.a7",   0x1000, 0x1000, CRC(12aaa48e) SHA1(c6b835fc45e4484a4d52b682ce015caa242c8b4f) )
 
 	ROM_REGION( 0x8000, "csd:cpu", 0 )  /* 32k for the Chip Squeak Deluxe */
-	ROM_LOAD16_BYTE( "csd_u7a.u7",   0x00000, 0x2000, CRC(6e689fe7) SHA1(38ad2e9f12b9d389fb2568ebcb32c8bd1ac6879e) )
-	ROM_LOAD16_BYTE( "csd_u17b.u17", 0x00001, 0x2000, CRC(0d9ddce6) SHA1(d955c0e67fc78b517cc229601ab4023cc5a644c2) )
-	ROM_LOAD16_BYTE( "csd_u8c.u8",   0x04000, 0x2000, CRC(35563cd0) SHA1(5708d374dd56758194c95118f096ea51bf12bf64) )
-	ROM_LOAD16_BYTE( "csd_u18d.u18", 0x04001, 0x2000, CRC(63d3f5b1) SHA1(5864a7e9b6bc3d2df6891d40965a7a0efbba6837) )
+	ROM_LOAD16_BYTE( "spy-hunter_c.s._deluxe_u7_a.u7",   0x00000, 0x2000, CRC(6e689fe7) SHA1(38ad2e9f12b9d389fb2568ebcb32c8bd1ac6879e) ) /* Dated 11/18/83 */
+	ROM_LOAD16_BYTE( "spy-hunter_c.s._deluxe_u17_b.u17", 0x00001, 0x2000, CRC(0d9ddce6) SHA1(d955c0e67fc78b517cc229601ab4023cc5a644c2) )
+	ROM_LOAD16_BYTE( "spy-hunter_c.s._deluxe_u8_c.u8",   0x04000, 0x2000, CRC(35563cd0) SHA1(5708d374dd56758194c95118f096ea51bf12bf64) )
+	ROM_LOAD16_BYTE( "spy-hunter_c.s._deluxe_u18_d.u18", 0x04001, 0x2000, CRC(63d3f5b1) SHA1(5864a7e9b6bc3d2df6891d40965a7a0efbba6837) )
+
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "cpu_bg0.3a",   0x00000, 0x2000, CRC(dea34fed) SHA1(cbbb2ba75e087eebdce79a0016118c327c8f0a96) )
