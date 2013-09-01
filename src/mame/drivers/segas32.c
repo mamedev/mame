@@ -3176,7 +3176,7 @@ ROM_START( jparkja )
 ROM_END
 
 /**************************************************************************************************************************
-    Jurassic Park Japan (Convertion)
+    Jurassic Park Japan (Conversion)
     not protected
      Game: 833-10544-03 JURASSIC PARK CVT
    ROM BD: 834-10545-03
@@ -4513,7 +4513,7 @@ GAME( 1992, holo,     0,        system32,     holo, segas32_state,     holo,    
 GAME( 1993, jpark,    0,        system32,     jpark, segas32_state,    jpark,    ROT0, "Sega",   "Jurassic Park (World)", GAME_IMPERFECT_GRAPHICS )  /* Released in 02.1994 */
 GAME( 1993, jparkj,   jpark,    system32,     jpark, segas32_state,    jpark,    ROT0, "Sega",   "Jurassic Park (Japan, Rev A, Deluxe)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1993, jparkja,  jpark,    system32,     jpark, segas32_state,    jpark,    ROT0, "Sega",   "Jurassic Park (Japan, Deluxe)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, jparkjc,  jpark,    system32,     jpark, segas32_state,    jpark,    ROT0, "Sega",   "Jurassic Park (Japan, Rev A, Convertion)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, jparkjc,  jpark,    system32,     jpark, segas32_state,    jpark,    ROT0, "Sega",   "Jurassic Park (Japan, Rev A, Conversion)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1994, kokoroj2, 0,        system32,     radr, segas32_state,     radr,     ROT0, "Sega",   "Kokoroji 2", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING) /* uses an Audio CD */
 GAME( 1990, radm,     0,        system32,     radm, segas32_state,     radm,     ROT0, "Sega",   "Rad Mobile (World)", GAME_IMPERFECT_GRAPHICS )  /* Released in 02.1991 */
 GAME( 1990, radmu,    radm,     system32,     radm, segas32_state,     radm,     ROT0, "Sega",   "Rad Mobile (US)", GAME_IMPERFECT_GRAPHICS )
