@@ -374,7 +374,7 @@ TIMER_CALLBACK_MEMBER(socrates_state::clear_speech_cb)
 	m_speech_load_settings_count = 0;
 }
 
-WRITE8_MEMBER(socrates_state::speech_command)// write 0x4x, some sort of bitfield; speech chip is probably hitachi hd38880 related but not exact, w/4 bit interface
+WRITE8_MEMBER(socrates_state::speech_command) // write 0x4x
 {
 	/*
 	 * 76543210
