@@ -6638,6 +6638,7 @@ src/mess/drivers/vta2000.c svneol=native#text/plain
 src/mess/drivers/vtech1.c svneol=native#text/plain
 src/mess/drivers/vtech2.c svneol=native#text/plain
 src/mess/drivers/wangpc.c svneol=native#text/plain
+src/mess/drivers/wicat.c svneol=native#text/plain
 src/mess/drivers/wswan.c svneol=native#text/plain
 src/mess/drivers/x07.c svneol=native#text/plain
 src/mess/drivers/x1.c svneol=native#text/plain

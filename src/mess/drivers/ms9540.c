@@ -9,7 +9,7 @@ controller roms of the 9520.
 
 There's no known documents for the 9540, so everything in here is a guess.
 
-The 9520 is Z80-based, but is not emulated due to missing roms.
+The 9520 is Z80-based, but is currently not emulated.
 The 9540 is 68000-based.
 
 Chips:
@@ -87,7 +87,7 @@ MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( ms9540 )
-	ROM_REGION(0x4000, "9540", 0)
+	ROM_REGION16_BE(0x4000, "9540", 0)
 	ROM_LOAD16_BYTE("0954-0135-01.20n", 0x00000, 0x2000, CRC(93ee9363) SHA1(73bc09e0379e06e0da96279cb5cc1581a0f0bf77) )
 	ROM_LOAD16_BYTE("0954-0135-02.16n", 0x00001, 0x2000, CRC(a21077c5) SHA1(51dcbe543317d2042fb1acb1885461ba1790721e) )
 
