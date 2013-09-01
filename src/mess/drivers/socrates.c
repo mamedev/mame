@@ -6,13 +6,22 @@
 *
 *  (driver structure copied from vtech1.c)
 TODO:
-    The speech chip is a toshiba tc8802AF running at 800khz clock/10khz output with between 1 and 4 t6684F vsm roms attached; create a sound driver for this!
-    fix glitches with keyboard input (double keys still don't work, super painter letter entry still doesn't work)
-    hook up hblank
-    hook up mouse
-    add waitstates for ram access (lack of this causes the system to run way too fast)
-    find and hook up any timers/interrupt controls
-    keyboard IR decoder MCU is HLE'd for now, needs decap and cpu core (it is rather tms1000 or CIC-like)
+    * The speech chip is a toshiba tc8802AF (which is pin and speech
+      compatible with the older toshiba t6803, but adds rom read mode and
+      apparently does away with the melody mode); the chip is running at
+      800khz clock/10khz output with between 1 and 4 t6684F vsm roms
+      attached; create a sound driver for this!
+    * fix glitches with keyboard input (double keys still don't work, super painter letter entry still doesn't work)
+    * hook up hblank (m_hblankstate is inited 0 right now and never changed)
+    * hook up mouse
+    * add waitstates for ram access (lack of this causes the system to run
+      way too fast)
+      This will require some probing with the LA and the fluke to figure out
+      how many cycles the waitstates are for for rom/ram/etc access.
+    * figure out what bit 6 of the status register actually does; is this an
+      ir mcu flag?
+    * keyboard IR decoder MCU is HLE'd for now, needs decap and cpu core (it
+      is rather tms1000 or CIC-like iirc)
 
 
   Socrates Educational Video System
@@ -367,9 +376,20 @@ TIMER_CALLBACK_MEMBER(socrates_state::clear_speech_cb)
 
 WRITE8_MEMBER(socrates_state::speech_command)// write 0x4x, some sort of bitfield; speech chip is probably hitachi hd38880 related but not exact, w/4 bit interface
 {
+	/*
+	 * 76543210
+	 * |||||||\-- SEL0
+	 * ||||||\--- SEL1
+	 * |||||\---- SEL2
+	 * ||||\----- SEL3
+	 * |||\------ SEL4
+	 * ||\------- SEL5
+	 * |\-------- 64UP (if LOW the chip is in 'dumb' mode and can only play 64 fixed phrases; if HIGH the chip is in 'cpu controlled' mode and commands work) (not 100% sure about this but suspect it is correct)
+	 * \--------- START (in cpu mode must be toggled from low->high for a cpu command to 'take'; in 'dumb' mode must be toggled low->high to start that 'word')
+	 */
 	logerror("write to i/o 0x4x of %x\n", data);
 /*
-// the high 4 bits of the write control which 'register' is written to, the low 4 bits are data (this is based on a readback test)
+// old readback test, probably get rid of this junk:
 // 00-0f: readback: 70-7f
 // 10-1f: readback: 70-7f
 // 20-2f: readback: 70-7f
@@ -387,84 +407,73 @@ WRITE8_MEMBER(socrates_state::speech_command)// write 0x4x, some sort of bitfiel
 // e0-ef: readback ALL 76
 // f0-ff: 70-7f
 */
-/* all this really tells us is: 0x80 is the speech start command;
-   all commands are open bus on readback of 4 bits EXCEPT for 0x60 and 0xE0, which are the CTP active and inactive versions of the same command */
-/*  following is hd38880 info:
-    microcomputer interface of hd38880 is usually 7 wires:
-    FP      frame pulse, involved with READ command somehow
-    SYBS1   data line bit 0, bidirectional
-    SYBS2   data line bit 1, "
-    SYBS3   data line bit 2, "
-    SYBS4   data line bit 3, "
-    CTP     Command pulse line, sort of a 'write' line
-    CMV     More or less the 'command is being written' line which is active whenenever any command sequence is being written and during readback.
+/* The speech chip is a toshiba tc8802, it is NOT a t6803 since the t6803
+   does not have the rom read mode, which the socrates definitely uses! */
+/* Commands (tc8802):
+SEL 5 4 3 2 1 0
+    0 0 n n n n -  ADLD - ADress LoaD - writes one nybble to the address
+                          of vsm rom selected (internal or external) starting
+                          from the low 4 bits; each subsequent write writes to
+                          the next higher 4 bits; resetting the chip resets
+                          the position
+    0 1 n n n n -  CNDT - CoNDiTion (aka 'setup') - writes one nybble to the
+                          setting register, starting from the low 4 bits; the
+                          subsequent write will be to the high 4 bits;
+                          resetting the chip will reset the position
 
-    The instructions which the hd38880 can be sent are: (msb first/to the left), blank instructions are invalid
-    0000    (nop?, used as a dummy read/write during direction change??? invalid when used alone?)
-    0001
-    0010    ADSET (Transfer address to "vsm-alike serial roms") <followed by 5 nybbles>
-    0011    READ (read nybble) <bus changes from cpu->speechchip to speechchip->sys and you get as many nybbles as you pulse the CTP line for, address auto-increments>
-    0100    INT1 (initialize 1) <followed by one nybble>
-    0101
-    0110    INT2 (initialize 2) <followed by one nybble>
-    0111
-    1000    SYSPD (set speed) <followed by one nybble>
-    1001
-    1010    STOP
-    1011    CONDT (Read state P1) <bus changes from cpu->speechchip to speechchip->sys and you get one nybble>
-    1100    START
-    1101
-    1110    SSTART (same as start but syspd speed is ignored and forced to be set to 9 (scale = 1.0))
-    1111
-end hd38880 info.*/
-/* the socrates speech chip does not QUITE match the hd38880 though, but is very similar */
-	switch(data&0xF0)
+                          CNDT bits (? are from T6803 datasheet, which could be wrong on the tc8802AF here):
+                           * 76543210
+                           * |||||||\-- ?bits/frame bit 1 (0 = see bit 2; 1 = 98bits/frame (these may be backwards))
+                           * ||||||\--- ?melody mode select if high
+                           * |||||\---- speech rom select; 0 is internal 8k mask, 1 is external vsm bus
+                           * ||||\----- ?voiced source select (0 = A; 1 = B)
+                           * |||\------ ?filter stages (0 = lpc-10; 1 = lpc-8)
+                           * ||\------- ?always 0
+                           * |\-------- ?frame length (0 = 20ms; 1 = 10ms)
+                           * \--------- ?bits/frame bit 2 (if bit 1 is not set: 0 = 56 bits/frame; 1 = 50 bits/frame)
+                           *
+    1 0 x x x x -  DTRD - DaTa ReaD - reads a nybble from the address as loaded
+                          and increments the address by one nybble. The first
+                          DTRD command after any other commands is a 'dummy
+                          read' which serves to reset the bus direction of the
+                          low 4 SEL lines, identical to the way the TMS5100
+                          does things. it doesn't affect the bus direction of
+                          the high two SEL lines.
+    1 1 0 x x x - START - Starts speech at the address as loaded.
+    1 1 1 x x x - RESET - Resets the internal chip state (clears shifters and
+                          counters) and forces speech to end/silence
+                          immediately.
+*/
+	switch(data&0xF8)
 	{
-		case 0x80:
-			if (data==0x80)
-			{
-				/* write me: start talking */
-				m_speech_running = 1;
-				timer_set(attotime::from_seconds(4), TIMER_CLEAR_SPEECH); // hack
-			}
+		case 0x80: case 0x88: case 0x90: case 0x98: case 0xA0: case 0xA8: case 0xB0: case 0xB8:
+			/* 'dumb' mode speech command: write me: start talking */
+			m_speech_running = 1;
+			timer_set(attotime::from_seconds(4), TIMER_CLEAR_SPEECH); // hack
 			break;
-		case 0x90: // unknown, one of these is probably read and branch
-			break;
-		case 0xA0: // unknown
-			break;
-		case 0xB0: // unknown
-			break;
-		case 0xC0: // load address to vsm
+		case 0xC0: case 0xC8: // ADLD: load address to vsm
 			m_speech_address |= (((int)data&0xF)<<(m_speech_load_address_count*4))<<1;
 			m_speech_load_address_count++;
 			logerror("loaded address nybble %X, byte address is currently %5X with %d nybbles loaded\n", data&0xF, m_speech_address>>1, m_speech_load_address_count);
 			break;
-		case 0xD0: // load settings
+		case 0xD0: case 0xD8: // CNDT: load settings
 			m_speech_settings |= ((data&0xF)<<(m_speech_load_settings_count*4));
 			m_speech_load_settings_count++;
 			break;
-		case 0xE0: // read byte, handled elsewhere
+		case 0xE0: case 0xE8: // DTRD: read byte, handled elsewhere
 			break;
-		case 0xF0: // command: sub 0 is speak, sub 8 is reset
-			if ((data&0xF) == 0) // speak
-			{
-				m_speech_running = 1;
-				timer_set(attotime::from_seconds(4), TIMER_CLEAR_SPEECH); // hack
-			}
-			else if ((data&0xF) == 8) // reset
-			{
-				m_speech_running = 0;
-				m_speech_address = 0;
-				m_speech_settings = 0;
-				m_speech_dummy_read = 0;
-				m_speech_load_address_count = 0;
-				m_speech_load_settings_count = 0;
-				m_io40_latch &= 0x0f; // set last command to 0 to prevent problems
-			}
-			else // other
-			{
-			logerror("speech command 0xF%x is unknown!\n",data&0xF);
-			}
+		case 0xF0: // SPEAK
+			m_speech_running = 1;
+			timer_set(attotime::from_seconds(4), TIMER_CLEAR_SPEECH); // hack
+			break;
+		case 0xF8: // RESET
+			m_speech_running = 0;
+			m_speech_address = 0;
+			m_speech_settings = 0;
+			m_speech_dummy_read = 0;
+			m_speech_load_address_count = 0;
+			m_speech_load_settings_count = 0;
+			m_io40_latch &= 0x0f; // set last command to 0 to prevent problems
 			break;
 		default: // 00 through 70 are packets without the write bit set, ignore them
 			break;
@@ -1052,7 +1061,8 @@ ROM_START(socrates)
 	  ? ?? 34  3 ?? ?
 	/CE -> 35  2 ?? ?
 	GND -- 36  1 -- GND
-	Note that a17 goes to what would be pin 2 if a 32 pin rom were installed, which is not the case. (pins 1, 31 and 32 would be tied to vcc)
+	Note that a17 goes to what would be pin 2 on a rom chip if a 32 pin rom were installed, which is not the case. (pins 1, 31 and 32 would be tied to vcc)
+	It is likely that at least one of the 6 unknown lines is R/W from the z80, and another may be phi1/m1/clock etc to allow for ram to live in cart space
 
 	Cartridge check procedure by socrates is, after screen init and check for speech synth,
 	bankswitch to bank 0x10 (i.e. first 0x4000 of cart appears at 4000-7fff in z80 space),
@@ -1073,7 +1083,7 @@ ROM_START(socrates)
 
 	/* english speech cart has a green QC sticker */
 	ROM_REGION(0x2000, "speechint", ROMREGION_ERASE00) // speech data inside of the speech chip; fill with 00, if no speech cart is present socrates will see this
-	ROM_LOAD_OPTIONAL("speech_internal.bin", 0x0000, 0x2000, CRC(edc1fb3f) SHA1(78b4631fc3b1c038e14911047f9edd6c4e8bae58)) // 8k on the speech chip itself
+	ROM_LOAD_OPTIONAL("speech_eng_internal.bin", 0x0000, 0x2000, CRC(edc1fb3f) SHA1(78b4631fc3b1c038e14911047f9edd6c4e8bae58)) // 8k on the speech chip itself
 
 	ROM_REGION(0x10000, "speechext", ROMREGION_ERASE00) // speech serial modules outside of the speech chip but still on speech cart
 	ROM_LOAD_OPTIONAL("speech_eng_vsm1.bin", 0x0000, 0x4000, CRC(888e3ddd) SHA1(33AF6A21BA6D826071C9D48557B1C9012752570B)) // 16k in serial rom
@@ -1094,7 +1104,7 @@ ROM_START(socratfc)
 	ROM_LOAD("tmp42c40p1844.u2", 0x000, 0x200, NO_DUMP) /* keyboard IR decoder MCU */
 
 	ROM_REGION(0x2000, "speechint", ROMREGION_ERASE00) // speech data inside of the speech chip; fill with 00, if no speech cart is present socrates will see this
-	ROM_LOAD_OPTIONAL("speech_fra_internal.bin", 0x0000, 0x2000, BAD_DUMP CRC(edc1fb3f) SHA1(78b4631fc3b1c038e14911047f9edd6c4e8bae58)) // probably same on french and english speech carts
+	ROM_LOAD_OPTIONAL("speech_fra_internal.bin", 0x0000, 0x2000, NO_DUMP)
 
 	ROM_REGION(0x10000, "speechext", ROMREGION_ERASE00) // speech serial modules outside of the speech chip but still on speech cart
 	ROM_LOAD_OPTIONAL("speech_fra_vsm1.bin", 0x0000, 0x4000, NO_DUMP) // 16k in serial rom
@@ -1118,13 +1128,11 @@ ROM_START(profweis)
 	ROM_LOAD("tmp42c40p1844.u2", 0x000, 0x200, NO_DUMP) /* keyboard IR decoder MCU */
 
 	ROM_REGION(0x2000, "speechint", ROMREGION_ERASE00) // speech data inside of the speech chip; fill with 00, if no speech cart is present socrates will see this
-	ROM_LOAD_OPTIONAL("speech_ger_internal.bin", 0x0000, 0x2000, BAD_DUMP CRC(edc1fb3f) SHA1(78b4631fc3b1c038e14911047f9edd6c4e8bae58)) // probably same on french and english speech carts
+	ROM_LOAD_OPTIONAL("speech_ger_internal.bin", 0x0000, 0x2000, CRC(5ff0fdc6) SHA1(8ef128561a846762a20e3fe9513a4a22aaadc7f6))
 
 	ROM_REGION(0x10000, "speechext", ROMREGION_ERASE00) // speech serial modules outside of the speech chip but still on speech cart
-	ROM_LOAD_OPTIONAL("speech_ger_vsm1.bin", 0x0000, 0x4000, NO_DUMP) // 16k in serial rom
-	ROM_LOAD_OPTIONAL("speech_ger_vsm2.bin", 0x4000, 0x4000, NO_DUMP) // 16k in serial rom
-	ROM_LOAD_OPTIONAL("speech_ger_vsm3.bin", 0x8000, 0x4000, NO_DUMP) // 16k in serial rom
-	ROM_FILL(0xC000, 0x4000, 0xff) // last vsm isn't present, FF fill
+	ROM_LOAD_OPTIONAL("speech_ger_vsm1.bin", 0x0000, 0x4000, CRC(a979a00b) SHA1(0290844619dbdf336757003aaab3ffd0a75b7ee9)) // 16k in serial rom
+	ROM_FILL(0x4000, 0xc000, 0xff) // last 3 vsms aren't present, FF fill
 ROM_END
 
 
