@@ -600,7 +600,7 @@ READ8_MEMBER( rainbow_state::diagnostic_r )
 //    printf("%02x DIP value ORed to diagnostic\n", ( m_inp1->read() | m_inp2->read() | m_inp3->read()   )  );
 
 	return ( (m_diagnostic & (0xf1)) | (     m_inp1->read() |
-                                m_inp2->read() | 
+                                             m_inp2->read() | 
                                              m_inp3->read()   )
 		   );
 }
@@ -758,7 +758,7 @@ static MACHINE_CONFIG_START( rainbow, rainbow_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*10-1, 0, 25*10-1)
 	MCFG_SCREEN_UPDATE_DRIVER(rainbow_state, screen_update_rainbow)
 	MCFG_GFXDECODE(rainbow)
-	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_LENGTH(3)
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, monochrome_green)
 	MCFG_RAINBOW_VIDEO_ADD("vt100_video", video_interface)
 	
@@ -796,4 +796,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT    STATE          INIT COMPANY                         FULLNAME       FLAGS */
-COMP( 1982, rainbow, 0,      0,       rainbow,   rainbow, driver_device, 0,  "Digital Equipment Corporation", "Rainbow 100B", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1982, rainbow, 0,      0,       rainbow,   rainbow, driver_device, 0,  "Digital Equipment Corporation", "Rainbow 100B", GAME_NOT_WORKING | GAME_IMPERFECT_COLORS)

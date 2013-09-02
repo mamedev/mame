@@ -67,6 +67,7 @@ protected:
 	// dc011 attributes
 	UINT8 m_columns;
 	UINT8 m_height;
+	UINT8 m_height_MAX;
 	UINT8 m_skip_lines;
 	UINT8 m_frequency;
 	UINT8 m_interlaced;
@@ -82,7 +83,7 @@ public:
 
 protected:
 	virtual void display_char(bitmap_ind16 &bitmap, UINT8 code, int x, int y, UINT8 scroll_region, UINT8 display_type);
-
+	virtual void device_reset();
 };
 
 extern const device_type VT100_VIDEO;
