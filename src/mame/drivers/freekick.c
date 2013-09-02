@@ -439,7 +439,7 @@ static INPUT_PORTS_START( freekck )
 	PORT_DIPSETTING(    0x80, "1 Coin/50 Credits" )
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x01, 0x00, "Manufacturer" )  PORT_DIPLOCATION("SW3:1")
+	PORT_DIPNAME( 0x01, 0x00, "Manufacturer" )  PORT_DIPLOCATION("SW3:1")	/* Set to "Sega" to show Japanese text on the "Continue" screen */
 	PORT_DIPSETTING(    0x00, "Nihon System" )
 	PORT_DIPSETTING(    0x01, "Sega/Nihon System" )
 	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW3:2" )
