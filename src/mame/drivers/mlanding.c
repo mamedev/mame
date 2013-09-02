@@ -41,6 +41,8 @@ public:
 		TIMER_DMA_COMPLETE
 	};
 
+	static const UINT32 c_dma_bank_words = 0x2000;
+
 	mlanding_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -51,11 +53,11 @@ public:
 		m_msm1(*this, "msm1"),
 		m_msm2(*this, "msm2"),
 		m_ctc(*this, "ctc"),
+		m_dma_bank(*this, "dma_ram"),
 		m_msm1_rom(*this, "adpcm1"),
 		m_msm2_rom(*this, "adpcm2"),
 		m_g_ram(*this, "g_ram"),
 		m_cha_ram(*this, "cha_ram"),
-		m_dma_ram(*this, "dma_ram"),
 		m_dot_ram(*this, "dot_ram"),
 		m_power_ram(*this, "power_ram")
 	{ }
@@ -69,15 +71,17 @@ public:
 	required_device<msm5205_device> m_msm2;
 	required_device<z80ctc_device> m_ctc;
 
-	required_memory_region m_msm1_rom;
-	required_memory_region m_msm2_rom;
+	required_memory_bank	m_dma_bank;
+	required_memory_region	m_msm1_rom;
+	required_memory_region	m_msm2_rom;
 
 	required_shared_ptr<UINT16>	m_g_ram;
 	required_shared_ptr<UINT16>	m_cha_ram;
-	required_shared_ptr<UINT16>	m_dma_ram;
 	required_shared_ptr<UINT16>	m_dot_ram;
 	required_shared_ptr<UINT8>	m_power_ram;
 
+	UINT16	*m_dma_ram;
+	UINT8	m_dma_cpu_bank;
 	UINT8	m_dma_busy;
 	UINT16	m_dsp_hold_signal;
 
@@ -136,7 +140,13 @@ protected:
 
 void mlanding_state::machine_start()
 {
+	// Allocate two DMA RAM banks
+	m_dma_ram = auto_alloc_array(machine(), UINT16, c_dma_bank_words * 2);
+	m_dma_bank->configure_entries(0, 2, m_dma_ram, c_dma_bank_words * 2);
+
 	// Register state for saving
+	save_pointer(NAME(m_dma_ram), c_dma_bank_words * 2);
+	save_item(NAME(m_dma_cpu_bank));
 	save_item(NAME(m_dma_busy));
 	save_item(NAME(m_dsp_hold_signal));
 	save_item(NAME(m_msm_pos));
@@ -152,6 +162,9 @@ void mlanding_state::machine_reset()
 	m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_mechacpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+
+	m_dma_cpu_bank = 0;
+	m_dma_bank->set_entry(m_dma_cpu_bank);
 
 	m_dsp_hold_signal = 0;
 
@@ -199,6 +212,9 @@ UINT32 mlanding_state::screen_update_mlanding(screen_device &screen, bitmap_ind1
 
 WRITE16_MEMBER(mlanding_state::dma_start_w)
 {
+	m_dma_cpu_bank ^= 1;
+	membank("dma_ram")->set_entry(m_dma_cpu_bank);
+
 	UINT32 pixels = exec_dma();
 
 	if (pixels)
@@ -238,28 +254,28 @@ WRITE16_MEMBER(mlanding_state::dma_stop_w)
 UINT32 mlanding_state::exec_dma()
 {
 	UINT32 pixcnt = 0;
-	UINT32 dma_words = m_dma_ram.bytes() / 2;
 	UINT32 gram_mask = m_g_ram.bytes() - 1;
+	UINT16 *dma_ram = &m_dma_ram[(m_dma_cpu_bank ^ 1) * c_dma_bank_words];
 
 	// Process the entries in DMA RAM
-	for (UINT32 offs = 0; offs < dma_words; offs += 4)
+	for (UINT32 offs = 0; offs < c_dma_bank_words; offs += 4)
 	{
-		UINT16 attr = m_dma_ram[offs];
+		UINT16 attr = dma_ram[offs];
 
 		if (attr == 0)
 			continue;
 
 		UINT16 code = attr & 0x1fff;
 
-		UINT16 xword = m_dma_ram[offs + 1];
-		UINT16 yword = m_dma_ram[offs + 2];
+		UINT16 xword = dma_ram[offs + 1];
+		UINT16 yword = dma_ram[offs + 2];
 
 		UINT16 x = xword & 0x1ff;
 		UINT16 y = yword & 0x1ff;
 		UINT16 sx = ((xword >> 11) & 0x1f) + 1;
 		UINT16 sy = ((yword >> 11) & 0x1f) + 1;
 
-		UINT8 colour = m_dma_ram[offs + 3] & 0xff;
+		UINT8 colour = dma_ram[offs + 3] & 0xff;
 
 		if ((attr & 0x2000) == 0)
 		{
@@ -678,7 +694,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, mlanding_state )
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM
 	AM_RANGE(0x100000, 0x17ffff) AM_RAM AM_SHARE("g_ram")
 	AM_RANGE(0x180000, 0x1bffff) AM_RAM AM_SHARE("cha_ram")
-	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM AM_SHARE("dma_ram")
+	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAMBANK("dma_ram")
 	AM_RANGE(0x1c4000, 0x1cffff) AM_RAM AM_SHARE("sub_com_ram")
 	AM_RANGE(0x1d0000, 0x1d0001) AM_WRITE(dma_start_w)
 	AM_RANGE(0x1d0002, 0x1d0003) AM_WRITE(dma_stop_w)
@@ -712,7 +728,7 @@ static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 16, mlanding_state )
 	AM_RANGE(0x040000, 0x043fff) AM_RAM
 	AM_RANGE(0x050000, 0x0503ff) AM_RAM AM_SHARE("dsp_prog")
 	AM_RANGE(0x060000, 0x060001) AM_WRITE(dsp_control_w)
-	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM AM_SHARE("dma_ram")
+	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAMBANK("dma_ram")
 	AM_RANGE(0x1c4000, 0x1cffff) AM_RAM AM_SHARE("sub_com_ram")
 	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_SHARE("dot_ram")
 ADDRESS_MAP_END
@@ -917,11 +933,11 @@ static const msm5205_interface msm5205_2_config =
 static MACHINE_CONFIG_START( mlanding, mlanding_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 10000000) // ?
+	MCFG_CPU_ADD("maincpu", M68000, 8000000) // Appears to be 68000P8 in PCB photo
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mlanding_state, irq6_line_hold)
 
-	MCFG_CPU_ADD("subcpu", M68000, 10000000) // ?
+	MCFG_CPU_ADD("subcpu", M68000, 8000000) // Appears to be 68000P8 in PCB photo
 	MCFG_CPU_PROGRAM_MAP(sub_map)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000) // ?
