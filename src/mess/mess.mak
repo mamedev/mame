@@ -2352,6 +2352,7 @@ $(MESSOBJ)/skeleton.a:          \
 	$(MESS_DRIVERS)/altos5.o    \
 	$(MESS_DRIVERS)/alphasma.o  \
 	$(MESS_DRIVERS)/alphatro.o  \
+	$(MESS_DRIVERS)/ampro.o     \
 	$(MESS_DRIVERS)/applix.o    \
 	$(MESS_DRIVERS)/attache.o   \
 	$(MESS_DRIVERS)/ax20.o      \

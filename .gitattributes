@@ -6144,6 +6144,7 @@ src/mess/drivers/altair.c svneol=native#text/plain
 src/mess/drivers/altos5.c svneol=native#text/plain
 src/mess/drivers/amico2k.c svneol=native#text/plain
 src/mess/drivers/amiga.c svneol=native#text/plain
+src/mess/drivers/ampro.c svneol=native#text/plain
 src/mess/drivers/amstr_pc.c svneol=native#text/plain
 src/mess/drivers/amstrad.c svneol=native#text/plain
 src/mess/drivers/apc.c svneol=native#text/plain
