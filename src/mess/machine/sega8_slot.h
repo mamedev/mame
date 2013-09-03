@@ -193,7 +193,7 @@ public:
 #define MCFG_SG1000MK3_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
 	MCFG_DEVICE_ADD(_tag, SEGA8_CART_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
-	static_cast<sega8_cart_slot_device *>(device)->set_mandatory(TRUE); \
+	static_cast<sega8_cart_slot_device *>(device)->set_mandatory(FALSE); \
 	static_cast<sega8_cart_slot_device *>(device)->set_intf("sms_cart"); \
 	static_cast<sega8_cart_slot_device *>(device)->set_ext("bin,sms,sg");
 

@@ -20,6 +20,7 @@
 #define CONTROL2_TAG   "ctrl2"
 
 #include "machine/smsctrl.h"
+#include "machine/smsexp.h"
 #include "machine/sega8_slot.h"
 
 
@@ -34,7 +35,8 @@ public:
 		m_main_scr(*this, "screen"),
 		m_mainram(*this, "mainram"),
 		m_cartslot(*this, "slot"),
-		m_card(*this, "mycard"),
+		m_cardslot(*this, "mycard"),
+		m_expslot(*this, "exp"),
 		m_region_maincpu(*this, "maincpu"),
 		m_port_ctrl1(*this, CONTROL1_TAG),
 		m_port_ctrl2(*this, CONTROL2_TAG),
@@ -50,7 +52,6 @@ public:
 		m_has_bios_0400(0),
 		m_has_bios_2000(0),
 		m_has_bios_full(0),
-		m_has_bios(0),
 		m_has_fm(0) { }
 
 	// devices
@@ -60,7 +61,8 @@ public:
 	required_device<screen_device> m_main_scr;
 	required_shared_ptr<UINT8> m_mainram;
 	required_device<sega8_cart_slot_device> m_cartslot;
-	optional_device<sega8_card_slot_device> m_card;
+	optional_device<sega8_card_slot_device> m_cardslot;
+	optional_device<sms_expansion_slot_device> m_expslot;
 	required_memory_region m_region_maincpu;
 	optional_device<sms_control_port_device> m_port_ctrl1;
 	optional_device<sms_control_port_device> m_port_ctrl2;
@@ -104,7 +106,6 @@ public:
 	UINT8 m_has_bios_0400;
 	UINT8 m_has_bios_2000;
 	UINT8 m_has_bios_full;
-	UINT8 m_has_bios;
 	UINT8 m_has_fm;
 
 	// Data needed for Light Phaser

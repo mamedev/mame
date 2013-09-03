@@ -569,9 +569,9 @@ static MACHINE_CONFIG_DERIVED( sms1_ntsc, sms_ntsc_base )
 	MCFG_SEGA315_5124_ADD("sms_vdp", _315_5124_ntsc_intf)
 	MCFG_SEGA315_5124_SET_SCREEN("screen")
 
-	// cardslot, not present in Master System II
+	// card and expansion slots, not present in Master System II
 	MCFG_SMS_CARD_ADD("mycard", sms_cart, NULL)
-
+	MCFG_SMS_EXPANSION_ADD("exp", sms_expansion_devices, NULL)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( sms_sdisp, smssdisp_state )
@@ -735,8 +735,9 @@ static MACHINE_CONFIG_DERIVED( sms1_pal, sms_pal_base )
 	MCFG_SEGA315_5124_ADD("sms_vdp", _315_5124_pal_intf)
 	MCFG_SEGA315_5124_SET_SCREEN("screen")
 
-	// cardslot, not present in Master System II
+	// card and expansion slots, not present in Master System II
 	MCFG_SMS_CARD_ADD("mycard", sms_cart, NULL)
+	MCFG_SMS_EXPANSION_ADD("exp", sms_expansion_devices, NULL)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( sms_fm, sms1_ntsc )

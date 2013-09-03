@@ -1959,6 +1959,8 @@ $(MESSOBJ)/sega.a:              \
 	$(MESS_MACHINE)/sms_rfu.o     \
 	$(MESS_MACHINE)/sega8_slot.o  \
 	$(MESS_MACHINE)/sega8_rom.o \
+	$(MESS_MACHINE)/smsexp.o    \
+	$(MESS_MACHINE)/sms_gender.o  \
 	$(MESS_DRIVERS)/sms.o       \
 	$(MESS_DRIVERS)/svmu.o      \
 
