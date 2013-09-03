@@ -3,20 +3,20 @@
     Midnight Landing
 
     driver by Tomasz Slanina, Phil Bennett & Angelo Salese
-
     Based on early work by David Haywood
 
     CPU Board quick layout:
     |------------------------------------|
-    |    68000-8             DSW  DSW    |
+    |    68000P8             DSW  DSW    |
     |                                  J|--|
-    |    x   x        TMS32025          |--|
-    |                        TC0060DCA? |--|
+    |                          uPD4701? |--|
+    |    x   x        TMS32025 uPD4701? |--|
     |                                   |--|
+    |                        TC0060DCA? |--|
     |A                                  |--|
     |                                   |--|
     |                                   |--|
-    |                                    |
+    |                                   |--|
     |                                    |
     | XTAL       x    YM2151           R |
     |B           x                       |
@@ -26,7 +26,7 @@
     |                        PC060HA     |
     |                                    |
     |                 x      Z80 CTC     |
-    |    68000-8      Z80                |
+    |    68000P8      Z80                |
     |------------------------------------|
         * A, B, R are flatcable connectors, and J is for Jamma
         * XTAL is assumed to be around 32MHz
