@@ -6,7 +6,7 @@
 const device_type SCSI_CR589 = &device_creator<scsi_cr589_device>;
 
 scsi_cr589_device::scsi_cr589_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: scsicd_device(mconfig, SCSI_CR589, "SCSI CR589", tag, owner, clock, "scsi cr589", __FILE__)
+	: scsicd_device(mconfig, SCSI_CR589, "SCSI CR589", tag, owner, clock, "scsi_cr589", __FILE__)
 {
 }
 
