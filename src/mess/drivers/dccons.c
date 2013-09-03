@@ -365,7 +365,8 @@ static ADDRESS_MAP_START( dc_map, AS_PROGRAM, 64, dc_cons_state )
 	AM_RANGE(0x00200000, 0x0021ffff) AM_ROM AM_REGION("dcflash",0)//AM_READWRITE8(dc_flash_r,dc_flash_w, U64(0xffffffffffffffff))
 	AM_RANGE(0x005f6800, 0x005f69ff) AM_READWRITE(dc_sysctrl_r, dc_sysctrl_w )
 	AM_RANGE(0x005f6c00, 0x005f6cff) AM_DEVICE32( "maple_dc", maple_dc_device, amap, U64(0xffffffffffffffff) )
-	AM_RANGE(0x005f7000, 0x005f70ff) AM_READWRITE32(dc_mess_gdrom_r, dc_mess_gdrom_w, U64(0xffffffffffffffff) )
+	AM_RANGE(0x005f7000, 0x005f701f) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs1, write_cs1, U64(0x0000ffff0000ffff) )
+	AM_RANGE(0x005f7080, 0x005f709f) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs0, write_cs0, U64(0x0000ffff0000ffff) )
 	AM_RANGE(0x005f7400, 0x005f74ff) AM_READWRITE32(dc_mess_g1_ctrl_r, dc_mess_g1_ctrl_w, U64(0xffffffffffffffff) )
 	AM_RANGE(0x005f7800, 0x005f78ff) AM_READWRITE(dc_g2_ctrl_r, dc_g2_ctrl_w )
 	AM_RANGE(0x005f7c00, 0x005f7cff) AM_DEVICE32("powervr2", powervr2_device, pd_dma_map, U64(0xffffffffffffffff))
@@ -562,7 +563,6 @@ MACHINE_RESET_MEMBER(dc_cons_state,dc_console)
 	device_t *aica = machine().device("aica");
 	dc_state::machine_reset();
 	aica_set_ram_base(aica, dc_sound_ram, 2*1024*1024);
-	dreamcast_atapi_reset();
 }
 
 WRITE_LINE_MEMBER(dc_cons_state::aica_irq)
@@ -589,6 +589,16 @@ static const aica_interface dc_aica_interface =
 };
 
 static const struct sh4_config sh4cpu_config = {  1,  0,  1,  0,  0,  0,  1,  1,  0, CPU_CLOCK };
+
+SLOT_INTERFACE_START(dccons_ata_devices)
+	SLOT_INTERFACE("gdrom", GDROM)
+SLOT_INTERFACE_END
+
+static MACHINE_CONFIG_FRAGMENT( gdrom_config )
+	MCFG_DEVICE_MODIFY("device:cdda")
+	MCFG_SOUND_ROUTE(0, "^^^^^lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "^^^^^rspeaker", 1.0)
+MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( dc, dc_cons_state )
 	/* basic machine hardware */
@@ -624,7 +634,11 @@ static MACHINE_CONFIG_START( dc, dc_cons_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
 
-	MCFG_DEVICE_ADD("cdrom", GDROM, 0)
+	MCFG_ATA_INTERFACE_ADD("ata", dccons_ata_devices, "gdrom", NULL, true)
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(dc_cons_state, ata_interrupt))
+
+	MCFG_DEVICE_MODIFY("ata:0")
+	MCFG_DEVICE_CARD_MACHINE_CONFIG( "gdrom", gdrom_config )
 MACHINE_CONFIG_END
 
 /*

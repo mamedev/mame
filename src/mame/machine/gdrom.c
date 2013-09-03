@@ -11,6 +11,17 @@
 #include "gdrom.h"
 #include "debugger.h"
 
+#define GDROM_BUSY_STATE    0x00
+#define GDROM_PAUSE_STATE   0x01
+#define GDROM_STANDBY_STATE 0x02
+#define GDROM_PLAY_STATE    0x03
+#define GDROM_SEEK_STATE    0x04
+#define GDROM_SCAN_STATE    0x05
+#define GDROM_OPEN_STATE    0x06
+#define GDROM_NODISC_STATE  0x07
+#define GDROM_RETRY_STATE   0x08
+#define GDROM_ERROR_STATE   0x09
+
 static const UINT8 GDROM_Cmd71_Reply[] =
 {
 	0x0b,0x96,0xf0,0x45,0xff,0x7e,0x06,0x3d,0x7d,0x4d,0xbf,0x10,0x00,0x07,0xcf,0x73,
@@ -89,15 +100,15 @@ static void phys_frame_to_msf(int phys_frame, int *m, int *s, int *f)
 }
 
 // device type definition
-const device_type GDROM = &device_creator<gdrom_device>;
+const device_type SCSI_GDROM = &device_creator<scsi_gdrom_device>;
 
-gdrom_device::gdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: scsihle_device(mconfig, GDROM, "GDROM", tag, owner, clock, "gdrom", __FILE__),
+scsi_gdrom_device::scsi_gdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: scsihle_device(mconfig, SCSI_GDROM, "SCSI GDROM", tag, owner, clock, "scsi_gdrom", __FILE__),
 		m_cdda(*this, "cdda")
 {
 }
 
-void gdrom_device::device_start()
+void scsi_gdrom_device::device_start()
 {
 	save_item( NAME( lba ) );
 	save_item( NAME( blocks ) );
@@ -108,7 +119,7 @@ void gdrom_device::device_start()
 	save_item( NAME( play_err_flag ) );
 }
 
-void gdrom_device::device_reset()
+void scsi_gdrom_device::device_reset()
 {
 	scsihle_device::device_reset();
 
@@ -148,7 +159,7 @@ void gdrom_device::device_reset()
 	play_err_flag = 0;
 }
 
-void gdrom_device::device_stop()
+void scsi_gdrom_device::device_stop()
 {
 	if (!is_file)
 	{
@@ -159,13 +170,14 @@ void gdrom_device::device_stop()
 	}
 }
 
-cdrom_interface gdrom_device::cd_intf = { 0, 0 };
+cdrom_interface scsi_gdrom_device::cd_intf = { 0, 0 };
 
 static MACHINE_CONFIG_FRAGMENT(scsi_cdrom)
-	MCFG_CDROM_ADD("image", gdrom_device::cd_intf)
+	MCFG_CDROM_ADD("image", scsi_gdrom_device::cd_intf)
+	MCFG_SOUND_ADD("cdda", CDDA, 0)
 MACHINE_CONFIG_END
 
-machine_config_constructor gdrom_device::device_mconfig_additions() const
+machine_config_constructor scsi_gdrom_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME(scsi_cdrom);
 }
@@ -174,7 +186,7 @@ machine_config_constructor gdrom_device::device_mconfig_additions() const
 //
 // Execute a SCSI command.
 
-void gdrom_device::ExecCommand( int *transferLength )
+void scsi_gdrom_device::ExecCommand( int *transferLength )
 {
 	int trk;
 
@@ -565,7 +577,7 @@ void gdrom_device::ExecCommand( int *transferLength )
 //
 // Read data from the device resulting from the execution of a command
 
-void gdrom_device::ReadData( UINT8 *data, int dataLength )
+void scsi_gdrom_device::ReadData( UINT8 *data, int dataLength )
 {
 	int i;
 	UINT32 last_phys_frame;
@@ -994,7 +1006,7 @@ void gdrom_device::ReadData( UINT8 *data, int dataLength )
 //
 // Write data to the CD-ROM device as part of the execution of a command
 
-void gdrom_device::WriteData( UINT8 *data, int dataLength )
+void scsi_gdrom_device::WriteData( UINT8 *data, int dataLength )
 {
 	switch (command[ 0 ])
 	{
@@ -1038,17 +1050,91 @@ void gdrom_device::WriteData( UINT8 *data, int dataLength )
 	}
 }
 
-void gdrom_device::GetDevice( void **_cdrom )
+void scsi_gdrom_device::GetDevice( void **_cdrom )
 {
 	*(cdrom_file **)_cdrom = cdrom;
 }
 
-void gdrom_device::SetDevice( void *_cdrom )
+void scsi_gdrom_device::SetDevice( void *_cdrom )
 {
 	cdrom = (cdrom_file *) _cdrom;
 }
 
-int gdrom_device::GetSectorBytes()
+int scsi_gdrom_device::GetSectorBytes()
 {
 	return bytes_per_sector;
+}
+
+// device type definition
+const device_type GDROM = &device_creator<gdrom_device>;
+
+gdrom_device::gdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: atapi_hle_device(mconfig, GDROM, "GDROM", tag, owner, clock, "gdrom", __FILE__)
+{
+}
+
+static MACHINE_CONFIG_FRAGMENT( gdrom )
+	MCFG_DEVICE_ADD("device", SCSI_GDROM, 0)
+MACHINE_CONFIG_END
+
+//-------------------------------------------------
+//  machine_config_additions - device-specific
+//  machine configurations
+//-------------------------------------------------
+
+machine_config_constructor gdrom_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( gdrom );
+}
+
+void gdrom_device::device_start()
+{
+	memset(m_identify_buffer, 0, sizeof(m_identify_buffer));
+
+	m_identify_buffer[ 0 ] = 0x8600; // ATAPI device, cmd set 6 compliant, DRQ within 3 ms of PACKET command
+
+	m_identify_buffer[ 23 ] = ('S' << 8) | 'E';
+	m_identify_buffer[ 24 ] = (' ' << 8) | ' ';
+	m_identify_buffer[ 25 ] = (' ' << 8) | ' ';
+	m_identify_buffer[ 26 ] = (' ' << 8) | ' ';
+
+	m_identify_buffer[ 27 ] = ('C' << 8) | 'D';
+	m_identify_buffer[ 28 ] = ('-' << 8) | 'R';
+	m_identify_buffer[ 29 ] = ('O' << 8) | 'M';
+	m_identify_buffer[ 30 ] = (' ' << 8) | 'D';
+	m_identify_buffer[ 31 ] = ('R' << 8) | 'I';
+	m_identify_buffer[ 32 ] = ('V' << 8) | 'E';
+	m_identify_buffer[ 33 ] = (' ' << 8) | ' ';
+	m_identify_buffer[ 34 ] = (' ' << 8) | ' ';
+	m_identify_buffer[ 35 ] = ('6' << 8) | '.';
+	m_identify_buffer[ 36 ] = ('4' << 8) | '2';
+	m_identify_buffer[ 37 ] = (' ' << 8) | ' ';
+	m_identify_buffer[ 38 ] = (' ' << 8) | ' ';
+	m_identify_buffer[ 39 ] = (' ' << 8) | ' ';
+	m_identify_buffer[ 40 ] = (' ' << 8) | ' ';
+	m_identify_buffer[ 41 ] = (' ' << 8) | ' ';
+	m_identify_buffer[ 42 ] = (' ' << 8) | ' ';
+	m_identify_buffer[ 43 ] = (' ' << 8) | ' ';
+	m_identify_buffer[ 44 ] = (' ' << 8) | ' ';
+	m_identify_buffer[ 45 ] = (' ' << 8) | ' ';
+	m_identify_buffer[ 46 ] = (' ' << 8) | ' ';
+
+	m_identify_buffer[ 49 ] = 0x0400; // IORDY may be disabled
+
+	atapi_hle_device::device_start();
+}
+
+void gdrom_device::perform_diagnostic()
+{
+	m_error = IDE_ERROR_DIAGNOSTIC_PASSED;
+}
+
+void gdrom_device::process_buffer()
+{
+	atapi_hle_device::process_buffer();
+	m_sector_number = 0x80 | GDROM_PAUSE_STATE; /// HACK: find out when this should be updated
+}
+
+void gdrom_device::identify_packet_device()
+{
 }
