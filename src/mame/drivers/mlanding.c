@@ -6,6 +6,32 @@
 
     Based on early work by David Haywood
 
+    CPU Board quick layout:
+    |------------------------------------|
+    |    68000-8             DSW  DSW    |
+    |                                  J|--|
+    |    x   x        TMS32025          |--|
+    |                        TC0060DCA? |--|
+    |                                   |--|
+    |A                                  |--|
+    |                                   |--|
+    |                                   |--|
+    |                                    |
+    |                                    |
+    | XTAL       x    YM2151           R |
+    |B           x                       |
+    |    x   x   x    5205 5205          |
+    |    x   x   x                       |
+    |    x   x   x           x           |
+    |                        PC060HA     |
+    |                                    |
+    |                 x      Z80 CTC     |
+    |    68000-8      Z80                |
+    |------------------------------------|
+        * A, B, R are flatcable connectors, and J is for Jamma
+        * XTAL is assumed to be around 32MHz
+        * x are ROM chips, PCB photo was too small to determine which
+
 
     To do:
         * Find Japanese version
@@ -948,7 +974,7 @@ static MACHINE_CONFIG_START( mlanding, mlanding_state )
 	MCFG_CPU_PROGRAM_MAP(mecha_map_prog)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mlanding_state, irq0_line_hold)
 
-	MCFG_CPU_ADD("dsp", TMS32025, 40000000) // ?
+	MCFG_CPU_ADD("dsp", TMS32025, 32000000) // ?
 	MCFG_CPU_PROGRAM_MAP(dsp_map_prog)
 	MCFG_CPU_DATA_MAP(dsp_map_data)
 	MCFG_CPU_IO_MAP(dsp_map_io)
