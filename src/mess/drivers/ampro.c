@@ -16,6 +16,11 @@ of a hard drive of up to 88MB.
 Status: The system will start up into the monitor, as long as no disk
         has been mounted.
 
+ToDo:
+- Fix fdc so that command 0xc0 works.
+- (maybe) add scsi interface
+- Add printer
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -24,7 +29,7 @@ Status: The system will start up into the monitor, as long as no disk
 #include "machine/z80ctc.h"
 #include "machine/z80dart.h"
 #include "machine/terminal.h"
-//#include "machine/serial.h"
+#include "machine/serial.h"
 #include "machine/wd_fdc.h"
 
 
@@ -34,36 +39,28 @@ public:
 	ampro_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_terminal(*this, TERMINAL_TAG)
+		, m_dart(*this, "z80dart")
+		, m_ctc (*this, "z80ctc")
 		, m_fdc (*this, "fdc")
 		, m_floppy0(*this, "fdc:0")
 	{ }
 
 	DECLARE_DRIVER_INIT(ampro);
 	DECLARE_MACHINE_RESET(ampro);
-	DECLARE_READ8_MEMBER(port80_r);
-	DECLARE_READ8_MEMBER(port84_r);
+	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
+	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
 	DECLARE_WRITE8_MEMBER(port00_w);
+	DECLARE_READ8_MEMBER(io_r);
+	DECLARE_WRITE8_MEMBER(io_w);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 private:
 	UINT8 m_term_data;
 	required_device<cpu_device> m_maincpu;
-	required_device<generic_terminal_device> m_terminal;
+	required_device<z80dart_device> m_dart;
+	required_device<z80ctc_device> m_ctc;
 	required_device<wd1772_t> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 };
-
-READ8_MEMBER( ampro_state::port80_r )
-{
-	UINT8 ret = m_term_data;
-	m_term_data = 0;
-	return ret;
-}
-
-READ8_MEMBER( ampro_state::port84_r )
-{
-	return (m_term_data) ? 5 : 4;
-}
 
 /*
 d0..d3 Drive select 0-3 (we only emulate 1 drive)
@@ -86,6 +83,22 @@ WRITE8_MEMBER( ampro_state::port00_w )
 	}
 }
 
+READ8_MEMBER( ampro_state::io_r )
+{
+	if (offset < 0x40)
+		return m_ctc->read(offset>>4);
+	else
+		return m_dart->ba_cd_r(space, offset>>2);
+}
+
+WRITE8_MEMBER( ampro_state::io_w )
+{
+	if (offset < 0x40)
+		m_ctc->write(offset>>4, data);
+	else
+		m_dart->ba_cd_w(space, offset>>2, data);
+}
+
 static ADDRESS_MAP_START(ampro_mem, AS_PROGRAM, 8, ampro_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
@@ -101,10 +114,7 @@ static ADDRESS_MAP_START(ampro_io, AS_IO, 8, ampro_state)
 	//AM_RANGE(0x20, 0x27) AM_READWRITE() // scsi chip
 	//AM_RANGE(0x28, 0x28) AM_WRITE(port28_w) // scsi control
 	//AM_RANGE(0x29, 0x29) AM_READ(port29_r) // ID port
-	//AM_RANGE(0x40, 0x7f) AM_READWRITE(ctc device)
-	//AM_RANGE(0x80, 0x8f) AM_READWRITE(dart device)
-	AM_RANGE(0x80, 0x80) AM_READ(port80_r) AM_DEVWRITE(TERMINAL_TAG, generic_terminal_device, write)
-	AM_RANGE(0x84, 0x84) AM_READ(port84_r)
+	AM_RANGE(0x40, 0x8f) AM_READWRITE(io_r,io_w)
 	AM_RANGE(0xc0, 0xc3) AM_DEVWRITE("fdc", wd1772_t, write)
 	AM_RANGE(0xc4, 0xc7) AM_DEVREAD("fdc", wd1772_t, read)
 ADDRESS_MAP_END
@@ -120,21 +130,19 @@ static Z80DART_INTERFACE( dart_intf )
 {
 	0, 0, 0, 0,
 
-	// console#3
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER("rs232", serial_port_device, rx),
+	DEVCB_DEVICE_LINE_MEMBER("rs232", serial_port_device, tx),
+	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, dtr_w),
+	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, rts_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 
-	// printer
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_NULL, // ChB in data
+	DEVCB_NULL, // out data
+	DEVCB_NULL, // DTR
+	DEVCB_NULL, // RTS
+	DEVCB_NULL, // WRDY
+	DEVCB_NULL, // SYNC
 
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
 	DEVCB_NULL,
@@ -143,24 +151,38 @@ static Z80DART_INTERFACE( dart_intf )
 	DEVCB_NULL
 };
 
+// Baud rate generator. All inputs are 2MHz.
+TIMER_DEVICE_CALLBACK_MEMBER( ampro_state::ctc_tick )
+{
+	m_ctc->trg0(1);
+	m_ctc->trg0(0);
+	m_ctc->trg1(1);
+	m_ctc->trg1(0);
+}
+
+WRITE_LINE_MEMBER( ampro_state::ctc_z0_w )
+{
+	m_dart->rxca_w(state);
+	m_dart->txca_w(state);
+}
+
 static Z80CTC_INTERFACE( ctc_intf )
 {
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), // interrupt callback
-	DEVCB_NULL,//DEVCB_DEVICE_LINE_MEMBER("z80sio", z80dart_device, rxtxcb_w),         /* ZC/TO0 callback - SIO Ch B */
-	DEVCB_NULL,//DEVCB_DRIVER_LINE_MEMBER(altos5_state, ctc_z1_w),         /* ZC/TO1 callback - Z80DART Ch A, SIO Ch A */
-	DEVCB_NULL//DEVCB_DEVICE_LINE_MEMBER("z80dart", z80dart_device, rxtxcb_w),         /* ZC/TO2 callback - Z80DART Ch B */
+	DEVCB_DRIVER_LINE_MEMBER(ampro_state, ctc_z0_w),         /* ZC/TO0 callback - Z80DART Ch A, SIO Ch A */
+	DEVCB_DEVICE_LINE_MEMBER("z80dart", z80dart_device, rxtxcb_w),         /* ZC/TO1 callback - SIO Ch B */
+	DEVCB_NULL         /* ZC/TO2 callback */
 };
 
-#if 0
 static const rs232_port_interface rs232_intf =
 {
 	DEVCB_NULL,
-	DEVCB_NULL,//DEVCB_DEVICE_LINE_MEMBER("z80sio", z80dart_device, dcdb_w),
 	DEVCB_NULL,
-	DEVCB_NULL,//DEVCB_DEVICE_LINE_MEMBER("z80sio", z80dart_device, rib_w),
-	DEVCB_NULL //DEVCB_DEVICE_LINE_MEMBER("z80sio", z80dart_device, ctsb_w)
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
-#endif
+
 static SLOT_INTERFACE_START( ampro_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
@@ -202,14 +224,11 @@ static MACHINE_CONFIG_START( ampro, ampro_state )
 	MCFG_CPU_CONFIG(daisy_chain_intf)
 	MCFG_MACHINE_RESET_OVERRIDE(ampro_state, ampro)
 
-	/* video hardware */
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
-
 	/* Devices */
 	MCFG_Z80CTC_ADD( "z80ctc",   XTAL_16MHz / 4, ctc_intf )
 	MCFG_Z80DART_ADD("z80dart",  XTAL_16MHz / 4, dart_intf )
-	//MCFG_RS232_PORT_ADD("rs232", rs232_intf, default_rs232_devices, "serial_terminal")
-	//MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc_tick", altos5_state, ctc_tick, attotime::from_hz(XTAL_16MHz / 4))
+	MCFG_RS232_PORT_ADD("rs232", rs232_intf, default_rs232_devices, "serial_terminal")
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc_tick", ampro_state, ctc_tick, attotime::from_hz(XTAL_16MHz / 8))
 	MCFG_WD1772x_ADD("fdc", XTAL_16MHz / 16)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ampro_floppies, "525dd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
