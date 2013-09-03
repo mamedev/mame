@@ -698,7 +698,7 @@ ROM_END
 
 ROM_START( devstors3 )
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "890k02.k11",   0x10000, 0x08000, CRC(52f4ccdd) SHA1(074e526ed170a5f2083c8c0808734291a2ea7403) ) /* Most likely should be 890v02.k11 */
+	ROM_LOAD( "890v02.k11",   0x10000, 0x08000, CRC(52f4ccdd) SHA1(074e526ed170a5f2083c8c0808734291a2ea7403) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
