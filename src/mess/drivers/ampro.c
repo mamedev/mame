@@ -28,7 +28,6 @@ ToDo:
 #include "cpu/z80/z80daisy.h"
 #include "machine/z80ctc.h"
 #include "machine/z80dart.h"
-#include "machine/terminal.h"
 #include "machine/serial.h"
 #include "machine/wd_fdc.h"
 
@@ -54,7 +53,6 @@ public:
 	DECLARE_WRITE8_MEMBER(io_w);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 private:
-	UINT8 m_term_data;
 	required_device<cpu_device> m_maincpu;
 	required_device<z80dart_device> m_dart;
 	required_device<z80ctc_device> m_ctc;
@@ -190,16 +188,6 @@ SLOT_INTERFACE_END
 /* Input ports */
 static INPUT_PORTS_START( ampro )
 INPUT_PORTS_END
-
-WRITE8_MEMBER( ampro_state::kbd_put )
-{
-	m_term_data = data;
-}
-
-static GENERIC_TERMINAL_INTERFACE( terminal_intf )
-{
-	DEVCB_DRIVER_MEMBER(ampro_state, kbd_put)
-};
 
 MACHINE_RESET_MEMBER( ampro_state, ampro )
 {
