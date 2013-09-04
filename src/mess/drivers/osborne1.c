@@ -268,7 +268,7 @@ MACHINE_CONFIG_END
 ROM_START( osborne1 )
 	ROM_REGION(0x1000, "maincpu", 0)
 	ROM_SYSTEM_BIOS( 0, "ver144", "BIOS version 1.44" )
-	ROMX_LOAD( "rev1.44.ud11", 0x0000, 0x1000, CRC(c0596b14) SHA1(ee6a9cc9be3ddc5949d3379351c1d58a175ce9ac), ROM_BIOS(1) )
+	ROMX_LOAD( "3a10082-00rev-e.ud11", 0x0000, 0x1000, CRC(c0596b14) SHA1(ee6a9cc9be3ddc5949d3379351c1d58a175ce9ac), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "verA", "BIOS version A" )
 	ROMX_LOAD( "osba.bin", 0x0000, 0x1000, NO_DUMP, ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 2, "ver12", "BIOS version 1.2" )
