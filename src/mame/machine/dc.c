@@ -559,11 +559,11 @@ WRITE64_MEMBER(dc_state::dc_g2_ctrl_w )
 			old = m_wave_dma.start & 1;
 			m_wave_dma.start = dat & 1;
 
-			#if DEBUG_AICA_DMA
+			//#if DEBUG_AICA_DMA
 			printf("AICA: G2-DMA start \n");
 			printf("DST %08x SRC %08x SIZE %08x IND %02x\n",m_wave_dma.aica_addr,m_wave_dma.root_addr,m_wave_dma.size,m_wave_dma.indirect);
 			printf("SEL %08x ST  %08x FLAG %08x DIR %02x\n",m_wave_dma.sel,m_wave_dma.start,m_wave_dma.flag,m_wave_dma.dir);
-			#endif
+			//#endif
 
 			//mame_printf_verbose("SB_ADST data %08x\n",dat);
 			if(((old & 1) == 0) && m_wave_dma.flag && m_wave_dma.start && ((m_wave_dma.sel & 2) == 0)) // 0 -> 1
@@ -642,96 +642,14 @@ WRITE64_MEMBER(dc_state::dc_modem_w )
 	mame_printf_verbose("MODEM: [%08x=%x] write %" I64FMT "x to %x, mask %" I64FMT "x\n", 0x600000+reg*4, dat, data, offset, mem_mask);
 }
 
-READ32_MEMBER(dc_state::dc_rtc_r)
-{
-	return dc_rtcregister[offset];
-}
-
-WRITE32_MEMBER(dc_state::dc_rtc_w)
-{
-	UINT32 old;
-
-	old = dc_rtcregister[offset];
-	COMBINE_DATA(&dc_rtcregister[offset]);
-
-	switch (offset)
-	{
-	case RTC1:
-		if (dc_rtcregister[RTC3])
-			dc_rtcregister[RTC3] = 0;
-		else
-			dc_rtcregister[offset] = old;
-		break;
-	case RTC2:
-		if (dc_rtcregister[RTC3] == 0)
-			dc_rtcregister[offset] = old;
-		else
-			dc_rtc_timer->adjust(attotime::zero, 0, attotime::from_seconds(1));
-		break;
-	case RTC3:
-		dc_rtcregister[RTC3] &= 1;
-		break;
-	}
-	//mame_printf_verbose("RTC: [%08x=%x] write %" I64FMT "x to %x, mask %" I64FMT "x\n", 0x710000 + offset*4, data, offset, mem_mask);
-}
-
-TIMER_CALLBACK_MEMBER(dc_state::dc_rtc_increment)
-{
-	dc_rtcregister[RTC2] = (dc_rtcregister[RTC2] + 1) & 0xFFFF;
-	if (dc_rtcregister[RTC2] == 0)
-		dc_rtcregister[RTC1] = (dc_rtcregister[RTC1] + 1) & 0xFFFF;
-}
-
-/* fill the RTC registers with the proper start-up values */
-void dc_state::rtc_initial_setup()
-{
-	static UINT32 current_time;
-	static int year_count,cur_year,i;
-	static const int month_to_day_conversion[12] = { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 };
-	system_time systime;
-	machine().base_datetime(systime);
-
-	memset(dc_rtcregister, 0, sizeof(dc_rtcregister));
-
-	/* put the seconds */
-	current_time = systime.local_time.second;
-	/* put the minutes */
-	current_time+= systime.local_time.minute*60;
-	/* put the hours */
-	current_time+= systime.local_time.hour*60*60;
-	/* put the days (note -1) */
-	current_time+= (systime.local_time.mday-1)*60*60*24;
-	/* take the current year here for calculating leaps */
-	cur_year = (systime.local_time.year);
-
-	/* take the months - despite popular beliefs, leap years aren't just evenly divisible by 4 */
-	if(((((cur_year % 4) == 0) && ((cur_year % 100) != 0)) || ((cur_year % 400) == 0)) && systime.local_time.month > 2)
-		current_time+= (month_to_day_conversion[systime.local_time.month]+1)*60*60*24;
-	else
-		current_time+= (month_to_day_conversion[systime.local_time.month])*60*60*24;
-
-	/* put the years */
-	year_count = (cur_year-1949);
-
-	for(i=0;i<year_count-1;i++)
-		current_time += (((((i+1950) % 4) == 0) && (((i+1950) % 100) != 0)) || (((i+1950) % 400) == 0)) ? 60*60*24*366 : 60*60*24*365;
-
-	dc_rtcregister[RTC2] = current_time & 0x0000ffff;
-	dc_rtcregister[RTC1] = (current_time & 0xffff0000) >> 16;
-
-	dc_rtc_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dc_state::dc_rtc_increment),this));
-}
 
 void dc_state::machine_start()
 {
-	rtc_initial_setup();
-
 	// dccons doesn't have a specific g1 device yet
 	if(m_naomig1)
 		m_naomig1->set_dma_cb(naomi_g1_device::dma_cb(FUNC(dc_state::generic_dma), this));
 
 	// save states
-	save_pointer(NAME(dc_rtcregister), 4);
 	save_pointer(NAME(dc_sysctrl_regs), 0x200/4);
 	save_pointer(NAME(g2bus_regs), 0x100/4);
 	save_item(NAME(m_wave_dma.aica_addr));
@@ -751,8 +669,6 @@ void dc_state::machine_reset()
 	m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	memset(dc_sysctrl_regs, 0, sizeof(dc_sysctrl_regs));
-
-	dc_rtc_timer->adjust(attotime::zero, 0, attotime::from_seconds(1));
 
 	dc_sysctrl_regs[SB_SBREV] = 0x0b;
 }

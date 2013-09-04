@@ -18,13 +18,13 @@
             25925600 (PAL 480 @ 50.00), 13462800 (PAL 240 @ 50.00)
 
     TODO:
-    - RTC error always pops up at start-up, tied to the aforementioned?
+    - RTC error always pops up at start-up, no flash plus bug with ticks (needs rewrite)
     - Inputs doesn't work most of the time;
-    - F355 Challenge: asserts after Sega logo;
+    - F355 Challenge: black screen after Sega logo;
 	- Idol Janshi wo Tsukucchaou: pixel aspect is way wrong (stretched and offsetted horizontally)
 	- Power Stone: hangs at Capcom logo;
 	- Sega GT: no cursor on main menu;
-	- Tetris 4D: has color bugs, hangs at FMV anyway
+	- Tetris 4D: hangs at BPS FMV (bp 0C0B0C4E)
 
 	Note:
 	- DC US and DC PAL flash ROMs are definitely hacked, they are set to have Chinese instead of Japanese.
@@ -205,7 +205,7 @@
 			Write Protect (0701)
 				ok
 			RW Comp (0702)
-				NG
+				ok
 			Clock (0703)
 				NG
 		ARM7 (08xx)
@@ -257,6 +257,7 @@
 #include "cpu/sh4/sh4.h"
 #include "cpu/arm7/arm7core.h"
 #include "sound/aica.h"
+#include "machine/aicartc.h"
 #include "includes/dc.h"
 #include "includes/dccons.h"
 #include "imagedev/chd_cd.h"
@@ -373,7 +374,7 @@ static ADDRESS_MAP_START( dc_map, AS_PROGRAM, 64, dc_cons_state )
 	AM_RANGE(0x005f8000, 0x005f9fff) AM_DEVICE32("powervr2", powervr2_device, ta_map, U64(0xffffffffffffffff))
 	AM_RANGE(0x00600000, 0x006007ff) AM_READWRITE(dc_modem_r, dc_modem_w )
 	AM_RANGE(0x00700000, 0x00707fff) AM_READWRITE32(dc_aica_reg_r, dc_aica_reg_w, U64(0xffffffffffffffff))
-	AM_RANGE(0x00710000, 0x0071000f) AM_MIRROR(0x02000000) AM_READWRITE32(dc_rtc_r, dc_rtc_w, U64(0xffffffffffffffff) )
+	AM_RANGE(0x00710000, 0x0071000f) AM_MIRROR(0x02000000) AM_DEVREADWRITE16("aicartc", aicartc_device, read, write, U64(0x0000ffff0000ffff) )
 	AM_RANGE(0x00800000, 0x009fffff) AM_READWRITE(dc_arm_r, dc_arm_w )
 //  AM_RANGE(0x01000000, 0x01ffffff) G2 Ext Device #1
 //  AM_RANGE(0x02700000, 0x02707fff) AICA reg mirror
@@ -640,6 +641,8 @@ static MACHINE_CONFIG_START( dc, dc_cons_state )
 	MCFG_SOUND_CONFIG(dc_aica_interface)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
+
+	MCFG_AICARTC_ADD("aicartc", XTAL_32_768kHz )
 
 	MCFG_ATA_INTERFACE_ADD("ata", dccons_ata_devices, "gdrom", NULL, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(dc_cons_state, ata_interrupt))

@@ -33,12 +33,9 @@ class dc_state : public driver_device
 	required_shared_ptr<UINT64> dc_ram;
 
 	/* machine related */
-	UINT32 dc_rtcregister[4];
 	UINT32 dc_sysctrl_regs[0x200/4];
 	UINT32 g1bus_regs[0x100/4]; // DC-only
 	UINT32 g2bus_regs[0x100/4];
-
-	emu_timer *dc_rtc_timer;
 
 	struct {
 		UINT32 aica_addr;
@@ -56,7 +53,6 @@ class dc_state : public driver_device
 	TIMER_CALLBACK_MEMBER(aica_dma_irq);
 	TIMER_CALLBACK_MEMBER(ch2_dma_irq);
 	TIMER_CALLBACK_MEMBER(yuv_fifo_irq);
-	TIMER_CALLBACK_MEMBER(dc_rtc_increment);
 	DECLARE_READ32_MEMBER(dc_aica_reg_r);
 	DECLARE_WRITE32_MEMBER(dc_aica_reg_w);
 	DECLARE_READ32_MEMBER(dc_arm_aica_r);
@@ -67,7 +63,6 @@ class dc_state : public driver_device
 	int dc_compute_interrupt_level();
 	void dc_update_interrupt_status();
 	inline int decode_reg_64(UINT32 offset, UINT64 mem_mask, UINT64 *shift);
-	void rtc_initial_setup();
 	DECLARE_READ64_MEMBER( dc_sysctrl_r );
 	DECLARE_WRITE64_MEMBER( dc_sysctrl_w );
 	DECLARE_READ64_MEMBER( dc_gdrom_r );
@@ -76,8 +71,6 @@ class dc_state : public driver_device
 	DECLARE_WRITE64_MEMBER( dc_g2_ctrl_w );
 	DECLARE_READ64_MEMBER( dc_modem_r );
 	DECLARE_WRITE64_MEMBER( dc_modem_w );
-	DECLARE_READ32_MEMBER( dc_rtc_r );
-	DECLARE_WRITE32_MEMBER( dc_rtc_w );
 	DECLARE_WRITE8_MEMBER( g1_irq );
 	DECLARE_WRITE8_MEMBER( pvr_irq );
 

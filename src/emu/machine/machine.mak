@@ -246,6 +246,15 @@ endif
 
 #-------------------------------------------------
 #
+#@src/emu/machine/aicartc.h,MACHINES += AICARTC
+#-------------------------------------------------
+
+ifneq ($(filter AICARTC,$(MACHINES)),)
+MACHINEOBJS += $(MACHINEOBJ)/aicartc.o
+endif
+
+#-------------------------------------------------
+#
 #@src/emu/machine/am53cf96.h,MACHINES += AM53CF96
 #-------------------------------------------------
 
