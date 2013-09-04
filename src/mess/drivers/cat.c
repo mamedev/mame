@@ -168,7 +168,7 @@ ToDo:
   what the writes actually do; hook these up properly to screen timing etc
 - Floppy drive (3.5", Single Sided Double Density MFM, ~400kb)
   * Cat has very low level control of data being read or written, much like
-    the Amiga does
+    the Amiga or AppleII does
   * first sector is id ZERO which is unusual since most MFM formats are base-1
     for sector numbering
   * sectors are 512 bytes, standard MFM with usual address and data marks and
@@ -187,8 +187,7 @@ ToDo:
 - RS232C port and Modem "port" connected to the DUART's two ports
 - DTMF generator chip (connected to DUART 'user output' pins OP4,5,6,7)
 - Correctly hook the duart interrupt to the 68k, including autovector using
-  the vector register on the duart
-  (the actual duart code is too buggy for this to work right now 8/18/2013)
+  the vector register on the duart; this is currently hacked around.
 - Watchdog timer/powerfail at 0x85xxxx
 - Canon Cat released versions known: 1.74 US (dumped), 2.40 US (dumped both
   original compile, and Dwight's recompile from the released source code),
@@ -716,7 +715,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(swyft_mem, AS_PROGRAM, 16, cat_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x0000ffff) AM_ROM // 64 KB ROM
-	AM_RANGE(0x00040000, 0x000fffff) AM_RAM AM_SHARE("p_videoram")
+	AM_RANGE(0x00040000, 0x000bffff) AM_RAM AM_SHARE("p_videoram")
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -916,7 +915,7 @@ UINT32 cat_state::screen_update_cat(screen_device &screen, bitmap_ind16 &bitmap,
 
 TIMER_CALLBACK_MEMBER(cat_state::swyft_reset)
 {
-	memset(m_maincpu->space(AS_PROGRAM).get_read_ptr(0xe2341), 0xff, 1);
+	//memset(m_maincpu->space(AS_PROGRAM).get_read_ptr(0xe2341), 0xff, 1);
 }
 
 MACHINE_START_MEMBER(cat_state,swyft)
