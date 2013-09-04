@@ -145,7 +145,10 @@ WRITE32_MEMBER(dc_cons_state::dc_mess_g1_ctrl_w )
 			}
 
 			atapi_xferbase = g1bus_regs[SB_GDSTAR];
-			atapi_timer->adjust(m_maincpu->cycles_to_attotime((ATAPI_CYCLES_PER_SECTOR * (atapi_xferlen/2048))));
+			//atapi_timer->adjust(m_maincpu->cycles_to_attotime((ATAPI_CYCLES_PER_SECTOR * (atapi_xferlen/2048))));
+			/* 12x * 75 Hz = 0,00(1) secs per sector */
+			/* TODO: make DMA to be single step */
+			atapi_timer->adjust(attotime::from_usec(1111*atapi_xferlen/2048));
 //			atapi_regs[ATAPI_REG_SAMTAG] = GDROM_PAUSE_STATE | 0x80;
 		}
 		break;

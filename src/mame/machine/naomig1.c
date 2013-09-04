@@ -153,7 +153,9 @@ WRITE32_MEMBER(naomi_g1_device::sb_gdst_w)
 			len -= tlen;
 		}
 
-		timer->adjust(attotime::from_usec(500));
+		/* 12x * 75 Hz = 0,00(1) secs per sector */
+		/* TODO: make DMA to be single step */
+		timer->adjust(attotime::from_usec(1111*(gdlen/2048)));
 	}
 }
 
