@@ -81,7 +81,7 @@ private:
 	
 };
 
-extern const device_type HD63484;
+extern ATTR_DEPRECATED const device_type HD63484;
 
 
 /***************************************************************************

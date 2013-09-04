@@ -30,7 +30,7 @@ private:
 	void *m_token;
 };
 
-extern const device_type DUART68681;
+extern ATTR_DEPRECATED const device_type DUART68681;
 
 
 #define MCFG_DUART68681_ADD(_tag, _clock, _config) \
