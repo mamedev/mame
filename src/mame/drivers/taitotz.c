@@ -2811,13 +2811,6 @@ static const powerpc_config ppc603e_config =
 	NULL
 };
 
-static const tlcs900_interface taitotz_tlcs900_interface =
-{
-	DEVCB_DRIVER_MEMBER(taitotz_state, tlcs900_to1),
-	DEVCB_DRIVER_MEMBER(taitotz_state, tlcs900_to3),
-	DEVCB_DRIVER_MEMBER(taitotz_state, tlcs900_port_read),
-	DEVCB_DRIVER_MEMBER(taitotz_state, tlcs900_port_write),
-};
 
 static MACHINE_CONFIG_START( taitotz, taitotz_state )
 	/* IBM EMPPC603eBG-100 */
@@ -2827,7 +2820,7 @@ static MACHINE_CONFIG_START( taitotz, taitotz_state )
 
 	/* TMP95C063F I/O CPU */
 	MCFG_CPU_ADD("iocpu", TMP95C063, 25000000)
-	MCFG_CPU_CONFIG(taitotz_tlcs900_interface)
+	MCFG_TLCS900_CONFIG( WRITE8(taitotz_state,tlcs900_to1), WRITE8(taitotz_state,tlcs900_to3), READ8(taitotz_state,tlcs900_port_read), WRITE8(taitotz_state,tlcs900_port_write) )
 	MCFG_CPU_PROGRAM_MAP(tlcs900h_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitotz_state,  taitotz_vbi)
 

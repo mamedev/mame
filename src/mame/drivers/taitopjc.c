@@ -407,11 +407,6 @@ static const powerpc_config ppc603e_config =
 	NULL
 };
 
-static const tlcs900_interface taitopjc_tlcs900_interface =
-{
-	DEVCB_DRIVER_MEMBER(taitopjc_state,taitopjc_tlcs900_to1 ),
-	DEVCB_DRIVER_MEMBER(taitopjc_state,taitopjc_tlcs900_to3 )
-};
 
 static MACHINE_CONFIG_START( taitopjc, taitopjc_state )
 	MCFG_CPU_ADD("maincpu", PPC603E, 100000000)
@@ -420,7 +415,7 @@ static MACHINE_CONFIG_START( taitopjc, taitopjc_state )
 
 	/* TMP95C063F I/O CPU */
 	MCFG_CPU_ADD("iocpu", TLCS900H, 25000000)
-	MCFG_CPU_CONFIG(taitopjc_tlcs900_interface)
+	MCFG_TLCS900_CONFIG( WRITE8(taitopjc_state,taitopjc_tlcs900_to1), WRITE8(taitopjc_state,taitopjc_tlcs900_to3), NULL, NULL )
 	MCFG_CPU_PROGRAM_MAP(tlcs900h_mem)
 
 	/* TMS320C53 DSP */

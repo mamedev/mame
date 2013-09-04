@@ -803,18 +803,11 @@ void ngp_state::nvram_write(emu_file &file)
 }
 
 
-static const tlcs900_interface ngp_tlcs900_interface =
-{
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER( ngp_state, ngp_tlcs900_to3 )
-};
-
-
 static MACHINE_CONFIG_START( ngp_common, ngp_state )
 
 	MCFG_CPU_ADD( "maincpu", TLCS900H, XTAL_6_144MHz )
 	MCFG_CPU_PROGRAM_MAP( ngp_mem)
-	MCFG_CPU_CONFIG( ngp_tlcs900_interface )
+	MCFG_TLCS900_CONFIG( NULL, WRITE8(ngp_state,ngp_tlcs900_to3), NULL, NULL )
 
 	MCFG_CPU_ADD( "soundcpu", Z80, XTAL_6_144MHz/2 )
 	MCFG_CPU_PROGRAM_MAP( z80_mem)
