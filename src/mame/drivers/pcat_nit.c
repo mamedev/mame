@@ -4,7 +4,7 @@ Street Games (c) 1993 New Image Technologies
 
 A modified 386 PC-AT HW
 
-preliminary driver by Angelo Salese and Mariusz Wojcieszek
+Driver by Angelo Salese and Mariusz Wojcieszek
 
 =====================================================================================================================
 
@@ -125,7 +125,7 @@ static const ins8250_interface pcat_nit_com0_interface =
 
 WRITE8_MEMBER(pcat_nit_state::pcat_nit_rombank_w)
 {
-	logerror( "rom bank #%02x at PC=%08X\n", data, space.device().safe_pc() );
+	//logerror( "rom bank #%02x at PC=%08X\n", data, space.device().safe_pc() );
 	if ( data & 0x40 )
 	{
 		// rom bank
@@ -164,6 +164,17 @@ static ADDRESS_MAP_START( pcat_map, AS_PROGRAM, 32, pcat_nit_state )
 	AM_RANGE(0xffff0000, 0xffffffff) AM_ROM AM_REGION("bios", 0 )
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( bonanza_map, AS_PROGRAM, 32, pcat_nit_state )
+	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
+	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", cirrus_vga_device, mem_r, mem_w, 0xffffffff)
+	AM_RANGE(0x000c0000, 0x000c7fff) AM_ROM AM_REGION("video_bios", 0) AM_WRITENOP
+	AM_RANGE(0x000d0000, 0x000d3fff) AM_RAM AM_REGION("disk_bios", 0)
+	AM_RANGE(0x000d7000, 0x000d7003) AM_WRITE8(pcat_nit_rombank_w, 0xff)
+	AM_RANGE(0x000d8000, 0x000dffff) AM_ROMBANK("rombank")
+	AM_RANGE(0x000f0000, 0x000fffff) AM_RAM AM_REGION("bios", 0 )
+	AM_RANGE(0xffff0000, 0xffffffff) AM_ROM AM_REGION("bios", 0 )
+ADDRESS_MAP_END
+
 READ8_MEMBER(pcat_nit_state::pcat_nit_io_r)
 {
 	switch(offset)
@@ -189,6 +200,16 @@ static ADDRESS_MAP_START( pcat_nit_io, AS_IO, 32, pcat_nit_state )
 	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8("ns16450_0", ns16450_device, ins8250_r, ins8250_w, 0xffffffff)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( bonanza_io_map, AS_IO, 32, pcat_nit_state )
+	AM_IMPORT_FROM(pcat32_io_common)
+	AM_RANGE(0x0278, 0x027f) AM_READ8(pcat_nit_io_r, 0xffffffff) AM_WRITENOP
+	AM_RANGE(0x0280, 0x0283) AM_READNOP
+	AM_RANGE(0x03b0, 0x03bf) AM_DEVREADWRITE8("vga", cirrus_vga_device, port_03b0_r, port_03b0_w, 0xffffffff)
+	AM_RANGE(0x03c0, 0x03cf) AM_DEVREADWRITE8("vga", cirrus_vga_device, port_03c0_r, port_03c0_w, 0xffffffff)
+	AM_RANGE(0x03d0, 0x03df) AM_DEVREADWRITE8("vga", cirrus_vga_device, port_03d0_r, port_03d0_w, 0xffffffff)
+	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8("ns16450_0", ns16450_device, ins8250_r, ins8250_w, 0xffffffff)
+ADDRESS_MAP_END
+
 static INPUT_PORTS_START( pcat_nit )
 	PORT_START("IN0")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Clear") PORT_CODE(KEYCODE_C)
@@ -204,8 +225,6 @@ void pcat_nit_state::machine_start()
 
 	membank("rombank")->configure_entries(0, 0x80, memregion("game_prg")->base(), 0x8000 );
 	membank("rombank")->set_entry(0);
-
-	//microtouch_init(machine(), pcat_nit_microtouch_tx_callback, NULL);
 }
 
 static MACHINE_CONFIG_START( pcat_nit, pcat_nit_state )
@@ -217,9 +236,21 @@ static MACHINE_CONFIG_START( pcat_nit, pcat_nit_state )
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_vga )
 
-//  MCFG_SCREEN_MODIFY("screen")
-//  MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_FRAGMENT_ADD( pcat_common )
+	MCFG_NS16450_ADD( "ns16450_0", pcat_nit_com0_interface, XTAL_1_8432MHz )
+	MCFG_MICROTOUCH_SERIAL_ADD( "microtouch", 9600, DEVWRITELINE("ns16450_0", ins8250_uart_device, rx_w) ) // rate?
+
+	MCFG_NVRAM_ADD_0FILL("nvram")
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_START( bonanza, pcat_nit_state )
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", I386, 14318180*2)   /* I386 ?? Mhz */
+	MCFG_CPU_PROGRAM_MAP(bonanza_map)
+	MCFG_CPU_IO_MAP(bonanza_io_map)
+
+	/* video hardware */
+	MCFG_FRAGMENT_ADD( pcvideo_cirrus_vga )
 
 	MCFG_FRAGMENT_ADD( pcat_common )
 	MCFG_NS16450_ADD( "ns16450_0", pcat_nit_com0_interface, XTAL_1_8432MHz )
@@ -390,9 +421,9 @@ DRIVER_INIT_MEMBER(pcat_nit_state,pcat_nit)
 	machine().device<nvram_device>("nvram")->set_base(m_banked_nvram, 0x2000);
 }
 
-GAME( 1993, bonanza,    0,         pcat_nit,  pcat_nit, pcat_nit_state, pcat_nit, ROT0, "New Image Technologies",  "Bonanza (Revision 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1993, bonanzar2,  bonanza,   pcat_nit,  pcat_nit, pcat_nit_state, pcat_nit, ROT0, "New Image Technologies",  "Bonanza (Revision 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 1993, streetg,    0,         pcat_nit,  pcat_nit, pcat_nit_state, pcat_nit, ROT0, "New Image Technologies",  "Street Games (Revision 4)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 1993, streetgr3,  streetg,   pcat_nit,  pcat_nit, pcat_nit_state, pcat_nit, ROT0, "New Image Technologies",  "Street Games (Revision 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1993, streetg2,   0,         pcat_nit,  pcat_nit, pcat_nit_state, pcat_nit, ROT0, "New Image Technologies",  "Street Games II (Revision 7C)", GAME_NO_SOUND )
+GAME( 1993, streetg2,   0,         pcat_nit,  pcat_nit, pcat_nit_state, pcat_nit, ROT0, "New Image Technologies",  "Street Games II (Revision 7C)", GAME_NO_SOUND ) // Street Games II+, 10-0007-07 083194
 GAME( 1993, streetg2r5, streetg2,  pcat_nit,  pcat_nit, pcat_nit_state, pcat_nit, ROT0, "New Image Technologies",  "Street Games II (Revision 5)", GAME_NO_SOUND )
+GAME( 1994, bonanza,    0,         bonanza,   pcat_nit, pcat_nit_state, pcat_nit, ROT0, "New Image Technologies",  "Touchstar Bonanza (Revision 3)", GAME_NO_SOUND ) // Bonanza 10-0018-03 090894
+GAME( 1994, bonanzar2,  bonanza,   bonanza,   pcat_nit, pcat_nit_state, pcat_nit, ROT0, "New Image Technologies",  "Touchstar Bonanza (Revision 2)", GAME_NO_SOUND ) // Bonanza 10-0018-02 081794

@@ -5658,6 +5658,8 @@ UINT16 cirrus_vga_device::offset()
 	//popmessage("Offset: %04x  %s %s **",vga.crtc.offset,vga.crtc.dw?"DW":"--",vga.crtc.word_mode?"BYTE":"WORD");
 	if(gc_mode_ext & 0x10)
 		return vga.crtc.offset << 3;
+	if ( svga.rgb8_en == 1 ) // guess
+		return vga.crtc.offset << 3;
 	return vga_device::offset();
 }
 
