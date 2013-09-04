@@ -1003,6 +1003,9 @@ VIDEO_START_MEMBER(sms_state,sms1)
 	m_main_scr->register_screen_bitmap(m_prevright_bitmap);
 	save_item(NAME(m_prevleft_bitmap));
 	save_item(NAME(m_prevright_bitmap));
+
+	// Allow sscope screens to have crosshair, useful for the game missil3d
+	crosshair_set_screen(machine(), 0, CROSSHAIR_SCREEN_ALL);
 }
 
 
