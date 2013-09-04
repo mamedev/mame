@@ -152,7 +152,7 @@ protected:
 };
 
 // device type definition
-extern const device_type I8275;
+extern ATTR_DEPRECATED const device_type I8275;
 
 
 #endif
