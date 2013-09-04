@@ -17,7 +17,8 @@
 #include "atapihle.h"
 #include "scsicd.h"
 
-class scsi_cr589_device : public scsicd_device
+class scsi_cr589_device : public scsicd_device,
+	public device_nvram_interface
 {
 public:
 	// construction/destruction
@@ -30,6 +31,11 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start();
+
+	// device_nvram_interface overrides
+	virtual void nvram_default();
+	virtual void nvram_read(emu_file &file);
+	virtual void nvram_write(emu_file &file);
 
 private:
 	int download;

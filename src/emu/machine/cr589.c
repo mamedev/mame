@@ -6,7 +6,8 @@
 const device_type SCSI_CR589 = &device_creator<scsi_cr589_device>;
 
 scsi_cr589_device::scsi_cr589_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: scsicd_device(mconfig, SCSI_CR589, "SCSI CR589", tag, owner, clock, "scsi_cr589", __FILE__)
+	: scsicd_device(mconfig, SCSI_CR589, "SCSI CR589", tag, owner, clock, "scsi_cr589", __FILE__),
+	device_nvram_interface(mconfig, *this)
 {
 }
 
@@ -18,12 +19,50 @@ void scsi_cr589_device::device_start()
 	scsicd_device::device_start();
 
 	download = 0;
-	memcpy( &buffer[ identity_offset ], "MATSHITACD-ROM CR-589   GS0N", 28 );
 
 	save_item(NAME(download));
 	save_item(NAME(buffer));
 	save_item(NAME(bufferOffset));
 }
+
+
+
+//-------------------------------------------------
+//  nvram_default - called to initialize NVRAM to
+//  its default state
+//-------------------------------------------------
+
+void scsi_cr589_device::nvram_default()
+{
+	memset( buffer, 0, sizeof(buffer));
+	memcpy( &buffer[ identity_offset ], "MATSHITACD-ROM CR-589   GS0N", 28 );
+}
+
+
+
+//-------------------------------------------------
+//  nvram_read - called to read NVRAM from the
+//  .nv file
+//-------------------------------------------------
+
+void scsi_cr589_device::nvram_read(emu_file &file)
+{
+	file.read(buffer, sizeof(buffer));
+}
+
+
+
+//-------------------------------------------------
+//  nvram_write - called to write NVRAM to the
+//  .nv file
+//-------------------------------------------------
+
+void scsi_cr589_device::nvram_write(emu_file &file)
+{
+	file.write(buffer, sizeof(buffer));
+}
+
+
 
 void scsi_cr589_device::ExecCommand( int *transferLength )
 {
