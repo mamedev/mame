@@ -255,6 +255,7 @@ ToDo:
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/n68681.h"
+#include "machine/6850acia.h"
 #include "machine/nvram.h"
 
 class cat_state : public driver_device
@@ -272,6 +273,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		//m_nvram(*this, "nvram"), // merge with svram?
 		m_duart(*this, "duartn68681"),
+		m_acia(*this, "acia6850"),
 		//m_speaker(*this, "speaker"),
 		m_svram(*this, "svram"), // nvram
 		m_p_videoram(*this, "p_videoram"),
@@ -288,7 +290,8 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	//optional_device<nvram_device> m_nvram;
-	optional_device<duartn68681_device> m_duart; // should be required once plumbed to the swyft
+	optional_device<duartn68681_device> m_duart; // only cat uses this
+	optional_device<acia6850_device> m_acia; // only swyft uses this
 	DECLARE_WRITE_LINE_MEMBER(cat_duart_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(cat_duart_txa);
 	DECLARE_READ8_MEMBER(cat_duart_input);
@@ -712,10 +715,27 @@ static ADDRESS_MAP_START(cat_mem, AS_PROGRAM, 16, cat_state)
 	AM_RANGE(0xC00000, 0xC00001) AM_READ(cat_2e80_r) AM_MIRROR(0x3FFFFE) // Open bus/vme?
 ADDRESS_MAP_END
 
+/* Swyft Memory map, based on watching the infoapp roms do their thing:
+68k address map:
+a23 a22 a21 a20 a19 a18 a17 a16 a15 a14 a13 a12 a11 a10 a9  a8  a7  a6  a5  a4  a3  a2  a1  (a0 via UDS/LDS)
+?   ?   ?   ?   0   0   ?   ?   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   a        R   ROM (a=0 is low, a=1 is high)
+?   ?   ?   ?   0   1   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   a        RW  RAM
+?   ?   ?   ?   1   1  ?0? ?1?  ?   ?   ?   ?   ?   ?   ?   ?   ?   ?   ?   ?   *   *   *   *        R   ? status of something?
+?   ?   ?   ?   1   1  ?1? ?0?  ?   0   0   1   ?   ?   ?   ?   ?   ?   ?   ?   ?   ?   ?   ?        W   6850 acia control reg lives here, gets 0x55 steadystate and 0x57 written to it to reset it
+?   ?   ?   ?   1   1  ?1? ?0?  ?   0   1   0   ?   ?   *   *   *   *  ?*?  ?   ?   ?   ?   ?        RW  ? i/o kb and floppy as well?\_ io and the modem chip too?
+?   ?   ?   ?   1   1  ?1? ?0?  ?   1   0   0   ?   ?   *   *   *   *  ?*?  ?   ?   ?   ?   ?        RW  ? i/o kb and floppy as well?/
+              ^               ^               ^               ^               ^
+*/
+
 static ADDRESS_MAP_START(swyft_mem, AS_PROGRAM, 16, cat_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000, 0x0000ffff) AM_ROM // 64 KB ROM
-	AM_RANGE(0x00040000, 0x000bffff) AM_RAM AM_SHARE("p_videoram")
+	AM_RANGE(0x000000, 0x00ffff) AM_ROM AM_MIRROR(0xF00000) // 64 KB ROM
+	AM_RANGE(0x040000, 0x07ffff) AM_RAM AM_MIRROR(0xF00000) AM_SHARE("p_videoram")
+	//AM_RANGE(0x0d0000, 0x0d000f) AM_READ(unknown_d0004) // status of something? reads from d0000, d0004, d0008, d000a, d000e
+	AM_RANGE(0x0e1000, 0x0e1001) AM_DEVWRITE8("acia6850", acia6850_device, control_write, 0xFF00) // 6850 ACIA lives here
+	// where are the other 3 acia registers?
+	//AM_RANGE(0x0e2000, 0x0e2fff) AM_READWRITE(unknown_e2000) // io area with selector on a9 a8 a7 a6?
+	//AM_RANGE(0x0e4000, 0x0e4fff) AM_READWRITE(unknown_e4000) // there's likely a modem chip mapped around somewhere
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -850,6 +870,7 @@ TIMER_CALLBACK_MEMBER(cat_state::counter_6ms_callback)
 	// This is effectively also the KTOBF line 'clock' output to the d-latch before the duart
 	// Hence, invert the d-latch on the duart's input ports.
 	// is there some way to 'strobe' the duart to tell it that its input ports just changed?
+	// with the devcb stuff, there definitely should be!
 	m_duart_inp ^= 0x04;
 	m_6ms_counter++;
 	m_maincpu->set_input_line(M68K_IRQ_1, ASSERT_LINE); // hack until duart ints work; as of march 2013 they do not work correctly here (they fire at the wrong rate)
@@ -920,11 +941,14 @@ TIMER_CALLBACK_MEMBER(cat_state::swyft_reset)
 
 MACHINE_START_MEMBER(cat_state,swyft)
 {
+	//m_6ms_timer = timer_alloc(TIMER_COUNTER_6MS); // CRUDE HACK
 }
 
 MACHINE_RESET_MEMBER(cat_state,swyft)
 {
-	timer_set(attotime::from_usec(10), TIMER_SWYFT_RESET);
+	//timer_set(attotime::from_usec(10), TIMER_SWYFT_RESET);
+	//m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(cat_state::cat_int_ack),this));
+	//m_6ms_timer->adjust(attotime::zero, 0, attotime::from_hz((XTAL_19_968MHz/2)/65536)); // horrible hack
 }
 
 VIDEO_START_MEMBER(cat_state,swyft)
@@ -1016,6 +1040,17 @@ static const duartn68681_config cat_duart_config =
 	DEVCB_DRIVER_MEMBER(cat_state, cat_duart_output),           /* output port */
 };
 
+static const acia6850_interface swyft_acia_config =
+{
+	3579545, // guess
+	3579545, // guess
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+};
+
 static MACHINE_CONFIG_START( cat, cat_state )
 
 	/* basic machine hardware */
@@ -1046,7 +1081,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( swyft, cat_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000, XTAL_5MHz)
+	MCFG_CPU_ADD("maincpu",M68000, XTAL_5MHz) // guess
 	MCFG_CPU_PROGRAM_MAP(swyft_mem)
 
 	MCFG_MACHINE_START_OVERRIDE(cat_state,swyft)
@@ -1064,6 +1099,8 @@ static MACHINE_CONFIG_START( swyft, cat_state )
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 
 	MCFG_VIDEO_START_OVERRIDE(cat_state,swyft)
+
+	MCFG_ACIA6850_ADD("acia6850", swyft_acia_config) // unknown clock
 MACHINE_CONFIG_END
 
 /* ROM definition */
