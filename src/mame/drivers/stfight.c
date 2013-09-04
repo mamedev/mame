@@ -71,6 +71,11 @@ are not accessed by the CPUs.
 
 Text video RAM is situated at $D000-$D7FF.
 
+The 68705 MCU handles the two coin inputs and drives the MSM5205 ADPCM chip.
+It also appears to serve as a simple protection device. During initialization,
+the main Z80 writes a special ADPCM code to the MCU and then spins in a loop.
+The MCU reponds by asserting the Z80's /NMI line, and thus the init process
+continues. The protection ADPCM code varies between versions of each game.
 
 3) MAIN CPU MEMORY MAP.
 
@@ -113,8 +118,11 @@ $C204       R   dipswitch #2 hard value (negative logic)
 $C205       R   read to determine coin circuit check status
 $C500       W   play fm number
 $C600       W   play voice number
-$C700       W   ?coin mechanism control?
-$C804       W   ?watchdog?
+$C700       W   coin mechanism control
+$C804       W   coin counters
+                - b4    Unknown
+                - b1    Coin counter 2
+                - b0    Coin counter 1
 $C806       W   ???
 $C807       W   current sprite bank h/w register
                 - bank = b2,b0
@@ -151,12 +159,16 @@ $C000       W   YM2203 #1 address register
 $C001       W   YM2203 #1 data register
 $C800       W   YM2203 #2 address register
 $C801       W   YM2203 #2 data register
-$E800       W   ??
+$D000       R   ADPCM code port (unused)
+$D800       W   MSM5205 control (unused)
+$E800       W   Debug port? (mirrors FM code)
 $F000       R   FM Voice number to play
                 - b7    set for valid data latched
                 - b6-b0 voice number
 $F800-$FFFF RW  RAM
 
+empcity contains an NMI routine which appears to control an MSM5205.
+However, it does not work properly. The NMI routine is not present in stfight.
 
 5) COLOR RAM
 
@@ -218,15 +230,16 @@ conventional RAM. See the memory map for sprite data format.
  ****************************************************************************
 
 TODO:
-- MCU is identical between Empire City and Cross Shooter, it's ADPCM and
-  perhaps coinage related too.
 - palette is incorporated - fix!!!
 - handle transparency in text layer properly (how?)
 - second bank of sf02 is this used? (probably NOT)
-
-DONE? (check on real board)
-- sound (fm)
-- sound (adpcm)
+- stfight/empcity YM2203s should be clocked at 1.5MHz but this results in
+  the sound and music being 1/3 of the pitch they should be. The game never
+  writes the YM2203s' divider registers yet other games (e.g. Lock-On)
+  suggest the default values are correct. What *is* going on here?
+- Each version of empcity/stfight has a different protection code stored in the
+  MCU (at $1D2) so each 68705 will need to be dumped.
+  We currently use hacked versions of the empcityu MCU for each different set.
 
 *****************************************************************************/
 
@@ -242,16 +255,17 @@ static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8, stfight_state )
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")                  /* sf02.bin */
 	AM_RANGE(0xc000, 0xc0ff) AM_RAM AM_SHARE("paletteram")
 	AM_RANGE(0xc100, 0xc1ff) AM_RAM AM_SHARE("paletteram2")
-	AM_RANGE(0xc200, 0xc200) AM_READ_PORT("P1")         /* IN1 */
-	AM_RANGE(0xc201, 0xc201) AM_READ_PORT("P2")         /* IN2 */
-	AM_RANGE(0xc202, 0xc202) AM_READ_PORT("START")      /* IN3 */
+	AM_RANGE(0xc200, 0xc200) AM_READ_PORT("P1")
+	AM_RANGE(0xc201, 0xc201) AM_READ_PORT("P2")
+	AM_RANGE(0xc202, 0xc202) AM_READ_PORT("START")
 	AM_RANGE(0xc203, 0xc203) AM_READ_PORT("DSW0")
 	AM_RANGE(0xc204, 0xc204) AM_READ_PORT("DSW1")
-	AM_RANGE(0xc205, 0xc205) AM_READ(stfight_coin_r)    /* coin mech */
-	AM_RANGE(0xc500, 0xc500) AM_WRITE(stfight_fm_w)               /* play fm sound */
-	AM_RANGE(0xc600, 0xc600) AM_WRITE(stfight_adpcm_control_w)    /* voice control */
-	AM_RANGE(0xc700, 0xc700) AM_WRITE(stfight_coin_w)             /* coin mech */
-	AM_RANGE(0xc804, 0xc806) AM_WRITENOP                    /* TBD */
+	AM_RANGE(0xc205, 0xc205) AM_READ(stfight_coin_r)
+	AM_RANGE(0xc500, 0xc500) AM_WRITE(stfight_fm_w)
+	AM_RANGE(0xc600, 0xc600) AM_WRITE(stfight_mcu_w)
+	AM_RANGE(0xc700, 0xc700) AM_WRITE(stfight_coin_w)
+	AM_RANGE(0xc804, 0xc804) AM_WRITE(stfight_io_w)
+	AM_RANGE(0xc806, 0xc806) AM_WRITENOP                    /* TBD */
 	AM_RANGE(0xc807, 0xc807) AM_WRITE(stfight_sprite_bank_w)
 	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(stfight_text_char_w) AM_SHARE("text_char_ram")
 	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(stfight_text_attr_w) AM_SHARE("text_attr_ram")
@@ -261,9 +275,6 @@ static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8, stfight_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cshooter_cpu1_map, AS_PROGRAM, 8, stfight_state )
-	/* wants 0xff at PC=0x9a otherwise it won't boot, MCU related? */
-	AM_RANGE(0x0007, 0x0007) AM_READ(cshooter_mcu_unk1_r)
-	AM_RANGE(0xc500, 0xc500) AM_WRITE(cshooter_fm_w)               /* play fm sound */
 	AM_RANGE(0xc801, 0xc801) AM_WRITE(stfight_bank_w)
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(cshooter_text_w) AM_SHARE("tx_vram")
 	AM_RANGE(0xe000, 0xfdff) AM_RAM
@@ -275,19 +286,21 @@ static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8, stfight_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
 	AM_RANGE(0xc800, 0xc801) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
-	AM_RANGE(0xe800, 0xe800) AM_WRITE(stfight_fm_w)
+	AM_RANGE(0xd000, 0xd000) AM_READNOP
+	AM_RANGE(0xd800, 0xd800) AM_WRITENOP
+	AM_RANGE(0xe800, 0xe800) AM_WRITENOP
 	AM_RANGE(0xf000, 0xf000) AM_READ(stfight_fm_r)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cshooter_mcu_map, AS_PROGRAM, 8, stfight_state )
+static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, stfight_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(cshooter_68705_port_a_r,cshooter_68705_port_a_w)
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE(cshooter_68705_port_b_r,cshooter_68705_port_b_w)
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE(cshooter_68705_port_c_r,cshooter_68705_port_c_w)
-	AM_RANGE(0x0004, 0x0004) AM_WRITE(cshooter_68705_ddr_a_w)
-	AM_RANGE(0x0005, 0x0005) AM_WRITE(cshooter_68705_ddr_b_w)
-	AM_RANGE(0x0006, 0x0006) AM_WRITE(cshooter_68705_ddr_c_w)
+	AM_RANGE(0x0000, 0x0000) AM_READWRITE(stfight_68705_port_a_r,stfight_68705_port_a_w)
+	AM_RANGE(0x0001, 0x0001) AM_READWRITE(stfight_68705_port_b_r,stfight_68705_port_b_w)
+	AM_RANGE(0x0002, 0x0002) AM_READWRITE(stfight_68705_port_c_r,stfight_68705_port_c_w)
+	AM_RANGE(0x0004, 0x0004) AM_WRITE(stfight_68705_ddr_a_w)
+	AM_RANGE(0x0005, 0x0005) AM_WRITE(stfight_68705_ddr_b_w)
+	AM_RANGE(0x0006, 0x0006) AM_WRITE(stfight_68705_ddr_c_w)
 	AM_RANGE(0x0010, 0x007f) AM_RAM
 	AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END
@@ -368,8 +381,8 @@ static INPUT_PORTS_START( stfight )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("COIN")  /* COIN MECH */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cshooter )
@@ -519,8 +532,8 @@ GFXDECODE_END
 
 static const msm5205_interface msm5205_config =
 {
-	DEVCB_DRIVER_LINE_MEMBER(stfight_state,stfight_adpcm_int),  /* interrupt function */
-	MSM5205_S48_4B      /* 8KHz               */
+	DEVCB_DRIVER_LINE_MEMBER(stfight_state, stfight_adpcm_int),	// Interrupt function
+	MSM5205_S48_4B	// 8KHz, 4-bit
 };
 
 static MACHINE_CONFIG_START( stfight, stfight_state )
@@ -535,7 +548,7 @@ static MACHINE_CONFIG_START( stfight, stfight_state )
 	MCFG_CPU_PERIODIC_INT_DRIVER(stfight_state, irq0_line_hold, 120)
 
 	MCFG_CPU_ADD("mcu", M68705, 6000000)   /* 6 MHz? */
-	MCFG_CPU_PROGRAM_MAP(cshooter_mcu_map)
+	MCFG_CPU_PROGRAM_MAP(mcu_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
@@ -555,29 +568,30 @@ static MACHINE_CONFIG_START( stfight, stfight_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ym1", YM2203, 3000000)
+	// HACK! These should be clocked at 1.5Mhz (see TODO list)
+	MCFG_SOUND_ADD("ym1", YM2203, 4500000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
 	MCFG_SOUND_ROUTE(3, "mono", 0.10)
 
-	MCFG_SOUND_ADD("ym2", YM2203, 3000000)
+	MCFG_SOUND_ADD("ym2", YM2203, 4500000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
 	MCFG_SOUND_ROUTE(3, "mono", 0.10)
 
-	MCFG_SOUND_ADD("msm", MSM5205, 384000)
+	MCFG_SOUND_ADD("msm", MSM5205, XTAL_384kHz)
 	MCFG_SOUND_CONFIG(msm5205_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( cshooter, stfight )
-	MCFG_CPU_REPLACE("maincpu", Z80, 6000000)   /* 6 MHz */
+	MCFG_CPU_REPLACE("maincpu", Z80, 6000000)
 	MCFG_CPU_PROGRAM_MAP(cshooter_cpu1_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", stfight_state,  stfight_vb_interrupt)
 
-	MCFG_CPU_REPLACE("audiocpu", Z80, 6000000)  /* 6 MHz */
+	MCFG_CPU_REPLACE("audiocpu", Z80, 6000000)
 	MCFG_CPU_PROGRAM_MAP(cpu2_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(stfight_state, irq0_line_hold, 120)
 
@@ -588,6 +602,12 @@ static MACHINE_CONFIG_DERIVED( cshooter, stfight )
 
 	MCFG_GFXDECODE(cshooter)
 	MCFG_VIDEO_START_OVERRIDE(stfight_state,cshooter)
+
+	MCFG_SOUND_MODIFY("ym1")
+	MCFG_SOUND_CLOCK(1500000)
+
+	MCFG_SOUND_MODIFY("ym2")
+	MCFG_SOUND_CLOCK(1500000)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -596,6 +616,7 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
+// Is this a bootleg? The MCU protection check at $00A7 has been disabled
 ROM_START( empcity )
 	ROM_REGION( 2*0x18000, "maincpu", 0 )   /* 96k for code + 96k for decrypted opcodes */
 	ROM_LOAD( "ec_01.rom",  0x00000, 0x8000, CRC(fe01d9b1) SHA1(c4b62d1b7e3a062f6a7a75f49cce5712f9016f98) )
@@ -604,9 +625,8 @@ ROM_START( empcity )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the second CPU */
 	ROM_LOAD( "ec_04.rom",  0x0000,  0x8000, CRC(aa3e7d1e) SHA1(da350384d55f011253d19ce17fc327cd2604257f) )
 
-	// not hooked up yet, what's it for, coinage?
 	ROM_REGION( 0x0800, "mcu", 0 )
-	ROM_LOAD( "empirecity_68705.bin",  0x0000,  0x0800, CRC(182f7616) SHA1(38b4f23a559ae13f8ca1b974407a2a40fc52879f) )
+	ROM_LOAD( "empcityu_68705.3j",  0x0000,  0x0800, CRC(182f7616) SHA1(38b4f23a559ae13f8ca1b974407a2a40fc52879f) )
 
 	ROM_REGION( 0x02000, "gfx1", 0 )    /* character data */
 	ROM_LOAD( "sf17.bin",   0x0000, 0x2000, CRC(1b3706b5) SHA1(61f069329a7a836523ffc8cce915b0d0129fd896) )
@@ -647,7 +667,7 @@ ROM_START( empcity )
 	ROM_LOAD( "82s129.066", 0x0600, 0x0100, CRC(51e8832f) SHA1(ed8c00559e7a02bb8c11861d747c8c64c01b7437) )
 	ROM_LOAD( "82s129.015", 0x0700, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )  /* timing? (not used) */
 
-	ROM_REGION( 0x08000, "adpcm", 0 )   /* adpcm voice data */
+	ROM_REGION( 0x08000, "adpcm", 0 )   /* ADPCM voice data */
 	ROM_LOAD( "sf04.bin",   0x00000, 0x8000, CRC(1b8d0c07) SHA1(c163ccd2b7ed6c84facc075eb1564ca399f3ba17) )
 ROM_END
 
@@ -660,9 +680,8 @@ ROM_START( empcityu )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the second CPU */
 	ROM_LOAD( "ec_04.rom",  0x0000,  0x8000, CRC(aa3e7d1e) SHA1(da350384d55f011253d19ce17fc327cd2604257f) )
 
-	// not hooked up yet, what's it for, coinage?
 	ROM_REGION( 0x0800, "mcu", 0 )
-	ROM_LOAD( "empirecity_68705.bin",  0x0000,  0x0800, CRC(182f7616) SHA1(38b4f23a559ae13f8ca1b974407a2a40fc52879f) )
+	ROM_LOAD( "empcityu_68705.3j",  0x0000,  0x0800, CRC(182f7616) SHA1(38b4f23a559ae13f8ca1b974407a2a40fc52879f) )
 
 	ROM_REGION( 0x02000, "gfx1", 0 )    /* character data */
 	ROM_LOAD( "vid.2p",   0x0000, 0x2000, CRC(15593793) SHA1(ac9ca8a0aa0ce3810f45aa41e74d4946ecced245) )
@@ -703,7 +722,7 @@ ROM_START( empcityu )
 	ROM_LOAD( "82s129.066", 0x0600, 0x0100, CRC(51e8832f) SHA1(ed8c00559e7a02bb8c11861d747c8c64c01b7437) )
 	ROM_LOAD( "82s129.015", 0x0700, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )  /* timing? (not used) */
 
-	ROM_REGION( 0x08000, "adpcm", 0 )   /* adpcm voice data */
+	ROM_REGION( 0x08000, "adpcm", 0 )   /* ADPCM voice data */
 	ROM_LOAD( "sf04.bin",   0x00000, 0x8000, CRC(1b8d0c07) SHA1(c163ccd2b7ed6c84facc075eb1564ca399f3ba17) )
 
 	ROM_REGION( 0x020, "user1", 0 )
@@ -718,9 +737,8 @@ ROM_START( empcityj )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the second CPU */
 	ROM_LOAD( "ec_04.rom",  0x0000,  0x8000, CRC(aa3e7d1e) SHA1(da350384d55f011253d19ce17fc327cd2604257f) )
 
-	// not hooked up yet, what's it for, coinage?
 	ROM_REGION( 0x0800, "mcu", 0 )
-	ROM_LOAD( "empirecity_68705.bin",  0x0000,  0x0800, CRC(182f7616) SHA1(38b4f23a559ae13f8ca1b974407a2a40fc52879f) )
+	ROM_LOAD( "empcityj_68705.3j",  0x0000,  0x0800, BAD_DUMP CRC(19bdb0a9) SHA1(6baba9a46d64ae8349c7e9713419141f76a7af96) )
 
 	ROM_REGION( 0x02000, "gfx1", 0 )    /* character data */
 	ROM_LOAD( "sf17.bin",   0x0000, 0x2000, CRC(1b3706b5) SHA1(61f069329a7a836523ffc8cce915b0d0129fd896) )
@@ -761,7 +779,7 @@ ROM_START( empcityj )
 	ROM_LOAD( "82s129.066", 0x0600, 0x0100, CRC(51e8832f) SHA1(ed8c00559e7a02bb8c11861d747c8c64c01b7437) )
 	ROM_LOAD( "82s129.015", 0x0700, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )  /* timing? (not used) */
 
-	ROM_REGION( 0x08000, "adpcm", 0 )   /* adpcm voice data */
+	ROM_REGION( 0x08000, "adpcm", 0 )   /* ADPCM voice data */
 	ROM_LOAD( "sf04.bin",   0x00000, 0x8000, CRC(1b8d0c07) SHA1(c163ccd2b7ed6c84facc075eb1564ca399f3ba17) )
 ROM_END
 
@@ -773,9 +791,8 @@ ROM_START( stfight )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the second CPU */
 	ROM_LOAD( "sf03.bin",   0x0000,  0x8000, CRC(6a8cb7a6) SHA1(dc123cc48d3623752b78e7c23dd8d2f5adf84f92) )
 
-	// not hooked up yet, what's it for, coinage?
 	ROM_REGION( 0x0800, "mcu", 0 )
-	ROM_LOAD( "empirecity_68705.bin",  0x0000,  0x0800, CRC(182f7616) SHA1(38b4f23a559ae13f8ca1b974407a2a40fc52879f) )
+	ROM_LOAD( "stfight_68705.3j",  0x0000,  0x0800, BAD_DUMP  CRC(f4cc50d6) SHA1(2ff62a349b74fa965b5d19615e52b867c04988dc) )
 
 	ROM_REGION( 0x02000, "gfx1", 0 )    /* character data */
 	ROM_LOAD( "sf17.bin",   0x0000, 0x2000, CRC(1b3706b5) SHA1(61f069329a7a836523ffc8cce915b0d0129fd896) )
@@ -816,7 +833,7 @@ ROM_START( stfight )
 	ROM_LOAD( "82s129.066", 0x0600, 0x0100, CRC(51e8832f) SHA1(ed8c00559e7a02bb8c11861d747c8c64c01b7437) )
 	ROM_LOAD( "82s129.015", 0x0700, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )  /* timing? (not used) */
 
-	ROM_REGION( 0x08000, "adpcm", 0 )   /* adpcm voice data */
+	ROM_REGION( 0x08000, "adpcm", 0 )   /* ADPCM voice data */
 	ROM_LOAD( "sf04.bin",   0x00000, 0x8000, CRC(1b8d0c07) SHA1(c163ccd2b7ed6c84facc075eb1564ca399f3ba17) )
 ROM_END
 
@@ -830,9 +847,8 @@ ROM_START( stfighta )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the second CPU */
 	ROM_LOAD( "sf03.bin",   0x0000,  0x8000, CRC(6a8cb7a6) SHA1(dc123cc48d3623752b78e7c23dd8d2f5adf84f92) )
 
-	// not hooked up yet, what's it for, coinage?
 	ROM_REGION( 0x0800, "mcu", 0 )
-	ROM_LOAD( "empirecity_68705.bin",  0x0000,  0x0800, CRC(182f7616) SHA1(38b4f23a559ae13f8ca1b974407a2a40fc52879f) )
+	ROM_LOAD( "stfight_68705.3j",  0x0000,  0x0800, BAD_DUMP CRC(f4cc50d6) SHA1(2ff62a349b74fa965b5d19615e52b867c04988dc) )
 
 	ROM_REGION( 0x02000, "gfx1", 0 )    /* character data */
 	ROM_LOAD( "sf17.bin",   0x0000, 0x2000, CRC(1b3706b5) SHA1(61f069329a7a836523ffc8cce915b0d0129fd896) )
@@ -873,7 +889,7 @@ ROM_START( stfighta )
 	ROM_LOAD( "82s129.066", 0x0600, 0x0100, CRC(51e8832f) SHA1(ed8c00559e7a02bb8c11861d747c8c64c01b7437) )
 	ROM_LOAD( "82s129.015", 0x0700, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )  /* timing? (not used) */
 
-	ROM_REGION( 0x08000, "adpcm", 0 )   /* adpcm voice data */
+	ROM_REGION( 0x08000, "adpcm", 0 )   /* ADPCM voice data */
 	ROM_LOAD( "sf04.bin",   0x00000, 0x8000, CRC(1b8d0c07) SHA1(c163ccd2b7ed6c84facc075eb1564ca399f3ba17) )
 ROM_END
 
@@ -885,9 +901,8 @@ ROM_START( empcityi ) // very similar to above set
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the second CPU */
 	ROM_LOAD( "sf03.bin",   0x0000,  0x8000, CRC(6a8cb7a6) SHA1(dc123cc48d3623752b78e7c23dd8d2f5adf84f92) )
 
-	// not hooked up yet, what's it for, coinage?
 	ROM_REGION( 0x0800, "mcu", 0 )
-	ROM_LOAD( "empirecity_68705.bin",  0x0000,  0x0800, CRC(182f7616) SHA1(38b4f23a559ae13f8ca1b974407a2a40fc52879f) )
+	ROM_LOAD( "empcityi_68705.3j",  0x0000,  0x0800, BAD_DUMP CRC(b1817d44) SHA1(395aad763eb054514f658a14c12b92c1b90c02ce) )
 
 	ROM_REGION( 0x02000, "gfx1", 0 )    /* character data */
 	ROM_LOAD( "sf17.bin",   0x0000, 0x2000, CRC(1b3706b5) SHA1(61f069329a7a836523ffc8cce915b0d0129fd896) )
@@ -928,7 +943,7 @@ ROM_START( empcityi ) // very similar to above set
 	ROM_LOAD( "82s129.066", 0x0600, 0x0100, CRC(51e8832f) SHA1(ed8c00559e7a02bb8c11861d747c8c64c01b7437) )
 	ROM_LOAD( "82s129.015", 0x0700, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )  /* timing? (not used) */
 
-	ROM_REGION( 0x08000, "adpcm", 0 )   /* adpcm voice data */
+	ROM_REGION( 0x08000, "adpcm", 0 )   /* ADPCM voice data */
 	ROM_LOAD( "sf04.bin",   0x00000, 0x8000, CRC(1b8d0c07) SHA1(c163ccd2b7ed6c84facc075eb1564ca399f3ba17) )
 ROM_END
 
@@ -993,7 +1008,6 @@ ROM_START( cshooter )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) // Sub/Sound CPU
 	ROM_LOAD( "r4.5c",   0x00000, 0x08000, CRC(84fed017) SHA1(9a564c9379eb48569cfba48562889277991864d8) )
 
-	// not hooked up yet (Taito version has this instead of encryption!
 	ROM_REGION( 0x0800, "mcu", 0 ) /* 2k for the microcontroller */
 	ROM_LOAD( "crshooter.3j", 0x0000, 0x0800, CRC(aae61ce7) SHA1(bb2b9887ec73a5b82604b9b64c533c2242d20d0f) )
 
@@ -1013,7 +1027,7 @@ ROM_START( cshooter )
 
 	ROM_REGION( 0x10000, "gfx6", ROMREGION_ERASEFF )    /* background map data */
 
-	ROM_REGION( 0x08000, "adpcm", ROMREGION_ERASEFF )   /* adpcm voice data */
+	ROM_REGION( 0x08000, "adpcm", ROMREGION_ERASEFF )   /* ADPCM voice data */
 
 	ROM_REGION( 0x820, "proms", 0 )
 	ROM_LOAD( "63s281.16a", 0x0000, 0x0100, CRC(0b8b914b) SHA1(8cf4910b846de79661cc187887171ed8ebfd6719) ) // clut
@@ -1022,11 +1036,12 @@ ROM_START( cshooter )
 	ROM_LOAD( "82s123.7a",  0x0800, 0x0020, CRC(93e2d292) SHA1(af8edd0cfe85f28ede9604cfaf4516d54e5277c9) ) // sprite color related? (not used)
 ROM_END
 
-GAME( 1986, empcity,  0,       stfight, stfight, stfight_state, empcity, ROT0,   "Seibu Kaihatsu",                           "Empire City: 1931 (bootleg?)", 0 )
-GAME( 1986, empcityu, empcity, stfight, stfight, stfight_state, stfight, ROT0,   "Seibu Kaihatsu (Taito / Romstar license)", "Empire City: 1931 (US)", 0 ) // different title logo
-GAME( 1986, empcityj, empcity, stfight, stfight, stfight_state, stfight, ROT0,   "Seibu Kaihatsu (Taito license)",           "Empire City: 1931 (Japan)", 0 )
-GAME( 1986, empcityi, empcity, stfight, stfight, stfight_state, stfight, ROT0,   "Seibu Kaihatsu (Eurobed license)",         "Empire City: 1931 (Italy)", 0 )
-GAME( 1986, stfight,  empcity, stfight, stfight, stfight_state, stfight, ROT0,   "Seibu Kaihatsu (Tuning license)",          "Street Fight (Germany)", 0 )
-GAME( 1986, stfighta, empcity, stfight, stfight, stfight_state, stfight, ROT0,   "Seibu Kaihatsu",                           "Street Fight (bootleg?)", 0 )
-/* Cross Shooter runs on a slightly modified version of Empire City, with M68705 MCU, a different text tilemap and gfx blobs (see also airraid.c) */
+// Note: Marked GAME_IMPERFECT_SOUND due to YM2203 clock issue
+GAME( 1986, empcity,  0,       stfight, stfight, stfight_state, empcity, ROT0,   "Seibu Kaihatsu",                           "Empire City: 1931 (bootleg?)", GAME_IMPERFECT_SOUND )
+GAME( 1986, empcityu, empcity, stfight, stfight, stfight_state, stfight, ROT0,   "Seibu Kaihatsu (Taito / Romstar license)", "Empire City: 1931 (US)", GAME_IMPERFECT_SOUND ) // different title logo
+GAME( 1986, empcityj, empcity, stfight, stfight, stfight_state, stfight, ROT0,   "Seibu Kaihatsu (Taito license)",           "Empire City: 1931 (Japan)", GAME_IMPERFECT_SOUND )
+GAME( 1986, empcityi, empcity, stfight, stfight, stfight_state, stfight, ROT0,   "Seibu Kaihatsu (Eurobed license)",         "Empire City: 1931 (Italy)", GAME_IMPERFECT_SOUND )
+GAME( 1986, stfight,  empcity, stfight, stfight, stfight_state, stfight, ROT0,   "Seibu Kaihatsu (Tuning license)",          "Street Fight (Germany)", GAME_IMPERFECT_SOUND )
+GAME( 1986, stfighta, empcity, stfight, stfight, stfight_state, stfight, ROT0,   "Seibu Kaihatsu",                           "Street Fight (bootleg?)", GAME_IMPERFECT_SOUND )
+/* Cross Shooter runs on a slightly modified PCB, with a different text tilemap and gfx blobs (see also airraid.c) */
 GAME( 1987, cshooter,  0,      cshooter,cshooter, stfight_state, cshooter,ROT270,"Seibu Kaihatsu (Taito license)",           "Cross Shooter (not encrypted)", GAME_NOT_WORKING )

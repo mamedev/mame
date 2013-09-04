@@ -12,7 +12,6 @@
 #include "sound/msm5205.h"
 #include "includes/stfight.h"
 
-// this prototype will move to the driver
 
 
 
@@ -40,12 +39,11 @@ DRIVER_INIT_MEMBER(stfight_state,empcity)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	UINT8 *rom = memregion("maincpu")->base();
-	int A;
 
 	m_decrypt = auto_alloc_array(machine(), UINT8, 0x8000);
 	space.set_decrypted_region(0x0000, 0x7fff, m_decrypt);
 
-	for (A = 0;A < 0x8000;A++)
+	for (UINT32 A = 0; A < 0x8000; ++A)
 	{
 		UINT8 src = rom[A];
 
@@ -70,38 +68,25 @@ DRIVER_INIT_MEMBER(stfight_state,empcity)
 DRIVER_INIT_MEMBER(stfight_state,stfight)
 {
 	DRIVER_INIT_CALL(empcity);
-
-	/* patch out a tight loop during startup - is the code waiting */
-	/* for NMI to wake it up? */
-	m_decrypt[0xb1] = 0x00;
-	m_decrypt[0xb2] = 0x00;
-	m_decrypt[0xb3] = 0x00;
-	m_decrypt[0xb4] = 0x00;
-	m_decrypt[0xb5] = 0x00;
 }
 
 DRIVER_INIT_MEMBER(stfight_state,cshooter)
 {
-	UINT8 *rom = memregion("maincpu")->base();
 
-	/* patch out initial coin mech check for now */
-	rom[0x5068] = 0xc9; /* ret z -> ret*/
+
 }
 
 void stfight_state::machine_reset()
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	m_adpcm_data_offs = m_adpcm_data_end = 0;
-	m_toggle = 0;
 	m_fm_data = 0;
-	m_coin_mech_latch[0] = 0x02;
-	m_coin_mech_latch[1] = 0x01;
+	m_adpcm_reset = 1;
+	m_cpu_to_mcu_empty = 1;
 
-	m_coin_mech_query_active = 0;
-	m_coin_mech_query = 0;
+	// Coin signals are active low
+	m_coin_state = 3;
 
-	// initialise rom bank
-	stfight_bank_w(space, 0, 0 );
+	// initialise ROM bank
+	stfight_bank_w(m_maincpu->space(AS_PROGRAM), 0, 0);
 }
 
 // It's entirely possible that this bank is never switched out
@@ -119,7 +104,7 @@ WRITE8_MEMBER(stfight_state::stfight_bank_w)
 	if(data & 0x04)
 		bank_num |= 0x4000;
 
-	membank("bank1")->set_base(&ROM2[bank_num] );
+	membank("bank1")->set_base(&ROM2[bank_num]);
 }
 
 /*
@@ -150,235 +135,171 @@ INTERRUPT_GEN_MEMBER(stfight_state::stfight_vb_interrupt)
  *      Hardware handlers
  */
 
+WRITE8_MEMBER(stfight_state::stfight_io_w)
+{
+	// TODO: What is bit 4?
+	coin_counter_w(machine(), 0, data & 1);
+	coin_counter_w(machine(), 1, data & 2);
+}
+
 READ8_MEMBER(stfight_state::stfight_coin_r)
 {
-	int coin_mech_data;
-	int i;
-
-	// Was the coin mech queried by software?
-	if( m_coin_mech_query_active )
-	{
-		m_coin_mech_query_active = 0;
-		return( (~m_coin_mech_query) & 0x03 );
-	}
-
-	/*
-	 *      Is this really necessary?
-	 *      - we can control impulse length so that the port is
-	 *        never strobed twice within the impulse period
-	 *        since it's read by the 30Hz interrupt ISR
-	 */
-
-	coin_mech_data = ioport("COIN")->read();
-
-	for( i=0; i<2; i++ )
-	{
-		/* Only valid on signal edge */
-		if( ( coin_mech_data & (1<<i) ) != m_coin_mech_latch[i] )
-			m_coin_mech_latch[i] = coin_mech_data & (1<<i);
-		else
-			coin_mech_data |= coin_mech_data & (1<<i);
-	}
-
-	return( coin_mech_data );
+	return m_coin_state;
 }
 
 WRITE8_MEMBER(stfight_state::stfight_coin_w)
 {
-	// interrogate coin mech
-	m_coin_mech_query_active = 1;
-	m_coin_mech_query = data;
-}
+	// Acknowledge coin signals (active low)
+	if (!BIT(data, 0))
+		m_coin_state |= 1;
 
-READ8_MEMBER(stfight_state::cshooter_mcu_unk1_r)
-{
-	return 0xff; // hack so it boots
+	if (!BIT(data, 1))
+		m_coin_state |= 2;
 }
 
 /*
  *      Machine hardware for MSM5205 ADPCM sound control
  */
 
-static const int sampleLimits[] =
-{
-	0x0000,     // machine gun fire?
-	0x1000,     // player getting shot
-	0x2C00,     // player shooting
-	0x3C00,     // girl screaming
-	0x5400,     // girl getting shot
-	0x7200,     // (end of samples)
-	0x7200,
-	0x7200,
-	0x7200
-};
-
 WRITE_LINE_MEMBER(stfight_state::stfight_adpcm_int)
 {
-	UINT8 *SAMPLES = memregion("adpcm")->base();
-	int adpcm_data = SAMPLES[m_adpcm_data_offs & 0x7fff];
+	static int m_vck2 = 0;
 
-	// finished playing sample?
-	if( m_adpcm_data_offs == m_adpcm_data_end )
-	{
-		m_msm->reset_w(1);
-		return;
-	}
+	// Falling edge triggered interrupt at half the rate of /VCK?
+	if (m_vck2)
+		m_mcu->set_input_line(0, HOLD_LINE);
 
-	if( m_toggle == 0 )
+	m_vck2 ^= 1;
+
+	if (!m_adpcm_reset)
 	{
-		m_msm->data_w((adpcm_data >> 4) & 0x0f);
-	}
-	else
-	{
+		const UINT8 *samples = memregion("adpcm")->base();
+		UINT8 adpcm_data = samples[m_adpcm_data_offs & 0x7fff];
+
+		if (m_adpcm_nibble == 0)
+			adpcm_data >>= 4;
+		else
+			++m_adpcm_data_offs;
+
 		m_msm->data_w(adpcm_data & 0x0f);
-		m_adpcm_data_offs++;
+		m_adpcm_nibble ^= 1;
 	}
-
-	m_toggle ^= 1;
 }
 
-WRITE8_MEMBER(stfight_state::stfight_adpcm_control_w)
-{
-	if( data < 0x08 )
-	{
-		m_adpcm_data_offs = sampleLimits[data];
-		m_adpcm_data_end = sampleLimits[data+1];
-	}
-
-	m_mcu->set_input_line(0, HOLD_LINE);
-	m_from_main = data;
-	m_main_sent = 1;
-//	m_maincpu->set_input_line(INPUT_LINE_NMI,PULSE_LINE);
-
-	m_msm->reset_w(BIT(data, 3));
-}
-
-WRITE8_MEMBER(stfight_state::stfight_e800_w)
-{
-}
 
 /*
- *      Machine hardware for YM2303 fm sound control
+ *      Machine hardware for YM2303 FM sound control
  */
 
 WRITE8_MEMBER(stfight_state::stfight_fm_w)
 {
-	// the sound cpu ignores any fm data without bit 7 set, it's very likely to be xor'ed and both CPUs can write to it.
-	m_fm_data = 0x80 ^ data;
-}
-
-WRITE8_MEMBER(stfight_state::cshooter_fm_w)
-{
-	m_fm_data = data;
+	// The sound cpu ignores any FM data without bit 7 set
+	m_fm_data = 0x80 | data;
 }
 
 READ8_MEMBER(stfight_state::stfight_fm_r)
 {
-	int data = m_fm_data;
+	UINT8 data = m_fm_data;
 
-	//m_fm_data &= 0x7f;
+	// Acknowledge the command
+	m_fm_data &= ~0x80;
 
-	return( data );
+	return data;
 }
 
+
 /*
- * Cross Shooter MCU communications
- *
- * TODO: everything, especially MCU to main comms (tied with coinage ports?)
+ *  MCU communications
  */
 
-WRITE8_MEMBER(stfight_state::cshooter_68705_ddr_a_w)
+WRITE8_MEMBER(stfight_state::stfight_mcu_w)
+{
+	m_cpu_to_mcu_data = data;
+	m_cpu_to_mcu_empty = 0;
+}
+
+WRITE8_MEMBER(stfight_state::stfight_68705_ddr_a_w)
 {
 	m_ddrA = data;
 }
 
-WRITE8_MEMBER(stfight_state::cshooter_68705_ddr_b_w)
+WRITE8_MEMBER(stfight_state::stfight_68705_ddr_b_w)
 {
 	m_ddrB = data;
 }
 
-WRITE8_MEMBER(stfight_state::cshooter_68705_ddr_c_w)
+WRITE8_MEMBER(stfight_state::stfight_68705_ddr_c_w)
 {
 	m_ddrC = data;
 }
 
-WRITE8_MEMBER(stfight_state::cshooter_mcu_w)
-{
-	m_mcu->set_input_line(0, HOLD_LINE);
-	m_from_main = data;
-	m_main_sent = 1;
 
-}
-
-READ8_MEMBER(stfight_state::cshooter_68705_port_a_r)
+READ8_MEMBER(stfight_state::stfight_68705_port_a_r)
 {
+	m_portA_in = m_cpu_to_mcu_data;
+
 	return (m_portA_out & m_ddrA) | (m_portA_in & ~m_ddrA);
 }
 
-WRITE8_MEMBER(stfight_state::cshooter_68705_port_a_w)
+WRITE8_MEMBER(stfight_state::stfight_68705_port_a_w)
 {
-	// ADPCM start offset goes there
-	// TODO: where's end offset?
+	m_adpcm_data_offs = data << 8;
 	m_portA_out = data;
 }
 
-READ8_MEMBER(stfight_state::cshooter_68705_port_b_r)
+READ8_MEMBER(stfight_state::stfight_68705_port_b_r)
 {
+	m_portB_in = (ioport("COIN")->read() << 6) | (m_cpu_to_mcu_empty << 4) | m_cpu_to_mcu_data;
+
 	return (m_portB_out & m_ddrB) | (m_portB_in & ~m_ddrB);
 }
 
-WRITE8_MEMBER(stfight_state::cshooter_68705_port_b_w)
+WRITE8_MEMBER(stfight_state::stfight_68705_port_b_w)
 {
-	if ((m_ddrB & 0x01) && (data & 0x01) && (~m_portB_out & 0x01))
+	if ((m_ddrB & 0x20) && (~data & 0x20))
 	{
-		printf("bit 0\n");
-	}
-	if ((m_ddrB & 0x02) && (data & 0x02) && (~m_portB_out & 0x02))
-	{
-		printf("bit 1\n");
-	}
-	if ((m_ddrB & 0x04) && (data & 0x04) && (~m_portB_out & 0x04))
-	{
-		printf("bit 2\n");
-	}
-	if ((m_ddrB & 0x08) && (data & 0x08) && (~m_portB_out & 0x08))
-	{
-		printf("bit 3\n");
-	}
-	if ((m_ddrB & 0x10) && (data & 0x10) && (~m_portB_out & 0x10))
-	{
-		printf("bit 4\n");
-	}
-	if ((m_ddrB & 0x20) && (data & 0x20) && (~m_portB_out & 0x20))
-	{
-		//printf("bit 5\n");
-		m_portB_in = m_from_main;
-
-		if (m_main_sent)
-		{
-			//m_mcu->set_input_line(0, CLEAR_LINE);
-		}
-
-		m_main_sent = 0;
-	}
-	if ((m_ddrB & 0x40) && (data & 0x40) && (~m_portB_out & 0x40))
-	{
-		printf("bit 6\n");
-	}
-	if ((m_ddrB & 0x80) && (data & 0x80) && (~m_portB_out & 0x80))
-	{
-		printf("bit 7\n");
+		// Acknowledge Z80 command
+		m_cpu_to_mcu_empty = 1;
 	}
 
 	m_portB_out = data;
 }
 
-READ8_MEMBER(stfight_state::cshooter_68705_port_c_r)
+READ8_MEMBER(stfight_state::stfight_68705_port_c_r)
 {
 	return (m_portC_out & m_ddrC) | (m_portC_in & ~m_ddrC);
 }
 
-WRITE8_MEMBER(stfight_state::cshooter_68705_port_c_w)
+WRITE8_MEMBER(stfight_state::stfight_68705_port_c_w)
 {
+	// Signal a valid coin on the falling edge
+	if ((m_ddrC & 0x01) && (m_portC_out & 0x01) && !(data & 0x01))
+	{
+		m_coin_state &= ~1;
+	}
+
+	if ((m_ddrC & 0x02) && (m_portC_out & 0x02) && !(data & 0x02))
+	{
+		m_coin_state &= ~2;
+	}
+
+	if (m_ddrC & 0x04)
+	{
+		if (data & 0x04)
+		{
+			m_adpcm_reset = 1;
+			m_adpcm_nibble = 0;
+			m_msm->reset_w(1);
+		}
+		else
+		{
+			m_adpcm_reset = 0;
+			m_msm->reset_w(0);
+		}
+	}
+
+	if (m_ddrC & 0x08)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, data & 0x08 ? CLEAR_LINE : ASSERT_LINE);
+
 	m_portC_out = data;
 }
