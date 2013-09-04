@@ -69,10 +69,9 @@ private:
 	required_device<cmos_40105_device> m_fifo;
 	required_device<c64_expansion_slot_device> m_exp;
 
-	int m_eprom;
-	int m_da_ca;
-	int m_pb6;
-	UINT8 m_vslsi_data;
+	UINT16 m_ca;
+	UINT8 m_tpi_pb;
+	int m_tpi_pc6;
 	UINT8 m_pd;
 };
 

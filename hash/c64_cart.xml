@@ -604,7 +604,7 @@
 		</part>
 	</software>
 
-	<software name="magicvce" supported="no">
+	<software name="magicvce" supported="partial">
 		<description>Magic Voice</description>
 		<year>1984</year>
 		<publisher>Commodore</publisher>
@@ -4093,7 +4093,7 @@
 		</part>
 	</software>
 
-	<software name="wow">
+	<software name="wowmv">
 		<!-- supports Magic Voice -->
 		<description>Wizard of Wor</description>
 		<year>1984</year>
@@ -6896,7 +6896,7 @@
 		</part>
 	</software>
 
-	<software name="abc" supported="no">
+	<software name="abc">
 		<!-- requires Magic Voice to run -->
 		<description>A Bee Cee's</description>
 		<year>198?</year>

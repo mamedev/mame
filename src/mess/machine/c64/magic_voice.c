@@ -36,7 +36,6 @@ http://www.stefan-uhlmann.de/cbm/MVM/index.html
 
 	TODO:
 
-	- wow graphics broken
 	- T6721A speech synthesis
 
 */
@@ -52,6 +51,13 @@ http://www.stefan-uhlmann.de/cbm/MVM/index.html
 #define T6721A_TAG  	"u5"
 #define MOS6525_TAG 	"u2"
 #define CMOS40105_TAG 	"u1"
+
+#define A12	BIT(offset, 12)
+#define A13	BIT(offset, 13)
+#define A14	BIT(offset, 14)
+#define A15	BIT(offset, 15)
+#define PB5 BIT(m_tpi_pb, 5)
+#define PB6 BIT(m_tpi_pb, 6)
 
 
 
@@ -90,7 +96,7 @@ READ8_MEMBER( c64_magic_voice_cartridge_device::tpi_pa_r )
 
 	UINT8 data = 0;
 
-	data |= m_exp->game_r(get_offset(0xdf80), 1, 0, 1, 0) << 5;
+	data |= m_exp->game_r(get_offset(m_ca), 1, 1, 1, 0) << 5;
 	data |= m_vslsi->eos_r() << 6;
 	data |= m_fifo->dir_r() << 7;
 
@@ -137,7 +143,7 @@ READ8_MEMBER( c64_magic_voice_cartridge_device::tpi_pb_r )
 
 	UINT8 data = 0;
 
-	data |= m_exp->exrom_r(get_offset(0xdf81), 1, 0, 1, 0) << 7;
+	data |= m_exp->exrom_r(get_offset(m_ca), 1, 1, 1, 0) << 7;
 
 	return data;
 }
@@ -159,20 +165,17 @@ WRITE8_MEMBER( c64_magic_voice_cartridge_device::tpi_pb_w )
 	
 	*/
 
-	m_vslsi_data = data & 0x0f;
-
-	if (!BIT(data, 4))
+	if (!BIT(m_tpi_pb, 4) && BIT(data, 4))
 	{
-		m_vslsi->write(space, 0, m_vslsi_data);
+		m_vslsi->write(space, 0, data & 0x0f);
 	}
 
-	m_da_ca = BIT(data, 5);
-	m_pb6 = BIT(data, 6);
+	m_tpi_pb = data;
 }
 
 WRITE_LINE_MEMBER( c64_magic_voice_cartridge_device::tpi_ca_w )
 {
-	m_eprom = state;
+	m_tpi_pc6 = state;
 }
 
 WRITE_LINE_MEMBER( c64_magic_voice_cartridge_device::tpi_cb_w )
@@ -272,10 +275,9 @@ c64_magic_voice_cartridge_device::c64_magic_voice_cartridge_device(const machine
 	m_tpi(*this, MOS6525_TAG),
 	m_fifo(*this, CMOS40105_TAG),
 	m_exp(*this, C64_EXPANSION_SLOT_TAG),
-	m_eprom(1),
-	m_da_ca(1),
-	m_pb6(1),
-	m_vslsi_data(0)
+	m_tpi_pb(0x60),
+	m_tpi_pc6(1),
+	m_pd(0)
 {
 }
 
@@ -286,6 +288,10 @@ c64_magic_voice_cartridge_device::c64_magic_voice_cartridge_device(const machine
 
 void c64_magic_voice_cartridge_device::device_start()
 {
+	// state saving
+	save_item(NAME(m_tpi_pb));
+	save_item(NAME(m_tpi_pc6));
+	save_item(NAME(m_pd));
 }
 
 
@@ -299,10 +305,9 @@ void c64_magic_voice_cartridge_device::device_reset()
 
 	m_exrom = 1;
 
-	m_eprom = 1;
-	m_da_ca = 1;
-	m_pb6 = 1;
-	m_vslsi_data = 0;
+	m_tpi_pb = 0x60;
+	m_tpi_pc6 = 1;
+	m_pd = 0;
 }
 
 
@@ -314,18 +319,19 @@ UINT8 c64_magic_voice_cartridge_device::c64_cd_r(address_space &space, offs_t of
 {
 	if (!io2 && sphi2)
 	{
+		m_ca = offset;
 		data = m_tpi->read(space, offset & 0x07);
 	}
 
-	if (m_eprom && m_pb6 && sphi2 && ((offset >= 0xa000 && offset < 0xc000) || (offset >= 0xe000)))
+	if (PB6 && A13 && A15)
 	{
-		data = m_romh[(BIT(offset, 14) << 13) | (offset & 0x1fff)];
+		data = m_romh[(A14 << 13) | (offset & 0x1fff)];
 	}
 
-	if (!m_pb6)
-	{
-		data = m_exp->cd_r(space, get_offset(offset), data, sphi2, ba, roml, romh, io1, 1);
-	}
+	int roml2 = !(!roml || (roml && !PB5 && A12 && A13 && !A14 && A15));
+	int romh2 = !((!romh && !PB6) || (!PB5 && A12 && A13 && !A14 && !A15));
+
+	data = m_exp->cd_r(space, get_offset(offset), data, sphi2, ba, roml2, romh2, io1, 1);
 
 	return data;
 }
@@ -342,10 +348,10 @@ void c64_magic_voice_cartridge_device::c64_cd_w(address_space &space, offs_t off
 		m_tpi->write(space, offset & 0x07, data);
 	}
 
-	if (!m_pb6)
-	{
-		m_exp->cd_w(space, get_offset(offset), data, sphi2, ba, roml, romh, io1, 1);
-	}
+	int roml2 = !(!roml || (roml && !PB5 && A12 && A13 && !A14 && A15));
+	int romh2 = !((!romh && !PB6) || (!PB5 && A12 && A13 && !A14 && !A15));
+
+	m_exp->cd_w(space, get_offset(offset), data, sphi2, ba, roml2, romh2, io1, 1);
 }
 
 
@@ -355,7 +361,7 @@ void c64_magic_voice_cartridge_device::c64_cd_w(address_space &space, offs_t off
 
 int c64_magic_voice_cartridge_device::c64_game_r(offs_t offset, int sphi2, int ba, int rw, int hiram)
 {
-	return !(m_eprom && ((offset >= 0xa000 && offset < 0xc000) || (offset >= 0xe000)));
+	return !((m_tpi_pc6 && sphi2) || (!m_tpi_pc6 && sphi2 && !PB5 && A12 && A13 && !A14));
 }
 
 
@@ -365,9 +371,9 @@ int c64_magic_voice_cartridge_device::c64_game_r(offs_t offset, int sphi2, int b
 
 offs_t c64_magic_voice_cartridge_device::get_offset(offs_t offset)
 {
-	if (!m_da_ca)
+	if (!PB5 && A12 && A13 && !A14)
 	{
-		offset = (m_vslsi_data << 12) | (offset & 0xfff);
+		offset = ((m_tpi_pb & 0x0f) << 12) | (offset & 0xfff);
 	}
 
 	return offset;
