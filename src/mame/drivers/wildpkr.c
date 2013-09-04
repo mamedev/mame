@@ -162,7 +162,7 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "video/hd63484.h"
+//#include "video/hd63484.h"
 #include "video/ramdac.h"
 
 

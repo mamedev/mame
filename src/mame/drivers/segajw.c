@@ -22,7 +22,7 @@ SOUND     : YM3438
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "video/hd63484.h"
+//#include "video/hd63484.h"
 
 class segajw_state : public driver_device
 {
