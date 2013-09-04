@@ -2424,6 +2424,7 @@ $(MESSOBJ)/skeleton.a:          \
 	$(MESS_DRIVERS)/pes.o       \
 	$(MESS_DRIVERS)/pipbug.o    \
 	$(MESS_DRIVERS)/plan80.o    \
+	$(MESS_DRIVERS)/pm68k.o     \
 	$(MESS_DRIVERS)/poly.o      \
 	$(MESS_DRIVERS)/pt68k4.o    \
 	$(MESS_DRIVERS)/ptcsol.o    \

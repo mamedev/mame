@@ -51,7 +51,6 @@ public:
 	DECLARE_WRITE8_MEMBER(port00_w);
 	DECLARE_READ8_MEMBER(io_r);
 	DECLARE_WRITE8_MEMBER(io_w);
-	DECLARE_WRITE8_MEMBER(kbd_put);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<z80dart_device> m_dart;
