@@ -24,6 +24,10 @@
 	MCFG_DEVICE_ADD(_tag, DECOCPU3, _clock) \
 	decocpu_type1_device::static_set_cpuregion(*device, _region);
 
+#define MCFG_DECOCPU_TYPE3B_ADD(_tag, _clock, _region) \
+	MCFG_DEVICE_ADD(_tag, DECOCPU3B, _clock) \
+	decocpu_type1_device::static_set_cpuregion(*device, _region);
+
 #define MCFG_DECOCPU_DISPLAY(_disp_r, _disp_w) \
 	downcast<decocpu_type1_device *>(device)->set_display_read_callback(DEVCB2_##_disp_r); \
 	downcast<decocpu_type1_device *>(device)->set_display_write_callback(DEVCB2_##_disp_w);
@@ -140,6 +144,17 @@ class decocpu_type3_device : public decocpu_type2_device
 {
 public:
 	decocpu_type3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	decocpu_type3_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+
+protected:
+	// overrides
+	virtual void device_start();
+};
+
+class decocpu_type3b_device : public decocpu_type3_device
+{
+public:
+	decocpu_type3b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	// overrides
@@ -149,5 +164,6 @@ protected:
 extern const device_type DECOCPU1;
 extern const device_type DECOCPU2;
 extern const device_type DECOCPU3;
+extern const device_type DECOCPU3B;
 
 #endif /* DECOPINCPU_H_ */

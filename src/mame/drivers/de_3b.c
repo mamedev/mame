@@ -4,8 +4,10 @@
 
 
 #include "emu.h"
-#include "cpu/m6800/m6800.h"
+#include "machine/decopincpu.h"
 #include "audio/decobsmt.h"
+#include "machine/genpin.h"
+#include "machine/nvram.h"
 
 extern const char layout_pinball[];
 class de_3b_state : public driver_device
@@ -13,13 +15,23 @@ class de_3b_state : public driver_device
 public:
 	de_3b_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
 			m_decobsmt(*this, "decobsmt")
 	{ }
 
 	// devices
-	required_device<cpu_device> m_maincpu;
 	required_device<decobsmt_device> m_decobsmt;
+
+	DECLARE_WRITE8_MEMBER(lamp0_w) { };
+	DECLARE_WRITE8_MEMBER(lamp1_w) { };
+	DECLARE_READ8_MEMBER(switch_r);
+	DECLARE_WRITE8_MEMBER(switch_w);
+	DECLARE_WRITE8_MEMBER(sound_w);
+	DECLARE_READ8_MEMBER(dmd_status_r);
+
+	// devcb2 callbacks
+	DECLARE_READ8_MEMBER(display_r);
+	DECLARE_WRITE8_MEMBER(display_w);
+	DECLARE_WRITE8_MEMBER(lamps_w);
 
 protected:
 
@@ -27,15 +39,172 @@ protected:
 	virtual void machine_reset();
 public:
 	DECLARE_DRIVER_INIT(de_3b);
+
+	UINT8 m_strobe;
+	UINT8 m_kbdrow;
+	UINT8 m_diag;
+	bool m_ca1;
+	bool m_irq_active;
+	UINT8 m_sound_data;
+
 };
 
 
-static ADDRESS_MAP_START( de_3b_map, AS_PROGRAM, 8, de_3b_state )
-	AM_RANGE(0x0000, 0xffff) AM_NOP
-ADDRESS_MAP_END
-
 static INPUT_PORTS_START( de_3b )
+	PORT_START("INP0")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("INP1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_TILT )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER )
+
+	PORT_START("INP2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_J)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_K)
+
+	PORT_START("INP4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_L)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_N)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_M)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_COMMA)
+
+	PORT_START("INP8")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_STOP)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_SLASH)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_COLON)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_QUOTE)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_MINUS)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_EQUALS)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSPACE)
+
+	PORT_START("INP10")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_OPENBRACE)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_CLOSEBRACE)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSLASH)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_ENTER)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_LEFT)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_RIGHT)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_UP)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_DOWN)
+
+	PORT_START("INP20")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Y)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_U)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_I)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_O)
+
+	PORT_START("INP40")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_LALT)
+	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("INP80")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
+
+READ8_MEMBER( de_3b_state::switch_r )
+{
+	char kbdrow[8];
+	sprintf(kbdrow,"INP%X",m_kbdrow);
+	return ~ioport(kbdrow)->read();
+}
+
+WRITE8_MEMBER( de_3b_state::switch_w )
+{
+	int x;
+
+	for(x=0;x<8;x++)
+	{
+		if(data & (1<<x))
+			break;
+	}
+	m_kbdrow = data & (1<<x);
+}
+
+WRITE8_MEMBER( de_3b_state::sound_w )
+{
+	m_sound_data = data;
+	if(m_sound_data != 0xfe)
+		m_decobsmt->bsmt_comms_w(space,offset,m_sound_data);
+}
+
+READ8_MEMBER( de_3b_state::dmd_status_r )
+{
+	//return m_dmdtype3->status_r(space,offset);
+	return 0;
+}
+
+READ8_MEMBER(de_3b_state::display_r)
+{
+	UINT8 ret = 0x00;
+
+	switch(offset)
+	{
+	case 0:
+//		ret = pia28_w7_r(space,0);
+		break;
+	case 3:
+//		ret = pia2c_pb_r(space,0);
+		break;
+	}
+
+	return ret;
+}
+
+WRITE8_MEMBER(de_3b_state::display_w)
+{
+/*	switch(offset)
+	{
+	case 0:
+		dig0_w(space,0,data);
+		break;
+	case 1:
+		dig1_w(space,0,data);
+		break;
+	case 2:
+		pia2c_pa_w(space,0,data);
+		break;
+	case 3:
+		pia2c_pb_w(space,0,data);
+		break;
+	case 4:
+		pia34_pa_w(space,0,data);
+		break;
+	}*/
+}
+
+WRITE8_MEMBER(de_3b_state::lamps_w)
+{
+	switch(offset)
+	{
+	case 0:
+		lamp0_w(space,0,data);
+		break;
+	case 1:
+		lamp1_w(space,0,data);
+		break;
+	}
+}
 
 void de_3b_state::machine_reset()
 {
@@ -47,8 +216,14 @@ DRIVER_INIT_MEMBER(de_3b_state,de_3b)
 
 static MACHINE_CONFIG_START( de_3b, de_3b_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800, 1000000)
-	MCFG_CPU_PROGRAM_MAP(de_3b_map)
+	MCFG_DECOCPU_TYPE3B_ADD("decocpu",XTAL_8MHz / 2, ":maincpu")
+	MCFG_DECOCPU_DISPLAY(READ8(de_3b_state,display_r),WRITE8(de_3b_state,display_w))
+	MCFG_DECOCPU_SOUNDLATCH(WRITE8(de_3b_state,sound_w))
+	MCFG_DECOCPU_SWITCH(READ8(de_3b_state,switch_r),WRITE8(de_3b_state,switch_w))
+	MCFG_DECOCPU_LAMP(WRITE8(de_3b_state,lamps_w))
+	MCFG_DECOCPU_DMDSTATUS(READ8(de_3b_state,dmd_status_r))
+
+	MCFG_FRAGMENT_ADD( genpin_audio )
 
 	/* sound hardware */
 	MCFG_DECOBSMT_ADD(DECOBSMT_TAG)

@@ -513,6 +513,7 @@ WRITE8_MEMBER(de_2_state::lamps_w)
 		break;
 	}
 }
+
 static const msm5205_interface msm5205_intf =
 {
 	DEVCB_DRIVER_LINE_MEMBER(de_2_state,msm5205_irq_w),
