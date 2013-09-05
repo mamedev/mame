@@ -1111,7 +1111,6 @@ void tmp95c061_device::update_porta()
 {
 	int fc = (m_to1 << 2) | (m_to3 << 3);
 
-	printf( "%02x %02x %02x %02x %02x\n", fc, m_reg[TMP95C061_PA], m_reg[TMP95C061_PACR], m_reg[TMP95C061_PAFC], ((fc & m_reg[TMP95C061_PAFC]) | (m_reg[TMP95C061_PA] & ~m_reg[TMP95C061_PAFC])) & m_reg[TMP95C061_PACR]);
 	m_porta_write(0, ((fc & m_reg[TMP95C061_PAFC]) | (m_reg[TMP95C061_PA] & ~m_reg[TMP95C061_PAFC])) & m_reg[TMP95C061_PACR], 0xff);
 }
 
