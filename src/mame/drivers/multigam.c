@@ -35,10 +35,16 @@
          - ROM at 0x80000:  Several things patched and/or relocated.
                             Most original NOPs were replaced by proper code.
 
+**************************************************************************************************
+
     Multi Game 2 & III: 21 games included, hardware features MMC3 NES mapper and additional
     RAM used by Super Mario Bros 3.
 
+**************************************************************************************************
+
     Multi Game (Tung Sheng Electronics): 10 games included, selectable by dip switches.
+
+**************************************************************************************************
 
     Super Game III:
 
@@ -63,6 +69,39 @@ PCB Layout
 
     Super Game III features 15 games, updated hardware with several NES mappers allowing newer NES
     games to run.
+
+***************************************************************************************************
+
+Super Game Mega Type 1 by Kim 1994
+
+This romset comes from an "original" pcb.Like Multigame series,this is another Nintendo PlayChoice-10 hacked clone but hardware based on the Nes/Famicom console.This one supports 7 games only but all with memory size of 2 megabit and over and all platform game type.
+Games are:
+1) Rockman 5 (Megaman 5)
+2) Ninja 2 (Ninja Ryukenden)
+3) Tom & Jerry and Tuffy
+4) Island II (Adventure Island II-Hudson's Wonder Boy II)
+5) Rainbow (Time Zone)
+6) Super Mario Bros 3
+7) Swap (Super Rescue Solbrain)
+
+Hardware info:
+Main cpu UA6527 (RP2A03 clone)
+Video PPU UA6528 (RP2C02 clone)
+There are present 3 custom ic,all with ID code erased:
+-Custom 1 is a 24 pin DIP (probably a PAL) that simulates the Memory Mapper Chip #1 (MMC1) used by Ninja Ryukenden
+-Custom 2 is a 40 pin DIP (a MCU or PLD) that simulates the Memory Mapper Chip #3 (MMC3) used by all other games
+-Custom 3 is a 44 pin chip,used as protection.Pcb doesn't boot without it.
+Other ic NEC upc1352C NTSC to RGB decoder
+PAL16V8 x2 (pal2,pal3) There is space for a pal1 but it is unpopulated
+OSC: 21,47727 Mhz and 3,58 Mhz (used by decoder)
+RAMs:
+Work 16kb (6264 x2)
+Video 10kb (6116 + 6264)
+
+Rom info:
+sg1_rom1 main program
+sg1_rom2 to sg1_rom7 games data.There are spaces for rom5 and rom8 but they are unpopulated.
+Eproms are 27512,27010,274001
 */
 
 #include "emu.h"
@@ -1080,6 +1119,24 @@ static INPUT_PORTS_START( supergm3 )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
 INPUT_PORTS_END
+
+static INPUT_PORTS_START( sgmt1 )
+	PORT_INCLUDE( multigam_common )
+
+	PORT_MODIFY("IN0")
+	PORT_DIPNAME( 0x03, 0x00, "Play Time per Credit" )
+	PORT_DIPSETTING(    0x00, "3 min" )
+	PORT_DIPSETTING(    0x02, "5 min" )
+	PORT_DIPSETTING(    0x01, "8 min" )
+	PORT_DIPSETTING(    0x03, "10 min" )
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
+INPUT_PORTS_END
+
 /******************************************************
 
    PPU/Video interface
@@ -1341,6 +1398,21 @@ ROM_START( multigmt )
 
 ROM_END
 
+ROM_START( sgmt1 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "sg1_rom1.bin", 0x0000, 0x10000, CRC(0fcec01d) SHA1(c622fdd99827b8ff8ffc4658363d454fdfb6ec61) )
+	ROM_COPY("maincpu", 0x0000, 0x10000, 0x10000)
+
+	ROM_REGION( 0x400000, "user1", 0 )
+	ROM_LOAD( "sg1_rom2.bin", 0x000000, 0x80000, CRC(7ee249f0) SHA1(eeb40ec7e9cd2afd03b5da01e985c5cfe650c8f8) )
+	ROM_LOAD( "sg1_rom3.bin", 0x080000, 0x80000, CRC(4809ca7f) SHA1(bdb8e097345e09b767d27ab1e9917d163974b170) )
+	ROM_LOAD( "sg1_rom4.bin", 0x100000, 0x20000, CRC(a293f2ce) SHA1(e1806e16d288ffd5922a75b02a72fea74fc9d621) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_LOAD( "sg1_rom6.bin", 0x000000, 0x80000, CRC(84d00362) SHA1(97e6ddc0224b8b614dadcbc916ac922d7d17c583) )
+	ROM_LOAD( "sg1_rom7.bin", 0x080000, 0x80000, CRC(fee064e3) SHA1(4fe76ea4ea02991e71b2b42f5c67a8260fee1070) )
+ROM_END
+
 ROM_START( supergm3 )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "sg3.ic36", 0x0000, 0x10000, CRC(f79dd9ef) SHA1(31b84097f4f14bdb6e87a7a624e9974abe680c80) )
@@ -1434,4 +1506,5 @@ GAME( 1992, multigmb, multigam, multigam, multigam, multigam_state, multigam, RO
 GAME( 1992, multigm2, 0,        multigm3, multigm2, multigam_state, multigm3, ROT0, "Seo Jin",   "Multi Game 2", 0 )
 GAME( 1992, multigm3, 0,        multigm3, multigm3, multigam_state, multigm3, ROT0, "Seo Jin",   "Multi Game III", 0 )
 GAME( 1992, multigmt, 0,        multigmt, multigmt, multigam_state, multigmt, ROT0, "Tung Sheng Electronics", "Multi Game (Tung Sheng Electronics)", 0 )
-GAME( 1996, supergm3, 0,        supergm3, supergm3, driver_device, 0,        ROT0, "<unknown>", "Super Game III", 0 )
+GAME( 1994, sgmt1,    0,        supergm3, sgmt1,    driver_device, 0,         ROT0, "<unknown>", "Super Game Mega Type 1", 0 )
+GAME( 1996, supergm3, 0,        supergm3, supergm3, driver_device, 0,         ROT0, "<unknown>", "Super Game III", 0 )
