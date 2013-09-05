@@ -539,15 +539,15 @@ static const msm5205_interface msm5205_config =
 static MACHINE_CONFIG_START( stfight, stfight_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 3000000)   /* 3 MHz */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(cpu1_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", stfight_state,  stfight_vb_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3000000)  /* 3 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_12MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(cpu2_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(stfight_state, irq0_line_hold, 120)
 
-	MCFG_CPU_ADD("mcu", M68705, 6000000)   /* 6 MHz? */
+	MCFG_CPU_ADD("mcu", M68705, XTAL_12MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(mcu_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
@@ -564,18 +564,17 @@ static MACHINE_CONFIG_START( stfight, stfight_state )
 	MCFG_GFXDECODE(stfight)
 	MCFG_PALETTE_LENGTH(16*4+16*16+16*16+16*16)
 
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	// HACK! These should be clocked at 1.5Mhz (see TODO list)
-	MCFG_SOUND_ADD("ym1", YM2203, 4500000)
+	MCFG_SOUND_ADD("ym1", YM2203, XTAL_12MHz / 8 * 3)
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
 	MCFG_SOUND_ROUTE(3, "mono", 0.10)
 
-	MCFG_SOUND_ADD("ym2", YM2203, 4500000)
+	MCFG_SOUND_ADD("ym2", YM2203, XTAL_12MHz / 8 * 3)
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
@@ -586,12 +585,13 @@ static MACHINE_CONFIG_START( stfight, stfight_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
+
 static MACHINE_CONFIG_DERIVED( cshooter, stfight )
-	MCFG_CPU_REPLACE("maincpu", Z80, 6000000)
+	MCFG_CPU_REPLACE("maincpu", Z80, XTAL_12MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(cshooter_cpu1_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", stfight_state,  stfight_vb_interrupt)
 
-	MCFG_CPU_REPLACE("audiocpu", Z80, 6000000)
+	MCFG_CPU_REPLACE("audiocpu", Z80, XTAL_12MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(cpu2_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(stfight_state, irq0_line_hold, 120)
 
@@ -604,11 +604,12 @@ static MACHINE_CONFIG_DERIVED( cshooter, stfight )
 	MCFG_VIDEO_START_OVERRIDE(stfight_state,cshooter)
 
 	MCFG_SOUND_MODIFY("ym1")
-	MCFG_SOUND_CLOCK(1500000)
+	MCFG_SOUND_CLOCK(XTAL_12MHz / 8)
 
 	MCFG_SOUND_MODIFY("ym2")
-	MCFG_SOUND_CLOCK(1500000)
+	MCFG_SOUND_CLOCK(XTAL_12MHz / 8)
 MACHINE_CONFIG_END
+
 
 /***************************************************************************
 
