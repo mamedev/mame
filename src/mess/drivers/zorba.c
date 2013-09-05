@@ -166,9 +166,6 @@ WRITE_LINE_MEMBER( zorba_state::busreq_w )
 	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, state);
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state); // do we need this?
 	m_dma->bai_w(state); // tell dma that bus has been granted
-
-	address_space &space = m_maincpu->space(AS_IO);
-	m_crtc->dack_w(space, 0, 0); // this must pass a whole row of data from the dma
 }
 
 READ8_MEMBER(zorba_state::memory_read_byte)
@@ -192,7 +189,15 @@ READ8_MEMBER(zorba_state::io_read_byte)
 WRITE8_MEMBER(zorba_state::io_write_byte)
 {
 	address_space& prog_space = m_maincpu->space(AS_IO);
-	return prog_space.write_byte(offset, data);
+
+	if (offset == 0x10)
+	{
+		m_crtc->dack_w(space, 0, data);
+	}
+	else
+	{
+		return prog_space.write_byte(offset, data);
+	}
 }
 
 // busack on cpu connects to bai pin
@@ -461,7 +466,7 @@ static MACHINE_CONFIG_START( zorba, zorba_state )
 	MCFG_PIA6821_ADD("pia0", pia0_intf)
 	MCFG_PIA6821_ADD("pia1", pia1_intf)
 	MCFG_PIT8254_ADD( "pit", pit_intf)
-	MCFG_I8275_ADD  ( "crtc", 2e6, crtc_intf)
+	MCFG_I8275_ADD  ( "crtc", XTAL_14_31818MHz/7, crtc_intf)
 	MCFG_FD1793x_ADD("fdc", XTAL_24MHz / 24)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", zorba_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", zorba_floppies, "525dd", floppy_image_device::default_floppy_formats)
