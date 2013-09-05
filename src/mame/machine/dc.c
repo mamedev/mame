@@ -559,11 +559,11 @@ WRITE64_MEMBER(dc_state::dc_g2_ctrl_w )
 			old = m_wave_dma.start & 1;
 			m_wave_dma.start = dat & 1;
 
-			//#if DEBUG_AICA_DMA
+			#if DEBUG_AICA_DMA
 			printf("AICA: G2-DMA start \n");
 			printf("DST %08x SRC %08x SIZE %08x IND %02x\n",m_wave_dma.aica_addr,m_wave_dma.root_addr,m_wave_dma.size,m_wave_dma.indirect);
 			printf("SEL %08x ST  %08x FLAG %08x DIR %02x\n",m_wave_dma.sel,m_wave_dma.start,m_wave_dma.flag,m_wave_dma.dir);
-			//#endif
+			#endif
 
 			//mame_printf_verbose("SB_ADST data %08x\n",dat);
 			if(((old & 1) == 0) && m_wave_dma.flag && m_wave_dma.start && ((m_wave_dma.sel & 2) == 0)) // 0 -> 1

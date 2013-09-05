@@ -26,8 +26,10 @@
 	- Sega GT: no cursor on main menu;
 	- Tetris 4D: hangs at BPS FMV (bp 0C0B0C4E)
 
-	Note:
+	Notes:
 	- DC US and DC PAL flash ROMs are definitely hacked, they are set to have Chinese instead of Japanese.
+	- 0x1a002 of flash ROM returns the region type (0x30=Japan, 0x31=USA, 0x32=Europe). Amusingly, if the value
+	  on a non-jp console is different than these ones, the system shows a black swirl (and nothing boots).
 	- gdi file for DCLP (a Dreamcast tester) doesn't have first two tracks info, they are:
 	  1 0 4 2048 FILE0001.DUP 0
       2 1798 0 2352 FILE0002.DUP 0
