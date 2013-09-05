@@ -2,7 +2,7 @@
 
         Morrow Designs Micro Decision
 
-        10/12/2009 Skeleton driver.
+        2009-12-10 Skeleton driver.
 
 ****************************************************************************/
 
@@ -16,30 +16,30 @@ class microdec_state : public driver_device
 {
 public:
 	microdec_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_terminal(*this, TERMINAL_TAG) ,
-		m_maincpu(*this, "maincpu") { }
+		: driver_device(mconfig, type, tag)
+		, m_terminal(*this, TERMINAL_TAG)
+		, m_maincpu(*this, "maincpu")
+	{ }
 
-	DECLARE_READ8_MEMBER(terminal_status_r);
-	DECLARE_READ8_MEMBER(terminal_r);
+	DECLARE_READ8_MEMBER(status_r);
+	DECLARE_READ8_MEMBER(keyin_r);
 	DECLARE_WRITE8_MEMBER(kbd_put);
+private:
 	UINT8 m_term_data;
-
-	required_device<generic_terminal_device> m_terminal;
 	virtual void machine_reset();
-
 	virtual void machine_start();
 	void fdc_irq(bool state);
+	required_device<generic_terminal_device> m_terminal;
 	required_device<cpu_device> m_maincpu;
 };
 
 
-READ8_MEMBER( microdec_state::terminal_status_r )
+READ8_MEMBER( microdec_state::status_r )
 {
 	return (m_term_data) ? 3 : 1;
 }
 
-READ8_MEMBER( microdec_state::terminal_r )
+READ8_MEMBER( microdec_state::keyin_r )
 {
 	UINT8 ret = m_term_data;
 	m_term_data = 0;
@@ -56,8 +56,18 @@ static ADDRESS_MAP_START(microdec_io, AS_IO, 8, microdec_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xfa, 0xfb) AM_DEVICE("upd765", upd765a_device, map)
-	AM_RANGE(0xfc, 0xfc) AM_READ(terminal_r) AM_DEVWRITE(TERMINAL_TAG, generic_terminal_device, write)
-	AM_RANGE(0xfd, 0xfd) AM_READ(terminal_status_r)
+	AM_RANGE(0xfc, 0xfc) AM_READ(keyin_r) AM_DEVWRITE(TERMINAL_TAG, generic_terminal_device, write)
+	AM_RANGE(0xfd, 0xfd) AM_READ(status_r)
+	// AM_RANGE(0xf0, 0xf3) 8253 PIT (md3 only) used as a baud rate generator for serial ports
+	// AM_RANGE(0xf4, 0xf4) Centronics data
+	// AM_RANGE(0xf5, 0xf5) motor check (md1/2)
+	// AM_RANGE(0xf5, 0xf5) Centronics status (md3) read bit 3 (ack=1); read bit 4 (busy=1); write bit 7 (stb=0)
+	// AM_RANGE(0xf6, 0xf6) rom enable (w=enable; r=disable)
+	// AM_RANGE(0xf7, 0xf7) VFO Count set
+	// AM_RANGE(0xf8, 0xf8) Motor and SHift control
+	// AM_RANGE(0xfa, 0xfb) uPD765C fdc FA=status; FB=data
+	// AM_RANGE(0xfc, 0xfd) Serial Port 1 FC=data FD=status
+	// AM_RANGE(0xfe, 0xff) Serial Port 2 FE=data FF=status
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -98,7 +108,6 @@ static MACHINE_CONFIG_START( microdec, microdec_state )
 	MCFG_CPU_PROGRAM_MAP(microdec_mem)
 	MCFG_CPU_IO_MAP(microdec_io)
 
-
 	/* video hardware */
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 
@@ -134,6 +143,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT     INIT     COMPANY                  FULLNAME       FLAGS */
-COMP( 1982, md2,    0,      0,       microdec,  microdec, driver_device, 0,    "Morrow Designs",   "Micro Decision MD-2",GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1982, md3,    md2,    0,       microdec,  microdec, driver_device, 0,    "Morrow Designs",   "Micro Decision MD-3",GAME_NOT_WORKING | GAME_NO_SOUND)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT     CLASS         INIT     COMPANY                  FULLNAME       FLAGS */
+COMP( 1982, md2,    0,      0,       microdec,  microdec, driver_device, 0,    "Morrow Designs", "Micro Decision MD-2", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1982, md3,    md2,    0,       microdec,  microdec, driver_device, 0,    "Morrow Designs", "Micro Decision MD-3", GAME_NOT_WORKING | GAME_NO_SOUND)
