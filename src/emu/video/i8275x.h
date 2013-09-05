@@ -43,13 +43,20 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_I8275_ADD(_tag, _clock, _config) \
+#define MCFG_I8275_ADD(_tag, _clock, _hpixels_per_column, _display_func, _drq) \
 	MCFG_DEVICE_ADD(_tag, I8275x, _clock) \
-	MCFG_DEVICE_CONFIG(_config)
+	downcast<i8275x_device *>(device)->set_hpixels_per_column(_hpixels_per_column); \
+	downcast<i8275x_device *>(device)->set_display_func(_display_func); \
+	downcast<i8275x_device *>(device)->set_drq_callback(DEVCB2_##_drq);
 
+#define MCFG_I8275_IRQ_CALLBACK(_irq) \
+	downcast<i8275x_device *>(device)->set_irq_callback(DEVCB2_##_irq); \
 
-#define I8275_INTERFACE(name) \
-	const i8275_interface (name) =
+#define MCFG_I8275_HRTC_CALLBACK(_hrtc) \
+	downcast<i8275x_device *>(device)->set_hrtc_callback(DEVCB2_##_hrtc); \
+
+#define MCFG_I8275_VRTC_CALLBACK(_vrtc) \
+	downcast<i8275x_device *>(device)->set_vrtc_callback(DEVCB2_##_vrtc);
 
 
 
@@ -66,33 +73,21 @@ typedef void (*i8275_display_pixels_func)(i8275x_device *device, bitmap_rgb32 &b
 #define I8275_DISPLAY_PIXELS(name)  void name(i8275x_device *device, bitmap_rgb32 &bitmap, int x, int y, UINT8 linecount, UINT8 charcode, UINT8 lineattr, UINT8 lten, UINT8 rvv, UINT8 vsp, UINT8 gpa, UINT8 hlgt)
 
 
-// ======================> i8275_interface
-
-struct i8275_interface
-{
-	int m_hpixels_per_column;
-	int m_dummy;
-
-	devcb_write_line m_out_drq_cb;
-	devcb_write_line m_out_irq_cb;
-
-	devcb_write_line m_out_hrtc_cb;
-	devcb_write_line m_out_vrtc_cb;
-
-	i8275_display_pixels_func m_display_pixels_func;
-};
-
-
-
 // ======================> i8275x_device
 
 class i8275x_device :   public device_t,
-						public device_video_interface,
-						public i8275_interface
+						public device_video_interface
 {
 public:
 	// construction/destruction
 	i8275x_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	template<class _irq> void set_irq_callback(_irq irq) { m_write_irq.set_callback(irq); }
+	template<class _drq> void set_drq_callback(_drq drq) { m_write_drq.set_callback(drq); }
+	template<class _hrtc> void set_hrtc_callback(_hrtc hrtc) { m_write_hrtc.set_callback(hrtc); }
+	template<class _vrtc> void set_vrtc_callback(_vrtc vrtc) { m_write_vrtc.set_callback(vrtc); }
+	void set_hpixels_per_column(int hpixels_per_column) { m_hpixels_per_column = hpixels_per_column; }
+	void set_display_func(i8275_display_pixels_func func) { m_display_pixels = func; }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -105,7 +100,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
@@ -172,10 +166,13 @@ protected:
 		FAC_U = 0x20
 	};
 
-	devcb_resolved_write_line   m_out_drq_func;
-	devcb_resolved_write_line   m_out_irq_func;
-	devcb_resolved_write_line   m_out_hrtc_func;
-	devcb_resolved_write_line   m_out_vrtc_func;
+	devcb2_write_line   m_write_irq;
+	devcb2_write_line   m_write_drq;
+	devcb2_write_line   m_write_hrtc;
+	devcb2_write_line   m_write_vrtc;
+
+	i8275_display_pixels_func m_display_pixels;
+	int m_hpixels_per_column;
 
 	bitmap_rgb32 m_bitmap;
 

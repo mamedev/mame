@@ -360,19 +360,6 @@ static I8275_DISPLAY_PIXELS( zorba_update_chr )
 		bitmap.pix32(y, x + 7 - i) = palette[BIT(gfx, i) ? (hlgt ? 2 : 1) : 0];
 }
 
-// dack connects to busack on cpu
-// drq connects to pin 25 "RDY" on z80dma
-const i8275_interface crtc_intf =
-{
-	8, // pixels in each char
-	0, // delay
-	DEVCB_NULL,//DEVCB_DEVICE_LINE_MEMBER("dma", z80dma_device, rdy_w), //wrln drq
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), //wrln irq
-	DEVCB_NULL, //wrln h
-	DEVCB_NULL, //wrln v
-	zorba_update_chr // output func
-};
-
 MACHINE_RESET_MEMBER( zorba_state, zorba )
 {
 	m_beep->set_frequency(800);
@@ -466,7 +453,8 @@ static MACHINE_CONFIG_START( zorba, zorba_state )
 	MCFG_PIA6821_ADD("pia0", pia0_intf)
 	MCFG_PIA6821_ADD("pia1", pia1_intf)
 	MCFG_PIT8254_ADD( "pit", pit_intf)
-	MCFG_I8275_ADD  ( "crtc", XTAL_14_31818MHz/7, crtc_intf)
+	MCFG_I8275_ADD("crtc", XTAL_14_31818MHz/7, 8, zorba_update_chr, DEVWRITELINE("dma", z80dma_device, rdy_w))
+	MCFG_I8275_IRQ_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_FD1793x_ADD("fdc", XTAL_24MHz / 24)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", zorba_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", zorba_floppies, "525dd", floppy_image_device::default_floppy_formats)

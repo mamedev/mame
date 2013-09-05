@@ -82,6 +82,11 @@ const device_type I8275x = &device_creator<i8275x_device>;
 i8275x_device::i8275x_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, I8275x, "I8275", tag, owner, clock, "i8275x", __FILE__),
 		device_video_interface(mconfig, *this),
+		m_write_irq(*this),
+		m_write_drq(*this),
+		m_write_hrtc(*this),
+		m_write_vrtc(*this),
+		m_display_pixels(NULL),
 		m_status(0),
 		m_param_idx(0),
 		m_param_end(0),
@@ -103,30 +108,6 @@ i8275x_device::i8275x_device(const machine_config &mconfig, const char *tag, dev
 
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void i8275x_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const i8275_interface *intf = reinterpret_cast<const i8275_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<i8275_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_drq_cb, 0, sizeof(m_out_drq_cb));
-		memset(&m_out_irq_cb, 0, sizeof(m_out_irq_cb));
-		memset(&m_out_hrtc_cb, 0, sizeof(m_out_hrtc_cb));
-		memset(&m_out_vrtc_cb, 0, sizeof(m_out_vrtc_cb));
-	}
-}
-
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
@@ -136,10 +117,10 @@ void i8275x_device::device_start()
 	m_screen->register_screen_bitmap(m_bitmap);
 
 	// resolve callbacks
-	m_out_drq_func.resolve(m_out_drq_cb, *this);
-	m_out_irq_func.resolve(m_out_irq_cb, *this);
-	m_out_hrtc_func.resolve(m_out_hrtc_cb, *this);
-	m_out_vrtc_func.resolve(m_out_vrtc_cb, *this);
+	m_write_drq.resolve_safe();
+	m_write_irq.resolve_safe();
+	m_write_hrtc.resolve_safe();
+	m_write_vrtc.resolve_safe();
 
 	// allocate timers
 	m_hrtc_on_timer = timer_alloc(TIMER_HRTC_ON);
@@ -172,7 +153,7 @@ void i8275x_device::device_reset()
 
 	m_status &= ~ST_IE;
 
-	m_out_irq_func(CLEAR_LINE);
+	m_write_irq(CLEAR_LINE);
 }
 
 
@@ -191,12 +172,12 @@ void i8275x_device::device_timer(emu_timer &timer, device_timer_id id, int param
 	{
 	case TIMER_HRTC_ON:
 		//logerror("I8275 '%s' y %u x %u HRTC 1\n", tag(), y, x);
-		m_out_hrtc_func(1);
+		m_write_hrtc(1);
 		break;
 
 	case TIMER_DRQ_ON:
 		//logerror("I8275 '%s' y %u x %u DRQ 1\n", tag(), y, x);
-		m_out_drq_func(1);
+		m_write_drq(1);
 		m_drq_off_timer->adjust(clocks_to_attotime(DMA_BURST_COUNT));
 		break;
 
@@ -206,17 +187,17 @@ void i8275x_device::device_timer(emu_timer &timer, device_timer_id id, int param
 			m_status |= ST_DU;
 			m_du = true;
 			//logerror("I8275 '%s' y %u x %u DRQ 0\n", tag(), y, x);
-			m_out_drq_func(0);
+			m_write_drq(0);
 		}
 		else if (m_buffer_idx == CHARACTERS_PER_ROW)
 		{
 			//logerror("I8275 '%s' y %u x %u DRQ 0\n", tag(), y, x);
-			m_out_drq_func(0);
+			m_write_drq(0);
 		}
 		else if (DMA_BURST_SPACE > 0)
 		{
 			//logerror("I8275 '%s' y %u x %u DRQ 0\n", tag(), y, x);
-			m_out_drq_func(0);
+			m_write_drq(0);
 			m_drq_on_timer->adjust(clocks_to_attotime(DMA_BURST_SPACE));
 		}
 		break;
@@ -225,12 +206,12 @@ void i8275x_device::device_timer(emu_timer &timer, device_timer_id id, int param
 		if (!(m_status & ST_VE)) break;
 
 		//logerror("I8275 '%s' y %u x %u HRTC 0\n", tag(), y, x);
-		m_out_hrtc_func(0);
+		m_write_hrtc(0);
 
 		if (m_scanline == 0)
 		{
 			//logerror("I8275 '%s' y %u x %u VRTC 0\n", tag(), y, x);
-			m_out_vrtc_func(0);
+			m_write_vrtc(0);
 		}
 		else if (m_scanline == m_irq_scanline)
 		{
@@ -238,13 +219,13 @@ void i8275x_device::device_timer(emu_timer &timer, device_timer_id id, int param
 			{
 				//logerror("I8275 '%s' y %u x %u IRQ 1\n", tag(), y, x);
 				m_status |= ST_IR;
-				m_out_irq_func(ASSERT_LINE);
+				m_write_irq(ASSERT_LINE);
 			}
 		}
 		else if (m_scanline == m_vrtc_scanline)
 		{
 			//logerror("I8275 '%s' y %u x %u VRTC 1\n", tag(), y, x);
-			m_out_vrtc_func(1);
+			m_write_vrtc(1);
 
 			// reset field attributes
 			m_hlgt = 0;
@@ -346,7 +327,8 @@ void i8275x_device::device_timer(emu_timer &timer, device_timer_id id, int param
 					lc = (lc - 1) & 0x0f;
 				}
 
-				m_display_pixels_func(this, m_bitmap,
+				if (m_display_pixels)
+				m_display_pixels(this, m_bitmap,
 					sx * m_hpixels_per_column, // x position on screen of starting point
 					m_scanline, // y position on screen
 					lc, // current line of char
@@ -383,7 +365,7 @@ READ8_MEMBER( i8275x_device::read )
 		if (m_status & ST_IR)
 		{
 			//logerror("I8275 '%s' IRQ 0\n", tag());
-			m_out_irq_func(CLEAR_LINE);
+			m_write_irq(CLEAR_LINE);
 		}
 
 		m_status &= ~(ST_IR | ST_LP | ST_IC | ST_DU | ST_FO);
@@ -420,7 +402,7 @@ WRITE8_MEMBER( i8275x_device::write )
 
 			m_status &= ~ST_IE;
 			logerror("I8275 '%s' IRQ 0\n", tag());
-			m_out_irq_func(CLEAR_LINE);
+			m_write_irq(CLEAR_LINE);
 
 			m_param_idx = REG_SCN1;
 			m_param_end = REG_SCN4;

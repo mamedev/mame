@@ -33,17 +33,6 @@ static I8275_DISPLAY_PIXELS( crtc_display_pixels )
 	}
 }
 
-static const i8275_interface crtc_intf =
-{
-	8,
-	0,
-	DEVCB_DEVICE_LINE_MEMBER(I8237_TAG, am9517a_device, dreq0_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	crtc_display_pixels
-};
-
 
 //-------------------------------------------------
 //  ADDRESS_MAP( mm1_upd7220_map )
@@ -133,6 +122,6 @@ MACHINE_CONFIG_FRAGMENT( mm1m6_video )
 
 	MCFG_GFXDECODE(mm1)
 
-	MCFG_I8275_ADD(I8275_TAG, XTAL_18_720MHz/8, crtc_intf)
+	MCFG_I8275_ADD(I8275_TAG, XTAL_18_720MHz/8, 8, crtc_display_pixels, DEVWRITELINE(I8237_TAG, am9517a_device, dreq0_w))
 	MCFG_UPD7220_ADD(UPD7220_TAG, XTAL_18_720MHz/8, hgdc_intf, mm1_upd7220_map)
 MACHINE_CONFIG_END
