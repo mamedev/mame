@@ -108,6 +108,9 @@
 #define MCFG_WD1773x_ADD(_tag, _clock)  \
 	MCFG_DEVICE_ADD(_tag, WD1773x, _clock)
 
+#define MCFG_WD_FDC_FORCE_READY \
+	downcast<wd_fdc_t *>(device)->set_force_ready(true);
+
 class wd_fdc_t : public device_t {
 public:
 	typedef delegate<void (bool state)> line_cb;
@@ -120,6 +123,7 @@ public:
 	void setup_drq_cb(line_cb cb);
 	void setup_hld_cb(line_cb cb);
 	void setup_enp_cb(line_cb cb);
+	void set_force_ready(bool force_ready);
 
 	void cmd_w(UINT8 val);
 	UINT8 status_r();
@@ -336,7 +340,7 @@ private:
 
 	emu_timer *t_gen, *t_cmd, *t_track, *t_sector;
 
-	bool dden, status_type_1, intrq, drq, hld, hlt, enp;
+	bool dden, status_type_1, intrq, drq, hld, hlt, enp, force_ready;
 	int main_state, sub_state;
 	UINT8 command, track, sector, data, status, intrq_cond;
 	int last_dir;

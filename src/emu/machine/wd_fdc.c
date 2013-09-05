@@ -61,6 +61,12 @@ const device_type WD1773x = &device_creator<wd1773_t>;
 wd_fdc_t::wd_fdc_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 {
+	force_ready = false;
+}
+
+void wd_fdc_t::set_force_ready(bool _force_ready)
+{
+	force_ready = _force_ready;
 }
 
 void wd_fdc_t::device_start()
@@ -121,8 +127,7 @@ void wd_fdc_t::set_floppy(floppy_image_device *_floppy)
 	int prev_ready = floppy ? floppy->ready_r() : 1;
 
 	if(floppy) {
-		if(motor_control)
-			floppy->mon_w(1);
+		// Warning: deselecting a drive does *not* stop its motor if it was running
 		floppy->setup_index_pulse_cb(floppy_image_device::index_pulse_cb());
 		floppy->setup_ready_cb(floppy_image_device::ready_cb());
 	}
@@ -380,13 +385,15 @@ bool wd_fdc_t::sector_matches() const
 
 bool wd_fdc_t::is_ready()
 {
-	return !ready_hooked || (floppy && !floppy->ready_r());
+	return !ready_hooked || force_ready || (floppy && !floppy->ready_r());
 }
 
 void wd_fdc_t::read_sector_start()
 {
-	if(!is_ready())
+	if(!is_ready()) {
 		command_end();
+		return;
+	}
 
 	main_state = READ_SECTOR;
 	status = (status & ~(S_CRC|S_LOST|S_RNF|S_WP|S_DDM)) | S_BUSY;
@@ -474,8 +481,10 @@ void wd_fdc_t::read_sector_continue()
 
 void wd_fdc_t::read_track_start()
 {
-	if(!is_ready())
+	if(!is_ready()) {
 		command_end();
+		return;
+	}
 
 	main_state = READ_TRACK;
 	status = (status & ~(S_LOST|S_RNF)) | S_BUSY;
@@ -541,8 +550,10 @@ void wd_fdc_t::read_track_continue()
 
 void wd_fdc_t::read_id_start()
 {
-	if(!is_ready())
+	if(!is_ready()) {
 		command_end();
+		return;
+	}
 
 	main_state = READ_ID;
 	status = (status & ~(S_WP|S_DDM|S_LOST|S_RNF)) | S_BUSY;
@@ -606,8 +617,10 @@ void wd_fdc_t::read_id_continue()
 
 void wd_fdc_t::write_track_start()
 {
-	if(!is_ready())
+	if(!is_ready()) {
 		command_end();
+		return;
+	}
 
 	main_state = WRITE_TRACK;
 	status = (status & ~(S_WP|S_DDM|S_LOST|S_RNF)) | S_BUSY;
@@ -702,8 +715,10 @@ void wd_fdc_t::write_track_continue()
 
 void wd_fdc_t::write_sector_start()
 {
-	if(!is_ready())
+	if(!is_ready()) {
 		command_end();
+		return;
+	}
 
 	main_state = WRITE_SECTOR;
 	status = (status & ~(S_CRC|S_LOST|S_RNF|S_WP|S_DDM)) | S_BUSY;
@@ -1451,7 +1466,7 @@ void wd_fdc_t::live_run(attotime limit)
 			if(cur_live.bit_counter & 15)
 				break;
 			int slot = (cur_live.bit_counter >> 4)-1;
-			//          fprintf(stderr, "%s: slot[%d] = %02x  crc = %04x\n", tts(cur_live.tm).cstr(), slot, cur_live.data_reg, cur_live.crc);
+			//			fprintf(stderr, "%s: slot[%d] = %02x  crc = %04x\n", tts(cur_live.tm).cstr(), slot, cur_live.data_reg, cur_live.crc);
 			cur_live.idbuf[slot] = cur_live.data_reg;
 			if(slot == 5) {
 				live_delay(IDLE);
@@ -1895,9 +1910,12 @@ void wd_fdc_t::live_run(attotime limit)
 
 void wd_fdc_t::set_drq()
 {
-	if(drq)
+	if(drq) {
 		status |= S_LOST;
-	else {
+		drq = false;
+		if(!drq_cb.isnull())
+			drq_cb(false);
+	} else if(!(status & S_LOST)) {
 		drq = true;
 		if(!drq_cb.isnull())
 			drq_cb(true);

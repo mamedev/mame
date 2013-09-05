@@ -72,7 +72,7 @@ WRITE8_MEMBER( kaypro_state::common_pio_system_w )
 
 	if (m_floppy)
 	{
-		m_floppy->mon_w(BIT(data, 6) ? 0 : 1); // motor on
+		m_floppy->mon_w(BIT(data, 6)); // motor on
 	}
 
 	output_set_value("ledA", BIT(data, 0));     /* LEDs in artwork */
@@ -300,7 +300,7 @@ void kaypro_state::fdc_intrq_w (bool state)
 //WRITE_LINE_MEMBER( kaypro_state::kaypro_fdc_intrq_w )
 {
 	if (state)
-		timer_set(attotime::from_usec(25), TIMER_FLOPPY);
+		timer_set(attotime::zero, TIMER_FLOPPY);
 	else
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
@@ -309,7 +309,7 @@ void kaypro_state::fdc_drq_w (bool state)
 //WRITE_LINE_MEMBER( kaypro_state::kaypro_fdc_drq_w )
 {
 	if (state)
-		timer_set(attotime::from_usec(25), TIMER_FLOPPY);
+		timer_set(attotime::zero, TIMER_FLOPPY);
 	else
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 
