@@ -13,11 +13,7 @@ power supply and serial terminal.
 The later versions included a SCSI chip (NCR5380) enabling the use
 of a hard drive of up to 88MB.
 
-Status: The system will start up into the monitor, as long as no disk
-        has been mounted.
-
 ToDo:
-- Fix fdc so that command 0xc0 works.
 - (maybe) add scsi interface
 - Add printer
 
@@ -231,4 +227,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    CLASS          INIT     COMPANY       FULLNAME       FLAGS */
-COMP( 1980, ampro,  0,      0,       ampro,     ampro,   ampro_state,   ampro,  "Ampro", "Little Z80 Board", GAME_NOT_WORKING | GAME_NO_SOUND_HW)
+COMP( 1980, ampro,  0,      0,       ampro,     ampro,   ampro_state,   ampro,  "Ampro", "Little Z80 Board", GAME_NO_SOUND_HW)
