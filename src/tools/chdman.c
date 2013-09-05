@@ -69,8 +69,6 @@ const int MODE_NORMAL = 0;
 const int MODE_CUEBIN = 1;
 const int MODE_GDI = 2;
 
-INT32 g_finds = 0;
-
 // command modifier
 #define REQUIRED "~"
 
