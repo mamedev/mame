@@ -15,66 +15,48 @@
 
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
 
-struct pps4_state
+const device_type PPS4 = &device_creator<pps4_device>;
+
+
+pps4_device::pps4_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: cpu_device(mconfig, PPS4, "PPS4", tag, owner, clock, "pps4", __FILE__ )
+	, m_program_config("program", ENDIANNESS_LITTLE, 8, 12)
+	, m_data_config("data", ENDIANNESS_LITTLE, 8, 12)  // 4bit RAM
+	, m_io_config("io", ENDIANNESS_LITTLE, 8, 8)  // 4bit IO
 {
-	UINT8   A; // Accumulator
-	UINT8   X;
-
-	PAIR    P;
-	PAIR    SA;
-	PAIR    SB;
-	PAIR    B; // BU + BM + BL
-
-	UINT8   C; // Carry flag
-	UINT8   FF1; // Flip-flop 1
-	UINT8   FF2; // Flip-flop 2
-
-	legacy_cpu_device *device;
-	address_space *program;
-	direct_read_data *direct;
-	address_space *data;
-	address_space *io;
-
-	int                 icount;
-};
-
-/***************************************************************************
-    INLINE FUNCTIONS
-***************************************************************************/
-
-INLINE pps4_state *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == PPS4);
-	return (pps4_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
-INLINE UINT8 ROP(pps4_state *cpustate)
+
+offs_t pps4_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
 {
-	UINT8 retVal = cpustate->direct->read_decrypted_byte(cpustate->P.w.l);
-	cpustate->P.w.l = (cpustate->P.w.l + 1) & 0x0fff;
+	extern CPU_DISASSEMBLE( pps4 );
+	return CPU_DISASSEMBLE_NAME(pps4)(this, buffer, pc, oprom, opram, options);
+}
+
+
+inline UINT8 pps4_device::ROP()
+{
+	UINT8 retVal = m_direct->read_decrypted_byte(m_P.w.l);
+	m_P.w.l = (m_P.w.l + 1) & 0x0fff;
 	return retVal;
 }
 
-INLINE UINT8 ARG(pps4_state *cpustate)
+inline UINT8 pps4_device::ARG()
 {
-	UINT8 retVal = cpustate->direct->read_raw_byte(cpustate->P.w.l);
-	cpustate->P.w.l = (cpustate->P.w.l + 1) & 0x0fff;
+	UINT8 retVal = m_direct->read_raw_byte(m_P.w.l);
+	m_P.w.l = (m_P.w.l + 1) & 0x0fff;
 	return retVal;
 }
 
-INLINE void DO_SKIP(pps4_state *cpustate)
+inline void pps4_device::DO_SKIP()
 {
-	cpustate->P.w.l = (cpustate->P.w.l + 1) & 0x0fff;
+	m_P.w.l = (m_P.w.l + 1) & 0x0fff;
 }
 
-static void execute_one(pps4_state *cpustate, int opcode)
+void pps4_device::execute_one(int opcode)
 {
-	cpustate->icount -= 1;
+	m_icount -= 1;
 	switch (opcode)
 	{
 		// Arithmetic instructions
@@ -93,7 +75,7 @@ static void execute_one(pps4_state *cpustate, int opcode)
 					// ADI
 					break;
 		case 0x65:  //DC
-					cpustate->A = (cpustate->A + 10) & 0x0f;
+					m_A = (m_A + 10) & 0x0f;
 					break;
 		// Logical instructions
 		case 0x0d:  // AND
@@ -103,26 +85,26 @@ static void execute_one(pps4_state *cpustate, int opcode)
 		case 0x0c:  // EOR
 					break;
 		case 0x0e:  // COMP
-					cpustate->A ^= 0x0f;
+					m_A ^= 0x0f;
 					break;
 		// Data transfer instructions
 		case 0x20:  // SC
-					cpustate->C = 1;
+					m_C = 1;
 					break;
 		case 0x24:  //RC
-					cpustate->C = 0;
+					m_C = 0;
 					break;
 		case 0x22:  // SF1
-					cpustate->FF1 = 1;
+					m_FF1 = 1;
 					break;
 		case 0x26:  // RF1
-					cpustate->FF1 = 0;
+					m_FF1 = 0;
 					break;
 		case 0x21:  // SF2
-					cpustate->FF2 = 1;
+					m_FF2 = 1;
 					break;
 		case 0x25:  // RF2
-					cpustate->FF2 = 0;
+					m_FF2 = 0;
 					break;
 		case 0x30:  case 0x31:  case 0x32:  case 0x33:
 		case 0x34:  case 0x35:  case 0x36:  case 0x37:
@@ -141,51 +123,51 @@ static void execute_one(pps4_state *cpustate, int opcode)
 		case 0x78:  case 0x79:  case 0x7a:  case 0x7b:
 		case 0x7c:  case 0x7d:  case 0x7e:  case 0x7f:
 					// LDI
-					cpustate->A = opcode & 0x0f;
+					m_A = opcode & 0x0f;
 					break;
 		case 0x12:  // LAX
-					cpustate->A = cpustate->X;
+					m_A = m_X;
 					break;
 		case 0x1b:  // LXA
-					cpustate->X = cpustate->A;
+					m_X = m_A;
 					break;
 		case 0x11:  // LABL
-					cpustate->A = cpustate->B.w.l & 0x00f;
+					m_A = m_B.w.l & 0x00f;
 					break;
 		case 0x10:  // LBMX
-					cpustate->B.w.l &= 0xf0f;
-					cpustate->B.w.l |= (cpustate->X << 4);
+					m_B.w.l &= 0xf0f;
+					m_B.w.l |= (m_X << 4);
 					break;
 		case 0x04:  // LBUA
 					break;
 		case 0x19:  // XABL
 					{
-						UINT8 tmp = cpustate->B.w.l & 0x00f;
-						cpustate->B.w.l &= 0xff0;
-						cpustate->B.w.l |= cpustate->A;
-						cpustate->A = tmp;
+						UINT8 tmp = m_B.w.l & 0x00f;
+						m_B.w.l &= 0xff0;
+						m_B.w.l |= m_A;
+						m_A = tmp;
 					}
 					break;
 		case 0x18:  // XBMX
 					{
-						UINT8 tmp = (cpustate->B.w.l & 0x0f0) >> 4;
-						cpustate->B.w.l &= 0xf0f;
-						cpustate->B.w.l |= (cpustate->X << 4);
-						cpustate->X = tmp;
+						UINT8 tmp = (m_B.w.l & 0x0f0) >> 4;
+						m_B.w.l &= 0xf0f;
+						m_B.w.l |= (m_X << 4);
+						m_X = tmp;
 					}
 					break;
 		case 0x1a:  // XAX
 					{
-						UINT8 tmp = cpustate->A;
-						cpustate->A = cpustate->X;
-						cpustate->X = tmp;
+						UINT8 tmp = m_A;
+						m_A = m_X;
+						m_X = tmp;
 					}
 					break;
 		case 0x06:  // XS
 					{
-						PAIR tmp = cpustate->SA;
-						cpustate->SA = cpustate->SB;
-						cpustate->SB = tmp;
+						PAIR tmp = m_SA;
+						m_SA = m_SB;
+						m_SB = tmp;
 					}
 					break;
 		case 0x6f:  // CYS
@@ -196,31 +178,31 @@ static void execute_one(pps4_state *cpustate, int opcode)
 		case 0xcc:  case 0xcd:  case 0xce:  case 0xcf:
 					// LB
 					{
-						//UINT8 tmp = ARG(cpustate);
-						cpustate->icount -= 1;
+						//UINT8 tmp = ARG();
+						m_icount -= 1;
 					}
 					break;
 		case 0x00:  // LBL
 					{
-						UINT8 tmp = ARG(cpustate);
-						cpustate->icount -= 1;
-						cpustate->B.w.l = tmp;
+						UINT8 tmp = ARG();
+						m_icount -= 1;
+						m_B.w.l = tmp;
 					}
 					break;
 		case 0x17:  // INCB
-					if ((cpustate->B.w.l & 0x0f) == 0x0f) {
-						cpustate->B.w.l &= 0xff0;
-						DO_SKIP(cpustate);
+					if ((m_B.w.l & 0x0f) == 0x0f) {
+						m_B.w.l &= 0xff0;
+						DO_SKIP();
 					} else {
-						cpustate->B.w.l += 1;
+						m_B.w.l += 1;
 					}
 					break;
 		case 0x1f:  // DECB
-					if ((cpustate->B.w.l & 0x0f) == 0x00) {
-						cpustate->B.w.l |= 0x00f;
-						DO_SKIP(cpustate);
+					if ((m_B.w.l & 0x0f) == 0x00) {
+						m_B.w.l |= 0x00f;
+						DO_SKIP();
 					} else {
-						cpustate->B.w.l -= 1;
+						m_B.w.l -= 1;
 					}
 					break;
 		// Control transfer instructions
@@ -241,7 +223,7 @@ static void execute_one(pps4_state *cpustate, int opcode)
 		case 0xb8:  case 0xb9:  case 0xba:  case 0xbb:
 		case 0xbc:  case 0xbd:  case 0xbe:  case 0xbf:
 					// T
-					cpustate->P.w.l = (cpustate->P.w.l & 0xfc0) | (opcode & 0x3f);
+					m_P.w.l = (m_P.w.l & 0xfc0) | (opcode & 0x3f);
 					break;
 		case 0xd0:  case 0xd1:  case 0xd2:  case 0xd3:
 		case 0xd4:  case 0xd5:  case 0xd6:  case 0xd7:
@@ -263,15 +245,15 @@ static void execute_one(pps4_state *cpustate, int opcode)
 		case 0x5c:  case 0x5d:  case 0x5e:  case 0x5f:
 					// TL
 					{
-						//UINT8 tmp = ARG(cpustate);
-						cpustate->icount -= 1;
+						//UINT8 tmp = ARG();
+						m_icount -= 1;
 					}
 					break;
 		case 0x01:  case 0x02:  case 0x03:
 					// TML
 					{
-						//UINT8 tmp = ARG(cpustate);
-						cpustate->icount -= 1;
+						//UINT8 tmp = ARG();
+						m_icount -= 1;
 					}
 					break;
 		case 0x15:  // SKC
@@ -295,8 +277,8 @@ static void execute_one(pps4_state *cpustate, int opcode)
 		// Input/Output instructions
 		case 0x1c:  // IOL
 					{
-						//UINT8 tmp = ARG(cpustate);
-						cpustate->icount -= 1;
+						//UINT8 tmp = ARG();
+						m_icount -= 1;
 					}
 					break;
 		case 0x27:  // DIA
@@ -315,140 +297,74 @@ static void execute_one(pps4_state *cpustate, int opcode)
 /***************************************************************************
     COMMON EXECUTION
 ***************************************************************************/
-static CPU_EXECUTE( pps4 )
+void pps4_device::execute_run()
 {
-	pps4_state *cpustate = get_safe_token(device);
-
 	do
 	{
-		debugger_instruction_hook(device, cpustate->P.d);
-		execute_one(cpustate, ROP(cpustate));
+		debugger_instruction_hook(this, m_P.d);
+		execute_one(ROP());
 
-	} while (cpustate->icount > 0);
+	} while (m_icount > 0);
 }
 
 /***************************************************************************
     CORE INITIALIZATION
 ***************************************************************************/
 
-static CPU_INIT( pps4 )
+void pps4_device::device_start()
 {
-	pps4_state *cpustate = get_safe_token(device);
+	m_program = &space(AS_PROGRAM);
+	m_direct = &m_program->direct();
+	m_data = &space(AS_DATA);
+	m_io = &space(AS_IO);
 
-	cpustate->device = device;
+	save_item(NAME(m_A));
+	save_item(NAME(m_X));
+	save_item(NAME(m_P));
+	save_item(NAME(m_SA));
+	save_item(NAME(m_SB));
+	save_item(NAME(m_B));
+	save_item(NAME(m_C));
+	save_item(NAME(m_FF1));
+	save_item(NAME(m_FF2));
 
-	cpustate->program = &device->space(AS_PROGRAM);
-	cpustate->direct = &cpustate->program->direct();
-	cpustate->data = &device->space(AS_DATA);
-	cpustate->io = &device->space(AS_IO);
+	state_add( PPS4_PC, "PC", m_P.d ).mask(0xfff).formatstr("%03X");
+	state_add( PPS4_A,  "A",  m_A ).formatstr("%02X");  // TODO: size?
+	state_add( PPS4_X,  "X",  m_X ).formatstr("%02X");  // TODO: size?
+	state_add( PPS4_SA, "SA", m_SA.d ).formatstr("%04X");  // TODO: size?
+	state_add( PPS4_SB, "SB", m_SB.d ).formatstr("%04X");  // TODO: size?
+	state_add( PPS4_B,  "B",  m_B.d ).formatstr("%04X"); // TODO: size?
+	state_add( STATE_GENPC, "GENPC", m_P.d ).noshow();
+	state_add( STATE_GENFLAGS, "GENFLAGS", m_C ).formatstr("%3s").noshow();
 
-	device->save_item(NAME(cpustate->A));
-	device->save_item(NAME(cpustate->X));
-	device->save_item(NAME(cpustate->P));
-	device->save_item(NAME(cpustate->SA));
-	device->save_item(NAME(cpustate->SB));
-	device->save_item(NAME(cpustate->B));
-	device->save_item(NAME(cpustate->C));
-	device->save_item(NAME(cpustate->FF1));
-	device->save_item(NAME(cpustate->FF2));
+	m_icountptr = &m_icount;
+}
+
+void pps4_device::state_string_export(const device_state_entry &entry, astring &string)
+{
+	switch (entry.index())
+	{
+		case STATE_GENFLAGS:
+			string.printf("%c%c%c",
+				m_C ? 'C':'.',
+				m_FF1 ? '1':'.',
+				m_FF2 ? '2':'.');
+			break;
+	}
 }
 
 /***************************************************************************
     COMMON RESET
 ***************************************************************************/
 
-static CPU_RESET( pps4 )
+void pps4_device::device_reset()
 {
-	pps4_state *cpustate = get_safe_token(device);
+	m_A = m_X = 0;
+	m_C = m_FF1 = m_FF2 = 0;
 
-	cpustate->A = cpustate->X = 0;
-	cpustate->C = cpustate->FF1 = cpustate->FF2 = 0;
-
-	cpustate->P.d = 0;
-	cpustate->SA.d = 0;
-	cpustate->SB.d = 0;
-	cpustate->B.d = 0;
+	m_P.d = 0;
+	m_SA.d = 0;
+	m_SB.d = 0;
+	m_B.d = 0;
 }
 
-/***************************************************************************
-    COMMON STATE IMPORT/EXPORT
-***************************************************************************/
-
-static CPU_IMPORT_STATE( pps4 )
-{
-}
-
-static CPU_EXPORT_STATE( pps4 )
-{
-}
-
-/***************************************************************************
-    COMMON SET INFO
-***************************************************************************/
-static CPU_SET_INFO( pps4 )
-{
-}
-
-/***************************************************************************
-    PPS4 GET INFO
-***************************************************************************/
-
-CPU_GET_INFO( pps4 )
-{
-	pps4_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:                  info->i = sizeof(pps4_state);           break;
-		case CPUINFO_INT_INPUT_LINES:                   info->i = 0;                            break;
-		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:            info->i = 0;                            break;
-		case CPUINFO_INT_ENDIANNESS:                    info->i = ENDIANNESS_LITTLE;            break;
-		case CPUINFO_INT_CLOCK_MULTIPLIER:              info->i = 1;                            break;
-		case CPUINFO_INT_CLOCK_DIVIDER:                 info->i = 1;                            break;
-		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:         info->i = 1;                            break;
-		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:         info->i = 2;                            break;
-		case CPUINFO_INT_MIN_CYCLES:                    info->i = 1;                            break;
-		case CPUINFO_INT_MAX_CYCLES:                    info->i = 2;                            break;
-
-		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:            info->i = 8;                            break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:        info->i = 12;                           break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM:        info->i = 0;                            break;
-
-		case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:           info->i = 8;                            break; // 4 bit for RAM
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:           info->i = 12;                           break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:           info->i = 0;                            break;
-
-		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:             info->i = 8;                            break; // 4 bit
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:             info->i = 8;                            break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:             info->i = 0;                            break;
-
-		/* --- the following bits of info are returned as pointers to functions --- */
-		case CPUINFO_FCT_SET_INFO:      info->setinfo = CPU_SET_INFO_NAME(pps4);                break;
-		case CPUINFO_FCT_INIT:          info->init = CPU_INIT_NAME(pps4);                       break;
-		case CPUINFO_FCT_RESET:         info->reset = CPU_RESET_NAME(pps4);                 break;
-		case CPUINFO_FCT_EXECUTE:       info->execute = CPU_EXECUTE_NAME(pps4);             break;
-		case CPUINFO_FCT_DISASSEMBLE:   info->disassemble = CPU_DISASSEMBLE_NAME(pps4);     break;
-		case CPUINFO_FCT_IMPORT_STATE:  info->import_state = CPU_IMPORT_STATE_NAME(pps4);       break;
-		case CPUINFO_FCT_EXPORT_STATE:  info->export_state = CPU_EXPORT_STATE_NAME(pps4);       break;
-
-		/* --- the following bits of info are returned as pointers --- */
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:           info->icount = &cpustate->icount;       break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:                      strcpy(info->s, "PPS4");                break;
-		case CPUINFO_STR_SHORTNAME:                 strcpy(info->s, "pps4");                break;
-		case CPUINFO_STR_FAMILY:                    strcpy(info->s, "Rockwell PPS-4");          break;
-		case CPUINFO_STR_VERSION:                   strcpy(info->s, "1.0");                 break;
-		case CPUINFO_STR_SOURCE_FILE:               strcpy(info->s, __FILE__);              break;
-		case CPUINFO_STR_CREDITS:                   strcpy(info->s, "Copyright Miodrag Milanovic"); break;
-
-		case CPUINFO_STR_FLAGS:
-			sprintf(info->s, "%c%c%c",
-				cpustate->C ? 'C':'.',
-				cpustate->FF1 ? '1':'.',
-				cpustate->FF2 ? '2':'.');
-			break;
-	}
-}
-
-DEFINE_LEGACY_CPU_DEVICE(PPS4, pps4);
