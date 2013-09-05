@@ -583,10 +583,6 @@ public:
 	DECLARE_WRITE8_MEMBER(tlcs_common_w);
 	DECLARE_READ8_MEMBER(tlcs_rtc_r);
 	DECLARE_WRITE8_MEMBER(tlcs_rtc_w);
-	DECLARE_WRITE8_MEMBER(tlcs900_to1);
-	DECLARE_WRITE8_MEMBER(tlcs900_to3);
-	DECLARE_READ8_MEMBER(tlcs900_port_read);
-	DECLARE_WRITE8_MEMBER(tlcs900_port_write);
 
 	UINT8 m_rtcdata[8];
 
@@ -2406,55 +2402,6 @@ WRITE8_MEMBER(taitotz_state::tlcs_ide1_w)
 	}
 }
 
-READ8_MEMBER(taitotz_state::tlcs900_port_read)
-{
-	switch (offset)
-	{
-		case 0x7: return 0;     // ???
-		case 0x9: return ioport("INPUTS1")->read();
-		case 0xa: return 0;     // ???
-		case 0xb: return ioport("INPUTS2")->read();
-		case 0xd: return ioport("INPUTS3")->read();
-		case 0xe: return ioport("INPUTS4")->read();
-
-		default:
-			//printf("tlcs900_port_read %02X\n", offset);
-			break;
-	}
-
-	return 0;
-}
-
-WRITE8_MEMBER(taitotz_state::tlcs900_port_write)
-{
-	switch (offset)
-	{
-		case 0x7:
-			//if (data != 0xff && data != 0xfa && data != 0xfe)
-			//  printf("tlcs900_port_write %02X, %02X\n", offset, data);
-			break;
-
-		case 0x8:
-			if (data & 1)
-			{
-				//m_mbox_ram[0x17] = 0x55;
-			}
-			break;
-
-		case 0x9:
-			//if (data != 0x00)
-			//  printf("tlcs900_port_write %02X, %02X\n", offset, data);
-			break;
-
-		case 0xb:
-			break;
-
-		default:
-			printf("tlcs900_port_write %02X, %02X\n", offset, data);
-			break;
-	}
-}
-
 // TLCS900 interrupt vectors
 // 0xfc0150:    Reset
 // 0xfc0120:    SWI1-7          -
@@ -2502,15 +2449,6 @@ static ADDRESS_MAP_START( landhigh_tlcs900h_mem, AS_PROGRAM, 8, taitotz_state)
 	AM_RANGE(0xfc0000, 0xffffff) AM_ROM AM_REGION("io_cpu", 0)
 ADDRESS_MAP_END
 
-
-
-WRITE8_MEMBER(taitotz_state::tlcs900_to1)
-{
-}
-
-WRITE8_MEMBER(taitotz_state::tlcs900_to3)
-{
-}
 
 
 static INPUT_PORTS_START( taitotz )
@@ -2820,7 +2758,11 @@ static MACHINE_CONFIG_START( taitotz, taitotz_state )
 
 	/* TMP95C063F I/O CPU */
 	MCFG_CPU_ADD("iocpu", TMP95C063, 25000000)
-	MCFG_TLCS900_CONFIG( WRITE8(taitotz_state,tlcs900_to1), WRITE8(taitotz_state,tlcs900_to3), READ8(taitotz_state,tlcs900_port_read), WRITE8(taitotz_state,tlcs900_port_write) )
+	MCFG_TMP95C063_PORT9_READ(IOPORT("INPUTS1"))
+	MCFG_TMP95C063_PORTB_READ(IOPORT("INPUTS2"))
+	MCFG_TMP95C063_PORTD_READ(IOPORT("INPUTS3"))
+	MCFG_TMP95C063_PORTE_READ(IOPORT("INPUTS4"))
+
 	MCFG_CPU_PROGRAM_MAP(tlcs900h_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitotz_state,  taitotz_vbi)
 

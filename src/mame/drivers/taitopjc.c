@@ -81,8 +81,6 @@ public:
 	DECLARE_WRITE8_MEMBER(tlcs_common_w);
 	DECLARE_READ8_MEMBER(tlcs_sound_r);
 	DECLARE_WRITE8_MEMBER(tlcs_sound_w);
-	DECLARE_WRITE8_MEMBER(taitopjc_tlcs900_to1);
-	DECLARE_WRITE8_MEMBER(taitopjc_tlcs900_to3);
 	virtual void video_start();
 	UINT32 screen_update_taitopjc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
@@ -387,15 +385,6 @@ ADDRESS_MAP_END
 
 
 
-WRITE8_MEMBER(taitopjc_state::taitopjc_tlcs900_to1)
-{
-}
-
-WRITE8_MEMBER(taitopjc_state::taitopjc_tlcs900_to3)
-{
-}
-
-
 static INPUT_PORTS_START( taitopjc )
 INPUT_PORTS_END
 
@@ -414,8 +403,7 @@ static MACHINE_CONFIG_START( taitopjc, taitopjc_state )
 	MCFG_CPU_PROGRAM_MAP(ppc603e_mem)
 
 	/* TMP95C063F I/O CPU */
-	MCFG_CPU_ADD("iocpu", TLCS900H, 25000000)
-	MCFG_TLCS900_CONFIG( WRITE8(taitopjc_state,taitopjc_tlcs900_to1), WRITE8(taitopjc_state,taitopjc_tlcs900_to3), NULL, NULL )
+	MCFG_CPU_ADD("iocpu", TMP95C063, 25000000)
 	MCFG_CPU_PROGRAM_MAP(tlcs900h_mem)
 
 	/* TMS320C53 DSP */
