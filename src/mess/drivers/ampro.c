@@ -74,10 +74,7 @@ WRITE8_MEMBER( ampro_state::port00_w )
 	if (BIT(data, 0)) floppy = m_floppy0->get_device();
 	m_fdc->set_floppy(floppy);
 	if (floppy)
-	{
-		floppy->ss_w(BIT(data, 4)); // might need inverting
-		floppy->mon_w(0);
-	}
+		floppy->ss_w(BIT(data, 4));
 }
 
 READ8_MEMBER( ampro_state::io_r )
@@ -216,7 +213,7 @@ static MACHINE_CONFIG_START( ampro, ampro_state )
 	MCFG_Z80DART_ADD("z80dart",  XTAL_16MHz / 4, dart_intf )
 	MCFG_RS232_PORT_ADD("rs232", rs232_intf, default_rs232_devices, "serial_terminal")
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc_tick", ampro_state, ctc_tick, attotime::from_hz(XTAL_16MHz / 8))
-	MCFG_WD1772x_ADD("fdc", XTAL_16MHz / 16)
+	MCFG_WD1772x_ADD("fdc", XTAL_16MHz / 2)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ampro_floppies, "525dd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
 
