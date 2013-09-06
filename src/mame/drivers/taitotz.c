@@ -551,7 +551,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_iocpu;
 	required_shared_ptr<UINT64> m_work_ram;
-	required_shared_ptr<UINT8>  m_mbox_ram;
+	required_shared_ptr<UINT16> m_mbox_ram;
 	required_device<ata_interface_device> m_ata;
 
 	DECLARE_READ64_MEMBER(ppc_common_r);
@@ -608,10 +608,8 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_taitotz(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(taitotz_vbi);
-	DECLARE_READ8_MEMBER(tlcs_ide0_r);
-	DECLARE_WRITE8_MEMBER(tlcs_ide0_w);
-	DECLARE_READ8_MEMBER(tlcs_ide1_r);
-	DECLARE_WRITE8_MEMBER(tlcs_ide1_w);
+	DECLARE_READ16_MEMBER(tlcs_ide0_r);
+	DECLARE_READ16_MEMBER(tlcs_ide1_r);
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
 	void taitotz_exit();
 	void draw_tile(taitotz_state *state, UINT32 pos, UINT32 tile);
@@ -2304,102 +2302,22 @@ WRITE8_MEMBER(taitotz_state::tlcs_rtc_w)
 	}
 }
 
-READ8_MEMBER(taitotz_state::tlcs_ide0_r)
+READ16_MEMBER(taitotz_state::tlcs_ide0_r)
 {
-	int reg = offset >> 1;
-
-	if (reg == 0)
-	{
-		if ((offset & 1) == 0)
-		{
-			ide_cs0_latch_r = m_ata->read_cs0(space, reg, 0xffff);
-			return (ide_cs0_latch_r & 0xff);
-		}
-		else
-		{
-			return (ide_cs0_latch_r >> 8) & 0xff;
-		}
-	}
-	else
-	{
-		if (offset & 1)
-			fatalerror("tlcs_ide0_r: %02X, odd offset\n", offset);
-
-		UINT8 d = m_ata->read_cs0(space, reg, 0xff);
-		if (reg == 7)
-			d &= ~0x2;      // Type Zero doesn't like the index bit. It's defined as vendor-specific, so it probably shouldn't be up...
-							// The status check explicitly checks for 0x50 (drive ready, seek complete).
-		return d;
-	}
-}
-
-WRITE8_MEMBER(taitotz_state::tlcs_ide0_w)
-{
-	int reg = offset >> 1;
-
-	if (reg == 7 || reg == 0)
-	{
-		if ((offset & 1) == 0)
-		{
-			ide_cs0_latch_w &= 0xff00;
-			ide_cs0_latch_w |= data;
-		}
-		else
-		{
-			ide_cs0_latch_w &= 0x00ff;
-			ide_cs0_latch_w |= (UINT16)(data) << 8;
-			m_ata->write_cs0(space, reg, ide_cs0_latch_w, 0xffff);
-		}
-	}
-	else
-	{
-		if (offset & 1)
-			fatalerror("tlcs_ide0_w: %02X, %02X, odd offset\n", offset, data);
-		m_ata->write_cs0(space, reg, data, 0xff);
-	}
-}
-
-READ8_MEMBER(taitotz_state::tlcs_ide1_r)
-{
-	int reg = offset >> 1;
-
-	if (reg != 6)
-		fatalerror("tlcs_ide1_r: %02X\n", offset);
-
-	if ((offset & 1) == 0)
-	{
-		UINT8 d = m_ata->read_cs1(space, reg, 0xff);
+	UINT16 d = m_ata->read_cs0(space, offset, mem_mask);
+	if (offset == 7)
 		d &= ~0x2;      // Type Zero doesn't like the index bit. It's defined as vendor-specific, so it probably shouldn't be up...
 						// The status check explicitly checks for 0x50 (drive ready, seek complete).
-		return d;
-	}
-	else
-	{
-		//fatalerror("tlcs_ide1_r: %02X, odd offset\n", offset);
-		UINT8 d = m_ata->read_cs1(space, reg, 0xff);
-		d &= ~0x2;
-		return d;
-	}
+	return d;
 }
 
-WRITE8_MEMBER(taitotz_state::tlcs_ide1_w)
+READ16_MEMBER(taitotz_state::tlcs_ide1_r)
 {
-	int reg = offset >> 1;
-
-	if (reg != 6)
-		fatalerror("tlcs_ide1_w: %02X, %02X\n", offset, data);
-
-	if ((offset & 1) == 0)
-	{
-		ide_cs1_latch_w &= 0xff00;
-		ide_cs1_latch_w |= data;
-	}
-	else
-	{
-		ide_cs1_latch_w &= 0x00ff;
-		ide_cs1_latch_w |= (UINT16)(data) << 16;
-		m_ata->write_cs1(space, reg, ide_cs1_latch_w, 0xffff);
-	}
+	UINT16 d = m_ata->read_cs1(space, offset, mem_mask);
+	if (offset == 6)
+		d &= ~0x2;      // Type Zero doesn't like the index bit. It's defined as vendor-specific, so it probably shouldn't be up...
+						// The status check explicitly checks for 0x50 (drive ready, seek complete).
+	return d;
 }
 
 // TLCS900 interrupt vectors
@@ -2427,25 +2345,25 @@ WRITE8_MEMBER(taitotz_state::tlcs_ide1_w)
 // 0xfc0d55:    INTRX1          Serial 1 receive
 // 0xfc0ce1:    INTTX1          Serial 1 transmit
 
-static ADDRESS_MAP_START( tlcs900h_mem, AS_PROGRAM, 8, taitotz_state)
+static ADDRESS_MAP_START( tlcs900h_mem, AS_PROGRAM, 16, taitotz_state)
 	AM_RANGE(0x010000, 0x02ffff) AM_RAM                                                     // Work RAM
 	AM_RANGE(0x040000, 0x041fff) AM_RAM AM_SHARE("nvram")                                   // Backup RAM
-	AM_RANGE(0x044000, 0x04400f) AM_READWRITE(tlcs_rtc_r, tlcs_rtc_w)
-	AM_RANGE(0x060000, 0x061fff) AM_READWRITE(tlcs_common_r, tlcs_common_w)
+	AM_RANGE(0x044000, 0x04400f) AM_READWRITE8(tlcs_rtc_r, tlcs_rtc_w, 0xffff)
+	AM_RANGE(0x060000, 0x061fff) AM_READWRITE8(tlcs_common_r, tlcs_common_w, 0xffff)
 	AM_RANGE(0x064000, 0x064fff) AM_RAM AM_SHARE("mbox_ram")                                // MBox
-	AM_RANGE(0x068000, 0x06800f) AM_READWRITE(tlcs_ide0_r, tlcs_ide0_w)
-	AM_RANGE(0x06c000, 0x06c00f) AM_READWRITE(tlcs_ide1_r, tlcs_ide1_w)
+	AM_RANGE(0x068000, 0x06800f) AM_DEVWRITE("ata", ata_interface_device, write_cs0) AM_READ(tlcs_ide0_r)
+	AM_RANGE(0x06c000, 0x06c00f) AM_DEVWRITE("ata", ata_interface_device, write_cs1) AM_READ(tlcs_ide1_r)
 	AM_RANGE(0xfc0000, 0xffffff) AM_ROM AM_REGION("io_cpu", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( landhigh_tlcs900h_mem, AS_PROGRAM, 8, taitotz_state)
+static ADDRESS_MAP_START( landhigh_tlcs900h_mem, AS_PROGRAM, 16, taitotz_state)
 	AM_RANGE(0x200000, 0x21ffff) AM_RAM                                                     // Work RAM
 	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_SHARE("nvram")                                   // Backup RAM
-	AM_RANGE(0x404000, 0x40400f) AM_READWRITE(tlcs_rtc_r, tlcs_rtc_w)
-	AM_RANGE(0x900000, 0x901fff) AM_READWRITE(tlcs_common_r, tlcs_common_w)
+	AM_RANGE(0x404000, 0x40400f) AM_READWRITE8(tlcs_rtc_r, tlcs_rtc_w, 0xffff)
+	AM_RANGE(0x900000, 0x901fff) AM_READWRITE8(tlcs_common_r, tlcs_common_w, 0xffff)
 	AM_RANGE(0x910000, 0x910fff) AM_RAM AM_SHARE("mbox_ram")                                // MBox
-	AM_RANGE(0x908000, 0x90800f) AM_READWRITE(tlcs_ide0_r, tlcs_ide0_w)
-	AM_RANGE(0x918000, 0x91800f) AM_READWRITE(tlcs_ide1_r, tlcs_ide1_w)
+	AM_RANGE(0x908000, 0x90800f) AM_DEVWRITE("ata", ata_interface_device, write_cs0) AM_READ(tlcs_ide0_r)
+	AM_RANGE(0x918000, 0x91800f) AM_DEVWRITE("ata", ata_interface_device, write_cs1) AM_READ(tlcs_ide1_r)
 	AM_RANGE(0xfc0000, 0xffffff) AM_ROM AM_REGION("io_cpu", 0)
 ADDRESS_MAP_END
 
@@ -2758,10 +2676,10 @@ static MACHINE_CONFIG_START( taitotz, taitotz_state )
 
 	/* TMP95C063F I/O CPU */
 	MCFG_CPU_ADD("iocpu", TMP95C063, 25000000)
-	MCFG_TMP95C063_PORT9_READ(IOPORT("INPUTS1"))
-	MCFG_TMP95C063_PORTB_READ(IOPORT("INPUTS2"))
-	MCFG_TMP95C063_PORTD_READ(IOPORT("INPUTS3"))
-	MCFG_TMP95C063_PORTE_READ(IOPORT("INPUTS4"))
+	MCFG_TMP95C063_PORT9_WRITE(IOPORT("INPUTS1"))
+	MCFG_TMP95C063_PORTB_WRITE(IOPORT("INPUTS2"))
+	MCFG_TMP95C063_PORTD_WRITE(IOPORT("INPUTS3"))
+	MCFG_TMP95C063_PORTE_WRITE(IOPORT("INPUTS4"))
 
 	MCFG_CPU_PROGRAM_MAP(tlcs900h_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitotz_state,  taitotz_vbi)

@@ -41,12 +41,17 @@ extern const device_type TMP95C061;
 extern const device_type TMP95C063;
 
 
+#define MCFG_TLCS900H_AM8_16( am8_16 ) tlcs900h_device::set_am8_16( *device, am8_16 );
+
 class tlcs900h_device : public cpu_device
 {
 public:
 	// construction/destruction
 	tlcs900h_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	tlcs900h_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, address_map_constructor internal_map);
+	tlcs900h_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname);
+
+	// static configuration helpers
+	static void set_am8_16(device_t &device, int am8_16) { downcast<tlcs900h_device &>(device).m_am8_16 = am8_16; }
 
 protected:
 	// device-level overrides
@@ -73,7 +78,15 @@ protected:
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
 
 protected:
+	int m_am8_16;
 	address_space_config m_program_config;
+
+	UINT8 RDMEM(offs_t addr) { return m_program->read_byte( addr ); }
+	UINT16 RDMEMW(offs_t addr) { return m_program->read_word( addr ); }
+	UINT32 RDMEML(offs_t addr) { return m_program->read_dword( addr ); }
+	void WRMEM(offs_t addr, UINT8 data) { m_program->write_byte( addr, data ); }
+	void WRMEMW(offs_t addr,UINT16 data) { m_program->write_word( addr, data ); }
+	void WRMEML(offs_t addr,UINT32 data) { m_program->write_dword( addr, data ); }
 
 	/* registers */
 	PAIR    m_xwa[4];
@@ -645,8 +658,10 @@ public:
 	DECLARE_WRITE8_MEMBER( internal_w );
 
 protected:
+	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
+
 	virtual void execute_set_input(int inputnum, int state);
 	virtual void tlcs900_check_hdma();
 	virtual void tlcs900_check_irqs();
@@ -762,8 +777,10 @@ public:
 	template<class _Object> static devcb2_base &set_porte_write(device_t &device, _Object object) { return downcast<tmp95c063_device &>(device).m_porte_write.set_callback(object); }
 
 protected:
+	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
+
 	virtual void execute_set_input(int inputnum, int state);
 	virtual void tlcs900_check_hdma();
 	virtual void tlcs900_check_irqs();

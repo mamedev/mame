@@ -807,6 +807,7 @@ void ngp_state::nvram_write(emu_file &file)
 static MACHINE_CONFIG_START( ngp_common, ngp_state )
 
 	MCFG_CPU_ADD( "maincpu", TMP95C061, XTAL_6_144MHz )
+	MCFG_TLCS900H_AM8_16(1)
 	MCFG_CPU_PROGRAM_MAP( ngp_mem)
 	MCFG_TMP95C061_PORTA_WRITE(WRITE8(ngp_state,ngp_tlcs900_porta))
 

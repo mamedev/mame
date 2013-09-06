@@ -376,10 +376,10 @@ WRITE8_MEMBER(taitopjc_state::tlcs_sound_w)
 // 0xfc0fb5: INTRX1
 // 0xfc0f41: INTTX1
 
-static ADDRESS_MAP_START( tlcs900h_mem, AS_PROGRAM, 8, taitopjc_state )
+static ADDRESS_MAP_START( tlcs900h_mem, AS_PROGRAM, 16, taitopjc_state )
 	AM_RANGE(0x010000, 0x02ffff) AM_RAM     // Work RAM
-	AM_RANGE(0x040000, 0x0400ff) AM_READWRITE(tlcs_sound_r, tlcs_sound_w)
-	AM_RANGE(0x060000, 0x061fff) AM_READWRITE(tlcs_common_r, tlcs_common_w)
+	AM_RANGE(0x040000, 0x0400ff) AM_READWRITE8(tlcs_sound_r, tlcs_sound_w, 0xffff)
+	AM_RANGE(0x060000, 0x061fff) AM_READWRITE8(tlcs_common_r, tlcs_common_w, 0xffff)
 	AM_RANGE(0xfc0000, 0xffffff) AM_ROM AM_REGION("io_cpu", 0)
 ADDRESS_MAP_END
 

@@ -22,24 +22,32 @@ const device_type TMP95C061 = &device_creator<tmp95c061_device>;
 const device_type TMP95C063 = &device_creator<tmp95c063_device>;
 
 
-static ADDRESS_MAP_START( tmp95c061_mem, AS_PROGRAM, 8, tmp95c061_device )
+static ADDRESS_MAP_START( tmp95c061_mem8, AS_PROGRAM, 8, tmp95c061_device )
 	AM_RANGE( 0x000000, 0x00007f ) AM_READWRITE( internal_r, internal_w )
 ADDRESS_MAP_END
 
-
-static ADDRESS_MAP_START(tmp95c063_mem, AS_PROGRAM, 8, tmp95c063_device )
-	AM_RANGE( 0x000000, 0x00009f ) AM_READWRITE( internal_r, internal_w )
+static ADDRESS_MAP_START( tmp95c061_mem16, AS_PROGRAM, 16, tmp95c061_device )
+	AM_RANGE( 0x000000, 0x00007f ) AM_READWRITE8( internal_r, internal_w, 0xffff )
 ADDRESS_MAP_END
 
 
-tlcs900h_device::tlcs900h_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, address_map_constructor internal_map)
-	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, __FILE__)
-	, m_program_config("program", ENDIANNESS_LITTLE, 8, 24, 0, internal_map)
+static ADDRESS_MAP_START(tmp95c063_mem8, AS_PROGRAM, 8, tmp95c063_device )
+	AM_RANGE( 0x000000, 0x00009f ) AM_READWRITE( internal_r, internal_w )
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(tmp95c063_mem16, AS_PROGRAM, 16, tmp95c063_device )
+	AM_RANGE( 0x000000, 0x00009f ) AM_READWRITE8( internal_r, internal_w, 0xffff )
+ADDRESS_MAP_END
+
+
+tlcs900h_device::tlcs900h_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname)
+	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
+	m_am8_16(0)
 {
 }
 
 tmp95c061_device::tmp95c061_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: tlcs900h_device(mconfig, TMP95C061, "TMP95C061", tag, owner, clock, "tmp95c061", ADDRESS_MAP_NAME(tmp95c061_mem) ),
+	: tlcs900h_device(mconfig, TMP95C061, "TMP95C061", tag, owner, clock, "tmp95c061" ),
 	m_port1_read(*this),
 	m_port1_write(*this),
 	m_port2_write(*this),
@@ -59,10 +67,26 @@ tmp95c061_device::tmp95c061_device(const machine_config &mconfig, const char *ta
 {
 }
 
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
 
+void tmp95c061_device::device_config_complete()
+{
+	if (m_am8_16 == 0)
+	{
+		m_program_config = address_space_config("program", ENDIANNESS_LITTLE, 16, 24, 0, ADDRESS_MAP_NAME(tmp95c061_mem16));
+	}
+	else
+	{
+		m_program_config = address_space_config("program", ENDIANNESS_LITTLE, 8, 24, 0, ADDRESS_MAP_NAME(tmp95c061_mem8));
+	}
+}
 
 tmp95c063_device::tmp95c063_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: tlcs900h_device(mconfig, TMP95C063, "TMP95C063", tag, owner, clock, "tmp95c063", ADDRESS_MAP_NAME(tmp95c063_mem) ),
+	: tlcs900h_device(mconfig, TMP95C063, "TMP95C063", tag, owner, clock, "tmp95c063"),
 	m_port1_read(*this),
 	m_port1_write(*this),
 	m_port2_write(*this),
@@ -86,6 +110,24 @@ tmp95c063_device::tmp95c063_device(const machine_config &mconfig, const char *ta
 	m_porte_read(*this),
 	m_porte_write(*this)
 {
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void tmp95c063_device::device_config_complete()
+{
+	if (m_am8_16 == 0)
+	{
+		m_program_config = address_space_config("program", ENDIANNESS_LITTLE, 16, 24, 0, ADDRESS_MAP_NAME(tmp95c063_mem16));
+	}
+	else
+	{
+		m_program_config = address_space_config("program", ENDIANNESS_LITTLE, 8, 24, 0, ADDRESS_MAP_NAME(tmp95c063_mem8));
+	}
 }
 
 
@@ -213,14 +255,6 @@ offs_t tlcs900h_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 
 #define FLAG_HF     0x10
 #define FLAG_ZF     0x40
 #define FLAG_SF     0x80
-
-
-#define RDMEM(addr)         m_program->read_byte( addr )
-#define WRMEM(addr,data)    m_program->write_byte( addr, data )
-#define RDMEMW(addr)            ( RDMEM(addr) | ( RDMEM(addr+1) << 8 ) )
-#define RDMEML(addr)            ( RDMEMW(addr) | ( RDMEMW(addr+2) << 16 ) )
-#define WRMEMW(addr,data)       { UINT16 dw = data; WRMEM(addr,dw & 0xff); WRMEM(addr+1,(dw >> 8 )); }
-#define WRMEML(addr,data)       { UINT32 dl = data; WRMEMW(addr,dl); WRMEMW(addr+2,(dl >> 16)); }
 
 
 inline UINT8 tlcs900h_device::RDOP()
@@ -1101,7 +1135,7 @@ READ8_MEMBER( tmp95c061_device::internal_r )
 		case TMP95C061_P8: m_reg[offset] = m_port8_read(0); break;
 		case TMP95C061_P9: m_reg[offset] = m_port9_read(0); break;
 		case TMP95C061_PA: m_reg[offset] = m_porta_read(0); break;
-		case TMP95C061_PB: m_reg[offset] = m_porta_read(0); break;
+		case TMP95C061_PB: m_reg[offset] = m_portb_read(0); break;
 	}
 	return m_reg[ offset ];
 }
