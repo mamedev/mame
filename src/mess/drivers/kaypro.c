@@ -9,23 +9,15 @@
 
     Things that need doing:
 
-    - MAME's z80sio implementation is unusable at this time. Needs proper callback
-      mechanism for both channels, and interface to modern standards.
+    - See about getting keyboard to work as a serial device.
+    - Need dump of 87C51 cpu in the keyboard.
 
-    - When z80sio gets updated, then see about getting keyboard to work as a serial device.
-
-    - Kaypro2x/4a are not booting.
+    - Only kayproii boots up, the remainder have floppy-disk problems.
 
     - Hard Disk not emulated.
       The controller is a WD1002 (original version, for Winchester drives).
 
-    - Kaypro 4 plus 88 does work as a normal Kaypro, but the extra processor needs
-      to be worked out.
-
     - RTC type MM58167A to be added. Modem chips TMS99531, TMS99532 to be developed.
-
-    - Regression all models: Cannot read the floppy disk any more since someone modified the
-      WD controller.
 
 **************************************************************************************************/
 
@@ -42,8 +34,8 @@ READ8_MEMBER( kaypro_state::kaypro2x_87_r ) { return 0x7f; }    /* to bypass une
 ************************************************************/
 
 static ADDRESS_MAP_START( kaypro_map, AS_PROGRAM, 8, kaypro_state )
-	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("maincpu", 0x0000)
-	AM_RANGE(0x3000, 0x3fff) AM_RAM AM_REGION("maincpu", 0x3000) AM_SHARE("p_videoram")
+	AM_RANGE(0x0000, 0x2fff) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
+	AM_RANGE(0x3000, 0x3fff) AM_RAMBANK("bank3")
 	AM_RANGE(0x4000, 0xffff) AM_RAM AM_REGION("rambank", 0x4000)
 ADDRESS_MAP_END
 
@@ -200,7 +192,7 @@ static MACHINE_CONFIG_START( kayproii, kaypro_state )
 	MCFG_CPU_CONFIG(kayproii_daisy_chain)
 
 	MCFG_MACHINE_START_OVERRIDE(kaypro_state, kayproii )
-	MCFG_MACHINE_RESET_OVERRIDE(kaypro_state, kayproii )
+	MCFG_MACHINE_RESET_OVERRIDE(kaypro_state, kaypro )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -220,7 +212,7 @@ static MACHINE_CONFIG_START( kayproii, kaypro_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* devices */
-	MCFG_QUICKLOAD_ADD("quickload", kaypro_state, kayproii, "com,cpm", 3)
+	MCFG_QUICKLOAD_ADD("quickload", kaypro_state, kaypro, "com,cpm", 3)
 	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
 	MCFG_COM8116_ADD("brg", XTAL_5_0688MHz, NULL, NULL, NULL)  // WD1943, SMC8116
 	MCFG_Z80PIO_ADD( "z80pio_g", 2500000, kayproii_pio_g_intf )
@@ -247,7 +239,7 @@ static MACHINE_CONFIG_START( kaypro2x, kaypro_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", kaypro_state,  kay_kbd_interrupt)
 	MCFG_CPU_CONFIG(kaypro2x_daisy_chain)
 
-	MCFG_MACHINE_RESET_OVERRIDE(kaypro_state, kaypro2x )
+	MCFG_MACHINE_RESET_OVERRIDE(kaypro_state, kaypro )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -268,7 +260,7 @@ static MACHINE_CONFIG_START( kaypro2x, kaypro_state )
 
 	/* devices */
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", 2000000, kaypro2x_crtc) /* comes out of ULA - needs to be measured */
-	MCFG_QUICKLOAD_ADD("quickload", kaypro_state, kaypro2x, "com,cpm", 3)
+	MCFG_QUICKLOAD_ADD("quickload", kaypro_state, kaypro, "com,cpm", 3)
 	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
 	MCFG_COM8116_ADD("brg", XTAL_5_0688MHz, NULL, NULL, NULL)  // WD1943, SMC8116
 	MCFG_Z80SIO_ADD( "z80sio", 4800, kaypro_sio_intf )
@@ -288,6 +280,15 @@ DRIVER_INIT_MEMBER( kaypro_state, kaypro )
 {
 	m_fdc->setup_intrq_cb(fd1793_t::line_cb(FUNC(kaypro_state::fdc_intrq_w), this));
 	m_fdc->setup_drq_cb(fd1793_t::line_cb(FUNC(kaypro_state::fdc_drq_w), this));
+
+	UINT8 *main = memregion("maincpu")->base();
+	UINT8 *ram = memregion("rambank")->base();
+
+	membank("bankr0")->configure_entry(1, &main[0x0000]);
+	membank("bankr0")->configure_entry(0, &ram[0x0000]);
+	membank("bank3")->configure_entry(1, &main[0x3000]);
+	membank("bank3")->configure_entry(0, &ram[0x3000]);
+	membank("bankw0")->configure_entry(0, &ram[0x0000]);
 }
 
 
@@ -304,8 +305,7 @@ ROM_START(kayproii)
 	ROM_REGION(0x4000, "maincpu",0)
 	ROM_LOAD("81-149.u47",   0x0000, 0x0800, CRC(28264bc1) SHA1(a12afb11a538fc0217e569bc29633d5270dfa51b) )
 
-	ROM_REGION(0x10000, "rambank",0)
-	ROM_FILL( 0, 0x10000, 0xff)
+	ROM_REGION(0x10000, "rambank", ROMREGION_ERASEFF)
 
 	ROM_REGION(0x0800, "chargen", ROMREGION_INVERT)
 	ROM_LOAD("81-146.u43",   0x0000, 0x0800, CRC(4cc7d206) SHA1(5cb880083b94bd8220aac1f87d537db7cfeb9013) )
@@ -315,8 +315,7 @@ ROM_START(kaypro4)
 	ROM_REGION(0x4000, "maincpu",0)
 	ROM_LOAD("81-232.u47",   0x0000, 0x1000, CRC(4918fb91) SHA1(cd9f45cc3546bcaad7254b92c5d501c40e2ef0b2) )
 
-	ROM_REGION(0x10000, "rambank",0)
-	ROM_FILL( 0, 0x10000, 0xff)
+	ROM_REGION(0x10000, "rambank", ROMREGION_ERASEFF)
 
 	ROM_REGION(0x0800, "chargen", ROMREGION_INVERT)
 	ROM_LOAD("81-146.u43",   0x0000, 0x0800, CRC(4cc7d206) SHA1(5cb880083b94bd8220aac1f87d537db7cfeb9013) )
@@ -326,8 +325,7 @@ ROM_START(kaypro4p88) // "KAYPRO-88" board has 128k or 256k of its own ram on it
 	ROM_REGION(0x4000, "maincpu",0)
 	ROM_LOAD("81-232.u47",   0x0000, 0x1000, CRC(4918fb91) SHA1(cd9f45cc3546bcaad7254b92c5d501c40e2ef0b2) )
 
-	ROM_REGION(0x10000, "rambank",0)
-	ROM_FILL( 0, 0x10000, 0xff)
+	ROM_REGION(0x10000, "rambank", ROMREGION_ERASEFF)
 
 	ROM_REGION(0x0800, "chargen", ROMREGION_INVERT)
 	ROM_LOAD("81-146.u43",   0x0000, 0x0800, CRC(4cc7d206) SHA1(5cb880083b94bd8220aac1f87d537db7cfeb9013) )
@@ -340,8 +338,7 @@ ROM_START(omni2)
 	ROM_REGION(0x4000, "maincpu",0)
 	ROM_LOAD("omni2.u47",    0x0000, 0x1000, CRC(2883f9e0) SHA1(d98c784e62853582d298bf7ca84c75872847ac9b) )
 
-	ROM_REGION(0x10000, "rambank",0)
-	ROM_FILL( 0, 0x10000, 0xff)
+	ROM_REGION(0x10000, "rambank", ROMREGION_ERASEFF)
 
 	ROM_REGION(0x0800, "chargen", ROMREGION_INVERT)
 	ROM_LOAD("omni2.u43",    0x0000, 0x0800, CRC(049b3381) SHA1(46f1d4f038747ba9048b075dc617361be088f82a) )
@@ -351,40 +348,47 @@ ROM_START(kaypro2x)
 	ROM_REGION(0x4000, "maincpu",0)
 	ROM_LOAD("81-292.u34",   0x0000, 0x2000, CRC(5eb69aec) SHA1(525f955ca002976e2e30ac7ee37e4a54f279fe96) )
 
-	ROM_REGION(0x10000, "rambank",0)
-	ROM_FILL( 0, 0x10000, 0xff)
+	ROM_REGION(0x10000, "rambank", ROMREGION_ERASEFF)
 
 	ROM_REGION(0x1000, "chargen",0)
-	ROM_LOAD("81-817.u9",    0x0000, 0x1000, CRC(5f72da5b) SHA1(8a597000cce1a7e184abfb7bebcb564c6bf24fb7) )
+	ROM_LOAD("81-235.u9",    0x0000, 0x1000, CRC(5f72da5b) SHA1(8a597000cce1a7e184abfb7bebcb564c6bf24fb7) )
 ROM_END
 
 ROM_START(kaypro4a) // same as kaypro2x ??
 	ROM_REGION(0x4000, "maincpu",0)
 	ROM_LOAD("81-292.u34",   0x0000, 0x2000, CRC(5eb69aec) SHA1(525f955ca002976e2e30ac7ee37e4a54f279fe96) )
 
-	ROM_REGION(0x10000, "rambank",0)
-	ROM_FILL( 0, 0x10000, 0xff)
+	ROM_REGION(0x10000, "rambank", ROMREGION_ERASEFF)
 
 	ROM_REGION(0x1000, "chargen",0)
-	ROM_LOAD("81-817.u9",    0x0000, 0x1000, CRC(5f72da5b) SHA1(8a597000cce1a7e184abfb7bebcb564c6bf24fb7) )
+	ROM_LOAD("81-235.u9",    0x0000, 0x1000, CRC(5f72da5b) SHA1(8a597000cce1a7e184abfb7bebcb564c6bf24fb7) )
 ROM_END
 
 ROM_START(kaypro10)
 	ROM_REGION(0x4000, "maincpu",0)
 	ROM_LOAD("81-302.u42",   0x0000, 0x1000, CRC(3f9bee20) SHA1(b29114a199e70afe46511119b77a662e97b093a0) )
-//Note: the older rom 81-187 is also allowed here for kaypro 10, but we don't have a dump of it yet.
-	ROM_REGION(0x10000, "rambank",0)
-	ROM_FILL( 0, 0x10000, 0xff)
+
+	ROM_REGION(0x10000, "rambank", ROMREGION_ERASEFF)
 
 	ROM_REGION(0x1000, "chargen",0)
-	ROM_LOAD("81-817.u31",   0x0000, 0x1000, CRC(5f72da5b) SHA1(8a597000cce1a7e184abfb7bebcb564c6bf24fb7) )
+	ROM_LOAD("81-187.u31",   0x0000, 0x1000, CRC(5f72da5b) SHA1(8a597000cce1a7e184abfb7bebcb564c6bf24fb7) )
 ROM_END
+
+//ROM_START(robie)
+//	ROM_REGION(0x4000, "maincpu",0)
+//	ROM_LOAD("81-326.u34",   0x0000, 0x2000, NO_DUMP )
+//
+//	ROM_REGION(0x10000, "rambank", ROMREGION_ERASEFF)
+//
+//	ROM_REGION(0x1000, "chargen",0)
+//	ROM_LOAD("81-235.u9",   0x0000, 0x1000, NO_DUMP )
+//ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT    CLASS         INIT         COMPANY                 FULLNAME */
 COMP( 1982, kayproii,   0,        0,    kayproii, kay_kbd, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro II - 2/83" , 0 )
-COMP( 1983, kaypro4,    kayproii, 0,    kaypro4,  kay_kbd, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro 4 - 4/83" , 0 ) // model 81-004
+COMP( 1983, kaypro4,    kayproii, 0,    kaypro4,  kay_kbd, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro 4 - 4/83" , GAME_NOT_WORKING ) // model 81-004
 COMP( 1983, kaypro4p88, kayproii, 0,    kaypro4,  kay_kbd, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro 4 plus88 - 4/83" , GAME_NOT_WORKING ) // model 81-004 with an added 8088 daughterboard and rom
-COMP( 198?, omni2,      kayproii, 0,    omni2,    kay_kbd, kaypro_state, kaypro, "Non Linear Systems",  "Omni II" , 0 )
+COMP( 198?, omni2,      kayproii, 0,    omni2,    kay_kbd, kaypro_state, kaypro, "Non Linear Systems",  "Omni II" , GAME_NOT_WORKING )
 COMP( 1984, kaypro2x,   0,        0,    kaypro2x, kay_kbd, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro 2x" , GAME_NOT_WORKING ) // model 81-025
 COMP( 1984, kaypro4a,   kaypro2x, 0,    kaypro2x, kay_kbd, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro 4 - 4/84" , GAME_NOT_WORKING ) // model 81-015
 // Kaypro 4/84 plus 88 goes here, model 81-015 with an added 8088 daughterboard and rom

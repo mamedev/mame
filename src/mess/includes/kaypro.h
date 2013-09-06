@@ -22,7 +22,6 @@ public:
 
 	kaypro_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_p_videoram(*this, "p_videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_pio_g(*this, "z80pio_g"),
 		m_pio_s(*this, "z80pio_s"),
@@ -53,9 +52,8 @@ public:
 	DECLARE_READ8_MEMBER(kaypro_videoram_r);
 	DECLARE_WRITE8_MEMBER(kaypro_videoram_w);
 	DECLARE_MACHINE_START(kayproii);
-	DECLARE_MACHINE_RESET(kayproii);
+	DECLARE_MACHINE_RESET(kaypro);
 	DECLARE_VIDEO_START(kaypro);
-	DECLARE_MACHINE_RESET(kaypro2x);
 	DECLARE_PALETTE_INIT(kaypro);
 	DECLARE_MACHINE_RESET(kay_kbd);
 	DECLARE_DRIVER_INIT(kaypro);
@@ -68,8 +66,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(kaypro_interrupt);
 	DECLARE_READ8_MEMBER(kaypro_sio_r);
 	DECLARE_WRITE8_MEMBER(kaypro_sio_w);
-	DECLARE_QUICKLOAD_LOAD_MEMBER(kayproii);
-	DECLARE_QUICKLOAD_LOAD_MEMBER(kaypro2x);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(kaypro);
 	const UINT8 *m_p_chargen;
 	UINT8 m_mc6845_cursor[16];
 	UINT8 m_mc6845_reg[32];
@@ -78,7 +75,7 @@ public:
 	UINT8 m_flash;
 	UINT8 m_framecnt;
 	UINT16 m_cursor;
-	required_shared_ptr<UINT8> m_p_videoram;
+	UINT8 *m_p_videoram;
 	kay_kbd_t *m_kbd;
 
 protected:

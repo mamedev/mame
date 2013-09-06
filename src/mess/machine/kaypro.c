@@ -31,7 +31,7 @@ READ8_MEMBER( kaypro_state::pio_system_r )
 	return data;
 }
 
-WRITE8_MEMBER( kaypro_state::common_pio_system_w )
+WRITE8_MEMBER( kaypro_state::kayproii_pio_system_w )
 {
 /*  d7 bank select
     d6 disk drive motors - (0=on)
@@ -41,24 +41,8 @@ WRITE8_MEMBER( kaypro_state::common_pio_system_w )
     d1 drive B
     d0 drive A */
 
-	/* get address space */
-	address_space &mem = m_maincpu->space(AS_PROGRAM);
-
-	if (data & 0x80)
-	{
-		mem.unmap_readwrite (0x0000, 0x3fff);
-		mem.install_read_bank (0x0000, 0x0fff, "bank1");
-		membank("bank1")->set_base(memregion("maincpu")->base());
-		mem.install_readwrite_handler (0x3000, 0x3fff, read8_delegate(FUNC(kaypro_state::kaypro_videoram_r), this), write8_delegate(FUNC(kaypro_state::kaypro_videoram_w), this));
-	}
-	else
-	{
-		mem.unmap_readwrite(0x0000, 0x3fff);
-		mem.install_read_bank (0x0000, 0x3fff, "bank2");
-		mem.install_write_bank (0x0000, 0x3fff, "bank3");
-		membank("bank2")->set_base(memregion("rambank")->base());
-		membank("bank3")->set_base(memregion("rambank")->base());
-	}
+	membank("bankr0")->set_entry(BIT(data, 7));
+	membank("bank3")->set_entry(BIT(data, 7));
 
 	m_floppy = NULL;
 	if (BIT(data, 0))
@@ -83,17 +67,9 @@ WRITE8_MEMBER( kaypro_state::common_pio_system_w )
 	m_system_port = data;
 }
 
-WRITE8_MEMBER( kaypro_state::kayproii_pio_system_w )
-{
-	common_pio_system_w(space, offset, data);
-
-	/* side select */
-	m_floppy->ss_w(!BIT(data, 2));
-}
-
 WRITE8_MEMBER( kaypro_state::kaypro4_pio_system_w )
 {
-	common_pio_system_w(space, offset, data);
+	kayproii_pio_system_w(space, offset, data);
 
 	/* side select */
 	m_floppy->ss_w(BIT(data, 2));
@@ -157,38 +133,23 @@ WRITE8_MEMBER( kaypro_state::kaypro2x_system_port_w )
     d1 drive B
     d0 drive A */
 
-	/* get address space */
-	address_space &mem = m_maincpu->space(AS_PROGRAM);
-
-	if (BIT(data, 7))
-	{
-		mem.unmap_readwrite (0x0000, 0x3fff);
-		mem.install_read_bank (0x0000, 0x1fff, "bank1");
-		membank("bank1")->set_base(memregion("maincpu")->base());
-	}
-	else
-	{
-		mem.unmap_readwrite (0x0000, 0x3fff);
-		mem.install_read_bank (0x0000, 0x3fff, "bank2");
-		mem.install_write_bank (0x0000, 0x3fff, "bank3");
-		membank("bank2")->set_base(memregion("rambank")->base());
-		membank("bank3")->set_base(memregion("rambank")->base());
-	}
+	membank("bankr0")->set_entry(BIT(data, 7));
+	membank("bank3")->set_entry(BIT(data, 7));
 
 	m_floppy = NULL;
-	if (BIT(data, 0))
+	if (!BIT(data, 0))
 		m_floppy = m_floppy0->get_device();
 	else
-	if (BIT(data, 1))
+	if (!BIT(data, 1))
 		m_floppy = m_floppy1->get_device();
 
 	m_fdc->set_floppy(m_floppy);
-	m_fdc->dden_w(BIT(data, 5));
+	//m_fdc->dden_w(BIT(data, 5)); // not connected
 
 	if (m_floppy)
 	{
-		m_floppy->mon_w(BIT(data, 6) ? 0 : 1); // motor on
-		m_floppy->ss_w(BIT(data, 2));
+		m_floppy->mon_w(!BIT(data, 4)); // motor on
+		m_floppy->ss_w(!BIT(data, 2));
 	}
 
 	output_set_value("ledA", BIT(data, 0));     /* LEDs in artwork */
@@ -321,22 +282,21 @@ void kaypro_state::fdc_drq_w (bool state)
     Machine
 
 ************************************************************/
-MACHINE_START_MEMBER(kaypro_state,kayproii)
+MACHINE_START_MEMBER( kaypro_state,kayproii )
 {
 	m_pio_s->strobe_a(0);
 }
 
-MACHINE_RESET_MEMBER(kaypro_state,kayproii)
+MACHINE_RESET_MEMBER( kaypro_state,kaypro )
 {
 	MACHINE_RESET_CALL_MEMBER(kay_kbd);
+	membank("bankr0")->set_entry(1); // point at rom
+	membank("bankw0")->set_entry(0); // always write to ram
+	membank("bank3")->set_entry(1); // point at video ram
+	m_system_port = 0x80;
+	m_maincpu->reset();
 }
 
-MACHINE_RESET_MEMBER(kaypro_state,kaypro2x)
-{
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	kaypro2x_system_port_w(space, 0, 0x80);
-	MACHINE_RESET_CALL_MEMBER(kay_kbd);
-}
 
 /***********************************************************
 
@@ -349,9 +309,8 @@ MACHINE_RESET_MEMBER(kaypro_state,kaypro2x)
 
 ************************************************************/
 
-QUICKLOAD_LOAD_MEMBER( kaypro_state, kayproii )
+QUICKLOAD_LOAD_MEMBER( kaypro_state, kaypro )
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
 	UINT8 *RAM = memregion("rambank")->base();
 	UINT16 i;
 	UINT8 data;
@@ -364,30 +323,10 @@ QUICKLOAD_LOAD_MEMBER( kaypro_state, kayproii )
 		RAM[i+0x100] = data;
 	}
 
-	common_pio_system_w(space, 0, m_system_port & 0x7f);  // switch TPA in
+	membank("bankr0")->set_entry(0);
+	membank("bank3")->set_entry(0);
 	RAM[0x80]=0;                            // clear out command tail
 	RAM[0x81]=0;
 	m_maincpu->set_pc(0x100);                // start program
-	return IMAGE_INIT_PASS;
-}
-
-QUICKLOAD_LOAD_MEMBER( kaypro_state, kaypro2x )
-{
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	UINT8 *RAM = memregion("rambank")->base();
-	UINT16 i;
-	UINT8 data;
-
-	for (i = 0; i < quickload_size; i++)
-	{
-		if (image.fread( &data, 1) != 1) return IMAGE_INIT_FAIL;
-
-		RAM[i+0x100] = data;
-	}
-
-	kaypro2x_system_port_w(space, 0, m_system_port & 0x7f);
-	RAM[0x80]=0;
-	RAM[0x81]=0;
-	m_maincpu->set_pc(0x100);
 	return IMAGE_INIT_PASS;
 }
