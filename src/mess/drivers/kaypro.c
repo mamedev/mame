@@ -5,7 +5,7 @@
     Each disk was single sided, and could hold 191k. The computer had 2x pio
     and 1x sio. One of the sio ports communicated with the keyboard with a coiled
     telephone cord, complete with modular plug on each end. The keyboard carries
-    its own Intel 8748 processor and is an intelligent device.
+    its own Intel 87C51 processor and is an intelligent device.
 
     Things that need doing:
 
@@ -13,6 +13,8 @@
     - Need dump of 87C51 cpu in the keyboard.
 
     - Only kayproii boots up, the remainder have floppy-disk problems.
+
+    - The DSK format needs to be supported. It is commented out until the code gets written.
 
     - Hard Disk not emulated.
       The controller is a WD1002 (original version, for Winchester drives).
@@ -170,13 +172,13 @@ static MC6845_INTERFACE( kaypro2x_crtc )
 
 ************************************************************/
 
-FLOPPY_FORMATS_MEMBER( kaypro_state::kayproii_floppy_formats )
-	FLOPPY_KAYPROII_FORMAT
-FLOPPY_FORMATS_END
+//FLOPPY_FORMATS_MEMBER( kaypro_state::kayproii_floppy_formats )
+//	FLOPPY_KAYPROII_FORMAT
+//FLOPPY_FORMATS_END
 
-FLOPPY_FORMATS_MEMBER( kaypro_state::kaypro2x_floppy_formats )
-	FLOPPY_KAYPRO2X_FORMAT
-FLOPPY_FORMATS_END
+//FLOPPY_FORMATS_MEMBER( kaypro_state::kaypro2x_floppy_formats )
+//	FLOPPY_KAYPRO2X_FORMAT
+//FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( kaypro_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
@@ -221,8 +223,10 @@ static MACHINE_CONFIG_START( kayproii, kaypro_state )
 
 	MCFG_FD1793x_ADD("fdc", XTAL_20MHz / 20)
 	MCFG_WD_FDC_FORCE_READY
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", kaypro_floppies, "525dd", kaypro_state::kayproii_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", kaypro_floppies, "525dd", kaypro_state::kayproii_floppy_formats)
+	//MCFG_FLOPPY_DRIVE_ADD("fdc:0", kaypro_floppies, "525dd", kaypro_state::kayproii_floppy_formats)
+	//MCFG_FLOPPY_DRIVE_ADD("fdc:1", kaypro_floppies, "525dd", kaypro_state::kayproii_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", kaypro_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", kaypro_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","kayproii")
 MACHINE_CONFIG_END
 
@@ -267,8 +271,10 @@ static MACHINE_CONFIG_START( kaypro2x, kaypro_state )
 	MCFG_Z80SIO_ADD( "z80sio_2x", 4800, kaypro_sio_intf )   /* extra sio for modem and printer */
 	MCFG_FD1793x_ADD("fdc", XTAL_16MHz / 16)
 	MCFG_WD_FDC_FORCE_READY
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", kaypro_floppies, "525dd", kaypro_state::kaypro2x_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", kaypro_floppies, "525dd", kaypro_state::kaypro2x_floppy_formats)
+	//MCFG_FLOPPY_DRIVE_ADD("fdc:0", kaypro_floppies, "525dd", kaypro_state::kaypro2x_floppy_formats)
+	//MCFG_FLOPPY_DRIVE_ADD("fdc:1", kaypro_floppies, "525dd", kaypro_state::kaypro2x_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", kaypro_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", kaypro_floppies, "525dd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( omni2, kaypro4 )
