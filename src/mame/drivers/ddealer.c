@@ -626,7 +626,7 @@ INTERRUPT_GEN_MEMBER(ddealer_state::ddealer_interrupt)
 
 static MACHINE_CONFIG_START( ddealer, ddealer_state )
 
-	MCFG_CPU_ADD("maincpu" , M68000, 10000000)
+	MCFG_CPU_ADD("maincpu" , M68000, XTAL_16MHz/) /* 8MHz */
 	MCFG_CPU_PROGRAM_MAP(ddealer)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", ddealer_state,  ddealer_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(ddealer_state, irq1_line_hold,  90)//guess,controls music tempo,112 is way too fast
@@ -649,7 +649,7 @@ static MACHINE_CONFIG_START( ddealer, ddealer_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("coinsim", ddealer_state, ddealer_mcu_sim, attotime::from_hz(10000))
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ymsnd", YM2203, 6000000 / 4)//guess
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_6MHz / 8) /* 7.5KHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
@@ -683,7 +683,7 @@ DRIVER_INIT_MEMBER(ddealer_state,ddealer)
 
 ROM_START( ddealer )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 Code */
-	ROM_LOAD16_BYTE( "1.ic6", 0x00001, 0x20000, CRC(ce0dff50) SHA1(2d7a03f6b9609aea7511a4dc49560a901b0b9f19) )
+	ROM_LOAD16_BYTE( "1.ic6",  0x00001, 0x20000, CRC(ce0dff50) SHA1(2d7a03f6b9609aea7511a4dc49560a901b0b9f19) )
 	ROM_LOAD16_BYTE( "2.ic28", 0x00000, 0x20000, CRC(f00c346f) SHA1(bd73efb19d5f9efc88210d92a82a3f4595b41097) )
 
 	ROM_REGION( 0x40000, "mcu", 0 ) /* M50747? MCU Code */
