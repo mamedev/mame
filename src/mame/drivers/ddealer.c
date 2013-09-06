@@ -626,7 +626,7 @@ INTERRUPT_GEN_MEMBER(ddealer_state::ddealer_interrupt)
 
 static MACHINE_CONFIG_START( ddealer, ddealer_state )
 
-	MCFG_CPU_ADD("maincpu" , M68000, XTAL_16MHz/) /* 8MHz */
+	MCFG_CPU_ADD("maincpu" , M68000, XTAL_16MHz/2) /* 8MHz */
 	MCFG_CPU_PROGRAM_MAP(ddealer)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", ddealer_state,  ddealer_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(ddealer_state, irq1_line_hold,  90)//guess,controls music tempo,112 is way too fast
