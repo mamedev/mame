@@ -1936,6 +1936,7 @@ $(MAMEOBJ)/pinball.a: \
 	$(MACHINE)/decopincpu.o \
 	$(VIDEO)/decodmd1.o \
 	$(VIDEO)/decodmd2.o \
+	$(VIDEO)/decodmd3.o \
 	$(DRIVERS)/de_3b.o  \
 	$(DRIVERS)/flicker.o  \
 	$(DRIVERS)/g627.o  \
