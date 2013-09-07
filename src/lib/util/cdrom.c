@@ -880,6 +880,7 @@ chd_error cdrom_parse_metadata(chd_file *chd, cdrom_toc *toc)
 					if (tracknum == 0 || tracknum > CD_MAX_TRACKS)
 						return CHDERR_INVALID_DATA;
 					track = &toc->tracks[tracknum - 1];
+					toc->flags |= CD_FLAG_GDROM;
 				}
 				else
 				{
