@@ -916,7 +916,7 @@ static ADDRESS_MAP_START( ssmissin_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ_PORT("IN0")
 	AM_RANGE(0x0c0004, 0x0c0005) AM_READ_PORT("IN1")
 	AM_RANGE(0x0c0006, 0x0c0007) AM_READ_PORT("DSW1")
-//  AM_RANGE(0x0c000e, 0x0c000f) AM_READ_LEGACY(??)
+//  AM_RANGE(0x0c000e, 0x0c000f) AM_READ(??)
 	AM_RANGE(0x0c0014, 0x0c0015) AM_WRITE(nmk_flipscreen_w) /* Maybe */
 	AM_RANGE(0x0c0018, 0x0c0019) AM_WRITE(nmk_tilebank_w) /* Tile Bank ? */
 	AM_RANGE(0x0c001e, 0x0c001f) AM_WRITE(ssmissin_sound_w)

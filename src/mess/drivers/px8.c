@@ -518,8 +518,8 @@ static ADDRESS_MAP_START( px8_io, AS_IO, 8, px8_state )
 	AM_RANGE(0x00, 0x07) AM_READWRITE(gah40m_r, gah40m_w)
 	AM_RANGE(0x0c, 0x0c) AM_DEVREADWRITE(I8251_TAG, i8251_device, data_r, data_w)
 	AM_RANGE(0x0d, 0x0d) AM_DEVREADWRITE(I8251_TAG, i8251_device, status_r, control_w)
-//  AM_RANGE(0x0e, 0x0e) AM_DEVREADWRITE_LEGACY(SED1320_TAG, sed1330_status_r, sed1330_data_w)
-//  AM_RANGE(0x0f, 0x0f) AM_DEVREADWRITE_LEGACY(SED1320_TAG, sed1330_data_r, sed1330_command_w)
+//  AM_RANGE(0x0e, 0x0e) AM_DEVREADWRITE(SED1320_TAG, sed1330_device, status_r, data_w)
+//  AM_RANGE(0x0f, 0x0f) AM_DEVREADWRITE(SED1320_TAG, sed1330_device, data_r, command_w)
 ADDRESS_MAP_END
 
 /*-------------------------------------------------

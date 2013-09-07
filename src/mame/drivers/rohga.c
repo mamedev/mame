@@ -257,7 +257,6 @@ static ADDRESS_MAP_START( nitrobal_map, AS_PROGRAM, 16, rohga_state )
 	AM_RANGE(0x390008, 0x390009) AM_DEVWRITE("deco_common", decocomn_device, palette_dma_w)
 
 	AM_RANGE(0xfec000, 0xff3fff) AM_RAM
-//  AM_RANGE(0xff4000, 0xff47ff) AM_MIRROR(0x800) AM_READWRITE_LEGACY(deco16_146_nitroball_prot_r,deco16_146_nitroball_prot_w) AM_SHARE("prot16ram") /* Protection device */
 	AM_RANGE(0xff4000, 0xff7fff) AM_READWRITE(nb_protection_region_0_146_r,nb_protection_region_0_146_w) AM_SHARE("prot16ram") /* Protection device */
 
 AM_RANGE(0xff8000, 0xffffff) AM_RAM
