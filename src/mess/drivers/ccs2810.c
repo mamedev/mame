@@ -96,7 +96,7 @@ static ADDRESS_MAP_START(ccs2810_io, AS_IO, 8, ccs2810_state)
 	AM_RANGE(0x20, 0x20) AM_READWRITE(ccs2810_20_r,ccs2810_20_w)
 	AM_RANGE(0x25, 0x25) AM_READ(ccs2810_25_r)
 	AM_RANGE(0x26, 0x26) AM_READ(ccs2810_26_r)
-	//AM_RANGE(0x20, 0x27) AM_DEVREADWRITE_LEGACY("ins8250", ins8250_r, ins8250_w )
+	//AM_RANGE(0x20, 0x27) AM_DEVREADWRITE("ins8250", ins8250_device, ins8250_r, ins8250_w )
 ADDRESS_MAP_END
 
 /* Input ports */

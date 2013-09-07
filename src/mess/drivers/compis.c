@@ -132,7 +132,7 @@ static ADDRESS_MAP_START( compis_io, AS_IO, 16, compis_state )
 	AM_RANGE( 0x0080, 0x0087) AM_DEVREADWRITE8("pit8253", pit8253_device, read, write, 0xffff)
 	AM_RANGE( 0x0100, 0x011b) AM_DEVREADWRITE8("mm58274c", mm58274c_device, read, write, 0xffff)
 	AM_RANGE( 0x0280, 0x0283) AM_DEVREADWRITE8("pic8259_master", pic8259_device, read, write, 0x00ff) /* 80150/80130 */
-	//AM_RANGE( 0x0288, 0x028f) AM_DEVREADWRITE_LEGACY("pit8254", compis_osp_pit_r, compis_osp_pit_w ) /* PIT 8254 (80150/80130)  */
+	//AM_RANGE( 0x0288, 0x028f) AM_READWRITE( compis_osp_pit_r, compis_osp_pit_w ) /* PIT 8254 (80150/80130)  */
 	AM_RANGE( 0x0310, 0x031f) AM_READWRITE8( compis_usart_r, compis_usart_w, 0xff00)    /* USART 8251 Keyboard      */
 	AM_RANGE( 0x0330, 0x0333) AM_DEVREADWRITE8("upd7220", upd7220_device, read, write, 0x00ff) /* GDC 82720 PCS6:6     */
 	AM_RANGE( 0x0340, 0x0343) AM_DEVICE8("i8272a", i8272a_device, map, 0x00ff)  /* iSBX0 (J8) FDC 8272      */

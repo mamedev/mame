@@ -189,8 +189,8 @@ READ8_MEMBER(jubilee_state::unk_r)
 
 static ADDRESS_MAP_START( jubileep_cru_map, AS_IO, 8, jubilee_state )
 //  AM_RANGE(0x0000, 0xffff) AM_READ(unk_r)
-//  AM_RANGE(0x00, 0x00) AM_DEVREADWRITE_LEGACY("crtc",  mc6845_status_r, mc6845_address_w)
-//  AM_RANGE(0x01, 0x01) AM_DEVREADWRITE_LEGACY("crtc", mc6845_register_r, mc6845_register_w)
+//  AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
+//  AM_RANGE(0x01, 0x01) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 	AM_RANGE(0xc8, 0xc8) AM_READ(unk_r)
 ADDRESS_MAP_END
 

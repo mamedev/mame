@@ -481,8 +481,8 @@ static ADDRESS_MAP_START( megadpkr_map, AS_PROGRAM, 8, blitz_state )
 //  ADDRESS_MAP_GLOBAL_MASK(0x7fff) // seems that hardware is playing with A14 & A15 CPU lines...
 
 	AM_RANGE(0x0000, 0x07ff) AM_RAM //AM_SHARE("nvram")   /* battery backed RAM */
-//  AM_RANGE(0x0800, 0x0800) AM_DEVWRITE_LEGACY("crtc", mc6845_address_w)
-//  AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE_LEGACY("crtc", mc6845_register_r, mc6845_register_w)
+//  AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("crtc", mc6845_device, address_w)
+//  AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 	AM_RANGE(0x0844, 0x0847) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
 	AM_RANGE(0x0848, 0x084b) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
 

@@ -249,12 +249,12 @@ static ADDRESS_MAP_START(ec1841_io, AS_IO, 16, pc_state)
 //  AM_RANGE(0x0230, 0x021f)    // mouse
 	AM_RANGE(0x0240, 0x0257) AM_READWRITE8(pc_rtc_r,                pc_rtc_w, 0xffff)
 	AM_RANGE(0x02b0, 0x02b3) AM_READWRITE8(ec1841_memboard_r, ec1841_memboard_w, 0xffff);
-//  AM_RANGE(0x02f8, 0x02f8) AM_DEVREADWRITE8_LEGACY("upd8251_1", i8251_device, data_r, data_w, 0x00ff)
-//  AM_RANGE(0x02f9, 0x02f9) AM_DEVREADWRITE8_LEGACY("upd8251_1", i8251_device, status_r, control_w, 0xff00)
+//  AM_RANGE(0x02f8, 0x02f8) AM_DEVREADWRITE8("upd8251_1", i8251_device, data_r, data_w, 0x00ff)
+//  AM_RANGE(0x02f9, 0x02f9) AM_DEVREADWRITE8("upd8251_1", i8251_device, status_r, control_w, 0xff00)
 	AM_RANGE(0x0378, 0x037f) AM_DEVREADWRITE8_LEGACY("lpt_0", pc_lpt_r, pc_lpt_w, 0xffff)
 	AM_RANGE(0x03f0, 0x03f7) AM_DEVICE8("fdc", pc_fdc_interface, map, 0xffff)
-//  AM_RANGE(0x03f8, 0x03f9) AM_DEVREADWRITE8_LEGACY("upd8251_0", i8251_device, data_r, data_w, 0x00ff)
-//  AM_RANGE(0x03f8, 0x03f9) AM_DEVREADWRITE8_LEGACY("upd8251_0", i8251_device, status_r, control_w, 0xff00)
+//  AM_RANGE(0x03f8, 0x03f9) AM_DEVREADWRITE8("upd8251_0", i8251_device, data_r, data_w, 0x00ff)
+//  AM_RANGE(0x03f8, 0x03f9) AM_DEVREADWRITE8("upd8251_0", i8251_device, status_r, control_w, 0xff00)
 ADDRESS_MAP_END
 
 
