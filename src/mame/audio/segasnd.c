@@ -340,7 +340,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( speech_portmap, AS_IO, 8, driver_device )
 	AM_RANGE(0x00, 0xff) AM_DEVREAD_LEGACY("segaspeech", speech_rom_r)
-	AM_RANGE(0x00, 0xff) AM_DEVWRITE_LEGACY("speech", sp0250_w)
+	AM_RANGE(0x00, 0xff) AM_DEVWRITE("speech", sp0250_device, write)
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVREADWRITE_LEGACY("segaspeech", speech_p1_r, speech_p1_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_DEVWRITE_LEGACY("segaspeech", speech_p2_w)
 	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_DEVREAD_LEGACY("segaspeech", speech_t0_r)

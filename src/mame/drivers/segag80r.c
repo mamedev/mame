@@ -109,7 +109,6 @@
 #include "sound/dac.h"
 #include "sound/sn76496.h"
 #include "sound/samples.h"
-#include "sound/sp0250.h"
 #include "audio/segasnd.h"
 #include "machine/i8255.h"
 #include "machine/segacrpt.h"

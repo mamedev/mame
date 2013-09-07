@@ -5,21 +5,21 @@
 
 
 struct sp0250_interface {
-	void (*drq_callback)(device_t *device, int state);
+	void (*m_drq_callback)(device_t *device, int state);
 };
 
-DECLARE_WRITE8_DEVICE_HANDLER( sp0250_w );
-UINT8 sp0250_drq_r(device_t *device);
 
 class sp0250_device : public device_t,
-									public device_sound_interface
+									public device_sound_interface,
+									public sp0250_interface
 {
 public:
 	sp0250_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~sp0250_device() { global_free(m_token); }
+	~sp0250_device() {}
 
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
+	DECLARE_WRITE8_MEMBER( write );
+	UINT8 drq_r();
+	
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -27,9 +27,29 @@ protected:
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	
 private:
 	// internal state
-	void *m_token;
+	INT16 m_amp;
+	UINT8 m_pitch;
+	UINT8 m_repeat;
+	int m_pcount, m_rcount;
+	int m_playing;
+	UINT32 m_RNG;
+	sound_stream * m_stream;
+	int m_voiced;
+	UINT8 m_fifo[15];
+	int m_fifo_pos;
+	void (*m_drq)(device_t *device, int state);
+
+	struct
+	{
+		INT16 F, B;
+		INT16 z1, z2;
+	} m_filter[6];
+	
+	void load_values();
+	TIMER_CALLBACK_MEMBER( timer_tick );
 };
 
 extern const device_type SP0250;
