@@ -524,23 +524,23 @@ static INPUT_PORTS_START( ddealer )
 	PORT_DIPUNUSED_DIPLOC( 0x0001, IP_ACTIVE_LOW, "SW1:8" )	/* Listed as "Always Off" */
 	PORT_DIPUNUSED_DIPLOC( 0x0002, IP_ACTIVE_LOW, "SW1:7" )	/* Listed as "Always Off" */
 	PORT_DIPNAME( 0x001c, 0x001c, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SW1:6,5,4")
-	PORT_DIPSETTING(      0x0004, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(      0x0014, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(      0x000c, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0018, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x001c, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(      0x0018, "18" ) /* Not listed in "dips" text, but used - Value unknown for now */
-	PORT_DIPSETTING(      0x0010, "10" ) /* Not listed in "dips" text, but used - Value unknown for now */
-	PORT_DIPSETTING(      0x0008, "08" ) /* Not listed in "dips" text, but used - Value unknown for now */
+	PORT_DIPSETTING(      0x000c, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x0014, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
 	PORT_DIPNAME( 0x00e0, 0x00e0, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW1:3,2,1")
-	PORT_DIPSETTING(      0x0020, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(      0x00a0, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(      0x0060, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x00c0, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x00e0, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(      0x00c0, "c0" ) /* Not listed in "dips" text, but used - Value unknown for now */
-	PORT_DIPSETTING(      0x0080, "80" ) /* Not listed in "dips" text, but used - Value unknown for now */
-	PORT_DIPSETTING(      0x0040, "40" ) /* Not listed in "dips" text, but used - Value unknown for now */
-	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
+	PORT_DIPSETTING(      0x0060, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x00a0, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) ) /* Not listed in "dips" text, but current effect is FREE PLAY. Is this correct? */
 	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Flip_Screen ) )		PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
