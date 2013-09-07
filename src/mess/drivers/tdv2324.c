@@ -148,9 +148,9 @@ static ADDRESS_MAP_START( tdv2324_io, AS_IO, 8, tdv2324_state )
 	AM_RANGE(0x30, 0x30) AM_READ(tdv2324_main_io_30)
 //  AM_RANGE(0xe2, 0xe2) AM_WRITE(tdv2324_main_io_e2) console output
 	AM_RANGE(0xe6, 0xe6) AM_READ(tdv2324_main_io_e6)
-//  AM_RANGE(0x, 0x) AM_DEVREADWRITE_LEGACY(P8253_5_0_TAG, pit8253_r, pit8253_w)
-//  AM_RANGE(0x, 0x) AM_DEVREADWRITE_LEGACY(MK3887N4_TAG, z80dart_ba_cd_r, z80dart_ba_cd_w)
-//  AM_RANGE(0x, 0x) AM_DEVREADWRITE_LEGACY(P8259A_TAG, pic8259_r, pic8259_w)
+//  AM_RANGE(0x, 0x) AM_DEVREADWRITE(P8253_5_0_TAG, pit8253_device, read, write)
+//  AM_RANGE(0x, 0x) AM_DEVREADWRITE(MK3887N4_TAG, z80dart_device, ba_cd_r, ba_cd_w)
+//  AM_RANGE(0x, 0x) AM_DEVREADWRITE(P8259A_TAG, pic8259_device, read, write)
 ADDRESS_MAP_END
 
 

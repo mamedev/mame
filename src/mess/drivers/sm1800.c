@@ -49,7 +49,7 @@ public:
 static ADDRESS_MAP_START(sm1800_mem, AS_PROGRAM, 8, sm1800_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x07ff ) AM_ROM
-	//AM_RANGE( 0x0fb0, 0x0fff ) AM_DEVWRITE_LEGACY("i8275", i8275_dack_w)
+	//AM_RANGE( 0x0fb0, 0x0fff ) AM_DEVWRITE("i8275", i8275_device, dack_w)
 	AM_RANGE( 0x1000, 0x17ff ) AM_RAM // videoram looks like 1080-17FF, normal ascii
 ADDRESS_MAP_END
 
@@ -60,7 +60,8 @@ static ADDRESS_MAP_START( sm1800_io, AS_IO, 8, sm1800_state)
 	AM_RANGE( 0x5c, 0x5c) AM_DEVREADWRITE("i8251", i8251_device, data_r, data_w)
 	AM_RANGE( 0x5d, 0x5d) AM_DEVREADWRITE("i8251", i8251_device, status_r, control_w)
 	AM_RANGE( 0x6c, 0x6f ) AM_DEVREADWRITE("i8255", i8255_device, read, write)
-	//AM_RANGE( 0x74, 0x75 ) AM_DEVREADWRITE_LEGACY("i8279", i8279_r, i8279_w)
+	//AM_RANGE( 0x74, 0x74 ) AM_DEVREADWRITE("i8279", i8279_device, status_r, cmd_w)
+	//AM_RANGE( 0x75, 0x75 ) AM_DEVREADWRITE("i8279", i8279_device, data_r, data_w)
 ADDRESS_MAP_END
 
 /* Input ports */
