@@ -2247,3 +2247,22 @@ endif
 
 $(CPUOBJ)/scudsp/scudspdasm.o: CPUOBJS += $(CPUOBJ)/scudsp/scudspdasm.c
 
+
+#-------------------------------------------------
+# Sunplus Technology S+core
+#@src/emu/cpu/score/score.h,CPUS += SCORE
+#-------------------------------------------------
+
+ifneq ($(filter SCORE,$(CPUS)),)
+OBJDIRS += $(CPUOBJ)/score
+CPUOBJS += $(CPUOBJ)/score/score.o
+DASMOBJS += $(CPUOBJ)/score/scoredsm.o
+endif
+
+$(CPUOBJ)/score/score.o:    $(CPUSRC)/score/score.c \
+							$(CPUSRC)/score/score.h \
+							$(CPUSRC)/score/scorem.h
+
+$(CPUOBJ)/score/scoredsm.o: $(CPUSRC)/score/scoredsm.c \
+							$(CPUSRC)/score/scorem.h
+

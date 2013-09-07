@@ -125,6 +125,7 @@ CPUS += PPS4
 CPUS += UPD7725
 CPUS += HD61700
 CPUS += LC8670
+CPUS += SCORE
 CPUS += ES5510
 CPUS += SCUDSP
 CPUS += IE15
@@ -1581,6 +1582,7 @@ $(MESSOBJ)/mattel.a:            \
 	$(MESS_VIDEO)/aquarius.o    \
 	$(MESS_DRIVERS)/juicebox.o  \
 	$(MESS_MACHINE)/s3c44b0.o   \
+	$(MESS_DRIVERS)/hyperscan.o \
 
 $(MESSOBJ)/matsushi.a:          \
 	$(MESS_DRIVERS)/jr100.o     \
