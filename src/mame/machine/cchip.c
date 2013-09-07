@@ -3,8 +3,8 @@
    cchip.c
 
 This file contains routines to interface with the Taito Controller Chip
-(or "Command Chip") version 1. It's currently used by Superman and Mega
-Blast. [Further cchip emulation is in machine/rainbow.c, machine/volfied.c,
+(or "Command Chip") version 1. It's currently used by Superman.
+[Further cchip emulation is in machine/rainbow.c, machine/volfied.c,
 drivers/opwolf.c and drivers/taito_f2.c]
 
 According to Richard Bush, the C-Chip is an encrypted Z80 which communicates
@@ -30,11 +30,7 @@ This code requires that the player & coin inputs be in input ports 2-4.
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/cchip.h"
-
-static UINT16 current_bank = 0;
-
-static UINT8 cc_port = 0;
+#include "includes/taito_x.h"
 
 /* This code for sound communication is a hack, it will not be
    identical to the code derived from the real c-chip */
@@ -55,33 +51,27 @@ static const UINT8 superman_code[40] =
 	0x4e, 0x75                          /* RTS                    ( Return ) */
 };
 
-MACHINE_RESET( cchip1 )
-{
-	machine.save().save_item(NAME(current_bank));
-	machine.save().save_item(NAME(cc_port));
-}
-
 /*************************************
  *
  * Writes to C-Chip - Important Bits
  *
  *************************************/
 
-WRITE16_HANDLER( cchip1_ctrl_w )
+WRITE16_MEMBER( taitox_state::cchip1_ctrl_w )
 {
 	/* value 2 is written here */
 }
 
-WRITE16_HANDLER( cchip1_bank_w )
+WRITE16_MEMBER( taitox_state::cchip1_bank_w )
 {
-	current_bank = data & 7;
+	m_current_bank = data & 7;
 }
 
-WRITE16_HANDLER( cchip1_ram_w )
+WRITE16_MEMBER( taitox_state::cchip1_ram_w )
 {
-	if (current_bank == 0 && offset == 0x03)
+	if (m_current_bank == 0 && offset == 0x03)
 	{
-		cc_port = data;
+		m_cc_port = data;
 
 		coin_lockout_w(space.machine(), 1, data & 0x08);
 		coin_lockout_w(space.machine(), 0, data & 0x04);
@@ -90,7 +80,7 @@ WRITE16_HANDLER( cchip1_ram_w )
 	}
 	else
 	{
-logerror("cchip1_w pc: %06x bank %02x offset %04x: %02x\n",space.device().safe_pc(),current_bank,offset,data);
+		logerror("cchip1_w pc: %06x bank %02x offset %04x: %02x\n",space.device().safe_pc(),m_current_bank,offset,data);
 	}
 }
 
@@ -101,7 +91,7 @@ logerror("cchip1_w pc: %06x bank %02x offset %04x: %02x\n",space.device().safe_p
  *
  *************************************/
 
-READ16_HANDLER( cchip1_ctrl_r )
+READ16_MEMBER( taitox_state::cchip1_ctrl_r )
 {
 	/*
 	    Bit 2 = Error signal
@@ -110,23 +100,23 @@ READ16_HANDLER( cchip1_ctrl_r )
 	return 0x01; /* Return 0x05 for C-Chip error */
 }
 
-READ16_HANDLER( cchip1_ram_r )
+READ16_MEMBER( taitox_state::cchip1_ram_r )
 {
 	/* Check for input ports */
-	if (current_bank == 0)
+	if (m_current_bank == 0)
 	{
 		switch (offset)
 		{
 		case 0x00: return space.machine().root_device().ioport("IN0")->read();    /* Player 1 controls + START1 */
 		case 0x01: return space.machine().root_device().ioport("IN1")->read();    /* Player 2 controls + START2 */
 		case 0x02: return space.machine().root_device().ioport("IN2")->read();    /* COINn + SERVICE1 + TILT */
-		case 0x03: return cc_port;
+		case 0x03: return m_cc_port;
 		}
 	}
 
 	/* Other non-standard offsets */
 
-	if (current_bank == 1 && offset <= 0xff)
+	if (m_current_bank == 1 && offset <= 0xff)
 	{
 		if (offset < 40)    /* our hack code is only 40 bytes long */
 			return superman_code[offset];
@@ -134,7 +124,7 @@ READ16_HANDLER( cchip1_ram_r )
 			return 0;
 	}
 
-	if (current_bank == 2)
+	if (m_current_bank == 2)
 	{
 		switch (offset)
 		{
@@ -144,6 +134,6 @@ READ16_HANDLER( cchip1_ram_r )
 		}
 	}
 
-logerror("cchip1_r bank: %02x offset: %04x\n",current_bank,offset);
+	logerror("cchip1_r bank: %02x offset: %04x\n",m_current_bank,offset);
 	return 0;
 }

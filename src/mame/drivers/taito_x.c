@@ -317,29 +317,9 @@ Stephh's notes (based on the game M68000 code and some tests) :
 #include "cpu/m68000/m68000.h"
 #include "includes/taitoipt.h"
 #include "audio/taitosnd.h"
-#include "includes/seta.h"
+#include "includes/taito_x.h"
 #include "sound/2610intf.h"
 #include "sound/2151intf.h"
-#include "includes/cchip.h"
-#include "drivlgcy.h"
-
-class taitox_state : public seta_state
-{
-public:
-	taitox_state(const machine_config &mconfig, device_type type, const char *tag)
-		: seta_state(mconfig, type, tag) { }
-
-	int m_banknum;
-	DECLARE_READ16_MEMBER(superman_dsw_input_r);
-	DECLARE_READ16_MEMBER(daisenpu_input_r);
-	DECLARE_WRITE16_MEMBER(daisenpu_input_w);
-	DECLARE_WRITE16_MEMBER(kyustrkr_input_w);
-	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
-	DECLARE_DRIVER_INIT(kyustrkr);
-	DECLARE_MACHINE_START(taitox);
-	void reset_sound_region();
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
-};
 
 READ16_MEMBER(taitox_state::superman_dsw_input_r)
 {
@@ -436,9 +416,9 @@ static ADDRESS_MAP_START( superman_map, AS_PROGRAM, 16, taitox_state )
 	AM_RANGE(0x600000, 0x600001) AM_WRITENOP    /* written each frame at $3ab0, mostly 0x10 */
 	AM_RANGE(0x800000, 0x800001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, tc0140syt_port_w, 0x00ff)
 	AM_RANGE(0x800002, 0x800003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, tc0140syt_comm_r, tc0140syt_comm_w, 0x00ff)
-	AM_RANGE(0x900000, 0x9007ff) AM_READWRITE_LEGACY(cchip1_ram_r, cchip1_ram_w)
-	AM_RANGE(0x900802, 0x900803) AM_READWRITE_LEGACY(cchip1_ctrl_r, cchip1_ctrl_w)
-	AM_RANGE(0x900c00, 0x900c01) AM_WRITE_LEGACY(cchip1_bank_w)
+	AM_RANGE(0x900000, 0x9007ff) AM_READWRITE(cchip1_ram_r, cchip1_ram_w)
+	AM_RANGE(0x900802, 0x900803) AM_READWRITE(cchip1_ctrl_r, cchip1_ctrl_w)
+	AM_RANGE(0x900c00, 0x900c01) AM_WRITE(cchip1_bank_w)
 	AM_RANGE(0xb00000, 0xb00fff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0xd00000, 0xd005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16) // Sprites Y
 	AM_RANGE(0xd00600, 0xd00607) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritectrl_r16, spritectrl_w16)
@@ -804,6 +784,18 @@ MACHINE_START_MEMBER(taitox_state,taitox)
 	machine().save().register_postload(save_prepost_delegate(FUNC(taitox_state::reset_sound_region), this));
 }
 
+MACHINE_START_MEMBER(taitox_state,superman)
+{
+	m_banknum = -1;
+	save_item(NAME(m_banknum));
+	machine().save().register_postload(save_prepost_delegate(FUNC(taitox_state::reset_sound_region), this));
+	
+	m_current_bank = 0;
+	m_cc_port = 0;
+	save_item(NAME(m_current_bank));
+	save_item(NAME(m_cc_port));
+}
+
 static const tc0140syt_interface taitox_tc0140syt_intf =
 {
 	"maincpu", "audiocpu"
@@ -824,9 +816,8 @@ static MACHINE_CONFIG_START( superman, taitox_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
-	MCFG_MACHINE_START_OVERRIDE(taitox_state,taitox)
-	MCFG_MACHINE_RESET(cchip1)
-
+	MCFG_MACHINE_START_OVERRIDE(taitox_state,superman)
+	
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 
 	/* video hardware */
