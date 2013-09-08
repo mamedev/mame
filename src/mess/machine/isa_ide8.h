@@ -4,7 +4,8 @@
 #define __ISA_IDE8_H__
 
 #include "emu.h"
-#include "machine/idectrl.h"
+#include "machine/ataintf.h"
+#include "machine/eeprompar.h"
 #include "machine/isa.h"
 
 //**************************************************************************
@@ -37,6 +38,7 @@ protected:
 
 private:
 	required_device<ata_interface_device> m_ata;
+	required_device<eeprom_parallel_28xx_device> m_eeprom;
 
 	UINT8 m_irq_number;
 	UINT8 m_d8_d15_latch;

@@ -118,6 +118,8 @@ WRITE_LINE_MEMBER(isa8_ide_device::ide_interrupt)
 static MACHINE_CONFIG_FRAGMENT( ide8_config )
 	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", NULL, false)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(isa8_ide_device, ide_interrupt))
+
+	MCFG_EEPROM_2864_ADD("eeprom")
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( ide8_port )
@@ -169,7 +171,7 @@ static INPUT_PORTS_START( ide8_port )
 INPUT_PORTS_END
 
 ROM_START( ide8 )
-	ROM_REGION(0x02000,"ide8", 0)
+	ROM_REGION(0x02000,"eeprom", 0)
 
 	ROM_DEFAULT_BIOS("xub200b3xt")
 
@@ -294,7 +296,8 @@ const rom_entry *isa8_ide_device::device_rom_region() const
 isa8_ide_device::isa8_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ISA8_IDE, "XT-IDE Fixed Drive Adapter", tag, owner, clock, "isa8_ide", __FILE__),
 	device_isa8_card_interface( mconfig, *this ),
-	m_ata(*this, "ata")
+	m_ata(*this, "ata"),
+	m_eeprom(*this, "eeprom")
 {
 }
 
@@ -317,7 +320,7 @@ void isa8_ide_device::device_reset()
 	int io_address      = ((ioport("IO_ADDRESS")->read() & 0x0F) * 0x20) + 0x200;
 	m_irq_number        = (ioport("IRQ")->read() & 0x07);
 
-	m_isa->install_rom(this, base_address, base_address + 0x1fff, 0, 0, "ide8", "ide8");
+	m_isa->install_memory(base_address, base_address + 0x1fff, 0, 0, read8_delegate(FUNC(eeprom_parallel_28xx_device::read), &(*m_eeprom)), write8_delegate(FUNC(eeprom_parallel_28xx_device::write), &(*m_eeprom)));
 	m_isa->install_device(io_address, io_address + 0xf, 0, 0, read8_delegate(FUNC(isa8_ide_device::ide8_r), this), write8_delegate(FUNC(isa8_ide_device::ide8_w), this));
 
 	//logerror("isa8_ide_device::device_reset(), bios_base=0x%5X to 0x%5X, I/O=0x%3X, IRQ=%d\n",base_address,base_address + (16*1024)  -1 ,io_address,irq);
