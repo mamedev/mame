@@ -1,13 +1,14 @@
 /***************************************************************************
 
-  ISA 8 bit IDE controller
+The XT-IDE project is a Vintage Computer forum driven project to develop and manufacturer an 8-bit ISA IDE controller.
+It allows any PC/XT class machine to use modern IDE hard drives or Compact Flash devices for long term storage.
 
-As implemented by the Vintage computer forums XT-IDE controller.
+http://www.vintage-computer.com/vcforum/showwiki.php?title=XTIDE+project
 
-Card has jumpers for I/O base address, and ROM base address, for the time
-being we'll emulate an I/O base of 0x300 and a ROM base of 0xC8000.
+Card has jumpers for I/O base address, and ROM base address, the default
+rom images being we'll emulate an I/O base of 0x300 and a ROM base of 0xC8000.
 
-If the I/O address is changed then the ROM will need to be patched.
+If the I/O address is changed then you will need to use XTIDECFG to configure the ROM.
 The opensource bios is available from :
 http://code.google.com/p/xtideuniversalbios/
 
@@ -22,6 +23,9 @@ then read from the latch to the processor.
 A data write will first write the top 8 bits to the latch, and then the bottom
 8 bits to the normal data register, this will also transfer the top 8 bits to
 the drive.
+
+A modded r1 has A0 & A3 swapped, AKA chuckmod, which puts the high & low bytes together.
+This also affects the eeprom, so the BIOS would need to be shuffled (or the plain images flashed using XTIDECFG).
 
 IDE Register                XTIDE rev 1     rev 2 or modded rev 1
 Data (XTIDE Data Low)       0               0
@@ -47,10 +51,10 @@ Device Control (out)        14              7
 
 
 
-#include "machine/isa_ide8.h"
+#include "machine/isa_xtide.h"
 
 
-READ8_MEMBER( isa8_ide_device::ide8_r )
+READ8_MEMBER( xtide_device::read )
 {
 	UINT8 result;
 
@@ -73,14 +77,14 @@ READ8_MEMBER( isa8_ide_device::ide8_r )
 		result = m_ata->read_cs1(space, offset & 7, 0xff);
 	}
 
-//  logerror("%s ide8_r: offset=%d, result=%2X\n",device->machine().describe_context(),offset,result);
+//  logerror("%s xtide_device::read: offset=%d, result=%2X\n",device->machine().describe_context(),offset,result);
 
 	return result;
 }
 
-WRITE8_MEMBER( isa8_ide_device::ide8_w )
+WRITE8_MEMBER( xtide_device::write )
 {
-//  logerror("%s ide8_w: offset=%d, data=%2X\n",device->machine().describe_context(),offset,data);
+//  logerror("%s xtide_device::write: offset=%d, data=%2X\n",device->machine().describe_context(),offset,data);
 
 	if (offset == 0)
 	{
@@ -103,7 +107,7 @@ WRITE8_MEMBER( isa8_ide_device::ide8_w )
 }
 
 
-WRITE_LINE_MEMBER(isa8_ide_device::ide_interrupt)
+WRITE_LINE_MEMBER(xtide_device::ide_interrupt)
 {
 	switch (m_irq_number)
 	{
@@ -115,14 +119,14 @@ WRITE_LINE_MEMBER(isa8_ide_device::ide_interrupt)
 	}
 }
 
-static MACHINE_CONFIG_FRAGMENT( ide8_config )
+static MACHINE_CONFIG_FRAGMENT( xtide_config )
 	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", NULL, false)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(isa8_ide_device, ide_interrupt))
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(xtide_device, ide_interrupt))
 
 	MCFG_EEPROM_2864_ADD("eeprom")
 MACHINE_CONFIG_END
 
-static INPUT_PORTS_START( ide8_port )
+static INPUT_PORTS_START( xtide_port )
 	PORT_START("BIOS_BASE")
 	PORT_DIPNAME( 0x0F, 0x02, "XT-IDE ROM base segment")
 	PORT_DIPSETTING(    0x00, "C000" )
@@ -170,7 +174,7 @@ static INPUT_PORTS_START( ide8_port )
 	PORT_DIPSETTING(    0x07, "IRQ 7" )
 INPUT_PORTS_END
 
-ROM_START( ide8 )
+ROM_START( xtide )
 	ROM_REGION(0x02000,"eeprom", 0)
 
 	ROM_DEFAULT_BIOS("xub200b3xt")
@@ -255,34 +259,34 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA8_IDE = &device_creator<isa8_ide_device>;
+const device_type ISA8_XTIDE = &device_creator<xtide_device>;
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor isa8_ide_device::device_mconfig_additions() const
+machine_config_constructor xtide_device::device_mconfig_additions() const
 {
-	return MACHINE_CONFIG_NAME( ide8_config );
+	return MACHINE_CONFIG_NAME( xtide_config );
 }
 
 //-------------------------------------------------
 //  input_ports - device-specific input ports
 //-------------------------------------------------
 
-ioport_constructor isa8_ide_device::device_input_ports() const
+ioport_constructor xtide_device::device_input_ports() const
 {
-	return INPUT_PORTS_NAME( ide8_port );
+	return INPUT_PORTS_NAME( xtide_port );
 }
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *isa8_ide_device::device_rom_region() const
+const rom_entry *xtide_device::device_rom_region() const
 {
-	return ROM_NAME( ide8 );
+	return ROM_NAME( xtide );
 }
 
 //**************************************************************************
@@ -290,11 +294,11 @@ const rom_entry *isa8_ide_device::device_rom_region() const
 //**************************************************************************
 
 //-------------------------------------------------
-//  isa8_ide_device - constructor
+//  xtide_device - constructor
 //-------------------------------------------------
 
-isa8_ide_device::isa8_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, ISA8_IDE, "XT-IDE Fixed Drive Adapter", tag, owner, clock, "isa8_ide", __FILE__),
+xtide_device::xtide_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, ISA8_XTIDE, "XT-IDE Fixed Drive Adapter", tag, owner, clock, "isa8_xtide", __FILE__),
 	device_isa8_card_interface( mconfig, *this ),
 	m_ata(*this, "ata"),
 	m_eeprom(*this, "eeprom")
@@ -305,7 +309,7 @@ isa8_ide_device::isa8_ide_device(const machine_config &mconfig, const char *tag,
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void isa8_ide_device::device_start()
+void xtide_device::device_start()
 {
 	set_isa_device();
 }
@@ -314,14 +318,14 @@ void isa8_ide_device::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void isa8_ide_device::device_reset()
+void xtide_device::device_reset()
 {
 	int base_address    = ((ioport("BIOS_BASE")->read() & 0x0F) * 16 * 1024) + 0xC0000;
 	int io_address      = ((ioport("IO_ADDRESS")->read() & 0x0F) * 0x20) + 0x200;
 	m_irq_number        = (ioport("IRQ")->read() & 0x07);
 
 	m_isa->install_memory(base_address, base_address + 0x1fff, 0, 0, read8_delegate(FUNC(eeprom_parallel_28xx_device::read), &(*m_eeprom)), write8_delegate(FUNC(eeprom_parallel_28xx_device::write), &(*m_eeprom)));
-	m_isa->install_device(io_address, io_address + 0xf, 0, 0, read8_delegate(FUNC(isa8_ide_device::ide8_r), this), write8_delegate(FUNC(isa8_ide_device::ide8_w), this));
+	m_isa->install_device(io_address, io_address + 0xf, 0, 0, read8_delegate(FUNC(xtide_device::read), this), write8_delegate(FUNC(xtide_device::write), this));
 
-	//logerror("isa8_ide_device::device_reset(), bios_base=0x%5X to 0x%5X, I/O=0x%3X, IRQ=%d\n",base_address,base_address + (16*1024)  -1 ,io_address,irq);
+	//logerror("xtide_device::device_reset(), bios_base=0x%5X to 0x%5X, I/O=0x%3X, IRQ=%d\n",base_address,base_address + (16*1024)  -1 ,io_address,irq);
 }
