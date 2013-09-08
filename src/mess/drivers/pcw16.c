@@ -960,7 +960,7 @@ static ADDRESS_MAP_START(pcw16_io, AS_IO, 8, pcw16_state )
 	AM_RANGE(0x018, 0x01f) AM_DEVICE("fdc", pc_fdc_superio_device, map)
 	AM_RANGE(0x020, 0x027) AM_DEVREADWRITE("ns16550_1", ns16550_device, ins8250_r, ins8250_w)
 	AM_RANGE(0x028, 0x02f) AM_DEVREADWRITE("ns16550_2", ns16550_device, ins8250_r, ins8250_w)
-	AM_RANGE(0x038, 0x03a) AM_DEVREADWRITE_LEGACY("lpt", pc_lpt_r, pc_lpt_w)
+	AM_RANGE(0x038, 0x03a) AM_DEVREADWRITE("lpt", pc_lpt_device, read, write)
 	/* anne asic */
 	AM_RANGE(0x0e0, 0x0ef) AM_WRITE(pcw16_palette_w)
 	AM_RANGE(0x0f0, 0x0f3) AM_READWRITE(pcw16_bankhw_r, pcw16_bankhw_w)

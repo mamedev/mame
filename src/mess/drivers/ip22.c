@@ -148,7 +148,7 @@ public:
 	required_device<wd33c93_device> m_wd33c93;
 	required_shared_ptr<UINT32> m_unkpbus0;
 	required_shared_ptr<UINT32> m_mainram;
-	required_device<device_t> m_lpt0;
+	required_device<pc_lpt_device> m_lpt0;
 	required_device<pit8254_device> m_pit;
 	required_device<newport_video_device> m_newport;
 	required_device<dac_device> m_dac;
@@ -270,11 +270,11 @@ READ32_MEMBER(ip22_state::hpc3_pbus6_r)
 	switch( offset )
 	{
 	case 0x004/4:
-		ret8 = pc_lpt_control_r(m_lpt0, space, 0) ^ 0x0d;
+		ret8 = m_lpt0->control_r(space, 0) ^ 0x0d;
 		//verboselog(0, "Parallel Control Read: %02x\n", ret8 );
 		return ret8;
 	case 0x008/4:
-		ret8 = pc_lpt_status_r(m_lpt0, space, 0) ^ 0x80;
+		ret8 = m_lpt0->status_r(space, 0) ^ 0x80;
 		//verboselog(0, "Parallel Status Read: %02x\n", ret8 );
 		return ret8;
 	case 0x030/4:
@@ -344,7 +344,7 @@ WRITE32_MEMBER(ip22_state::hpc3_pbus6_w)
 	{
 	case 0x004/4:
 		//verboselog(0, "Parallel Control Write: %08x\n", data );
-		pc_lpt_control_w(m_lpt0, space, 0, data ^ 0x0d);
+		m_lpt0->control_w(space, 0, data ^ 0x0d);
 		//m_nIOC_ParCntl = data;
 		break;
 	case 0x030/4:

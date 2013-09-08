@@ -438,7 +438,7 @@ READ8_MEMBER( isa8_mda_device::status_r)
 WRITE8_MEMBER( isa8_mda_device::io_write)
 {
 	mc6845_device *mc6845 = subdevice<mc6845_device>(MDA_MC6845_NAME);
-	device_t *lpt = subdevice("lpt");
+	pc_lpt_device *lpt = subdevice<pc_lpt_device>("lpt");
 	switch( offset )
 	{
 		case 0: case 2: case 4: case 6:
@@ -451,7 +451,7 @@ WRITE8_MEMBER( isa8_mda_device::io_write)
 			mode_control_w(space, offset, data);
 			break;
 		case 12: case 13:  case 14:
-			pc_lpt_w(lpt, space, offset - 12, data);
+			lpt->write(space, offset - 12, data);
 			break;
 	}
 }
@@ -460,7 +460,7 @@ READ8_MEMBER( isa8_mda_device::io_read)
 {
 	int data = 0xff;
 	mc6845_device *mc6845 = subdevice<mc6845_device>(MDA_MC6845_NAME);
-	device_t *lpt = subdevice("lpt");
+	pc_lpt_device *lpt = subdevice<pc_lpt_device>("lpt");
 	switch( offset )
 	{
 		case 0: case 2: case 4: case 6:
@@ -474,7 +474,7 @@ READ8_MEMBER( isa8_mda_device::io_read)
 			break;
 		/* 12, 13, 14  are the LPT ports */
 		case 12: case 13:  case 14:
-			data = pc_lpt_r(lpt, space, offset - 12);
+			data = lpt->read(space, offset - 12);
 			break;
 	}
 	return data;
@@ -671,7 +671,7 @@ WRITE8_MEMBER( isa8_hercules_device::mode_control_w )
 WRITE8_MEMBER( isa8_hercules_device::io_write )
 {
 	mc6845_device *mc6845 = subdevice<mc6845_device>(HERCULES_MC6845_NAME);
-	device_t *lpt = subdevice("lpt");
+	pc_lpt_device *lpt = subdevice<pc_lpt_device>("lpt");
 	switch( offset )
 	{
 	case 0: case 2: case 4: case 6:
@@ -684,7 +684,7 @@ WRITE8_MEMBER( isa8_hercules_device::io_write )
 		mode_control_w(space, offset, data);
 		break;
 	case 12: case 13:  case 14:
-		pc_lpt_w(lpt, space, offset - 12, data);
+		lpt->write(space, offset - 12, data);
 		break;
 	case 15:
 		m_configuration_switch = data;
@@ -717,7 +717,7 @@ READ8_MEMBER( isa8_hercules_device::io_read )
 {
 	int data = 0xff;
 	mc6845_device *mc6845 = subdevice<mc6845_device>(HERCULES_MC6845_NAME);
-	device_t *lpt = subdevice("lpt");
+	pc_lpt_device *lpt = subdevice<pc_lpt_device>("lpt");
 	switch( offset )
 	{
 	case 0: case 2: case 4: case 6:
@@ -731,7 +731,7 @@ READ8_MEMBER( isa8_hercules_device::io_read )
 		break;
 	/* 12, 13, 14  are the LPT ports */
 	case 12: case 13:  case 14:
-		data = pc_lpt_r(lpt, space, offset - 12);
+		data = lpt->read(space, offset - 12);
 		break;
 	}
 	return data;

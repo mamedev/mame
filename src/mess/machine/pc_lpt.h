@@ -8,6 +8,8 @@
 #define __PC_LPT_H__
 
 #include "isa.h"
+#include "machine/ctronics.h"
+#include "cntr_covox.h"
 
 
 /***************************************************************************
@@ -16,44 +18,54 @@
 
 struct pc_lpt_interface
 {
-	devcb_write_line out_irq_func;
+	devcb_write_line m_out_irq;
 };
-
-
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-DECLARE_READ8_DEVICE_HANDLER( pc_lpt_r );
-DECLARE_WRITE8_DEVICE_HANDLER( pc_lpt_w );
-
-DECLARE_READ8_DEVICE_HANDLER( pc_lpt_data_r );
-DECLARE_WRITE8_DEVICE_HANDLER( pc_lpt_data_w );
-DECLARE_READ8_DEVICE_HANDLER( pc_lpt_status_r );
-DECLARE_READ8_DEVICE_HANDLER( pc_lpt_control_r );
-DECLARE_WRITE8_DEVICE_HANDLER( pc_lpt_control_w );
-
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-class pc_lpt_device : public device_t
+class pc_lpt_device : public device_t,
+								public pc_lpt_interface
 {
 public:
 	pc_lpt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~pc_lpt_device() { global_free(m_token); }
+	~pc_lpt_device() {}
 
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
+
+	DECLARE_READ8_MEMBER( data_r );
+	DECLARE_WRITE8_MEMBER( data_w );
+	DECLARE_READ8_MEMBER( status_r );
+	DECLARE_READ8_MEMBER( control_r );
+	DECLARE_WRITE8_MEMBER( control_w );
+	
+	DECLARE_WRITE_LINE_MEMBER( ack_w );
+	
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 	virtual machine_config_constructor device_mconfig_additions() const;
+
 private:
 	// internal state
-	void *m_token;
+	centronics_device *m_centronics;
+
+	devcb_resolved_write_line m_out_irq_func;
+
+	UINT8 m_data;
+
+	int m_ack;
+
+	/* control latch */
+	int m_strobe;
+	int m_autofd;
+	int m_init;
+	int m_select;
+	int m_irq_enabled;
 };
 
 extern const device_type PC_LPT;

@@ -1,7 +1,6 @@
 #include "emu.h"
 
 #include "machine/pit8253.h"
-#include "machine/pc_lpt.h"
 #include "includes/amstr_pc.h"
 #include "includes/pc.h"
 #include "video/pc_vga.h"
@@ -231,8 +230,7 @@ READ8_MEMBER( amstrad_pc_state::pc1640_port60_r )
 
 READ8_MEMBER( amstrad_pc_state::pc200_port378_r )
 {
-	device_t *lpt = machine().device("lpt_1");
-	UINT8 data = pc_lpt_r(lpt, space, offset);
+	UINT8 data = m_lpt1->read(space, offset);
 
 	if (offset == 1)
 		data = (data & ~7) | (ioport("DSW0")->read() & 7);
@@ -244,8 +242,7 @@ READ8_MEMBER( amstrad_pc_state::pc200_port378_r )
 
 READ8_MEMBER( amstrad_pc_state::pc200_port278_r )
 {
-	device_t *lpt = machine().device("lpt_2");
-	UINT8 data = pc_lpt_r(lpt, space, offset);
+	UINT8 data = m_lpt2->read(space, offset);
 
 	if (offset == 1)
 		data = (data & ~7) | (ioport("DSW0")->read() & 7);
@@ -258,8 +255,7 @@ READ8_MEMBER( amstrad_pc_state::pc200_port278_r )
 
 READ8_MEMBER( amstrad_pc_state::pc1640_port378_r )
 {
-	device_t *lpt = machine().device("lpt_1");
-	UINT8 data = pc_lpt_r(lpt, space, offset);
+	UINT8 data = m_lpt1->read(space, offset);
 
 	if (offset == 1)
 		data=(data & ~7) | (ioport("DSW0")->read() & 7);

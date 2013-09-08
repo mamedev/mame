@@ -8,14 +8,20 @@
 #define AMSTR_PC_H_
 
 #include "includes/pc.h"
+#include "machine/pc_lpt.h"
 
 class amstrad_pc_state : public pc_state
 {
 public:
 	amstrad_pc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pc_state(mconfig, type, tag)
+		: pc_state(mconfig, type, tag),
+		m_lpt1(*this, "lpt_1"),
+		m_lpt2(*this, "lpt_2")
 			{ m_mouse.x =0; m_mouse.y=0;}
-
+	
+	required_device<pc_lpt_device> m_lpt1;
+	required_device<pc_lpt_device> m_lpt2;
+	
 	DECLARE_READ8_MEMBER( pc1640_port60_r );
 	DECLARE_WRITE8_MEMBER( pc1640_port60_w );
 
