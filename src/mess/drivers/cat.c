@@ -159,7 +159,43 @@ X2: 3.579545Mhz, used by the DTMF generator chip AMI S2579 at IC40
 X3: 2.4576Mhz, used by the modem chip AMI S35213 at IC37
 
 IAI Swyft:
-<insert guru-diagram here once drawn>
+Board name: 950-0001C
+"INFORMATION APPLIANCE INC. COPYRIGHT 1985"
+ _________________|||||||||_____________________________________________________________________________
+|                 video out         [unknown IDC connector]____                                         |
+|                                                         /    \                                        |
+<4 pin edge)           74LS107                            |PB1 |        uA339     MC3403                |
+|                                          7407           \____/                                        |
+| Y1       "TIMING B" 74LS132    74LS175                                                                |
+|                                                  ____________                                         |
+| TMS4256   74LS161  "DECODE E" "DISK 3.5C"       |            |                           4N37         |
+|                                                 |  MC6850P   |                                   -----|
+| TMS4256   74LS166   74HCT259   74LS299          '------------'        MC3403    MC3403           LINE =
+|                      ___________________     ___________________                                 -----|
+| TMS4256   74LS373   |                   |   |                   |                                PHONE=
+|                     |   MC68008P8       |   |       R6522P      |                                -----|
+| TMS4256   74F153    '-------------------'   '-------------------'     MN4053    MN4053          .-----|
+|                             (jumper E1)                                                         |J1   =
+| TMS4256   74F153    74HCT08     __________   ___________________      MC14412   DS1489          | B   =
+|                                |          | |                   | ||                            | R   =
+| TMS4256   74F153    74HC4040E  | 27C256   | |       R6522P      | ||                            | E   =
+|                                '----------' '-------------------' ||                            | A   =
+| TMS4256   74F153    "VIDEO 2B" .----------.                       J4                            | K   =
+|                                | 27C256   |   74HC02     74HC374  ||                            | O   =
+| TMS4256   74F153    74LS393    |__________|                       ||  UM95089  Y2               | U   =
+|_____________________________________(j9)________________________________________________________|_T___=    
+
+"TIMING B" - AMPAL16R4APC (marked on silkscreen "TIMING PAL")
+"DECODE E" - AMPAL16L8 (marked on silkscreen "DECODE PAL")
+"VIDEO 2B" - AMPAL16RAPC (marked on silkscreen "VIDEO PAL")
+"DISK 3.5C" - AMPAL16R4PC (marked on silkscreen "DISK PAL")
+4N37 (marked on silkscreen "4N35")
+74F153 (marked on silkscreen "74ALS153")
+TMS4256-15NL - 262144 x 1 DRAM
+PB1 - piezo speaker
+Crystals:
+Y1: 15.8796Mhx, main clock?
+Y2: 3.579545Mhz, used by the DTMF generator chip UM95089?
 
 
 ToDo:
@@ -256,6 +292,7 @@ ToDo:
 #include "cpu/m68000/m68000.h"
 #include "machine/n68681.h"
 #include "machine/6850acia.h"
+#include "machine/6522via.h"
 #include "machine/nvram.h"
 
 class cat_state : public driver_device
@@ -264,8 +301,7 @@ public:
 	enum
 	{
 		TIMER_KEYBOARD,
-		TIMER_COUNTER_6MS,
-		TIMER_SWYFT_RESET
+		TIMER_COUNTER_6MS
 	};
 
 	cat_state(const machine_config &mconfig, device_type type, const char *tag)
@@ -274,6 +310,8 @@ public:
 		//m_nvram(*this, "nvram"), // merge with svram?
 		m_duart(*this, "duartn68681"),
 		m_acia(*this, "acia6850"),
+		m_via0(*this, "via6522_0"),
+		m_via1(*this, "via6522_1"),
 		//m_speaker(*this, "speaker"),
 		m_svram(*this, "svram"), // nvram
 		m_p_videoram(*this, "p_videoram"),
@@ -292,6 +330,8 @@ public:
 	//optional_device<nvram_device> m_nvram;
 	optional_device<duartn68681_device> m_duart; // only cat uses this
 	optional_device<acia6850_device> m_acia; // only swyft uses this
+	optional_device<via6522_device> m_via0; // only swyft uses this
+	optional_device<via6522_device> m_via1; // only swyft uses this
 	DECLARE_WRITE_LINE_MEMBER(cat_duart_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(cat_duart_txa);
 	DECLARE_READ8_MEMBER(cat_duart_input);
@@ -360,7 +400,6 @@ public:
 
 	//TIMER_CALLBACK_MEMBER(keyboard_callback);
 	TIMER_CALLBACK_MEMBER(counter_6ms_callback);
-	TIMER_CALLBACK_MEMBER(swyft_reset);
 	IRQ_CALLBACK_MEMBER(cat_int_ack);
 
 protected:
@@ -720,20 +759,20 @@ ADDRESS_MAP_END
 a23 a22 a21 a20 a19 a18 a17 a16 a15 a14 a13 a12 a11 a10 a9  a8  a7  a6  a5  a4  a3  a2  a1  (a0 via UDS/LDS)
 ?   ?   ?   ?   0   0   ?   ?   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   a        R   ROM (a=0 is low, a=1 is high)
 ?   ?   ?   ?   0   1   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   a        RW  RAM
-?   ?   ?   ?   1   1  ?0? ?1?  ?   ?   ?   ?   ?   ?   ?   ?   ?   ?   ?   ?   *   *   *   *        R   ? status of something?
-?   ?   ?   ?   1   1  ?1? ?0?  ?   0   0   1   ?   ?   ?   ?   ?   ?   ?   ?   ?   ?   ?   ?        W   6850 acia control reg lives here, gets 0x55 steadystate and 0x57 written to it to reset it
-?   ?   ?   ?   1   1  ?1? ?0?  ?   0   1   0   ?   ?   *   *   *   *  ?*?  ?   ?   ?   ?   ?        RW  ? i/o kb and floppy as well?\_ io and the modem chip too?
-?   ?   ?   ?   1   1  ?1? ?0?  ?   1   0   0   ?   ?   *   *   *   *  ?*?  ?   ?   ?   ?   ?        RW  ? i/o kb and floppy as well?/
+?   ?   ?   ?   1   1  ?0? ?1?  ?   ?   ?   ?   ?   ?   ?   ?   ?   ?   ?   ?   *   *   *   *        R   ? status of something? floppy?
+?   ?   ?   ?   1   1  ?1? ?0?  ?   0   0   1   ?   ?   ?   ?   ?   ?   ?   ?   ?   ?   ?   ?        ?R?W   6850 acia control reg lives here, gets 0x55 steadystate and 0x57 written to it to reset it
+?   ?   ?   ?   1   1  ?1? ?0?  ?   0   1   0   ?   ?   *   *   *   *  ?*?  ?   ?   ?   ?   ?        RW  VIA 0
+?   ?   ?   ?   1   1  ?1? ?0?  ?   1   0   0   ?   ?   *   *   *   *  ?*?  ?   ?   ?   ?   ?        RW  VIA 1
               ^               ^               ^               ^               ^
 */
 
 static ADDRESS_MAP_START(swyft_mem, AS_PROGRAM, 16, cat_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM AM_MIRROR(0xF00000) // 64 KB ROM
-	AM_RANGE(0x040000, 0x07ffff) AM_RAM AM_MIRROR(0xF00000) AM_SHARE("p_videoram")
+	AM_RANGE(0x040000, 0x07ffff) AM_RAM AM_MIRROR(0xF00000) AM_SHARE("p_videoram") // 256 KB RAM
 	//AM_RANGE(0x0d0000, 0x0d000f) AM_READ(unknown_d0004) // status of something? reads from d0000, d0004, d0008, d000a, d000e
 	AM_RANGE(0x0e1000, 0x0e1001) AM_DEVWRITE8("acia6850", acia6850_device, control_write, 0xFF00) // 6850 ACIA lives here
-	// where are the other 3 acia registers?
+	// where are the other 3 acia registers? e1002-e1003, and read/write for each?
 	//AM_RANGE(0x0e2000, 0x0e2fff) AM_READWRITE(unknown_e2000) // io area with selector on a9 a8 a7 a6?
 	//AM_RANGE(0x0e4000, 0x0e4fff) AM_READWRITE(unknown_e4000) // there's likely a modem chip mapped around somewhere
 ADDRESS_MAP_END
@@ -857,9 +896,6 @@ void cat_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 	case TIMER_COUNTER_6MS:
 		counter_6ms_callback(ptr, param);
 		break;
-	case TIMER_SWYFT_RESET:
-		swyft_reset(ptr, param);
-		break;
 	default:
 		assert_always(FALSE, "Unknown id in cat_state::device_timer");
 	}
@@ -934,11 +970,6 @@ UINT32 cat_state::screen_update_cat(screen_device &screen, bitmap_ind16 &bitmap,
 	return 0;
 }
 
-TIMER_CALLBACK_MEMBER(cat_state::swyft_reset)
-{
-	//memset(m_maincpu->space(AS_PROGRAM).get_read_ptr(0xe2341), 0xff, 1);
-}
-
 MACHINE_START_MEMBER(cat_state,swyft)
 {
 	//m_6ms_timer = timer_alloc(TIMER_COUNTER_6MS); // CRUDE HACK
@@ -946,7 +977,6 @@ MACHINE_START_MEMBER(cat_state,swyft)
 
 MACHINE_RESET_MEMBER(cat_state,swyft)
 {
-	//timer_set(attotime::from_usec(10), TIMER_SWYFT_RESET);
 	//m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(cat_state::cat_int_ack),this));
 	//m_6ms_timer->adjust(attotime::zero, 0, attotime::from_hz((XTAL_19_968MHz/2)/65536)); // horrible hack
 }
@@ -1040,17 +1070,6 @@ static const duartn68681_config cat_duart_config =
 	DEVCB_DRIVER_MEMBER(cat_state, cat_duart_output),           /* output port */
 };
 
-static const acia6850_interface swyft_acia_config =
-{
-	3579545, // guess
-	3579545, // guess
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-};
-
 static MACHINE_CONFIG_START( cat, cat_state )
 
 	/* basic machine hardware */
@@ -1078,10 +1097,56 @@ static MACHINE_CONFIG_START( cat, cat_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
+static const acia6850_interface swyft_acia_config =
+{
+	3579545, // guess
+	3579545, // guess
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+};
+
+static const via6522_interface swyft_via0_config =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+};
+
+static const via6522_interface swyft_via1_config =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+};
+
 static MACHINE_CONFIG_START( swyft, cat_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000, XTAL_5MHz) // guess
+	//MCFG_CPU_ADD("maincpu",M68008, XTAL_15_8976MHz/2) //MC68008P8, Y1=15.8796Mhz, clock GUESSED at Y1 / 2
+	MCFG_CPU_ADD("maincpu",M68000, XTAL_15_8976MHz/2) //MC68008P8, Y1=15.8796Mhz, clock GUESSED at Y1 / 2
 	MCFG_CPU_PROGRAM_MAP(swyft_mem)
 
 	MCFG_MACHINE_START_OVERRIDE(cat_state,swyft)
