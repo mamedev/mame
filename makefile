@@ -259,6 +259,9 @@ BUILD_MIDILIB = 1
 # uncomment next line to enable LTO (link-time optimizations)
 # LTO = 1
 
+# uncomment next line to enable networking
+# USE_NETWORK = 1
+
 # specify optimization level or leave commented to use the default
 # (default is OPTIMIZE = 3 normally, or OPTIMIZE = 0 with symbols)
 # OPTIMIZE = 3
