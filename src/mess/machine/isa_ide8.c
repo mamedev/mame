@@ -47,74 +47,76 @@ Device Control (out)        14              7
 
 
 
-#include "emu.h"
 #include "machine/isa_ide8.h"
-#include "machine/idectrl.h"
-#include "imagedev/harddriv.h"
 
 
-static READ8_DEVICE_HANDLER( ide8_r )
+READ8_MEMBER( isa8_ide_device::ide8_r )
 {
-	ata_interface_device   *ide = (ata_interface_device *) device;
-	isa8_ide_device         *ide8_d = downcast<isa8_ide_device *>(device->owner());
-	UINT8   result  = 0;
+	UINT8 result;
 
-	if(offset == 0)
+	if (offset == 0)
 	{
-		// Data register transfer low byte and latch high
-		UINT16 data16 = ide->read_cs0(space, (offset & 0x07), 0xffff);
+		UINT16 data16 = m_ata->read_cs0(space, offset & 7, 0xffff);
 		result = data16 & 0xff;
-		ide8_d->set_latch_in(data16>>8);
+		m_d8_d15_latch = data16 >> 8;
 	}
-	else if((offset > 0) && (offset < 8))
-		result=ide->read_cs0(space, (offset & 0x07), 0xff);
-	else if(offset == 8)
-		result=ide8_d->get_latch_in();
-	else if(offset == 14)
-		result=ide->read_cs1(space, (offset & 0x07), 0xff);
+	else if (offset < 8)
+	{
+		result = m_ata->read_cs0(space, offset & 7, 0xff);
+	}
+	else if (offset == 8)
+	{
+		result = m_d8_d15_latch;
+	}
+	else
+	{
+		result = m_ata->read_cs1(space, offset & 7, 0xff);
+	}
 
 //  logerror("%s ide8_r: offset=%d, result=%2X\n",device->machine().describe_context(),offset,result);
 
 	return result;
 }
 
-static WRITE8_DEVICE_HANDLER( ide8_w )
+WRITE8_MEMBER( isa8_ide_device::ide8_w )
 {
-	ata_interface_device   *ide = (ata_interface_device *) device;
-	isa8_ide_device         *ide8_d = downcast<isa8_ide_device *>(device->owner());
-
 //  logerror("%s ide8_w: offset=%d, data=%2X\n",device->machine().describe_context(),offset,data);
 
-	if(offset == 0)
+	if (offset == 0)
 	{
 		// Data register transfer low byte and latched high
-		UINT16 data16 = (ide8_d->get_latch_out() << 8) | data;
-		ide->write_cs0(space, (offset & 7), data16, 0xffff);
+		UINT16 data16 = (m_d8_d15_latch << 8) | data;
+		m_ata->write_cs0(space, offset & 7, data16, 0xffff);
 	}
-	else if((offset > 0) && (offset < 8))
-		ide->write_cs0(space, (offset & 7), data, 0xff);
-	else if(offset == 8)
-		ide8_d->set_latch_out(data);
-	else if(offset == 14)
-		ide->write_cs1(space, (offset & 7), data, 0xff);
+	else if (offset < 8)
+	{
+		m_ata->write_cs0(space, offset & 7, data, 0xff);
+	}
+	else if (offset == 8)
+	{
+		m_d8_d15_latch = data;
+	}
+	else
+	{
+		m_ata->write_cs1(space, offset & 7, data, 0xff);
+	}
 }
 
 
 WRITE_LINE_MEMBER(isa8_ide_device::ide_interrupt)
 {
-	switch(irq)
+	switch (m_irq_number)
 	{
-		case 0x02 : m_isa->irq2_w(state); break;
-		case 0x03 : m_isa->irq3_w(state); break;
-		case 0x04 : m_isa->irq4_w(state); break;
-		case 0x05 : m_isa->irq5_w(state); break;
-		case 0x07 : m_isa->irq7_w(state); break;
-		default : ;
+		case 0x02: m_isa->irq2_w(state); break;
+		case 0x03: m_isa->irq3_w(state); break;
+		case 0x04: m_isa->irq4_w(state); break;
+		case 0x05: m_isa->irq5_w(state); break;
+		case 0x07: m_isa->irq7_w(state); break;
 	}
 }
 
 static MACHINE_CONFIG_FRAGMENT( ide8_config )
-	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", NULL, false)
+	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", NULL, false)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(isa8_ide_device, ide_interrupt))
 MACHINE_CONFIG_END
 
@@ -167,9 +169,84 @@ static INPUT_PORTS_START( ide8_port )
 INPUT_PORTS_END
 
 ROM_START( ide8 )
-	ROM_REGION(0x04000,"ide8", 0)
-	// XT-IDE universal bios from : http://code.google.com/p/xtideuniversalbios/
-	ROM_LOAD("ide_xtl.bin",  0x00000, 0x03800, CRC(68801d16) SHA1(f3f5bed385d00ac444d85f492c879aa68a864160))
+	ROM_REGION(0x02000,"ide8", 0)
+
+	ROM_DEFAULT_BIOS("xub200b3xt")
+
+	ROM_SYSTEM_BIOS( 0, "xtide_010", "Hargle's Bios v0.10" )
+	ROMX_LOAD( "oprom.bin(v0.10)", 0x000000, 0x002000, CRC(56075ac2) SHA1(f55285a1ed8414c8ddf2364421552e0548cf548f), ROM_BIOS(1) )
+
+	ROM_SYSTEM_BIOS( 1, "xtide_011", "Hargle's Bios v0.11" )
+	ROMX_LOAD( "oprom.bin(v0.11)", 0x000000, 0x002000, CRC(c5fee6c5) SHA1(cc3a015d8d36208d99de8500c962828d2daea939), ROM_BIOS(2) )
+
+	ROM_SYSTEM_BIOS( 2, "xub110xt", "XTIDE_Universal_BIOS_v1.1.0 (XT)" )
+	ROMX_LOAD( "ide_xt.bin(v1.1.0)", 0x000000, 0x002000, CRC(d13f6ae7) SHA1(42c7e7cbf949af718abbd279e9a33680b8428400), ROM_BIOS(3) )
+
+	ROM_SYSTEM_BIOS( 3, "xub110xtp", "XTIDE_Universal_BIOS_v1.1.0 (XT 80186+)" )
+	ROMX_LOAD( "ide_xtp.bin(v1.1.0)", 0x000000, 0x002000, CRC(4dd9124b) SHA1(af9e5742f57cccd16a580efcbda519314afd272d), ROM_BIOS(4) )
+
+	ROM_SYSTEM_BIOS( 4, "xub110at", "XTIDE_Universal_BIOS_v1.1.0 (AT)" )
+	ROMX_LOAD( "ide_at.bin(v1.1.0)", 0x000000, 0x002000, CRC(673ebf69) SHA1(3960c0be39a787e740d14c8667fc09437bd56ff7), ROM_BIOS(5) )
+
+	ROM_SYSTEM_BIOS( 5, "xub111xt", "XTIDE_Universal_BIOS_v1.1.1 (XT)" )
+	ROMX_LOAD( "ide_xt.bin(v1.1.1)", 0x000000, 0x002000, CRC(6c15f095) SHA1(007db7dc16ccbbd9d297e13b81dee4785ac9fa9b), ROM_BIOS(6) )
+
+	ROM_SYSTEM_BIOS( 6, "xub111xtp", "XTIDE_Universal_BIOS_v1.1.1 (XT 80186+)" )
+	ROMX_LOAD( "ide_xtp.bin(v1.1.1)", 0x000000, 0x002000, CRC(3eb1210d) SHA1(1d2e1cd20d548f794c889cdcfa7ebf224d073052), ROM_BIOS(7) )
+
+	ROM_SYSTEM_BIOS( 7, "xub111at", "XTIDE_Universal_BIOS_v1.1.1 (AT)" )
+	ROMX_LOAD( "ide_at.bin(v1.1.1)", 0x000000, 0x002000, CRC(c808b718) SHA1(215903c68784c886a3117662c735a84d203b7858), ROM_BIOS(8) )
+
+	ROM_SYSTEM_BIOS( 8, "xub113xt", "XTIDE_Universal_BIOS_v1.1.3 (XT)" )
+	ROMX_LOAD( "ide_xt.bin(v1.1.3)", 0x000000, 0x002000, CRC(3158452f) SHA1(1363f370196a12c6770de5a76e8daf283b561625), ROM_BIOS(9) )
+
+	ROM_SYSTEM_BIOS( 9, "xub113xtp", "XTIDE_Universal_BIOS_v1.1.3 (XT 80186+)" )
+	ROMX_LOAD( "ide_xtp.bin(v1.1.3)", 0x000000, 0x002000, CRC(d994fa2f) SHA1(68bdc24cc9878a09a77d6420b9565e51bb08e9b1), ROM_BIOS(10) )
+
+	ROM_SYSTEM_BIOS( 10, "xub113at", "XTIDE_Universal_BIOS_v1.1.3 (AT)" )
+	ROMX_LOAD( "ide_at.bin(v1.1.3)", 0x000000, 0x002000, CRC(14ce1ced) SHA1(3eea39ffcb9a796c30f48d12ec8ff13572b3b9dc), ROM_BIOS(11) )
+
+	ROM_SYSTEM_BIOS( 11, "xub114xt", "XTIDE_Universal_BIOS_v1.1.4 (XT)" )
+	ROMX_LOAD( "ide_xt.bin(v1.1.4)", 0x000000, 0x002000, CRC(c73d2dcc) SHA1(335a79be455ef856f2b0c7444fc0b1dfeccc649c), ROM_BIOS(12) )
+
+	ROM_SYSTEM_BIOS( 12, "xub114at", "XTIDE_Universal_BIOS_v1.1.4 (AT)" )
+	ROMX_LOAD( "ide_at.bin(v1.1.4)", 0x000000, 0x002000, CRC(ebb3deda) SHA1(bcab1743e37f5c0a252d7b127b13e64d5c65baf3), ROM_BIOS(13) )
+
+	ROM_SYSTEM_BIOS( 13, "xub115xt", "XTIDE_Universal_BIOS_v1.1.5 (XT)" )
+	ROMX_LOAD( "ide_xt.bin(v1.1.5)", 0x000000, 0x002000, CRC(33a7e0ee) SHA1(b610fd8ea31f5b0568b8b3f2c3ef682be4897a3d), ROM_BIOS(14) )
+
+	ROM_SYSTEM_BIOS( 14, "xub115xtp", "XTIDE_Universal_BIOS_v1.1.3 (XT 80186+)" )
+	ROMX_LOAD( "ide_xtp.bin(v1.1.5)", 0x000000, 0x002000, CRC(44ad9ee9) SHA1(9cd275469703cadb85b6654c56e421a151324ac0), ROM_BIOS(15) ) 
+
+	ROM_SYSTEM_BIOS( 15, "xub115at", "XTIDE_Universal_BIOS_v1.1.5 (AT)" )
+	ROMX_LOAD( "ide_at.bin(v1.1.5)", 0x000000, 0x002000, CRC(434286ce) SHA1(3fc07d174924e7c48b4758a7ba76ecd5362bd75b), ROM_BIOS(16) )
+
+	ROM_SYSTEM_BIOS( 16, "xub200b1xt", "XTIDE_Universal_BIOS_v2.0.0_beta1 (XT)" )
+	ROMX_LOAD( "ide_xt.bin(v2.0.0_beta1)", 0x000000, 0x002000, CRC(379579e7) SHA1(da5ee7b9c43a55592fe909451d31a6766d0ab977), ROM_BIOS(17) )
+	
+	ROM_SYSTEM_BIOS( 17, "xub200b1xtp", "XTIDE_Universal_BIOS_v2.0.0_beta1 (XT 80186+)" )
+	ROMX_LOAD( "ide_xtp.bin(v2.0.0_beta1)", 0x000000, 0x002000, CRC(a887ed63) SHA1(fb33d9e8e8824f61a8d247610d7bd215b7e306b4), ROM_BIOS(18) )
+
+	ROM_SYSTEM_BIOS( 18, "xub200b1at", "XTIDE_Universal_BIOS_v2.0.0_beta1 (AT)" )
+	ROMX_LOAD( "ide_at.bin(v2.0.0_beta1)", 0x000000, 0x002000, CRC(cd2d8791) SHA1(2f831e7701d181d719a777b63dbd61d87036ee21), ROM_BIOS(19) )
+
+	ROM_SYSTEM_BIOS( 19, "xub200b2xt", "XTIDE_Universal_BIOS_v2.0.0_beta2 (XT)" )
+	ROMX_LOAD( "ide_xt.bin(v2.0.0_beta2)", 0x000000, 0x002000, CRC(61ae1143) SHA1(de5f04b71f2614a0c3db6ec01a5dc7546205100a), ROM_BIOS(20) )
+
+	ROM_SYSTEM_BIOS( 20, "xub200b2xtp", "XTIDE_Universal_BIOS_v2.0.0_beta2 (XT 80186+)" )
+	ROMX_LOAD( "ide_xtp.bin(v2.0.0_beta2)", 0x000000, 0x002000, CRC(58883399) SHA1(582718d6dcd8a4367ee86da3201fb966dc4fffcd), ROM_BIOS(21) )
+
+	ROM_SYSTEM_BIOS( 21, "xub200b2at", "XTIDE_Universal_BIOS_v2.0.0_beta2 (AT)" )
+	ROMX_LOAD( "ide_at.bin(v2.0.0_beta2)", 0x000000, 0x002000, CRC(33fe9336) SHA1(723de092af44e2b709b620f3b591ec12bdca53cd), ROM_BIOS(22) )
+
+	ROM_SYSTEM_BIOS( 22, "xub200b3xt", "XTIDE_Universal_BIOS_v2.0.0_beta3 (XT)" )
+	ROMX_LOAD( "ide_xt.bin(v2.0.0_beta3)", 0x000000, 0x002000, CRC(0a8d4bb4) SHA1(509504c1c54842bcd24cdd318bcf6fb0ece09c33), ROM_BIOS(23) )
+
+	ROM_SYSTEM_BIOS( 23, "xub200b3xtp", "XTIDE_Universal_BIOS_v2.0.0_beta3 (XT 80186+)" )
+	ROMX_LOAD( "ide_xtp.bin(v2.0.0_beta3)", 0x000000, 0x002000, CRC(a58658f8) SHA1(f3a4c1dfc8e2b56eeaf0e39aa192125bc05af626), ROM_BIOS(24) )
+
+	ROM_SYSTEM_BIOS( 24, "xub200b3at", "XTIDE_Universal_BIOS_v2.0.0_beta3 (AT)" )
+	ROMX_LOAD( "ide_at.bin(v2.0.0_beta3)", 0x000000, 0x002000, CRC(fc228f41) SHA1(c0053710ebac15284e740889967d73a6657734c7), ROM_BIOS(25) )
 ROM_END
 
 //**************************************************************************
@@ -215,8 +292,9 @@ const rom_entry *isa8_ide_device::device_rom_region() const
 //-------------------------------------------------
 
 isa8_ide_device::isa8_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: device_t(mconfig, ISA8_IDE, "XT-IDE Fixed Drive Adapter", tag, owner, clock, "isa8_ide", __FILE__),
-		device_isa8_card_interface( mconfig, *this )
+	: device_t(mconfig, ISA8_IDE, "XT-IDE Fixed Drive Adapter", tag, owner, clock, "isa8_ide", __FILE__),
+	device_isa8_card_interface( mconfig, *this ),
+	m_ata(*this, "ata")
 {
 }
 
@@ -237,10 +315,10 @@ void isa8_ide_device::device_reset()
 {
 	int base_address    = ((ioport("BIOS_BASE")->read() & 0x0F) * 16 * 1024) + 0xC0000;
 	int io_address      = ((ioport("IO_ADDRESS")->read() & 0x0F) * 0x20) + 0x200;
-	irq                 = (ioport("IRQ")->read() & 0x07);
+	m_irq_number        = (ioport("IRQ")->read() & 0x07);
 
-	m_isa->install_rom(this, base_address, base_address + (16*1024) -1 , 0, 0, "ide8", "ide8");
-	m_isa->install_device(subdevice("ide"), io_address, io_address+15, 0, 0, FUNC(ide8_r), FUNC(ide8_w) );
+	m_isa->install_rom(this, base_address, base_address + 0x1fff, 0, 0, "ide8", "ide8");
+	m_isa->install_device(io_address, io_address + 0xf, 0, 0, read8_delegate(FUNC(isa8_ide_device::ide8_r), this), write8_delegate(FUNC(isa8_ide_device::ide8_w), this));
 
 	//logerror("isa8_ide_device::device_reset(), bios_base=0x%5X to 0x%5X, I/O=0x%3X, IRQ=%d\n",base_address,base_address + (16*1024)  -1 ,io_address,irq);
 }

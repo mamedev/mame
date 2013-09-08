@@ -4,6 +4,7 @@
 #define __ISA_IDE8_H__
 
 #include "emu.h"
+#include "machine/idectrl.h"
 #include "machine/isa.h"
 
 //**************************************************************************
@@ -24,14 +25,9 @@ public:
 	virtual ioport_constructor device_input_ports() const;
 	virtual const rom_entry *device_rom_region() const;
 
-	//bool is_primary() { return m_is_primary; }
+	DECLARE_READ8_MEMBER(ide8_r);
+	DECLARE_WRITE8_MEMBER(ide8_w);
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
-
-	UINT8 get_latch_in() { return data_high_in; }
-	void set_latch_in(UINT8 new_latch) { data_high_in=new_latch; }
-	UINT8 get_latch_out() { return data_high_out; }
-	void set_latch_out(UINT8 new_latch) { data_high_out=new_latch; }
-
 
 protected:
 	// device-level overrides
@@ -40,15 +36,10 @@ protected:
 	virtual void device_config_complete() { m_shortname = "isa_ide8"; }
 
 private:
-	// internal state
-//  bool m_is_primary;
+	required_device<ata_interface_device> m_ata;
 
-	// Interupt request
-	UINT8   irq;
-
-	// Data latch for high byte in and out
-	UINT8 data_high_in;
-	UINT8 data_high_out;
+	UINT8 m_irq_number;
+	UINT8 m_d8_d15_latch;
 };
 
 
