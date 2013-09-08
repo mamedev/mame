@@ -178,16 +178,16 @@ Board name: 950-0001C
 |                             (jumper E1)                                                         |J1   =
 | TMS4256   74F153    74HCT08     __________   ___________________      MC14412   DS1489          | B   =
 |                                |          | |                   | ||                            | R   =
-| TMS4256   74F153    74HC4040E  | 27C256   | |       R6522P      | ||                            | E   =
+| TMS4256   74F153    74HC4040E  | AM27256  | |       R6522P      | ||                            | E   =
 |                                '----------' '-------------------' ||                            | A   =
 | TMS4256   74F153    "VIDEO 2B" .----------.                       J4                            | K   =
-|                                | 27C256   |   74HC02     74HC374  ||                            | O   =
+|                                | AM27256  |   74HC02     74HC374  ||                            | O   =
 | TMS4256   74F153    74LS393    |__________|                       ||  UM95089  Y2               | U   =
 |_____________________________________(j9)________________________________________________________|_T___=    
 
 "TIMING B" - AMPAL16R4APC (marked on silkscreen "TIMING PAL")
-"DECODE E" - AMPAL16L8 (marked on silkscreen "DECODE PAL")
-"VIDEO 2B" - AMPAL16RAPC (marked on silkscreen "VIDEO PAL")
+"DECODE E" - AMPAL16L8PC (marked on silkscreen "DECODE PAL")
+"VIDEO 2B" - AMPAL16R4APC (marked on silkscreen "VIDEO PAL")
 "DISK 3.5C" - AMPAL16R4PC (marked on silkscreen "DISK PAL")
 4N37 (marked on silkscreen "4N35")
 74F153 (marked on silkscreen "74ALS153")
@@ -1173,6 +1173,12 @@ ROM_START( swyft )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "infoapp.lo", 0x0000, 0x8000, CRC(52c1bd66) SHA1(b3266d72970f9d64d94d405965b694f5dcb23bca) )
 	ROM_LOAD( "infoapp.hi", 0x8000, 0x8000, CRC(83505015) SHA1(693c914819dd171114a8c408f399b56b470f6be0) )
+	/* a version of the swyft roms are labeled '331 low' and '331 high' */
+	ROM_REGION( 0x1000, "pals", ROMREGION_ERASEFF )
+	ROM_LOAD( "timing b.pal16r4", 0x0000, 0x38b, NO_DUMP)
+	ROM_LOAD( "decode e.pal16l8", 0x0400, 0x38b, NO_DUMP)
+	ROM_LOAD( "video 2b.pal16r4", 0x0800, 0x38b, NO_DUMP)
+	ROM_LOAD( "disk 3.5c.pal16r4", 0x0c00, 0x38b, NO_DUMP)
 ROM_END
 
 ROM_START( cat )
