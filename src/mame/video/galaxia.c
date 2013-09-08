@@ -14,7 +14,7 @@
 #define BULLET_PEN          (0x19)
 
 
-// Colors are 1bpp, but how they are generated is a mystery
+// Colors are 3bpp, but how they are generated is a mystery
 // there's no color prom on the pcb, nor palette ram
 
 PALETTE_INIT_MEMBER(galaxia_state,galaxia)
