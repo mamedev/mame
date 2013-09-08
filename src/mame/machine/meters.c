@@ -113,5 +113,5 @@ int MechMtr_update(int id, int state)
 	}
 	}
 
-	return res;
+	return meter_info[id].on;
 }

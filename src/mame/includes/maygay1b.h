@@ -55,6 +55,7 @@ public:
 	int m_WDOG;
 	int m_SRSEL;
 	int m_NMIENABLE;
+	int m_meter;
 	TIMER_DEVICE_CALLBACK_MEMBER( maygay1b_nmitimer_callback );
 	UINT8 m_Lamps[256];
 	int m_optic_pattern;

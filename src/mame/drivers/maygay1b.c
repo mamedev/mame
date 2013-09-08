@@ -68,6 +68,8 @@
             3x trimmer
 
 
+		TODO: Convert to stock i8279 implementation, as currently inouts aren't read.
+		      Fix meter reading (possibly related to above)
 ******************************************************************************************/
 #include "emu.h"
 #include "includes/maygay1b.h"
@@ -165,7 +167,7 @@ READ8_MEMBER(maygay1b_state::m1_8279_r)
 	{
 		if ( chip->read_sensor )
 		{
-			result = ioport(portnames[chip->sense_address])->read();
+		result = ioport(portnames[chip->sense_address])->read();
 //          break
 		}
 		if ( chip->sense_auto_inc )
@@ -737,9 +739,14 @@ static UINT8 m1_duart_r (device_t *device)
 WRITE8_MEMBER(maygay1b_state::m1_meter_w)
 {
 	int i;
-
 	for (i=0; i<8; i++)
-	if ( data & (1 << i) )  MechMtr_update(i, data & (1 << i) );
+	{
+		if ( data & (1 << i) )  
+		{
+			MechMtr_update(i, data & (1 << i) );
+			m_meter = data;
+		}
+	}
 }
 
 WRITE8_MEMBER(maygay1b_state::m1_latch_w)
@@ -795,8 +802,11 @@ READ8_MEMBER(maygay1b_state::latch_st_lo)
 
 READ8_MEMBER(maygay1b_state::m1_meter_r)
 {
-	ay8910_device *ay8910 = machine().device<ay8910_device>("aysnd");
-	return ~ay8910->data_r(space, offset);
+	//ay8910_device *ay8910 = machine().device<ay8910_device>("aysnd");
+	//return ay8910->data_r(space, offset);
+	
+	//TODO: Game should read the meter state through Port A of the AY chip, but our timings aren't good enough (?)
+	return m_meter;
 }
 
 static ADDRESS_MAP_START( m1_memmap, AS_PROGRAM, 8, maygay1b_state )
@@ -821,13 +831,11 @@ static ADDRESS_MAP_START( m1_memmap, AS_PROGRAM, 8, maygay1b_state )
 
 	AM_RANGE(0x20C0, 0x20C7) AM_WRITE(m1_latch_w)
 
-	AM_RANGE(0x2400, 0x2401) AM_DEVWRITE("ymsnd", ym2413_device, write) // 2149F??
+	AM_RANGE(0x2400, 0x2401) AM_DEVWRITE("ymsnd", ym2413_device, write)
 	AM_RANGE(0x2404, 0x2405) AM_READ(latch_st_lo)
 	AM_RANGE(0x2406, 0x2407) AM_READ(latch_st_hi)
 
 	AM_RANGE(0x2412, 0x2412) AM_READ(m1_firq_trg_r) // firq, sample playback?
-
-
 
 	AM_RANGE(0x2420, 0x2421) AM_WRITE(latch_ch2_w ) // oki
 
@@ -865,7 +873,7 @@ MACHINE_CONFIG_START( maygay_m1, maygay1b_state )
 	MCFG_PIA6821_ADD("pia", m1_pia_intf)
 	MCFG_MSC1937_ADD("vfd",0,RIGHT_TO_LEFT)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd",AY8913, M1_MASTER_CLOCK)
+	MCFG_SOUND_ADD("aysnd",YM2149, M1_MASTER_CLOCK)
 	MCFG_SOUND_CONFIG(ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
