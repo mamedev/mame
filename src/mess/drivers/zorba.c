@@ -9,8 +9,7 @@ Because it doesn't use the standard Z80 peripherals, it uses a homebrew interrup
  of the Z80's IM2.
 
 The keyboard is an intelligent serial device like the Kaypro's keyboard. They even have the same plug,
-and might be swappable. The keyboard needs to be investigated to find what cpu it uses and maybe get a
-dump of its rom.
+and might be swappable. Need a schematic.
 
 ToDo:
 - Add interrupt vector hardware and masking feature
@@ -27,6 +26,7 @@ Note: because the 8275 isn't working, a generic video handler is being used at t
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "cpu/m6805/m6805.h"
 #include "machine/i8251.h"
 #include "machine/6821pia.h"
 #include "machine/z80dma.h"
@@ -96,6 +96,12 @@ static ADDRESS_MAP_START( zorba_mem, AS_PROGRAM, 8, zorba_state )
 	AM_RANGE( 0x0000, 0x3fff ) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
 	AM_RANGE( 0x4000, 0xf6ff ) AM_RAM
 	AM_RANGE( 0xf700, 0xffff ) AM_RAM AM_SHARE("videoram")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( zorba_kbdmem, AS_PROGRAM, 8, zorba_state )
+	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
+	AM_RANGE( 0x000, 0x07f ) AM_RAM // internal RAM
+	AM_RANGE( 0x080, 0x7ff ) AM_ROM // internal EPROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( zorba_io, AS_IO, 8, zorba_state )
@@ -429,6 +435,10 @@ static MACHINE_CONFIG_START( zorba, zorba_state )
 	MCFG_CPU_IO_MAP(zorba_io)
 	MCFG_MACHINE_RESET_OVERRIDE(zorba_state, zorba)
 
+	/* keyboard */
+	MCFG_CPU_ADD("kbdcpu", M68705, XTAL_3_579545MHz) // MC68705P3S (0x80 bytes ram, 0x780 bytes of rom)
+	MCFG_CPU_PROGRAM_MAP(zorba_kbdmem)
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -466,6 +476,9 @@ MACHINE_CONFIG_END
 ROM_START( zorba )
 	ROM_REGION( 0x14000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "780000.u47", 0x10000, 0x1000, CRC(6d58f2c5) SHA1(7763f08c801cd36e5a761c6dc9f30a50b3bc482d) )
+
+	ROM_REGION( 0x800, "kbdcpu", 0 )
+	ROM_LOAD( "8999-1 3-28-83", 0x080, 0x780, CRC(79fe6c0d) SHA1(4b6fca9379d5199d1347ad1187cbfdebfc4c73e7) )
 
 	ROM_REGION( 0x1000, "chargen", 0 )
 	ROM_LOAD( "773000.u5", 0x0000, 0x1000, CRC(d0a2f8fc) SHA1(29aee7ee657778c46e9800abd4955e6d4b33ef68) )
