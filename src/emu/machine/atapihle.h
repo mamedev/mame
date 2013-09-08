@@ -22,7 +22,13 @@ class atapi_hle_device : public ata_hle_device
 public:
 	atapi_hle_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock,const char *shortname, const char *source);
 
-	enum
+	enum atapi_features_flag_t
+	{
+		ATAPI_FEATURES_FLAG_DMA = 0x01,
+		ATAPI_FEATURES_FLAG_OVL = 0x02
+	};
+
+	enum atapi_interrupt_reason_t
 	{
 		ATAPI_INTERRUPT_REASON_CD = 0x01, // 1 = command, 0 = data
 		ATAPI_INTERRUPT_REASON_IO = 0x02, // 1 = to host, 0 = to device
@@ -59,6 +65,8 @@ protected:
 	packet_command_response_t packet_command_response();
 
 private:
+	void wait_buffer();
+
 	int m_packet;
 	int m_data_size;
 	required_device<scsihle_device> m_scsidev_device;

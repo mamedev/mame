@@ -34,29 +34,15 @@ void atapi_hle_device::process_buffer()
 		if (m_buffer_size > ATAPI_BUFFER_LENGTH || m_buffer_size == 0)
 			m_buffer_size = ATAPI_BUFFER_LENGTH;
 
-		// TODO: dma flag
+		if (m_feature & ATAPI_FEATURES_FLAG_OVL)
+		{
+			printf( "ATAPI_FEATURES_FLAG_OVL not supported\n" );
+		}
+
 		switch (phase)
 		{
 		case SCSI_PHASE_DATAOUT:
-			if (m_buffer_size > m_data_size)
-			{
-				m_buffer_size = m_data_size;
-			}
-
-			m_cylinder_low = m_buffer_size & 0xff;
-			m_cylinder_high = m_buffer_size >> 8;
-
-			if (m_buffer_size > 0)
-			{
-				m_status |= IDE_STATUS_DRQ;
-				m_sector_count = 0;
-			}
-			else
-			{
-				m_sector_count = ATAPI_INTERRUPT_REASON_IO | ATAPI_INTERRUPT_REASON_CD;
-			}
-
-			set_irq(ASSERT_LINE);
+			wait_buffer();
 			break;
 
 		case SCSI_PHASE_DATAIN:
@@ -82,25 +68,7 @@ void atapi_hle_device::process_buffer()
 			m_scsidev_device->WriteData( m_buffer, m_buffer_size );
 			m_data_size -= m_buffer_size;
 
-			if (m_buffer_size > m_data_size)
-			{
-				m_buffer_size = m_data_size;
-			}
-
-			m_cylinder_low = m_buffer_size & 0xff;
-			m_cylinder_high = m_buffer_size >> 8;
-
-			if (m_buffer_size > 0)
-			{
-				m_status |= IDE_STATUS_DRQ;
-				m_sector_count = 0;
-			}
-			else
-			{
-				m_sector_count = ATAPI_INTERRUPT_REASON_IO | ATAPI_INTERRUPT_REASON_CD;
-			}
-
-			set_irq(ASSERT_LINE);
+			wait_buffer();
 			break;
 		}
 	}
@@ -111,9 +79,13 @@ void atapi_hle_device::fill_buffer()
 	switch (m_command)
 	{
 	case IDE_COMMAND_PACKET:
-		if (m_buffer_size > m_data_size)
+		if (m_buffer_size >= m_data_size)
 		{
 			m_buffer_size = m_data_size;
+		}
+		else if (m_buffer_size & 1)
+		{
+			m_buffer_size--;
 		}
 
 		m_cylinder_low = m_buffer_size & 0xff;
@@ -126,13 +98,21 @@ void atapi_hle_device::fill_buffer()
 
 			m_status |= IDE_STATUS_DRQ;
 			m_sector_count = ATAPI_INTERRUPT_REASON_IO;
+
+			if (m_feature & ATAPI_FEATURES_FLAG_DMA)
+			{
+				set_dmarq(ASSERT_LINE);
+			}
+			else
+			{
+				set_irq(ASSERT_LINE);
+			}
 		}
 		else
 		{
 			m_sector_count = ATAPI_INTERRUPT_REASON_IO | ATAPI_INTERRUPT_REASON_CD;
+			set_irq(ASSERT_LINE);
 		}
-
-		set_irq(ASSERT_LINE);
 		break;
 
 	case IDE_COMMAND_IDENTIFY_PACKET_DEVICE:
@@ -142,6 +122,41 @@ void atapi_hle_device::fill_buffer()
 		m_sector_count = ATAPI_INTERRUPT_REASON_IO | ATAPI_INTERRUPT_REASON_CD;
 		set_irq(ASSERT_LINE);
 		break;
+	}
+}
+
+void atapi_hle_device::wait_buffer()
+{
+	if (m_buffer_size >= m_data_size)
+	{
+		m_buffer_size = m_data_size;
+	}
+	else if (m_buffer_size & 1)
+	{
+		m_buffer_size--;
+	}
+
+	m_cylinder_low = m_buffer_size & 0xff;
+	m_cylinder_high = m_buffer_size >> 8;
+
+	if (m_buffer_size > 0)
+	{
+		m_status |= IDE_STATUS_DRQ;
+		m_sector_count = 0;
+
+		if (m_feature & ATAPI_FEATURES_FLAG_DMA)
+		{
+			set_dmarq(ASSERT_LINE);
+		}
+		else
+		{
+			set_irq(ASSERT_LINE);
+		}
+	}
+	else
+	{
+		m_sector_count = ATAPI_INTERRUPT_REASON_IO | ATAPI_INTERRUPT_REASON_CD;
+		set_irq(ASSERT_LINE);
 	}
 }
 

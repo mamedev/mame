@@ -46,7 +46,7 @@ TIMER_CALLBACK_MEMBER(dc_cons_state::atapi_xfer_end )
 
 	//mame_printf_debug("ATAPI: xfer_end.  xferlen = %d\n", atapi_xferlen);
 
-	address_space &space = m_maincpu->space(AS_PROGRAM);
+	m_ata->write_dmack(1);
 
 	while (atapi_xferlen > 0 )
 	{
@@ -55,7 +55,7 @@ TIMER_CALLBACK_MEMBER(dc_cons_state::atapi_xfer_end )
 		// get a sector from the SCSI device
 		for (int i = 0; i < 2048/2; i++)
 		{
-			int d = m_ata->read_cs0(space, 0, 0xffff);
+			int d = m_ata->read_dma();
 			sector_buffer[ i*2 ] = d & 0xff;
 			sector_buffer[ (i*2)+1 ] = d >> 8;
 		}
@@ -75,6 +75,8 @@ TIMER_CALLBACK_MEMBER(dc_cons_state::atapi_xfer_end )
 
 		atapi_xferbase += 2048;
 	}
+
+	m_ata->write_dmack(0);
 
 	g1bus_regs[SB_GDST]=0;
 	dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_GDROM;
