@@ -41,6 +41,7 @@ public:
 		m_mb14241(*this,"mb14241"),
 		m_main_ram(*this, "main_ram"),
 		m_colorram(*this, "colorram"),
+		m_colorram2(*this, "colorram2"),
 		m_discrete(*this, "discrete"),
 		m_samples(*this, "samples"),
 		m_samples1(*this, "samples1"),
@@ -52,6 +53,7 @@ public:
 	optional_device<mb14241_device> m_mb14241;
 	required_shared_ptr<UINT8> m_main_ram;
 	optional_shared_ptr<UINT8> m_colorram;
+	optional_shared_ptr<UINT8> m_colorram2;
 	optional_device<discrete_device> m_discrete;
 
 	/* sound-related */
