@@ -88,20 +88,11 @@
 
 ****************************************************************************/
 
-
-#include <time.h>
-
 #include "emu.h"
-#include "machine/6522via.h"
-#include "machine/8530scc.h"
-#include "cpu/m68000/m68000.h"
+#include "includes/mac.h"
 #include "machine/applefdc.h"
 #include "machine/sonydriv.h"
-#include "machine/ncr5380.h"
-#include "sound/asc.h"
-#include "includes/mac.h"
 #include "debug/debugcpu.h"
-#include "machine/ram.h"
 #include "debugger.h"
 
 #define AUDIO_IS_CLASSIC (m_model <= MODEL_MAC_CLASSIC)
@@ -134,7 +125,12 @@ const via6522_interface mac_via6522_intf =
 {
 	DEVCB_DRIVER_MEMBER(mac_state,mac_via_in_a), DEVCB_DRIVER_MEMBER(mac_state,mac_via_in_b),
 	DEVCB_NULL, DEVCB_NULL,
+
+#ifdef MAC_USE_EMULATED_KBD
+	DEVCB_NULL, DEVCB_DRIVER_MEMBER(mac_state,mac_via_in_cb2),
+#else
 	DEVCB_NULL, DEVCB_NULL,
+#endif
 	DEVCB_DRIVER_MEMBER(mac_state,mac_via_out_a), DEVCB_DRIVER_MEMBER(mac_state,mac_via_out_b),
 	DEVCB_NULL, DEVCB_NULL,
 	DEVCB_NULL, DEVCB_DRIVER_MEMBER(mac_state,mac_via_out_cb2),
@@ -545,7 +541,7 @@ void mac_state::set_memory_overlay(int overlay)
 
     scan the keyboard, and returns key transition code (or NULL ($7B) if none)
 */
-
+#ifndef MAC_USE_EMULATED_KBD
 int mac_state::scan_keyboard()
 {
 	int i, j;
@@ -671,8 +667,30 @@ void mac_state::keyboard_init()
 	/* purge transmission buffer */
 	m_keycode_buf_index = 0;
 }
+#endif
 
 /******************* Keyboard <-> VIA communication ***********************/
+
+WRITE_LINE_MEMBER(mac_state::mac_kbd_clk_in)
+{
+    printf("CLK: %d\n", state^1);
+    m_via1->write_cb1(state ? 0 : 1);
+}
+
+#ifdef MAC_USE_EMULATED_KBD
+READ8_MEMBER(mac_state::mac_via_in_cb2)
+{
+    printf("Read %d from keyboard (PC=%x)\n", (m_mackbd->data_r() == ASSERT_LINE) ? 1 : 0, m_maincpu->pc());
+    return (m_mackbd->data_r() == ASSERT_LINE) ? 1 : 0;
+}
+
+WRITE8_MEMBER(mac_state::mac_via_out_cb2)
+{
+    printf("Sending %d to kbd (PC=%x)\n", data, m_maincpu->pc());
+    m_mackbd->data_w((data & 1) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+#else	// keyboard HLE
 
 TIMER_CALLBACK_MEMBER(mac_state::kbd_clock)
 {
@@ -813,6 +831,7 @@ void mac_state::keyboard_receive(int val)
 		break;
 	}
 }
+#endif
 
 /* *************************************************************************
  * Mouse
@@ -1891,11 +1910,13 @@ void mac_state::machine_reset()
 	m_via2_vbl = 0;
 	m_se30_vbl_enable = 0;
 	m_nubus_irq_state = 0xff;
+#ifndef MAC_USE_EMULATED_KBD
 	m_keyboard_reply = 0;
 	m_kbd_comm = 0;
 	m_kbd_receive = 0;
 	m_kbd_shift_reg = 0;
 	m_kbd_shift_count = 0;
+#endif
 	m_mouse_bit_x = m_mouse_bit_y = 0;
 	m_pm_data_send = m_pm_data_recv = m_pm_ack = m_pm_req = m_pm_dptr = 0;
 	m_pm_state = 0;
@@ -2053,9 +2074,16 @@ void mac_state::mac_driver_init(model_t model)
 	}
 
 	/* setup keyboard */
+#ifndef MAC_USE_EMULATED_KBD
 	keyboard_init();
-
 	m_inquiry_timeout = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mac_state::inquiry_timeout_func),this));
+#else
+	/* clear key matrix for macadb */
+	for (int i=0; i<7; i++)
+	{
+		m_key_matrix[i] = 0;
+	}
+#endif
 
 	/* save state stuff */
 	machine().save().register_postload(save_prepost_delegate(FUNC(mac_state::mac_state_load), this));
@@ -2153,6 +2181,7 @@ void mac_state::vblank_irq()
 		this->adb_vblank();
 	}
 
+#ifndef MAC_USE_EMULATED_KBD
 	/* handle keyboard */
 	if (m_kbd_comm == TRUE)
 	{
@@ -2168,6 +2197,7 @@ void mac_state::vblank_irq()
 			kbd_shift_out(keycode);
 		}
 	}
+#endif
 
 	/* signal VBlank on CA1 input on the VIA */
 	if ((m_model < MODEL_MAC_II) || (m_model == MODEL_MAC_PB140) || (m_model == MODEL_MAC_PB160) || (m_model == MODEL_MAC_QUADRA_700))

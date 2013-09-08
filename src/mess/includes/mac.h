@@ -28,6 +28,9 @@
 #define MAC_539X_1_TAG "scsi:539x_1"
 #define MAC_539X_2_TAG "scsi:539x_2"
 
+// uncomment to run i8021 keyboard in orignal Mac/512(e)/Plus
+//#define MAC_USE_EMULATED_KBD (1)
+
 // model helpers
 #define ADB_IS_BITBANG  ((mac->m_model == MODEL_MAC_SE || mac->m_model == MODEL_MAC_CLASSIC) || (mac->m_model >= MODEL_MAC_II && mac->m_model <= MODEL_MAC_IICI) || (mac->m_model == MODEL_MAC_SE30) || (mac->m_model == MODEL_MAC_QUADRA_700))
 #define ADB_IS_BITBANG_CLASS    ((m_model == MODEL_MAC_SE || m_model == MODEL_MAC_CLASSIC) || (m_model >= MODEL_MAC_II && m_model <= MODEL_MAC_IICI) || (m_model == MODEL_MAC_SE30) || (m_model == MODEL_MAC_QUADRA_700))
@@ -251,6 +254,7 @@ public:
 	UINT32 m_se30_vbl_enable;
 	UINT8 m_nubus_irq_state;
 
+#ifndef MAC_USE_EMULATED_KBD
 	/* used to store the reply to most keyboard commands */
 	int m_keyboard_reply;
 
@@ -263,12 +267,13 @@ public:
 	int m_kbd_shift_reg;
 	int m_kbd_shift_count;
 
-	/* keyboard matrix to detect transition */
-	int m_key_matrix[7];
-
 	/* keycode buffer (used for keypad/arrow key transition) */
 	int m_keycode_buf[2];
 	int m_keycode_buf_index;
+#endif
+
+	/* keyboard matrix to detect transition - macadb needs to stop relying on this */
+	int m_key_matrix[7];
 
 	int m_mouse_bit_x;
 	int m_mouse_bit_y;
@@ -499,8 +504,10 @@ public:
 	UINT32 screen_update_macsonora(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_macpbwd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(mac_rbv_vbl);
+#ifndef MAC_USE_EMULATED_KBD
 	TIMER_CALLBACK_MEMBER(kbd_clock);
 	TIMER_CALLBACK_MEMBER(inquiry_timeout_func);
+#endif
 	TIMER_CALLBACK_MEMBER(mac_6015_tick);
 	TIMER_CALLBACK_MEMBER(mac_scanline_tick);
 	TIMER_CALLBACK_MEMBER(dafb_vbl_tick);
