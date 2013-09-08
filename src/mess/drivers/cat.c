@@ -194,7 +194,7 @@ Board name: 950-0001C
 TMS4256-15NL - 262144 x 1 DRAM
 PB1 - piezo speaker
 Crystals:
-Y1: 15.8976Mhx, main clock?
+Y1: 15.8976Mhz, main clock?
 Y2: 3.579545Mhz, used by the DTMF generator chip UM95089?
 
 
