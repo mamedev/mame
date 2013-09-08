@@ -79,6 +79,9 @@ USE_DISPATCH_GL = 1
 # uncomment to disable MIDI
 # NO_USE_MIDI = 1
 
+# uncomment to disable implementations based on assembler code
+# NOASM = 1
+
 ###########################################################################
 ##################   END USER-CONFIGURABLE OPTIONS   ######################
 ###########################################################################
@@ -458,6 +461,11 @@ endif
 # array bounds checking seems to be buggy in 4.8.1 (try it on video/stvvdp1.c and video/model1.c without -Wno-array-bounds)
 ifeq ($(findstring 4.8.,$(TEST_GCC)),4.8.)
 	CCOMFLAGS += -Wno-narrowing -Wno-attributes -Wno-unused-local-typedefs -Wno-unused-variable -Wno-array-bounds -Wno-strict-overflow
+endif
+
+# disable the cast alignment warnings for the Rasberry Pi
+ifeq ($(findstring rpi,$(TEST_GCC)),rpi)
+	CCOMFLAGS += -Wno-cast-align
 endif
 endif
 

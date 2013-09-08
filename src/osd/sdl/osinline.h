@@ -83,6 +83,9 @@ _osd_exchange64(INT64 volatile *ptr, INT64 exchange)
 
 #endif /* __ppc64__ || __PPC64__ */
 
+#else
+
+#error "no matching assembler implementations found - please compile with NOASM=1"
 
 #endif
 
