@@ -21,6 +21,8 @@
 
     - RTC type MM58167A to be added. Modem chips TMS99531, TMS99532 to be developed.
 
+    - Once everything works, sort out parent and compat relationships.
+
 **************************************************************************************************/
 
 #include "includes/kaypro.h"
@@ -287,7 +289,7 @@ DRIVER_INIT_MEMBER( kaypro_state, kaypro )
 	m_fdc->setup_intrq_cb(fd1793_t::line_cb(FUNC(kaypro_state::fdc_intrq_w), this));
 	m_fdc->setup_drq_cb(fd1793_t::line_cb(FUNC(kaypro_state::fdc_drq_w), this));
 
-	UINT8 *main = memregion("maincpu")->base();
+	UINT8 *main = memregion("roms")->base();
 	UINT8 *ram = memregion("rambank")->base();
 
 	membank("bankr0")->configure_entry(1, &main[0x0000]);
@@ -308,8 +310,13 @@ DRIVER_INIT_MEMBER( kaypro_state, kaypro )
 
 ROM_START(kayproii)
 	/* The board could take a 2716 or 2732 */
-	ROM_REGION(0x4000, "maincpu",0)
-	ROM_LOAD("81-149.u47",   0x0000, 0x0800, CRC(28264bc1) SHA1(a12afb11a538fc0217e569bc29633d5270dfa51b) )
+	ROM_REGION(0x4000, "roms",0)
+	ROM_SYSTEM_BIOS( 0, "149", "149")
+	ROMX_LOAD("81-149.u47",   0x0000, 0x0800, CRC(28264bc1) SHA1(a12afb11a538fc0217e569bc29633d5270dfa51b), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "149b", "149B")
+	ROMX_LOAD("81-149b.u47",  0x0000, 0x0800, CRC(c008549e) SHA1(b9346a16f5f9ffb6bb0eb1766c348b74056485a8), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS( 2, "149c", "149C")
+	ROMX_LOAD("81-149c.u47",  0x0000, 0x0800, CRC(1272aa65) SHA1(027fee2f5f17ba71a4738f00188e132e326536ff), ROM_BIOS(3) )
 
 	ROM_REGION(0x10000, "rambank", ROMREGION_ERASEFF)
 
@@ -318,7 +325,7 @@ ROM_START(kayproii)
 ROM_END
 
 ROM_START(kaypro4)
-	ROM_REGION(0x4000, "maincpu",0)
+	ROM_REGION(0x4000, "roms",0)
 	ROM_LOAD("81-232.u47",   0x0000, 0x1000, CRC(4918fb91) SHA1(cd9f45cc3546bcaad7254b92c5d501c40e2ef0b2) )
 
 	ROM_REGION(0x10000, "rambank", ROMREGION_ERASEFF)
@@ -328,7 +335,7 @@ ROM_START(kaypro4)
 ROM_END
 
 ROM_START(kaypro4p88) // "KAYPRO-88" board has 128k or 256k of its own ram on it
-	ROM_REGION(0x4000, "maincpu",0)
+	ROM_REGION(0x4000, "roms",0)
 	ROM_LOAD("81-232.u47",   0x0000, 0x1000, CRC(4918fb91) SHA1(cd9f45cc3546bcaad7254b92c5d501c40e2ef0b2) )
 
 	ROM_REGION(0x10000, "rambank", ROMREGION_ERASEFF)
@@ -341,7 +348,7 @@ ROM_START(kaypro4p88) // "KAYPRO-88" board has 128k or 256k of its own ram on it
 ROM_END
 
 ROM_START(omni2)
-	ROM_REGION(0x4000, "maincpu",0)
+	ROM_REGION(0x4000, "roms",0)
 	ROM_LOAD("omni2.u47",    0x0000, 0x1000, CRC(2883f9e0) SHA1(d98c784e62853582d298bf7ca84c75872847ac9b) )
 
 	ROM_REGION(0x10000, "rambank", ROMREGION_ERASEFF)
@@ -351,8 +358,11 @@ ROM_START(omni2)
 ROM_END
 
 ROM_START(kaypro2x)
-	ROM_REGION(0x4000, "maincpu",0)
-	ROM_LOAD("81-292.u34",   0x0000, 0x2000, CRC(5eb69aec) SHA1(525f955ca002976e2e30ac7ee37e4a54f279fe96) )
+	ROM_REGION(0x4000, "roms",0)
+	ROM_SYSTEM_BIOS( 0, "292", "292")
+	ROMX_LOAD("81-292.u34",   0x0000, 0x2000, CRC(5eb69aec) SHA1(525f955ca002976e2e30ac7ee37e4a54f279fe96), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "292a", "292A")
+	ROMX_LOAD("81-292a.u34",  0x0000, 0x1000, CRC(241f27a5) SHA1(82711289d19e9b165e35324da010466d225e503a), ROM_BIOS(2) )
 
 	ROM_REGION(0x10000, "rambank", ROMREGION_ERASEFF)
 
@@ -361,7 +371,7 @@ ROM_START(kaypro2x)
 ROM_END
 
 ROM_START(kaypro4a) // same as kaypro2x ??
-	ROM_REGION(0x4000, "maincpu",0)
+	ROM_REGION(0x4000, "roms",0)
 	ROM_LOAD("81-292.u34",   0x0000, 0x2000, CRC(5eb69aec) SHA1(525f955ca002976e2e30ac7ee37e4a54f279fe96) )
 
 	ROM_REGION(0x10000, "rambank", ROMREGION_ERASEFF)
@@ -371,8 +381,15 @@ ROM_START(kaypro4a) // same as kaypro2x ??
 ROM_END
 
 ROM_START(kaypro10)
-	ROM_REGION(0x4000, "maincpu",0)
-	ROM_LOAD("81-302.u42",   0x0000, 0x1000, CRC(3f9bee20) SHA1(b29114a199e70afe46511119b77a662e97b093a0) )
+	ROM_REGION(0x4000, "roms",0)
+	ROM_SYSTEM_BIOS( 0, "302", "V1.9E")
+	ROMX_LOAD("81-302.u42",   0x0000, 0x1000, CRC(3f9bee20) SHA1(b29114a199e70afe46511119b77a662e97b093a0), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "188", "V1.9")
+	ROMX_LOAD("81-188.u42",   0x0000, 0x1000, CRC(6cbd6aa0) SHA1(47004f8c6e17407e4f8d613c9520f9316716d9e2), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS( 2, "277", "V1.9E(F)")
+	ROMX_LOAD("81-277.u42",   0x0000, 0x1000, CRC(e4e1831f) SHA1(1de31ed532a461ace7a4abad1f6647eeddceb3e7), ROM_BIOS(3) )
+	ROM_SYSTEM_BIOS( 3, "478", "V2.01")
+	ROMX_LOAD("81-478.u42",   0x0000, 0x2000, CRC(de618380) SHA1(c8d6312e6eeb62a53e741f1ff3b878bdcb7b5aaa), ROM_BIOS(4) )
 
 	ROM_REGION(0x10000, "rambank", ROMREGION_ERASEFF)
 
@@ -380,15 +397,18 @@ ROM_START(kaypro10)
 	ROM_LOAD("81-187.u31",   0x0000, 0x1000, CRC(5f72da5b) SHA1(8a597000cce1a7e184abfb7bebcb564c6bf24fb7) )
 ROM_END
 
-//ROM_START(robie)
-//	ROM_REGION(0x4000, "maincpu",0)
-//	ROM_LOAD("81-326.u34",   0x0000, 0x2000, NO_DUMP )
-//
-//	ROM_REGION(0x10000, "rambank", ROMREGION_ERASEFF)
-//
-//	ROM_REGION(0x1000, "chargen",0)
-//	ROM_LOAD("81-235.u9",   0x0000, 0x1000, NO_DUMP )
-//ROM_END
+ROM_START(robie)
+	ROM_REGION(0x4000, "roms",0)
+	ROM_SYSTEM_BIOS( 0, "326", "V1.7R")
+	ROMX_LOAD("81-326.u34",   0x0000, 0x2000, CRC(7f0c3f68) SHA1(54b088a1b2200f9df4b9b347bbefb0115f3a4976), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "u", "V1.4")
+	ROMX_LOAD("robie_u.u34",  0x0000, 0x2000, CRC(da7248b5) SHA1(1dc053b3e44ead47255cc166b7b4b0adaeb3dd3d), ROM_BIOS(2) ) // rom number unknown
+
+	ROM_REGION(0x10000, "rambank", ROMREGION_ERASEFF)
+
+	ROM_REGION(0x1000, "chargen",0)
+	ROM_LOAD("81-235.u9",    0x0000, 0x1000, CRC(5f72da5b) SHA1(8a597000cce1a7e184abfb7bebcb564c6bf24fb7) )
+ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT    CLASS         INIT         COMPANY                 FULLNAME */
 COMP( 1982, kayproii,   0,        0,    kayproii, kay_kbd, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro II - 2/83" , 0 )
@@ -399,3 +419,4 @@ COMP( 1984, kaypro2x,   0,        0,    kaypro2x, kay_kbd, kaypro_state, kaypro,
 COMP( 1984, kaypro4a,   kaypro2x, 0,    kaypro2x, kay_kbd, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro 4 - 4/84" , GAME_NOT_WORKING ) // model 81-015
 // Kaypro 4/84 plus 88 goes here, model 81-015 with an added 8088 daughterboard and rom
 COMP( 1983, kaypro10,   0,        0,    kaypro2x, kay_kbd, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro 10" , GAME_NOT_WORKING ) // model 81-005
+COMP( 1984, robie,      0,        0,    kaypro2x, kay_kbd, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro Robie" , GAME_NOT_WORKING ) // model 81-005
