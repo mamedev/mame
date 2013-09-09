@@ -1238,7 +1238,7 @@ $(MESSOBJ)/cce.a:               \
 	$(MESS_DRIVERS)/mc1000.o    \
 
 $(MESSOBJ)/ccs.a:               \
-	$(MESS_DRIVERS)/ccs2422.o   \
+	$(MESS_DRIVERS)/ccs300.o    \
 	$(MESS_DRIVERS)/ccs2810.o   \
 
 $(MESSOBJ)/chromatics.a:        \
