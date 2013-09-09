@@ -463,7 +463,8 @@ ifeq ($(findstring 4.8.,$(TEST_GCC)),4.8.)
 	CCOMFLAGS += -Wno-narrowing -Wno-attributes -Wno-unused-local-typedefs -Wno-unused-variable -Wno-array-bounds -Wno-strict-overflow
 endif
 
-# disable the cast alignment warnings for the Rasberry Pi
+# disable the cast alignment warnings for ARM-based systems (test needs to be fixed to check arch rather than a specific vendor)
+#ifneq (,$(findstring arm,$(UNAME))) # does this work?
 ifeq ($(findstring rpi,$(TEST_GCC)),rpi)
 	CCOMFLAGS += -Wno-cast-align
 endif
