@@ -731,6 +731,12 @@ static void AICA_UpdateReg(aica_state *AICA, address_space &space, int reg)
 		case 0x9:
 			aica_midi_in(AICA->device, space, 0, AICA->udata.data[0x8/2]&0xff, 0xffff);
 			break;
+
+		//case 0x0c:
+		//case 0x0d:
+		//	printf("%04x\n",AICA->udata.data[0xc/2]);
+		//	break;
+
 		case 0x12:
 		case 0x13:
 		case 0x14:
@@ -945,6 +951,7 @@ static void AICA_UpdateRegR(aica_state *AICA, address_space &space, int reg)
 		case 0x14:  // CA (slot address)
 		case 0x15:
 			{
+				//AICA->stream->update();
 				int slotnum = MSLC(AICA);
 				SLOT *slot=AICA->Slots+slotnum;
 				unsigned int CA = 0;
@@ -957,6 +964,8 @@ static void AICA_UpdateRegR(aica_state *AICA, address_space &space, int reg)
 				{
 					CA = (slot->cur_addr>>SHIFT)&AICA->RAM_MASK;
 				}
+
+				//printf("%08x %08x\n",CA,slot->cur_addr&AICA->RAM_MASK16);
 
 				AICA->udata.data[0x14/2] = CA;
 			}

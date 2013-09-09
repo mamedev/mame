@@ -666,6 +666,7 @@ void dc_state::machine_start()
 void dc_state::machine_reset()
 {
 	/* halt the ARM7 */
+	m_armrst = 1;
 	m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	memset(dc_sysctrl_regs, 0, sizeof(dc_sysctrl_regs));
@@ -677,6 +678,9 @@ READ32_MEMBER(dc_state::dc_aica_reg_r)
 {
 //  mame_printf_verbose("AICA REG: [%08x] read %" I64FMT "x, mask %" I64FMT "x\n", 0x700000+reg*4, (UINT64)offset, mem_mask);
 
+	if(offset == 0x2c00/4)
+		return m_armrst;
+
 	return aica_r(machine().device("aica"), space, offset*2, 0xffff);
 }
 
@@ -684,15 +688,20 @@ WRITE32_MEMBER(dc_state::dc_aica_reg_w)
 {
 	if (offset == (0x2c00/4))
 	{
-		if (data & 1)
+		if(ACCESSING_BITS_0_7)
 		{
-			/* halt the ARM7 */
-			m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-		}
-		else
-		{
-			/* it's alive ! */
-			m_soundcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+			m_armrst = data & 1;
+
+			if (data & 1)
+			{
+				/* halt the ARM7 */
+				m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+			}
+			else
+			{
+				/* it's alive ! */
+				m_soundcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+			}
 		}
 	}
 

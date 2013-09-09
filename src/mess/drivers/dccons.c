@@ -157,9 +157,9 @@
 				ok
 		S_Clock (03xx)
 			50MSEC (0301)
-				NG
+				NG -> ~0xa58 in 0x702814, must be > 0x889 and < 0x8b0
 			25MSEC (0302)
-				NG
+				NG -> ~0x372 in 0x702814, must be > 0x443 and < 0x45a
 		Timer (04xx)
 			Timer A (0401)
 				NG

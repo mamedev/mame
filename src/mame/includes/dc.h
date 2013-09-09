@@ -36,6 +36,7 @@ class dc_state : public driver_device
 	UINT32 dc_sysctrl_regs[0x200/4];
 	UINT32 g1bus_regs[0x100/4]; // DC-only
 	UINT32 g2bus_regs[0x100/4];
+	UINT8 m_armrst;
 
 	struct {
 		UINT32 aica_addr;
