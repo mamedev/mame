@@ -2242,11 +2242,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( hotdogst, cave_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)
 	MCFG_CPU_PROGRAM_MAP(hotdogst_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_4MHz)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_32MHz/8)
 	MCFG_CPU_PROGRAM_MAP(hotdogst_sound_map)
 	MCFG_CPU_IO_MAP(hotdogst_sound_portmap)
 
@@ -2273,7 +2273,7 @@ static MACHINE_CONFIG_START( hotdogst, cave_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_4MHz)
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_32MHz/8)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(cave_state, irqhandler))
 	MCFG_YM2203_AY8910_INTF(&ay8910_config)
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.20)
@@ -2285,7 +2285,7 @@ static MACHINE_CONFIG_START( hotdogst, cave_state )
 	MCFG_SOUND_ROUTE(3, "lspeaker",  0.80)
 	MCFG_SOUND_ROUTE(3, "rspeaker", 0.80)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_1_056MHz, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_32MHz/32, OKIM6295_PIN7_HIGH) // pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
