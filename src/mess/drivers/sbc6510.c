@@ -50,6 +50,7 @@ ToDo:
 
 #include "emu.h"
 #include "cpu/m6502/m6510.h"
+#include "cpu/avr8/avr8.h"
 #include "machine/mos6526.h"
 #include "sound/ay8910.h"
 #include "machine/terminal.h"
@@ -61,6 +62,7 @@ public:
 	sbc6510_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") ,
+		m_videocpu(*this, "videocpu") ,
 		m_terminal(*this, TERMINAL_TAG) { }
 
 	DECLARE_READ8_MEMBER(a2_r);
@@ -78,6 +80,7 @@ public:
 protected:
 	ioport_port *m_io_port[8];
 	required_device<cpu_device> m_maincpu;
+	required_device<avr8_device> m_videocpu;
 	required_device<generic_terminal_device> m_terminal;
 };
 
@@ -91,6 +94,17 @@ static ADDRESS_MAP_START( sbc6510_mem, AS_PROGRAM, 8, sbc6510_state )
 	AM_RANGE(0xe800, 0xe800) AM_MIRROR(0x1ff) AM_DEVWRITE("ay8910", ay8910_device, address_w)
 	AM_RANGE(0xea00, 0xea00) AM_MIRROR(0x1ff) AM_DEVREADWRITE("ay8910", ay8910_device, data_r, data_w)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( sbc6510_video_mem, AS_PROGRAM, 8, sbc6510_state )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( sbc6510_video_data, AS_DATA, 8, sbc6510_state )
+	AM_RANGE(0x0100, 0x04ff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( sbc6510_video_io, AS_IO, 8, sbc6510_state )
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -180,6 +194,9 @@ static INPUT_PORTS_START( sbc6510 ) // cbm keyboard
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Shift Lock (switch)") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("MAIN")
+		PORT_BIT(0xff, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
 
@@ -255,11 +272,23 @@ WRITE8_MEMBER( sbc6510_state::key_w )
 	m_key_row = data;
 }
 
+const avr8_config atmega88_config =
+{
+	"eeprom"
+};
+
+
 static MACHINE_CONFIG_START( sbc6510, sbc6510_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6510, XTAL_1MHz)
 	MCFG_CPU_PROGRAM_MAP(sbc6510_mem)
 
+	MCFG_CPU_ADD("videocpu",ATMEGA88, XTAL_16MHz)
+	MCFG_DEVICE_DISABLE() // trips SLEEP opcode, needs to be emulated
+	MCFG_CPU_AVR8_CONFIG(atmega88_config)
+	MCFG_CPU_PROGRAM_MAP(sbc6510_video_mem)
+	MCFG_CPU_DATA_MAP(sbc6510_video_data)
+	MCFG_CPU_IO_MAP(sbc6510_video_io)
 
 	/* video hardware */
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
@@ -279,13 +308,14 @@ MACHINE_CONFIG_END
 ROM_START( sbc6510 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "sbc6510.rom", 0xf000, 0x1000, CRC(e13a5e62) SHA1(1e7482e9b98b39d0cc456254fbe8fd0981e9377e))
-	ROM_REGION( 0x2000, "videocpu", ROMREGION_ERASEFF ) // ATMEGA8 at 16MHz
+	ROM_REGION( 0x10000, "videocpu", ROMREGION_ERASEFF ) // ATMEGA8 at 16MHz
 	ROM_LOAD( "video.bin",   0x0000, 0x2000, CRC(809f31ce) SHA1(4639de5f7b8f6c036d74f217ba85e7e897039094))
 	ROM_REGION( 0x200, "gal", ROMREGION_ERASEFF )
 	ROM_LOAD( "sbc6510.gal", 0x0000, 0x0117, CRC(f78f9927) SHA1(b951163958f5722032826d0d17a07c81dbd5f68e))
+	ROM_REGION( 0x2000, "eeprom", ROMREGION_ERASEFF )
 ROM_END
 
 /* Driver */
 
 /*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    CLASS         INIT    COMPANY          FULLNAME       FLAGS */
-COMP( 2009, sbc6510,  0,      0,       sbc6510,   sbc6510, driver_device, 0,   "Josip Perusanec", "SBC6510", 0 )
+COMP( 2009, sbc6510,  0,      0,       sbc6510,   sbc6510, driver_device, 0,   "Josip Perusanec", "SBC6510", GAME_NOT_WORKING )
