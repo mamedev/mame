@@ -1,6 +1,6 @@
 /******************************************************************************
 *
-*  Dectalk DTC-01 Driver
+*  DECtalk DTC-01 Driver
 *  By Jonathan Gevaryahu AKA Lord Nightmare
 *  with major help (dumping, tech questions answered, etc)
 *  from Kevin 'kevtris' Horton, without whom this driver would
@@ -11,8 +11,8 @@
 *  Special thanks to leeeeee for helping figure out what the led selftest codes actually mean
 *
 *  This driver dedicated in memory of Dennis Klatt and Jonathan Allen, without whose
-*  original work MITalk and hence KlattTalk and DECTALK would never have existed, and
-*  in memory of Martin Minow, who wrote much of the Dectalk DTC-01 code.
+*  original work MITalk and hence KlattTalk and DECtalk would never have existed, and
+*  in memory of Martin Minow, who wrote much of the DECtalk DTC-01 code.
 *
 *  TODO:
 *  * DUART:
@@ -29,10 +29,10 @@
 *    * pins OP0 and OP2 are connected to the primary serial port:
 *      * OP0 is RTS
 *      * OP2 is DTR
-*  * Actually store the X2212 nvram's eeprom data to disk rather than throwing it out on exit
-*    * Is there some way I can hook this up using &generic_nvram? Right now signs point to no.
+*  * <DONE> Actually store the X2212 nvram's eeprom data to disk rather than throwing it out on exit
+*    * Get setup mode with the serial BREAK int working enough to actually properly save the default nvram back to the chip in emulation, and get rid of the (currently unused) nvram default image in the rom definitions
 *  * emulate/simulate the MT8060 dtmf decoder as a 16-key input device? or hook it to some simple fft code? Francois Javier's fftmorse code ran full speed on a 6mhz 80286, maybe use that?
-*  * discuss and figure out how to have an external application send data to the two serial ports to be spoken (maybe using paste from clipboard?)
+*  * figure out how to plumb diserial/rs232 to have an external application send data to the two serial ports to be spoken; this shouldn't be too hard at this point.
 *
 * LED error code list (found by experimentation and help from leeeeee):
 *    Startup Self tests:
@@ -78,13 +78,13 @@ DTC-01 LEDs
    101              waiting for CD and CTS (main part of state 5)
    110              moving data (state 6)
    111              disconnecting (start of state 7)
-*    Dectalk dtc-01 hardware and rom version history, from dtc-01 schematic at bitsavers and with additional info from
+*    DECtalk dtc-01 hardware and rom version history, from DTC-01 schematic at bitsavers and with additional info from
      http://americanhistory.si.edu/archives/speechsynthesis/ss_dec1.htm
 *    August 1983: Hardware version A done
 *    unknown date: Version 1.0 roms finalized
 *    unknown date: Version 1.1 roms released to fix a bug with insufficient stack space, see ss_dec1 above
 *    March 1984: Hardware version B done (integrates the output fifo sync error check onto the pcb; Version A units are retrofitted when sent in for firmware upgrades) (most of the schematics come from this time)
-     <there might be a v1.2 or v1.3 in this period>
+     <there might be a v1.2 or v1.3 in this period, but there is definitely a v1.8, which isn't dumped.>
 *    July 02 1984: Second half of Version 2.0 rom finalized
 *    July 23 1984: First half of Version 2.0 rom finalized
 *    October 1984 (the rest of the schematics come from this time)
@@ -116,7 +116,7 @@ ram/nvram/speech mapping:
 0x08c000-0x08ffff: e33 low, e46 high
 0x090000-0x093fff: e32 low, e45 high
 0x094000-0x097fff: LED/SW/NVR
-0x098000-0x09bfff: DUART
+0x098000-0x09bfff: 2681 DUART
 0x09c000-0x09ffff: DTMF and TMS32010 (TLC, SPC)
 mirrored at 0x0a0000-0x0fffff x3
 entire space mirrored at 0x100000-0x7fffff
@@ -217,17 +217,17 @@ dgc (dg(no!spam)cx@mac.com)
 #undef SPC_LOG_68K
 // logs reads and writes to SPC regs, dsp side only
 #undef SPC_LOG_DSP
-// logs txd and related serial lines to stderr
+// logs txa, txb and related serial lines to stderr
 #undef SERIAL_TO_STDERR
 
 /* Core includes */
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/tms32010/tms32010.h"
-#include "dectalk.lh" //  hack to avoid screenless system crash
-#include "machine/68681.h"
+#include "machine/n68681.h"
+#include "machine/x2212.h"
 #include "sound/dac.h"
-#include "machine/terminal.h"
+#include "machine/serial.h"
 
 
 class dectalk_state : public driver_device
@@ -240,13 +240,12 @@ public:
 
 	dectalk_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_terminal(*this, TERMINAL_TAG) ,
 		m_maincpu(*this, "maincpu"),
 		m_dsp(*this, "dsp"),
+		m_duart(*this, "duartn68681"),
+		m_nvram(*this, "x2212"),
 		m_dac(*this, "dac") { }
 
-	UINT8 m_data[8]; // hack to prevent gcc bitching about struct pointers. not used.
-	UINT8 m_x2214_sram[256]; // NVRAM chip's temp sram space
 	// input fifo, between m68k and tms32010
 	UINT16 m_infifo[32]; // technically eight 74LS224 4bit*16stage FIFO chips, arranged as a 32 stage, 16-bit wide fifo
 	UINT8 m_infifo_tail_ptr;
@@ -267,10 +266,18 @@ public:
 	UINT8 m_duart_outport; // most recent duart output
 	UINT8 m_hack_self_test; // temp variable for hack below
 
-	required_device<generic_terminal_device> m_terminal;
-	DECLARE_READ8_MEMBER(nvram_read);
+	required_device<m68000_base_device> m_maincpu;
+	required_device<cpu_device> m_dsp;
+	required_device<duartn68681_device> m_duart;
+	required_device<x2212_device> m_nvram;
+	required_device<dac_device> m_dac;
+	DECLARE_WRITE_LINE_MEMBER(dectalk_duart_irq_handler);
+	DECLARE_WRITE_LINE_MEMBER(dectalk_duart_txa);
+	DECLARE_READ8_MEMBER(dectalk_duart_input);
+	DECLARE_WRITE8_MEMBER(dectalk_duart_output);
+	DECLARE_READ8_MEMBER(nvram_recall);
 	DECLARE_WRITE8_MEMBER(led_write);
-	DECLARE_WRITE8_MEMBER(nvram_write);
+	DECLARE_WRITE8_MEMBER(nvram_store);
 	DECLARE_WRITE16_MEMBER(m68k_infifo_w);
 	DECLARE_READ16_MEMBER(m68k_spcflags_r);
 	DECLARE_WRITE16_MEMBER(m68k_spcflags_w);
@@ -284,68 +291,71 @@ public:
 	DECLARE_DRIVER_INIT(dectalk);
 	virtual void machine_reset();
 	TIMER_CALLBACK_MEMBER(outfifo_read_cb);
-	DECLARE_WRITE8_MEMBER(dectalk_kbd_put);
 	void dectalk_outfifo_check ();
 	void dectalk_clear_all_fifos(  );
-	void dectalk_x2212_store(  );
-	void dectalk_x2212_recall(  );
 	void dectalk_semaphore_w ( UINT16 data );
 	UINT16 dectalk_outfifo_r (  );
-	required_device<m68000_base_device> m_maincpu;
-	required_device<cpu_device> m_dsp;
-	required_device<dac_device> m_dac;
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 
-/* Devices */
-static void duart_irq_handler(device_t *device, int state, UINT8 vector)
+/* 2681 DUART */
+WRITE_LINE_MEMBER(dectalk_state::dectalk_duart_irq_handler)
 {
-	dectalk_state *drvstate = device->machine().driver_data<dectalk_state>();
-	drvstate->m_maincpu->set_input_line_and_vector(M68K_IRQ_6, state, M68K_INT_ACK_AUTOVECTOR);
+	m_maincpu->set_input_line_and_vector(M68K_IRQ_6, state, M68K_INT_ACK_AUTOVECTOR);
 	//drvstate->m_maincpu->set_input_line_and_vector(M68K_IRQ_6, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
 	//drvstate->m_maincpu->set_input_line_and_vector(M68K_IRQ_6, HOLD_LINE, vector);
 };
 
-static UINT8 duart_input(device_t *device)
+READ8_MEMBER(dectalk_state::dectalk_duart_input)
 {
-	dectalk_state *state = device->machine().driver_data<dectalk_state>();
 	UINT8 data = 0;
-	data |= state->m_duart_inport&0xF;
-	data |= (state->ioport("duart_in")->read()&0xF0);
-	if ((state->m_hack_self_test == 1) && (state->ioport("hacks")->read()&0x01)) data |= 0x10; // hack to prevent hang if selftest disable bit is kept low past the first read; i suppose the proper use of this bit was an incremental switch, or perhaps its expecting an interrupt later from serial in or tone in? added a dipswitch to disable the hack for testing
-		state->m_hack_self_test = 1;
+	data |= m_duart_inport&0xF;
+	data |= (ioport("duart_in")->read()&0xF0);
+	if ((m_hack_self_test == 1) && (ioport("hacks")->read()&0x01)) data |= 0x10; // hack to prevent hang if selftest disable bit is kept low past the first read; i suppose the proper use of this bit was an incremental switch, or perhaps its expecting an interrupt later from serial in or tone in? added a dipswitch to disable the hack for testing
+		m_hack_self_test = 1;
 	return data;
 }
 
-static void duart_output(device_t *device, UINT8 data)
+WRITE8_MEMBER(dectalk_state::dectalk_duart_output)
 {
-	dectalk_state *state = device->machine().driver_data<dectalk_state>();
-	state->m_duart_outport = data;
+	m_duart_outport = data;
 #ifdef SERIAL_TO_STDERR
 	fprintf(stderr, "RTS: %01X, DTR: %01X\n", data&1, (data&4)>>2);
 #endif
 }
 
-static void duart_tx(device_t *device, int channel, UINT8 data)
+WRITE_LINE_MEMBER(dectalk_state::dectalk_duart_txa)
 {
-	device_t *devconf = device->machine().device(TERMINAL_TAG);
-	dynamic_cast<generic_terminal_device *>(devconf)->write(devconf->machine().driver_data()->generic_space(), 0, data);
+	//TODO: this needs to be plumbed so it shows up optionally on a second terminal somehow, or connects to diserial
+	// it is the second 'alternate' serial connection on the DTC-01, used for a serial passthru and other stuff.
 #ifdef SERIAL_TO_STDERR
-	fprintf(stderr, "%02X ",data);
+	fprintf(stderr, "TXA:%02X ",data);
 #endif
 }
 
-static const duart68681_config dectalk_duart68681_config =
+static const duartn68681_config dectalk_duart_config =
 {
-	duart_irq_handler,
-	duart_tx,
-	duart_input,
-	duart_output
+	DEVCB_DRIVER_LINE_MEMBER(dectalk_state, dectalk_duart_irq_handler), /* irq callback */
+	DEVCB_DRIVER_LINE_MEMBER(dectalk_state, dectalk_duart_txa),         /* serial transmit A (alternate) */
+	DEVCB_DEVICE_LINE_MEMBER("rs232", serial_port_device, tx),          /* serial transmit B (main/local terminal) */
+	DEVCB_DRIVER_MEMBER(dectalk_state, dectalk_duart_input),            /* input port */
+	DEVCB_DRIVER_MEMBER(dectalk_state, dectalk_duart_output),           /* output port */
 };
 
+static const rs232_port_interface rs232_intf =
+{
+	DEVCB_DEVICE_LINE_MEMBER("duartn68681", duartn68681_device, rx_b_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+
+/* FIFO and TMS32010 stuff */
 #define SPC_INITIALIZE state->m_m68k_spcflags_latch&0x1 // speech initialize flag
 #define SPC_IRQ_ENABLED ((state->m_m68k_spcflags_latch&0x40)>>6) // irq enable flag
 
@@ -367,28 +377,6 @@ void dectalk_state::dectalk_clear_all_fifos(  )
 	m_outfifo_tail_ptr = m_outfifo_head_ptr = 0;
 	m_infifo_tail_ptr = m_infifo_head_ptr = 0;
 	dectalk_outfifo_check();
-}
-
-void dectalk_state::dectalk_x2212_store(  )
-{
-	UINT8 *nvram = memregion("nvram")->base();
-	int i;
-	for (i = 0; i < 256; i++)
-	nvram[i] = m_x2214_sram[i];
-#ifdef NVRAM_LOG
-	logerror("nvram store done\n");
-#endif
-}
-
-void dectalk_state::dectalk_x2212_recall(  )
-{
-	UINT8 *nvram = memregion("nvram")->base();
-	int i;
-	for (i = 0; i < 256; i++)
-	m_x2214_sram[i] = nvram[i];
-#ifdef NVRAM_LOG
-	logerror("nvram recall done\n");
-#endif
 }
 
 // helper for dsp infifo_semaphore flag to make dealing with interrupts easier
@@ -426,13 +414,15 @@ static void dectalk_reset(device_t *device)
 	dectalk_state *state = device->machine().driver_data<dectalk_state>();
 	state->m_hack_self_test = 0; // hack
 	// stuff that is DIRECTLY affected by the RESET line
-	state->dectalk_x2212_recall(); // nvram recall
+	device->machine().device<x2212_device>("x2212")->recall(0);
+	device->machine().device<x2212_device>("x2212")->recall(1);
+	device->machine().device<x2212_device>("x2212")->recall(0); // nvram recall
 	state->m_m68k_spcflags_latch = 1; // initial status is speech reset(d0) active and spc int(d6) disabled
 	state->m_m68k_tlcflags_latch = 0; // initial status is tone detect int(d6) off, answer phone(d8) off, ring detect int(d14) off
-	device->machine().device("duart68681")->reset(); // reset the DUART
+	device->machine().device("duartn68681")->reset(); // reset the DUART
 	// stuff that is INDIRECTLY affected by the RESET line
 	state->dectalk_clear_all_fifos(); // speech reset clears the fifos, though we have to do it explicitly here since we're not actually in the m68k_spcflags_w function.
-	state->dectalk_semaphore_w(0); // on the original dectalk pcb revision, this is a semaphore for the INPUT fifo, later dec hacked on a check for the 3 output fifo chips to see if they're in sync, and set both of these latches if true.
+	state->dectalk_semaphore_w(0); // on the original DECtalk DTC-01 pcb revision, this is a semaphore for the INPUT fifo, later dec hacked on a check for the 3 output fifo chips to see if they're in sync, and set both of these latches if true.
 	state->m_spc_error_latch = 0; // spc error latch is cleared on /reset
 	state->m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE); // speech reset forces the CLR line active on the tms32010
 	state->m_tlc_tonedetect = 0; // TODO, needed for selftest pass
@@ -449,16 +439,16 @@ void dectalk_state::machine_reset()
 }
 
 /* Begin 68k i/o handlers */
-READ8_MEMBER(dectalk_state::nvram_read)// read from x2212 nvram chip and possibly do recall
+
+READ8_MEMBER(dectalk_state::nvram_recall)// recall from x2212 nvram chip
 {
-	UINT8 data = 0xFF;
-	data = m_x2214_sram[offset&0xff]; // TODO: should this be before or after a possible /RECALL? I'm guessing before.
 #ifdef NVRAM_LOG
-		logerror("m68k: nvram read at %08X: %02X\n", offset, data);
+	fprintf(stderr,"NVRAM RECALL executed: offset %03x\n", offset);
 #endif
-	if (offset&0x200) // if a9 is set, do a /RECALL
-	dectalk_x2212_recall();
-	return data;
+	m_nvram->recall(0);
+	m_nvram->recall(1);
+	m_nvram->recall(0);
+	return 0xFF;
 }
 
 WRITE8_MEMBER(dectalk_state::led_write)
@@ -470,14 +460,14 @@ WRITE8_MEMBER(dectalk_state::led_write)
 	//popmessage("LED status: %x %x %x %x %x %x %x %x\n", data&0x80, data&0x40, data&0x20, data&0x10, data&0x8, data&0x4, data&0x2, data&0x1);
 }
 
-WRITE8_MEMBER(dectalk_state::nvram_write)// write to X2212 NVRAM chip and possibly do store
+WRITE8_MEMBER(dectalk_state::nvram_store) // store to X2212 NVRAM chip
 {
 #ifdef NVRAM_LOG
-	logerror("m68k: nvram write at %08X: %02X\n", offset, data&0x0f);
+		fprintf(stderr,"NVRAM STORE executed: offset %03x, data written (and ignored) is %02x\n", offset, data);
 #endif
-	m_x2214_sram[offset&0xff] = (UINT8)data&0x0f; // TODO: should this be before or after a possible /STORE? I'm guessing before.
-	if (offset&0x200) // if a9 is set, do a /STORE
-	dectalk_x2212_store();
+	m_nvram->store(0);
+	m_nvram->store(1);
+	m_nvram->store(0);
 }
 
 WRITE16_MEMBER(dectalk_state::m68k_infifo_w)// 68k write to the speech input fifo
@@ -741,10 +731,10 @@ static ADDRESS_MAP_START(m68k_mem, AS_PROGRAM, 16, dectalk_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_MIRROR(0x740000) /* ROM */
 	AM_RANGE(0x080000, 0x093fff) AM_RAM AM_MIRROR(0x760000) /* RAM */
-	//AM_RANGE(0x094000, 0x0943ff) AM_READWRITE(led_sw_nvr_read, led_sw_nv_write) AM_MIRROR(0x763C00) /* LED array and Xicor X2212 NVRAM */
-	AM_RANGE(0x094000, 0x0943ff) AM_WRITE8(led_write, 0x00FF) AM_MIRROR(0x763C00) /* LED array */
-	AM_RANGE(0x094000, 0x0943ff) AM_READWRITE8(nvram_read, nvram_write, 0xFF00) AM_MIRROR(0x763C00) /* Xicor X2212 NVRAM */
-	AM_RANGE(0x098000, 0x09801f) AM_DEVREADWRITE8_LEGACY("duart68681", duart68681_r, duart68681_w, 0xff) AM_MIRROR(0x763FE0) /* DUART */
+	AM_RANGE(0x094000, 0x0941ff) AM_WRITE8(led_write, 0x00FF) AM_MIRROR(0x763C00) /* LED array */
+	AM_RANGE(0x094000, 0x0941ff) AM_DEVREADWRITE8("x2212", x2212_device, read, write, 0xFF00) AM_MIRROR(0x763C00) /* Xicor X2212 NVRAM */
+	AM_RANGE(0x094200, 0x0943ff) AM_READWRITE8(nvram_recall, nvram_store, 0xFF00) AM_MIRROR(0x763C00) /* Xicor X2212 NVRAM */
+	AM_RANGE(0x098000, 0x09801f) AM_DEVREADWRITE8("duartn68681", duartn68681_device, read, write, 0xff ) AM_MIRROR(0x763FE0) /* DUART */
 	AM_RANGE(0x09C000, 0x09C001) AM_READWRITE(m68k_spcflags_r, m68k_spcflags_w) AM_MIRROR(0x763FF8) /* SPC flags reg */
 	AM_RANGE(0x09C002, 0x09C003) AM_WRITE(m68k_infifo_w) AM_MIRROR(0x763FF8) /* SPC fifo reg */
 	AM_RANGE(0x09C004, 0x09C005) AM_READWRITE(m68k_tlcflags_r, m68k_tlcflags_w) AM_MIRROR(0x763FF8) /* telephone status flags */
@@ -816,7 +806,7 @@ TIMER_CALLBACK_MEMBER(dectalk_state::outfifo_read_cb)
 	m_dac->write_signed16(data);
 	// hack for break key, requires hacked up duart core so disabled for now
 	// also it doesn't work well, the setup menu is badly corrupt
-	/*device_t *duart = machine().device("duart68681");
+	/*device_t *duart = machine().device("duartn68681");
 	if (machine.input().code_pressed(KEYCODE_F1))
 	    duart68681_rx_break(duart, 1, 1);
 	else
@@ -831,23 +821,12 @@ DRIVER_INIT_MEMBER(dectalk_state,dectalk)
 	timer_set(attotime::from_hz(10000), TIMER_OUTFIFO_READ);
 }
 
-WRITE8_MEMBER(dectalk_state::dectalk_kbd_put)
-{
-	duart68681_rx_data(machine().device("duart68681"), 1, data);
-}
-
-static GENERIC_TERMINAL_INTERFACE( dectalk_terminal_intf )
-{
-	DEVCB_DRIVER_MEMBER(dectalk_state,dectalk_kbd_put)
-};
-
 static MACHINE_CONFIG_START( dectalk, dectalk_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* E74 20MHz OSC (/2) */
 	MCFG_CPU_PROGRAM_MAP(m68k_mem)
 	MCFG_CPU_IO_MAP(m68k_io)
-	MCFG_DUART68681_ADD( "duart68681", XTAL_3_6864MHz, dectalk_duart68681_config ) /* Y3 3.6864MHz Xtal */
-
+	MCFG_DUARTN68681_ADD( "duartn68681", XTAL_3_6864MHz, dectalk_duart_config ) /* 2681 duart (not 68681!); Y3 3.6864MHz Xtal */
 
 	MCFG_CPU_ADD("dsp", TMS32010, XTAL_20MHz) /* Y1 20MHz xtal */
 	MCFG_CPU_PROGRAM_MAP(tms32010_mem)
@@ -858,10 +837,9 @@ static MACHINE_CONFIG_START( dectalk, dectalk_state )
 	MCFG_QUANTUM_PERFECT_CPU("dsp")
 #endif
 
-	//MCFG_NVRAM_ADD_0FILL("nvram")
+	MCFG_X2212_ADD("x2212")
 
 	/* video hardware */
-	//MCFG_DEFAULT_LAYOUT(layout_dectalk) // hack to avoid screenless system crash
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -870,7 +848,7 @@ static MACHINE_CONFIG_START( dectalk, dectalk_state )
 
 	/* Y2 is a 3.579545 MHz xtal for the dtmf decoder chip */
 
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG,dectalk_terminal_intf)
+	MCFG_RS232_PORT_ADD("rs232", rs232_intf, default_rs232_devices, "serial_terminal")
 MACHINE_CONFIG_END
 
 
@@ -881,7 +859,7 @@ MACHINE_CONFIG_END
 
 ROM_START( dectalk )
 	ROM_REGION16_BE(0x40000,"maincpu", 0)
-	// dectalk dtc-01 firmware v2.0 (first half: 23Jul84 tag; second half: 02Jul84 tag), all roms are 27128 eproms
+	// DECtalk DTC-01 firmware v2.0 (first half: 23Jul84 tag; second half: 02Jul84 tag), all roms are 27128 eproms
 	// technically the correct rom names are 23-123e5.e8, etc, but the chips they were dumped from were NOT labeled that way
 	// labels were SP8510123E5 etc, which means the chips were burned at dec in week 10, 1985
 	/* the labels dec uses for most non-factory-programmed eproms, proms and pals is something like SPddddnnnto or WBddddnnto
@@ -919,10 +897,11 @@ ROM_START( dectalk )
 	*/
 
 	ROM_REGION(0x2000,"dsp", 0)
-	// dectalk dtc-01 'klsyn' tms32010 firmware v2.0?, both proms are 82s191 equivalent
+	// DECtalk DTC-01 'klsyn' tms32010 firmware v2.0?, both proms are 82s191 equivalent
 	ROM_LOAD16_BYTE("23-205f4.e70", 0x000, 0x800, CRC(ed76a3ad) SHA1(3136bae243ef48721e21c66fde70dab5fc3c21d0)) // Label: "LM8506205F4 // M1-76161-5" @ E70
 	ROM_LOAD16_BYTE("23-204f4.e69", 0x001, 0x800, CRC(79bb54ff) SHA1(9409f90f7a397b041e4440341f2d7934cb479285)) // Label: "LM8504204F4 // 78S191" @ E69
 
+	// TODO: load this as default if the nvram file is missing, OR get the setup page working enough that it can be saved properly to the chip from an NVR FAULT state!
 	ROM_REGION(0x100,"nvram", 0) // default nvram image is at 0x1A7AE in main rom, read lsn first so 0x0005 in rom becomes 05 00 00 00 etc for all words of main rom
 	ROM_FILL(0x00, 0xff, 0x00) // blank it first;
 	ROM_FILL(0x00, 0x01, 0x05)
@@ -936,7 +915,7 @@ ROM_START( dectalk )
 	ROM_FILL(0x20, 0x01, 0x01)
 	ROM_FILL(0x24, 0x01, 0x01)
 	ROM_FILL(0x28, 0x01, 0x00)
-	ROM_FILL(0x2c, 0x01, 0x01)
+	ROM_FILL(0x2C, 0x01, 0x01)
 	ROM_FILL(0xFC, 0x01, 0x0D) // checksum, calculated some weird way which I haven't figured out yet
 	ROM_FILL(0xFD, 0x01, 0x02) // "
 	ROM_FILL(0xFE, 0x01, 0x05) // "
@@ -949,4 +928,4 @@ ROM_END
 ******************************************************************************/
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT      COMPANY     FULLNAME            FLAGS */
-COMP( 1984, dectalk,    0,      0,      dectalk,    dectalk, dectalk_state, dectalk,  "Digital Equipment Corporation",      "DECTalk DTC-01",   GAME_NOT_WORKING )
+COMP( 1984, dectalk,    0,      0,      dectalk,    dectalk, dectalk_state, dectalk,  "Digital Equipment Corporation",      "DECtalk DTC-01",   GAME_NOT_WORKING )
