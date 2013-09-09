@@ -154,7 +154,7 @@
 			EXT Input (0202)
 				ok
 			DSP Data (0203)
-				NG (ADDR=0xa0704000 W=0xff R=0x00)
+				ok
 		S_Clock (03xx)
 			50MSEC (0301)
 				NG
