@@ -1983,7 +1983,7 @@ static MACHINE_CONFIG_START( rastsag2, taitob_state )
 	MCFG_CPU_PROGRAM_MAP(rastsag2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitob_state,  rastansaga2_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/6)  /* 4 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/4)  /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
