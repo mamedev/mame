@@ -68,7 +68,7 @@
             3x trimmer
 
 
-		TODO: Convert to stock i8279 implementation, as currently inouts aren't read.
+		TODO: Convert to stock i8279 implementation, as currently inputs aren't read.
 		      Fix meter reading (possibly related to above)
 ******************************************************************************************/
 #include "emu.h"
