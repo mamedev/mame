@@ -65,7 +65,7 @@ static ADDRESS_MAP_START( bebox_mem, AS_PROGRAM, 64, bebox_state )
 	AM_RANGE(0x800003F8, 0x800003FF) AM_DEVREADWRITE8( "ns16550_0",ns16550_device,  ins8250_r, ins8250_w, U64(0xffffffffffffffff) )
 	AM_RANGE(0x80000480, 0x8000048F) AM_READWRITE8(bebox_80000480_r, bebox_80000480_w, U64(0xffffffffffffffff) )
 	AM_RANGE(0x80000CF8, 0x80000CFF) AM_DEVREADWRITE("pcibus", pci_bus_device, read_64be, write_64be )
-	//AM_RANGE(0x800042E8, 0x800042EF) AM_DEVWRITE8_LEGACY("cirrus", cirrus_42E8_w, U64(0xffffffffffffffff) )
+	//AM_RANGE(0x800042E8, 0x800042EF) AM_DEVWRITE8("cirrus", cirrus_device, cirrus_42E8_w, U64(0xffffffffffffffff) )
 
 	AM_RANGE(0xBFFFFFF0, 0xBFFFFFFF) AM_READ(bebox_interrupt_ack_r )
 	AM_RANGE(0xC00A0000, 0XC00BFFFF) AM_DEVREADWRITE8("vga", cirrus_vga_device, mem_r, mem_w, U64(0xffffffffffffffff) )
