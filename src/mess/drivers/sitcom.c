@@ -65,8 +65,8 @@ static ADDRESS_MAP_START( sitcom_io, AS_IO, 8, sitcom_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	// AM_RANGE(0x00, 0x1f) 8255 for expansion only
-	AM_RANGE(0xc0, 0xc3) AM_DEVWRITE_LEGACY("ds0", dl1416_data_w) //left display
-	AM_RANGE(0xe0, 0xe3) AM_DEVWRITE_LEGACY("ds1", dl1416_data_w) //right display
+	AM_RANGE(0xc0, 0xc3) AM_DEVWRITE("ds0", dl1416_device, data_w) //left display
+	AM_RANGE(0xe0, 0xe3) AM_DEVWRITE("ds1", dl1416_device, data_w) //right display
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -75,12 +75,12 @@ INPUT_PORTS_END
 
 void sitcom_state::machine_reset()
 {
-	dl1416_ce_w(m_ds0, 0); // enable
-	dl1416_wr_w(m_ds0, 0);
-	dl1416_cu_w(m_ds0, 1); // no cursor
-	dl1416_ce_w(m_ds1, 0);
-	dl1416_wr_w(m_ds1, 0);
-	dl1416_cu_w(m_ds1, 1);
+	m_ds0->ce_w(0); // enable
+	m_ds0->wr_w(0);
+	m_ds0->cu_w(1); // no cursor
+	m_ds1->ce_w(0);
+	m_ds1->wr_w(0);
+	m_ds1->cu_w(1);
 }
 
 WRITE16_MEMBER(sitcom_state::sitcom_update_ds0)

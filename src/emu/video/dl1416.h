@@ -21,7 +21,7 @@
 
 struct dl1416_interface
 {
-	devcb_write16 update;
+	devcb_write16 m_update;
 };
 
 
@@ -42,29 +42,35 @@ struct dl1416_interface
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-/* inputs */
-WRITE_LINE_DEVICE_HANDLER( dl1416_wr_w ); /* write enable */
-WRITE_LINE_DEVICE_HANDLER( dl1416_ce_w ); /* chip enable */
-WRITE_LINE_DEVICE_HANDLER( dl1416_cu_w ); /* cursor enable */
-DECLARE_WRITE8_DEVICE_HANDLER( dl1416_data_w );
-
 /* device get info callback */
-class dl1416_device : public device_t
+class dl1416_device : public device_t,
+										public dl1416_interface
 {
 public:
 	dl1416_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	~dl1416_device() { global_free(m_token); }
+	~dl1416_device() {}
 
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
+	/* inputs */
+	DECLARE_WRITE_LINE_MEMBER( wr_w ); /* write enable */
+	DECLARE_WRITE_LINE_MEMBER( ce_w ); /* chip enable */
+	DECLARE_WRITE_LINE_MEMBER( cu_w ); /* cursor enable */
+	DECLARE_WRITE8_MEMBER( data_w );
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
+
 private:
 	// internal state
-	void *m_token;
+	int m_write_enable;
+	int m_chip_enable;
+	int m_cursor_enable;
+	devcb_resolved_write16 m_update_func;
+
+	UINT16 m_digit_ram[4]; // holds the digit code for each position
+	UINT8 m_cursor_state[4]; // holds the cursor state for each position, 0=off, 1=on
 };
 
 class dl1416b_device : public dl1416_device

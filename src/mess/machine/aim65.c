@@ -41,22 +41,21 @@
  * PB7: CU (Cursor)
  */
 
-static void dl1416_update(device_t *device, int index)
+void aim65_state::dl1416_update(dl1416_device *device, int index)
 {
-	aim65_state *state = device->machine().driver_data<aim65_state>();
-	dl1416_ce_w(device, state->m_pia_a & (0x04 << index));
-	dl1416_wr_w(device, BIT(state->m_pia_a, 7));
-	dl1416_cu_w(device, BIT(state->m_pia_b, 7));
-	dl1416_data_w(device, state->generic_space(), state->m_pia_a & 0x03, state->m_pia_b & 0x7f);
+	device->ce_w(m_pia_a & (0x04 << index));
+	device->wr_w(BIT(m_pia_a, 7));
+	device->cu_w(BIT(m_pia_b, 7));
+	device->data_w(generic_space(), m_pia_a & 0x03, m_pia_b & 0x7f);
 }
 
 void aim65_state::aim65_pia()
 {
-	dl1416_update(machine().device("ds1"), 0);
-	dl1416_update(machine().device("ds2"), 1);
-	dl1416_update(machine().device("ds3"), 2);
-	dl1416_update(machine().device("ds4"), 3);
-	dl1416_update(machine().device("ds5"), 4);
+	dl1416_update(m_ds1, 0);
+	dl1416_update(m_ds2, 1);
+	dl1416_update(m_ds3, 2);
+	dl1416_update(m_ds4, 3);
+	dl1416_update(m_ds5, 4);
 }
 
 

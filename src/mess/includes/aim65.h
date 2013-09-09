@@ -38,7 +38,12 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_cassette1(*this, "cassette"),
 		m_cassette2(*this, "cassette2"),
-		m_ram(*this, RAM_TAG)
+		m_ram(*this, RAM_TAG),
+		m_ds1(*this, "ds1"),
+		m_ds2(*this, "ds2"),
+		m_ds3(*this, "ds3"),
+		m_ds4(*this, "ds4"),
+		m_ds5(*this, "ds5")
 	{ }
 
 	DECLARE_WRITE8_MEMBER(aim65_pia_a_w);
@@ -58,6 +63,11 @@ public:
 	required_device<cassette_image_device> m_cassette1;
 	required_device<cassette_image_device> m_cassette2;
 	required_device<ram_device> m_ram;
+	required_device<dl1416_device> m_ds1;
+	required_device<dl1416_device> m_ds2;
+	required_device<dl1416_device> m_ds3;
+	required_device<dl1416_device> m_ds4;
+	required_device<dl1416_device> m_ds5;
 	virtual void machine_start();
 	TIMER_CALLBACK_MEMBER(aim65_printer_timer);
 	void aim65_pia();
@@ -67,6 +77,8 @@ public:
 	DECLARE_WRITE16_MEMBER(aim65_update_ds3);
 	DECLARE_WRITE16_MEMBER(aim65_update_ds4);
 	DECLARE_WRITE16_MEMBER(aim65_update_ds5);
+	
+	void dl1416_update(dl1416_device *device, int index);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(aim65_cart);
 };
