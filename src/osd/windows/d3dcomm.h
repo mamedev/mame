@@ -204,7 +204,6 @@ private:
 	texture *               m_d3dtex;                   // Direct3D texture pointer
 	surface *               m_d3dsurface;               // Direct3D offscreen plain surface pointer
 	texture *               m_d3dfinaltex;              // Direct3D final (post-scaled) texture
-	int                     m_target_index;             // Direct3D target index
 };
 
 /* d3d::poly_info holds information about a single polygon/d3d primitive */
