@@ -2631,11 +2631,11 @@ void taitotz_state::machine_reset()
 	if (m_hdd_serial_number != NULL)
 	{
 		ide_hdd_device *hdd = m_ata->subdevice<ata_slot_device>("0")->subdevice<ide_hdd_device>("hdd");
-		UINT8 *identify_device = hdd->identify_device_buffer();
+		UINT16 *identify_device = hdd->identify_device_buffer();
 
-		for (int i=0; i < 20; i++)
+		for (int i=0; i < 10; i++)
 		{
-			identify_device[10*2+(i^1)] = m_hdd_serial_number[i];
+			identify_device[10+i] = (m_hdd_serial_number[i*2] << 8) | m_hdd_serial_number[i*2+1];
 		}
 	}
 }

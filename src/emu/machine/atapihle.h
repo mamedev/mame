@@ -58,7 +58,6 @@ protected:
 	virtual void process_command();
 	virtual void finished_command();
 
-	UINT16 m_identify_buffer[256];
 	virtual void identify_packet_device() = 0;
 
 	packet_command_length_t packet_command_length();

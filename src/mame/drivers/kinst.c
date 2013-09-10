@@ -217,35 +217,25 @@ void kinst_state::machine_start()
 void kinst_state::machine_reset()
 {
 	ide_hdd_device *hdd = m_ata->subdevice<ata_slot_device>("0")->subdevice<ide_hdd_device>("hdd");
-	UINT8 *identify_device = hdd->identify_device_buffer();
+	UINT16 *identify_device = hdd->identify_device_buffer();
 
 	if (strncmp(machine().system().name, "kinst2", 6) != 0)
 	{
 		/* kinst: tweak the model number so we pass the check */
-		identify_device[27*2+0] = 0x54;
-		identify_device[27*2+1] = 0x53;
-		identify_device[28*2+0] = 0x31;
-		identify_device[28*2+1] = 0x39;
-		identify_device[29*2+0] = 0x30;
-		identify_device[29*2+1] = 0x35;
-		identify_device[30*2+0] = 0x47;
-		identify_device[30*2+1] = 0x41;
-		identify_device[31*2+0] = 0x20;
-		identify_device[31*2+1] = 0x20;
+		identify_device[27] = ('S' << 8) | 'T';
+		identify_device[28] = ('9' << 8) | '1';
+		identify_device[29] = ('5' << 8) | '0';
+		identify_device[30] = ('A' << 8) | 'G';
+		identify_device[31] = (' ' << 8) | ' ';
 	}
 	else
 	{
 		/* kinst2: tweak the model number so we pass the check */
-		identify_device[10*2+0] = 0x30;
-		identify_device[10*2+1] = 0x30;
-		identify_device[11*2+0] = 0x54;
-		identify_device[11*2+1] = 0x53;
-		identify_device[12*2+0] = 0x31;
-		identify_device[12*2+1] = 0x39;
-		identify_device[13*2+0] = 0x30;
-		identify_device[13*2+1] = 0x35;
-		identify_device[14*2+0] = 0x47;
-		identify_device[14*2+1] = 0x41;
+		identify_device[10] = ('0' << 8) | '0';
+		identify_device[11] = ('S' << 8) | 'T';
+		identify_device[12] = ('9' << 8) | '1';
+		identify_device[13] = ('5' << 8) | '0';
+		identify_device[14] = ('A' << 8) | 'G';
 	}
 
 	/* set a safe base location for video */

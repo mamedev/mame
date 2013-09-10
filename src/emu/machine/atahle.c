@@ -100,6 +100,8 @@ void ata_hle_device::device_start()
 	save_item(NAME(m_pdiagin));
 	save_item(NAME(m_pdiagout));
 
+	save_item(NAME(m_identify_buffer));
+
 	m_busy_timer = timer_alloc(TID_BUSY);
 }
 
@@ -184,6 +186,10 @@ void ata_hle_device::process_command()
 		start_busy(DIAGNOSTIC_TIME, PARAM_COMMAND);
 		break;
 
+	case IDE_COMMAND_SET_FEATURES:
+		start_busy(MINIMUM_COMMAND_TIME, PARAM_COMMAND);
+		break;
+
 	default:
 		LOGPRINT(("IDE unknown command (%02X)\n", m_command));
 		m_status |= IDE_STATUS_ERR;
@@ -205,10 +211,123 @@ void ata_hle_device::finished_command()
 			set_irq(ASSERT_LINE);
 		break;
 
+	case IDE_COMMAND_SET_FEATURES:
+		if (!set_features())
+		{
+			LOGPRINT(("IDE Set features failed (%02X %02X %02X %02X %02X)\n", m_feature, m_sector_count & 0xff, m_sector_number, m_cylinder_low, m_cylinder_high));
+
+			m_status |= IDE_STATUS_ERR;
+			m_error = IDE_ERROR_ABRT;
+		}
+		set_irq(ASSERT_LINE);
+		break;
+
 	default:
 		logerror( "finished_command() unhandled command %02x\n", m_command );
 		break;
 	}
+}
+
+bool ata_hle_device::set_dma_mode(int word)
+{
+	if ((m_identify_buffer[word] >> (m_sector_count & 7)) & 1)
+	{
+		m_identify_buffer[62] &= 0xff;
+		m_identify_buffer[63] &= 0xff;
+		m_identify_buffer[88] &= 0xff;
+
+		m_identify_buffer[word] |= 0x100 << (m_sector_count & 7);
+		return true;
+	}
+	
+	return false;
+}
+
+bool ata_hle_device::set_features()
+{
+	switch (m_feature)
+	{
+	case IDE_SET_FEATURES_TRANSFER_MODE:
+		switch (m_sector_count & IDE_TRANSFER_TYPE_MASK)
+		{
+		case IDE_TRANSFER_TYPE_PIO_DEFAULT:
+			switch (m_sector_count & 7)
+			{
+			case 0:
+			case 1:
+				return true;
+			}
+			break;
+
+		case IDE_TRANSFER_TYPE_PIO_FLOW_CONTROL:
+			switch (m_sector_count & 7)
+			{
+			case 0:
+			case 1:
+			case 2:
+				return true;
+
+			default:
+				if ((m_identify_buffer[64] >> ((m_sector_count & 7) - 3)) & 1)
+				{
+					return true;
+				}
+			}
+			break;
+
+		case IDE_TRANSFER_TYPE_SINGLE_WORD_DMA:
+			return set_dma_mode(62);
+
+		case IDE_TRANSFER_TYPE_MULTI_WORD_DMA:
+			return set_dma_mode(63);
+
+		case IDE_TRANSFER_TYPE_ULTRA_DMA:
+			return set_dma_mode(88);
+		}
+		break;
+	}
+
+	return false;
+}
+
+int ata_hle_device::bit_to_mode(UINT16 word)
+{
+	switch (word>>8)
+	{
+	case 0x01:
+		return 0;
+	case 0x02:
+		return 1;
+	case 0x04:
+		return 2;
+	case 0x08:
+		return 3;
+	case 0x10:
+		return 4;
+	case 0x20:
+		return 5;
+	case 0x40:
+		return 6;
+	case 0x080:
+		return 7;
+	}
+
+	return -1;
+}
+
+int ata_hle_device::single_word_dma_mode()
+{
+	return bit_to_mode(m_identify_buffer[62]);
+}
+
+int ata_hle_device::multi_word_dma_mode()
+{
+	return bit_to_mode(m_identify_buffer[63]);
+}
+
+int ata_hle_device::ultra_dma_mode()
+{
+	return bit_to_mode(m_identify_buffer[88]);
 }
 
 UINT16 ata_hle_device::read_data(UINT16 mem_mask)
@@ -308,7 +427,9 @@ void ata_hle_device::read_buffer_empty()
 	m_buffer_offset = 0;
 
 	m_status &= ~IDE_STATUS_DRQ;
-	set_dmarq(CLEAR_LINE);
+
+	if (multi_word_dma_mode() >= 0)
+		set_dmarq(CLEAR_LINE);
 
 	fill_buffer();
 }
@@ -318,7 +439,9 @@ void ata_hle_device::write_buffer_full()
 	m_buffer_offset = 0;
 
 	m_status &= ~IDE_STATUS_DRQ;
-	set_dmarq(CLEAR_LINE);
+
+	if (multi_word_dma_mode() >= 0)
+		set_dmarq(CLEAR_LINE);
 
 	process_buffer();
 }
@@ -358,6 +481,9 @@ WRITE_LINE_MEMBER( ata_hle_device::write_dasp )
 
 WRITE_LINE_MEMBER( ata_hle_device::write_dmack )
 {
+	if (state && !m_dmack && single_word_dma_mode() >= 0)
+		set_dmarq(CLEAR_LINE);
+
 	m_dmack = state;
 }
 
@@ -382,7 +508,11 @@ UINT16 ata_hle_device::read_dma()
 		{
 			logerror( "%s: %s dev %d read_dma ignored (!DMACK)\n", machine().describe_context(), tag(), dev() );
 		}
-		else if (!m_dmarq)
+		else if (m_dmarq && single_word_dma_mode() >= 0)
+		{
+			logerror( "%s: %s dev %d read_dma ignored (DMARQ)\n", machine().describe_context(), tag(), dev() );
+		}
+		else if (!m_dmarq && multi_word_dma_mode() >= 0)
 		{
 			logerror( "%s: %s dev %d read_dma ignored (!DMARQ)\n", machine().describe_context(), tag(), dev() );
 		}
@@ -397,6 +527,9 @@ UINT16 ata_hle_device::read_dma()
 		else
 		{
 			result = read_data(0xffff);
+
+			if ((m_status & IDE_STATUS_DRQ) && single_word_dma_mode() >= 0)
+				set_dmarq(ASSERT_LINE);
 		}
 	}
 
@@ -570,7 +703,11 @@ void ata_hle_device::write_dma( UINT16 data )
 		{
 			logerror( "%s: %s dev %d write_dma %04x ignored (!DMACK)\n", machine().describe_context(), tag(), dev(), data );
 		}
-		else if (!m_dmarq)
+		else if (m_dmarq && single_word_dma_mode() >= 0)
+		{
+			logerror( "%s: %s dev %d write_dma %04x ignored (DMARQ)\n", machine().describe_context(), tag(), dev(), data );
+		}
+		else if (!m_dmarq && multi_word_dma_mode() >= 0)
 		{
 			logerror( "%s: %s dev %d write_dma %04x ignored (!DMARQ)\n", machine().describe_context(), tag(), dev(), data );
 		}
@@ -585,6 +722,9 @@ void ata_hle_device::write_dma( UINT16 data )
 		else
 		{
 			write_data(data, 0xffff);
+
+			if ((m_status & IDE_STATUS_DRQ) && single_word_dma_mode() >= 0)
+				set_dmarq(ASSERT_LINE);
 		}
 	}
 }

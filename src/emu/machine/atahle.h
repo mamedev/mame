@@ -55,6 +55,7 @@ protected:
 	virtual void soft_reset();
 	virtual void process_command();
 	virtual void finished_command();
+	virtual bool set_features();
 	virtual int sector_length() = 0;
 	virtual void process_buffer() = 0;
 	virtual void fill_buffer() = 0;
@@ -63,6 +64,11 @@ protected:
 	virtual void signature() = 0;
 	virtual UINT16 read_data(UINT16 mem_mask);
 	virtual void write_data(UINT16 data, UINT16 mem_mask);
+
+	int bit_to_mode(UINT16 word);
+	int single_word_dma_mode();
+	int multi_word_dma_mode();
+	int ultra_dma_mode();
 
 	/// TODO: not sure this should be protected.
 	void read_buffer_empty();
@@ -125,6 +131,21 @@ protected:
 
 	enum
 	{
+		IDE_SET_FEATURES_TRANSFER_MODE = 0x03
+	};
+
+	enum ide_transfer_type_t
+	{
+		IDE_TRANSFER_TYPE_PIO_DEFAULT = 0x00,
+		IDE_TRANSFER_TYPE_PIO_FLOW_CONTROL = 0x08,
+		IDE_TRANSFER_TYPE_SINGLE_WORD_DMA = 0x10,
+		IDE_TRANSFER_TYPE_MULTI_WORD_DMA = 0x20,
+		IDE_TRANSFER_TYPE_ULTRA_DMA = 0x40,
+		IDE_TRANSFER_TYPE_MASK = 0xf8
+	};
+
+	enum
+	{
 		IDE_DEVICE_HEAD_HS = 0x0f,
 		IDE_DEVICE_HEAD_DRV = 0x10,
 		IDE_DEVICE_HEAD_L = 0x40,
@@ -161,12 +182,15 @@ protected:
 	UINT8 m_command;
 	UINT8 m_device_control;
 
+	UINT16 m_identify_buffer[256];
+
 private:
 	void update_irq();
 	void write_buffer_full();
 	void start_diagnostic();
 	void finished_diagnostic();
 	void finished_busy(int param);
+	bool set_dma_mode(int word);
 
 	int m_csel;
 	int m_daspin;

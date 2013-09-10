@@ -23,7 +23,7 @@ class ata_mass_storage_device : public ata_hle_device
 public:
 	ata_mass_storage_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock,const char *shortname, const char *source);
 
-	UINT8 *identify_device_buffer() { return m_identify_device; }
+	UINT16 *identify_device_buffer() { return m_identify_buffer; }
 
 	void set_master_password(const UINT8 *password)
 	{
@@ -56,7 +56,6 @@ protected:
 	virtual void signature();
 
 	int m_can_identify_device;
-	UINT8           m_identify_device[IDE_DISK_SECTOR_SIZE];
 	UINT16          m_num_cylinders;
 	UINT8           m_num_sectors;
 	UINT8           m_num_heads;

@@ -1091,35 +1091,38 @@ void gdrom_device::device_start()
 {
 	memset(m_identify_buffer, 0, sizeof(m_identify_buffer));
 
-	m_identify_buffer[ 0 ] = 0x8600; // ATAPI device, cmd set 6 compliant, DRQ within 3 ms of PACKET command
+	m_identify_buffer[0] = 0x8600; // ATAPI device, cmd set 6 compliant, DRQ within 3 ms of PACKET command
 
-	m_identify_buffer[ 23 ] = ('S' << 8) | 'E';
-	m_identify_buffer[ 24 ] = (' ' << 8) | ' ';
-	m_identify_buffer[ 25 ] = (' ' << 8) | ' ';
-	m_identify_buffer[ 26 ] = (' ' << 8) | ' ';
+	m_identify_buffer[23] = ('S' << 8) | 'E';
+	m_identify_buffer[24] = (' ' << 8) | ' ';
+	m_identify_buffer[25] = (' ' << 8) | ' ';
+	m_identify_buffer[26] = (' ' << 8) | ' ';
 
-	m_identify_buffer[ 27 ] = ('C' << 8) | 'D';
-	m_identify_buffer[ 28 ] = ('-' << 8) | 'R';
-	m_identify_buffer[ 29 ] = ('O' << 8) | 'M';
-	m_identify_buffer[ 30 ] = (' ' << 8) | 'D';
-	m_identify_buffer[ 31 ] = ('R' << 8) | 'I';
-	m_identify_buffer[ 32 ] = ('V' << 8) | 'E';
-	m_identify_buffer[ 33 ] = (' ' << 8) | ' ';
-	m_identify_buffer[ 34 ] = (' ' << 8) | ' ';
-	m_identify_buffer[ 35 ] = ('6' << 8) | '.';
-	m_identify_buffer[ 36 ] = ('4' << 8) | '2';
-	m_identify_buffer[ 37 ] = (' ' << 8) | ' ';
-	m_identify_buffer[ 38 ] = (' ' << 8) | ' ';
-	m_identify_buffer[ 39 ] = (' ' << 8) | ' ';
-	m_identify_buffer[ 40 ] = (' ' << 8) | ' ';
-	m_identify_buffer[ 41 ] = (' ' << 8) | ' ';
-	m_identify_buffer[ 42 ] = (' ' << 8) | ' ';
-	m_identify_buffer[ 43 ] = (' ' << 8) | ' ';
-	m_identify_buffer[ 44 ] = (' ' << 8) | ' ';
-	m_identify_buffer[ 45 ] = (' ' << 8) | ' ';
-	m_identify_buffer[ 46 ] = (' ' << 8) | ' ';
+	m_identify_buffer[27] = ('C' << 8) | 'D';
+	m_identify_buffer[28] = ('-' << 8) | 'R';
+	m_identify_buffer[29] = ('O' << 8) | 'M';
+	m_identify_buffer[30] = (' ' << 8) | 'D';
+	m_identify_buffer[31] = ('R' << 8) | 'I';
+	m_identify_buffer[32] = ('V' << 8) | 'E';
+	m_identify_buffer[33] = (' ' << 8) | ' ';
+	m_identify_buffer[34] = (' ' << 8) | ' ';
+	m_identify_buffer[35] = ('6' << 8) | '.';
+	m_identify_buffer[36] = ('4' << 8) | '2';
+	m_identify_buffer[37] = (' ' << 8) | ' ';
+	m_identify_buffer[38] = (' ' << 8) | ' ';
+	m_identify_buffer[39] = (' ' << 8) | ' ';
+	m_identify_buffer[40] = (' ' << 8) | ' ';
+	m_identify_buffer[41] = (' ' << 8) | ' ';
+	m_identify_buffer[42] = (' ' << 8) | ' ';
+	m_identify_buffer[43] = (' ' << 8) | ' ';
+	m_identify_buffer[44] = (' ' << 8) | ' ';
+	m_identify_buffer[45] = (' ' << 8) | ' ';
+	m_identify_buffer[46] = (' ' << 8) | ' ';
 
-	m_identify_buffer[ 49 ] = 0x0400; // IORDY may be disabled
+	m_identify_buffer[49] = 0x0400; // IORDY may be disabled
+
+	m_identify_buffer[63]=7; // multi word dma mode 0-2 supported
+	m_identify_buffer[64]=1; // PIO mode 3 supported
 
 	atapi_hle_device::device_start();
 }

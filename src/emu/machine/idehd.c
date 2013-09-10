@@ -49,173 +49,120 @@ UINT32 ata_mass_storage_device::lba_address()
  *
  *************************************/
 
-static void swap_strncpy(UINT8 *dst, const char *src, int field_size_in_words)
+static void swap_strncpy(UINT16 *dst, const char *src, int field_size_in_words)
 {
-	int i;
+	for (int i = 0; i < field_size_in_words; i++)
+	{
+		UINT16 d = 0;
 
-	assert(strlen(src) <= (field_size_in_words*2));
+		if (*src)
+		{
+			d = *(src++) << 8;
+		}
+		else
+		{
+			d = ' ' << 8;
+		}
 
-	for (i = 0; i < strlen(src); i++)
-		dst[i ^ 1] = src[i];
-	for ( ; i < field_size_in_words * 2; i++)
-		dst[i ^ 1] = ' ';
+		if (*src)
+		{
+			d |= *(src++);
+		}
+		else
+		{
+			d |= ' ';
+		}
+
+		dst[i] = d;
+	}
+
+	assert(*(src) == 0);
 }
 
 
 void ata_mass_storage_device::ide_build_identify_device()
 {
-	memset(m_identify_device, 0, IDE_DISK_SECTOR_SIZE);
+	memset(m_identify_buffer, 0, sizeof(m_identify_buffer));
 	int total_sectors = m_num_cylinders * m_num_heads * m_num_sectors;
 
 	/* basic geometry */
-	m_identify_device[ 0*2+0] = 0x5a;                      /*  0: configuration bits */
-	m_identify_device[ 0*2+1] = 0x04;
-	m_identify_device[ 1*2+0] = m_num_cylinders & 0xff;    /*  1: logical cylinders */
-	m_identify_device[ 1*2+1] = m_num_cylinders >> 8;
-	m_identify_device[ 2*2+0] = 0;                         /*  2: reserved */
-	m_identify_device[ 2*2+1] = 0;
-	m_identify_device[ 3*2+0] = m_num_heads & 0xff;        /*  3: logical heads */
-	m_identify_device[ 3*2+1] = 0;/*num_heads >> 8;*/
-	m_identify_device[ 4*2+0] = 0;                         /*  4: vendor specific (obsolete) */
-	m_identify_device[ 4*2+1] = 0;
-	m_identify_device[ 5*2+0] = 0;                         /*  5: vendor specific (obsolete) */
-	m_identify_device[ 5*2+1] = 0;
-	m_identify_device[ 6*2+0] = m_num_sectors & 0xff;  /*  6: logical sectors per logical track */
-	m_identify_device[ 6*2+1] = 0;/*num_sectors >> 8;*/
-	m_identify_device[ 7*2+0] = 0;                         /*  7: vendor-specific */
-	m_identify_device[ 7*2+1] = 0;
-	m_identify_device[ 8*2+0] = 0;                         /*  8: vendor-specific */
-	m_identify_device[ 8*2+1] = 0;
-	m_identify_device[ 9*2+0] = 0;                         /*  9: vendor-specific */
-	m_identify_device[ 9*2+1] = 0;
-	swap_strncpy(&m_identify_device[10*2+0],               /* 10-19: serial number */
+	m_identify_buffer[0] = 0x045a;                    /*  0: configuration bits */
+	m_identify_buffer[1] = m_num_cylinders;           /*  1: logical cylinders */
+	m_identify_buffer[2] = 0;                         /*  2: reserved */
+	m_identify_buffer[3] = m_num_heads;               /*  3: logical heads */
+	m_identify_buffer[4] = 0;                         /*  4: vendor specific (obsolete) */
+	m_identify_buffer[5] = 0;                         /*  5: vendor specific (obsolete) */
+	m_identify_buffer[6] = m_num_sectors;             /*  6: logical sectors per logical track */
+	m_identify_buffer[7] = 0;                         /*  7: vendor-specific */
+	m_identify_buffer[8] = 0;                         /*  8: vendor-specific */
+	m_identify_buffer[9] = 0;                         /*  9: vendor-specific */
+	swap_strncpy(&m_identify_buffer[10],               /* 10-19: serial number */
 			"00000000000000000000", 10);
-	m_identify_device[20*2+0] = 0;                         /* 20: vendor-specific */
-	m_identify_device[20*2+1] = 0;
-	m_identify_device[21*2+0] = 0;                         /* 21: vendor-specific */
-	m_identify_device[21*2+1] = 0;
-	m_identify_device[22*2+0] = 4;                         /* 22: # of vendor-specific bytes on read/write long commands */
-	m_identify_device[22*2+1] = 0;
-	swap_strncpy(&m_identify_device[23*2+0],               /* 23-26: firmware revision */
+	m_identify_buffer[20] = 0;                         /* 20: vendor-specific */
+	m_identify_buffer[21] = 0;                         /* 21: vendor-specific */
+	m_identify_buffer[22] = 4;                         /* 22: # of vendor-specific bytes on read/write long commands */
+	swap_strncpy(&m_identify_buffer[23],               /* 23-26: firmware revision */
 			"1.0", 4);
-	swap_strncpy(&m_identify_device[27*2+0],               /* 27-46: model number */
+	swap_strncpy(&m_identify_buffer[27],               /* 27-46: model number */
 			"MAME Compressed Hard Disk", 20);
-	m_identify_device[47*2+0] = 0x01;                      /* 47: read/write multiple support */
-	m_identify_device[47*2+1] = 0x80;
-	m_identify_device[48*2+0] = 0;                         /* 48: reserved */
-	m_identify_device[48*2+1] = 0;
-	m_identify_device[49*2+0] = 0x03;                      /* 49: capabilities */
-	m_identify_device[49*2+1] = 0x0f;
-	m_identify_device[50*2+0] = 0;                         /* 50: reserved */
-	m_identify_device[50*2+1] = 0;
-	m_identify_device[51*2+0] = 2;                         /* 51: PIO data transfer cycle timing mode */
-	m_identify_device[51*2+1] = 0;
-	m_identify_device[52*2+0] = 2;                         /* 52: single word DMA transfer cycle timing mode */
-	m_identify_device[52*2+1] = 0;
-	m_identify_device[53*2+0] = 3;                         /* 53: field validity */
-	m_identify_device[53*2+1] = 0;
-	m_identify_device[54*2+0] = m_num_cylinders & 0xff;    /* 54: number of current logical cylinders */
-	m_identify_device[54*2+1] = m_num_cylinders >> 8;
-	m_identify_device[55*2+0] = m_num_heads & 0xff;        /* 55: number of current logical heads */
-	m_identify_device[55*2+1] = 0;/*num_heads >> 8;*/
-	m_identify_device[56*2+0] = m_num_sectors & 0xff;  /* 56: number of current logical sectors per track */
-	m_identify_device[56*2+1] = 0;/*num_sectors >> 8;*/
-	m_identify_device[57*2+0] = total_sectors & 0xff;  /* 57-58: current capacity in sectors (ATA-1 through ATA-5; obsoleted in ATA-6) */
-	m_identify_device[57*2+1] = total_sectors >> 8;
-	m_identify_device[58*2+0] = total_sectors >> 16;
-	m_identify_device[58*2+1] = total_sectors >> 24;
-	m_identify_device[59*2+0] = 0;                         /* 59: multiple sector timing */
-	m_identify_device[59*2+1] = 0;
-	m_identify_device[60*2+0] = total_sectors & 0xff;      /* 60-61: total user addressable sectors for LBA mode (ATA-1 through ATA-7) */
-	m_identify_device[60*2+1] = total_sectors >> 8;
-	m_identify_device[61*2+0] = total_sectors >> 16;
-	m_identify_device[61*2+1] = total_sectors >> 24;
-	m_identify_device[62*2+0] = 0x07;                      /* 62: single word dma transfer */
-	m_identify_device[62*2+1] = 0x00;
-	m_identify_device[63*2+0] = 0x07;                      /* 63: multiword DMA transfer */
-	m_identify_device[63*2+1] = 0x04;
-	m_identify_device[64*2+0] = 0x03;                      /* 64: flow control PIO transfer modes supported */
-	m_identify_device[64*2+1] = 0x00;
-	m_identify_device[65*2+0] = 0x78;                      /* 65: minimum multiword DMA transfer cycle time per word */
-	m_identify_device[65*2+1] = 0x00;
-	m_identify_device[66*2+0] = 0x78;                      /* 66: mfr's recommended multiword DMA transfer cycle time */
-	m_identify_device[66*2+1] = 0x00;
-	m_identify_device[67*2+0] = 0x4d;                      /* 67: minimum PIO transfer cycle time without flow control */
-	m_identify_device[67*2+1] = 0x01;
-	m_identify_device[68*2+0] = 0x78;                      /* 68: minimum PIO transfer cycle time with IORDY */
-	m_identify_device[68*2+1] = 0x00;
-	m_identify_device[69*2+0] = 0x00;                      /* 69-70: reserved */
-	m_identify_device[69*2+1] = 0x00;
-	m_identify_device[71*2+0] = 0x00;                      /* 71: reserved for IDENTIFY PACKET command */
-	m_identify_device[71*2+1] = 0x00;
-	m_identify_device[72*2+0] = 0x00;                      /* 72: reserved for IDENTIFY PACKET command */
-	m_identify_device[72*2+1] = 0x00;
-	m_identify_device[73*2+0] = 0x00;                      /* 73: reserved for IDENTIFY PACKET command */
-	m_identify_device[73*2+1] = 0x00;
-	m_identify_device[74*2+0] = 0x00;                      /* 74: reserved for IDENTIFY PACKET command */
-	m_identify_device[74*2+1] = 0x00;
-	m_identify_device[75*2+0] = 0x00;                      /* 75: queue depth */
-	m_identify_device[75*2+1] = 0x00;
-	m_identify_device[76*2+0] = 0x00;                      /* 76-79: reserved */
-	m_identify_device[76*2+1] = 0x00;
-	m_identify_device[80*2+0] = 0x00;                      /* 80: major version number */
-	m_identify_device[80*2+1] = 0x00;
-	m_identify_device[81*2+0] = 0x00;                      /* 81: minor version number */
-	m_identify_device[81*2+1] = 0x00;
-	m_identify_device[82*2+0] = 0x00;                      /* 82: command set supported */
-	m_identify_device[82*2+1] = 0x00;
-	m_identify_device[83*2+0] = 0x00;                      /* 83: command sets supported */
-	m_identify_device[83*2+1] = 0x00;
-	m_identify_device[84*2+0] = 0x00;                      /* 84: command set/feature supported extension */
-	m_identify_device[84*2+1] = 0x00;
-	m_identify_device[85*2+0] = 0x00;                      /* 85: command set/feature enabled */
-	m_identify_device[85*2+1] = 0x00;
-	m_identify_device[86*2+0] = 0x00;                      /* 86: command set/feature enabled */
-	m_identify_device[86*2+1] = 0x00;
-	m_identify_device[87*2+0] = 0x00;                      /* 87: command set/feature default */
-	m_identify_device[87*2+1] = 0x00;
-	m_identify_device[88*2+0] = 0x00;                      /* 88: additional DMA modes */
-	m_identify_device[88*2+1] = 0x00;
-	m_identify_device[89*2+0] = 0x00;                      /* 89: time required for security erase unit completion */
-	m_identify_device[89*2+1] = 0x00;
-	m_identify_device[90*2+0] = 0x00;                      /* 90: time required for enhanced security erase unit completion */
-	m_identify_device[90*2+1] = 0x00;
-	m_identify_device[91*2+0] = 0x00;                      /* 91: current advanced power management value */
-	m_identify_device[91*2+1] = 0x00;
-	m_identify_device[92*2+0] = 0x00;                      /* 92: master password revision code */
-	m_identify_device[92*2+1] = 0x00;
-	m_identify_device[93*2+0] = 0x00;                      /* 93: hardware reset result */
-	m_identify_device[93*2+1] = 0x00;
-	m_identify_device[94*2+0] = 0x00;                      /* 94: acoustic management values */
-	m_identify_device[94*2+1] = 0x00;
-	m_identify_device[95*2+0] = 0x00;                      /* 95-99: reserved */
-	m_identify_device[95*2+1] = 0x00;
-	m_identify_device[100*2+0] = total_sectors & 0xff;     /* 100-103: maximum 48-bit LBA */
-	m_identify_device[100*2+1] = total_sectors >> 8;
-	m_identify_device[101*2+0] = total_sectors >> 16;
-	m_identify_device[101*2+1] = total_sectors >> 24;
-	m_identify_device[102*2+0] = 0x00;
-	m_identify_device[102*2+1] = 0x00;
-	m_identify_device[103*2+0] = 0x00;
-	m_identify_device[103*2+1] = 0x00;
-	m_identify_device[104*2+0] = 0x00;                     /* 104-126: reserved */
-	m_identify_device[104*2+1] = 0x00;
-	m_identify_device[127*2+0] = 0x00;                     /* 127: removable media status notification */
-	m_identify_device[127*2+1] = 0x00;
-	m_identify_device[128*2+0] = 0x00;                     /* 128: security status */
-	m_identify_device[128*2+1] = 0x00;
-	m_identify_device[129*2+0] = 0x00;                     /* 129-159: vendor specific */
-	m_identify_device[129*2+1] = 0x00;
-	m_identify_device[160*2+0] = 0x00;                     /* 160: CFA power mode 1 */
-	m_identify_device[160*2+1] = 0x00;
-	m_identify_device[161*2+0] = 0x00;                     /* 161-175: reserved for CompactFlash */
-	m_identify_device[161*2+1] = 0x00;
-	m_identify_device[176*2+0] = 0x00;                     /* 176-205: current media serial number */
-	m_identify_device[176*2+1] = 0x00;
-	m_identify_device[206*2+0] = 0x00;                     /* 206-254: reserved */
-	m_identify_device[206*2+1] = 0x00;
-	m_identify_device[255*2+0] = 0x00;                     /* 255: integrity word */
-	m_identify_device[255*2+1] = 0x00;
+	m_identify_buffer[47] = 0x8001;                    /* 47: read/write multiple support */
+	m_identify_buffer[48] = 0;                         /* 48: reserved */
+	m_identify_buffer[49] = 0x0f03;                    /* 49: capabilities */
+	m_identify_buffer[50] = 0;                         /* 50: reserved */
+	m_identify_buffer[51] = 2;                         /* 51: PIO data transfer cycle timing mode */
+	m_identify_buffer[52] = 2;                         /* 52: single word DMA transfer cycle timing mode */
+	m_identify_buffer[53] = 3;                         /* 53: field validity */
+	m_identify_buffer[54] = m_num_cylinders;           /* 54: number of current logical cylinders */
+	m_identify_buffer[55] = m_num_heads;               /* 55: number of current logical heads */
+	m_identify_buffer[56] = m_num_sectors;             /* 56: number of current logical sectors per track */
+	m_identify_buffer[57] = total_sectors & 0xffff;    /* 57-58: current capacity in sectors (ATA-1 through ATA-5; obsoleted in ATA-6) */
+	m_identify_buffer[58] = total_sectors >> 16;
+	m_identify_buffer[59] = 0;                         /* 59: multiple sector timing */
+	m_identify_buffer[60] = total_sectors & 0xffff;    /* 60-61: total user addressable sectors for LBA mode (ATA-1 through ATA-7) */
+	m_identify_buffer[61] = total_sectors >> 16;
+	m_identify_buffer[62] = 0x0007;                    /* 62: single word dma transfer */
+	m_identify_buffer[63] = 0x0407;                    /* 63: multiword DMA transfer */
+	m_identify_buffer[64] = 0x0003;                    /* 64: flow control PIO transfer modes supported */
+	m_identify_buffer[65] = 0x78;                      /* 65: minimum multiword DMA transfer cycle time per word */
+	m_identify_buffer[66] = 0x78;                      /* 66: mfr's recommended multiword DMA transfer cycle time */
+	m_identify_buffer[67] = 0x014d;                    /* 67: minimum PIO transfer cycle time without flow control */
+	m_identify_buffer[68] = 0x78;                      /* 68: minimum PIO transfer cycle time with IORDY */
+	m_identify_buffer[69] = 0x00;                      /* 69-70: reserved */
+	m_identify_buffer[71] = 0x00;                      /* 71: reserved for IDENTIFY PACKET command */
+	m_identify_buffer[72] = 0x00;                      /* 72: reserved for IDENTIFY PACKET command */
+	m_identify_buffer[73] = 0x00;                      /* 73: reserved for IDENTIFY PACKET command */
+	m_identify_buffer[74] = 0x00;                      /* 74: reserved for IDENTIFY PACKET command */
+	m_identify_buffer[75] = 0x00;                      /* 75: queue depth */
+	m_identify_buffer[76] = 0x00;                      /* 76-79: reserved */
+	m_identify_buffer[80] = 0x00;                      /* 80: major version number */
+	m_identify_buffer[81] = 0x00;                      /* 81: minor version number */
+	m_identify_buffer[82] = 0x00;                      /* 82: command set supported */
+	m_identify_buffer[83] = 0x00;                      /* 83: command sets supported */
+	m_identify_buffer[84] = 0x00;                      /* 84: command set/feature supported extension */
+	m_identify_buffer[85] = 0x00;                      /* 85: command set/feature enabled */
+	m_identify_buffer[86] = 0x00;                      /* 86: command set/feature enabled */
+	m_identify_buffer[87] = 0x00;                      /* 87: command set/feature default */
+	m_identify_buffer[88] = 0x00;                      /* 88: additional DMA modes */
+	m_identify_buffer[89] = 0x00;                      /* 89: time required for security erase unit completion */
+	m_identify_buffer[90] = 0x00;                      /* 90: time required for enhanced security erase unit completion */
+	m_identify_buffer[91] = 0x00;                      /* 91: current advanced power management value */
+	m_identify_buffer[92] = 0x00;                      /* 92: master password revision code */
+	m_identify_buffer[93] = 0x00;                      /* 93: hardware reset result */
+	m_identify_buffer[94] = 0x00;                      /* 94: acoustic management values */
+	m_identify_buffer[95] = 0x00;                      /* 95-99: reserved */
+	m_identify_buffer[100] = total_sectors & 0xffff;   /* 100-103: maximum 48-bit LBA */
+	m_identify_buffer[101] = total_sectors >> 16;
+	m_identify_buffer[102] = 0x00;
+	m_identify_buffer[103] = 0x00;
+	m_identify_buffer[104] = 0x00;                     /* 104-126: reserved */
+	m_identify_buffer[127] = 0x00;                     /* 127: removable media status notification */
+	m_identify_buffer[128] = 0x00;                     /* 128: security status */
+	m_identify_buffer[129] = 0x00;                     /* 129-159: vendor specific */
+	m_identify_buffer[160] = 0x00;                     /* 160: CFA power mode 1 */
+	m_identify_buffer[161] = 0x00;                     /* 161-175: reserved for CompactFlash */
+	m_identify_buffer[176] = 0x00;                     /* 176-205: current media serial number */
+	m_identify_buffer[206] = 0x00;                     /* 206-254: reserved */
+	m_identify_buffer[255] = 0x00;                     /* 255: integrity word */
 }
 
 //-------------------------------------------------
@@ -227,7 +174,6 @@ void ata_mass_storage_device::device_start()
 	ata_hle_device::device_start();
 
 	save_item(NAME(m_can_identify_device));
-	save_item(NAME(m_identify_device));
 	save_item(NAME(m_cur_lba));
 	save_item(NAME(m_sectors_until_int));
 	save_item(NAME(m_master_password_enable));
@@ -267,7 +213,12 @@ void ata_mass_storage_device::finished_command()
 	case IDE_COMMAND_IDENTIFY_DEVICE:
 		if (m_can_identify_device)
 		{
-			memcpy(m_buffer, m_identify_device, m_buffer_size);
+			for( int w = 0; w < 256; w++ )
+			{
+				m_buffer[w * 2] = m_identify_buffer[ w ] & 0xff;
+				m_buffer[(w * 2) + 1] = m_identify_buffer[ w ] >> 8;
+			}
+
 			m_status |= IDE_STATUS_DRQ;
 		}
 		else
@@ -301,10 +252,6 @@ void ata_mass_storage_device::finished_command()
 		break;
 
 	case IDE_COMMAND_RECALIBRATE:
-		set_irq(ASSERT_LINE);
-		break;
-
-	case IDE_COMMAND_SET_FEATURES:
 		set_irq(ASSERT_LINE);
 		break;
 
@@ -637,7 +584,7 @@ void ata_mass_storage_device::process_command()
 
 		/* start the read going */
 		read_first_sector();
-		return;
+		break;
 
 	case IDE_COMMAND_READ_MULTIPLE:
 		LOGPRINT(("IDE Read multiple block: C=%d H=%d S=%d LBA=%d count=%d\n",
@@ -647,7 +594,7 @@ void ata_mass_storage_device::process_command()
 
 		/* start the read going */
 		read_first_sector();
-		return;
+		break;
 
 	case IDE_COMMAND_VERIFY_SECTORS:
 	case IDE_COMMAND_VERIFY_SECTORS_NORETRY:
@@ -659,7 +606,7 @@ void ata_mass_storage_device::process_command()
 
 		/* start the read going */
 		read_first_sector();
-		return;
+		break;
 
 	case IDE_COMMAND_READ_DMA:
 		LOGPRINT(("IDE Read multiple DMA: C=%d H=%d S=%d LBA=%d count=%d\n",
@@ -670,7 +617,7 @@ void ata_mass_storage_device::process_command()
 
 		/* start the read going */
 		read_first_sector();
-		return;
+		break;
 
 	case IDE_COMMAND_WRITE_SECTORS:
 	case IDE_COMMAND_WRITE_SECTORS_NORETRY:
@@ -682,7 +629,7 @@ void ata_mass_storage_device::process_command()
 
 		/* mark the buffer ready */
 		m_status |= IDE_STATUS_DRQ;
-		return;
+		break;
 
 	case IDE_COMMAND_WRITE_MULTIPLE:
 		LOGPRINT(("IDE Write multiple block: C=%d H=%d S=%d LBA=%d count=%d\n",
@@ -693,7 +640,7 @@ void ata_mass_storage_device::process_command()
 
 		/* mark the buffer ready */
 		m_status |= IDE_STATUS_DRQ;
-		return;
+		break;
 
 	case IDE_COMMAND_WRITE_DMA:
 		LOGPRINT(("IDE Write multiple DMA: C=%d H=%d S=%d LBA=%d count=%d\n",
@@ -707,7 +654,7 @@ void ata_mass_storage_device::process_command()
 
 		/* start the read going */
 		set_dmarq(ASSERT_LINE);
-		return;
+		break;
 
 	case IDE_COMMAND_SECURITY_UNLOCK:
 		LOGPRINT(("IDE Security Unlock\n"));
@@ -716,41 +663,35 @@ void ata_mass_storage_device::process_command()
 		m_status |= IDE_STATUS_DRQ;
 
 		set_irq(ASSERT_LINE);
-		return;
+		break;
 
 	case IDE_COMMAND_IDENTIFY_DEVICE:
 		LOGPRINT(("IDE Identify device\n"));
 
 		start_busy(MINIMUM_COMMAND_TIME, PARAM_COMMAND);
-		return;
+		break;
 
 	case IDE_COMMAND_RECALIBRATE:
 		start_busy(MINIMUM_COMMAND_TIME, PARAM_COMMAND);
-		return;
+		break;
 
 	case IDE_COMMAND_IDLE:
 		/* signal an interrupt */
 		set_irq(ASSERT_LINE);
-		return;
+		break;
 
 	case IDE_COMMAND_SET_CONFIG:
 		LOGPRINT(("IDE Set configuration (%d heads, %d sectors)\n", (m_device_head & IDE_DEVICE_HEAD_HS) + 1, m_sector_count));
 
 		start_busy(MINIMUM_COMMAND_TIME, PARAM_COMMAND);
-		return;
+		break;
 
 	case IDE_COMMAND_SET_MAX:
 		LOGPRINT(("IDE Set max (%02X %02X %02X %02X %02X)\n", m_feature, m_sector_count & 0xff, m_sector_number, m_cylinder_low, m_cylinder_high));
 
 		/* signal an interrupt */
 		set_irq(ASSERT_LINE);
-		return;
-
-	case IDE_COMMAND_SET_FEATURES:
-		LOGPRINT(("IDE Set features (%02X %02X %02X %02X %02X)\n", m_feature, m_sector_count & 0xff, m_sector_number, m_cylinder_low, m_cylinder_high));
-
-		start_busy(MINIMUM_COMMAND_TIME, PARAM_COMMAND);
-		return;
+		break;
 
 	case IDE_COMMAND_SET_BLOCK_COUNT:
 		LOGPRINT(("IDE Set block count (%02X)\n", m_sector_count));
@@ -759,15 +700,17 @@ void ata_mass_storage_device::process_command()
 
 		/* signal an interrupt */
 		set_irq(ASSERT_LINE);
-		return;
+		break;
 
 	case IDE_COMMAND_SEEK:
 		/* signal an interrupt */
 		set_irq(ASSERT_LINE);
-		return;
-	}
+		break;
 
-	ata_hle_device::process_command();
+	default:
+		ata_hle_device::process_command();
+		break;
+	}
 }
 
 //**************************************************************************
@@ -824,8 +767,18 @@ void ide_hdd_device::device_reset()
 
 		// build the features page
 		UINT32 metalength;
-		if (m_handle->read_metadata (HARD_DISK_IDENT_METADATA_TAG, 0, m_identify_device, IDE_DISK_SECTOR_SIZE, metalength) != CHDERR_NONE)
+		if (m_handle->read_metadata (HARD_DISK_IDENT_METADATA_TAG, 0, m_buffer, 512, metalength) == CHDERR_NONE)
+		{
+			printf( "identify from chd\n" );
+			for( int w = 0; w < 256; w++ )
+			{
+				m_identify_buffer[w] = (m_buffer[(w * 2) + 1] << 8) | m_buffer[w * 2];
+			}
+		}
+		else
+		{
 			ide_build_identify_device();
+		}
 
 		m_can_identify_device = 1;
 	}

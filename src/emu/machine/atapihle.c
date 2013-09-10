@@ -181,11 +181,6 @@ void atapi_hle_device::process_command()
 		soft_reset();
 		break;
 
-	case IDE_COMMAND_SET_FEATURES:
-		//printf("IDE Set features (%02X %02X %02X %02X %02X)\n", m_feature, m_sector_count & 0xff, m_sector_number, m_cylinder_low, m_cylinder_high);
-		set_irq(ASSERT_LINE);
-		break;
-
 	case IDE_COMMAND_PACKET:
 		m_packet = 1;
 
