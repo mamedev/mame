@@ -32,11 +32,6 @@
 
     TODO:
 
-    - segment/page RAM addresses are not correctly decoded, "sas/format/format" can't find the SASI interface because of this
-        forcetask0 1 t0 0 t1 0 t2 0 t3 0
-        sega19 0 task 0
-        sega 000 segd 00 pga 008 pgd 4058 virtual 02c730 (should be 004730)
-
     - short/long reset (RSTBUT)
     - CIO
         - optimize timers!
@@ -59,81 +54,12 @@
 #define LOG 0
 
 
-// MAC
-#define A0          BIT(offset, 0)
 #define A1          BIT(offset, 1)
 #define A2          BIT(offset, 2)
 #define A4          BIT(offset, 4)
-#define A7          BIT(offset, 7)
-#define A8          BIT(offset, 8)
 #define X11         BIT(offset, 11)
-#define X12         BIT(offset, 12)
-#define A17         BIT(offset, 17)
-#define A18         BIT(offset, 18)
-#define A19         BIT(offset, 19)
-
-#define A10_A9_A8   ((offset >> 8) & 0x07)
-#define A2_A1_A0    (offset & 0x07)
 #define A1_A2       ((A1 << 1) | A2)
 #define A2_A1       ((offset >> 1) & 0x03)
-
-#define FC0         BIT(fc, 0)
-#define FC1         BIT(fc, 1)
-#define FC2         BIT(fc, 2)
-
-#define PAGE_WP     BIT(page_data, 14)
-#define PAGE_NONX   BIT(page_data, 15)
-
-
-// task register
-#define BOOTE       BIT(m_task, 6)
-#define MAGIC       BIT(m_task, 7)
-#define READ_MAGIC  !MAGIC
-
-
-// DMA map
-enum
-{
-	DMAMAP_R2_LO = 0,
-	DMAMAP_R2_HI,
-	DMAMAP_R1_LO = 4,
-	DMAMAP_R1_HI,
-	DMAMAP_R0_LO,
-	DMAMAP_R0_HI
-};
-
-
-// internal I/O registers
-enum
-{
-	FLP = 0,
-	CRT,
-	DRT,
-	DMA0,
-	DMA1,
-	DMA2,
-	SCC,
-	CIO
-};
-
-
-// internal I/O registers
-enum
-{
-	IORD0 = 0
-};
-
-
-// internal I/O registers
-enum
-{
-	IOWR0 = 0,
-	IOWR1,
-	IOWR2,
-	FW,
-	DMAMAP = 5,
-	SPEC_CONTR_REG
-};
 
 
 // external I/O
@@ -155,152 +81,16 @@ enum
 
 
 
+
 //**************************************************************************
-//  MEMORY ACCESS CONTROLLER
+//  READ/WRITE HANDLERS
 //**************************************************************************
 
 //-------------------------------------------------
-//  read_ram -
+//  bus_r -
 //-------------------------------------------------
 
-UINT8 abc1600_state::read_ram(offs_t offset)
-{
-	UINT8 data = 0;
-
-	if (offset < 0x100000)
-	{
-		// main RAM
-		UINT8 *ram = m_ram->pointer();
-		data = ram[offset];
-	}
-	else if (offset < 0x180000)
-	{
-		// video RAM
-		address_space &program = m_maincpu->space(AS_PROGRAM);
-		data = video_ram_r(program, offset);
-	}
-	else
-	{
-		logerror("%s Unmapped read from virtual memory %06x\n", machine().describe_context(), offset);
-	}
-
-	return data;
-}
-
-
-//-------------------------------------------------
-//  write_ram -
-//-------------------------------------------------
-
-void abc1600_state::write_ram(offs_t offset, UINT8 data)
-{
-	if (offset < 0x100000)
-	{
-		// main RAM
-		UINT8 *ram = m_ram->pointer();
-		ram[offset] = data;
-	}
-	else if (offset < 0x180000)
-	{
-		// video RAM
-		address_space &program = m_maincpu->space(AS_PROGRAM);
-		video_ram_w(program, offset, data);
-	}
-	else
-	{
-		logerror("%s Unmapped write to virtual memory %06x : %02x\n", machine().describe_context(), offset, data);
-	}
-}
-
-
-//-------------------------------------------------
-//  read_io -
-//-------------------------------------------------
-
-UINT8 abc1600_state::read_io(offs_t offset)
-{
-	if (X12)
-	{
-		return read_internal_io(offset);
-	}
-	else
-	{
-		return read_external_io(offset);
-	}
-}
-
-
-//-------------------------------------------------
-//  read_internal_io -
-//-------------------------------------------------
-
-UINT8 abc1600_state::read_internal_io(offs_t offset)
-{
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-	UINT8 data = 0;
-
-	if (X11)
-	{
-		switch (A10_A9_A8)
-		{
-		case IORD0:
-			data = iord0_r(program, offset);
-			break;
-
-		default:
-			logerror("%s Unmapped read from virtual I/O %06x\n", machine().describe_context(), offset);
-		}
-	}
-	else
-	{
-		switch (A10_A9_A8)
-		{
-		case FLP:
-			data = m_fdc->gen_r(A2_A1);
-			break;
-
-		case CRT:
-			if (A0)
-				data = m_crtc->register_r(program, offset);
-			else
-				data = m_crtc->status_r(program, offset);
-			break;
-
-		case DRT:
-			data = m_dart->ba_cd_r(program, A2_A1 ^ 0x03);
-			break;
-
-		case DMA0:
-			data = m_dma0->read();
-			break;
-
-		case DMA1:
-			data = m_dma1->read();
-			break;
-
-		case DMA2:
-			data = m_dma2->read();
-			break;
-
-		case SCC:
-			data = m_scc->reg_r(program, A1_A2);
-			break;
-
-		case CIO:
-			data = m_cio->read(program, A2_A1);
-			break;
-		}
-	}
-
-	return data;
-}
-
-
-//-------------------------------------------------
-//  read_external_io -
-//-------------------------------------------------
-
-UINT8 abc1600_state::read_external_io(offs_t offset)
+READ8_MEMBER( abc1600_state::bus_r )
 {
 	UINT8 data = 0;
 
@@ -439,120 +229,10 @@ UINT8 abc1600_state::read_external_io(offs_t offset)
 
 
 //-------------------------------------------------
-//  write_io -
+//  bus_w -
 //-------------------------------------------------
 
-void abc1600_state::write_io(offs_t offset, UINT8 data)
-{
-	if (X12)
-	{
-		write_internal_io(offset, data);
-	}
-	else
-	{
-		write_external_io(offset, data);
-	}
-}
-
-
-//-------------------------------------------------
-//  write_internal_io -
-//-------------------------------------------------
-
-void abc1600_state::write_internal_io(offs_t offset, UINT8 data)
-{
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-
-	if (X11)
-	{
-		switch (A10_A9_A8)
-		{
-		case IOWR0:
-			iowr0_w(program, offset, data);
-			break;
-
-		case IOWR1:
-			iowr1_w(program, offset, data);
-			break;
-
-		case IOWR2:
-			iowr2_w(program, offset, data);
-			break;
-
-		case FW:
-			if (!A7)
-			{
-				if (A0)
-					fw1_w(program, offset, data);
-				else
-					fw0_w(program, offset, data);
-			}
-			else
-			{
-				logerror("%s Unmapped write to virtual I/O %06x : %02x\n", machine().describe_context(), offset, data);
-			}
-			break;
-
-		case DMAMAP:
-			dmamap_w(program, offset, data);
-			break;
-
-		case SPEC_CONTR_REG:
-			spec_contr_reg_w(program, offset, data);
-			break;
-
-		default:
-			logerror("%s Unmapped write to virtual I/O %06x : %02x\n", machine().describe_context(), offset, data);
-		}
-	}
-	else
-	{
-		switch (A10_A9_A8)
-		{
-		case FLP:
-			m_fdc->gen_w(A2_A1, data);
-			break;
-
-		case CRT:
-			if (A0)
-				m_crtc->register_w(program, offset, data);
-			else
-				m_crtc->address_w(program, offset, data);
-			break;
-
-		case DRT:
-			m_dart->ba_cd_w(program, A2_A1 ^ 0x03, data);
-			break;
-
-		case DMA0:
-			m_dma0->write(data);
-			break;
-
-		case DMA1:
-			m_dma1->write(data);
-			break;
-
-		case DMA2:
-			m_dma2->write(data);
-			break;
-
-		case SCC:
-			m_scc->reg_w(program, A1_A2, data);
-			break;
-
-		case CIO:
-			m_cio->write(program, A2_A1, data);
-			break;
-		}
-	}
-}
-
-
-//-------------------------------------------------
-//  write_external_io -
-//-------------------------------------------------
-
-void abc1600_state::write_external_io(offs_t offset, UINT8 data)
+WRITE8_MEMBER( abc1600_state::bus_w )
 {
 	UINT8 cs = (m_cs7 << 7) | ((offset >> 5) & 0x3f);
 
@@ -643,609 +323,6 @@ void abc1600_state::write_external_io(offs_t offset, UINT8 data)
 	}
 }
 
-
-//-------------------------------------------------
-//  get_current_task -
-//-------------------------------------------------
-
-int abc1600_state::get_current_task(offs_t offset)
-{
-	int force_task0 = !(m_ifc2 || A19);
-	int t0 = !(BIT(m_task, 0) || force_task0);
-	int t1 = !(BIT(m_task, 1) || force_task0);
-	int t2 = !(BIT(m_task, 2) || force_task0);
-	int t3 = !(BIT(m_task, 3) || force_task0);
-
-	return (t3 << 3) | (t2 << 2) | (t1 << 1) | t0;
-}
-
-
-//-------------------------------------------------
-//  get_segment_address -
-//-------------------------------------------------
-
-offs_t abc1600_state::get_segment_address(offs_t offset)
-{
-	int sega19 = !(!(A8 || m_ifc2) || !A19);
-	int task = get_current_task(offset);
-
-	return (task << 5) | (sega19 << 4) | ((offset >> 15) & 0x0f);
-}
-
-
-//-------------------------------------------------
-//  get_page_address -
-//-------------------------------------------------
-
-offs_t abc1600_state::get_page_address(offs_t offset, UINT8 segd)
-{
-	return ((segd & 0x3f) << 4) | ((offset >> 11) & 0x0f);
-}
-
-
-//-------------------------------------------------
-//  translate_address -
-//-------------------------------------------------
-
-offs_t abc1600_state::translate_address(offs_t offset, int *nonx, int *wp)
-{
-	// segment
-	offs_t sega = get_segment_address(offset);
-	UINT8 segd = m_segment_ram[sega];
-
-	// page
-	offs_t pga = get_page_address(offset, segd);
-	UINT16 page_data = m_page_ram[pga];
-
-	offs_t virtual_offset = ((page_data & 0x3ff) << 11) | (offset & 0x7ff);
-
-	if (PAGE_NONX)
-	{
-		//logerror("Bus error %06x : %06x\n", offset, virtual_offset);
-		//m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-		//m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
-	}
-
-	*nonx = PAGE_NONX;
-	*wp = PAGE_WP;
-
-	return virtual_offset;
-}
-
-
-//-------------------------------------------------
-//  read_user_memory -
-//-------------------------------------------------
-
-UINT8 abc1600_state::read_user_memory(offs_t offset)
-{
-	int nonx = 0, wp = 0;
-	offs_t virtual_offset = translate_address(offset, &nonx, &wp);
-	UINT8 data = 0;
-
-	if (virtual_offset < 0x1fe000)
-	{
-		data = read_ram(virtual_offset);
-	}
-	else
-	{
-		data = read_io(virtual_offset);
-	}
-
-	return data;
-}
-
-
-//-------------------------------------------------
-//  write_user_memory -
-//-------------------------------------------------
-
-void abc1600_state::write_user_memory(offs_t offset, UINT8 data)
-{
-	int nonx = 0, wp = 0;
-	offs_t virtual_offset = translate_address(offset, &nonx, &wp);
-
-	//if (nonx || !wp) return;
-
-	if (virtual_offset < 0x1fe000)
-	{
-		write_ram(virtual_offset, data);
-	}
-	else
-	{
-		write_io(virtual_offset, data);
-	}
-}
-
-
-//-------------------------------------------------
-//  read_supervisor_memory -
-//-------------------------------------------------
-
-UINT8 abc1600_state::read_supervisor_memory(offs_t offset)
-{
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-	UINT8 data = 0;
-
-	if (!A2 && !A1)
-	{
-		// _EP
-		data = page_r(program, offset);
-	}
-	else if (!A2 && A1 && A0)
-	{
-		// _ES
-		data = segment_r(program, offset);
-	}
-	else if (A2 && A1 && A0)
-	{
-		// _CAUSE
-		data = cause_r(program, offset);
-	}
-
-	return data;
-}
-
-
-//-------------------------------------------------
-//  write_supervisor_memory -
-//-------------------------------------------------
-
-void abc1600_state::write_supervisor_memory(offs_t offset, UINT8 data)
-{
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-
-	if (!A2 && !A1)
-	{
-		// _WEP
-		page_w(program, offset, data);
-	}
-	else if (!A2 && A1 && A0)
-	{
-		// _WES
-		segment_w(program, offset, data);
-	}
-	else if (A2 && !A1 && A0)
-	{
-		// W(C)
-		task_w(program, offset, data);
-	}
-}
-
-
-//-------------------------------------------------
-//  get_fc -
-//-------------------------------------------------
-
-int abc1600_state::get_fc()
-{
-	UINT16 fc = m68k_get_fc(m_maincpu);
-
-	m_ifc2 = !(!(MAGIC || FC0) || FC2);
-
-	return fc;
-}
-
-
-//-------------------------------------------------
-//  mac_r -
-//-------------------------------------------------
-
-READ8_MEMBER( abc1600_state::mac_r )
-{
-	int fc = get_fc();
-
-	UINT8 data = 0;
-
-	if (!BOOTE && !A19 && !A18 && !A17)
-	{
-		// _BOOTCE
-		data = m_rom->base()[offset & 0x3fff];
-	}
-	else if (A19 && !m_ifc2 && !FC1)
-	{
-		data = read_supervisor_memory(offset);
-	}
-	else
-	{
-		data = read_user_memory(offset);
-	}
-
-	return data;
-}
-
-
-//-------------------------------------------------
-//  mac_w -
-//-------------------------------------------------
-
-WRITE8_MEMBER( abc1600_state::mac_w )
-{
-	int fc = get_fc();
-
-	if (A19 && !m_ifc2 && !FC1)
-	{
-		write_supervisor_memory(offset, data);
-	}
-	else
-	{
-		write_user_memory(offset, data);
-	}
-}
-
-
-//-------------------------------------------------
-//  cause_r -
-//-------------------------------------------------
-
-READ8_MEMBER( abc1600_state::cause_r )
-{
-	/*
-
-	    bit     description
-
-	    0       RSTBUT
-	    1       1
-	    2       DMAOK
-	    3       X16
-	    4       X17
-	    5       X18
-	    6       X19
-	    7       X20
-
-	*/
-
-	UINT8 data = 0x02;
-
-	// DMA status
-	data |= m_cause;
-
-	machine().watchdog_reset();
-
-	return data;
-}
-
-
-//-------------------------------------------------
-//  task_w -
-//-------------------------------------------------
-
-WRITE8_MEMBER( abc1600_state::task_w )
-{
-	/*
-
-	    bit     description
-
-	    0       TASKD0* (inverted SEGA5)
-	    1       TASKD1* (inverted SEGA6)
-	    2       TASKD2* (inverted SEGA7)
-	    3       TASKD3* (inverted SEGA8)
-	    4
-	    5
-	    6       BOOTE*
-	    7       MAGIC*
-
-	*/
-
-	m_task = data ^ 0xff;
-
-	if (LOG) logerror("%s: %06x Task %u BOOTE %u MAGIC %u\n", machine().describe_context(), offset, get_current_task(offset), BOOTE, MAGIC);
-}
-
-
-//-------------------------------------------------
-//  segment_r -
-//-------------------------------------------------
-
-READ8_MEMBER( abc1600_state::segment_r )
-{
-	/*
-
-	    bit     description
-
-	    0       SEGD0
-	    1       SEGD1
-	    2       SEGD2
-	    3       SEGD3
-	    4       SEGD4
-	    5       SEGD5
-	    6       SEGD6
-	    7       READ_MAGIC
-
-	*/
-
-	offs_t sega = get_segment_address(offset);
-	UINT8 segd = m_segment_ram[sega];
-
-	return (READ_MAGIC << 7) | (segd & 0x7f);
-}
-
-
-//-------------------------------------------------
-//  segment_w -
-//-------------------------------------------------
-
-WRITE8_MEMBER( abc1600_state::segment_w )
-{
-	/*
-
-	    bit     description
-
-	    0       SEGD0
-	    1       SEGD1
-	    2       SEGD2
-	    3       SEGD3
-	    4       SEGD4
-	    5       SEGD5
-	    6       SEGD6
-	    7       0
-
-	*/
-
-	offs_t sega = get_segment_address(offset);
-
-	m_segment_ram[sega] = data & 0x7f;
-
-	if (LOG) logerror("%s: %06x Task %u Segment %03x : %02x\n", machine().describe_context(), offset, get_current_task(offset), sega, data);
-}
-
-
-//-------------------------------------------------
-//  page_r -
-//-------------------------------------------------
-
-READ8_MEMBER( abc1600_state::page_r )
-{
-	/*
-
-	    bit     description
-
-	    0       X11
-	    1       X12
-	    2       X13
-	    3       X14
-	    4       X15
-	    5       X16
-	    6       X17
-	    7       X18
-
-	    8       X19
-	    9       X20
-	    10      X20
-	    11      X20
-	    12      X20
-	    13      X20
-	    14      _WP
-	    15      NONX
-
-	*/
-
-	// segment
-	offs_t sega = get_segment_address(offset);
-	UINT8 segd = m_segment_ram[sega];
-
-	// page
-	offs_t pga = get_page_address(offset, segd);
-	UINT16 pgd = m_page_ram[pga];
-
-	UINT8 data = 0;
-
-	if (A0)
-	{
-		data = pgd & 0xff;
-	}
-	else
-	{
-		int x20 = BIT(pgd, 9);
-
-		data = (pgd >> 8) | (x20 << 2) | (x20 << 3) | (x20 << 4) | (x20 << 5);
-	}
-
-	return data;
-}
-
-
-//-------------------------------------------------
-//  page_w -
-//-------------------------------------------------
-
-WRITE8_MEMBER( abc1600_state::page_w )
-{
-	/*
-
-	    bit     description
-
-	    0       X11
-	    1       X12
-	    2       X13
-	    3       X14
-	    4       X15
-	    5       X16
-	    6       X17
-	    7       X18
-
-	    8       X19
-	    9       X20
-	    10
-	    11
-	    12
-	    13
-	    14      _WP
-	    15      NONX
-
-	*/
-
-	// segment
-	offs_t sega = get_segment_address(offset);
-	UINT8 segd = m_segment_ram[sega];
-
-	// page
-	offs_t pga = get_page_address(offset, segd);
-
-	if (A0)
-	{
-		m_page_ram[pga] = (m_page_ram[pga] & 0xff00) | data;
-	}
-	else
-	{
-		m_page_ram[pga] = ((data & 0xc3) << 8) | (m_page_ram[pga] & 0xff);
-	}
-
-	if (LOG) logerror("%s: %06x Task %u Segment %03x Page %03x : %02x -> %04x\n", machine().describe_context(), offset, get_current_task(offset), sega, pga, data, m_page_ram[pga]);
-}
-
-
-
-//**************************************************************************
-//  DMA
-//**************************************************************************
-
-//-------------------------------------------------
-//  update_drdy0 -
-//-------------------------------------------------
-
-inline void abc1600_state::update_drdy0()
-{
-	if (m_sysfs)
-	{
-		// floppy
-		m_dma0->rdy_w(!m_fdc->drq_r());
-	}
-	else
-	{
-		// BUS0I/BUS0X
-		int trrq0 = m_bus0i->trrq_r() && m_bus0x->trrq_r();
-
-		m_dma0->rdy_w(trrq0);
-	}
-}
-
-
-//-------------------------------------------------
-//  update_drdy1 -
-//-------------------------------------------------
-
-inline void abc1600_state::update_drdy1()
-{
-	if (m_sysscc)
-	{
-		// SCC
-		m_dma1->rdy_w(1);
-	}
-	else
-	{
-		// BUS1
-		m_dma1->rdy_w(m_bus1->trrq_r());
-	}
-}
-
-
-//-------------------------------------------------
-//  update_drdy2 -
-//-------------------------------------------------
-
-inline void abc1600_state::update_drdy2()
-{
-	// Winchester
-	m_dma2->rdy_w(1);
-}
-
-
-//-------------------------------------------------
-//  get_dma_address -
-//-------------------------------------------------
-
-inline offs_t abc1600_state::get_dma_address(int index, UINT16 offset)
-{
-	// A0 = DMA15, A1 = BA1, A2 = BA2
-	UINT8 dmamap_addr = index | BIT(offset, 15);
-	UINT8 dmamap = m_dmamap[dmamap_addr];
-
-	m_cause = (dmamap & 0x1f) << 3;
-
-	return ((dmamap & 0x1f) << 16) | offset;
-}
-
-
-//-------------------------------------------------
-//  dma_mreq_r - DMA memory read
-//-------------------------------------------------
-
-inline UINT8 abc1600_state::dma_mreq_r(int index, UINT16 offset)
-{
-	offs_t virtual_offset = get_dma_address(index, offset);
-
-	return read_ram(virtual_offset);
-}
-
-
-//-------------------------------------------------
-//  dma_mreq_w - DMA memory write
-//-------------------------------------------------
-
-inline void abc1600_state::dma_mreq_w(int index, UINT16 offset, UINT8 data)
-{
-	offs_t virtual_offset = get_dma_address(index, offset);
-
-	write_ram(virtual_offset, data);
-}
-
-
-//-------------------------------------------------
-//  dma_iorq_r - DMA I/O read
-//-------------------------------------------------
-
-inline UINT8 abc1600_state::dma_iorq_r(int index, UINT16 offset)
-{
-	offs_t virtual_offset = get_dma_address(index, offset);
-
-	return read_io(virtual_offset);
-}
-
-
-//-------------------------------------------------
-//  dma_iorq_w - DMA I/O write
-//-------------------------------------------------
-
-inline void abc1600_state::dma_iorq_w(int index, UINT16 offset, UINT8 data)
-{
-	offs_t virtual_offset = get_dma_address(index, offset);
-
-	write_io(virtual_offset, data);
-}
-
-
-//-------------------------------------------------
-//  dmamap_w - DMA map write
-//-------------------------------------------------
-
-WRITE8_MEMBER( abc1600_state::dmamap_w )
-{
-	/*
-
-	    bit     description
-
-	    0       X16
-	    1       X17
-	    2       X18
-	    3       X19
-	    4       X20
-	    5
-	    6
-	    7       _R/W
-
-	*/
-
-	if (LOG) logerror("DMAMAP %u %02x\n", offset & 7, data);
-
-	m_dmamap[offset & 7] = data;
-}
-
-
-
-//**************************************************************************
-//  READ/WRITE HANDLERS
-//**************************************************************************
 
 //-------------------------------------------------
 //  fw0_w -
@@ -1380,7 +457,34 @@ WRITE8_MEMBER( abc1600_state::spec_contr_reg_w )
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( abc1600_mem, AS_PROGRAM, 8, abc1600_state )
-	AM_RANGE(0x00000, 0xfffff) AM_READWRITE(mac_r, mac_w)
+	AM_RANGE(0x00000, 0xfffff) AM_DEVICE(ABC1600_MAC_TAG, abc1600_mac_device, map)
+ADDRESS_MAP_END
+
+
+//-------------------------------------------------
+//  ADDRESS_MAP( mac_mem )
+//-------------------------------------------------
+
+static ADDRESS_MAP_START( mac_mem, AS_PROGRAM, 8, abc1600_state )
+	AM_RANGE(0x000000, 0x0fffff) AM_RAM
+	AM_RANGE(0x100000, 0x17ffff) AM_DEVICE(ABC1600_MOVER_TAG, abc1600_mover_device, vram_map)//AM_READWRITE(video_ram_r, video_ram_w)
+	AM_RANGE(0x1fe000, 0x1fefff) AM_READWRITE(bus_r, bus_w)
+	AM_RANGE(0x1ff000, 0x1ff000) AM_MIRROR(0xf9) AM_DEVREADWRITE(SAB1797_02P_TAG, fd1797_t, status_r, cmd_w)
+	AM_RANGE(0x1ff002, 0x1ff002) AM_MIRROR(0xf9) AM_DEVREADWRITE(SAB1797_02P_TAG, fd1797_t, track_r, track_w)
+	AM_RANGE(0x1ff004, 0x1ff004) AM_MIRROR(0xf9) AM_DEVREADWRITE(SAB1797_02P_TAG, fd1797_t, sector_r, sector_w)
+	AM_RANGE(0x1ff006, 0x1ff006) AM_MIRROR(0xf9) AM_DEVREADWRITE(SAB1797_02P_TAG, fd1797_t, data_r, data_w)
+	AM_RANGE(0x1ff100, 0x1ff101) AM_MIRROR(0xfe) AM_DEVICE(ABC1600_MOVER_TAG, abc1600_mover_device, crtc_map)
+	AM_RANGE(0x1ff200, 0x1ff207) AM_MIRROR(0xf8) AM_READWRITE(dart_r, dart_w)
+	AM_RANGE(0x1ff300, 0x1ff300) AM_MIRROR(0xff) AM_DEVREADWRITE_LEGACY(Z8410AB1_0_TAG, z80dma_r, z80dma_w)
+	AM_RANGE(0x1ff400, 0x1ff400) AM_MIRROR(0xff) AM_DEVREADWRITE_LEGACY(Z8410AB1_1_TAG, z80dma_r, z80dma_w)
+	AM_RANGE(0x1ff500, 0x1ff500) AM_MIRROR(0xff) AM_DEVREADWRITE_LEGACY(Z8410AB1_2_TAG, z80dma_r, z80dma_w)
+	AM_RANGE(0x1ff600, 0x1ff607) AM_MIRROR(0xf8) AM_READWRITE(scc_r, scc_w) 
+	AM_RANGE(0x1ff700, 0x1ff707) AM_MIRROR(0xf8) AM_READWRITE(cio_r, cio_w) 
+	AM_RANGE(0x1ff800, 0x1ffaff) AM_DEVICE(ABC1600_MOVER_TAG, abc1600_mover_device, io_map)
+	AM_RANGE(0x1ffb00, 0x1ffb00) AM_MIRROR(0x7e) AM_WRITE(fw0_w)
+	AM_RANGE(0x1ffb01, 0x1ffb01) AM_MIRROR(0x7e) AM_WRITE(fw1_w)
+	AM_RANGE(0x1ffd00, 0x1ffd07) AM_MIRROR(0xf8) AM_DEVWRITE(ABC1600_MAC_TAG, abc1600_mac_device, dmamap_w)
+	AM_RANGE(0x1ffe00, 0x1ffe00) AM_MIRROR(0xff) AM_WRITE(spec_contr_reg_w)
 ADDRESS_MAP_END
 
 
@@ -1407,29 +511,25 @@ INPUT_PORTS_END
 //  Z80DMA_INTERFACE( dma0_intf )
 //-------------------------------------------------
 
+void abc1600_state::update_drdy0()
+{
+	if (m_sysfs)
+	{
+		// floppy
+		m_dma0->rdy_w(!m_fdc->drq_r());
+	}
+	else
+	{
+		// BUS0I/BUS0X
+		int trrq0 = m_bus0i->trrq_r() && m_bus0x->trrq_r();
+
+		m_dma0->rdy_w(trrq0);
+	}
+}
+
 WRITE_LINE_MEMBER( abc1600_state::dbrq_w )
 {
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state && m_dmadis);
-}
-
-READ8_MEMBER( abc1600_state::dma0_mreq_r )
-{
-	return dma_mreq_r(DMAMAP_R0_LO, offset);
-}
-
-WRITE8_MEMBER( abc1600_state::dma0_mreq_w )
-{
-	dma_mreq_w(DMAMAP_R0_LO, offset, data);
-}
-
-READ8_MEMBER( abc1600_state::dma0_iorq_r )
-{
-	return dma_iorq_r(DMAMAP_R0_LO, offset);
-}
-
-WRITE8_MEMBER( abc1600_state::dma0_iorq_w )
-{
-	dma_iorq_w(DMAMAP_R0_LO, offset, data);
 }
 
 static Z80DMA_INTERFACE( dma0_intf )
@@ -1437,10 +537,10 @@ static Z80DMA_INTERFACE( dma0_intf )
 	DEVCB_DRIVER_LINE_MEMBER(abc1600_state, dbrq_w),
 	DEVCB_NULL,
 	DEVCB_DEVICE_LINE(Z8410AB1_1_TAG, z80dma_bai_w),
-	DEVCB_DRIVER_MEMBER(abc1600_state, dma0_mreq_r),
-	DEVCB_DRIVER_MEMBER(abc1600_state, dma0_mreq_w),
-	DEVCB_DRIVER_MEMBER(abc1600_state, dma0_iorq_r),
-	DEVCB_DRIVER_MEMBER(abc1600_state, dma0_iorq_w)
+	DEVCB_DEVICE_MEMBER(ABC1600_MAC_TAG, abc1600_mac_device, dma0_mreq_r),
+	DEVCB_DEVICE_MEMBER(ABC1600_MAC_TAG, abc1600_mac_device, dma0_mreq_w),
+	DEVCB_DEVICE_MEMBER(ABC1600_MAC_TAG, abc1600_mac_device, dma0_iorq_r),
+	DEVCB_DEVICE_MEMBER(ABC1600_MAC_TAG, abc1600_mac_device, dma0_iorq_w)
 };
 
 
@@ -1448,24 +548,18 @@ static Z80DMA_INTERFACE( dma0_intf )
 //  Z80DMA_INTERFACE( dma1_intf )
 //-------------------------------------------------
 
-READ8_MEMBER( abc1600_state::dma1_mreq_r )
+void abc1600_state::update_drdy1()
 {
-	return dma_mreq_r(DMAMAP_R1_LO, offset);
-}
-
-WRITE8_MEMBER( abc1600_state::dma1_mreq_w )
-{
-	dma_mreq_w(DMAMAP_R1_LO, offset, data);
-}
-
-READ8_MEMBER( abc1600_state::dma1_iorq_r )
-{
-	return dma_iorq_r(DMAMAP_R1_LO, offset);
-}
-
-WRITE8_MEMBER( abc1600_state::dma1_iorq_w )
-{
-	dma_iorq_w(DMAMAP_R1_LO, offset, data);
+	if (m_sysscc)
+	{
+		// SCC
+		m_dma1->rdy_w(1);
+	}
+	else
+	{
+		// BUS1
+		m_dma1->rdy_w(m_bus1->trrq_r());
+	}
 }
 
 static Z80DMA_INTERFACE( dma1_intf )
@@ -1473,10 +567,10 @@ static Z80DMA_INTERFACE( dma1_intf )
 	DEVCB_DRIVER_LINE_MEMBER(abc1600_state, dbrq_w),
 	DEVCB_NULL,
 	DEVCB_DEVICE_LINE(Z8410AB1_2_TAG, z80dma_bai_w),
-	DEVCB_DRIVER_MEMBER(abc1600_state, dma1_mreq_r),
-	DEVCB_DRIVER_MEMBER(abc1600_state, dma1_mreq_w),
-	DEVCB_DRIVER_MEMBER(abc1600_state, dma1_iorq_r),
-	DEVCB_DRIVER_MEMBER(abc1600_state, dma1_iorq_w)
+	DEVCB_DEVICE_MEMBER(ABC1600_MAC_TAG, abc1600_mac_device, dma1_mreq_r),
+	DEVCB_DEVICE_MEMBER(ABC1600_MAC_TAG, abc1600_mac_device, dma1_mreq_w),
+	DEVCB_DEVICE_MEMBER(ABC1600_MAC_TAG, abc1600_mac_device, dma1_iorq_r),
+	DEVCB_DEVICE_MEMBER(ABC1600_MAC_TAG, abc1600_mac_device, dma1_iorq_w)
 };
 
 
@@ -1484,24 +578,10 @@ static Z80DMA_INTERFACE( dma1_intf )
 //  Z80DMA_INTERFACE( dma2_intf )
 //-------------------------------------------------
 
-READ8_MEMBER( abc1600_state::dma2_mreq_r )
+void abc1600_state::update_drdy2()
 {
-	return dma_mreq_r(DMAMAP_R2_LO, offset);
-}
-
-WRITE8_MEMBER( abc1600_state::dma2_mreq_w )
-{
-	dma_mreq_w(DMAMAP_R2_LO, offset, data);
-}
-
-READ8_MEMBER( abc1600_state::dma2_iorq_r )
-{
-	return dma_iorq_r(DMAMAP_R2_LO, offset);
-}
-
-WRITE8_MEMBER( abc1600_state::dma2_iorq_w )
-{
-	dma_iorq_w(DMAMAP_R2_LO, offset, data);
+	// Winchester
+	m_dma2->rdy_w(1);
 }
 
 static Z80DMA_INTERFACE( dma2_intf )
@@ -1509,16 +589,26 @@ static Z80DMA_INTERFACE( dma2_intf )
 	DEVCB_DRIVER_LINE_MEMBER(abc1600_state, dbrq_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(abc1600_state, dma2_mreq_r),
-	DEVCB_DRIVER_MEMBER(abc1600_state, dma2_mreq_w),
-	DEVCB_DRIVER_MEMBER(abc1600_state, dma2_iorq_r),
-	DEVCB_DRIVER_MEMBER(abc1600_state, dma2_iorq_w)
+	DEVCB_DEVICE_MEMBER(ABC1600_MAC_TAG, abc1600_mac_device, dma2_mreq_r),
+	DEVCB_DEVICE_MEMBER(ABC1600_MAC_TAG, abc1600_mac_device, dma2_mreq_w),
+	DEVCB_DEVICE_MEMBER(ABC1600_MAC_TAG, abc1600_mac_device, dma2_iorq_r),
+	DEVCB_DEVICE_MEMBER(ABC1600_MAC_TAG, abc1600_mac_device, dma2_iorq_w)
 };
 
 
 //-------------------------------------------------
 //  Z80DART_INTERFACE( dart_intf )
 //-------------------------------------------------
+
+READ8_MEMBER( abc1600_state::dart_r )
+{
+	return m_dart->ba_cd_r(space, A2_A1 ^ 0x03);
+}
+
+WRITE8_MEMBER( abc1600_state::dart_w )
+{
+	m_dart->ba_cd_w(space, A2_A1 ^ 0x03, data);
+}
 
 static Z80DART_INTERFACE( dart_intf )
 {
@@ -1546,6 +636,16 @@ static Z80DART_INTERFACE( dart_intf )
 //  SCC8530_INTERFACE( sc_intf )
 //-------------------------------------------------
 
+READ8_MEMBER( abc1600_state::scc_r )
+{
+	return m_scc->reg_r(space, A1_A2);
+}
+
+WRITE8_MEMBER( abc1600_state::scc_w )
+{
+	m_scc->reg_w(space, A1_A2, data);
+}
+
 void abc1600_state::scc_irq(bool status)
 {
 	m_maincpu->set_input_line(M68K_IRQ_5, status ? ASSERT_LINE : CLEAR_LINE);
@@ -1555,6 +655,16 @@ void abc1600_state::scc_irq(bool status)
 //-------------------------------------------------
 //  Z8536_INTERFACE( cio_intf )
 //-------------------------------------------------
+
+READ8_MEMBER( abc1600_state::cio_r )
+{
+	return m_cio->read(space, A2_A1);
+}
+
+WRITE8_MEMBER( abc1600_state::cio_w )
+{
+	m_cio->write(space, A2_A1, data);
+}
 
 READ8_MEMBER( abc1600_state::cio_pa_r )
 {
@@ -1704,16 +814,6 @@ static Z8536_INTERFACE( cio_intf )
 //-------------------------------------------------
 //  wd17xx_interface fdc_intf
 //-------------------------------------------------
-/*
-static LEGACY_FLOPPY_OPTIONS_START( abc1600 )
-    LEGACY_FLOPPY_OPTION(abc1600, "dsk", "Luxor ABC 1600", basicdsk_identify_default, basicdsk_construct_default, NULL,
-        HEADS([2])
-        TRACKS([80])
-        SECTORS([16])
-        SECTOR_LENGTH([256])
-        FIRST_SECTOR_ID([1]))
-LEGACY_FLOPPY_OPTIONS_END
-*/
 
 static SLOT_INTERFACE_START( abc1600_floppies )
 	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
@@ -1844,10 +944,6 @@ IRQ_CALLBACK_MEMBER( abc1600_state::abc1600_int_ack )
 }
 
 
-//-------------------------------------------------
-//  MACHINE_START( abc1600 )
-//-------------------------------------------------
-
 void abc1600_state::machine_start()
 {
 	// interrupt callback
@@ -1857,21 +953,10 @@ void abc1600_state::machine_start()
 	m_fdc->setup_intrq_cb(wd_fdc_t::line_cb(FUNC(abc1600_state::fdc_intrq_w), this));
 	m_fdc->setup_drq_cb(wd_fdc_t::line_cb(FUNC(abc1600_state::fdc_drq_w), this));
 
-	// allocate memory
-	m_segment_ram.allocate(0x400);
-	m_page_ram.allocate(0x400);
-
-	// HACK fill segment RAM with non-zero values or no boot
-	memset(m_segment_ram, 0xcd, 0x400);
-
 	// state saving
-	save_item(NAME(m_ifc2));
-	save_item(NAME(m_task));
-	save_item(NAME(m_dmamap));
 	save_item(NAME(m_dmadis));
 	save_item(NAME(m_sysscc));
 	save_item(NAME(m_sysfs));
-	save_item(NAME(m_cause));
 	save_item(NAME(m_partst));
 	save_item(NAME(m_cs7));
 	save_item(NAME(m_bus0));
@@ -1895,13 +980,6 @@ void abc1600_state::machine_reset()
 	fw0_w(program, 0, 0);
 	fw1_w(program, 0, 0);
 
-	// clear task register
-	m_task = 0;
-
-	// disable display
-	m_clocks_disabled = 1;
-	m_endisp = 0;
-
 	// clear NMI
 	m_maincpu->set_input_line(M68K_IRQ_7, CLEAR_LINE);
 }
@@ -1923,9 +1001,10 @@ static MACHINE_CONFIG_START( abc1600, abc1600_state )
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(1600)) // XTAL_64MHz/8/10/20000/8/8
 
 	// video hardware
-	MCFG_FRAGMENT_ADD(abc1600_video)
+	MCFG_ABC1600_MOVER_ADD()
 
 	// devices
+	MCFG_ABC1600_MAC_ADD(MC68008P8_TAG, mac_mem)
 	MCFG_Z80DMA_ADD(Z8410AB1_0_TAG, XTAL_64MHz/16, dma0_intf)
 	MCFG_Z80DMA_ADD(Z8410AB1_1_TAG, XTAL_64MHz/16, dma1_intf)
 	MCFG_Z80DMA_ADD(Z8410AB1_2_TAG, XTAL_64MHz/16, dma2_intf)
@@ -1941,7 +1020,6 @@ static MACHINE_CONFIG_START( abc1600, abc1600_state )
 	MCFG_RS232_PORT_ADD(RS232_A_TAG, rs232a_intf, default_rs232_devices, NULL)
 	MCFG_RS232_PORT_ADD(RS232_B_TAG, rs232b_intf, default_rs232_devices, NULL)
 	MCFG_ABC_KEYBOARD_PORT_ADD("abc99", DEVWRITELINE(Z8470AB1_TAG, z80dart_device, rxtxcb_w), DEVWRITELINE(Z8470AB1_TAG, z80dart_device, dcdb_w))
-
 	MCFG_ABC1600BUS_SLOT_ADD("bus0i", bus0i_intf, abc1600bus_cards, NULL)
 	MCFG_ABC1600BUS_SLOT_ADD("bus0x", bus0x_intf, abc1600bus_cards, NULL)
 	MCFG_ABC1600BUS_SLOT_ADD("bus1", bus1_intf, abc1600bus_cards, NULL)
@@ -1966,25 +1044,9 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 ROM_START( abc1600 )
-	ROM_REGION( 0x4000, MC68008P8_TAG, 0 )
-	ROM_LOAD( "boot 6490356-04.1f", 0x0000, 0x4000, CRC(9372f6f2) SHA1(86f0681f7ef8dd190b49eda5e781881582e0c2a4) )
-
-	ROM_REGION( 0x2000, "wrmsk", 0 )
-	ROM_LOAD( "wrmskl 6490362-01.1g", 0x0000, 0x1000, CRC(bc737538) SHA1(80e2c3757eb7f713018808d6e41ebef612425028) )
-	ROM_LOAD( "wrmskh 6490363-01.1j", 0x1000, 0x1000, CRC(6b7c9f0b) SHA1(7155a993adcf08a5a8a2f22becf9fd66fda698be) )
-
-	ROM_REGION( 0x200, "shinf", 0 )
-	ROM_LOAD( "shinf 6490361-01.1f", 0x000, 0x200, CRC(20260f8f) SHA1(29bf49c64e7cc7592e88cde2768ac57c7ce5e085) )
-
-	ROM_REGION( 0x40, "drmsk", 0 )
-	ROM_LOAD( "drmskl 6490359-01.1k", 0x00, 0x20, CRC(6e71087c) SHA1(0acf67700d6227f4b315cf8fb0fb31c0e7fb9496) )
-	ROM_LOAD( "drmskh 6490358-01.1l", 0x20, 0x20, CRC(a4a9a9dc) SHA1(d8575c0335d6021cbb5f7bcd298b41c35294a80a) )
-
 	ROM_REGION( 0x71c, "plds", 0 )
-	ROM_LOAD( "drmsk 6490360-01.1m", 0x000, 0x104, CRC(5f7143c1) SHA1(1129917845f8e505998b15288f02bf907487e4ac) ) // mover word mixer @ 1m,1n,1t,2t
 	ROM_LOAD( "1020 6490349-01.8b",  0x104, 0x104, CRC(1fa065eb) SHA1(20a95940e39fa98e97e59ea1e548ac2e0c9a3444) ) // expansion bus strobes
 	ROM_LOAD( "1021 6490350-01.5d",  0x208, 0x104, CRC(96f6f44b) SHA1(12d1cd153dcc99d1c4a6c834122f370d49723674) ) // interrupt encoder and ROM/RAM control
-	ROM_LOAD( "1022 6490351-01.17e", 0x30c, 0x104, CRC(5dd00d43) SHA1(a3871f0d796bea9df8f25d41b3169dd4b8ef65ab) ) // MAC register address decoder
 	ROM_LOAD( "1023 6490352-01.11e", 0x410, 0x104, CRC(a2f350ac) SHA1(77e08654a197080fa2111bc3031cd2c7699bf82b) ) // interrupt acknowledge
 	ROM_LOAD( "1024 6490353-01.12e", 0x514, 0x104, CRC(67f1328a) SHA1(b585495fe14a7ae2fbb29f722dca106d59325002) ) // expansion bus timing and control
 	ROM_LOAD( "1025 6490354-01.6e",  0x618, 0x104, CRC(9bda0468) SHA1(ad373995dcc18532274efad76fa80bd13c23df25) ) // DMA transfer

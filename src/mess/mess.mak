@@ -1570,6 +1570,7 @@ $(MESSOBJ)/luxor.a:             \
 	$(MESS_MACHINE)/abc890.o    \
 	$(MESS_DRIVERS)/abc1600.o   \
 	$(MESS_MACHINE)/abc1600_bus.o   \
+	$(MESS_MACHINE)/abc1600mac.o   \
 	$(MESS_MACHINE)/lux4105.o   \
 	$(MESS_VIDEO)/abc1600.o     \
 	$(MESS_MACHINE)/s1410.o     \
