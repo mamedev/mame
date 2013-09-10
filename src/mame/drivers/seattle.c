@@ -430,7 +430,8 @@ public:
 		m_asic_reset(*this, "asic_reset"),
 		m_rombase(*this, "rombase"),
 		m_maincpu(*this, "maincpu"),
-		m_ide(*this, "ide")
+		m_ide(*this, "ide"),
+		m_ethernet(*this, "ethernet")
 	{
 	}
 
@@ -440,6 +441,9 @@ public:
 	required_shared_ptr<UINT32> m_interrupt_config;
 	required_shared_ptr<UINT32> m_asic_reset;
 	required_shared_ptr<UINT32> m_rombase;
+	required_device<cpu_device> m_maincpu;
+	required_device<bus_master_ide_controller_device> m_ide;
+	optional_device<smc91c94_device> m_ethernet;
 	galileo_data m_galileo;
 	widget_data m_widget;
 	device_t *m_voodoo;
@@ -517,8 +521,6 @@ public:
 	void widget_reset();
 	void update_widget_irq();
 	void init_common(int ioasic, int serialnum, int yearoffs, int config);
-	required_device<cpu_device> m_maincpu;
-	required_device<bus_master_ide_controller_device> m_ide;
 };
 
 /*************************************
@@ -1518,21 +1520,19 @@ WRITE32_MEMBER(seattle_state::carnevil_gun_w)
 
 READ32_MEMBER(seattle_state::ethernet_r)
 {
-	device_t *device = machine().device("ethernet");
 	if (!(offset & 8))
-		return smc91c9x_r(device, space, offset & 7, mem_mask & 0xffff);
+		return m_ethernet->read(space, offset & 7, mem_mask & 0xffff);
 	else
-		return smc91c9x_r(device, space, offset & 7, mem_mask & 0x00ff);
+		return m_ethernet->read(space, offset & 7, mem_mask & 0x00ff);
 }
 
 
 WRITE32_MEMBER(seattle_state::ethernet_w)
 {
-	device_t *device = machine().device("ethernet");
 	if (!(offset & 8))
-		smc91c9x_w(device, space, offset & 7, data & 0xffff, mem_mask | 0xffff);
+		m_ethernet->write(space, offset & 7, data & 0xffff, mem_mask | 0xffff);
 	else
-		smc91c9x_w(device, space, offset & 7, data & 0x00ff, mem_mask | 0x00ff);
+		m_ethernet->write(space, offset & 7, data & 0x00ff, mem_mask | 0x00ff);
 }
 
 
@@ -1565,7 +1565,6 @@ void seattle_state::update_widget_irq()
 
 READ32_MEMBER(seattle_state::widget_r)
 {
-	device_t *device = machine().device("ethernet");
 	UINT32 result = ~0;
 
 	switch (offset)
@@ -1584,7 +1583,7 @@ READ32_MEMBER(seattle_state::widget_r)
 			break;
 
 		case WREG_ETHER_DATA:
-			result = smc91c9x_r(device, space, m_widget.ethernet_addr & 7, mem_mask & 0xffff);
+			result = m_ethernet->read(space, m_widget.ethernet_addr & 7, mem_mask & 0xffff);
 			break;
 	}
 
@@ -1596,7 +1595,6 @@ READ32_MEMBER(seattle_state::widget_r)
 
 WRITE32_MEMBER(seattle_state::widget_w)
 {
-	device_t *device = machine().device("ethernet");
 	if (LOG_WIDGET)
 		logerror("Widget write (%02X) = %08X & %08X\n", offset*4, data, mem_mask);
 
@@ -1616,7 +1614,7 @@ WRITE32_MEMBER(seattle_state::widget_w)
 			break;
 
 		case WREG_ETHER_DATA:
-			smc91c9x_w(device, space, m_widget.ethernet_addr & 7, data & 0xffff, mem_mask & 0xffff);
+			m_ethernet->write(space, m_widget.ethernet_addr & 7, data & 0xffff, mem_mask & 0xffff);
 			break;
 	}
 }
@@ -2569,7 +2567,7 @@ static MACHINE_CONFIG_DERIVED( seattle150, seattle_common )
 	MCFG_CPU_PROGRAM_MAP(seattle_map)
 MACHINE_CONFIG_END
 
-static const smc91c9x_config ethernet_intf =
+static const smc91c9x_interface ethernet_intf =
 {
 	ethernet_interrupt
 };

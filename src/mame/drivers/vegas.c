@@ -1500,21 +1500,25 @@ static WRITE32_DEVICE_HANDLER( ide_bus_master32_w )
 
 static READ32_DEVICE_HANDLER( ethernet_r )
 {
+	smc91c94_device *ethernet = space.machine().device<smc91c94_device>("ethernet");
+	
 	UINT32 result = 0;
 	if (ACCESSING_BITS_0_15)
-		result |= smc91c9x_r(device, space, offset * 2 + 0, mem_mask);
+		result |= ethernet->read(space, offset * 2 + 0, mem_mask);
 	if (ACCESSING_BITS_16_31)
-		result |= smc91c9x_r(device, space, offset * 2 + 1, mem_mask >> 16) << 16;
+		result |= ethernet->read(space, offset * 2 + 1, mem_mask >> 16) << 16;
 	return result;
 }
 
 
 static WRITE32_DEVICE_HANDLER( ethernet_w )
 {
+	smc91c94_device *ethernet = space.machine().device<smc91c94_device>("ethernet");
+	
 	if (ACCESSING_BITS_0_15)
-		smc91c9x_w(device, space, offset * 2 + 0, data, mem_mask);
+		ethernet->write(space, offset * 2 + 0, data, mem_mask);
 	if (ACCESSING_BITS_16_31)
-		smc91c9x_w(device, space, offset * 2 + 1, data >> 16, mem_mask >> 16);
+		ethernet->write(space, offset * 2 + 1, data >> 16, mem_mask >> 16);
 }
 
 
@@ -2232,7 +2236,7 @@ static const mips3_config r5000_config =
 	SYSTEM_CLOCK    /* system clock rate */
 };
 
-static const smc91c9x_config ethernet_intf =
+static const smc91c9x_interface ethernet_intf =
 {
 	ethernet_interrupt
 };
