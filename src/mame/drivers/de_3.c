@@ -1083,7 +1083,7 @@ ROM_START(wwfr_103)
 ROM_END
 
 
-GAME(1983,  rab_320,        0,          de_3_dmd2,   de_3, de_3_state,   de_3,   ROT0,   "Data East",    "Adventures of Rocky and Bullwinkle and Friends (3.20)",        GAME_IS_SKELETON_MECHANICAL)
+GAME(1993,  rab_320,        0,          de_3_dmd2,   de_3, de_3_state,   de_3,   ROT0,   "Data East",    "Adventures of Rocky and Bullwinkle and Friends (3.20)",        GAME_IS_SKELETON_MECHANICAL)
 GAME(1993,  rab_130,        rab_320,    de_3_dmd2,   de_3, de_3_state,   de_3,   ROT0,   "Data East",    "Adventures of Rocky and Bullwinkle and Friends (1.30)",        GAME_IS_SKELETON_MECHANICAL)
 GAME(1993,  rab_103,        rab_320,    de_3_dmd2,   de_3, de_3_state,   de_3,   ROT0,   "Data East",    "Adventures of Rocky and Bullwinkle and Friends (1.03 Spain)",  GAME_IS_SKELETON_MECHANICAL)
 GAME(1992,  aar_101,        0,          de_3_dmd2,   de_3, de_3_state,   de_3,   ROT0,   "Data East",    "Aaron Spelling (1.01)",                                        GAME_IS_SKELETON_MECHANICAL)
