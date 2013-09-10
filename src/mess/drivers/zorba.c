@@ -268,17 +268,17 @@ static const i8251_interface u2_intf =
 WRITE8_MEMBER( zorba_state::pia0_porta_w )
 {
 	m_beep->set_state(BIT(data, 7));
-	m_fdc->dden_w(!BIT(data, 6));
+	m_fdc->dden_w(BIT(data, 6));
 
 	floppy_image_device *floppy = NULL;
-	if (BIT(data, 0)) floppy = m_floppy0->get_device();
-	if (BIT(data, 1)) floppy = m_floppy1->get_device();
+	if (!BIT(data, 0)) floppy = m_floppy0->get_device();
+	if (!BIT(data, 1)) floppy = m_floppy1->get_device();
 
 	m_fdc->set_floppy(floppy);
 
 	if (floppy)
 	{
-		floppy->ss_w(BIT(data, 5)); // might need inverting
+		floppy->ss_w(!BIT(data, 5)); // might need inverting
 	}
 
 	m_floppy0->get_device()->mon_w(BIT(data, 4));
