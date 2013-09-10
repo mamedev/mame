@@ -21,8 +21,8 @@ public:
 	{ }
 
 	// devices
-	required_device<decobsmt_device> m_decobsmt;
-	required_device<decodmd_type3_device> m_dmdtype3;
+	optional_device<decobsmt_device> m_decobsmt;
+	optional_device<decodmd_type3_device> m_dmdtype3;
 
 	DECLARE_WRITE8_MEMBER(lamp0_w) { };
 	DECLARE_WRITE8_MEMBER(lamp1_w) { };
@@ -252,6 +252,14 @@ static MACHINE_CONFIG_START( de_3b, de_3b_state )
 	MCFG_DECOBSMT_ADD(DECOBSMT_TAG)
 
 	MCFG_DECODMD_TYPE3_ADD("decodmd",":cpu3")
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_START( detest, de_3b_state )
+	/* basic machine hardware */
+	MCFG_DECOCPU_TYPE3B_ADD("decocpu",XTAL_8MHz / 2, ":maincpu")
+
+	MCFG_FRAGMENT_ADD( genpin_audio )
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------
@@ -595,6 +603,7 @@ ROM_START(detest)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("de_test.512", 0x0000, 0x10000, CRC(bade8ca8) SHA1(e7e9d6622b9c9b9381ba2793297f87f102214972))
 
+	ROM_REGION(0x01000000, "cpu3", ROMREGION_ERASE00)
 	ROM_REGION(0x010000, "soundcpu", ROMREGION_ERASE00)
 	ROM_REGION(0x1000000, "bsmt", ROMREGION_ERASE00)
 ROM_END
@@ -623,5 +632,5 @@ GAME(1994,  mav_402,    0,              de_3b,  de_3b, de_3b_state, de_3b,  ROT0
 GAME(1994,  mav_401,    mav_402,        de_3b,  de_3b, de_3b_state, de_3b,  ROT0,   "Sega",             "Maverick (Display Rev. 4.01)",         GAME_IS_SKELETON_MECHANICAL)
 GAME(1994,  mav_400,    mav_402,        de_3b,  de_3b, de_3b_state, de_3b,  ROT0,   "Sega",             "Maverick (Display Rev. 4.00)",         GAME_IS_SKELETON_MECHANICAL)
 GAME(1994,  mav_100,    mav_402,        de_3b,  de_3b, de_3b_state, de_3b,  ROT0,   "Sega",             "Maverick (1.00)",                      GAME_IS_SKELETON_MECHANICAL)
-GAME(1998,  detest,     0,              de_3b,  de_3b, de_3b_state, de_3b,  ROT0,   "Data East",        "Data East Test Chip",                  GAME_IS_SKELETON_MECHANICAL)
+GAME(1998,  detest,     0,              detest, de_3b, de_3b_state, de_3b,  ROT0,   "Data East",        "Data East Test Chip",                  GAME_IS_SKELETON_MECHANICAL)
 GAME(1996,  ctcheese,   0,              de_3b,  de_3b, de_3b_state, de_3b,  ROT0,   "Sega",             "Cut The Cheese (Redemption)",          GAME_IS_SKELETON_MECHANICAL)
