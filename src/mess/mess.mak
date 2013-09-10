@@ -2449,6 +2449,7 @@ $(MESSOBJ)/skeleton.a:          \
 	$(MESS_DRIVERS)/tricep.o    \
 	$(MESS_DRIVERS)/ts802.o     \
 	$(MESS_DRIVERS)/ts803.o     \
+	$(MESS_DRIVERS)/ts816.o     \
 	$(MESS_DRIVERS)/tsispch.o   \
 	$(MESS_DRIVERS)/unior.o     \
 	$(MESS_DRIVERS)/unistar.o   \
