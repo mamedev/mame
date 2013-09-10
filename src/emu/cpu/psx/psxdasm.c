@@ -497,7 +497,7 @@ unsigned DasmPSXCPU( DasmPSXCPU_state *state, char *buffer, UINT32 pc, const UIN
 
 				switch( GTE_FUNCT( op ) )
 				{
-				case 0x00:
+				case 0x00: // drop through to RTPS
 				case 0x01:
 					sprintf( buffer, "rtps%s%s", s_gtesf[ GTE_SF( op ) ], s_gtelm[ GTE_LM( op ) ] );
 					break;
@@ -541,6 +541,7 @@ unsigned DasmPSXCPU( DasmPSXCPU_state *state, char *buffer, UINT32 pc, const UIN
 				case 0x28:
 					sprintf( buffer, "sqr%s%s", s_gtesf[ GTE_SF( op ) ], s_gtelm[ GTE_LM( op ) ] );
 					break;
+				case 0x1a: // end of NCDT
 				case 0x29:
 					sprintf( buffer, "dpcl%s%s", s_gtesf[ GTE_SF( op ) ], s_gtelm[ GTE_LM( op ) ] );
 					break;

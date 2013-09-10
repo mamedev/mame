@@ -492,7 +492,7 @@ int gte::docop2( UINT32 pc, int gteop )
 
 	switch( GTE_FUNCT( gteop ) )
 	{
-	case 0x00:
+	case 0x00: // drop through to RTPS
 	case 0x01:
 		GTELOG( pc, "%08x RTPS", gteop );
 
@@ -792,6 +792,7 @@ int gte::docop2( UINT32 pc, int gteop )
 		IR3 = Lm_B3( MAC3, lm );
 		return 1;
 
+	case 0x1a: // end of NCDT
 	case 0x29:
 		GTELOG( pc, "%08x DPCL", gteop );
 
