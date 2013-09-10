@@ -107,5 +107,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    CLASS         INIT     COMPANY                          FULLNAME       FLAGS */
-COMP( 19??, ccs300, 0,      0,       ccs300,    ccs300,  driver_device,  0,   "California Computer Systems", "CCS Model 300", GAME_IS_SKELETON )
+/*    YEAR  NAME    PARENT   COMPAT   MACHINE    INPUT    CLASS         INIT     COMPANY                          FULLNAME       FLAGS */
+COMP( 19??, ccs300, ccs2810, 0,       ccs300,    ccs300,  driver_device,  0,   "California Computer Systems", "CCS Model 300", GAME_IS_SKELETON )
