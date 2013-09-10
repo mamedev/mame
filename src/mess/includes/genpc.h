@@ -130,6 +130,9 @@ public:
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
+
+	DECLARE_WRITE_LINE_MEMBER( keyboard_clock_w );
+
 protected:
 	// device-level overrides
 	virtual void device_start();
