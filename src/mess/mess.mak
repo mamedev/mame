@@ -2400,6 +2400,7 @@ $(MESSOBJ)/skeleton.a:          \
 	$(MESS_DRIVERS)/ibm6580.o   \
 	$(MESS_DRIVERS)/ie15.o      \
 	$(MESS_DRIVERS)/if800.o     \
+	$(MESS_DRIVERS)/imsai.o     \
 	$(MESS_DRIVERS)/indiana.o   \
 	$(MESS_DRIVERS)/itt3030.o   \
 	$(MESS_DRIVERS)/konin.o     \

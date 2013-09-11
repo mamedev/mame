@@ -6327,6 +6327,7 @@ src/mess/drivers/ibmpc.c svneol=native#text/plain
 src/mess/drivers/ie15.c svneol=native#text/plain
 src/mess/drivers/if800.c svneol=native#text/plain
 src/mess/drivers/imds.c svneol=native#text/plain
+src/mess/drivers/imsai.c svneol=native#text/plain
 src/mess/drivers/indiana.c svneol=native#text/plain
 src/mess/drivers/instruct.c svneol=native#text/plain
 src/mess/drivers/interact.c svneol=native#text/plain
