@@ -245,11 +245,6 @@ void k056832_device::device_config_complete()
 	};
 }
 
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-
 void k056832_device::create_tilemaps(running_machine &machine)
 {
 	tilemap_t *tmap;
@@ -320,15 +315,10 @@ void k056832_device::finalize_init(running_machine &machine)
 {
 	int i;
 
-	memset(m_regs,     0x00, sizeof(m_regs) );
-	memset(m_regsb,    0x00, sizeof(m_regsb) );
-
 	update_page_layout();
 
 	change_rambank();
 	change_rombank();
-
-
 
 	save_pointer(NAME(m_videoram), 0x10000);
 	save_item(NAME(m_regs));
@@ -375,9 +365,10 @@ void k056832_device::device_start()
 	if (m_bpp == -1)
 		return;
 
+	memset(m_regs,     0x00, sizeof(m_regs) );
+	memset(m_regsb,    0x00, sizeof(m_regsb) );
 
 	m_k055555 = machine().device<k055555_device>(m_k055555_tag);
-
 
 /* TODO: understand which elements MUST be init here (to keep correct layer
    associations) and which ones can can be init at RESET, if any */
