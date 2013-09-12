@@ -4,6 +4,22 @@
     [ DC012 and DC011 emulation ]
 
     01/05/2009 Initial implementation [Miodrag Milanovic]
+    Sept. 2013 portions by Karl-Ludwig Deisenhofer.
+
+	STATE OF DEC-100 VIDEO AS OF SEPTEMBER 2013
+	-------------------------------------------
+	- FURTHER TESTING: do line and character attributes match real hardware?  Does soft scrolling work?
+	- LIKELY INCORRECT : implementation of double size attribute in 132 columns mode (additional case)
+
+	- MISSING: undocumented features of DC011 / DC012 - see public domain SQUEEZE.COM pokes: 
+		0f00 => PORT 0C; 
+		0b00 => PORT 0C; 
+		1000 => PORT 04  
+		(SQUEEZE compresses the display in X and Y direction on a real DEC-100 B)
+
+	- IMPROVEMENTS: 
+		- find a more realistic approach for intensity control (bold attribute)
+		- correct phosphor colors (green, white and amber monitors were common)
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -128,8 +144,8 @@ void vt100_video_device::device_reset()
 void rainbow_video_device::device_reset()
 {
 	palette_set_color_rgb(machine(), 0, 0x00, 0x00, 0x00); // black
-	palette_set_color_rgb(machine(), 1, 213, 146, 82);      // ORANGE (not exact)
-	palette_set_color_rgb(machine(), 2, 255, 193, 129);     // ORANGE (brighter)
+	palette_set_color_rgb(machine(), 1, 213, 146, 82);      // AMBER (not exact)
+	palette_set_color_rgb(machine(), 2, 255, 193, 129);     // AMBER (brighter)
 
 	m_height = 24;  // <---- DEC-100
 	m_height_MAX = 48;
@@ -464,13 +480,14 @@ void rainbow_video_device::display_char(bitmap_ind16 &bitmap, UINT8 code, int x,
 		  if ( underline != 0  ) line = 0xff;
 		}
 
-		// TODO: verify if basic attribute behaves the same on DEC-100 
+		//  Code to handle basic attribute from VT-100
 		if ( m_basic_attribute == 1 ) 
 		{
-			{
-					line = line ^ 0xff;
+			if ((code & 0x80) == 0x80)
+				invert = 1;
+			else
+				invert = 0;
 			}
-		}
 
     		if (m_blink_flip_flop > 0)
 		{

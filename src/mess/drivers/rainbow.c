@@ -2,8 +2,22 @@
 
     DEC Rainbow 100
 
-    Driver-in-progress by R. Belmont and Miodrag Milanovic
+    Driver-in-progress by R. Belmont and Miodrag Milanovic with additions by Karl-Ludwig Deisenhofer.
 
+    STATE AS OF SEPTEMBER 2013
+	--------------------------
+	- FATAL: keyboard emulation needs love (inhibits the system from booting with ERROR 50 on cold or ERROR 13 on warm boot).
+	- NOT WORKING: serial (ERROR 60) 
+	- NOT WORKING: printer interface (ERROR 40).
+
+	- NON-CRITICAL: NVRAM currently saves changes instantly.  A switch to EEPROM (load, store...) might be in order.  
+	- NON-CRITICAL: no code for W18 (DSR) jumper.
+	- NON-CRITICAL: watchdog logic not implemented. MHFLU - ERROR 16 indicated hardware problems or (most often) software crashes on real hardware.
+
+	- FUTURE IMPROVEMENTS (=> DIP switches currently disabled):  
+			* Color graphics option (NEC 7220)
+			* Extended communication option ( = Bundle option ?)
+             
 
     Meaning of Diagnostics LEDs (from PC100ESV1.PDF found, e.g.,
     on ftp://ftp.update.uu.se/pub/rainbow/doc/rainbow-docs/
@@ -122,6 +136,10 @@ public:
 			m_inp2(*this, "W14"),
 			m_inp3(*this, "W15"),
 			m_inp4(*this, "W18"),
+			m_inp5(*this, "BUNDLE OPTION"),
+			m_inp6(*this, "FLOPPY CONTROLLER"),
+			m_inp7(*this, "GRAPHICS OPTION"),
+			m_inp8(*this, "MEMORY PRESENT"),
 
 		m_beep(*this, "beeper"),
 		m_crtc(*this, "vt100_video"),
@@ -139,7 +157,10 @@ public:
 	required_ioport m_inp2;
 	required_ioport m_inp3;
 	required_ioport m_inp4;
-
+	required_ioport m_inp5;
+	required_ioport m_inp6;
+	required_ioport m_inp7;
+	required_ioport m_inp8;
 		
     required_device<beep_device> m_beep;
 
@@ -162,12 +183,14 @@ public:
 	DECLARE_READ8_MEMBER(diagnostic_r);
 	DECLARE_WRITE8_MEMBER(diagnostic_w);
 
+	DECLARE_READ8_MEMBER(comm_control_r);
 	DECLARE_WRITE8_MEMBER(comm_control_w);
 		
 	DECLARE_READ8_MEMBER(share_z80_r);
 	DECLARE_WRITE8_MEMBER(share_z80_w);
 
 	DECLARE_READ8_MEMBER(floating_bus_r);
+	DECLARE_WRITE8_MEMBER(floating_bus_w);
 
 		// EMULATOR TRAP TO INTERCEPT KEYBOARD cmd in AH and PARAMETER in AL (port 90 = AL / port 91 = AH)
         // TODO: beeper and led handling should better be handled by LK201 code.
@@ -190,6 +213,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(kbd_rxready_w);
 	DECLARE_WRITE_LINE_MEMBER(kbd_txready_w);
 
+	bool m_COLDBOOT;
+
 	bool m_zflip;                   // Z80 alternate memory map with A15 inverted
 	bool m_z80_halted;
 	bool m_kbd_tx_ready, m_kbd_rx_ready;
@@ -211,7 +236,8 @@ public:
 };
 
 void rainbow_state::machine_start()
-{
+{	m_COLDBOOT = true;
+
 	save_item(NAME(m_z80_private));
 	save_item(NAME(m_z80_mailbox));
 	save_item(NAME(m_8088_mailbox));
@@ -252,8 +278,10 @@ static ADDRESS_MAP_START( rainbow8088_map, AS_PROGRAM, 8, rainbow_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0x0ffff) AM_RAM AM_SHARE("sh_ram")
 	AM_RANGE(0x10000, 0x1ffff) AM_RAM
-	AM_RANGE(0x20000, 0xdffff) AM_READ(floating_bus_r)  // test at f4e1c
-	AM_RANGE(0x20000, 0x3ffff) AM_RAM
+
+	// test at f4e00 - f4e1c 
+	AM_RANGE(0x20000, 0xdffff) AM_READWRITE(floating_bus_r,floating_bus_w)  
+	AM_RANGE(0x20000, 0xdffff) AM_RAM  
 
 	// TODO: handle shadowing 100% correctly.
 	// PDF says there is a 256 x 4 bit NVRAM from 0xed000 to 0xed040.
@@ -274,8 +302,8 @@ static ADDRESS_MAP_START( rainbow8088_io , AS_IO, 8, rainbow_state)
 	AM_RANGE (0x00, 0x00) AM_READWRITE(i8088_latch_r, i8088_latch_w)
 	
 	// 0x02 Communication status / control register (8088)
-	AM_RANGE (0x02, 0x02) AM_WRITE(comm_control_w)
-	
+	AM_RANGE (0x02, 0x02) AM_READWRITE(comm_control_r, comm_control_w)
+
 	// 0x04 Video processor DC011
 	AM_RANGE (0x04, 0x04) AM_DEVWRITE("vt100_video", rainbow_video_device, dc011_w)
       
@@ -312,6 +340,36 @@ ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( rainbow )
+    	PORT_START("FLOPPY CONTROLLER")
+	    PORT_DIPNAME( 0x02, 0x02, "FLOPPY CONTROLLER") PORT_TOGGLE
+		PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+		PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+
+	PORT_START("MEMORY PRESENT")
+	    PORT_DIPNAME( 0xF000, 0x2000, "MEMORY PRESENT") 
+		PORT_DIPSETTING(    0x2000, "128 K (BOARD DEFAULT)" ) // NOTE: 0x2000 hard coded in 'system_parameter_r'
+		PORT_DIPSETTING(    0x3000, "192 K (MEMORY OPTION)" )
+		PORT_DIPSETTING(    0x4000, "256 K (MEMORY OPTION)" )
+		PORT_DIPSETTING(    0x5000, "320 K (MEMORY OPTION)" )
+		PORT_DIPSETTING(    0x6000, "384 K (MEMORY OPTION)" )
+		PORT_DIPSETTING(    0x7000, "448 K (MEMORY OPTION)" )
+		PORT_DIPSETTING(    0x8000, "512 K (MEMORY OPTION)" )
+		PORT_DIPSETTING(    0x9000, "576 K (MEMORY OPTION)" )
+		PORT_DIPSETTING(    0xA000, "640 K (MEMORY OPTION)" )
+		PORT_DIPSETTING(    0xB000, "704 K (MEMORY OPTION)" )
+		PORT_DIPSETTING(    0xC000, "768 K (MEMORY OPTION)" )
+		PORT_DIPSETTING(    0xD000, "832 K (MEMORY OPTION)" )
+		PORT_DIPSETTING(    0xE000, "896 K (MEMORY OPTION)" )
+
+    	PORT_START("GRAPHICS OPTION")
+	    PORT_DIPNAME( 0x00, 0x00, "GRAPHICS OPTION") PORT_TOGGLE
+		PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+		PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+    	PORT_START("BUNDLE OPTION")
+	    PORT_DIPNAME( 0x00, 0x00, "BUNDLE OPTION") PORT_TOGGLE
+		PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+		PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+			
 	PORT_START("W13")
 	    PORT_DIPNAME( 0x02, 0x02, "W13") PORT_TOGGLE
 		PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
@@ -325,8 +383,8 @@ static INPUT_PORTS_START( rainbow )
 		PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 		PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_START("W18")
-	    PORT_DIPNAME( 0x80, 0x80, "W18") PORT_TOGGLE
-		PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	    PORT_DIPNAME( 0x00, 0x04, "W18") PORT_TOGGLE
+		PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 		PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
@@ -369,10 +427,27 @@ UINT32 rainbow_state::screen_update_rainbow(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
+// Simulate floating bus for initial RAM detection in low ROM.
+// WANTED: is a cleaner, more compatible way feasible?
 READ8_MEMBER(rainbow_state::floating_bus_r)
 {
-	return (offset>>16) + 2;
+  if ( m_maincpu->state_int(I8086_CS) != 0xF400) 
+    	return space.read_byte(offset);
+
+  if  ( m_maincpu->state_int(I8086_DS) < m_inp8->read() )
+  {
+	  	return space.read_byte(offset);
+  } else 
+  {
+	    return (offset>>16) + 2; 
+  }
 }
+
+WRITE8_MEMBER(rainbow_state::floating_bus_w)
+{
+  space.write_byte(offset,data);
+}
+
 
 READ8_MEMBER(rainbow_state::share_z80_r)
 {
@@ -439,8 +514,24 @@ READ8_MEMBER(rainbow_state::system_parameter_r)
     B F G M
    ( 1 means NOT present )
 */
-   // return 0x0f;
-	return 0x0f - 2;
+	// Hard coded value 0x2000 - see DIP switch setup!
+	return 0x0f - m_inp5->read() - m_inp6->read() - m_inp7->read() - ( 
+									   (m_inp8->read() > 0x2000) ? 8 : 0  
+									 );
+}
+
+READ8_MEMBER(rainbow_state::comm_control_r)
+{
+  // Our simple COLDBOOT flag is adequate for the initial MHFU test (at BIOS location 00A8).
+
+  // TODO: on real hardware, MHFU detection is disabled BY WRITING TO 0x10c (=> BIOS assumes power-up reset)
+  //       MHFU is enabled by writing to 0x0c.
+  if (m_COLDBOOT) 
+  {    m_COLDBOOT = 0;
+  	   return ( 0x20 );  // bit 5 = watchdog detect.  
+  } else {
+	   return ( 0x00 );  // ERROR 16 is displayed = watchdog triggered
+  }
 }
 
 WRITE8_MEMBER(rainbow_state::comm_control_w)
@@ -759,7 +850,7 @@ static MACHINE_CONFIG_START( rainbow, rainbow_state )
 	MCFG_SCREEN_UPDATE_DRIVER(rainbow_state, screen_update_rainbow)
 	MCFG_GFXDECODE(rainbow)
 	MCFG_PALETTE_LENGTH(3)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, monochrome_green)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, monochrome_amber)
 	MCFG_RAINBOW_VIDEO_ADD("vt100_video", video_interface)
 	
 		/* sound hardware */
