@@ -271,7 +271,10 @@ READ8_MEMBER( at_state::at_portb_r )
 	/* 0x10 is the dram refresh line bit.  The 5170 (bios 1) and 5162 test the cpu clock against it in post. */
 	if ( --m_poll_delay < 0 )
 	{
-		m_poll_delay = m_at_offset1 ? 3 : 2;
+		if(m_type == TYPE_286)
+			m_poll_delay = m_at_offset1 ? 3 : 2;
+		else
+			m_poll_delay = 3;
 		m_at_offset1 ^= 0x10;
 	}
 	data = (data & ~0x10) | ( m_at_offset1 & 0x10 );
@@ -304,6 +307,13 @@ void at_state::init_at_common()
 {
 	address_space& space = m_maincpu->space(AS_PROGRAM);
 
+	if(!strncmp(m_maincpu->shortname(), "i386", 4))
+		m_type = TYPE_386;
+	else if(!strncmp(m_maincpu->shortname(), "i486", 4))
+		m_type = TYPE_486;
+	else
+		m_type = TYPE_286;
+
 	/* MESS managed RAM */
 	membank("bank10")->set_base(m_ram->pointer());
 
@@ -315,7 +325,10 @@ void at_state::init_at_common()
 		membank("bank1")->set_base(m_ram->pointer() + 0xa0000);
 	}
 
-	m_at_offset1 = 0;
+	if(m_type == TYPE_286)
+		m_at_offset1 = 0;
+	else
+		m_at_offset1 = 0xff;
 }
 
 DRIVER_INIT_MEMBER(at_state,atcga)
@@ -326,6 +339,12 @@ DRIVER_INIT_MEMBER(at_state,atcga)
 DRIVER_INIT_MEMBER(at_state,atvga)
 {
 	init_at_common();
+}
+
+DRIVER_INIT_MEMBER(at_state,at586)
+{
+	m_type = TYPE_586;
+	m_at_offset1 = 0xff;
 }
 
 IRQ_CALLBACK_MEMBER(at_state::at_irq_callback)
@@ -340,7 +359,10 @@ MACHINE_START_MEMBER(at_state,at)
 
 MACHINE_RESET_MEMBER(at_state,at)
 {
-	m_poll_delay = 3;
+	if(m_type == TYPE_286)
+		m_poll_delay = 3;
+	else
+		m_poll_delay = 4;
 	m_at_spkrdata = 0;
 	m_at_speaker_input = 0;
 	m_dma_channel = -1;

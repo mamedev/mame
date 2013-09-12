@@ -198,6 +198,7 @@ stereo_fx_device::stereo_fx_device(const machine_config &mconfig, const char *ta
 void stereo_fx_device::device_start()
 {
 	ym3812_device *ym3812 = subdevice<ym3812_device>("ym3812");
+	set_isa_device();
 
 	m_isa->install_device(0x0200, 0x0207, 0, 0, read8_delegate(FUNC(pc_joy_device::joy_port_r), subdevice<pc_joy_device>("pc_joy")), write8_delegate(FUNC(pc_joy_device::joy_port_w), subdevice<pc_joy_device>("pc_joy")));
 	m_isa->install_device(0x0226, 0x0227, 0, 0, read8_delegate(FUNC(stereo_fx_device::invalid_r), this), write8_delegate(FUNC(stereo_fx_device::dsp_reset_w), this));
