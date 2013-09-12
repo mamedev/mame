@@ -2453,6 +2453,11 @@ static void I386OP(aam)(i386_state *cpustate)               // Opcode 0xd4
 	UINT8 tempAL = REG8(AL);
 	UINT8 i = FETCH(cpustate);
 
+	if(!i)
+	{
+		i386_trap(cpustate, 0, 0, 0);
+		return;
+	}
 	REG8(AH) = tempAL / i;
 	REG8(AL) = tempAL % i;
 	SetSZPF8( REG8(AL) );

@@ -1669,7 +1669,7 @@ WRITE16_MEMBER(i80186_cpu_device::internal_port_w)
 				UINT32 oldmap = (m_reloc & 0xfff) << 8;
 				if(!(data & 0x1000) || ((data & 0x1000) && (m_reloc & 0x1000)))
 					m_program->unmap_readwrite(oldmap, oldmap + 0xff);
-				if(data & 0x1000)
+				if(data & 0x1000)  // TODO: make work with 80188 if needed
 					m_program->install_readwrite_handler(newmap, newmap + 0xff, read16_delegate(FUNC(i80186_cpu_device::internal_port_r), this), write16_delegate(FUNC(i80186_cpu_device::internal_port_w), this));
 			}
 			m_reloc = data;
