@@ -6340,6 +6340,7 @@ src/mess/drivers/iq151.c svneol=native#text/plain
 src/mess/drivers/irisha.c svneol=native#text/plain
 src/mess/drivers/isbc.c svneol=native#text/plain
 src/mess/drivers/itt3030.c svneol=native#text/plain
+src/mess/drivers/jade.c svneol=native#text/plain
 src/mess/drivers/jr100.c svneol=native#text/plain
 src/mess/drivers/jr200.c svneol=native#text/plain
 src/mess/drivers/jtc.c svneol=native#text/plain
