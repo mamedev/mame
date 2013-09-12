@@ -6923,7 +6923,6 @@ src/mess/layout/coco3.lay svneol=native#text/plain
 src/mess/layout/cosmicos.lay svneol=native#text/plain
 src/mess/layout/cp1.lay svneol=native#text/xml
 src/mess/layout/cvicny.lay svneol=native#text/plain
-src/mess/layout/dectalk.lay svneol=native#text/plain
 src/mess/layout/digel804.lay svneol=native#text/plain
 src/mess/layout/dmv.lay svneol=native#text/plain
 src/mess/layout/dolphunk.lay svneol=native#text/plain
