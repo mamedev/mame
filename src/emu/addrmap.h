@@ -456,8 +456,6 @@ void _class :: _name(::address_map &map, device_t &device) \
 // legacy device writes
 #define AM_DEVWRITE_LEGACY(_tag, _handler) \
 	curentry->set_handler(device, write_delegate(&_handler, #_handler, _tag, (device_t *)0));
-#define AM_DEVWRITE8_LEGACY(_tag, _handler, _unitmask) \
-	curentry->set_handler(device, write8_delegate(&_handler, #_handler, _tag, (device_t *)0), _unitmask);
 
 // legacy device reads/writes
 #define AM_DEVREADWRITE_LEGACY(_tag, _rhandler, _whandler) \
