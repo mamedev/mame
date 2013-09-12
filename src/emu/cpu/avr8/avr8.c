@@ -2648,7 +2648,9 @@ void avr8_device::execute_run()
 										break;
 									case 0x0080:    // SLEEP
 										//output += sprintf( output, "SLEEP" );
-										unimplemented_opcode(op);
+										m_pc--;
+										opcycles = 1;
+										//unimplemented_opcode(op);
 										break;
 									case 0x0090:    // BREAK
 										//output += sprintf( output, "BREAK" );

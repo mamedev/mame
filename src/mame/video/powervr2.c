@@ -104,7 +104,7 @@ const int powervr2_device::pvr_wordspolygon[24] = {8,8,8,8,8, 8, 8,8,8,8,16,16,8
 #define DEBUG_FIFO_POLY (0)
 #define DEBUG_PVRTA 0
 #define DEBUG_PVRDLIST  (0)
-#define DEBUG_PALRAM (1)
+#define DEBUG_PALRAM (0)
 #define DEBUG_PVRCTRL   (0)
 
 inline INT32 powervr2_device::clamp(INT32 in, INT32 min, INT32 max)
@@ -1541,18 +1541,19 @@ void powervr2_device::update_screen_format()
 	INT32 spg_hbend = (spg_hblank >> 16) & 0x3ff;
 	INT32 spg_vbstart = spg_vblank & 0x3ff;
 	INT32 spg_vbend = (spg_vblank >> 16) & 0x3ff;
-	INT32 vo_horz_start_pos = vo_startx & 0x3ff;
-	INT32 vo_vert_start_pos_f1 = vo_starty & 0x3ff;
+	//INT32 vo_horz_start_pos = vo_startx & 0x3ff;
+	//INT32 vo_vert_start_pos_f1 = vo_starty & 0x3ff;
 	int pclk = spg_clks[(spg_control >> 6) & 3] * (((spg_control & 0x10) >> 4)+1);
 
 	attoseconds_t refresh = HZ_TO_ATTOSECONDS(pclk) * spg_hsize * spg_vsize;
 
 	rectangle visarea = m_screen->visible_area();
-	/* FIXME: right visible area calculations aren't known yet*/
-	visarea.min_x = 0;
-	visarea.max_x = ((spg_hbstart - spg_hbend - vo_horz_start_pos) <= 0x180 ? 320 : 640) - 1;
-	visarea.min_y = 0;
-	visarea.max_y = ((spg_vbstart - spg_vbend - vo_vert_start_pos_f1) <= 0x100 ? 240 : 480) - 1;
+	/* FIXME: fix if spg_*bend > spg_*bstart */
+	visarea.min_x = spg_hbend;
+	visarea.max_x = spg_hbstart - 1;
+	visarea.min_y = spg_vbend;
+	visarea.max_y = spg_vbstart - 1;
+	//printf("%d %d %d\n",spg_vbstart,spg_vbend,vo_vert_start_pos_f1);
 
 	m_screen->configure(spg_hsize, spg_vsize, visarea, refresh );
 }
@@ -2952,7 +2953,7 @@ void powervr2_device::pvr_accumulationbuffer_to_framebuffer(address_space &space
 		break;
 
 		// used by Suchie3
-		case 0x04: // 888 RGB 24-bit (HACK! should not downconvert and pvr_drawframebuffer should change accordingly)
+		case 0x04: // 888 RGB 24-bit
 		{
 			switch(unpackmode)
 			{
@@ -2995,6 +2996,11 @@ void powervr2_device::pvr_drawframebuffer(bitmap_rgb32 &bitmap,const rectangle &
 	UINT32 *fbaddr;
 	UINT32 c;
 	UINT32 r,g,b;
+	//INT32 vo_horz_start_pos = vo_startx & 0x3ff;
+	UINT8 interlace_on = ((spg_control & 0x10) >> 4);
+	INT32 ystart_f1 = (vo_starty & 0x3ff) << interlace_on;
+	//INT32 ystart_f2 = (vo_starty >> 16) & 0x3ff;
+	INT32 hstart = (vo_startx & 0x3ff);
 
 	UINT8 unpackmode = (fb_r_ctrl & 0x0000000c) >>2;  // aka fb_depth
 	UINT8 enable = (fb_r_ctrl & 0x00000001);
@@ -3009,6 +3015,8 @@ void powervr2_device::pvr_drawframebuffer(bitmap_rgb32 &bitmap,const rectangle &
 	dy++;
 	dy*=2; // probably depends on interlace mode, fields etc...
 
+//	popmessage("%d %d %d %d %d",ystart_f1,ystart_f2,interlace_on,spg_vblank & 0x3ff,(spg_vblank >> 16) & 0x3ff);
+
 	switch (unpackmode)
 	{
 		case 0x00: // 0555 RGB 16-bit, Cleo Fortune Plus
@@ -3020,7 +3028,7 @@ void powervr2_device::pvr_drawframebuffer(bitmap_rgb32 &bitmap,const rectangle &
 				{
 					for (x=0;x < xi;x++)
 					{
-						fbaddr=&bitmap.pix32(y, x*2+0);
+						fbaddr=&bitmap.pix32(y + ystart_f1, x*2+0 + hstart);
 						c=*((reinterpret_cast<UINT16 *>(dc_framebuffer_ram)) + (WORD2_XOR_LE(addrp) >> 1));
 
 						b = (c & 0x001f) << 3;
@@ -3030,7 +3038,7 @@ void powervr2_device::pvr_drawframebuffer(bitmap_rgb32 &bitmap,const rectangle &
 						if (y<=cliprect.max_y)
 							*fbaddr = b | (g<<8) | (r<<16);
 
-						fbaddr=&bitmap.pix32(y, x*2+1);
+						fbaddr=&bitmap.pix32(y + ystart_f1, x*2+1 + hstart);
 						if (y<=cliprect.max_y)
 							*fbaddr = b | (g<<8) | (r<<16);
 						addrp+=2;
@@ -3040,7 +3048,7 @@ void powervr2_device::pvr_drawframebuffer(bitmap_rgb32 &bitmap,const rectangle &
 				{
 					for (x=0;x < xi;x++)
 					{
-						fbaddr=&bitmap.pix32(y, x);
+						fbaddr=&bitmap.pix32(y + ystart_f1, x + hstart);
 						c=*((reinterpret_cast<UINT16 *>(dc_framebuffer_ram)) + (WORD2_XOR_LE(addrp) >> 1));
 
 						b = (c & 0x001f) << 3;
@@ -3064,7 +3072,7 @@ void powervr2_device::pvr_drawframebuffer(bitmap_rgb32 &bitmap,const rectangle &
 				{
 					for (x=0;x < xi;x++)
 					{
-						fbaddr=&bitmap.pix32(y, x*2+0);
+						fbaddr=&bitmap.pix32(y + ystart_f1, x*2+0 + hstart);
 						c=*((reinterpret_cast<UINT16 *>(dc_framebuffer_ram)) + (WORD2_XOR_LE(addrp) >> 1));
 
 						b = (c & 0x001f) << 3;
@@ -3074,7 +3082,7 @@ void powervr2_device::pvr_drawframebuffer(bitmap_rgb32 &bitmap,const rectangle &
 						if (y<=cliprect.max_y)
 							*fbaddr = b | (g<<8) | (r<<16);
 
-						fbaddr=&bitmap.pix32(y, x*2+1);
+						fbaddr=&bitmap.pix32(y + ystart_f1, x*2+1 + hstart);
 
 						if (y<=cliprect.max_y)
 							*fbaddr = b | (g<<8) | (r<<16);
@@ -3086,7 +3094,7 @@ void powervr2_device::pvr_drawframebuffer(bitmap_rgb32 &bitmap,const rectangle &
 				{
 					for (x=0;x < xi;x++)
 					{
-						fbaddr=&bitmap.pix32(y, x);
+						fbaddr=&bitmap.pix32(y + ystart_f1, x + hstart);
 						c=*((reinterpret_cast<UINT16 *>(dc_framebuffer_ram)) + (WORD2_XOR_LE(addrp) >> 1));
 
 						b = (c & 0x001f) << 3;
@@ -3110,7 +3118,7 @@ void powervr2_device::pvr_drawframebuffer(bitmap_rgb32 &bitmap,const rectangle &
 				{
 					for (x=0;x < xi;x++)
 					{
-						fbaddr=&bitmap.pix32(y, x*2+0);
+						fbaddr=&bitmap.pix32(y + ystart_f1, x*2+0 + hstart);
 
 						c =*(UINT8 *)((reinterpret_cast<UINT8 *>(dc_framebuffer_ram)) + BYTE8_XOR_LE(addrp));
 						b = c;
@@ -3124,7 +3132,7 @@ void powervr2_device::pvr_drawframebuffer(bitmap_rgb32 &bitmap,const rectangle &
 						if (y<=cliprect.max_y)
 							*fbaddr = b | (g<<8) | (r<<16);
 
-						fbaddr=&bitmap.pix32(y, x*2+1);
+						fbaddr=&bitmap.pix32(y + ystart_f1, x*2+1 + hstart);
 						if (y<=cliprect.max_y)
 							*fbaddr = b | (g<<8) | (r<<16);
 
@@ -3135,7 +3143,7 @@ void powervr2_device::pvr_drawframebuffer(bitmap_rgb32 &bitmap,const rectangle &
 				{
 					for (x=0;x < xi;x++)
 					{
-						fbaddr=&bitmap.pix32(y, x);
+						fbaddr=&bitmap.pix32(y + ystart_f1, x + hstart);
 
 						c =*(UINT8 *)((reinterpret_cast<UINT8 *>(dc_framebuffer_ram)) + BYTE8_XOR_LE(addrp));
 						b = c;
@@ -3164,7 +3172,7 @@ void powervr2_device::pvr_drawframebuffer(bitmap_rgb32 &bitmap,const rectangle &
 				{
 					for (x=0;x < xi;x++)
 					{
-						fbaddr=&bitmap.pix32(y, x*2+0);
+						fbaddr=&bitmap.pix32(y + ystart_f1, x*2+0 + hstart);
 						c =*((reinterpret_cast<UINT32 *>(dc_framebuffer_ram)) + (WORD2_XOR_LE(addrp) >> 2));
 
 						b = (c & 0x0000ff) >> 0;
@@ -3174,7 +3182,7 @@ void powervr2_device::pvr_drawframebuffer(bitmap_rgb32 &bitmap,const rectangle &
 						if (y<=cliprect.max_y)
 							*fbaddr = b | (g<<8) | (r<<16);
 
-						fbaddr=&bitmap.pix32(y, x*2+1);
+						fbaddr=&bitmap.pix32(y + ystart_f1, x*2+1 + hstart);
 						if (y<=cliprect.max_y)
 							*fbaddr = b | (g<<8) | (r<<16);
 
@@ -3185,7 +3193,7 @@ void powervr2_device::pvr_drawframebuffer(bitmap_rgb32 &bitmap,const rectangle &
 				{
 					for (x=0;x < xi;x++)
 					{
-						fbaddr=&bitmap.pix32(y, x);
+						fbaddr=&bitmap.pix32(y + ystart_f1, x + hstart);
 						c =*((reinterpret_cast<UINT32 *>(dc_framebuffer_ram)) + (WORD2_XOR_LE(addrp) >> 2));
 
 						b = (c & 0x0000ff) >> 0;

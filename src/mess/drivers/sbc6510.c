@@ -284,7 +284,7 @@ static MACHINE_CONFIG_START( sbc6510, sbc6510_state )
 	MCFG_CPU_PROGRAM_MAP(sbc6510_mem)
 
 	MCFG_CPU_ADD("videocpu",ATMEGA88, XTAL_16MHz)
-	MCFG_DEVICE_DISABLE() // trips SLEEP opcode, needs to be emulated
+//	MCFG_DEVICE_DISABLE() // trips SLEEP opcode, needs to be emulated
 	MCFG_CPU_AVR8_CONFIG(atmega88_config)
 	MCFG_CPU_PROGRAM_MAP(sbc6510_video_mem)
 	MCFG_CPU_DATA_MAP(sbc6510_video_data)
