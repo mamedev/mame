@@ -185,8 +185,8 @@ static ADDRESS_MAP_START( rungun_map, AS_PROGRAM, 16, rungun_state )
 	AM_RANGE(0x740000, 0x741fff) AM_READWRITE(rng_ttl_ram_r, rng_ttl_ram_w)     // text plane RAM
 	AM_RANGE(0x7c0000, 0x7c0001) AM_WRITENOP                                    // watchdog
 #if RNG_DEBUG
-	AM_RANGE(0x5c0010, 0x5c001f) AM_DEVREAD_LEGACY("k055673", k053247_reg_word_r)
-	AM_RANGE(0x640000, 0x640007) AM_DEVREAD_LEGACY("k055673", k053246_reg_word_r)
+	AM_RANGE(0x5c0010, 0x5c001f) AM_DEVREAD("k055673", k055673_device, k053247_reg_word_r)
+	AM_RANGE(0x640000, 0x640007) AM_DEVREAD("k055673", k055673_device, k053246_reg_word_r)
 #endif
 ADDRESS_MAP_END
 
