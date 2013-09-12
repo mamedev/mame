@@ -52,7 +52,10 @@ memory_array::memory_array()
 	: m_base(NULL),
 		m_bytes(0),
 		m_membits(0),
-		m_bytes_per_entry(0)
+		m_endianness(ENDIANNESS_LITTLE),
+		m_bytes_per_entry(0),
+		m_reader(NULL),
+		m_writer(NULL)
 {
 }
 
