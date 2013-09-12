@@ -361,12 +361,12 @@ void k056832_device::finalize_init(running_machine &machine)
 
 void k056832_device::device_start()
 {
+	memset(m_regs,     0x00, sizeof(m_regs) );
+	memset(m_regsb,    0x00, sizeof(m_regsb) );
+
 	// for non-interface cases we still use the vh_start call
 	if (m_bpp == -1)
 		return;
-
-	memset(m_regs,     0x00, sizeof(m_regs) );
-	memset(m_regsb,    0x00, sizeof(m_regsb) );
 
 	m_k055555 = machine().device<k055555_device>(m_k055555_tag);
 
