@@ -2196,8 +2196,8 @@ DRIVER_INIT_MEMBER(m62_state,youjyudn)
 	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
-GAME( 1984, kungfum,  0,        kungfum,  kungfum, driver_device,  0,        ROT0,   "Irem", "Kung-Fu Master", GAME_SUPPORTS_SAVE )
-GAME( 1984, kungfumd, kungfum,  kungfum,  kungfum, driver_device,  0,        ROT0,   "Irem (Data East license)", "Kung-Fu Master (Data East)", GAME_SUPPORTS_SAVE )
+GAME( 1984, kungfum,  0,        kungfum,  kungfum, driver_device,  0,        ROT0,   "Irem", "Kung-Fu Master (World)", GAME_SUPPORTS_SAVE )
+GAME( 1984, kungfumd, kungfum,  kungfum,  kungfum, driver_device,  0,        ROT0,   "Irem (Data East USA license)", "Kung-Fu Master (US)", GAME_SUPPORTS_SAVE )
 GAME( 1984, spartanx, kungfum,  kungfum,  kungfum, driver_device,  0,        ROT0,   "Irem", "Spartan X (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1984, kungfub,  kungfum,  kungfum,  kungfum, driver_device,  0,        ROT0,   "bootleg", "Kung-Fu Master (bootleg set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1984, kungfub2, kungfum,  kungfum,  kungfum, driver_device,  0,        ROT0,   "bootleg", "Kung-Fu Master (bootleg set 2)", GAME_SUPPORTS_SAVE )
