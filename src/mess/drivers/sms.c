@@ -10,9 +10,15 @@
  To do:
 
  - SIO interface for Game Gear (needs netplay, I guess)
- - SMS lightgun support
- - LCD persistence emulation for GG
- - SMS 3D glass support
+ - SMS Store Display Unit
+ - Keyboard support for Sega Mark-III (sg1000m3 driver)
+ - Mark-III expansion slot, used by keyboard and FM module
+ - Japanese Sports Pad model used by the game Sports Pad Soccer
+   (info: http://www.smspower.org/forums/viewtopic.php?t=11876)
+ - Software compatibility flags, by region and/or BIOS
+ - Emulate SRAM cartridges? (for use with Bock's dump tool)
+ - Support for other DE-9 compatible controllers, like the Mega Drive 6-Button
+   that has software support (at least a test tool made by Charles MacDonald)
 
  The Game Gear SIO hardware is not emulated but has some
  placeholders in 'machine/sms.c'
@@ -291,8 +297,8 @@ static ADDRESS_MAP_START( sms_io, AS_IO, 8, sms_state )
 ADDRESS_MAP_END
 
 
-// I/O ports $3E and $3F do not exist o Mark-III
-static ADDRESS_MAP_START( sms_no3e3f_io, AS_IO, 8, sms_state )
+// I/O ports $3E and $3F do not exist on Mark-III
+static ADDRESS_MAP_START( sg1000m3_io, AS_IO, 8, sms_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x40, 0x7f)                 AM_READ(sms_count_r)
@@ -318,11 +324,12 @@ ADDRESS_MAP_END
 // addresses.
 // At least the mirrors for I/O ports $3E/$3F don't seem to exist there.
 // Leaving the mirrors breaks the Korean cartridge bublboky.
-static ADDRESS_MAP_START( sms_kor_io, AS_IO, 8, sms_state )
+// The version is derived from japanene SMS, that has no output on its
+// controller ports, so port $3F probably does not exist, like on Mark-III.
+static ADDRESS_MAP_START( sms_fm_io, AS_IO, 8, sms_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x3e, 0x3e)                 AM_WRITE(sms_bios_w)
-	AM_RANGE(0x3f, 0x3f)                 AM_WRITE(sms_io_control_w)
 	AM_RANGE(0x40, 0x7f)                 AM_READ(sms_count_r)
 	AM_RANGE(0x40, 0x7f)                 AM_DEVWRITE("segapsg", segapsg_device, write)
 	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3e) AM_DEVREADWRITE("sms_vdp", sega315_5124_device, vram_read, vram_write)
@@ -371,11 +378,8 @@ static INPUT_PORTS_START( sms )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME(DEF_STR(Pause)) PORT_CODE(KEYCODE_1)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( sms1 )
+static INPUT_PORTS_START( sg1000m3 )
 	PORT_INCLUDE( sms )
-
-	PORT_START("RESET")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Reset Button")
 
 	PORT_START("SEGASCOPE")
 	PORT_CONFNAME( 0x01, 0x00, "SegaScope (3-D Glasses)" )
@@ -389,6 +393,13 @@ static INPUT_PORTS_START( sms1 )
 	PORT_CONFSETTING( 0x02, "Right Lens" )
 	PORT_CONFSETTING( 0x03, "Both Lens" )
 	PORT_BIT( 0x03, 0x00, IPT_UNUSED ) PORT_CONDITION("SEGASCOPE", 0x01, EQUALS, 0x00)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( sms1 )
+	PORT_INCLUDE( sg1000m3 )
+
+	PORT_START("RESET")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Reset Button")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( gg )
@@ -561,10 +572,10 @@ static MACHINE_CONFIG_DERIVED( sms1_ntsc, sms_ntsc_base )
 
 	MCFG_DEFAULT_LAYOUT(layout_sms1)
 
-	MCFG_PALETTE_LENGTH(SEGA315_5124_PALETTE_SIZE)
-
 	MCFG_VIDEO_START_OVERRIDE(sms_state,sms1)
 	MCFG_VIDEO_RESET_OVERRIDE(sms_state,sms1)
+
+	MCFG_PALETTE_LENGTH(SEGA315_5124_PALETTE_SIZE)
 
 	MCFG_SEGA315_5124_ADD("sms_vdp", _315_5124_ntsc_intf)
 	MCFG_SEGA315_5124_SET_SCREEN("screen")
@@ -727,10 +738,10 @@ static MACHINE_CONFIG_DERIVED( sms1_pal, sms_pal_base )
 
 	MCFG_DEFAULT_LAYOUT(layout_sms1)
 
-	MCFG_PALETTE_LENGTH(SEGA315_5124_PALETTE_SIZE)
-
 	MCFG_VIDEO_START_OVERRIDE(sms_state,sms1)
 	MCFG_VIDEO_RESET_OVERRIDE(sms_state,sms1)
+
+	MCFG_PALETTE_LENGTH(SEGA315_5124_PALETTE_SIZE)
 
 	MCFG_SEGA315_5124_ADD("sms_vdp", _315_5124_pal_intf)
 	MCFG_SEGA315_5124_SET_SCREEN("screen")
@@ -741,6 +752,14 @@ static MACHINE_CONFIG_DERIVED( sms1_pal, sms_pal_base )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( sms_fm, sms1_ntsc )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(sms_fm_io)
+
+	// Japanese sms and sg1000m3 consoles do not have TH input
+	MCFG_SMS_CONTROL_PORT_MODIFY(CONTROL1_TAG)
+	MCFG_SMS_CONTROL_PORT_TH_INPUT_HANDLER(NULL)
+	MCFG_SMS_CONTROL_PORT_MODIFY(CONTROL2_TAG)
+	MCFG_SMS_CONTROL_PORT_TH_INPUT_HANDLER(NULL)
 
 	MCFG_SOUND_ADD("ym2413", YM2413, XTAL_53_693175MHz/15)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
@@ -748,7 +767,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( sg1000m3, sms_fm )
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(sms_no3e3f_io)
+	MCFG_CPU_IO_MAP(sg1000m3_io)
 
 	MCFG_DEVICE_REMOVE("slot")
 	MCFG_SG1000MK3_CARTRIDGE_ADD("slot", sg1000mk3_cart, NULL)
@@ -756,7 +775,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( sms2_fm, sms2_ntsc )
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(sms_kor_io)
+	MCFG_CPU_IO_MAP(sms_fm_io)
 
 	MCFG_SOUND_ADD("ym2413", YM2413, XTAL_53_693175MHz/15)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
@@ -780,9 +799,9 @@ static MACHINE_CONFIG_START( gamegear, sms_state )
 		SEGA315_5124_HEIGHT_NTSC, SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_192_TBORDER_HEIGHT + 3*8, SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_192_TBORDER_HEIGHT + 21*8 )
 	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_gamegear)
 
-	MCFG_PALETTE_LENGTH(SEGA315_5378_PALETTE_SIZE)
-
 	MCFG_VIDEO_START_OVERRIDE(sms_state,gamegear)
+
+	MCFG_PALETTE_LENGTH(SEGA315_5378_PALETTE_SIZE)
 
 	MCFG_SEGA315_5378_ADD("sms_vdp", _315_5124_ntsc_intf)
 	MCFG_SEGA315_5378_SET_SCREEN("screen")
@@ -947,15 +966,15 @@ ROM_END
 
 ***************************************************************************/
 
-/*    YEAR  NAME        PARENT      COMPAT  MACHINE      INPUT   INIT      COMPANY     FULLNAME                            FLAGS */
-CONS( 1984, sg1000m3,   sms,        0,      sg1000m3,    sms1, sms_state,      sg1000m3, "Sega",     "SG-1000 Mark III",                 GAME_SUPPORTS_SAVE )
-CONS( 1986, sms1,       sms,        0,      sms1_ntsc,   sms1, sms_state,      sms1,     "Sega",     "Master System I",                  GAME_SUPPORTS_SAVE )
-CONS( 1986, sms1pal,    sms,        0,      sms1_pal,    sms1, sms_state,      sms1,     "Sega",     "Master System I (PAL)" ,           GAME_SUPPORTS_SAVE )
-CONS( 1986, smssdisp,   sms,        0,      sms_sdisp,   sms,  smssdisp_state, smssdisp, "Sega",     "Master System Store Display Unit", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-CONS( 1987, smsj,       sms,        0,      sms_fm,      sms1, sms_state,      smsj,     "Sega",     "Master System (Japan)",            GAME_SUPPORTS_SAVE )
-CONS( 1990, sms,        0,          0,      sms2_ntsc,   sms,  sms_state,      sms1,     "Sega",     "Master System II",                 GAME_SUPPORTS_SAVE )
-CONS( 1990, smspal,     sms,        0,      sms2_pal,    sms,  sms_state,      sms1,     "Sega",     "Master System II (PAL)",           GAME_SUPPORTS_SAVE )
-CONS( 1990, sms2kr,     sms,        0,      sms2_fm,     sms,  sms_state,      sms2kr,   "Samsung",  "Gam*Boy II (Korea)",               GAME_SUPPORTS_SAVE )
+/*    YEAR  NAME        PARENT      COMPAT  MACHINE      INPUT     CLASS           INIT      COMPANY     FULLNAME                            FLAGS */
+CONS( 1984, sg1000m3,   sms,        0,      sg1000m3,    sg1000m3, sms_state,      sg1000m3, "Sega",     "SG-1000 Mark III",                 GAME_SUPPORTS_SAVE )
+CONS( 1986, sms1,       sms,        0,      sms1_ntsc,   sms1,     sms_state,      sms1,     "Sega",     "Master System I",                  GAME_SUPPORTS_SAVE )
+CONS( 1986, sms1pal,    sms,        0,      sms1_pal,    sms1,     sms_state,      sms1,     "Sega",     "Master System I (PAL)" ,           GAME_SUPPORTS_SAVE )
+CONS( 1986, smssdisp,   sms,        0,      sms_sdisp,   sms,      smssdisp_state, smssdisp, "Sega",     "Master System Store Display Unit", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+CONS( 1987, smsj,       sms,        0,      sms_fm,      sms1,     sms_state,      smsj,     "Sega",     "Master System (Japan)",            GAME_SUPPORTS_SAVE )
+CONS( 1990, sms,        0,          0,      sms2_ntsc,   sms,      sms_state,      sms1,     "Sega",     "Master System II",                 GAME_SUPPORTS_SAVE )
+CONS( 1990, smspal,     sms,        0,      sms2_pal,    sms,      sms_state,      sms1,     "Sega",     "Master System II (PAL)",           GAME_SUPPORTS_SAVE )
+CONS( 1990, sms2kr,     sms,        0,      sms2_fm,     sms,      sms_state,      sms2kr,   "Samsung",  "Gam*Boy II (Korea)",               GAME_SUPPORTS_SAVE )
 
-CONS( 1990, gamegear,   0,          sms,    gamegear,    gg,   sms_state,      gamegear, "Sega",     "Game Gear (Europe/America)",       GAME_SUPPORTS_SAVE )
-CONS( 1990, gamegeaj,   gamegear,   0,      gamegear,    gg,   sms_state,      gamegeaj, "Sega",     "Game Gear (Japan)",                GAME_SUPPORTS_SAVE )
+CONS( 1990, gamegear,   0,          sms,    gamegear,    gg,       sms_state,      gamegear, "Sega",     "Game Gear (Europe/America)",       GAME_SUPPORTS_SAVE )
+CONS( 1990, gamegeaj,   gamegear,   0,      gamegear,    gg,       sms_state,      gamegeaj, "Sega",     "Game Gear (Japan)",                GAME_SUPPORTS_SAVE )

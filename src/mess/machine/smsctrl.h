@@ -26,6 +26,8 @@
 #define MCFG_SMS_CONTROL_PORT_ADD(_tag, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, SMS_CONTROL_PORT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
+#define MCFG_SMS_CONTROL_PORT_MODIFY(_tag) \
+	MCFG_DEVICE_MODIFY(_tag)
 
 
 #define MCFG_SMS_CONTROL_PORT_TH_INPUT_HANDLER(_devcb) \

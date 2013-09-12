@@ -25,7 +25,7 @@ void sms_state::lphaser_hcount_latch()
 WRITE_LINE_MEMBER(sms_state::sms_ctrl1_th_input)
 {
 	// Check if TH of controller port 1 is set to input (1)
-	if (m_io_ctrl_reg & 0x02)
+	if (m_is_korean || (m_io_ctrl_reg & 0x02))
 	{
 		if (state == 0)
 		{
@@ -45,7 +45,7 @@ WRITE_LINE_MEMBER(sms_state::sms_ctrl1_th_input)
 WRITE_LINE_MEMBER(sms_state::sms_ctrl2_th_input)
 {
 	// Check if TH of controller port 2 is set to input (1)
-	if (m_io_ctrl_reg & 0x08)
+	if (m_is_korean || (m_io_ctrl_reg & 0x08))
 	{
 		if (state == 0)
 		{
@@ -64,23 +64,28 @@ WRITE_LINE_MEMBER(sms_state::sms_ctrl2_th_input)
 
 void sms_state::sms_get_inputs( address_space &space )
 {
-	UINT8 data;
+	UINT8 data1, data2;
 
 	m_port_dc_reg = 0xff;
 	m_port_dd_reg = 0xff;
 
-	data = m_port_ctrl1->port_r();
-	m_port_dc_reg &= ~0x0F | data; // Up, Down, Left, Right
-	m_port_dc_reg &= ~0x10 | (data >> 1); // TL (Button 1)
-	m_port_dc_reg &= ~0x20 | (data >> 2); // TR (Button 2)
-	m_port_dd_reg &= ~0x40 | data; // TH
+	data1 = m_port_ctrl1->port_r();
+	m_port_dc_reg &= ~0x0f | data1; // Up, Down, Left, Right
+	m_port_dc_reg &= ~0x10 | (data1 >> 1); // TL (Button 1)
+	m_port_dc_reg &= ~0x20 | (data1 >> 2); // TR (Button 2)
 
-	data = m_port_ctrl2->port_r();
-	m_port_dc_reg &= ~0xc0 | (data << 6); // Up, Down
-	m_port_dd_reg &= ~0x03 | (data >> 2); // Left, Right
-	m_port_dd_reg &= ~0x04 | (data >> 3); // TL (Button 1)
-	m_port_dd_reg &= ~0x08 | (data >> 4); // TR (Button 2)
-	m_port_dd_reg &= ~0x80 | (data << 1); // TH
+	data2 = m_port_ctrl2->port_r();
+	m_port_dc_reg &= ~0xc0 | (data2 << 6); // Up, Down
+	m_port_dd_reg &= ~0x03 | (data2 >> 2); // Left, Right
+	m_port_dd_reg &= ~0x04 | (data2 >> 3); // TL (Button 1)
+	m_port_dd_reg &= ~0x08 | (data2 >> 4); // TR (Button 2)
+
+	// Japanese consoles do not have TH line connected.
+	if (!m_is_region_japan || m_is_korean)
+	{
+		m_port_dd_reg &= ~0x40 | data1; // TH ctrl1
+		m_port_dd_reg &= ~0x80 | (data2 << 1); // TH ctrl2
+	}
 }
 
 
@@ -225,10 +230,10 @@ READ8_MEMBER(sms_state::sms_input_port_dc_r)
 		sms_get_inputs(space);
 
 		// Check if TR of controller port 1 is set to output (0)
-		if (!(m_io_ctrl_reg & 0x01))
+		if (!m_is_region_japan && !(m_io_ctrl_reg & 0x01))
 		{
 			// Read TR state set through IO control port
-			m_port_dc_reg &= ~0x20 | (m_is_region_japan ? 0x00 : (m_io_ctrl_reg & 0x10) << 1);
+			m_port_dc_reg &= ~0x20 | ((m_io_ctrl_reg & 0x10) << 1);
 		}
 
 		return m_port_dc_reg;
@@ -248,23 +253,19 @@ READ8_MEMBER(sms_state::sms_input_port_dd_r)
 	{
 		m_port_dd_reg &= ~0x10 | (m_port_reset->read() & 0x01) << 4;
 	}
-	else
-	{
-		m_port_dd_reg |= 0x10;
-	}
 
 	// Check if TR of controller port 2 is set to output (0)
-	if (!(m_io_ctrl_reg & 0x04))
+	if (!m_is_region_japan && !(m_io_ctrl_reg & 0x04))
 	{
 		// Read TR state set through IO control port
-		m_port_dd_reg &= ~0x08 | (m_is_region_japan ? 0x00 : (m_io_ctrl_reg & 0x40) >> 3);
+		m_port_dd_reg &= ~0x08 | ((m_io_ctrl_reg & 0x40) >> 3);
 	}
 
 	// Check if TH of controller port 1 is set to output (0)
-	if (!(m_io_ctrl_reg & 0x02))
+	if (!m_is_region_japan && !(m_io_ctrl_reg & 0x02))
 	{
 		// Read TH state set through IO control port
-		m_port_dd_reg &= ~0x40 | (m_is_region_japan ? 0x00 : (m_io_ctrl_reg & 0x20) << 1);
+		m_port_dd_reg &= ~0x40 | ((m_io_ctrl_reg & 0x20) << 1);
 	}
 	else  // TH set to input (1)
 	{
@@ -276,10 +277,10 @@ READ8_MEMBER(sms_state::sms_input_port_dd_r)
 	}
 
 	// Check if TH of controller port 2 is set to output (0)
-	if (!(m_io_ctrl_reg & 0x08))
+	if (!m_is_region_japan && !(m_io_ctrl_reg & 0x08))
 	{
 		// Read TH state set through IO control port
-		m_port_dd_reg &= ~0x80 | (m_is_region_japan ? 0x00 : (m_io_ctrl_reg & 0x80));
+		m_port_dd_reg &= ~0x80 | (m_io_ctrl_reg & 0x80);
 	}
 	else  // TH set to input (1)
 	{
@@ -628,7 +629,7 @@ WRITE8_MEMBER(sms_state::gg_sio_w)
 		case 0x00: /* Parallel Data */
 			break;
 
-		case 0x01: /* Data Direction/ NMI Enable */
+		case 0x01: /* Data Direction / NMI Enable */
 			break;
 
 		case 0x02: /* Serial Output */
@@ -652,7 +653,7 @@ READ8_MEMBER(sms_state::gg_sio_r)
 		case 0x00: /* Parallel Data */
 			break;
 
-		case 0x01: /* Data Direction/ NMI Enable */
+		case 0x01: /* Data Direction / NMI Enable */
 			break;
 
 		case 0x02: /* Serial Output */
@@ -973,6 +974,7 @@ DRIVER_INIT_MEMBER(sms_state,sms2kr)
 	m_is_region_japan = 1;
 	m_has_bios_full = 1;
 	m_has_fm = 1;
+	m_is_korean = 1;
 }
 
 

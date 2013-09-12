@@ -78,7 +78,7 @@ sms_light_phaser_device::sms_light_phaser_device(const machine_config &mconfig, 
 	m_lphaser_y(*this, "LPHASER_Y")
 {
 	// Workaround for failed validation that occurs when running on a driver
-	// with Sega Scope emulation, which adds 2 screens for left/right lens.
+	// with Sega Scope emulation, which adds 2 screens (left/right lenses).
 	m_screen_tag = ":screen";
 }
 

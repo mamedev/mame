@@ -48,6 +48,7 @@ public:
 		m_port_persist(*this, "PERSISTENCE"),
 		m_is_gamegear(0),
 		m_is_region_japan(0),
+		m_is_korean(0),
 		m_is_sdisp(0),
 		m_has_bios_0400(0),
 		m_has_bios_2000(0),
@@ -102,6 +103,7 @@ public:
 	// model identifiers
 	UINT8 m_is_gamegear;
 	UINT8 m_is_region_japan;
+	UINT8 m_is_korean;
 	UINT8 m_is_sdisp;
 	UINT8 m_has_bios_0400;
 	UINT8 m_has_bios_2000;
