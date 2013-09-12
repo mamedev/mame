@@ -2285,7 +2285,7 @@ static MACHINE_CONFIG_START( hotdogst, cave_state )
 	MCFG_SOUND_ROUTE(3, "lspeaker",  0.80)
 	MCFG_SOUND_ROUTE(3, "rspeaker", 0.80)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_32MHz/32, OKIM6295_PIN7_HIGH) // pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_32MHz/16, OKIM6295_PIN7_HIGH) // pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
