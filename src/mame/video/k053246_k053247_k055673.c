@@ -1265,7 +1265,7 @@ void k053247_device::alt_k055673_vh_start(running_machine &machine, const char *
 		}
 
 		total = size4 / 128;
-		konami_decode_gfx(machine, gfx_index, (UINT8 *)alt_k055673_rom, total, &spritelayout, 4);
+		konami_decode_gfx(machine, gfx_index, (UINT8 *)alt_k055673_rom, total, &spritelayout, 5);
 		break;
 
 	case K055673_LAYOUT_RNG:
@@ -1275,12 +1275,12 @@ void k053247_device::alt_k055673_vh_start(running_machine &machine, const char *
 
 	case K055673_LAYOUT_LE2:
 		total = machine.root_device().memregion(gfx_memory_region)->bytes() / (16*16);
-		konami_decode_gfx(machine, gfx_index, (UINT8 *)alt_k055673_rom, total, &spritelayout3, 4);
+		konami_decode_gfx(machine, gfx_index, (UINT8 *)alt_k055673_rom, total, &spritelayout3, 8);
 		break;
 
 	case K055673_LAYOUT_GX6:
 		total = machine.root_device().memregion(gfx_memory_region)->bytes() / (16*16*6/8);
-		konami_decode_gfx(machine, gfx_index, (UINT8 *)alt_k055673_rom, total, &spritelayout4, 4);
+		konami_decode_gfx(machine, gfx_index, (UINT8 *)alt_k055673_rom, total, &spritelayout4, 6);
 		break;
 
 	default:

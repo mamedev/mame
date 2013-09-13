@@ -250,7 +250,7 @@ void k056832_device::create_tilemaps(running_machine &machine)
 	tilemap_t *tmap;
 	int i;
 
-	for (i = 0; i < 4; i++)
+	for (i = 0; i < 8; i++)
 	{
 		m_layer_offs[i][0] = 0;
 		m_layer_offs[i][1] = 0;
@@ -281,7 +281,6 @@ void k056832_device::create_tilemaps(running_machine &machine)
 
 
 	m_videoram = auto_alloc_array_clear(machine, UINT16, 0x2000 * (K056832_PAGE_COUNT + 1) / 2);
-	memset(m_videoram, 0x00, 0x20000);
 
 	m_tilemap[0x0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info0),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
 	m_tilemap[0x1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info1),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
@@ -2121,27 +2120,27 @@ void k056832_device::create_gfx(running_machine &machine, const char *gfx_memory
 
 		case K056832_BPP_5:
 			total = machine.root_device().memregion(gfx_memory_region)->bytes() / (i*5);
-			konami_decode_gfx(machine, gfx_index, machine.root_device().memregion(gfx_memory_region)->base(), total, &charlayout5, 4);
+			konami_decode_gfx(machine, gfx_index, machine.root_device().memregion(gfx_memory_region)->base(), total, &charlayout5, 5);
 			break;
 
 		case K056832_BPP_6:
 			total = machine.root_device().memregion(gfx_memory_region)->bytes() / (i*6);
-			konami_decode_gfx(machine, gfx_index, machine.root_device().memregion(gfx_memory_region)->base(), total, &charlayout6, 4);
+			konami_decode_gfx(machine, gfx_index, machine.root_device().memregion(gfx_memory_region)->base(), total, &charlayout6, 6);
 			break;
 
 		case K056832_BPP_8:
 			total = machine.root_device().memregion(gfx_memory_region)->bytes() / (i*8);
-			konami_decode_gfx(machine, gfx_index, machine.root_device().memregion(gfx_memory_region)->base(), total, &charlayout8, 4);
+			konami_decode_gfx(machine, gfx_index, machine.root_device().memregion(gfx_memory_region)->base(), total, &charlayout8, 8);
 			break;
 
 		case K056832_BPP_8LE:
 			total = machine.root_device().memregion(gfx_memory_region)->bytes() / (i*8);
-			konami_decode_gfx(machine, gfx_index, machine.root_device().memregion(gfx_memory_region)->base(), total, &charlayout8le, 4);
+			konami_decode_gfx(machine, gfx_index, machine.root_device().memregion(gfx_memory_region)->base(), total, &charlayout8le, 8);
 			break;
 
 		case K056832_BPP_8TASMAN:
 			total = machine.root_device().memregion(gfx_memory_region)->bytes() / (i*8);
-			konami_decode_gfx(machine, gfx_index, machine.root_device().memregion(gfx_memory_region)->base(), total, &charlayout8_tasman, 4);
+			konami_decode_gfx(machine, gfx_index, machine.root_device().memregion(gfx_memory_region)->base(), total, &charlayout8_tasman, 8);
 			break;
 
 		case K056832_BPP_4dj:
@@ -2304,8 +2303,6 @@ int k056832_device::altK056832_update_linemap(screen_device &screen, bitmap_rgb3
 
 void k056832_device::m_tilemap_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, UINT32 flags, UINT32 priority)
 {
-	static int last_colorbase[K056832_PAGE_COUNT];
-
 	UINT32 last_dx, last_visible, new_colorbase, last_active;
 	int sx, sy, ay, tx, ty, width, height;
 	int clipw, clipx, cliph, clipy, clipmaxy;
@@ -2493,9 +2490,9 @@ void k056832_device::m_tilemap_draw(screen_device &screen, bitmap_rgb32 &bitmap,
 
 		if (m_k055555 != NULL)
 		{
-			if (last_colorbase[pageIndex] != new_colorbase)
+			if (m_last_colorbase[pageIndex] != new_colorbase)
 			{
-				last_colorbase[pageIndex] = new_colorbase;
+				m_last_colorbase[pageIndex] = new_colorbase;
 				mark_page_dirty(pageIndex);
 			}
 		}
