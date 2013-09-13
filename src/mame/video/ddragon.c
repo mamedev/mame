@@ -28,11 +28,11 @@ Top Tile layout.
 Sprite layout.
   0          1          2          3          4
   ---- ----  ---- ----  ---- xxxx  xxxx xxxx  ---- ----  = Sprite number
-  ---- ----  ---- ----  -xxx ----  ---- ----  ---- ----  = Color
+  ---- ----  ---- ----  xxxx ----  ---- ----  ---- ----  = Color
   xxxx xxxx  ---- ----  ---- ----  ---- ----  ---- ----  = Y position
   ---- ----  ---- ---x  ---- ----  ---- ----  ---- ----  = Y MSb position ???
   ---- ----  ---- ----  ---- ----  ---- ----  xxxx xxxx  = X position
-  ---- ----  ---- --x-  ---- ----  ---- ----  ---- ----  = X MSb position ???
+  ---- ----  ---- --x-  ---- ----  ---- ----  ---- ----  = X position MSb
   ---- ----  ---- -x--  ---- ----  ---- ----  ---- ----  = Y Flip
   ---- ----  ---- x---  ---- ----  ---- ----  ---- ----  = X Flip
   ---- ----  --xx ----  ---- ----  ---- ----  ---- ----  = Sprite Dimension
@@ -105,6 +105,7 @@ VIDEO_START_MEMBER(ddragon_state,ddragon)
 	m_bg_tilemap->set_scrolldy(-8, -8);
 }
 
+
 /***************************************************************************
 
   Memory handlers
@@ -134,19 +135,13 @@ WRITE8_MEMBER(ddragon_state::ddragon_fgvideoram_w)
 					cliprect,gfx, \
 					(which + order),color,flipx,flipy,sx,sy,0);
 
-void ddragon_state::draw_sprites(  bitmap_ind16 &bitmap,const rectangle &cliprect )
+void ddragon_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	gfx_element *gfx = machine().gfx[1];
+	const UINT8 *src = m_spriteram;
+	const UINT32 bytes = m_spriteram.bytes();
 
-	UINT8 *src;
-	int i;
-
-	if (m_technos_video_hw == 1)     /* China Gate Sprite RAM */
-		src = (UINT8 *) (m_spriteram);
-	else
-		src = (UINT8 *) (&(m_spriteram[0x800]));
-
-	for (i = 0; i < (64 * 5); i += 5)
+	for (UINT32 i = 0; i < bytes; i += 5)
 	{
 		int attr = src[i + 1];
 		if (attr & 0x80)  /* visible */
@@ -154,16 +149,16 @@ void ddragon_state::draw_sprites(  bitmap_ind16 &bitmap,const rectangle &cliprec
 			int sx = 240 - src[i + 4] + ((attr & 2) << 7);
 			int sy = 232 - src[i + 0] + ((attr & 1) << 8);
 			int size = (attr & 0x30) >> 4;
-			int flipx = (attr & 8);
-			int flipy = (attr & 4);
-			int dx = -16,dy = -16;
+			int flipx = attr & 8;
+			int flipy = attr & 4;
+			int dx = -16, dy = -16;
 
 			int which;
 			int color;
 
 			if (m_technos_video_hw == 2)     /* Double Dragon 2 */
 			{
-				color = (src[i + 2] >> 5);
+				color = src[i + 2] >> 5;
 				which = src[i + 3] + ((src[i + 2] & 0x1f) << 8);
 			}
 			else
@@ -173,7 +168,7 @@ void ddragon_state::draw_sprites(  bitmap_ind16 &bitmap,const rectangle &cliprec
 					if ((sx < -7) && (sx > -16)) sx += 256; /* fix sprite clip */
 					if ((sy < -7) && (sy > -16)) sy += 256; /* fix sprite clip */
 				}
-				color = (src[i + 2] >> 4) & 0x07;
+				color = src[i + 2] >> 4;
 				which = src[i + 3] + ((src[i + 2] & 0x0f) << 8);
 			}
 

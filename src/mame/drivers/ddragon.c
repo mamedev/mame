@@ -8,30 +8,12 @@ Toffy / Super Toffy added by David Haywood
 Thanks to Bryan McPhail for spotting the Toffy program rom encryption
 Toffy / Super Toffy sound hooked up by R. Belmont.
 
-BM, 8/1/2006:
 
-Double Dragon has a crash which sometimes occurs at the very end of the game
-(right before the final animation sequence).  It occurs because of a jump look up
-table:
+Modifications by Phil Bennett Sep 2013:
 
-    BAD3: LDY   #$BADD
-    BAD7: JSR   [A,Y]
-
-At the point of the crash A is 0x3e which causes a jump to 0x3401 (background tile
-ram) which obviously doesn't contain proper code and causes a crash.  The jump
-table has 32 entries, and only the last contains an invalid jump vector.  A is set
-to 0x3e as a result of code at 0x625f - it reads from the shared spriteram (0x2049
-in main cpu memory space), copies the value to 0x523 (main ram) where it is later
-fetched and shifted to make 0x3e.
-
-So..  it's not clear where the error is - the 0x1f value is actually written to
-shared RAM by the main CPU - perhaps the MCU should modify it before the main CPU
-reads it back?  Perhaps 0x1f should never be written at all?  If you want to trace
-this further please submit a proper fix!  In the meantime I have patched the error
-by making sure the invalid jump is never taken - this fixes the crash (see
-ddragon_spriteram_r).
-
-
+Cleanups based on Double Dragon schematics.
+Fixed sub CPU interrupt handling and common RAM access.
+Removed now-unnecessary workarounds.
 
 Modifications by Bryan McPhail, June-November 2003:
 
@@ -80,10 +62,10 @@ Dip locations verified with manual for ddragon & ddragon2
 #include "includes/ddragon.h"
 
 
-#define MAIN_CLOCK      XTAL_12MHz
-#define SOUND_CLOCK     XTAL_3_579545MHz
-#define MCU_CLOCK           MAIN_CLOCK / 3
-#define PIXEL_CLOCK     MAIN_CLOCK / 2
+#define MAIN_CLOCK		XTAL_12MHz
+#define SOUND_CLOCK		XTAL_3_579545MHz
+#define MCU_CLOCK		MAIN_CLOCK / 3
+#define PIXEL_CLOCK		MAIN_CLOCK / 2
 
 
 /*************************************
@@ -93,7 +75,7 @@ Dip locations verified with manual for ddragon & ddragon2
  *************************************/
 
 /*
-    Based on the Solar Warrior schematics, vertical timing counts as follows:
+    Vertical timing counts as follows:
 
         08,09,0A,0B,...,FC,FD,FE,FF,E8,E9,EA,EB,...,FC,FD,FE,FF,
         08,09,....
@@ -150,25 +132,25 @@ MACHINE_START_MEMBER(ddragon_state,ddragon)
 	membank("bank1")->configure_entries(0, 8, memregion("maincpu")->base() + 0x10000, 0x4000);
 
 	/* register for save states */
-	save_item(NAME(m_dd_sub_cpu_busy));
 	save_item(NAME(m_scrollx_hi));
 	save_item(NAME(m_scrolly_hi));
 	save_item(NAME(m_adpcm_pos));
 	save_item(NAME(m_adpcm_end));
 	save_item(NAME(m_adpcm_idle));
 	save_item(NAME(m_adpcm_data));
+	save_item(NAME(m_ddragon_sub_port));
 }
 
 
 MACHINE_RESET_MEMBER(ddragon_state,ddragon)
 {
-	m_dd_sub_cpu_busy = 1;
+	m_scrollx_hi = 0;
+	m_scrolly_hi = 0;
+	m_ddragon_sub_port = 0;
 	m_adpcm_pos[0] = m_adpcm_pos[1] = 0;
 	m_adpcm_end[0] = m_adpcm_end[1] = 0;
 	m_adpcm_idle[0] = m_adpcm_idle[1] = 1;
 	m_adpcm_data[0] = m_adpcm_data[1] = -1;
-	m_scrollx_hi = 0;
-	m_scrolly_hi = 0;
 }
 
 
@@ -181,29 +163,31 @@ MACHINE_RESET_MEMBER(ddragon_state,ddragon)
 
 WRITE8_MEMBER(ddragon_state::ddragon_bankswitch_w)
 {
-	m_scrollx_hi = (data & 0x01);
-	m_scrolly_hi = ((data & 0x02) >> 1);
+	/*
+		76543210
+		.......x	X-scroll D9 (H9BT)
+		......x.	Y-scroll D9 (V9BT)
+		.....x..	/Screen flip (*1P/2P)
+		....x...	/Sub CPU reset (*RESET)
+		...x....	/Sub CPU halt (*HALT)
+		xxx.....	ROM bank (*BANK)
+	*/
+	m_scrollx_hi = data & 0x01;
+	m_scrolly_hi = (data & 0x02) >> 1;
 	flip_screen_set(~data & 0x04);
 
-	/* bit 3 unknown */
-
-	if (data & 0x10)
-		m_dd_sub_cpu_busy = 0;
-	else if (m_dd_sub_cpu_busy == 0)
-		m_subcpu->set_input_line(m_sprite_irq, (m_sprite_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE);
-
+	m_subcpu->set_input_line(INPUT_LINE_RESET, data & 0x08 ? CLEAR_LINE : ASSERT_LINE);
+	m_subcpu->set_input_line(INPUT_LINE_HALT, data & 0x10 ? ASSERT_LINE : CLEAR_LINE);
 	membank("bank1")->set_entry((data & 0xe0) >> 5);
 }
 
 
 WRITE8_MEMBER(ddragon_state::toffy_bankswitch_w)
 {
-	m_scrollx_hi = (data & 0x01);
-	m_scrolly_hi = ((data & 0x02) >> 1);
+	m_scrollx_hi = data & 0x01;
+	m_scrolly_hi = (data & 0x02) >> 1;
 
 //  flip_screen_set(machine(), ~data & 0x04);
-
-	/* bit 3 unknown */
 
 	/* I don't know ... */
 	membank("bank1")->set_entry((data & 0x20) >> 5);
@@ -252,20 +236,16 @@ WRITE8_MEMBER(ddragon_state::darktowr_mcu_bank_w)
 
 WRITE8_MEMBER(ddragon_state::darktowr_bankswitch_w)
 {
-	int oldbank = membank("bank1")->entry();
-	int newbank = (data & 0xe0) >> 5;
-
 	m_scrollx_hi = (data & 0x01);
 	m_scrolly_hi = ((data & 0x02) >> 1);
 
 //  flip_screen_set(machine(), ~data & 0x04);
 
-	/* bit 3 unknown */
+	m_subcpu->set_input_line(INPUT_LINE_RESET, data & 0x08 ? CLEAR_LINE : ASSERT_LINE);
+	m_subcpu->set_input_line(INPUT_LINE_HALT, data & 0x10 ? ASSERT_LINE : CLEAR_LINE);
 
-	if (data & 0x10)
-		m_dd_sub_cpu_busy = 0;
-	else if (m_dd_sub_cpu_busy == 0)
-		m_subcpu->set_input_line(m_sprite_irq, (m_sprite_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE);
+	int oldbank = membank("bank1")->entry();
+	int newbank = (data & 0xe0) >> 5;
 
 	membank("bank1")->set_entry(newbank);
 	if (newbank == 4 && oldbank != 4)
@@ -282,7 +262,7 @@ WRITE8_MEMBER(ddragon_state::darktowr_bankswitch_w)
  *
  *************************************/
 
-WRITE8_MEMBER(ddragon_state::ddragon_interrupt_w)
+void ddragon_state::ddragon_interrupt_ack(address_space &space, offs_t offset, UINT8 data)
 {
 	switch (offset)
 	{
@@ -298,21 +278,35 @@ WRITE8_MEMBER(ddragon_state::ddragon_interrupt_w)
 			m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 			break;
 
-		case 3: /* 380e - SND irq */
+		case 3: /* 380e - SND IRQ and latch */
 			soundlatch_byte_w(space, 0, data);
-			m_soundcpu->set_input_line(m_sound_irq, (m_sound_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE);
+			m_soundcpu->set_input_line(m_sound_irq, ASSERT_LINE);
 			break;
 
-		case 4: /* 380f - ? */
-			/* Not sure what this is - almost certainly related to the sprite mcu */
+		case 4: /* 380f - MCU IRQ */
+			if (m_subcpu)
+				m_subcpu->set_input_line(m_sprite_irq, ASSERT_LINE);
 			break;
 	}
 }
 
 
+READ8_MEMBER(ddragon_state::ddragon_interrupt_r)
+{
+	ddragon_interrupt_ack(space, offset, 0xff);
+	return 0xff;
+}
+
+
+WRITE8_MEMBER(ddragon_state::ddragon_interrupt_w)
+{
+	ddragon_interrupt_ack(space, offset, data);
+}
+
+
 WRITE8_MEMBER(ddragon_state::ddragon2_sub_irq_ack_w)
 {
-	m_subcpu->set_input_line(m_sprite_irq, CLEAR_LINE );
+	m_subcpu->set_input_line(m_sprite_irq, CLEAR_LINE);
 }
 
 
@@ -324,7 +318,26 @@ WRITE8_MEMBER(ddragon_state::ddragon2_sub_irq_w)
 
 WRITE_LINE_MEMBER(ddragon_state::irq_handler)
 {
-	m_soundcpu->set_input_line(m_ym_irq , state ? ASSERT_LINE : CLEAR_LINE );
+	m_soundcpu->set_input_line(m_ym_irq, state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+
+READ8_MEMBER(ddragon_state::soundlatch_ack_r)
+{
+	m_soundcpu->set_input_line(m_sound_irq, CLEAR_LINE);
+	return soundlatch_byte_r(space, 0);
+}
+
+
+WRITE8_MEMBER(ddragon_state::ddragonba_port_w)
+{
+	if ((data & 0x8) == 0)
+		m_subcpu->set_input_line(m_sprite_irq, CLEAR_LINE);
+
+	if (!(m_ddragon_sub_port & 0x10) && (data & 0x10))
+		m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
+
+	m_ddragon_sub_port = data;
 }
 
 
@@ -335,9 +348,13 @@ WRITE_LINE_MEMBER(ddragon_state::irq_handler)
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(ddragon_state::sub_cpu_busy)
+CUSTOM_INPUT_MEMBER(ddragon_state::subcpu_bus_free)
 {
-	return m_dd_sub_cpu_busy;
+	// Corresponds to BA (Bus Available) on the HD63701
+	if (m_subcpu)
+		return m_subcpu->suspended(SUSPEND_REASON_RESET | SUSPEND_REASON_HALT);
+	else
+		return 0;
 }
 
 
@@ -357,17 +374,16 @@ READ8_MEMBER(ddragon_state::ddragon_hd63701_internal_registers_r)
 
 WRITE8_MEMBER(ddragon_state::ddragon_hd63701_internal_registers_w)
 {
-	/* I don't know why port 0x17 is used..  Doesn't seem to be a standard MCU port */
+	// Port 6
 	if (offset == 0x17)
 	{
-		/* This is a guess, but makes sense.. The mcu definitely interrupts the main cpu.
-		I don't know what bit is the assert and what is the clear though (in comparison
-		it's quite obvious from the Double Dragon 2 code, below). */
-		if (data & 3)
-		{
-			m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
+		if ((data & 0x1) == 0)
 			m_subcpu->set_input_line(m_sprite_irq, CLEAR_LINE);
-		}
+
+		if (!(m_ddragon_sub_port & 0x2) && (data & 0x2))
+			m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
+
+		m_ddragon_sub_port = data;
 	}
 }
 
@@ -379,22 +395,22 @@ WRITE8_MEMBER(ddragon_state::ddragon_hd63701_internal_registers_w)
  *
  *************************************/
 
-READ8_MEMBER(ddragon_state::ddragon_spriteram_r)
+READ8_MEMBER(ddragon_state::ddragon_comram_r)
 {
-	/* Double Dragon crash fix - see notes above */
-	if (offset == 0x49 && space.device().safe_pc() == 0x6261 && m_spriteram[offset] == 0x1f)
-		return 0x1;
+	// Access to shared RAM is prevented when the sub CPU is active
+	if (!m_subcpu->suspended(SUSPEND_REASON_RESET | SUSPEND_REASON_HALT))
+		return 0xff;
 
-	return m_spriteram[offset];
+	return m_comram[offset];
 }
 
 
-WRITE8_MEMBER(ddragon_state::ddragon_spriteram_w)
+WRITE8_MEMBER(ddragon_state::ddragon_comram_w)
 {
-	if (&space.device() == m_subcpu && offset == 0)
-		m_dd_sub_cpu_busy = 1;
+	if (!m_subcpu->suspended(SUSPEND_REASON_RESET | SUSPEND_REASON_HALT))
+		return;
 
-	m_spriteram[offset] = data;
+	m_comram[offset] = data;
 }
 
 
@@ -481,9 +497,9 @@ static ADDRESS_MAP_START( ddragon_map, AS_PROGRAM, 8, ddragon_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("rambase")
 	AM_RANGE(0x1000, 0x11ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_byte_split_lo_w) AM_SHARE("paletteram")
 	AM_RANGE(0x1200, 0x13ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_byte_split_hi_w) AM_SHARE("paletteram2")
-	AM_RANGE(0x1400, 0x17ff) AM_RAM
 	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(ddragon_fgvideoram_w) AM_SHARE("fgvideoram")
-	AM_RANGE(0x2000, 0x2fff) AM_READWRITE(ddragon_spriteram_r, ddragon_spriteram_w) AM_SHARE("spriteram")
+	AM_RANGE(0x2000, 0x21ff) AM_READWRITE(ddragon_comram_r, ddragon_comram_w) AM_SHARE("comram") AM_MIRROR(0x0600)
+	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE(ddragon_bgvideoram_w) AM_SHARE("bgvideoram")
 	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("P1")
 	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("P2")
@@ -493,7 +509,7 @@ static ADDRESS_MAP_START( ddragon_map, AS_PROGRAM, 8, ddragon_state )
 	AM_RANGE(0x3808, 0x3808) AM_WRITE(ddragon_bankswitch_w)
 	AM_RANGE(0x3809, 0x3809) AM_WRITEONLY AM_SHARE("scrollx_lo")
 	AM_RANGE(0x380a, 0x380a) AM_WRITEONLY AM_SHARE("scrolly_lo")
-	AM_RANGE(0x380b, 0x380f) AM_WRITE(ddragon_interrupt_w)
+	AM_RANGE(0x380b, 0x380f) AM_READWRITE(ddragon_interrupt_r, ddragon_interrupt_w)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -502,7 +518,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dd2_map, AS_PROGRAM, 8, ddragon_state )
 	AM_RANGE(0x0000, 0x17ff) AM_RAM
 	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(ddragon_fgvideoram_w) AM_SHARE("fgvideoram")
-	AM_RANGE(0x2000, 0x2fff) AM_READWRITE(ddragon_spriteram_r, ddragon_spriteram_w) AM_SHARE("spriteram")
+	AM_RANGE(0x2000, 0x21ff) AM_READWRITE(ddragon_comram_r, ddragon_comram_w) AM_SHARE("comram") AM_MIRROR(0x0600)
+	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE(ddragon_bgvideoram_w) AM_SHARE("bgvideoram")
 	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("P1")
 	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("P2")
@@ -512,7 +529,7 @@ static ADDRESS_MAP_START( dd2_map, AS_PROGRAM, 8, ddragon_state )
 	AM_RANGE(0x3808, 0x3808) AM_WRITE(ddragon_bankswitch_w)
 	AM_RANGE(0x3809, 0x3809) AM_WRITEONLY AM_SHARE("scrollx_lo")
 	AM_RANGE(0x380a, 0x380a) AM_WRITEONLY AM_SHARE("scrolly_lo")
-	AM_RANGE(0x380b, 0x380f) AM_WRITE(ddragon_interrupt_w)
+	AM_RANGE(0x380b, 0x380f) AM_READWRITE(ddragon_interrupt_r, ddragon_interrupt_w)
 	AM_RANGE(0x3c00, 0x3dff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_byte_split_lo_w) AM_SHARE("paletteram")
 	AM_RANGE(0x3e00, 0x3fff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_byte_split_hi_w) AM_SHARE("paletteram2")
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
@@ -530,31 +547,25 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, ddragon_state )
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(ddragon_hd63701_internal_registers_r, ddragon_hd63701_internal_registers_w)
 	AM_RANGE(0x001f, 0x0fff) AM_RAM
-	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(ddragon_spriteram_r, ddragon_spriteram_w)
+	AM_RANGE(0x8000, 0x81ff) AM_RAM AM_SHARE("comram")
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( ddragonba_sub_map, AS_PROGRAM, 8, ddragon_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(ddragon_spriteram_r, ddragon_spriteram_w)
+	AM_RANGE(0x8000, 0x81ff) AM_RAM AM_SHARE("comram")
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( dd2_sub_map, AS_PROGRAM, 8, ddragon_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc3ff) AM_READWRITE(ddragon_spriteram_r, ddragon_spriteram_w)
+	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_SHARE("comram")
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(ddragon2_sub_irq_ack_w)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(ddragon2_sub_irq_w)
 ADDRESS_MAP_END
 
-/* might not be 100% accurate, check bits written */
-WRITE8_MEMBER(ddragon_state::ddragonba_port_w)
-{
-	m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
-	m_subcpu->set_input_line(m_sprite_irq, CLEAR_LINE );
-}
 
 static ADDRESS_MAP_START( ddragonba_sub_portmap, AS_IO, 8, ddragon_state )
 	AM_RANGE(0x0000, 0xffff) AM_WRITE(ddragonba_port_w)
@@ -570,7 +581,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, ddragon_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x1000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x1000, 0x1000) AM_READ(soundlatch_ack_r)
 	AM_RANGE(0x1800, 0x1800) AM_READ(dd_adpcm_status_r)
 	AM_RANGE(0x2800, 0x2801) AM_DEVREADWRITE("fmsnd", ym2151_device, read, write)
 	AM_RANGE(0x3800, 0x3807) AM_WRITE(dd_adpcm_w)
@@ -583,7 +594,7 @@ static ADDRESS_MAP_START( dd2_sound_map, AS_PROGRAM, 8, ddragon_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE("fmsnd", ym2151_device, read, write)
 	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xA000, 0xA000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_ack_r)
 ADDRESS_MAP_END
 
 
@@ -682,10 +693,8 @@ static INPUT_PORTS_START( ddragon )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ddragon_state,sub_cpu_busy, NULL)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ddragon_state, subcpu_bus_free, NULL)
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -967,7 +976,7 @@ static MACHINE_CONFIG_START( ddragon, ddragon_state )
 	MCFG_CPU_ADD("soundcpu", M6809, MAIN_CLOCK / 8) /* 1.5 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60000)) /* heavy interleaving to sync up sprite<->main cpu's */
+	MCFG_QUANTUM_TIME(attotime::from_hz(60000)) /* heavy interleaving to sync up sprite<->main CPUs */
 
 	MCFG_MACHINE_START_OVERRIDE(ddragon_state,ddragon)
 	MCFG_MACHINE_RESET_OVERRIDE(ddragon_state,ddragon)
@@ -986,15 +995,15 @@ static MACHINE_CONFIG_START( ddragon, ddragon_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_YM2151_ADD("fmsnd", SOUND_CLOCK)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(ddragon_state,irq_handler))
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE(ddragon_state, irq_handler))
 	MCFG_SOUND_ROUTE(0, "mono", 0.60)
 	MCFG_SOUND_ROUTE(1, "mono", 0.60)
 
-	MCFG_SOUND_ADD("adpcm1", MSM5205, MAIN_CLOCK/32)
+	MCFG_SOUND_ADD("adpcm1", MSM5205, MAIN_CLOCK / 32)
 	MCFG_SOUND_CONFIG(msm5205_config_1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("adpcm2", MSM5205, MAIN_CLOCK/32)
+	MCFG_SOUND_ADD("adpcm2", MSM5205, MAIN_CLOCK / 32)
 	MCFG_SOUND_CONFIG(msm5205_config_2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -1003,7 +1012,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( ddragonb, ddragon )
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("sub", M6809, MAIN_CLOCK / 8)  /* 1.5Mhz */
+	MCFG_CPU_REPLACE("sub", M6809, MAIN_CLOCK / 8)  /* 1.5MHz */
 	MCFG_CPU_PROGRAM_MAP(sub_map)
 MACHINE_CONFIG_END
 
@@ -1011,7 +1020,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( ddragonba, ddragon )
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("sub", M6803, MAIN_CLOCK / 2)  /* 6Mhz / 4 internally */
+	MCFG_CPU_REPLACE("sub", M6803, MAIN_CLOCK / 2)  /* 6MHz / 4 internally */
 	MCFG_CPU_PROGRAM_MAP(ddragonba_sub_map)
 	MCFG_CPU_IO_MAP(ddragonba_sub_portmap)
 MACHINE_CONFIG_END
@@ -1030,7 +1039,7 @@ static MACHINE_CONFIG_START( ddragon6809, ddragon_state )
 	MCFG_CPU_ADD("soundcpu", M6809, MAIN_CLOCK / 8) /* 1.5 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60000)) /* heavy interleaving to sync up sprite<->main cpu's */
+	MCFG_QUANTUM_TIME(attotime::from_hz(60000)) /* heavy interleaving to sync up sprite<->main CPUs */
 
 	MCFG_MACHINE_START_OVERRIDE(ddragon_state,ddragon)
 	MCFG_MACHINE_RESET_OVERRIDE(ddragon_state,ddragon)
@@ -1076,7 +1085,7 @@ static MACHINE_CONFIG_START( ddragon2, ddragon_state )
 	MCFG_CPU_ADD("soundcpu", Z80, 3579545)
 	MCFG_CPU_PROGRAM_MAP(dd2_sound_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60000)) /* heavy interleaving to sync up sprite<->main cpu's */
+	MCFG_QUANTUM_TIME(attotime::from_hz(60000)) /* heavy interleaving to sync up sprite<->main CPUs */
 
 	MCFG_MACHINE_START_OVERRIDE(ddragon_state,ddragon)
 	MCFG_MACHINE_RESET_OVERRIDE(ddragon_state,ddragon)
@@ -1170,7 +1179,7 @@ ROM_START( ddragon )
 
 	ROM_REGION( 0x0300, "proms", 0 )
 	ROM_LOAD( "21j-k-0",      0x0000, 0x0100, CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )    /* unknown */
-	ROM_LOAD( "21j-l-0",      0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* unknown */
+	ROM_LOAD( "21j-l-0",      0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* Layer priority */
 ROM_END
 
 ROM_START( ddragonw )
@@ -1210,8 +1219,8 @@ ROM_START( ddragonw )
 	ROM_LOAD( "21j-7",        0x10000, 0x10000, CRC(904de6f8) SHA1(3623e5ea05fd7c455992b7ed87e605b87c3850aa) )
 
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "21j-k-0",      0x0000, 0x0100, CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )    /* unknown */
-	ROM_LOAD( "21j-l-0",      0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* unknown */
+	ROM_LOAD( "21j-k-0.101",  0x0000, 0x0100, CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )    /* layer priorities */
+	ROM_LOAD( "21j-l-0.16",   0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* sprite timing */
 ROM_END
 
 ROM_START( ddragonw1 )
@@ -1251,8 +1260,8 @@ ROM_START( ddragonw1 )
 	ROM_LOAD( "21j-7",        0x10000, 0x10000, CRC(904de6f8) SHA1(3623e5ea05fd7c455992b7ed87e605b87c3850aa) )
 
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "21j-k-0",      0x0000, 0x0100, CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )    /* unknown */
-	ROM_LOAD( "21j-l-0",      0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* unknown */
+	ROM_LOAD( "21j-k-0.101",  0x0000, 0x0100, CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )    /* layer priorities */
+	ROM_LOAD( "21j-l-0.16",   0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* sprite timing */
 ROM_END
 
 ROM_START( ddragonu )
@@ -1292,8 +1301,8 @@ ROM_START( ddragonu )
 	ROM_LOAD( "21j-7",        0x10000, 0x10000, CRC(904de6f8) SHA1(3623e5ea05fd7c455992b7ed87e605b87c3850aa) )
 
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "21j-k-0",      0x0000, 0x0100, CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )    /* unknown */
-	ROM_LOAD( "21j-l-0",      0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* unknown */
+	ROM_LOAD( "21j-k-0.101",  0x0000, 0x0100, CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )    /* layer priorities */
+	ROM_LOAD( "21j-l-0.16",   0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* sprite timing */
 ROM_END
 
 ROM_START( ddragonua )
@@ -1333,8 +1342,8 @@ ROM_START( ddragonua )
 	ROM_LOAD( "21j-7",        0x10000, 0x10000, CRC(904de6f8) SHA1(3623e5ea05fd7c455992b7ed87e605b87c3850aa) )
 
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "21j-k-0",      0x0000, 0x0100, CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )    /* unknown */
-	ROM_LOAD( "21j-l-0",      0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* unknown */
+	ROM_LOAD( "21j-k-0.101",  0x0000, 0x0100, CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )    /* layer priorities */
+	ROM_LOAD( "21j-l-0.16",   0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* sprite timing */
 ROM_END
 
 
@@ -1375,8 +1384,8 @@ ROM_START( ddragonub )
 	ROM_LOAD( "21j-7",        0x10000, 0x10000, CRC(904de6f8) SHA1(3623e5ea05fd7c455992b7ed87e605b87c3850aa) )
 
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "21j-k-0",      0x0000, 0x0100, CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )    /* unknown */
-	ROM_LOAD( "21j-l-0",      0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* unknown */
+	ROM_LOAD( "21j-k-0.101",  0x0000, 0x0100, CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )    /* layer priorities */
+	ROM_LOAD( "21j-l-0.16",   0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* sprite timing */
 ROM_END
 
 
@@ -1417,8 +1426,8 @@ ROM_START( ddragonb ) /* Same program roms as the World set */
 	ROM_LOAD( "21j-7",        0x10000, 0x10000, CRC(904de6f8) SHA1(3623e5ea05fd7c455992b7ed87e605b87c3850aa) )
 
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "21j-k-0",      0x0000, 0x0100, CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )    /* unknown */
-	ROM_LOAD( "21j-l-0",      0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* unknown */
+	ROM_LOAD( "21j-k-0.101",  0x0000, 0x0100, CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )    /* layer priorities */
+	ROM_LOAD( "21j-l-0.16",   0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* sprite timing */
 ROM_END
 
 ROM_START( ddragonba )
@@ -1458,8 +1467,8 @@ ROM_START( ddragonba )
 	ROM_LOAD( "7.bin",        0x10000, 0x10000, CRC(f9311f72) SHA1(aa554ef020e04dc896e5495bcddc64e489d0ffff) )
 
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "21j-k-0",      0x0000, 0x0100, CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )    /* unknown */
-	ROM_LOAD( "21j-l-0",      0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* unknown */
+	ROM_LOAD( "21j-k-0.101",  0x0000, 0x0100, CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )    /* layer priorities */
+	ROM_LOAD( "21j-l-0.16",   0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* sprite timing */
 ROM_END
 
 ROM_START( ddragonb2 )
@@ -1499,8 +1508,8 @@ ROM_START( ddragonb2 )
 	ROM_LOAD( "2.bin",        0x10000, 0x10000, CRC(904de6f8) SHA1(3623e5ea05fd7c455992b7ed87e605b87c3850aa) )
 
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "21j-k-0",      0x0000, 0x0100, CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )    /* unknown */
-	ROM_LOAD( "21j-l-0",      0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* unknown */
+	ROM_LOAD( "21j-k-0.101",  0x0000, 0x0100, CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )    /* layer priorities */
+	ROM_LOAD( "21j-l-0.16",   0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* sprite timing */
 ROM_END
 
 /* this is a well known italian bootleg of Double Dragon it can be identified by the following gameplay trait
@@ -1673,7 +1682,7 @@ ROM_START( ddragon2 )
 	ROM_LOAD( "26j7-0.bin",   0x20000, 0x20000, CRC(bc6a48d5) SHA1(04c434f8cd42a8f82a263548183569396f9b684d) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "prom.16",      0x0000, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* unknown (same as ddragon) */
+	ROM_LOAD( "prom.16",      0x0000, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* sprite timing (same as ddragon) */	
 ROM_END
 
 ROM_START( ddragon2u )
@@ -1709,7 +1718,7 @@ ROM_START( ddragon2u )
 	ROM_LOAD( "26j7-0.bin",   0x20000, 0x20000, CRC(bc6a48d5) SHA1(04c434f8cd42a8f82a263548183569396f9b684d) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "prom.16",      0x0000, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* unknown (same as ddragon) */
+	ROM_LOAD( "prom.16",      0x0000, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* sprite timing (same as ddragon) */
 ROM_END
 
 
@@ -1753,8 +1762,8 @@ ROM_START( tstrike )
 	ROM_LOAD( "tstrike.95",        0x10000, 0x08000, CRC(1812eecb) SHA1(9b7d526f30a86682cdf088600b25ea5a56b112ef) )
 
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "21j-k-0",      0x0000, 0x0100, CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )    /* unknown */
-	ROM_LOAD( "21j-l-0",      0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* unknown */
+	ROM_LOAD( "21j-k-0.101",  0x0000, 0x0100, CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )    /* layer priorities */
+	ROM_LOAD( "21j-l-0.16",   0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* sprite timing */
 ROM_END
 
 ROM_START( tstrikea )
@@ -1797,8 +1806,8 @@ ROM_START( tstrikea )
 	ROM_LOAD( "tstrike.95",        0x10000, 0x08000, CRC(1812eecb) SHA1(9b7d526f30a86682cdf088600b25ea5a56b112ef) )
 
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "21j-k-0",      0x0000, 0x0100, CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )    /* unknown */
-	ROM_LOAD( "21j-l-0",      0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* unknown */
+	ROM_LOAD( "21j-k-0.101",  0x0000, 0x0100, CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )    /* layer priorities */
+	ROM_LOAD( "21j-l-0.16",   0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* sprite timing */
 ROM_END
 
 
@@ -1833,8 +1842,8 @@ ROM_START( ddungeon )
 	ROM_LOAD( "21j-7",      0x10000, 0x10000, CRC(904de6f8) SHA1(3623e5ea05fd7c455992b7ed87e605b87c3850aa) ) /* at IC94 */
 
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "21j-k-0",    0x0000,  0x0100,  CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) ) /* at IC101 */
-	ROM_LOAD( "21j-l-0",    0x0100,  0x0200,  CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) ) /* at IC16 */
+	ROM_LOAD( "21j-k-0.101",  0x0000, 0x0100, CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )    /* layer priorities */
+	ROM_LOAD( "21j-l-0.16",   0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* sprite timing */
 ROM_END
 
 /* the only differences with this set are 2x graphic roms, and the sound program.
@@ -1872,8 +1881,8 @@ ROM_START( ddungeone )
 	ROM_LOAD( "21j-7",      0x10000, 0x10000, CRC(904de6f8) SHA1(3623e5ea05fd7c455992b7ed87e605b87c3850aa) )
 
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "21j-k-0",    0x0000,  0x0100,  CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) ) /* unknown  */
-	ROM_LOAD( "21j-l-0",    0x0100,  0x0200,  CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) ) /* unknown  */
+	ROM_LOAD( "21j-k-0.101",  0x0000, 0x0100, CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )    /* layer priorities */
+	ROM_LOAD( "21j-l-0.16",   0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* sprite timing */
 ROM_END
 
 
@@ -1917,8 +1926,8 @@ ROM_START( darktowr )
 	ROM_LOAD( "21j-7",        0x10000, 0x10000, CRC(904de6f8) SHA1(3623e5ea05fd7c455992b7ed87e605b87c3850aa) ) /* from ddragon */
 
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "21j-k-0",      0x0000, 0x0100, CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )    /* unknown */ /* from ddragon */
-	ROM_LOAD( "21j-l-0",      0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* unknown */ /* from ddragon */
+	ROM_LOAD( "21j-k-0.101",  0x0000, 0x0100, CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )    /* layer priorities */
+	ROM_LOAD( "21j-l-0.16",   0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* sprite timing */
 ROM_END
 
 
@@ -2063,6 +2072,8 @@ DRIVER_INIT_MEMBER(ddragon_state,ddragon6809)
 	m_ym_irq = M6809_FIRQ_LINE;
 	m_technos_video_hw = 0;
 }
+
+
 
 /*************************************
  *
