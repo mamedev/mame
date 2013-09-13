@@ -1760,6 +1760,10 @@ static void i386_protected_mode_call(i386_state *cpustate, UINT16 seg, UINT32 of
 						FAULT(FAULT_SS,stack.selector)  // #SS(SS selector)
 					}
 					UINT32 newESP = i386_get_stack_ptr(cpustate,DPL);
+					if(!stack.d)
+					{
+						newESP &= 0xffff;
+					}
 					if(operand32 != 0)
 					{
 						if(newESP < ((gate.dword_count & 0x1f) + 16))
@@ -1775,7 +1779,6 @@ static void i386_protected_mode_call(i386_state *cpustate, UINT16 seg, UINT32 of
 					}
 					else
 					{
-						newESP &= 0x0000ffff;
 						if(newESP < ((gate.dword_count & 0x1f) + 8))
 						{
 							logerror("CALL: Call gate: New stack has no room for 16-bit return address and parameters.\n");
@@ -1795,7 +1798,7 @@ static void i386_protected_mode_call(i386_state *cpustate, UINT16 seg, UINT32 of
 					WRITE_TEST(cpustate, stack.base+newESP-1);
 					/* switch to new stack */
 					oldSS = cpustate->sreg[SS].selector;
-					cpustate->sreg[SS].selector = i386_get_stack_segment(cpustate,gate.selector & 0x03);
+					cpustate->sreg[SS].selector = i386_get_stack_segment(cpustate,cpustate->CPL);
 					if(operand32 != 0)
 					{
 						oldESP = REG32(ESP);
