@@ -1366,6 +1366,16 @@ READ_LINE_MEMBER( kc85_state::kc85_sid_r )
 	return m_cassette->input() > 0.0;
 }
 
+WRITE_LINE_MEMBER( tandy200_state::kc85_sod_w )
+{
+	m_cassette->output(state ? +1.0 : -1.0);
+}
+
+READ_LINE_MEMBER( tandy200_state::kc85_sid_r )
+{
+	return m_cassette->input() > 0.0;
+}
+
 TIMER_DEVICE_CALLBACK_MEMBER(tandy200_state::tandy200_tp_tick)
 {
 	m_maincpu->set_input_line(I8085_RST75_LINE, m_tp);
@@ -1514,8 +1524,8 @@ static MACHINE_CONFIG_START( tandy200, tandy200_state )
 	MCFG_CPU_ADD(I8085_TAG, I8085A, XTAL_4_9152MHz)
 	MCFG_CPU_PROGRAM_MAP(tandy200_mem)
 	MCFG_CPU_IO_MAP(tandy200_io)
-	MCFG_I8085A_SID(READLINE(kc85_state,kc85_sid_r))
-	MCFG_I8085A_SOD(WRITELINE(kc85_state,kc85_sod_w))
+	MCFG_I8085A_SID(READLINE(tandy200_state,kc85_sid_r))
+	MCFG_I8085A_SOD(WRITELINE(tandy200_state,kc85_sod_w))
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD(tandy200_video)
