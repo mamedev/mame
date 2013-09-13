@@ -8,10 +8,10 @@
 **********************************************************************
 
     D9060: Tandon TM602S
-    chdman -createblankhd d9060.chd 153 4 32 256
+    chdman createhd -o d9060.chd -chs 153,4,32 -ss 256
 
     D9090: Tandon TM603S
-    chdman -createblankhd d9090.chd 153 6 32 256
+    chdman createhd -o d9090.chd -chs 153,6,32 -ss 256
 
     How to format the disk:
     HEADER "LABEL",D0,I01

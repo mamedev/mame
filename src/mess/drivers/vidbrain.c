@@ -7,8 +7,9 @@
     http://www.seanriddle.com/videobrain.html
     http://www.google.com/patents/US4232374
     http://www.google.com/patents/US4177462
-
-    07/04/2009 Skeleton driver.
+    http://www.orphanedgames.com/videobrain/
+    http://www.datalytixllc.com/videobrain/
+    http://blog.kevtris.org/blogfiles/videobrain/videobrain_unwrapped.txt
 
 ****************************************************************************/
 
