@@ -245,6 +245,7 @@ hash/sms.xml svneol=native#text/xml
 hash/snes.xml svneol=native#text/xml
 hash/snes_bspack.xml svneol=native#text/xml
 hash/snes_strom.xml svneol=native#text/xml
+hash/snes_vkun.xml svneol=native#text/xml
 hash/socrates.xml svneol=native#text/xml
 hash/softbox.xml svneol=native#text/xml
 hash/softwarelist.dtd svneol=native#text/plain

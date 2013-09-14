@@ -90,15 +90,6 @@ Undumped
           o   PCB pic    Adventures of Dr. Franken / Prototype
           ?              Plok! / Prototype 19930403
 
-  Voice-Kun audio discs
-  The Voice-Kun, often called Voicer Kun,
-  is a device which connects to the second controller port and acts as a remote control for CD players.
-          o   WP         Angelique - Voice Fantasy (Japan)
-          o   Box pic    Emit Vol. 1 - Toki no Maigo (Japan) (2 discs?)
-          o   Box pic    Emit Vol. 2 - Inochigake no Tabi (Japan) (2 discs?)
-          o   Box pic    Emit Vol. 3 - Watashi ni Sayonara wo (Japan) (2 discs?)
-          x   WP         Emit Value Set (Vol. 1-3)
-
   Cancelled (most of these titles are probably lost forever)
 
   - Asterix - USA, for 1993, Electro Brain
@@ -2066,7 +2057,6 @@ List of documented non retail cartridges
 
 	<software name="ppersia2p" cloneof="ppersia2">
 		<!-- legrospixel.com -->
-		<!-- Notes: identical to the final release, except it has full save capability -->
 		<description>Prince of Persia 2 - The Shadow &amp; The Flame (Euro, Prototype 19950417)</description>
 		<year>1995</year>
 		<publisher>Titus</publisher>
@@ -2607,6 +2597,34 @@ List of documented non retail cartridges
 				<rom name="driftout rom-2 usa 05-18-95 fe18.u2" size="524288" crc="6f9c1e99" sha1="6e8848a7aaac8bace38cb7f56be750beb786c949" offset="0x080000" />
 				<rom name="driftout rom-3 usa 05-18-95 e157.u3" size="524288" crc="54802853" sha1="789ec05b4236d2fc1e01cf5006607fcd68a76822" offset="0x100000" />
 				<rom name="driftout rom-4 usa 05-18-95 45e5.u4" size="524288" crc="1f1d34a3" sha1="c448199840340ead46cb3aa9bd24ffce7a9f6fa7" offset="0x180000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fireprw2p" cloneof="fireprw2">
+		<!-- snescentral.com -->
+		<!-- Notes: 99% identical to the final release -->
+		<description>Super Fire Pro Wrestling 2 (Jpn, Final Prototype)</description>
+		<year>1992</year>
+		<publisher>Human Entertainment</publisher>
+		<info name="serial" value="HUMAN No. 138" />
+		<info name="alt_title" value="スーパーファイヤープロレスリング2" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-2P3B-01" />
+			<feature name="u1" value="U1 EPROM(J)" />
+			<feature name="u2" value="U2 EPROM(J)" />
+			<feature name="u3" value="U3 SRAM" />
+			<feature name="u4" value="U4 74F139" /> <!-- HD74LS139P -->
+			<feature name="u5" value="U5 CIC" />
+			<feature name="lockout" value="D411 C126 06B" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="unknown" />
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="u1" size="524288" crc="f4274ab3" sha1="8a420aa508d876508aa14878f2d5c77c4248a5c5" offset="0x000000" />
+				<rom name="u2" size="524288" crc="a6de134a" sha1="f2359829253b258e842f6a8f921c3272efd24d61" offset="0x080000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>

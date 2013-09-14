@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!--
+
+  The Voice-Kun, often improperly called Voicer Kun,
+  is a device which connects to the second controller port of the Super Family Computer
+  and acts as an remote control for CD players supporting IR commands.
+
+Undumped
+ Confirmed?   Source     Title
+          o   Box pic    Emit Vol. 1 - Toki no Maigo (Japan) (2 discs?)
+          o   Box pic    Emit Vol. 2 - Inochigake no Tabi (Japan) (2 discs?)
+          o   Box pic    Emit Vol. 3 - Watashi ni Sayonara wo (Japan) (2 discs?)
+          x   WP         Emit Value Set (Vol. 1-3)
+
+-->
+
+<softwarelist name="snes_vkun" description="Voice-Kun audio compact discs">
+
+	<software name="angelvf">
+		<!-- original image (from King Mike)
+		<rom name="ANGELVOICE.BIN" size="558644688" crc="ee1af152" sha1="5900295c8fce37c497d766b545b7bac4b9c657e3" status="baddump"/>
+		<rom name="ANGELVOICE.CUE" size="5767"      crc="860a72dc" sha1="4224c47111ffde20c7287066122d45ba733c6e93" status="baddump"/>
+		-->
+		<description>Angelique - Voice Fantasy (Jpn)</description>
+		<year>1996</year>
+		<publisher>Koei</publisher>
+		<part name="cdrom" interface="ir_controlled_cd_player">
+			<diskarea name="cdrom">
+				<disk name="angelvf" sha1="97aa958bc0ae6cbb9ede9b00dd54e1e1750077aa" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+</softwarelist>
