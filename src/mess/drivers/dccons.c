@@ -20,6 +20,8 @@
     TODO:
     - RTC error always pops up at start-up, no flash plus bug with ticks (needs rewrite)
     - Inputs doesn't work most of the time;
+    - Candy Stripe: fills the log with "ATAPI_FEATURES_FLAG_OVL not supported", black screen
+    - Carrier: Jaleco logo uses YUV, but y size is halved?
     - F355 Challenge: black screen after Sega logo;
 	- Idol Janshi wo Tsukucchaou: pixel aspect is way wrong (stretched and offsetted horizontally)
 	- Power Stone: hangs at Capcom logo;
