@@ -540,10 +540,35 @@ MACHINE_CONFIG_END
 
                                     Magix
 
-Yun Sung, 1995.
-CPU : Z80B
-SND : Z80A + YM3812 + Oki M5205
-OSC : 16.000
+Yun Sung, 1995
+
++-------------------------------------+
+|VOL YM3104      6116               04|
+|     M5202 400KHz                  03|
+|     Z80A      CXK5118PN-15L       02|
+|      08       GM76C28-10          01|
+|    MCM2018AN45                      |
+|J   MCM2018AN45                      |
+|A DSW1       +--------+              |
+|M            |        |              |
+|M DSW2*      | Quick  |              |
+|A            | Logic  |              |
+|             |        |              |
+| U66         +--------+            06|
+|    HM6264                         05|
+|     07     HM6264                   |
+|    Z80B    YM3812           16MHz   |
++-------------------------------------+
+
+ Main CPU: Z80B
+Sound CPU: Z80A
+    Sound: Yamaha YM3812 + Oki M5202 + YM3014 DAC
+    Video: QuickLogic FPGA - unknown type / model
+      OSC: 16MHz + 400Khz resontator
+   Memory: 2 x MCM2018AN45, 2 x HM6264, CXK5118PN-15L, GM76C28-10 & 6116
+     Misc: DSW1 is a 8 position dipswitch
+           DSW2 is not populated
+           VOL Volume pot
 
 ***************************************************************************/
 
