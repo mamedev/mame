@@ -189,6 +189,7 @@ void cquestsnd_cpu_device::device_start()
 	m_ramwlatch = 0;
 	m_prev_ipram = 0;
 	m_prev_ipwrt = 0;
+	m_adrlatch = 0;
 
 	save_item(NAME(m_ram));
 	save_item(NAME(m_q));
