@@ -21,6 +21,8 @@
 #include "cpu/i8085/i8085.h"
 #include "video/mc6845.h"
 #include "sound/ay8910.h"
+#include "imagedev/cassette.h"
+#include "sound/wave.h"
 
 #define AY8910_TAG "g12"
 #define HD46505SP_TAG "h45"
@@ -30,8 +32,10 @@ class lola8a_state : public driver_device
 {
 public:
 	lola8a_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_cass(*this, "cassette")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	
@@ -41,11 +45,14 @@ public:
 	DECLARE_READ8_MEMBER(lola8a_port_a_r);
 	DECLARE_WRITE8_MEMBER(lola8a_port_b_w);
 	DECLARE_WRITE_LINE_MEMBER(crtc_vsync);
+	DECLARE_READ_LINE_MEMBER(cass_r);
+	DECLARE_WRITE_LINE_MEMBER(cass_w);
 	
 	DECLARE_READ8_MEMBER(keyboard_r);
 	
 private: 
 	UINT8 m_portb;
+	required_device<cassette_image_device> m_cass;
 };
 
 static ADDRESS_MAP_START(lola8a_mem, AS_PROGRAM, 8, lola8a_state)
@@ -215,6 +222,16 @@ WRITE8_MEMBER(lola8a_state::lola8a_port_b_w)
 	m_portb = data;
 }
 
+READ_LINE_MEMBER( lola8a_state::cass_r )
+{
+	return (m_cass->input() < 0.03);
+}
+
+WRITE_LINE_MEMBER( lola8a_state::cass_w )
+{
+	m_cass->output(state ? -1.0 : +1.0);
+}
+
 READ8_MEMBER(lola8a_state::keyboard_r)
 {
 	static const char *const keynames[] =
@@ -264,24 +281,28 @@ static MACHINE_CONFIG_START( lola8a, lola8a_state )
 	MCFG_CPU_ADD("maincpu", I8085A, XTAL_4_9152MHz)
 	MCFG_CPU_PROGRAM_MAP(lola8a_mem)
 	MCFG_CPU_IO_MAP(lola8a_io)
-
+	MCFG_I8085A_SID(READLINE(lola8a_state, cass_r))
+	MCFG_I8085A_SOD(WRITELINE(lola8a_state, cass_w))
 		
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(AY8910_TAG, AY8910, XTAL_4_9152MHz / 4)
 	MCFG_SOUND_CONFIG(psg_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",1.0)
 	
-    /* video hardware */
+	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_UPDATE_DEVICE(HD46505SP_TAG, hd6845_device, screen_update)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	
 	MCFG_MC6845_ADD(HD46505SP_TAG, HD6845, "screen", XTAL_8MHz / 8, hd46505sp_intf) // HD6845 == HD46505S
-	
    	MCFG_PALETTE_LENGTH(8)
+
+	/* Cassette */
+	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 /* ROM definition */
