@@ -22,7 +22,7 @@ Sega Naomi is Dreamcast based Arcade hardware.
 Compatibility list (as per 26-jun-2013)
 - sfz3ugd: currently dies at disclaimer screen (regression);
 - sprtjam: garbage on initial attract mode screen (regression).
-- puyofev: hangs after pressing start.
+- puyofev: hangs after pressing start (bp 0C03F490, similar if not same snippet as Tetris 4d on DC).
 - vtennisg: crashes after stage screen.
 
 TODO (general):

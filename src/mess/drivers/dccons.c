@@ -22,7 +22,9 @@
     - Inputs doesn't work most of the time;
     - Candy Stripe: fills the log with "ATAPI_FEATURES_FLAG_OVL not supported", black screen
     - Carrier: Jaleco logo uses YUV, but y size is halved?
+    - Close To: Hangs at FMV
     - F355 Challenge: black screen after Sega logo;
+	- Gundam - Side Story 0079: currently hangs at Bandai logo (regression)
 	- Idol Janshi wo Tsukucchaou: pixel aspect is way wrong (stretched and offsetted horizontally)
 	- Power Stone: hangs at Capcom logo;
 	- Sega GT: no cursor on main menu;

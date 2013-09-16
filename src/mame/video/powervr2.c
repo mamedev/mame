@@ -1476,6 +1476,8 @@ WRITE32_MEMBER( powervr2_device::ta_yuv_tex_ctrl_w )
 	ta_yuv_x_size = ((ta_yuv_tex_ctrl & 0x3f)+1)*16;
 	ta_yuv_y_size = (((ta_yuv_tex_ctrl>>8) & 0x3f)+1)*16;
 	logerror("%s: ta_yuv_tex_ctrl = %08x\n", tag(), ta_yuv_tex_ctrl);
+	if(ta_yuv_tex_ctrl & 0x01010000)
+		fatalerror("YUV with setting %08x",ta_yuv_tex_ctrl);
 }
 
 #include "debugger.h"
