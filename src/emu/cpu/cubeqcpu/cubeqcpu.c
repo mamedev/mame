@@ -1099,8 +1099,6 @@ void cquestrot_cpu_device::execute_run()
     LINE DRAWER CORE EXECUTION LOOP
 ***************************************************************************/
 
-#define VISIBLE_FIELD   !m_field
-
 enum line_spf
 {
 	LSPF_UNUSED  = 0,
@@ -1169,13 +1167,13 @@ void cquestlin_cpu_device::cubeqcpu_clear_stack()
 
 UINT8 cquestlin_cpu_device::cubeqcpu_get_ptr_ram_val(int i)
 {
-	return m_ptr_ram[(VISIBLE_FIELD * 256) + i];
+	return m_ptr_ram[((m_field^1) * 256) + i];
 }
 
 
 UINT32* cquestlin_cpu_device::cubeqcpu_get_stack_ram()
 {
-	if (VISIBLE_FIELD == ODD_FIELD)
+	if (m_field != ODD_FIELD)
 		return m_o_stack;
 	else
 		return m_e_stack;
