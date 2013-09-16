@@ -554,7 +554,7 @@ void mos6560_device::soundport_w( int offset, int data )
 		{
 			m_tone1pos = 0;
 			m_tone1samples = machine().sample_rate() / TONE1_FREQUENCY;
-			if (!m_tone1samples == 0)
+			if (m_tone1samples == 0)
 				m_tone1samples = 1;
 		}
 		DBG_LOG(1, "mos6560", ("tone1 %.2x %d\n", data, TONE1_FREQUENCY));
