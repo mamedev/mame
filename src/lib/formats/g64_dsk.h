@@ -35,7 +35,7 @@ extern const floppy_format_type FLOPPY_G64_FORMAT;
 // legacy
 #define G64_SYNC_MARK           0x3ff       /* 10 consecutive 1-bits */
 
-#define G64_BUFFER_SIZE         16384
+#define G64_BUFFER_SIZE         32768
 #define G64_SPEED_BLOCK_SIZE    1982
 
 const int C2040_BITRATE[] =

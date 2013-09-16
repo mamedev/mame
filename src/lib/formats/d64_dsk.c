@@ -826,14 +826,14 @@ static floperr_t d64_read_track(floppy_image_legacy *floppy, int head, int track
 
 		memset(((UINT8*)buffer) + gcr_track_size, speed_byte, G64_SPEED_BLOCK_SIZE);
 
-		LOG_FORMATS("D64 track %.1f length %u\n", get_dos_track(track), gcr_track_size);
+		LOG_FORMATS("D64 side %u track %.1f length %u\n", head, get_dos_track(track), gcr_track_size);
 	}
 	else    /* half tracks */
 	{
 		/* set track length to 0 */
 		memset(buffer, 0, buflen);
 
-		LOG_FORMATS("D64 track %.1f length %u\n", get_dos_track(track), 0);
+		LOG_FORMATS("D64 side %u track %.1f length %u\n", head, get_dos_track(track), 0);
 	}
 
 	return FLOPPY_ERROR_SUCCESS;

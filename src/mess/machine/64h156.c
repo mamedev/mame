@@ -754,7 +754,13 @@ void c64h156_device::ds_w(int data)
 
 void c64h156_device::set_side(int side)
 {
-	m_side = side;
+	if (m_side != side)
+	{
+		m_side = side;
+	
+		// read new track data
+		read_current_track();
+	}
 }
 
 

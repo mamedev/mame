@@ -196,6 +196,7 @@ const floppy_format_type FLOPPY_G64_FORMAT = &floppy_image_format_creator<g64_fo
 ***************************************************************************/
 
 #define HEADER_LENGTH       0x2ac           // standard length for 84 half tracks
+#define MAX_HEADS			2
 #define MAX_TRACKS          84
 
 /***************************************************************************
@@ -205,11 +206,11 @@ const floppy_format_type FLOPPY_G64_FORMAT = &floppy_image_format_creator<g64_fo
 struct g64dsk_tag
 {
 	int version;
-	int heads;                              // number of physical heads
-	int tracks;                             // number of physical tracks
-	UINT16 track_size[MAX_TRACKS];          // size of each track
-	UINT32 track_offset[MAX_TRACKS];        // offset within data for each track
-	UINT32 speed_zone_offset[MAX_TRACKS];   // offset within data for each track
+	int heads;                              			// number of physical heads
+	int tracks;                             			// number of physical tracks
+	UINT16 track_size[MAX_HEADS][MAX_TRACKS];         	// size of each track
+	UINT32 track_offset[MAX_HEADS][MAX_TRACKS];        	// offset within data for each track
+	UINT32 speed_zone_offset[MAX_HEADS][MAX_TRACKS];  	// offset within data for each track
 };
 
 /***************************************************************************
@@ -260,10 +261,10 @@ static floperr_t get_track_offset(floppy_image_legacy *floppy, int head, int tra
 	struct g64dsk_tag *tag = get_tag(floppy);
 	UINT64 offs = 0;
 
-	if ((track < 0) || (track >= tag->tracks))
+	if ((track < 0) || (track >= MAX_TRACKS))
 		return FLOPPY_ERROR_SEEKERROR;
 
-	offs = tag->track_offset[track];
+	offs = tag->track_offset[head][track];
 
 	if (offset)
 		*offset = offs;
@@ -317,7 +318,7 @@ static floperr_t g64_read_track(floppy_image_legacy *floppy, int head, int track
 	struct g64dsk_tag *tag = get_tag(floppy);
 	floperr_t err;
 	UINT64 track_offset;
-	UINT16 track_length = tag->track_size[track];
+	UINT16 track_length = tag->track_size[head][track];
 
 	// get track offset
 	err = get_track_offset(floppy, head, track, &track_offset);
@@ -325,34 +326,36 @@ static floperr_t g64_read_track(floppy_image_legacy *floppy, int head, int track
 	if (err)
 		return err;
 
-	if (!head && track_offset)
+	if ((head <= tag->heads) && track_offset)
 	{
 		if (buflen < track_length) { printf("G64 track buffer too small: %u < %u!", (UINT32)buflen, track_length); exit(-1); }
 
 		// read track data
 		floppy_image_read(floppy, ((UINT8*)buffer), track_offset + 2, track_length); // skip the 2 track length bytes in the beginning of track data
 
-		if (tag->speed_zone_offset[track] > 3)
+		if (tag->speed_zone_offset[head][track] > 3)
 		{
 			// read speed block
-			floppy_image_read(floppy, ((UINT8*)buffer) + track_length, tag->speed_zone_offset[track], G64_SPEED_BLOCK_SIZE);
+			floppy_image_read(floppy, ((UINT8*)buffer) + track_length, tag->speed_zone_offset[head][track], G64_SPEED_BLOCK_SIZE);
 		}
 		else
 		{
 			// create a speed block with the same speed zone for the whole track
-			UINT8 speed = tag->speed_zone_offset[track] & 0x03;
+			UINT8 speed = tag->speed_zone_offset[head][track] & 0x03;
 			UINT8 speed_byte = (speed << 6) | (speed << 4) | (speed << 2) | speed;
 
 			memset(((UINT8*)buffer) + track_length, speed_byte, G64_SPEED_BLOCK_SIZE);
 		}
+
+		LOG_FORMATS("G64 side %u track %.1f length %u\n", head, get_dos_track(track), track_length);
 	}
 	else
 	{
 		// no data for given track, or tried to read side 1
 		memset(((UINT8*)buffer), 0, buflen);
-	}
 
-	LOG_FORMATS("G64 track %.1f length %u\n", get_dos_track(track), track_length);
+		LOG_FORMATS("G64 side %u track %.1f\n", head, get_dos_track(track));
+	}
 
 	return FLOPPY_ERROR_SUCCESS;
 }
@@ -424,13 +427,77 @@ FLOPPY_IDENTIFY( g64_dsk_identify )
 
 */
 
+static void read_g64_header(floppy_image_legacy *floppy, struct g64dsk_tag *tag, int head, UINT64 &pos)
+{
+	UINT8 header[HEADER_LENGTH];
+
+	UINT64 start_pos = pos;
+
+	// read header
+	floppy_image_read(floppy, header, pos, HEADER_LENGTH);
+
+	// get version
+	tag->version = header[8];
+	if (!head) LOG_FORMATS("G64 version: %u\n", tag->version);
+
+	// get number of tracks
+	tag->tracks = header[9];
+	LOG_FORMATS("G64 side %u tracks: %u\n", head, tag->tracks);
+
+	// get track size
+	UINT16 track_size = (header[0xb] << 8) | header[0xa];
+
+	// get data offsets
+	pos = 0xc;
+	for (int i = 0; i < tag->tracks; i++)
+	{
+		tag->track_offset[head][i] = pick_integer_le(header, pos, 4);
+
+		if (tag->track_offset[head][i])
+		{
+			tag->track_offset[head][i] += start_pos;
+		}
+
+		pos += 4;
+	}
+
+	// get speed zone information
+	UINT32 track_offs = 0;
+	for (int i = 0; i < tag->tracks; i++)
+	{
+		tag->speed_zone_offset[head][i] = pick_integer_le(header, pos, 4);
+		
+		if (tag->speed_zone_offset[head][i] >= 4)
+		{
+			tag->speed_zone_offset[head][i] += start_pos;
+		}
+
+		pos += 4;
+
+		tag->track_size[head][i] = g64_get_track_size(floppy, head, i);
+
+		if (tag->track_offset[head][i] != 0)
+		{
+			LOG_FORMATS("G64 side %u track %.1f offset %05x length %04x ", head, get_dos_track(i), tag->track_offset[head][i], tag->track_size[head][i]);
+
+			track_offs = tag->track_offset[head][i];
+
+			if (tag->speed_zone_offset[head][i] < 4) {
+				LOG_FORMATS("speed %u\n", tag->speed_zone_offset[head][i]);
+			} else {
+				LOG_FORMATS("speed offset %04x\n", tag->speed_zone_offset[head][i]);
+			}
+		}
+	}
+
+	pos = track_offs + 2 + track_size;
+}
+
 FLOPPY_CONSTRUCT( g64_dsk_construct )
 {
 	struct FloppyCallbacks *callbacks;
 	struct g64dsk_tag *tag;
-	UINT8 header[HEADER_LENGTH];
-	UINT64 pos = 0xc;
-	int i;
+	UINT64 pos = 0;
 
 	if (params)
 	{
@@ -442,43 +509,17 @@ FLOPPY_CONSTRUCT( g64_dsk_construct )
 
 	if (!tag) return FLOPPY_ERROR_OUTOFMEMORY;
 
-	// read header
-	floppy_image_read(floppy, header, 0, HEADER_LENGTH);
+	tag->heads = 0;
+	int head = 0;
 
-	// get version
-	tag->version = header[8];
-	LOG_FORMATS("G64 version: %u\n", tag->version);
+	read_g64_header(floppy, tag, head, pos);
 
-	// get number of tracks
-	tag->heads = 1;
-	tag->tracks = header[9];
-	LOG_FORMATS("G64 tracks: %u\n", tag->tracks);
-
-	// get data offsets
-	for (i = 0; i < tag->tracks; i++)
+	if (floppy_image_size(floppy) > pos)
 	{
-		tag->track_offset[i] = pick_integer_le(header, pos, 4);
-		pos += 4;
-	}
+		tag->heads++;
+		head++;
 
-	// get speed zone information
-	for (i = 0; i < tag->tracks; i++)
-	{
-		tag->speed_zone_offset[i] = pick_integer_le(header, pos, 4);
-		pos += 4;
-
-		tag->track_size[i] = g64_get_track_size(floppy, 0, i);
-
-		if (tag->track_offset[i] > 0)
-		{
-			LOG_FORMATS("G64 track %.1f offset %05x length %04x ", get_dos_track(i), tag->track_offset[i], tag->track_size[i]);
-
-			if (tag->speed_zone_offset[i] < 4) {
-				LOG_FORMATS("speed %u\n", tag->speed_zone_offset[i]);
-			} else {
-				LOG_FORMATS("speed offset %04x\n", tag->speed_zone_offset[i]);
-			}
-		}
+		read_g64_header(floppy, tag, head, pos);
 	}
 
 	// set callbacks

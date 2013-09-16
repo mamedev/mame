@@ -662,7 +662,7 @@ SLOT_INTERFACE_END
 //-------------------------------------------------
 
 static LEGACY_FLOPPY_OPTIONS_START( c1571 )
-	LEGACY_FLOPPY_OPTION( c1571, "g64", "Commodore 1541 GCR Disk Image", g64_dsk_identify, g64_dsk_construct, NULL, NULL )
+	LEGACY_FLOPPY_OPTION( c1571, "g64,g71", "Commodore 1541/1571 GCR Disk Image", g64_dsk_identify, g64_dsk_construct, NULL, NULL )
 	LEGACY_FLOPPY_OPTION( c1571, "d64", "Commodore 1541 Disk Image", d64_dsk_identify, d64_dsk_construct, NULL, NULL )
 	LEGACY_FLOPPY_OPTION( c1571, "d71", "Commodore 1571 Disk Image", d71_dsk_identify, d64_dsk_construct, NULL, NULL )
 LEGACY_FLOPPY_OPTIONS_END
