@@ -213,26 +213,66 @@ Stephh's notes (based on the games M6502 code and some tests) :
 
 
 /*****************************************************************************************/
-/* Emulate Protection ( only for original express raider, code is cracked on the bootleg */
+/* Emulate DECO 291 protection (for original express raider, code is cracked on the bootleg)*/
 /*****************************************************************************************/
 
-READ8_MEMBER(exprraid_state::exprraid_protection_r)
+READ8_MEMBER(exprraid_state::exprraid_prot_data_r)
 {
-	switch (offset)
-	{
-	case 0:
-		return m_main_ram[0x02a9];
-	case 1:
-		return 0x02;
-	}
+	return m_prot_value;
+}
 
-	return 0;
+READ8_MEMBER(exprraid_state::exprraid_prot_status_r)
+{
+	/*
+		76543210
+		.......x	?
+		......x.	Device data available
+		.....x..	CPU data available (cleared by device)
+	*/
+
+	return 0x02;
+}
+
+WRITE8_MEMBER(exprraid_state::exprraid_prot_data_w)
+{
+	switch (data)
+	{
+		case 0x20:
+			// Written when CPU times out waiting for status
+			break;
+
+		case 0x60:
+			// ?
+			break;
+
+		case 0x80:
+			++m_prot_value;
+			break;
+
+		case 0x90:
+			m_prot_value = 0;
+			break;
+
+		default:
+			logerror("Unknown protection write: %x at PC:%x\n", data, space.device().safe_pc());
+	}
+}
+
+READ8_MEMBER(exprraid_state::sound_cpu_command_r)
+{
+	m_slave->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	return soundlatch_byte_r(space, 0);
 }
 
 WRITE8_MEMBER(exprraid_state::sound_cpu_command_w)
 {
 	soundlatch_byte_w(space, 0, data);
-	m_slave->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_slave->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+}
+
+WRITE8_MEMBER(exprraid_state::exprraid_int_clear_w)
+{
+	m_maincpu->set_input_line(DECO16_IRQ_LINE, CLEAR_LINE);
 }
 
 READ8_MEMBER(exprraid_state::vblank_r)
@@ -240,26 +280,26 @@ READ8_MEMBER(exprraid_state::vblank_r)
 	return ioport("IN0")->read();
 }
 
+
 static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, exprraid_state )
 	AM_RANGE(0x0000, 0x05ff) AM_RAM AM_SHARE("main_ram")
 	AM_RANGE(0x0600, 0x07ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(exprraid_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(exprraid_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x1317, 0x1317) AM_READNOP // ???
-	AM_RANGE(0x1700, 0x1700) AM_READNOP // ???
 	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("DSW0")   /* DSW 0 */
 	AM_RANGE(0x1801, 0x1801) AM_READ_PORT("IN1")    /* Controls */
 	AM_RANGE(0x1802, 0x1802) AM_READ_PORT("IN2")    /* Coins */
 	AM_RANGE(0x1803, 0x1803) AM_READ_PORT("DSW1")   /* DSW 1 */
-	AM_RANGE(0x2000, 0x2000) AM_WRITENOP // ???
+	AM_RANGE(0x2000, 0x2000) AM_WRITE(exprraid_int_clear_w)
 	AM_RANGE(0x2001, 0x2001) AM_WRITE(sound_cpu_command_w)
 	AM_RANGE(0x2002, 0x2002) AM_WRITE(exprraid_flipscreen_w)
-	AM_RANGE(0x2003, 0x2003) AM_WRITENOP // ???
-	AM_RANGE(0x2800, 0x2801) AM_READ(exprraid_protection_r)
+	AM_RANGE(0x2003, 0x2003) AM_WRITENOP // DMA SWAP - Allow writes to video and sprite RAM
+	AM_RANGE(0x2800, 0x2800) AM_READ(exprraid_prot_data_r)
+	AM_RANGE(0x2801, 0x2801) AM_READ(exprraid_prot_status_r)
 	AM_RANGE(0x2800, 0x2803) AM_WRITE(exprraid_bgselect_w)
 	AM_RANGE(0x2804, 0x2804) AM_WRITE(exprraid_scrolly_w)
 	AM_RANGE(0x2805, 0x2806) AM_WRITE(exprraid_scrollx_w)
-	AM_RANGE(0x2807, 0x2807) AM_WRITENOP    // Scroll related ?
+	AM_RANGE(0x2807, 0x2807) AM_WRITE(exprraid_prot_data_w)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -271,13 +311,15 @@ static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8, exprraid_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
 	AM_RANGE(0x4000, 0x4001) AM_DEVREADWRITE("ym2", ym3526_device, read, write)
-	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x6000, 0x6000) AM_READ(sound_cpu_command_r)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
+
 INPUT_CHANGED_MEMBER(exprraid_state::coin_inserted_deco16)
 {
-	m_maincpu->set_input_line(DECO16_IRQ_LINE, oldval ? ASSERT_LINE : CLEAR_LINE);
+	if (oldval && !newval)
+		m_maincpu->set_input_line(DECO16_IRQ_LINE, ASSERT_LINE);
 }
 
 INPUT_CHANGED_MEMBER(exprraid_state::coin_inserted_nmi)
@@ -336,8 +378,8 @@ static INPUT_PORTS_START( exprraid )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, exprraid_state, coin_inserted_deco16, 0)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, exprraid_state, coin_inserted_deco16, 0)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, exprraid_state, coin_inserted_deco16, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, exprraid_state, coin_inserted_deco16, 0)
 
 	PORT_START("DSW1")  /* 0x1803 */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )            PORT_DIPLOCATION("SW2:1,2")
@@ -356,9 +398,7 @@ static INPUT_PORTS_START( exprraid )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION("SW2:6")     /* see notes */
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Force Coinage = 1C/1C" )     PORT_DIPLOCATION("SW2:7")     /* see notes */
-	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, exprraid_state, coin_inserted_deco16, 0)
 	PORT_DIPUNUSED_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW1:8" )
 INPUT_PORTS_END
 
@@ -368,6 +408,7 @@ static INPUT_PORTS_START( exprboot )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, exprraid_state, coin_inserted_nmi, 0)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, exprraid_state, coin_inserted_nmi, 0)
 INPUT_PORTS_END
+
 
 static const gfx_layout charlayout =
 {
@@ -432,36 +473,15 @@ static GFXDECODE_START( exprraid )
 GFXDECODE_END
 
 
-
 /* handler called by the 3812 emulator when the internal timers cause an IRQ */
 WRITE_LINE_MEMBER(exprraid_state::irqhandler)
 {
 	m_slave->set_input_line_and_vector(0, state, 0xff);
 }
 
-#if 0
-INTERRUPT_GEN_MEMBER(exprraid_state::exprraid_interrupt)
-{
-	if ((~ioport("IN2")->read()) & 0xc0)
-	{
-		if (m_coin == 0)
-		{
-			m_coin = 1;
-			//device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-			device.execute().set_input_line(DECO16_IRQ_LINE, ASSERT_LINE);
-		}
-	}
-	else
-	{
-		device.execute().set_input_line(DECO16_IRQ_LINE, CLEAR_LINE);
-		m_coin = 0;
-	}
-}
-#endif
-
-
 void exprraid_state::machine_start()
 {
+	save_item(NAME(m_prot_value));
 	save_item(NAME(m_bg_index));
 }
 
@@ -473,16 +493,19 @@ void exprraid_state::machine_reset()
 	m_bg_index[3] = 0;
 }
 
+
 static MACHINE_CONFIG_START( exprraid, exprraid_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", DECO16, 4000000)        /* 4 MHz ??? */
+	MCFG_CPU_ADD("maincpu", DECO16, XTAL_12MHz / 8)
 	MCFG_CPU_PROGRAM_MAP(master_map)
 	MCFG_CPU_IO_MAP(master_io_map)
 
-	MCFG_CPU_ADD("slave", M6809, 2000000)        /* 2 MHz ??? */
+	MCFG_CPU_ADD("slave", M6809, XTAL_12MHz / 8)
 	MCFG_CPU_PROGRAM_MAP(slave_map)
-								/* IRQs are caused by the YM3526 */
+	/* IRQs are caused by the YM3526 */
+
+	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -500,17 +523,17 @@ static MACHINE_CONFIG_START( exprraid, exprraid_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ym1", YM2203, 1500000)
+	MCFG_SOUND_ADD("ym1", YM2203, XTAL_12MHz / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("ym2", YM3526, 3600000)
+	MCFG_SOUND_ADD("ym2", YM3526, XTAL_12MHz / 4)
 	MCFG_YM3526_IRQ_HANDLER(WRITELINE(exprraid_state, irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( exprboot, exprraid )
 
-	MCFG_CPU_REPLACE("maincpu", M6502, 4000000)        /* 4 MHz ??? */
+	MCFG_CPU_REPLACE("maincpu", M6502, 1500000)        /* 1.5 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(master_map)
 MACHINE_CONFIG_END
 
