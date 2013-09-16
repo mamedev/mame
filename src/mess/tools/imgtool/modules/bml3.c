@@ -394,8 +394,10 @@ static imgtoolerr_t get_file_size(struct bml3_dirent *ent, imgtool_image *img, c
 			ferr = read_granule(img, granule_list->granules[granule_list->granule_count-1], info->sector_size * (granule_list->last_granule_sectors - 1), info->sector_size, buf);
 			if (ferr)
 				return imgtool_floppy_error(ferr);
-			for (last_sector_bytes = info->sector_size - 1; last_sector_bytes >= 0; last_sector_bytes--) {
+			for (last_sector_bytes = info->sector_size - 1; ; last_sector_bytes--) {
 				if (buf[last_sector_bytes] != 0)
+					break;
+				if (last_sector_bytes == 0)
 					break;
 			}
 			if (buf[last_sector_bytes] != 0x1a) {
@@ -409,7 +411,7 @@ static imgtoolerr_t get_file_size(struct bml3_dirent *ent, imgtool_image *img, c
 	}
 
 	// TODO is it valid for last_sector_bytes == 0?
-	if (last_sector_bytes < 0 || last_sector_bytes > info->sector_size) {
+	if (last_sector_bytes > info->sector_size) {
 		return IMGTOOLERR_CORRUPTIMAGE;
 	}
 	*size += last_sector_bytes;
