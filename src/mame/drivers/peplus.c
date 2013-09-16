@@ -1773,7 +1773,7 @@ ROM_START( pexmp006 ) /* Superboard : Multi-Poker (XMP00006) - Bonus Poker, Bonu
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "xm00002p.u66",   0x00000, 0x10000, CRC(96cf471c) SHA1(9597bf6a80c392ee22dc4606db610fdaf032377f) )
-	/* Can also be found with XM00001P or XM00003P for different payout tables */
+	/* Can be found with any of the following Payout Table roms: XM00001P, XM00002P, XM00003P or XM00006P */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "mro-cg2174.u77",  0x00000, 0x8000, CRC(bb666733) SHA1(dcaa1980b051a554cb0f443b1183a680edc9ad3f) )
