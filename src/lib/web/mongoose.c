@@ -4007,7 +4007,7 @@ static void read_websocket(struct mg_connection *conn) {
 	// so the queue begins after it.
 	unsigned char *buf = (unsigned char *) conn->buf + conn->request_len;
 	int bits, n, stop = 0;
-	size_t i, len, mask_len, data_len, header_len, body_len;
+	size_t i, len, mask_len = 0, data_len = 0, header_len, body_len;
 	// data points to the place where the message is stored when passed to the
 	// websocket_data callback. This is either mem on the stack,
 	// or a dynamically allocated buffer if it is too large.
