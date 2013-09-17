@@ -82,7 +82,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile3_info);
 
 	int       m_oki_bank;
-	UINT16	m_gfx_control;
+	UINT16  m_gfx_control;
 
 	DECLARE_WRITE16_HANDLER(gfx_ctrl_w);
 	DECLARE_WRITE16_HANDLER(tilemap1_scrollx_w);
@@ -177,8 +177,6 @@ void _3x3puzzle_state::video_start()
 
 UINT32 _3x3puzzle_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
-
-
 	m_tilemap1->draw(screen, bitmap, cliprect, 0, 1);
 	m_tilemap2->draw(screen, bitmap, cliprect, 0, 2);
 	m_tilemap3->draw(screen, bitmap, cliprect, 0, 3);
@@ -241,7 +239,7 @@ static INPUT_PORTS_START( _3x3puzzle )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
-	
+
 	PORT_START("SYS")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -308,22 +306,22 @@ static INPUT_PORTS_START( casanova )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
 
 	PORT_MODIFY("DSW01") /* Do NOT trust "DIP INFO" for correct settings! At least Coinage is WRONG! */
-	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Coinage ) )	PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(      0x0002, DEF_STR( 1C_2C ) ) /* Dip info shows 2 Coins / Credit */
 	PORT_DIPSETTING(      0x0003, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( 2C_1C ) ) /* Dip info shows 3 Coins / Credit */
 	PORT_DIPSETTING(      0x0000, DEF_STR( 3C_1C ) ) /* Dip info shows 5 Coins / Credit */
-	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(      0x0008, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x000c, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Very_Hard ) )
-	PORT_DIPNAME( 0x0010, 0x0000, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x0010, 0x0000, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPUNUSED_DIPLOC( 0x0020, 0x0020, "SW1:6" )
 	PORT_DIPUNUSED_DIPLOC( 0x0040, 0x0040, "SW1:7" )
-	PORT_DIPNAME( 0x0080, 0x0080, "Dip Info" )		PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x0080, 0x0080, "Dip Info" )      PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPUNUSED_DIPLOC( 0x0100, 0x0100, "SW2:1" )        /* DSW2 bank, not used? */
@@ -480,7 +478,7 @@ ROM_START( casanova )
 	ROM_LOAD32_BYTE( "casanova.u81", 0x200000, 0x80000, CRC(9eafd37d) SHA1(bc9e7a035849f23da48c9d923188c61188d93c43) )
 	ROM_LOAD32_BYTE( "casanova.u83", 0x200001, 0x80000, CRC(9d4ce407) SHA1(949c7f329bd348beff4f14ac7b506c8aef212ad8) )
 	ROM_LOAD32_BYTE( "casanova.u85", 0x200002, 0x80000, CRC(113c6e3a) SHA1(e90d78c4415d244004734a481501f8040f8aa468) )
-	ROM_LOAD32_BYTE( "casanova.u87", 0x200003, 0x80000, CRC(61bd80f8) SHA1(13b93f2638c37a5dec5b4016c058f486f9cbadae) )	
+	ROM_LOAD32_BYTE( "casanova.u87", 0x200003, 0x80000, CRC(61bd80f8) SHA1(13b93f2638c37a5dec5b4016c058f486f9cbadae) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 )
 	ROM_LOAD32_BYTE( "casanova.u39", 0x000003, 0x80000, CRC(97d4095a) SHA1(4b1fde984025fae240bf64f812d67bc9cbf3a60c) )

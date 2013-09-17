@@ -26,5 +26,3 @@ public:
 	DECLARE_MACHINE_START( ms_megadriv );   // setup ioport_port + install cartslot handlers
 	DECLARE_MACHINE_RESET( ms_megadriv );
 };
-
-

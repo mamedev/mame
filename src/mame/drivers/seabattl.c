@@ -525,7 +525,7 @@ static MACHINE_CONFIG_START( seabattl, seabattl_state )
 
 	MCFG_S2636_ADD("s2636", s2636_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
-	
+
 	MCFG_DM9368_ADD("sc_thousand", digit_score_thousand_intf)
 	MCFG_DM9368_ADD("sc_hundred", digit_score_hundred_intf)
 	MCFG_DM9368_ADD("sc_half", digit_score_half_a_score_intf)

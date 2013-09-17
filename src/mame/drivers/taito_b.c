@@ -2994,7 +2994,7 @@ ROM_START( tetrist ) // Nastar / Nastar Warrior / Rastan Saga 2 conversion with 
 	  the game doesn't use any tiles from here but the roms must be present on the board to avoid
 	  tile 0 being solid and obscuring the bitmap (however if we load them in the correct region
 	  unwanted tiles from here are shown after gameover which is wrong) - There is an undumped PAL
-          C12-01 that controls this effect.
+	      C12-01 that controls this effect.
 	 */
 	ROM_LOAD( "b81-03.14", 0x000000, 0x080000, CRC(551b75e6) SHA1(5b8388ee2c6262f359c9e6d04c951ea8dc3901c9) )
 	ROM_LOAD( "b81-04.15", 0x080000, 0x080000, CRC(cf734e12) SHA1(4201a74468058761454515738fbf3a7b22a66e00) )
@@ -3024,7 +3024,7 @@ ROM_START( tetrista ) // Master of Weapon conversion with graphics ROMs left in 
 	  the game doesn't use any tiles from here but the roms must be present on the board to avoid
 	  tile 0 being solid and obscuring the bitmap (however if we load them in the correct region
 	  unwanted tiles from here are shown after gameover which is wrong) - There is an undumped PAL
-          C35-06 that controls this effect.
+	      C35-06 that controls this effect.
 	 */
 	ROM_LOAD( "b72-02.6", 0x000000, 0x080000, CRC(843444eb) SHA1(2b466045f882996c80e0090009ee957e11d32825) )
 	ROM_LOAD( "b72-01.5", 0x080000, 0x080000, CRC(a24ac26e) SHA1(895715a2bb0cb15334cba2283bd228b4fc08cd0c) )

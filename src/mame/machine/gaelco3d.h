@@ -89,14 +89,14 @@ public:
 
 	/* only used in radikalb, set at beginning of receive isr, cleared at end */
 	DECLARE_WRITE8_MEMBER( irq_enable );
-	
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_stop();
 	virtual void device_reset();
-	
+
 private:
 	// internal state
 	devcb_resolved_write_line m_irq_func;
@@ -111,7 +111,7 @@ private:
 	buf_t *m_out_ptr;
 	osd_shared_mem *m_os_shmem;
 	shmem_t *m_shmem;
-	
+
 	TIMER_CALLBACK_MEMBER( set_status_cb );
 	TIMER_CALLBACK_MEMBER( link_cb );
 	void set_status(UINT8 mask, UINT8 set, int wait);

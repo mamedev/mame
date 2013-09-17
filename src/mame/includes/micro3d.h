@@ -185,7 +185,7 @@ public:
 	~micro3d_sound_device() {}
 
 	void noise_sh_w(UINT8 data);
-	
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();

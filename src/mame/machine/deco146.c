@@ -95,8 +95,6 @@
 
 
 deco146port_xx port_table[] = {
-
-
 /* 0x000 */ { 0x08a,           {  NIB1__, NIB2__, NIB3__, BLANK_ },  0, 1 },
 /* 0x002 */ { 0x0aa,           {  NIB3__, NIB2__, NIB0__, NIB1__ },  0, 0 },
 /* 0x004 */ { 0x018,           {  NIB2R2, NIB3__, BLANK_, BLANK_ },  0, 1 },

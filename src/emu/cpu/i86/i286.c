@@ -1956,4 +1956,3 @@ void i80286_cpu_device::check_permission(UINT8 check_seg, UINT32 offset, UINT16 
 			throw TRAP(trap, 0);
 	}
 }
-

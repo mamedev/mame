@@ -323,7 +323,7 @@ static MACHINE_CONFIG_START( namcond1, namcond1_state )
 	MCFG_SOUND_ROUTE(3, "lspeaker", 1.00)
 
 	MCFG_AT28C16_ADD( "at28c16", NULL )
-	
+
 	MCFG_YGV608_ADD("ygv608")
 MACHINE_CONFIG_END
 

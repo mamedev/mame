@@ -21,32 +21,32 @@ Pico mainboard (PAL version)
 |   |                              |                                    +-+                                  |
 |   |                              |                 +--+               |B|        +-+                       |
 |   |                              |                 |A3|               +-+        | |                       |
-|   +------------------------------+                 +--+                          |C|                     +-|                             
+|   +------------------------------+                 +--+                          |C|                     +-|
 |                                                                                  | |                     | |
 |    GCMK-C2X                                                                      +-+                     | --> PEN
-|                                 +-----+     +--+                                                         +-| 
-|                                 |     |     |A3|            +--------+                                     |      
-|                                 | A1  |     +--+            |        |              +---------+            |         
+|                                 +-----+     +--+                                                         +-|
+|                                 |     |     |A3|            +--------+                                     |
+|                                 | A1  |     +--+            |        |              +---------+            |
 |          SEGA                   |     |                     |    A2  |              |HM53861J |            |
-|     1994 837-10846              +-----+                     |        |              |         |            |     
-|      IAC MAIN PAL                                           +--------+              +---------+            |               
+|     1994 837-10846              +-----+                     |        |              |         |            |
+|      IAC MAIN PAL                                           +--------+              +---------+            |
 |     MADE IN JAPAN                                                        +----+                            |
-|           VA0          +----------+                                      |XTAL|                         +--+            
-|                        |   SEGA   |         +---------+                  |    |                         |  <-- VCC IN         
+|           VA0          +----------+                                      |XTAL|                         +--+
+|                        |   SEGA   |         +---------+                  |    |                         |  <-- VCC IN
 |                        | 315-5640 |         |MC68HC000|                  |53.2|                         +--+
-|                        | 9434 W51 |         |FN8-A    |  +----+          |00  |    +----------+            |                  
-|                        |          |         |         |  |    |          +----+    |   SEGA   |            |        
-|                        |          |         |  2B89N  |  |    |                    | 315-5313A|            |  
-|                        |          |         |S0AH9425A|  | A4 |                    |   F1001  |         +--|     
-|                        +----------+         +---------+  |    |                    |          |         |  |                      
+|                        | 9434 W51 |         |FN8-A    |  +----+          |00  |    +----------+            |
+|                        |          |         |         |  |    |          +----+    |   SEGA   |            |
+|                        |          |         |  2B89N  |  |    |                    | 315-5313A|            |
+|                        |          |         |S0AH9425A|  | A4 |                    |   F1001  |         +--|
+|                        +----------+         +---------+  |    |                    |          |         |  |
 |                                                          |    |                    |9428 LAGG |         |  --> VIDEO OUT
 |                                                          |    |                    |          |         |  |
-|                                                          +----+                    +----------+         +--|            
+|                                                          +----+                    +----------+         +--|
 |                                                                                                            |
 |                                                                     +----------------------------+         |
 |                                                                     ||||||CARTRIDGE CONNECTOR|||||         |
 |                                                                     +----------------------------+         |
-|                                                                                                            | 
+|                                                                                                            |
 +------------------------------------------------------------------------------------------------------------+
 
 A1 = SEGA / 315-5641 / D77591 / 9442CA010
@@ -130,7 +130,7 @@ class pico_base_state : public md_cons_state
 {
 public:
 	pico_base_state(const machine_config &mconfig, device_type type, const char *tag)
-		: md_cons_state(mconfig, type, tag), 
+		: md_cons_state(mconfig, type, tag),
 	m_upd7759(*this, "7759") { }
 
 	optional_device<upd7759_device> m_upd7759;
@@ -271,7 +271,7 @@ READ16_MEMBER(pico_base_state::pico_68k_io_read )
 static void sound_cause_irq( device_t *device, int chip )
 {
 	pico_base_state *state = device->machine().driver_data<pico_base_state>();
-//	printf("sound irq\n");
+//  printf("sound irq\n");
 	/* upd7759 callback */
 	state->m_maincpu->set_input_line(3, HOLD_LINE);
 }
@@ -285,11 +285,10 @@ const upd775x_interface pico_upd7759_interface  =
 
 WRITE16_MEMBER(pico_base_state::pico_68k_io_write )
 {
-//	printf("pico_68k_io_write %04x %04x %04x\n", offset*2, data, mem_mask);
+//  printf("pico_68k_io_write %04x %04x %04x\n", offset*2, data, mem_mask);
 
 	switch (offset)
 	{
-
 		case 0x12/2: // guess
 			m_upd7759->reset_w(0);
 			m_upd7759->start_w(0);
@@ -471,11 +470,11 @@ MMG-1
             |                                                                        |FL-1|  |FL-1|                      |             |     |  E |
             |                                                                        |0   |  |0   |                      |             |     |  D |
             |                                                                        |    |  |    |                      |             |     |    |
-            |--+                                                                     +----+  +----+                      +-------------+     |    |  
+            |--+                                                                     +----+  +----+                      +-------------+     |    |
           +--  |                                                                                                                             |  C |
           | |--+                                                                                                                             |  O |
 S-AUDIO <-| |                              +-----------+           +-------+                                                                 |  N |
-          | |--+                           |   SEGA    |           | SEGA  |          +-----------+                                          |  N |      
+          | |--+                           |   SEGA    |           | SEGA  |          +-----------+                                          |  N |
           +--  |                           | 315-5640  |           |315-564|          |   3D4 UA  |                                          |  E |
             |--+                           | 9333 W26  |           |1      |          |HD68HC000CP|                                          |  C |
             |                              |           |           |D77591 |          |8          |                                          |  T |

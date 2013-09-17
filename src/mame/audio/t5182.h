@@ -32,7 +32,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_handler);
 	DECLARE_WRITE8_MEMBER(ym2151_irq_ack_w);
 	DECLARE_WRITE8_MEMBER(cpu_irq_ack_w);
-		
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -45,7 +45,7 @@ private:
 	int m_irqstate;
 	int m_semaphore_main;
 	int m_semaphore_snd;
-	
+
 	TIMER_CALLBACK_MEMBER( setirq_callback );
 };
 

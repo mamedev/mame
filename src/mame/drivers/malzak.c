@@ -364,7 +364,7 @@ static MACHINE_CONFIG_START( malzak, malzak_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_S2636_ADD("s2636_1", malzac_s2636_1_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	
+
 	MCFG_SAA5050_ADD("saa5050", 6000000, malzac_saa5050_intf)
 
 	/* sound hardware */

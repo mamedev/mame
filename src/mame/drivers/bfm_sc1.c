@@ -182,7 +182,7 @@ public:
 	int Scorpion1_GetSwitchState(int strobe, int data);
 	int sc1_find_project_string( );
 	required_device<cpu_device> m_maincpu;
-	optional_device<upd7759_device> m_upd7759;	
+	optional_device<upd7759_device> m_upd7759;
 };
 
 #define VFD_RESET  0x20
@@ -1092,7 +1092,7 @@ static MACHINE_CONFIG_DERIVED( scorpion1_adder2, scorpion1 )
 	MCFG_CPU_PROGRAM_MAP(sc1_adder2)                // setup read and write memorymap
 
 	MCFG_DEFAULT_LAYOUT(layout_sc1_vid)
-	
+
 	MCFG_BFM_ADDER2_ADD("adder2")
 MACHINE_CONFIG_END
 

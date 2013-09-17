@@ -6167,4 +6167,3 @@ CPU_GET_INFO( rsp_drc )
 }
 
 DEFINE_LEGACY_CPU_DEVICE(RSP_DRC, rsp_drc);
-

@@ -77,7 +77,7 @@ WRITE8_MEMBER( dsb46_state::port1a_w )
 {
 	membank("read")->set_entry(data & 1);
 }
-	
+
 READ8_MEMBER( dsb46_state::port01_r )
 {
 	return (m_term_data) ? 5 : 4;

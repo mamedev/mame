@@ -262,7 +262,7 @@ ROM_END
 //           TAITO Type X  Model 006B   No 150FG0217  AC100V  50/60Hz 2.5A
 //           Windows(R) XP Embedded    00039-111-243-487    X11-15305
 //
-//			 USAGI   M9006613A  VER.2.04JPN     40.0GB  WD  WD400BB-22JHCO
+//           USAGI   M9006613A  VER.2.04JPN     40.0GB  WD  WD400BB-22JHCO
 ROM_START( usagiol )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD("taito_type_x_bios.bin", 0x00, 0x10000, NO_DUMP ) // size unknown.

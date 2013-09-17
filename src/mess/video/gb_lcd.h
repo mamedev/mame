@@ -36,7 +36,7 @@ struct layer_struct {
 };
 
 
-class gb_lcd_device : 	public device_t,
+class gb_lcd_device :   public device_t,
 						public device_video_interface
 {
 public:

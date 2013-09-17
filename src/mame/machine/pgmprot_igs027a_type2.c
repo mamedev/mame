@@ -165,7 +165,7 @@ WRITE32_MEMBER(pgm_arm_type2_state::kov2p_arm_region_w )
 {
 	int pc = space.device().safe_pc();
 	int regionhack = ioport("RegionHack")->read();
-//	printf("%08x\n", pc);
+//  printf("%08x\n", pc);
 	if (pc==0x1b0 && regionhack != 0xff) data = (data & 0xffff0000) | (regionhack << 0);
 	COMBINE_DATA(&m_arm7_shareram[0x138/4]);
 }

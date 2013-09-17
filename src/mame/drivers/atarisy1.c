@@ -731,7 +731,7 @@ static MACHINE_CONFIG_START( atarisy1, atarisy1_state )
 
 	MCFG_MACHINE_START_OVERRIDE(atarisy1_state,atarisy1)
 	MCFG_MACHINE_RESET_OVERRIDE(atarisy1_state,atarisy1)
-	
+
 	MCFG_ATARI_EEPROM_2804_ADD("eeprom")
 
 	MCFG_TIMER_DRIVER_ADD("joystick_timer", atarisy1_state, delayed_joystick_int)
@@ -746,7 +746,7 @@ static MACHINE_CONFIG_START( atarisy1, atarisy1_state )
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield", 2, atarisy1_state, get_playfield_tile_info, 8,8, SCAN_ROWS, 64,64)
 	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", 2, atarisy1_state, get_alpha_tile_info, 8,8, SCAN_ROWS, 64,32, 0)
-	
+
 	MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "screen", atarisy1_state::s_mob_config)
 
 	MCFG_SCREEN_ADD("screen", RASTER)

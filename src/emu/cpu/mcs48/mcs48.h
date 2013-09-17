@@ -484,9 +484,9 @@ public:
 	i8021_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-    // device_execute_interface overrides
-    virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const { return (clocks + 30 - 1) / 30; }
-    virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const { return (cycles * 30); }
+	// device_execute_interface overrides
+	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const { return (clocks + 30 - 1) / 30; }
+	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const { return (cycles * 30); }
 };
 
 class i8022_device : public mcs48_cpu_device
@@ -496,9 +496,9 @@ public:
 	i8022_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-    // device_execute_interface overrides
-    virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const { return (clocks + 30 - 1) / 30; }
-    virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const { return (cycles * 30); }
+	// device_execute_interface overrides
+	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const { return (clocks + 30 - 1) / 30; }
+	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const { return (cycles * 30); }
 };
 
 class i8035_device : public mcs48_cpu_device

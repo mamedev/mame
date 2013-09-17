@@ -52,7 +52,7 @@ sp0250_device::sp0250_device(const machine_config &mconfig, const char *tag, dev
 	{
 		m_fifo[i] = 0;
 	}
-	
+
 	for (int i = 0; i < 6; i++)
 	{
 		m_filter[i].F = 0;
@@ -88,7 +88,7 @@ void sp0250_device::device_config_complete()
 void sp0250_device::device_start()
 {
 	const sp0250_interface *intf = reinterpret_cast<const sp0250_interface *>(static_config());
-	
+
 	m_RNG = 1;
 	m_drq = ( intf!= NULL) ? m_drq_callback : NULL;
 	if (m_drq != NULL)
@@ -98,7 +98,7 @@ void sp0250_device::device_start()
 	}
 
 	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock() / CLOCK_DIVIDER, this);
-		
+
 	save_item(NAME(m_amp));
 	save_item(NAME(m_pitch));
 	save_item(NAME(m_repeat));

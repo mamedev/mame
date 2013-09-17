@@ -102,8 +102,7 @@
 
 #define MCFG_ATARI_VAD_MOB(_config) \
 	{ astring fulltag(device->tag(), ":mob"); device_t *device; \
-	MCFG_ATARI_MOTION_OBJECTS_ADD(fulltag, "^^screen", _config) } \
-
+	MCFG_ATARI_MOTION_OBJECTS_ADD(fulltag, "^^screen", _config) }
 
 
 #define MCFG_ATARI_EEPROM_2804_ADD(_tag) \
@@ -202,7 +201,7 @@ private:
 // device type definition
 extern const device_type ATARI_VAD;
 
-class atari_vad_device :  	public device_t,
+class atari_vad_device :    public device_t,
 							public device_video_interface
 {
 public:
@@ -298,7 +297,7 @@ public:
 	DECLARE_WRITE16_MEMBER(unlock_write);
 	DECLARE_READ32_MEMBER(unlock_read);
 	DECLARE_WRITE32_MEMBER(unlock_write);
-	
+
 	// EEPROM read/write
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
@@ -310,9 +309,9 @@ protected:
 
 	// internal state
 	required_device<eeprom_parallel_28xx_device> m_eeprom;
-	
+
 	// live state
-	bool		m_unlocked;
+	bool        m_unlocked;
 };
 
 class atari_eeprom_2804_device : public atari_eeprom_device
@@ -337,7 +336,7 @@ protected:
 	virtual machine_config_constructor device_mconfig_additions() const;
 };
 
-	
+
 
 /***************************************************************************
     TYPES & STRUCTURES

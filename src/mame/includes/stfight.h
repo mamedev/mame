@@ -38,7 +38,7 @@ public:
 	UINT16 m_adpcm_data_offs;
 	UINT8 m_adpcm_nibble;
 	UINT8 m_adpcm_reset;
-	
+
 	UINT8 m_coin_state;
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
@@ -62,7 +62,7 @@ public:
 	DECLARE_WRITE8_MEMBER(stfight_text_attr_w);
 	DECLARE_WRITE8_MEMBER(stfight_sprite_bank_w);
 	DECLARE_WRITE8_MEMBER(stfight_vh_latch_w);
-	DECLARE_WRITE8_MEMBER(cshooter_text_w);	
+	DECLARE_WRITE8_MEMBER(cshooter_text_w);
 
 	DECLARE_READ8_MEMBER(stfight_fm_r);
 

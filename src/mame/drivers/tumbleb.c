@@ -2155,8 +2155,8 @@ static MACHINE_CONFIG_START( htchctch, tumbleb_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	/* on at least hatch catch, cookie & bibi and choky choky the YM2151 clock is connected
-           directly to the Z80 clock so the speed should match */
-        MCFG_YM2151_ADD("ymsnd", 15000000/4)
+	       directly to the Z80 clock so the speed should match */
+		MCFG_YM2151_ADD("ymsnd", 15000000/4)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.10)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.10)
@@ -2173,9 +2173,9 @@ static MACHINE_CONFIG_DERIVED( cookbib, htchctch )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( chokchok, htchctch )
-        MCFG_OKIM6295_REPLACE("oki", 3579545/4, OKIM6295_PIN7_HIGH)
-        MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-        MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+		MCFG_OKIM6295_REPLACE("oki", 3579545/4, OKIM6295_PIN7_HIGH)
+		MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+		MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( cookbib_mcu, htchctch )

@@ -316,7 +316,7 @@ static MACHINE_CONFIG_START( galaxia, galaxia_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_S2636_ADD("s2636_2", galaxia_s2636_config[2])
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

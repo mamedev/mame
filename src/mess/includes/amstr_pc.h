@@ -18,10 +18,10 @@ public:
 		m_lpt1(*this, "lpt_1"),
 		m_lpt2(*this, "lpt_2")
 			{ m_mouse.x =0; m_mouse.y=0;}
-	
+
 	required_device<pc_lpt_device> m_lpt1;
 	required_device<pc_lpt_device> m_lpt2;
-	
+
 	DECLARE_READ8_MEMBER( pc1640_port60_r );
 	DECLARE_WRITE8_MEMBER( pc1640_port60_w );
 

@@ -20,7 +20,7 @@ const device_type UPD7752 = &device_creator<upd7752_device>;
 
 /* TODO: unknown exact size */
 static ADDRESS_MAP_START( upd7752_ram, AS_0, 8, upd7752_device )
-//	AM_RANGE(0x0000, 0x7fff) AM_ROM
+//  AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x0000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -34,9 +34,9 @@ ADDRESS_MAP_END
 
 upd7752_device::upd7752_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, UPD7752, "uPD7752", tag, owner, clock, "upd7752", __FILE__),
-	  device_sound_interface(mconfig, *this),
-	  device_memory_interface(mconfig, *this),
-	  m_space_config("ram", ENDIANNESS_LITTLE, 8, 16, 0, NULL, *ADDRESS_MAP_NAME(upd7752_ram))
+		device_sound_interface(mconfig, *this),
+		device_memory_interface(mconfig, *this),
+		m_space_config("ram", ENDIANNESS_LITTLE, 8, 16, 0, NULL, *ADDRESS_MAP_NAME(upd7752_ram))
 {
 }
 
@@ -80,7 +80,6 @@ void upd7752_device::device_reset()
 
 void upd7752_device::device_stop()
 {
-
 }
 
 //-------------------------------------------------
@@ -155,7 +154,7 @@ WRITE8_MEMBER( upd7752_device::write )
 				[1] xxxx ---- amp Voice source amplitude
 				    ---- x--- Fricative Voice data
 				    ---- -xxx Pitch
-					(repeat for N1 times)
+				    (repeat for N1 times)
 				if [0] & 0xf8 == 0 then command stop
 				*/
 				writebyte(m_ram_addr++,data);

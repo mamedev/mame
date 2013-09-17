@@ -47,14 +47,14 @@ public:
 	bitmap_ind16 &update( const rectangle &cliprect );
 	DECLARE_WRITE8_MEMBER( work_ram_w );
 	DECLARE_READ8_MEMBER( work_ram_r );
-	
+
 	void soundport_w (int mode, int data);
 
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
-	
+
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
@@ -63,13 +63,13 @@ private:
 	UINT8     *m_work_ram;
 	bitmap_ind16 *m_bitmap;
 	bitmap_ind16 *m_collision_bitmap;
-	
+
 	sound_stream *m_channel;
 	UINT8 m_reg[1];
 	int m_size;
 	int m_pos;
 	unsigned m_level;
-	
+
 	int check_collision( int spriteno1, int spriteno2, const rectangle &cliprect );
 };
 

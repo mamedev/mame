@@ -265,7 +265,7 @@ static MACHINE_CONFIG_START( relief, relief_state )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(relief_state,relief)
-	
+
 	MCFG_ATARI_EEPROM_2816_ADD("eeprom")
 
 	/* video hardware */

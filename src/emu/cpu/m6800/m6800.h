@@ -139,7 +139,7 @@ protected:
 	int     m_clock_divider;
 	UINT8   m_trcsr, m_rmcr, m_rdr, m_tdr, m_rsr, m_tsr;
 	int     m_rxbits, m_txbits, m_txstate, m_trcsr_read_tdre, m_trcsr_read_orfe, m_trcsr_read_rdrf, m_tx, m_ext_serclock;
-	bool	m_use_ext_serclock;
+	bool    m_use_ext_serclock;
 	int     m_port2_written;
 
 	int     m_icount;

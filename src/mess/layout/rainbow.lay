@@ -8,7 +8,7 @@
 		</disk>
 	</element>
 
-	
+
 	<element name="DRIVE0">
 		<text string="A">
 			<color red="1.0" green="1.0" blue="1.0" />
@@ -87,7 +87,7 @@
 		<bezel name="led21" element="led">
 			<bounds x="15" y="18" width="10" height="10" />
 		</bezel>
-		
+
 		<bezel name="led1" element="led">
 			<bounds x="15" y="43" width="10" height="10" />
 		</bezel>
@@ -121,7 +121,7 @@
 		<bezel name="led11" element="led">
 			<bounds x="15" y="252" width="10" height="10" />
 		</bezel>
-		
+
 		<bezel name="label20" element="DRIVE0">
 			<bounds x="0" y="0" width="15" height="16" />
 		</bezel>

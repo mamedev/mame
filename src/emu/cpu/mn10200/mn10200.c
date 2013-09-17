@@ -2436,5 +2436,3 @@ offs_t mn10200_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *
 	extern CPU_DISASSEMBLE( mn10200 );
 	return CPU_DISASSEMBLE_NAME(mn10200)(this, buffer, pc, oprom, opram, options);
 }
-
-

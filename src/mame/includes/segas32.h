@@ -30,7 +30,7 @@ public:
 	required_shared_ptr<UINT16> m_system32_videoram;
 	required_shared_ptr<UINT16> m_system32_spriteram;
 	optional_shared_ptr_array<UINT16, 2> m_system32_paletteram;
-	
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	optional_device<multipcm_device> m_multipcm;

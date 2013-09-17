@@ -987,7 +987,7 @@ TIMER_CALLBACK_MEMBER( nmk004_device::real_init )
 	m_rom = machine().root_device().memregion("audiocpu")->base();
 
 	address_space &space = machine().firstcpu->space(AS_PROGRAM);
-	
+
 	if (m_ymdevice != NULL)
 	{
 		m_ymdevice->control_port_w(space, 0, 0x2f);
@@ -998,10 +998,10 @@ TIMER_CALLBACK_MEMBER( nmk004_device::real_init )
 			m_ymdevice->control_port_w(space, 0, ym2203_init[i++]);
 			m_ymdevice->write_port_w(space, 0, ym2203_init[i++]);
 		}
-	}	
+	}
 	else
 		return;
-	
+
 	m_oki_playing = 0;
 
 	oki_play_sample(0);

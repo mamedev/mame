@@ -69,7 +69,7 @@ READ8_MEMBER( cosmicos_state::read )
 WRITE8_MEMBER( cosmicos_state::write )
 {
 	if (m_boot) offset |= 0xc0c0;
-	
+
 	if (offset < 0xc000)
 	{
 		// TODO
@@ -77,7 +77,7 @@ WRITE8_MEMBER( cosmicos_state::write )
 	else if (!m_ram_disable && !m_ram_protect && (offset >= 0xff00))
 	{
 		m_ram->pointer()[offset & 0xff] = data;
-	}	
+	}
 }
 
 READ8_MEMBER( cosmicos_state::video_off_r )

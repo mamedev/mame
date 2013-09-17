@@ -68,7 +68,7 @@ class nmk004_device : public device_t
 public:
 	nmk004_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~nmk004_device() {}
-	
+
 	void ym2203_irq_handler(int irq);
 	DECLARE_READ16_MEMBER( read );
 	DECLARE_WRITE16_MEMBER( write );
@@ -95,7 +95,7 @@ private:
 	/* C020-C19F */ struct fm_control m_fm_control[FM_CHANNELS];
 	/* C220-C2DF */ struct psg_control m_psg_control[PSG_CHANNELS];
 	/* C1A0-C21F */ struct effects_control m_effects_control[EFFECTS_CHANNELS];
-	
+
 	TIMER_CALLBACK_MEMBER( real_init );
 	UINT8 read8(int address);
 	UINT16 read16(int address);
@@ -112,4 +112,4 @@ private:
 extern const device_type NMK004;
 
 #define MCFG_NMK004_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, NMK004, 0) 
+	MCFG_DEVICE_ADD(_tag, NMK004, 0)

@@ -40,11 +40,11 @@ public:
 	required_shared_ptr<UINT16> m_md_vram;
 	required_shared_ptr<UINT16> m_fg_vram;
 	required_shared_ptr<UINT16> m_tx_vram;
-	
+
 	required_device<cpu_device> m_maincpu;
 	optional_device<seibu_sound_device> m_seibu_sound;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
-	
+
 	DECLARE_WRITE16_MEMBER(rdx_bg_vram_w);
 	DECLARE_WRITE16_MEMBER(rdx_md_vram_w);
 	DECLARE_WRITE16_MEMBER(rdx_fg_vram_w);

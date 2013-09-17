@@ -31,7 +31,7 @@ struct player_gfx {
 #define MCFG_TIA_PAL_VIDEO_ADD(_tag, _config) \
 	MCFG_DEVICE_ADD(_tag, TIA_PAL_VIDEO, 0) \
 	MCFG_DEVICE_CONFIG(_config)
-	
+
 #define MCFG_TIA_NTSC_VIDEO_ADD(_tag, _config) \
 	MCFG_DEVICE_ADD(_tag, TIA_NTSC_VIDEO, 0) \
 	MCFG_DEVICE_CONFIG(_config)
@@ -61,7 +61,7 @@ public:
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
-	
+
 protected:
 	// construction/destruction
 	tia_video_device(const machine_config &mconfig, device_type type, const char *name, const char *shortname, const char *tag, device_t *owner, UINT32 clock);
@@ -211,9 +211,9 @@ class tia_pal_video_device : public tia_video_device
 {
 public:
 	tia_pal_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	DECLARE_PALETTE_INIT(tia_pal);
-	
+
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const;
 };
@@ -222,9 +222,9 @@ class tia_ntsc_video_device : public tia_video_device
 {
 public:
 	tia_ntsc_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	DECLARE_PALETTE_INIT(tia_ntsc);
-	
+
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const;
 };

@@ -50,11 +50,9 @@
 	downcast<i8275x_device *>(device)->set_drq_callback(DEVCB2_##_drq);
 
 #define MCFG_I8275_IRQ_CALLBACK(_irq) \
-	downcast<i8275x_device *>(device)->set_irq_callback(DEVCB2_##_irq); \
-
+	downcast<i8275x_device *>(device)->set_irq_callback(DEVCB2_##_irq);
 #define MCFG_I8275_HRTC_CALLBACK(_hrtc) \
-	downcast<i8275x_device *>(device)->set_hrtc_callback(DEVCB2_##_hrtc); \
-
+	downcast<i8275x_device *>(device)->set_hrtc_callback(DEVCB2_##_hrtc);
 #define MCFG_I8275_VRTC_CALLBACK(_vrtc) \
 	downcast<i8275x_device *>(device)->set_vrtc_callback(DEVCB2_##_vrtc);
 

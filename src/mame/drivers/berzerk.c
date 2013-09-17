@@ -33,13 +33,13 @@ public:
 
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;
-	
+
 	required_device<cpu_device> m_maincpu;
 	required_device<s14001a_device> m_s14001a;
 	required_device<ttl74181_device> m_ls181_10c;
 	required_device<ttl74181_device> m_ls181_12c;
 	required_device<exidy_sound_device> m_custom;
-		
+
 	UINT8 m_magicram_control;
 	UINT8 m_last_shift_data;
 	UINT8 m_intercept;

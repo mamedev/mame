@@ -1647,7 +1647,7 @@ void snes_ppu_class::ppu_start(screen_device &screen)
 {
 	m_screen = &screen;
 	running_machine &machine = screen.machine();
-	
+
 #if SNES_LAYER_DEBUG
 	memset(&debug_options, 0, sizeof(debug_options));
 #endif

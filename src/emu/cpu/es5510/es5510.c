@@ -168,7 +168,7 @@ es5510_device::es5510_device(const machine_config &mconfig, const char *tag, dev
 	instr_latch = 0;
 	ram_sel = 0;
 	host_control = 0;
-   
+
 	pc = 0;
 	memset(&alu, 0, sizeof(alu));
 	memset(&mulacc, 0, sizeof(mulacc));
@@ -606,7 +606,7 @@ void es5510_device::list_program(void(p)(const char *, ...)) {
 		is_written[i] = is_read[i] = false;
 		name[i][0] = '\0';
 	}
-	
+
 	for (addr = 0; addr < 0xa0; addr++) {
 		DESCRIBE_INSTR(buf, instr[addr], gpr[addr], NULL, NULL, NULL, NULL);
 		UINT64 inst = instr[addr];
@@ -621,7 +621,7 @@ void es5510_device::list_program(void(p)(const char *, ...)) {
 		}
 
 		UINT8 operandSelect = (UINT8)((inst >> 8) & 0x0f);
-		const op_select_t &opSelect = OPERAND_SELECT[operandSelect];		
+		const op_select_t &opSelect = OPERAND_SELECT[operandSelect];
 
 		if (opSelect.mac_src == SRC_DST_REG) {
 			is_read[cReg] = true;
@@ -630,7 +630,7 @@ void es5510_device::list_program(void(p)(const char *, ...)) {
 		if (opSelect.mac_dst != SRC_DST_DELAY) { // either REG or BOTH
 			is_written[cReg] = true;
 		}
-		
+
 		alu_op_t aluOp = ALU_OPS[alu_op];
 		if (aluOp.operands == 1) {
 			if (opSelect.alu_src == SRC_DST_REG) {
@@ -663,7 +663,7 @@ void es5510_device::list_program(void(p)(const char *, ...)) {
 	for (int i = 0xc0; i < 0x100; i++) {
 		name[i][0] = 0;
 	}
-	
+
 	for (addr = 0; addr < 0xa0; addr++) {
 		UINT8 aReg = (UINT8)((instr[addr] >> 16) & 0xff);
 		UINT8 bReg = (UINT8)((instr[addr] >> 24) & 0xff);
@@ -830,7 +830,7 @@ void es5510_device::execute_run() {
 			// *** T2, clock high
 
 			LOG_EXEC(("- T2.1\n"));
-		  
+
 			// --- Write ALU Result N-1
 			LOG_EXEC((". write ALU:\n"));
 			if (alu.write_result) {

@@ -1501,7 +1501,7 @@ static WRITE32_DEVICE_HANDLER( ide_bus_master32_w )
 static READ32_DEVICE_HANDLER( ethernet_r )
 {
 	smc91c94_device *ethernet = space.machine().device<smc91c94_device>("ethernet");
-	
+
 	UINT32 result = 0;
 	if (ACCESSING_BITS_0_15)
 		result |= ethernet->read(space, offset * 2 + 0, mem_mask);
@@ -1514,7 +1514,7 @@ static READ32_DEVICE_HANDLER( ethernet_r )
 static WRITE32_DEVICE_HANDLER( ethernet_w )
 {
 	smc91c94_device *ethernet = space.machine().device<smc91c94_device>("ethernet");
-	
+
 	if (ACCESSING_BITS_0_15)
 		ethernet->write(space, offset * 2 + 0, data, mem_mask);
 	if (ACCESSING_BITS_16_31)

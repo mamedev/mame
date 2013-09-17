@@ -390,7 +390,7 @@ static MACHINE_CONFIG_START( eprom, eprom_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_MACHINE_RESET_OVERRIDE(eprom_state,eprom)
-	
+
 	MCFG_ATARI_EEPROM_2804_ADD("eeprom")
 
 	/* video hardware */
@@ -430,7 +430,7 @@ static MACHINE_CONFIG_START( klaxp, eprom_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_MACHINE_RESET_OVERRIDE(eprom_state,eprom)
-	
+
 	MCFG_ATARI_EEPROM_2804_ADD("eeprom")
 
 	/* video hardware */
@@ -469,7 +469,7 @@ static MACHINE_CONFIG_START( guts, eprom_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_MACHINE_RESET_OVERRIDE(eprom_state,eprom)
-	
+
 	MCFG_ATARI_EEPROM_2804_ADD("eeprom")
 
 	/* video hardware */

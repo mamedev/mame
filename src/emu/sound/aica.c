@@ -734,8 +734,8 @@ static void AICA_UpdateReg(aica_state *AICA, address_space &space, int reg)
 
 		//case 0x0c:
 		//case 0x0d:
-		//	printf("%04x\n",AICA->udata.data[0xc/2]);
-		//	break;
+		//  printf("%04x\n",AICA->udata.data[0xc/2]);
+		//  break;
 
 		case 0x12:
 		case 0x13:

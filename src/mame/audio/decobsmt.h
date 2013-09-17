@@ -30,7 +30,7 @@ public:
 		DECLARE_WRITE8_MEMBER(bsmt_comms_w);
 
 		DECLARE_WRITE_LINE_MEMBER(bsmt_reset_line);
-		
+
 		INTERRUPT_GEN_MEMBER(decobsmt_firq_interrupt);
 
 		required_device<cpu_device> m_ourcpu;

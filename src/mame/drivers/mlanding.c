@@ -97,25 +97,25 @@ public:
 	required_device<msm5205_device> m_msm2;
 	required_device<z80ctc_device> m_ctc;
 
-	required_memory_bank	m_dma_bank;
-	required_memory_region	m_msm1_rom;
-	required_memory_region	m_msm2_rom;
+	required_memory_bank    m_dma_bank;
+	required_memory_region  m_msm1_rom;
+	required_memory_region  m_msm2_rom;
 
-	required_shared_ptr<UINT16>	m_g_ram;
-	required_shared_ptr<UINT16>	m_cha_ram;
-	required_shared_ptr<UINT16>	m_dot_ram;
-	required_shared_ptr<UINT8>	m_power_ram;
+	required_shared_ptr<UINT16> m_g_ram;
+	required_shared_ptr<UINT16> m_cha_ram;
+	required_shared_ptr<UINT16> m_dot_ram;
+	required_shared_ptr<UINT8>  m_power_ram;
 
-	UINT16	*m_dma_ram;
-	UINT8	m_dma_cpu_bank;
-	UINT8	m_dma_busy;
-	UINT16	m_dsp_hold_signal;
+	UINT16  *m_dma_ram;
+	UINT8   m_dma_cpu_bank;
+	UINT8   m_dma_busy;
+	UINT16  m_dsp_hold_signal;
 
-	UINT32	m_msm_pos[2];
-	UINT8	m_msm_reset[2];
-	UINT8	m_msm_nibble[2];
-	UINT8	m_msm2_vck;
-	UINT8	m_msm2_vck2;
+	UINT32  m_msm_pos[2];
+	UINT8   m_msm_reset[2];
+	UINT8   m_msm_nibble[2];
+	UINT8   m_msm2_vck;
+	UINT8   m_msm2_vck2;
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -261,21 +261,21 @@ WRITE16_MEMBER(mlanding_state::dma_stop_w)
 
 
 /*
-		FEDCBA9876543210
+        FEDCBA9876543210
 
-	0	...xxxxx xxxxxxxx		Tile index
-		..x..... ........		Clear mode
-		.x...... ........		Clear pixel/palette data
-		x....... ........		Transparent/opaque mode
+    0   ...xxxxx xxxxxxxx       Tile index
+        ..x..... ........       Clear mode
+        .x...... ........       Clear pixel/palette data
+        x....... ........       Transparent/opaque mode
 
-	1	.......x xxxxxxxx		X Coordinate
-		xxxxx... ........		Width in 8x8 tiles
+    1   .......x xxxxxxxx       X Coordinate
+        xxxxx... ........       Width in 8x8 tiles
 
-	2	.......x xxxxxxxx		Y Coordinate
-		.....xx. ........		Unused
-		xxxxx... ........		Height in 8x8 tiles
+    2   .......x xxxxxxxx       Y Coordinate
+        .....xx. ........       Unused
+        xxxxx... ........       Height in 8x8 tiles
 
-	3	........ ....xxxx		Colour
+    3   ........ ....xxxx       Colour
 */
 UINT32 mlanding_state::exec_dma()
 {
@@ -414,10 +414,10 @@ void mlanding_state::device_timer(emu_timer &timer, device_timer_id id, int para
 READ16_MEMBER(mlanding_state::input_r)
 {
 	/*
-		FEDCBA98 76543210
-		........ xxxxxxxx	DSWA
-		.xxxxxxx ........	DSWB
-		x....... ........	DMA busy
+	    FEDCBA98 76543210
+	    ........ xxxxxxxx   DSWA
+	    .xxxxxxx ........   DSWB
+	    x....... ........   DMA busy
 	*/
 
 	UINT8 dswa = ioport("DSWA")->read();
@@ -429,15 +429,15 @@ READ16_MEMBER(mlanding_state::input_r)
 WRITE16_MEMBER(mlanding_state::output_w)
 {
 	/*
-		76543210
-		x.......	Start lamp?
-		.x......	/Mecha CPU reset
-		..x.....	? (Briefly transitions from 1 to 0 at $5040, after pressing start)
-		...x....	/Sub CPU reset
-		....x...	Coin counter B
-		.....x..	Coin counter A
-		......x.	/Coin lockout B
-		.......x	/Coin lockout A
+	    76543210
+	    x.......    Start lamp?
+	    .x......    /Mecha CPU reset
+	    ..x.....    ? (Briefly transitions from 1 to 0 at $5040, after pressing start)
+	    ...x....    /Sub CPU reset
+	    ....x...    Coin counter B
+	    .....x..    Coin counter A
+	    ......x.    /Coin lockout B
+	    .......x    /Coin lockout A
 	*/
 	m_subcpu->set_input_line(INPUT_LINE_RESET, data & 0x10 ? CLEAR_LINE : ASSERT_LINE);
 	m_mechacpu->set_input_line(INPUT_LINE_RESET, data & 0x40 ? CLEAR_LINE : ASSERT_LINE);
@@ -472,11 +472,11 @@ READ16_MEMBER(mlanding_state::analog3_msb_r)
 READ16_MEMBER(mlanding_state::analog1_lsb_r)
 {
 	/*
-		76543210
-		....xxxx	Counter 1 bits 3-0
-		...x....	Handle left
-		..x.....	Slot down
-		.x......	Slot up
+	    76543210
+	    ....xxxx    Counter 1 bits 3-0
+	    ...x....    Handle left
+	    ..x.....    Slot down
+	    .x......    Slot up
 	*/
 	UINT16 throttle = ioport("THROTTLE")->read();
 	UINT16 x = ioport("STICK_X")->read();
@@ -498,8 +498,8 @@ READ16_MEMBER(mlanding_state::analog1_lsb_r)
 READ16_MEMBER(mlanding_state::analog2_lsb_r)
 {
 	/*
-		76543210
-		....xxxx	Counter 2 bits 3-0
+	    76543210
+	    ....xxxx    Counter 2 bits 3-0
 	*/
 	return ioport("STICK_X")->read() & 0x0f;
 }
@@ -508,11 +508,11 @@ READ16_MEMBER(mlanding_state::analog2_lsb_r)
 READ16_MEMBER(mlanding_state::analog3_lsb_r)
 {
 	/*
-		76543210
-		....xxxx	Counter 3 bits 3-0
-		...x....	Handle up
-		..x.....	Handle right
-		.x......	Handle down
+	    76543210
+	    ....xxxx    Counter 3 bits 3-0
+	    ...x....    Handle up
+	    ..x.....    Handle right
+	    .x......    Handle down
 	*/
 	UINT16 x = ioport("STICK_X")->read();
 	UINT16 y = ioport("STICK_Y")->read();
@@ -546,8 +546,8 @@ READ16_MEMBER(mlanding_state::dsp_hold_signal_r)
 WRITE16_MEMBER(mlanding_state::dsp_control_w)
 {
 	/*
-		1 after zeroing 'dot' RAM
-		3 after uploading DSP program
+	    1 after zeroing 'dot' RAM
+	    3 after uploading DSP program
 	*/
 	m_dsp->set_input_line(INPUT_LINE_RESET, data & 0x2 ? CLEAR_LINE : ASSERT_LINE);
 }
@@ -692,16 +692,16 @@ WRITE16_MEMBER(mlanding_state::power_ram_w)
 READ8_MEMBER(mlanding_state::motor_r)
 {
 	/*
-		9001: RIGHT MOTOR: 1F=UP, 00=STOP, 2F=DOWN
-		9003: LEFT MOTOR:  1F=UP, 00=STOP, 2F=DOWN
+	    9001: RIGHT MOTOR: 1F=UP, 00=STOP, 2F=DOWN
+	    9003: LEFT MOTOR:  1F=UP, 00=STOP, 2F=DOWN
 
-		9800: xxxx .... - Counter R 3-0
-		9801: .... xxxx - Counter R 7-4
-		   ...x .... - SW R
-		9802: xxxx .... - Counter L 3-0
-		9803: .... xxxx - Counter L 7-4
-		9804: .... .... -
-		9805: ...x .... - SW L
+	    9800: xxxx .... - Counter R 3-0
+	    9801: .... xxxx - Counter R 7-4
+	       ...x .... - SW R
+	    9802: xxxx .... - Counter L 3-0
+	    9803: .... xxxx - Counter L 7-4
+	    9804: .... .... -
+	    9805: ...x .... - SW L
 	*/
 
 	return 0x10;
@@ -928,24 +928,24 @@ static const tc0140syt_interface mlanding_tc0140syt_intf =
 
 static Z80CTC_INTERFACE( ctc_intf )
 {
-	DEVCB_NULL,	// Interrupt handler
+	DEVCB_NULL, // Interrupt handler
 	DEVCB_DRIVER_LINE_MEMBER(mlanding_state, z80ctc_to0), // ZC/TO0 callback
 	DEVCB_NULL, // ZC/TO1 callback
-	DEVCB_NULL	// ZC/TO2 callback
+	DEVCB_NULL  // ZC/TO2 callback
 };
 
 
 static const msm5205_interface msm5205_1_config =
 {
 	DEVCB_DRIVER_LINE_MEMBER(mlanding_state, msm5205_1_vck), // VCK function
-	MSM5205_S48_4B		// 8 kHz, 4-bit
+	MSM5205_S48_4B      // 8 kHz, 4-bit
 };
 
 
 static const msm5205_interface msm5205_2_config =
 {
-	DEVCB_NULL,			// VCK function
-	MSM5205_SEX_4B		// Slave mode, 4-bit
+	DEVCB_NULL,         // VCK function
+	MSM5205_SEX_4B      // Slave mode, 4-bit
 };
 
 

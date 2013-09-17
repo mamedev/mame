@@ -31,13 +31,13 @@ public:
 	void swap_buffers();
 	void preprocess_texture_data(UINT8 *rom, int length, int gticlub);
 	void render_polygons();
-	
+
 	#if POLY_DEVICE
-	
+
 	void draw_scanline( void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid );
 	void draw_scanline_tex( void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid );
-	
-	
+
+
 	#endif
 
 	DECLARE_READ32_MEMBER( read );

@@ -760,4 +760,3 @@ bool sh2_frontend::describe_group_12(opcode_desc &desc, const opcode_desc *prev,
 
 	return false;
 }
-

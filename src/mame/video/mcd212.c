@@ -1510,7 +1510,7 @@ void mcd212_device::device_reset()
 
 mcd212_device::mcd212_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MACHINE_MCD212, "MCD212", tag, owner, clock, "mcd212", __FILE__),
-	  device_video_interface(mconfig, *this)
+		device_video_interface(mconfig, *this)
 {
 }
 

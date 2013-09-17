@@ -1783,10 +1783,10 @@ static MACHINE_CONFIG_START( firebeat, firebeat_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-//	TODO: Hookup cdrom audio
-//	MCFG_SOUND_MODIFY("scsi1:cdda")
-//	MCFG_SOUND_ROUTE(0, "^^lspeaker", 1.0)
-//	MCFG_SOUND_ROUTE(1, "^^rspeaker", 1.0)
+//  TODO: Hookup cdrom audio
+//  MCFG_SOUND_MODIFY("scsi1:cdda")
+//  MCFG_SOUND_ROUTE(0, "^^lspeaker", 1.0)
+//  MCFG_SOUND_ROUTE(1, "^^rspeaker", 1.0)
 
 	MCFG_PC16552D_ADD("duart_com", firebeat_com0_interface, firebeat_com1_interface, XTAL_19_6608MHz) // pgmd to 9600baud
 	MCFG_PC16552D_ADD("duart_midi", firebeat_midi0_interface, firebeat_midi1_interface, XTAL_24MHz) // in all memory maps, pgmd to 31250baud

@@ -80,11 +80,11 @@ public:
 	public:
 		// construction/destruction
 		breakpoint(device_debug* debugInterface,
-				   symbol_table &symbols,
-				   int index,
-				   offs_t address,
-				   const char *condition = NULL,
-				   const char *action = NULL);
+					symbol_table &symbols,
+					int index,
+					offs_t address,
+					const char *condition = NULL,
+					const char *action = NULL);
 
 		// getters
 		const device_debug *debugInterface() const { return m_debugInterface; }
@@ -119,14 +119,14 @@ public:
 	public:
 		// construction/destruction
 		watchpoint(device_debug* debugInterface,
-				   symbol_table &symbols,
-				   int index,
-				   address_space &space,
-				   int type,
-				   offs_t address,
-				   offs_t length,
-				   const char *condition = NULL,
-				   const char *action = NULL);
+					symbol_table &symbols,
+					int index,
+					address_space &space,
+					int type,
+					offs_t address,
+					offs_t length,
+					const char *condition = NULL,
+					const char *action = NULL);
 
 		// getters
 		const device_debug *debugInterface() const { return m_debugInterface; }

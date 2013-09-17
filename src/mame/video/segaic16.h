@@ -89,7 +89,7 @@ struct rotate_info
 
 
 
-class segaic16_video_device : 	public device_t,
+class segaic16_video_device :   public device_t,
 								public device_video_interface
 {
 public:

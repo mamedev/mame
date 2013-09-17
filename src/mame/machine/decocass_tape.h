@@ -10,13 +10,13 @@ public:
 	UINT8 get_status_bits();
 	UINT8 is_present();
 	void change_speed(INT8 newspeed);
-	
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 private:
 	/* regions within the virtual tape */
 	enum tape_region
@@ -52,7 +52,7 @@ private:
 		BYTE_POSTGAP_33 = BYTE_POSTGAP_0 + 33,
 		BYTE_BLOCK_TOTAL            /* total number of bytes in block */
 	};
-	
+
 	// internal state
 	emu_timer *         m_tape_timer;              /* timer for running the tape */
 	INT8                m_speed;              /* speed: <-1=fast rewind, -1=reverse, 0=stopped, 1=normal, >1=fast forward */
@@ -62,7 +62,7 @@ private:
 	UINT32              m_clockpos;           /* the current clock position of the tape */
 	UINT32              m_numclocks;          /* total number of clocks on the entire tape */
 	UINT16              m_crc16[256];         /* CRC16 for each block */
-	
+
 	const char *describe_state();
 	TIMER_CALLBACK_MEMBER( tape_clock_callback );
 };

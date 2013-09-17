@@ -98,7 +98,7 @@
 #define AUDIO_IS_CLASSIC (m_model <= MODEL_MAC_CLASSIC)
 #define MAC_HAS_VIA2    ((m_model >= MODEL_MAC_II) && (m_model != MODEL_MAC_IIFX))
 
-#define INTS_RBV    ((m_model >= MODEL_MAC_IICI) && (m_model <= MODEL_MAC_IIVI)) || ((m_model >= MODEL_MAC_LC) && (m_model <= MODEL_MAC_LC_580)) 
+#define INTS_RBV    ((m_model >= MODEL_MAC_IICI) && (m_model <= MODEL_MAC_IIVI)) || ((m_model >= MODEL_MAC_LC) && (m_model <= MODEL_MAC_LC_580))
 
 #ifdef MAME_DEBUG
 #define LOG_ADB         0
@@ -673,24 +673,24 @@ void mac_state::keyboard_init()
 
 WRITE_LINE_MEMBER(mac_state::mac_kbd_clk_in)
 {
-    printf("CLK: %d\n", state^1);
-    m_via1->write_cb1(state ? 0 : 1);
+	printf("CLK: %d\n", state^1);
+	m_via1->write_cb1(state ? 0 : 1);
 }
 
 #ifdef MAC_USE_EMULATED_KBD
 READ8_MEMBER(mac_state::mac_via_in_cb2)
 {
-    printf("Read %d from keyboard (PC=%x)\n", (m_mackbd->data_r() == ASSERT_LINE) ? 1 : 0, m_maincpu->pc());
-    return (m_mackbd->data_r() == ASSERT_LINE) ? 1 : 0;
+	printf("Read %d from keyboard (PC=%x)\n", (m_mackbd->data_r() == ASSERT_LINE) ? 1 : 0, m_maincpu->pc());
+	return (m_mackbd->data_r() == ASSERT_LINE) ? 1 : 0;
 }
 
 WRITE8_MEMBER(mac_state::mac_via_out_cb2)
 {
-    printf("Sending %d to kbd (PC=%x)\n", data, m_maincpu->pc());
-    m_mackbd->data_w((data & 1) ? ASSERT_LINE : CLEAR_LINE);
+	printf("Sending %d to kbd (PC=%x)\n", data, m_maincpu->pc());
+	m_mackbd->data_w((data & 1) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-#else	// keyboard HLE
+#else   // keyboard HLE
 
 TIMER_CALLBACK_MEMBER(mac_state::kbd_clock)
 {

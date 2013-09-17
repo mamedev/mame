@@ -87,8 +87,7 @@
 
 // optional enable for streaming reads
 #define MCFG_EEPROM_SERIAL_ENABLE_STREAMING() \
-	eeprom_serial_base_device::static_enable_streaming(*device); \
-
+	eeprom_serial_base_device::static_enable_streaming(*device);
 // pass-throughs to the base class for setting default data
 #define MCFG_EEPROM_SERIAL_DATA MCFG_EEPROM_DATA
 #define MCFG_EEPROM_SERIAL_DEFAULT_VALUE MCFG_EEPROM_DEFAULT_VALUE
@@ -112,14 +111,14 @@ public:
 	// inline configuration helpers
 	static void static_set_address_bits(device_t &device, int addrbits);
 	static void static_enable_streaming(device_t &device);
-	
+
 protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 	// read interfaces differ between implementations
-	
+
 	// commands
 	enum eeprom_command
 	{
@@ -143,7 +142,7 @@ protected:
 		STATE_WAIT_FOR_DATA,
 		STATE_WAIT_FOR_COMPLETION
 	};
-	
+
 	// events
 	enum eeprom_event
 	{
@@ -158,34 +157,34 @@ protected:
 	void handle_event(eeprom_event event);
 	void execute_command();
 	void execute_write_command();
-	
+
 	// subclass helpers
 	void base_cs_write(int state);
 	void base_clk_write(int state);
 	void base_di_write(int state);
 	int base_do_read();
 	int base_ready_read();
-	
+
 	// subclass overrides
 	virtual void parse_command_and_address() = 0;
 
 	// configuration state
-	UINT8			m_command_address_bits;		// number of address bits in a command
-	bool			m_streaming_enabled;		// true if streaming is enabled
+	UINT8           m_command_address_bits;     // number of address bits in a command
+	bool            m_streaming_enabled;        // true if streaming is enabled
 
 	// runtime state
-	eeprom_state	m_state;					// current internal state
-	UINT8			m_cs_state;					// state of the CS line
-	attotime		m_last_cs_rising_edge_time;	// time of the last CS rising edge
-	UINT8			m_oe_state;					// state of the OE line
-	UINT8			m_clk_state;				// state of the CLK line
-	UINT8			m_di_state;					// state of the DI line
-	bool			m_locked;					// are we locked against writes?
-	UINT32			m_bits_accum;				// number of bits accumulated
-	UINT32			m_command_address_accum;	// accumulator of command+address bits
-	eeprom_command	m_command;					// current command
-	UINT32			m_address;					// current address extracted from command
-	UINT32			m_shift_register;			// holds data coming in/going out
+	eeprom_state    m_state;                    // current internal state
+	UINT8           m_cs_state;                 // state of the CS line
+	attotime        m_last_cs_rising_edge_time; // time of the last CS rising edge
+	UINT8           m_oe_state;                 // state of the OE line
+	UINT8           m_clk_state;                // state of the CLK line
+	UINT8           m_di_state;                 // state of the DI line
+	bool            m_locked;                   // are we locked against writes?
+	UINT32          m_bits_accum;               // number of bits accumulated
+	UINT32          m_command_address_accum;    // accumulator of command+address bits
+	eeprom_command  m_command;                  // current command
+	UINT32          m_address;                  // current address extracted from command
+	UINT32          m_shift_register;           // holds data coming in/going out
 };
 
 
@@ -200,12 +199,12 @@ protected:
 
 public:
 	// read handlers
-	DECLARE_READ_LINE_MEMBER(do_read);	// combined DO+READY/BUSY
+	DECLARE_READ_LINE_MEMBER(do_read);  // combined DO+READY/BUSY
 
 	// write handlers
-	DECLARE_WRITE_LINE_MEMBER(cs_write);		// CS signal (active high)
-	DECLARE_WRITE_LINE_MEMBER(clk_write);		// CLK signal (active high)
-	DECLARE_WRITE_LINE_MEMBER(di_write);		// DI
+	DECLARE_WRITE_LINE_MEMBER(cs_write);        // CS signal (active high)
+	DECLARE_WRITE_LINE_MEMBER(clk_write);       // CLK signal (active high)
+	DECLARE_WRITE_LINE_MEMBER(di_write);        // DI
 
 protected:
 	// subclass overrides
@@ -223,13 +222,13 @@ protected:
 
 public:
 	// read handlers
-	DECLARE_READ_LINE_MEMBER(do_read);			// DO
-	DECLARE_READ_LINE_MEMBER(ready_read);		// READY/BUSY only
+	DECLARE_READ_LINE_MEMBER(do_read);          // DO
+	DECLARE_READ_LINE_MEMBER(ready_read);       // READY/BUSY only
 
 	// write handlers
-	DECLARE_WRITE_LINE_MEMBER(cs_write);		// CS signal (active high)
-	DECLARE_WRITE_LINE_MEMBER(clk_write);		// CLK signal (active high)
-	DECLARE_WRITE_LINE_MEMBER(di_write);		// DI
+	DECLARE_WRITE_LINE_MEMBER(cs_write);        // CS signal (active high)
+	DECLARE_WRITE_LINE_MEMBER(clk_write);       // CLK signal (active high)
+	DECLARE_WRITE_LINE_MEMBER(di_write);        // DI
 
 protected:
 	// subclass overrides
@@ -249,8 +248,7 @@ class eeprom_serial_##_lowercase##_##_bits##bit_device : public eeprom_serial_##
 public: \
 	eeprom_serial_##_lowercase##_##_bits##bit_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock); \
 }; \
-extern const device_type EEPROM_SERIAL_##_uppercase##_##_bits##BIT; \
-
+extern const device_type EEPROM_SERIAL_##_uppercase##_##_bits##BIT;
 // standard 93CX6 class of 16-bit EEPROMs
 DECLARE_SERIAL_EEPROM_DEVICE(93cxx, 93c06, 93C06, 16)
 DECLARE_SERIAL_EEPROM_DEVICE(93cxx, 93c46, 93C46, 16)

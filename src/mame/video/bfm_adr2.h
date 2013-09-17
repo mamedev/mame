@@ -25,39 +25,39 @@ public:
 	DECLARE_READ8_MEMBER( adder2_uart_rx_r );
 	DECLARE_WRITE8_MEMBER( adder2_uart_tx_w );
 	DECLARE_READ8_MEMBER( adder2_irq_r );
-	
+
 	DECLARE_WRITE8_MEMBER(vid_uart_tx_w);
 	DECLARE_WRITE8_MEMBER(vid_uart_ctrl_w);
 	DECLARE_READ8_MEMBER(vid_uart_rx_r);
 	DECLARE_READ8_MEMBER(vid_uart_ctrl_r);
-	
+
 	void adder2_decode_char_roms();
-	
+
 protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
 	virtual machine_config_constructor device_mconfig_additions() const;
 private:
-	
+
 	int m_adder2_screen_page_reg;        // access/display select
 	int m_adder2_c101;
 	int m_adder2_rx;
 	int m_adder_vbl_triggered;           // flag <>0, VBL IRQ triggered
 	int m_adder2_acia_triggered;         // flag <>0, ACIA receive IRQ
-	
+
 	UINT8 m_adder_ram[0xE80];              // normal RAM
 	UINT8 m_adder_screen_ram[2][0x1180];   // paged  display RAM
-	
+
 	tilemap_t *m_tilemap0;  // tilemap screen0
 	tilemap_t *m_tilemap1;  // timemap screen1
-	
+
 	UINT8 m_adder2_data_from_sc2;
 	UINT8 m_adder2_data_to_sc2;
-	
+
 	UINT8 m_adder2_data;
-	UINT8 m_adder2_sc2data;	
-	
+	UINT8 m_adder2_sc2data;
+
 	optional_device<cpu_device> m_cpu;
 };
 

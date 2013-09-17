@@ -1,34 +1,34 @@
 /***************************************************************************
 
-	Tap a Tune
+    Tap a Tune
 
     driver by Mariusz Wojcieszek and Phil Bennett
 
 
-	PCB Notes:
+    PCB Notes:
 
-	Top board notable:
+    Top board notable:
 
-	- Hitachi HD68HC000-12 68000 CPU (24 MHz crystal)
-	- Hitachi HD46505SP-2 CRTC
-	- 2x Sony CXK581000P-10L RAM
-	- 2x Mosel MS6264L-10PC RAM
-	- 2x Mosel MS62256L-10PC RAM
-	- rom0.u3 / rom1.u12 - 68000 program
-	- rom2.u4 / rom3.u13 / rom4.u5 / rom5.u14 - graphics
+    - Hitachi HD68HC000-12 68000 CPU (24 MHz crystal)
+    - Hitachi HD46505SP-2 CRTC
+    - 2x Sony CXK581000P-10L RAM
+    - 2x Mosel MS6264L-10PC RAM
+    - 2x Mosel MS62256L-10PC RAM
+    - rom0.u3 / rom1.u12 - 68000 program
+    - rom2.u4 / rom3.u13 / rom4.u5 / rom5.u14 - graphics
 
-	Bottom board notable:
+    Bottom board notable:
 
-	- Zilog Z0840006PSC Z80 CPU (24 MHz crystal)
-	- BSMT2000 custom audio IC
-	- rom.u8 Z80 program
-	- arom1.u16 BSMT2000 samples
-	- 2 banks of 8-position DIP switches
-	- red/green/yellow LEDs
-	- many connectors for I/O
+    - Zilog Z0840006PSC Z80 CPU (24 MHz crystal)
+    - BSMT2000 custom audio IC
+    - rom.u8 Z80 program
+    - arom1.u16 BSMT2000 samples
+    - 2 banks of 8-position DIP switches
+    - red/green/yellow LEDs
+    - many connectors for I/O
 
-	The sound and I/O board is used by other redemption games such as
-	Colorama and Wheel 'Em In
+    The sound and I/O board is used by other redemption games such as
+    Colorama and Wheel 'Em In
 
 ****************************************************************************/
 
@@ -70,11 +70,11 @@ public:
 	UINT8   m_z80_to_68k_data;
 	UINT8   m_68k_to_z80_index;
 	UINT8   m_68k_to_z80_data;
-	UINT8	m_z80_data_available;
-	UINT8	m_68k_data_available;
-	UINT8	m_bsmt_data_l;
-	UINT8	m_bsmt_data_h;
-	bool	m_bsmt_reset;
+	UINT8   m_z80_data_available;
+	UINT8   m_68k_data_available;
+	UINT8   m_bsmt_data_l;
+	UINT8   m_bsmt_data_h;
+	bool    m_bsmt_reset;
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -330,17 +330,17 @@ READ8_MEMBER(tapatune_state::sound_irq_clear)
 WRITE8_MEMBER(tapatune_state::controls_mux)
 {
 	/*
-		Input multiplexer select and outputs:
+	    Input multiplexer select and outputs:
 
-		76543210
-		.......x	Mux A
-		......x.	Mux B (/Red LED)
-		.....x..	Mux C (/Yellow LED)
-		....x...	Mux D (/Green LED)
-		...x....	DOUT1 - High current driver 0
-		..x.....	DOUT2 - High current driver 1
-		.x......	DOUT3 - High current driver 2
-		x.......	DOUT4 - Ticket dispenser
+	    76543210
+	    .......x    Mux A
+	    ......x.    Mux B (/Red LED)
+	    .....x..    Mux C (/Yellow LED)
+	    ....x...    Mux D (/Green LED)
+	    ...x....    DOUT1 - High current driver 0
+	    ..x.....    DOUT2 - High current driver 1
+	    .x......    DOUT3 - High current driver 2
+	    x.......    DOUT4 - Ticket dispenser
 	*/
 
 	m_controls_mux = data;
@@ -373,17 +373,17 @@ READ8_MEMBER(tapatune_state::special_r)
 WRITE8_MEMBER(tapatune_state::lamps_w)
 {
 	/*
-		Button Lamps:
+	    Button Lamps:
 
-		7654 3210
-		.... ...x	Pink
-		.... ..x.	Purple
-		.... .x..	Blue
-		.... x...	Dark Green
-		...x ....	Light Green
-		..x. ....	Yellow
-		.x.. ....	Orange
-		x... ....	Red
+	    7654 3210
+	    .... ...x   Pink
+	    .... ..x.   Purple
+	    .... .x..   Blue
+	    .... x...   Dark Green
+	    ...x ....   Light Green
+	    ..x. ....   Yellow
+	    .x.. ....   Orange
+	    x... ....   Red
 	*/
 }
 
@@ -468,10 +468,10 @@ static INPUT_PORTS_START( tapatune )
 	PORT_DIPSETTING(    0x01, "35 secs" )
 	PORT_DIPSETTING(    0x00, "40 secs" )
 	PORT_DIPNAME( 0x18, 0x10, "Bad note penalty" ) PORT_DIPLOCATION("SW5:4,5")
-	PORT_DIPSETTING(	0x18, "0 secs" )
-	PORT_DIPSETTING(	0x10, "1 secs" )
-	PORT_DIPSETTING(	0x08, "5 secs" )
-	PORT_DIPSETTING(	0x00, "10 secs" )
+	PORT_DIPSETTING(    0x18, "0 secs" )
+	PORT_DIPSETTING(    0x10, "1 secs" )
+	PORT_DIPSETTING(    0x08, "5 secs" )
+	PORT_DIPSETTING(    0x00, "10 secs" )
 	PORT_DIPNAME( 0x20, 0x20, "Coins per game" ) PORT_DIPLOCATION("SW5:6")
 	PORT_DIPSETTING(    0x20, "1" )
 	PORT_DIPSETTING(    0x00, "2" )

@@ -19,7 +19,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER( write );
 	UINT8 drq_r();
-	
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -27,7 +27,7 @@ protected:
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
-	
+
 private:
 	// internal state
 	INT16 m_amp;
@@ -47,7 +47,7 @@ private:
 		INT16 F, B;
 		INT16 z1, z2;
 	} m_filter[6];
-	
+
 	void load_values();
 	TIMER_CALLBACK_MEMBER( timer_tick );
 };

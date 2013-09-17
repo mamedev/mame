@@ -105,7 +105,7 @@ TILEMAP_MAPPER_MEMBER( ygv608_device::get_tile_offset )
 (machine().config().m_gfxdecodeinfo[x].gfxlayout->total)
 
 TILE_GET_INFO_MEMBER( ygv608_device::get_tile_info_A_8 )
-{	
+{
 	// extract row,col packed into tile_index
 	int             col = tile_index >> 6;
 	int             row = tile_index & 0x3f;
@@ -502,7 +502,7 @@ void ygv608_device::device_start()
 	memset(&m_regs, 0, sizeof(m_regs));
 	memset(&m_pattern_name_table, 0, sizeof(m_pattern_name_table));
 	memset(&m_sprite_attribute_table, 0, sizeof(m_sprite_attribute_table));
-	
+
 	memset(&m_scroll_data_table, 0, sizeof(m_scroll_data_table));
 	memset(&m_colour_palette, 0, sizeof(m_colour_palette));
 
@@ -512,7 +512,7 @@ void ygv608_device::device_start()
 	m_pny_shift = 0;
 	m_na8_mask = 0;
 	m_col_shift = 0;
-	
+
 	m_ax = 0; m_dx = 0; m_dxy = 0; m_ay = 0; m_dy = 0; m_dyx = 0;
 
 	memset(&m_base_addr, 0, sizeof(m_base_addr));
@@ -526,7 +526,7 @@ void ygv608_device::device_start()
 	m_namcond1_gfxbank = 0;
 	save_item(NAME(m_namcond1_gfxbank));
 
-	/* create tilemaps of all sizes and combinations */	
+	/* create tilemaps of all sizes and combinations */
 	m_tilemap_A_cache_8[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_A_8),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  8,8, 32,32);
 	m_tilemap_A_cache_8[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_A_8),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  8,8, 64,32);
 	m_tilemap_A_cache_8[2] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_A_8),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  8,8, 32,64);

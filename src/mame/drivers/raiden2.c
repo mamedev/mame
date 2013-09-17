@@ -1175,7 +1175,7 @@ MACHINE_RESET_MEMBER(raiden2_state,raiden2)
 {
 	common_reset();
 	sprcpt_init();
-	
+
 	membank("mainbank")->set_entry(1);
 
 	prg_bank = 0;
@@ -1186,7 +1186,7 @@ MACHINE_RESET_MEMBER(raiden2_state,raidendx)
 {
 	common_reset();
 	sprcpt_init();
-	
+
 	membank("mainbank")->set_entry(8);
 
 	prg_bank = 0x08;
@@ -1200,7 +1200,7 @@ MACHINE_RESET_MEMBER(raiden2_state,zeroteam)
 	fg_bank = 2;
 	mid_bank = 1;
 	sprcpt_init();
-	
+
 	membank("mainbank")->set_entry(1);
 
 	prg_bank = 0;
@@ -1213,7 +1213,7 @@ MACHINE_RESET_MEMBER(raiden2_state,xsedae)
 	fg_bank = 2;
 	mid_bank = 1;
 	sprcpt_init();
-	
+
 	//membank("mainbank")->set_entry(1);
 
 	//cop_init();

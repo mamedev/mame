@@ -37,33 +37,33 @@
 
 ****************************************************************************
 
-	Parallel EEPROMs are generally simpler than serial EEPROMs, though
-	they require more pins to provide the full set of address and data
-	lines necessary. They also require more pins the larger the EEPROM
-	is, whereas serial EEPROMs all share the same pinout regardless of
-	size.
-	
-	At a basic level, there are 5 sets of signals involved:
-	
-		* /CE = chip enable
-		* /OE = output enable
-		* /WE = write enable
-		* D0-Dn = data lines
-		* A0-An = address lines
+    Parallel EEPROMs are generally simpler than serial EEPROMs, though
+    they require more pins to provide the full set of address and data
+    lines necessary. They also require more pins the larger the EEPROM
+    is, whereas serial EEPROMs all share the same pinout regardless of
+    size.
 
-	To access the chip, the various enable states must be asserted or
-	cleared. Note that these are generally active-low, so asserted means
-	pulled to GND, and cleared means pulled to Vcc:
-	
-		/CE   	/OE		/WE    	Action
-	   ASSERT  ASSERT  CLEAR	Read (D0-Dn contain output data)
-	   ASSERT  CLEAR   ASSERT	Write/Erase (D0-Dn are input data)
-	
-	Erase is performed by doing a write with D0-Dn all set to 1.
-	
-	In general, it is slow to write or erase (9ms is quoted in the 2816A
-	datasheet, for example), and the /WE must be held low for the entire
-	write/erase duration in order to guarantee the data is written.
+    At a basic level, there are 5 sets of signals involved:
+
+        * /CE = chip enable
+        * /OE = output enable
+        * /WE = write enable
+        * D0-Dn = data lines
+        * A0-An = address lines
+
+    To access the chip, the various enable states must be asserted or
+    cleared. Note that these are generally active-low, so asserted means
+    pulled to GND, and cleared means pulled to Vcc:
+
+        /CE     /OE     /WE     Action
+       ASSERT  ASSERT  CLEAR    Read (D0-Dn contain output data)
+       ASSERT  CLEAR   ASSERT   Write/Erase (D0-Dn are input data)
+
+    Erase is performed by doing a write with D0-Dn all set to 1.
+
+    In general, it is slow to write or erase (9ms is quoted in the 2816A
+    datasheet, for example), and the /WE must be held low for the entire
+    write/erase duration in order to guarantee the data is written.
 
 ***************************************************************************/
 
@@ -150,8 +150,7 @@ eeprom_parallel_##_lowercase##_device::eeprom_parallel_##_lowercase##_device(con
 { \
 	static_set_size(*this, _cells, _bits); \
 }; \
-const device_type EEPROM_PARALLEL_##_uppercase = &device_creator<eeprom_parallel_##_lowercase##_device>; \
-
+const device_type EEPROM_PARALLEL_##_uppercase = &device_creator<eeprom_parallel_##_lowercase##_device>;
 // standard 28XX class of 8-bit EEPROMs
 DEFINE_PARALLEL_EEPROM_DEVICE(28xx, 2804, 2804, 8, 512)
 DEFINE_PARALLEL_EEPROM_DEVICE(28xx, 2816, 2816, 8, 2048)

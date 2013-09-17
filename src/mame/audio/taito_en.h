@@ -7,16 +7,16 @@ class taito_en_device : public device_t
 public:
 	taito_en_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~taito_en_device() {}
-	
+
 	DECLARE_READ16_MEMBER( en_68000_share_r );
 	DECLARE_WRITE16_MEMBER( en_68000_share_w );
 	DECLARE_WRITE16_MEMBER( en_es5505_bank_w );
 	DECLARE_WRITE16_MEMBER( en_volume_w );
-	
+
 	//todo: hook up cpu/es5510
 	DECLARE_READ16_MEMBER( es5510_dsp_r );
 	DECLARE_WRITE16_MEMBER( es5510_dsp_w );
-	
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -35,9 +35,9 @@ private:
 	UINT32   m_es5510_dadr_latch;
 	UINT32   m_es5510_gpr_latch;
 	UINT8    m_es5510_ram_sel;
-	
+
 	UINT32   *m_snd_shared_ram;
-	
+
 };
 
 extern const device_type TAITO_EN;

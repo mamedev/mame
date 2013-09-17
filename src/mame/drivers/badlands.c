@@ -503,7 +503,7 @@ static MACHINE_CONFIG_START( badlands, badlands_state )
 
 	MCFG_MACHINE_START_OVERRIDE(badlands_state,badlands)
 	MCFG_MACHINE_RESET_OVERRIDE(badlands_state,badlands)
-	
+
 	MCFG_ATARI_EEPROM_2816_ADD("eeprom")
 
 	/* video hardware */
@@ -656,7 +656,7 @@ static ADDRESS_MAP_START( bootleg_map, AS_PROGRAM, 16, badlands_state )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( badlandsb )
-	
+
 	PORT_INCLUDE( badlands )
 
 	PORT_MODIFY("AUDIO") /* audio port */
@@ -705,7 +705,7 @@ static MACHINE_CONFIG_START( badlandsb, badlands_state )
 
 	MCFG_MACHINE_START_OVERRIDE(badlands_state,badlands)
 	MCFG_MACHINE_RESET_OVERRIDE(badlands_state,badlandsb)
-	
+
 	MCFG_ATARI_EEPROM_2816_ADD("eeprom")
 
 	/* video hardware */

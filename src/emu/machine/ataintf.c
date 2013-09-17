@@ -141,7 +141,7 @@ READ16_MEMBER( ata_interface_device::read_cs0 )
 		if (m_slot[i]->dev() != NULL)
 			result &= m_slot[i]->dev()->read_cs0(space, offset, mem_mask);
 
-//	{ static int last_status = -1; if (offset == 7 ) { if( result == last_status ) return last_status; last_status = result; } else last_status = -1; }
+//  { static int last_status = -1; if (offset == 7 ) { if( result == last_status ) return last_status; last_status = result; } else last_status = -1; }
 
 //  printf( "read cs0 %04x %04x %04x\n", offset, result, mem_mask );
 

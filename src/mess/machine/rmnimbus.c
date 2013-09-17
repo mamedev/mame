@@ -1230,7 +1230,7 @@ READ8_MEMBER(rmnimbus_state::cascade_callback)
 void rmnimbus_state::machine_reset()
 {
 	/* CPU */
-//	nimbus_cpu_reset();
+//  nimbus_cpu_reset();
 	iou_reset();
 	fdc_reset();
 	hdc_reset();
@@ -1248,7 +1248,7 @@ DRIVER_INIT_MEMBER(rmnimbus_state,nimbus)
 void rmnimbus_state::machine_start()
 {
 	/* init cpu */
-//	nimbus_cpu_init();
+//  nimbus_cpu_init();
 
 	m_keyboard.keyscan_timer=machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(rmnimbus_state::keyscan_callback),this));
 	m_nimbus_mouse.m_mouse_timer=machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(rmnimbus_state::mouse_callback),this));

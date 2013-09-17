@@ -19,16 +19,16 @@
 #define VERBOSE_DMA  1
 
 // channel control register fields
-#define CC_TMC     ((m_r[CC].w >>  0) & 0x07)	// terminate on masked compare
-#define CC_TBC     ((m_r[CC].w >>  3) & 0x03)	// terminate on byte count
-#define CC_TX      ((m_r[CC].w >>  5) & 0x03)	// terminate on external signal
-#define CC_TS      ((m_r[CC].w >>  7) & 0x01)	// terminate on single transfer
-#define CC_CHAIN   ((m_r[CC].w >>  8) & 0x01)	// chaining
-#define CC_LOCK    ((m_r[CC].w >>  9) & 0x01)	// actuate lock
-#define CC_SOURCE  ((m_r[CC].w >> 10) & 0x01)	// source register
-#define CC_SYNC    ((m_r[CC].w >> 11) & 0x03)	// synchronization
-#define CC_TRANS   ((m_r[CC].w >> 13) & 0x01)	// translation
-#define CC_FUNC    ((m_r[CC].w >> 14) & 0x03)	// function
+#define CC_TMC     ((m_r[CC].w >>  0) & 0x07)   // terminate on masked compare
+#define CC_TBC     ((m_r[CC].w >>  3) & 0x03)   // terminate on byte count
+#define CC_TX      ((m_r[CC].w >>  5) & 0x03)   // terminate on external signal
+#define CC_TS      ((m_r[CC].w >>  7) & 0x01)   // terminate on single transfer
+#define CC_CHAIN   ((m_r[CC].w >>  8) & 0x01)   // chaining
+#define CC_LOCK    ((m_r[CC].w >>  9) & 0x01)   // actuate lock
+#define CC_SOURCE  ((m_r[CC].w >> 10) & 0x01)   // source register
+#define CC_SYNC    ((m_r[CC].w >> 11) & 0x03)   // synchronization
+#define CC_TRANS   ((m_r[CC].w >> 13) & 0x01)   // translation
+#define CC_FUNC    ((m_r[CC].w >> 14) & 0x03)   // function
 
 
 //**************************************************************************

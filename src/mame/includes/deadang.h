@@ -19,13 +19,13 @@ public:
 	required_shared_ptr<UINT16> m_videoram;
 	required_shared_ptr<UINT16> m_scroll_ram;
 	required_shared_ptr<UINT16> m_video_data;
-	
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<seibu_sound_device> m_seibu_sound;
 	required_device<seibu_adpcm_device> m_adpcm1;
 	required_device<seibu_adpcm_device> m_adpcm2;
-	
+
 	tilemap_t *m_pf3_layer;
 	tilemap_t *m_pf2_layer;
 	tilemap_t *m_pf1_layer;

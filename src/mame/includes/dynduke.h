@@ -19,7 +19,7 @@ public:
 	required_shared_ptr<UINT16> m_videoram;
 	required_shared_ptr<UINT16> m_back_data;
 	required_shared_ptr<UINT16> m_fore_data;
-	
+
 	required_device<cpu_device> m_maincpu;
 	required_device<seibu_sound_device> m_seibu_sound;
 

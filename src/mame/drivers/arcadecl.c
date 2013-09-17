@@ -327,7 +327,7 @@ static MACHINE_CONFIG_START( arcadecl, arcadecl_state )
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_GFXDECODE(arcadecl)
 	MCFG_PALETTE_LENGTH(512)
-	
+
 	MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "screen", arcadecl_state::s_mob_config)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -348,7 +348,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( sparkz, arcadecl )
 	MCFG_DEVICE_REMOVE("mob")
 MACHINE_CONFIG_END
-	
+
 
 
 /*************************************

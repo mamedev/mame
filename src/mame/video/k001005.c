@@ -74,7 +74,7 @@ void k001005_device::device_config_complete()
 	const k001005_interface *intf = reinterpret_cast<const k001005_interface *>(static_config());
 	if (intf != NULL)
 	*static_cast<k001005_interface *>(this) = *intf;
-	
+
 	// or initialize to defaults if none provided
 	else
 	{
@@ -163,7 +163,7 @@ void k001005_device::device_reset()
 	m_bitmap_page = 0;
 
 	memset(m_prev_v, 0, sizeof(m_prev_v));
-	m_prev_poly_type = 0;	
+	m_prev_poly_type = 0;
 }
 
 //-------------------------------------------------

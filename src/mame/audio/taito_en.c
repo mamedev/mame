@@ -141,7 +141,7 @@ WRITE16_MEMBER( taito_en_device::en_volume_w )
  *************************************/
 
 //todo: hook up cpu/es5510
- 
+
 READ16_MEMBER( taito_en_device::es5510_dsp_r )
 {
 //  logerror("%06x: DSP read offset %04x (data is %04x)\n",space.device().safe_pc(),offset,m_es5510_dsp_ram[offset]);

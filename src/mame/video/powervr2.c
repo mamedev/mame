@@ -614,7 +614,7 @@ void powervr2_device::tex_get_info(texinfo *t)
 	t->textured    = texture;
 
 	// not textured, abort.
-//	if (!t->textured) return;
+//  if (!t->textured) return;
 
 	t->address     = textureaddress;
 	t->pf          = pixelformat;
@@ -664,7 +664,7 @@ void powervr2_device::tex_get_info(texinfo *t)
 	t->vqbase = t->address;
 	t->blend = use_alpha ? blend_functions[t->blend_mode] : bl10;
 
-//	fprintf(stderr, "tex %d %d %d %d\n", t->pf, t->mode, pal_ram_ctrl, t->mipmapped);
+//  fprintf(stderr, "tex %d %d %d %d\n", t->pf, t->mode, pal_ram_ctrl, t->mipmapped);
 	if(!t->textured)
 	{
 		t->coltype = coltype;
@@ -1002,9 +1002,9 @@ WRITE32_MEMBER( powervr2_device::startrender_w )
 				sanitycount++;
 				// prevent infinite loop if asked to process invalid data
 				//if(sanitycount>2000)
-				//	break;
+				//  break;
 			}
-//			printf("ISP START %d %d\n",sanitycount,m_screen->vpos());
+//          printf("ISP START %d %d\n",sanitycount,m_screen->vpos());
 			/* Fire ISP irq after a set amount of time TODO: timing of this */
 			endofrender_timer_isp->adjust(state->m_maincpu->cycles_to_attotime(sanitycount*25));
 			break;
@@ -1184,11 +1184,11 @@ WRITE32_MEMBER( powervr2_device::spg_vblank_int_w )
 	COMBINE_DATA(&spg_vblank_int);
 
 	/* clear pending irqs and modify them with the updated ones */
-//	vbin_timer->adjust(attotime::never);
-//	vbout_timer->adjust(attotime::never);
+//  vbin_timer->adjust(attotime::never);
+//  vbout_timer->adjust(attotime::never);
 
-//	vbin_timer->adjust(m_screen->time_until_pos(spg_vblank_int & 0x3ff));
-//	vbout_timer->adjust(m_screen->time_until_pos((spg_vblank_int >> 16) & 0x3ff));
+//  vbin_timer->adjust(m_screen->time_until_pos(spg_vblank_int & 0x3ff));
+//  vbout_timer->adjust(m_screen->time_until_pos((spg_vblank_int >> 16) & 0x3ff));
 }
 
 READ32_MEMBER( powervr2_device::spg_control_r )
@@ -1316,7 +1316,7 @@ READ32_MEMBER( powervr2_device::spg_status_r )
 	UINT32 hsync = ((m_screen->hpos() >= spg_hbstart) || (m_screen->hpos() < spg_hbend)) ? 0 : 1;
 	/* FIXME: following is just a wild guess */
 	UINT32 blank = ((m_screen->vpos() >= spg_vbstart) || (m_screen->vpos() < spg_vbend) |
-                    (m_screen->hpos() >= spg_hbstart) || (m_screen->hpos() < spg_hbend)) ? 0 : 1;
+					(m_screen->hpos() >= spg_hbstart) || (m_screen->hpos() < spg_hbend)) ? 0 : 1;
 	if(vo_control & 4) { blank^=1; }
 	if(vo_control & 2) { vsync^=1; }
 	if(vo_control & 1) { hsync^=1; }
@@ -1656,35 +1656,35 @@ WRITE32_MEMBER( powervr2_device::sb_pdapro_w )
 
 TIMER_CALLBACK_MEMBER(powervr2_device::transfer_opaque_list_irq)
 {
-//	printf("OPLST %d\n",m_screen->vpos());
+//  printf("OPLST %d\n",m_screen->vpos());
 
 	irq_cb(EOXFER_OPLST_IRQ);
 }
 
 TIMER_CALLBACK_MEMBER(powervr2_device::transfer_opaque_modifier_volume_list_irq)
 {
-//	printf("OPMV %d\n",m_screen->vpos());
+//  printf("OPMV %d\n",m_screen->vpos());
 
 	irq_cb(EOXFER_OPMV_IRQ);
 }
 
 TIMER_CALLBACK_MEMBER(powervr2_device::transfer_translucent_list_irq)
 {
-//	printf("TRLST %d\n",m_screen->vpos());
+//  printf("TRLST %d\n",m_screen->vpos());
 
 	irq_cb(EOXFER_TRLST_IRQ);
 }
 
 TIMER_CALLBACK_MEMBER(powervr2_device::transfer_translucent_modifier_volume_list_irq)
 {
-//	printf("TRMV %d\n",m_screen->vpos());
+//  printf("TRMV %d\n",m_screen->vpos());
 
 	irq_cb(EOXFER_TRMV_IRQ);
 }
 
 TIMER_CALLBACK_MEMBER(powervr2_device::transfer_punch_through_list_irq)
 {
-//	printf("PTLST %d\n",m_screen->vpos());
+//  printf("PTLST %d\n",m_screen->vpos());
 
 	irq_cb(EOXFER_PTLST_IRQ);
 }
@@ -2164,7 +2164,7 @@ void powervr2_device::render_hline(bitmap_rgb32 &bitmap, texinfo *ti, int y, flo
 	float *wbufline;
 
 	// untextured cases aren't handled
-//	if (!ti->textured) return;
+//  if (!ti->textured) return;
 
 	if(xr < 0 || xl >= 640)
 		return;
@@ -2908,7 +2908,7 @@ void powervr2_device::pvr_accumulationbuffer_to_framebuffer(address_space &space
 	UINT8 packmode = fb_w_ctrl & 0x7;
 	UINT8 unpackmode = (fb_r_ctrl & 0x0000000c) >>2;  // aka fb_depth
 
-//	popmessage("%02x %02x",packmode,unpackmode);
+//  popmessage("%02x %02x",packmode,unpackmode);
 
 	switch (packmode)
 	{
@@ -3003,7 +3003,7 @@ void powervr2_device::pvr_drawframebuffer(bitmap_rgb32 &bitmap,const rectangle &
 	//INT32 ystart_f2 = (vo_starty >> 16) & 0x3ff;
 	INT32 hstart = (vo_startx & 0x3ff);
 	int res_x,res_y;
-//	rectangle fbclip;
+//  rectangle fbclip;
 
 	UINT8 unpackmode = (fb_r_ctrl & 0x0000000c) >>2;  // aka fb_depth
 	UINT8 enable = (fb_r_ctrl & 0x00000001);
@@ -3018,7 +3018,7 @@ void powervr2_device::pvr_drawframebuffer(bitmap_rgb32 &bitmap,const rectangle &
 	dy++;
 	dy*=2; // probably depends on interlace mode, fields etc...
 
-//	popmessage("%d %d %d %d %d",ystart_f1,ystart_f2,interlace_on,spg_vblank & 0x3ff,(spg_vblank >> 16) & 0x3ff);
+//  popmessage("%d %d %d %d %d",ystart_f1,ystart_f2,interlace_on,spg_vblank & 0x3ff,(spg_vblank >> 16) & 0x3ff);
 
 #if 0
 	fbclip.min_x = hstart;
@@ -3345,14 +3345,14 @@ TIMER_CALLBACK_MEMBER(powervr2_device::vbin)
 	irq_cb(VBL_IN_IRQ);
 
 	//popmessage("VII %d VOI %d VI %d VO %d VS %d",spg_vblank_int & 0x3ff,(spg_vblank_int >> 16) & 0x3ff,spg_vblank & 0x3ff,(spg_vblank >> 16) & 0x3ff,(spg_load >> 16) & 0x3ff);
-//	vbin_timer->adjust(m_screen->time_until_pos(spg_vblank_int & 0x3ff));
+//  vbin_timer->adjust(m_screen->time_until_pos(spg_vblank_int & 0x3ff));
 }
 
 TIMER_CALLBACK_MEMBER(powervr2_device::vbout)
 {
 	irq_cb(VBL_OUT_IRQ);
 
-//	vbout_timer->adjust(m_screen->time_until_pos((spg_vblank_int >> 16) & 0x3ff));
+//  vbout_timer->adjust(m_screen->time_until_pos((spg_vblank_int >> 16) & 0x3ff));
 }
 
 TIMER_CALLBACK_MEMBER(powervr2_device::hbin)
@@ -3388,15 +3388,15 @@ TIMER_CALLBACK_MEMBER(powervr2_device::hbin)
 TIMER_CALLBACK_MEMBER(powervr2_device::endofrender_video)
 {
 	printf("VIDEO END %d\n",m_screen->vpos());
-//	endofrender_timer_video->adjust(attotime::never);
+//  endofrender_timer_video->adjust(attotime::never);
 }
 
 TIMER_CALLBACK_MEMBER(powervr2_device::endofrender_tsp)
 {
 	printf("TSP END %d\n",m_screen->vpos());
 
-//	endofrender_timer_tsp->adjust(attotime::never);
-//	endofrender_timer_video->adjust(attotime::from_usec(500) );
+//  endofrender_timer_tsp->adjust(attotime::never);
+//  endofrender_timer_video->adjust(attotime::from_usec(500) );
 }
 
 TIMER_CALLBACK_MEMBER(powervr2_device::endofrender_isp)
@@ -3405,10 +3405,10 @@ TIMER_CALLBACK_MEMBER(powervr2_device::endofrender_isp)
 	irq_cb(EOR_TSP_IRQ); // TSP end of render
 	irq_cb(EOR_VIDEO_IRQ); // VIDEO end of render
 
-//	printf("ISP END %d\n",m_screen->vpos());
+//  printf("ISP END %d\n",m_screen->vpos());
 
 	endofrender_timer_isp->adjust(attotime::never);
-//	endofrender_timer_tsp->adjust(attotime::from_usec(500) );
+//  endofrender_timer_tsp->adjust(attotime::from_usec(500) );
 }
 
 UINT32 powervr2_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -3605,8 +3605,8 @@ void powervr2_device::device_start()
 
 	computedilated();
 
-//	vbout_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(powervr2_device::vbout),this));
-//	vbin_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(powervr2_device::vbin),this));
+//  vbout_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(powervr2_device::vbout),this));
+//  vbin_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(powervr2_device::vbin),this));
 	hbin_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(powervr2_device::hbin),this));
 	yuv_timer_end = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(powervr2_device::yuv_convert_end),this));
 
@@ -3749,8 +3749,8 @@ void powervr2_device::device_reset()
 	renderselect= -1;
 	grabsel=0;
 
-//	vbout_timer->adjust(m_screen->time_until_pos((spg_vblank_int >> 16) & 0x3ff));
-//	vbin_timer->adjust(m_screen->time_until_pos(spg_vblank_int & 0x3ff));
+//  vbout_timer->adjust(m_screen->time_until_pos((spg_vblank_int >> 16) & 0x3ff));
+//  vbin_timer->adjust(m_screen->time_until_pos(spg_vblank_int & 0x3ff));
 	hbin_timer->adjust(m_screen->time_until_pos(0, ((spg_hblank_int >> 16) & 0x3ff)-1));
 
 	scanline = 0;
@@ -3786,4 +3786,3 @@ void powervr2_device::pvr_scanline_timer(int vpos)
 	if(vbout_line == vpos)
 		irq_cb(VBL_OUT_IRQ);
 }
-

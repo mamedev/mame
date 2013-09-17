@@ -67,8 +67,8 @@ TODO (general):
 TODO (game-specific):
     - 18 Wheeler Deluxe: "MOTOR NETWORK ERR IN 01 OUT FF" msg pops up during gameplay;
     - Airline Pilots Deluxe: returns error 03
- 	- Capcom vs. SNK Pro: doesn't accept start input (REGRESSION)
- 	- Derby Owner Club: if you try to start a game, it moans about something and enters into some kind of JP test mode, pretty bogus behaviour;
+    - Capcom vs. SNK Pro: doesn't accept start input (REGRESSION)
+    - Derby Owner Club: if you try to start a game, it moans about something and enters into some kind of JP test mode, pretty bogus behaviour;
     - Ferrari 355 Challenge: dies at the network check;
     - Giant Gram 2: no VMU emulation;
     - Gun Survivor 2: crashes during game loading;

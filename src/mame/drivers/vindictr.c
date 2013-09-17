@@ -183,7 +183,7 @@ static MACHINE_CONFIG_START( vindictr, vindictr_state )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(vindictr_state,vindictr)
-	
+
 	MCFG_ATARI_EEPROM_2804_ADD("eeprom")
 
 	/* video hardware */
@@ -194,7 +194,7 @@ static MACHINE_CONFIG_START( vindictr, vindictr_state )
 	MCFG_TILEMAP_ADD_STANDARD("playfield", 2, vindictr_state, get_playfield_tile_info, 8,8, SCAN_COLS, 64,64)
 	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", 2, vindictr_state, get_alpha_tile_info, 8,8, SCAN_ROWS, 64,32, 0)
 	MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "screen", vindictr_state::s_mob_config)
-	
+
 	MCFG_SCREEN_ADD("screen", RASTER)
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses a SYNGEN chip to generate video signals */

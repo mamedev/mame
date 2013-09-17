@@ -4781,7 +4781,7 @@ void TMS99XX_GET_INFO(legacy_cpu_device *device, UINT32 state, cpuinfo *info)
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, TMS99XX_device_get_name);       break;
 		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, TMS99XX_device_get_shortname);       break;
-		
+
 		case CPUINFO_STR_FAMILY:                    strcpy(info->s, "Texas Instruments 9900L"); break;
 		case CPUINFO_STR_VERSION:                   strcpy(info->s, "2.0");                 break;
 		case CPUINFO_STR_SOURCE_FILE:                       strcpy(info->s, __FILE__);              break;

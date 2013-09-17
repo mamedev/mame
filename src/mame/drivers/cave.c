@@ -808,13 +808,13 @@ UINT16 cave_state::ppsatan_touch_r(int player)
 	UINT16 x = ioport(player ? "TOUCH2_X" : "TOUCH1_X")->read();
 	UINT16 y = ioport(player ? "TOUCH2_Y" : "TOUCH1_Y")->read();
 
-	if (x & 0x8000)	// touching
+	if (x & 0x8000) // touching
 	{
 		x &= 0x7fff;
 
 		// x
 		int slot_x = floor( ((320.0f - 1 - x) - 12) / 20 );
-		
+
 		if (slot_x < 0)
 			slot_x = 0;
 		else if (slot_x > 14)
@@ -834,7 +834,7 @@ UINT16 cave_state::ppsatan_touch_r(int player)
 		if ( ((m_ppsatan_io_mux >> 2) & (1 << slot_y)) || ((m_ppsatan_io_mux << 6) & (1 << slot_y)) )
 			ret_y |= 1 << (slot_y % 6);
 
-//		if (!player)	popmessage("TOUCH %03x %03x -> %f -> %d", x, y, ((320.0f - 1 - x) - 12) / 20, slot_x);
+//      if (!player)    popmessage("TOUCH %03x %03x -> %f -> %d", x, y, ((320.0f - 1 - x) - 12) / 20, slot_x);
 	}
 
 	return ret_x | (ret_y << 8);
@@ -864,13 +864,13 @@ WRITE16_MEMBER(cave_state::ppsatan_out_w)
 	{
 		set_led_status(machine(), 4, data & 0x0100);
 		set_led_status(machine(), 5, data & 0x0200);
-		set_led_status(machine(), 6, data & 0x0400);	// not tested in service mode 
-		set_led_status(machine(), 7, data & 0x0800);	// not tested in service mode 
+		set_led_status(machine(), 6, data & 0x0400);    // not tested in service mode
+		set_led_status(machine(), 7, data & 0x0800);    // not tested in service mode
 
 		m_oki->set_bank_base((data & 0x8000) ? 0x40000 : 0);
 	}
 
-//	popmessage("OUT %04x", data);
+//  popmessage("OUT %04x", data);
 }
 
 static ADDRESS_MAP_START( ppsatan_map, AS_PROGRAM, 16, cave_state )
@@ -880,8 +880,8 @@ static ADDRESS_MAP_START( ppsatan_map, AS_PROGRAM, 16, cave_state )
 	// Left Screen (Player 2)
 	AM_RANGE(0x080000, 0x080005) AM_RAM AM_SHARE("vctrl.1")                             // Layer Control
 	AM_RANGE(0x100000, 0x107fff) AM_RAM_WRITE(cave_vram_1_w) AM_SHARE("vram.1")         // Layer
-//	AM_RANGE(0x180000, 0x1803ff) AM_RAM                                                 // Palette (Tilemaps)
-//	AM_RANGE(0x187800, 0x188fff) AM_RAM AM_SHARE("paletteram.1")                        // Palette (Sprites)
+//  AM_RANGE(0x180000, 0x1803ff) AM_RAM                                                 // Palette (Tilemaps)
+//  AM_RANGE(0x187800, 0x188fff) AM_RAM AM_SHARE("paletteram.1")                        // Palette (Sprites)
 	AM_RANGE(0x180000, 0x188fff) AM_RAM AM_SHARE("paletteram.1")                        // Palette
 	AM_RANGE(0x1c0000, 0x1c7fff) AM_RAM AM_SHARE("spriteram.1")                         // Sprites
 	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("SYSTEM" )                                // DSW + (unused) EEPROM
@@ -898,8 +898,8 @@ static ADDRESS_MAP_START( ppsatan_map, AS_PROGRAM, 16, cave_state )
 	// Right Screen (Player 1)
 	AM_RANGE(0x480000, 0x480005) AM_RAM AM_SHARE("vctrl.2")                             // Layer Control
 	AM_RANGE(0x500000, 0x507fff) AM_RAM_WRITE(cave_vram_2_w) AM_SHARE("vram.2")         // Layer
-//	AM_RANGE(0x580000, 0x5803ff) AM_RAM                                                 // Palette (Tilemaps)
-//	AM_RANGE(0x587800, 0x588fff) AM_RAM //AM_SHARE("paletteram.2")                      // Palette (Sprites)
+//  AM_RANGE(0x580000, 0x5803ff) AM_RAM                                                 // Palette (Tilemaps)
+//  AM_RANGE(0x587800, 0x588fff) AM_RAM //AM_SHARE("paletteram.2")                      // Palette (Sprites)
 	AM_RANGE(0x580000, 0x588fff) AM_RAM AM_SHARE("paletteram.2")                        // Palette
 	AM_RANGE(0x5c0000, 0x5c7fff) AM_RAM AM_SHARE("spriteram.2")                         // Sprites
 	AM_RANGE(0x6c0000, 0x6c007f) AM_WRITEONLY AM_SHARE("videoregs.2")                   // Video Regs
@@ -907,8 +907,8 @@ static ADDRESS_MAP_START( ppsatan_map, AS_PROGRAM, 16, cave_state )
 	// Top Screen
 	AM_RANGE(0x880000, 0x880005) AM_RAM AM_SHARE("vctrl.0")                             // Layer Control
 	AM_RANGE(0x900000, 0x907fff) AM_RAM_WRITE(cave_vram_0_w) AM_SHARE("vram.0")         // Layer
-//	AM_RANGE(0x980000, 0x9803ff) AM_RAM                                                 // Palette (Tilemaps)
-//	AM_RANGE(0x987800, 0x988fff) AM_RAM AM_SHARE("paletteram.0")                        // Palette (Sprites)
+//  AM_RANGE(0x980000, 0x9803ff) AM_RAM                                                 // Palette (Tilemaps)
+//  AM_RANGE(0x987800, 0x988fff) AM_RAM AM_SHARE("paletteram.0")                        // Palette (Sprites)
 	AM_RANGE(0x980000, 0x988fff) AM_RAM AM_SHARE("paletteram.0")                        // Palette
 	AM_RANGE(0x9c0000, 0x9c7fff) AM_RAM AM_SHARE("spriteram.0")                         // Sprites
 	AM_RANGE(0xac0000, 0xac007f) AM_WRITEONLY AM_SHARE("videoregs.0")                   // Video Regs
@@ -1660,7 +1660,7 @@ static INPUT_PORTS_START( ppsatan )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1    )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 ) // service coin
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE2 )	// advance in service mode
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE2 ) // advance in service mode
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN  )
@@ -1678,7 +1678,7 @@ static INPUT_PORTS_START( ppsatan )
 	PORT_DIPSETTING(      0x3000, DEF_STR( Normal ) )  // 20 hits
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hard ) )    // 25 hits
 	PORT_DIPSETTING(      0x2000, "Hard (duplicate)" )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION("SW1:7")	// Jingle after "warning" screen (every 3 demo loops)
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION("SW1:7")   // Jingle after "warning" screen (every 3 demo loops)
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x4000, DEF_STR( On ) )
 	PORT_SERVICE(0x8000, IP_ACTIVE_LOW)                         PORT_DIPLOCATION("SW1:8")
@@ -2473,7 +2473,7 @@ static MACHINE_CONFIG_START( pacslot, cave_state )
 
 	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
-	
+
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_EEPROM_SERIAL_ENABLE_STREAMING()
 
@@ -2513,7 +2513,7 @@ MACHINE_CONFIG_END
 
 TIMER_DEVICE_CALLBACK_MEMBER( cave_state::timer_lev2_cb )
 {
-	m_maincpu->set_input_line(M68K_IRQ_2, HOLD_LINE);	// ppsatan: read touch screens
+	m_maincpu->set_input_line(M68K_IRQ_2, HOLD_LINE);   // ppsatan: read touch screens
 }
 
 static MACHINE_CONFIG_START( ppsatan, cave_state )
@@ -2532,7 +2532,7 @@ static MACHINE_CONFIG_START( ppsatan, cave_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_lev2", cave_state, timer_lev2_cb, attotime::from_hz(60))
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)		// Top
+	MCFG_SCREEN_ADD("screen", RASTER)       // Top
 	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(320, 240)

@@ -148,7 +148,7 @@ static SAMPLES_START( spectar_audio_start )
 {
 	running_machine &machine = device.machine();
 	exidy_state *state = machine.driver_data<exidy_state>();
-	
+
 	state->common_audio_start(SPECTAR_MAXFREQ);
 }
 
@@ -157,7 +157,7 @@ static SAMPLES_START( targ_audio_start )
 {
 	running_machine &machine = device.machine();
 	exidy_state *state = machine.driver_data<exidy_state>();
-	
+
 	state->common_audio_start(TARG_MAXFREQ);
 
 	state->m_tone_pointer = 0;

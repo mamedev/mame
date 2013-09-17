@@ -7,7 +7,7 @@
 extern const device_type I80286;
 
 enum
-{	// same order as I8086 registers
+{   // same order as I8086 registers
 	I286_PC = 0,
 
 	I286_IP,

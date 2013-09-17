@@ -68,8 +68,6 @@ WRITE16_MEMBER(ddragon3_state::ddragon3_bg_videoram_w)
 
 TILE_GET_INFO_MEMBER(ddragon3_state::get_fg_tile_info)
 {
-
-
 	UINT16 *tilebase;
 	int tileno,colbank;
 
@@ -332,4 +330,3 @@ UINT32 wwfwfest_state::screen_update_wwfwfest(screen_device &screen, bitmap_ind1
 
 	return 0;
 }
-

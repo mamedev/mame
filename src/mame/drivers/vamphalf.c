@@ -984,8 +984,8 @@ static MACHINE_CONFIG_START( common, vamphalf_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
-	MCFG_EEPROM_ERASE_TIME(attotime::from_usec(250))	// coolmini requires fast erase
-	MCFG_EEPROM_WRITE_TIME(attotime::from_usec(250))	// dtfamily requires fast write
+	MCFG_EEPROM_ERASE_TIME(attotime::from_usec(250))    // coolmini requires fast erase
+	MCFG_EEPROM_WRITE_TIME(attotime::from_usec(250))    // dtfamily requires fast write
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

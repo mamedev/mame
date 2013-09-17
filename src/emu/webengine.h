@@ -55,25 +55,25 @@ public:
 	void push_message(const char *message);
 	void close();
 
-	void set_machine(running_machine &machine) { m_machine = &machine; }	
-	
+	void set_machine(running_machine &machine) { m_machine = &machine; }
+
 	void websocket_ready_handler(struct mg_connection *conn);
 	int websocket_data_handler(struct mg_connection *conn, int flags, char *data, size_t data_len);
-	int begin_request_handler(struct mg_connection *conn);	
-	void *websocket_keepalive();	
+	int begin_request_handler(struct mg_connection *conn);
+	void *websocket_keepalive();
 protected:
 	// getters
 	running_machine &machine() const { return *m_machine; }
-	
+
 	int json_game_handler(struct mg_connection *conn);
 	int json_slider_handler(struct mg_connection *conn);
 private:
 	// internal state
-	emu_options &		m_options;
-	running_machine *   m_machine;	
+	emu_options &       m_options;
+	running_machine *   m_machine;
 	struct mg_context * m_ctx;
-	osd_ticks_t 		m_lastupdatetime;
-	bool 				m_exiting_core;
+	osd_ticks_t         m_lastupdatetime;
+	bool                m_exiting_core;
 	simple_list<simple_list_wrapper<mg_connection> > m_websockets;
 };
 

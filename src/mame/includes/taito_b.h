@@ -66,7 +66,7 @@ public:
 	optional_device<tc0220ioc_device> m_tc0220ioc;
 	optional_device<tc0510nio_device> m_tc0510nio;
 	optional_device<mb87078_device> m_mb87078;
-	
+
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
 	DECLARE_READ16_MEMBER(tracky1_hi_r);
 	DECLARE_READ16_MEMBER(tracky1_lo_r);

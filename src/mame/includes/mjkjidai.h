@@ -20,7 +20,7 @@ public:
 	required_shared_ptr<UINT8> m_spriteram2;
 	required_shared_ptr<UINT8> m_spriteram3;
 	required_shared_ptr<UINT8> m_videoram;
-	
+
 	required_device<cpu_device> m_maincpu;
 	required_device<mjkjidai_adpcm_device> m_mjk_adpcm;
 
@@ -48,7 +48,7 @@ class mjkjidai_adpcm_device : public device_t,
 public:
 	mjkjidai_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~mjkjidai_adpcm_device() {}
-	
+
 	void mjkjidai_adpcm_play (int offset, int length);
 
 protected:

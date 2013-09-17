@@ -174,7 +174,7 @@ static MACHINE_CONFIG_START( mustache, mustache_state )
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(memmap)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mustache_state, mustache_scanline, "screen", 0, 1)
-	
+
 	MCFG_T5182_ADD("t5182")
 	MCFG_FRAGMENT_ADD(t5182)
 
@@ -192,9 +192,9 @@ static MACHINE_CONFIG_START( mustache, mustache_state )
 
 	/* sound hardware */
 	MCFG_SEIBU_SOUND_ADD("seibu_sound") // for seibu_sound_decrypt on the MAIN cpu (not sound)
-	
+
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	
+
 	MCFG_YM2151_ADD("ymsnd", YM_CLOCK)
 	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("t5182", t5182_device, ym2151_irq_handler))
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)

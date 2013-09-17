@@ -76,7 +76,7 @@ public:
 	DECLARE_WRITE8_MEMBER( register_write );
 	DECLARE_READ8_MEMBER( vcount_read );
 	DECLARE_READ8_MEMBER( hcount_read );
-	
+
 	DECLARE_PALETTE_INIT( sega315_5124 );
 
 	void hcount_latch() { hcount_latch_at_hpos( m_screen->hpos() ); };

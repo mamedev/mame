@@ -124,7 +124,7 @@ class namcos22_renderer : public poly_manager<float, namcos22_object_data, 4, 80
 {
 public:
 	namcos22_renderer(namcos22_state &state);
-	
+
 	void render_scene(screen_device &screen, bitmap_rgb32 &bitmap);
 	struct namcos22_scenenode *new_scenenode(running_machine &machine, UINT32 zsort, namcos22_scenenode_type type);
 
@@ -306,7 +306,7 @@ public:
 	float m_camera_lz; // "
 	int m_camera_ambient; // 0.0..1.0
 	int m_camera_power;   // 0.0..1.0
-	
+
 	DECLARE_WRITE32_MEMBER(namcos22s_czram_w);
 	DECLARE_READ32_MEMBER(namcos22s_czram_r);
 	DECLARE_READ32_MEMBER(namcos22s_vics_control_r);
@@ -396,13 +396,13 @@ public:
 
 	inline UINT8 nthbyte(const UINT32 *src, int n) { return (src[n / 4] << ((n & 3) * 8)) >> 24; }
 	inline UINT16 nthword(const UINT32 *src, int n) { return (src[n / 2] << ((n & 1) * 16)) >> 16; }
-	
+
 	inline INT32 signed18(INT32 val) { return (val & 0x00020000) ? (INT32)(val | 0xfffc0000) : val & 0x0001ffff; }
 	inline INT32 signed24(INT32 val) { return (val & 0x00800000) ? (INT32)(val | 0xff000000) : val & 0x007fffff; }
-	
+
 	inline float dspfixed_to_nativefloat(INT16 val) { return val / (float)0x7fff; }
 	float dspfloat_to_nativefloat(UINT32 val);
-	
+
 	void handle_driving_io();
 	void handle_coinage(int slots, int address_is_odd);
 	void handle_cybrcomm_io();
@@ -412,23 +412,23 @@ public:
 	void slave_halt();
 	void slave_enable();
 	void enable_slave_simulation(bool enable);
-	
+
 	void matrix3d_multiply(float a[4][4], float b[4][4]);
 	void matrix3d_identity(float m[4][4]);
 	void transform_point(float *vx, float *vy, float *vz, float m[4][4]);
 	void transform_normal(float *nx, float *ny, float *nz, float m[4][4]);
 	void register_normals(INT32 addr, float m[4][4]);
-	
+
 	void blit_single_quad(bitmap_rgb32 &bitmap, UINT32 color, UINT32 addr, float m[4][4], INT32 polyshift, int flags, int packetformat);
 	void blit_quads(bitmap_rgb32 &bitmap, INT32 addr, float m[4][4], INT32 base);
 	void blit_polyobject(bitmap_rgb32 &bitmap, int code, float m[4][4]);
-	
+
 	void slavesim_handle_bb0003(const INT32 *src);
 	void slavesim_handle_200002(bitmap_rgb32 &bitmap, const INT32 *src);
 	void slavesim_handle_300000(const INT32 *src);
 	void slavesim_handle_233002(const INT32 *src);
 	void simulate_slavedsp(bitmap_rgb32 &bitmap);
-	
+
 	INT32 point_read(INT32 addr);
 	void init_tables();
 	void update_mixer();
@@ -441,7 +441,7 @@ public:
 	void draw_text_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void namcos22s_mix_text_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int prival);
 	void namcos22_mix_text_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	
+
 	void install_c74_speedup();
 	void install_130_speedup();
 	void install_141_speedup();

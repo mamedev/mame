@@ -36,7 +36,7 @@ class micropolis_device : public device_t,
 public:
 	micropolis_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~micropolis_device() {}
-	
+
 	void set_drive(UINT8 drive); // set current drive (0-3)
 
 	DECLARE_READ8_MEMBER( status_r );
@@ -53,14 +53,14 @@ protected:
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 private:
 	// internal state
-	
+
 	devcb_resolved_read_line m_in_dden_func;
 	devcb_resolved_write_line m_out_intrq_func;
 	devcb_resolved_write_line m_out_drq_func;
-	
+
 	/* register */
 	UINT8 m_data;
 	UINT8 m_drive_num;
@@ -79,7 +79,7 @@ private:
 
 	/* this is the drive currently selected */
 	device_t *m_drive;
-	
+
 	void read_sector();
 	void write_sector();
 };

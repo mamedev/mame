@@ -83,8 +83,8 @@
     - Bishoujo Shanshinkan: has white rectangles all over the place;
     - Bishoujo Tsuushin: hangs with a beep while writing some intro text;
 
-	- Bomber Quest: beeps when speech is supposed to be played (0->1 to i/o port 0xfe8e?)
-	- Deflektor: no sound, moans about a DIP-sw during loading, very slow on non-pc9801rs machines;
+    - Bomber Quest: beeps when speech is supposed to be played (0->1 to i/o port 0xfe8e?)
+    - Deflektor: no sound, moans about a DIP-sw during loading, very slow on non-pc9801rs machines;
     - Dragon Buster: slight issue with window masking;
     - Far Side Moon: doesn't detect sound board (tied to 0x00ec ports)
     - Jan Borg Suzume: gets stuck at a pic8259 read;
@@ -92,17 +92,17 @@
     - Lovely Horror: Doesn't show kanji, tries to read it thru the 0xa9 port;
     - Madou Monogatari 1/2/3: doesn't display bitmap gfxs during gameplay;
     - Quarth: should do a split screen effect, it doesn't hence there are broken gfxs
- 	- Princess Maker 2: mouse is buggy;
+    - Princess Maker 2: mouse is buggy;
     - Princess Maker 2: screen transitions are very ugly (btanb?)
- 	- Puyo Puyo: beeps out when it's supposed to play samples, Not supposed to use ADPCM, is it a PIT issue?
- 	- Puzznic: trips illegal irq 0x41 (?), prints an error on screen. (PC-9801RS only, writes an 1 to 0x69d2f for whatever reason, almost surely a btanb)
- 	- Runner's High: wrong double height on the title screen;
- 	- Sokoban Perfect: hangs at title screen, after loading the menu;
+    - Puyo Puyo: beeps out when it's supposed to play samples, Not supposed to use ADPCM, is it a PIT issue?
+    - Puzznic: trips illegal irq 0x41 (?), prints an error on screen. (PC-9801RS only, writes an 1 to 0x69d2f for whatever reason, almost surely a btanb)
+    - Runner's High: wrong double height on the title screen;
+    - Sokoban Perfect: hangs at title screen, after loading the menu;
     - Sorcerian, Twilight Zone 3: Fails initial booting, issue with 2dd irq?
-	- The Incredible Machine: hangs at main menu (YM mis-fires irq?)
+    - The Incredible Machine: hangs at main menu (YM mis-fires irq?)
     - Uchiyama Aki no Chou Bangai: keyboard irq is fussy (sometimes it doesn't register a key press);
     - Uno: uses EGC
-	- Viper V16 Demo: moans with a JP message;
+    - Viper V16 Demo: moans with a JP message;
 
     per-game TODO (PC-9821):
     - Battle Skin Panic: gfx bugs at the Gainax logo, it crashes after it;
@@ -323,7 +323,7 @@ IDE:
 0x432: IDE drive switch
 0x435: <unknown>
 
-													(ISA correlated i/o)
+                                                    (ISA correlated i/o)
 ----------------------------------------------------------
 0x0640      |WORD|R/W|Data Register                |01F0h
 0x0642      |BYTE| R |Error Register               |01F1h
@@ -2291,15 +2291,15 @@ WRITE8_MEMBER(pc9801_state::pc9801rs_ide_io_0_w)
 	/*
 	[0x430]
 	[Read/write]
-		bit 7-0: unknown
-		00 h = IDE Bank # 1
-		01 h = IDE Bank # 2
+	    bit 7-0: unknown
+	    00 h = IDE Bank # 1
+	    01 h = IDE Bank # 2
 
 	[0x432]
-		bit 7-0: Bank select
-		80 h = readout for dummy (only [WRITE])
-		00 h = IDE Bank # 1 choice
-		01 h = IDE Bank # 2 selection
+	    bit 7-0: Bank select
+	    80 h = readout for dummy (only [WRITE])
+	    00 h = IDE Bank # 1 choice
+	    01 h = IDE Bank # 2 selection
 	*/
 
 	printf("IDE w %02x %02x\n",offset,data);
@@ -3828,7 +3828,7 @@ static MACHINE_CONFIG_DERIVED( pc9801ux, pc9801rs )
 	MCFG_80286_A20(pc9801_state, pc9801_286_a20)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc9801_state, pc9801_vrtc_irq)
 
-//	MCFG_I8237_REPLACE("i8237", 10000000, pc9801rs_dmac_intf) // unknown clock
+//  MCFG_I8237_REPLACE("i8237", 10000000, pc9801rs_dmac_intf) // unknown clock
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pc9801bx2, pc9801rs )

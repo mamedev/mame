@@ -72,8 +72,6 @@ DRIVER_INIT_MEMBER(stfight_state,stfight)
 
 DRIVER_INIT_MEMBER(stfight_state,cshooter)
 {
-
-
 }
 
 void stfight_state::machine_reset()

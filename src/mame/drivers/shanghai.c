@@ -34,7 +34,7 @@ public:
 	shanghai_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_hd63484(*this, "hd63484")	{ }
+		m_hd63484(*this, "hd63484") { }
 
 	DECLARE_WRITE16_MEMBER(shanghai_coin_w);
 	DECLARE_READ16_MEMBER(kothello_hd63484_status_r);

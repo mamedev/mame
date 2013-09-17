@@ -44,9 +44,9 @@ Notes:
 
 /*
 
-	TODO:
+    TODO:
 
-	- floppy broken (wd1770 digital PLL FM mode incomplete)
+    - floppy broken (wd1770 digital PLL FM mode incomplete)
 
 */
 

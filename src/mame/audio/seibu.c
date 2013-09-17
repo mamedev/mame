@@ -43,7 +43,7 @@
 
 
 /***************************************************************************
-	Seibu Sound System
+    Seibu Sound System
 ***************************************************************************/
 
 /*
@@ -100,13 +100,13 @@ void seibu_sound_device::device_start()
 {
 	m_main2sub[0] = m_main2sub[1] = 0;
 	m_sub2main[0] = m_sub2main[1] = 0;
-	
+
 	save_item(NAME(m_main2sub_pending));
 	save_item(NAME(m_sub2main_pending));
-	
+
 	save_item(NAME(m_main2sub));
 	save_item(NAME(m_sub2main));
-	
+
 	for (int i = 0; i < 2; i++)
 	{
 		save_item(NAME(m_main2sub[i]), i);
@@ -222,8 +222,8 @@ void seibu_sound_device::update_irq_lines(int param)
 				m_sound_cpu->execute().set_input_line_and_vector(0,ASSERT_LINE,irq1 & irq2);
 	else
 	return;
-	}	
-	
+	}
+
 
 WRITE8_MEMBER( seibu_sound_device::irq_clear_w )
 {
@@ -497,7 +497,7 @@ ADDRESS_MAP_START( seibu3_adpcm_sound_map, AS_PROGRAM, 8, driver_device )
 ADDRESS_MAP_END
 
 /***************************************************************************
-	Seibu ADPCM device
+    Seibu ADPCM device
 ***************************************************************************/
 
 const device_type SEIBU_ADPCM = &device_creator<seibu_adpcm_device>;

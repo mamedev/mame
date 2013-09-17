@@ -12,10 +12,10 @@ public:
 
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_s2636_0_ram;
-	
+
 	required_device<cpu_device> m_maincpu;
 	required_device<s2636_device> m_s2636_sound;
-	
+
 	bitmap_ind16 m_bitmap;
 	bitmap_ind16 m_spritebitmap;
 	int m_CollisionBackground;

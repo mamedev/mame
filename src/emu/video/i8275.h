@@ -59,7 +59,7 @@ struct i8275_interface
 };
 
 
-class i8275_device : 	public device_t,
+class i8275_device :    public device_t,
 						public device_video_interface,
 						public i8275_interface
 {

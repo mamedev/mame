@@ -5,28 +5,28 @@
     Driver-in-progress by R. Belmont and Miodrag Milanovic with additions by Karl-Ludwig Deisenhofer.
 
     STATE AS OF SEPTEMBER 2013
-	--------------------------
-	- FATAL: keyboard emulation needs love (inhibits the system from booting with ERROR 50 on cold or ERROR 13 on warm boot).
-	- NOT WORKING: serial (ERROR 60) 
-	- NOT WORKING: printer interface (ERROR 40).
+    --------------------------
+    - FATAL: keyboard emulation needs love (inhibits the system from booting with ERROR 50 on cold or ERROR 13 on warm boot).
+    - NOT WORKING: serial (ERROR 60)
+    - NOT WORKING: printer interface (ERROR 40).
 
-	- NON-CRITICAL: NVRAM currently saves changes instantly.  A switch to EEPROM (load, store...) might be in order.  
-	- NON-CRITICAL: no code for W18 (DSR) jumper.
-	- NON-CRITICAL: watchdog logic not implemented. MHFLU - ERROR 16 indicated hardware problems or (most often) software crashes on real hardware.
+    - NON-CRITICAL: NVRAM currently saves changes instantly.  A switch to EEPROM (load, store...) might be in order.
+    - NON-CRITICAL: no code for W18 (DSR) jumper.
+    - NON-CRITICAL: watchdog logic not implemented. MHFLU - ERROR 16 indicated hardware problems or (most often) software crashes on real hardware.
 
-	- FUTURE IMPROVEMENTS (=> DIP switches currently disabled):  
-			* Color graphics option (NEC 7220)
-			* Extended communication option ( = Bundle option ?)
-             
+    - FUTURE IMPROVEMENTS (=> DIP switches currently disabled):
+            * Color graphics option (NEC 7220)
+            * Extended communication option ( = Bundle option ?)
+
 
     Meaning of Diagnostics LEDs (from PC100ESV1.PDF found, e.g.,
     on ftp://ftp.update.uu.se/pub/rainbow/doc/rainbow-docs/
 
-    Internal Diagnostic Messages                               F 
+    Internal Diagnostic Messages                               F
     Msg Message                               Lights Display   A
     No.                                       * = on o = off   T
                                               - = on or off    A
-                                              1 2 3 4 5 6 7    L 
+                                              1 2 3 4 5 6 7    L
     --------------------------------------------------------------
      1  Main Board (Video)                    o * * o * o *   Yes
      2  Main Board* (unsolicited interrupt)   * * * * o * o   Yes
@@ -74,7 +74,7 @@
 PCB layout
 ----------
 
-DEC-100 model B 
+DEC-100 model B
 
 PCB # 5416206 / 5016205-01C1:
 
@@ -125,7 +125,7 @@ W17 pulls J1 serial  port pin 1 to GND when set (otherwise pin unconnected)
 
 #include "rainbow.lh" // BEZEL - LAYOUT with LEDs for diag 1-7, keyboard 8-11 and floppy 20-21
 
-#define DEC_B_NVMEM_SIZE (256) 
+#define DEC_B_NVMEM_SIZE (256)
 
 class rainbow_state : public driver_device
 {
@@ -161,8 +161,8 @@ public:
 	required_ioport m_inp6;
 	required_ioport m_inp7;
 	required_ioport m_inp8;
-		
-    required_device<beep_device> m_beep;
+
+	required_device<beep_device> m_beep;
 
 	required_device<rainbow_video_device> m_crtc;
 	required_device<cpu_device> m_i8088;
@@ -185,7 +185,7 @@ public:
 
 	DECLARE_READ8_MEMBER(comm_control_r);
 	DECLARE_WRITE8_MEMBER(comm_control_w);
-		
+
 	DECLARE_READ8_MEMBER(share_z80_r);
 	DECLARE_WRITE8_MEMBER(share_z80_w);
 
@@ -193,10 +193,10 @@ public:
 	DECLARE_WRITE8_MEMBER(floating_bus_w);
 
 		// EMULATOR TRAP TO INTERCEPT KEYBOARD cmd in AH and PARAMETER in AL (port 90 = AL / port 91 = AH)
-        // TODO: beeper and led handling should better be handled by LK201 code.
+		// TODO: beeper and led handling should better be handled by LK201 code.
 	DECLARE_WRITE8_MEMBER(PORT90_W);
 	DECLARE_WRITE8_MEMBER(PORT91_W);
-	
+
 	DECLARE_READ8_MEMBER(i8088_latch_r);
 	DECLARE_WRITE8_MEMBER(i8088_latch_w);
 	DECLARE_READ8_MEMBER(z80_latch_r);
@@ -204,10 +204,10 @@ public:
 
 	DECLARE_WRITE8_MEMBER(z80_diskdiag_read_w);
 	DECLARE_WRITE8_MEMBER(z80_diskdiag_write_w);
-	
+
 	DECLARE_WRITE8_MEMBER(z80_diskcontrol_write_w);
 	DECLARE_READ8_MEMBER(system_parameter_r);
-	
+
 	DECLARE_READ_LINE_MEMBER(kbd_rx);
 	DECLARE_WRITE_LINE_MEMBER(kbd_tx);
 	DECLARE_WRITE_LINE_MEMBER(kbd_rxready_w);
@@ -218,7 +218,7 @@ public:
 	bool m_zflip;                   // Z80 alternate memory map with A15 inverted
 	bool m_z80_halted;
 	bool m_kbd_tx_ready, m_kbd_rx_ready;
-	
+
 	int m_KBD;
 	int m_beep_counter;
 
@@ -236,7 +236,7 @@ public:
 };
 
 void rainbow_state::machine_start()
-{	m_COLDBOOT = true;
+{   m_COLDBOOT = true;
 
 	save_item(NAME(m_z80_private));
 	save_item(NAME(m_z80_mailbox));
@@ -249,25 +249,25 @@ void rainbow_state::machine_start()
 
 	// Enables PORT90_W + PORT91_W via BIOS call (offset +$21 in HIGH ROM)
 	// F8 / FC ROM REGION (CHECK + PATCH)
-	if(rom[0xfc000 + 0x0022] == 0x22 && rom[0xfc000 + 0x0023] == 0x28) 
+	if(rom[0xfc000 + 0x0022] == 0x22 && rom[0xfc000 + 0x0023] == 0x28)
 	{
 			rom[0xf4303]=0x00; // Disable CRC CHECK (F0 / F4 ROM)
 
 			rom[0xfc000 + 0x0022] =0xe2;  // jmp to offset $3906
 			rom[0xfc000 + 0x0023] =0x38;
-			
+
 			rom[0xfc000 + 0x3906] =0xe6;  // out 90,al
 			rom[0xfc000 + 0x3907] =0x90;
-			
+
 			rom[0xfc000 + 0x3908] =0x86;  //  xchg al,ah
 			rom[0xfc000 + 0x3909] =0xc4;
 
 			rom[0xfc000 + 0x390a] =0xe6;  // out 91,al
 			rom[0xfc000 + 0x390b] =0x91;
-			
+
 			rom[0xfc000 + 0x390c] =0x86;  // xchg al,ah
 			rom[0xfc000 + 0x390d] =0xc4;
-			
+
 			rom[0xfc000 + 0x390e] =0xe9;  // jmp (original jump offset $2846)
 			rom[0xfc000 + 0x390f] =0x35;
 			rom[0xfc000 + 0x3910] =0xef;
@@ -279,18 +279,18 @@ static ADDRESS_MAP_START( rainbow8088_map, AS_PROGRAM, 8, rainbow_state)
 	AM_RANGE(0x00000, 0x0ffff) AM_RAM AM_SHARE("sh_ram")
 	AM_RANGE(0x10000, 0x1ffff) AM_RAM
 
-	// test at f4e00 - f4e1c 
-	AM_RANGE(0x20000, 0xdffff) AM_READWRITE(floating_bus_r,floating_bus_w)  
-	AM_RANGE(0x20000, 0xdffff) AM_RAM  
+	// test at f4e00 - f4e1c
+	AM_RANGE(0x20000, 0xdffff) AM_READWRITE(floating_bus_r,floating_bus_w)
+	AM_RANGE(0x20000, 0xdffff) AM_RAM
 
 	// TODO: handle shadowing 100% correctly.
 	// PDF says there is a 256 x 4 bit NVRAM from 0xed000 to 0xed040.
- 	// * SHOULD * be shadowed from $ec00 - $ecfff AND FROM $ed040 - $edfff. 
+	// * SHOULD * be shadowed from $ec00 - $ecfff AND FROM $ed040 - $edfff.
 	// "address bits 8-12 are not decoded when accessing the NVM"
 
 	// ROM code gives an error if NVRAM isn't 256 x 8 bit
 	// with address bits 8-12 ignored, so do that.
-	AM_RANGE(0xec000, 0xec0ff) AM_MIRROR(0x1f00) AM_RAM AM_SHARE("nvram") 
+	AM_RANGE(0xec000, 0xec0ff) AM_MIRROR(0x1f00) AM_RAM AM_SHARE("nvram")
 
 	AM_RANGE(0xee000, 0xeffff) AM_RAM AM_SHARE("p_ram")
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM
@@ -300,22 +300,22 @@ static ADDRESS_MAP_START( rainbow8088_io , AS_IO, 8, rainbow_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE (0x00, 0x00) AM_READWRITE(i8088_latch_r, i8088_latch_w)
-	
+
 	// 0x02 Communication status / control register (8088)
 	AM_RANGE (0x02, 0x02) AM_READWRITE(comm_control_r, comm_control_w)
 
 	// 0x04 Video processor DC011
 	AM_RANGE (0x04, 0x04) AM_DEVWRITE("vt100_video", rainbow_video_device, dc011_w)
-      
+
 	AM_RANGE (0x08, 0x08) AM_READ(system_parameter_r)
-	
+
 	AM_RANGE (0x0a, 0x0a) AM_READWRITE(diagnostic_r, diagnostic_w)
 	// 0x0C Video processor DC012
 	AM_RANGE (0x0c, 0x0c) AM_DEVWRITE("vt100_video", rainbow_video_device, dc012_w)
 
 	AM_RANGE(0x10, 0x10) AM_DEVREADWRITE("kbdser", i8251_device, data_r, data_w)
 	AM_RANGE(0x11, 0x11) AM_DEVREADWRITE("kbdser", i8251_device, status_r, control_w)
-	
+
 	AM_RANGE (0x90, 0x90) AM_WRITE(PORT90_W)
 	AM_RANGE (0x91, 0x91) AM_WRITE(PORT91_W)
 ADDRESS_MAP_END
@@ -340,13 +340,13 @@ ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( rainbow )
-    	PORT_START("FLOPPY CONTROLLER")
-	    PORT_DIPNAME( 0x02, 0x02, "FLOPPY CONTROLLER") PORT_TOGGLE
+		PORT_START("FLOPPY CONTROLLER")
+		PORT_DIPNAME( 0x02, 0x02, "FLOPPY CONTROLLER") PORT_TOGGLE
 		PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 		PORT_DIPSETTING(    0x02, DEF_STR( On ) )
 
 	PORT_START("MEMORY PRESENT")
-	    PORT_DIPNAME( 0xF000, 0x2000, "MEMORY PRESENT") 
+		PORT_DIPNAME( 0xF000, 0x2000, "MEMORY PRESENT")
 		PORT_DIPSETTING(    0x2000, "128 K (BOARD DEFAULT)" ) // NOTE: 0x2000 hard coded in 'system_parameter_r'
 		PORT_DIPSETTING(    0x3000, "192 K (MEMORY OPTION)" )
 		PORT_DIPSETTING(    0x4000, "256 K (MEMORY OPTION)" )
@@ -361,29 +361,29 @@ static INPUT_PORTS_START( rainbow )
 		PORT_DIPSETTING(    0xD000, "832 K (MEMORY OPTION)" )
 		PORT_DIPSETTING(    0xE000, "896 K (MEMORY OPTION)" )
 
-    	PORT_START("GRAPHICS OPTION")
-	    PORT_DIPNAME( 0x00, 0x00, "GRAPHICS OPTION") PORT_TOGGLE
+		PORT_START("GRAPHICS OPTION")
+		PORT_DIPNAME( 0x00, 0x00, "GRAPHICS OPTION") PORT_TOGGLE
 		PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 		PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-    	PORT_START("BUNDLE OPTION")
-	    PORT_DIPNAME( 0x00, 0x00, "BUNDLE OPTION") PORT_TOGGLE
+		PORT_START("BUNDLE OPTION")
+		PORT_DIPNAME( 0x00, 0x00, "BUNDLE OPTION") PORT_TOGGLE
 		PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 		PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-			
+
 	PORT_START("W13")
-	    PORT_DIPNAME( 0x02, 0x02, "W13") PORT_TOGGLE
+		PORT_DIPNAME( 0x02, 0x02, "W13") PORT_TOGGLE
 		PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 		PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_START("W14")
-	    PORT_DIPNAME( 0x04, 0x04, "W14") PORT_TOGGLE
+		PORT_DIPNAME( 0x04, 0x04, "W14") PORT_TOGGLE
 		PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 		PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_START("W15")
-	    PORT_DIPNAME( 0x08, 0x08, "W15") PORT_TOGGLE
+		PORT_DIPNAME( 0x08, 0x08, "W15") PORT_TOGGLE
 		PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 		PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_START("W18")
-	    PORT_DIPNAME( 0x00, 0x04, "W18") PORT_TOGGLE
+		PORT_DIPNAME( 0x00, 0x04, "W18") PORT_TOGGLE
 		PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 		PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -398,12 +398,12 @@ void rainbow_state::machine_reset()
 	m_kbd_tx_ready = m_kbd_rx_ready = false;
 
 	m_kbd8251->input_callback(SERIAL_STATE_CTS); // raise clear to send
-	
-	m_KBD = 0; 
+
+	m_KBD = 0;
 
 	m_beep->set_frequency(2000);
-    	m_beep->set_state(0);	
-	
+		m_beep->set_state(0);
+
 	// RESET ALL LEDs
 	output_set_value("led1", 1);
 	output_set_value("led2", 1);
@@ -416,7 +416,7 @@ void rainbow_state::machine_reset()
 	output_set_value("led9", 1);
 	output_set_value("led10", 1);
 	output_set_value("led11", 1);
-	
+
 	output_set_value("led20", 1); // DRIVE 0 (A)
 	output_set_value("led21", 1); // DRIVE 1 (B)
 }
@@ -431,21 +431,21 @@ UINT32 rainbow_state::screen_update_rainbow(screen_device &screen, bitmap_ind16 
 // WANTED: is a cleaner, more compatible way feasible?
 READ8_MEMBER(rainbow_state::floating_bus_r)
 {
-  if ( m_maincpu->state_int(I8086_CS) != 0xF400) 
-    	return space.read_byte(offset);
+	if ( m_maincpu->state_int(I8086_CS) != 0xF400)
+		return space.read_byte(offset);
 
-  if  ( m_maincpu->state_int(I8086_DS) < m_inp8->read() )
-  {
-	  	return space.read_byte(offset);
-  } else 
-  {
-	    return (offset>>16) + 2; 
-  }
+	if  ( m_maincpu->state_int(I8086_DS) < m_inp8->read() )
+	{
+		return space.read_byte(offset);
+	} else
+	{
+		return (offset>>16) + 2;
+	}
 }
 
 WRITE8_MEMBER(rainbow_state::floating_bus_w)
 {
-  space.write_byte(offset,data);
+	space.write_byte(offset,data);
 }
 
 
@@ -507,31 +507,31 @@ WRITE8_MEMBER(rainbow_state::share_z80_w)
 
 READ8_MEMBER(rainbow_state::system_parameter_r)
 {
-/*	Info about option boards is in bits 0 - 3:
+/*  Info about option boards is in bits 0 - 3:
     Bundle card (1) | Floppy (2) | Graphics (4) | Memory option (8)
 
-	0 1 2 3 4 5 6 7
+    0 1 2 3 4 5 6 7
     B F G M
    ( 1 means NOT present )
 */
 	// Hard coded value 0x2000 - see DIP switch setup!
-	return 0x0f - m_inp5->read() - m_inp6->read() - m_inp7->read() - ( 
-									   (m_inp8->read() > 0x2000) ? 8 : 0  
-									 );
+	return 0x0f - m_inp5->read() - m_inp6->read() - m_inp7->read() - (
+										(m_inp8->read() > 0x2000) ? 8 : 0
+										);
 }
 
 READ8_MEMBER(rainbow_state::comm_control_r)
 {
-  // Our simple COLDBOOT flag is adequate for the initial MHFU test (at BIOS location 00A8).
+	// Our simple COLDBOOT flag is adequate for the initial MHFU test (at BIOS location 00A8).
 
-  // TODO: on real hardware, MHFU detection is disabled BY WRITING TO 0x10c (=> BIOS assumes power-up reset)
-  //       MHFU is enabled by writing to 0x0c.
-  if (m_COLDBOOT) 
-  {    m_COLDBOOT = 0;
-  	   return ( 0x20 );  // bit 5 = watchdog detect.  
-  } else {
-	   return ( 0x00 );  // ERROR 16 is displayed = watchdog triggered
-  }
+	// TODO: on real hardware, MHFU detection is disabled BY WRITING TO 0x10c (=> BIOS assumes power-up reset)
+	//       MHFU is enabled by writing to 0x0c.
+	if (m_COLDBOOT)
+	{    m_COLDBOOT = 0;
+		return ( 0x20 );  // bit 5 = watchdog detect.
+	} else {
+		return ( 0x00 );  // ERROR 16 is displayed = watchdog triggered
+	}
 }
 
 WRITE8_MEMBER(rainbow_state::comm_control_w)
@@ -544,9 +544,9 @@ WRITE8_MEMBER(rainbow_state::comm_control_w)
    -4--5--6--7-  <- NUMBERS EMBOSSED ON BACK OF PLASTIC HOUSING (see error chart)
 */
 	output_set_value("led4", BIT(data, 5)); // LED "D6"
-	output_set_value("led5", BIT(data, 7)); // LED "D5" 
+	output_set_value("led5", BIT(data, 7)); // LED "D5"
 	output_set_value("led6", BIT(data, 6)); // LED "D4"
-	output_set_value("led7", BIT(data, 4)); // LED "D3" 
+	output_set_value("led7", BIT(data, 4)); // LED "D3"
 
 //  printf("%02x to COMM.CONTROL REGISTER\n", data);
 }
@@ -554,53 +554,53 @@ WRITE8_MEMBER(rainbow_state::comm_control_w)
 // EMULATOR TRAP (patched into ROM @ machine_start) via BIOS : call / offset +$21  (AL / AH)
 WRITE8_MEMBER(rainbow_state::PORT90_W)
 {
-    //printf("KBD COMMAND : %02x to AL (90)\n", data);
-	
+	//printf("KBD COMMAND : %02x to AL (90)\n", data);
+
 	m_KBD = 0; // reset previous command.
 
-	if (data == 0xfd) {  	 // Powerup (beep)
-	    m_beep->set_state(1);	
-	    m_beep_counter=600;  // BELL = 125 ms
+	if (data == 0xfd) {      // Powerup (beep)
+		m_beep->set_state(1);
+		m_beep_counter=600;  // BELL = 125 ms
 	}
 
-	if (data == 0xa7) {      
-            m_beep->set_state(1);	
-	    m_beep_counter=600;  // BELL = 125 ms
+	if (data == 0xa7) {
+			m_beep->set_state(1);
+		m_beep_counter=600;  // BELL = 125 ms
 	}
 
 	if (data == 0x9f) {    // emit a keyclick (2ms)
-		m_beep->set_state(1);	
+		m_beep->set_state(1);
 		m_beep_counter=25; // longer than calculated ( 9,6 )
 	}
 
-	if (data == 0x13) {  // light LEDs - 
-   	    m_KBD = 0x13;
+	if (data == 0x13) {  // light LEDs -
+		m_KBD = 0x13;
 	}
-	if (data == 0x11) {  // switch off LEDs - 
-            m_KBD = 0x11;
+	if (data == 0x11) {  // switch off LEDs -
+			m_KBD = 0x11;
 	}
 }
 
 WRITE8_MEMBER(rainbow_state::PORT91_W)
 {
-    //printf("KBD PARAM %02x to AH (91) \n", data);
-	
-    // 4 leds, represented in the low 4 bits of a byte 
-	if (m_KBD == 0x13) {  // light LEDs - 
-        if (data & 1) { output_set_value("led8", 0); } //   KEYBOARD :  "Wait" LED
+	//printf("KBD PARAM %02x to AH (91) \n", data);
+
+	// 4 leds, represented in the low 4 bits of a byte
+	if (m_KBD == 0x13) {  // light LEDs -
+		if (data & 1) { output_set_value("led8", 0); } //   KEYBOARD :  "Wait" LED
 		if (data & 2) { output_set_value("led9", 0); } //   KEYBOARD :  "Compose" LED
 		if (data & 4) { output_set_value("led10", 0); } //  KEYBOARD :  "Lock" LED
 		if (data & 8) { output_set_value("led11", 0); } //  KEYBOARD :  "Hold" LED
 		m_KBD = 0; // reset previous command.
 	}
-	if (m_KBD == 0x11) {  // switch off LEDs - 
-        if (data & 1) { output_set_value("led8", 1); } //   KEYBOARD :  "Wait" LED
+	if (m_KBD == 0x11) {  // switch off LEDs -
+		if (data & 1) { output_set_value("led8", 1); } //   KEYBOARD :  "Wait" LED
 		if (data & 2) { output_set_value("led9", 1); } //   KEYBOARD :  "Compose" LED
 		if (data & 4) { output_set_value("led10", 1); } //  KEYBOARD :  "Lock" LED
 		if (data & 8) { output_set_value("led11", 1); } //  KEYBOARD :  "Hold" LED
 		m_KBD = 0; // reset previous command.
 	}
-	
+
 	if (m_KBD == 0x1b) {   /* enable the keyclick */
 							/* max volume is 0, lowest is 0x7 */
 		m_KBD = 0; // reset previous command.
@@ -644,8 +644,8 @@ WRITE8_MEMBER(rainbow_state::z80_diskdiag_write_w)
 {
 /*   Z80 LEDs:
      4   5   6  <- bit #
-	D11 D10 -D9 <- INTERNAL LED NUMBER (see PDF) 
-	-1 --2-- 3  <- NUMBERS EMBOSSED ON BACK OF PLASTIC HOUSING (see error chart)
+    D11 D10 -D9 <- INTERNAL LED NUMBER (see PDF)
+    -1 --2-- 3  <- NUMBERS EMBOSSED ON BACK OF PLASTIC HOUSING (see error chart)
 */
 	output_set_value("led1", BIT(data, 4)); // LED "D11"
 	output_set_value("led2", BIT(data, 5)); // LED "D10"
@@ -656,19 +656,19 @@ WRITE8_MEMBER(rainbow_state::z80_diskdiag_write_w)
 
 WRITE8_MEMBER(rainbow_state::z80_diskcontrol_write_w)
 {
-    //printf("%02x to z80 DISK CONTROL (W)\n", data);
+	//printf("%02x to z80 DISK CONTROL (W)\n", data);
 
-	// TODO: this logic is a bit primitive. According to the spec, the RX-50 drive LED only turns on if 
+	// TODO: this logic is a bit primitive. According to the spec, the RX-50 drive LED only turns on if
 	//       (a) spindle motor runs (b) disk is in drive (c) door closed (d) drive side is selected
-    if ( (data & 1) && (data & 8) ) 
-	   output_set_value("led20", 0); // DISKETTE 0 SELECTED & MOTOR 0 ON => LIGHT "DRIVE A"
+	if ( (data & 1) && (data & 8) )
+		output_set_value("led20", 0); // DISKETTE 0 SELECTED & MOTOR 0 ON => LIGHT "DRIVE A"
 	else
-	   output_set_value("led20", 1); 
+		output_set_value("led20", 1);
 
-	if ( (data & 2) && (data & 8) ) 
-	   output_set_value("led21", 0); // DISKETTE 1 SELECTED & MOTOR 0 ON => LIGHT "DRIVE B"
+	if ( (data & 2) && (data & 8) )
+		output_set_value("led21", 0); // DISKETTE 1 SELECTED & MOTOR 0 ON => LIGHT "DRIVE B"
 	else
-	   output_set_value("led21", 1); 
+		output_set_value("led21", 1);
 }
 
 READ8_MEMBER( rainbow_state::read_video_ram_r )
@@ -691,9 +691,9 @@ READ8_MEMBER( rainbow_state::diagnostic_r )
 //    printf("%02x DIP value ORed to diagnostic\n", ( m_inp1->read() | m_inp2->read() | m_inp3->read()   )  );
 
 	return ( (m_diagnostic & (0xf1)) | (     m_inp1->read() |
-                                             m_inp2->read() | 
-                                             m_inp3->read()   )
-		   );
+												m_inp2->read() |
+												m_inp3->read()   )
+			);
 }
 
 WRITE8_MEMBER( rainbow_state::diagnostic_w )
@@ -758,14 +758,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(rainbow_state::keyboard_tick)
 {
 	m_kbd8251->transmit_clock();
 	m_kbd8251->receive_clock();
-	
-	if (m_beep_counter > 1) 
-            m_beep_counter--;
-    else		
-	    if ( m_beep_counter == 1 ) 
+
+	if (m_beep_counter > 1)
+			m_beep_counter--;
+	else
+		if ( m_beep_counter == 1 )
 		{   m_beep->set_state(0);
-		    m_beep_counter = 0;
-		}  
+			m_beep_counter = 0;
+		}
 }
 
 static const vt_video_interface video_interface =
@@ -852,7 +852,7 @@ static MACHINE_CONFIG_START( rainbow, rainbow_state )
 	MCFG_PALETTE_LENGTH(3)
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, monochrome_amber)
 	MCFG_RAINBOW_VIDEO_ADD("vt100_video", video_interface)
-	
+
 		/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("beeper", BEEP, 0)

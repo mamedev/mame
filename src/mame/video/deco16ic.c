@@ -421,7 +421,7 @@ TILE_GET_INFO_MEMBER(deco16ic_device::get_pf1_tile_info_b)
 
 template<class _BitmapClass>
 void deco16ic_device::custom_tilemap_draw(
-	screen_device &screen, 
+	screen_device &screen,
 	_BitmapClass &bitmap,
 	const rectangle &cliprect,
 	tilemap_t *tilemap0_8x8,

@@ -61,16 +61,16 @@ Z04G2-004
 |          6116 6116    G003K5.U63         |------|                  |
 |--------------------------------------------------------------------|
 Notes:
-           * - These ROMs not populated. Korean-specific ROMs have a K as part of the label text
-       68000 - Clock 13.500MHz [27/2]
-       M6295 - Clock 2.000MHz [16/8]. Pin 7 HIGH
-      V-080D - Custom Kaneko RGB DAC
-     MC-1091 - Custom Kaneko I/O module
-      LFP-6K - Custom Kaneko sound filter/DAC
-      PX4460 - Custom Kaneko sound filter/DAC
-      PISCES - NEC uPD78324 series MCU with 32k internal rom. Clock 13.500MHz [27/2] on pins 51 & 52
-       VSync - 59.1856Hz
-       HSync - 15.625kHz
+	       * - These ROMs not populated. Korean-specific ROMs have a K as part of the label text
+	   68000 - Clock 13.500MHz [27/2]
+	   M6295 - Clock 2.000MHz [16/8]. Pin 7 HIGH
+	  V-080D - Custom Kaneko RGB DAC
+	 MC-1091 - Custom Kaneko I/O module
+	  LFP-6K - Custom Kaneko sound filter/DAC
+	  PX4460 - Custom Kaneko sound filter/DAC
+	  PISCES - NEC uPD78324 series MCU with 32k internal rom. Clock 13.500MHz [27/2] on pins 51 & 52
+	   VSync - 59.1856Hz
+	   HSync - 15.625kHz
 
 ***************************************************************************/
 
@@ -426,7 +426,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( galpani2 )
 	PORT_START("DSW1_P1")   /* 780000.w */
-	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Difficulty ) )		PORT_DIPLOCATION("SW B:8,7,6")
+	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("SW B:8,7,6")
 	PORT_DIPSETTING(      0x0007, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0006, DEF_STR( Very_Easy ) )
 	PORT_DIPSETTING(      0x0005, DEF_STR( Easy ) )
@@ -435,15 +435,15 @@ static INPUT_PORTS_START( galpani2 )
 	PORT_DIPSETTING(      0x0002, DEF_STR( Very_Hard ) )
 	PORT_DIPSETTING(      0x0001, "Ultra Hard" )
 	PORT_DIPSETTING(      0x0000, "God Hands" )
-	PORT_DIPNAME( 0x0008, 0x0008, "Picture Mode" )			PORT_DIPLOCATION("SW B:5")
+	PORT_DIPNAME( 0x0008, 0x0008, "Picture Mode" )          PORT_DIPLOCATION("SW B:5")
 	PORT_DIPSETTING(      0x0008, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0000, "Adult" )
-	PORT_DIPNAME( 0x0030, 0x0030, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW B:4,3")
+	PORT_DIPNAME( 0x0030, 0x0030, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW B:4,3")
 	PORT_DIPSETTING(      0x0030, "3" )
 	PORT_DIPSETTING(      0x0020, "1" )
 	PORT_DIPSETTING(      0x0010, "4" )
 	PORT_DIPSETTING(      0x0000, "5" )
-	PORT_DIPNAME( 0x00c0, 0x00c0, "Max Unit of Players" )		PORT_DIPLOCATION("SW B:2,1")
+	PORT_DIPNAME( 0x00c0, 0x00c0, "Max Unit of Players" )       PORT_DIPLOCATION("SW B:2,1")
 	PORT_DIPSETTING(      0x00c0, "9" )
 	PORT_DIPSETTING(      0x0080, "1" )
 	PORT_DIPSETTING(      0x0040, "4" )
@@ -459,7 +459,7 @@ static INPUT_PORTS_START( galpani2 )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
 
 	PORT_START("DSW2_P2")   /* 780002.w */
-	PORT_DIPNAME( 0x000f, 0x000f, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW A:8,7,6,5")
+	PORT_DIPNAME( 0x000f, 0x000f, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW A:8,7,6,5")
 	PORT_DIPSETTING(      0x000f, "1 Coin/1 Credit  1/1" )
 	PORT_DIPSETTING(      0x000e, "2 Coin/1 Credit  2/1" )
 	PORT_DIPSETTING(      0x000d, "3 Coin/1 Credit  3/1" )
@@ -476,13 +476,13 @@ static INPUT_PORTS_START( galpani2 )
 	PORT_DIPSETTING(      0x0002, "1 Coin/2 Credit  1/2" )
 	PORT_DIPSETTING(      0x0001, "1 Coin/3 Credit  1/3" )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x0010, 0x0010, "Card Dispenser" )		PORT_DIPLOCATION("SW A:4")
+	PORT_DIPNAME( 0x0010, 0x0010, "Card Dispenser" )        PORT_DIPLOCATION("SW A:4")
 	PORT_DIPSETTING(      0x0010, "Used" )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Unused ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Flip_Screen ) )		PORT_DIPLOCATION("SW A:3")
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Flip_Screen ) )      PORT_DIPLOCATION("SW A:3")
 	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Demo_Sounds ) )		PORT_DIPLOCATION("SW A:2")
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION("SW A:2")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0040, DEF_STR( On ) )
 	PORT_SERVICE_DIPLOC(  0x0080, IP_ACTIVE_LOW, "SW A:1" )
@@ -528,7 +528,7 @@ static INPUT_PORTS_START( gp2se )
 	PORT_DIPUNUSED_DIPLOC( 0x0008, IP_ACTIVE_LOW, "SW B:5" ) // picture mode is "normal fix" and cannot be changed
 
 	PORT_MODIFY("DSW2_P2")  /* 780002.w */
-	PORT_DIPNAME( 0x0010, 0x0010, "Card Dispenser" )		PORT_DIPLOCATION("SW A:4") // Reversed compared to other sets.
+	PORT_DIPNAME( 0x0010, 0x0010, "Card Dispenser" )        PORT_DIPLOCATION("SW A:4") // Reversed compared to other sets.
 	PORT_DIPSETTING(      0x0000, "Used" )
 	PORT_DIPSETTING(      0x0010, DEF_STR( Unused ) )
 

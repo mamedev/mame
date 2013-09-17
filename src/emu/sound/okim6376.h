@@ -36,7 +36,7 @@ public:
 
 	void set_frequency(int frequency);
 
-	
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -66,7 +66,7 @@ private:
 	UINT8 m_st_pulses;        /* Keep track of attenuation */
 	UINT8 m_ch2_update;       /* Pulse shape */
 	UINT8 m_st_update;
-	
+
 	void oki_process(int channel, int command);
 	void generate_adpcm(struct ADPCMVoice *voice, INT16 *buffer, int samples,int channel);
 	void postload();

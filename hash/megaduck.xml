@@ -193,7 +193,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="2ndspace">
 		<description>2nd Space</description>
 		<year>1993</year>
@@ -206,7 +206,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="trapturn">
 		<description>Trap &amp; Turn</description>
 		<year>1993</year>
@@ -219,7 +219,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="bombdisp">
 		<description>Bomb Disposer</description>
 		<year>1993</year>
@@ -232,7 +232,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="mmaze">
 		<description>Magic Maze</description>
 		<year>1993</year>
@@ -245,7 +245,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="vex">
 		<description>Vex</description>
 		<year>1993</year>

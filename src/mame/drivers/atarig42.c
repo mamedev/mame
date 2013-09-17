@@ -542,7 +542,7 @@ static MACHINE_CONFIG_START( atarig42, atarig42_state )
 
 	MCFG_MACHINE_START_OVERRIDE(atarig42_state,atarig42)
 	MCFG_MACHINE_RESET_OVERRIDE(atarig42_state,atarig42)
-	
+
 	MCFG_ATARI_EEPROM_2816_ADD("eeprom")
 
 	/* video hardware */

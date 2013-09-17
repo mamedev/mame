@@ -626,7 +626,7 @@ class taitotz_renderer : public poly_manager<float, taitotz_polydata, 6, 50000>
 public:
 	taitotz_renderer(taitotz_state &state, int width, int height, UINT32 *texram)
 		: poly_manager<float, taitotz_polydata, 6, 50000>(state.machine()),
-		  m_state(state)
+			m_state(state)
 	{
 		m_zbuffer = auto_bitmap_ind32_alloc(state.machine(), width, height);
 		m_texture = texram;

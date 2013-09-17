@@ -65,7 +65,7 @@ private:
 	UINT16 root_current( int n_counter );
 	int root_target( int n_counter );
 	void root_timer_adjust( int n_counter );
-	
+
 	devcb2_write_line m_irq0_handler;
 	devcb2_write_line m_irq1_handler;
 	devcb2_write_line m_irq2_handler;

@@ -1406,7 +1406,7 @@ static MACHINE_CONFIG_START( atarigx2, atarigx2_state )
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", atarigen_state, video_int_gen)
 
 	MCFG_MACHINE_RESET_OVERRIDE(atarigx2_state,atarigx2)
-	
+
 	MCFG_ATARI_EEPROM_2816_ADD("eeprom")
 
 	/* video hardware */

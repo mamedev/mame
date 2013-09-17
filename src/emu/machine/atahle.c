@@ -239,7 +239,7 @@ bool ata_hle_device::set_dma_mode(int word)
 		m_identify_buffer[word] |= 0x100 << (m_sector_count & 7);
 		return true;
 	}
-	
+
 	return false;
 }
 

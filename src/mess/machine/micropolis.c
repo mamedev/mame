@@ -134,7 +134,7 @@ void micropolis_device::device_start()
 	m_in_dden_func.resolve(m_in_dden_cb, *this);
 	m_out_intrq_func.resolve(m_out_intrq_cb, *this);
 	m_out_drq_func.resolve(m_out_drq_cb, *this);
-	
+
 	save_item(NAME(m_data));
 	save_item(NAME(m_drive_num));
 	save_item(NAME(m_track));

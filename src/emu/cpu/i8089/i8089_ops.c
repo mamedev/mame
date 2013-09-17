@@ -2,7 +2,7 @@
 
     Intel 8089 I/O Processor
 
-	Opcode implementations
+    Opcode implementations
 
 ***************************************************************************/
 

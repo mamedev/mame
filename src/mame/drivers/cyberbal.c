@@ -403,7 +403,7 @@ static MACHINE_CONFIG_START( cyberbal, cyberbal_state )
 
 	MCFG_MACHINE_START_OVERRIDE(cyberbal_state,cyberbal)
 	MCFG_MACHINE_RESET_OVERRIDE(cyberbal_state,cyberbal)
-	
+
 	MCFG_ATARI_EEPROM_2804_ADD("eeprom")
 
 	/* video hardware */
@@ -465,7 +465,7 @@ static MACHINE_CONFIG_START( cyberbal2p, cyberbal_state )
 
 	MCFG_MACHINE_START_OVERRIDE(cyberbal_state,cyberbal)
 	MCFG_MACHINE_RESET_OVERRIDE(cyberbal_state,cyberbal2p)
-	
+
 	MCFG_ATARI_EEPROM_2816_ADD("eeprom")
 
 	/* video hardware */

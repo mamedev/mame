@@ -17,7 +17,7 @@ public:
 		m_scrb_videoram(*this, "scrb_videoram"),
 		m_scrb_linezoom(*this, "scrb_linezoom"),
 		m_scrb_videoregs(*this, "scrb_videoregs"),
-	
+
 		m_scrc_videoram(*this, "scrc_videoram"),
 		m_scrc_linezoom(*this, "scrc_linezoom"),
 		m_scrc_videoregs(*this, "scrc_videoregs"),
@@ -30,8 +30,7 @@ public:
 		m_mainram(*this, "mainram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu")
-	{ 
-	
+	{
 	}
 
 	/* memory pointers */

@@ -1495,8 +1495,8 @@ static void execute_wplist(running_machine &machine, int ref, int params, const 
 			{
 				static const char *const types[] = { "unkn ", "read ", "write", "r/w  " };
 
-				debug_console_printf(machine, "Device '%s' %s space watchpoints:\n", device->tag(), 
-																					 device->debug()->watchpoint_first(spacenum)->space().name());
+				debug_console_printf(machine, "Device '%s' %s space watchpoints:\n", device->tag(),
+																						device->debug()->watchpoint_first(spacenum)->space().name());
 
 				/* loop over the watchpoints */
 				for (device_debug::watchpoint *wp = device->debug()->watchpoint_first(spacenum); wp != NULL; wp = wp->next())

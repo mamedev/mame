@@ -22,7 +22,7 @@ const device_type TMS32082_PP = &device_creator<tms32082_pp_device>;
 
 // internal memory map
 static ADDRESS_MAP_START(mp_internal_map, AS_PROGRAM, 32, tms32082_mp_device)
-	AM_RANGE(0x00000000, 0x00000fff) AM_RAM	AM_SHARE("pp0_data0")
+	AM_RANGE(0x00000000, 0x00000fff) AM_RAM AM_SHARE("pp0_data0")
 	AM_RANGE(0x00001000, 0x00001fff) AM_RAM AM_SHARE("pp1_data0")
 	AM_RANGE(0x00008000, 0x00008fff) AM_RAM AM_SHARE("pp0_data1")
 	AM_RANGE(0x00009000, 0x00009fff) AM_RAM AM_SHARE("pp1_data1")
@@ -141,7 +141,7 @@ void tms32082_mp_device::device_start()
 	save_item(NAME(m_fetchpc));
 	save_item(NAME(m_reg));
 	save_item(NAME(m_acc));
-	
+
 	save_item(NAME(m_in0p));
 	save_item(NAME(m_in1p));
 	save_item(NAME(m_outp));
@@ -256,7 +256,7 @@ void tms32082_mp_device::processor_command(UINT32 command)
 		printf("Task ");
 	if (command & 0x00002000)
 		printf("Msg ");
-	
+
 	printf("to: ");
 
 	if (command & 0x00000400)
@@ -300,28 +300,28 @@ UINT32 tms32082_mp_device::read_creg(int reg)
 {
 	switch (reg)
 	{
-		case 0x0:			// EPC
+		case 0x0:           // EPC
 			return m_epc;
 
-		case 0x1:			// EIP
+		case 0x1:           // EIP
 			return m_eip;
 
-		case 0x4:			// INTPEN
+		case 0x4:           // INTPEN
 			return m_intpen;
 
-		case 0x6:			// IE
+		case 0x6:           // IE
 			return m_ie;
 
 		case 0xa:           // PPERROR
 			return 0xe0000;
 
-		case 0x4000:		// IN0P
+		case 0x4000:        // IN0P
 			return m_in0p;
 
-		case 0x4001:		// IN1P
+		case 0x4001:        // IN1P
 			return m_in1p;
 
-		case 0x4002:		// OUTP
+		case 0x4002:        // OUTP
 			return m_outp;
 
 		default:
@@ -335,15 +335,15 @@ void tms32082_mp_device::write_creg(int reg, UINT32 data)
 {
 	switch (reg)
 	{
-		case 0x0:			// EPC
+		case 0x0:           // EPC
 			m_epc = data;
 			break;
 
-		case 0x1:			// EIP
+		case 0x1:           // EIP
 			m_eip = data;
 			break;
 
-		case 0x4:			// INTPEN
+		case 0x4:           // INTPEN
 		{
 			for (int i=0; i < 32; i++)
 			{
@@ -353,20 +353,20 @@ void tms32082_mp_device::write_creg(int reg, UINT32 data)
 			break;
 		}
 
-		case 0x6:			// IE
+		case 0x6:           // IE
 			m_ie = data;
 			printf("IE = %08X\n", data);
 			break;
 
-		case 0x4000:		// IN0P
+		case 0x4000:        // IN0P
 			m_in0p = data;
 			break;
 
-		case 0x4001:		// IN1P
+		case 0x4001:        // IN1P
 			m_in1p = data;
 			break;
 
-		case 0x4002:		// OUTP
+		case 0x4002:        // OUTP
 			m_outp = data;
 			break;
 
@@ -378,19 +378,19 @@ void tms32082_mp_device::write_creg(int reg, UINT32 data)
 
 void tms32082_mp_device::check_interrupts()
 {
-	if (m_ie & 1)		// global interrupt mask
+	if (m_ie & 1)       // global interrupt mask
 	{
 		for (int i=1; i < 32; i++)
 		{
 			if (m_ie & m_intpen & (1 << i))
 			{
 				m_epc = (m_fetchpc & ~3);
-				m_epc |= (m_ie & 1);		// save global interrupt mask
+				m_epc |= (m_ie & 1);        // save global interrupt mask
 				// TODO: user mode bit to EPC
 
 				m_eip = m_pc;
 
-				m_ie &= ~1;					// clear global interrupt mask
+				m_ie &= ~1;                 // clear global interrupt mask
 
 				// get new pc from vector table
 				m_fetchpc = m_pc = m_program->read_dword(0x01010180 + (i * 4));
@@ -445,7 +445,7 @@ void tms32082_mp_device::execute_run()
 	while (m_icount > 0)
 	{
 		m_pc = m_fetchpc;
-		
+
 		check_interrupts();
 
 		debugger_instruction_hook(this, m_pc);
@@ -466,7 +466,7 @@ void tms32082_mp_device::execute_run()
 
 // internal memory map
 static ADDRESS_MAP_START(pp_internal_map, AS_PROGRAM, 32, tms32082_pp_device)
-	AM_RANGE(0x00000000, 0x00000fff) AM_RAM	AM_SHARE("pp0_data0")
+	AM_RANGE(0x00000000, 0x00000fff) AM_RAM AM_SHARE("pp0_data0")
 	AM_RANGE(0x00001000, 0x00001fff) AM_RAM AM_SHARE("pp1_data0")
 	AM_RANGE(0x00008000, 0x00008fff) AM_RAM AM_SHARE("pp0_data1")
 	AM_RANGE(0x00009000, 0x00009fff) AM_RAM AM_SHARE("pp1_data1")

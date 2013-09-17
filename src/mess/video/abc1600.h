@@ -36,7 +36,7 @@
 // ======================> abc1600_mover_device
 
 class abc1600_mover_device :  public device_t,
-							  public device_memory_interface
+								public device_memory_interface
 {
 public:
 	// construction/destruction

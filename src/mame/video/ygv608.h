@@ -288,16 +288,16 @@ public:
 
 	DECLARE_WRITE16_MEMBER( write );
 	DECLARE_READ16_MEMBER( read );
-	
+
 
 	void set_gfxbank(UINT8 gfxbank);
-	
+
 	UINT32 update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	
+
 	INTERRUPT_GEN_MEMBER( timed_interrupt );
-	
+
 	// to be removed
-	DECLARE_READ16_MEMBER( debug_trigger_r );	
+	DECLARE_READ16_MEMBER( debug_trigger_r );
 protected:
 	// device-level overrides
 	virtual void device_start();
@@ -326,7 +326,7 @@ private:
 	void SetPreShortcuts(int reg, int data );
 	void SetPostShortcuts(int reg);
 	void ShowYGV608Registers();
-	
+
 	union {
 		UINT8       b[8];
 		YGV_PORTS   s;
@@ -369,7 +369,7 @@ private:
 	UINT32 m_base_y_shift;    // for extracting pattern y coord 'base'
 
 	UINT8 m_screen_resize;  // screen requires resize
-	UINT8 m_tilemap_resize; // tilemap requires resize	
+	UINT8 m_tilemap_resize; // tilemap requires resize
 };
 
 // device type definition

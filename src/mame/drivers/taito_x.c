@@ -789,7 +789,7 @@ MACHINE_START_MEMBER(taitox_state,superman)
 	m_banknum = -1;
 	save_item(NAME(m_banknum));
 	machine().save().register_postload(save_prepost_delegate(FUNC(taitox_state::reset_sound_region), this));
-	
+
 	m_current_bank = 0;
 	m_cc_port = 0;
 	save_item(NAME(m_current_bank));
@@ -817,7 +817,7 @@ static MACHINE_CONFIG_START( superman, taitox_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
 	MCFG_MACHINE_START_OVERRIDE(taitox_state,superman)
-	
+
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 
 	/* video hardware */

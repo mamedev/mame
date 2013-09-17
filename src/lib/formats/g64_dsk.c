@@ -196,7 +196,7 @@ const floppy_format_type FLOPPY_G64_FORMAT = &floppy_image_format_creator<g64_fo
 ***************************************************************************/
 
 #define HEADER_LENGTH       0x2ac           // standard length for 84 half tracks
-#define MAX_HEADS			2
+#define MAX_HEADS           2
 #define MAX_TRACKS          84
 
 /***************************************************************************
@@ -206,11 +206,11 @@ const floppy_format_type FLOPPY_G64_FORMAT = &floppy_image_format_creator<g64_fo
 struct g64dsk_tag
 {
 	int version;
-	int heads;                              			// number of physical heads
-	int tracks;                             			// number of physical tracks
-	UINT16 track_size[MAX_HEADS][MAX_TRACKS];         	// size of each track
-	UINT32 track_offset[MAX_HEADS][MAX_TRACKS];        	// offset within data for each track
-	UINT32 speed_zone_offset[MAX_HEADS][MAX_TRACKS];  	// offset within data for each track
+	int heads;                                          // number of physical heads
+	int tracks;                                         // number of physical tracks
+	UINT16 track_size[MAX_HEADS][MAX_TRACKS];           // size of each track
+	UINT32 track_offset[MAX_HEADS][MAX_TRACKS];         // offset within data for each track
+	UINT32 speed_zone_offset[MAX_HEADS][MAX_TRACKS];    // offset within data for each track
 };
 
 /***************************************************************************
@@ -466,7 +466,7 @@ static void read_g64_header(floppy_image_legacy *floppy, struct g64dsk_tag *tag,
 	for (int i = 0; i < tag->tracks; i++)
 	{
 		tag->speed_zone_offset[head][i] = pick_integer_le(header, pos, 4);
-		
+
 		if (tag->speed_zone_offset[head][i] >= 4)
 		{
 			tag->speed_zone_offset[head][i] += start_pos;

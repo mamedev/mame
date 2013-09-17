@@ -1708,17 +1708,17 @@ WRITE8_MEMBER( m6800_cpu_device::m6801_io_w )
 	}
 }
 
-void m6801_cpu_device::m6801_clock_serial() 
-{ 
+void m6801_cpu_device::m6801_clock_serial()
+{
 	if (m_use_ext_serclock)
 	{
-		m_ext_serclock++; 
+		m_ext_serclock++;
 
 		if (m_ext_serclock >= 8)
-		{ 
-			m_ext_serclock = 0; 
-			serial_transmit(); 
-			serial_receive(); 
+		{
+			m_ext_serclock = 0;
+			serial_transmit();
+			serial_receive();
 		}
 	}
 }
@@ -1777,4 +1777,3 @@ offs_t nsc8105_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UIN
 	extern CPU_DISASSEMBLE( nsc8105 );
 	return CPU_DISASSEMBLE_NAME(nsc8105)(this, buffer, pc, oprom, opram, options);
 }
-

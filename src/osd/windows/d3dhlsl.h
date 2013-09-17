@@ -55,7 +55,6 @@
 
 namespace d3d
 {
-
 class effect;
 class shaders;
 
@@ -133,33 +132,33 @@ public:
 
 	uniform(effect *shader, const char *name, uniform_type type, int id);
 
-	void 		set_next(uniform *next);
-	uniform *	get_next() { return m_next; }
+	void        set_next(uniform *next);
+	uniform *   get_next() { return m_next; }
 
-	void 		set(float x, float y, float z, float w);
-	void 		set(float x, float y, float z);
-	void 		set(float x, float y);
-	void 		set(float x);
-	void 		set(int x);
-	void 		set(matrix *mat);
-	void 		set(texture *tex);
+	void        set(float x, float y, float z, float w);
+	void        set(float x, float y, float z);
+	void        set(float x, float y);
+	void        set(float x);
+	void        set(int x);
+	void        set(matrix *mat);
+	void        set(texture *tex);
 
-	void 		upload();
-	void 		update();
+	void        upload();
+	void        update();
 
 protected:
-	uniform		*m_next;
+	uniform     *m_next;
 
-	float		m_vec[4];
-	int			m_ival;
-	matrix		*m_mval;
-	texture		*m_texture;
-	int			m_count;
-	uniform_type	m_type;
-	int			m_id;
+	float       m_vec[4];
+	int         m_ival;
+	matrix      *m_mval;
+	texture     *m_texture;
+	int         m_count;
+	uniform_type    m_type;
+	int         m_id;
 
-	effect 		*m_shader;
-	D3DXHANDLE	m_handle;
+	effect      *m_shader;
+	D3DXHANDLE  m_handle;
 };
 
 class effect
@@ -170,38 +169,38 @@ public:
 	effect(shaders *shadersys, device *dev, const char *name, const char *path);
 	~effect();
 
-	void    	begin(UINT *passes, DWORD flags);
-	void    	begin_pass(UINT pass);
+	void        begin(UINT *passes, DWORD flags);
+	void        begin_pass(UINT pass);
 
-	void    	end();
-	void    	end_pass();
+	void        end();
+	void        end_pass();
 
-	void    	set_technique(const char *name);
+	void        set_technique(const char *name);
 
-	void    	set_vector(D3DXHANDLE param, int count, float *vector);
-	void    	set_float(D3DXHANDLE param, float value);
-	void    	set_int(D3DXHANDLE param, int value);
-	void    	set_matrix(D3DXHANDLE param, matrix *matrix);
-	void    	set_texture(D3DXHANDLE param, texture *tex);
+	void        set_vector(D3DXHANDLE param, int count, float *vector);
+	void        set_float(D3DXHANDLE param, float value);
+	void        set_int(D3DXHANDLE param, int value);
+	void        set_matrix(D3DXHANDLE param, matrix *matrix);
+	void        set_texture(D3DXHANDLE param, texture *tex);
 
-	void		add_uniform(const char *name, uniform::uniform_type type, int id);
-	void		update_uniforms();
+	void        add_uniform(const char *name, uniform::uniform_type type, int id);
+	void        update_uniforms();
 
-	D3DXHANDLE	get_parameter(D3DXHANDLE param, const char *name);
+	D3DXHANDLE  get_parameter(D3DXHANDLE param, const char *name);
 
-	ULONG   	release();
+	ULONG       release();
 
-	shaders*	get_shaders() { return m_shaders; }
+	shaders*    get_shaders() { return m_shaders; }
 
-	bool		is_valid() { return m_valid; }
+	bool        is_valid() { return m_valid; }
 
 private:
-	uniform		*m_uniform_head;
-	uniform		*m_uniform_tail;
+	uniform     *m_uniform_head;
+	uniform     *m_uniform_tail;
 	ID3DXEffect *m_effect;
-	shaders		*m_shaders;
+	shaders     *m_shaders;
 
-	bool		m_valid;
+	bool        m_valid;
 };
 
 class render_target;
@@ -358,15 +357,15 @@ private:
 	void                    remove_cache_target(cache_target *cache);
 
 	// Shader passes
-	void					ntsc_pass(render_target *rt, vec2f &texsize, vec2f &delta);
-	void 					color_convolution_pass(render_target *rt, vec2f &texsize, vec2f &sourcedims);
-	void 					prescale_pass(render_target *rt, vec2f &texsize, vec2f &sourcedims);
-	void 					deconverge_pass(render_target *rt, vec2f &texsize, vec2f &delta, vec2f &sourcedims);
-	void 					defocus_pass(render_target *rt, vec2f &texsize);
-	void 					phosphor_pass(render_target *rt, cache_target *ct, vec2f &texsize, bool focus_enable);
-	void 					screen_post_pass(render_target *rt, vec2f &texsize, vec2f &delta, vec2f &sourcedims, poly_info *poly, int vertnum);
-	void 					avi_post_pass(render_target *rt, vec2f &texsize, vec2f &delta, vec2f &sourcedims, poly_info *poly, int vertnum);
-	void 					raster_bloom_pass(render_target *rt, vec2f &texsize, vec2f &delta, poly_info *poly, int vertnum);
+	void                    ntsc_pass(render_target *rt, vec2f &texsize, vec2f &delta);
+	void                    color_convolution_pass(render_target *rt, vec2f &texsize, vec2f &sourcedims);
+	void                    prescale_pass(render_target *rt, vec2f &texsize, vec2f &sourcedims);
+	void                    deconverge_pass(render_target *rt, vec2f &texsize, vec2f &delta, vec2f &sourcedims);
+	void                    defocus_pass(render_target *rt, vec2f &texsize);
+	void                    phosphor_pass(render_target *rt, cache_target *ct, vec2f &texsize, bool focus_enable);
+	void                    screen_post_pass(render_target *rt, vec2f &texsize, vec2f &delta, vec2f &sourcedims, poly_info *poly, int vertnum);
+	void                    avi_post_pass(render_target *rt, vec2f &texsize, vec2f &delta, vec2f &sourcedims, poly_info *poly, int vertnum);
+	void                    raster_bloom_pass(render_target *rt, vec2f &texsize, vec2f &delta, poly_info *poly, int vertnum);
 
 	base *                  d3dintf;                    // D3D interface
 	win_window_info *       window;                     // D3D window info
@@ -434,9 +433,9 @@ private:
 	effect *                vector_effect;              // pointer to the vector-effect object
 	vertex *                fsfx_vertices;              // pointer to our full-screen-quad object
 
-	texture_info *			curr_texture;
-	bool					phosphor_passthrough;
-	float					target_size[2];
+	texture_info *          curr_texture;
+	bool                    phosphor_passthrough;
+	float                   target_size[2];
 
 public:
 	render_target *         targethead;

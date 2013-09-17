@@ -68,8 +68,8 @@
             3x trimmer
 
 
-		TODO: Convert to stock i8279 implementation, as currently inputs aren't read.
-		      Fix meter reading (possibly related to above)
+        TODO: Convert to stock i8279 implementation, as currently inputs aren't read.
+              Fix meter reading (possibly related to above)
 ******************************************************************************************/
 #include "emu.h"
 #include "includes/maygay1b.h"
@@ -741,7 +741,7 @@ WRITE8_MEMBER(maygay1b_state::m1_meter_w)
 	int i;
 	for (i=0; i<8; i++)
 	{
-		if ( data & (1 << i) )  
+		if ( data & (1 << i) )
 		{
 			MechMtr_update(i, data & (1 << i) );
 			m_meter = data;
@@ -804,7 +804,7 @@ READ8_MEMBER(maygay1b_state::m1_meter_r)
 {
 	//ay8910_device *ay8910 = machine().device<ay8910_device>("aysnd");
 	//return ay8910->data_r(space, offset);
-	
+
 	//TODO: Game should read the meter state through Port A of the AY chip, but our timings aren't good enough (?)
 	return m_meter;
 }

@@ -1601,7 +1601,7 @@ void f8_cpu_device::device_reset()
 	m_irq_vector = 0;
 	memset(m_r, 0, sizeof(m_r));
 	m_irq_request = 0;
-	
+
 	m_w&=~I;
 
 	/* save PC0 to PC1 and reset PC0 */
@@ -2054,11 +2054,11 @@ void f8_cpu_device::state_string_export(const device_state_entry &entry, astring
 	{
 		case STATE_GENFLAGS:
 			string.printf("%c%c%c%c%c",
-			              m_w & 0x10 ? 'I':'.',
-			              m_w & 0x08 ? 'O':'.',
-			              m_w & 0x04 ? 'Z':'.',
-			              m_w & 0x02 ? 'C':'.',
-			              m_w & 0x01 ? 'S':'.');
+							m_w & 0x10 ? 'I':'.',
+							m_w & 0x08 ? 'O':'.',
+							m_w & 0x04 ? 'Z':'.',
+							m_w & 0x02 ? 'C':'.',
+							m_w & 0x01 ? 'S':'.');
 			break;
 	}
 }
@@ -2075,5 +2075,3 @@ void f8_cpu_device::execute_set_input( int inptnum, int state )
 {
 	m_irq_request = state;
 }
-
-

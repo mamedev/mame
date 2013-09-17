@@ -285,11 +285,11 @@ void i860_cpu_device::set_fregval_d (int fr, double d)
 
 int i860_cpu_device::has_delay_slot(UINT32 insn)
 {
-    int opc = (insn >> 26) & 0x3f;
-    if (opc == 0x10 || opc == 0x1a || opc == 0x1b || opc == 0x1d ||
-        opc == 0x1f || opc == 0x2d || (opc == 0x13 && (insn & 3) == 2))
-    return 1;
-    return 0;
+	int opc = (insn >> 26) & 0x3f;
+	if (opc == 0x10 || opc == 0x1a || opc == 0x1b || opc == 0x1d ||
+		opc == 0x1f || opc == 0x2d || (opc == 0x13 && (insn & 3) == 2))
+	return 1;
+	return 0;
 }
 
 /* This is the external interface for asserting/deasserting pins on

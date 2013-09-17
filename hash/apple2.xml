@@ -2766,7 +2766,7 @@
 	<software name="breakout">
 		<description>Breakout</description>
 		<year>19??</year>
-		<publisher>Apple Computer, Inc.</publisher>	<!-- programmed by Steve Wozniak -->
+		<publisher>Apple Computer, Inc.</publisher> <!-- programmed by Steve Wozniak -->
 
 		<part name="flop11" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">

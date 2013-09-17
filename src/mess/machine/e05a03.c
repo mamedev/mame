@@ -29,7 +29,6 @@ e05a03_device::e05a03_device(const machine_config &mconfig, const char *tag, dev
 	m_pf_motor(0),
 	m_cr_motor(0)
 {
-	
 }
 
 //-------------------------------------------------

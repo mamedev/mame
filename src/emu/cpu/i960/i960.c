@@ -2077,7 +2077,6 @@ void i960_cpu_device::device_start()
 
 void i960_cpu_device::state_string_export(const device_state_entry &entry, astring &string)
 {
-
 	static const char *const conditions[8] =
 	{
 		"no", "g", "e", "ge", "l", "ne", "le", "o"
@@ -2116,4 +2115,3 @@ offs_t i960_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 
 	extern CPU_DISASSEMBLE( i960 );
 	return CPU_DISASSEMBLE_NAME(i960)(this, buffer, pc, oprom, opram, options);
 }
-

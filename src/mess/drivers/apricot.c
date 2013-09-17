@@ -342,8 +342,8 @@ void apricot_state::machine_start()
 //**************************************************************************
 
 static ADDRESS_MAP_START( apricot_mem, AS_PROGRAM, 16, apricot_state )
-//	AM_RANGE(0x00000, 0x3ffff) AM_RAMBANK("standard_ram")
-//	AM_RANGE(0x40000, 0xeffff) AM_RAMBANK("expansion_ram")
+//  AM_RANGE(0x00000, 0x3ffff) AM_RAMBANK("standard_ram")
+//  AM_RANGE(0x40000, 0xeffff) AM_RAMBANK("expansion_ram")
 	AM_RANGE(0xf0000, 0xf0fff) AM_MIRROR(0x7000) AM_RAM AM_SHARE("screen_buffer")
 	AM_RANGE(0xfc000, 0xfffff) AM_MIRROR(0x4000) AM_ROM AM_REGION("bootstrap", 0)
 ADDRESS_MAP_END

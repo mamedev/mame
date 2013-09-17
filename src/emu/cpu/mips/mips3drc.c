@@ -3934,7 +3934,7 @@ CPU_GET_INFO( r4700le_drc )
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "R4700 (little) DRC");      break;
 		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "r4700le_drc");                 break;
-		
+
 		/* --- everything else is handled generically --- */
 		default:                                        CPU_GET_INFO_CALL(mips3);           break;
 	}
@@ -4124,4 +4124,3 @@ DEFINE_LEGACY_CPU_DEVICE(QED5271LE_DRC, qed5271le_drc);
 
 DEFINE_LEGACY_CPU_DEVICE(RM7000BE_DRC, rm7000be_drc);
 DEFINE_LEGACY_CPU_DEVICE(RM7000LE_DRC, rm7000le_drc);
-

@@ -227,7 +227,7 @@ void vicdual_state::machine_start()
 {
 	m_coin_status = 0;
 	m_palette_bank = 0;
-	
+
 	m_port1State = 0;
 	m_port2State = 0;
 	m_psgData = 0;

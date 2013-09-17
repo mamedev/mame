@@ -24,7 +24,7 @@ protected:
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
-	
+
 private:
 	// internal state
 	sound_stream * m_stream;
@@ -50,7 +50,7 @@ private:
 	UINT8 *m_SpeechRom; // array to hold rom contents, mame will not need this, will use a pointer
 	INT16 m_filtervals[8];
 	UINT8 m_VSU1000_amp; // amplitude setting on VSU-1000 board
-	
+
 	INT16 audiofilter();
 	void shiftIntoFilter(INT16 inputvalue);
 	void PostPhoneme();

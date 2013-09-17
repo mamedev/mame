@@ -595,4 +595,3 @@ void mc68hc11_cpu_device::execute_run()
 		(this->*hc11_optable[op])();
 	}
 }
-

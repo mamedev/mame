@@ -189,8 +189,8 @@ const options_entry emu_options::s_option_entries[] =
 
 	// misc options
 	{ NULL,                                              NULL,        OPTION_HEADER,     "CORE MISC OPTIONS" },
-	{ OPTION_DRC,                                      	 "1",         OPTION_BOOLEAN,    "enable DRC cpu core if available" },
-	{ OPTION_DRC_USE_C,                                	 "0",         OPTION_BOOLEAN,    "force DRC use C backend" },
+	{ OPTION_DRC,                                        "1",         OPTION_BOOLEAN,    "enable DRC cpu core if available" },
+	{ OPTION_DRC_USE_C,                                  "0",         OPTION_BOOLEAN,    "force DRC use C backend" },
 	{ OPTION_BIOS,                                       NULL,        OPTION_STRING,     "select the system BIOS to use" },
 	{ OPTION_CHEAT ";c",                                 "0",         OPTION_BOOLEAN,    "enable cheat subsystem" },
 	{ OPTION_SKIP_GAMEINFO,                              "0",         OPTION_BOOLEAN,    "skip displaying the information screen at startup" },
@@ -202,8 +202,8 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_AUTOBOOT_DELAY,                             "2",         OPTION_INTEGER,    "timer delay in sec to trigger command execution on autoboot" },
 	{ OPTION_AUTOBOOT_SCRIPT ";script",                  NULL,        OPTION_STRING,     "lua script to execute after machine boot" },
 	{ OPTION_HTTP,                                       "0",         OPTION_BOOLEAN,    "enable local http server" },
-	{ OPTION_HTTP_PORT,                             	 "8080",      OPTION_INTEGER,    "http server listener port" },
-	{ OPTION_HTTP_PATH,                  				 "web",       OPTION_STRING,     "path to web files" },
+	{ OPTION_HTTP_PORT,                                  "8080",      OPTION_INTEGER,    "http server listener port" },
+	{ OPTION_HTTP_PATH,                                  "web",       OPTION_STRING,     "path to web files" },
 	{ NULL }
 };
 

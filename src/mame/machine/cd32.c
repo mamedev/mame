@@ -61,7 +61,7 @@ akiko_device::akiko_device(const machine_config &mconfig, const char *tag, devic
 		m_c2p_input_buffer[i] = 0;
 		m_c2p_output_buffer[i] = 0;
 	}
-	
+
 	for (int i = 0; i < 2; i++)
 	{
 		m_cdrom_status[i] = 0;

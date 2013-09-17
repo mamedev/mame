@@ -93,39 +93,39 @@ Notes:
 
 /*
 
-	Using the hard disk
-	-------------------
+    Using the hard disk
+    -------------------
 
-	Use the chdman utility to create a Tandon TM501 (5MB) or CMI CM-5412 (10MB) hard disk image:
+    Use the chdman utility to create a Tandon TM501 (5MB) or CMI CM-5412 (10MB) hard disk image:
 
     $ chdman createhd -chs 306,2,32 -ss 256 -o tm501.chd
-	$ chdman createhd -chs 306,4,32 -ss 256 -o cm5412.chd
+    $ chdman createhd -chs 306,4,32 -ss 256 -o cm5412.chd
 
-	Start the Visual 1050 emulator with the floppy and hard disk images mounted:
+    Start the Visual 1050 emulator with the floppy and hard disk images mounted:
 
-	$ mess v1050 -flop1 cpm3:flop2 -hard cm5412.chd
+    $??mess v1050 -flop1 cpm3:flop2 -hard cm5412.chd
 
-	Start the Winchester Format Program from the CP/M prompt:
+    Start the Winchester Format Program from the CP/M prompt:
 
-	A>fmtwinch
+    A>fmtwinch
 
-	Enter Y to continue.
-	Ener A for 5MB, or B for 10MB hard disk.
-	Enter C to start formatting.
+    Enter Y to continue.
+    Ener A for 5MB, or B for 10MB hard disk.
+    Enter C to start formatting.
 
-	Once the formatting is complete, the CP/M system files need to be copied over to the hard disk:
+    Once the formatting is complete, the CP/M system files need to be copied over to the hard disk:
 
-	A>copysys
+    A>copysys
 
-	Enter source drive name "a" and press RETURN.
-	Enter target drive name "c" and press RETURN.
-	Enter "y" at the prompt for CPM3.SYS.
-	Enter "y" at the prompt for CCP.COM.
-	Press RETURN to return to CP/M.
+    Enter source drive name "a" and press RETURN.
+    Enter target drive name "c" and press RETURN.
+    Enter "y" at the prompt for CPM3.SYS.
+    Enter "y" at the prompt for CCP.COM.
+    Press RETURN to return to CP/M.
 
-	The hard disk can now be booted from with the following command line:
+    The hard disk can now be booted from with the following command line:
 
-	$ mess v1050 -hard cm5412.chd
+    $ mess v1050 -hard cm5412.chd
 
 */
 

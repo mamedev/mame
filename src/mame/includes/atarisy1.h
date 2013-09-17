@@ -86,6 +86,6 @@ public:
 	DECLARE_WRITE16_MEMBER( atarisy1_xscroll_w );
 	DECLARE_WRITE16_MEMBER( atarisy1_yscroll_w );
 	DECLARE_WRITE16_MEMBER( atarisy1_priority_w );
-	
+
 	static const atari_motion_objects_config s_mob_config;
 };

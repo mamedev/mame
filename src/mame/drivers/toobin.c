@@ -198,9 +198,9 @@ static MACHINE_CONFIG_START( toobin, toobin_state )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(toobin_state,toobin)
-	
+
 	MCFG_ATARI_EEPROM_2804_ADD("eeprom")
-	
+
 	MCFG_WATCHDOG_VBLANK_INIT(8)
 
 	/* video hardware */

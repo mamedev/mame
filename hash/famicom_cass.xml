@@ -2,7 +2,7 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="famicom_cass" description="Nintendo Famicom Family BASIC cassettes">
 
-<!-- 
+<!--
 
 This list is a bit peculiar, since it contains cassette images obtained on a FC
 by saving BASIC programs typed in from magazines, books, or homebrew

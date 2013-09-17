@@ -2,12 +2,12 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 
-	Atari 400 / 800 floppies
-	(skeleton list)
-	
-	note: many 'original' floppy images are in .atx format, whereas cracked / unprotected ones are .atr format
-	      .atx is unsupported, although apparently has been reverse engineered (insert info link here)
-		  There are also images in .xex format?
+    Atari 400 / 800 floppies
+    (skeleton list)
+
+    note: many 'original' floppy images are in .atx format, whereas cracked / unprotected ones are .atr format
+          .atx is unsupported, although apparently has been reverse engineered (insert info link here)
+          There are also images in .xex format?
 
 -->
 
@@ -23,6 +23,6 @@
 			</dataarea>
 		</part>
 	</software>
-	
-	
+
+
 </softwarelist>

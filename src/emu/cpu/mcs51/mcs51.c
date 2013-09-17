@@ -2506,4 +2506,3 @@ offs_t ds5002fp_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 
 	extern CPU_DISASSEMBLE( ds5002fp );
 	return CPU_DISASSEMBLE_NAME(ds5002fp)(this, buffer, pc, oprom, opram, options);
 }
-

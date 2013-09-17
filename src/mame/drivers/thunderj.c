@@ -254,7 +254,7 @@ static MACHINE_CONFIG_START( thunderj, thunderj_state )
 
 	MCFG_MACHINE_START_OVERRIDE(thunderj_state,thunderj)
 	MCFG_MACHINE_RESET_OVERRIDE(thunderj_state,thunderj)
-	
+
 	MCFG_ATARI_EEPROM_2816_ADD("eeprom")
 
 	/* perfect synchronization due to shared RAM */

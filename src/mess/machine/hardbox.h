@@ -68,7 +68,7 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 
-    int m_ifc;  // Tracks previous state of IEEE-488 IFC line
+	int m_ifc;  // Tracks previous state of IEEE-488 IFC line
 };
 
 // device type definition

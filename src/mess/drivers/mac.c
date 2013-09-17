@@ -960,7 +960,7 @@ static MACHINE_CONFIG_START( mac512ke, mac_state )
 	MCFG_VIA6522_ADD("via6522_0", 1000000, mac_via6522_intf)
 
 	MCFG_MACKBD_ADD()
-    MCFG_MACKBD_CLKOUT_HANDLER(WRITELINE(mac_state, mac_kbd_clk_in))
+	MCFG_MACKBD_CLKOUT_HANDLER(WRITELINE(mac_state, mac_kbd_clk_in))
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

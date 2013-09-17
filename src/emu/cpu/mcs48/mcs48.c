@@ -1330,4 +1330,3 @@ void mcs48_cpu_device::execute_set_input(int inputnum, int state)
 			break;
 	}
 }
-

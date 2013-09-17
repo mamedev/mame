@@ -290,7 +290,7 @@ WRITE32_MEMBER(model2_state::copro_tgp_fifoout_push)
 		return;
 	}
 
-//	logerror("COPRO FIFOOUT PUSH %08X, %f, %d\n", data, *(float*)&data,m_copro_fifoout_num);
+//  logerror("COPRO FIFOOUT PUSH %08X, %f, %d\n", data, *(float*)&data,m_copro_fifoout_num);
 
 	m_copro_fifoout_data[m_copro_fifoout_wpos++] = data;
 	if (m_copro_fifoout_wpos == COPRO_FIFOOUT_SIZE)

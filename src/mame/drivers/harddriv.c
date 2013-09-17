@@ -1350,7 +1350,7 @@ static MACHINE_CONFIG_START( driver_nomsp, harddriv_state )
 	MCFG_MACHINE_START_OVERRIDE(harddriv_state,harddriv)
 	MCFG_MACHINE_RESET_OVERRIDE(harddriv_state,harddriv)
 
-// TODO: ZRAM is really an MK48T02	MCFG_MK48T02_ADD("zram")
+// TODO: ZRAM is really an MK48T02  MCFG_MK48T02_ADD("zram")
 	MCFG_NVRAM_ADD_1FILL("zram")
 
 	MCFG_DUARTN68681_ADD("duartn68681", XTAL_3_6864MHz, duart_config)

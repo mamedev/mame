@@ -8,8 +8,8 @@
     speech synthesizer must be moved into the Peripheral Box.
 
     The Speech Synthesizer used for the TI was the CD2501E, AKA TMS5200,
-	(internal name TMC0285), a predecessor of the TMS5220 which was used in
-	other commercial products.
+    (internal name TMC0285), a predecessor of the TMS5220 which was used in
+    other commercial products.
 
     Note that this adapter also contains the speech roms.
 

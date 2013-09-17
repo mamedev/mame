@@ -25,7 +25,7 @@ Template for skeleton device
 // ======================> aicartc_device
 
 class aicartc_device : public device_t,
-  					   public device_rtc_interface
+						public device_rtc_interface
 {
 public:
 	// construction/destruction

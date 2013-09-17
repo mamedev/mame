@@ -32,7 +32,7 @@ CPU board:
 Sound: AY-3-8910
   RAM: AMD AM9128-15PC (2048x8 Static RAM)
   OSC: 10.000MHz
-Video: F6845P (or H6845P also labeled as HD46505RP) 40 pin dil (8 bit CRT Controller) 
+Video: F6845P (or H6845P also labeled as HD46505RP) 40 pin dil (8 bit CRT Controller)
  Misc: RCA X (CDM6116E2) 24 pin dil (General-Purpose Static RAM - Multiplexed I/O)
  Roms: u7f lat green - type 2764
        u6f lat green - type 2764

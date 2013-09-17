@@ -34,7 +34,7 @@ PALETTE_INIT_MEMBER(_8080bw_state,rollingc)
 		palette_set_color_rgb(machine(), i, pal1bit(i >> 2) >> 1, pal1bit(i >> 1) >> 1, pal1bit(i >> 0) >> 1);
 		palette_set_color_rgb(machine(), i | 8, pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
 	}
-	
+
 	// but according to photos, pen 6 is clearly orange instead of dark-yellow, and pen 5 is less dark as well
 	// pens 1, 2 and 4 are good though. Maybe we're missing a color prom?
 	palette_set_color_rgb(machine(), 0x05, 0xff, 0x00, 0x80); // pink

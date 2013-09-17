@@ -1133,4 +1133,3 @@ offs_t i8085a_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT
 	extern CPU_DISASSEMBLE( i8085 );
 	return CPU_DISASSEMBLE_NAME(i8085)(this, buffer, pc, oprom, opram, options);
 }
-

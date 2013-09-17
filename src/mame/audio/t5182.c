@@ -177,12 +177,12 @@ void t5182_device::device_config_complete()
 void t5182_device::device_start()
 {
 	m_t5182_sharedram = reinterpret_cast<UINT8 *>(machine().root_device().memshare("t5182_sharedram")->ptr());
-	
+
 	save_pointer(NAME(m_t5182_sharedram), sizeof(UINT8));
 	save_item(NAME(m_irqstate));
 	save_item(NAME(m_semaphore_main));
 	save_item(NAME(m_semaphore_snd));
-	
+
 	m_ourcpu = machine().device<cpu_device>("t5182_z80");
 }
 
@@ -220,7 +220,7 @@ TIMER_CALLBACK_MEMBER( t5182_device::setirq_callback )
 			m_irqstate &= ~2;
 			break;
 	}
-	
+
 	if (m_ourcpu == NULL)
 		return;
 

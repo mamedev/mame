@@ -1564,4 +1564,3 @@ void s2650_device::execute_run()
 		}
 	} while( m_icount > 0 );
 }
-

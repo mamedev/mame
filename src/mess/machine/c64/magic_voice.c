@@ -11,21 +11,21 @@
 
 LA05-123 Pinout
 ---------------
-	            _____   _____
-	 NEXTP   1 |*    \_/     | 28  +5V
-	   PD0   2 |             | 27  _ROML2
-	   PD1   3 |             | 26  _ROML
-	   PD2   4 |             | 25  _I/O2
-	   PD3   5 |             | 24  _GAME
-	 CLEAR   6 |             | 23  PHI2
+                _____   _____
+     NEXTP   1 |*    \_/     | 28  +5V
+       PD0   2 |             | 27  _ROML2
+       PD1   3 |             | 26  _ROML
+       PD2   4 |             | 25  _I/O2
+       PD3   5 |             | 24  _GAME
+     CLEAR   6 |             | 23  PHI2
 _RAM/EPROM   7 |  LA05-123   | 22  _ROMH2
-	   PB5   8 |  LA05-124   | 21  _ROMH
-	   PB6   9 |             | 20  CLOCK
-	 _6525  10 |             | 19  SDO
-	_EPROM  11 |             | 18  NEXTS
-	  CA12  12 |             | 17  _DA/CA
-	  CA14  13 |             | 16  CA15
-	   GND  14 |_____________| 15  CA13
+       PB5   8 |  LA05-124   | 21  _ROMH
+       PB6   9 |             | 20  CLOCK
+     _6525  10 |             | 19  SDO
+    _EPROM  11 |             | 18  NEXTS
+      CA12  12 |             | 17  _DA/CA
+      CA14  13 |             | 16  CA15
+       GND  14 |_____________| 15  CA13
 
 
 http://www.stefan-uhlmann.de/cbm/MVM/index.html
@@ -34,9 +34,9 @@ http://www.stefan-uhlmann.de/cbm/MVM/index.html
 
 /*
 
-	TODO:
+    TODO:
 
-	- T6721A speech synthesis
+    - T6721A speech synthesis
 
 */
 
@@ -48,14 +48,14 @@ http://www.stefan-uhlmann.de/cbm/MVM/index.html
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define T6721A_TAG  	"u5"
-#define MOS6525_TAG 	"u2"
-#define CMOS40105_TAG 	"u1"
+#define T6721A_TAG      "u5"
+#define MOS6525_TAG     "u2"
+#define CMOS40105_TAG   "u1"
 
-#define A12	BIT(offset, 12)
-#define A13	BIT(offset, 13)
-#define A14	BIT(offset, 14)
-#define A15	BIT(offset, 15)
+#define A12 BIT(offset, 12)
+#define A13 BIT(offset, 13)
+#define A14 BIT(offset, 14)
+#define A15 BIT(offset, 15)
 #define PB5 BIT(m_tpi_pb, 5)
 #define PB6 BIT(m_tpi_pb, 6)
 
@@ -80,18 +80,18 @@ WRITE_LINE_MEMBER( c64_magic_voice_cartridge_device::tpi_irq_w )
 READ8_MEMBER( c64_magic_voice_cartridge_device::tpi_pa_r )
 {
 	/*
-	
+
 	    bit     description
-	
-	    0       
-	    1       
-	    2       
-	    3       
-	    4       
+
+	    0
+	    1
+	    2
+	    3
+	    4
 	    5       J1 _GAME
 	    6       T6721 _EOS
 	    7       FIFO DIR
-	
+
 	*/
 
 	UINT8 data = 0;
@@ -106,18 +106,18 @@ READ8_MEMBER( c64_magic_voice_cartridge_device::tpi_pa_r )
 WRITE8_MEMBER( c64_magic_voice_cartridge_device::tpi_pa_w )
 {
 	/*
-	
+
 	    bit     description
-	
+
 	    0       FIFO D0
 	    1       FIFO D1
 	    2       FIFO D2
 	    3       FIFO D3
 	    4       FIFO SI
-	    5       
-	    6       
-	    7       
-	
+	    5
+	    6
+	    7
+
 	*/
 
 	m_fifo->write(data & 0x0f);
@@ -127,18 +127,18 @@ WRITE8_MEMBER( c64_magic_voice_cartridge_device::tpi_pa_w )
 READ8_MEMBER( c64_magic_voice_cartridge_device::tpi_pb_r )
 {
 	/*
-	
+
 	    bit     description
-	
-	    0       
-	    1       
-	    2       
-	    3       
-	    4       
-	    5       
-	    6       
+
+	    0
+	    1
+	    2
+	    3
+	    4
+	    5
+	    6
 	    7       J1 _EXROM
-	
+
 	*/
 
 	UINT8 data = 0;
@@ -151,9 +151,9 @@ READ8_MEMBER( c64_magic_voice_cartridge_device::tpi_pb_r )
 WRITE8_MEMBER( c64_magic_voice_cartridge_device::tpi_pb_w )
 {
 	/*
-	
+
 	    bit     description
-	
+
 	    0       T6721 D0
 	    1       T6721 D1
 	    2       T6721 D2
@@ -161,8 +161,8 @@ WRITE8_MEMBER( c64_magic_voice_cartridge_device::tpi_pb_w )
 	    4       T6721 _WR
 	    5       LA05-124 pin 8 (DA/CA)
 	    6       LA05-124 pin 9 (passthru)
-	    7       
-	
+	    7
+
 	*/
 
 	if (!BIT(m_tpi_pb, 4) && BIT(data, 4))
@@ -208,7 +208,7 @@ WRITE_LINE_MEMBER( c64_magic_voice_cartridge_device::phi2_w )
 		m_vslsi->di_w(m_pd & 0x01);
 
 		m_pd >>= 1;
-	}	
+	}
 }
 
 WRITE_LINE_MEMBER( c64_magic_voice_cartridge_device::dtrd_w )

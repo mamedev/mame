@@ -158,32 +158,32 @@ private:
 class mb8841_cpu_device : public mb88_cpu_device
 {
 public:
-    // construction/destruction
-    mb8841_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	mb8841_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
 class mb8842_cpu_device : public mb88_cpu_device
 {
 public:
-    // construction/destruction
-    mb8842_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	mb8842_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
 class mb8843_cpu_device : public mb88_cpu_device
 {
 public:
-    // construction/destruction
-    mb8843_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	mb8843_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
 class mb8844_cpu_device : public mb88_cpu_device
 {
 public:
-    // construction/destruction
-    mb8844_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	mb8844_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 

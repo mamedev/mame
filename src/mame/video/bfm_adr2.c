@@ -117,7 +117,7 @@ const device_type BFM_ADDER2 = &device_creator<bfm_adder2_device>;
 
 bfm_adder2_device::bfm_adder2_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock )
 	: device_t(mconfig, BFM_ADDER2, "BFM ADDER2", tag, owner, clock, "bfm_adder2", __FILE__),
-	  m_cpu(*this, "adder2")
+		m_cpu(*this, "adder2")
 {
 }
 
@@ -192,7 +192,7 @@ void bfm_adder2_device::device_reset()
 void bfm_adder2_device::device_start()
 {
 	adder2_decode_char_roms();
-	
+
 	save_item(NAME(m_adder2_screen_page_reg));
 	save_item(NAME(m_adder2_c101));
 	save_item(NAME(m_adder2_rx));
@@ -208,7 +208,7 @@ void bfm_adder2_device::device_start()
 	m_tilemap0 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(bfm_adder2_device::get_tile0_info),this), TILEMAP_SCAN_ROWS,  8, 8, 50, 35);
 
 	m_tilemap1 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(bfm_adder2_device::get_tile1_info),this), TILEMAP_SCAN_ROWS,  8, 8, 50, 35);
-	
+
 	palette_set_color(machine(), 0,MAKE_RGB(0x00,0x00,0x00));
 	palette_set_color(machine(), 1,MAKE_RGB(0x00,0x00,0xFF));
 	palette_set_color(machine(), 2,MAKE_RGB(0x00,0xFF,0x00));
@@ -224,13 +224,12 @@ void bfm_adder2_device::device_start()
 	palette_set_color(machine(),12,MAKE_RGB(0x80,0x00,0x00));
 	palette_set_color(machine(),13,MAKE_RGB(0x80,0x00,0x80));
 	palette_set_color(machine(),14,MAKE_RGB(0x80,0x80,0x00));
-	palette_set_color(machine(),15,MAKE_RGB(0x80,0x80,0x80));	
+	palette_set_color(machine(),15,MAKE_RGB(0x80,0x80,0x80));
 }
 
 // video update ///////////////////////////////////////////////////////////
 UINT32 bfm_adder2_device::update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	const rectangle visible1(0, 400-1,  0,  280-1);  //minx,maxx, miny,maxy
 
 	if (m_adder2_screen_page_reg & SL_DISPLAY) m_tilemap1->draw(screen, bitmap, visible1, 0, 0);
@@ -409,7 +408,7 @@ WRITE8_MEMBER(bfm_adder2_device::vid_uart_tx_w)
 	m_adder2_sc2data       = data;    // store data
 
 	m_adder2_acia_triggered = 1;      // set flag, acia IRQ triggered
-	
+
 	m_cpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE );
 
 	//LOG_SERIAL(("sadder  %02X  (%c)\n",data, data ));
@@ -564,4 +563,3 @@ machine_config_constructor bfm_adder2_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( adder2 );
 }
-

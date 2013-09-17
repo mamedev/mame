@@ -12,7 +12,7 @@ public:
 			sprites(*this, "sprites") ,
 		m_maincpu(*this, "maincpu"),
 		m_seibu_sound(*this, "seibu_sound") { }
-		
+
 	required_shared_ptr<UINT16> back_data,fore_data,mid_data, text_data, sprites;
 	required_device<cpu_device> m_maincpu;
 	required_device<seibu_sound_device> m_seibu_sound;

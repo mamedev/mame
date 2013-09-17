@@ -880,8 +880,8 @@ private:
 	static const op_func insnminx_CE[256];
 	static const int insnminx_cycles_CE[256];
 
-    static const op_func insnminx_CF[256];
-    static const int insnminx_cycles_CF[256];
+	static const op_func insnminx_CF[256];
+	static const int insnminx_cycles_CF[256];
 
 };
 

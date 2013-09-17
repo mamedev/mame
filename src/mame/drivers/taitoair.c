@@ -133,7 +133,7 @@ Video section hung off TaitoH driver, it should be separate.
 hardware which creates the 3d background scenes? It seems
 the TMS320C25 is being used as a co-processor to relieve the
 68000 of 3d calculations... it has direct access to line ram
-along with the 68000. 
+along with the 68000.
 
 Gradiation RAM is used to display a rotatable gradient background.
 The rotation is most likely handled by the TC0430GRW ROZ chip.
@@ -691,11 +691,11 @@ void taitoair_state::machine_reset()
 static MACHINE_CONFIG_START( airsys, taitoair_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz)	// MC68000P12
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz) // MC68000P12
 	MCFG_CPU_PROGRAM_MAP(airsys_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitoair_state,  irq5_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz / 4)	// Z8400AB1
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz / 4)   // Z8400AB1
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_CPU_ADD("dsp", TMS32025, XTAL_36MHz) // Unverified

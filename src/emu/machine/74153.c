@@ -52,13 +52,13 @@ ttl74153_device::ttl74153_device(const machine_config &mconfig, const char *tag,
 	m_input_lines[1][1] = 0;
 	m_input_lines[1][2] = 0;
 	m_input_lines[1][3] = 0;
-	
+
 	for (int i = 0; i < 2; i++)
 	m_enable[i] = 0;
-	
+
 	for (int i = 0; i < 2; i++)
 	m_output[i] = 0;
-	
+
 	for (int i = 0; i < 2; i++)
 	m_last_output[i] = 0;
 }
@@ -75,7 +75,7 @@ void ttl74153_device::device_config_complete()
 	const ttl74153_config *intf = reinterpret_cast<const ttl74153_config *>(static_config());
 	if (intf != NULL)
 	*static_cast<ttl74153_config *>(this) = *intf;
-	
+
 	// or initialize to defaults if none provided
 	else
 	{

@@ -227,8 +227,8 @@ public:
 class pic16cr620a_device : public pic16c62x_device
 {
 public:
-	// construction/destruction
-	pic16cr620a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+    // construction/destruction
+    pic16cr620a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 }*/;
 
 class pic16c621_device : public pic16c62x_device

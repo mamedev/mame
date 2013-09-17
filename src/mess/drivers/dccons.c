@@ -24,236 +24,236 @@
     - Carrier: Jaleco logo uses YUV, but y size is halved?
     - Close To: Hangs at FMV
     - F355 Challenge: black screen after Sega logo;
-	- Gundam - Side Story 0079: currently hangs at Bandai logo (regression)
-	- Idol Janshi wo Tsukucchaou: pixel aspect is way wrong (stretched and offsetted horizontally)
-	- Power Stone: hangs at Capcom logo;
-	- Sega GT: no cursor on main menu;
-	- Tetris 4D: hangs at BPS FMV (bp 0C0B0C4E)
+    - Gundam - Side Story 0079: currently hangs at Bandai logo (regression)
+    - Idol Janshi wo Tsukucchaou: pixel aspect is way wrong (stretched and offsetted horizontally)
+    - Power Stone: hangs at Capcom logo;
+    - Sega GT: no cursor on main menu;
+    - Tetris 4D: hangs at BPS FMV (bp 0C0B0C4E)
 
-	Notes:
-	- DC US and DC PAL flash ROMs are definitely hacked, they are set to have Chinese instead of Japanese.
-	- 0x1a002 of flash ROM returns the region type (0x30=Japan, 0x31=USA, 0x32=Europe). Amusingly, if the value
-	  on a non-jp console is different than these ones, the system shows a black swirl (and nothing boots).
-	- gdi file for DCLP (a Dreamcast tester) doesn't have first two tracks info, they are:
-	  1 0 4 2048 FILE0001.DUP 0
+    Notes:
+    - DC US and DC PAL flash ROMs are definitely hacked, they are set to have Chinese instead of Japanese.
+    - 0x1a002 of flash ROM returns the region type (0x30=Japan, 0x31=USA, 0x32=Europe). Amusingly, if the value
+      on a non-jp console is different than these ones, the system shows a black swirl (and nothing boots).
+    - gdi file for DCLP (a Dreamcast tester) doesn't have first two tracks info, they are:
+      1 0 4 2048 FILE0001.DUP 0
       2 1798 0 2352 FILE0002.DUP 0
-	  serial i/o also fails on that, work ram addresses that needs to be patched with 0x0009 (nop) are:
-	  0xc0196da
-	  0xc0196ec
-	SH4 TEST:
-		UBC test (0101):
-			ok
-		FPU test (0201):
-			NG
-		0xc03fe24 work ram flag check (1=error, 0=ok)
-		Cache test (03xx):
-			Cache Read/Write test (0301)
-			NG
-			Cache RAM mode Check (0305)
-			NG
-		MMU test (04xx):
-			asserts
-		TMU test (0501):
-			*_reg check -> ok
-			TCNT* reload -> NG
-			TCNT* underflow irq -> NG
-		MULT test (0601)
-			ok
-		DIVU test (0701)
-			ok
-		Store Queue test (0801):
-			ok
-		SCIF test (0901)
-			NG
-		Private Instruction test (0a01)
-			NG
-		Critical test (0dxx)
-			Critical (Store Queue) test (0d01):
-				ok
-			Critical (Write back) test (0d02):
-				ok
-			Critical (ADD,CMP/EQ) test (0d03):
-				ok
-			Critical (OC_OIX) test (0d04):
-				NG
-			Critical (MAX current) test (0d05):
-				ok (very slow!)
-		 	Critical (IC Cross Talk) test (0d06):
-				NG
-		 	Critical (Cache D-array) test (0d07):
-				NG
-		SH-4 BUG (0exx)
-			SH4_BUG 64bit FMOV
-				ok
-			SH4 BUG FIX (64bitFMOV)
-				ok
-	MEM TEST:
-		AICA (0102)
-			ok
-		Work RAM (0204):
-			ok
-		PV64 area (0303):
-			ok
-		PV32 area (0403):
-			ok
-	CLX TEST:
-		CLX internal RAM (0101):
-			ok
-		<Torus> check (0401):
-			(sets up RGB888 mode 2, assuming it's critically failed)
-	TA TEST:
-		TA_YUVINT (0101):
-			ok -> IST_EOXFER_YUV
-		TA_OENDINT (0102):
-			ok -> IST_EOXFER_OPLST
-		TA_OMENDINT (0103):
-			ok -> IST_EOXFER_OPMV
-		TA_TENDINT (0104):
-			ok -> IST_EOXFER_TRLST
-		TA_TMENDINT (0105):
-			ok -> IST_EOXFER_TRMV
-		TA_PTENDINT (0106):
-			ok -> IST_EOXFER_PTLST
-		TA_ISPINT (0107):
-			NG -> ISP/TSP Parameter Overflow (error)
-		TA_OBJINT (0108):
-			NG -> OBJect list pointer Overflow (error)
-		TA_IPINT (0109):
-			NG -> TA: Illegal parameter (error)
-		YUV Converter (0201):
-			ok
-	DDT i/f TEST:
-		Sort, Normal DMA (1) (0101)
-			hangs (wants Sort DMA irq, of course)
-		Sort, Normal DMA (2)
-			...
-		Through
-			NG, hangs again
-		DC_DEINT (0201)
-			ok
-		DC_SDTEINT (0202)
-			ok
-		DC_SDTERINT (0203)
-			ok (but returns error count ++, think it's a bug in the SW)
-	G2 TEST
-		DMA (0101):
-			G2 EXT AREA DETECT:
-			"!!!! ch00 ERROR DETECT !!!!"
-		Interrupt (0301):
-			G2 EXT AREA DETECT
-			DMA END INT
-				hangs
-		Ext Interrupt (06xx)
-			AICA INT  (0601)
-				error detect
-			Modem INT (0602)
-				error detect
-	AICA TEST
-		Sound RAM (01xx)
-			Pattern R/W check (0101)
-				ok
-		Register (02xx)
-			CH Data (0201)
-				ok
-			EXT Input (0202)
-				ok
-			DSP Data (0203)
-				ok
-		S_Clock (03xx)
-			50MSEC (0301)
-				NG -> ~0xa58 in 0x702814, must be > 0x889 and < 0x8b0
-			25MSEC (0302)
-				NG -> ~0x372 in 0x702814, must be > 0x443 and < 0x45a
-		Timer (04xx)
-			Timer A (0401)
-				NG
-			Timer B (0402)
-				NG
-			Timer C (0403)
-				NG
-		DMA (05xx)
-			SRAM -> CH Reg (0501)
-				ok
-			SRAM -> Comm Reg (0502)
-				ok
-			SRAM -> DSP Reg (0503)
-				ok
-			CH Reg -> SRAM (0504)
-				ok
-			Comm Reg -> SRAM (0505)
-				ok
-			DSP Reg -> SRAM (0506)
-				ok
-			Clear SRAM (0507)
-				ok
-			Clear CH Reg (0508)
-				ok
-			Clear Comm Reg (0509)
-				ok
-			Clear DSP Reg (050a)
-				ok
-		Interrupt (06xx)
-			Sampling clock (0601)
-				NG (irq 0x400)
-			Timer A (0602)
-				randomly NG/ok
-			Timer B (0603)
-				ok
-			Timer C (0604)
-				ok
-			DMA End (0605)
-				ok
-			Midi Out (0606)
-				NG
-			Main CPU (0607)
-				ok
-		RTC (07xx)
-			Write Protect (0701)
-				ok
-			RW Comp (0702)
-				ok
-			Clock (0703)
-				NG
-		ARM7 (08xx)
-			Load & Start (0801)
-				NG
-			Timer & Intr (0802)
-				NG
-			DMA (0803)
-				NG
-			Ch-Reg R/W (0804)
-				ok
-			SRAM incr (0805)
-				NG
-			SRAM pattern (0806)
-				ok
-		EG (09xx)
-			LSA-Reg Left (0901)
-				ok/NG
-			LSA-Reg Right (0902)
-				ok/NG
-			LSA-Reg Left & Right (0903)
-				ok/NG
-		MIDI (0axx)
-			OEMP bit (0a01)
-				NG
-			OFLL bit (0a02)
-				NG
-	PVRi/f test
-		DMA (01xx)
-			CPU trig (0101)
-				ok
-			INT trig
-				ok
-		Interrupt (02xx)
-			PVR DMA end Int (0201)
-				ok
-			PVR DMA IA Int (0202)
-				NG
-			PVR DMA end (0203)
-				NG
-	Flash test:
-		(SH-4 jumps to la la land as soon as this is started)
+      serial i/o also fails on that, work ram addresses that needs to be patched with 0x0009 (nop) are:
+      0xc0196da
+      0xc0196ec
+    SH4 TEST:
+        UBC test (0101):
+            ok
+        FPU test (0201):
+            NG
+        0xc03fe24 work ram flag check (1=error, 0=ok)
+        Cache test (03xx):
+            Cache Read/Write test (0301)
+            NG
+            Cache RAM mode Check (0305)
+            NG
+        MMU test (04xx):
+            asserts
+        TMU test (0501):
+            *_reg check -> ok
+            TCNT* reload -> NG
+            TCNT* underflow irq -> NG
+        MULT test (0601)
+            ok
+        DIVU test (0701)
+            ok
+        Store Queue test (0801):
+            ok
+        SCIF test (0901)
+            NG
+        Private Instruction test (0a01)
+            NG
+        Critical test (0dxx)
+            Critical (Store Queue) test (0d01):
+                ok
+            Critical (Write back) test (0d02):
+                ok
+            Critical (ADD,CMP/EQ) test (0d03):
+                ok
+            Critical (OC_OIX) test (0d04):
+                NG
+            Critical (MAX current) test (0d05):
+                ok (very slow!)
+            Critical (IC Cross Talk) test (0d06):
+                NG
+            Critical (Cache D-array) test (0d07):
+                NG
+        SH-4 BUG (0exx)
+            SH4_BUG 64bit FMOV
+                ok
+            SH4 BUG FIX (64bitFMOV)
+                ok
+    MEM TEST:
+        AICA (0102)
+            ok
+        Work RAM (0204):
+            ok
+        PV64 area (0303):
+            ok
+        PV32 area (0403):
+            ok
+    CLX TEST:
+        CLX internal RAM (0101):
+            ok
+        <Torus> check (0401):
+            (sets up RGB888 mode 2, assuming it's critically failed)
+    TA TEST:
+        TA_YUVINT (0101):
+            ok -> IST_EOXFER_YUV
+        TA_OENDINT (0102):
+            ok -> IST_EOXFER_OPLST
+        TA_OMENDINT (0103):
+            ok -> IST_EOXFER_OPMV
+        TA_TENDINT (0104):
+            ok -> IST_EOXFER_TRLST
+        TA_TMENDINT (0105):
+            ok -> IST_EOXFER_TRMV
+        TA_PTENDINT (0106):
+            ok -> IST_EOXFER_PTLST
+        TA_ISPINT (0107):
+            NG -> ISP/TSP Parameter Overflow (error)
+        TA_OBJINT (0108):
+            NG -> OBJect list pointer Overflow (error)
+        TA_IPINT (0109):
+            NG -> TA: Illegal parameter (error)
+        YUV Converter (0201):
+            ok
+    DDT i/f TEST:
+        Sort, Normal DMA (1) (0101)
+            hangs (wants Sort DMA irq, of course)
+        Sort, Normal DMA (2)
+            ...
+        Through
+            NG, hangs again
+        DC_DEINT (0201)
+            ok
+        DC_SDTEINT (0202)
+            ok
+        DC_SDTERINT (0203)
+            ok (but returns error count ++, think it's a bug in the SW)
+    G2 TEST
+        DMA (0101):
+            G2 EXT AREA DETECT:
+            "!!!! ch00 ERROR DETECT !!!!"
+        Interrupt (0301):
+            G2 EXT AREA DETECT
+            DMA END INT
+                hangs
+        Ext Interrupt (06xx)
+            AICA INT  (0601)
+                error detect
+            Modem INT (0602)
+                error detect
+    AICA TEST
+        Sound RAM (01xx)
+            Pattern R/W check (0101)
+                ok
+        Register (02xx)
+            CH Data (0201)
+                ok
+            EXT Input (0202)
+                ok
+            DSP Data (0203)
+                ok
+        S_Clock (03xx)
+            50MSEC (0301)
+                NG -> ~0xa58 in 0x702814, must be > 0x889 and < 0x8b0
+            25MSEC (0302)
+                NG -> ~0x372 in 0x702814, must be > 0x443 and < 0x45a
+        Timer (04xx)
+            Timer A (0401)
+                NG
+            Timer B (0402)
+                NG
+            Timer C (0403)
+                NG
+        DMA (05xx)
+            SRAM -> CH Reg (0501)
+                ok
+            SRAM -> Comm Reg (0502)
+                ok
+            SRAM -> DSP Reg (0503)
+                ok
+            CH Reg -> SRAM (0504)
+                ok
+            Comm Reg -> SRAM (0505)
+                ok
+            DSP Reg -> SRAM (0506)
+                ok
+            Clear SRAM (0507)
+                ok
+            Clear CH Reg (0508)
+                ok
+            Clear Comm Reg (0509)
+                ok
+            Clear DSP Reg (050a)
+                ok
+        Interrupt (06xx)
+            Sampling clock (0601)
+                NG (irq 0x400)
+            Timer A (0602)
+                randomly NG/ok
+            Timer B (0603)
+                ok
+            Timer C (0604)
+                ok
+            DMA End (0605)
+                ok
+            Midi Out (0606)
+                NG
+            Main CPU (0607)
+                ok
+        RTC (07xx)
+            Write Protect (0701)
+                ok
+            RW Comp (0702)
+                ok
+            Clock (0703)
+                NG
+        ARM7 (08xx)
+            Load & Start (0801)
+                NG
+            Timer & Intr (0802)
+                NG
+            DMA (0803)
+                NG
+            Ch-Reg R/W (0804)
+                ok
+            SRAM incr (0805)
+                NG
+            SRAM pattern (0806)
+                ok
+        EG (09xx)
+            LSA-Reg Left (0901)
+                ok/NG
+            LSA-Reg Right (0902)
+                ok/NG
+            LSA-Reg Left & Right (0903)
+                ok/NG
+        MIDI (0axx)
+            OEMP bit (0a01)
+                NG
+            OFLL bit (0a02)
+                NG
+    PVRi/f test
+        DMA (01xx)
+            CPU trig (0101)
+                ok
+            INT trig
+                ok
+        Interrupt (02xx)
+            PVR DMA end Int (0201)
+                ok
+            PVR DMA IA Int (0202)
+                NG
+            PVR DMA end (0203)
+                NG
+    Flash test:
+        (SH-4 jumps to la la land as soon as this is started)
 
 
 */
@@ -275,7 +275,7 @@
 READ64_MEMBER(dc_cons_state::dcus_idle_skip_r )
 {
 	//if (space.device().safe_pc()==0xc0ba52a)
-	//	space.device().execute().spin_until_time(attotime::from_usec(2500));
+	//  space.device().execute().spin_until_time(attotime::from_usec(2500));
 	//  device_spinuntil_int(&space.device());
 
 	return dc_ram[0x2303b0/8];
@@ -284,7 +284,7 @@ READ64_MEMBER(dc_cons_state::dcus_idle_skip_r )
 READ64_MEMBER(dc_cons_state::dcjp_idle_skip_r )
 {
 	//if (space.device().safe_pc()==0xc0bac62)
-	//	space.device().execute().spin_until_time(attotime::from_usec(2500));
+	//  space.device().execute().spin_until_time(attotime::from_usec(2500));
 	//  device_spinuntil_int(&space.device());
 
 	return dc_ram[0x2302f8/8];
@@ -384,7 +384,7 @@ static ADDRESS_MAP_START( dc_map, AS_PROGRAM, 64, dc_cons_state )
 	AM_RANGE(0x00800000, 0x009fffff) AM_READWRITE(dc_arm_r, dc_arm_w )
 //  AM_RANGE(0x01000000, 0x01ffffff) G2 Ext Device #1
 //  AM_RANGE(0x02700000, 0x02707fff) AICA reg mirror
-//	AM_RANGE(0x02800000, 0x02ffffff) AICA wave mem mirror
+//  AM_RANGE(0x02800000, 0x02ffffff) AICA wave mem mirror
 
 //  AM_RANGE(0x03000000, 0x03ffffff) G2 Ext Device #2
 
@@ -627,7 +627,7 @@ static MACHINE_CONFIG_START( dc, dc_cons_state )
 
 	MCFG_MACHINE_RESET_OVERRIDE(dc_cons_state,dc_console )
 
-//	MCFG_MACRONIX_29LV160TMC_ADD("dcflash")
+//  MCFG_MACRONIX_29LV160TMC_ADD("dcflash")
 
 	MCFG_MAPLE_DC_ADD( "maple_dc", "maincpu", dc_maple_irq )
 	MCFG_DC_CONTROLLER_ADD("dcctrl0", "maple_dc", 0, ":P1:0", ":P1:1", ":P1:A0", ":P1:A1", ":P1:A2", ":P1:A3", ":P1:A4", ":P1:A5")

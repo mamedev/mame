@@ -158,7 +158,7 @@ private:
 		TIMER_DMA,
 		TIMER_HSYNC
 	};
-	
+
 	void initialize_palette();
 
 	static const int bckgnd[];

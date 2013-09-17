@@ -228,7 +228,7 @@ static MACHINE_CONFIG_START( skullxbo, skullxbo_state )
 
 	MCFG_TIMER_DRIVER_ADD("scan_timer", skullxbo_state, scanline_timer)
 	MCFG_MACHINE_RESET_OVERRIDE(skullxbo_state,skullxbo)
-	
+
 	MCFG_ATARI_EEPROM_2816_ADD("eeprom")
 
 	/* video hardware */

@@ -270,12 +270,12 @@ void namcos22_renderer::poly3d_drawquad(screen_device &screen, bitmap_rgb32 &bit
 	vertex_t clipv[6];
 	int clipverts;
 	int vertnum;
-	
+
 	int direct = node->data.quad.direct;
 	int flags = node->data.quad.flags;
 	int color = node->data.quad.color;
 	int cz_adjust = node->data.quad.cz_adjust;
-	
+
 	extra.destbase = &bitmap;
 	extra.pfade_enabled = 0;
 	extra.zfog_enabled = 0;
@@ -640,7 +640,7 @@ struct namcos22_scenenode *namcos22_renderer::new_scenenode(running_machine &mac
 	struct namcos22_scenenode *node = &m_scenenode_root;
 	struct namcos22_scenenode *prev = NULL;
 	int hash = 0;
-	
+
 	for (int i = 0; i < 24; i += NAMCOS22_RADIX_BITS)
 	{
 		hash = (zsort >> 20) & NAMCOS22_RADIX_MASK;
@@ -751,7 +751,7 @@ float namcos22_state::dspfloat_to_nativefloat(UINT32 val)
 void namcos22_state::matrix3d_multiply(float a[4][4], float b[4][4])
 {
 	float temp[4][4];
-	
+
 	for (int row = 0; row < 4;  row++)
 	{
 		for (int col = 0; col < 4; col++)
@@ -764,7 +764,7 @@ void namcos22_state::matrix3d_multiply(float a[4][4], float b[4][4])
 			temp[row][col] = sum;
 		}
 	}
-	
+
 	memcpy(a, temp, sizeof(temp));
 }
 
@@ -784,7 +784,7 @@ void namcos22_state::transform_point(float *vx, float *vy, float *vz, float m[4]
 	float x = *vx;
 	float y = *vy;
 	float z = *vz;
-	
+
 	*vx = m[0][0]*x + m[1][0]*y + m[2][0]*z + m[3][0];
 	*vy = m[0][1]*x + m[1][1]*y + m[2][1]*z + m[3][1];
 	*vz = m[0][2]*x + m[1][2]*y + m[2][2]*z + m[3][2];
@@ -795,7 +795,7 @@ void namcos22_state::transform_normal(float *nx, float *ny, float *nz, float m[4
 	float x = *nx;
 	float y = *ny;
 	float z = *nz;
-	
+
 	*nx = m[0][0]*x + m[1][0]*y + m[2][0]*z;
 	*ny = m[0][1]*x + m[1][1]*y + m[2][1]*z;
 	*nz = m[0][2]*x + m[1][2]*y + m[2][2]*z;
@@ -2291,7 +2291,7 @@ UINT32 namcos22_state::screen_update_namcos22s(screen_device &screen, bitmap_rgb
 	if (layer & 1) draw_polygons(bitmap);
 	m_poly->render_scene(screen, bitmap);
 	if (layer & 4) namcos22s_mix_text_layer(screen, bitmap, cliprect, 6);
-	
+
 	// apply gamma
 	const UINT8 *rlut = (const UINT8 *)&m_mixer[0x100/4];
 	const UINT8 *glut = (const UINT8 *)&m_mixer[0x200/4];
@@ -2317,15 +2317,15 @@ UINT32 namcos22_state::screen_update_namcos22(screen_device &screen, bitmap_rgb3
 	update_mixer();
 	update_palette();
 	screen.priority().fill(0, cliprect);
-	
+
 	// background color
 	bitmap.fill(screen.machine().pens[0x7fff], cliprect);
-	
+
 	// layers
 	draw_polygons(bitmap);
 	m_poly->render_scene(screen, bitmap);
 	draw_text_layer(screen, bitmap, cliprect);
-	
+
 	// apply gamma
 	const UINT8 *rlut = (const UINT8 *)m_gamma_proms->base();
 	const UINT8 *glut = (const UINT8 *)m_gamma_proms->base() + 0x100;
@@ -2383,7 +2383,7 @@ void namcos22_state::init_tables()
 	{
 		m_pointrom[i] = signed24(pointrom_high[i] << 16 | pointrom_mid[i] << 8 | pointrom_low[i]);
 	}
-	
+
 	m_pointram = auto_alloc_array_clear(machine(), UINT32, 0x20000);
 
 	// textures
@@ -2393,7 +2393,7 @@ void namcos22_state::init_tables()
 	m_texture_tilemap = (UINT16 *)memregion("textilemap")->base();
 	m_texture_tiledata = (UINT8 *)machine().gfx[1]->get_data(0);
 	m_texture_tileattr = auto_alloc_array(machine(), UINT8, 0x080000*2);
-	
+
 	// unpack textures
 	UINT8 *packed_tileattr = 0x200000 + (UINT8 *)memregion("textilemap")->base();
 	UINT8 *unpacked_tileattr = m_texture_tileattr;
@@ -2403,7 +2403,7 @@ void namcos22_state::init_tables()
 		*unpacked_tileattr++ = (*packed_tileattr) & 0xf;
 		packed_tileattr++;
 	}
-	
+
 	// make attr/y/x lookup table
 	m_texture_ayx_to_pixel = auto_alloc_array(machine(), UINT8, 16*16*16);
 	for (int attr = 0; attr < 16; attr++)
@@ -2431,7 +2431,7 @@ void namcos22_state::init_tables()
 			}
 		}
 	}
-	
+
 	// following setup is Namco System 22 specific
 	switch (m_gametype)
 	{
@@ -2475,7 +2475,7 @@ VIDEO_START_MEMBER(namcos22_state,common)
 VIDEO_START_MEMBER(namcos22_state,namcos22)
 {
 	m_is_ss22 = 0;
-	
+
 	VIDEO_START_CALL_MEMBER(common);
 }
 

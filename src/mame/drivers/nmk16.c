@@ -3683,7 +3683,7 @@ static MACHINE_CONFIG_START( mustang, nmk16_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	
+
 	MCFG_NMK004_ADD("nmk004")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 1500000)
@@ -3757,7 +3757,7 @@ static MACHINE_CONFIG_START( bioship, nmk16_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	
+
 	MCFG_NMK004_ADD("nmk004")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, BIOSHIP_CRYSTAL2 / 8) /* 1.5 Mhz (verified) */
@@ -3799,7 +3799,7 @@ static MACHINE_CONFIG_START( vandyke, nmk16_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	
+
 	MCFG_NMK004_ADD("nmk004")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/8) /* verified on pcb */
@@ -3844,7 +3844,7 @@ static MACHINE_CONFIG_START( vandykeb, nmk16_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	
+
 	MCFG_NMK004_ADD("nmk004")
 
 	MCFG_OKIM6295_ADD("oki1", 16000000/4, OKIM6295_PIN7_LOW)
@@ -3875,7 +3875,7 @@ static MACHINE_CONFIG_START( acrobatm, nmk16_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	
+
 	MCFG_NMK004_ADD("nmk004")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 1500000) /* (verified on pcb) */
@@ -3949,7 +3949,7 @@ static MACHINE_CONFIG_START( tdragon, nmk16_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	
+
 	MCFG_NMK004_ADD("nmk004")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/8) /* verified on pcb */
@@ -4024,7 +4024,7 @@ static MACHINE_CONFIG_START( strahl, nmk16_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	
+
 	MCFG_NMK004_ADD("nmk004")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 1500000)
@@ -4067,7 +4067,7 @@ static MACHINE_CONFIG_START( hachamf, nmk16_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	
+
 	MCFG_NMK004_ADD("nmk004")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 1500000)
@@ -4109,7 +4109,7 @@ static MACHINE_CONFIG_START( macross, nmk16_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	
+
 	MCFG_NMK004_ADD("nmk004")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 1500000)
@@ -4151,7 +4151,7 @@ static MACHINE_CONFIG_START( blkheart, nmk16_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	
+
 	MCFG_NMK004_ADD("nmk004")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/8 ) /* verified on pcb */
@@ -4193,7 +4193,7 @@ static MACHINE_CONFIG_START( gunnail, nmk16_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	
+
 	MCFG_NMK004_ADD("nmk004")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 1500000)

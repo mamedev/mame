@@ -40,10 +40,10 @@ public:
 	required_shared_ptr<UINT32> m_lumaram;
 	optional_shared_ptr<UINT16> m_soundram;
 	optional_shared_ptr<UINT32> m_tgp_program;
-	
+
 	required_device<i960_cpu_device> m_maincpu;
 	optional_device<dsbz80_device> m_dsbz80;    // Z80-based MPEG Digital Sound Board
-	optional_device<segam1audio_device> m_m1audio;	// Model 1 standard sound board
+	optional_device<segam1audio_device> m_m1audio;  // Model 1 standard sound board
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<cpu_device> m_tgp;
 	optional_device<cpu_device> m_dsp;

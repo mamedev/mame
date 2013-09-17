@@ -18,7 +18,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_oki(*this, "oki")
-	
+
 	{
 		vblank_level = 6;
 		raster_level = 5;
@@ -27,7 +27,7 @@ public:
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_bg_videoram;
 	required_shared_ptr<UINT16> m_fg_videoram;
-//	required_shared_ptr<UINT16> m_spriteram;
+//  required_shared_ptr<UINT16> m_spriteram;
 	required_device<buffered_spriteram16_device> m_spriteram;
 	//  UINT16 *        m_paletteram; // currently this uses generic palette handling
 

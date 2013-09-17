@@ -139,9 +139,9 @@ void i860_cpu_device::device_start()
 void i860_cpu_device::state_import(const device_state_entry &entry)
 {
 #define I860_SET_INFO_F(fnum) m_frg[0+(4*fnum)] = (m_freg[fnum] & 0x000000ff);       \
-                              m_frg[1+(4*fnum)] = (m_freg[fnum] & 0x0000ff00) >> 8;  \
-                              m_frg[2+(4*fnum)] = (m_freg[fnum] & 0x00ff0000) >> 16; \
-                              m_frg[3+(4*fnum)] = (m_freg[fnum] & 0xff000000) >> 24;
+								m_frg[1+(4*fnum)] = (m_freg[fnum] & 0x0000ff00) >> 8;  \
+								m_frg[2+(4*fnum)] = (m_freg[fnum] & 0x00ff0000) >> 16; \
+								m_frg[3+(4*fnum)] = (m_freg[fnum] & 0xff000000) >> 24;
 
 	switch (entry.index())
 	{
@@ -238,4 +238,3 @@ offs_t i860_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 
  * The actual decode and execute code.
  **************************************************************************/
 #include "i860dec.c"
-

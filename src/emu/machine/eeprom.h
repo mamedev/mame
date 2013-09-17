@@ -72,7 +72,7 @@
 
 // ======================> eeprom_base_device
 
-class eeprom_base_device : 	public device_t,
+class eeprom_base_device :  public device_t,
 							public device_memory_interface,
 							public device_nvram_interface
 {
@@ -84,10 +84,10 @@ public:
 	// timing constants
 	enum timing_type
 	{
-		WRITE_TIME,			// default = 2ms
-		WRITE_ALL_TIME,		// default = 8ms
-		ERASE_TIME,			// default = 1ms
-		ERASE_ALL_TIME,		// default = 8ms
+		WRITE_TIME,         // default = 2ms
+		WRITE_ALL_TIME,     // default = 8ms
+		ERASE_TIME,         // default = 1ms
+		ERASE_ALL_TIME,     // default = 8ms
 		TIMING_COUNT
 	};
 
@@ -104,10 +104,10 @@ public:
 	void write_all(UINT32 data);
 	void erase(offs_t address);
 	void erase_all();
-	
+
 	// status
 	bool ready() const { return machine().time() >= m_completion_time; }
-	
+
 protected:
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const;
@@ -127,18 +127,18 @@ protected:
 	void internal_write(offs_t address, UINT32 data);
 
 	// configuration state
-	UINT32					m_cells;
-	UINT8					m_address_bits;
-	UINT8					m_data_bits;
+	UINT32                  m_cells;
+	UINT8                   m_address_bits;
+	UINT8                   m_data_bits;
 	address_space_config    m_space_config;
 	generic_ptr             m_default_data;
 	UINT32                  m_default_data_size;
 	UINT32                  m_default_value;
 	bool                    m_default_value_set;
-	attotime				m_operation_time[TIMING_COUNT];
+	attotime                m_operation_time[TIMING_COUNT];
 
 	// live state
-	attotime				m_completion_time;
+	attotime                m_completion_time;
 };
 
 

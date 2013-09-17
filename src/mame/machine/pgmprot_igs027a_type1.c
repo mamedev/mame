@@ -571,39 +571,39 @@ void pgm_arm_type1_state::command_handler_ddp3(int pc)
 
 // should be correct, note each value only appears once
 UINT8 puzzli2_level_decode[256] = {
-  // 0  ,  1  ,  2  ,  3  ,  4  ,  5   , 6  ,  7  ,  8  ,  9  ,  a  ,  b  ,  c  ,  d  ,  e  ,  f  ,
+	// 0  ,  1  ,  2  ,  3  ,  4  ,  5   , 6  ,  7  ,  8  ,  9  ,  a  ,  b  ,  c  ,  d  ,  e  ,  f  ,
 	0x32, 0x3e, 0xb2, 0x37, 0x31, 0x22, 0xd6, 0x0d, 0x35, 0x5c, 0x8d, 0x3c, 0x7a, 0x5f, 0xd7, 0xac, // 0x0
-//   0  ,  0  ,  0  ,  0  ,  0  ,  1  ,  1  ,  0  ,  1  ,  1  ,  0  ,  0  ,  0  ,  0  ,  x  ,  x  , 
-    0x53, 0xff, 0xeb, 0x44, 0xe8, 0x11, 0x69, 0x77, 0xd9, 0x34, 0x36, 0x45, 0xa6, 0xe9, 0x1c, 0xc6, // 0x1
-//   0  ,  0  ,  x  ,  x  ,  x  ,  0  ,  x  ,  0  ,  x  ,  0  ,  0  ,  0  ,  0  ,  x  ,  0  ,  x  , 
+//   0  ,  0  ,  0  ,  0  ,  0  ,  1  ,  1  ,  0  ,  1  ,  1  ,  0  ,  0  ,  0  ,  0  ,  x  ,  x  ,
+	0x53, 0xff, 0xeb, 0x44, 0xe8, 0x11, 0x69, 0x77, 0xd9, 0x34, 0x36, 0x45, 0xa6, 0xe9, 0x1c, 0xc6, // 0x1
+//   0  ,  0  ,  x  ,  x  ,  x  ,  0  ,  x  ,  0  ,  x  ,  0  ,  0  ,  0  ,  0  ,  x  ,  0  ,  x  ,
 	0x3b, 0xbd, 0xad, 0x2e, 0x18, 0xdf, 0xa1, 0xab, 0xdd, 0x52, 0x57, 0xc2, 0xe5, 0x0a, 0x00, 0x6d, // 0x2
-//   0  ,  0  ,  0  ,  1  ,  1  ,  1  ,  1  ,  x  ,  1  ,  1  ,  0  ,  0  ,  1  ,  1  ,  x  ,  0  , 
+//   0  ,  0  ,  0  ,  1  ,  1  ,  1  ,  1  ,  x  ,  1  ,  1  ,  0  ,  0  ,  1  ,  1  ,  x  ,  0  ,
 	0x67, 0x64, 0x15, 0x70, 0xb6, 0x39, 0x27, 0x78, 0x82, 0xd2, 0x71, 0xb9, 0x13, 0xf5, 0x93, 0x92, // 0x3
-//   0  ,  x  ,  1  ,  1  ,  x  ,  1  ,  1  ,  1  ,  1  ,  1  ,  1  ,  1  ,  x  ,  0  ,  x  ,  x  , 
+//   0  ,  x  ,  1  ,  1  ,  x  ,  1  ,  1  ,  1  ,  1  ,  1  ,  1  ,  1  ,  x  ,  0  ,  x  ,  x  ,
 	0xfa, 0xe7, 0x5e, 0xb0, 0xf6, 0xaf, 0x95, 0x8a, 0x7c, 0x73, 0xf9, 0x63, 0x86, 0xcb, 0x1a, 0x56, // 0x4
-//   0  ,  1  ,  1  ,  0  ,  0  ,  0  ,  0  ,  1  ,  1  ,  1  ,  1  ,  0  ,  1  ,  1  ,  1  ,  0  , 
-    0xf1, 0x3a, 0xae, 0x61, 0x01, 0x29, 0x97, 0x23, 0x8e, 0x5d, 0x9a, 0x65, 0x74, 0x21, 0x20, 0x40, // 0x5
-//   0  ,  1  ,  1  ,  1  ,  1  ,  0  ,  x  ,  x  ,  x  ,  0  ,  0  ,  1  ,  1  ,  1  ,  1  ,  1  , 
-    0xd3, 0x05, 0xa2, 0xe1, 0xbc, 0x9e, 0x1e, 0x10, 0x14, 0x0c, 0x88, 0x9c, 0xec, 0x38, 0xb5, 0x9d, // 0x6
-//   1  ,  0  ,  0  ,  x  ,  1  ,  1  ,  0  ,  0  ,  x  ,  0  ,  x  ,  0  ,  0  ,  1  ,  1  ,  1  , 
-    0x2d, 0xf7, 0x17, 0x0e, 0x84, 0xc7, 0x7d, 0xce, 0x94, 0x16, 0x48, 0xa8, 0x81, 0x6e, 0x7b, 0xd8, // 0x7
-//   1  ,  1  ,  1  ,  1  ,  x  ,  0  ,  x  ,  0  ,  1  ,  1  ,  1  ,  x  ,  x  ,  1  ,  1  ,  1  , 
-    0xa7, 0x7f, 0x42, 0xe6, 0xa0, 0x2a, 0xef, 0xee, 0x24, 0xba, 0xb8, 0x7e, 0xc9, 0x2b, 0x90, 0xcc, // 0x8
-//   1  ,  x  ,  1  ,  1  ,  1  ,  1  ,  1  ,  1  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  , 
-    0x5b, 0xd1, 0xf3, 0xe2, 0x6f, 0xed, 0x9f, 0xf0, 0x4b, 0x54, 0x8c, 0x08, 0xf8, 0x51, 0x68, 0xc8, // 0x9
-//   x  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  x  ,  0  ,  x  ,  0  ,  0  ,  0  ,  0  ,  1  , 
-    0x03, 0x0b, 0xbb, 0xc1, 0xe3, 0x4d, 0x04, 0xc5, 0x8f, 0x09, 0x0f, 0xbf, 0x62, 0x49, 0x76, 0x59, // 0xa
-//   1  ,  1  ,  1  ,  1  ,  1  ,  x  ,  0  ,  1  ,  1  ,  0  ,  x  ,  1  ,  1  ,  1  ,  1  ,  0  , 
-    0x1d, 0x80, 0xde, 0x60, 0x07, 0xe0, 0x1b, 0x66, 0xa5, 0xbe, 0xcd, 0x87, 0xdc, 0xc3, 0x6b, 0x4e, // 0xb
-//   0  ,  1  ,  1  ,  1  ,  1  ,  x  ,  0  ,  x  ,  0  ,  x  ,  0  ,  1  ,  1  ,  0  ,  1  ,  1  , 
-    0xd0, 0xfd, 0xd4, 0x3f, 0x98, 0x96, 0x2f, 0x4c, 0xb3, 0xea, 0x2c, 0x75, 0xe4, 0xc0, 0x6c, 0x6a, // 0xc
-//   0  ,  x  ,  1  ,  1  ,  0  ,  1  ,  1  ,  1  ,  1  ,  0  ,  1  ,  1  ,  x  ,  1  ,  1  ,  1  , 
-    0x9b, 0xb7, 0x43, 0x8b, 0x41, 0x47, 0x02, 0xdb, 0x99, 0x3d, 0xa3, 0x79, 0x50, 0x4f, 0xb4, 0x55, // 0xd
+//   0  ,  1  ,  1  ,  0  ,  0  ,  0  ,  0  ,  1  ,  1  ,  1  ,  1  ,  0  ,  1  ,  1  ,  1  ,  0  ,
+	0xf1, 0x3a, 0xae, 0x61, 0x01, 0x29, 0x97, 0x23, 0x8e, 0x5d, 0x9a, 0x65, 0x74, 0x21, 0x20, 0x40, // 0x5
+//   0  ,  1  ,  1  ,  1  ,  1  ,  0  ,  x  ,  x  ,  x  ,  0  ,  0  ,  1  ,  1  ,  1  ,  1  ,  1  ,
+	0xd3, 0x05, 0xa2, 0xe1, 0xbc, 0x9e, 0x1e, 0x10, 0x14, 0x0c, 0x88, 0x9c, 0xec, 0x38, 0xb5, 0x9d, // 0x6
+//   1  ,  0  ,  0  ,  x  ,  1  ,  1  ,  0  ,  0  ,  x  ,  0  ,  x  ,  0  ,  0  ,  1  ,  1  ,  1  ,
+	0x2d, 0xf7, 0x17, 0x0e, 0x84, 0xc7, 0x7d, 0xce, 0x94, 0x16, 0x48, 0xa8, 0x81, 0x6e, 0x7b, 0xd8, // 0x7
+//   1  ,  1  ,  1  ,  1  ,  x  ,  0  ,  x  ,  0  ,  1  ,  1  ,  1  ,  x  ,  x  ,  1  ,  1  ,  1  ,
+	0xa7, 0x7f, 0x42, 0xe6, 0xa0, 0x2a, 0xef, 0xee, 0x24, 0xba, 0xb8, 0x7e, 0xc9, 0x2b, 0x90, 0xcc, // 0x8
+//   1  ,  x  ,  1  ,  1  ,  1  ,  1  ,  1  ,  1  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,
+	0x5b, 0xd1, 0xf3, 0xe2, 0x6f, 0xed, 0x9f, 0xf0, 0x4b, 0x54, 0x8c, 0x08, 0xf8, 0x51, 0x68, 0xc8, // 0x9
+//   x  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  x  ,  0  ,  x  ,  0  ,  0  ,  0  ,  0  ,  1  ,
+	0x03, 0x0b, 0xbb, 0xc1, 0xe3, 0x4d, 0x04, 0xc5, 0x8f, 0x09, 0x0f, 0xbf, 0x62, 0x49, 0x76, 0x59, // 0xa
+//   1  ,  1  ,  1  ,  1  ,  1  ,  x  ,  0  ,  1  ,  1  ,  0  ,  x  ,  1  ,  1  ,  1  ,  1  ,  0  ,
+	0x1d, 0x80, 0xde, 0x60, 0x07, 0xe0, 0x1b, 0x66, 0xa5, 0xbe, 0xcd, 0x87, 0xdc, 0xc3, 0x6b, 0x4e, // 0xb
+//   0  ,  1  ,  1  ,  1  ,  1  ,  x  ,  0  ,  x  ,  0  ,  x  ,  0  ,  1  ,  1  ,  0  ,  1  ,  1  ,
+	0xd0, 0xfd, 0xd4, 0x3f, 0x98, 0x96, 0x2f, 0x4c, 0xb3, 0xea, 0x2c, 0x75, 0xe4, 0xc0, 0x6c, 0x6a, // 0xc
+//   0  ,  x  ,  1  ,  1  ,  0  ,  1  ,  1  ,  1  ,  1  ,  0  ,  1  ,  1  ,  x  ,  1  ,  1  ,  1  ,
+	0x9b, 0xb7, 0x43, 0x8b, 0x41, 0x47, 0x02, 0xdb, 0x99, 0x3d, 0xa3, 0x79, 0x50, 0x4f, 0xb4, 0x55, // 0xd
 //   1  ,  0  ,  0  ,  0  ,  1  ,  0  ,  0  ,  x  ,  x  ,  1  ,  1  ,  1  ,  0  ,  1  ,  1  ,  1  ,
-    0x5a, 0x25, 0xf4, 0xca, 0x58, 0x30, 0xc4, 0x12, 0xa9, 0x46, 0xda, 0x91, 0xa4, 0xaa, 0xfc, 0x85, // 0xe
-//   1  ,  1  ,  0  ,  1  ,  1  ,  1  ,  1  ,  0  ,  0  ,  1  ,  1  ,  1  ,  1  ,  0  ,  0  ,  x  , 
-    0xfb, 0x89, 0x06, 0xcf, 0xfe, 0x33, 0xd5, 0x28, 0x1f, 0x19, 0x4a, 0xb1, 0x83, 0xf2, 0x72, 0x26, // 0xf
-//   x  ,  x  ,  1  ,  1  ,  1  ,  1  ,  1  ,  1  ,  x  ,  0  ,  1  ,  1  ,  1  ,  1  ,  1  ,  1  , 
+	0x5a, 0x25, 0xf4, 0xca, 0x58, 0x30, 0xc4, 0x12, 0xa9, 0x46, 0xda, 0x91, 0xa4, 0xaa, 0xfc, 0x85, // 0xe
+//   1  ,  1  ,  0  ,  1  ,  1  ,  1  ,  1  ,  0  ,  0  ,  1  ,  1  ,  1  ,  1  ,  0  ,  0  ,  x  ,
+	0xfb, 0x89, 0x06, 0xcf, 0xfe, 0x33, 0xd5, 0x28, 0x1f, 0x19, 0x4a, 0xb1, 0x83, 0xf2, 0x72, 0x26, // 0xf
+//   x  ,  x  ,  1  ,  1  ,  1  ,  1  ,  1  ,  1  ,  x  ,  0  ,  1  ,  1  ,  1  ,  1  ,  1  ,  1  ,
 };
 
 
@@ -611,23 +611,19 @@ UINT8 puzzli2_level_decode[256] = {
 
 void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 {
-
 	switch (m_ddp3lastcommand)
 	{
-
-
-
 		case 0x31:
 		{
 			// how is this selected? command 54?
 
 
-			/* writes the following sequence before how to play 
+			/* writes the following sequence before how to play
 			 each level has a different sequence written before it, size of sequence doesn't seem directly connected to level size (unlike the reads)
 			 so it's probably compressed somehow as well as scrambled?  68k doesnt know in advance how big each lot of data is either, it only stops
 			 writing when it gets a difference response from the MCU.
 
-		
+
 			00138278: 31 00fd | (set xor table offset)
 		UNKNOWN - related to depth / number of columns?
 			00138278: 31 0087 | value 87, after xor is 75 (table address,value fd,f2)
@@ -639,7 +635,7 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 			00138278: 31 003f | value 3f, after xor is 01 (table address,value 01,3e)  -> 0x0101
 			00138278: 31 00b0 | value b0, after xor is 02 (table address,value 02,b2)  -> 0x0102
 			00138278: 31 0035 | value 35, after xor is 02 (table address,value 03,37)  -> 0x0102
-        COLUMN 2
+		COLUMN 2
 			00138278: 31 0071 | value 71, after xor is 40 (table address,value 04,31) << 4 is the number of entries in this column
 			00138278: 31 002d | value 2d, after xor is 0f (table address,value 05,22) << 0x0f is a mask of 4 bits..
 
@@ -650,12 +646,12 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 		COLUMN 3
 			00138278: 31 00dd | value dd, after xor is 50 (table address,value 0a,8d) << 5 is the number of entries in this column
 			00138278: 31 0023 | value 23, after xor is 1f (table address,value 0b,3c) << 0x1f is a mask of 5 bits..
-			
+
 			00138278: 31 007a | value 7a, after xor is 00 (table address,value 0c,7a)  -> 0x0100
 			00138278: 31 00f3 | value f3, after xor is 01 (table address,value fd,f2)  -> 0x0101
 			00138278: 31 0077 | value 77, after xor is 05 (table address,value fe,72)  -> 0x0105
 			00138278: 31 0022 | value 22, after xor is 04 (table address,value ff,26)  -> 0x0104
-			00138278: 31 0036 | value 36, after xor is 04 (table address,value 00,32)  -> 0x0104	  
+			00138278: 31 0036 | value 36, after xor is 04 (table address,value 00,32)  -> 0x0104
 		COLUMN 4
 			00138278: 31 002e | value 2e, after xor is 10 (table address,value 01,3e) << 1 is the number of entries in this column
 			00138278: 31 00b3 | value b3, after xor is 01 (table address,value 02,b2) << 0x01 is a mask of 1 bit..
@@ -664,7 +660,7 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 		COLUMN 5
 			00138278: 31 0041 | value 41, after xor is 70 (table address,value 04,31) << 7 is the number of entries in this column
 			00138278: 31 005d | value 5d, after xor is 7f (table address,value 05,22) << 0x7f is a mask of 7 bits..
-			
+
 			00138278: 31 00d6 | value d6, after xor is 00 (table address,value 06,d6)  -> 0x0100
 			00138278: 31 000c | value 0c, after xor is 01 (table address,value 07,0d)  -> 0x0101
 			00138278: 31 0036 | value 36, after xor is 03 (table address,value 08,35)  -> 0x0103
@@ -675,7 +671,7 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 		COLUMN 6
 			00138278: 31 00a2 | value a2, after xor is 50 (table address,value fd,f2) << 5 is the number of entries in this column
 			00138278: 31 006d | value 6d, after xor is 1f (table address,value fe,72) << 0x1f is a mask of 5 bits..
-			
+
 			00138278: 31 0023 | value 23, after xor is 05 (table address,value ff,26)  -> 0x0105
 			00138278: 31 0037 | value 37, after xor is 05 (table address,value 00,32)  -> 0x0105
 			00138278: 31 003f | value 3f, after xor is 01 (table address,value 01,3e)  -> 0x0101
@@ -708,7 +704,6 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 
 					if (!end)
 					{
-
 						// always d2 0000 when writing doing level data
 						// but different for the writes on startup?
 						m_valueresponse = 0x00d20000;
@@ -716,17 +711,17 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 						//UINT8 tableaddr = (hack_31_table_offset + (hack_31_table_offset2&0xf))&0xff;
 						//UINT8 xoredval = m_value0 ^ puzzli2_level_decode[tableaddr];
 						//puzzli2_printf("value %02x, after xor is %02x (table address,value %02x,%02x)\n", m_value0, xoredval, tableaddr, puzzli2_level_decode[tableaddr]);
-				
+
 						hackcount2++;
 						hack_31_table_offset2++;
 					}
 					else
 					{
 						hackcount2=0;
-	
+
 						// when the ARM detects the end of the stream has been reached it returns a 0x63 status with the number of columns in the data word
 						m_valueresponse = 0x00630000 | numbercolumns;
-				
+
 						//UINT8 tableaddr = (hack_31_table_offset + (hack_31_table_offset2&0xf))&0xff;
 						//UINT8 xoredval = m_value0 ^ puzzli2_level_decode[tableaddr];
 						//puzzli2_printf("value %02x, after xor is %02x (table address,value %02x,%02x) (end, returning %02x as playfield width)\n", m_value0, xoredval, tableaddr, puzzli2_level_decode[tableaddr], m_valueresponse);
@@ -748,7 +743,7 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 
 		}
 		break;
-	
+
 
 		// after writing the compressed and scrambled data stream for the level (copied from ROM) with command 0x31
 		// the game expects to read back a fully formed level structure from the ARM
@@ -758,7 +753,7 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 
 			// this is the how to play screen, correctly returned with current code
 			/*
-			UINT16 retvals[61] = 
+			UINT16 retvals[61] =
 			{ 0x0008, // depth (-2?)
 			  0x0103, 0x0101, 0x0102, 0x0102, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, // first column
 			  0x0103, 0x0100, 0x0101, 0x0105, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
@@ -807,7 +802,7 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 			m_valueresponse = 0x780000 | m_simregion<<8; // this must also return the cart region or the game will act in odd ways when inserting a coin on continue, or during the game on later levels
 			m_valuekey = 0x100;
 			m_puzzli_54_trigger = 0;
-			
+
 		break;
 
 
@@ -846,7 +841,6 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 			}
 			else
 			{
-
 				int val = ((hack_47_value & 0x0f00)>>8) * 0x19;
 				val +=((hack_47_value & 0x000f)>>0) * 0x05;
 				val += m_value0 & 0x000f;
@@ -855,14 +849,14 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 			}
 
 
-			
+
 		break;
 
 
 
 		case 0x61: // ??
 			puzzli2_printf("%08x: %02x %04x\n",pc, m_ddp3lastcommand, m_value0);
-			
+
 			// this command is written before the values used to decrypt the z80 addresses (assumed) are uploaded with command 31
 			command_31_write_type = 1;
 
@@ -882,7 +876,7 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 
 		case 0x54: // ??
 			puzzli2_printf("%08x: %02x %04x\n",pc, m_ddp3lastcommand, m_value0);
-			
+
 			// this command is written before uploading the compressed level data stream with command 31
 
 			command_31_write_type = 2;
@@ -891,7 +885,7 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 			hackcount2 = 0;
 			hackcount = 0;
 			m_valueresponse = 0x36<<16;
-			
+
 			//  clear the return structure
 			for (int columns=0;columns<8;columns++)
 				for (int rows=0;rows<10;rows++)
@@ -899,36 +893,36 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 
 		break;
 
-	/* 
+	/*
 
-  puzzli2 on startup (00148a84)         puzzli2s on startup (0014cf58)
-	                                             
-		(001489f6: 61 0202  0014ceca: 61 0202)
-		                                       always
-		: 31 004e a6f7 | : 31 | 0051 14c9       + 26DD2
-		: 31 279e 534f | : 31 | 27a0 c121  
-		: 31 ab5c a7cf | : 31 | ab5f 15a1  
-		: 31 145f 7054 | : 31 | 1461 de26  
-		: 31 85a0 7b7f | : 31 | 85a2 e951  
-		: 31 7003 c5ab | : 31 | 7006 337d  
-		: 31 456d f3aa | : 31 | 4570 617c  
+	puzzli2 on startup (00148a84)         puzzli2s on startup (0014cf58)
 
-		(00148b34: 41 e2bb  0014d008: 41 706d)
+	    (001489f6: 61 0202  0014ceca: 61 0202)
+	                                           always
+	    : 31 004e a6f7 | : 31 | 0051 14c9       + 26DD2
+	    : 31 279e 534f | : 31 | 27a0 c121
+	    : 31 ab5c a7cf | : 31 | ab5f 15a1
+	    : 31 145f 7054 | : 31 | 1461 de26
+	    : 31 85a0 7b7f | : 31 | 85a2 e951
+	    : 31 7003 c5ab | : 31 | 7006 337d
+	    : 31 456d f3aa | : 31 | 4570 617c
 
-		actual values needed       always
-		0x001694a8 / 0x0019027a  + 26DD2
-		0x0016cfae / 0x00193D80
-		0x0016ebf2 / 0x001959c4
-		0x0016faa8 / 0x0019687a
-		0x00174416 / 0x0019b1e8
+	    (00148b34: 41 e2bb  0014d008: 41 706d)
 
-		0x00166178 / 0x0018cf4a
-		0x00166e72 / 0x0018dc44
+	    actual values needed       always
+	    0x001694a8 / 0x0019027a  + 26DD2
+	    0x0016cfae / 0x00193D80
+	    0x0016ebf2 / 0x001959c4
+	    0x0016faa8 / 0x0019687a
+	    0x00174416 / 0x0019b1e8
 
-		 as you can see the difference between the values written is always 26dd2, as is the difference between offsets expected
-		 this makes it impossible to know which value is for which address without further tests!
-	
-	
+	    0x00166178 / 0x0018cf4a
+	    0x00166e72 / 0x0018dc44
+
+	     as you can see the difference between the values written is always 26dd2, as is the difference between offsets expected
+	     this makes it impossible to know which value is for which address without further tests!
+
+
 	*/
 
 		// I think the values returned here must be connected to the values written to command 31 on startup
@@ -1072,7 +1066,7 @@ void pgm_arm_type1_state::command_handler_py2k2(int pc)
 			m_simregion = ioport("Region")->read();
 			m_valuekey = 0x100;
 			m_valueresponse = 0x00880000 | m_simregion<<8;
-			
+
 			break;
 	}
 }
@@ -1877,7 +1871,6 @@ int pgm_arm_type1_state::puzzli2_take_leveldata_value(UINT8 datvalue)
 	}
 	else
 	{
-	
 		UINT8 rawvalue = datvalue;
 		UINT8 tableloc = (tableoffs+tableoffs2)&0xff;
 		rawvalue ^= puzzli2_level_decode[tableloc];
@@ -1916,7 +1909,7 @@ int pgm_arm_type1_state::puzzli2_take_leveldata_value(UINT8 datvalue)
 			stage = 2;
 			entries_left = (rawvalue >> 4);
 			m_row_bitmask = (rawvalue & 0x0f)<<8;
-			
+
 			full_entry = rawvalue;
 			prev_tablloc = tableloc;
 
@@ -1931,10 +1924,10 @@ int pgm_arm_type1_state::puzzli2_take_leveldata_value(UINT8 datvalue)
 
 			puzzli2_printf("\n");
 
-					
+
 		}
 		else if (stage==2)
-		{	
+		{
 			puzzli2_printf("%02x <- Mask value equal to number of entries (xor table location is %02x)", rawvalue, tableloc);
 			stage = 3;
 
@@ -1945,7 +1938,7 @@ int pgm_arm_type1_state::puzzli2_take_leveldata_value(UINT8 datvalue)
 			if (num_mask_bits != num_entries)
 				puzzli2_printf(" error - number of mask bits != number of entries - ");
 
-			// 
+			//
 			if (entries_left == 0)
 			{
 				// for 0 entries skip back to state 1 instead of 3, because there is nothing following
@@ -1972,7 +1965,7 @@ int pgm_arm_type1_state::puzzli2_take_leveldata_value(UINT8 datvalue)
 				{
 					return 1;
 				}
-	
+
 			}
 			else
 			{
@@ -1982,7 +1975,6 @@ int pgm_arm_type1_state::puzzli2_take_leveldata_value(UINT8 datvalue)
 				}
 				else
 				{
-
 					// this isn't a strict rule
 					// the mask is used so they can specify spaces between elements too without storing the 00 bytes
 					coverage[tableloc] = 1;
@@ -2037,21 +2029,21 @@ int pgm_arm_type1_state::puzzli2_take_leveldata_value(UINT8 datvalue)
 			{
 				int fishtype = rawvalue;
 				puzzli2_printf("%02x <- fish type %d", rawvalue, fishtype);
-				object_value = 0x0100 + fishtype; 
+				object_value = 0x0100 + fishtype;
 				// 0x110 is a flashy fish? might be glitchy and need a special number..
 			}
 			else if (rawvalue<=0x21) // fish in bubbles
 			{
 				int fishtype = rawvalue - 0x11;
 				puzzli2_printf("%02x <- fish in bubble %d", rawvalue, fishtype);
-				object_value = 0x0120 + fishtype; 
+				object_value = 0x0120 + fishtype;
 				// 0x130 is a flashy fish? might be glitchy and need a special number..
 			}
 			else if (rawvalue<=0x32) // fish in eggs
 			{
 				int fishtype = rawvalue - 0x22;
 				puzzli2_printf("%02x <- fish in egg %d", rawvalue, fishtype);
-				object_value = 0x0140 + fishtype; 
+				object_value = 0x0140 + fishtype;
 				// 0x150 is a flashy fish? might be glitchy and need a special number..
 
 			}
@@ -2059,7 +2051,7 @@ int pgm_arm_type1_state::puzzli2_take_leveldata_value(UINT8 datvalue)
 			{
 				int fishtype = rawvalue - 0x33;
 				puzzli2_printf("%02x <- fish on hook %d", rawvalue, fishtype);
-				object_value = 0x0180 + fishtype; 
+				object_value = 0x0180 + fishtype;
 				// 0x190 is a flashy fish? might be glitchy and need a special number..
 
 			}
@@ -2080,7 +2072,7 @@ int pgm_arm_type1_state::puzzli2_take_leveldata_value(UINT8 datvalue)
 			if (object_value==0xffff)
 			{
 				object_value = 0x110;
-				popmessage("unknown object type %02x\n", rawvalue); 
+				popmessage("unknown object type %02x\n", rawvalue);
 			}
 
 			int realrow = get_position_of_bit(m_row_bitmask, currentrow);
@@ -2105,12 +2097,12 @@ int pgm_arm_type1_state::puzzli2_take_leveldata_value(UINT8 datvalue)
 
 			}
 		}
-				
+
 	}
 
 	return 0;
 }
-	
+
 
 
 DRIVER_INIT_MEMBER(pgm_arm_type1_state,puzzli2)
@@ -2142,12 +2134,12 @@ DRIVER_INIT_MEMBER(pgm_arm_type1_state,puzzli2)
 	if (!strcmp(machine().system().name,"puzzli2"))
 	{
 		offset = 0x17ab66;
-		 limit = 476;
+			limit = 476;
 	}
 	else
 	{
-		 offset = 0x16c3ca;
-		 limit = 500;
+			offset = 0x16c3ca;
+			limit = 500;
 	}
 
 
@@ -2206,7 +2198,7 @@ DRIVER_INIT_MEMBER(pgm_arm_type1_state,puzzli2)
 			fatalerror("mismatch in number of columns vs specified amount\n");
 
 		printf("\n");
-		
+
 
 	}
 

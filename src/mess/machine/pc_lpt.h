@@ -40,9 +40,9 @@ public:
 	DECLARE_READ8_MEMBER( status_r );
 	DECLARE_READ8_MEMBER( control_r );
 	DECLARE_WRITE8_MEMBER( control_w );
-	
+
 	DECLARE_WRITE_LINE_MEMBER( ack_w );
-	
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();

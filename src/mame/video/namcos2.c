@@ -113,7 +113,7 @@ DrawRozHelperBlock(const struct RozParam *rozInfo, int destx, int desty,
 
 static void
 DrawRozHelper(
-	screen_device &screen, 
+	screen_device &screen,
 	bitmap_ind16 &bitmap,
 	tilemap_t *tmap,
 	const rectangle &clip,
@@ -226,7 +226,7 @@ DrawRozHelper(
 	}
 	else
 	{
-		tmap->draw_roz(screen, 
+		tmap->draw_roz(screen,
 			bitmap, clip,
 			rozInfo->startx, rozInfo->starty,
 			rozInfo->incxx, rozInfo->incxy,

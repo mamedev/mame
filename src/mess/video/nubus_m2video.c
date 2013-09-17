@@ -281,7 +281,7 @@ WRITE32_MEMBER( nubus_m2video_device::m2video_w )
 			break;
 
 		default:
-//			printf("m2video_w: %08x @ %x, mask %08x (PC=%x)\n", data, offset, mem_mask, space.device().safe_pc());
+//          printf("m2video_w: %08x @ %x, mask %08x (PC=%x)\n", data, offset, mem_mask, space.device().safe_pc());
 			break;
 	}
 }
@@ -295,7 +295,7 @@ READ32_MEMBER( nubus_m2video_device::m2video_r )
 	}
 	else
 	{
-//		printf("m2video_r: @ %x, mask %08x (PC=%x)\n", offset, mem_mask, space.device().safe_pc());
+//      printf("m2video_r: @ %x, mask %08x (PC=%x)\n", offset, mem_mask, space.device().safe_pc());
 	}
 
 	return 0;

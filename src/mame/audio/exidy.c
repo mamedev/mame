@@ -764,7 +764,7 @@ void venture_sound_device::device_reset()
 	m_pia0->reset();
 	//machine().device("pia1")->reset();
 	m_pia1->reset();
-	
+
 	/* 6532 */
 	m_riot->reset();
 
@@ -999,7 +999,7 @@ void victory_sound_device::device_start()
 
 	save_item(NAME(m_riot_irq_state));
 	sh8253_register_state_globals();
-	
+
 	m_tms = machine().device<tms5220_device>("tms");
 }
 

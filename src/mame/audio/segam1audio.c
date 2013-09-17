@@ -1,6 +1,6 @@
 /***************************************************************************
 
-  Sega Model 1 sound board (68000 + 2x 315-5560 "MultiPCM") 
+  Sega Model 1 sound board (68000 + 2x 315-5560 "MultiPCM")
 
   used for Model 1 and early Model 2 games
 
@@ -8,10 +8,10 @@
 
 #include "audio/segam1audio.h"
 
-#define M68000_TAG		"m1sndcpu"
+#define M68000_TAG      "m1sndcpu"
 #define MULTIPCM_1_TAG  "m1pcm1"
 #define MULTIPCM_2_TAG  "m1pcm2"
-#define YM3438_TAG		"m1ym"
+#define YM3438_TAG      "m1ym"
 
 static ADDRESS_MAP_START( segam1audio_map, AS_PROGRAM, 16, segam1audio_device )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM AM_REGION(":m1sndcpu", 0)
@@ -172,4 +172,3 @@ void segam1audio_device::write_fifo(UINT8 data)
 	// signal the 68000 that there's data waiting
 	m_audiocpu->set_input_line(2, HOLD_LINE);
 }
-

@@ -48,7 +48,7 @@ protected:
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 private:
 	// internal state
 	UINT16 *   m_ram;
@@ -64,7 +64,7 @@ private:
 	INT16        m_cpx, m_cpy;
 
 	int          m_regno;
-	
+
 	void doclr16( int opcode, UINT16 fill, int *dst, INT16 _ax, INT16 _ay );
 	void docpy16( int opcode, int src, int *dst, INT16 _ax, INT16 _ay );
 	int org_first_pixel( int _org_dpd );
@@ -76,9 +76,9 @@ private:
 	void line( INT16 sx, INT16 sy, INT16 ex, INT16 ey, INT16 col );
 	void circle( INT16 sx, INT16 sy, UINT16 r, INT16 col );
 	void paint( int sx, int sy, int col );
-	
+
 	void command_w(UINT16 cmd);
-	
+
 };
 
 extern ATTR_DEPRECATED const device_type HD63484;

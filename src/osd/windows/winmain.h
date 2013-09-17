@@ -66,7 +66,7 @@
 #define WINOPTION_WINDOW                "window"
 #define WINOPTION_MAXIMIZE              "maximize"
 #define WINOPTION_KEEPASPECT            "keepaspect"
-#define WINOPTION_UNEVENSTRETCH			"unevenstretch"
+#define WINOPTION_UNEVENSTRETCH         "unevenstretch"
 #define WINOPTION_PRESCALE              "prescale"
 #define WINOPTION_WAITVSYNC             "waitvsync"
 #define WINOPTION_SYNCREFRESH           "syncrefresh"

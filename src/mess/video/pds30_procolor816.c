@@ -332,7 +332,7 @@ READ32_MEMBER( nubus_procolor816_device::procolor816_r )
 	}
 	else
 	{
-//		printf("procolor816_r: @ %x, mask %08x [PC=%x]\n", offset, mem_mask, machine().device("maincpu")->safe_pc());
+//      printf("procolor816_r: @ %x, mask %08x [PC=%x]\n", offset, mem_mask, machine().device("maincpu")->safe_pc());
 	}
 
 	return 0;

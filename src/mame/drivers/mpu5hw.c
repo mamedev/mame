@@ -92,7 +92,6 @@ READ32_MEMBER(mpu5_state::mpu5_mem_r)
 
 	switch ( cs )
 	{
-
 		case 2:
 			if ((addr & 0xf0) == 0xf0)
 			{
@@ -144,7 +143,6 @@ WRITE32_MEMBER(mpu5_state::mpu5_mem_w)
 
 	switch ( cs )
 	{
-
 		case 2:
 			if ((addr & 0xf0) == 0xf0)
 			{

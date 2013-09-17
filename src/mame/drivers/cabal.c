@@ -494,7 +494,7 @@ static MACHINE_CONFIG_START( cabal, cabal_state )
 
 	/* sound hardware */
 	MCFG_SEIBU_SOUND_ADD("seibu_sound")
-	
+
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz) /* verified on pcb */

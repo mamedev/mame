@@ -79,7 +79,7 @@ public:
 	required_shared_ptr<UINT8> m_color1_ram;
 
 	DECLARE_WRITE8_MEMBER( dma_w );
-	
+
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( visicom_cart_load );
 };
 

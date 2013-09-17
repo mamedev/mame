@@ -1130,7 +1130,7 @@ static ADDRESS_MAP_START( supracan_mem, AS_PROGRAM, 16, supracan_state )
 	AM_RANGE( 0xe90000, 0xe9001f ) AM_READWRITE( supracan_sound_r, supracan_sound_w )
 	AM_RANGE( 0xe90020, 0xe9002f ) AM_WRITE( supracan_dma_channel0_w )
 	AM_RANGE( 0xe90030, 0xe9003f ) AM_WRITE( supracan_dma_channel1_w )
-	
+
 	AM_RANGE( 0xf00000, 0xf001ff ) AM_READWRITE( supracan_video_r, supracan_video_w )
 	AM_RANGE( 0xf00200, 0xf003ff ) AM_RAM AM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE( 0xf40000, 0xf5ffff ) AM_READWRITE(supracan_vram_r, supracan_vram_w)
@@ -1743,7 +1743,7 @@ WRITE16_MEMBER( supracan_state::supracan_video_w )
 			verboselog("maincpu", 0, "supracan_video_w: Unknown register: %08x = %04x & %04x\n", 0xf00000 + (offset << 1), data, mem_mask);
 			break;
 	}
-//	m_video_regs[offset] = data;
+//  m_video_regs[offset] = data;
 }
 
 

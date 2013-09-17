@@ -312,6 +312,3 @@ WRITE32_MEMBER(maple_dc_device::sb_msys_w)
 WRITE32_MEMBER(maple_dc_device::sb_mdapro_w)
 {
 }
-
-
-

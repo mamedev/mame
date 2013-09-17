@@ -96,7 +96,7 @@ void mb86233_cpu_device::device_start()
 	m_fifo_read_cb.resolve_safe(0);
 	m_fifo_read_ok_cb.resolve_safe(0);
 	m_fifo_write_cb.resolve_safe();
-	
+
 	m_program = &space(AS_PROGRAM);
 	m_direct = &m_program->direct();
 
@@ -1582,4 +1582,3 @@ void mb86233_cpu_device::execute_run()
 		}
 	}
 }
-

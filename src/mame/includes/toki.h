@@ -22,7 +22,7 @@ public:
 	required_shared_ptr<UINT16> m_background2_videoram16;
 	required_shared_ptr<UINT16> m_videoram;
 	required_shared_ptr<UINT16> m_scrollram16;
-	
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	optional_device<seibu_sound_device> m_seibu_sound;

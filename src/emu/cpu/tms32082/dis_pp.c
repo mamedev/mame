@@ -6,37 +6,37 @@
 static const char *REG_NAMES[128] =
 {
 	// 0 - 15
-	"a0",		"a1",		"a2",		"a3",		"a4",		"???",		"a6",		"a7",
-	"a8",		"a9",		"a10",		"a11",		"a12",		"???",		"a14",		"a15",
+	"a0",       "a1",       "a2",       "a3",       "a4",       "???",      "a6",       "a7",
+	"a8",       "a9",       "a10",      "a11",      "a12",      "???",      "a14",      "a15",
 	// 16 - 31
-	"x0",		"x1",		"x2",		"???",		"???",		"???",		"???",		"???",
-	"x8",		"x9",		"x10",		"???",		"???",		"???",		"???",		"???",
+	"x0",       "x1",       "x2",       "???",      "???",      "???",      "???",      "???",
+	"x8",       "x9",       "x10",      "???",      "???",      "???",      "???",      "???",
 	// 32 - 47
-	"d0",		"d1",		"d2",		"d3",		"d4",		"d5",		"d6",		"d7",
-	"???",		"sr",		"mf",		"???",		"???",		"???",		"???",		"???",
+	"d0",       "d1",       "d2",       "d3",       "d4",       "d5",       "d6",       "d7",
+	"???",      "sr",       "mf",       "???",      "???",      "???",      "???",      "???",
 	// 48 - 63
-	"???",		"???",		"???",		"???",		"???",		"???",		"???",		"???",
-	"pc/call",	"ipa/br",	"ipe",		"iprs",		"inten",	"intflg",	"comm",		"lctl",
+	"???",      "???",      "???",      "???",      "???",      "???",      "???",      "???",
+	"pc/call",  "ipa/br",   "ipe",      "iprs",     "inten",    "intflg",   "comm",     "lctl",
 	// 64 - 79
-	"???",		"???",		"???",		"???",		"???",		"???",		"???",		"???",
-	"???",		"???",		"???",		"???",		"???",		"???",		"???",		"???",
+	"???",      "???",      "???",      "???",      "???",      "???",      "???",      "???",
+	"???",      "???",      "???",      "???",      "???",      "???",      "???",      "???",
 	// 80 - 95
-	"???",		"???",		"???",		"???",		"???",		"???",		"???",		"???",
-	"???",		"???",		"???",		"???",		"???",		"???",		"???",		"???",
+	"???",      "???",      "???",      "???",      "???",      "???",      "???",      "???",
+	"???",      "???",      "???",      "???",      "???",      "???",      "???",      "???",
 	// 96 - 111
-	"lc0",		"lc1",		"lc2",		"???",		"lr0",		"lr1",		"lr2",		"???",
-	"lrse0",	"lrse1",	"lrse2",	"???",		"lrs0",		"lrs1",		"lrs2",		"???",
+	"lc0",      "lc1",      "lc2",      "???",      "lr0",      "lr1",      "lr2",      "???",
+	"lrse0",    "lrse1",    "lrse2",    "???",      "lrs0",     "lrs1",     "lrs2",     "???",
 	// 112 - 127
-	"ls0",		"ls1",		"ls2",		"???",		"le0",		"le1",		"le2",		"???",
-	"???",		"???",		"???",		"???",		"tag0",		"tag1",		"tag2",		"tag3"
+	"ls0",      "ls1",      "ls2",      "???",      "le0",      "le1",      "le2",      "???",
+	"???",      "???",      "???",      "???",      "tag0",     "tag1",     "tag2",     "tag3"
 };
 
 static const char *CONDITION_CODES[16] =
 {
-	"",			"[p] ",		"[ls] ",	"[hi] ",
-	"[lt] ",	"[le] ",	"[ge] ",	"[gt] ",
-	"[hs] ",	"[lo] ",	"[eq] ",	"[ne] ",
-	"[v] ",		"[nv] ",	"[n] ",		"[nn] "
+	"",         "[p] ",     "[ls] ",    "[hi] ",
+	"[lt] ",    "[le] ",    "[ge] ",    "[gt] ",
+	"[hs] ",    "[lo] ",    "[eq] ",    "[ne] ",
+	"[v] ",     "[nv] ",    "[n] ",     "[nn] "
 };
 
 static const char *TRANSFER_SIZE[4] =
@@ -103,7 +103,7 @@ static void format_transfer(UINT64 op)
 
 			switch (gmode)
 			{
-				case 0x00:										// Format 7: Conditional DU || Conditional Move
+				case 0x00:                                      // Format 7: Conditional DU || Conditional Move
 				{
 					int dstbank = (op >> 18) & 0xf;
 					int srcbank = (op >> 6) & 0xf;
@@ -117,14 +117,14 @@ static void format_transfer(UINT64 op)
 					b += sprintf(b, "%s = %s", REG_NAMES[dreg], REG_NAMES[sreg]);
 					break;
 				}
-				case 0x01:										// Format 8: Conditional DU ||Conditional Field Move
+				case 0x01:                                      // Format 8: Conditional DU ||Conditional Field Move
 				{
 					int dstbank = (op >> 18) & 0xf;
 					int src = (op >> 10) & 0x7;
 					int dst = (op >> 3) & 0x7;
 					int itm = (op >> 22) & 0x3;
 					int size = (op >> 7) & 0x3;
-			//		int e = (op & (1 << 9));
+			//      int e = (op & (1 << 9));
 
 					int dreg = (dstbank << 3) | dst;
 					int sreg = (4 << 3) | src;
@@ -133,7 +133,7 @@ static void format_transfer(UINT64 op)
 					b += sprintf(b, "%s = [%s%d]%s", REG_NAMES[dreg], TRANSFER_SIZE[size], itm, REG_NAMES[sreg]);
 					break;
 				}
-				case 0x02: case 0x03:							// Format 10: Conditional Non-D Data Unit
+				case 0x02: case 0x03:                           // Format 10: Conditional Non-D Data Unit
 				{
 					int as1bank = (op >> 6) & 0xf;
 					int adstbank = (op >> 18) & 0xf;
@@ -156,7 +156,7 @@ static void format_transfer(UINT64 op)
 				}
 				default:
 				{
-					if (op & 0x4)								// Format 9: Conditional DU || Conditional Global
+					if (op & 0x4)                               // Format 9: Conditional DU || Conditional Global
 					{
 						int bank = (op >> 18) & 0xf;
 						int le = ((op >> 16) & 2) | ((op >> 9) & 1);
@@ -178,7 +178,7 @@ static void format_transfer(UINT64 op)
 							case 3: b += sprintf(b, "%s = &%s%s", REG_NAMES[greg], TRANSFER_SIZE[size], format_address_mode(gmode, ga, s, gimx)); break;
 						}
 					}
-					else										// Format 5: Global (Long Offset)
+					else                                        // Format 5: Global (Long Offset)
 					{
 						int bank = (op >> 18) & 0xf;
 						int le = ((op >> 16) & 2) | ((op >> 9) & 1);
@@ -194,7 +194,7 @@ static void format_transfer(UINT64 op)
 						// sign extend offset
 						if (s && (offset & 0x4000))
 							offset |= 0xffffc000;
-						
+
 						switch (le)
 						{
 							case 0: b += sprintf(b, "&%s%s = %s", TRANSFER_SIZE[size], format_address_mode(gmode, ga, s, offset), REG_NAMES[greg]); break;
@@ -215,17 +215,17 @@ static void format_transfer(UINT64 op)
 
 			switch (mode)
 			{
-				case 0x00:										// Format 2: Move || Local
+				case 0x00:                                      // Format 2: Move || Local
 				{
 					b += sprintf(b, "move||local <TODO>");
 					break;
 				}
-				case 0x01:										// Format 3: Field Move || Local
+				case 0x01:                                      // Format 3: Field Move || Local
 				{
 					b += sprintf(b, "field move||local <TODO>");
 					break;
 				}
-				case 0x02: case 0x03:							// Format 6: Non-D DU || Local
+				case 0x02: case 0x03:                           // Format 6: Non-D DU || Local
 				{
 					int d = (op >> 32) & 0x7;
 					int s = (op & (1 << 28));
@@ -245,7 +245,7 @@ static void format_transfer(UINT64 op)
 					}
 					break;
 				}
-				case 0x10: case 0x11: case 0x12: case 0x13:		// Format 4: Local (Long Offset)
+				case 0x10: case 0x11: case 0x12: case 0x13:     // Format 4: Local (Long Offset)
 				{
 					int d = (op >> 32) & 0x7;
 					int bank = (op >> 18) & 0xf;
@@ -277,7 +277,7 @@ static void format_transfer(UINT64 op)
 					}
 					break;
 				}
-				case 0x14: case 0x15: case 0x16: case 0x17:		// Format 1: Double Parallel
+				case 0x14: case 0x15: case 0x16: case 0x17:     // Format 1: Double Parallel
 				case 0x18: case 0x19: case 0x1a: case 0x1b:
 				case 0x1c: case 0x1d: case 0x1e: case 0x1f:
 				{
@@ -329,83 +329,83 @@ static void format_transfer(UINT64 op)
 
 static void format_alu_op(int aluop, int a, const char *dst_text, const char *a_text, const char *b_text, const char *c_text)
 {
-	if (a)		// arithmetic
+	if (a)      // arithmetic
 	{
 		int bits = (aluop & 1) | ((aluop >> 1) & 2) | ((aluop >> 2) & 4) | ((aluop >> 3) & 8);
 		switch (bits)
 		{
-			case 1:		print("%s = %s - %s<1<", dst_text, a_text, b_text); break;
-			case 2:		print("%s = %s + %s<0<", dst_text, a_text, b_text); break;
-			case 3:		print("%s = %s - %s", dst_text, a_text, c_text); break;
-			case 4:		print("%s = %s - %s>1>", dst_text, a_text, b_text); break;
-			case 5:		print("%s = %s - %s", dst_text, a_text, b_text); break;
-			case 6:		print("?"); break;
-			case 7:		print("%s = %s - %s>0>", dst_text, a_text, b_text); break;
-			case 8:		print("%s = %s + %s>0>", dst_text, a_text, b_text); break;
-			case 9:		print("?"); break;
-			case 10:	print("%s = %s + %s", dst_text, a_text, b_text); break;
-			case 11:	print("%s = %s + %s>1>", dst_text, a_text, b_text); break;
-			case 12:	print("%s = %s + %s", dst_text, a_text, c_text); break;
-			case 13:	print("%s = %s - %s<0<", dst_text, a_text, b_text); break;
-			case 14:	print("%s = %s + %s<1<", dst_text, a_text, b_text); break;
-			case 15:	print("%s = field %s + %s", dst_text, a_text, b_text); break;
+			case 1:     print("%s = %s - %s<1<", dst_text, a_text, b_text); break;
+			case 2:     print("%s = %s + %s<0<", dst_text, a_text, b_text); break;
+			case 3:     print("%s = %s - %s", dst_text, a_text, c_text); break;
+			case 4:     print("%s = %s - %s>1>", dst_text, a_text, b_text); break;
+			case 5:     print("%s = %s - %s", dst_text, a_text, b_text); break;
+			case 6:     print("?"); break;
+			case 7:     print("%s = %s - %s>0>", dst_text, a_text, b_text); break;
+			case 8:     print("%s = %s + %s>0>", dst_text, a_text, b_text); break;
+			case 9:     print("?"); break;
+			case 10:    print("%s = %s + %s", dst_text, a_text, b_text); break;
+			case 11:    print("%s = %s + %s>1>", dst_text, a_text, b_text); break;
+			case 12:    print("%s = %s + %s", dst_text, a_text, c_text); break;
+			case 13:    print("%s = %s - %s<0<", dst_text, a_text, b_text); break;
+			case 14:    print("%s = %s + %s<1<", dst_text, a_text, b_text); break;
+			case 15:    print("%s = field %s + %s", dst_text, a_text, b_text); break;
 		}
 	}
-	else		// boolean
+	else        // boolean
 	{
 		switch (aluop)
 		{
-			case 0xaa:		// A & B & C | A & ~B & C | A & B & ~C | A & ~B & ~C       = A
+			case 0xaa:      // A & B & C | A & ~B & C | A & B & ~C | A & ~B & ~C       = A
 				print("%s = %s", dst_text, a_text);
 				break;
 
-			case 0x55:		// ~A & B & C | ~A & ~B & C | ~A & B & ~C | ~A & ~B & ~C   = ~A
+			case 0x55:      // ~A & B & C | ~A & ~B & C | ~A & B & ~C | ~A & ~B & ~C   = ~A
 				print("%s = ~%s", dst_text, a_text);
 				break;
 
-			case 0xcc:		// A & B & C | ~A & B & C | A & B & ~C | ~A & B & ~C       = B
+			case 0xcc:      // A & B & C | ~A & B & C | A & B & ~C | ~A & B & ~C       = B
 				print("%s = %s", dst_text, b_text);
 				break;
 
-			case 0x33:		// A & ~B & C | ~A & ~B & C | A & ~B & ~C | ~A & ~B & ~C   = ~B
+			case 0x33:      // A & ~B & C | ~A & ~B & C | A & ~B & ~C | ~A & ~B & ~C   = ~B
 				print("%s = %s", dst_text, b_text);
 				break;
 
-			case 0xf0:		// A & B & C | ~A & B & C | A & ~B & C | ~A & ~B & C       = C
+			case 0xf0:      // A & B & C | ~A & B & C | A & ~B & C | ~A & ~B & C       = C
 				print("%s = %s", dst_text, c_text);
 				break;
 
-			case 0x0f:		// A & B & ~C | ~A & B & ~C | A & ~B & ~C | ~A & ~B & ~C   = ~C
+			case 0x0f:      // A & B & ~C | ~A & B & ~C | A & ~B & ~C | ~A & ~B & ~C   = ~C
 				print("%s = ~%s", dst_text, c_text);
 				break;
 
-			case 0x80:		// A & B & C
+			case 0x80:      // A & B & C
 				print("%s = %s & %s & %s", dst_text, a_text, b_text, c_text);
 				break;
 
-			case 0x88:		// A & B & C | A & B & ~C                                  = A & B
+			case 0x88:      // A & B & C | A & B & ~C                                  = A & B
 				print("%s = %s & %s", dst_text, a_text, b_text);
 				break;
 
-			case 0xa0:		// A & B & C | A & ~B & C                                  = A & C
+			case 0xa0:      // A & B & C | A & ~B & C                                  = A & C
 				print("%s = %s & %s", dst_text, a_text, c_text);
 				break;
 
-			case 0xc0:		// A & B & C | ~A & B & C                                  = B & C
+			case 0xc0:      // A & B & C | ~A & B & C                                  = B & C
 				print("%s = %s & %s", dst_text, b_text, c_text);
 				break;
 
-			case 0xea:		//  A &  B &  C | ~A &  B &  C |  A & ~B &  C |
+			case 0xea:      //  A &  B &  C | ~A &  B &  C |  A & ~B &  C |
 							//  A &  B & ~C |  A & ~B & ~C                             = A | C
 				print("%s = %s | %s", dst_text, a_text, c_text);
 				break;
 
-			case 0xee:		//  A &  B &  C | ~A &  B &  C |  A & ~B &  C |
+			case 0xee:      //  A &  B &  C | ~A &  B &  C |  A & ~B &  C |
 							//  A &  B & ~C | ~A &  B & ~C |  A & ~B & ~C              = A | B
 				print("%s = %s | %s", dst_text, a_text, b_text);
 				break;
 
-			case 0x44:		// ~A &  B &  C | ~A &  B & ~C                             = ~A & B
+			case 0x44:      // ~A &  B &  C | ~A &  B & ~C                             = ~A & B
 				print("%s = ~%s & %s", dst_text, a_text, b_text);
 				break;
 
@@ -420,14 +420,14 @@ static offs_t tms32082_disasm_pp(char *buffer, offs_t pc, const UINT8 *oprom)
 {
 	output = buffer;
 	UINT32 flags = 0;
-	
+
 	UINT64 op = ((UINT64)(oprom[0]) << 56) | ((UINT64)(oprom[1]) << 48) | ((UINT64)(oprom[2]) << 40) | ((UINT64)(oprom[3]) << 32) |
 				((UINT64)(oprom[4]) << 24) | ((UINT64)(oprom[5]) << 16) | ((UINT64)(oprom[6]) << 8) | ((UINT64)(oprom[7]));
 
 	switch (op >> 60)
 	{
 		case 0x6:
-		case 0x7:			// Six-operand
+		case 0x7:           // Six-operand
 		{
 			print("A: six operand <TODO>");
 			break;
@@ -452,7 +452,7 @@ static offs_t tms32082_disasm_pp(char *buffer, offs_t pc, const UINT8 *oprom)
 					case 0x00: print("nop"); break;
 					case 0x02: print("eint"); break;
 					case 0x03: print("dint"); break;
-					default:   print("<reserved>"); break;	
+					default:   print("<reserved>"); break;
 				}
 
 				format_transfer(parallel_xfer);
@@ -467,7 +467,7 @@ static offs_t tms32082_disasm_pp(char *buffer, offs_t pc, const UINT8 *oprom)
 				switch ((op >> 43) & 3)
 				{
 					case 0:
-					case 1:		// Base set ALU (5-bit immediate)
+					case 1:     // Base set ALU (5-bit immediate)
 					{
 						UINT64 parallel_xfer = (op & U64(0x0000007fffffffff));
 
@@ -545,8 +545,8 @@ static offs_t tms32082_disasm_pp(char *buffer, offs_t pc, const UINT8 *oprom)
 						format_transfer(parallel_xfer);
 						break;
 					}
-	
-					case 2:		// Base set ALU (reg src2)
+
+					case 2:     // Base set ALU (reg src2)
 					{
 						UINT64 parallel_xfer = (op & U64(0x0000007fffffffff));
 
@@ -625,8 +625,8 @@ static offs_t tms32082_disasm_pp(char *buffer, offs_t pc, const UINT8 *oprom)
 						format_transfer(parallel_xfer);
 						break;
 					}
-	
-					case 3:		// Base set ALU (32-bit immediate)
+
+					case 3:     // Base set ALU (32-bit immediate)
 					{
 						int dst = (op >> 48) & 7;
 						int src1 = (op >> 45) & 7;

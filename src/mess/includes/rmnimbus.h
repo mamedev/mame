@@ -411,7 +411,7 @@ public:
 	required_device<ram_device> m_ram;
 
 	UINT32 m_debug_machine;
-//	i186_state m_i186;
+//  i186_state m_i186;
 	keyboard_t m_keyboard;
 	nimbus_drives_t m_nimbus_drives;
 	ipc_interface_t m_ipc_interface;
@@ -429,8 +429,8 @@ public:
 	UINT8 m_hs_count;
 	UINT32 m_debug_video;
 	UINT8 m_vector;
-//	DECLARE_READ16_MEMBER(nimbus_i186_internal_port_r);
-//	DECLARE_WRITE16_MEMBER(nimbus_i186_internal_port_w);
+//  DECLARE_READ16_MEMBER(nimbus_i186_internal_port_r);
+//  DECLARE_WRITE16_MEMBER(nimbus_i186_internal_port_w);
 	DECLARE_READ8_MEMBER(nimbus_mcu_r);
 	DECLARE_WRITE8_MEMBER(nimbus_mcu_w);
 	DECLARE_READ16_MEMBER(nimbus_io_r);
@@ -461,8 +461,8 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_nimbus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_nimbus(screen_device &screen, bool state);
-//	TIMER_CALLBACK_MEMBER(internal_timer_int);
-//	TIMER_CALLBACK_MEMBER(dma_timer_callback);
+//  TIMER_CALLBACK_MEMBER(internal_timer_int);
+//  TIMER_CALLBACK_MEMBER(dma_timer_callback);
 	TIMER_CALLBACK_MEMBER(keyscan_callback);
 	TIMER_CALLBACK_MEMBER(mouse_callback);
 	DECLARE_WRITE_LINE_MEMBER(sio_interrupt);
@@ -502,17 +502,17 @@ public:
 	void write_reg_01E();
 	void write_reg_026();
 	void change_palette(UINT8 bank, UINT16 colours, UINT8 regno);
-//	void update_interrupt_state();
-//	void handle_eoi(int data);
+//  void update_interrupt_state();
+//  void handle_eoi(int data);
 	void external_int(UINT16 intno, UINT8 vector);
 	DECLARE_READ8_MEMBER(cascade_callback);
-//	void nimbus_recalculate_ints();
-//	void internal_timer_sync(int which);
-//	void internal_timer_update(int which,int new_count,int new_maxA,int new_maxB,int new_control);
-//	void update_dma_control(int which, int new_control);
-//	void drq_callback(int which);
-//	void nimbus_cpu_init();
-//	void nimbus_cpu_reset();
+//  void nimbus_recalculate_ints();
+//  void internal_timer_sync(int which);
+//  void internal_timer_update(int which,int new_count,int new_maxA,int new_maxB,int new_control);
+//  void update_dma_control(int which, int new_control);
+//  void drq_callback(int which);
+//  void nimbus_cpu_init();
+//  void nimbus_cpu_reset();
 	void *get_dssi_ptr(address_space &space, UINT16   ds, UINT16 si);
 	void nimbus_bank_memory();
 	void memory_reset();

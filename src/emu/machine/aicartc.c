@@ -1,9 +1,9 @@
 /***************************************************************************
 
-	AICA-RTC sub-device
+    AICA-RTC sub-device
 
-	TODO:
-	- move this inside AICA sound core once that'll get modernized
+    TODO:
+    - move this inside AICA sound core once that'll get modernized
 
 ***************************************************************************/
 

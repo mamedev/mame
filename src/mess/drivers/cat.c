@@ -154,7 +154,7 @@ Canon Cat:
 Crystals:
 X1: 19.968Mhz, used by GA2 (plus a PLL to multiply by 2?), and divide by 4 for
     cpuclk, divide by 8 for 2.5mhz and divide by 5.5 for 3.63mhz (is this
-	suposed to be divide by 6? there may not be a pll if it is...)
+    suposed to be divide by 6? there may not be a pll if it is...)
 X2: 3.579545Mhz, used by the DTMF generator chip AMI S2579 at IC40
 X3: 2.4576Mhz, used by the modem chip AMI S35213 at IC37
 
@@ -183,7 +183,7 @@ Board name: 950-0001C
 | TMS4256   74F153    "VIDEO 2B" .----------.                       J4                            | K   =
 |                                | AM27256  |   74HC02     74HC374  ||                            | O   =
 | TMS4256   74F153    74LS393    |__________|                       ||  UM95089  Y2               | U   =
-|_____________________________________(j9)________________________________________________________|_T___=    
+|_____________________________________(j9)________________________________________________________|_T___=
 
 "TIMING B" - AMPAL16R4APC (marked on silkscreen "TIMING PAL")
 "DECODE E" - AMPAL16L8PC (marked on silkscreen "DECODE PAL")

@@ -58,10 +58,10 @@ public:
 
 	enum
 	{
-		INPUT_X1		= 1,
-		INPUT_X2		= 2,
-		INPUT_X3		= 3,
-		INPUT_X4		= 4,
+		INPUT_X1        = 1,
+		INPUT_X2        = 2,
+		INPUT_X3        = 3,
+		INPUT_X4        = 4,
 	};
 
 	DECLARE_READ32_MEMBER(mp_param_r);

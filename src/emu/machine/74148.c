@@ -70,12 +70,12 @@ void ttl74148_device::device_config_complete()
 	const ttl74148_config *intf = reinterpret_cast<const ttl74148_config *>(static_config());
 	if (intf != NULL)
 	*static_cast<ttl74148_config *>(this) = *intf;
-	
+
 	// or initialize to defaults if none provided
 	else
 	{
 	}
-	
+
 }
 
 //-------------------------------------------------
@@ -100,7 +100,6 @@ void ttl74148_device::device_start()
 
 void ttl74148_device::device_reset()
 {
-	
 	m_enable_input = 1;
 	m_input_lines[0] = 1;
 	m_input_lines[1] = 1;

@@ -245,7 +245,7 @@ struct base
 	void *                      d3dobj;
 	HINSTANCE                   dllhandle;
 	bool                        post_fx_available;
-	HINSTANCE 					libhandle;
+	HINSTANCE                   libhandle;
 
 	// interface pointers
 	interface               d3d;

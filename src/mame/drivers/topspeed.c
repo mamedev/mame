@@ -212,10 +212,10 @@ READ16_MEMBER(topspeed_state::motor_r)
 {
 	switch (offset)
 	{
-		case 0x0:	// Motor status?
+		case 0x0:   // Motor status?
 			return (machine().rand() & 0xff);
 
-		case 0x101:	// Motor CPU status?
+		case 0x101: // Motor CPU status?
 			return 0x55;
 
 		case 0x141: // Left limit data
@@ -315,10 +315,10 @@ WRITE8_MEMBER(topspeed_state::volume_w)
 
 	switch (offset)
 	{
-		case 0x000: filter = m_filter2;		break; // MSM5205 1
-		case 0x200: filter = m_filter3;		break; // MSM5205 2
-		case 0x400: filter = m_filter1l;	break; // YM-2151 L
-		case 0x600: filter = m_filter1r;	break; // YM-2151 R
+		case 0x000: filter = m_filter2;     break; // MSM5205 1
+		case 0x200: filter = m_filter3;     break; // MSM5205 2
+		case 0x400: filter = m_filter1l;    break; // YM-2151 L
+		case 0x600: filter = m_filter1r;    break; // YM-2151 R
 	}
 
 	filter->flt_volume_set_volume(data / 255.0f);
@@ -494,29 +494,29 @@ INPUT_PORTS_END
 
 static const gfx_layout tile16x8_layout =
 {
-	16,8,	// 16*8 sprites
+	16,8,   // 16*8 sprites
 	RGN_FRAC(1,1),
-	4,		// 4 bits per pixel
+	4,      // 4 bits per pixel
 	{ 0, 8, 16, 24 },
 	{ 32, 33, 34, 35, 36, 37, 38, 39, 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64 },
-	64*8	// every sprite takes 64 consecutive bytes
+	64*8    // every sprite takes 64 consecutive bytes
 };
 
 static const gfx_layout charlayout =
 {
 	8,8,    // 8*8 characters
 	RGN_FRAC(1,1),
-	4,		// 4 bits per pixel
+	4,      // 4 bits per pixel
 	{ 0, 1, 2, 3 },
 	{ 2*4, 3*4, 0*4, 1*4, 6*4, 7*4, 4*4, 5*4 },
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8	// every sprite takes 32 consecutive bytes
+	32*8    // every sprite takes 32 consecutive bytes
 };
 
 static GFXDECODE_START( topspeed )
-	GFXDECODE_ENTRY( "gfx2", 0x0, tile16x8_layout,  0, 256 )	// Sprite parts
-	GFXDECODE_ENTRY( "gfx1", 0x0, charlayout,  0, 256 )			// Sprites & playfield
+	GFXDECODE_ENTRY( "gfx2", 0x0, tile16x8_layout,  0, 256 )    // Sprite parts
+	GFXDECODE_ENTRY( "gfx1", 0x0, charlayout,  0, 256 )         // Sprites & playfield
 	// Road Lines gfxdecodable ?
 GFXDECODE_END
 
@@ -528,13 +528,13 @@ GFXDECODE_END
 static const msm5205_interface msm5205_config_1 =
 {
 	DEVCB_DRIVER_LINE_MEMBER(topspeed_state, msm5205_1_vck), // VCK function
-	MSM5205_S48_4B		// 8 kHz, 4-bit
+	MSM5205_S48_4B      // 8 kHz, 4-bit
 };
 
 static const msm5205_interface msm5205_config_2 =
 {
-	DEVCB_NULL,			// VCK function
-	MSM5205_SEX_4B		// Slave mode, 4-bit
+	DEVCB_NULL,         // VCK function
+	MSM5205_SEX_4B      // Slave mode, 4-bit
 };
 
 
@@ -544,7 +544,7 @@ static const msm5205_interface msm5205_config_2 =
 
 static const pc080sn_interface pc080sn_intf =
 {
-	1,			// gfxnum
+	1,          // gfxnum
 	0, 8, 0, 0  // x_offset, y_offset, y_invert, dblwidth
 };
 
@@ -564,10 +564,10 @@ static const tc0140syt_interface tc0140syt_intf =
 
 static Z80CTC_INTERFACE( ctc_intf )
 {
-	DEVCB_NULL,	// Interrupt handler
+	DEVCB_NULL, // Interrupt handler
 	DEVCB_DRIVER_LINE_MEMBER(topspeed_state, z80ctc_to0), // ZC/TO0 callback
 	DEVCB_NULL, // ZC/TO1 callback
-	DEVCB_NULL	// ZC/TO2 callback
+	DEVCB_NULL  // ZC/TO2 callback
 };
 
 

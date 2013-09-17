@@ -632,7 +632,7 @@ READ16_MEMBER( leland_80186_sound_device::peripheral_r )
 		case 0:
 			/* we have to return 0 periodically so that they handle interrupts */
 			//if ((++m_clock_tick & 7) == 0)
-			//	return 0;
+			//  return 0;
 
 			/* if we've filled up all the active channels, we can give this CPU a reset */
 			/* until the next interrupt */

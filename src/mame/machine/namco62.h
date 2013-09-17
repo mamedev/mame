@@ -18,13 +18,13 @@ public:
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
-	
+
 protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
-	
+
 private:
 	// internal state
 	device_t* m_cpu;

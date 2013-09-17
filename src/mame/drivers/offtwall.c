@@ -362,7 +362,7 @@ static MACHINE_CONFIG_START( offtwall, offtwall_state )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(offtwall_state,offtwall)
-	
+
 	MCFG_ATARI_EEPROM_2816_ADD("eeprom")
 
 	/* video hardware */

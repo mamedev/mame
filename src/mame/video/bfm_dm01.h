@@ -28,7 +28,7 @@ public:
 	DECLARE_WRITE8_MEMBER( comm_w );
 	DECLARE_READ8_MEMBER( unknown_r );
 	DECLARE_WRITE8_MEMBER( unknown_w );
-	
+
 	void writedata(UINT8 data);
 	int busy(void);
 
@@ -38,7 +38,7 @@ protected:
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 private:
 	// internal state
 	int m_data_avail;
@@ -49,9 +49,9 @@ private:
 
 	UINT8 m_scanline[DM_BYTESPERROW];
 	UINT8 m_comdata;
-	
+
 	int read_data(void);
-	
+
 };
 
 extern const device_type BF_DM01;

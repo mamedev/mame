@@ -425,7 +425,7 @@ void cave_state::cave_vh_start( int num )
 	m_row_effect_offs_n = -1;
 	m_row_effect_offs_f = 1;
 
-	m_background_pen	=	machine().config().m_gfxdecodeinfo[0].color_codes_start +
+	m_background_pen    =   machine().config().m_gfxdecodeinfo[0].color_codes_start +
 							(machine().config().m_gfxdecodeinfo[0].total_color_codes - 1) *
 							machine().gfx[0]->granularity();
 
@@ -1666,12 +1666,12 @@ PALETTE_INIT_MEMBER(cave_state,ppsatan)
 
 	for (int chip = 0; chip < 3; chip++)
 	{
-		//	Sprites: 0x987800 - 0x988fff
+		//  Sprites: 0x987800 - 0x988fff
 		for (color = 0; color < 0x40; color++)
 			for (pen = 0; pen < 0x10; pen++)
 				m_palette_map[chip][(color << 8) | pen] = 0x7800/2 + ((color << 4) | pen);
 
-		//	Tiles:   0x980000 - 0x9803ff
+		//  Tiles:   0x980000 - 0x9803ff
 		for (color = 0; color < 0x40; color++)
 			for (pen = 0; pen < 0x10; pen++)
 				m_palette_map[chip][0x4000 + ((color << 4) | pen)] = ((color << 4) | pen);

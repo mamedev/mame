@@ -1842,4 +1842,3 @@ tms34020_device::tms34020_device(const machine_config &mconfig, device_type type
 }
 
 const device_type TMS34020 = &legacy_device_creator<tms34020_device>;
-

@@ -1,13 +1,13 @@
 /****************************************************************************************************************************************
 
-	Sharp Zaurus PDA skeleton driver (SL, ARM/Linux based, 4th generation)
+    Sharp Zaurus PDA skeleton driver (SL, ARM/Linux based, 4th generation)
 
-	TODO:
-	- PXA-255 ID opcode fails on this
-	- ARM TLB look-up errors?
-	- RTC irq doesn't fire?
-	- For whatever reason, after RTC check ARM executes invalid code at 0-0x200
-	- Dumps are questionable to say the least
+    TODO:
+    - PXA-255 ID opcode fails on this
+    - ARM TLB look-up errors?
+    - RTC irq doesn't fire?
+    - For whatever reason, after RTC check ARM executes invalid code at 0-0x200
+    - Dumps are questionable to say the least
 
 =========================================================================================================================================
 Sharp Zaurus
@@ -1472,8 +1472,6 @@ void zaurus_state::video_start()
 
 UINT32 zaurus_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
-
-
 	return 0;
 }
 
@@ -1501,7 +1499,7 @@ void zaurus_state::pxa255_ostimer_irq_check()
 {
 	PXA255_OSTMR_Regs *ostimer_regs = &m_ostimer_regs;
 
-//	logerror("%08x OStimer irq check\n",ostimer_regs->oier);
+//  logerror("%08x OStimer irq check\n",ostimer_regs->oier);
 
 	pxa255_set_irq_line(PXA255_INT_OSTIMER0, (ostimer_regs->oier & PXA255_OIER_E0) ? ((ostimer_regs->ossr & PXA255_OSSR_M0) ? 1 : 0) : 0);
 	//pxa255_set_irq_line(PXA255_INT_OSTIMER1, (ostimer_regs->oier & PXA255_OIER_E1) ? ((ostimer_regs->ossr & PXA255_OSSR_M1) ? 1 : 0) : 0);
@@ -1784,7 +1782,7 @@ MACHINE_CONFIG_END
 /* was labeled SL-C500 */
 ROM_START( zsl5500 )
 	ROM_REGION32_LE( 0x200000, "firmware", ROMREGION_ERASE00 )
-    ROM_LOAD( "sl-c500 v1.20 (zimage).bin", 0x000000, 0x13c000, BAD_DUMP CRC(dc1c259f) SHA1(8150744196a72821ae792462d0381182274c2ce0) )
+	ROM_LOAD( "sl-c500 v1.20 (zimage).bin", 0x000000, 0x13c000, BAD_DUMP CRC(dc1c259f) SHA1(8150744196a72821ae792462d0381182274c2ce0) )
 ROM_END
 
 ROM_START( zsl5600 )
@@ -1794,7 +1792,7 @@ ROM_END
 
 ROM_START( zslc750 )
 	ROM_REGION32_LE( 0x200000, "firmware", ROMREGION_ERASE00 )
-    ROM_LOAD( "zaurus sl-c750 (zimage).bin", 0x000000, 0x121544, BAD_DUMP CRC(56353f4d) SHA1(8e1fff6e93d560bd6572c5c163bbd81378693f68) )
+	ROM_LOAD( "zaurus sl-c750 (zimage).bin", 0x000000, 0x121544, BAD_DUMP CRC(56353f4d) SHA1(8e1fff6e93d560bd6572c5c163bbd81378693f68) )
 ROM_END
 
 ROM_START( zslc760 )
@@ -1804,12 +1802,12 @@ ROM_END
 
 ROM_START( zslc3000 )
 	ROM_REGION32_LE( 0x200000, "firmware", ROMREGION_ERASE00 )
-    ROM_LOAD( "openzaurus 3.5.3 - zimage-sharp sl-c3000-20050428091110.bin", 0x000000, 0x12828c, BAD_DUMP CRC(fd94510d) SHA1(901f8154b4228a448f5551f0c9f21c2153e1e3a1) )
+	ROM_LOAD( "openzaurus 3.5.3 - zimage-sharp sl-c3000-20050428091110.bin", 0x000000, 0x12828c, BAD_DUMP CRC(fd94510d) SHA1(901f8154b4228a448f5551f0c9f21c2153e1e3a1) )
 ROM_END
 
 ROM_START( zslc1000 )
 	ROM_REGION32_LE( 0x200000, "firmware", ROMREGION_ERASE00 )
-    ROM_LOAD( "openzaurus 3.5.3 - zimage-sharp sl-c1000-20050427214434.bin", 0x000000, 0x128980, BAD_DUMP  CRC(1e1a9279) SHA1(909ac3f00385eced55822d6a155b79d9d25f43b3) )
+	ROM_LOAD( "openzaurus 3.5.3 - zimage-sharp sl-c1000-20050427214434.bin", 0x000000, 0x128980, BAD_DUMP  CRC(1e1a9279) SHA1(909ac3f00385eced55822d6a155b79d9d25f43b3) )
 ROM_END
 
 GAME( 2002, zsl5500,  0,   zaurus,  zaurus, driver_device,  0,       ROT0, "Sharp",      "Zaurus SL-5500 \"Collie\"", GAME_IS_SKELETON )

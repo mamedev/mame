@@ -17,7 +17,7 @@ public:
 	DECLARE_MACHINE_START(superman);
 	void reset_sound_region();
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
-	
+
 	// superman c-chip
 	UINT16 m_current_bank;
 	UINT8 m_cc_port;

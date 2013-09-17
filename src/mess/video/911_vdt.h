@@ -48,7 +48,7 @@ public:
 	~vdt911_device() { global_free(m_token); }
 
 	DECLARE_PALETTE_INIT(vdt911);
-	
+
 	// access to legacy token
 	void *token() const { assert(m_token != NULL); return m_token; }
 protected:

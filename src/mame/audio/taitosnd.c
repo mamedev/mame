@@ -1,10 +1,10 @@
 /**********************************************************************************************
 
-	Taito TC0140SYT
-	
-	TODO:
-	 - Add pinout and description
-	 - Create a separate implementation for the PC060HA
+    Taito TC0140SYT
+
+    TODO:
+     - Add pinout and description
+     - Create a separate implementation for the PC060HA
 
 **********************************************************************************************/
 

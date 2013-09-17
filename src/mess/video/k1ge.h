@@ -27,9 +27,9 @@ public:
 	DECLARE_WRITE8_MEMBER( reg_write );
 	DECLARE_READ8_MEMBER( vram_read );
 	DECLARE_WRITE8_MEMBER( vram_write );
-	
+
 	DECLARE_PALETTE_INIT(k1ge);
-	
+
 	void update( bitmap_ind16 &bitmap, const rectangle &cliprect );
 
 	// Static methods
@@ -66,7 +66,7 @@ class k2ge_device : public k1ge_device
 {
 public:
 	k2ge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	DECLARE_PALETTE_INIT(k2ge);
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const;

@@ -619,7 +619,7 @@ void cli_frontend::listdevices(const char *gamename)
 
 		// sort them by tag
 		qsort(&device_list[0], device_list.count(), sizeof(device_list[0]), compare_devices);
-		
+
 		// dump the results
 		for (int index = 0; index < device_list.count(); index++)
 		{
@@ -629,7 +629,7 @@ void cli_frontend::listdevices(const char *gamename)
 			const char *tag = device->tag();
 			if (*tag == ':')
 				tag++;
-			
+
 			// determine the depth
 			int depth = 1;
 			if (*tag == 0)

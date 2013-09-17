@@ -4,7 +4,7 @@
  seems to be Kupidon in the ROMs?
 
  these act a bit like the pluto5 ones but with a video system, possibly a variant on that?
- 
+
  needs 68340 peripherals (irq controller + timer at least) to be fleshed out.
 
  video might be vga-like?
@@ -46,16 +46,12 @@ protected:
 
 UINT32 cupidon_state::screen_update_cupidon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	
 	int count = 0;
 
 	for (int ytile=0;ytile<16;ytile++)
 	{
-		
-
 		for (int xtile=0;xtile<32;xtile++)
 		{
-
 			for (int y=0;y<16;y++)
 			{
 				UINT16* destline = &bitmap.pix16(ytile*16 + y);
@@ -79,20 +75,20 @@ UINT32 cupidon_state::screen_update_cupidon(screen_device &screen, bitmap_ind16 
 
 // could be pumped through the get_cs function (if they use the memory protection features we might have to) but that's slow...
 static ADDRESS_MAP_START( cupidon_map, AS_PROGRAM, 32, cupidon_state )
-	AM_RANGE(0x0000000, 0x07fffff) AM_ROM AM_MIRROR(0x1000000)                     
+	AM_RANGE(0x0000000, 0x07fffff) AM_ROM AM_MIRROR(0x1000000)
 
 	AM_RANGE(0x1000000, 0x100ffff) AM_RAM
 	AM_RANGE(0x1800000, 0x1800003) AM_READ(cupidon_return_ffffffff)
 	AM_RANGE(0x2000074, 0x2000077) AM_RAM // port
 
-//	AM_RANGE(0x2000040, 0x200004f) AM_RAM
+//  AM_RANGE(0x2000040, 0x200004f) AM_RAM
 
 
 // might just be 4mb of VRAM
 	AM_RANGE(0x3000000, 0x33bffff) AM_RAM
 	AM_RANGE(0x33c0000, 0x33fffff) AM_RAM AM_SHARE("gfxram") // seems to upload graphics to here, tiles etc. if you skip the loop after the romtest in funnyfm
-//	AM_RANGE(0x3400000, 0x3400fff) AM_RAM
-//	AM_RANGE(0x3F80000, 0x3F80003) AM_RAM
+//  AM_RANGE(0x3400000, 0x3400fff) AM_RAM
+//  AM_RANGE(0x3F80000, 0x3F80003) AM_RAM
 	AM_RANGE(0x3FF0400, 0x3FF0403) AM_RAM // register? gangrose likes to read this?
 ADDRESS_MAP_END
 

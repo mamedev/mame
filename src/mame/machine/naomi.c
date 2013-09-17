@@ -25,8 +25,8 @@ hotd2o: bp 0xc0ba1f6, modify work RAM 0xc9c35a8 to be zero, bpclear
 
 READ64_MEMBER(naomi_state::naomi_biose_idle_skip_r )
 {
-//	if (space.device().safe_pc()==0xc04173c)
-//		space.device().execute().spin_until_time(attotime::from_usec(500));
+//  if (space.device().safe_pc()==0xc04173c)
+//      space.device().execute().spin_until_time(attotime::from_usec(500));
 		//space.device().execute().spin_until_interrupt();
 //  else
 //      printf("%08x\n", space.device().safe_pc());
@@ -36,8 +36,8 @@ READ64_MEMBER(naomi_state::naomi_biose_idle_skip_r )
 
 READ64_MEMBER(naomi_state::naomi_biosh_idle_skip_r )
 {
-//	if (space.device().safe_pc()==0xc045ffc)
-//		space.device().execute().spin_until_time(attotime::from_usec(500));
+//  if (space.device().safe_pc()==0xc045ffc)
+//      space.device().execute().spin_until_time(attotime::from_usec(500));
 
 //   printf("%08x\n", space.device().safe_pc());
 
@@ -46,8 +46,8 @@ READ64_MEMBER(naomi_state::naomi_biosh_idle_skip_r )
 
 READ64_MEMBER(naomi_state::naomi2_biose_idle_skip_r )
 {
-//	if (space.device().safe_pc()==0xc04637c)
-//		space.device().execute().spin_until_time(attotime::from_usec(500));
+//  if (space.device().safe_pc()==0xc04637c)
+//      space.device().execute().spin_until_time(attotime::from_usec(500));
 		//space.device().execute().spin_until_interrupt();
 //  else
 //      printf("%08x\n", space.device().safe_pc());
@@ -240,8 +240,8 @@ DRIVER_INIT_MEMBER(naomi_state,naomigd_mp)
 
 READ64_MEMBER(naomi_state::naomigd_ggxxsla_idle_skip_r )
 {
-//	if (space.device().safe_pc()==0x0c0c9adc)
-//		space.device().execute().spin_until_time(attotime::from_usec(500));
+//  if (space.device().safe_pc()==0x0c0c9adc)
+//      space.device().execute().spin_until_time(attotime::from_usec(500));
 
 	return dc_ram[0x1aae18/8];
 }
@@ -254,8 +254,8 @@ DRIVER_INIT_MEMBER(naomi_state,ggxxsla)
 
 READ64_MEMBER(naomi_state::naomigd_ggxx_idle_skip_r )
 {
-//	if (space.device().safe_pc()==0xc0b5c3c) // or 0xc0bab0c
-//		space.device().execute().spin_until_time(attotime::from_usec(500));
+//  if (space.device().safe_pc()==0xc0b5c3c) // or 0xc0bab0c
+//      space.device().execute().spin_until_time(attotime::from_usec(500));
 
 	return dc_ram[0x1837b8/8];
 }
@@ -269,8 +269,8 @@ DRIVER_INIT_MEMBER(naomi_state,ggxx)
 
 READ64_MEMBER(naomi_state::naomigd_ggxxrl_idle_skip_r )
 {
-//	if (space.device().safe_pc()==0xc0b84bc) // or 0xc0bab0c
-//		space.device().execute().spin_until_time(attotime::from_usec(500));
+//  if (space.device().safe_pc()==0xc0b84bc) // or 0xc0bab0c
+//      space.device().execute().spin_until_time(attotime::from_usec(500));
 
 	//printf("%08x\n", space.device().safe_pc());
 
@@ -286,8 +286,8 @@ DRIVER_INIT_MEMBER(naomi_state,ggxxrl)
 /* at least speeds up the annoying copyright screens ;-) */
 READ64_MEMBER(naomi_state::naomigd_sfz3ugd_idle_skip_r )
 {
-//	if (space.device().safe_pc()==0xc36a2dc)
-//		space.device().execute().spin_until_time(attotime::from_usec(500));
+//  if (space.device().safe_pc()==0xc36a2dc)
+//      space.device().execute().spin_until_time(attotime::from_usec(500));
 
 	return dc_ram[0x5dc900/8];
 }
@@ -331,8 +331,8 @@ DRIVER_INIT_MEMBER(naomi_state,kick4csh)
 
 READ64_MEMBER(naomi_state::hotd2_idle_skip_r )
 {
-//	if (space.device().safe_pc()==0xc0cfcbc)
-//		space.device().execute().spin_until_time(attotime::from_usec(500));
+//  if (space.device().safe_pc()==0xc0cfcbc)
+//      space.device().execute().spin_until_time(attotime::from_usec(500));
 		//space.device().execute().spin_until_interrupt();
 //  else
 //  printf("%08x\n", space.device().safe_pc());

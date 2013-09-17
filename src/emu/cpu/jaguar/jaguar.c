@@ -416,7 +416,7 @@ void jaguar_cpu_device::state_string_export(const device_state_entry &entry, ast
 				FLAGS & 0x0008 ? 'I':'.',
 				FLAGS & 0x0004 ? 'N':'.',
 				FLAGS & 0x0002 ? 'C':'.',
-				FLAGS & 0x0001 ? 'Z':'.'); 
+				FLAGS & 0x0001 ? 'Z':'.');
 			break;
 	}
 }
@@ -1447,4 +1447,3 @@ offs_t jaguardsp_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const U
 	extern CPU_DISASSEMBLE( jaguardsp );
 	return CPU_DISASSEMBLE_NAME(jaguardsp)(this, buffer, pc, oprom, opram, options);
 }
-

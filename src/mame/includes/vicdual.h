@@ -40,7 +40,7 @@ public:
 	UINT8 m_samurai_protection_data;
 	int m_nsub_coin_counter;
 	int m_nsub_play_counter;
-	
+
 	int m_port1State;
 	int m_port2State;
 	int m_psgData;
@@ -79,27 +79,27 @@ public:
 	DECLARE_READ8_MEMBER(invinco_io_r);
 	DECLARE_WRITE8_MEMBER(invinco_io_w);
 	DECLARE_WRITE8_MEMBER(vicdual_palette_bank_w);
-	
+
 	/*----------- defined in audio/vicdual.c -----------*/
 	DECLARE_WRITE8_MEMBER( frogs_audio_w );
 	DECLARE_WRITE8_MEMBER( headon_audio_w );
 	DECLARE_WRITE8_MEMBER( invho2_audio_w );
 	TIMER_CALLBACK_MEMBER( frogs_croak_callback );
 
-	
+
 	/*----------- defined in audio/carnival.c -----------*/
 	DECLARE_WRITE8_MEMBER( carnival_audio_1_w );
 	DECLARE_WRITE8_MEMBER( carnival_audio_2_w );
 	DECLARE_READ8_MEMBER( carnival_music_port_t1_r );
 	DECLARE_WRITE8_MEMBER( carnival_music_port_1_w );
 	DECLARE_WRITE8_MEMBER( carnival_music_port_2_w );
-	
+
 	/*----------- defined in audio/depthch.c -----------*/
 	DECLARE_WRITE8_MEMBER( depthch_audio_w );
-	
+
 	/*----------- defined in audio/invinco.c -----------*/
 	DECLARE_WRITE8_MEMBER( invinco_audio_w );
-	
+
 	/*----------- defined in audio/pulsar.c -----------*/
 	DECLARE_WRITE8_MEMBER( pulsar_audio_1_w );
 	DECLARE_WRITE8_MEMBER( pulsar_audio_2_w );

@@ -224,10 +224,10 @@ READ8_MEMBER(exprraid_state::exprraid_prot_data_r)
 READ8_MEMBER(exprraid_state::exprraid_prot_status_r)
 {
 	/*
-		76543210
-		.......x	?
-		......x.	Device data available
-		.....x..	CPU data available (cleared by device)
+	    76543210
+	    .......x    ?
+	    ......x.    Device data available
+	    .....x..    CPU data available (cleared by device)
 	*/
 
 	return 0x02;

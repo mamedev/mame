@@ -456,31 +456,31 @@ COMP( 1984, rs128,    mtx512,   0,      rs128,    mtx512, driver_device,   0,   
 The following roms are available should they be considered useful:
 
 ROM_START( mtx_roms )
-	ROM_LOAD( "assem.rom",    CRC(599d5b6b) SHA1(3ec1f7f476a21ca3206012ded22198c020b47f7d) )
-	ROM_LOAD( "basic.rom",    CRC(d1e9ff36) SHA1(e89ae3a627716e6cee7e35054be8a2472bdd49d4) )
-	ROM_LOAD( "boot.rom",     CRC(ed98d6dd) SHA1(4671ee49bb96262b0468f7122a49bf2588170903) )
-	ROM_LOAD( "mtx3-an.rom",  CRC(54c9eca2) SHA1(3e628beaa360e635264c8c2c3a5b8312951a220b) )
-	ROM_LOAD( "nboot.rom",    CRC(9caea81c) SHA1(93fca6e7ffbc7ae3283b8bda9f01c36b2bed1c54) )
+    ROM_LOAD( "assem.rom",    CRC(599d5b6b) SHA1(3ec1f7f476a21ca3206012ded22198c020b47f7d) )
+    ROM_LOAD( "basic.rom",    CRC(d1e9ff36) SHA1(e89ae3a627716e6cee7e35054be8a2472bdd49d4) )
+    ROM_LOAD( "boot.rom",     CRC(ed98d6dd) SHA1(4671ee49bb96262b0468f7122a49bf2588170903) )
+    ROM_LOAD( "mtx3-an.rom",  CRC(54c9eca2) SHA1(3e628beaa360e635264c8c2c3a5b8312951a220b) )
+    ROM_LOAD( "nboot.rom",    CRC(9caea81c) SHA1(93fca6e7ffbc7ae3283b8bda9f01c36b2bed1c54) )
 ROM_END
 
-BASIC.ROM	this contains the monitor ROM plus the BASIC ROM.
-		It's good to view them as one, because the monitor
-		ROM contains a good deal of BASIC code and the machine
-		code just runs from the monitor ROM into the BASIC ROM.
-		It's also handy if you want to disassemble it (which
-		you don't need because it's already done).
+BASIC.ROM   this contains the monitor ROM plus the BASIC ROM.
+        It's good to view them as one, because the monitor
+        ROM contains a good deal of BASIC code and the machine
+        code just runs from the monitor ROM into the BASIC ROM.
+        It's also handy if you want to disassemble it (which
+        you don't need because it's already done).
 
-MTX3-AN.ROM	the monitor ROM, but slightly modified
-		While detecting memory size, the startup code destroys
-		RAM content. When you have a lot of RAM it is convenient
-		to have a ramdisk for CP/M, but it is a nuisance if the
-		ramdisk is trashed at each reset. The modification simply
-		prevents RAM trashing.
+MTX3-AN.ROM the monitor ROM, but slightly modified
+        While detecting memory size, the startup code destroys
+        RAM content. When you have a lot of RAM it is convenient
+        to have a ramdisk for CP/M, but it is a nuisance if the
+        ramdisk is trashed at each reset. The modification simply
+        prevents RAM trashing.
 
-ASSEM.ROM	assembler ROM
+ASSEM.ROM   assembler ROM
 
-BOOT.ROM	FDX floppy boot ROM
+BOOT.ROM    FDX floppy boot ROM
 
-NBOOT.ROM	replacement FDX boot ROM written by M. Kessler (supports
-		booting from different disk formats and different drives)
+NBOOT.ROM   replacement FDX boot ROM written by M. Kessler (supports
+        booting from different disk formats and different drives)
 */

@@ -50,19 +50,19 @@ public:
 	required_device<filter_volume_device> m_filter3;
 
 	// Misc
-	UINT16	m_cpua_ctrl;
-	INT32	m_ioc220_port;
+	UINT16  m_cpua_ctrl;
+	INT32   m_ioc220_port;
 
 	// ADPCM
-	UINT8	*m_msm_rom[2];
-	UINT16	m_msm_pos[2];
-	UINT8	m_msm_reset[2];
-	UINT8	m_msm_nibble[2];
-	UINT8	m_msm2_vck;
-	UINT8	m_msm2_vck2;
+	UINT8   *m_msm_rom[2];
+	UINT16  m_msm_pos[2];
+	UINT8   m_msm_reset[2];
+	UINT8   m_msm_nibble[2];
+	UINT8   m_msm2_vck;
+	UINT8   m_msm2_vck2;
 
 #ifdef MAME_DEBUG
-	UINT8	m_dislayer[5];
+	UINT8   m_dislayer[5];
 #endif
 
 	// drivers/topspeed.c

@@ -599,7 +599,7 @@ private:
 	// blitting parameters for rendering
 	struct blit_parameters
 	{
-		bitmap_ind8 *		priority;
+		bitmap_ind8 *       priority;
 		rectangle           cliprect;
 		UINT32              tilemap_priority_code;
 		UINT8               mask;

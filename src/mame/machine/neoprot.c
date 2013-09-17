@@ -507,12 +507,12 @@ void neogeo_state::pvc_write_pack_color()
 	UINT16 sr = m_pvc_cartridge_ram[0xff5];
 
 	m_pvc_cartridge_ram[0xff6] = ((gb & 0x001e) >> 1) |
-								 ((gb & 0x1e00) >> 5) |
-								 ((sr & 0x001e) << 7) |
-								 ((gb & 0x0001) << 12) |
-								 ((gb & 0x0100) << 5) |
-								 ((sr & 0x0001) << 14) |
-								 ((sr & 0x0100) << 7);
+									((gb & 0x1e00) >> 5) |
+									((sr & 0x001e) << 7) |
+									((gb & 0x0001) << 12) |
+									((gb & 0x0100) << 5) |
+									((sr & 0x0001) << 14) |
+									((sr & 0x0100) << 7);
 }
 
 

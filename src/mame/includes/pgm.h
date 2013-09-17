@@ -279,7 +279,7 @@ public:
 	UINT8 coverage[256]; // coverage is how much of the table we've managed to verify using known facts about the table structure
 
 	int command_31_write_type;
-	
+
 
 	// the maximum level size returned or read by the device appears to be this size
 	UINT16 level_structure[8][10];

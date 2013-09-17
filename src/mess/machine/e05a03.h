@@ -49,10 +49,10 @@ protected:
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 private:
 	// internal state
-	
+
 	/* 24-bit shift register, port 0x00, 0x01 and 0x02 */
 	UINT32 m_shift;
 

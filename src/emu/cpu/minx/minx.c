@@ -236,4 +236,3 @@ offs_t minx_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 
 	extern CPU_DISASSEMBLE( minx );
 	return CPU_DISASSEMBLE_NAME(minx)(this, buffer, pc, oprom, opram, options);
 }
-

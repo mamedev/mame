@@ -57,7 +57,7 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define MACKBD_CPU_TAG	"mackbd"
+#define MACKBD_CPU_TAG  "mackbd"
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -94,7 +94,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( mackbd )
-	MCFG_CPU_ADD(MACKBD_CPU_TAG, I8021, 3000000)	// "the approximate clock rate of the MPU is 3 MHz"
+	MCFG_CPU_ADD(MACKBD_CPU_TAG, I8021, 3000000)    // "the approximate clock rate of the MPU is 3 MHz"
 	MCFG_CPU_PROGRAM_MAP(mackbd_map)
 	MCFG_CPU_IO_MAP(mackbd_io_map)
 MACHINE_CONFIG_END
@@ -135,7 +135,7 @@ static INPUT_PORTS_START( mackbd )
 	PORT_START("COL4")
 	PORT_BIT(0x0001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR(')')
 	PORT_BIT(0x0002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('*')
-	PORT_BIT(0x0004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS)	PORT_CHAR('-') PORT_CHAR('_')
+	PORT_BIT(0x0004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS)  PORT_CHAR('-') PORT_CHAR('_')
 	PORT_BIT(0x0008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('&')
 	PORT_BIT(0x0010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR('(')
 	PORT_BIT(0x0020, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('=') PORT_CHAR('+')
@@ -143,15 +143,15 @@ static INPUT_PORTS_START( mackbd )
 	PORT_START("COL5")
 	PORT_BIT(0x0001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P')
 	PORT_BIT(0x0002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_I) PORT_CHAR('i') PORT_CHAR('I')
-	PORT_BIT(0x0004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE)	PORT_CHAR('[') PORT_CHAR('{')
+	PORT_BIT(0x0004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR('[') PORT_CHAR('{')
 	PORT_BIT(0x0008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_U) PORT_CHAR('u') PORT_CHAR('U')
 	PORT_BIT(0x0010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_O) PORT_CHAR('o') PORT_CHAR('O')
 	PORT_BIT(0x0020, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']') PORT_CHAR('}')
 
 	PORT_START("COL6")
-	PORT_BIT(0x0001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON)	PORT_CHAR(';') PORT_CHAR(':')
+	PORT_BIT(0x0001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON)  PORT_CHAR(';') PORT_CHAR(':')
 	PORT_BIT(0x0002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_K) PORT_CHAR('k') PORT_CHAR('K')
-	PORT_BIT(0x0004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE)	PORT_CHAR('\'') PORT_CHAR('"')
+	PORT_BIT(0x0004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE)  PORT_CHAR('\'') PORT_CHAR('"')
 	PORT_BIT(0x0008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_J) PORT_CHAR('j') PORT_CHAR('J')
 	PORT_BIT(0x0010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_L) PORT_CHAR('l') PORT_CHAR('L')
 	PORT_BIT(0x0020, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER) PORT_CHAR('\r') PORT_NAME("Return")
@@ -167,7 +167,7 @@ static INPUT_PORTS_START( mackbd )
 	PORT_START("COL8")
 	PORT_BIT(0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN)
 	PORT_BIT(0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x0004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSPACE)	PORT_CHAR(8)
+	PORT_BIT(0x0004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSPACE)  PORT_CHAR(8)
 	PORT_BIT(0x0008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_TILDE) PORT_CHAR('`') PORT_CHAR('~')
 	PORT_BIT(0x0010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
 	PORT_BIT(0x0020, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_TAB) PORT_CHAR('\t')
@@ -208,7 +208,7 @@ ioport_constructor mackbd_device::device_input_ports() const
 //-------------------------------------------------
 
 mackbd_device::mackbd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, MACKBD, "Macintosh keyboard", tag, owner, clock, "mackbd", __FILE__),
+	: device_t(mconfig, MACKBD, "Macintosh keyboard", tag, owner, clock, "mackbd", __FILE__),
 	m_maincpu(*this, MACKBD_CPU_TAG),
 	m_clkout_handler(*this)
 {
@@ -278,7 +278,7 @@ WRITE8_MEMBER(mackbd_device::p0_w)
 	else
 	{
 		m_clkout_handler(CLEAR_LINE);
-//		machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(10));
+//      machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(10));
 	}
 }
 
@@ -311,7 +311,7 @@ WRITE8_MEMBER(mackbd_device::p2_w)
 	if (m_maincpu->pc() != 0x19e && m_maincpu->pc() != 0x1a3)
 	{
 		data_to_mac = data_from_mac = (data & 1);
-//		printf("data to/from mac = %d (PC=%x)\n", data_to_mac, m_maincpu->pc());
+//      printf("data to/from mac = %d (PC=%x)\n", data_to_mac, m_maincpu->pc());
 	}
 }
 
@@ -329,4 +329,3 @@ WRITE_LINE_MEMBER(mackbd_device::data_w)
 {
 	data_from_mac = (state == ASSERT_LINE) ? 1 : 0;
 }
-

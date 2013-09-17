@@ -62,10 +62,10 @@ Dip locations verified with manual for ddragon & ddragon2
 #include "includes/ddragon.h"
 
 
-#define MAIN_CLOCK		XTAL_12MHz
-#define SOUND_CLOCK		XTAL_3_579545MHz
-#define MCU_CLOCK		MAIN_CLOCK / 3
-#define PIXEL_CLOCK		MAIN_CLOCK / 2
+#define MAIN_CLOCK      XTAL_12MHz
+#define SOUND_CLOCK     XTAL_3_579545MHz
+#define MCU_CLOCK       MAIN_CLOCK / 3
+#define PIXEL_CLOCK     MAIN_CLOCK / 2
 
 
 /*************************************
@@ -164,13 +164,13 @@ MACHINE_RESET_MEMBER(ddragon_state,ddragon)
 WRITE8_MEMBER(ddragon_state::ddragon_bankswitch_w)
 {
 	/*
-		76543210
-		.......x	X-scroll D9 (H9BT)
-		......x.	Y-scroll D9 (V9BT)
-		.....x..	/Screen flip (*1P/2P)
-		....x...	/Sub CPU reset (*RESET)
-		...x....	/Sub CPU halt (*HALT)
-		xxx.....	ROM bank (*BANK)
+	    76543210
+	    .......x    X-scroll D9 (H9BT)
+	    ......x.    Y-scroll D9 (V9BT)
+	    .....x..    /Screen flip (*1P/2P)
+	    ....x...    /Sub CPU reset (*RESET)
+	    ...x....    /Sub CPU halt (*HALT)
+	    xxx.....    ROM bank (*BANK)
 	*/
 	m_scrollx_hi = data & 0x01;
 	m_scrolly_hi = (data & 0x02) >> 1;
@@ -1682,7 +1682,7 @@ ROM_START( ddragon2 )
 	ROM_LOAD( "26j7-0.bin",   0x20000, 0x20000, CRC(bc6a48d5) SHA1(04c434f8cd42a8f82a263548183569396f9b684d) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "prom.16",      0x0000, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* sprite timing (same as ddragon) */	
+	ROM_LOAD( "prom.16",      0x0000, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* sprite timing (same as ddragon) */
 ROM_END
 
 ROM_START( ddragon2u )

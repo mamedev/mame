@@ -5538,7 +5538,7 @@ ROM_END
    ROM3   429D
    ROM4   AA27
    ROM5   C409
-   ROM6   59B6     
+   ROM6   59B6
 
 Note: ROM5 & ROM6 graphics roms were updated at some point to correct the misspelling of
       POINT on the play field, currently it's "PONIT". Theses are currently undumped.

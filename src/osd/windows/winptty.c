@@ -18,9 +18,9 @@ file_error win_open_ptty(const char *path, UINT32 openflags, osd_file **file, UI
 		return FILERR_OUT_OF_MEMORY;
 
 	pipe = CreateNamedPipe(t_name, PIPE_ACCESS_DUPLEX, PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_NOWAIT, 1, 32, 32, 0, NULL);
-	
+
 	osd_free(t_name);
-	
+
 	if(pipe == INVALID_HANDLE_VALUE)
 		return FILERR_ACCESS_DENIED;
 

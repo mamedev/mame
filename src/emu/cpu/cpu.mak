@@ -726,8 +726,8 @@ $(CPUOBJ)/i8085/i8085.o:    $(CPUSRC)/i8085/i8085.c \
 ifneq ($(filter I8089,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/i8089
 CPUOBJS += $(CPUOBJ)/i8089/i8089.o \
-           $(CPUOBJ)/i8089/i8089_channel.o \
-           $(CPUOBJ)/i8089/i8089_ops.o
+			$(CPUOBJ)/i8089/i8089_channel.o \
+			$(CPUOBJ)/i8089/i8089_ops.o
 DASMOBJS += $(CPUOBJ)/i8089/i8089_dasm.o
 endif
 

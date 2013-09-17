@@ -64,7 +64,7 @@ public:
 	DECLARE_WRITE8_MEMBER( pending_w );
 	void decrypt(const char *cpu,int length);
 	void update_irq_lines(int param);
-	
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -77,8 +77,8 @@ protected:
 	UINT8 m_main2sub[2];
 	UINT8 m_sub2main[2];
 	int m_main2sub_pending;
-	int m_sub2main_pending;	
-	
+	int m_sub2main_pending;
+
 	enum
 	{
 		VECTOR_INIT,
@@ -112,7 +112,7 @@ public:
 	void decrypt(const char *region);
 	DECLARE_WRITE8_MEMBER( adr_w );
 	DECLARE_WRITE8_MEMBER( ctl_w );
-	
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -142,7 +142,7 @@ extern const seibu_adpcm_interface seibu_adpcm2_intf;
 /**************************************************************************/
 
 #define MCFG_SEIBU_SOUND_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, SEIBU_SOUND, 0) 
+	MCFG_DEVICE_ADD(_tag, SEIBU_SOUND, 0)
 
 #define SEIBU_COIN_INPUTS                                           \
 	PORT_START("COIN")                                              \
@@ -159,39 +159,39 @@ extern const seibu_adpcm_interface seibu_adpcm2_intf;
 
 #define SEIBU_SOUND_SYSTEM_CPU(freq)                                \
 	MCFG_CPU_ADD("audiocpu", Z80, freq)                             \
-	MCFG_CPU_PROGRAM_MAP(seibu_sound_map)							\
-	MCFG_SEIBU_SOUND_ADD("seibu_sound")						
-	
+	MCFG_CPU_PROGRAM_MAP(seibu_sound_map)                           \
+	MCFG_SEIBU_SOUND_ADD("seibu_sound")
+
 #define SEIBU2_SOUND_SYSTEM_CPU(freq)                               \
 	MCFG_CPU_ADD("audiocpu", Z80, freq)                             \
-	MCFG_CPU_PROGRAM_MAP(seibu2_sound_map)							\
-	MCFG_SEIBU_SOUND_ADD("seibu_sound")						
-	
+	MCFG_CPU_PROGRAM_MAP(seibu2_sound_map)                          \
+	MCFG_SEIBU_SOUND_ADD("seibu_sound")
+
 #define SEIBU2_AIRRAID_SOUND_SYSTEM_CPU(freq)                       \
 	MCFG_CPU_ADD("audiocpu", Z80, freq)                             \
-	MCFG_CPU_PROGRAM_MAP(seibu2_airraid_sound_map)					\
-	MCFG_SEIBU_SOUND_ADD("seibu_sound")						
+	MCFG_CPU_PROGRAM_MAP(seibu2_airraid_sound_map)                  \
+	MCFG_SEIBU_SOUND_ADD("seibu_sound")
 
 #define SEIBU2_RAIDEN2_SOUND_SYSTEM_CPU(freq)                       \
 	MCFG_CPU_ADD("audiocpu",  Z80, freq)                            \
-	MCFG_CPU_PROGRAM_MAP(seibu2_raiden2_sound_map)					\
-	MCFG_SEIBU_SOUND_ADD("seibu_sound")						
-	
+	MCFG_CPU_PROGRAM_MAP(seibu2_raiden2_sound_map)                  \
+	MCFG_SEIBU_SOUND_ADD("seibu_sound")
+
 #define SEIBU_NEWZEROTEAM_SOUND_SYSTEM_CPU(freq)                    \
 	MCFG_CPU_ADD("audiocpu", Z80, freq)                             \
-	MCFG_CPU_PROGRAM_MAP(seibu_newzeroteam_sound_map)				\
-	MCFG_SEIBU_SOUND_ADD("seibu_sound")						
-	
+	MCFG_CPU_PROGRAM_MAP(seibu_newzeroteam_sound_map)               \
+	MCFG_SEIBU_SOUND_ADD("seibu_sound")
+
 #define SEIBU3_SOUND_SYSTEM_CPU(freq)                               \
 	MCFG_CPU_ADD("audiocpu", Z80, freq)                             \
-	MCFG_CPU_PROGRAM_MAP(seibu3_sound_map)							\
-	MCFG_SEIBU_SOUND_ADD("seibu_sound")						
-	
+	MCFG_CPU_PROGRAM_MAP(seibu3_sound_map)                          \
+	MCFG_SEIBU_SOUND_ADD("seibu_sound")
+
 #define SEIBU3A_SOUND_SYSTEM_CPU(freq)                              \
 	MCFG_CPU_ADD("audiocpu", Z80, freq)                             \
-	MCFG_CPU_PROGRAM_MAP(seibu3_adpcm_sound_map)					\
-	MCFG_SEIBU_SOUND_ADD("seibu_sound")						
-	
+	MCFG_CPU_PROGRAM_MAP(seibu3_adpcm_sound_map)                    \
+	MCFG_SEIBU_SOUND_ADD("seibu_sound")
+
 #define SEIBU_SOUND_SYSTEM_YM3812_INTERFACE(freq1,freq2)            \
 	MCFG_SPEAKER_STANDARD_MONO("mono")                              \
 																	\

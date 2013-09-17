@@ -564,7 +564,7 @@ private:
 	// internal state
 	audio_channel   m_channel[4];
 	sound_stream *  m_stream;
-	
+
 	TIMER_CALLBACK_MEMBER( signal_irq );
 };
 

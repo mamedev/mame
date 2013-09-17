@@ -1,7 +1,7 @@
 /*
 
 Double Wings
-Mitchell 1993 
+Mitchell 1993
 
 This game runs on Data East hardware.
 
@@ -302,7 +302,7 @@ static INPUT_PORTS_START( dblewing )
 	PORT_DIPSETTING( 0x0200, "1" )
 	PORT_DIPSETTING( 0x0100, "2" )
 	PORT_DIPSETTING( 0x0300, "3" )
-	PORT_DIPSETTING( 0x0000, "5" ) 
+	PORT_DIPSETTING( 0x0000, "5" )
 	PORT_DIPNAME( 0x0c00, 0x0c00, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(      0x0800, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x0c00, DEF_STR( Normal ) )

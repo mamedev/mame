@@ -139,7 +139,7 @@ void dl1416_device::device_start()
 	save_item(NAME(m_cursor_enable));
 	save_item(NAME(m_write_enable));
 	save_item(NAME(m_digit_ram));
-	
+
 	m_update_func.resolve(m_update, *this);
 }
 

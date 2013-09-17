@@ -61,7 +61,7 @@ public:
 
 	DECLARE_READ32_MEMBER( read );
 	DECLARE_WRITE32_MEMBER( write );
-	
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -108,25 +108,25 @@ private:
 	device_t *m_i2cmem;
 
 	int m_cdrom_is_device;
-	
+
 	void nvram_write(UINT32 data);
 	UINT32 nvram_read();
-	
+
 	void c2p_write(UINT32 data);
 	UINT32 c2p_read();
-	
+
 	void cdda_stop();
 	void cdda_play(UINT32 lba, UINT32 num_blocks);
 	void cdda_pause(int pause);
 	UINT8 cdda_getstatus(UINT32 *lba);
 	void set_cd_status(UINT32 status);
-	
+
 	TIMER_CALLBACK_MEMBER(frame_proc);
 	TIMER_CALLBACK_MEMBER(dma_proc);
-	
+
 	void start_dma();
 	void setup_response( int len, UINT8 *r1 );
-	
+
 	TIMER_CALLBACK_MEMBER( cd_delayed_cmd );
 	void update_cdrom();
 };

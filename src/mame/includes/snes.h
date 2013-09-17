@@ -450,7 +450,7 @@ public:
 		UINT16 ver_offset;
 		UINT8 extbg;
 	} m_mode7;
-	
+
 	screen_device *m_screen;
 
 	UINT8 m_mosaic_size;

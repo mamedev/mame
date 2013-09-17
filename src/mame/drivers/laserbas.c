@@ -99,14 +99,14 @@ UINT32 laserbas_state::screen_update_laserbas(screen_device &screen, bitmap_ind1
 	if (m_flipscreen)
 	{
 		delta = -1;
-		x0 = 256-1;		x1 = -1;
-		y0 = 256-1;		y1 = -1;
+		x0 = 256-1;     x1 = -1;
+		y0 = 256-1;     y1 = -1;
 	}
 	else
 	{
 		delta = 1;
-		x0 = 0;		x1 = 256;
-		y0 = 0;		y1 = 256;
+		x0 = 0;     x1 = 256;
+		y0 = 0;     y1 = 256;
 	}
 
 	int pixaddr = 0;
@@ -114,10 +114,10 @@ UINT32 laserbas_state::screen_update_laserbas(screen_device &screen, bitmap_ind1
 	{
 		for (x = x0; x != x1; x += delta)
 		{
-			UINT8 p1	=	m_vram1[pixaddr/2];
-			UINT8 p2	=	m_vram2[pixaddr/2];
-			UINT8 mask	=	(pixaddr & 1) ? 0xf0 : 0x0f;
-			UINT8 shift	=	(pixaddr & 1) ?    4 :    0;
+			UINT8 p1    =   m_vram1[pixaddr/2];
+			UINT8 p2    =   m_vram2[pixaddr/2];
+			UINT8 mask  =   (pixaddr & 1) ? 0xf0 : 0x0f;
+			UINT8 shift =   (pixaddr & 1) ?    4 :    0;
 
 			if (p2 & mask)
 				bitmap.pix16(y, x) = (p2 & mask) >> shift;
@@ -164,14 +164,14 @@ WRITE8_MEMBER(laserbas_state::vrambank_w)
 READ8_MEMBER(laserbas_state::protram_r)
 {
 	UINT8 prot = m_protram[offset];
-//	prot = machine().rand();
-//	logerror("%s: Z1 read %03x = %02x\n", machine().describe_context(), offset, prot);
+//  prot = machine().rand();
+//  logerror("%s: Z1 read %03x = %02x\n", machine().describe_context(), offset, prot);
 	return prot;
 }
 
 WRITE8_MEMBER(laserbas_state::protram_w)
 {
-//	logerror("%s: Z1 write %03x = %02x\n", machine().describe_context(), offset, data);
+//  logerror("%s: Z1 write %03x = %02x\n", machine().describe_context(), offset, data);
 	m_protram[offset] = data;
 }
 
@@ -222,41 +222,41 @@ static ADDRESS_MAP_START( laserbas_io, AS_IO, 8, laserbas_state )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( laserbas )
-	PORT_START("DSW")	// $20
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) )		PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x20)
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )		PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x20)
-	PORT_DIPSETTING(    0x01, DEF_STR( Cocktail ) )		PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x20)
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Difficulty ) )	PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x20)
-	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )			PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x20)
-	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )		PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x20)
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Bonus_Life ) )	PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x20)
-	PORT_DIPSETTING(    0x04, "10k" )					PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x20)
-	PORT_DIPSETTING(    0x00, "30k" )					PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x20)
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )	PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x20)
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )			PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x20)
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )			PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x20)
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_B ) )		PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x20)
-	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) )		PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x20)
-	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )		PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x20)
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )		PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x20)
-	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )	PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x20)
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_A ) )		PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x20)
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) )		PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x20)
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )		PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x20)
-	PORT_DIPSETTING(    0x40, DEF_STR( 1C_3C ) )		PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x20)
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )		PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x20)
+	PORT_START("DSW")   // $20
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) )      PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x20)
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )      PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x20)
+	PORT_DIPSETTING(    0x01, DEF_STR( Cocktail ) )     PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x20)
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Difficulty ) )   PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x20)
+	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )         PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x20)
+	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )       PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x20)
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Bonus_Life ) )   PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x20)
+	PORT_DIPSETTING(    0x04, "10k" )                   PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x20)
+	PORT_DIPSETTING(    0x00, "30k" )                   PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x20)
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )  PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x20)
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )          PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x20)
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )           PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x20)
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_B ) )       PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x20)
+	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) )        PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x20)
+	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )        PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x20)
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )        PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x20)
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )    PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x20)
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_A ) )       PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x20)
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) )        PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x20)
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )        PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x20)
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_3C ) )        PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x20)
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )        PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x20)
 	// To do: split into separate switches (easier to debug as it is now though)
-	PORT_DIPNAME( 0xff, 0xfe, "Service Mode Test" )		PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x00)
-	PORT_DIPSETTING(    0xfe, "S RAM CHECK"	)			PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x00)
-	PORT_DIPSETTING(    0xfd, "D RAM CHECK F" )			PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x00)
-	PORT_DIPSETTING(    0xfb, "D RAM CHECK B" )			PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x00)
-	PORT_DIPSETTING(    0xf7, "ROM CHECK" )				PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x00)
-	PORT_DIPSETTING(    0xef, "CRT INVERT CHECK" )		PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x00)	// press start 2
-	PORT_DIPSETTING(    0xdf, "SWITCH CHECK" )			PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x00)
-	PORT_DIPSETTING(    0xbf, "COLOR CHECK" )			PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x00)
-	PORT_DIPSETTING(    0x7f, "SOUND CHECK" )			PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x00)
+	PORT_DIPNAME( 0xff, 0xfe, "Service Mode Test" )     PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x00)
+	PORT_DIPSETTING(    0xfe, "S RAM CHECK" )           PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x00)
+	PORT_DIPSETTING(    0xfd, "D RAM CHECK F" )         PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x00)
+	PORT_DIPSETTING(    0xfb, "D RAM CHECK B" )         PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x00)
+	PORT_DIPSETTING(    0xf7, "ROM CHECK" )             PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x00)
+	PORT_DIPSETTING(    0xef, "CRT INVERT CHECK" )      PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x00)    // press start 2
+	PORT_DIPSETTING(    0xdf, "SWITCH CHECK" )          PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x00)
+	PORT_DIPSETTING(    0xbf, "COLOR CHECK" )           PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x7f, "SOUND CHECK" )           PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x00)
 
-	PORT_START("INPUTS")	// $21
+	PORT_START("INPUTS")    // $21
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
@@ -264,7 +264,7 @@ static INPUT_PORTS_START( laserbas )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )	// service coin
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )   // service coin
 
 	PORT_START("TRACK_X")
 	PORT_BIT( 0x1f, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(10) PORT_KEYDELTA(1) PORT_RESET
@@ -350,7 +350,7 @@ static MACHINE_CONFIG_START( laserbas, laserbas_state )
 	MCFG_CPU_PROGRAM_MAP(laserbas_memory)
 	MCFG_CPU_IO_MAP(laserbas_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", laserbas_state, irq0_line_hold)
-//	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi", laserbas_state, nmi_line_pulse, attotime::from_hz(60))
+//  MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi", laserbas_state, nmi_line_pulse, attotime::from_hz(60))
 
 	MCFG_PIT8253_ADD("pit0", laserbas_pit8253_intf_0)
 	MCFG_PIT8253_ADD("pit1", laserbas_pit8253_intf_1)

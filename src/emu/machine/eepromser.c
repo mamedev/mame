@@ -37,95 +37,95 @@
 
 ****************************************************************************
 
-	Serial EEPROMs generally work the same across manufacturers and models,
-	varying largely by the size of the EEPROM and the packaging details.
-	
-	At a basic level, there are 5 signals involved:
-	
-		* CS = chip select
-		* CLK = serial data clock
-		* DI = serial data in
-		* DO = serial data out
-		* RDY/BUSY = ready (1) or busy (0) status
-	
-	Data is read or written via serial commands. A command is begun on a
-	low-to-high transition of the CS line, following by clocking a start
-	bit (1) on the DI line. After the start bit, subsequent clocks
-	assemble one of the following commands:
-	
-		Start	Opcode	Address		Data
-		  1       01    aaaaaaaaa	ddddddd		WRITE data
-		  1		  10	aaaaaaaaa				READ data
-		  1		  11	aaaaaaaaa				ERASE data
-		  1		  00	00xxxxxxx				WREN = WRite ENable
-		  1		  00	01xxxxxxx   ddddddd		WRAL = WRite ALl cells
-		  1		  00	10xxxxxxx				ERAL = ERase ALl cells
-		  1		  00	11xxxxxxx				WRDS = WRite DiSable
+    Serial EEPROMs generally work the same across manufacturers and models,
+    varying largely by the size of the EEPROM and the packaging details.
 
-	The number of address bits (a) clocked varies based on the size of the
-	chip, though it does not always map 1:1 with the size of the chip.
-	For example, the 93C06 has 16 cells, which only needs 4 address bits;
-	but commands to the 93C06 require 6 address bits (the top two must
-	be 0).
-	
-	The number of data bits (d) clocked varies based on the chip and at
-	times on the state of a pin on the chip which selects between multiple
-	sizes (e.g., 8-bit versus 16-bit).
-	
-****************************************************************************
+    At a basic level, there are 5 signals involved:
 
-	Most EEPROMs are based on the 93Cxx design (and have similar part
-	designations):
-	
-						        +--v--+
-							 CS |1   8| Vcc
-							CLK |2   7| NC
-							 DI |3   6| NC
-						 	 DO |4   5| GND
-						 	    +-----+
-	
-	Note the lack of a READY/BUSY pin. On the 93Cxx series, the DO pin
-	serves double-duty, returning READY/BUSY during a write/erase cycle,
-	and outputting data during a read cycle.
-	
-	Some manufacturers have released "enhanced" versions with additional
-	features:
-	
-		* Several manufacturers (ST) map pin 6 to "ORG", specifying the
-		  logical organization of the data. Connecting ORG to ground
-		  makes the EEPROM work as an 8-bit device, while connecting it
-		  to Vcc makes it work as a 16-bit device with one less
-		  address bit.
-		
-		* Other manufacturers (ST) have enhanced the read operations to
-		  allow serially streaming more than one cell. Essentially, after
-		  reading the first cell, keep CS high and keep clocking, and
-		  data from following cells will be read as well.
+        * CS = chip select
+        * CLK = serial data clock
+        * DI = serial data in
+        * DO = serial data out
+        * RDY/BUSY = ready (1) or busy (0) status
 
-	The ER5911 is only slightly different:
-	
-						        +--v--+
-							 CS |1   8| Vcc
-							CLK |2   7| RDY/BUSY
-							 DI |3   6| ORG
-						 	 DO |4   5| GND
-						 	    +-----+
-	
-	Here we have an explicit RDY/BUSY signal, and the ORG flag as described
-	above.
+    Data is read or written via serial commands. A command is begun on a
+    low-to-high transition of the CS line, following by clocking a start
+    bit (1) on the DI line. After the start bit, subsequent clocks
+    assemble one of the following commands:
 
-	From a command perspective, the ER5911 is also slightly different:
-	
-		93Cxx has ERASE command; this maps to WRITE on ER5911
-		93Cxx has WRITEALL command; no equivalent on ER5911
+        Start   Opcode  Address     Data
+          1       01    aaaaaaaaa   ddddddd     WRITE data
+          1       10    aaaaaaaaa               READ data
+          1       11    aaaaaaaaa               ERASE data
+          1       00    00xxxxxxx               WREN = WRite ENable
+          1       00    01xxxxxxx   ddddddd     WRAL = WRite ALl cells
+          1       00    10xxxxxxx               ERAL = ERase ALl cells
+          1       00    11xxxxxxx               WRDS = WRite DiSable
+
+    The number of address bits (a) clocked varies based on the size of the
+    chip, though it does not always map 1:1 with the size of the chip.
+    For example, the 93C06 has 16 cells, which only needs 4 address bits;
+    but commands to the 93C06 require 6 address bits (the top two must
+    be 0).
+
+    The number of data bits (d) clocked varies based on the chip and at
+    times on the state of a pin on the chip which selects between multiple
+    sizes (e.g., 8-bit versus 16-bit).
 
 ****************************************************************************
 
-	Issues with:
-	
-	kickgoal.c - code seems wrong, clock logic writes 0-0-0 instead of 0-1-0 as expected
-	overdriv.c - drops CS, raises CS, keeps DI=1, triggering extraneous start bit
-	
+    Most EEPROMs are based on the 93Cxx design (and have similar part
+    designations):
+
+                                +--v--+
+                             CS |1   8| Vcc
+                            CLK |2   7| NC
+                             DI |3   6| NC
+                             DO |4   5| GND
+                                +-----+
+
+    Note the lack of a READY/BUSY pin. On the 93Cxx series, the DO pin
+    serves double-duty, returning READY/BUSY during a write/erase cycle,
+    and outputting data during a read cycle.
+
+    Some manufacturers have released "enhanced" versions with additional
+    features:
+
+        * Several manufacturers (ST) map pin 6 to "ORG", specifying the
+          logical organization of the data. Connecting ORG to ground
+          makes the EEPROM work as an 8-bit device, while connecting it
+          to Vcc makes it work as a 16-bit device with one less
+          address bit.
+
+        * Other manufacturers (ST) have enhanced the read operations to
+          allow serially streaming more than one cell. Essentially, after
+          reading the first cell, keep CS high and keep clocking, and
+          data from following cells will be read as well.
+
+    The ER5911 is only slightly different:
+
+                                +--v--+
+                             CS |1   8| Vcc
+                            CLK |2   7| RDY/BUSY
+                             DI |3   6| ORG
+                             DO |4   5| GND
+                                +-----+
+
+    Here we have an explicit RDY/BUSY signal, and the ORG flag as described
+    above.
+
+    From a command perspective, the ER5911 is also slightly different:
+
+        93Cxx has ERASE command; this maps to WRITE on ER5911
+        93Cxx has WRITEALL command; no equivalent on ER5911
+
+****************************************************************************
+
+    Issues with:
+
+    kickgoal.c - code seems wrong, clock logic writes 0-0-0 instead of 0-1-0 as expected
+    overdriv.c - drops CS, raises CS, keeps DI=1, triggering extraneous start bit
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -138,11 +138,11 @@
 //**************************************************************************
 
 // logging levels:
-//	0 = errors and warnings only
-//	1 = commands
-//	2 = state machine
-//	3 = DI/DO/READY reads & writes
-//	4 = all reads & writes
+//  0 = errors and warnings only
+//  1 = commands
+//  2 = state machine
+//  3 = DI/DO/READY reads & writes
+//  4 = all reads & writes
 
 #define VERBOSE_PRINTF 0
 #define VERBOSE_LOGERROR 0
@@ -195,7 +195,7 @@ eeprom_serial_base_device::eeprom_serial_base_device(const machine_config &mconf
 //-------------------------------------------------
 //  static_set_address_bits - configuration helper
 //  to set the number of address bits in the
-//	serial commands
+//  serial commands
 //-------------------------------------------------
 
 void eeprom_serial_base_device::static_set_address_bits(device_t &device, int addrbits)
@@ -227,7 +227,7 @@ void eeprom_serial_base_device::device_start()
 
 	// start the base class
 	eeprom_base_device::device_start();
-	
+
 	// save the current state
 	save_item(NAME(m_state));
 	save_item(NAME(m_cs_state));
@@ -269,8 +269,8 @@ void eeprom_serial_base_device::device_reset()
 //**************************************************************************
 
 //-------------------------------------------------
-//  base_cs_write - set the state of the chip 
-//	select (CS) line
+//  base_cs_write - set the state of the chip
+//  select (CS) line
 //-------------------------------------------------
 
 void eeprom_serial_base_device::base_cs_write(int state)
@@ -280,10 +280,10 @@ void eeprom_serial_base_device::base_cs_write(int state)
 	if (state == m_cs_state)
 		return;
 
-	// set the new state		
+	// set the new state
 	LOG4(("  cs_write(%d)\n", state));
 	m_cs_state = state;
-	
+
 	// remember the rising edge time so we don't process CLK signals at the same time
 	if (state == ASSERT_LINE)
 		m_last_cs_rising_edge_time = machine().time();
@@ -292,7 +292,7 @@ void eeprom_serial_base_device::base_cs_write(int state)
 
 
 //-------------------------------------------------
-//  base_clk_write - set the state of the clock 
+//  base_clk_write - set the state of the clock
 //  (CLK) line
 //-------------------------------------------------
 
@@ -303,7 +303,7 @@ void eeprom_serial_base_device::base_clk_write(int state)
 	if (state == m_clk_state)
 		return;
 
-	// set the new state		
+	// set the new state
 	LOG4(("  clk_write(%d)\n", state));
 	m_clk_state = state;
 	handle_event((m_clk_state == ASSERT_LINE) ? EVENT_CLK_RISING_EDGE : EVENT_CLK_FALLING_EDGE);
@@ -311,8 +311,8 @@ void eeprom_serial_base_device::base_clk_write(int state)
 
 
 //-------------------------------------------------
-//  base_di_write - set the state of the data input 
-//	(DI) line
+//  base_di_write - set the state of the data input
+//  (DI) line
 //-------------------------------------------------
 
 void eeprom_serial_base_device::base_di_write(int state)
@@ -325,7 +325,7 @@ void eeprom_serial_base_device::base_di_write(int state)
 
 
 //-------------------------------------------------
-//  base_do_read - read the state of the data 
+//  base_do_read - read the state of the data
 //  output (DO) line
 //-------------------------------------------------
 
@@ -341,7 +341,7 @@ int eeprom_serial_base_device::base_do_read()
 
 
 //-------------------------------------------------
-//  base_ready_read - read the state of the 
+//  base_ready_read - read the state of the
 //  READY/BUSY line
 //-------------------------------------------------
 
@@ -390,7 +390,7 @@ void eeprom_serial_base_device::set_state(eeprom_state newstate)
 
 //-------------------------------------------------
 //  handle_event - handle an event via the state
-//	machine
+//  machine
 //-------------------------------------------------
 
 void eeprom_serial_base_device::handle_event(eeprom_event event)
@@ -421,7 +421,7 @@ void eeprom_serial_base_device::handle_event(eeprom_event event)
 			if (event == EVENT_CS_RISING_EDGE)
 				set_state(STATE_WAIT_FOR_START_BIT);
 			break;
-		
+
 		// CS is asserted; wait for rising clock with a 1 start bit; falling CS will reset us
 		// note that because each bit is written independently, it is possible for us to receive
 		// a false rising CLK edge at the exact same time as a rising CS edge; it appears we
@@ -435,7 +435,7 @@ void eeprom_serial_base_device::handle_event(eeprom_event event)
 			else if (event == EVENT_CS_FALLING_EDGE)
 				set_state(STATE_IN_RESET);
 			break;
-		
+
 		// CS is asserted; wait for a command to come through; falling CS will reset us
 		case STATE_WAIT_FOR_COMMAND:
 			if (event == EVENT_CLK_RISING_EDGE)
@@ -448,13 +448,13 @@ void eeprom_serial_base_device::handle_event(eeprom_event event)
 			else if (event == EVENT_CS_FALLING_EDGE)
 				set_state(STATE_IN_RESET);
 			break;
-		
+
 		// CS is asserted; reading data, clock the shift register; falling CS will reset us
 		case STATE_READING_DATA:
 			if (event == EVENT_CLK_RISING_EDGE)
 			{
 				int bit_index = m_bits_accum++;
-				
+
 				// wrapping the address on multi-read is required by pacslot(cave.c)
 				if (bit_index % m_data_bits == 0 && (bit_index == 0 || m_streaming_enabled))
 					m_shift_register = read((m_address + m_bits_accum / m_data_bits) & ((1 << m_address_bits) - 1)) << (32 - m_data_bits);
@@ -474,7 +474,7 @@ void eeprom_serial_base_device::handle_event(eeprom_event event)
 					LOG0(("EEPROM: CS deasserted in READING_DATA after %d bits\n", m_bits_accum));
 			}
 			break;
-		
+
 		// CS is asserted; waiting for data; clock data through until we accumulate enough; falling CS will reset us
 		case STATE_WAIT_FOR_DATA:
 			if (event == EVENT_CLK_RISING_EDGE)
@@ -489,7 +489,7 @@ void eeprom_serial_base_device::handle_event(eeprom_event event)
 				LOG0(("EEPROM: CS deasserted in STATE_WAIT_FOR_DATA after %d bits\n", m_bits_accum));
 			}
 			break;
-		
+
 		// CS is asserted; waiting for completion; watch for CS falling
 		case STATE_WAIT_FOR_COMPLETION:
 			if (event == EVENT_CS_FALLING_EDGE)
@@ -501,7 +501,7 @@ void eeprom_serial_base_device::handle_event(eeprom_event event)
 
 //-------------------------------------------------
 //  execute_command - execute a command once we
-//	have enough bits for one
+//  have enough bits for one
 //-------------------------------------------------
 
 void eeprom_serial_base_device::execute_command()
@@ -509,7 +509,7 @@ void eeprom_serial_base_device::execute_command()
 	// parse into a generic command and reset the accumulator count
 	parse_command_and_address();
 	m_bits_accum = 0;
-	
+
 #if (VERBOSE_PRINTF > 0 || VERBOSE_LOGERROR > 0)
 	// for debugging purposes
 	static const struct { eeprom_command command; const char *string; } s_command_names[] =
@@ -540,14 +540,14 @@ void eeprom_serial_base_device::execute_command()
 			m_shift_register = 0;
 			set_state(STATE_READING_DATA);
 			break;
-			
+
 		// reset the shift register and wait for enough data to be clocked through
 		case COMMAND_WRITE:
 		case COMMAND_WRITEALL:
 			m_shift_register = 0;
 			set_state(STATE_WAIT_FOR_DATA);
 			break;
-		
+
 		// erase the parsed address (unless locked) and wait for it to complete
 		case COMMAND_ERASE:
 			if (m_locked)
@@ -559,19 +559,19 @@ void eeprom_serial_base_device::execute_command()
 			erase(m_address);
 			set_state(STATE_WAIT_FOR_COMPLETION);
 			break;
-		
+
 		// lock the chip; return to IN_RESET state
 		case COMMAND_LOCK:
 			m_locked = true;
 			set_state(STATE_IN_RESET);
 			break;
-			
+
 		// unlock the chip; return to IN_RESET state
 		case COMMAND_UNLOCK:
 			m_locked = false;
 			set_state(STATE_IN_RESET);
 			break;
-		
+
 		// erase the entire chip (unless locked) and wait for it to complete
 		case COMMAND_ERASEALL:
 			if (m_locked)
@@ -583,7 +583,7 @@ void eeprom_serial_base_device::execute_command()
 			erase_all();
 			set_state(STATE_WAIT_FOR_COMPLETION);
 			break;
-		
+
 		default:
 			throw emu_fatalerror("execute_command called with invalid command %d\n", m_command);
 	}
@@ -591,8 +591,8 @@ void eeprom_serial_base_device::execute_command()
 
 
 //-------------------------------------------------
-//  execute_write_command - execute a write 
-//	command after receiving the data bits
+//  execute_write_command - execute a write
+//  command after receiving the data bits
 //-------------------------------------------------
 
 void eeprom_serial_base_device::execute_write_command()
@@ -627,7 +627,7 @@ void eeprom_serial_base_device::execute_write_command()
 			break;
 
 		// write the entire EEPROM with the same data; ERASEALL is required before so we
-		// AND against the already-present data		
+		// AND against the already-present data
 		case COMMAND_WRITEALL:
 			if (m_locked)
 			{
@@ -638,7 +638,7 @@ void eeprom_serial_base_device::execute_write_command()
 			write_all(m_shift_register);
 			set_state(STATE_WAIT_FOR_COMPLETION);
 			break;
-		
+
 		default:
 			throw emu_fatalerror("execute_write_command called with invalid command %d\n", m_command);
 	}
@@ -661,8 +661,8 @@ eeprom_serial_93cxx_device::eeprom_serial_93cxx_device(const machine_config &mco
 
 
 //-------------------------------------------------
-//  parse_command_and_address - extract the 
-//	command and address from a bitstream
+//  parse_command_and_address - extract the
+//  command and address from a bitstream
 //-------------------------------------------------
 
 void eeprom_serial_93cxx_device::parse_command_and_address()
@@ -670,7 +670,7 @@ void eeprom_serial_93cxx_device::parse_command_and_address()
 	// set the defaults
 	m_command = COMMAND_INVALID;
 	m_address = m_command_address_accum & ((1 << m_command_address_bits) - 1);
-	
+
 	// extract the command portion and handle it
 	switch (m_command_address_accum >> m_command_address_bits)
 	{
@@ -678,16 +678,16 @@ void eeprom_serial_93cxx_device::parse_command_and_address()
 		case 0:
 			switch (m_address >> (m_command_address_bits - 2))
 			{
-				case 0:	m_command = COMMAND_LOCK;		break;
-				case 1:	m_command = COMMAND_WRITEALL;	break;
-				case 2:	m_command = COMMAND_ERASEALL;	break;
-				case 3:	m_command = COMMAND_UNLOCK;		break;
+				case 0: m_command = COMMAND_LOCK;       break;
+				case 1: m_command = COMMAND_WRITEALL;   break;
+				case 2: m_command = COMMAND_ERASEALL;   break;
+				case 3: m_command = COMMAND_UNLOCK;     break;
 			}
 			m_address = 0;
 			break;
-		case 1:	m_command = COMMAND_WRITE;	break;
-		case 2:	m_command = COMMAND_READ;	break;
-		case 3:	m_command = COMMAND_ERASE;	break;
+		case 1: m_command = COMMAND_WRITE;  break;
+		case 2: m_command = COMMAND_READ;   break;
+		case 3: m_command = COMMAND_ERASE;  break;
 	}
 
 	// warn about out-of-range addresses
@@ -728,8 +728,8 @@ eeprom_serial_er5911_device::eeprom_serial_er5911_device(const machine_config &m
 
 
 //-------------------------------------------------
-//  parse_command_and_address - extract the 
-//	command and address from a bitstream
+//  parse_command_and_address - extract the
+//  command and address from a bitstream
 //-------------------------------------------------
 
 void eeprom_serial_er5911_device::parse_command_and_address()
@@ -737,7 +737,7 @@ void eeprom_serial_er5911_device::parse_command_and_address()
 	// set the defaults
 	m_command = COMMAND_INVALID;
 	m_address = m_command_address_accum & ((1 << m_command_address_bits) - 1);
-	
+
 	// extract the command portion and handle it
 	switch (m_command_address_accum >> m_command_address_bits)
 	{
@@ -745,16 +745,16 @@ void eeprom_serial_er5911_device::parse_command_and_address()
 		case 0:
 			switch (m_address >> (m_command_address_bits - 2))
 			{
-				case 0:	m_command = COMMAND_LOCK;		break;
-				case 1:	m_command = COMMAND_INVALID;	break;	// not on ER5911
-				case 2:	m_command = COMMAND_ERASEALL;	break;
-				case 3:	m_command = COMMAND_UNLOCK;		break;
+				case 0: m_command = COMMAND_LOCK;       break;
+				case 1: m_command = COMMAND_INVALID;    break;  // not on ER5911
+				case 2: m_command = COMMAND_ERASEALL;   break;
+				case 3: m_command = COMMAND_UNLOCK;     break;
 			}
 			m_address = 0;
 			break;
-		case 1:	m_command = COMMAND_WRITE;	break;
-		case 2:	m_command = COMMAND_READ;	break;
-		case 3:	m_command = COMMAND_WRITE;	break;	// WRITE instead of ERASE on ER5911
+		case 1: m_command = COMMAND_WRITE;  break;
+		case 2: m_command = COMMAND_READ;   break;
+		case 3: m_command = COMMAND_WRITE;  break;  // WRITE instead of ERASE on ER5911
 	}
 
 	// warn about out-of-range addresses
@@ -793,8 +793,7 @@ eeprom_serial_##_lowercase##_##_bits##bit_device::eeprom_serial_##_lowercase##_#
 	static_set_size(*this, _cells, _bits); \
 	static_set_address_bits(*this, _addrbits); \
 }; \
-const device_type EEPROM_SERIAL_##_uppercase##_##_bits##BIT = &device_creator<eeprom_serial_##_lowercase##_##_bits##bit_device>; \
-
+const device_type EEPROM_SERIAL_##_uppercase##_##_bits##BIT = &device_creator<eeprom_serial_##_lowercase##_##_bits##bit_device>;
 // standard 93CX6 class of 16-bit EEPROMs
 DEFINE_SERIAL_EEPROM_DEVICE(93cxx, 93c06, 93C06, 16, 16, 6)
 DEFINE_SERIAL_EEPROM_DEVICE(93cxx, 93c46, 93C46, 16, 64, 6)

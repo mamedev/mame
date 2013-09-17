@@ -28,12 +28,12 @@ public:
 	required_shared_ptr<UINT8> m_colorram;
 
 	/* protection */
-	UINT8			m_prot_value;
+	UINT8           m_prot_value;
 
 	/* video-related */
-	tilemap_t		*m_bg_tilemap;
-	tilemap_t		*m_fg_tilemap;
-	int				m_bg_index[4];
+	tilemap_t       *m_bg_tilemap;
+	tilemap_t       *m_fg_tilemap;
+	int             m_bg_index[4];
 
 	virtual void machine_start();
 	virtual void machine_reset();

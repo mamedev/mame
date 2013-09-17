@@ -496,9 +496,9 @@ void debug_view_watchpoints::view_update()
 			pad_astring_to_length(buffer, tableBreaks[2]);
 			buffer.catprintf("%s", wp->space().name());
 			pad_astring_to_length(buffer, tableBreaks[3]);
-			buffer.catprintf("%s-%s", 
-							 core_i64_hex_format(wp->space().byte_to_address(wp->address()), wp->space().addrchars()),
-							 core_i64_hex_format(wp->space().byte_to_address_end(wp->address() + wp->length()) - 1, wp->space().addrchars()));
+			buffer.catprintf("%s-%s",
+								core_i64_hex_format(wp->space().byte_to_address(wp->address()), wp->space().addrchars()),
+								core_i64_hex_format(wp->space().byte_to_address_end(wp->address() + wp->length()) - 1, wp->space().addrchars()));
 			pad_astring_to_length(buffer, tableBreaks[4]);
 			buffer.catprintf("%s", types[wp->type() & 3]);
 			pad_astring_to_length(buffer, tableBreaks[5]);

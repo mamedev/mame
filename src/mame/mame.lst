@@ -284,9 +284,9 @@ chewing         // ?? unknown
 catacomb        // 1982 MTM Games
 ckongg          // 1981 bootleg
 ckongmc         // 1981 bootleg
-ckonggx			//
+ckonggx         //
 ckongcv          // 19?? Competitive Video?
-ckongis			//
+ckongis         //
 porter          // 1982 bootleg (Arcade TV Game List - P.98, Left, 15 from bottom)
 tdpgal          // 1983 Design Labs / Thomas Automatics
 guttangt
@@ -1095,7 +1095,7 @@ gdvsgd
 
 // Misc Namco games
 30test          // (c) 1997
-25pacman		// (c) 2006 Ver 3.0
+25pacman        // (c) 2006 Ver 3.0
 25pacmano       // (c) 2005 Ver 2.0 - Same hardware as 20pacgal
 20pacgal        // (c) 2000 Ver 1.08
 20pacgalr4      // (c) 2000 Ver 1.04
@@ -1107,7 +1107,7 @@ turrett         // (c) 2001 licensed from Dell Electronics
 
 // Universal games
 cosmicg         // 7907 (c) 1979
-cosmicgi		// bootleg (Inder)
+cosmicgi        // bootleg (Inder)
 cosmica         // 7910-AII (c) [1979]
 cosmica1        // 7910-A (c) [1979]
 cosmica2        // 7910 (c) 1979
@@ -1345,7 +1345,7 @@ multigmb        // 1992
 multigm2        // 1992
 multigm3        // 19??
 multigmt
-sgmt1			// 1994
+sgmt1           // 1994
 supergm3        // 1996
 cham24          // 2002
 
@@ -2405,7 +2405,7 @@ dariusgj        // 1994.09 D87 (c) 1994 Taito Corporation (Japan)
 dariusgu        // 1994.11 D87 (c) 1994 Taito America Corporation (US)
 dariusgx        // 1994.?? D87 (c) 1994 Taito Corporation
 bublbob2        // 1994.?? D90 (c) 1994 Taito Corporation Japan (World)
-bublbob2p		// prototype
+bublbob2p       // prototype
 bubsymphe       // 1994.?? D90 (c) 1994 Taito Corporation Japan (Europe)
 bubsymphu       // 1994.10 D90 (c) 1994 Taito America Corporation (US)
 bubsymphj       // 1994.10 D90 (c) 1994 Taito Corporation (Japan)
@@ -2498,7 +2498,7 @@ homura          // (c) 2005 SKonec Entertainment
 hotgmkmp        // (c) 2005 XNauts
 raiden3         // (c) 2005 Seibu Kaihatsu/Moss Ltd
 spicaadv        // (c) 2005 Taito Corporation
-usagiol			// (c) 2005 Taito Corporation/Warashi
+usagiol         // (c) 2005 Taito Corporation/Warashi
 shikiga3        // (c) 2006 Alfa System/SKonec Entertainment
 raiden4         // (c) 2007 Seibu Kaihatsu/Moss Ltd
 kof98um         // (c) 2008 SNK
@@ -5825,8 +5825,8 @@ hvysmsha        // MBG (c) 1993 Data East Corporation (Asia)
 hvysmshj        // MBG (c) 1993 Data East Corporation (Japan)
 nslasher        // MBH (c) 1993 Data East Corporation
 nslasherj       // MBH (c) 1993 Data East Corporation (Japan)
-nslashers       // MBH (c) 1993 Data East Corporation 
-nslasheru		// MBH (c) 1993 Data EAst Corporation (US)
+nslashers       // MBH (c) 1993 Data East Corporation
+nslasheru       // MBH (c) 1993 Data EAst Corporation (US)
 				// MBI ??
 				// MBJ ??
 				// MBK ??
@@ -9476,8 +9476,8 @@ dmnfrnta        //
 dmnfrntb        //
 dmnfrntpcb      //
 kovshp          // (c) 2004 Knights of Valor Superheroes PLUS
-kovshpa			//
-kovytzy			// (c) 1999 Knights of Valour: Yi Tong Zhong Yuan
+kovshpa         //
+kovytzy         // (c) 1999 Knights of Valour: Yi Tong Zhong Yuan
 kovshxas        // bootleg
 kovlsqh         // bootleg
 kovlsqh2        // bootleg
@@ -9495,7 +9495,7 @@ ddpdoj          // (c) 2002 DoDonPachi Dai-Ou-Jou
 ddpdoja         //
 ddpdojb         //
 ddpdojblk       //
-ddpdojblka		//
+ddpdojblka      //
 espgal          // (c) 2003 Espgaluda
 
 // IGS PGM2 Platform
@@ -11886,7 +11886,7 @@ nfsug           // Need For Speed: Underground Install (2 Discs) (v1.1)
 
 // unknown
 fruitpc         // ???
-casanova		// 
+casanova        //
 
 // Leisure Ent.
 roul            // (c) 1990

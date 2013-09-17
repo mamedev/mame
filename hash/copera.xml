@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
- <!--
+	<!--
 Games for the MIXT BOOK PLAYER COPERA
 
 * メロディランド - Melody Land (Yamaha - 199312xx - MMGS-1)
@@ -16,9 +16,9 @@ not dumped?
 * コペラのちきゅうだいすき - Copera no Chikyuu Daisuki (Yamaha - ???? - MMGS-9)
 * 冒険!メロリン島 - Bouken! Merorin Shima (Yamaha - ???? - MMGS-10)
 
-  --> 
-  
- <softwarelist name="copera" description="Yamaha / Sega Copera cartridges">
+	-->
+
+	<softwarelist name="copera" description="Yamaha / Sega Copera cartridges">
 
 
 	<software name="melody">
@@ -68,7 +68,7 @@ not dumped?
 			</dataarea>
 		</part>
 	</software>
-  
+
 	<software name="outacanv">
 		<description>Outa no Canvas (Jpn)</description>
 		<year>1994</year>
@@ -83,8 +83,8 @@ not dumped?
 			</dataarea>
 		</part>
 	</software>
-	
-  <software name="copekono">
+
+	<software name="copekono">
 		<description>Copera no Kono Otonaani (Jpn)</description>
 		<year>1994</year>
 		<publisher>Yamaha</publisher>
@@ -98,7 +98,7 @@ not dumped?
 			</dataarea>
 		</part>
 	</software>
-  
+
 	<software name="mikeatmw">
 		<description>Mike to Asobou Tobidase Milky Way (Jpn)</description>
 		<year>1994</year>

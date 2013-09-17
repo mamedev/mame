@@ -81,13 +81,13 @@ protected:
 	// optional operation overrides
 	virtual void interface_validity_check(validity_checker &valid) const;
 	virtual void interface_pre_start();
-	
+
 	// configuration state
-	bool 			m_screen_required;			// is a screen required?
-	const char *	m_screen_tag;				// configured tag for the target screen
+	bool            m_screen_required;          // is a screen required?
+	const char *    m_screen_tag;               // configured tag for the target screen
 
 	// internal state
-	screen_device *	m_screen;					// pointer to the screen device
+	screen_device * m_screen;                   // pointer to the screen device
 };
 
 // iterator

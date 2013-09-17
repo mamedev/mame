@@ -120,7 +120,7 @@ Patent notes (important timing info for interpolation):
     01      7 0#3 4 5 6 7 0#3 4 5 6 7 0#3 4 5
     10      7 0#5 6 7 0#5 6 7 0#5 6 7 0#5 6 7
     11      7 0#7 0#7 0#7 0#7 0#7 0#7 0#7 0#7
-	Based on the behavior tested on the CD2501ECD this is assumed to be the same for that chip as well.
+    Based on the behavior tested on the CD2501ECD this is assumed to be the same for that chip as well.
 
 Most of the following is based on figure 8c of 4,331,836, which is the
   TMS5100/TMC0280 patent, but the same information applies to the TMS52xx
@@ -219,7 +219,7 @@ serial chips); Street Electronics Corp.'s Apple II 'Echo 2' Speech
 synthesizer (early cards only)
 
 CD2501ECD: (1983)
-	Home computer: TI 99/8 (prototypes only)
+    Home computer: TI 99/8 (prototypes only)
 
 TMS5220: (mostly on things made between 1981 and 1984-1985)
     Arcade: Bally/Midway's 'NFL Football'; Atari's 'Star Wars',

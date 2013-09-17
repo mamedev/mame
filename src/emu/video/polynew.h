@@ -249,7 +249,7 @@ private:
 
 	// queue management
 	running_machine &   m_machine;
-	screen_device *		m_screen;
+	screen_device *     m_screen;
 	osd_work_queue *    m_queue;                    // work queue
 
 	// arrays

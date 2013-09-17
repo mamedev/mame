@@ -184,7 +184,7 @@ READ8_MEMBER(de_3b_state::display_r)
 	switch(offset)
 	{
 	case 0:
-//		ret = pia28_w7_r(space,0);
+//      ret = pia28_w7_r(space,0);
 		break;
 	case 3:
 		ret = pia2c_pb_r(space,0);
@@ -199,10 +199,10 @@ WRITE8_MEMBER(de_3b_state::display_w)
 	switch(offset)
 	{
 	case 0:
-//		dig0_w(space,0,data);
+//      dig0_w(space,0,data);
 		break;
 	case 1:
-//		dig1_w(space,0,data);
+//      dig1_w(space,0,data);
 		break;
 	case 2:
 		pia2c_pa_w(space,0,data);
@@ -211,7 +211,7 @@ WRITE8_MEMBER(de_3b_state::display_w)
 		pia2c_pb_w(space,0,data);
 		break;
 	case 4:
-//		pia34_pa_w(space,0,data);
+//      pia34_pa_w(space,0,data);
 		break;
 	}
 }

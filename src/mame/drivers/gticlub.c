@@ -289,7 +289,7 @@ public:
 	DECLARE_MACHINE_RESET(hangplt);
 	DECLARE_VIDEO_START(gticlub);
 	INTERRUPT_GEN_MEMBER(gticlub_vblank);
-	
+
 	UINT32 screen_update_gticlub(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_hangplt(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -297,8 +297,8 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 private:
 	void gticlub_led_setreg(int offset, UINT8 data);
-	
-	UINT8 gticlub_led_reg[2];	
+
+	UINT8 gticlub_led_reg[2];
 };
 
 

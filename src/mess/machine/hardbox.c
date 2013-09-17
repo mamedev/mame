@@ -1,42 +1,42 @@
 /****************************************************************************
 
-	SSE HardBox emulation
+    SSE HardBox emulation
 
-	Copyright MESS Team.
-	Visit http://mamedev.org for licensing and usage restrictions.
+    Copyright MESS Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
 
 ****************************************************************************/
 
 /*
-	http://mikenaberezny.com/hardware/pet-cbm/sse-hardbox-corvus-interface/
+    http://mikenaberezny.com/hardware/pet-cbm/sse-hardbox-corvus-interface/
 
-	The HardBox provides a CBM DOS interface for a Corvus hard disk.  Before
-	it can be used, a hard disk image must first be created and formatted.
-	Use the CHDMAN utility to create a 20MB image:
+    The HardBox provides a CBM DOS interface for a Corvus hard disk.  Before
+    it can be used, a hard disk image must first be created and formatted.
+    Use the CHDMAN utility to create a 20MB image:
 
-	$ chdman createhd -o /path/to/corvus20mb.chd -chs 388,5,20 -ss 512
+    $ chdman createhd -o /path/to/corvus20mb.chd -chs 388,5,20 -ss 512
 
-	Start the pet8032 emulator with the HardBox attached as device 9,
-	with the new CHD and the utilities floppy mounted:
+    Start the pet8032 emulator with the HardBox attached as device 9,
+    with the new CHD and the utilities floppy mounted:
 
-	$ mess pet8032 -ieee9 hardbox \
-				   -hard1 /path/to/corvus20mb.chd \
-				   -flop1 /path/to/hardbox-utils.d80
-	
-	Load and run the "configure" program from the floppy.  When prompted
-	for the HardBox device number, enter "9".
+    $ mess pet8032 -ieee9 hardbox \
+                   -hard1 /path/to/corvus20mb.chd \
+                   -flop1 /path/to/hardbox-utils.d80
 
-	Select "q" for quick configure at the menu.  It will present a default 
-	drive size and ask if you want to alter it.  If the size is not 20, 
-	change it to 20.
+    Load and run the "configure" program from the floppy.  When prompted
+    for the HardBox device number, enter "9".
 
-	After accepting the drive size, it will prompt if you want to perform
-	a format check.  This requires uploading code into the Corvus, which
-	the high level emulation of the Corvus does not support.  Enter "n"
-	to skip the format check.
+    Select "q" for quick configure at the menu.  It will present a default
+    drive size and ask if you want to alter it.  If the size is not 20,
+    change it to 20.
 
-	Enter "y" to proceed with the format.  After it has completed, the
-	program will exit back to BASIC.  The drive should now be usable.
+    After accepting the drive size, it will prompt if you want to perform
+    a format check.  This requires uploading code into the Corvus, which
+    the high level emulation of the Corvus does not support.  Enter "n"
+    to skip the format check.
+
+    Enter "y" to proceed with the format.  After it has completed, the
+    program will exit back to BASIC.  The drive should now be usable.
 */
 
 
@@ -136,7 +136,7 @@ READ8_MEMBER( hardbox_device::ppi0_pc_r )
 {
 	UINT8 data = ioport("SW1")->read();
 
-	/* DIP switches on PC1,PC2,PC3 configure the IEEE-488 primary address.  
+	/* DIP switches on PC1,PC2,PC3 configure the IEEE-488 primary address.
 	   We get the address from m_address instead. */
 	data |= ((m_slot->get_address() - 8) << 1) ^ 0xff;
 
@@ -373,7 +373,7 @@ void hardbox_device::device_start()
 //    reset that must happen after child devices
 //    have performed their resets
 //-------------------------------------------------
- 
+
 void hardbox_device::device_reset_after_children()
 {
 	/* The Z80 starts at address 0x0000 but the HardBox has RAM there and
@@ -381,9 +381,9 @@ void hardbox_device::device_reset_after_children()
 	   74S287 PROM that temporarily changes the memory map so that the
 	   IC3 EPROM at 0xe000 is mapped to 0x0000 for the first instruction
 	   fetch only.  The instruction normally at 0xe000 is an absolute jump
-	   into the ROM.  On reset, the Z80 will fetch it from 0x0000 and set 
+	   into the ROM.  On reset, the Z80 will fetch it from 0x0000 and set
 	   its PC, then the normal map will be restored before the next
-	   instruction fetch.  Here we just set the PC to 0xe000 after the Z80 
+	   instruction fetch.  Here we just set the PC to 0xe000 after the Z80
 	   resets, which has the same effect. */
 
 	m_maincpu->set_state_int(Z80_PC, 0xe000);
@@ -403,4 +403,3 @@ void hardbox_device::ieee488_ifc(int state)
 
 	m_ifc = state;
 }
-

@@ -760,7 +760,7 @@ TIMER_CALLBACK_MEMBER(ksys573_state::atapi_xfer_end)
 	{
 		UINT32 d = m_ata->read_cs0(space, (UINT32) 0, (UINT32) 0xffff) << 0;
 		d |= m_ata->read_cs0(space, (UINT32) 0, (UINT32) 0xffff) << 16;
-	
+
 		m_p_n_psxram[ m_atapi_xferbase / 4 ] = d;
 		m_atapi_xferbase += 4;
 		m_atapi_xfersize--;

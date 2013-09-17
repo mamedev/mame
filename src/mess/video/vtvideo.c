@@ -6,20 +6,20 @@
     01/05/2009 Initial implementation [Miodrag Milanovic]
     Sept. 2013 portions by Karl-Ludwig Deisenhofer.
 
-	STATE OF DEC-100 VIDEO AS OF SEPTEMBER 2013
-	-------------------------------------------
-	- FURTHER TESTING: do line and character attributes match real hardware?  Does soft scrolling work?
-	- LIKELY INCORRECT : implementation of double size attribute in 132 columns mode (additional case)
+    STATE OF DEC-100 VIDEO AS OF SEPTEMBER 2013
+    -------------------------------------------
+    - FURTHER TESTING: do line and character attributes match real hardware?  Does soft scrolling work?
+    - LIKELY INCORRECT : implementation of double size attribute in 132 columns mode (additional case)
 
-	- MISSING: undocumented features of DC011 / DC012 - see public domain SQUEEZE.COM pokes: 
-		0f00 => PORT 0C; 
-		0b00 => PORT 0C; 
-		1000 => PORT 04  
-		(SQUEEZE compresses the display in X and Y direction on a real DEC-100 B)
+    - MISSING: undocumented features of DC011 / DC012 - see public domain SQUEEZE.COM pokes:
+        0f00 => PORT 0C;
+        0b00 => PORT 0C;
+        1000 => PORT 04
+        (SQUEEZE compresses the display in X and Y direction on a real DEC-100 B)
 
-	- IMPROVEMENTS: 
-		- find a more realistic approach for intensity control (bold attribute)
-		- correct phosphor colors (green, white and amber monitors were common)
+    - IMPROVEMENTS:
+        - find a more realistic approach for intensity control (bold attribute)
+        - correct phosphor colors (green, white and amber monitors were common)
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -122,7 +122,7 @@ void vt100_video_device::device_reset()
 {
 	palette_set_color_rgb(machine(), 0, 0x00, 0x00, 0x00); // black
 	palette_set_color_rgb(machine(), 1, 0xff, 0xff, 0xff); // white
-	
+
 	m_height = 25;
 	m_height_MAX = 25;
 
@@ -149,7 +149,7 @@ void rainbow_video_device::device_reset()
 
 	m_height = 24;  // <---- DEC-100
 	m_height_MAX = 48;
-	
+
 	m_lba7 = 0;
 
 	m_scroll_latch = 0;
@@ -181,7 +181,7 @@ void vt100_video_device::recompute_parameters()
 	} else {
 		horiz_pix_total = m_columns * 10; // normal 80 character mode.
 	}
- 
+
 	visarea.set(0, horiz_pix_total - 1, 0, vert_pix_total - 1);
 
 	m_screen->configure(horiz_pix_total, vert_pix_total, visarea, m_screen->frame_period().attoseconds);
@@ -238,31 +238,31 @@ WRITE8_MEMBER( vt100_video_device::dc012_w )
 				// set basic attribute to reverse video / blink flip-flop off
 				m_basic_attribute = 1;
 				m_blink_flip_flop = 0;
-				
-				if (m_height_MAX == 25) break; // VT 100. 
 
-				if (m_height != 24)  
+				if (m_height_MAX == 25) break; // VT 100.
+
+				if (m_height != 24)
 				{
-					m_height = 24;  // (DEC Rainbow 100) : 24 line display 
+					m_height = 24;  // (DEC Rainbow 100) : 24 line display
 					recompute_parameters();
-			    }
+				}
 				break;
 
 			case 0x0e:
-			    break;					// (DC12) : 'not supported' 
+				break;                  // (DC12) : 'not supported'
 
 			case 0x0f:
 				// (DEC Rainbow 100) : set basic attribute to reverse video / blink flip-flop off
 				m_basic_attribute = 1;
 				m_blink_flip_flop = 0;
 
-				if (m_height_MAX == 25) break; // VT 100. 
+				if (m_height_MAX == 25) break; // VT 100.
 
 				if (m_height != 48)
 				{
-					m_height = 48;   // (DEC Rainbow 100) : 48 line display 
+					m_height = 48;   // (DEC Rainbow 100) : 48 line display
 					recompute_parameters();
-			    }
+				}
 				break;
 		}
 	}
@@ -440,12 +440,12 @@ void rainbow_video_device::display_char(bitmap_ind16 &bitmap, UINT8 code, int x,
 {
 	UINT8 xsize, d_xsize;
 	if (m_columns == 132)
-	{	  xsize = 9;
-		  d_xsize = 18;
+	{     xsize = 9;
+			d_xsize = 18;
 	} else
 	{
-		  xsize = 10;
-		  d_xsize = 20;
+			xsize = 10;
+			d_xsize = 20;
 	}
 
 	UINT8 line = 0;
@@ -475,13 +475,13 @@ void rainbow_video_device::display_char(bitmap_ind16 &bitmap, UINT8 code, int x,
 
 		line = m_gfx[code * 16 + j];
 
-		if ( i == 8 ) 
-		{  
-		  if ( underline != 0  ) line = 0xff;
+		if ( i == 8 )
+		{
+			if ( underline != 0  ) line = 0xff;
 		}
 
 		//  Code to handle basic attribute from VT-100
-		if ( m_basic_attribute == 1 ) 
+		if ( m_basic_attribute == 1 )
 		{
 			if ((code & 0x80) == 0x80)
 				invert = 1;
@@ -489,15 +489,15 @@ void rainbow_video_device::display_char(bitmap_ind16 &bitmap, UINT8 code, int x,
 				invert = 0;
 			}
 
-    		if (m_blink_flip_flop > 0)
+			if (m_blink_flip_flop > 0)
 		{
- 		   if ( blink != 0 ) 
-		   {
-			 line = line ^ 0xff;
-		   }
+			if ( blink != 0 )
+			{
+				line = line ^ 0xff;
+			}
 		}
-		if (invert != 0) 
-			   line = line ^ 0xff;
+		if (invert != 0)
+				line = line ^ 0xff;
 
 		for (int b = 0; b < 8; b++)
 		{
@@ -519,7 +519,7 @@ void rainbow_video_device::display_char(bitmap_ind16 &bitmap, UINT8 code, int x,
 		{
 			bitmap.pix16(y * 10 + i, x * d_xsize + 16) = bit;
 			bitmap.pix16(y * 10 + i, x * d_xsize + 17) = bit;
-			bitmap.pix16(y * 10 + i, x * d_xsize + 18) = bit; 
+			bitmap.pix16(y * 10 + i, x * d_xsize + 18) = bit;
 			bitmap.pix16(y * 10 + i, x * d_xsize + 19) = bit;
 		}
 		else
@@ -567,14 +567,14 @@ void rainbow_video_device::video_update(bitmap_ind16 &bitmap, const rectangle &c
 			addr = (temp) & 0x0fff;
 			attr_addr = ((temp) & 0x1fff) - 2;
 
-			//  No AVO here. 
-			attr_addr |= 0x1000;  
+			//  No AVO here.
+			attr_addr |= 0x1000;
 			if (attr_addr > 0x2000) // Ignore attributes beyond 8192 byte limit (SRAM).
 			{
 				scroll_region = 1; // binary 1   <- SET DEFAULTS
 				display_type = 3;  // binary 111
-			} else  
-			{	
+			} else
+			{
 				temp = m_in_ram_func(attr_addr);
 				scroll_region = (temp) & 1;
 				display_type  = (temp >> 1) & 3;
@@ -589,22 +589,22 @@ void rainbow_video_device::video_update(bitmap_ind16 &bitmap, const rectangle &c
 		}
 		else
 		{
-			// display regular char 
+			// display regular char
 			if (line >= m_skip_lines)
 			{
 				attr_addr = 0x1000 | ( (addr + xpos) & 0x0fff );
 				temp = m_in_ram_func(attr_addr); // get character attribute
 
-				// TODO: check if reverse bit is treated the same way on real hardware 
+				// TODO: check if reverse bit is treated the same way on real hardware
 				// 1 = display char. in REVERSE   (encoded as 8)
 				// 0 = display char. in BOLD      (encoded as 16)
 				// 0 = display char. w. BLINK     (encoded as 32)
-				// 0 = display char. w. UNDERLINE (encoded as 64).  
+				// 0 = display char. w. UNDERLINE (encoded as 64).
 					display_char(bitmap, code, xpos, ypos, scroll_region, display_type | ( (  (temp & 1)) << 3 )
-																				   | ( (2-(temp & 2)) << 3 )
-																				   | ( (4-(temp & 4)) << 3 )
-																				   | ( (8-(temp & 8)) << 3 )
-																				   );
+																					| ( (2-(temp & 2)) << 3 )
+																					| ( (4-(temp & 4)) << 3 )
+																					| ( (8-(temp & 8)) << 3 )
+																					);
 			}
 			xpos++;
 			if (xpos > m_columns)

@@ -44,7 +44,7 @@ public:
 	   Range from 100 to 0. (100 = 0dB; 50 = -6dB; 0 = -infinity)
 	   This function is designed for use with MAME mixer_xxx() functions. */
 	int gain_percent_r(int channel);
-	
+
 	void gain_recalc();
 
 protected:
@@ -52,7 +52,7 @@ protected:
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 private:
 	// internal state
 	int          m_gain[4];       /* gain index 0-63,64,65 */

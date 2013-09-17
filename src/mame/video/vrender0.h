@@ -44,7 +44,7 @@ public:
 	~vr0video_device() {}
 
 	int vrender0_ProcessPacket(UINT32 PacketPtr, UINT16 *Dest, UINT8 *TEXTURE);
-	
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -59,7 +59,7 @@ private:
 	UINT32 m_LastPalUpdate;
 
 	RenderStateInfo m_RenderState;
-	
+
 	UINT16 Alpha(UINT16 Src, UINT16 Dst);
 };
 

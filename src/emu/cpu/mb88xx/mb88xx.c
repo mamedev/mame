@@ -114,25 +114,25 @@ mb88_cpu_device::mb88_cpu_device(const machine_config &mconfig, device_type type
 
 
 mb8841_cpu_device::mb8841_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : mb88_cpu_device(mconfig, MB8841, "MB8841", tag, owner, clock, "mb8841", __FILE__, 11, 7)
+	: mb88_cpu_device(mconfig, MB8841, "MB8841", tag, owner, clock, "mb8841", __FILE__, 11, 7)
 {
 }
 
 
 mb8842_cpu_device::mb8842_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : mb88_cpu_device(mconfig, MB8842, "MB8842", tag, owner, clock, "mb8842", __FILE__, 11, 7)
+	: mb88_cpu_device(mconfig, MB8842, "MB8842", tag, owner, clock, "mb8842", __FILE__, 11, 7)
 {
 }
 
 
 mb8843_cpu_device::mb8843_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : mb88_cpu_device(mconfig, MB8843, "MB8843", tag, owner, clock, "mb8843", __FILE__, 10, 6)
+	: mb88_cpu_device(mconfig, MB8843, "MB8843", tag, owner, clock, "mb8843", __FILE__, 10, 6)
 {
 }
 
 
 mb8844_cpu_device::mb8844_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : mb88_cpu_device(mconfig, MB8844, "MB8844", tag, owner, clock, "mb8844", __FILE__, 10, 6)
+	: mb88_cpu_device(mconfig, MB8844, "MB8844", tag, owner, clock, "mb8844", __FILE__, 10, 6)
 {
 }
 
@@ -946,4 +946,3 @@ void mb88_cpu_device::execute_run()
 		update_pio(oc);
 	}
 }
-

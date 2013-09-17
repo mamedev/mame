@@ -104,7 +104,7 @@ void device_video_interface::interface_validity_check(validity_checker &valid) c
 			if (screen == NULL)
 				mame_printf_error("Screen '%s' not found, explicitly set for device '%s'", m_screen_tag, device().tag());
 		}
-		
+
 		// otherwise, look for a single match
 		else
 		{
@@ -138,7 +138,7 @@ void device_video_interface::interface_pre_start()
 			if (m_screen == NULL)
 				throw emu_fatalerror("Screen '%s' not found, explicitly set for device '%s'", m_screen_tag, device().tag());
 		}
-		
+
 		// otherwise, look for a single match
 		else
 		{

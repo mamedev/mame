@@ -124,7 +124,7 @@ struct QuadInfo
 	UINT8 DstAlpha;
 	UINT32 DstColor;
 };
- 
+
 /*
 Pick a rare enough color to disable transparency (that way I save a cmp per loop to check
 if I must draw transparent or not. The palette build will take this color in account so

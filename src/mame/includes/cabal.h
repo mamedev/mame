@@ -20,7 +20,7 @@ public:
 	required_shared_ptr<UINT16> m_spriteram;
 	required_shared_ptr<UINT16> m_colorram;
 	required_shared_ptr<UINT16> m_videoram;
-	
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	optional_device<seibu_sound_device> m_seibu_sound;
@@ -28,7 +28,7 @@ public:
 	optional_device<seibu_adpcm_device> m_adpcm2;
 	optional_device<msm5205_device> m_msm1;
 	optional_device<msm5205_device> m_msm2;
-		
+
 	tilemap_t *m_background_layer;
 	tilemap_t *m_text_layer;
 	int m_sound_command1;

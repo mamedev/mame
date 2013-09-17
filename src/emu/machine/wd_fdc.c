@@ -1466,7 +1466,7 @@ void wd_fdc_t::live_run(attotime limit)
 			if(cur_live.bit_counter & 15)
 				break;
 			int slot = (cur_live.bit_counter >> 4)-1;
-			//			fprintf(stderr, "%s: slot[%d] = %02x  crc = %04x\n", tts(cur_live.tm).cstr(), slot, cur_live.data_reg, cur_live.crc);
+			//          fprintf(stderr, "%s: slot[%d] = %02x  crc = %04x\n", tts(cur_live.tm).cstr(), slot, cur_live.data_reg, cur_live.crc);
 			cur_live.idbuf[slot] = cur_live.data_reg;
 			if(slot == 5) {
 				live_delay(IDLE);

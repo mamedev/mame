@@ -394,7 +394,7 @@ int running_machine::run(bool firstrun)
 		bool settingsloaded = config_load_settings(*this);
 		nvram_load(*this);
 		sound().ui_mute(false);
-		
+
 		// initialize ui lists
 		ui_initialize(*this);
 

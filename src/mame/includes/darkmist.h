@@ -18,10 +18,10 @@ public:
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_workram;
 	required_shared_ptr<UINT8> m_spriteram;
-	
+
 	required_device<cpu_device> m_maincpu;
 	required_device<t5182_device> m_t5182;
-	
+
 	int m_hw;
 	tilemap_t *m_bgtilemap;
 	tilemap_t *m_fgtilemap;

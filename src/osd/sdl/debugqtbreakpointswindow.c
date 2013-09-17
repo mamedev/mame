@@ -112,7 +112,7 @@ void BreakpointsWindowQtConfig::applyToQWidget(QWidget* widget)
 	BreakpointsWindow* window = dynamic_cast<BreakpointsWindow*>(widget);
 
 	QActionGroup* typeGroup = window->findChild<QActionGroup*>("typegroup");
- 	typeGroup->actions()[m_bwType]->trigger();
+	typeGroup->actions()[m_bwType]->trigger();
 }
 
 

@@ -175,11 +175,11 @@ static MC6845_INTERFACE( kaypro2x_crtc )
 ************************************************************/
 
 //FLOPPY_FORMATS_MEMBER( kaypro_state::kayproii_floppy_formats )
-//	FLOPPY_KAYPROII_FORMAT
+//  FLOPPY_KAYPROII_FORMAT
 //FLOPPY_FORMATS_END
 
 //FLOPPY_FORMATS_MEMBER( kaypro_state::kaypro2x_floppy_formats )
-//	FLOPPY_KAYPRO2X_FORMAT
+//  FLOPPY_KAYPRO2X_FORMAT
 //FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( kaypro_floppies )

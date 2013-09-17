@@ -37,9 +37,9 @@ enum { atarirle_hilite_index = -1 };
 //**************************************************************************
 
 //-------------------------------------------------
-//  round_to_powerof2: Rounds a number up to the 
-//  nearest power of 2. Even powers of 2 are 
-//  rounded up to the next greatest power 
+//  round_to_powerof2: Rounds a number up to the
+//  nearest power of 2. Even powers of 2 are
+//  rounded up to the next greatest power
 //  (e.g., 4 returns 8).
 //-------------------------------------------------
 
@@ -66,14 +66,14 @@ inline int atari_rle_objects_device::round_to_powerof2(int value)
 
 atari_rle_objects_device::atari_rle_objects_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ATARI_RLE_OBJECTS, "Atari RLE Motion Objects", tag, owner, clock, "atari_rle", __FILE__),
-	  device_video_interface(mconfig, *this)
+		device_video_interface(mconfig, *this)
 {
 }
 
 
 //-------------------------------------------------
 //  static_set_config: Set the tag of the
-//	sound CPU
+//  sound CPU
 //-------------------------------------------------
 
 void atari_rle_objects_device::static_set_config(device_t &device, const atari_rle_objects_config &config)
@@ -84,8 +84,8 @@ void atari_rle_objects_device::static_set_config(device_t &device, const atari_r
 
 
 //-------------------------------------------------
-//  control_write: Write handler for MO control 
-//	bits.
+//  control_write: Write handler for MO control
+//  bits.
 //-------------------------------------------------
 
 WRITE8_MEMBER(atari_rle_objects_device::control_write)
@@ -137,8 +137,8 @@ WRITE8_MEMBER(atari_rle_objects_device::control_write)
 
 
 //-------------------------------------------------
-//  command_write: Write handler for MO command 
-//	bits.
+//  command_write: Write handler for MO command
+//  bits.
 //-------------------------------------------------
 
 WRITE8_MEMBER(atari_rle_objects_device::command_write)
@@ -178,9 +178,9 @@ void atari_rle_objects_device::vblank_callback(screen_device &screen, bool state
 
 
 //-------------------------------------------------
-//  device_start: Configures the motion objects 
-//  using the input description. Allocates all 
-//  memory necessary and generates the attribute 
+//  device_start: Configures the motion objects
+//  using the input description. Allocates all
+//  memory necessary and generates the attribute
 //  lookup table.
 //-------------------------------------------------
 
@@ -284,7 +284,7 @@ void atari_rle_objects_device::device_reset()
 
 
 //-------------------------------------------------
-//  build_rle_tables: Builds internal table for 
+//  build_rle_tables: Builds internal table for
 //  RLE mapping.
 //-------------------------------------------------
 
@@ -439,8 +439,8 @@ void atari_rle_objects_device::prescan_rle(int which)
 
 
 //-------------------------------------------------
-//  compute_checksum: Compute the checksum values 
-//	on the ROMs.
+//  compute_checksum: Compute the checksum values
+//  on the ROMs.
 //-------------------------------------------------
 
 void atari_rle_objects_device::compute_checksum()
@@ -458,16 +458,16 @@ void atari_rle_objects_device::compute_checksum()
 
 
 //-------------------------------------------------
-//  sort_and_render: Render all motion objects in 
-//	order.
+//  sort_and_render: Render all motion objects in
+//  order.
 //-------------------------------------------------
 
 void atari_rle_objects_device::sort_and_render()
-{	
+{
 	// struct for sorting
 	struct sort_entry_t
 	{
-		sort_entry_t * 	next;
+		sort_entry_t *  next;
 		int             entry;
 	};
 
@@ -538,7 +538,7 @@ void atari_rle_objects_device::draw_rle(bitmap_ind16 &bitmap, const rectangle &c
 	if (info.data == NULL)
 		return;
 
-	// 
+	//
 	int scaled_xoffs = (xscale * info.xoffs) >> 12;
 	int scaled_yoffs = (yscale * info.yoffs) >> 12;
 
@@ -567,7 +567,7 @@ void atari_rle_objects_device::draw_rle(bitmap_ind16 &bitmap, const rectangle &c
 
 
 //-------------------------------------------------
-//  draw_rle_zoom: Draw an RLE-compressed object to 
+//  draw_rle_zoom: Draw an RLE-compressed object to
 //  a 16-bit bitmap.
 //-------------------------------------------------
 
@@ -745,8 +745,8 @@ void atari_rle_objects_device::draw_rle_zoom(bitmap_ind16 &bitmap, const rectang
 
 
 //-------------------------------------------------
-//  draw_rle_zoom_hflip: Draw an RLE-compressed 
-//  object to a 16-bit bitmap with horizontal 
+//  draw_rle_zoom_hflip: Draw an RLE-compressed
+//  object to a 16-bit bitmap with horizontal
 //  flip.
 //-------------------------------------------------
 
@@ -924,7 +924,7 @@ void atari_rle_objects_device::draw_rle_zoom_hflip(bitmap_ind16 &bitmap, const r
 
 //-------------------------------------------------
 //  hilite_object: Hilight an object by drawing a
-//	flashing box around it
+//  flashing box around it
 //-------------------------------------------------
 
 void atari_rle_objects_device::hilite_object(bitmap_ind16 &bitmap, int hilite)
@@ -1031,9 +1031,9 @@ void atari_rle_objects_device::hilite_object(bitmap_ind16 &bitmap, int hilite)
 //-------------------------------------------------
 
 atari_rle_objects_device::sprite_parameter::sprite_parameter()
-	: m_word(0), 
-		m_shift(0), 
-		m_mask(0) 
+	: m_word(0),
+		m_shift(0),
+		m_mask(0)
 {
 }
 

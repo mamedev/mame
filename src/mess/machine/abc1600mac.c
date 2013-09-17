@@ -241,7 +241,7 @@ UINT8 abc1600_mac_device::read_user_memory(offs_t offset)
 {
 	int nonx = 0, wp = 0;
 	offs_t virtual_offset = translate_address(offset, &nonx, &wp);
-	
+
 	return space().read_byte(virtual_offset);
 }
 

@@ -215,12 +215,12 @@ static ADDRESS_MAP_START( 25pacman_map, AS_PROGRAM, 8, _25pacman_state )
 	AM_RANGE(0x04800, 0x05fff) AM_RAM
 	AM_RANGE(0x06000, 0x06fff) AM_WRITEONLY AM_SHARE("char_gfx_ram")
 	AM_RANGE(0x0a000, 0x0bfff) AM_WRITE(sprite_gfx_w)
-//	AM_RANGE(0x0fffe, 0x0ffff) AM_WRITENOP
+//  AM_RANGE(0x0fffe, 0x0ffff) AM_WRITENOP
 
-//	AM_RANGE(0x0c000, 0x0dfff) // is this the sound waveforms in a different format?
+//  AM_RANGE(0x0c000, 0x0dfff) // is this the sound waveforms in a different format?
 	AM_RANGE(0x07000, 0x0717f) AM_WRITE(sprite_ram_w)
 
-//	AM_RANGE(0x00000, 0x3ffff) AM_DEVREADWRITE("flash", sst_39vf020_device, read, write )  // (always fall through if nothing else is mapped?)
+//  AM_RANGE(0x00000, 0x3ffff) AM_DEVREADWRITE("flash", sst_39vf020_device, read, write )  // (always fall through if nothing else is mapped?)
 
 ADDRESS_MAP_END
 
@@ -255,7 +255,7 @@ READ8_MEMBER( _25pacman_state::_25pacman_io_87_r )
 	return 0xff;
 }
 
- static ADDRESS_MAP_START( 25pacman_io_map, AS_IO, 8, _25pacman_state )
+	static ADDRESS_MAP_START( 25pacman_io_map, AS_IO, 8, _25pacman_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x3f) AM_NOP /* Z180 internal registers */
 	AM_RANGE(0x40, 0x7f) AM_NOP /* Z180 internal registers */
@@ -265,7 +265,7 @@ READ8_MEMBER( _25pacman_state::_25pacman_io_87_r )
 	AM_RANGE(0x80, 0x80) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x81, 0x81) AM_WRITE(timer_pulse_w)        /* ??? pulsed by the timer irq */
 	AM_RANGE(0x82, 0x82) AM_WRITE(irqack_w)
-//	AM_RANGE(0x84, 0x84) AM_NOP /* ?? */
+//  AM_RANGE(0x84, 0x84) AM_NOP /* ?? */
 	AM_RANGE(0x85, 0x86) AM_WRITEONLY AM_SHARE("stars_seed")    /* stars: rng seed (lo/hi) */
 	AM_RANGE(0x87, 0x87) AM_READ( _25pacman_io_87_r ) // not eeprom on this
 	AM_RANGE(0x88, 0x88) AM_WRITE(ram_bank_select_w)
@@ -339,7 +339,7 @@ static INPUT_PORTS_START( 20pacgal )
 
 	PORT_START( "EEPROMOUT" )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)    /* bit 5 is cs (active high) */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write) 	/* bit 6 is clock (active high) */
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write)     /* bit 6 is clock (active high) */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)    /* bit 7 is data */
 INPUT_PORTS_END
 
@@ -449,7 +449,7 @@ ROM_END
 // guzuta v2.2 PCB
 // this uses the main FLASH rom to save things instead of eeprom (type is AM29LV20)
 // different memory map.. no palette rom
-ROM_START( 25pacman ) /* Revision 3.00 */ 
+ROM_START( 25pacman ) /* Revision 3.00 */
 	ROM_REGION( 0x40000, "flash", 0 )
 	ROM_LOAD( "pacman25ver3.u1", 0x00000, 0x40000, CRC(55b0076e) SHA1(4544cc193bdd22bfc88d096083ccc4069cac4607) ) /* program says Rev 3.00 */
 	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASE00 )

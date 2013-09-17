@@ -111,8 +111,8 @@ offs_t cquestrot_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const U
 
 
 cquestlin_cpu_device::cquestlin_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : cpu_device(mconfig, CQUESTLIN, "Cube Quest Line CPU", tag, owner, clock, "cquestlin", __FILE__)
-    , m_program_config("program", ENDIANNESS_BIG, 64, 8, -3)
+	: cpu_device(mconfig, CQUESTLIN, "Cube Quest Line CPU", tag, owner, clock, "cquestlin", __FILE__)
+	, m_program_config("program", ENDIANNESS_BIG, 64, 8, -3)
 	, m_linedata_r(*this)
 	, m_flags(0)
 	, m_curpc(0)
@@ -358,8 +358,8 @@ void cquestrot_cpu_device::state_string_export(const device_state_entry &entry, 
 	{
 		case STATE_GENFLAGS:
 			string.printf( "%c%c%c", m_cflag ? 'C' : '.',
-			                         m_vflag ? 'V' : '.',
-			                         m_f ? '.' : 'Z');
+										m_vflag ? 'V' : '.',
+										m_f ? '.' : 'Z');
 			break;
 	}
 }
@@ -488,9 +488,9 @@ void cquestlin_cpu_device::state_string_export(const device_state_entry &entry, 
 	{
 		case STATE_GENFLAGS:
 			string.printf( "%c%c%c|%cG", m_cflag ? 'C' : '.',
-			                             m_vflag ? 'V' : '.',
-			                             m_f ? '.' : 'Z',
-			                             ( m_clkcnt & 3 ) ? 'B' : 'F');
+											m_vflag ? 'V' : '.',
+											m_f ? '.' : 'Z',
+											( m_clkcnt & 3 ) ? 'B' : 'F');
 			break;
 	}
 }
@@ -1551,4 +1551,3 @@ void cquestlin_cpu_device::execute_run()
 		m_clkcnt++;
 	} while (m_icount > 0);
 }
-

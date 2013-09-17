@@ -59,13 +59,13 @@ public:
 	void input_line_w(int section, int input_line, int data);
 	void enable_w(int section, int data);
 	int output_r(int section);
-	
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 private:
 	// internal state
 

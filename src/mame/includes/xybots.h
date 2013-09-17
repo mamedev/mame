@@ -19,10 +19,10 @@ public:
 			m_mob(*this, "mob") { }
 
 	required_device<atari_jsa_i_device> m_jsa;
-	required_device<tilemap_device>	m_playfield_tilemap;
-	required_device<tilemap_device>	m_alpha_tilemap;
+	required_device<tilemap_device> m_playfield_tilemap;
+	required_device<tilemap_device> m_alpha_tilemap;
 	required_device<atari_motion_objects_device> m_mob;
-	
+
 	UINT16          m_h256;
 	virtual void update_interrupts();
 	DECLARE_READ16_MEMBER(special_port1_r);

@@ -152,8 +152,8 @@ private:
 	INT16 ser2l;
 	INT16 ser3r;
 	INT16 ser3l;
-	INT64 machl;		// 48 bits, right justified and sign extended
-	bool mac_overflow;	// whether reading the MAC register should return a saturated replacement value
+	INT64 machl;        // 48 bits, right justified and sign extended
+	bool mac_overflow;  // whether reading the MAC register should return a saturated replacement value
 	INT32 dil;
 	INT32 memsiz;
 	INT32 memmask;
@@ -165,8 +165,8 @@ private:
 	INT32 dbase;
 	INT32 sigreg;
 	int mulshift;
-	INT8 ccr;			// really, 5 bits, left justified
-	INT8 cmr;			// really, 6 bits, left justified
+	INT8 ccr;           // really, 5 bits, left justified
+	INT8 cmr;           // really, 6 bits, left justified
 	INT32 dol[2];
 	int dol_count;
 

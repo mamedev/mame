@@ -23,45 +23,45 @@ CP/M, MP/M (concurrent - multitasking-like OS, even with terminals), or even MS-
 with Z80 or 8080. There was also LSI ELSIE system, a concurrent DOS. Last British LSI machines were 386 computers
 which could be used as servers for Octopus computers.
 
-Manufacturer 	Hilger Analytical / LSI Computers Ltd. 	
+Manufacturer    Hilger Analytical / LSI Computers Ltd.
 
-Origin 	UK
-Year of unit 	1986?
-Year of introduction 	1985
-End of production 	?
-CPU 	Z80, 8088
-Speed 	??
-RAM 	256kB
-ROM 	16kB (Basic)
-Colors: 	??
-Sound: 	Speaker. Beeps :)
-OS: 	CP/M 80 or 86
+Origin  UK
+Year of unit    1986?
+Year of introduction    1985
+End of production   ?
+CPU     Z80, 8088
+Speed   ??
+RAM     256kB
+ROM     16kB (Basic)
+Colors:     ??
+Sound:  Speaker. Beeps :)
+OS:     CP/M 80 or 86
 MP/M 80 o 86
 Concurrent CP/M
 LSI ELSIE
 MS-DOS
-Display modes: 	Text: ??
-Graphics: ?? 	 
-  	
-Media: 	Two internal 5.25" floppy disk drives, DS DD, 96tpi.
-Probably hard disk 	
+Display modes:  Text: ??
+Graphics: ??
+
+Media:  Two internal 5.25" floppy disk drives, DS DD, 96tpi.
+Probably hard disk
 
 Power supply:
 Built-in switching power supply.
 
-I/O: 	Serial port
+I/O:    Serial port
 2 parallel ports
 
 Video TTL Output
 Composite video output
- 
-Possible upgrades: 	Many
- 
+
+Possible upgrades:  Many
+
 Software accessibility:
 Dedicated: Impossible.
 CP/M - Good
 DOS - Good.
-  	 
+
 It won't take XT nor AT keyboard, but pinout is quite similar. UPDATE: I saw a few photos of keyboard.
 It's another Z80 computer! It has an EPROM, simple memory and CPU.
 
@@ -100,7 +100,7 @@ Enter selection:
 This information was gained by studying boot ROM of the machine.
 
 It's a very rare computer. It has 2 processors, Z80 and 8088, so it seems that it may run CP/M and DOS.
-Its BIOS performs POST and halts as there's no keyboard. 
+Its BIOS performs POST and halts as there's no keyboard.
 
 ****************************************************************************/
 

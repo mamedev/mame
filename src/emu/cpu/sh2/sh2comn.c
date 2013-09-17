@@ -17,11 +17,11 @@
 
 INLINE sh2_state *GET_SH2(device_t *dev)
 {
-  if (dev->machine().options().drc()) {
+	if (dev->machine().options().drc()) {
 	return *(sh2_state **)downcast<legacy_cpu_device *>(dev)->token();
-  } else {
+	} else {
 	return (sh2_state *)downcast<legacy_cpu_device *>(dev)->token();
-  }
+	}
 }
 
 static const int div_tab[4] = { 3, 5, 7, 0 };
@@ -844,7 +844,7 @@ void sh2_set_irq_line(sh2_state *sh2, int irqline, int state)
 			sh2_exception(sh2, "Set IRQ line", 16);
 
 			if (sh2->isdrc)
-				sh2->pending_nmi = 1;			
+				sh2->pending_nmi = 1;
 		}
 	}
 	else

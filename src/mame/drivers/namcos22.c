@@ -138,8 +138,8 @@
  *  RR1.GAM (for Ridge Racer 1/2, Rave Racer)
  **********************************************************************************************************
  *
- *Namco Super System 22 Hardware Overview (last updated 21st 
- *December 2012 at 7:15pm) 
+ *Namco Super System 22 Hardware Overview (last updated 21st
+ *December 2012 at 7:15pm)
  *---------------------------------------
  *
  *This document covers all the known Namco Super System 22 games, including....
@@ -883,8 +883,8 @@
  *
  *Game               ROMs populated (All Intel E28F016SA TSOP56 16M FlashROMs)
  *-----------------------------------------------------------------
- *Armadillo Racing   F1E, F1J, F2E, F2J            - CCRL/CCRH 
- *ROMs (prototype or 
+ *Armadillo Racing   F1E, F1J, F2E, F2J            - CCRL/CCRH
+ *ROMs (prototype or
  *early test version)F4E, F4J, F5E, F5J, F6E, F6J, \
  *                   F7E, F7J, F8E, F8J, F9E, F9J, \ CGx ROMs
  *                   F11E, F11J, F12E, F12J        /
@@ -1292,7 +1292,7 @@ WRITE8_MEMBER(namcos22_state::namcos22s_system_controller_w)
 			}
 			break;
 		}
-		
+
 		// acknowledge irqs
 		case 0x04: // vblank
 		case 0x05: // hblank
@@ -1304,16 +1304,16 @@ WRITE8_MEMBER(namcos22_state::namcos22s_system_controller_w)
 			m_maincpu->set_input_line(m_syscontrol[offset-4] & 7, CLEAR_LINE);
 			break;
 		}
-		
+
 		// watchdog
 		case 0x14:
 			break;
-		
+
 		// reset mcu
 		case 0x16:
 			m_mcu->set_input_line(INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
 			break;
-		
+
 		// dsp control
 		case 0x1c:
 			if (data != m_syscontrol[0x1c])
@@ -1341,12 +1341,12 @@ WRITE8_MEMBER(namcos22_state::namcos22s_system_controller_w)
 				}
 			}
 			break;
-		
+
 		// other regs: unknown
 		default:
 			break;
 	}
-	
+
 	m_syscontrol[offset] = data;
 }
 
@@ -1436,7 +1436,7 @@ WRITE8_MEMBER(namcos22_state::namcos22_system_controller_w)
 			}
 			break;
 		}
-		
+
 		// acknowledge irqs
 		case 0x05: // unknown
 		case 0x06: // ?
@@ -1449,11 +1449,11 @@ WRITE8_MEMBER(namcos22_state::namcos22_system_controller_w)
 			m_maincpu->set_input_line(m_syscontrol[offset-5] & 7, CLEAR_LINE);
 			break;
 		}
-		
+
 		// watchdog
 		case 0x16:
 			break;
-		
+
 		// reset mcu
 		case 0x18:
 			m_mcu->set_input_line(INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
@@ -1661,7 +1661,7 @@ WRITE32_MEMBER(namcos22_state::namcos22s_chipselect_w)
 	// other bits: no clue
 	if (ACCESSING_BITS_16_23)
 		m_chipselect = data >> 16;
-	
+
 	// 8-bit access? (see alpinerd)
 	else if (ACCESSING_BITS_24_31)
 		m_chipselect = data >> 24;
@@ -1987,7 +1987,7 @@ void namcos22_state::slave_enable()
 READ16_MEMBER(namcos22_state::namcos22_dspram16_r)
 {
 	UINT32 value = m_polygonram[offset];
-	
+
 	switch (m_dspram_bank)
 	{
 		case 0:
@@ -2006,7 +2006,7 @@ READ16_MEMBER(namcos22_state::namcos22_dspram16_r)
 		default:
 			break;
 	}
-	
+
 	return (UINT16)value;
 }
 
@@ -2034,7 +2034,7 @@ WRITE16_MEMBER(namcos22_state::namcos22_dspram16_w)
 		default:
 			break;
 	}
-	
+
 	m_polygonram[offset] = (hi << 16) | lo;
 }
 
@@ -2246,7 +2246,7 @@ READ16_MEMBER(namcos22_state::pdp_begin_r)
 			}
 		}
 	}
-	
+
 	return 0;
 }
 
@@ -3681,7 +3681,7 @@ void namcos22_state::machine_reset()
 	m_master->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_slave->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_mcu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	
+
 	m_poly->reset();
 }
 
@@ -3799,7 +3799,7 @@ static MACHINE_CONFIG_DERIVED( alpine, namcos22s )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("mcu")
 	MCFG_CPU_IO_MAP(alpine_io_map)
-	
+
 	MCFG_TIMER_DRIVER_ADD("motor_timer", namcos22_state, alpine_steplock_callback)
 MACHINE_CONFIG_END
 
@@ -3822,7 +3822,7 @@ static MACHINE_CONFIG_DERIVED( propcycl, namcos22s )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("mcu")
 	MCFG_CPU_IO_MAP(propcycl_io_map)
-	
+
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("pc_p_upd", namcos22_state, propcycl_pedal_update, attotime::from_msec(20))
 	MCFG_TIMER_DRIVER_ADD("pc_p_int", namcos22_state, propcycl_pedal_interrupt)
 MACHINE_CONFIG_END

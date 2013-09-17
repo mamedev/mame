@@ -1,9 +1,9 @@
 /***************************************************************************
- 
+
   esqpump.c - Ensoniq 5505/5506 to 5510 interface.
- 
+
   By Christian Brunschen
- 
+
 ***************************************************************************/
 
 #include "sound/esqpump.h"
@@ -70,7 +70,7 @@ void esq_5505_5510_pump::sound_stream_update(sound_stream &stream, stream_sample
 	for (int i = 0; i < samples; i++)
 	{
 #define SAMPLE_SHIFT 4
-	    // anything for the 'aux' output?
+		// anything for the 'aux' output?
 		INT16 l = inputs[0][i] >> SAMPLE_SHIFT;
 		INT16 r = inputs[1][i] >> SAMPLE_SHIFT;
 
@@ -108,7 +108,7 @@ void esq_5505_5510_pump::sound_stream_update(sound_stream &stream, stream_sample
 		INT32 er = (inputs[3][i]) + (inputs[5][i]) + (inputs[7][i]);
 		INT32 e_next = el + er;
 		e[(ei + 0x1d0f) % 0x4000] = e_next;
-		
+
 		if (l != e[ei]) {
 			fprintf(stderr, "expected (%d) but have (%d)\n", e[ei], l);
 		}
@@ -166,4 +166,3 @@ void esq_5505_5510_pump::device_timer(emu_timer &timer, device_timer_id id, int 
 	// ecery time there's a new sample period, update the stream!
 	m_stream->update();
 }
-

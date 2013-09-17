@@ -76,7 +76,7 @@ public:
 	UINT16 *                m_dsk_zram;
 	UINT16 *                m_m68k_slapstic_base;
 	UINT16 *                m_m68k_sloop_alt_base;
-	
+
 	required_shared_ptr<UINT16> m_zram;
 
 	optional_shared_ptr<UINT16> m_adsp_data_memory;

@@ -1176,4 +1176,3 @@ void pic16c62x_device::device_reset()
 	pic16c62x_reset_regs();
 	SET(STATUS, (TO_FLAG | PD_FLAG));
 }
-

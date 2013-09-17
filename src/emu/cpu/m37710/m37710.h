@@ -161,7 +161,7 @@ private:
 	address_space *m_program;
 	address_space *m_io;
 	UINT32 m_stopped;       /* Sets how the CPU is stopped */
-	
+
 	// on-board peripheral stuff
 	UINT8 m_m37710_regs[128];
 	attotime m_reload[8];

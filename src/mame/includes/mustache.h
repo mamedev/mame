@@ -12,10 +12,10 @@ public:
 
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_spriteram;
-	
+
 	required_device<cpu_device> m_maincpu;
 	required_device<seibu_sound_device> m_cpu_decrypt;
-	
+
 	tilemap_t *m_bg_tilemap;
 	int m_control_byte;
 	DECLARE_WRITE8_MEMBER(mustache_videoram_w);

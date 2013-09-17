@@ -24,10 +24,9 @@ public:
 		m_esp_halted = esp_halted;
 		logerror("ESP-halted -> %d\n", m_esp_halted);
 		if (!esp_halted) {
-
 #if PUMP_REPLACE_ESP_PROGRAM
 			m_esp->write_reg(245, 0x1d0f << 8); // dlength = 0x3fff, 16-sample delay
-			
+
 			int pc = 0;
 			for (pc = 0; pc < 0xc0; pc++) {
 				m_esp->write_reg(pc, 0);
@@ -41,7 +40,7 @@ public:
 			m_esp->_instr(pc++) = 0xffffeea00000; // ADD SER2R, gpr_a0 > gpr_a0
 
 			m_esp->_instr(pc  ) = 0xffffefa00000; // ADD SER2L, gpr_a0 > gpr_a0; prepare to read from delay 2 instructions from now, offset = 0
-            m_esp->write_reg(pc++, 0); //offset into delay
+			m_esp->write_reg(pc++, 0); //offset into delay
 
 			m_esp->_instr(pc  ) = 0xffffa0a09508; // MOV gpr_a0 > delay + offset
 			m_esp->write_reg(pc++, 1 << 8); // offset into delay - -1 samples

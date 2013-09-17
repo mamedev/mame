@@ -87,10 +87,10 @@ eeprom_base_device::eeprom_base_device(const machine_config &mconfig, device_typ
 		m_completion_time(attotime::zero)
 {
 	// a 2ms write time is too long for rfjetsa
-	m_operation_time[WRITE_TIME] 		= attotime::from_usec(1750);
-	m_operation_time[WRITE_ALL_TIME] 	= attotime::from_usec(8000);
-	m_operation_time[ERASE_TIME] 		= attotime::from_usec(1000);
-	m_operation_time[ERASE_ALL_TIME] 	= attotime::from_usec(8000);
+	m_operation_time[WRITE_TIME]        = attotime::from_usec(1750);
+	m_operation_time[WRITE_ALL_TIME]    = attotime::from_usec(8000);
+	m_operation_time[ERASE_TIME]        = attotime::from_usec(1000);
+	m_operation_time[ERASE_ALL_TIME]    = attotime::from_usec(8000);
 }
 
 
@@ -195,8 +195,8 @@ void eeprom_base_device::write(offs_t address, UINT32 data)
 
 //-------------------------------------------------
 //  write_all - write data at all addresses
-//	(assumes an erase has previously been 
-//	performed)
+//  (assumes an erase has previously been
+//  performed)
 //-------------------------------------------------
 
 void eeprom_base_device::write_all(UINT32 data)
@@ -308,7 +308,7 @@ void eeprom_base_device::nvram_default()
 	if (m_default_data.u8 != NULL)
 	{
 		mame_printf_verbose("Warning: Driver-specific EEPROM defaults are going away soon.\n");
-		for (offs_t offs = 0; offs < m_default_data_size; offs++) 
+		for (offs_t offs = 0; offs < m_default_data_size; offs++)
 		{
 			if (m_data_bits == 8)
 				m_addrspace[0]->write_byte(offs, m_default_data.u8[offs]);
@@ -385,8 +385,8 @@ UINT32 eeprom_base_device::internal_read(offs_t address)
 
 
 //-------------------------------------------------
-//  internal_write - write data at the given 
-//	address
+//  internal_write - write data at the given
+//  address
 //-------------------------------------------------
 
 void eeprom_base_device::internal_write(offs_t address, UINT32 data)

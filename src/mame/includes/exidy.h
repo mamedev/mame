@@ -45,7 +45,7 @@ public:
 		m_dac(*this, "dac"),
 		m_samples(*this, "samples") { }
 
-	
+
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_sprite1_xpos;
 	required_shared_ptr<UINT8> m_sprite1_ypos;
@@ -55,11 +55,11 @@ public:
 	required_shared_ptr<UINT8> m_sprite_enable;
 	required_shared_ptr<UINT8> m_color_latch;
 	required_shared_ptr<UINT8> m_characterram;
-	
+
 	required_device<cpu_device> m_maincpu;
 	optional_device<dac_device> m_dac;
 	optional_device<samples_device> m_samples;
-		
+
 	UINT8 m_last_dial;
 	UINT8 m_collision_mask;
 	UINT8 m_collision_invert;
@@ -94,7 +94,7 @@ public:
 	inline int sprite_1_enabled();
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void check_collision();
-	
+
 	/* Targ and Spectar samples */
 	int m_max_freq;
 	UINT8 m_port_1_last;
@@ -107,7 +107,7 @@ public:
 	DECLARE_WRITE8_MEMBER(spectar_audio_2_w);
 	void adjust_sample(UINT8 freq);
 	void common_audio_start(int freq);
-	
+
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);

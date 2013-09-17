@@ -186,7 +186,7 @@ void pgm_028_025_state::IGS028_do_dma(UINT16 src, UINT16 dst, UINT16 size, UINT1
 	UINT16 param = mode >> 8;
 	UINT16 *PROTROM = (UINT16*)memregion("user1")->base();
 
-//	logerror ("mode: %2.2x, src: %4.4x, dst: %4.4x, size: %4.4x, data: %4.4x\n", (mode &0xf), src, dst, size, mode);
+//  logerror ("mode: %2.2x, src: %4.4x, dst: %4.4x, size: %4.4x, data: %4.4x\n", (mode &0xf), src, dst, size, mode);
 
 	mode &= 0x0f;
 
@@ -214,7 +214,7 @@ void pgm_028_025_state::IGS028_do_dma(UINT16 src, UINT16 dst, UINT16 size, UINT1
 				if (mode==0) dat2 = 0x4e75; // hack
 				if (mode==1) dat2  = ((dat2 & 0xf000) >> 12) | ((dat2 & 0x0f00) >> 4) | ((dat2 & 0x00f0) << 4) | ((dat2 & 0x000f) << 12);
 				if (mode==2) dat2 ^= extraxor;
-			//	if (mode==5) dat2  = dat2;
+			//  if (mode==5) dat2  = dat2;
 				if (mode==6) dat2 += extraxor;
 
 				if (mode==2 || mode==6) dat2 = (dat2<<8)|(dat2>>8);
@@ -224,8 +224,8 @@ void pgm_028_025_state::IGS028_do_dma(UINT16 src, UINT16 dst, UINT16 size, UINT1
 		}
 		break;
 
-	//	default:
-	//		logerror ("DMA mode unknown!!!\nsrc:%4.4x, dst: %4.4x, size: %4.4x, mode: %4.4x\n", src, dst, size, mode);
+	//  default:
+	//      logerror ("DMA mode unknown!!!\nsrc:%4.4x, dst: %4.4x, size: %4.4x, mode: %4.4x\n", src, dst, size, mode);
 	}
 }
 
@@ -304,40 +304,40 @@ WRITE16_MEMBER(pgm_028_025_state::olds_w )
 
 					case 0x64: // incomplete?
 					{
-					        UINT16 p1 = m_sharedprotram[0x3050 / 2];
-					        UINT16 p2 = m_sharedprotram[0x3082 / 2];
-					        UINT16 p3 = m_sharedprotram[0x3054 / 2];
-					        UINT16 p4 = m_sharedprotram[0x3088 / 2];
+							UINT16 p1 = m_sharedprotram[0x3050 / 2];
+							UINT16 p2 = m_sharedprotram[0x3082 / 2];
+							UINT16 p3 = m_sharedprotram[0x3054 / 2];
+							UINT16 p4 = m_sharedprotram[0x3088 / 2];
 
-					        if (p2  == 0x02)
-					                olds_write_reg(p1, olds_read_reg(p1) + 0x10000);
+							if (p2  == 0x02)
+									olds_write_reg(p1, olds_read_reg(p1) + 0x10000);
 
-					        switch (p4)
-					        {
-					                case 0xd:
-					                        olds_write_reg(p1,olds_read_reg(p3));
-					                        break;
-					                case 0x0:
-					                        olds_write_reg(p3,(olds_read_reg(p2))^(olds_read_reg(p1)));
-					                        break;
-					                case 0xe:
-					                        olds_write_reg(p3,olds_read_reg(p3)+0x10000);
-					                        break;
-					                case 0x2:
-					                        olds_write_reg(p1,(olds_read_reg(p2))+(olds_read_reg(p3)));
-					                        break;
-					                case 0x6:
-					                        olds_write_reg(p3,(olds_read_reg(p2))&(olds_read_reg(p1)));
-					                        break;
-					                case 0x1:
-					                        olds_write_reg(p2,olds_read_reg(p1)+0x10000);
-					                        break;
-					                case 0x7:
-					                        olds_write_reg(p3,olds_read_reg(p1));
-					                        break;
-					                default:
-					                        break;
-					        }
+							switch (p4)
+							{
+									case 0xd:
+											olds_write_reg(p1,olds_read_reg(p3));
+											break;
+									case 0x0:
+											olds_write_reg(p3,(olds_read_reg(p2))^(olds_read_reg(p1)));
+											break;
+									case 0xe:
+											olds_write_reg(p3,olds_read_reg(p3)+0x10000);
+											break;
+									case 0x2:
+											olds_write_reg(p1,(olds_read_reg(p2))+(olds_read_reg(p3)));
+											break;
+									case 0x6:
+											olds_write_reg(p3,(olds_read_reg(p2))&(olds_read_reg(p1)));
+											break;
+									case 0x1:
+											olds_write_reg(p2,olds_read_reg(p1)+0x10000);
+											break;
+									case 0x7:
+											olds_write_reg(p3,olds_read_reg(p1));
+											break;
+									default:
+											break;
+							}
 					}
 					break;
 
@@ -365,8 +365,8 @@ WRITE16_MEMBER(pgm_028_025_state::olds_w )
 				olds_protection_calculate_hold(m_olds_cmd & 0x0f, data & 0xff);
 			break;
 
-		//	default:
-		//		logerror ("unemulated write mode!\n");
+		//  default:
+		//      logerror ("unemulated write mode!\n");
 		}
 	}
 }
@@ -420,8 +420,8 @@ MACHINE_RESET_MEMBER(pgm_028_025_state,olds)
 {
 	MACHINE_RESET_CALL_MEMBER(pgm);
 
-//	written by protection device
-//	there seems to be an auto-dma that writes from $401000-402573?
+//  written by protection device
+//  there seems to be an auto-dma that writes from $401000-402573?
 	m_sharedprotram[0x1000/2] = 0x4749; // 'IGS.28'
 	m_sharedprotram[0x1002/2] = 0x2E53;
 	m_sharedprotram[0x1004/2] = 0x3832;

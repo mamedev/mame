@@ -74,7 +74,7 @@ public:
 		m_textram(*this, "textram"),
 		m_spritebank(*this, "spritebank"),
 		m_maincpu(*this, "maincpu"),
-		m_t5182(*this, "t5182")	{ }
+		m_t5182(*this, "t5182") { }
 
 	required_shared_ptr<UINT8> m_mainram;
 	required_shared_ptr<UINT8> m_spriteram;
@@ -289,8 +289,8 @@ UINT32 panicr_state::screen_update_panicr(screen_device &screen, bitmap_ind16 &b
 	m_bgtilemap->set_scrollx(0, m_scrollx);
 	m_bgtilemap->draw(screen, *m_temprender, m_tempbitmap_clip, 0,0);
 
-//	m_infotilemap_2->set_scrollx(0, m_scrollx);
-//	m_infotilemap_2->draw(screen, *m_temprender, m_tempbitmap_clip, 0,0);
+//  m_infotilemap_2->set_scrollx(0, m_scrollx);
+//  m_infotilemap_2->draw(screen, *m_temprender, m_tempbitmap_clip, 0,0);
 
 
 	bitmap.fill(get_black_pen(machine()), cliprect);
@@ -619,7 +619,7 @@ static MACHINE_CONFIG_START( panicr, panicr_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
-//	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
+//  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
 	MCFG_SCREEN_UPDATE_DRIVER(panicr_state, screen_update_panicr)

@@ -35,13 +35,13 @@ public:
 
 	DECLARE_READ16_MEMBER( read );
 	DECLARE_WRITE16_MEMBER( write );
-	
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 private:
 	// internal state
 	smc91c9x_irq_func m_irq_handler;
@@ -64,7 +64,7 @@ private:
 	/* counters */
 	UINT32          m_sent;
 	UINT32          m_recd;
-	
+
 	void update_ethernet_irq();
 	void update_stats();
 	void finish_enqueue(int param);

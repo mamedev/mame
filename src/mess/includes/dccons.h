@@ -9,11 +9,11 @@ public:
 	dc_cons_state(const machine_config &mconfig, device_type type, const char *tag)
 		: dc_state(mconfig, type, tag),
 		m_ata(*this, "ata")
-//		  m_dcflash(*this, "dcflash")
+//        m_dcflash(*this, "dcflash")
 		{ }
 
 	required_device<ata_interface_device> m_ata;
-//	required_device<macronix_29lv160tmc_device> m_dcflash;
+//  required_device<macronix_29lv160tmc_device> m_dcflash;
 
 	DECLARE_DRIVER_INIT(dc);
 	DECLARE_DRIVER_INIT(dcus);
@@ -36,8 +36,8 @@ public:
 	void dreamcast_atapi_init();
 	DECLARE_READ32_MEMBER( dc_mess_g1_ctrl_r );
 	DECLARE_WRITE32_MEMBER( dc_mess_g1_ctrl_w );
-//	DECLARE_READ8_MEMBER( dc_flash_r );
-//	DECLARE_WRITE8_MEMBER( dc_flash_w );
+//  DECLARE_READ8_MEMBER( dc_flash_r );
+//  DECLARE_WRITE8_MEMBER( dc_flash_w );
 
 private:
 	UINT64 PDTRA, PCTRA;

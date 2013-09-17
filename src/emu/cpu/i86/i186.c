@@ -1284,8 +1284,8 @@ void i80186_cpu_device::drq_callback(int which)
 		update_interrupt_state();
 	}
 
-//	dma->finish_timer->adjust(attotime::from_hz(clock()/8), 0);
-//	dma->drq_delay = true;
+//  dma->finish_timer->adjust(attotime::from_hz(clock()/8), 0);
+//  dma->drq_delay = true;
 }
 
 READ16_MEMBER(i80186_cpu_device::internal_port_r)

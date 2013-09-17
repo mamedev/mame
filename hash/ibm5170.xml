@@ -13,7 +13,7 @@ Missing files come here
 		<description>Advanced Diagnostics for the IBM AT (v2.07)</description>
 		<year>1985</year>
 		<publisher>IBM</publisher>
-		
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<rom name="atad_207.img" size="368640" crc="43d0783b" sha1="63a48f7dd92382356222ed2030cd4b900d09de3d" offset="0" />

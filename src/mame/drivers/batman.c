@@ -200,7 +200,7 @@ static MACHINE_CONFIG_START( batman, batman_state )
 
 	MCFG_MACHINE_START_OVERRIDE(batman_state,batman)
 	MCFG_MACHINE_RESET_OVERRIDE(batman_state,batman)
-	
+
 	MCFG_ATARI_EEPROM_2816_ADD("eeprom")
 
 	/* video hardware */

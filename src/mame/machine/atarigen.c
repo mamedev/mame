@@ -871,7 +871,7 @@ atari_eeprom_device::atari_eeprom_device(const machine_config &mconfig, device_t
 
 //-------------------------------------------------
 //  unlock_read/unlock_write - unlock read/write
-//	handlers
+//  handlers
 //-------------------------------------------------
 
 READ8_MEMBER(atari_eeprom_device::unlock_read) { m_unlocked = true; return space.unmap(); }
@@ -936,7 +936,7 @@ atari_eeprom_2804_device::atari_eeprom_2804_device(const machine_config &mconfig
 
 //-------------------------------------------------
 //  device_mconfig_additions - return machine
-//	config fragment
+//  config fragment
 //-------------------------------------------------
 
 MACHINE_CONFIG_FRAGMENT(atari_eeprom_2804_config)
@@ -961,7 +961,7 @@ atari_eeprom_2816_device::atari_eeprom_2816_device(const machine_config &mconfig
 
 //-------------------------------------------------
 //  device_mconfig_additions - return machine
-//	config fragment
+//  config fragment
 //-------------------------------------------------
 
 MACHINE_CONFIG_FRAGMENT(atari_eeprom_2816_config)

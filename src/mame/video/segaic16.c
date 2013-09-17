@@ -373,7 +373,7 @@ const device_type SEGAIC16VID = &device_creator<segaic16_video_device>;
 
 segaic16_video_device::segaic16_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SEGAIC16VID, "Sega 16-bit Video", tag, owner, clock, "segaic16_video", __FILE__),
-	  device_video_interface(mconfig, *this)
+		device_video_interface(mconfig, *this)
 {
 }
 

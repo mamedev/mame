@@ -28,7 +28,7 @@ public:
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;
 	required_shared_ptr<UINT8> m_charram;
-	
+
 	required_device<cpu_device> m_maincpu;
 	required_device<snk6502_sound_device> m_sound;
 
@@ -102,7 +102,7 @@ public:
 	DECLARE_WRITE8_MEMBER( vanguard_speech_w );
 	DECLARE_WRITE8_MEMBER( fantasy_sound_w );
 	DECLARE_WRITE8_MEMBER( fantasy_speech_w );
-	
+
 	void set_music_clock(double clock_time);
 	void set_music_freq(int freq);
 	int music0_playing();
@@ -131,7 +131,7 @@ private:
 	UINT32 m_hd38880_addr;
 	int m_hd38880_data_bytes;
 	double m_hd38880_speed;
-	
+
 	inline void validate_tone_channel(int channel);
 	void sasuke_build_waveform(int mask);
 	void satansat_build_waveform(int mask);

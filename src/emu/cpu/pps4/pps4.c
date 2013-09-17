@@ -367,4 +367,3 @@ void pps4_device::device_reset()
 	m_SB.d = 0;
 	m_B.d = 0;
 }
-

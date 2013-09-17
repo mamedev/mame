@@ -249,9 +249,9 @@ static ADDRESS_MAP_START(c8002_mem, AS_PROGRAM, 16, onyx_state)
 ADDRESS_MAP_END
 
 //static ADDRESS_MAP_START(c8002_data, AS_DATA, 16, onyx_state)
-//	AM_RANGE(0x00000, 0x00fff) AM_ROM AM_SHARE("share0")
-//	AM_RANGE(0x01000, 0x07fff) AM_RAM AM_SHARE("share1")
-//	AM_RANGE(0x08000, 0xfffff) AM_RAM AM_SHARE("share2")
+//  AM_RANGE(0x00000, 0x00fff) AM_ROM AM_SHARE("share0")
+//  AM_RANGE(0x01000, 0x07fff) AM_RAM AM_SHARE("share1")
+//  AM_RANGE(0x08000, 0xfffff) AM_RAM AM_SHARE("share2")
 //ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(c8002_io, AS_IO, 8, onyx_state)

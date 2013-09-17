@@ -92,7 +92,7 @@ public:
 
 	template<class _BitmapClass>
 	void custom_tilemap_draw(
-	screen_device &screen, 
+	screen_device &screen,
 	_BitmapClass &bitmap,
 	const rectangle &cliprect,
 	tilemap_t *tilemap0_8x8,

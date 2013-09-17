@@ -2168,4 +2168,3 @@ void tmp95c063_device::execute_set_input(int input, int level)
 	}
 	m_check_irqs = 1;
 }
-

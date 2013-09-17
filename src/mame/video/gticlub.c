@@ -1591,5 +1591,3 @@ static int tick = 0;
 static int debug_tex_page = 0;
 static int debug_tex_palette = 0;
 */
-
-

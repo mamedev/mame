@@ -411,9 +411,9 @@ void galaxian_sound_device::device_config_complete()
 void galaxian_sound_device::device_start()
 {
 	m_lfo_val = 0;
-	
+
 	m_discrete = machine().device<discrete_device>(GAL_AUDIO);
-	
+
 	save_item(NAME(m_lfo_val));
 }
 
@@ -508,7 +508,7 @@ MACHINE_CONFIG_FRAGMENT( galaxian_audio )
 
 	MCFG_SOUND_ADD("cust", GALAXIAN, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.4)
-	
+
 	MCFG_SOUND_ADD(GAL_AUDIO, DISCRETE, 0)
 	MCFG_SOUND_CONFIG_DISCRETE(galaxian)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -518,7 +518,7 @@ MACHINE_CONFIG_FRAGMENT( mooncrst_audio )
 
 	MCFG_SOUND_ADD("cust", GALAXIAN, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.4)
-	
+
 	MCFG_SOUND_ADD(GAL_AUDIO, DISCRETE, 0)
 	MCFG_SOUND_CONFIG_DISCRETE(mooncrst)
 

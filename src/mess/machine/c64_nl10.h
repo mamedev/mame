@@ -24,7 +24,7 @@
 // ======================> c64_nl10_interface_device
 
 class c64_nl10_interface_device :  public device_t,
-						   		   public device_cbm_iec_interface
+									public device_cbm_iec_interface
 {
 public:
 	// construction/destruction

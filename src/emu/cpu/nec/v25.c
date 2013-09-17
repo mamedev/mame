@@ -711,7 +711,7 @@ static CPU_GET_INFO( v25v35 )
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:           info->icount = &nec_state->icount;              break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "NEC");                 break;		
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "NEC");                 break;
 		case CPUINFO_STR_FAMILY:                    strcpy(info->s, "NEC V-Series");        break;
 		case CPUINFO_STR_VERSION:                   strcpy(info->s, "2.0");                 break;
 		case CPUINFO_STR_SOURCE_FILE:                       strcpy(info->s, __FILE__);              break;

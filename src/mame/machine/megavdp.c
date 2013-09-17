@@ -24,9 +24,9 @@ const device_type SEGA_GEN_VDP = &device_creator<sega_genesis_vdp_device>;
 
 sega_genesis_vdp_device::sega_genesis_vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: sega315_5124_device( mconfig, SEGA315_5246, "Sega Genesis VDP", tag, owner, clock, SEGA315_5124_CRAM_SIZE, 0, true, "sega_genesis_vdp", __FILE__),
- 	m_genesis_vdp_sndirqline_callback(*this),
- 	m_genesis_vdp_lv6irqline_callback(*this),
- 	m_genesis_vdp_lv4irqline_callback(*this)
+	m_genesis_vdp_sndirqline_callback(*this),
+	m_genesis_vdp_lv6irqline_callback(*this),
+	m_genesis_vdp_lv4irqline_callback(*this)
 {
 	m_use_alt_timing = 0;
 	m_palwrite_base = -1;

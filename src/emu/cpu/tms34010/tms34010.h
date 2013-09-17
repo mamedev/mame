@@ -210,10 +210,10 @@ class tms34010_device : public legacy_cpu_device
 public:
 	tms34010_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock);
 	tms34010_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, cpu_get_info_func get_info);
-	
+
 	UINT32 tms340x0_ind16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 tms340x0_rgb32(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-}; 
+};
 
 extern const device_type TMS34010;
 

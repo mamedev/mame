@@ -151,7 +151,7 @@ WRITE32_MEMBER(dc_cons_state::dc_mess_g1_ctrl_w )
 			/* 12x * 75 Hz = 0,00(1) secs per sector */
 			/* TODO: make DMA to be single step */
 			atapi_timer->adjust(attotime::from_usec(1111*atapi_xferlen/2048));
-//			atapi_regs[ATAPI_REG_SAMTAG] = GDROM_PAUSE_STATE | 0x80;
+//          atapi_regs[ATAPI_REG_SAMTAG] = GDROM_PAUSE_STATE | 0x80;
 		}
 		break;
 
@@ -163,7 +163,7 @@ WRITE32_MEMBER(dc_cons_state::dc_mess_g1_ctrl_w )
 	case GD_UNLOCK:
 		if (data==0 || data==0x001fffff || data==0x42fe)
 		{
-//			atapi_regs[ATAPI_REG_SAMTAG] = GDROM_PAUSE_STATE | 0x80;
+//          atapi_regs[ATAPI_REG_SAMTAG] = GDROM_PAUSE_STATE | 0x80;
 			printf("Unlocking GD-ROM! %x\n", data);
 		}
 		break;

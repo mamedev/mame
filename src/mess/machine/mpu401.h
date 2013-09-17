@@ -73,5 +73,3 @@ private:
 extern const device_type MPU401;
 
 #endif  /* __MPU401_H__ */
-
-

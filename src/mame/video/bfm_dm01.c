@@ -63,7 +63,7 @@ bfmdm01_device::bfmdm01_device(const machine_config &mconfig, const char *tag, d
 {
 	for (int i = 0; i < 65; i++)
 	m_segbuffer[i] = 0;
-	
+
 	for (int i = 0; i < DM_BYTESPERROW; i++)
 	m_scanline[i] = 0;
 }
@@ -98,10 +98,10 @@ void bfmdm01_device::device_start()
 	save_item(NAME(m_xcounter));
 	save_item(NAME(m_busy));
 	save_item(NAME(m_comdata));
-	
+
 	for (int i = 0; i < 65; i++)
 	save_item(NAME(m_segbuffer), i);
-	
+
 	for (int i = 0; i < DM_BYTESPERROW; i++)
 	save_item(NAME(m_scanline), i);
 }

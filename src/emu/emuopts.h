@@ -206,9 +206,9 @@ enum
 #define OPTION_AUTOBOOT_DELAY       "autoboot_delay"
 #define OPTION_AUTOBOOT_SCRIPT      "autoboot_script"
 
-#define OPTION_HTTP				    "http"
-#define OPTION_HTTP_PORT		    "http_port"
-#define OPTION_HTTP_PATH		    "http_path"
+#define OPTION_HTTP                 "http"
+#define OPTION_HTTP_PORT            "http_port"
+#define OPTION_HTTP_PATH            "http_path"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -369,7 +369,7 @@ public:
 	const char *autoboot_command() const { return value(OPTION_AUTOBOOT_COMMAND); }
 	int autoboot_delay() const { return int_value(OPTION_AUTOBOOT_DELAY); }
 	const char *autoboot_script() const { return value(OPTION_AUTOBOOT_SCRIPT); }
-	
+
 	bool http() const { return bool_value(OPTION_HTTP); }
 	const char *http_port() const { return value(OPTION_HTTP_PORT); }
 	const char *http_path() const { return value(OPTION_HTTP_PATH); }

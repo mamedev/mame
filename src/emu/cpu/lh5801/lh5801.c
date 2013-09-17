@@ -264,4 +264,3 @@ offs_t lh5801_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT
 	extern CPU_DISASSEMBLE( lh5801 );
 	return CPU_DISASSEMBLE_NAME(lh5801)(this, buffer, pc, oprom, opram, options);
 }
-

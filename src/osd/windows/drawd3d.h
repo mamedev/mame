@@ -177,7 +177,7 @@ public:
 	// Setters / getters
 	int                     get_adapter() { return m_adapter; }
 	int                     get_width() { return m_width; }
-	vec2f					get_dims() { return vec2f(m_width, m_height); }
+	vec2f                   get_dims() { return vec2f(m_width, m_height); }
 	int                     get_height() { return m_height; }
 	int                     get_refresh() { return m_refresh; }
 

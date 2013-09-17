@@ -48,14 +48,14 @@ cyberbal    1   1   1   0   0   0   1   1k  0   0   0x600   0x100   0   0,0,07f8
 eprom       0   1   1   0   1   0   0   8   0   0   0x100   0x100   0   03ff,0,0,0  0,7fff,0,0  0           0,0,000f,0  0,0,ff80,0  0,0,0,ff80  0,0,0,0070  0,0,0,0007  0,0,0,0008  0           0,0,0070,0  0           0           0
 guts        0   1   1   0   0   0   0   8   0   0   0x100   0x100   0   03ff,0,0,0  0,7fff,0,0  0           0,0,000f,0  0,0,ff80,0  0,0,0,ff80  0,0,0,0070  0,0,0,000f  0,8000,0,0  0           0,0,0070,0  0           0           0
 gauntlet    0   1   1   1   0   0   0   8   1   0   0x100   0x100   0   0,0,0,03ff  7fff,0,0,0  0           0,000f,0,0  0,ff80,0,0  0,0,ff80,0  0,0,0038,0  0,0,0007,0  0,0,0040,0  0           0           0           0           0
-klax        1   1   1   0   0   0   0   8   0   0   0x000   0x100   0   00ff,0,0,0  0,0fff,0,0  0           0,0,000f,0  0,0,ff80,0  0,0,0,ff80  0,0,0,0070  0,0,0,0007  0,0,0,0008  0           0           0           0           0       
-offtwall    0   1   1   0   0   0   0   8   0   0   0x100   0x100   0   00ff,0,0,0  0,7fff,0,0  0           0,0,000f,0  0,0,ff80,0  0,0,0,ff80  0,0,0,0070  0,0,0,0007  0,8000,0,0  0           0           0           0           0 
-rampart     0   1   1   0   0   0   0   8   0   0   0x100   0x100   0   00ff,0,0,0  0,7fff,0,0  0           0,0,000f,0  0,0,ff80,0  0,0,0,ff80  0,0,0,0070  0,0,0,0007  0,8000,0,0  0           0           0           0           0       
+klax        1   1   1   0   0   0   0   8   0   0   0x000   0x100   0   00ff,0,0,0  0,0fff,0,0  0           0,0,000f,0  0,0,ff80,0  0,0,0,ff80  0,0,0,0070  0,0,0,0007  0,0,0,0008  0           0           0           0           0
+offtwall    0   1   1   0   0   0   0   8   0   0   0x100   0x100   0   00ff,0,0,0  0,7fff,0,0  0           0,0,000f,0  0,0,ff80,0  0,0,0,ff80  0,0,0,0070  0,0,0,0007  0,8000,0,0  0           0           0           0           0
+rampart     0   1   1   0   0   0   0   8   0   0   0x100   0x100   0   00ff,0,0,0  0,7fff,0,0  0           0,0,000f,0  0,0,ff80,0  0,0,0,ff80  0,0,0,0070  0,0,0,0007  0,8000,0,0  0           0           0           0           0
 relief      1   1   1   0   0   0   0   8   0   0   0x100   0x100   0   00ff,0,0,0  0,7fff,0,0  0           0,0,000f,0  0,0,ff80,0  0,0,0,ff80  0,0,0,0070  0,0,0,0007  0,8000,0,0  0           0           0           0           0
 shuuz       1   1   1   0   0   0   0   8   0   0   0x000   0x100   0   00ff,0,0,0  0,7fff,0,0  0           0,0,000f,0  0,0,ff80,0  0,0,0,ff80  0,0,0,0070  0,0,0,0007  0,8000,0,0  0           0           0           0           0
 skullxbo    0   2   1   0   0   0   0   8   0   0   0x000   0x200   0   00ff,0,0,0  0,7fff,0,0  0           0,0,000f,0  0,0,ffc0,0  0,0,0,ff80  0,0,0,0070  0,0,0,000f  0,8000,0,0  0           0,0,0030,0  0           0           0
 thunderj    1   1   1   0   1   0   0   8   0   0   0x100   0x100   0   03ff,0,0,0  0,7fff,0,0  0           0,0,000f,0  0,0,ff80,0  0,0,0,ff80  0,0,0,0070  0,0,0,0007  0,8000,0,0  0           0,0,0070,0  0           0           0
-toobin      1   1   1   0   0   1   0   1k  0   0   0x100   0x100   0   0,0,00ff,0  0,3fff,0,0  0           0,0,0,000f  0,0,0,ffc0  7fc0,0,0,0  0007,0,0,0  0038,0,0,0  0,4000,0,0  0,8000,0,0  0           0           8000,0,0,0  0   
+toobin      1   1   1   0   0   1   0   1k  0   0   0x100   0x100   0   0,0,00ff,0  0,3fff,0,0  0           0,0,0,000f  0,0,0,ffc0  7fc0,0,0,0  0007,0,0,0  0038,0,0,0  0,4000,0,0  0,8000,0,0  0           0           8000,0,0,0  0
 vindictr    0   1   1   0   0   0   0   8   0   0   0x100   0x100   0   0,0,0,03ff  7fff,0,0,0  0           0,000f,0,0  0,ff80,0,0  0,0,ff80,0  0,0,0038,0  0,0,0007,0  0,0,0040,0  0           0,0070,0,0  0           0           0
 xybots      1   1   0   0   0   0   0   0   0   0   0x100   0x300   0   003f,0,0,0  3fff,0,0,0  0           0,0,0,000f  0,0,0,ff80  0,0,ff80,0  0           0,0,0007,0  8000,0,0,0  0           0,000f,0,0  0           0           0
 
@@ -67,7 +67,7 @@ atarisy1    0   8   1   1   0   0   0   0   0   x38 0x100   0x100   0   0,0,0,00
 
 atarisy2    1   1   1   0   0   0   0   0   0   0   0x000   0x040   15  0,0,0,07f8  0,07ff,0,0  0007,0,0,0  0,0,0,3000  0,0,ffc0,0  7fc0,0,0,0  0           0,3800,0,0  0,4000,0,0  0           0,0,0,c000  0,8000,0,0  0           0
 
-toobin      1   1   1   0   0   1   0   1k  0   0   0x100   0x100   0   0,0,00ff,0  0,3fff,0,0  0           0,0,0,000f  0,0,0,ffc0  7fc0,0,0,0  0007,0,0,0  0038,0,0,0  0,4000,0,0  0,8000,0,0  0           0           8000,0,0,0  0   
+toobin      1   1   1   0   0   1   0   1k  0   0   0x100   0x100   0   0,0,00ff,0  0,3fff,0,0  0           0,0,0,000f  0,0,0,ffc0  7fc0,0,0,0  0007,0,0,0  0038,0,0,0  0,4000,0,0  0,8000,0,0  0           0           8000,0,0,0  0
 
 gauntlet    0   1   1   1   0   0   0   8   1   0   0x100   0x100   0   0,0,0,03ff  7fff,0,0,0  0           0,000f,0,0  0,ff80,0,0  0,0,ff80,0  0,0,0038,0  0,0,0007,0  0,0,0040,0  0           0           0           0           0
 vindictr    0   1   1   0   0   0   0   8   0   0   0x100   0x100   0   0,0,0,03ff  7fff,0,0,0  0           0,000f,0,0  0,ff80,0,0  0,0,ff80,0  0,0,0038,0  0,0,0007,0  0,0,0040,0  0           0,0070,0,0  0           0           0
@@ -85,9 +85,9 @@ guts        0   1   1   0   0   0   0   8   0   0   0x100   0x100   0   03ff,0,0
 skullxbo    0   2   1   0   0   0   0   8   0   0   0x000   0x200   0   00ff,0,0,0  0,7fff,0,0  0           0,0,000f,0  0,0,ffc0,0  0,0,0,ff80  0,0,0,0070  0,0,0,000f  0,8000,0,0  0           0,0,0030,0  0           0           0
 thunderj    1   1   1   0   1   0   0   8   0   0   0x100   0x100   0   03ff,0,0,0  0,7fff,0,0  0           0,0,000f,0  0,0,ff80,0  0,0,0,ff80  0,0,0,0070  0,0,0,0007  0,8000,0,0  0           0,0,0070,0  0           0           0
 arcadecl    0   1   1   0   0   0   0   0   0   0   0x100   0x100   0   00ff,0,0,0  0,7fff,0,0  0           0,0,000f,0  0,0,ff80,0  0,0,0,ff80  0,0,0,0070  0,0,0,0007  0           0           0           0           0           0
-klax        1   1   1   0   0   0   0   8   0   0   0x000   0x100   0   00ff,0,0,0  0,0fff,0,0  0           0,0,000f,0  0,0,ff80,0  0,0,0,ff80  0,0,0,0070  0,0,0,0007  0,0,0,0008  0           0           0           0           0       
-offtwall    0   1   1   0   0   0   0   8   0   0   0x100   0x100   0   00ff,0,0,0  0,7fff,0,0  0           0,0,000f,0  0,0,ff80,0  0,0,0,ff80  0,0,0,0070  0,0,0,0007  0,8000,0,0  0           0           0           0           0 
-rampart     0   1   1   0   0   0   0   8   0   0   0x100   0x100   0   00ff,0,0,0  0,7fff,0,0  0           0,0,000f,0  0,0,ff80,0  0,0,0,ff80  0,0,0,0070  0,0,0,0007  0,8000,0,0  0           0           0           0           0       
+klax        1   1   1   0   0   0   0   8   0   0   0x000   0x100   0   00ff,0,0,0  0,0fff,0,0  0           0,0,000f,0  0,0,ff80,0  0,0,0,ff80  0,0,0,0070  0,0,0,0007  0,0,0,0008  0           0           0           0           0
+offtwall    0   1   1   0   0   0   0   8   0   0   0x100   0x100   0   00ff,0,0,0  0,7fff,0,0  0           0,0,000f,0  0,0,ff80,0  0,0,0,ff80  0,0,0,0070  0,0,0,0007  0,8000,0,0  0           0           0           0           0
+rampart     0   1   1   0   0   0   0   8   0   0   0x100   0x100   0   00ff,0,0,0  0,7fff,0,0  0           0,0,000f,0  0,0,ff80,0  0,0,0,ff80  0,0,0,0070  0,0,0,0007  0,8000,0,0  0           0           0           0           0
 relief      1   1   1   0   0   0   0   8   0   0   0x100   0x100   0   00ff,0,0,0  0,7fff,0,0  0           0,0,000f,0  0,0,ff80,0  0,0,0,ff80  0,0,0,0070  0,0,0,0007  0,8000,0,0  0           0           0           0           0
 shuuz       1   1   1   0   0   0   0   8   0   0   0x000   0x100   0   00ff,0,0,0  0,7fff,0,0  0           0,0,000f,0  0,0,ff80,0  0,0,0,ff80  0,0,0,0070  0,0,0,0007  0,8000,0,0  0           0           0           0           0
 
@@ -102,8 +102,8 @@ shuuz       1   1   1   0   0   0   0   8   0   0   0x000   0x100   0   00ff,0,0
 //**************************************************************************
 
 //-------------------------------------------------
-//  compute_log: Computes the number of bits 
-//  necessary to hold a given value. The input must 
+//  compute_log: Computes the number of bits
+//  necessary to hold a given value. The input must
 //  be an even power of two.
 //-------------------------------------------------
 
@@ -122,9 +122,9 @@ inline int atari_motion_objects_device::compute_log(int value)
 
 
 //-------------------------------------------------
-//  round_to_powerof2: Rounds a number up to the 
-//  nearest power of 2. Even powers of 2 are 
-//  rounded up to the next greatest power 
+//  round_to_powerof2: Rounds a number up to the
+//  nearest power of 2. Even powers of 2 are
+//  rounded up to the next greatest power
 //  (e.g., 4 returns 8).
 //-------------------------------------------------
 
@@ -183,7 +183,7 @@ atari_motion_objects_device::atari_motion_objects_device(const machine_config &m
 
 //-------------------------------------------------
 //  static_set_config: Set the tag of the
-//	sound CPU
+//  sound CPU
 //-------------------------------------------------
 
 void atari_motion_objects_device::static_set_config(device_t &device, const atari_motion_objects_config &config)
@@ -261,8 +261,8 @@ void atari_motion_objects_device::draw(bitmap_ind16 &bitmap, const rectangle &cl
 
 
 //-------------------------------------------------
-//  apply_stain: Mark high palette bits 
-//  starting at the given X,Y and continuing until 
+//  apply_stain: Mark high palette bits
+//  starting at the given X,Y and continuing until
 //  a stop or the end of line.
 //-------------------------------------------------
 
@@ -315,13 +315,13 @@ void atari_motion_objects_device::device_start()
 	m_tileheight = gfx->height();
 	m_tilexshift = compute_log(m_tilewidth);
 	m_tileyshift = compute_log(m_tileheight);
-	
+
 	// derive bitmap information
 	m_bitmapwidth = round_to_powerof2(m_xposmask.mask());
 	m_bitmapheight = round_to_powerof2(m_yposmask.mask());
 	m_bitmapxmask = m_bitmapwidth - 1;
 	m_bitmapymask = m_bitmapheight - 1;
-	
+
 	// derive sprite information
 	m_entrycount = round_to_powerof2(m_linkmask.mask());
 	m_entrybits = compute_log(m_entrycount);
@@ -363,8 +363,8 @@ void atari_motion_objects_device::device_start()
 
 
 //-------------------------------------------------
-//  device_reset: Handle a device reset by 
-//	clearing the interrupt lines and states
+//  device_reset: Handle a device reset by
+//  clearing the interrupt lines and states
 //-------------------------------------------------
 
 void atari_motion_objects_device::device_reset()
@@ -379,7 +379,7 @@ void atari_motion_objects_device::device_reset()
 
 //-------------------------------------------------
 //  device_timer: Handle device-specific timer
-//	calbacks
+//  calbacks
 //-------------------------------------------------
 
 void atari_motion_objects_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -399,8 +399,8 @@ void atari_motion_objects_device::device_timer(emu_timer &timer, device_timer_id
 
 
 //-------------------------------------------------
-//  build_active_list: Build a list of active 
-//	objects.
+//  build_active_list: Build a list of active
+//  objects.
 //-------------------------------------------------
 
 void atari_motion_objects_device::build_active_list(int link)
@@ -445,8 +445,8 @@ void atari_motion_objects_device::build_active_list(int link)
 
 
 //-------------------------------------------------
-//  render_object: Internal processing callback 
-//  that renders to the backing bitmap and then 
+//  render_object: Internal processing callback
+//  that renders to the backing bitmap and then
 //  copies the result  to the destination.
 //-------------------------------------------------
 
@@ -605,9 +605,9 @@ void atari_motion_objects_device::render_object(bitmap_ind16 &bitmap, const rect
 //-------------------------------------------------
 
 atari_motion_objects_device::sprite_parameter::sprite_parameter()
-	: m_word(0), 
-		m_shift(0), 
-		m_mask(0) 
+	: m_word(0),
+		m_shift(0),
+		m_mask(0)
 {
 }
 
@@ -654,7 +654,7 @@ bool atari_motion_objects_device::sprite_parameter::set(const UINT16 input[4])
 //-------------------------------------------------
 
 atari_motion_objects_device::dual_sprite_parameter::dual_sprite_parameter()
-	: m_uppershift(0) 
+	: m_uppershift(0)
 {
 }
 
@@ -670,7 +670,7 @@ bool atari_motion_objects_device::dual_sprite_parameter::set(const atari_motion_
 		return false;
 	if (!m_upper.set(input.data_upper))
 		return false;
-	
+
 	// determine teh upper shift amount
 	UINT16 temp = m_lower.mask();
 	m_uppershift = 0;

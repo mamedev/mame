@@ -15,10 +15,10 @@ public:
 		m_s14001a(*this, "speech") { }
 
 	required_shared_ptr<UINT8> m_alpha_num_ram;
-	
+
 	required_device<cpu_device> m_maincpu;
 	required_device<s14001a_device> m_s14001a;
-	
+
 	int m_collision;
 	unsigned m_current_index;
 	UINT8 m_video_invert;

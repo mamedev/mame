@@ -1235,7 +1235,7 @@ static MACHINE_CONFIG_START( atarisy2, atarisy2_state )
 
 	MCFG_MACHINE_START_OVERRIDE(atarisy2_state,atarisy2)
 	MCFG_MACHINE_RESET_OVERRIDE(atarisy2_state,atarisy2)
-	
+
 	MCFG_EEPROM_2804_ADD("eeprom")
 
 	/* video hardware */
@@ -1245,7 +1245,7 @@ static MACHINE_CONFIG_START( atarisy2, atarisy2_state )
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield", 2, atarisy2_state, get_playfield_tile_info, 8,8, SCAN_ROWS, 128,64)
 	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", 2, atarisy2_state, get_alpha_tile_info, 8,8, SCAN_ROWS, 64,48, 0)
-	
+
 	MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "screen", atarisy2_state::s_mob_config)
 
 	MCFG_SCREEN_ADD("screen", RASTER)

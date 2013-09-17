@@ -62,7 +62,7 @@ public:
 		m_custom(*this, "cust") { }
 
 	required_device<galaxian_sound_device> m_custom;
-	
+
 	int m_noise_data;
 	DECLARE_WRITE8_MEMBER(dambustr_noise_enable_w);
 	DECLARE_DRIVER_INIT(dambustr);

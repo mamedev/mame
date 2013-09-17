@@ -117,7 +117,7 @@ struct sh2_state
 	UINT32  irqsr;              // IRQ-time old SR for DRC
 	UINT32 target;              // target for jmp/jsr/etc so the delay slot can't kill it
 	irq_entry     irq_queue[16];
-	
+
 	bool isdrc;
 
 	int pcfsel;                 // last pcflush entry set
