@@ -11,7 +11,7 @@ public:
 	// construction/destruction
 	d9060hd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual void ExecCommand( int *transferLength );
+	virtual void ExecCommand();
 };
 
 // device type definition

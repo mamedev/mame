@@ -1,38 +1,15 @@
 #include "cr589.h"
-#include "scsicd.h"
-#include "machine/cr589.h"
 
-// device type definition
-const device_type SCSI_CR589 = &device_creator<scsi_cr589_device>;
-
-scsi_cr589_device::scsi_cr589_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: scsicd_device(mconfig, SCSI_CR589, "SCSI CR589", tag, owner, clock, "scsi_cr589", __FILE__),
-	device_nvram_interface(mconfig, *this)
-{
-}
 
 static const int identity_offset = 0x3ab;
 static const char download_identity[] = "MATSHITA CD98Q4 DOWNLOADGS0N";
-
-void scsi_cr589_device::device_start()
-{
-	scsicd_device::device_start();
-
-	download = 0;
-
-	save_item(NAME(download));
-	save_item(NAME(buffer));
-	save_item(NAME(bufferOffset));
-}
-
-
 
 //-------------------------------------------------
 //  nvram_default - called to initialize NVRAM to
 //  its default state
 //-------------------------------------------------
 
-void scsi_cr589_device::nvram_default()
+void matsushita_cr589_device::nvram_default()
 {
 	memset( buffer, 0, sizeof(buffer));
 	memcpy( &buffer[ identity_offset ], "MATSHITACD-ROM CR-589   GS0N", 28 );
@@ -45,7 +22,7 @@ void scsi_cr589_device::nvram_default()
 //  .nv file
 //-------------------------------------------------
 
-void scsi_cr589_device::nvram_read(emu_file &file)
+void matsushita_cr589_device::nvram_read(emu_file &file)
 {
 	file.read(buffer, sizeof(buffer));
 }
@@ -57,45 +34,45 @@ void scsi_cr589_device::nvram_read(emu_file &file)
 //  .nv file
 //-------------------------------------------------
 
-void scsi_cr589_device::nvram_write(emu_file &file)
+void matsushita_cr589_device::nvram_write(emu_file &file)
 {
 	file.write(buffer, sizeof(buffer));
 }
 
 
 
-void scsi_cr589_device::ExecCommand( int *transferLength )
+void matsushita_cr589_device::ExecCommand()
 {
 	switch( command[ 0 ] )
 	{
 		case 0x3b: // WRITE BUFFER
 			bufferOffset = ( command[ 3 ] << 16 ) | ( command[ 4 ] << 8 ) | command[ 5 ];
-			SetPhase( SCSI_PHASE_DATAOUT );
-			*transferLength = ( command[ 6 ] << 16 ) | ( command[ 7 ] << 8 ) | command[ 8 ];
+			m_phase = SCSI_PHASE_DATAOUT;
+			m_transfer_length = ( command[ 6 ] << 16 ) | ( command[ 7 ] << 8 ) | command[ 8 ];
 			break;
 
 		case 0x3c: // READ BUFFER
 			bufferOffset = ( command[ 3 ] << 16 ) | ( command[ 4 ] << 8 ) | command[ 5 ];
-			SetPhase( SCSI_PHASE_DATAIN );
-			*transferLength = ( command[ 6 ] << 16 ) | ( command[ 7 ] << 8 ) | command[ 8 ];
+			m_phase = SCSI_PHASE_DATAIN;
+			m_transfer_length = ( command[ 6 ] << 16 ) | ( command[ 7 ] << 8 ) | command[ 8 ];
 			break;
 
 		case 0xcc: // FIRMWARE DOWNLOAD ENABLE
-			SetPhase( SCSI_PHASE_DATAOUT );
-			*transferLength = SCSILengthFromUINT16( &command[7] );
+			m_phase = SCSI_PHASE_DATAOUT;
+			m_transfer_length = SCSILengthFromUINT16( &command[7] );
 			break;
 
 		default:
-			scsicd_device::ExecCommand( transferLength );
+			t10mmc::ExecCommand();
 	}
 }
 
-void scsi_cr589_device::ReadData( UINT8 *data, int dataLength )
+void matsushita_cr589_device::ReadData( UINT8 *data, int dataLength )
 {
 	switch( command[ 0 ] )
 	{
 		case 0x12: // INQUIRY
-			scsicd_device::ReadData( data, dataLength );
+			t10mmc::ReadData( data, dataLength );
 
 			if( download )
 			{
@@ -113,12 +90,12 @@ void scsi_cr589_device::ReadData( UINT8 *data, int dataLength )
 			break;
 
 		default:
-			scsicd_device::ReadData( data, dataLength );
+			t10mmc::ReadData( data, dataLength );
 			break;
 	}
 }
 
-void scsi_cr589_device::WriteData( UINT8 *data, int dataLength )
+void matsushita_cr589_device::WriteData( UINT8 *data, int dataLength )
 {
 	switch( command[ 0 ] )
 	{
@@ -139,7 +116,7 @@ void scsi_cr589_device::WriteData( UINT8 *data, int dataLength )
 			break;
 
 		default:
-			scsicd_device::WriteData( data, dataLength );
+			t10mmc::WriteData( data, dataLength );
 			break;
 	}
 }
@@ -147,27 +124,21 @@ void scsi_cr589_device::WriteData( UINT8 *data, int dataLength )
 // device type definition
 const device_type CR589 = &device_creator<matsushita_cr589_device>;
 
-matsushita_cr589_device::matsushita_cr589_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: atapi_hle_device(mconfig, CR589, "Matsushita CR589", tag, owner, clock, "cr589", __FILE__)
+matsushita_cr589_device::matsushita_cr589_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	atapi_cdrom_device(mconfig, CR589, "Matsushita CR589", tag, owner, clock, "cr589", __FILE__),
+	device_nvram_interface(mconfig, *this)
 {
-}
-
-static MACHINE_CONFIG_FRAGMENT( cr589 )
-	MCFG_DEVICE_ADD("device", SCSI_CR589, 0)
-MACHINE_CONFIG_END
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor matsushita_cr589_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( cr589 );
 }
 
 void matsushita_cr589_device::device_start()
 {
+	save_item(NAME(download));
+	save_item(NAME(buffer));
+	save_item(NAME(bufferOffset));
+
+	atapi_cdrom_device::device_start();
+
+	/// TODO: split identify buffer into another method as device_start() should be called after it's filled in, but the atapi_cdrom_device has it's own.
 	memset(m_identify_buffer, 0, sizeof(m_identify_buffer));
 
 	m_identify_buffer[ 0 ] = 0x8500; // ATAPI device, cmd set 5 compliant, DRQ within 3 ms of PACKET command
@@ -199,15 +170,12 @@ void matsushita_cr589_device::device_start()
 	m_identify_buffer[ 46 ] = (' ' << 8) | ' ';
 
 	m_identify_buffer[ 49 ] = 0x0400; // IORDY may be disabled
-
-	atapi_hle_device::device_start();
 }
 
-void matsushita_cr589_device::perform_diagnostic()
+void matsushita_cr589_device::device_reset()
 {
-	m_error = IDE_ERROR_DIAGNOSTIC_PASSED;
-}
+	atapi_cdrom_device::device_reset();
 
-void matsushita_cr589_device::identify_packet_device()
-{
+	download = 0;
+	bufferOffset = 0;
 }

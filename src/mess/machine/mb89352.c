@@ -518,7 +518,8 @@ WRITE8_MEMBER( mb89352_device::mb89352_w )
 					int phase;
 					// execute SCSI command
 					m_SCSIdevices[m_target]->SetCommand(m_command,m_command_index);
-					m_SCSIdevices[m_target]->ExecCommand(&m_result_length);
+					m_SCSIdevices[m_target]->ExecCommand();
+					m_SCSIdevices[m_target]->GetLength(&m_result_length);
 					m_SCSIdevices[m_target]->GetPhase(&phase);
 					if(m_command[0] == 1) // Rezero Unit - not implemented in SCSI code
 						set_phase(SCSI_PHASE_STATUS);
@@ -583,7 +584,8 @@ WRITE8_MEMBER( mb89352_device::mb89352_w )
 				int phase;
 				// execute SCSI command
 				m_SCSIdevices[m_target]->SetCommand(m_command,m_command_index);
-				m_SCSIdevices[m_target]->ExecCommand(&m_result_length);
+				m_SCSIdevices[m_target]->ExecCommand();
+				m_SCSIdevices[m_target]->GetLength(&m_result_length);
 				m_SCSIdevices[m_target]->GetPhase(&phase);
 				if(m_command[0] == 1) // Rezero Unit - not implemented in SCSI code
 					set_phase(SCSI_PHASE_STATUS);

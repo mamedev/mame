@@ -209,40 +209,40 @@ s1410_device::s1410_device(const machine_config &mconfig, const char *tag, devic
 #define TRANSFERLENGTH_FORMAT_ALT_TRACK ( 0x03 )
 #define TRANSFERLENGTH_SECTOR_BUFFER ( 0x0200 )
 
-void s1410_device::ExecCommand( int *transferLength )
+void s1410_device::ExecCommand()
 {
 	switch( command[ 0 ] )
 	{
 	case S1410_CMD_INIT_DRIVE_PARAMS:
-		SetPhase(SCSI_PHASE_DATAOUT);
-		*transferLength = TRANSFERLENGTH_INIT_DRIVE_PARAMS;
+		m_phase = SCSI_PHASE_DATAOUT;
+		m_transfer_length = TRANSFERLENGTH_INIT_DRIVE_PARAMS;
 		break;
 
 	case S1410_CMD_FORMAT_ALT_TRACK:
-		SetPhase(SCSI_PHASE_DATAOUT);
-		*transferLength = TRANSFERLENGTH_FORMAT_ALT_TRACK;
+		m_phase = SCSI_PHASE_DATAOUT;
+		m_transfer_length = TRANSFERLENGTH_FORMAT_ALT_TRACK;
 		break;
 
 	case S1410_CMD_WRITE_SEC_BUFFER:
-		SetPhase(SCSI_PHASE_DATAOUT);
-		*transferLength = TRANSFERLENGTH_SECTOR_BUFFER;
+		m_phase = SCSI_PHASE_DATAOUT;
+		m_transfer_length = TRANSFERLENGTH_SECTOR_BUFFER;
 		break;
 
 	case S1410_CMD_READ_SEC_BUFFER:
-		SetPhase(SCSI_PHASE_DATAIN);
-		*transferLength = TRANSFERLENGTH_SECTOR_BUFFER;
+		m_phase = SCSI_PHASE_DATAIN;
+		m_transfer_length = TRANSFERLENGTH_SECTOR_BUFFER;
 		break;
 
 	case S1410_CMD_CHECK_TRACK_FORMAT:
 	case S1410_CMD_RAM_DIAGS:
 	case S1410_CMD_DRIVE_DIAGS:
 	case S1410_CMD_CONTROLER_DIAGS:
-		SetPhase(SCSI_PHASE_STATUS);
-		*transferLength = 0;
+		m_phase = SCSI_PHASE_STATUS;
+		m_transfer_length = 0;
 		break;
 
 	default:
-		scsihd_device::ExecCommand( transferLength );
+		scsihd_device::ExecCommand();
 		break;
 	}
 }
@@ -254,9 +254,8 @@ void s1410_device::WriteData( UINT8 *data, int dataLength )
 	case S1410_CMD_INIT_DRIVE_PARAMS:
 		{
 			int sectorsPerTrack = 0;
-			int bytesPerSector = GetSectorBytes();
 
-			switch( bytesPerSector )
+			switch( m_sector_bytes )
 			{
 			case 256:
 				sectorsPerTrack = 32;
@@ -269,7 +268,7 @@ void s1410_device::WriteData( UINT8 *data, int dataLength )
 
 			UINT16 tracks = ((data[0]<<8)+data[1]);
 			UINT8 heads = data[2];
-			UINT32 capacity = tracks * heads * sectorsPerTrack * bytesPerSector;
+			UINT32 capacity = tracks * heads * sectorsPerTrack * m_sector_bytes;
 
 			logerror("S1410_CMD_INIT_DRIVE_PARAMS Tracks=%d, Heads=%d, Capacity=%d\n",tracks,heads,capacity);
 		}

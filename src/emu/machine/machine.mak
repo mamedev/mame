@@ -562,6 +562,7 @@ MACHINEOBJS += $(MACHINEOBJ)/atapihle.o
 MACHINEOBJS += $(MACHINEOBJ)/idectrl.o
 MACHINEOBJS += $(MACHINEOBJ)/idehd.o
 MACHINEOBJS += $(MACHINEOBJ)/vt83c461.o
+MACHINES += T10
 endif
 
 #-------------------------------------------------
@@ -1193,6 +1194,7 @@ MACHINEOBJS += $(MACHINEOBJ)/scsicd.o
 MACHINEOBJS += $(MACHINEOBJ)/scsidev.o
 MACHINEOBJS += $(MACHINEOBJ)/scsihd.o
 MACHINEOBJS += $(MACHINEOBJ)/scsihle.o
+MACHINES += T10
 endif
 
 #-------------------------------------------------
@@ -1247,6 +1249,17 @@ endif
 
 ifneq ($(filter STVCD,$(MACHINES)),)
 MACHINEOBJS += $(MACHINEOBJ)/stvcd.o
+endif
+
+#-------------------------------------------------
+#
+#-------------------------------------------------
+
+ifneq ($(filter T10,$(MACHINES)),)
+MACHINEOBJS += $(MACHINEOBJ)/t10mmc.o
+MACHINEOBJS += $(MACHINEOBJ)/t10sbc.o
+MACHINEOBJS += $(MACHINEOBJ)/t10spc.o
+MACHINES += T10
 endif
 
 #-------------------------------------------------

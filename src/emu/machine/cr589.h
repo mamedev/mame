@@ -14,23 +14,23 @@
 #ifndef __CR589_H__
 #define __CR589_H__
 
-#include "atapihle.h"
-#include "scsicd.h"
+#include "atapicdr.h"
+#include "t10mmc.h"
 
-class scsi_cr589_device : public scsicd_device,
+class matsushita_cr589_device : public atapi_cdrom_device,
 	public device_nvram_interface
 {
 public:
-	// construction/destruction
-	scsi_cr589_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	matsushita_cr589_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual void ExecCommand( int *transferLength );
+	virtual void ExecCommand();
 	virtual void WriteData( UINT8 *data, int dataLength );
 	virtual void ReadData( UINT8 *data, int dataLength );
 
 protected:
 	// device-level overrides
 	virtual void device_start();
+	virtual void device_reset();
 
 	// device_nvram_interface overrides
 	virtual void nvram_default();
@@ -41,23 +41,6 @@ private:
 	int download;
 	UINT8 buffer[ 65536 ];
 	int bufferOffset;
-};
-
-// device type definition
-extern const device_type SCSI_CR589;
-
-class matsushita_cr589_device : public atapi_hle_device
-{
-public:
-	matsushita_cr589_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-protected:
-	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
-
-	virtual void perform_diagnostic();
-	virtual void identify_packet_device();
 };
 
 // device type definition

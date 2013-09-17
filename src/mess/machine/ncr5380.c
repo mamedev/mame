@@ -337,7 +337,8 @@ void ncr5380_device::ncr5380_write_reg(UINT32 offset, UINT8 data)
 							logerror("NCR5380: Command (to ID %d): %x %x %x %x %x %x %x %x %x %x (PC %x)\n", m_last_id, m_5380_Command[0], m_5380_Command[1], m_5380_Command[2], m_5380_Command[3], m_5380_Command[4], m_5380_Command[5], m_5380_Command[6], m_5380_Command[7], m_5380_Command[8], m_5380_Command[9], machine().firstcpu->pc());
 
 						m_scsi_devices[m_last_id]->SetCommand(&m_5380_Command[0], 16);
-						m_scsi_devices[m_last_id]->ExecCommand(&m_d_limit);
+						m_scsi_devices[m_last_id]->ExecCommand();
+						m_scsi_devices[m_last_id]->GetLength(&m_d_limit);
 
 						if (VERBOSE)
 							logerror("NCR5380: Command returned %d bytes\n",  m_d_limit);

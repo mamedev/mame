@@ -4,12 +4,7 @@
 
 ***************************************************************************/
 
-#include "emu.h"
-#include "machine/scsihle.h"
-#include "cdrom.h"
-#include "imagedev/chd_cd.h"
 #include "gdrom.h"
-#include "debugger.h"
 
 #define GDROM_BUSY_STATE    0x00
 #define GDROM_PAUSE_STATE   0x01
@@ -91,38 +86,8 @@ static const UINT8 GDROM_Cmd71_Reply[] =
 };
 
 
-static void phys_frame_to_msf(int phys_frame, int *m, int *s, int *f)
+void gdrom_device::device_reset()
 {
-	*m = phys_frame / (60*75);
-	phys_frame -= (*m * 60 * 75);
-	*s = phys_frame / 75;
-	*f = phys_frame % 75;
-}
-
-// device type definition
-const device_type SCSI_GDROM = &device_creator<scsi_gdrom_device>;
-
-scsi_gdrom_device::scsi_gdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: scsihle_device(mconfig, SCSI_GDROM, "SCSI GDROM", tag, owner, clock, "scsi_gdrom", __FILE__),
-		m_cdda(*this, "cdda")
-{
-}
-
-void scsi_gdrom_device::device_start()
-{
-	save_item( NAME( lba ) );
-	save_item( NAME( blocks ) );
-	save_item( NAME( last_lba ) );
-	save_item( NAME( bytes_per_sector ) );
-	save_item( NAME( num_subblocks ) );
-	save_item( NAME( cur_subblock ) );
-	save_item( NAME( play_err_flag ) );
-}
-
-void scsi_gdrom_device::device_reset()
-{
-	scsihle_device::device_reset();
-
 	static const UINT8 GDROM_Def_Cmd11_Reply[32] =
 	{
 		0x00, 0x00, 0x00, 0x00, 0x00, 0xB4, 0x19, 0x00, 0x00, 0x08, 0x53, 0x45, 0x20, 0x20, 0x20, 0x20,
@@ -132,151 +97,41 @@ void scsi_gdrom_device::device_reset()
 	for(int i = 0;i<32;i++)
 		GDROM_Cmd11_Reply[i] = GDROM_Def_Cmd11_Reply[i];
 
-	is_file = TRUE;
-	cdrom = subdevice<cdrom_image_device>("image")->get_cdrom_file();
-	if( !cdrom )
-	{
-		// try to locate the CHD from a DISK_REGION
-		chd_file *chd = get_disk_handle( machine(), tag() );
-		if( chd != NULL )
-		{
-			is_file = FALSE;
-			cdrom = cdrom_open( chd );
-		}
-	}
-
-	if (!cdrom)
-	{
-		logerror("GDROM: no CD found!\n");
-	}
-
-	lba = 0;
-	blocks = 0;
-	last_lba = 0;
-	bytes_per_sector = 2048;
-	num_subblocks = 1;
-	cur_subblock = 0;
-	play_err_flag = 0;
-}
-
-void scsi_gdrom_device::device_stop()
-{
-	if (!is_file)
-	{
-		if( cdrom )
-		{
-			cdrom_close( cdrom );
-		}
-	}
-}
-
-cdrom_interface scsi_gdrom_device::cd_intf = { 0, 0 };
-
-static MACHINE_CONFIG_FRAGMENT(scsi_cdrom)
-	MCFG_CDROM_ADD("image", scsi_gdrom_device::cd_intf)
-	MCFG_SOUND_ADD("cdda", CDDA, 0)
-MACHINE_CONFIG_END
-
-machine_config_constructor scsi_gdrom_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(scsi_cdrom);
+	atapi_cdrom_device::device_reset();
 }
 
 // scsicd_exec_command
 //
 // Execute a SCSI command.
 
-void scsi_gdrom_device::ExecCommand( int *transferLength )
+void gdrom_device::ExecCommand()
 {
-	int trk;
-
 	switch ( command[0] )
 	{
-		case 0x03: // REQUEST SENSE
-			SetPhase( SCSI_PHASE_DATAIN );
-			*transferLength = SCSILengthFromUINT8( &command[ 4 ] );
-			break;
-
 		case 0x11: // REQ_MODE
-			SetPhase( SCSI_PHASE_DATAIN );
+			m_phase = SCSI_PHASE_DATAIN;
 			printf("REQ_MODE %02x %02x %02x %02x %02x %02x\n",
 				command[0], command[1],
 				command[2], command[3],
 				command[4], command[5]);
 //          if (SCSILengthFromUINT8( &command[ 4 ] ) < 32) return -1;
 			transferOffset = command[2];
-			*transferLength = SCSILengthFromUINT8( &command[ 4 ] );
+			m_transfer_length = SCSILengthFromUINT8( &command[ 4 ] );
 			break;
 
 		case 0x12: // INQUIRY
 			logerror("GDROM: REQUEST SENSE\n");
-			SetPhase( SCSI_PHASE_DATAOUT );
+			m_phase = SCSI_PHASE_DATAOUT;
 			//transferOffset = command[2];
-			*transferLength = SCSILengthFromUINT8( &command[ 4 ] );
+			m_transfer_length = SCSILengthFromUINT8( &command[ 4 ] );
 			printf("SET_MODE %02x %02x\n",command[2],command[4]);
-			break;
-
-		case 0x15: // MODE SELECT(6)
-			logerror("GDROM: MODE SELECT(6) length %x control %x\n", command[4], command[5]);
-			SetPhase( SCSI_PHASE_DATAOUT );
-			*transferLength = SCSILengthFromUINT8( &command[ 4 ] );
-			break;
-
-		case 0x1a: // MODE SENSE(6)
-			SetPhase( SCSI_PHASE_DATAIN );
-			*transferLength = SCSILengthFromUINT8( &command[ 4 ] );
-			break;
-
-		case 0x1b: // START STOP UNIT
-			if (m_cdda != NULL)
-			{
-				m_cdda->stop_audio();
-			}
-			SetPhase( SCSI_PHASE_STATUS );
-			*transferLength = 0;
-			break;
-
-		case 0x1e: // PREVENT ALLOW MEDIUM REMOVAL
-			SetPhase( SCSI_PHASE_STATUS );
-			*transferLength = 0;
-			break;
-
-		case 0x25: // READ CAPACITY
-			SetPhase( SCSI_PHASE_DATAIN );
-			*transferLength = 8;
-			break;
-
-		case 0x28: // READ(10)
-
-			lba = command[2]<<24 | command[3]<<16 | command[4]<<8 | command[5];
-			blocks = SCSILengthFromUINT16( &command[7] );
-
-			logerror("GDROM: READ(10) at LBA %x for %d blocks (%d bytes)\n", lba, blocks, blocks * bytes_per_sector);
-
-			if (num_subblocks > 1)
-			{
-				cur_subblock = lba % num_subblocks;
-				lba /= num_subblocks;
-			}
-			else
-			{
-				cur_subblock = 0;
-			}
-
-			if (m_cdda != NULL)
-			{
-				m_cdda->stop_audio();
-			}
-
-			SetPhase( SCSI_PHASE_DATAIN );
-			*transferLength = blocks * bytes_per_sector;
 			break;
 
 		case 0x30: // CD_READ
 			if (command[1] & 1)
 			{
 				fatalerror("GDROM: MSF mode used for CD_READ, unsupported\n");
-				*transferLength = 0;
+				m_transfer_length = 0;
 			}
 			else
 			{
@@ -296,7 +151,7 @@ void scsi_gdrom_device::ExecCommand( int *transferLength )
 					fatalerror("GDROM: Unhandled data_select %d\n", data_select);
 				}
 
-				printf("GDROM: CD_READ at LBA %x for %d blocks (%d bytes, read type %d, data select %d)\n", lba, blocks, blocks * bytes_per_sector, read_type, data_select);
+				printf("GDROM: CD_READ at LBA %x for %d blocks (%d bytes, read type %d, data select %d)\n", lba, blocks, blocks * m_sector_bytes, read_type, data_select);
 
 				if (num_subblocks > 1)
 				{
@@ -313,53 +168,10 @@ void scsi_gdrom_device::ExecCommand( int *transferLength )
 					m_cdda->stop_audio();
 				}
 
-				SetPhase( SCSI_PHASE_DATAIN );
-				*transferLength = blocks * bytes_per_sector;
+				m_phase = SCSI_PHASE_DATAIN;
+				m_transfer_length = blocks * m_sector_bytes;
 			}
 			break;
-
-		case 0x42: // READ SUB-CHANNEL
-//                      logerror("GDROM: READ SUB-CHANNEL type %d\n", command[3]);
-			SetPhase( SCSI_PHASE_DATAIN );
-			*transferLength = SCSILengthFromUINT16( &command[ 7 ] );
-			break;
-
-		case 0x43: // READ TOC
-		{
-			int start_trk = command[6];
-			int end_trk = cdrom_get_last_track(cdrom);
-			int length;
-			int allocation_length = SCSILengthFromUINT16( &command[ 7 ] );
-
-			if( start_trk == 0 )
-			{
-				start_trk = 1;
-			}
-			if( start_trk == 0xaa )
-			{
-				end_trk = start_trk;
-			}
-
-			length = 4 + ( 8 * ( ( end_trk - start_trk ) + 1 ) );
-			if( length > allocation_length )
-			{
-				length = allocation_length;
-			}
-			else if( length < 4 )
-			{
-				length = 4;
-			}
-
-			if (m_cdda != NULL)
-			{
-				m_cdda->stop_audio();
-			}
-
-			SetPhase( SCSI_PHASE_DATAIN );
-			*transferLength = length;
-			//debugger_break(machine());
-			break;
-		}
 
 		// READ TOC (GD-ROM ver.)
 		case 0x14:
@@ -393,173 +205,26 @@ void scsi_gdrom_device::ExecCommand( int *transferLength )
 				m_cdda->stop_audio();
 			}
 
-			SetPhase( SCSI_PHASE_DATAIN );
-			*transferLength = length;
+			m_phase = SCSI_PHASE_DATAIN;
+			m_transfer_length = length;
 			break;
 		}
 
-		case 0x45: // PLAY AUDIO(10)
-			lba = command[2]<<24 | command[3]<<16 | command[4]<<8 | command[5];
-			blocks = SCSILengthFromUINT16( &command[7] );
-
-			// special cases: lba of 0 means MSF of 00:02:00
-			if (lba == 0)
-			{
-				lba = 150;
-			}
-			else if (lba == 0xffffffff)
-			{
-				logerror("GDROM: play audio from current not implemented!\n");
-			}
-
-			logerror("GDROM: PLAY AUDIO(10) at LBA %x for %x blocks\n", lba, blocks);
-
-			trk = cdrom_get_track(cdrom, lba);
-
-			if (cdrom_get_track_type(cdrom, trk) == CD_TRACK_AUDIO)
-			{
-				play_err_flag = 0;
-				if (m_cdda != NULL)
-					m_cdda->start_audio(lba, blocks);
-			}
-			else
-			{
-				logerror("GDROM: track is NOT audio!\n");
-				play_err_flag = 1;
-			}
-
-			SetPhase( SCSI_PHASE_STATUS );
-			*transferLength = 0;
-			break;
-
-		case 0x48: // PLAY AUDIO TRACK/INDEX
-			// be careful: tracks here are zero-based, but the SCSI command
-			// uses the real CD track number which is 1-based!
-			lba = cdrom_get_track_start(cdrom, command[4]-1);
-			blocks = cdrom_get_track_start(cdrom, command[7]-1) - lba;
-			if (command[4] > command[7])
-			{
-				blocks = 0;
-			}
-
-			if (command[4] == command[7])
-			{
-				blocks = cdrom_get_track_start(cdrom, command[4]) - lba;
-			}
-
-			if (blocks && cdrom)
-			{
-				if (m_cdda != NULL)
-					m_cdda->start_audio(lba, blocks);
-			}
-
-			logerror("GDROM: PLAY AUDIO T/I: strk %d idx %d etrk %d idx %d frames %d\n", command[4], command[5], command[7], command[8], blocks);
-			SetPhase( SCSI_PHASE_STATUS );
-			*transferLength = 0;
-			break;
-
-		case 0x4b: // PAUSE/RESUME
-			if (cdrom)
-			{
-				if (m_cdda != NULL)
-					m_cdda->pause_audio((command[8] & 0x01) ^ 0x01);
-			}
-
-			logerror("GDROM: PAUSE/RESUME: %s\n", command[8]&1 ? "RESUME" : "PAUSE");
-			SetPhase( SCSI_PHASE_STATUS );
-			*transferLength = 0;
-			break;
-
-		case 0x55: // MODE SELECT(10)
-			logerror("GDROM: MODE SELECT length %x control %x\n", command[7]<<8 | command[8], command[1]);
-			SetPhase( SCSI_PHASE_DATAOUT );
-			*transferLength = SCSILengthFromUINT16( &command[ 7 ] );
-			break;
-
-		case 0x5a: // MODE SENSE(10)
-			SetPhase( SCSI_PHASE_DATAIN );
-			*transferLength = SCSILengthFromUINT16( &command[ 7 ] );
-			break;
-
-		case 0xa5: // PLAY AUDIO(12)
-			lba = command[2]<<24 | command[3]<<16 | command[4]<<8 | command[5];
-			blocks = command[6]<<24 | command[7]<<16 | command[8]<<8 | command[9];
-
-			// special cases: lba of 0 means MSF of 00:02:00
-			if (lba == 0)
-			{
-				lba = 150;
-			}
-			else if (lba == 0xffffffff)
-			{
-				logerror("GDROM: play audio from current not implemented!\n");
-			}
-
-			logerror("GDROM: PLAY AUDIO(12) at LBA %x for %x blocks\n", lba, blocks);
-
-			trk = cdrom_get_track(cdrom, lba);
-
-			if (cdrom_get_track_type(cdrom, trk) == CD_TRACK_AUDIO)
-			{
-				play_err_flag = 0;
-				if (m_cdda != NULL)
-					m_cdda->start_audio(lba, blocks);
-			}
-			else
-			{
-				logerror("GDROM: track is NOT audio!\n");
-				play_err_flag = 1;
-			}
-			SetPhase( SCSI_PHASE_STATUS );
-			*transferLength = 0;
-			break;
-
-		case 0xa8: // READ(12)
-			lba = command[2]<<24 | command[3]<<16 | command[4]<<8 | command[5];
-			blocks = command[7]<<16 | command[8]<<8 | command[9];
-
-			logerror("GDROM: READ(12) at LBA %x for %x blocks (%x bytes)\n", lba, blocks, blocks * bytes_per_sector);
-
-			if (num_subblocks > 1)
-			{
-				cur_subblock = lba % num_subblocks;
-				lba /= num_subblocks;
-			}
-			else
-			{
-				cur_subblock = 0;
-			}
-
-			if (m_cdda != NULL)
-			{
-				m_cdda->stop_audio();
-			}
-
-			SetPhase( SCSI_PHASE_DATAIN );
-			*transferLength = blocks * bytes_per_sector;
-			break;
-
-		case 0xbb: // SET CD SPEED
-			logerror("GDROM: SET CD SPEED to %d kbytes/sec.\n", command[2]<<8 | command[3]);
-			SetPhase( SCSI_PHASE_STATUS );
-			*transferLength = 0;
-			break;
-
 		case 0x70:
-			SetPhase( SCSI_PHASE_STATUS );
-			*transferLength = 0;
+			m_phase = SCSI_PHASE_STATUS;
+			m_transfer_length = 0;
 			break;
 
 		case 0x71:
-			SetPhase( SCSI_PHASE_DATAIN );
-			*transferLength = sizeof(GDROM_Cmd71_Reply);
+			m_phase = SCSI_PHASE_DATAIN;
+			m_transfer_length = sizeof(GDROM_Cmd71_Reply);
 			break;
 
 		case 0x40:
 			if(command[1] & 0xf)
 			{
-				SetPhase( SCSI_PHASE_DATAIN );
-				*transferLength = 0xe;
+				m_phase = SCSI_PHASE_DATAIN;
+				m_transfer_length = 0xe;
 			}
 			else
 			{
@@ -568,7 +233,7 @@ void scsi_gdrom_device::ExecCommand( int *transferLength )
 			break;
 
 		default:
-			scsihle_device::ExecCommand( transferLength );
+			t10mmc::ExecCommand();
 			break;
 	}
 }
@@ -577,87 +242,16 @@ void scsi_gdrom_device::ExecCommand( int *transferLength )
 //
 // Read data from the device resulting from the execution of a command
 
-void scsi_gdrom_device::ReadData( UINT8 *data, int dataLength )
+void gdrom_device::ReadData( UINT8 *data, int dataLength )
 {
 	int i;
-	UINT32 last_phys_frame;
-	UINT32 temp;
 	UINT8 tmp_buffer[2048];
 
 	switch ( command[0] )
 	{
-		case 0x03: // REQUEST SENSE
-			logerror("GDROM: Reading REQUEST SENSE data\n");
-
-			memset( data, 0, dataLength );
-
-			data[0] = 0x71; // deferred error
-
-			if (m_cdda != NULL && m_cdda->audio_active())
-			{
-				data[12] = 0x00;
-				data[13] = 0x11;    // AUDIO PLAY OPERATION IN PROGRESS
-			}
-			else if (play_err_flag)
-			{
-				play_err_flag = 0;
-				data[12] = 0x64;    // ILLEGAL MODE FOR THIS TRACK
-				data[13] = 0x00;
-			}
-			// (else 00/00 means no error to report)
-			break;
-
 		case 0x11: // REQ_MODE
 			printf("REQ_MODE: dataLength %d\n", dataLength);
 			memcpy(data, &GDROM_Cmd11_Reply[transferOffset], (dataLength >= 32-transferOffset) ? 32-transferOffset : dataLength);
-			break;
-
-		case 0x25: // READ CAPACITY
-			logerror("GDROM: READ CAPACITY\n");
-
-			temp = cdrom_get_track_start(cdrom, 0xaa);
-			temp--; // return the last used block on the disc
-
-			data[0] = (temp>>24) & 0xff;
-			data[1] = (temp>>16) & 0xff;
-			data[2] = (temp>>8) & 0xff;
-			data[3] = (temp & 0xff);
-			data[4] = 0;
-			data[5] = 0;
-			data[6] = (bytes_per_sector>>8)&0xff;
-			data[7] = (bytes_per_sector & 0xff);
-			break;
-
-		case 0x28: // READ(10)
-		case 0xa8: // READ(12)
-			logerror("GDROM: read %x dataLength, \n", dataLength);
-			if ((cdrom) && (blocks))
-			{
-				while (dataLength > 0)
-				{
-					if (!cdrom_read_data(cdrom, lba, tmp_buffer, CD_TRACK_MODE1))
-					{
-						logerror("GDROM: CD read error!\n");
-					}
-
-					logerror("True LBA: %d, buffer half: %d\n", lba, cur_subblock * bytes_per_sector);
-
-					memcpy(data, &tmp_buffer[cur_subblock * bytes_per_sector], bytes_per_sector);
-
-					cur_subblock++;
-					if (cur_subblock >= num_subblocks)
-					{
-						cur_subblock = 0;
-
-						lba++;
-						blocks--;
-					}
-
-					last_lba = lba;
-					dataLength -= bytes_per_sector;
-					data += bytes_per_sector;
-				}
-			}
 			break;
 
 		case 0x30: // CD_READ
@@ -671,9 +265,9 @@ void scsi_gdrom_device::ReadData( UINT8 *data, int dataLength )
 						logerror("GDROM: CD read error!\n");
 					}
 
-					logerror("True LBA: %d, buffer half: %d\n", lba, cur_subblock * bytes_per_sector);
+					logerror("True LBA: %d, buffer half: %d\n", lba, cur_subblock * m_sector_bytes);
 
-					memcpy(data, &tmp_buffer[cur_subblock * bytes_per_sector], bytes_per_sector);
+					memcpy(data, &tmp_buffer[cur_subblock * m_sector_bytes], m_sector_bytes);
 
 					cur_subblock++;
 					if (cur_subblock >= num_subblocks)
@@ -685,188 +279,9 @@ void scsi_gdrom_device::ReadData( UINT8 *data, int dataLength )
 					}
 
 					last_lba = lba;
-					dataLength -= bytes_per_sector;
-					data += bytes_per_sector;
+					dataLength -= m_sector_bytes;
+					data += m_sector_bytes;
 				}
-			}
-
-		case 0x42: // READ SUB-CHANNEL
-			switch (command[3])
-			{
-				case 1: // return current position
-				{
-					int audio_active;
-					int msf;
-
-					if (!cdrom)
-					{
-						return;
-					}
-
-					logerror("GDROM: READ SUB-CHANNEL Time = %x, SUBQ = %x\n", command[1], command[2]);
-
-					msf = command[1] & 0x2;
-
-					audio_active = m_cdda != NULL && m_cdda->audio_active();
-					if (audio_active)
-					{
-						if (m_cdda->audio_paused())
-						{
-							data[1] = 0x12;     // audio is paused
-						}
-						else
-						{
-							data[1] = 0x11;     // audio in progress
-						}
-					}
-					else
-					{
-						if (m_cdda != NULL && m_cdda->audio_ended())
-						{
-							data[1] = 0x13; // ended successfully
-						}
-						else
-						{
-//                          data[1] = 0x14;    // stopped due to error
-							data[1] = 0x15; // No current audio status to return
-						}
-					}
-
-					// if audio is playing, get the latest LBA from the CDROM layer
-					if (audio_active)
-					{
-						last_lba = m_cdda->get_audio_lba();
-					}
-					else
-					{
-						last_lba = 0;
-					}
-
-					data[2] = 0;
-					data[3] = 12;       // data length
-					data[4] = 0x01; // sub-channel format code
-					data[5] = 0x10 | (audio_active ? 0 : 4);
-					data[6] = cdrom_get_track(cdrom, last_lba) + 1; // track
-					data[7] = 0;    // index
-
-					last_phys_frame = last_lba;
-
-					if (msf)
-					{
-						int m,s,f;
-						phys_frame_to_msf(last_phys_frame, &m, &s, &f);
-						data[8] = 0;
-						data[9] = m;
-						data[10] = s;
-						data[11] = f;
-					}
-					else
-					{
-						data[8] = last_phys_frame>>24;
-						data[9] = (last_phys_frame>>16)&0xff;
-						data[10] = (last_phys_frame>>8)&0xff;
-						data[11] = last_phys_frame&0xff;
-					}
-
-					last_phys_frame -= cdrom_get_track_start(cdrom, data[6] - 1);
-
-					if (msf)
-					{
-						int m,s,f;
-						phys_frame_to_msf(last_phys_frame, &m, &s, &f);
-						data[12] = 0;
-						data[13] = m;
-						data[14] = s;
-						data[15] = f;
-					}
-					else
-					{
-						data[12] = last_phys_frame>>24;
-						data[13] = (last_phys_frame>>16)&0xff;
-						data[14] = (last_phys_frame>>8)&0xff;
-						data[15] = last_phys_frame&0xff;
-					}
-					break;
-				}
-				default:
-					logerror("GDROM: Unknown subchannel type %d requested\n", command[3]);
-			}
-			break;
-
-		case 0x43: // READ TOC
-			/*
-			    Track numbers are problematic here: 0 = lead-in, 0xaa = lead-out.
-			    That makes sense in terms of how real-world CDs are referred to, but
-			    our internal routines for tracks use "0" as track 1.  That probably
-			    should be fixed...
-			*/
-			logerror("GDROM: READ TOC, format = %d time=%d\n", command[2]&0xf,(command[1]>>1)&1);
-			switch (command[2] & 0x0f)
-			{
-				case 0:     // normal
-					{
-						int start_trk;
-						int end_trk;
-						int len;
-						int in_len;
-						int dptr;
-						UINT32 tstart;
-
-						start_trk = command[6];
-						if( start_trk == 0 )
-						{
-							start_trk = 1;
-						}
-
-						end_trk = cdrom_get_last_track(cdrom);
-						len = (end_trk * 8) + 2;
-
-						// the returned TOC DATA LENGTH must be the full amount,
-						// regardless of how much we're able to pass back due to in_len
-						dptr = 0;
-						data[dptr++] = (len>>8) & 0xff;
-						data[dptr++] = (len & 0xff);
-						data[dptr++] = 1;
-						data[dptr++] = end_trk;
-
-						if( start_trk == 0xaa )
-						{
-							end_trk = 0xaa;
-						}
-
-						in_len = command[7]<<8 | command[8];
-
-						for (i = start_trk; i <= end_trk; i++)
-						{
-							int cdrom_track = i;
-							if( cdrom_track != 0xaa )
-							{
-								cdrom_track--;
-							}
-
-							if( dptr >= in_len )
-							{
-								break;
-							}
-
-							data[dptr++] = 0;
-							data[dptr++] = cdrom_get_adr_control(cdrom, cdrom_track);
-							data[dptr++] = i;
-							data[dptr++] = 0;
-
-							tstart = cdrom_get_track_start(cdrom, cdrom_track);
-							if ((command[1]&2)>>1)
-								tstart = lba_to_msf(tstart);
-							data[dptr++] = (tstart>>24) & 0xff;
-							data[dptr++] = (tstart>>16) & 0xff;
-							data[dptr++] = (tstart>>8) & 0xff;
-							data[dptr++] = (tstart & 0xff);
-						}
-					}
-					break;
-				default:
-					logerror("GDROM: Unhandled READ TOC format %d\n", command[2]&0xf);
-					break;
 			}
 			break;
 
@@ -947,34 +362,6 @@ void scsi_gdrom_device::ReadData( UINT8 *data, int dataLength )
 			}
 			break;
 
-		case 0x1a: // MODE SENSE(6)
-		case 0x5a: // MODE SENSE(10)
-			logerror("GDROM: MODE SENSE page code = %x, PC = %x\n", command[2] & 0x3f, (command[2]&0xc0)>>6);
-
-			switch (command[2] & 0x3f)
-			{
-				case 0xe:   // CD Audio control page
-					data[0] = 0x8e; // page E, parameter is savable
-					data[1] = 0x0e; // page length
-					data[2] = 0x04; // IMMED = 1, SOTC = 0
-					data[3] = data[4] = data[5] = data[6] = data[7] = 0; // reserved
-
-					// connect each audio channel to 1 output port
-					data[8] = 1;
-					data[10] = 2;
-					data[12] = 4;
-					data[14] = 8;
-
-					// indicate max volume
-					data[9] = data[11] = data[13] = data[15] = 0xff;
-					break;
-
-				default:
-					logerror("GDROM: MODE SENSE unknown page %x\n", command[2] & 0x3f);
-					break;
-			}
-			break;
-
 		case 0x71:
 			memcpy(data, &GDROM_Cmd71_Reply[0], sizeof(GDROM_Cmd71_Reply));
 			break;
@@ -997,7 +384,7 @@ void scsi_gdrom_device::ReadData( UINT8 *data, int dataLength )
 			break;
 
 		default:
-			scsihle_device::ReadData( data, dataLength );
+			t10mmc::ReadData( data, dataLength );
 			break;
 	}
 }
@@ -1006,89 +393,37 @@ void scsi_gdrom_device::ReadData( UINT8 *data, int dataLength )
 //
 // Write data to the CD-ROM device as part of the execution of a command
 
-void scsi_gdrom_device::WriteData( UINT8 *data, int dataLength )
+void gdrom_device::WriteData( UINT8 *data, int dataLength )
 {
 	switch (command[ 0 ])
 	{
-		case 0x15: // MODE SELECT(6)
-		case 0x55: // MODE SELECT(10)
-			logerror("GDROM: MODE SELECT page %x\n", data[0] & 0x3f);
-
-			switch (data[0] & 0x3f)
-			{
-				case 0x0:   // vendor-specific
-					// check for SGI extension to force 512-byte blocks
-					if ((data[3] == 8) && (data[10] == 2))
-					{
-						logerror("GDROM: Experimental SGI 512-byte block extension enabled\n");
-
-						bytes_per_sector = 512;
-						num_subblocks = 4;
-					}
-					else
-					{
-						logerror("GDROM: Unknown vendor-specific page!\n");
-					}
-					break;
-
-				case 0xe:   // audio page
-					logerror("Ch 0 route: %x vol: %x\n", data[8], data[9]);
-					logerror("Ch 1 route: %x vol: %x\n", data[10], data[11]);
-					logerror("Ch 2 route: %x vol: %x\n", data[12], data[13]);
-					logerror("Ch 3 route: %x vol: %x\n", data[14], data[15]);
-					break;
-			}
-			break;
-
 		case 0x12:
 			memcpy(&GDROM_Cmd11_Reply[transferOffset], data, (dataLength >= 32-transferOffset) ? 32-transferOffset : dataLength);
 			break;
 
 		default:
-			scsihle_device::WriteData( data, dataLength );
+			t10mmc::WriteData( data, dataLength );
 			break;
 	}
-}
-
-void scsi_gdrom_device::GetDevice( void **_cdrom )
-{
-	*(cdrom_file **)_cdrom = cdrom;
-}
-
-void scsi_gdrom_device::SetDevice( void *_cdrom )
-{
-	cdrom = (cdrom_file *) _cdrom;
-}
-
-int scsi_gdrom_device::GetSectorBytes()
-{
-	return bytes_per_sector;
 }
 
 // device type definition
 const device_type GDROM = &device_creator<gdrom_device>;
 
-gdrom_device::gdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: atapi_hle_device(mconfig, GDROM, "GDROM", tag, owner, clock, "gdrom", __FILE__)
+gdrom_device::gdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	atapi_cdrom_device(mconfig, GDROM, "GDROM", tag, owner, clock, "gdrom", __FILE__)
 {
-}
-
-static MACHINE_CONFIG_FRAGMENT( gdrom )
-	MCFG_DEVICE_ADD("device", SCSI_GDROM, 0)
-MACHINE_CONFIG_END
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor gdrom_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( gdrom );
 }
 
 void gdrom_device::device_start()
 {
+	save_item(NAME(read_type));
+	save_item(NAME(data_select));
+	save_item(NAME(transferOffset));
+
+	/// TODO: split identify buffer into another method as device_start() should be called after it's filled in, but the atapi_cdrom_device has it's own.
+	atapi_cdrom_device::device_start();
+
 	memset(m_identify_buffer, 0, sizeof(m_identify_buffer));
 
 	m_identify_buffer[0] = 0x8600; // ATAPI device, cmd set 6 compliant, DRQ within 3 ms of PACKET command
@@ -1123,21 +458,10 @@ void gdrom_device::device_start()
 
 	m_identify_buffer[63]=7; // multi word dma mode 0-2 supported
 	m_identify_buffer[64]=1; // PIO mode 3 supported
-
-	atapi_hle_device::device_start();
-}
-
-void gdrom_device::perform_diagnostic()
-{
-	m_error = IDE_ERROR_DIAGNOSTIC_PASSED;
 }
 
 void gdrom_device::process_buffer()
 {
 	atapi_hle_device::process_buffer();
 	m_sector_number = 0x80 | GDROM_PAUSE_STATE; /// HACK: find out when this should be updated
-}
-
-void gdrom_device::identify_packet_device()
-{
 }

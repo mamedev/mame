@@ -1734,9 +1734,9 @@ WRITE_LINE_MEMBER( firebeat_state::ata_interrupt )
 }
 
 static MACHINE_CONFIG_FRAGMENT( cdrom_config )
-	MCFG_DEVICE_MODIFY("device:cdda")
-	MCFG_SOUND_ROUTE(0, "^^^^^lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "^^^^^rspeaker", 1.0)
+	MCFG_DEVICE_MODIFY("cdda")
+	MCFG_SOUND_ROUTE(0, "^^^^lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "^^^^rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( firebeat, firebeat_state )
@@ -1782,11 +1782,6 @@ static MACHINE_CONFIG_START( firebeat, firebeat_state )
 	MCFG_YMZ280B_EXT_READ_HANDLER(READ8(firebeat_state, soundram_r))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-
-//  TODO: Hookup cdrom audio
-//  MCFG_SOUND_MODIFY("scsi1:cdda")
-//  MCFG_SOUND_ROUTE(0, "^^lspeaker", 1.0)
-//  MCFG_SOUND_ROUTE(1, "^^rspeaker", 1.0)
 
 	MCFG_PC16552D_ADD("duart_com", firebeat_com0_interface, firebeat_com1_interface, XTAL_19_6608MHz) // pgmd to 9600baud
 	MCFG_PC16552D_ADD("duart_midi", firebeat_midi0_interface, firebeat_midi1_interface, XTAL_24MHz) // in all memory maps, pgmd to 31250baud
@@ -2066,10 +2061,10 @@ ROM_START( ppp )
 	ROM_REGION(0xc0, "user2", 0)    // Security dongle
 	ROM_LOAD("gq977-ja", 0x00, 0xc0, BAD_DUMP CRC(55b5abdb) SHA1(d8da5bac005235480a1815bd0a79c3e8a63ebad1))
 
-	DISK_REGION( "ata:0:cdrom:device" ) // program CD-ROM
+	DISK_REGION( "ata:0:cdrom" ) // program CD-ROM
 	DISK_IMAGE_READONLY( "977jaa01", 0, BAD_DUMP SHA1(59c03d8eb366167feef741d42d9d8b54bfeb3c1e) )
 
-	DISK_REGION( "ata:1:cdrom:device" ) // audio CD-ROM
+	DISK_REGION( "ata:1:cdrom" ) // audio CD-ROM
 	DISK_IMAGE_READONLY( "977jaa02", 0, SHA1(bd07c25ee3e1edc962997f6a5bb1700897231fb2) )
 ROM_END
 
@@ -2080,10 +2075,10 @@ ROM_START( ppp1mp )
 	ROM_REGION(0xc0, "user2", 0)    // Security dongle
 	ROM_LOAD( "gqa11-ja",     0x000000, 0x0000c0, CRC(2ed8e2ae) SHA1(b8c3410dab643111b2d2027068175ba018a0a67e) )
 
-	DISK_REGION( "ata:0:cdrom:device" ) // program CD-ROM
+	DISK_REGION( "ata:0:cdrom" ) // program CD-ROM
 	DISK_IMAGE_READONLY( "a11jaa01", 0, SHA1(539ec6f1c1d198b0d6ce5543eadcbb4d9917fa42) )
 
-	DISK_REGION( "ata:1:cdrom:device" ) // audio CD-ROM
+	DISK_REGION( "ata:1:cdrom" ) // audio CD-ROM
 	DISK_IMAGE_READONLY( "a11jaa02", 0, SHA1(575069570cb4a2b58b199a1329d45b189a20fcc9) )
 ROM_END
 
@@ -2094,10 +2089,10 @@ ROM_START( kbm )
 	ROM_REGION(0xc0, "user2", ROMREGION_ERASE00)    // Security dongle
 	ROM_LOAD("gq974-ja", 0x00, 0xc0, BAD_DUMP CRC(4578f29b) SHA1(faaeaf6357c1e86e898e7017566cfd2fc7ee3d6f))
 
-	DISK_REGION( "ata:0:cdrom:device" ) // program CD-ROM
+	DISK_REGION( "ata:0:cdrom" ) // program CD-ROM
 	DISK_IMAGE_READONLY( "974jac01", 0, BAD_DUMP SHA1(c6145d7090e44c87f71ba626620d2ae2596a75ca) )
 
-	DISK_REGION( "ata:1:cdrom:device" ) // audio CD-ROM
+	DISK_REGION( "ata:1:cdrom" ) // audio CD-ROM
 	DISK_IMAGE_READONLY( "974jaa02", 1, BAD_DUMP SHA1(3b9946083239eb5687f66a49df24568bffa4fbbd) )
 ROM_END
 
@@ -2108,10 +2103,10 @@ ROM_START( kbm2nd )
 	ROM_REGION(0xc0, "user2", ROMREGION_ERASE00)    // Security dongle
 	ROM_LOAD("gca01-ja", 0x00, 0xc0, BAD_DUMP CRC(2bda339d) SHA1(031cb3f44e7a89cd62a9ba948f3d19d53a325abd))
 
-	DISK_REGION( "ata:0:cdrom:device" ) // program CD-ROM
+	DISK_REGION( "ata:0:cdrom" ) // program CD-ROM
 	DISK_IMAGE_READONLY( "a01jaa01", 0, BAD_DUMP SHA1(37bc3879719b3d3c6bc8a5691abd7aa4aec87d45) )
 
-	DISK_REGION( "ata:1:cdrom:device" ) // audio CD-ROM
+	DISK_REGION( "ata:1:cdrom" ) // audio CD-ROM
 	DISK_IMAGE_READONLY( "a01jaa02", 1, BAD_DUMP SHA1(a3fdeee0f85a7a9718c0fb1cc642ac22d3eff8db) )
 ROM_END
 
@@ -2122,10 +2117,10 @@ ROM_START( kbm3rd )
 	ROM_REGION(0xc0, "user2", 0)    // Security dongle
 	ROM_LOAD("gca12-ja", 0x00, 0xc0, BAD_DUMP CRC(cf01dc15) SHA1(da8d208233487ebe65a0a9826fc72f1f459baa26))
 
-	DISK_REGION( "ata:0:cdrom:device" ) // program CD-ROM
+	DISK_REGION( "ata:0:cdrom" ) // program CD-ROM
 	DISK_IMAGE_READONLY( "a12jaa01", 0, BAD_DUMP SHA1(10f2284248e51b1adf0fde173df72ad97fe0e5c8) )
 
-	DISK_REGION( "ata:1:cdrom:device" ) // audio CD-ROM
+	DISK_REGION( "ata:1:cdrom" ) // audio CD-ROM
 	DISK_IMAGE_READONLY( "a12jaa02", 1, BAD_DUMP SHA1(1256ce9d71350d355a256f83c7b319f0e6e84525) )
 ROM_END
 
@@ -2139,10 +2134,10 @@ ROM_START( popn4 )
 	ROM_REGION(0x80000, "audiocpu", 0)          // SPU 68K program
 	ROM_LOAD16_WORD_SWAP("a02jaa04.3q", 0x00000, 0x80000, CRC(8c6000dd) SHA1(94ab2a66879839411eac6c673b25143d15836683))
 
-	DISK_REGION( "ata:0:cdrom:device" ) // program CD-ROM
+	DISK_REGION( "ata:0:cdrom" ) // program CD-ROM
 	DISK_IMAGE_READONLY( "gq986jaa01", 0, SHA1(e5368ac029b0bdf29943ae66677b5521ae1176e1) )
 
-	DISK_REGION( "ata:1:cdrom:device" ) // data DVD-ROM
+	DISK_REGION( "ata:1:cdrom" ) // data DVD-ROM
 	DISK_IMAGE( "gq986jaa02", 1, SHA1(53367d3d5f91422fe386c42716492a0ae4332390) )
 ROM_END
 
@@ -2156,10 +2151,10 @@ ROM_START( popn5 )
 	ROM_REGION(0x80000, "audiocpu", 0)          // SPU 68K program
 	ROM_LOAD16_WORD_SWAP( "a02jaa04.3q",  0x000000, 0x080000, CRC(8c6000dd) SHA1(94ab2a66879839411eac6c673b25143d15836683) )
 
-	DISK_REGION( "ata:0:cdrom:device" ) // program CD-ROM
+	DISK_REGION( "ata:0:cdrom" ) // program CD-ROM
 	DISK_IMAGE_READONLY( "a04jaa01", 0, SHA1(87136ddad1d786b4d5f04381fcbf679ab666e6c9) )
 
-	DISK_REGION( "ata:1:cdrom:device" ) // data DVD-ROM
+	DISK_REGION( "ata:1:cdrom" ) // data DVD-ROM
 	DISK_IMAGE_READONLY( "a04jaa02", 1, SHA1(49a017dde76f84829f6e99a678524c40665c3bfd) )
 ROM_END
 
@@ -2173,10 +2168,10 @@ ROM_START( popn6 )
 	ROM_REGION(0x80000, "audiocpu", 0)          // SPU 68K program
 	ROM_LOAD16_WORD_SWAP("a02jaa04.3q", 0x00000, 0x80000, CRC(8c6000dd) SHA1(94ab2a66879839411eac6c673b25143d15836683))
 
-	DISK_REGION( "ata:0:cdrom:device" ) // program CD-ROM
+	DISK_REGION( "ata:0:cdrom" ) // program CD-ROM
 	DISK_IMAGE_READONLY( "gqa16jaa01", 0, SHA1(7a7e475d06c74a273f821fdfde0743b33d566e4c) )
 
-	DISK_REGION( "ata:1:cdrom:device" ) // data DVD-ROM
+	DISK_REGION( "ata:1:cdrom" ) // data DVD-ROM
 	DISK_IMAGE( "gqa16jaa02", 1, SHA1(e39067300e9440ff19cb98c1abc234fa3d5b26d1) )
 ROM_END
 
@@ -2190,10 +2185,10 @@ ROM_START( popn7 )
 	ROM_REGION(0x80000, "audiocpu", 0)          // SPU 68K program
 	ROM_LOAD16_WORD_SWAP("a02jaa04.3q", 0x00000, 0x80000, CRC(8c6000dd) SHA1(94ab2a66879839411eac6c673b25143d15836683))
 
-	DISK_REGION( "ata:0:cdrom:device" ) // program CD-ROM
+	DISK_REGION( "ata:0:cdrom" ) // program CD-ROM
 	DISK_IMAGE_READONLY( "b00jab01", 0, SHA1(259c733ca4d30281205b46b7bf8d60c9d01aa818) )
 
-	DISK_REGION( "ata:1:cdrom:device" ) // data DVD-ROM
+	DISK_REGION( "ata:1:cdrom" ) // data DVD-ROM
 	DISK_IMAGE_READONLY( "b00jaa02", 1, SHA1(c8ce2f8ee6aeeedef9c110a59e68fcec7b669ad6) )
 ROM_END
 
@@ -2207,10 +2202,10 @@ ROM_START( popn8 )
 	ROM_REGION(0x80000, "audiocpu", 0)          // SPU 68K program
 	ROM_LOAD16_WORD_SWAP("a02jaa04.3q", 0x00000, 0x80000, CRC(8c6000dd) SHA1(94ab2a66879839411eac6c673b25143d15836683))
 
-	DISK_REGION( "ata:0:cdrom:device" ) // program CD-ROM
+	DISK_REGION( "ata:0:cdrom" ) // program CD-ROM
 	DISK_IMAGE_READONLY( "gqb30jaa01", 0, SHA1(0ff3e40e3717ce23337b3a2438bdaca01cba9e30) )
 
-	DISK_REGION( "ata:1:cdrom:device" ) // data DVD-ROM
+	DISK_REGION( "ata:1:cdrom" ) // data DVD-ROM
 	DISK_IMAGE_READONLY( "gqb30jaa02", 1, SHA1(f067d502c23efe0267aada5706f5bc7a54605942) )
 ROM_END
 
@@ -2224,10 +2219,10 @@ ROM_START( popnanm2 )
 	ROM_REGION(0x80000, "audiocpu", 0)          // SPU 68K program
 	ROM_LOAD16_WORD_SWAP("a02jaa04.3q", 0x00000, 0x80000, CRC(8c6000dd) SHA1(94ab2a66879839411eac6c673b25143d15836683))
 
-	DISK_REGION( "ata:0:cdrom:device" ) // program CD-ROM
+	DISK_REGION( "ata:0:cdrom" ) // program CD-ROM
 	DISK_IMAGE_READONLY( "gea02jaa01", 0, SHA1(e81203b6812336c4d00476377193340031ef11b1) )
 
-	DISK_REGION( "ata:1:cdrom:device" ) // data DVD-ROM
+	DISK_REGION( "ata:1:cdrom" ) // data DVD-ROM
 	DISK_IMAGE_READONLY( "gea02jaa02", 1, SHA1(7212e399779f37a5dcb8317a8f635a3b3f620aa9) )
 ROM_END
 
@@ -2238,10 +2233,10 @@ ROM_START( ppd )
 	ROM_REGION(0xc0, "user2", ROMREGION_ERASE00)    // Security dongle
 	ROM_LOAD("gq977-ko", 0x00, 0xc0, BAD_DUMP CRC(ee743323) SHA1(2042e45879795557ad3cc21b37962f6bf54da60d))
 
-	DISK_REGION( "ata:0:cdrom:device" ) // program CD-ROM
+	DISK_REGION( "ata:0:cdrom" ) // program CD-ROM
 	DISK_IMAGE_READONLY( "977kaa01", 0, BAD_DUMP SHA1(7af9f4949ffa10ea5fc18b6c88c2abc710df3cf9) )
 
-	DISK_REGION( "ata:1:cdrom:device" ) // audio CD-ROM
+	DISK_REGION( "ata:1:cdrom" ) // audio CD-ROM
 	DISK_IMAGE_READONLY( "977kaa02", 1, SHA1(0feb5ac56269ad4a8401fcfe3bb98b01a0169177) )
 ROM_END
 
@@ -2252,10 +2247,10 @@ ROM_START( ppp11 )
 	ROM_REGION(0xc0, "user2", ROMREGION_ERASE00)    // Security dongle
 	ROM_LOAD("gq977-ja", 0x00, 0xc0, BAD_DUMP CRC(55b5abdb) SHA1(d8da5bac005235480a1815bd0a79c3e8a63ebad1))
 
-	DISK_REGION( "ata:0:cdrom:device" ) // program CD-ROM
+	DISK_REGION( "ata:0:cdrom" ) // program CD-ROM
 	DISK_IMAGE_READONLY( "gc977jaa01", 0, SHA1(7ed1f4b55105c93fec74468436bfb1d540bce944) )
 
-	DISK_REGION( "ata:1:cdrom:device" ) // audio CD-ROM
+	DISK_REGION( "ata:1:cdrom" ) // audio CD-ROM
 	DISK_IMAGE_READONLY( "gc977jaa02", 1, SHA1(74ce8c90575fd562807def7d561392d0f91f2bc6) )
 ROM_END
 
@@ -2270,7 +2265,7 @@ ROM_START( bm37th )
 	ROM_REGION(0x80000, "audiocpu", 0)          // SPU 68K program
 	ROM_LOAD16_WORD_SWAP("a02jaa04.3q", 0x00000, 0x80000, BAD_DUMP CRC(8c6000dd) SHA1(94ab2a66879839411eac6c673b25143d15836683))
 
-	DISK_REGION( "ata:0:cdrom:device" ) // program CD-ROM
+	DISK_REGION( "ata:0:cdrom" ) // program CD-ROM
 	DISK_IMAGE_READONLY( "gcb07jca01", 0, SHA1(f906379bdebee314e2ca97c7756259c8c25897fd) )
 
 	DISK_REGION( "ata:1:hdd:image" ) // data HDD
@@ -2287,7 +2282,7 @@ ROM_START( bm3final )
 	ROM_REGION(0x80000, "audiocpu", 0)          // SPU 68K program
 	ROM_LOAD16_WORD_SWAP("a02jaa04.3q", 0x00000, 0x80000, BAD_DUMP CRC(8c6000dd) SHA1(94ab2a66879839411eac6c673b25143d15836683))
 
-	DISK_REGION( "ata:0:cdrom:device" ) // program CD-ROM
+	DISK_REGION( "ata:0:cdrom" ) // program CD-ROM
 	DISK_IMAGE_READONLY( "gcc01jca01", 0, SHA1(3e7af83670d791591ad838823422959987f7aab9) )
 
 	DISK_REGION( "ata:1:hdd:image" ) // data HDD

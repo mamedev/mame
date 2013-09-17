@@ -25,7 +25,7 @@ public:
 	virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
 
-	virtual void ExecCommand( int *transferLength );
+	virtual void ExecCommand();
 	virtual void WriteData( UINT8 *data, int dataLength );
 };
 

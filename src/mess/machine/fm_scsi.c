@@ -220,7 +220,8 @@ void fmscsi_device::fmscsi_data_w(UINT8 data)
 		{
 			// command complete
 			m_SCSIdevices[m_target]->SetCommand(m_command,m_command_index);
-			m_SCSIdevices[m_target]->ExecCommand(&m_result_length);
+			m_SCSIdevices[m_target]->ExecCommand();
+			m_SCSIdevices[m_target]->GetLength(&m_result_length);
 			m_SCSIdevices[m_target]->GetPhase(&phase);
 			if(m_command[0] == 1)  // rezero unit command - not implemented in SCSI code
 				m_phase_timer->adjust(attotime::from_usec(800),SCSI_PHASE_STATUS);

@@ -609,9 +609,9 @@ SLOT_INTERFACE_START(dccons_ata_devices)
 SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_FRAGMENT( gdrom_config )
-	MCFG_DEVICE_MODIFY("device:cdda")
-	MCFG_SOUND_ROUTE(0, "^^^^^lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "^^^^^rspeaker", 1.0)
+	MCFG_DEVICE_MODIFY("cdda")
+	MCFG_SOUND_ROUTE(0, "^^^^lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "^^^^rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( dc, dc_cons_state )

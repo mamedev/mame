@@ -19,22 +19,22 @@ acb4070_device::acb4070_device(const machine_config &mconfig, const char *tag, d
 
 #define TRANSFERLENGTH_DATA_BUFFER  0x0400
 
-void acb4070_device::ExecCommand( int *transferLength )
+void acb4070_device::ExecCommand()
 {
 	switch( command[ 0 ] )
 	{
 	case ACB4070_CMD_WRITE_DATA_BUFFER:
-		SetPhase( SCSI_PHASE_DATAOUT );
-		*transferLength = TRANSFERLENGTH_DATA_BUFFER;
+		m_phase = SCSI_PHASE_DATAOUT;
+		m_transfer_length = TRANSFERLENGTH_DATA_BUFFER;
 		break;
 
 	case ACB4070_CMD_READ_DATA_BUFFER:
-		SetPhase( SCSI_PHASE_DATAIN );
-		*transferLength = TRANSFERLENGTH_DATA_BUFFER;
+		m_phase = SCSI_PHASE_DATAIN;
+		m_transfer_length = TRANSFERLENGTH_DATA_BUFFER;
 		break;
 
 	default:
-		scsihd_device::ExecCommand( transferLength );
+		scsihd_device::ExecCommand();
 		break;
 	}
 }

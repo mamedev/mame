@@ -776,7 +776,8 @@ void ncr539x_device::exec_fifo()
 	int length, phase;
 
 	m_scsi_devices[m_last_id]->SetCommand(&m_fifo[0], 12);
-	m_scsi_devices[m_last_id]->ExecCommand(&length);
+	m_scsi_devices[m_last_id]->ExecCommand();
+	m_scsi_devices[m_last_id]->GetLength(&length);
 	m_scsi_devices[m_last_id]->GetPhase(&phase);
 
 	#if VERBOSE

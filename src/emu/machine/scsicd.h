@@ -8,10 +8,10 @@
 #define _SCSICD_H_
 
 #include "machine/scsihle.h"
-#include "sound/cdda.h"
-#include "cdrom.h"
+#include "machine/t10mmc.h"
 
-class scsicd_device : public scsihle_device
+class scsicd_device : public scsihle_device,
+	public t10mmc
 {
 public:
 	// construction/destruction
@@ -19,30 +19,10 @@ public:
 	scsicd_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	virtual machine_config_constructor device_mconfig_additions() const;
 
-	virtual void SetDevice( void *device );
-	virtual void GetDevice( void **device );
-	virtual void ExecCommand( int *transferLength );
-	virtual void WriteData( UINT8 *data, int dataLength );
-	virtual void ReadData( UINT8 *data, int dataLength );
-	virtual int GetSectorBytes();
-
 	static struct cdrom_interface cd_intf;
 
 protected:
-	// device-level overrides
 	virtual void device_start();
-	virtual void device_reset();
-
-private:
-	required_device<cdda_device> m_cdda;
-	UINT32 lba;
-	UINT32 blocks;
-	UINT32 last_lba;
-	UINT32 bytes_per_sector;
-	UINT32 num_subblocks;
-	UINT32 cur_subblock;
-	UINT32 play_err_flag;
-	cdrom_file *cdrom;
 };
 
 // device type definition

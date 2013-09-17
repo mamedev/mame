@@ -1,16 +1,23 @@
 #include "atapicdr.h"
-#include "scsicd.h"
 
 // device type definition
 const device_type ATAPI_CDROM = &device_creator<atapi_cdrom_device>;
 
-atapi_cdrom_device::atapi_cdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: atapi_hle_device(mconfig, ATAPI_CDROM, "ATAPI CDROM", tag, owner, clock, "cdrom", __FILE__)
+atapi_cdrom_device::atapi_cdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	atapi_hle_device(mconfig, ATAPI_CDROM, "ATAPI CDROM", tag, owner, clock, "cdrom", __FILE__)
 {
 }
 
+atapi_cdrom_device::atapi_cdrom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+	atapi_hle_device(mconfig, type, name, tag, owner, clock, shortname, source)
+{
+}
+
+cdrom_interface atapi_cdrom_device::cd_intf = { "cdrom", NULL };
+
 static MACHINE_CONFIG_FRAGMENT( atapicdr )
-	MCFG_DEVICE_ADD("device", SCSICD, 0)
+	MCFG_CDROM_ADD("image", atapi_cdrom_device::cd_intf)
+	MCFG_SOUND_ADD("cdda", CDDA, 0)
 MACHINE_CONFIG_END
 
 //-------------------------------------------------
@@ -25,6 +32,9 @@ machine_config_constructor atapi_cdrom_device::device_mconfig_additions() const
 
 void atapi_cdrom_device::device_start()
 {
+	m_image = subdevice<cdrom_image_device>("image");
+	m_cdda = subdevice<cdda_device>("cdda");
+
 	memset(m_identify_buffer, 0, sizeof(m_identify_buffer));
 
 	m_identify_buffer[ 0 ] = 0x8500; // ATAPI device, cmd set 5 compliant, DRQ within 3 ms of PACKET command

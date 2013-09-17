@@ -127,7 +127,8 @@ WRITE8_MEMBER( am53cf96_device::write )
 					int length;
 
 					devices[last_id]->SetCommand( &fifo[1], 12 );
-					devices[last_id]->ExecCommand( &length );
+					devices[last_id]->ExecCommand();
+					devices[last_id]->GetLength(&length);
 				}
 				else
 				{

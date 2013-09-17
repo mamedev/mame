@@ -17,7 +17,8 @@
 #include "atahle.h"
 #include "scsihle.h"
 
-class atapi_hle_device : public ata_hle_device
+class atapi_hle_device : public ata_hle_device,
+	public virtual t10spc
 {
 public:
 	atapi_hle_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock,const char *shortname, const char *source);
@@ -50,6 +51,9 @@ public:
 	};
 
 protected:
+	virtual void device_start();
+	virtual void device_reset();
+
 	virtual int sector_length() { return ATAPI_BUFFER_LENGTH; }
 	virtual void process_buffer();
 	virtual void fill_buffer();
@@ -68,7 +72,6 @@ private:
 
 	int m_packet;
 	int m_data_size;
-	required_device<scsihle_device> m_scsidev_device;
 
 	static const int ATAPI_BUFFER_LENGTH = 0xf800;
 };

@@ -331,7 +331,8 @@ void wd33c93_device::selectxfer_cmd()
 
 			/* do the request */
 			devices[unit]->SetCommand( &regs[WD_CDB_1], 12 );
-			devices[unit]->ExecCommand( &xfercount );
+			devices[unit]->ExecCommand();
+			devices[unit]->GetLength( &xfercount );
 			devices[unit]->GetPhase( &phase );
 
 			/* set transfer count */
@@ -554,7 +555,8 @@ WRITE8_MEMBER(wd33c93_device::write)
 
 								/* Execute the command. Depending on the command, we'll move to data in or out */
 								devices[unit]->SetCommand( &fifo[0], 12 );
-								devices[unit]->ExecCommand( &xfercount );
+								devices[unit]->ExecCommand();
+								devices[unit]->GetLength( &xfercount );
 								devices[unit]->GetPhase( &phase );
 
 								/* reset fifo */

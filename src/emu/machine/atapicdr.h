@@ -15,11 +15,16 @@
 #define __ATAPICDR_H__
 
 #include "atapihle.h"
+#include "t10mmc.h"
 
-class atapi_cdrom_device : public atapi_hle_device
+class atapi_cdrom_device : public atapi_hle_device,
+	public t10mmc
 {
 public:
 	atapi_cdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	atapi_cdrom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock,const char *shortname, const char *source);
+
+	static struct cdrom_interface cd_intf;
 
 protected:
 	// device-level overrides

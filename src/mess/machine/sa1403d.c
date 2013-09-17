@@ -126,12 +126,12 @@ sa1403d_device::sa1403d_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-void sa1403d_device::ExecCommand( int *transferLength )
+void sa1403d_device::ExecCommand()
 {
 	switch( command[ 0 ] )
 	{
 	default:
-		scsihd_device::ExecCommand( transferLength );
+		scsihd_device::ExecCommand();
 		break;
 	}
 }

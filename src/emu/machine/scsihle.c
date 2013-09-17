@@ -16,103 +16,16 @@ scsihle_device::scsihle_device(const machine_config &mconfig, device_type type, 
 void scsihle_device::device_start()
 {
 	scsidev_device::device_start();
+	t10_start(*this);
 
 	req_timer = timer_alloc(0);
 	sel_timer = timer_alloc(1);
 	dataout_timer = timer_alloc(2);
-
-	save_item( NAME( command ) );
-	save_item( NAME( commandLength ) );
-	save_item( NAME( phase ) );
-
-	// Start with bus free
-	phase = SCSI_PHASE_BUS_FREE;
 }
 
-#define SCSI_SENSE_SIZE             4
-
-void scsihle_device::ExecCommand( int *transferLength )
+void scsihle_device::device_reset()
 {
-	switch( command[ 0 ] )
-	{
-	case SCSI_CMD_TEST_UNIT_READY:
-		SetPhase( SCSI_PHASE_STATUS );
-		*transferLength = 0;
-		break;
-
-	case SCSI_CMD_RECALIBRATE:
-		SetPhase( SCSI_PHASE_STATUS );
-		*transferLength = 0;
-		break;
-
-	case SCSI_CMD_REQUEST_SENSE:
-		SetPhase( SCSI_PHASE_DATAOUT );
-		*transferLength = SCSI_SENSE_SIZE;
-		break;
-
-	case SCSI_CMD_SEND_DIAGNOSTIC:
-		SetPhase( SCSI_PHASE_DATAOUT );
-		*transferLength = ( command[ 3 ] << 8 ) + command[ 4 ];
-		break;
-
-	default:
-		logerror( "%s: SCSIDEV unknown command %02x\n", machine().describe_context(), command[ 0 ] );
-		*transferLength = 0;
-		break;
-	}
-}
-
-void scsihle_device::ReadData( UINT8 *data, int dataLength )
-{
-	switch( command[ 0 ] )
-	{
-	case SCSI_CMD_REQUEST_SENSE:
-		data[ 0 ] = SCSI_SENSE_NO_SENSE;
-		data[ 1 ] = 0x00;
-		data[ 2 ] = 0x00;
-		data[ 3 ] = 0x00;
-		break;
-	default:
-		logerror( "%s: SCSIDEV unknown read %02x\n", machine().describe_context(), command[ 0 ] );
-		break;
-	}
-}
-
-void scsihle_device::WriteData( UINT8 *data, int dataLength )
-{
-	switch( command[ 0 ] )
-	{
-	case SCSI_CMD_SEND_DIAGNOSTIC:
-		break;
-
-	default:
-		logerror( "%s: SCSIDEV unknown write %02x\n", machine().describe_context(), command[ 0 ] );
-		break;
-	}
-}
-
-void scsihle_device::SetPhase( int _phase )
-{
-	phase = _phase;
-}
-
-void scsihle_device::GetPhase( int *_phase)
-{
-	*_phase = phase;
-}
-
-void scsihle_device::SetCommand( UINT8 *_command, int _commandLength )
-{
-	if( _commandLength > sizeof( command ) )
-	{
-		/// TODO: output an error.
-		return;
-	}
-
-	memcpy( command, _command, _commandLength );
-	commandLength = _commandLength;
-
-	SetPhase( SCSI_PHASE_COMMAND );
+	t10_reset();
 }
 
 int scsihle_device::GetDeviceID()
@@ -124,21 +37,6 @@ void scsihle_device::static_set_deviceid( device_t &device, int _scsiID )
 {
 	scsihle_device &scsidev = downcast<scsihle_device &>(device);
 	scsidev.scsiID = _scsiID;
-}
-
-int SCSILengthFromUINT8( UINT8 *length )
-{
-	if( *length == 0 )
-	{
-		return 256;
-	}
-
-	return *length;
-}
-
-int SCSILengthFromUINT16( UINT8 *length )
-{
-	return ( *(length) << 8 ) | *(length + 1 );
 }
 
 #define BSY_DELAY_NS    50
@@ -160,8 +58,6 @@ static const char *const phasenames[] =
 
 
 #define IS_COMMAND(cmd)             (command[0]==cmd)
-#define IS_READ_COMMAND()           ((command[0]==0x08) || (command[0]==0x28) || (command[0]==0xa8))
-#define IS_WRITE_COMMAND()          ((command[0]==0x0a) || (command[0]==0x2a))
 
 #define FORMAT_UNIT_TIMEOUT         5
 
@@ -231,7 +127,7 @@ void scsihle_device::dump_data_bytes(int count)
 
 void scsihle_device::scsibus_read_data()
 {
-	data_last = (bytes_left >= sectorbytes) ? sectorbytes : bytes_left;
+	data_last = (bytes_left >= m_sector_bytes) ? m_sector_bytes : bytes_left;
 
 	LOG(2,"SCSIBUS:scsibus_read_data bytes_left=%04X, data_last=%04X\n",bytes_left,data_last);
 
@@ -284,7 +180,6 @@ void scsihle_device::device_timer(emu_timer &timer, device_timer_id tid, int par
 void scsihle_device::scsibus_exec_command()
 {
 	int command_local = 0;
-	int newphase;
 
 	if(LOGLEVEL)
 		dump_command_bytes();
@@ -300,9 +195,9 @@ void scsihle_device::scsibus_exec_command()
 			LOG(1,"SCSIBUS: format unit command[1]=%02X & 0x10\n",(command[1] & 0x10));
 			command_local=1;
 			if((command[1] & 0x10)==0x10)
-				SetPhase(SCSI_PHASE_DATAOUT);
+				m_phase = SCSI_PHASE_DATAOUT;
 			else
-				SetPhase(SCSI_PHASE_STATUS);
+				m_phase = SCSI_PHASE_STATUS;
 
 			bytes_left=4;
 			dataout_timer->adjust(attotime::from_seconds(FORMAT_UNIT_TIMEOUT));
@@ -312,7 +207,7 @@ void scsihle_device::scsibus_exec_command()
 			LOG(1,"SCSIBUS: Search_data_equaln");
 			command_local=1;
 			bytes_left=0;
-			SetPhase(SCSI_PHASE_STATUS);
+			m_phase = SCSI_PHASE_STATUS;
 			break;
 
 		case SCSI_CMD_READ_DEFECT:
@@ -325,7 +220,7 @@ void scsihle_device::scsibus_exec_command()
 			buffer[4] = 0x00; // defect list len lsb
 
 			bytes_left=4;
-			SetPhase(SCSI_PHASE_DATAIN);
+			m_phase = SCSI_PHASE_DATAIN;
 			break;
 
 		// write buffer
@@ -333,7 +228,7 @@ void scsihle_device::scsibus_exec_command()
 			LOG(1,"SCSIBUS: write_buffer\n");
 			command_local=1;
 			bytes_left=(command[7]<<8)+command[8];
-			SetPhase(SCSI_PHASE_DATAOUT);
+			m_phase = SCSI_PHASE_DATAOUT;
 			break;
 
 		// read buffer
@@ -341,7 +236,7 @@ void scsihle_device::scsibus_exec_command()
 			LOG(1,"SCSIBUS: read_buffer\n");
 			command_local=1;
 			bytes_left=(command[7]<<8)+command[8];
-			SetPhase(SCSI_PHASE_DATAIN);
+			m_phase = SCSI_PHASE_DATAIN;
 			break;
 	}
 
@@ -351,18 +246,17 @@ void scsihle_device::scsibus_exec_command()
 	if(!command_local)
 	{
 		SetCommand(command, cmd_idx);
-		ExecCommand(&bytes_left);
+		ExecCommand();
+		GetLength(&bytes_left);
 		data_idx=0;
 	}
 
-	GetPhase(&newphase);
-
-	scsi_change_phase(newphase);
+	scsi_change_phase(m_phase);
 
 	LOG(1,"SCSIBUS:bytes_left=%02X data_idx=%02X\n",bytes_left,data_idx);
 
 	// This is correct as we need to read from disk for commands other than just read data
-	if ((phase == SCSI_PHASE_DATAIN) && (!command_local))
+	if ((m_phase == SCSI_PHASE_DATAIN) && (!command_local))
 		scsibus_read_data();
 }
 
@@ -384,13 +278,13 @@ UINT8 scsihle_device::scsibus_driveno(UINT8 drivesel)
 
 void scsihle_device::scsi_change_phase(UINT8 newphase)
 {
-	LOG(1,"scsi_change_phase() from=%s, to=%s\n",phasenames[phase],phasenames[newphase]);
+	LOG(1,"scsi_change_phase() from=%s, to=%s\n",phasenames[m_phase],phasenames[newphase]);
 
-	phase=newphase;
+	m_phase=newphase;
 	cmd_idx=0;
 	data_idx=0;
 
-	switch(phase)
+	switch(m_phase)
 	{
 		case SCSI_PHASE_BUS_FREE:
 			scsi_out( 0, SCSI_MASK_ALL );
@@ -443,7 +337,7 @@ void scsihle_device::scsi_in( UINT32 data, UINT32 mask )
 		return;
 	}
 
-	switch (phase)
+	switch (m_phase)
 	{
 		case SCSI_PHASE_BUS_FREE:
 			// Note this assumes we only have one initiator and therefore
@@ -458,7 +352,6 @@ void scsihle_device::scsi_in( UINT32 data, UINT32 mask )
 				{
 					if( ( data & SCSI_MASK_SEL ) == 0 )
 					{
-						sectorbytes = GetSectorBytes();
 						scsi_change_phase(SCSI_PHASE_COMMAND);
 					}
 					else
@@ -500,7 +393,7 @@ void scsihle_device::scsi_in( UINT32 data, UINT32 mask )
 				{
 					// check to see if we have reached the end of the block buffer
 					// and that there is more data to read from the scsi disk
-					if(data_idx==sectorbytes)
+					if(data_idx == m_sector_bytes)
 					{
 						scsibus_read_data();
 					}
@@ -548,7 +441,7 @@ void scsihle_device::scsi_in( UINT32 data, UINT32 mask )
 
 					// If the data buffer is full flush it to the SCSI disk
 
-					data_last = (bytes_left >= sectorbytes) ? sectorbytes : bytes_left;
+					data_last = (bytes_left >= m_sector_bytes) ? m_sector_bytes : bytes_left;
 
 					if(data_idx == data_last)
 						scsibus_write_data();

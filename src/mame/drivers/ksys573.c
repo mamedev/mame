@@ -829,7 +829,7 @@ void ksys573_state::update_disc()
 		new_cdrom = m_available_cdroms[ 0 ];
 	}
 
-	scsihle_device *image = machine().device<scsihle_device>("ata:0:cr589:device");
+	atapi_hle_device *image = machine().device<atapi_hle_device>("ata:0:cr589");
 	if (image != NULL)
 	{
 		void *current_cdrom = NULL;
@@ -2104,9 +2104,9 @@ SLOT_INTERFACE_START(slot_empty)
 SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_FRAGMENT( cr589_config )
-	MCFG_DEVICE_MODIFY("device:cdda")
-	MCFG_SOUND_ROUTE(0, "^^^^^lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "^^^^^rspeaker", 1.0)
+	MCFG_DEVICE_MODIFY("cdda")
+	MCFG_SOUND_ROUTE(0, "^^^^lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "^^^^rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( konami573, ksys573_state )

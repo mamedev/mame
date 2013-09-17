@@ -17,18 +17,18 @@ d9060hd_device::d9060hd_device(const machine_config &mconfig, const char *tag, d
 #define D9060HD_CMD_PHYSICAL_DEVICE_ID ( 0xc0 )
 #define D9060HD_CMD_DRIVE_DIAGS ( 0xe3 )
 
-void d9060hd_device::ExecCommand( int *transferLength )
+void d9060hd_device::ExecCommand()
 {
 	switch( command[ 0 ] )
 	{
 	case D9060HD_CMD_PHYSICAL_DEVICE_ID:
 	case D9060HD_CMD_DRIVE_DIAGS:
-		SetPhase(SCSI_PHASE_STATUS);
-		*transferLength = 0;
+		m_phase = SCSI_PHASE_STATUS;
+		m_transfer_length = 0;
 		break;
 
 	default:
-		scsihd_device::ExecCommand( transferLength );
+		scsihd_device::ExecCommand();
 		break;
 	}
 }
