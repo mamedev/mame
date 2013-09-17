@@ -3427,6 +3427,67 @@ static INPUT_PORTS_START( twinactn )
 	PORT_DIPSETTING(      0x0000, "5" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( dolmen )
+	PORT_INCLUDE( afega_common )
+
+	PORT_MODIFY("IN0")  // $080000.w
+	PORT_SERVICE_NO_TOGGLE(0x0020, IP_ACTIVE_LOW   )    // Test in service mode
+
+	PORT_MODIFY("IN1")  // $080002.w
+	PORT_BIT(  0x0080, IP_ACTIVE_LOW,IPT_UNKNOWN ) // Tested at boot
+	PORT_BIT(  0x8000, IP_ACTIVE_LOW,IPT_UNKNOWN ) // Tested at boot
+
+	PORT_START("DSW1")  // $080004.w
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+INPUT_PORTS_END
+
 
 
 static const gfx_layout charlayout =
@@ -7122,6 +7183,37 @@ ROM_START( hotbubl )
 	ROM_LOAD( "s2.uc18", 0x00000, 0x40000, CRC(401c980f) SHA1(e47710c47cfeecce3ccf87f845b219a9c9f21ee3) )
 ROM_END
 
+
+ROM_START( dolmen )
+	ROM_REGION( 0x40000, "maincpu", 0 )     /* 68000 Code */
+	ROM_LOAD16_BYTE( "afega8.uj3", 0x00000, 0x20000, CRC(f1b73e4c) SHA1(fe5bbd1e91d1a81744c373effbd96adbbc896133) )
+	ROM_LOAD16_BYTE( "afega7.uj2", 0x00001, 0x20000, CRC(c91bda0b) SHA1(8c09e3020e72e8ab2ca3a3dad708d64f9bf75a4f) )
+
+	ROM_REGION( 0x8000, "audiocpu", 0 )     /* Z80 Code */
+	ROM_LOAD( "afega1.su6", 0x0000, 0x8000, CRC(166b53cb) SHA1(44864d1518205bdc445dc95e5825924f73d334b2) )   // 1111xxxxxxxxxxx = 0x00
+
+	ROM_REGION( 0x100000, "sprites", 0 )   /* Sprites, 16x16x4 */
+	ROM_LOAD16_BYTE( "afega4.ub11", 0x00000, 0x80000, CRC(5a259393) SHA1(62c41ef4f398295d5cc1122c64487e12c4226ede) )
+	ROM_LOAD16_BYTE( "afega5.ub13", 0x00001, 0x80000, CRC(7f6a683d) SHA1(ab7026906b68aa9f4d75b0e56564216727decfde) )
+
+	ROM_REGION( 0x80000, "bgtile", 0 )    /* Layer 0, 16x16x8 */
+	ROM_LOAD( "afega9.ui20", 0x00000, 0x80000, CRC(b3fa7be6) SHA1(7ef8d902bd954960fbae727aae02dce9750f740e) )
+
+	ROM_REGION( 0x20000, "fgtile", 0 )    /* Layer 1, 8x8x4 */
+	ROM_LOAD( "afega6.uj11", 0x00000, 0x20000, CRC(13fa4415) SHA1(193524ebccbaae6b8c00893c42399c38cafdbd79) )
+
+	ROM_REGION( 0x100000, "oki1", 0 )   /* Samples */
+	ROM_LOAD( "afega2.su12", 0x000000, 0x20000, CRC(1a2ce1c2) SHA1(ae6991fbfe57d35f32b541367d3b31244456713e) )
+	ROM_RELOAD(              0x040000, 0x20000 )
+	ROM_RELOAD(              0x080000, 0x20000 )
+	ROM_RELOAD(              0x0c0000, 0x20000 )
+	ROM_RELOAD(              0x020000, 0x20000 )
+	ROM_RELOAD(              0x060000, 0x20000 )
+	ROM_LOAD( "afega3.su13", 0x0a0000, 0x20000, CRC(d3531018) SHA1(940067a8634339258666c89319cb0e1b43f2af56) )
+	ROM_CONTINUE(            0x0e0000, 0x20000 )
+ROM_END
+
+
 /***************************************************************************
 
 Fire Hawk - ESD, 2001
@@ -7316,8 +7408,6 @@ ROM_START( twinactn )
 	ROM_CONTINUE(           0x0e0000, 0x20000 )
 ROM_END
 
-
-
 /***************************************************************************
 
 
@@ -7398,6 +7488,8 @@ GAME( 1996, airattcka,airattck, ssmissin, airattck, nmk16_state, ssmissin, ROT27
 // afega & clones
 GAME( 1995, twinactn, 0,        twinactn, twinactn, driver_device, 0,        ROT0,   "Afega",                             "Twin Action", 0 ) // hacked from USSAF Mustang
 
+GAME( 1995, dolmen, 0,          twinactn, dolmen, driver_device, 0,        ROT0,   "Afega",                             "Dolmen", 0 )
+
 GAME( 1998, stagger1, 0,        stagger1, stagger1, driver_device, 0,        ROT270, "Afega",                             "Stagger I (Japan)", 0 )
 GAME( 1997, redhawk,  stagger1, stagger1, stagger1, nmk16_state,   redhawk,  ROT270, "Afega (New Vision Ent. license)",   "Red Hawk (US)", 0 )
 GAME( 1997, redhawki, stagger1, redhawki, stagger1, driver_device, 0,        ROT0,   "Afega (Hea Dong Corp license)",     "Red Hawk (Italy)", 0 ) // bootleg? strange scroll regs
@@ -7411,8 +7503,9 @@ GAME( 1998, redfoxwp2,grdnstrm, grdnstrmk,grdnstrk, nmk16_state,   grdnstrm, ROT
 GAME( 1998, redfoxwp2a,grdnstrm,grdnstrmk,grdnstrk, nmk16_state,  redfoxwp2a,ROT270,             "Afega",                             "Red Fox War Planes II (China, set 2)", 0 )
 GAME( 1998, grdnstrmg,grdnstrm, grdnstrmk,grdnstrk, nmk16_state,   grdnstrmg,ROT270,             "Afega",                             "Guardian Storm (Germany)", 0 )
 
-GAME( 1998, bubl2000, 0,        popspops, bubl2000, nmk16_state,   bubl2000, ROT0,               "Tuning",                            "Bubble 2000", 0 ) // on a tuning board (bootleg?)
-GAME( 1998, hotbubl,  bubl2000, popspops, bubl2000, nmk16_state,   bubl2000, ROT0,               "Pandora",                           "Hot Bubble" , 0 ) // on an afega board ..
+// is there a 'bubble 2000' / 'hot bubble' version with Afega copyright, or is the only Afega release dolmen above, this seems like a sequel, not a clone?
+GAME( 1998, bubl2000, 0,        popspops, bubl2000, nmk16_state,   bubl2000, ROT0,               "Afega (Tuning license)",                            "Bubble 2000", 0 ) // on a tuning board (bootleg?)
+GAME( 1998, hotbubl,  bubl2000, popspops, bubl2000, nmk16_state,   bubl2000, ROT0,               "Afega (Pandora license)",                           "Hot Bubble" , 0 ) // on an afega board ..
 
 GAME( 1999, popspops, 0,        popspops, popspops, nmk16_state,   grdnstrm, ROT0,               "Afega",                             "Pop's Pop's", 0 )
 
