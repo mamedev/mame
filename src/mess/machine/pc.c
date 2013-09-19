@@ -13,6 +13,7 @@
 
 #include "emu.h"
 #include "includes/pc.h"
+#include "cpu/i86/i86.h"
 
 #include "machine/i8255.h"
 #include "machine/ins8250.h"
@@ -1278,7 +1279,7 @@ READ8_MEMBER(pc_state::mc1502_wd17xx_drq_r)
 
 	if (!fdc->drq_r() && !fdc->intrq_r()) {
 		/* fake cpu wait by resetting PC one insn back */
-		m_maincpu->set_pc(m_maincpu->pc() - 1);
+		m_maincpu->set_state_int(I8086_IP, m_maincpu->state_int(I8086_IP) - 1);
 		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	}
 
