@@ -62,7 +62,7 @@ void m4510_device::device_start()
 	else
 		mintf = new mi_4510_normal(this);
 
-	m65ce02_device::device_start();
+	m65ce02_device::init();
 
 	save_item(NAME(map_offset));
 	save_item(NAME(map_enable));
@@ -70,10 +70,14 @@ void m4510_device::device_start()
 
 void m4510_device::device_reset()
 {
-	m65ce02_device::device_reset();
 	map_offset[0] = map_offset[1] = 0;
 	map_enable = 0;
 	nomap = true;
+
+	// Wild guess, this setting makes the cpu start executing some code in the c65 driver
+	map_offset[1] = 0x30000;
+	map_enable = 0x80;
+	m65ce02_device::device_reset();
 }
 
 m4510_device::mi_4510_normal::mi_4510_normal(m4510_device *_base)
