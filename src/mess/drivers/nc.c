@@ -1672,6 +1672,12 @@ ROM_START(nc100)
 ROM_END
 
 
+ROM_START(dw225)
+	ROM_REGION(((64*1024)+(512*1024)), "maincpu",0)
+	ROM_LOAD("dr (1.06).ic303",  0x010000, 0x080000, CRC(fcf2f7bd) SHA1(a69951618b24e97154cb4284d215cbf4aa9fb34f))
+ROM_END
+
+
 ROM_START(nc150)
 	ROM_REGION(((64*1024)+(512*1024)), "maincpu",0)
 	ROM_SYSTEM_BIOS(0, "b2", "French B2")
@@ -1688,5 +1694,6 @@ ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY         FULLNAME    FLAGS */
 COMP( 1992, nc100,  0,      0,      nc100,  nc100, nc_state,  nc,      "Amstrad plc",  "NC100",    0 )
+COMP( 1992, dw225,  nc100,  0,      nc100,  nc100, nc_state,  nc,      "NTS Computer Systems", "DreamWriter 225",    0 )
 COMP( 1992, nc150,  nc100,  0,      nc100,  nc100, nc_state,  nc,      "Amstrad plc",  "NC150",    0 )
 COMP( 1993, nc200,  0,      0,      nc200,  nc200, nc_state,  nc,      "Amstrad plc",  "NC200",    GAME_NOT_WORKING ) // boot hangs while checking the MC146818 UIP (update in progress) bit
