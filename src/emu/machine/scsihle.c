@@ -61,29 +61,6 @@ static const char *const phasenames[] =
 
 #define FORMAT_UNIT_TIMEOUT         5
 
-struct adaptec_sense_t
-{
-	// parameter list
-	UINT8       reserved1[3];
-	UINT8       length;
-
-	// descriptor list
-	UINT8       density;
-	UINT8       reserved2[4];
-	UINT8       block_size[3];
-
-	// drive parameter list
-	UINT8       format_code;
-	UINT8       cylinder_count[2];
-	UINT8       head_count;
-	UINT8       reduced_write[2];
-	UINT8       write_precomp[2];
-	UINT8       landing_zone;
-	UINT8       step_pulse_code;
-	UINT8       bit_flags;
-	UINT8       sectors_per_track;
-};
-
 /*
     LOGLEVEL
         0   no logging,
@@ -172,9 +149,9 @@ void scsihle_device::device_timer(emu_timer &timer, device_timer_id tid, int par
 		if(IS_COMMAND(SCSI_CMD_FORMAT_UNIT) && (data_idx==0))
 		{
 			scsi_change_phase(SCSI_PHASE_STATUS);
-		}
-		break;
 	}
+		break;
+}
 }
 
 void scsihle_device::scsibus_exec_command()
@@ -448,7 +425,6 @@ void scsihle_device::scsi_in( UINT32 data, UINT32 mask )
 
 					if(data_idx == 0 && bytes_left == 0)
 					{
-						check_process_dataout();
 						scsi_change_phase(SCSI_PHASE_STATUS);
 					}
 					else
@@ -508,27 +484,6 @@ void scsihle_device::scsi_in( UINT32 data, UINT32 mask )
 					scsi_out_req_delay( 0 );
 				}
 			}
-			break;
-	}
-}
-
-void scsihle_device::check_process_dataout()
-{
-	int capacity=0;
-	int tracks;
-	adaptec_sense_t *sense;
-
-	LOG(1,"SCSIBUS:check_process_dataout cmd=%02X\n",command[0]);
-
-	switch (command[0])
-	{
-		case SCSI_CMD_MODE_SELECT:
-			sense=(adaptec_sense_t *)buffer;
-			tracks=(sense->cylinder_count[0]<<8)+sense->cylinder_count[1];
-			capacity=(tracks * sense->head_count * 17);
-			LOG(1,"Tracks=%d, Heads=%d sec/track=%d\n",tracks,sense->head_count,sense->sectors_per_track);
-			LOG(1,"Setting disk capacity to %d blocks\n",capacity);
-			dump_data_bytes(0x16);
 			break;
 	}
 }

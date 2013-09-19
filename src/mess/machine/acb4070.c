@@ -33,8 +33,27 @@ void acb4070_device::ExecCommand()
 		m_transfer_length = TRANSFERLENGTH_DATA_BUFFER;
 		break;
 
+	case SCSI_CMD_MODE_SELECT:
+		m_phase = SCSI_PHASE_DATAOUT;
+		m_transfer_length = SCSILengthFromUINT8( &command[ 4 ] );
+		break;
+
 	default:
 		scsihd_device::ExecCommand();
+		break;
+	}
+}
+
+void acb4070_device::WriteData( UINT8 *data, int dataLength )
+{
+	switch( command[ 0 ] )
+	{
+	case SCSI_CMD_MODE_SELECT:
+		adaptec_sense_t *sense=(adaptec_sense_t *) data;
+		int tracks=(sense->cylinder_count[0]<<8)+sense->cylinder_count[1];
+		int capacity=(tracks * sense->head_count * 17);
+		logerror("Tracks=%d, Heads=%d sec/track=%d\n",tracks,sense->head_count,sense->sectors_per_track);
+		logerror("Setting disk capacity to %d blocks\n",capacity);
 		break;
 	}
 }

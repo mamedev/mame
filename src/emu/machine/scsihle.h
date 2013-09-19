@@ -41,7 +41,6 @@ private:
 	void scsibus_read_data();
 	void scsibus_write_data();
 	void scsibus_exec_command();
-	void check_process_dataout();
 	void dump_command_bytes();
 	void dump_data_bytes(int count);
 	void dump_bytes(UINT8 *buff, int count);
