@@ -80,7 +80,8 @@
   }
   
   function startWebSocket() {
-    var url = 'ws://localhost:8080/foo';
+	var docbase = window.location.href.toString();
+	var url = docbase.replace("http://","ws://");
     websocket = new WebSocket(url);
     websocket.onopen = function(ev) {
 	  writeToScreen('<b style="color: green;">Connected</b>');
