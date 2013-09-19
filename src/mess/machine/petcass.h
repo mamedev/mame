@@ -107,5 +107,12 @@ protected:
 extern const device_type PET_DATASSETTE_PORT;
 
 
+// slot devices
+#include "machine/c2n.h"
+#include "machine/diag264_lb_tape.h"
+
+SLOT_INTERFACE_EXTERN( cbm_datassette_devices );
+
+
 
 #endif

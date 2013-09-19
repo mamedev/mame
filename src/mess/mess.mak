@@ -747,6 +747,14 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/hd63450.o   \
 	$(MESS_MACHINE)/i8271.o     \
 	$(MESS_MACHINE)/ieee488.o   \
+	$(MESS_MACHINE)/c2031.o     \
+	$(MESS_MACHINE)/c2040.o     \
+	$(MESS_MACHINE)/c8280.o     \
+	$(MESS_MACHINE)/d9060.o     \
+	$(MESS_MACHINE)/d9060hd.o   \
+	$(MESS_MACHINE)/softbox.o   \
+	$(MESS_MACHINE)/hardbox.o   \
+	$(MESS_MACHINE)/shark.o     \
 	$(MESS_MACHINE)/imi5000h.o  \
 	$(MESS_MACHINE)/kb3600.o    \
 	$(MESS_MACHINE)/keyboard.o  \
@@ -1074,7 +1082,6 @@ $(MESSOBJ)/cbm.a:               \
 	$(MESS_MACHINE)/pet_64k.o   \
 	$(MESS_MACHINE)/superpet.o  \
 	$(MESS_MACHINE)/mos6702.o   \
-	$(MESS_MACHINE)/shark.o     \
 	$(MESS_DRIVERS)/c64.o       \
 	$(MESS_DRIVERS)/c64dtv.o    \
 	$(MESS_MACHINE)/c64/exp.o   \
@@ -1187,20 +1194,11 @@ $(MESSOBJ)/cbm.a:               \
 	$(MESS_MACHINE)/c1551.o     \
 	$(MESS_MACHINE)/c1571.o     \
 	$(MESS_MACHINE)/c1581.o     \
-	$(MESS_MACHINE)/c2031.o     \
-	$(MESS_MACHINE)/c2040.o     \
-	$(MESS_MACHINE)/c8280.o     \
-	$(MESS_MACHINE)/d9060.o     \
-	$(MESS_MACHINE)/d9060hd.o   \
 	$(MESS_MACHINE)/serialbox.o \
 	$(MESS_MACHINE)/c64_nl10.o \
-	$(MESS_MACHINE)/softbox.o   \
-	$(MESS_MACHINE)/hardbox.o   \
 	$(MESS_MACHINE)/cmdhd.o     \
 	$(MESS_MACHINE)/fd2000.o    \
 	$(MESS_DRIVERS)/clcd.o      \
-	$(MESS_MACHINE)/cbm.o       \
-	$(MESS_MACHINE)/cbmipt.o    \
 	$(MESS_MACHINE)/64h156.o    \
 	$(MESS_MACHINE)/mos8722.o   \
 	$(MESS_MACHINE)/mos8726.o   \

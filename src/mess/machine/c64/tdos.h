@@ -14,7 +14,6 @@
 
 #include "emu.h"
 #include "machine/c64/exp.h"
-#include "machine/cbmipt.h"
 #include "machine/mc6852.h"
 
 

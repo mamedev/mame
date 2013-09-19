@@ -117,5 +117,11 @@ protected:
 extern const device_type PLUS4_USER_PORT;
 
 
+// slot devices
+#include "machine/diag264_lb_user.h"
+
+SLOT_INTERFACE_EXTERN( plus4_user_port_cards );
+
+
 
 #endif

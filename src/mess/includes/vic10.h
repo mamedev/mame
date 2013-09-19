@@ -5,10 +5,10 @@
 
 #include "emu.h"
 #include "cpu/m6502/m6510.h"
-#include "machine/cbmipt.h"
 #include "machine/mos6526.h"
 #include "machine/petcass.h"
 #include "machine/ram.h"
+#include "machine/vic10exp.h"
 #include "machine/vcsctrl.h"
 #include "sound/dac.h"
 #include "sound/mos6581.h"

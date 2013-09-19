@@ -152,5 +152,17 @@ protected:
 extern const device_type C64_USER_PORT;
 
 
+// slot devices
+#include "machine/c64/4cga.h"
+#include "machine/c64/4dxh.h"
+#include "machine/c64/4ksa.h"
+#include "machine/c64/4tba.h"
+#include "machine/c64/bn1541.h"
+#include "machine/c64/geocable.h"
+#include "machine/c64/vic1011.h"
+
+SLOT_INTERFACE_EXTERN( c64_user_port_cards );
+
+
 
 #endif

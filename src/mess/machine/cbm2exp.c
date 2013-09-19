@@ -289,3 +289,14 @@ void cbm2_expansion_slot_device::write(address_space &space, offs_t offset, UINT
 		m_card->cbm2_bd_w(space, offset, data, csbank1, csbank2, csbank3);
 	}
 }
+
+
+//-------------------------------------------------
+//  SLOT_INTERFACE( cbm2_expansion_cards )
+//-------------------------------------------------
+
+SLOT_INTERFACE_START( cbm2_expansion_cards )
+	SLOT_INTERFACE("24k", CBM2_24K)
+	SLOT_INTERFACE_INTERNAL("standard", CBM2_STD)
+	SLOT_INTERFACE_INTERNAL("graphic", CBM2_GRAPHIC)
+SLOT_INTERFACE_END

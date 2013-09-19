@@ -17,12 +17,7 @@
 #include "machine/6522via.h"
 #include "machine/6532riot.h"
 #include "machine/6850acia.h"
-#include "machine/c2031.h"
-#include "machine/c2040.h"
-#include "machine/c8280.h"
-#include "machine/d9060.h"
 #include "machine/cbmiec.h"
-#include "machine/cbmipt.h"
 #include "machine/ieee488.h"
 
 

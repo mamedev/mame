@@ -123,3 +123,12 @@ READ_LINE_MEMBER( vic20_user_port_device::cassette_switch_r ) { int state = 1; i
 WRITE_LINE_MEMBER( vic20_user_port_device::cb1_w ) { if (m_card != NULL) m_card->vic20_cb1_w(state); }
 WRITE_LINE_MEMBER( vic20_user_port_device::cb2_w ) { if (m_card != NULL) m_card->vic20_cb2_w(state); }
 WRITE_LINE_MEMBER( vic20_user_port_device::atn_w ) { if (m_card != NULL) m_card->vic20_atn_w(state); }
+
+
+//-------------------------------------------------
+//  SLOT_INTERFACE( vic20_user_port_cards )
+//-------------------------------------------------
+
+SLOT_INTERFACE_START( vic20_user_port_cards )
+	SLOT_INTERFACE("rs232", VIC1011)
+SLOT_INTERFACE_END

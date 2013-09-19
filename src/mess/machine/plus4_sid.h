@@ -17,7 +17,6 @@
 #include "machine/plus4exp.h"
 #include "sound/dac.h"
 #include "sound/mos6581.h"
-#include "machine/cbmipt.h"
 #include "machine/vcsctrl.h"
 
 

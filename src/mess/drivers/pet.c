@@ -1269,6 +1269,15 @@ static MC6845_INTERFACE( cbm8296_crtc_intf )
 };
 
 
+//-------------------------------------------------
+//  SLOT_INTERFACE( cbm8296d_ieee488_devices )
+//-------------------------------------------------
+
+SLOT_INTERFACE_START( cbm8296d_ieee488_devices )
+	SLOT_INTERFACE("c8250lp", C8250LP)
+SLOT_INTERFACE_END
+
+
 
 //**************************************************************************
 //  MACHINE INITIALIZATION

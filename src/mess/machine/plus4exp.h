@@ -187,5 +187,13 @@ protected:
 extern const device_type PLUS4_EXPANSION_SLOT;
 
 
+// slot devices
+#include "machine/c1551.h"
+#include "machine/plus4_sid.h"
+#include "machine/plus4_std.h"
+
+SLOT_INTERFACE_EXTERN( plus4_expansion_cards );
+
+
 
 #endif

@@ -146,5 +146,11 @@ protected:
 extern const device_type VIC20_USER_PORT;
 
 
+// slot devices
+#include "machine/vic1011.h"
+
+SLOT_INTERFACE_EXTERN( vic20_user_port_cards );
+
+
 
 #endif

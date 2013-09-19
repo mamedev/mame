@@ -12,7 +12,6 @@
 #ifndef __C2040__
 #define __C2040__
 
-
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6502/m6504.h"
@@ -21,9 +20,8 @@
 #include "formats/g64_dsk.h"
 #include "machine/6522via.h"
 #include "machine/6532riot.h"
-#include "machine/cbmipt.h"
-#include "machine/mos6530.h"
 #include "machine/ieee488.h"
+#include "machine/mos6530.h"
 
 
 

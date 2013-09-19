@@ -16,7 +16,6 @@
 #include "emu.h"
 #include "machine/6525tpi.h"
 #include "machine/c64/exp.h"
-#include "machine/cbmipt.h"
 #include "machine/ieee488.h"
 #include "video/mc6845.h"
 

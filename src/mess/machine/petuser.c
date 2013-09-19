@@ -112,3 +112,11 @@ READ_LINE_MEMBER( pet_user_port_device::ca1_r ) { int state = 1; if (m_card != N
 WRITE_LINE_MEMBER( pet_user_port_device::ca1_w ) { if (m_card != NULL) m_card->pet_ca1_w(state); }
 READ_LINE_MEMBER( pet_user_port_device::cb2_r ) { int state = 1; if (m_card != NULL) state = m_card->pet_cb2_r(); return state; }
 WRITE_LINE_MEMBER( pet_user_port_device::cb2_w ) { if (m_card != NULL) m_card->pet_cb2_w(state); }
+
+
+//-------------------------------------------------
+//  SLOT_INTERFACE( pet_user_port_cards )
+//-------------------------------------------------
+
+SLOT_INTERFACE_START( pet_user_port_cards )
+SLOT_INTERFACE_END

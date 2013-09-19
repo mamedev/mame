@@ -21,7 +21,6 @@
 #include "machine/64h156.h"
 #include "machine/6525tpi.h"
 #include "machine/c1541.h"
-#include "machine/cbmipt.h"
 #include "machine/pla.h"
 #include "machine/plus4exp.h"
 

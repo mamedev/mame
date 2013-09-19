@@ -28,7 +28,6 @@
 #include "cpu/m6502/m6502.h"
 #include "machine/6522via.h"
 #include "machine/6532riot.h"
-#include "machine/cbmipt.h"
 #include "machine/ieee488.h"
 #include "machine/scsicb.h"
 

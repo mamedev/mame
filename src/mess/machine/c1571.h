@@ -21,7 +21,6 @@
 #include "machine/6522via.h"
 #include "machine/c64/bn1541.h"
 #include "machine/cbmiec.h"
-#include "machine/cbmipt.h"
 #include "machine/isa.h"
 #include "machine/mos6526.h"
 #include "machine/wd_fdc.h"

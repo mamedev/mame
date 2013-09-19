@@ -121,3 +121,11 @@ WRITE_LINE_MEMBER( cbm2_user_port_device::pb3_w ) { if (m_card != NULL) m_card->
 WRITE_LINE_MEMBER( cbm2_user_port_device::pc_w ) { if (m_card != NULL) m_card->cbm2_pc_w(state); }
 WRITE_LINE_MEMBER( cbm2_user_port_device::cnt_w ) { if (m_card != NULL) m_card->cbm2_cnt_w(state); }
 WRITE_LINE_MEMBER( cbm2_user_port_device::sp_w ) { if (m_card != NULL) m_card->cbm2_sp_w(state); }
+
+
+//-------------------------------------------------
+//  SLOT_INTERFACE( cbm2_user_port_cards )
+//-------------------------------------------------
+
+SLOT_INTERFACE_START( cbm2_user_port_cards )
+SLOT_INTERFACE_END

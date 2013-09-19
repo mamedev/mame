@@ -315,3 +315,20 @@ void vic20_expansion_slot_device::cd_w(address_space &space, offs_t offset, UINT
 		m_card->vic20_cd_w(space, offset, data, ram1, ram2, ram3, blk1, blk2, blk3, blk5, io2, io3);
 	}
 }
+
+
+//-------------------------------------------------
+//  SLOT_INTERFACE( vic20_expansion_cards )
+//-------------------------------------------------
+
+SLOT_INTERFACE_START( vic20_expansion_cards )
+	SLOT_INTERFACE("exp", VIC1010)
+	SLOT_INTERFACE("3k", VIC1210)
+	SLOT_INTERFACE("8k", VIC1110)
+	SLOT_INTERFACE("16k", VIC1111)
+
+	// the following need ROMs from the software list
+	SLOT_INTERFACE_INTERNAL("standard", VIC20_STD)
+	SLOT_INTERFACE_INTERNAL("ieee488", VIC1112)
+	SLOT_INTERFACE_INTERNAL("megacart", VIC20_MEGACART)
+SLOT_INTERFACE_END

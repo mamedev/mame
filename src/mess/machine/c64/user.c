@@ -106,3 +106,18 @@ WRITE_LINE_MEMBER( c64_user_port_device::cnt1_w ) { if (m_card != NULL) m_card->
 WRITE_LINE_MEMBER( c64_user_port_device::sp1_w ) { if (m_card != NULL) m_card->c64_sp1_w(state); }
 WRITE_LINE_MEMBER( c64_user_port_device::cnt2_w ) { if (m_card != NULL) m_card->c64_cnt2_w(state); }
 WRITE_LINE_MEMBER( c64_user_port_device::sp2_w ) { if (m_card != NULL) m_card->c64_sp2_w(state); }
+
+
+//-------------------------------------------------
+//  SLOT_INTERFACE( c64_user_port_cards )
+//-------------------------------------------------
+
+SLOT_INTERFACE_START( c64_user_port_cards )
+	SLOT_INTERFACE("4cga", C64_4CGA)
+	SLOT_INTERFACE("4dxh", C64_4DXH)
+	SLOT_INTERFACE("4ksa", C64_4KSA)
+	SLOT_INTERFACE("4tba", C64_4TBA)
+	SLOT_INTERFACE("bn1541", C64_BN1541)
+	SLOT_INTERFACE("geocable", C64_GEOCABLE)
+	SLOT_INTERFACE("rs232", C64_VIC1011)
+SLOT_INTERFACE_END

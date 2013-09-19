@@ -136,5 +136,9 @@ protected:
 extern const device_type CBM2_USER_PORT;
 
 
+// slot devices
+SLOT_INTERFACE_EXTERN( cbm2_user_port_cards );
+
+
 
 #endif

@@ -131,5 +131,9 @@ protected:
 extern const device_type PET_USER_PORT;
 
 
+// slot devices
+SLOT_INTERFACE_EXTERN( pet_user_port_cards );
+
+
 
 #endif

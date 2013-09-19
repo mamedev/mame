@@ -5,13 +5,11 @@
 
 
 #include "emu.h"
-#include "includes/cbm.h"
 #include "machine/cbm_snqk.h"
 #include "cpu/m6502/m6510.h"
 #include "imagedev/cartslot.h"
 #include "machine/6522via.h"
 #include "machine/cbmiec.h"
-#include "machine/cbmipt.h"
 #include "machine/ieee488.h"
 #include "machine/petcass.h"
 #include "machine/ram.h"

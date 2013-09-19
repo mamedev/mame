@@ -17,7 +17,6 @@
 #include "imagedev/harddriv.h"
 #include "machine/6522via.h"
 #include "machine/cbmiec.h"
-#include "machine/cbmipt.h"
 #include "machine/i8255.h"
 #include "machine/scsibus.h"
 #include "machine/scsicb.h"

@@ -186,3 +186,13 @@ int pet_expansion_slot_device::phi2()
 {
 	return clock();
 }
+
+
+//-------------------------------------------------
+//  SLOT_INTERFACE( pet_expansion_cards )
+//-------------------------------------------------
+
+SLOT_INTERFACE_START( pet_expansion_cards )
+	SLOT_INTERFACE("64k", PET_64K)
+	SLOT_INTERFACE("superpet", SUPERPET)
+SLOT_INTERFACE_END

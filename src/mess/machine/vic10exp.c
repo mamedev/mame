@@ -275,3 +275,13 @@ void vic10_expansion_slot_device::cd_w(address_space &space, offs_t offset, UINT
 
 READ_LINE_MEMBER( vic10_expansion_slot_device::p0_r ) { int state = 0; if (m_card != NULL) state = m_card->vic10_p0_r(); return state; }
 WRITE_LINE_MEMBER( vic10_expansion_slot_device::p0_w ) { if (m_card != NULL) m_card->vic10_p0_w(state); }
+
+
+//-------------------------------------------------
+//  SLOT_INTERFACE( vic10_expansion_cards )
+//-------------------------------------------------
+
+SLOT_INTERFACE_START( vic10_expansion_cards )
+	// the following need ROMs from the software list
+	SLOT_INTERFACE_INTERNAL("standard", VIC10_STD)
+SLOT_INTERFACE_END

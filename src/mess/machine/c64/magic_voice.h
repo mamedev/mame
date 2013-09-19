@@ -16,7 +16,6 @@
 #include "machine/40105.h"
 #include "machine/6525tpi.h"
 #include "machine/c64/exp.h"
-#include "machine/cbmipt.h"
 #include "sound/t6721a.h"
 
 

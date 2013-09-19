@@ -22,7 +22,6 @@
 #include "machine/6821pia.h"
 #include "machine/c64/bn1541.h"
 #include "machine/cbmiec.h"
-#include "machine/cbmipt.h"
 #include "machine/ctronics.h"
 
 

@@ -654,6 +654,16 @@ WRITE_LINE_MEMBER( plus4_state::exp_irq_w )
 }
 
 
+//-------------------------------------------------
+//  SLOT_INTERFACE( cbm_datassette_devices )
+//-------------------------------------------------
+
+SLOT_INTERFACE_START( plus4_datassette_devices )
+	SLOT_INTERFACE("c1531", C1531)
+	SLOT_INTERFACE("diag264", DIAG264_CASSETTE_LOOPBACK)
+SLOT_INTERFACE_END
+
+
 
 //**************************************************************************
 //  MACHINE INITIALIZATION

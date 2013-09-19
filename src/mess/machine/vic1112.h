@@ -18,7 +18,6 @@
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/6522via.h"
-#include "machine/cbmipt.h"
 #include "machine/ieee488.h"
 #include "machine/vic20exp.h"
 

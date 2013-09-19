@@ -362,3 +362,24 @@ UINT8 ieee488_device::get_data()
 
 	return data;
 }
+
+
+//-------------------------------------------------
+//  SLOT_INTERFACE( cbm_ieee488_devices )
+//-------------------------------------------------
+
+SLOT_INTERFACE_START( cbm_ieee488_devices )
+	SLOT_INTERFACE("c2040", C2040)
+	SLOT_INTERFACE("c3040", C3040)
+	SLOT_INTERFACE("c4040", C4040)
+	SLOT_INTERFACE("c8050", C8050)
+	SLOT_INTERFACE("c8250", C8250)
+	SLOT_INTERFACE("sfd1001", SFD1001)
+	SLOT_INTERFACE("c2031", C2031)
+	SLOT_INTERFACE("c8280", C8280)
+	SLOT_INTERFACE("d9060", D9060)
+	SLOT_INTERFACE("d9090", D9090)
+	SLOT_INTERFACE("softbox", SOFTBOX)
+	SLOT_INTERFACE("hardbox", HARDBOX)
+	SLOT_INTERFACE("shark", SHARK)
+SLOT_INTERFACE_END

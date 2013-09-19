@@ -54,6 +54,15 @@
 	downcast<cbm_iec_slot_device *>(device)->set_address(_address);
 
 
+#define MCFG_CBM_IEC_ADD(_default_drive) \
+	MCFG_CBM_IEC_SLOT_ADD("iec4", 4, cbm_iec_devices, NULL) \
+	MCFG_CBM_IEC_SLOT_ADD("iec8", 8, cbm_iec_devices, _default_drive) \
+	MCFG_CBM_IEC_SLOT_ADD("iec9", 9, cbm_iec_devices, NULL) \
+	MCFG_CBM_IEC_SLOT_ADD("iec10", 10, cbm_iec_devices, NULL) \
+	MCFG_CBM_IEC_SLOT_ADD("iec11", 11, cbm_iec_devices, NULL) \
+	MCFG_CBM_IEC_BUS_ADD()
+
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -193,6 +202,20 @@ public:
 // device type definition
 extern const device_type CBM_IEC;
 extern const device_type CBM_IEC_SLOT;
+
+
+// slot devices
+#include "machine/c1541.h"
+#include "machine/c1571.h"
+#include "machine/c1581.h"
+#include "machine/c64_nl10.h"
+#include "machine/cmdhd.h"
+#include "machine/diag264_lb_iec.h"
+#include "machine/fd2000.h"
+#include "machine/interpod.h"
+#include "machine/serialbox.h"
+
+SLOT_INTERFACE_EXTERN( cbm_iec_devices );
 
 
 

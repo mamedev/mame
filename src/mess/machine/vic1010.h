@@ -14,7 +14,6 @@
 
 
 #include "emu.h"
-#include "machine/cbmipt.h"
 #include "machine/vic20exp.h"
 
 

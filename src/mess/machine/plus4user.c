@@ -94,3 +94,12 @@ WRITE_LINE_MEMBER( plus4_user_port_device::dtr_w ) { if (m_cart != NULL) m_cart-
 WRITE_LINE_MEMBER( plus4_user_port_device::rts_w ) { if (m_cart != NULL) m_cart->plus4_rts_w(state); }
 WRITE_LINE_MEMBER( plus4_user_port_device::rxc_w ) { if (m_cart != NULL) m_cart->plus4_rxc_w(state); }
 WRITE_LINE_MEMBER( plus4_user_port_device::atn_w ) { if (m_cart != NULL) m_cart->plus4_atn_w(state); }
+
+
+//-------------------------------------------------
+//  SLOT_INTERFACE( plus4_user_port_cards )
+//-------------------------------------------------
+
+SLOT_INTERFACE_START( plus4_user_port_cards )
+	SLOT_INTERFACE("diag264", DIAG264_USER_PORT_LOOPBACK)
+SLOT_INTERFACE_END

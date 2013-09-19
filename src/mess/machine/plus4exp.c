@@ -312,3 +312,16 @@ void plus4_expansion_slot_device::cd_w(address_space &space, offs_t offset, UINT
 		m_card->plus4_cd_w(space, offset, data, ba, cs0, c1l, c1h, cs1, c2l, c2h);
 	}
 }
+
+
+//-------------------------------------------------
+//  SLOT_INTERFACE( plus4_expansion_cards )
+//-------------------------------------------------
+
+SLOT_INTERFACE_START( plus4_expansion_cards )
+	SLOT_INTERFACE("c1551", C1551)
+	SLOT_INTERFACE("sid", PLUS4_SID)
+
+	// the following need ROMs from the software list
+	SLOT_INTERFACE_INTERNAL("standard", PLUS4_STD)
+SLOT_INTERFACE_END

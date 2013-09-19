@@ -88,3 +88,13 @@ READ_LINE_MEMBER( pet_datassette_port_device::sense_r ) { int state = 1; if (m_c
 WRITE_LINE_MEMBER( pet_datassette_port_device::motor_w ) { if (m_cart != NULL) m_cart->datassette_motor(state); }
 
 WRITE_LINE_MEMBER( pet_datassette_port_device::read_w ) { m_read_handler(state); }
+
+
+//-------------------------------------------------
+//  SLOT_INTERFACE( cbm_datassette_devices )
+//-------------------------------------------------
+
+SLOT_INTERFACE_START( cbm_datassette_devices )
+	SLOT_INTERFACE("c2n", C2N)
+	SLOT_INTERFACE("c1530", C1530)
+SLOT_INTERFACE_END
