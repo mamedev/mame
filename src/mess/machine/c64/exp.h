@@ -238,6 +238,7 @@ extern const device_type C64_EXPANSION_SLOT;
 #include "machine/c64/neoram.h"
 #include "machine/c64/ocean.h"
 #include "machine/c64/pagefox.h"
+#include "machine/c64/partner.h"
 #include "machine/c64/prophet64.h"
 #include "machine/c64/ps64.h"
 #include "machine/c64/reu.h"

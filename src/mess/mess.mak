@@ -1128,6 +1128,7 @@ $(MESSOBJ)/cbm.a:               \
 	$(MESS_MACHINE)/c64/neoram.o\
 	$(MESS_MACHINE)/c64/ocean.o \
 	$(MESS_MACHINE)/c64/pagefox.o   \
+	$(MESS_MACHINE)/c64/partner.o   \
 	$(MESS_MACHINE)/c64/prophet64.o \
 	$(MESS_MACHINE)/c64/ps64.o  \
 	$(MESS_MACHINE)/c64/reu.o   \
