@@ -827,6 +827,10 @@ ROM_START( dendy )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )  /* Main RAM */
 ROM_END
 
+ROM_START( gchinatv )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )  /* Main RAM */
+	ROM_REGION( 0x800,   "ciram", ROMREGION_ERASE00 )  /* CI RAM */
+ROM_END
 
 /***************************************************************************
 
@@ -842,3 +846,4 @@ CONS( 1986, famitwin,  nes,    0,     famicom,  famicom, nes_state, famicom, "Sh
 CONS( 198?, m82,       nes,    0,     nes,      nes, driver_device,     0,       "Nintendo",  "M82 Display Unit", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 CONS( 1996, drpcjr,    nes,    0,     famicom,  famicom, nes_state, famicom, "Bung",      "Doctor PC Jr", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 CONS( 1992, dendy,     nes,    0,     dendy,    nes, driver_device,     0,       "Steepler",  "Dendy Classic", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+CONS( 198?, gchinatv,  nes,    0,     nespal,   nes, driver_device,     0,       "Golden China",  "Golden China TV Game", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )

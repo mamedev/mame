@@ -57,6 +57,9 @@
                (medium) default. Phase shifting falls outside the realm of
                video controls and hope to implement a selectable toggle
                hardware option similar to Donkey Kong TKG02/TKG04.
+
+    2013/09/19 Robert Tuccitto  Cleanup of Address Maps, high score maps
+               added.
 ***************************************************************************/
 
 #include "emu.h"
@@ -82,20 +85,22 @@ static ADDRESS_MAP_START( a7800_mem, AS_PROGRAM, 8, a7800_state )
 	AM_RANGE(0x0040, 0x00ff) AM_READ_BANK("bank5") AM_WRITE(a7800_RAM0_w)   /* RAM (6116 block 0) */
 	AM_RANGE(0x0140, 0x01ff) AM_RAMBANK("bank6")    /* RAM (6116 block 1) */
 	AM_RANGE(0x0280, 0x02ff) AM_DEVREADWRITE("riot", riot6532_device, read, write)
-	AM_RANGE(0x0450, 0x045f) /*XBOARD POKEY1*/
-	AM_RANGE(0x0460, 0x046f) /*XBOARD POKEY2*/
-	AM_RANGE(0x0470, 0x047f) /*XBOARD CTRL*/
+	AM_RANGE(0x0450, 0x045f) /* XBOARD POKEY1 */
+	AM_RANGE(0x0460, 0x046f) /* XBOARD POKEY2 */
+	AM_RANGE(0x0470, 0x047f) /* XBOARD CTRL */
 	AM_RANGE(0x0480, 0x04ff) AM_MIRROR(0x100) AM_RAM    /* RIOT RAM */
+       AM_RANGE(0x1000, 0x17ff) AM_RAM /* hs SRAM */
 	AM_RANGE(0x1800, 0x27ff) AM_RAM
 	AM_RANGE(0x2800, 0x2fff) AM_RAMBANK("bank7")    /* MAINRAM */
 	AM_RANGE(0x3000, 0x37ff) AM_RAMBANK("bank7")    /* MAINRAM */
 	AM_RANGE(0x3800, 0x3fff) AM_RAMBANK("bank7")    /* MAINRAM */
+       AM_RANGE(0x3000, 0x3fff) AM_ROM  /* hs ROM space */
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")                        /* f18 hornet */
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank2")                        /* sc */
+	AM_RANGE(0x4000, 0xffff) AM_WRITE(a7800_cart_w) /* XBOARD SRAM */
+       AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank2")                        /* sc */
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank3")                        /* sc + ac */
 	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank4")                        /* ac */
-	AM_RANGE(0xe000, 0xffff) AM_ROM
-	AM_RANGE(0x4000, 0xffff) AM_WRITE(a7800_cart_w) /* XBOARD SRAM */
+	AM_RANGE(0xe000, 0xffff) AM_ROM	
 ADDRESS_MAP_END
 
 
