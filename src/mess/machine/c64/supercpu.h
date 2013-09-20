@@ -44,8 +44,8 @@ protected:
 	// device_c64_expansion_card_interface overrides
 	virtual UINT8 c64_cd_r(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2);
 	virtual void c64_cd_w(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2);
-	virtual int c64_game_r(offs_t offset, int sphi2, int ba, int rw, int hiram);
-	virtual int c64_exrom_r(offs_t offset, int sphi2, int ba, int rw, int hiram);
+	virtual int c64_game_r(offs_t offset, int sphi2, int ba, int rw);
+	virtual int c64_exrom_r(offs_t offset, int sphi2, int ba, int rw);
 
 private:
 	required_device<legacy_cpu_device> m_maincpu;

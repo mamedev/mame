@@ -62,7 +62,7 @@ UINT8 c64_exos_cartridge_device::c64_cd_r(address_space &space, offs_t offset, U
 //  c64_game_r - GAME read
 //-------------------------------------------------
 
-int c64_exos_cartridge_device::c64_game_r(offs_t offset, int sphi2, int ba, int rw, int hiram)
+int c64_exos_cartridge_device::c64_game_r(offs_t offset, int sphi2, int ba, int rw)
 {
-	return !(ba & rw & ((offset & 0xe000) == 0xe000) & hiram);
+	return !(ba & rw & ((offset & 0xe000) == 0xe000) & m_slot->hiram());
 }

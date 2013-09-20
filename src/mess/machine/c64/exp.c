@@ -351,9 +351,11 @@ int c64_expansion_slot_device::game_r(offs_t offset, int sphi2, int ba, int rw, 
 {
 	int state = 1;
 
+	m_hiram = hiram;
+
 	if (m_card != NULL)
 	{
-		state = m_card->c64_game_r(offset, sphi2, ba, rw, hiram);
+		state = m_card->c64_game_r(offset, sphi2, ba, rw);
 	}
 
 	return state;
@@ -368,9 +370,11 @@ int c64_expansion_slot_device::exrom_r(offs_t offset, int sphi2, int ba, int rw,
 {
 	int state = 1;
 
+	m_hiram = hiram;
+
 	if (m_card != NULL)
 	{
-		state = m_card->c64_exrom_r(offset, sphi2, ba, rw, hiram);
+		state = m_card->c64_exrom_r(offset, sphi2, ba, rw);
 	}
 
 	return state;

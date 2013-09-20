@@ -184,7 +184,7 @@ void c64_cpm_cartridge_device::c64_cd_w(address_space &space, offs_t offset, UIN
 //  c64_game_r - GAME read
 //-------------------------------------------------
 
-int c64_cpm_cartridge_device::c64_game_r(offs_t offset, int sphi2, int ba, int rw, int hiram)
+int c64_cpm_cartridge_device::c64_game_r(offs_t offset, int sphi2, int ba, int rw)
 {
 	if (m_ba != ba)
 	{

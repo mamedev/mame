@@ -212,7 +212,7 @@ void c64_easyflash_cartridge_device::c64_cd_w(address_space &space, offs_t offse
 //  c64_exrom_r - EXROM read
 //-------------------------------------------------
 
-int c64_easyflash_cartridge_device::c64_exrom_r(offs_t offset, int sphi2, int ba, int rw, int hiram)
+int c64_easyflash_cartridge_device::c64_exrom_r(offs_t offset, int sphi2, int ba, int rw)
 {
 	return !BIT(m_mode, 1);
 }
@@ -222,7 +222,7 @@ int c64_easyflash_cartridge_device::c64_exrom_r(offs_t offset, int sphi2, int ba
 //  c64_game_r - GAME read
 //-------------------------------------------------
 
-int c64_easyflash_cartridge_device::c64_game_r(offs_t offset, int sphi2, int ba, int rw, int hiram)
+int c64_easyflash_cartridge_device::c64_game_r(offs_t offset, int sphi2, int ba, int rw)
 {
 	return !(BIT(m_mode, 0) | !(BIT(m_mode, 2) | m_jp1->read()));
 }

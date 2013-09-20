@@ -115,6 +115,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( reset_w ) { m_write_reset(state); }
 	int phi2() { return clock(); }
 	int dotclock() { return phi2() * 8; }
+	int hiram() { return m_hiram; }
 
 protected:
 	// device-level overrides
@@ -148,6 +149,8 @@ protected:
 	devcb2_write_line   m_write_reset;
 
 	device_c64_expansion_card_interface *m_card;
+
+	int m_hiram;
 };
 
 
@@ -172,8 +175,8 @@ protected:
 	// runtime
 	virtual UINT8 c64_cd_r(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2) { return data; };
 	virtual void c64_cd_w(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2) { };
-	virtual int c64_game_r(offs_t offset, int sphi2, int ba, int rw, int hiram) { return m_game; }
-	virtual int c64_exrom_r(offs_t offset, int sphi2, int ba, int rw, int hiram) { return m_exrom; }
+	virtual int c64_game_r(offs_t offset, int sphi2, int ba, int rw) { return m_game; }
+	virtual int c64_exrom_r(offs_t offset, int sphi2, int ba, int rw) { return m_exrom; }
 
 	c64_expansion_slot_device *m_slot;
 

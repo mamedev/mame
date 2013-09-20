@@ -359,7 +359,7 @@ void c64_magic_voice_cartridge_device::c64_cd_w(address_space &space, offs_t off
 //  c64_game_r - GAME read
 //-------------------------------------------------
 
-int c64_magic_voice_cartridge_device::c64_game_r(offs_t offset, int sphi2, int ba, int rw, int hiram)
+int c64_magic_voice_cartridge_device::c64_game_r(offs_t offset, int sphi2, int ba, int rw)
 {
 	return !((m_tpi_pc6 && sphi2) || (!m_tpi_pc6 && sphi2 && !PB5 && A12 && A13 && !A14));
 }

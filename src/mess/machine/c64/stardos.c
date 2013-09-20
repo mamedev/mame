@@ -179,9 +179,9 @@ void c64_stardos_cartridge_device::c64_cd_w(address_space &space, offs_t offset,
 //  c64_game_r - GAME read
 //-------------------------------------------------
 
-int c64_stardos_cartridge_device::c64_game_r(offs_t offset, int sphi2, int ba, int rw, int hiram)
+int c64_stardos_cartridge_device::c64_game_r(offs_t offset, int sphi2, int ba, int rw)
 {
-	return !(sphi2 && ba & rw & ((offset & 0xe000) == 0xe000) & hiram);
+	return !(sphi2 && ba & rw & ((offset & 0xe000) == 0xe000) & m_slot->hiram());
 }
 
 
@@ -189,7 +189,7 @@ int c64_stardos_cartridge_device::c64_game_r(offs_t offset, int sphi2, int ba, i
 //  c64_exrom_r - EXROM read
 //-------------------------------------------------
 
-int c64_stardos_cartridge_device::c64_exrom_r(offs_t offset, int sphi2, int ba, int rw, int hiram)
+int c64_stardos_cartridge_device::c64_exrom_r(offs_t offset, int sphi2, int ba, int rw)
 {
 	return (BIT(offset, 13)) ? 1 : m_exrom;
 }
