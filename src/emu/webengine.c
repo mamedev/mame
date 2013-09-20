@@ -182,6 +182,13 @@ int web_engine::begin_request_handler(struct mg_connection *conn)
 		{
 			m_machine->schedule_exit();
 		}
+		else if(!strcmp(cmd_name,"togglepause"))
+		{
+			if (m_machine->paused())
+				m_machine->resume();
+		else
+				m_machine->pause();
+		}
 
 		// Send HTTP reply to the client
 		mg_printf(conn,
