@@ -33,6 +33,8 @@ public:
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const;
 
+	DECLARE_WRITE_LINE_MEMBER( nmi_w );
+
 protected:
 	// device-level overrides
 	virtual void device_start();
@@ -41,8 +43,12 @@ protected:
 	// device_c64_expansion_card_interface overrides
 	virtual UINT8 c64_cd_r(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2);
 	virtual void c64_cd_w(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2);
-	virtual int c64_exrom_r(offs_t offset, int sphi2, int ba, int rw);
 	virtual int c64_game_r(offs_t offset, int sphi2, int ba, int rw);
+
+private:
+	int m_a0;
+	int m_a6;
+	int m_nmi;
 };
 
 

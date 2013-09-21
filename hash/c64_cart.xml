@@ -6924,9 +6924,9 @@
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="partner" />
 			<feature name="game" value="0" />
-			<feature name="exrom" value="0" />
+			<feature name="exrom" value="1" />
 	
-			<dataarea name="roml" size="0x4000">
+			<dataarea name="romh" size="0x4000">
 				<rom name="timeworks c-64 ver 2-16-87" size="0x4000" status="nodump" offset="0" />
 			</dataarea>
 		</part>

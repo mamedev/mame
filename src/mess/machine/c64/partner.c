@@ -43,9 +43,18 @@ const device_type C64_PARTNER = &device_creator<c64_partner_cartridge_device>;
 //  INPUT_PORTS( c64_partner )
 //-------------------------------------------------
 
+WRITE_LINE_MEMBER( c64_partner_cartridge_device::nmi_w )
+{
+	if (!state && !m_a6 && !m_nmi)
+	{
+		m_slot->nmi_w(ASSERT_LINE);
+		m_nmi = 1;
+	}
+}
+
 static INPUT_PORTS_START( c64_partner )
-	PORT_START("RESET")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F11) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF_OWNER, c64_expansion_slot_device, reset_w)
+	PORT_START("NMI")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("NMI") PORT_CODE(KEYCODE_F11) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF_OWNER, c64_partner_cartridge_device, nmi_w)
 INPUT_PORTS_END
 
 
@@ -70,7 +79,10 @@ ioport_constructor c64_partner_cartridge_device::device_input_ports() const
 
 c64_partner_cartridge_device::c64_partner_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, C64_PARTNER, "C64 PARTNER 64 cartridge", tag, owner, clock, "c64_partner", __FILE__),
-	device_c64_expansion_card_interface(mconfig, *this)
+	device_c64_expansion_card_interface(mconfig, *this),
+	m_a0(1),
+	m_a6(1),
+	m_nmi(0)
 {
 }
 
@@ -92,6 +104,14 @@ void c64_partner_cartridge_device::device_start()
 
 void c64_partner_cartridge_device::device_reset()
 {
+	m_a0 = 1;
+	m_a6 = 1;
+
+	if (m_nmi && m_a6)
+	{
+		m_slot->nmi_w(CLEAR_LINE);
+		m_nmi = 0;
+	}
 }
 
 
@@ -101,6 +121,30 @@ void c64_partner_cartridge_device::device_reset()
 
 UINT8 c64_partner_cartridge_device::c64_cd_r(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
+	if (!io1)
+	{
+		data = m_romh[offset & 0x3fff];
+	}
+
+	if (m_nmi && (offset == 0xfffa || offset == 0xfffb))
+	{
+		m_a0 = 1;
+	}
+
+	if (m_a0 && BIT(offset, 15))
+	{
+		switch ((offset >> 13) & 0x03)
+		{
+		case 0: case 3:
+			data = m_romh[offset & 0x3fff];
+			break;
+
+		case 1:
+			data = m_ram[offset & 0x1fff];
+			break;
+		}
+	}
+
 	return data;
 }
 
@@ -111,16 +155,32 @@ UINT8 c64_partner_cartridge_device::c64_cd_r(address_space &space, offs_t offset
 
 void c64_partner_cartridge_device::c64_cd_w(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
-}
+	if (!io1)
+	{
+		m_a0 = BIT(offset, 0);
+		m_a6 = BIT(offset, 6);
 
+		if (m_nmi && m_a6)
+		{
+			m_slot->nmi_w(CLEAR_LINE);
+			m_nmi = 0;
+		}
+	}
 
-//-------------------------------------------------
-//  c64_exrom_r - EXROM read
-//-------------------------------------------------
+	if (m_a0 && BIT(offset, 15))
+	{
+		switch ((offset >> 13) & 0x03)
+		{
+		case 1:
+			m_ram[offset & 0x1fff] = data;
+			break;
+		}
+	}
 
-int c64_partner_cartridge_device::c64_exrom_r(offs_t offset, int sphi2, int ba, int rw)
-{
-	return m_exrom;
+	if (m_nmi && (offset == 0xfffa || offset == 0xfffb))
+	{
+		m_a0 = 1;
+	}
 }
 
 
@@ -130,5 +190,19 @@ int c64_partner_cartridge_device::c64_exrom_r(offs_t offset, int sphi2, int ba, 
 
 int c64_partner_cartridge_device::c64_game_r(offs_t offset, int sphi2, int ba, int rw)
 {
-	return m_game;
+	int game = 1;
+
+	if (m_a0 && BIT(offset, 15))
+	{
+		switch ((offset >> 13) & 0x03)
+		{
+		case 0: case 1:	case 3:
+			game = 0;
+			break;
+		}
+	}
+
+	// TODO if I/O1=0, GAME=0
+
+	return game;
 }
