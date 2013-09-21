@@ -77,7 +77,7 @@ ti99_datamux_device::ti99_datamux_device(const machine_config &mconfig, const ch
 {
 }
 
-#define VERBOSE 0
+#define VERBOSE 1
 #define LOG logerror
 
 /***************************************************************************
@@ -206,6 +206,11 @@ WRITE16_MEMBER( ti99_datamux_device::write )
 	// Insert four wait states and let CPU enter wait state
 	m_waitcount = 6;
 	m_ready(CLEAR_LINE);
+}
+
+SETOFFSET_MEMBER( ti99_datamux_device::setoffset )
+{
+	if (VERBOSE>6) LOG("set address %04x\n", offset << 1);
 }
 
 /*
