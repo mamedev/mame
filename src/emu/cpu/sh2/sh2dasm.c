@@ -482,7 +482,7 @@ static UINT32 op1000(char *buffer, UINT32 pc, UINT16 opcode)
 
 static UINT32 op1001(char *buffer, UINT32 pc, UINT16 opcode)
 {
-	sprintf(buffer, "MOV.W   @($%04X,PC),%s", (opcode & 0xff) * 2, regname[Rn]);
+	sprintf(buffer, "MOV.W   @($%04X,PC),%s [%08X]", (opcode & 0xff) * 2, regname[Rn], pc+((opcode & 0xff) * 2)+2);
 	return 0;
 }
 
@@ -526,7 +526,7 @@ static UINT32 op1100(char *buffer, UINT32 pc, UINT16 opcode)
 		sprintf(buffer, "MOV.L   @($%04X,GBR),R0", (opcode & 0xff) * 4);
 		break;
 	case  7:
-		sprintf(buffer, "MOVA    @($%04X,PC),R0", (opcode & 0xff) * 4);
+		sprintf(buffer, "MOVA    @($%04X,PC),R0 [%08X]", (opcode & 0xff) * 4, ((pc + 2) & ~3) + (opcode & 0xff) * 4);
 		break;
 	case  8:
 		sprintf(buffer, "TST     #$%02X,R0", opcode & 0xff);
@@ -558,7 +558,7 @@ static UINT32 op1100(char *buffer, UINT32 pc, UINT16 opcode)
 
 static UINT32 op1101(char *buffer, UINT32 pc, UINT16 opcode)
 {
-	sprintf(buffer, "MOV.L   @($%02X,PC),%s", (opcode * 4) & 0xff, regname[Rn]);
+	sprintf(buffer, "MOV.L   @($%02X,PC),%s [%08X]", (opcode * 4) & 0xff, regname[Rn], ((pc + 2) & ~3) + (opcode & 0xff) * 4);
 	return 0;
 }
 
