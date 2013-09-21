@@ -26,34 +26,11 @@ TODO:
 - Add the RS232c interface (serial port), needed by fhboxers (accesses some ports in the a-bus dummy range).
 - Video emulation is nowhere near perfection.
 - Reimplement the idle skip if possible.
-- Properly emulate the protection chips, used by several games (check stvprot.c for more info)
 - Move SCU device into its respective file;
-- Split ST-V and Saturn files properly;
 
-(per-game issues)
-- stress: accesses the Sound Memory Expansion Area (0x05a80000-0x05afffff), unknown purpose;
-
-- smleague / finlarch: it randomly hangs / crashes,it works if you use a ridiculous MCFG_INTERLEAVE number,might need strict
-  SH-2 synching or it's actually a m68k comms issue.
-
-- groovef: ugly back screen color, caused by incorrect usage of the Color Calculation function.
-
-- myfairld: Apparently this game gives a black screen (either test mode and in-game mode),but let it wait for about
-  10 seconds and the game will load everything. This is because of a hellishly slow m68k sub-routine located at 54c2.
-  Likely to not be a bug but an in-game design issue.
-
-- danchih / danchiq: currently hangs randomly (regression).
-
-- batmanfr: Missing sound,caused by an extra ADSP chip which is on the cart.The CPU is a
-  ADSP-2181,and it's the same used by NBA Jam Extreme (ZN game).
-
-- vfremix: when you play as Akira, there is a problem with third match: game doesn't upload all textures
-  and tiles and doesn't enable display, although gameplay is normal - wait a while to get back
-  to title screen after losing a match
-
-- vfremix: various problems with SCU DSP: Jeffry causes a black screen hang. Akira's kick sometimes
-  sends the opponent out of the ring from whatever position.
-
+test1f diagnostic hacks:
+"chash parge error" test 0x6035d04 <- 0x0009 (nop the button check)
+"chase line pearg" test 0x6036964 <- 0x0009 (nop the button check again)
 
 ****************************************************************************************************/
 
@@ -170,7 +147,7 @@ READ32_MEMBER( sat_console_state::abus_dummy_r )
 }
 
 static ADDRESS_MAP_START( saturn_mem, AS_PROGRAM, 32, sat_console_state )
-	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_SHARE("share6")  // bios
+	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_SHARE("share6")  AM_WRITENOP // bios
 	AM_RANGE(0x00100000, 0x0010007f) AM_READWRITE8(saturn_SMPC_r, saturn_SMPC_w,0xffffffff)
 	AM_RANGE(0x00180000, 0x0018ffff) AM_READWRITE8(saturn_backupram_r, saturn_backupram_w,0xffffffff) AM_SHARE("share1")
 	AM_RANGE(0x00200000, 0x002fffff) AM_RAM AM_MIRROR(0x20100000) AM_SHARE("workram_l")
@@ -198,7 +175,7 @@ static ADDRESS_MAP_START( saturn_mem, AS_PROGRAM, 32, sat_console_state )
 //  AM_RANGE(0x22000000, 0x24ffffff) AM_ROM // Cartridge area mirror
 	AM_RANGE(0x45000000, 0x46ffffff) AM_WRITENOP
 	AM_RANGE(0x60000000, 0x600003ff) AM_WRITENOP // cache address array
-	AM_RANGE(0xc0000000, 0xc00007ff) AM_RAM // cache data array, Dragon Ball Z sprites relies on this
+	AM_RANGE(0xc0000000, 0xc0000fff) AM_RAM // cache data array, Dragon Ball Z sprites relies on this
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_mem, AS_PROGRAM, 16, sat_console_state )
@@ -765,6 +742,10 @@ static MACHINE_CONFIG_START( saturn, sat_console_state )
 
 	MCFG_CPU_ADD("audiocpu", M68000, 11289600) //256 x 44100 Hz = 11.2896 MHz
 	MCFG_CPU_PROGRAM_MAP(sound_mem)
+
+//	SH-1
+
+//  SMPC MCU, running at 4 MHz (+ custom RTC device that runs at 32.768 KHz)
 
 	MCFG_MACHINE_START_OVERRIDE(sat_console_state,saturn)
 	MCFG_MACHINE_RESET_OVERRIDE(sat_console_state,saturn)
