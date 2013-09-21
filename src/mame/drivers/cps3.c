@@ -151,20 +151,29 @@ the mainboard and there has been confirmed to be one in the cart. Tests were don
 BIOS and code and running it on the PCB. It is known that neither of these CPU's will run standard
 (i.e. unencrypted) SH2 code.
 
-The security cart is thought to work like this: the flashROM in the cart contains a program BIOS which is
+The security cart works like this: the flashROM in the cart contains a program BIOS which is
 decrypted by the CPU in the cart (the CPU has built-in decryption) then executed by that CPU to boot the
 BIOS code. Even though the code in the flashROM is encrypted, the cart can run it even if it is dead/suicided
 because it has been discovered that the BIOS contains a hidden security menu allowing the cart to be loaded
 with the security data. This proves the cart runs the BIOS even if it is dead. The special security menu is
-not normally available but is likely accessed with a special key/button combination which is unknown ATM.
-The cart contains a FM1208S NVRAM which appears to either be unused or holds game settings. Because the CPU
-in the cart is always powered by a battery, it has stealth capability that allows it to continually monitor
-the situation. If the custom CPU detects any tampering (generally things such as voltage fluctuation or
-voltage dropping or even removal of the cart with the power on), it immediately erases the SRAM inside the
-CPU (and thus the key) which effectively kills the security cart dead. This also suggests that the custom
-Capcom CPU contains some additional internal code to initiate the boot process which is battery-backed as
-well. It is known (from decapping it) that the CPU in the security cart does contain an amount of static
-RAM for data storage and a SH2 core.
+not normally available but is likely accessed with a special key/button combination which is unknown ATM. 
+The cart contains a FM1208S NVRAM which appears to either be unused or holds game settings. 
+ 
+There are 4 types of CPS3 carts. They have a label on the custom CPU that can be either A,B,C or D.
+Cartidge types A and B are identical and both have extra space on the back side to solder a 29F400 in PSOP-44
+package, which is much easier to assemble as compared to the default TSOP-48 package.
+A and B cartridges also contain a FM1208S NVRAM which appears to be used or holds game settings. 
+C and D cartridges lack the extra space to solder a PSOP-44 Flash Rom and instead of the FM1208
+it has a MACH111 which is a EE CMOS CPLD. C and D cartridge still have a space to solder a FM1208.
+ 
+Because the CPU in the cart is always powered by a battery, it has stealth capability that allows it to 
+continually monitor the situation. If the custom CPU detects any tampering (generally things such as voltage 
+fluctuation or voltage dropping or even removal of the cart with the power on), it immediately erases the SRAM 
+inside the CPU (and thus the key) which effectively kills the security cart dead. When a cartridge goes dead, 
+it will set the decryption keys identical to the ones of SFIII-2nd Impact, so removing the battery and changing 
+the content of the BIOS (if it's not a 2nd Impact) will make it run as a normal SFIII-2nd Impact cartridge.
+It is known (from decapping it) that the CPU in the security cart does contain an amount of static RAM 
+for data storage and a SH2 core.
 
 The main board uses the familiar Capcom SIMM modules to hold the data from the CDROM so that the life of
 the CD drive is maximized. The SIMMs don't contain RAM, but instead TSOP48 surface mounted flashROMs that
