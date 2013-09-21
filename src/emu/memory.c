@@ -178,6 +178,25 @@
         specify the share 'tag' will use its memory as backing for all
         future buckets that specify AM_SHARE with the same 'tag'.
 
+    AM_SETOFFSET(setoffset)
+        Specifies a handler for a 'set address' operation. The intended use case
+        for this operation is to emulate a split-phase memory access: The caller
+        (usually a CPU) sets the address bus lines using set_address. Some
+        component may then react, for instance, by asserting a control line
+        like WAIT before delivering the data on the data bus. The data bits are
+        then sampled on the read operation or delivered on the write operation
+        that must be called subsequently.
+        It is not checked whether the address of the set_address operation
+        matches the address of the subsequent read/write operation.
+        The address map translates the address to a bucket and an offset,
+        hence the name of the macro. If no handler is specified for a bucket,
+        a set_address operation hitting that bucket returns silently.
+
+    AM_DEVSETOFFSET(tag, setoffset)
+        Specifies a handler for a set_address operation, bound to the device
+        specified by 'tag'.
+
+
 ***************************************************************************/
 
 #include <list>
@@ -521,6 +540,34 @@ private:
 	legacy_info m_sublegacy_info[8];
 };
 
+// ======================> handler_entry_setoffset
+// a setoffset-access-specific extension of handler_entry
+class handler_entry_setoffset : public handler_entry
+{
+public:
+	// construction/destruction
+	handler_entry_setoffset()
+		: handler_entry(0, ENDIANNESS_LITTLE, NULL)
+	{
+	}
+
+	const char *name() const { return m_setoffset.name(); }
+	const char *subunit_name(int entry) const { return "no subunit"; }
+
+	// Call through only if the setoffset handler has been late-bound before
+	// (i.e. if it was declared in the address map)
+	void setoffset(address_space &space, offs_t offset) const { if (m_setoffset.has_object()) m_setoffset(space, offset); }
+
+	// configure delegate callbacks
+	void set_delegate(setoffset_delegate delegate, UINT64 mask = 0) { m_setoffset = delegate; }
+
+private:
+	setoffset_delegate         m_setoffset;
+	// We do not have subunits for setoffset
+	// Accordingly, we need not implement unused functions.
+	void remove_subunit(int entry) { }
+};
+
 // ======================> handler_entry_proxy
 
 // A proxy class that contains an handler_entry_read or _write and forwards the setter calls
@@ -823,6 +870,60 @@ private:
 	handler_entry_write *       m_handlers[TOTAL_MEMORY_BANKS];        // array of user-installed handlers
 };
 
+// ======================> address_table_setoffset
+// setoffset access-specific version of an address table
+class address_table_setoffset : public address_table
+{
+public:
+	// construction/destruction
+	address_table_setoffset(address_space &space, bool large)
+		: address_table(space, large)
+	{
+		// allocate handlers for each entry, prepopulating the bankptrs for banks
+		for (int entrynum = 0; entrynum < ARRAY_LENGTH(m_handlers); entrynum++)
+		{
+			m_handlers[entrynum] = auto_alloc(space.machine(), handler_entry_setoffset());
+		}
+
+		// Watchpoints and unmap states do not make sense for setoffset
+		m_handlers[STATIC_NOP]->set_delegate(setoffset_delegate(FUNC(address_table_setoffset::nop_so), this));
+		m_handlers[STATIC_NOP]->configure(0, space.bytemask(), ~0);
+	}
+
+	~address_table_setoffset()
+	{
+		for (int handnum = 0; handnum < ARRAY_LENGTH(m_handlers); handnum++)
+			auto_free(m_space.machine(), m_handlers[handnum]);
+	}
+
+	handler_entry &handler(UINT32 index) const {    assert(index < ARRAY_LENGTH(m_handlers));   return *m_handlers[index]; }
+	handler_entry_setoffset &handler_setoffset(UINT32 index) const { assert(index < ARRAY_LENGTH(m_handlers)); return *m_handlers[index]; }
+
+	// range getter
+	handler_entry_proxy<handler_entry_setoffset> handler_map_range(offs_t bytestart, offs_t byteend, offs_t bytemask, offs_t bytemirror, UINT64 mask = 0) {
+		std::list<UINT32> entries;
+		setup_range(bytestart, byteend, bytemask, bytemirror, mask, entries);
+		std::list<handler_entry_setoffset *> handlers;
+		for (std::list<UINT32>::const_iterator i = entries.begin(); i != entries.end(); i++)
+			handlers.push_back(&handler_setoffset(*i));
+		return handler_entry_proxy<handler_entry_setoffset>(handlers, mask);
+	}
+
+private:
+	// internal handlers
+	// Setoffset does not allow for watchpoints, since we assume that a
+	// corresponding read/write operation will follow, and the watchpoint will
+	// apply for that operation
+	// For the same reason it does not make sense to put a warning into the log
+	// for unmapped locations, as this will be done by the read/write operation
+	void nop_so(address_space &space, offs_t offset)
+	{
+	}
+
+	// internal state
+	handler_entry_setoffset *m_handlers[TOTAL_MEMORY_BANKS];        // array of user-installed handlers
+};
+
 
 // ======================> address_space_specific
 
@@ -840,13 +941,15 @@ class address_space_specific : public address_space
 	// helpers to simplify core code
 	UINT32 read_lookup(offs_t byteaddress) const { return _Large ? m_read.lookup_live_large(byteaddress) : m_read.lookup_live_small(byteaddress); }
 	UINT32 write_lookup(offs_t byteaddress) const { return _Large ? m_write.lookup_live_large(byteaddress) : m_write.lookup_live_small(byteaddress); }
+	UINT32 setoffset_lookup(offs_t byteaddress) const { return _Large ? m_setoffset.lookup_live_large(byteaddress) : m_setoffset.lookup_live_small(byteaddress); }
 
 public:
 	// construction/destruction
 	address_space_specific(memory_manager &manager, device_memory_interface &memory, address_spacenum spacenum)
 		: address_space(manager, memory, spacenum, _Large),
 			m_read(*this, _Large),
-			m_write(*this, _Large)
+			m_write(*this, _Large),
+			m_setoffset(*this, _Large)
 	{
 #if (TEST_HANDLER)
 		// test code to verify the read/write handlers are touching the correct bits
@@ -988,6 +1091,7 @@ public:
 	// accessors
 	virtual address_table_read &read() { return m_read; }
 	virtual address_table_write &write() { return m_write; }
+	virtual address_table_setoffset &setoffset() { return m_setoffset; }
 
 	// watchpoint control
 	virtual void enable_read_watchpoints(bool enable = true) { m_read.enable_watchpoints(enable); }
@@ -1385,6 +1489,19 @@ public:
 		}
 	}
 
+	// Allows to announce a pending read or write operation on this address.
+	// The user of the address_space calls a set_address operation which leads
+	// to some particular set_offset operation for an entry in the address map.
+	void set_address(offs_t address)
+	{
+		offs_t byteaddress = address & m_bytemask;
+		UINT32 entry = setoffset_lookup(byteaddress);
+		const handler_entry_setoffset &handler = m_setoffset.handler_setoffset(entry);
+
+		offs_t offset = handler.byteoffset(byteaddress);
+		handler.setoffset(*this, offset / sizeof(_NativeType));
+	}
+
 	// virtual access to these functions
 	UINT8 read_byte(offs_t address) { return (NATIVE_BITS == 8) ? read_native(address & ~NATIVE_MASK) : read_direct<UINT8, true>(address, 0xff); }
 	UINT16 read_word(offs_t address) { return (NATIVE_BITS == 16) ? read_native(address & ~NATIVE_MASK) : read_direct<UINT16, true>(address, 0xffff); }
@@ -1432,6 +1549,7 @@ public:
 
 	address_table_read      m_read;             // memory read lookup table
 	address_table_write     m_write;            // memory write lookup table
+	address_table_setoffset m_setoffset;        // memory setoffset lookup table
 };
 
 typedef address_space_specific<UINT8,  ENDIANNESS_LITTLE, false> address_space_8le_small;
@@ -1890,6 +2008,7 @@ void address_space::populate_from_map(address_map *map)
 		// map both read and write halves
 		populate_map_entry(*entry, ROW_READ);
 		populate_map_entry(*entry, ROW_WRITE);
+		populate_map_entry_setoffset(*entry);
 	}
 }
 
@@ -1984,6 +2103,15 @@ void address_space::populate_map_entry(const address_map_entry &entry, read_or_w
 	}
 }
 
+//-------------------------------------------------
+//  populate_map_entry_setoffset - special case for setoffset
+//-------------------------------------------------
+
+void address_space::populate_map_entry_setoffset(const address_map_entry &entry)
+{
+	install_setoffset_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask,
+		entry.m_addrmirror, setoffset_delegate(entry.m_soproto, *entry.m_setoffsethd.m_devbase), entry.m_setoffsethd.m_mask);
+}
 
 //-------------------------------------------------
 //  allocate_memory - determine all neighboring
@@ -2641,6 +2769,19 @@ UINT64 *address_space::install_legacy_readwrite_handler(offs_t addrstart, offs_t
 }
 
 
+//-----------------------------------------------------------------------
+//  install_setoffset_handler - install set_offset delegate handlers for the space
+//-----------------------------------------------------------------------
+
+void address_space::install_setoffset_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, setoffset_delegate handler, UINT64 unitmask)
+{
+	VPRINTF(("address_space::install_setoffset_handler(%s-%s mask=%s mirror=%s, %s, %s)\n",
+				core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
+				core_i64_hex_format(addrmask, m_addrchars), core_i64_hex_format(addrmirror, m_addrchars),
+				handler.name(), core_i64_hex_format(unitmask, data_width() / 4)));
+
+	setoffset().handler_map_range(addrstart, addrend, addrmask, addrmirror, unitmask).set_delegate(handler);
+}
 
 //**************************************************************************
 //  MEMORY MAPPING HELPERS

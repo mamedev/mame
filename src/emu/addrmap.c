@@ -473,6 +473,21 @@ void address_map_entry::internal_set_handler(device_t &device, read64_delegate r
 
 
 //-------------------------------------------------
+//  set_handler - handler setter for setoffset
+//-------------------------------------------------
+
+void address_map_entry::set_handler(device_t &device, setoffset_delegate func)
+{
+	assert(!func.isnull());
+	m_setoffsethd.m_type = AMH_DEVICE_DELEGATE;
+	m_setoffsethd.m_bits = 0;
+	m_setoffsethd.m_mask = 0;
+	m_setoffsethd.m_name = func.name();
+	m_setoffsethd.m_devbase = &device;
+	m_soproto = func;
+}
+
+//-------------------------------------------------
 //  unitmask_is_appropriate - verify that the
 //  provided unitmask is valid and expected
 //-------------------------------------------------
@@ -809,9 +824,9 @@ void address_map::uplift_submaps(running_machine &machine, device_t &device, dev
 				subentry->m_addrmirror |= entry->m_addrmirror;
 
 				// Twiddle the unitmask on the data accessors that need it
-				for (int data_entry = 0; data_entry < 2; data_entry++)
+				for (int data_entry = 0; data_entry < 3; data_entry++)
 				{
-					map_handler_data &mdata = data_entry ? subentry->m_write : subentry->m_read;
+					map_handler_data &mdata = (data_entry==0)? subentry->m_read : ((data_entry==1)? subentry->m_write : subentry->m_setoffsethd);
 
 					if (mdata.m_type == AMH_NONE)
 						continue;
