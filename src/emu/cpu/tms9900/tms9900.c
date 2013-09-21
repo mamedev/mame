@@ -1382,6 +1382,14 @@ void tms99xx_device::acquire_instruction()
 */
 void tms99xx_device::mem_read()
 {
+	// The following line will be taken out of this method and
+	// be executed at an earlier microprogram clock tick
+	// After set_address, any device attached to the address bus may pull down
+	// READY in order to put the CPU into wait state before the read_word
+	// operation will be performed
+	// set_address and read_word should pass the same address as argument
+	m_prgspace->set_address(m_address & m_prgaddr_mask & 0xfffe);
+
 	m_current_value = m_prgspace->read_word(m_address & m_prgaddr_mask & 0xfffe);
 	pulse_clock(2);
 	m_check_ready = true;
@@ -1390,6 +1398,9 @@ void tms99xx_device::mem_read()
 
 void tms99xx_device::mem_write()
 {
+	// see mem_read
+	m_prgspace->set_address(m_address & m_prgaddr_mask & 0xfffe);
+
 	m_prgspace->write_word(m_address & m_prgaddr_mask & 0xfffe, m_current_value);
 	pulse_clock(2);
 	m_check_ready = true;
