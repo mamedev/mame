@@ -2784,8 +2784,8 @@ static void texture_coord_update(sdl_window_info *window,
 									texture_info *texture, const render_primitive *prim, int shaderIdx)
 {
 	sdl_info *sdl = (sdl_info *) window->dxdata;
-	float ustart, ustop;            // beginning/ending U coordinates
-	float vstart, vstop;            // beginning/ending V coordinates
+	float ustart = 0.0f, ustop = 0.0f;            // beginning/ending U coordinates
+	float vstart = 0.0f, vstop = 0.0f;            // beginning/ending V coordinates
 	float du, dv;
 
 	if ( texture->type != TEXTURE_TYPE_SHADER ||
@@ -2803,9 +2803,7 @@ static void texture_coord_update(sdl_window_info *window,
 		}
 		else
 		{
-			ustart = 0.0f;
 			ustop  = (float)(prim->texture.width*texture->xprescale) / (float)texture->rawwidth_create;
-			vstart = 0.0f;
 			vstop  = (float)(prim->texture.height*texture->yprescale) / (float)texture->rawheight_create;
 		}
 	}
@@ -2814,9 +2812,7 @@ static void texture_coord_update(sdl_window_info *window,
 		int surf_w_pow2  = get_valid_pow2_value (window->width, texture->texpow2);
 		int surf_h_pow2  = get_valid_pow2_value (window->height, texture->texpow2);
 
-		ustart = 0.0f;
 		ustop  = (float)(window->width) / (float)surf_w_pow2;
-		vstart = 0.0f;
 		vstop  = (float)(window->height) / (float)surf_h_pow2;
 	}
 	else
