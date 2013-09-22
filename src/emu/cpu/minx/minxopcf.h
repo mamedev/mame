@@ -239,22 +239,22 @@ OP(DD) { AD1_YIY; wr16( addr1, m_HL ); }
 OP(DE) { AD1_YIY; wr16( addr1, m_X ); }
 OP(DF) { AD1_YIY; wr16( addr1, m_Y ); }
 
-OP(E0) { m_BA = m_BA; }
+OP(E0) { } //{ m_BA = m_BA; }
 OP(E1) { m_BA = m_HL; }
 OP(E2) { m_BA = m_X; }
 OP(E3) { m_BA = m_Y; }
 OP(E4) { m_HL = m_BA; }
-OP(E5) { m_HL = m_HL; }
+OP(E5) { } //{ m_HL = m_HL; }
 OP(E6) { m_HL = m_X; }
 OP(E7) { m_HL = m_Y; }
 OP(E8) { m_X = m_BA; }
 OP(E9) { m_X = m_HL; }
-OP(EA) { m_X = m_X; }
+OP(EA) { } //{ m_X = m_X; }
 OP(EB) { m_X = m_Y; }
 OP(EC) { m_Y = m_BA; }
 OP(ED) { m_Y = m_HL; }
 OP(EE) { m_Y = m_X; }
-OP(EF) { m_Y = m_Y; }
+OP(EF) { } //{ m_Y = m_Y; }
 
 OP(F0) { m_SP = m_BA; }
 OP(F1) { m_SP = m_HL; }
