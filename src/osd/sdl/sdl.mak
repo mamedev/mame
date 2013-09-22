@@ -440,8 +440,12 @@ SDLOS_TARGETOS = $(BASE_TARGETOS)
 #-------------------------------------------------
 
 ifeq (,$(findstring clang,$(CC)))
-# TODO: needs to use $(CC)
 TEST_GCC = $(shell gcc --version)
+
+# is it Clang symlinked/renamed to GCC (Xcode 5.0 on OS X)?
+ifeq ($(findstring clang,$(TEST_GCC)),clang)
+	CCOMFLAGS += -Wno-cast-align -Wno-constant-logical-operand -Wno-shift-count-overflow -Wno-tautological-constant-out-of-range-compare -Wno-tautological-compare -Wno-self-assign-field
+endif
 
 # Ubuntu 12.10 GCC 4.7.2 autodetect
 ifeq ($(findstring 4.7.2-2ubuntu1,$(TEST_GCC)),4.7.2-2ubuntu1)
@@ -468,6 +472,9 @@ endif
 ifeq ($(findstring rpi,$(TEST_GCC)),rpi)
 	CCOMFLAGS += -Wno-cast-align
 endif
+
+else	# compiler is specifically Clang
+	CCOMFLAGS += -Wno-cast-align -Wno-constant-logical-operand -Wno-shift-count-overflow -Wno-tautological-constant-out-of-range-compare -Wno-tautological-compare -Wno-self-assign-field
 endif
 
 #-------------------------------------------------
