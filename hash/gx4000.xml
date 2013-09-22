@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="gx4000" description="Amstrad GX4000 cartridges">
+	<!-- no controls in gx4000, works in cpc6128p -->
 	<software name="barb2">
 		<description>Barbarian II</description>
 		<year>1989</year>
@@ -12,7 +13,7 @@
 		</part>
 	</software>
 
-	<!-- no controls -->
+	<!-- no controls in gx4000, works in cpc6128p -->
 	<software name="batman">
 		<description>Batman</description>
 		<year>1989</year>
