@@ -37,7 +37,7 @@ READ8_MEMBER( stereo_fx_device::p3_r )
 
 WRITE8_MEMBER( stereo_fx_device::p3_w )
 {
-	m_t1 = (data & 0x20)&&1;
+	m_t1 = (data & 0x20)&1;
 }
 
 WRITE8_MEMBER( stereo_fx_device::dev_host_irq_w )
