@@ -76,6 +76,40 @@ static void get_qsvar(const struct mg_request_info *request_info,
 	mg_get_var(qs, strlen(qs == NULL ? "" : qs), name, dst, dst_len);
 }
 
+char* websanitize_statefilename ( char* unsanitized )
+{ 
+	// It's important that we remove any dangerous characters from any filename 
+	// we receive from a web client. This can be a serious security hole.
+	// As MAME/MESS policy is lowercase filenames, also lowercase it.
+	
+	char* sanitized = new char[64];
+	int insertpoint =0;
+	char charcompare;
+	
+	while (*unsanitized != 0)
+	{
+	charcompare = *unsanitized;
+		// ASCII 48-57 are 0-9
+		// ASCII 97-122 are lowercase A-Z
+
+		if ((charcompare >= 48 && charcompare <= 57) || (charcompare >= 97 && charcompare <= 122))
+		{
+			sanitized[insertpoint] = charcompare;
+			insertpoint++;
+			sanitized[insertpoint] = '\0'; // Make sure we're null-terminated.
+		}
+		// ASCII 65-90 are uppercase A-Z. These need to be lowercased.
+		if (charcompare >= 65 && charcompare <= 90)
+		{
+			sanitized[insertpoint] = tolower(charcompare); // Lowercase it
+			insertpoint++;
+			sanitized[insertpoint] = '\0'; // Make sure we're null-terminated.
+		}
+		unsanitized++;
+	} 
+	return (sanitized);
+}
+
 int web_engine::json_game_handler(struct mg_connection *conn)
 {
 	Json::Value data;
@@ -188,6 +222,25 @@ int web_engine::begin_request_handler(struct mg_connection *conn)
 				m_machine->resume();
 		else
 				m_machine->pause();
+		}
+		else if(!strcmp(cmd_name,"savestate"))
+		{
+			char cmd_val[64];
+			get_qsvar(request_info, "val", cmd_val, sizeof(cmd_val)); 
+			char *filename = websanitize_statefilename(cmd_val);
+			m_machine->schedule_save(filename);
+		}
+		else if(!strcmp(cmd_name,"loadstate"))
+		{
+			char cmd_val[64];
+			get_qsvar(request_info, "val", cmd_val, sizeof(cmd_val));
+			char *filename = cmd_val;
+			m_machine->schedule_load(filename);
+		}
+		else if(!strcmp(cmd_name,"loadauto"))
+		{
+			// This is here to just load the autosave and only the autosave.
+			m_machine->schedule_load("auto");
 		}
 
 		// Send HTTP reply to the client
