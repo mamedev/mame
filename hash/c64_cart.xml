@@ -6914,7 +6914,6 @@
 		</part>
 	</software>
 
-	<!--
 	<software name="partner">
 		<description>PARTNER 64</description>
 		<year>1985</year>
@@ -6927,11 +6926,10 @@
 			<feature name="exrom" value="1" />
 	
 			<dataarea name="romh" size="0x4000">
-				<rom name="timeworks c-64 ver 2-16-87" size="0x4000" status="nodump" offset="0" />
+				<rom name="timeworks c-64 ver 2-16-87" size="0x4000" crc="d40ec888" sha1="c9050ce93f9375b81800953a38450b0de3751bca" offset="0" />
 			</dataarea>
 		</part>
 	</software>
-	-->
 
 	<!-- Dummy cartridge entries to allow requirement mappings from c64_flop -->
 
