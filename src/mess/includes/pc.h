@@ -8,6 +8,7 @@
 #define PC_H_
 
 #include "machine/ins8250.h"
+#include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/am9517a.h"
 #include "machine/serial.h"
@@ -19,6 +20,7 @@
 #include "machine/ram.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
+#include "machine/ctronics.h"
 
 class pc_state : public driver_device
 {
@@ -32,6 +34,7 @@ public:
 		m_pc_kbdc(*this, "pc_kbdc"),
 		m_speaker(*this, "speaker"),
 		m_cassette(*this, "cassette"),
+		m_centronics(*this, "centronics"),
 		m_ram(*this, RAM_TAG) { }
 
 	required_device<cpu_device> m_maincpu;
@@ -41,6 +44,7 @@ public:
 	optional_device<pc_kbdc_device>  m_pc_kbdc;
 	optional_device<speaker_sound_device> m_speaker;
 	optional_device<cassette_image_device> m_cassette;
+	optional_device<centronics_device> m_centronics;
 	optional_device<ram_device> m_ram;
 
 	/* U73 is an LS74 - dual flip flop */
@@ -120,6 +124,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pcjr_pic8259_set_int_line);
 	DECLARE_WRITE_LINE_MEMBER(ibm5150_pit8253_out1_changed);
 	DECLARE_WRITE_LINE_MEMBER(ibm5150_pit8253_out2_changed);
+	DECLARE_WRITE_LINE_MEMBER(mc1502_pit8253_out1_changed);
+	DECLARE_WRITE_LINE_MEMBER(mc1502_pit8253_out2_changed);
 	DECLARE_WRITE_LINE_MEMBER(pc_com_interrupt_1);
 	DECLARE_WRITE_LINE_MEMBER(pc_com_interrupt_2);
 	DECLARE_READ8_MEMBER(ibm5160_ppi_porta_r);
@@ -127,11 +133,11 @@ public:
 	DECLARE_WRITE8_MEMBER(ibm5160_ppi_portb_w);
 	DECLARE_READ8_MEMBER(pc_ppi_porta_r);
 	DECLARE_WRITE8_MEMBER(pc_ppi_portb_w);
-	DECLARE_READ8_MEMBER(mc1502_ppi_porta_r);
 	DECLARE_WRITE8_MEMBER(mc1502_ppi_porta_w);
 	DECLARE_WRITE8_MEMBER(mc1502_ppi_portb_w);
 	DECLARE_READ8_MEMBER(mc1502_ppi_portc_r);
 	DECLARE_READ8_MEMBER(mc1502_kppi_porta_r);
+	DECLARE_READ8_MEMBER(mc1502_kppi_portc_r);
 	DECLARE_WRITE8_MEMBER(mc1502_kppi_portb_w);
 	DECLARE_WRITE8_MEMBER(mc1502_kppi_portc_w);
 	DECLARE_WRITE8_MEMBER(pcjr_ppi_portb_w);
@@ -199,6 +205,7 @@ extern const rs232_port_interface ibm5150_serport_config[4];
 extern const i8255_interface ibm5160_ppi8255_interface;
 extern const i8255_interface pc_ppi8255_interface;
 extern const i8255_interface pcjr_ppi8255_interface;
+extern const i8251_interface mc1502_i8251_interface;
 extern const i8255_interface mc1502_ppi8255_interface;
 extern const i8255_interface mc1502_ppi8255_interface_2;
 

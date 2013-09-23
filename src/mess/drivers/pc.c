@@ -62,6 +62,7 @@ video HW too.
 #include "cpu/i86/i86.h"
 #include "cpu/i86/i286.h"
 #include "sound/speaker.h"
+#include "sound/wave.h"
 
 #include "machine/i8255.h"
 #include "machine/ins8250.h"
@@ -90,6 +91,7 @@ video HW too.
 #include "imagedev/harddriv.h"
 #include "imagedev/cassette.h"
 #include "imagedev/cartslot.h"
+#include "imagedev/serial.h"
 #include "formats/mfi_dsk.h"
 #include "formats/pc_dsk.h"
 #include "formats/asst128_dsk.h"
@@ -1339,6 +1341,11 @@ static const cassette_interface mc1502_cassette_interface =
 	NULL
 };
 
+static const serial_image_interface mc1502_serial =
+{
+	9600, 8, 1, SERIAL_PARITY_NONE, 1, "upd8251"
+};
+
 static MACHINE_CONFIG_START( ibmpcjr, tandy_pc_state )
 	/* basic machine hardware */
 	MCFG_CPU_PC(ibmpcjr, ibmpcjr, I8088, 4900000, pcjr_frame_interrupt) /* TODO: Get correct cpu frequency, probably XTAL_14_31818MHz/3 */
@@ -1426,7 +1433,6 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( mc1502, pc_state )
 	/* basic machine hardware */
-//  MCFG_CPU_PC(mc1502, mc1502, I8088, XTAL_16MHz/3, pcjr_frame_interrupt)  /* check frame_interrupt */
 	MCFG_CPU_ADD("maincpu", I8088, XTAL_16MHz/3)
 	MCFG_CPU_PROGRAM_MAP(mc1502_map)
 	MCFG_CPU_IO_MAP(mc1502_io)
@@ -1441,22 +1447,21 @@ static MACHINE_CONFIG_START( mc1502, pc_state )
 	MCFG_I8255_ADD( "ppi8255", mc1502_ppi8255_interface )       /* not complete */
 	MCFG_I8255_ADD( "ppi8255n2", mc1502_ppi8255_interface_2 )   /* not complete */
 
-	MCFG_I8251_ADD( "upd8251", default_i8251_interface )
+	MCFG_I8251_ADD( "upd8251", mc1502_i8251_interface )
+	MCFG_SERIAL_ADD("irps", mc1502_serial)
 
-	/* video hardware */
-	MCFG_FRAGMENT_ADD( pcvideo_mc1502 )             /* only 1 chargen, CGA_FONT dip always 1 */
+	/* video hardware (only 1 chargen in ROM; CGA_FONT dip always 1 */
+	MCFG_FRAGMENT_ADD( pcvideo_mc1502 )
 	MCFG_GFXDECODE(ibmpcjr)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	/* printer */
-//  MCFG_PC_LPT_ADD("lpt_0", pc_lpt_config)             /* TODO: non-standard */
-
-	/* cassette */
-	MCFG_CASSETTE_ADD( "cassette", mc1502_cassette_interface )    // has no motor control
+	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
+	MCFG_CASSETTE_ADD( "cassette", mc1502_cassette_interface )
 
 	MCFG_FD1793x_ADD("vg93", XTAL_16MHz / 16)
 	MCFG_FLOPPY_DRIVE_ADD("fd0", mc1502_floppies, "525qd", pc_state::floppy_formats)

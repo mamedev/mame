@@ -17,6 +17,7 @@
 
 #include "machine/i8255.h"
 #include "machine/ins8250.h"
+#include "machine/i8251.h"
 #include "machine/mc146818.h"
 #include "machine/pic8259.h"
 
@@ -409,6 +410,31 @@ const struct pit8253_interface pcjr_pit8253_config =
 
 /* MC1502 uses single XTAL for everything -- incl. CGA? check */
 
+const i8251_interface mc1502_i8251_interface =
+{
+	DEVCB_NULL,	/* XXX RxD data are accessible via PPI port C, bit 7 */
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir7_w),	/* default handler does nothing */
+	DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir7_w),
+	DEVCB_NULL,
+	DEVCB_NULL	/* XXX SYNDET triggers NMI */
+};
+
+WRITE_LINE_MEMBER(pc_state::mc1502_pit8253_out1_changed)
+{
+	machine().device<i8251_device>("upd8251")->txc_w(state);
+	machine().device<i8251_device>("upd8251")->rxc_w(state);
+}
+
+WRITE_LINE_MEMBER(pc_state::mc1502_pit8253_out2_changed)
+{
+	pc_speaker_set_input( state );
+	m_cassette->output(state ? 1 : -1);
+}
+
 const struct pit8253_interface mc1502_pit8253_config =
 {
 	{
@@ -419,11 +445,11 @@ const struct pit8253_interface mc1502_pit8253_config =
 		}, {
 			XTAL_16MHz/12,              /* serial port */
 			DEVCB_NULL,
-			DEVCB_NULL
+			DEVCB_DRIVER_LINE_MEMBER(pc_state,mc1502_pit8253_out1_changed)
 		}, {
 			XTAL_16MHz/12,              /* pio port c pin 4, and speaker polling enough */
 			DEVCB_NULL,
-			DEVCB_DRIVER_LINE_MEMBER(pc_state,ibm5150_pit8253_out2_changed)
+			DEVCB_DRIVER_LINE_MEMBER(pc_state,mc1502_pit8253_out2_changed)
 		}
 	}
 };
@@ -886,7 +912,6 @@ I8255_INTERFACE( pc_ppi8255_interface )
 
 static struct {
 	UINT8       pulsing;
-	UINT8       latch;      /* keyboard scan code */
 	UINT16      mask;       /* input lines */
 	emu_timer   *keyb_signal_timer;
 } mc1502_keyb;
@@ -930,19 +955,9 @@ TIMER_CALLBACK_MEMBER(pc_state::mc1502_keyb_signal_callback)
 	}
 }
 
-READ8_MEMBER(pc_state::mc1502_ppi_porta_r)
-{
-//  DBG_LOG(1,"mc1502_ppi_porta_r",("= %02X\n", mc1502_keyb.latch));
-	return mc1502_keyb.latch;
-}
-
 WRITE8_MEMBER(pc_state::mc1502_ppi_porta_w)
 {
-//  DBG_LOG(1,"mc1502_ppi_porta_w",("( %02X )\n", data));
-	mc1502_keyb.latch = data;
-	if (mc1502_keyb.pulsing)
-		mc1502_keyb.pulsing--;
-	m_pic8259->ir1_w(0);
+	m_centronics->write(space, 0, data);
 }
 
 WRITE8_MEMBER(pc_state::mc1502_ppi_portb_w)
@@ -950,7 +965,22 @@ WRITE8_MEMBER(pc_state::mc1502_ppi_portb_w)
 //  DBG_LOG(2,"mc1502_ppi_portb_w",("( %02X )\n", data));
 	m_ppi_portb = data;
 	machine().device<pit8253_device>("pit8253")->gate2_w(BIT(data, 0));
-	pc_speaker_set_spkrdata( data & 0x02 );
+	pc_speaker_set_spkrdata(BIT(data, 1));
+	m_centronics->strobe_w(BIT(data, 2));
+	m_centronics->autofeed_w(BIT(data, 3));
+	m_centronics->init_prime_w(BIT(data, 4));
+}
+
+READ8_MEMBER(pc_state::mc1502_kppi_portc_r)
+{
+	UINT8 data = 0;
+
+	data |= m_centronics->fault_r() << 4;
+	data |= m_centronics->pe_r() << 5;
+	data |= m_centronics->busy_r() << 6;
+	data |= m_centronics->ack_r() << 7;
+
+	return data;
 }
 
 READ8_MEMBER(pc_state::mc1502_ppi_portc_r)
@@ -1097,7 +1127,7 @@ I8255_INTERFACE( pcjr_ppi8255_interface )
 
 I8255_INTERFACE( mc1502_ppi8255_interface )
 {
-	DEVCB_DRIVER_MEMBER(pc_state,mc1502_ppi_porta_r),
+	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(pc_state,mc1502_ppi_porta_w),
 	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(pc_state,mc1502_ppi_portb_w),
