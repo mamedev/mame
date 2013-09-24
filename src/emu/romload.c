@@ -1187,7 +1187,7 @@ static void process_disk_entries(romload_private *romdata, const char *regiontag
 				/* if this is NO_DUMP, keep going, though the system may not be able to handle it */
 				if (hashes.flag(hash_collection::FLAG_NO_DUMP))
 					romdata->knownbad++;
-				else if (DISK_ISOPTIONAL(romp))
+				else if (ROM_ISOPTIONAL(romp))
 					romdata->warnings++;
 				else
 					romdata->errors++;

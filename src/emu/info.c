@@ -606,7 +606,7 @@ void info_xml_creator::output_rom(device_t &device)
 				}
 
 				// add optional flag
-				if ((!is_disk && ROM_ISOPTIONAL(rom)) || (is_disk && DISK_ISOPTIONAL(rom)))
+				if (ROM_ISOPTIONAL(rom))
 					output.cat(" optional=\"yes\"");
 
 				output.cat("/>\n");
