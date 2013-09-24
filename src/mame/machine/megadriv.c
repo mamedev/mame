@@ -1156,7 +1156,7 @@ DRIVER_INIT_MEMBER(md_base_state,megadriv_c2)
 	m_vdp->set_use_cram(0); // C2 uses its own palette ram
 	m_vdp->set_vdp_pal(FALSE);
 	m_vdp->set_framerate(60);
-	m_vdp->set_total_scanlines(313);
+	m_vdp->set_total_scanlines(262);
 }
 
 
@@ -1171,7 +1171,7 @@ DRIVER_INIT_MEMBER(md_base_state,megadriv)
 	m_vdp->set_use_cram(1);
 	m_vdp->set_vdp_pal(FALSE);
 	m_vdp->set_framerate(60);
-	m_vdp->set_total_scanlines(313);
+	m_vdp->set_total_scanlines(262);
 	if (m_32x)
 	{
 		m_32x->set_framerate(60);
@@ -1194,7 +1194,7 @@ DRIVER_INIT_MEMBER(md_base_state,megadrij)
 	m_vdp->set_use_cram(1);
 	m_vdp->set_vdp_pal(FALSE);
 	m_vdp->set_framerate(60);
-	m_vdp->set_total_scanlines(313);
+	m_vdp->set_total_scanlines(262);
 	if (m_32x)
 	{
 		m_32x->set_framerate(60);
@@ -1217,7 +1217,7 @@ DRIVER_INIT_MEMBER(md_base_state,megadrie)
 	m_vdp->set_use_cram(1);
 	m_vdp->set_vdp_pal(TRUE);
 	m_vdp->set_framerate(50);
-	m_vdp->set_total_scanlines(262);
+	m_vdp->set_total_scanlines(313);
 	if (m_32x)
 	{
 		m_32x->set_framerate(50);
