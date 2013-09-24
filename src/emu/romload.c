@@ -374,29 +374,42 @@ static void fill_random(running_machine &machine, UINT8 *base, UINT32 length)
     for missing files
 -------------------------------------------------*/
 
-static void handle_missing_file(romload_private *romdata, const rom_entry *romp, astring tried_file_names)
+static void handle_missing_file(romload_private *romdata, const rom_entry *romp, astring tried_file_names, chd_error chderr)
 {
 	if(tried_file_names.len() != 0)
 		tried_file_names = " (tried in " + tried_file_names + ")";
 
+	astring name(ROM_GETNAME(romp));
+
+	bool is_chd = (chderr != CHDERR_NONE);
+	if (is_chd)
+		name += ".chd";
+
+	bool is_chd_error = (is_chd && chderr != CHDERR_FILE_NOT_FOUND);
+	if (is_chd_error)
+		romdata->errorstring.catprintf("%s CHD ERROR: %s\n", name.cstr(), chd_file::error_string(chderr));
+
 	/* optional files are okay */
 	if (ROM_ISOPTIONAL(romp))
 	{
-		romdata->errorstring.catprintf("OPTIONAL %s NOT FOUND%s\n", ROM_GETNAME(romp), tried_file_names.cstr());
+		if (!is_chd_error)
+			romdata->errorstring.catprintf("OPTIONAL %s NOT FOUND%s\n", name.cstr(), tried_file_names.cstr());
 		romdata->warnings++;
 	}
 
 	/* no good dumps are okay */
 	else if (hash_collection(ROM_GETHASHDATA(romp)).flag(hash_collection::FLAG_NO_DUMP))
 	{
-		romdata->errorstring.catprintf("%s NOT FOUND (NO GOOD DUMP KNOWN)%s\n", ROM_GETNAME(romp), tried_file_names.cstr());
+		if (!is_chd_error)
+			romdata->errorstring.catprintf("%s NOT FOUND (NO GOOD DUMP KNOWN)%s\n", name.cstr(), tried_file_names.cstr());
 		romdata->knownbad++;
 	}
 
 	/* anything else is bad */
 	else
 	{
-		romdata->errorstring.catprintf("%s NOT FOUND%s\n", ROM_GETNAME(romp), tried_file_names.cstr());
+		if (!is_chd_error)
+			romdata->errorstring.catprintf("%s NOT FOUND%s\n", name.cstr(), tried_file_names.cstr());
 		romdata->errors++;
 	}
 }
@@ -904,7 +917,7 @@ static void process_rom_entries(romload_private *romdata, const char *regiontag,
 			LOG(("Opening ROM file: %s\n", ROM_GETNAME(romp)));
 			astring tried_file_names;
 			if (!irrelevantbios && !open_rom_file(romdata, regiontag, romp, tried_file_names, from_list))
-				handle_missing_file(romdata, romp, tried_file_names);
+				handle_missing_file(romdata, romp, tried_file_names, CHDERR_NONE);
 
 			/* loop until we run out of reloads */
 			do
@@ -1179,18 +1192,7 @@ static void process_disk_entries(romload_private *romdata, const char *regiontag
 			err = chd_error(open_disk_image(romdata->machine().options(), &romdata->machine().system(), romp, chd->orig_chd(), locationtag));
 			if (err != CHDERR_NONE)
 			{
-				if (err == CHDERR_FILE_NOT_FOUND)
-					romdata->errorstring.catprintf("%s NOT FOUND\n", filename.cstr());
-				else
-					romdata->errorstring.catprintf("%s CHD ERROR: %s\n", filename.cstr(), chd_file::error_string(err));
-
-				/* if this is NO_DUMP, keep going, though the system may not be able to handle it */
-				if (hashes.flag(hash_collection::FLAG_NO_DUMP))
-					romdata->knownbad++;
-				else if (ROM_ISOPTIONAL(romp))
-					romdata->warnings++;
-				else
-					romdata->errors++;
+				handle_missing_file(romdata, romp, astring(), err);
 				global_free(chd);
 				continue;
 			}
