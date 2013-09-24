@@ -11,15 +11,15 @@ Sound emulation by Philip Bennett
 
 SCSI code by ElSemi
 
-ToDo: (in order or priority?)
+To-Do/Issues:
 
 Street Fighter 3 2nd Impact uses flipped tilemaps during flashing, emulate this.
 
 Figure out proper IRQ10 generation:
- If we generate on DMA operations only then Warzard is OK, otherwise it hangs during attract
- HOWEVER, SFIII2 sometimes has messed up character profiles unless we also generate it periodicly.
- I think the corrupt background on some of the lighning effects may be realted to this + the DMA
- status flags.
+    If we generate on DMA operations only then Warzard is OK, otherwise it hangs during attract
+    HOWEVER, SFIII2 sometimes has messed up character profiles unless we also generate it periodically.
+    I think the corrupt background on some of the lighting effects may be related to this + the DMA
+    status flags.
 
 Alpha Blending Effects
     These are actually palette manipulation effects, not true blending.  How the values are used is
@@ -32,19 +32,19 @@ Palette DMA effects
     Verify them, they might not be 100% accurate at the moment
 
 Verify Full Screen Zoom on real hardware
- Which is which, x & y registers, how far can it zoom etc.
+    Which is which, x & y registers, how far can it zoom etc.
 
 Verify CRT registers
- Only SFIII2 changes them, for widescreen mode.  What other modes are possible?
+    Only SFIII2 changes them, for widescreen mode.  What other modes are possible?
 
 Sprite positioning glitches
- Some sprites are still in the wrong places, seems the placement of zooming sprites is imperfect
- eg. warzard intro + cutscenes leave the left most 16 pixels uncovered because the sprite is positioned incorrectly,
-     the same occurs in the sf games.  doesn't look like the origin is correct when zooming in all cases.
+    Some sprites are still in the wrong places, seems the placement of zooming sprites is imperfect
+    eg. warzard intro + cutscenes leave the left most 16 pixels uncovered because the sprite is positioned incorrectly,
+    the same occurs in the sf games.  doesn't look like the origin is correct when zooming in all cases.
 
 Gaps in Sprite Zooming
- probably cause by use of drawgfx instead of processing as a single large sprite, but could also be due to the
- positioning of each part of the sprite.  Warzard is confirmed to have gaps during some cutscenes on real hardware.
+    probably caused by use of drawgfx instead of processing as a single large sprite, but could also be due to the
+    positioning of each part of the sprite.  Warzard is confirmed to have gaps during some cut-scenes on real hardware.
 
 ---
 
@@ -120,79 +120,75 @@ JoJo's Bizarre Adventure                                   JJM999A0F  CP3000B0G 
 
 * NOT DUMPED but known to exist
 
-Each game consists of a Cart and a CD having various codes needed to identify them. Carts and CDs have
-both a different Part # printed on their front/top side that includes the game Cart/CD code and ends
+Each game consists of a cart and a CD having various codes needed to identify them. Carts and CDs have
+both a different Part # printed on their front/top side that includes the game cart/CD code and ends
 respectively with 00F/000 for all Japan releases and with A0F/0A0 for all the other ones. Therefore,
-the Part # can be used only to identify Japan releases and further parameters need to be introduced.
-The Cart is responsible for the game Region that can be identified by a Label with coloured characters
-and a code printed on back side. The antepenultimate character of the Label code and the colour of the
-sticker vary by Region, exactly as happens on the boot screen when the board is powered on. There are two
-types of Carts. Some require the CD to boot, some don't since the game is already loaded into the SIMMs.
-Both types are externally identical and use the same codes, so the only way to distinguish them is dump
-the BIOSes. The game Region and CD/NO CD flags are controlled by two different bytes in the BIOS rom.
-The CD (and SIMMs too if the Cart is of type NO CD) contains the game Revision that can be identified
-by two codes, the Catalog # and the Label. The Catalog # is the identifying code printed in the mirror
-ring on top side close to the CD's center while the Label is the code appearing on the CD icon when
-it's inserted into a PC CD reader. It has been verified that the Catalog # and Label are the same for
+the part # can be used only to identify Japan releases and further parameters need to be introduced.
+The cart is responsible for the game region that can be identified by a label with colored characters
+and a code printed on the back side. The antepenultimate character of the label code and the colour of the
+sticker vary by region, exactly as happens on the boot screen when the board is powered on. There are two
+types of carts. Some require the CD to boot, some don't since the game is already loaded into the SIMMs.
+Both types are externally identical and use the same codes, so the only way to distinguish them is to dump
+the flashROMs. The game region and CD/NO CD flags are controlled by two different bytes in the flashROM.
+The CD (and SIMMs too if the cart is of type NO CD) contains the game revision that can be identified
+by two codes, the catalog # and the label. The catalog # is the identifying code printed in the mirror
+ring on the top side close to the CD's center while the label is the code appearing on the CD icon when
+it's inserted into a PC CD drive. It has been verified that the catalog # and label are the same for
 some games but quite different for some others, so it's better to check both to avoid confusion. It
-has also been verified that the Catalog # and Label (and the data on CDs) don't change between Regions,
-only between Revisions. However, knowing one of them and comparing it with the table above will help
-to understand if a new game Revision has been discovered. Current CD dumps have been documented using
-the Catalog # as name, since the Label is already included into the images used to generate CHDs.
+has also been verified that the catalog # and label (and the data on CDs) don't change between regions,
+only between revisions. However, knowing one of them and comparing it with the table above will help
+to understand if a new game revision has been discovered. Current CD dumps have been documented using
+the catalog # as name, since the label is already included into the images used to generate CHDs.
 
 The CP SYSTEM III comprises a main board with several custom ASICs, custom 72-pin SIMMs for program
 and graphics storage (the same SIMMs are also used in some CPS2 titles), SCSI CDROM and CDROM disc,
-and a plug-in security cart containing a boot ROM, an NVRAM and another custom ASIC containing vital
-decryption information held by a [suicide] battery.
+and a plug-in security cart containing a boot flashROM, an NVRAM and a custom Capcom CPU containing
+battery-backed decryption keys.
 
-Not much is known about the actual CPU used in this system due to the extensive use of encryption,
-and the volatile nature of the security information. There appears to be a custom Hitachi SH-2 CPU on
-the mainboard and there has been confirmed to be one in the cart. Tests were done by decrypting the
-BIOS and code and running it on the PCB. It is known that neither of these CPU's will run standard
-(i.e. unencrypted) SH2 code.
+Not much is known about the actual CPU used in this system due to the extensive use of encryption and the volatile
+nature of the security information. It is known that the CPU inside the security cart is the main CPU. It is known to
+be a Hitachi SH-2 derivative thought to be based on a Hitachi HD6417099 SH2 variant with built-in encryption.
+Tests were done by decrypting the security cart flashROM code and running it on the PCB with a dead cart with a zero
+key and it didn't run so it is known that the custom CPU will not run standard (i.e. unencrypted) SH2 code.
 
-The security cart works like this: the flashROM in the cart contains a program BIOS which is
-decrypted by the CPU in the cart (the CPU has built-in decryption) then executed by that CPU to boot the
-BIOS code. Even though the code in the flashROM is encrypted, the cart can run it even if it is dead/suicided
-because it has been discovered that the BIOS contains a hidden security menu allowing the cart to be loaded
-with the security data. This proves the cart runs the BIOS even if it is dead. The special security menu is
-not normally available but is likely accessed with a special key/button combination which is unknown ATM. 
-The cart contains a FM1208S NVRAM which appears to either be unused or holds game settings. 
- 
-There are 4 types of CPS3 carts. They have a label on the custom CPU that can be either A,B,C or D.
-Cartidge types A and B are identical and both have extra space on the back side to solder a 29F400 in PSOP-44
-package, which is much easier to assemble as compared to the default TSOP-48 package.
-A and B cartridges also contain a FM1208S NVRAM which appears to be used or holds game settings. 
-C and D cartridges lack the extra space to solder a PSOP-44 Flash Rom and instead of the FM1208
-it has a MACH111 which is a EE CMOS CPLD. C and D cartridge still have a space to solder a FM1208.
- 
-Because the CPU in the cart is always powered by a battery, it has stealth capability that allows it to 
-continually monitor the situation. If the custom CPU detects any tampering (generally things such as voltage 
-fluctuation or voltage dropping or even removal of the cart with the power on), it immediately erases the SRAM 
-inside the CPU (and thus the key) which effectively kills the security cart dead. When a cartridge goes dead, 
-it will set the decryption keys identical to the ones of SFIII-2nd Impact, so removing the battery and changing 
-the content of the BIOS (if it's not a 2nd Impact) will make it run as a normal SFIII-2nd Impact cartridge.
-It is known (from decapping it) that the CPU in the security cart does contain an amount of static RAM 
-for data storage and a SH2 core.
+The flashROM in the cart contains an encrypted program which is decrypted by the CPU in the cart. The CPU has built-in
+decryption and the key is held in some static RAM on the CPU die and kept there by a battery. The code is executed by
+the CPU to boot the system. Even though the code in the flashROM is encrypted, the cart can run it even if it is
+dead/suicided because it has been discovered that the program contains a hidden security menu allowing the cart to be
+loaded with the security data. This proves the cart runs the code even if the battery is dead. The special security
+menu is not normally available but is likely accessed with a special key/button combination which is currently unknown.
 
-The main board uses the familiar Capcom SIMM modules to hold the data from the CDROM so that the life of
-the CD drive is maximized. The SIMMs don't contain RAM, but instead TSOP48 surface mounted flashROMs that
-can be updated with different games on bootup using a built-in software updating system.
+Because the CPU in the cart is always powered by the battery, it has stealth capability that allows it to continually
+monitor the situation. If the custom CPU detects any tampering (generally things such as voltage fluctuation or voltage
+dropping or even removal of the cart with the power on), it immediately erases the SRAM (i.e. the decryption key)
+inside the CPU which effectively kills the security cart. This also suggests that the custom Capcom CPU contains some
+additional internal code to initiate the boot process because in order to re-program a cart using the hidden security
+menu the CPU must execute some working code. It is known (from decapping it) that the CPU in the security cart contains
+an amount of static RAM for data storage and a SH2 core based on the Hitachi SH7010-series (SH7014) SuperH RISC engine
+family of Microprocessors.
+
+It is thought that when a cartridge dies it will set the decryption keys identical to the ones of SFIII-2nd Impact, so
+removing the battery and changing the content of the flashROM (if it's not a 2nd Impact) will make it run as a normal
+SFIII-2nd Impact cartridge (is this verified on real hardware?)
+
+The main board uses the familiar Capcom SIMM modules to hold the data from the CDROM so that the life of the CD drive
+is maximized. The SIMMs don't contain RAM, but instead TSOP48 surface mounted flashROMs that can be updated with
+different games on bootup using a built-in software updating system.
 The SIMMs that hold the program code are located in positions 1 & 2 and are 64MBit.
-The SIMMs that hold the graphics are located in positions 3, 4, 5, 6 & 7 and are 128MBit.
-The data in the SIMMs is not decrypted, it is merely taken directly from the CDROM and shuffled slightly
-then programmed to the flashROMs. The SIMMs hold the entire contents of the CDROM.
+The SIMMs that hold the graphics and sound data are located in positions 3, 4, 5, 6 & 7 and are 128MBit.
+The data in the SIMMs is not decrypted, it is merely taken directly from the CDROM and shuffled slightly then
+programmed to the flashROMs. The SIMMs hold the entire contents of the CDROM.
 
-To swap games requires the security cart for the game, it's CDROM disc and the correctly populated type
-and number of SIMMs on the main board.
-On first power-up after switching the cart and CD, you're presented with a screen asking if you want to
-re-program the SIMMs with the new game. Pressing player 1 button 2 cancels it. Pressing player 1 button 1
-allows it to proceed whereby you wait about 25 minutes then the game boots up almost immediately. On
-subsequent power-ups, the game boots immediately.
+To swap games requires the security cart for the game, it's CDROM disc and the correctly populated type and number of
+SIMMs on the main board.
+On first power-up after switching the cart and CD, you're presented with a screen asking if you want to re-program the
+SIMMs with the new game. Pressing player 1 button 2 cancels it. Pressing player 1 button 1 allows it to proceed whereby
+you wait about 25-30 minutes then the game boots up almost immediately. On subsequent power-ups, the game boots
+immediately.
 If the CDROM is not present in the drive on a normal bootup, a message tells you to insert the CDROM.
 Then you press button 1 to continue and the game boots immediately.
-Note that not all of the SIMMs are populated on the PCB for each game. Some games have more, some less,
-depending on game requirements, so flash times can vary per game. See the table below for details.
+Note that not all of the SIMMs are populated on the PCB for each game. Some games have more, some less, depending on
+game requirements, so flash times can vary per game. See the table below for details.
 
                                                      |----------- Required SIMM Locations & Types -----------|
 Game                                                 1       2       3        4        5         6         7
@@ -211,22 +207,21 @@ JoJo's Bizarre Adventure                             64MBit  64MBit  128MBit  12
                                                            No game uses a SIMM at 7
                                                            See main board diagram below for SIMM locations.
 
-Due to the built-in upgradability of the hardware, and the higher frame-rates the hardware seems to have,
-it appears Capcom had big plans for this system and possibly intended to create many games on it, as they
-did with CPS2. Unfortunately for Capcom, CP SYSTEM III was an absolute flop in the arcades so those plans
-were cancelled. Possible reasons include:
-- the games were essentially just 2D, and already there were many 3D games coming out onto the market that
-  interested operators more than this,
-- the cost of the system was quite expensive when compared to other games on the market,
-- it is rumoured that the system was difficult to program for developers,
-- these PCBs were not popular with operators because the security carts are extremely static-sensitive and most
-  of them failed due to the decryption information being zapped by simple handling of the PCBs or by touching
-  the security cart edge connector underneath the PCB while the security cart was plugged in, or by power
-  fluctuations while flashing the SIMMs. You will know if your cart has been zapped because on bootup, you get
-  a screen full of garbage coloured pixels instead of the game booting up, or just a black or single-coloured
-  screen. You should also not touch the inside of the security cart because it will be immediately zapped
-  when you touch it! The PCB can detect the presence of the security cart and if it is removed on a working game,
-  the game will freeze immediately and it will also erase the security cart battery-backed data.
+Due to the built-in upgradability of the hardware, and the higher frame-rates the hardware seems to have, it appears
+Capcom had big plans for this system and possibly intended to create many games on it, as they did with CPS2.
+Unfortunately for Capcom, CP SYSTEM III was an absolute flop in the arcades so those plans were cancelled. Possible
+reasons include:
+- the games were essentially just 2D, and already there were many 3D games coming out onto the market that interested
+  operators more than this.
+- the cost of the system was quite expensive when compared to other games on the market.
+- it is rumoured that the system was difficult to program for developers.
+- these PCBs were not popular with operators because the security carts are extremely static-sensitive and most of them
+  failed due to the decryption information being zapped by simple handling of the PCBs or by touching the security cart
+  edge connector underneath the PCB while the security cart was plugged in, or by power fluctuations while flashing the
+  SIMMs. You will know if your cart has been zapped because on bootup, you get a screen full of garbage coloured pixels
+  instead of the game booting up, or just a black or single-colored screen. You should also not touch the inside of the
+  security cart. The PCB can detect the presence of the security cart and if it is removed on a working game, the game
+  will freeze immediately and it will also erase the security cart battery-backed decryption data.
 
 
 PCB Layouts
@@ -236,7 +231,7 @@ CAPCOM
 CP SYSTEM III
 95682A-4 (older rev 95682A-3)
    |----------------------------------------------------------------------|
-  |= J1             HM514260     |------------|      |  |  |  |  |        |
+  |= J1             HM514260(2)  |------------|      |  |  |  |  |        |
    |                             |CAPCOM      |      |  |  |  |  |        |
   |= J2     TA8201  TC5118160    |DL-2729 PPU |      |  |  |  |  |        |
    |                             |(QFP304)    |      |  |  |  |  |        |
@@ -283,10 +278,15 @@ Notes:
                    (unsecured) EEPROM so why it was covered is not known.
       LM385      - National Semiconductor LM385 Adjustable Micropower Voltage Reference Diode (SOIC8)
       33C93      - AMD 33C93A-16 SCSI Controller (PLCC44)
-      KM681002   - Samsung Electronics KM681002 128k x8 SRAM (SOJ32)
-      62256      - 8k x8 SRAM (SOJ28)
-      HM514260   - Hitachi HM514260CJ7 1M x16 DRAM (SOJ42)
-      TC5118160  - Toshiba TC5118160BJ-60 256k x16 DRAM (SOJ42)
+      KM681002   - Samsung Electronics KM681002 128k x8 SRAM (SOJ32). This is the 'Color RAM' in the test mode memory
+                   test
+      62256      - 8k x8 SRAM (SOJ28). This is the 'SS RAM' in the test mode memory test and is connected to the custom
+                   SSU chip.
+      HM514260(1)- Hitachi HM514260CJ7 1M x16 DRAM (SOJ40). This is the 'Work RAM' in the test mode memory test and is
+                   connected to the custom CCU chip.
+      HM514260(2)- Hitachi HM514260CJ7 1M x16 DRAM (SOJ40). This is the 'Sprite RAM' in the test mode memory test
+      TC5118160  - Toshiba TC5118160BJ-60 or NEC 4218160-60 256k x16 DRAM (SOJ42). This is the 'Character RAM' in the
+                   test mode memory test
       SW1        - Push-button Test Switch
       VOL        - Master Volume Potentiometer
       J1/J2      - Optional RCA Left/Right Audio Out Connectors
@@ -315,14 +315,15 @@ Notes:
                                   For SIMMs 3-7, the 8 FlashROMs are populated on both sides using a similar layout.
 
       Capcom Custom ASICs -
-                           DL-2729 PPU SD10-505   (QFP304). Decapping reveals this is the main graphics chip.
-                           DL-2829 CCU SD07-1514  (QFP208). Decapping reveals this to be a custom Toshiba ASIC.
-                           DL-2929 IOU SD08-1513  (QFP208). This is the I/O controller.
-                           DL-3329 SSU SD04-1536  (QFP144). This is might be the main CPU. It appears to be a SH2
-                                                            variant with built-in encryption. It is clocked at
-                                                            21.47725MHz (42.9545/2)
-                           DL-3429 GLL1 SD06-1537 (QFP144). Unknown, possibly a DMA or bus controller.
-                           DL-3529 GLL2 SD11-1755 (QFP80).  This might be the sound chip (it has 32k SRAM connected to it).
+                           DL-2729 PPU SD10-505   (QFP304) - Graphics chip.
+                           DL-2829 CCU SD07-1514  (QFP208) - Probably a companion CPU or co-processor. Decapping
+                                                             reveals it is manufactured by Toshiba. The 'Work RAM' is
+                                                             connected to it.
+                           DL-2929 IOU SD08-1513  (QFP208) - I/O controller.
+                           DL-3329 SSU SD04-1536  (QFP144) - Sound chip, clocked at 21.47725MHz (42.9545/2). It has 32k
+                                                             SRAM connected to it.
+                           DL-3429 GLL1 SD06-1537 (QFP144) - DMA memory/bus controller.
+                           DL-3529 GLL2 SD11-1755 (QFP80)  - ROM/SIMM bank selection chip (via 3x FCT162244 logic ICs).
 
 
 Connector Pinouts
@@ -365,6 +366,22 @@ Connector Pinouts
 Security Cartridge PCB Layout
 -----------------------------
 
+There are 4 types of CPS3 security carts. They have a label on the custom CPU that can be either A, B, C or D.
+Cartridge types A/B are identical and cartridge types C/D are identical.
+Type A/B have extra space on the back side to solder a 28F400 SOP44 flashROM which shares all electrical connections
+with the 29F400 TSOP48 flashROM on the front side of the PCB. Either chip can be used to store the 512k cart program,
+but no cart has been seen with a SOP44 flashROM populated, nor with both SOP44 and TSOP48 populated on one cart.
+A and B cartridges also contain a FM1208S NVRAM which holds game settings or other per-game data. It is definitely
+used. If the NVRAM data is not present when the game boots or the NVRAM is not working or inaccessible a message is
+displayed 'EEPROM ERROR' and the game halts. This error can also occur if the security cart edge connector is dirty
+and not contacting properly.
+C and D cartridges lack the extra space to solder a SOP44 flashROM. A space is available on the back side for a FM1208S
+NVRAM but it is not populated. A MACH111 CPLD is present on the back side and stamped 'CP3B1A'
+
+
+Type A and Type B
+-----------------
+
 CAPCOM 95682B-3 TORNADE
 |------------------------------------------------|
 |      BATTERY                                   |
@@ -386,11 +403,56 @@ Notes:
       FM1208S      - RAMTRON FM1208S 4k (512bytes x8) Nonvolatile Ferroelectric RAM (SOIC24)
       28F400       - 28F400 SOP44 FlashROM (not populated)
       *            - These components located on the other side of the PCB
-      The battery powers the CPU only. A small board containing some transistors is wired to the 74HC00
+
+      Note: The battery powers the CPU only. A small board containing some transistors/resistors is wired to the 74HC00
       to switch the CPU from battery power to main power to increase the life of the battery.
 
-*/
 
+Type C and Type D
+-----------------
+
+CAPCOM 95682B-4 CP SYSTEM III
+|------------------------------------------------|
+|      BATTERY                                   |
+|                          |-------|             |
+|                          |CAPCOM |   29F400    |
+|                          |DL-3229|   *MACH111  |
+|                          |SCU    |     *FM1208S|
+| 74HC00                   |-------|             |
+|               6.25MHz                    74F00 |
+|---|     |-|                             |------|
+    |     | |                             |
+    |-----| |-----------------------------|
+Notes:
+      74F00        - 74F00 Quad 2-Input NAND Gate (SOIC14)
+      74HC00       - Philips 74HC00N Quad 2-Input NAND Gate (DIP14)
+      29F400       - Fujitsu 29F400TA-90PFTN 512k x8 FlashROM (TSOP48)
+      Custom ASIC  - CAPCOM DL-3229 SCU (QFP144). Decapping reveals this is a Hitachi HD6417099 SH2 variant
+                     with built-in encryption, clocked at 6.250MHz
+      FM1208S      - RAMTRON FM1208S 4k (512bytes x8) Nonvolatile Ferroelectric RAM (not populated)
+      MACH111      - AMD MACH111 CPLD stamped 'CP3B1A' (PLCC44)
+      *            - These components located on the other side of the PCB
+
+      Note: The battery powers the CPU only. Some transistors/resistors present on the PCB and wired to the 74HC00
+      switch the CPU from battery power to main power to increase the life of the battery.
+
+
+Security cart resurrection info
+-------------------------------
+
+When the security cart dies the game no longer functions. The PCB can be brought back to life by doing the following
+hardware modification to the security cart.....
+
+1. Remove the custom QFP144 CPU and replace it with a standard Hitachi HD6417095 SH-2 CPU
+2. Remove the 29F400 TSOP48 flashROM and re-program it with the decrypted and modified main program ROM from set
+   'cps3nobatt' in MAME. A 28F400 SOP44 flashROM can be used instead and mounted to the back side of the security cart
+   PCB. Do not mount both SOP44 and TSOP48 flashROMs, use only one TSOP48 flashROM or one SOP44 flashROM.
+3. Power on the PCB and using the built-in cart flashROM menu re-program the SIMMs for your chosen game using the CD
+   from set 'cps3nobatt' in MAME.
+4. That is all. Enjoy your working PCB.
+ 
+*/ 
+ 
 #include "emu.h"
 #include "cdrom.h"
 #include "cpu/sh2/sh2.h"
