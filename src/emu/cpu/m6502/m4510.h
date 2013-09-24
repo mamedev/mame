@@ -81,6 +81,7 @@ protected:
 
 	virtual void device_start();
 	virtual void device_reset();
+	virtual bool memory_translate(address_spacenum spacenum, int intention, offs_t &address);
 
 	inline UINT32 map(UINT16 adr) {
 		if(map_enable & (1 << (adr >> 13))) {

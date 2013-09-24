@@ -80,6 +80,16 @@ void m4510_device::device_reset()
 	m65ce02_device::device_reset();
 }
 
+bool m4510_device::memory_translate(address_spacenum spacenum, int intention, offs_t &address)
+{
+	if (spacenum == AS_PROGRAM)
+	{
+		address = map(address);
+	}
+
+	return true;
+}
+
 m4510_device::mi_4510_normal::mi_4510_normal(m4510_device *_base)
 {
 	base = _base;
