@@ -34,19 +34,63 @@
 #include "includes/1943.h"
 
 
-/* Read/Write Handlers */
+/* Protection Handlers */
+
+WRITE8_MEMBER(_1943_state::c1943_protection_w)
+{
+	m_prot_value = data;
+}
 
 READ8_MEMBER(_1943_state::c1943_protection_r)
 {
-	/*
-	    This is a protection check. The game crashes (thru a jump to 0x8000)
-	    if a read from this address doesn't return the value it expects.
-	*/
+	// The game crashes (through a jump to 0x8000) if the return value is not what it expects..
 
-	int data = space.device().state().state_int(Z80_BC) >> 8;
-//  logerror("protection read, PC: %04x Result:%02x\n", space.device().safe_pc(), data);
-	return data;
+	switch (m_prot_value)
+	{
+		// This data comes from a table at $21a containing 64 entries, even is "case", odd is return value.
+		case 0x24: return 0x1d;
+		case 0x60: return 0xf7;
+		case 0x01: return 0xac;
+		case 0x55: return 0x50;
+		case 0x56: return 0xe2;
+		case 0x2a: return 0x58;
+		case 0xa8: return 0x13;
+		case 0x22: return 0x3e;
+		case 0x3b: return 0x5a;
+		case 0x1e: return 0x1b;
+		case 0xe9: return 0x41;
+		case 0x7d: return 0xd5;
+		case 0x43: return 0x54;
+		case 0x37: return 0x6f;
+		case 0x4c: return 0x59;
+		case 0x5f: return 0x56;
+		case 0x3f: return 0x2f;
+		case 0x3e: return 0x3d;
+		case 0xfb: return 0x36;
+		case 0x1d: return 0x3b;
+		case 0x27: return 0xae;
+		case 0x26: return 0x39;
+		case 0x58: return 0x3c;
+		case 0x32: return 0x51;
+		case 0x1a: return 0xa8;
+		case 0xbc: return 0x33;
+		case 0x30: return 0x4a;
+		case 0x64: return 0x12;
+		case 0x11: return 0x40;
+		case 0x33: return 0x35;
+		case 0x09: return 0x17;
+		case 0x25: return 0x04;
+	}
+
+	return 0;
 }
+
+// The bootleg expects 0x00 to be returned from the protection reads because the protection has been patched out.
+READ8_MEMBER(_1943_state::_1943b_c007_r)
+{
+	return 0;
+}
+
 
 /* Memory Maps */
 
@@ -62,7 +106,7 @@ static ADDRESS_MAP_START( c1943_map, AS_PROGRAM, 8, _1943_state )
 	AM_RANGE(0xc800, 0xc800) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0xc804, 0xc804) AM_WRITE(c1943_c804_w) // ROM bank switch, screen flip
 	AM_RANGE(0xc806, 0xc806) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0xc807, 0xc807) AM_WRITENOP // ???
+	AM_RANGE(0xc807, 0xc807) AM_WRITE(c1943_protection_w)
 	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(c1943_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(c1943_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0xd800, 0xd801) AM_RAM AM_SHARE("scrollx")
@@ -243,25 +287,30 @@ GFXDECODE_END
 
 /* Machine Driver */
 
+void _1943_state::machine_start()
+{
+	save_item(NAME(m_prot_value));
+}
+
 void _1943_state::machine_reset()
 {
 	m_char_on = 0;
 	m_obj_on = 0;
 	m_bg1_on = 0;
 	m_bg2_on = 0;
+	m_prot_value = 0;
 }
 
 static MACHINE_CONFIG_START( 1943, _1943_state )
 
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz/4)  /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz/4) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(c1943_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", _1943_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/8) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(_1943_state, irq0_line_hold,  4*60)
-
+	MCFG_CPU_PERIODIC_INT_DRIVER(_1943_state, irq0_line_hold, 4*60)
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -274,17 +323,16 @@ static MACHINE_CONFIG_START( 1943, _1943_state )
 	MCFG_GFXDECODE(1943)
 	MCFG_PALETTE_LENGTH(32*4+16*16+16*16+16*16)
 
-
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL_24MHz/16)    /* verified on pcb */
+	MCFG_SOUND_ADD("ym1", YM2203, XTAL_24MHz/16) /* verified on pcb */
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
 	MCFG_SOUND_ROUTE(3, "mono", 0.10)
 
-	MCFG_SOUND_ADD("ym2", YM2203, XTAL_24MHz/16)    /* verified on pcb */
+	MCFG_SOUND_ADD("ym2", YM2203, XTAL_24MHz/16) /* verified on pcb */
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
@@ -642,15 +690,11 @@ DRIVER_INIT_MEMBER(_1943_state,1943)
 	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 }
 
-READ8_MEMBER(_1943_state::_1943b_c007_r){ return 0; }
-
 DRIVER_INIT_MEMBER(_1943_state,1943b)
 {
 	DRIVER_INIT_CALL(1943);
-	//it expects 0x00 to be returned from the protection reads because the protection has been patched out.
-	//AM_RANGE(0xc007, 0xc007) AM_READ(c1943_protection_r)
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc007, 0xc007, read8_delegate(FUNC(_1943_state::_1943b_c007_r),this));
 
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc007, 0xc007, read8_delegate(FUNC(_1943_state::_1943b_c007_r),this));
 }
 
 /* Game Drivers */
