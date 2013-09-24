@@ -784,6 +784,30 @@ ROM_START( eggventrd )
 ROM_END
 
 
+ROM_START( franticf )
+	ROM_REGION16_LE( 0x100000, "user1", 0 )     /* 34010 code */
+	ROM_LOAD16_BYTE( "fred_vc-8.vc8", 0x000000, 0x080000, CRC(f7eb92a2) SHA1(c56a0432b8c4fe8522f6dd1e0b60eded3dfc25d2) )
+	ROM_LOAD16_BYTE( "fred_vc-9.vc9", 0x000001, 0x080000, CRC(b657b800) SHA1(12649becab0019ea7150b5d797b72b07121c6a3e) )
+
+	ROM_REGION16_LE( 0x600000, "gfx1", 0 )          /* graphics data */
+	ROM_LOAD16_BYTE( "fred_gr1.gr1", 0x000000, 0x080000, CRC(acb75e63) SHA1(637ec6b7101f34a2bb93be8d0d5eaa800aafd332) )
+	ROM_LOAD16_BYTE( "fred_gr2.gr2", 0x000001, 0x080000, CRC(b47c6363) SHA1(0acfd7dc45d21e6e73b5abbc544e7c0fa192c462) )
+	ROM_LOAD16_BYTE( "fred_gr4.gr4", 0x200000, 0x080000, CRC(ac63729f) SHA1(dd856d983d85c38a784666105cb2d421bee8e76a) )
+	ROM_LOAD16_BYTE( "fred_gr3.gr3", 0x200001, 0x080000, CRC(d7444ecc) SHA1(47b9369fec845e844ffccd121fdde12cb4842ec6) )
+	ROM_LOAD16_BYTE( "fred_gr6.gr6", 0x400000, 0x080000, CRC(a0f1c918) SHA1(2004c2081a90ecc940d56f120f6e63190c8897a2) )
+	ROM_LOAD16_BYTE( "fred_gr5.gr5", 0x400001, 0x080000, CRC(fcdf73a6) SHA1(081daa1dc6af59ce63b976e059533b23097cedd9) )
+
+	ROM_REGION( 0x80000, "oki1", 0 )                /* sound data */
+	ROM_LOAD( "fred_u20.u20", 0x00000, 0x80000, CRC(2fb2e5a6) SHA1(8599ec10500016c3486f9078b72cb3bda3381208) )
+
+	ROM_REGION( 0x80000, "oki2", ROMREGION_ERASE00 )                /* sound data */
+	/* Not populated */
+
+	ROM_REGION( 0x80000, "oki3", 0 )                /* sound data */
+	ROM_LOAD( "fred_u18.u18", 0x00000, 0x80000, CRC(2fb2e5a6) SHA1(8599ec10500016c3486f9078b72cb3bda3381208) )
+ROM_END
+
+
 ROM_START( cclownz )
 	ROM_REGION16_LE( 0x100000, "user1", 0 )     /* 34010 code */
 	ROM_LOAD16_BYTE( "cc-v1-vc8.bin", 0x000000, 0x080000, CRC(433fe6ac) SHA1(dea7aede9882ee52be88927418b7395418757d12) )
@@ -913,6 +937,7 @@ DRIVER_INIT_MEMBER(lethalj_state,cclownz)
  *************************************/
 
 GAME( 1996, lethalj,   0,        lethalj,  lethalj,   driver_device, 0,        ROT0,  "The Game Room", "Lethal Justice", 0 )
+GAME( 1996, franticf,  0,        gameroom, eggvntdx,  driver_device, 0,        ROT0,  "The Game Room", "Frantic Fred", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 1997, eggventr,  0,        gameroom, eggventr,  driver_device, 0,        ROT0,  "The Game Room", "Egg Venture (Release 10)", 0 )
 GAME( 1997, eggventr8, eggventr, gameroom, eggventr,  driver_device, 0,        ROT0,  "The Game Room", "Egg Venture (Release 8)", 0 )
 GAME( 1997, eggventr7, eggventr, gameroom, eggventr,  driver_device, 0,        ROT0,  "The Game Room", "Egg Venture (Release 7)", 0 )
