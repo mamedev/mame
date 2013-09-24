@@ -172,11 +172,13 @@ sq80        // 1988 SQ-80 Digital Wave Synthesizer
 eps         // 1988 EPS
 vfx         // 1989 VFX
 vfxsd       // 1989 VFX-SD
+eps16p      // 1990 EPS 16 Plus
 sd1         // 1990 SD-1
 sd132       // 1991 SD-1 32
 sq1         // 1990 SQ-1
 sqrack      // 1990 SQ-Rack
 kt76        // 1996 KT-76
+mr61		// 1996 MR-61
 mrrack      // 1996 MR-Rack
 
 // Fairchild

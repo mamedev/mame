@@ -101,6 +101,17 @@ MACHINE_CONFIG_END
 static INPUT_PORTS_START( mr )
 INPUT_PORTS_END
 
+ROM_START( mr61 )
+	ROM_REGION(0x100000, "maincpu", 0)
+	ROM_LOAD16_WORD_SWAP( "mrw-osf-11af-2.10.bin",  0x000000, 0x080000, CRC(5854314e) SHA1(8fb2e2ee2f5fb12eae8ea33cb18f757efaec6780) ) 
+	ROM_LOAD16_WORD_SWAP( "mrw-romc-32ef-1.20.bin", 0x080000, 0x080000, CRC(68321347) SHA1(56cb96943ba42c35ba2787a49b5f4adf7c8dffb8) ) 
+
+	ROM_REGION(0x200000, "waverom", ROMREGION_ERASE00)
+	ROM_REGION(0x200000, "waverom2", ROMREGION_ERASE00)
+	ROM_REGION(0x200000, "waverom3", ROMREGION_ERASE00)
+	ROM_REGION(0x200000, "waverom4", ROMREGION_ERASE00)
+ROM_END
+
 ROM_START( mrrack )
 	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD16_BYTE( "mr-rack-150-lo.bin", 0x000001, 0x080000, CRC(b29988a1) SHA1(986c2def11de27fa2b9be55ac32f7fec0c414bca) )
@@ -116,4 +127,5 @@ DRIVER_INIT_MEMBER(esqmr_state, mr)
 {
 }
 
+CONS( 1996, mr61,   0, 0, mr, mr, esqmr_state, mr, "Ensoniq", "MR-61 Workstation", GAME_NOT_WORKING )
 CONS( 1996, mrrack, 0, 0, mr, mr, esqmr_state, mr, "Ensoniq", "MR-Rack", GAME_NOT_WORKING )
