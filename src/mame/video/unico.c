@@ -109,7 +109,7 @@ WRITE16_MEMBER(unico_state::unico_vram_w)
 	UINT16 *vram = m_vram;
 	int tile = ((offset / 0x2000) + 1) % 3;
 	COMBINE_DATA(&vram[offset]);
-	m_tilemap[tile]->mark_tile_dirty((offset & 0x3fff)/2);
+	m_tilemap[tile]->mark_tile_dirty((offset & 0x1fff)/2);
 }
 
 WRITE32_MEMBER(unico_state::unico_vram32_w)
@@ -117,7 +117,7 @@ WRITE32_MEMBER(unico_state::unico_vram32_w)
 	UINT32 *vram = m_vram32;
 	int tile = ((offset / 0x1000) + 1) % 3;
 	COMBINE_DATA(&vram[offset]);
-	m_tilemap[tile]->mark_tile_dirty((offset & 0x3fff));
+	m_tilemap[tile]->mark_tile_dirty((offset & 0xfff));
 }
 
 
