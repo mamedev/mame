@@ -1132,24 +1132,24 @@ rom:
 0x01E0-0x02DF: ? table (may be part of next table)
 0x02E0-0x03DF: ? table
 0x03E0-0x0B3F: int16-packed jump table (expanded to int32s at ram at 0x46000-0x46EC0 on boot)
-0x0B40-0x108F: ?binary code of forth interpreter?
-0x1090-0xCD3B: tForth bytecode, even the fonts?:
-	0x1090-0x24CF: ?
-	**Fonts:
-	0x24D0-0x254F: ? (likely font 1 width lookup table)
-	0x2550-0x2BCF: Font 1 data
-	0x2BD0-0x2C4F: ? (likely font 2 width lookup table)
-	0x2C50-0x32CF: Font 2 data
-	**unknown?:
-	0x32D0-0x360F: String data (and control codes?)
-	0x3610-0x364F: ? fill (0x03 0xe8)
-	0x3650-0x369F: ? fill (0x03 0x20)
-	0x36A0-0x384d: ? forth code?
-	0x384e-0x385d: Lookup table for phone keypad
-	0x385e-...: ?
-	...-0xC951: ?
-	0xC952: boot vector
-	0xC952-...: boot code?
+0x0B40-0x0E83: ? function index tables?
+0x0E84-0x1544: binary code (purpose?)
+0x1545-0x24CF: ?
+**Fonts:
+0x24D0-0x254F: ? (likely font 1 width lookup table)
+0x2550-0x2BCF: Font 1 data
+0x2BD0-0x2C4F: ? (likely font 2 width lookup table)
+0x2C50-0x32CF: Font 2 data
+**unknown?:
+0x32D0-0x360F: String data (and control codes?)
+0x3610-0x364F: ? fill (0x03 0xe8)
+0x3650-0x369F: ? fill (0x03 0x20)
+0x36A0-0x384d: ? forth code?
+0x384e-0x385d: Lookup table for phone keypad
+0x385e-...: ?
+...-0xC951: ?
+0xC952: boot vector
+0xC952-0xCAAE: binary code (purpose?)
 	0xCD26-0xCD3B: ?init forth bytecode?
 0xCD3C-0xCEBA: 0xFF fill (unused?)
 0xCEEB-0xFFFE: Forth dictionaries for compiling, with <word> then <3 bytes> afterward? (or before it? most likely afterward)
@@ -1317,7 +1317,7 @@ static const char *const swyft_via_regnames[] = { "0: ORB/IRB", "1: ORA/IRA", "2
 READ8_MEMBER( cat_state::swyft_via0_r )
 {
 	if (offset&0x000C3F) fprintf(stderr,"VIA0: read from invalid offset in 68k space: %06X!\n", offset);
-	UINT8 data = m_via0->read(space, (offset>>5)&0xF);
+	UINT8 data = m_via0->read(space, (offset>>6)&0xF);
 #ifdef DEBUG_SWYFT_VIA0
 	logerror("VIA0 register %s read by cpu: returning %02x\n", swyft_via_regnames[(offset>>5)&0xF], data);
 #endif
@@ -1330,13 +1330,13 @@ WRITE8_MEMBER( cat_state::swyft_via0_w )
 	logerror("VIA0 register %s written by cpu with data %02x\n", swyft_via_regnames[(offset>>5)&0xF], data);
 #endif
 	if (offset&0x000C3F) fprintf(stderr,"VIA0: write to invalid offset in 68k space: %06X, data: %02X!\n", offset, data);
-	m_via1->write(space, (offset>>5)&0xF, data);
+	m_via1->write(space, (offset>>6)&0xF, data);
 }
 
 READ8_MEMBER( cat_state::swyft_via1_r )
 {
 	if (offset&0x000C3F) fprintf(stderr," VIA1: read from invalid offset in 68k space: %06X!\n", offset);
-	UINT8 data = m_via1->read(space, (offset>>5)&0xF);
+	UINT8 data = m_via1->read(space, (offset>>6)&0xF);
 #ifdef DEBUG_SWYFT_VIA1
 	logerror(" VIA1 register %s read by cpu: returning %02x\n", swyft_via_regnames[(offset>>5)&0xF], data);
 #endif
@@ -1349,7 +1349,7 @@ WRITE8_MEMBER( cat_state::swyft_via1_w )
 	logerror(" VIA1 register %s written by cpu with data %02x\n", swyft_via_regnames[(offset>>5)&0xF], data);
 #endif
 	if (offset&0x000C3F) fprintf(stderr," VIA1: write to invalid offset in 68k space: %06X, data: %02X!\n", offset, data);
-	m_via0->write(space, (offset>>5)&0xF, data);
+	m_via0->write(space, (offset>>6)&0xF, data);
 }
 
 // first via
