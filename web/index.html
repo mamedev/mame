@@ -25,13 +25,14 @@
   {
 	document.getElementById('main').innerHTML = '<center><img src="/screenshot.png"/></center>';
   }
-  
+ 
   function loadContent(htmlName)
   {  
 	$("#main").load(htmlName+'.html', function () {
 		$(this).trigger('create');
 	});
   }
+
   function executeCommands(command)
   {
 	$.ajax({
@@ -42,6 +43,24 @@
 	  },
 	  error: function (request, status, error) { alert(status + ", " + error); }
 	});	
+  }
+
+  function executeHardReset()
+  {
+    executeCommands("hardreset");
+	$('.ui-dialog').dialog('close');
+  }
+
+  function executeSoftReset()
+  {
+    executeCommands("softreset");
+	$('.ui-dialog').dialog('close');
+  }
+
+  function executeExit()
+  {
+    executeCommands("exit");
+	$('.ui-dialog').dialog('close');
   }
 
   function executeSlider()
