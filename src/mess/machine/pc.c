@@ -977,8 +977,8 @@ READ8_MEMBER(pc_state::mc1502_kppi_portc_r)
 
 	data |= m_centronics->fault_r() << 4;
 	data |= m_centronics->pe_r() << 5;
-	data |= m_centronics->busy_r() << 6;
-	data |= m_centronics->ack_r() << 7;
+	data |= m_centronics->ack_r() << 6;
+	data |= m_centronics->busy_r() << 7;
 
 	return data;
 }
@@ -1141,7 +1141,7 @@ I8255_INTERFACE( mc1502_ppi8255_interface_2 )
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(pc_state,mc1502_kppi_portb_w),
-	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(pc_state,mc1502_kppi_portc_r),
 	DEVCB_DRIVER_MEMBER(pc_state,mc1502_kppi_portc_w)
 };
 
@@ -1289,7 +1289,7 @@ WRITE8_MEMBER(pc_state::mc1502_wd17xx_aux_w)
 	fdc->set_floppy(floppy);
 
 	// master reset
-	if(data & 1)
+	if((data & 1) == 0)
 		fdc->reset();
 
 	// SIDE ONE

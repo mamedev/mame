@@ -157,11 +157,17 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mc1502_io, AS_IO, 8, pc_state )
 	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE("pic8259", pic8259_device, read, write)
-	AM_RANGE(0x0028, 0x0028) AM_DEVREADWRITE("upd8251", i8251_device, data_r, data_w)   // not working yet
+  AM_RANGE(0x0028, 0x0028) AM_DEVREADWRITE("upd8251", i8251_device, data_r, data_w)   // not working yet
 	AM_RANGE(0x0029, 0x0029) AM_DEVREADWRITE("upd8251", i8251_device, status_r, control_w)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE("pit8253", pit8253_device, read, write)
+	// BIOS 5.31, 5.33
+	AM_RANGE(0x004c, 0x004c) AM_READWRITE(mc1502_wd17xx_aux_r, mc1502_wd17xx_aux_w)
+	AM_RANGE(0x004d, 0x004d) AM_READ(mc1502_wd17xx_motor_r)
+	AM_RANGE(0x004e, 0x004e) AM_READ(mc1502_wd17xx_drq_r)           // blocking read!
+	AM_RANGE(0x0048, 0x004b) AM_DEVREADWRITE("vg93", fd1793_t, read, write)
 	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 	AM_RANGE(0x0068, 0x006B) AM_DEVREADWRITE("ppi8255n2", i8255_device, read, write)    // keyboard poll
+	// BIOS 5.0, 5.2
 	AM_RANGE(0x0100, 0x0100) AM_READWRITE(mc1502_wd17xx_aux_r, mc1502_wd17xx_aux_w)
 	AM_RANGE(0x0108, 0x0108) AM_READ(mc1502_wd17xx_drq_r)           // blocking read!
 	AM_RANGE(0x010a, 0x010a) AM_READ(mc1502_wd17xx_motor_r)
