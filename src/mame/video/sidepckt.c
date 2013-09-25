@@ -1,3 +1,11 @@
+/******************************************************************************
+
+    Data East Side Pocket hardware
+
+    Functions to emulate the video hardware
+
+******************************************************************************/
+
 #include "emu.h"
 #include "includes/sidepckt.h"
 

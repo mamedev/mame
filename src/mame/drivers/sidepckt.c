@@ -130,6 +130,15 @@ Stephh's notes (based on the games M6809 code and some tests) :
 #include "sound/3526intf.h"
 #include "includes/sidepckt.h"
 
+// protection tables
+static const UINT8 sidepckt_prot_table_1[0x10]={0x05,0x03,0x02,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff};
+static const UINT8 sidepckt_prot_table_2[0x10]={0x8e,0x42,0xad,0x58,0xec,0x85,0xdd,0x4c,0xad,0x9f,0x00,0x4c,0x7e,0x42,0xa2,0xff};
+static const UINT8 sidepckt_prot_table_3[0x10]={0xbd,0x73,0x80,0xbd,0x73,0xa7,0xbd,0x73,0xe0,0x7e,0x72,0x56,0xff,0xff,0xff,0xff};
+
+static const UINT8 sidepcktj_prot_table_1[0x10]={0x05,0x03,0x00,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff};
+static const UINT8 sidepcktj_prot_table_2[0x10]={0x8e,0x42,0xb2,0x58,0xec,0x85,0xdd,0x4c,0xad,0x9f,0x00,0x4c,0x7e,0x42,0xa7,0xff};
+static const UINT8 sidepcktj_prot_table_3[0x10]={0xbd,0x71,0xc8,0xbd,0x71,0xef,0xbd,0x72,0x28,0x7e,0x70,0x9e,0xff,0xff,0xff,0xff};
+
 
 WRITE8_MEMBER(sidepckt_state::sound_cpu_command_w)
 {
@@ -144,88 +153,38 @@ READ8_MEMBER(sidepckt_state::sidepckt_i8751_r)
 
 WRITE8_MEMBER(sidepckt_state::sidepckt_i8751_w)
 {
-	static const int table_1[]={5,3,2};
-	static const int table_2[]={0x8e,0x42,0xad,0x58,0xec,0x85,0xdd,0x4c,0xad,0x9f,0x00,0x4c,0x7e,0x42,0xa2,0xff};
-	static const int table_3[]={0xbd,0x73,0x80,0xbd,0x73,0xa7,0xbd,0x73,0xe0,0x7e,0x72,0x56,0xff,0xff,0xff,0xff};
-
 	m_maincpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE); /* i8751 triggers FIRQ on main cpu */
 
 	/* This function takes multiple parameters */
-	if (m_in_math==1) {
-		m_in_math=2;
-		m_i8751_return=m_math_param=data;
+	if (m_in_math == 1)
+	{
+		m_in_math = 2;
+		m_math_param = data;
+		m_i8751_return = m_math_param;
 	}
-	else if (m_in_math==2) {
-		m_in_math=0;
-		m_i8751_return=m_math_param/data;
+	else if (m_in_math == 2)
+	{
+		m_in_math = 0;
+		m_i8751_return = (data) ? (m_math_param / data) : 0;
 	}
-	else switch (data) {
+	else switch (data)
+	{
 		case 1: /* ID Check */
-			m_current_table=1; m_current_ptr=0; m_i8751_return=table_1[m_current_ptr++]; break;
-
 		case 2: /* Protection data (executable code) */
-			m_current_table=2; m_current_ptr=0; m_i8751_return=table_2[m_current_ptr++]; break;
-
 		case 3: /* Protection data (executable code) */
-			m_current_table=3; m_current_ptr=0; m_i8751_return=table_3[m_current_ptr++]; break;
+			m_current_table = data - 1;
+			m_current_ptr = 0;
+		case 6: /* Read table data */
+			m_i8751_return = m_prot_table[m_current_table][m_current_ptr];
+			m_current_ptr = (m_current_ptr + 1) & 0x0f;
+			break;
 
 		case 4: /* Divide function - multiple parameters */
-			m_in_math=1;
-			m_i8751_return=4;
+			m_in_math = 1;
+			m_i8751_return = 4;
 			break;
 
-		case 6: /* Read table data */
-			if (m_current_table==1)
-			{
-				assert(m_current_ptr >= 0 && m_current_ptr < ARRAY_LENGTH(table_1));
-				m_i8751_return=table_1[m_current_ptr++];
-			}
-			if (m_current_table==2) m_i8751_return=table_2[m_current_ptr++];
-			if (m_current_table==3) m_i8751_return=table_3[m_current_ptr++];
-			break;
-	}
-}
-
-WRITE8_MEMBER(sidepckt_state::sidepctj_i8751_w)
-{
-	static const int table_1[]={5,3,0};
-	static const int table_2[]={0x8e,0x42,0xb2,0x58,0xec,0x85,0xdd,0x4c,0xad,0x9f,0x00,0x4c,0x7e,0x42,0xa7,0xff};
-	static const int table_3[]={0xbd,0x71,0xc8,0xbd,0x71,0xef,0xbd,0x72,0x28,0x7e,0x70,0x9e,0xff,0xff,0xff,0xff};
-
-	m_maincpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE); /* i8751 triggers FIRQ on main cpu */
-
-	/* This function takes multiple parameters */
-	if (m_in_math==1) {
-		m_in_math=2;
-		m_i8751_return=m_math_param=data;
-	}
-	else if (m_in_math==2) {
-		m_in_math=0;
-		m_i8751_return=m_math_param/data;
-	}
-	else switch (data) {
-		case 1: /* ID Check */
-			m_current_table=1; m_current_ptr=0; m_i8751_return=table_1[m_current_ptr++]; break;
-
-		case 2: /* Protection data (executable code) */
-			m_current_table=2; m_current_ptr=0; m_i8751_return=table_2[m_current_ptr++]; break;
-
-		case 3: /* Protection data (executable code) */
-			m_current_table=3; m_current_ptr=0; m_i8751_return=table_3[m_current_ptr++]; break;
-
-		case 4: /* Divide function - multiple parameters */
-			m_in_math=1;
-			m_i8751_return=4;
-			break;
-
-		case 6: /* Read table data */
-			if (m_current_table==1)
-			{
-				assert(m_current_ptr >= 0 && m_current_ptr < ARRAY_LENGTH(table_1));
-				m_i8751_return=table_1[m_current_ptr++];
-			}
-			if (m_current_table==2) m_i8751_return=table_2[m_current_ptr++];
-			if (m_current_table==3) m_i8751_return=table_3[m_current_ptr++];
+		default:
 			break;
 	}
 }
@@ -246,10 +205,17 @@ static ADDRESS_MAP_START( sidepckt_map, AS_PROGRAM, 8, sidepckt_state )
 	AM_RANGE(0x3003, 0x3003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x3004, 0x3004) AM_WRITE(sound_cpu_command_w)
 	AM_RANGE(0x300c, 0x300c) AM_READNOP AM_WRITE(sidepckt_flipscreen_w)
-//  AM_RANGE(0x3014, 0x3014) //i8751 read
-//  AM_RANGE(0x3018, 0x3018) //i8751 write
+	AM_RANGE(0x3014, 0x3014) AM_READ(sidepckt_i8751_r)
+	AM_RANGE(0x3018, 0x3018) AM_WRITE(sidepckt_i8751_w)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( sidepcktb_map, AS_PROGRAM, 8, sidepckt_state )
+	AM_RANGE(0x3014, 0x3014) AM_READNOP
+	AM_RANGE(0x3018, 0x3018) AM_WRITENOP
+	AM_IMPORT_FROM( sidepckt_map )
+ADDRESS_MAP_END
+
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, sidepckt_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
@@ -386,29 +352,35 @@ static GFXDECODE_START( sidepckt )
 GFXDECODE_END
 
 
+void sidepckt_state::machine_reset()
+{
+	m_i8751_return = 0;
+	m_current_ptr = 0;
+	m_current_table = 0;
+	m_in_math = 0;
+	m_math_param = 0;
+}
 
 static MACHINE_CONFIG_START( sidepckt, sidepckt_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, 2000000)        /* 2 MHz */
+	MCFG_CPU_ADD("maincpu", M6809, 2000000) /* 2 MHz */
 	MCFG_CPU_PROGRAM_MAP(sidepckt_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", sidepckt_state,  nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", sidepckt_state, nmi_line_pulse)
 
-	MCFG_CPU_ADD("audiocpu", M6502, 1500000)        /* 1.5 MHz */
+	MCFG_CPU_ADD("audiocpu", M6502, 1500000) /* 1.5 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-								/* NMIs are triggered by the main cpu */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */  /* VERIFY:  May be 55 or 56 */)
+	MCFG_SCREEN_REFRESH_RATE(58) /* VERIFY: May be 55 or 56 */
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */ )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sidepckt_state, screen_update_sidepckt)
 
 	MCFG_GFXDECODE(sidepckt)
 	MCFG_PALETTE_LENGTH(256)
-
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -419,6 +391,13 @@ static MACHINE_CONFIG_START( sidepckt, sidepckt_state )
 	MCFG_SOUND_ADD("ym2", YM3526, 3000000)
 	MCFG_YM3526_IRQ_HANDLER(DEVWRITELINE("audiocpu", m6502_device, irq_line))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( sidepcktb, sidepckt )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(sidepcktb_map)
 MACHINE_CONFIG_END
 
 
@@ -504,17 +483,19 @@ ROM_END
 
 DRIVER_INIT_MEMBER(sidepckt_state,sidepckt)
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x3014, 0x3014, read8_delegate(FUNC(sidepckt_state::sidepckt_i8751_r),this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x3018, 0x3018, write8_delegate(FUNC(sidepckt_state::sidepckt_i8751_w),this));
+	m_prot_table[0] = sidepckt_prot_table_1;
+	m_prot_table[1] = sidepckt_prot_table_2;
+	m_prot_table[2] = sidepckt_prot_table_3;
 }
 
-DRIVER_INIT_MEMBER(sidepckt_state,sidepctj)
+DRIVER_INIT_MEMBER(sidepckt_state,sidepcktj)
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x3014, 0x3014, read8_delegate(FUNC(sidepckt_state::sidepckt_i8751_r),this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x3018, 0x3018, write8_delegate(FUNC(sidepckt_state::sidepctj_i8751_w),this));
+	m_prot_table[0] = sidepcktj_prot_table_1;
+	m_prot_table[1] = sidepcktj_prot_table_2;
+	m_prot_table[2] = sidepcktj_prot_table_3;
 }
 
 
-GAME( 1986, sidepckt,  0,        sidepckt, sidepckt, sidepckt_state,  sidepckt, ROT0, "Data East Corporation", "Side Pocket (World)", GAME_NO_COCKTAIL )
-GAME( 1986, sidepcktj, sidepckt, sidepckt, sidepcktj, sidepckt_state, sidepctj, ROT0, "Data East Corporation", "Side Pocket (Japan)", GAME_NO_COCKTAIL )
-GAME( 1986, sidepcktb, sidepckt, sidepckt, sidepcktb, driver_device, 0,        ROT0, "bootleg", "Side Pocket (bootleg)", GAME_NO_COCKTAIL )
+GAME( 1986, sidepckt,  0,        sidepckt,  sidepckt,  sidepckt_state, sidepckt,  ROT0, "Data East Corporation", "Side Pocket (World)", GAME_NO_COCKTAIL )
+GAME( 1986, sidepcktj, sidepckt, sidepckt,  sidepcktj, sidepckt_state, sidepcktj, ROT0, "Data East Corporation", "Side Pocket (Japan)", GAME_NO_COCKTAIL )
+GAME( 1986, sidepcktb, sidepckt, sidepcktb, sidepcktb, driver_device,  0,         ROT0, "bootleg", "Side Pocket (bootleg)", GAME_NO_COCKTAIL )
