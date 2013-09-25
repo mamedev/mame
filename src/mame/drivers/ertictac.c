@@ -313,6 +313,29 @@ ROM_START( ertictaca ) /* PCB had sticker printed "092121 EROTICTAC" */
 	ROM_REGION(0x200000, "vram", ROMREGION_ERASE00)
 ROM_END
 
+ROM_START( ertictacb ) 
+	ROM_REGION(0x800000, "maincpu", 0 )
+	ROM_LOAD32_BYTE( "1.bin", 0x00000, 0x10000, CRC(b8eee693) SHA1(12a7c50040ccbc14bac0beb2938d79322aa01a28) )
+	ROM_LOAD32_BYTE( "2.bin", 0x00001, 0x10000, CRC(e22618ef) SHA1(cf6a6ba37400a2b3f4235a02d70cfb6258d52a16) )
+	ROM_LOAD32_BYTE( "3.bin", 0x00002, 0x10000, CRC(15683de7) SHA1(b9d478437fe927e05632c6e03b65e5e953fce3a3) )
+	ROM_LOAD32_BYTE( "4.bin", 0x00003, 0x10000, CRC(7949e19c) SHA1(af5bf745d4266368b129ca25d623b724f0a23603) )
+	ROM_LOAD32_BYTE( "eroti_ver01_-05-", 0x40000, 0x10000, CRC(d08a6c89) SHA1(17b0f5fb2094126146b09d69c91bf413737b0c9e) )
+	ROM_LOAD32_BYTE( "eroti_ver01_-06-", 0x40001, 0x10000, CRC(d727bcd8) SHA1(4627f8d4d6e6f323445b3ffcfc0d9c699a9a4f89) )
+	ROM_LOAD32_BYTE( "eroti_ver01_-07-", 0x40002, 0x10000, CRC(23b75de2) SHA1(e18f5339ca2dd362298784ff3e5479d780d823f8) )
+	ROM_LOAD32_BYTE( "eroti_ver01_-08-", 0x40003, 0x10000, CRC(9448ccdf) SHA1(75fe3c31625f8ba1eedd806b52993e92b1f585b6) )
+	ROM_LOAD32_BYTE( "eroti_ver01_-09-", 0x80000, 0x10000, CRC(2bfb312e) SHA1(af7a4a1926c9c3d0b3ad41a4729a17383581c070) )
+	ROM_LOAD32_BYTE( "eroti_ver01_-10-", 0x80001, 0x10000, CRC(e7a05477) SHA1(0ec6f94a35b87e1e4529dea194fce1fde9a5b0ad) )
+	ROM_LOAD32_BYTE( "eroti_ver01_-11-", 0x80002, 0x10000, CRC(3722591c) SHA1(e0c4075bc4b1c90a6decba3005a1f8298bd61bd1) )
+	ROM_LOAD32_BYTE( "eroti_ver01_-12-", 0x80003, 0x10000, CRC(fe022b7e) SHA1(056f7283bc54eff555fd1db91410c020fd905063) )
+	ROM_LOAD32_BYTE( "eroti_ver01_-13-", 0xc0000, 0x10000, CRC(83550842) SHA1(0fee78dbf13ba970e0544c48f8939550f9347822) )
+	ROM_LOAD32_BYTE( "eroti_ver01_-14-", 0xc0001, 0x10000, CRC(3029567c) SHA1(6d49bea3a3f6f11f4182a602d37b53f1f896c154) )
+	ROM_LOAD32_BYTE( "eroti_ver01_-15-", 0xc0002, 0x10000, CRC(500997ab) SHA1(028c7b3ca03141e5b596ab1e2ab98d0ccd9bf93a) )
+	ROM_LOAD32_BYTE( "eroti_ver01_-16-", 0xc0003, 0x10000, CRC(70a8d136) SHA1(50b11f5701ed5b79a5d59c9a3c7d5b7528e66a4d) )
+
+	ROM_REGION(0x200000, "vram", ROMREGION_ERASE00)
+ROM_END
+
+
 ROM_START( poizone )
 	ROM_REGION(0x800000, "maincpu", 0 )
 	ROM_LOAD32_BYTE( "p_son01.bin", 0x00000, 0x10000, CRC(28793c9f) SHA1(2d9f7d667203e745b47cd2cc97501ae961ae1a66) )
@@ -338,4 +361,5 @@ ROM_END
 
 GAME( 1990, ertictac,         0, ertictac, ertictac, ertictac_state, ertictac, ROT0, "Sisteme", "Erotictac/Tactic" ,GAME_IMPERFECT_SOUND)
 GAME( 1990, ertictaca, ertictac, ertictac, ertictac, ertictac_state, ertictac, ROT0, "Sisteme", "Erotictac/Tactic (ver 01)" ,GAME_IMPERFECT_SOUND)
+GAME( 1990, ertictacb, ertictac, ertictac, ertictac, ertictac_state, ertictac, ROT0, "Sisteme", "Erotictac/Tactic (set 2)" ,GAME_IMPERFECT_SOUND)
 GAME( 1991, poizone,          0, ertictac, poizone, ertictac_state, ertictac,  ROT0, "Eterna" ,"Poizone" ,GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS)
