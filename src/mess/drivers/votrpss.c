@@ -336,7 +336,7 @@ static MACHINE_CONFIG_START( votrpss, votrpss_state )
 	MCFG_SOUND_ADD("ay", AY8910, XTAL_8MHz/4) /* 2.000 MHz, verified */
 	MCFG_SOUND_CONFIG(ay8910_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_VOTRAX_SC01_ADD("votrax", 1700000, votrax_interface ) /* 1.70 MHz? needs verify */
+	MCFG_VOTRAX_SC01_ADD("votrax", 720000, votrax_interface ) /* 720 kHz? needs verify */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* Devices */

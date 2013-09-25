@@ -133,7 +133,7 @@ static MACHINE_CONFIG_START( votrtnt, votrtnt_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_VOTRAX_SC01_ADD("votrax", 1700000, votrtnt_votrax_interface ) /* 1.70 MHz? needs verify */
+	MCFG_VOTRAX_SC01_ADD("votrax", 720000, votrtnt_votrax_interface ) /* 720kHz? needs verify */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
