@@ -6297,6 +6297,7 @@ src/mess/drivers/fmtowns.c svneol=native#text/plain
 src/mess/drivers/fp1100.c svneol=native#text/plain
 src/mess/drivers/fp200.c svneol=native#text/plain
 src/mess/drivers/fp6000.c svneol=native#text/plain
+src/mess/drivers/ft68m.c svneol=native#text/plain
 src/mess/drivers/galaxy.c svneol=native#text/plain
 src/mess/drivers/galeb.c svneol=native#text/plain
 src/mess/drivers/gamecom.c svneol=native#text/plain
