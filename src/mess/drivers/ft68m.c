@@ -88,6 +88,7 @@ static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 };
 
 static MACHINE_CONFIG_START( ft68m, ft68m_state )
+
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_19_6608MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(ft68m_mem)
@@ -116,5 +117,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME   PARENT  COMPAT  MACHINE INPUT   CLASS         INIT    COMPANY           FULLNAME       FLAGS */
-COMP( 198?, ft68m, 0,      0,      ft68m,  ft68m,  driver_device, 0, "Callan Data Systems", "ft68m", GAME_NOT_WORKING | GAME_NO_SOUND_HW )
+/*    YEAR  NAME   PARENT  COMPAT  MACHINE INPUT   CLASS          INIT COMPANY               FULLNAME  FLAGS */
+COMP( 198?, ft68m, 0,      0,      ft68m,  ft68m,  driver_device, 0,   "Forward Technology", "FT-68M", GAME_NOT_WORKING | GAME_NO_SOUND_HW )
