@@ -796,7 +796,7 @@ $(CPUOBJ)/mcs96/i8xc196.o:  $(CPUOBJ)/mcs96/i8xc196.inc \
 							$(CPUSRC)/mcs96/mcs96.h
 
 $(CPUOBJ)/mcs96/mcs96.inc:   $(CPUSRC)/mcs96/mcs96make.py $(CPUSRC)/mcs96/mcs96ops.lst
-	@echo Generating i8x9x source file...
+	@echo Generating mcs96 source file...
 	$(PYTHON) $(CPUSRC)/mcs96/mcs96make.py mcs96 $(CPUSRC)/mcs96/mcs96ops.lst $@
 
 $(CPUOBJ)/mcs96/i8x9x.inc:   $(CPUSRC)/mcs96/mcs96make.py $(CPUSRC)/mcs96/mcs96ops.lst
@@ -804,7 +804,7 @@ $(CPUOBJ)/mcs96/i8x9x.inc:   $(CPUSRC)/mcs96/mcs96make.py $(CPUSRC)/mcs96/mcs96o
 	$(PYTHON) $(CPUSRC)/mcs96/mcs96make.py i8x9x $(CPUSRC)/mcs96/mcs96ops.lst $@
 
 $(CPUOBJ)/mcs96/i8xc196.inc: $(CPUSRC)/mcs96/mcs96make.py $(CPUSRC)/mcs96/mcs96ops.lst
-	@echo Generating i8x9x source file...
+	@echo Generating i8xc196 source file...
 	$(PYTHON) $(CPUSRC)/mcs96/mcs96make.py i8xc196 $(CPUSRC)/mcs96/mcs96ops.lst $@
 
 #-------------------------------------------------
