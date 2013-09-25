@@ -187,9 +187,6 @@ ROMs (All ROMs are 27C010 EPROM. - means not populated)
 #include "sound/okim6295.h"
 #include "includes/ddragon3.h"
 
-#define MASTER_CLOCK        XTAL_24MHz
-#define CPU_CLOCK           MASTER_CLOCK / 2
-#define PIXEL_CLOCK     MASTER_CLOCK / 4
 
 /*************************************
  *
@@ -201,9 +198,6 @@ WRITE8_MEMBER(ddragon3_state::oki_bankswitch_w)
 {
 	m_oki->set_bank_base((data & 1) * 0x40000);
 }
-
-
-
 
 WRITE16_MEMBER(wwfwfest_state::wwfwfest_soundwrite)
 {
@@ -840,10 +834,9 @@ static MACHINE_CONFIG_START( ddragon3, ddragon3_state )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 448, 0, 320, 272, 8, 248)   /* HTOTAL and VTOTAL are guessed */
+	MCFG_SCREEN_RAW_PARAMS(XTAL_28MHz / 4, 448, 0, 320, 272, 8, 248)   /* HTOTAL and VTOTAL are guessed */
 	MCFG_SCREEN_UPDATE_DRIVER(ddragon3_state, screen_update_ddragon3)
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
 
@@ -897,7 +890,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( wwfwfest, wwfwfest_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK)  /* 24 crystal, 12 rated chip */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2)  /* 24 crystal, 12 rated chip */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ddragon3_state, ddragon3_scanline, "screen", 0, 1)
 
@@ -908,13 +901,12 @@ static MACHINE_CONFIG_START( wwfwfest, wwfwfest_state )
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 320, 272, 8, 248)   /* HTOTAL and VTOTAL are guessed */
+	MCFG_SCREEN_RAW_PARAMS(XTAL_28MHz / 4, 448, 0, 320, 272, 8, 248)   /* HTOTAL and VTOTAL are guessed */
 	MCFG_SCREEN_UPDATE_DRIVER(wwfwfest_state, screen_update_wwfwfest)
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
 
 	MCFG_GFXDECODE(wwfwfest)
 	MCFG_PALETTE_LENGTH(8192)
-
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
