@@ -4513,6 +4513,46 @@ ROM_START( runark )
 	ROM_LOAD( "c74-05.ic29",   0x000000, 0x080000, CRC(e29c0828) SHA1(f541d724f118130bb7a8f9e790582c68779cc6b6) )
 ROM_END
 
+
+ROM_START( growlp )
+	ROM_REGION( 0x100000, "maincpu", 0 )     /* 1024k for 68000 code */
+	ROM_LOAD16_BYTE( "growl_ic15_japan_0h_fb09.bin",  0x00000, 0x40000, CRC(3A9141DC) SHA1(5B0F6CD39A8964BA9A3FCCA587565B37E45B24AC) )
+	ROM_LOAD16_BYTE( "growl_ic13_japan_0l_a80a.bin",  0x00001, 0x40000, CRC(A8547FD6) SHA1(2C5CD70B23E03AF80C6F72600DD5EEF2C7B3724D) )
+	ROM_LOAD16_BYTE( "growl_ic16_japan_1h_41bb.bin",  0x80000, 0x40000, CRC(64AA6F4B) SHA1(FD3F838CEDEE99D86A2EE5FF87F0381D164A2F90) )
+	ROM_LOAD16_BYTE( "growl_ic14_europe_1l_726b.bin",  0x80001, 0x40000, CRC(C38BBB05) SHA1(A168F18CE903D9AF295F475760F7209F6E0F8C82) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )   /* SCR */
+	ROM_LOAD16_BYTE( "growl_ic11_scro-0-l_a971.bin",  0x00000, 0x40000, CRC(769DDAAB) SHA1(AB45547438998CCDF8CDB8123F6F9102008DD291) )
+	ROM_LOAD16_BYTE( "growl_ic13_scro-0-0-h_2e7a.bin",  0x00001, 0x40000, CRC(4E220E34) SHA1(C0D69B178B3E2DD004295EEE92311B387733228B) )
+	ROM_LOAD16_BYTE( "growl_ic12_scro-1-l_026e.bin",  0x80000, 0x40000, CRC(486925B4) SHA1(7D804E45AB58A4B1A121438D354A4A294DAA5177) )
+	ROM_LOAD16_BYTE( "growl_ic14_scro-0-1-h_f0fa.bin",  0x80001, 0x40000, CRC(42C2A2D0) SHA1(638D563A3928B7B2E6DAE7F8C607669116284899) )
+		
+	ROM_REGION( 0x200000, "gfx2", 0 )   /* OBJ */
+	ROM_LOAD16_BYTE( "growl_ic17_obj0-0-l_90b9.bin",  0x000000, 0x40000, CRC(CD94025A) SHA1(0DA7A0F213F9A9D7A420A9DCDD6D3DB2E4B6A9EF) )
+	ROM_LOAD16_BYTE( "growl_ic19_obj0-0-h_b652.bin",  0x000001, 0x40000, CRC(6838C1B0) SHA1(0355BFF010AB94F9D566E6BD404BD3559C407A37) )
+	ROM_LOAD16_BYTE( "growl_ic18_obj0-1-l_a299.bin",  0x080000, 0x40000, CRC(0DDF592E) SHA1(2B630143DD52DA6068AACE2C3A02C89432D45044) )
+	ROM_LOAD16_BYTE( "growl_ic20_obj0-1-h_9f1a.bin",  0x080001, 0x40000, CRC(0F0407F1) SHA1(05E897445D501D93A0ABA6BC9DAE1598E651DF8D) )
+	ROM_LOAD16_BYTE( "growl_ic4_obj1-l_7d96.bin",    0x100000, 0x40000, CRC(bed51bd6) SHA1(1a35b5a511261b70b5a4aece665d0a0e6386af78) )
+	ROM_LOAD16_BYTE( "growl_ic6_obj1-0-h_3a22.bin",  0x100001, 0x40000, CRC(5b696d20) SHA1(e01e2d150ad61cf1cdddfcfcec9dac0980a8f0d6) )
+	ROM_LOAD16_BYTE( "growl_ic5_obj1-1-l_d34f.bin",  0x180000, 0x40000, CRC(f34d83ec) SHA1(7b032d2c004735aa4658143fe399b0a05ab85ec8) )
+	ROM_LOAD16_BYTE( "growl_ic7_obj1-1-h_b5af.bin",  0x180001, 0x40000, CRC(e9fda1fa) SHA1(37d48d26c45aca6364d74656d597c2b1f8a5c685) )
+
+	ROM_REGION( 0x1c000, "audiocpu", 0 )      /* sound cpu */
+	ROM_LOAD( "growl_ic3_snd.bin",   0x00000, 0x04000, CRC(F75929E0) SHA1(2DC278F4253D76853BBC3AF099784545CFAC65CE) )
+	ROM_CONTINUE(            0x10000, 0x0c000 ) /* banked stuff */
+
+	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_LOAD( "growl_ic23_ch-a-0_b5d9.bin",   0x00000, 0x40000, CRC(CC9FFBF8) SHA1(834892CE0D40D1B016D202144E683FE98EF374AC) )
+	ROM_LOAD( "growl_ic24_ch-a-1_3c70.bin",   0x40000, 0x40000, CRC(7177B4AD) SHA1(4603893588ABA0261B9D50BF70F46C7DAD8592A2) )
+	ROM_LOAD( "growl_ic25_ch-a-2_9614.bin",   0x80000, 0x40000, CRC(7C9B1423) SHA1(A8D0D7340BF54D9792E21BD0E4BE5EDD1BCFBBD4) )
+	ROM_LOAD( "growl_ic26_ch-a-3_fca6.bin",   0xc0000, 0x40000, CRC(DB1ECEFE) SHA1(7F7C40A9C9ACEB41BA799249E57DF5F38715D571) )
+
+	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )   /* Delta-T samples */
+	ROM_LOAD( "growl_ic21_ch-b-0_d743.bin",   0x00000, 0x40000, CRC(7A7EAB62) SHA1(268D900F84162BA655CB652A1C1865DFC25DA4DE) )
+	ROM_LOAD( "growl_ic22_ch-b-1_a5f1.bin",   0x40000, 0x40000, CRC(567DF833) SHA1(1AD019A9F938EBE2F09BC68B57B6C2623ECD9F46) )
+
+ROM_END
+
 ROM_START( mjnquest )   /* Mahjong Quest */
 	ROM_REGION( 0x100000, "maincpu", 0 )     /* 256k for 68000 code */
 	ROM_LOAD16_BYTE( "c77-09",  0x000000, 0x020000, CRC(0a005d01) SHA1(caf44fcdeca9f7f1bfdb0c29503bb82ce17f945c) )
@@ -5393,6 +5433,8 @@ GAME( 1990, gunfrontj,  gunfront, gunfront,  gunfrontj, driver_device, 0,       
 GAME( 1990, growl,      0,        growl,     growl, driver_device,     0,        ROT0,   "Taito Corporation Japan",   "Growl (World)", GAME_SUPPORTS_SAVE )
 GAME( 1990, growlu,     growl,    growl,     growlu, driver_device,    0,        ROT0,   "Taito America Corporation", "Growl (US)", GAME_SUPPORTS_SAVE )
 GAME( 1990, runark,     growl,    growl,     runark, driver_device,    0,        ROT0,   "Taito Corporation",         "Runark (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1990, growlp,     0,        growl,     growl, driver_device,     0,        ROT0,   "Taito Corporation Japan",   "Growl (World, prototype)", GAME_SUPPORTS_SAVE )
+
 
 GAME( 1990, mjnquest,   0,        mjnquest,  mjnquest, taitof2_state,  mjnquest, ROT0,   "Taito Corporation",         "Mahjong Quest (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1990, mjnquestb,  mjnquest, mjnquest,  mjnquest, taitof2_state,  mjnquest, ROT0,   "Taito Corporation",         "Mahjong Quest (No Nudity)", GAME_SUPPORTS_SAVE )
