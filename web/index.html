@@ -18,10 +18,15 @@
 <script language="javascript" type="text/javascript">
 
   var writeConnectionStatus = function(message) {
+	// Update the statusbar on each subpage at the same time.
     document.getElementById('main_statusbar_connectionstatus').innerHTML = message;
 	document.getElementById('command_statusbar_connectionstatus').innerHTML = message;
 	document.getElementById('option_statusbar_connectionstatus').innerHTML = message;
 	document.getElementById('slider_statusbar_connectionstatus').innerHTML = message;
+	document.getElementById('driver_statusbar_connectionstatus').innerHTML = message;
+	document.getElementById('image_statusbar_connectionstatus').innerHTML = message;
+	document.getElementById('info_statusbar_connectionstatus').innerHTML = message;
+	document.getElementById('logs_statusbar_connectionstatus').innerHTML = message;
   };
   
   function takeScreenshot()
@@ -31,13 +36,6 @@
 	document.getElementById('screenshot').innerHTML = '<img height="240" width="320" src="/screenshot.png?cachebreaker='+random.toString()+'"/>';
   }
  
-  function loadContent(htmlName)
-  {  
-	$("#main").load(htmlName+'.html', function () {
-		$(this).trigger('create');
-	});
-  }
-
   function executeCommands(command)
   {
 	$.ajax({
@@ -158,6 +156,14 @@
 			document.getElementById('option_statusbar_ispaused').innerHTML = statusbar_ispaused.join('');
 			document.getElementById('slider_statusbar_runningdriver').innerHTML = statusbar_runningdriver.join('');
 			document.getElementById('slider_statusbar_ispaused').innerHTML = statusbar_ispaused.join('');
+			document.getElementById('driver_statusbar_runningdriver').innerHTML = statusbar_runningdriver.join('');
+			document.getElementById('driver_statusbar_ispaused').innerHTML = statusbar_ispaused.join('');
+			document.getElementById('image_statusbar_runningdriver').innerHTML = statusbar_runningdriver.join('');
+			document.getElementById('image_statusbar_ispaused').innerHTML = statusbar_ispaused.join('');
+			document.getElementById('info_statusbar_runningdriver').innerHTML = statusbar_runningdriver.join('');
+			document.getElementById('info_statusbar_ispaused').innerHTML = statusbar_ispaused.join('');
+			document.getElementById('logs_statusbar_runningdriver').innerHTML = statusbar_runningdriver.join('');
+			document.getElementById('logs_statusbar_ispaused').innerHTML = statusbar_ispaused.join('');
 			document.getElementById('maindesc_name').innerHTML = maindesc_name.join('');
 			document.getElementById('maindesc_description').innerHTML = maindesc_description.join('');
 			document.getElementById('maindesc_year').innerHTML = maindesc_year.join('');
@@ -179,7 +185,7 @@
 	startWebSocket();
   };
 </script>
-<!-- Home -->
+<!-- This begins the MAIN MENU page ------------------------------------------------------------------->
 <div data-role="page" id="mainmenu">
     <div data-theme="a" data-role="header">
         <div style="width: 100%; height: 120px; position: relative;">
@@ -189,13 +195,13 @@
         <div data-role="navbar" data-iconpos="top">
             <ul>
                 <li>
-                    <a href="javascript:loadContent('driver');" data-transition="fade" data-icon="bars">Driver</a>
+                    <a href="#drivermenumenu" data-transition="fade" data-icon="bars">Driver</a>
                 </li>
                 <li>
                     <a href="#optionmenu" data-transition="fade" data-icon="gear">Options</a>
                 </li>
                 <li>
-                    <a href="javascript:loadContent('image');" data-transition="fade" data-icon="grid">Image</a>
+                    <a href="#imagemenu" data-transition="fade" data-icon="grid">Image</a>
                 </li>
                 <li>
                     <a href="#commandmenu" data-transition="fade" data-icon="star">Commands</a>
@@ -203,8 +209,8 @@
             </ul>
         </div>
     </div>
-    <div data-role="content" id ="main">	
-		<table style="tablelayout: auto; width: 100%" border="0" id="maindisplay">
+    <div data-role="content" id ="mainmenucontent">	
+		<table style="tablelayout: auto; width: 100%" border="0">
 				<tr>
 					<td style="padding: 0px; vertical-align:top; width: 1px"><div id="screenshot"><a href="#screenshotpopup" data-rel="popup"><img height="240" width="320" src="/screenshot.png"></a></div></td>
 					<td style="padding: 0px; vertical-align:top">
@@ -242,10 +248,10 @@
 		<div  data-role="navbar" data-iconpos="top">
 			<ul>
 				<li>
-					<a href="javascript:loadContent('info');" data-transition="fade" data-icon="info">Info</a>
+					<a href="#infomenu" data-transition="fade" data-icon="info">Info</a>
 				</li>
 				<li>
-					<a href="javascript:loadContent('logs');" data-transition="fade" data-icon="check">Logs</a>
+					<a href="#logsmenu" data-transition="fade" data-icon="check">Logs</a>
 				</li>
 				<li>
 					<a href="javascript:takeScreenshot();" data-transition="fade" data-icon="search">Screenshot</a>
@@ -256,7 +262,7 @@
 			</ul>
 		</div>
 		<h3>
-			<table style="tablelayout: fixed; width: 100%; height: 10px; border-collapse:collapse; " border="0" id="maindisplay">
+			<table style="tablelayout: fixed; width: 100%; height: 10px; border-collapse:collapse;" border="0">
 				<tr>
 					<td style="padding: 0px;"<div id="main_statusbar_connectionstatus"></div></td>
 					<td style="padding: 0px;"<div id="main_statusbar_ispaused"></div></td>
@@ -267,6 +273,7 @@
 	</div>
 </div>
 
+<!-- This begins the COMMAND MENU page ------------------------------------------------------------------->
 <div data-role="page" id="commandmenu">
     <div data-theme="a" data-role="header">
         <div style="width: 100%; height: 120px; position: relative;">
@@ -276,13 +283,13 @@
         <div data-role="navbar" data-iconpos="top">
             <ul>
                 <li>
-                    <a href="javascript:loadContent('driver');" data-transition="fade" data-icon="bars">Driver</a>
+                    <a href="#drivermenumenu" data-transition="fade" data-icon="bars">Driver</a>
                 </li>
                 <li>
                     <a href="#optionmenu" data-transition="fade" data-icon="gear">Options</a>
                 </li>
                 <li>
-                    <a href="javascript:loadContent('image');" data-transition="fade" data-icon="grid">Image</a>
+                    <a href="#imagemenu" data-transition="fade" data-icon="grid">Image</a>
                 </li>
                 <li>
                     <a href="#mainmenu" data-transition="fade" data-icon="home">Main Menu</a>
@@ -304,6 +311,8 @@
 		<h2>Execution Control</h2>
 		<a href="javascript:executeCommands('togglepause');" data-role="button">Toggle Pause</a>
 		<a href="confirmexit.html" data-rel="dialog" data-role="button">Exit</a>
+
+		<!-- This begins the Save State panel -------------------------------------------------------->
 		<div data-role="panel" id="savestatepanel" data-position="left" data-display="overlay" data-theme="a">
 			<h3>Select position to save to</h3>
 
@@ -370,6 +379,7 @@
 			<br><br><br><br><br>
 		</div>
 
+		<!-- This begins the Load State panel -------------------------------------------------------->
 		<div data-role="panel" id="loadstatepanel" data-position="left" data-display="overlay" data-theme="a">
 			<h3>Select position to load from</h3>
 
@@ -435,15 +445,16 @@
 			<!-- This is here to prevent webkit from trying to put the last row of states under the bottom menu on small screens like phone-->
 			<br><br><br><br><br>
 		</div>
+		
     </div>
     <div data-theme="a" data-role="footer" data-position="fixed">
 		<div  data-role="navbar" data-iconpos="top">
 			<ul>
 				<li>
-					<a href="javascript:loadContent('info');" data-transition="fade" data-icon="info">Info</a>
+					<a href="#infomenu" data-transition="fade" data-icon="info">Info</a>
 				</li>
 				<li>
-					<a href="javascript:loadContent('logs');" data-transition="fade" data-icon="check">Logs</a>
+					<a href="#logsmenu" data-transition="fade" data-icon="check">Logs</a>
 				</li>
 				<li>
 					<a href="javascript:takeScreenshot();" data-transition="fade" data-icon="search">Screenshot</a>
@@ -454,7 +465,7 @@
 			</ul>
 		</div>
 		<h3>
-			<table style="tablelayout: fixed; width: 100%; height: 10px; border-collapse:collapse; " border="0" id="maindisplay">
+			<table style="tablelayout: fixed; width: 100%; height: 10px; border-collapse:collapse;" border="0">
 				<tr>
 					<td style="padding: 0px;"<div id="command_statusbar_connectionstatus"></div></td>
 					<td style="padding: 0px;"<div id="command_statusbar_ispaused"></div></td>
@@ -465,6 +476,7 @@
     </div>
 </div>
 
+<!-- This begins the SLIDERS page ------------------------------------------------------------------->
 <div data-role="page" id="slidermenu">
     <div data-theme="a" data-role="header">
         <div style="width: 100%; height: 120px; position: relative;">
@@ -474,13 +486,13 @@
         <div data-role="navbar" data-iconpos="top">
             <ul>
                 <li>
-                    <a href="javascript:loadContent('driver');" data-transition="fade" data-icon="bars">Driver</a>
+                    <a href="#drivermenumenu" data-transition="fade" data-icon="bars">Driver</a>
                 </li>
                 <li>
                     <a href="#optionmenu" data-transition="fade" data-icon="gear">Options</a>
                 </li>
                 <li>
-                    <a href="javascript:loadContent('image');" data-transition="fade" data-icon="grid">Image</a>
+                    <a href="#imagemenu" data-transition="fade" data-icon="grid">Image</a>
                 </li>
                 <li>
                     <a href="#commandmenu" data-transition="fade" data-icon="star">Commands</a>
@@ -494,10 +506,10 @@
 		<div  data-role="navbar" data-iconpos="top">
 			<ul>
 				<li>
-					<a href="javascript:loadContent('info');" data-transition="fade" data-icon="info">Info</a>
+					<a href="#infomenu" data-transition="fade" data-icon="info">Info</a>
 				</li>
 				<li>
-					<a href="javascript:loadContent('logs');" data-transition="fade" data-icon="check">Logs</a>
+					<a href="#logsmenu" data-transition="fade" data-icon="check">Logs</a>
 				</li>
 				<li>
 					<a href="javascript:takeScreenshot();" data-transition="fade" data-icon="search">Screenshot</a>
@@ -508,20 +520,18 @@
 			</ul>
 		</div>
 		<h3>
-
-				<table style="tablelayout: fixed; width: 100%; height: 10px; border-collapse:collapse; " border="0" id="maindisplay">
-					<tr>
-						<td style="padding: 0px;"<div id="option_statusbar_connectionstatus"></div></td>
-						<td style="padding: 0px;"<div id="option_statusbar_ispaused"></div></td>
-						<td style="width: 80%; padding: 0px;"<div id="option_statusbar_runningdriver"></div></td>
-					</tr>
-				</table> 
-
-			</div>
+			<table style="tablelayout: fixed; width: 100%; height: 10px; border-collapse:collapse;" border="0">
+				<tr>
+					<td style="padding: 0px;"<div id="option_statusbar_connectionstatus"></div></td>
+					<td style="padding: 0px;"<div id="option_statusbar_ispaused"></div></td>
+					<td style="width: 80%; padding: 0px;"<div id="option_statusbar_runningdriver"></div></td>
+				</tr>
+			</table> 
 		</h3>
     </div>
 </div>
 
+<!-- This begins the OPTION MENU page ------------------------------------------------------------------->
 <div data-role="page" id="optionmenu">
     <div data-theme="a" data-role="header">
         <div style="width: 100%; height: 120px; position: relative;">
@@ -531,13 +541,13 @@
         <div data-role="navbar" data-iconpos="top">
             <ul>
                 <li>
-                    <a href="javascript:loadContent('driver');" data-transition="fade" data-icon="bars">Driver</a>
+                    <a href="#drivermenumenu" data-transition="fade" data-icon="bars">Driver</a>
                 </li>
                 <li>
                     <a href="#mainmenu" data-transition="fade" data-icon="home">Main Menu</a>
                 </li>
                 <li>
-                    <a href="javascript:loadContent('image');" data-transition="fade" data-icon="grid">Image</a>
+                    <a href="#imagemenu" data-transition="fade" data-icon="grid">Image</a>
                 </li>
                 <li>
                     <a href="#commandmenu" data-transition="fade" data-icon="star">Commands</a>
@@ -552,10 +562,10 @@
 		<div  data-role="navbar" data-iconpos="top">
 			<ul>
 				<li>
-					<a href="javascript:loadContent('info');" data-transition="fade" data-icon="info">Info</a>
+					<a href="#infomenu" data-transition="fade" data-icon="info">Info</a>
 				</li>
 				<li>
-					<a href="javascript:loadContent('logs');" data-transition="fade" data-icon="check">Logs</a>
+					<a href="#logsmenu" data-transition="fade" data-icon="check">Logs</a>
 				</li>
 				<li>
 					<a href="javascript:takeScreenshot();" data-transition="fade" data-icon="search">Screenshot</a>
@@ -566,7 +576,7 @@
 			</ul>
 		</div>
 		<h3>
-			<table style="tablelayout: fixed; width: 100%; height: 10px; border-collapse:collapse; " border="0" id="maindisplay">
+			<table style="tablelayout: fixed; width: 100%; height: 10px; border-collapse:collapse;" border="0">
 				<tr>
 					<td style="padding:0px;"><div id="slider_statusbar_connectionstatus"></div></td>
 					<td style="padding:0px;"><div id="slider_statusbar_ispaused"></div></td>
@@ -575,6 +585,226 @@
 			</table> 
 		</h3>
     </div>
+</div>
+
+<!-- This begins the DRIVER MENU page ------------------------------------------------------------------->
+<div data-role="page" id="drivermenu">
+    <div data-theme="a" data-role="header">
+        <div style="width: 100%; height: 120px; position: relative;">
+			<img src="images/logo-mame-small.png" alt="image" style="position: absolute; top: 50%; left: 50%; margin-left: -158px; margin-top: -50px">
+        </div>
+        <a data-role="button" href="#mainmenu" data-icon="home" data-iconpos="left" class="ui-btn-right">Home</a>
+        <div data-role="navbar" data-iconpos="top">
+            <ul>
+                <li>
+                    <a href="#mainmenu" data-transition="fade" data-icon="home">Main Menu</a>
+                </li>
+                <li>
+                    <a href="#optionmenu" data-transition="fade" data-icon="gear">Options</a>
+                </li>
+                <li>
+                    <a href="#imagemenu" data-transition="fade" data-icon="grid">Image</a>
+                </li>
+                <li>
+                    <a href="#commandmenu" data-transition="fade" data-icon="star">Commands</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div data-role="content" id="drivermenucontent">	
+    </div>
+    <div data-theme="a" data-role="footer" data-position="fixed">
+		<div  data-role="navbar" data-iconpos="top">
+			<ul>
+				<li>
+					<a href="#infomenu" data-transition="fade" data-icon="info">Info</a>
+				</li>
+				<li>
+					<a href="#logsmenu" data-transition="fade" data-icon="check">Logs</a>
+				</li>
+				<li>
+					<a href="javascript:takeScreenshot();" data-transition="fade" data-icon="search">Screenshot</a>
+				</li>
+				<li>
+					<a href="javascript:startWebSocket();" data-transition="fade" data-icon="refresh">Reconnect</a>
+				</li>
+			</ul>
+		</div>
+		<h3>
+			<table style="tablelayout: fixed; width: 100%; height: 10px; border-collapse:collapse;" border="0">
+				<tr>
+					<td style="padding: 0px;"<div id="driver_statusbar_connectionstatus"></div></td>
+					<td style="padding: 0px;"<div id="driver_statusbar_ispaused"></div></td>
+					<td style="width: 80%; padding: 0px;"<div id="driver_statusbar_runningdriver"></div></td>
+				</tr>
+			</table> 
+		</h3>
+	</div>
+</div>
+
+<!-- This begins the IMAGE MENU page ------------------------------------------------------------------->
+<div data-role="page" id="imagemenu">
+    <div data-theme="a" data-role="header">
+        <div style="width: 100%; height: 120px; position: relative;">
+			<img src="images/logo-mame-small.png" alt="image" style="position: absolute; top: 50%; left: 50%; margin-left: -158px; margin-top: -50px">
+        </div>
+        <a data-role="button" href="#mainmenu" data-icon="home" data-iconpos="left" class="ui-btn-right">Home</a>
+        <div data-role="navbar" data-iconpos="top">
+            <ul>
+                <li>
+                    <a href="#drivermenu" data-transition="fade" data-icon="bars">Driver</a>
+                </li>
+                <li>
+                    <a href="#optionmenu" data-transition="fade" data-icon="gear">Options</a>
+                </li>
+                <li>
+                    <a href="#imagemenu" data-transition="fade" data-icon="grid">Image</a>
+                </li>
+                <li>
+                    <a href="#commandmenu" data-transition="fade" data-icon="star">Commands</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div data-role="content" id="imagemenucontent">	
+    </div>
+    <div data-theme="a" data-role="footer" data-position="fixed">
+		<div  data-role="navbar" data-iconpos="top">
+			<ul>
+				<li>
+					<a href="#infomenu" data-transition="fade" data-icon="info">Info</a>
+				</li>
+				<li>
+					<a href="#logsmenu" data-transition="fade" data-icon="check">Logs</a>
+				</li>
+				<li>
+					<a href="javascript:takeScreenshot();" data-transition="fade" data-icon="search">Screenshot</a>
+				</li>
+				<li>
+					<a href="javascript:startWebSocket();" data-transition="fade" data-icon="refresh">Reconnect</a>
+				</li>
+			</ul>
+		</div>
+		<h3>
+			<table style="tablelayout: fixed; width: 100%; height: 10px; border-collapse:collapse;" border="0">
+				<tr>
+					<td style="padding: 0px;"<div id="image_statusbar_connectionstatus"></div></td>
+					<td style="padding: 0px;"<div id="image_statusbar_ispaused"></div></td>
+					<td style="width: 80%; padding: 0px;"<div id="image_statusbar_runningdriver"></div></td>
+				</tr>
+			</table> 
+		</h3>
+	</div>
+</div>
+
+<!-- This begins the INFO MENU page ------------------------------------------------------------------->
+<div data-role="page" id="infomenu">
+    <div data-theme="a" data-role="header">
+        <div style="width: 100%; height: 120px; position: relative;">
+			<img src="images/logo-mame-small.png" alt="image" style="position: absolute; top: 50%; left: 50%; margin-left: -158px; margin-top: -50px">
+        </div>
+        <a data-role="button" href="#mainmenu" data-icon="home" data-iconpos="left" class="ui-btn-right">Home</a>
+        <div data-role="navbar" data-iconpos="top">
+            <ul>
+                <li>
+                    <a href="#drivermenu" data-transition="fade" data-icon="bars">Driver</a>
+                </li>
+                <li>
+                    <a href="#optionmenu" data-transition="fade" data-icon="gear">Options</a>
+                </li>
+                <li>
+                    <a href="#imagemenu" data-transition="fade" data-icon="grid">Image</a>
+                </li>
+                <li>
+                    <a href="#commandmenu" data-transition="fade" data-icon="star">Commands</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div data-role="content" id="infomenucontent">	
+    </div>
+    <div data-theme="a" data-role="footer" data-position="fixed">
+		<div  data-role="navbar" data-iconpos="top">
+			<ul>
+				<li>
+					<a href="#infomenu" data-transition="fade" data-icon="info">Info</a>
+				</li>
+				<li>
+					<a href="#logsmenu" data-transition="fade" data-icon="check">Logs</a>
+				</li>
+				<li>
+					<a href="javascript:takeScreenshot();" data-transition="fade" data-icon="search">Screenshot</a>
+				</li>
+				<li>
+					<a href="javascript:startWebSocket();" data-transition="fade" data-icon="refresh">Reconnect</a>
+				</li>
+			</ul>
+		</div>
+		<h3>
+			<table style="tablelayout: fixed; width: 100%; height: 10px; border-collapse:collapse;" border="0">
+				<tr>
+					<td style="padding: 0px;"<div id="info_statusbar_connectionstatus"></div></td>
+					<td style="padding: 0px;"<div id="info_statusbar_ispaused"></div></td>
+					<td style="width: 80%; padding: 0px;"<div id="info_statusbar_runningdriver"></div></td>
+				</tr>
+			</table> 
+		</h3>
+	</div>
+</div>
+
+<!-- This begins the LOGS MENU page ------------------------------------------------------------------->
+<div data-role="page" id="logsmenu">
+    <div data-theme="a" data-role="header">
+        <div style="width: 100%; height: 120px; position: relative;">
+			<img src="images/logo-mame-small.png" alt="image" style="position: absolute; top: 50%; left: 50%; margin-left: -158px; margin-top: -50px">
+        </div>
+        <a data-role="button" href="#mainmenu" data-icon="home" data-iconpos="left" class="ui-btn-right">Home</a>
+        <div data-role="navbar" data-iconpos="top">
+            <ul>
+                <li>
+                    <a href="#drivermenu" data-transition="fade" data-icon="bars">Driver</a>
+                </li>
+                <li>
+                    <a href="#optionmenu" data-transition="fade" data-icon="gear">Options</a>
+                </li>
+                <li>
+                    <a href="#imagemenu" data-transition="fade" data-icon="grid">Image</a>
+                </li>
+                <li>
+                    <a href="#commandmenu" data-transition="fade" data-icon="star">Commands</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div data-role="content" id="logsmenucontent">	
+    </div>
+    <div data-theme="a" data-role="footer" data-position="fixed">
+		<div  data-role="navbar" data-iconpos="top">
+			<ul>
+				<li>
+					<a href="#infomenu" data-transition="fade" data-icon="info">Info</a>
+				</li>
+				<li>
+					<a href="#logsmenu" data-transition="fade" data-icon="check">Logs</a>
+				</li>
+				<li>
+					<a href="javascript:takeScreenshot();" data-transition="fade" data-icon="search">Screenshot</a>
+				</li>
+				<li>
+					<a href="javascript:startWebSocket();" data-transition="fade" data-icon="refresh">Reconnect</a>
+				</li>
+			</ul>
+		</div>
+		<h3>
+			<table style="tablelayout: fixed; width: 100%; height: 10px; border-collapse:collapse;" border="0">
+				<tr>
+					<td style="padding: 0px;"<div id="logs_statusbar_connectionstatus"></div></td>
+					<td style="padding: 0px;"<div id="logs_statusbar_ispaused"></div></td>
+					<td style="width: 80%; padding: 0px;"<div id="logs_statusbar_runningdriver"></div></td>
+				</tr>
+			</table> 
+		</h3>
+	</div>
 </div>
 
 </body>
