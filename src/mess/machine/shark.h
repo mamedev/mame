@@ -26,14 +26,14 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> shark_device
+// ======================> mshark_device
 
-class shark_device :  public device_t,
+class mshark_device :  public device_t,
 						public device_ieee488_interface
 {
 public:
 	// construction/destruction
-	shark_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mshark_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
