@@ -276,13 +276,13 @@ INLINE UINT16 ACCUM_L(const rsp_state *rsp, int x)
 
 #else
 
-#define ACCUM_H(v, x)			rsp->accum[((x))].w[3]
-#define ACCUM_M(v, x)			rsp->accum[((x))].w[2]
-#define ACCUM_L(v, x)			rsp->accum[((x))].w[1]
+#define ACCUM_H(v, x)			(UINT16)rsp->accum[x].w[3]
+#define ACCUM_M(v, x)			(UINT16)rsp->accum[x].w[2]
+#define ACCUM_L(v, x)			(UINT16)rsp->accum[x].w[1]
 
-#define SET_ACCUM_H(v, x)		ACCUM_H(-1, x) = v;
-#define SET_ACCUM_M(v, x)		ACCUM_M(-1, x) = v;
-#define SET_ACCUM_L(v, x)		ACCUM_L(-1, x) = v;
+#define SET_ACCUM_H(v, x)		rsp->accum[x].w[3] = v;
+#define SET_ACCUM_M(v, x)		rsp->accum[x].w[2] = v;
+#define SET_ACCUM_L(v, x)		rsp->accum[x].w[1] = v;
 
 #define SCALAR_GET_VS1(out, i)	out = VREG_S(VS1REG, i)
 #define SCALAR_GET_VS2(out, i)	out = VREG_S(VS2REG, VEC_EL_2(EL, i))
@@ -941,7 +941,6 @@ static void cfunc_rsp_lbv(void *param)
 #else
     VREG_B(dest, index) = READ8(rsp, ea);
 #endif
-
 }
 
 static void cfunc_rsp_lsv(void *param)
@@ -2529,6 +2528,7 @@ INLINE void cfunc_rsp_vmudh(void *param)
 {
     rsp_state *rsp = (rsp_state*)param;
     int op = rsp->impstate->arg0;
+
     // 31       25  24     20      15      10      5        0
     // ------------------------------------------------------
     // | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 000111 |
@@ -2997,7 +2997,7 @@ INLINE void cfunc_rsp_vmadn(void *param)
         INT32 s1 = (UINT16)w1;
         INT32 s2 = (INT32)(INT16)w2;
 
-        INT64 q = (UINT64)ACCUM(i) & 0x000000000000ffffL;
+        UINT64 q = (UINT64)ACCUM(i) & 0x000000000000ffffL;
         q |= (((UINT64)ACCUM_L(rsp, i)) << 16);
         q |= (((UINT64)ACCUM_M(rsp, i)) << 32);
         q |= (((UINT64)ACCUM_H(rsp, i)) << 48);
@@ -3018,6 +3018,7 @@ INLINE void cfunc_rsp_vmadh(void *param)
 {
     rsp_state *rsp = (rsp_state*)param;
     int op = rsp->impstate->arg0;
+
     // 31       25  24     20      15      10      5        0
     // ------------------------------------------------------
     // | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 001111 |
@@ -3076,6 +3077,7 @@ INLINE void cfunc_rsp_vadd(void *param)
 {
     rsp_state *rsp = (rsp_state*)param;
     int op = rsp->impstate->arg0;
+
     // 31       25  24     20      15      10      5        0
     // ------------------------------------------------------
     // | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 010000 |
@@ -3127,6 +3129,7 @@ INLINE void cfunc_rsp_vsub(void *param)
 {
     rsp_state *rsp = (rsp_state*)param;
     int op = rsp->impstate->arg0;
+
     // 31       25  24     20      15      10      5        0
     // ------------------------------------------------------
     // | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 010001 |
@@ -3179,6 +3182,7 @@ INLINE void cfunc_rsp_vabs(void *param)
 {
     rsp_state *rsp = (rsp_state*)param;
     int op = rsp->impstate->arg0;
+
     // 31       25  24     20      15      10      5        0
     // ------------------------------------------------------
     // | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 010011 |
@@ -3235,6 +3239,7 @@ INLINE void cfunc_rsp_vaddc(void *param)
 {
     rsp_state *rsp = (rsp_state*)param;
     int op = rsp->impstate->arg0;
+
     // 31       25  24     20      15      10      5        0
     // ------------------------------------------------------
     // | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 010100 |
@@ -3288,6 +3293,7 @@ INLINE void cfunc_rsp_vsubc(void *param)
 {
     rsp_state *rsp = (rsp_state*)param;
     int op = rsp->impstate->arg0;
+
     // 31       25  24     20      15      10      5        0
     // ------------------------------------------------------
     // | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 010101 |
@@ -3351,6 +3357,7 @@ INLINE void cfunc_rsp_vsaw(void *param)
 {
     rsp_state *rsp = (rsp_state*)param;
     int op = rsp->impstate->arg0;
+
     // 31       25  24     20      15      10      5        0
     // ------------------------------------------------------
     // | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 011101 |
@@ -3404,6 +3411,7 @@ INLINE void cfunc_rsp_vlt(void *param)
 {
     rsp_state *rsp = (rsp_state*)param;
     int op = rsp->impstate->arg0;
+
     //int i;
     // 31       25  24     20      15      10      5        0
     // ------------------------------------------------------
@@ -4206,6 +4214,7 @@ INLINE void cfunc_rsp_vmrg(void *param)
 {
     rsp_state *rsp = (rsp_state*)param;
     int op = rsp->impstate->arg0;
+
     // 31       25  24     20      15      10      5        0
     // ------------------------------------------------------
     // | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 100111 |
@@ -4601,6 +4610,7 @@ INLINE void cfunc_rsp_vrcph(void *param)
 {
     rsp_state *rsp = (rsp_state*)param;
     int op = rsp->impstate->arg0;
+
     // 31       25  24     20      15      10      5        0
     // ------------------------------------------------------
     // | 010010 | 1 | EEEE | SSSSS | ?FFFF | DDDDD | 110010 |
