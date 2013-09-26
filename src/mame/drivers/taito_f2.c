@@ -5433,7 +5433,7 @@ GAME( 1990, gunfrontj,  gunfront, gunfront,  gunfrontj, driver_device, 0,       
 GAME( 1990, growl,      0,        growl,     growl, driver_device,     0,        ROT0,   "Taito Corporation Japan",   "Growl (World)", GAME_SUPPORTS_SAVE )
 GAME( 1990, growlu,     growl,    growl,     growlu, driver_device,    0,        ROT0,   "Taito America Corporation", "Growl (US)", GAME_SUPPORTS_SAVE )
 GAME( 1990, runark,     growl,    growl,     runark, driver_device,    0,        ROT0,   "Taito Corporation",         "Runark (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1990, growlp,     0,        growl,     growl, driver_device,     0,        ROT0,   "Taito Corporation Japan",   "Growl (World, prototype)", GAME_SUPPORTS_SAVE )
+GAME( 1990, growlp,     growl,    growl,     growl, driver_device,     0,        ROT0,   "Taito Corporation Japan",   "Growl (World, prototype)", GAME_SUPPORTS_SAVE )
 
 
 GAME( 1990, mjnquest,   0,        mjnquest,  mjnquest, taitof2_state,  mjnquest, ROT0,   "Taito Corporation",         "Mahjong Quest (Japan)", GAME_SUPPORTS_SAVE )
