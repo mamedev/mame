@@ -121,7 +121,8 @@ int web_engine::json_game_handler(struct mg_connection *conn)
 	data["parent"] = m_machine->system().parent;
 	data["source_file"] = m_machine->system().source_file;
 	data["flags"] = m_machine->system().flags;
-
+    data["ispaused"] = m_machine->paused();
+	
 	Json::FastWriter writer;
 	const char *json = writer.write(data).c_str();
 	// Send HTTP reply to the client
