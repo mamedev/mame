@@ -167,12 +167,13 @@ struct rsp_state
 	UINT32 pc;
 	UINT32 r[35];
 	VECTOR_REG v[32];
+	UINT16 vflag[6][8];
 #if USE_SIMD
 	// Mirror of v[] for now, to be used in parallel as
 	// more vector ops are transitioned over
 	__m128i xv[32];
+	__m128i xvflag[6];
 #endif
-	UINT16 flag[4];
 	UINT32 sr;
 	UINT32 step_count;
 

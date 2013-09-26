@@ -66,22 +66,35 @@ INLINE rsp_state *get_safe_token(device_t *device)
 #define ACCUM_M(x)      rsp->accum[((x))].w[2]
 #define ACCUM_L(x)      rsp->accum[((x))].w[1]
 
-#define CARRY_FLAG(x)           ((rsp->flag[0] & (1 << ((x)))) ? 1 : 0)
-#define CLEAR_CARRY_FLAGS()     { rsp->flag[0] &= ~0xff; }
-#define SET_CARRY_FLAG(x)       { rsp->flag[0] |= (1 << ((x))); }
-#define CLEAR_CARRY_FLAG(x)     { rsp->flag[0] &= ~(1 << ((x))); }
+#define CARRY		0
+#define COMPARE		1
+#define CLIP1		2
+#define ZERO		3
+#define CLIP2		4
 
-#define COMPARE_FLAG(x)         ((rsp->flag[1] & (1 << ((x)))) ? 1 : 0)
-#define CLEAR_COMPARE_FLAGS()   { rsp->flag[1] &= ~0xff; }
-#define SET_COMPARE_FLAG(x)     { rsp->flag[1] |= (1 << ((x))); }
-#define CLEAR_COMPARE_FLAG(x)   { rsp->flag[1] &= ~(1 << ((x))); }
+#define CARRY_FLAG(x)           (rsp->vflag[CARRY][x & 7] != 0 ? 0xffff : 0)
+#define COMPARE_FLAG(x)         (rsp->vflag[COMPARE][x & 7] != 0 ? 0xffff : 0)
+#define CLIP1_FLAG(x)           (rsp->vflag[CLIP1][x & 7] != 0 ? 0xffff : 0)
+#define ZERO_FLAG(x)            (rsp->vflag[ZERO][x & 7] != 0 ? 0xffff : 0)
+#define CLIP2_FLAG(x)           (rsp->vflag[CLIP2][x & 7] != 0 ? 0xffff : 0)
 
-#define ZERO_FLAG(x)            ((rsp->flag[0] & (1 << (8+(x)))) ? 1 : 0)
-#define CLEAR_ZERO_FLAGS()      { rsp->flag[0] &= ~0xff00; }
-#define SET_ZERO_FLAG(x)        { rsp->flag[0] |= (1 << (8+(x))); }
-#define CLEAR_ZERO_FLAG(x)      { rsp->flag[0] &= ~(1 << (8+(x))); }
+#define CLEAR_CARRY_FLAGS()   	{ memset(rsp->vflag[0], 0, 16); }
+#define CLEAR_COMPARE_FLAGS()   { memset(rsp->vflag[1], 0, 16); }
+#define CLEAR_CLIP1_FLAGS()     { memset(rsp->vflag[2], 0, 16); }
+#define CLEAR_ZERO_FLAGS()      { memset(rsp->vflag[3], 0, 16); }
+#define CLEAR_CLIP2_FLAGS()     { memset(rsp->vflag[4], 0, 16); }
 
-#define EXTENSION_FLAG(x)       ((rsp.flag[2] & (1 << ((x)))) ? 1 : 0)
+#define SET_CARRY_FLAG(x)       { rsp->vflag[0][x & 7] = 0xffff; }
+#define SET_COMPARE_FLAG(x)     { rsp->vflag[1][x & 7] = 0xffff; }
+#define SET_CLIP1_FLAG(x)       { rsp->vflag[2][x & 7] = 0xffff; }
+#define SET_ZERO_FLAG(x)        { rsp->vflag[3][x & 7] = 0xffff; }
+#define SET_CLIP2_FLAG(x)       { rsp->vflag[4][x & 7] = 0xffff; }
+
+#define CLEAR_CARRY_FLAG(x)     { rsp->vflag[0][x & 7] = 0; }
+#define CLEAR_COMPARE_FLAG(x)   { rsp->vflag[1][x & 7] = 0; }
+#define CLEAR_CLIP1_FLAG(x)     { rsp->vflag[2][x & 7] = 0; }
+#define CLEAR_ZERO_FLAG(x)      { rsp->vflag[3][x & 7] = 0; }
+#define CLEAR_CLIP2_FLAG(x)     { rsp->vflag[4][x & 7] = 0; }
 
 #define ROPCODE(pc)     rsp->program->read_dword(pc)
 
@@ -296,10 +309,11 @@ static CPU_INIT( rsp )
 		rsp->v[regIdx].d[0] = 0;
 		rsp->v[regIdx].d[1] = 0;
 	}
-	rsp->flag[0] = 0;
-	rsp->flag[1] = 0;
-	rsp->flag[2] = 0;
-	rsp->flag[3] = 0;
+    CLEAR_CARRY_FLAGS();
+    CLEAR_COMPARE_FLAGS();
+    CLEAR_CLIP1_FLAGS();
+    CLEAR_ZERO_FLAGS();
+    CLEAR_CLIP2_FLAGS();
 	//rsp->square_root_res = 0;
 	//rsp->square_root_high = 0;
 	rsp->reciprocal_res = 0;
@@ -1732,7 +1746,8 @@ static void handle_vector_ops(rsp_state *rsp, UINT32 op)
 			// Moves the element in VS2 to destination vector
 
 			int sel;
-			rsp->flag[1] = 0;
+			CLEAR_COMPARE_FLAGS();
+			CLEAR_CLIP2_FLAGS();
 
 			for (i=0; i < 8; i++)
 			{
@@ -1762,7 +1777,8 @@ static void handle_vector_ops(rsp_state *rsp, UINT32 op)
 				ACCUM_L(i) = vres[i];
 			}
 
-			rsp->flag[0] = 0;
+			CLEAR_CARRY_FLAGS();
+			CLEAR_ZERO_FLAGS();
 			WRITEBACK_RESULT();
 			break;
 		}
@@ -1778,7 +1794,8 @@ static void handle_vector_ops(rsp_state *rsp, UINT32 op)
 			// Moves the element in VS2 to destination vector
 
 			int sel;
-			rsp->flag[1] = 0;
+			CLEAR_COMPARE_FLAGS();
+			CLEAR_CLIP2_FLAGS();
 
 			for (i = 0; i < 8; i++)
 			{
@@ -1796,7 +1813,8 @@ static void handle_vector_ops(rsp_state *rsp, UINT32 op)
 				ACCUM_L(i) = vres[i];
 			}
 
-			rsp->flag[0] = 0;
+			CLEAR_ZERO_FLAGS();
+			CLEAR_CARRY_FLAGS();
 			WRITEBACK_RESULT();
 			break;
 		}
@@ -1812,7 +1830,8 @@ static void handle_vector_ops(rsp_state *rsp, UINT32 op)
 			// Moves the element in VS2 to destination vector
 
 			int sel;
-			rsp->flag[1] = 0;
+			CLEAR_COMPARE_FLAGS();
+			CLEAR_CLIP2_FLAGS();
 
 			for (i=0; i < 8; i++)//?????????? ????
 			{
@@ -1840,7 +1859,8 @@ static void handle_vector_ops(rsp_state *rsp, UINT32 op)
 				ACCUM_L(i) = vres[i];
 			}
 
-			rsp->flag[0] = 0;
+			CLEAR_CARRY_FLAGS();
+			CLEAR_ZERO_FLAGS();
 			WRITEBACK_RESULT();
 			break;
 		}
@@ -1856,7 +1876,8 @@ static void handle_vector_ops(rsp_state *rsp, UINT32 op)
 			// Moves the element in VS2 to destination vector
 
 			int sel;
-			rsp->flag[1] = 0;
+			CLEAR_COMPARE_FLAGS();
+			CLEAR_CLIP2_FLAGS();
 
 			for (i=0; i < 8; i++)
 			{
@@ -1886,7 +1907,8 @@ static void handle_vector_ops(rsp_state *rsp, UINT32 op)
 				ACCUM_L(i) = vres[i];
 			}
 
-			rsp->flag[0] = 0;
+			CLEAR_CARRY_FLAGS();
+			CLEAR_ZERO_FLAGS();
 			WRITEBACK_RESULT();
 			break;
 		}
@@ -1923,7 +1945,7 @@ static void handle_vector_ops(rsp_state *rsp, UINT32 op)
 					}
 					else//ZERO_FLAG(i)==0
 					{
-						if (rsp->flag[2] & (1 << (i)))
+						if (CLIP1_FLAG(i) != 0)
 						{
 							if (((UINT32)(UINT16)(s1) + (UINT32)(UINT16)(s2)) > 0x10000)
 							{//proper fix for Harvest Moon 64, r4
@@ -1956,7 +1978,7 @@ static void handle_vector_ops(rsp_state *rsp, UINT32 op)
 				{
 					if (ZERO_FLAG(i) != 0)
 					{
-						if (rsp->flag[1] & (1 << (8+i)))
+						if (CLIP2_FLAG(i) != 0)
 						{
 							ACCUM_L(i) = s2;
 						}
@@ -1970,20 +1992,21 @@ static void handle_vector_ops(rsp_state *rsp, UINT32 op)
 						if (((INT32)(UINT16)s1 - (INT32)(UINT16)s2) >= 0)
 						{
 							ACCUM_L(i) = s2;
-							rsp->flag[1] |= (1 << (8+i));
+							SET_CLIP2_FLAG(i);
 						}
 						else
 						{
 							ACCUM_L(i) = s1;
-							rsp->flag[1] &= ~(1 << (8+i));
+							CLEAR_CLIP2_FLAG(i);
 						}
 					}
 				}
 
 				vres[i] = ACCUM_L(i);
 			}
-			rsp->flag[0] = 0;
-			rsp->flag[2] = 0;
+			CLEAR_CARRY_FLAGS();
+			CLEAR_ZERO_FLAGS();
+			CLEAR_CLIP1_FLAGS();
 			WRITEBACK_RESULT();
 			break;
 		}
@@ -1999,9 +2022,11 @@ static void handle_vector_ops(rsp_state *rsp, UINT32 op)
 
 			int sel;
 			INT16 s1, s2;
-			rsp->flag[0] = 0;
-			rsp->flag[1] = 0;
-			rsp->flag[2] = 0;
+			CLEAR_CARRY_FLAGS();
+			CLEAR_COMPARE_FLAGS();
+			CLEAR_CLIP1_FLAGS();
+			CLEAR_ZERO_FLAGS();
+			CLEAR_CLIP2_FLAGS();
 			UINT32 vce = 0;
 
 			for (i=0; i < 8; i++)
@@ -2016,7 +2041,7 @@ static void handle_vector_ops(rsp_state *rsp, UINT32 op)
 					SET_CARRY_FLAG(i);
 					if (s2 < 0)
 					{
-						rsp->flag[1] |= (1 << (8+i));
+						SET_CLIP2_FLAG(i);
 					}
 
 					if (s1 + s2 <= 0)
@@ -2046,7 +2071,7 @@ static void handle_vector_ops(rsp_state *rsp, UINT32 op)
 					}
 					if (s1 - s2 >= 0)
 					{
-						rsp->flag[1] |= (1 << (8+i));
+						SET_CLIP2_FLAG(i);
 						vres[i] = s2;
 					}
 					else
@@ -2062,7 +2087,10 @@ static void handle_vector_ops(rsp_state *rsp, UINT32 op)
 						}
 					}
 				}
-				rsp->flag[2] |= (vce << (i));
+				if (vce != 0)
+				{
+					SET_CLIP1_FLAG(i);
+				}
 				ACCUM_L(i) = vres[i];
 			}
 			WRITEBACK_RESULT();
@@ -2080,9 +2108,11 @@ static void handle_vector_ops(rsp_state *rsp, UINT32 op)
 
 			int sel;
 			INT16 s1, s2;
-			rsp->flag[0] = 0;
-			rsp->flag[1] = 0;
-			rsp->flag[2] = 0;
+			CLEAR_CARRY_FLAGS();
+			CLEAR_COMPARE_FLAGS();
+			CLEAR_CLIP1_FLAGS();
+			CLEAR_ZERO_FLAGS();
+			CLEAR_CLIP2_FLAGS();
 
 			for (i=0; i < 8; i++)
 			{
@@ -2094,7 +2124,7 @@ static void handle_vector_ops(rsp_state *rsp, UINT32 op)
 				{
 					if (s2 < 0)
 					{
-						rsp->flag[1] |= (1 << (8+i));
+						SET_CLIP2_FLAG(i);
 					}
 					if ((s1 + s2) <= 0)
 					{
@@ -2115,7 +2145,7 @@ static void handle_vector_ops(rsp_state *rsp, UINT32 op)
 					if ((s1 - s2) >= 0)
 					{
 						ACCUM_L(i) = s2;
-						rsp->flag[1] |= (1 << (8+i));
+						SET_CLIP2_FLAG(i);
 					}
 					else
 					{
@@ -2801,15 +2831,65 @@ static CPU_EXECUTE( rsp )
 
 						if (RTREG)
 						{
-							if (RDREG == 2)
+							switch(RDREG)
 							{
-								// Anciliary clipping flags
-								RTVAL = rsp->flag[RDREG] & 0x00ff;
-							}
-							else
-							{
-								// All other flags are 16 bits but sign-extended at retrieval
-								RTVAL = (UINT32)rsp->flag[RDREG] | ( ( rsp->flag[RDREG] & 0x8000 ) ? 0xffff0000 : 0 );
+								case 0:
+									RTVAL = ((CARRY_FLAG(0) & 1) << 0) |
+											((CARRY_FLAG(1) & 1) << 1) |
+											((CARRY_FLAG(2) & 1) << 2) |
+											((CARRY_FLAG(3) & 1) << 3) |
+											((CARRY_FLAG(4) & 1) << 4) |
+											((CARRY_FLAG(5) & 1) << 5) |
+											((CARRY_FLAG(6) & 1) << 6) |
+											((CARRY_FLAG(7) & 1) << 7) |
+											((ZERO_FLAG(0) & 1) << 8) |
+											((ZERO_FLAG(1) & 1) << 9) |
+											((ZERO_FLAG(2) & 1) << 10) |
+											((ZERO_FLAG(3) & 1) << 11) |
+											((ZERO_FLAG(4) & 1) << 12) |
+											((ZERO_FLAG(5) & 1) << 13) |
+											((ZERO_FLAG(6) & 1) << 14) |
+											((ZERO_FLAG(7) & 1) << 15);
+									if (RTVAL & 0x8000) RTVAL |= 0xffff0000;
+									break;
+								case 1:
+									RTVAL = ((COMPARE_FLAG(0) & 1) << 0) |
+											((COMPARE_FLAG(1) & 1) << 1) |
+											((COMPARE_FLAG(2) & 1) << 2) |
+											((COMPARE_FLAG(3) & 1) << 3) |
+											((COMPARE_FLAG(4) & 1) << 4) |
+											((COMPARE_FLAG(5) & 1) << 5) |
+											((COMPARE_FLAG(6) & 1) << 6) |
+											((COMPARE_FLAG(7) & 1) << 7) |
+											((CLIP2_FLAG(0) & 1) << 8) |
+											((CLIP2_FLAG(1) & 1) << 9) |
+											((CLIP2_FLAG(2) & 1) << 10) |
+											((CLIP2_FLAG(3) & 1) << 11) |
+											((CLIP2_FLAG(4) & 1) << 12) |
+											((CLIP2_FLAG(5) & 1) << 13) |
+											((CLIP2_FLAG(6) & 1) << 14) |
+											((CLIP2_FLAG(7) & 1) << 15);
+									if (RTVAL & 0x8000) RTVAL |= 0xffff0000;
+									break;
+								case 2:
+									// Anciliary clipping flags
+									RTVAL = ((CARRY_FLAG(0) & 1) << 0) |
+											((CARRY_FLAG(1) & 1) << 1) |
+											((CARRY_FLAG(2) & 1) << 2) |
+											((CARRY_FLAG(3) & 1) << 3) |
+											((CARRY_FLAG(4) & 1) << 4) |
+											((CARRY_FLAG(5) & 1) << 5) |
+											((CARRY_FLAG(6) & 1) << 6) |
+											((CARRY_FLAG(7) & 1) << 7) |
+											((ZERO_FLAG(0) & 1) << 8) |
+											((ZERO_FLAG(1) & 1) << 9) |
+											((ZERO_FLAG(2) & 1) << 10) |
+											((ZERO_FLAG(3) & 1) << 11) |
+											((ZERO_FLAG(4) & 1) << 12) |
+											((ZERO_FLAG(5) & 1) << 13) |
+											((ZERO_FLAG(6) & 1) << 14) |
+											((ZERO_FLAG(7) & 1) << 15);
+									if (RTVAL & 0x8000) RTVAL |= 0xffff0000;
 							}
 						}
 						break;
@@ -2835,7 +2915,60 @@ static CPU_EXECUTE( rsp )
 						// ------------------------------------------------
 						//
 
-						rsp->flag[RDREG] = RTVAL & 0xffff;
+						switch(RDREG)
+						{
+							case 0:
+								CLEAR_CARRY_FLAGS();
+								CLEAR_ZERO_FLAGS();
+								if (RTVAL & (1 << 0))  { SET_CARRY_FLAG(0); }
+								if (RTVAL & (1 << 1))  { SET_CARRY_FLAG(1); }
+								if (RTVAL & (1 << 2))  { SET_CARRY_FLAG(2); }
+								if (RTVAL & (1 << 3))  { SET_CARRY_FLAG(3); }
+								if (RTVAL & (1 << 4))  { SET_CARRY_FLAG(4); }
+								if (RTVAL & (1 << 5))  { SET_CARRY_FLAG(5); }
+								if (RTVAL & (1 << 6))  { SET_CARRY_FLAG(6); }
+								if (RTVAL & (1 << 7))  { SET_CARRY_FLAG(7); }
+								if (RTVAL & (1 << 8))  { SET_ZERO_FLAG(0); }
+								if (RTVAL & (1 << 9))  { SET_ZERO_FLAG(1); }
+								if (RTVAL & (1 << 10)) { SET_ZERO_FLAG(2); }
+								if (RTVAL & (1 << 11)) { SET_ZERO_FLAG(3); }
+								if (RTVAL & (1 << 12)) { SET_ZERO_FLAG(4); }
+								if (RTVAL & (1 << 13)) { SET_ZERO_FLAG(5); }
+								if (RTVAL & (1 << 14)) { SET_ZERO_FLAG(6); }
+								if (RTVAL & (1 << 15)) { SET_ZERO_FLAG(7); }
+								break;
+							case 1:
+								CLEAR_COMPARE_FLAGS();
+								CLEAR_CLIP2_FLAGS();
+								if (RTVAL & (1 << 0)) { SET_COMPARE_FLAG(0); }
+								if (RTVAL & (1 << 1)) { SET_COMPARE_FLAG(1); }
+								if (RTVAL & (1 << 2)) { SET_COMPARE_FLAG(2); }
+								if (RTVAL & (1 << 3)) { SET_COMPARE_FLAG(3); }
+								if (RTVAL & (1 << 4)) { SET_COMPARE_FLAG(4); }
+								if (RTVAL & (1 << 5)) { SET_COMPARE_FLAG(5); }
+								if (RTVAL & (1 << 6)) { SET_COMPARE_FLAG(6); }
+								if (RTVAL & (1 << 7)) { SET_COMPARE_FLAG(7); }
+								if (RTVAL & (1 << 8))  { SET_CLIP2_FLAG(0); }
+								if (RTVAL & (1 << 9))  { SET_CLIP2_FLAG(1); }
+								if (RTVAL & (1 << 10)) { SET_CLIP2_FLAG(2); }
+								if (RTVAL & (1 << 11)) { SET_CLIP2_FLAG(3); }
+								if (RTVAL & (1 << 12)) { SET_CLIP2_FLAG(4); }
+								if (RTVAL & (1 << 13)) { SET_CLIP2_FLAG(5); }
+								if (RTVAL & (1 << 14)) { SET_CLIP2_FLAG(6); }
+								if (RTVAL & (1 << 15)) { SET_CLIP2_FLAG(7); }
+								break;
+							case 2:
+								CLEAR_CLIP1_FLAGS();
+								if (RTVAL & (1 << 0)) { SET_CLIP1_FLAG(0); }
+								if (RTVAL & (1 << 1)) { SET_CLIP1_FLAG(1); }
+								if (RTVAL & (1 << 2)) { SET_CLIP1_FLAG(2); }
+								if (RTVAL & (1 << 3)) { SET_CLIP1_FLAG(3); }
+								if (RTVAL & (1 << 4)) { SET_CLIP1_FLAG(4); }
+								if (RTVAL & (1 << 5)) { SET_CLIP1_FLAG(5); }
+								if (RTVAL & (1 << 6)) { SET_CLIP1_FLAG(6); }
+								if (RTVAL & (1 << 7)) { SET_CLIP1_FLAG(7); }
+								break;
+						}
 						break;
 					}
 
