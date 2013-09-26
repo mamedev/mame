@@ -295,7 +295,7 @@ void konamigv_state::scsi_dma_write( UINT32 *p_n_psxram, UINT32 n_address, INT32
 			n_this--;
 		}
 
-		m_am53cf96->dma_write_data( n_this * 4, sector_buffer );
+		m_am53cf96->dma_write_data( i, sector_buffer );
 	}
 }
 
