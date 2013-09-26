@@ -49,18 +49,6 @@ Updates:
   emulation related. While these common one-pixel lags are very obvious
   on VGA-class displays they're virtually invisible on TV and older
   15kHz arcade monitors.
-- TMNT2: "BIG APPLE, 3 AM" is not played in the first loop. I believe
-  it's a design decision because it'll cut into the last intro dialogue.
-  The game looks up sound codes of these prologue lines from two different
-  tables. One for the first loop and the other for any loop thereafter.
-  The SNES port plays it everytime probably because it has no intro speech.
-  If the real board turns out otherwise I have no idea how to fix it except
-  patching the first table.
-- TMNT: In the sewer level when purple foot soldiers jump out of the water
-  they turn white for a short moment. The color index is copied straight
-  form ROM and nothing unusual is found in that part the code. There is no
-  known protection in this game so this bug may need reconfirmation.
-(081003AT)
 
 ***************************************************************************/
 
