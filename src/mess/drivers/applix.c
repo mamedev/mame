@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    Skeleton driver for Applix 1616 computer
+    Applix 1616 computer
 
     See for docs: http;//www.microbee-mspp.org.au
     You need to sign up and make an introductory thread.
@@ -30,6 +30,7 @@
     - Audio: it could be better
     - DAC output is used to compare against analog inputs; core doesn't permit
       audio outputs to be used for non-speaker purposes.
+    - Bios 5 crashes mess after scrolling about half a screen
 
 ****************************************************************************/
 
@@ -915,22 +916,35 @@ MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( applix )
-	ROM_REGION(0x20000, "maincpu", 0)
+	ROM_REGION16_BE(0x20000, "maincpu", 0)
 	ROM_SYSTEM_BIOS(0, "v4.5a", "V4.5a")
-	ROMX_LOAD( "1616oshv.045", 0x00000, 0x10000, CRC(9dfb3224) SHA1(5223833a357f90b147f25826c01713269fc1945f), ROM_SKIP(1) | ROM_BIOS(1) )
-	ROMX_LOAD( "1616oslv.045", 0x00001, 0x10000, CRC(951bd441) SHA1(e0a38c8d0d38d84955c1de3f6a7d56ce06b063f6), ROM_SKIP(1) | ROM_BIOS(1) )
+	ROMX_LOAD( "1616osl.45a", 0x00000, 0x10000, CRC(9dfb3224) SHA1(5223833a357f90b147f25826c01713269fc1945f), ROM_SKIP(1) | ROM_BIOS(1) )
+	ROMX_LOAD( "1616osh.45a", 0x00001, 0x10000, CRC(951bd441) SHA1(e0a38c8d0d38d84955c1de3f6a7d56ce06b063f6), ROM_SKIP(1) | ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS(1, "v4.4a", "V4.4a")
-	ROMX_LOAD( "1616oshv.044", 0x00000, 0x10000, CRC(4a1a90d3) SHA1(4df504bbf6fc5dad76c29e9657bfa556500420a6), ROM_SKIP(1) | ROM_BIOS(2) )
-	ROMX_LOAD( "1616oslv.044", 0x00001, 0x10000, CRC(ef619994) SHA1(ff16fe9e2c99a1ffc855baf89278a97a2a2e881a), ROM_SKIP(1) | ROM_BIOS(2) )
+	ROMX_LOAD( "1616osl.44a", 0x00000, 0x10000, CRC(4a1a90d3) SHA1(4df504bbf6fc5dad76c29e9657bfa556500420a6), ROM_SKIP(1) | ROM_BIOS(2) )
+	ROMX_LOAD( "1616osh.44a", 0x00001, 0x10000, CRC(ef619994) SHA1(ff16fe9e2c99a1ffc855baf89278a97a2a2e881a), ROM_SKIP(1) | ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS(2, "v4.3a", "V4.3a")
+	ROMX_LOAD( "1616osl.43a", 0x00000, 0x10000, CRC(c09b9ff8) SHA1(c46f2a98470d2d09cf9f9eec0f4096ab762407b5), ROM_SKIP(1) | ROM_BIOS(3) )
+	ROMX_LOAD( "1616osh.43a", 0x00001, 0x10000, CRC(071a2505) SHA1(42c4cc6e3e78b6a5320f9d9c858fc9f4e6220857), ROM_SKIP(1) | ROM_BIOS(3) )
+	ROM_SYSTEM_BIOS(3, "v4.0c", "V4.0c")
+	ROMX_LOAD( "1616osl.40c", 0x00000, 0x10000, CRC(6a517b5d) SHA1(e0f4eba0cb8d273ba681b9d2c6d4b1beff9ef325), ROM_SKIP(1) | ROM_BIOS(4) )
+	ROMX_LOAD( "1616osh.40c", 0x00001, 0x10000, CRC(7851651f) SHA1(d7d329aa7fe9f4418de0cdf813b61e70243e0e77), ROM_SKIP(1) | ROM_BIOS(4) )
+	ROM_SYSTEM_BIOS(4, "v3.0b", "V3.0b")
+	ROMX_LOAD( "1616osl.30b", 0x00000, 0x10000, CRC(fb9198c3) SHA1(e0e7a1dd176c1cbed063df1c405821c261d48f3a), ROM_SKIP(1) | ROM_BIOS(5) )
+	ROMX_LOAD( "1616osh.30b", 0x00001, 0x10000, CRC(a279e1d7) SHA1(3451b2cae87a9ccee5f579fd1d49cf52d9f97b83), ROM_SKIP(1) | ROM_BIOS(5) )
+	ROM_SYSTEM_BIOS(5, "v2.4a", "V2.4a")
+	ROMX_LOAD( "1616osl.24a", 0x00000, 0x08000, CRC(b155830b) SHA1(b32db6a06c8a3c544210ba9faba7c49497c504fb), ROM_SKIP(1) | ROM_BIOS(6) )
+	ROMX_LOAD( "1616osh.24a", 0x00001, 0x08000, CRC(6d9fc0e0) SHA1(07111f46386494ed3f426c1e50308f0209587f06), ROM_SKIP(1) | ROM_BIOS(6) )
 
 	ROM_REGION(0x18000, "subcpu", 0)
 	ROM_LOAD( "1616ssdv.022", 0x0000, 0x8000, CRC(6d8e413a) SHA1(fc27d92c34f231345a387b06670f36f8c1705856) )
 
 	ROM_REGION(0x20000, "user1", 0)
-	ROM_LOAD( "1616osv.045",  0x00000, 0x20000, CRC(b9f75432) SHA1(278964e2a02b1fe26ff34f09dc040e03c1d81a6d) )
+	ROM_LOAD( "ssdcromv.22",  0x0000, 0x8000, CRC(c85c47fb) SHA1(6f0bb3753fc0d74ee5901d71d05a74ec6a4a1d05) )
+	ROM_LOAD( "ssddromv.14a", 0x8000, 0x8000, CRC(8fe2db78) SHA1(487484003aba4d8960101ced6a689dc81676235d) )
 
 	ROM_REGION(0x2000, "kbdcpu", 0)
-	ROM_LOAD("14166.bin", 0x0000, 0x2000, CRC(1aea1b53) SHA1(b75b6d4509036406052157bc34159f7039cdc72e))
+	ROM_LOAD( "14166.bin", 0x0000, 0x2000, CRC(1aea1b53) SHA1(b75b6d4509036406052157bc34159f7039cdc72e) )
 ROM_END
 
 
