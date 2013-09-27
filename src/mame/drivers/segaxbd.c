@@ -1697,10 +1697,10 @@ MACHINE_CONFIG_END
 //     EPR-11099.97
 //     EPR-11100.101
 //     EPR-11101.105
-//     EPR-11094.92
-//     EPR-11095.96
-//     EPR-11096.100
-//     EPR-11097.104
+//     EPR-11094.92--
+//     EPR-11095.96  \ These 4 found in Afterburner II (German)??
+//     EPR-11096.100 /
+//     EPR-11097.104-
 //   Sound Data
 //     EPR-10929.13
 //
@@ -1745,7 +1745,7 @@ ROM_START( aburner )
 	ROM_REGION( 0x80000, "pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
 	ROM_LOAD( "mpr-10931.11", 0x00000, 0x20000, CRC(9209068f) SHA1(01f3dda1c066d00080c55f2c86c506b6b2407f98) )
 	ROM_LOAD( "mpr-10930.12", 0x20000, 0x20000, CRC(6493368b) SHA1(328aff19ff1d1344e9115f519d3962390c4e5ba4) )
-	ROM_LOAD( "epr-11102.13", 0x40000, 0x20000, CRC(6c07c78d) SHA1(3868b1824f43e4f2b4fbcd9274bfb3000c889d12) ) // This really should be EPR-10929 at IC13
+	ROM_LOAD( "epr-10929.13", 0x40000, 0x20000, CRC(6c07c78d) SHA1(3868b1824f43e4f2b4fbcd9274bfb3000c889d12) )
 ROM_END
 
 
@@ -1797,6 +1797,55 @@ ROM_START( aburner2 )
 	ROM_LOAD( "mpr-10931.11", 0x00000, 0x20000, CRC(9209068f) SHA1(01f3dda1c066d00080c55f2c86c506b6b2407f98) )
 	ROM_LOAD( "mpr-10930.12", 0x20000, 0x20000, CRC(6493368b) SHA1(328aff19ff1d1344e9115f519d3962390c4e5ba4) )
 	ROM_LOAD( "epr-11102.13", 0x40000, 0x20000, CRC(6c07c78d) SHA1(3868b1824f43e4f2b4fbcd9274bfb3000c889d12) )
+ROM_END
+
+//*************************************************************************************************************************
+//  Afterburner II (German), Sega X-board
+//  CPU: 68000 (317-????)
+//  Sega Game ID #: 834-6335-04 AFTER BURNER
+//
+ROM_START( aburner2g )
+	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "epr-11173a.58", 0x00000, 0x20000, CRC(cbf480f4) SHA1(f5bab7b2889cdd3f3f2a3e9edd3f17b4d2a5b8a9) )
+	ROM_LOAD16_BYTE( "epr-11174a.63", 0x00001, 0x20000, CRC(ed7cba77) SHA1(e81f24fa93329ad25150eada7717cce55fa3887d) )
+
+	ROM_REGION( 0x80000, "subcpu", 0 ) // 2nd 68000 code
+	ROM_LOAD16_BYTE( "epr-11109.20", 0x00000, 0x20000, CRC(85a0fe07) SHA1(5a3a8fda6cb4898cfece4ec865b81b9b60f9ad55) )
+	ROM_LOAD16_BYTE( "epr-11110.29", 0x00001, 0x20000, CRC(f3d6797c) SHA1(17487b89ddbfbcc32a0b52268259f1c8d10fd0b2) )
+
+	ROM_REGION( 0x30000, "gfx1", 0 ) // tiles
+	ROM_LOAD( "epr-11115.154", 0x00000, 0x10000, CRC(e8e32921) SHA1(30a96e6b514a475c778296228ba5b6fb96b211b0) )
+	ROM_LOAD( "epr-11114.153", 0x10000, 0x10000, CRC(2e97f633) SHA1(074125c106dd00785903b2e10cd7e28d5036eb60) )
+	ROM_LOAD( "epr-11113.152", 0x20000, 0x10000, CRC(36058c8c) SHA1(52befe6c6c53f10b6fd4971098abc8f8d3eef9d4) )
+
+	ROM_REGION32_LE( 0x200000, "sprites", 0 ) // sprites
+	ROM_LOAD32_BYTE( "mpr-10932.90",  0x000000, 0x20000, CRC(cc0821d6) SHA1(22e84419a585209bbda1466d2180504c316a9b7f) ) // First 8 roms are MPR, the rest are EPR
+	ROM_LOAD32_BYTE( "mpr-10934.94",  0x000001, 0x20000, CRC(4a51b1fa) SHA1(2eed018a5a1e935bb72b6f440a794466a1397dc5) )
+	ROM_LOAD32_BYTE( "mpr-10936.98",  0x000002, 0x20000, CRC(ada70d64) SHA1(ba6203b0fdb4c4998b7be5b446eb8354751d553a) )
+	ROM_LOAD32_BYTE( "mpr-10938.102", 0x000003, 0x20000, CRC(e7675baf) SHA1(aa979319a44c0b18c462afb5ca9cdeed2292c76a) )
+	ROM_LOAD32_BYTE( "mpr-10933.91",  0x080000, 0x20000, CRC(c8efb2c3) SHA1(ba31da93f929f2c457e60b2099d5a1ba6b5a9f48) )
+	ROM_LOAD32_BYTE( "mpr-10935.95",  0x080001, 0x20000, CRC(c1e23521) SHA1(5e95f3b6ff9f4caca676eaa6c84f1200315218ea) )
+	ROM_LOAD32_BYTE( "mpr-10937.99",  0x080002, 0x20000, CRC(f0199658) SHA1(cd67504fef53f637a3b1c723c4a04148f88028d2) )
+	ROM_LOAD32_BYTE( "mpr-10939.103", 0x080003, 0x20000, CRC(a0d49480) SHA1(6c4234456bc09ae771beec284d7aa21ebe474f6f) )
+	ROM_LOAD32_BYTE( "epr-11094.92",  0x100000, 0x20000, CRC(bdd60da2) SHA1(01673837c5ad84fa087728a05549ac01542ef4e9) )
+	ROM_LOAD32_BYTE( "epr-11095.96",  0x100001, 0x20000, CRC(06a35fce) SHA1(c39ae02fc8246e883c4f4c320f668ce6ca9c845a) )
+	ROM_LOAD32_BYTE( "epr-11096.100", 0x100002, 0x20000, CRC(027b0689) SHA1(c704c79faadb5e445fd3bd9281683b09831782d2) )
+	ROM_LOAD32_BYTE( "epr-11097.104", 0x100003, 0x20000, CRC(9e1fec09) SHA1(6cc47d86852b988bfcd64cb4ed7d832c683e3114) )
+	ROM_LOAD32_BYTE( "epr-11116.93",  0x180000, 0x20000, CRC(49b4c1ba) SHA1(5419f49f091e386eead4ccf5e03f12769e278179) )
+	ROM_LOAD32_BYTE( "epr-11117.97",  0x180001, 0x20000, CRC(821fbb71) SHA1(be2366d7b4a3a2543ba5024f0e258f1bc43caec8) )
+	ROM_LOAD32_BYTE( "epr-11118.101", 0x180002, 0x20000, CRC(8f38540b) SHA1(1fdfb157d1aca96cb635bd3d64f94545eb88c133) )
+	ROM_LOAD32_BYTE( "epr-11119.105", 0x180003, 0x20000, CRC(d0343a8e) SHA1(8c0c0addb6dfd0ea04c3900a9f7f7c731ca6e9ea) )
+
+	ROM_REGION( 0x10000, "gfx3", ROMREGION_ERASE00 ) // road gfx
+	ROM_LOAD( "epr-10922.40", 0x000000, 0x10000, CRC(b49183d4) SHA1(71d87bfbce858049ccde9597ab15575b3cdba892) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 ) // sound CPU
+	ROM_LOAD( "epr-11112.17",    0x00000, 0x10000, CRC(d777fc6d) SHA1(46ce1c3875437044c0a172960d560d6acd6eaa92) )
+
+	ROM_REGION( 0x80000, "pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
+	ROM_LOAD( "mpr-10931.11", 0x00000, 0x20000, CRC(9209068f) SHA1(01f3dda1c066d00080c55f2c86c506b6b2407f98) ) // There is known to exist German Sample roms
+	ROM_LOAD( "mpr-10930.12", 0x20000, 0x20000, CRC(6493368b) SHA1(328aff19ff1d1344e9115f519d3962390c4e5ba4) )
+	ROM_LOAD( "epr-10929.13", 0x40000, 0x20000, CRC(6c07c78d) SHA1(3868b1824f43e4f2b4fbcd9274bfb3000c889d12) )
 ROM_END
 
 
@@ -3280,7 +3329,8 @@ DRIVER_INIT_MEMBER(segaxbd_state,gprider)
 
 //    YEAR, NAME,     PARENT,   MACHINE,        INPUT,    INIT,                    MONITOR,COMPANY,FULLNAME,FLAGS
 GAME( 1987, aburner2, 0,        xboard,         aburner2, segaxbd_state, aburner2, ROT0,   "Sega", "After Burner II", 0 )
-GAME( 1987, aburner,  aburner2, xboard,         aburner,  segaxbd_state, aburner2, ROT0,   "Sega", "After Burner (Japan)", 0 )
+GAME( 1987, aburner2g,aburner2, xboard,         aburner2, segaxbd_state, aburner2, ROT0,   "Sega", "After Burner II (German)", 0 )
+GAME( 1987, aburner,  aburner2, xboard,         aburner,  segaxbd_state, aburner2, ROT0,   "Sega", "After Burner", 0 )
 GAME( 1987, thndrbld, 0,        xboard_fd1094,  thndrbld, segaxbd_state, generic,  ROT0,   "Sega", "Thunder Blade (upright, FD1094 317-0056)", 0 )
 GAME( 1987, thndrbld1,thndrbld, xboard,         thndrbd1, segaxbd_state, generic,  ROT0,   "Sega", "Thunder Blade (deluxe/standing, unprotected)", 0 )
 GAME( 1989, lastsurv, 0,        lastsurv_fd1094,lastsurv, segaxbd_state, lastsurv, ROT0,   "Sega", "Last Survivor (Japan, FD1094 317-0083)", 0 )
