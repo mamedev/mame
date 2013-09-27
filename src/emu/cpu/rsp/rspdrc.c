@@ -2186,7 +2186,7 @@ INLINE UINT16 C_SATURATE_ACCUM1(UINT16 *h, UINT16 *m, int accum, UINT16 negative
 }
 #endif
 
-
+#if USE_SIMD
 /* ============================================================================
 * RSPPackLo32to16: Pack LSBs of 32-bit vectors to 16-bits without saturation.
 * TODO: 5 SSE2 operations is kind of expensive just to truncate values?
@@ -2273,7 +2273,7 @@ INLINE __m128i RSPClampLowToVal(__m128i vaccLow, __m128i vaccMid, __m128i vaccHi
 	posVal = _mm_andnot_si128(negCheck, posVal);
 	return _mm_or_si128(negVal, posVal);
 }
-
+#endif
 INLINE void cfunc_rsp_vmulf(void *param)
 {
     rsp_state *rsp = (rsp_state*)param;
