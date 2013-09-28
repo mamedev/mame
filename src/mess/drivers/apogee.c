@@ -10,8 +10,10 @@
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "sound/wave.h"
+#include "sound/speaker.h"
 #include "machine/i8255.h"
 #include "machine/8257dma.h"
+#include "machine/pit8253.h"
 #include "video/i8275.h"
 #include "imagedev/cassette.h"
 #include "formats/rk_cas.h"
@@ -22,7 +24,17 @@ class apogee_state : public radio86_state
 {
 public:
 	apogee_state(const machine_config &mconfig, device_type type, const char *tag)
-		: radio86_state(mconfig, type, tag) { }
+		: radio86_state(mconfig, type, tag),
+		m_speaker(*this, "speaker") { }
+
+	UINT8 m_out0;
+	UINT8 m_out1;
+	UINT8 m_out2;
+	DECLARE_WRITE_LINE_MEMBER(pit8253_out0_changed);
+	DECLARE_WRITE_LINE_MEMBER(pit8253_out1_changed);
+	DECLARE_WRITE_LINE_MEMBER(pit8253_out2_changed);
+
+	required_device<speaker_sound_device> m_speaker;
 };
 
 
@@ -30,7 +42,7 @@ public:
 static ADDRESS_MAP_START(apogee_mem, AS_PROGRAM, 8, apogee_state )
 	AM_RANGE( 0x0000, 0x0fff ) AM_RAMBANK("bank1") // First bank
 	AM_RANGE( 0x1000, 0xebff ) AM_RAM  // RAM
-	//AM_RANGE( 0xec00, 0xecff ) AM_RAM  // Timer
+	AM_RANGE( 0xec00, 0xec03 ) AM_DEVREADWRITE("pit8253", pit8253_device, read, write) AM_MIRROR(0x00fc)
 	AM_RANGE( 0xed00, 0xed03 ) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write) AM_MIRROR(0x00fc)
 	//AM_RANGE( 0xee00, 0xee03 ) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write) AM_MIRROR(0x00fc)
 	AM_RANGE( 0xef00, 0xef01 ) AM_DEVREADWRITE("i8275", i8275_device, read, write) AM_MIRROR(0x00fe) // video
@@ -140,6 +152,51 @@ static const cassette_interface apogee_cassette_interface =
 	NULL
 };
 
+static const INT16 speaker_levels[] = {-32767, -10922, 10922, 32767};
+
+static const speaker_interface apogee_speaker_interface =
+{
+	4,
+	speaker_levels
+};
+
+WRITE_LINE_MEMBER(apogee_state::pit8253_out0_changed)
+{
+	m_out0 = state;
+	m_speaker->level_w(m_out0+m_out1+m_out2);
+}
+
+WRITE_LINE_MEMBER(apogee_state::pit8253_out1_changed)
+{
+	m_out1 = state;
+	m_speaker->level_w(m_out0+m_out1+m_out2);
+}
+
+WRITE_LINE_MEMBER(apogee_state::pit8253_out2_changed)
+{
+	m_out2 = state;
+	m_speaker->level_w(m_out0+m_out1+m_out2);
+}
+
+const struct pit8253_interface apogee_pit8253_config =
+{
+	{
+		{
+			XTAL_16MHz/9,
+			DEVCB_NULL,
+			DEVCB_DRIVER_LINE_MEMBER(apogee_state,pit8253_out0_changed)
+		}, {
+			XTAL_16MHz/9,
+			DEVCB_NULL,
+			DEVCB_DRIVER_LINE_MEMBER(apogee_state,pit8253_out1_changed)
+		}, {
+			XTAL_16MHz/9,
+			DEVCB_NULL,
+			DEVCB_DRIVER_LINE_MEMBER(apogee_state,pit8253_out2_changed)
+		}
+	}
+};
+
 
 /* F4 Character Displayer */
 static const gfx_layout apogee_charlayout =
@@ -167,6 +224,8 @@ static MACHINE_CONFIG_START( apogee, apogee_state )
 	MCFG_CPU_PROGRAM_MAP(apogee_mem)
 	MCFG_MACHINE_RESET_OVERRIDE(apogee_state, radio86 )
 
+	MCFG_PIT8253_ADD( "pit8253", apogee_pit8253_config )
+
 	MCFG_I8255_ADD( "ppi8255_1", radio86_ppi8255_interface_1 )
 
 	//MCFG_I8255_ADD( "ppi8255_2", apogee_ppi8255_interface_2 )
@@ -187,6 +246,9 @@ static MACHINE_CONFIG_START( apogee, apogee_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_CONFIG(apogee_speaker_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	MCFG_I8257_ADD("dma8257", XTAL_16MHz / 9, radio86_dma)
 
