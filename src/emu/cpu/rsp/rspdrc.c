@@ -3089,7 +3089,7 @@ INLINE void cfunc_rsp_vadd(void *param)
 
     __m128i shuffled = _mm_shuffle_epi8(rsp->xv[VS2REG], vec_shuf_inverse[EL]);
 	__m128i carry = _mm_and_si128(rsp->xvflag[CARRY], vec_flagmask);
-    __m128i unsat = _mm_add_epi16(_mm_add_epi16(rsp->xv[VS1REG], shuffled), carry);
+    rsp->accum_l = _mm_add_epi16(_mm_add_epi16(rsp->xv[VS1REG], shuffled), carry);
 
     __m128i addvec = _mm_adds_epi16(rsp->xv[VS1REG], shuffled);
 
@@ -3097,8 +3097,6 @@ INLINE void cfunc_rsp_vadd(void *param)
     carry = _mm_and_si128(carry, _mm_xor_si128(_mm_cmpeq_epi16(addvec, vec_n32768), vec_neg1));
 
     rsp->xv[VDREG] = _mm_add_epi16(addvec, carry);
-
-    rsp->accum_l = unsat;
 
 	rsp->xvflag[ZERO] = _mm_setzero_si128();
 	rsp->xvflag[CARRY] = _mm_setzero_si128();

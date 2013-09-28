@@ -50,6 +50,7 @@ void n64_rdp::RenderSpans(int start, int end, int tilenum, bool flip, extent_t *
 		case CYCLE_TYPE_1:
 			render_triangle_custom(visarea, render_delegate(FUNC(n64_rdp::SpanDraw1Cycle), this), start, (end - start) + 1, Spans + offset);
 			break;
+
 		case CYCLE_TYPE_2:
 			render_triangle_custom(visarea, render_delegate(FUNC(n64_rdp::SpanDraw2Cycle), this), start, (end - start) + 1, Spans + offset);
 			break;
@@ -148,16 +149,28 @@ void n64_rdp::SpanDraw1Cycle(INT32 scanline, const extent_t &extent, const rdp_p
 	bool partialreject = (userdata->ColorInputs.blender2b_a[0] == &userdata->InvPixelColor.i.a && userdata->ColorInputs.blender1b_a[0] == &userdata->PixelColor.i.a);
 	bool bsel0 = (userdata->ColorInputs.blender2b_a[0] == &userdata->MemoryColor.i.a);
 
-	int drinc = flip ? (object.SpanBase.m_span_dr) : -object.SpanBase.m_span_dr;
-	int dginc = flip ? (object.SpanBase.m_span_dg) : -object.SpanBase.m_span_dg;
-	int dbinc = flip ? (object.SpanBase.m_span_db) : -object.SpanBase.m_span_db;
-	int dainc = flip ? (object.SpanBase.m_span_da) : -object.SpanBase.m_span_da;
-	int dzinc = flip ? (object.SpanBase.m_span_dz) : -object.SpanBase.m_span_dz;
-	int dsinc = flip ? (object.SpanBase.m_span_ds) : -object.SpanBase.m_span_ds;
-	int dtinc = flip ? (object.SpanBase.m_span_dt) : -object.SpanBase.m_span_dt;
-	int dwinc = flip ? (object.SpanBase.m_span_dw) : -object.SpanBase.m_span_dw;
+	int drinc = object.SpanBase.m_span_dr;
+	int dginc = object.SpanBase.m_span_dg;
+	int dbinc = object.SpanBase.m_span_db;
+	int dainc = object.SpanBase.m_span_da;
+	int dzinc = object.SpanBase.m_span_dz;
+	int dsinc = object.SpanBase.m_span_ds;
+	int dtinc = object.SpanBase.m_span_dt;
+	int dwinc = object.SpanBase.m_span_dw;
+	int xinc = 1;
+	if (!flip)
+	{
+		drinc = -drinc;
+		dginc = -dginc;
+		dbinc = -dbinc;
+		dainc = -dainc;
+		dzinc = -dzinc;
+		dsinc = -dsinc;
+		dtinc = -dtinc;
+		dwinc = -dwinc;
+		xinc = -xinc;
+	}
 	int dzpix = object.SpanBase.m_span_dzpix;
-	int xinc = flip ? 1 : -1;
 
 	int fb_index = object.MiscState.FBWidth * scanline;
 
@@ -180,6 +193,9 @@ void n64_rdp::SpanDraw1Cycle(INT32 scanline, const extent_t &extent, const rdp_p
 		dzinc = 0;
 	}
 
+	int blend_index = (object.OtherModes.alpha_cvg_select ? 2 : 0) | ((object.OtherModes.rgb_dither_sel < 3) ? 1 : 0);
+	int read_index = ((object.MiscState.FBSize - 2) << 1) | object.OtherModes.image_read_en;
+	int write_index = ((object.MiscState.FBSize - 2) << 3) | (object.OtherModes.cvg_dest << 1);
 	userdata->m_start_span = true;
 	for (int j = 0; j <= length; j++)
 	{
@@ -233,17 +249,17 @@ void n64_rdp::SpanDraw1Cycle(INT32 scanline, const extent_t &extent, const rdp_p
 			UINT32 zbcur = zb + curpixel;
 			UINT32 zhbcur = zhb + curpixel;
 
-			((this)->*(_Read[((object.MiscState.FBSize - 2) << 1) | object.OtherModes.image_read_en]))(curpixel, userdata, object);
+			((this)->*(_Read[read_index]))(curpixel, userdata, object);
 
 			if(m_rdp->ZCompare(zbcur, zhbcur, sz, dzpix, userdata, object))
 			{
 				m_rdp->GetDitherValues(scanline, j, &cdith, &adith, object);
 
-				bool rendered = m_rdp->Blender.Blend1Cycle(&fir, &fig, &fib, cdith, adith, partialreject, bsel0, userdata, object);
+				bool rendered = ((&m_rdp->Blender)->*(m_rdp->Blender.blend1[(userdata->BlendEnable << 2) | blend_index]))(&fir, &fig, &fib, cdith, adith, partialreject, bsel0, userdata, object);
 
 				if (rendered)
 				{
-					((this)->*(_Write[((object.MiscState.FBSize - 2) << 3) | (object.OtherModes.cvg_dest << 1) | userdata->BlendEnable]))(curpixel, fir, fig, fib, userdata, object);
+					((this)->*(_Write[write_index | userdata->BlendEnable]))(curpixel, fir, fig, fib, userdata, object);
 
 					if (object.OtherModes.z_update_en)
 					{
@@ -337,6 +353,9 @@ void n64_rdp::SpanDraw2Cycle(INT32 scanline, const extent_t &extent, const rdp_p
 		dzinc = 0;
 	}
 
+	int blend_index = (object.OtherModes.alpha_cvg_select ? 2 : 0) | ((object.OtherModes.rgb_dither_sel < 3) ? 1 : 0);
+	int read_index = ((object.MiscState.FBSize - 2) << 1) | object.OtherModes.image_read_en;
+	int write_index = ((object.MiscState.FBSize - 2) << 3) | (object.OtherModes.cvg_dest << 1);
 	userdata->m_start_span = true;
 	for (int j = 0; j <= length; j++)
 	{
@@ -399,17 +418,17 @@ void n64_rdp::SpanDraw2Cycle(INT32 scanline, const extent_t &extent, const rdp_p
 			UINT32 zbcur = zb + curpixel;
 			UINT32 zhbcur = zhb + curpixel;
 
-			((this)->*(_Read[((object.MiscState.FBSize - 2) << 1) | object.OtherModes.image_read_en]))(curpixel, userdata, object);
+			((this)->*(_Read[read_index]))(curpixel, userdata, object);
 
 			if(m_rdp->ZCompare(zbcur, zhbcur, sz, dzpix, userdata, object))
 			{
 				m_rdp->GetDitherValues(scanline, j, &cdith, &adith, object);
 
-				bool rendered = m_rdp->Blender.Blend2Cycle(&fir, &fig, &fib, cdith, adith, partialreject, bsel0, bsel1, userdata, object);
+				bool rendered = ((&m_rdp->Blender)->*(m_rdp->Blender.blend2[(userdata->BlendEnable << 2) | blend_index]))(&fir, &fig, &fib, cdith, adith, partialreject, bsel0, bsel1, userdata, object);
 
 				if (rendered)
 				{
-					((this)->*(_Write[((object.MiscState.FBSize - 2) << 3) | (object.OtherModes.cvg_dest << 1) | userdata->BlendEnable]))(curpixel, fir, fig, fib, userdata, object);
+					((this)->*(_Write[write_index | userdata->BlendEnable]))(curpixel, fir, fig, fib, userdata, object);
 					if (object.OtherModes.z_update_en)
 					{
 						m_rdp->ZStore(zbcur, zhbcur, sz, userdata->m_dzpix_enc);
