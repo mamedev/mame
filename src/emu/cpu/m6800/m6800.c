@@ -1051,6 +1051,11 @@ void m6800_cpu_device::device_start()
 	m_tdr = 0;
 	m_ram_ctrl = 0;
 
+	m_s.d = 0;
+	m_x.d = 0;
+	m_d.d = 0;
+	m_irq_state[0] = m_irq_state[1] = m_irq_state[2] = 0;
+
 	save_item(NAME(m_ppc.w.l));
 	save_item(NAME(m_pc.w.l));
 	save_item(NAME(m_s.w.l));
