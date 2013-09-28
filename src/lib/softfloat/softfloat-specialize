@@ -311,7 +311,7 @@ static floatx80 commonNaNToFloatx80( commonNaNT a )
 | `b' is a signaling NaN, the invalid exception is raised.
 *----------------------------------------------------------------------------*/
 
-static floatx80 propagateFloatx80NaN( floatx80 a, floatx80 b )
+floatx80 propagateFloatx80NaN( floatx80 a, floatx80 b )
 {
     flag aIsNaN, aIsSignalingNaN, bIsNaN, bIsSignalingNaN;
 

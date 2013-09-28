@@ -89,11 +89,8 @@ enum {
 *----------------------------------------------------------------------------*/
 extern int8 float_exception_flags;
 enum {
-	float_flag_inexact   =  1,
-	float_flag_underflow =  2,
-	float_flag_overflow  =  4,
-	float_flag_divbyzero =  8,
-	float_flag_invalid   = 16
+  float_flag_invalid = 0x01, float_flag_denormal = 0x02, float_flag_divbyzero = 0x04, float_flag_overflow = 0x08,
+  float_flag_underflow = 0x10, float_flag_inexact = 0x20 
 };
 
 /*----------------------------------------------------------------------------
@@ -202,6 +199,7 @@ float64 floatx80_to_float64( floatx80 );
 #ifdef FLOAT128
 float128 floatx80_to_float128( floatx80 );
 #endif
+floatx80 floatx80_scale(floatx80 a, floatx80 b);
 
 /*----------------------------------------------------------------------------
 | Packs the sign `zSign', exponent `zExp', and significand `zSig' into an
@@ -459,5 +457,4 @@ INLINE float128
 	return roundAndPackFloat128( zSign, zExp, zSig0, zSig1, zSig2 );
 
 }
-
 #endif

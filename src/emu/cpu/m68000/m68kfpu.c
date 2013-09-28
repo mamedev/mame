@@ -1488,6 +1488,13 @@ static void fpgen_rm_reg(m68000_base_device *m68k, UINT16 w2)
 			m68k->remaining_cycles -= 43;   // guess
 			break;
 		}
+		case 0x26:      // FSCALE
+		{
+			REG_FP(m68k)[dst] = floatx80_scale(REG_FP(m68k)[dst], source);
+			SET_CONDITION_CODES(m68k, REG_FP(m68k)[dst]);
+			m68k->remaining_cycles -= 43;   // guess
+			break;
+		}
 		case 0x27:      // FSGLMUL
 		{
 			float32 a = floatx80_to_float32( REG_FP(m68k)[dst] );
