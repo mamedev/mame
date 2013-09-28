@@ -381,12 +381,13 @@ READ8_MEMBER(jangou_state::master_com_r)
 
 WRITE8_MEMBER(jangou_state::master_com_w)
 {
-	m_nsc->set_input_line(0, HOLD_LINE);
+	m_nsc->set_input_line(0, ASSERT_LINE);
 	m_nsc_latch = data;
 }
 
 READ8_MEMBER(jangou_state::slave_com_r)
 {
+	m_nsc->set_input_line(0, CLEAR_LINE);
 	return m_nsc_latch;
 }
 
