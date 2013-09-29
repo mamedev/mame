@@ -7,9 +7,7 @@
 ****************************************************************************/
 
 
-#include "emu.h"
 #include "includes/pp01.h"
-#include "machine/ram.h"
 
 void pp01_state::video_start()
 {

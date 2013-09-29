@@ -7,10 +7,7 @@
 ****************************************************************************/
 
 
-#include "emu.h"
-#include "cpu/i8085/i8085.h"
 #include "includes/pp01.h"
-#include "machine/ram.h"
 
 
 WRITE8_MEMBER(pp01_state::pp01_video_write_mode_w)
@@ -209,7 +206,10 @@ WRITE8_MEMBER(pp01_state::pp01_8255_portb_w)
 
 WRITE8_MEMBER(pp01_state::pp01_8255_portc_w)
 {
-	m_key_line = data & 0x0f;
+	if BIT(data, 4)
+		m_key_line = data & 0x0f;
+	else
+		m_speaker->level_w(BIT(data, 0));
 }
 
 READ8_MEMBER(pp01_state::pp01_8255_portc_r)

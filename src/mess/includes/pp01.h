@@ -7,9 +7,15 @@
 #ifndef PP01_H_
 #define PP01_H_
 
+#include "emu.h"
+#include "cpu/i8085/i8085.h"
+#include "machine/ram.h"
+//#include "machine/i8251.h"
 #include "machine/pit8253.h"
 #include "machine/i8255.h"
-#include "machine/ram.h"
+#include "sound/speaker.h"
+//#include "sound/wave.h"
+//#include "imagedev/cassette.h"
 
 class pp01_state : public driver_device
 {
@@ -18,10 +24,12 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_pit(*this, "pit8253"),
+		m_speaker(*this, "speaker"),
 		m_ram(*this, RAM_TAG) { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<pit8253_device> m_pit;
+	required_device<speaker_sound_device> m_speaker;
 	required_device<ram_device> m_ram;
 	UINT8 m_video_scroll;
 	UINT8 m_memory_block[16];
