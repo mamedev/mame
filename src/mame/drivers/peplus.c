@@ -2809,13 +2809,13 @@ ROM_START( peps0047 ) /* Normal board : Wild Cherry (PS0047) */
 	ROM_LOAD( "ps0047.u68",   0x00000, 0x10000, CRC(b7df1cf8) SHA1(5c5392b7b3a387ccb45fe96310b47078215f2ea0) ) /* Play 2 Coins */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg1004.u72",  0x00000, 0x1000, BAD_DUMP CRC(631ca70e) SHA1(c4d9c4ebc9e90bd1704f154f1bf9b0ce91af35b4) ) /* These should each be 0x8000 bytes */
+	ROM_LOAD( "mro-cg1004.u72",  0x00000, 0x3000, BAD_DUMP CRC(631ca70e) SHA1(c4d9c4ebc9e90bd1704f154f1bf9b0ce91af35b4) ) /* These should each be 0x8000 bytes */
 	ROM_LOAD( "mgo-cg1004.u73",  0x08000, 0x1000, BAD_DUMP CRC(28b4f718) SHA1(91ca3ebf288bb60f43fb0e7aace1f2ada2e978ba) ) /* Needs to redumped as standard 27C256 roms */
-	ROM_LOAD( "mbo-cg1004.u74",  0x10000, 0x3000, BAD_DUMP CRC(542a3a45) SHA1(13569e5bac44c2cffd647c27cf40456494d4612e) )
+	ROM_LOAD( "mbo-cg1004.u74",  0x10000, 0x1000, BAD_DUMP CRC(542a3a45) SHA1(13569e5bac44c2cffd647c27cf40456494d4612e) )
 	ROM_LOAD( "mxo-cg1004.u75",  0x18000, 0x1000, BAD_DUMP CRC(20242083) SHA1(f9c9bbe559516f1d02cd4f0bab69f0f7765780ca) )
 
-	ROM_REGION( 0x200, "proms", 0 )
-	ROM_LOAD( "cap1004.u50", 0x0000, 0x0200, CRC(5eced808) SHA1(b40b8efa8cbc76cff7560c36939275eb360c6f11) )
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "cap1004.u50", 0x0000, 0x0100, CRC(5eced808) SHA1(b40b8efa8cbc76cff7560c36939275eb360c6f11) )
 ROM_END
 
 ROM_START( peps0092 ) /* Normal board : Wild Cherry (PS0092) */
