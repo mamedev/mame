@@ -19,21 +19,23 @@
 
   var writeConnectionStatus = function(message) {
 	// Update the statusbar on each subpage at the same time.
-    document.getElementById('main_statusbar_connectionstatus').innerHTML = message;
-	document.getElementById('command_statusbar_connectionstatus').innerHTML = message;
-	document.getElementById('option_statusbar_connectionstatus').innerHTML = message;
-	document.getElementById('slider_statusbar_connectionstatus').innerHTML = message;
-	document.getElementById('driver_statusbar_connectionstatus').innerHTML = message;
-	document.getElementById('image_statusbar_connectionstatus').innerHTML = message;
-	document.getElementById('info_statusbar_connectionstatus').innerHTML = message;
-	document.getElementById('logs_statusbar_connectionstatus').innerHTML = message;
+	$("td#main_statusbar_connectionstatus").html(message);
+	$("td#command_statusbar_connectionstatus").html(message);
+	$("td#option_statusbar_connectionstatus").html(message);
+	$("td#slider_statusbar_connectionstatus").html(message);
+	$("td#driver_statusbar_connectionstatus").html(message);
+	$("td#image_statusbar_connectionstatus").html(message);
+	$("td#info_statusbar_connectionstatus").html(message);
+	$("td#logs_statusbar_connectionstatus").html(message);
   };
   
   function takeScreenshot()
   {
     // First, we need to generate a random number to make absolutely sure we bypass browser caching.
 	var random=Math.floor(Math.random()*999999999)
-	document.getElementById('screenshot').innerHTML = '<img height="240" width="320" src="/screenshot.png?cachebreaker='+random.toString()+'"/>';
+	$("#screenshot").html('<img height="240" width="320" src="/screenshot.png?cachebreaker='+random.toString()+'"/>');
+	// Navigate back to home so we can see the screenshot.
+	window.location.hash='#mainmenu';
   }
  
   function executeCommands(command)
@@ -148,28 +150,28 @@
 			maindesc_parent.push(data.parent);
 			maindesc_sourcefile.push(data.source_file);
 			
-			document.getElementById('main_statusbar_runningdriver').innerHTML = statusbar_runningdriver.join('');
-			document.getElementById('main_statusbar_ispaused').innerHTML = statusbar_ispaused.join('');
-			document.getElementById('command_statusbar_runningdriver').innerHTML = statusbar_runningdriver.join('');
-			document.getElementById('command_statusbar_ispaused').innerHTML = statusbar_ispaused.join('');
-			document.getElementById('option_statusbar_runningdriver').innerHTML = statusbar_runningdriver.join('');
-			document.getElementById('option_statusbar_ispaused').innerHTML = statusbar_ispaused.join('');
-			document.getElementById('slider_statusbar_runningdriver').innerHTML = statusbar_runningdriver.join('');
-			document.getElementById('slider_statusbar_ispaused').innerHTML = statusbar_ispaused.join('');
-			document.getElementById('driver_statusbar_runningdriver').innerHTML = statusbar_runningdriver.join('');
-			document.getElementById('driver_statusbar_ispaused').innerHTML = statusbar_ispaused.join('');
-			document.getElementById('image_statusbar_runningdriver').innerHTML = statusbar_runningdriver.join('');
-			document.getElementById('image_statusbar_ispaused').innerHTML = statusbar_ispaused.join('');
-			document.getElementById('info_statusbar_runningdriver').innerHTML = statusbar_runningdriver.join('');
-			document.getElementById('info_statusbar_ispaused').innerHTML = statusbar_ispaused.join('');
-			document.getElementById('logs_statusbar_runningdriver').innerHTML = statusbar_runningdriver.join('');
-			document.getElementById('logs_statusbar_ispaused').innerHTML = statusbar_ispaused.join('');
-			document.getElementById('maindesc_name').innerHTML = maindesc_name.join('');
-			document.getElementById('maindesc_description').innerHTML = maindesc_description.join('');
-			document.getElementById('maindesc_year').innerHTML = maindesc_year.join('');
-			document.getElementById('maindesc_manufacturer').innerHTML = maindesc_manufacturer.join('');
-			document.getElementById('maindesc_parent').innerHTML = maindesc_parent.join('');
-			document.getElementById('maindesc_sourcefile').innerHTML = maindesc_sourcefile.join('');
+			$("td#main_statusbar_runningdriver").html(statusbar_runningdriver.join(''));
+			$("td#main_statusbar_ispaused").html(statusbar_ispaused.join(''));
+			$("td#command_statusbar_runningdriver").html(statusbar_runningdriver.join(''));
+			$("td#command_statusbar_ispaused").html(statusbar_ispaused.join(''));
+			$("td#option_statusbar_runningdriver").html(statusbar_runningdriver.join(''));
+			$("td#option_statusbar_ispaused").html(statusbar_ispaused.join(''));
+			$("td#slider_statusbar_runningdriver").html(statusbar_runningdriver.join(''));
+			$("td#slider_statusbar_ispaused").html(statusbar_ispaused.join(''));
+			$("td#driver_statusbar_runningdriver").html(statusbar_runningdriver.join(''));
+			$("td#driver_statusbar_ispaused").html(statusbar_ispaused.join(''));
+			$("td#image_statusbar_runningdriver").html(statusbar_runningdriver.join(''));
+			$("td#image_statusbar_ispaused").html(statusbar_ispaused.join(''));
+			$("td#info_statusbar_runningdriver").html(statusbar_runningdriver.join(''));
+			$("td#info_statusbar_ispaused").html(statusbar_ispaused.join(''));
+			$("td#logs_statusbar_runningdriver").html(statusbar_runningdriver.join(''));
+			$("td#logs_statusbar_ispaused").html(statusbar_ispaused.join(''));
+			$("#maindesc_name").html(maindesc_name.join(''));
+			$("#maindesc_description").html(maindesc_description.join(''));
+			$("#maindesc_year").html(maindesc_year.join(''));
+			$("#maindesc_manufacturer").html(maindesc_manufacturer.join(''));
+			$("#maindesc_parent").html(maindesc_parent.join(''));
+			$("#maindesc_sourcefile").html(maindesc_sourcefile.join(''));
 		  },
 		  error: function (request, status, error) { alert(status + ", " + error); }
 		});	
@@ -264,9 +266,9 @@
 		<h3>
 			<table style="tablelayout: fixed; width: 100%; height: 10px; border-collapse:collapse;" border="0">
 				<tr>
-					<td style="padding: 0px;"<div id="main_statusbar_connectionstatus"></div></td>
-					<td style="padding: 0px;"<div id="main_statusbar_ispaused"></div></td>
-					<td style="width: 80%; padding: 0px;"<div id="main_statusbar_runningdriver"></div></td>
+					<td style="width: 10%; padding: 0px;" id="main_statusbar_connectionstatus"></div></td>
+					<td style="width: 10%; padding: 0px;" id="main_statusbar_ispaused"></div></td>
+					<td style="width: 80%; padding: 0px;" id="main_statusbar_runningdriver"></div></td>
 				</tr>
 			</table> 
 		</h3>
@@ -467,9 +469,9 @@
 		<h3>
 			<table style="tablelayout: fixed; width: 100%; height: 10px; border-collapse:collapse;" border="0">
 				<tr>
-					<td style="padding: 0px;"<div id="command_statusbar_connectionstatus"></div></td>
-					<td style="padding: 0px;"<div id="command_statusbar_ispaused"></div></td>
-					<td style="width: 80%; padding: 0px;"<div id="command_statusbar_runningdriver"></div></td>
+					<td style="width: 10%; padding: 0px;" id="command_statusbar_connectionstatus"></div></td>
+					<td style="width: 10%; padding: 0px;" id="command_statusbar_ispaused"></div></td>
+					<td style="width: 80%; padding: 0px;" id="command_statusbar_runningdriver"></div></td>
 				</tr>
 			</table> 
 		</h3>
@@ -522,9 +524,9 @@
 		<h3>
 			<table style="tablelayout: fixed; width: 100%; height: 10px; border-collapse:collapse;" border="0">
 				<tr>
-					<td style="padding: 0px;"<div id="option_statusbar_connectionstatus"></div></td>
-					<td style="padding: 0px;"<div id="option_statusbar_ispaused"></div></td>
-					<td style="width: 80%; padding: 0px;"<div id="option_statusbar_runningdriver"></div></td>
+					<td style="width: 10%; padding: 0px;" id="option_statusbar_connectionstatus"></div></td>
+					<td style="width: 10%; padding: 0px;" id="option_statusbar_ispaused"></div></td>
+					<td style="width: 80%; padding: 0px;" id="option_statusbar_runningdriver"></div></td>
 				</tr>
 			</table> 
 		</h3>
@@ -578,9 +580,9 @@
 		<h3>
 			<table style="tablelayout: fixed; width: 100%; height: 10px; border-collapse:collapse;" border="0">
 				<tr>
-					<td style="padding:0px;"><div id="slider_statusbar_connectionstatus"></div></td>
-					<td style="padding:0px;"><div id="slider_statusbar_ispaused"></div></td>
-					<td style="width: 80%; padding:0px;"><div id="slider_statusbar_runningdriver"></div></td>
+					<td style="width: 10%; padding: 0px;" id="slider_statusbar_connectionstatus"></div></td>
+					<td style="width: 10%; padding: 0px;" id="slider_statusbar_ispaused"></div></td>
+					<td style="width: 80%; padding: 0px;" id="slider_statusbar_runningdriver"></div></td>
 				</tr>
 			</table> 
 		</h3>
@@ -633,9 +635,9 @@
 		<h3>
 			<table style="tablelayout: fixed; width: 100%; height: 10px; border-collapse:collapse;" border="0">
 				<tr>
-					<td style="padding: 0px;"<div id="driver_statusbar_connectionstatus"></div></td>
-					<td style="padding: 0px;"<div id="driver_statusbar_ispaused"></div></td>
-					<td style="width: 80%; padding: 0px;"<div id="driver_statusbar_runningdriver"></div></td>
+					<td style="width: 10%; padding: 0px;" id="driver_statusbar_connectionstatus"></div></td>
+					<td style="width: 10%; padding: 0px;" id="driver_statusbar_ispaused"></div></td>
+					<td style="width: 80%; padding: 0px;" id="driver_statusbar_runningdriver"></div></td>
 				</tr>
 			</table> 
 		</h3>
@@ -688,9 +690,9 @@
 		<h3>
 			<table style="tablelayout: fixed; width: 100%; height: 10px; border-collapse:collapse;" border="0">
 				<tr>
-					<td style="padding: 0px;"<div id="image_statusbar_connectionstatus"></div></td>
-					<td style="padding: 0px;"<div id="image_statusbar_ispaused"></div></td>
-					<td style="width: 80%; padding: 0px;"<div id="image_statusbar_runningdriver"></div></td>
+					<td style="width: 10%; padding: 0px;" id="image_statusbar_connectionstatus"></div></td>
+					<td style="width: 10%; padding: 0px;" id="image_statusbar_ispaused"></div></td>
+					<td style="width: 80%; padding: 0px;" id="image_statusbar_runningdriver"></div></td>
 				</tr>
 			</table> 
 		</h3>
@@ -743,9 +745,9 @@
 		<h3>
 			<table style="tablelayout: fixed; width: 100%; height: 10px; border-collapse:collapse;" border="0">
 				<tr>
-					<td style="padding: 0px;"<div id="info_statusbar_connectionstatus"></div></td>
-					<td style="padding: 0px;"<div id="info_statusbar_ispaused"></div></td>
-					<td style="width: 80%; padding: 0px;"<div id="info_statusbar_runningdriver"></div></td>
+					<td style="width: 10%; padding: 0px;" id="info_statusbar_connectionstatus"></div></td>
+					<td style="width: 10%; padding: 0px;" id="info_statusbar_ispaused"></div></td>
+					<td style="width: 80%; padding: 0px;" id="info_statusbar_runningdriver"></div></td>
 				</tr>
 			</table> 
 		</h3>
@@ -798,9 +800,9 @@
 		<h3>
 			<table style="tablelayout: fixed; width: 100%; height: 10px; border-collapse:collapse;" border="0">
 				<tr>
-					<td style="padding: 0px;"<div id="logs_statusbar_connectionstatus"></div></td>
-					<td style="padding: 0px;"<div id="logs_statusbar_ispaused"></div></td>
-					<td style="width: 80%; padding: 0px;"<div id="logs_statusbar_runningdriver"></div></td>
+					<td style="width: 10%; padding: 0px;" id="logs_statusbar_connectionstatus"></div></td>
+					<td style="width: 10%; padding: 0px;" id="logs_statusbar_ispaused"></div></td>
+					<td style="width: 80%; padding: 0px;" id="logs_statusbar_runningdriver"></div></td>
 				</tr>
 			</table> 
 		</h3>
