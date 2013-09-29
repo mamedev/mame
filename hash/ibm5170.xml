@@ -242,6 +242,25 @@ Missing files come here
 		</part>
 	</software>
 
+	<software name="drdos6">
+		<description>DR DOS 6.0</description>
+		<year>1991</year>
+		<publisher>Digital Research</publisher>
+		<info name="serial" value="E1182-2160" />
+		<part name="disk1" interface="floppy_3_5">
+			<feature name="part_id" value="Start Up"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="dr dos 6.0 start up.img" size="1474560" crc="d9c340bd" sha1="77d72c23f79c9037dbc0de66cc92e8da2c7b1e9f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="disk2" interface="floppy_3_5">
+			<feature name="part_id" value="Viewmax"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="dr dos 6.0 viewmax.img" size="1474560" crc="46b02859" sha1="dcb33437585ab8e34e93980d12c11b6e36f82e74" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="win95b">
 		<description>Microsoft Windows 95 (Bootdisk)</description>
 		<year>1995</year>
