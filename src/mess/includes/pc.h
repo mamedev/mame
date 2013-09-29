@@ -52,6 +52,7 @@ public:
 	UINT8   m_u73_q2;
 	UINT8   m_out1;
 	UINT8   m_memboard[4];      /* used only by ec1840 and ec1841 */
+	int m_memboards;
 	int m_dma_channel;
 	UINT8 m_dma_offset[2][4];
 	int m_cur_eop;
@@ -91,6 +92,7 @@ public:
 	DECLARE_READ8_MEMBER(unk_r);
 	DECLARE_READ8_MEMBER(ec1841_memboard_r);
 	DECLARE_WRITE8_MEMBER(ec1841_memboard_w);
+	DECLARE_DRIVER_INIT(ec1841);
 	DECLARE_DRIVER_INIT(mc1502);
 	DECLARE_DRIVER_INIT(bondwell);
 	DECLARE_DRIVER_INIT(pcjr);

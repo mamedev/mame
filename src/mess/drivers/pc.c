@@ -140,7 +140,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ec1841_map, AS_PROGRAM, 16, pc_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000, 0x7ffff) AM_RAMBANK("bank10") // up to 4 banks
+	AM_RANGE(0x00000, 0x7ffff) AM_RAM
 	AM_RANGE(0xa0000, 0xbffff) AM_NOP
 	AM_RANGE(0xc0000, 0xc7fff) AM_ROM
 	AM_RANGE(0xc8000, 0xcffff) AM_ROM
@@ -879,6 +879,35 @@ static INPUT_PORTS_START( mc1502 )          /* fix */
 	PORT_INCLUDE( pcvideo_mc1502 )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( ec1841 )
+	PORT_START("DSW0") /* SA1 */
+	PORT_DIPNAME( 0xc0, 0x40, "Number of floppy drives")
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x40, "2" )
+	PORT_DIPSETTING(    0x80, "3" )
+	PORT_DIPSETTING(    0xc0, "4" )
+	PORT_DIPNAME( 0x30, 0x20, "Graphics adapter")
+	PORT_DIPSETTING(    0x00, "Reserved" )
+	PORT_DIPSETTING(    0x10, "Color 40x25" )
+	PORT_DIPSETTING(    0x20, "Color 80x25" )
+	PORT_DIPSETTING(    0x30, "Monochrome" )
+	PORT_BIT(     0x08, 0x08, IPT_UNUSED )
+	PORT_DIPNAME( 0x04, 0x04, "Floppy type")
+	PORT_DIPSETTING(    0x00, "80 tracks" )
+	PORT_DIPSETTING(    0x04, "40 tracks" )
+	PORT_DIPNAME( 0x02, 0x00, "8087 installed")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x01, 0x01, "Boot from floppy")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
+
+//	PORT_START("DSW1") /* SA2 */
+
+	PORT_INCLUDE( pcvideo_cga )
+INPUT_PORTS_END
+
+
 
 static const pc_lpt_interface pc_lpt_config =
 {
@@ -1523,14 +1552,13 @@ static MACHINE_CONFIG_START( ec1841, pc_state )
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list","ec1841")
 
-	/* keyboard -- needs dump */
 	MCFG_PC_KBDC_ADD("pc_kbdc", pc_kbdc_intf)
-	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270)
+	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_EC_1841)
 
 	/* internal ram -- up to 4 banks of 512K */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("512K")
-//  MCFG_RAM_EXTRA_OPTIONS("640K,1024K,1576K,2048K")
+	MCFG_RAM_EXTRA_OPTIONS("1024K,1576K,2048K")
 MACHINE_CONFIG_END
 
 
@@ -2540,7 +2568,7 @@ COMP( 1989, iskr1030m,  ibm5150,    0,          iskr1031,   pccga, pc_state,    
 COMP( 1992, iskr3104,   ibm5150,    0,          iskr3104,   pcega, pc_state,      pccga,      "Schetmash", "Iskra 3104", GAME_NOT_WORKING)
 COMP( 198?, asst128,    ibm5150,    0,          asst128,    pccga, pc_state,      pccga,      "Schetmash", "Assistent 128", GAME_NOT_WORKING)
 COMP( 1987, ec1840,     ibm5150,    0,          iskr1031,   pccga, pc_state,      pccga,      "<unknown>", "EC-1840", GAME_NOT_WORKING)
-COMP( 1987, ec1841,     ibm5150,    0,          ec1841,     pccga, pc_state,      pccga,      "<unknown>", "EC-1841", GAME_NOT_WORKING)
+COMP( 1987, ec1841,     ibm5150,    0,          ec1841,     ec1841, pc_state,     ec1841,     "<unknown>", "EC-1841", GAME_NOT_WORKING)
 COMP( 1989, ec1845,     ibm5150,    0,          iskr1031,   pccga, pc_state,      pccga,      "<unknown>", "EC-1845", GAME_NOT_WORKING)
 COMP( 1989, mk88,       ibm5150,    0,          iskr1031,   pccga, pc_state,      pccga,      "<unknown>", "MK-88", GAME_NOT_WORKING)
 COMP( 1990, poisk1,     ibm5150,    0,          iskr1031,   pccga, pc_state,      pccga,      "<unknown>", "Poisk-1", GAME_NOT_WORKING)

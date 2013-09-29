@@ -88,7 +88,16 @@
 READ8_MEMBER(pc_state::ec1841_memboard_r)
 {
 	pc_state *st = space.machine().driver_data<pc_state>();
-	return st->m_memboard[(offset % 4)];
+	UINT8 data;
+
+	data = offset % 4;
+	if (data > m_memboards)
+		data = 0xff;
+	else
+		data = st->m_memboard[data];
+	DBG_LOG(1,"ec1841_memboard",("R (%d of %d) == %02X\n", offset, m_memboards, data ));
+
+	return data;
 }
 
 WRITE8_MEMBER(pc_state::ec1841_memboard_w)
@@ -97,15 +106,13 @@ WRITE8_MEMBER(pc_state::ec1841_memboard_w)
 	address_space &program = st->m_maincpu->space(AS_PROGRAM);
 	UINT8 current;
 
-	DBG_LOG(1,"ec1841_memboard_w",("(%d) <- %02X\n", offset, data));
+	current = st->m_memboard[offset];
 
-	// for now, handle only board 0
-	if (offset > 0) {
-		st->m_memboard[offset] = data;
+	DBG_LOG(1,"ec1841_memboard",("W (%d of %d) <- %02X (%02X)\n", offset, m_memboards, data, current));
+
+	if (offset > m_memboards) {
 		return;
 	}
-
-	current = st->m_memboard[offset];
 
 	if (BIT(current, 2) && !BIT(data, 2)) {
 		// disable read access
@@ -120,14 +127,20 @@ WRITE8_MEMBER(pc_state::ec1841_memboard_w)
 	}
 
 	if (!BIT(current, 2) && BIT(data, 2)) {
+		for(int i=0; i<4; i++)
+			st->m_memboard[i] &= 0xfb;
 		// enable read access
+		membank("bank10")->set_base(m_ram->pointer() + offset*0x80000);
 		program.install_read_bank(0, 0x7ffff, "bank10");
 		DBG_LOG(1,"ec1841_memboard_w",("map_read(%d)\n", offset));
 	}
 
 	if (!BIT(current, 3) && BIT(data, 3)) {
+		for(int i=0; i<4; i++)
+			st->m_memboard[i] &= 0xf7;
 		// enable write access
-		program.install_write_bank(0, 0x7ffff, "bank10");
+		membank("bank20")->set_base(m_ram->pointer() + offset*0x80000);
+		program.install_write_bank(0, 0x7ffff, "bank20");
 		DBG_LOG(1,"ec1841_memboard_w",("map_write(%d)\n", offset));
 	}
 
@@ -1470,6 +1483,18 @@ DRIVER_INIT_MEMBER(pc_state,mc1502)
 	mess_init_pc_common(NULL);
 }
 
+DRIVER_INIT_MEMBER(pc_state,ec1841)
+{
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+
+	program.install_read_bank(0, 0x7ffff, "bank10");
+	program.install_write_bank(0, 0x7ffff, "bank20");
+	membank( "bank10" )->set_base( m_ram->pointer() );
+	membank( "bank20" )->set_base( m_ram->pointer() );
+
+	pc_rtc_init();
+}
+
 
 IRQ_CALLBACK_MEMBER(pc_state::pc_irq_callback)
 {
@@ -1507,6 +1532,14 @@ MACHINE_RESET_MEMBER(pc_state,pc)
 	m_ppi_shift_enable = 0;
 
 	m_speaker->level_w(0);
+
+	// ec1841-specific code
+	m_memboards = m_ram->size()/(512*1024) - 1; 
+	if (m_memboards > 3)
+		m_memboards = 3;
+	memset(m_memboard,0,sizeof(m_memboard));
+	// mark 1st board enabled
+	m_memboard[0]=0xc;
 }
 
 
@@ -1548,7 +1581,6 @@ MACHINE_RESET_MEMBER(pc_state,pcjr)
 	m_pc_spkrdata = 0;
 	m_pc_input = 1;
 	m_dma_channel = -1;
-	memset(m_memboard,0xc,sizeof(m_memboard));  // check
 	memset(m_dma_offset,0,sizeof(m_dma_offset));
 	m_ppi_portc_switch_high = 0;
 	m_ppi_speaker = 0;

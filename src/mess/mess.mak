@@ -1828,6 +1828,7 @@ $(MESSOBJ)/pcshare.a:           \
 	$(MESS_MACHINE)/pc_joy.o    \
 	$(MESS_MACHINE)/pc_joy_sw.o \
 	$(MESS_MACHINE)/pc_keyboards.o \
+	$(MESS_MACHINE)/kb_ec1841.o \
 	$(MESS_MACHINE)/kb_keytro.o \
 	$(MESS_MACHINE)/kb_msnat.o  \
 	$(MESS_MACHINE)/kb_pc83.o   \
