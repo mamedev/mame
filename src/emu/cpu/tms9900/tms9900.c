@@ -177,6 +177,7 @@ void tms99xx_device::device_start()
 	m_clock_out_line.resolve(conf->clock_out, *this);
 	m_wait_line.resolve(conf->wait_line, *this);
 	m_holda_line.resolve(conf->holda_line, *this);
+	m_dbin_line.resolve(conf->dbin_line, *this);        // we need this for the set_address operation
 
 	// set our instruction counter
 	m_icountptr = &m_icount;
@@ -202,7 +203,7 @@ void tms99xx_device::device_start()
 void tms99xx_device::device_stop()
 {
 	int k = 0;
-	if (VERBOSE>8) LOG("tms99xx: Deleting lookup tables\n");
+	if (VERBOSE>3) LOG("tms99xx: Deleting lookup tables\n");
 	while (m_lotables[k]!=NULL) delete[] m_lotables[k++];
 }
 
@@ -1122,18 +1123,18 @@ void tms99xx_device::execute_run()
 				m_program[MPC] != MEMORY_READ && m_program[MPC] != MEMORY_WRITE &&
 				m_program[MPC] != REG_READ && m_program[MPC] != REG_WRITE)))
 			{
-				if (VERBOSE>5) LOG("tms99xx: hold state\n");
+				if (VERBOSE>2) LOG("tms99xx: hold state\n");
 				if (!m_hold_acknowledged) acknowledge_hold();
 				pulse_clock(1);
 			}
 			else
 			{
 				// Normal operation
-				if (m_check_ready && m_ready_state == false)
+				if (m_check_ready && m_ready == false)
 				{
 					// We are in a wait state
 					set_wait_state(true);
-					if (VERBOSE>5) LOG("tms99xx: wait state\n");
+					if (VERBOSE>2) LOG("tms99xx: wait state\n");
 					// The clock output should be used to change the state of an outer
 					// device which operates the READY line
 					pulse_clock(1);
@@ -1157,6 +1158,7 @@ void tms99xx_device::execute_run()
 					{
 						m_pass = 1;
 						MPC++;
+						m_mem_phase = 1;
 						m_iaq_line(CLEAR_LINE);
 					}
 				}
@@ -1214,9 +1216,10 @@ void tms99xx_device::service_interrupt()
 	m_command = INTR;
 	m_idle_state = false;
 	m_external_operation(IDLE_OP, 0);
-	m_lowbyte = false;
 
 	m_state = 0;
+
+	m_dbin_line(ASSERT_LINE);
 
 	// If reset, we just start with execution, otherwise we put the MPC
 	// on the first microinstruction, which also means that the main loop shall
@@ -1227,13 +1230,15 @@ void tms99xx_device::service_interrupt()
 	{
 		m_irq_level = RESET_INT;
 
-		m_ready_state = true;
+		m_ready_bufd = true;
+		m_ready = true;
 		m_load_state = false;
 		m_hold_state = false;
 		m_hold_acknowledged = false;
 		m_wait_state = false;
 		IR = 0;
 		ST = 0;
+		m_mem_phase = 1;
 
 		m_reset = false;
 	}
@@ -1251,9 +1256,14 @@ void tms99xx_device::pulse_clock(int count)
 	for (int i=0; i < count; i++)
 	{
 		m_clock_out_line(ASSERT_LINE);
+		m_ready = m_ready_bufd;              // get the latched READY state
 		m_clock_out_line(CLEAR_LINE);
 		m_icount--;                         // This is the only location where we count down the cycles.
-		if (VERBOSE>7) LOG("tms99xx: pulse_clock\n");
+		if (VERBOSE>7)
+		{
+			if (m_check_ready) LOG("tms99xx: pulse_clock, READY=%d\n", m_ready? 1:0);
+			else LOG("tms99xx: pulse_clock\n");
+		}
 	}
 }
 
@@ -1280,11 +1290,12 @@ inline void tms99xx_device::acknowledge_hold()
 }
 
 /*
-    Signal READY to the CPU. When cleared, the CPU enters wait states.
+    Signal READY to the CPU. When cleared, the CPU enters wait states. This
+    becomes effective on a clock pulse.
 */
 void tms99xx_device::set_ready(int state)
 {
-	m_ready_state = (state==ASSERT_LINE);
+	m_ready_bufd = (state==ASSERT_LINE);
 }
 
 void tms99xx_device::abort_operation()
@@ -1344,7 +1355,7 @@ void tms99xx_device::decode(UINT16 inst)
 		m_program = decoded->prog;
 		MPC = -1;
 		m_command = decoded->id;
-		if (VERBOSE>7) LOG("tms99xx: Command decoded as id %d, %s, base opcode %04x\n", m_command, opname[m_command], decoded->opcode);
+		if (VERBOSE>8) LOG("tms99xx: Command decoded as id %d, %s, base opcode %04x\n", m_command, opname[m_command], decoded->opcode);
 		// Byte operations are either format 1 with the byte flag set
 		// or format 4 (CRU multi bit operations) with 1-8 bits to transfer.
 		m_byteop = ((decoded->format==1 && ((IR & 0x1000)!=0))
@@ -1360,77 +1371,107 @@ inline bool tms99xx_device::byte_operation()
 
 void tms99xx_device::acquire_instruction()
 {
-	m_iaq_line(ASSERT_LINE);
-	m_address = PC;
-	m_first_cycle = m_icount;
+	if (m_mem_phase == 1)
+	{
+		m_iaq_line(ASSERT_LINE);
+		m_address = PC;
+		m_first_cycle = m_icount;
+	}
+
 	mem_read();
-	decode(m_current_value);
-	if (VERBOSE>3) LOG("tms99xx: ===== Next operation %04x (%s) at %04x =====\n", IR, opname[m_command], PC);
-	debugger_instruction_hook(this, PC);
-	PC = (PC + 2) & 0xfffe & m_prgaddr_mask;
-	// IAQ will be cleared in the main loop
+
+	if (m_mem_phase == 1)
+	{
+		decode(m_current_value);
+		if (VERBOSE>3) LOG("tms99xx: ===== Next operation %04x (%s) at %04x =====\n", IR, opname[m_command], PC);
+		debugger_instruction_hook(this, PC);
+		PC = (PC + 2) & 0xfffe & m_prgaddr_mask;
+		// IAQ will be cleared in the main loop
+	}
 }
 
 /*
-    Memory read:
-    1) Pulse clock (done above)
-    2) Set address (we also get the value right here)
-    3) Pulse clock
-    4) If READY=L (WAIT=H, GOTO 3) else (WAIT=L, STOP)
-
+    Memory read
     Clock cycles: 2 + W, W = number of wait states
 */
 void tms99xx_device::mem_read()
 {
-	// The following line will be taken out of this method and
-	// be executed at an earlier microprogram clock tick
 	// After set_address, any device attached to the address bus may pull down
 	// READY in order to put the CPU into wait state before the read_word
 	// operation will be performed
 	// set_address and read_word should pass the same address as argument
-	m_prgspace->set_address(m_address & m_prgaddr_mask & 0xfffe);
+	if (m_mem_phase==1)
+	{
+		m_dbin_line(ASSERT_LINE);
+		m_prgspace->set_address(m_address & m_prgaddr_mask & 0xfffe);
+		m_check_ready = true;
+		m_mem_phase = 2;
+		m_pass = 2;
+		if (VERBOSE>7) LOG("tms99xx: set address bus %04x\n", m_address);
 
-	m_current_value = m_prgspace->read_word(m_address & m_prgaddr_mask & 0xfffe);
-	pulse_clock(2);
-	m_check_ready = true;
-	if (VERBOSE>7) LOG("tms99xx: memory read %04x -> %04x\n", m_address, m_current_value);
+		pulse_clock(1); // Concludes the first cycle
+		// If READY has been found to be low, the CPU will now stay in the wait state loop
+	}
+	else
+	{
+		// Second phase (after READY was raised again)
+		m_current_value = m_prgspace->read_word(m_address & m_prgaddr_mask & 0xfffe);
+		pulse_clock(1);
+		m_dbin_line(CLEAR_LINE);
+		m_mem_phase = 1;        // reset to phase 1
+		if (VERBOSE>7) LOG("tms99xx: memory read %04x -> %04x\n", m_address, m_current_value);
+	}
 }
 
 void tms99xx_device::mem_write()
 {
-	// see mem_read
-	m_prgspace->set_address(m_address & m_prgaddr_mask & 0xfffe);
-
-	m_prgspace->write_word(m_address & m_prgaddr_mask & 0xfffe, m_current_value);
-	pulse_clock(2);
-	m_check_ready = true;
-	if (VERBOSE>7) LOG("tms99xx: memory write %04x <- %04x\n", m_address, m_current_value);
+	if (m_mem_phase==1)
+	{
+		m_dbin_line(CLEAR_LINE);
+		// When writing, the data bus is asserted immediately after the address bus
+		if (VERBOSE>7) LOG("tms99xx: set address bus %04x\n", m_address);
+		m_prgspace->set_address(m_address & m_prgaddr_mask & 0xfffe);
+		if (VERBOSE>7) LOG("tms99xx: memory write %04x <- %04x\n", m_address, m_current_value);
+		m_prgspace->write_word(m_address & m_prgaddr_mask & 0xfffe, m_current_value);
+		m_check_ready = true;
+		m_mem_phase = 2;
+		m_pass = 2;
+		pulse_clock(1);
+	}
+	else
+	{
+		// Second phase (we arrive here when the wait states are over)
+		pulse_clock(1);
+	}
 }
 
 void tms99xx_device::register_read()
 {
 	// Need to set m_address for F1/F3 (we don't know what the data_derive did)
-	m_address = WP + (m_regnumber<<1);
+	if (m_mem_phase==1)
+	{
+		m_address = WP + (m_regnumber<<1);
+	}
+
 	mem_read();
-	m_check_ready = true;
-	m_register_contents = m_current_value;
+
+	if (m_mem_phase==1)
+	{
+		m_register_contents = m_current_value;
+	}
 }
 
 /*
     Memory write:
-    1) Pulse clock
-    2) Set address and write (as in the real system)
-    3) Pulse clock
-    4) If READY=L (WAIT=H, GOTO 3) else (WAIT=L, STOP)
 
     Clock cycles: 2 + W, W = number of wait states
 */
 void tms99xx_device::register_write()
 {
+	// This will be called twice; m_pass is set by the embedded mem_write
 	UINT16 addr_save = m_address;
 	m_address = (WP + (m_regnumber<<1)) & m_prgaddr_mask & 0xfffe;
 	mem_write();
-	m_check_ready = true;
 	m_address = addr_save;
 }
 
@@ -1530,13 +1571,13 @@ void tms99xx_device::command_completed()
 	// Pseudo state at the end of the current instruction cycle sequence
 	if (VERBOSE>4)
 	{
-		LOG("tms99xx: +++++ Instruction %04x (%s) completed +++++\n", IR, opname[m_command]);
+		LOG("tms99xx: +++++ Instruction %04x (%s) completed", IR, opname[m_command]);
 		int cycles =  m_first_cycle - m_icount;
 		// Avoid nonsense values due to expired and resumed main loop
-		if (cycles > 0 && cycles < 10000) LOG("tms99xx: Consumed %d cycles\n", cycles);
+		if (cycles > 0 && cycles < 10000) LOG(", consumed %d cycles", cycles);
+		LOG(" +++++\n");
 	}
 	m_program = NULL;
-	m_lowbyte = false;
 }
 
 /*

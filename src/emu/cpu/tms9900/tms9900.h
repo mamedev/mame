@@ -117,6 +117,7 @@ struct tms99xx_config
 	devcb_write_line    clock_out;
 	devcb_write_line    wait_line;
 	devcb_write_line    holda_line;
+	devcb_write_line    dbin_line;
 };
 
 #define TMS99xx_CONFIG(name) \
@@ -208,11 +209,11 @@ protected:
 	// Data bus width. Needed for TMS9980.
 	int     m_databus_width;
 
-	// Needed for TMS9980
-	bool    m_lowbyte;
-
 	// Check the READY line?
 	bool    m_check_ready;
+
+	// Phase of the memory access
+	int     m_mem_phase;
 
 	// Max address
 	const UINT16  m_prgaddr_mask;
@@ -238,13 +239,22 @@ protected:
 	// Get the value of the interrupt level lines
 	devcb_resolved_read8    m_get_intlevel;
 
+	// DBIN line. When asserted (high), the CPU has disabled the data bus output buffers.
+	devcb_resolved_write_line   m_dbin_line;
+
 private:
 	// Indicates if this is a byte-oriented command
 	inline bool     byte_operation();
 
 	// Processor states
 	bool    m_idle_state;
-	bool    m_ready_state;
+
+	// READY handling. The READY line is operated before the phi1 clock
+	// pulse rises. As the ready line is only set once in this emulation we
+	// keep the level in a buffer (like a latch)
+	bool    m_ready_bufd;   // buffered state
+	bool    m_ready;        // sampled value
+
 	bool    m_wait_state;
 	bool    m_hold_state;
 

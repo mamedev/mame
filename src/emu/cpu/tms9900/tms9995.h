@@ -65,8 +65,8 @@ struct tms9995_config
 	devcb_write8        external_callback;
 	devcb_write_line    iaq_line;
 	devcb_write_line    clock_out;
-	devcb_write_line    wait_line;
 	devcb_write_line    holda_line;
+	devcb_write_line    dbin_line;
 	int                 mode;
 	int                 overflow;
 };
@@ -151,18 +151,23 @@ private:
 	bool    m_idle_state;
 	bool    m_nmi_state;
 	bool    m_irq_state;
-	bool    m_ready_state;
-	bool    m_wait_state;
 	bool    m_hold_state;
 
+	// READY handling. The READY line is operated before the clock
+	// pulse falls. As the ready line is only set once in this emulation we
+	// keep the level in a buffer (like a latch)
+	bool    m_ready_bufd;   // buffered state
+	bool    m_ready;        // sampled value
+
 	// Auto-wait state generation
-	bool    m_auto_wait_state;
+	bool    m_request_auto_wait_state;
+	bool    m_auto_wait;
 
 	// Cycle counter
 	int     m_icount;
 
-	// The next memory access will address the low byte
-	bool    m_lowbyte;
+	// Phase of the memory access
+	int     m_mem_phase;
 
 	// Check the READY line?
 	bool    m_check_ready;
@@ -195,6 +200,7 @@ private:
 	bool    m_int_overflow;
 
 	bool    m_reset;
+	bool    m_from_reset;
 	bool    m_mid_flag;
 
 	// Flag field
@@ -213,10 +219,7 @@ private:
 	// Issue clock pulses. The TMS9995 uses one (output) clock cycle per machine cycle.
 	inline void pulse_clock(int count);
 
-	// Signal the wait state via the external line
-	inline void set_wait_state(bool state);
-
-	// Signal the wait state via the external line
+	// Signal the hold state via the external line
 	inline void set_hold_state(bool state);
 
 	// Only used for the DIV(S) operations. It seems sufficient to let the
@@ -434,11 +437,11 @@ private:
 	// Clock output.
 	devcb_resolved_write_line   m_clock_out_line;
 
-	// Wait output. When asserted (high), the CPU is in a wait state.
-	devcb_resolved_write_line   m_wait_line;
-
 	// Asserted when the CPU is in a HOLD state
 	devcb_resolved_write_line   m_holda_line;
+
+	// DBIN line. When asserted (high), the CPU has disabled the data bus output buffers.
+	devcb_resolved_write_line   m_dbin_line;
 };
 
 // device type definition

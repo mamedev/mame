@@ -158,8 +158,8 @@ void tms9995_device::device_start()
 	m_external_operation.resolve(conf->external_callback, *this);
 	m_iaq_line.resolve(conf->iaq_line, *this);
 	m_clock_out_line.resolve(conf->clock_out, *this);
-	m_wait_line.resolve(conf->wait_line, *this);
 	m_holda_line.resolve(conf->holda_line, *this);
+	m_dbin_line.resolve(conf->dbin_line, *this);
 
 	m_mp9537 = (conf->mode==NO_INTERNAL_RAM);
 	m_check_overflow = (conf->overflow==OVERFLOW_INT);
@@ -1086,10 +1086,9 @@ void tms9995_device::execute_run()
 	do
 	{
 		// Normal operation
-		if (m_check_ready && m_ready_state == false)
+		if (m_check_ready && m_ready == false)
 		{
 			// We are in a wait state
-			set_wait_state(true);
 			if (VERBOSE>2) LOG("tms9995: wait state\n");
 			// The clock output should be used to change the state of an outer
 			// device which operates the READY line
@@ -1105,7 +1104,6 @@ void tms9995_device::execute_run()
 			}
 			else
 			{
-				set_wait_state(false);
 				set_hold_state(false);
 
 				m_check_ready = false;
@@ -1189,9 +1187,15 @@ inline void tms9995_device::pulse_clock(int count)
 	for (int i=0; i < count; i++)
 	{
 		m_clock_out_line(ASSERT_LINE);
+		m_ready = m_ready_bufd && !m_request_auto_wait_state;                // get the latched READY state
 		m_clock_out_line(CLEAR_LINE);
 		m_icount--;                         // This is the only location where we count down the cycles.
-		if (VERBOSE>7) LOG("tms9995: pulse_clock\n");
+		if (VERBOSE>7)
+		{
+			if (m_check_ready) LOG("tms9995: pulse_clock, READY=%d, auto_wait=%d\n", m_ready_bufd? 1:0, m_auto_wait? 1:0);
+			else LOG("tms9995: pulse_clock\n");
+		}
+		m_request_auto_wait_state = false;
 		if (m_flag[0] == false && m_flag[1] == true) trigger_decrementer();
 	}
 }
@@ -1210,12 +1214,13 @@ void tms9995_device::set_hold(int state)
 }
 
 /*
-    Signal READY to the CPU. When cleared, the CPU enters wait states.
+    Signal READY to the CPU. When cleared, the CPU enters wait states. This
+    becomes effective on a clock pulse.
 */
 void tms9995_device::set_ready(int state)
 {
-	if (VERBOSE>5) LOG("tms9995: set READY = %d\n", state);
-	m_ready_state = (state==ASSERT_LINE);
+	m_ready_bufd = (state==ASSERT_LINE);
+	if (VERBOSE>7) LOG("tms9995: set READY = %d\n", m_ready_bufd? 1 : 0);
 }
 
 /*
@@ -1227,16 +1232,7 @@ void tms9995_device::abort_operation()
 	// And don't forget that prefetch is a 2-pass operation, so this method
 	// will be called a second time. Only when the lowbyte has been fetched,
 	// continue with the next step
-	if (!m_lowbyte) command_completed();
-}
-
-/*
-    Enter or leave the wait state. We only operate the WAIT line when there is a change.
-*/
-inline void tms9995_device::set_wait_state(bool state)
-{
-	if (m_wait_state != state) m_wait_line(state? ASSERT_LINE : CLEAR_LINE);
-	m_wait_state = state;
+	if (m_mem_phase==1) command_completed();
 }
 
 /*
@@ -1307,56 +1303,55 @@ void tms9995_device::int_prefetch_and_decode()
 	bool check_int = (m_instruction->command != XOP && m_instruction->command != BLWP);
 	int intmask = ST & 0x000f;
 
-	if (m_lowbyte)
+	if (m_mem_phase == 1)
 	{
-		prefetch_and_decode();
-		return;
-	}
-
-	// Check interrupt lines
-	if (m_nmi_active)
-	{
-		if (VERBOSE>7) LOG("tms9995: Checking interrupts ... NMI active\n");
-		m_int_pending |= PENDING_NMI;
-		m_idle_state = false;
-		PC = (PC + 2) & 0xfffe;     // we have not prefetched the next instruction
-	}
-	else
-	{
-		m_int_pending = 0;
-
-		if (m_int1_active && intmask >= 1 && check_int) m_int_pending |= PENDING_LEVEL1;
-		if (m_int_overflow && intmask >= 2 && check_int) m_int_pending |= PENDING_OVERFLOW;
-		if (m_int_decrementer && intmask >= 3 && check_int) m_int_pending |= PENDING_DECR;
-		if (m_int4_active && intmask >= 4 && check_int) m_int_pending |= PENDING_LEVEL4;
-
-		if (m_int_pending!=0)
+		// Check interrupt lines
+		if (m_nmi_active)
 		{
-			if (m_idle_state)
-			{
-				m_idle_state = false;
-				if (VERBOSE>7) LOG("tms9995: Interrupt occured, terminate IDLE state\n");
-			}
-			PC = PC + 2;        // PC must be advanced (see flow chart), but no prefetch
-			if (VERBOSE>7) LOG("tms9995: Interrupts pending; no prefetch; advance PC to %04x\n", PC);
+			if (VERBOSE>7) LOG("tms9995: Checking interrupts ... NMI active\n");
+			m_int_pending |= PENDING_NMI;
+			m_idle_state = false;
+			PC = (PC + 2) & 0xfffe;     // we have not prefetched the next instruction
+			return;
 		}
 		else
 		{
-			if (VERBOSE>7) LOG("tms9995: Checking interrupts ... none pending\n");
-			// No pending interrupts
-			if (check_idle && m_idle_state)
+			m_int_pending = 0;
+
+			if (m_int1_active && intmask >= 1 && check_int) m_int_pending |= PENDING_LEVEL1;
+			if (m_int_overflow && intmask >= 2 && check_int) m_int_pending |= PENDING_OVERFLOW;
+			if (m_int_decrementer && intmask >= 3 && check_int) m_int_pending |= PENDING_DECR;
+			if (m_int4_active && intmask >= 4 && check_int) m_int_pending |= PENDING_LEVEL4;
+
+			if (m_int_pending!=0)
 			{
-				if (VERBOSE>7) LOG("tms9995: IDLE state\n");
-				// We are IDLE, stay in the loop and do not advance the PC
-				m_pass = 2;
-				pulse_clock(1);
+				if (m_idle_state)
+				{
+					m_idle_state = false;
+					if (VERBOSE>7) LOG("tms9995: Interrupt occured, terminate IDLE state\n");
+				}
+				PC = PC + 2;        // PC must be advanced (see flow chart), but no prefetch
+				if (VERBOSE>7) LOG("tms9995: Interrupts pending; no prefetch; advance PC to %04x\n", PC);
+				return;
 			}
 			else
 			{
-				prefetch_and_decode();
+				if (VERBOSE>7) LOG("tms9995: Checking interrupts ... none pending\n");
+				// No pending interrupts
+				if (check_idle && m_idle_state)
+				{
+					if (VERBOSE>7) LOG("tms9995: IDLE state\n");
+					// We are IDLE, stay in the loop and do not advance the PC
+					m_pass = 2;
+					pulse_clock(1);
+					return;
+				}
 			}
 		}
 	}
+
+	// We reach this point in phase 1 if there is no interrupt and in all other phases
+	prefetch_and_decode();
 }
 
 /*
@@ -1367,46 +1362,28 @@ void tms9995_device::int_prefetch_and_decode()
 */
 void tms9995_device::prefetch_and_decode()
 {
-	if (m_lowbyte)
-	{
-		// Second pass for getting the instruction
-		if (VERBOSE>6) LOG("tms9995: Prefetch memory access (second pass)\n");
-		word_read();
-		decode(m_current_value);            // This is for free; in reality it is in parallel with the next memory operation
-		m_address = m_address_copy;     // restore m_address
-		m_current_value = m_value_copy; // restore m_current_value
-		PC = (PC + 2) & 0xfffe;     // advance PC
-		m_iaq_line(CLEAR_LINE);
-		if (VERBOSE>5) LOG("tms9995: ++++ Prefetch done ++++\n");
-		m_lowbyte = false;
-	}
-	else
+	if (m_mem_phase==1)
 	{
 		// Fetch next instruction
 		// Save these values; they have been computed during the current instruction execution
 		m_address_copy = m_address;
 		m_value_copy = m_current_value;
-
 		m_iaq_line(ASSERT_LINE);
-
 		m_address = PC;
-
 		if (VERBOSE>5) LOG("tms9995: **** Prefetching new instruction at %04x ****\n", PC);
+	}
 
-		m_lowbyte = false;  // for mem_read
-		word_read();            // this is where the clock pulses occur
+	word_read();
 
-		if (!m_lowbyte)
-		{
-			// Only if we got the word in one pass
-			decode(m_current_value);    // This is for free; in reality it is in parallel with the next memory operation
-
-			m_address = m_address_copy;         // restore m_address
-			m_current_value = m_value_copy;     // restore m_current_value
-			PC = (PC + 2) & 0xfffe;     // advance PC
-
-			m_iaq_line(CLEAR_LINE);
-		}
+	if (m_mem_phase==1)
+	{
+		// We're back in phase 1, i.e. the whole prefetch is done
+		decode(m_current_value);    // This is for free; in reality it is in parallel with the next memory operation
+		m_address = m_address_copy;     // restore m_address
+		m_current_value = m_value_copy; // restore m_current_value
+		PC = (PC + 2) & 0xfffe;     // advance PC
+		m_iaq_line(CLEAR_LINE);
+		if (VERBOSE>5) LOG("tms9995: ++++ Prefetch done ++++\n");
 	}
 }
 
@@ -1447,10 +1424,11 @@ void tms9995_device::command_completed()
 	// Pseudo state at the end of the current instruction cycle sequence
 	if (VERBOSE>4)
 	{
-		LOG("tms9995: +++++ Instruction %04x (%s) completed +++++\n", m_instruction->IR, opname[m_instruction->command]);
+		LOG("tms9995: +++++ Instruction %04x (%s) completed", m_instruction->IR, opname[m_instruction->command]);
 		int cycles =  m_first_cycle - m_icount;
 		// Avoid nonsense values due to expired and resumed main loop
-		if (cycles > 0 && cycles < 10000) LOG("tms9995: Consumed %d cycles\n", cycles);
+		if (cycles > 0 && cycles < 10000) LOG(", consumed %d cycles", cycles);
+		LOG(" +++++\n");
 	}
 
 	if (m_int_pending != 0)
@@ -1484,8 +1462,7 @@ void tms9995_device::service_interrupt()
 
 		m_nmi_state = false;
 		m_hold_state = false;
-		m_wait_state = false;
-		m_lowbyte = false;
+		m_mem_phase = 1;
 		m_check_hold = false;
 		m_word_access = false;
 		m_int4_active = false;
@@ -1500,9 +1477,10 @@ void tms9995_device::service_interrupt()
 
 		// The auto-wait state generation is turned on when the READY line is cleared
 		// on RESET.
-		m_auto_wait_state = !m_ready_state;
-		if (VERBOSE>0) LOG("tms9995: RESET; automatic wait state creation is %s\n", m_auto_wait_state? "enabled":"disabled");
-		m_ready_state = true;
+		m_auto_wait = !m_ready_bufd;
+		if (VERBOSE>0) LOG("tms9995: RESET; automatic wait state creation is %s\n", m_auto_wait? "enabled":"disabled");
+		// We reset the READY flag, or the CPU will not start
+		m_ready_bufd = true;
 	}
 	else
 	{
@@ -1574,6 +1552,7 @@ void tms9995_device::service_interrupt()
 	m_instruction->byteop = false;
 	m_instruction->command = INTR;
 	m_pass = m_reset? 1 : 2;
+	m_from_reset = m_reset;
 
 	if (m_reset)
 	{
@@ -1604,7 +1583,7 @@ void tms9995_device::service_interrupt()
 void tms9995_device::mem_read()
 {
 	// First determine whether the memory is inside the CPU
-	// On-chip memory is F000 ... F0F9, F0FC-FFF9 = off-chip, FFFA/B = Decrementer
+	// On-chip memory is F000 ... F0F9, F0FA-FFF9 = off-chip, FFFA/B = Decrementer
 	// FFFC-FFFF = NMI vector (on-chip)
 	// There is a variant of the TMS9995 with no on-chip RAM which was used
 	// for the TI-99/8 (9537).
@@ -1641,42 +1620,55 @@ void tms9995_device::mem_read()
 	}
 	else
 	{
-		// This is a off-chip access
+		// This is an off-chip access
 		m_check_ready = true;
-		if (m_lowbyte)
+		UINT8 value;
+		UINT16 address = m_address;
+
+		switch (m_mem_phase)
 		{
-			// This is always the odd address
-			// With the OR we can ensure that we do not skip to an even address
-			// when we try to read a word from an odd address
-			m_current_value |= m_prgspace->read_byte(m_address | 0x0001);
-			m_lowbyte = false;
-			if (VERBOSE>3) LOG("tms9995: read external memory, second pass (address %04x, complete word = %04x)\n", m_address | 1, m_current_value);
-			m_check_hold = true;
-		}
-		else
-		{
-			UINT16 address = m_address;
+		case 1:
+			// Set address
+			// If this is a word access, 4 passes, else 2 passes
+			m_dbin_line(ASSERT_LINE);
 			if (m_word_access || !m_instruction->byteop)
 			{
-				// We have to come here a second time; do not advance the MPC
-				// if the address value is even
-				m_lowbyte = true;
-				m_pass = 2;
+				m_pass = 4;
+				// For word accesses, we always start at the even address
 				address &= 0xfffe;
-				m_check_hold = false;
 			}
-			m_current_value = m_prgspace->read_byte(address) << 8;
-			if (VERBOSE>3)
-			{
-				if (m_pass==2) LOG("tms9995: read external memory, first pass (address %04x, value %02x)\n", address, (m_current_value>>8)&0xff);
-				else LOG("tms9995: read external memory (single pass), address %04x, value=%04x)\n", address, m_current_value);
-			}
+			else m_pass = 2;
+
+			m_check_hold = false;
+			if (VERBOSE>7) LOG("tms9995: set address bus %04x\n", m_address & ~1);
+			m_prgspace->set_address(address);
+			m_request_auto_wait_state = m_auto_wait;
+			break;
+		case 2:
+			// Sample the value on the data bus (high byte)
+			if (m_word_access || !m_instruction->byteop) address &= 0xfffe;
+			value = m_prgspace->read_byte(address);
+			if (VERBOSE>7) LOG("tms9995: memory read byte %04x -> %02x\n", m_address & ~1, value);
+			m_current_value = (value << 8) & 0xff00;
+			break;
+		case 3:
+			// Set address + 1 (unless byte command)
+			if (VERBOSE>7) LOG("tms9995: set address bus %04x\n", m_address | 1);
+			m_prgspace->set_address(m_address | 1);
+			break;
+		case 4:
+			// Read low byte
+			value = m_prgspace->read_byte(m_address | 1);
+			m_current_value |= value;
+			if (VERBOSE>3) LOG("tms9995: memory read byte %04x -> %02x, complete word = %04x\n", m_address | 1, value, m_current_value);
+			m_check_hold = true;
+			break;
 		}
-		if (m_auto_wait_state)
-		{
-			if (VERBOSE>7) LOG("tms9995: Next pulse is auto wait\n");
-			pulse_clock(1);
-		}
+
+		m_mem_phase = (m_mem_phase % 4) +1;
+
+		// Reset to 1 when we are done
+		if (m_pass==1) m_mem_phase = 1;
 	}
 	pulse_clock(1);
 }
@@ -1738,7 +1730,6 @@ void tms9995_device::mem_write()
 		pulse_clock(1);
 		return;
 	}
-
 	bool onchip = (((m_address & 0xff00)==0xf000 && (m_address < 0xf0fc)) || ((m_address & 0xfffc)==0xfffc)) && !m_mp9537;
 
 	if (onchip)
@@ -1753,41 +1744,50 @@ void tms9995_device::mem_write()
 	}
 	else
 	{
+		// This is an off-chip access
 		m_check_ready = true;
+		UINT16 address = m_address;
+		switch (m_mem_phase)
+		{
+		case 1:
+			// Set address
+			// If this is a word access, 4 passes, else 2 passes
+			m_dbin_line(CLEAR_LINE);
 
-		if (m_lowbyte)
-		{
-			// see above in mem_read
-			m_prgspace->write_byte(m_address | 0x0001, m_current_value & 0xff);
-			m_lowbyte = false;
-			if (VERBOSE>3) LOG("tms9995: write second pass (address %04x, value %02x)\n", m_address | 0x0001, m_current_value & 0xff);
-			m_check_hold = true;
-		}
-		else
-		{
-			UINT16 address = m_address;
 			if (m_word_access || !m_instruction->byteop)
 			{
-				// We have to come here a second time; do not advance the MPC
-				// if the address value is even
-				m_lowbyte = true;
-				m_pass = 2;
+				m_pass = 4;
 				address &= 0xfffe;
-				m_check_hold = false;
 			}
-			if (VERBOSE>3)
-			{
-				if (m_pass==2) LOG("tms9995: write external memory, first pass (address %04x, value %02x)\n", address, (m_current_value>>8)&0xff);
-				else LOG("tms9995: write external memory (single pass), address %04x, value=%02x\n", address, (m_current_value>>8)&0xff);
-			}
-			m_prgspace->write_byte(address, (m_current_value >> 8)& 0xff);
+			else m_pass = 2;
+
+			m_check_hold = false;
+			if (VERBOSE>7) LOG("tms9995: set address bus %04x\n", address);
+			m_prgspace->set_address(address);
+			if (VERBOSE>7) LOG("tms9995: memory write byte %04x <- %02x\n", address, (m_current_value >> 8)&0xff);
+			m_prgspace->write_byte(address, (m_current_value >> 8)&0xff);
+			break;
+
+		case 2:
+			// no action here, just wait for READY
+			break;
+		case 3:
+			// Set address + 1 (unless byte command)
+			if (VERBOSE>7) LOG("tms9995: set address bus %04x\n", m_address | 1);
+			m_prgspace->set_address(m_address | 1);
+			if (VERBOSE>7) LOG("tms9995: memory write byte %04x <- %02x\n", m_address | 1, m_current_value & 0xff);
+			m_prgspace->write_byte(m_address | 1, m_current_value & 0xff);
+			break;
+		case 4:
+			// no action here, just wait for READY
+			m_check_hold = true;
+			break;
 		}
 
-		if (m_auto_wait_state)
-		{
-			if (VERBOSE>7) LOG("tms9995: Next pulse is auto wait\n");
-			pulse_clock(1);
-		}
+		m_mem_phase = (m_mem_phase % 4) +1;
+
+		// Reset to 1 when we are done
+		if (m_pass==1) m_mem_phase = 1;
 	}
 	pulse_clock(1);
 }
@@ -2072,7 +2072,7 @@ void tms9995_device::operand_address_subprogram()
 	}
 
 	m_get_destination = true;
-	m_lowbyte = false;
+	m_mem_phase = 1;
 	m_address_add = 0;
 	MPC--;      // will be increased in the mail loop
 	if (VERBOSE>8) LOG("tms9995: *** Operand address derivation; address=%04x; index=%d\n", m_address, MPC+1);
@@ -2087,7 +2087,7 @@ void tms9995_device::increment_register()
 	m_address_saved = m_current_value;  // need a special return so we do not lose the value
 	m_current_value += m_instruction->byteop? 1 : 2;
 	m_address = (WP + (m_regnumber<<1)) & 0xffff;
-	m_lowbyte = false;
+	m_mem_phase = 1;
 	pulse_clock(1);
 }
 
@@ -2101,7 +2101,7 @@ void tms9995_device::indexed_addressing()
 	m_address_add = m_current_value;
 	m_address = PC;
 	PC = (PC + 2) & 0xfffe;
-	m_lowbyte = false;
+	m_mem_phase = 1;
 	pulse_clock(1);
 }
 
@@ -2112,7 +2112,7 @@ void tms9995_device::set_immediate()
 	m_address = PC;
 	m_source_value = m_current_value;       // needed for AI, ANDI, ORI
 	PC = (PC + 2) & 0xfffe;
-	m_lowbyte = false;
+	m_mem_phase = 1;
 }
 
 /**************************************************************************
@@ -3227,7 +3227,7 @@ void tms9995_device::alu_int()
 
 		if (((m_int_pending & PENDING_MID)!=0) && m_nmi_active)
 		{
-			if (VERBOSE>5) LOG("tms9995: interrupt service (5): NMI active after context switch\n");
+			if (VERBOSE>5) LOG("tms9995: interrupt service (6): NMI active after context switch\n");
 			m_int_pending &= ~PENDING_MID;
 			m_address = 0xfffc;
 			m_intmask = 0;
@@ -3235,11 +3235,11 @@ void tms9995_device::alu_int()
 		}
 		else
 		{
-			if (m_reset)
+			if (m_from_reset)
 			{
-				if (VERBOSE>5) LOG("tms9995: interrupt service (5): RESET completed\n");
+				if (VERBOSE>5) LOG("tms9995: interrupt service (6): RESET completed\n");
 				// We came from the RESET interrupt
-				m_reset = false;
+				m_from_reset = false;
 				ST &= 0x01ff;
 				m_mid_flag = false;
 				// FLAG0 and FLAG1 are also set to zero after RESET ([1], sect. 2.3.1.2.2)
