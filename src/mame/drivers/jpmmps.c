@@ -32,21 +32,30 @@
 #include "sound/sn76496.h"
 #include "machine/i8255.h"
 #include "machine/tms9902.h"
+#include "machine/meters.h"
+#include "jpmmps.lh"
 
 class jpmmps_state : public driver_device
 {
 public:
 	jpmmps_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")
+			m_maincpu(*this, "maincpu"),
+			m_psg(*this, "sn")
 	{ }
-
+	UINT8 m_sound_buffer;
+	UINT8 m_psg_latch;
 protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
+	optional_device<sn76489_device> m_psg;
 public:
 	DECLARE_DRIVER_INIT(jpmmps);
+	DECLARE_WRITE8_MEMBER(jpmmps_meters_w);
+	DECLARE_WRITE8_MEMBER(jpmmps_psg_buf_w);
+	DECLARE_WRITE8_MEMBER(jpmmps_ic22_portc_w);
+	DECLARE_MACHINE_START(jpmmps);
 };
 
 static ADDRESS_MAP_START( jpmmps_map, AS_PROGRAM, 8, jpmmps_state )
@@ -88,14 +97,24 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( jpmmps )
 INPUT_PORTS_END
 
+WRITE8_MEMBER(jpmmps_state::jpmmps_meters_w)
+{
+	int meter=0;
+	for (meter = 0; meter < 8; meter ++)
+	{
+		MechMtr_update(meter, (data & (1 << meter)));
+	}
+}
+
+
 static I8255_INTERFACE (ppi8255_intf_ic26)
 {
 	DEVCB_NULL,                     /* Port A read */
 	DEVCB_NULL,                     /* Port A write */
 	DEVCB_NULL,                     /* Port B read */
-	DEVCB_NULL,                     /* Port B write */
+	DEVCB_NULL,                     /* Port B write (0 is coin lockout) */
 	DEVCB_NULL,                     /* Port C read */
-	DEVCB_NULL                      /* Port C write */
+	DEVCB_DRIVER_MEMBER(jpmmps_state,jpmmps_meters_w)                      /* Port C write meters */
 };
 
 static I8255_INTERFACE (ppi8255_intf_ic21)
@@ -108,14 +127,37 @@ static I8255_INTERFACE (ppi8255_intf_ic21)
 	DEVCB_NULL                      /* Port C write */
 };
 
+
+WRITE8_MEMBER(jpmmps_state::jpmmps_psg_buf_w)
+{
+	m_sound_buffer = data;
+}
+
+WRITE8_MEMBER(jpmmps_state::jpmmps_ic22_portc_w)
+{
+	//Handle PSG
+	
+	if (m_psg_latch != (data & 0x04))
+	{
+		if (!m_psg_latch)//falling edge
+		{
+			m_psg->write(m_sound_buffer);
+		}
+	}
+	m_psg_latch = (data & 0x04);
+
+	MechMtr_update(8, (data & 0x08));
+
+}
+
 static I8255_INTERFACE (ppi8255_intf_ic22)
 {
 	DEVCB_NULL,                     /* Port A read */
 	DEVCB_NULL,                     /* Port A write */
 	DEVCB_NULL,                     /* Port B read */
-	DEVCB_NULL,                     /* Port B write */
+	DEVCB_DRIVER_MEMBER(jpmmps_state,jpmmps_psg_buf_w),                /* Port B write (SN chip data)*/
 	DEVCB_NULL,                     /* Port C read */
-	DEVCB_NULL                      /* Port C write */
+	DEVCB_DRIVER_MEMBER(jpmmps_state,jpmmps_ic22_portc_w)              /* Port C write (C3 is last meter, C2 latches in data) */
 };
 
 static I8255_INTERFACE (ppi8255_intf_ic25)
@@ -168,6 +210,12 @@ static const sn76496_config psg_intf =
 	DEVCB_NULL
 };
 
+MACHINE_START_MEMBER(jpmmps_state,jpmmps)
+{
+	/* setup 9 mechanical meters */
+	MechMtr_config(machine(),9);
+
+}
 
 static MACHINE_CONFIG_START( jpmmps, jpmmps_state )
 
@@ -184,13 +232,14 @@ static MACHINE_CONFIG_START( jpmmps, jpmmps_state )
 	MCFG_TMS9902_ADD("tms9902_ic10", tms9902_uart4_ic10_params, DUART_CLOCK)
 	MCFG_TMS9902_ADD("tms9902_ic5",  tms9902_uart2_ic5_params,  DUART_CLOCK)
 
+	MCFG_MACHINE_START_OVERRIDE(jpmmps_state,jpmmps)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("sn", SN76489, SOUND_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	MCFG_SOUND_CONFIG(psg_intf)
-
+	MCFG_DEFAULT_LAYOUT(layout_jpmmps)
 MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(jpmmps_state,jpmmps)

@@ -6,16 +6,17 @@
 
     driver by Phil Bennett
 
+	AWP bits J.Wallace, D. Haywood
+	
     Video System Games supported:
         * Monopoly
         * Monopoly Classic
         * Monopoly Deluxe
 
     Known Issues:
-        * Some features used by the AWP games such as reels and meters
-        are not emulated.
-        * Timing for reels, and other opto devices is controlled by the same clock
-        as the lamps, in a weird daisychain setup.
+        * Some features used by the AWP games such as reels are not emulated.
+        * Timing for reels, and other opto devices is controlled by a generated clock
+        in a weird daisychain setup.
 
     AWP game notes:
       The byte at 0x81 of the EVEN 68k rom appears to be some kind of
@@ -290,26 +291,22 @@ READ16_MEMBER(jpmsys5_state::jpm_upd7759_r)
  *************************************/
 
 #define JPM_SYS5_COMMON_MAP \
+	ADDRESS_MAP_UNMAP_HIGH \
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM \
 	AM_RANGE(0x040000, 0x043fff) AM_RAM AM_SHARE("nvram") \
 	AM_RANGE(0x046000, 0x046001) AM_WRITENOP \
 	AM_RANGE(0x046020, 0x046021) AM_DEVREADWRITE8("acia6850_0", acia6850_device, status_read, control_write, 0xff) \
 	AM_RANGE(0x046022, 0x046023) AM_DEVREADWRITE8("acia6850_0", acia6850_device, data_read, data_write, 0xff) \
 	AM_RANGE(0x046040, 0x04604f) AM_DEVREADWRITE8("6840ptm", ptm6840_device, read, write, 0xff) \
-	AM_RANGE(0x046060, 0x046061) AM_READ_PORT("DIRECT") AM_WRITENOP \
-	AM_RANGE(0x046062, 0x046063) AM_WRITENOP \
-	AM_RANGE(0x046064, 0x046065) AM_WRITENOP \
-	AM_RANGE(0x046066, 0x046067) AM_WRITENOP \
+	AM_RANGE(0x046060, 0x046067) AM_DEVREADWRITE8("6821pia", pia6821_device, read, write,0xff) \
 	AM_RANGE(0x046080, 0x046081) AM_DEVREADWRITE8("acia6850_1", acia6850_device, status_read, control_write, 0xff) \
 	AM_RANGE(0x046082, 0x046083) AM_DEVREADWRITE8("acia6850_1", acia6850_device, data_read, data_write, 0xff) \
-	AM_RANGE(0x046084, 0x046085) AM_READ(unk_r) /* PIA? */ \
-	AM_RANGE(0x046088, 0x046089) AM_READ(unk_r) /* PIA? */ \
 	AM_RANGE(0x04608c, 0x04608d) AM_DEVREADWRITE8("acia6850_2", acia6850_device, status_read, control_write, 0xff) \
 	AM_RANGE(0x04608e, 0x04608f) AM_DEVREADWRITE8("acia6850_2", acia6850_device, data_read, data_write, 0xff) \
 	AM_RANGE(0x0460c0, 0x0460c1) AM_WRITENOP \
 	AM_RANGE(0x048000, 0x04801f) AM_READWRITE(coins_r, coins_w) \
 	AM_RANGE(0x04c000, 0x04c0ff) AM_READ(mux_r) AM_WRITE(mux_w)
-
+	
 static ADDRESS_MAP_START( 68000_awp_map, AS_PROGRAM, 16, jpmsys5_state )
 	JPM_SYS5_COMMON_MAP
 	AM_RANGE(0x0460a0, 0x0460a3) AM_DEVWRITE8("ym2413", ym2413_device, write, 0x00ff)
@@ -481,6 +478,73 @@ static INPUT_PORTS_START( monopoly )
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(45) PORT_KEYDELTA(15)
 INPUT_PORTS_END
 
+/*************************************
+ *
+ *  6821 PIA
+ *
+ *************************************/
+WRITE_LINE_MEMBER(jpmsys5_state::pia_irq)
+{
+	m_maincpu->set_input_line(INT_6821PIA, state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+READ8_MEMBER(jpmsys5_state::u29_porta_r)
+{
+
+	int combined_meter = MechMtr_GetActivity(0) | MechMtr_GetActivity(1) |
+							MechMtr_GetActivity(2) | MechMtr_GetActivity(3) |
+							MechMtr_GetActivity(4) | MechMtr_GetActivity(5) |
+							MechMtr_GetActivity(6) | MechMtr_GetActivity(7);
+
+	int meter_bit =0;
+	if(combined_meter)
+	{
+		meter_bit =  0x80;
+	}
+	else
+	{
+		meter_bit =  0x00;
+	}
+
+	return m_direct_port->read() | meter_bit;
+}
+
+WRITE8_MEMBER(jpmsys5_state::u29_portb_w)
+{
+	int meter =0;
+	for (meter = 0; meter < 8; meter ++)
+	{
+		MechMtr_update(meter, (data & (1 << meter)));
+	}
+}
+
+WRITE_LINE_MEMBER(jpmsys5_state::u29_ca2_w)
+{
+	//The 'CHOP' line controls power to the reel motors, without this the reels won't turn
+	m_chop = state;
+}
+
+WRITE_LINE_MEMBER(jpmsys5_state::u29_cb2_w)
+{
+	//On a cabinet, this overrides the volume, we don't emulate this yet
+	logerror("Alarm override enabled \n");
+}
+
+static const pia6821_interface pia_intf =
+{
+	DEVCB_DRIVER_MEMBER(jpmsys5_state,u29_porta_r),        /* port A in */
+	DEVCB_NULL,     /* port B in */
+	DEVCB_NULL,     /* line CA1 in */
+	DEVCB_NULL,     /* line CB1 in */
+	DEVCB_NULL,     /* line CA2 in */
+	DEVCB_NULL,     /* line CB2 in */
+	DEVCB_NULL,     /* port A out */
+	DEVCB_DRIVER_MEMBER(jpmsys5_state,u29_portb_w),        /* port B out */
+	DEVCB_DRIVER_LINE_MEMBER(jpmsys5_state,u29_ca2_w),         /* line CA2 out */
+	DEVCB_DRIVER_LINE_MEMBER(jpmsys5_state,u29_cb2_w),         /* port CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(jpmsys5_state,pia_irq),              /* IRQA */
+	DEVCB_DRIVER_LINE_MEMBER(jpmsys5_state,pia_irq)               /* IRQB */
+};
 
 /*************************************
  *
@@ -672,9 +736,11 @@ static MACHINE_CONFIG_START( jpmsys5v, jpmsys5_state )
 	MCFG_SOUND_ADD("upd7759", UPD7759, UPD7759_STANDARD_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	/* Earlier revisions use an SAA1099 */
+	/* Earlier revisions use an SAA1099, but no video card games seem to (?) */
 	MCFG_SOUND_ADD("ym2413", YM2413, 4000000 ) /* Unconfirmed */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
+	MCFG_PIA6821_ADD("6821pia", pia_intf)
 
 	/* 6840 PTM */
 	MCFG_PTM6840_ADD("6840ptm", ptm_intf)
@@ -747,7 +813,7 @@ INPUT_PORTS_START( popeye )
 	PORT_START("DSW2")
 	PORT_BIT(0xFF, IP_ACTIVE_LOW, IPT_UNKNOWN)
 
-	PORT_START("ROTARY")//not everything has this hooked up, cna be used as a test switch internally
+	PORT_START("ROTARY")//not everything has this hooked up, can be used as a test switch internally
 	PORT_CONFNAME(0x0F, 0x0F, "Rotary Switch")
 	PORT_CONFSETTING(   0x0F, "0")
 	PORT_CONFSETTING(   0x0E, "1")
@@ -782,9 +848,7 @@ INPUT_PORTS_START( popeye )
 	PORT_DIPNAME( 0x40, 0x40, "Reset" ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR ( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )
 
 	PORT_START("COINS")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_NAME("10p")
@@ -821,6 +885,10 @@ INPUT_PORTS_END
 MACHINE_START_MEMBER(jpmsys5_state,jpmsys5)
 {
 //  membank("bank1")->set_base(memregion("maincpu")->base()+0x20000);
+
+	/* setup 8 mechanical meters */
+	MechMtr_config(machine(),8);
+
 }
 
 MACHINE_RESET_MEMBER(jpmsys5_state,jpmsys5)
@@ -859,6 +927,8 @@ MACHINE_CONFIG_START( jpmsys5_ym, jpmsys5_state )
 	MCFG_SOUND_ADD("ym2413", YM2413, 4000000 ) /* Unconfirmed */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
+	MCFG_PIA6821_ADD("6821pia", pia_intf)
+
 	/* 6840 PTM */
 	MCFG_PTM6840_ADD("6840ptm", ptm_intf)
 	MCFG_DEFAULT_LAYOUT(layout_jpmsys5)
@@ -885,6 +955,8 @@ MACHINE_CONFIG_START( jpmsys5, jpmsys5_state )
 
 	MCFG_SAA1099_ADD("saa", 4000000 /* guess */)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_PIA6821_ADD("6821pia", pia_intf)
 
 	/* 6840 PTM */
 	MCFG_PTM6840_ADD("6840ptm", ptm_intf)

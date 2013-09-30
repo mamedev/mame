@@ -1,5 +1,6 @@
 
 #include "cpu/m68000/m68000.h"
+#include "machine/6821pia.h"
 #include "machine/6840ptm.h"
 #include "machine/6850acia.h"
 #include "sound/2413intf.h"
@@ -9,6 +10,7 @@
 #include "video/awpvid.h"
 #include "machine/steppers.h"
 #include "machine/roc10937.h"
+#include "machine/meters.h"
 
 class jpmsys5_state : public driver_device
 {
@@ -18,12 +20,14 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_upd7759(*this, "upd7759"),
 		m_tms34061(*this, "tms34061"),
-		m_vfd(*this, "vfd") { }
+		m_vfd(*this, "vfd"),
+		m_direct_port(*this, "DIRECT") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<upd7759_device> m_upd7759;
 	optional_device<tms34061_device> m_tms34061;
 	optional_device<roc10937_t> m_vfd;
+	required_ioport m_direct_port;
 
 	UINT8 m_palette[16][3];
 	int m_pal_addr;
@@ -37,6 +41,7 @@ public:
 	int m_mpxclk;
 	int m_muxram[255];
 	int m_alpha_clock;
+	int m_chop;
 	UINT8 m_a0_acia_dcd;
 	UINT8 m_a0_data_out;
 	UINT8 m_a0_data_in;
@@ -60,6 +65,11 @@ public:
 	DECLARE_READ16_MEMBER(jpm_upd7759_r);
 	DECLARE_WRITE_LINE_MEMBER(ptm_irq);
 	DECLARE_WRITE8_MEMBER(u26_o1_callback);
+	DECLARE_WRITE_LINE_MEMBER(pia_irq);
+	DECLARE_READ8_MEMBER(u29_porta_r);
+	DECLARE_WRITE8_MEMBER(u29_portb_w);
+	DECLARE_WRITE_LINE_MEMBER(u29_ca2_w);
+	DECLARE_WRITE_LINE_MEMBER(u29_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(acia_irq);
 	DECLARE_READ_LINE_MEMBER(a0_rx_r);
 	DECLARE_WRITE_LINE_MEMBER(a0_tx_w);

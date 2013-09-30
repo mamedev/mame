@@ -2432,6 +2432,8 @@ $(DRIVERS)/jankenmn.o:  $(LAYOUT)/jankenmn.lh
 
 $(DRIVERS)/jpmimpct.o:  $(LAYOUT)/jpmimpct.lh
 
+$(DRIVERS)/jpmmps.o:   $(LAYOUT)/jpmmps.lh
+
 $(DRIVERS)/jpmsys5.o:   $(LAYOUT)/jpmsys5.lh
 
 $(DRIVERS)/kas89.o:     $(LAYOUT)/kas89.lh
