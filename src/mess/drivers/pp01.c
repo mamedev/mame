@@ -31,12 +31,13 @@ static ADDRESS_MAP_START(pp01_mem, AS_PROGRAM, 8, pp01_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pp01_io, AS_IO, 8, pp01_state )
-	AM_RANGE(0xc0, 0xc3) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-	//AM_RANGE(0xc4, 0xc7) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
+	AM_RANGE(0xc0, 0xc3) AM_DEVREADWRITE("ppi8255", i8255_device, read, write) // system
+	//AM_RANGE(0xc4, 0xc7) AM_DEVREADWRITE("ppi8255", i8255_device, read, write) // user
+	AM_RANGE(0xc8, 0xc8) AM_MIRROR(2) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
+	AM_RANGE(0xc9, 0xc9) AM_MIRROR(2) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
 	AM_RANGE(0xcc, 0xcf) AM_WRITE(pp01_video_write_mode_w)
 	AM_RANGE(0xd0, 0xd3) AM_DEVREADWRITE("pit8253", pit8253_device, read, write)
-	AM_RANGE(0xe0, 0xef) AM_READWRITE(pp01_mem_block_r, pp01_mem_block_w)
-	AM_RANGE(0xf0, 0xff) AM_READWRITE(pp01_mem_block_r, pp01_mem_block_w)
+	AM_RANGE(0xe0, 0xef) AM_MIRROR(0x10) AM_READWRITE(pp01_mem_block_r, pp01_mem_block_w)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -215,6 +216,7 @@ static MACHINE_CONFIG_START( pp01, pp01_state )
 	//MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* Devices */
+	MCFG_I8251_ADD("uart", pp01_uart_intf)
 	MCFG_PIT8253_ADD( "pit8253", pp01_pit8253_intf )
 	MCFG_I8255A_ADD( "ppi8255", pp01_ppi8255_interface )
 

@@ -10,7 +10,7 @@
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/ram.h"
-//#include "machine/i8251.h"
+#include "machine/i8251.h"
 #include "machine/pit8253.h"
 #include "machine/i8255.h"
 #include "sound/speaker.h"
@@ -63,6 +63,7 @@ public:
 
 
 /*----------- defined in machine/pp01.c -----------*/
+extern const i8251_interface pp01_uart_intf;
 extern const struct pit8253_interface pp01_pit8253_intf;
 extern const i8255_interface pp01_ppi8255_interface;
 
