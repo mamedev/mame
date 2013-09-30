@@ -589,10 +589,7 @@ static MACHINE_CONFIG_START( magicbub, yunsun16_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(0x180, 0xe0)
-	MCFG_SCREEN_VISIBLE_AREA(0+0x20, 0x180-1-0x20, 0, 0xe0-1)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_16MHz/2, 512, 0x20, 0x180-0x20, 260, 0, 0xe0) /* TODO: completely inaccurate */
 	MCFG_SCREEN_UPDATE_DRIVER(yunsun16_state, screen_update_yunsun16)
 
 	MCFG_GFXDECODE(yunsun16)
@@ -627,10 +624,8 @@ static MACHINE_CONFIG_START( shocking, yunsun16_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(0x180, 0xe0)
-	MCFG_SCREEN_VISIBLE_AREA(0, 0x180-1-4, 0, 0xe0-1)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_16MHz/2, 512, 0, 0x180-4, 260, 0, 0xe0) /* TODO: completely inaccurate */
+
 	MCFG_SCREEN_UPDATE_DRIVER(yunsun16_state, screen_update_yunsun16)
 
 	MCFG_GFXDECODE(yunsun16)
