@@ -4,18 +4,17 @@
     SGI/Nintendo Reality Display Processor
     -------------------
 
-    Initial revision by Ville Linde
-    Many improvements by Harmony, angrylion, Ziggy, Gonetz and Orkin
-
-    Class re-write by Harmony
+	by MooglyGuy
+	based on initial C code by Ville Linde
+	contains additional improvements from angrylion, Ziggy, Gonetz and Orkin
 
 
 *******************************************************************************
 
 STATUS:
 
-Much behavior needs verification against real hardware.  Many literal edge
-cases must be verified on real hardware as well.
+Much behavior needs verification against real hardware.  Many edge cases must
+be verified on real hardware as well.
 
 TODO:
 
@@ -36,13 +35,14 @@ bool n64_rdp::rdp_range_check(UINT32 addr)
 	if(MiscState.FBSize == 0) return false;
 
 	int fbcount = ((MiscState.FBWidth * Scissor.m_yl) << (MiscState.FBSize - 1)) * 3;
-	int zbcount = MiscState.FBWidth * Scissor.m_yl * 2;
 	int fbaddr = MiscState.FBAddress & 0x007fffff;
-	int zbaddr = MiscState.ZBAddress & 0x007fffff;
 	if ((addr >= fbaddr) && (addr < (fbaddr + fbcount)))
 	{
 		return false;
 	}
+
+	int zbcount = MiscState.FBWidth * Scissor.m_yl * 2;
+	int zbaddr = MiscState.ZBAddress & 0x007fffff;
 	if ((addr >= zbaddr) && (addr < (zbaddr + zbcount)))
 	{
 		return false;
@@ -899,7 +899,7 @@ void n64_rdp::lookup_cvmask_derivatives(UINT32 mask, UINT8* offx, UINT8* offy, r
 	*offy = cvarray[index].yoff;
 }
 
-void n64_rdp::ZStore(UINT32 zcurpixel, UINT32 dzcurpixel, UINT32 z, UINT32 enc)
+void n64_rdp::ZStore(const rdp_poly_state &object, UINT32 zcurpixel, UINT32 dzcurpixel, UINT32 z, UINT32 enc)
 {
 	UINT16 zval = z_com_table[z & 0x3ffff]|(enc >> 2);
 	if(zcurpixel <= MEM16_LIMIT)
@@ -2032,7 +2032,7 @@ void n64_rdp::DrawTriangle(bool shade, bool texture, bool zbuffer, bool rect)
 	int dzdy_dz = (dzdy >> 16) & 0xffff;
 	int dzdx_dz = (dzdx >> 16) & 0xffff;
 
-	extent_t Spans[1024];
+	extent_t Spans[2048];
 
 	SpanBase.m_span_drdy = drdy;
 	SpanBase.m_span_dgdy = dgdy;
@@ -2121,6 +2121,7 @@ void n64_rdp::DrawTriangle(bool shade, bool texture, bool zbuffer, bool rect)
 
 	bool new_object = true;
 	rdp_poly_state *object = NULL;
+	bool valid = false;
 
 	if(flip)
 	{
@@ -2135,10 +2136,11 @@ void n64_rdp::DrawTriangle(bool shade, bool texture, bool zbuffer, bool rect)
 			int xstart = xleft >> 16; // 319
 			int xend = xright >> 16; // 0
 			int j = k >> 2;
+			int spanidx = (k - ycur) >> 2;
 			int spix = k & 3;
 			valid_y = !(k < yh || k >= yl);
 
-			if (k >= 0 && k < 0x1000)
+			if (spanidx >= 0 && spanidx < 2048)
 			{
 				majorxint[spix] = xend; // 0
 				minorxint[spix] = xstart; // 319
@@ -2166,7 +2168,7 @@ void n64_rdp::DrawTriangle(bool shade, bool texture, bool zbuffer, bool rect)
 						new_object = false;
 					}
 
-					Spans[j - (ycur >> 2)].userdata = (void*)((UINT8*)AuxBuf + AuxBufPtr);
+					Spans[spanidx].userdata = (void*)((UINT8*)AuxBuf + AuxBufPtr);
 					AuxBufPtr += sizeof(rdp_span_aux);
 
 					if(AuxBufPtr >= EXTENT_AUX_COUNT)
@@ -2174,7 +2176,8 @@ void n64_rdp::DrawTriangle(bool shade, bool texture, bool zbuffer, bool rect)
 						fatalerror("n64_rdp::DrawTriangle: span aux buffer overflow\n");
 					}
 
-					rdp_span_aux *userdata = (rdp_span_aux*)Spans[j - (ycur >> 2)].userdata;
+					rdp_span_aux *userdata = (rdp_span_aux*)Spans[spanidx].userdata;
+					valid = true;
 
 					userdata->m_tmem = object->m_tmem;
 
@@ -2252,23 +2255,23 @@ void n64_rdp::DrawTriangle(bool shade, bool texture, bool zbuffer, bool rect)
 
 				if (spix == 3)
 				{
-					Spans[j - (ycur >> 2)].startx = maxxmx;
-					Spans[j - (ycur >> 2)].stopx = minxhx;
+					Spans[spanidx].startx = maxxmx;
+					Spans[spanidx].stopx = minxhx;
 					compute_cvg_flip(Spans, majorx, minorx, majorxint, minorxint, j, yh, yl, ycur >> 2);
 				}
 
 				if (spix == ldflag)
 				{
-					((rdp_span_aux*)Spans[j - (ycur >> 2)].userdata)->m_unscissored_rx = xend;
+					((rdp_span_aux*)Spans[spanidx].userdata)->m_unscissored_rx = xend;
 					xfrac = ((xright >> 8) & 0xff);
-					Spans[j - (ycur >> 2)].param[SPAN_R].start = ((r >> 9) << 9) + drdiff - (xfrac * drdxh);
-					Spans[j - (ycur >> 2)].param[SPAN_G].start = ((g >> 9) << 9) + dgdiff - (xfrac * dgdxh);
-					Spans[j - (ycur >> 2)].param[SPAN_B].start = ((b >> 9) << 9) + dbdiff - (xfrac * dbdxh);
-					Spans[j - (ycur >> 2)].param[SPAN_A].start = ((a >> 9) << 9) + dadiff - (xfrac * dadxh);
-					Spans[j - (ycur >> 2)].param[SPAN_S].start = (((s >> 9) << 9)  + dsdiff - (xfrac * dsdxh)) & ~0x1f;
-					Spans[j - (ycur >> 2)].param[SPAN_T].start = (((t >> 9) << 9)  + dtdiff - (xfrac * dtdxh)) & ~0x1f;
-					Spans[j - (ycur >> 2)].param[SPAN_W].start = (((w >> 9) << 9)  + dwdiff - (xfrac * dwdxh)) & ~0x1f;
-					Spans[j - (ycur >> 2)].param[SPAN_Z].start = ((z >> 9) << 9)  + dzdiff - (xfrac * dzdxh);
+					Spans[spanidx].param[SPAN_R].start = ((r >> 9) << 9) + drdiff - (xfrac * drdxh);
+					Spans[spanidx].param[SPAN_G].start = ((g >> 9) << 9) + dgdiff - (xfrac * dgdxh);
+					Spans[spanidx].param[SPAN_B].start = ((b >> 9) << 9) + dbdiff - (xfrac * dbdxh);
+					Spans[spanidx].param[SPAN_A].start = ((a >> 9) << 9) + dadiff - (xfrac * dadxh);
+					Spans[spanidx].param[SPAN_S].start = (((s >> 9) << 9)  + dsdiff - (xfrac * dsdxh)) & ~0x1f;
+					Spans[spanidx].param[SPAN_T].start = (((t >> 9) << 9)  + dtdiff - (xfrac * dtdxh)) & ~0x1f;
+					Spans[spanidx].param[SPAN_W].start = (((w >> 9) << 9)  + dwdiff - (xfrac * dwdxh)) & ~0x1f;
+					Spans[spanidx].param[SPAN_Z].start = ((z >> 9) << 9)  + dzdiff - (xfrac * dzdxh);
 				}
 			}
 
@@ -2301,6 +2304,7 @@ void n64_rdp::DrawTriangle(bool shade, bool texture, bool zbuffer, bool rect)
 			int xstart = xleft >> 16;
 			int xend = xright >> 16;
 			int j = k >> 2;
+			int spanidx = j - (ycur >> 2);
 			int spix = k & 3;
 			valid_y = !(k < yh || k >= yl);
 
@@ -2332,7 +2336,8 @@ void n64_rdp::DrawTriangle(bool shade, bool texture, bool zbuffer, bool rect)
 						new_object = false;
 					}
 
-					Spans[j - (ycur >> 2)].userdata = (void*)((UINT8*)AuxBuf + AuxBufPtr);
+					Spans[spanidx].userdata = (void*)((UINT8*)AuxBuf + AuxBufPtr);
+					valid = true;
 					AuxBufPtr += sizeof(rdp_span_aux);
 
 					if(AuxBufPtr >= EXTENT_AUX_COUNT)
@@ -2340,7 +2345,7 @@ void n64_rdp::DrawTriangle(bool shade, bool texture, bool zbuffer, bool rect)
 						fatalerror("n64_rdp::DrawTriangle: span aux buffer overflow\n");
 					}
 
-					rdp_span_aux *userdata = (rdp_span_aux*)Spans[j - (ycur >> 2)].userdata;
+					rdp_span_aux *userdata = (rdp_span_aux*)Spans[spanidx].userdata;
 					userdata->m_tmem = object->m_tmem;
 
 					userdata->BlendColor = BlendColor;
@@ -2417,23 +2422,23 @@ void n64_rdp::DrawTriangle(bool shade, bool texture, bool zbuffer, bool rect)
 
 				if (spix == 3)
 				{
-					Spans[j - (ycur >> 2)].startx = minxmx;
-					Spans[j - (ycur >> 2)].stopx = maxxhx;
+					Spans[spanidx].startx = minxmx;
+					Spans[spanidx].stopx = maxxhx;
 					compute_cvg_noflip(Spans, majorx, minorx, majorxint, minorxint, j, yh, yl, ycur >> 2);
 				}
 
 				if (spix == ldflag)
 				{
-					((rdp_span_aux*)Spans[j - (ycur >> 2)].userdata)->m_unscissored_rx = xend;
+					((rdp_span_aux*)Spans[spanidx].userdata)->m_unscissored_rx = xend;
 					xfrac = ((xright >> 8) & 0xff);
-					Spans[j - (ycur >> 2)].param[SPAN_R].start = ((r >> 9) << 9) + drdiff - (xfrac * drdxh);
-					Spans[j - (ycur >> 2)].param[SPAN_G].start = ((g >> 9) << 9) + dgdiff - (xfrac * dgdxh);
-					Spans[j - (ycur >> 2)].param[SPAN_B].start = ((b >> 9) << 9) + dbdiff - (xfrac * dbdxh);
-					Spans[j - (ycur >> 2)].param[SPAN_A].start = ((a >> 9) << 9) + dadiff - (xfrac * dadxh);
-					Spans[j - (ycur >> 2)].param[SPAN_S].start = (((s >> 9) << 9)  + dsdiff - (xfrac * dsdxh)) & ~0x1f;
-					Spans[j - (ycur >> 2)].param[SPAN_T].start = (((t >> 9) << 9)  + dtdiff - (xfrac * dtdxh)) & ~0x1f;
-					Spans[j - (ycur >> 2)].param[SPAN_W].start = (((w >> 9) << 9)  + dwdiff - (xfrac * dwdxh)) & ~0x1f;
-					Spans[j - (ycur >> 2)].param[SPAN_Z].start = ((z >> 9) << 9)  + dzdiff - (xfrac * dzdxh);
+					Spans[spanidx].param[SPAN_R].start = ((r >> 9) << 9) + drdiff - (xfrac * drdxh);
+					Spans[spanidx].param[SPAN_G].start = ((g >> 9) << 9) + dgdiff - (xfrac * dgdxh);
+					Spans[spanidx].param[SPAN_B].start = ((b >> 9) << 9) + dbdiff - (xfrac * dbdxh);
+					Spans[spanidx].param[SPAN_A].start = ((a >> 9) << 9) + dadiff - (xfrac * dadxh);
+					Spans[spanidx].param[SPAN_S].start = (((s >> 9) << 9)  + dsdiff - (xfrac * dsdxh)) & ~0x1f;
+					Spans[spanidx].param[SPAN_T].start = (((t >> 9) << 9)  + dtdiff - (xfrac * dtdxh)) & ~0x1f;
+					Spans[spanidx].param[SPAN_W].start = (((w >> 9) << 9)  + dwdiff - (xfrac * dwdxh)) & ~0x1f;
+					Spans[spanidx].param[SPAN_Z].start = ((z >> 9) << 9)  + dzdiff - (xfrac * dzdxh);
 				}
 			}
 
@@ -2453,7 +2458,7 @@ void n64_rdp::DrawTriangle(bool shade, bool texture, bool zbuffer, bool rect)
 		}
 	}
 
-	if(!new_object)
+	if(!new_object && valid)
 	{
 		RenderSpans(yh >> 2, yl >> 2, tilenum, flip ? true : false, Spans, rect, object);
 	}

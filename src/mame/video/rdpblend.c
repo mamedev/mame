@@ -1,6 +1,20 @@
+/******************************************************************************
+
+
+    SGI/Nintendo Reality Display Processor Blend Unit (BL)
+    -------------------
+
+	by MooglyGuy
+	based on initial C code by Ville Linde
+	contains additional improvements from angrylion, Ziggy, Gonetz and Orkin
+
+
+******************************************************************************/
+
 #include "emu.h"
 #include "includes/n64.h"
 #include "video/n64.h"
+#include "video/rdpbhelp.h"
 
 N64BlenderT::N64BlenderT()
 {
@@ -31,119 +45,40 @@ N64BlenderT::N64BlenderT()
 	cycle1[1] = &N64BlenderT::BlendEquationCycle1NoForceSpecial;
 	cycle1[2] = &N64BlenderT::BlendEquationCycle1ForceNoSpecial;
 	cycle1[3] = &N64BlenderT::BlendEquationCycle1ForceSpecial;
+
+	compare[0] = &N64BlenderT::AlphaCompareNone;
+	compare[1] = &N64BlenderT::AlphaCompareNone;
+	compare[2] = &N64BlenderT::AlphaCompareNoDither;
+	compare[3] = &N64BlenderT::AlphaCompareDither;
 }
 
-#define ALPHA_COMPARE()	\
-	if (!AlphaCompare(userdata->PixelColor.i.a, userdata, object))	\
-	{																\
-		return false;												\
-	}
-
-#define CVG_COMPARE() \
-	if (object.OtherModes.antialias_en ? (!userdata->CurrentPixCvg) : (!userdata->CurrentCvgBit))	\
-	{																\
-		return false;												\
-	}
-
-#define TEST_REJECT() \
-	ALPHA_COMPARE() \
-	CVG_COMPARE()
-
-#define WRITE_OUT_NB_ND(cycle) \
-	*fr = *userdata->ColorInputs.blender1a_r[cycle];	\
-	*fg = *userdata->ColorInputs.blender1a_g[cycle];	\
-	*fb = *userdata->ColorInputs.blender1a_b[cycle];
-
-#define WRITE_OUT() \
-	*fr = r;	\
-	*fg = g;	\
-	*fb = b;
-
-#define WRITE_BLENDED_COLOR() \
-	userdata->BlendedPixelColor.i.r = r;	\
-	userdata->BlendedPixelColor.i.g = g;	\
-	userdata->BlendedPixelColor.i.b = b;	\
-	userdata->BlendedPixelColor.i.a = userdata->PixelColor.i.a;
-
-#define BLEND_CYCLE(cyc) \
-	if (partialreject && userdata->PixelColor.i.a >= 0xff)	\
-	{														\
-		ASSIGN_OUT(cyc);									\
-	}														\
-	else													\
-	{														\
-		userdata->InvPixelColor.i.a = 0xff - *userdata->ColorInputs.blender1b_a[cyc];	\
-		((this)->*(cycle##cyc[((object.OtherModes.force_blend & 1) << 1) | (special_bsel##cyc & 1)]))(&r, &g, &b, userdata, object);	\
-	}
-
-#define BLEND_FACTORS(cycle) \
-	UINT8 blend1a = *userdata->ColorInputs.blender1b_a[cycle] >> 3;	\
-	UINT8 blend2a = *userdata->ColorInputs.blender2b_a[cycle] >> 3;
-
-#define BLEND_FACTORS_SUM(cycle) \
-	UINT8 blend1a = *userdata->ColorInputs.blender1b_a[cycle] >> 3;	\
-	UINT8 blend2a = *userdata->ColorInputs.blender2b_a[cycle] >> 3;	\
-	UINT32 sum = ((blend1a >> 2) + (blend2a >> 2) + 1) & 0xf;
-
-#define BLEND_FACTORS_SPECIAL(cycle) \
-	UINT8 blend1a = (*userdata->ColorInputs.blender1b_a[cycle] >> (3 + userdata->ShiftA)) & 0x1c;	\
-	UINT8 blend2a = (*userdata->ColorInputs.blender2b_a[cycle] >> (3 + userdata->ShiftB)) & 0x1c;
-
-#define BLEND_FACTORS_SPECIAL_SUM(cycle) \
-	UINT8 blend1a = (*userdata->ColorInputs.blender1b_a[cycle] >> (3 + userdata->ShiftA)) & 0x1c;	\
-	UINT8 blend2a = (*userdata->ColorInputs.blender2b_a[cycle] >> (3 + userdata->ShiftB)) & 0x1c;	\
-	UINT32 sum = ((blend1a >> 2) + (blend2a >> 2) + 1) & 0xf;
-
-#define BLEND_MUL(cycle) \
-	*r = (((int)(*userdata->ColorInputs.blender1a_r[cycle]) * (int)(blend1a))) +	\
-		(((int)(*userdata->ColorInputs.blender2a_r[cycle]) * (int)(blend2a)));		\
-	*g = (((int)(*userdata->ColorInputs.blender1a_g[cycle]) * (int)(blend1a))) +	\
-		(((int)(*userdata->ColorInputs.blender2a_g[cycle]) * (int)(blend2a)));		\
-	*b = (((int)(*userdata->ColorInputs.blender1a_b[cycle]) * (int)(blend1a))) +	\
-		(((int)(*userdata->ColorInputs.blender2a_b[cycle]) * (int)(blend2a)));
-
-#define BLEND_ADD_SPECIAL(cycle) \
-	*r += (((int)*userdata->ColorInputs.blender2a_r[cycle]) << 2);	\
-	*g += (((int)*userdata->ColorInputs.blender2a_g[cycle]) << 2);	\
-	*b += (((int)*userdata->ColorInputs.blender2a_b[cycle]) << 2);
-
-#define BLEND_ADD(cycle) \
-	*r += (int)*userdata->ColorInputs.blender2a_r[cycle];	\
-	*g += (int)*userdata->ColorInputs.blender2a_g[cycle];	\
-	*b += (int)*userdata->ColorInputs.blender2a_b[cycle];
-
-#define BLEND_SHIFT(shift)	\
-	*r >>= shift;			\
-	*g >>= shift;			\
-	*b >>= shift;
-
-#define BLEND_CLAMP()		\
-	if (*r > 255) *r = 255;	\
-	if (*g > 255) *g = 255;	\
-	if (*b > 255) *b = 255;
-
-#define BLEND_SCALE()			\
-	if (sum)					\
-	{							\
-		*r /= sum;				\
-		*g /= sum;				\
-		*b /= sum;				\
-	}							\
-	else						\
-	{							\
-		*r = *g = *b = 0xff;	\
-	}
-
-
-#define ASSIGN_OUT(cycle) \
-	r = *userdata->ColorInputs.blender1a_r[cycle];	\
-	g = *userdata->ColorInputs.blender1a_g[cycle];	\
-	b = *userdata->ColorInputs.blender1a_b[cycle];
-
-bool N64BlenderT::Blend1CycleNoBlendNoACVGNoDither(UINT32* fr, UINT32* fg, UINT32* fb, int dith, int adseed, int partialreject, int special_bsel0, rdp_span_aux *userdata, const rdp_poly_state& object)
+bool N64BlenderT::Blend1CycleNoBlendNoACVGNoDither(UINT32* fr, UINT32* fg, UINT32* fb, int dith, int adseed, int partialreject, int sel0, int acmode, rdp_span_aux *userdata, const rdp_poly_state& object)
 {
-	DitherA(&userdata->PixelColor.i.a, adseed);
-	DitherA(&userdata->ShadeColor.i.a, adseed);
+	DITHER_A(userdata->PixelColor.i.a, adseed);
+	DITHER_A(userdata->ShadeColor.i.a, adseed);
+	TEST_REJECT();
+	WRITE_OUT_NB_ND(0);
+
+	return true;
+}
+
+bool N64BlenderT::Blend1CycleNoBlendNoACVGDither(UINT32* fr, UINT32* fg, UINT32* fb, int dith, int adseed, int partialreject, int sel0, int acmode, rdp_span_aux *userdata, const rdp_poly_state& object)
+{
+	INT32 r, g, b;
+
+	DITHER_A(userdata->PixelColor.i.a, adseed);
+	DITHER_A(userdata->ShadeColor.i.a, adseed);
+	TEST_REJECT();
+	ASSIGN_OUT(0);
+	DITHER_RGB(dith);
+	WRITE_OUT();
+
+	return true;
+}
+
+bool N64BlenderT::Blend1CycleNoBlendACVGNoDither(UINT32* fr, UINT32* fg, UINT32* fb, int dith, int adseed, int partialreject, int sel0, int acmode, rdp_span_aux *userdata, const rdp_poly_state& object)
+{
+	DITHER_A(userdata->ShadeColor.i.a, adseed);
 
 	TEST_REJECT();
 	WRITE_OUT_NB_ND(0);
@@ -151,360 +86,260 @@ bool N64BlenderT::Blend1CycleNoBlendNoACVGNoDither(UINT32* fr, UINT32* fg, UINT3
 	return true;
 }
 
-bool N64BlenderT::Blend1CycleNoBlendNoACVGDither(UINT32* fr, UINT32* fg, UINT32* fb, int dith, int adseed, int partialreject, int special_bsel0, rdp_span_aux *userdata, const rdp_poly_state& object)
+bool N64BlenderT::Blend1CycleNoBlendACVGDither(UINT32* fr, UINT32* fg, UINT32* fb, int dith, int adseed, int partialreject, int sel0, int acmode, rdp_span_aux *userdata, const rdp_poly_state& object)
 {
 	INT32 r, g, b;
 
-	DitherA(&userdata->PixelColor.i.a, adseed);
-	DitherA(&userdata->ShadeColor.i.a, adseed);
+	DITHER_A(userdata->ShadeColor.i.a, adseed);
 
 	TEST_REJECT();
 	ASSIGN_OUT(0);
-	DitherRGB(&r, &g, &b, dith);
+	DITHER_RGB(dith);
 	WRITE_OUT();
 
 	return true;
 }
 
-bool N64BlenderT::Blend1CycleNoBlendACVGNoDither(UINT32* fr, UINT32* fg, UINT32* fb, int dith, int adseed, int partialreject, int special_bsel0, rdp_span_aux *userdata, const rdp_poly_state& object)
-{
-	DitherA(&userdata->ShadeColor.i.a, adseed);
-
-	TEST_REJECT();
-	WRITE_OUT_NB_ND(0);
-
-	return true;
-}
-
-bool N64BlenderT::Blend1CycleNoBlendACVGDither(UINT32* fr, UINT32* fg, UINT32* fb, int dith, int adseed, int partialreject, int special_bsel0, rdp_span_aux *userdata, const rdp_poly_state& object)
+bool N64BlenderT::Blend1CycleBlendNoACVGNoDither(UINT32* fr, UINT32* fg, UINT32* fb, int dith, int adseed, int partialreject, int sel0, int acmode, rdp_span_aux *userdata, const rdp_poly_state& object)
 {
 	INT32 r, g, b;
 
-	DitherA(&userdata->ShadeColor.i.a, adseed);
+	DITHER_A(userdata->PixelColor.i.a, adseed);
+	DITHER_A(userdata->ShadeColor.i.a, adseed);
 
 	TEST_REJECT();
-	ASSIGN_OUT(0);
-	DitherRGB(&r, &g, &b, dith);
+	BLEND_CYCLE(0, 1);
 	WRITE_OUT();
 
 	return true;
 }
 
-bool N64BlenderT::Blend1CycleBlendNoACVGNoDither(UINT32* fr, UINT32* fg, UINT32* fb, int dith, int adseed, int partialreject, int special_bsel0, rdp_span_aux *userdata, const rdp_poly_state& object)
+bool N64BlenderT::Blend1CycleBlendNoACVGDither(UINT32* fr, UINT32* fg, UINT32* fb, int dith, int adseed, int partialreject, int sel0, int acmode, rdp_span_aux *userdata, const rdp_poly_state& object)
 {
 	INT32 r, g, b;
 
-	DitherA(&userdata->PixelColor.i.a, adseed);
-	DitherA(&userdata->ShadeColor.i.a, adseed);
+	DITHER_A(userdata->PixelColor.i.a, adseed);
+	DITHER_A(userdata->ShadeColor.i.a, adseed);
 
 	TEST_REJECT();
-	BLEND_CYCLE(0);
+	BLEND_CYCLE(0, 1);
+	DITHER_RGB(dith);
 	WRITE_OUT();
 
 	return true;
 }
 
-bool N64BlenderT::Blend1CycleBlendNoACVGDither(UINT32* fr, UINT32* fg, UINT32* fb, int dith, int adseed, int partialreject, int special_bsel0, rdp_span_aux *userdata, const rdp_poly_state& object)
+bool N64BlenderT::Blend1CycleBlendACVGNoDither(UINT32* fr, UINT32* fg, UINT32* fb, int dith, int adseed, int partialreject, int sel0, int acmode, rdp_span_aux *userdata, const rdp_poly_state& object)
 {
 	INT32 r, g, b;
 
-	DitherA(&userdata->PixelColor.i.a, adseed);
-	DitherA(&userdata->ShadeColor.i.a, adseed);
+	DITHER_A(userdata->ShadeColor.i.a, adseed);
 
 	TEST_REJECT();
-	BLEND_CYCLE(0);
-	DitherRGB(&r, &g, &b, dith);
+	BLEND_CYCLE(0, 1);
 	WRITE_OUT();
 
 	return true;
 }
 
-bool N64BlenderT::Blend1CycleBlendACVGNoDither(UINT32* fr, UINT32* fg, UINT32* fb, int dith, int adseed, int partialreject, int special_bsel0, rdp_span_aux *userdata, const rdp_poly_state& object)
+bool N64BlenderT::Blend1CycleBlendACVGDither(UINT32* fr, UINT32* fg, UINT32* fb, int dith, int adseed, int partialreject, int sel0, int acmode, rdp_span_aux *userdata, const rdp_poly_state& object)
 {
 	INT32 r, g, b;
 
-	DitherA(&userdata->ShadeColor.i.a, adseed);
+	DITHER_A(userdata->ShadeColor.i.a, adseed);
 
 	TEST_REJECT();
-	BLEND_CYCLE(0);
+	BLEND_CYCLE(0, 1);
+	DITHER_RGB(dith);
 	WRITE_OUT();
 
 	return true;
 }
 
-bool N64BlenderT::Blend1CycleBlendACVGDither(UINT32* fr, UINT32* fg, UINT32* fb, int dith, int adseed, int partialreject, int special_bsel0, rdp_span_aux *userdata, const rdp_poly_state& object)
+bool N64BlenderT::Blend2CycleNoBlendNoACVGNoDither(UINT32* fr, UINT32* fg, UINT32* fb, int dith, int adseed, int partialreject, int sel0, int sel1, int acmode, rdp_span_aux *userdata, const rdp_poly_state& object)
 {
 	INT32 r, g, b;
 
-	DitherA(&userdata->ShadeColor.i.a, adseed);
+	DITHER_A(userdata->PixelColor.i.a, adseed);
+	DITHER_A(userdata->ShadeColor.i.a, adseed);
 
 	TEST_REJECT();
-	BLEND_CYCLE(0);
-	DitherRGB(&r, &g, &b, dith);
-	WRITE_OUT();
-
-	return true;
-}
-
-bool N64BlenderT::Blend2CycleNoBlendNoACVGNoDither(UINT32* fr, UINT32* fg, UINT32* fb, int dith, int adseed, int partialreject, int special_bsel0, int special_bsel1, rdp_span_aux *userdata, const rdp_poly_state& object)
-{
-	INT32 r, g, b;
-
-	DitherA(&userdata->PixelColor.i.a, adseed);
-	DitherA(&userdata->ShadeColor.i.a, adseed);
-
-	TEST_REJECT();
-	userdata->InvPixelColor.i.a = 0xff - *userdata->ColorInputs.blender1b_a[0];
-	((this)->*(cycle0[((object.OtherModes.force_blend & 1) << 1) | (special_bsel0 & 1)]))(&r, &g, &b, userdata, object);
+	BLEND_CYCLE(0, 0);
 	WRITE_BLENDED_COLOR();
 	WRITE_OUT_NB_ND(1);
 
 	return true;
 }
 
-bool N64BlenderT::Blend2CycleNoBlendNoACVGDither(UINT32* fr, UINT32* fg, UINT32* fb, int dith, int adseed, int partialreject, int special_bsel0, int special_bsel1, rdp_span_aux *userdata, const rdp_poly_state& object)
+bool N64BlenderT::Blend2CycleNoBlendNoACVGDither(UINT32* fr, UINT32* fg, UINT32* fb, int dith, int adseed, int partialreject, int sel0, int sel1, int acmode, rdp_span_aux *userdata, const rdp_poly_state& object)
 {
 	INT32 r, g, b;
 
-	DitherA(&userdata->PixelColor.i.a, adseed);
-	DitherA(&userdata->ShadeColor.i.a, adseed);
+	DITHER_A(userdata->PixelColor.i.a, adseed);
+	DITHER_A(userdata->ShadeColor.i.a, adseed);
 
 	TEST_REJECT();
-	userdata->InvPixelColor.i.a = 0xff - *userdata->ColorInputs.blender1b_a[0];
-	((this)->*(cycle0[((object.OtherModes.force_blend & 1) << 1) | (special_bsel0 & 1)]))(&r, &g, &b, userdata, object);
+	BLEND_CYCLE(0, 0);
 	WRITE_BLENDED_COLOR();
 	ASSIGN_OUT(1);
-	DitherRGB(&r, &g, &b, dith);
+	DITHER_RGB(dith);
 	WRITE_OUT();
 
 	return true;
 }
 
-bool N64BlenderT::Blend2CycleNoBlendACVGNoDither(UINT32* fr, UINT32* fg, UINT32* fb, int dith, int adseed, int partialreject, int special_bsel0, int special_bsel1, rdp_span_aux *userdata, const rdp_poly_state& object)
+bool N64BlenderT::Blend2CycleNoBlendACVGNoDither(UINT32* fr, UINT32* fg, UINT32* fb, int dith, int adseed, int partialreject, int sel0, int sel1, int acmode, rdp_span_aux *userdata, const rdp_poly_state& object)
 {
 	INT32 r, g, b;
 
-	DitherA(&userdata->ShadeColor.i.a, adseed);
+	DITHER_A(userdata->ShadeColor.i.a, adseed);
 
 	TEST_REJECT();
-	userdata->InvPixelColor.i.a = 0xff - *userdata->ColorInputs.blender1b_a[0];
-	((this)->*(cycle0[((object.OtherModes.force_blend & 1) << 1) | (special_bsel0 & 1)]))(&r, &g, &b, userdata, object);
+	BLEND_CYCLE(0, 0);
 	WRITE_BLENDED_COLOR();
 	WRITE_OUT_NB_ND(1);
 
 	return true;
 }
 
-bool N64BlenderT::Blend2CycleNoBlendACVGDither(UINT32* fr, UINT32* fg, UINT32* fb, int dith, int adseed, int partialreject, int special_bsel0, int special_bsel1, rdp_span_aux *userdata, const rdp_poly_state& object)
+bool N64BlenderT::Blend2CycleNoBlendACVGDither(UINT32* fr, UINT32* fg, UINT32* fb, int dith, int adseed, int partialreject, int sel0, int sel1, int acmode, rdp_span_aux *userdata, const rdp_poly_state& object)
 {
 	INT32 r, g, b;
 
-	DitherA(&userdata->ShadeColor.i.a, adseed);
+	DITHER_A(userdata->ShadeColor.i.a, adseed);
 
 	TEST_REJECT();
-	userdata->InvPixelColor.i.a = 0xff - *userdata->ColorInputs.blender1b_a[0];
-	((this)->*(cycle0[((object.OtherModes.force_blend & 1) << 1) | (special_bsel0 & 1)]))(&r, &g, &b, userdata, object);
+	BLEND_CYCLE(0, 0);
 	WRITE_BLENDED_COLOR();
 	ASSIGN_OUT(1);
-	DitherRGB(&r, &g, &b, dith);
+	DITHER_RGB(dith);
 	WRITE_OUT();
 
 	return true;
 }
 
-bool N64BlenderT::Blend2CycleBlendNoACVGNoDither(UINT32* fr, UINT32* fg, UINT32* fb, int dith, int adseed, int partialreject, int special_bsel0, int special_bsel1, rdp_span_aux *userdata, const rdp_poly_state& object)
+bool N64BlenderT::Blend2CycleBlendNoACVGNoDither(UINT32* fr, UINT32* fg, UINT32* fb, int dith, int adseed, int partialreject, int sel0, int sel1, int acmode, rdp_span_aux *userdata, const rdp_poly_state& object)
 {
 	INT32 r, g, b;
 
-	DitherA(&userdata->PixelColor.i.a, adseed);
-	DitherA(&userdata->ShadeColor.i.a, adseed);
+	DITHER_A(userdata->PixelColor.i.a, adseed);
+	DITHER_A(userdata->ShadeColor.i.a, adseed);
 
 	TEST_REJECT();
-	userdata->InvPixelColor.i.a = 0xff - *userdata->ColorInputs.blender1b_a[0];
-	((this)->*(cycle0[((object.OtherModes.force_blend & 1) << 1) | (special_bsel0 & 1)]))(&r, &g, &b, userdata, object);
+	BLEND_CYCLE(0, 0);
 	WRITE_BLENDED_COLOR();
-	BLEND_CYCLE(1);
+	BLEND_CYCLE(1, 1);
 	WRITE_OUT();
 
 	return true;
 }
 
-bool N64BlenderT::Blend2CycleBlendNoACVGDither(UINT32* fr, UINT32* fg, UINT32* fb, int dith, int adseed, int partialreject, int special_bsel0, int special_bsel1, rdp_span_aux *userdata, const rdp_poly_state& object)
+bool N64BlenderT::Blend2CycleBlendNoACVGDither(UINT32* fr, UINT32* fg, UINT32* fb, int dith, int adseed, int partialreject, int sel0, int sel1, int acmode, rdp_span_aux *userdata, const rdp_poly_state& object)
 {
 	INT32 r, g, b;
 
-	DitherA(&userdata->PixelColor.i.a, adseed);
-	DitherA(&userdata->ShadeColor.i.a, adseed);
+	DITHER_A(userdata->PixelColor.i.a, adseed);
+	DITHER_A(userdata->ShadeColor.i.a, adseed);
 
 	TEST_REJECT();
-	userdata->InvPixelColor.i.a = 0xff - *userdata->ColorInputs.blender1b_a[0];
-	((this)->*(cycle0[((object.OtherModes.force_blend & 1) << 1) | (special_bsel0 & 1)]))(&r, &g, &b, userdata, object);
+	BLEND_CYCLE(0, 0);
 	WRITE_BLENDED_COLOR();
-	BLEND_CYCLE(1);
-	DitherRGB(&r, &g, &b, dith);
+	BLEND_CYCLE(1, 1);
+	DITHER_RGB(dith);
 	WRITE_OUT();
 
 	return true;
 }
 
-bool N64BlenderT::Blend2CycleBlendACVGNoDither(UINT32* fr, UINT32* fg, UINT32* fb, int dith, int adseed, int partialreject, int special_bsel0, int special_bsel1, rdp_span_aux *userdata, const rdp_poly_state& object)
+bool N64BlenderT::Blend2CycleBlendACVGNoDither(UINT32* fr, UINT32* fg, UINT32* fb, int dith, int adseed, int partialreject, int sel0, int sel1, int acmode, rdp_span_aux *userdata, const rdp_poly_state& object)
 {
 	INT32 r, g, b;
 
-	DitherA(&userdata->ShadeColor.i.a, adseed);
+	DITHER_A(userdata->ShadeColor.i.a, adseed);
 
 	TEST_REJECT();
-	userdata->InvPixelColor.i.a = 0xff - *userdata->ColorInputs.blender1b_a[0];
-	((this)->*(cycle0[((object.OtherModes.force_blend & 1) << 1) | (special_bsel0 & 1)]))(&r, &g, &b, userdata, object);
+	BLEND_CYCLE(0, 0);
 	WRITE_BLENDED_COLOR();
-	BLEND_CYCLE(1);
+	BLEND_CYCLE(1, 1);
 	WRITE_OUT();
 
 	return true;
 }
 
-bool N64BlenderT::Blend2CycleBlendACVGDither(UINT32* fr, UINT32* fg, UINT32* fb, int dith, int adseed, int partialreject, int special_bsel0, int special_bsel1, rdp_span_aux *userdata, const rdp_poly_state& object)
+bool N64BlenderT::Blend2CycleBlendACVGDither(UINT32* fr, UINT32* fg, UINT32* fb, int dith, int adseed, int partialreject, int sel0, int sel1, int acmode, rdp_span_aux *userdata, const rdp_poly_state& object)
 {
 	INT32 r, g, b;
 
-	DitherA(&userdata->ShadeColor.i.a, adseed);
+	DITHER_A(userdata->ShadeColor.i.a, adseed);
 
 	TEST_REJECT();
-	userdata->InvPixelColor.i.a = 0xff - *userdata->ColorInputs.blender1b_a[0];
-	((this)->*(cycle0[((object.OtherModes.force_blend & 1) << 1) | (special_bsel0 & 1)]))(&r, &g, &b, userdata, object);
+	BLEND_CYCLE(0, 0);
 	WRITE_BLENDED_COLOR();
-	BLEND_CYCLE(1);
-	DitherRGB(&r, &g, &b, dith);
+	BLEND_CYCLE(1, 1);
+	DITHER_RGB(dith);
 	WRITE_OUT();
 
 	return true;
 }
+
+#define BLEND_PIPE(cycle, special, sum, shift)	\
+	BLEND_FACTORS(cycle, special, sum);			\
+	BLEND_MUL(cycle);							\
+	BLEND_ADD(cycle, special);					\
+	BLEND_SHIFT(shift);							\
+	BLEND_SCALE_CLAMP(sum);
 
 void N64BlenderT::BlendEquationCycle0NoForceNoSpecial(int* r, int* g, int* b, rdp_span_aux *userdata, const rdp_poly_state& object)
 {
-	BLEND_FACTORS_SUM(0);
-	BLEND_MUL(0);
-	BLEND_ADD(0);
-	BLEND_SHIFT(2);
-	BLEND_SCALE();
-	BLEND_CLAMP();
+	BLEND_PIPE(0, 0, 1, 2);
 }
 
 void N64BlenderT::BlendEquationCycle0NoForceSpecial(int* r, int* g, int* b, rdp_span_aux *userdata, const rdp_poly_state& object)
 {
-	BLEND_FACTORS_SPECIAL_SUM(0);
-	BLEND_MUL(0);
-	BLEND_ADD_SPECIAL(0);
-	BLEND_SHIFT(2);
-	BLEND_SCALE();
-	BLEND_CLAMP();
+	BLEND_PIPE(0, 1, 1, 2);
 }
 
 void N64BlenderT::BlendEquationCycle0ForceNoSpecial(int* r, int* g, int* b, rdp_span_aux *userdata, const rdp_poly_state& object)
 {
-	BLEND_FACTORS(0);
-	BLEND_MUL(0);
-	BLEND_ADD(0);
-	BLEND_SHIFT(5);
-	BLEND_CLAMP();
+	BLEND_PIPE(0, 0, 0, 5);
 }
 
 void N64BlenderT::BlendEquationCycle0ForceSpecial(int* r, int* g, int* b, rdp_span_aux *userdata, const rdp_poly_state& object)
 {
-	BLEND_FACTORS_SPECIAL(0);
-	BLEND_MUL(0);
-	BLEND_ADD_SPECIAL(0);
-	BLEND_SHIFT(5);
-	BLEND_CLAMP();
+	BLEND_PIPE(0, 1, 0, 5);
 }
 
 void N64BlenderT::BlendEquationCycle1NoForceNoSpecial(INT32* r, INT32* g, INT32* b, rdp_span_aux *userdata, const rdp_poly_state& object)
 {
-	BLEND_FACTORS_SUM(1);
-	BLEND_MUL(1);
-	BLEND_ADD(1);
-	BLEND_SHIFT(2);
-	BLEND_SCALE();
-	BLEND_CLAMP();
+	BLEND_PIPE(1, 0, 1, 2);
 }
 
 void N64BlenderT::BlendEquationCycle1NoForceSpecial(INT32* r, INT32* g, INT32* b, rdp_span_aux *userdata, const rdp_poly_state& object)
 {
-	BLEND_FACTORS_SPECIAL_SUM(1);
-	BLEND_MUL(1);
-	BLEND_ADD_SPECIAL(1);
-	BLEND_SHIFT(2);
-	BLEND_SCALE();
-	BLEND_CLAMP();
+	BLEND_PIPE(1, 1, 1, 2);
 }
 
 void N64BlenderT::BlendEquationCycle1ForceNoSpecial(INT32* r, INT32* g, INT32* b, rdp_span_aux *userdata, const rdp_poly_state& object)
 {
-	BLEND_FACTORS(1);
-	BLEND_MUL(1);
-	BLEND_ADD(1);
-	BLEND_SHIFT(5);
-	BLEND_CLAMP();
+	BLEND_PIPE(1, 0, 0, 5);
 }
 
 void N64BlenderT::BlendEquationCycle1ForceSpecial(INT32* r, INT32* g, INT32* b, rdp_span_aux *userdata, const rdp_poly_state& object)
 {
-	BLEND_FACTORS_SPECIAL(1);
-	BLEND_MUL(1);
-	BLEND_ADD_SPECIAL(1);
-	BLEND_SHIFT(5);
-	BLEND_CLAMP();
+	BLEND_PIPE(1, 1, 0, 5);
 }
 
-bool N64BlenderT::AlphaCompare(UINT8 alpha, const rdp_span_aux *userdata, const rdp_poly_state& object)
+bool N64BlenderT::AlphaCompareNone(UINT8 alpha, const rdp_span_aux *userdata, const rdp_poly_state& object)
 {
-	INT32 threshold;
-	if (object.OtherModes.alpha_compare_en)
-	{
-		threshold = (object.OtherModes.dither_alpha_en) ? m_rdp->GetRandom() : userdata->BlendColor.i.a;
-		if (alpha < threshold)
-		{
-			return false;
-		}
-		return true;
-	}
-	return true;
+	return false;
 }
 
-void N64BlenderT::DitherA(UINT8 *a, int dith)
+bool N64BlenderT::AlphaCompareNoDither(UINT8 alpha, const rdp_span_aux *userdata, const rdp_poly_state& object)
 {
-	INT32 new_a = *a + dith;
-	if(new_a & 0x100)
-	{
-		new_a = 0xff;
-	}
-	*a = (UINT8)new_a;
+	return alpha < userdata->BlendColor.i.a;
 }
 
-void N64BlenderT::DitherRGB(INT32 *r, INT32 *g, INT32 *b, int dith)
+bool N64BlenderT::AlphaCompareDither(UINT8 alpha, const rdp_span_aux *userdata, const rdp_poly_state& object)
 {
-	if ((*r & 7) > dith)
-	{
-		*r = (*r & 0xf8) + 8;
-		if (*r > 247)
-		{
-			*r = 255;
-		}
-	}
-	if ((*g & 7) > dith)
-	{
-		*g = (*g & 0xf8) + 8;
-		if (*g > 247)
-		{
-			*g = 255;
-		}
-	}
-	if ((*b & 7) > dith)
-	{
-		*b = (*b & 0xf8) + 8;
-		if (*b > 247)
-		{
-			*b = 255;
-		}
-	}
+	return alpha < (rand() & 0xff);
 }

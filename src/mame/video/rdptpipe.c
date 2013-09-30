@@ -1,3 +1,16 @@
+/******************************************************************************
+
+
+    SGI/Nintendo Reality Display Texture Fetch Unit (TF)
+    -------------------
+
+	by MooglyGuy
+	based on initial C code by Ville Linde
+	contains additional improvements from angrylion, Ziggy, Gonetz and Orkin
+
+
+******************************************************************************/
+
 #include "emu.h"
 #include "includes/n64.h"
 #include "video/n64.h"

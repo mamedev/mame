@@ -566,16 +566,17 @@ void n64_periphs::sp_dma(int direction)
 
 	UINT32 *sp_mem[2] = { rsp_dmem, rsp_imem };
 
+	int sp_mem_page = (sp_mem_addr >> 12) & 1;
 	if(direction == 0)// RDRAM -> I/DMEM
 	{
 		for(int c = 0; c <= sp_dma_count; c++)
 		{
 			UINT32 src = (sp_dram_addr & 0x007fffff) >> 2;
-			UINT32 dst = (sp_mem_addr & 0x1fff) >> 2;
+			UINT32 dst = (sp_mem_addr & 0xfff) >> 2;
 
 			for(int i = 0; i < length / 4; i++)
 			{
-				sp_mem[(dst + i) >> 10][(dst + i) & 0x3ff] = rdram[src + i];
+				sp_mem[sp_mem_page][(dst + i) & 0x3ff] = rdram[src + i];
 			}
 
 			sp_mem_addr += length;
@@ -588,12 +589,12 @@ void n64_periphs::sp_dma(int direction)
 	{
 		for(int c = 0; c <= sp_dma_count; c++)
 		{
-			UINT32 src = (sp_mem_addr & 0x1fff) >> 2;
+			UINT32 src = (sp_mem_addr & 0xfff) >> 2;
 			UINT32 dst = (sp_dram_addr & 0x007fffff) >> 2;
 
 			for(int i = 0; i < length / 4; i++)
 			{
-				rdram[dst + i] = sp_mem[(src + i) >> 10][(src + i) & 0x3ff];
+				rdram[dst + i] = sp_mem[sp_mem_page][(src + i) & 0x3ff];
 			}
 
 			sp_mem_addr += length;

@@ -56,7 +56,7 @@
 #define MEM16_LIMIT 0x3fffff
 #define MEM32_LIMIT 0x1fffff
 
-#define RDP_RANGE_CHECK (0)
+#define RDP_RANGE_CHECK (1)
 
 #if RDP_RANGE_CHECK
 #define CHECK8(in) if(rdp_range_check((in))) { printf("Check8: Address %08x out of range!\n", (in)); fflush(stdout); fatalerror("Address %08x out of range!\n", (in)); }
@@ -74,7 +74,7 @@
 #define RREADIDX32(in) ((rdp_range_check((in) << 2)) ? 0 : rdram[(in)])
 
 #define RWRITEADDR8(in, val)    if(rdp_range_check((in))) { printf("Write8: Address %08x out of range!\n", (in)); fflush(stdout); fatalerror("Address %08x out of range!\n", (in)); } else { ((UINT8*)rdram)[(in) ^ BYTE_ADDR_XOR] = val;}
-#define RWRITEIDX16(in, val)    if(rdp_range_check((in) << 1)) { printf("Write16: Address %08x out of range!\n", (in) << 1); fflush(stdout); fatalerror("Address %08x out of range!\n", (in) << 1); } else { ((UINT16*)rdram)[(in) ^ WORD_ADDR_XOR] = val;}
+#define RWRITEIDX16(in, val)    if(rdp_range_check((in) << 1)) { printf("Write16: Address %08x out of range!\n", ((object.MiscState.FBAddress >> 1) + curpixel) << 1); fflush(stdout); fatalerror("Address out of range\n"); } else { ((UINT16*)rdram)[(in) ^ WORD_ADDR_XOR] = val;}
 #define RWRITEIDX32(in, val)    if(rdp_range_check((in) << 2)) { printf("Write32: Address %08x out of range!\n", (in) << 2); fflush(stdout); fatalerror("Address %08x out of range!\n", (in) << 2); } else { rdram[(in)] = val;}
 #else
 #define RREADADDR8(in) (((UINT8*)rdram)[(in) ^ BYTE_ADDR_XOR])
@@ -89,10 +89,6 @@
 #define U_RREADADDR8(in) (((UINT8*)rdram)[(in) ^ BYTE_ADDR_XOR])
 #define U_RREADIDX16(in) (((UINT16*)rdram)[(in) ^ WORD_ADDR_XOR])
 #define U_RREADIDX32(in) (rdram[(in)])
-
-#define U_RWRITEADDR8(in, val)  ((UINT8*)rdram)[(in) ^ BYTE_ADDR_XOR] = val;
-#define U_RWRITEIDX16(in, val)  ((UINT16*)rdram)[(in) ^ WORD_ADDR_XOR] = val;
-#define U_RWRITEIDX32(in, val)  rdram[(in)] = val
 
 #define GETLOWCOL(x)    (((x) & 0x3e) << 2)
 #define GETMEDCOL(x)    (((x) & 0x7c0) >> 3)
@@ -508,7 +504,7 @@ class n64_rdp : public poly_manager<UINT32, rdp_poly_state, 8, 32000>
 		const UINT8*    GetMagicMatrix() const { return s_magic_matrix; }
 		int             GetCurrFIFOIndex() const { return m_cmd_cur; }
 
-		void            ZStore(UINT32 zcurpixel, UINT32 dzcurpixel, UINT32 z, UINT32 enc);
+		void            ZStore(const rdp_poly_state &object, UINT32 zcurpixel, UINT32 dzcurpixel, UINT32 z, UINT32 enc);
 		UINT32          ZDecompress(UINT32 zcurpixel);
 		UINT32          DZDecompress(UINT32 zcurpixel, UINT32 dzcurpixel);
 		UINT32          DZCompress(UINT32 value);

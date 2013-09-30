@@ -5830,6 +5830,7 @@ src/mame/video/rainbow.c svneol=native#text/plain
 src/mame/video/rallyx.c svneol=native#text/plain
 src/mame/video/rampart.c svneol=native#text/plain
 src/mame/video/rastan.c svneol=native#text/plain
+src/mame/video/rdpbhelp.h svneol=native#text/plain
 src/mame/video/rdpblend.c svneol=native#text/plain
 src/mame/video/rdpblend.h svneol=native#text/plain
 src/mame/video/rdpfiltr.inc svneol=native#text/plain

@@ -1,3 +1,16 @@
+/******************************************************************************
+
+
+    SGI/Nintendo Reality Display Processor span-drawing functions
+    -------------------
+
+	by MooglyGuy
+	based on initial C code by Ville Linde
+	contains additional improvements from angrylion, Ziggy, Gonetz and Orkin
+
+
+******************************************************************************/
+
 #include "emu.h"
 #include "includes/n64.h"
 #include "video/n64.h"
@@ -135,7 +148,7 @@ void n64_rdp::SpanDraw1Cycle(INT32 scanline, const extent_t &extent, const rdp_p
 	SpanParam w; w.w = extent.param[SPAN_W].start;
 
 	UINT32 zb = object.MiscState.ZBAddress >> 1;
-	UINT32 zhb = zb;
+	UINT32 zhb = object.MiscState.ZBAddress;
 	UINT8 offx = 0, offy = 0;
 
 	INT32 tile1 = tilenum;
@@ -147,7 +160,7 @@ void n64_rdp::SpanDraw1Cycle(INT32 scanline, const extent_t &extent, const rdp_p
 	m_rdp->TexPipe.CalculateClampDiffs(tile1, userdata, object, m_clamp_s_diff, m_clamp_t_diff);
 
 	bool partialreject = (userdata->ColorInputs.blender2b_a[0] == &userdata->InvPixelColor.i.a && userdata->ColorInputs.blender1b_a[0] == &userdata->PixelColor.i.a);
-	bool bsel0 = (userdata->ColorInputs.blender2b_a[0] == &userdata->MemoryColor.i.a);
+	int sel0 = (OtherModes.force_blend ? 2 : 0) | ((userdata->ColorInputs.blender2b_a[0] == &userdata->MemoryColor.i.a) ? 1 : 0);
 
 	int drinc = object.SpanBase.m_span_dr;
 	int dginc = object.SpanBase.m_span_dg;
@@ -196,6 +209,8 @@ void n64_rdp::SpanDraw1Cycle(INT32 scanline, const extent_t &extent, const rdp_p
 	int blend_index = (object.OtherModes.alpha_cvg_select ? 2 : 0) | ((object.OtherModes.rgb_dither_sel < 3) ? 1 : 0);
 	int read_index = ((object.MiscState.FBSize - 2) << 1) | object.OtherModes.image_read_en;
 	int write_index = ((object.MiscState.FBSize - 2) << 3) | (object.OtherModes.cvg_dest << 1);
+	int acmode = (object.OtherModes.alpha_compare_en ? 2 : 0) | (object.OtherModes.dither_alpha_en ? 1 : 0);
+
 	userdata->m_start_span = true;
 	for (int j = 0; j <= length; j++)
 	{
@@ -255,7 +270,7 @@ void n64_rdp::SpanDraw1Cycle(INT32 scanline, const extent_t &extent, const rdp_p
 			{
 				m_rdp->GetDitherValues(scanline, j, &cdith, &adith, object);
 
-				bool rendered = ((&m_rdp->Blender)->*(m_rdp->Blender.blend1[(userdata->BlendEnable << 2) | blend_index]))(&fir, &fig, &fib, cdith, adith, partialreject, bsel0, userdata, object);
+				bool rendered = ((&m_rdp->Blender)->*(m_rdp->Blender.blend1[(userdata->BlendEnable << 2) | blend_index]))(&fir, &fig, &fib, cdith, adith, partialreject, sel0, acmode, userdata, object);
 
 				if (rendered)
 				{
@@ -263,7 +278,7 @@ void n64_rdp::SpanDraw1Cycle(INT32 scanline, const extent_t &extent, const rdp_p
 
 					if (object.OtherModes.z_update_en)
 					{
-						m_rdp->ZStore(zbcur, zhbcur, sz, userdata->m_dzpix_enc);
+						m_rdp->ZStore(object, zbcur, zhbcur, sz, userdata->m_dzpix_enc);
 					}
 				}
 			}
@@ -300,7 +315,7 @@ void n64_rdp::SpanDraw2Cycle(INT32 scanline, const extent_t &extent, const rdp_p
 	SpanParam w; w.w = extent.param[SPAN_W].start;
 
 	UINT32 zb = object.MiscState.ZBAddress >> 1;
-	UINT32 zhb = zb;
+	UINT32 zhb = object.MiscState.ZBAddress;
 	UINT8 offx = 0, offy = 0;
 
 	INT32 tile2 = (tilenum + 1) & 7;
@@ -318,8 +333,8 @@ void n64_rdp::SpanDraw2Cycle(INT32 scanline, const extent_t &extent, const rdp_p
 	m_rdp->TexPipe.CalculateClampDiffs(tile1, userdata, object, m_clamp_s_diff, m_clamp_t_diff);
 
 	bool partialreject = (userdata->ColorInputs.blender2b_a[1] == &userdata->InvPixelColor.i.a && userdata->ColorInputs.blender1b_a[1] == &userdata->PixelColor.i.a);
-	bool bsel0 = (userdata->ColorInputs.blender2b_a[0] == &userdata->MemoryColor.i.a);
-	bool bsel1 = (userdata->ColorInputs.blender2b_a[1] == &userdata->MemoryColor.i.a);
+	int sel0 = (OtherModes.force_blend ? 2 : 0) | ((userdata->ColorInputs.blender2b_a[0] == &userdata->MemoryColor.i.a) ? 1 : 0);
+	int sel1 = (OtherModes.force_blend ? 2 : 0) | ((userdata->ColorInputs.blender2b_a[1] == &userdata->MemoryColor.i.a) ? 1 : 0);
 
 	int dzpix = object.SpanBase.m_span_dzpix;
 	int drinc = flip ? (object.SpanBase.m_span_dr) : -object.SpanBase.m_span_dr;
@@ -356,6 +371,8 @@ void n64_rdp::SpanDraw2Cycle(INT32 scanline, const extent_t &extent, const rdp_p
 	int blend_index = (object.OtherModes.alpha_cvg_select ? 2 : 0) | ((object.OtherModes.rgb_dither_sel < 3) ? 1 : 0);
 	int read_index = ((object.MiscState.FBSize - 2) << 1) | object.OtherModes.image_read_en;
 	int write_index = ((object.MiscState.FBSize - 2) << 3) | (object.OtherModes.cvg_dest << 1);
+	int acmode = (object.OtherModes.alpha_compare_en ? 2 : 0) | (object.OtherModes.dither_alpha_en ? 1 : 0);
+
 	userdata->m_start_span = true;
 	for (int j = 0; j <= length; j++)
 	{
@@ -424,14 +441,14 @@ void n64_rdp::SpanDraw2Cycle(INT32 scanline, const extent_t &extent, const rdp_p
 			{
 				m_rdp->GetDitherValues(scanline, j, &cdith, &adith, object);
 
-				bool rendered = ((&m_rdp->Blender)->*(m_rdp->Blender.blend2[(userdata->BlendEnable << 2) | blend_index]))(&fir, &fig, &fib, cdith, adith, partialreject, bsel0, bsel1, userdata, object);
+				bool rendered = ((&m_rdp->Blender)->*(m_rdp->Blender.blend2[(userdata->BlendEnable << 2) | blend_index]))(&fir, &fig, &fib, cdith, adith, partialreject, sel0, sel1, acmode, userdata, object);
 
 				if (rendered)
 				{
 					((this)->*(_Write[write_index | userdata->BlendEnable]))(curpixel, fir, fig, fib, userdata, object);
 					if (object.OtherModes.z_update_en)
 					{
-						m_rdp->ZStore(zbcur, zhbcur, sz, userdata->m_dzpix_enc);
+						m_rdp->ZStore(object, zbcur, zhbcur, sz, userdata->m_dzpix_enc);
 					}
 				}
 			}
