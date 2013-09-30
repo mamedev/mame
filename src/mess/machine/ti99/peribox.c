@@ -249,6 +249,14 @@ WRITE8_MEMBER(peribox_device::write)
 	}
 }
 
+SETADDRESS_DBIN_MEMBER(peribox_device::setaddress_dbin)
+{
+	for (int i=2; i <= 8; i++)
+	{
+		if (m_slot[i]!=NULL) m_slot[i]->setaddress_dbin(space, offset | m_address_prefix, state);
+	}
+}
+
 void peribox_device::crureadz(offs_t offset, UINT8 *value)
 {
 	for (int i=2; i <= 8; i++)
@@ -577,6 +585,11 @@ READ8Z_MEMBER(peribox_slot_device::readz)
 WRITE8_MEMBER(peribox_slot_device::write)
 {
 	m_card->write(space, offset, data, mem_mask);
+}
+
+SETADDRESS_DBIN_MEMBER(peribox_slot_device::setaddress_dbin)
+{
+	m_card->setaddress_dbin(space, offset, state);
 }
 
 void peribox_slot_device::crureadz(offs_t offset, UINT8 *value)

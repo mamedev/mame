@@ -135,10 +135,12 @@ public:
 
 	DECLARE_READ8_MEMBER( readm );
 	DECLARE_WRITE8_MEMBER( writem );
+	DECLARE_SETOFFSET_MEMBER( setoffset );
 
 	DECLARE_INPUT_CHANGED_MEMBER( gm_changed );
 
 	void clock_in(int state);
+	void dbin(int state);
 
 protected:
 	virtual void    device_start();
@@ -157,6 +159,8 @@ private:
 	bool        m_video_waitstates;
 	bool        m_extra_waitstates;
 
+	bool        m_read_mode;
+
 	// Mapper function
 	bool    m_geneve_mode;
 	bool    m_direct_mode;
@@ -165,6 +169,11 @@ private:
 	bool    m_cartridge6_writable;
 	bool    m_cartridge7_writable;
 	int     m_map[8];
+
+	int     m_mapdecode;
+
+	int     m_offset;
+	int     m_physaddr;
 
 	// Genmod modifications
 	bool    m_turbo;

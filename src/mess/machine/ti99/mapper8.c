@@ -54,6 +54,7 @@ ti998_mapper_device::ti998_mapper_device(const machine_config &mconfig, const ch
     CRU access
 ***************************************************************************/
 
+#define HEXBUS_CRU_BASE 0x1700
 #define MAPPER_CRU_BASE 0x2700
 
 void ti998_mapper_device::crureadz(offs_t offset, UINT8 *value)
@@ -83,6 +84,19 @@ void ti998_mapper_device::cruwrite(offs_t offset, UINT8 data)
 			machine().schedule_soft_reset();
 			break;
 		}
+		return;
+	}
+
+	if ((offset & 0xff00)==HEXBUS_CRU_BASE)
+	{
+		if (VERBOSE>5) LOG("mapper8: Set CRU>%04x (Hexbus) to %d\n",offset,data);
+		return;
+	}
+
+	if ((offset & 0xff00)>=0x0100)
+	{
+		if (VERBOSE>5) LOG("mapper8: Set CRU>%04x (unknown) to %d\n",offset,data);
+		return;
 	}
 }
 
@@ -234,6 +248,7 @@ void ti998_mapper_device::mapwrite(int offset, UINT8 data)
 				int ptr = (bankindx << 6);
 				m_pas_offset[i] =   (m_sram[(i<<2) + ptr] << 24) | (m_sram[(i<<2)+ ptr+1] << 16)
 				| (m_sram[(i<<2) + ptr+2] << 8) | (m_sram[(i<<2) + ptr+3]);
+				if (VERBOSE>7) LOG("mapper8: load %d=%08x\n", i, m_pas_offset[i]);
 			}
 		}
 		else
@@ -247,6 +262,7 @@ void ti998_mapper_device::mapwrite(int offset, UINT8 data)
 				m_sram[(i<<2) + ptr +1] =  (m_pas_offset[i] >> 16)& 0xff;
 				m_sram[(i<<2) + ptr +2] =  (m_pas_offset[i] >> 8)& 0xff;
 				m_sram[(i<<2) + ptr +3] =  (m_pas_offset[i])& 0xff;
+				if (VERBOSE>7) LOG("mapper8: save %d=%08x\n", i, m_pas_offset[i]);
 			}
 		}
 	}

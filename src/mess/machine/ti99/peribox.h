@@ -49,9 +49,11 @@ public:
 	peribox_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	peribox_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
-	// Next six methods are called from the console
+	// Next seven methods are called from the console
 	DECLARE_READ8Z_MEMBER(readz);
 	DECLARE_WRITE8_MEMBER(write);
+	DECLARE_SETADDRESS_DBIN_MEMBER(setaddress_dbin);
+
 	void crureadz(offs_t offset, UINT8 *value);
 	void cruwrite(offs_t offset, UINT8 value);
 	DECLARE_WRITE_LINE_MEMBER(senila);
@@ -143,6 +145,8 @@ public:
 	// Called from the box (direction to card)
 	DECLARE_READ8Z_MEMBER(readz);
 	DECLARE_WRITE8_MEMBER(write);
+	DECLARE_SETADDRESS_DBIN_MEMBER(setaddress_dbin);
+
 	DECLARE_WRITE_LINE_MEMBER(senila);
 	DECLARE_WRITE_LINE_MEMBER(senilb);
 

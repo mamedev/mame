@@ -215,7 +215,7 @@ Known Issues (MZ, 2010-11-07)
 #include "machine/ti99/gromport.h"
 #include "machine/ti99/joyport.h"
 
-#define VERBOSE 0
+#define VERBOSE 1
 #define LOG logerror
 
 class ti99_8_state : public driver_device
@@ -630,6 +630,14 @@ WRITE_LINE_MEMBER( ti99_8_state::keyC3 )
 WRITE_LINE_MEMBER( ti99_8_state::CRUS )
 {
 	m_mapper->CRUS_set(state==ASSERT_LINE);
+	if (state==ASSERT_LINE)
+	{
+		m_gromport->set_grom_base(0x9800, 0xfbf1);
+	}
+	else
+	{
+		m_gromport->set_grom_base(0xf830, 0xfff1);
+	}
 }
 
 /*
@@ -795,8 +803,8 @@ static TMS9995_CONFIG( ti99_8_processor_config )
 	DEVCB_DRIVER_MEMBER(ti99_8_state, external_operation),
 	DEVCB_NULL,     // Instruction acquisition
 	DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, clock_out),
-	DEVCB_NULL,     // wait
 	DEVCB_NULL,     // HOLDA
+	DEVCB_NULL,      // DBIN
 	NO_INTERNAL_RAM,
 	NO_OVERFLOW_INT
 };
@@ -962,6 +970,7 @@ void ti99_8_state::machine_reset()
 
 	// But we assert the line here so that the system starts running
 	m_ready_line = m_ready_line1 = ASSERT_LINE;
+	m_gromport->set_grom_base(0x9800, 0xfff1);
 }
 
 static MACHINE_CONFIG_START( ti99_8_60hz, ti99_8_state )

@@ -120,54 +120,48 @@ void ti99_datamux_device::write_all(address_space& space, UINT16 addr, UINT8 val
 	}
 }
 
+void ti99_datamux_device::setaddress_all(address_space& space, UINT16 addr)
+{
+	attached_device *dev = m_devices.first();
+	while (dev != NULL)
+	{
+		if ((addr & dev->m_config->address_mask)==(dev->m_config->select | dev->m_config->write_select))
+		{
+			bus8z_device *devz = static_cast<bus8z_device *>(dev->m_device);
+			devz->setaddress_dbin(space, addr, m_read_mode? ASSERT_LINE : CLEAR_LINE);
+		}
+		dev = dev->m_next;
+	}
+}
+
 /*
     Read access. We are using two loops because the delay between both
     accesses must not occur within the loop. So we have one access on the bus,
     a delay, and then the second access (each one with possibly many attached
     devices)
-
-    TODO: Check two-pass operation
 */
 READ16_MEMBER( ti99_datamux_device::read )
 {
-	UINT8 hbyte = 0;
-	UINT16 addr = (offset << 1);
-
 	// Looks ugly, but this is close to the real thing. If the 16bit
 	// memory expansion is installed in the console, and the access hits its
 	// space, just respond to the memory access and don't bother the
 	// datamux in any way. In particular, do not make the datamux insert wait
 	// states.
-	if (m_use32k)
+	if (m_base32k != 0)
 	{
-		UINT16 base = 0;
-		if ((addr & 0xe000)==0x2000) base = 0x1000;
-		if (((addr & 0xe000)==0xa000) || ((addr & 0xc000)==0xc000)) base = 0x4000;
-
-		if (base != 0)
-		{
-			UINT16 reply = m_ram16b[offset-base];
-			return reply & mem_mask;
-		}
+		UINT16 reply = m_ram16b[offset-m_base32k];
+		return reply & mem_mask;
 	}
+	else
+	{
+		// The byte from the odd address has already been read into the latch
+		// Reading the even address now (addr)
+		UINT8 hbyte = 0;
+		read_all(space, m_addr_buf, &hbyte);
+		if (VERBOSE>3) LOG("datamux: read even byte from address %04x -> %02x\n",  m_addr_buf, hbyte);
 
-	// Read the odd address into the latch
-	read_all(space, addr+1, &m_latch);
-
-	// Reading the even address now (addr)
-	read_all(space, addr, &hbyte);
-
-	// Insert four wait states and let CPU enter wait state
-	// The counter in the real console is implemented by a shift register
-	// that is triggered on a memory access
-
-	// We cannot split the wait states between the read accesses before we
-	// have a split-phase read access in the core
-	m_waitcount = 6;
-	m_ready(CLEAR_LINE);
-
-	// use the latch and the currently read byte and put it on the 16bit bus
-	return ((hbyte<<8) | m_latch) & mem_mask;
+		return ((hbyte<<8) | m_latch) & mem_mask;
+	}
 }
 
 /*
@@ -175,55 +169,115 @@ READ16_MEMBER( ti99_datamux_device::read )
 */
 WRITE16_MEMBER( ti99_datamux_device::write )
 {
-	UINT16 addr = (offset << 1);
-
 	// Although MESS allows for using mem_mask to address parts of the
 	// data bus, this is not used in the TMS implementation. In fact, all
 	// accesses are true 16-bit accesses. We check for mem_mask always
 	// being ffff.
 
-//  printf("write addr=%04x, value=%04x\n", addr, data);
-
 	// Handle the internal 32K expansion
-	if (m_use32k)
+	if (m_base32k != 0)
 	{
-		UINT16 base = 0;
-		if ((addr & 0xe000)==0x2000) base = 0x1000;
-		if (((addr & 0xe000)==0xa000) || ((addr & 0xc000)==0xc000)) base = 0x4000;
-
-		if (base != 0)
-		{
-			m_ram16b[offset-base] = data;
-			return;
-		}
+		m_ram16b[offset-m_base32k] = data;
 	}
+	else
+	{
+		// Otherwise the datamux is in normal operation which means it puts
+		// the even value into the latch and outputs the odd value now.
+		m_latch = (data >> 8) & 0xff;
 
-	// write odd byte
-	write_all(space, addr+1, data & 0xff);
-	// write even byte
-	write_all(space, addr, (data>>8) & 0xff);
-
-	// Insert four wait states and let CPU enter wait state
-	m_waitcount = 6;
-	m_ready(CLEAR_LINE);
+		// write odd byte
+		if (VERBOSE>3) LOG("datamux: write odd byte to address %04x <- %02x\n",  m_addr_buf+1, data & 0xff);
+		write_all(space, m_addr_buf+1, data & 0xff);
+	}
 }
 
+/*
+    Called when the memory access starts by setting the address bus. From that
+    point on, we suspend the CPU until all operations are done.
+*/
 SETOFFSET_MEMBER( ti99_datamux_device::setoffset )
 {
-	if (VERBOSE>6) LOG("set address %04x\n", offset << 1);
+	if (VERBOSE>6) LOG("datamux: set address %04x\n", offset << 1);
+	// Initialize counter
+	// 1 cycle for loading into the datamux
+	// 2 subsequent wait states (LSB)
+	// 2 subsequent wait states (MSB)
+	// clock cycle 6 is the nominal follower of the last wait state
+	m_waitcount = 5;
+	m_addr_buf = offset << 1;
+	m_spacep = &space;
+
+	m_base32k = 0;
+	if (m_use32k)
+	{
+		if ((m_addr_buf & 0xe000)==0x2000) m_base32k = 0x1000;
+		if (((m_addr_buf & 0xe000)==0xa000) || ((m_addr_buf & 0xc000)==0xc000)) m_base32k = 0x4000;
+	}
+
+	// Suspend the CPU if not using the 32K
+	if (m_base32k == 0)
+	{
+		// propagate the setaddress operation
+		// First the odd address
+		setaddress_all(space, m_addr_buf+1);
+		m_ready(CLEAR_LINE);
+	}
+	else m_waitcount = 0;
 }
 
 /*
     The datamux is connected to the clock line in order to operate
-    the wait state counter.
+    the wait state counter and to read/write the bytes.
 */
 void ti99_datamux_device::clock_in(int clock)
 {
-	if (clock==ASSERT_LINE && m_waitcount!=0)
+	// return immediately if the datamux is currently inactive
+	if (m_waitcount>0)
 	{
-		m_waitcount--;
-		if (m_waitcount==0) m_ready(ASSERT_LINE);
+		if (VERBOSE>6) LOG("datamux: wait count %d\n", m_waitcount);
+		if (m_read_mode)
+		{
+			// Reading
+			if (clock==ASSERT_LINE)
+			{   // raising edge
+				m_waitcount--;
+				if (m_waitcount==0) m_ready(ASSERT_LINE);
+				if (m_waitcount==2)
+				{
+					// read odd byte
+					read_all(*m_spacep, m_addr_buf+1, &m_latch);
+					if (VERBOSE>3) LOG("datamux: read odd byte from address %04x -> %02x\n",  m_addr_buf+1, m_latch);
+					// do the setaddress for the even address
+					setaddress_all(*m_spacep, m_addr_buf);
+				}
+			}
+		}
+		else
+		{
+			if (clock==ASSERT_LINE)
+			{   // raising edge
+				m_waitcount--;
+				if (m_waitcount==0) m_ready(ASSERT_LINE);
+			}
+			else
+			{   // falling edge
+				if (m_waitcount==2)
+				{
+					// do the setaddress for the even address
+					setaddress_all(*m_spacep, m_addr_buf);
+					// write even byte
+					if (VERBOSE>3) LOG("datamux: write even byte to address %04x <- %02x\n",  m_addr_buf, m_latch);
+					write_all(*m_spacep, m_addr_buf, m_latch);
+				}
+			}
+		}
 	}
+}
+
+void ti99_datamux_device::dbin_in(int state)
+{
+	m_read_mode = (state==ASSERT_LINE);
+	if (VERBOSE>6) LOG("datamux: data bus in = %d\n", m_read_mode? 1:0 );
 }
 
 /***************************************************************************
@@ -308,6 +362,8 @@ void ti99_datamux_device::device_reset(void)
 
 	m_waitcount = 0;
 	m_latch = 0;
+
+	m_read_mode = true;
 }
 
 INPUT_PORTS_START( datamux )

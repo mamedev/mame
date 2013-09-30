@@ -28,8 +28,6 @@
 #define VERBOSE 1
 #define LOG logerror
 
-#define REAL_TIMING 0
-
 /****************************************************************************/
 
 ti_speech_synthesizer_device::ti_speech_synthesizer_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -38,78 +36,22 @@ ti_speech_synthesizer_device::ti_speech_synthesizer_device(const machine_config 
 }
 
 /*
-    Comments on real timing in the TMS5200 emulation
-
-    Real timing means that the synthesizer clears the /READY line (puts high)
-    whenever a read or write access is in progress. This is done by setting
-    /RS and /WS lines, according to the read or write operation. The /READY line
-    is asserted again after some time. Real timing is used once the tms5220_wsq_w
-    and tms5220_rsq_w are called.
-
-    Within the TI systems, the /RS and /WS lines are controlled directly by the
-    address bus. There is currently no way to insert wait states between
-    the address setting and the data bus sampling, since this is an atomic
-    operation in the emulator (read_byte). It would be necessary to somehow
-    announce the pending read before it actually happens so that devices
-    like this VSP may insert wait states before the read.
-
-    The TMS5220 implementation assumes that wait states are respected and
-    therefore delivers bad values when queried too early. It uses a latch that
-    gets the new value after some time has expired.
-
-    To fix this we have to modify the RS/WS methods in TMS5200 to immediately
-    set the status (after updating the sound status, or the status will be
-    outdated too early).
-
-    Also note that the /RS and /WS lines must be cleared (put to high) when the
-    read is done. Again, this is not possible with the current implementation.
-    So we do this in the ready callback.
-
-    On the bottom line we will stay with the not-REAL_TIMING for now and wait
-    for the core to allow for split read accesses.
-*/
-
-
-/*
     Memory read
 */
-#if REAL_TIMING
+
 // ======  This is the version with real timing =======
 READ8Z_MEMBER( ti_speech_synthesizer_device::readz )
 {
 	if ((offset & m_select_mask)==m_select_value)
 	{
-		m_vsp->wsq_w(TRUE);
-		m_vsp->rsq_w(FALSE);
-		*value = m_vsp->read(offset) & 0xff;
-		if (VERBOSE>4) LOG("spchsyn: read value = %02x\n", *value);
-	}
-}
-
-/*
-    Memory write
-*/
-WRITE8_MEMBER( ti_speech_synthesizer_device::write )
-{
-	if ((offset & m_select_mask)==(m_select_value | 0x0400))
-	{
-		m_vsp->rsq_w(m_vsp, TRUE);
-		m_vsp->wsq_w(m_vsp, FALSE);
-		if (VERBOSE>4) LOG("spchsyn: write value = %02x\n", data);
-		m_vsp->write(offset, data);
-	}
-}
-
-#else
-// ======  This is the version without real timing =======
-
-READ8Z_MEMBER( ti_speech_synthesizer_device::readz )
-{
-	if ((offset & m_select_mask)==m_select_value)
-	{
-		machine().device("maincpu")->execute().adjust_icount(-(18+3));      /* this is just a minimum, it can be more */
 		*value = m_vsp->status_r(space, offset, 0xff) & 0xff;
 		if (VERBOSE>4) LOG("spchsyn: read value = %02x\n", *value);
+		// We should clear the lines at this point. The TI-99/4A clears the
+		// lines by setting the address bus to a different value, but the
+		// Geneve may behave differently. This may not 100% reflect the real
+		// situation, but it ensures a safe processing.
+		m_vsp->rsq_w(TRUE);
+		m_vsp->wsq_w(TRUE);
 	}
 }
 
@@ -120,26 +62,51 @@ WRITE8_MEMBER( ti_speech_synthesizer_device::write )
 {
 	if ((offset & m_select_mask)==(m_select_value | 0x0400))
 	{
-		machine().device("maincpu")->execute().adjust_icount(-(54+3));      /* this is just an approx. minimum, it can be much more */
-
-		/* RN: the stupid design of the tms5220 core means that ready is cleared */
-		/* when there are 15 bytes in FIFO.  It should be 16.  Of course, if */
-		/* it were the case, we would need to store the value on the bus, */
-		/* which would be more complex. */
-		if (!m_vsp->readyq_r())
-		{
-			attotime time_to_ready = attotime::from_double(m_vsp->time_to_ready());
-			int cycles_to_ready = machine().device<cpu_device>("maincpu")->attotime_to_cycles(time_to_ready);
-			if (VERBOSE>8) LOG("spchsyn: time to ready: %f -> %d\n", time_to_ready.as_double(), (int) cycles_to_ready);
-
-			machine().device("maincpu")->execute().adjust_icount(-cycles_to_ready);
-			machine().scheduler().timer_set(attotime::zero, FUNC_NULL);
-		}
 		if (VERBOSE>4) LOG("spchsyn: write value = %02x\n", data);
 		m_vsp->data_w(space, offset, data);
+		// Note that we must NOT clear the lines here. Find the lines in the
+		// READY callback below.
 	}
 }
-#endif
+
+SETADDRESS_DBIN_MEMBER( ti_speech_synthesizer_device::setaddress_dbin )
+{
+	if ((offset & m_select_mask & ~0x0400)==m_select_value)
+	{
+		if (VERBOSE>4) LOG("spchsyn: set address = %04x, dbin = %d\n", offset, state);
+		m_read_mode = (state==ASSERT_LINE);
+		bool readop = (offset & 0x0400)==0;
+
+		if (m_read_mode != readop)
+		{
+			// reset all; this is not a valid access
+			m_vsp->rsq_w(TRUE);
+			m_vsp->wsq_w(TRUE);
+		}
+		else
+		{
+			if (readop)
+			{
+				// Caution: We MUST first clear (TRUE) one line to avoid
+				// both RS* and WS* be asserted (otherwise tms5220 will report "illegal")
+				m_vsp->wsq_w(TRUE);
+				m_vsp->rsq_w(FALSE);
+			}
+			else
+			{
+				m_vsp->rsq_w(TRUE);
+				m_vsp->wsq_w(FALSE);
+			}
+		}
+	}
+	else
+	{
+		// If other address, turn off RS* and WS* (negative logic!)
+		m_vsp->rsq_w(TRUE);
+		m_vsp->wsq_w(TRUE);
+		return;
+	}
+}
 
 /****************************************************************************/
 
@@ -151,14 +118,12 @@ WRITE_LINE_MEMBER( ti_speech_synthesizer_device::speech_ready )
 	m_slot->set_ready((state==0)? ASSERT_LINE : CLEAR_LINE);
 	if (VERBOSE>5) LOG("spchsyn: READY = %d\n", (state==0));
 
-#if REAL_TIMING
-	// Need to do that here (see explanations above)
-	if (state==0)
+	if ((state==0) && !m_read_mode)
 	{
+		// Clear the lines only when we are done with writing.
 		m_vsp->rsq_w(TRUE);
 		m_vsp->wsq_w(TRUE);
 	}
-#endif
 }
 
 void ti_speech_synthesizer_device::device_start()
@@ -172,6 +137,7 @@ void ti_speech_synthesizer_device::device_config_complete()
 
 void ti_speech_synthesizer_device::device_reset()
 {
+	if (VERBOSE>5) LOG("spchsyn: reset\n");
 	if (m_genmod)
 	{
 		m_select_mask = 0x1ffc01;
@@ -182,6 +148,7 @@ void ti_speech_synthesizer_device::device_reset()
 		m_select_mask = 0x7fc01;
 		m_select_value = 0x79000;
 	}
+	m_read_mode = false;
 }
 
 MACHINE_CONFIG_FRAGMENT( ti99_speech )

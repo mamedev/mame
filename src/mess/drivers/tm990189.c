@@ -824,7 +824,8 @@ static TMS99xx_CONFIG( cpuconf )
 	DEVCB_NULL,     // Instruction acquisition
 	DEVCB_NULL,     // Clock out
 	DEVCB_NULL,     // wait
-	DEVCB_NULL      // Hold acknowledge
+	DEVCB_NULL,      // Hold acknowledge
+	DEVCB_NULL      // DBIN
 };
 
 static MACHINE_CONFIG_START( tm990_189, tm990189_state )

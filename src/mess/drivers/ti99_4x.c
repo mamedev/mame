@@ -89,6 +89,7 @@ public:
 	DECLARE_READ8_MEMBER( interrupt_level );
 	DECLARE_READ_LINE_MEMBER( ready_connect );
 	DECLARE_WRITE_LINE_MEMBER( clock_out );
+	DECLARE_WRITE_LINE_MEMBER( dbin_line );
 
 	DECLARE_INPUT_CHANGED_MEMBER( load_interrupt );
 	TIMER_DEVICE_CALLBACK_MEMBER(ti99_4ev_hblank_interrupt);
@@ -601,6 +602,14 @@ WRITE_LINE_MEMBER( ti99_4x_state::clock_out )
 	m_datamux->clock_in(state);
 }
 
+/*
+   Data bus in (DBIN) line from the CPU.
+*/
+WRITE_LINE_MEMBER( ti99_4x_state::dbin_line )
+{
+	m_datamux->dbin_in(state);
+}
+
 /*****************************************************************************/
 
 /*
@@ -822,7 +831,8 @@ static TMS99xx_CONFIG( ti99_cpuconf )
 	DEVCB_NULL,     // Instruction acquisition
 	DEVCB_DRIVER_LINE_MEMBER(ti99_4x_state, clock_out),
 	DEVCB_NULL,     // wait
-	DEVCB_NULL      // Hold acknowledge
+	DEVCB_NULL,      // Hold acknowledge
+	DEVCB_DRIVER_LINE_MEMBER(ti99_4x_state, dbin_line)      // data bus in
 };
 
 static JOYPORT_CONFIG( joyport4_60 )

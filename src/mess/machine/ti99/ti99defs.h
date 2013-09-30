@@ -49,6 +49,15 @@
 #define READ8Z_MEMBER(name)             void name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 *value, ATTR_UNUSED UINT8 mem_mask)
 #define DECLARE_READ8Z_MEMBER(name)     void name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 *value, ATTR_UNUSED UINT8 mem_mask = 0xff)
 
+/*
+    For almost all applications of setoffset, we also need the data bus
+    direction. This line is called DBIN on the TI CPUs, but as we do not assume
+    that this is a general rule, we use new macros here which contain the
+    DBIN setting.
+*/
+#define SETADDRESS_DBIN_MEMBER(name)          void  name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED int state)
+#define DECLARE_SETADDRESS_DBIN_MEMBER(name)  void  name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED int state)
+
 #define GENMOD 0x01
 
 /*
@@ -65,6 +74,7 @@ public:
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source) { }
 	virtual DECLARE_READ8Z_MEMBER(readz) =0;
 	virtual DECLARE_WRITE8_MEMBER(write) =0;
+	virtual DECLARE_SETADDRESS_DBIN_MEMBER( setaddress_dbin ) { };
 };
 
 class bus16z_device : device_t
@@ -72,6 +82,7 @@ class bus16z_device : device_t
 public:
 	virtual DECLARE_READ16Z_MEMBER(read16z) =0;
 	virtual DECLARE_WRITE16_MEMBER(write16) =0;
+	virtual DECLARE_SETADDRESS_DBIN_MEMBER( setaddress_dbin ) { };
 };
 
 /****************************************************************************

@@ -73,6 +73,7 @@ public:
 	DECLARE_SETOFFSET_MEMBER( setoffset );
 
 	void clock_in(int state);
+	void dbin_in(int state);
 
 protected:
 	/* Constructor */
@@ -82,14 +83,26 @@ protected:
 	virtual ioport_constructor device_input_ports() const;
 
 private:
+	// Keeps the address space pointer
+	address_space* m_spacep;
+
 	// Common read routine
 	void read_all(address_space& space, UINT16 addr, UINT8 *target);
 
 	// Common write routine
 	void write_all(address_space& space, UINT16 addr, UINT8 value);
 
+	// Common set address method
+	void setaddress_all(address_space& space, UINT16 addr);
+
 	// Ready line to the CPU
 	devcb_resolved_write_line m_ready;
+
+	/* Address latch (emu). In reality, the address bus remains constant. */
+	UINT16 m_addr_buf;
+
+	/* Stores the state of the DBIN line. */
+	bool    m_read_mode;
 
 	/* All devices that are attached to the 8-bit bus. */
 	simple_list<attached_device> m_devices;
@@ -105,6 +118,9 @@ private:
 
 	/* Use the memory expansion? */
 	bool m_use32k;
+
+	/* Memory base for piggy-back 32K expansion. If 0, expansion is not used. */
+	UINT16  m_base32k;
 
 	/* Reference to the CPU; avoid lookups. */
 	device_t *m_cpu;

@@ -240,6 +240,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(video_wait_states);
 
 	DECLARE_WRITE_LINE_MEMBER(clock_out);
+	DECLARE_WRITE_LINE_MEMBER(dbin_line);
+
 	DECLARE_WRITE8_MEMBER(external_operation);
 
 	DECLARE_WRITE8_MEMBER(tms9901_interrupt);
@@ -284,7 +286,7 @@ private:
 */
 
 static ADDRESS_MAP_START(memmap, AS_PROGRAM, 8, geneve_state)
-	AM_RANGE(0x0000, 0xffff) AM_DEVREADWRITE(GMAPPER_TAG, geneve_mapper_device, readm, writem)
+	AM_RANGE(0x0000, 0xffff) AM_DEVREADWRITE(GMAPPER_TAG, geneve_mapper_device, readm, writem) AM_DEVSETOFFSET(GMAPPER_TAG, geneve_mapper_device, setoffset)
 ADDRESS_MAP_END
 
 /*
@@ -604,7 +606,7 @@ WRITE_LINE_MEMBER( geneve_state::intb )
 
 WRITE_LINE_MEMBER( geneve_state::ext_ready )
 {
-	if (VERBOSE>6) LOG("ti99_8: READY level (ext) =%02x\n", state);
+	if (VERBOSE>6) LOG("geneve: READY level (ext) = %02x\n", state);
 	m_ready_line = state;
 	m_cpu->set_ready((m_ready_line == ASSERT_LINE && m_ready_line1 == ASSERT_LINE)? ASSERT_LINE : CLEAR_LINE);
 }
@@ -670,13 +672,21 @@ WRITE_LINE_MEMBER( geneve_state::clock_out )
 	m_mapper->clock_in(state);
 }
 
+/*
+    DBIN line from the CPU. Used to control wait state generation.
+*/
+WRITE_LINE_MEMBER( geneve_state::dbin_line )
+{
+	m_mapper->dbin(state);
+}
+
 static TMS9995_CONFIG( geneve_processor_config )
 {
 	DEVCB_DRIVER_MEMBER(geneve_state, external_operation),
 	DEVCB_NULL,         // Instruction acquisition
 	DEVCB_DRIVER_LINE_MEMBER(geneve_state, clock_out),
-	DEVCB_NULL,         // wait
 	DEVCB_NULL,         // HOLDA
+	DEVCB_DRIVER_LINE_MEMBER(geneve_state, dbin_line),      // DBIN
 	INTERNAL_RAM,       // use internal RAM
 	NO_OVERFLOW_INT     // The generally available versions of TMS9995 have a deactivated overflow interrupt
 };
