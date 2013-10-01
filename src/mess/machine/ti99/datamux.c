@@ -134,6 +134,9 @@ void ti99_datamux_device::setaddress_all(address_space& space, UINT16 addr)
 	}
 }
 
+// FIXME: Allow for a separate debugger access, or it will spoil the whole
+// addressing process!
+
 /*
     Read access. We are using two loops because the delay between both
     accesses must not occur within the loop. So we have one access on the bus,
@@ -142,11 +145,19 @@ void ti99_datamux_device::setaddress_all(address_space& space, UINT16 addr)
 */
 READ16_MEMBER( ti99_datamux_device::read )
 {
+	if (space.debugger_access())
+	{
+		// FIXME, or the debugger will become blind for addresses outside
+		// ROM and scratch pad RAM.
+		return 0;
+	}
+
 	// Looks ugly, but this is close to the real thing. If the 16bit
 	// memory expansion is installed in the console, and the access hits its
 	// space, just respond to the memory access and don't bother the
 	// datamux in any way. In particular, do not make the datamux insert wait
 	// states.
+
 	if (m_base32k != 0)
 	{
 		UINT16 reply = m_ram16b[offset-m_base32k];
@@ -169,10 +180,16 @@ READ16_MEMBER( ti99_datamux_device::read )
 */
 WRITE16_MEMBER( ti99_datamux_device::write )
 {
-	// Although MESS allows for using mem_mask to address parts of the
-	// data bus, this is not used in the TMS implementation. In fact, all
-	// accesses are true 16-bit accesses. We check for mem_mask always
-	// being ffff.
+	// Addresses below 0x2000 are ROM and should be handled in the address map
+	// by the ROM entry, but as the write handler for ROM is not mapped, we end up
+	// here when there are invalid accesses, and this will mess up everything.
+	if (offset < 0x1000) return;
+
+	if (space.debugger_access())
+	{
+		// Do not accept write operations from the debugger (later maybe).
+		return;
+	}
 
 	// Handle the internal 32K expansion
 	if (m_base32k != 0)
@@ -277,7 +294,7 @@ void ti99_datamux_device::clock_in(int clock)
 void ti99_datamux_device::dbin_in(int state)
 {
 	m_read_mode = (state==ASSERT_LINE);
-	if (VERBOSE>6) LOG("datamux: data bus in = %d\n", m_read_mode? 1:0 );
+	if (VERBOSE>7) LOG("datamux: data bus in = %d\n", m_read_mode? 1:0 );
 }
 
 /***************************************************************************
