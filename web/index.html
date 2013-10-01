@@ -16,19 +16,44 @@
 </head>
 <body>
 <script language="javascript" type="text/javascript">
+ 
+  function updateStatusBar(connectionStatus, isPaused, driverText) {
+	if (connectionStatus) {
+		// Update every page's connection statusbar.
+		$("td#main_statusbar_connectionstatus").html(connectionStatus);
+		$("td#command_statusbar_connectionstatus").html(connectionStatus);
+		$("td#option_statusbar_connectionstatus").html(connectionStatus);
+		$("td#slider_statusbar_connectionstatus").html(connectionStatus);
+		$("td#driver_statusbar_connectionstatus").html(connectionStatus);
+		$("td#image_statusbar_connectionstatus").html(connectionStatus);
+		$("td#info_statusbar_connectionstatus").html(connectionStatus);
+		$("td#logs_statusbar_connectionstatus").html(connectionStatus);
+	}
+	if (isPaused) {
+		// Update every page's running/paused statusbar.
+		$("td#main_statusbar_ispaused").html(isPaused);
+		$("td#command_statusbar_ispaused").html(isPaused);
+		$("td#option_statusbar_ispaused").html(isPaused);
+		$("td#slider_statusbar_ispaused").html(isPaused);
+		$("td#driver_statusbar_ispaused").html(isPaused);
+		$("td#image_statusbar_ispaused").html(isPaused);
+		$("td#info_statusbar_ispaused").html(isPaused);
+		$("td#logs_statusbar_ispaused").html(isPaused);
+		}
+	if (driverText) {
+		// Update every page's running driver statusbar.
+		$("td#main_statusbar_runningdriver").html(driverText);
+		$("td#command_statusbar_runningdriver").html(driverText);
+		$("td#option_statusbar_runningdriver").html(driverText);
+		$("td#slider_statusbar_runningdriver").html(driverText);
+		$("td#driver_statusbar_runningdriver").html(driverText);
+		$("td#image_statusbar_runningdriver").html(driverText);
+		$("td#info_statusbar_runningdriver").html(driverText);
+		$("td#logs_statusbar_runningdriver").html(driverText);
+	}
+	
+  }
 
-  var writeConnectionStatus = function(message) {
-	// Update the statusbar on each subpage at the same time.
-	$("td#main_statusbar_connectionstatus").html(message);
-	$("td#command_statusbar_connectionstatus").html(message);
-	$("td#option_statusbar_connectionstatus").html(message);
-	$("td#slider_statusbar_connectionstatus").html(message);
-	$("td#driver_statusbar_connectionstatus").html(message);
-	$("td#image_statusbar_connectionstatus").html(message);
-	$("td#info_statusbar_connectionstatus").html(message);
-	$("td#logs_statusbar_connectionstatus").html(message);
-  };
-  
   function takeScreenshot()
   {
     // First, we need to generate a random number to make absolutely sure we bypass browser caching.
@@ -48,7 +73,11 @@
 	  },
 	  error: function (request, status, error) { alert(status + ", " + error); }
 	});
-	startWebSocket();
+	if (command !== 'exit') {
+		startWebSocket();
+	} else {
+		updateStatusBar('<b style="color: red;">Disconnected</b>','Exited','No Driver');
+	}
   }
 
   function executeHardReset()
@@ -70,7 +99,7 @@
     executeCommands("exit");
 	$('.ui-dialog').dialog('close');
   }
- 
+
   function executeSlider()
   {
 	$.ajax({
@@ -92,7 +121,7 @@
 		  },
 		  error: function (request, status, error) { alert(status + ", " + error); }
 		});	
-  window.location.hash='#slidermenu';
+  window.location.hash='#slidermenu'; // Just making sure we're on the slider screen.
   }
 
   function setSliderValue(id,val)
@@ -112,10 +141,10 @@
 	var url = docbase.replace("http://","ws://");
     websocket = new WebSocket(url);
     websocket.onopen = function(ev) {
-	  writeConnectionStatus('<b style="color: green;">Connected</b>');
+	  updateStatusBar('<b style="color: green;">Connected</b>','','');
     };
     websocket.onclose = function(ev) {      
-      writeConnectionStatus('<b style="color: red;">Disconnected</b>');
+      updateStatusBar('<b style="color: red;">Disconnected</b>','','');
     };
     websocket.onmessage = function(ev) {
 	if (ev.data=='update_machine') 
@@ -149,29 +178,15 @@
 			maindesc_manufacturer.push(data.manufacturer);
 			maindesc_parent.push(data.parent);
 			maindesc_sourcefile.push(data.source_file);
-			
-			$("td#main_statusbar_runningdriver").html(statusbar_runningdriver.join(''));
-			$("td#main_statusbar_ispaused").html(statusbar_ispaused.join(''));
-			$("td#command_statusbar_runningdriver").html(statusbar_runningdriver.join(''));
-			$("td#command_statusbar_ispaused").html(statusbar_ispaused.join(''));
-			$("td#option_statusbar_runningdriver").html(statusbar_runningdriver.join(''));
-			$("td#option_statusbar_ispaused").html(statusbar_ispaused.join(''));
-			$("td#slider_statusbar_runningdriver").html(statusbar_runningdriver.join(''));
-			$("td#slider_statusbar_ispaused").html(statusbar_ispaused.join(''));
-			$("td#driver_statusbar_runningdriver").html(statusbar_runningdriver.join(''));
-			$("td#driver_statusbar_ispaused").html(statusbar_ispaused.join(''));
-			$("td#image_statusbar_runningdriver").html(statusbar_runningdriver.join(''));
-			$("td#image_statusbar_ispaused").html(statusbar_ispaused.join(''));
-			$("td#info_statusbar_runningdriver").html(statusbar_runningdriver.join(''));
-			$("td#info_statusbar_ispaused").html(statusbar_ispaused.join(''));
-			$("td#logs_statusbar_runningdriver").html(statusbar_runningdriver.join(''));
-			$("td#logs_statusbar_ispaused").html(statusbar_ispaused.join(''));
 			$("#maindesc_name").html(maindesc_name.join(''));
 			$("#maindesc_description").html(maindesc_description.join(''));
 			$("#maindesc_year").html(maindesc_year.join(''));
 			$("#maindesc_manufacturer").html(maindesc_manufacturer.join(''));
 			$("#maindesc_parent").html(maindesc_parent.join(''));
 			$("#maindesc_sourcefile").html(maindesc_sourcefile.join(''));
+
+			// Now, actually update the status bar..
+			updateStatusBar('',statusbar_ispaused.join(''),statusbar_runningdriver.join(''));
 		  },
 		  error: function (request, status, error) { alert(status + ", " + error); }
 		});	
@@ -179,7 +194,7 @@
 
     };
     websocket.onerror = function(ev) {
-      writeConnectionStatus('<b style="color: red; ">Error</b>');
+		updateStatusBar('<b style="color: red; ">Error</b>',' ',' ');
     };
   }
 
@@ -187,6 +202,7 @@
 	startWebSocket();
   };
 </script>
+
 <!-- This begins the MAIN MENU page ------------------------------------------------------------------->
 <div data-role="page" id="mainmenu">
     <div data-theme="a" data-role="header">
@@ -660,7 +676,7 @@
                     <a href="#optionmenu" data-transition="fade" data-icon="gear">Options</a>
                 </li>
                 <li>
-                    <a href="#imagemenu" data-transition="fade" data-icon="grid">Image</a>
+                    <a href="#mainmenu" data-transition="fade" data-icon="home">Main Menu</a>
                 </li>
                 <li>
                     <a href="#commandmenu" data-transition="fade" data-icon="star">Commands</a>
@@ -729,7 +745,7 @@
 		<div  data-role="navbar" data-iconpos="top">
 			<ul>
 				<li>
-					<a href="#infomenu" data-transition="fade" data-icon="info">Info</a>
+                    <a href="#mainmenu" data-transition="fade" data-icon="home">Main Menu</a>
 				</li>
 				<li>
 					<a href="#logsmenu" data-transition="fade" data-icon="check">Logs</a>
@@ -787,7 +803,7 @@
 					<a href="#infomenu" data-transition="fade" data-icon="info">Info</a>
 				</li>
 				<li>
-					<a href="#logsmenu" data-transition="fade" data-icon="check">Logs</a>
+                    <a href="#mainmenu" data-transition="fade" data-icon="home">Main Menu</a>
 				</li>
 				<li>
 					<a href="javascript:takeScreenshot();" data-transition="fade" data-icon="search">Screenshot</a>
