@@ -2245,6 +2245,11 @@ static MACHINE_CONFIG_START( ghostb, dec8_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( meikyuh, ghostb )
+	MCFG_CPU_REPLACE("audiocpu", M6502, 1500000)
+	MCFG_CPU_PROGRAM_MAP(dec8_s_map)
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_START( csilver, dec8_state )
 
 	/* basic machine hardware */
@@ -3599,8 +3604,8 @@ GAME( 1987, garyoret, 0,        garyoret, garyoret, dec8_state,  garyoret,    RO
 GAME( 1987, ghostb,   0,        ghostb,   ghostb, dec8_state,    ghostb,      ROT0,   "Data East USA", "The Real Ghostbusters (US 2 Players, revision 2)", GAME_SUPPORTS_SAVE )
 GAME( 1987, ghostb2a, ghostb,   ghostb,   ghostb2a, dec8_state,  ghostb,      ROT0,   "Data East USA", "The Real Ghostbusters (US 2 Players)", GAME_SUPPORTS_SAVE )
 GAME( 1987, ghostb3,  ghostb,   ghostb,   ghostb3, dec8_state,   ghostb,      ROT0,   "Data East USA", "The Real Ghostbusters (US 3 Players)", GAME_SUPPORTS_SAVE )
-GAME( 1987, meikyuh,  ghostb,   ghostb,   meikyuh, dec8_state,   meikyuh,     ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan, set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1987, meikyuha, ghostb,   ghostb,   meikyuh, dec8_state,   meikyuh,     ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan, set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1987, meikyuh,  ghostb,   meikyuh,  meikyuh, dec8_state,   meikyuh,     ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan, set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1987, meikyuha, ghostb,   meikyuh,  meikyuh, dec8_state,   meikyuh,     ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan, set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1987, csilver,  0,        csilver,  csilver, dec8_state,   csilver,     ROT0,   "Data East Corporation", "Captain Silver (World)", GAME_SUPPORTS_SAVE )
 GAME( 1987, csilverj, csilver,  csilver,  csilverj, dec8_state,  csilver,     ROT0,   "Data East Corporation", "Captain Silver (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1987, oscar,    0,        oscar,    oscar, dec8_state,     oscar,       ROT0,   "Data East Corporation", "Psycho-Nics Oscar (World revision 0)", GAME_SUPPORTS_SAVE )
