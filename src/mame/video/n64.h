@@ -56,7 +56,7 @@
 #define MEM16_LIMIT 0x3fffff
 #define MEM32_LIMIT 0x1fffff
 
-#define RDP_RANGE_CHECK (1)
+#define RDP_RANGE_CHECK (0)
 
 #if RDP_RANGE_CHECK
 #define CHECK8(in) if(rdp_range_check((in))) { printf("Check8: Address %08x out of range!\n", (in)); fflush(stdout); fatalerror("Address %08x out of range!\n", (in)); }
@@ -458,8 +458,6 @@ class n64_rdp : public poly_manager<UINT32, rdp_poly_state, 8, 32000>
 		// Color Combiner
 		INT32       ColorCombinerEquation(INT32 a, INT32 b, INT32 c, INT32 d);
 		INT32       AlphaCombinerEquation(INT32 a, INT32 b, INT32 c, INT32 d);
-		void        ColorCombiner2Cycle(rdp_span_aux *userdata);
-		void        ColorCombiner1Cycle(rdp_span_aux *userdata);
 		void        SetSubAInputRGB(UINT8 **input_r, UINT8 **input_g, UINT8 **input_b, int code, rdp_span_aux *userdata);
 		void        SetSubBInputRGB(UINT8 **input_r, UINT8 **input_g, UINT8 **input_b, int code, rdp_span_aux *userdata);
 		void        SetMulInputRGB(UINT8 **input_r, UINT8 **input_g, UINT8 **input_b, int code, rdp_span_aux *userdata);
@@ -562,8 +560,6 @@ class n64_rdp : public poly_manager<UINT32, rdp_poly_state, 8, 32000>
 
 		void        GetDitherValues(int x, int y, int* cdith, int* adith, const rdp_poly_state &object);
 
-		UINT32*         GetSpecial9BitClampTable() { return m_special_9bit_clamptable; }
-
 		UINT16 decompress_cvmask_frombyte(UINT8 x);
 		void lookup_cvmask_derivatives(UINT32 mask, UINT8* offx, UINT8* offy, rdp_span_aux *userdata);
 
@@ -665,7 +661,7 @@ class n64_rdp : public poly_manager<UINT32, rdp_poly_state, 8, 32000>
 		INT32 m_gamma_table[256];
 		INT32 m_gamma_dither_table[0x4000];
 
-		UINT32 m_special_9bit_clamptable[512];
+		static UINT32 s_special_9bit_clamptable[512];
 
 		Writer              _Write[16];
 		Reader              _Read[4];

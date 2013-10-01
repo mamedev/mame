@@ -26,6 +26,7 @@ class N64TexturePipeT
 {
 	public:
 		typedef UINT32 (N64TexturePipeT::*TexelFetcher) (INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux *userdata);
+		typedef void (N64TexturePipeT::*Cycler) (Color* TEX, Color* prev, INT32 SSS, INT32 SST, UINT32 tilenum, UINT32 cycle, rdp_span_aux *userdata, const rdp_poly_state& object, INT32 *m_clamp_s_diff, INT32 *m_clamp_t_diff);
 
 		N64TexturePipeT()
 		{
@@ -85,9 +86,20 @@ class N64TexturePipeT
 			TexelFetch[69] = &N64TexturePipeT::_FetchI_8_RAW;
 			TexelFetch[70] = &N64TexturePipeT::_FetchI_8_TLUT0;
 			TexelFetch[71] = &N64TexturePipeT::_FetchI_8_TLUT1;
+
+			cycle[0] = &N64TexturePipeT::CycleNearest;
+			cycle[1] = &N64TexturePipeT::CycleNearestLerp;
+			cycle[2] = &N64TexturePipeT::CycleLinear;
+			cycle[3] = &N64TexturePipeT::CycleLinearLerp;
 		}
 
-		void                Cycle(Color* TEX, Color* prev, INT32 SSS, INT32 SST, UINT32 tilenum, UINT32 cycle, rdp_span_aux *userdata, const rdp_poly_state& object, INT32 *m_clamp_s_diff, INT32 *m_clamp_t_diff);
+		void                CycleNearest(Color* TEX, Color* prev, INT32 SSS, INT32 SST, UINT32 tilenum, UINT32 cycle, rdp_span_aux *userdata, const rdp_poly_state& object, INT32 *m_clamp_s_diff, INT32 *m_clamp_t_diff);
+		void                CycleNearestLerp(Color* TEX, Color* prev, INT32 SSS, INT32 SST, UINT32 tilenum, UINT32 cycle, rdp_span_aux *userdata, const rdp_poly_state& object, INT32 *m_clamp_s_diff, INT32 *m_clamp_t_diff);
+		void                CycleLinear(Color* TEX, Color* prev, INT32 SSS, INT32 SST, UINT32 tilenum, UINT32 cycle, rdp_span_aux *userdata, const rdp_poly_state& object, INT32 *m_clamp_s_diff, INT32 *m_clamp_t_diff);
+		void                CycleLinearLerp(Color* TEX, Color* prev, INT32 SSS, INT32 SST, UINT32 tilenum, UINT32 cycle, rdp_span_aux *userdata, const rdp_poly_state& object, INT32 *m_clamp_s_diff, INT32 *m_clamp_t_diff);
+
+		Cycler				cycle[4];
+
 		void                Copy(Color* TEX, INT32 SSS, INT32 SST, UINT32 tilenum, const rdp_poly_state& object, rdp_span_aux *userdata);
 		UINT32              Fetch(INT32 SSS, INT32 SST, INT32 tile, const rdp_poly_state& object, rdp_span_aux *userdata);
 		void                CalculateClampDiffs(UINT32 prim_tile, rdp_span_aux *userdata, const rdp_poly_state& object, INT32 *m_clamp_s_diff, INT32 *m_clamp_t_diff);

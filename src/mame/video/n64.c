@@ -30,6 +30,8 @@ TODO:
 
 static FILE *rdp_exec;
 
+UINT32 n64_rdp::s_special_9bit_clamptable[512];
+
 bool n64_rdp::rdp_range_check(UINT32 addr)
 {
 	if(MiscState.FBSize == 0) return false;
@@ -413,7 +415,7 @@ INT32 n64_rdp::ColorCombinerEquation(INT32 a, INT32 b, INT32 c, INT32 d)
 	d = KURT_AKELEY_SIGN9(d);
 	a = (((a - b) * c) + (d << 8) + 0x80);
 	a = SIGN17(a) >> 8;
-	a = m_special_9bit_clamptable[a & 0x1ff];
+	a = s_special_9bit_clamptable[a & 0x1ff];
 	return a;
 }
 
@@ -425,59 +427,8 @@ INT32 n64_rdp::AlphaCombinerEquation(INT32 a, INT32 b, INT32 c, INT32 d)
 	d = KURT_AKELEY_SIGN9(d);
 	a = (((a - b) * c) + (d << 8) + 0x80) >> 8;
 	a = SIGN9(a);
-	a = m_special_9bit_clamptable[a & 0x1ff];
+	a = s_special_9bit_clamptable[a & 0x1ff];
 	return a;
-}
-
-void n64_rdp::ColorCombiner1Cycle(rdp_span_aux *userdata)
-{
-	userdata->NoiseColor.i.r = userdata->NoiseColor.i.g = userdata->NoiseColor.i.b = GetRandom() << 3; // Not accurate
-
-	userdata->PixelColor.i.r = ColorCombinerEquation(*userdata->ColorInputs.combiner_rgbsub_a_r[1],*userdata->ColorInputs.combiner_rgbsub_b_r[1],*userdata->ColorInputs.combiner_rgbmul_r[1],*userdata->ColorInputs.combiner_rgbadd_r[1]);
-	userdata->PixelColor.i.g = ColorCombinerEquation(*userdata->ColorInputs.combiner_rgbsub_a_g[1],*userdata->ColorInputs.combiner_rgbsub_b_g[1],*userdata->ColorInputs.combiner_rgbmul_g[1],*userdata->ColorInputs.combiner_rgbadd_g[1]);
-	userdata->PixelColor.i.b = ColorCombinerEquation(*userdata->ColorInputs.combiner_rgbsub_a_b[1],*userdata->ColorInputs.combiner_rgbsub_b_b[1],*userdata->ColorInputs.combiner_rgbmul_b[1],*userdata->ColorInputs.combiner_rgbadd_b[1]);
-	userdata->PixelColor.i.a = AlphaCombinerEquation(*userdata->ColorInputs.combiner_alphasub_a[1],*userdata->ColorInputs.combiner_alphasub_b[1],*userdata->ColorInputs.combiner_alphamul[1],*userdata->ColorInputs.combiner_alphaadd[1]);
-}
-
-void n64_rdp::ColorCombiner2Cycle(rdp_span_aux *userdata)
-{
-	userdata->NoiseColor.i.r = userdata->NoiseColor.i.g = userdata->NoiseColor.i.b = GetRandom() << 3; // Not accurate
-	userdata->CombinedColor.i.r = ColorCombinerEquation(*userdata->ColorInputs.combiner_rgbsub_a_r[0],
-														*userdata->ColorInputs.combiner_rgbsub_b_r[0],
-														*userdata->ColorInputs.combiner_rgbmul_r[0],
-														*userdata->ColorInputs.combiner_rgbadd_r[0]);
-	userdata->CombinedColor.i.g = ColorCombinerEquation(*userdata->ColorInputs.combiner_rgbsub_a_g[0],
-														*userdata->ColorInputs.combiner_rgbsub_b_g[0],
-														*userdata->ColorInputs.combiner_rgbmul_g[0],
-														*userdata->ColorInputs.combiner_rgbadd_g[0]);
-	userdata->CombinedColor.i.b = ColorCombinerEquation(*userdata->ColorInputs.combiner_rgbsub_a_b[0],
-														*userdata->ColorInputs.combiner_rgbsub_b_b[0],
-														*userdata->ColorInputs.combiner_rgbmul_b[0],
-														*userdata->ColorInputs.combiner_rgbadd_b[0]);
-	userdata->CombinedColor.i.a = AlphaCombinerEquation(*userdata->ColorInputs.combiner_alphasub_a[0],
-														*userdata->ColorInputs.combiner_alphasub_b[0],
-														*userdata->ColorInputs.combiner_alphamul[0],
-														*userdata->ColorInputs.combiner_alphaadd[0]);
-
-	userdata->Texel0Color = userdata->Texel1Color;
-	userdata->Texel1Color = userdata->NextTexelColor;
-
-	userdata->PixelColor.i.r = ColorCombinerEquation(*userdata->ColorInputs.combiner_rgbsub_a_r[1],
-														*userdata->ColorInputs.combiner_rgbsub_b_r[1],
-														*userdata->ColorInputs.combiner_rgbmul_r[1],
-														*userdata->ColorInputs.combiner_rgbadd_r[1]);
-	userdata->PixelColor.i.g = ColorCombinerEquation(*userdata->ColorInputs.combiner_rgbsub_a_g[1],
-														*userdata->ColorInputs.combiner_rgbsub_b_g[1],
-														*userdata->ColorInputs.combiner_rgbmul_g[1],
-														*userdata->ColorInputs.combiner_rgbadd_g[1]);
-	userdata->PixelColor.i.b = ColorCombinerEquation(*userdata->ColorInputs.combiner_rgbsub_a_b[1],
-														*userdata->ColorInputs.combiner_rgbsub_b_b[1],
-														*userdata->ColorInputs.combiner_rgbmul_b[1],
-														*userdata->ColorInputs.combiner_rgbadd_b[1]);
-	userdata->PixelColor.i.a = AlphaCombinerEquation(*userdata->ColorInputs.combiner_alphasub_a[1],
-														*userdata->ColorInputs.combiner_alphasub_b[1],
-														*userdata->ColorInputs.combiner_alphamul[1],
-														*userdata->ColorInputs.combiner_alphaadd[1]);
 }
 
 void n64_rdp::SetSubAInputRGB(UINT8 **input_r, UINT8 **input_g, UINT8 **input_b, int code, rdp_span_aux *userdata)
@@ -3782,13 +3733,13 @@ n64_rdp::n64_rdp(n64_state &state) : poly_manager<UINT32, rdp_poly_state, 8, 320
 		{
 		case 0:
 		case 1:
-			m_special_9bit_clamptable[i] = i & 0xff;
+			s_special_9bit_clamptable[i] = i & 0xff;
 			break;
 		case 2:
-			m_special_9bit_clamptable[i] = 0xff;
+			s_special_9bit_clamptable[i] = 0xff;
 			break;
 		case 3:
-			m_special_9bit_clamptable[i] = 0;
+			s_special_9bit_clamptable[i] = 0;
 			break;
 		}
 	}

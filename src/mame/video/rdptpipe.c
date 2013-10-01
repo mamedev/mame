@@ -36,41 +36,61 @@ void N64TexturePipeT::SetMachine(running_machine &machine)
 
 void N64TexturePipeT::Mask(INT32* S, INT32* T, INT32 num, const rdp_poly_state& object)
 {
-	const N64Tile* tile = object.m_tiles;
+	const N64Tile* tiles = object.m_tiles;
 
-	if (tile[num].mask_s)
+	if (tiles[num].mask_s)
 	{
-		INT32 wrap = *S >> (tile[num].mask_s > 10 ? 10 : tile[num].mask_s);
+		INT32 wrap = *S >> (tiles[num].mask_s > 10 ? 10 : tiles[num].mask_s);
 		wrap &= 1;
-		if (tile[num].ms && wrap)
+		if (tiles[num].ms && wrap)
 		{
 			*S = (~(*S));
 		}
-		*S &= m_maskbits_table[tile[num].mask_s];
+		*S &= m_maskbits_table[tiles[num].mask_s];
 	}
 
-	if (tile[num].mask_t)
+	if (tiles[num].mask_t)
 	{
-		INT32 wrap = *T >> (tile[num].mask_t > 10 ? 10 : tile[num].mask_t);
+		INT32 wrap = *T >> (tiles[num].mask_t > 10 ? 10 : tiles[num].mask_t);
 		wrap &= 1;
-		if (tile[num].mt && wrap)
+		if (tiles[num].mt && wrap)
 		{
 			*T = (~(*T));
 		}
-		*T &= m_maskbits_table[tile[num].mask_t];
+		*T &= m_maskbits_table[tiles[num].mask_t];
 	}
 }
 
+#define MASK_COUPLED(param, param1, num, coord) \
+	if (tiles[num].mask_##coord)					\
+	{											\
+		INT32 maskbits_##coord = m_maskbits_table[tiles[num].mask_##coord];	\
+		if (tiles[num].m##coord)					\
+		{										\
+			INT32 wrapthreshold = tiles[num].mask_##coord > 10 ? 10 : tiles[num].mask_##coord;	\
+			if ((param >> wrapthreshold) & 1)	\
+			{									\
+				param = ~param;					\
+			}									\
+			if ((param1 >> wrapthreshold) & 1)	\
+			{									\
+				param1 = ~param1;				\
+			}									\
+		}										\
+		param &= maskbits_##coord;				\
+		param1 &= maskbits_##coord;				\
+	}
+
 void N64TexturePipeT::MaskCoupled(INT32* S, INT32* S1, INT32* T, INT32* T1, INT32 num, const rdp_poly_state& object)
 {
-	const N64Tile* tile = object.m_tiles;
+	const N64Tile* tiles = object.m_tiles;
 
-	if (tile[num].mask_s)
+	if (tiles[num].mask_s)
 	{
-		INT32 maskbits_s = m_maskbits_table[tile[num].mask_s];
-		if (tile[num].ms)
+		INT32 maskbits_s = m_maskbits_table[tiles[num].mask_s];
+		if (tiles[num].ms)
 		{
-			INT32 swrapthreshold = tile[num].mask_s > 10 ? 10 : tile[num].mask_s;
+			INT32 swrapthreshold = tiles[num].mask_s > 10 ? 10 : tiles[num].mask_s;
 			INT32 wrap = (*S >> swrapthreshold) & 1;
 			INT32 wrap1 = (*S1 >> swrapthreshold) & 1;
 			if (wrap)
@@ -86,12 +106,12 @@ void N64TexturePipeT::MaskCoupled(INT32* S, INT32* S1, INT32* T, INT32* T1, INT3
 		*S1 &= maskbits_s;
 	}
 
-	if (tile[num].mask_t)
+	if (tiles[num].mask_t)
 	{
-		INT32 maskbits_t = m_maskbits_table[tile[num].mask_t];
-		if (tile[num].mt)
+		INT32 maskbits_t = m_maskbits_table[tiles[num].mask_t];
+		if (tiles[num].mt)
 		{
-			INT32 twrapthreshold = tile[num].mask_t > 10 ? 10 : tile[num].mask_t;
+			INT32 twrapthreshold = tiles[num].mask_t > 10 ? 10 : tiles[num].mask_t;
 			INT32 wrap = (*T >> twrapthreshold) & 1;
 			INT32 wrap1 = (*T1 >> twrapthreshold) & 1;
 			if (wrap)
@@ -108,66 +128,100 @@ void N64TexturePipeT::MaskCoupled(INT32* S, INT32* S1, INT32* T, INT32* T1, INT3
 	}
 }
 
+#define SHIFT_CYCLE(param, max, num, coord)			\
+	param = SIGN16(param);							\
+	if (tiles[num].shift_##coord < 11)				\
+	{												\
+		param >>= tiles[num].shift_##coord;			\
+	}												\
+	else											\
+	{												\
+		param <<= (16 - tiles[num].shift_##coord);	\
+	}												\
+	param = SIGN16(param);							\
+	max = ((param >> 3) >= tiles[num].coord##h);
+
 void N64TexturePipeT::ShiftCycle(INT32* S, INT32* T, INT32* maxs, INT32* maxt, UINT32 num, const rdp_poly_state& object)
 {
-	const N64Tile* tile = object.m_tiles;
+	const N64Tile* tiles = object.m_tiles;
 	*S = SIGN16(*S);
-	*T = SIGN16(*T);
-	if (tile[num].shift_s < 11)
+	if (tiles[num].shift_s < 11)
 	{
-		*S >>= tile[num].shift_s;
+		*S >>= tiles[num].shift_s;
 	}
 	else
 	{
-		*S <<= (16 - tile[num].shift_s);
+		*S <<= (16 - tiles[num].shift_s);
 	}
 	*S = SIGN16(*S);
-	if (tile[num].shift_t < 11)
-	{
-		*T >>= tile[num].shift_t;
-	}
-	else
-	{
-		*T <<= (16 - tile[num].shift_t);
-	}
-	*T = SIGN16(*T);
+	*maxs = ((*S >> 3) >= tiles[num].sh);
 
-	*maxs = ((*S >> 3) >= tile[num].sh);
-	*maxt = ((*T >> 3) >= tile[num].th);
+	*T = SIGN16(*T);
+	if (tiles[num].shift_t < 11)
+	{
+		*T >>= tiles[num].shift_t;
+	}
+	else
+	{
+		*T <<= (16 - tiles[num].shift_t);
+	}
+	*T = SIGN16(*T);
+	*maxt = ((*T >> 3) >= tiles[num].th);
 }
 
 void N64TexturePipeT::ShiftCopy(INT32* S, INT32* T, UINT32 num, const rdp_poly_state& object)
 {
-	const N64Tile* tile = object.m_tiles;
+	const N64Tile* tiles = object.m_tiles;
 	*S = SIGN16(*S);
 	*T = SIGN16(*T);
-	if (tile[num].shift_s < 11)//?-? tcu_tile
+	if (tiles[num].shift_s < 11)//?-? tcu_tile
 	{
-		*S >>= tile[num].shift_s;
+		*S >>= tiles[num].shift_s;
 	}
 	else
 	{
-		*S <<= (16 - tile[num].shift_s);
+		*S <<= (16 - tiles[num].shift_s);
 	}
 	*S = SIGN16(*S);
-	if (tile[num].shift_t < 11)
+	if (tiles[num].shift_t < 11)
 	{
-		*T >>= tile[num].shift_t;
+		*T >>= tiles[num].shift_t;
 	}
 	else
 	{
-		*T <<= (16 - tile[num].shift_t);
+		*T <<= (16 - tiles[num].shift_t);
 	}
 	*T = SIGN16(*T);
 }
 
+#define CLAMP_CYCLE(param, frac, max, num, coord)		\
+	if (tiles[num].c##coord || !tiles[num].mask_##coord)	\
+	{													\
+		if (param & 0x10000)							\
+		{												\
+			param = 0;									\
+			frac = 0;									\
+		}												\
+		else if (max)									\
+		{												\
+			param = m_clamp_##coord##_diff[num];		\
+			frac = 0;									\
+		}												\
+		else											\
+		{												\
+			param = (SIGN17(param) >> 5) & 0x1fff;		\
+		}												\
+	}													\
+	else												\
+	{													\
+		param = (SIGN17(param) >> 5) & 0x1fff;			\
+	}
+
 void N64TexturePipeT::ClampCycle(INT32* S, INT32* T, INT32* SFRAC, INT32* TFRAC, INT32 maxs, INT32 maxt, INT32 num, rdp_span_aux *userdata, const rdp_poly_state& object, INT32 *m_clamp_s_diff, INT32 *m_clamp_t_diff)
 {
-	const N64Tile* tile = object.m_tiles;
-	int dos = tile[num].cs || !tile[num].mask_s;
-	int dot = tile[num].ct || !tile[num].mask_t;
+	const N64Tile* tiles = object.m_tiles;
 
-	if (dos)
+	if (tiles[num].cs || !tiles[num].mask_s)
 	{
 		if (*S & 0x10000)
 		{
@@ -189,7 +243,7 @@ void N64TexturePipeT::ClampCycle(INT32* S, INT32* T, INT32* SFRAC, INT32* TFRAC,
 		*S = (SIGN17(*S) >> 5) & 0x1fff;
 	}
 
-	if (dot)
+	if (tiles[num].ct || !tiles[num].mask_t)
 	{
 		if (*T & 0x10000)
 		{
@@ -214,9 +268,9 @@ void N64TexturePipeT::ClampCycle(INT32* S, INT32* T, INT32* SFRAC, INT32* TFRAC,
 
 void N64TexturePipeT::ClampCycleLight(INT32* S, INT32* T, bool maxs, bool maxt, INT32 num, rdp_span_aux *userdata, const rdp_poly_state& object, INT32 *m_clamp_s_diff, INT32 *m_clamp_t_diff)
 {
-	const N64Tile* tile = object.m_tiles;
-	int dos = tile[num].cs || !tile[num].mask_s;
-	int dot = tile[num].ct || !tile[num].mask_t;
+	const N64Tile* tiles = object.m_tiles;
+	int dos = tiles[num].cs || !tiles[num].mask_s;
+	int dot = tiles[num].ct || !tiles[num].mask_t;
 
 	if (dos)
 	{
@@ -259,180 +313,263 @@ void N64TexturePipeT::ClampCycleLight(INT32* S, INT32* T, bool maxs, bool maxt, 
 	}
 }
 
-void N64TexturePipeT::Cycle(Color* TEX, Color* prev, INT32 SSS, INT32 SST, UINT32 tilenum, UINT32 cycle, rdp_span_aux *userdata, const rdp_poly_state& object, INT32 *m_clamp_s_diff, INT32 *m_clamp_t_diff)
+void N64TexturePipeT::CycleNearest(Color* TEX, Color* prev, INT32 SSS, INT32 SST, UINT32 tilenum, UINT32 cycle, rdp_span_aux *userdata, const rdp_poly_state& object, INT32 *m_clamp_s_diff, INT32 *m_clamp_t_diff)
 {
-	const N64Tile* tile = object.m_tiles;
+	const N64Tile* tiles = object.m_tiles;
+	const N64Tile& tile = tiles[tilenum];
+	UINT32 tformat = tile.format;
+	UINT32 tsize =  tile.size;
+	UINT32 tpal = tile.palette;
+	UINT32 index = (tformat << 4) | (tsize << 2) | ((UINT32) object.OtherModes.en_tlut << 1) | (UINT32) object.OtherModes.tlut_type;
 
 #define TRELATIVE(x, y)     ((((x) >> 3) - (y)) << 3) | (x & 7);
-	INT32 bilerp = cycle ? object.OtherModes.bi_lerp1 : object.OtherModes.bi_lerp0;
 	int convert = object.OtherModes.convert_one && cycle;
 	Color t0;
+
+	INT32 sss1 = SSS;
+	INT32 maxs;
+	SHIFT_CYCLE(sss1, maxs, tilenum, s);
+	sss1 = TRELATIVE(sss1, tile.sl);
+
+	INT32 sst1 = SST;
+	INT32 maxt;
+	SHIFT_CYCLE(sst1, maxt, tilenum, t);
+	sst1 = TRELATIVE(sst1, tile.tl);
+
+	ClampCycleLight(&sss1, &sst1, maxs, maxt, tilenum, userdata, object, m_clamp_s_diff, m_clamp_t_diff);
+	Mask(&sss1, &sst1, tilenum, object);
+
+	UINT32 tbase = tile.tmem + ((tile.line * sst1) & 0x1ff);
+
+	t0.c = ((this)->*(TexelFetch[index]))(sss1, sst1, tbase, tpal, userdata);
+
+	INT32 newk0 = SIGN9(m_rdp->GetK0());
+	INT32 newk1 = SIGN9(m_rdp->GetK1());
+	INT32 newk2 = SIGN9(m_rdp->GetK2());
+	INT32 newk3 = SIGN9(m_rdp->GetK3());
+	INT32 invk0 = ~newk0;
+	INT32 invk1 = ~newk1;
+	INT32 invk2 = ~newk2;
+	INT32 invk3 = ~newk3;
+	if (convert)
+	{
+		t0 = *prev;
+	}
+	t0.i.r = SIGN9(t0.i.r);
+	t0.i.g = SIGN9(t0.i.g);
+	t0.i.b = SIGN9(t0.i.b);
+	TEX->i.r = t0.i.b + (((newk0 - invk0) * t0.i.g + 0x80) >> 8);
+	TEX->i.g = t0.i.b + (((newk1 - invk1) * t0.i.r + (newk2 - invk2) * t0.i.g + 0x80) >> 8);
+	TEX->i.b = t0.i.b + (((newk3 - invk3) * t0.i.r + 0x80) >> 8);
+	TEX->i.a = t0.i.b;
+	TEX->i.r &= 0x1ff;
+	TEX->i.g &= 0x1ff;
+	TEX->i.b &= 0x1ff;
+	TEX->i.a &= 0x1ff;
+}
+
+void N64TexturePipeT::CycleNearestLerp(Color* TEX, Color* prev, INT32 SSS, INT32 SST, UINT32 tilenum, UINT32 cycle, rdp_span_aux *userdata, const rdp_poly_state& object, INT32 *m_clamp_s_diff, INT32 *m_clamp_t_diff)
+{
+	const N64Tile* tiles = object.m_tiles;
+	const N64Tile& tile = tiles[tilenum];
+	UINT32 tformat = tile.format;
+	UINT32 tsize =  tile.size;
+	UINT32 tpal = tile.palette;
+	UINT32 index = (tformat << 4) | (tsize << 2) | ((UINT32) object.OtherModes.en_tlut << 1) | (UINT32) object.OtherModes.tlut_type;
+
+#define TRELATIVE(x, y)     ((((x) >> 3) - (y)) << 3) | (x & 7);
+	Color t0;
+
+	INT32 sss1 = SSS;
+	INT32 maxs;
+	SHIFT_CYCLE(sss1, maxs, tilenum, s);
+	sss1 = TRELATIVE(sss1, tile.sl);
+
+	INT32 sst1 = SST;
+	INT32 maxt;
+	SHIFT_CYCLE(sst1, maxt, tilenum, t);
+	sst1 = TRELATIVE(sst1, tile.tl);
+
+	ClampCycleLight(&sss1, &sst1, maxs, maxt, tilenum, userdata, object, m_clamp_s_diff, m_clamp_t_diff);
+	Mask(&sss1, &sst1, tilenum, object);
+
+	UINT32 tbase = tile.tmem + ((tile.line * sst1) & 0x1ff);
+
+	(*TEX).c = ((this)->*(TexelFetch[index]))(sss1, sst1, tbase, tpal, userdata);
+}
+
+void N64TexturePipeT::CycleLinear(Color* TEX, Color* prev, INT32 SSS, INT32 SST, UINT32 tilenum, UINT32 cycle, rdp_span_aux *userdata, const rdp_poly_state& object, INT32 *m_clamp_s_diff, INT32 *m_clamp_t_diff)
+{
+	const N64Tile* tiles = object.m_tiles;
+	const N64Tile& tile = tiles[tilenum];
+
+#define TRELATIVE(x, y)     ((((x) >> 3) - (y)) << 3) | (x & 7);
+	int convert = object.OtherModes.convert_one && cycle;
+	UINT32 tpal = tile.palette;
+	UINT32 index = (tile.format << 4) | (tile.size << 2) | ((UINT32) object.OtherModes.en_tlut << 1) | (UINT32) object.OtherModes.tlut_type;
+
+	INT32 invsf = 0;
+	INT32 sss1 = SSS;
+	INT32 maxs;
+	SHIFT_CYCLE(sss1, maxs, tilenum, s);
+	sss1 = TRELATIVE(sss1, tile.sl);
+	INT32 sfrac = sss1 & 0x1f;
+	CLAMP_CYCLE(sss1, sfrac, maxs, tilenum, s);
+	INT32 sss2 = sss1 + 1;
+	MASK_COUPLED(sss1, sss2, tilenum, s);
+
+	INT32 invtf = 0;
+	INT32 sst1 = SST;
+	INT32 maxt;
+	SHIFT_CYCLE(sst1, maxt, tilenum, t);
+	sst1 = TRELATIVE(sst1, tile.tl);
+	INT32 tfrac = sst1 & 0x1f;
+	CLAMP_CYCLE(sst1, tfrac, maxt, tilenum, t);
+	INT32 sst2 = sst1 + 1;
+	MASK_COUPLED(sst1, sst2, tilenum, t);
+
+	UINT32 tbase = tile.tmem + ((tile.line * sst1) & 0x1ff);
+
+	bool upper = ((sfrac + tfrac) >= 0x20);
+
+	if (upper)
+	{
+		invsf = 0x20 - sfrac;
+		invsf <<= 3;
+
+		invtf = 0x20 - tfrac;
+		invtf <<= 3;
+	}
+
+	sfrac <<= 3;
+	tfrac <<= 3;
+
+	Color t0;
+	t0.c = ((this)->*(TexelFetch[index]))(sss1, sst1, tbase, tpal, userdata);
+	INT32 newk0 = SIGN9(m_rdp->GetK0());
+	INT32 newk1 = SIGN9(m_rdp->GetK1());
+	INT32 newk2 = SIGN9(m_rdp->GetK2());
+	INT32 newk3 = SIGN9(m_rdp->GetK3());
+	INT32 invk0 = ~newk0;
+	INT32 invk1 = ~newk1;
+	INT32 invk2 = ~newk2;
+	INT32 invk3 = ~newk3;
+	if (convert)
+	{
+		t0 = *prev;
+	}
+	t0.i.r = SIGN9(t0.i.r); t0.i.g = SIGN9(t0.i.g); t0.i.b = SIGN9(t0.i.b);
+	TEX->i.r = t0.i.b + (((newk0 - invk0) * t0.i.g + 0x80) >> 8);
+	TEX->i.g = t0.i.b + (((newk1 - invk1) * t0.i.r + (newk2 - invk2) * t0.i.g + 0x80) >> 8);
+	TEX->i.b = t0.i.b + (((newk3 - invk3) * t0.i.r + 0x80) >> 8);
+	TEX->i.a = t0.i.b;
+	TEX->i.r &= 0x1ff;
+	TEX->i.g &= 0x1ff;
+	TEX->i.b &= 0x1ff;
+	TEX->i.a &= 0x1ff;
+}
+
+void N64TexturePipeT::CycleLinearLerp(Color* TEX, Color* prev, INT32 SSS, INT32 SST, UINT32 tilenum, UINT32 cycle, rdp_span_aux *userdata, const rdp_poly_state& object, INT32 *m_clamp_s_diff, INT32 *m_clamp_t_diff)
+{
+	const N64Tile* tiles = object.m_tiles;
+	const N64Tile& tile = tiles[tilenum];
+
+#define TRELATIVE(x, y)     ((((x) >> 3) - (y)) << 3) | (x & 7);
+	UINT32 tpal = tile.palette;
+	UINT32 index = (tile.format << 4) | (tile.size << 2) | ((UINT32) object.OtherModes.en_tlut << 1) | (UINT32) object.OtherModes.tlut_type;
+
+	int center = 0;
+
+	INT32 invsf = 0;
+	INT32 sss1 = SSS;
+	INT32 maxs;
+	SHIFT_CYCLE(sss1, maxs, tilenum, s);
+	sss1 = TRELATIVE(sss1, tile.sl);
+	INT32 sfrac = sss1 & 0x1f;
+	CLAMP_CYCLE(sss1, sfrac, maxs, tilenum, s);
+	INT32 sss2 = sss1 + 1;
+	MASK_COUPLED(sss1, sss2, tilenum, s);
+
+	INT32 invtf = 0;
+	INT32 sst1 = SST;
+	INT32 maxt;
+	SHIFT_CYCLE(sst1, maxt, tilenum, t);
+	sst1 = TRELATIVE(sst1, tile.tl);
+	INT32 tfrac = sst1 & 0x1f;
+	CLAMP_CYCLE(sst1, tfrac, maxt, tilenum, t);
+	INT32 sst2 = sst1 + 1;
+	MASK_COUPLED(sst1, sst2, tilenum, t);
+
+	UINT32 tbase1 = tile.tmem + ((tile.line * sst1) & 0x1ff);
+	UINT32 tbase2 = tile.tmem + ((tile.line * sst2) & 0x1ff);
+
+	bool upper = ((sfrac + tfrac) >= 0x20);
+
+	if (upper)
+	{
+		invsf = 0x20 - sfrac;
+		invsf <<= 3;
+
+		invtf = 0x20 - tfrac;
+		invtf <<= 3;
+	}
+
+	center = (sfrac == 0x10) && (tfrac == 0x10) && object.OtherModes.mid_texel;
+
+	sfrac <<= 3;
+	tfrac <<= 3;
+
 	Color t1;
 	Color t2;
-	Color t3;
-	if (object.OtherModes.sample_type)
+	t1.c = ((this)->*(TexelFetch[index]))(sss2, sst1, tbase1, tpal, userdata);
+	t2.c = ((this)->*(TexelFetch[index]))(sss1, sst2, tbase2, tpal, userdata);
+	if (!center)
 	{
-		int sss1, sst1, sss2, sst2;
-
-		INT32 invsf = 0;
-		INT32 invtf = 0;
-		int center = 0;
-
-		sss1 = SSS;
-		sst1 = SST;
-
-		INT32 maxs;
-		INT32 maxt;
-
-		ShiftCycle(&sss1, &sst1, &maxs, &maxt, tilenum, object);
-
-		sss1 = TRELATIVE(sss1, tile[tilenum].sl);
-		sst1 = TRELATIVE(sst1, tile[tilenum].tl);
-
-		INT32 sfrac = sss1 & 0x1f;
-		INT32 tfrac = sst1 & 0x1f;
-
-		ClampCycle(&sss1, &sst1, &sfrac, &tfrac, maxs, maxt, tilenum, userdata, object, m_clamp_s_diff, m_clamp_t_diff);
-
-		sss2 = sss1 + 1;
-		sst2 = sst1 + 1;
-
-		MaskCoupled(&sss1, &sss2, &sst1, &sst2, tilenum, object);
-
-		bool upper = ((sfrac + tfrac) >= 0x20);
-
 		if (upper)
 		{
-			invsf = 0x20 - sfrac;
-			invtf = 0x20 - tfrac;
-		}
-
-		center = (sfrac == 0x10) && (tfrac == 0x10) && object.OtherModes.mid_texel;
-
-		invsf <<= 3;
-		invtf <<= 3;
-		sfrac <<= 3;
-		tfrac <<= 3;
-
-		t0.c = Fetch(sss1, sst1, tilenum, object, userdata);
-
-		if (bilerp)
-		{
-			t1.c = Fetch(sss2, sst1, tilenum, object, userdata);
-			t2.c = Fetch(sss1, sst2, tilenum, object, userdata);
-			t3.c = Fetch(sss2, sst2, tilenum, object, userdata);
-			if (!center)
-			{
-				if (upper)
-				{
-					TEX->i.r = t3.i.r + (((invsf * (t2.i.r - t3.i.r)) + (invtf * (t1.i.r - t3.i.r)) + 0x80) >> 8);
-					TEX->i.g = t3.i.g + (((invsf * (t2.i.g - t3.i.g)) + (invtf * (t1.i.g - t3.i.g)) + 0x80) >> 8);
-					TEX->i.b = t3.i.b + (((invsf * (t2.i.b - t3.i.b)) + (invtf * (t1.i.b - t3.i.b)) + 0x80) >> 8);
-					TEX->i.a = t3.i.a + (((invsf * (t2.i.a - t3.i.a)) + (invtf * (t1.i.a - t3.i.a)) + 0x80) >> 8);
-				}
-				else
-				{
-					TEX->i.r = t0.i.r + (((sfrac * (t1.i.r - t0.i.r)) + (tfrac * (t2.i.r - t0.i.r)) + 0x80) >> 8);
-					TEX->i.g = t0.i.g + (((sfrac * (t1.i.g - t0.i.g)) + (tfrac * (t2.i.g - t0.i.g)) + 0x80) >> 8);
-					TEX->i.b = t0.i.b + (((sfrac * (t1.i.b - t0.i.b)) + (tfrac * (t2.i.b - t0.i.b)) + 0x80) >> 8);
-					TEX->i.a = t0.i.a + (((sfrac * (t1.i.a - t0.i.a)) + (tfrac * (t2.i.a - t0.i.a)) + 0x80) >> 8);
-				}
-				TEX->i.r &= 0x1ff;
-				TEX->i.g &= 0x1ff;
-				TEX->i.b &= 0x1ff;
-				TEX->i.a &= 0x1ff;
-			}
-			else
-			{
-				TEX->i.r = (t0.i.r + t1.i.r + t2.i.r + t3.i.r) >> 2;
-				TEX->i.g = (t0.i.g + t1.i.g + t2.i.g + t3.i.g) >> 2;
-				TEX->i.b = (t0.i.b + t1.i.b + t2.i.b + t3.i.b) >> 2;
-				TEX->i.a = (t0.i.a + t1.i.a + t2.i.a + t3.i.a) >> 2;
-			}
+			Color t3;
+			t3.c = ((this)->*(TexelFetch[index]))(sss2, sst2, tbase2, tpal, userdata);
+			TEX->i.r = t3.i.r + (((invsf * (t2.i.r - t3.i.r)) + (invtf * (t1.i.r - t3.i.r)) + 0x80) >> 8);
+			TEX->i.g = t3.i.g + (((invsf * (t2.i.g - t3.i.g)) + (invtf * (t1.i.g - t3.i.g)) + 0x80) >> 8);
+			TEX->i.b = t3.i.b + (((invsf * (t2.i.b - t3.i.b)) + (invtf * (t1.i.b - t3.i.b)) + 0x80) >> 8);
+			TEX->i.a = t3.i.a + (((invsf * (t2.i.a - t3.i.a)) + (invtf * (t1.i.a - t3.i.a)) + 0x80) >> 8);
 		}
 		else
 		{
-			INT32 newk0 = SIGN9(m_rdp->GetK0());
-			INT32 newk1 = SIGN9(m_rdp->GetK1());
-			INT32 newk2 = SIGN9(m_rdp->GetK2());
-			INT32 newk3 = SIGN9(m_rdp->GetK3());
-			INT32 invk0 = ~newk0;
-			INT32 invk1 = ~newk1;
-			INT32 invk2 = ~newk2;
-			INT32 invk3 = ~newk3;
-			if (convert)
-			{
-				t0 = *prev;
-			}
-			t0.i.r = SIGN9(t0.i.r); t0.i.g = SIGN9(t0.i.g); t0.i.b = SIGN9(t0.i.b);
-			TEX->i.r = t0.i.b + (((newk0 - invk0) * t0.i.g + 0x80) >> 8);
-			TEX->i.g = t0.i.b + (((newk1 - invk1) * t0.i.r + (newk2 - invk2) * t0.i.g + 0x80) >> 8);
-			TEX->i.b = t0.i.b + (((newk3 - invk3) * t0.i.r + 0x80) >> 8);
-			TEX->i.a = t0.i.b;
-			TEX->i.r &= 0x1ff;
-			TEX->i.g &= 0x1ff;
-			TEX->i.b &= 0x1ff;
-			TEX->i.a &= 0x1ff;
+			Color t0;
+			t0.c = ((this)->*(TexelFetch[index]))(sss1, sst1, tbase1, tpal, userdata);
+			TEX->i.r = t0.i.r + (((sfrac * (t1.i.r - t0.i.r)) + (tfrac * (t2.i.r - t0.i.r)) + 0x80) >> 8);
+			TEX->i.g = t0.i.g + (((sfrac * (t1.i.g - t0.i.g)) + (tfrac * (t2.i.g - t0.i.g)) + 0x80) >> 8);
+			TEX->i.b = t0.i.b + (((sfrac * (t1.i.b - t0.i.b)) + (tfrac * (t2.i.b - t0.i.b)) + 0x80) >> 8);
+			TEX->i.a = t0.i.a + (((sfrac * (t1.i.a - t0.i.a)) + (tfrac * (t2.i.a - t0.i.a)) + 0x80) >> 8);
 		}
+		TEX->i.r &= 0x1ff;
+		TEX->i.g &= 0x1ff;
+		TEX->i.b &= 0x1ff;
+		TEX->i.a &= 0x1ff;
 	}
 	else
 	{
-		INT32 sss1 = SSS;
-		INT32 sst1 = SST;
-
-		INT32 maxs;
-		INT32 maxt;
-
-		ShiftCycle(&sss1, &sst1, &maxs, &maxt, tilenum, object);
-		sss1 = TRELATIVE(sss1, tile[tilenum].sl);
-		sst1 = TRELATIVE(sst1, tile[tilenum].tl);
-
-		ClampCycleLight(&sss1, &sst1, maxs, maxt, tilenum, userdata, object, m_clamp_s_diff, m_clamp_t_diff);
-
-		Mask(&sss1, &sst1, tilenum, object);
-
-		t0.c = Fetch(sss1, sst1, tilenum, object, userdata);
-		if (bilerp)
-		{
-			*TEX = t0;
-		}
-		else
-		{
-			INT32 newk0 = SIGN9(m_rdp->GetK0());
-			INT32 newk1 = SIGN9(m_rdp->GetK1());
-			INT32 newk2 = SIGN9(m_rdp->GetK2());
-			INT32 newk3 = SIGN9(m_rdp->GetK3());
-			INT32 invk0 = ~newk0;
-			INT32 invk1 = ~newk1;
-			INT32 invk2 = ~newk2;
-			INT32 invk3 = ~newk3;
-			if (convert)
-			{
-				t0 = *prev;
-			}
-			t0.i.r = SIGN9(t0.i.r);
-			t0.i.g = SIGN9(t0.i.g);
-			t0.i.b = SIGN9(t0.i.b);
-			TEX->i.r = t0.i.b + (((newk0 - invk0) * t0.i.g + 0x80) >> 8);
-			TEX->i.g = t0.i.b + (((newk1 - invk1) * t0.i.r + (newk2 - invk2) * t0.i.g + 0x80) >> 8);
-			TEX->i.b = t0.i.b + (((newk3 - invk3) * t0.i.r + 0x80) >> 8);
-			TEX->i.a = t0.i.b;
-			TEX->i.r &= 0x1ff;
-			TEX->i.g &= 0x1ff;
-			TEX->i.b &= 0x1ff;
-			TEX->i.a &= 0x1ff;
-		}
+		Color t0;
+		Color t3;
+		t0.c = ((this)->*(TexelFetch[index]))(sss1, sst1, 1, tpal, userdata);
+		t3.c = ((this)->*(TexelFetch[index]))(sss2, sst2, tbase2, tpal, userdata);
+		TEX->i.r = (t0.i.r + t1.i.r + t2.i.r + t3.i.r) >> 2;
+		TEX->i.g = (t0.i.g + t1.i.g + t2.i.g + t3.i.g) >> 2;
+		TEX->i.b = (t0.i.b + t1.i.b + t2.i.b + t3.i.b) >> 2;
+		TEX->i.a = (t0.i.a + t1.i.a + t2.i.a + t3.i.a) >> 2;
 	}
 }
 
 void N64TexturePipeT::Copy(Color* TEX, INT32 SSS, INT32 SST, UINT32 tilenum, const rdp_poly_state& object, rdp_span_aux *userdata)
 {
-	const N64Tile* tile = object.m_tiles;
+	const N64Tile* tiles = object.m_tiles;
+	const N64Tile& tile = tiles[tilenum];
 	INT32 sss1 = SSS;
 	INT32 sst1 = SST;
 	ShiftCopy(&sss1, &sst1, tilenum, object);
-	sss1 = TRELATIVE(sss1, tile[tilenum].sl);
-	sst1 = TRELATIVE(sst1, tile[tilenum].tl);
+	sss1 = TRELATIVE(sss1, tile.sl);
+	sst1 = TRELATIVE(sst1, tile.tl);
 	sss1 = (SIGN17(sss1) >> 5) & 0x1fff;
 	sst1 = (SIGN17(sst1) >> 5) & 0x1fff;
 	Mask(&sss1, &sst1, tilenum, object);
@@ -789,7 +926,7 @@ void N64TexturePipeT::LOD2CycleLimited(INT32* sss, INT32* sst, INT32 s, INT32 t,
 
 void N64TexturePipeT::CalculateClampDiffs(UINT32 prim_tile, rdp_span_aux *userdata, const rdp_poly_state& object, INT32 *m_clamp_s_diff, INT32 *m_clamp_t_diff)
 {
-	const N64Tile* tile = object.m_tiles;
+	const N64Tile* tiles = object.m_tiles;
 	if (object.OtherModes.cycle_type == CYCLE_TYPE_2)
 	{
 		if (object.OtherModes.tex_lod_en)
@@ -798,24 +935,24 @@ void N64TexturePipeT::CalculateClampDiffs(UINT32 prim_tile, rdp_span_aux *userda
 			int end = 7;
 			for (; start <= end; start++)
 			{
-				m_clamp_s_diff[start] = (tile[start].sh >> 2) - (tile[start].sl >> 2);
-				m_clamp_t_diff[start] = (tile[start].th >> 2) - (tile[start].tl >> 2);
+				m_clamp_s_diff[start] = (tiles[start].sh >> 2) - (tiles[start].sl >> 2);
+				m_clamp_t_diff[start] = (tiles[start].th >> 2) - (tiles[start].tl >> 2);
 			}
 		}
 		else
 		{
 			int start = prim_tile;
 			int end = (prim_tile + 1) & 7;
-			m_clamp_s_diff[start] = (tile[start].sh >> 2) - (tile[start].sl >> 2);
-			m_clamp_t_diff[start] = (tile[start].th >> 2) - (tile[start].tl >> 2);
-			m_clamp_s_diff[end] = (tile[end].sh >> 2) - (tile[end].sl >> 2);
-			m_clamp_t_diff[end] = (tile[end].th >> 2) - (tile[end].tl >> 2);
+			m_clamp_s_diff[start] = (tiles[start].sh >> 2) - (tiles[start].sl >> 2);
+			m_clamp_t_diff[start] = (tiles[start].th >> 2) - (tiles[start].tl >> 2);
+			m_clamp_s_diff[end] = (tiles[end].sh >> 2) - (tiles[end].sl >> 2);
+			m_clamp_t_diff[end] = (tiles[end].th >> 2) - (tiles[end].tl >> 2);
 		}
 	}
 	else//1-cycle or copy
 	{
-		m_clamp_s_diff[prim_tile] = (tile[prim_tile].sh >> 2) - (tile[prim_tile].sl >> 2);
-		m_clamp_t_diff[prim_tile] = (tile[prim_tile].th >> 2) - (tile[prim_tile].tl >> 2);
+		m_clamp_s_diff[prim_tile] = (tiles[prim_tile].sh >> 2) - (tiles[prim_tile].sl >> 2);
+		m_clamp_t_diff[prim_tile] = (tiles[prim_tile].th >> 2) - (tiles[prim_tile].tl >> 2);
 	}
 }
 
@@ -1377,15 +1514,14 @@ UINT32 N64TexturePipeT::_FetchI_8_RAW(INT32 s, INT32 t, INT32 tbase, INT32 tpal,
 
 UINT32 N64TexturePipeT::Fetch(INT32 s, INT32 t, INT32 tilenum, const rdp_poly_state& object, rdp_span_aux *userdata)
 {
-	const N64Tile* tile = object.m_tiles;
-	UINT32 tformat = tile[tilenum].format;
-	UINT32 tsize =  tile[tilenum].size;
-
-	UINT32 tbase = (tile[tilenum].line * t) & 0x1ff;
-	tbase += tile[tilenum].tmem;
-	UINT32 tpal = tile[tilenum].palette;
-
+	const N64Tile* tiles = object.m_tiles;
+	const N64Tile& tile = tiles[tilenum];
+	UINT32 tformat = tile.format;
+	UINT32 tsize =  tile.size;
+	UINT32 tpal = tile.palette;
 	UINT32 index = (tformat << 4) | (tsize << 2) | ((UINT32) object.OtherModes.en_tlut << 1) | (UINT32) object.OtherModes.tlut_type;
+
+	UINT32 tbase = tile.tmem + ((tile.line * t) & 0x1ff);
 
 	return ((this)->*(TexelFetch[index]))(s, t, tbase, tpal, userdata);
 }

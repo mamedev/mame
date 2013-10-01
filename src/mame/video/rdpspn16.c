@@ -15,7 +15,7 @@
 #include "includes/n64.h"
 #include "video/n64.h"
 
-#define LookUpCC(A, B, C, D) m_rdp->GetCCLUT2()[(m_rdp->GetCCLUT1()[(A << 16) | (B << 8) | C] << 8) | D]
+#define LookUpCC(A, B, C, D) GetCCLUT2()[(GetCCLUT1()[(A << 16) | (B << 8) | C] << 8) | D]
 
 void n64_rdp::RenderSpans(int start, int end, int tilenum, bool flip, extent_t *Spans, bool rect, rdp_poly_state *object)
 {
@@ -81,10 +81,10 @@ void n64_rdp::RenderSpans(int start, int end, int tilenum, bool flip, extent_t *
 
 void n64_rdp::RGBAZClip(int sr, int sg, int sb, int sa, int *sz, rdp_span_aux *userdata)
 {
-	userdata->ShadeColor.i.r = m_special_9bit_clamptable[sr & 0x1ff];
-	userdata->ShadeColor.i.g = m_special_9bit_clamptable[sg & 0x1ff];
-	userdata->ShadeColor.i.b = m_special_9bit_clamptable[sb & 0x1ff];
-	userdata->ShadeColor.i.a = m_special_9bit_clamptable[sa & 0x1ff];
+	userdata->ShadeColor.i.r = s_special_9bit_clamptable[sr & 0x1ff];
+	userdata->ShadeColor.i.g = s_special_9bit_clamptable[sg & 0x1ff];
+	userdata->ShadeColor.i.b = s_special_9bit_clamptable[sb & 0x1ff];
+	userdata->ShadeColor.i.a = s_special_9bit_clamptable[sa & 0x1ff];
 
 	INT32 zanded = (*sz) & 0x60000;
 
@@ -134,7 +134,6 @@ void n64_rdp::SpanDraw1Cycle(INT32 scanline, const extent_t &extent, const rdp_p
 {
 	int clipx1 = object.Scissor.m_xh;
 	int clipx2 = object.Scissor.m_xl;
-	n64_rdp *m_rdp = object.m_rdp;
 	int tilenum = object.tilenum;
 	bool flip = object.flip;
 
@@ -157,7 +156,7 @@ void n64_rdp::SpanDraw1Cycle(INT32 scanline, const extent_t &extent, const rdp_p
 
 	INT32 m_clamp_s_diff[8];
 	INT32 m_clamp_t_diff[8];
-	m_rdp->TexPipe.CalculateClampDiffs(tile1, userdata, object, m_clamp_s_diff, m_clamp_t_diff);
+	TexPipe.CalculateClampDiffs(tile1, userdata, object, m_clamp_s_diff, m_clamp_t_diff);
 
 	bool partialreject = (userdata->ColorInputs.blender2b_a[0] == &userdata->InvPixelColor.i.a && userdata->ColorInputs.blender1b_a[0] == &userdata->PixelColor.i.a);
 	int sel0 = (OtherModes.force_blend ? 2 : 0) | ((userdata->ColorInputs.blender2b_a[0] == &userdata->MemoryColor.i.a) ? 1 : 0);
@@ -209,7 +208,20 @@ void n64_rdp::SpanDraw1Cycle(INT32 scanline, const extent_t &extent, const rdp_p
 	int blend_index = (object.OtherModes.alpha_cvg_select ? 2 : 0) | ((object.OtherModes.rgb_dither_sel < 3) ? 1 : 0);
 	int read_index = ((object.MiscState.FBSize - 2) << 1) | object.OtherModes.image_read_en;
 	int write_index = ((object.MiscState.FBSize - 2) << 3) | (object.OtherModes.cvg_dest << 1);
+	int cycle0 = ((object.OtherModes.sample_type & 1) << 1) | (object.OtherModes.bi_lerp0 & 1);
 	int acmode = (object.OtherModes.alpha_compare_en ? 2 : 0) | (object.OtherModes.dither_alpha_en ? 1 : 0);
+
+	INT32 sss = 0;
+	INT32 sst = 0;
+
+	if (object.OtherModes.persp_tex_en)
+	{
+		TCDiv(s.w >> 16, t.w >> 16, w.w >> 16, &sss, &sst);
+	}
+	else
+	{
+		TCDivNoPersp(s.w >> 16, t.w >> 16, w.w >> 16, &sss, &sst);
+	}
 
 	userdata->m_start_span = true;
 	for (int j = 0; j <= length; j++)
@@ -218,44 +230,27 @@ void n64_rdp::SpanDraw1Cycle(INT32 scanline, const extent_t &extent, const rdp_p
 		int sg = g.w >> 14;
 		int sb = b.w >> 14;
 		int sa = a.w >> 14;
-		int ss = s.w >> 16;
-		int st = t.w >> 16;
-		int sw = w.w >> 16;
 		int sz = (z.w >> 10) & 0x3fffff;
-		INT32 sss = 0;
-		INT32 sst = 0;
-
 		bool valid_x = (flip) ? (x >= xend_scissored) : (x <= xend_scissored);
 
 		if (x >= clipx1 && x < clipx2 && valid_x)
 		{
-			m_rdp->lookup_cvmask_derivatives(userdata->m_cvg[x], &offx, &offy, userdata);
+			lookup_cvmask_derivatives(userdata->m_cvg[x], &offx, &offy, userdata);
 
-			if (userdata->m_start_span)
-			{
-				if (object.OtherModes.persp_tex_en)
-				{
-					m_rdp->TCDiv(ss, st, sw, &sss, &sst);
-				}
-				else
-				{
-					m_rdp->TCDivNoPersp(ss, st, sw, &sss, &sst);
-				}
-			}
-			else
-			{
-				sss = userdata->m_precomp_s;
-				sst = userdata->m_precomp_t;
-			}
-
-			m_rdp->TexPipe.LOD1Cycle(&sss, &sst, s.w, t.w, w.w, dsinc, dtinc, dwinc, userdata, object);
+			TexPipe.LOD1Cycle(&sss, &sst, s.w, t.w, w.w, dsinc, dtinc, dwinc, userdata, object);
 
 			RGBAZCorrectTriangle(offx, offy, &sr, &sg, &sb, &sa, &sz, userdata, object);
 			RGBAZClip(sr, sg, sb, sa, &sz, userdata);
 
-			m_rdp->TexPipe.Cycle(&userdata->Texel0Color, &userdata->Texel0Color, sss, sst, tilenum, 0, userdata, object, m_clamp_s_diff, m_clamp_t_diff);
+			((TexPipe).*(TexPipe.cycle[cycle0]))(&userdata->Texel0Color, &userdata->Texel0Color, sss, sst, tilenum, 0, userdata, object, m_clamp_s_diff, m_clamp_t_diff);
+			//TexPipe.Cycle(&userdata->Texel0Color, &userdata->Texel0Color, sss, sst, tilenum, 0, userdata, object, m_clamp_s_diff, m_clamp_t_diff);
 
-			m_rdp->ColorCombiner1Cycle(userdata);
+			userdata->NoiseColor.i.r = userdata->NoiseColor.i.g = userdata->NoiseColor.i.b = rand() << 3; // Not accurate
+
+			userdata->PixelColor.i.r = ColorCombinerEquation(*userdata->ColorInputs.combiner_rgbsub_a_r[1],*userdata->ColorInputs.combiner_rgbsub_b_r[1],*userdata->ColorInputs.combiner_rgbmul_r[1],*userdata->ColorInputs.combiner_rgbadd_r[1]);
+			userdata->PixelColor.i.g = ColorCombinerEquation(*userdata->ColorInputs.combiner_rgbsub_a_g[1],*userdata->ColorInputs.combiner_rgbsub_b_g[1],*userdata->ColorInputs.combiner_rgbmul_g[1],*userdata->ColorInputs.combiner_rgbadd_g[1]);
+			userdata->PixelColor.i.b = ColorCombinerEquation(*userdata->ColorInputs.combiner_rgbsub_a_b[1],*userdata->ColorInputs.combiner_rgbsub_b_b[1],*userdata->ColorInputs.combiner_rgbmul_b[1],*userdata->ColorInputs.combiner_rgbadd_b[1]);
+			userdata->PixelColor.i.a = AlphaCombinerEquation(*userdata->ColorInputs.combiner_alphasub_a[1],*userdata->ColorInputs.combiner_alphasub_b[1],*userdata->ColorInputs.combiner_alphamul[1],*userdata->ColorInputs.combiner_alphaadd[1]);
 
 			//Alpha coverage combiner
 			GetAlphaCvg(&userdata->PixelColor.i.a, userdata, object);
@@ -266,11 +261,11 @@ void n64_rdp::SpanDraw1Cycle(INT32 scanline, const extent_t &extent, const rdp_p
 
 			((this)->*(_Read[read_index]))(curpixel, userdata, object);
 
-			if(m_rdp->ZCompare(zbcur, zhbcur, sz, dzpix, userdata, object))
+			if(ZCompare(zbcur, zhbcur, sz, dzpix, userdata, object))
 			{
-				m_rdp->GetDitherValues(scanline, j, &cdith, &adith, object);
+				GetDitherValues(scanline, j, &cdith, &adith, object);
 
-				bool rendered = ((&m_rdp->Blender)->*(m_rdp->Blender.blend1[(userdata->BlendEnable << 2) | blend_index]))(&fir, &fig, &fib, cdith, adith, partialreject, sel0, acmode, userdata, object);
+				bool rendered = ((&Blender)->*(Blender.blend1[(userdata->BlendEnable << 2) | blend_index]))(&fir, &fig, &fib, cdith, adith, partialreject, sel0, acmode, userdata, object);
 
 				if (rendered)
 				{
@@ -278,10 +273,13 @@ void n64_rdp::SpanDraw1Cycle(INT32 scanline, const extent_t &extent, const rdp_p
 
 					if (object.OtherModes.z_update_en)
 					{
-						m_rdp->ZStore(object, zbcur, zhbcur, sz, userdata->m_dzpix_enc);
+						ZStore(object, zbcur, zhbcur, sz, userdata->m_dzpix_enc);
 					}
 				}
 			}
+
+			sss = userdata->m_precomp_s;
+			sst = userdata->m_precomp_t;
 		}
 
 		r.w += drinc;
@@ -301,7 +299,6 @@ void n64_rdp::SpanDraw2Cycle(INT32 scanline, const extent_t &extent, const rdp_p
 {
 	int clipx1 = object.Scissor.m_xh;
 	int clipx2 = object.Scissor.m_xl;
-	n64_rdp *m_rdp = object.m_rdp;
 	int tilenum = object.tilenum;
 	bool flip = object.flip;
 
@@ -316,7 +313,6 @@ void n64_rdp::SpanDraw2Cycle(INT32 scanline, const extent_t &extent, const rdp_p
 
 	UINT32 zb = object.MiscState.ZBAddress >> 1;
 	UINT32 zhb = object.MiscState.ZBAddress;
-	UINT8 offx = 0, offy = 0;
 
 	INT32 tile2 = (tilenum + 1) & 7;
 	INT32 tile1 = tilenum;
@@ -330,7 +326,7 @@ void n64_rdp::SpanDraw2Cycle(INT32 scanline, const extent_t &extent, const rdp_p
 
 	INT32 m_clamp_s_diff[8];
 	INT32 m_clamp_t_diff[8];
-	m_rdp->TexPipe.CalculateClampDiffs(tile1, userdata, object, m_clamp_s_diff, m_clamp_t_diff);
+	TexPipe.CalculateClampDiffs(tile1, userdata, object, m_clamp_s_diff, m_clamp_t_diff);
 
 	bool partialreject = (userdata->ColorInputs.blender2b_a[1] == &userdata->InvPixelColor.i.a && userdata->ColorInputs.blender1b_a[1] == &userdata->PixelColor.i.a);
 	int sel0 = (OtherModes.force_blend ? 2 : 0) | ((userdata->ColorInputs.blender2b_a[0] == &userdata->MemoryColor.i.a) ? 1 : 0);
@@ -371,7 +367,21 @@ void n64_rdp::SpanDraw2Cycle(INT32 scanline, const extent_t &extent, const rdp_p
 	int blend_index = (object.OtherModes.alpha_cvg_select ? 2 : 0) | ((object.OtherModes.rgb_dither_sel < 3) ? 1 : 0);
 	int read_index = ((object.MiscState.FBSize - 2) << 1) | object.OtherModes.image_read_en;
 	int write_index = ((object.MiscState.FBSize - 2) << 3) | (object.OtherModes.cvg_dest << 1);
+	int cycle0 = ((object.OtherModes.sample_type & 1) << 1) | (object.OtherModes.bi_lerp0 & 1);
+	int cycle1 = ((object.OtherModes.sample_type & 1) << 1) | (object.OtherModes.bi_lerp1 & 1);
 	int acmode = (object.OtherModes.alpha_compare_en ? 2 : 0) | (object.OtherModes.dither_alpha_en ? 1 : 0);
+
+	INT32 sss = 0;
+	INT32 sst = 0;
+
+	if (object.OtherModes.persp_tex_en)
+	{
+		TCDiv(s.w >> 16, t.w >> 16, w.w >> 16, &sss, &sst);
+	}
+	else
+	{
+		TCDivNoPersp(s.w >> 16, t.w >> 16, w.w >> 16, &sss, &sst);
+	}
 
 	userdata->m_start_span = true;
 	for (int j = 0; j <= length; j++)
@@ -380,12 +390,7 @@ void n64_rdp::SpanDraw2Cycle(INT32 scanline, const extent_t &extent, const rdp_p
 		int sg = g.w >> 14;
 		int sb = b.w >> 14;
 		int sa = a.w >> 14;
-		int ss = s.h.h;
-		int st = t.h.h;
-		int sw = w.h.h;
 		int sz = (z.w >> 10) & 0x3fffff;
-		INT32 sss = 0;
-		INT32 sst = 0;
 		Color c1;
 		Color c2;
 
@@ -393,40 +398,66 @@ void n64_rdp::SpanDraw2Cycle(INT32 scanline, const extent_t &extent, const rdp_p
 
 		if (x >= clipx1 && x < clipx2 && valid_x)
 		{
-			m_rdp->lookup_cvmask_derivatives(userdata->m_cvg[x], &offx, &offy, userdata);
+			UINT32 compidx = compressed_cvmasks[userdata->m_cvg[x]];
+			userdata->CurrentPixCvg = cvarray[compidx].cvg;
+			userdata->CurrentCvgBit = cvarray[compidx].cvbit;
+			UINT8 offx = cvarray[compidx].xoff;
+			UINT8 offy = cvarray[compidx].yoff;
+			//lookup_cvmask_derivatives(userdata->m_cvg[x], &offx, &offy, userdata);
 
-			if (userdata->m_start_span)
-			{
-				if (object.OtherModes.persp_tex_en)
-				{
-					m_rdp->TCDiv(ss, st, sw, &sss, &sst);
-				}
-				else
-				{
-					m_rdp->TCDivNoPersp(ss, st, sw, &sss, &sst);
-				}
-			}
-			else
-			{
-				sss = userdata->m_precomp_s;
-				sst = userdata->m_precomp_t;
-			}
-
-			m_rdp->TexPipe.LOD2Cycle(&sss, &sst, s.w, t.w, w.w, dsinc, dtinc, dwinc, prim_tile, &tile1, &tile2, userdata, object);
+			TexPipe.LOD2Cycle(&sss, &sst, s.w, t.w, w.w, dsinc, dtinc, dwinc, prim_tile, &tile1, &tile2, userdata, object);
 
 			news = userdata->m_precomp_s;
 			newt = userdata->m_precomp_t;
-			m_rdp->TexPipe.LOD2CycleLimited(&news, &newt, s.w + dsinc, t.w + dtinc, w.w + dwinc, dsinc, dtinc, dwinc, prim_tile, &newtile1, object);
+			TexPipe.LOD2CycleLimited(&news, &newt, s.w + dsinc, t.w + dtinc, w.w + dwinc, dsinc, dtinc, dwinc, prim_tile, &newtile1, object);
 
 			RGBAZCorrectTriangle(offx, offy, &sr, &sg, &sb, &sa, &sz, userdata, object);
 			RGBAZClip(sr, sg, sb, sa, &sz, userdata);
 
-			m_rdp->TexPipe.Cycle(&userdata->Texel0Color, &userdata->Texel0Color, sss, sst, tile1, 0, userdata, object, m_clamp_s_diff, m_clamp_t_diff);
-			m_rdp->TexPipe.Cycle(&userdata->Texel1Color, &userdata->Texel0Color, sss, sst, tile2, 1, userdata, object, m_clamp_s_diff, m_clamp_t_diff);
+			((TexPipe).*(TexPipe.cycle[cycle0]))(&userdata->Texel0Color, &userdata->Texel0Color, sss, sst, tile1, 0, userdata, object, m_clamp_s_diff, m_clamp_t_diff);
+			((TexPipe).*(TexPipe.cycle[cycle1]))(&userdata->Texel1Color, &userdata->Texel0Color, sss, sst, tile2, 1, userdata, object, m_clamp_s_diff, m_clamp_t_diff);
+			((TexPipe).*(TexPipe.cycle[cycle1]))(&userdata->NextTexelColor, &userdata->NextTexelColor, sss, sst, tile2, 1, userdata, object, m_clamp_s_diff, m_clamp_t_diff);
+			//TexPipe.Cycle(&userdata->Texel0Color, &userdata->Texel0Color, sss, sst, tile1, 0, userdata, object, m_clamp_s_diff, m_clamp_t_diff);
+			//TexPipe.Cycle(&userdata->Texel1Color, &userdata->Texel0Color, sss, sst, tile2, 1, userdata, object, m_clamp_s_diff, m_clamp_t_diff);
+			//TexPipe.Cycle(&userdata->NextTexelColor, &userdata->NextTexelColor, sss, sst, tile2, 1, userdata, object, m_clamp_s_diff, m_clamp_t_diff);
 
-			m_rdp->TexPipe.Cycle(&userdata->NextTexelColor, &userdata->NextTexelColor, sss, sst, tile2, 1, userdata, object, m_clamp_s_diff, m_clamp_t_diff);
+			userdata->NoiseColor.i.r = userdata->NoiseColor.i.g = userdata->NoiseColor.i.b = rand() << 3; // Not accurate
+			userdata->CombinedColor.i.r = ColorCombinerEquation(*userdata->ColorInputs.combiner_rgbsub_a_r[0],
+																*userdata->ColorInputs.combiner_rgbsub_b_r[0],
+																*userdata->ColorInputs.combiner_rgbmul_r[0],
+																*userdata->ColorInputs.combiner_rgbadd_r[0]);
+			userdata->CombinedColor.i.g = ColorCombinerEquation(*userdata->ColorInputs.combiner_rgbsub_a_g[0],
+																*userdata->ColorInputs.combiner_rgbsub_b_g[0],
+																*userdata->ColorInputs.combiner_rgbmul_g[0],
+																*userdata->ColorInputs.combiner_rgbadd_g[0]);
+			userdata->CombinedColor.i.b = ColorCombinerEquation(*userdata->ColorInputs.combiner_rgbsub_a_b[0],
+																*userdata->ColorInputs.combiner_rgbsub_b_b[0],
+																*userdata->ColorInputs.combiner_rgbmul_b[0],
+																*userdata->ColorInputs.combiner_rgbadd_b[0]);
+			userdata->CombinedColor.i.a = AlphaCombinerEquation(*userdata->ColorInputs.combiner_alphasub_a[0],
+																*userdata->ColorInputs.combiner_alphasub_b[0],
+																*userdata->ColorInputs.combiner_alphamul[0],
+																*userdata->ColorInputs.combiner_alphaadd[0]);
 
-			m_rdp->ColorCombiner2Cycle(userdata);
+			userdata->Texel0Color = userdata->Texel1Color;
+			userdata->Texel1Color = userdata->NextTexelColor;
+
+			userdata->PixelColor.i.r = ColorCombinerEquation(*userdata->ColorInputs.combiner_rgbsub_a_r[1],
+																*userdata->ColorInputs.combiner_rgbsub_b_r[1],
+																*userdata->ColorInputs.combiner_rgbmul_r[1],
+																*userdata->ColorInputs.combiner_rgbadd_r[1]);
+			userdata->PixelColor.i.g = ColorCombinerEquation(*userdata->ColorInputs.combiner_rgbsub_a_g[1],
+																*userdata->ColorInputs.combiner_rgbsub_b_g[1],
+																*userdata->ColorInputs.combiner_rgbmul_g[1],
+																*userdata->ColorInputs.combiner_rgbadd_g[1]);
+			userdata->PixelColor.i.b = ColorCombinerEquation(*userdata->ColorInputs.combiner_rgbsub_a_b[1],
+																*userdata->ColorInputs.combiner_rgbsub_b_b[1],
+																*userdata->ColorInputs.combiner_rgbmul_b[1],
+																*userdata->ColorInputs.combiner_rgbadd_b[1]);
+			userdata->PixelColor.i.a = AlphaCombinerEquation(*userdata->ColorInputs.combiner_alphasub_a[1],
+																*userdata->ColorInputs.combiner_alphasub_b[1],
+																*userdata->ColorInputs.combiner_alphamul[1],
+																*userdata->ColorInputs.combiner_alphaadd[1]);
 
 			//Alpha coverage combiner
 			GetAlphaCvg(&userdata->PixelColor.i.a, userdata, object);
@@ -437,21 +468,23 @@ void n64_rdp::SpanDraw2Cycle(INT32 scanline, const extent_t &extent, const rdp_p
 
 			((this)->*(_Read[read_index]))(curpixel, userdata, object);
 
-			if(m_rdp->ZCompare(zbcur, zhbcur, sz, dzpix, userdata, object))
+			if(ZCompare(zbcur, zhbcur, sz, dzpix, userdata, object))
 			{
-				m_rdp->GetDitherValues(scanline, j, &cdith, &adith, object);
+				GetDitherValues(scanline, j, &cdith, &adith, object);
 
-				bool rendered = ((&m_rdp->Blender)->*(m_rdp->Blender.blend2[(userdata->BlendEnable << 2) | blend_index]))(&fir, &fig, &fib, cdith, adith, partialreject, sel0, sel1, acmode, userdata, object);
+				bool rendered = ((&Blender)->*(Blender.blend2[(userdata->BlendEnable << 2) | blend_index]))(&fir, &fig, &fib, cdith, adith, partialreject, sel0, sel1, acmode, userdata, object);
 
 				if (rendered)
 				{
 					((this)->*(_Write[write_index | userdata->BlendEnable]))(curpixel, fir, fig, fib, userdata, object);
 					if (object.OtherModes.z_update_en)
 					{
-						m_rdp->ZStore(object, zbcur, zhbcur, sz, userdata->m_dzpix_enc);
+						ZStore(object, zbcur, zhbcur, sz, userdata->m_dzpix_enc);
 					}
 				}
 			}
+			sss = userdata->m_precomp_s;
+			sst = userdata->m_precomp_t;
 		}
 
 		r.w += drinc;
@@ -471,7 +504,6 @@ void n64_rdp::SpanDrawCopy(INT32 scanline, const extent_t &extent, const rdp_pol
 {
 	int clipx1 = object.Scissor.m_xh;
 	int clipx2 = object.Scissor.m_xl;
-	n64_rdp *m_rdp = object.m_rdp;
 	int tilenum = object.tilenum;
 	bool flip = object.flip;
 
@@ -503,7 +535,7 @@ void n64_rdp::SpanDrawCopy(INT32 scanline, const extent_t &extent, const rdp_pol
 		{
 			INT32 sss = s.h.h;
 			INT32 sst = t.h.h;
-			m_rdp->TexPipe.Copy(&userdata->Texel0Color, sss, sst, tilenum, object, userdata);
+			TexPipe.Copy(&userdata->Texel0Color, sss, sst, tilenum, object, userdata);
 
 			UINT32 curpixel = fb_index + x;
 			if ((userdata->Texel0Color.i.a != 0) || (!object.OtherModes.alpha_compare_en))
