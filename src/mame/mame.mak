@@ -2661,6 +2661,8 @@ $(DRIVERS)/warpwarp.o:  $(LAYOUT)/geebee.lh \
 			$(LAYOUT)/navarone.lh \
 			$(LAYOUT)/sos.lh
 
+$(DRIVERS)/wpc_an.o:    $(LAYOUT)/wpc_an.lh
+
 $(DRIVERS)/wecleman.o:  $(LAYOUT)/wecleman.lh
 
 $(DRIVERS)/wico.o:  $(LAYOUT)/wico.lh
