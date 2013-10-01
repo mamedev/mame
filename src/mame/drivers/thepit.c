@@ -112,6 +112,42 @@ HT-01B
 |-------------------------------------------------------|
 
 
+*************************************************************
+
+	       Desert Dan (C)1982 by Video Optics 
+			     pinout
+                          -------------
+
+       ---------------------------------------------------
+                   SOLDER SIDE  |  COMPONENT SIDE
+       -------------------------+-------------------------
+                       GND |  A | 1  | GND
+                        +5 |  B | 2  | +5
+                        +5 |  C | 3  | +5
+                           |  D | 4  | 
+                  1P START |  E | 5  | 2P START
+                           |  F | 6  | 
+                           |  H | 7  | COIN
+                           |  J | 8  | 
+                           |  K | 9  | 
+                           |  L | 10 | ATTACK
+                           |  M | 11 | 
+                           |  N | 12 | 
+                        UP |  P | 13 | 
+                      DOWN |  R | 14 | 
+                      LEFT |  S | 15 | 
+                     RIGHT |  T | 16 | 
+                     SPK + |  U | 17 | SPK - (GND)
+                     	   |  V | 18 | 
+               SYNC (COMP) |  W | 19 | RED
+                     GREEN |  X | 20 | BLUE
+                      + 12 |  Y | 21 | + 12
+                       GND |  Z | 22 | GND
+       ---------------------------------------------------
+
+NOTE:
+Player 2 and Player 1 share the same controls !
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -1137,7 +1173,7 @@ ROM_START( desertdn )
 	ROM_LOAD( "rs1.bin",  0x1000, 0x1000, CRC(c051b090) SHA1(7280831c99a3f5a1d4af707bddf5b25a5000cabd) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "82s123.ic4",   0x0000, 0x0020, NO_DUMP CRC(a758b567) SHA1(d188c90dba10fe3abaae92488786b555b35218c5) ) /* Color prom was a MMI6331 and is compatible with the 82s123 prom type */
+	ROM_LOAD( "mb7051.8j",   0x0000, 0x0020, CRC(a14111f4) SHA1(cc103d91ca01390a68c8a211409f23d8af713296) ) /* BPROM is a Harris M3-7603-5 (82S123N compatible) */
 ROM_END
 
 /*
@@ -1192,7 +1228,7 @@ GAME( 1982, portman,  dockman,  intrepid, dockman,  driver_device, 0,     ROT90,
 GAME( 1982, suprmous, 0,        suprmous, suprmous, driver_device, 0,     ROT90, "Taito Corporation",                           "Super Mouse", 0 )
 GAME( 1982, funnymou, suprmous, suprmous, suprmous, driver_device, 0,     ROT90, "bootleg? (Chuo Co. Ltd)",                     "Funny Mouse", 0 )
 GAME( 1982, machomou, 0,        suprmous, suprmous, driver_device, 0,     ROT90, "Techstar",                                    "Macho Mouse", 0 )
-GAME( 1982, desertdn, 0,        desertdn, desertdn, driver_device, 0,     ROT0,  "Video Optics",                                "Desert Dan", GAME_WRONG_COLORS )
+GAME( 1982, desertdn, 0,        desertdn, desertdn, driver_device, 0,     ROT0,  "Video Optics",                                "Desert Dan", 0 )
 GAME( 1983, intrepid, 0,        intrepid, intrepid, driver_device, 0,     ROT90, "Nova Games Ltd.",                             "Intrepid (set 1)", 0 )
 GAME( 1983, intrepid2,intrepid, intrepid, intrepid, driver_device, 0,     ROT90, "Nova Games Ltd.",                             "Intrepid (set 2)", 0 )
 GAME( 1984, intrepidb,intrepid, intrepid, intrepid, driver_device, 0,     ROT90, "bootleg (Elsys)",                             "Intrepid (bootleg)", 0 )
