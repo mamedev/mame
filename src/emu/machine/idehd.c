@@ -769,7 +769,6 @@ void ide_hdd_device::device_reset()
 		UINT32 metalength;
 		if (m_handle->read_metadata (HARD_DISK_IDENT_METADATA_TAG, 0, m_buffer, 512, metalength) == CHDERR_NONE)
 		{
-			printf( "identify from chd\n" );
 			for( int w = 0; w < 256; w++ )
 			{
 				m_identify_buffer[w] = (m_buffer[(w * 2) + 1] << 8) | m_buffer[w * 2];

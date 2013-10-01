@@ -122,6 +122,8 @@ bool ata_flash_pccard_device::is_ready()
 
 void ata_flash_pccard_device::process_command()
 {
+	m_buffer_size = IDE_DISK_SECTOR_SIZE;
+
 	switch (m_command)
 	{
 	case IDE_COMMAND_TAITO_GNET_UNLOCK_1:
