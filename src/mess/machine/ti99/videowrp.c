@@ -211,7 +211,9 @@ void ti_sound_system_device::device_start(void)
 
 WRITE_LINE_MEMBER( ti_sound_system_device::sound_ready )
 {
-	m_console_ready(state);
+	// Need to disable this until READY handling is properly implemented in the sound chip
+	// and in the console (otherwise external speech like in Parsec will be interrupted)
+	//m_console_ready(state);
 }
 
 MACHINE_CONFIG_FRAGMENT( sn94624 )

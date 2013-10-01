@@ -647,6 +647,10 @@ INPUT_CHANGED_MEMBER( ti99_4x_state::load_interrupt )
     Links to external devices
 ***********************************************************/
 
+// FIXME: The sound chip is one of the devices that may operate the ready line
+// at some later time and thus mess up the READY handling (raises the READY
+// line without bothering about the rest). We need to do a proper AND here.
+
 /*
     We may have lots of devices pulling down this line; so we should use a AND
     gate to do it right. On the other hand, when READY is down, there is just
