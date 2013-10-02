@@ -275,7 +275,7 @@ ToDo:
 - Joystick port (also likely on a via)
 - Keypad? (also likely on a via done as a grid scan?)
 - Forth button (on the port on the back; keep in mind shift-usefront-space ALWAYS enables forth on a swyft)
-- Multple undumped firmware revisions exist
+- Multple undumped firmware revisions exist (330 and 331 are dumped)
 
 ****************************************************************************/
 
@@ -1300,7 +1300,7 @@ static const via6522_interface swyft_via1_config =
 READ8_MEMBER( cat_state::swyft_d0000 )
 {
 	// wtf is this supposed to be?
-	UINT8 byte = 0xD3; // ?
+	UINT8 byte = 0xFF; // ?
 	logerror("mystery device: read from 0x%5X, returning %02X\n", offset+0xD0000, byte);
 	return byte;
 }
@@ -1526,15 +1526,18 @@ MACHINE_CONFIG_END
 /* ROM definition */
 ROM_START( swyft )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	/* this version of the swyft code identifies itself at 0x3fCB as version 330 */
-	ROM_LOAD( "infoapp.lo", 0x0000, 0x8000, CRC(52c1bd66) SHA1(b3266d72970f9d64d94d405965b694f5dcb23bca) )
-	ROM_LOAD( "infoapp.hi", 0x8000, 0x8000, CRC(83505015) SHA1(693c914819dd171114a8c408f399b56b470f6be0) )
-	/* another (yet to be dumped) version of the swyft roms are labeled '331 low' and '331 high' */
-	ROM_REGION( 0x1000, "pals", ROMREGION_ERASEFF )
-	ROM_LOAD( "timing b.pal16r4", 0x0000, 0x38b, NO_DUMP)
-	ROM_LOAD( "decode e.pal16l8", 0x0400, 0x38b, NO_DUMP)
-	ROM_LOAD( "video 2b.pal16r4", 0x0800, 0x38b, NO_DUMP)
-	ROM_LOAD( "disk 3.5c.pal16r4", 0x0c00, 0x38b, NO_DUMP)
+	ROM_SYSTEM_BIOS( 0, "v331", "IAI Swyft Version 331 Firmware")
+	ROMX_LOAD( "331-lo.u30", 0x0000, 0x8000, CRC(d6cc2e2f) SHA1(39ff26c18b1cf589fc48793263f280ef3780cc61), ROM_BIOS(1))
+	ROMX_LOAD( "331-hi.u31", 0x8000, 0x8000, CRC(4677630a) SHA1(8845d702fa8b8e1a08352f4c59d3076cc2e1307e), ROM_BIOS(1))
+	/* this version of the swyft code identifies itself at 0x3FCB as version 330 */
+	ROM_SYSTEM_BIOS( 1, "v330", "IAI Swyft Version 330 Firmware")
+	ROMX_LOAD( "infoapp.lo.u30", 0x0000, 0x8000, CRC(52c1bd66) SHA1(b3266d72970f9d64d94d405965b694f5dcb23bca), ROM_BIOS(2))
+	ROMX_LOAD( "infoapp.hi.u31", 0x8000, 0x8000, CRC(83505015) SHA1(693c914819dd171114a8c408f399b56b470f6be0), ROM_BIOS(2))
+	ROM_REGION( 0x4000, "pals", ROMREGION_ERASEFF )
+	ROM_LOAD( "timing_b.pal16r4.u9.jed", 0x0000, 0xb08, CRC(643e6e83) SHA1(7db167883f9d6cf385ce496d08976dc16fc3e2c3))
+	ROM_LOAD( "decode_e.pal16l8.u20.jed", 0x1000, 0xb08, CRC(0b1dbd76) SHA1(08c144ad7a7bbdd53eefd271b2f6813f8b3b1594))
+	ROM_LOAD( "video_2b.pal16r4.u25.jed", 0x2000, 0xb08, CRC(caf91148) SHA1(3f8ddcb512a1c05395c74ad9a6ba7b87027ce4ec))
+	ROM_LOAD( "disk_3.5c.pal16r4.u26.jed", 0x3000, 0xb08, CRC(fd994d02) SHA1(f910ab16587dd248d63017da1e5b37855e4c1a0c))
 ROM_END
 
 ROM_START( cat )
