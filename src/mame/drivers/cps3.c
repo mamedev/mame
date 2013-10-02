@@ -813,7 +813,7 @@ void cps3_state::init_crypt(UINT32 key1, UINT32 key2, int altEncryption)
 
 DRIVER_INIT_MEMBER(cps3_state,redearth)  { init_crypt(0x9e300ab1, 0xa175b82c, 0); }
 DRIVER_INIT_MEMBER(cps3_state,sfiii)     { init_crypt(0xb5fe053e, 0xfc03925a, 0); }
-DRIVER_INIT_MEMBER(cps3_state,sfiii2)    { init_crypt(0x00000000, 0x00000000, 1); }
+DRIVER_INIT_MEMBER(cps3_state,sfiii2)    { init_crypt(0x00000000, 0x00000000, 1); } // sfiii2 runs off a 'dead' cart
 DRIVER_INIT_MEMBER(cps3_state,jojo)      { init_crypt(0x02203ee3, 0x01301972, 0); }
 DRIVER_INIT_MEMBER(cps3_state,sfiii3)    { init_crypt(0xa55432b4, 0x0c129981, 0); }
 DRIVER_INIT_MEMBER(cps3_state,jojoba)    { init_crypt(0x23323ee3, 0x03021972, 0); }
@@ -3617,13 +3617,22 @@ ROM_END
 
 /* Bootlegs for use with modified security carts */
 
-ROM_START( cps3boot )
+ROM_START( cps3boot ) // for cart with standard SH2
 	ROM_REGION32_BE( 0x080000, "user1", 0 ) /* bios region */
-	ROM_LOAD( "no-battery_bios_29f400.u2", 0x000000, 0x080000, CRC(cb9bd5b0) SHA1(ea7ecb3deb69f5307a62d8f0d7d8e68d49013d07))
+	ROM_LOAD( "no-battery_bios_29f400_for_hd6417095_sh2.u2", 0x000000, 0x080000, CRC(cb9bd5b0) SHA1(ea7ecb3deb69f5307a62d8f0d7d8e68d49013d07))
 
 	DISK_REGION( "scsi:cdrom" )
 	DISK_IMAGE_READONLY( "no-battery_multi-game_bootleg_cd_for_hd6417095_sh2", 0, SHA1(123f2fcb0f3dd3d6b859e82a51d0127e46763776) )
 ROM_END
+
+ROM_START( cps3boota ) // for cart with dead custom SH2 (or 2nd Impact CPU which is the same as a dead one)
+	ROM_REGION32_BE( 0x080000, "user1", 0 ) /* bios region */
+	ROM_LOAD( "no-battery_bios_29f400_for_dead_security_cart.u2", 0x000000, 0x080000, CRC(0fd56fb3) SHA1(5a8bffc07eb7da73cf4bca6718df72e471296bfd) )
+
+	DISK_REGION( "scsi:cdrom" )
+	DISK_IMAGE_READONLY( "no-battery_multi-game_bootleg_cd_for_dead_security_cart", 0, SHA1(4b0b673b45dac94da018576c0a7f8644653fc564) )
+ROM_END
+
 
 /*****************************************************************************************
   CPS3 game region / special flag information
@@ -3839,7 +3848,10 @@ GAME( 1999, jojobar1,  jojoba,   jojoba,   cps3_jojo, cps3_state, jojoba,   ROT0
 GAME( 1999, jojobanr1, jojoba,   jojoba,   cps3_jojo, cps3_state, jojoba,   ROT0, "Capcom", "JoJo no Kimyou na Bouken: Mirai e no Isan (Japan 990913, NO CD)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1999, jojobaner1,jojoba,   jojoba,   cps3_jojo, cps3_state, jojoba,   ROT0, "Capcom", "JoJo's Bizarre Adventure (Euro 990913, NO CD)", GAME_IMPERFECT_GRAPHICS )
 
-// bootleg
-GAME( 1999, cps3boot,  0,        sfiii3,   cps3_jojo, cps3_state, cps3boot,   ROT0, "bootleg", "CPS3 Multi-game bootleg for HD6417095 type SH2", GAME_IMPERFECT_GRAPHICS ) // hold start 1 while booting to write a different game, note the CD doesn't actually contain 2nd Impact, attempting to flash that just gives another copy of 3rd Strike
+// bootlegs, hold START1 during bootup to change games
+// this doesn't play 2nd Impact despite it being listed.  2nd Impact uses separate data/code encryption and can't be decrypted cleanly for a standard SH2.  Selecting it just flashes in a copy of 3rd Strike with the 2nd Impact loading screen
+GAME( 1999, cps3boot,  0,        sfiii3,   cps3_jojo, cps3_state, cps3boot,   ROT0, "bootleg", "CPS3 Multi-game bootleg for HD6417095 type SH2 (New Generation, 3rd Strike, JoJo's Venture, JoJo's Bizarre Adventure, Red Earth)", GAME_IMPERFECT_GRAPHICS )
+// this does not play Red Earth or the 2 Jojo games.  New Generation and 3rd Strike have been heavily modified to work with the separate code/data encryption a dead cart / 2nd Impact cart has.  Selecting the other games will give an 'invalid CD' message.
+GAME( 1999, cps3boota, cps3boot, sfiii3,   cps3_jojo, cps3_state, sfiii2,     ROT0, "bootleg", "CPS3 Multi-game bootleg for dead security cart (New Generation, 2nd Impact, 3rd Strike)", GAME_IMPERFECT_GRAPHICS )
 
 
