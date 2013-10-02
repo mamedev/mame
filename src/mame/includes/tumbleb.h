@@ -82,6 +82,7 @@ public:
 	DECLARE_DRIVER_INIT(tumbleb2);
 	DECLARE_DRIVER_INIT(chokchok);
 	DECLARE_DRIVER_INIT(fncywld);
+	DECLARE_DRIVER_INIT(carket);
 	TILEMAP_MAPPER_MEMBER(tumblep_scan);
 	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg2_tile_info);

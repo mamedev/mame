@@ -2747,6 +2747,79 @@ ROM_START( htchctch )
 	ROM_LOAD16_BYTE( "p11uor4.bin",  0x40001, 0x20000, CRC(9c511d98) SHA1(6615cbb125bd1e1b4da400ec4c4a0f4df8f6fa75) )
 ROM_END
 
+/* Carket Ball */
+
+/*
+carket ball
+
+
+68000P10 Xtal 15Mhz
+2*62256
+27020.ub17
+27020.ub18  prg roms
+
+
+gfx ram (???) 2x6264
+near
+27040.srom5
+27040.srom6
+
+gfx
+27020.uor1
+27020.uor2
+27020.uor3
+27020.uor4
+
+sound Z80 (Xtal 4.096Mhz)
+27512.ub5 sound prg
+6116 sound ram
+
+
+27010.uc1 audio data  
+
+
+sound hardware
+Z80+6295+YM2151+YM3012
+
+protection??
+Intel P8752BH (protected)
+*/
+
+ROM_START( carket )
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "27020.ub18",  0x00001, 0x20000, CRC(3bedee05) SHA1(0d9ddbe0b34307ac02740f813f89937c3af24c30) )
+	ROM_LOAD16_BYTE( "27020.ub17",  0x00000, 0x20000, CRC(b43fb7b6) SHA1(609e2626522bff49c13e253337072fcc6c0b8eae) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 Code */
+	ROM_LOAD( "27512.ub5", 0x00000, 0x10000 , CRC(750516fe) SHA1(5025ffc0fa2461047db0d847de863f8b633a0c7c) )
+
+	ROM_REGION( 0x10000, "cpu2", 0 ) /* Intel 87C52 MCU Code */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x2000, NO_DUMP ) /* can't be dumped */
+
+	ROM_REGION16_BE( 0x200, "user1", 0 ) /* Data from Shared RAM */
+	/* this is not a real rom but instead the data extracted from shared ram, the MCU puts it there */
+	ROM_LOAD16_WORD( "protdata.bin", 0x00000, 0x200 , BAD_DUMP CRC(0bd39834) SHA1(2860c2b7fcb74546afde11a59d4b359612ab6e68) ) // this is WRONG, taken from Choky Choky, causes game to crash on coin, need real data.
+
+	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "27010.uc1", 0x00000, 0x20000, CRC(b825bb9c) SHA1(9e444306e7ac1282871f0132f0137bf7aa87b7e0) )
+
+	ROM_REGION( 0x200000, "tilegfx", 0 ) /* tiles */
+	ROM_LOAD16_BYTE( "27040.srom5", 0x00001, 0x20000, CRC(d3e2c243) SHA1(279905c56f7f8eada076c15de67a6f0c571cb317) )
+	ROM_CONTINUE ( 0x100001,0x20000)
+	ROM_CONTINUE ( 0x040001,0x20000)
+	ROM_CONTINUE ( 0x140001,0x20000)
+	ROM_LOAD16_BYTE( "27040.srom6", 0x00000, 0x20000, CRC(0291be4c) SHA1(3106e4d2eb3256ce9914e562ac335beb351f79e6) )
+	ROM_CONTINUE ( 0x100000,0x20000)
+	ROM_CONTINUE ( 0x040000,0x20000)
+	ROM_CONTINUE ( 0x140000,0x20000)
+
+	ROM_REGION( 0x100000, "sprgfx", 0 ) /* sprites */
+	ROM_LOAD16_BYTE( "27020.uor1",  0x000000, 0x40000, CRC(e6a94756) SHA1(114808ab18dc15dc47126673d0ccc40c7d8b8c20) )
+	ROM_LOAD16_BYTE( "27020.uor2",  0x000001, 0x40000, CRC(f7158b76) SHA1(e1e35a88aa18376593389fff0bbe3784b17dccab) )
+	ROM_LOAD16_BYTE( "27020.uor3",  0x080000, 0x40000, CRC(9295c315) SHA1(97e6c7550abb0e20ff21d7307a3850a4cfc0985f) )
+	ROM_LOAD16_BYTE( "27020.uor4",  0x080001, 0x40000, CRC(333f1ed1) SHA1(0eaa3e11cbbb181106639298dc1a551c9ccb1208) )
+ROM_END
+
 /* Cookie & Bibi */
 
 ROM_START( cookbib )
@@ -2814,6 +2887,9 @@ ROM_START( chokchok )
 	ROM_LOAD16_BYTE( "uor3.bin",  0x100000, 0x80000, CRC(e2dc3e12) SHA1(9e2571f93d27b9048fe8e42d3f13a8e509b3adca) )
 	ROM_LOAD16_BYTE( "uor4.bin",  0x100001, 0x80000, CRC(6f377530) SHA1(1367987e3af0baa8e22f09d1b40ad838f33371bc) )
 ROM_END
+
+
+
 
 /* Date Quiz Go Go */
 
@@ -3366,6 +3442,14 @@ DRIVER_INIT_MEMBER(tumbleb_state,chokchok)
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x100002, 0x100003, write16_delegate(FUNC(tumbleb_state::chokchok_tilebank_w),this));
 }
 
+DRIVER_INIT_MEMBER(tumbleb_state,carket)
+{
+	DRIVER_INIT_CALL(htchctch);
+
+	/* slightly different banking */
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x100002, 0x100003, write16_delegate(FUNC(tumbleb_state::chokchok_tilebank_w),this));
+}
+
 DRIVER_INIT_MEMBER(tumbleb_state,wlstar)
 {
 	tumblepb_gfx_rearrange(1);
@@ -3410,6 +3494,7 @@ GAME( 1995, chokchok, 0,       chokchok,    chokchok, tumbleb_state, chokchok, R
 GAME( 1995, wlstar,   0,       cookbib_mcu, wlstar, tumbleb_state,   wlstar,   ROT0, "Mijin",   "Wonder League Star - Sok-Magicball Fighting (Korea)", GAME_SUPPORTS_SAVE ) // translates to 'Wonder League Star - Return of Magicball Fighting'
 GAME( 1995, htchctch, 0,       htchctch,    htchctch, tumbleb_state, htchctch, ROT0, "SemiCom", "Hatch Catch" , GAME_SUPPORTS_SAVE ) // not 100% sure about gfx offsets
 GAME( 1995, cookbib,  0,       cookbib,     cookbib, tumbleb_state,  htchctch, ROT0, "SemiCom", "Cookie & Bibi" , GAME_SUPPORTS_SAVE ) // not 100% sure about gfx offsets
+GAME( 1996, carket,   0,       chokchok,    chokchok, tumbleb_state, carket,   ROT0, "SemiCom", "Carket Ball", GAME_NOT_WORKING  )
 GAME( 1996, wondl96,  0,       cookbib_mcu, wondl96, tumbleb_state,  wondl96,  ROT0, "SemiCom", "Wonder League '96 (Korea)", GAME_SUPPORTS_SAVE )
 GAME( 1996, sdfight,  0,       sdfight,     sdfight, tumbleb_state,  bcstory,  ROT0, "SemiCom", "SD Fighters (Korea)", GAME_SUPPORTS_SAVE )
 GAME( 1997, bcstry,   0,       bcstory,     bcstory, tumbleb_state,  bcstory,  ROT0, "SemiCom", "B.C. Story (set 1)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) // gfx offsets?
