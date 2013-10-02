@@ -3840,5 +3840,6 @@ GAME( 1999, jojobanr1, jojoba,   jojoba,   cps3_jojo, cps3_state, jojoba,   ROT0
 GAME( 1999, jojobaner1,jojoba,   jojoba,   cps3_jojo, cps3_state, jojoba,   ROT0, "Capcom", "JoJo's Bizarre Adventure (Euro 990913, NO CD)", GAME_IMPERFECT_GRAPHICS )
 
 // bootleg
-GAME( 1999, cps3boot,  0,        sfiii3,   cps3_jojo, cps3_state, cps3boot,   ROT0, "bootleg", "CPS3 Multi-game bootleg for HD6417095 type SH2", GAME_IMPERFECT_GRAPHICS ) // hold start 1 while booting to write a different game
+GAME( 1999, cps3boot,  0,        sfiii3,   cps3_jojo, cps3_state, cps3boot,   ROT0, "bootleg", "CPS3 Multi-game bootleg for HD6417095 type SH2", GAME_IMPERFECT_GRAPHICS ) // hold start 1 while booting to write a different game, note the CD doesn't actually contain 2nd Impact, attempting to flash that just gives another copy of 3rd Strike
+
 
