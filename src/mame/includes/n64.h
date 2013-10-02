@@ -221,7 +221,7 @@ private:
 	void handle_pif();
 	int pif_channel_handle_command(int channel, int slength, UINT8 *sdata, int rlength, UINT8 *rdata);
 	UINT8 calc_mempak_crc(UINT8 *buffer, int length);
-	UINT32 pif_ram[0x10];
+	UINT8 pif_ram[0x40];
 	UINT8 pif_cmd[0x40];
 	UINT32 si_dram_addr;
 	UINT32 si_pif_addr;

@@ -45,22 +45,40 @@ void n64_periphs::reset_tick()
 	switch(cic_type)
 	{
 		case 1:
-			pif_ram[0x09] = 0x00063f3f;
+			pif_ram[0x24] = 0x00;
+			pif_ram[0x25] = 0x06;
+			pif_ram[0x26] = 0x3f;
+			pif_ram[0x27] = 0x3f;
 			break;
 		case 3:
-			pif_ram[0x09] = 0x0002783f;
+			pif_ram[0x24] = 0x00;
+			pif_ram[0x25] = 0x02;
+			pif_ram[0x26] = 0x78;
+			pif_ram[0x27] = 0x3f;
 			break;
 		case 5:
-			pif_ram[0x09] = 0x0002913f;
+			pif_ram[0x24] = 0x00;
+			pif_ram[0x25] = 0x02;
+			pif_ram[0x26] = 0x91;
+			pif_ram[0x27] = 0x3f;
 			break;
 		case 6:
-			pif_ram[0x09] = 0x0002853f;
+			pif_ram[0x24] = 0x00;
+			pif_ram[0x25] = 0x02;
+			pif_ram[0x26] = 0x85;
+			pif_ram[0x27] = 0x3f;
 			break;
 		case 0xd:
-			pif_ram[0x09] = 0x000add3f;
+			pif_ram[0x24] = 0x00;
+			pif_ram[0x25] = 0x0a;
+			pif_ram[0x26] = 0xdd;
+			pif_ram[0x27] = 0x3f;
 			break;
 		default:
-			pif_ram[0x09] = 0x00023f3f;
+			pif_ram[0x24] = 0x00;
+			pif_ram[0x25] = 0x02;
+			pif_ram[0x26] = 0x3f;
+			pif_ram[0x27] = 0x3f;
 			break;
 	}
 }
@@ -195,40 +213,58 @@ void n64_periphs::device_reset()
 	}
 
 	// CIC-NUS-6102 (default)
-	pif_ram[0x09] = 0x00003f3f;
+	pif_ram[0x24] = 0x00;
+	pif_ram[0x25] = 0x00;
+	pif_ram[0x26] = 0x3f;
+	pif_ram[0x27] = 0x3f;
 	dd_present = false;
 	cic_type=2;
 	mem_map->write_dword(0x00000318, 0x800000);
 
 	if (boot_checksum == U64(0x00000000001ff230))
 	{
-		pif_ram[0x09] = 0x3fdd0800;
+		pif_ram[0x24] = 0x00;
+		pif_ram[0x25] = 0x08;
+		pif_ram[0x26] = 0xdd;
+		pif_ram[0x27] = 0x3f;
 		dd_present = true;
 		cic_type=0xd;
 	}
 	else if (boot_checksum == U64(0x000000cffb830843) || boot_checksum == U64(0x000000d0027fdf31))
 	{
 		// CIC-NUS-6101
-		pif_ram[0x09] = 0x00043f3f;
+		pif_ram[0x24] = 0x00;
+		pif_ram[0x25] = 0x04;
+		pif_ram[0x26] = 0x3f;
+		pif_ram[0x27] = 0x3f;
 		cic_type=1;
 	}
 	else if (boot_checksum == U64(0x000000d6499e376b))
 	{
 		// CIC-NUS-6103
-		pif_ram[0x09] = 0x0000783f;
+		pif_ram[0x24] = 0x00;
+		pif_ram[0x25] = 0x00;
+		pif_ram[0x26] = 0x78;
+		pif_ram[0x27] = 0x3f;
 		cic_type=3;
 	}
 	else if (boot_checksum == U64(0x0000011a4a1604b6))
 	{
 		// CIC-NUS-6105
-		pif_ram[0x09] = 0x0000913f;
+		pif_ram[0x24] = 0x00;
+		pif_ram[0x25] = 0x00;
+		pif_ram[0x26] = 0x91;
+		pif_ram[0x27] = 0x3f;
 		cic_type=5;
 		mem_map->write_dword(0x000003f0, 0x800000);
 	}
 	else if (boot_checksum == U64(0x000000d6d5de4ba0))
 	{
 		// CIC-NUS-6106
-		pif_ram[0x09] = 0x0000853f;
+		pif_ram[0x24] = 0x00;
+		pif_ram[0x25] = 0x00;
+		pif_ram[0x26] = 0x85;
+		pif_ram[0x27] = 0x3f;
 		cic_type=6;
 	}
 	else
@@ -2015,14 +2051,13 @@ void n64_periphs::handle_pif()
 						}
 						for(int j = 0; j < bytes_to_recv; j++)
 						{
-							ram[cmd_ptr ^ BYTE4_XOR_BE(0)] = recv_buffer[j];
-							cmd_ptr++;
+							pif_ram[cmd_ptr++] = recv_buffer[j];
 						}
 					}
 					else if (res == 1)
 					{
 						int offset = 0;//bytes_to_send;
-						ram[(cmd_ptr - offset - 2) ^ BYTE4_XOR_BE(0)] |= 0x80;
+						pif_ram[cmd_ptr - offset - 2] |= 0x80;
 					}
 				}
 
@@ -2046,8 +2081,6 @@ void n64_periphs::handle_pif()
 
 void n64_periphs::pif_dma(int direction)
 {
-	UINT8 *ram = (UINT8*)pif_ram;
-
 	if (si_dram_addr & 0x3)
 	{
 		fatalerror("pif_dma: si_dram_addr unaligned: %08X\n", si_dram_addr);
@@ -2059,8 +2092,11 @@ void n64_periphs::pif_dma(int direction)
 
 		for(int i = 0; i < 64; i+=4)
 		{
-			ram[i >> 2] = *src;
-			src++;
+			UINT32 d = *src++;
+			pif_ram[i+0] = (d >> 24) & 0xff;
+			pif_ram[i+1] = (d >> 16) & 0xff;
+			pif_ram[i+2] = (d >>  8) & 0xff;
+			pif_ram[i+3] = (d >>  0) & 0xff;
 		}
 
 		memcpy(pif_cmd, pif_ram, 0x40);
@@ -2073,8 +2109,13 @@ void n64_periphs::pif_dma(int direction)
 
 		for(int i = 0; i < 64; i+=4)
 		{
-			*dst = ram[i >> 2];
-			dst++;
+			UINT32 d = 0;
+			d |= pif_ram[i+0] << 24;
+			d |= pif_ram[i+1] << 16;
+			d |= pif_ram[i+2] <<  8;
+			d |= pif_ram[i+3] <<  0;
+
+			*dst++ = d;
 		}
 	}
 
@@ -2347,12 +2388,28 @@ READ32_MEMBER( n64_periphs::pif_ram_r )
 			return cic_status;
 		}
 	}
-	return pif_ram[offset] & mem_mask;
+	return ( ( pif_ram[offset*4+0] << 24 ) | ( pif_ram[offset*4+1] << 16 ) | ( pif_ram[offset*4+2] <<  8 ) | ( pif_ram[offset*4+3] <<  0 ) ) & mem_mask;
 }
 
 WRITE32_MEMBER( n64_periphs::pif_ram_w )
 {
-	COMBINE_DATA(&pif_ram[offset]);
+	if( mem_mask & 0xff000000 )
+	{
+		pif_ram[offset*4+0] = ( data >> 24 ) & 0x000000ff;
+	}
+	if( mem_mask & 0x00ff0000 )
+	{
+		pif_ram[offset*4+1] = ( data >> 16 ) & 0x000000ff;
+	}
+	if( mem_mask & 0x0000ff00 )
+	{
+		pif_ram[offset*4+2] = ( data >>  8 ) & 0x000000ff;
+	}
+	if( mem_mask & 0x000000ff )
+	{
+		pif_ram[offset*4+3] = ( data >>  0 ) & 0x000000ff;
+	}
+
 	signal_rcp_interrupt(SI_INTERRUPT);
 }
 
