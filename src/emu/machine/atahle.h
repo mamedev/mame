@@ -131,7 +131,9 @@ protected:
 
 	enum
 	{
-		IDE_SET_FEATURES_TRANSFER_MODE = 0x03
+		IDE_SET_FEATURES_TRANSFER_MODE = 0x03,
+		IDE_SET_FEATURES_DISABLE_REVERTING_TO_POWER_ON_DEFAULTS = 0x66,
+		IDE_SET_FEATURES_ENABLE_REVERTING_TO_POWER_ON_DEFAULTS = 0xcc
 	};
 
 	enum ide_transfer_type_t
@@ -183,6 +185,7 @@ protected:
 	UINT8 m_device_control;
 
 	UINT16 m_identify_buffer[256];
+	bool m_revert_to_defaults;
 
 private:
 	void update_irq();

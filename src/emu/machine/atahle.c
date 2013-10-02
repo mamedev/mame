@@ -52,6 +52,7 @@ ata_hle_device::ata_hle_device(const machine_config &mconfig, device_type type, 
 	m_status(0),
 	m_command(0),
 	m_device_control(0),
+	m_revert_to_defaults(true),
 	m_csel(0),
 	m_daspin(0),
 	m_daspout(0),
@@ -87,6 +88,7 @@ void ata_hle_device::device_start()
 	save_item(NAME(m_status));
 	save_item(NAME(m_command));
 	save_item(NAME(m_device_control));
+	save_item(NAME(m_revert_to_defaults));
 
 	save_item(NAME(m_single_device));
 	save_item(NAME(m_resetting));
@@ -285,6 +287,14 @@ bool ata_hle_device::set_features()
 			return set_dma_mode(88);
 		}
 		break;
+
+	case IDE_SET_FEATURES_DISABLE_REVERTING_TO_POWER_ON_DEFAULTS:
+		m_revert_to_defaults = false;
+		return true;
+
+	case IDE_SET_FEATURES_ENABLE_REVERTING_TO_POWER_ON_DEFAULTS:
+		m_revert_to_defaults = true;
+		return true;
 	}
 
 	return false;
