@@ -445,10 +445,10 @@ hardware modification to the security cart.....
 
 1. Remove the custom QFP144 CPU and replace it with a standard Hitachi HD6417095 SH-2 CPU
 2. Remove the 29F400 TSOP48 flashROM and re-program it with the decrypted and modified main program ROM from set
-   'cps3nobatt' in MAME. A 28F400 SOP44 flashROM can be used instead and mounted to the back side of the security cart
+   'cps3boot' in MAME. A 28F400 SOP44 flashROM can be used instead and mounted to the back side of the security cart
    PCB. Do not mount both SOP44 and TSOP48 flashROMs, use only one TSOP48 flashROM or one SOP44 flashROM.
 3. Power on the PCB and using the built-in cart flashROM menu re-program the SIMMs for your chosen game using the CD
-   from set 'cps3nobatt' in MAME.
+   from set 'cps3boot' in MAME.
 4. That is all. Enjoy your working PCB.
  
 */ 
@@ -712,6 +712,10 @@ UINT16 cps3_state::rotxor(UINT16 val, UINT16 xorval)
 
 UINT32 cps3_state::cps3_mask(UINT32 address, UINT32 key1, UINT32 key2)
 {
+	// ignore all encryption
+	if (m_altEncryption == 2)
+		return 0;
+
 	UINT16 val;
 
 	address ^= key1;
@@ -760,8 +764,25 @@ void cps3_state::cps3_decrypt_bios()
 #endif
 }
 
+void cps3_state::init_common(void)
+{
+	/* just some NOPs for the game to execute if it crashes and starts executing unmapped addresses
+	 - this prevents MAME from crashing */
+	m_nops = auto_alloc(machine(), UINT32);
+	m_nops[0] = 0x00090009;
 
-void cps3_state::init_common(UINT32 key1, UINT32 key2, int altEncryption)
+	// flash roms
+	astring tempstr;
+	for (int simmnum = 0; simmnum < 7; simmnum++)
+		for (int chipnum = 0; chipnum < 8; chipnum++)
+			m_simm[simmnum][chipnum] = machine().device<fujitsu_29f016a_device>(tempstr.format("simm%d.%d", simmnum + 1, chipnum));
+
+	m_eeprom = auto_alloc_array(machine(), UINT32, 0x400/4);
+	machine().device<nvram_device>("eeprom")->set_base(m_eeprom, 0x400);
+}
+
+
+void cps3_state::init_crypt(UINT32 key1, UINT32 key2, int altEncryption)
 {
 	m_key1 = key1;
 	m_key2 = key2;
@@ -780,33 +801,23 @@ void cps3_state::init_common(UINT32 key1, UINT32 key2, int altEncryption)
 	cps3_decrypt_bios();
 	m_decrypted_gamerom = auto_alloc_array(machine(), UINT32, 0x1000000/4);
 
-	/* just some NOPs for the game to execute if it crashes and starts executing unmapped addresses
-	 - this prevents MAME from crashing */
-	m_nops = auto_alloc(machine(), UINT32);
-	m_nops[0] = 0x00090009;
-
 
 	m_0xc0000000_ram_decrypted = auto_alloc_array(machine(), UINT32, 0x400/4);
 
 	address_space &main = m_maincpu->space(AS_PROGRAM);
 	main.set_direct_update_handler(direct_update_delegate(FUNC(cps3_state::cps3_direct_handler), this));
 
-	// flash roms
-	astring tempstr;
-	for (int simmnum = 0; simmnum < 7; simmnum++)
-		for (int chipnum = 0; chipnum < 8; chipnum++)
-			m_simm[simmnum][chipnum] = machine().device<fujitsu_29f016a_device>(tempstr.format("simm%d.%d", simmnum + 1, chipnum));
+	init_common();
 
-	m_eeprom = auto_alloc_array(machine(), UINT32, 0x400/4);
-	machine().device<nvram_device>("eeprom")->set_base(m_eeprom, 0x400);
 }
 
-DRIVER_INIT_MEMBER(cps3_state,redearth)  { init_common(0x9e300ab1, 0xa175b82c, 0); }
-DRIVER_INIT_MEMBER(cps3_state,sfiii)     { init_common(0xb5fe053e, 0xfc03925a, 0); }
-DRIVER_INIT_MEMBER(cps3_state,sfiii2)    { init_common(0x00000000, 0x00000000, 1); }
-DRIVER_INIT_MEMBER(cps3_state,jojo)      { init_common(0x02203ee3, 0x01301972, 0); }
-DRIVER_INIT_MEMBER(cps3_state,sfiii3)    { init_common(0xa55432b4, 0x0c129981, 0); }
-DRIVER_INIT_MEMBER(cps3_state,jojoba)    { init_common(0x23323ee3, 0x03021972, 0); }
+DRIVER_INIT_MEMBER(cps3_state,redearth)  { init_crypt(0x9e300ab1, 0xa175b82c, 0); }
+DRIVER_INIT_MEMBER(cps3_state,sfiii)     { init_crypt(0xb5fe053e, 0xfc03925a, 0); }
+DRIVER_INIT_MEMBER(cps3_state,sfiii2)    { init_crypt(0x00000000, 0x00000000, 1); }
+DRIVER_INIT_MEMBER(cps3_state,jojo)      { init_crypt(0x02203ee3, 0x01301972, 0); }
+DRIVER_INIT_MEMBER(cps3_state,sfiii3)    { init_crypt(0xa55432b4, 0x0c129981, 0); }
+DRIVER_INIT_MEMBER(cps3_state,jojoba)    { init_crypt(0x23323ee3, 0x03021972, 0); }
+DRIVER_INIT_MEMBER(cps3_state,cps3boot)  { init_crypt(-1,-1,2); }
 
 
 
@@ -2808,6 +2819,9 @@ ROM_START( jojobar1 )
 ROM_END
 
 
+
+
+
 /* NO CD sets - use NO CD BIOS roms - don't require the CD image to boot */
 
 ROM_START( sfiiin )
@@ -3601,6 +3615,15 @@ ROM_START( jojobaner1 )
 	ROM_LOAD( "jojoba-simm5.7",  0x00000, 0x200000, CRC(8c8be520) SHA1(c461f3f76a83592b36b29afb316679a7c8972404) )
 ROM_END
 
+/* Bootlegs for use with modified security carts */
+
+ROM_START( cps3boot )
+	ROM_REGION32_BE( 0x080000, "user1", 0 ) /* bios region */
+	ROM_LOAD( "no-battery_bios_29f400.u2", 0x000000, 0x080000, CRC(cb9bd5b0) SHA1(ea7ecb3deb69f5307a62d8f0d7d8e68d49013d07))
+
+	DISK_REGION( "scsi:cdrom" )
+	DISK_IMAGE_READONLY( "no-battery_multi-game_bootleg_cd_for_hd6417095_sh2", 0, SHA1(123f2fcb0f3dd3d6b859e82a51d0127e46763776) )
+ROM_END
 
 /*****************************************************************************************
   CPS3 game region / special flag information
@@ -3815,3 +3838,7 @@ GAME( 1999, jojobane,  jojoba,   jojoba,   cps3_jojo, cps3_state, jojoba,   ROT0
 GAME( 1999, jojobar1,  jojoba,   jojoba,   cps3_jojo, cps3_state, jojoba,   ROT0, "Capcom", "JoJo no Kimyou na Bouken: Mirai e no Isan (Japan 990913)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1999, jojobanr1, jojoba,   jojoba,   cps3_jojo, cps3_state, jojoba,   ROT0, "Capcom", "JoJo no Kimyou na Bouken: Mirai e no Isan (Japan 990913, NO CD)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1999, jojobaner1,jojoba,   jojoba,   cps3_jojo, cps3_state, jojoba,   ROT0, "Capcom", "JoJo's Bizarre Adventure (Euro 990913, NO CD)", GAME_IMPERFECT_GRAPHICS )
+
+// bootleg
+GAME( 1999, cps3boot,  0,        sfiii3,   cps3_jojo, cps3_state, cps3boot,   ROT0, "bootleg", "CPS3 Multi-game bootleg for HD6417095 type SH2", GAME_IMPERFECT_GRAPHICS ) // hold start 1 while booting to write a different game
+

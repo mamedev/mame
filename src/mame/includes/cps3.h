@@ -103,6 +103,7 @@ public:
 	DECLARE_DRIVER_INIT(jojo);
 	DECLARE_DRIVER_INIT(jojoba);
 	DECLARE_DRIVER_INIT(sfiii2);
+	DECLARE_DRIVER_INIT(cps3boot);
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_cps3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -112,7 +113,8 @@ public:
 	UINT16 rotxor(UINT16 val, UINT16 xorval);
 	UINT32 cps3_mask(UINT32 address, UINT32 key1, UINT32 key2);
 	void cps3_decrypt_bios();
-	void init_common(UINT32 key1, UINT32 key2, int altEncryption);
+	void init_common(void);
+	void init_crypt(UINT32 key1, UINT32 key2, int altEncryption);
 	void cps3_set_mame_colours(int colournum, UINT16 data, UINT32 fadeval);
 	void cps3_draw_tilemapsprite_line(int tmnum, int drawline, bitmap_rgb32 &bitmap, const rectangle &cliprect );
 	UINT32 cps3_flashmain_r(address_space &space, int which, UINT32 offset, UINT32 mem_mask);
