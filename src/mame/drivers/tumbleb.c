@@ -2798,7 +2798,7 @@ ROM_START( carket )
 
 	ROM_REGION16_BE( 0x200, "user1", 0 ) /* Data from Shared RAM */
 	/* this is not a real rom but instead the data extracted from shared ram, the MCU puts it there */
-	ROM_LOAD16_WORD( "protdata.bin", 0x00000, 0x200 , BAD_DUMP CRC(0bd39834) SHA1(2860c2b7fcb74546afde11a59d4b359612ab6e68) ) // this is WRONG, taken from Choky Choky, causes game to crash on coin, need real data.
+	ROM_LOAD16_WORD( "protdata.bin", 0x00000, 0x200 , BAD_DUMP CRC(4b5126de) SHA1(73a80c5b68540fb86231cad658d78b51f2575010) ) // this is hand-crafted from choky choky and hatch catch with 3 jumps adjusted to point to similar code in carket
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "27010.uc1", 0x00000, 0x20000, CRC(b825bb9c) SHA1(9e444306e7ac1282871f0132f0137bf7aa87b7e0) )
