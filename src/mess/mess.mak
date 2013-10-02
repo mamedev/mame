@@ -2126,8 +2126,6 @@ $(MESSOBJ)/tesla.a:             \
 	$(MESS_MACHINE)/pmd85.o     \
 	$(MESS_DRIVERS)/pmi80.o     \
 	$(MESS_DRIVERS)/sapi1.o     \
-	$(MESS_MACHINE)/sapi1.o     \
-	$(MESS_VIDEO)/sapi1.o       \
 
 $(MESSOBJ)/test.a:              \
 	$(MESS_DRIVERS)/test_t400.o \
