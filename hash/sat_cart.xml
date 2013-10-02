@@ -22,14 +22,13 @@
 		</part>
 	</software>
 
-	<!-- Only the CD for this seems to be dumped? The support cart is missing... -->
 	<software name="ultraman" supported="no">
 		<description>Ultraman (Jpn) (Support Cartridge)</description>
 		<year>1995</year>
 		<publisher>Bandai</publisher>
 		<part name="cart" interface="sat_cart">
 			<dataarea name="cart" size="0x200000">
-				<rom name="ultraman (j).rom" size="0x200000" status="nodump" offset="0" />
+				<rom name="mpr-19367-mx.ic1" size="0x200000" crc="b9644b52" sha1="56c1b93da6b660bf393fbf48ca47569000ef4047" offset="0" />
 			</dataarea>
 		</part>
 	</software>
