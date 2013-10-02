@@ -2,6 +2,18 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="ibm5170_cdrom" description="IBM PC/AT CD-ROM images">
 
+	<software name="pcdos2k">
+		<description>PC DOS 2000</description>
+		<year>1998</year>
+		<publisher>IBM</publisher>
+		
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="pcdos2k" sha1="ae69e305e82f24d908296ba9f45a1321a1c9dd58" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="win31sdk">
 		<description>Windows Software Development Kit Version 3.1</description>
 		<year>1992</year>
