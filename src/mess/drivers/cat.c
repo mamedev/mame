@@ -161,33 +161,43 @@ X3: 2.4576Mhz, used by the modem chip AMI S35213 at IC37
 IAI Swyft:
 Board name: 950-0001C
 "INFORMATION APPLIANCE INC. COPYRIGHT 1985"
- _________________|||||||||_____________________________________________________________________________
-|                 video out            [Floppy connector]  ____                                         |
-|                                                         /    \                                        |
-<4 pin edge)           74LS107                            |PB1 |        uA339     MC3403                |
-|                                          7407           \____/                                        |
-| Y1       "TIMING B" 74LS132    74LS175                                                                |
-|                                                  ____________                                         |
-| TMS4256   74LS161  "DECODE E" "DISK 3.5C"       |            |                           4N37         |
-|                                                 |  MC6850P   |                                   -----|
-| TMS4256   74LS166   74HCT259   74LS299          '------------'        MC3403    MC3403           LINE =
-|                      ___________________     ___________________                                 -----|
-| TMS4256   74LS373   |                   |   |                   |                                PHONE=
-|                     |   MC68008P8       |   |       R6522P      |                                -----|
-| TMS4256   74F153    '-------------------'   '-------------------'     MN4053    MN4053          .-----|
-|                             (jumper E1)                                                         |J1   =
-| TMS4256   74F153    74HCT08     __________   ___________________      MC14412   DS1489          | B   =
-|                                |          | |                   | ||                            | R   =
-| TMS4256   74F153    74HC4040E  | AM27256  | |       R6522P      | ||                            | E   =
-|                                '----------' '-------------------' ||                            | A   =
-| TMS4256   74F153    "VIDEO 2B" .----------.                       J4                            | K   =
-|                                | AM27256  |   74HC02     74HC374  ||                            | O   =
-| TMS4256   74F153    74LS393    |__________|                       ||  UM95089  Y2               | U   =
-|_____________________________________(j9)________________________________________________________|_T___=
+ _________________|||||||||___________________________________________________________________________________
+|                     J8               [=======J3=======]  ____                                               |
+=                                                         /    \  (E2)                                        |
+= Jx                   74LS107   J5                       |PB1 |        uA339     MC3403                      |
+|                                          7407           \____/                                              |
+| Y1       "TIMING B" 74LS132    74LS175                                                                 -----|
+|                                                  ____________                            4N37  Relay   J7   =
+| TMS4256   74LS161  "DECODE E" "DISK 3.5C"       |            |                                         -----|
+|                                                 |  MC6850P   |                                         J6   =
+| TMS4256   74LS166   74HCT259   74LS299          '------------'        MC3403    MC3403                 -----|
+|                      ___________________     ___________________                                      .-----|
+| TMS4256   74LS373   |                   |   |                   |                                     |J1   =
+|                     |   MC68008P8       |   |       R6522P      |                                     |     =
+| TMS4256   74F153    '-------------------'   '-------------------'     MN4053    MN4053                | B   =
+|                                    (E1)                                                               | R   =
+| TMS4256   74F153    74HCT08     __________   ___________________      MC14412   DS1489                | E   =
+|                                |          | |                   | ||                                  | A   =
+| TMS4256   74F153    74HC4040E  | AM27256  | |       R6522P      | ||                                  | K   =
+|                                '----------' '-------------------' ||  INFORMATION                     | O   =
+| TMS4256   74F153    "VIDEO 2B" .----------.                       J4  APPLIANCE INC.                  | U   =
+|                                | AM27256  |   74HC02     74HC374  ||  Copyright 1985                  | T   =
+| TMS4256   74F153    74LS393    |__________|                       ||  UM95089  Y2                     |     =
+|_____________________________[________J9___]__________________________________________________D13______|_____=
 
 *Devices of interest:
 J1: breakout of joystick, serial/rs232, hex-keypad, parallel port, and forth switch (and maybe cassette?) pins
+Jx: 4 pin on top side, 6 pin on bottom side edge ?debug? connector (may have been intended to be J2, doesn't actually have a J number at all)
+J3: Floppy Connector (standard 34 pin shugart)
 J4: keyboard ribbon cable
+J5: Berg type socket for supplying power (5v gnd gnd 12v) to the floppy drive
+J6: Phone connector, rj11 jack
+J7: Line connector, rj11 jack
+J8: Video out/power in
+J9: solder points for a rom expansion/replacement daughterboard, not populated
+E1: jumper, unknown purpose
+E2: jumper, unknown purpose
+D13: LED
 R6522P (upper): parallel port via
 R6522P (lower): keyboard via
 UM95089: Tone Dialer chip
@@ -202,6 +212,7 @@ UM95089: Tone Dialer chip
 *Deviations from silkscreen:
 4N37 (marked on silkscreen "4N35")
 74F153 (marked on silkscreen "74ALS153")
+74HCT259 is socketed, possibly intended that the rom expansion daughterboard will fit in its socket and in place of the 2 roms, if populated
 
 *Other Devices:
 TMS4256-15NL - 262144 x 1 DRAM
@@ -209,7 +220,7 @@ PB1 - piezo speaker
 
 Crystals:
 Y1: 15.8976Mhz, main clock?
-Y2: 3.579545Mhz, used by the DTMF generator chip UM95089?
+Y2: 3.579545Mhz, used by the DTMF generator chip UM95089 (connects to pins 7 and 8 of it)
 
 
 ToDo:
@@ -1499,7 +1510,7 @@ WRITE_LINE_MEMBER ( cat_state::via1_int_w )
 static MACHINE_CONFIG_START( swyft, cat_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68008, XTAL_15_8976MHz/2) //MC68008P8, Y1=15.8796Mhz, clock GUESSED at Y1 / 2
+	MCFG_CPU_ADD("maincpu",M68008, XTAL_15_8976MHz/2) //MC68008P8, Y1=15.8976Mhz, clock GUESSED at Y1 / 2
 	MCFG_CPU_PROGRAM_MAP(swyft_mem)
 
 	MCFG_MACHINE_START_OVERRIDE(cat_state,swyft)
