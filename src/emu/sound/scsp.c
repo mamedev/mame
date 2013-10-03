@@ -216,12 +216,13 @@ struct scsp_state
 	emu_timer *timerA, *timerB, *timerC;
 
 	// DMA stuff
-	UINT32 scsp_dmea;
-	UINT16 scsp_drga;
-	UINT16 scsp_dtlg;
-	UINT16 scsp_dmactrl;
-
-	UINT16 dma_regs[3];
+	struct{
+		UINT32 dmea;
+		UINT16 drga;
+		UINT16 dtlg;
+		UINT8 dgate;
+		UINT8 ddir;
+	}dma;
 
 	UINT16 mcieb;
 	UINT16 mcipd;
@@ -234,10 +235,7 @@ struct scsp_state
 	device_t *device;
 };
 
-static void dma_scsp(address_space &space, scsp_state *scsp);       /*state DMA transfer function*/
-#define scsp_dgate      scsp->scsp_dmactrl & 0x4000
-#define scsp_ddir       scsp->scsp_dmactrl & 0x2000
-#define scsp_dexe       scsp->scsp_dmactrl & 0x1000
+static void scsp_exec_dma(address_space &space, scsp_state *scsp);       /*state DMA transfer function*/
 /* TODO */
 //#define dma_transfer_end  ((scsp_regs[0x24/2] & 0x10)>>4)|(((scsp_regs[0x26/2] & 0x10)>>4)<<1)|(((scsp_regs[0x28/2] & 0x10)>>4)<<2)
 
@@ -747,10 +745,20 @@ static void SCSP_UpdateReg(scsp_state *scsp, address_space &space, int reg)
 			break;
 		case 0x12:
 		case 0x13:
+			scsp->dma.dmea = (scsp->udata.data[0x12/2] & 0xfffe) | (scsp->dma.dmea & 0xf0000);
+			break;
 		case 0x14:
 		case 0x15:
+			scsp->dma.dmea = ((scsp->udata.data[0x14/2] & 0xf000) << 4) | (scsp->dma.dmea & 0xfffe);
+			scsp->dma.drga = (scsp->udata.data[0x14/2] & 0x0ffe);
+			break;
 		case 0x16:
 		case 0x17:
+			scsp->dma.dtlg = (scsp->udata.data[0x16/2] & 0x0ffe);
+			scsp->dma.ddir = (scsp->udata.data[0x16/2] & 0x2000) >> 13;
+			scsp->dma.dgate = (scsp->udata.data[0x16/2] & 0x4000) >> 14;
+			if(scsp->udata.data[0x16/2] & 0x1000) // dexe
+				scsp_exec_dma(space,scsp);
 			break;
 		case 0x18:
 		case 0x19:
@@ -999,8 +1007,6 @@ static unsigned short SCSP_r16(scsp_state *scsp, address_space &space, unsigned 
 		SCSP_UpdateSlotRegR(scsp, slot,addr&0x1f);
 		v=*((unsigned short *) (scsp->Slots[slot].udata.datab+(addr)));
 	}
-	else if(addr>=0x412 && addr <= 0x416)
-		v = scsp->dma_regs[((addr-0x412)/2) & 3];
 	else if(addr<0x600)
 	{
 		if (addr < 0x430)
@@ -1319,94 +1325,84 @@ static void SCSP_DoMasterSamples(scsp_state *scsp, int nsamples)
 }
 
 /* TODO: this needs to be timer-ized */
-static void dma_scsp(address_space &space, scsp_state *scsp)
+static void scsp_exec_dma(address_space &space, scsp_state *scsp)
 {
 	static UINT16 tmp_dma[3];
 	int i;
 
-	scsp->scsp_dmactrl = scsp->dma_regs[2] & 0x7000;
-
-	if(!(scsp_dexe)) //don't bother if DMA is off
-		return;
-
-	/* calc the registers */
-	scsp->scsp_dmea = ((scsp->dma_regs[1] & 0xf000) << 4) | (scsp->dma_regs[0] & 0xfffe); /* RAM address */
-	scsp->scsp_drga = (scsp->dma_regs[1] & 0x0ffe);
-	scsp->scsp_dtlg = (scsp->dma_regs[2] & 0x0ffe);
-
 	logerror("SCSP: DMA transfer START\n"
 				"DMEA: %04x DRGA: %04x DTLG: %04x\n"
-				"DGATE: %d  DDIR: %d\n",scsp->scsp_dmea,scsp->scsp_drga,scsp->scsp_dtlg,scsp_dgate ? 1 : 0,scsp_ddir ? 1 : 0);
+				"DGATE: %d  DDIR: %d\n",scsp->dma.dmea,scsp->dma.drga,scsp->dma.dtlg,scsp->dma.dgate ? 1 : 0,scsp->dma.ddir ? 1 : 0);
 
 	/* Copy the dma values in a temp storage for resuming later */
 		/* (DMA *can't* overwrite its parameters).                  */
-	if(!(scsp_ddir))
+	if(!(scsp->dma.ddir))
 	{
 		for(i=0;i<3;i++)
-			tmp_dma[i] = scsp->dma_regs[i];
+			tmp_dma[i] = scsp->udata.data[(0x12+(i*2))/2];
 	}
 
 	/* note: we don't use space.read_word / write_word because it can happen that SH-2 enables the DMA instead of m68k. */
 	/* TODO: don't know if params auto-updates, I guess not ... */
-	if(scsp_ddir)
+	if(scsp->dma.ddir)
 	{
-		if(scsp_dgate)
+		if(scsp->dma.dgate)
 		{
 			popmessage("Check: SCSP DMA DGATE enabled, contact MAME/MESSdev");
-			for(i=0;i < scsp->scsp_dtlg;i+=2)
+			for(i=0;i < scsp->dma.dtlg;i+=2)
 			{
-				scsp->SCSPRAM[scsp->scsp_dmea] = 0;
-				scsp->SCSPRAM[scsp->scsp_dmea+1] = 0;
-				scsp->scsp_dmea+=2;
+				scsp->SCSPRAM[scsp->dma.dmea] = 0;
+				scsp->SCSPRAM[scsp->dma.dmea+1] = 0;
+				scsp->dma.dmea+=2;
 			}
 		}
 		else
 		{
-			for(i=0;i < scsp->scsp_dtlg;i+=2)
+			for(i=0;i < scsp->dma.dtlg;i+=2)
 			{
 				UINT16 tmp;
-				tmp = SCSP_r16(scsp, space, scsp->scsp_drga);
-				scsp->SCSPRAM[scsp->scsp_dmea] = tmp & 0xff;
-				scsp->SCSPRAM[scsp->scsp_dmea+1] = tmp>>8;
-				scsp->scsp_dmea+=2;
-				scsp->scsp_drga+=2;
+				tmp = SCSP_r16(scsp, space, scsp->dma.drga);
+				scsp->SCSPRAM[scsp->dma.dmea] = tmp & 0xff;
+				scsp->SCSPRAM[scsp->dma.dmea+1] = tmp>>8;
+				scsp->dma.dmea+=2;
+				scsp->dma.drga+=2;
 			}
 		}
 	}
 	else
 	{
-		if(scsp_dgate)
+		if(scsp->dma.dgate)
 		{
 			popmessage("Check: SCSP DMA DGATE enabled, contact MAME/MESSdev");
-			for(i=0;i < scsp->scsp_dtlg;i+=2)
+			for(i=0;i < scsp->dma.dtlg;i+=2)
 			{
-				SCSP_w16(scsp, space, scsp->scsp_drga, 0);
-				scsp->scsp_drga+=2;
+				SCSP_w16(scsp, space, scsp->dma.drga, 0);
+				scsp->dma.drga+=2;
 			}
 		}
 		else
 		{
-			for(i=0;i < scsp->scsp_dtlg;i+=2)
+			for(i=0;i < scsp->dma.dtlg;i+=2)
 			{
 				UINT16 tmp;
-				tmp = scsp->SCSPRAM[scsp->scsp_dmea];
-				tmp|= scsp->SCSPRAM[scsp->scsp_dmea+1]<<8;
-				SCSP_w16(scsp, space, scsp->scsp_drga, tmp);
-				scsp->scsp_dmea+=2;
-				scsp->scsp_drga+=2;
+				tmp = scsp->SCSPRAM[scsp->dma.dmea];
+				tmp|= scsp->SCSPRAM[scsp->dma.dmea+1]<<8;
+				SCSP_w16(scsp, space, scsp->dma.drga, tmp);
+				scsp->dma.dmea+=2;
+				scsp->dma.drga+=2;
 			}
 		}
 	}
 
 	/*Resume the values*/
-	if(!(scsp_ddir))
+	if(!(scsp->dma.ddir))
 	{
 		for(i=0;i<3;i++)
-			scsp->dma_regs[i] = tmp_dma[i];
+			scsp->udata.data[(0x12+(i*2))/2] = tmp_dma[i];
 	}
 
 	/* Job done */
-	scsp->dma_regs[2] &= ~0x1000;
+	scsp->udata.data[0x16/2] &= ~0x1000;
 	/* request a dma end irq (TODO: make it inside the interface) */
 	if(scsp->udata.data[0x1e/2] & 0x10)
 	{
@@ -1486,19 +1482,6 @@ WRITE16_DEVICE_HANDLER( scsp_w )
 	tmp = SCSP_r16(scsp, space, offset*2);
 	COMBINE_DATA(&tmp);
 	SCSP_w16(scsp,space,offset*2, tmp);
-
-	/* TODO: move in UpdateSlot structure */
-	switch(offset*2)
-	{
-		// check DMA
-		case 0x412:
-		case 0x414:
-		case 0x416:
-			COMBINE_DATA(&scsp->dma_regs[((offset-0x412)/2) & 3]);
-			if(ACCESSING_BITS_8_15 && offset*2 == 0x416)
-				dma_scsp(space, scsp);
-			break;
-	}
 }
 
 WRITE16_DEVICE_HANDLER( scsp_midi_in )

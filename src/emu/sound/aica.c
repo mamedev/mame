@@ -212,7 +212,7 @@ struct aica_state
 	device_t *device;
 };
 
-static void aica_exec_dma(aica_state *aica,address_space &space);       /*state DMA transfer function*/
+static void aica_exec_dma(address_space &space,aica_state *aica);       /*state DMA transfer function*/
 
 static const float SDLT[16]={-1000000.0,-42.0,-39.0,-36.0,-33.0,-30.0,-27.0,-24.0,-21.0,-18.0,-15.0,-12.0,-9.0,-6.0,-3.0,0.0};
 
@@ -767,7 +767,7 @@ static void AICA_UpdateReg(aica_state *AICA, address_space &space, int reg)
 			AICA->dma.dlg = (AICA->udata.data[0x8c/2] & 0x7ffc);
 			AICA->dma.ddir = (AICA->udata.data[0x8c/2] & 0x8000) >> 15;
 			if(AICA->udata.data[0x8c/2] & 1) // dexe
-				aica_exec_dma(AICA,space);
+				aica_exec_dma(space,AICA);
 			break;
 
 		case 0x90:
@@ -1410,7 +1410,7 @@ static void AICA_DoMasterSamples(aica_state *AICA, int nsamples)
 }
 
 /* TODO: this needs to be timer-ized */
-static void aica_exec_dma(aica_state *aica,address_space &space)
+static void aica_exec_dma(address_space &space, aica_state *aica)
 {
 	static UINT16 tmp_dma[4];
 	int i;
