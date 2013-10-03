@@ -8,8 +8,6 @@
         With no available docs, the i/o ports are a guess. The ram
         allocation is based on the actions of the various bios roms.
         Port 25 is used as a jump vector. in a,(25); ld l,a; jp(hl).
-        According to wikipedia, e800+ is the videoram area, and the
-        number of columns is 64.
 
         2012-04-19 Connected sapizps3 to a terminal. It is trying to
         load a 128-byte boot sector from a floppy disk.
@@ -50,6 +48,7 @@ public:
 	DECLARE_WRITE8_MEMBER(sapi1_keyboard_w);
 	DECLARE_READ8_MEMBER(sapi2_keyboard_status_r);
 	DECLARE_READ8_MEMBER(sapi2_keyboard_data_r);
+	DECLARE_READ8_MEMBER(sapi3_0c_r);
 	DECLARE_WRITE8_MEMBER(sapi3_00_w);
 	DECLARE_READ8_MEMBER(sapi3_25_r);
 	DECLARE_WRITE8_MEMBER(sapi3_25_w);
@@ -192,8 +191,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(sapi3b_mem, AS_PROGRAM, 8, sapi1_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_RAMBANK("bank1")
-	AM_RANGE(0x0800, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("videoram")
+	AM_RANGE(0x0800, 0xafff) AM_RAM
+	AM_RANGE(0xb000, 0xb7ff) AM_RAM AM_SHARE("videoram")
+	AM_RANGE(0xb800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sapi3_io, AS_IO, 8, sapi1_state )
@@ -215,6 +215,7 @@ static ADDRESS_MAP_START( sapi3b_io, AS_IO, 8, sapi1_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(sapi3_00_w)
+	AM_RANGE(0x0c, 0x0c) AM_READ(sapi3_0c_r)
 	AM_RANGE(0x25, 0x25) AM_READWRITE(sapi3_25_r,sapi3_25_w)
 	AM_RANGE(0xe0, 0xe0) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
 	AM_RANGE(0xe1, 0xe1) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
@@ -283,10 +284,9 @@ INPUT_PORTS_END
 
 UINT32 sapi1_state::screen_update_sapi1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x,y,j,b;
 	bool val;
-	UINT16 addr;
-	int xpos;
+	UINT16 addr,xpos;
+	UINT8 chr,attr,ra,x,y,b;
 
 	for(y = 0; y < 24; y++ )
 	{
@@ -294,35 +294,35 @@ UINT32 sapi1_state::screen_update_sapi1(screen_device &screen, bitmap_ind16 &bit
 		xpos = 0;
 		for(x = 0; x < 40; x++ )
 		{
-			UINT8 code = m_p_videoram[addr + x];
-			UINT8 attr = (code >> 6) & 3;
-			code &= 0x3f;
-			for(j = 0; j < 9; j++ )
+			chr = m_p_videoram[addr + x];
+			attr = (chr >> 6) & 3;
+			chr &= 0x3f;
+			for(ra = 0; ra < 9; ra++ )
 			{
 				for(b = 0; b < 6; b++ )
 				{
 					val = 0;
 
-					if (j==8)
+					if (ra==8)
 					{
 						if (attr==2)
 							val = BIT(m_refresh_counter, 5);
 					}
 					else
 					{
-						val = BIT(MHB2501[code*8 + j], 5-b);
+						val = BIT(MHB2501[(chr<<3) | ra], 5-b);
 						if (attr==1)
 							val = BIT(m_refresh_counter, 5) ? val : 0;
 					}
 
 					if(attr==3)
 					{
-						bitmap.pix16(y*9+j, xpos+2*b   ) = val;
-						bitmap.pix16(y*9+j, xpos+2*b+1 ) = val;
+						bitmap.pix16(y*9+ra, xpos+2*b   ) = val;
+						bitmap.pix16(y*9+ra, xpos+2*b+1 ) = val;
 					}
 					else
 					{
-						bitmap.pix16(y*9+j, xpos+b ) = val;
+						bitmap.pix16(y*9+ra, xpos+b ) = val;
 					}
 				}
 			}
@@ -336,6 +336,30 @@ UINT32 sapi1_state::screen_update_sapi1(screen_device &screen, bitmap_ind16 &bit
 
 static MC6845_UPDATE_ROW( update_row )
 {
+	sapi1_state *state = device->machine().driver_data<sapi1_state>();
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	UINT8 chr,gfx,inv;
+	UINT16 mem,x;
+	UINT32 *p = &bitmap.pix32(y);
+
+	for (x = 0; x < x_count; x++)
+	{
+		inv = gfx = 0;
+		if (x == cursor_x) inv ^= 0xff;
+		mem = (2*(ma + x)) & 0xfff;
+		chr = state->m_p_videoram[mem] & 0x3f;
+
+		if (ra < 8)
+			gfx = MHB2501[(chr<<3) | ra] ^ inv;
+
+		/* Display a scanline of a character */
+		*p++ = palette[BIT(gfx, 5)];
+		*p++ = palette[BIT(gfx, 4)];
+		*p++ = palette[BIT(gfx, 3)];
+		*p++ = palette[BIT(gfx, 2)];
+		*p++ = palette[BIT(gfx, 1)];
+		*p++ = palette[BIT(gfx, 0)];
+	}
 }
 
 static MC6845_INTERFACE( mc6845_intf )
@@ -405,6 +429,11 @@ static GENERIC_TERMINAL_INTERFACE( terminal_intf )
     Machine
 
 **************************************/
+
+READ8_MEMBER( sapi1_state::sapi3_0c_r )
+{
+	return 0xc0;
+}
 
 /* switch out the rom shadow */
 WRITE8_MEMBER( sapi1_state::sapi3_00_w )
@@ -564,7 +593,7 @@ ROM_END
 
 ROM_START( sapizps3b )
 	ROM_REGION( 0x10800, "maincpu", 0 )
-	// This bios uses a 6845 and unknown videoram
+	// This bios uses a 6845
 	ROM_LOAD( "pkt1.bin",       0x10000, 0x0800, CRC(ed5a2725) SHA1(3383c15f87f976400b8d0f31829e2a95236c4b6c))
 ROM_END
 
