@@ -1,6 +1,6 @@
 /***************************************************************************
 
-  Besta-88 and Besta-90 engineering workstations.
+    Besta-88 and Besta-90 engineering workstations.
 
     Derived (OEMd?) from Force Computers' SYS68K series.
 
@@ -9,9 +9,6 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/terminal.h"
-#if 0
-#include "machine/68561mpcc.h"
-#endif
 
 #define VERBOSE_DBG 1       /* general debug messages */
 
@@ -20,7 +17,7 @@
 		if(VERBOSE_DBG>=N) \
 		{ \
 			if( M ) \
-				logerror("%11.6f: %-24s",machine().time().as_double(),(char*)M ); \
+				logerror("%11.6f at %s: %-24s",machine().time().as_double(),machine().describe_context(),(char*)M ); \
 			logerror A; \
 		} \
 	} while (0)
@@ -51,7 +48,6 @@ public:
 	required_shared_ptr<UINT32> m_p_ram;
 };
 
-#if 1
 READ8_MEMBER( besta_state::mpcc_reg_r )
 {
 	UINT8 ret;
@@ -82,10 +78,12 @@ WRITE8_MEMBER( besta_state::mpcc_reg_w )
 	switch (offset) {
 		case 2:
 			m_term_data = data;
+			break;
 		case 10:
 			dynamic_cast<generic_terminal_device *>(devconf)->write(*machine().memory().first_space(), 0, data);
 		default:
-			m_mpcc_regs[offset] = data; break;
+			m_mpcc_regs[offset] = data;
+			break;
 	}
 }
 
@@ -93,7 +91,6 @@ WRITE8_MEMBER( besta_state::kbd_put )
 {
 	mpcc_reg_w(space, (offs_t)2, data, mem_mask);
 }
-#endif
 
 static ADDRESS_MAP_START(besta_mem, AS_PROGRAM, 32, besta_state)
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("p_ram")       // local bus DRAM, 4MB
@@ -132,9 +129,6 @@ static MACHINE_CONFIG_START( besta, besta_state )
 	MCFG_CPU_ADD("maincpu", M68030, 2*16670000)
 	MCFG_CPU_PROGRAM_MAP(besta_mem)
 
-#if 0
-	MCFG_DEVICE_ADD("mpcc", MPCC68561, XTAL_25MHz);    // confirm internal oscillator frequency
-#endif
 	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(besta_state, kbd_put))
 MACHINE_CONFIG_END
