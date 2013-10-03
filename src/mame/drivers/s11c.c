@@ -10,6 +10,7 @@
 #include "sound/hc55516.h"
 #include "sound/2151intf.h"
 #include "sound/dac.h"
+#include "audio/s11c_bg.h"
 #include "includes/s11.h"
 #include "s11c.lh"
 
@@ -33,7 +34,6 @@ static ADDRESS_MAP_START( s11c_audio_map, AS_PROGRAM, 8, s11c_state )
     AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank0")
     AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
-*/
 static ADDRESS_MAP_START( s11c_bg_map, AS_PROGRAM, 8, s11c_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x1ffe) AM_DEVREADWRITE("ym2151", ym2151_device, read, write)
@@ -43,6 +43,7 @@ static ADDRESS_MAP_START( s11c_bg_map, AS_PROGRAM, 8, s11c_state )
 	AM_RANGE(0x7800, 0x7fff) AM_WRITE(bgbank_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bgbank")
 ADDRESS_MAP_END
+*/
 
 static INPUT_PORTS_START( s11c )
 	PORT_START("X0")
@@ -124,26 +125,27 @@ static INPUT_PORTS_START( s11c )
 	PORT_CONFSETTING( 0x10, "English" )
 INPUT_PORTS_END
 
+/*
 WRITE8_MEMBER( s11c_state::bgbank_w )
 {
 	UINT8 bank = ((data & 0x04) >> 2) | ((data & 0x03) << 1);
 	membank("bgbank")->set_entry(bank);
 //  popmessage("BG bank set to %02x (%i)",data,bank);
 }
-
+*/
 MACHINE_RESET_MEMBER( s11c_state, s11c )
 {
-	membank("bgbank")->set_entry(0);
+//	membank("bgbank")->set_entry(0);
 	// reset the CPUs again, so that the CPUs are starting with the right vectors (otherwise sound may die on reset)
-	m_bgcpu->set_input_line(INPUT_LINE_RESET,PULSE_LINE);
+//	m_bgcpu->set_input_line(INPUT_LINE_RESET,PULSE_LINE);
 }
 
 DRIVER_INIT_MEMBER(s11c_state,s11c)
 {
 	emu_timer* timer = timer_alloc(TIMER_IRQ);
-	UINT8 *BGROM = memregion("bgcpu")->base();
-	membank("bgbank")->configure_entries(0, 8, &BGROM[0x10000], 0x8000);
-	membank("bgbank")->set_entry(0);
+//	UINT8 *BGROM = memregion("bgcpu")->base();
+//	membank("bgbank")->configure_entries(0, 8, &BGROM[0x10000], 0x8000);
+//	membank("bgbank")->set_entry(0);
 	set_invert(true);
 	set_timer(timer);
 	timer->adjust(attotime::from_ticks(S11_IRQ_CYCLES,E_CLOCK),1);
@@ -261,21 +263,21 @@ static const pia6821_interface pia34_intf =
 //  DEVCB_CPU_INPUT_LINE("audiocpu", M6800_IRQ_LINE)        /* IRQB */
 //};
 
-static const pia6821_interface pia40_intf =
-{
-	DEVCB_NULL,     /* port A in */
-	DEVCB_NULL,     /* port B in */
-	DEVCB_NULL,     /* line CA1 in */
-	DEVCB_NULL,     /* line CB1 in */
-	DEVCB_LINE_VCC,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_DRIVER_MEMBER(s11_state, pia40_pa_w),     /* port A out */
-	DEVCB_DRIVER_MEMBER(s11_state, pia40_pb_w),     /* port B out */
-	DEVCB_DRIVER_LINE_MEMBER(s11b_state, pia40_ca2_w),      /* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia40_cb2_w),       /* line CB2 out */
-	DEVCB_CPU_INPUT_LINE("bgcpu", M6809_FIRQ_LINE),     /* IRQA */
-	DEVCB_CPU_INPUT_LINE("bgcpu", INPUT_LINE_NMI)       /* IRQB */
-};
+//static const pia6821_interface pia40_intf =
+//{
+//	DEVCB_NULL,     /* port A in */
+//	DEVCB_NULL,     /* port B in */
+//	DEVCB_NULL,     /* line CA1 in */
+//	DEVCB_NULL,     /* line CB1 in */
+//	DEVCB_LINE_VCC,     /* line CA2 in */
+//	DEVCB_NULL,     /* line CB2 in */
+//	DEVCB_DRIVER_MEMBER(s11_state, pia40_pa_w),     /* port A out */
+//	DEVCB_DRIVER_MEMBER(s11_state, pia40_pb_w),     /* port B out */
+//	DEVCB_DRIVER_LINE_MEMBER(s11b_state, pia40_ca2_w),      /* line CA2 out */
+//	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia40_cb2_w),       /* line CB2 out */
+//	DEVCB_CPU_INPUT_LINE("bgcpu", M6809_FIRQ_LINE),     /* IRQA */
+//	DEVCB_CPU_INPUT_LINE("bgcpu", INPUT_LINE_NMI)       /* IRQB */
+//};
 
 static MACHINE_CONFIG_START( s11c, s11c_state )
 	/* basic machine hardware */
@@ -301,6 +303,8 @@ static MACHINE_CONFIG_START( s11c, s11c_state )
 	// generic sound board is not used in System 11C, except for Star Trax
 
 	/* Add the background music card */
+	MCFG_WMS_S11C_BG_ADD("bgm",":bgcpu")
+	/*
 	MCFG_CPU_ADD("bgcpu", M6809E, XTAL_8MHz) // MC68B09E (note: schematics show this as 8mhz/2, but games crash very quickly with that speed?)
 	MCFG_CPU_PROGRAM_MAP(s11c_bg_map)
 	MCFG_QUANTUM_TIME(attotime::from_hz(50))
@@ -317,6 +321,7 @@ static MACHINE_CONFIG_START( s11c, s11c_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bg", 0.50)
 
 	MCFG_PIA6821_ADD("pia40", pia40_intf)
+	*/
 MACHINE_CONFIG_END
 
 /*--------------------

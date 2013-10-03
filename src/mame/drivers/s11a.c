@@ -26,6 +26,7 @@ Note: To start a game, certain switches need to be activated.  You must first pr
 #include "sound/hc55516.h"
 #include "sound/2151intf.h"
 #include "sound/dac.h"
+#include "audio/s11c_bg.h"
 #include "includes/s11.h"
 #include "s11a.lh"
 

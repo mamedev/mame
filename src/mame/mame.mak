@@ -1970,6 +1970,7 @@ $(MAMEOBJ)/pinball.a: \
 	$(DRIVERS)/s11a.o  \
 	$(DRIVERS)/s11b.o  \
 	$(DRIVERS)/s11c.o  \
+	$(AUDIO)/s11c_bg.o \
 	$(DRIVERS)/s3.o  \
 	$(DRIVERS)/s4.o  \
 	$(DRIVERS)/s6.o  \

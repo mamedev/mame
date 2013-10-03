@@ -26,6 +26,7 @@
 #include "sound/hc55516.h"
 #include "sound/2151intf.h"
 #include "sound/dac.h"
+#include "audio/s11c_bg.h"
 #include "includes/s11.h"
 #include "s11b.lh"
 
@@ -146,19 +147,24 @@ MACHINE_RESET_MEMBER( s11b_state, s11b )
 	membank("bgbank")->set_entry(0);
 	// reset the CPUs again, so that the CPUs are starting with the right vectors (otherwise sound may die on reset)
 	m_audiocpu->set_input_line(INPUT_LINE_RESET,PULSE_LINE);
-	m_bgcpu->set_input_line(INPUT_LINE_RESET,PULSE_LINE);
+	if(m_bgcpu)
+		m_bgcpu->set_input_line(INPUT_LINE_RESET,PULSE_LINE);
 }
 
 WRITE8_MEMBER( s11b_state::bg_speech_clock_w )
 {
-	// pulses clock input?
-	m_bg_hc55516->clock_w(1);
-	m_bg_hc55516->clock_w(0);
+	if(m_bg_hc55516)
+	{
+		// pulses clock input?
+		m_bg_hc55516->clock_w(1);
+		m_bg_hc55516->clock_w(0);
+	}
 }
 
 WRITE8_MEMBER( s11b_state::bg_speech_digit_w )
 {
-	m_bg_hc55516->digit_w(data);
+	if(m_bg_hc55516)
+		m_bg_hc55516->digit_w(data);
 }
 
 static const pia6821_interface pia21_intf =

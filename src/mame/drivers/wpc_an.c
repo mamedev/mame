@@ -5,6 +5,7 @@
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
+#include "audio/s11c_bg.h"
 #include "wpc_an.lh"
 
 #define LOG_WPC (1)
@@ -15,6 +16,7 @@
 #define WPC_PRINTDATA     (0x11) /* xxxxx  W: send to printer */
 #define WPC_PRINTDATAX    (0x12) /* xxxxx  W: 0: Printer data available */
 /* Sound board */
+#define WPC_SOUNDS11      (0x21) /* xxx    RW: R: Sound data availble, W: Reset soundboard ? */
 #define WPC_SOUNDIF       (0x2c) /* xxx    RW: Sound board interface */
 #define WPC_SOUNDBACK     (0x2d) /* xxx    RW: R: Sound data availble, W: Reset soundboard ? */
 
@@ -53,6 +55,7 @@ public:
 	wpc_an_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
+			m_bg(*this,"bg"),
 			m_cpubank(*this, "cpubank")
 	{ }
 
@@ -60,6 +63,7 @@ protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
+	optional_device<s11c_bg_device> m_bg;  // only used with Dr. Dude
 	required_memory_bank m_cpubank;
 
 	// driver_device overrides
@@ -297,6 +301,28 @@ WRITE8_MEMBER(wpc_an_state::wpc_w)
 	case WPC_SWCOLSELECT:
 		m_switch_col = data;
 		break;
+	case WPC_SOUNDIF:
+		if(m_bg)
+		{
+			m_bg->data_w(data);
+			m_bg->ctrl_w(0);
+		}
+		break;
+	case WPC_SOUNDBACK:
+		if(m_bg)
+		{
+			m_bg->data_w(data);
+			m_bg->ctrl_w(1);
+		}
+		break;
+	case WPC_SOUNDS11:
+		if(m_bg)
+		{
+			m_bg->data_w(data);
+			m_bg->ctrl_w(0);
+			m_bg->ctrl_w(1);
+		}
+		break;
 	}
 }
 
@@ -323,7 +349,7 @@ DRIVER_INIT_MEMBER(wpc_an_state,wpc_an)
 	logerror("WPC: ROM bank mask = %02x\n",m_bankmask);
 }
 
-static MACHINE_CONFIG_START( wpc_an, wpc_an_state )
+static MACHINE_CONFIG_FRAGMENT( wpc_an_base )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 2000000)
 	MCFG_CPU_PROGRAM_MAP(wpc_an_map)
@@ -331,6 +357,14 @@ static MACHINE_CONFIG_START( wpc_an, wpc_an_state )
 	MCFG_DEFAULT_LAYOUT(layout_wpc_an)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_START( wpc_an, wpc_an_state )
+	MCFG_FRAGMENT_ADD(wpc_an_base)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_START( wpc_an_dd, wpc_an_state )
+	MCFG_FRAGMENT_ADD(wpc_an_base)
+	MCFG_WMS_S11C_BG_ADD("bg",":sound1")
+MACHINE_CONFIG_END
 
 /*-----------------
 /  Dr. Dude
@@ -340,10 +374,10 @@ ROM_START(dd_p7)
 	ROM_LOAD("dude_u6.p7", 0x10000, 0x18000, CRC(b6c35b98) SHA1(5e9d70ce40669e2f402561dc1d8aa70a8b8a2958))
 	ROM_CONTINUE(0x8000,0x8000)
 	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
-	ROM_REGION(0x30000, "sound1", 0)
-	ROM_LOAD("dude_u4.l1", 0x00000, 0x10000, CRC(3eeef714) SHA1(74dcc83958cb62819e0ac36ca83001694faafec7))
-	ROM_LOAD("dude_u19.l1", 0x10000, 0x10000, CRC(dc7b985b) SHA1(f672d1f1fe1d1d887113ea6ccd745a78f7760526))
-	ROM_LOAD("dude_u20.l1", 0x20000, 0x10000, CRC(a83d53dd) SHA1(92a81069c42c7760888201fb0787fa7ddfbf1658))
+	ROM_REGION(0x40000, "sound1", 0)
+	ROM_LOAD("dude_u4.l1", 0x10000, 0x10000, CRC(3eeef714) SHA1(74dcc83958cb62819e0ac36ca83001694faafec7))
+	ROM_LOAD("dude_u19.l1", 0x20000, 0x10000, CRC(dc7b985b) SHA1(f672d1f1fe1d1d887113ea6ccd745a78f7760526))
+	ROM_LOAD("dude_u20.l1", 0x30000, 0x10000, CRC(a83d53dd) SHA1(92a81069c42c7760888201fb0787fa7ddfbf1658))
 ROM_END
 
 ROM_START(dd_p06)
@@ -351,10 +385,10 @@ ROM_START(dd_p06)
 	ROM_LOAD("u6-pa6.wpc", 0x10000, 0x18000, CRC(fb72571b) SHA1(a12b32eac3141c881064e6de2f49d6d213248fde))
 	ROM_CONTINUE(0x8000,0x8000)
 	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
-	ROM_REGION(0x30000, "sound1", 0)
-	ROM_LOAD("dude_u4.l1", 0x00000, 0x10000, CRC(3eeef714) SHA1(74dcc83958cb62819e0ac36ca83001694faafec7))
-	ROM_LOAD("dude_u19.l1", 0x10000, 0x10000, CRC(dc7b985b) SHA1(f672d1f1fe1d1d887113ea6ccd745a78f7760526))
-	ROM_LOAD("dude_u20.l1", 0x20000, 0x10000, CRC(a83d53dd) SHA1(92a81069c42c7760888201fb0787fa7ddfbf1658))
+	ROM_REGION(0x40000, "sound1", 0)
+	ROM_LOAD("dude_u4.l1", 0x10000, 0x10000, CRC(3eeef714) SHA1(74dcc83958cb62819e0ac36ca83001694faafec7))
+	ROM_LOAD("dude_u19.l1", 0x20000, 0x10000, CRC(dc7b985b) SHA1(f672d1f1fe1d1d887113ea6ccd745a78f7760526))
+	ROM_LOAD("dude_u20.l1", 0x30000, 0x10000, CRC(a83d53dd) SHA1(92a81069c42c7760888201fb0787fa7ddfbf1658))
 ROM_END
 
 /*-------------
@@ -524,7 +558,6 @@ ROM_START(bop_l7)
 	ROM_REGION(0x50000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("tmbopl_7.rom", 0x10000, 0x38000, CRC(773e1488) SHA1(36e8957b3903b99844a76bf15ba393b17db0db59))
 	ROM_CONTINUE(0x8000,0x8000)
-	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
 	ROM_REGION(0x180000, "sound1",0)
 	ROM_LOAD("mach_u18.l1", 0x000000, 0x20000, CRC(f3f53896) SHA1(4be5a8a27c5ac4718713c05ff2ddf51658a1be27))
 	ROM_RELOAD( 0x000000 + 0x20000, 0x20000)
@@ -650,8 +683,8 @@ ROM_START(tfa_13)
 ROM_END
 
 GAME(1990,  tfa_13,     0,      wpc_an, wpc_an, wpc_an_state,   wpc_an, ROT0,   "Bally",                "WPC Test Fixture: Alphanumeric (1.3)",             GAME_IS_SKELETON_MECHANICAL)
-GAME(1990,  dd_p7,      dd_l2,  wpc_an, wpc_an, wpc_an_state,   wpc_an, ROT0,   "Bally",                "Dr. Dude (PA-7 WPC)",              GAME_IS_SKELETON_MECHANICAL)
-GAME(1990,  dd_p06,     dd_l2,  wpc_an, wpc_an, wpc_an_state,   wpc_an, ROT0,   "Bally",                "Dr. Dude (PA-6 WPC)",              GAME_IS_SKELETON_MECHANICAL)
+GAME(1990,  dd_p7,      dd_l2,  wpc_an_dd, wpc_an, wpc_an_state,   wpc_an, ROT0,   "Bally",                "Dr. Dude (PA-7 WPC)",              GAME_IS_SKELETON_MECHANICAL)
+GAME(1990,  dd_p06,     dd_l2,  wpc_an_dd, wpc_an, wpc_an_state,   wpc_an, ROT0,   "Bally",                "Dr. Dude (PA-6 WPC)",              GAME_IS_SKELETON_MECHANICAL)
 GAME(1990,  fh_l9,      0,      wpc_an, wpc_an, wpc_an_state,   wpc_an, ROT0,   "Williams",             "Funhouse L-9 (SL-2m)",             GAME_IS_SKELETON_MECHANICAL)
 GAME(1990,  fh_l9b,     fh_l9,  wpc_an, wpc_an, wpc_an_state,   wpc_an, ROT0,   "Williams",             "Funhouse L-9 (SL-2m) Bootleg Improved German translation",             GAME_IS_SKELETON_MECHANICAL)
 GAME(1996,  fh_905h,    fh_l9,  wpc_an, wpc_an, wpc_an_state,   wpc_an, ROT0,   "Williams",             "Funhouse 9.05H",               GAME_IS_SKELETON_MECHANICAL)

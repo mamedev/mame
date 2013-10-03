@@ -23,6 +23,7 @@ ToDo:
 #include "sound/hc55516.h"
 #include "sound/2151intf.h"
 #include "sound/dac.h"
+#include "audio/s11c_bg.h"
 #include "includes/s11.h"
 #include "s11.lh"
 
@@ -215,7 +216,8 @@ WRITE_LINE_MEMBER( s11_state::pia21_ca2_w )
 	m_ca1 = state;
 	if(m_pias)
 		m_pias->ca1_w(m_ca1);
-	m_pia40->cb2_w(m_ca1);
+	if(m_pia40)
+		m_pia40->cb2_w(m_ca1);
 }
 
 static const pia6821_interface pia21_intf =
@@ -385,12 +387,18 @@ WRITE8_MEMBER( s11_state::pia34_pa_w )
 
 WRITE8_MEMBER( s11_state::pia34_pb_w )
 {
-	m_pia40->portb_w(data);
+	if(m_pia40)
+		m_pia40->portb_w(data);
+	else
+		m_bg->data_w(data);
 }
 
 WRITE_LINE_MEMBER( s11_state::pia34_cb2_w )
 {
-	m_pia40->cb1_w(state);  // MCB2 through CPU interface
+	if(m_pia40)
+		m_pia40->cb1_w(state);  // MCB2 through CPU interface
+	else
+		m_bg->ctrl_w(state);
 }
 
 static const pia6821_interface pia34_intf =
@@ -463,15 +471,19 @@ static const pia6821_interface pias_intf =
 
 WRITE8_MEMBER( s11_state::pia40_pa_w )
 {
-	m_dac1->write_unsigned8(data);
+	if(m_dac1)
+		m_dac1->write_unsigned8(data);
 }
 
 WRITE_LINE_MEMBER( s11_state::ym2151_irq_w)
 {
-	if(state == CLEAR_LINE)
-		m_pia40->ca1_w(1);
-	else
-		m_pia40->ca1_w(0);
+	if(m_pia40)
+	{
+		if(state == CLEAR_LINE)
+			m_pia40->ca1_w(1);
+		else
+			m_pia40->ca1_w(0);
+	}
 }
 
 WRITE_LINE_MEMBER( s11_state::pia40_cb2_w)
