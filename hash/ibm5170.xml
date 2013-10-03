@@ -35,8 +35,1413 @@ Missing files come here
 	</software>
 
 <!-- OS Disks -->
+	<software name="gem11">
+		<description>GEM Desktop 1.1</description>
+		<year>19??</year>
+		<publisher>Digital Research</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="system master.img" size="368640" crc="e5e63685" sha1="8edb3d79e4996cfeec8bef0d0610aa25c76990d0" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="desktop master.img" size="368640" crc="2dd99c6d" sha1="4389df98afa76773a4ca6ffde4c8542b02290e8a" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="device disk 1.img" size="368640" crc="04431e7f" sha1="ba4c6146de8755650a1cf26ec8bbe12c23616660" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="device disk 2.img" size="368640" crc="374c7c9a" sha1="468e75163c778bf30bbf6fa9055e7085170ec6cd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gem12">
+		<description>GEM Desktop 1.2</description>
+		<year>19??</year>
+		<publisher>Digital Research</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="system master.img" size="368640" crc="cf60e1d9" sha1="ada8b253ecf0ff304f7a8ef9896eb9623eaf6580" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="desktop master.img" size="368640" crc="c5f4f01e" sha1="1462c88e73b8591126c196b07c27ea3f487fdfdb" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="device driver 1.img" size="368640" crc="891648e3" sha1="b9407d24f03776be45281c230e39233bd95acd32" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="device driver 2.img" size="368640" crc="c3433eea" sha1="19b08fc1eb4cf057214a6e9c86023c52a546cc12" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gem13">
+		<description>GEM Desktop 1.3</description>
+		<year>19??</year>
+		<publisher>Digital Research</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="system master.img" size="368640" crc="bbfeb21a" sha1="0009af9f9cda1be9011b755c5a7ca01e6b0e9ff8" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="device driver 1.img" size="368640" crc="968b6b3a" sha1="38dc7672755aa9a70ded5bf2fa9dc1e3a8578a96" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="device driver 2.img" size="368640" crc="01d0b0af" sha1="f87b5ce6e5d67a960ae690c03e387bbbec2cfbeb" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="device driver 3.img" size="368640" crc="08f64e74" sha1="353925917f92327214d6de7f1df4890def5521d8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gem14">
+		<description>GEM Desktop 1.4</description>
+		<year>19??</year>
+		<publisher>Digital Research</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="system master.img" size="368640" crc="473a5bd0" sha1="b72e3011aa5dabc2d85cb1e03099aa27a14c4431" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="desktop master.img" size="368640" crc="af7408b2" sha1="3e3c9cc8e80be5c61db3c96a9194b9d80d71a88c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="device driver 1.img" size="368640" crc="a333c8e9" sha1="56a334f84c9684e5516a6bb088ec29e60fb5aee5" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="device driver 2.img" size="368640" crc="bdcfae5b" sha1="9a09213354f2e8374323b07127b66d3cf7c596fa" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gem15">
+		<description>GEM Desktop 1.5</description>
+		<year>19??</year>
+		<publisher>Digital Research</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="system master.img" size="368640" crc="42957377" sha1="47f10c24ac2d95e5b0cbe9e770b87577f108a32c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="desktop master.img" size="368640" crc="744f5c1a" sha1="39c731708d5f759007bb8a349014af4e4d6af965" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="device driver 1.img" size="368640" crc="8d35a487" sha1="6cb3f6bf3d0bbcc68b7e9fa32bdafed5b04611b4" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="device driver 2.img" size="368640" crc="dc33e60d" sha1="aa3237d62536e633a2d72e0489650062e636c185" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gem16">
+		<description>GEM Desktop 1.6</description>
+		<year>19??</year>
+		<publisher>Digital Research</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="system master.img" size="368640" crc="4b070db3" sha1="c6958cd3d9f0c9aaf3d2f0b7755a789c13638929" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="desktop master.img" size="368640" crc="d3eb5b31" sha1="7b206ff674cc0c98d64cb6e2dbf9ba0575d1d5b5" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="device driver 1.img" size="368640" crc="2e311092" sha1="4817844c7610dcccd4aa0b826fb5bd79e8ff95d5" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="device driver 2.img" size="368640" crc="969afd34" sha1="a1c7d610eaacd4e5eee01389a09ebbe1e372f057" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gem21">
+		<description>GEM Desktop 2.1</description>
+		<year>19??</year>
+		<publisher>Digital Research</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="system master.img" size="368640" crc="75fa88a9" sha1="9f4bfde3d76bf674e46785a43f325bd8d10046a9" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="device driver 1.img" size="368640" crc="cb9dba05" sha1="20faf12266c0419c47ca464fece72b4ae21bfa97" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="device driver 2.img" size="368640" crc="a901c01c" sha1="f5f6d26ef76937eafb093752dfc334186d536bf6" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="device driver 3.img" size="368640" crc="f55ef714" sha1="74a07dd139bf47f8eb9c14259e4cfe75f9193abc" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="device driver 4.img" size="368640" crc="5a60b93b" sha1="84b9b6e5346bfbdc0cc05b66f653771e2e9b18d2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gem30">
+		<description>GEM Desktop 3.0</description>
+		<year>19??</year>
+		<publisher>Digital Research</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="system master.img" size="368640" crc="2ebdb5fe" sha1="e2190f07fb6d4f36ca3c9fc5524ac5ab7440855c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="screen 1.img" size="368640" crc="f4d618b0" sha1="02fedd94df50f57c281b9a931ef72fc8dbeacc5c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="screen 2.img" size="368640" crc="031bd65f" sha1="87fcc18b8e99d727b71854a6f27cfcc7f4d6e569" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="printer 1.img" size="368640" crc="7f6a1247" sha1="200cd4002d6f2285a2762566bfd2f69a3ca70550" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="printer 2.img" size="368640" crc="1afc7a36" sha1="967103595523c7cdae923d5ff7bd1da802f6da9c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="printer 3.img" size="368640" crc="c704dcbd" sha1="f6a8fdd8cd2de0b30a0b96481daf4125a4ce0528" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gem301d">
+		<description>GEM Desktop 3.01d</description>
+		<year>19??</year>
+		<publisher>Digital Research</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="system master.img" size="368640" crc="af28959d" sha1="b0a2319cba8f2423969926e6ac2053209c689396" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="screen 1.img" size="368640" crc="098a85ec" sha1="1ed066692563afb6be4d1cbc0902f7eacc1378f3" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="screen 2.img" size="368640" crc="253b84e9" sha1="18ac60d22055438dffbbfa8f9d1801bd650e571a" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="printer 1.img" size="368640" crc="934b3426" sha1="da3caa8122fc2a9e538b3c57c4d00c609f351cd1" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="printer 2.img" size="368640" crc="f1882987" sha1="3a92fa60408f8881fdcf582f8b4e981c12eaa5fe" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="printer 3.img" size="368640" crc="19d6957a" sha1="9ad00be79187e767643952404e7e9502e1d109e7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gempaint">
+		<description>GEM Paint</description>
+		<year>19??</year>
+		<publisher>Digital Research</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk1.img" size="368640" crc="8d7af99e" sha1="1622b1bd5cfc777625d92129b5cb2c2176d4b624" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="geos20">
+		<description>GEOS Ensemble 2.0</description>
+		<year>19??</year>
+		<publisher>GeoWorks</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk1.img" size="1474560" crc="4935d991" sha1="752f39f19d5a26307eb9c07339763c95447f8616" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk2.img" size="1474560" crc="e72b697b" sha1="353b0e9979ef94181e3e1745a6a7e3f097092dfd" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk3.img" size="1474560" crc="b15e719a" sha1="a5838a09c018875db116986e3074a9c403544c75" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk4.img" size="1474560" crc="49856628" sha1="25b1b3477a7bd31423b6e3901a1d4c1c1069467b" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk5.img" size="1474560" crc="370f711c" sha1="b7ef83e7f99a563f39c04c0190a9d8ac1f5193d0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="geoworks">
+		<description>GeoWorks Pro 1.2</description>
+		<year>19??</year>
+		<publisher>GeoWorks</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1228800">
+				<rom name="geoworks1.ima" size="1228800" crc="81d27dd7" sha1="55e76f86d414acb02623217bfa1f5bd075aa1d8f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1228800">
+				<rom name="geoworks2.ima" size="1228800" crc="f22d7d42" sha1="20c3855121e42a7953ba0a66a823dc925f4ca862" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1228800">
+				<rom name="geoworks3.ima" size="1228800" crc="b83b115c" sha1="dfa6a7acf2a95eb2ce6079508777700ffe1e619c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="sampler.ima" size="368640" crc="6f12fe02" sha1="c439c38a75b235b50475c814c4ba2b2446c6abe4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="os2">
+		<description>OS/2 1.0</description>
+		<year>19??</year>
+		<publisher>IBM</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="install.img" size="1474560" crc="b3ebeacb" sha1="dbd5950c5fc24c2853742ffa80238f05fdc2aaca" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk1.img" size="1474560" crc="00ce904f" sha1="ce782155cac34d226c3d269b1194764f0595015c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk2.img" size="1474560" crc="42df004b" sha1="9799c91f7f228cd4fdcc87a1b8d203f8a0b5fec2" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk3.img" size="1474560" crc="b1220314" sha1="5fc2248934ba8968f75d290a0750243629a3591e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="os2es">
+		<description>OS/2 1.0 Extended Services</description>
+		<year>19??</year>
+		<publisher>IBM</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk1.img" size="1474560" crc="347adce6" sha1="9beaaf80bcddf5c9b85fe118011ad081a07d4c0e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk2.img" size="1474560" crc="343f59bc" sha1="240ddc66571e5c81845c472c836550f3daaa45bc" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk4.img" size="1474560" crc="65ffb990" sha1="fccfec98e57956f36a84ba2afb7a512a8faa3acf" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk5.img" size="1474560" crc="8e981b9d" sha1="cb1f4d417617ad8d3f7886ba5f9c8f02b5f43bd1" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk7.img" size="1474560" crc="b1d20980" sha1="82cecdeb477b0ecf1582f1febf4cfa192468d242" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk8.img" size="1474560" crc="30b6c9c6" sha1="2045227b4692c9730fc7a87d54481e32eb8cdda1" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="database client (dos).img" size="737280" crc="22fe4a3d" sha1="5ff24921adba7522692eabb735616e025c0d7969" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="database client (dos, windows).img" size="737280" crc="fbe5e3e4" sha1="c8d995d1303e6d0c9553d2dea03341f3820c920f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="netbios database client disk1.img" size="1474560" crc="d4e2b3ef" sha1="1194d8b6ccb3a7cba227e44caa50d8f02f8b74bc" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="netbios database client disk2.img" size="1474560" crc="2fc27159" sha1="b291527a07e3fda00e5bfb1fcf96af0b1fdce25e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="pc lan support program.img" size="737280" crc="75aff87d" sha1="8c2d912ded1b176ad9cc2bb3ba5b51f789cdb77b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="os2_11">
+		<description>OS/2 1.1</description>
+		<year>19??</year>
+		<publisher>IBM</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="install.img" size="1474560" crc="ea6699f9" sha1="32ed36322d28654aa1967ad34cdbba2cbd8ad054" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk1.img" size="1474560" crc="7cf8d448" sha1="3ff1658482be2887c085ccde4acebec5454b7db5" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk2.img" size="1474560" crc="cbd4dc12" sha1="3055ec5dd9c7d9095010217726b4a5f0267f8fb6" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk3.img" size="1474560" crc="64b87f7b" sha1="ed2371d898071fc264be529dc2e8c98e738458a9" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk4.img" size="1474560" crc="6f6e4286" sha1="5a6c32eb3a2193225b7b26dea7f98c77b7f95759" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="driver.img" size="1474560" crc="72ff6e6c" sha1="aa90bc8857dd884046f7b42107951d7fa4775597" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="dual boot.img" size="1474560" crc="dd3c4610" sha1="14c12441e4d6eefa5261da9449c1a87ff9084686" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="ms lan manager xns option dos drivers.img" size="737280" crc="b2155ef8" sha1="2f6236eec4315e8a904db33e8739de057ea5120c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="ms lan manager xns option os2 drivers disk1.img" size="1474560" crc="06bb1227" sha1="e67cffd6a2df4b583f9be1a049af5a37bd14efe8" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="ms lan manager xns option os2 drivers disk2.img" size="1474560" crc="bd06d6de" sha1="7e672e7d4aa736c7e167b82a9d194fba27ad03df" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="os_12e">
+		<description>OS/2 1.2 Extended</description>
+		<year>19??</year>
+		<publisher>IBM</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk00.img" size="1474560" crc="4e4e5761" sha1="a4ec05301825521a59fd9056d720d2294508e5a2" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk01.img" size="1474560" crc="22ea2df9" sha1="74407f16ed74cf4301be8963af3991157d55f737" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk02.img" size="1474560" crc="bd7b1519" sha1="31d1c43888750126b26f5a470f7990f68c6c938f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk03.img" size="1474560" crc="4cc87b3b" sha1="2bcced4e9b05cc09fe166683fde7a65e70810aa7" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk04.img" size="1474560" crc="b82ee991" sha1="44c8f076de224eda4e9ecf624bd0872a90b2ed6a" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk05.img" size="1474560" crc="bd17046a" sha1="1bc0568d23945a6d9aaead0741940fb7a9a96189" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk06.img" size="1474560" crc="a76b63da" sha1="b7518fa46553403c2114a13da90d2243a9d9cdac" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk07.img" size="1474560" crc="857f1425" sha1="4ca908bef2a9b324436462b25c0a56187c358b0d" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk08.img" size="1474560" crc="b3c806d5" sha1="2db52ad7e1a70efa1c3ed17b4ae35521fdb72206" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk09.img" size="1474560" crc="57532a7d" sha1="17491ac5b9207d802769bce90ba9340b4a8eea95" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk10.img" size="1474560" crc="1824758e" sha1="0632341a6b4460d7013bb08b4291a38230fbc157" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop12" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk11.img" size="1474560" crc="1fd0d59e" sha1="5c6c4c0cac8ac6b03560b0043c6ba97d082fe699" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop13" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk12.img" size="1474560" crc="5cc873da" sha1="8f8da0581a29c8eec31070295d20fe9e703a0b55" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop14" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk13.img" size="1474560" crc="d60b3ec5" sha1="5efb3b3f8e71c9a43d835485bab6d0ef2a4c69b8" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop15" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk14.img" size="1474560" crc="70ab3263" sha1="b48ca91ce50caa7bf13050717b3427164104fc80" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop16" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="device_driver_01.img" size="1474560" crc="3f8ea1e7" sha1="ee28e659d86860ccd60d2c1b5bdc8a172c215fcd" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop17" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="device_driver_02.img" size="1474560" crc="16b539e3" sha1="41d30d627ef81c541bcbc388d2233e79359a56c1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="os2_12">
+		<description>OS/2 1.2 Standard</description>
+		<year>19??</year>
+		<publisher>IBM</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="install.img" size="1474560" crc="5ed73bee" sha1="74235214a2ad1c93d36b3a06780b1217fda3aabb" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk1.img" size="1474560" crc="004a5758" sha1="44cc0401ac2713d5347c9ae376bb874b5fdbd9bf" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk2.img" size="1474560" crc="3cccdef8" sha1="e80fcbc7b035e38db7b7d855b20dea9adf06ef7d" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk3.img" size="1474560" crc="c13c1b75" sha1="61521587a6fbb06f62e7586ef8e79395ede40c97" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk4.img" size="1474560" crc="0cb31eef" sha1="b27baf57513e960dab1e115fd279d0c982cefbdb" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk5.img" size="1474560" crc="b2cb980e" sha1="3163c3b87467185f0095d480b86613b26fa7510e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="device driver 1.img" size="1474560" crc="1b833ba8" sha1="f5b136642549b0d2813054e3c802bf2c9fe21f72" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="device driver 2.img" size="1474560" crc="45e14593" sha1="03e3e7433623cbbe49ead428c548816c97a9fe5e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcdos10">
+		<description>PC-DOS 1.0</description>
+		<year>19??</year>
+		<publisher>IBM</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="pcdos100.img" size="163840" crc="2df1c1c8" sha1="7d3e3a807ad2144315b3c3b90751ff691d3895db" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcdos110">
+		<description>PC-DOS 1.10</description>
+		<year>19??</year>
+		<publisher>IBM</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="ibmdos11.img" size="163840" crc="ddfe9550" sha1="437bec5be7d28cc2248d5477f38a07545816e49a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcdos20">
+		<description>PC-DOS 2.0</description>
+		<year>19??</year>
+		<publisher>IBM</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk1.img" size="368640" crc="d0fb7d31" sha1="cbee7f6109fb0ed8a94de1893fc47ab066de36d3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcdos21">
+		<description>PC-DOS 2.1</description>
+		<year>19??</year>
+		<publisher>IBM</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="184320">
+				<rom name="disk1.img" size="184320" crc="6a568d95" sha1="db165cb9bf2b2abbf5fa826dfe3a8f9819ce7ea5" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="184320">
+				<rom name="disk2.img" size="184320" crc="d5f74e98" sha1="2bfda7185e769ceb5594cfae01c503eaac8449df" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcdos30">
+		<description>PC-DOS 3.0</description>
+		<year>19??</year>
+		<publisher>IBM</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk1.img" size="368640" crc="7a24e3bf" sha1="8cfebd5548b918c8d03f501ef02e66aca4ce3231" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk2.img" size="368640" crc="33184477" sha1="a7c150881903359859e46f9fe2de21d5c3afba99" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcdos31">
+		<description>PC-DOS 3.1</description>
+		<year>19??</year>
+		<publisher>IBM</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk1.img" size="368640" crc="4b7ac87b" sha1="6f6ff69c4e2c14e2d64af06f1af9b60655d705a0" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk2.img" size="368640" crc="73eda674" sha1="1e6bb4a676137acbf6ff0cf59f94e206056c5821" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcdos32">
+		<description>PC-DOS 3.2</description>
+		<year>19??</year>
+		<publisher>IBM</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="405504">
+				<rom name="disk1.img" size="405504" crc="d4f4bfad" sha1="dab0710c79625a3e104b8945d7d179009376773a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcdos330">
+		<description>PC-DOS 3.30</description>
+		<year>19??</year>
+		<publisher>IBM</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="startup.img" size="368640" crc="402f4949" sha1="c6dc54ae6cbf810a0f54403c68acc1a10caedc21" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="operating.img" size="368640" crc="b0e167b0" sha1="4f582d07b1c4c18c6582ff8e53311a37c109aced" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcdos400">
+		<description>PC-DOS 4.00</description>
+		<year>19??</year>
+		<publisher>IBM</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="install.img" size="737280" crc="edcb2ea3" sha1="352dffca01bd72349503024d0b9d16c4b684f791" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="operating.img" size="737280" crc="086f29e0" sha1="0a75aa0424bad3ef0609b5835855da3fb206c142" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcdos500">
+		<description>PC-DOS 5.00</description>
+		<year>19??</year>
+		<publisher>IBM</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="disk1.img" size="737280" crc="49ee0681" sha1="30fedf09e8b55eadc35c387968bcd02620630a27" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="disk2.img" size="737280" crc="9cfecb72" sha1="ffef155e6c746602e9ea28aef091119055f4cdb4" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="disk3.img" size="737280" crc="8414bc1f" sha1="d6ebe11bba3d995f574e0385358edbdd52a6b219" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcdos502">
+		<description>PC-DOS 5.02</description>
+		<year>19??</year>
+		<publisher>IBM</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="disk1.img" size="737280" crc="c3d4b69e" sha1="8e8fdbf1a39cbf541c5e8e3afa9351d3afef41bd" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="disk2.img" size="737280" crc="05c5345e" sha1="6d1fc805f9602836a379042d36edad56d692e922" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="disk3.img" size="737280" crc="d63b96f5" sha1="ae0ed2b14cd5477b2239a40a9987b23db8a1e28c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcdos610">
+		<description>PC-DOS 6.10</description>
+		<year>19??</year>
+		<publisher>IBM</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="pcdos611.img" size="1474560" crc="bc3d3dda" sha1="ce0ee857ad124f8bdcfa4f1ff38eb55a49183c95" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="pcdos612.img" size="1474560" crc="b7f510c4" sha1="6a96c81148c1aa04334031cbe09e02f79c955547" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="pcdos613.img" size="1474560" crc="9e736c08" sha1="2a426c71f4ed3a541f962a039fd886b68cd0a31f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="pcdos614.img" size="1474560" crc="5f17272b" sha1="762ce79963d30dc22fabcecacda1dc3eda894ff9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcdos630">
+		<description>PC-DOS 6.30</description>
+		<year>19??</year>
+		<publisher>IBM</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk1.img" size="1474560" crc="0fc87254" sha1="2b4166557ea8eba7d6b0f3a4d9376896bf5a217c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk2.img" size="1474560" crc="68d38459" sha1="658316c31ffef03832525da24b27066fbfef3faf" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk3.img" size="1474560" crc="e94d664a" sha1="5dbe0b9a25b94da175bf545c84834e62e718b46d" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk4.img" size="1474560" crc="511f430e" sha1="8f634563c5e161edf5a0d634291831a5374b2ec2" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk5.img" size="1474560" crc="49128f94" sha1="1c8d991d3adffa28b24e09e6c4ee4a0843d9eca1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcdos70">
+		<description>PC-DOS 7.0</description>
+		<year>19??</year>
+		<publisher>IBM</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk1.img" size="1474560" crc="0c7bed30" sha1="798538fa378058c52393d2b67885d3b1bf8dd63a" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk2.img" size="1474560" crc="290aa80a" sha1="e3dae31f57f2792e0a07f6f00129f429d336c390" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk3.img" size="1474560" crc="9607fa30" sha1="29c6c2277d78a615d215bb39ae89aa4c73df8be4" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk4.img" size="1474560" crc="d342b9e3" sha1="0ff177551f54aa013908e05713e1c79fbc0fe8f7" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk5.img" size="1474560" crc="903ebc5d" sha1="16bdca0f1d9472ae1b6c7b3a7dcd9ff4f4d5e4b5" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk6.img" size="1474560" crc="cba1f9e0" sha1="83851f0fd38aec897f6c4378a8598e17c4b17702" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msdos211">
+		<description>MS-DOS 2.11</description>
+		<year>19??</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk01.img" size="368640" crc="71cb84ef" sha1="278d3f796e84b851b5b1abd09b610c6a663aef1a" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk02.img" size="368640" crc="08cd78c2" sha1="5d7364d31350854e45b5346c3670c9c19e8cb7ee" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msdos32">
+		<description>MS-DOS 3.2</description>
+		<year>19??</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk1.img" size="368640" crc="136579c0" sha1="dc50472d5355b7c29fab0361c262ef83dde6a2ea" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk2.img" size="368640" crc="c5e7e32f" sha1="c03f03494271bbdfb8865efa79bf8f5b5061b233" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk3.img" size="368640" crc="9a7366fe" sha1="e56a8fb2732a258bd50465c596ff5e16b53afae3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="msdos330">
+		<description>MS-DOS 3.30</description>
+		<year>19??</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="369152">
+				<rom name="disk1.img" size="369152" crc="812d0573" sha1="1fe01c291fbacc5d97c86ea8aef21289669bab9c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="369152">
+				<rom name="disk2.img" size="369152" crc="489b485b" sha1="cc97e6f33df9df2b7a459dbcf0bba86778667534" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msdos33a">
+		<description>MS-DOS 3.30a</description>
+		<year>19??</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk1.img" size="368640" crc="b34d23a3" sha1="25488e58b6a462e7681940b589bd33c3ddcf2ae7" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk2.img" size="368640" crc="376ac8a2" sha1="ab165a11bc79d4cb6819e7901fea3cbcfa2de1a8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msdos331">
+		<description>MS-DOS 3.31</description>
+		<year>19??</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk1.img" size="1474560" crc="a864516e" sha1="35a275626d7973b856aeb163ee216157078b175a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msdos401">
+		<description>MS-DOS 4.01</description>
+		<year>19??</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="setup.img" size="737280" crc="ff363533" sha1="6cbf2bcf051d168d542c289aeb630f98fc2a56a7" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="operating.img" size="737280" crc="f0e2b019" sha1="e4f0dc4df9df1581a2acb109b5159ca142005707" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="dos shell.img" size="737280" crc="7be56e89" sha1="2f45b4a5140c04d572a8be6e3ef4011edb741b5b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msdos401m">
+		<description>MS-DOS 4.01 (5.25")</description>
+		<year>19??</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="369152">
+				<rom name="install.img" size="369152" crc="ceeb1691" sha1="9d69d99a7c7a9b903e3f8c1e3f02b68270feff9c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="369152">
+				<rom name="operating 1.img" size="369152" crc="1b37564d" sha1="bce6027533ff4252229fe017f676de0cff653b3a" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="369152">
+				<rom name="operating 2.img" size="369152" crc="d33a9768" sha1="0dba1f9ce818dae3ced74e04dab9a07976a3d720" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="369152">
+				<rom name="operating 3.img" size="369152" crc="6776d4f9" sha1="6d2a569c2d1cd3237bc1964c14b10396dd9c461e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="369152">
+				<rom name="select.img" size="369152" crc="7979de98" sha1="23fc5ce0ac5dee1a89fbe8ba6f96e5f1a5f7800b" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size="369152">
+				<rom name="shell.img" size="369152" crc="c40b54a2" sha1="181b6668eb5f3f11f817ccc5d576389911254261" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msdos50">
+		<description>MS-DOS 5.0</description>
+		<year>19??</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="disk01.img" size="737280" crc="a34dc98f" sha1="791e291a16a7ce3b3ffb536b1c27dfe8e620338e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="disk02.img" size="737280" crc="332cb5b4" sha1="0e1f4f63d68d02b5224a69e73ee9b7a3e630a1bb" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="disk03.img" size="737280" crc="758c9037" sha1="53ba701accbf58db3b43188f4b4769a6a8008e05" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msdos50m">
+		<description>MS-DOS 5.0 (5.25")</description>
+		<year>19??</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk01.img" size="368640" crc="54f94294" sha1="6a66bdcdc141eaa8dbcbea8d344b7012add15672" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk02.img" size="368640" crc="224bde66" sha1="7fcc9e283d5245c4eb3e2d0a5e4f7abd2cb2cc7b" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk03.img" size="368640" crc="ad5aff11" sha1="447d6e95ae2e19bc783c5ca3934cbe796e6023de" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk04.img" size="368640" crc="6853a453" sha1="fcf640843977bfd5c40fd059a3d2203aab337977" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk05.img" size="368640" crc="6592c217" sha1="35ed264ef14719a7bc6373d2e7d0688170d53442" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msdos50u">
+		<description>MS-DOS 5.0 (Upgrade)</description>
+		<year>19??</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk01.img" size="368640" crc="0dd44931" sha1="47b077300d22f2a86de31855ee8e1ff215aa592f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk02.img" size="368640" crc="b7fcb627" sha1="bd0655ed4999bc792a699f89588e4773ee33335b" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk03.img" size="368640" crc="614b279e" sha1="c5e02fae37b5ed7a2f761a21973b14c2ce56294c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk04.img" size="368640" crc="90fc6384" sha1="73ea8e782238d786d108be9bcb40fcab7e11269a" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk05.img" size="368640" crc="5b436ce1" sha1="b8b4b3c4b905a90ca13910d0230deeb7fe04273f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk06.img" size="368640" crc="fc26ce05" sha1="a4471bc3d43dec17b116f0b673ab10103ca14a25" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msdos60">
+		<description>MS-DOS 6.0</description>
+		<year>19??</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk1.img" size="1474560" crc="662b4a3d" sha1="114d4075729fc338839637f8f57f184ea59a769e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk2.img" size="1474560" crc="24b611f7" sha1="4fc338c763890fa17a456427d42d06beca667d41" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk3.img" size="1474560" crc="97cc651d" sha1="efd6c30929b30eebca052c55ac613ecab11b82d9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msdos620">
+		<description>MS-DOS 6.20</description>
+		<year>19??</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk1.img" size="1474560" crc="23a8a1f2" sha1="cb4f53c46e39b60fa11543f356bc04080c2b7b8c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk2.img" size="1474560" crc="7269a69d" sha1="fbbf1d15c744829eb65dac2216175b4f53802d7e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk3.img" size="1474560" crc="c409a1da" sha1="9b6c306de95343e814a18ed77d8a67ee149cbb99" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msdos620u">
+		<description>MS-DOS 6.20 (Upgrade)</description>
+		<year>19??</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk1.img" size="1474560" crc="e2852c46" sha1="10048dd8d24b2e65cb4dca7568d544b9ee99a084" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk2.img" size="1474560" crc="f083b635" sha1="165644b7c1ed791e2e993f27fd89dbf2af77eb30" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk3.img" size="1474560" crc="0b62c415" sha1="b972d42b998b846b2802f848774a1408ae173f10" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="supplemental.img" size="1474560" crc="23e03482" sha1="3fac12de77cafdea28a68793b597410a594506f8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msdos621">
+		<description>MS-DOS 6.21</description>
+		<year>19??</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1228800">
+				<rom name="disk1.img" size="1228800" crc="f600eec8" sha1="7ce713f473beb93d85059933d3b44044daedd834" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1228800">
+				<rom name="disk2.img" size="1228800" crc="167334a5" sha1="189ce3bba927642b92608547655bda2da9d70544" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1228800">
+				<rom name="disk3.img" size="1228800" crc="5c5dfc37" sha1="92111bb2d115f0a2d1df160f24d068a3e21265f2" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="1228800">
+				<rom name="disk4.img" size="1228800" crc="4e7a380c" sha1="4cb2953022cac635185140a0a33a12e7b94d55c2" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="1228800">
+				<rom name="supplementary.img" size="1228800" crc="f17bc4cd" sha1="14faf3cd8a0ad311046c368e4b8c6f8ab38fef4b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msdos622">
+		<description>MS-DOS 6.22</description>
+		<year>19??</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk1.img" size="1474560" crc="adbd36fe" sha1="3fb0df208670ea5fafae451661017391a381bc9d" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk2.img" size="1474560" crc="417eb8b3" sha1="63e670bb166995a7a1124c8f2b540355eed3bbd8" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk3.img" size="1474560" crc="6a158e98" sha1="b8493fc000f405ba7a1a89503178482328616e01" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="supplemental.img" size="1474560" crc="136b4fae" sha1="c397f4825337204ee49467bd7a598d77bc2fe19f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msdos622u">
+		<description>MS-DOS 6.22 (Upgrade)</description>
+		<year>19??</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk1.img" size="1474560" crc="4b7d4093" sha1="3f18e0f833ab3c0a6e231f0dffd2cfd849b40c26" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk2.img" size="1474560" crc="8bd7688d" sha1="dfb44325e69e58393adfe8c911f709c63db0399c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk3.img" size="1474560" crc="930f809d" sha1="cffa2e29b24d033218f73d1a4ba0b19f0a179316" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msdos622mu">
+		<description>MS-DOS 6.22 (5.25" Upgrade)</description>
+		<year>19??</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1228800">
+				<rom name="disk1.img" size="1228800" crc="9519c473" sha1="1a2ca99b7ae94f21555326695cbb14a9a1898eee" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1228800">
+				<rom name="disk2.img" size="1228800" crc="f70f29ab" sha1="f0a37131ba662ca3b8d0d0a291279497b533c156" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1228800">
+				<rom name="disk3.img" size="1228800" crc="8980019f" sha1="ed14124c32e5075bad74729b2237bf9ef3e53e24" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="1228800">
+				<rom name="disk4.img" size="1228800" crc="4d7453ab" sha1="f7063a4f9e129ac25013b6b3223e028d758f71aa" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msos2">
+		<description>OS/2 1.0 (Microsoft)</description>
+		<year>19??</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1228800">
+				<rom name="disk01.img" size="1228800" crc="82aa993f" sha1="69bd8297a2e0f75a7d0c4eeccb3ed92337410f9a" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1228800">
+				<rom name="disk02.img" size="1228800" crc="57bd21ef" sha1="c0db3c3e36834ac2c6138bbc870faa084b98874f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1228800">
+				<rom name="disk03.img" size="1228800" crc="9658d1ae" sha1="1b0fe4fd4d634e3a2e754087b0c9ce33eb9751bb" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="1228800">
+				<rom name="install.img" size="1228800" crc="812732b4" sha1="7de26b049eef2d1edf55ba5dc1bc19ac4703d789" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msos2_11">
+		<description>OS/2 1.1 (Microsoft)</description>
+		<year>19??</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="install.img" size="1474560" crc="ea6699f9" sha1="32ed36322d28654aa1967ad34cdbba2cbd8ad054" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk01.img" size="1474560" crc="7cf8d448" sha1="3ff1658482be2887c085ccde4acebec5454b7db5" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk02.img" size="1474560" crc="cbd4dc12" sha1="3055ec5dd9c7d9095010217726b4a5f0267f8fb6" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk03.img" size="1474560" crc="64b87f7b" sha1="ed2371d898071fc264be529dc2e8c98e738458a9" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk04.img" size="1474560" crc="6f6e4286" sha1="5a6c32eb3a2193225b7b26dea7f98c77b7f95759" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="drivers.img" size="1474560" crc="72ff6e6c" sha1="aa90bc8857dd884046f7b42107951d7fa4775597" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="dualboot.img" size="1474560" crc="dd3c4610" sha1="14c12441e4d6eefa5261da9449c1a87ff9084686" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="ms lan manager (dos).img" size="737280" crc="b2155ef8" sha1="2f6236eec4315e8a904db33e8739de057ea5120c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="ms lan manager (os2) disk01.img" size="1474560" crc="06bb1227" sha1="e67cffd6a2df4b583f9be1a049af5a37bd14efe8" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="ms lan manager (os2) disk02.img" size="1474560" crc="bd06d6de" sha1="7e672e7d4aa736c7e167b82a9d194fba27ad03df" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msos2srv">
+		<description>OS/2 Server 1.30.1 (Microsoft)</description>
+		<year>19??</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="install a.img" size="1474560" crc="e40194dd" sha1="c2003f08e2e88d327ba5a469a4436a58abcfeb01" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="install b.img" size="1474560" crc="03d72834" sha1="9cd1b6f43f2157b4ba2e1fdecf4992789c7a6c45" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk 1.img" size="1474560" crc="7f933590" sha1="1165ecd0a0b891d29f4096cf690edfacbd6b2da6" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk 2.img" size="1474560" crc="ed2d93d1" sha1="cabd43e5c263d7891e731ac3728c932b737021e5" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk 3.img" size="1474560" crc="45616040" sha1="d7a7b2fdacb71308188b6fc9dba7260572d6a40f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk 4.img" size="1474560" crc="62c716f6" sha1="4a1d5b916f93974a66407660a77f4b3e2e5cb561" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk 5.img" size="1474560" crc="515501af" sha1="2fa2fce813156ad16cef094961f40ffc44c57953" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="fonts.img" size="1474560" crc="3ff7ea93" sha1="2e4c6f7832028c6c4514077a432083753740512a" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="presentation manager 1.img" size="1474560" crc="0a16d365" sha1="8dec8913728738b7aee4929fdd8e117129edd9e0" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="presentation manager 2.img" size="1474560" crc="024aa1a8" sha1="d8eee0971f67de90259450639ef608de29983150" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="support.img" size="1474560" crc="dc433ce5" sha1="a46a1cb3d796c3f3726e74222d2c09129b82574e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msdos330k">
 		<description>MS-Dos 3.30</description>
 		<year>1993</year>
 		<publisher>Knowledge Dynamics Corp,</publisher>
@@ -56,7 +1461,7 @@ Missing files come here
 		</part>
 	</software>
 
-	<software name="msdos5">
+	<software name="msdos5m">
 		<description>MS-Dos 5.0 (Mecer OEM)</description>
 		<year>1991</year>
 		<publisher>Microsoft</publisher>
@@ -81,7 +1486,7 @@ Missing files come here
 		</part>
 	</software>
 
-	<software name="dos5" cloneof="msdos5">
+	<software name="dos5">
 		<description>MS-Dos 5.0 (5.25 Disks, RTM)</description>
 		<year>1991</year>
 		<publisher>Microsoft</publisher>
@@ -113,7 +1518,7 @@ Missing files come here
 		</part>
 	</software>
 
-	<software name="dos5upg" cloneof="msdos5">
+	<software name="dos5upg">
 		<description>MS-Dos 5.0 Upgrade (5.25 Disks, RTM)</description>
 		<year>1991</year>
 		<publisher>Microsoft</publisher>
@@ -150,29 +1555,8 @@ Missing files come here
 		</part>
 	</software>
 
-	<software name="msdos622">
-		<description>MS-DOS 6.22 (OEM)</description>
-		<year>1994</year>
-		<publisher>Microsoft</publisher>
-		<part name="disk1" interface="floppy_3_5">
-			<dataarea name="flop" size="1474560">
-				<rom name="disk1.img" size="1474560" crc="adbd36fe" sha1="3fb0df208670ea5fafae451661017391a381bc9d" offset="0" />
-			</dataarea>
-		</part>
-		<part name="disk2" interface="floppy_3_5">
-			<dataarea name="flop" size="1474560">
-				<rom name="disk2.img" size="1474560" crc="417eb8b3" sha1="63e670bb166995a7a1124c8f2b540355eed3bbd8" offset="0" />
-			</dataarea>
-		</part>
-		<part name="disk3" interface="floppy_3_5">
-			<dataarea name="flop" size="1474560">
-				<rom name="disk3.img" size="1474560" crc="6a158e98" sha1="b8493fc000f405ba7a1a89503178482328616e01" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="msdos622up" cloneof="msdos622">
-		<description>MS-DOS 6.22 (Upgrade)</description>
+		<description>MS-DOS 6.22 (Upgrade, Alt)</description>
 		<year>1994</year>
 		<publisher>Microsoft</publisher>
 		<part name="disk1" interface="floppy_3_5">
