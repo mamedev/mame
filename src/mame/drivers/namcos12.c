@@ -1152,12 +1152,6 @@ WRITE16_MEMBER(namcos12_state::dmaoffset_w)
 {
 	m_n_dmaoffset = ( offset * 2 ) | ( data << 16 );
 
-	/// HACK: it's unclear how exp_cfg & exp_base really play a part in this.
-	if( m_maincpu->exp_base() == 0x1f300000 )
-	{
-		m_n_dmaoffset |= 0x80000000;
-	}
-
 	verboselog(1, "dmaoffset_w( %08x, %08x, %08x ) %08x\n", offset, data, mem_mask, m_n_dmaoffset );
 }
 
@@ -1181,8 +1175,9 @@ void namcos12_state::namcos12_rom_read( UINT32 *p_n_psxram, UINT32 n_address, IN
 		n_offset = m_n_tektagdmaoffset & 0x7fffffff;
 		verboselog(1, "namcos12_rom_read( %08x, %08x ) tektagt %08x\n", n_address, n_size, n_offset );
 	}
-	else if( m_n_dmaoffset >= 0x80000000 )
+	else if( m_n_dmaoffset >= 0x80000000 || m_maincpu->exp_base() == 0x1f300000 )
 	{
+		/// HACK: it's unclear how exp_cfg & exp_base really play a part in this, tenkomor needs the test here and not in dmaoffset_w().
 		n_region = "maincpu:rom";
 		n_offset = m_n_dmaoffset & 0x003fffff;
 		verboselog(1, "namcos12_rom_read( %08x, %08x ) boot %08x\n", n_address, n_size, n_offset );
