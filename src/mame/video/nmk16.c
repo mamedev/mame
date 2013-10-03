@@ -355,7 +355,10 @@ WRITE16_MEMBER(nmk16_state::nmk_tilebank_w)
 		if (m_bgbank != (data & 0xff))
 		{
 			m_bgbank = data & 0xff;
-			m_bg_tilemap0->mark_all_dirty();
+			if (m_bg_tilemap0) m_bg_tilemap0->mark_all_dirty();
+			if (m_bg_tilemap1) m_bg_tilemap1->mark_all_dirty();
+			if (m_bg_tilemap2) m_bg_tilemap2->mark_all_dirty();
+			if (m_bg_tilemap3) m_bg_tilemap3->mark_all_dirty();
 		}
 	}
 }
