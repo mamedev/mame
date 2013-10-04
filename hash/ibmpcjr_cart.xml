@@ -52,7 +52,7 @@ Fraction Fever (Spinaker)
 		<year>1984</year>
 		<publisher>IBM</publisher>
 		<info name="usage" value="Boot from a DOS floppy and type 'G'" />
-		<sharedfeat name="requirement" value="ibmpcjr_flop:dos2"/>
+		<sharedfeat name="requirement" value="ibmpcjr_flop:pcdos21"/>
 		<part name="cart" interface="ibmpcjr_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="colorpnt.bin" size="65536" crc="0dcdef20" sha1="5aeee32a4ec4dd1aeea9a02b3d174a2f294d13b9" offset="0" />
@@ -76,7 +76,7 @@ Fraction Fever (Spinaker)
 		<year>1984</year>
 		<publisher>Lotus Development</publisher>
 		<info name="usage" value="Mount both carts and a DOS floppy and type 'TUTOR'" />
-		<sharedfeat name="requirement" value="ibmpcjr_flop:dos2"/>
+		<sharedfeat name="requirement" value="ibmpcjr_flop:pcdos21"/>
 		<part name="cart1" interface="ibmpcjr_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="lotus123.b" size="65536" crc="7b2c1f81" sha1="0a47fe8f99a6362d756d0648f0eefbd4d3ca9223" offset="0" />
