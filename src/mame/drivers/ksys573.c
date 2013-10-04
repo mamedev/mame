@@ -768,7 +768,7 @@ TIMER_CALLBACK_MEMBER(ksys573_state::atapi_xfer_end)
 	/// HACK: konami80s only works if you dma more data than requested
 	if ((m_ata->read_cs1(space, (UINT32) 6, (UINT32) 0xffff) & 8) != 0)
 	{
-		m_atapi_timer->adjust(m_maincpu->cycles_to_attotime((ATAPI_CYCLES_PER_SECTOR * (m_atapi_xfersize/512))));
+		m_atapi_timer->adjust(m_maincpu->cycles_to_attotime((ATAPI_CYCLES_PER_SECTOR * (m_atapi_xfersize/256))));
 	}
 }
 
