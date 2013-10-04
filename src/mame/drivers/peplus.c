@@ -2819,8 +2819,8 @@ ROM_START( peps0047 ) /* Normal board : Wild Cherry (PS0047) */
 	ROM_LOAD( "mbo-cg1004.u74",  0x10000, 0x1000, BAD_DUMP CRC(542a3a45) SHA1(13569e5bac44c2cffd647c27cf40456494d4612e) )
 	ROM_LOAD( "mxo-cg1004.u75",  0x18000, 0x1000, BAD_DUMP CRC(20242083) SHA1(f9c9bbe559516f1d02cd4f0bab69f0f7765780ca) )
 
-	ROM_REGION( 0x200, "proms", 0 )
-	ROM_LOAD( "cap1004.u50", 0x0000, 0x0200, CRC(5eced808) SHA1(b40b8efa8cbc76cff7560c36939275eb360c6f11) )
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "cap1004.u50", 0x0000, 0x0100, CRC(5eced808) SHA1(b40b8efa8cbc76cff7560c36939275eb360c6f11) )
 ROM_END
 
 ROM_START( peps0092 ) /* Normal board : Wild Cherry (PS0092) */
