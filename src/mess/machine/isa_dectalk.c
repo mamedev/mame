@@ -49,14 +49,7 @@ WRITE8_MEMBER(dectalk_isa_device::dma_w)
 
 WRITE16_MEMBER(dectalk_isa_device::dac_w)
 {
-	// TODO: Some words are understandable but overall it sounds bad
-	UINT16 out;
-	out = (data >> 4) & 0xfff;
-	out = ((out >> 1) & 0x555) | ((out & 0x555) << 1);
-	out = ((out >> 2) & 0x333) | ((out & 0x333) << 2);
-	out = ((out >> 4) & 0xf0f) | ((out & 0xf0f) << 4);
-	out |= (data & 0x8) << 12;
-	m_dac->write(out << 3);
+	m_dac->write(data & 0xfff0);
 }
 
 WRITE16_MEMBER(dectalk_isa_device::output_ctl_w)
