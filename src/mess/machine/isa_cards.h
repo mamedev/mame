@@ -42,6 +42,7 @@
 #include "machine/isa_sblaster.h"
 #include "machine/isa_ssi2001.h"
 #include "machine/isa_stereo_fx.h"
+#include "machine/isa_dectalk.h"
 
 // network
 #include "machine/3c503.h"
