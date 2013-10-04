@@ -16,6 +16,15 @@
         According to wikipedia, sapi1 & 2 have cassette facility,
         while sapi3 uses 8 inch floppy disk.
 
+ToDo:
+- Add cassette to sapi1 and 2
+-- UART on port 12, save and load bytes
+-- port 11 bit 7 for load, chr available
+-- port 11 bit 6 for save, tx buffer empty
+- sapi3 is trying to read a disk, so there is no response after showing the logo
+
+Unable to proceed due to no info available (& in English).
+
 ****************************************************************************/
 
 
@@ -59,6 +68,7 @@ public:
 	DECLARE_MACHINE_RESET(sapi1);
 	DECLARE_MACHINE_RESET(sapizps3);
 	UINT32 screen_update_sapi1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_sapi3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 private:
 	UINT8 m_term_data;
 	UINT8 m_keyboard_mask;
@@ -334,6 +344,61 @@ UINT32 sapi1_state::screen_update_sapi1(screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
+// The attributes seem to be different on this one, they need to be understood, so disabled for now
+UINT32 sapi1_state::screen_update_sapi3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	bool val;
+	UINT16 addr,xpos;
+	UINT8 chr,attr,ra,x,y,b;
+
+	for(y = 0; y < 20; y++ )
+	{
+		addr = y*64;
+		xpos = 0;
+		for(x = 0; x < 40; x++ )
+		{
+			chr = m_p_videoram[addr + x];
+			attr = 0;//(chr >> 6) & 3;
+			if (chr > 0x3f)
+				chr &= 0x1f;
+
+			for(ra = 0; ra < 9; ra++ )
+			{
+				for(b = 0; b < 6; b++ )
+				{
+					val = 0;
+
+					if (ra==8)
+					{
+						if (attr==2)
+							val = BIT(m_refresh_counter, 5);
+					}
+					else
+					{
+						val = BIT(MHB2501[(chr<<3) | ra], 5-b);
+						if (attr==1)
+							val = BIT(m_refresh_counter, 5) ? val : 0;
+					}
+
+					if(attr==3)
+					{
+						bitmap.pix16(y*9+ra, xpos+2*b   ) = val;
+						bitmap.pix16(y*9+ra, xpos+2*b+1 ) = val;
+					}
+					else
+					{
+						bitmap.pix16(y*9+ra, xpos+b ) = val;
+					}
+				}
+			}
+			xpos+= (attr==3) ? 12 : 6;
+			if (xpos>=6*40) break;
+		}
+	}
+	m_refresh_counter++;
+	return 0;
+}
+
 static MC6845_UPDATE_ROW( update_row )
 {
 	sapi1_state *state = device->machine().driver_data<sapi1_state>();
@@ -518,6 +583,10 @@ static MACHINE_CONFIG_DERIVED( sapi3, sapi2 )
 	MCFG_CPU_PROGRAM_MAP(sapi3_mem)
 	MCFG_CPU_IO_MAP(sapi3_io)
 	MCFG_MACHINE_RESET_OVERRIDE(sapi1_state, sapizps3 )
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_SIZE(40*6, 20*9)
+	MCFG_SCREEN_VISIBLE_AREA(0, 40*6-1, 0, 20*9-1)
+	MCFG_SCREEN_UPDATE_DRIVER(sapi1_state, screen_update_sapi3)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( sapi3b, sapi3 )
