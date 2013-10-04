@@ -369,7 +369,9 @@ static MACHINE_CONFIG_START( ibm5170, at_state )
 	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_IBM_PC_AT_84)
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("disk_list","ibm5170")
+	MCFG_SOFTWARE_LIST_ADD("pc_disk_list","ibm5150")
+	MCFG_SOFTWARE_LIST_ADD("xt_disk_list","ibm5160_flop")
+	MCFG_SOFTWARE_LIST_ADD("at_disk_list","ibm5170")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

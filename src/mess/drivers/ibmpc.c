@@ -356,6 +356,10 @@ static MACHINE_CONFIG_START( ibm5160, ibmpc_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("640K")
+
+  /* software lists */
+  MCFG_SOFTWARE_LIST_ADD("pc_disk_list","ibm5150")
+  MCFG_SOFTWARE_LIST_ADD("xt_disk_list","ibm5160_flop")
 MACHINE_CONFIG_END
 
 

@@ -6,13 +6,18 @@
 <softwarelist name="ibmpcjr_flop" description="IBM PCjr disk images">
 
 	<!-- OS -->
-	<software name="dos2">
-		<description>IBM PC-DOS Version 2.00</description>
+	<software name="pcdos21">
+		<description>PC DOS 2.1</description>
 		<year>1983</year>
 		<publisher>IBM</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="368640">
-				<rom name="dos2.ima" size="368640" crc="d0fb7d31" sha1="cbee7f6109fb0ed8a94de1893fc47ab066de36d3" offset="0x00000" />
+			<dataarea name="flop" size="184320">
+				<rom name="disk1.img" size="184320" crc="6a568d95" sha1="db165cb9bf2b2abbf5fa826dfe3a8f9819ce7ea5" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="184320">
+				<rom name="disk2.img" size="184320" crc="d5f74e98" sha1="2bfda7185e769ceb5594cfae01c503eaac8449df" offset="0" />
 			</dataarea>
 		</part>
 	</software>

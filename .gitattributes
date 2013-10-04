@@ -119,6 +119,7 @@ hash/hx20_flop.xml svneol=native#text/xml
 hash/ibm5140.xml svneol=native#text/xml
 hash/ibm5150.xml svneol=native#text/xml
 hash/ibm5150_cass.xml svneol=native#text/xml
+hash/ibm5160_flop.xml svneol=native#text/xml
 hash/ibm5170.xml svneol=native#text/xml
 hash/ibm5170_cdrom.xml svneol=native#text/xml
 hash/ibmpcjr_cart.xml svneol=native#text/xml

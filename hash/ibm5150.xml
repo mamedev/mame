@@ -63,7 +63,30 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
  - Word Spinner
 
 -->
-<softwarelist name="ibm5150" description="IBM PC/XT disk images">
+<softwarelist name="ibm5150" description="IBM PC disk images">
+
+	<!-- Operating Systems -->
+	<software name="pcdos10">
+		<description>PC DOS 1.0</description>
+		<year>1981</year>
+		<publisher>IBM</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="pcdos100.img" size="163840" crc="2df1c1c8" sha1="7d3e3a807ad2144315b3c3b90751ff691d3895db" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcdos110">
+		<description>PC DOS 1.10</description>
+		<year>1982</year>
+		<publisher>IBM</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="ibmdos11.img" size="163840" crc="ddfe9550" sha1="437bec5be7d28cc2248d5477f38a07545816e49a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
 	<!-- Booter Games -->
 	<software name="3ktrivia">
