@@ -98,6 +98,22 @@ public:
 	void hp48_reset_modules(  );
 	void hp48_decode_nibble( UINT8* dst, UINT8* src, int size );
 	void hp48_encode_nibble( UINT8* dst, UINT8* src, int size );
+
+	/* memory controller */
+	DECLARE_WRITE_LINE_MEMBER( hp48_mem_reset );
+	DECLARE_WRITE32_MEMBER( hp48_mem_config );
+	DECLARE_WRITE32_MEMBER( hp48_mem_unconfig );
+	DECLARE_READ32_MEMBER( hp48_mem_id );
+
+	/* CRC computation */
+	DECLARE_WRITE32_MEMBER( hp48_mem_crc );
+
+	/* IN/OUT registers */
+	DECLARE_READ32_MEMBER( hp48_reg_in );
+	DECLARE_WRITE32_MEMBER( hp48_reg_out );
+
+	/* keybord interrupt system */
+	DECLARE_WRITE_LINE_MEMBER( hp48_rsi );
 };
 
 
@@ -126,26 +142,6 @@ public:
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
-
-
-/************************ Saturn's I/O *******************************/
-
-/* memory controller */
-void hp48_mem_reset( device_t *device );
-void hp48_mem_config( device_t *device, int v );
-void hp48_mem_unconfig( device_t *device, int v );
-int  hp48_mem_id( device_t *device );
-
-/* CRC computation */
-void hp48_mem_crc( device_t *device, int addr, int data );
-
-/* IN/OUT registers */
-int  hp48_reg_in( device_t *device );
-void hp48_reg_out( device_t *device, int v );
-
-/* keybord interrupt system */
-void hp48_rsi( device_t *device );
-
 
 /***************************** serial ********************************/
 

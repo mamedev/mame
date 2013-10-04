@@ -914,17 +914,6 @@ ADDRESS_MAP_END
 
 
 
-/********************** Saturn's I/O *******************************/
-
-static const saturn_cpu_core hp48_config =
-{
-	hp48_reg_out, hp48_reg_in,
-	hp48_mem_reset, hp48_mem_config, hp48_mem_unconfig, hp48_mem_id,
-	hp48_mem_crc,
-	hp48_rsi
-};
-
-
 /*************************** layout ********************************/
 
 static const char layout_hp48gx[] = "hp48gx";
@@ -942,7 +931,10 @@ static MACHINE_CONFIG_START( hp48_common, hp48_state )
 	/* cpu */
 	MCFG_CPU_ADD ( "maincpu", SATURN, 3937007 ) /* almost 4 MHz */
 	MCFG_CPU_PROGRAM_MAP ( hp48)
-	MCFG_CPU_CONFIG( hp48_config )
+	MCFG_SATURN_CONFIG( WRITE32(hp48_state, hp48_reg_out), READ32(hp48_state, hp48_reg_in),
+	                    WRITELINE(hp48_state, hp48_mem_reset), WRITE32(hp48_state, hp48_mem_config),
+	                    WRITE32(hp48_state, hp48_mem_unconfig), READ32(hp48_state, hp48_mem_id),
+	                    WRITE32(hp48_state, hp48_mem_crc), WRITELINE(hp48_state, hp48_rsi) )
 
 	/* memory */
 	MCFG_NVRAM_ADD_0FILL("nvram")

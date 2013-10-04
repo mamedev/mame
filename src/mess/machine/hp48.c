@@ -230,19 +230,18 @@ static const chardev_interface hp48_chardev_iface =
 
 
 /* CPU sets OUT register (keyboard + beeper) */
-void hp48_reg_out( device_t *device, int out )
+WRITE32_MEMBER( hp48_state::hp48_reg_out )
 {
-	hp48_state *state = device->machine().driver_data<hp48_state>();
 	LOG(( "%s %f hp48_reg_out: %03x\n",
-			device->machine().describe_context(), device->machine().time().as_double(), out ));
+			machine().describe_context(), machine().time().as_double(), data ));
 
 	/* bits 0-8: keyboard lines */
-	state->m_out = out & 0x1ff;
+	m_out = data & 0x1ff;
 
 	/* bits 9-10: unused */
 
 	/* bit 11: beeper */
-	state->m_dac->write_unsigned8((out & 0x800) ? 0x80 : 00 );
+	m_dac->write_unsigned8((data & 0x800) ? 0x80 : 00 );
 }
 
 int hp48_state::hp48_get_in(  )
@@ -267,12 +266,11 @@ int hp48_state::hp48_get_in(  )
 }
 
 /* CPU reads IN register (keyboard) */
-int hp48_reg_in( device_t *device )
+READ32_MEMBER( hp48_state::hp48_reg_in )
 {
-	hp48_state *state = device->machine().driver_data<hp48_state>();
-	int in = state->hp48_get_in();
+	int in = hp48_get_in();
 	LOG(( "%s %f hp48_reg_in: %04x\n",
-			device->machine().describe_context(), device->machine().time().as_double(), in ));
+			machine().describe_context(), machine().time().as_double(), in ));
 	return in;
 }
 
@@ -312,15 +310,14 @@ TIMER_CALLBACK_MEMBER(hp48_state::hp48_kbd_cb)
 }
 
 /* RSI opcode */
-void hp48_rsi( device_t *device )
+WRITE_LINE_MEMBER( hp48_state::hp48_rsi )
 {
-	hp48_state *state = device->machine().driver_data<hp48_state>();
-	LOG(( "%s %f hp48_rsi\n", device->machine().describe_context(), device->machine().time().as_double() ));
+	LOG(( "%s %f hp48_rsi\n", machine().describe_context(), machine().time().as_double() ));
 
 	/* enables interrupts on key repeat
 	   (normally, there is only one interrupt, when the key is pressed)
 	*/
-	state->m_kdn = 0;
+	m_kdn = 0;
 }
 
 
@@ -814,41 +811,39 @@ void hp48_state::hp48_reset_modules(  )
 
 
 /* RESET opcode */
-void hp48_mem_reset( device_t *device )
+WRITE_LINE_MEMBER( hp48_state::hp48_mem_reset )
 {
-	hp48_state *state = device->machine().driver_data<hp48_state>();
-	LOG(( "%s %f hp48_mem_reset\n", device->machine().describe_context(), device->machine().time().as_double() ));
-	state->hp48_reset_modules();
+	LOG(( "%s %f hp48_mem_reset\n", machine().describe_context(), machine().time().as_double() ));
+	hp48_reset_modules();
 }
 
 
 /* CONFIG opcode */
-void hp48_mem_config( device_t *device, int v )
+WRITE32_MEMBER( hp48_state::hp48_mem_config )
 {
-	hp48_state *state = device->machine().driver_data<hp48_state>();
 	int i;
 
-	LOG(( "%s %f hp48_mem_config: %05x\n", device->machine().describe_context(), device->machine().time().as_double(), v ));
+	LOG(( "%s %f hp48_mem_config: %05x\n", machine().describe_context(), machine().time().as_double(), data ));
 
 	/* find the highest priority unconfigured module (except non-configurable NCE1)... */
 	for ( i = 0; i < 5; i++ )
 	{
 		/* ... first call sets the address mask */
-		if ( state->m_modules[i].state == HP48_MODULE_UNCONFIGURED )
+		if ( m_modules[i].state == HP48_MODULE_UNCONFIGURED )
 		{
-			state->m_modules[i].mask = v & 0xff000;
-			state->m_modules[i].state = HP48_MODULE_MASK_KNOWN;
+			m_modules[i].mask = data & 0xff000;
+			m_modules[i].state = HP48_MODULE_MASK_KNOWN;
 			break;
 		}
 
 		/* ... second call sets the base address */
-		if ( state->m_modules[i].state == HP48_MODULE_MASK_KNOWN )
+		if ( m_modules[i].state == HP48_MODULE_MASK_KNOWN )
 		{
-			state->m_modules[i].base = v & state->m_modules[i].mask;
-			state->m_modules[i].state = HP48_MODULE_CONFIGURED;
+			m_modules[i].base = data & m_modules[i].mask;
+			m_modules[i].state = HP48_MODULE_CONFIGURED;
 			LOG(( "hp48_mem_config: module %s configured base=%05x, mask=%05x\n",
-					hp48_module_names[i], state->m_modules[i].base, state->m_modules[i].mask ));
-			state->hp48_apply_modules();
+					hp48_module_names[i], m_modules[i].base, m_modules[i].mask ));
+			hp48_apply_modules();
 			break;
 		}
 	}
@@ -856,22 +851,21 @@ void hp48_mem_config( device_t *device, int v )
 
 
 /* UNCFG opcode */
-void hp48_mem_unconfig( device_t *device, int v )
+WRITE32_MEMBER( hp48_state::hp48_mem_unconfig )
 {
-	hp48_state *state = device->machine().driver_data<hp48_state>();
 	int i;
-	LOG(( "%s %f hp48_mem_unconfig: %05x\n", device->machine().describe_context(), device->machine().time().as_double(), v ));
+	LOG(( "%s %f hp48_mem_unconfig: %05x\n", machine().describe_context(), machine().time().as_double(), data ));
 
 	/* find the highest priority fully configured module at address v (except NCE1)... */
 	for ( i = 0; i < 5; i++ )
 	{
 		/* ... and unconfigure it */
-		if ( state->m_modules[i].state == HP48_MODULE_CONFIGURED &&
-				(state->m_modules[i].base == (v & state->m_modules[i].mask)) )
+		if ( m_modules[i].state == HP48_MODULE_CONFIGURED &&
+				(m_modules[i].base == (data & m_modules[i].mask)) )
 		{
-			state->m_modules[i].state = i> 0 ? HP48_MODULE_UNCONFIGURED : HP48_MODULE_MASK_KNOWN;
+			m_modules[i].state = i> 0 ? HP48_MODULE_UNCONFIGURED : HP48_MODULE_MASK_KNOWN;
 			LOG(( "hp48_mem_unconfig: module %s\n", hp48_module_names[i] ));
-			state->hp48_apply_modules();
+			hp48_apply_modules();
 			break;
 		}
 	}
@@ -879,9 +873,8 @@ void hp48_mem_unconfig( device_t *device, int v )
 
 
 /* C=ID opcode */
-int  hp48_mem_id( device_t *device )
+READ32_MEMBER( hp48_state::hp48_mem_id )
 {
-	hp48_state *state = device->machine().driver_data<hp48_state>();
 	int i;
 	int data = 0; /* 0 = everything is configured */
 
@@ -889,22 +882,22 @@ int  hp48_mem_id( device_t *device )
 	for ( i = 0; i < 5; i++ )
 	{
 		/* ... mask need to be configured */
-		if ( state->m_modules[i].state == HP48_MODULE_UNCONFIGURED )
+		if ( m_modules[i].state == HP48_MODULE_UNCONFIGURED )
 		{
-			data = hp48_module_mask_id[i] | (state->m_modules[i].mask & ~0xff);
+			data = hp48_module_mask_id[i] | (m_modules[i].mask & ~0xff);
 			break;
 		}
 
 		/* ... address need to be configured */
-		if ( state->m_modules[i].state == HP48_MODULE_MASK_KNOWN )
+		if ( m_modules[i].state == HP48_MODULE_MASK_KNOWN )
 		{
-			data = hp48_module_addr_id[i] | (state->m_modules[i].base & ~0x3f);
+			data = hp48_module_addr_id[i] | (m_modules[i].base & ~0x3f);
 			break;
 		}
 	}
 
 	LOG(( "%s %f hp48_mem_id = %02x\n",
-			device->machine().describe_context(), device->machine().time().as_double(), data ));
+			machine().describe_context(), machine().time().as_double(), data ));
 
 	return data; /* everything is configured */
 }
@@ -914,13 +907,12 @@ int  hp48_mem_id( device_t *device )
 /* --------- CRC ---------- */
 
 /* each memory read by the CPU updates the internal CRC state */
-void hp48_mem_crc( device_t *device, int addr, int data )
+WRITE32_MEMBER( hp48_state::hp48_mem_crc )
 {
-	hp48_state *state = device->machine().driver_data<hp48_state>();
 	/* no CRC for I/O RAM */
-	if ( addr >= state->m_io_addr && addr < state->m_io_addr + 0x40 ) return;
+	if ( offset >= m_io_addr && offset < m_io_addr + 0x40 ) return;
 
-	state->m_crc = (state->m_crc >> 4) ^ (((state->m_crc ^ data) & 0xf) * 0x1081);
+	m_crc = (m_crc >> 4) ^ (((m_crc ^ data) & 0xf) * 0x1081);
 }
 
 
