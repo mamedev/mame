@@ -11,7 +11,6 @@
 
 
 
-
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
@@ -67,14 +66,16 @@ machine_config_constructor c2n_device::device_mconfig_additions() const
 c2n_device::c2n_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_pet_datassette_port_interface(mconfig, *this),
-		m_cassette(*this, "cassette")
+		m_cassette(*this, "cassette"),
+		m_motor(false)
 {
 }
 
 c2n_device::c2n_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, C2N, "C2N Datassette", tag, owner, clock, "c2n", __FILE__),
 		device_pet_datassette_port_interface(mconfig, *this),
-		m_cassette(*this, "cassette")
+		m_cassette(*this, "cassette"),
+		m_motor(false)
 {
 }
 
@@ -113,9 +114,10 @@ void c2n_device::device_start()
 
 void c2n_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	int input = (m_cassette->input() > +0.0) ? 1 : 0;
-
-	m_slot->read_w(input);
+	if (m_motor)
+	{
+		m_slot->read_w(datassette_read());
+	}
 }
 
 
@@ -158,11 +160,13 @@ void c2n_device::datassette_motor(int state)
 	if (!state)
 	{
 		m_cassette->change_state(CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
-		m_read_timer->enable(true);
+		m_motor = true;
 	}
 	else
 	{
 		m_cassette->change_state(CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
-		m_read_timer->enable(false);
+		m_motor = false;
 	}
+
+	m_slot->read_w(datassette_read());
 }

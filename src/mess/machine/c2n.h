@@ -12,7 +12,6 @@
 #ifndef __C2N__
 #define __C2N__
 
-
 #include "emu.h"
 #include "formats/cbm_tap.h"
 #include "imagedev/cassette.h"
@@ -50,6 +49,8 @@ protected:
 
 private:
 	required_device<cassette_image_device> m_cassette;
+
+	bool m_motor;
 
 	// timers
 	emu_timer *m_read_timer;
