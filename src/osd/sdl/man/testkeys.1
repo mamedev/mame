@@ -5,11 +5,11 @@
 .\" Man page created from source and usage information
 .\" Cesare Falco <c.falco@ubuntu.com>, February 2007
 .\"
-.TH TESTKEYS 1 2012-12-01 0.147u3 "MAME SDL keycode checker"
+.TH TESTKEYS 1 2013-09-23 0.150 "MAME SDL keycode scanner"
 .\"
 .\" NAME chapter
 .SH NAME
-testkeys \- returns SDL keycode for key pressed.
+testkeys \- MAME SDL keycode scanner
 .\"
 .\" SYNOPSIS chapter
 .SH SYNOPSIS
@@ -17,7 +17,11 @@ testkeys \- returns SDL keycode for key pressed.
 .\"
 .\" DESCRIPTION chapter
 .SH DESCRIPTION
-Since 0.113 SDLMAME introduced keymap files to handle keyboards with non\-us layouts.
+Since 0.113 (SDL)MAME introduced keymap files to handle keyboards
+with non\-us layouts.
 .PP
-This simple utility helps determining which SDL keycode is bound to each key, thus
-making the process of compiling keymap files a bit easier.
+This simple utility helps determining which SDL keycode is bound
+to each key, thus making the process of compiling keymap files a
+bit easier.
+.SH SEE ALSO
+mame(6), mess(6)

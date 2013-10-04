@@ -9,7 +9,7 @@
 .\" References
 .\" http://www.mame.net/mamefaq.html
 .\"
-.TH ROMCMP 1 2012-12-01 0.147u3 "MAME romset checking tool"
+.TH ROMCMP 1 2013-09-23 0.150 "MAME romset checking tool"
 .\"
 .\" NAME chapter
 .SH NAME
@@ -24,15 +24,14 @@ romcmp \- MAME rom and romsets check and comparison tool
 .\"
 .\" DESCRIPTION chapter
 .SH DESCRIPTION
-An eternal nuisance in arcade emulation are incomplete or corrupt dumps of the ROM chips.
-\fBromcmp\fP is a tool developed to detect the most common errors that can occur when dumping ROMS,
-for example stuck bits and address line errors.
+\fBromcmp\fP is a tool developed to detect the most common errors that
+can occur when dumping ROMS, for example stuck bits and address line errors.
 .PP
-It can check the ROMs in ZIP files or subdirectories.
-.PP
-\fBromcmp\fP can also be used to compare two ROM sets, by giving it two files or subdirectories
-as parameters. It will determine which ROMS are identical and which are the closest matches.
-This is useful when figuring out if a newly dumped ROM set is a clone of another ROM set.
+It can check the ROMs in ZIP files or subdirectories; it can also be used
+to compare two ROM sets, by giving it two files or subdirectories
+as parameters. It will determine which ROMS are identical and which are
+the closest matches.  This is useful when figuring out if a newly dumped
+ROM set is a clone of another ROM set.
 .\"
 .\" OPTIONS chapter
 .SH OPTIONS
@@ -42,11 +41,16 @@ Enables a slower, more comprehensive comparison.
 .\"
 .\" EXAMPLES chapter
 .SH EXAMPLES
-.B romcmp \fIjumpkids.zip\fP
+.B romcmp jumpkids.zip
 will output the following:
 
   11 files
   23.3c			FIXED BITS (xxxxxx1x)
   23.3c		  	FIRST AND SECOND HALF IDENTICAL
       
-This tells us that the 23.3C ROM in Jump Kids is bad, and incidentally, it causes the missing sound in that game.
+This tells us that the 23.3C ROM in Jump Kids is bad, and incidentally,
+it causes the missing sound in that game.
+.\"
+.\" SEE ALSO chapter
+.SH SEE ALSO
+mame(6)

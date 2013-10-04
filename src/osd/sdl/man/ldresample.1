@@ -3,7 +3,7 @@
 .\" Second parameter, SECTION, should be 1-8, maybe w/ subsection
 .\" other parameters are allowed: see man(7), man(1)
 .\"
-.TH ldresample 1 2012-12-01 0.147u3 "MESS Laserdisc audio manipulation tool"
+.TH LDRESAMPLE 1 2013-09-23 0.150 "MAME laserdisc audio manipulation tool"
 .\"
 .\" Please adjust this date whenever revising the manpage.
 .\"
@@ -19,7 +19,7 @@
 .\" for manpage-specific macros, see man(7)
 
 .SH "NAME"
-ldresample \- Laserdisc audio synchronizer and resampler.
+ldresample \- MAME laserdisc audio manipulation tool
 
 .SH "SYNOPSIS"
 .B ldresample
@@ -32,26 +32,18 @@ ldresample \- Laserdisc audio synchronizer and resampler.
 .B [slope]
 
 .SH "DESCRIPTION"
-Assists in resynchronizing audio tracks in a CHD (Compressed Hunks of Data) file
- with frames.
-.br
+Assists in resynchronizing audio tracks in a CHD (Compressed Hunks of Data)
+file with frames.
+.PP
 .B Offset
-parameter and 
-.B slope
-option make a linear equation f(x) which
-describes the sample offset from the source as a function
-of field number.
-
+parameter and \fBslope\fR option make a linear equation f(x) which
+describes the sample offset from the source as a function of field number.
 .SH "COPYRIGHT"
 Copyright \(co 2008 Aaron Giles. BSD License.
-
-.SH "AUTHOR"
-Written by Aaron Giles.
-
 .SH "SEE ALSO"
-.BR ldverify (1),
-.BR ldplayer (1).
-
-.sp 3
+ldverify(1), mame(6), mess(6)
+.SH "AUTHORS"
+Written by Aaron Giles.
+.PP
 This manual page was written by Ludovic Lechapt <ludomatic@gmail.com>,
 for the Debian project but may be used by others.
