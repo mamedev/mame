@@ -559,6 +559,7 @@ MACHINE_CONFIG_EXTERN( pgm_022_025 );
 
 INPUT_PORTS_EXTERN( killbld );
 INPUT_PORTS_EXTERN( dw3 );
+INPUT_PORTS_EXTERN( dw3j );
 
 /*----------- defined in machine/pgmprot5.c -----------*/
 

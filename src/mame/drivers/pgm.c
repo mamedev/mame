@@ -4018,9 +4018,9 @@ GAME( 1998, killbld,      pgm,       pgm_022_025, killbld, pgm_022_025_state,  k
 GAME( 1998, killbld104,   killbld,   pgm_022_025, killbld, pgm_022_025_state,  killbld,    ROT0,   "IGS", "The Killing Blade (ver. 104)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) /* region provided by protection device */
 
 // these seem playable but the DMA mode transfering 68k code to RAM is not emulated so there could still be problems
-GAME( 1998, drgw3,        pgm,       pgm_022_025,     dw3, pgm_022_025_state,      drgw3,      ROT0,   "IGS", "Dragon World 3 (ver. 106, Korean Board)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) /* region provided by protection device */
+GAME( 1998, drgw3,        pgm,       pgm_022_025,     dw3, pgm_022_025_state,      drgw3,      ROT0,   "IGS", "Dragon World 3 (ver. 106)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) /* region provided by protection device */
 GAME( 1998, drgw3105,     drgw3,     pgm_022_025,     dw3, pgm_022_025_state,      drgw3,      ROT0,   "IGS", "Dragon World 3 (ver. 105)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) /* region provided by protection device */
-GAME( 1998, drgw3100,     drgw3,     pgm_022_025,     dw3, pgm_022_025_state,      drgw3,      ROT0,   "IGS", "Dragon World 3 (ver. 100)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // Japan Only?
+GAME( 1998, drgw3100,     drgw3,     pgm_022_025,     dw3j,pgm_022_025_state,      drgw3,      ROT0,   "IGS", "Dragon World 3 (Japan, ver. 100)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // Japan only, has an extra game mode option!
 
 GAME( 1998, dwex,         pgm,       pgm_022_025,     dw3, pgm_022_025_state,      drgw3,      ROT0,   "IGS", "Dragon World 3 EX (ver. 100)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) /* region provided by protection device */
 
