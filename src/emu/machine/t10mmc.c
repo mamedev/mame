@@ -17,7 +17,7 @@ void t10mmc::t10_start(device_t &device)
 	device.save_item(NAME(last_lba));
 	device.save_item(NAME(num_subblocks));
 	device.save_item(NAME(cur_subblock));
-	device.save_item(NAME(play_err_flag));
+	device.save_item(NAME(m_audio_sense));
 }
 
 void t10mmc::t10_reset()
@@ -36,10 +36,20 @@ void t10mmc::t10_reset()
 	m_sector_bytes = 2048;
 	num_subblocks = 1;
 	cur_subblock = 0;
-	play_err_flag = 0;
+	m_audio_sense = 0;
 }
 
 // scsicd_exec_command
+
+void t10mmc::abort_audio()
+{
+	if (m_cdda->audio_active())
+	{
+		m_cdda->stop_audio();
+		m_audio_sense = SCSI_SENSE_ASC_ASCQ_AUDIO_PLAY_OPERATION_STOPPED_DUE_TO_ERROR;
+	}
+}
+
 //
 // Execute a SCSI command.
 
@@ -47,15 +57,26 @@ void t10mmc::ExecCommand()
 {
 	int trk;
 
+	// keep updating the sense data while playing audio.
+	if (command[0] == SCSI_CMD_REQUEST_SENSE && m_audio_sense != SCSI_SENSE_ASC_ASCQ_NO_SENSE && m_sense_key == SCSI_SENSE_KEY_NO_SENSE && m_sense_asc == 0 && m_sense_ascq == 0)
+	{
+		if (m_audio_sense == SCSI_SENSE_ASC_ASCQ_AUDIO_PLAY_OPERATION_IN_PROGRESS && !m_cdda->audio_active())
+		{
+			m_audio_sense = SCSI_SENSE_ASC_ASCQ_AUDIO_PLAY_OPERATION_SUCCESSFULLY_COMPLETED;
+		}
+
+		set_sense(SCSI_SENSE_KEY_NO_SENSE, (sense_asc_ascq_t) m_audio_sense);
+
+		if (m_audio_sense != SCSI_SENSE_ASC_ASCQ_AUDIO_PLAY_OPERATION_IN_PROGRESS)
+		{
+			m_audio_sense = SCSI_SENSE_ASC_ASCQ_NO_SENSE;
+		}
+	}
+
 	switch ( command[0] )
 	{
-		case 0x03: // REQUEST SENSE
-			m_phase = SCSI_PHASE_DATAIN;
-			m_transfer_length = SCSILengthFromUINT8( &command[ 4 ] );
-			break;
-
 		case 0x12: // INQUIRY
-			logerror("T10MMC: REQUEST SENSE\n");
+			logerror("T10MMC: INQUIRY\n");
 			m_phase = SCSI_PHASE_DATAIN;
 			m_transfer_length = SCSILengthFromUINT8( &command[ 4 ] );
 			break;
@@ -72,7 +93,7 @@ void t10mmc::ExecCommand()
 			break;
 
 		case 0x1b: // START STOP UNIT
-			m_cdda->stop_audio();
+			abort_audio();
 			m_phase = SCSI_PHASE_STATUS;
 			m_transfer_length = 0;
 			break;
@@ -104,7 +125,7 @@ void t10mmc::ExecCommand()
 				cur_subblock = 0;
 			}
 
-			m_cdda->stop_audio();
+			abort_audio();
 
 			m_phase = SCSI_PHASE_DATAIN;
 			m_transfer_length = blocks * m_sector_bytes;
@@ -142,7 +163,7 @@ void t10mmc::ExecCommand()
 				length = 4;
 			}
 
-			m_cdda->stop_audio();
+			abort_audio();
 
 			m_phase = SCSI_PHASE_DATAIN;
 			m_transfer_length = length;
@@ -168,13 +189,13 @@ void t10mmc::ExecCommand()
 
 			if (cdrom_get_track_type(cdrom, trk) == CD_TRACK_AUDIO)
 			{
-				play_err_flag = 0;
 				m_cdda->start_audio(lba, blocks);
+				m_audio_sense = SCSI_SENSE_ASC_ASCQ_AUDIO_PLAY_OPERATION_IN_PROGRESS;
 			}
 			else
 			{
 				logerror("T10MMC: track is NOT audio!\n");
-				play_err_flag = 1;
+				set_sense(SCSI_SENSE_KEY_ILLEGAL_REQUEST, SCSI_SENSE_ASC_ASCQ_ILLEGAL_MODE_FOR_THIS_TRACK);
 			}
 
 			m_phase = SCSI_PHASE_STATUS;
@@ -184,6 +205,7 @@ void t10mmc::ExecCommand()
 		case 0x48: // PLAY AUDIO TRACK/INDEX
 			// be careful: tracks here are zero-based, but the SCSI command
 			// uses the real CD track number which is 1-based!
+			logerror("T10MMC: PLAY AUDIO T/I: strk %d idx %d etrk %d idx %d frames %d\n", command[4], command[5], command[7], command[8], blocks);
 			lba = cdrom_get_track_start(cdrom, command[4]-1);
 			blocks = cdrom_get_track_start(cdrom, command[7]-1) - lba;
 			if (command[4] > command[7])
@@ -196,12 +218,19 @@ void t10mmc::ExecCommand()
 				blocks = cdrom_get_track_start(cdrom, command[4]) - lba;
 			}
 
-			if (blocks && cdrom)
+			trk = cdrom_get_track(cdrom, lba);
+
+			if (cdrom_get_track_type(cdrom, trk) == CD_TRACK_AUDIO)
 			{
 				m_cdda->start_audio(lba, blocks);
+				m_audio_sense = SCSI_SENSE_ASC_ASCQ_AUDIO_PLAY_OPERATION_IN_PROGRESS;
+			}
+			else
+			{
+				logerror("T10MMC: track is NOT audio!\n");
+				set_sense(SCSI_SENSE_KEY_ILLEGAL_REQUEST, SCSI_SENSE_ASC_ASCQ_ILLEGAL_MODE_FOR_THIS_TRACK);
 			}
 
-			logerror("T10MMC: PLAY AUDIO T/I: strk %d idx %d etrk %d idx %d frames %d\n", command[4], command[5], command[7], command[8], blocks);
 			m_phase = SCSI_PHASE_STATUS;
 			m_transfer_length = 0;
 			break;
@@ -218,10 +247,7 @@ void t10mmc::ExecCommand()
 			break;
 
 		case 0x4e: // STOP
-			if (cdrom)
-			{
-				m_cdda->stop_audio();
-			}
+			abort_audio();
 
 			logerror("T10MMC: STOP_PLAY_SCAN\n");
 			m_phase = SCSI_PHASE_STATUS;
@@ -259,14 +285,15 @@ void t10mmc::ExecCommand()
 
 			if (cdrom_get_track_type(cdrom, trk) == CD_TRACK_AUDIO)
 			{
-				play_err_flag = 0;
 				m_cdda->start_audio(lba, blocks);
+				m_audio_sense = SCSI_SENSE_ASC_ASCQ_AUDIO_PLAY_OPERATION_IN_PROGRESS;
 			}
 			else
 			{
 				logerror("T10MMC: track is NOT audio!\n");
-				play_err_flag = 1;
+				set_sense(SCSI_SENSE_KEY_ILLEGAL_REQUEST, SCSI_SENSE_ASC_ASCQ_ILLEGAL_MODE_FOR_THIS_TRACK);
 			}
+
 			m_phase = SCSI_PHASE_STATUS;
 			m_transfer_length = 0;
 			break;
@@ -287,7 +314,7 @@ void t10mmc::ExecCommand()
 				cur_subblock = 0;
 			}
 
-			m_cdda->stop_audio();
+			abort_audio();
 
 			m_phase = SCSI_PHASE_DATAIN;
 			m_transfer_length = blocks * m_sector_bytes;
@@ -317,27 +344,6 @@ void t10mmc::ReadData( UINT8 *data, int dataLength )
 
 	switch ( command[0] )
 	{
-		case 0x03: // REQUEST SENSE
-			logerror("T10MMC: Reading REQUEST SENSE data\n");
-
-			memset( data, 0, dataLength );
-
-			data[0] = 0x71; // deferred error
-
-			if (m_cdda->audio_active())
-			{
-				data[12] = 0x00;
-				data[13] = 0x11;    // AUDIO PLAY OPERATION IN PROGRESS
-			}
-			else if (play_err_flag)
-			{
-				play_err_flag = 0;
-				data[12] = 0x64;    // ILLEGAL MODE FOR THIS TRACK
-				data[13] = 0x00;
-			}
-			// (else 00/00 means no error to report)
-			break;
-
 		case 0x12: // INQUIRY
 			memset( data, 0, dataLength );
 			data[0] = 0x05; // device is present, device is CD/DVD (MMC-3)
@@ -404,16 +410,12 @@ void t10mmc::ReadData( UINT8 *data, int dataLength )
 			{
 				case 1: // return current position
 				{
-					int msf;
-
 					if (!cdrom)
 					{
 						return;
 					}
 
 					logerror("T10MMC: READ SUB-CHANNEL Time = %x, SUBQ = %x\n", command[1], command[2]);
-
-					msf = command[1] & 0x2;
 
 					int audio_active = m_cdda->audio_active();
 					if (audio_active)
@@ -452,6 +454,7 @@ void t10mmc::ReadData( UINT8 *data, int dataLength )
 
 					last_phys_frame = last_lba;
 
+					int msf = command[1] & 0x2;
 					if (msf)
 					{
 						int m,s,f;

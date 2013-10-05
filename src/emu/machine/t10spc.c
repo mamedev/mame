@@ -1,18 +1,32 @@
 #include "t10spc.h"
 
-#define SCSI_SENSE_SIZE             4
-
 void t10spc::t10_start(device_t &device)
 {
 	device.save_item(NAME(command));
 	device.save_item(NAME(commandLength));
-	device.save_item(NAME(m_phase));
 	device.save_item(NAME(m_transfer_length));
+	device.save_item(NAME(m_phase));
+	device.save_item(NAME(m_sense_key));
+	device.save_item(NAME(m_sense_asc));
+	device.save_item(NAME(m_sense_ascq));
+	device.save_item(NAME(m_sense_information));
 }
 
 void t10spc::t10_reset()
 {
 	m_phase = SCSI_PHASE_BUS_FREE;
+	m_sense_key = 0;
+	m_sense_asc = 0;
+	m_sense_ascq = 0;
+	m_sense_information = 0;
+}
+
+void t10spc::set_sense(sense_key_t key, sense_asc_ascq_t asc_ascq)
+{
+	m_sense_key = key;
+	m_sense_asc = (asc_ascq >> 8) & 0xff;
+	m_sense_ascq = asc_ascq & 0xff;
+	m_sense_information = 0;
 }
 
 void t10spc::ExecCommand()
@@ -30,8 +44,19 @@ void t10spc::ExecCommand()
 		break;
 
 	case SCSI_CMD_REQUEST_SENSE:
-		m_phase = SCSI_PHASE_DATAOUT;
-		m_transfer_length = SCSI_SENSE_SIZE;
+		m_phase = SCSI_PHASE_DATAIN;
+		if (command[4] == 0)
+		{
+			m_transfer_length = 4;
+		}
+		else if (command[4] > 18)
+		{
+			m_transfer_length = 18;
+		}
+		else
+		{
+			m_transfer_length = command[ 4 ];
+		}
 		break;
 
 	case SCSI_CMD_SEND_DIAGNOSTIC:
@@ -51,11 +76,38 @@ void t10spc::ReadData( UINT8 *data, int dataLength )
 	switch( command[ 0 ] )
 	{
 	case SCSI_CMD_REQUEST_SENSE:
-		data[ 0 ] = SCSI_SENSE_NO_SENSE;
-		data[ 1 ] = 0x00;
-		data[ 2 ] = 0x00;
-		data[ 3 ] = 0x00;
+		if (command[4] == 0)
+		{
+			data[0] = m_sense_asc & 0x7f;
+			data[1] = (m_sense_information >> 16) & 0x1f;
+			data[2] = (m_sense_information >> 8) & 0xff;
+			data[3] = (m_sense_information >> 0) & 0xff;
+		}
+		else
+		{
+			data[0] = 0x70;
+			data[1] = 0;
+			data[2] = m_sense_key & 0xf;
+			data[3] = (m_sense_information >> 24) & 0xff;
+			data[4] = (m_sense_information >> 16) & 0xff;
+			data[5] = (m_sense_information >> 8) & 0xff;
+			data[6] = (m_sense_information >> 0) & 0xff;
+			data[7] = 10;
+			data[8] = 0;
+			data[9] = 0;
+			data[10] = 0;
+			data[11] = 0;
+			data[12] = m_sense_asc;
+			data[13] = m_sense_ascq;
+			data[14] = 0;
+			data[15] = 0;
+			data[16] = 0;
+			data[17] = 0;
+		}
+
+		set_sense(SCSI_SENSE_KEY_NO_SENSE, SCSI_SENSE_ASC_ASCQ_NO_SENSE);
 		break;
+
 	default:
 		logerror( "SCSIDEV unknown read %02x\n", command[ 0 ] );
 		break;

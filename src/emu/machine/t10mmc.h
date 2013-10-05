@@ -24,6 +24,8 @@ protected:
 	virtual void t10_start(device_t &device);
 	virtual void t10_reset();
 
+	void abort_audio();
+
 	cdrom_image_device *m_image;
 	cdda_device *m_cdda;
 	cdrom_file *cdrom;
@@ -33,7 +35,7 @@ protected:
 	UINT32 last_lba;
 	UINT32 num_subblocks;
 	UINT32 cur_subblock;
-	UINT32 play_err_flag;
+	int m_audio_sense;
 };
 
 #endif

@@ -29,10 +29,32 @@ protected:
 	int SCSILengthFromUINT8( UINT8 *length ) { if( *length == 0 ) { return 256; } return *length; }
 	int SCSILengthFromUINT16( UINT8 *length ) { return ( *(length) << 8 ) | *(length + 1 ); }
 
+	enum sense_key_t
+	{
+		SCSI_SENSE_KEY_NO_SENSE = 0,
+		SCSI_SENSE_KEY_ILLEGAL_REQUEST = 5
+	};
+
+	enum sense_asc_ascq_t
+	{
+		SCSI_SENSE_ASC_ASCQ_NO_SENSE = 0x0,
+		SCSI_SENSE_ASC_ASCQ_AUDIO_PLAY_OPERATION_IN_PROGRESS = 0x0011,
+		SCSI_SENSE_ASC_ASCQ_AUDIO_PLAY_OPERATION_PAUSED = 0x0012,
+		SCSI_SENSE_ASC_ASCQ_AUDIO_PLAY_OPERATION_SUCCESSFULLY_COMPLETED = 0x0013,
+		SCSI_SENSE_ASC_ASCQ_AUDIO_PLAY_OPERATION_STOPPED_DUE_TO_ERROR = 0x0014,
+		SCSI_SENSE_ASC_ASCQ_ILLEGAL_MODE_FOR_THIS_TRACK = 0x6400
+	};
+
+	void set_sense(sense_key_t key, sense_asc_ascq_t asc_ascq);
+
 	UINT8 command[ 32 ];
 	int commandLength;
 	int m_transfer_length;
 	int m_phase;
+	UINT8 m_sense_key;
+	UINT8 m_sense_asc;
+	UINT8 m_sense_ascq;
+	UINT32 m_sense_information;
 	int m_sector_bytes;
 	device_t *m_device;
 };
@@ -51,29 +73,5 @@ protected:
 #define SCSI_CMD_REQUEST_SENSE ( 0x03 )
 #define SCSI_CMD_MODE_SELECT ( 0x15 )
 #define SCSI_CMD_SEND_DIAGNOSTIC ( 0x1d )
-
-#define SCSI_SENSE_ADDR_VALID       0x80
-#define SCSI_SENSE_NO_SENSE         0x00
-#define SCSI_SENSE_NO_INDEX         0x01
-#define SCSI_SENSE_SEEK_NOT_COMP    0x02
-#define SCSI_SENSE_WRITE_FAULT      0x03
-#define SCSI_SENSE_DRIVE_NOT_READY  0x04
-#define SCSI_SENSE_NO_TRACK0        0x06
-#define SCSI_SENSE_ID_CRC_ERROR     0x10
-#define SCSI_SENSE_UNCORRECTABLE    0x11
-#define SCSI_SENSE_ADDRESS_NF       0x12
-#define SCSI_SENSE_RECORD_NOT_FOUND 0x14
-#define SCSI_SENSE_SEEK_ERROR       0x15
-#define SCSI_SENSE_DATA_CHECK_RETRY 0x18
-#define SCSI_SENSE_ECC_VERIFY       0x19
-#define SCSI_SENSE_INTERLEAVE_ERROR 0x1A
-#define SCSI_SENSE_UNFORMATTED      0x1C
-#define SCSI_SENSE_ILLEGAL_COMMAND  0x20
-#define SCSI_SENSE_ILLEGAL_ADDRESS  0x21
-#define SCSI_SENSE_VOLUME_OVERFLOW  0x23
-#define SCSI_SENSE_BAD_ARGUMENT     0x24
-#define SCSI_SENSE_INVALID_LUN      0x25
-#define SCSI_SENSE_CART_CHANGED     0x28
-#define SCSI_SENSE_ERROR_OVERFLOW   0x2C
 
 #endif

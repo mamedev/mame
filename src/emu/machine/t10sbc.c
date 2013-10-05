@@ -34,11 +34,6 @@ void t10sbc::ExecCommand()
 {
 	switch ( command[0] )
 	{
-		case 0x03: // REQUEST SENSE
-			m_phase = SCSI_PHASE_DATAIN;
-			m_transfer_length = SCSILengthFromUINT8( &command[ 4 ] );
-			break;
-
 		case 0x04: // FORMAT UNIT
 			m_phase = SCSI_PHASE_STATUS;
 			m_transfer_length = 0;
@@ -123,8 +118,6 @@ void t10sbc::ExecCommand()
 
 void t10sbc::ReadData( UINT8 *data, int dataLength )
 {
-	int i;
-
 	// if we're a drive without a disk, return all zeroes
 	if (!disk)
 	{
@@ -134,14 +127,6 @@ void t10sbc::ReadData( UINT8 *data, int dataLength )
 
 	switch ( command[0] )
 	{
-		case 0x03:  // REQUEST SENSE
-			data[0] = 0x80; // valid sense
-			for (i = 1; i < 12; i++)
-			{
-				data[i] = 0;
-			}
-			break;
-
 		case 0x12:  // INQUIRY
 			memset( data, 0, dataLength );
 			data[0] = 0x00; // device is direct-access (e.g. hard disk)
