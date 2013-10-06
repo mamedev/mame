@@ -277,6 +277,22 @@ const avr8_config atmega88_config =
 	"eeprom"
 };
 
+static const gfx_layout charset_8x16 =
+{
+	8, 9,
+	256,
+	1,
+	{ 0 },
+	{ STEP8(0,1) },
+	{ 0*1024*2, 1*1024*2, 2*1024*2, 3*1024*2, 4*1024*2, 5*1024*2, 6*1024*2, 7*1024*2, 8*1024*2 },
+	8
+};
+
+
+static GFXDECODE_START( sbc6510 )
+	GFXDECODE_ENTRY( "videocpu", 0x1500, charset_8x16, 0, 128 )
+GFXDECODE_END
+
 
 static MACHINE_CONFIG_START( sbc6510, sbc6510_state )
 	/* basic machine hardware */
@@ -289,6 +305,8 @@ static MACHINE_CONFIG_START( sbc6510, sbc6510_state )
 	MCFG_CPU_PROGRAM_MAP(sbc6510_video_mem)
 	MCFG_CPU_DATA_MAP(sbc6510_video_data)
 	MCFG_CPU_IO_MAP(sbc6510_video_io)
+
+	MCFG_GFXDECODE(sbc6510)
 
 	/* video hardware */
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
