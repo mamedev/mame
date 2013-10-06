@@ -89,7 +89,10 @@ DTC-01 LEDs
 *    unknown date: Version 1.1 roms released to fix a bug with insufficient stack space, see ss_dec1 above
 *    October 11 1983: Second half of Version 1.8 rom finalized
 *    December 05 1983: First half of Version 1.8 rom finalized
-*    March 1984: Hardware version B done (integrates the output fifo sync error check onto the pcb; Version A units are retrofitted when sent in for firmware upgrades) (most of the schematics come from this time)
+*    March 1984: Hardware version B done 
+       (integrates the output fifo sync error check onto the pcb;
+       Version A units are retrofitted when sent in for firmware upgrades)
+       (most of the schematics come from this time, and have the version 1.8 roms listed on them)
 *    July 02 1984: Second half of Version 2.0 rom finalized
 *    July 23 1984: First half of Version 2.0 rom finalized
 *    October 1984 (the rest of the schematics come from this time)
@@ -212,6 +215,8 @@ dgc (dg(no!spam)cx@mac.com)
 
 // USE_LOOSE_TIMING makes the cpu interleave much lower and boosts it on fifo and flag writes by the 68k and semaphore sets by the dsp
 #define USE_LOOSE_TIMING 1
+// makes use_loose_timing boost interleave when the outfifo is about to run out. slightly slows things down but may prevent some glitching
+#undef USE_LOOSE_TIMING_OUTPUT
 // generic logs like led state, and common writes for dsp and spc such as the speech int
 #undef VERBOSE
 // logs reads and writes to nvram, and nvram store/recall flag messages
@@ -253,10 +258,12 @@ public:
 
 	// input fifo, between m68k and tms32010
 	UINT16 m_infifo[32]; // technically eight 74LS224 4bit*16stage FIFO chips, arranged as a 32 stage, 16-bit wide fifo
+	UINT8 m_infifo_count;
 	UINT8 m_infifo_tail_ptr;
 	UINT8 m_infifo_head_ptr;
 	// output fifo, between tms32010 and 10khz sample latch for dac
 	UINT16 m_outfifo[16]; // technically three 74LS224 4bit*16stage FIFO chips, arranged as a 16 stage, 12-bit wide fifo
+	UINT8 m_outfifo_count;
 	UINT8 m_outfifo_tail_ptr;
 	UINT8 m_outfifo_head_ptr;
 	UINT8 m_infifo_semaphore; // latch for status of output fifo, d-latch 74ls74 @ E64 'lower half'
@@ -367,7 +374,7 @@ static const rs232_port_interface rs232_intf =
 void dectalk_state::dectalk_outfifo_check ()
 {
 	// check if output fifo is full; if it isn't, set the int on the dsp
-	if (((m_outfifo_head_ptr-1)&0xF) != m_outfifo_tail_ptr)
+	if (m_outfifo_count < 16)
 		m_dsp->set_input_line(0, ASSERT_LINE); // TMS32010 INT
 	else
 		m_dsp->set_input_line(0, CLEAR_LINE); // TMS32010 INT
@@ -378,8 +385,10 @@ void dectalk_state::dectalk_clear_all_fifos(  )
 	// clear fifos (TODO: memset would work better here...)
 	int i;
 	for (i=0; i<16; i++) m_outfifo[i] = 0;
-	for (i=0; i<32; i++) m_infifo[i] = 0;
+	m_outfifo_count = 0;
 	m_outfifo_tail_ptr = m_outfifo_head_ptr = 0;
+	for (i=0; i<32; i++) m_infifo[i] = 0;
+	m_infifo_count = 0;
 	m_infifo_tail_ptr = m_infifo_head_ptr = 0;
 	dectalk_outfifo_check();
 }
@@ -403,10 +412,21 @@ void dectalk_state::dectalk_semaphore_w ( UINT16 data )
 UINT16 dectalk_state::dectalk_outfifo_r (  )
 {
 	UINT16 data = 0xFFFF;
+#ifdef USE_LOOSE_TIMING_OUTPUT
+	// if outfifo count is less than two, boost the interleave to prevent running the fifo out
+	if (m_outfifo_count < 2)
+	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(25));
+#endif
+#ifdef VERBOSE
+	if (m_outfifo_count == 0) logerror("output fifo is EMPTY! repeating previous sample!\n");
+#endif
 	data = m_outfifo[m_outfifo_tail_ptr];
 	// if fifo is empty (tail ptr == head ptr), do not increment the tail ptr, otherwise do.
-	//if (m_outfifo_tail_ptr != m_outfifo_head_ptr) m_outfifo_tail_ptr++; // technically correct but doesn't match sn74ls224 sheet
-	if (((m_outfifo_head_ptr-1)&0xF) != m_outfifo_tail_ptr) m_outfifo_tail_ptr++; // matches sn74ls224 sheet
+	if (m_outfifo_count > 0)
+	{
+		m_outfifo_tail_ptr++;
+		m_outfifo_count--;
+	}
 	m_outfifo_tail_ptr&=0xF;
 	dectalk_outfifo_check();
 	return ((data&0xfff0)^0x8000); // yes this is right, top bit is inverted and bottom 4 are ignored
@@ -661,8 +681,8 @@ WRITE16_MEMBER(dectalk_state::spc_latch_outfifo_error_stats)// latch 74ls74 @ E6
 #ifdef SPC_LOG_DSP
 	logerror("dsp: set fifo semaphore and set error status = %01X\n",data&1);
 #endif
-	dectalk_semaphore_w((~m_simulate_outfifo_error)&1); // always set to 1 here, unless outfifo error.
-	m_spc_error_latch = (data&1);
+	dectalk_semaphore_w((~m_simulate_outfifo_error)&1); // always set to 1 here, unless outfifo desync-between-the-three-parallel-fifo-chips error occurs.
+	m_spc_error_latch = (data&1); // latch the dsp 'soft error' state aka "ERROR DETECTED D5 H" on schematics (different from the outfifo error state above!)
 }
 
 READ16_MEMBER(dectalk_state::spc_infifo_data_r)
@@ -687,7 +707,7 @@ WRITE16_MEMBER(dectalk_state::spc_outfifo_data_w)
 #endif
 	m_dsp->set_input_line(0, CLEAR_LINE); //TMS32010 INT (cleared because LDCK inverts the IR line, clearing int on any outfifo write... for a moment at least.)
 	// if fifo is full (head ptr = tail ptr-1), do not increment the head ptr and do not store the data
-	if (((m_outfifo_tail_ptr-1)&0xF) == m_outfifo_head_ptr)
+	if (m_outfifo_count == 16)
 	{
 #ifdef SPC_LOG_DSP
 		logerror("outfifo was full, write ignored!\n");
@@ -696,8 +716,9 @@ WRITE16_MEMBER(dectalk_state::spc_outfifo_data_w)
 	}
 	m_outfifo[m_outfifo_head_ptr] = data;
 	m_outfifo_head_ptr++;
+	m_outfifo_count++;
 	m_outfifo_head_ptr&=0xF;
-	//dectalk_outfifo_check(); // commented to allow int to clear
+	//dectalk_outfifo_check(); // outfifo check should only be done in the audio 10khz polling function
 }
 
 READ16_MEMBER(dectalk_state::spc_semaphore_r)// Return state of d-latch 74ls74 @ E64 'lower half' in d0 which indicates whether infifo is readable
@@ -758,7 +779,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(tms32010_io, AS_IO, 16, dectalk_state )
 	AM_RANGE(0, 0) AM_WRITE(spc_latch_outfifo_error_stats) // *set* the outfifo_status_r semaphore, and also latch the error bit at D0.
 	AM_RANGE(1, 1) AM_READWRITE(spc_infifo_data_r, spc_outfifo_data_w) //read from input fifo, write to sound fifo
-	AM_RANGE(TMS32010_BIO, TMS32010_BIO) AM_READ(spc_semaphore_r) //read output fifo writable status
+	AM_RANGE(TMS32010_BIO, TMS32010_BIO) AM_READ(spc_semaphore_r) //read infifo-has-data-in-it fifo readable status
+	//AM_RANGE(8, 8) //the newer firmware seems to want something mapped here?
 ADDRESS_MAP_END
 
 /******************************************************************************
@@ -926,10 +948,15 @@ ROM_START( dectalk )
 	// older firmware from firmware 1.8, overridden by the later firmware; this version (oldest one dumped so far) doesn't seem to work properly with the current semaphore/fifo implementation
 	ROM_LOAD16_BYTE("23-166f4.e70", 0x000, 0x800, CRC(2d036ffc) SHA1(e8c25ca092dde2dc0aec73921af806026bdfbbc3)) // HM1-76161-5
 	ROM_LOAD16_BYTE("23-165f4.e69", 0x001, 0x800, CRC(a3019ca4) SHA1(249f269c38f7f44edb6d025bcc867c8ca0de3e9c)) // HM1-76161-5
-	// NEWER/final? firmware from later 2.0 units, overridden by below; this firmware; I can't seem to get it working... Is this the same firmware as on the tms320P15 on the dtc-07?
+	// NEWER/final? firmware from later 2.0 units; this firmware DOES WORK.
+	// this firmware seems to have some leftover test garbage mapped into its space, which is not present on the dtc-01 board
+	// it writes 0x0000 to 0x90 on start
+	// it writes a sequence of values to 0xFF down to 0xE9
+	// it wants something readable mapped at 0x08 or else it waits for an interrupt
+	// Is this the same firmware as on the tms320P15 on the dtc-07 or a backported variant of such?
 	ROM_LOAD16_BYTE("23-410f4.e70", 0x000, 0x800, CRC(121e2ec3) SHA1(3fabe018d0e0b478093951cb20501853358faa18))
 	ROM_LOAD16_BYTE("23-409f4.e69", 0x001, 0x800, CRC(61f67c79) SHA1(9a13426c92f879f2953f180f805990a91c37ac43))
-	// DECtalk DTC-01 'klsyn' tms32010 firmware v2.0?, both proms are 82s191 equivalent; this version seems to be the most robust in terms of loose fifo timing
+	// DECtalk DTC-01 'klsyn' tms32010 firmware v2.0?, both proms are 82s191 equivalent; this firmware DOES WORK.
 	ROM_LOAD16_BYTE("23-205f4.e70", 0x000, 0x800, CRC(ed76a3ad) SHA1(3136bae243ef48721e21c66fde70dab5fc3c21d0)) // Label: "LM8506205F4 // M1-76161-5" @ E70
 	ROM_LOAD16_BYTE("23-204f4.e69", 0x001, 0x800, CRC(79bb54ff) SHA1(9409f90f7a397b041e4440341f2d7934cb479285)) // Label: "LM8504204F4 // 78S191" @ E69
 
