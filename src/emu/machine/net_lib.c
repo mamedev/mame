@@ -84,7 +84,7 @@ NETLIB_UPDATE_PARAM(netdev_clock)
 
 NETLIB_UPDATE(netdev_clock)
 {
-	m_Q.setToPS(!m_Q.new_Q(), m_inc  );
+	m_Q.setToNoCheckPS(!m_Q.new_Q(), m_inc  );
 }
 
 NETLIB_START(nicMultiSwitch)
@@ -231,8 +231,9 @@ NETLIB_UPDATE(nicNE555N_MSTABLE)
 {
 	update_param(); // FIXME : m_CV should be on a sub device ...
 
-	bool bthresh = (INPANALOG(m_THRESHOLD) > nicNE555N_cv(*this));
-	bool btrig = (INPANALOG(m_trigger) > nicNE555N_cv(*this) * 0.5);
+	double vt = nicNE555N_clamp(*this, nicNE555N_cv(*this), 0.7, 1.4);
+	bool bthresh = (INPANALOG(m_THRESHOLD) > vt);
+	bool btrig = (INPANALOG(m_trigger) > nicNE555N_clamp(*this, nicNE555N_cv(*this) * 0.5, 0.7, 1.4));
 	bool out = m_last;
 
 	if (!btrig)
@@ -246,20 +247,23 @@ NETLIB_UPDATE(nicNE555N_MSTABLE)
 
 	if (!m_last && out)
 	{
-		double vt = nicNE555N_cv(*this);
 		double vl = m_VL.Value();
 		double time;
 
-		vt = nicNE555N_clamp(*this, vt, 0.7, 1.4);
 		// FIXME : m_CV should be on a sub device ...
 
+		// TI datasheet states minimum pulse of 10 us
 		if (vt<vl)
-			time = 0;
+			time = 10;
 		else
-			time = - log((m_VS.Value()-vt)/(m_VS.Value()-vl)) * m_R.Value() * m_C.Value();
+		{
+			time = - log((m_VS.Value()-vt)/(m_VS.Value()-vl)) * m_R.Value() * m_C.Value() * 1.0e6; // in us
+			if (time < 10.0)
+				time = 10.0;
+		}
 
 		m_Q.setToNoCheckPS(m_VS.Value() * 0.7, NLTIME_FROM_NS(100));
-		m_THRESHOLD_OUT.setToPS(m_VS.Value(), NLTIME_FROM_US(time * 1.0e6));
+		m_THRESHOLD_OUT.setToPS(m_VS.Value(), NLTIME_FROM_US(time ));
 	}
 	else if (m_last && !out)
 	{
@@ -268,15 +272,6 @@ NETLIB_UPDATE(nicNE555N_MSTABLE)
 	}
 	m_last = out;
 }
-
-#if 0
-NETLIB_TIMER_CALLBACK(nicNE555N_MSTABLE)
-{
-	if (INPVAL(m_trigger))
-		m_Q.setToPS(0.25, NLTIME_FROM_NS(100));
-	m_fired = 1;
-}
-#endif
 
 NETLIB_START(nic7404)
 {
@@ -522,10 +517,10 @@ NETLIB_START(nic7490)
 	register_input("R91", m_R91);
 	register_input("R92", m_R92);
 
-	register_output("QA", m_QA);
-	register_output("QB", m_QB);
-	register_output("QC", m_QC);
-	register_output("QD", m_QD);
+	register_output("QA", m_Q[0]);
+	register_output("QB", m_Q[1]);
+	register_output("QC", m_Q[2]);
+	register_output("QD", m_Q[3]);
 }
 
 NETLIB_UPDATE(nic7490)
@@ -548,7 +543,7 @@ NETLIB_UPDATE(nic7490)
 		update_outputs();
 	}
 }
-
+#if 0
 NETLIB_FUNC_VOID(nic7490, update_outputs)
 {
 	m_QA.setToPS((m_cnt >> 0) & 1, NLTIME_FROM_NS(18));
@@ -556,7 +551,19 @@ NETLIB_FUNC_VOID(nic7490, update_outputs)
 	m_QC.setToPS((m_cnt >> 2) & 1, NLTIME_FROM_NS(54));
 	m_QD.setToPS((m_cnt >> 3) & 1, NLTIME_FROM_NS(72));
 }
+#else
+NETLIB_FUNC_VOID(nic7490, update_outputs)
+{
+	static netlist_time delay[4] = { NLTIME_FROM_NS(18), NLTIME_FROM_NS(36), NLTIME_FROM_NS(54), NLTIME_FROM_NS(72) };
+	for (int i=0; i<4; i++)
+		m_Q[i].setToPS((m_cnt >> i) & 1, delay[i]);
 
+		//m_QA.setToPS((m_cnt >> 0) & 1, delay[0]);
+		//m_QB.setToPS((m_cnt >> 1) & 1, delay[1]);
+		//m_QC.setToPS((m_cnt >> 2) & 1, delay[2]);
+		//m_QD.setToPS((m_cnt >> 3) & 1, delay[3]);
+}
+#endif
 #if 1
 NETLIB_START(nic7493)
 {
@@ -595,12 +602,12 @@ NETLIB_UPDATE(nic7493)
 	{
 		//printf("%s reset\n", name());
 		A.m_I.inactivate();
-		A.m_Q.setToPS(0, NLTIME_FROM_NS(40));
 		B.m_I.inactivate();
-		B.m_Q.setToPS(0, NLTIME_FROM_NS(40));
 		C.m_I.inactivate();
-		C.m_Q.setToPS(0, NLTIME_FROM_NS(40));
 		D.m_I.inactivate();
+		A.m_Q.setToPS(0, NLTIME_FROM_NS(40));
+		B.m_Q.setToPS(0, NLTIME_FROM_NS(40));
+		C.m_Q.setToPS(0, NLTIME_FROM_NS(40));
 		D.m_Q.setToPS(0, NLTIME_FROM_NS(40));
 	}
 	else
