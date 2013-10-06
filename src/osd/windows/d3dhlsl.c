@@ -1875,23 +1875,17 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 		int bloom_index = 0;
 		float bloom_width = rt->target_width;
 		float bloom_height = rt->target_height;
-		float prim_width = poly->get_prim_width();
-		float prim_height = poly->get_prim_height();
-		float prim_ratio[2] = { prim_width / bloom_width, prim_height / bloom_height };
 		float screen_size[2] = { d3d->get_width(), d3d->get_height() };
-		//float target_size[2] = { bloom_width * 0.5f, bloom_height * 0.5f };
 		curr_effect->set_vector("ScreenSize", 2, screen_size);
 		for(; bloom_size >= 2.0f && bloom_index < 11; bloom_size *= 0.5f)
 		{
-			float target_size[2] = { bloom_width, bloom_height };
-			float source_size[2] = { bloom_width * 0.5f, bloom_height * 0.5f };
+			target_size[0] = bloom_width;
+			target_size[1] = bloom_height;
 			curr_effect->set_vector("TargetSize", 2, target_size);
-			curr_effect->set_vector("SourceSize", 2, source_size);
-			curr_effect->set_vector("PrimRatio", 2, prim_ratio);
 
 			curr_effect->begin(&num_passes, 0);
 
-			curr_effect->set_texture("Diffuse", (bloom_index == 0) ? rt->render_texture[0] : rt->bloom_texture[bloom_index - 1]);
+			curr_effect->set_texture("DiffuseTexture", (bloom_index == 0) ? rt->render_texture[0] : rt->bloom_texture[bloom_index - 1]);
 
 			HRESULT result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, rt->bloom_target[bloom_index]);
 			if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_render_target call 6\n", (int)result);
@@ -1970,8 +1964,8 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 			curr_effect->set_vector("ScreenDims", 2, &screendims.c.x);
 			curr_effect->set_vector("Phosphor", 3, options->phosphor);
 		}
-		curr_effect->set_float("TextureWidth", (float)d3d->get_width());
-		curr_effect->set_float("TextureHeight", (float)d3d->get_height());
+		float target_dims[2] = { d3d->get_width(), d3d->get_height() };
+		curr_effect->set_vector("TargetDims", 2, target_dims);
 		curr_effect->set_float("Passthrough", 0.0f);
 
 		curr_effect->set_texture("Diffuse", rt->render_texture[1]);
