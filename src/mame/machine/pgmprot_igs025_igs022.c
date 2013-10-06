@@ -327,7 +327,7 @@ void pgm_022_025_state::IGS022_do_dma(UINT16 src, UINT16 dst, UINT16 size, UINT1
 	param = mode >> 8;
 	mode &=0xf;  // what are the other bits?
 
-	if ((mode == 0) || (mode == 1) || (mode == 2) || (mode == 3))
+	if ((mode == 0) || (mode == 1) || (mode == 2) || (mode == 3)  || (mode == 4))
 	{
 		/* mode3 applies a xor from a 0x100 byte table to the data being
 		   transferred
@@ -351,26 +351,36 @@ void pgm_022_025_state::IGS022_do_dma(UINT16 src, UINT16 dst, UINT16 size, UINT1
 			UINT8 taboff = ((x*2)+extraoffset) & 0xff; // must allow for overflow in instances of odd offsets
 			UINT16 extraxor = ((dectable[taboff+1]) << 8) | (dectable[taboff+0] << 0);
 
+			if (mode==4)
+			{
+				extraxor = 0;
+				if ((x & 0x003) == 0x000) extraxor |= 0x0049; // 'I'
+				if ((x & 0x003) == 0x001) extraxor |= 0x0047; // 'G'
+				if ((x & 0x003) == 0x002) extraxor |= 0x0053; // 'S'
+				if ((x & 0x003) == 0x003) extraxor |= 0x0020; // ' '
+
+
+				if ((x & 0x300) == 0x000) extraxor |= 0x4900; // 'I'
+				if ((x & 0x300) == 0x100) extraxor |= 0x4700; // 'G'
+				if ((x & 0x300) == 0x200) extraxor |= 0x5300; // 'S'
+				if ((x & 0x300) == 0x300) extraxor |= 0x2000; // ' '
+			}
+
 			//  mode==0 plain
 			if (mode==3) dat2 ^= extraxor;
 			if (mode==2) dat2 += extraxor;
 			if (mode==1) dat2 -= extraxor;
 
+			if (mode==4)
+			{
+				printf("%06x | %04x (%04x)\n", (dst+x)*2, dat2, (UINT16)(dat2-extraxor));
+
+				dat2 -= extraxor;
+			}
+
+
 			m_sharedprotram[dst + x] = dat2;
 		}
-	}
-	else if (mode == 4)
-	{
-		mame_printf_debug("unhandled copy mode %04x!\n", mode);
-
-		int x;
-		for (x = 0; x < size; x++)
-		{
-			m_sharedprotram[dst + x] = 0x4e75; // Hack until algorithm for decoding this is figured out.
-		}
-
-		// not used by killing blade
-		/* looks almost like a fixed value xor, but isn't */
 	}
 	else if (mode == 5)
 	{
