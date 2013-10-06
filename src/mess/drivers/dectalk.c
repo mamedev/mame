@@ -87,14 +87,15 @@ DTC-01 LEDs
 *    August 1983: Hardware version A done
 *    unknown date: Version 1.0 roms finalized
 *    unknown date: Version 1.1 roms released to fix a bug with insufficient stack space, see ss_dec1 above
+*    October 11 1983: Second half of Version 1.8 rom finalized
+*    December 05 1983: First half of Version 1.8 rom finalized
 *    March 1984: Hardware version B done (integrates the output fifo sync error check onto the pcb; Version A units are retrofitted when sent in for firmware upgrades) (most of the schematics come from this time)
-     <there might be a v1.2 or v1.3 in this period, but there is definitely a v1.8, which isn't dumped.>
 *    July 02 1984: Second half of Version 2.0 rom finalized
 *    July 23 1984: First half of Version 2.0 rom finalized
 *    October 1984 (the rest of the schematics come from this time)
-*    sometime after 6th week of 1985: dsp roms updated to the 23-409f4/23-410f4 set
+*    sometime after 6th week of 1985: dsp roms updated to the -409/-410 set
 *
-* NVRAM related stuff found by leeeeee:
+* NVRAM related stuff found by leeeeee (in v2.0):
 * $10402 - nvram recall/reset based on byte on stack (0 = recall, 1 = write default to nvram)
 * $10f2E - nvram recall
 * $10f52 - entry point for nvram check routine
@@ -901,6 +902,7 @@ ROM_START( dectalk )
 	the 2.0 version above
 	*/
 
+	// DECtalk DTC-01 firmware v1.8 (first half: 05Dec83 tag; second half: 11Oct83 tag), all roms are 27128 eproms
 	ROM_SYSTEM_BIOS( 1, "v18", "DTC-01 Version 1.8")
 	ROMX_LOAD("23-063e5.e8", 0x00000, 0x4000, CRC(9f5ca045) SHA1(1b1b9c1e092c44329b385fb04001e13422eb8d39), ROM_SKIP(1) | ROM_BIOS(2))
 	ROMX_LOAD("23-059e5.e22", 0x00001, 0x4000, CRC(b299cf64) SHA1(84bbe9ff303ea6ce7b1c0b1ad05421edd18fae49), ROM_SKIP(1) | ROM_BIOS(2))
