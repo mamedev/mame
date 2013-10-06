@@ -16,6 +16,8 @@
 *
 *  TODO:
 *  * DUART:
+*    * Get the duart self test to pass again; this used to work with the old non-devcb duart implementation but regressed with the newer one
+*      * The duart self tests are EXTENSIVE and make an excellent check of many of the duart internal bits.
 *    * <DONE> DUART needs to be reset on reset line activation. as is it works ok, but it should be done anyway.
 *    * DUART needs its i/o pins connected as well:
 *    * pins IP0, IP2, and IP3 are connected to the primary serial port:
@@ -29,6 +31,8 @@
 *    * pins OP0 and OP2 are connected to the primary serial port:
 *      * OP0 is RTS
 *      * OP2 is DTR
+*  * Figure out why the v1.8 dectalk firmware clips/screeches like hell (it may just require the older dsp code to work properly)
+*  * Figure out why the older -165/-166 and newer -409/-410 tms32010 dsp firmwares don't produce any sound, while the middle -204/-205 one does (maybe an issue with the fifo and semaphore bits implementations?)
 *  * <DONE> Actually store the X2212 nvram's eeprom data to disk rather than throwing it out on exit
 *    * Get setup mode with the serial BREAK int working enough to actually properly save the default nvram back to the chip in emulation, and get rid of the (currently unused) nvram default image in the rom definitions
 *  * emulate/simulate the MT8060 dtmf decoder as a 16-key input device? or hook it to some simple fft code? Francois Javier's fftmorse code ran full speed on a 6mhz 80286, maybe use that?
@@ -88,7 +92,7 @@ DTC-01 LEDs
 *    July 02 1984: Second half of Version 2.0 rom finalized
 *    July 23 1984: First half of Version 2.0 rom finalized
 *    October 1984 (the rest of the schematics come from this time)
-*    unknown date: version 2.1 rom finalized
+*    sometime after 6th week of 1985: dsp roms updated to the 23-409f4/23-410f4 set
 *
 * NVRAM related stuff found by leeeeee:
 * $10402 - nvram recall/reset based on byte on stack (0 = recall, 1 = write default to nvram)
@@ -872,36 +876,63 @@ ROM_START( dectalk )
 	 *   for eproms/otproms or mask roms it is: e1 = 0x400, e2 = 0x800, e3 = 0x1000, e4 = 0x2000, e5 = 0x4000, e6 = 0x8000, etc)
 	 *   for proms it is: a1 = 82s123(0x20, 8b TS); a2 = 82s129(0x100 4b TS); a9 = 82s131(0x200 4b TS); b1 = 82s135(0x100 8b TS); f1 = 82s137(0x400 4b TS); f4 = 82s191(0x800 8b TS); s0 = MC68HC05; m2 = i8051 or other MCS-51; (there are more)
 	 */
-	ROM_LOAD16_BYTE("23-123e5.e8", 0x00000, 0x4000, CRC(03e1eefa) SHA1(e586de03e113683c2534fca1f3f40ba391193044)) // Label: "SP8510123E5" @ E8
-	ROM_LOAD16_BYTE("23-119e5.e22", 0x00001, 0x4000, CRC(af20411f) SHA1(7954bb56b7591f8954403a22d34de31c7d5441ac)) // Label: "SP8510119E5" @ E22
-	ROM_LOAD16_BYTE("23-124e5.e7", 0x08000, 0x4000, CRC(9edeafcb) SHA1(7724babf4ae5d77c0b4200f608d599058d04b25c)) // Label: "SP8510124E5" @ E7
-	ROM_LOAD16_BYTE("23-120e5.e21", 0x08001, 0x4000, CRC(f2a346a6) SHA1(af5e4ea0b3631f7d6f16c22e86a33fa2cb520ee0)) // Label: "SP8510120E5" @ E21
-	ROM_LOAD16_BYTE("23-125e5.e6", 0x10000, 0x4000, CRC(1c0100d1) SHA1(1b60cd71dfa83408b17e13f683b6bf3198c905cc)) // Label: "SP8510125E5" @ E6
-	ROM_LOAD16_BYTE("23-121e5.e20", 0x10001, 0x4000, CRC(4cb081bd) SHA1(4ad0b00628a90085cd7c78a354256c39fd14db6c)) // Label: "SP8510121E5" @ E20
-	ROM_LOAD16_BYTE("23-126e5.e5", 0x18000, 0x4000, CRC(7823dedb) SHA1(e2b2415eec838ddd46094f2fea93fd289dd0caa2)) // Label: "SP8510126E5" @ E5
-	ROM_LOAD16_BYTE("23-122e5.e19", 0x18001, 0x4000, CRC(b86370e6) SHA1(92ab22a24484ad0d0f5c8a07347105509999f3ee)) // Label: "SP8510122E5" @ E19
-	ROM_LOAD16_BYTE("23-103e5.e4", 0x20000, 0x4000, CRC(35aac6b9) SHA1(b5aec0bf37a176ff4d66d6a10357715957662ebd)) // Label: "SP8510103E5" @ E4
-	ROM_LOAD16_BYTE("23-095e5.e18", 0x20001, 0x4000, CRC(2296fe39) SHA1(891f3a3b4ce75ef14001257bc8f1f60463a9a7cb)) // Label: "SP8510095E5" @ E18
-	ROM_LOAD16_BYTE("23-104e5.e3", 0x28000, 0x4000, CRC(9658b43c) SHA1(4d6808f67cbdd316df23adc8ddf701df57aa854a)) // Label: "SP8510104E5" @ E3
-	ROM_LOAD16_BYTE("23-096e5.e17", 0x28001, 0x4000, CRC(cf236077) SHA1(496c69e52cfa013173f7b9c500ce544a03ad01f7)) // Label: "SP8510096E5" @ E17
-	ROM_LOAD16_BYTE("23-105e5.e2", 0x30000, 0x4000, CRC(09cddd28) SHA1(de0c25687bab3ff0c88c98622092e0b58331aa16)) // Label: "SP8510105E5" @ E2
-	ROM_LOAD16_BYTE("23-097e5.e16", 0x30001, 0x4000, CRC(49434da1) SHA1(c450abae0ccf372d7eb87370b8a8c97a45e164d3)) // Label: "SP8510097E5" @ E16
-	ROM_LOAD16_BYTE("23-106e5.e1", 0x38000, 0x4000, CRC(a389ab31) SHA1(355348bfc96a04193136cdde3418366e6476c3ca)) // Label: "SP8510106E5" @ E1
-	ROM_LOAD16_BYTE("23-098e5.e15", 0x38001, 0x4000, CRC(3d8910e7) SHA1(01921e77b46c2d4845023605239c45ffa4a35872)) // Label: "SP8510098E5" @ E15
+	ROM_SYSTEM_BIOS( 0, "v20", "DTC-01 Version 2.0")
+	ROMX_LOAD("23-123e5.e8", 0x00000, 0x4000, CRC(03e1eefa) SHA1(e586de03e113683c2534fca1f3f40ba391193044), ROM_SKIP(1) | ROM_BIOS(1)) // Label: "SP8510123E5" @ E8
+	ROMX_LOAD("23-119e5.e22", 0x00001, 0x4000, CRC(af20411f) SHA1(7954bb56b7591f8954403a22d34de31c7d5441ac), ROM_SKIP(1) | ROM_BIOS(1)) // Label: "SP8510119E5" @ E22
+	ROMX_LOAD("23-124e5.e7", 0x08000, 0x4000, CRC(9edeafcb) SHA1(7724babf4ae5d77c0b4200f608d599058d04b25c), ROM_SKIP(1) | ROM_BIOS(1)) // Label: "SP8510124E5" @ E7
+	ROMX_LOAD("23-120e5.e21", 0x08001, 0x4000, CRC(f2a346a6) SHA1(af5e4ea0b3631f7d6f16c22e86a33fa2cb520ee0), ROM_SKIP(1) | ROM_BIOS(1)) // Label: "SP8510120E5" @ E21
+	ROMX_LOAD("23-125e5.e6", 0x10000, 0x4000, CRC(1c0100d1) SHA1(1b60cd71dfa83408b17e13f683b6bf3198c905cc), ROM_SKIP(1) | ROM_BIOS(1)) // Label: "SP8510125E5" @ E6
+	ROMX_LOAD("23-121e5.e20", 0x10001, 0x4000, CRC(4cb081bd) SHA1(4ad0b00628a90085cd7c78a354256c39fd14db6c), ROM_SKIP(1) | ROM_BIOS(1)) // Label: "SP8510121E5" @ E20
+	ROMX_LOAD("23-126e5.e5", 0x18000, 0x4000, CRC(7823dedb) SHA1(e2b2415eec838ddd46094f2fea93fd289dd0caa2), ROM_SKIP(1) | ROM_BIOS(1)) // Label: "SP8510126E5" @ E5
+	ROMX_LOAD("23-122e5.e19", 0x18001, 0x4000, CRC(b86370e6) SHA1(92ab22a24484ad0d0f5c8a07347105509999f3ee), ROM_SKIP(1) | ROM_BIOS(1)) // Label: "SP8510122E5" @ E19
+	ROMX_LOAD("23-103e5.e4", 0x20000, 0x4000, CRC(35aac6b9) SHA1(b5aec0bf37a176ff4d66d6a10357715957662ebd), ROM_SKIP(1) | ROM_BIOS(1)) // Label: "SP8510103E5" @ E4
+	ROMX_LOAD("23-095e5.e18", 0x20001, 0x4000, CRC(2296fe39) SHA1(891f3a3b4ce75ef14001257bc8f1f60463a9a7cb), ROM_SKIP(1) | ROM_BIOS(1)) // Label: "SP8510095E5" @ E18
+	ROMX_LOAD("23-104e5.e3", 0x28000, 0x4000, CRC(9658b43c) SHA1(4d6808f67cbdd316df23adc8ddf701df57aa854a), ROM_SKIP(1) | ROM_BIOS(1)) // Label: "SP8510104E5" @ E3
+	ROMX_LOAD("23-096e5.e17", 0x28001, 0x4000, CRC(cf236077) SHA1(496c69e52cfa013173f7b9c500ce544a03ad01f7), ROM_SKIP(1) | ROM_BIOS(1)) // Label: "SP8510096E5" @ E17
+	ROMX_LOAD("23-105e5.e2", 0x30000, 0x4000, CRC(09cddd28) SHA1(de0c25687bab3ff0c88c98622092e0b58331aa16), ROM_SKIP(1) | ROM_BIOS(1)) // Label: "SP8510105E5" @ E2
+	ROMX_LOAD("23-097e5.e16", 0x30001, 0x4000, CRC(49434da1) SHA1(c450abae0ccf372d7eb87370b8a8c97a45e164d3), ROM_SKIP(1) | ROM_BIOS(1)) // Label: "SP8510097E5" @ E16
+	ROMX_LOAD("23-106e5.e1", 0x38000, 0x4000, CRC(a389ab31) SHA1(355348bfc96a04193136cdde3418366e6476c3ca), ROM_SKIP(1) | ROM_BIOS(1)) // Label: "SP8510106E5" @ E1
+	ROMX_LOAD("23-098e5.e15", 0x38001, 0x4000, CRC(3d8910e7) SHA1(01921e77b46c2d4845023605239c45ffa4a35872), ROM_SKIP(1) | ROM_BIOS(1)) // Label: "SP8510098E5" @ E15
 
-	/* the undumped 1.8 or 2.0 (beta?) version likely has roms:
+	/* the undumped 2.0 (beta?) version likely has roms:
 	23-091e5.e22, 23-092e5.e21, 23-093e5.e20, 23-094e5.e19,
 	23-099e5.e8, 23-100e5.e7, 23-101e5.e6, 23-102e5.e5
 	and shares the 23-103e5 thru 106e5, and 095e5 thru 098e5 roms with
 	the 2.0 version above
 	*/
 
+	ROM_SYSTEM_BIOS( 1, "v18", "DTC-01 Version 1.8")
+	ROMX_LOAD("23-063e5.e8", 0x00000, 0x4000, CRC(9f5ca045) SHA1(1b1b9c1e092c44329b385fb04001e13422eb8d39), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD("23-059e5.e22", 0x00001, 0x4000, CRC(b299cf64) SHA1(84bbe9ff303ea6ce7b1c0b1ad05421edd18fae49), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD("23-064e5.e7", 0x08000, 0x4000, CRC(e4ff20f4) SHA1(fdd91e4d2ef92608a08b2e78b6108e31ff53a1f9), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD("23-060e5.e21", 0x08001, 0x4000, CRC(213c65ba) SHA1(c95662d0d40499af01cdc23f05936762ab54081a), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD("23-065e5.e6", 0x10000, 0x4000, CRC(38ea0c75) SHA1(232b622cef6d69a493db1ed02e5236235c68daba), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD("23-061e5.e20", 0x10001, 0x4000, CRC(44f6fe5c) SHA1(81daa4abae273c7f0aead902b5c3c842f7e7f116), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD("23-066e5.e5", 0x18000, 0x4000, CRC(957aa8cf) SHA1(5f9f916b99867d1adbafd58d411feb630f6e4b6d), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD("23-062e5.e19", 0x18001, 0x4000, CRC(10ab969c) SHA1(46ee22a295b8709b6f829751aca5f92e4f459a9f), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD("23-032e5.e4", 0x20000, 0x4000, CRC(0f805e3a) SHA1(1d8008e30a448358224364fd8237dbb08907b219), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD("23-031e5.e18", 0x20001, 0x4000, CRC(846b5b68) SHA1(55c759b3fb927d2dfc9d77e8e080748866bea854), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD("23-034e5.e3", 0x28000, 0x4000, CRC(90700738) SHA1(738337c5b6acd3f30c3c4be2457370d2ce9313f9), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD("23-033e5.e17", 0x28001, 0x4000, CRC(48756a4d) SHA1(5946ccd367d88a484bb1549d0cc990b9b7d88f0c), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD("23-036e5.e2", 0x30000, 0x4000, CRC(5c2d4f73) SHA1(30f95e5383c4f71bc700346e2d49e8ad70b94c8c), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD("23-035e5.e16", 0x30001, 0x4000, CRC(80116443) SHA1(7b3b68e61b421dedaad88b5600c739943a316c9e), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD("23-038e5.e1", 0x38000, 0x4000, CRC(c840493f) SHA1(abd6af442690e981a9089f19febffc8f3fb52717), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD("23-037e5.e15", 0x38001, 0x4000, CRC(d62ab309) SHA1(a743a23625feadf6e46ef889e2bb04af88589992), ROM_SKIP(1) | ROM_BIOS(2))
+
 	ROM_REGION(0x2000,"dsp", 0)
-	// DECtalk DTC-01 'klsyn' tms32010 firmware v2.0?, both proms are 82s191 equivalent
+
+	// older firmware from firmware 1.8, overridden by the later firmware; this version (oldest one dumped so far) doesn't seem to work properly with the current semaphore/fifo implementation
+	ROM_LOAD16_BYTE("23-166f4.e70", 0x000, 0x800, CRC(2d036ffc) SHA1(e8c25ca092dde2dc0aec73921af806026bdfbbc3)) // HM1-76161-5
+	ROM_LOAD16_BYTE("23-165f4.e69", 0x001, 0x800, CRC(a3019ca4) SHA1(249f269c38f7f44edb6d025bcc867c8ca0de3e9c)) // HM1-76161-5
+	// NEWER/final? firmware from later 2.0 units, overridden by below; this firmware; I can't seem to get it working... Is this the same firmware as on the tms320P15 on the dtc-07?
+	ROM_LOAD16_BYTE("23-410f4.e70", 0x000, 0x800, CRC(121e2ec3) SHA1(3fabe018d0e0b478093951cb20501853358faa18))
+	ROM_LOAD16_BYTE("23-409f4.e69", 0x001, 0x800, CRC(61f67c79) SHA1(9a13426c92f879f2953f180f805990a91c37ac43))
+	// DECtalk DTC-01 'klsyn' tms32010 firmware v2.0?, both proms are 82s191 equivalent; this version seems to be the most robust in terms of loose fifo timing
 	ROM_LOAD16_BYTE("23-205f4.e70", 0x000, 0x800, CRC(ed76a3ad) SHA1(3136bae243ef48721e21c66fde70dab5fc3c21d0)) // Label: "LM8506205F4 // M1-76161-5" @ E70
 	ROM_LOAD16_BYTE("23-204f4.e69", 0x001, 0x800, CRC(79bb54ff) SHA1(9409f90f7a397b041e4440341f2d7934cb479285)) // Label: "LM8504204F4 // 78S191" @ E69
 
 	// TODO: load this as default if the nvram file is missing, OR get the setup page working enough that it can be saved properly to the chip from an NVR FAULT state!
+	// NOTE: this nvram image is ONLY VALID for v2.0; v1.8 expects a different image.
 	ROM_REGION(0x100,"nvram", 0) // default nvram image is at 0x1A7AE in main rom, read lsn first so 0x0005 in rom becomes 05 00 00 00 etc for all words of main rom
 	ROM_FILL(0x00, 0xff, 0x00) // blank it first;
 	ROM_FILL(0x00, 0x01, 0x05)
