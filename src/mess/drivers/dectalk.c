@@ -504,7 +504,7 @@ WRITE16_MEMBER(dectalk_state::m68k_infifo_w)// 68k write to the speech input fif
 	logerror("m68k: SPC infifo written with data = %04X, fifo head was: %02X; fifo tail: %02X\n",data, m_infifo_head_ptr, m_infifo_tail_ptr);
 #endif
 	// if fifo is full (head ptr = tail ptr-1), do not increment the head ptr and do not store the data
-	if (((m_infifo_tail_ptr-1)&0x1F) == m_infifo_head_ptr)
+	if (m_infifo_count == 32)
 	{
 #ifdef SPC_LOG_68K
 		logerror("infifo was full, write ignored!\n");
@@ -513,6 +513,7 @@ WRITE16_MEMBER(dectalk_state::m68k_infifo_w)// 68k write to the speech input fif
 	}
 	m_infifo[m_infifo_head_ptr] = data;
 	m_infifo_head_ptr++;
+	m_infifo_count++;
 	m_infifo_head_ptr&=0x1F;
 }
 
@@ -693,8 +694,11 @@ READ16_MEMBER(dectalk_state::spc_infifo_data_r)
 	logerror("dsp: SPC infifo read with data = %04X, fifo head: %02X; fifo tail was: %02X\n",data, m_infifo_head_ptr, m_infifo_tail_ptr);
 #endif
 	// if fifo is empty (tail ptr == head ptr), do not increment the tail ptr, otherwise do.
-	if (m_infifo_tail_ptr != m_infifo_head_ptr) m_infifo_tail_ptr++; // technically correct but doesn't match sn74ls224 sheet
-	//if (((m_infifo_head_ptr-1)&0x1F) != m_infifo_tail_ptr) m_infifo_tail_ptr++; // matches sn74ls224 sheet
+	if (m_infifo_count > 0)
+	{
+		m_infifo_tail_ptr++; 
+		m_infifo_count--;
+	}
 	m_infifo_tail_ptr&=0x1F;
 	return data;
 }
@@ -944,11 +948,7 @@ ROM_START( dectalk )
 	ROMX_LOAD("23-037e5.e15", 0x38001, 0x4000, CRC(d62ab309) SHA1(a743a23625feadf6e46ef889e2bb04af88589992), ROM_SKIP(1) | ROM_BIOS(2))
 
 	ROM_REGION(0x2000,"dsp", 0)
-
-	// older firmware from firmware 1.8, overridden by the later firmware; this version (oldest one dumped so far) doesn't seem to work properly with the current semaphore/fifo implementation
-	ROM_LOAD16_BYTE("23-166f4.e70", 0x000, 0x800, CRC(2d036ffc) SHA1(e8c25ca092dde2dc0aec73921af806026bdfbbc3)) // HM1-76161-5
-	ROM_LOAD16_BYTE("23-165f4.e69", 0x001, 0x800, CRC(a3019ca4) SHA1(249f269c38f7f44edb6d025bcc867c8ca0de3e9c)) // HM1-76161-5
-	// NEWER/final? firmware from later 2.0 units; this firmware DOES WORK.
+	// NEWER/final? firmware 'later 2.0'; this firmware DOES WORK.
 	// this firmware seems to have some leftover test garbage mapped into its space, which is not present on the dtc-01 board
 	// it writes 0x0000 to 0x90 on start
 	// it writes a sequence of values to 0xFF down to 0xE9
@@ -956,9 +956,12 @@ ROM_START( dectalk )
 	// Is this the same firmware as on the tms320P15 on the dtc-07 or a backported variant of such?
 	ROM_LOAD16_BYTE("23-410f4.e70", 0x000, 0x800, CRC(121e2ec3) SHA1(3fabe018d0e0b478093951cb20501853358faa18))
 	ROM_LOAD16_BYTE("23-409f4.e69", 0x001, 0x800, CRC(61f67c79) SHA1(9a13426c92f879f2953f180f805990a91c37ac43))
-	// DECtalk DTC-01 'klsyn' tms32010 firmware v2.0?, both proms are 82s191 equivalent; this firmware DOES WORK.
+	// DECtalk DTC-01 'klsyn' tms32010 firmware 'earlier 2.0', both proms are 82s191 equivalent; this firmware DOES WORK.
 	ROM_LOAD16_BYTE("23-205f4.e70", 0x000, 0x800, CRC(ed76a3ad) SHA1(3136bae243ef48721e21c66fde70dab5fc3c21d0)) // Label: "LM8506205F4 // M1-76161-5" @ E70
 	ROM_LOAD16_BYTE("23-204f4.e69", 0x001, 0x800, CRC(79bb54ff) SHA1(9409f90f7a397b041e4440341f2d7934cb479285)) // Label: "LM8504204F4 // 78S191" @ E69
+	// older dsp firmware from dectalk firmware 1.8; this firmware DOES WORK, and even works with 2.0 dectalk firmware! its a bit quiter than the others, though.
+	ROM_LOAD16_BYTE("23-166f4.e70", 0x000, 0x800, CRC(2d036ffc) SHA1(e8c25ca092dde2dc0aec73921af806026bdfbbc3)) // HM1-76161-5
+	ROM_LOAD16_BYTE("23-165f4.e69", 0x001, 0x800, CRC(a3019ca4) SHA1(249f269c38f7f44edb6d025bcc867c8ca0de3e9c)) // HM1-76161-5
 
 	// TODO: load this as default if the nvram file is missing, OR get the setup page working enough that it can be saved properly to the chip from an NVR FAULT state!
 	// NOTE: this nvram image is ONLY VALID for v2.0; v1.8 expects a different image.
