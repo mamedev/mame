@@ -167,7 +167,7 @@ public:
 		dev = net_create_device_by_name(dev_type, &m_setup, devname);
 		m_setup.register_dev(dev);
 		skipws();
-		VERBOSE_OUT(("Parser: IC: %s\n", n));
+		VERBOSE_OUT(("Parser: IC: %s\n", devname));
 		cnt = 0;
 		while (*m_p != ')')
 		{
@@ -307,9 +307,9 @@ public:
 	ATTR_HOT void update()
 	{
 		if (m_I.Q_Analog() > m_I.m_high_thresh_V)
-			m_Q.setToPS(1, NLTIME_FROM_NS(1));
+			m_Q.setTo(1, NLTIME_FROM_NS(1));
 		else if (m_I.Q_Analog() < m_I.m_low_thresh_V)
-			m_Q.setToPS(0, NLTIME_FROM_NS(1));
+			m_Q.setTo(0, NLTIME_FROM_NS(1));
 	}
 
 	ATTR_COLD void start()
@@ -340,7 +340,7 @@ NETLIB_UPDATE(netdev_ttl_const)
 
 NETLIB_UPDATE_PARAM(netdev_ttl_const)
 {
-	m_Q.setToPS(m_const.ValueInt(), NLTIME_IMMEDIATE);
+	m_Q.setTo(m_const.ValueInt(), NLTIME_IMMEDIATE);
 }
 
 NETLIB_START(netdev_analog_const)
@@ -382,28 +382,66 @@ void netlist_base_t::set_clock_freq(UINT64 clockfreq)
 
 ATTR_HOT ATTR_ALIGN void netlist_base_t::process_list(INT32 &atime)
 {
-	while ( (atime > 0) && (m_queue.is_not_empty()))
+	if (m_mainclock == NULL)
 	{
-		queue_t::entry_t e = m_queue.pop();
-		netlist_time delta = e.time() - m_time_ps + netlist_time::from_raw(m_rem);
+		while ( (atime > 0) && (m_queue.is_not_empty()))
+		{
+			queue_t::entry_t &e = m_queue.pop();
+			const netlist_time delta = e.time() - m_time_ps + netlist_time::from_raw(m_rem);
 
-		atime -= divu_64x32_rem(delta.as_raw(), m_div, &m_rem);
-		m_time_ps = e.time();
+			atime -= divu_64x32_rem(delta.as_raw(), m_div, &m_rem);
+			m_time_ps = e.time();
 
-		e.object()->update_devs();
+			e.object()->update_devs();
 
-		add_to_stat(m_perf_out_processed, 1);
-		add_to_stat(m_perf_list_len, m_end);
+			add_to_stat(m_perf_out_processed, 1);
+		}
+
+		if (atime > 0)
+		{
+			m_time_ps += netlist_time::from_raw(atime * m_div);
+			atime = 0;
+		}
+	} else {
+		net_output_t &mainclock_Q = m_mainclock->m_Q;
+		while (atime > 0)
+		{
+			if (m_queue.is_not_empty())
+			{
+				while (m_queue.peek().time() > mainclock_Q.time())
+				{
+					const netlist_time delta = mainclock_Q.time() - m_time_ps + netlist_time::from_raw(m_rem);
+					atime -= divu_64x32_rem(delta.as_raw(), m_div, &m_rem);
+					m_time_ps = mainclock_Q.time();
+					m_mainclock->update();
+					mainclock_Q.update_devs();
+				}
+				queue_t::entry_t &e = m_queue.pop();
+
+				const netlist_time delta = e.time() - m_time_ps + netlist_time::from_raw(m_rem);
+				atime -= divu_64x32_rem(delta.as_raw(), m_div, &m_rem);
+				m_time_ps = e.time();
+
+				e.object()->update_devs();
+			} else {
+				const netlist_time delta = mainclock_Q.time() - m_time_ps + netlist_time::from_raw(m_rem);
+				atime -= divu_64x32_rem(delta.as_raw(), m_div, &m_rem);
+				m_time_ps = mainclock_Q.time();
+				m_mainclock->update();
+				mainclock_Q.update_devs();
+			}
+
+			add_to_stat(m_perf_out_processed, 1);
+		}
+
+		if (atime > 0)
+		{
+			m_time_ps += netlist_time::from_raw(atime * m_div);
+			atime = 0;
+		}
 	}
-
-	if (atime > 0)
-	{
-		m_time_ps += netlist_time::from_raw(atime * m_div);
-		atime = 0;
-	}
-
-	if (KEEP_STATISTICS)
-		printf("%f\n", (double) m_perf_list_len / (double) m_perf_out_processed);
+	//if (KEEP_STATISTICS)
+	//	printf("%d\n", m_perf_out_processed);
 }
 
 // ----------------------------------------------------------------------------------------
@@ -610,6 +648,16 @@ void netlist_setup_t::resolve_inputs(void)
 		entry->object()->netdev().update_param();
 	}
 
+	/* find the main clock ... */
+	for (tagmap_devices_t::entry_t *entry = m_devices.first(); entry != NULL; entry = m_devices.next(entry))
+	{
+		net_device_t *dev = entry->object();
+		if (dynamic_cast<netdev_mainclock*>(dev) != NULL)
+		{
+			m_netlist.m_mainclock = dynamic_cast<netdev_mainclock*>(dev);
+		}
+	}
+
 	/* make sure all outputs are triggered once */
 	for (tagmap_output_t::entry_t *entry = m_outputs.first(); entry != NULL; entry = m_outputs.next(entry))
 	{
@@ -656,9 +704,6 @@ ATTR_COLD void net_core_device_t::init_core(netlist_base_t *anetlist, const char
 {
 	m_netlist = anetlist;
 	m_name = name;
-#if USE_DELEGATES_A
-	h = net_update_delegate(&net_core_device_t::update, "update", this);
-#endif
 }
 
 
@@ -777,18 +822,18 @@ ATTR_COLD void net_output_t::set_netdev(const net_core_device_t *dev)
 	m_netlist = dev->netlist();
 }
 
-static inline void update_dev(const net_input_t *inp, const UINT32 mask)
+ATTR_HOT inline void net_output_t::update_dev(const net_input_t &inp, const UINT32 mask)
 {
-	if ((inp->state() & mask) != 0)
+	if ((inp.state() & mask) != 0)
 	{
-		begin_timing(inp->netdev()->total_time);
-		inc_stat(inp->netdev()->stat_count);
+		begin_timing(inp.netdev()->total_time);
+		inc_stat(inp.netdev()->stat_count);
 #if USE_DELEGATES
-		inp->h();
+		inp.h();
 #else
-		inp->netdev()->update_device();
+		inp.netdev()->update();
 #endif
-		end_timing(inp->netdev()->total_time);
+		end_timing(inp.netdev()->total_time);
 	}
 }
 
@@ -804,15 +849,16 @@ ATTR_HOT inline void net_output_t::update_devs()
 	switch (m_num_cons)
 	{
 	case 2:
-		update_dev(m_cons[1], mask);
+		update_dev(*m_cons[1], mask);
 	case 1:
-		update_dev(m_cons[0], mask);
+		update_dev(*m_cons[0], mask);
 		break;
 	default:
 		{
 			for (int i=0; i < m_num_cons; i++)
-				update_dev(m_cons[i], mask);
+				update_dev(*m_cons[i], mask);
 		}
+		break;
 	case 0:
 		break;
 	}
@@ -834,7 +880,7 @@ ATTR_COLD  void net_output_t::update_devs_force()
 #if USE_DELEGATES
 			(*s)->h();
 #else
-			(*s)->netdev()->update_device();
+			(*s)->netdev()->update();
 #endif
 		s++;
 	}
@@ -915,7 +961,6 @@ void netlist_mame_device::device_start()
 
 	m_setup->resolve_inputs();
 
-	//save_item(NAME(m_clockcnt));
 	save_state();
 	/* TODO: we have to save the round robin queue as well */
 

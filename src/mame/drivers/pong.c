@@ -55,7 +55,7 @@ TODO:
 #define VBSTART                 (V_TOTAL)
 #define VBEND                   (16)
 
-#define HRES_MULT                   (1)
+#define HRES_MULT                   (2)
 
 enum input_changed_enum
 {
@@ -70,7 +70,7 @@ enum input_changed_enum
 static NETLIST_START(pong_schematics)
 	NETDEV_TTL_CONST(high, 1)
 	NETDEV_TTL_CONST(low, 0)
-	NETDEV_CLOCK(clk)
+	NETDEV_MAINCLOCK(clk)
 	NETDEV_PARAM(clk.FREQ, 7159000.0)
 	NETDEV_LOGIC_INPUT(SRST)
 	NETDEV_ANALOG_INPUT(P1)
@@ -287,7 +287,7 @@ static NETLIST_START(pong_schematics)
 	NE555N_MSTABLE(ic_b9, 256VQ, P1)
 	NETDEV_PARAM(ic_b9.R, RES_K(90))
 	NETDEV_PARAM(ic_b9.C, CAP_U(.1))
-	NETDEV_PARAM(ic_b9.VL, 0.7)
+	NETDEV_PARAM(ic_b9.VL, 0.5)			// 1N914
 	TTL_7404_INVERT(ic_c9b, ic_b9.Q)
 	TTL_7400_NAND(ic_b7b, ic_a7b.Q, hsyncQ)
 	TTL_7493(ic_b8, ic_b7b.Q, ic_b8.QA, ic_b9.Q, ic_b9.Q)
@@ -304,7 +304,7 @@ static NETLIST_START(pong_schematics)
 	NE555N_MSTABLE(ic_a9, 256VQ, P2)
 	NETDEV_PARAM(ic_a9.R, RES_K(90))
 	NETDEV_PARAM(ic_a9.C, CAP_U(.1))
-	NETDEV_PARAM(ic_a9.VL, 0.7)
+	NETDEV_PARAM(ic_a9.VL, 0.5)			// 1N914
 	TTL_7404_INVERT(ic_c9a, ic_a9.Q)
 	TTL_7400_NAND(ic_b7c, ic_a7a.Q, hsyncQ)
 	TTL_7493(ic_a8, ic_b7c.Q, ic_a8.QA, ic_a9.Q, ic_a9.Q)
@@ -558,6 +558,7 @@ private:
 			}
 			else if (time >= hsync_min_time)
 			{
+				//printf("%d\n", m_last_x);
 				m_last_x = 0; // hsync
 				m_last_y++;
 				m_line_clock = clocks;
@@ -608,6 +609,7 @@ INPUT_CHANGED_MEMBER(pong_state::input_changed)
 {
 	static const double NE555_R = RES_K(5);
 	static const double PRE_R = RES_R(470);
+	static const double POT_R = RES_K(1);
 
 	double pad;
 	int numpad = (FPTR) (param);
@@ -620,8 +622,9 @@ INPUT_CHANGED_MEMBER(pong_state::input_changed)
 		// http://ion.chem.usu.edu/~sbialkow/Classes/564/Thevenin/Thevenin.html
 
 		double fac = (double) newval / (double) 256;
-		double R1 = fac * RES_K(10);
-		double R3 = (1.0 - fac) * RES_K(10);
+		fac = (exp(fac) - 1.0) / (exp(1.0) -1.0) ;
+		double R1 = fac * POT_R;
+		double R3 = (1.0 - fac) * POT_R;
 		double vA = 5.0 * R3 / (R3 + R1);
 		double vB = 5.0 * 2 * NE555_R / (2 * NE555_R + NE555_R);
 		double Req = RES_2_PARALLEL(R1, R3) + RES_2_PARALLEL(NE555_R, 2.0 * NE555_R);
@@ -631,6 +634,7 @@ INPUT_CHANGED_MEMBER(pong_state::input_changed)
 		case IC_PADDLE1:    m_p_V0->setToPS(pad, NLTIME_FROM_NS(0)); break;
 		case IC_PADDLE2:    m_p_V1->setToPS(pad, NLTIME_FROM_NS(0)); break;
 		}
+		printf("%d %f\n", newval, (float) pad);
 		break;
 	}
 	case IC_SWITCH:
@@ -638,7 +642,7 @@ INPUT_CHANGED_MEMBER(pong_state::input_changed)
 		m_sw1b->setTo(newval ? 1 : 0);
 		break;
 	case IC_COIN:
-		m_srst->setToPS(newval & 1, NLTIME_FROM_US(500));
+		m_srst->setTo(newval & 1, NLTIME_FROM_US(500));
 		break;
 	case IC_VR1:
 	case IC_VR2:

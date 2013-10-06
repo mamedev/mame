@@ -54,6 +54,8 @@
 // Special chips
 // ----------------------------------------------------------------------------------------
 
+#define NETDEV_MAINCLOCK(_name)                                                         \
+		NET_REGISTER_DEV(netdev_mainclock, _name)
 #define NETDEV_CLOCK(_name)                                                         \
 		NET_REGISTER_DEV(netdev_clock, _name)
 #define NETDEV_LOGIC_INPUT(_name)                                                   \
@@ -432,10 +434,7 @@ NETLIB_DEVICE(nic7490,
 
 	UINT8 m_cnt;
 
-	ttl_output_t m_QA;
-	ttl_output_t m_QB;
-	ttl_output_t m_QC;
-	ttl_output_t m_QD;
+	ttl_output_t m_Q[4];
 );
 
 /* ripple-carry counter on low-high clock transition */

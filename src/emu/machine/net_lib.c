@@ -84,7 +84,7 @@ NETLIB_UPDATE_PARAM(netdev_clock)
 
 NETLIB_UPDATE(netdev_clock)
 {
-	m_Q.setToNoCheckPS(!m_Q.new_Q(), m_inc  );
+	m_Q.setToNoCheck(!m_Q.new_Q(), m_inc  );
 }
 
 NETLIB_START(nicMultiSwitch)
@@ -282,9 +282,9 @@ NETLIB_START(nic7404)
 
 NETLIB_UPDATE(nic7404)
 {
-	static netlist_time delay[2] = { NLTIME_FROM_NS(15), NLTIME_FROM_NS(22) };
+	static const netlist_time delay[2] = { NLTIME_FROM_NS(15), NLTIME_FROM_NS(22) };
 	UINT8 t = (INPVAL(m_I)) ^ 1;
-	m_Q.setToPS(t, delay[t]);
+	m_Q.setTo(t, delay[t]);
 }
 
 NETLIB_START(nic7486)
@@ -296,9 +296,9 @@ NETLIB_START(nic7486)
 
 NETLIB_UPDATE(nic7486)
 {
-	static netlist_time delay[2] = { NLTIME_FROM_NS(15), NLTIME_FROM_NS(22) };
+	static const netlist_time delay[2] = { NLTIME_FROM_NS(15), NLTIME_FROM_NS(22) };
 	UINT8 t = INPVAL(m_I0) ^ INPVAL(m_I1);
-	m_Q.setToPS(t, delay[t]);
+	m_Q.setTo(t, delay[t]);
 }
 
 NETLIB_START(nic7448)
@@ -335,13 +335,13 @@ NETLIB_UPDATE(nic7448)
 	assert(v<16);
 	if (v != m_state)
 	{
-		m_a.setToPS(tab7448[v][0], NLTIME_FROM_NS(100));
-		m_b.setToPS(tab7448[v][1], NLTIME_FROM_NS(100));
-		m_c.setToPS(tab7448[v][2], NLTIME_FROM_NS(100));
-		m_d.setToPS(tab7448[v][3], NLTIME_FROM_NS(100));
-		m_e.setToPS(tab7448[v][4], NLTIME_FROM_NS(100));
-		m_f.setToPS(tab7448[v][5], NLTIME_FROM_NS(100));
-		m_g.setToPS(tab7448[v][6], NLTIME_FROM_NS(100));
+		m_a.setTo(tab7448[v][0], NLTIME_FROM_NS(100));
+		m_b.setTo(tab7448[v][1], NLTIME_FROM_NS(100));
+		m_c.setTo(tab7448[v][2], NLTIME_FROM_NS(100));
+		m_d.setTo(tab7448[v][3], NLTIME_FROM_NS(100));
+		m_e.setTo(tab7448[v][4], NLTIME_FROM_NS(100));
+		m_f.setTo(tab7448[v][5], NLTIME_FROM_NS(100));
+		m_g.setTo(tab7448[v][6], NLTIME_FROM_NS(100));
 		m_state = v;
 	}
 }
@@ -380,15 +380,15 @@ NETLIB_UPDATE(nic7450)
 	UINT8 t1 = INPVAL(m_I0) & INPVAL(m_I1);
 	UINT8 t2 = INPVAL(m_I2) & INPVAL(m_I3);
 	UINT8 t =  (t1 | t2) ^ 1;
-	m_Q.setToPS(t, t ? NLTIME_FROM_NS(22) : NLTIME_FROM_NS(15));
+	m_Q.setTo(t, t ? NLTIME_FROM_NS(22) : NLTIME_FROM_NS(15));
 }
 
-INLINE void nic7474_newstate(UINT8 state, ttl_output_t &Q, ttl_output_t &QQ)
+INLINE void nic7474_newstate(const UINT8 state, ttl_output_t &Q, ttl_output_t &QQ)
 {
-	static netlist_time delay[2] = { NLTIME_FROM_NS(25), NLTIME_FROM_NS(40) };
+	static const netlist_time delay[2] = { NLTIME_FROM_NS(25), NLTIME_FROM_NS(40) };
 	//printf("%s %d %d %d\n", "7474", state, Q.Q(), QQ.Q());
-	Q.setToPS(state, delay[state]);
-	QQ.setToPS(!state, delay[!state]);
+	Q.setTo(state, delay[state]);
+	QQ.setTo(!state, delay[!state]);
 }
 
 #if 0
@@ -499,11 +499,11 @@ NETLIB_UPDATE(nic7483)
 	if (r != m_lastr)
 	{
 		m_lastr = r;
-		m_SA.setToPS((r >> 0) & 1, NLTIME_FROM_NS(23));
-		m_SB.setToPS((r >> 1) & 1, NLTIME_FROM_NS(23));
-		m_SC.setToPS((r >> 2) & 1, NLTIME_FROM_NS(23));
-		m_SD.setToPS((r >> 3) & 1, NLTIME_FROM_NS(23));
-		m_CO.setToPS((r >> 4) & 1, NLTIME_FROM_NS(23));
+		m_SA.setTo((r >> 0) & 1, NLTIME_FROM_NS(23));
+		m_SB.setTo((r >> 1) & 1, NLTIME_FROM_NS(23));
+		m_SC.setTo((r >> 2) & 1, NLTIME_FROM_NS(23));
+		m_SD.setTo((r >> 3) & 1, NLTIME_FROM_NS(23));
+		m_CO.setTo((r >> 4) & 1, NLTIME_FROM_NS(23));
 	}
 }
 
@@ -546,17 +546,17 @@ NETLIB_UPDATE(nic7490)
 #if 0
 NETLIB_FUNC_VOID(nic7490, update_outputs)
 {
-	m_QA.setToPS((m_cnt >> 0) & 1, NLTIME_FROM_NS(18));
-	m_QB.setToPS((m_cnt >> 1) & 1, NLTIME_FROM_NS(36));
-	m_QC.setToPS((m_cnt >> 2) & 1, NLTIME_FROM_NS(54));
-	m_QD.setToPS((m_cnt >> 3) & 1, NLTIME_FROM_NS(72));
+	m_QA.setTo((m_cnt >> 0) & 1, NLTIME_FROM_NS(18));
+	m_QB.setTo((m_cnt >> 1) & 1, NLTIME_FROM_NS(36));
+	m_QC.setTo((m_cnt >> 2) & 1, NLTIME_FROM_NS(54));
+	m_QD.setTo((m_cnt >> 3) & 1, NLTIME_FROM_NS(72));
 }
 #else
 NETLIB_FUNC_VOID(nic7490, update_outputs)
 {
-	static netlist_time delay[4] = { NLTIME_FROM_NS(18), NLTIME_FROM_NS(36), NLTIME_FROM_NS(54), NLTIME_FROM_NS(72) };
+	static const netlist_time delay[4] = { NLTIME_FROM_NS(18), NLTIME_FROM_NS(36), NLTIME_FROM_NS(54), NLTIME_FROM_NS(72) };
 	for (int i=0; i<4; i++)
-		m_Q[i].setToPS((m_cnt >> i) & 1, delay[i]);
+		m_Q[i].setTo((m_cnt >> i) & 1, delay[i]);
 
 		//m_QA.setToPS((m_cnt >> 0) & 1, delay[0]);
 		//m_QB.setToPS((m_cnt >> 1) & 1, delay[1]);
@@ -591,7 +591,7 @@ NETLIB_START(nic7493)
 NETLIB_UPDATE(nic7493ff)
 {
 	//if INP_LAST(m_I) && !INP(m_I))
-		m_Q.setToNoCheckPS(!m_Q.new_Q(), NLTIME_FROM_NS(18));
+		m_Q.setToNoCheck(!m_Q.new_Q(), NLTIME_FROM_NS(18));
 }
 
 NETLIB_UPDATE(nic7493)
@@ -605,10 +605,10 @@ NETLIB_UPDATE(nic7493)
 		B.m_I.inactivate();
 		C.m_I.inactivate();
 		D.m_I.inactivate();
-		A.m_Q.setToPS(0, NLTIME_FROM_NS(40));
-		B.m_Q.setToPS(0, NLTIME_FROM_NS(40));
-		C.m_Q.setToPS(0, NLTIME_FROM_NS(40));
-		D.m_Q.setToPS(0, NLTIME_FROM_NS(40));
+		A.m_Q.setTo(0, NLTIME_FROM_NS(40));
+		B.m_Q.setTo(0, NLTIME_FROM_NS(40));
+		C.m_Q.setTo(0, NLTIME_FROM_NS(40));
+		D.m_Q.setTo(0, NLTIME_FROM_NS(40));
 	}
 	else
 	{
@@ -646,10 +646,10 @@ NETLIB_UPDATE(nic7493)
 		if (m_cnt > 0)
 		{
 			m_cnt = 0;
-			m_QA.setToPS(0, 40000);
-			m_QB.setToPS(0, 40000);
-			m_QC.setToPS(0, 40000);
-			m_QD.setToPS(0, 40000);
+			m_QA.setTo(0, 40000);
+			m_QB.setTo(0, 40000);
+			m_QC.setTo(0, 40000);
+			m_QD.setTo(0, 40000);
 		}
 	}
 	//else if (old_clk & !m_lastclk)
@@ -664,32 +664,32 @@ NETLIB_UPDATE(nic7493)
 NETLIB_FUNC_VOID(nic7493, update_outputs)
 {
 	if (m_cnt & 1)
-		m_QA.setToNoCheckPS(1, 16000);
+		m_QA.setToNoCheck(1, 16000);
 	else
 	{
-		m_QA.setToNoCheckPS(0, 16000);
+		m_QA.setToNoCheck(0, 16000);
 		switch (m_cnt)
 		{
 		case 0x00:
-			m_QB.setToNoCheckPS(0, 34000);
-			m_QC.setToNoCheckPS(0, 48000);
-			m_QD.setToNoCheckPS(0, 70000);
+			m_QB.setToNoCheck(0, 34000);
+			m_QC.setToNoCheck(0, 48000);
+			m_QD.setToNoCheck(0, 70000);
 			break;
 		case 0x02:
 		case 0x06:
 		case 0x0A:
 		case 0x0E:
-			m_QB.setToNoCheckPS(1, 34000);
+			m_QB.setToNoCheck(1, 34000);
 			break;
 		case 0x04:
 		case 0x0C:
-			m_QB.setToNoCheckPS(0, 34000);
-			m_QC.setToNoCheckPS(1, 48000);
+			m_QB.setToNoCheck(0, 34000);
+			m_QC.setToNoCheck(1, 48000);
 			break;
 		case 0x08:
-			m_QB.setToNoCheckPS(0, 34000);
-			m_QC.setToNoCheckPS(0, 48000);
-			m_QD.setToNoCheckPS(1, 70000);
+			m_QB.setToNoCheck(0, 34000);
+			m_QC.setToNoCheck(0, 48000);
+			m_QD.setToNoCheck(1, 70000);
 			break;
 		}
 	}
@@ -717,13 +717,13 @@ INLINE void nic74107A_newstate(UINT8 state, ttl_output_t &Q, ttl_output_t &QQ)
 	{
 		if (state)
 		{
-			Q.setToNoCheckPS(1, NLTIME_FROM_NS(40));
-			QQ.setToNoCheckPS(0, NLTIME_FROM_NS(25));
+			Q.setToNoCheck(1, NLTIME_FROM_NS(40));
+			QQ.setToNoCheck(0, NLTIME_FROM_NS(25));
 		}
 		else
 		{
-			Q.setToNoCheckPS(0, NLTIME_FROM_NS(25));
-			QQ.setToNoCheckPS(1, NLTIME_FROM_NS(40));
+			Q.setToNoCheck(0, NLTIME_FROM_NS(25));
+			QQ.setToNoCheck(1, NLTIME_FROM_NS(40));
 		}
 	}
 }
@@ -793,11 +793,11 @@ NETLIB_UPDATE(nic74153)
 	{
 		UINT8 chan = (INPVAL(m_A) | (INPVAL(m_B)<<1));
 		UINT8 t = INPVAL(m_I[chan]);
-		m_AY.setToPS(t, t ? NLTIME_FROM_NS(18) : NLTIME_FROM_NS(23)); /* data to y only, FIXME */
+		m_AY.setTo(t, t ? NLTIME_FROM_NS(18) : NLTIME_FROM_NS(23)); /* data to y only, FIXME */
 	}
 	else
 	{
-		m_AY.setToPS(0, NLTIME_FROM_NS(23));
+		m_AY.setTo(0, NLTIME_FROM_NS(23));
 	}
 }
 
@@ -833,13 +833,13 @@ NETLIB_UPDATE(nic9316sub)
 		{
 			m_cnt = ( m_cnt + 1) & 0x0f;
 			update_outputs();
-			m_RC.setToPS(m_cnt == 0x0f, NLTIME_FROM_NS(20));
+			m_RC.setTo(m_cnt == 0x0f, NLTIME_FROM_NS(20));
 		}
 		else
 		{
 			m_cnt = (INPVAL_PASSIVE(m_D) << 3) | (INPVAL_PASSIVE(m_C) << 2) | (INPVAL_PASSIVE(m_B) << 1) | (INPVAL_PASSIVE(m_A) << 0);
 			update_outputs_all();
-			m_RC.setToPS(INPVAL(m_ENT) & (m_cnt == 0x0f), NLTIME_FROM_NS(20));
+			m_RC.setTo(INPVAL(m_ENT) & (m_cnt == 0x0f), NLTIME_FROM_NS(20));
 		}
 	}
 }
@@ -855,55 +855,55 @@ NETLIB_UPDATE(nic9316)
 		{
 			sub.m_cnt = 0;
 			sub.update_outputs();
-			sub.m_RC.setToPS(0, NLTIME_FROM_NS(20));
+			sub.m_RC.setTo(0, NLTIME_FROM_NS(20));
 		}
 	}
-	sub.m_RC.setToPS(INPVAL(sub.m_ENT) & (sub.m_cnt == 0x0f), NLTIME_FROM_NS(20));
+	sub.m_RC.setTo(INPVAL(sub.m_ENT) & (sub.m_cnt == 0x0f), NLTIME_FROM_NS(20));
 }
 
 NETLIB_FUNC_VOID(nic9316sub, update_outputs_all)
 {
-	m_QA.setToPS((m_cnt >> 0) & 1, NLTIME_FROM_NS(20));
-	m_QB.setToPS((m_cnt >> 1) & 1, NLTIME_FROM_NS(20));
-	m_QC.setToPS((m_cnt >> 2) & 1, NLTIME_FROM_NS(20));
-	m_QD.setToPS((m_cnt >> 3) & 1, NLTIME_FROM_NS(20));
+	m_QA.setTo((m_cnt >> 0) & 1, NLTIME_FROM_NS(20));
+	m_QB.setTo((m_cnt >> 1) & 1, NLTIME_FROM_NS(20));
+	m_QC.setTo((m_cnt >> 2) & 1, NLTIME_FROM_NS(20));
+	m_QD.setTo((m_cnt >> 3) & 1, NLTIME_FROM_NS(20));
 }
 
 NETLIB_FUNC_VOID(nic9316sub, update_outputs)
 {
-#if 0
-	m_QA.setTo((m_cnt >> 0) & 1, 20);
-	m_QB.setTo((m_cnt >> 1) & 1, 20);
-	m_QC.setTo((m_cnt >> 2) & 1, 20);
-	m_QD.setTo((m_cnt >> 3) & 1, 20);
+#if 1
+	m_QA.setTo((m_cnt >> 0) & 1, NLTIME_FROM_NS(20));
+	m_QB.setTo((m_cnt >> 1) & 1, NLTIME_FROM_NS(20));
+	m_QC.setTo((m_cnt >> 2) & 1, NLTIME_FROM_NS(20));
+	m_QD.setTo((m_cnt >> 3) & 1, NLTIME_FROM_NS(20));
 #else
 	if ((m_cnt & 1) == 1)
-		m_QA.setToNoCheckPS(1, NLTIME_FROM_NS(20));
+		m_QA.setToNoCheck(1, NLTIME_FROM_NS(20));
 	else
 	{
-		m_QA.setToNoCheckPS(0, NLTIME_FROM_NS(20));
+		m_QA.setToNoCheck(0, NLTIME_FROM_NS(20));
 		switch (m_cnt)
 		{
 		case 0x00:
-			m_QB.setToNoCheckPS(0, NLTIME_FROM_NS(20));
-			m_QC.setToNoCheckPS(0, NLTIME_FROM_NS(20));
-			m_QD.setToNoCheckPS(0, NLTIME_FROM_NS(20));
+			m_QB.setToNoCheck(0, NLTIME_FROM_NS(20));
+			m_QC.setToNoCheck(0, NLTIME_FROM_NS(20));
+			m_QD.setToNoCheck(0, NLTIME_FROM_NS(20));
 			break;
 		case 0x02:
 		case 0x06:
 		case 0x0A:
 		case 0x0E:
-			m_QB.setToNoCheckPS(1, NLTIME_FROM_NS(20));
+			m_QB.setToNoCheck(1, NLTIME_FROM_NS(20));
 			break;
 		case 0x04:
 		case 0x0C:
-			m_QB.setToNoCheckPS(0, NLTIME_FROM_NS(20));
-			m_QC.setToNoCheckPS(1, NLTIME_FROM_NS(20));
+			m_QB.setToNoCheck(0, NLTIME_FROM_NS(20));
+			m_QC.setToNoCheck(1, NLTIME_FROM_NS(20));
 			break;
 		case 0x08:
-			m_QB.setToNoCheckPS(0, NLTIME_FROM_NS(20));
-			m_QC.setToNoCheckPS(0, NLTIME_FROM_NS(20));
-			m_QD.setToNoCheckPS(1, NLTIME_FROM_NS(20));
+			m_QB.setToNoCheck(0, NLTIME_FROM_NS(20));
+			m_QC.setToNoCheck(0, NLTIME_FROM_NS(20));
+			m_QD.setToNoCheck(1, NLTIME_FROM_NS(20));
 			break;
 		}
 
@@ -913,13 +913,14 @@ NETLIB_FUNC_VOID(nic9316sub, update_outputs)
 
 #define ENTRY(_nic, _name) new net_device_t_factory< _nic >( # _name, # _nic ),
 
-static net_device_t_base_factory *netregistry[] =
+static const net_device_t_base_factory *netregistry[] =
 {
 	ENTRY(netdev_ttl_const,     NETDEV_TTL_CONST)
 	ENTRY(netdev_analog_const,  NETDEV_ANALOG_CONST)
 	ENTRY(netdev_logic_input,   NETDEV_LOGIC_INPUT)
 	ENTRY(netdev_analog_input,  NETDEV_ANALOG_INPUT)
 	ENTRY(netdev_clock,         NETDEV_CLOCK)
+	ENTRY(netdev_mainclock,     NETDEV_MAINCLOCK)
 	ENTRY(netdev_callback,      NETDEV_CALLBACK)
 	ENTRY(nicMultiSwitch,       NETDEV_SWITCH2)
 	ENTRY(nicRSFF,              NETDEV_RSFF)
@@ -949,7 +950,7 @@ static net_device_t_base_factory *netregistry[] =
 
 net_device_t *net_create_device_by_classname(const char *classname, netlist_setup_t *setup, const char *icname)
 {
-	net_device_t_base_factory **p = &netregistry[0];
+	const net_device_t_base_factory **p = &netregistry[0];
 	while (p != NULL)
 	{
 		if (strcmp((*p)->classname(), classname) == 0)
@@ -961,7 +962,7 @@ net_device_t *net_create_device_by_classname(const char *classname, netlist_setu
 
 net_device_t *net_create_device_by_name(const char *name, netlist_setup_t *setup, const char *icname)
 {
-	net_device_t_base_factory **p = &netregistry[0];
+	const net_device_t_base_factory **p = &netregistry[0];
 	while (p != NULL)
 	{
 		if (strcmp((*p)->name(), name) == 0)
