@@ -1183,12 +1183,12 @@ void psxcpu_device::multiplier_update()
 		break;
 
 	case MULTIPLIER_OPERATION_DIV:
-		if( m_multiplier_operand2 != 0 )
+		if( m_multiplier_operand1 == 0x80000000 && m_multiplier_operand2 == 0xffffffff)
 		{
-			m_lo = (INT32)m_multiplier_operand1 / (INT32)m_multiplier_operand2;
-			m_hi = (INT32)m_multiplier_operand1 % (INT32)m_multiplier_operand2;
+			m_hi = 0x00000000;
+			m_lo = 0x80000000;
 		}
-		else
+		else if( m_multiplier_operand2 == 0 )
 		{
 			if( (INT32)m_multiplier_operand1 < 0 )
 			{
@@ -1201,18 +1201,23 @@ void psxcpu_device::multiplier_update()
 
 			m_hi = m_multiplier_operand1;
 		}
+		else
+		{
+			m_lo = (INT32)m_multiplier_operand1 / (INT32)m_multiplier_operand2;
+			m_hi = (INT32)m_multiplier_operand1 % (INT32)m_multiplier_operand2;
+		}
 		break;
 
 	case MULTIPLIER_OPERATION_DIVU:
-		if( m_multiplier_operand2 != 0 )
-		{
-			m_lo = m_multiplier_operand1 / m_multiplier_operand2;
-			m_hi = m_multiplier_operand1 % m_multiplier_operand2;
-		}
-		else
+		if( m_multiplier_operand2 == 0 )
 		{
 			m_lo = 0xffffffff;
 			m_hi = m_multiplier_operand1;
+		}
+		else
+		{
+			m_lo = m_multiplier_operand1 / m_multiplier_operand2;
+			m_hi = m_multiplier_operand1 % m_multiplier_operand2;
 		}
 		break;
 	}
@@ -1512,6 +1517,12 @@ void psxcpu_device::load( UINT32 reg, UINT32 value )
 
 void psxcpu_device::delayed_load( UINT32 reg, UINT32 value )
 {
+	if( m_delayr == reg )
+	{
+		m_delayr = 0;
+		m_delayv = 0;
+	}
+
 	advance_pc();
 
 	m_delayr = reg;
@@ -2052,12 +2063,7 @@ UINT32 psxcpu_device::get_register_from_pipeline( int reg )
 {
 	if( m_delayr == reg )
 	{
-		UINT32 data = m_delayv;
-
-		m_delayr = 0;
-		m_delayv = 0;
-
-		return data;
+		return m_delayv;
 	}
 
 	return m_r[ reg ];
