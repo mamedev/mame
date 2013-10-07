@@ -662,7 +662,8 @@ csplayh7        // (c) 1999
 fuudol          // (c) 2000
 
 // "Phoenix hardware" (and variations) games
-safarir         // Shin Nihon Kikaku (SNK)
+safarir         // (c) 1980 Shin Nihon Kikaku (SNK) + Taito license
+safarirj        // (c) 1979 Shin Nihon Kikaku (SNK)
 phoenix         // (c) 1980 Amstar
 phoenixa        // (c) 1980 Amstar + Centuri license
 phoenixb        // (c) 1980 Amstar + Centuri license
@@ -682,7 +683,7 @@ vautourz        // bootleg
 griffon         // bootleg (Videotron)
 nextfase        // bootleg
 phoenixs        // bootleg (Sonic)
-avefenix        //
+avefenix        // bootleg (Video Game)
 pleiads         // (c) 1981 Tehkan
 pleiadsb2       // bootleg
 pleiadbl        // bootleg
