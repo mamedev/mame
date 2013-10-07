@@ -69,9 +69,11 @@ void igs022_device::IGS022_do_dma(UINT16 src, UINT16 dst, UINT16 size, UINT16 mo
 	*/
 
 	param = mode >> 8;
-	if (mode & 0x00f0) printf("IGS022_do_dma mode bits %04x set\n", mode & 0x00f0);
 
-	mode &=0xf;  // what are the other bits?
+	// the initial DMA on kilbld has 0x10 set, drgw3 has 0x18 set, not sure how they affect the operation.
+	if (mode & 0x00f8) printf("IGS022_do_dma mode bits %04x set\n", mode & 0x00f8);
+
+	mode &=0x7;  // what are the other bits?
 
 
 	if ((mode == 0) || (mode == 1) || (mode == 2) || (mode == 3)  || (mode == 4))
