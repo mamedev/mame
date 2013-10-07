@@ -37,28 +37,59 @@ READ8_MEMBER( special_state::specialist_8255_porta_r )
 
 READ8_MEMBER( special_state::specialist_8255_portb_r )
 {
-	UINT8 dat = 0;
-	double level;
+	UINT8 dat = 0xff;
 
-	if ((m_specialist_8255_porta & 0x01)==0) dat ^= (m_io_line0->read() ^ 0xff);
-	if ((m_specialist_8255_porta & 0x02)==0) dat ^= (m_io_line1->read() ^ 0xff);
-	if ((m_specialist_8255_porta & 0x04)==0) dat ^= (m_io_line2->read() ^ 0xff);
-	if ((m_specialist_8255_porta & 0x08)==0) dat ^= (m_io_line3->read() ^ 0xff);
-	if ((m_specialist_8255_porta & 0x10)==0) dat ^= (m_io_line4->read() ^ 0xff);
-	if ((m_specialist_8255_porta & 0x20)==0) dat ^= (m_io_line5->read() ^ 0xff);
-	if ((m_specialist_8255_porta & 0x40)==0) dat ^= (m_io_line6->read() ^ 0xff);
-	if ((m_specialist_8255_porta & 0x80)==0) dat ^= (m_io_line7->read() ^ 0xff);
-	if ((m_specialist_8255_portc & 0x01)==0) dat ^= (m_io_line8->read() ^ 0xff);
-	if ((m_specialist_8255_portc & 0x02)==0) dat ^= (m_io_line9->read() ^ 0xff);
-	if ((m_specialist_8255_portc & 0x04)==0) dat ^= (m_io_line10->read() ^ 0xff);
-	if ((m_specialist_8255_portc & 0x08)==0) dat ^= (m_io_line11->read() ^ 0xff);
+	if ((m_specialist_8255_porta & 0x01)==0) dat &= m_io_line0->read();
+	if ((m_specialist_8255_porta & 0x02)==0) dat &= m_io_line1->read();
+	if ((m_specialist_8255_porta & 0x04)==0) dat &= m_io_line2->read();
+	if ((m_specialist_8255_porta & 0x08)==0) dat &= m_io_line3->read();
+	if ((m_specialist_8255_porta & 0x10)==0) dat &= m_io_line4->read();
+	if ((m_specialist_8255_porta & 0x20)==0) dat &= m_io_line5->read();
+	if ((m_specialist_8255_porta & 0x40)==0) dat &= m_io_line6->read();
+	if ((m_specialist_8255_porta & 0x80)==0) dat &= m_io_line7->read();
+	if ((m_specialist_8255_portc & 0x01)==0) dat &= m_io_line8->read();
+	if ((m_specialist_8255_portc & 0x02)==0) dat &= m_io_line9->read();
+	if ((m_specialist_8255_portc & 0x04)==0) dat &= m_io_line10->read();
+	if ((m_specialist_8255_portc & 0x08)==0) dat &= m_io_line11->read();
 
-	dat = (dat  << 2) ^0xff;
-	if (m_io_line12->read()!=0xff) dat ^= 0x02;
+	// shift key
+	if BIT(~m_io_line12->read(), 0)
+		dat &= 0xfd;
 
-	level = m_cassette->input();
-	if (level >=  0)
-			dat ^= 0x01;
+	// cassette
+	if (m_cassette->input() > 0.01)
+		dat &= 0xfe;
+
+	// strobe if a key is pressed
+	if (dat < 0xfc) dat &= 0x7f;
+
+	return dat;
+}
+
+READ8_MEMBER( special_state::specimx_8255_portb_r )
+{
+	UINT8 dat = 0xff;
+
+	if ((m_specialist_8255_porta & 0x01)==0) dat &= m_io_line0->read();
+	if ((m_specialist_8255_porta & 0x02)==0) dat &= m_io_line1->read();
+	if ((m_specialist_8255_porta & 0x04)==0) dat &= m_io_line2->read();
+	if ((m_specialist_8255_porta & 0x08)==0) dat &= m_io_line3->read();
+	if ((m_specialist_8255_porta & 0x10)==0) dat &= m_io_line4->read();
+	if ((m_specialist_8255_porta & 0x20)==0) dat &= m_io_line5->read();
+	if ((m_specialist_8255_porta & 0x40)==0) dat &= m_io_line6->read();
+	if ((m_specialist_8255_porta & 0x80)==0) dat &= m_io_line7->read();
+	if ((m_specialist_8255_portc & 0x01)==0) dat &= m_io_line8->read();
+	if ((m_specialist_8255_portc & 0x02)==0) dat &= m_io_line9->read();
+	if ((m_specialist_8255_portc & 0x04)==0) dat &= m_io_line10->read();
+	if ((m_specialist_8255_portc & 0x08)==0) dat &= m_io_line11->read();
+
+	// shift key
+	if BIT(~m_io_line12->read(), 0)
+		dat &= 0xfd;
+
+	// cassette
+	if (m_cassette->input() > 0.01)
+		dat &= 0xfe;
 
 	return dat;
 }
@@ -96,6 +127,16 @@ I8255_INTERFACE( specialist_ppi8255_interface )
 	DEVCB_DRIVER_MEMBER(special_state, specialist_8255_porta_r),
 	DEVCB_DRIVER_MEMBER(special_state, specialist_8255_porta_w),
 	DEVCB_DRIVER_MEMBER(special_state, specialist_8255_portb_r),
+	DEVCB_DRIVER_MEMBER(special_state, specialist_8255_portb_w),
+	DEVCB_DRIVER_MEMBER(special_state, specialist_8255_portc_r),
+	DEVCB_DRIVER_MEMBER(special_state, specialist_8255_portc_w)
+};
+
+I8255_INTERFACE( specimx_ppi8255_interface )
+{
+	DEVCB_DRIVER_MEMBER(special_state, specialist_8255_porta_r),
+	DEVCB_DRIVER_MEMBER(special_state, specialist_8255_porta_w),
+	DEVCB_DRIVER_MEMBER(special_state, specimx_8255_portb_r),
 	DEVCB_DRIVER_MEMBER(special_state, specialist_8255_portb_w),
 	DEVCB_DRIVER_MEMBER(special_state, specialist_8255_portc_r),
 	DEVCB_DRIVER_MEMBER(special_state, specialist_8255_portc_w)

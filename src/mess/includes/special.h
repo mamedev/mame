@@ -77,6 +77,7 @@ public:
 	DECLARE_WRITE8_MEMBER(erik_disk_reg_w);
 	DECLARE_READ8_MEMBER(specialist_8255_porta_r);
 	DECLARE_READ8_MEMBER(specialist_8255_portb_r);
+	DECLARE_READ8_MEMBER(specimx_8255_portb_r);
 	DECLARE_READ8_MEMBER(specialist_8255_portc_r);
 	DECLARE_WRITE8_MEMBER(specialist_8255_porta_w);
 	DECLARE_WRITE8_MEMBER(specialist_8255_portb_w);
@@ -155,6 +156,7 @@ protected:
 
 extern const struct pit8253_interface specimx_pit8253_intf;
 extern const i8255_interface specialist_ppi8255_interface;
+extern const i8255_interface specimx_ppi8255_interface;
 
 
 /*----------- defined in video/special.c -----------*/
