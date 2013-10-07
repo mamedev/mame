@@ -196,6 +196,7 @@ psoldier dip locations still need verification.
 
 #include "emu.h"
 #include "cpu/nec/nec.h"
+#include "cpu/nec/v25.h"
 #include "includes/m92.h"
 #include "includes/iremipt.h"
 #include "machine/irem_cpu.h"
@@ -954,48 +955,41 @@ static MACHINE_CONFIG_START( m92, m92_state )
 MACHINE_CONFIG_END
 
 
-static const nec_config gunforce_config ={  gunforce_decryption_table, };
 static MACHINE_CONFIG_DERIVED( gunforce, m92 )
 	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_CONFIG(gunforce_config)
+	MCFG_V25_CONFIG(gunforce_decryption_table)
 MACHINE_CONFIG_END
 
-static const nec_config bmaster_config ={ bomberman_decryption_table, };
 static MACHINE_CONFIG_DERIVED( bmaster, m92 )
 	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_CONFIG(bmaster_config)
+	MCFG_V25_CONFIG(bomberman_decryption_table)
 MACHINE_CONFIG_END
 
-static const nec_config lethalth_config ={ lethalth_decryption_table, };
 static MACHINE_CONFIG_DERIVED( lethalth, m92 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(lethalth_map)
 	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_CONFIG(lethalth_config)
+	MCFG_V25_CONFIG(lethalth_decryption_table)
 MACHINE_CONFIG_END
 
-static const nec_config uccops_config ={ dynablaster_decryption_table, };
 static MACHINE_CONFIG_DERIVED( uccops, m92 )
 	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_CONFIG(uccops_config)
+	MCFG_V25_CONFIG(dynablaster_decryption_table)
 MACHINE_CONFIG_END
 
-static const nec_config mysticri_config ={ mysticri_decryption_table, };
 static MACHINE_CONFIG_DERIVED( mysticri, m92 )
 	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_CONFIG(mysticri_config)
+	MCFG_V25_CONFIG(mysticri_decryption_table)
 MACHINE_CONFIG_END
 
-static const nec_config majtitl2_config ={ majtitl2_decryption_table, };
 static MACHINE_CONFIG_DERIVED( majtitl2, m92 )
 	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_CONFIG(majtitl2_config)
+	MCFG_V25_CONFIG(majtitl2_decryption_table)
 MACHINE_CONFIG_END
 
-static const nec_config hook_config ={ hook_decryption_table, };
 static MACHINE_CONFIG_DERIVED( hook, m92 )
 	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_CONFIG(hook_config)
+	MCFG_V25_CONFIG(hook_decryption_table)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( ppan, m92_state )
@@ -1034,24 +1028,21 @@ static MACHINE_CONFIG_START( ppan, m92_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static const nec_config rtypeleo_config ={ rtypeleo_decryption_table, };
 static MACHINE_CONFIG_DERIVED( rtypeleo, m92 )
 	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_CONFIG(rtypeleo_config)
+	MCFG_V25_CONFIG(rtypeleo_decryption_table)
 MACHINE_CONFIG_END
 
 
-static const nec_config inthunt_config ={ inthunt_decryption_table, };
 static MACHINE_CONFIG_DERIVED( inthunt, m92 )
 	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_CONFIG(inthunt_config)
+	MCFG_V25_CONFIG(inthunt_decryption_table)
 MACHINE_CONFIG_END
 
 
-static const nec_config nbbatman_config ={ leagueman_decryption_table, };
 static MACHINE_CONFIG_DERIVED( nbbatman, m92 )
 	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_CONFIG(nbbatman_config)
+	MCFG_V25_CONFIG(leagueman_decryption_table)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( nbbatman2bl, m92 )
@@ -1066,26 +1057,23 @@ static MACHINE_CONFIG_DERIVED( nbbatman2bl, m92 )
 
 MACHINE_CONFIG_END
 
-static const nec_config psoldier_config ={ psoldier_decryption_table, };
 static MACHINE_CONFIG_DERIVED( psoldier, m92 )
 	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_CONFIG(psoldier_config)
+	MCFG_V25_CONFIG(psoldier_decryption_table)
 	/* video hardware */
 	MCFG_GFXDECODE(psoldier)
 MACHINE_CONFIG_END
 
-static const nec_config dsoccr94_config ={ dsoccr94_decryption_table, };
 static MACHINE_CONFIG_DERIVED( dsoccr94j, m92 )
 	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_CONFIG(dsoccr94_config)
+	MCFG_V25_CONFIG(dsoccr94_decryption_table)
 	/* video hardware */
 	MCFG_GFXDECODE(psoldier)
 MACHINE_CONFIG_END
 
-static const nec_config gunforc2_config ={ lethalth_decryption_table, };
 static MACHINE_CONFIG_DERIVED( gunforc2, m92 )
 	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_CONFIG(gunforc2_config)
+	MCFG_V25_CONFIG(lethalth_decryption_table)
 MACHINE_CONFIG_END
 
 /***************************************************************************/

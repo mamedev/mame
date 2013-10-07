@@ -25,6 +25,7 @@ confirmed for m107 games as well.
 
 #include "emu.h"
 #include "cpu/nec/nec.h"
+#include "cpu/nec/v25.h"
 #include "includes/m107.h"
 #include "includes/iremipt.h"
 #include "machine/irem_cpu.h"
@@ -753,8 +754,6 @@ GFXDECODE_END
 
 /***************************************************************************/
 
-static const nec_config firebarr_config ={ rtypeleo_decryption_table, };
-
 static MACHINE_CONFIG_START( firebarr, m107_state )
 
 	/* basic machine hardware */
@@ -764,7 +763,7 @@ static MACHINE_CONFIG_START( firebarr, m107_state )
 
 	MCFG_CPU_ADD("soundcpu", V35, 14318000)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_CONFIG(firebarr_config)
+	MCFG_V25_CONFIG(rtypeleo_decryption_table)
 
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", m107_state, m107_scanline_interrupt, "screen", 0, 1)
@@ -794,7 +793,6 @@ static MACHINE_CONFIG_START( firebarr, m107_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static const nec_config dsoccr94_config ={ dsoccr94_decryption_table, };
 static MACHINE_CONFIG_DERIVED( dsoccr94, firebarr )
 
 	/* basic machine hardware */
@@ -802,21 +800,20 @@ static MACHINE_CONFIG_DERIVED( dsoccr94, firebarr )
 	MCFG_CPU_CLOCK(20000000/2)  /* NEC V33, Could be 28MHz clock? */
 
 	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_CONFIG(dsoccr94_config)
+	MCFG_V25_CONFIG(dsoccr94_decryption_table)
 
 	/* video hardware */
 	MCFG_GFXDECODE(m107)
 MACHINE_CONFIG_END
 
 
-static const nec_config wpksoc_config ={ leagueman_decryption_table, };
 static MACHINE_CONFIG_DERIVED( wpksoc, firebarr )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(wpksoc_map)
 	MCFG_CPU_IO_MAP(wpksoc_io_map)
 
 	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_CONFIG(wpksoc_config)
+	MCFG_V25_CONFIG(leagueman_decryption_table)
 MACHINE_CONFIG_END
 
 /***************************************************************************/

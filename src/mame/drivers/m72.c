@@ -84,6 +84,7 @@ other supported games as well.
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/nec/nec.h"
+#include "cpu/nec/v25.h"
 #include "machine/irem_cpu.h"
 #include "sound/2151intf.h"
 #include "includes/iremipt.h"
@@ -2326,11 +2327,9 @@ static MACHINE_CONFIG_START( cosmccop, m72_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_CONFIG_END
 
-static const nec_config kengo_config ={ gunforce_decryption_table, };
-
 static MACHINE_CONFIG_DERIVED( kengo, cosmccop )
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CONFIG(kengo_config)
+	MCFG_V25_CONFIG(gunforce_decryption_table)
 MACHINE_CONFIG_END
 
 

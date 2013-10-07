@@ -5,64 +5,64 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "nec.h"
+#include "v25.h"
 #include "v25priv.h"
 
-static UINT8 read_irqcontrol(v25_state_t *nec_state, INTSOURCES source, UINT8 priority)
+UINT8 v25_common_device::read_irqcontrol(int /*INTSOURCES*/ source, UINT8 priority)
 {
-	return  (((nec_state->pending_irq & source)     ? 0x80 : 0x00)
-			| ((nec_state->unmasked_irq & source)   ? 0x00 : 0x40)
-			| ((nec_state->bankswitch_irq & source) ? 0x10 : 0x00)
+	return  (((m_pending_irq & source)     ? 0x80 : 0x00)
+			| ((m_unmasked_irq & source)   ? 0x00 : 0x40)
+			| ((m_bankswitch_irq & source) ? 0x10 : 0x00)
 			| priority);
 }
 
-static UINT8 read_sfr(v25_state_t *nec_state, unsigned o)
+UINT8 v25_common_device::read_sfr(unsigned o)
 {
 	UINT8 ret;
 
 	switch(o)
 	{
 		case 0x00: /* P0 */
-			ret = nec_state->io->read_byte(V25_PORT_P0);
+			ret = m_io->read_byte(V25_PORT_P0);
 			break;
 		case 0x08: /* P1 */
 			/* P1 is combined with the interrupt lines */
-			ret = ((nec_state->io->read_byte(V25_PORT_P1) & 0xF0)
-					| (nec_state->nmi_state     ? 0x00 : 0x01)
-					| (nec_state->intp_state[0] ? 0x00 : 0x02)
-					| (nec_state->intp_state[1] ? 0x00 : 0x04)
-					| (nec_state->intp_state[2] ? 0x00 : 0x08));
+			ret = ((m_io->read_byte(V25_PORT_P1) & 0xF0)
+					| (m_nmi_state     ? 0x00 : 0x01)
+					| (m_intp_state[0] ? 0x00 : 0x02)
+					| (m_intp_state[1] ? 0x00 : 0x04)
+					| (m_intp_state[2] ? 0x00 : 0x08));
 			break;
 		case 0x10: /* P2 */
-			ret = nec_state->io->read_byte(V25_PORT_P2);
+			ret = m_io->read_byte(V25_PORT_P2);
 			break;
 		case 0x38: /* PT */
-			ret = nec_state->io->read_byte(V25_PORT_PT);
+			ret = m_io->read_byte(V25_PORT_PT);
 			break;
 		case 0x4C: /* EXIC0 */
-			ret = read_irqcontrol(nec_state, INTP0, nec_state->priority_intp);
+			ret = read_irqcontrol(INTP0, m_priority_intp);
 			break;
 		case 0x4D: /* EXIC1 */
-			ret = read_irqcontrol(nec_state, INTP1, 7);
+			ret = read_irqcontrol(INTP1, 7);
 			break;
 		case 0x4E: /* EXIC2 */
-			ret = read_irqcontrol(nec_state, INTP2, 7);
+			ret = read_irqcontrol(INTP2, 7);
 			break;
 		case 0x9C: /* TMIC0 */
-			ret = read_irqcontrol(nec_state, INTTU0, nec_state->priority_inttu);
+			ret = read_irqcontrol(INTTU0, m_priority_inttu);
 			break;
 		case 0x9D: /* TMIC1 */
-			ret = read_irqcontrol(nec_state, INTTU1, 7);
+			ret = read_irqcontrol(INTTU1, 7);
 			break;
 		case 0x9E: /* TMIC2 */
-			ret = read_irqcontrol(nec_state, INTTU2, 7);
+			ret = read_irqcontrol(INTTU2, 7);
 			break;
 		case 0xEA: /* FLAG */
-			ret = ((nec_state->F0 << 3) | (nec_state->F1 << 5));
+			ret = ((m_F0 << 3) | (m_F1 << 5));
 			break;
 		case 0xEB: /* PRC */
-			ret = (nec_state->RAMEN ? 0x40 : 0);
-			switch (nec_state->TB)
+			ret = (m_RAMEN ? 0x40 : 0);
+			switch (m_TB)
 			{
 				case 10:
 					break;
@@ -76,7 +76,7 @@ static UINT8 read_sfr(v25_state_t *nec_state, unsigned o)
 					ret |= 0x0C;
 					break;
 			}
-			switch (nec_state->PCK)
+			switch (m_PCK)
 			{
 				case 2:
 					break;
@@ -89,74 +89,74 @@ static UINT8 read_sfr(v25_state_t *nec_state, unsigned o)
 			}
 			break;
 		case 0xEC: /* TBIC */
-			ret = read_irqcontrol(nec_state, INTTB, 7);
+			ret = read_irqcontrol(INTTB, 7);
 			break;
 		case 0xEF: /* IRQS */
-			ret = nec_state->IRQS;
+			ret = m_IRQS;
 			break;
 		case 0xFC: /* ISPR */
-			ret = nec_state->ISPR;
+			ret = m_ISPR;
 			break;
 		case 0xFF: /* IDB */
-			ret = (nec_state->IDB >> 12);
+			ret = (m_IDB >> 12);
 			break;
 		default:
-			logerror("%06x: Read from special function register %02x\n",PC(nec_state),o);
+			logerror("%06x: Read from special function register %02x\n",PC(),o);
 			ret = 0;
 	}
 	return ret;
 }
 
-static UINT16 read_sfr_word(v25_state_t *nec_state, unsigned o)
+UINT16 v25_common_device::read_sfr_word(unsigned o)
 {
 	UINT16 ret;
 
 	switch(o)
 	{
 		case 0x80:  /* TM0 */
-			logerror("%06x: Warning: read back TM0\n",PC(nec_state));
-			ret = nec_state->TM0;
+			logerror("%06x: Warning: read back TM0\n",PC());
+			ret = m_TM0;
 			break;
 		case 0x82: /* MD0 */
-			logerror("%06x: Warning: read back MD0\n",PC(nec_state));
-			ret = nec_state->MD0;
+			logerror("%06x: Warning: read back MD0\n",PC());
+			ret = m_MD0;
 			break;
 		case 0x88:  /* TM1 */
-			logerror("%06x: Warning: read back TM1\n",PC(nec_state));
-			ret = nec_state->TM1;
+			logerror("%06x: Warning: read back TM1\n",PC());
+			ret = m_TM1;
 			break;
 		case 0x8A: /* MD1 */
-			logerror("%06x: Warning: read back MD1\n",PC(nec_state));
-			ret = nec_state->MD1;
+			logerror("%06x: Warning: read back MD1\n",PC());
+			ret = m_MD1;
 			break;
 		default:
-			ret = (read_sfr(nec_state, o) | (read_sfr(nec_state, o+1) << 8));
+			ret = (read_sfr(o) | (read_sfr(o+1) << 8));
 	}
 	return ret;
 }
 
-static void write_irqcontrol(v25_state_t *nec_state, INTSOURCES source, UINT8 d)
+void v25_common_device::write_irqcontrol(int /*INTSOURCES*/ source, UINT8 d)
 {
 	if(d & 0x80)
-		nec_state->pending_irq |= source;
+		m_pending_irq |= source;
 	else
-		nec_state->pending_irq &= ~source;
+		m_pending_irq &= ~source;
 
 	if(d & 0x40)
-		nec_state->unmasked_irq &= ~source;
+		m_unmasked_irq &= ~source;
 	else
-		nec_state->unmasked_irq |= source;
+		m_unmasked_irq |= source;
 
 	if(d & 0x20)
-		logerror("%06x: Warning: macro service function not implemented\n",PC(nec_state));
+		logerror("%06x: Warning: macro service function not implemented\n",PC());
 
 	if(d & 0x10)
-		nec_state->bankswitch_irq |= source;
+		m_bankswitch_irq |= source;
 	else
-		nec_state->bankswitch_irq &= ~source;
+		m_bankswitch_irq &= ~source;
 }
 
-static void write_sfr(v25_state_t *nec_state, unsigned o, UINT8 d)
+void v25_common_device::write_sfr(unsigned o, UINT8 d)
 {
 	int tmp;
 	attotime time;
@@ -167,234 +167,234 @@ static void write_sfr(v25_state_t *nec_state, unsigned o, UINT8 d)
 	switch(o)
 	{
 		case 0x00: /* P0 */
-			nec_state->io->write_byte(V25_PORT_P0, d);
+			m_io->write_byte(V25_PORT_P0, d);
 			break;
 		case 0x08: /* P1 */
 			/* only the upper four bits of P1 can be used as output */
-			nec_state->io->write_byte(V25_PORT_P1, d & 0xF0);
+			m_io->write_byte(V25_PORT_P1, d & 0xF0);
 			break;
 		case 0x10: /* P2 */
-			nec_state->io->write_byte(V25_PORT_P2, d);
+			m_io->write_byte(V25_PORT_P2, d);
 			break;
 		case 0x4C: /* EXIC0 */
-			write_irqcontrol(nec_state, INTP0, d);
-			nec_state->priority_intp = d & 0x7;
+			write_irqcontrol(INTP0, d);
+			m_priority_intp = d & 0x7;
 			break;
 		case 0x4D: /* EXIC1 */
-			write_irqcontrol(nec_state, INTP1, d);
+			write_irqcontrol(INTP1, d);
 			break;
 		case 0x4E: /* EXIC2 */
-			write_irqcontrol(nec_state, INTP2, d);
+			write_irqcontrol(INTP2, d);
 			break;
 		case 0x90: /* TMC0 */
-			nec_state->TMC0 = d;
+			m_TMC0 = d;
 			if(d & 1)   /* oneshot mode */
 			{
 				if(d & 0x80)
 				{
-					tmp = nec_state->TM0 * nec_state->PCK * ((d & 0x40) ? 128 : 12 );
-					time = attotime::from_hz(nec_state->device->unscaled_clock()) * tmp;
-					nec_state->timers[0]->adjust(time, INTTU0);
+					tmp = m_TM0 * m_PCK * ((d & 0x40) ? 128 : 12 );
+					time = attotime::from_hz(unscaled_clock()) * tmp;
+					m_timers[0]->adjust(time, INTTU0);
 				}
 				else
-					nec_state->timers[0]->adjust(attotime::never);
+					m_timers[0]->adjust(attotime::never);
 
 				if(d & 0x20)
 				{
-					tmp = nec_state->MD0 * nec_state->PCK * ((d & 0x10) ? 128 : 12 );
-					time = attotime::from_hz(nec_state->device->unscaled_clock()) * tmp;
-					nec_state->timers[1]->adjust(time, INTTU1);
+					tmp = m_MD0 * m_PCK * ((d & 0x10) ? 128 : 12 );
+					time = attotime::from_hz(unscaled_clock()) * tmp;
+					m_timers[1]->adjust(time, INTTU1);
 				}
 				else
-					nec_state->timers[1]->adjust(attotime::never);
+					m_timers[1]->adjust(attotime::never);
 			}
 			else    /* interval mode */
 			{
 				if(d & 0x80)
 				{
-					tmp = nec_state->MD0 * nec_state->PCK * ((d & 0x40) ? 128 : 6 );
-					time = attotime::from_hz(nec_state->device->unscaled_clock()) * tmp;
-					nec_state->timers[0]->adjust(time, INTTU0, time);
-					nec_state->timers[1]->adjust(attotime::never);
-					nec_state->TM0 = nec_state->MD0;
+					tmp = m_MD0 * m_PCK * ((d & 0x40) ? 128 : 6 );
+					time = attotime::from_hz(unscaled_clock()) * tmp;
+					m_timers[0]->adjust(time, INTTU0, time);
+					m_timers[1]->adjust(attotime::never);
+					m_TM0 = m_MD0;
 				}
 				else
 				{
-					nec_state->timers[0]->adjust(attotime::never);
-					nec_state->timers[1]->adjust(attotime::never);
+					m_timers[0]->adjust(attotime::never);
+					m_timers[1]->adjust(attotime::never);
 				}
 			}
 			break;
 		case 0x91: /* TMC1 */
-			nec_state->TMC1 = d & 0xC0;
+			m_TMC1 = d & 0xC0;
 			if(d & 0x80)
 			{
-				tmp = nec_state->MD1 * nec_state->PCK * ((d & 0x40) ? 128 : 6 );
-				time = attotime::from_hz(nec_state->device->unscaled_clock()) * tmp;
-				nec_state->timers[2]->adjust(time, INTTU2, time);
-				nec_state->TM1 = nec_state->MD1;
+				tmp = m_MD1 * m_PCK * ((d & 0x40) ? 128 : 6 );
+				time = attotime::from_hz(unscaled_clock()) * tmp;
+				m_timers[2]->adjust(time, INTTU2, time);
+				m_TM1 = m_MD1;
 			}
 			else
-				nec_state->timers[2]->adjust(attotime::never);
+				m_timers[2]->adjust(attotime::never);
 			break;
 		case 0x9C: /* TMIC0 */
-			write_irqcontrol(nec_state, INTTU0, d);
-			nec_state->priority_inttu = d & 0x7;
+			write_irqcontrol(INTTU0, d);
+			m_priority_inttu = d & 0x7;
 			break;
 		case 0x9D: /* TMIC1 */
-			write_irqcontrol(nec_state, INTTU1, d);
+			write_irqcontrol(INTTU1, d);
 			break;
 		case 0x9E: /* TMIC2 */
-			write_irqcontrol(nec_state, INTTU2, d);
+			write_irqcontrol(INTTU2, d);
 			break;
 		case 0xEA: /* FLAG */
-			nec_state->F0 = ((d & 0x08) == 0x08);
-			nec_state->F1 = ((d & 0x20) == 0x20);
+			m_F0 = ((d & 0x08) == 0x08);
+			m_F1 = ((d & 0x20) == 0x20);
 			break;
 		case 0xEB: /* PRC */
-			logerror("%06x: PRC set to %02x\n", PC(nec_state), d);
-			nec_state->RAMEN = ((d & 0x40) == 0x40);
-			nec_state->TB = timebases[(d & 0x0C) >> 2];
-			nec_state->PCK = clocks[d & 0x03];
-			if (nec_state->PCK == 0)
+			logerror("%06x: PRC set to %02x\n", PC(), d);
+			m_RAMEN = ((d & 0x40) == 0x40);
+			m_TB = timebases[(d & 0x0C) >> 2];
+			m_PCK = clocks[d & 0x03];
+			if (m_PCK == 0)
 			{
 				logerror("        Warning: invalid clock divider\n");
-				nec_state->PCK = 8;
+				m_PCK = 8;
 			}
-			tmp = nec_state->PCK << nec_state->TB;
-			time = attotime::from_hz(nec_state->device->unscaled_clock()) * tmp;
-			nec_state->timers[3]->adjust(time, INTTB, time);
-			logerror("        Internal RAM %sabled\n", (nec_state->RAMEN ? "en" : "dis"));
-			logerror("        Time base set to 2^%d\n", nec_state->TB);
-			logerror("        Clock divider set to %d\n", nec_state->PCK);
+			tmp = m_PCK << m_TB;
+			time = attotime::from_hz(unscaled_clock()) * tmp;
+			m_timers[3]->adjust(time, INTTB, time);
+			logerror("        Internal RAM %sabled\n", (m_RAMEN ? "en" : "dis"));
+			logerror("        Time base set to 2^%d\n", m_TB);
+			logerror("        Clock divider set to %d\n", m_PCK);
 			break;
 		case 0xEC: /* TBIC */
 			/* time base interrupt doesn't support macro service, bank switching or priority control */
-			write_irqcontrol(nec_state, INTTB, d & 0xC0);
+			write_irqcontrol(INTTB, d & 0xC0);
 			break;
 		case 0xFF: /* IDB */
-			nec_state->IDB = (d << 12) | 0xE00;
-			logerror("%06x: IDB set to %02x\n",PC(nec_state),d);
+			m_IDB = (d << 12) | 0xE00;
+			logerror("%06x: IDB set to %02x\n",PC(),d);
 			break;
 		default:
-			logerror("%06x: Wrote %02x to special function register %02x\n",PC(nec_state),d,o);
+			logerror("%06x: Wrote %02x to special function register %02x\n",PC(),d,o);
 	}
 }
 
-static void write_sfr_word(v25_state_t *nec_state, unsigned o, UINT16 d)
+void v25_common_device::write_sfr_word(unsigned o, UINT16 d)
 {
 	switch(o)
 	{
 		case 0x80:  /* TM0 */
-			nec_state->TM0 = d;
+			m_TM0 = d;
 			break;
 		case 0x82: /* MD0 */
-			nec_state->MD0 = d;
+			m_MD0 = d;
 			break;
 		case 0x88:  /* TM1 */
-			nec_state->TM1 = d;
+			m_TM1 = d;
 			break;
 		case 0x8A: /* MD1 */
-			nec_state->MD1 = d;
+			m_MD1 = d;
 			break;
 		default:
-			write_sfr(nec_state, o, d);
-			write_sfr(nec_state, o+1, d >> 8);
+			write_sfr(o, d);
+			write_sfr(o+1, d >> 8);
 	}
 }
 
-UINT8 v25_read_byte(v25_state_t *nec_state, unsigned a)
+UINT8 v25_common_device::v25_read_byte(unsigned a)
 {
-	if((a & 0xFFE00) == nec_state->IDB || a == 0xFFFFF)
+	if((a & 0xFFE00) == m_IDB || a == 0xFFFFF)
 	{
 		unsigned o = a & 0x1FF;
 
-		if(nec_state->RAMEN && o < 0x100)
-			return nec_state->ram.b[BYTE_XOR_LE(o)];
+		if(m_RAMEN && o < 0x100)
+			return m_ram.b[BYTE_XOR_LE(o)];
 
 		if(o >= 0x100)
-			return read_sfr(nec_state, o-0x100);
+			return read_sfr(o-0x100);
 	}
 
-	return nec_state->program->read_byte(a);
+	return m_program->read_byte(a);
 }
 
-UINT16 v25_read_word(v25_state_t *nec_state, unsigned a)
+UINT16 v25_common_device::v25_read_word(unsigned a)
 {
 	if( a & 1 )
-		return (v25_read_byte(nec_state, a) | (v25_read_byte(nec_state, a + 1) << 8));
+		return (v25_read_byte(a) | (v25_read_byte(a + 1) << 8));
 
-	if((a & 0xFFE00) == nec_state->IDB)
+	if((a & 0xFFE00) == m_IDB)
 	{
 		unsigned o = a & 0x1FF;
 
-		if(nec_state->RAMEN && o < 0x100)
-			return nec_state->ram.w[o/2];
+		if(m_RAMEN && o < 0x100)
+			return m_ram.w[o/2];
 
 		if(o >= 0x100)
-			return read_sfr_word(nec_state, o-0x100);
+			return read_sfr_word(o-0x100);
 	}
 
 	if(a == 0xFFFFE)    /* not sure about this - manual says FFFFC-FFFFE are "reserved" */
-		return (nec_state->program->read_byte(a) | (read_sfr(nec_state, 0xFF) << 8));
+		return (m_program->read_byte(a) | (read_sfr(0xFF) << 8));
 
-	return nec_state->program->read_word(a);
+	return m_program->read_word(a);
 }
 
-void v25_write_byte(v25_state_t *nec_state, unsigned a, UINT8 d)
+void v25_common_device::v25_write_byte(unsigned a, UINT8 d)
 {
-	if((a & 0xFFE00) == nec_state->IDB || a == 0xFFFFF)
+	if((a & 0xFFE00) == m_IDB || a == 0xFFFFF)
 	{
 		unsigned o = a & 0x1FF;
 
-		if(nec_state->RAMEN && o < 0x100)
+		if(m_RAMEN && o < 0x100)
 		{
-			nec_state->ram.b[BYTE_XOR_LE(o)] = d;
+			m_ram.b[BYTE_XOR_LE(o)] = d;
 			return;
 		}
 
 		if(o >= 0x100)
 		{
-			write_sfr(nec_state, o-0x100, d);
+			write_sfr(o-0x100, d);
 			return;
 		}
 	}
 
-	nec_state->program->write_byte(a, d);
+	m_program->write_byte(a, d);
 }
 
-void v25_write_word(v25_state_t *nec_state, unsigned a, UINT16 d)
+void v25_common_device::v25_write_word(unsigned a, UINT16 d)
 {
 	if( a & 1 )
 	{
-		v25_write_byte(nec_state, a, d);
-		v25_write_byte(nec_state, a + 1, d >> 8);
+		v25_write_byte(a, d);
+		v25_write_byte(a + 1, d >> 8);
 		return;
 	}
 
-	if((a & 0xFFE00) == nec_state->IDB)
+	if((a & 0xFFE00) == m_IDB)
 	{
 		unsigned o = a & 0x1FF;
 
-		if(nec_state->RAMEN && o < 0x100)
+		if(m_RAMEN && o < 0x100)
 		{
-			nec_state->ram.w[o/2] = d;
+			m_ram.w[o/2] = d;
 			return;
 		}
 
 		if(o >= 0x100)
 		{
-			write_sfr_word(nec_state, o-0x100, d);
+			write_sfr_word(o-0x100, d);
 			return;
 		}
 	}
 
 	if(a == 0xFFFFE)    /* not sure about this - manual says FFFFC-FFFFE are "reserved" */
 	{
-		nec_state->program->write_byte(a, d);
-		write_sfr(nec_state, 0xFF, d >> 8);
+		m_program->write_byte(a, d);
+		write_sfr(0xFF, d >> 8);
 		return;
 	}
 
-	nec_state->program->write_word(a, d);
+	m_program->write_word(a, d);
 }

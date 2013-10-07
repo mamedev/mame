@@ -1,6 +1,6 @@
 /* ASG 971222 -- rewrote this interface */
-#ifndef __NEC_H_
-#define __NEC_H_
+#ifndef __NEC_V25_H_
+#define __NEC_V25_H_
 
 
 #define NEC_INPUT_LINE_INTP0 10
@@ -8,20 +8,34 @@
 #define NEC_INPUT_LINE_INTP2 12
 #define NEC_INPUT_LINE_POLL 20
 
+#define V25_PORT_P0 0x10000
+#define V25_PORT_P1 0x10002
+#define V25_PORT_P2 0x10004
+#define V25_PORT_PT 0x10006
+
 enum
 {
-	NEC_PC=0,
-	NEC_IP, NEC_AW, NEC_CW, NEC_DW, NEC_BW, NEC_SP, NEC_BP, NEC_IX, NEC_IY,
-	NEC_FLAGS, NEC_ES, NEC_CS, NEC_SS, NEC_DS,
-	NEC_PENDING
+	V25_PC=0,
+	V25_IP, V25_AW, V25_CW, V25_DW, V25_BW, V25_SP, V25_BP, V25_IX, V25_IY,
+	V25_FLAGS, V25_ES, V25_CS, V25_SS, V25_DS,
+	V25_PENDING
 };
 
 
-class nec_common_device : public cpu_device
+#define MCFG_V25_CONFIG(_table) \
+	v25_common_device::set_decryption_table(*device, _table);
+
+
+class v25_common_device : public cpu_device
 {
 public:
 	// construction/destruction
-	nec_common_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, bool is_16bit, offs_t fetch_xor, UINT8 prefetch_size, UINT8 prefetch_cycles, UINT32 chip_type);
+	v25_common_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, bool is_16bit, offs_t fetch_xor, UINT8 prefetch_size, UINT8 prefetch_cycles, UINT32 chip_type);
+
+	// static configuration helpers
+	static void set_decryption_table(device_t &device, const UINT8 *decryption_table) { downcast<v25_common_device &>(device).m_v25v35_decryptiontable = decryption_table; }
+
+	TIMER_CALLBACK_MEMBER(v25_timer_callback);
 
 protected:
 	// device-level overrides
@@ -53,38 +67,46 @@ private:
 	address_space_config m_program_config;
 	address_space_config m_io_config;
 
-/* NEC registers */
-union necbasicregs
-{                   /* eight general registers */
-	UINT16 w[8];    /* viewed as 16 bits registers */
-	UINT8  b[16];   /* or as 8 bit registers */
+/* internal RAM and register banks */
+union internalram
+{
+	UINT16 w[128];
+	UINT8  b[256];
 };
 
-	necbasicregs m_regs;
+	internalram m_ram;
 	offs_t  m_fetch_xor;
-	UINT16  m_sregs[4];
 
 	UINT16  m_ip;
 
 	/* PSW flags */
 	INT32   m_SignVal;
-	UINT32  m_AuxVal;   /* 0 or non-0 valued flags */
-	UINT32  m_OverVal;
-	UINT32  m_ZeroVal;
-	UINT32  m_CarryVal;
-	UINT32  m_ParityVal;
-	UINT8   m_TF; /* 0 or 1 valued flags */
-	UINT8   m_IF;
-	UINT8   m_DF;
-	UINT8   m_MF;
+	UINT32  m_AuxVal, m_OverVal, m_ZeroVal, m_CarryVal, m_ParityVal;  /* 0 or non-0 valued flags */
+	UINT8   m_IBRK, m_F0, m_F1, m_TF, m_IF, m_DF, m_MF;   /* 0 or 1 valued flags */
+	UINT8   m_RBW, m_RBB;   /* current register bank base, preshifted for word and byte registers */
 
 	/* interrupt related */
 	UINT32  m_pending_irq;
+	UINT32  m_unmasked_irq;
+	UINT32  m_bankswitch_irq;
+	UINT8   m_priority_inttu, m_priority_intd, m_priority_intp, m_priority_ints0, m_priority_ints1;
+	UINT8   m_IRQS, m_ISPR;
 	UINT32  m_nmi_state;
 	UINT32  m_irq_state;
 	UINT32  m_poll_state;
+	UINT32  m_mode_state;
+	UINT32  m_intp_state[3];
 	UINT8   m_no_interrupt;
 	UINT8   m_halted;
+
+	/* timer related */
+	UINT16  m_TM0, m_MD0, m_TM1, m_MD1;
+	UINT8   m_TMC0, m_TMC1;
+	emu_timer *m_timers[4];
+
+	/* system control */
+	UINT8   m_RAMEN, m_TB, m_PCK; /* PRC register */
+	UINT32  m_IDB;
 
 	address_space *m_program;
 	direct_read_data *m_direct;
@@ -106,8 +128,10 @@ union necbasicregs
 
 	UINT32 m_debugger_temp;
 
-	typedef void (nec_common_device::*nec_ophandler)();
-	typedef UINT32 (nec_common_device::*nec_eahandler)();
+	const UINT8 *m_v25v35_decryptiontable;  // internal decryption table
+
+	typedef void (v25_common_device::*nec_ophandler)();
+	typedef UINT32 (v25_common_device::*nec_eahandler)();
 	static const nec_ophandler s_nec_instruction[256];
 	static const nec_eahandler s_GetEA[192];
 
@@ -115,10 +139,21 @@ union necbasicregs
 	void do_prefetch(int previous_ICount);
 	inline UINT8 fetch();
 	inline UINT16 fetchword();
-	UINT8 fetchop();
-	void nec_interrupt(unsigned int_num, int source);
+	inline UINT8 fetchop();
+	void nec_interrupt(unsigned int_num, int /*INTSOURCES*/ source);
+	void nec_bankswitch(unsigned bank_num);
 	void nec_trap();
 	void external_int();
+	UINT8 read_irqcontrol(int /*INTSOURCES*/ source, UINT8 priority);
+	UINT8 read_sfr(unsigned o);
+	UINT16 read_sfr_word(unsigned o);
+	void write_irqcontrol(int /*INTSOURCES*/ source, UINT8 d);
+	void write_sfr(unsigned o, UINT8 d);
+	void write_sfr_word(unsigned o, UINT16 d);
+	UINT8 v25_read_byte(unsigned a);
+	UINT16 v25_read_word(unsigned a);
+	void v25_write_byte(unsigned a, UINT8 d);
+	void v25_write_word(unsigned a, UINT16 d);
 
 	void i_add_br8();
 	void i_add_wr16();
@@ -136,6 +171,7 @@ union necbasicregs
 	void i_or_axd16();
 	void i_push_cs();
 	void i_pre_nec();
+	void i_pre_v25();
 	void i_adc_br8();
 	void i_adc_wr16();
 	void i_adc_r8b();
@@ -366,6 +402,8 @@ union necbasicregs
 	void i_fepre();
 	void i_ffpre();
 	void i_wait();
+	void i_brkn();
+	void i_brks();
 
 	UINT32 EA_000();
 	UINT32 EA_001();
@@ -394,30 +432,22 @@ union necbasicregs
 };
 
 
-class v20_device : public nec_common_device
+class v25_device : public v25_common_device
 {
 public:
-	v20_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	v25_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
-class v30_device : public nec_common_device
+class v35_device : public v25_common_device
 {
 public:
-	v30_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	v35_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
-class v33_device : public nec_common_device
-{
-public:
-	v33_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-};
-
-
-extern const device_type V20;
-extern const device_type V30;
-extern const device_type V33;
+extern const device_type V25;
+extern const device_type V35;
 
 
 #endif

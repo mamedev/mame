@@ -42,38 +42,51 @@ typedef UINT8 BYTE;
 typedef UINT16 WORD;
 typedef UINT32 DWORD;
 
-#include "nec.h"
+#include "v25.h"
 #include "v25priv.h"
 
-/* default configuration */
-static const nec_config default_config =
-{
-	NULL
-};
+const device_type V25 = &device_creator<v25_device>;
+const device_type V35 = &device_creator<v35_device>;
 
-extern int necv_dasm_one(char *buffer, UINT32 eip, const UINT8 *oprom, const nec_config *config);
 
-INLINE v25_state_t *get_safe_token(device_t *device)
+v25_common_device::v25_common_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, bool is_16bit, offs_t fetch_xor, UINT8 prefetch_size, UINT8 prefetch_cycles, UINT32 chip_type)
+	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, __FILE__)
+	, m_program_config("program", ENDIANNESS_LITTLE, is_16bit ? 16 : 8, 20, 0)
+	, m_io_config("io", ENDIANNESS_LITTLE, is_16bit ? 16 : 8, 17, 0)
+	, m_fetch_xor(fetch_xor)
+	, m_prefetch_size(prefetch_size)
+	, m_prefetch_cycles(prefetch_cycles)
+	, m_chip_type(chip_type)
+	, m_v25v35_decryptiontable(NULL)
 {
-	assert(device != NULL);
-	assert(device->type() == V25 || device->type() == V35);
-	return (v25_state_t *)downcast<legacy_cpu_device *>(device)->token();
 }
 
-static TIMER_CALLBACK(v25_timer_callback)
+
+v25_device::v25_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: v25_common_device(mconfig, V25, "V25", tag, owner, clock, "v25", false, 0, 4, 4, V20_TYPE)
 {
-	v25_state_t *nec_state = (v25_state_t *)ptr;
-	nec_state->pending_irq |= param;
 }
 
-INLINE void prefetch(v25_state_t *nec_state)
+
+v35_device::v35_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: v25_common_device(mconfig, V35, "V35", tag, owner, clock, "v35", true, BYTE_XOR_LE(0), 6, 2, V30_TYPE)
 {
-	nec_state->prefetch_count--;
 }
 
-static void do_prefetch(v25_state_t *nec_state, int previous_ICount)
+
+TIMER_CALLBACK_MEMBER(v25_common_device::v25_timer_callback)
 {
-	int diff = previous_ICount - (int) nec_state->icount;
+	m_pending_irq |= param;
+}
+
+void v25_common_device::prefetch()
+{
+	m_prefetch_count--;
+}
+
+void v25_common_device::do_prefetch(int previous_ICount)
+{
+	int diff = previous_ICount - (int) m_icount;
 
 	/* The implementation is not accurate, but comes close.
 	 * It does not respect that the V30 will fetch two bytes
@@ -81,44 +94,44 @@ static void do_prefetch(v25_state_t *nec_state, int previous_ICount)
 	 * of 4. There are however only very few sources publicly
 	 * available and they are vague.
 	 */
-	while (nec_state->prefetch_count<0)
+	while (m_prefetch_count<0)
 	{
-		nec_state->prefetch_count++;
-		if (diff>nec_state->prefetch_cycles)
-			diff -= nec_state->prefetch_cycles;
+		m_prefetch_count++;
+		if (diff>m_prefetch_cycles)
+			diff -= m_prefetch_cycles;
 		else
-			nec_state->icount -= nec_state->prefetch_cycles;
+			m_icount -= m_prefetch_cycles;
 	}
 
-	if (nec_state->prefetch_reset)
+	if (m_prefetch_reset)
 	{
-		nec_state->prefetch_count = 0;
-		nec_state->prefetch_reset = 0;
+		m_prefetch_count = 0;
+		m_prefetch_reset = 0;
 		return;
 	}
 
-	while (diff>=nec_state->prefetch_cycles && nec_state->prefetch_count < nec_state->prefetch_size)
+	while (diff>=m_prefetch_cycles && m_prefetch_count < m_prefetch_size)
 	{
-		diff -= nec_state->prefetch_cycles;
-		nec_state->prefetch_count++;
+		diff -= m_prefetch_cycles;
+		m_prefetch_count++;
 	}
 
 }
 
-INLINE UINT8 fetch(v25_state_t *nec_state)
+UINT8 v25_common_device::fetch()
 {
-	prefetch(nec_state);
-	return nec_state->direct->read_raw_byte((Sreg(PS)<<4)+nec_state->ip++, nec_state->fetch_xor);
+	prefetch();
+	return m_direct->read_raw_byte((Sreg(PS)<<4)+m_ip++, m_fetch_xor);
 }
 
-INLINE UINT16 fetchword(v25_state_t *nec_state)
+UINT16 v25_common_device::fetchword()
 {
 	UINT16 r = FETCH();
 	r |= (FETCH()<<8);
 	return r;
 }
 
-#define nec_state_t v25_state_t
+#define nec_common_device v25_common_device
 
 #include "v25instr.h"
 #include "necmacro.h"
@@ -127,17 +140,17 @@ INLINE UINT16 fetchword(v25_state_t *nec_state)
 
 static UINT8 parity_table[256];
 
-static UINT8 fetchop(v25_state_t *nec_state)
+UINT8 v25_common_device::fetchop()
 {
 	UINT8 ret;
 
-	prefetch(nec_state);
-	ret = nec_state->direct->read_decrypted_byte(( Sreg(PS)<<4)+nec_state->ip++, nec_state->fetch_xor);
+	prefetch();
+	ret = m_direct->read_decrypted_byte(( Sreg(PS)<<4)+m_ip++, m_fetch_xor);
 
-	if (nec_state->MF == 0)
-		if (nec_state->config->v25v35_decryptiontable)
+	if (m_MF == 0)
+		if (m_v25v35_decryptiontable)
 		{
-			ret = nec_state->config->v25v35_decryptiontable[ret];
+			ret = m_v25v35_decryptiontable[ret];
 		}
 	return ret;
 }
@@ -146,58 +159,57 @@ static UINT8 fetchop(v25_state_t *nec_state)
 
 /***************************************************************************/
 
-static CPU_RESET( v25 )
+void v25_common_device::device_reset()
 {
-	v25_state_t *nec_state = get_safe_token(device);
 	int tmp;
 	attotime time;
 
-	nec_state->ip = 0;
-	nec_state->IBRK = 1;
-	nec_state->F0 = 0;
-	nec_state->F1 = 0;
-	nec_state->TF = 0;
-	nec_state->IF = 0;
-	nec_state->DF = 0;
-	nec_state->SignVal = 0;
-	nec_state->AuxVal = 0;
-	nec_state->OverVal = 0;
-	nec_state->ZeroVal = 1;
-	nec_state->CarryVal = 0;
-	nec_state->ParityVal = 1;
-	nec_state->pending_irq = 0;
-	nec_state->unmasked_irq = INT_IRQ | NMI_IRQ;
-	nec_state->bankswitch_irq = 0;
-	nec_state->priority_inttu = 7;
-	nec_state->priority_intd = 7;
-	nec_state->priority_intp = 7;
-	nec_state->priority_ints0 = 7;
-	nec_state->priority_ints1 = 7;
-	nec_state->IRQS = nec_state->ISPR = 0;
-	nec_state->nmi_state = 0;
-	nec_state->irq_state = 0;
-	nec_state->poll_state = 1;
-	nec_state->mode_state = nec_state->MF = (nec_state->config->v25v35_decryptiontable) ? 0 : 1;
-	nec_state->intp_state[0] = 0;
-	nec_state->intp_state[1] = 0;
-	nec_state->intp_state[2] = 0;
-	nec_state->halted = 0;
+	m_ip = 0;
+	m_IBRK = 1;
+	m_F0 = 0;
+	m_F1 = 0;
+	m_TF = 0;
+	m_IF = 0;
+	m_DF = 0;
+	m_SignVal = 0;
+	m_AuxVal = 0;
+	m_OverVal = 0;
+	m_ZeroVal = 1;
+	m_CarryVal = 0;
+	m_ParityVal = 1;
+	m_pending_irq = 0;
+	m_unmasked_irq = INT_IRQ | NMI_IRQ;
+	m_bankswitch_irq = 0;
+	m_priority_inttu = 7;
+	m_priority_intd = 7;
+	m_priority_intp = 7;
+	m_priority_ints0 = 7;
+	m_priority_ints1 = 7;
+	m_IRQS = m_ISPR = 0;
+	m_nmi_state = 0;
+	m_irq_state = 0;
+	m_poll_state = 1;
+	m_mode_state = m_MF = (m_v25v35_decryptiontable) ? 0 : 1;
+	m_intp_state[0] = 0;
+	m_intp_state[1] = 0;
+	m_intp_state[2] = 0;
+	m_halted = 0;
 
-	nec_state->TM0 = nec_state->MD0 = nec_state->TM1 = nec_state->MD1 = 0;
-	nec_state->TMC0 = nec_state->TMC1 = 0;
+	m_TM0 = m_MD0 = m_TM1 = m_MD1 = 0;
+	m_TMC0 = m_TMC1 = 0;
 
-	nec_state->RAMEN = 1;
-	nec_state->TB = 20;
-	nec_state->PCK = 8;
-	nec_state->IDB = 0xFFE00;
+	m_RAMEN = 1;
+	m_TB = 20;
+	m_PCK = 8;
+	m_IDB = 0xFFE00;
 
-	tmp = nec_state->PCK << nec_state->TB;
-	time = attotime::from_hz(nec_state->device->unscaled_clock()) * tmp;
-	nec_state->timers[3]->adjust(time, INTTB, time);
+	tmp = m_PCK << m_TB;
+	time = attotime::from_hz(unscaled_clock()) * tmp;
+	m_timers[3]->adjust(time, INTTB, time);
 
-	nec_state->timers[0]->adjust(attotime::never);
-	nec_state->timers[1]->adjust(attotime::never);
-	nec_state->timers[2]->adjust(attotime::never);
+	m_timers[0]->adjust(attotime::never);
+	m_timers[1]->adjust(attotime::never);
+	m_timers[2]->adjust(attotime::never);
 
 	SetRB(7);
 	Sreg(PS) = 0xffff;
@@ -208,31 +220,28 @@ static CPU_RESET( v25 )
 	CHANGE_PC;
 }
 
-static CPU_EXIT( v25 )
-{
-}
 
-static void nec_interrupt(v25_state_t *nec_state, unsigned int_num, INTSOURCES source)
+void v25_common_device::nec_interrupt(unsigned int_num, int /*INTSOURCES*/ source)
 {
 	UINT32 dest_seg, dest_off;
 
-	i_pushf(nec_state);
-	nec_state->TF = nec_state->IF = 0;
-	nec_state->MF = nec_state->mode_state;
+	i_pushf();
+	m_TF = m_IF = 0;
+	m_MF = m_mode_state;
 
 	switch(source)
 	{
 		case BRKN:  /* force native mode */
-			nec_state->MF = 1;
+			m_MF = 1;
 			break;
 		case BRKS:  /* force secure mode */
-			if (nec_state->config->v25v35_decryptiontable)
-				nec_state->MF = 0;
+			if (m_v25v35_decryptiontable)
+				m_MF = 0;
 			else
-				logerror("%06x: BRKS executed with no decryption table\n",PC(nec_state));
+				logerror("%06x: BRKS executed with no decryption table\n",PC());
 			break;
 		case INT_IRQ:   /* get vector */
-			int_num = (*nec_state->irq_callback)(nec_state->device, 0);
+			int_num = standard_irq_callback(0);
 			break;
 		default:
 			break;
@@ -242,42 +251,42 @@ static void nec_interrupt(v25_state_t *nec_state, unsigned int_num, INTSOURCES s
 	dest_seg = read_mem_word(int_num*4+2);
 
 	PUSH(Sreg(PS));
-	PUSH(nec_state->ip);
-	nec_state->ip = (WORD)dest_off;
+	PUSH(m_ip);
+	m_ip = (WORD)dest_off;
 	Sreg(PS) = (WORD)dest_seg;
 	CHANGE_PC;
 }
 
-static void nec_bankswitch(v25_state_t *nec_state, unsigned bank_num)
+void v25_common_device::nec_bankswitch(unsigned bank_num)
 {
 	int tmp = CompressFlags();
 
-	nec_state->TF = nec_state->IF = 0;
-	nec_state->MF = nec_state->mode_state;
+	m_TF = m_IF = 0;
+	m_MF = m_mode_state;
 
 	SetRB(bank_num);
 
 	Wreg(PSW_SAVE) = tmp;
-	Wreg(PC_SAVE) = nec_state->ip;
-	nec_state->ip = Wreg(VECTOR_PC);
+	Wreg(PC_SAVE) = m_ip;
+	m_ip = Wreg(VECTOR_PC);
 	CHANGE_PC;
 }
 
-static void nec_trap(v25_state_t *nec_state)
+void v25_common_device::nec_trap()
 {
-	nec_instruction[fetchop(nec_state)](nec_state);
-	nec_interrupt(nec_state, NEC_TRAP_VECTOR, BRK);
+	(this->*s_nec_instruction[fetchop()])();
+	nec_interrupt(NEC_TRAP_VECTOR, BRK);
 }
 
 #define INTERRUPT(source, vector, priority) \
 	if(pending & (source)) {                \
-		nec_state->IRQS = vector;               \
-		nec_state->ISPR |= (1 << (priority));   \
-		nec_state->pending_irq &= ~(source);    \
-		if(nec_state->bankswitch_irq & (source))    \
-			nec_bankswitch(nec_state, priority);    \
+		m_IRQS = vector;               \
+		m_ISPR |= (1 << (priority));   \
+		m_pending_irq &= ~(source);    \
+		if(m_bankswitch_irq & (source))    \
+			nec_bankswitch(priority);    \
 		else                                    \
-			nec_interrupt(nec_state, vector, source);   \
+			nec_interrupt(vector, source);   \
 		break;  /* break out of loop */ \
 	}
 
@@ -285,49 +294,49 @@ static void nec_trap(v25_state_t *nec_state)
 #define SOURCES (INTTU0 | INTTU1 | INTTU2 | INTD0 | INTD1 | INTP0 | INTP1 | INTP2 \
 				| INTSER0 | INTSR0 | INTST0 | INTSER1 | INTSR1 | INTST1 | INTTB)
 
-static void external_int(v25_state_t *nec_state)
+void v25_common_device::external_int()
 {
-	int pending = nec_state->pending_irq & nec_state->unmasked_irq;
+	int pending = m_pending_irq & m_unmasked_irq;
 
 	if (pending & NMI_IRQ)
 	{
-		nec_interrupt(nec_state, NEC_NMI_VECTOR, NMI_IRQ);
-		nec_state->pending_irq &= ~NMI_IRQ;
+		nec_interrupt(NEC_NMI_VECTOR, NMI_IRQ);
+		m_pending_irq &= ~NMI_IRQ;
 	}
 	else if (pending & SOURCES)
 	{
 		for(int i = 0; i < 8; i++)
 		{
-			if (nec_state->ISPR & (1 << i)) break;
+			if (m_ISPR & (1 << i)) break;
 
-			if (nec_state->priority_inttu == i)
+			if (m_priority_inttu == i)
 			{
 				INTERRUPT(INTTU0, NEC_INTTU0_VECTOR, i)
 				INTERRUPT(INTTU1, NEC_INTTU1_VECTOR, i)
 				INTERRUPT(INTTU2, NEC_INTTU2_VECTOR, i)
 			}
 
-			if (nec_state->priority_intd == i)
+			if (m_priority_intd == i)
 			{
 				INTERRUPT(INTD0, NEC_INTD0_VECTOR, i)
 				INTERRUPT(INTD1, NEC_INTD1_VECTOR, i)
 			}
 
-			if (nec_state->priority_intp == i)
+			if (m_priority_intp == i)
 			{
 				INTERRUPT(INTP0, NEC_INTP0_VECTOR, i)
 				INTERRUPT(INTP1, NEC_INTP1_VECTOR, i)
 				INTERRUPT(INTP2, NEC_INTP2_VECTOR, i)
 			}
 
-			if (nec_state->priority_ints0 == i)
+			if (m_priority_ints0 == i)
 			{
 				INTERRUPT(INTSER0, NEC_INTSER0_VECTOR, i)
 				INTERRUPT(INTSR0, NEC_INTSR0_VECTOR, i)
 				INTERRUPT(INTST0, NEC_INTST0_VECTOR, i)
 			}
 
-			if (nec_state->priority_ints1 == i)
+			if (m_priority_ints1 == i)
 			{
 				INTERRUPT(INTSER1, NEC_INTSER1_VECTOR, i)
 				INTERRUPT(INTSR1, NEC_INTSR1_VECTOR, i)
@@ -342,9 +351,9 @@ static void external_int(v25_state_t *nec_state)
 	{
 		/* the actual vector is retrieved after pushing flags */
 		/* and clearing the IF */
-		nec_interrupt(nec_state, (UINT32)-1, INT_IRQ);
-		nec_state->irq_state = CLEAR_LINE;
-		nec_state->pending_irq &= ~INT_IRQ;
+		nec_interrupt((UINT32)-1, INT_IRQ);
+		m_irq_state = CLEAR_LINE;
+		m_pending_irq &= ~INT_IRQ;
 	}
 }
 
@@ -357,56 +366,53 @@ static void external_int(v25_state_t *nec_state)
 
 /*****************************************************************************/
 
-static void set_irq_line(v25_state_t *nec_state, int irqline, int state)
+void v25_common_device::execute_set_input(int irqline, int state)
 {
 	switch (irqline)
 	{
 		case 0:
-			nec_state->irq_state = state;
+			m_irq_state = state;
 			if (state == CLEAR_LINE)
-				nec_state->pending_irq &= ~INT_IRQ;
+				m_pending_irq &= ~INT_IRQ;
 			else
 			{
-				nec_state->pending_irq |= INT_IRQ;
-				nec_state->halted = 0;
+				m_pending_irq |= INT_IRQ;
+				m_halted = 0;
 			}
 			break;
 		case INPUT_LINE_NMI:
-			if (nec_state->nmi_state == state) return;
-			nec_state->nmi_state = state;
+			if (m_nmi_state == state) return;
+			m_nmi_state = state;
 			if (state != CLEAR_LINE)
 			{
-				nec_state->pending_irq |= NMI_IRQ;
-				nec_state->halted = 0;
+				m_pending_irq |= NMI_IRQ;
+				m_halted = 0;
 			}
 			break;
 		case NEC_INPUT_LINE_INTP0:
 		case NEC_INPUT_LINE_INTP1:
 		case NEC_INPUT_LINE_INTP2:
 			irqline -= NEC_INPUT_LINE_INTP0;
-			if (nec_state->intp_state[irqline] == state) return;
-			nec_state->intp_state[irqline] = state;
+			if (m_intp_state[irqline] == state) return;
+			m_intp_state[irqline] = state;
 			if (state != CLEAR_LINE)
-				nec_state->pending_irq |= (INTP0 << irqline);
+				m_pending_irq |= (INTP0 << irqline);
 			break;
 		case NEC_INPUT_LINE_POLL:
-			nec_state->poll_state = state;
+			m_poll_state = state;
 			break;
 	}
 }
 
-static CPU_DISASSEMBLE( v25 )
+offs_t v25_common_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
 {
-	v25_state_t *nec_state = get_safe_token(device);
+	extern int necv_dasm_one(char *buffer, UINT32 eip, const UINT8 *oprom, const UINT8 *decryption_table);
 
-	return necv_dasm_one(buffer, pc, oprom, nec_state->config);
+	return necv_dasm_one(buffer, pc, oprom, m_v25v35_decryptiontable);
 }
 
-static void v25_init(legacy_cpu_device *device, device_irq_acknowledge_callback irqcallback)
+void v25_common_device::device_start()
 {
-	const nec_config *config = device->static_config() ? (const nec_config *)device->static_config() : &default_config;
-	v25_state_t *nec_state = get_safe_token(device);
-
 	unsigned int i, j, c;
 
 	static const WREGS wreg_name[8]={ AW, CW, DW, BW, SP, BP, IX, IY };
@@ -431,295 +437,99 @@ static void v25_init(legacy_cpu_device *device, device_irq_acknowledge_callback 
 		Mod_RM.RM.b[i] = breg_name[i & 7];
 	}
 
-	memset(nec_state, 0, sizeof(*nec_state));
-
-	nec_state->config = config;
+	m_no_interrupt = 0;
+	m_prefetch_count = 0;
+	m_prefetch_reset = 0;
+	m_prefix_base = 0;
+	m_seg_prefix = 0;
+	m_EA = 0;
+	m_EO = 0;
+	m_E16 = 0;
 
 	for (i = 0; i < 4; i++)
-		nec_state->timers[i] = device->machine().scheduler().timer_alloc(FUNC(v25_timer_callback), nec_state);
+		m_timers[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(v25_common_device::v25_timer_callback),this));
 
-	device->save_item(NAME(nec_state->ram.w));
-	device->save_item(NAME(nec_state->intp_state));
+	save_item(NAME(m_ram.w));
+	save_item(NAME(m_intp_state));
 
-	device->save_item(NAME(nec_state->ip));
-	device->save_item(NAME(nec_state->IBRK));
-	device->save_item(NAME(nec_state->F0));
-	device->save_item(NAME(nec_state->F1));
-	device->save_item(NAME(nec_state->TF));
-	device->save_item(NAME(nec_state->IF));
-	device->save_item(NAME(nec_state->DF));
-	device->save_item(NAME(nec_state->MF));
-	device->save_item(NAME(nec_state->RBW));
-	device->save_item(NAME(nec_state->RBB));
-	device->save_item(NAME(nec_state->SignVal));
-	device->save_item(NAME(nec_state->AuxVal));
-	device->save_item(NAME(nec_state->OverVal));
-	device->save_item(NAME(nec_state->ZeroVal));
-	device->save_item(NAME(nec_state->CarryVal));
-	device->save_item(NAME(nec_state->ParityVal));
-	device->save_item(NAME(nec_state->pending_irq));
-	device->save_item(NAME(nec_state->unmasked_irq));
-	device->save_item(NAME(nec_state->bankswitch_irq));
-	device->save_item(NAME(nec_state->priority_inttu));
-	device->save_item(NAME(nec_state->priority_intd));
-	device->save_item(NAME(nec_state->priority_intp));
-	device->save_item(NAME(nec_state->priority_ints0));
-	device->save_item(NAME(nec_state->priority_ints1));
-	device->save_item(NAME(nec_state->IRQS));
-	device->save_item(NAME(nec_state->ISPR));
-	device->save_item(NAME(nec_state->nmi_state));
-	device->save_item(NAME(nec_state->irq_state));
-	device->save_item(NAME(nec_state->poll_state));
-	device->save_item(NAME(nec_state->mode_state));
-	device->save_item(NAME(nec_state->halted));
-	device->save_item(NAME(nec_state->TM0));
-	device->save_item(NAME(nec_state->MD0));
-	device->save_item(NAME(nec_state->TM1));
-	device->save_item(NAME(nec_state->MD1));
-	device->save_item(NAME(nec_state->TMC0));
-	device->save_item(NAME(nec_state->TMC1));
-	device->save_item(NAME(nec_state->RAMEN));
-	device->save_item(NAME(nec_state->TB));
-	device->save_item(NAME(nec_state->PCK));
-	device->save_item(NAME(nec_state->IDB));
+	save_item(NAME(m_ip));
+	save_item(NAME(m_IBRK));
+	save_item(NAME(m_F0));
+	save_item(NAME(m_F1));
+	save_item(NAME(m_TF));
+	save_item(NAME(m_IF));
+	save_item(NAME(m_DF));
+	save_item(NAME(m_MF));
+	save_item(NAME(m_RBW));
+	save_item(NAME(m_RBB));
+	save_item(NAME(m_SignVal));
+	save_item(NAME(m_AuxVal));
+	save_item(NAME(m_OverVal));
+	save_item(NAME(m_ZeroVal));
+	save_item(NAME(m_CarryVal));
+	save_item(NAME(m_ParityVal));
+	save_item(NAME(m_pending_irq));
+	save_item(NAME(m_unmasked_irq));
+	save_item(NAME(m_bankswitch_irq));
+	save_item(NAME(m_priority_inttu));
+	save_item(NAME(m_priority_intd));
+	save_item(NAME(m_priority_intp));
+	save_item(NAME(m_priority_ints0));
+	save_item(NAME(m_priority_ints1));
+	save_item(NAME(m_IRQS));
+	save_item(NAME(m_ISPR));
+	save_item(NAME(m_nmi_state));
+	save_item(NAME(m_irq_state));
+	save_item(NAME(m_poll_state));
+	save_item(NAME(m_mode_state));
+	save_item(NAME(m_halted));
+	save_item(NAME(m_TM0));
+	save_item(NAME(m_MD0));
+	save_item(NAME(m_TM1));
+	save_item(NAME(m_MD1));
+	save_item(NAME(m_TMC0));
+	save_item(NAME(m_TMC1));
+	save_item(NAME(m_RAMEN));
+	save_item(NAME(m_TB));
+	save_item(NAME(m_PCK));
+	save_item(NAME(m_IDB));
 
-	nec_state->irq_callback = irqcallback;
-	nec_state->device = device;
-	nec_state->program = &device->space(AS_PROGRAM);
-	nec_state->direct = &nec_state->program->direct();
-	nec_state->io = &device->space(AS_IO);
+	m_program = &space(AS_PROGRAM);
+	m_direct = &m_program->direct();
+	m_io = &space(AS_IO);
+
+	state_add( V25_PC,    "PC", m_debugger_temp).callimport().callexport().formatstr("%5X");
+	state_add( V25_IP,    "IP", m_ip).formatstr("%4X");
+	state_add( V25_SP,    "SP", m_debugger_temp).callimport().callexport().formatstr("%4X");
+	state_add( V25_FLAGS, "F", m_debugger_temp).callimport().callexport().formatstr("%4X");
+	state_add( V25_AW,    "AW", m_debugger_temp).callimport().callexport().formatstr("%4X");
+	state_add( V25_CW,    "CW", m_debugger_temp).callimport().callexport().formatstr("%4X");
+	state_add( V25_DW,    "DW", m_debugger_temp).callimport().callexport().formatstr("%4X");
+	state_add( V25_BW,    "BW", m_debugger_temp).callimport().callexport().formatstr("%4X");
+	state_add( V25_BP,    "BP", m_debugger_temp).callimport().callexport().formatstr("%4X");
+	state_add( V25_IX,    "IX", m_debugger_temp).callimport().callexport().formatstr("%4X");
+	state_add( V25_IY,    "IY", m_debugger_temp).callimport().callexport().formatstr("%4X");
+	state_add( V25_ES,    "DS1", m_debugger_temp).callimport().callexport().formatstr("%4X");
+	state_add( V25_CS,    "PS", m_debugger_temp).callimport().callexport().formatstr("%4X");
+	state_add( V25_SS,    "SS", m_debugger_temp).callimport().callexport().formatstr("%4X");
+	state_add( V25_DS,    "DS0", m_debugger_temp).callimport().callexport().formatstr("%4X");
+
+	state_add( STATE_GENPC, "GENPC", m_debugger_temp).callimport().callexport().noshow();
+	state_add( STATE_GENSP, "GENSP", m_debugger_temp).callimport().callexport().noshow();
+	state_add( STATE_GENFLAGS, "GENFLAGS", m_debugger_temp).formatstr("%16s").noshow();
+
+	m_icountptr = &m_icount;
 }
 
 
-
-static CPU_EXECUTE( v25 )
+void v25_common_device::state_string_export(const device_state_entry &entry, astring &string)
 {
-	v25_state_t *nec_state = get_safe_token(device);
-	int prev_ICount;
+	UINT16 flags = CompressFlags();
 
-	int pending = nec_state->pending_irq & nec_state->unmasked_irq;
-
-	if (nec_state->halted && pending)
+	switch (entry.index())
 	{
-		for(int i = 0; i < 8; i++)
-		{
-			if (nec_state->ISPR & (1 << i)) break;
-
-			if (nec_state->priority_inttu == i && (pending & (INTTU0|INTTU1|INTTU2)))
-				nec_state->halted = 0;
-
-			if (nec_state->priority_intd == i && (pending & (INTD0|INTD1)))
-				nec_state->halted = 0;
-
-			if (nec_state->priority_intp == i && (pending & (INTP0|INTP1|INTP2)))
-				nec_state->halted = 0;
-
-			if (nec_state->priority_ints0 == i && (pending & (INTSER0|INTSR0|INTST0)))
-				nec_state->halted = 0;
-
-			if (nec_state->priority_ints1 == i && (pending & (INTSER1|INTSR1|INTST1)))
-				nec_state->halted = 0;
-
-			if (i == 7 && (pending & INTTB))
-				nec_state->halted = 0;
-		}
-	}
-
-	if (nec_state->halted)
-	{
-		nec_state->icount = 0;
-		debugger_instruction_hook(device, (Sreg(PS)<<4) + nec_state->ip);
-		return;
-	}
-
-	while(nec_state->icount>0) {
-		/* Dispatch IRQ */
-		if (nec_state->no_interrupt==0 && (nec_state->pending_irq & nec_state->unmasked_irq))
-		{
-			if (nec_state->pending_irq & NMI_IRQ)
-				external_int(nec_state);
-			else if (nec_state->IF)
-				external_int(nec_state);
-		}
-
-		/* No interrupt allowed between last instruction and this one */
-		if (nec_state->no_interrupt)
-			nec_state->no_interrupt--;
-
-		debugger_instruction_hook(device, (Sreg(PS)<<4) + nec_state->ip);
-		prev_ICount = nec_state->icount;
-		nec_instruction[fetchop(nec_state)](nec_state);
-		do_prefetch(nec_state, prev_ICount);
-	}
-}
-
-/* Wrappers for the different CPU types */
-static CPU_INIT( v25 )
-{
-	v25_state_t *nec_state = get_safe_token(device);
-
-	v25_init(device, irqcallback);
-	nec_state->fetch_xor = 0;
-	nec_state->chip_type=V20_TYPE;
-	nec_state->prefetch_size = 4;       /* 3 words */
-	nec_state->prefetch_cycles = 4;     /* four cycles per byte */
-}
-
-static CPU_INIT( v35 )
-{
-	v25_state_t *nec_state = get_safe_token(device);
-
-	v25_init(device, irqcallback);
-	nec_state->fetch_xor = BYTE_XOR_LE(0);
-	nec_state->chip_type=V30_TYPE;
-	nec_state->prefetch_size = 6;       /* 3 words */
-	nec_state->prefetch_cycles = 2;     /* two cycles per byte / four per word */
-
-}
-
-
-
-/**************************************************************************
- * Generic set_info
- **************************************************************************/
-
-static CPU_SET_INFO( v25 )
-{
-	v25_state_t *nec_state = get_safe_token(device);
-
-	switch (state)
-	{
-		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_STATE + 0:                       set_irq_line(nec_state, 0, info->i);                break;
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:          set_irq_line(nec_state, INPUT_LINE_NMI, info->i);   break;
-		case CPUINFO_INT_INPUT_STATE + NEC_INPUT_LINE_INTP0:    set_irq_line(nec_state, NEC_INPUT_LINE_INTP0, info->i); break;
-		case CPUINFO_INT_INPUT_STATE + NEC_INPUT_LINE_INTP1:    set_irq_line(nec_state, NEC_INPUT_LINE_INTP1, info->i); break;
-		case CPUINFO_INT_INPUT_STATE + NEC_INPUT_LINE_INTP2:    set_irq_line(nec_state, NEC_INPUT_LINE_INTP2, info->i); break;
-		case CPUINFO_INT_INPUT_STATE + NEC_INPUT_LINE_POLL:     set_irq_line(nec_state, NEC_INPUT_LINE_POLL, info->i);  break;
-
-		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + NEC_PC:
-			if( info->i - (Sreg(PS)<<4) < 0x10000 )
-			{
-				nec_state->ip = info->i - (Sreg(PS)<<4);
-			}
-			else
-			{
-				Sreg(PS) = info->i >> 4;
-				nec_state->ip = info->i & 0x0000f;
-			}
-			break;
-		case CPUINFO_INT_REGISTER + NEC_IP:             nec_state->ip = info->i;                            break;
-		case CPUINFO_INT_SP:
-			if( info->i - (Sreg(SS)<<4) < 0x10000 )
-			{
-				Wreg(SP) = info->i - (Sreg(SS)<<4);
-			}
-			else
-			{
-				Sreg(SS) = info->i >> 4;
-				Wreg(SP) = info->i & 0x0000f;
-			}
-			break;
-		case CPUINFO_INT_REGISTER + NEC_SP:             Wreg(SP) = info->i;                 break;
-		case CPUINFO_INT_REGISTER + NEC_FLAGS:          ExpandFlags(info->i);                   break;
-		case CPUINFO_INT_REGISTER + NEC_AW:             Wreg(AW) = info->i;                 break;
-		case CPUINFO_INT_REGISTER + NEC_CW:             Wreg(CW) = info->i;                 break;
-		case CPUINFO_INT_REGISTER + NEC_DW:             Wreg(DW) = info->i;                 break;
-		case CPUINFO_INT_REGISTER + NEC_BW:             Wreg(BW) = info->i;                 break;
-		case CPUINFO_INT_REGISTER + NEC_BP:             Wreg(BP) = info->i;                 break;
-		case CPUINFO_INT_REGISTER + NEC_IX:             Wreg(IX) = info->i;                 break;
-		case CPUINFO_INT_REGISTER + NEC_IY:             Wreg(IY) = info->i;                 break;
-		case CPUINFO_INT_REGISTER + NEC_ES:             Sreg(DS1) = info->i;                    break;
-		case CPUINFO_INT_REGISTER + NEC_CS:             Sreg(PS) = info->i;                 break;
-		case CPUINFO_INT_REGISTER + NEC_SS:             Sreg(SS) = info->i;                 break;
-		case CPUINFO_INT_REGISTER + NEC_DS:             Sreg(DS0) = info->i;                    break;
-	}
-}
-
-
-
-/**************************************************************************
- * Generic get_info
- **************************************************************************/
-
-static CPU_GET_INFO( v25v35 )
-{
-	v25_state_t *nec_state = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
-	int flags;
-
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:                  info->i = sizeof(v25_state_t);                  break;
-		case CPUINFO_INT_INPUT_LINES:                   info->i = 1;                            break;
-		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:            info->i = 0xff;                         break;
-		case CPUINFO_INT_ENDIANNESS:                    info->i = ENDIANNESS_LITTLE;                    break;
-		case CPUINFO_INT_CLOCK_MULTIPLIER:              info->i = 1;                            break;
-		case CPUINFO_INT_CLOCK_DIVIDER:                 info->i = 2;                            break;
-		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:         info->i = 1;                            break;
-		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:         info->i = 8;                            break;
-		case CPUINFO_INT_MIN_CYCLES:                    info->i = 1;                            break;
-		case CPUINFO_INT_MAX_CYCLES:                    info->i = 80;                           break;
-
-		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:    info->i = 16;                   break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:    info->i = 20;                   break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM:    info->i = 0;                    break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:   info->i = 0;                    break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:   info->i = 0;                    break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:   info->i = 0;                    break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:     info->i = 16;                   break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:     info->i = 17;                   break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:     info->i = 0;                    break;
-
-		case CPUINFO_INT_INPUT_STATE + 0:                       info->i = (nec_state->pending_irq & INT_IRQ) ? ASSERT_LINE : CLEAR_LINE; break;
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:          info->i = nec_state->nmi_state;             break;
-		case CPUINFO_INT_INPUT_STATE + NEC_INPUT_LINE_INTP0:    info->i = nec_state->intp_state[0];         break;
-		case CPUINFO_INT_INPUT_STATE + NEC_INPUT_LINE_INTP1:    info->i = nec_state->intp_state[1];         break;
-		case CPUINFO_INT_INPUT_STATE + NEC_INPUT_LINE_INTP2:    info->i = nec_state->intp_state[2];         break;
-		case CPUINFO_INT_INPUT_STATE + NEC_INPUT_LINE_POLL:     info->i = nec_state->poll_state;            break;
-
-		case CPUINFO_INT_PREVIOUSPC:                    /* not supported */                     break;
-
-		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + NEC_PC:             info->i = ((Sreg(PS)<<4) + nec_state->ip);  break;
-		case CPUINFO_INT_REGISTER + NEC_IP:             info->i = nec_state->ip;                            break;
-		case CPUINFO_INT_SP:                            info->i = (Sreg(SS)<<4) + Wreg(SP); break;
-		case CPUINFO_INT_REGISTER + NEC_SP:             info->i = Wreg(SP);                 break;
-		case CPUINFO_INT_REGISTER + NEC_FLAGS:          info->i = CompressFlags();              break;
-		case CPUINFO_INT_REGISTER + NEC_AW:             info->i = Wreg(AW);                 break;
-		case CPUINFO_INT_REGISTER + NEC_CW:             info->i = Wreg(CW);                 break;
-		case CPUINFO_INT_REGISTER + NEC_DW:             info->i = Wreg(DW);                 break;
-		case CPUINFO_INT_REGISTER + NEC_BW:             info->i = Wreg(BW);                 break;
-		case CPUINFO_INT_REGISTER + NEC_BP:             info->i = Wreg(BP);                 break;
-		case CPUINFO_INT_REGISTER + NEC_IX:             info->i = Wreg(IX);                 break;
-		case CPUINFO_INT_REGISTER + NEC_IY:             info->i = Wreg(IY);                 break;
-		case CPUINFO_INT_REGISTER + NEC_ES:             info->i = Sreg(DS1);                    break;
-		case CPUINFO_INT_REGISTER + NEC_CS:             info->i = Sreg(PS);                 break;
-		case CPUINFO_INT_REGISTER + NEC_SS:             info->i = Sreg(SS);                 break;
-		case CPUINFO_INT_REGISTER + NEC_DS:             info->i = Sreg(DS0);                    break;
-		case CPUINFO_INT_REGISTER + NEC_PENDING:        info->i = nec_state->pending_irq;               break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_SET_INFO:                      info->setinfo = CPU_SET_INFO_NAME(v25);         break;
-		case CPUINFO_FCT_INIT:                          /* set per-CPU */                       break;
-		case CPUINFO_FCT_RESET:                         info->reset = CPU_RESET_NAME(v25);              break;
-		case CPUINFO_FCT_EXIT:                          info->exit = CPU_EXIT_NAME(v25);                    break;
-		case CPUINFO_FCT_EXECUTE:                       info->execute = CPU_EXECUTE_NAME(v25);          break;
-		case CPUINFO_FCT_BURN:                          info->burn = NULL;                      break;
-		case CPUINFO_FCT_DISASSEMBLE:                   info->disassemble = CPU_DISASSEMBLE_NAME(v25);          break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:           info->icount = &nec_state->icount;              break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "NEC");                 break;
-		case CPUINFO_STR_FAMILY:                    strcpy(info->s, "NEC V-Series");        break;
-		case CPUINFO_STR_VERSION:                   strcpy(info->s, "2.0");                 break;
-		case CPUINFO_STR_SOURCE_FILE:                       strcpy(info->s, __FILE__);              break;
-		case CPUINFO_STR_CREDITS:                   strcpy(info->s, "Bryan McPhail (V25/V35 support added by Alex W. Jackson)"); break;
-
-		case CPUINFO_STR_FLAGS:
-			flags = CompressFlags();
-			sprintf(info->s, "%c %d %c%c%c%c%c%c%c%c%c%c%c%c",
+		case STATE_GENFLAGS:
+			string.printf("%c %d %c%c%c%c%c%c%c%c%c%c%c%c",
 				flags & 0x8000 ? 'N':'S',
 				(flags & 0x7000) >> 12,
 				flags & 0x0800 ? 'O':'.',
@@ -735,72 +545,205 @@ static CPU_GET_INFO( v25v35 )
 				flags & 0x0002 ? '.':'I',
 				flags & 0x0001 ? 'C':'.');
 			break;
-
-		case CPUINFO_STR_REGISTER + NEC_PC:             sprintf(info->s, "PC:%05X", (Sreg(PS)<<4) + nec_state->ip); break;
-		case CPUINFO_STR_REGISTER + NEC_IP:             sprintf(info->s, "IP:%04X", nec_state->ip); break;
-		case CPUINFO_STR_REGISTER + NEC_SP:             sprintf(info->s, "SP:%04X", Wreg(SP)); break;
-		case CPUINFO_STR_REGISTER + NEC_FLAGS:          sprintf(info->s, "F:%04X", CompressFlags()); break;
-		case CPUINFO_STR_REGISTER + NEC_AW:             sprintf(info->s, "AW:%04X", Wreg(AW)); break;
-		case CPUINFO_STR_REGISTER + NEC_CW:             sprintf(info->s, "CW:%04X", Wreg(CW)); break;
-		case CPUINFO_STR_REGISTER + NEC_DW:             sprintf(info->s, "DW:%04X", Wreg(DW)); break;
-		case CPUINFO_STR_REGISTER + NEC_BW:             sprintf(info->s, "BW:%04X", Wreg(BW)); break;
-		case CPUINFO_STR_REGISTER + NEC_BP:             sprintf(info->s, "BP:%04X", Wreg(BP)); break;
-		case CPUINFO_STR_REGISTER + NEC_IX:             sprintf(info->s, "IX:%04X", Wreg(IX)); break;
-		case CPUINFO_STR_REGISTER + NEC_IY:             sprintf(info->s, "IY:%04X", Wreg(IY)); break;
-		case CPUINFO_STR_REGISTER + NEC_ES:             sprintf(info->s, "DS1:%04X", Sreg(DS1)); break;
-		case CPUINFO_STR_REGISTER + NEC_CS:             sprintf(info->s, "PS:%04X", Sreg(PS)); break;
-		case CPUINFO_STR_REGISTER + NEC_SS:             sprintf(info->s, "SS:%04X", Sreg(SS)); break;
-		case CPUINFO_STR_REGISTER + NEC_DS:             sprintf(info->s, "DS0:%04X", Sreg(DS0)); break;
 	}
 }
 
-
-/**************************************************************************
- * CPU-specific set_info
- **************************************************************************/
-
-CPU_GET_INFO( v25 )
+void v25_common_device::state_import(const device_state_entry &entry)
 {
-	switch (state)
+	switch (entry.index())
 	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:    info->i = 8;                    break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:     info->i = 8;                    break;
+		case V25_PC:
+			if( m_debugger_temp - (Sreg(PS)<<4) < 0x10000 )
+			{
+				m_ip = m_debugger_temp - (Sreg(PS)<<4);
+			}
+			else
+			{
+				Sreg(PS) = m_debugger_temp >> 4;
+				m_ip = m_debugger_temp & 0x0000f;
+			}
+			break;
 
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(v25);                    break;
+		case V25_SP:
+			Wreg(SP) = m_debugger_temp;
+			break;
 
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "V25");                 break;
-		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "v25");                 break;
+		case V25_FLAGS:
+			ExpandFlags(m_debugger_temp);
+			break;
 
-		default:                                        CPU_GET_INFO_CALL(v25v35);              break;
+		case V25_AW:
+			Wreg(AW) = m_debugger_temp;
+			break;
+
+		case V25_CW:
+			Wreg(CW) = m_debugger_temp;
+			break;
+
+		case V25_DW:
+			Wreg(DW) = m_debugger_temp;
+			break;
+
+		case V25_BW:
+			Wreg(BW) = m_debugger_temp;
+			break;
+
+		case V25_BP:
+			Wreg(BP) = m_debugger_temp;
+			break;
+
+		case V25_IX:
+			Wreg(IX) = m_debugger_temp;
+			break;
+
+		case V25_IY:
+			Wreg(IY) = m_debugger_temp;
+			break;
+
+		case V25_ES:
+			Sreg(DS1) = m_debugger_temp;
+			break;
+
+		case V25_CS:
+			Sreg(PS) = m_debugger_temp;
+			break;
+
+		case V25_SS:
+			Sreg(SS) = m_debugger_temp;
+			break;
+
+		case V25_DS:
+			Sreg(DS0) = m_debugger_temp;
+			break;
 	}
 }
 
 
-/**************************************************************************
- * CPU-specific set_info
- **************************************************************************/
-
-CPU_GET_INFO( v35 )
+void v25_common_device::state_export(const device_state_entry &entry)
 {
-	switch (state)
+	switch (entry.index())
 	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:    info->i = 16;                   break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:     info->i = 16;                   break;
+		case STATE_GENPC:
+		case V25_PC:
+			m_debugger_temp = (Sreg(PS)<<4) + m_ip;
+			break;
 
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(v35);                    break;
+		case STATE_GENSP:
+			m_debugger_temp = (Sreg(SS)<<4) + Wreg(SP);
+			break;
 
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "V35");                 break;
-		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "v35");                 break;
+		case V25_SP:
+			m_debugger_temp = Wreg(SP);
+			break;
 
-		default:                                        CPU_GET_INFO_CALL(v25v35);              break;
+		case V25_FLAGS:
+			m_debugger_temp = CompressFlags();
+			break;
+
+		case V25_AW:
+			m_debugger_temp = Wreg(AW);
+			break;
+
+		case V25_CW:
+			m_debugger_temp = Wreg(CW);
+			break;
+
+		case V25_DW:
+			m_debugger_temp = Wreg(DW);
+			break;
+
+		case V25_BW:
+			m_debugger_temp = Wreg(BW);
+			break;
+
+		case V25_BP:
+			m_debugger_temp = Wreg(BP);
+			break;
+
+		case V25_IX:
+			m_debugger_temp = Wreg(IX);
+			break;
+
+		case V25_IY:
+			m_debugger_temp = Wreg(IY);
+			break;
+
+		case V25_ES:
+			m_debugger_temp = Sreg(DS1);
+			break;
+
+		case V25_CS:
+			m_debugger_temp = Sreg(PS);
+			break;
+
+		case V25_SS:
+			m_debugger_temp = Sreg(SS);
+			break;
+
+		case V25_DS:
+			m_debugger_temp = Sreg(DS0);
+			break;
 	}
 }
 
-DEFINE_LEGACY_CPU_DEVICE(V25, v25);
-DEFINE_LEGACY_CPU_DEVICE(V35, v35);
+
+void v25_common_device::execute_run()
+{
+	int prev_ICount;
+
+	int pending = m_pending_irq & m_unmasked_irq;
+
+	if (m_halted && pending)
+	{
+		for(int i = 0; i < 8; i++)
+		{
+			if (m_ISPR & (1 << i)) break;
+
+			if (m_priority_inttu == i && (pending & (INTTU0|INTTU1|INTTU2)))
+				m_halted = 0;
+
+			if (m_priority_intd == i && (pending & (INTD0|INTD1)))
+				m_halted = 0;
+
+			if (m_priority_intp == i && (pending & (INTP0|INTP1|INTP2)))
+				m_halted = 0;
+
+			if (m_priority_ints0 == i && (pending & (INTSER0|INTSR0|INTST0)))
+				m_halted = 0;
+
+			if (m_priority_ints1 == i && (pending & (INTSER1|INTSR1|INTST1)))
+				m_halted = 0;
+
+			if (i == 7 && (pending & INTTB))
+				m_halted = 0;
+		}
+	}
+
+	if (m_halted)
+	{
+		m_icount = 0;
+		debugger_instruction_hook(this, (Sreg(PS)<<4) + m_ip);
+		return;
+	}
+
+	while(m_icount>0) {
+		/* Dispatch IRQ */
+		if (m_no_interrupt==0 && (m_pending_irq & m_unmasked_irq))
+		{
+			if (m_pending_irq & NMI_IRQ)
+				external_int();
+			else if (m_IF)
+				external_int();
+		}
+
+		/* No interrupt allowed between last instruction and this one */
+		if (m_no_interrupt)
+			m_no_interrupt--;
+
+		debugger_instruction_hook(this, (Sreg(PS)<<4) + m_ip);
+		prev_ICount = m_icount;
+		(this->*s_nec_instruction[fetchop()])();
+		do_prefetch(prev_ICount);
+	}
+}
+

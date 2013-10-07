@@ -1,60 +1,57 @@
 
-static UINT32 EA;
-static UINT16 EO;
-static UINT16 E16;
+UINT32 nec_common_device::EA_000() { m_EO=Wreg(BW)+Wreg(IX); m_EA=DefaultBase(DS0)+m_EO; return m_EA; }
+UINT32 nec_common_device::EA_001() { m_EO=Wreg(BW)+Wreg(IY); m_EA=DefaultBase(DS0)+m_EO; return m_EA; }
+UINT32 nec_common_device::EA_002() { m_EO=Wreg(BP)+Wreg(IX); m_EA=DefaultBase(SS)+m_EO; return m_EA; }
+UINT32 nec_common_device::EA_003() { m_EO=Wreg(BP)+Wreg(IY); m_EA=DefaultBase(SS)+m_EO; return m_EA; }
+UINT32 nec_common_device::EA_004() { m_EO=Wreg(IX); m_EA=DefaultBase(DS0)+m_EO; return m_EA; }
+UINT32 nec_common_device::EA_005() { m_EO=Wreg(IY); m_EA=DefaultBase(DS0)+m_EO; return m_EA; }
+UINT32 nec_common_device::EA_006() { m_EO=FETCH(); m_EO+=FETCH()<<8; m_EA=DefaultBase(DS0)+m_EO; return m_EA; }
+UINT32 nec_common_device::EA_007() { m_EO=Wreg(BW); m_EA=DefaultBase(DS0)+m_EO; return m_EA; }
 
-static unsigned EA_000(nec_state_t *nec_state) { EO=Wreg(BW)+Wreg(IX); EA=DefaultBase(DS0)+EO; return EA; }
-static unsigned EA_001(nec_state_t *nec_state) { EO=Wreg(BW)+Wreg(IY); EA=DefaultBase(DS0)+EO; return EA; }
-static unsigned EA_002(nec_state_t *nec_state) { EO=Wreg(BP)+Wreg(IX); EA=DefaultBase(SS)+EO; return EA; }
-static unsigned EA_003(nec_state_t *nec_state) { EO=Wreg(BP)+Wreg(IY); EA=DefaultBase(SS)+EO; return EA; }
-static unsigned EA_004(nec_state_t *nec_state) { EO=Wreg(IX); EA=DefaultBase(DS0)+EO; return EA; }
-static unsigned EA_005(nec_state_t *nec_state) { EO=Wreg(IY); EA=DefaultBase(DS0)+EO; return EA; }
-static unsigned EA_006(nec_state_t *nec_state) { EO=FETCH(); EO+=FETCH()<<8; EA=DefaultBase(DS0)+EO; return EA; }
-static unsigned EA_007(nec_state_t *nec_state) { EO=Wreg(BW); EA=DefaultBase(DS0)+EO; return EA; }
+UINT32 nec_common_device::EA_100() { m_EO=(Wreg(BW)+Wreg(IX)+(INT8)FETCH()); m_EA=DefaultBase(DS0)+m_EO; return m_EA; }
+UINT32 nec_common_device::EA_101() { m_EO=(Wreg(BW)+Wreg(IY)+(INT8)FETCH()); m_EA=DefaultBase(DS0)+m_EO; return m_EA; }
+UINT32 nec_common_device::EA_102() { m_EO=(Wreg(BP)+Wreg(IX)+(INT8)FETCH()); m_EA=DefaultBase(SS)+m_EO; return m_EA; }
+UINT32 nec_common_device::EA_103() { m_EO=(Wreg(BP)+Wreg(IY)+(INT8)FETCH()); m_EA=DefaultBase(SS)+m_EO; return m_EA; }
+UINT32 nec_common_device::EA_104() { m_EO=(Wreg(IX)+(INT8)FETCH()); m_EA=DefaultBase(DS0)+m_EO; return m_EA; }
+UINT32 nec_common_device::EA_105() { m_EO=(Wreg(IY)+(INT8)FETCH()); m_EA=DefaultBase(DS0)+m_EO; return m_EA; }
+UINT32 nec_common_device::EA_106() { m_EO=(Wreg(BP)+(INT8)FETCH()); m_EA=DefaultBase(SS)+m_EO; return m_EA; }
+UINT32 nec_common_device::EA_107() { m_EO=(Wreg(BW)+(INT8)FETCH()); m_EA=DefaultBase(DS0)+m_EO; return m_EA; }
 
-static unsigned EA_100(nec_state_t *nec_state) { EO=(Wreg(BW)+Wreg(IX)+(INT8)FETCH()); EA=DefaultBase(DS0)+EO; return EA; }
-static unsigned EA_101(nec_state_t *nec_state) { EO=(Wreg(BW)+Wreg(IY)+(INT8)FETCH()); EA=DefaultBase(DS0)+EO; return EA; }
-static unsigned EA_102(nec_state_t *nec_state) { EO=(Wreg(BP)+Wreg(IX)+(INT8)FETCH()); EA=DefaultBase(SS)+EO; return EA; }
-static unsigned EA_103(nec_state_t *nec_state) { EO=(Wreg(BP)+Wreg(IY)+(INT8)FETCH()); EA=DefaultBase(SS)+EO; return EA; }
-static unsigned EA_104(nec_state_t *nec_state) { EO=(Wreg(IX)+(INT8)FETCH()); EA=DefaultBase(DS0)+EO; return EA; }
-static unsigned EA_105(nec_state_t *nec_state) { EO=(Wreg(IY)+(INT8)FETCH()); EA=DefaultBase(DS0)+EO; return EA; }
-static unsigned EA_106(nec_state_t *nec_state) { EO=(Wreg(BP)+(INT8)FETCH()); EA=DefaultBase(SS)+EO; return EA; }
-static unsigned EA_107(nec_state_t *nec_state) { EO=(Wreg(BW)+(INT8)FETCH()); EA=DefaultBase(DS0)+EO; return EA; }
+UINT32 nec_common_device::EA_200() { m_E16=FETCH(); m_E16+=FETCH()<<8; m_EO=Wreg(BW)+Wreg(IX)+(INT16)m_E16; m_EA=DefaultBase(DS0)+m_EO; return m_EA; }
+UINT32 nec_common_device::EA_201() { m_E16=FETCH(); m_E16+=FETCH()<<8; m_EO=Wreg(BW)+Wreg(IY)+(INT16)m_E16; m_EA=DefaultBase(DS0)+m_EO; return m_EA; }
+UINT32 nec_common_device::EA_202() { m_E16=FETCH(); m_E16+=FETCH()<<8; m_EO=Wreg(BP)+Wreg(IX)+(INT16)m_E16; m_EA=DefaultBase(SS)+m_EO; return m_EA; }
+UINT32 nec_common_device::EA_203() { m_E16=FETCH(); m_E16+=FETCH()<<8; m_EO=Wreg(BP)+Wreg(IY)+(INT16)m_E16; m_EA=DefaultBase(SS)+m_EO; return m_EA; }
+UINT32 nec_common_device::EA_204() { m_E16=FETCH(); m_E16+=FETCH()<<8; m_EO=Wreg(IX)+(INT16)m_E16; m_EA=DefaultBase(DS0)+m_EO; return m_EA; }
+UINT32 nec_common_device::EA_205() { m_E16=FETCH(); m_E16+=FETCH()<<8; m_EO=Wreg(IY)+(INT16)m_E16; m_EA=DefaultBase(DS0)+m_EO; return m_EA; }
+UINT32 nec_common_device::EA_206() { m_E16=FETCH(); m_E16+=FETCH()<<8; m_EO=Wreg(BP)+(INT16)m_E16; m_EA=DefaultBase(SS)+m_EO; return m_EA; }
+UINT32 nec_common_device::EA_207() { m_E16=FETCH(); m_E16+=FETCH()<<8; m_EO=Wreg(BW)+(INT16)m_E16; m_EA=DefaultBase(DS0)+m_EO; return m_EA; }
 
-static unsigned EA_200(nec_state_t *nec_state) { E16=FETCH(); E16+=FETCH()<<8; EO=Wreg(BW)+Wreg(IX)+(INT16)E16; EA=DefaultBase(DS0)+EO; return EA; }
-static unsigned EA_201(nec_state_t *nec_state) { E16=FETCH(); E16+=FETCH()<<8; EO=Wreg(BW)+Wreg(IY)+(INT16)E16; EA=DefaultBase(DS0)+EO; return EA; }
-static unsigned EA_202(nec_state_t *nec_state) { E16=FETCH(); E16+=FETCH()<<8; EO=Wreg(BP)+Wreg(IX)+(INT16)E16; EA=DefaultBase(SS)+EO; return EA; }
-static unsigned EA_203(nec_state_t *nec_state) { E16=FETCH(); E16+=FETCH()<<8; EO=Wreg(BP)+Wreg(IY)+(INT16)E16; EA=DefaultBase(SS)+EO; return EA; }
-static unsigned EA_204(nec_state_t *nec_state) { E16=FETCH(); E16+=FETCH()<<8; EO=Wreg(IX)+(INT16)E16; EA=DefaultBase(DS0)+EO; return EA; }
-static unsigned EA_205(nec_state_t *nec_state) { E16=FETCH(); E16+=FETCH()<<8; EO=Wreg(IY)+(INT16)E16; EA=DefaultBase(DS0)+EO; return EA; }
-static unsigned EA_206(nec_state_t *nec_state) { E16=FETCH(); E16+=FETCH()<<8; EO=Wreg(BP)+(INT16)E16; EA=DefaultBase(SS)+EO; return EA; }
-static unsigned EA_207(nec_state_t *nec_state) { E16=FETCH(); E16+=FETCH()<<8; EO=Wreg(BW)+(INT16)E16; EA=DefaultBase(DS0)+EO; return EA; }
+const nec_common_device::nec_eahandler nec_common_device::s_GetEA[192]=
+{
+	&nec_common_device::EA_000, &nec_common_device::EA_001, &nec_common_device::EA_002, &nec_common_device::EA_003, &nec_common_device::EA_004, &nec_common_device::EA_005, &nec_common_device::EA_006, &nec_common_device::EA_007,
+	&nec_common_device::EA_000, &nec_common_device::EA_001, &nec_common_device::EA_002, &nec_common_device::EA_003, &nec_common_device::EA_004, &nec_common_device::EA_005, &nec_common_device::EA_006, &nec_common_device::EA_007,
+	&nec_common_device::EA_000, &nec_common_device::EA_001, &nec_common_device::EA_002, &nec_common_device::EA_003, &nec_common_device::EA_004, &nec_common_device::EA_005, &nec_common_device::EA_006, &nec_common_device::EA_007,
+	&nec_common_device::EA_000, &nec_common_device::EA_001, &nec_common_device::EA_002, &nec_common_device::EA_003, &nec_common_device::EA_004, &nec_common_device::EA_005, &nec_common_device::EA_006, &nec_common_device::EA_007,
+	&nec_common_device::EA_000, &nec_common_device::EA_001, &nec_common_device::EA_002, &nec_common_device::EA_003, &nec_common_device::EA_004, &nec_common_device::EA_005, &nec_common_device::EA_006, &nec_common_device::EA_007,
+	&nec_common_device::EA_000, &nec_common_device::EA_001, &nec_common_device::EA_002, &nec_common_device::EA_003, &nec_common_device::EA_004, &nec_common_device::EA_005, &nec_common_device::EA_006, &nec_common_device::EA_007,
+	&nec_common_device::EA_000, &nec_common_device::EA_001, &nec_common_device::EA_002, &nec_common_device::EA_003, &nec_common_device::EA_004, &nec_common_device::EA_005, &nec_common_device::EA_006, &nec_common_device::EA_007,
+	&nec_common_device::EA_000, &nec_common_device::EA_001, &nec_common_device::EA_002, &nec_common_device::EA_003, &nec_common_device::EA_004, &nec_common_device::EA_005, &nec_common_device::EA_006, &nec_common_device::EA_007,
 
-static unsigned (*const GetEA[192])(nec_state_t *)={
-	EA_000, EA_001, EA_002, EA_003, EA_004, EA_005, EA_006, EA_007,
-	EA_000, EA_001, EA_002, EA_003, EA_004, EA_005, EA_006, EA_007,
-	EA_000, EA_001, EA_002, EA_003, EA_004, EA_005, EA_006, EA_007,
-	EA_000, EA_001, EA_002, EA_003, EA_004, EA_005, EA_006, EA_007,
-	EA_000, EA_001, EA_002, EA_003, EA_004, EA_005, EA_006, EA_007,
-	EA_000, EA_001, EA_002, EA_003, EA_004, EA_005, EA_006, EA_007,
-	EA_000, EA_001, EA_002, EA_003, EA_004, EA_005, EA_006, EA_007,
-	EA_000, EA_001, EA_002, EA_003, EA_004, EA_005, EA_006, EA_007,
+	&nec_common_device::EA_100, &nec_common_device::EA_101, &nec_common_device::EA_102, &nec_common_device::EA_103, &nec_common_device::EA_104, &nec_common_device::EA_105, &nec_common_device::EA_106, &nec_common_device::EA_107,
+	&nec_common_device::EA_100, &nec_common_device::EA_101, &nec_common_device::EA_102, &nec_common_device::EA_103, &nec_common_device::EA_104, &nec_common_device::EA_105, &nec_common_device::EA_106, &nec_common_device::EA_107,
+	&nec_common_device::EA_100, &nec_common_device::EA_101, &nec_common_device::EA_102, &nec_common_device::EA_103, &nec_common_device::EA_104, &nec_common_device::EA_105, &nec_common_device::EA_106, &nec_common_device::EA_107,
+	&nec_common_device::EA_100, &nec_common_device::EA_101, &nec_common_device::EA_102, &nec_common_device::EA_103, &nec_common_device::EA_104, &nec_common_device::EA_105, &nec_common_device::EA_106, &nec_common_device::EA_107,
+	&nec_common_device::EA_100, &nec_common_device::EA_101, &nec_common_device::EA_102, &nec_common_device::EA_103, &nec_common_device::EA_104, &nec_common_device::EA_105, &nec_common_device::EA_106, &nec_common_device::EA_107,
+	&nec_common_device::EA_100, &nec_common_device::EA_101, &nec_common_device::EA_102, &nec_common_device::EA_103, &nec_common_device::EA_104, &nec_common_device::EA_105, &nec_common_device::EA_106, &nec_common_device::EA_107,
+	&nec_common_device::EA_100, &nec_common_device::EA_101, &nec_common_device::EA_102, &nec_common_device::EA_103, &nec_common_device::EA_104, &nec_common_device::EA_105, &nec_common_device::EA_106, &nec_common_device::EA_107,
+	&nec_common_device::EA_100, &nec_common_device::EA_101, &nec_common_device::EA_102, &nec_common_device::EA_103, &nec_common_device::EA_104, &nec_common_device::EA_105, &nec_common_device::EA_106, &nec_common_device::EA_107,
 
-	EA_100, EA_101, EA_102, EA_103, EA_104, EA_105, EA_106, EA_107,
-	EA_100, EA_101, EA_102, EA_103, EA_104, EA_105, EA_106, EA_107,
-	EA_100, EA_101, EA_102, EA_103, EA_104, EA_105, EA_106, EA_107,
-	EA_100, EA_101, EA_102, EA_103, EA_104, EA_105, EA_106, EA_107,
-	EA_100, EA_101, EA_102, EA_103, EA_104, EA_105, EA_106, EA_107,
-	EA_100, EA_101, EA_102, EA_103, EA_104, EA_105, EA_106, EA_107,
-	EA_100, EA_101, EA_102, EA_103, EA_104, EA_105, EA_106, EA_107,
-	EA_100, EA_101, EA_102, EA_103, EA_104, EA_105, EA_106, EA_107,
-
-	EA_200, EA_201, EA_202, EA_203, EA_204, EA_205, EA_206, EA_207,
-	EA_200, EA_201, EA_202, EA_203, EA_204, EA_205, EA_206, EA_207,
-	EA_200, EA_201, EA_202, EA_203, EA_204, EA_205, EA_206, EA_207,
-	EA_200, EA_201, EA_202, EA_203, EA_204, EA_205, EA_206, EA_207,
-	EA_200, EA_201, EA_202, EA_203, EA_204, EA_205, EA_206, EA_207,
-	EA_200, EA_201, EA_202, EA_203, EA_204, EA_205, EA_206, EA_207,
-	EA_200, EA_201, EA_202, EA_203, EA_204, EA_205, EA_206, EA_207,
-	EA_200, EA_201, EA_202, EA_203, EA_204, EA_205, EA_206, EA_207
+	&nec_common_device::EA_200, &nec_common_device::EA_201, &nec_common_device::EA_202, &nec_common_device::EA_203, &nec_common_device::EA_204, &nec_common_device::EA_205, &nec_common_device::EA_206, &nec_common_device::EA_207,
+	&nec_common_device::EA_200, &nec_common_device::EA_201, &nec_common_device::EA_202, &nec_common_device::EA_203, &nec_common_device::EA_204, &nec_common_device::EA_205, &nec_common_device::EA_206, &nec_common_device::EA_207,
+	&nec_common_device::EA_200, &nec_common_device::EA_201, &nec_common_device::EA_202, &nec_common_device::EA_203, &nec_common_device::EA_204, &nec_common_device::EA_205, &nec_common_device::EA_206, &nec_common_device::EA_207,
+	&nec_common_device::EA_200, &nec_common_device::EA_201, &nec_common_device::EA_202, &nec_common_device::EA_203, &nec_common_device::EA_204, &nec_common_device::EA_205, &nec_common_device::EA_206, &nec_common_device::EA_207,
+	&nec_common_device::EA_200, &nec_common_device::EA_201, &nec_common_device::EA_202, &nec_common_device::EA_203, &nec_common_device::EA_204, &nec_common_device::EA_205, &nec_common_device::EA_206, &nec_common_device::EA_207,
+	&nec_common_device::EA_200, &nec_common_device::EA_201, &nec_common_device::EA_202, &nec_common_device::EA_203, &nec_common_device::EA_204, &nec_common_device::EA_205, &nec_common_device::EA_206, &nec_common_device::EA_207,
+	&nec_common_device::EA_200, &nec_common_device::EA_201, &nec_common_device::EA_202, &nec_common_device::EA_203, &nec_common_device::EA_204, &nec_common_device::EA_205, &nec_common_device::EA_206, &nec_common_device::EA_207,
+	&nec_common_device::EA_200, &nec_common_device::EA_201, &nec_common_device::EA_202, &nec_common_device::EA_203, &nec_common_device::EA_204, &nec_common_device::EA_205, &nec_common_device::EA_206, &nec_common_device::EA_207
 };

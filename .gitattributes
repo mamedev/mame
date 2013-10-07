@@ -715,6 +715,7 @@ src/emu/cpu/nec/necmacro.h svneol=native#text/plain
 src/emu/cpu/nec/necmodrm.h svneol=native#text/plain
 src/emu/cpu/nec/necpriv.h svneol=native#text/plain
 src/emu/cpu/nec/v25.c svneol=native#text/plain
+src/emu/cpu/nec/v25.h svneol=native#text/plain
 src/emu/cpu/nec/v25instr.c svneol=native#text/plain
 src/emu/cpu/nec/v25instr.h svneol=native#text/plain
 src/emu/cpu/nec/v25priv.h svneol=native#text/plain

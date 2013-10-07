@@ -7,18 +7,7 @@
 
 #include "emu.h"
 
-struct nec_config
-{
-	const UINT8*    v25v35_decryptiontable; // internal decryption table
-};
-
-/* default configuration */
-static const nec_config default_config =
-{
-	NULL
-};
-
-static const nec_config *Iconfig;
+static const UINT8 *Iconfig;
 
 enum
 {
@@ -1532,14 +1521,14 @@ static void decode_opcode(char *s, const I386_OPCODE *op, UINT8 op1 )
 		case SEG_SS:
 			segment = op->flags;
 			op2 = FETCH();
-			if (Iconfig->v25v35_decryptiontable) op2 = Iconfig->v25v35_decryptiontable[op2];
+			if (Iconfig) op2 = Iconfig[op2];
 			decode_opcode( s, &necv_opcode_table1[op2], op1 );
 			return;
 
 		case PREFIX:
 			s += sprintf( s, "%-8s", op->mnemonic );
 			op2 = FETCH();
-			if (Iconfig->v25v35_decryptiontable) op2 = Iconfig->v25v35_decryptiontable[op2];
+			if (Iconfig) op2 = Iconfig[op2];
 			decode_opcode( s, &necv_opcode_table1[op2], op1 );
 			return;
 
@@ -1586,11 +1575,10 @@ handle_unknown:
 	sprintf(s, "???");
 }
 
-int necv_dasm_one(char *buffer, UINT32 eip, const UINT8 *oprom, const nec_config *_config)
+int necv_dasm_one(char *buffer, UINT32 eip, const UINT8 *oprom, const UINT8 *decryption_table)
 {
 	UINT8 op;
-	const nec_config *config = _config ? _config : &default_config;
-	Iconfig = config;
+	Iconfig = decryption_table;
 
 	opcode_ptr = opcode_ptr_base = oprom;
 	pc = eip;
@@ -1599,7 +1587,7 @@ int necv_dasm_one(char *buffer, UINT32 eip, const UINT8 *oprom, const nec_config
 
 	op = FETCH();
 
-	if (Iconfig->v25v35_decryptiontable) op = Iconfig->v25v35_decryptiontable[op];
+	if (Iconfig) op = Iconfig[op];
 
 	decode_opcode( buffer, &necv_opcode_table1[op], op );
 	return (pc-eip) | dasm_flags | DASMFLAG_SUPPORTED;

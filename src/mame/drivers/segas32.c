@@ -332,7 +332,7 @@ orunners:  Interleaved with the dj and << >> buttons is the data the drives the 
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/v60/v60.h"
-#include "cpu/nec/nec.h"
+#include "cpu/nec/v25.h"
 #include "rendlay.h"
 #include "includes/segas32.h"
 #include "machine/eepromser.h"
@@ -2210,14 +2210,12 @@ static MACHINE_CONFIG_START( system32, segas32_state )
 MACHINE_CONFIG_END
 
 
-static const nec_config ga2_v25_config ={ ga2_v25_opcode_table, };
-
 static MACHINE_CONFIG_DERIVED( system32_v25, system32 )
 
 	/* add a V25 for protection */
 	MCFG_CPU_ADD("mcu", V25, 10000000)
 	MCFG_CPU_PROGRAM_MAP(ga2_v25_map)
-	MCFG_CPU_CONFIG(ga2_v25_config)
+	MCFG_V25_CONFIG(ga2_v25_opcode_table)
 MACHINE_CONFIG_END
 
 

@@ -59,68 +59,6 @@ enum INTSOURCES
 	BRKS    = 1 << 18
 };
 
-/* internal RAM and register banks */
-union internalram
-{
-	UINT16 w[128];
-	UINT8  b[256];
-};
-
-struct v25_state_t
-{
-	internalram ram;
-	offs_t  fetch_xor;
-
-	UINT16  ip;
-
-	/* PSW flags */
-	INT32   SignVal;
-	UINT32  AuxVal, OverVal, ZeroVal, CarryVal, ParityVal;  /* 0 or non-0 valued flags */
-	UINT8   IBRK, F0, F1, TF, IF, DF, MF;   /* 0 or 1 valued flags */
-	UINT8   RBW, RBB;   /* current register bank base, preshifted for word and byte registers */
-
-	/* interrupt related */
-	UINT32  pending_irq;
-	UINT32  unmasked_irq;
-	UINT32  bankswitch_irq;
-	UINT8   priority_inttu, priority_intd, priority_intp, priority_ints0, priority_ints1;
-	UINT8   IRQS, ISPR;
-	UINT32  nmi_state;
-	UINT32  irq_state;
-	UINT32  poll_state;
-	UINT32  mode_state;
-	UINT32  intp_state[3];
-	UINT8   no_interrupt;
-	UINT8   halted;
-
-	/* timer related */
-	UINT16  TM0, MD0, TM1, MD1;
-	UINT8   TMC0, TMC1;
-	emu_timer *timers[4];
-
-	/* system control */
-	UINT8   RAMEN, TB, PCK; /* PRC register */
-	UINT32  IDB;
-
-	device_irq_acknowledge_callback irq_callback;
-	legacy_cpu_device *device;
-	address_space *program;
-	direct_read_data *direct;
-	address_space *io;
-	int     icount;
-
-	const nec_config *config;
-
-	UINT8   prefetch_size;
-	UINT8   prefetch_cycles;
-	INT8    prefetch_count;
-	UINT8   prefetch_reset;
-	UINT32  chip_type;
-
-	UINT32  prefix_base;    /* base address of the latest prefix segment */
-	UINT8   seg_prefix;     /* prefix segment indicator */
-};
-
 enum {
 	VECTOR_PC = 0x02/2,
 	PSW_SAVE  = 0x04/2,
@@ -156,38 +94,33 @@ enum BREGS {
 	BH = NATIVE_ENDIAN_VALUE_LE_BE(0x19, 0x18)
 };
 
-#define SetRB(x)        do { nec_state->RBW = (x) << 4; nec_state->RBB = (x) << 5; } while (0)
+#define SetRB(x)        do { m_RBW = (x) << 4; m_RBB = (x) << 5; } while (0)
 
-#define Sreg(x)         nec_state->ram.w[nec_state->RBW + (x)]
-#define Wreg(x)         nec_state->ram.w[nec_state->RBW + (x)]
-#define Breg(x)         nec_state->ram.b[nec_state->RBB + (x)]
+#define Sreg(x)         m_ram.w[m_RBW + (x)]
+#define Wreg(x)         m_ram.w[m_RBW + (x)]
+#define Breg(x)         m_ram.b[m_RBB + (x)]
 
-#define PC(n)       ((Sreg(PS)<<4)+(n)->ip)
+#define PC()       ((Sreg(PS)<<4)+m_ip)
 
-#define CF      (nec_state->CarryVal!=0)
-#define SF      (nec_state->SignVal<0)
-#define ZF      (nec_state->ZeroVal==0)
-#define PF      parity_table[(BYTE)nec_state->ParityVal]
-#define AF      (nec_state->AuxVal!=0)
-#define OF      (nec_state->OverVal!=0)
-#define RB      (nec_state->RBW >> 4)
+#define CF      (m_CarryVal!=0)
+#define SF      (m_SignVal<0)
+#define ZF      (m_ZeroVal==0)
+#define PF      parity_table[(BYTE)m_ParityVal]
+#define AF      (m_AuxVal!=0)
+#define OF      (m_OverVal!=0)
+#define RB      (m_RBW >> 4)
 
 /************************************************************************/
 
-UINT8 v25_read_byte(v25_state_t *nec_state, unsigned a);
-UINT16 v25_read_word(v25_state_t *nec_state, unsigned a);
-void v25_write_byte(v25_state_t *nec_state, unsigned a, UINT8 d);
-void v25_write_word(v25_state_t *nec_state, unsigned a, UINT16 d);
+#define read_mem_byte(a)            v25_read_byte((a))
+#define read_mem_word(a)            v25_read_word((a))
+#define write_mem_byte(a,d)         v25_write_byte((a),(d))
+#define write_mem_word(a,d)         v25_write_word((a),(d))
 
-#define read_mem_byte(a)            v25_read_byte(nec_state,(a))
-#define read_mem_word(a)            v25_read_word(nec_state,(a))
-#define write_mem_byte(a,d)         v25_write_byte(nec_state,(a),(d))
-#define write_mem_word(a,d)         v25_write_word(nec_state,(a),(d))
-
-#define read_port_byte(a)       nec_state->io->read_byte(a)
-#define read_port_word(a)       nec_state->io->read_word_unaligned(a)
-#define write_port_byte(a,d)    nec_state->io->write_byte((a),(d))
-#define write_port_word(a,d)    nec_state->io->write_word_unaligned((a),(d))
+#define read_port_byte(a)       m_io->read_byte(a)
+#define read_port_word(a)       m_io->read_word_unaligned(a)
+#define write_port_byte(a,d)    m_io->write_byte((a),(d))
+#define write_port_word(a,d)    m_io->write_word_unaligned((a),(d))
 
 /************************************************************************/
 
@@ -195,7 +128,7 @@ void v25_write_word(v25_state_t *nec_state, unsigned a, UINT16 d);
 
 #define SegBase(Seg) (Sreg(Seg) << 4)
 
-#define DefaultBase(Seg) ((nec_state->seg_prefix && (Seg==DS0 || Seg==SS)) ? nec_state->prefix_base : Sreg(Seg) << 4)
+#define DefaultBase(Seg) ((m_seg_prefix && (Seg==DS0 || Seg==SS)) ? m_prefix_base : Sreg(Seg) << 4)
 
 #define GetMemB(Seg,Off) (read_mem_byte(DefaultBase(Seg) + (Off)))
 #define GetMemW(Seg,Off) (read_mem_word(DefaultBase(Seg) + (Off)))
@@ -205,9 +138,9 @@ void v25_write_word(v25_state_t *nec_state, unsigned a, UINT16 d);
 
 /* prefetch timing */
 
-#define FETCH()             fetch(nec_state)
-#define FETCHWORD()         fetchword(nec_state)
-#define EMPTY_PREFETCH()    nec_state->prefetch_reset = 1
+#define FETCH()             fetch()
+#define FETCHWORD()         fetchword()
+#define EMPTY_PREFETCH()    m_prefetch_reset = 1
 
 
 #define PUSH(val) { Wreg(SP) -= 2; write_mem_word(((Sreg(SS)<<4)+Wreg(SP)), val); }
@@ -227,31 +160,31 @@ void v25_write_word(v25_state_t *nec_state, unsigned a, UINT16 d);
     Extra cycles for PUSH'ing or POP'ing registers to odd addresses is not emulated.
 */
 
-#define CLK(all) nec_state->icount-=all
-#define CLKS(v20,v30,v33) { const UINT32 ccount=(v20<<16)|(v30<<8)|v33; nec_state->icount-=(ccount>>nec_state->chip_type)&0x7f; }
-#define CLKW(v20o,v30o,v33o,v20e,v30e,v33e,addr) { const UINT32 ocount=(v20o<<16)|(v30o<<8)|v33o, ecount=(v20e<<16)|(v30e<<8)|v33e; nec_state->icount-=(addr&1)?((ocount>>nec_state->chip_type)&0x7f):((ecount>>nec_state->chip_type)&0x7f); }
-#define CLKM(v20,v30,v33,v20m,v30m,v33m) { const UINT32 ccount=(v20<<16)|(v30<<8)|v33, mcount=(v20m<<16)|(v30m<<8)|v33m; nec_state->icount-=( ModRM >=0xc0 )?((ccount>>nec_state->chip_type)&0x7f):((mcount>>nec_state->chip_type)&0x7f); }
-#define CLKR(v20o,v30o,v33o,v20e,v30e,v33e,vall,addr) { const UINT32 ocount=(v20o<<16)|(v30o<<8)|v33o, ecount=(v20e<<16)|(v30e<<8)|v33e; if (ModRM >=0xc0) nec_state->icount-=vall; else nec_state->icount-=(addr&1)?((ocount>>nec_state->chip_type)&0x7f):((ecount>>nec_state->chip_type)&0x7f); }
+#define CLK(all) m_icount-=all
+#define CLKS(v20,v30,v33) { const UINT32 ccount=(v20<<16)|(v30<<8)|v33; m_icount-=(ccount>>m_chip_type)&0x7f; }
+#define CLKW(v20o,v30o,v33o,v20e,v30e,v33e,addr) { const UINT32 ocount=(v20o<<16)|(v30o<<8)|v33o, ecount=(v20e<<16)|(v30e<<8)|v33e; m_icount-=(addr&1)?((ocount>>m_chip_type)&0x7f):((ecount>>m_chip_type)&0x7f); }
+#define CLKM(v20,v30,v33,v20m,v30m,v33m) { const UINT32 ccount=(v20<<16)|(v30<<8)|v33, mcount=(v20m<<16)|(v30m<<8)|v33m; m_icount-=( ModRM >=0xc0 )?((ccount>>m_chip_type)&0x7f):((mcount>>m_chip_type)&0x7f); }
+#define CLKR(v20o,v30o,v33o,v20e,v30e,v33e,vall,addr) { const UINT32 ocount=(v20o<<16)|(v30o<<8)|v33o, ecount=(v20e<<16)|(v30e<<8)|v33e; if (ModRM >=0xc0) m_icount-=vall; else m_icount-=(addr&1)?((ocount>>m_chip_type)&0x7f):((ecount>>m_chip_type)&0x7f); }
 
 /************************************************************************/
-#define CompressFlags() (WORD)(CF | (nec_state->IBRK << 1) | (PF << 2) | (nec_state->F0 << 3) | (AF << 4) \
-				| (nec_state->F1 << 5) | (ZF << 6) | (SF << 7) | (nec_state->TF << 8) | (nec_state->IF << 9) \
-				| (nec_state->DF << 10) | (OF << 11) | (RB << 12) | (nec_state->MF << 15))
+#define CompressFlags() (WORD)(CF | (m_IBRK << 1) | (PF << 2) | (m_F0 << 3) | (AF << 4) \
+				| (m_F1 << 5) | (ZF << 6) | (SF << 7) | (m_TF << 8) | (m_IF << 9) \
+				| (m_DF << 10) | (OF << 11) | (RB << 12) | (m_MF << 15))
 
 #define ExpandFlags(f) \
 { \
-	nec_state->CarryVal = (f) & 0x0001; \
-	nec_state->IBRK = ((f) & 0x0002) == 0x0002; \
-	nec_state->ParityVal = !((f) & 0x0004); \
-	nec_state->F0 = ((f) & 0x0008) == 0x0008; \
-	nec_state->AuxVal = (f) & 0x0010; \
-	nec_state->F1 = ((f) & 0x0020) == 0x0020; \
-	nec_state->ZeroVal = !((f) & 0x0040); \
-	nec_state->SignVal = (f) & 0x0080 ? -1 : 0; \
-	nec_state->TF = ((f) & 0x0100) == 0x0100; \
-	nec_state->IF = ((f) & 0x0200) == 0x0200; \
-	nec_state->DF = ((f) & 0x0400) == 0x0400; \
-	nec_state->OverVal = (f) & 0x0800; \
+	m_CarryVal = (f) & 0x0001; \
+	m_IBRK = ((f) & 0x0002) == 0x0002; \
+	m_ParityVal = !((f) & 0x0004); \
+	m_F0 = ((f) & 0x0008) == 0x0008; \
+	m_AuxVal = (f) & 0x0010; \
+	m_F1 = ((f) & 0x0020) == 0x0020; \
+	m_ZeroVal = !((f) & 0x0040); \
+	m_SignVal = (f) & 0x0080 ? -1 : 0; \
+	m_TF = ((f) & 0x0100) == 0x0100; \
+	m_IF = ((f) & 0x0200) == 0x0200; \
+	m_DF = ((f) & 0x0400) == 0x0400; \
+	m_OverVal = (f) & 0x0800; \
 	/* RB only changes on BRKCS/RETRBI/TSKSW, so skip it */ \
-	nec_state->MF = ((f) & 0x8000) == 0x8000; \
+	m_MF = ((f) & 0x8000) == 0x8000; \
 }

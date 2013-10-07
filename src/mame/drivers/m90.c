@@ -19,6 +19,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/nec/nec.h"
+#include "cpu/nec/v25.h"
 #include "includes/iremipt.h"
 #include "machine/irem_cpu.h"
 #include "sound/dac.h"
@@ -738,48 +739,42 @@ static MACHINE_CONFIG_START( m90, m90_state )
 MACHINE_CONFIG_END
 
 
-static const nec_config hasamu_config ={ gunforce_decryption_table, };
 static MACHINE_CONFIG_DERIVED( hasamu, m90 )
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CONFIG(hasamu_config)
+	MCFG_V25_CONFIG(gunforce_decryption_table)
 MACHINE_CONFIG_END
 
-static const nec_config quizf1_config ={    lethalth_decryption_table, };
 static MACHINE_CONFIG_DERIVED( quizf1, m90 )
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CONFIG(quizf1_config)
+	MCFG_V25_CONFIG(lethalth_decryption_table)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(6*8, 54*8-1, 17*8-8, 47*8-1+8)
 MACHINE_CONFIG_END
 
-static const nec_config matchit2_config ={  matchit2_decryption_table, };
 static MACHINE_CONFIG_DERIVED( matchit2, m90 )
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CONFIG(matchit2_config)
+	MCFG_V25_CONFIG(matchit2_decryption_table)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(6*8, 54*8-1, 17*8-8, 47*8-1+8)
 MACHINE_CONFIG_END
 
-static const nec_config riskchal_config ={  gussun_decryption_table, };
 static MACHINE_CONFIG_DERIVED( riskchal, m90 )
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CONFIG(riskchal_config)
+	MCFG_V25_CONFIG(gussun_decryption_table)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(10*8, 50*8-1, 17*8, 47*8-1)
 MACHINE_CONFIG_END
 
-static const nec_config bomberman_config ={     bomberman_decryption_table, };
 static MACHINE_CONFIG_DERIVED( bombrman, m90 )
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CONFIG(bomberman_config)
+	MCFG_V25_CONFIG(bomberman_decryption_table)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(10*8, 50*8-1, 17*8, 47*8-1)
 MACHINE_CONFIG_END
 
-static const nec_config dynablaster_config ={   dynablaster_decryption_table, };
 static MACHINE_CONFIG_DERIVED( bbmanwj, m90 )
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CONFIG(dynablaster_config)
+	MCFG_V25_CONFIG(dynablaster_decryption_table)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(10*8, 50*8-1, 17*8, 47*8-1)
 MACHINE_CONFIG_END

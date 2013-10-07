@@ -41,7 +41,7 @@ this seems more like 8-bit hardware, maybe it should be v25, not v35...
 *************************************************************************************************/
 
 #include "emu.h"
-#include "cpu/nec/nec.h"
+#include "cpu/nec/v25.h"
 #include "sound/ay8910.h"
 #include "machine/i8255.h"
 
@@ -832,11 +832,9 @@ static const ay8910_interface cb2001_ay8910_config =
 	DEVCB_NULL
 };
 
-static const nec_config cb2001_config = { cb2001_decryption_table, };
-
 static MACHINE_CONFIG_START( cb2001, cb2001_state )
 	MCFG_CPU_ADD("maincpu", V35, 20000000) // CPU91A-011-0016JK004; encrypted cpu like nec v25/35 used in some irem game
-	MCFG_CPU_CONFIG(cb2001_config)
+	MCFG_V25_CONFIG(cb2001_decryption_table)
 	MCFG_CPU_PROGRAM_MAP(cb2001_map)
 	MCFG_CPU_IO_MAP(cb2001_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cb2001_state,  vblank_irq)

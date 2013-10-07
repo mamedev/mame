@@ -1,507 +1,260 @@
-static void i_add_br8(nec_state_t *nec_state);
-static void i_add_wr16(nec_state_t *nec_state);
-static void i_add_r8b(nec_state_t *nec_state);
-static void i_add_r16w(nec_state_t *nec_state);
-static void i_add_ald8(nec_state_t *nec_state);
-static void i_add_axd16(nec_state_t *nec_state);
-static void i_push_es(nec_state_t *nec_state);
-static void i_pop_es(nec_state_t *nec_state);
-static void i_or_br8(nec_state_t *nec_state);
-static void i_or_r8b(nec_state_t *nec_state);
-static void i_or_wr16(nec_state_t *nec_state);
-static void i_or_r16w(nec_state_t *nec_state);
-static void i_or_ald8(nec_state_t *nec_state);
-static void i_or_axd16(nec_state_t *nec_state);
-static void i_push_cs(nec_state_t *nec_state);
-static void i_pre_nec(nec_state_t *nec_state);
-static void i_adc_br8(nec_state_t *nec_state);
-static void i_adc_wr16(nec_state_t *nec_state);
-static void i_adc_r8b(nec_state_t *nec_state);
-static void i_adc_r16w(nec_state_t *nec_state);
-static void i_adc_ald8(nec_state_t *nec_state);
-static void i_adc_axd16(nec_state_t *nec_state);
-static void i_push_ss(nec_state_t *nec_state);
-static void i_pop_ss(nec_state_t *nec_state);
-static void i_sbb_br8(nec_state_t *nec_state);
-static void i_sbb_wr16(nec_state_t *nec_state);
-static void i_sbb_r8b(nec_state_t *nec_state);
-static void i_sbb_r16w(nec_state_t *nec_state);
-static void i_sbb_ald8(nec_state_t *nec_state);
-static void i_sbb_axd16(nec_state_t *nec_state);
-static void i_push_ds(nec_state_t *nec_state);
-static void i_pop_ds(nec_state_t *nec_state);
-static void i_and_br8(nec_state_t *nec_state);
-static void i_and_r8b(nec_state_t *nec_state);
-static void i_and_wr16(nec_state_t *nec_state);
-static void i_and_r16w(nec_state_t *nec_state);
-static void i_and_ald8(nec_state_t *nec_state);
-static void i_and_axd16(nec_state_t *nec_state);
-static void i_es(nec_state_t *nec_state);
-static void i_daa(nec_state_t *nec_state);
-static void i_sub_br8(nec_state_t *nec_state);
-static void i_sub_wr16(nec_state_t *nec_state);
-static void i_sub_r8b(nec_state_t *nec_state);
-static void i_sub_r16w(nec_state_t *nec_state);
-static void i_sub_ald8(nec_state_t *nec_state);
-static void i_sub_axd16(nec_state_t *nec_state);
-static void i_cs(nec_state_t *nec_state);
-static void i_das(nec_state_t *nec_state);
-static void i_xor_br8(nec_state_t *nec_state);
-static void i_xor_r8b(nec_state_t *nec_state);
-static void i_xor_wr16(nec_state_t *nec_state);
-static void i_xor_r16w(nec_state_t *nec_state);
-static void i_xor_ald8(nec_state_t *nec_state);
-static void i_xor_axd16(nec_state_t *nec_state);
-static void i_ss(nec_state_t *nec_state);
-static void i_aaa(nec_state_t *nec_state);
-static void i_cmp_br8(nec_state_t *nec_state);
-static void i_cmp_wr16(nec_state_t *nec_state);
-static void i_cmp_r8b(nec_state_t *nec_state);
-static void i_cmp_r16w(nec_state_t *nec_state);
-static void i_cmp_ald8(nec_state_t *nec_state);
-static void i_cmp_axd16(nec_state_t *nec_state);
-static void i_ds(nec_state_t *nec_state);
-static void i_aas(nec_state_t *nec_state);
-static void i_inc_ax(nec_state_t *nec_state);
-static void i_inc_cx(nec_state_t *nec_state);
-static void i_inc_dx(nec_state_t *nec_state);
-static void i_inc_bx(nec_state_t *nec_state);
-static void i_inc_sp(nec_state_t *nec_state);
-static void i_inc_bp(nec_state_t *nec_state);
-static void i_inc_si(nec_state_t *nec_state);
-static void i_inc_di(nec_state_t *nec_state);
-static void i_dec_ax(nec_state_t *nec_state);
-static void i_dec_cx(nec_state_t *nec_state);
-static void i_dec_dx(nec_state_t *nec_state);
-static void i_dec_bx(nec_state_t *nec_state);
-static void i_dec_sp(nec_state_t *nec_state);
-static void i_dec_bp(nec_state_t *nec_state);
-static void i_dec_si(nec_state_t *nec_state);
-static void i_dec_di(nec_state_t *nec_state);
-static void i_push_ax(nec_state_t *nec_state);
-static void i_push_cx(nec_state_t *nec_state);
-static void i_push_dx(nec_state_t *nec_state);
-static void i_push_bx(nec_state_t *nec_state);
-static void i_push_sp(nec_state_t *nec_state);
-static void i_push_bp(nec_state_t *nec_state);
-static void i_push_si(nec_state_t *nec_state);
-static void i_push_di(nec_state_t *nec_state);
-static void i_pop_ax(nec_state_t *nec_state);
-static void i_pop_cx(nec_state_t *nec_state);
-static void i_pop_dx(nec_state_t *nec_state);
-static void i_pop_bx(nec_state_t *nec_state);
-static void i_pop_sp(nec_state_t *nec_state);
-static void i_pop_bp(nec_state_t *nec_state);
-static void i_pop_si(nec_state_t *nec_state);
-static void i_pop_di(nec_state_t *nec_state);
-static void i_pusha(nec_state_t *nec_state);
-static void i_popa(nec_state_t *nec_state);
-static void i_chkind(nec_state_t *nec_state);
-static void i_repnc(nec_state_t *nec_state);
-static void i_repc(nec_state_t *nec_state);
-static void i_push_d16(nec_state_t *nec_state);
-static void i_imul_d16(nec_state_t *nec_state);
-static void i_push_d8(nec_state_t *nec_state);
-static void i_imul_d8(nec_state_t *nec_state);
-static void i_insb(nec_state_t *nec_state);
-static void i_insw(nec_state_t *nec_state);
-static void i_outsb(nec_state_t *nec_state);
-static void i_outsw(nec_state_t *nec_state);
-static void i_jo(nec_state_t *nec_state);
-static void i_jno(nec_state_t *nec_state);
-static void i_jc(nec_state_t *nec_state);
-static void i_jnc(nec_state_t *nec_state);
-static void i_jz(nec_state_t *nec_state);
-static void i_jnz(nec_state_t *nec_state);
-static void i_jce(nec_state_t *nec_state);
-static void i_jnce(nec_state_t *nec_state);
-static void i_js(nec_state_t *nec_state);
-static void i_jns(nec_state_t *nec_state);
-static void i_jp(nec_state_t *nec_state);
-static void i_jnp(nec_state_t *nec_state);
-static void i_jl(nec_state_t *nec_state);
-static void i_jnl(nec_state_t *nec_state);
-static void i_jle(nec_state_t *nec_state);
-static void i_jnle(nec_state_t *nec_state);
-static void i_80pre(nec_state_t *nec_state);
-static void i_82pre(nec_state_t *nec_state);
-static void i_81pre(nec_state_t *nec_state);
-static void i_83pre(nec_state_t *nec_state);
-static void i_test_br8(nec_state_t *nec_state);
-static void i_test_wr16(nec_state_t *nec_state);
-static void i_xchg_br8(nec_state_t *nec_state);
-static void i_xchg_wr16(nec_state_t *nec_state);
-static void i_mov_br8(nec_state_t *nec_state);
-static void i_mov_r8b(nec_state_t *nec_state);
-static void i_mov_wr16(nec_state_t *nec_state);
-static void i_mov_r16w(nec_state_t *nec_state);
-static void i_mov_wsreg(nec_state_t *nec_state);
-static void i_lea(nec_state_t *nec_state);
-static void i_mov_sregw(nec_state_t *nec_state);
-static void i_invalid(nec_state_t *nec_state);
-static void i_popw(nec_state_t *nec_state);
-static void i_nop(nec_state_t *nec_state);
-static void i_xchg_axcx(nec_state_t *nec_state);
-static void i_xchg_axdx(nec_state_t *nec_state);
-static void i_xchg_axbx(nec_state_t *nec_state);
-static void i_xchg_axsp(nec_state_t *nec_state);
-static void i_xchg_axbp(nec_state_t *nec_state);
-static void i_xchg_axsi(nec_state_t *nec_state);
-static void i_xchg_axdi(nec_state_t *nec_state);
-static void i_cbw(nec_state_t *nec_state);
-static void i_cwd(nec_state_t *nec_state);
-static void i_call_far(nec_state_t *nec_state);
-static void i_pushf(nec_state_t *nec_state);
-static void i_popf(nec_state_t *nec_state);
-static void i_sahf(nec_state_t *nec_state);
-static void i_lahf(nec_state_t *nec_state);
-static void i_mov_aldisp(nec_state_t *nec_state);
-static void i_mov_axdisp(nec_state_t *nec_state);
-static void i_mov_dispal(nec_state_t *nec_state);
-static void i_mov_dispax(nec_state_t *nec_state);
-static void i_movsb(nec_state_t *nec_state);
-static void i_movsw(nec_state_t *nec_state);
-static void i_cmpsb(nec_state_t *nec_state);
-static void i_cmpsw(nec_state_t *nec_state);
-static void i_test_ald8(nec_state_t *nec_state);
-static void i_test_axd16(nec_state_t *nec_state);
-static void i_stosb(nec_state_t *nec_state);
-static void i_stosw(nec_state_t *nec_state);
-static void i_lodsb(nec_state_t *nec_state);
-static void i_lodsw(nec_state_t *nec_state);
-static void i_scasb(nec_state_t *nec_state);
-static void i_scasw(nec_state_t *nec_state);
-static void i_mov_ald8(nec_state_t *nec_state);
-static void i_mov_cld8(nec_state_t *nec_state);
-static void i_mov_dld8(nec_state_t *nec_state);
-static void i_mov_bld8(nec_state_t *nec_state);
-static void i_mov_ahd8(nec_state_t *nec_state);
-static void i_mov_chd8(nec_state_t *nec_state);
-static void i_mov_dhd8(nec_state_t *nec_state);
-static void i_mov_bhd8(nec_state_t *nec_state);
-static void i_mov_axd16(nec_state_t *nec_state);
-static void i_mov_cxd16(nec_state_t *nec_state);
-static void i_mov_dxd16(nec_state_t *nec_state);
-static void i_mov_bxd16(nec_state_t *nec_state);
-static void i_mov_spd16(nec_state_t *nec_state);
-static void i_mov_bpd16(nec_state_t *nec_state);
-static void i_mov_sid16(nec_state_t *nec_state);
-static void i_mov_did16(nec_state_t *nec_state);
-static void i_rotshft_bd8(nec_state_t *nec_state);
-static void i_rotshft_wd8(nec_state_t *nec_state);
-static void i_ret_d16(nec_state_t *nec_state);
-static void i_ret(nec_state_t *nec_state);
-static void i_les_dw(nec_state_t *nec_state);
-static void i_lds_dw(nec_state_t *nec_state);
-static void i_mov_bd8(nec_state_t *nec_state);
-static void i_mov_wd16(nec_state_t *nec_state);
-static void i_enter(nec_state_t *nec_state);
-static void i_leave(nec_state_t *nec_state);
-static void i_retf_d16(nec_state_t *nec_state);
-static void i_retf(nec_state_t *nec_state);
-static void i_int3(nec_state_t *nec_state);
-static void i_int(nec_state_t *nec_state);
-static void i_into(nec_state_t *nec_state);
-static void i_iret(nec_state_t *nec_state);
-static void i_rotshft_b(nec_state_t *nec_state);
-static void i_rotshft_w(nec_state_t *nec_state);
-static void i_rotshft_bcl(nec_state_t *nec_state);
-static void i_rotshft_wcl(nec_state_t *nec_state);
-static void i_aam(nec_state_t *nec_state);
-static void i_aad(nec_state_t *nec_state);
-static void i_setalc(nec_state_t *nec_state);
-static void i_trans(nec_state_t *nec_state);
-static void i_fpo(nec_state_t *nec_state);
-static void i_loopne(nec_state_t *nec_state);
-static void i_loope(nec_state_t *nec_state);
-static void i_loop(nec_state_t *nec_state);
-static void i_jcxz(nec_state_t *nec_state);
-static void i_inal(nec_state_t *nec_state);
-static void i_inax(nec_state_t *nec_state);
-static void i_outal(nec_state_t *nec_state);
-static void i_outax(nec_state_t *nec_state);
-static void i_call_d16(nec_state_t *nec_state);
-static void i_jmp_d16(nec_state_t *nec_state);
-static void i_jmp_far(nec_state_t *nec_state);
-static void i_jmp_d8(nec_state_t *nec_state);
-static void i_inaldx(nec_state_t *nec_state);
-static void i_inaxdx(nec_state_t *nec_state);
-static void i_outdxal(nec_state_t *nec_state);
-static void i_outdxax(nec_state_t *nec_state);
-static void i_lock(nec_state_t *nec_state);
-static void i_repne(nec_state_t *nec_state);
-static void i_repe(nec_state_t *nec_state);
-static void i_hlt(nec_state_t *nec_state);
-static void i_cmc(nec_state_t *nec_state);
-static void i_f6pre(nec_state_t *nec_state);
-static void i_f7pre(nec_state_t *nec_state);
-static void i_clc(nec_state_t *nec_state);
-static void i_stc(nec_state_t *nec_state);
-static void i_di(nec_state_t *nec_state);
-static void i_ei(nec_state_t *nec_state);
-static void i_cld(nec_state_t *nec_state);
-static void i_std(nec_state_t *nec_state);
-static void i_fepre(nec_state_t *nec_state);
-static void i_ffpre(nec_state_t *nec_state);
 
-static void i_wait(nec_state_t *nec_state);
-
-static void (*const nec_instruction[256])(nec_state_t *nec_state) =
+const nec_common_device::nec_ophandler nec_common_device::s_nec_instruction[256] =
 {
-	i_add_br8,      /* 0x00 */
-	i_add_wr16,     /* 0x01 */
-	i_add_r8b,      /* 0x02 */
-	i_add_r16w,     /* 0x03 */
-	i_add_ald8,     /* 0x04 */
-	i_add_axd16,    /* 0x05 */
-	i_push_es,      /* 0x06 */
-	i_pop_es,       /* 0x07 */
-	i_or_br8,       /* 0x08 */
-	i_or_wr16,      /* 0x09 */
-	i_or_r8b,       /* 0x0a */
-	i_or_r16w,      /* 0x0b */
-	i_or_ald8,      /* 0x0c */
-	i_or_axd16,     /* 0x0d */
-	i_push_cs,      /* 0x0e */
-	i_pre_nec,      /* 0x0f */
-	i_adc_br8,      /* 0x10 */
-	i_adc_wr16,     /* 0x11 */
-	i_adc_r8b,      /* 0x12 */
-	i_adc_r16w,     /* 0x13 */
-	i_adc_ald8,     /* 0x14 */
-	i_adc_axd16,    /* 0x15 */
-	i_push_ss,      /* 0x16 */
-	i_pop_ss,       /* 0x17 */
-	i_sbb_br8,      /* 0x18 */
-	i_sbb_wr16,     /* 0x19 */
-	i_sbb_r8b,      /* 0x1a */
-	i_sbb_r16w,     /* 0x1b */
-	i_sbb_ald8,     /* 0x1c */
-	i_sbb_axd16,    /* 0x1d */
-	i_push_ds,      /* 0x1e */
-	i_pop_ds,       /* 0x1f */
-	i_and_br8,      /* 0x20 */
-	i_and_wr16,     /* 0x21 */
-	i_and_r8b,      /* 0x22 */
-	i_and_r16w,     /* 0x23 */
-	i_and_ald8,     /* 0x24 */
-	i_and_axd16,    /* 0x25 */
-	i_es,           /* 0x26 */
-	i_daa,          /* 0x27 */
-	i_sub_br8,      /* 0x28 */
-	i_sub_wr16,     /* 0x29 */
-	i_sub_r8b,      /* 0x2a */
-	i_sub_r16w,     /* 0x2b */
-	i_sub_ald8,     /* 0x2c */
-	i_sub_axd16,    /* 0x2d */
-	i_cs,           /* 0x2e */
-	i_das,          /* 0x2f */
-	i_xor_br8,      /* 0x30 */
-	i_xor_wr16,     /* 0x31 */
-	i_xor_r8b,      /* 0x32 */
-	i_xor_r16w,     /* 0x33 */
-	i_xor_ald8,     /* 0x34 */
-	i_xor_axd16,    /* 0x35 */
-	i_ss,           /* 0x36 */
-	i_aaa,          /* 0x37 */
-	i_cmp_br8,      /* 0x38 */
-	i_cmp_wr16,     /* 0x39 */
-	i_cmp_r8b,      /* 0x3a */
-	i_cmp_r16w,     /* 0x3b */
-	i_cmp_ald8,     /* 0x3c */
-	i_cmp_axd16,    /* 0x3d */
-	i_ds,           /* 0x3e */
-	i_aas,          /* 0x3f */
-	i_inc_ax,       /* 0x40 */
-	i_inc_cx,       /* 0x41 */
-	i_inc_dx,       /* 0x42 */
-	i_inc_bx,       /* 0x43 */
-	i_inc_sp,       /* 0x44 */
-	i_inc_bp,       /* 0x45 */
-	i_inc_si,       /* 0x46 */
-	i_inc_di,       /* 0x47 */
-	i_dec_ax,       /* 0x48 */
-	i_dec_cx,       /* 0x49 */
-	i_dec_dx,       /* 0x4a */
-	i_dec_bx,       /* 0x4b */
-	i_dec_sp,       /* 0x4c */
-	i_dec_bp,       /* 0x4d */
-	i_dec_si,       /* 0x4e */
-	i_dec_di,       /* 0x4f */
-	i_push_ax,      /* 0x50 */
-	i_push_cx,      /* 0x51 */
-	i_push_dx,      /* 0x52 */
-	i_push_bx,      /* 0x53 */
-	i_push_sp,      /* 0x54 */
-	i_push_bp,      /* 0x55 */
-	i_push_si,      /* 0x56 */
-	i_push_di,      /* 0x57 */
-	i_pop_ax,       /* 0x58 */
-	i_pop_cx,       /* 0x59 */
-	i_pop_dx,       /* 0x5a */
-	i_pop_bx,       /* 0x5b */
-	i_pop_sp,       /* 0x5c */
-	i_pop_bp,       /* 0x5d */
-	i_pop_si,       /* 0x5e */
-	i_pop_di,       /* 0x5f */
-	i_pusha,        /* 0x60 */
-	i_popa,         /* 0x61 */
-	i_chkind,       /* 0x62 */
-	i_invalid,      /* 0x63 */
-	i_repnc,        /* 0x64 */
-	i_repc,         /* 0x65 */
-	i_invalid,      /* 0x66 */
-	i_invalid,      /* 0x67 */
-	i_push_d16,     /* 0x68 */
-	i_imul_d16,     /* 0x69 */
-	i_push_d8,      /* 0x6a */
-	i_imul_d8,      /* 0x6b */
-	i_insb,         /* 0x6c */
-	i_insw,         /* 0x6d */
-	i_outsb,        /* 0x6e */
-	i_outsw,        /* 0x6f */
-	i_jo,           /* 0x70 */
-	i_jno,          /* 0x71 */
-	i_jc,           /* 0x72 */
-	i_jnc,          /* 0x73 */
-	i_jz,           /* 0x74 */
-	i_jnz,          /* 0x75 */
-	i_jce,          /* 0x76 */
-	i_jnce,         /* 0x77 */
-	i_js,           /* 0x78 */
-	i_jns,          /* 0x79 */
-	i_jp,           /* 0x7a */
-	i_jnp,          /* 0x7b */
-	i_jl,           /* 0x7c */
-	i_jnl,          /* 0x7d */
-	i_jle,          /* 0x7e */
-	i_jnle,         /* 0x7f */
-	i_80pre,        /* 0x80 */
-	i_81pre,        /* 0x81 */
-	i_82pre,        /* 0x82 */
-	i_83pre,        /* 0x83 */
-	i_test_br8,     /* 0x84 */
-	i_test_wr16,    /* 0x85 */
-	i_xchg_br8,     /* 0x86 */
-	i_xchg_wr16,    /* 0x87 */
-	i_mov_br8,      /* 0x88 */
-	i_mov_wr16,     /* 0x89 */
-	i_mov_r8b,      /* 0x8a */
-	i_mov_r16w,     /* 0x8b */
-	i_mov_wsreg,    /* 0x8c */
-	i_lea,          /* 0x8d */
-	i_mov_sregw,    /* 0x8e */
-	i_popw,         /* 0x8f */
-	i_nop,          /* 0x90 */
-	i_xchg_axcx,    /* 0x91 */
-	i_xchg_axdx,    /* 0x92 */
-	i_xchg_axbx,    /* 0x93 */
-	i_xchg_axsp,    /* 0x94 */
-	i_xchg_axbp,    /* 0x95 */
-	i_xchg_axsi,    /* 0x96 */
-	i_xchg_axdi,    /* 0x97 */
-	i_cbw,          /* 0x98 */
-	i_cwd,          /* 0x99 */
-	i_call_far,     /* 0x9a */
-	i_wait,         /* 0x9b */
-	i_pushf,        /* 0x9c */
-	i_popf,         /* 0x9d */
-	i_sahf,         /* 0x9e */
-	i_lahf,         /* 0x9f */
-	i_mov_aldisp,   /* 0xa0 */
-	i_mov_axdisp,   /* 0xa1 */
-	i_mov_dispal,   /* 0xa2 */
-	i_mov_dispax,   /* 0xa3 */
-	i_movsb,        /* 0xa4 */
-	i_movsw,        /* 0xa5 */
-	i_cmpsb,        /* 0xa6 */
-	i_cmpsw,        /* 0xa7 */
-	i_test_ald8,    /* 0xa8 */
-	i_test_axd16,   /* 0xa9 */
-	i_stosb,        /* 0xaa */
-	i_stosw,        /* 0xab */
-	i_lodsb,        /* 0xac */
-	i_lodsw,        /* 0xad */
-	i_scasb,        /* 0xae */
-	i_scasw,        /* 0xaf */
-	i_mov_ald8,     /* 0xb0 */
-	i_mov_cld8,     /* 0xb1 */
-	i_mov_dld8,     /* 0xb2 */
-	i_mov_bld8,     /* 0xb3 */
-	i_mov_ahd8,     /* 0xb4 */
-	i_mov_chd8,     /* 0xb5 */
-	i_mov_dhd8,     /* 0xb6 */
-	i_mov_bhd8,     /* 0xb7 */
-	i_mov_axd16,    /* 0xb8 */
-	i_mov_cxd16,    /* 0xb9 */
-	i_mov_dxd16,    /* 0xba */
-	i_mov_bxd16,    /* 0xbb */
-	i_mov_spd16,    /* 0xbc */
-	i_mov_bpd16,    /* 0xbd */
-	i_mov_sid16,    /* 0xbe */
-	i_mov_did16,    /* 0xbf */
-	i_rotshft_bd8,  /* 0xc0 */
-	i_rotshft_wd8,  /* 0xc1 */
-	i_ret_d16,      /* 0xc2 */
-	i_ret,          /* 0xc3 */
-	i_les_dw,       /* 0xc4 */
-	i_lds_dw,       /* 0xc5 */
-	i_mov_bd8,      /* 0xc6 */
-	i_mov_wd16,     /* 0xc7 */
-	i_enter,        /* 0xc8 */
-	i_leave,        /* 0xc9 */
-	i_retf_d16,     /* 0xca */
-	i_retf,         /* 0xcb */
-	i_int3,         /* 0xcc */
-	i_int,          /* 0xcd */
-	i_into,         /* 0xce */
-	i_iret,         /* 0xcf */
-	i_rotshft_b,    /* 0xd0 */
-	i_rotshft_w,    /* 0xd1 */
-	i_rotshft_bcl,  /* 0xd2 */
-	i_rotshft_wcl,  /* 0xd3 */
-	i_aam,          /* 0xd4 */
-	i_aad,          /* 0xd5 */
-	i_setalc,       /* 0xd6 */
-	i_trans,        /* 0xd7 */
-	i_fpo,          /* 0xd8 */
-	i_fpo,          /* 0xd9 */
-	i_fpo,          /* 0xda */
-	i_fpo,          /* 0xdb */
-	i_fpo,          /* 0xdc */
-	i_fpo,          /* 0xdd */
-	i_fpo,          /* 0xde */
-	i_fpo,          /* 0xdf */
-	i_loopne,       /* 0xe0 */
-	i_loope,        /* 0xe1 */
-	i_loop,         /* 0xe2 */
-	i_jcxz,         /* 0xe3 */
-	i_inal,         /* 0xe4 */
-	i_inax,         /* 0xe5 */
-	i_outal,        /* 0xe6 */
-	i_outax,        /* 0xe7 */
-	i_call_d16,     /* 0xe8 */
-	i_jmp_d16,      /* 0xe9 */
-	i_jmp_far,      /* 0xea */
-	i_jmp_d8,       /* 0xeb */
-	i_inaldx,       /* 0xec */
-	i_inaxdx,       /* 0xed */
-	i_outdxal,      /* 0xee */
-	i_outdxax,      /* 0xef */
-	i_lock,         /* 0xf0 */
-	i_invalid,      /* 0xf1 */
-	i_repne,        /* 0xf2 */
-	i_repe,         /* 0xf3 */
-	i_hlt,          /* 0xf4 */
-	i_cmc,          /* 0xf5 */
-	i_f6pre,        /* 0xf6 */
-	i_f7pre,        /* 0xf7 */
-	i_clc,          /* 0xf8 */
-	i_stc,          /* 0xf9 */
-	i_di,           /* 0xfa */
-	i_ei,           /* 0xfb */
-	i_cld,          /* 0xfc */
-	i_std,          /* 0xfd */
-	i_fepre,        /* 0xfe */
-	i_ffpre         /* 0xff */
+	&nec_common_device::i_add_br8,      /* 0x00 */
+	&nec_common_device::i_add_wr16,     /* 0x01 */
+	&nec_common_device::i_add_r8b,      /* 0x02 */
+	&nec_common_device::i_add_r16w,     /* 0x03 */
+	&nec_common_device::i_add_ald8,     /* 0x04 */
+	&nec_common_device::i_add_axd16,    /* 0x05 */
+	&nec_common_device::i_push_es,      /* 0x06 */
+	&nec_common_device::i_pop_es,       /* 0x07 */
+	&nec_common_device::i_or_br8,       /* 0x08 */
+	&nec_common_device::i_or_wr16,      /* 0x09 */
+	&nec_common_device::i_or_r8b,       /* 0x0a */
+	&nec_common_device::i_or_r16w,      /* 0x0b */
+	&nec_common_device::i_or_ald8,      /* 0x0c */
+	&nec_common_device::i_or_axd16,     /* 0x0d */
+	&nec_common_device::i_push_cs,      /* 0x0e */
+	&nec_common_device::i_pre_nec,      /* 0x0f */
+	&nec_common_device::i_adc_br8,      /* 0x10 */
+	&nec_common_device::i_adc_wr16,     /* 0x11 */
+	&nec_common_device::i_adc_r8b,      /* 0x12 */
+	&nec_common_device::i_adc_r16w,     /* 0x13 */
+	&nec_common_device::i_adc_ald8,     /* 0x14 */
+	&nec_common_device::i_adc_axd16,    /* 0x15 */
+	&nec_common_device::i_push_ss,      /* 0x16 */
+	&nec_common_device::i_pop_ss,       /* 0x17 */
+	&nec_common_device::i_sbb_br8,      /* 0x18 */
+	&nec_common_device::i_sbb_wr16,     /* 0x19 */
+	&nec_common_device::i_sbb_r8b,      /* 0x1a */
+	&nec_common_device::i_sbb_r16w,     /* 0x1b */
+	&nec_common_device::i_sbb_ald8,     /* 0x1c */
+	&nec_common_device::i_sbb_axd16,    /* 0x1d */
+	&nec_common_device::i_push_ds,      /* 0x1e */
+	&nec_common_device::i_pop_ds,       /* 0x1f */
+	&nec_common_device::i_and_br8,      /* 0x20 */
+	&nec_common_device::i_and_wr16,     /* 0x21 */
+	&nec_common_device::i_and_r8b,      /* 0x22 */
+	&nec_common_device::i_and_r16w,     /* 0x23 */
+	&nec_common_device::i_and_ald8,     /* 0x24 */
+	&nec_common_device::i_and_axd16,    /* 0x25 */
+	&nec_common_device::i_es,           /* 0x26 */
+	&nec_common_device::i_daa,          /* 0x27 */
+	&nec_common_device::i_sub_br8,      /* 0x28 */
+	&nec_common_device::i_sub_wr16,     /* 0x29 */
+	&nec_common_device::i_sub_r8b,      /* 0x2a */
+	&nec_common_device::i_sub_r16w,     /* 0x2b */
+	&nec_common_device::i_sub_ald8,     /* 0x2c */
+	&nec_common_device::i_sub_axd16,    /* 0x2d */
+	&nec_common_device::i_cs,           /* 0x2e */
+	&nec_common_device::i_das,          /* 0x2f */
+	&nec_common_device::i_xor_br8,      /* 0x30 */
+	&nec_common_device::i_xor_wr16,     /* 0x31 */
+	&nec_common_device::i_xor_r8b,      /* 0x32 */
+	&nec_common_device::i_xor_r16w,     /* 0x33 */
+	&nec_common_device::i_xor_ald8,     /* 0x34 */
+	&nec_common_device::i_xor_axd16,    /* 0x35 */
+	&nec_common_device::i_ss,           /* 0x36 */
+	&nec_common_device::i_aaa,          /* 0x37 */
+	&nec_common_device::i_cmp_br8,      /* 0x38 */
+	&nec_common_device::i_cmp_wr16,     /* 0x39 */
+	&nec_common_device::i_cmp_r8b,      /* 0x3a */
+	&nec_common_device::i_cmp_r16w,     /* 0x3b */
+	&nec_common_device::i_cmp_ald8,     /* 0x3c */
+	&nec_common_device::i_cmp_axd16,    /* 0x3d */
+	&nec_common_device::i_ds,           /* 0x3e */
+	&nec_common_device::i_aas,          /* 0x3f */
+	&nec_common_device::i_inc_ax,       /* 0x40 */
+	&nec_common_device::i_inc_cx,       /* 0x41 */
+	&nec_common_device::i_inc_dx,       /* 0x42 */
+	&nec_common_device::i_inc_bx,       /* 0x43 */
+	&nec_common_device::i_inc_sp,       /* 0x44 */
+	&nec_common_device::i_inc_bp,       /* 0x45 */
+	&nec_common_device::i_inc_si,       /* 0x46 */
+	&nec_common_device::i_inc_di,       /* 0x47 */
+	&nec_common_device::i_dec_ax,       /* 0x48 */
+	&nec_common_device::i_dec_cx,       /* 0x49 */
+	&nec_common_device::i_dec_dx,       /* 0x4a */
+	&nec_common_device::i_dec_bx,       /* 0x4b */
+	&nec_common_device::i_dec_sp,       /* 0x4c */
+	&nec_common_device::i_dec_bp,       /* 0x4d */
+	&nec_common_device::i_dec_si,       /* 0x4e */
+	&nec_common_device::i_dec_di,       /* 0x4f */
+	&nec_common_device::i_push_ax,      /* 0x50 */
+	&nec_common_device::i_push_cx,      /* 0x51 */
+	&nec_common_device::i_push_dx,      /* 0x52 */
+	&nec_common_device::i_push_bx,      /* 0x53 */
+	&nec_common_device::i_push_sp,      /* 0x54 */
+	&nec_common_device::i_push_bp,      /* 0x55 */
+	&nec_common_device::i_push_si,      /* 0x56 */
+	&nec_common_device::i_push_di,      /* 0x57 */
+	&nec_common_device::i_pop_ax,       /* 0x58 */
+	&nec_common_device::i_pop_cx,       /* 0x59 */
+	&nec_common_device::i_pop_dx,       /* 0x5a */
+	&nec_common_device::i_pop_bx,       /* 0x5b */
+	&nec_common_device::i_pop_sp,       /* 0x5c */
+	&nec_common_device::i_pop_bp,       /* 0x5d */
+	&nec_common_device::i_pop_si,       /* 0x5e */
+	&nec_common_device::i_pop_di,       /* 0x5f */
+	&nec_common_device::i_pusha,        /* 0x60 */
+	&nec_common_device::i_popa,         /* 0x61 */
+	&nec_common_device::i_chkind,       /* 0x62 */
+	&nec_common_device::i_invalid,      /* 0x63 */
+	&nec_common_device::i_repnc,        /* 0x64 */
+	&nec_common_device::i_repc,         /* 0x65 */
+	&nec_common_device::i_invalid,      /* 0x66 */
+	&nec_common_device::i_invalid,      /* 0x67 */
+	&nec_common_device::i_push_d16,     /* 0x68 */
+	&nec_common_device::i_imul_d16,     /* 0x69 */
+	&nec_common_device::i_push_d8,      /* 0x6a */
+	&nec_common_device::i_imul_d8,      /* 0x6b */
+	&nec_common_device::i_insb,         /* 0x6c */
+	&nec_common_device::i_insw,         /* 0x6d */
+	&nec_common_device::i_outsb,        /* 0x6e */
+	&nec_common_device::i_outsw,        /* 0x6f */
+	&nec_common_device::i_jo,           /* 0x70 */
+	&nec_common_device::i_jno,          /* 0x71 */
+	&nec_common_device::i_jc,           /* 0x72 */
+	&nec_common_device::i_jnc,          /* 0x73 */
+	&nec_common_device::i_jz,           /* 0x74 */
+	&nec_common_device::i_jnz,          /* 0x75 */
+	&nec_common_device::i_jce,          /* 0x76 */
+	&nec_common_device::i_jnce,         /* 0x77 */
+	&nec_common_device::i_js,           /* 0x78 */
+	&nec_common_device::i_jns,          /* 0x79 */
+	&nec_common_device::i_jp,           /* 0x7a */
+	&nec_common_device::i_jnp,          /* 0x7b */
+	&nec_common_device::i_jl,           /* 0x7c */
+	&nec_common_device::i_jnl,          /* 0x7d */
+	&nec_common_device::i_jle,          /* 0x7e */
+	&nec_common_device::i_jnle,         /* 0x7f */
+	&nec_common_device::i_80pre,        /* 0x80 */
+	&nec_common_device::i_81pre,        /* 0x81 */
+	&nec_common_device::i_82pre,        /* 0x82 */
+	&nec_common_device::i_83pre,        /* 0x83 */
+	&nec_common_device::i_test_br8,     /* 0x84 */
+	&nec_common_device::i_test_wr16,    /* 0x85 */
+	&nec_common_device::i_xchg_br8,     /* 0x86 */
+	&nec_common_device::i_xchg_wr16,    /* 0x87 */
+	&nec_common_device::i_mov_br8,      /* 0x88 */
+	&nec_common_device::i_mov_wr16,     /* 0x89 */
+	&nec_common_device::i_mov_r8b,      /* 0x8a */
+	&nec_common_device::i_mov_r16w,     /* 0x8b */
+	&nec_common_device::i_mov_wsreg,    /* 0x8c */
+	&nec_common_device::i_lea,          /* 0x8d */
+	&nec_common_device::i_mov_sregw,    /* 0x8e */
+	&nec_common_device::i_popw,         /* 0x8f */
+	&nec_common_device::i_nop,          /* 0x90 */
+	&nec_common_device::i_xchg_axcx,    /* 0x91 */
+	&nec_common_device::i_xchg_axdx,    /* 0x92 */
+	&nec_common_device::i_xchg_axbx,    /* 0x93 */
+	&nec_common_device::i_xchg_axsp,    /* 0x94 */
+	&nec_common_device::i_xchg_axbp,    /* 0x95 */
+	&nec_common_device::i_xchg_axsi,    /* 0x96 */
+	&nec_common_device::i_xchg_axdi,    /* 0x97 */
+	&nec_common_device::i_cbw,          /* 0x98 */
+	&nec_common_device::i_cwd,          /* 0x99 */
+	&nec_common_device::i_call_far,     /* 0x9a */
+	&nec_common_device::i_wait,         /* 0x9b */
+	&nec_common_device::i_pushf,        /* 0x9c */
+	&nec_common_device::i_popf,         /* 0x9d */
+	&nec_common_device::i_sahf,         /* 0x9e */
+	&nec_common_device::i_lahf,         /* 0x9f */
+	&nec_common_device::i_mov_aldisp,   /* 0xa0 */
+	&nec_common_device::i_mov_axdisp,   /* 0xa1 */
+	&nec_common_device::i_mov_dispal,   /* 0xa2 */
+	&nec_common_device::i_mov_dispax,   /* 0xa3 */
+	&nec_common_device::i_movsb,        /* 0xa4 */
+	&nec_common_device::i_movsw,        /* 0xa5 */
+	&nec_common_device::i_cmpsb,        /* 0xa6 */
+	&nec_common_device::i_cmpsw,        /* 0xa7 */
+	&nec_common_device::i_test_ald8,    /* 0xa8 */
+	&nec_common_device::i_test_axd16,   /* 0xa9 */
+	&nec_common_device::i_stosb,        /* 0xaa */
+	&nec_common_device::i_stosw,        /* 0xab */
+	&nec_common_device::i_lodsb,        /* 0xac */
+	&nec_common_device::i_lodsw,        /* 0xad */
+	&nec_common_device::i_scasb,        /* 0xae */
+	&nec_common_device::i_scasw,        /* 0xaf */
+	&nec_common_device::i_mov_ald8,     /* 0xb0 */
+	&nec_common_device::i_mov_cld8,     /* 0xb1 */
+	&nec_common_device::i_mov_dld8,     /* 0xb2 */
+	&nec_common_device::i_mov_bld8,     /* 0xb3 */
+	&nec_common_device::i_mov_ahd8,     /* 0xb4 */
+	&nec_common_device::i_mov_chd8,     /* 0xb5 */
+	&nec_common_device::i_mov_dhd8,     /* 0xb6 */
+	&nec_common_device::i_mov_bhd8,     /* 0xb7 */
+	&nec_common_device::i_mov_axd16,    /* 0xb8 */
+	&nec_common_device::i_mov_cxd16,    /* 0xb9 */
+	&nec_common_device::i_mov_dxd16,    /* 0xba */
+	&nec_common_device::i_mov_bxd16,    /* 0xbb */
+	&nec_common_device::i_mov_spd16,    /* 0xbc */
+	&nec_common_device::i_mov_bpd16,    /* 0xbd */
+	&nec_common_device::i_mov_sid16,    /* 0xbe */
+	&nec_common_device::i_mov_did16,    /* 0xbf */
+	&nec_common_device::i_rotshft_bd8,  /* 0xc0 */
+	&nec_common_device::i_rotshft_wd8,  /* 0xc1 */
+	&nec_common_device::i_ret_d16,      /* 0xc2 */
+	&nec_common_device::i_ret,          /* 0xc3 */
+	&nec_common_device::i_les_dw,       /* 0xc4 */
+	&nec_common_device::i_lds_dw,       /* 0xc5 */
+	&nec_common_device::i_mov_bd8,      /* 0xc6 */
+	&nec_common_device::i_mov_wd16,     /* 0xc7 */
+	&nec_common_device::i_enter,        /* 0xc8 */
+	&nec_common_device::i_leave,        /* 0xc9 */
+	&nec_common_device::i_retf_d16,     /* 0xca */
+	&nec_common_device::i_retf,         /* 0xcb */
+	&nec_common_device::i_int3,         /* 0xcc */
+	&nec_common_device::i_int,          /* 0xcd */
+	&nec_common_device::i_into,         /* 0xce */
+	&nec_common_device::i_iret,         /* 0xcf */
+	&nec_common_device::i_rotshft_b,    /* 0xd0 */
+	&nec_common_device::i_rotshft_w,    /* 0xd1 */
+	&nec_common_device::i_rotshft_bcl,  /* 0xd2 */
+	&nec_common_device::i_rotshft_wcl,  /* 0xd3 */
+	&nec_common_device::i_aam,          /* 0xd4 */
+	&nec_common_device::i_aad,          /* 0xd5 */
+	&nec_common_device::i_setalc,       /* 0xd6 */
+	&nec_common_device::i_trans,        /* 0xd7 */
+	&nec_common_device::i_fpo,          /* 0xd8 */
+	&nec_common_device::i_fpo,          /* 0xd9 */
+	&nec_common_device::i_fpo,          /* 0xda */
+	&nec_common_device::i_fpo,          /* 0xdb */
+	&nec_common_device::i_fpo,          /* 0xdc */
+	&nec_common_device::i_fpo,          /* 0xdd */
+	&nec_common_device::i_fpo,          /* 0xde */
+	&nec_common_device::i_fpo,          /* 0xdf */
+	&nec_common_device::i_loopne,       /* 0xe0 */
+	&nec_common_device::i_loope,        /* 0xe1 */
+	&nec_common_device::i_loop,         /* 0xe2 */
+	&nec_common_device::i_jcxz,         /* 0xe3 */
+	&nec_common_device::i_inal,         /* 0xe4 */
+	&nec_common_device::i_inax,         /* 0xe5 */
+	&nec_common_device::i_outal,        /* 0xe6 */
+	&nec_common_device::i_outax,        /* 0xe7 */
+	&nec_common_device::i_call_d16,     /* 0xe8 */
+	&nec_common_device::i_jmp_d16,      /* 0xe9 */
+	&nec_common_device::i_jmp_far,      /* 0xea */
+	&nec_common_device::i_jmp_d8,       /* 0xeb */
+	&nec_common_device::i_inaldx,       /* 0xec */
+	&nec_common_device::i_inaxdx,       /* 0xed */
+	&nec_common_device::i_outdxal,      /* 0xee */
+	&nec_common_device::i_outdxax,      /* 0xef */
+	&nec_common_device::i_lock,         /* 0xf0 */
+	&nec_common_device::i_invalid,      /* 0xf1 */
+	&nec_common_device::i_repne,        /* 0xf2 */
+	&nec_common_device::i_repe,         /* 0xf3 */
+	&nec_common_device::i_hlt,          /* 0xf4 */
+	&nec_common_device::i_cmc,          /* 0xf5 */
+	&nec_common_device::i_f6pre,        /* 0xf6 */
+	&nec_common_device::i_f7pre,        /* 0xf7 */
+	&nec_common_device::i_clc,          /* 0xf8 */
+	&nec_common_device::i_stc,          /* 0xf9 */
+	&nec_common_device::i_di,           /* 0xfa */
+	&nec_common_device::i_ei,           /* 0xfb */
+	&nec_common_device::i_cld,          /* 0xfc */
+	&nec_common_device::i_std,          /* 0xfd */
+	&nec_common_device::i_fepre,        /* 0xfe */
+	&nec_common_device::i_ffpre         /* 0xff */
 };

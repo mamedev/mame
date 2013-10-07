@@ -349,7 +349,7 @@ To Do / Unknowns:
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "cpu/nec/nec.h"
+#include "cpu/nec/v25.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z180/z180.h"
 #include "machine/eepromser.h"
@@ -3006,8 +3006,6 @@ a4849 cd
 
 */
 
-static const nec_config nitro_config ={ nitro_decryption_table, };
-
 static MACHINE_CONFIG_START( dogyuun, toaplan2_state )
 
 	/* basic machine hardware */
@@ -3018,7 +3016,7 @@ static MACHINE_CONFIG_START( dogyuun, toaplan2_state )
 	MCFG_CPU_ADD("audiocpu", V25, XTAL_25MHz/2)         /* NEC V25 type Toaplan marked CPU ??? */
 	MCFG_CPU_PROGRAM_MAP(v25_mem)
 	MCFG_CPU_IO_MAP(dogyuun_v25_port)
-	MCFG_CPU_CONFIG(nitro_config)
+	MCFG_V25_CONFIG(nitro_decryption_table)
 
 	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
 
@@ -3062,7 +3060,7 @@ static MACHINE_CONFIG_START( kbash, toaplan2_state )
 	MCFG_CPU_ADD("audiocpu", V25, XTAL_16MHz)           /* NEC V25 type Toaplan marked CPU ??? */
 	MCFG_CPU_PROGRAM_MAP(kbash_v25_mem)
 	MCFG_CPU_IO_MAP(v25_port)
-	MCFG_CPU_CONFIG(nitro_config)
+	MCFG_V25_CONFIG(nitro_decryption_table)
 
 	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
 
@@ -3298,8 +3296,6 @@ static const UINT8 ts001turbo_decryption_table[256] = {
 	/*r*//*r*//*r*//*r*//*r*//*r*//*r*//*r*/ /*r*//*x*//*r*//*r*//*r*/     /*r*/
 };
 
-static const nec_config ts001turbo_config ={ ts001turbo_decryption_table, };
-
 
 static MACHINE_CONFIG_START( fixeight, toaplan2_state )
 
@@ -3311,7 +3307,7 @@ static MACHINE_CONFIG_START( fixeight, toaplan2_state )
 	MCFG_CPU_ADD("audiocpu", V25, XTAL_16MHz)           /* NEC V25 type Toaplan marked CPU ??? */
 	MCFG_CPU_PROGRAM_MAP(fixeight_v25_mem)
 	MCFG_CPU_IO_MAP(fixeight_v25_port)
-	MCFG_CPU_CONFIG(ts001turbo_config)
+	MCFG_V25_CONFIG(ts001turbo_decryption_table)
 
 	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
 
@@ -3390,7 +3386,7 @@ static MACHINE_CONFIG_START( vfive, toaplan2_state )
 	MCFG_CPU_ADD("audiocpu", V25, XTAL_20MHz/2) /* Verified on pcb, NEC V25 type Toaplan mark scratched out */
 	MCFG_CPU_PROGRAM_MAP(vfive_v25_mem)
 	MCFG_CPU_IO_MAP(v25_port)
-	MCFG_CPU_CONFIG(nitro_config)
+	MCFG_V25_CONFIG(nitro_decryption_table)
 
 	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
 
