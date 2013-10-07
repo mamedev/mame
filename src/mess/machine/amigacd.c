@@ -216,9 +216,9 @@ static READ16_HANDLER( amiga_dmac_r )
 		case 0x66:
 		case 0x67:
 		{
-			device_t *tpi = space.machine().device("tpi6525");
+			tpi6525_device *tpi = space.machine().device<tpi6525_device>("tpi6525");
 			LOG(( "DMAC: PC=%08x - TPI6525 Read(%d)\n", space.device().safe_pc(), (offset - 0x58) ));
-			return tpi6525_r(tpi, space, offset - 0x58);
+			return tpi->read(space, offset - 0x58);
 		}
 		break;
 
@@ -343,9 +343,9 @@ static WRITE16_HANDLER( amiga_dmac_w )
 		case 0x66:
 		case 0x67:
 		{
-			device_t *tpi = space.machine().device("tpi6525");
+			tpi6525_device *tpi = space.machine().device<tpi6525_device>("tpi6525");
 			LOG(( "DMAC: PC=%08x - TPI6525 Write(%d) - data = %04x\n", space.device().safe_pc(), (offset - 0x58), data ));
-			tpi6525_w(tpi, space, offset - 0x58, data);
+			tpi->write(space, offset - 0x58, data);
 		}
 		break;
 
@@ -431,13 +431,15 @@ static const amiga_autoconfig_device dmac_device =
 READ8_DEVICE_HANDLER( amigacd_tpi6525_portc_r )
 {
 	int ret = 0;
+	
+	tpi6525_device *tpi = space.machine().device<tpi6525_device>("tpi6525");
 
-	if ( (tpi6525_get_ddr_c(device) & 0x04) == 0 ) /* if pin 2 is set to input */
+	if ( (tpi->get_ddr_c() & 0x04) == 0 ) /* if pin 2 is set to input */
 	{
 		ret |= matsucd_stch_r() ? 0x00 : 0x04;  /* read status change signal */
 	}
 
-	if ( (tpi6525_get_ddr_c(device) & 0x08) == 0 ) /* if pin 3 is set to input */
+	if ( (tpi->get_ddr_c() & 0x08) == 0 ) /* if pin 3 is set to input */
 		ret |= matsucd_sten_r() ? 0x08 : 0x00;  /* read enable signal */
 
 	return ret;
@@ -445,10 +447,12 @@ READ8_DEVICE_HANDLER( amigacd_tpi6525_portc_r )
 
 WRITE8_DEVICE_HANDLER( amigacd_tpi6525_portb_w )
 {
-	if ( tpi6525_get_ddr_b(device) & 0x01 ) /* if pin 0 is set to output */
+	tpi6525_device *tpi = space.machine().device<tpi6525_device>("tpi6525");
+	
+	if ( tpi->get_ddr_b() & 0x01 ) /* if pin 0 is set to output */
 		matsucd_cmd_w( data & 1 ); /* write to the /CMD signal */
 
-	if ( tpi6525_get_ddr_b(device) & 0x02 ) /* if pin 1 is set to output */
+	if ( tpi->get_ddr_b() & 0x02 ) /* if pin 1 is set to output */
 		matsucd_enable_w( data & 2 ); /* write to the /ENABLE signal */
 }
 
@@ -495,29 +499,29 @@ WRITE_LINE_DEVICE_HANDLER( amigacd_tpi6525_irq )
 
 static void cdrom_status_enabled( running_machine &machine, int level )
 {
-	device_t *tpi = machine.device("tpi6525");
+	tpi6525_device *tpi = machine.device<tpi6525_device>("tpi6525");
 
 	/* PC3 on the 6525 */
-	tpi6525_i3_w(tpi, level);
+	tpi->i3_w(level);
 }
 
 static void cdrom_status_change( running_machine &machine, int level )
 {
-	device_t *tpi = machine.device("tpi6525");
+	tpi6525_device *tpi = machine.device<tpi6525_device>("tpi6525");
 
 	/* invert */
 	level = level ? 0 : 1;
 
 	/* PC2 on the 6525 */
-	tpi6525_i2_w(tpi, level);
+	tpi->i2_w(level);
 }
 
 static void cdrom_subcode_ready( running_machine &machine, int level )
 {
-	device_t *tpi = machine.device("tpi6525");
+	tpi6525_device *tpi = machine.device<tpi6525_device>("tpi6525");
 
 	/* PC1 on the 6525 */
-	tpi6525_i1_w(tpi, level);
+	tpi->i1_w(level);
 }
 
 MACHINE_START( amigacd )

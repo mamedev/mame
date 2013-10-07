@@ -36,19 +36,19 @@
 
 struct tpi6525_interface
 {
-	devcb_write_line    out_irq_func;
+	devcb_write_line    m_out_irq_cb;
 
-	devcb_read8         in_pa_func;
-	devcb_write8        out_pa_func;
+	devcb_read8         m_in_pa_cb;
+	devcb_write8        m_out_pa_cb;
 
-	devcb_read8         in_pb_func;
-	devcb_write8        out_pb_func;
+	devcb_read8         m_in_pb_cb;
+	devcb_write8        m_out_pb_cb;
 
-	devcb_read8         in_pc_func;
-	devcb_write8        out_pc_func;
+	devcb_read8         m_in_pc_cb;
+	devcb_write8        m_out_pc_cb;
 
-	devcb_write_line    out_ca_func;
-	devcb_write_line    out_cb_func;
+	devcb_write_line    m_out_ca_cb;
+	devcb_write_line    m_out_cb_cb;
 };
 
 
@@ -56,14 +56,12 @@ struct tpi6525_interface
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-class tpi6525_device : public device_t
+class tpi6525_device : public device_t,
+								public tpi6525_interface
 {
 public:
 	tpi6525_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~tpi6525_device() { global_free(m_token); }
-
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
+	~tpi6525_device() {}
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -77,15 +75,45 @@ public:
 	DECLARE_READ8_MEMBER( pa_r );
 	DECLARE_READ8_MEMBER( pb_r );
 	DECLARE_READ8_MEMBER( pc_r );
+	DECLARE_WRITE8_MEMBER( pa_w );
+	DECLARE_WRITE8_MEMBER( pb_w );
+	DECLARE_WRITE8_MEMBER( pc_w );
+	
+	UINT8 get_ddr_a();
+	UINT8 get_ddr_b();
+	UINT8 get_ddr_c();
 
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
+	
 private:
 	// internal state
-	void *m_token;
+	devcb_resolved_write_line   m_out_irq_func;
+	devcb_resolved_read8        m_in_pa_func;
+	devcb_resolved_write8       m_out_pa_func;
+	devcb_resolved_read8        m_in_pb_func;
+	devcb_resolved_write8       m_out_pb_func;
+	devcb_resolved_read8        m_in_pc_func;
+	devcb_resolved_write8       m_out_pc_func;
+	devcb_resolved_write_line   m_out_ca_func;
+	devcb_resolved_write_line   m_out_cb_func;
+
+	UINT8 m_port_a, m_ddr_a, m_in_a;
+	UINT8 m_port_b, m_ddr_b, m_in_b;
+	UINT8 m_port_c, m_ddr_c, m_in_c;
+
+	UINT8 m_ca_level, m_cb_level, m_interrupt_level;
+
+	UINT8 m_cr;
+	UINT8 m_air;
+
+	UINT8 m_irq_level[5];
+	
+	void set_interrupt();
+	void clear_interrupt();
 };
 
 extern const device_type TPI6525;
@@ -95,32 +123,6 @@ extern const device_type TPI6525;
 	MCFG_DEVICE_ADD(_tag, TPI6525, 0) \
 	MCFG_DEVICE_CONFIG(_intrf)
 
-
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-DECLARE_READ8_DEVICE_HANDLER( tpi6525_r );
-DECLARE_WRITE8_DEVICE_HANDLER( tpi6525_w );
-
-DECLARE_READ8_DEVICE_HANDLER( tpi6525_porta_r );
-DECLARE_WRITE8_DEVICE_HANDLER( tpi6525_porta_w );
-
-DECLARE_READ8_DEVICE_HANDLER( tpi6525_portb_r );
-DECLARE_WRITE8_DEVICE_HANDLER( tpi6525_portb_w );
-
-DECLARE_READ8_DEVICE_HANDLER( tpi6525_portc_r );
-DECLARE_WRITE8_DEVICE_HANDLER( tpi6525_portc_w );
-
-WRITE_LINE_DEVICE_HANDLER( tpi6525_i0_w );
-WRITE_LINE_DEVICE_HANDLER( tpi6525_i1_w );
-WRITE_LINE_DEVICE_HANDLER( tpi6525_i2_w );
-WRITE_LINE_DEVICE_HANDLER( tpi6525_i3_w );
-WRITE_LINE_DEVICE_HANDLER( tpi6525_i4_w );
-
-UINT8 tpi6525_get_ddr_a(device_t *device);
-UINT8 tpi6525_get_ddr_b(device_t *device);
-UINT8 tpi6525_get_ddr_c(device_t *device);
 
 
 #endif /* __TPI6525_H__ */
