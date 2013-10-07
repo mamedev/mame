@@ -61,7 +61,6 @@ chdman createhd -o ST125N.chd -chs 407,4,26 -ss 512
 #include "debug/debugcon.h"
 #include "imagedev/flopdrv.h"
 #include "machine/ram.h"
-#include "machine/er59256.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/i8251.h"
@@ -2491,14 +2490,12 @@ void rmnimbus_state::nimbus_scsi_linechange( UINT8 mask, UINT8 state )
 
 void rmnimbus_state::pc8031_reset()
 {
-	device_t *er59256 = machine().device(ER59256_TAG);
-
 	logerror("peripheral controler reset\n");
 
 	memset(&m_ipc_interface,0,sizeof(m_ipc_interface));
 
-	if(!er59256_data_loaded(er59256))
-		er59256_preload_rom(er59256,def_config,ARRAY_LENGTH(def_config));
+	if(!m_eeprom->data_loaded())
+		m_eeprom->preload_rom(def_config,ARRAY_LENGTH(def_config));
 }
 
 
@@ -2628,7 +2625,6 @@ WRITE8_MEMBER(rmnimbus_state::nimbus_pc8031_iou_w)
 
 READ8_MEMBER(rmnimbus_state::nimbus_pc8031_port_r)
 {
-	device_t *er59256 = machine().device(ER59256_TAG);
 	int pc=space.device().safe_pc();
 	UINT8   result = 0;
 
@@ -2637,7 +2633,7 @@ READ8_MEMBER(rmnimbus_state::nimbus_pc8031_port_r)
 
 	switch(offset)
 	{
-		case 0x01   : result=er59256_get_iobits(er59256);
+		case 0x01   : result=m_eeprom->get_iobits();
 	}
 
 	return result;
@@ -2645,12 +2641,11 @@ READ8_MEMBER(rmnimbus_state::nimbus_pc8031_port_r)
 
 WRITE8_MEMBER(rmnimbus_state::nimbus_pc8031_port_w)
 {
-	device_t *er59256 = machine().device(ER59256_TAG);
 	int pc=space.device().safe_pc();
 
 	switch (offset)
 	{
-		case 0x01   : er59256_set_iobits(er59256,(data&0x0F));
+		case 0x01   : m_eeprom->set_iobits((data&0x0F));
 	}
 
 	if(LOG_PC8031_PORT)

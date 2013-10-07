@@ -12,6 +12,7 @@
 #include "machine/scsicb.h"
 #include "machine/6522via.h"
 #include "machine/ram.h"
+#include "machine/er59256.h"
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
 
@@ -400,7 +401,8 @@ public:
 		m_msm(*this, MSM5205_TAG),
 		m_ay8910(*this, AY8910_TAG),
 		m_scsibus(*this, SCSIBUS_TAG ":host"),
-		m_ram(*this, RAM_TAG)
+		m_ram(*this, RAM_TAG),
+		m_eeprom(*this, ER59256_TAG)
 	{
 	}
 
@@ -409,9 +411,10 @@ public:
 	required_device<ay8910_device> m_ay8910;
 	required_device<scsicb_device> m_scsibus;
 	required_device<ram_device> m_ram;
+	required_device<er59256_device> m_eeprom;
 
 	UINT32 m_debug_machine;
-//  i186_state m_i186;
+//	i186_state m_i186;
 	keyboard_t m_keyboard;
 	nimbus_drives_t m_nimbus_drives;
 	ipc_interface_t m_ipc_interface;

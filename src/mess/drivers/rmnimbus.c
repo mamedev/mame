@@ -14,7 +14,6 @@
 #include "machine/ram.h"
 #include "formats/pc_dsk.h"
 #include "includes/rmnimbus.h"
-#include "machine/er59256.h"
 #include "machine/scsibus.h"
 #include "machine/scsicb.h"
 #include "machine/scsihd.h"

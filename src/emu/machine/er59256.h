@@ -10,6 +10,8 @@
 #ifndef _ER59256_H_
 #define _ER59256_H_
 
+#define EEROM_WORDS         0x10
+
 /***************************************************************************
     MACROS
 ***************************************************************************/
@@ -18,18 +20,46 @@ class er59256_device : public device_t
 {
 public:
 	er59256_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~er59256_device() { global_free(m_token); }
+	~er59256_device() {}
 
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
+	void set_iobits(UINT8 newbits);
+	UINT8 get_iobits();
+	void preload_rom(const UINT16 *rom_data, int count);
+	UINT8 data_loaded();
+	
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_stop();
+	
 private:
 	// internal state
-	void *m_token;
+	
+	/* The actual memory */
+	UINT16  m_eerom[EEROM_WORDS];
+
+	/* Bits as they appear on the io pins, current state */
+	UINT8   m_io_bits;
+
+	/* Bits as they appear on the io pins, previous state */
+	UINT8   m_old_io_bits;
+
+
+	/* the 16 bit shift in/out reg */
+	UINT16  m_in_shifter;
+	UINT32  m_out_shifter;
+
+	/* Count of bits received since last CS low->high */
+	UINT8   m_bitcount;
+
+	/* Command & addresss */
+	UINT8   m_command;
+
+	/* Write enable and write in progress flags */
+	UINT8   m_flags;
+	
+	void decode_command();
 };
 
 extern const device_type ER59256;
@@ -41,8 +71,6 @@ extern const device_type ER59256;
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
-
-#define EEROM_WORDS         0x10
 
 #define CK_SHIFT            0x00
 #define DI_SHIFT            0x01
@@ -57,26 +85,26 @@ extern const device_type ER59256;
 #define ALL_MASK            (CK_MASK | DI_MASK | DO_MASK | CS_MASK)
 #define IN_MASK             (CK_MASK | DI_MASK | CS_MASK)
 
-#define GET_CK(eep)         ((eep->io_bits & CK_MASK) >> CK_SHIFT)
-#define GET_DI(eep)         ((eep->io_bits & DI_MASK) >> DI_SHIFT)
-#define GET_DO(eep)         ((eep->io_bits & DO_MASK) >> DO_SHIFT)
-#define GET_CS(eep)         ((eep->io_bits & CS_MASK) >> CS_SHIFT)
+#define GET_CK()         ((m_io_bits & CK_MASK) >> CK_SHIFT)
+#define GET_DI()         ((m_io_bits & DI_MASK) >> DI_SHIFT)
+#define GET_DO()         ((m_io_bits & DO_MASK) >> DO_SHIFT)
+#define GET_CS()         ((m_io_bits & CS_MASK) >> CS_SHIFT)
 
-#define SET_CK(eep,data)    eep->io_bits=((eep->io_bits & ~CK_MASK) | ((data & 0x01) << CK_SHIFT))
-#define SET_DI(eep,data)    eep->io_bits=((eep->io_bits & ~DI_MASK) | ((data & 0x01) << DI_SHIFT))
-#define SET_DO(eep,data)    eep->io_bits=((eep->io_bits & ~DO_MASK) | ((data & 0x01) << DO_SHIFT))
-#define SET_CS(eep,data)    eep->io_bits=((eep->io_bits & ~CS_MASK) | ((data & 0x01) << CS_SHIFT))
+#define SET_CK(data)    m_io_bits=((m_io_bits & ~CK_MASK) | ((data & 0x01) << CK_SHIFT))
+#define SET_DI(data)    m_io_bits=((m_io_bits & ~DI_MASK) | ((data & 0x01) << DI_SHIFT))
+#define SET_DO(data)    m_io_bits=((m_io_bits & ~DO_MASK) | ((data & 0x01) << DO_SHIFT))
+#define SET_CS(data)    m_io_bits=((m_io_bits & ~CS_MASK) | ((data & 0x01) << CS_SHIFT))
 
-#define CK_RISE(eep)        ((eep->io_bits & CK_MASK) & ~(eep->old_io_bits & CK_MASK))
-#define CS_RISE(eep)        ((eep->io_bits & CS_MASK) & ~(eep->old_io_bits & CS_MASK))
-#define CS_VALID(eep)       ((eep->io_bits & CS_MASK) & (eep->old_io_bits & CS_MASK))
+#define CK_RISE()        ((m_io_bits & CK_MASK) & ~(m_old_io_bits & CK_MASK))
+#define CS_RISE()        ((m_io_bits & CS_MASK) & ~(m_old_io_bits & CS_MASK))
+#define CS_VALID()       ((m_io_bits & CS_MASK) & (m_old_io_bits & CS_MASK))
 
-#define CK_FALL(eep)        (~(eep->io_bits & CK_MASK) & (eep->old_io_bits & CK_MASK))
-#define CS_FALL(eep)        (~(eep->io_bits & CS_MASK) & (eep->old_io_bits & CS_MASK))
+#define CK_FALL()        (~(m_io_bits & CK_MASK) & (m_old_io_bits & CK_MASK))
+#define CS_FALL()        (~(m_io_bits & CS_MASK) & (m_old_io_bits & CS_MASK))
 
 
-#define SHIFT_IN(eep)       eep->in_shifter=(eep->in_shifter<<1) | GET_DI(eep)
-#define SHIFT_OUT(eep)      SET_DO(eep,(eep->out_shifter & 0x10000)>>16); eep->out_shifter=(eep->out_shifter<<1)
+#define SHIFT_IN()       m_in_shifter=(m_in_shifter<<1) | GET_DI()
+#define SHIFT_OUT()      SET_DO((m_out_shifter & 0x10000)>>16); m_out_shifter=(m_out_shifter<<1)
 
 #define CMD_READ            0x80
 #define CMD_WRITE           0x40
@@ -98,15 +126,7 @@ extern const device_type ER59256;
 #define FLAG_START_BIT      0x02
 #define FLAG_DATA_LOADED    0x04
 
-#define WRITE_ENABLED(eep)  ((eep->flags & FLAG_WRITE_EN) ? 1 : 0)
-#define STARTED(eep)        ((eep->flags & FLAG_START_BIT) ? 1 : 0)
+#define WRITE_ENABLED()  ((m_flags & FLAG_WRITE_EN) ? 1 : 0)
+#define STARTED()        ((m_flags & FLAG_START_BIT) ? 1 : 0)
 
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-void er59256_set_iobits(device_t *device, UINT8 newbits);
-UINT8 er59256_get_iobits(device_t *device);
-void er59256_preload_rom(device_t *device, const UINT16 *rom_data, int count);
-UINT8 er59256_data_loaded(device_t *device);
 #endif
