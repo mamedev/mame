@@ -1120,7 +1120,7 @@ Missing files come here
 		</part>
 	</software>
 
-	<software name="msdos401m">
+	<software name="msds401m">
 		<description>MS-DOS 4.01 (5.25")</description>
 		<year>1988</year>
 		<publisher>Microsoft</publisher>
@@ -1286,7 +1286,7 @@ Missing files come here
 		</part>
 	</software>
 
-	<software name="msdos620u">
+	<software name="msds620u">
 		<description>MS-DOS 6.20 (Upgrade)</description>
 		<year>1993</year>
 		<publisher>Microsoft</publisher>
@@ -1369,7 +1369,7 @@ Missing files come here
 		</part>
 	</software>
 
-	<software name="msdos622u">
+	<software name="msds622u">
 		<description>MS-DOS 6.22 (Upgrade)</description>
 		<year>1994</year>
 		<publisher>Microsoft</publisher>
@@ -1390,7 +1390,7 @@ Missing files come here
 		</part>
 	</software>
 
-	<software name="msdos622mu">
+	<software name="msd622mu">
 		<description>MS-DOS 6.22 (5.25" Upgrade)</description>
 		<year>1994</year>
 		<publisher>Microsoft</publisher>
@@ -1416,8 +1416,8 @@ Missing files come here
 		</part>
 	</software>
 
-	<software name="msdos330k">
-		<description>MS-Dos 3.30</description>
+	<software name="msds330k">
+		<description>MS-Dos 3.30 (Knowledge Dynamics Corp)</description>
 		<year>1993</year>
 		<publisher>Knowledge Dynamics Corp,</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1882,7 +1882,7 @@ Missing files come here
 		</part>
 	</software>
 
-	<software name="win21_286">
+	<software name="win21286">
 		<description>Microsoft Windows/286 Version 2.1</description>
 		<year>1988</year>
 		<publisher>Microsoft</publisher>
@@ -1931,7 +1931,7 @@ Missing files come here
 		</part>
 	</software>
 
-	<software name="win21_386">
+	<software name="win21386">
 		<description>Microsoft Windows/386 Version 2.1</description>
 		<year>1988</year>
 		<publisher>Microsoft</publisher>
@@ -1974,7 +1974,7 @@ Missing files come here
 		</part>
 	</software>
 
-	<software name="win211_286">
+	<software name="wi211286">
 		<description>Microsoft Windows/286 Version 2.11</description>
 		<year>1989</year>
 		<publisher>Microsoft</publisher>
@@ -2023,7 +2023,7 @@ Missing files come here
 		</part>
 	</software>
 
-	<software name="win211_386">
+	<software name="wi211386">
 		<description>Microsoft Windows/386 Version 2.11</description>
 		<year>1989</year>
 		<publisher>Microsoft</publisher>
