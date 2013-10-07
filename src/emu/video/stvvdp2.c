@@ -2007,6 +2007,9 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
+	#define STV_VDP2_CCRLB   (m_vdp2_regs[0x10e/2])
+
+
 /* 180110 - Colour Offset Enable
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
@@ -6043,7 +6046,7 @@ int saturn_state::get_vcounter( void )
 		return (vcount & ~1) | (machine().primary_screen->frame_number() & 1);
 
 	/* docs says << 1, but according to HW tests it's a typo. */
-	return (vcount & 0x1ff); // Non-interlace
+	return (true_vcount[vcount & 0x1ff][STV_VDP2_VRES]); // Non-interlace
 }
 
 void saturn_state::stv_vdp2_state_save_postload( void )
@@ -6115,6 +6118,7 @@ int saturn_state::stv_vdp2_start ( void )
 /* maybe we should move this to video/stv.c */
 VIDEO_START_MEMBER(saturn_state,stv_vdp2)
 {
+	int i;
 	machine().primary_screen->register_screen_bitmap(m_tmpbitmap);
 	stv_vdp2_start();
 	stv_vdp1_start();
@@ -6123,6 +6127,29 @@ VIDEO_START_MEMBER(saturn_state,stv_vdp2)
 	machine().gfx[1]->set_source(m_vdp2.gfx_decode);
 	machine().gfx[2]->set_source(m_vdp2.gfx_decode);
 	machine().gfx[3]->set_source(m_vdp2.gfx_decode);
+
+	/* calc V counter offsets */
+	/* 224 mode */
+	for(i=0;i<263;i++)
+	{
+		true_vcount[i][0] = i;
+		if(i>0xec)
+			true_vcount[i][0]+=0xf9;
+	}
+
+	for(i=0;i<263;i++)
+	{
+		true_vcount[i][1] = i;
+		if(i>0xf5)
+			true_vcount[i][1]+=0xf9;
+	}
+
+	/* 256 mode, todo */
+	for(i=0;i<263;i++)
+	{
+		true_vcount[i][2] = i;
+		true_vcount[i][3] = i;
+	}
 }
 
 void saturn_state::stv_vdp2_dynamic_res_change( void )

@@ -358,6 +358,7 @@ public:
 	void stv_vdp2_draw_NBG3(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void stv_vdp2_draw_RBG0(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT8 pri);
+	int true_vcount[263][4];
 
 	void stv_vdp2_state_save_postload( void );
 	void stv_vdp2_exit ( void );

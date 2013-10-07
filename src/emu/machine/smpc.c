@@ -694,23 +694,20 @@ static void smpc_comreg_exec(address_space &space, UINT8 data, UINT8 is_stv)
 		case 0x02:
 		case 0x03:
 			if(LOG_SMPC) printf ("SMPC: Slave %s %d %d\n",(data & 1) ? "off" : "on",space.machine().primary_screen->hpos(),space.machine().primary_screen->vpos());
-			if((data & 1) != (state->m_smpc.slave_on & 1))
-				space.machine().scheduler().timer_set(attotime::from_usec(100), FUNC(smpc_slave_enable),data & 1);
-			else /* guess: if Slave state is equal to the previous one, just execute less code. ask Greatest Nine '97. Unless SMPC is really so fast ... */
-				space.machine().scheduler().timer_set(attotime::from_usec(5), FUNC(smpc_slave_enable),data & 1);
+			space.machine().scheduler().timer_set(attotime::from_usec(15), FUNC(smpc_slave_enable),data & 1);
 			break;
 		case 0x06:
 		case 0x07:
 			if(LOG_SMPC) printf ("SMPC: Sound %s\n",(data & 1) ? "off" : "on");
 
 			if(!is_stv)
-				space.machine().scheduler().timer_set(attotime::from_usec(100), FUNC(smpc_sound_enable),data & 1);
+				space.machine().scheduler().timer_set(attotime::from_usec(15), FUNC(smpc_sound_enable),data & 1);
 			break;
 		/*CD (SH-1) ON/OFF */
 		case 0x08:
 		case 0x09:
 			printf ("SMPC: CD %s\n",(data & 1) ? "off" : "on");
-			space.machine().scheduler().timer_set(attotime::from_usec(40), FUNC(smpc_cd_enable),data & 1);
+			space.machine().scheduler().timer_set(attotime::from_usec(20), FUNC(smpc_cd_enable),data & 1);
 			break;
 		case 0x0d:
 			if(LOG_SMPC) printf ("SMPC: System Reset\n");
@@ -742,11 +739,12 @@ static void smpc_comreg_exec(address_space &space, UINT8 data, UINT8 is_stv)
 
 			int timing;
 
-			timing = 100;
+			timing = 8;
 
 			if(state->m_smpc.IREG[0] != 0) // non-peripheral data
-				timing += 100;
+				timing += 8;
 
+			/* TODO: At vblank-out actually ... */
 			if(state->m_smpc.IREG[1] & 8) // peripheral data
 				timing += 700;
 
@@ -784,6 +782,7 @@ static void smpc_comreg_exec(address_space &space, UINT8 data, UINT8 is_stv)
 			break;
 		case 0x19:
 		case 0x1a:
+			/* TODO: timing */
 			if(LOG_SMPC) printf ("SMPC: NMI %sable %d %d\n",data & 1 ? "Dis" : "En",space.machine().primary_screen->hpos(),space.machine().primary_screen->vpos());
 			space.machine().scheduler().timer_set(attotime::from_usec(100), FUNC(smpc_nmi_set),data & 1);
 			break;
