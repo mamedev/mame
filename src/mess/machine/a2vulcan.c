@@ -206,7 +206,7 @@ void a2bus_vulcanbase_device::write_c0nx(address_space &space, UINT8 offset, UIN
 				m_lastdata &= 0x00ff;
 				m_lastdata |= (data << 8);
 //              printf("IDE: write %04x\n", m_lastdata);
-				m_ata->write_cs0(space, offset, m_lastdata, 0xffff);
+				m_ata->write_cs0(space, 0, m_lastdata, 0xffff);
 			}
 			else
 			{
