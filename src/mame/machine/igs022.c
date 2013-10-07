@@ -69,7 +69,10 @@ void igs022_device::IGS022_do_dma(UINT16 src, UINT16 dst, UINT16 size, UINT16 mo
 	*/
 
 	param = mode >> 8;
+	if (mode & 0x00f0) printf("IGS022_do_dma mode bits %04x set\n", mode & 0x00f0);
+
 	mode &=0xf;  // what are the other bits?
+
 
 	if ((mode == 0) || (mode == 1) || (mode == 2) || (mode == 3)  || (mode == 4))
 	{
@@ -128,29 +131,28 @@ void igs022_device::IGS022_do_dma(UINT16 src, UINT16 dst, UINT16 size, UINT16 mo
 	}
 	else if (mode == 5)
 	{
-		/* mode 5 seems to be a straight copy, byteswap */
+		/* mode 5 seems to be a byteswapped copy */
 		int x;
 		UINT16 *PROTROM = (UINT16*)memregion(":igs022data")->base();
 		for (x = 0; x < size; x++)
 		{
 			UINT16 dat = PROTROM[src + x];
+			dat = ((dat &0x00ff) << 8) | ((dat &0xff00) >> 8);
 
-			m_sharedprotram[dst + x] = (dat << 8) | (dat >> 8);
+			m_sharedprotram[dst + x] = dat;
 		}
 	}
 	else if (mode == 6)
 	{
-		/* mode 6 seems to swap bytes and nibbles */
+		/* mode 6 seems to be a nibble swapped copy */
 		int x;
 		UINT16 *PROTROM = (UINT16*)memregion(":igs022data")->base();
 		for (x = 0; x < size; x++)
 		{
 			UINT16 dat = PROTROM[src + x];
 
-			dat = ((dat & 0xf000) >> 12)|
-					((dat & 0x0f00) >> 4)|
-					((dat & 0x00f0) << 4)|
-					((dat & 0x000f) << 12);
+			dat = ((dat & 0xf0f0) >> 4)|
+					((dat & 0x0f0f) << 4);
 
 			m_sharedprotram[dst + x] = dat;
 		}
