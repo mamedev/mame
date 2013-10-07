@@ -1357,21 +1357,28 @@ DEVICE_IMAGE_LOAD_MEMBER( vboy_state, vboy_cart )
 	if (image.software_entry() == NULL)
 	{
 		cart_size = image.length();
+		image.fread(ROM, cart_size);
 		switch (cart_size)
 		{
+			case 0x001000:
+				memcpy(ROM + 0x001000, ROM, 0x001000);
+			case 0x002000:
+				memcpy(ROM + 0x002000, ROM, 0x002000);
+			case 0x004000:
+				memcpy(ROM + 0x004000, ROM, 0x004000);
+			case 0x008000:
+				memcpy(ROM + 0x008000, ROM, 0x008000);
+			case 0x010000:
+				memcpy(ROM + 0x010000, ROM, 0x010000);
+			case 0x020000:
+				memcpy(ROM + 0x020000, ROM, 0x020000);
+			case 0x040000:
+				memcpy(ROM + 0x040000, ROM, 0x040000);
 			case 0x080000:
-				image.fread(ROM, cart_size);
-				memcpy(ROM + 0x080000, ROM, cart_size);
-				memcpy(ROM + 0x100000, ROM, cart_size);
-				memcpy(ROM + 0x180000, ROM, cart_size);
-				break;
+				memcpy(ROM + 0x080000, ROM, 0x080000);
 			case 0x100000:
-				image.fread(ROM, cart_size);
-				memcpy(ROM + 0x100000, ROM, cart_size);
-				break;
-			case 0x200000:
+				memcpy(ROM + 0x100000, ROM, 0x100000);
 			default:
-				image.fread(ROM, cart_size);
 				break;
 		}
 	}
