@@ -1603,8 +1603,6 @@ $(MESSOBJ)/memotech.a:          \
 
 $(MESSOBJ)/mgu.a:               \
 	$(MESS_DRIVERS)/irisha.o    \
-	$(MESS_MACHINE)/irisha.o    \
-	$(MESS_VIDEO)/irisha.o      \
 
 $(MESSOBJ)/microkey.a:          \
 	$(MESS_DRIVERS)/primo.o     \
