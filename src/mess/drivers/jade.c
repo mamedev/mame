@@ -6,6 +6,9 @@
 
     No info found as yet.
 
+    It takes about 8 seconds to start up.
+    Type HE to get a list of commands.
+
 ****************************************************************************/
 
 #include "emu.h"
