@@ -48,7 +48,8 @@ Notes:
 #include "machine/i8255.h"
 #include "sound/2413intf.h"
 #include "sound/okim6295.h"
-#include "machine/igs025_igs022.h"
+#include "machine/igs025.h"
+#include "machine/igs022.h"
 
 class igs017_state : public driver_device
 {
@@ -61,8 +62,9 @@ public:
 		m_fg_videoram(*this, "fg_videoram", 0),
 		m_bg_videoram(*this, "bg_videoram", 0),
 		m_oki(*this, "oki"),
-		m_igs025_igs022(*this,"igs022igs025")
-		{ }
+		m_igs025(*this,"igs025"),
+		m_igs022(*this,"igs022")
+	{ }
 
 	int m_input_addr;
 	required_device<cpu_device> m_maincpu;
@@ -70,9 +72,10 @@ public:
 	optional_shared_ptr<UINT8> m_fg_videoram;
 	optional_shared_ptr<UINT8> m_bg_videoram;
 	required_device<okim6295_device> m_oki;
-	optional_device<igs_025_022_device> m_igs025_igs022; // Mj Shuang Long Qiang Zhu 2
+	optional_device<igs025_device> m_igs025; // Mj Shuang Long Qiang Zhu 2
+	optional_device<igs022_device> m_igs022; // Mj Shuang Long Qiang Zhu 2
 
-	 
+	 void igs025_to_igs022_callback( void );
 
 	int m_toggle;
 	int m_debug_addr;
@@ -997,6 +1000,13 @@ void igs017_state::lhzb2_decrypt_sprites()
 	}
 }
 
+void igs017_state::igs025_to_igs022_callback( void )
+{
+	m_igs022->IGS022_handle_command();
+}
+
+
+
 DRIVER_INIT_MEMBER(igs017_state,lhzb2)
 {
 	int i;
@@ -1088,11 +1098,11 @@ DRIVER_INIT_MEMBER(igs017_state,lhzb2)
 	lhzb2_patch_rom();
 
 	// install and configure protection device(s)
-//	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xda5610, 0xda5613, read16_delegate(FUNC(igs_025_022_device::killbld_igs025_prot_r), (igs_025_022_device*)m_igs025_igs022), write16_delegate(FUNC(igs_025_022_device::killbld_igs025_prot_w), (igs_025_022_device*)m_igs025_igs022));
-//	m_igs025_igs022->m_sharedprotram = m_sharedprotram;
-//	m_igs025_igs022->m_kb_source_data = dw3_source_data;
-//	m_igs025_igs022->m_kb_source_data_offset = 0;
-//	m_igs025_igs022->m_kb_game_id = 0x00060000;
+//	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xda5610, 0xda5613, read16_delegate(FUNC(igs025_device::killbld_igs025_prot_r), (igs025_device*)m_igs025), write16_delegate(FUNC(igs025_device::killbld_igs025_prot_w), (igs025_device*)m_igs025));
+//	m_igs022->m_sharedprotram = m_sharedprotram;
+//	m_igs025->m_kb_source_data = dw3_source_data;
+//	m_igs025->m_kb_source_data_offset = 0;
+//	m_igs025->m_kb_game_id = 0x00060000;
 }
 
 
@@ -1272,11 +1282,11 @@ DRIVER_INIT_MEMBER(igs017_state,slqz2)
 	slqz2_patch_rom();
 
 	// install and configure protection device(s)
-//	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xda5610, 0xda5613, read16_delegate(FUNC(igs_025_022_device::killbld_igs025_prot_r), (igs_025_022_device*)m_igs025_igs022), write16_delegate(FUNC(igs_025_022_device::killbld_igs025_prot_w), (igs_025_022_device*)m_igs025_igs022));
-//	m_igs025_igs022->m_sharedprotram = m_sharedprotram;
-//	m_igs025_igs022->m_kb_source_data = dw3_source_data;
-//	m_igs025_igs022->m_kb_source_data_offset = 0;
-//	m_igs025_igs022->m_kb_game_id = 0x00060000;
+//	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xda5610, 0xda5613, read16_delegate(FUNC(igs025_device::killbld_igs025_prot_r), (igs025_device*)m_igs025), write16_delegate(FUNC(igs025_device::killbld_igs025_prot_w), (igs025_device*)m_igs025));
+//	m_igs022->m_sharedprotram = m_sharedprotram;
+//	m_igs025->m_kb_source_data = dw3_source_data;
+//	m_igs025->m_kb_source_data_offset = 0;
+//	m_igs025->m_kb_game_id = 0x00060000;
 }
 
 // spkrform
@@ -3595,7 +3605,11 @@ static MACHINE_CONFIG_START( lhzb2, igs017_state )
 	MCFG_PALETTE_LENGTH(0x100*2)
 
 	// protection
-	MCFG_DEVICE_ADD("igs022igs025", IGS025022, 0)
+	MCFG_DEVICE_ADD("igs025", IGS025, 0)
+	MCFG_IGS025_SET_EXTERNAL_EXECUTE( igs017_state, igs025_to_igs022_callback )
+
+	MCFG_DEVICE_ADD("igs022", IGS022, 0)
+
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3665,7 +3679,10 @@ static MACHINE_CONFIG_START( slqz2, igs017_state )
 	MCFG_PALETTE_LENGTH(0x100*2)
 
 	// protection
-	MCFG_DEVICE_ADD("igs022igs025", IGS025022, 0)
+	MCFG_DEVICE_ADD("igs025", IGS025, 0)
+	MCFG_IGS025_SET_EXTERNAL_EXECUTE( igs017_state, igs025_to_igs022_callback )
+
+	MCFG_DEVICE_ADD("igs022", IGS022, 0)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

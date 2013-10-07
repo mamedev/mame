@@ -315,17 +315,25 @@ MACHINE_RESET_MEMBER(pgm_022_025_state,killbld)
 	MACHINE_RESET_CALL_MEMBER(pgm);
 }
 
+void pgm_022_025_state::igs025_to_igs022_callback( void )
+{
+//	printf("igs025_to_igs022_callback\n");
+	m_igs022->IGS022_handle_command();
+}
+
+
+
 DRIVER_INIT_MEMBER(pgm_022_025_state,killbld)
 {
 	pgm_basic_init();
 	pgm_killbld_decrypt();
 
 	// install and configure protection device(s)
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xd40000, 0xd40003, read16_delegate(FUNC(igs_025_022_device::killbld_igs025_prot_r), (igs_025_022_device*)m_igs025_igs022), write16_delegate(FUNC(igs_025_022_device::killbld_igs025_prot_w), (igs_025_022_device*)m_igs025_igs022));
-	m_igs025_igs022->m_sharedprotram = m_sharedprotram;
-	m_igs025_igs022->m_kb_source_data = killbld_source_data;
-	m_igs025_igs022->m_kb_source_data_offset = 0x16;
-	m_igs025_igs022->m_kb_game_id = 0x89911400;
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xd40000, 0xd40003, read16_delegate(FUNC(igs025_device::killbld_igs025_prot_r), (igs025_device*)m_igs025), write16_delegate(FUNC(igs025_device::killbld_igs025_prot_w), (igs025_device*)m_igs025));
+	m_igs022->m_sharedprotram = m_sharedprotram;
+	m_igs025->m_kb_source_data = killbld_source_data;
+	m_igs025->m_kb_source_data_offset = 0x16;
+	m_igs025->m_kb_game_id = 0x89911400;
 }
 
 DRIVER_INIT_MEMBER(pgm_022_025_state,drgw3)
@@ -334,11 +342,11 @@ DRIVER_INIT_MEMBER(pgm_022_025_state,drgw3)
 	pgm_dw3_decrypt();
 	
 	// install and configure protection device(s)
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xda5610, 0xda5613, read16_delegate(FUNC(igs_025_022_device::killbld_igs025_prot_r), (igs_025_022_device*)m_igs025_igs022), write16_delegate(FUNC(igs_025_022_device::killbld_igs025_prot_w), (igs_025_022_device*)m_igs025_igs022));
-	m_igs025_igs022->m_sharedprotram = m_sharedprotram;
-	m_igs025_igs022->m_kb_source_data = dw3_source_data;
-	m_igs025_igs022->m_kb_source_data_offset = 0;
-	m_igs025_igs022->m_kb_game_id = 0x00060000;
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xda5610, 0xda5613, read16_delegate(FUNC(igs025_device::killbld_igs025_prot_r), (igs025_device*)m_igs025), write16_delegate(FUNC(igs025_device::killbld_igs025_prot_w), (igs025_device*)m_igs025));
+	m_igs022->m_sharedprotram = m_sharedprotram;
+	m_igs025->m_kb_source_data = dw3_source_data;
+	m_igs025->m_kb_source_data_offset = 0;
+	m_igs025->m_kb_game_id = 0x00060000;
 }
 
 
@@ -355,7 +363,10 @@ MACHINE_CONFIG_START( pgm_022_025, pgm_022_025_state )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(killbld_mem)
 
-	MCFG_DEVICE_ADD("igs022igs025", IGS025022, 0)
+	MCFG_DEVICE_ADD("igs025", IGS025, 0)
+	MCFG_IGS025_SET_EXTERNAL_EXECUTE( pgm_022_025_state, igs025_to_igs022_callback )
+
+	MCFG_DEVICE_ADD("igs022", IGS022, 0)
 
 	MCFG_MACHINE_RESET_OVERRIDE(pgm_022_025_state,killbld)
 MACHINE_CONFIG_END

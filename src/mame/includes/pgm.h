@@ -8,7 +8,8 @@
 #include "machine/nvram.h"
 #include "machine/pgmcrypt.h"
 
-#include "machine/igs025_igs022.h"
+#include "machine/igs025.h"
+#include "machine/igs022.h"
 
 #define PGMARM7LOGERROR 0
 
@@ -387,7 +388,9 @@ public:
 	pgm_022_025_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pgm_state(mconfig, type, tag),
 			m_sharedprotram(*this, "sharedprotram"),
-			m_igs025_igs022(*this,"igs022igs025")
+			m_igs025(*this,"igs025"),
+			m_igs022(*this,"igs022")
+
 	{ }
 
 	void pgm_dw3_decrypt();
@@ -399,7 +402,10 @@ public:
 	DECLARE_DRIVER_INIT(drgw3);
 	DECLARE_MACHINE_RESET(killbld);
 
-	required_device<igs_025_022_device> m_igs025_igs022;
+	void igs025_to_igs022_callback( void );
+
+	required_device<igs025_device> m_igs025;
+	required_device<igs022_device> m_igs022;
 };
 
 /* for machine/pgmprot5.c type games */
