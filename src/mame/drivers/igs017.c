@@ -48,7 +48,7 @@ Notes:
 #include "machine/i8255.h"
 #include "sound/2413intf.h"
 #include "sound/okim6295.h"
-
+#include "machine/igs025_igs022.h"
 
 class igs017_state : public driver_device
 {
@@ -60,7 +60,9 @@ public:
 		m_spriteram(*this, "spriteram", 0),
 		m_fg_videoram(*this, "fg_videoram", 0),
 		m_bg_videoram(*this, "bg_videoram", 0),
-		m_oki(*this, "oki"){ }
+		m_oki(*this, "oki"),
+		m_igs025_igs022(*this,"igs022igs025")
+		{ }
 
 	int m_input_addr;
 	required_device<cpu_device> m_maincpu;
@@ -68,6 +70,9 @@ public:
 	optional_shared_ptr<UINT8> m_fg_videoram;
 	optional_shared_ptr<UINT8> m_bg_videoram;
 	required_device<okim6295_device> m_oki;
+	optional_device<igs_025_022_device> m_igs025_igs022; // Mj Shuang Long Qiang Zhu 2
+
+	 
 
 	int m_toggle;
 	int m_debug_addr;
@@ -1081,6 +1086,13 @@ DRIVER_INIT_MEMBER(igs017_state,lhzb2)
 	lhzb2_decrypt_tiles();
 	lhzb2_decrypt_sprites();
 	lhzb2_patch_rom();
+
+	// install and configure protection device(s)
+//	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xda5610, 0xda5613, read16_delegate(FUNC(igs_025_022_device::killbld_igs025_prot_r), (igs_025_022_device*)m_igs025_igs022), write16_delegate(FUNC(igs_025_022_device::killbld_igs025_prot_w), (igs_025_022_device*)m_igs025_igs022));
+//	m_igs025_igs022->m_sharedprotram = m_sharedprotram;
+//	m_igs025_igs022->m_kb_source_data = dw3_source_data;
+//	m_igs025_igs022->m_kb_source_data_offset = 0;
+//	m_igs025_igs022->m_kb_game_id = 0x00060000;
 }
 
 
@@ -1258,6 +1270,13 @@ DRIVER_INIT_MEMBER(igs017_state,slqz2)
 	slqz2_decrypt_tiles();
 	lhzb2_decrypt_sprites();
 	slqz2_patch_rom();
+
+	// install and configure protection device(s)
+//	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xda5610, 0xda5613, read16_delegate(FUNC(igs_025_022_device::killbld_igs025_prot_r), (igs_025_022_device*)m_igs025_igs022), write16_delegate(FUNC(igs_025_022_device::killbld_igs025_prot_w), (igs_025_022_device*)m_igs025_igs022));
+//	m_igs025_igs022->m_sharedprotram = m_sharedprotram;
+//	m_igs025_igs022->m_kb_source_data = dw3_source_data;
+//	m_igs025_igs022->m_kb_source_data_offset = 0;
+//	m_igs025_igs022->m_kb_game_id = 0x00060000;
 }
 
 // spkrform
@@ -3575,6 +3594,8 @@ static MACHINE_CONFIG_START( lhzb2, igs017_state )
 	MCFG_GFXDECODE(igs017_swapped)
 	MCFG_PALETTE_LENGTH(0x100*2)
 
+	// protection
+	MCFG_DEVICE_ADD("igs022igs025", IGS025022, 0)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3643,6 +3664,8 @@ static MACHINE_CONFIG_START( slqz2, igs017_state )
 	MCFG_GFXDECODE(igs017)
 	MCFG_PALETTE_LENGTH(0x100*2)
 
+	// protection
+	MCFG_DEVICE_ADD("igs022igs025", IGS025022, 0)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -4113,7 +4136,7 @@ ROM_START( lhzb2 )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "p1100.u30", 0x00000, 0x80000, CRC(68102b25) SHA1(6c1e8d204be0efda0e9b6c2f49b5c6760712475f) )
 
-	ROM_REGION( 0x10000, "igs022", 0 )  // INTERNATIONAL GAMES SYSTEM CO.,LTD
+	ROM_REGION( 0x10000, "igs022data", 0 )  // INTERNATIONAL GAMES SYSTEM CO.,LTD
 	ROM_LOAD( "m1104.u11",0x0000, 0x10000, CRC(794d0276) SHA1(ac903d2faa3fb315438dc8da22c5337611a8790d) )
 
 	ROM_REGION( 0x400000, "sprites", 0 )    // adddress scrambling
@@ -4188,7 +4211,7 @@ ROM_START( slqz2 )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "p1100.u28", 0x00000, 0x80000, CRC(0b8e5c9e) SHA1(16572bd1163bba4da8a76b10649d2f71e50ad369) )
 
-	ROM_REGION( 0x10000, "igs022", 0 )  // INTERNATIONAL GAMES SYSTEM CO.,LTD
+	ROM_REGION( 0x10000, "igs022data", 0 )  // INTERNATIONAL GAMES SYSTEM CO.,LTD
 	ROM_LOAD( "m1103.u12", 0x00000, 0x10000, CRC(9f3b8d65) SHA1(5ee1ad025474399c2826f21d970e76f25d0fa1fd) )
 
 	ROM_REGION( 0x400000, "sprites", 0 )    // adddress scrambling

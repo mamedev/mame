@@ -8,6 +8,8 @@
 #include "machine/nvram.h"
 #include "machine/pgmcrypt.h"
 
+#include "machine/igs025_igs022.h"
+
 #define PGMARM7LOGERROR 0
 
 class pgm_state : public driver_device
@@ -384,39 +386,20 @@ class pgm_022_025_state : public pgm_state
 public:
 	pgm_022_025_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pgm_state(mconfig, type, tag),
-			m_sharedprotram(*this, "sharedprotram") {
-	}
+			m_sharedprotram(*this, "sharedprotram"),
+			m_igs025_igs022(*this,"igs022igs025")
+	{ }
 
-	const UINT8 (*m_kb_source_data)[0xec];
-	INT32 m_kb_source_data_offset;
-
-	UINT32 m_kb_game_id;
-
-	UINT16        m_kb_prot_hold;
-	UINT16        m_kb_prot_hilo;
-	UINT16        m_kb_prot_hilo_select;
-
-	int           m_kb_cmd;
-	int           m_kb_reg;
-	int           m_kb_ptr;
-	UINT8         m_kb_swap;
-	UINT32        m_kb_regs[0x100];
+	void pgm_dw3_decrypt();
+	void pgm_killbld_decrypt();
 
 	required_shared_ptr<UINT16> m_sharedprotram;
 
 	DECLARE_DRIVER_INIT(killbld);
 	DECLARE_DRIVER_INIT(drgw3);
 	DECLARE_MACHINE_RESET(killbld);
-	void pgm_dw3_decrypt();
-	void pgm_killbld_decrypt();
-	void killbld_protection_calculate_hilo();
-	void killbld_protection_calculate_hold(int y, int z);
-	void IGS022_do_dma(UINT16 src, UINT16 dst, UINT16 size, UINT16 mode);
-	void IGS022_reset();
-	void IGS022_handle_command();
 
-	DECLARE_WRITE16_MEMBER( killbld_igs025_prot_w );
-	DECLARE_READ16_MEMBER( killbld_igs025_prot_r );
+	required_device<igs_025_022_device> m_igs025_igs022;
 };
 
 /* for machine/pgmprot5.c type games */
