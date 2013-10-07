@@ -164,7 +164,7 @@ void a2bus_zipdrivebase_device::write_c0nx(address_space &space, UINT8 offset, U
 //          printf("%02x to IDE data hi\n", data);
 			m_lastdata &= 0x00ff;
 			m_lastdata |= (data << 8);
-			m_ata->write_cs0(space, offset, m_lastdata, 0xffff);
+			m_ata->write_cs0(space, 0, m_lastdata, 0xffff);
 			break;
 
 		default:
