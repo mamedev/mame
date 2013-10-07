@@ -443,9 +443,6 @@ void pgm_022_025_state::IGS022_reset()
 	UINT16 size = PROTROM[0x104 / 2];
 	UINT16 mode = PROTROM[0x106 / 2];
 
-	src = ((src & 0xff00) >> 8) | ((src & 0x00ff) << 8);
-	dst = ((dst & 0xff00) >> 8) | ((dst & 0x00ff) << 8);
-	size = ((size & 0xff00) >> 8) | ((size & 0x00ff) << 8);
 	mode &= 0xff;
 
 	src >>= 1;
