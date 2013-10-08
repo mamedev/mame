@@ -64,7 +64,7 @@ int t10mmc::toc_tracks()
 	{
 		return ( end_track - start_track ) + 2;
 	}
-	else if (start_track < 0xaa)
+	else if (start_track <= 0xaa)
 	{
 		return 1;
 	}
@@ -512,10 +512,16 @@ void t10mmc::ReadData( UINT8 *data, int dataLength )
 						data[dptr++] = 1;
 						data[dptr++] = cdrom_get_last_track(cdrom);
 
+						int first_track = command[6];
+						if (first_track == 0)
+						{
+							first_track = 1;
+						}
+
 						for (int i = 0; i < tracks; i++)
 						{
-							int track = i + 1;
-							int cdrom_track = i;
+							int track = first_track + i;
+							int cdrom_track = track - 1;
 							if( i == tracks - 1 )
 							{
 								track = 0xaa;
