@@ -53,6 +53,7 @@
 
 #define VERBOSE                 (0)
 #define KEEP_STATISTICS         (0)
+#define FATAL_ERROR_AFTER_NS	 (0) //(1000)
 
 #if (VERBOSE)
 
@@ -140,7 +141,7 @@ public:
 	{
 		char *devname;
 		net_device_t *dev;
-		char paramfq[30];
+		char paramfq[300];
 		double val;
 
 		skipws();
@@ -153,7 +154,7 @@ public:
 		strcpy(paramfq, devname);
 		strcat(paramfq, ".CONST");
 		VERBOSE_OUT(("Parser: Const: %s %f\n", devname, val));
-		m_setup.find_param(paramfq).setTo(val);
+		m_setup.find_param(paramfq).initial(val);
 	}
 
 	void netdev_device(const char *dev_type)
@@ -181,6 +182,8 @@ public:
 		}
 		if (cnt != dev->m_inputs.count() && !dev->variable_input_count())
 			fatalerror("netlist: input count mismatch for %s - expected %d found %d\n", devname, dev->m_inputs.count(), cnt);
+		if (dev->variable_input_count())
+			VERBOSE_OUT(("variable inputs %s: %d\n", dev->name(), cnt));
 		check_char(')');
 	}
 
@@ -230,7 +233,7 @@ private:
 
 	char *getname(char sep)
 	{
-		static char buf[30];
+		char buf[300];
 		char *p1 = buf;
 
 		while (*m_p != sep)
@@ -242,7 +245,7 @@ private:
 
 	char *getname2(char sep1, char sep2)
 	{
-		static char buf[30];
+		char buf[300];
 		char *p1 = buf;
 
 		while ((*m_p != sep1) && (*m_p != sep2))
@@ -380,6 +383,14 @@ void netlist_base_t::set_clock_freq(UINT64 clockfreq)
 	VERBOSE_OUT(("Setting clock %lld and divisor %d\n", clockfreq, m_div));
 }
 
+ATTR_HOT ATTR_ALIGN void netlist_base_t::update_time(const netlist_time t, INT32 &atime)
+{
+	const netlist_time delta = t - m_time_ps + netlist_time::from_raw(m_rem);
+
+	m_time_ps = t;
+	atime -= divu_64x32_rem(delta.as_raw(), m_div, &m_rem);
+}
+
 ATTR_HOT ATTR_ALIGN void netlist_base_t::process_list(INT32 &atime)
 {
 	if (m_mainclock == NULL)
@@ -387,14 +398,18 @@ ATTR_HOT ATTR_ALIGN void netlist_base_t::process_list(INT32 &atime)
 		while ( (atime > 0) && (m_queue.is_not_empty()))
 		{
 			queue_t::entry_t &e = m_queue.pop();
-			const netlist_time delta = e.time() - m_time_ps + netlist_time::from_raw(m_rem);
+			update_time(e.time(), atime);
 
-			atime -= divu_64x32_rem(delta.as_raw(), m_div, &m_rem);
-			m_time_ps = e.time();
+			if (FATAL_ERROR_AFTER_NS)
+				printf("%s\n", e.object()->netdev()->name());
 
 			e.object()->update_devs();
 
 			add_to_stat(m_perf_out_processed, 1);
+
+			if (FATAL_ERROR_AFTER_NS)
+				if (time() > NLTIME_FROM_NS(FATAL_ERROR_AFTER_NS))
+					fatalerror("Stopped");
 		}
 
 		if (atime > 0)
@@ -410,26 +425,25 @@ ATTR_HOT ATTR_ALIGN void netlist_base_t::process_list(INT32 &atime)
 			{
 				while (m_queue.peek().time() > mainclock_Q.time())
 				{
-					const netlist_time delta = mainclock_Q.time() - m_time_ps + netlist_time::from_raw(m_rem);
-					atime -= divu_64x32_rem(delta.as_raw(), m_div, &m_rem);
-					m_time_ps = mainclock_Q.time();
+					update_time(mainclock_Q.time(), atime);
+
 					m_mainclock->update();
 					mainclock_Q.update_devs();
 				}
 				queue_t::entry_t &e = m_queue.pop();
 
-				const netlist_time delta = e.time() - m_time_ps + netlist_time::from_raw(m_rem);
-				atime -= divu_64x32_rem(delta.as_raw(), m_div, &m_rem);
-				m_time_ps = e.time();
+				update_time(e.time(), atime);
 
 				e.object()->update_devs();
 			} else {
-				const netlist_time delta = mainclock_Q.time() - m_time_ps + netlist_time::from_raw(m_rem);
-				atime -= divu_64x32_rem(delta.as_raw(), m_div, &m_rem);
-				m_time_ps = mainclock_Q.time();
+				update_time(mainclock_Q.time(), atime);
+
 				m_mainclock->update();
 				mainclock_Q.update_devs();
 			}
+			if (FATAL_ERROR_AFTER_NS)
+				if (time() > NLTIME_FROM_NS(FATAL_ERROR_AFTER_NS))
+					fatalerror("Stopped");
 
 			add_to_stat(m_perf_out_processed, 1);
 		}
@@ -658,14 +672,40 @@ void netlist_setup_t::resolve_inputs(void)
 		}
 	}
 
+#if 1
+	for (tagmap_devices_t::entry_t *entry = m_devices.first(); entry != NULL; entry = m_devices.next(entry))
+	{
+		net_device_t *dev = entry->object();
+		dev->update_device();
+		//INT32 time = 10000;
+		//m_netlist.process_list(time);
+	}
+	//m_netlist.m_queue.clear();
+
+
+#else
 	/* make sure all outputs are triggered once */
 	for (tagmap_output_t::entry_t *entry = m_outputs.first(); entry != NULL; entry = m_outputs.next(entry))
 	{
 		net_output_t *out = entry->object();
-		out->update_devs_force();
-		INT32 time = 1000;
-		m_netlist.process_list(time);
+		//if (dynamic_cast<const netdev_clock *>(out->netdev()) == NULL )
+		{
+			out->update_devs_force();
+			INT32 time = 10000;
+			m_netlist.process_list(time);
+		}
 	}
+	//m_netlist.m_queue.clear();
+#endif
+
+	/* print all outputs */
+	for (tagmap_output_t::entry_t *entry = m_outputs.first(); entry != NULL; entry = m_outputs.next(entry))
+	{
+		ATTR_UNUSED net_output_t *out = entry->object();
+		VERBOSE_OUT(("%s %d\n", out->netdev()->name(), *out->Q_ptr()));
+	}
+
+
 }
 
 void netlist_setup_t::parse(char *buf)
@@ -748,7 +788,7 @@ void net_device_t::register_output(const char *name, net_output_t &port)
 	register_output(*this, name, port);
 }
 
-void net_device_t::register_input(net_core_device_t &dev, const char *name, net_input_t &inp, int type)
+void net_device_t::register_input(net_core_device_t &dev, const char *name, net_input_t &inp, net_input_t::net_input_state type)
 {
 	astring temp = dev.name();
 	temp.cat(".");
@@ -758,7 +798,7 @@ void net_device_t::register_input(net_core_device_t &dev, const char *name, net_
 	m_setup->register_input(temp, &inp);
 }
 
-void net_device_t::register_input(const char *name, net_input_t &inp, int type)
+void net_device_t::register_input(const char *name, net_input_t &inp, net_input_t::net_input_state type)
 {
 	register_input(*this, name, inp, type);
 }
@@ -792,7 +832,7 @@ void net_device_t::register_param(const char *name, net_param_t &param, double i
 // net_input_t
 // ----------------------------------------------------------------------------------------
 
-ATTR_COLD void net_input_t::init(net_core_device_t *dev, int astate)
+ATTR_COLD void net_input_t::init(net_core_device_t *dev, net_input_state astate)
 {
 	m_netdev = dev;
 	m_state = astate;
@@ -808,12 +848,14 @@ ATTR_COLD void net_input_t::init(net_core_device_t *dev, int astate)
 net_output_t::net_output_t(int atype)
 	: net_object_t(atype)
 {
-	m_last_Q = 1;
+	m_last_Q = 0;
 	m_Q = 0;
 	m_new_Q = m_Q;
 	m_active = 0;
 	m_in_queue = 2;
 	m_num_cons = 0;
+	m_Q_analog = 0.0;
+	m_new_Q_analog = 0.0;
 }
 
 ATTR_COLD void net_output_t::set_netdev(const net_core_device_t *dev)
@@ -822,7 +864,7 @@ ATTR_COLD void net_output_t::set_netdev(const net_core_device_t *dev)
 	m_netlist = dev->netlist();
 }
 
-ATTR_HOT inline void net_output_t::update_dev(const net_input_t &inp, const UINT32 mask)
+ATTR_HOT inline void net_output_t::update_dev(const net_input_t &inp, const UINT8 mask)
 {
 	if ((inp.state() & mask) != 0)
 	{
@@ -839,12 +881,12 @@ ATTR_HOT inline void net_output_t::update_dev(const net_input_t &inp, const UINT
 
 ATTR_HOT inline void net_output_t::update_devs()
 {
-	const UINT32 masks[4] = { 1, 5, 3, 1 };
+	const UINT8 masks[4] = { 1, 5, 3, 1 };
 	m_Q = m_new_Q;
 	m_Q_analog = m_new_Q_analog;
 
 	//UINT32 mask = 1 | ((m_last_Q & (m_Q ^ 1)) << 1) | (((m_last_Q ^ 1) & m_Q) << 2);
-	const UINT32 mask = masks[ (m_last_Q  << 1) | m_Q ];
+	const UINT8 mask = masks[ (m_last_Q  << 1) | m_Q ];
 
 	switch (m_num_cons)
 	{
@@ -885,6 +927,7 @@ ATTR_COLD  void net_output_t::update_devs_force()
 		s++;
 	}
 
+	m_in_queue = 2; /* mark as taken ... */
 	m_last_Q = m_Q;
 }
 

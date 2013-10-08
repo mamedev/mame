@@ -71,6 +71,7 @@ static NETLIST_START(pong_schematics)
 	NETDEV_TTL_CONST(high, 1)
 	NETDEV_TTL_CONST(low, 0)
 	NETDEV_MAINCLOCK(clk)
+	//NETDEV_CLOCK(clk)
 	NETDEV_PARAM(clk.FREQ, 7159000.0)
 	NETDEV_LOGIC_INPUT(SRST)
 	NETDEV_ANALOG_INPUT(P1)
@@ -373,6 +374,7 @@ static NETLIST_START(pong_schematics)
 	TTL_7427_NOR(ic_e5c, ic_e4b.Q, 8H, 4H)
 	NET_ALIAS(scoreFE, ic_e5c.Q)
 
+	//TTL_7400_NAND(ic_c3d, 8H, 4H)
 	TTL_7400_NAND(ic_c3d, 4H, 8H)
 	TTL_7402_NOR(ic_d2b, ic_e4b.Q, ic_c3d.Q)
 	NET_ALIAS(scoreBC, ic_d2b.Q)
@@ -526,13 +528,11 @@ private:
 
 			while (pixels >= m_bitmap->width())
 			{
-				for (int i = m_last_x ; i < m_bitmap->width() - 1; i++)
-					m_bitmap->pix(m_last_y, i) = col;
+				m_bitmap->plot_box(m_last_x, m_last_y, m_bitmap->width() - 1 - m_last_x, 1, col);
 				pixels -= m_bitmap->width();
 				m_last_x = 0;
 			}
-			for (int i = m_last_x ; i < pixels; i++)
-				m_bitmap->pix(m_last_y, i) = col;
+			m_bitmap->plot_box(m_last_x, m_last_y, pixels - m_last_x, 1, col);
 			m_last_x = pixels;
 		}
 		if (m_vid <= 0.34)

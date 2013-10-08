@@ -316,20 +316,6 @@ NETLIB_DEVICE(nic7450,
 	ttl_output_t m_Q;
 );
 
-#if 0
-NETLIB_DEVICE(nic7474,
-	ttl_input_t m_clk;
-	ttl_input_t m_D;
-	ttl_input_t m_clrQ;
-	ttl_input_t m_preQ;
-
-	net_sig_t m_lastclk;
-
-	ttl_output_t m_Q;
-	ttl_output_t m_QQ;
-);
-
-#else
 NETLIB_SUBDEVICE(nic7474sub,
 	ttl_input_t m_clk;
 
@@ -345,7 +331,6 @@ NETLIB_DEVICE(nic7474,
 	ttl_input_t m_clrQ;
 	ttl_input_t m_preQ;
 );
-#endif
 
 NETLIB_DEVICE(nic7486,
 		ttl_input_t m_I0;
@@ -394,7 +379,6 @@ NETLIB_SUBDEVICE(nic7493ff,
 	UINT8 m_active;
 );
 
-#if 1
 NETLIB_DEVICE(nic7493,
 	ttl_input_t m_R1;
 	ttl_input_t m_R2;
@@ -405,23 +389,6 @@ NETLIB_DEVICE(nic7493,
 	nic7493ff D;
 
 );
-#else
-
-NETLIB_DEVICE(nic7493,
-	ATTR_HOT void update_outputs();
-
-	ttl_input_t m_clk;
-	ttl_input_t m_R1;
-	ttl_input_t m_R2;
-
-	ttl_output_t m_QA;
-	ttl_output_t m_QB;
-	ttl_output_t m_QC;
-	ttl_output_t m_QD;
-
-	UINT8 m_cnt;
-);
-#endif
 
 NETLIB_DEVICE(nic7490,
 	ATTR_HOT void update_outputs();
@@ -439,20 +406,20 @@ NETLIB_DEVICE(nic7490,
 
 /* ripple-carry counter on low-high clock transition */
 
-NETLIB_SUBDEVICE(nic9316sub,
+NETLIB_SUBDEVICE(nic9316_sub,
 	ATTR_HOT void update_outputs_all();
 	ATTR_HOT void update_outputs();
 
 	ttl_input_t m_clk;
 
-	ttl_input_t m_LOADQ;
-	ttl_input_t m_ENT;
 	ttl_input_t m_A;
 	ttl_input_t m_B;
 	ttl_input_t m_C;
 	ttl_input_t m_D;
 
 	UINT8 m_cnt;
+	net_sig_t m_loadq;
+	net_sig_t m_ent;
 
 	ttl_output_t m_QA;
 	ttl_output_t m_QB;
@@ -462,9 +429,11 @@ NETLIB_SUBDEVICE(nic9316sub,
 );
 
 NETLIB_DEVICE(nic9316,
-	nic9316sub sub;
+	nic9316_sub sub;
 	ttl_input_t m_ENP;
+	ttl_input_t m_ENT;
 	ttl_input_t m_CLRQ;
+	ttl_input_t m_LOADQ;
 );
 
 NETLIB_DEVICE(nic7483,
@@ -500,16 +469,15 @@ NETLIB_DEVICE(nic74153,
 	ttl_output_t m_AY;
 );
 
-NETLIB_DEVICE(nic7448,
+NETLIB_SUBDEVICE(nic7448_sub,
+	ATTR_HOT void update_outputs(UINT8 v);
 	static const UINT8 tab7448[16][7];
 
 	ttl_input_t m_A0;
 	ttl_input_t m_A1;
 	ttl_input_t m_A2;
 	ttl_input_t m_A3;
-	ttl_input_t m_LTQ;
 	ttl_input_t m_RBIQ;
-	ttl_input_t m_BIQ;
 
 	UINT8 m_state;
 
@@ -522,6 +490,12 @@ NETLIB_DEVICE(nic7448,
 	ttl_output_t m_g;
 );
 
+NETLIB_DEVICE(nic7448,
 
+	nic7448_sub sub;
+
+	ttl_input_t m_LTQ;
+	ttl_input_t m_BIQ;
+);
 
 #endif

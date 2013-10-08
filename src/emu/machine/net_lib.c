@@ -303,35 +303,69 @@ NETLIB_UPDATE(nic7486)
 
 NETLIB_START(nic7448)
 {
-	register_input("A0", m_A0);
-	register_input("A1", m_A1);
-	register_input("A2", m_A2);
-	register_input("A3", m_A3);
+	register_subdevice(sub);
+
+	//sub.m_state = 0;
+
+	register_input(sub, "A0", sub.m_A0);
+	register_input(sub, "A1", sub.m_A1);
+	register_input(sub, "A2", sub.m_A2);
+	register_input(sub, "A3", sub.m_A3);
 	register_input("LTQ", m_LTQ);
 	register_input("BIQ", m_BIQ);
-	register_input("RBIQ",m_RBIQ);
+	register_input(sub, "RBIQ",sub.m_RBIQ);
 
-	register_output("a", m_a);
-	register_output("b", m_b);
-	register_output("c", m_c);
-	register_output("d", m_d);
-	register_output("e", m_e);
-	register_output("f", m_f);
-	register_output("g", m_g);
+	register_output(sub, "a", sub.m_a);
+	register_output(sub, "b", sub.m_b);
+	register_output(sub, "c", sub.m_c);
+	register_output(sub, "d", sub.m_d);
+	register_output(sub, "e", sub.m_e);
+	register_output(sub, "f", sub.m_f);
+	register_output(sub, "g", sub.m_g);
 }
 
 NETLIB_UPDATE(nic7448)
 {
-	UINT8 v;
 
 	if (INPVAL(m_BIQ) && !INPVAL(m_LTQ))
-		v = 8;
-	else
 	{
-		v = (INPVAL(m_A0) << 0) | (INPVAL(m_A1) << 1) | (INPVAL(m_A2) << 2) | (INPVAL(m_A3) << 3);
-		if (!INPVAL(m_BIQ) || (!INPVAL(m_RBIQ) && (v==0)))
-			v = 15;
+		sub.update_outputs(8);
 	}
+	else if (!INPVAL(m_BIQ))
+	{
+		sub.update_outputs(15);
+	}
+
+	if (!INPVAL(m_BIQ) || (INPVAL(m_BIQ) && !INPVAL(m_LTQ)))
+	{
+		sub.m_A0.inactivate();
+		sub.m_A1.inactivate();
+		sub.m_A2.inactivate();
+		sub.m_A3.inactivate();
+		sub.m_RBIQ.inactivate();
+	} else {
+		sub.m_RBIQ.activate();
+		sub.m_A3.activate();
+		sub.m_A2.activate();
+		sub.m_A1.activate();
+		sub.m_A0.activate();
+		sub.update();
+	}
+
+}
+
+NETLIB_UPDATE(nic7448_sub)
+{
+	UINT8 v;
+
+	v = (INPVAL(m_A0) << 0) | (INPVAL(m_A1) << 1) | (INPVAL(m_A2) << 2) | (INPVAL(m_A3) << 3);
+	if ((!INPVAL(m_RBIQ) && (v==0)))
+			v = 15;
+	update_outputs(v);
+}
+
+NETLIB_FUNC_VOID(nic7448_sub, update_outputs, (UINT8 v))
+{
 	assert(v<16);
 	if (v != m_state)
 	{
@@ -346,7 +380,7 @@ NETLIB_UPDATE(nic7448)
 	}
 }
 
-const UINT8 nic7448::tab7448[16][7] =
+const UINT8 nic7448_sub::tab7448[16][7] =
 {
 		{   1, 1, 1, 1, 1, 1, 0 },  /* 00 - not blanked ! */
 		{   0, 1, 1, 0, 0, 0, 0 },  /* 01 */
@@ -391,40 +425,6 @@ INLINE void nic7474_newstate(const UINT8 state, ttl_output_t &Q, ttl_output_t &Q
 	QQ.setTo(!state, delay[!state]);
 }
 
-#if 0
-NETLIB_UPDATE(nic7474)
-{
-	if (!INPVAL(m_preQ))
-		nic7474_newstate(1, m_Q, m_QQ);
-	else if (!INPVAL(m_clrQ))
-		nic7474_newstate(0, m_Q, m_QQ);
-	else if (!INP_LAST(m_clk) & INP(m_clk))
-	{
-		nic7474_newstate(INPVAL(m_D), m_Q, m_QQ);
-		m_clk.inactivate();
-	}
-	else
-		m_clk.set_state(INP_STATE_LH);
-
-}
-
-NETLIB_START(nic7474)
-{
-	m_lastclk = 0;
-
-	register_input("CLK",  m_clk, INP_STATE_LH);
-	register_input("D",    m_D);
-	register_input("CLRQ", m_clrQ);
-	register_input("PREQ", m_preQ);
-
-	register_output("Q",   m_Q);
-	register_output("QQ",  m_QQ);
-
-	m_Q.initial(1);
-	m_QQ.initial(0);
-}
-
-#else
 NETLIB_UPDATE(nic7474sub)
 {
 	//if (!INP_LAST(m_clk) & INP(m_clk))
@@ -466,7 +466,6 @@ NETLIB_START(nic7474)
 	sub.m_Q.initial(1);
 	sub.m_QQ.initial(0);
 }
-#endif
 
 NETLIB_START(nic7483)
 {
@@ -552,9 +551,9 @@ NETLIB_FUNC_VOID(nic7490, update_outputs)
 	m_QD.setTo((m_cnt >> 3) & 1, NLTIME_FROM_NS(72));
 }
 #else
-NETLIB_FUNC_VOID(nic7490, update_outputs)
+NETLIB_FUNC_VOID(nic7490, update_outputs, (void))
 {
-	static const netlist_time delay[4] = { NLTIME_FROM_NS(18), NLTIME_FROM_NS(36), NLTIME_FROM_NS(54), NLTIME_FROM_NS(72) };
+	const netlist_time delay[4] = { NLTIME_FROM_NS(18), NLTIME_FROM_NS(36), NLTIME_FROM_NS(54), NLTIME_FROM_NS(72) };
 	for (int i=0; i<4; i++)
 		m_Q[i].setTo((m_cnt >> i) & 1, delay[i]);
 
@@ -713,18 +712,11 @@ NETLIB_START(nic74107A)
 
 INLINE void nic74107A_newstate(UINT8 state, ttl_output_t &Q, ttl_output_t &QQ)
 {
+	const netlist_time delay[2] = { NLTIME_FROM_NS(40), NLTIME_FROM_NS(25) };
 	if (state != Q.new_Q())
 	{
-		if (state)
-		{
-			Q.setToNoCheck(1, NLTIME_FROM_NS(40));
-			QQ.setToNoCheck(0, NLTIME_FROM_NS(25));
-		}
-		else
-		{
-			Q.setToNoCheck(0, NLTIME_FROM_NS(25));
-			QQ.setToNoCheck(1, NLTIME_FROM_NS(40));
-		}
+		Q.setToNoCheck(state, delay[1-state]);
+		QQ.setToNoCheck(1-state, delay[state]);
 	}
 }
 
@@ -789,15 +781,16 @@ NETLIB_START(nic74153)
 
 NETLIB_UPDATE(nic74153)
 {
+	const netlist_time delay[2] = { NLTIME_FROM_NS(23), NLTIME_FROM_NS(18) };
 	if (!INPVAL(m_GA))
 	{
 		UINT8 chan = (INPVAL(m_A) | (INPVAL(m_B)<<1));
 		UINT8 t = INPVAL(m_I[chan]);
-		m_AY.setTo(t, t ? NLTIME_FROM_NS(18) : NLTIME_FROM_NS(23)); /* data to y only, FIXME */
+		m_AY.setTo(t, delay[t] ); /* data to y only, FIXME */
 	}
 	else
 	{
-		m_AY.setTo(0, NLTIME_FROM_NS(23));
+		m_AY.setTo(0, delay[0]);
 	}
 }
 
@@ -805,12 +798,15 @@ NETLIB_START(nic9316)
 {
 	register_subdevice(sub);
 	sub.m_cnt = 0;
+	sub.m_loadq = 1;
+	sub.m_ent = 1;
 
 	register_input(sub, "CLK", sub.m_clk, net_input_t::INP_STATE_LH);
+
 	register_input("ENP", m_ENP);
-	register_input("ENT", sub.m_ENT);
+	register_input("ENT", m_ENT);
 	register_input("CLRQ", m_CLRQ);
-	register_input("LOADQ", sub.m_LOADQ, net_input_t::INP_STATE_ACTIVE);
+	register_input("LOADQ", m_LOADQ);
 
 	register_input(sub, "A", sub.m_A, net_input_t::INP_STATE_PASSIVE);
 	register_input(sub, "B", sub.m_B, net_input_t::INP_STATE_PASSIVE);
@@ -825,85 +821,88 @@ NETLIB_START(nic9316)
 
 }
 
-NETLIB_UPDATE(nic9316sub)
+NETLIB_UPDATE(nic9316_sub)
 {
-	//if (!INP_LAST(m_clk) & INP(m_clk))
+	if (m_loadq)
 	{
-		if (INPVAL(m_LOADQ))
-		{
-			m_cnt = ( m_cnt + 1) & 0x0f;
-			update_outputs();
-			m_RC.setTo(m_cnt == 0x0f, NLTIME_FROM_NS(20));
-		}
-		else
-		{
-			m_cnt = (INPVAL_PASSIVE(m_D) << 3) | (INPVAL_PASSIVE(m_C) << 2) | (INPVAL_PASSIVE(m_B) << 1) | (INPVAL_PASSIVE(m_A) << 0);
-			update_outputs_all();
-			m_RC.setTo(INPVAL(m_ENT) & (m_cnt == 0x0f), NLTIME_FROM_NS(20));
-		}
+		m_cnt = ( m_cnt + 1) & 0x0f;
+		update_outputs();
 	}
+	else
+	{
+		m_cnt = (INPVAL_PASSIVE(m_D) << 3) | (INPVAL_PASSIVE(m_C) << 2) | (INPVAL_PASSIVE(m_B) << 1) | (INPVAL_PASSIVE(m_A) << 0);
+		update_outputs_all();
+	}
+	m_RC.setTo(m_ent & (m_cnt == 0x0f), NLTIME_FROM_NS(20));
 }
 
 NETLIB_UPDATE(nic9316)
 {
-	if ((!INPVAL(sub.m_LOADQ) | (INPVAL(sub.m_ENT) & INPVAL(m_ENP))) & INPVAL(m_CLRQ))
+	sub.m_loadq = INPVAL(m_LOADQ);
+	sub.m_ent = INPVAL(m_ENT);
+
+	if ((!sub.m_loadq || (sub.m_ent && INPVAL(m_ENP))) && INPVAL(m_CLRQ))
+	{
 		sub.m_clk.activate_lh();
+	}
 	else
 	{
 		sub.m_clk.inactivate();
-		if (!INPVAL(m_CLRQ) & (sub.m_cnt>0))
+		if (!INPVAL(m_CLRQ) && (sub.m_cnt>0))
 		{
 			sub.m_cnt = 0;
 			sub.update_outputs();
 			sub.m_RC.setTo(0, NLTIME_FROM_NS(20));
 		}
 	}
-	sub.m_RC.setTo(INPVAL(sub.m_ENT) & (sub.m_cnt == 0x0f), NLTIME_FROM_NS(20));
+	sub.m_RC.setTo(sub.m_ent & (sub.m_cnt == 0x0f), NLTIME_FROM_NS(20));
 }
 
-NETLIB_FUNC_VOID(nic9316sub, update_outputs_all)
+NETLIB_FUNC_VOID(nic9316_sub, update_outputs_all, (void))
 {
-	m_QA.setTo((m_cnt >> 0) & 1, NLTIME_FROM_NS(20));
-	m_QB.setTo((m_cnt >> 1) & 1, NLTIME_FROM_NS(20));
-	m_QC.setTo((m_cnt >> 2) & 1, NLTIME_FROM_NS(20));
-	m_QD.setTo((m_cnt >> 3) & 1, NLTIME_FROM_NS(20));
+	const netlist_time out_delay = NLTIME_FROM_NS(20);
+	m_QA.setTo((m_cnt >> 0) & 1, out_delay);
+	m_QB.setTo((m_cnt >> 1) & 1, out_delay);
+	m_QC.setTo((m_cnt >> 2) & 1, out_delay);
+	m_QD.setTo((m_cnt >> 3) & 1, out_delay);
 }
 
-NETLIB_FUNC_VOID(nic9316sub, update_outputs)
+NETLIB_FUNC_VOID(nic9316_sub, update_outputs, (void))
 {
-#if 1
-	m_QA.setTo((m_cnt >> 0) & 1, NLTIME_FROM_NS(20));
-	m_QB.setTo((m_cnt >> 1) & 1, NLTIME_FROM_NS(20));
-	m_QC.setTo((m_cnt >> 2) & 1, NLTIME_FROM_NS(20));
-	m_QD.setTo((m_cnt >> 3) & 1, NLTIME_FROM_NS(20));
+	const netlist_time out_delay = NLTIME_FROM_NS(20);
+#if 0
+	m_QA.setTo((m_cnt >> 0) & 1, out_delay);
+	m_QB.setTo((m_cnt >> 1) & 1, out_delay);
+	m_QC.setTo((m_cnt >> 2) & 1, out_delay);
+	m_QD.setTo((m_cnt >> 3) & 1, out_delay);
 #else
 	if ((m_cnt & 1) == 1)
-		m_QA.setToNoCheck(1, NLTIME_FROM_NS(20));
+		m_QA.setToNoCheck(1, out_delay);
 	else
 	{
-		m_QA.setToNoCheck(0, NLTIME_FROM_NS(20));
+		m_QA.setToNoCheck(0, out_delay);
 		switch (m_cnt)
 		{
 		case 0x00:
-			m_QB.setToNoCheck(0, NLTIME_FROM_NS(20));
-			m_QC.setToNoCheck(0, NLTIME_FROM_NS(20));
-			m_QD.setToNoCheck(0, NLTIME_FROM_NS(20));
+			m_QB.setToNoCheck(0, out_delay);
+			m_QC.setToNoCheck(0, out_delay);
+			m_QD.setToNoCheck(0, out_delay);
 			break;
 		case 0x02:
 		case 0x06:
 		case 0x0A:
 		case 0x0E:
-			m_QB.setToNoCheck(1, NLTIME_FROM_NS(20));
+			m_QB.setToNoCheck(1, out_delay);
 			break;
 		case 0x04:
 		case 0x0C:
-			m_QB.setToNoCheck(0, NLTIME_FROM_NS(20));
-			m_QC.setToNoCheck(1, NLTIME_FROM_NS(20));
+			m_QB.setToNoCheck(0, out_delay);
+			m_QC.setToNoCheck(1, out_delay);
 			break;
 		case 0x08:
-			m_QB.setToNoCheck(0, NLTIME_FROM_NS(20));
-			m_QC.setToNoCheck(0, NLTIME_FROM_NS(20));
-			m_QD.setToNoCheck(1, NLTIME_FROM_NS(20));
+			m_QB.setToNoCheck(0, out_delay);
+			m_QC.setToNoCheck(0, out_delay);
+			m_QD.setToNoCheck(1, out_delay);
 			break;
 		}
 
