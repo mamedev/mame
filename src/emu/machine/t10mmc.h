@@ -25,6 +25,7 @@ protected:
 	virtual void t10_reset();
 
 	void abort_audio();
+	int toc_tracks();
 
 	cdrom_image_device *m_image;
 	cdda_device *m_cdda;
