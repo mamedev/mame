@@ -2242,10 +2242,12 @@ $(CPUOBJ)/lc8670/lc8670.o:  $(CPUSRC)/lc8670/lc8670.c \
 
 ifneq ($(filter SCUDSP,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/scudsp
+CPUOBJS += $(CPUOBJ)/scudsp/scudsp.o
 DASMOBJS += $(CPUOBJ)/scudsp/scudspdasm.o
 endif
 
-$(CPUOBJ)/scudsp/scudspdasm.o: CPUOBJS += $(CPUOBJ)/scudsp/scudspdasm.c
+$(CPUOBJ)/scudsp/scudsp.o: $(CPUSRC)/scudsp/scudsp.c \
+							$(CPUSRC)/scudsp/scudsp.h
 
 
 #-------------------------------------------------

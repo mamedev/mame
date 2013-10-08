@@ -38,6 +38,7 @@ test1f diagnostic hacks:
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
 #include "cpu/sh2/sh2.h"
+#include "cpu/scudsp/scudsp.h"
 #include "machine/scudsp.h"
 #include "sound/scsp.h"
 #include "sound/cdda.h"
@@ -182,6 +183,16 @@ static ADDRESS_MAP_START( sound_mem, AS_PROGRAM, 16, sat_console_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_RAM AM_SHARE("sound_ram")
 	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE_LEGACY("scsp", scsp_r, scsp_w)
 ADDRESS_MAP_END
+
+#if 0
+static ADDRESS_MAP_START( scudsp_mem, AS_PROGRAM, 32, sat_console_state )
+	AM_RANGE(0x00, 0xff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( scudsp_data, AS_DATA, 32, sat_console_state )
+	AM_RANGE(0x00, 0xff) AM_RAM
+ADDRESS_MAP_END
+#endif
 
 
 /* keyboard code */
@@ -742,6 +753,14 @@ static MACHINE_CONFIG_START( saturn, sat_console_state )
 
 	MCFG_CPU_ADD("audiocpu", M68000, 11289600) //256 x 44100 Hz = 11.2896 MHz
 	MCFG_CPU_PROGRAM_MAP(sound_mem)
+
+#if 0
+	MCFG_CPU_ADD("scudsp", SCUDSP, MASTER_CLOCK_352/4) // 14 MHz
+	MCFG_CPU_PROGRAM_MAP(scudsp_mem)
+	MCFG_CPU_DATA_MAP(scudsp_data)
+//	MCFG_CPU_CONFIG(scudsp_config)
+#endif
+
 
 //	SH-1
 

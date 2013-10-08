@@ -44,6 +44,7 @@
 #include "includes/stv.h"
 #include "machine/scudsp.h"
 #include "cpu/sh2/sh2.h"
+#include "cpu/scudsp/scudsp.h"
 
 /* TODO: do this in a verboselog style */
 #define LOG_CDB  0
