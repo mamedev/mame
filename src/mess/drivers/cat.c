@@ -162,46 +162,50 @@ IAI Swyft:
 Board name: 950-0001C
 "INFORMATION APPLIANCE INC. COPYRIGHT 1985"
  _________________|||||||||___________________________________________________________________________________
-|                     J8               [=======J3=======]  ____                                               |
-=                                                         /    \  (E2)                                        |
-= Jx                   74LS107   J5                       |PB1 |        uA339     MC3403                 -----|
+|                     J8               [=======J3=======]  ____                              Trans-           |
+==                                                        /    \  (E2)                       former           |
+==Jx                   74LS107   J5                       |PB1 |        uA339     MC3403                 -----|
 |                                          7407           \____/                                         J7   =
 | Y1       "TIMING B" 74LS132    74LS175                                                                 -----|
 |                                                  ____________                            4N37  Relay   -----|
 | TMS4256   74LS161  "DECODE E" "DISK 3.5C"       |            |                                         J6   =
 |                                                 |  MC6850P   |                                         -----|
 | TMS4256   74LS166   74HCT259   74LS299          '------------'        MC3403    MC3403                 _____|
-|                      ___________________     ___________________                                      |     =
-| TMS4256   74LS373   |                   |   |                   |                                     | J1  =
-|                     |   MC68008P8       |   |       R6522P      |                                     |     =
-| TMS4256   74F153    '-------------------'   '-------------------'     MN4053    MN4053                | B   =
-|                                    (E1)                                                               | R   =
-| TMS4256   74F153    74HCT08     __________   ___________________      MC14412   DS1489                | E   =
-|                                |          | |                   | ||                                  | A   =
-| TMS4256   74F153    74HC4040E  | AM27256  | |       R6522P      | ||                                  | K   =
-|                                '----------' '-------------------' ||  INFORMATION                     | O   =
-| TMS4256   74F153    "VIDEO 2B" .----------.                       J4  APPLIANCE INC.                  | U   =
-|                                | AM27256  |   74HC02     74HC374  ||  Copyright 1985                  | T   =
-| TMS4256   74F153    74LS393    |__________|                       ||  UM95089  Y2                     |     =
+|                      ___________________     ___________________             ||                       |     =
+| TMS4256   74LS373   |                   |   |                   |            J2                       | J1  =
+|                     |   MC68008P8       |   |       R6522P      |            ||              I   P R  |     =
+| TMS4256   74F153    '-------------------'   '-------------------'     MN4053 || MN4053       N   R E  | B   =
+|                                    (E1)                                                      D   O S  | R   =
+| TMS4256   74F153    74HCT08     __________   ___________________      MC14412   DS1489       U E T I  | E   =
+|                                |          | |                   | ||                         C S E S  | A   =
+| TMS4256   74F153    74HC4040E  | AM27256  | |       R6522P      | ||                         T D C T  | K   =
+|                                '----------' '-------------------' ||  INFORMATION            O   T O  | O   =
+| TMS4256   74F153    "VIDEO 2B" .----------.                       J4  APPLIANCE INC.         R   I R  | U   =
+|                                | AM27256  |   74HC02     74HC374  ||  Copyright 1985         S   O S  | T   =
+| TMS4256   74F153    74LS393    |__________|                       ||  UM95089  Y2                N    |     =
 |_____________________________[________J9___]__________________________________________________D13______|_____=
 
 *Devices of interest:
 J1: breakout of joystick, serial/rs232, hex-keypad, parallel port, and forth switch (and maybe cassette?) pins
-Jx: 4 pin on top side, 6 pin on bottom side edge ?debug? connector (may have been intended to be J2, doesn't actually have a J number at all)
-J3: Floppy Connector (standard 34 pin shugart)
-J4: keyboard ribbon cable
+J2: unpopulated 8-pin sip header, serial/rs232-related?
+J3: Floppy Connector (standard DIL 34 pin mini-shugart/pc floppy connector)
+J4: 18-pin sip header for keyboard ribbon cable
 J5: Berg type socket for supplying power (5v gnd gnd 12v) to the floppy drive
 J6: Phone connector, rj11 jack
 J7: Line connector, rj11 jack
-J8: Video out/power in
-J9: solder points for a rom expansion/replacement daughterboard, not populated
-E1: jumper, unknown purpose
-E2: jumper, unknown purpose
+J8: 9-pin Video out/power in connector
+J9: unpopulated holes for a DIL connector for a ROM expansion/shadow/replacement daughterboard
+Jx: 4 pin on top side, 6 pin on bottom side edge ?debug? connector (doesn't have a Jx number)
+E1: jumper, unknown purpose, not set
+E2: jumper, unknown purpose, not set
 D13: LED
 R6522P (upper): parallel port via
 R6522P (lower): keyboard via
-UM95089: Tone Dialer chip
-
+UM95089: DTMF Tone generator chip (if you read the datasheet this is technically ROM based!)
+Y1: 15.8976Mhz, main clock?
+Y2: 3.579545Mhz, used by the DTMF generator chip UM95089 (connects to pins 7 and 8 of it)
+TMS4256-15NL - 262144 x 1 DRAM
+PB1 - piezo speaker
 
 *Pals:
 "TIMING B" - AMPAL16R4APC (marked on silkscreen "TIMING PAL")
@@ -212,15 +216,7 @@ UM95089: Tone Dialer chip
 *Deviations from silkscreen:
 4N37 (marked on silkscreen "4N35")
 74F153 (marked on silkscreen "74ALS153")
-74HCT259 is socketed, possibly intended that the rom expansion daughterboard will fit in its socket and in place of the 2 roms, if populated
-
-*Other Devices:
-TMS4256-15NL - 262144 x 1 DRAM
-PB1 - piezo speaker
-
-Crystals:
-Y1: 15.8976Mhz, main clock?
-Y2: 3.579545Mhz, used by the DTMF generator chip UM95089 (connects to pins 7 and 8 of it)
+74HCT259 is socketed, possibly intended that the rom expansion daughterboard will have a ribbon cable fit in its socket
 
 
 ToDo:
@@ -275,9 +271,9 @@ ToDo:
 
 * Swyft
 - Figure out the keyboard (interrupts are involved? or maybe an NMI on a
-  timer/vblank? It iss possible this uses the same DUART+IP2 'keyboard read
-  int' stuff as the cat does)
-- get the keyboard scanning actually working
+  timer/vblank? It iss possible this uses a similar 'keyboard read int'
+  to what the cat does)
+- get the keyboard scanning actually working; the VIAs are going nuts right now.
 - Beeper (on one of the vias?)
 - vblank/hblank stuff
 - Get the 6850 ACIA working for communications
@@ -1548,7 +1544,7 @@ ROM_START( swyft )
 	ROM_LOAD( "timing_b.pal16r4.u9.jed", 0x0000, 0xb08, CRC(643e6e83) SHA1(7db167883f9d6cf385ce496d08976dc16fc3e2c3))
 	ROM_LOAD( "decode_e.pal16l8.u20.jed", 0x1000, 0xb08, CRC(0b1dbd76) SHA1(08c144ad7a7bbdd53eefd271b2f6813f8b3b1594))
 	ROM_LOAD( "video_2b.pal16r4.u25.jed", 0x2000, 0xb08, CRC(caf91148) SHA1(3f8ddcb512a1c05395c74ad9a6ba7b87027ce4ec))
-	ROM_LOAD( "disk_3.5c.pal16r4.u26.jed", 0x3000, 0xb08, CRC(fd994d02) SHA1(f910ab16587dd248d63017da1e5b37855e4c1a0c))
+	ROM_LOAD( "disk_3.5c.pal16r4.u28.jed", 0x3000, 0xb08, CRC(fd994d02) SHA1(f910ab16587dd248d63017da1e5b37855e4c1a0c))
 ROM_END
 
 ROM_START( cat )
