@@ -146,7 +146,7 @@ public:
 
 		skipws();
 		devname = getname(',');
-		dev = net_create_device_by_name(dev_name, &m_setup, devname);
+		dev = net_create_device_by_name(dev_name, m_setup, devname);
 		m_setup.register_dev(dev);
 		skipws();
 		val = eval_param();
@@ -165,7 +165,7 @@ public:
 
 		skipws();
 		devname = getname2(',', ')');
-		dev = net_create_device_by_name(dev_type, &m_setup, devname);
+		dev = net_create_device_by_name(dev_type, m_setup, devname);
 		m_setup.register_dev(dev);
 		skipws();
 		VERBOSE_OUT(("Parser: IC: %s\n", devname));
@@ -300,7 +300,8 @@ private:
 class netdev_a_to_d_proxy : public net_device_t
 {
 public:
-	netdev_a_to_d_proxy(net_input_t &in_proxied) : net_device_t()
+	netdev_a_to_d_proxy(netlist_setup_t &setup, const char *name, net_input_t &in_proxied)
+			: net_device_t(setup, name)
 	{
 		assert_always(in_proxied.object_type(SIGNAL_MASK) == SIGNAL_DIGITAL, "Digital signal expected");
 		m_I.m_high_thresh_V = in_proxied.m_high_thresh_V;
@@ -367,9 +368,10 @@ NETLIB_UPDATE_PARAM(netdev_analog_const)
 
 
 netlist_base_t::netlist_base_t()
-	//m_output_list(ttl_list_t<output_t *>(2048)),
-	//:  m_divisor(32), m_gatedelay(100), m_clockfreq(1000000)
-	: m_div(1024)
+	: m_mainclock(NULL),
+	  m_time_ps(NLTIME_FROM_MS(0)),
+	  m_rem(0),
+	  m_div(1024)
 {
 }
 
@@ -636,8 +638,7 @@ void netlist_setup_t::resolve_inputs(void)
 		{
 			//          fatalerror("connecting analog output %s with %s\n", out.netdev()->name(), in->netdev()->name());
 			//          fatalerror("connecting analog output %s with %s\n", out.netdev()->name(), in->netdev()->name());
-			netdev_a_to_d_proxy *proxy = new netdev_a_to_d_proxy(*in);
-			proxy->init(this, "abc");
+			netdev_a_to_d_proxy *proxy = new netdev_a_to_d_proxy(*this, "abc", *in);
 			proxy->start();
 			in->set_output(proxy->GETINPPTR(proxy->m_Q));
 			//Next check would not work with dynamic activation
@@ -668,7 +669,7 @@ void netlist_setup_t::resolve_inputs(void)
 		net_device_t *dev = entry->object();
 		if (dynamic_cast<netdev_mainclock*>(dev) != NULL)
 		{
-			m_netlist.m_mainclock = dynamic_cast<netdev_mainclock*>(dev);
+			m_netlist.set_mainclock_dev(dynamic_cast<netdev_mainclock*>(dev));
 		}
 	}
 
@@ -759,19 +760,16 @@ ATTR_COLD void net_core_device_t::register_subdevice(net_core_device_t &subdev)
 // ----------------------------------------------------------------------------------------
 
 
-net_device_t::net_device_t()
-: net_core_device_t(), m_variable_input_count(false)
+net_device_t::net_device_t(netlist_setup_t &setup, const char *name)
+	: net_core_device_t(),
+	  m_setup(setup),
+	  m_variable_input_count(false)
 {
+	init_core(&setup.netlist(), name);
 }
 
 net_device_t::~net_device_t()
 {
-}
-
-ATTR_COLD void net_device_t::init(netlist_setup_t *setup, const char *name)
-{
-	m_setup = setup;
-	init_core(&setup->netlist(), name);
 }
 
 void net_device_t::register_output(const net_core_device_t &dev, const char *name, net_output_t &port)
@@ -780,7 +778,7 @@ void net_device_t::register_output(const net_core_device_t &dev, const char *nam
 	temp.cat(".");
 	temp.cat(name);
 	port.set_netdev(&dev);
-	m_setup->register_output(temp, &port);
+	m_setup.register_output(temp, &port);
 }
 
 void net_device_t::register_output(const char *name, net_output_t &port)
@@ -795,7 +793,7 @@ void net_device_t::register_input(net_core_device_t &dev, const char *name, net_
 	temp.cat(name);
 	inp.init(&dev, type);
 	m_inputs.add(core_strdup(temp.cstr()));
-	m_setup->register_input(temp, &inp);
+	m_setup.register_input(temp, &inp);
 }
 
 void net_device_t::register_input(const char *name, net_input_t &inp, net_input_t::net_input_state type)
@@ -820,7 +818,7 @@ void net_device_t::register_param(net_core_device_t &dev, const char *name, net_
 {
 	param.set_netdev(dev);
 	param.initial(initialVal);
-	m_setup->register_param(name, &param);
+	m_setup.register_param(name, &param);
 }
 
 void net_device_t::register_param(const char *name, net_param_t &param, double initialVal)
@@ -903,28 +901,6 @@ ATTR_HOT inline void net_output_t::update_devs()
 		break;
 	case 0:
 		break;
-	}
-
-	m_in_queue = 2; /* mark as taken ... */
-	m_last_Q = m_Q;
-}
-
-ATTR_COLD  void net_output_t::update_devs_force()
-{
-	net_input_t **s = m_cons;
-	int i =  m_num_cons;
-
-	m_Q = m_new_Q;
-	m_Q_analog = m_new_Q_analog;
-	while (i-- > 0)
-	{
-		if (((*s)->state() & net_input_t::INP_STATE_ACTIVE) != 0)
-#if USE_DELEGATES
-			(*s)->h();
-#else
-			(*s)->netdev()->update();
-#endif
-		s++;
 	}
 
 	m_in_queue = 2; /* mark as taken ... */

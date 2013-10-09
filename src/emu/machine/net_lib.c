@@ -947,7 +947,7 @@ static const net_device_t_base_factory *netregistry[] =
 	NULL
 };
 
-net_device_t *net_create_device_by_classname(const char *classname, netlist_setup_t *setup, const char *icname)
+net_device_t *net_create_device_by_classname(const char *classname, netlist_setup_t &setup, const char *icname)
 {
 	const net_device_t_base_factory **p = &netregistry[0];
 	while (p != NULL)
@@ -959,7 +959,7 @@ net_device_t *net_create_device_by_classname(const char *classname, netlist_setu
 	fatalerror("Class %s required for IC %s not found!\n", classname, icname);
 }
 
-net_device_t *net_create_device_by_name(const char *name, netlist_setup_t *setup, const char *icname)
+net_device_t *net_create_device_by_name(const char *name, netlist_setup_t &setup, const char *icname)
 {
 	const net_device_t_base_factory **p = &netregistry[0];
 	while (p != NULL)

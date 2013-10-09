@@ -367,8 +367,8 @@ NETLIB_DEVICE(nic74107A,
 class nic74107 : public nic74107A
 {
 public:
-	nic74107()
-	:   nic74107A() {}
+	nic74107(netlist_setup_t &setup, const char *name)
+	:   nic74107A(setup, name) {}
 
 };
 

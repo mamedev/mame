@@ -73,7 +73,7 @@
 
 #define NET_ALIAS(_alias, _name)                                                    \
 	netlist.register_alias(# _alias, # _name);
-#define NET_NEW(_type , _name)  net_create_device_by_classname(# _type, &netlist, # _name)
+#define NET_NEW(_type , _name)  net_create_device_by_classname(# _type, netlist, # _name)
 
 #define NET_REGISTER_DEV(_type, _name)                                              \
 		netlist.register_dev(NET_NEW(_type, _name));
@@ -123,13 +123,15 @@ ATTR_COLD void NETLIST_NAME(_name)(netlist_setup_t &netlist) \
 	class _name : public net_signal_t<_num_input, _check>                           \
 	{                                                                               \
 	public:                                                                         \
-		_name () : net_signal_t<_num_input, _check>() { }                           \
+		_name (netlist_setup_t &setup, const char *name) 							\
+			: net_signal_t<_num_input, _check>(setup, name) { }                     \
 	};
 #define NETLIB_DEVICE(_name, _priv)                                                 \
 	class _name : public net_device_t                                               \
 	{                                                                               \
 	public:                                                                         \
-		_name () : net_device_t() { }                                               \
+		_name (netlist_setup_t &setup, const char *name) 							\
+			: net_device_t(setup, name) { }                                         \
 		ATTR_HOT void update();                                                     \
 		ATTR_COLD void start();                                                     \
 	protected:                                                                      \
@@ -148,7 +150,8 @@ ATTR_COLD void NETLIST_NAME(_name)(netlist_setup_t &netlist) \
 	class _name : public net_device_t                                               \
 	{                                                                               \
 	public:                                                                         \
-		_name () : net_device_t() { }                                               \
+		_name (netlist_setup_t &setup, const char *name) 							\
+			: net_device_t(setup, name) { }                                         \
 		ATTR_HOT void update_param();                                               \
 		ATTR_HOT void update();                                                     \
 		ATTR_COLD void start();                                                     \
@@ -530,7 +533,6 @@ public:
 
 	ATTR_HOT void update_dev(const net_input_t &inp, const UINT8 mask);
 	ATTR_HOT void update_devs();
-	ATTR_COLD void update_devs_force();
 
 	ATTR_HOT inline const net_core_device_t *netdev() const { return m_netdev; }
 
@@ -723,13 +725,11 @@ class net_device_t : public net_core_device_t
 {
 public:
 
-	net_device_t();
+	net_device_t(netlist_setup_t &setup, const char *name);
 
 	virtual ~net_device_t();
 
-	ATTR_COLD void init(netlist_setup_t *setup, const char *name);
-
-	ATTR_COLD netlist_setup_t *setup() const { return m_setup; }
+	ATTR_COLD const netlist_setup_t &setup() const { return m_setup; }
 
 	ATTR_COLD virtual void start() {}
 
@@ -751,7 +751,7 @@ protected:
 	ATTR_COLD void register_param(const char *sname, net_param_t &param, const double initialVal = 0.0);
 	ATTR_COLD void register_param(net_core_device_t &dev, const char *sname, net_param_t &param, const double initialVal = 0.0);
 
-	netlist_setup_t *m_setup;
+	netlist_setup_t &m_setup;
 	bool m_variable_input_count;
 
 private:
@@ -787,8 +787,8 @@ template <int _numdev, int _check>
 class net_signal_t : public net_device_t
 {
 public:
-	net_signal_t()
-	: net_device_t() { }
+	net_signal_t(netlist_setup_t &setup, const char *name)
+	: net_device_t(setup, name) { }
 
 	ATTR_COLD void start()
 	{
@@ -960,23 +960,21 @@ public:
 
 	ATTR_HOT inline netlist_time &time() { return m_time_ps; }
 
-	netdev_mainclock *m_mainclock;
-
-	//FIXME:
-	queue_t m_queue;
+	ATTR_COLD void set_mainclock_dev(netdev_mainclock *dev) { m_mainclock = dev; }
 
 protected:
-	netlist_time m_time_ps;
-	UINT32   m_rem;
-	UINT32  m_div;
-
-
 	// performance
 	int m_perf_out_processed;
 	int m_perf_inp_processed;
 	int m_perf_inp_active;
 
 private:
+	netdev_mainclock *m_mainclock;
+	netlist_time m_time_ps;
+	UINT32   m_rem;
+	UINT32  m_div;
+
+	queue_t m_queue;
 
 	ATTR_HOT void update_time(const netlist_time t, INT32 &atime);
 
@@ -1022,8 +1020,8 @@ inline NETLIB_UPDATE(netdev_mainclock)
 class netdev_callback : public net_device_t
 {
 public:
-	netdev_callback()
-	: net_device_t() {}
+	netdev_callback(netlist_setup_t &setup, const char *name)
+		: net_device_t(setup, name) {}
 
 	void register_callback(net_output_delegate callback)
 	{
@@ -1148,7 +1146,7 @@ class net_device_t_base_factory
 {
 public:
 	virtual ~net_device_t_base_factory() {}
-	virtual net_device_t *Create(netlist_setup_t *setup, const char *name) const = 0;
+	virtual net_device_t *Create(netlist_setup_t &setup, const char *name) const = 0;
 
 	const char *name() const { return m_name; }
 	const char *classname() const { return m_classname; }
@@ -1162,16 +1160,16 @@ class net_device_t_factory : public net_device_t_base_factory
 {
 public:
 	net_device_t_factory(const char *name, const char *classname) { m_name = name; m_classname = classname; }
-	net_device_t *Create(netlist_setup_t *setup, const char *name) const
+	net_device_t *Create(netlist_setup_t &setup, const char *name) const
 	{
-		net_device_t *r = global_alloc_clear(C());
-		r->init(setup, name);
+		net_device_t *r = global_alloc_clear(C(setup, name));
+		//r->init(setup, name);
 		return r;
 	}
 };
 
-net_device_t *net_create_device_by_classname(const char *classname, netlist_setup_t *setup, const char *icname);
-net_device_t *net_create_device_by_name(const char *name, netlist_setup_t *setup, const char *icname);
+net_device_t *net_create_device_by_classname(const char *classname, netlist_setup_t &setup, const char *icname);
+net_device_t *net_create_device_by_name(const char *name, netlist_setup_t &setup, const char *icname);
 
 // ----------------------------------------------------------------------------------------
 // MAME glue classes
