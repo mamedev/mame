@@ -24,7 +24,14 @@ protected:
 	virtual void t10_start(device_t &device);
 	virtual void t10_reset();
 
+	enum toc_format_t
+	{
+		TOC_FORMAT_TRACKS = 0,
+		TOC_FORMAT_SESSIONS = 1
+	};
+
 	void abort_audio();
+	toc_format_t toc_format();
 	int toc_tracks();
 
 	cdrom_image_device *m_image;

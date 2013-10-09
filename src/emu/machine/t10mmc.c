@@ -51,6 +51,18 @@ void t10mmc::abort_audio()
 	}
 }
 
+t10mmc::toc_format_t t10mmc::toc_format()
+{
+	int mmc_format = command[2] & 0xf;
+	if (mmc_format != 0)
+	{
+		return (toc_format_t) mmc_format;
+	}
+
+	/// SFF8020 legacy format field (see T10/1836-D Revision 2g page 643)
+	return (toc_format_t) ((command[9] >> 6) & 3);
+}
+
 int t10mmc::toc_tracks()
 {
 	int start_track = command[6];
@@ -161,7 +173,24 @@ void t10mmc::ExecCommand()
 
 		case 0x43: // READ TOC
 		{
-			int length = 4 + ( 8 * toc_tracks() );
+			int length;
+
+			switch (toc_format())
+			{
+			case TOC_FORMAT_TRACKS:
+				length = 4 + (8 * toc_tracks());
+				break;
+
+			case TOC_FORMAT_SESSIONS:
+				length = 4 + (8 * 1);
+				break;
+
+			default:
+				logerror("T10MMC: Unhandled READ TOC format %d\n", toc_format());
+				length = 0;
+				break;
+			}
+
 			int allocation_length = SCSILengthFromUINT16( &command[ 7 ] );
 
 			if( length > allocation_length )
@@ -423,6 +452,8 @@ void t10mmc::ReadData( UINT8 *data, int dataLength )
 
 					bool msf = (command[1] & 0x2) != 0;
 
+					data[0]= 0x00;
+
 					int audio_active = m_cdda->audio_active();
 					if (audio_active)
 					{
@@ -451,36 +482,44 @@ void t10mmc::ReadData( UINT8 *data, int dataLength )
 						}
 					}
 
-					data[2] = 0;
-					data[3] = 12;       // data length
-					data[4] = 0x01; // sub-channel format code
-					data[5] = 0x10 | (audio_active ? 0 : 4);
-					data[6] = cdrom_get_track(cdrom, last_lba) + 1; // track
-					data[7] = 0;    // index
-
-					UINT32 frame = last_lba;
-
-					if (msf)
+					if (command[1] & 0x40)
 					{
-						frame = to_msf(frame);
+						data[2] = 0;
+						data[3] = 12;       // data length
+						data[4] = 0x01; // sub-channel format code
+						data[5] = 0x10 | (audio_active ? 0 : 4);
+						data[6] = cdrom_get_track(cdrom, last_lba) + 1; // track
+						data[7] = 0;    // index
+
+						UINT32 frame = last_lba;
+
+						if (msf)
+						{
+							frame = to_msf(frame);
+						}
+
+						data[8] = (frame>>24)&0xff;
+						data[9] = (frame>>16)&0xff;
+						data[10] = (frame>>8)&0xff;
+						data[11] = frame&0xff;
+
+						frame -= cdrom_get_track_start(cdrom, data[6] - 1);
+
+						if (msf)
+						{
+							frame = to_msf(frame);
+						}
+
+						data[12] = (frame>>24)&0xff;
+						data[13] = (frame>>16)&0xff;
+						data[14] = (frame>>8)&0xff;
+						data[15] = frame&0xff;
 					}
-
-					data[8] = (frame>>24)&0xff;
-					data[9] = (frame>>16)&0xff;
-					data[10] = (frame>>8)&0xff;
-					data[11] = frame&0xff;
-
-					frame -= cdrom_get_track_start(cdrom, data[6] - 1);
-
-					if (msf)
+					else
 					{
-						frame = to_msf(frame);
+						data[2] = 0;
+						data[3] = 0;
 					}
-
-					data[12] = (frame>>24)&0xff;
-					data[13] = (frame>>16)&0xff;
-					data[14] = (frame>>8)&0xff;
-					data[15] = frame&0xff;
 					break;
 				}
 				default:
@@ -495,14 +534,16 @@ void t10mmc::ReadData( UINT8 *data, int dataLength )
 			    our internal routines for tracks use "0" as track 1.  That probably
 			    should be fixed...
 			*/
-			logerror("T10MMC: READ TOC, format = %d time=%d\n", command[2]&0xf,(command[1]>>1)&1);
-			switch (command[2] & 0x0f)
 			{
-				case 0:     // normal
+				bool msf = (command[1] & 0x2) != 0;
+
+				logerror("T10MMC: READ TOC, format = %d time=%d\n", toc_format(),msf);
+				switch (toc_format())
+				{
+				case TOC_FORMAT_TRACKS:
 					{
 						int tracks = toc_tracks();
 						int len = 2 + (tracks * 8);
-						bool msf = (command[1] & 0x2) != 0;
 
 						// the returned TOC DATA LENGTH must be the full amount,
 						// regardless of how much we're able to pass back due to in_len
@@ -553,9 +594,39 @@ void t10mmc::ReadData( UINT8 *data, int dataLength )
 					}
 					break;
 
-				default:
-					logerror("T10MMC: Unhandled READ TOC format %d\n", command[2]&0xf);
+				case TOC_FORMAT_SESSIONS:
+					{
+						int len = 2 + (8 * 1);
+
+						int dptr = 0;
+						data[dptr++] = (len>>8) & 0xff;
+						data[dptr++] = (len & 0xff);
+						data[dptr++] = 1;
+						data[dptr++] = 1;
+
+						data[dptr++] = 0;
+						data[dptr++] = cdrom_get_adr_control(cdrom, 0);
+						data[dptr++] = 1;
+						data[dptr++] = 0;
+
+						UINT32 tstart = cdrom_get_track_start(cdrom, 0);
+
+						if (msf)
+						{
+							tstart = to_msf(tstart+150);
+						}
+
+						data[dptr++] = (tstart>>24) & 0xff;
+						data[dptr++] = (tstart>>16) & 0xff;
+						data[dptr++] = (tstart>>8) & 0xff;
+						data[dptr++] = (tstart & 0xff);
+					}
 					break;
+
+				default:
+					logerror("T10MMC: Unhandled READ TOC format %d\n", toc_format());
+					break;
+				}
 			}
 			break;
 
