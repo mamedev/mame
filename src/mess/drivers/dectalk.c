@@ -11,13 +11,30 @@
 *  Special thanks to leeeeee for helping figure out what the led selftest codes actually mean
 *
 *  This driver dedicated in memory of Dennis Klatt and Jonathan Allen, without whose
-*  original work MITalk and hence KlattTalk and DECtalk would never have existed, and
-*  in memory of Martin Minow, who wrote much of the DECtalk DTC-01 code.
+*  original work MITalk and hence KlattTalk and DECtalk would never have existed,
+*  in memory of Martin Minow, who wrote much of the DECtalk DTC-01 code, and
+*  in memory of Tony Vitale, who was one of the architects of the DECtalk project. 
+*
+*  Staff behind DECtalk itself: (mostly from http://amhistory.si.edu/archives/speechsynthesis/ss_dec.htm ):
+*     John C. Broihier
+*     Edward A. Bruckert (who followed the DECtalk IP from DEC->Compaq->HP->Force Computers->Fonix inc and still works on DECtalk as of 2012)
+*     Dave Conroy (dtc-03 letter to sound rules; logic design, worked on dtc-01 and dtc-03, see correspondence below)
+*     Michael J. Crowley
+*     Dennis H. Klatt [1938 - Dec 30, 1988] (worked on klsyn and other parts of MITalk, wrote KLATTtalk which was exclusively licensed to DEC in 1982, worked on dtc-01 and dtc-03)
+*     Martin A. Minow [Nov 6, 1940 - Dec 21, 2000] (dtc-01 conversion of hunnicutt's letter to sound rules, phonetics and general programming)
+*     Walter Tetschner (DECtalk project director; as of 2013 publishes ASRnews: http://www.asrnews.com/)
+*     Anthony J. Vitale [Apr 30, 1945 - Aug 5, 2002] (DECtalk project architect; dtc-03 letter to sound rules; worked on dtc-01 and dtc-03)
+*
+*  Staff behind MITalk: (also see http://amhistory.si.edu/archives/speechsynthesis/ss_mit.htm )
+*     Dennis H. Klatt (see above)
+*     Jonathan Allen [Jun 4, 1934 - Apr 24, 2000] (speech synthesis theory and development)
+*     M. Sharon 'Sheri' Hunnicutt (worked on letter to phoneme rules, which were licensed non-exclusively to DEC in 1982; still works as a docent at KTH in Sweden as of 2013)
 *
 *  TODO:
 *  * DUART:
 *    * Get the duart self test to pass again; this used to work with the old non-devcb duart implementation but regressed with the newer one
 *      * The duart self tests are EXTENSIVE and make an excellent check of many of the duart internal bits.
+*        to enable them rather than bypassing the self tests, disable the IP5-short-to-gnd
 *    * <DONE> DUART needs to be reset on reset line activation. as is it works ok, but it should be done anyway.
 *    * DUART needs its i/o pins connected as well:
 *    * pins IP0, IP2, and IP3 are connected to the primary serial port:
@@ -136,7 +153,7 @@ TLC is INT level 4
 SPC is INT level 5
 DUART is INT level 6
 */
-/* dtc-03 post by dave conroy from usenet comp.sys.dec on 12/2011:
+/* dtc-03 post by dave conroy from usenet comp.sys.dec on 12/29/2011:
 > Wow.  were they better than the DTC01? (OK, I guess they had to be.)
 
 I worked on both of these at DEC (in fact, I think if you look in the
@@ -959,7 +976,7 @@ ROM_START( dectalk )
 	// DECtalk DTC-01 'klsyn' tms32010 firmware 'earlier 2.0', both proms are 82s191 equivalent; this firmware DOES WORK.
 	ROM_LOAD16_BYTE("23-205f4.e70", 0x000, 0x800, CRC(ed76a3ad) SHA1(3136bae243ef48721e21c66fde70dab5fc3c21d0)) // Label: "LM8506205F4 // M1-76161-5" @ E70
 	ROM_LOAD16_BYTE("23-204f4.e69", 0x001, 0x800, CRC(79bb54ff) SHA1(9409f90f7a397b041e4440341f2d7934cb479285)) // Label: "LM8504204F4 // 78S191" @ E69
-	// older dsp firmware from dectalk firmware 1.8; this firmware DOES WORK, and even works with 2.0 dectalk firmware! its a bit quiter than the others, though.
+	// older dsp firmware from dectalk firmware 1.8; this firmware DOES WORK, and even works with 2.0 dectalk firmware! its a bit quieter than the others, though.
 	ROM_LOAD16_BYTE("23-166f4.e70", 0x000, 0x800, CRC(2d036ffc) SHA1(e8c25ca092dde2dc0aec73921af806026bdfbbc3)) // HM1-76161-5
 	ROM_LOAD16_BYTE("23-165f4.e69", 0x001, 0x800, CRC(a3019ca4) SHA1(249f269c38f7f44edb6d025bcc867c8ca0de3e9c)) // HM1-76161-5
 
