@@ -80,7 +80,6 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_outputs16(*this, "outputs16"),
 		m_outputs(*this, "outputs"),
-		m_am188em_regs(*this, "am188em_regs"),
 		m_maincpu(*this, "maincpu"),
 		m_oki(*this, "oki") { }
 
@@ -97,7 +96,6 @@ public:
 	UINT8 m_dsw_mask;
 	optional_shared_ptr<UINT16> m_outputs16;
 	optional_shared_ptr<UINT8> m_outputs;
-	optional_shared_ptr<UINT8> m_am188em_regs;
 	UINT16 m_bishjan_sel;
 	UINT16 m_bishjan_input;
 	DECLARE_WRITE8_MEMBER(ss9601_byte_lo_w);
@@ -136,8 +134,6 @@ public:
 	DECLARE_READ8_MEMBER(dsw_r);
 	DECLARE_READ8_MEMBER(vblank_bit2_r);
 	DECLARE_READ8_MEMBER(vblank_bit6_r);
-	DECLARE_READ8_MEMBER(am188em_regs_r);
-	DECLARE_WRITE8_MEMBER(am188em_regs_w);
 	DECLARE_WRITE16_MEMBER(bishjan_sel_w);
 	DECLARE_READ16_MEMBER(bishjan_serial_r);
 	DECLARE_WRITE16_MEMBER(bishjan_input_w);
@@ -164,12 +160,10 @@ public:
 	TILE_GET_INFO_MEMBER(ss9601_get_tile_info_1);
 	DECLARE_VIDEO_START(subsino2);
 	DECLARE_VIDEO_START(mtrain);
-	DECLARE_MACHINE_RESET(am188em);
 	DECLARE_VIDEO_START(xtrain);
 	UINT32 screen_update_subsino2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(am188em_int0_irq);
-	TIMER_DEVICE_CALLBACK_MEMBER(am188em_timer2_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(h8_timer_irq);
+	INTERRUPT_GEN_MEMBER(am188em_int0_irq);
 	required_device<cpu_device> m_maincpu;
 	optional_device<okim6295_device> m_oki;
 
@@ -834,50 +828,9 @@ WRITE8_MEMBER(subsino2_state::oki_bank_bit4_w)
 	m_oki->set_bank_base(((data >> 4) & 1) * 0x40000);
 }
 
-
-/***************************************************************************
-                              AM188-EM Functions
-***************************************************************************/
-
-// To be moved to a cpu core
-
-
-enum
-{
-	AM188EM_IMASK = 0x28,
-	AM188EM_I0CON = 0x38
-};
-
-READ8_MEMBER(subsino2_state::am188em_regs_r)
-{
-	return m_am188em_regs[offset];
-}
-
-WRITE8_MEMBER(subsino2_state::am188em_regs_w)
-{
-	m_am188em_regs[offset] = data;
-}
-
-MACHINE_RESET_MEMBER(subsino2_state,am188em)
-{
-	// start with masked interrupts
-	m_am188em_regs[AM188EM_IMASK+0] = 0xfd;
-	m_am188em_regs[AM188EM_IMASK+1] = 0x07;
-	m_am188em_regs[AM188EM_I0CON+0] = 0x0f;
-	m_am188em_regs[AM188EM_I0CON+1] = 0x00;
-}
-
 INTERRUPT_GEN_MEMBER(subsino2_state::am188em_int0_irq)
 {
-	if ( ((m_am188em_regs[AM188EM_IMASK+0] & 0x10) == 0) || // IMASK.I0 mask
-			((m_am188em_regs[AM188EM_I0CON+0] & 0x08) == 0) )   // I0CON.MSK mask
-		device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x0c); // INT0 (background scrolling in xplan)
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER(subsino2_state::am188em_timer2_irq)
-{
-	if ((m_am188em_regs[AM188EM_IMASK+0] & 0x01) == 0)  // TMR mask
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x4c/4);
+	downcast<i80186_cpu_device *>(m_maincpu.target())->int0_w(1);
 }
 
 /***************************************************************************
@@ -1255,8 +1208,6 @@ static ADDRESS_MAP_START( saklove_io, AS_IO, 8, subsino2_state )
 
 	AM_RANGE(0x0312, 0x0312) AM_READ(vblank_bit2_r ) AM_WRITE(oki_bank_bit0_w )
 
-	// Peripheral Control Block
-	AM_RANGE(0xff00, 0xffff) AM_READWRITE(am188em_regs_r, am188em_regs_w ) AM_SHARE("am188em_regs")
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -1356,9 +1307,6 @@ static ADDRESS_MAP_START( xplan_io, AS_IO, 8, subsino2_state )
 
 	// 306 = d, 307 = c, 308 = b, 309 = a
 	AM_RANGE(0x0306, 0x0309) AM_WRITE(xplan_outputs_w ) AM_SHARE("outputs")
-
-	// Peripheral Control Block
-	AM_RANGE(0xff00, 0xffff) AM_READWRITE(am188em_regs_r, am188em_regs_w ) AM_SHARE("am188em_regs")
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -2241,9 +2189,7 @@ static MACHINE_CONFIG_START( saklove, subsino2_state )
 	MCFG_CPU_ADD("maincpu", I80188, XTAL_20MHz )    // !! AMD AM188-EM !!
 	MCFG_CPU_PROGRAM_MAP( saklove_map )
 	MCFG_CPU_IO_MAP( saklove_io )
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer2", subsino2_state, am188em_timer2_irq, attotime::from_hz(60))
 
-	MCFG_MACHINE_RESET_OVERRIDE(subsino2_state,am188em)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	// video hardware
@@ -2278,9 +2224,7 @@ static MACHINE_CONFIG_START( xplan, subsino2_state )
 	MCFG_CPU_PROGRAM_MAP( xplan_map )
 	MCFG_CPU_IO_MAP( xplan_io )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", subsino2_state,  am188em_int0_irq)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer2", subsino2_state, am188em_timer2_irq, attotime::from_hz(60))
 
-	MCFG_MACHINE_RESET_OVERRIDE(subsino2_state,am188em)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	// video hardware
