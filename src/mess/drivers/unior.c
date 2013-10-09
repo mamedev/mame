@@ -2,11 +2,11 @@
 
         Unior
 
-        12/05/2009 Skeleton driver.
+    2009-05-12 Skeleton driver.
+    2013-10-09 Added DMA and CRTC
 
     Some info obtained from EMU-80.
-    There are no manuals, diagrams, or anything else available afaik.
-    The entire driver is guesswork.
+    The schematic is difficult to read, and some code is guesswork.
 
 The monitor will only allow certain characters to be typed, thus the
 modifier keys appear to do nothing. There is no need to use the enter
@@ -26,7 +26,7 @@ L - list registers
 M
 
 ToDo:
-- All devices
+- Some devices
 - Beeper (requires a timer chip)
 - Cassette (requires a UART)
 - Colour?
@@ -35,32 +35,35 @@ ToDo:
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "machine/8257dma.h"
+#include "video/i8275.h"
 
 
 class unior_state : public driver_device
 {
 public:
 	unior_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_p_videoram(*this, "p_videoram"),
-		m_maincpu(*this, "maincpu") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_dma(*this, "dma")
+	{ }
 
 	DECLARE_WRITE8_MEMBER(vram_w);
 	DECLARE_WRITE8_MEMBER(unior_4c_w);
 	DECLARE_READ8_MEMBER(unior_4c_r);
 	DECLARE_READ8_MEMBER(unior_4d_r);
 	DECLARE_WRITE8_MEMBER(unior_50_w);
-	DECLARE_WRITE8_MEMBER(unior_60_w);
+	DECLARE_WRITE8_MEMBER(cpu_status_callback);
+	DECLARE_PALETTE_INIT(unior);
+	DECLARE_READ8_MEMBER(dma_r);
 	UINT8 *m_p_vram;
-	required_shared_ptr<UINT8> m_p_videoram;
 	UINT8 *m_p_chargen;
+private:
 	UINT8 m_4c;
-	UINT8 m_cursor_col;
-	UINT8 m_cursor_row;
 	virtual void machine_reset();
 	virtual void video_start();
-	UINT32 screen_update_unior(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	required_device<i8257_device> m_dma;
 };
 
 READ8_MEMBER( unior_state::unior_4c_r )
@@ -91,38 +94,22 @@ WRITE8_MEMBER( unior_state::unior_50_w )
 		memcpy(m_p_vram, m_p_vram+80, 24*80);
 }
 
-WRITE8_MEMBER( unior_state::unior_60_w )
-{
-	static UINT8 ctrl=0;
-	if (offset)
-		ctrl = 0; // port 61 - reset ctrl
-	else
-	if (ctrl)
-		m_cursor_row = data; // port 60 - row
-	else
-	{
-		m_cursor_col = data; // port 60 - column
-		ctrl++;
-	}
-}
-
 static ADDRESS_MAP_START( unior_mem, AS_PROGRAM, 8, unior_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xf7af) AM_RAM
-	AM_RANGE(0xf7b0, 0xf7ff) AM_RAM AM_SHARE("p_videoram") // status line
+	AM_RANGE(0x0000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xffff) AM_ROM AM_WRITE(vram_w) // main video
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( unior_io, AS_IO, 8, unior_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x30, 0x38) AM_NOP // dma data
+	AM_RANGE(0x30, 0x38) AM_DEVREADWRITE("dma", i8257_device, i8257_r, i8257_w) // dma data
 	AM_RANGE(0x3c, 0x3f) AM_NOP // cassette player control
 	AM_RANGE(0x4c, 0x4c) AM_READWRITE(unior_4c_r,unior_4c_w)
 	AM_RANGE(0x4d, 0x4d) AM_READ(unior_4d_r)
 	AM_RANGE(0x4e, 0x4f) AM_NOP // possibly the control ports of a PIO
 	AM_RANGE(0x50, 0x50) AM_WRITE(unior_50_w)
-	AM_RANGE(0x60, 0x61) AM_READNOP AM_WRITE(unior_60_w)
+	AM_RANGE(0x60, 0x61) AM_DEVREADWRITE("crtc", i8275_device, read, write)
 	AM_RANGE(0xdc, 0xdf) AM_NOP // timer chip + beeper
 	AM_RANGE(0xec, 0xed) AM_NOP // cassette data to&from UART
 ADDRESS_MAP_END
@@ -252,50 +239,6 @@ void unior_state::video_start()
 	m_p_vram = memregion("vram")->base();
 }
 
-UINT32 unior_state::screen_update_unior(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	UINT8 y,ra,gfx;
-	UINT16 sy=0,ma=0,x,chr;
-	UINT8 *videoram;
-	videoram = m_p_videoram;
-	static UINT8 framecnt=0;
-
-	framecnt++;
-
-	for (y = 0; y < 25; y++)
-	{
-		for (ra = 0; ra < 8; ra++)
-		{
-			UINT16 *p = &bitmap.pix16(sy++);
-
-			for (x = 0; x < 80; x++)
-			{
-				chr = videoram[x+ma];
-
-				gfx = m_p_chargen[(chr<<3) | ra ];
-
-				/* cursor */
-				if ((y == m_cursor_row) && (x == m_cursor_col) && (ra > 6) & BIT(framecnt, 3))
-					gfx ^= 0xff;
-
-				/* Display a scanline of a character */
-				*p++ = BIT(gfx, 7);
-				*p++ = BIT(gfx, 6);
-				*p++ = BIT(gfx, 5);
-				*p++ = BIT(gfx, 4);
-				*p++ = BIT(gfx, 3);
-				*p++ = BIT(gfx, 2);
-				*p++ = BIT(gfx, 1);
-				*p++ = BIT(gfx, 0);
-			}
-		}
-		if (y)
-			ma+=80;
-		else
-			videoram = m_p_vram;
-	}
-	return 0;
-}
 
 /* F4 Character Displayer */
 static const gfx_layout unior_charlayout =
@@ -315,12 +258,77 @@ static GFXDECODE_START( unior )
 	GFXDECODE_ENTRY( "chargen", 0x0000, unior_charlayout, 0, 1 )
 GFXDECODE_END
 
+static I8275_DISPLAY_PIXELS(display_pixels)
+{
+	unior_state *state = device->machine().driver_data<unior_state>();
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	UINT8 gfx = state->m_p_chargen[(linecount & 7) | (charcode << 3)];
+	if (vsp)
+		gfx = 0;
+
+	if (lten)
+		gfx = 0xff;
+
+	if (rvv)
+		gfx ^= 0xff;
+
+	for(UINT8 i=0;i<6;i++)
+		bitmap.pix32(y, x + i) = palette[BIT(gfx, 5-i) ? (hlgt ? 2 : 1) : 0];
+}
+
+static const i8275_interface i8275_intf =
+{
+	6,
+	0,
+	DEVCB_DEVICE_LINE_MEMBER("dma", i8257_device, i8257_drq2_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	display_pixels
+};
+
+static const rgb_t unior_palette[3] =
+{
+	MAKE_RGB(0x00, 0x00, 0x00), // black
+	MAKE_RGB(0xa0, 0xa0, 0xa0), // white
+	MAKE_RGB(0xff, 0xff, 0xff)  // highlight
+};
+
+PALETTE_INIT_MEMBER(unior_state,unior)
+{
+	palette_set_colors(machine(), 0, unior_palette, ARRAY_LENGTH(unior_palette));
+}
+
+READ8_MEMBER(unior_state::dma_r)
+{
+	if (offset < 0xf800)
+		return m_maincpu->space(AS_PROGRAM).read_byte(offset);
+	else
+		return m_p_vram[offset & 0x7ff];
+}
+
+static I8257_INTERFACE( i8257_intf )
+{
+	DEVCB_CPU_INPUT_LINE("maincpu", I8085_HALT),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DEVICE_MEMBER("crtc", i8275_device, dack_w),
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(unior_state, dma_r), DEVCB_NULL },
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
+};
+
+WRITE8_MEMBER( unior_state::cpu_status_callback )
+{
+	m_dma->i8257_hlda_w(BIT(data, 3));
+}
+
 static MACHINE_CONFIG_START( unior, unior_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8080, 2222222)
+	MCFG_CPU_ADD("maincpu",I8080, XTAL_20MHz / 9) // unknown clock
 	MCFG_CPU_PROGRAM_MAP(unior_mem)
 	MCFG_CPU_IO_MAP(unior_io)
-
+	MCFG_I8085A_STATUS(WRITE8(unior_state, cpu_status_callback))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -328,10 +336,13 @@ static MACHINE_CONFIG_START( unior, unior_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
-	MCFG_SCREEN_UPDATE_DRIVER(unior_state, screen_update_unior)
+	MCFG_SCREEN_UPDATE_DEVICE("crtc", i8275_device, screen_update)
 	MCFG_GFXDECODE(unior)
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
+	MCFG_PALETTE_LENGTH(3)
+	MCFG_PALETTE_INIT_OVERRIDE(unior_state,unior)
+
+	MCFG_I8257_ADD("dma", XTAL_20MHz / 9, i8257_intf) // unknown clock
+	MCFG_I8275_ADD("crtc", i8275_intf)
 MACHINE_CONFIG_END
 
 /* ROM definition */
