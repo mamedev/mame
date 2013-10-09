@@ -115,7 +115,10 @@ ATTR_COLD void NETLIST_NAME(_name)(netlist_setup_t &netlist) \
 //============================================================
 
 #define NETLIB_UPDATE(_chip) ATTR_HOT ATTR_ALIGN void _chip :: update(void)
-#define NETLIB_START(_chip) ATTR_COLD ATTR_ALIGN void _chip :: start(void)
+//#define NETLIB_START(_chip) ATTR_COLD _chip :: _chip (netlist_setup_t &setup, const char *name)
+#define NETLIB_CONSTRUCTOR(_chip) ATTR_COLD _chip :: _chip (netlist_setup_t &setup, const char *name) 	\
+			: net_device_t(setup, name)
+
 #define NETLIB_UPDATE_PARAM(_chip) ATTR_HOT ATTR_ALIGN void _chip :: update_param(void)
 #define NETLIB_FUNC_VOID(_chip, _name, _params) ATTR_HOT ATTR_ALIGN inline void _chip :: _name _params
 
@@ -124,19 +127,19 @@ ATTR_COLD void NETLIST_NAME(_name)(netlist_setup_t &netlist) \
 	{                                                                               \
 	public:                                                                         \
 		_name (netlist_setup_t &setup, const char *name) 							\
-			: net_signal_t<_num_input, _check>(setup, name) { }                     \
+		: net_signal_t<_num_input, _check>(setup, name) { }							\
 	};
+
 #define NETLIB_DEVICE(_name, _priv)                                                 \
 	class _name : public net_device_t                                               \
 	{                                                                               \
 	public:                                                                         \
-		_name (netlist_setup_t &setup, const char *name) 							\
-			: net_device_t(setup, name) { }                                         \
+		_name (netlist_setup_t &setup, const char *name); 							\
 		ATTR_HOT void update();                                                     \
-		ATTR_COLD void start();                                                     \
 	protected:                                                                      \
 		_priv                                                                       \
 	}
+
 #define NETLIB_SUBDEVICE(_name, _priv)                                              \
 	class _name : public net_core_device_t                                          \
 	{                                                                               \
@@ -146,15 +149,14 @@ ATTR_COLD void NETLIST_NAME(_name)(netlist_setup_t &netlist) \
 	/*protected:*/                                                                  \
 		_priv                                                                       \
 	}
+
 #define NETLIB_DEVICE_WITH_PARAMS(_name, _priv)                                     \
 	class _name : public net_device_t                                               \
 	{                                                                               \
 	public:                                                                         \
-		_name (netlist_setup_t &setup, const char *name) 							\
-			: net_device_t(setup, name) { }                                         \
+		_name (netlist_setup_t &setup, const char *name); 							\
 		ATTR_HOT void update_param();                                               \
 		ATTR_HOT void update();                                                     \
-		ATTR_COLD void start();                                                     \
 	/* protected: */                                                                \
 		_priv                                                                       \
 	}
@@ -731,8 +733,6 @@ public:
 
 	ATTR_COLD const netlist_setup_t &setup() const { return m_setup; }
 
-	ATTR_COLD virtual void start() {}
-
 	ATTR_COLD bool variable_input_count() { return m_variable_input_count; }
 
 	ATTR_COLD void register_output(const char *name, net_output_t &out);
@@ -788,9 +788,7 @@ class net_signal_t : public net_device_t
 {
 public:
 	net_signal_t(netlist_setup_t &setup, const char *name)
-	: net_device_t(setup, name) { }
-
-	ATTR_COLD void start()
+	: net_device_t(setup, name)
 	{
 		const char *sIN[8] = { "I1", "I2", "I3", "I4", "I5", "I6", "I7", "I8" };
 
@@ -991,7 +989,7 @@ NETLIB_DEVICE_WITH_PARAMS(netdev_mainclock,
 	netlist_time m_inc;
 );
 
-inline NETLIB_START(netdev_mainclock)
+inline NETLIB_CONSTRUCTOR(netdev_mainclock)
 {
 	register_output("Q", m_Q);
 	//register_input("FB", m_feedback);
@@ -1021,7 +1019,10 @@ class netdev_callback : public net_device_t
 {
 public:
 	netdev_callback(netlist_setup_t &setup, const char *name)
-		: net_device_t(setup, name) {}
+		: net_device_t(setup, name)
+	{
+		register_input("IN", m_in);
+	}
 
 	void register_callback(net_output_delegate callback)
 	{
@@ -1029,10 +1030,6 @@ public:
 	}
 
 	ATTR_HOT void update();
-	ATTR_COLD void start()
-	{
-		register_input("IN", m_in);
-	}
 
 
 private:

@@ -376,7 +376,6 @@ public:
 NETLIB_SUBDEVICE(nic7493ff,
 	ttl_input_t m_I;
 	ttl_output_t m_Q;
-	UINT8 m_active;
 );
 
 NETLIB_DEVICE(nic7493,

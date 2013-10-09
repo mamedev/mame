@@ -51,7 +51,7 @@
 //  DEBUGGING
 //============================================================
 
-#define VERBOSE                 (0)
+#define VERBOSE                 (1)
 #define KEEP_STATISTICS         (0)
 #define FATAL_ERROR_AFTER_NS	 (0) //(1000)
 
@@ -332,7 +332,7 @@ public:
 // netdev_const
 // ----------------------------------------------------------------------------------------
 
-NETLIB_START(netdev_ttl_const)
+NETLIB_CONSTRUCTOR(netdev_ttl_const)
 {
 	register_output("Q", m_Q);
 	register_param("CONST", m_const, 0.0);
@@ -347,7 +347,7 @@ NETLIB_UPDATE_PARAM(netdev_ttl_const)
 	m_Q.setTo(m_const.ValueInt(), NLTIME_IMMEDIATE);
 }
 
-NETLIB_START(netdev_analog_const)
+NETLIB_CONSTRUCTOR(netdev_analog_const)
 {
 	register_output("Q", m_Q);
 	register_param("CONST", m_const, 0.0);
@@ -494,7 +494,6 @@ net_device_t *netlist_setup_t::register_dev(net_device_t *dev)
 {
 	if (!(m_devices.add(dev->name(), dev, false)==TMERR_NONE))
 		fatalerror("Error adding %s to device list\n", dev->name());
-	dev->start();
 	return dev;
 }
 
@@ -631,6 +630,9 @@ void netlist_setup_t::resolve_inputs(void)
 		const astring *sout = entry->object();
 		astring sin = entry->tag();
 		net_input_t *in = m_inputs.find(sin);
+
+		if (in == NULL)
+			fatalerror("Unable to find %s\n", sin.cstr());
 
 		net_output_t  &out = find_output(sout->cstr());
 		if (out.object_type(net_output_t::SIGNAL_MASK) == net_output_t::SIGNAL_ANALOG
