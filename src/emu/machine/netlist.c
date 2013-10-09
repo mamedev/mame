@@ -382,7 +382,7 @@ netlist_base_t::~netlist_base_t()
 void netlist_base_t::set_clock_freq(UINT64 clockfreq)
 {
 	m_div = netlist_time::from_hz(clockfreq).as_raw();
-	VERBOSE_OUT(("Setting clock %lld and divisor %d\n", clockfreq, m_div));
+	VERBOSE_OUT(("Setting clock %" I64FMT "d and divisor %d\n", clockfreq, m_div));
 }
 
 ATTR_HOT ATTR_ALIGN void netlist_base_t::update_time(const netlist_time t, INT32 &atime)
