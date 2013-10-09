@@ -34,7 +34,8 @@
 *  * DUART:
 *    * Get the duart self test to pass again; this used to work with the old non-devcb duart implementation but regressed with the newer one
 *      * The duart self tests are EXTENSIVE and make an excellent check of many of the duart internal bits.
-*        to enable them rather than bypassing the self tests, disable the IP5-short-to-gnd
+*        To enable the self tests rather than bypassing them, under dipswitches, set 'Skip Self Test(IP4)' to 'Open (VCC)'
+*        and under system configuration set 'Hack to prevent hang when skip self test is shorted' to 'Off'
 *    * <DONE> DUART needs to be reset on reset line activation. as is it works ok, but it should be done anyway.
 *    * DUART needs its i/o pins connected as well:
 *    * pins IP0, IP2, and IP3 are connected to the primary serial port:
