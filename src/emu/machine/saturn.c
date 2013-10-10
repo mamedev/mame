@@ -221,6 +221,8 @@ void saturn_state::scu_test_pending_irq()
 	}
 }
 
+#define USE_NEW_SCUDSP 1
+
 READ32_MEMBER(saturn_state::saturn_scu_r)
 {
 	UINT32 res;
@@ -238,12 +240,19 @@ READ32_MEMBER(saturn_state::saturn_scu_r)
 			res = m_scu.status;
 			break;
 		case 0x80/4:
+			#if USE_NEW_SCUDSP
 			res = m_scudsp->program_control_r(space, 0, mem_mask);
+			#else
 			res = dsp_prg_ctrl_r(space);
+			#endif
 			break;
 		case 0x8c/4:
 			if(LOG_SCU && !space.debugger_access()) logerror( "DSP mem read at %08X\n", m_scu_regs[34]);
+			#if USE_NEW_SCUDSP
+			res = m_scudsp->ram_address_r(space, 0, mem_mask);
+			#else
 			res = dsp_ram_addr_r();
+			#endif
 			break;
 		case 0xa0/4:
 			if(LOG_SCU && !space.debugger_access()) logerror("(PC=%08x) IRQ mask reg read %08x MASK=%08x\n",space.device().safe_pc(),mem_mask,m_scu_regs[0xa0/4]);
@@ -313,20 +322,35 @@ WRITE32_MEMBER(saturn_state::saturn_scu_w)
 		/*DSP section*/
 		case 0x80/4:
 			/* TODO: you can't overwrite some flags with this */
+			#if USE_NEW_SCUDSP
+			m_scudsp->program_control_w(space, 0, m_scu_regs[offset], mem_mask);
+			#else
 			dsp_prg_ctrl_w(space, m_scu_regs[offset]);
-			m_scudsp->program_control_w(space, 0, mem_mask,data);
+			#endif
 			if(LOG_SCU) logerror("SCU DSP: Program Control Port Access %08x\n",data);
 			break;
 		case 0x84/4:
+			#if USE_NEW_SCUDSP
+			m_scudsp->program_w(space, 0, m_scu_regs[offset], mem_mask);
+			#else
 			dsp_prg_data(m_scu_regs[offset]);
+			#endif
 			if(LOG_SCU) logerror("SCU DSP: Program RAM Data Port Access %08x\n",data);
 			break;
 		case 0x88/4:
+			#if USE_NEW_SCUDSP
+			m_scudsp->ram_address_control_w(space, 0,m_scu_regs[offset], mem_mask);
+			#else
 			dsp_ram_addr_ctrl(m_scu_regs[offset]);
+			#endif
 			if(LOG_SCU) logerror("SCU DSP: Data RAM Address Port Access %08x\n",data);
 			break;
 		case 0x8c/4:
+			#if USE_NEW_SCUDSP
+			m_scudsp->ram_address_w(space, 0, m_scu_regs[offset], mem_mask);
+			#else
 			dsp_ram_addr_w(m_scu_regs[offset]);
+			#endif
 			if(LOG_SCU) logerror("SCU DSP: Data RAM Data Port Access %08x\n",data);
 			break;
 		case 0x90/4: /*if(LOG_SCU) logerror("timer 0 compare data = %03x\n",m_scu_regs[36]);*/ break;

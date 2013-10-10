@@ -13,7 +13,9 @@
 
 enum
 {
-	SCUDSP_PC=1, SCUDSP_FLAGS
+	SCUDSP_RA=1,
+	SCUDSP_CT0, SCUDSP_CT1, SCUDSP_CT2, SCUDSP_CT3,
+	SCUDSP_PC, SCUDSP_FLAGS
 };
 
 #define SCUDSP_RESET        INPUT_LINE_RESET    /* Non-Maskable */
@@ -25,9 +27,16 @@ public:
 	// construction/destruction
 	scudsp_cpu_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock);
 
+	/* port 0 */
 	DECLARE_READ32_MEMBER( program_control_r );
 	DECLARE_WRITE32_MEMBER( program_control_w );
-
+	/* port 1 */
+	DECLARE_WRITE32_MEMBER( program_w );
+	/* port 2 */
+	DECLARE_WRITE32_MEMBER( ram_address_control_w );
+	/* port 3 */
+	DECLARE_READ32_MEMBER( ram_address_r );
+	DECLARE_WRITE32_MEMBER( ram_address_w );
 //	virtual DECLARE_ADDRESS_MAP(map, 32) = 0;
 
 protected:
@@ -59,13 +68,16 @@ private:
 
 	UINT8	m_pc;   /* registers */
 	UINT32	m_flags;  /* flags */
+	UINT8   m_ra;
+	UINT8   m_ct0,m_ct1,m_ct2,m_ct3;                        /*Index for RAM*/      /*6-bits */
 	int     m_reset_state;
 	address_space *m_program;
 	address_space *m_data;
 	int m_icount;
 
+	UINT32 scudsp_get_source_mem_value(UINT8 mode);
+	void scudsp_set_dest_mem_reg( UINT32 mode, UINT32 value );
 	void scudsp_illegal();
-
 };
 
 
