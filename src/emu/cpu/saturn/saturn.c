@@ -119,6 +119,7 @@ void saturn_device::device_start()
 	m_in_irq = 0;
 	m_pending_irq = 0;
 	m_sleeping = 0;
+	m_p = 0;
 
 	save_item(NAME(m_reg[R0]));
 	save_item(NAME(m_reg[R1]));
