@@ -11,13 +11,10 @@
 #ifndef __SCUDSP_H__
 #define __SCUDSP_H__
 
-#if 0
 enum
 {
-	SCUDSP_R0=1, SCUDSP_R1, SCUDSP_R2, SCUDSP_R3,
-	SCUDSP_R4, SCUDSP_R5, SCUDSP_R6, SCUDSP_R7
+	SCUDSP_PC=1, SCUDSP_FLAGS
 };
-#endif
 
 #define SCUDSP_RESET        INPUT_LINE_RESET    /* Non-Maskable */
 
@@ -27,6 +24,11 @@ class scudsp_cpu_device :  public cpu_device
 public:
 	// construction/destruction
 	scudsp_cpu_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock);
+
+	DECLARE_READ32_MEMBER( program_control_r );
+	DECLARE_WRITE32_MEMBER( program_control_w );
+
+//	virtual DECLARE_ADDRESS_MAP(map, 32) = 0;
 
 protected:
 	// device-level overrides
@@ -56,7 +58,7 @@ private:
 	address_space_config m_data_config;
 
 	UINT8	m_pc;   /* registers */
-	UINT8	m_flags;  /* flags */
+	UINT32	m_flags;  /* flags */
 	int     m_reset_state;
 	address_space *m_program;
 	address_space *m_data;

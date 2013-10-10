@@ -3,6 +3,7 @@
 #include "machine/eepromser.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/adsp2100/adsp2100.h"
+#include "cpu/scudsp/scudsp.h"
 
 #define MAX_FILTERS (24)
 #define MAX_BLOCKS  (200)
@@ -20,6 +21,7 @@ public:
 			m_maincpu(*this, "maincpu"),
 			m_slave(*this, "slave"),
 			m_audiocpu(*this, "audiocpu"),
+			m_scudsp(*this, "scudsp"),
 			m_eeprom(*this, "eeprom")
 	{
 	}
@@ -144,6 +146,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_slave;
 	required_device<m68000_base_device> m_audiocpu;
+	required_device<scudsp_cpu_device> m_scudsp;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 
 	bitmap_rgb32 m_tmpbitmap;

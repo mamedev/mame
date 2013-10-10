@@ -238,6 +238,7 @@ READ32_MEMBER(saturn_state::saturn_scu_r)
 			res = m_scu.status;
 			break;
 		case 0x80/4:
+			res = m_scudsp->program_control_r(space, 0, mem_mask);
 			res = dsp_prg_ctrl_r(space);
 			break;
 		case 0x8c/4:
@@ -313,6 +314,7 @@ WRITE32_MEMBER(saturn_state::saturn_scu_w)
 		case 0x80/4:
 			/* TODO: you can't overwrite some flags with this */
 			dsp_prg_ctrl_w(space, m_scu_regs[offset]);
+			m_scudsp->program_control_w(space, 0, mem_mask,data);
 			if(LOG_SCU) logerror("SCU DSP: Program Control Port Access %08x\n",data);
 			break;
 		case 0x84/4:

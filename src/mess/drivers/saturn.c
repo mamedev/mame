@@ -184,7 +184,7 @@ static ADDRESS_MAP_START( sound_mem, AS_PROGRAM, 16, sat_console_state )
 	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE_LEGACY("scsp", scsp_r, scsp_w)
 ADDRESS_MAP_END
 
-#if 0
+#if 1
 static ADDRESS_MAP_START( scudsp_mem, AS_PROGRAM, 32, sat_console_state )
 	AM_RANGE(0x00, 0xff) AM_RAM
 ADDRESS_MAP_END
@@ -706,6 +706,7 @@ MACHINE_RESET_MEMBER(sat_console_state,saturn)
 	// don't let the slave cpu and the 68k go anywhere
 	m_slave->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_scudsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	m_smpc.SR = 0x40;   // this bit is always on according to docs
 
@@ -754,12 +755,10 @@ static MACHINE_CONFIG_START( saturn, sat_console_state )
 	MCFG_CPU_ADD("audiocpu", M68000, 11289600) //256 x 44100 Hz = 11.2896 MHz
 	MCFG_CPU_PROGRAM_MAP(sound_mem)
 
-#if 0
 	MCFG_CPU_ADD("scudsp", SCUDSP, MASTER_CLOCK_352/4) // 14 MHz
 	MCFG_CPU_PROGRAM_MAP(scudsp_mem)
 	MCFG_CPU_DATA_MAP(scudsp_data)
 //	MCFG_CPU_CONFIG(scudsp_config)
-#endif
 
 
 //	SH-1

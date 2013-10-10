@@ -39,6 +39,7 @@
 #include "cpu/sh2/sh2.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/adsp2100/adsp2100.h"
+#include "cpu/scudsp/scudsp.h"
 #include "machine/eepromser.h"
 #include "machine/scudsp.h"
 #include "sound/scsp.h"
@@ -976,6 +977,11 @@ static MACHINE_CONFIG_START( stv, stv_state )
 	MCFG_CPU_ADD("audiocpu", M68000, 11289600) //11.2896 MHz
 	MCFG_CPU_PROGRAM_MAP(sound_mem)
 
+	MCFG_CPU_ADD("scudsp", SCUDSP, MASTER_CLOCK_352/4) // 14 MHz
+	MCFG_CPU_PROGRAM_MAP(scudsp_mem)
+	MCFG_CPU_DATA_MAP(scudsp_data)
+//	MCFG_CPU_CONFIG(scudsp_config)
+
 	MCFG_MACHINE_START_OVERRIDE(stv_state,stv)
 	MCFG_MACHINE_RESET_OVERRIDE(stv_state,stv)
 
@@ -1220,6 +1226,7 @@ MACHINE_RESET_MEMBER(stv_state,stv)
 	// don't let the slave cpu and the 68k go anywhere
 	m_slave->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_scudsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	m_en_68k = 0;
 	m_NMI_reset = 0;

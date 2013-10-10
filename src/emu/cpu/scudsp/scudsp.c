@@ -15,18 +15,43 @@ const device_type SCUDSP = &device_creator<scudsp_cpu_device>;
 
 
 /* FLAGS */
-#if 0
-#define S  0x80
-#define Z  0x40
-#define OV 0x20
-#define C  0x10
-#endif
+#define PRF m_flags & 0x04000000
+#define EPF m_flags & 0x02000000
+#define T0F m_flags & 0x00800000
+#define SF  m_flags & 0x00400000
+#define ZF  m_flags & 0x00200000
+#define CF  m_flags & 0x00100000
+#define VF  m_flags & 0x00080000
+#define EF  m_flags & 0x00040000
+#define ESF m_flags & 0x00020000
+#define EXF m_flags & 0x00010000 // execute flag (basically tied to RESET pin)
+#define LEF m_flags & 0x00008000 // change PC value
 
 
 #define scudsp_readop(A) m_program->read_dword(A)
 #define scudsp_readmem16(A) m_data->read_dword(A)
 #define scudsp_writemem16(A,B) m_data->write_dword((A),B)
 
+READ32_MEMBER( scudsp_cpu_device::program_control_r )
+{
+	return (m_pc & 0xff) | (m_flags & 0xffffff00);
+}
+
+WRITE32_MEMBER( scudsp_cpu_device::program_control_w )
+{
+	UINT32 oldval, newval;
+
+	oldval = (m_flags & 0xffffff00) | (m_pc & 0xff);
+	newval = oldval;
+	COMBINE_DATA(&newval);
+
+	m_flags = newval & 0xffffff00;
+
+	if(LEF)
+		m_pc = newval & 0xff;
+
+	set_input_line(INPUT_LINE_RESET, (EXF) ? CLEAR_LINE : ASSERT_LINE);
+}
 
 /***********************************
  *  illegal opcodes
@@ -70,7 +95,8 @@ void scudsp_cpu_device::device_start()
 	save_item(NAME(m_reset_state));
 
 	// Register state for debugger
-//	state_add( CP1610_R0, "PC", m_pc ).formatstr("%02X");
+	state_add( SCUDSP_PC, "PC", m_pc ).formatstr("%02X");
+	state_add( SCUDSP_FLAGS, "SR", m_flags ).formatstr("%08X");
 	state_add( STATE_GENPC, "curpc", m_pc ).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_flags ).noshow();
 
