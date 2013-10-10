@@ -961,11 +961,11 @@ static ADDRESS_MAP_START( sound_mem, AS_PROGRAM, 16, stv_state )
 	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE_LEGACY("scsp", scsp_r, scsp_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( scudsp_mem, AS_PROGRAM, 32, sat_console_state )
+static ADDRESS_MAP_START( scudsp_mem, AS_PROGRAM, 32, stv_state )
 	AM_RANGE(0x00, 0xff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( scudsp_data, AS_DATA, 32, sat_console_state )
+static ADDRESS_MAP_START( scudsp_data, AS_DATA, 32, stv_state )
 	AM_RANGE(0x00, 0xff) AM_RAM
 ADDRESS_MAP_END
 

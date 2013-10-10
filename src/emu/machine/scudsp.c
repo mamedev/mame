@@ -106,12 +106,12 @@ Changelog:
 #define SET_Z(_val) (state->m_scu_regs[32] = ((state->m_scu_regs[32] & ~0x00200000) | ((_val) ? 0x00200000 : 0)))
 #define SET_V(_val) (state->m_scu_regs[32] = ((state->m_scu_regs[32] & ~0x00080000) | ((_val) ? 0x00080000 : 0)))
 
-union SCUDSPREG32 {
+union SCUDSPREG32_OLD {
 	INT32  si;
 	UINT32 ui;
 };
 
-union SCUDSPREG16 {
+union SCUDSPREG16_OLD {
 	INT16  si;
 	UINT16 ui;
 };
@@ -124,14 +124,14 @@ static struct {
 		UINT8  ct0,ct1,ct2,ct3;                        /*Index for RAM*/      /*6-bits */
 		UINT32 md0[0x40],md1[0x40],md2[0x40],md3[0x40]; /*RAM memory*/
 		UINT8  ra;                                     /*RAM selector*/
-		SCUDSPREG32 rx;                                /*X-Bus register*/
+		SCUDSPREG32_OLD rx;                                /*X-Bus register*/
 		INT64 mul;                                      /*Multiplier register*//*48-bits*/
-		SCUDSPREG32 ry;                                /*Y-Bus register*/
+		SCUDSPREG32_OLD ry;                                /*Y-Bus register*/
 		INT64  alu;                                     /*ALU register*/       /*48-bits*/
-		SCUDSPREG16 ph;                                /*ALU high register*/
-		SCUDSPREG32 pl;                                /*ALU low register*/
-		SCUDSPREG16 ach;                                   /*ALU external high register*/
-		SCUDSPREG32 acl;                                   /*ALU external low register*/
+		SCUDSPREG16_OLD ph;                                /*ALU high register*/
+		SCUDSPREG32_OLD pl;                                /*ALU low register*/
+		SCUDSPREG16_OLD ach;                                   /*ALU external high register*/
+		SCUDSPREG32_OLD acl;                                   /*ALU external low register*/
 		UINT32 ra0,wa0;                                /*DSP DMA registers*/
 		UINT32 internal_prg[0x100];
 } dsp_reg;

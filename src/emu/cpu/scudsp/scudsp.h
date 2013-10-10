@@ -1,8 +1,6 @@
 /*****************************************************************************
  *
- * SCUDSP CPU core
- *
- * skeleton for now ...
+ * Sega SCUDSP emulator
  *
  *****************************************************************************/
 
@@ -13,13 +11,39 @@
 
 enum
 {
-	SCUDSP_RA=1,
-	SCUDSP_CT0, SCUDSP_CT1, SCUDSP_CT2, SCUDSP_CT3,
-	SCUDSP_PC, SCUDSP_FLAGS
+	SCUDSP_PC=1,
+	SCUDSP_FLAGS,
+	SCUDSP_DELAY,
+	SCUDSP_TOP,
+	SCUDSP_LOP,
+	SCUDSP_RX,
+	SCUDSP_MUL,
+	SCUDSP_RY,
+	SCUDSP_ALU,
+	SCUDSP_PH,
+	SCUDSP_PL,
+	SCUDSP_ACH,
+	SCUDSP_ACL,
+	SCUDSP_RA0,
+	SCUDSP_WA0,
+	SCUDSP_RA,
+	SCUDSP_CT0,
+	SCUDSP_CT1,
+	SCUDSP_CT2,
+	SCUDSP_CT3
 };
 
 #define SCUDSP_RESET        INPUT_LINE_RESET    /* Non-Maskable */
 
+union SCUDSPREG32 {
+	INT32  si;
+	UINT32 ui;
+};
+
+union SCUDSPREG16 {
+	INT16  si;
+	UINT16 ui;
+};
 
 class scudsp_cpu_device :  public cpu_device
 {
@@ -69,15 +93,39 @@ private:
 	UINT8	m_pc;   /* registers */
 	UINT32	m_flags;  /* flags */
 	UINT8   m_ra;
-	UINT8   m_ct0,m_ct1,m_ct2,m_ct3;                        /*Index for RAM*/      /*6-bits */
-	int     m_reset_state;
+	UINT8   m_ct0,m_ct1,m_ct2,m_ct3;
+	UINT8	m_delay;                                   /* Delay */
+	UINT8	m_top;                                     /*Jump Command memory*/
+	UINT16	m_lop;                                    /*Counter Register*/   /*12-bits*/
+	SCUDSPREG32 m_rx;                                /*X-Bus register*/
+	INT64 	m_mul;                                     /*Multiplier register*//*48-bits*/
+	SCUDSPREG32 m_ry;                                /*Y-Bus register*/
+	INT64  	m_alu;                                    /*ALU register*/       /*48-bits*/
+	SCUDSPREG16 m_ph;                                /*ALU high register*/
+	SCUDSPREG32 m_pl;                                /*ALU low register*/
+	SCUDSPREG16 m_ach;                               /*ALU external high register*/
+	SCUDSPREG32 m_acl;                               /*ALU external low register*/
+	UINT32  m_ra0,m_wa0;                                /*DSP DMA registers*/
 	address_space *m_program;
 	address_space *m_data;
 	int m_icount;
+	UINT8 m_update_mul;
 
+	UINT32 scudsp_get_source_mem_reg_value( UINT32 mode );
 	UINT32 scudsp_get_source_mem_value(UINT8 mode);
 	void scudsp_set_dest_mem_reg( UINT32 mode, UINT32 value );
-	void scudsp_illegal();
+	void scudsp_set_dest_mem_reg_2( UINT32 mode, UINT32 value );
+	UINT32 scudsp_compute_condition( UINT32 condition );
+	UINT32 scudsp_get_mem_source_dma( UINT32 memcode, UINT32 counter );
+	void scudsp_set_dest_dma_mem( UINT32 memcode, UINT32 value, UINT32 counter );
+
+	void scudsp_illegal(UINT32 opcode);
+	void scudsp_operation(UINT32 opcode);
+	void scudsp_move_immediate(UINT32 opcode);
+	void scudsp_dma(UINT32 opcode);
+	void scudsp_jump(UINT32 opcode);
+	void scudsp_loop(UINT32 opcode);
+	void scudsp_end(UINT32 opcode);
 };
 
 
