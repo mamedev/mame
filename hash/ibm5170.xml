@@ -2868,6 +2868,53 @@ Missing files come here
 		</part>
 	</software>
 
+	<software name="msip11">
+		<description>Microsoft IntelliPoint 1.1 for the Microsoft Mouse</description>
+		<year>1995</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 - Setup"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="disk1.img" size="1474560" crc="657f88ea" sha1="28624a650a44c1c8743d9448970f5b8c61fd0462" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="disk2.img" size="1474560" crc="43c7fb48" sha1="65d02e9391dc4bb41776a0ba279a55b4b0f96c15" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hpdj420">
+		<description>HP DeskJet 420 Series Printer Software v8.5 for Windows 98, Windows 95 or 3.1x (Den, Swe, Fin, Nor)</description>
+		<year>1998</year>
+		<publisher>Hewlett-Packard</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Installation Disk 1"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="c2642-10022.img" size="1474560" crc="e631efbc" sha1="3620c266ec00fb8ddc25a97e3c56f042a302b0d9" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Installation Disk 2"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="c2642-10023.img" size="1474560" crc="866bd172" sha1="1fd91eec0f6e720de77058629c4e246ed1a5e8bb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nokiamon">
+		<description>Nokia Monitor Setup for Windows 95</description>
+		<year>1998</year>
+		<publisher>Nokia</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="zk0004.img" size="1474560" crc="b4be6044" sha1="25b1967cfd372ad3f6b0855d54e52ae0d6e88c9a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Application Disks -->
 
 	<software name="dos7demo">
@@ -2906,6 +2953,17 @@ Missing files come here
 			<feature name="disk_serial" value="03WDXW3001" />
 			<dataarea name="flop" size="1474560">
 				<rom name="wdel3.img" size="1474560" crc="9c2e76b9" sha1="b6b6f18726ce0f4ae1aeb2c33b8e4793ca15f87a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mbhh95">
+		<description>MikroBITTI Huvi- ja hyötylevyke 1995 (Fin)</description>
+		<year>1995</year>
+		<publisher>Sanoma</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="mb1995.img" size="1474560" crc="281e055f" sha1="398bd9dbb0f1019169fdcb9d640960dbe5352f6a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
