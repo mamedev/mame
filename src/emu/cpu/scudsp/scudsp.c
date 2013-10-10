@@ -302,7 +302,21 @@ void scudsp_cpu_device::scudsp_set_dest_dma_mem( UINT32 memcode, UINT32 value, U
 {
 	if ( memcode < 4 )
 	{
-		scudsp_set_dest_mem_reg( memcode, value );
+		switch(memcode)
+		{
+			case 0x0:   /* MC0 */
+				scudsp_writemem(((m_ct0 + counter) & 0x3f),0,value);
+				break;
+			case 0x1:   /* MC1 */
+				scudsp_writemem(((m_ct1 + counter) & 0x3f),1,value);
+				break;
+			case 0x2:   /* MC2 */
+				scudsp_writemem(((m_ct2 + counter) & 0x3f),2,value);
+				break;
+			case 0x3:   /* MC3 */
+				scudsp_writemem(((m_ct3 + counter) & 0x3f),3,value);
+				break;
+		}
 	}
 	else if ( memcode == 4 )
 	{
