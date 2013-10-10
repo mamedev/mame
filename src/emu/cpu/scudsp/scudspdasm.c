@@ -242,7 +242,7 @@ CPU_DISASSEMBLE( scudsp )
 //  const char *sym, *sym2;
 	char *my_buffer = buffer;
 	char temp_buffer[64];
-	UINT32 data[2];
+	UINT32 data[3];
 
 	switch( op >> 30 )
 	{
