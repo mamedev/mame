@@ -242,7 +242,7 @@ CPU_DISASSEMBLE( scudsp )
 //  const char *sym, *sym2;
 	char *my_buffer = buffer;
 	char temp_buffer[64];
-	UINT32 data[3];
+	UINT32 data[4];
 
 	switch( op >> 30 )
 	{
@@ -325,7 +325,11 @@ CPU_DISASSEMBLE( scudsp )
 			switch((op >> 28) & 3)
 			{
 				case 0:
-					sprintf(buffer, "DMA");
+					data[0] = (op &  0x4000) >> 14; /* H */
+					data[1] = (op & 0x38000) >> 15; /* A */
+					data[2] = (op & 0x700) >> 8; /* Mem */
+					data[3] = (op & 0xff);
+					scudsp_dasm_prefix( DMA_Command[(op & 0x3000) >> 12], buffer, data );
 					break;
 				case 1:
 					if ( op & 0x3F80000 )

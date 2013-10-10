@@ -33,6 +33,19 @@ enum
 	SCUDSP_CT3
 };
 
+// ======================> scudsp_interface
+
+struct scudsp_interface
+{
+	devcb_write_line     m_out_irq_cb;
+	devcb_read16         m_in_dma_cb;
+	devcb_write16        m_out_dma_cb;
+};
+
+#define SCUDSP_INTERFACE(name) \
+	const scudsp_interface (name) =
+
+
 #define SCUDSP_RESET        INPUT_LINE_RESET    /* Non-Maskable */
 
 union SCUDSPREG32 {
@@ -45,7 +58,8 @@ union SCUDSPREG16 {
 	UINT16 ui;
 };
 
-class scudsp_cpu_device :  public cpu_device
+class scudsp_cpu_device :  public cpu_device,
+                           public scudsp_interface
 {
 public:
 	// construction/destruction
@@ -65,6 +79,7 @@ public:
 
 protected:
 	// device-level overrides
+	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 
@@ -86,6 +101,9 @@ protected:
 	virtual UINT32 disasm_max_opcode_bytes() const { return 4; }
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
 
+	devcb_resolved_write_line     m_out_irq_func;
+	devcb_resolved_read16         m_in_dma_func;
+	devcb_resolved_write16        m_out_dma_func;
 private:
 	address_space_config m_program_config;
 	address_space_config m_data_config;
@@ -106,6 +124,11 @@ private:
 	SCUDSPREG16 m_ach;                               /*ALU external high register*/
 	SCUDSPREG32 m_acl;                               /*ALU external low register*/
 	UINT32  m_ra0,m_wa0;                                /*DSP DMA registers*/
+	struct{
+		UINT32 src, dst;
+		UINT16 add;
+		UINT8 size, update, ex, dir, count;
+	}m_dma;
 	address_space *m_program;
 	address_space *m_data;
 	int m_icount;
@@ -126,6 +149,7 @@ private:
 	void scudsp_jump(UINT32 opcode);
 	void scudsp_loop(UINT32 opcode);
 	void scudsp_end(UINT32 opcode);
+	void scudsp_exec_dma();
 };
 
 

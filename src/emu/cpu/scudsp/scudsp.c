@@ -130,8 +130,8 @@ const device_type SCUDSP = &device_creator<scudsp_cpu_device>;
 
 #define scudsp_readop(A) m_program->read_dword(A << 2)
 #define scudsp_writeop(A, B) m_program->write_dword(A << 2, B)
-#define scudsp_readmem(A,MD) m_data->read_dword(((A | MD) << 6) << 2)
-#define scudsp_writemem(A,MD,B) m_data->write_dword(((A | MD) << 6) << 2, B)
+#define scudsp_readmem(A,MD) m_data->read_dword((A | (MD << 6)) << 2)
+#define scudsp_writemem(A,MD,B) m_data->write_dword((A | (MD << 6)) << 2, B)
 
 UINT32 scudsp_cpu_device::scudsp_get_source_mem_reg_value( UINT32 mode )
 {
@@ -616,6 +616,57 @@ void scudsp_cpu_device::scudsp_move_immediate( UINT32 opcode )
 
 void scudsp_cpu_device::scudsp_dma( UINT32 opcode )
 {
+	UINT8 hold = (opcode &  0x4000) >> 14;
+	UINT32 add = (opcode & 0x38000) >> 15;
+	UINT32 dir_from_D0 = (opcode & 0x1000 ) >> 12;
+	UINT32 dsp_mem = (opcode & 0x300) >> 8;
+
+	T0F_1;
+
+	if ( opcode & 0x2000 )
+	{
+		m_dma.size = scudsp_get_source_mem_value( opcode & 0xf );
+		switch ( add & 0x7 )
+		{
+			case 0: m_dma.add = 0; break;
+			case 1: m_dma.add = 4; break;
+			default: m_dma.add = 4; break;
+		}
+	}
+	else
+	{
+		m_dma.size = opcode & 0xff;
+		switch( add )
+		{
+			case 0: m_dma.add = 0; break;  /* 0 */
+			case 1: m_dma.add = 4; break;  /* 1 */
+			case 2: m_dma.add = 4; break;  /* 2 */
+			case 3: m_dma.add = 16; break; /* 4 */
+			case 4: m_dma.add = 16; break;  /* 8 */
+			case 5: m_dma.add = 64; break; /* 16 */
+			case 6: m_dma.add = 128; break; /* 32 */
+			case 7: m_dma.add = 256; break; /* 64 */
+		}
+	}
+
+	m_dma.dir = dir_from_D0;
+	if ( m_dma.dir == 0 )
+	{
+		m_dma.src = (m_ra0 << 2) & 0x07ffffff;
+		m_dma.dst = dsp_mem;
+	}
+	else
+	{
+		m_dma.src = dsp_mem;
+		m_dma.dst = (m_wa0 << 2) & 0x07ffffff;
+	}
+
+	m_dma.update = ( hold == 0 );
+	m_dma.ex = 1;
+	m_dma.count = 0;
+
+	//printf("SRC %08x DST %08x SIZE %08x UPDATE %08x DIR %08x ADD %08x\n",m_dma.src,m_dma.dst,m_dma.size,m_dma.update,m_dma.dir,m_dma.add);
+
 	m_icount -= 1;
 }
 
@@ -668,9 +719,10 @@ void scudsp_cpu_device::scudsp_end(UINT32 opcode)
 	if(opcode & 0x08000000)
 	{
 		/*ENDI*/
-		//TODO: irq signal
+		m_out_irq_func(1);
 	}
 
+	EF_1; // ok?
 	EXF_0; /* END / ENDI */
 	set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_icount -= 1;
@@ -679,6 +731,47 @@ void scudsp_cpu_device::scudsp_end(UINT32 opcode)
 void scudsp_cpu_device::scudsp_illegal(UINT32 opcode)
 {
 	fatalerror("scudsp illegal opcode at 0x%04x\n", m_pc);
+	m_icount -= 1;
+}
+
+void scudsp_cpu_device::scudsp_exec_dma()
+{
+	UINT32 data;
+	if ( m_dma.dir == 0 )
+	{
+		data = (m_in_dma_func(m_dma.src)<<16) | m_in_dma_func(m_dma.src+2);
+		scudsp_set_dest_dma_mem( m_dma.dst, data, m_dma.count++ );
+
+		m_dma.src += m_dma.add;
+
+		if ( m_dma.update )
+		{
+			m_ra0 += ((1 * m_dma.add) >> 2);
+		}
+	}
+	else
+	{
+		data = scudsp_get_mem_source_dma( m_dma.src, m_dma.count++ );
+
+		m_out_dma_func(m_dma.dst, data >> 16 );
+		m_out_dma_func(m_dma.dst+2, data & 0xffff );
+
+		m_dma.dst += m_dma.add;
+
+		if ( m_dma.update )
+		{
+			m_wa0 += ((1 * m_dma.add) >> 2);
+		}
+	}
+
+	m_dma.size--;
+
+	if(m_dma.size == 0)
+	{
+		m_dma.ex = 0;
+		T0F_0;
+	}
+
 	m_icount -= 1;
 }
 
@@ -740,8 +833,32 @@ void scudsp_cpu_device::execute_run()
 			m_update_mul = 0;
 		}
 
+		if (m_dma.ex == 1)
+		{
+			scudsp_exec_dma();
+		}
 
 	} while( m_icount > 0 );
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void scudsp_cpu_device::device_config_complete()
+{
+	// inherit a copy of the static data
+	const scudsp_interface *intf = reinterpret_cast<const scudsp_interface *>(static_config());
+	if (intf != NULL)
+		*static_cast<scudsp_interface *>(this) = *intf;
+
+	// or error out if none provided
+	else
+	{
+		fatalerror("SCUDSP_INTERFACE for cpu '%s' not defined!\n", tag());
+	}
 }
 
 
@@ -800,6 +917,10 @@ void scudsp_cpu_device::device_start()
 	state_add( SCUDSP_CT3, "CT3", m_ct3 ).formatstr("%02X");
 	state_add( STATE_GENPC, "curpc", m_pc ).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_flags ).formatstr("%17s").noshow();
+
+	m_out_irq_func.resolve(m_out_irq_cb, *this);
+	m_in_dma_func.resolve(m_in_dma_cb, *this);
+	m_out_dma_func.resolve(m_out_dma_cb, *this);
 
 	m_icountptr = &m_icount;
 }

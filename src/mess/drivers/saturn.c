@@ -736,6 +736,12 @@ struct cdrom_interface saturn_cdrom =
 	NULL
 };
 
+static SCUDSP_INTERFACE( scudsp_config )
+{
+	DEVCB_DRIVER_LINE_MEMBER(saturn_state, scudsp_end_w),
+	DEVCB_DRIVER_MEMBER16(saturn_state,scudsp_dma_r),
+	DEVCB_DRIVER_MEMBER16(saturn_state,scudsp_dma_w)
+};
 
 static MACHINE_CONFIG_START( saturn, sat_console_state )
 
@@ -756,8 +762,7 @@ static MACHINE_CONFIG_START( saturn, sat_console_state )
 	MCFG_CPU_ADD("scudsp", SCUDSP, MASTER_CLOCK_352/4) // 14 MHz
 	MCFG_CPU_PROGRAM_MAP(scudsp_mem)
 	MCFG_CPU_DATA_MAP(scudsp_data)
-//	MCFG_CPU_CONFIG(scudsp_config)
-
+	MCFG_CPU_CONFIG(scudsp_config)
 
 //	SH-1
 

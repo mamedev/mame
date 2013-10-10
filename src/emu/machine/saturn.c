@@ -999,3 +999,35 @@ GFXDECODE_START( stv )
 	GFXDECODE_ENTRY( NULL, 0, tiles8x8x8_layout,   0x00, (0x08*(2+1))  )
 	GFXDECODE_ENTRY( NULL, 0, tiles16x16x8_layout, 0x00, (0x08*(2+1))  )
 GFXDECODE_END
+
+WRITE_LINE_MEMBER(saturn_state::scudsp_end_w)
+{
+	if(state)
+	{
+		if(!(m_scu.ism & IRQ_DSP_END))
+			m_maincpu->set_input_line_and_vector(0xa, HOLD_LINE, 0x45);
+		else
+			m_scu.ist |= (IRQ_DSP_END);
+	}
+}
+
+READ16_MEMBER(saturn_state::scudsp_dma_r)
+{
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+	offs_t addr = offset;
+
+//  printf("%08x\n",addr);
+
+	return program.read_word(addr,mem_mask);
+}
+
+
+WRITE16_MEMBER(saturn_state::scudsp_dma_w)
+{
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+	offs_t addr = offset;
+
+//  printf("%08x %02x\n",addr,data);
+
+	program.write_word(addr, data,mem_mask);
+}

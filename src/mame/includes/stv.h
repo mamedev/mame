@@ -636,6 +636,10 @@ public:
 
 	static void m68k_reset_callback(device_t *device);
 	int DectoBCD(int num);
+
+	DECLARE_WRITE_LINE_MEMBER(scudsp_end_w);
+	DECLARE_READ16_MEMBER(scudsp_dma_r);
+	DECLARE_WRITE16_MEMBER(scudsp_dma_w);
 };
 
 class stv_state : public saturn_state
