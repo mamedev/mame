@@ -11,13 +11,13 @@
 #ifndef __SCUDSP_H__
 #define __SCUDSP_H__
 
+#if 0
 enum
 {
-	#if 0
 	SCUDSP_R0=1, SCUDSP_R1, SCUDSP_R2, SCUDSP_R3,
 	SCUDSP_R4, SCUDSP_R5, SCUDSP_R6, SCUDSP_R7
-	#endif
 };
+#endif
 
 #define SCUDSP_RESET        INPUT_LINE_RESET    /* Non-Maskable */
 
