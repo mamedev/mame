@@ -2597,8 +2597,8 @@ ROM_END
 
 ROM_START( pebe0014 ) /* Normal board : Blackjack (BE0014) */
 /* Known to exist:
-BE0013 508-544
-BE0013 528-A22
+BE0013 508-544 (Non Double-up)
+BE0013 528-A22 (Non Double-up)
 BE0014 526-906
 BE0014 527-936
 BE0017 532-A22
