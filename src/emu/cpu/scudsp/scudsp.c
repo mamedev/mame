@@ -77,6 +77,9 @@
  * - overworked disassembler
  *
  *  TODO:
+ * - Fix INSTA_DMA hack
+ * - Fix disassembler
+ * - Fix timings (no info available so far)
  * - Add control flags
  * - Croc: has a bug somewhere that never allows it to trip the ENDI opcode.
  *   Snippet of interest is:
@@ -127,6 +130,7 @@ const device_type SCUDSP = &device_creator<scudsp_cpu_device>;
 
 
 #define FLAGS_MASK 0x06ff8000
+#define INSTA_DMA 1
 
 #define scudsp_readop(A) m_program->read_dword(A << 2)
 #define scudsp_writeop(A, B) m_program->write_dword(A << 2, B)
@@ -678,6 +682,53 @@ void scudsp_cpu_device::scudsp_dma( UINT32 opcode )
 	m_dma.update = ( hold == 0 );
 	m_dma.ex = 1;
 	m_dma.count = 0;
+	/* HACK ALERT: It looks like that scheduling craps out the m_dma parameters, why this happens I don't know ... */
+	#if INSTA_DMA
+	{
+		UINT32 data;
+		if ( m_dma.dir == 0 )
+		{
+			for(m_dma.count = 0;m_dma.count < m_dma.size; m_dma.count++)
+			{
+				data = (m_in_dma_func(m_dma.src)<<16) | m_in_dma_func(m_dma.src+2);
+				scudsp_set_dest_dma_mem( m_dma.dst, data, m_dma.count );
+
+				m_dma.src += m_dma.add;
+
+				if ( m_dma.update )
+				{
+					m_ra0 += ((1 * m_dma.add) >> 2);
+				}
+			}
+		}
+		else
+		{
+			for(m_dma.count = 0;m_dma.count < m_dma.size; m_dma.count++)
+			{
+				data = scudsp_get_mem_source_dma( m_dma.src, m_dma.count );
+
+				m_out_dma_func(m_dma.dst, data >> 16 );
+				m_out_dma_func(m_dma.dst+2, data & 0xffff );
+
+				m_dma.dst += m_dma.add;
+
+				if ( m_dma.update )
+				{
+					m_wa0 += ((1 * m_dma.add) >> 2);
+				}
+			}
+		}
+
+		//if(m_dma.count >= m_dma.size)
+		{
+			m_dma.ex = 0;
+			T0F_0;
+		}
+
+		m_icount -= m_dma.size;
+	}
+	#endif
+
 
 	//printf("SRC %08x DST %08x SIZE %08x UPDATE %08x DIR %08x ADD %08x\n",m_dma.src,m_dma.dst,m_dma.size,m_dma.update,m_dma.dir,m_dma.add);
 
@@ -754,7 +805,7 @@ void scudsp_cpu_device::scudsp_exec_dma()
 	if ( m_dma.dir == 0 )
 	{
 		data = (m_in_dma_func(m_dma.src)<<16) | m_in_dma_func(m_dma.src+2);
-		scudsp_set_dest_dma_mem( m_dma.dst, data, m_dma.count++ );
+		scudsp_set_dest_dma_mem( m_dma.dst, data, m_dma.count );
 
 		m_dma.src += m_dma.add;
 
@@ -765,7 +816,7 @@ void scudsp_cpu_device::scudsp_exec_dma()
 	}
 	else
 	{
-		data = scudsp_get_mem_source_dma( m_dma.src, m_dma.count++ );
+		data = scudsp_get_mem_source_dma( m_dma.src, m_dma.count );
 
 		m_out_dma_func(m_dma.dst, data >> 16 );
 		m_out_dma_func(m_dma.dst+2, data & 0xffff );
@@ -778,9 +829,8 @@ void scudsp_cpu_device::scudsp_exec_dma()
 		}
 	}
 
-	m_dma.size--;
-
-	if(m_dma.size == 0)
+	m_dma.count++;
+	if(m_dma.count >= m_dma.size)
 	{
 		m_dma.ex = 0;
 		T0F_0;
@@ -798,15 +848,15 @@ void scudsp_cpu_device::execute_run()
 	{
 		m_update_mul = 0;
 
+		debugger_instruction_hook(this, m_pc);
+
 		if ( m_delay )
 		{
-			debugger_instruction_hook(this, m_delay);
 			opcode = scudsp_readop(m_delay);
 			m_delay = 0;
 		}
 		else
 		{
-			debugger_instruction_hook(this, m_pc);
 			opcode = scudsp_readop(m_pc);
 			m_pc++;
 		}
@@ -907,6 +957,10 @@ void scudsp_cpu_device::device_start()
 	save_item(NAME(m_acl.ui));
 	save_item(NAME(m_ra0));
 	save_item(NAME(m_wa0));
+
+	save_item(NAME(m_dma.src));
+	save_item(NAME(m_dma.dst));
+	save_item(NAME(m_dma.size));
 
 	// Register state for debugger
 	state_add( SCUDSP_PC, "PC", m_pc ).formatstr("%02X");

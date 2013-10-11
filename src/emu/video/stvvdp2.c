@@ -6346,7 +6346,7 @@ int saturn_state::get_window_pixel(int s_x,int e_x,int s_y,int e_y,int x, int y,
 	return res;
 }
 
-int saturn_state::stv_vdp2_window_process(int x,int y)
+inline int saturn_state::stv_vdp2_window_process(int x,int y)
 {
 	int s_x=0,e_x=0,s_y=0,e_y=0;
 	int w0_pix, w1_pix;

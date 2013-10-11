@@ -686,8 +686,6 @@ static void dsp_dma( address_space &space )
 		dest &= 0x07ffffff;
 		transfer_cnt &= 0xff;
 
-		printf("[DSP DMA] SRC = %08x | DEST = %08x | SIZE = %08x | ADD VALUE = %08x\n",source,dest,transfer_cnt,add);
-
 #if DEBUG_DSP
 		fprintf( log_file, "/*DSP DMA D0,[RAM%d],%d add=%d*/\n", dsp_mem, transfer_cnt, add );
 #endif
@@ -730,7 +728,7 @@ static void dsp_dma( address_space &space )
 		source &= 0x07ffffff;
 		dest &= 0x07ffffff;
 		transfer_cnt &= 0xff;
-		printf("[DSP DMA] SRC = %08x | DEST = %08x | SIZE = %08x | ADD VALUE = %08x\n",source,dest,transfer_cnt,add);
+		//logerror("[DSP DMA] SRC = %08x | DEST = %08x | SIZE = %08x | ADD VALUE = %08x\n",source,dest,transfer_cnt,add);
 
 #if DEBUG_DSP
 		fprintf( log_file, "/*DSP DMA [RAM%d],D0,%d\tadd=%d,source=%08X*/\n", dsp_mem, transfer_cnt, add, source );

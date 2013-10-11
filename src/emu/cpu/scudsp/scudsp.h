@@ -127,7 +127,7 @@ private:
 	struct{
 		UINT32 src, dst;
 		UINT16 add;
-		UINT8 size, update, ex, dir, count;
+		UINT16 size, update, ex, dir, count;
 	}m_dma;
 	address_space *m_program;
 	address_space *m_data;

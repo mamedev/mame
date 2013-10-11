@@ -4,22 +4,22 @@
 
 static const char *const ALU_Commands[] =
 {
-	"",     /* 0000 */
-	"AND",  /* 0001 */
-	"OR",   /* 0010 */
-	"XOR",  /* 0011 */
-	"ADD",  /* 0100 */
-	"SUB",  /* 0101 */
-	"AD2",  /* 0110 */
-	"???",  /* 0111 */
-	"SR",   /* 1000 */
-	"RR",   /* 1001 */
-	"SL",   /* 1010 */
-	"RL",   /* 1011 */
-	"???",  /* 1100 */
-	"???",  /* 1101 */
-	"???",  /* 1110 */
-	"RL8",  /* 1111 */
+	"    ",     /* 0000 */
+	"AND ",  /* 0001 */
+	"OR  ",   /* 0010 */
+	"XOR ",  /* 0011 */
+	"ADD ",  /* 0100 */
+	"SUB ",  /* 0101 */
+	"AD2 ",  /* 0110 */
+	"ALU?",  /* 0111 */
+	"SR  ",   /* 1000 */
+	"RR  ",   /* 1001 */
+	"SL  ",   /* 1010 */
+	"RL  ",   /* 1011 */
+	"ALU?",  /* 1100 */
+	"ALU?",  /* 1101 */
+	"ALU?",  /* 1110 */
+	"RL8 ",  /* 1111 */
 };
 
 static const char *const X_Commands[] =
@@ -254,7 +254,7 @@ CPU_DISASSEMBLE( scudsp )
 			}
 
 			/* ALU */
-			sprintf(my_buffer, "%-10s", ALU_Commands[ (op & 0x3c000000) >> 26] );
+			sprintf(my_buffer, "%s", ALU_Commands[ (op & 0x3c000000) >> 26] );
 			my_buffer += strlen( my_buffer );
 
 			/* X-Bus */
@@ -267,11 +267,11 @@ CPU_DISASSEMBLE( scudsp )
 			{
 				*temp_buffer = 0;
 			}
-			sprintf( my_buffer, "%-10s", temp_buffer );
+			sprintf( my_buffer, "%s", temp_buffer );
 			my_buffer += strlen( my_buffer );
 
 			scudsp_dasm_prefix( X_Commands[ (op & 0x1800000) >> 23 ], temp_buffer,  data );
-			sprintf( my_buffer, "%-10s", temp_buffer );
+			sprintf( my_buffer, "%s", temp_buffer );
 			my_buffer += strlen( my_buffer );
 
 			data[0] = (op & 0x1C000 ) >> 14 ;
@@ -283,11 +283,11 @@ CPU_DISASSEMBLE( scudsp )
 			{
 				*temp_buffer = 0;
 			}
-			sprintf( my_buffer, "%-8s", temp_buffer );
+			sprintf( my_buffer, "%s", temp_buffer );
 			my_buffer += strlen( my_buffer );
 
 			scudsp_dasm_prefix( Y_Commands[ (op & 0x60000) >> 17 ], temp_buffer,  data );
-			sprintf( my_buffer, "%-8s", temp_buffer );
+			sprintf( my_buffer, "%s", temp_buffer );
 			my_buffer += strlen( my_buffer );
 
 			/* D1-Bus */
@@ -304,7 +304,7 @@ CPU_DISASSEMBLE( scudsp )
 			}
 
 			scudsp_dasm_prefix( D1_Commands[ (op & 0x3000) >> 12 ], temp_buffer, data );
-			sprintf( my_buffer, "%-8s", temp_buffer );
+			sprintf( my_buffer, "%s", temp_buffer );
 			break;
 		case 2:
 			if ( (op & 0x2000000) )

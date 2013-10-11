@@ -314,7 +314,7 @@ public:
 	int get_ystep_count( void );
 
 	void refresh_palette_data( void );
-	int stv_vdp2_window_process(int x,int y);
+	inline int stv_vdp2_window_process(int x,int y);
 	void stv_vdp2_get_window0_coordinates(int *s_x, int *e_x, int *s_y, int *e_y);
 	void stv_vdp2_get_window1_coordinates(int *s_x, int *e_x, int *s_y, int *e_y);
 	int get_window_pixel(int s_x,int e_x,int s_y,int e_y,int x, int y,UINT8 win_num);
