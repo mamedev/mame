@@ -428,9 +428,41 @@ DRIVER_INIT_MEMBER(wallc_state,sidam)
 	UINT32 i;
 
 	UINT8 *ROM = memregion("maincpu")->base();
+	int count = 0;
 
 	for (i=0; i<0x2000; i++)
 	{
+
+		switch (i & 0x4a)  // A1, A3, A6
+		{
+			case 0x00:
+				logerror("%02x ", ROM[i]);
+				count++;
+				break;
+			case 0x02:
+				break;
+			case 0x08:
+				break;
+			case 0x0a:
+				break;
+			case 0x40:
+				break;
+			case 0x42:
+				break;
+			case 0x48:
+				break;
+			case 0x4a:
+				break;
+		}
+
+
+		
+		if (count==16)
+		{
+			count = 0;
+			logerror("\n");
+		}
+
 		c = ROM[ i ] ^ 0x0f; 
 		ROM[ i ] = c;
 	}
