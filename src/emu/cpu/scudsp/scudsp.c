@@ -784,10 +784,10 @@ void scudsp_cpu_device::scudsp_end(UINT32 opcode)
 	if(opcode & 0x08000000)
 	{
 		/*ENDI*/
+		EF_1;
 		m_out_irq_func(1);
 	}
 
-	EF_1; // ok?
 	EXF_0; /* END / ENDI */
 	set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_icount -= 1;
