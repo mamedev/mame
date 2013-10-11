@@ -49,8 +49,8 @@
 *    * pins OP0 and OP2 are connected to the primary serial port:
 *      * OP0 is RTS
 *      * OP2 is DTR
-*  * Figure out why the v1.8 dectalk firmware clips/screeches like hell (it may just require the older dsp code to work properly)
-*  * Figure out why the older -165/-166 and newer -409/-410 tms32010 dsp firmwares don't produce any sound, while the middle -204/-205 one does (maybe an issue with the fifo and semaphore bits implementations?)
+*  * <DONE> Figure out why the v1.8 dectalk firmware clips/screeches like hell (it requires the older dsp code to work properly)
+*  * <DONE> Figure out why the older -165/-166 and newer -409/-410 tms32010 dsp firmwares don't produce any sound, while the middle -204/-205 one does (fifo implementations were busted)
 *  * <DONE> Actually store the X2212 nvram's eeprom data to disk rather than throwing it out on exit
 *    * Get setup mode with the serial BREAK int working enough to actually properly save the default nvram back to the chip in emulation, and get rid of the (currently unused) nvram default image in the rom definitions
 *  * emulate/simulate the MT8060 dtmf decoder as a 16-key input device? or hook it to some simple fft code? Francois Javier's fftmorse code ran full speed on a 6mhz 80286, maybe use that?
