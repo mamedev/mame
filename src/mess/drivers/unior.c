@@ -14,7 +14,7 @@ key; using spacebar and the correct parameters is enough.
 
 Monitor commands:
 C
-D
+D - hex dump
 E - save
 F
 G
@@ -35,6 +35,7 @@ ToDo:
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "machine/i8255.h"
 #include "machine/8257dma.h"
 #include "video/i8275.h"
 
@@ -49,10 +50,14 @@ public:
 	{ }
 
 	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_WRITE8_MEMBER(unior_4c_w);
-	DECLARE_READ8_MEMBER(unior_4c_r);
-	DECLARE_READ8_MEMBER(unior_4d_r);
 	DECLARE_WRITE8_MEMBER(unior_50_w);
+	DECLARE_READ8_MEMBER(ppi0_b_r);
+	DECLARE_WRITE8_MEMBER(ppi0_b_w);
+	DECLARE_READ8_MEMBER(ppi1_a_r);
+	DECLARE_READ8_MEMBER(ppi1_b_r);
+	DECLARE_READ8_MEMBER(ppi1_c_r);
+	DECLARE_WRITE8_MEMBER(ppi1_a_w);
+	DECLARE_WRITE8_MEMBER(ppi1_c_w);
 	DECLARE_WRITE8_MEMBER(cpu_status_callback);
 	DECLARE_PALETTE_INIT(unior);
 	DECLARE_READ8_MEMBER(dma_r);
@@ -60,34 +65,19 @@ public:
 	UINT8 *m_p_chargen;
 private:
 	UINT8 m_4c;
+	UINT8 m_4e;
 	virtual void machine_reset();
 	virtual void video_start();
 	required_device<cpu_device> m_maincpu;
 	required_device<i8257_device> m_dma;
 };
 
-READ8_MEMBER( unior_state::unior_4c_r )
-{
-	return m_4c;
-}
-
-READ8_MEMBER( unior_state::unior_4d_r )
-{
-	char kbdrow[6];
-	sprintf(kbdrow,"X%X", m_4c&15);
-	return ioport(kbdrow)->read();
-}
-
-WRITE8_MEMBER( unior_state::unior_4c_w )
-{
-	m_4c = data;
-}
-
 WRITE8_MEMBER( unior_state::vram_w )
 {
 	m_p_vram[offset] = data;
 }
 
+// pulses a 1 to scroll
 WRITE8_MEMBER( unior_state::unior_50_w )
 {
 	if (data)
@@ -104,10 +94,8 @@ static ADDRESS_MAP_START( unior_io, AS_IO, 8, unior_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x30, 0x38) AM_DEVREADWRITE("dma", i8257_device, i8257_r, i8257_w) // dma data
-	AM_RANGE(0x3c, 0x3f) AM_NOP // cassette player control
-	AM_RANGE(0x4c, 0x4c) AM_READWRITE(unior_4c_r,unior_4c_w)
-	AM_RANGE(0x4d, 0x4d) AM_READ(unior_4d_r)
-	AM_RANGE(0x4e, 0x4f) AM_NOP // possibly the control ports of a PIO
+	AM_RANGE(0x3c, 0x3f) AM_DEVREADWRITE("ppi0", i8255_device, read, write) // cassette player control
+	AM_RANGE(0x4c, 0x4f) AM_DEVREADWRITE("ppi1", i8255_device, read, write)
 	AM_RANGE(0x50, 0x50) AM_WRITE(unior_50_w)
 	AM_RANGE(0x60, 0x61) AM_DEVREADWRITE("crtc", i8275_device, read, write)
 	AM_RANGE(0xdc, 0xdf) AM_NOP // timer chip + beeper
@@ -299,6 +287,72 @@ PALETTE_INIT_MEMBER(unior_state,unior)
 	palette_set_colors(machine(), 0, unior_palette, ARRAY_LENGTH(unior_palette));
 }
 
+READ8_MEMBER( unior_state::ppi0_b_r )
+{
+	return 0;
+}
+
+WRITE8_MEMBER( unior_state::ppi0_b_w )
+{
+}
+
+// ports a & c connect to an external slot
+static I8255A_INTERFACE( ppi0_intf )
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(unior_state, ppi0_b_r),
+	DEVCB_DRIVER_MEMBER(unior_state, ppi0_b_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
+};
+
+READ8_MEMBER( unior_state::ppi1_a_r )
+{
+	return m_4c;
+}
+
+READ8_MEMBER( unior_state::ppi1_b_r )
+{
+	char kbdrow[6];
+	sprintf(kbdrow,"X%X", m_4c&15);
+	return ioport(kbdrow)->read();
+}
+
+READ8_MEMBER( unior_state::ppi1_c_r )
+{
+	return m_4e;
+}
+
+WRITE8_MEMBER( unior_state::ppi1_a_w )
+{
+	m_4c = data;
+}
+
+/*
+d0,1,2 = connect to what might be a 74LS138, then to an external slot
+d4 = unknown
+d5 = unknown
+d6 = connect to A7 of the palette prom
+d7 = not used
+*/
+WRITE8_MEMBER( unior_state::ppi1_c_w )
+{
+	m_4e = data;
+}
+
+// ports a & b are for the keyboard
+// port c operates various control lines for mostly unknown purposes
+static I8255A_INTERFACE( ppi1_intf )
+{
+	DEVCB_DRIVER_MEMBER(unior_state, ppi1_a_r),
+	DEVCB_DRIVER_MEMBER(unior_state, ppi1_a_w),
+	DEVCB_DRIVER_MEMBER(unior_state, ppi1_b_r),
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(unior_state, ppi1_c_r),
+	DEVCB_DRIVER_MEMBER(unior_state, ppi1_c_w),
+};
+
 READ8_MEMBER(unior_state::dma_r)
 {
 	if (offset < 0xf800)
@@ -341,6 +395,8 @@ static MACHINE_CONFIG_START( unior, unior_state )
 	MCFG_PALETTE_LENGTH(3)
 	MCFG_PALETTE_INIT_OVERRIDE(unior_state,unior)
 
+	MCFG_I8255_ADD( "ppi0", ppi0_intf )
+	MCFG_I8255_ADD( "ppi1", ppi1_intf )
 	MCFG_I8257_ADD("dma", XTAL_20MHz / 9, i8257_intf) // unknown clock
 	MCFG_I8275_ADD("crtc", i8275_intf)
 MACHINE_CONFIG_END
