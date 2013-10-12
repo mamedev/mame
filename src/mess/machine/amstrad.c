@@ -953,8 +953,7 @@ WRITE_LINE_MEMBER(amstrad_state::amstrad_plus_hsync_changed)
 			}
 			// CPC+/GX4000 DMA channels
 			amstrad_plus_handle_dma();  // a DMA command is handled at the leading edge of HSYNC (every 64us)
-			if(m_asic.de_start != 0)
-				m_asic.vpos++;
+			m_asic.vpos++;
 		}
 	}
 	m_gate_array.hsync = state ? 1 : 0;
@@ -972,7 +971,6 @@ WRITE_LINE_MEMBER(amstrad_state::amstrad_vsync_changed)
 
 		/* Start of new frame */
 		m_gate_array.y = -1;
-		m_asic.vpos = 1;
 		m_asic.de_start = 0;
 	}
 
@@ -994,7 +992,6 @@ WRITE_LINE_MEMBER(amstrad_state::amstrad_plus_vsync_changed)
 
 		/* Start of new frame */
 		m_gate_array.y = -1;
-		m_asic.vpos = 1;
 		m_asic.de_start = 0;
 	}
 
@@ -1014,9 +1011,12 @@ WRITE_LINE_MEMBER(amstrad_state::amstrad_de_changed)
 		/* DE became active, store the starting MA and RA signals */
 		mc6845_device *mc6845 = m_crtc;
 
+		if(m_asic.de_start == 0)
+			m_asic.vpos = 1;
+
 		m_gate_array.ma = mc6845->get_ma();
 		m_gate_array.ra = mc6845->get_ra();
-logerror("y = %d; ma = %02x; ra = %02x, address = %04x\n", m_gate_array.y, m_gate_array.ma, m_gate_array.ra, ( ( m_gate_array.ma & 0x3000 ) << 2 ) | ( ( m_gate_array.ra & 0x07 ) << 11 ) | ( ( m_gate_array.ma & 0x3ff ) << 1 ) );
+//logerror("y = %d; ma = %02x; ra = %02x, address = %04x\n", m_gate_array.y, m_gate_array.ma, m_gate_array.ra, ( ( m_gate_array.ma & 0x3000 ) << 2 ) | ( ( m_gate_array.ra & 0x07 ) << 11 ) | ( ( m_gate_array.ma & 0x3ff ) << 1 ) );
 		amstrad_gate_array_get_video_data();
 		m_asic.de_start = 1;
 	}
@@ -1035,6 +1035,8 @@ WRITE_LINE_MEMBER(amstrad_state::amstrad_plus_de_changed)
 		m_gate_array.ma = m_crtc->get_ma();
 		m_gate_array.ra = m_crtc->get_ra();
 		m_asic.h_start = m_gate_array.line_ticks;
+		if(m_asic.de_start == 0)
+			m_asic.vpos = 1;
 		m_asic.de_start = 1;
 
 		/* Start of screen */
@@ -1426,7 +1428,7 @@ WRITE8_MEMBER(amstrad_state::amstrad_plus_asic_6000_w)
 		}
 		if(offset == 0x0800)  // Programmable raster interrupt
 		{
-	//      logerror("ASIC: Wrote %02x to PRI\n",data);
+	     // logerror("ASIC: Wrote %02x to PRI\n",data);
 			m_asic.pri = data;
 		}
 		if(offset >= 0x0801 && offset <= 0x0803)  // Split screen registers
@@ -2570,7 +2572,7 @@ READ8_MEMBER(amstrad_state::amstrad_ppi_portb_r)
 			data |= 0x02;
 	}
 
-logerror("amstrad_ppi_portb_r\n");
+//logerror("amstrad_ppi_portb_r\n");
 	/* Schedule a write to PC2 */
 	timer_set(attotime::zero, TIMER_PC2_LOW);
 
