@@ -29451,6 +29451,29 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
+  <software name="tbolt2">
+		<description>Thunderbolt II (Unl)</description>
+		<year>199?</year>
+		<publisher>Sun Green</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_smouse"/>
+			<dataarea name="rom" size="524288">
+				<rom name="thunderbolt ii.bin" size="524288" crc="d5fcc49f" sha1="3dca68795b6c9a16cafa5e71218d5ce83aa465fc" offset="0x000000" loadflag="load16_word_swap"/>
+			</dataarea>
+		</part>
+	</software>
+    
+   <software name="tbolt2p" cloneof="tbolt2">
+		<description>Thunderbolt II (Unl, Cracked)</description>
+		<year>199?</year>
+		<publisher>Sun Green</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="thunderbolt ii (cracked).bin" size="524288" crc="a2ef16de" sha1="3c8a2a3324b7560d6e62e650bafc34a55af858ae" offset="0x000000" loadflag="load16_word_swap"/>
+			</dataarea>
+		</part>
+	</software> 
+  
 	<software name="topfight">
 		<description>Top Fighter 2000 MK VIII</description>
 		<year>199?</year>
