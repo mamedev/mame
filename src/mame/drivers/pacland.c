@@ -161,14 +161,30 @@ Notes:
 
 Notes:
 -----
-- Is there a service mode Easter egg? Maybe with this game they stopped putting
-  them in, because I haven't found them in the later games either (skykid,
-  drgnbstr, etc.)
 
 - Sprites cover the top and bottom non-scrolling portions of the fg. This
   includes the cookie cut light in round 19, which makes text disappear from
   those areas. This looks odd, but it's the correct behaviour verified on the
   real hardware.
+
+- There is an Easter egg in the service mode:
+  1) Go into the service mode
+  2) Press left or right to change the sound effect until it's $18
+  3) Press the service button to display the screen calibration test grid
+  4) Press right 4 times
+  5) Press left once
+  6) Press right twice
+  7) Press left 6 times
+  8) Press jump
+
+- There's a minor Easter egg in the high score name entry routine.
+  If you enter your name as one of the following then the name will
+  flash red and yellow for 12.8 seconds when you finish entering it:
+
+  KISSY
+  YURI.
+  NEGIE
+  S#TOU (# is the small ghost sprite)
 
 ***************************************************************************/
 
@@ -410,11 +426,11 @@ INTERRUPT_GEN_MEMBER(pacland_state::mcu_vblank_irq)
 static MACHINE_CONFIG_START( pacland, pacland_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, 49152000/32) /* 1.536 MHz */
+	MCFG_CPU_ADD("maincpu", M6809, XTAL_49_152MHz/32) /* 1.536 MHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pacland_state,  main_vblank_irq)
 
-	MCFG_CPU_ADD("mcu", HD63701, 49152000/8)    /* 1.536 MHz? */
+	MCFG_CPU_ADD("mcu", HD63701, XTAL_49_152MHz/8) /* 6.144 MHz? */
 	MCFG_CPU_PROGRAM_MAP(mcu_map)
 	MCFG_CPU_IO_MAP(mcu_port_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pacland_state,  mcu_vblank_irq)
@@ -432,11 +448,10 @@ static MACHINE_CONFIG_START( pacland, pacland_state )
 	MCFG_GFXDECODE(pacland)
 	MCFG_PALETTE_LENGTH(256*4+256*4+64*16)
 
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("namco", NAMCO_CUS30, 49152000/2/1024)
+	MCFG_SOUND_ADD("namco", NAMCO_CUS30, XTAL_49_152MHz/2/1024)
 	MCFG_SOUND_CONFIG(namco_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
