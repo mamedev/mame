@@ -70,9 +70,28 @@ enum input_changed_enum
 static NETLIST_START(pong_schematics)
 	NETDEV_TTL_CONST(high, 1)
 	NETDEV_TTL_CONST(low, 0)
+#if 1
+#if 0
+	/* this is the clock circuit in schematics. */
+	NETDEV_MAINCLOCK(xclk)
+	//NETDEV_CLOCK(clk)
+	NETDEV_PARAM(xclk.FREQ, 7159000.0*2)
+	TTL_74107(ic_f6a, xclk, high, high, high)
+	NET_ALIAS(clk, ic_f6a.Q)
+#else
+	/* abstracting this, performance increases by 80%
+	 * No surprise, the clock is extremely expensive */
 	NETDEV_MAINCLOCK(clk)
 	//NETDEV_CLOCK(clk)
 	NETDEV_PARAM(clk.FREQ, 7159000.0)
+#endif
+#else
+	// benchmarking ...
+	NETDEV_TTL_CONST(clk, 0)
+	NETDEV_MAINCLOCK(xclk)
+	NETDEV_PARAM(xclk.FREQ, 7159000.0*2)
+#endif
+
 	NETDEV_LOGIC_INPUT(SRST)
 	NETDEV_ANALOG_INPUT(P1)
 	NETDEV_ANALOG_INPUT(P2)
@@ -179,6 +198,9 @@ static NETLIST_START(pong_schematics)
 	TTL_7400_NAND(ic_e1c, ic_f1.QC, ic_f1.QD)
 	TTL_7493(ic_f1, ic_e1d.Q, ic_f1.QA, rstspeed, rstspeed)
 
+	//NETDEV_LOG(LOG2, ic_f1.QC)
+	//NETDEV_LOG(LOG3, ic_f1.QD)
+
 	TTL_7402_NOR(ic_g1d, ic_f1.QC, ic_f1.QD)
 	TTL_7400_NAND(ic_h1a, ic_g1d.Q, ic_g1d.Q)
 	TTL_7400_NAND(ic_h1d, ic_e1c.Q, ic_h1a.Q)
@@ -189,12 +211,19 @@ static NETLIST_START(pong_schematics)
 
 	TTL_74107(ic_h2a, ic_g1c.Q, ic_h2b.Q, low, ic_h1b.Q)
 	TTL_74107(ic_h2b, ic_g1c.Q, high, move, ic_h1c.Q)
+
+	//NETDEV_LOG(LOG2, ic_h2a)
+	//NETDEV_LOG(LOG3, ic_h2b)
+
+
 	TTL_7400_NAND(ic_h4a, ic_h2b.Q, ic_h2a.Q)
 	NET_ALIAS(move, ic_h4a.Q)
 
 	TTL_7400_NAND(ic_c1d, SC, attract)
 	TTL_7404_INVERT(ic_d1a, ic_c1d.Q)
 	TTL_7474(ic_h3b, ic_d1a.Q, ic_h3b.QQ, hit1Q, hit2Q)
+
+	//NETDEV_LOG(LOG1, move)
 
 	TTL_7400_NAND(ic_h4d, ic_h3b.Q, move)
 	TTL_7400_NAND(ic_h4b, ic_h3b.QQ, move)
@@ -374,8 +403,8 @@ static NETLIST_START(pong_schematics)
 	TTL_7427_NOR(ic_e5c, ic_e4b.Q, 8H, 4H)
 	NET_ALIAS(scoreFE, ic_e5c.Q)
 
-	//TTL_7400_NAND(ic_c3d, 8H, 4H)
-	TTL_7400_NAND(ic_c3d, 4H, 8H)
+	TTL_7400_NAND(ic_c3d, 8H, 4H)
+	//TTL_7400_NAND(ic_c3d, 4H, 8H)
 	TTL_7402_NOR(ic_d2b, ic_e4b.Q, ic_c3d.Q)
 	NET_ALIAS(scoreBC, ic_d2b.Q)
 
@@ -418,7 +447,6 @@ static NETLIST_START(pong_schematics)
 	NETDEV_PARAM(videomix.R1, RES_K(1))
 	NETDEV_PARAM(videomix.R2, RES_K(1.2))
 	NETDEV_PARAM(videomix.R3, RES_K(22))
-
 NETLIST_END
 
 static NETLIST_START(pong)
@@ -513,6 +541,8 @@ private:
 		const netlist_time vsync_min_time = netlist_time::from_us(50); /* usec */
 		const int vsync_min_pulses = 4;
 
+		bitmap_rgb32 *bm = m_bitmap[m_cur_bm];
+
 		UINT64 clocks = m_maincpu->total_cycles(); // m_maincpu->attotime_to_cycles(m_maincpu->local_time());
 		int pw = NETLIST_CLOCK / ((UINT64)MASTER_CLOCK) / HRES_MULT;
 		netlist_time time = clock_period * (clocks - m_last_clock);
@@ -520,19 +550,19 @@ private:
 		//UINT64 clocks = m_maincpu->netlist().time().as_raw() >> 10; // m_maincpu->attotime_to_cycles(m_maincpu->local_time());
 		//int pw = (NETLIST_INTERNAL_CLOCK / ((UINT64)MASTER_CLOCK) / HRES_MULT) >> 8;
 
-		if (m_last_y < m_bitmap->height())
+		if (m_last_y < bm->height())
 		{
 			int colv = (int) (m_vid / 3.5 * 255.0);
 			rgb_t col = MAKE_RGB(colv, colv, colv);
 			int pixels = (clocks - m_line_clock) / pw;
 
-			while (pixels >= m_bitmap->width())
+			while (pixels >= bm->width())
 			{
-				m_bitmap->plot_box(m_last_x, m_last_y, m_bitmap->width() - 1 - m_last_x, 1, col);
-				pixels -= m_bitmap->width();
+				bm->plot_box(m_last_x, m_last_y, bm->width() - 1 - m_last_x, 1, col);
+				pixels -= bm->width();
 				m_last_x = 0;
 			}
-			m_bitmap->plot_box(m_last_x, m_last_y, pixels - m_last_x, 1, col);
+			bm->plot_box(m_last_x, m_last_y, pixels - m_last_x, 1, col);
 			m_last_x = pixels;
 		}
 		if (m_vid <= 0.34)
@@ -544,6 +574,8 @@ private:
 				{
 					m_vsync_cnt = 0;
 					m_last_y = 0;
+					// toggle bitmap
+					m_cur_bm ^= 1;
 					attoseconds_t new_refresh = DOUBLE_TO_ATTOSECONDS((double) (clocks - m_vsync_clock) / (double) NETLIST_CLOCK);
 					if (new_refresh != m_refresh)
 					{
@@ -575,12 +607,15 @@ private:
 	UINT64 m_vsync_clock;
 	attoseconds_t m_refresh;
 	int m_vsync_cnt;
-	bitmap_rgb32 *m_bitmap;
+	bitmap_rgb32 *m_bitmap[2];
+	int m_cur_bm;
 };
 
 void pong_state::machine_start()
 {
-	m_bitmap = auto_bitmap_rgb32_alloc(machine(),H_TOTAL * HRES_MULT,V_TOTAL);
+	m_bitmap[0] = auto_bitmap_rgb32_alloc(machine(),H_TOTAL * HRES_MULT,V_TOTAL);
+	m_bitmap[1] = auto_bitmap_rgb32_alloc(machine(),H_TOTAL * HRES_MULT,V_TOTAL);
+	m_cur_bm = 0;
 
 	m_maincpu->setup().register_callback("sound_cb", net_output_delegate(&pong_state::sound_cb, "pong_state::sound_cb", this));
 	m_maincpu->setup().register_callback("video_cb", net_output_delegate(&pong_state::video_cb, "pong_state::video_cb", this));
@@ -599,7 +634,7 @@ void pong_state::video_start()
 
 UINT32 pong_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
-	copybitmap(bitmap, *m_bitmap, 0, 0, 0, 0, cliprect);
+	copybitmap(bitmap, *m_bitmap[!m_cur_bm], 0, 0, 0, 0, cliprect);
 	//m_bitmap->fill(MAKE_RGB(0,0,0));
 	return 0;
 }
@@ -631,8 +666,8 @@ INPUT_CHANGED_MEMBER(pong_state::input_changed)
 		double pad = vA + (vB - vA)*PRE_R / (Req + PRE_R);
 		switch (numpad)
 		{
-		case IC_PADDLE1:    m_p_V0->setToPS(pad, NLTIME_FROM_NS(0)); break;
-		case IC_PADDLE2:    m_p_V1->setToPS(pad, NLTIME_FROM_NS(0)); break;
+		case IC_PADDLE1:    m_p_V0->setTo(pad, NLTIME_FROM_NS(0)); break;
+		case IC_PADDLE2:    m_p_V1->setTo(pad, NLTIME_FROM_NS(0)); break;
 		}
 		printf("%d %f\n", newval, (float) pad);
 		break;

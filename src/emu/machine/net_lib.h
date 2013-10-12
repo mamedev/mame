@@ -50,11 +50,15 @@
 
 #include "netlist.h"
 
+// this is a bad hack
+
+#define USE_OLD7493	(1)
+
 // ----------------------------------------------------------------------------------------
 // Special chips
 // ----------------------------------------------------------------------------------------
 
-#define NETDEV_MAINCLOCK(_name)                                                         \
+#define NETDEV_MAINCLOCK(_name)                                                     \
 		NET_REGISTER_DEV(netdev_mainclock, _name)
 #define NETDEV_CLOCK(_name)                                                         \
 		NET_REGISTER_DEV(netdev_clock, _name)
@@ -77,6 +81,11 @@
 		NET_REGISTER_DEV(nicRSFF, _name)                                            \
 		NET_CONNECT(_name, S, _S)                                                   \
 		NET_CONNECT(_name, R, _R)
+
+#define NETDEV_LOG(_name, _I)  	                                                    \
+		NET_REGISTER_DEV(netdev_log, _name)											\
+		NET_CONNECT(_name, I, _I)
+
 
 // ----------------------------------------------------------------------------------------
 // TTL Logic chips
@@ -213,6 +222,7 @@
 		NET_CONNECT(_name, I1, _I1)                                                 \
 		NET_CONNECT(_name, I2, _I2)                                                 \
 		NET_CONNECT(_name, I3, _I3)
+
 // ----------------------------------------------------------------------------------------
 // Special support devices ...
 // ----------------------------------------------------------------------------------------
@@ -225,7 +235,9 @@ NETLIB_DEVICE(netdev_analog_input,
 	analog_output_t m_Q;
 );
 
-
+NETLIB_DEVICE(netdev_log,
+	ttl_input_t m_I;
+);
 
 
 // ----------------------------------------------------------------------------------------
@@ -295,13 +307,13 @@ NETLIB_DEVICE_WITH_PARAMS(nicNE555N_MSTABLE,
 	net_param_t m_VL;
 );
 
-NETLIB_SIGNAL(nic7400, 2, 0)
-NETLIB_SIGNAL(nic7402, 2, 1)
-NETLIB_SIGNAL(nic7410, 3, 0)
-NETLIB_SIGNAL(nic7420, 4, 0)
-NETLIB_SIGNAL(nic7425, 4, 1)
-NETLIB_SIGNAL(nic7427, 3, 1)
-NETLIB_SIGNAL(nic7430, 8, 0)
+NETLIB_SIGNAL(nic7400, 2, 0, 0)
+NETLIB_SIGNAL(nic7402, 2, 1, 0)
+NETLIB_SIGNAL(nic7410, 3, 0, 0)
+NETLIB_SIGNAL(nic7420, 4, 0, 0)
+NETLIB_SIGNAL(nic7425, 4, 1, 0)
+NETLIB_SIGNAL(nic7427, 3, 1, 0)
+NETLIB_SIGNAL(nic7430, 8, 0, 0)
 
 NETLIB_DEVICE(nic7404,
 	ttl_input_t m_I;
@@ -379,14 +391,28 @@ NETLIB_SUBDEVICE(nic7493ff,
 );
 
 NETLIB_DEVICE(nic7493,
-	ttl_input_t m_R1;
-	ttl_input_t m_R2;
+#if !USE_OLD7493
+		ttl_input_t m_R1;
+		ttl_input_t m_R2;
 
 	nic7493ff A;
 	nic7493ff B;
 	nic7493ff C;
 	nic7493ff D;
+#else
+	ttl_input_t m_CLK;
+	ttl_input_t m_CLKB; /* dummy ! */
+	ttl_input_t m_R1;
+	ttl_input_t m_R2;
 
+	ttl_output_t m_QA;
+	ttl_output_t m_QB;
+	ttl_output_t m_QC;
+	ttl_output_t m_QD;
+
+	UINT8 m_cnt;
+	ATTR_HOT void update_outputs();
+#endif
 );
 
 NETLIB_DEVICE(nic7490,
