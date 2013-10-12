@@ -414,7 +414,21 @@ static INPUT_PORTS_START( bbmanwj )
 	PORT_INCLUDE(bbmanw)
 
 	PORT_MODIFY("DSW")
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:5") /* Manual says "NOT USE" */
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:5") /* Manual says "NOT USE" - No Game Title Change */
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0600, 0x0200, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW2:2,3") /* Cabinet type switched around */
+	PORT_DIPSETTING(      0x0600, "2 Player" )
+	PORT_DIPSETTING(      0x0200, "4 Player Separate Coins" )       /* Each player has a separate Coin Slot */
+	PORT_DIPSETTING(      0x0400, "4 Player Shared Coins" )     /* All 4 players Share coin 1&2 */
+	PORT_DIPSETTING(      0x0000, "4 Player 1&2 3&4 Share Coins" )  /* Players 1&2 share coin 1&2, Players 3&4 share coin 3&4 */
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( newapunk )
+	PORT_INCLUDE(bbmanw)
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:5") /* Manual says "NOT USE" - No Game Title Change */
 	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1011,7 +1025,26 @@ ROM_START( bbmanwj )
 	ROM_COPY( "maincpu", 0x7fff0,  0xffff0, 0x10 )  /* start vector */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "bbm2-sp-b.bin", 0x0000, 0x10000, CRC(b8d8108c) SHA1(ef4fb46d843819c273db2083754eb312f5abd44e) )
+	ROM_LOAD( "bbm2-sp-a.33", 0x0000, 0x10000, CRC(a4b0a66e) SHA1(834c809089c7ad424796f3fd0cc6747601af9fb6) ) /* Newer sound CPU code, same sound hardware as bbnanw / newapunk */
+
+	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_LOAD( "bbm2-c0.81",  0x000000, 0x40000, CRC(e7ce058a) SHA1(f2336718ecbce4771f27abcdc4d28fe91c702a9e) )
+	ROM_LOAD( "bbm2-c1.82",  0x080000, 0x40000, CRC(636a78a9) SHA1(98562ea056e5bd36c1a094ae6f267367236d166f) )
+	ROM_LOAD( "bbm2-c2.83",  0x100000, 0x40000, CRC(9ac2142f) SHA1(744fe1acae2fcba0051c303b644081546b4aed9e) )
+	ROM_LOAD( "bbm2-c3.84",  0x180000, 0x40000, CRC(47af1750) SHA1(dce176a6ca95852208b6eba7fb88a0d96467c34b) )
+
+	ROM_REGION( 0x20000, "samples", 0 ) /* samples */
+	ROM_LOAD( "bbm2-v0-b.30",  0x0000, 0x20000, CRC(0ae655ff) SHA1(78752182662fd8f5b55bbbc2787c9f2b04096ea1) )
+ROM_END
+
+ROM_START( bbmanwja )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "bbm2-h0.77",  0x00001, 0x40000, CRC(e1407b91) SHA1(6c94afc6b1d2a469295890ee5dd9d9d5a02ae5c4) )
+	ROM_LOAD16_BYTE( "bbm2-l0.79",  0x00000, 0x40000, CRC(20873b49) SHA1(30ae595f7961cd56f2506608ae76973b2d0e73ca) )
+	ROM_COPY( "maincpu", 0x7fff0,  0xffff0, 0x10 )  /* start vector */
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "bbm2-sp-b.33", 0x0000, 0x10000, CRC(b8d8108c) SHA1(ef4fb46d843819c273db2083754eb312f5abd44e) ) /* Differently mapped sound hardware */
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
 	ROM_LOAD( "bbm2-c0.81",  0x000000, 0x40000, CRC(e7ce058a) SHA1(f2336718ecbce4771f27abcdc4d28fe91c702a9e) )
@@ -1185,18 +1218,19 @@ DRIVER_INIT_MEMBER(m90_state,bomblord)
 
 
 
-GAME( 1991, hasamu,   0,        hasamu,   hasamu, driver_device,   0,        ROT0, "Irem", "Hasamu (Japan)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1991, hasamu,   0,        hasamu,   hasamu,   driver_device, 0,        ROT0, "Irem", "Hasamu (Japan)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1991, dynablst, 0,        bombrman, dynablst, driver_device, 0,        ROT0, "Irem (licensed from Hudson Soft)", "Dynablaster / Bomber Man", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1991, bombrman, dynablst, bombrman, bombrman, driver_device, 0,        ROT0, "Irem (licensed from Hudson Soft)", "Bomber Man (Japan)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1991, atompunk, dynablst, bombrman, atompunk, driver_device, 0,        ROT0, "Irem America (licensed from Hudson Soft)", "Atomic Punk (US)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1991, dynablstb,dynablst, dynablsb, dynablsb, driver_device, 0,        ROT0, "bootleg (Seitu)", "Dynablaster / Bomber Man (bootleg)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1991, dynablstb2,dynablst,dynablsb, dynablsb, driver_device, 0,        ROT0, "bootleg (Seitu)", "Dynablaster / Bomber Man (bootleg, alt)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1992, bbmanw,   0,        bbmanw,   bbmanw, driver_device,   0,        ROT0, "Irem", "Bomber Man World / New Dyna Blaster - Global Quest", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1992, bbmanwj,  bbmanw,   bbmanwj,  bbmanwj, driver_device,  0,        ROT0, "Irem", "Bomber Man World (Japan)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1992, newapunk, bbmanw,   bbmanw,   bbmanwj, driver_device,  0,        ROT0, "Irem America", "New Atomic Punk - Global Quest (US)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1992, bomblord, bbmanw,   bomblord, bbmanw, m90_state,   bomblord, ROT0, "bootleg", "Bomber Lord (bootleg)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1992, quizf1,   0,        quizf1,   quizf1, m90_state,   quizf1,   ROT0, "Irem", "Quiz F1 1-2 Finish (Japan)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1992, bbmanw,   0,        bbmanw,   bbmanw,   driver_device, 0,        ROT0, "Irem", "Bomber Man World / New Dyna Blaster - Global Quest", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1992, bbmanwj,  bbmanw,   bbmanw,   bbmanwj,  driver_device, 0,        ROT0, "Irem", "Bomber Man World (Japan)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1992, bbmanwja, bbmanw,   bbmanwj,  bbmanwj,  driver_device, 0,        ROT0, "Irem", "Bomber Man World (Japan, revised sound hardware)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1992, newapunk, bbmanw,   bbmanw,   newapunk, driver_device, 0,        ROT0, "Irem America", "New Atomic Punk - Global Quest (US)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1992, bomblord, bbmanw,   bomblord, bbmanw,   m90_state,     bomblord, ROT0, "bootleg", "Bomber Lord (bootleg)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1992, quizf1,   0,        quizf1,   quizf1,   m90_state,     quizf1,   ROT0, "Irem", "Quiz F1 1-2 Finish (Japan)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1993, riskchal, 0,        riskchal, riskchal, driver_device, 0,        ROT0, "Irem", "Risky Challenge", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1993, gussun,   riskchal, riskchal, riskchal, driver_device, 0,        ROT0, "Irem", "Gussun Oyoyo (Japan)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1993, matchit2, 0,        matchit2, matchit2, driver_device, 0,        ROT0, "Tamtex", "Match It II", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1993, shisen2,  matchit2, matchit2, shisen2, driver_device,  0,        ROT0, "Tamtex", "Shisensho II", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1993, shisen2,  matchit2, matchit2, shisen2,  driver_device, 0,        ROT0, "Tamtex", "Shisensho II", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
