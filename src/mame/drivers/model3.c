@@ -2121,13 +2121,13 @@ INPUT_PORTS_END
 
 #define ROM_LOAD_VROM(name, offset, length, hash)     ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_SKIP(14) )
 
-ROM_START( lemans24 )   /* step 1.5 */
+ROM_START( lemans24 )   /* step 1.5, Sega game ID# is 833-13139, ROM board ID# 834-13160 GAME BD LEMANS 24 */
 	ROM_REGION64_BE( 0x4800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
-	ROM_LOAD64_WORD_SWAP( "epr-19887.17", 0x600006, 0x080000, CRC(2842bb87) SHA1(2acabf3f7281acaf6bab4d3bae9701df3909cf81) )
-	ROM_LOAD64_WORD_SWAP( "epr-19888.18", 0x600004, 0x080000, CRC(800d763d) SHA1(4f2865a64d6dda638840d359db3bd2f22b6d1404) )
-	ROM_LOAD64_WORD_SWAP( "epr-19889.19", 0x600002, 0x080000, CRC(d1f7e44c) SHA1(5faad711cf39c0fb10c3b9ccce25f5219ddd5a17) )
-	ROM_LOAD64_WORD_SWAP( "epr-19890.20", 0x600000, 0x080000, CRC(9c16c3cc) SHA1(f1fba0c7cbdf7ddc4224356d50fdabea612c129d) )
+	ROM_LOAD64_WORD_SWAP( "epr-19887b.17", 0x600006, 0x080000, CRC(2842bb87) SHA1(2acabf3f7281acaf6bab4d3bae9701df3909cf81) )
+	ROM_LOAD64_WORD_SWAP( "epr-19888b.18", 0x600004, 0x080000, CRC(800d763d) SHA1(4f2865a64d6dda638840d359db3bd2f22b6d1404) )
+	ROM_LOAD64_WORD_SWAP( "epr-19889b.19", 0x600002, 0x080000, CRC(d1f7e44c) SHA1(5faad711cf39c0fb10c3b9ccce25f5219ddd5a17) )
+	ROM_LOAD64_WORD_SWAP( "epr-19890b.20", 0x600000, 0x080000, CRC(9c16c3cc) SHA1(f1fba0c7cbdf7ddc4224356d50fdabea612c129d) )
 
 	// CROM0
 	ROM_LOAD64_WORD_SWAP( "mpr-19857.01", 0x800006, 0x400000, CRC(82c9fcfc) SHA1(31c38483b33606b11d74da21dc49df8fa9f227db) )
@@ -3010,13 +3010,13 @@ ROM_START( getbass )    /* step 1.0, Sega game ID# is 833-13416 GET BASS STD, RO
 	ROM_FILL( 0x000000, 0x80000, 0 )
 ROM_END
 
-ROM_START( lostwsga )   /* Step 1.5, PCB cage labeled 834-13172 THE LOST WORLD U/R   Rev A known to exist, but not dumped */
+ROM_START( lostwsga )   /* Step 1.5, PCB cage labeled 834-13172 THE LOST WORLD U/R. Sega game ID# is 833-13171, ROM board ID# 834-13172 REV.A */
 	ROM_REGION64_BE( 0x4800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
-	ROM_LOAD64_WORD_SWAP( "epr-19939.17",  0x600006, 0x080000, CRC(8788b939) SHA1(30932057f763545568526f85977aa0afc4b66e7d) )
-	ROM_LOAD64_WORD_SWAP( "epr-19938.18",  0x600004, 0x080000, CRC(38afe27a) SHA1(718a238ee246eeed9fa698b58493806932d0e7cb) )
-	ROM_LOAD64_WORD_SWAP( "epr-19937.19",  0x600002, 0x080000, CRC(9dbf5712) SHA1(ca5923bb5a0b7702391dcacc20e863a7f615929d) )
-	ROM_LOAD64_WORD_SWAP( "epr-19936.20",  0x600000, 0x080000, CRC(2f1ca664) SHA1(9138e28ad6c0219b4b3a4609136ed69f484de9a3) )
+	ROM_LOAD64_WORD_SWAP( "epr-19939a.17",  0x600006, 0x080000, CRC(8788b939) SHA1(30932057f763545568526f85977aa0afc4b66e7d) )
+	ROM_LOAD64_WORD_SWAP( "epr-19938a.18",  0x600004, 0x080000, CRC(38afe27a) SHA1(718a238ee246eeed9fa698b58493806932d0e7cb) )
+	ROM_LOAD64_WORD_SWAP( "epr-19937a.19",  0x600002, 0x080000, CRC(9dbf5712) SHA1(ca5923bb5a0b7702391dcacc20e863a7f615929d) )
+	ROM_LOAD64_WORD_SWAP( "epr-19936a.20",  0x600000, 0x080000, CRC(2f1ca664) SHA1(9138e28ad6c0219b4b3a4609136ed69f484de9a3) )
 
 	// CROM0
 	ROM_LOAD64_WORD_SWAP( "mpr-19918.1",   0x800006, 0x400000, CRC(95b690e9) SHA1(50b71aa41372b9acda1db2e0b7ac70707a5cca4b) )
@@ -5967,10 +5967,10 @@ GAME( 1996, scudj,       scud,      scud, scud, model3_state,         scud, ROT0
 GAME( 1996, scuda,       scud,      scud, scud, model3_state,         scud, ROT0, "Sega", "Scud Race Twin (Export)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1997, scudplus,    scud,      scud, scud, model3_state,     scudplus, ROT0, "Sega", "Scud Race Plus (Revision A)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1997, scudplusa,   scud,      scud, scud, model3_state,    scudplusa, ROT0, "Sega", "Scud Race Plus", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1997, lostwsga,       0, model3_15, lostwsga, model3_state, lostwsga, ROT0, "Sega", "The Lost World", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1997, lostwsga,       0, model3_15, lostwsga, model3_state, lostwsga, ROT0, "Sega", "The Lost World (Revision A)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1997, vs215,        vs2, model3_15, model3, model3_state,      vs215, ROT0, "Sega", "Virtua Striker 2 (Step 1.5)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1997, vs215o,       vs2, model3_15, model3, model3_state,      vs215, ROT0, "Sega", "Virtua Striker 2 (Step 1.5, older)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1997, lemans24,       0, model3_15, scud, model3_state,     lemans24, ROT0, "Sega", "LeMans 24", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1997, lemans24,       0, model3_15, scud, model3_state,     lemans24, ROT0, "Sega", "LeMans 24 (Revision B)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1998, vs29815,    vs298, model3_15, model3, model3_state,    vs29815, ROT0, "Sega", "Virtua Striker 2 '98 (Step 1.5)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 
 /* Model 3 Step 2.0 */
