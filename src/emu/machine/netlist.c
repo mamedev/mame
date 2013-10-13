@@ -183,7 +183,9 @@ public:
 		if (cnt != dev->m_inputs.count() && !dev->variable_input_count())
 			fatalerror("netlist: input count mismatch for %s - expected %d found %d\n", devname, dev->m_inputs.count(), cnt);
 		if (dev->variable_input_count())
+		{
 			VERBOSE_OUT(("variable inputs %s: %d\n", dev->name(), cnt));
+		}
 		check_char(')');
 	}
 
