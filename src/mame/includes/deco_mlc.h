@@ -32,8 +32,6 @@ public:
 	UINT16 *m_mlc_spriteram_spare;
 	UINT16 *m_mlc_buffered_spriteram;
 	DECLARE_READ32_MEMBER(test2_r);
-	DECLARE_READ32_MEMBER(mlc_440000_r);
-	DECLARE_READ32_MEMBER(mlc_440004_r);
 	DECLARE_READ32_MEMBER(mlc_440008_r);
 	DECLARE_READ32_MEMBER(mlc_44001c_r);
 	DECLARE_WRITE32_MEMBER(mlc_44001c_w);
