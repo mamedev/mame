@@ -307,10 +307,29 @@ void tms9995_device::state_string_export(const device_state_entry &entry, astrin
 	string.cpy(flags);
 }
 
+/*
+    Provide access to the workspace registers via the debugger. We have to
+    take care whether this is in onchip RAM or outside.
+*/
 UINT16 tms9995_device::read_workspace_register_debug(int reg)
 {
 	int temp = m_icount;
-	UINT16 value = m_prgspace->read_word((WP+(reg<<1)) & 0xfffe);
+	UINT16 value;
+
+	int addrb = (WP + (reg << 1)) & 0xfffe;
+	bool onchip = (((addrb & 0xff00)==0xf000 && (addrb < 0xf0fc)) || ((addrb & 0xfffc)==0xfffc)) && !m_mp9537;
+
+	if (onchip)
+	{
+		value = (m_onchip_memory[addrb & 0x00fe]<<8) | m_onchip_memory[(addrb & 0x00fe) + 1];
+	}
+	else
+	{
+		m_prgspace->set_debugger_access(true);
+		value = (m_prgspace->read_byte(addrb) << 8) & 0xff00;
+		value |= m_prgspace->read_byte(addrb+1);
+		m_prgspace->set_debugger_access(false);
+	}
 	m_icount = temp;
 	return value;
 }
@@ -318,7 +337,22 @@ UINT16 tms9995_device::read_workspace_register_debug(int reg)
 void tms9995_device::write_workspace_register_debug(int reg, UINT16 data)
 {
 	int temp = m_icount;
-	m_prgspace->write_word((WP+(reg<<1)) & 0xfffe, data);
+	int addrb = (WP + (reg << 1)) & 0xfffe;
+
+	bool onchip = (((addrb & 0xff00)==0xf000 && (addrb < 0xf0fc)) || ((addrb & 0xfffc)==0xfffc)) && !m_mp9537;
+
+	if (onchip)
+	{
+		m_onchip_memory[addrb & 0x00fe] = (data >> 8) & 0xff;
+		m_onchip_memory[(addrb & 0x00fe) + 1] = data & 0xff;
+	}
+	else
+	{
+		m_prgspace->set_debugger_access(true);
+		m_prgspace->write_byte(addrb, (data >> 8) & 0xff);
+		m_prgspace->write_byte(addrb+1, data & 0xff);
+		m_prgspace->set_debugger_access(false);
+	}
 	m_icount = temp;
 }
 

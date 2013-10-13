@@ -318,7 +318,9 @@ void tms99xx_device::state_string_export(const device_state_entry &entry, astrin
 UINT16 tms99xx_device::read_workspace_register_debug(int reg)
 {
 	int temp = m_icount;
+	m_prgspace->set_debugger_access(true);
 	UINT16 value = m_prgspace->read_word((WP+(reg<<1)) & m_prgaddr_mask & 0xfffe);
+	m_prgspace->set_debugger_access(false);
 	m_icount = temp;
 	return value;
 }
@@ -326,7 +328,9 @@ UINT16 tms99xx_device::read_workspace_register_debug(int reg)
 void tms99xx_device::write_workspace_register_debug(int reg, UINT16 data)
 {
 	int temp = m_icount;
+	m_prgspace->set_debugger_access(true);
 	m_prgspace->write_word((WP+(reg<<1)) & m_prgaddr_mask & 0xfffe, data);
+	m_prgspace->set_debugger_access(false);
 	m_icount = temp;
 }
 
