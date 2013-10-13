@@ -390,16 +390,18 @@ NETLIB_SUBDEVICE(nic7493ff,
 	ttl_output_t m_Q;
 );
 
-NETLIB_DEVICE(nic7493,
 #if !USE_OLD7493
-		ttl_input_t m_R1;
-		ttl_input_t m_R2;
+NETLIB_DEVICE(nic7493,
+	ttl_input_t m_R1;
+	ttl_input_t m_R2;
 
 	nic7493ff A;
 	nic7493ff B;
 	nic7493ff C;
 	nic7493ff D;
+);
 #else
+NETLIB_DEVICE(nic7493,
 	ttl_input_t m_CLK;
 	ttl_input_t m_CLKB; /* dummy ! */
 	ttl_input_t m_R1;
@@ -412,8 +414,8 @@ NETLIB_DEVICE(nic7493,
 
 	UINT8 m_cnt;
 	ATTR_HOT void update_outputs();
-#endif
 );
+#endif
 
 NETLIB_DEVICE(nic7490,
 	ATTR_HOT void update_outputs();
