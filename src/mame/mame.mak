@@ -2103,6 +2103,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/gstream.o \
 	$(DRIVERS)/gumbo.o $(VIDEO)/gumbo.o \
 	$(DRIVERS)/gunpey.o \
+	$(DRIVERS)/hideseek.o \
 	$(DRIVERS)/hazelgr.o \
 	$(DRIVERS)/headonb.o \
 	$(DRIVERS)/highvdeo.o \

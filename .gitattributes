@@ -3233,6 +3233,7 @@ src/mame/drivers/hazelgr.c svneol=native#text/plain
 src/mame/drivers/hcastle.c svneol=native#text/plain
 src/mame/drivers/headonb.c svneol=native#text/plain
 src/mame/drivers/hexion.c svneol=native#text/plain
+src/mame/drivers/hideseek.c svneol=native#text/plain
 src/mame/drivers/higemaru.c svneol=native#text/plain
 src/mame/drivers/highvdeo.c svneol=native#text/plain
 src/mame/drivers/hikaru.c svneol=native#text/plain
