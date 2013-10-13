@@ -7,18 +7,23 @@
 
   Emulation by Bryan McPhail, mish@tendril.co.uk
 
-  Trivia ;)  The Mad Gear pcb has an unused pad on the board for an i8751
-microcontroller.
+
+PCB Numbers:
+- Mad Gear / LED Storm     Top:87616A-5 / Bottom:87616B-5
+- Last Duel                Top:87615A-4 / Bottom:87615B-3
+
+Trivia:
+- The Mad Gear and Last Duel PCBs have unpopulated spaces for an
+  i8751 microcontroller.
+
+To advance test mode screens:
+- Last Duel / LED Storm Rally 2011: Press P1 buttons 1 and 2
+- Mad Gear / LED Storm: Press P1 button 1 and hold up
 
 TODO:
 - The seem to be minor priority issues in Mad Gear, but the game might just
   be like that. The priority PROM is dumped but currently not used.
 - visible area might be wrong
-
-
-PCB Numbers:
- Mad Gear / LED Storm     Top:87616A-5 / Bottom:87616B-5
- Last Duel                Top:87615A-4 / Bottom:87615B-3
 
 **************************************************************************
 
@@ -32,7 +37,7 @@ PCB Layout
        |-----------|     |------------|     |-----------|
 |------|-----------|-----|------------|-----|-----------|------|
 |                                                              |
-|      43256   CPU1.2D     DEC.2F            VR2.2J DL-0100-103|
+|      43256   CPU1.2D     DEC.2F            VR2.2J DL-010D-103|
 |      43256        CPU3.3E                  VR1.3J    24MHz   |
 |                          6116                                |
 |      LS-01.5B            6116                                |
@@ -64,7 +69,7 @@ Notes:
       SOUND*       /
       43256         - 32kx8 SRAM (DIP28)
       6116          - 2kx8 SRAM (DIP24)
-      DL-0100-103   - NEC custom (SDIP64)
+      DL-010D-103   - NEC custom (SDIP64)
       ROMs          -
                       LS-07       - 27C512 EPROM (DIP28)
                       LS-08       - 27C256 EPROM (DIP28)
@@ -343,16 +348,16 @@ static INPUT_PORTS_START( madgear )
 
 	PORT_START("P1_P2")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
@@ -414,7 +419,7 @@ static const gfx_layout madgear_tile2 =
 	16,16,
 	RGN_FRAC(1,1),
 	4,
-	{ 1*4, 3*4, 0*4, 2*4 },
+	{ 1*4, 0*4, 3*4, 2*4 },
 	{ 0, 1, 2, 3, 16+0, 16+1, 16+2, 16+3,
 			32*16+0, 32*16+1, 32*16+2, 32*16+3, 32*16+16+0, 32*16+16+1, 32*16+16+2, 32*16+16+3 },
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
@@ -489,12 +494,12 @@ void lastduel_state::machine_reset()
 static MACHINE_CONFIG_START( lastduel, lastduel_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* Could be 8 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, 100000000) // Unconfirmed - could be 8MHz
 	MCFG_CPU_PROGRAM_MAP(lastduel_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", lastduel_state, irq2_line_hold)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_irq", lastduel_state, lastduel_timer_cb, attotime::from_hz(120))
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3579545) /* Accurate */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_MACHINE_START_OVERRIDE(lastduel_state,lastduel)
@@ -520,12 +525,12 @@ static MACHINE_CONFIG_START( lastduel, lastduel_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ym1", YM2203, 3579545)
+	MCFG_SOUND_ADD("ym1", YM2203, XTAL_3_579545MHz)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(lastduel_state, irqhandler))
 	MCFG_YM2203_AY8910_INTF(&ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_SOUND_ADD("ym2", YM2203, 3579545)
+	MCFG_SOUND_ADD("ym2", YM2203, XTAL_3_579545MHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
@@ -533,12 +538,12 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( madgear, lastduel_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* Accurate */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
 	MCFG_CPU_PROGRAM_MAP(madgear_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", lastduel_state, irq5_line_hold)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_irq", lastduel_state, madgear_timer_cb, attotime::from_hz(120))
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz) /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
 	MCFG_CPU_PROGRAM_MAP(madgear_sound_map)
 
 	MCFG_MACHINE_START_OVERRIDE(lastduel_state,madgear)
@@ -547,7 +552,7 @@ static MACHINE_CONFIG_START( madgear, lastduel_state )
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_REFRESH_RATE(57.4444)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
@@ -564,15 +569,15 @@ static MACHINE_CONFIG_START( madgear, lastduel_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL_3_579545MHz) /* verified on pcb */
+	MCFG_SOUND_ADD("ym1", YM2203, XTAL_3_579545MHz)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(lastduel_state, irqhandler))
 	MCFG_YM2203_AY8910_INTF(&ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_SOUND_ADD("ym2", YM2203, XTAL_3_579545MHz) /* verified on pcb */
+	MCFG_SOUND_ADD("ym2", YM2203, XTAL_3_579545MHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_10MHz/10, OKIM6295_PIN7_HIGH) /* verified on pcb */
+	MCFG_OKIM6295_ADD("oki", XTAL_10MHz/10, OKIM6295_PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.98)
 MACHINE_CONFIG_END
 
@@ -838,9 +843,9 @@ ROM_START( ledstorm2 )
 	ROM_LOAD( "ls-07.14j",    0x00000,  0x08000, CRC(98af7838) SHA1(a0b87b9ce3c1b0e5d7696ffaab9cea483b9ee928) )
 	ROM_CONTINUE(             0x10000,  0x08000 )
 
-	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "ls-09.5a",     0x000000, 0x40000, BAD_DUMP CRC(80875e1d) SHA1(6f53694a0617bf3b4f65a0cf71750b0e65e49b46) )    /* NEC 23C2000 256kx8 mask ROM (QFP52) */
-	ROM_LOAD( "ls-10.13a",    0x040000, 0x40000, BAD_DUMP CRC(c5993f93) SHA1(29c565c112edb003c7d4adc5ac52e98e034bd1a1) )    /* NEC 23C2000 256kx8 mask ROM (QFP52) */
+	ROM_REGION( 0x80000, "gfx1", 0 ) /* These ROMs are good but are incorrect for this set */
+	ROM_LOAD( "ls-10.13a",    0x00000, 0x40000, BAD_DUMP CRC(c5993f93) SHA1(29c565c112edb003c7d4adc5ac52e98e034bd1a1) )    /* NEC 23C2000 256kx8 mask ROM (QFP52) */
+	ROM_LOAD( "ls-09.5a",     0x40000, 0x40000, BAD_DUMP CRC(80875e1d) SHA1(6f53694a0617bf3b4f65a0cf71750b0e65e49b46) )    /* NEC 23C2000 256kx8 mask ROM (QFP52) */
 
 	ROM_REGION( 0x08000, "gfx2", 0 )
 	ROM_LOAD( "ls-08.10k",    0x000000, 0x08000, CRC(8803cf49) SHA1(7a01a05f760d8e2472fdbc1d10b53094babe295e) ) /* 8x8 text */
