@@ -469,7 +469,6 @@ WRITE8_MEMBER( geneve_mapper_device::writem )
 	{
 		dec = &debug;
 		decode(space, offset, false, false, dec);
-		return;
 	}
 	else
 	{
@@ -1077,11 +1076,6 @@ void geneve_mapper_device::device_start()
 	m_clock = machine().device<mm58274c_device>(GCLOCK_TAG);
 
 	m_ready.resolve(conf->ready, *this);
-
-	// This is a preliminary setting; the initial context switch occurs before
-	// device_reset. Luckily, the reset vector at >0000/>0002 is the same for
-	// all variants of the boot eprom.
-//  m_eprom = machine().root_device().memregion("maincpu")->base();
 
 	m_sram = machine().root_device().memregion(SRAM_TAG)->base();
 	m_dram = machine().root_device().memregion(DRAM_TAG)->base();
