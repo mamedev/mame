@@ -897,6 +897,7 @@ void s2650_device::device_reset()
 	m_r = 0;
 	m_halt = 0;
 	m_ir = 0;
+	m_irq_state = CLEAR_LINE;
 	memset(m_reg, 0, sizeof(m_reg));
 	memset(m_ras, 0, sizeof(m_ras));
 
