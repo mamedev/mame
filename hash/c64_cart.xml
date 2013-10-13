@@ -6931,6 +6931,26 @@
 		</part>
 	</software>
 
+	<software name="pk232">
+		<description>PK-232 v2.5</description>
+		<year>1987</year>
+		<publisher>ICS Electronics</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+		
+		<part name="cart" interface="c64_cart">
+			<feature name="game" value="0" />
+			<feature name="exrom" value="0" />
+	
+			<dataarea name="roml" size="0x2000">
+				<rom name="2.5 v low" size="0x2000" crc="66986152" sha1="ee4ad8ec165a9a3dfad1337a530df64170ad7522" offset="0" />
+			</dataarea>
+	
+			<dataarea name="romh" size="0x2000">
+				<rom name="2.5 v. high" size="0x2000" crc="bc62db7f" sha1="4a3c97174b9912588009de28b0c9040e013f020e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Dummy cartridge entries to allow requirement mappings from c64_flop -->
 
 	<software name="cpm">
