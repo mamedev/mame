@@ -139,8 +139,8 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER( gm_changed );
 
-	void clock_in(int state);
-	void dbin(int state);
+	DECLARE_WRITE_LINE_MEMBER( clock_in );
+	DECLARE_WRITE_LINE_MEMBER( dbin_in );
 
 protected:
 	virtual void    device_start();

@@ -245,7 +245,7 @@ ti99_cartridge_connector_device::ti99_cartridge_connector_device(const machine_c
 {
 }
 
-void ti99_cartridge_connector_device::ready_line(int state)
+WRITE_LINE_MEMBER( ti99_cartridge_connector_device::ready_line )
 {
 	m_gromport->ready_line(state);
 }
@@ -1352,7 +1352,7 @@ void ti99_cartridge_device::cruwrite(offs_t offset, UINT8 data)
 	if (m_pcb != NULL) m_pcb->cruwrite(offset, data);
 }
 
-void ti99_cartridge_device::ready_line(int state)
+WRITE_LINE_MEMBER( ti99_cartridge_device::ready_line )
 {
 	m_connector->ready_line(state);
 }

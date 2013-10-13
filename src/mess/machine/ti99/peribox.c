@@ -602,12 +602,12 @@ void peribox_slot_device::cruwrite(offs_t offset, UINT8 data)
 	m_card->cruwrite(offset, data);
 }
 
-void peribox_slot_device::senila(int state)
+WRITE_LINE_MEMBER( peribox_slot_device::senila )
 {
 	m_card->set_senila(state);
 }
 
-void peribox_slot_device::senilb(int state)
+WRITE_LINE_MEMBER( peribox_slot_device::senilb )
 {
 	m_card->set_senilb(state);
 }

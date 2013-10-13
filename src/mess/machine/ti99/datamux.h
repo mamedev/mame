@@ -72,8 +72,8 @@ public:
 	DECLARE_WRITE16_MEMBER( write );
 	DECLARE_SETOFFSET_MEMBER( setoffset );
 
-	void clock_in(int state);
-	void dbin_in(int state);
+	DECLARE_WRITE_LINE_MEMBER( clock_in );
+	DECLARE_WRITE_LINE_MEMBER( dbin_in );
 
 protected:
 	/* Constructor */

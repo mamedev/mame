@@ -291,7 +291,7 @@ SETOFFSET_MEMBER( ti99_datamux_device::setoffset )
     The datamux is connected to the clock line in order to operate
     the wait state counter and to read/write the bytes.
 */
-void ti99_datamux_device::clock_in(int clock)
+WRITE_LINE_MEMBER( ti99_datamux_device::clock_in )
 {
 	// return immediately if the datamux is currently inactive
 	if (m_waitcount>0)
@@ -300,7 +300,7 @@ void ti99_datamux_device::clock_in(int clock)
 		if (m_read_mode)
 		{
 			// Reading
-			if (clock==ASSERT_LINE)
+			if (state==ASSERT_LINE)
 			{   // raising edge
 				m_waitcount--;
 				if (m_waitcount==0) m_ready(ASSERT_LINE);
@@ -316,7 +316,7 @@ void ti99_datamux_device::clock_in(int clock)
 		}
 		else
 		{
-			if (clock==ASSERT_LINE)
+			if (state==ASSERT_LINE)
 			{   // raising edge
 				m_waitcount--;
 				if (m_waitcount==0) m_ready(ASSERT_LINE);
@@ -336,7 +336,7 @@ void ti99_datamux_device::clock_in(int clock)
 	}
 }
 
-void ti99_datamux_device::dbin_in(int state)
+WRITE_LINE_MEMBER( ti99_datamux_device::dbin_in )
 {
 	m_read_mode = (state==ASSERT_LINE);
 	if (VERBOSE>7) LOG("datamux: data bus in = %d\n", m_read_mode? 1:0 );

@@ -78,7 +78,7 @@ public:
 	void    crureadz(offs_t offset, UINT8 *value);
 	void    cruwrite(offs_t offset, UINT8 data);
 
-	void    ready_line(int state);
+	DECLARE_WRITE_LINE_MEMBER(ready_line);
 	bool    is_available() { return m_pcb != NULL; }
 	bool    has_grom();
 	void    set_slot(int i);
@@ -135,7 +135,7 @@ public:
 	virtual void crureadz(offs_t offset, UINT8 *value) =0;
 	virtual void cruwrite(offs_t offset, UINT8 data) =0;
 
-	void ready_line(int state);
+	DECLARE_WRITE_LINE_MEMBER(ready_line);
 
 	virtual void insert(int index, ti99_cartridge_device* cart) { m_gromport->cartridge_inserted(); };
 	virtual void remove(int index) { };

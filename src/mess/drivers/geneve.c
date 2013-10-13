@@ -677,7 +677,7 @@ WRITE_LINE_MEMBER( geneve_state::clock_out )
 */
 WRITE_LINE_MEMBER( geneve_state::dbin_line )
 {
-	m_mapper->dbin(state);
+	m_mapper->dbin_in(state);
 }
 
 static TMS9995_CONFIG( geneve_processor_config )
