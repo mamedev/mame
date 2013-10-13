@@ -97,6 +97,14 @@ NETLIB_UPDATE(netdev_clock)
 	m_Q.setToNoCheck(!m_Q.new_Q(), m_inc  );
 }
 
+NETLIB_UPDATE_PARAM(netdev_mainclock)
+{
+}
+
+NETLIB_UPDATE(netdev_mainclock)
+{
+}
+
 NETLIB_CONSTRUCTOR(nicMultiSwitch)
 {
 	static const char *sIN[8] = { "i1", "i2", "i3", "i4", "i5", "i6", "i7", "i8" };
