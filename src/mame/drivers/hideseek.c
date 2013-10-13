@@ -1,13 +1,20 @@
 /* Hide & Seek
 
-the AG-2 AX51201 should be the follow-up to the AG-1 AX51101 in hideseek.c
+the AG-2 AX51201 should be the follow-up to the AG-1 AX51101 in gunpey.c
 
-
+AS:
+Current ROM code barely contains some valid SH-2 opcodes but not enough for a HD64F7045F28. i.e. It doesn't contain VBR set-up, valid irq routines,
+a valid irq table and no internal SH-2 i/o set-up. sub-routine at 0xe0 also points to 0x4b0, which is full of illegal opcodes with current ROM.
+Two possible reasons about this:
+* U11 isn't really empty or ...
+* There's an internal ROM (pages 43 and 78 of the HD64F7045F28 manual hints that). And really, good luck into finding a way for trojanning that
+  (exotic usage of the SCIF seems the only possible route)
 
 
 Guru:
 It's called Hide and Seek. I don't know the manufacturer.
-I dumped the ROMs and with a byte swap on U10 I see plain text with words like BET, PAYOUT, HIT etc so it looks like some kind of gambling game. Main program ROMs are 16M flashROMs. The rest are 128M flashROMs. ROMs U8, U9 and U11 are empty.
+I dumped the ROMs and with a byte swap on U10 I see plain text with words like BET, PAYOUT, HIT etc so it looks like some kind of gambling game.
+Main program ROMs are 16M flashROMs. The rest are 128M flashROMs. ROMs U8, U9 and U11 are empty.
 PCB number is BO-023C
 The CPU is a SH2 HD64F7045F28. Connected xtal is 7.3728MHz.
 Main RAM is 2x NEC D431000 (128k x8-bit SRAM).
@@ -55,9 +62,10 @@ UINT32 hideseek_state::screen_update_hideseek(screen_device &screen, bitmap_ind1
 }
 
 static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 32, hideseek_state )
-	AM_RANGE(0x00000000, 0x003fffff) AM_ROM
+	AM_RANGE(0x00000000, 0x001fffff) AM_ROM
+	AM_RANGE(0x00200000, 0x0023ffff) AM_RAM
 //	AM_RANGE(0x06000000, 0x07ffffff) AM_ROM AM_REGION("blit_data", 0)
-	          
+
 ADDRESS_MAP_END
 
 
@@ -110,8 +118,12 @@ MACHINE_CONFIG_END
 
 ROM_START( hideseek )
 	ROM_REGION( 0x400000, "maincpu", 0 ) /* SH2 code */
-	ROM_LOAD16_WORD_SWAP( "29f160te.u10",  0x000000, 0x200000, CRC(44539f9b) SHA1(2e531455e5445e09e99494e47d96866e8ee07135) )
-	ROM_LOAD16_WORD_SWAP( "29f160te.u11",  0x200000, 0x200000, CRC(9a4109e5) SHA1(ba59caac5f5a80fc52c507d8a47f322a380aa9a1) ) /* empty! */
+	ROM_LOAD16_WORD_SWAP( "29f160te.u10",  0x000000, 0x200000, BAD_DUMP CRC(44539f9b) SHA1(2e531455e5445e09e99494e47d96866e8ee07135) )
+	ROM_LOAD16_WORD_SWAP( "29f160te.u11",  0x200000, 0x200000, BAD_DUMP CRC(9a4109e5) SHA1(ba59caac5f5a80fc52c507d8a47f322a380aa9a1) ) /* empty! */
+//	ROM_FILL(         0, 1, 0x00 )
+//	ROM_FILL(         1, 1, 0x00 )
+//	ROM_FILL(         2, 1, 0x01 )
+//	ROM_FILL(         3, 1, 0xe0 )
 
 	ROM_REGION( 0x4000000, "blit_data", 0 )
 	ROM_LOAD16_WORD_SWAP( "s29gl128n.u6",  0x0000000, 0x1000000,  CRC(2d6632f3) SHA1(e8d91bcc6975f5c07b438d29e8a23d403c7e52aa) )
