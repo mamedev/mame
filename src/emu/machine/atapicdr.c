@@ -46,12 +46,12 @@ void atapi_cdrom_device::device_start()
 
 	m_identify_buffer[ 27 ] = ('M' << 8) | 'A';
 	m_identify_buffer[ 28 ] = ('M' << 8) | 'E';
-	m_identify_buffer[ 29 ] = (' ' << 8) | 'C';
-	m_identify_buffer[ 30 ] = ('o' << 8) | 'm';
-	m_identify_buffer[ 31 ] = ('p' << 8) | 'r';
-	m_identify_buffer[ 32 ] = ('e' << 8) | 's';
-	m_identify_buffer[ 33 ] = ('s' << 8) | 'e';
-	m_identify_buffer[ 34 ] = ('d' << 8) | ' ';
+	m_identify_buffer[ 29 ] = (' ' << 8) | ' ';
+	m_identify_buffer[ 30 ] = (' ' << 8) | ' ';
+	m_identify_buffer[ 31 ] = ('V' << 8) | 'i';
+	m_identify_buffer[ 32 ] = ('r' << 8) | 't';
+	m_identify_buffer[ 33 ] = ('u' << 8) | 'a';
+	m_identify_buffer[ 34 ] = ('l' << 8) | ' ';
 	m_identify_buffer[ 35 ] = ('C' << 8) | 'D';
 	m_identify_buffer[ 36 ] = ('R' << 8) | 'O';
 	m_identify_buffer[ 37 ] = ('M' << 8) | ' ';

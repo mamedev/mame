@@ -113,6 +113,8 @@ void t10mmc::ExecCommand()
 			logerror("T10MMC: INQUIRY\n");
 			m_phase = SCSI_PHASE_DATAIN;
 			m_transfer_length = SCSILengthFromUINT8( &command[ 4 ] );
+			if (m_transfer_length > 36)
+				m_transfer_length = 36;
 			break;
 
 		case 0x15: // MODE SELECT(6)
@@ -378,16 +380,18 @@ void t10mmc::ReadData( UINT8 *data, int dataLength )
 	switch ( command[0] )
 	{
 		case 0x12: // INQUIRY
-			memset( data, 0, dataLength );
 			data[0] = 0x05; // device is present, device is CD/DVD (MMC-3)
 			data[1] = 0x80; // media is removable
 			data[2] = 0x05; // device complies with SPC-3 standard
 			data[3] = 0x02; // response data format = SPC-3 standard
-			// some Konami games freak out if this isn't "Sony", so we'll lie
-			// this is the actual drive on my Nagano '98 board
-			strcpy((char *)&data[8], "Sony");
-			strcpy((char *)&data[16], "CDU-76S");
-			strcpy((char *)&data[32], "1.0");
+			data[4] = 0x1f;
+			data[5] = 0;
+			data[6] = 0;
+			data[7] = 0;
+			memset(&data[8], ' ', 28);
+			memcpy(&data[8], "MAME", 4);
+			memcpy(&data[16], "Virtual CDROM", 13);
+			memcpy(&data[32], "1.0", 3);
 			break;
 
 		case 0x25: // READ CAPACITY
