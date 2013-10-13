@@ -1493,6 +1493,9 @@ static MACHINE_CONFIG_DERIVED( mars, scramble )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mars_map)
+	
+	MCFG_DEVICE_REMOVE("ppi8255_1")
+	MCFG_I8255A_ADD( "ppi8255_1", stratgyx_ppi_1_intf )
 
 	/* video hardware */
 	MCFG_PALETTE_LENGTH(32+64+2+0)  /* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */

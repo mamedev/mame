@@ -20,7 +20,6 @@
 
 #include "emu.h"
 #include "video/hd63484.h"
-#include "devlegcy.h"
 
 #define LOG_COMMANDS 0
 
