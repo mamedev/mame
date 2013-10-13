@@ -363,17 +363,6 @@ NETLIB_UPDATE_PARAM(netdev_analog_const)
 	m_Q.initial(m_const.Value());
 }
 
-inline NETLIB_UPDATE_PARAM(netdev_mainclock)
-{
-	m_inc = netlist_time::from_hz(m_freq.Value()*2);
-}
-
-inline NETLIB_UPDATE(netdev_mainclock)
-{
-	*m_Q.new_Q_ptr() = !m_Q.new_Q();
-	m_Q.set_time(m_netlist.time() + m_inc);
-}
-
 // ----------------------------------------------------------------------------------------
 // netlist_base_t
 // ----------------------------------------------------------------------------------------

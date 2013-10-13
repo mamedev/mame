@@ -99,10 +99,13 @@ NETLIB_UPDATE(netdev_clock)
 
 NETLIB_UPDATE_PARAM(netdev_mainclock)
 {
+	m_inc = netlist_time::from_hz(m_freq.Value()*2);
 }
 
 NETLIB_UPDATE(netdev_mainclock)
 {
+	*m_Q.new_Q_ptr() = !m_Q.new_Q();
+	m_Q.set_time(m_netlist.time() + m_inc);
 }
 
 NETLIB_CONSTRUCTOR(nicMultiSwitch)
