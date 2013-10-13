@@ -39,9 +39,10 @@ ti_speech_synthesizer_device::ti_speech_synthesizer_device(const machine_config 
     Memory read
 */
 
-// ======  This is the version with real timing =======
 READ8Z_MEMBER( ti_speech_synthesizer_device::readz )
 {
+	if (space.debugger_access()) return;
+
 	if ((offset & m_select_mask)==m_select_value)
 	{
 		*value = m_vsp->status_r(space, offset, 0xff) & 0xff;
@@ -60,6 +61,8 @@ READ8Z_MEMBER( ti_speech_synthesizer_device::readz )
 */
 WRITE8_MEMBER( ti_speech_synthesizer_device::write )
 {
+	if (space.debugger_access()) return;
+
 	if ((offset & m_select_mask)==(m_select_value | 0x0400))
 	{
 		if (VERBOSE>4) LOG("spchsyn: write value = %02x\n", data);

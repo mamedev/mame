@@ -124,6 +124,7 @@ void nouspikel_ide_interface_device::cruwrite(offs_t offset, UINT8 data)
 READ8Z_MEMBER(nouspikel_ide_interface_device::readz)
 {
 	UINT8 reply = 0;
+	if (space.debugger_access()) return;
 
 	if (((offset & m_select_mask)==m_select_value) && m_selected)
 	{
@@ -189,6 +190,8 @@ READ8Z_MEMBER(nouspikel_ide_interface_device::readz)
 */
 WRITE8_MEMBER(nouspikel_ide_interface_device::write)
 {
+	if (space.debugger_access()) return;
+
 	if (((offset & m_select_mask)==m_select_value) && m_selected)
 	{
 		if (m_cru_register & cru_reg_page_switching)

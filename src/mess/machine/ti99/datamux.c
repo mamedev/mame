@@ -134,8 +134,54 @@ void ti99_datamux_device::setaddress_all(address_space& space, UINT16 addr)
 	}
 }
 
-// FIXME: Allow for a separate debugger access, or it will spoil the whole
-// addressing process!
+/*
+    Special debugger access; these routines have no influence on the wait
+    state generation.
+*/
+UINT16 ti99_datamux_device::debugger_read(address_space& space, UINT16 addr)
+{
+	UINT16 base32k = 0;
+	UINT8 lval, hval;
+
+	UINT16 addrb = addr << 1;
+	if (m_use32k)
+	{
+		if ((addrb & 0xe000)==0x2000) base32k = 0x1000;
+		if (((addrb & 0xe000)==0xa000) || ((addrb & 0xc000)==0xc000)) base32k = 0x4000;
+	}
+	if (base32k != 0)
+	{
+		return m_ram16b[addr - base32k];
+	}
+	else
+	{
+		lval = hval = 0;
+		read_all(space, addrb+1, &lval);
+		read_all(space, addrb, &hval);
+		return ((hval << 8)&0xff00) | (lval & 0xff);
+	}
+}
+
+void ti99_datamux_device::debugger_write(address_space& space, UINT16 addr, UINT16 data)
+{
+	UINT16 base32k = 0;
+
+	UINT16 addrb = addr << 1;
+	if (m_use32k)
+	{
+		if ((addrb & 0xe000)==0x2000) base32k = 0x1000;
+		if (((addrb & 0xe000)==0xa000) || ((addrb & 0xc000)==0xc000)) base32k = 0x4000;
+	}
+	if (base32k != 0)
+	{
+		m_ram16b[addr - base32k] = data;
+	}
+	else
+	{
+		write_all(space, addrb+1, data & 0xff);
+		write_all(space, addrb, (data >> 8) & 0xff);
+	}
+}
 
 /*
     Read access. We are using two loops because the delay between both
@@ -145,11 +191,10 @@ void ti99_datamux_device::setaddress_all(address_space& space, UINT16 addr)
 */
 READ16_MEMBER( ti99_datamux_device::read )
 {
+	// Care for debugger
 	if (space.debugger_access())
 	{
-		// FIXME, or the debugger will become blind for addresses outside
-		// ROM and scratch pad RAM.
-		return 0;
+		return debugger_read(space, offset);
 	}
 
 	// Looks ugly, but this is close to the real thing. If the 16bit
@@ -187,7 +232,7 @@ WRITE16_MEMBER( ti99_datamux_device::write )
 
 	if (space.debugger_access())
 	{
-		// Do not accept write operations from the debugger (later maybe).
+		debugger_write(space, offset, data);
 		return;
 	}
 

@@ -231,6 +231,8 @@ void nouspikel_usb_smartmedia_device::cruwrite(offs_t offset, UINT8 data)
 */
 READ8Z_MEMBER(nouspikel_usb_smartmedia_device::readz)
 {
+	if (space.debugger_access()) return;
+
 	if (((offset & m_select_mask)==m_select_value) && m_selected)
 	{
 		if (m_tms9995_mode ? (!(offset & 1)) : (offset & 1))
@@ -248,6 +250,8 @@ READ8Z_MEMBER(nouspikel_usb_smartmedia_device::readz)
 */
 WRITE8_MEMBER(nouspikel_usb_smartmedia_device::write)
 {
+	if (space.debugger_access()) return;
+
 	if (((offset & m_select_mask)==m_select_value) && m_selected)
 	{
 		/* latch write */

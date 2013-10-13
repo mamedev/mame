@@ -131,7 +131,7 @@ public:
 	inline void set_video_waitstates(bool wait) { m_video_waitstates = wait; }
 	inline void set_extra_waitstates(bool wait) { m_extra_waitstates = wait; }
 
-	void do_wait(int min);
+	void set_wait(int min);
 
 	DECLARE_READ8_MEMBER( readm );
 	DECLARE_WRITE8_MEMBER( writem );
@@ -155,13 +155,19 @@ private:
 	DECLARE_WRITE8_MEMBER( write_grom );
 
 	// wait states
-	bool        m_video_waiting;
 	bool        m_video_waitstates;
 	bool        m_extra_waitstates;
 
 	bool        m_read_mode;
 
 	// Mapper function
+	typedef struct
+	{
+		int     function;
+		offs_t  offset;
+		offs_t  physaddr;
+	} decdata;
+
 	bool    m_geneve_mode;
 	bool    m_direct_mode;
 	int     m_cartridge_size;
@@ -174,6 +180,8 @@ private:
 
 	int     m_offset;
 	int     m_physaddr;
+	void    decode(address_space& space, offs_t offset, bool setwait, bool read_mode, decdata* dec);
+	decdata m_decoded;
 
 	// Genmod modifications
 	bool    m_turbo;

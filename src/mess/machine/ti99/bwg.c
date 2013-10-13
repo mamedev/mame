@@ -131,7 +131,7 @@ READ8Z_MEMBER(snug_bwg_device::readz)
 					if ((offset & 0x03e1)==0x03e0)
 					{
 						// .... ..11 111x xxx0
-						*value = m_clock->read(space, (offset & 0x001e) >> 1);
+						if (!space.debugger_access()) *value = m_clock->read(space, (offset & 0x001e) >> 1);
 					}
 					else
 					{
@@ -145,7 +145,7 @@ READ8Z_MEMBER(snug_bwg_device::readz)
 						// .... ..11 1111 0xx0
 						// Note that the value is inverted again on the board,
 						// so we can drop the inversion
-						*value = wd17xx_r(m_controller, space, (offset >> 1)&0x03);
+						if (!space.debugger_access()) *value = wd17xx_r(m_controller, space, (offset >> 1)&0x03);
 					}
 					else
 					{
@@ -210,7 +210,7 @@ WRITE8_MEMBER(snug_bwg_device::write)
 					if ((offset & 0x03e1)==0x03e0)
 					{
 						// .... ..11 111x xxx0
-						m_clock->write(space, (offset & 0x001e) >> 1, data);
+						if (!space.debugger_access()) m_clock->write(space, (offset & 0x001e) >> 1, data);
 					}
 					else
 					{
@@ -224,7 +224,7 @@ WRITE8_MEMBER(snug_bwg_device::write)
 						// .... ..11 1111 1xx0
 						// Note that the value is inverted again on the board,
 						// so we can drop the inversion
-						wd17xx_w(m_controller, space, (offset >> 1)&0x03, data);
+						if (!space.debugger_access()) wd17xx_w(m_controller, space, (offset >> 1)&0x03, data);
 					}
 					else
 					{

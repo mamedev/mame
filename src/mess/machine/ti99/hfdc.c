@@ -79,14 +79,14 @@ READ8Z_MEMBER(myarc_hfdc_device::readz)
 				// read: 0100 1111 1101 xx00
 				if ((offset & 0x1ff3)==HDC_R_ADDR)
 				{
-					*value = m_hdc9234->read(space, (offset>>2)&1, mem_mask);
+					if (!space.debugger_access()) *value = m_hdc9234->read(space, (offset>>2)&1, mem_mask);
 					if (VERBOSE>7) LOG("hfdc: read %04x: %02x\n",  offset & 0xffff, *value);
 					return;
 				}
 
 				if ((offset & 0x1fe1)==CLK_ADDR)
 				{
-					*value = m_clock->read(space, (offset & 0x001e) >> 1);
+					if (!space.debugger_access()) *value = m_clock->read(space, (offset & 0x001e) >> 1);
 					if (VERBOSE>7) LOG("hfdc: read from clock address %04x: %02x\n", offset & 0xffff, *value);
 					return;
 				}
@@ -133,14 +133,14 @@ WRITE8_MEMBER( myarc_hfdc_device::write )
 		if ((offset & 0x1ff3)==HDC_W_ADDR)
 		{
 			if (VERBOSE>7) LOG("hfdc: write to controller address %04x: %02x\n", offset & 0xffff, data);
-			m_hdc9234->write(space, (offset>>2)&1, data, mem_mask);
+			if (!space.debugger_access()) m_hdc9234->write(space, (offset>>2)&1, data, mem_mask);
 			return;
 		}
 
 		if ((offset & 0x1fe1)==CLK_ADDR)
 		{
 			if (VERBOSE>7) LOG("hfdc: write to clock address %04x: %02x\n", offset & 0xffff, data);
-			m_clock->write(space, (offset & 0x001e) >> 1, data);
+			if (!space.debugger_access()) m_clock->write(space, (offset & 0x001e) >> 1, data);
 			return;
 		}
 

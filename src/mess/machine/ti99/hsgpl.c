@@ -315,6 +315,8 @@ void snug_high_speed_gpl_device::cartspace_readz(address_space& space, offs_t of
 void snug_high_speed_gpl_device::grom_readz(address_space& space, offs_t offset, UINT8* value, UINT8 mem_mask)
 {
 	int port;
+	if (space.debugger_access()) return;
+
 	//activedevice_adjust_icount(-4);
 
 	// 1001 10bb bbbb bba0
@@ -478,6 +480,7 @@ void snug_high_speed_gpl_device::cartspace_write(address_space& space, offs_t of
 void snug_high_speed_gpl_device::grom_write(address_space& space, offs_t offset, UINT8 data, UINT8 mem_mask)
 {
 	int port;
+	if (space.debugger_access()) return;
 
 	//activedevice_adjust_icount(-4);
 

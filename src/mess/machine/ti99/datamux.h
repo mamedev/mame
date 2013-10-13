@@ -95,6 +95,10 @@ private:
 	// Common set address method
 	void setaddress_all(address_space& space, UINT16 addr);
 
+	// Debugger access
+	UINT16 debugger_read(address_space& space, UINT16 addr);
+	void debugger_write(address_space& space, UINT16 addr, UINT16 data);
+
 	// Ready line to the CPU
 	devcb_resolved_write_line m_ready;
 
