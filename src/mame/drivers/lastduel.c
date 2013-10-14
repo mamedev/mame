@@ -494,7 +494,7 @@ void lastduel_state::machine_reset()
 static MACHINE_CONFIG_START( lastduel, lastduel_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 100000000) // Unconfirmed - could be 8MHz
+	MCFG_CPU_ADD("maincpu", M68000, 10000000) // Unconfirmed - could be 8MHz
 	MCFG_CPU_PROGRAM_MAP(lastduel_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", lastduel_state, irq2_line_hold)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_irq", lastduel_state, lastduel_timer_cb, attotime::from_hz(120))
