@@ -3,9 +3,29 @@
 *  Telesensory Systems Inc./Speech Plus
 *  1500 and 2000 series
 *  Prose 2020
-*  By Jonathan Gevaryahu AKA Lord Nightmare and Kevin 'kevtris' Horton
+*  Copyright (C) 2011-2013 Jonathan Gevaryahu AKA Lord Nightmare and Kevin 'kevtris' Horton
 *
-*  Skeleton Driver
+*  This source file is dual-licensed under the following licenses:
+*  1. The MAME license as of September 2013
+*  2. The GNU LGPLv2.1:
+*
+*  This library is free software; you can redistribute it and/or
+*  modify it under the terms of the GNU Lesser General Public
+*  License as published by the Free Software Foundation; either
+*  version 2.1 of the License, or (at your option) any later version.
+*  
+*  This library is distributed in the hope that it will be useful,
+*  but WITHOUT ANY WARRANTY; without even the implied warranty of
+*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+*  Lesser General Public License for more details.
+*  
+*  You should have received a copy of the GNU Lesser General Public
+*  License along with this library; if not, write to the Free Software
+*  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+*
+*  Please contact the author if you require other licensing.
+*
+*
 *
 *  DONE:
 *  Skeleton Written
@@ -14,11 +34,11 @@
 *  Successful run
 *  Correctly Interleave 8086 CPU roms
 *  Debug LEDs hooked to popmessage
-*  Correctly load UPD7720 roms as UPD7725 data - done, this is utterly disgusting code.
+*  Correctly load UPD7720 roms as UPD7725 data - done; this is utterly disgusting code, but appears to work.
 *  Attached i8251a uart at u15
 *  Added dipswitch array S4
 *  Attached 8259 PIC
-   * IR0 = upd7720 p0 pin masked by (probably peripheral bit 0)
+   * IR0 = upd7720 p0 pin masked by (probably peripheral bit 8)
    * IR1 = i8251 rxrdy
    * IR2 = i8251 txempty
    * IR3 = i8251 txrdy
@@ -183,15 +203,14 @@ IRQ_CALLBACK_MEMBER(tsispch_state::irq_callback)
 *****************************************************************************/
 READ8_MEMBER( tsispch_state::dsw_r )
 {
-	UINT8 data;
 	/* the only dipswitch I'm really sure about is s4-7 which enables the test mode
 	 * The switches are, for normal operation on my unit:
+	 * 1  2  3   4   5   6   7   8
 	 * ON ON OFF OFF OFF OFF OFF OFF
 	 * which makes this register read 0xFC
 	 * When s4-7 is turned on, it reads 0xBC
 	 */
-	data = ioport("s4")->read();
-	return data;
+	return ioport("s4")->read();
 }
 
 WRITE8_MEMBER( tsispch_state::peripheral_w )
@@ -465,16 +484,16 @@ ROM_START( prose2k )
 	//      3 - to /EN3 (pin 4) of 74S138N at U80
 	//          AND to EN1 (pin 6) of 74S138N at U78
 	//          i.e. one is activated when pin is high and other when pin is low
-	//          The 74S138N at U80:
+	//          The 74S138N at U80: [*ENABLED ONLY WITHIN/CONTROLS THE 3000-3FFF AREA*]
 	//              /EN2 - pulled to GND
 	//              EN1 - pulled to VCC through resistor R5
 	//              inputs: S0 - A9; S1 - A10; S2 - A11
-	//              /Y0 - /CS (pin 11) of iP8251A at U15
-	//              /Y1 - /CS (pin 1) of AMD 8259A at U4
-	//              /Y2 - pins 1, 4, 9 (1A, 2A, 3A inputs) of 74HCT32 Quad OR gate at U58 <wip, this is the 'peripheral' register, which deals with upd7720 control lines, LEDS and dipswitches>
-	//              /Y3 - pin 26 (/CS) of UPD77P20 at U29
-	//              /Y4 through /Y7 - seem unconnected SO FAR? <wip>
-	//          The 74S138N at U78: <wip>
+	//              /Y0 - /CS (pin 11) of iP8251A at U15 [0x3000-0x31FF]
+	//              /Y1 - /CS (pin 1) of AMD 8259A at U4 [0x3200-0x33FF]
+	//              /Y2 - pins 1, 4, 9 (1A, 2A, 3A inputs) of 74HCT32 Quad OR gate at U58 [0x3400-0x35FF]
+	//              /Y3 - pin 26 (/CS) of UPD77P20 at U29 [0x3600-0x37FF]
+	//              /Y4 through /Y7 - seem unconnected? [0x3800-0x3FFF]
+	//          The 74S138N at U78: [*ENABLED IN ALL AREAS EXCEPT 3000-3FFF*] <wip>
 	//              /EN3 - ? (TODO: figure these out)
 	//              /EN2 - ?
 	//              inputs: S0 - A18; S1 - A19; S2 - Pulled to GND
