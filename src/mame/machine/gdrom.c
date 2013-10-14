@@ -119,8 +119,8 @@ void gdrom_device::ExecCommand()
 			m_transfer_length = SCSILengthFromUINT8( &command[ 4 ] );
 			break;
 
-		case 0x12: // INQUIRY
-			logerror("GDROM: REQUEST SENSE\n");
+		case 0x12: // SET_MODE
+			logerror("GDROM: SET_MODE\n");
 			m_phase = SCSI_PHASE_DATAOUT;
 			//transferOffset = command[2];
 			m_transfer_length = SCSILengthFromUINT8( &command[ 4 ] );
@@ -397,7 +397,7 @@ void gdrom_device::WriteData( UINT8 *data, int dataLength )
 {
 	switch (command[ 0 ])
 	{
-		case 0x12:
+		case 0x12: // SET_MODE
 			memcpy(&GDROM_Cmd11_Reply[transferOffset], data, (dataLength >= 32-transferOffset) ? 32-transferOffset : dataLength);
 			break;
 
