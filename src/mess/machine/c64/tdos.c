@@ -9,60 +9,85 @@
 
 /*
 
-    PCB Layout
-    ----------
+PCB Layout
+----------
 
-    XM-2206-A (top)
-    XM-2205-A (bottom)
+XM-2206-A (top)
+XM-2205-A (bottom)
 
-                |===========================|
-                |            CN4            |
-                |                           |
-                |      ULA                  |
-                |                           |
-                |      6.5MHz               |
-                |                           |
-                |      SSDA                 |
-                |                 LS175     |
-                |                 LS367     |
-                |            CN3            |
-                |=========|||||||||=========|
-                          |||||||||
-            |=============|||||||||============|
-            |                CN2               |
-            |       LS00     LS02     LS138    |
-    |=======|                                  |
-    |=|             LS245        ROM           |
-    |=|                                        |
-    |=|                                        |
-    |=|                                     CN1|
-    |=|                                        |
-    |=|                                        |
-    |=|                                        |
-    |=|                             SW1        |
-    |==========================================|
+            |===========================|
+            |            CN4            |
+            |                           |
+            |      ULA                  |
+            |                           |
+            |      6.5MHz               |
+            |                           |
+            |      SSDA                 |
+            |                 LS175     |
+            |                 LS367     |
+            |            CN3            |
+            |=========|||||||||=========|
+                      |||||||||
+        |=============|||||||||============|
+        |                CN2               |
+        |       LS00     LS02     LS138    |
+|=======|                                  |
+|=|             LS245        ROM           |
+|=|                                        |
+|=|                                        |
+|=|                                     CN1|
+|=|                                        |
+|=|                                        |
+|=|                                        |
+|=|                             SW1        |
+|==========================================|
 
-    ROM    - Hitachi HN482764G 8Kx8 EPROM "TDOS 1.2"
-    ULA    - Ferranti ULA5RB073E1 XZ-2085-1 40-pin custom ULA
-    SSDA   - Motorola MC68A52P SSDA
-    CN1    - C64 expansion connector (pass-thru)
-    CN2,3  - 19x1 flat ribbon cable to other PCB
-    CN4    - 9 wires to 3" drive
-    SW1    - cartridge on/off switch
+ROM    - Hitachi HN482764G 8Kx8 EPROM "TDOS 1.2"
+ULA    - Ferranti ULA5RB073E1 XZ-2085-1 40-pin custom ULA
+SSDA   - Motorola MC68A52P SSDA
+CN1    - C64 expansion connector (pass-thru)
+CN2,3  - 19x1 flat ribbon cable to other PCB
+CN4    - 9 wires to 3" drive
+SW1    - cartridge on/off switch
 
 
-	Drive cable pinout
-	------------------
-    1    WP
-    2    WD
-    3    WG
-    4    MO
-    5    RD
-    6    RY
-    7    MS
-    8    RS
-    9    +5V
-    10   GND
+Drive cable pinout
+------------------
+1    WP
+2    WD
+3    WG
+4    MO
+5    RD
+6    RY
+7    MS
+8    RS
+9    +5V
+10   GND
+
+
+ULA pinout
+----------
+            _____   _____
+         1 |*    \_/     | 40  
+         2 |             | 39  
+         3 |             | 38  
+         4 |             | 37  
+         5 |             | 36  
+         6 |             | 35  
+    RD   7 |             | 34  
+   _D5   8 |             | 33  
+   RxC   9 |             | 32  
+   RxD  10 |             | 31  
+        11 |             | 30  
+    WD  12 |             | 29  
+   TxC  13 |             | 28  
+   TxD  14 |             | 27  
+    D7  15 |             | 26  
+    WG  16 |             | 25  +5V
+        17 |             | 24  
+        18 |             | 23  
+    RS  19 |             | 22  
+        20 |_____________| 21  
 
 */
 
@@ -204,7 +229,7 @@ UINT8 c64_tdos_cartridge_device::c64_cd_r(address_space &space, offs_t offset, U
 
 	if (m_enabled && !io2)
 	{
-		switch (offset >> 1)
+		switch ((offset >> 1) & 0x07)
 		{
 		case 0:
 			data = m_ssda->read(space, offset & 0x01);
@@ -246,7 +271,7 @@ void c64_tdos_cartridge_device::c64_cd_w(address_space &space, offs_t offset, UI
 
 	if (m_enabled && !io2)
 	{
-		switch (offset >> 1)
+		switch ((offset >> 1) & 0x07)
 		{
 		case 0:
 			m_ssda->write(space, offset & 0x01, data);
