@@ -497,21 +497,21 @@ void v25_common_device::device_start()
 	m_direct = &m_program->direct();
 	m_io = &space(AS_IO);
 
-	state_add( V25_PC,    "PC", m_debugger_temp).callimport().callexport().formatstr("%5X");
-	state_add( V25_IP,    "IP", m_ip).formatstr("%4X");
-	state_add( V25_SP,    "SP", m_debugger_temp).callimport().callexport().formatstr("%4X");
-	state_add( V25_FLAGS, "F", m_debugger_temp).callimport().callexport().formatstr("%4X");
-	state_add( V25_AW,    "AW", m_debugger_temp).callimport().callexport().formatstr("%4X");
-	state_add( V25_CW,    "CW", m_debugger_temp).callimport().callexport().formatstr("%4X");
-	state_add( V25_DW,    "DW", m_debugger_temp).callimport().callexport().formatstr("%4X");
-	state_add( V25_BW,    "BW", m_debugger_temp).callimport().callexport().formatstr("%4X");
-	state_add( V25_BP,    "BP", m_debugger_temp).callimport().callexport().formatstr("%4X");
-	state_add( V25_IX,    "IX", m_debugger_temp).callimport().callexport().formatstr("%4X");
-	state_add( V25_IY,    "IY", m_debugger_temp).callimport().callexport().formatstr("%4X");
-	state_add( V25_ES,    "DS1", m_debugger_temp).callimport().callexport().formatstr("%4X");
-	state_add( V25_CS,    "PS", m_debugger_temp).callimport().callexport().formatstr("%4X");
-	state_add( V25_SS,    "SS", m_debugger_temp).callimport().callexport().formatstr("%4X");
-	state_add( V25_DS,    "DS0", m_debugger_temp).callimport().callexport().formatstr("%4X");
+	state_add( V25_PC,    "PC", m_debugger_temp).callimport().callexport().formatstr("%05X");
+	state_add( V25_IP,    "IP", m_ip).formatstr("%04X");
+	state_add( V25_SP,    "SP", m_debugger_temp).callimport().callexport().formatstr("%04X");
+	state_add( V25_FLAGS, "F", m_debugger_temp).callimport().callexport().formatstr("%04X");
+	state_add( V25_AW,    "AW", m_debugger_temp).callimport().callexport().formatstr("%04X");
+	state_add( V25_CW,    "CW", m_debugger_temp).callimport().callexport().formatstr("%04X");
+	state_add( V25_DW,    "DW", m_debugger_temp).callimport().callexport().formatstr("%04X");
+	state_add( V25_BW,    "BW", m_debugger_temp).callimport().callexport().formatstr("%04X");
+	state_add( V25_BP,    "BP", m_debugger_temp).callimport().callexport().formatstr("%04X");
+	state_add( V25_IX,    "IX", m_debugger_temp).callimport().callexport().formatstr("%04X");
+	state_add( V25_IY,    "IY", m_debugger_temp).callimport().callexport().formatstr("%04X");
+	state_add( V25_ES,    "DS1", m_debugger_temp).callimport().callexport().formatstr("%04X");
+	state_add( V25_CS,    "PS", m_debugger_temp).callimport().callexport().formatstr("%04X");
+	state_add( V25_SS,    "SS", m_debugger_temp).callimport().callexport().formatstr("%04X");
+	state_add( V25_DS,    "DS0", m_debugger_temp).callimport().callexport().formatstr("%04X");
 
 	state_add( STATE_GENPC, "GENPC", m_debugger_temp).callimport().callexport().noshow();
 	state_add( STATE_GENSP, "GENSP", m_debugger_temp).callimport().callexport().noshow();
