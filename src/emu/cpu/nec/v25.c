@@ -8,8 +8,6 @@
 
     Using V20/V30 cycle counts for now. V25/V35 cycle counts
     vary based on whether internal RAM access is enabled (RAMEN).
-    Likewise, the programmable clock divider (PCK) currently only
-    affects the timers, not instruction execution.
 
     BTCLR and STOP instructions not implemented.
 
@@ -203,6 +201,7 @@ void v25_common_device::device_reset()
 	m_PCK = 8;
 	m_IDB = 0xFFE00;
 
+	set_clock_scale(1.0 / m_PCK);
 	tmp = m_PCK << m_TB;
 	time = attotime::from_hz(unscaled_clock()) * tmp;
 	m_timers[3]->adjust(time, INTTB, time);
