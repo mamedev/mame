@@ -10,6 +10,7 @@
 
 #include "machine/igs025.h"
 #include "machine/igs022.h"
+#include "machine/igs028.h"
 
 #define PGMARM7LOGERROR 0
 
@@ -449,7 +450,10 @@ class pgm_028_025_state : public pgm_state
 public:
 	pgm_028_025_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pgm_state(mconfig, type, tag),
-			m_sharedprotram(*this, "sharedprotram") {
+			m_sharedprotram(*this, "sharedprotram"),
+			m_igs028(*this,"igs028")
+	
+	{
 	}
 
 	int           m_olds_cmd;
@@ -461,18 +465,16 @@ public:
 	UINT16        m_olds_prot_hilo;
 	UINT16        m_olds_prot_hilo_select;
 	const UINT8  *m_olds_prot_hilo_source2;
+
 	required_shared_ptr<UINT16> m_sharedprotram;
+	required_device<igs028_device> m_igs028;
 
 	DECLARE_DRIVER_INIT(olds);
 	DECLARE_MACHINE_RESET(olds);
 
-	UINT32 olds_prot_addr( UINT16 addr );
-	UINT32 olds_read_reg( UINT16 addr );
-	void olds_write_reg( UINT16 addr, UINT32 val );
 	DECLARE_READ16_MEMBER( olds_r );
 	DECLARE_WRITE16_MEMBER( olds_w );
-	DECLARE_READ16_MEMBER( olds_prot_swap_r );
-	void IGS028_do_dma(UINT16 src, UINT16 dst, UINT16 size, UINT16 mode);
+
 	void olds_protection_calculate_hilo();
 	void olds_protection_calculate_hold(int y, int z);
 };

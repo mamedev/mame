@@ -1050,6 +1050,7 @@ $(MAMEOBJ)/igs.a: \
 	$(MACHINE)/pgmprot_igs025_igs028.o \
 	$(MACHINE)/igs025.o \
 	$(MACHINE)/igs022.o \
+	$(MACHINE)/igs028.o \
 
 $(MAMEOBJ)/irem.a: \
 	$(DRIVERS)/m10.o $(VIDEO)/m10.o \
