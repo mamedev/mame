@@ -63,6 +63,7 @@ public:
 		TIMER_X68K_CRTC_RASTER_END,
 		TIMER_X68K_CRTC_RASTER_IRQ,
 		TIMER_X68K_CRTC_VBLANK_IRQ,
+		TIMER_X68K_FDC_TC,
 	};
 
 	x68k_state(const machine_config &mconfig, device_type type, const char *tag)
@@ -279,6 +280,7 @@ public:
 	emu_timer* m_scanline_timer;
 	emu_timer* m_raster_irq;
 	emu_timer* m_vblank_irq;
+	emu_timer* m_fdc_tc;
 	UINT16* m_spriteram;
 	UINT16* m_spritereg;
 	tilemap_t* m_bg0_8;

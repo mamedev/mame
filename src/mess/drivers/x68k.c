@@ -126,6 +126,7 @@
 #include "machine/rp5c15.h"
 #include "machine/mb89352.h"
 #include "formats/xdf_dsk.h"
+#include "formats/dim_dsk.h"
 #include "machine/x68k_hdc.h"
 #include "includes/x68k.h"
 #include "machine/ram.h"
@@ -234,6 +235,10 @@ void x68k_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 		break;
 	case TIMER_X68K_CRTC_VBLANK_IRQ:
 		x68k_crtc_vblank_irq(ptr, param);
+		break;
+	case TIMER_X68K_FDC_TC:
+		m_fdc.fdc->tc_w(ASSERT_LINE);
+		m_fdc.fdc->tc_w(CLEAR_LINE);
 		break;
 	default:
 		assert_always(FALSE, "Unknown id in x68k_state::device_timer");
@@ -1110,7 +1115,13 @@ static void x68k_fdc_write_byte(running_machine &machine,int addr, int data)
 
 void x68k_state::fdc_drq(bool state)
 {
+	bool ostate = m_fdc.drq_state;
 	m_fdc.drq_state = state;
+	if(state && !ostate)
+	{
+		device_t* device = machine().device("hd63450");
+		hd63450_single_transfer(device, 0);
+	}
 }
 
 WRITE16_MEMBER(x68k_state::x68k_fm_w)
@@ -1787,6 +1798,11 @@ static void x68k_dma_end(running_machine &machine, int channel,int irq)
 	if(irq != 0)
 	{
 		x68k_dma_irq(machine, channel);
+	}
+	if(channel == 0)
+	{
+		x68k_state *state = machine.driver_data<x68k_state>();
+		state->m_fdc_tc->adjust(attotime::from_usec(1), 0, attotime::never);
 	}
 }
 
@@ -2651,6 +2667,7 @@ DRIVER_INIT_MEMBER(x68k_state,x68000)
 	m_mouse_timer = timer_alloc(TIMER_X68K_SCC_ACK);
 	m_led_timer = timer_alloc(TIMER_X68K_LED);
 	m_net_timer = timer_alloc(TIMER_X68K_NET_IRQ);
+	m_fdc_tc = timer_alloc(TIMER_X68K_FDC_TC);
 
 	// Initialise timers for 6-button MD controllers
 	md_6button_init();
@@ -2674,7 +2691,8 @@ DRIVER_INIT_MEMBER(x68k_state,x68030)
 }
 
 FLOPPY_FORMATS_MEMBER( x68k_state::floppy_formats )
-	FLOPPY_XDF_FORMAT
+	FLOPPY_XDF_FORMAT,
+	FLOPPY_DIM_FORMAT
 FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( x68k_floppies )

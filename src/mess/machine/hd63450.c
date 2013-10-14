@@ -260,8 +260,10 @@ static void dma_transfer_start(device_t* device, int channel, int dir)
 		cpu->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 		dmac->timer[channel]->adjust(attotime::zero, channel, dmac->burst_clock[channel]);
 	}
-	else
+	else if(!(dmac->reg[channel].ocr & 2))
 		dmac->timer[channel]->adjust(attotime::from_usec(500), channel, dmac->clock[channel]);
+	else if((dmac->reg[channel].ocr & 3) == 3)
+		dmac->timer[channel]->adjust(attotime::from_usec(500), channel, attotime::never);
 
 	dmac->transfer_size[channel] = dmac->reg[channel].mtc;
 

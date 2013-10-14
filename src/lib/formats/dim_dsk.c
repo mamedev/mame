@@ -98,3 +98,156 @@ FLOPPY_CONSTRUCT(dim_dsk_construct)
 	geometry.offset = 0x100;
 	return basicdsk_construct(floppy, &geometry);
 }
+
+
+/***************************************************************************
+
+    Copyright Olivier Galibert
+    All rights reserved.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are
+    met:
+
+        * Redistributions of source code must retain the above copyright
+          notice, this list of conditions and the following disclaimer.
+        * Redistributions in binary form must reproduce the above copyright
+          notice, this list of conditions and the following disclaimer in
+          the documentation and/or other materials provided with the
+          distribution.
+        * Neither the name 'MAME' nor the names of its contributors may be
+          used to endorse or promote products derived from this software
+          without specific prior written permission.
+
+    THIS SOFTWARE IS PROVIDED BY AARON GILES ''AS IS'' AND ANY EXPRESS OR
+    IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+    DISCLAIMED. IN NO EVENT SHALL AARON GILES BE LIABLE FOR ANY DIRECT,
+    INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+    SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+    HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+    STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+
+****************************************************************************/
+
+/*********************************************************************
+
+    formats/dim_dsk.h
+
+    DIM disk images
+
+*********************************************************************/
+
+#include "emu.h"
+#include "dim_dsk.h"
+
+dim_format::dim_format()
+{
+}
+
+const char *dim_format::name() const
+{
+	return "dim";
+}
+
+const char *dim_format::description() const
+{
+	return "DIM disk image";
+}
+
+const char *dim_format::extensions() const
+{
+	return "dim";
+}
+
+int dim_format::identify(io_generic *io, UINT32 form_factor)
+{
+	UINT8 h[16];
+
+	io_generic_read(io, h, 0xab, 16);
+
+	if(strncmp((const char *)h, "DIFC HEADER", 11) == 0)
+		return 100;
+
+	return 0;
+}
+
+bool dim_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
+{
+	int offset = 0x100;
+	UINT8 h;
+
+	io_generic_read(io, &h, 0, 1);
+
+	int spt, gap3, bps, size;
+	switch(h) {
+	case 0:
+	default:
+		spt = 8;
+		gap3 = 0x74;
+		size = 3;
+		break;
+	case 1:
+	case 3:
+		spt = 9;
+		gap3 = 0x39;
+		size = 3;
+		break;
+	case 2:
+		spt = 15;
+		gap3 = 0x54;
+		size = 2;
+		break;
+	case 9:
+		spt = 18;
+		gap3 = 0x54;
+		size = 2;
+		break;
+	case 17:
+		spt = 26;
+		gap3 = 0x33;
+		size = 1;
+		break;
+	}
+	bps = 128 << size;
+
+	for(int track=0; track < 77; track++)
+		for(int head=0; head < 2; head++) {
+			desc_pc_sector sects[30];
+			UINT8 sect_data[10000];
+			int sdatapos = 0;
+			for(int i=0; i<spt; i++) {
+				sects[i].track       = track;
+				sects[i].head        = head;
+				sects[i].sector      = i+1;
+				sects[i].size        = size;
+				sects[i].actual_size = bps;
+				sects[i].deleted     = false;
+				sects[i].bad_crc     = false;
+				sects[i].data        = &sect_data[sdatapos];
+				io_generic_read(io, sects[i].data, offset, bps);
+				offset += bps;
+				sdatapos += bps;
+			}
+
+			build_pc_track_mfm(track, head, image, (500000*60/360)*2, spt, sects, gap3);
+		}
+
+	return true;
+}
+
+
+bool dim_format::save(io_generic *io, floppy_image *image)
+{
+	return false;
+}
+
+bool dim_format::supports_save() const
+{
+	return false;
+}
+
+const floppy_format_type FLOPPY_DIM_FORMAT = &floppy_image_format_creator<dim_format>;
