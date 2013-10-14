@@ -120,8 +120,8 @@ public:
 	DECLARE_READ8Z_MEMBER( readz );
 	DECLARE_WRITE8_MEMBER( write );
 
-	void crureadz(offs_t offset, UINT8 *value);
-	void cruwrite(offs_t offset, UINT8 data);
+	DECLARE_READ8Z_MEMBER(crureadz);
+	DECLARE_WRITE8_MEMBER(cruwrite);
 
 	void CRUS_set(bool state);
 	void PTGE_set(bool state);

@@ -137,7 +137,7 @@ snug_high_speed_gpl_device::snug_high_speed_gpl_device(const machine_config &mco
 /*
    Read hsgpl CRU interface. None here.
 */
-void snug_high_speed_gpl_device::crureadz(offs_t offset, UINT8 *value)
+READ8Z_MEMBER(snug_high_speed_gpl_device::crureadz)
 {
 	return;
 }
@@ -145,7 +145,7 @@ void snug_high_speed_gpl_device::crureadz(offs_t offset, UINT8 *value)
 /*
     Write hsgpl CRU interface
 */
-void snug_high_speed_gpl_device::cruwrite(offs_t offset, UINT8 data)
+WRITE8_MEMBER(snug_high_speed_gpl_device::cruwrite)
 {
 	// SuperCart handling - see gromport.c
 	if (m_supercart_enabled && ((offset & 0xfff0)==SUPERCART_BASE))

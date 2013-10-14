@@ -57,7 +57,7 @@ nouspikel_ide_interface_device::nouspikel_ide_interface_device(const machine_con
 /*
     CRU read
 */
-void nouspikel_ide_interface_device::crureadz(offs_t offset, UINT8 *value)
+READ8Z_MEMBER(nouspikel_ide_interface_device::crureadz)
 {
 	UINT8 reply = 0;
 	if ((offset & 0xff00)==m_cru_base)
@@ -82,7 +82,7 @@ void nouspikel_ide_interface_device::crureadz(offs_t offset, UINT8 *value)
 /*
     CRU write
 */
-void nouspikel_ide_interface_device::cruwrite(offs_t offset, UINT8 data)
+WRITE8_MEMBER(nouspikel_ide_interface_device::cruwrite)
 {
 	if ((offset & 0xff00)==m_cru_base)
 	{

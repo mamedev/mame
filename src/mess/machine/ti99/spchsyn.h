@@ -25,8 +25,8 @@ public:
 	DECLARE_WRITE8_MEMBER(write);
 	DECLARE_SETADDRESS_DBIN_MEMBER(setaddress_dbin);
 
-	void crureadz(offs_t offset, UINT8 *value) { };
-	void cruwrite(offs_t offset, UINT8 value) { };
+	DECLARE_READ8Z_MEMBER(crureadz) { };
+	DECLARE_WRITE8_MEMBER(cruwrite) { };
 
 	DECLARE_WRITE_LINE_MEMBER( speech_ready );
 

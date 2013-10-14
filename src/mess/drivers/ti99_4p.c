@@ -503,13 +503,13 @@ WRITE8_MEMBER( ti99_4p_state::cruwrite )
 	}
 
 	// No match - pass to peribox
-	m_peribox->cruwrite(addroff, data);
+	m_peribox->cruwrite(space, addroff, data);
 }
 
 READ8_MEMBER( ti99_4p_state::cruread )
 {
 	UINT8 value = 0;
-	m_peribox->crureadz(offset<<4, &value);
+	m_peribox->crureadz(space, offset<<4, &value);
 	return value;
 }
 

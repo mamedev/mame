@@ -122,9 +122,8 @@ WRITE8_MEMBER(myarc_memory_expansion_device::write)
 /*
     CRU read. None here.
 */
-void myarc_memory_expansion_device::crureadz(offs_t offset, UINT8 *value)
+READ8Z_MEMBER(myarc_memory_expansion_device::crureadz)
 {
-	return;
 }
 
 /*
@@ -138,7 +137,7 @@ void myarc_memory_expansion_device::crureadz(offs_t offset, UINT8 *value)
         1006 = bit 2 of RAM bank value (512K)
         1008 = bit 3 of RAM bank value (512K)
 */
-void myarc_memory_expansion_device::cruwrite(offs_t offset, UINT8 data)
+WRITE8_MEMBER(myarc_memory_expansion_device::cruwrite)
 {
 	if (((offset & 0xff00)==MYARCMEM_CRU_BASE1)||((offset & 0xff00)==MYARCMEM_CRU_BASE2))
 	{

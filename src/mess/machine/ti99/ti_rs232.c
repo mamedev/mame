@@ -258,7 +258,7 @@ void ti_pio_attached_device::call_unload()
 /*
     CRU read
 */
-void ti_rs232_pio_device::crureadz(offs_t offset, UINT8 *value)
+READ8Z_MEMBER(ti_rs232_pio_device::crureadz)
 {
 	if ((offset & 0xff00)==m_cru_base)
 	{
@@ -279,12 +279,12 @@ void ti_rs232_pio_device::crureadz(offs_t offset, UINT8 *value)
 		}
 		if ((offset & 0x00c0)==0x0040)
 		{
-			*value = m_uart[0]->cruread(*m_space, offset>>4, 0xff);
+			*value = m_uart[0]->cruread(space, offset>>4, 0xff);
 			return;
 		}
 		if ((offset & 0x00c0)==0x0080)
 		{
-			*value = m_uart[1]->cruread(*m_space, offset>>4, 0xff);
+			*value = m_uart[1]->cruread(space, offset>>4, 0xff);
 			return;
 		}
 	}
@@ -293,18 +293,18 @@ void ti_rs232_pio_device::crureadz(offs_t offset, UINT8 *value)
 /*
     CRU write
 */
-void ti_rs232_pio_device::cruwrite(offs_t offset, UINT8 data)
+WRITE8_MEMBER(ti_rs232_pio_device::cruwrite)
 {
 	if ((offset & 0xff00)==m_cru_base)
 	{
 		if ((offset & 0x00c0)==0x0040)
 		{
-			m_uart[0]->cruwrite(*m_space, offset>>1, data, 0xff);
+			m_uart[0]->cruwrite(space, offset>>1, data, 0xff);
 			return;
 		}
 		if ((offset & 0x00c0)==0x0080)
 		{
-			m_uart[1]->cruwrite(*m_space, offset>>1, data, 0xff);
+			m_uart[1]->cruwrite(space, offset>>1, data, 0xff);
 			return;
 		}
 
@@ -1075,7 +1075,6 @@ void ti_rs232_pio_device::device_reset()
 		m_select_value = 0x74000;
 	}
 
-	m_space = &machine().device("maincpu")->memory().space(AS_IO);
 	m_selected = false;
 
 	m_cru_base = (ioport("CRURS232")->read()==0)? 0x1300 : 0x1500;

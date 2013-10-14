@@ -28,8 +28,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( intrq_w );
 	DECLARE_WRITE_LINE_MEMBER( drq_w );
 
-	void crureadz(offs_t offset, UINT8 *value);
-	void cruwrite(offs_t offset, UINT8 value);
+	DECLARE_READ8Z_MEMBER(crureadz);
+	DECLARE_WRITE8_MEMBER(cruwrite);
 
 protected:
 	virtual void device_start(void);

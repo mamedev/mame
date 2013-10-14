@@ -235,7 +235,7 @@ WRITE8_MEMBER(snug_enhanced_video_device::write)
     7: DIP or NOVRAM
     Logic is inverted
 */
-void snug_enhanced_video_device::crureadz(offs_t offset, UINT8 *value)
+READ8Z_MEMBER(snug_enhanced_video_device::crureadz)
 {
 	if ((offset & 0xff00)==EVPC_CRU_BASE)
 	{
@@ -258,7 +258,7 @@ void snug_enhanced_video_device::crureadz(offs_t offset, UINT8 *value)
     Bit 6: -
     Bit 7: -
 */
-void snug_enhanced_video_device::cruwrite(offs_t offset, UINT8 data)
+WRITE8_MEMBER(snug_enhanced_video_device::cruwrite)
 {
 	if ((offset & 0xff00)==EVPC_CRU_BASE)
 	{

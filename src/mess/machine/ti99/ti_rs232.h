@@ -33,8 +33,8 @@ public:
 	DECLARE_READ8Z_MEMBER(readz);
 	DECLARE_WRITE8_MEMBER(write);
 
-	void crureadz(offs_t offset, UINT8 *value);
-	void cruwrite(offs_t offset, UINT8 data);
+	DECLARE_READ8Z_MEMBER(crureadz);
+	DECLARE_WRITE8_MEMBER(cruwrite);
 
 	DECLARE_WRITE_LINE_MEMBER( int0_callback );
 	DECLARE_WRITE_LINE_MEMBER( int1_callback );
@@ -75,7 +75,6 @@ private:
 	// Connected image (file) that represents the device connected to the
 	// parallel interface
 	ti_pio_attached_device*     m_piodev;
-	address_space*              m_space;
 	UINT8*                      m_dsrrom;
 
 	// Input buffer for each UART. We have to copy the contents of sdlsocket here

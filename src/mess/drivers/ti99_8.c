@@ -492,9 +492,9 @@ READ8_MEMBER( ti99_8_state::cruread )
 	// Similar to the bus8z_devices, just let the mapper, the gromport, and the p-box
 	// decide whether they want to change the value at the CRU address
 	// Also, we translate the bit addresses to base addresses
-	m_mapper->crureadz(offset<<4, &value);
-	m_gromport->crureadz(offset<<4, &value);
-	m_peribox->crureadz(offset<<4, &value);
+	m_mapper->crureadz(space, offset<<4, &value);
+	m_gromport->crureadz(space, offset<<4, &value);
+	m_peribox->crureadz(space, offset<<4, &value);
 
 	if (VERBOSE>8) LOG("ti99_8: CRU %04x -> %02x\n", offset<<4, value);
 	return value;
@@ -503,9 +503,9 @@ READ8_MEMBER( ti99_8_state::cruread )
 WRITE8_MEMBER( ti99_8_state::cruwrite )
 {
 	if (VERBOSE>8) LOG("ti99_8: CRU %04x <- %x\n", offset<<1, data);
-	m_mapper->cruwrite(offset<<1, data);
-	m_gromport->cruwrite(offset<<1, data);
-	m_peribox->cruwrite(offset<<1, data);
+	m_mapper->cruwrite(space, offset<<1, data);
+	m_gromport->cruwrite(space, offset<<1, data);
+	m_peribox->cruwrite(space, offset<<1, data);
 }
 
 /***************************************************************************

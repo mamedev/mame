@@ -102,7 +102,7 @@ WRITE8_MEMBER(ti_fdc_device::write)
     bit 6: always 1
     bit 7: selected side
 */
-void ti_fdc_device::crureadz(offs_t offset, UINT8 *value)
+READ8Z_MEMBER(ti_fdc_device::crureadz)
 {
 	if ((offset & 0xff00)==m_cru_base)
 	{
@@ -122,7 +122,7 @@ void ti_fdc_device::crureadz(offs_t offset, UINT8 *value)
 	}
 }
 
-void ti_fdc_device::cruwrite(offs_t offset, UINT8 data)
+WRITE8_MEMBER(ti_fdc_device::cruwrite)
 {
 	int drive, drivebit;
 

@@ -247,7 +247,7 @@ WRITE8_MEMBER(snug_bwg_device::write)
     bit 6: Dip 3
     bit 7: Dip 4
 */
-void snug_bwg_device::crureadz(offs_t offset, UINT8 *value)
+READ8Z_MEMBER(snug_bwg_device::crureadz)
 {
 	UINT8 reply = 0;
 
@@ -273,7 +273,7 @@ void snug_bwg_device::crureadz(offs_t offset, UINT8 *value)
 	}
 }
 
-void snug_bwg_device::cruwrite(offs_t offset, UINT8 data)
+WRITE8_MEMBER(snug_bwg_device::cruwrite)
 {
 	int drive, drivebit;
 

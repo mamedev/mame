@@ -171,10 +171,8 @@ WRITE_LINE_MEMBER( ti_pcode_card_device::ready_line )
     we just ignore any request. (Note that CRU lines are not like memory; you
     may be able to write to them, but not necessarily read them again.)
 */
-void ti_pcode_card_device::crureadz(offs_t offset, UINT8 *value)
+READ8Z_MEMBER(ti_pcode_card_device::crureadz)
 {
-	// Nothing here.
-	return;
 }
 
 /*
@@ -186,7 +184,7 @@ void ti_pcode_card_device::crureadz(offs_t offset, UINT8 *value)
     A8, A13, and A14 so bit 0 is at 0x1f00, but bit 4 is at 0x1f80. Accordingly,
     bit 7 would be 0x1f86 but it is not used.
 */
-void ti_pcode_card_device::cruwrite(offs_t offset, UINT8 data)
+WRITE8_MEMBER(ti_pcode_card_device::cruwrite)
 {
 	if ((offset & 0xff00)==m_cru_base)
 	{

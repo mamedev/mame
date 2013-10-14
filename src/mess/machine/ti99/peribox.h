@@ -54,8 +54,8 @@ public:
 	DECLARE_WRITE8_MEMBER(write);
 	DECLARE_SETADDRESS_DBIN_MEMBER(setaddress_dbin);
 
-	void crureadz(offs_t offset, UINT8 *value);
-	void cruwrite(offs_t offset, UINT8 value);
+	DECLARE_READ8Z_MEMBER(crureadz);
+	DECLARE_WRITE8_MEMBER(cruwrite);
 	DECLARE_WRITE_LINE_MEMBER(senila);
 	DECLARE_WRITE_LINE_MEMBER(senilb);
 
@@ -155,8 +155,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( set_intb );
 	DECLARE_WRITE_LINE_MEMBER( set_ready );
 
-	void crureadz(offs_t offset, UINT8 *value);
-	void cruwrite(offs_t offset, UINT8 value);
+	DECLARE_READ8Z_MEMBER(crureadz);
+	DECLARE_WRITE8_MEMBER(cruwrite);
 
 	// called from the box itself
 	void set_genmod(bool set);
@@ -193,8 +193,8 @@ public:
 		m_genmod = false;
 	}
 
-	virtual void crureadz(offs_t offset, UINT8 *value) =0;
-	virtual void cruwrite(offs_t offset, UINT8 data) =0;
+	virtual DECLARE_READ8Z_MEMBER(crureadz) =0;
+	virtual DECLARE_WRITE8_MEMBER(cruwrite) =0;
 
 	void    set_senila(int state) { m_senila = state; }
 	void    set_senilb(int state) { m_senilb = state; }

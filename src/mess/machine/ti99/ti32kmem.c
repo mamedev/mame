@@ -91,19 +91,6 @@ WRITE8_MEMBER(ti_32k_expcard_device::write)
 	}
 }
 
-/*
-    32K memory expansion does not have a CRU interface
-*/
-void ti_32k_expcard_device::crureadz(offs_t offset, UINT8 *value)
-{
-	return;
-}
-
-void ti_32k_expcard_device::cruwrite(offs_t offset, UINT8 value)
-{
-	return;
-}
-
 void ti_32k_expcard_device::device_start(void)
 {
 	m_ram_ptr = memregion(RAMREGION)->base();

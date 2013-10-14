@@ -32,8 +32,8 @@ public:
 	gromport_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	DECLARE_READ8Z_MEMBER(readz);
 	DECLARE_WRITE8_MEMBER(write);
-	void crureadz(offs_t offset, UINT8 *value);
-	void cruwrite(offs_t offset, UINT8 data);
+	DECLARE_READ8Z_MEMBER(crureadz);
+	DECLARE_WRITE8_MEMBER(cruwrite);
 	DECLARE_WRITE_LINE_MEMBER(ready_line);
 
 	void    cartridge_inserted();
@@ -75,8 +75,8 @@ public:
 
 	DECLARE_READ8Z_MEMBER(readz);
 	DECLARE_WRITE8_MEMBER(write);
-	void    crureadz(offs_t offset, UINT8 *value);
-	void    cruwrite(offs_t offset, UINT8 data);
+	DECLARE_READ8Z_MEMBER(crureadz);
+	DECLARE_WRITE8_MEMBER(cruwrite);
 
 	DECLARE_WRITE_LINE_MEMBER(ready_line);
 	bool    is_available() { return m_pcb != NULL; }
@@ -132,8 +132,8 @@ class ti99_cartridge_connector_device : public bus8z_device
 public:
 	virtual DECLARE_READ8Z_MEMBER(readz) =0;
 	virtual DECLARE_WRITE8_MEMBER(write) =0;
-	virtual void crureadz(offs_t offset, UINT8 *value) =0;
-	virtual void cruwrite(offs_t offset, UINT8 data) =0;
+	virtual DECLARE_READ8Z_MEMBER(crureadz) = 0;
+	virtual DECLARE_WRITE8_MEMBER(cruwrite) = 0;
 
 	DECLARE_WRITE_LINE_MEMBER(ready_line);
 
@@ -159,8 +159,8 @@ public:
 
 	DECLARE_READ8Z_MEMBER(readz);
 	DECLARE_WRITE8_MEMBER(write);
-	void crureadz(offs_t offset, UINT8 *value);
-	void cruwrite(offs_t offset, UINT8 data);
+	DECLARE_READ8Z_MEMBER(crureadz);
+	DECLARE_WRITE8_MEMBER(cruwrite);
 
 protected:
 	virtual void device_start();
@@ -187,8 +187,8 @@ public:
 
 	DECLARE_READ8Z_MEMBER(readz);
 	DECLARE_WRITE8_MEMBER(write);
-	void crureadz(offs_t offset, UINT8 *value);
-	void cruwrite(offs_t offset, UINT8 data);
+	DECLARE_READ8Z_MEMBER(crureadz);
+	DECLARE_WRITE8_MEMBER(cruwrite);
 
 	void insert(int index, ti99_cartridge_device* cart);
 	void remove(int index);
@@ -220,8 +220,8 @@ public:
 
 	DECLARE_READ8Z_MEMBER(readz);
 	DECLARE_WRITE8_MEMBER(write);
-	void crureadz(offs_t offset, UINT8 *value);
-	void cruwrite(offs_t offset, UINT8 data);
+	DECLARE_READ8Z_MEMBER(crureadz);
+	DECLARE_WRITE8_MEMBER(cruwrite);
 
 	void insert(int index, ti99_cartridge_device* cart);
 	void remove(int index);
@@ -272,8 +272,8 @@ public:
 protected:
 	virtual DECLARE_READ8Z_MEMBER(readz);
 	virtual DECLARE_WRITE8_MEMBER(write);
-	virtual void    crureadz(offs_t offset, UINT8 *value);
-	virtual void    cruwrite(offs_t offset, UINT8 data);
+	virtual DECLARE_READ8Z_MEMBER(crureadz);
+	virtual DECLARE_WRITE8_MEMBER(cruwrite);
 
 	DECLARE_READ8Z_MEMBER(gromreadz);
 	DECLARE_WRITE8_MEMBER(gromwrite);
@@ -334,8 +334,8 @@ public:
 	~ti99_super_cartridge() { };
 	DECLARE_READ8Z_MEMBER(readz);
 	DECLARE_WRITE8_MEMBER(write);
-	void    crureadz(offs_t offset, UINT8 *value);
-	void    cruwrite(offs_t offset, UINT8 data);
+	DECLARE_READ8Z_MEMBER(crureadz);
+	DECLARE_WRITE8_MEMBER(cruwrite);
 };
 
 /************************* MBX  ***************************************/
@@ -368,8 +368,8 @@ public:
 	~ti99_pagedcru_cartridge() { };
 	DECLARE_READ8Z_MEMBER(readz);
 	DECLARE_WRITE8_MEMBER(write);
-	void    crureadz(offs_t offset, UINT8 *value);
-	void    cruwrite(offs_t offset, UINT8 data);
+	DECLARE_READ8Z_MEMBER(crureadz);
+	DECLARE_WRITE8_MEMBER(cruwrite);
 };
 
 /********************** GROM emulation cartridge  ************************************/

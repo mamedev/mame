@@ -146,16 +146,16 @@ WRITE8_MEMBER(gromport_device::write)
 		m_connector->write(space, offset, data);
 }
 
-void gromport_device::crureadz(offs_t offset, UINT8 *value)
+READ8Z_MEMBER(gromport_device::crureadz)
 {
 	if (m_connector != NULL)
-		m_connector->crureadz(offset, value);
+		m_connector->crureadz(space, offset, value);
 }
 
-void gromport_device::cruwrite(offs_t offset, UINT8 data)
+WRITE8_MEMBER(gromport_device::cruwrite)
 {
 	if (m_connector != NULL)
-		m_connector->cruwrite(offset, data);
+		m_connector->cruwrite(space, offset, data);
 }
 
 WRITE_LINE_MEMBER(gromport_device::ready_line)
@@ -283,16 +283,16 @@ WRITE8_MEMBER(single_conn_device::write)
 	m_cartridge->write(space, offset, data);
 }
 
-void single_conn_device::crureadz(offs_t offset, UINT8 *value)
+READ8Z_MEMBER(single_conn_device::crureadz)
 {
 	// Pass through
-	m_cartridge->crureadz(offset, value);
+	m_cartridge->crureadz(space, offset, value);
 }
 
-void single_conn_device::cruwrite(offs_t offset, UINT8 data)
+WRITE8_MEMBER(single_conn_device::cruwrite)
 {
 	// Pass through
-	m_cartridge->cruwrite(offset, data);
+	m_cartridge->cruwrite(space, offset, data);
 }
 
 void single_conn_device::device_start()
@@ -499,7 +499,7 @@ WRITE8_MEMBER(multi_conn_device::write)
 	}
 }
 
-void multi_conn_device::crureadz(offs_t offset, UINT8 *value)
+READ8Z_MEMBER(multi_conn_device::crureadz)
 {
 	int slot = get_active_slot(false, offset);
 	/* Sanity check. Higher slots are always empty. */
@@ -508,11 +508,11 @@ void multi_conn_device::crureadz(offs_t offset, UINT8 *value)
 
 	if (m_cartridge[slot] != NULL)
 	{
-		m_cartridge[slot]->crureadz(offset, value);
+		m_cartridge[slot]->crureadz(space, offset, value);
 	}
 }
 
-void multi_conn_device::cruwrite(offs_t offset, UINT8 data)
+WRITE8_MEMBER(multi_conn_device::cruwrite)
 {
 	int slot = get_active_slot(true, offset);
 
@@ -522,7 +522,7 @@ void multi_conn_device::cruwrite(offs_t offset, UINT8 data)
 
 	if (m_cartridge[slot] != NULL)
 	{
-		m_cartridge[slot]->cruwrite(offset, data);
+		m_cartridge[slot]->cruwrite(space, offset, data);
 	}
 }
 
@@ -895,14 +895,14 @@ WRITE8_MEMBER(gkracker_device::write)
 	}
 }
 
-void gkracker_device::crureadz(offs_t offset, UINT8 *value)
+READ8Z_MEMBER( gkracker_device::crureadz )
 {
-	if (m_cartridge != NULL) m_cartridge->crureadz(offset, value);
+	if (m_cartridge != NULL) m_cartridge->crureadz(space, offset, value);
 }
 
-void gkracker_device::cruwrite(offs_t offset, UINT8 data)
+WRITE8_MEMBER( gkracker_device::cruwrite )
 {
-	if (m_cartridge != NULL) m_cartridge->cruwrite(offset, data);
+	if (m_cartridge != NULL) m_cartridge->cruwrite(space, offset, data);
 }
 
 INPUT_CHANGED_MEMBER( gkracker_device::gk_changed )
@@ -1342,14 +1342,14 @@ WRITE8_MEMBER(ti99_cartridge_device::write)
 	if (m_pcb != NULL) m_pcb->write(space, offset, data);
 }
 
-void ti99_cartridge_device::crureadz(offs_t offset, UINT8 *value)
+READ8Z_MEMBER(ti99_cartridge_device::crureadz)
 {
-	if (m_pcb != NULL) m_pcb->crureadz(offset, value);
+	if (m_pcb != NULL) m_pcb->crureadz(space, offset, value);
 }
 
-void ti99_cartridge_device::cruwrite(offs_t offset, UINT8 data)
+WRITE8_MEMBER(ti99_cartridge_device::cruwrite)
 {
-	if (m_pcb != NULL) m_pcb->cruwrite(offset, data);
+	if (m_pcb != NULL) m_pcb->cruwrite(space, offset, data);
 }
 
 WRITE_LINE_MEMBER( ti99_cartridge_device::ready_line )
@@ -1496,11 +1496,11 @@ WRITE8_MEMBER(ti99_cartridge_pcb::write)
 	}
 }
 
-void ti99_cartridge_pcb::crureadz(offs_t offset, UINT8 *value)
+READ8Z_MEMBER(ti99_cartridge_pcb::crureadz)
 {
 }
 
-void ti99_cartridge_pcb::cruwrite(offs_t offset, UINT8 data)
+WRITE8_MEMBER(ti99_cartridge_pcb::cruwrite)
 {
 }
 
@@ -1636,7 +1636,7 @@ WRITE8_MEMBER(ti99_super_cartridge::write)
 	}
 }
 
-void ti99_super_cartridge::crureadz(offs_t offset, UINT8 *value)
+READ8Z_MEMBER(ti99_super_cartridge::crureadz)
 {
 	// offset is the bit number. The CRU base address is already divided  by 2.
 
@@ -1674,7 +1674,7 @@ void ti99_super_cartridge::crureadz(offs_t offset, UINT8 *value)
 	}
 }
 
-void ti99_super_cartridge::cruwrite(offs_t offset, UINT8 data)
+WRITE8_MEMBER(ti99_super_cartridge::cruwrite)
 {
 	if ((offset & 0xfff0) == 0x0800)
 	{
@@ -1852,7 +1852,7 @@ WRITE8_MEMBER(ti99_pagedcru_cartridge::write)
 	return;
 }
 
-void ti99_pagedcru_cartridge::crureadz(offs_t offset, UINT8 *value)
+READ8Z_MEMBER(ti99_pagedcru_cartridge::crureadz)
 {
 	int page = m_rom_page;
 	if ((offset & 0xf800)==0x0800)
@@ -1866,7 +1866,7 @@ void ti99_pagedcru_cartridge::crureadz(offs_t offset, UINT8 *value)
 	}
 }
 
-void ti99_pagedcru_cartridge::cruwrite(offs_t offset, UINT8 data)
+WRITE8_MEMBER(ti99_pagedcru_cartridge::cruwrite)
 {
 	if ((offset & 0xf800)==0x0800)
 	{

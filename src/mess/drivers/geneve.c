@@ -407,7 +407,7 @@ WRITE8_MEMBER ( geneve_state::cruwrite )
 	}
 	else
 	{
-		m_peribox->cruwrite(addroff, data);
+		m_peribox->cruwrite(space, addroff, data);
 	}
 }
 
@@ -429,7 +429,7 @@ READ8_MEMBER( geneve_state::cruread )
 	// so we just don't arrive here
 
 	// Propagate the CRU access to external devices
-	m_peribox->crureadz(addroff, &value);
+	m_peribox->crureadz(space, addroff, &value);
 	return value;
 }
 

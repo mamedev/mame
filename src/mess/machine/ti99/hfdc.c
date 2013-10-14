@@ -158,7 +158,7 @@ WRITE8_MEMBER( myarc_hfdc_device::write )
 	}
 }
 
-void myarc_hfdc_device::crureadz(offs_t offset, UINT8 *value)
+READ8Z_MEMBER(myarc_hfdc_device::crureadz)
 {
 	UINT8 reply;
 	if ((offset & 0xff00)==m_cru_base)
@@ -211,7 +211,7 @@ void myarc_hfdc_device::crureadz(offs_t offset, UINT8 *value)
     Bit number = (CRU_rel_address - base_address)/2
     CD0 and CD1 are Clock Divider selections for the Floppy Data Separator (FDC9216)
 */
-void myarc_hfdc_device::cruwrite(offs_t offset, UINT8 data)
+WRITE8_MEMBER(myarc_hfdc_device::cruwrite)
 {
 	if ((offset & 0xff00)==m_cru_base)
 	{

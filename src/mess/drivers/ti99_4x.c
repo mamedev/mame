@@ -362,8 +362,8 @@ READ8_MEMBER( ti99_4x_state::cruread )
 	// Also, we translate the bit addresses to base addresses
 
 	// The QI version does not propagate the CRU signals to the cartridge slot
-	if (!m_qi_version) m_gromport->crureadz(offset<<4, &value);
-	m_peribox->crureadz(offset<<4, &value);
+	if (!m_qi_version) m_gromport->crureadz(space, offset<<4, &value);
+	m_peribox->crureadz(space, offset<<4, &value);
 
 	return value;
 }
@@ -372,8 +372,8 @@ WRITE8_MEMBER( ti99_4x_state::cruwrite )
 {
 	if (VERBOSE>6) LOG("ti99_4x: write access to CRU address %04x\n", offset << 1);
 	// The QI version does not propagate the CRU signals to the cartridge slot
-	if (!m_qi_version) m_gromport->cruwrite(offset<<1, data);
-	m_peribox->cruwrite(offset<<1, data);
+	if (!m_qi_version) m_gromport->cruwrite(space, offset<<1, data);
+	m_peribox->cruwrite(space, offset<<1, data);
 }
 
 WRITE8_MEMBER( ti99_4x_state::external_operation )
