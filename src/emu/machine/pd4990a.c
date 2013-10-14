@@ -131,14 +131,6 @@ void upd4990a_old_device::device_start()
 
 void upd4990a_old_device::device_reset()
 {
-	m_seconds = 0;
-	m_minutes = 0;
-	m_hours = 0;
-	m_days = 0;
-	m_month = 0;
-	m_year = 0;
-	m_weekday = 0;
-	
 	m_shiftlo = 0;
 	m_shifthi = 0;
 
