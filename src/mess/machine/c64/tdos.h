@@ -33,6 +33,7 @@ public:
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual ioport_constructor device_input_ports() const;
 
 protected:
 	// device-level overrides
@@ -48,6 +49,9 @@ protected:
 private:
 	required_device<mc6852_device> m_ssda;
 	required_device<c64_expansion_slot_device> m_exp;
+	required_ioport m_sw1;
+
+	bool m_enabled;
 };
 
 

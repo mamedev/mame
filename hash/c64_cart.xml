@@ -84,10 +84,11 @@
 		</part>
 	</software>
 
-	<software name="tdos12" supported="no">
+	<software name="tdos12" supported="partial">
 		<description>Triton QD TDOS 1.2</description>
 		<year>198?</year>
 		<publisher>Radofin</publisher>
+		<info name="usage" value="Enter 'SYS 32768' to run" />
 
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="tdos" />
