@@ -149,135 +149,6 @@ static const UINT8 olds_source_data[8][0xec] = // table addresses $2951CA
 	}
 };
 
-void pgm_028_025_state::olds_protection_calculate_hold(int y, int z) // calculated in routine $12dbc2 in olds
-{
-	unsigned short old = m_olds_prot_hold;
-
-	m_olds_prot_hold = ((old << 1) | (old >> 15));
-
-	m_olds_prot_hold ^= 0x2bad;
-	m_olds_prot_hold ^= BIT(z, y);
-	m_olds_prot_hold ^= BIT( old,  7) <<  0;
-	m_olds_prot_hold ^= BIT(~old, 13) <<  4;
-	m_olds_prot_hold ^= BIT( old,  3) << 11;
-
-	m_olds_prot_hold ^= (m_olds_prot_hilo & ~0x0408) << 1; // $81790c
-}
-
-void pgm_028_025_state::olds_protection_calculate_hilo() // calculated in routine $12dbc2 in olds
-{
-	UINT8 source;
-
-	m_olds_prot_hilo_select++;
-	if (m_olds_prot_hilo_select > 0xeb) {
-		m_olds_prot_hilo_select = 0;
-	}
-
-	source = olds_source_data[ioport("Region")->read()][m_olds_prot_hilo_select];
-
-	if (m_olds_prot_hilo_select & 1)    // $8178fa
-	{
-		m_olds_prot_hilo = (m_olds_prot_hilo & 0x00ff) | (source << 8);     // $8178d8
-	}
-	else
-	{
-		m_olds_prot_hilo = (m_olds_prot_hilo & 0xff00) | (source << 0);     // $8178d8
-	}
-}
-
-WRITE16_MEMBER(pgm_028_025_state::olds_w )
-{
-	if (offset == 0)
-	{
-		m_olds_cmd = data;
-	}
-	else
-	{
-		switch (m_olds_cmd)
-		{
-			case 0x00:
-				m_olds_reg = data;
-			break;
-
-			case 0x02:
-				m_olds_bs = ((data & 0x03) << 6) | ((data & 0x04) << 3) | ((data & 0x08) << 1);
-			break;
-
-			case 0x03:
-			{
-				m_igs028->IGS028_handle();
-
-				m_olds_cmd3 = ((data >> 4) + 1) & 0x3;
-			}
-			break;
-
-			case 0x04:
-				m_olds_ptr = data;
-			break;
-
-			case 0x20:
-			case 0x21:
-			case 0x22:
-			case 0x23:
-			case 0x24:
-			case 0x25:
-			case 0x26:
-			case 0x27:
-				m_olds_ptr++;
-				olds_protection_calculate_hold(m_olds_cmd & 0x0f, data & 0xff);
-			break;
-
-		//  default:
-		//      logerror ("unemulated write mode!\n");
-		}
-	}
-}
-
-READ16_MEMBER(pgm_028_025_state::olds_r )
-{
-	if (offset)
-	{
-		switch (m_olds_cmd)
-		{
-			case 0x01:
-				return m_olds_reg & 0x7f;
-
-			case 0x02:
-				return m_olds_bs | 0x80;
-
-			case 0x03:
-				return m_olds_cmd3;
-
-			case 0x05:
-			{
-				switch (m_olds_ptr)
-				{
-					case 1: return 0x3f00 | ioport("Region")->read();
-
-					case 2:
-						return 0x3f00 | 0x00;
-
-					case 3:
-						return 0x3f00 | 0x90;
-
-					case 4:
-						return 0x3f00 | 0x00;
-
-					case 5:
-					default: // >= 5
-						return 0x3f00 | BITSWAP8(m_olds_prot_hold, 5,2,9,7,10,13,12,15);    // $817906
-				}
-			}
-
-			case 0x40:
-				olds_protection_calculate_hilo();
-				return 0; // unused?
-		}
-	}
-
-	return 0;
-}
-
 MACHINE_RESET_MEMBER(pgm_028_025_state,olds)
 {
 	MACHINE_RESET_CALL_MEMBER(pgm);
@@ -289,25 +160,10 @@ DRIVER_INIT_MEMBER(pgm_028_025_state,olds)
 {
 	pgm_basic_init();
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xdcb400, 0xdcb403, read16_delegate(FUNC(pgm_028_025_state::olds_r),this), write16_delegate(FUNC(pgm_028_025_state::olds_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xdcb400, 0xdcb403, read16_delegate(FUNC(igs025_device::olds_r), (igs025_device*)m_igs025), write16_delegate(FUNC(igs025_device::olds_w), (igs025_device*)m_igs025));
 	m_igs028->m_sharedprotram = m_sharedprotram;
+	m_igs025->olds_source_data = olds_source_data;
 
-
-	m_olds_prot_hold = 0;
-	m_olds_prot_hilo = 0;
-	m_olds_prot_hilo_select = 0;
-
-	m_olds_cmd = 0;
-	m_olds_reg = 0;
-	m_olds_ptr = 0;
-	m_olds_bs = 0;
-	m_olds_cmd3 = 0;
-
-	save_item(NAME(m_olds_cmd));
-	save_item(NAME(m_olds_reg));
-	save_item(NAME(m_olds_ptr));
-	save_item(NAME(m_olds_bs));
-	save_item(NAME(m_olds_cmd3));
 }
 
 static ADDRESS_MAP_START( olds_mem, AS_PROGRAM, 16, pgm_028_025_state )
@@ -316,12 +172,21 @@ static ADDRESS_MAP_START( olds_mem, AS_PROGRAM, 16, pgm_028_025_state )
 	AM_RANGE(0x400000, 0x403fff) AM_RAM AM_SHARE("sharedprotram") // Shared with protection device
 ADDRESS_MAP_END
 
+void pgm_028_025_state::igs025_to_igs028_callback( void )
+{
+//	printf("igs025_to_igs028_callback\n");
+	m_igs028->IGS028_handle();
+}
+
 
 MACHINE_CONFIG_START( pgm_028_025_ol, pgm_028_025_state )
 	MCFG_FRAGMENT_ADD(pgmbase)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(olds_mem)
+
+	MCFG_DEVICE_ADD("igs025", IGS025, 0)
+	MCFG_IGS025_SET_EXTERNAL_EXECUTE( pgm_028_025_state, igs025_to_igs028_callback )
 
 	MCFG_DEVICE_ADD("igs028", IGS028, 0)
 

@@ -451,32 +451,24 @@ public:
 	pgm_028_025_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pgm_state(mconfig, type, tag),
 			m_sharedprotram(*this, "sharedprotram"),
+			m_igs025(*this,"igs025"),
 			m_igs028(*this,"igs028")
 	
 	{
 	}
 
-	int           m_olds_cmd;
-	int           m_olds_reg;
-	int           m_olds_ptr;
-	UINT16        m_olds_bs;
-	UINT16        m_olds_cmd3;
-	UINT16        m_olds_prot_hold;
-	UINT16        m_olds_prot_hilo;
-	UINT16        m_olds_prot_hilo_select;
-	const UINT8  *m_olds_prot_hilo_source2;
+
 
 	required_shared_ptr<UINT16> m_sharedprotram;
+	required_device<igs025_device> m_igs025;
 	required_device<igs028_device> m_igs028;
+
+	void igs025_to_igs028_callback( void );
 
 	DECLARE_DRIVER_INIT(olds);
 	DECLARE_MACHINE_RESET(olds);
 
-	DECLARE_READ16_MEMBER( olds_r );
-	DECLARE_WRITE16_MEMBER( olds_w );
 
-	void olds_protection_calculate_hilo();
-	void olds_protection_calculate_hold(int y, int z);
 };
 
 

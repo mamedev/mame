@@ -23,6 +23,12 @@ public:
 	igs025_execute_external m_execute_external;
 	static void set_external_cb(device_t &device,igs025_execute_external newcb);
 
+
+	DECLARE_READ16_MEMBER( olds_r );
+	DECLARE_WRITE16_MEMBER( olds_w );
+	//const UINT8  *m_olds_prot_hilo_source2;
+	const UINT8 (*olds_source_data)[0xec];
+
 protected:
 	virtual void device_config_complete();
 	virtual void device_validity_check(validity_checker &valid) const;
@@ -43,6 +49,20 @@ protected:
 	void killbld_protection_calculate_hold(int y, int z);
 
 	void no_callback_setup(void);
+
+	int           m_olds_cmd;
+	int           m_olds_reg;
+	int           m_olds_ptr;
+	UINT16        m_olds_bs;
+	UINT16        m_olds_cmd3;
+	UINT16        m_olds_prot_hold;
+	UINT16        m_olds_prot_hilo;
+	UINT16        m_olds_prot_hilo_select;
+
+
+	void olds_protection_calculate_hilo();
+	void olds_protection_calculate_hold(int y, int z);
+
 };
 
 
