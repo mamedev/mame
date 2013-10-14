@@ -94,16 +94,21 @@ void igs028_device::IGS028_do_dma(UINT16 src, UINT16 dst, UINT16 size, UINT16 mo
 
 	mode &= 0x0f;
 
-	switch (mode)
+	switch (mode & 0x7)
 	{
-		case 0x00: // This mode copies code later on in the game! Encrypted somehow?
-		// src:2fc8, dst: 045a, size: 025e, mode: 0000
-		// jumps from 12beb4 in unprotected set
-		// jumps from 1313e0 in protected set
-		case 0x01: // swap bytes and nibbles
+		// igs022 has an 'IGS ' encryption mode, a plain copy, and a NOP, these aren't covered at the moment..
+
+		case 0x00: // -= encryption
+		case 0x01: // swap nibbles
 		case 0x02: // ^= encryption
-		case 0x05: // copy
+
+		case 0x03: // unused?
+		case 0x04: // unused?
+
+		case 0x05: // swap bytes
 		case 0x06: // += encryption (correct?)
+
+		case 0x07: // unused?
 		{
 			UINT8 extraoffset = param & 0xff;
 			UINT8 *dectable = (UINT8 *)(PROTROM + (0x100 / 2));
@@ -115,21 +120,38 @@ void igs028_device::IGS028_do_dma(UINT16 src, UINT16 dst, UINT16 size, UINT16 mo
 				int taboff = ((x*2)+extraoffset) & 0xff; // must allow for overflow in instances of odd offsets
 				unsigned short extraxor = ((dectable[taboff + 0]) << 0) | (dectable[taboff + 1] << 8);
 
-				if (mode==0) dat2 = 0x4e75; // hack
-				if (mode==1) dat2  = ((dat2 & 0xf000) >> 12) | ((dat2 & 0x0f00) >> 4) | ((dat2 & 0x00f0) << 4) | ((dat2 & 0x000f) << 12);
-				if (mode==2) dat2 ^= extraxor;
-			//  if (mode==5) dat2  = dat2;
-				if (mode==6) dat2 += extraxor;
+				if (mode==0) dat2 -= extraxor;
+				else if (mode==1) dat2  = ((dat2 & 0xf0f0) >> 4)|((dat2 & 0x0f0f) << 4);
+				else if (mode==2) dat2 ^= extraxor;
+			    else if (mode==5) dat2  = ((dat2 &0x00ff) << 8) | ((dat2 &0xff00) >> 8);
+				else if (mode==6) dat2 += extraxor;
+				else
+				{
+					// if other modes are used we need to know about them
+					UINT16 extraxor2 = 0;
+					if ((x & 0x003) == 0x000) extraxor2 |= 0x0049; // 'I'
+					if ((x & 0x003) == 0x001) extraxor2 |= 0x0047; // 'G'
+					if ((x & 0x003) == 0x002) extraxor2 |= 0x0053; // 'S'
+					if ((x & 0x003) == 0x003) extraxor2 |= 0x0020; // ' '
 
-				if (mode==2 || mode==6) dat2 = (dat2<<8)|(dat2>>8);
 
-				m_sharedprotram[dst + x] = (dat2 << 8) | (dat2 >> 8);
+					if ((x & 0x300) == 0x000) extraxor2 |= 0x4900; // 'I'
+					if ((x & 0x300) == 0x100) extraxor2 |= 0x4700; // 'G'
+					if ((x & 0x300) == 0x200) extraxor2 |= 0x5300; // 'S'
+					if ((x & 0x300) == 0x300) extraxor2 |= 0x2000; // ' '
+
+
+					printf("mode %d - %04x (%04x %04x %04x - %04x %04x %04x - %04x %04x \n", mode, dat2, (UINT16)(dat2-extraxor), (UINT16)(dat2+extraxor), (UINT16)(dat2^extraxor), (UINT16)(dat2-extraxor2), (UINT16)(dat2+extraxor2), (UINT16)(dat2^extraxor2), ((dat2 & 0xf0f0) >> 4)|((dat2 & 0x0f0f) << 4), ((dat2 &0x00ff) << 8) | ((dat2 &0xff00) >> 8) );
+					dat2 = 0x4e75; // hack
+				}
+
+				m_sharedprotram[dst + x] = dat2;
 			}
 		}
 		break;
 
-	//  default:
-	//      logerror ("DMA mode unknown!!!\nsrc:%4.4x, dst: %4.4x, size: %4.4x, mode: %4.4x\n", src, dst, size, mode);
+	   default: // >=8
+	      printf ("DMA mode unknown!!!\nsrc:%4.4x, dst: %4.4x, size: %4.4x, mode: %4.4x\n", src, dst, size, mode);
 	}
 }
 
