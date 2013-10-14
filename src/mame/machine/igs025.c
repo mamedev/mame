@@ -79,6 +79,19 @@ void igs025_device::device_start()
 	save_item(NAME(m_olds_ptr));
 	save_item(NAME(m_olds_bs));
 	save_item(NAME(m_olds_cmd3));
+
+
+	m_drgw2_cmd = 0;
+	m_drgw2_ptr = 0;
+	m_drgw2_prot_hilo = 0;
+	m_drgw2_prot_hilo_select = 0;
+	m_drgw2_prot_hold = 0;
+
+	save_item(NAME(m_drgw2_cmd));
+	save_item(NAME(m_drgw2_ptr));
+	save_item(NAME(m_drgw2_prot_hilo));
+	save_item(NAME(m_drgw2_prot_hilo_select));
+	save_item(NAME(m_drgw2_prot_hold));
 }
 
 void igs025_device::device_reset()
@@ -101,6 +114,12 @@ void igs025_device::device_reset()
 	m_olds_ptr = 0;
 	m_olds_bs = 0;
 	m_olds_cmd3 = 0;
+
+	m_drgw2_cmd = 0;
+	m_drgw2_ptr = 0;
+	m_drgw2_prot_hilo = 0;
+	m_drgw2_prot_hilo_select = 0;
+	m_drgw2_prot_hold = 0;
 
 }
 
@@ -378,6 +397,128 @@ READ16_MEMBER(igs025_device::olds_r )
 
 	return 0;
 }
+
+
+void igs025_device::drgw2_protection_calculate_hold(int y, int z)
+{
+	unsigned short old = m_drgw2_prot_hold;
+
+	m_drgw2_prot_hold = ((old << 1) | (old >> 15));
+
+	m_drgw2_prot_hold ^= 0x2bad;
+	m_drgw2_prot_hold ^= BIT(z, y);
+	m_drgw2_prot_hold ^= BIT( old,  7) <<  0;
+	m_drgw2_prot_hold ^= BIT(~old, 13) <<  4;
+	m_drgw2_prot_hold ^= BIT( old,  3) << 11;
+
+	m_drgw2_prot_hold ^= (m_drgw2_prot_hilo & ~0x0408) << 1;
+}
+
+void igs025_device::drgw2_protection_calculate_hilo()
+{
+	UINT8 source;
+
+	m_drgw2_prot_hilo_select++;
+	if (m_drgw2_prot_hilo_select > 0xeb) {
+		m_drgw2_prot_hilo_select = 0;
+	}
+
+	source = m_drgw2_source_data[m_drgw2_protection_region][m_drgw2_prot_hilo_select];
+
+	if (m_drgw2_prot_hilo_select & 1)
+	{
+		m_drgw2_prot_hilo = (m_drgw2_prot_hilo & 0x00ff) | (source << 8);
+	}
+	else
+	{
+		m_drgw2_prot_hilo = (m_drgw2_prot_hilo & 0xff00) | (source << 0);
+	}
+}
+
+READ16_MEMBER(igs025_device::drgw2_d80000_protection_r )
+{
+	switch (m_drgw2_cmd)
+	{
+		case 0x05:
+		{
+			switch (m_drgw2_ptr)
+			{
+				case 1: return 0x3f00 | ((m_drgw2_protection_region >> 0) & 0xff);
+
+				case 2:
+					return 0x3f00 | ((m_drgw2_protection_region >> 8) & 0xff);
+
+				case 3:
+					return 0x3f00 | ((m_drgw2_protection_region >> 16) & 0xff);
+
+				case 4:
+					return 0x3f00 | ((m_drgw2_protection_region >> 24) & 0xff);
+
+				case 5:
+				default:
+					return 0x3f00 | BITSWAP8(m_drgw2_prot_hold, 5,2,9,7,10,13,12,15);
+			}
+
+			return 0x3f00;
+		}
+
+		case 0x40:
+			drgw2_protection_calculate_hilo();
+			return 0;
+
+	//  case 0x13: // Read to $80eeb8
+	//  case 0x1f: // Read to $80eeb8
+	//  case 0xf4: // Read to $80eeb8
+	//  case 0xf6: // Read to $80eeb8
+	//  case 0xf8: // Read to $80eeb8
+	//      return 0;
+
+	//  default:
+	//      logerror("%06x: warning, reading with igs003_reg = %02x\n", space.device().safe_pc(), m_drgw2_cmd);
+	}
+
+	return 0;
+}
+
+WRITE16_MEMBER(igs025_device::drgw2_d80000_protection_w )
+{
+	if (offset == 0)
+	{
+		m_drgw2_cmd = data;
+		return;
+	}
+
+	switch (m_drgw2_cmd)
+	{
+		case 0x20:
+		case 0x21:
+		case 0x22:
+		case 0x23:
+		case 0x24:
+		case 0x25:
+		case 0x26:
+		case 0x27:
+			m_drgw2_ptr++;
+			drgw2_protection_calculate_hold(m_drgw2_cmd & 0x0f, data & 0xff);
+		break;
+
+	//  case 0x08: // Used only on init..
+	//  case 0x09:
+	//  case 0x0a:
+	//  case 0x0b:
+	//  case 0x0c:
+	//  break;
+
+	//  case 0x15: // ????
+	//  case 0x17:
+	//  case 0xf2:
+	//  break;
+
+	//  default:
+	//      logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", space.device().safe_pc(), m_drgw2_cmd, data);
+	}
+}
+
 
 
 

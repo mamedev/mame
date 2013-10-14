@@ -29,6 +29,11 @@ public:
 	//const UINT8  *m_olds_prot_hilo_source2;
 	const UINT8 (*olds_source_data)[0xec];
 
+	DECLARE_READ16_MEMBER( drgw2_d80000_protection_r );
+	DECLARE_WRITE16_MEMBER( drgw2_d80000_protection_w );
+	UINT32 m_drgw2_protection_region;
+	const UINT8 (*m_drgw2_source_data)[0xec];
+
 protected:
 	virtual void device_config_complete();
 	virtual void device_validity_check(validity_checker &valid) const;
@@ -62,6 +67,20 @@ protected:
 
 	void olds_protection_calculate_hilo();
 	void olds_protection_calculate_hold(int y, int z);
+
+
+
+
+
+	UINT16        m_drgw2_prot_hold;
+	UINT16        m_drgw2_prot_hilo;
+	UINT16        m_drgw2_prot_hilo_select;
+	int           m_drgw2_cmd;
+	int           m_drgw2_ptr;
+
+
+	void drgw2_protection_calculate_hilo();
+	void drgw2_protection_calculate_hold(int y, int z);
 
 };
 

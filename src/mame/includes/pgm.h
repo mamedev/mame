@@ -414,18 +414,13 @@ class pgm_012_025_state : public pgm_state
 {
 public:
 	pgm_012_025_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pgm_state(mconfig, type, tag) {
+		: pgm_state(mconfig, type, tag),
+			m_igs025(*this,"igs025")
+	{
 	}
 
-	UINT32 m_drgw2_protection_region;
 
-	const UINT8 (*m_drgw2_source_data)[0xec];
-
-	UINT16        m_drgw2_prot_hold;
-	UINT16        m_drgw2_prot_hilo;
-	UINT16        m_drgw2_prot_hilo_select;
-	int           m_drgw2_cmd;
-	int           m_drgw2_ptr;
+	required_device<igs025_device> m_igs025;
 
 	void pgm_drgw2_decrypt();
 	void drgw2_common_init();
@@ -437,11 +432,7 @@ public:
 
 	DECLARE_MACHINE_RESET(drgw2);
 
-	DECLARE_READ16_MEMBER( drgw2_d80000_protection_r );
-	DECLARE_WRITE16_MEMBER( drgw2_d80000_protection_w );
 
-	void drgw2_protection_calculate_hilo();
-	void drgw2_protection_calculate_hold(int y, int z);
 };
 
 /* for machine/pgmprot6.c type games */

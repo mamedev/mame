@@ -103,156 +103,30 @@ static const UINT8 drgw2_source_data[0x08][0xec] =
 	{ 0, }  // Region 7, not used
 };
 
-void pgm_012_025_state::drgw2_protection_calculate_hold(int y, int z)
-{
-	unsigned short old = m_drgw2_prot_hold;
-
-	m_drgw2_prot_hold = ((old << 1) | (old >> 15));
-
-	m_drgw2_prot_hold ^= 0x2bad;
-	m_drgw2_prot_hold ^= BIT(z, y);
-	m_drgw2_prot_hold ^= BIT( old,  7) <<  0;
-	m_drgw2_prot_hold ^= BIT(~old, 13) <<  4;
-	m_drgw2_prot_hold ^= BIT( old,  3) << 11;
-
-	m_drgw2_prot_hold ^= (m_drgw2_prot_hilo & ~0x0408) << 1;
-}
-
-void pgm_012_025_state::drgw2_protection_calculate_hilo()
-{
-	UINT8 source;
-
-	m_drgw2_prot_hilo_select++;
-	if (m_drgw2_prot_hilo_select > 0xeb) {
-		m_drgw2_prot_hilo_select = 0;
-	}
-
-	source = m_drgw2_source_data[m_drgw2_protection_region][m_drgw2_prot_hilo_select];
-
-	if (m_drgw2_prot_hilo_select & 1)
-	{
-		m_drgw2_prot_hilo = (m_drgw2_prot_hilo & 0x00ff) | (source << 8);
-	}
-	else
-	{
-		m_drgw2_prot_hilo = (m_drgw2_prot_hilo & 0xff00) | (source << 0);
-	}
-}
-
-READ16_MEMBER(pgm_012_025_state::drgw2_d80000_protection_r )
-{
-	switch (m_drgw2_cmd)
-	{
-		case 0x05:
-		{
-			switch (m_drgw2_ptr)
-			{
-				case 1: return 0x3f00 | ((m_drgw2_protection_region >> 0) & 0xff);
-
-				case 2:
-					return 0x3f00 | ((m_drgw2_protection_region >> 8) & 0xff);
-
-				case 3:
-					return 0x3f00 | ((m_drgw2_protection_region >> 16) & 0xff);
-
-				case 4:
-					return 0x3f00 | ((m_drgw2_protection_region >> 24) & 0xff);
-
-				case 5:
-				default:
-					return 0x3f00 | BITSWAP8(m_drgw2_prot_hold, 5,2,9,7,10,13,12,15);
-			}
-
-			return 0x3f00;
-		}
-
-		case 0x40:
-			drgw2_protection_calculate_hilo();
-			return 0;
-
-	//  case 0x13: // Read to $80eeb8
-	//  case 0x1f: // Read to $80eeb8
-	//  case 0xf4: // Read to $80eeb8
-	//  case 0xf6: // Read to $80eeb8
-	//  case 0xf8: // Read to $80eeb8
-	//      return 0;
-
-	//  default:
-	//      logerror("%06x: warning, reading with igs003_reg = %02x\n", space.device().safe_pc(), m_drgw2_cmd);
-	}
-
-	return 0;
-}
-
-WRITE16_MEMBER(pgm_012_025_state::drgw2_d80000_protection_w )
-{
-	if (offset == 0)
-	{
-		m_drgw2_cmd = data;
-		return;
-	}
-
-	switch (m_drgw2_cmd)
-	{
-		case 0x20:
-		case 0x21:
-		case 0x22:
-		case 0x23:
-		case 0x24:
-		case 0x25:
-		case 0x26:
-		case 0x27:
-			m_drgw2_ptr++;
-			drgw2_protection_calculate_hold(m_drgw2_cmd & 0x0f, data & 0xff);
-		break;
-
-	//  case 0x08: // Used only on init..
-	//  case 0x09:
-	//  case 0x0a:
-	//  case 0x0b:
-	//  case 0x0c:
-	//  break;
-
-	//  case 0x15: // ????
-	//  case 0x17:
-	//  case 0xf2:
-	//  break;
-
-	//  default:
-	//      logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", space.device().safe_pc(), m_drgw2_cmd, data);
-	}
-}
-
 MACHINE_RESET_MEMBER(pgm_012_025_state,drgw2)
 {
 	MACHINE_RESET_CALL_MEMBER(pgm);
 
-	m_drgw2_cmd = 0;
-	m_drgw2_ptr = 0;
-	m_drgw2_prot_hilo = 0;
-	m_drgw2_prot_hilo_select = 0;
-	m_drgw2_prot_hold = 0;
+
 }
 
 void pgm_012_025_state::drgw2_common_init()
 {
-	m_drgw2_source_data = drgw2_source_data;
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xd80000, 0xd80003, read16_delegate(FUNC(igs025_device::drgw2_d80000_protection_r), (igs025_device*)m_igs025), write16_delegate(FUNC(igs025_device::drgw2_d80000_protection_w), (igs025_device*)m_igs025));
+
+
+	m_igs025->m_drgw2_source_data = drgw2_source_data;
 
 	pgm_basic_init();
 	pgm_drgw2_decrypt();
 
-	save_item(NAME(m_drgw2_cmd));
-	save_item(NAME(m_drgw2_ptr));
-	save_item(NAME(m_drgw2_prot_hilo));
-	save_item(NAME(m_drgw2_prot_hilo_select));
-	save_item(NAME(m_drgw2_prot_hold));
+
 }
 
 static ADDRESS_MAP_START( drgw2_mem, AS_PROGRAM, 16, pgm_012_025_state )
 	AM_IMPORT_FROM(pgm_mem)
 	AM_RANGE(0x100000, 0x1fffff) AM_ROMBANK("bank1") /* Game ROM */
-	AM_RANGE(0xd00000, 0xd00fff) AM_NOP // Written, but never read back? Related to the protection device?
-	AM_RANGE(0xd80000, 0xd80003) AM_READWRITE(drgw2_d80000_protection_r, drgw2_d80000_protection_w)
+	AM_RANGE(0xd00000, 0xd00fff) AM_NOP // Written, but never read back? Related to the protection device? - IGS012?
 ADDRESS_MAP_END
 
 MACHINE_CONFIG_START( pgm_012_025_drgw2, pgm_012_025_state )
@@ -260,6 +134,9 @@ MACHINE_CONFIG_START( pgm_012_025_drgw2, pgm_012_025_state )
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(drgw2_mem)
+
+	MCFG_DEVICE_ADD("igs025", IGS025, 0)
+	//MCFG_IGS025_SET_EXTERNAL_EXECUTE( pgm_022_025_state, igs025_to_igs012_callback )
 
 	MCFG_MACHINE_RESET_OVERRIDE(pgm_012_025_state,drgw2)
 MACHINE_CONFIG_END
@@ -272,11 +149,8 @@ DRIVER_INIT_MEMBER(pgm_012_025_state,drgw2)
 
 	drgw2_common_init();
 
-	m_drgw2_protection_region = 0x00000006;
+	m_igs025->m_drgw2_protection_region = 0x00000006;
 
-	/* These ROM patches are not hacks, the protection device
-	   overlays the normal ROM code, this has been confirmed on a real PCB
-	   although some addresses may be missing */
 	mem16[0x131098 / 2] = 0x4e93;
 	mem16[0x13113e / 2] = 0x4e93;
 	mem16[0x1311ce / 2] = 0x4e93;
@@ -288,11 +162,8 @@ DRIVER_INIT_MEMBER(pgm_012_025_state,dw2v100x)
 
 	drgw2_common_init();
 
-	m_drgw2_protection_region = 0x00000006;
+	m_igs025->m_drgw2_protection_region = 0x00000006;
 
-	/* These ROM patches are not hacks, the protection device
-	   overlays the normal ROM code, this has been confirmed on a real PCB
-	   although some addresses may be missing */
 	mem16[0x131084 / 2] = 0x4e93;
 	mem16[0x13112a / 2] = 0x4e93;
 	mem16[0x1311ba / 2] = 0x4e93;
@@ -304,11 +175,8 @@ DRIVER_INIT_MEMBER(pgm_012_025_state,drgw2c)
 
 	drgw2_common_init();
 
-	m_drgw2_protection_region = 0x00000005;
+	m_igs025->m_drgw2_protection_region = 0x00000005;
 
-	/* These ROM patches are not hacks, the protection device
-	   overlays the normal ROM code, this has been confirmed on a real PCB
-	   although some addresses may be missing */
 	mem16[0x1303bc / 2] = 0x4e93;
 	mem16[0x130462 / 2] = 0x4e93;
 	mem16[0x1304f2 / 2] = 0x4e93;
@@ -320,11 +188,8 @@ DRIVER_INIT_MEMBER(pgm_012_025_state,drgw2j)
 
 	drgw2_common_init();
 
-	m_drgw2_protection_region = 0x00000001;
+	m_igs025->m_drgw2_protection_region = 0x00000001;
 
-	/* These ROM patches are not hacks, the protection device
-	   overlays the normal ROM code, this has been confirmed on a real PCB
-	   although some addresses may be missing */
 	mem16[0x1302c0 / 2] = 0x4e93;
 	mem16[0x130366 / 2] = 0x4e93;
 	mem16[0x1303f6 / 2] = 0x4e93;
