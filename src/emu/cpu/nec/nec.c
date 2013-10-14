@@ -397,21 +397,21 @@ void nec_common_device::device_start()
 	m_direct = &m_program->direct();
 	m_io = &space(AS_IO);
 
-	state_add( NEC_PC,    "PC", m_debugger_temp).callimport().callexport().formatstr("%5X");
-	state_add( NEC_IP,    "IP", m_ip).formatstr("%4X");
-	state_add( NEC_SP,    "SP", Wreg(SP)).formatstr("%4X");
-	state_add( NEC_FLAGS, "F", m_debugger_temp).callimport().callexport().formatstr("%4X");
-	state_add( NEC_AW,    "AW", Wreg(AW)).formatstr("%4X");
-	state_add( NEC_CW,    "CW", Wreg(CW)).formatstr("%4X");
-	state_add( NEC_DW,    "DW", Wreg(DW)).formatstr("%4X");
-	state_add( NEC_BW,    "BW", Wreg(BW)).formatstr("%4X");
-	state_add( NEC_BP,    "BP", Wreg(BP)).formatstr("%4X");
-	state_add( NEC_IX,    "IX", Wreg(IX)).formatstr("%4X");
-	state_add( NEC_IY,    "IY", Wreg(IY)).formatstr("%4X");
-	state_add( NEC_ES,    "DS1", Sreg(DS1)).formatstr("%4X");
-	state_add( NEC_CS,    "PS", Sreg(PS)).formatstr("%4X");
-	state_add( NEC_SS,    "SS", Sreg(SS)).formatstr("%4X");
-	state_add( NEC_DS,    "DS0", Sreg(DS0)).formatstr("%4X");
+	state_add( NEC_PC,    "PC", m_debugger_temp).callimport().callexport().formatstr("%05X");
+	state_add( NEC_IP,    "IP", m_ip).formatstr("%04X");
+	state_add( NEC_SP,    "SP", Wreg(SP)).formatstr("%04X");
+	state_add( NEC_FLAGS, "F", m_debugger_temp).callimport().callexport().formatstr("%04X");
+	state_add( NEC_AW,    "AW", Wreg(AW)).formatstr("%04X");
+	state_add( NEC_CW,    "CW", Wreg(CW)).formatstr("%04X");
+	state_add( NEC_DW,    "DW", Wreg(DW)).formatstr("%04X");
+	state_add( NEC_BW,    "BW", Wreg(BW)).formatstr("%04X");
+	state_add( NEC_BP,    "BP", Wreg(BP)).formatstr("%04X");
+	state_add( NEC_IX,    "IX", Wreg(IX)).formatstr("%04X");
+	state_add( NEC_IY,    "IY", Wreg(IY)).formatstr("%04X");
+	state_add( NEC_ES,    "DS1", Sreg(DS1)).formatstr("%04X");
+	state_add( NEC_CS,    "PS", Sreg(PS)).formatstr("%04X");
+	state_add( NEC_SS,    "SS", Sreg(SS)).formatstr("%04X");
+	state_add( NEC_DS,    "DS0", Sreg(DS0)).formatstr("%04X");
 
 	state_add( STATE_GENPC, "GENPC", m_debugger_temp).callimport().callexport().noshow();
 	state_add( STATE_GENSP, "GENSP", m_debugger_temp).callimport().callexport().noshow();
