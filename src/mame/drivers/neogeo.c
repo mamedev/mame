@@ -147,7 +147,6 @@
 #include "cpu/m68000/m68000.h"
 #include "includes/neogeo.h"
 #include "machine/nvram.h"
-#include "machine/pd4990a.h"
 #include "cpu/z80/z80.h"
 #include "sound/2610intf.h"
 #include "imagedev/cartslot.h"
@@ -285,7 +284,7 @@ TIMER_CALLBACK_MEMBER(neogeo_state::vblank_interrupt_callback)
 	if (LOG_VIDEO_SYSTEM) logerror("+++ VBLANK @ %d,%d\n", m_screen->vpos(), m_screen->hpos());
 
 	/* add a timer tick to the pd4990a */
-	upd4990a_addretrace(m_upd4990a);
+	m_upd4990a->addretrace();
 
 	m_vblank_interrupt_pending = 1;
 
@@ -393,7 +392,7 @@ WRITE16_MEMBER(neogeo_state::io_control_w)
 	case 0x00: select_controller(data & 0x00ff); break;
 	case 0x18: if (m_is_mvs) set_output_latch(data & 0x00ff); break;
 	case 0x20: if (m_is_mvs) set_output_data(data & 0x00ff); break;
-	case 0x28: upd4990a_control_16_w(m_upd4990a, space, 0, data, mem_mask); break;
+	case 0x28: m_upd4990a->control_16_w(space, 0, data, mem_mask); break;
 //  case 0x30: break; // coin counters
 //  case 0x31: break; // coin counters
 //  case 0x32: break; // coin lockout
@@ -442,7 +441,7 @@ READ16_MEMBER(neogeo_state::neogeo_unmapped_r)
 
 CUSTOM_INPUT_MEMBER(neogeo_state::get_calendar_status)
 {
-	return (upd4990a_databit_r(m_upd4990a, generic_space(), 0) << 1) | upd4990a_testbit_r(m_upd4990a, generic_space(), 0);
+	return (m_upd4990a->databit_r(generic_space(), 0) << 1) | m_upd4990a->testbit_r(generic_space(), 0);
 }
 
 

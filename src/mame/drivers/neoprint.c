@@ -34,10 +34,15 @@ public:
 		m_npvidram(*this, "npvidram"),
 		m_npvidregs(*this, "npvidregs"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_upd4990a(*this, "upd4990a") { }
 
 	required_shared_ptr<UINT16> m_npvidram;
 	required_shared_ptr<UINT16> m_npvidregs;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<upd4990a_old_device> m_upd4990a;
+	
 	UINT8 m_audio_result;
 	UINT8 m_bank_val;
 	UINT8 m_vblank;
@@ -62,8 +67,6 @@ public:
 	void draw_layer(bitmap_ind16 &bitmap,const rectangle &cliprect,int layer,int data_shift);
 	void audio_cpu_assert_nmi();
 	DECLARE_WRITE_LINE_MEMBER(audio_cpu_irq);
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
 };
 
 
@@ -144,12 +147,12 @@ READ16_MEMBER(neoprint_state::neoprint_calendar_r)
 	//if(space.device().safe_pc() != 0x4b38 )//&& space.device().safe_pc() != 0x5f86 && space.device().safe_pc() != 0x5f90)
 	//  printf("%08x\n",space.device().safe_pc());
 
-	return (upd4990a_databit_r(machine().device("upd4990a"), space, 0) << 15);
+	return (m_upd4990a->databit_r(space, 0) << 15);
 }
 
 WRITE16_MEMBER(neoprint_state::neoprint_calendar_w)
 {
-		upd4990a_control_16_w(machine().device("upd4990a"), space, 0, ((data >> 8) & 7), mem_mask);
+		m_upd4990a->control_16_w(space, 0, ((data >> 8) & 7), mem_mask);
 }
 
 READ8_MEMBER(neoprint_state::neoprint_unk_r)

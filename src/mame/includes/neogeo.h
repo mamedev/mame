@@ -4,6 +4,7 @@
 
 *************************************************************************/
 
+#include "machine/pd4990a.h"
 
 #define NEOGEO_MASTER_CLOCK                     (24000000)
 #define NEOGEO_MAIN_CPU_CLOCK                   (NEOGEO_MASTER_CLOCK / 2)
@@ -140,7 +141,7 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	required_device<device_t> m_upd4990a;
+	required_device<upd4990a_old_device> m_upd4990a;
 
 	DECLARE_WRITE8_MEMBER(audio_cpu_clear_nmi_w);
 	DECLARE_WRITE16_MEMBER(io_control_w);
