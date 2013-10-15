@@ -907,6 +907,7 @@ static const struct game_keys keys_table[] =
 	{ "xmvsfa",   { 0x7438fc3e,0x19abed90 }, 0x100000 },    // 0C81 1972 0327  cmpi.l  #$19720327,D1
 	{ "xmvsfar1", { 0x7438fc3e,0x19abed90 }, 0x100000 },    // 0C81 1972 0327  cmpi.l  #$19720327,D1
 	{ "xmvsfar2", { 0x7438fc3e,0x19abed90 }, 0x100000 },    // 0C81 1972 0327  cmpi.l  #$19720327,D1
+	{ "xmvsfar3", { 0x7438fc3e,0x19abed90 }, 0x100000 },    // 0C81 1972 0327  cmpi.l  #$19720327,D1
 	{ "xmvsfh",   { 0x835fb2d0,0x42fa9137 }, 0x100000 },    // 0C81 1972 0327  cmpi.l  #$19720327,D1
 	{ "xmvsfb",   { 0x8ead9e4a,0xb02184f0 }, 0x100000 },    // 0C81 1972 0327  cmpi.l  #$19720327,D1
 	{ "batcir",   { 0xd195e597,0x3cbce2b5 }, 0x200000 },    // 0C81 0097 0131  cmpi.l  #$00970131,D1

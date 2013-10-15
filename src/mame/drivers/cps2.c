@@ -8179,8 +8179,8 @@ ROM_END
 
 ROM_START( xmvsfar1 )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
-	ROM_LOAD16_WORD_SWAP( "xvsa.03e", 0x000000, 0x80000, CRC(9bdde21c) SHA1(56c295d9e908a1496d6a08ff1cd10c87de1d4ff5) )
-	ROM_LOAD16_WORD_SWAP( "xvsa.04e", 0x080000, 0x80000, CRC(33300edf) SHA1(8ec4203c1bc23a6284c47ee873b151da9f072edc) )
+	ROM_LOAD16_WORD_SWAP( "xvsa.03",  0x000000, 0x80000, CRC(520054df) SHA1(98fd30aeb4cc9120607434f258a1c00204d75d63) )	/* Missing revision letter */
+	ROM_LOAD16_WORD_SWAP( "xvsa.04",  0x080000, 0x80000, CRC(13086e55) SHA1(0d9a4b2a4278a98423155702c66df3f2e1e8ef56) )	/* Missing revision letter */
 	ROM_LOAD16_WORD_SWAP( "xvs.05a",  0x100000, 0x80000, CRC(7db6025d) SHA1(2d74f48f83f45359bfaca28ab686625766af12ee) )
 	ROM_LOAD16_WORD_SWAP( "xvs.06a",  0x180000, 0x80000, CRC(e8e2c75c) SHA1(929408cb5d98e95cec75ea58e4701b0cbdbcd016) )
 	ROM_LOAD16_WORD_SWAP( "xvs.07",   0x200000, 0x80000, CRC(08f0abed) SHA1(ef16c376232dba63b0b9bc3aa0640f9001ccb68a) )
@@ -8209,6 +8209,36 @@ ROM_END
 
 ROM_START( xmvsfar2 )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
+	ROM_LOAD16_WORD_SWAP( "xvsa.03e", 0x000000, 0x80000, CRC(9bdde21c) SHA1(56c295d9e908a1496d6a08ff1cd10c87de1d4ff5) )
+	ROM_LOAD16_WORD_SWAP( "xvsa.04e", 0x080000, 0x80000, CRC(33300edf) SHA1(8ec4203c1bc23a6284c47ee873b151da9f072edc) )
+	ROM_LOAD16_WORD_SWAP( "xvs.05a",  0x100000, 0x80000, CRC(7db6025d) SHA1(2d74f48f83f45359bfaca28ab686625766af12ee) )
+	ROM_LOAD16_WORD_SWAP( "xvs.06a",  0x180000, 0x80000, CRC(e8e2c75c) SHA1(929408cb5d98e95cec75ea58e4701b0cbdbcd016) )
+	ROM_LOAD16_WORD_SWAP( "xvs.07",   0x200000, 0x80000, CRC(08f0abed) SHA1(ef16c376232dba63b0b9bc3aa0640f9001ccb68a) )
+	ROM_LOAD16_WORD_SWAP( "xvs.08",   0x280000, 0x80000, CRC(81929675) SHA1(19cf7afbc1daaefec40195e40ba74970f3906a1c) )
+	ROM_LOAD16_WORD_SWAP( "xvs.09",   0x300000, 0x80000, CRC(9641f36b) SHA1(dcba3482d1ba37ccfb30d402793ee063c6621aed) )
+
+	ROM_REGION( 0x2000000, "gfx", 0 )
+	ROMX_LOAD( "xvs.13m",   0x0000000, 0x400000, CRC(f6684efd) SHA1(c0a2f3a9e82ab8b084a500aec71ac633e947328c) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "xvs.15m",   0x0000002, 0x400000, CRC(29109221) SHA1(898b8f678fd03c462ce0d8eb7fb3441ef601085b) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "xvs.17m",   0x0000004, 0x400000, CRC(92db3474) SHA1(7b6f4c8ebfdac167b25f35029068b6253c141fe6) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "xvs.19m",   0x0000006, 0x400000, CRC(3733473c) SHA1(6579da7145c95b3ad00844a5fc8c2e22c23365e2) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "xvs.14m",   0x1000000, 0x400000, CRC(bcac2e41) SHA1(838ff24f7e8543a787a55a5d592c9517ce3b8b93) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "xvs.16m",   0x1000002, 0x400000, CRC(ea04a272) SHA1(cd7c79037b5b4a39bef5156433e984dc4dc2c081) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "xvs.18m",   0x1000004, 0x400000, CRC(b0def86a) SHA1(da3a6705ea7050fc5c2c10d33400ed67be9f455d) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "xvs.20m",   0x1000006, 0x400000, CRC(4b40ff9f) SHA1(9a981d442132efff09a27408d74646ba357c7357) , ROM_GROUPWORD | ROM_SKIP(6) )
+
+	ROM_REGION( QSOUND_SIZE, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "xvs.01",   0x00000, 0x08000, CRC(3999e93a) SHA1(fefcff8a9a5c83df7655a16187cf9ba3e7efbb25) )
+	ROM_CONTINUE(         0x10000, 0x18000 )
+	ROM_LOAD( "xvs.02",   0x28000, 0x20000, CRC(101bdee9) SHA1(75920e88bf46fcd33a7957777a1d799818ffb0d6) )
+
+	ROM_REGION( 0x400000, "qsound", 0 ) /* QSound samples */
+	ROM_LOAD16_WORD_SWAP( "xvs.11m",   0x000000, 0x200000, CRC(9cadcdbc) SHA1(64d3bd53b04daec84c9af4aa3ff010867b3d306d) )
+	ROM_LOAD16_WORD_SWAP( "xvs.12m",   0x200000, 0x200000, CRC(7b11e460) SHA1(a581c84acaaf0ce056841c15a6f36889e88be68d) )
+ROM_END
+
+ROM_START( xmvsfar3 )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "xvsa.03d", 0x000000, 0x80000, CRC(2b164fd7) SHA1(90eefa309202978c914897f30b2e6caf23fcd9f3) ) /* Came in a Blue cart on Euro MB, maybe Rent??? */
 	ROM_LOAD16_WORD_SWAP( "xvsa.04d", 0x080000, 0x80000, CRC(2d32f039) SHA1(515bdb1ad99106a5b8aa3a94be4fc4ceb31a6711) )
 	ROM_LOAD16_WORD_SWAP( "xvs.05a",  0x100000, 0x80000, CRC(7db6025d) SHA1(2d74f48f83f45359bfaca28ab686625766af12ee) )
@@ -8230,7 +8260,7 @@ ROM_START( xmvsfar2 )
 	ROM_REGION( QSOUND_SIZE, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
 	ROM_LOAD( "xvs.01",   0x00000, 0x08000, CRC(3999e93a) SHA1(fefcff8a9a5c83df7655a16187cf9ba3e7efbb25) )
 	ROM_CONTINUE(         0x10000, 0x18000 )
-	ROM_LOAD( "xvsa.02",  0x28000, 0x20000, CRC(19272e4c) SHA1(8a4a85cbdfb867a2014af2405cc8214541250b50) ) /* Different sound code then the other sets */
+	ROM_LOAD( "xvsa.02",  0x28000, 0x20000, CRC(19272e4c) SHA1(8a4a85cbdfb867a2014af2405cc8214541250b50) ) /* Different sound code than other sets */
 
 	ROM_REGION( 0x400000, "qsound", 0 ) /* QSound samples */
 	ROM_LOAD16_WORD_SWAP( "xvs.11m",   0x000000, 0x200000, CRC(9cadcdbc) SHA1(64d3bd53b04daec84c9af4aa3ff010867b3d306d) )
@@ -8497,9 +8527,9 @@ GAME( 1995, vhuntj,     nwarr,    cps2, cps2_2p6b, cps_state, cps2,     ROT0,   
 GAME( 1995, vhuntjr1s,  nwarr,    cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "Vampire Hunter: Darkstalkers' Revenge (Japan 950307 stop version)", GAME_SUPPORTS_SAVE )
 GAME( 1995, vhuntjr1,   nwarr,    cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "Vampire Hunter: Darkstalkers' Revenge (Japan 950307)", GAME_SUPPORTS_SAVE )
 GAME( 1995, vhuntjr2,   nwarr,    cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "Vampire Hunter: Darkstalkers' Revenge (Japan 950302)", GAME_SUPPORTS_SAVE )
-GAME( 1995, cybots,     0,        cps2, cybots, cps_state,    cps2,     ROT0,   "Capcom", "Cyberbots: Fullmetal Madness (Euro 950424)", GAME_SUPPORTS_SAVE )
-GAME( 1995, cybotsu,    cybots,   cps2, cybots, cps_state,    cps2,     ROT0,   "Capcom", "Cyberbots: Fullmetal Madness (USA 950424)", GAME_SUPPORTS_SAVE )
-GAME( 1995, cybotsj,    cybots,   cps2, cybots, cps_state,    cps2,     ROT0,   "Capcom", "Cyberbots: Fullmetal Madness (Japan 950420)", GAME_SUPPORTS_SAVE )
+GAME( 1995, cybots,     0,        cps2, cybots,    cps_state, cps2,     ROT0,   "Capcom", "Cyberbots: Fullmetal Madness (Euro 950424)", GAME_SUPPORTS_SAVE )
+GAME( 1995, cybotsu,    cybots,   cps2, cybots,    cps_state, cps2,     ROT0,   "Capcom", "Cyberbots: Fullmetal Madness (USA 950424)", GAME_SUPPORTS_SAVE )
+GAME( 1995, cybotsj,    cybots,   cps2, cybots,    cps_state, cps2,     ROT0,   "Capcom", "Cyberbots: Fullmetal Madness (Japan 950420)", GAME_SUPPORTS_SAVE )
 GAME( 1995, sfa,        0,        cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "Street Fighter Alpha: Warriors' Dreams (Euro 950727)", GAME_SUPPORTS_SAVE )
 GAME( 1995, sfar1,      sfa,      cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "Street Fighter Alpha: Warriors' Dreams (Euro 950718)", GAME_SUPPORTS_SAVE )
 GAME( 1995, sfar2,      sfa,      cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "Street Fighter Alpha: Warriors' Dreams (Euro 950627)", GAME_SUPPORTS_SAVE )
@@ -8562,7 +8592,7 @@ GAME( 1996, megaman2,   0,        cps2, cps2_2p3b, cps_state, cps2,     ROT0,   
 GAME( 1996, megaman2a,  megaman2, cps2, cps2_2p3b, cps_state, cps2,     ROT0,   "Capcom", "Mega Man 2: The Power Fighters (Asia 960708)", GAME_SUPPORTS_SAVE )
 GAME( 1996, rockman2j,  megaman2, cps2, cps2_2p3b, cps_state, cps2,     ROT0,   "Capcom", "Rockman 2: The Power Fighters (Japan 960708)", GAME_SUPPORTS_SAVE )
 GAME( 1996, megaman2h,  megaman2, cps2, cps2_2p3b, cps_state, cps2,     ROT0,   "Capcom", "Mega Man 2: The Power Fighters (Hispanic 960712)", GAME_SUPPORTS_SAVE )
-GAME( 1996, qndream,    0,        cps2, qndream, cps_state,   cps2,     ROT0,   "Capcom", "Quiz Nanairo Dreams: Nijiirochou no Kiseki (Japan 960826)", GAME_SUPPORTS_SAVE )
+GAME( 1996, qndream,    0,        cps2, qndream,   cps_state, cps2,     ROT0,   "Capcom", "Quiz Nanairo Dreams: Nijiirochou no Kiseki (Japan 960826)", GAME_SUPPORTS_SAVE )
 GAME( 1996, xmvsf,      0,        cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (Euro 961004)", GAME_SUPPORTS_SAVE )
 GAME( 1996, xmvsfr1,    xmvsf,    cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (Euro 960910)", GAME_SUPPORTS_SAVE )
 GAME( 1996, xmvsfu,     xmvsf,    cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (USA 961023)", GAME_SUPPORTS_SAVE )
@@ -8571,8 +8601,9 @@ GAME( 1996, xmvsfj,     xmvsf,    cps2, cps2_2p6b, cps_state, cps2,     ROT0,   
 GAME( 1996, xmvsfjr1,   xmvsf,    cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (Japan 960910)", GAME_SUPPORTS_SAVE )
 GAME( 1996, xmvsfjr2,   xmvsf,    cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (Japan 960909)", GAME_SUPPORTS_SAVE )
 GAME( 1996, xmvsfa,     xmvsf,    cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (Asia 961023)", GAME_SUPPORTS_SAVE )
-GAME( 1996, xmvsfar1,   xmvsf,    cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (Asia 960919)", GAME_SUPPORTS_SAVE )
-GAME( 1996, xmvsfar2,   xmvsf,    cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (Asia 960910)", GAME_SUPPORTS_SAVE )
+GAME( 1996, xmvsfar1,   xmvsf,    cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (Asia 961004)", GAME_SUPPORTS_SAVE )
+GAME( 1996, xmvsfar2,   xmvsf,    cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (Asia 960919)", GAME_SUPPORTS_SAVE )
+GAME( 1996, xmvsfar3,   xmvsf,    cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (Asia 960910)", GAME_SUPPORTS_SAVE )
 GAME( 1996, xmvsfh,     xmvsf,    cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (Hispanic 961004)", GAME_SUPPORTS_SAVE )
 GAME( 1996, xmvsfb,     xmvsf,    cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (Brazil 961023)", GAME_SUPPORTS_SAVE )
 GAME( 1997, batcir,     0,        cps2, cps2_4p2b, cps_state, cps2,     ROT0,   "Capcom", "Battle Circuit (Euro 970319)", GAME_SUPPORTS_SAVE )
