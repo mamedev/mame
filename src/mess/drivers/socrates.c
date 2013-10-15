@@ -1,3 +1,5 @@
+// license:mame|lgplv2.1+
+// copyright-holders:Jonathan Gevaryahu
 /******************************************************************************
 *
 *  V-tech Socrates Driver

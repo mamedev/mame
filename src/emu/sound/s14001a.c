@@ -1,3 +1,5 @@
+// license:mame|lgplv2.1+
+// copyright-holders:Jonathan Gevaryahu,R. Belmont,Zsolt Vasvari
 /*
 
  TSI S14001A emulator v1.32

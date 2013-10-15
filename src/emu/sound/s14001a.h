@@ -1,3 +1,5 @@
+// license:mame|lgplv2.1+
+// copyright-holders:Jonathan Gevaryahu,R. Belmont,Zsolt Vasvari
 #pragma once
 /*
     Copyright (C) 2006-2013 Jonathan Gevaryahu AKA Lord Nightmare

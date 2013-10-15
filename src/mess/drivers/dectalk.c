@@ -1,3 +1,5 @@
+// license:mame|lgplv2.1+
+// copyright-holders:Jonathan Gevaryahu
 /******************************************************************************
 *
 *  DECtalk DTC-01 Driver

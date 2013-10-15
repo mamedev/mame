@@ -1,3 +1,5 @@
+// license:mame|lgplv2.1+
+// copyright-holders:Jonathan Gevaryahu
 /******************************************************************************
 *
 *  Self Contained zexall 'Z80 instruction exerciser' test driver
