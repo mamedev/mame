@@ -2000,6 +2000,7 @@ $(MAMEOBJ)/pinball.a: \
 	$(DRIVERS)/wpc_flip1.o  \
 	$(DRIVERS)/wpc_flip2.o  \
 	$(DRIVERS)/wpc_s.o  \
+	$(MACHINE)/wpc.o \
 	$(AUDIO)/wpcsnd.o \
 	$(DRIVERS)/zac_1.o  \
 	$(DRIVERS)/zac_2.o  \

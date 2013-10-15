@@ -7,6 +7,7 @@
 #include "cpu/m6809/m6809.h"
 #include "audio/s11c_bg.h"
 #include "audio/wpcsnd.h"
+#include "machine/wpc.h"
 #include "wpc_an.lh"
 
 #define LOG_WPC (1)
@@ -59,7 +60,8 @@ public:
 			m_maincpu(*this, "maincpu"),
 			m_bg(*this,"bg"),
 			m_wpcsnd(*this,"wpcsnd"),
-			m_cpubank(*this, "cpubank")
+			m_cpubank(*this, "cpubank"),
+			m_wpc(*this,"wpc")
 	{ }
 
 protected:
@@ -69,27 +71,32 @@ protected:
 	optional_device<s11c_bg_device> m_bg;  // only used with Dr. Dude
 	optional_device<wpcsnd_device> m_wpcsnd;
 	required_memory_bank m_cpubank;
+	required_device<wpc_device> m_wpc;
 
 	// driver_device overrides
 	virtual void machine_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	static const device_timer_id TIMER_VBLANK = 0;
 	static const device_timer_id TIMER_IRQ = 1;
-	static const device_timer_id TIMER_ZEROCROSS = 2;
 public:
 	DECLARE_DRIVER_INIT(wpc_an);
-	DECLARE_READ8_MEMBER(wpc_r);
-	DECLARE_WRITE8_MEMBER(wpc_w);
 	DECLARE_READ8_MEMBER(ram_r);
 	DECLARE_WRITE8_MEMBER(ram_w);
 	DECLARE_WRITE_LINE_MEMBER(wpcsnd_reply_w);
+	DECLARE_WRITE_LINE_MEMBER(wpc_irq_w);
+	DECLARE_WRITE_LINE_MEMBER(wpc_firq_w);
+	DECLARE_READ8_MEMBER(wpc_sound_ctrl_r);
+	DECLARE_WRITE8_MEMBER(wpc_sound_ctrl_w);
+	DECLARE_READ8_MEMBER(wpc_sound_data_r);
+	DECLARE_WRITE8_MEMBER(wpc_sound_data_w);
+	DECLARE_WRITE8_MEMBER(wpc_sound_s11_w);
+	DECLARE_WRITE8_MEMBER(wpc_rombank_w);
 private:
 	UINT8 m_alpha_pos;  // selected LED position
 	UINT16 m_alpha_data[40];
 	UINT16 m_vblank_count;
 	UINT32 m_irq_count;
 	UINT8 m_switch_col;  // select switch column
-	bool m_zerocross;
 	UINT8 m_bankmask;
 	UINT8 m_switches[12];
 	UINT8 m_memprotect;
@@ -101,16 +108,15 @@ private:
 	UINT8 m_shift_bit2;
 	emu_timer* m_vblank_timer;
 	emu_timer* m_irq_timer;
-	emu_timer* m_zc_timer;
 };
 
 
 static ADDRESS_MAP_START( wpc_an_map, AS_PROGRAM, 8, wpc_an_state )
 	AM_RANGE(0x0000, 0x2fff) AM_READWRITE(ram_r,ram_w)
 	AM_RANGE(0x3000, 0x3faf) AM_RAM
-	AM_RANGE(0x3fb0, 0x3fff) AM_READWRITE(wpc_r,wpc_w) // WPC device
+	AM_RANGE(0x3fb0, 0x3fff) AM_DEVREADWRITE("wpc",wpc_device,read,write) // WPC device
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("cpubank")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
+	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("fixed",0)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( wpc_an )
@@ -227,6 +233,7 @@ static INPUT_PORTS_START( wpc_an )
 
 INPUT_PORTS_END
 
+
 void wpc_an_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	int x;
@@ -236,195 +243,84 @@ void wpc_an_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 		// update LED segments
 		for(x=0;x<16;x++)
 		{
-			output_set_digit_value(x,BITSWAP16(m_alpha_data[x], 15, 7, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
-			output_set_digit_value(x+16,BITSWAP16(m_alpha_data[20+x], 15, 7, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
+			output_set_digit_value(x,BITSWAP16(m_wpc->get_alphanumeric(x), 15, 7, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
+			output_set_digit_value(x+16,BITSWAP16(m_wpc->get_alphanumeric(20+x), 15, 7, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
 		}
-		memset(m_alpha_data,0,40*2);
-		// update switches (every 4 vblanks)?
-		if((m_vblank_count % 4) == 0)
-		{
-			m_switches[0] = ~ioport("COIN")->read();
-			m_switches[1] = ioport("DIPS")->read();
-			m_switches[2] = ~ioport("INP0")->read();
-			for(int x=0;x<8;x++)
-			{
-				char kbdrow[8];
-				sprintf(kbdrow,"INP%X",(1<<x));
-				m_switches[3+x] = ~ioport(kbdrow)->read();
-			}
-		}
-
+		m_wpc->reset_alphanumeric();
 		m_vblank_count++;
 		break;
 	case TIMER_IRQ:
 		m_maincpu->set_input_line(M6809_IRQ_LINE,ASSERT_LINE);
 		break;
-	case TIMER_ZEROCROSS:
-		m_zerocross = true;
-		break;
 	}
 }
 
-READ8_MEMBER(wpc_an_state::wpc_r)
+WRITE8_MEMBER(wpc_an_state::wpc_rombank_w)
 {
-	UINT8 ret = 0x00;
-	int x;
-
-	switch(offset)
-	{
-	case WPC_WATCHDOG:
-		if(m_zerocross)
-		{
-			ret |= 0x80;
-			m_irq_count = 0;
-		}
-		m_zerocross = false;
-		break;
-	case WPC_SWROWREAD:
-		for(x=0;x<8;x++)
-		{
-			if(m_switch_col & (1<<x))
-				ret = m_switches[3+x];
-		}
-		break;
-	case WPC_SWCOINDOOR:
-		ret = m_switches[0];
-		break;
-	case WPC_DIPSWITCH:
-		ret = m_switches[1];
-		break;
-	case WPC_SOUNDIF:
-		if(m_wpcsnd)
-			ret = m_wpcsnd->data_r();
-		break;
-	case WPC_SOUNDBACK:
-		if(m_wpcsnd)
-			ret = m_wpcsnd->ctrl_r();  // ack FIRQ?
-		break;
-	case WPC_FIRQSRC:
-		ret = 0x80;  // always 0x80 since there is no DMD
-		break;
-	case WPC_SHIFTADRH:
-		ret = m_shift_addr_high + ((m_shift_addr_low + (m_shift_bit1 >> 3)) >> 8);
-		break;
-	case WPC_SHIFTADRL:
-		ret = (m_shift_addr_low + (m_shift_bit1 >> 3)) & 0xff;
-		break;
-	case WPC_SHIFTBIT:
-		ret = 1 << (m_shift_bit1 & 0x07);
-		break;
-	case WPC_SHIFTBIT2:
-		ret = 1 << (m_shift_bit2 & 0x07);
-		break;
-	default:
-		logerror("WPC: Unknown or unimplemented WPC register read from offset %02x\n",offset);
-		break;
-	}
-	return ret;
-}
-
-WRITE8_MEMBER(wpc_an_state::wpc_w)
-{
-	switch(offset)
-	{
-	case WPC_ROMBANK:
-		m_cpubank->set_entry(data & m_bankmask);
-		if(LOG_WPC) logerror("WPC: ROM bank set to %02x\n",data & m_bankmask);
-		break;
-	case WPC_ALPHAPOS:
-		m_alpha_pos = data & 0x1f;
-		break;
-	case WPC_ALPHA1LO:
-		m_alpha_data[m_alpha_pos] |= data;
-		break;
-	case WPC_ALPHA1HI:
-		m_alpha_data[m_alpha_pos] |= (data << 8);
-		break;
-	case WPC_ALPHA2LO:
-		m_alpha_data[20+m_alpha_pos] |= data;
-		break;
-	case WPC_ALPHA2HI:
-		m_alpha_data[20+m_alpha_pos] |= (data << 8);
-		break;
-	case WPC_IRQACK:
-		m_maincpu->set_input_line(M6809_IRQ_LINE,CLEAR_LINE);
-		break;
-	case WPC_WATCHDOG:
-		if(data & 0x80)
-		{
-			m_irq_count++;
-			m_maincpu->set_input_line(M6809_IRQ_LINE,CLEAR_LINE);
-		}
-		break;
-	case WPC_SWCOLSELECT:
-		m_switch_col = data;
-		if(LOG_WPC) logerror("WPC: Switch column select %02x\n",data);
-		break;
-	case WPC_SOUNDIF:
-		if(m_bg)
-		{
-			m_bg->data_w(data);
-			m_bg->ctrl_w(0);
-		}
-		else
-			m_wpcsnd->data_w(data);
-		break;
-	case WPC_SOUNDBACK:
-		if(m_bg)
-		{
-			m_bg->data_w(data);
-			m_bg->ctrl_w(1);
-		}
-		else
-			m_wpcsnd->ctrl_w(data);
-		break;
-	case WPC_SOUNDS11:
-		if(m_bg)
-		{
-			m_bg->data_w(data);
-			m_bg->ctrl_w(0);
-			m_bg->ctrl_w(1);
-		}
-		break;
-	case WPC_FIRQSRC:
-		m_maincpu->set_input_line(M6809_FIRQ_LINE,CLEAR_LINE);
-		break;
-	case WPC_PROTMEMCTRL:
-		if(m_memprotect == 0xb4)
-		{  // may not be correct
-			m_memprotect_mask = (((data & 0x01) << 3) |
-								((data & 0x02) << 1) |
-								((data & 0x04) >> 1) |
-								((data & 0x08) >> 3) |
-								(data & 0xf0)) + 0x10;
-			m_memprotect_mask <<= 8;
-		}
-		break;
-	case WPC_PROTMEM:
-		m_memprotect = data;
-		break;
-	case WPC_SHIFTADRH:
-		m_shift_addr_high = data;
-		break;
-	case WPC_SHIFTADRL:
-		m_shift_addr_low = data;
-		break;
-	case WPC_SHIFTBIT:
-		m_shift_bit1 = data;
-		break;
-	case WPC_SHIFTBIT2:
-		m_shift_bit2 = data;
-		break;
-	default:
-		logerror("WPC: Unknown or unimplemented WPC register write %02x to offset %02x\n",data,offset);
-		break;
-	}
+	m_cpubank->set_entry(data & m_bankmask);
+	logerror("WPC: masked ROM bank selected %02x\n",data & m_bankmask);
 }
 
 WRITE_LINE_MEMBER(wpc_an_state::wpcsnd_reply_w)
 {
 	if(state)
 		m_maincpu->set_input_line(M6809_FIRQ_LINE,ASSERT_LINE);
+}
+
+WRITE_LINE_MEMBER(wpc_an_state::wpc_irq_w)
+{
+	m_maincpu->set_input_line(M6809_IRQ_LINE,CLEAR_LINE);
+}
+
+WRITE_LINE_MEMBER(wpc_an_state::wpc_firq_w)
+{
+	m_maincpu->set_input_line(M6809_FIRQ_LINE,CLEAR_LINE);
+}
+
+READ8_MEMBER(wpc_an_state::wpc_sound_ctrl_r)
+{
+	if(m_wpcsnd)
+		return m_wpcsnd->ctrl_r();  // ack FIRQ?
+	return 0;
+}
+
+WRITE8_MEMBER(wpc_an_state::wpc_sound_ctrl_w)
+{
+	if(m_bg)
+	{
+		m_bg->data_w(data);
+		m_bg->ctrl_w(1);
+	}
+	else
+		m_wpcsnd->ctrl_w(data);
+}
+
+READ8_MEMBER(wpc_an_state::wpc_sound_data_r)
+{
+	if(m_wpcsnd)
+		return m_wpcsnd->data_r();
+	return 0;
+}
+
+WRITE8_MEMBER(wpc_an_state::wpc_sound_data_w)
+{
+	if(m_bg)
+	{
+		m_bg->data_w(data);
+		m_bg->ctrl_w(0);
+	}
+	else
+		m_wpcsnd->data_w(data);
+}
+
+WRITE8_MEMBER(wpc_an_state::wpc_sound_s11_w)
+{
+	if(m_bg)
+	{
+		m_bg->data_w(data);
+		m_bg->ctrl_w(0);
+		m_bg->ctrl_w(1);
+	}
 }
 
 READ8_MEMBER(wpc_an_state::ram_r)
@@ -434,10 +330,10 @@ READ8_MEMBER(wpc_an_state::ram_r)
 
 WRITE8_MEMBER(wpc_an_state::ram_w)
 {
-	if((m_memprotect == 0xb4) || ((offset & m_memprotect_mask) != m_memprotect_mask))
+	if((!m_wpc->memprotect_active()) || ((offset & m_wpc->get_memprotect_mask()) != m_wpc->get_memprotect_mask()))
 		m_ram[offset] = data;
 	else
-		if(LOG_WPC) logerror("WPC: Memory protection violation at 0x%04x (mask=0x%04x)\n",offset,m_memprotect_mask);
+		if(LOG_WPC) logerror("WPC: Memory protection violation at 0x%04x (mask=0x%04x)\n",offset,m_wpc->get_memprotect_mask());
 }
 
 void wpc_an_state::machine_reset()
@@ -445,30 +341,37 @@ void wpc_an_state::machine_reset()
 	m_cpubank->set_entry(0);
 	m_vblank_count = 0;
 	m_irq_count = 0;
-	m_zerocross = false;
-	m_memprotect = 0;
 }
 
 DRIVER_INIT_MEMBER(wpc_an_state,wpc_an)
 {
 	UINT8 *ROM = memregion("maincpu")->base();
+	UINT8 *fixed = memregion("fixed")->base();
+	UINT32 codeoff = memregion("maincpu")->bytes() - 0x8000;
 	m_cpubank->configure_entries(0, 32, &ROM[0x10000], 0x4000);
 	m_cpubank->set_entry(0);
 	m_vblank_timer = timer_alloc(TIMER_VBLANK);
 	m_vblank_timer->adjust(attotime::from_hz(60),0,attotime::from_hz(60));
 	m_irq_timer = timer_alloc(TIMER_IRQ);
 	m_irq_timer->adjust(attotime::from_hz(976),0,attotime::from_hz(976));
-	m_zc_timer = timer_alloc(TIMER_ZEROCROSS);
-	m_zc_timer->adjust(attotime::from_hz(120),0,attotime::from_hz(120));
 	m_bankmask = ((memregion("maincpu")->bytes()-0x10000) >> 14) - 1;
 	logerror("WPC: ROM bank mask = %02x\n",m_bankmask);
 	memset(m_ram,0,0x3000);
+	memcpy(fixed,&ROM[codeoff],0x8000);  // copy static code from end of U6 ROM.
 }
 
 static MACHINE_CONFIG_FRAGMENT( wpc_an_base )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 2000000)
 	MCFG_CPU_PROGRAM_MAP(wpc_an_map)
+
+	MCFG_WMS_WPC_ADD("wpc")
+	MCFG_WPC_IRQ_ACKNOWLEDGE(WRITELINE(wpc_an_state,wpc_irq_w))
+	MCFG_WPC_FIRQ_ACKNOWLEDGE(WRITELINE(wpc_an_state,wpc_firq_w))
+	MCFG_WPC_ROMBANK(WRITE8(wpc_an_state,wpc_rombank_w))
+	MCFG_WPC_SOUND_CTRL(READ8(wpc_an_state,wpc_sound_ctrl_r),WRITE8(wpc_an_state,wpc_sound_ctrl_w))
+	MCFG_WPC_SOUND_DATA(READ8(wpc_an_state,wpc_sound_data_r),WRITE8(wpc_an_state,wpc_sound_data_w))
+	MCFG_WPC_SOUND_S11C(WRITE8(wpc_an_state,wpc_sound_s11_w))
 
 	MCFG_DEFAULT_LAYOUT(layout_wpc_an)
 MACHINE_CONFIG_END
@@ -489,22 +392,24 @@ MACHINE_CONFIG_END
 /------------------*/
 ROM_START(dd_p7)
 	ROM_REGION(0x30000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("dude_u6.p7", 0x10000, 0x18000, CRC(b6c35b98) SHA1(5e9d70ce40669e2f402561dc1d8aa70a8b8a2958))
-	ROM_CONTINUE(0x8000,0x8000)
+	ROM_LOAD("dude_u6.p7", 0x10000, 0x20000, CRC(b6c35b98) SHA1(5e9d70ce40669e2f402561dc1d8aa70a8b8a2958))
 	ROM_REGION(0x40000, "sound1", 0)
 	ROM_LOAD("dude_u4.l1", 0x10000, 0x10000, CRC(3eeef714) SHA1(74dcc83958cb62819e0ac36ca83001694faafec7))
 	ROM_LOAD("dude_u19.l1", 0x20000, 0x10000, CRC(dc7b985b) SHA1(f672d1f1fe1d1d887113ea6ccd745a78f7760526))
 	ROM_LOAD("dude_u20.l1", 0x30000, 0x10000, CRC(a83d53dd) SHA1(92a81069c42c7760888201fb0787fa7ddfbf1658))
+	ROM_REGION(0x8000, "fixed", 0)
+	ROM_FILL(0x0000,0x8000,0x00)
 ROM_END
 
 ROM_START(dd_p06)
 	ROM_REGION(0x30000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("u6-pa6.wpc", 0x10000, 0x18000, CRC(fb72571b) SHA1(a12b32eac3141c881064e6de2f49d6d213248fde))
-	ROM_CONTINUE(0x8000,0x8000)
+	ROM_LOAD("u6-pa6.wpc", 0x10000, 0x20000, CRC(fb72571b) SHA1(a12b32eac3141c881064e6de2f49d6d213248fde))
 	ROM_REGION(0x40000, "sound1", 0)
 	ROM_LOAD("dude_u4.l1", 0x10000, 0x10000, CRC(3eeef714) SHA1(74dcc83958cb62819e0ac36ca83001694faafec7))
 	ROM_LOAD("dude_u19.l1", 0x20000, 0x10000, CRC(dc7b985b) SHA1(f672d1f1fe1d1d887113ea6ccd745a78f7760526))
 	ROM_LOAD("dude_u20.l1", 0x30000, 0x10000, CRC(a83d53dd) SHA1(92a81069c42c7760888201fb0787fa7ddfbf1658))
+	ROM_REGION(0x8000, "fixed", 0)
+	ROM_FILL(0x0000,0x8000,0x00)
 ROM_END
 
 /*-------------
@@ -512,8 +417,7 @@ ROM_END
 /--------------*/
 ROM_START(fh_l9)
 	ROM_REGION(0x50000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("funh_l9.rom", 0x10000, 0x38000, CRC(c8f90ff8) SHA1(8d200ea30a68f5e3ba1ac9232a516c44b765eb45))
-	ROM_CONTINUE(0x8000,0x8000)
+	ROM_LOAD("funh_l9.rom", 0x10000, 0x40000, CRC(c8f90ff8) SHA1(8d200ea30a68f5e3ba1ac9232a516c44b765eb45))
 	ROM_REGION(0x180000, "sound1", 0)
 	ROM_LOAD("fh_u14.sl2", 0x000000, 0x20000, CRC(3394b69b) SHA1(34690688f00106b725b27a6975cdbf1e077e3bb3))
 	ROM_RELOAD( 0x000000 + 0x20000, 0x20000)
@@ -527,12 +431,13 @@ ROM_START(fh_l9)
 	ROM_RELOAD( 0x100000 + 0x20000, 0x20000)
 	ROM_RELOAD( 0x100000 + 0x40000, 0x20000)
 	ROM_RELOAD( 0x100000 + 0x60000, 0x20000)
+	ROM_REGION(0x8000, "fixed", 0)
+	ROM_FILL(0x0000,0x8000,0x00)
 ROM_END
 
 ROM_START(fh_l9b)
 	ROM_REGION(0x50000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("fh_l9ger.rom", 0x10000, 0x38000, CRC(e9b32a8f) SHA1(deb77f0d025001ddcc3045b4e49176c54896da3f))
-	ROM_CONTINUE(0x8000,0x8000)
+	ROM_LOAD("fh_l9ger.rom", 0x10000, 0x40000, CRC(e9b32a8f) SHA1(deb77f0d025001ddcc3045b4e49176c54896da3f))
 	ROM_REGION(0x180000, "sound1", 0)
 	ROM_LOAD("fh_u14.sl2", 0x000000, 0x20000, CRC(3394b69b) SHA1(34690688f00106b725b27a6975cdbf1e077e3bb3))
 	ROM_RELOAD( 0x000000 + 0x20000, 0x20000)
@@ -546,12 +451,13 @@ ROM_START(fh_l9b)
 	ROM_RELOAD( 0x100000 + 0x20000, 0x20000)
 	ROM_RELOAD( 0x100000 + 0x40000, 0x20000)
 	ROM_RELOAD( 0x100000 + 0x60000, 0x20000)
+	ROM_REGION(0x8000, "fixed", 0)
+	ROM_FILL(0x0000,0x8000,0x00)
 ROM_END
 
 ROM_START(fh_l3)
 	ROM_REGION(0x30000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("u6-l3.rom", 0x10000, 0x18000, CRC(7a74d702) SHA1(91540cdc62c855b4139b202aa6ad5440b2dee141))
-	ROM_CONTINUE(0x8000,0x8000)
+	ROM_LOAD("u6-l3.rom", 0x10000, 0x20000, CRC(7a74d702) SHA1(91540cdc62c855b4139b202aa6ad5440b2dee141))
 	ROM_REGION(0x180000, "sound1", 0)
 	ROM_LOAD("fh_u14.sl2", 0x000000, 0x20000, CRC(3394b69b) SHA1(34690688f00106b725b27a6975cdbf1e077e3bb3))
 	ROM_RELOAD( 0x000000 + 0x20000, 0x20000)
@@ -565,12 +471,13 @@ ROM_START(fh_l3)
 	ROM_RELOAD( 0x100000 + 0x20000, 0x20000)
 	ROM_RELOAD( 0x100000 + 0x40000, 0x20000)
 	ROM_RELOAD( 0x100000 + 0x60000, 0x20000)
+	ROM_REGION(0x8000, "fixed", 0)
+	ROM_FILL(0x0000,0x8000,0x00)
 ROM_END
 
 ROM_START(fh_l4)
 	ROM_REGION(0x30000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("u6-l4.rom", 0x10000, 0x18000, CRC(f438aaca) SHA1(42bf75325a0e85a4334a5a710c2eddf99160ffbf))
-	ROM_CONTINUE(0x8000,0x8000)
+	ROM_LOAD("u6-l4.rom", 0x10000, 0x20000, CRC(f438aaca) SHA1(42bf75325a0e85a4334a5a710c2eddf99160ffbf))
 	ROM_REGION(0x180000, "sound1", 0)
 	ROM_LOAD("fh_u14.sl2", 0x000000, 0x20000, CRC(3394b69b) SHA1(34690688f00106b725b27a6975cdbf1e077e3bb3))
 	ROM_RELOAD( 0x000000 + 0x20000, 0x20000)
@@ -584,13 +491,13 @@ ROM_START(fh_l4)
 	ROM_RELOAD( 0x100000 + 0x20000, 0x20000)
 	ROM_RELOAD( 0x100000 + 0x40000, 0x20000)
 	ROM_RELOAD( 0x100000 + 0x60000, 0x20000)
-
+	ROM_REGION(0x8000, "fixed", 0)
+	ROM_FILL(0x0000,0x8000,0x00)
 ROM_END
 
 ROM_START(fh_l5)
 	ROM_REGION(0x30000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("u6-l5.rom", 0x10000, 0x18000, CRC(e2b25da4) SHA1(87129e18c60a65035ade2f4766c154d5d333696b))
-	ROM_CONTINUE(0x8000,0x8000)
+	ROM_LOAD("u6-l5.rom", 0x10000, 0x20000, CRC(e2b25da4) SHA1(87129e18c60a65035ade2f4766c154d5d333696b))
 	ROM_REGION(0x180000, "sound1", 0)
 	ROM_LOAD("fh_u14.sl2", 0x000000, 0x20000, CRC(3394b69b) SHA1(34690688f00106b725b27a6975cdbf1e077e3bb3))
 	ROM_RELOAD( 0x000000 + 0x20000, 0x20000)
@@ -604,12 +511,13 @@ ROM_START(fh_l5)
 	ROM_RELOAD( 0x100000 + 0x20000, 0x20000)
 	ROM_RELOAD( 0x100000 + 0x40000, 0x20000)
 	ROM_RELOAD( 0x100000 + 0x60000, 0x20000)
+	ROM_REGION(0x8000, "fixed", 0)
+	ROM_FILL(0x0000,0x8000,0x00)
 ROM_END
 
 ROM_START(fh_905h)
 	ROM_REGION(0x90000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("fh_905h.rom", 0x10000, 0x78000, CRC(445b632a) SHA1(6e277027a1d025e2b93f0d7736b414ba3a68a4f8))
-	ROM_CONTINUE(0x8000,0x8000)
+	ROM_LOAD("fh_905h.rom", 0x10000, 0x80000, CRC(445b632a) SHA1(6e277027a1d025e2b93f0d7736b414ba3a68a4f8))
 	ROM_REGION(0x180000, "sound1", 0)
 	ROM_LOAD("fh_u14.sl2", 0x000000, 0x20000, CRC(3394b69b) SHA1(34690688f00106b725b27a6975cdbf1e077e3bb3))
 	ROM_RELOAD( 0x000000 + 0x20000, 0x20000)
@@ -623,6 +531,8 @@ ROM_START(fh_905h)
 	ROM_RELOAD( 0x100000 + 0x20000, 0x20000)
 	ROM_RELOAD( 0x100000 + 0x40000, 0x20000)
 	ROM_RELOAD( 0x100000 + 0x60000, 0x20000)
+	ROM_REGION(0x8000, "fixed", 0)
+	ROM_FILL(0x0000,0x8000,0x00)
 ROM_END
 
 
@@ -631,8 +541,7 @@ ROM_END
 /------------------*/
 ROM_START(hd_l3)
 	ROM_REGION(0x30000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("harly_l3.rom", 0x10000, 0x18000, CRC(65f2e0b4) SHA1(a44216c13b9f9adf4161ff6f9eeceba28ef37963))
-	ROM_CONTINUE(0x8000,0x8000)
+	ROM_LOAD("harly_l3.rom", 0x10000, 0x20000, CRC(65f2e0b4) SHA1(a44216c13b9f9adf4161ff6f9eeceba28ef37963))
 	ROM_REGION(0x180000, "sound1", 0)
 	ROM_LOAD("hd_u18.rom", 0x100000, 0x20000, CRC(810d98c0) SHA1(8080cbbe0f346020b2b2b8e97015dbb615dbadb3))
 	ROM_RELOAD( 0x100000 + 0x20000, 0x20000)
@@ -642,12 +551,13 @@ ROM_START(hd_l3)
 	ROM_RELOAD( 0x080000 + 0x20000, 0x20000)
 	ROM_RELOAD( 0x080000 + 0x40000, 0x20000)
 	ROM_RELOAD( 0x080000 + 0x60000, 0x20000)
+	ROM_REGION(0x8000, "fixed", 0)
+	ROM_FILL(0x0000,0x8000,0x00)
 ROM_END
 
 ROM_START(hd_l1)
 	ROM_REGION(0x30000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("u6-l1.rom", 0x10000, 0x18000, CRC(a0bdcfbf) SHA1(f906ffa2d4d04e87225bf711a07dd3bee1655a40))
-	ROM_CONTINUE(0x8000,0x8000)
+	ROM_LOAD("u6-l1.rom", 0x10000, 0x20000, CRC(a0bdcfbf) SHA1(f906ffa2d4d04e87225bf711a07dd3bee1655a40))
 	ROM_REGION(0x180000, "sound1", 0)
 	ROM_LOAD("u18-sp1.rom", 0x100000, 0x20000, CRC(708aa419) SHA1(cfc2692fb3bcbacceb85021e282bfbc8dcdf8fcc))
 	ROM_RELOAD( 0x100000 + 0x20000, 0x20000)
@@ -657,6 +567,8 @@ ROM_START(hd_l1)
 	ROM_RELOAD( 0x080000 + 0x20000, 0x20000)
 	ROM_RELOAD( 0x080000 + 0x40000, 0x20000)
 	ROM_RELOAD( 0x080000 + 0x60000, 0x20000)
+	ROM_REGION(0x8000, "fixed", 0)
+	ROM_FILL(0x0000,0x8000,0x00)
 ROM_END
 
 /*-----------------
@@ -664,8 +576,7 @@ ROM_END
 /------------------*/
 ROM_START(bop_l7)
 	ROM_REGION(0x50000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("tmbopl_7.rom", 0x10000, 0x38000, CRC(773e1488) SHA1(36e8957b3903b99844a76bf15ba393b17db0db59))
-	ROM_CONTINUE(0x8000,0x8000)
+	ROM_LOAD("tmbopl_7.rom", 0x10000, 0x40000, CRC(773e1488) SHA1(36e8957b3903b99844a76bf15ba393b17db0db59))
 	ROM_REGION(0x180000, "sound1",0)
 	ROM_LOAD("mach_u14.l1", 0x000000, 0x20000, CRC(be2a736a) SHA1(ebf7b26a86d3ffcc35eaa1da8e4f432bd281fe15))
 	ROM_RELOAD( 0x000000 + 0x20000, 0x20000)
@@ -679,12 +590,13 @@ ROM_START(bop_l7)
 	ROM_RELOAD( 0x100000 + 0x20000, 0x20000)
 	ROM_RELOAD( 0x100000 + 0x40000, 0x20000)
 	ROM_RELOAD( 0x100000 + 0x60000, 0x20000)
+	ROM_REGION(0x8000, "fixed", 0)
+	ROM_FILL(0x0000,0x8000,0x00)
 ROM_END
 
 ROM_START(bop_l6)
 	ROM_REGION(0x30000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("tmbopl_6.rom", 0x10000, 0x18000, CRC(96b844d6) SHA1(981194c249a8fc2534e24ef672380d751a5dc5fd))
-	ROM_CONTINUE(0x8000,0x8000)
+	ROM_LOAD("tmbopl_6.rom", 0x10000, 0x20000, CRC(96b844d6) SHA1(981194c249a8fc2534e24ef672380d751a5dc5fd))
 	ROM_REGION(0x180000, "sound1",0)
 	ROM_LOAD("mach_u14.l1", 0x000000, 0x20000, CRC(be2a736a) SHA1(ebf7b26a86d3ffcc35eaa1da8e4f432bd281fe15))
 	ROM_RELOAD( 0x000000 + 0x20000, 0x20000)
@@ -698,12 +610,13 @@ ROM_START(bop_l6)
 	ROM_RELOAD( 0x100000 + 0x20000, 0x20000)
 	ROM_RELOAD( 0x100000 + 0x40000, 0x20000)
 	ROM_RELOAD( 0x100000 + 0x60000, 0x20000)
+	ROM_REGION(0x8000, "fixed", 0)
+	ROM_FILL(0x0000,0x8000,0x00)
 ROM_END
 
 ROM_START(bop_l5)
 	ROM_REGION(0x30000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("tmbopl_5.rom", 0x10000, 0x18000, CRC(fd5c426d) SHA1(e006f8e39cf382249db0b969cf966fd8deaa344a))
-	ROM_CONTINUE(0x8000,0x8000)
+	ROM_LOAD("tmbopl_5.rom", 0x10000, 0x20000, CRC(fd5c426d) SHA1(e006f8e39cf382249db0b969cf966fd8deaa344a))
 	ROM_REGION(0x180000, "sound1",0)
 	ROM_LOAD("mach_u14.l1", 0x000000, 0x20000, CRC(be2a736a) SHA1(ebf7b26a86d3ffcc35eaa1da8e4f432bd281fe15))
 	ROM_RELOAD( 0x000000 + 0x20000, 0x20000)
@@ -717,12 +630,13 @@ ROM_START(bop_l5)
 	ROM_RELOAD( 0x100000 + 0x20000, 0x20000)
 	ROM_RELOAD( 0x100000 + 0x40000, 0x20000)
 	ROM_RELOAD( 0x100000 + 0x60000, 0x20000)
+	ROM_REGION(0x8000, "fixed", 0)
+	ROM_FILL(0x0000,0x8000,0x00)
 ROM_END
 
 ROM_START(bop_l4)
 	ROM_REGION(0x30000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("tmbopl_4.rom", 0x10000, 0x18000, CRC(eea14ecd) SHA1(afd670bdc3680f12360561a1a5e5854718c099f7))
-	ROM_CONTINUE(0x8000,0x8000)
+	ROM_LOAD("tmbopl_4.rom", 0x10000, 0x20000, CRC(eea14ecd) SHA1(afd670bdc3680f12360561a1a5e5854718c099f7))
 	ROM_REGION(0x180000, "sound1",0)
 	ROM_LOAD("mach_u14.l1", 0x000000, 0x20000, CRC(be2a736a) SHA1(ebf7b26a86d3ffcc35eaa1da8e4f432bd281fe15))
 	ROM_RELOAD( 0x000000 + 0x20000, 0x20000)
@@ -736,12 +650,13 @@ ROM_START(bop_l4)
 	ROM_RELOAD( 0x100000 + 0x20000, 0x20000)
 	ROM_RELOAD( 0x100000 + 0x40000, 0x20000)
 	ROM_RELOAD( 0x100000 + 0x60000, 0x20000)
+	ROM_REGION(0x8000, "fixed", 0)
+	ROM_FILL(0x0000,0x8000,0x00)
 ROM_END
 
 ROM_START(bop_l3)
 	ROM_REGION(0x30000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("bop_l3.u6", 0x10000, 0x18000, CRC(cd4d219d) SHA1(4e73dca186867ebee07682deab058a45cee53be1))
-	ROM_CONTINUE(0x8000,0x8000)
+	ROM_LOAD("bop_l3.u6", 0x10000, 0x20000, CRC(cd4d219d) SHA1(4e73dca186867ebee07682deab058a45cee53be1))
 	ROM_REGION(0x180000, "sound1",0)
 	ROM_LOAD("mach_u14.l1", 0x000000, 0x20000, CRC(be2a736a) SHA1(ebf7b26a86d3ffcc35eaa1da8e4f432bd281fe15))
 	ROM_RELOAD( 0x000000 + 0x20000, 0x20000)
@@ -755,12 +670,13 @@ ROM_START(bop_l3)
 	ROM_RELOAD( 0x100000 + 0x20000, 0x20000)
 	ROM_RELOAD( 0x100000 + 0x40000, 0x20000)
 	ROM_RELOAD( 0x100000 + 0x60000, 0x20000)
+	ROM_REGION(0x8000, "fixed", 0)
+	ROM_FILL(0x0000,0x8000,0x00)
 ROM_END
 
 ROM_START(bop_l2)
 	ROM_REGION(0x30000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("bop_l2.u6", 0x10000, 0x18000, CRC(17ee1f56) SHA1(bee68ed5680455f23dc33e889acec83cba68b1dc))
-	ROM_CONTINUE(0x8000,0x8000)
+	ROM_LOAD("bop_l2.u6", 0x10000, 0x20000, CRC(17ee1f56) SHA1(bee68ed5680455f23dc33e889acec83cba68b1dc))
 	ROM_REGION(0x180000, "sound1",0)
 	ROM_LOAD("mach_u14.l1", 0x000000, 0x20000, CRC(be2a736a) SHA1(ebf7b26a86d3ffcc35eaa1da8e4f432bd281fe15))
 	ROM_RELOAD( 0x000000 + 0x20000, 0x20000)
@@ -774,6 +690,8 @@ ROM_START(bop_l2)
 	ROM_RELOAD( 0x100000 + 0x20000, 0x20000)
 	ROM_RELOAD( 0x100000 + 0x40000, 0x20000)
 	ROM_RELOAD( 0x100000 + 0x60000, 0x20000)
+	ROM_REGION(0x8000, "fixed", 0)
+	ROM_FILL(0x0000,0x8000,0x00)
 ROM_END
 
 /*===========
@@ -781,8 +699,9 @@ ROM_END
 /============*/
 ROM_START(tfa_13)
 	ROM_REGION(0x30000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("u6_l3.rom", 0x10000, 0x18000, CRC(bf4a37b5) SHA1(91b8bba6182e818a34252a4b2a0b86a2a44d9c42))
-	ROM_CONTINUE(0x8000,0x8000)
+	ROM_LOAD("u6_l3.rom", 0x10000, 0x20000, CRC(bf4a37b5) SHA1(91b8bba6182e818a34252a4b2a0b86a2a44d9c42))
+	ROM_REGION(0x8000, "fixed", 0)
+	ROM_FILL(0x0000,0x8000,0x00)
 ROM_END
 
 GAME(1990,  tfa_13,     0,      wpc_an, wpc_an, wpc_an_state,   wpc_an, ROT0,   "Bally",                "WPC Test Fixture: Alphanumeric (1.3)",             GAME_IS_SKELETON_MECHANICAL)
