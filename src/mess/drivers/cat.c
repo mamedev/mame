@@ -2,10 +2,32 @@
 
     Canon Cat, Model V777
     IAI Swyft Model P0001
-    driver by Miodrag Milanovic and Lord Nightmare
+    Copyright (C) 2009-2013 Miodrag Milanovic and Jonathan Gevaryahu AKA Lord Nightmare
     With information and help from John "Sandy" Bumgarner, Dwight Elvey,
     Charles Springer, Terry Holmes, Jonathan Sand, Aza Raskin and others.
-
+  
+  
+    This source file is dual-licensed under the following licenses:
+    1. The MAME license as of September 2013
+    2. The GNU LGPLv2.1:
+  
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser General Public
+    License as published by the Free Software Foundation; either
+    version 2.1 of the License, or (at your option) any later version.
+    
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Lesser General Public License for more details.
+    
+    You should have received a copy of the GNU Lesser General Public
+    License along with this library; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+  
+    Please contact the authors if you require other licensing.
+  
+  
     This driver is dedicated in memory of Jef Raskin and Dave Boulton
 
     12/06/2009 Skeleton driver.
@@ -182,20 +204,38 @@ Board name: 950-0001C
 |                                '----------' '-------------------' ||  INFORMATION            O   T O  | O   =
 | TMS4256   74F153    "VIDEO 2B" .----------.                       J4  APPLIANCE INC.         R   I R  | U   =
 |                                | AM27256  |   74HC02     74HC374  ||  Copyright 1985         S   O S  | T   =
-| TMS4256   74F153    74LS393    |__________|                       ||  UM95089  Y2                N    |     =
+| TMS4256   74F153    74LS393  B1|__________|                       ||  UM95089  Y2                N    |     =
 |_____________________________[________J9___]__________________________________________________D13______|_____=
 
 *Devices of interest:
 J1: breakout of joystick, serial/rs232, hex-keypad, parallel port, and forth switch (and maybe cassette?) pins
+    DIL 60 pin 2-row right-angle rectangular connector with metal shield contact;
+    not all 60 pins are populated in the connector, only pins 1-6, 8, 13-15, 17-18, 23-30, 35-60 are present
+    (traced partly by dwight)
 J2: unpopulated 8-pin sip header, serial/rs232-related?
-J3: Floppy Connector (standard DIL 34 pin mini-shugart/pc floppy connector)
+    (vcc ? ? ? ? ? ? gnd)
+J3: Floppy Connector
+    (standard DIL 34 pin 2-row rectangular connector for mini-shugart/pc floppy cable; pin 2 IS connected somewhere)
 J4: 18-pin sip header for keyboard ribbon cable
-J5: Berg type socket for supplying power (5v gnd gnd 12v) to the floppy drive
+    (needs tracing to see the VIA hookup order)
+J5: locking-tab-type "CONN HEADER VERT 4POS .100 TIN" connector for supplying power
+    through a small cable with a berg connector at the other end, to the floppy drive
+    (5v gnd gnd 12v)
 J6: Phone connector, rj11 jack
 J7: Line connector, rj11 jack
-J8: 9-pin Video out/power in connector
-J9: unpopulated holes for a DIL connector for a ROM expansion/shadow/replacement daughterboard
+J8: 9-pin Video out/power in connector "CONN RECEPT 6POS .156 R/A PCB" plus "CONN RECEPT 3POS .156 R/A PCB" acting as one 9-pin connector
+    (NC ? ? ? NC NC ? 12v 5v) (video, vsync, hsync and case/video-gnd are likely here)
+J9: unpopulated DIL 40-pin straight connector for a ROM debug/expansion/RAM-shadow daughterboard
+    the pins after pin 12 connect to that of the ROM-LO 27256 pinout counting pins 1,28,2,27,3,26,etc
+    the ROM-HI rom has a different /HICE pin which is not connected to this connector
+    /LOCE is most likely !(a19|a18)&a15
+    /HICE is most likely !(a19|a18)&!a15
+    pin 1 (GND) is in the lower left and the pins count low-high then to the right
+    (gnd ? ? ? ?   ? vcc a14 a13 a8 a9 a11 /OE a10 /LOCE d7 d6 d5 d4 d3 )
+    (GND ? ? ? gnd ? vcc a12 a7  a6 a5 a4  a3  a2  a1    a0 d0 d1 d2 gnd) 
 Jx: 4 pin on top side, 6 pin on bottom side edge ?debug? connector (doesn't have a Jx number)
+    (trace me!)
+B1: a cut-able trace on the pcb. Not cut, affects one of the pins on the unpopulated J9 connector only.
 E1: jumper, unknown purpose, not set
 E2: jumper, unknown purpose, not set
 D13: LED
@@ -210,13 +250,13 @@ PB1 - piezo speaker
 *Pals:
 "TIMING B" - AMPAL16R4APC (marked on silkscreen "TIMING PAL")
 "DECODE E" - AMPAL16L8PC (marked on silkscreen "DECODE PAL")
-"VIDEO 2B" - AMPAL16R4APC (marked on silkscreen "VIDEO PAL")
+"VIDEO 2B" - AMPAL16R4PC (marked on silkscreen "VIDEO PAL")
 "DISK 3.5C" - AMPAL16R4PC (marked on silkscreen "DISK PAL")
 
 *Deviations from silkscreen:
 4N37 (marked on silkscreen "4N35")
 74F153 (marked on silkscreen "74ALS153")
-74HCT259 is socketed, possibly intended that the rom expansion daughterboard will have a ribbon cable fit in its socket
+74HCT259 is socketed, possibly intended that the rom expansion daughterboard will have a ribbon cable fit in its socket?
 
 
 ToDo:
@@ -1118,8 +1158,9 @@ MACHINE_CONFIG_END
 /* Swyft Memory map, based on watching the infoapp roms do their thing:
 68k address map:
 (a23,a22,a21,a20 lines don't exist on the 68008 so are considered unconnected)
-a23 a22 a21 a20 a19 a18 a17 a16 a15 a14 a13 a12 a11 a10 a9  a8  a7  a6  a5  a4  a3  a2  a1  (a0 via UDS/LDS)
-x   x   x   x   0   0   ?   ?   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   a        R   ROM (a=0 is low, a=1 is high)
+a23 a22 a21 a20 a19 a18 a17 a16 a15 a14 a13 a12 a11 a10 a9  a8  a7  a6  a5  a4  a3  a2  a1  a0
+x   x   x   x   0   0   ?   ?   0   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *        R   ROM-LO (/LOCE is 0, /HICE is 1)
+x   x   x   x   0   0   ?   ?   1   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *        R   ROM-HI (/LOCE is 1, /HICE is 0)
 x   x   x   x   0   1   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   a        RW  RAM
 x   x   x   x   1   1  ?0? ?1?  ?   ?   ?   ?   ?   ?   ?   ?   ?   ?   ?   ?   *   *   *   *        R   ? status of something? floppy?
 x   x   x   x   1   1  ?1? ?0?  ?   0   0   1   ?   ?   ?   ?   ?   ?   ?   ?   ?   ?   ?   ?        ?R?W   6850 acia control reg lives here, gets 0x55 steadystate and 0x57 written to it to reset it
@@ -1541,10 +1582,10 @@ ROM_START( swyft )
 	ROMX_LOAD( "infoapp.lo.u30", 0x0000, 0x8000, CRC(52c1bd66) SHA1(b3266d72970f9d64d94d405965b694f5dcb23bca), ROM_BIOS(2))
 	ROMX_LOAD( "infoapp.hi.u31", 0x8000, 0x8000, CRC(83505015) SHA1(693c914819dd171114a8c408f399b56b470f6be0), ROM_BIOS(2))
 	ROM_REGION( 0x4000, "pals", ROMREGION_ERASEFF )
-	ROM_LOAD( "timing_b.pal16r4.u9.jed", 0x0000, 0xb08, CRC(643e6e83) SHA1(7db167883f9d6cf385ce496d08976dc16fc3e2c3))
-	ROM_LOAD( "decode_e.pal16l8.u20.jed", 0x1000, 0xb08, CRC(0b1dbd76) SHA1(08c144ad7a7bbdd53eefd271b2f6813f8b3b1594))
-	ROM_LOAD( "video_2b.pal16r4.u25.jed", 0x2000, 0xb08, CRC(caf91148) SHA1(3f8ddcb512a1c05395c74ad9a6ba7b87027ce4ec))
-	ROM_LOAD( "disk_3.5c.pal16r4.u28.jed", 0x3000, 0xb08, CRC(fd994d02) SHA1(f910ab16587dd248d63017da1e5b37855e4c1a0c))
+	ROM_LOAD( "timing_b.ampal16r4a.u9.jed", 0x0000, 0xb08, CRC(643e6e83) SHA1(7db167883f9d6cf385ce496d08976dc16fc3e2c3))
+	ROM_LOAD( "decode_e.ampal16l8.u20.jed", 0x1000, 0xb08, CRC(0b1dbd76) SHA1(08c144ad7a7bbdd53eefd271b2f6813f8b3b1594))
+	ROM_LOAD( "video_2b.ampal16r4.u25.jed", 0x2000, 0xb08, CRC(caf91148) SHA1(3f8ddcb512a1c05395c74ad9a6ba7b87027ce4ec))
+	ROM_LOAD( "disk_3.5c.ampal16r4.u28.jed", 0x3000, 0xb08, CRC(fd994d02) SHA1(f910ab16587dd248d63017da1e5b37855e4c1a0c))
 ROM_END
 
 ROM_START( cat )
@@ -1596,7 +1637,7 @@ ROM_START( cat )
 	 *  (since no rom is in the socket; it reads as open bus, sometimes 0x2E)
 	 * svrom-2 maps to 240000-25ffff every ODD byte (d8-d0)
 	 *  (since no rom is in the socket; it reads as open bus, sometimes 0x80)
-	 * there is no svrom-3; 240000-25ffff EVEN always reads as 0x2E
+	 * there is no svrom-3 socket; 240000-25ffff EVEN always reads as 0x2E
 	 * since ROM_FILL16BE(0x0, 0x80000, 0x2e80) doesn't exist, the
 	 * even bytes and latter chunk of the svrom space need to be filled in
 	 * DRIVER_INIT or some other means needs to be found to declare them as
