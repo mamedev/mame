@@ -7679,6 +7679,7 @@ omegaf          // UPL-89016 (c) 1989
 omegafs         // UPL-89016 (c) 1989
 
 // UPL/NMK/Banpresto games
+urashima        // UPL-89052
 tharrier        // UPL-89053 (c) 1989 UPL
 tharrieru       // UPL-89053 (c) 1989 UPL + American Sammy license
 mustang         // UPL-90058 (c) 1990 UPL
@@ -7728,6 +7729,13 @@ airattcka       // (c) 1996 Comad
 
 // Bee-Oh games on unofficial hardware based on nmk16.c
 manybloc        // (c) 1991 Bee-Oh
+
+// Jaleco Mahjong Games, Similar Hardware to the NMK ones above?
+daireika        // (c) 1989 Jaleco/NMK
+mjzoomin        // (c) 1990
+kakumei         // (c) 1990
+kakumei2        // (c) 1992
+suchipi         // (c) 1993
 
 // NMK Double Dealer, Similar Hardware to Jaleco Mahjong games above
 ddealer         // (c) 1991 NMK

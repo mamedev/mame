@@ -314,7 +314,65 @@ UINT32 ddealer_state::screen_update_ddealer(screen_device &screen, bitmap_ind16 
 
 TIMER_DEVICE_CALLBACK_MEMBER(ddealer_state::ddealer_mcu_sim)
 {
+	/*coin/credit simulation*/
+	/*$fe002 is used,might be for multiple coins for one credit settings.*/
+	m_coin_input = (~(ioport("IN0")->read()));
 
+	if (m_coin_input & 0x01)//coin 1
+	{
+		if((m_input_pressed & 0x01) == 0)
+			m_mcu_shared_ram[0x000 / 2]++;
+		m_input_pressed = (m_input_pressed & 0xfe) | 1;
+	}
+	else
+		m_input_pressed = (m_input_pressed & 0xfe);
+
+	if (m_coin_input & 0x02)//coin 2
+	{
+		if ((m_input_pressed & 0x02) == 0)
+			m_mcu_shared_ram[0x000 / 2]++;
+		m_input_pressed = (m_input_pressed & 0xfd) | 2;
+	}
+	else
+		m_input_pressed = (m_input_pressed & 0xfd);
+
+	if (m_coin_input & 0x04)//service 1
+	{
+		if ((m_input_pressed & 0x04) == 0)
+			m_mcu_shared_ram[0x000 / 2]++;
+		m_input_pressed = (m_input_pressed & 0xfb) | 4;
+	}
+	else
+		m_input_pressed = (m_input_pressed & 0xfb);
+
+	/*0x104/2 is some sort of "start-lock",i.e. used on the girl selection.
+	  Without it,the game "steals" one credit if you press the start button on that.*/
+	if (m_mcu_shared_ram[0x000 / 2] > 0 && m_work_ram[0x104 / 2] & 1)
+	{
+		if (m_coin_input & 0x08)//start 1
+		{
+			if ((m_input_pressed & 0x08) == 0 && (~(m_work_ram[0x100 / 2] & 1)))
+				m_mcu_shared_ram[0x000 / 2]--;
+			m_input_pressed = (m_input_pressed & 0xf7) | 8;
+		}
+		else
+			m_input_pressed = (m_input_pressed & 0xf7);
+
+		if (m_coin_input & 0x10)//start 2
+		{
+			if((m_input_pressed & 0x10) == 0 && (~(m_work_ram[0x100 / 2] & 2)))
+				m_mcu_shared_ram[0x000 / 2]--;
+			m_input_pressed = (m_input_pressed & 0xef) | 0x10;
+		}
+		else
+			m_input_pressed = (m_input_pressed & 0xef);
+	}
+
+	/*random number generators,controls order of cards*/
+	m_mcu_shared_ram[0x10 / 2] = machine().rand() & 0xffff;
+	m_mcu_shared_ram[0x12 / 2] = machine().rand() & 0xffff;
+	m_mcu_shared_ram[0x14 / 2] = machine().rand() & 0xffff;
+	m_mcu_shared_ram[0x16 / 2] = machine().rand() & 0xffff;
 }
 
 
@@ -337,10 +395,76 @@ Protection handling,identical to Hacha Mecha Fighter / Thunder Dragon with diffe
 
 ******************************************************************************************************/
 
+#define PROT_JSR(_offs_,_protvalue_,_pc_) \
+	if(m_mcu_shared_ram[(_offs_)/2] == _protvalue_) \
+	{ \
+		m_mcu_shared_ram[(_offs_)/2] = 0xffff;  /*(MCU job done)*/ \
+		m_mcu_shared_ram[(_offs_+2-0x10)/2] = 0x4ef9;/*JMP*/\
+		m_mcu_shared_ram[(_offs_+4-0x10)/2] = 0x0000;/*HI-DWORD*/\
+		m_mcu_shared_ram[(_offs_+6-0x10)/2] = _pc_;  /*LO-DWORD*/\
+	}
+#define PROT_INPUT(_offs_,_protvalue_,_protinput_,_input_) \
+	if(m_mcu_shared_ram[_offs_] == _protvalue_) \
+	{\
+		m_mcu_shared_ram[_protinput_] = ((_input_ & 0xffff0000)>>16);\
+		m_mcu_shared_ram[_protinput_+1] = (_input_ & 0x0000ffff);\
+	}
 
 WRITE16_MEMBER(ddealer_state::ddealer_mcu_shared_w)
 {
 	COMBINE_DATA(&m_mcu_shared_ram[offset]);
+
+	switch(offset)
+	{
+		case 0x086/2: PROT_INPUT(0x086/2,0x1234,0x100/2,0x80000); break;
+		case 0x164/2: PROT_INPUT(0x164/2,0x5678,0x104/2,0x80002); break;
+		case 0x62e/2: PROT_INPUT(0x62e/2,0x9ca3,0x108/2,0x80008); break;
+		case 0x734/2: PROT_INPUT(0x734/2,0xaba2,0x10c/2,0x8000a); break;
+/*These enables something for sure,maybe the random number generator?*/
+	//00054C: 33FC B891 000F E828        move.w  #$b891, $fe828.l
+	//000554: 33FC C760 000F E950        move.w  #$c760, $fe950.l
+	//00055C: 33FC D45F 000F EA7C        move.w  #$d45f, $fea7c.l
+	//000564: 33FC E32E 000F ED4A        move.w  #$e32e, $fed4a.l
+
+		case 0x40e/2: PROT_JSR(0x40e,0x8011,0x6992); break;//score
+		case 0x41e/2: break;//unused
+		case 0x42e/2: PROT_JSR(0x42e,0x8007,0x6004); break;//cards on playfield/hand (ram side)
+		case 0x43e/2: PROT_JSR(0x43e,0x801d,0x6176); break;//second player sub-routine
+		case 0x44e/2: PROT_JSR(0x44e,0x8028,0x6932); break;//"gun card" logic
+		case 0x45e/2: PROT_JSR(0x45e,0x803e,0x6f90); break;//card delete
+		case 0x46e/2: PROT_JSR(0x46e,0x8033,0x93c2); break;//card movements
+		case 0x47e/2: PROT_JSR(0x47e,0x8026,0x67a0); break;//cards on playfield (vram side)
+		case 0x48e/2: PROT_JSR(0x48e,0x8012,0x6824); break;//cards on hand (vram side)
+		case 0x49e/2: PROT_JSR(0x49e,0x8004,0x9696); break;//write to text layer
+		case 0x4ae/2: PROT_JSR(0x4ae,0x8035,0x95fe); break;//write to scroll layer
+		case 0x4be/2: PROT_JSR(0x4be,0x8009,0x9634); break;//show girls sub-routine
+		case 0x4ce/2: PROT_JSR(0x4ce,0x802a,0x9656); break;
+		case 0x4de/2: PROT_JSR(0x4de,0x803b,0x96c2); break;
+		case 0x4ee/2: PROT_JSR(0x4ee,0x800c,0x5ca4); break;//palette ram buffer
+		case 0x4fe/2: PROT_JSR(0x4fe,0x8018,0x9818); break;
+		/*Start-up vector,I think that only the first ram address can be written by the main CPU,or it is a whole sequence.*/
+		case 0x000/2:
+			if (m_mcu_shared_ram[0x000 / 2] == 0x60fe)
+			{
+				m_mcu_shared_ram[0x000 / 2] = 0x0000;//coin counter
+				m_mcu_shared_ram[0x002 / 2] = 0x0000;//coin counter "decimal point"
+				m_mcu_shared_ram[0x004 / 2] = 0x4ef9;
+			}
+			break;
+		case 0x002/2:
+		case 0x004/2:
+			if (m_mcu_shared_ram[0x002 / 2] == 0x0000 && m_mcu_shared_ram[0x004 / 2] == 0x0214)
+				m_mcu_shared_ram[0x004 / 2] = 0x4ef9;
+			break;
+		case 0x008/2:
+			if (m_mcu_shared_ram[0x008 / 2] == 0x000f)
+				m_mcu_shared_ram[0x008 / 2] = 0x0604;
+			break;
+		case 0x00c/2:
+			if (m_mcu_shared_ram[0x00c / 2] == 0x000f)
+				m_mcu_shared_ram[0x00c / 2] = 0x0000;
+			break;
+	}
 }
 
 static ADDRESS_MAP_START( ddealer, AS_PROGRAM, 16, ddealer_state )
@@ -566,4 +690,4 @@ ROM_START( ddealer )
 	ROM_LOAD( "6.ic86", 0x100, 0x100, NO_DUMP )
 ROM_END
 
-GAME( 1991, ddealer,  0, ddealer, ddealer, ddealer_state, ddealer,  ROT0, "NMK", "Double Dealer", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
+GAME( 1991, ddealer,  0, ddealer, ddealer, ddealer_state, ddealer,  ROT0, "NMK", "Double Dealer", GAME_SUPPORTS_SAVE )

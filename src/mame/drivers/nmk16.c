@@ -479,10 +479,163 @@ static ADDRESS_MAP_START( bioship_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_SHARE("mainram")
 ADDRESS_MAP_END
 
+/******************************************************************************************
+
+Thunder Dragon & Hacha Mecha Fighter shares some ram with the MCU,the job of the latter
+is to provide some jsr vectors used by the game for gameplay calculations.Also it has
+the job to give the vectors of where the inputs are to be read & to calculate the coin
+settings,the latter is in a TIMER_DEVICE_CALLBACK to avoid sync problems.
+To make a long story short,this MCU is an alternative version of the same protection
+used by the MJ-8956 games (there are even the same kind of error codes!(i.e the number
+printed on the up-left corner of the screen)...
+
+Note: I'm 100% sure of the Thunder Dragon vectors because I've compared it with the
+bootleg sets,I'm *not* 100% sure of the Hacha Mecha Fighter vectors because I don't have
+anything to compare and I don't know if for example an option should be there if you lose a
+life,but the game looks pretty much hard without it.
+
+******************************************************************************************/
+
+
+#define PROT_JSR(_offs_,_protvalue_,_pc_) \
+	if(m_mainram[(_offs_)/2] == _protvalue_) \
+	{ \
+		m_mainram[(_offs_)/2] = 0xffff;  /*(MCU job done)*/ \
+		m_mainram[(_offs_+2-0x10)/2] = 0x4ef9;/*JMP*/\
+		m_mainram[(_offs_+4-0x10)/2] = 0x0000;/*HI-DWORD*/\
+		m_mainram[(_offs_+6-0x10)/2] = _pc_;  /*LO-DWORD*/\
+	}
+#define PROT_INPUT(_offs_,_protvalue_,_protinput_,_input_) \
+	if(m_mainram[_offs_] == _protvalue_) \
+	{ \
+		m_mainram[_protinput_] = ((_input_ & 0xffff0000)>>16);\
+		m_mainram[_protinput_+1] = (_input_ & 0x0000ffff);\
+	}
+
+#ifdef UNUSED_FUNCTION
+READ16_MEMBER(nmk16_state::mcu_shared_r)
+{
+	return nmk16_mcu_shared_ram[offset];
+}
+#endif
+
+//td     - hmf
+//008D9E - 00796e
+/*
+007B9E: bra     7b9c
+007BA0: move.w  #$10, $f907a.l
+007BA8: bsr     8106
+007BAC: bsr     dfc4
+007BB0: bsr     c44e
+007BB4: bcs     7cfa
+007BB8: bsr     d9c6
+007BBC: bsr     9400
+007BC0: bsr     7a54
+007BC4: bsr     da06
+007BC8: cmpi.w  #$3, $f907a.l
+007BD0: bcc     7be2
+007BD2: move.w  #$a, $f530e.l
+007BDA: move.w  #$a, $f670e.l
+007BE2: bsr     81aa
+007BE6: bsr     8994
+007BEA: bsr     8c36
+007BEE: bsr     8d0c
+007BF2: bsr     870a
+007BF6: bsr     9d66
+007BFA: bsr     b3f2
+007BFE: bsr     b59e
+007C02: bsr     9ac2
+007C06: bsr     c366
+
+thunder dragon algorithm (level 1):
+90 - spriteram update
+a0 - tilemap update
+b0 - player inputs
+c0 - controls sprite animation
+d0 - player shoots
+e0 - controls power-ups
+f0 - player bombs
+00 - controls player shoots
+10 - ?
+20 - level logic
+30 - enemy appearence
+40 - enemy energy
+50 - enemy energy 2
+60 - enemy shoots
+
+hacha mecha fighter algorithm (level 1):
+90 - spriteram update (d9c6)
+a0 - tilemap update (d1f8?)
+b0 - player inputs (da06)
+c0 - controls sprite animation (81aa)
+d0 - player shoots (8994)
+e0 - controls power-ups & options (8d0c)
+f0 - player bombs (8c36)
+00 - controls player shoots (870a)
+10 - ?
+20 - level logic (9642)
+30 - enemy appearence (9d66)
+40 - enemy energy (b3f2)
+50 - enemy energy 2 (b59e)
+60 - enemy shoots (9ac2)
+70 - ?
+80 - <unused>
+
+*/
 
 WRITE16_MEMBER(nmk16_state::hachamf_mainram_w)
 {
 	COMBINE_DATA(&m_mainram[offset]);
+
+	switch(offset)
+	{
+		case 0xe058/2: PROT_INPUT(0xe058/2,0xc71f,0xe000/2,0x00080000); break;
+		case 0xe182/2: PROT_INPUT(0xe182/2,0x865d,0xe004/2,0x00080002); break;
+		case 0xe51e/2: PROT_INPUT(0xe51e/2,0x0f82,0xe008/2,0x00080008); break;
+		case 0xe6b4/2: PROT_INPUT(0xe6b4/2,0x79be,0xe00c/2,0x0008000a); break;
+		case 0xe10e/2: PROT_JSR(0xe10e,0x8007,0x870a);//870a not 9d66
+						PROT_JSR(0xe10e,0x8000,0xd9c6); break;
+		case 0xe11e/2: PROT_JSR(0xe11e,0x8038,0x972a);//972a
+						PROT_JSR(0xe11e,0x8031,0xd1f8); break;
+		case 0xe12e/2: PROT_JSR(0xe12e,0x8019,0x9642);//OK-9642
+						PROT_JSR(0xe12e,0x8022,0xda06); break;
+		case 0xe13e/2: PROT_JSR(0xe13e,0x802a,0x9d66);//9d66 not 9400 - OK
+						PROT_JSR(0xe13e,0x8013,0x81aa); break;
+		case 0xe14e/2: PROT_JSR(0xe14e,0x800b,0xb3f2);//b3f2 - OK
+						PROT_JSR(0xe14e,0x8004,0x8994); break;
+		case 0xe15e/2: PROT_JSR(0xe15e,0x803c,0xb59e);//b59e - OK
+						PROT_JSR(0xe15e,0x8035,0x8d0c); break;
+		case 0xe16e/2: PROT_JSR(0xe16e,0x801d,0x9ac2);//9ac2 - OK
+						PROT_JSR(0xe16e,0x8026,0x8c36); break;
+		case 0xe17e/2: PROT_JSR(0xe17e,0x802e,0xc366);//c366 - OK
+						PROT_JSR(0xe17e,0x8017,0x870a); break;
+		case 0xe18e/2: PROT_JSR(0xe18e,0x8004,0xd620);        //unused
+						PROT_JSR(0xe18e,0x8008,0x972a); break; //unused
+		case 0xe19e/2: PROT_JSR(0xe19e,0x8030,0xd9c6);//OK-d9c6
+						PROT_JSR(0xe19e,0x8039,0x9642); break;
+		case 0xe1ae/2: PROT_JSR(0xe1ae,0x8011,0xd1f8);//d1f8 not c67e
+						PROT_JSR(0xe1ae,0x802a,0x9d66); break;
+		case 0xe1be/2: PROT_JSR(0xe1be,0x8022,0xda06);//da06
+						PROT_JSR(0xe1be,0x801b,0xb3f2); break;
+		case 0xe1ce/2: PROT_JSR(0xe1ce,0x8003,0x81aa);//81aa
+						PROT_JSR(0xe1ce,0x800c,0xb59e); break;
+		case 0xe1de/2: PROT_JSR(0xe1de,0x8034,0x8994);//8994 - OK
+						PROT_JSR(0xe1de,0x803d,0x9ac2); break;
+		case 0xe1ee/2: PROT_JSR(0xe1ee,0x8015,0x8d0c);//8d0c not 82f6
+						PROT_JSR(0xe1ee,0x802e,0xc366); break;
+		case 0xe1fe/2: PROT_JSR(0xe1fe,0x8026,0x8c36);//8c36
+						PROT_JSR(0xe1fe,0x8016,0xd620); break;  //unused
+		case 0xef00/2:
+			if(m_mainram[0xef00/2] == 0x60fe)
+			{
+				m_mainram[0xef00/2] = 0x0000; //this is the coin counter
+				m_mainram[0xef02/2] = 0x0000;
+				m_mainram[0xef04/2] = 0x4ef9;
+				m_mainram[0xef06/2] = 0x0000;
+				m_mainram[0xef08/2] = 0x7dc2;
+			}
+			break;
+	}
 }
 
 static ADDRESS_MAP_START( hachamf_map, AS_PROGRAM, 16, nmk16_state )
@@ -510,12 +663,195 @@ ADDRESS_MAP_END
 WRITE16_MEMBER(nmk16_state::tdragon_mainram_w)
 {
 	COMBINE_DATA(&m_mainram[offset]);
+
+	switch(offset)
+	{
+		case 0xe066/2: PROT_INPUT(0xe066/2,0xe23e,0xe000/2,0x000c0000); break;
+		case 0xe144/2: PROT_INPUT(0xe144/2,0xf54d,0xe004/2,0x000c0002); break;
+		case 0xe60e/2: PROT_INPUT(0xe60e/2,0x067c,0xe008/2,0x000c0008); break;
+		case 0xe714/2: PROT_INPUT(0xe714/2,0x198b,0xe00c/2,0x000c000a); break;
+		case 0xe70e/2: PROT_JSR(0xe70e,0x8007,0x9e22);
+						PROT_JSR(0xe70e,0x8000,0xd518); break;
+		case 0xe71e/2: PROT_JSR(0xe71e,0x8038,0xaa0a);
+						PROT_JSR(0xe71e,0x8031,0x8e7c); break;
+		case 0xe72e/2: PROT_JSR(0xe72e,0x8019,0xac48);
+						PROT_JSR(0xe72e,0x8022,0xd558); break;
+		case 0xe73e/2: PROT_JSR(0xe73e,0x802a,0xb110);
+						PROT_JSR(0xe73e,0x8013,0x96da); break;
+		case 0xe74e/2: PROT_JSR(0xe74e,0x800b,0xb9b2);
+						PROT_JSR(0xe74e,0x8004,0xa062); break;
+		case 0xe75e/2: PROT_JSR(0xe75e,0x803c,0xbb4c);
+						PROT_JSR(0xe75e,0x8035,0xa154); break;
+		case 0xe76e/2: PROT_JSR(0xe76e,0x801d,0xafa6);
+						PROT_JSR(0xe76e,0x8026,0xa57a); break;
+		case 0xe77e/2: PROT_JSR(0xe77e,0x802e,0xc6a4);
+						PROT_JSR(0xe77e,0x8017,0x9e22); break;
+		case 0xe78e/2: PROT_JSR(0xe78e,0x8004,0xaa0a);
+						PROT_JSR(0xe78e,0x8008,0xaa0a); break;
+		case 0xe79e/2: PROT_JSR(0xe79e,0x8030,0xd518);
+						PROT_JSR(0xe79e,0x8039,0xac48); break;
+		case 0xe7ae/2: PROT_JSR(0xe7ae,0x8011,0x8e7c);
+						PROT_JSR(0xe7ae,0x802a,0xb110); break;
+		case 0xe7be/2: PROT_JSR(0xe7be,0x8022,0xd558);
+						PROT_JSR(0xe7be,0x801b,0xb9b2); break;
+		case 0xe7ce/2: PROT_JSR(0xe7ce,0x8003,0x96da);
+						PROT_JSR(0xe7ce,0x800c,0xbb4c); break;
+		case 0xe7de/2: PROT_JSR(0xe7de,0x8034,0xa062);
+						PROT_JSR(0xe7de,0x803d,0xafa6); break;
+		case 0xe7ee/2: PROT_JSR(0xe7ee,0x8015,0xa154);
+						PROT_JSR(0xe7ee,0x802e,0xc6a4); break;
+		case 0xe7fe/2: PROT_JSR(0xe7fe,0x8026,0xa57a);
+						PROT_JSR(0xe7fe,0x8016,0xa57a); break;
+		case 0xef00/2:
+			if(m_mainram[0xef00/2] == 0x60fe)
+			{
+				m_mainram[0xef00/2] = 0x0000; //this is the coin counter
+				m_mainram[0xef02/2] = 0x0000;
+				m_mainram[0xef04/2] = 0x4ef9;
+				m_mainram[0xef06/2] = 0x0000;
+				m_mainram[0xef08/2] = 0x92f4;
+			}
+			break;
+	}
 }
 
 /*coin setting MCU simulation*/
 void nmk16_state::mcu_run(UINT8 dsw_setting)
 {
-	// ...
+	UINT16 coin_input;
+	UINT8 dsw[2];
+	UINT8 i;
+
+	/*Accept the start button but needs some m68k processing first,otherwise you can't start a play with 1 credit inserted*/
+	if(m_start_helper & 1 && m_mainram[0x9000/2] & 0x0200) /*start 1 */
+	{
+		m_mainram[0xef00/2]--;
+		m_start_helper = m_start_helper & 2;
+	}
+	if(m_start_helper & 2 && m_mainram[0x9000/2] & 0x0100) /*start 2*/
+	{
+		m_mainram[0xef00/2]--;
+		m_start_helper = m_start_helper & 1;
+	}
+
+	/*needed because of the uncompatibility of the dsw settings.*/
+	if(dsw_setting) // Thunder Dragon
+	{
+		dsw[0] = (ioport("DSW2")->read() & 0x7);
+		dsw[1] = (ioport("DSW2")->read() & 0x38) >> 3;
+		for(i=0;i<2;i++)
+		{
+			switch(dsw[i] & 7)
+			{
+				case 0: m_mainram[0x9000/2]|=0x4000; break; //free play
+				case 1: m_coin_count_frac[i] = 1; m_coin_count[i] = 4; break;
+				case 2: m_coin_count_frac[i] = 1; m_coin_count[i] = 3; break;
+				case 3: m_coin_count_frac[i] = 1; m_coin_count[i] = 2; break;
+				case 4: m_coin_count_frac[i] = 4; m_coin_count[i] = 1; break;
+				case 5: m_coin_count_frac[i] = 3; m_coin_count[i] = 1; break;
+				case 6: m_coin_count_frac[i] = 2; m_coin_count[i] = 1; break;
+				case 7: m_coin_count_frac[i] = 1; m_coin_count[i] = 1; break;
+			}
+		}
+	}
+	else // Hacha Mecha Fighter
+	{
+		dsw[0] = (ioport("DSW1")->read() & 0x0700) >> 8;
+		dsw[1] = (ioport("DSW1")->read() & 0x3800) >> 11;
+		for(i=0;i<2;i++)
+		{
+			switch(dsw[i] & 7)
+			{
+				case 0: m_mainram[0x9000/2]|=0x4000; break; //free play
+				case 1: m_coin_count_frac[i] = 4; m_coin_count[i] = 1; break;
+				case 2: m_coin_count_frac[i] = 3; m_coin_count[i] = 1; break;
+				case 3: m_coin_count_frac[i] = 2; m_coin_count[i] = 1; break;
+				case 4: m_coin_count_frac[i] = 1; m_coin_count[i] = 4; break;
+				case 5: m_coin_count_frac[i] = 1; m_coin_count[i] = 3; break;
+				case 6: m_coin_count_frac[i] = 1; m_coin_count[i] = 2; break;
+				case 7: m_coin_count_frac[i] = 1; m_coin_count[i] = 1; break;
+			}
+		}
+	}
+
+	/*read the coin port*/
+	coin_input = (~(ioport("IN0")->read()));
+
+	if(coin_input & 0x01)//coin 1
+	{
+		if((m_input_pressed & 0x01) == 0)
+		{
+			if(m_coin_count_frac[0] != 1)
+			{
+				m_mainram[0xef02/2]+=m_coin_count[0];
+				if(m_coin_count_frac[0] == m_mainram[0xef02/2])
+				{
+					m_mainram[0xef00/2]+=m_coin_count[0];
+					m_mainram[0xef02/2] = 0;
+				}
+			}
+			else
+				m_mainram[0xef00/2]+=m_coin_count[0];
+		}
+		m_input_pressed = (m_input_pressed & 0xfe) | 1;
+	}
+	else
+		m_input_pressed = (m_input_pressed & 0xfe);
+
+	if(coin_input & 0x02)//coin 2
+	{
+		if((m_input_pressed & 0x02) == 0)
+		{
+			if(m_coin_count_frac[1] != 1)
+			{
+				m_mainram[0xef02/2]+=m_coin_count[1];
+				if(m_coin_count_frac[1] == m_mainram[0xef02/2])
+				{
+					m_mainram[0xef00/2]+=m_coin_count[1];
+					m_mainram[0xef02/2] = 0;
+				}
+			}
+			else
+				m_mainram[0xef00/2]+=m_coin_count[1];
+		}
+		m_input_pressed = (m_input_pressed & 0xfd) | 2;
+	}
+	else
+		m_input_pressed = (m_input_pressed & 0xfd);
+
+	if(coin_input & 0x04)//service 1
+	{
+		if((m_input_pressed & 0x04) == 0)
+			m_mainram[0xef00/2]++;
+		m_input_pressed = (m_input_pressed & 0xfb) | 4;
+	}
+	else
+		m_input_pressed = (m_input_pressed & 0xfb);
+
+	/*The 0x9000 ram address is the status */
+	if(m_mainram[0xef00/2] > 0 && m_mainram[0x9000/2] & 0x8000) //enable start button
+	{
+		if(coin_input & 0x08)//start 1
+		{
+			if((m_input_pressed & 0x08) == 0 && (!(m_mainram[0x9000/2] & 0x0200))) //start 1
+				m_start_helper = 1;
+
+			m_input_pressed = (m_input_pressed & 0xf7) | 8;
+		}
+		else
+			m_input_pressed = (m_input_pressed & 0xf7);
+
+		if(coin_input & 0x10)//start 2
+		{
+			/*Decrease two coins to let two players play with one start 2 button and two credits inserted at the insert coin screen.*/
+			if((m_input_pressed & 0x10) == 0 && (!(m_mainram[0x9000/2] & 0x0100))) // start 2
+				m_start_helper = (m_mainram[0x9000/2] == 0x8000) ? (3) : (2);
+
+			m_input_pressed = (m_input_pressed & 0xef) | 0x10;
+		}
+		else
+			m_input_pressed = (m_input_pressed & 0xef);
+	}
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(nmk16_state::tdragon_mcu_sim)
@@ -7101,10 +7437,10 @@ GAME( 1991, acrobatm, 0,        acrobatm, acrobatm, driver_device, 0,        ROT
 GAME( 1992, strahl,   0,        strahl,   strahl, driver_device,   0,        ROT0,   "UPL",                          "Koutetsu Yousai Strahl (Japan set 1)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1992, strahla,  strahl,   strahl,   strahl, driver_device,   0,        ROT0,   "UPL",                          "Koutetsu Yousai Strahl (Japan set 2)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 
-GAME( 1991, tdragon,  0,        tdragon,  tdragon, nmk16_state,  tdragon,  ROT270, "NMK (Tecmo license)",          "Thunder Dragon (9th Jan. 1992)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1991, tdragon1, tdragon,  tdragon,  tdragon, nmk16_state,  tdragon,  ROT270, "NMK (Tecmo license)",          "Thunder Dragon (4th Jun. 1991)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1991, tdragon,  0,        tdragon,  tdragon, nmk16_state,  tdragon,  ROT270, "NMK (Tecmo license)",          "Thunder Dragon (9th Jan. 1992)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1991, tdragon1, tdragon,  tdragon,  tdragon, nmk16_state,  tdragon,  ROT270, "NMK (Tecmo license)",          "Thunder Dragon (4th Jun. 1991)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 
-GAME( 1991, hachamf,  0,        hachamf,  hachamf, nmk16_state,    hachamf,  ROT0,   "NMK",                          "Hacha Mecha Fighter (19th Sep. 1991)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1991, hachamf,  0,        hachamf,  hachamf, nmk16_state,    hachamf,  ROT0,   "NMK",                          "Hacha Mecha Fighter (19th Sep. 1991)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 
 GAME( 1992, macross,  0,        macross,  macross, nmk16_state,    nmk,      ROT270, "Banpresto",                    "Super Spacefortress Macross / Chou-Jikuu Yousai Macross", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 
