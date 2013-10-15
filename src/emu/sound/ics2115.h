@@ -1,4 +1,4 @@
-// license:mame
+// license:MAME
 // copyright-holders:trap15,nimitz,austere
 #pragma once
 
