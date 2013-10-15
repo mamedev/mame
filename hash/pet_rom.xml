@@ -176,6 +176,18 @@
 		</part>
 	</software>
 
+	<software name="toolkit4">
+		<description>The BASIC Programmer's Toolkit (for BASIC 4.0)</description>
+		<year>1980</year>
+		<publisher>Palo Alto ICs Inc.</publisher>
+
+		<part name="rom" interface="pet_a000_rom">
+			<dataarea name="rom" size="0x800">
+				<rom name="toolkit4-a000.bin" size="0x800" crc="95bc7177" sha1="e9d291a3e1d95152c9b54920c12d8aadd214f1d3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ud11">
 		<description>UD11</description>
 		<year>198?</year>
