@@ -6,6 +6,7 @@ docs/config.txt svneol=native#text/plain
 docs/hlsl.txt svneol=native#text/plain
 docs/imgtool.txt svneol=native#text/plain
 docs/license.txt svneol=native#text/plain
+docs/licenseinfo.txt svneol=native#text/plain
 docs/m6502.txt svneol=native#text/plain
 docs/mame.txt svneol=native#text/plain
 docs/newvideo.txt svneol=native#text/plain

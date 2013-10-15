@@ -1,0 +1,3 @@
+MAME: see docs/license.txt
+LGPL-2.1+: http://spdx.org/licenses/LGPL-2.1+
+
