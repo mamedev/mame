@@ -1,3 +1,5 @@
+// license:mame
+// copyright-holders:trap15,nimitz,austere
 //ICS2115 by Raiden II team (c) 2010
 //members: austere, nimitz, trap15
 //
