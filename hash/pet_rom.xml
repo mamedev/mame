@@ -56,6 +56,18 @@
 		</part>
 	</software>
 
+	<software name="mcterm120">
+		<description>McTerm 1.20</description>
+		<year>1981</year>
+		<publisher>Madison Computer</publisher>
+
+		<part name="rom" interface="pet_9000_rom">
+			<dataarea name="rom" size="0x1000">
+				<rom name="mcterm120-9000.bin" size="0x1000" crc="5bdde574" sha1="fe37ea20af85b7e128e3ce8e99cb141bcacecd13" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="msvweigh">
 		<description>msvweigh</description>
 		<year>198?</year>
