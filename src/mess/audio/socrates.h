@@ -1,5 +1,11 @@
 #pragma once
+/*
+    Copyright (C) 2010-2011 Jonathan Gevaryahu AKA Lord Nightmare
 
+    This source file is dual-licensed under the following licenses:
+    1. The MAME license as of September 2013
+    2. The GNU LGPLv2.1
+*/
 #ifndef __SOCR_SND_H__
 #define __SOCR_SND_H__
 
