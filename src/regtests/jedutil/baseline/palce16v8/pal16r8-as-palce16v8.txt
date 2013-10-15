@@ -1,0 +1,97 @@
+Inputs:
+
+2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19
+
+Outputs:
+
+12 (Registered, Output feedback registered, Active low)
+13 (Registered, Output feedback registered, Active low)
+14 (Registered, Output feedback registered, Active low)
+15 (Registered, Output feedback registered, Active low)
+16 (Registered, Output feedback registered, Active low)
+17 (Registered, Output feedback registered, Active low)
+18 (Registered, Output feedback registered, Active low)
+19 (Registered, Output feedback registered, Active low)
+
+Equations:
+
+/rf12 := i5 & rf19 +
+         /i5 & /rf19 +
+         /i7 & /i9 & rf12 +
+         i7 & i9 & /rf12 +
+         i3 & /i4 & i5 +
+         /i3 & i4 & /i5 +
+         /i2 & i6 +
+         i2 & /i6
+rf12.oe = OE
+
+/rf13 := i8 & i9 & /rf12 +
+         /i7 & i8 +
+         i6 & i7 & /i8 & /rf13 +
+         i5 & /i7 & /i8 +
+         i5 & /i9 +
+         i4 & rf12 & rf13 +
+         /i2 & /i3 & /i9 +
+         /i4 & /i6
+rf13.oe = OE
+
+/rf14 := /i4 & /i8 & rf13 +
+         i2 & /i4 +
+         i3 & /i4 & /rf13 +
+         /i4 & i5 & i6 +
+         /i4 & /i5 & i6 & /rf14 +
+         /i4 & /i5 & /i6 & i7 +
+         i7 & i8 & rf14 +
+         /i8 & /i9
+rf14.oe = OE
+
+/rf15 := /i3 & /i4 +
+         i3 & i5 +
+         i6 & /rf14 +
+         i7 & i8 & rf14 +
+         i9 & /rf15 +
+         /i5 & /i8 +
+         i2 & rf15 +
+         i2 & i9
+rf15.oe = OE
+
+/rf16 := i5 & i9 & /rf16 +
+         /i5 & /i9 & rf16 +
+         /i2 & /i3 +
+         i2 & i3 & i4 +
+         i5 & i6 & i7 & i8 & i9 & rf15 +
+         /i5 & /i6 & /i7 & /i8 & /i9 & /rf15 +
+         i6 & /i7 +
+         i9
+rf16.oe = OE
+
+/rf17 := i9 +
+         i8 & /i9 +
+         /i2 & /rf16 +
+         /i2 & /i3 & /i9 +
+         /i3 & i4 & rf17 +
+         /i3 & i6 & i7 +
+         /i7 & /i9 +
+         i5 & rf16 & /rf17
+rf17.oe = OE
+
+/rf18 := /rf17 +
+         /i2 & /i3 & /i4 & rf17 +
+         /i2 & /rf18 +
+         i7 +
+         i8 +
+         i9 +
+         /i2 & /i3 & /i4 & /i5 +
+         i6 & i7 & /i8 & /i9
+rf18.oe = OE
+
+/rf19 := i2 +
+         /rf19 +
+         i3 +
+         /rf12 & rf19 +
+         /i5 & /i9 +
+         /i2 & i8 +
+         /i4 & i5 & rf12 +
+         i6 & /i8 & /i9
+rf19.oe = OE
+

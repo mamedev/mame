@@ -1,0 +1,101 @@
+;PALASM Design Description
+
+;---------------------------------- Declaration Segment ------------
+TITLE    PAL12L6 Test
+PATTERN  A
+REVISION 1.0
+AUTHOR   MAMEDev
+COMPANY  MAMEDev
+DATE     08/25/13
+
+CHIP  PAL12L6Test  PALCE16V8
+
+SIGNATURE #b0010011001100110011001100110011001100110011001100110011001100100
+
+;---------------------------------- PIN Declarations ---------------
+PIN  1          I1                   COMBINATORIAL               ;       
+PIN  2          I2                   COMBINATORIAL               ;       
+PIN  3          I3                   COMBINATORIAL               ;       
+PIN  4          I4                   COMBINATORIAL               ;       
+PIN  5          I5                   COMBINATORIAL               ;       
+PIN  6          I6                   COMBINATORIAL               ;       
+PIN  7          I7                   COMBINATORIAL               ;       
+PIN  8          I8                   COMBINATORIAL               ;       
+PIN  9          I9                   COMBINATORIAL               ;
+PIN  10         GND                                              ;
+PIN  11         I11                  COMBINATORIAL               ;       
+PIN  12         I12                  COMBINATORIAL               ;       
+PIN  13         O13                  COMBINATORIAL               ;       
+PIN  14         O14                  COMBINATORIAL               ;       
+PIN  15         O15                  COMBINATORIAL               ;       
+PIN  16         O16                  COMBINATORIAL               ;       
+PIN  17         O17                  COMBINATORIAL               ;       
+PIN  18         O18                  COMBINATORIAL               ;       
+PIN  19         I19                  COMBINATORIAL               ;
+PIN  20         VCC                                              ;
+
+;----------------------------------- Boolean Equation Segment ------
+EQUATIONS
+
+MINIMIZE_OFF
+
+/O13 = /I8 +
+       /I11 +
+       /I9 +
+       /I3 * /I6 +
+       /I1 * /I7 +
+       /I2 +
+       /I4 * /I12 +
+       /I5
+
+/O14 = /I3 * /I9 * I19 +
+       /I6 +
+       /I2 +
+       I4 +
+       /I8 * I11 +
+       I7 +
+       I5 * /I11 +
+       /I1
+
+/O15 = I4 +
+       I1 * /I3 +
+       I2 * I9 +
+       I5 +
+       I1 * I7 +
+       /I3 +
+       /I8 +
+       /I1
+
+/O16 = I6 +
+       /I2 * /I9 +
+       I3 * I11 +
+       /I8 +
+       I6 * I8 +
+       /I1 +
+       /i5 * I7 * I8 +
+       /I7 * /I8 * I12
+
+/O17 = I3 * I4 +
+       /I5 +
+       /I9 +
+       /I1 * /I11 +
+       I7 +
+       I2 * I9 * /I19 +
+       I6 * I9 +
+       /I8
+
+/O18 = /I9 +
+       I3 * I5 * I9 +
+       /I7 +
+       /I11 +
+       /I1 +
+       /I3 +
+       /I5 +
+       I1 * I7 * I11
+
+MINIMIZE_ON
+
+;----------------------------------- Simulation Segment ------------
+SIMULATION
+
+;-------------------------------------------------------------------

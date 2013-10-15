@@ -1,0 +1,95 @@
+Inputs:
+
+2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19
+
+Outputs:
+
+12 (Combinatorial, Output feedback output, Active low)
+13 (Registered, Output feedback registered, Active low)
+14 (Registered, Output feedback registered, Active low)
+15 (Registered, Output feedback registered, Active low)
+16 (Registered, Output feedback registered, Active low)
+17 (Registered, Output feedback registered, Active low)
+18 (Registered, Output feedback registered, Active low)
+19 (Combinatorial, Output feedback output, Active low)
+
+Equations:
+
+/o12 = rf13 & rf14 & rf15 & rf16 & rf17 & rf18 +
+       i2 +
+       i3 +
+       i4 +
+       /o19 +
+       i6 & o19 +
+       i7 & /i8 & i9
+o12.oe = /i5
+
+/rf13 := /i6 & rf13 +
+         o12 & o19 +
+         /i9 & /rf13 +
+         /i2 & /i5 +
+         i2 & /o12 +
+         /i7 & /i9 +
+         /i2 & /i8 +
+         /i3 & i8 & i9
+rf13.oe = OE
+
+/rf14 := i2 +
+         /rf14 +
+         i3 +
+         i7 & /i8 & /rf13 +
+         /i9 & rf14 +
+         i6 & i9 & rf13 +
+         i2 & i4 & /i9 +
+         /i5 & /i8
+rf14.oe = OE
+
+/rf15 := /i3 +
+         i4 +
+         i5 & rf14 & rf16 +
+         /i7 & i9 +
+         i3 & /rf14 +
+         /i4 & /i5 +
+         i6 & /i9 +
+         /i8 & /rf16
+rf15.oe = OE
+
+/rf16 := i8 & rf17 +
+         i3 & i9 +
+         /i4 & /i9 & /rf15 +
+         i7 & i8 +
+         i2 & i3 & i9 & /rf17 +
+         i2 & i5 +
+         i3 & /i4 & /i5 & rf15 +
+         /i6 & /i7 & i9
+rf16.oe = OE
+
+/rf17 := i2 & i9 +
+         /i2 & i3 & /i8 +
+         /i4 & /i8 +
+         /i5 & i6 & /i8 & /rf16 +
+         rf16 & /rf18 +
+         i3 & /i8 +
+         /i4 & /i8 & rf16 +
+         rf18
+rf17.oe = OE
+
+/rf18 := rf18 +
+         i8 & i9 +
+         /i5 & i8 +
+         i3 & i4 & /rf18 +
+         i2 & /i3 +
+         /i5 & /i7 & /o19 +
+         /i2 & i3 & /i7 +
+         /i2 & o19
+rf18.oe = OE
+
+/o19 = i4 & /o12 +
+       i5 & /i6 +
+       /i5 & i6 +
+       i8 & i9 & /rf18 +
+       i2 & /i9 & rf18 +
+       i3 & i9 +
+       /i4 & /i7 & /i8
+o19.oe = o12 & /rf18
+

@@ -1,0 +1,1 @@
+These files are for use with the PALASM 4 v1.5 tool.  The PALASM tool will take the pds files and automatically creates a jed file.  (Under Windows 7 64-bit the PALASM tool will not run under the Windows XP VM downloadable for free with Windows 7, but will run under DOSBox.)
