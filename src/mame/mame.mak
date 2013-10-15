@@ -1429,7 +1429,6 @@ $(MAMEOBJ)/nmk.a: \
 	$(DRIVERS)/acommand.o \
 	$(DRIVERS)/cultures.o \
 	$(DRIVERS)/ddealer.o \
-	$(DRIVERS)/jalmah.o \
 	$(DRIVERS)/macrossp.o $(VIDEO)/macrossp.o \
 	$(DRIVERS)/nmk16.o $(MACHINE)/nmk004.o $(VIDEO)/nmk16.o \
 	$(DRIVERS)/quizdna.o $(VIDEO)/quizdna.o \
