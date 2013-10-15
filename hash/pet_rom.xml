@@ -104,6 +104,18 @@
 		</part>
 	</software>
 
+	<software name="oracl303">
+		<description>Oracle 3.03</description>
+		<year>1983</year>
+		<publisher>Batteries Included Inc.</publisher>
+
+		<part name="rom" interface="pet_9000_rom">
+			<dataarea name="rom" size="0x1000">
+				<rom name="oracl303-9000.bin" size="0x1000" crc="1ee9485d" sha1="f876933087c9633b0fafff4d1dc198017f250267" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="orgabasi">
 		<description>OrgaBASIC 101 (v1.4.015)</description>
 		<year>198?</year>
