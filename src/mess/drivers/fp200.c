@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Angelo Salese
 /***************************************************************************
 
     FP-200 (c) 1982 Casio

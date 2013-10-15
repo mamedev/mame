@@ -1,3 +1,5 @@
+// license:?
+// copyright-holders:Angelo Salese, Chris Hardy, David Haywood, Tomasz Slanina
 /******************************************************************************************
 
 PC-XT (c) 1987 IBM

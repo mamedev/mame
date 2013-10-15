@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Angelo Salese
 /***************************************************************************
 
     Double Crown (c) 1997 Cadence Technology / Dyna

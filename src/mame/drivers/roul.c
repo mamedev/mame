@@ -1,3 +1,5 @@
+// license:?
+// copyright-holders:Roberto Zandona'
 /* Super Lucky Roulette?
 
 driver by Roberto Zandona'

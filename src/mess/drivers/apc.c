@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Angelo Salese
 /***************************************************************************
 
     Advanced Personal Computer (c) 1982 NEC

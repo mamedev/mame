@@ -1,3 +1,5 @@
+// license:?
+// copyright-holders:Angelo Salese, Roberto Fresca
 /**************************************************************************
 
   Waku Waku Doubutsu Land TonTon (c) 199? Success.

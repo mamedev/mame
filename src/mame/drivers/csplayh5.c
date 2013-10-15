@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Angelo Salese
 /***************************************************************************
 
     'High Rate DVD' HW (c) 1998 Nichibutsu

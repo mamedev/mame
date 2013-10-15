@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Angelo Salese
 /***************************************************************************
 
     Nintendo Super System

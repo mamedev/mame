@@ -1,3 +1,5 @@
+// license:?
+// copyright-holders:Angelo Salese, Pierpaolo Prazzoli, Roberto Fresca
 /************************************************************************
 
   Super Draw Poker (c) Stern Electronics 1983

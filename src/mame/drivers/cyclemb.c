@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Angelo Salese
 /***************************************************************************************************
 
     Cycle Maabou (c) 1984 Taito Corporation / Seta

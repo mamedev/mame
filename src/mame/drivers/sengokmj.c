@@ -1,3 +1,5 @@
+// license:?
+// copyright-holders:Angelo Salese, Pierpaolo Prazzoli
 /******************************************************************************************
 
 Sengoku Mahjong (c) 1991 Sigma

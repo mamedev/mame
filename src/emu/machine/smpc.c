@@ -1,3 +1,5 @@
+// license:?
+// copyright-holders:Angelo Salese, R. Belmont
 /************************************************************************************
 
 Sega Saturn SMPC - System Manager and Peripheral Control MCU simulation

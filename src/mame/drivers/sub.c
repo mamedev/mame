@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Angelo Salese, David Haywood
 /*************************************************************************************
 
 Submarine (c) 1985 Sigma

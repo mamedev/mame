@@ -1,3 +1,5 @@
+// license:?
+// copyright-holders:Angelo Salese, Tomasz Slanina, Olivier Galibert
 /*
 ****************************************************
 Mirax (C)1985 Current Technologies

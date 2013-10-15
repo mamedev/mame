@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Angelo Salese, David Haywood
 /******************************************************************************************************
 
     System H1 (c) 1994 Sega

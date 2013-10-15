@@ -1,3 +1,5 @@
+// license:?
+// copyright-holders:Angelo Salese, Andrew Gardner, Roberto Fresca, Luca Elia
 /*******************************************************************************************
 
 King Derby (c) 1981 Tatsumi

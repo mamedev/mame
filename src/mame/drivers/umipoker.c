@@ -1,3 +1,5 @@
+// license:?
+// copyright-holders:Angelo Salese, Roberto Fresca
 /***************************************************************************
 
     Umi de Poker (c) 1997 World Station Co.,LTD

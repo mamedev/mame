@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Angelo Salese, David Haywood
 /*******************************************************************************************
 
     Popo Bear (c) 2000 BMC

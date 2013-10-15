@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Angelo Salese, David Haywood
 /*******************************************************************************************
 
 Cyber Tank HW (c) 1987/1988 Coreland Technology

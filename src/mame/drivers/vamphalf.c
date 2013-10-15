@@ -1,3 +1,5 @@
+// license:?
+// copyright-holders:Angelo Salese, David Haywood, Pierpaolo Prazzoli, Tomasz Slanina
 /********************************************************************
 
  Driver for common Hyperstone based games

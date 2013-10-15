@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Angelo Salese, David Haywood
 /*******************************************************************************************
 
     Neo Print (c) 1996 SNK
@@ -42,7 +44,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<upd4990a_old_device> m_upd4990a;
-	
+
 	UINT8 m_audio_result;
 	UINT8 m_bank_val;
 	UINT8 m_vblank;

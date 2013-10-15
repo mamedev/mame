@@ -1,3 +1,5 @@
+// license:?
+// copyright-holders:Angelo Salese, Nicola Salmoria
 /*******************************************************************************************
 
 Fever Soccer (c) 2004 Seibu Kaihatsu

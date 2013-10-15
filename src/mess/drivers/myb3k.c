@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Angelo Salese
 /***************************************************************************
 
     Matsushita / Panasonic My Brain 3000 / JB-3000

@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Angelo Salese, David Haywood
 /*******************************************************************************************
 
 Night Gal (c) 1984 Nichibutsu

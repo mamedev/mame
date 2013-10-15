@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:David Haywood, Angelo Salese
 /******************************************************************************
 
 Hit Poker (c) 1997 Accept LTD

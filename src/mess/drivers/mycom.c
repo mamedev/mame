@@ -1,3 +1,5 @@
+// license:?
+// copyright-holders:Angelo Salese, Robbbert
 /******************************************************************************
 
     MYCOMZ-80A (c) 1981 Japan Electronics College

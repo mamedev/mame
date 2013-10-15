@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Angelo Salese, David Haywood, Mike Green
 /*******************************************************************************************
 
 Diamond Derby - G4001 board (c) 1986 Electrocoin

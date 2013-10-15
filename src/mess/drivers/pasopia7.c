@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Angelo Salese
 /**************************************************************************************************
 
     Toshiba Pasopia 7 (c) 1983 Toshiba

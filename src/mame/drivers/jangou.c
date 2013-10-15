@@ -1,3 +1,5 @@
+// license:?
+// copyright-holders:David Haywood, Angelo Salese, Phil Bennett
 /*******************************************************************************************
 
 Jangou (c) 1983 Nichibutsu

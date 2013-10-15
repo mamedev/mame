@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Angelo Salese
 /***************************************************************************
 
     Basic Master Jr (MB-6885) (c) 1982? Hitachi

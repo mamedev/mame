@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Angelo Salese, Barry Rodewald
 /************************************************************************************************
 
     Sharp X1 (c) 1983 Sharp Corporation

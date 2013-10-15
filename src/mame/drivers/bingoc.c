@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Angelo Salese, David Haywood
 /*******************************************************************************************
 
 Bingo Circus (c) 1989 Sega

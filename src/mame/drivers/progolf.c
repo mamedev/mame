@@ -1,3 +1,5 @@
+// license:?
+// copyright-holders:Angelo Salese, Roberto Zandona'
 /****************************************************************************************
 
 18 Holes Pro Golf (c) 1981 Data East

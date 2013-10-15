@@ -1,3 +1,5 @@
+// license:?
+// copyright-holders:Angelo Salese, Sandro Ronco
 /***************************************************************************
 
     Sharp PC-E220

@@ -1,3 +1,5 @@
+// license:?
+// copyright-holders:Roberto Zandona'
 /* Unknown - Poker (morugem
 
 driver by Roberto Zandona'

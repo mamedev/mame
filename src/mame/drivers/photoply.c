@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Angelo Salese
 /*******************************************************************************************************
 
 Photo Play (c) 199? Funworld

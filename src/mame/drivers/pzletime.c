@@ -1,3 +1,5 @@
+// license:?
+// copyright-holders:Angelo Salese, Pierpaolo Prazzoli
 /*****************************************************************************************
 
     Puzzle Time (Prototype)

@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Angelo Salese
 /***************************************************************************************************************************
 
     Konami 053252 chip emulation, codenamed "CCU"

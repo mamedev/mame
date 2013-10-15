@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Angelo Salese
 /*************************************************************************************************
 
 (Hologram) Time Traveler (c) 1991 Virtual Image Productions / Sega

@@ -1,3 +1,5 @@
+// license:?
+// copyright-holders:Angelo Salese, Pierpaolo Prazzoli
 /*****************************************************************************************
 
 Speed Attack! (c) 1984 Seta Kikaku Corp.

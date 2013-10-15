@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Angelo Salese
 /*******************************************************************************************
 
 MJ-8956 HW games (c) 1989 Jaleco / NMK / UPL

@@ -1,3 +1,5 @@
+// license:?
+// copyright-holders:Angelo Salese, R. Belmont, Anthony Kruize, Fabio Priuli, Harmony
 /***************************************************************************
 
   snes.c

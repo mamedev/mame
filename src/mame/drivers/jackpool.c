@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:David Haywood, Angelo Salese
 /*******************************************************************************************
 
 Jackpot Cards / Jackpot Pool (c) 1997 Electronic Projects

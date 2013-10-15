@@ -1,3 +1,5 @@
+// license:?
+// copyright-holders:Angelo Salese, Roberto Fresca,David Haywood
 /*********************************************************************************
 
   Merit Industries Multi-Poker (1981)

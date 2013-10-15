@@ -1,3 +1,5 @@
+// license:?
+// copyright-holders:Angelo Salese, Jonathan Edwards, Christopher Edwards
 /**************************************************************************************
 
     Basic Master Level 3 (MB-689x) (c) 1980 Hitachi

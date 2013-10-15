@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Angelo Salese
 /********************************************************************************************************************
 
 Tournament Solitaire (c) 1995 Dynamo

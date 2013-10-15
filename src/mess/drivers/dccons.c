@@ -1,3 +1,5 @@
+// license:?
+// copyright-holders:Angelo Salese, R. Belmont
 /*
 
     dc.c - Sega Dreamcast driver

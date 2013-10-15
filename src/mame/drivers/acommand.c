@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Angelo Salese
 /*******************************************************************************************
 
 Alien Command (c) 1993 Jaleco

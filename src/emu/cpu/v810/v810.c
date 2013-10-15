@@ -1,6 +1,9 @@
+// license:?
+// copyright-holders:Angelo Salese, Tomasz Slanina
 /******************************************************************
  NEC V810 (upd70732) core
   Tomasz Slanina - analog[at]op.pl
+  Angelo Salese - lordkale[at]libero.it
 
  Change Log
  - 23/08/2012 - Implemented remaining BSU opcodes (Angelo Salese)

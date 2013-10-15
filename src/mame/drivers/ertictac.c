@@ -1,3 +1,5 @@
+// license:?
+// copyright-holders:Angelo Salese, R. Belmont, Tomasz Slanina, Steve Ellenoff, Nicola Salmoria
 /*******************************************************************************************
 
     Erotictac/Tactic (c) 1990 Sisteme
@@ -313,7 +315,7 @@ ROM_START( ertictaca ) /* PCB had sticker printed "092121 EROTICTAC" */
 	ROM_REGION(0x200000, "vram", ROMREGION_ERASE00)
 ROM_END
 
-ROM_START( ertictacb ) 
+ROM_START( ertictacb )
 	ROM_REGION(0x800000, "maincpu", 0 )
 	ROM_LOAD32_BYTE( "1.bin", 0x00000, 0x10000, CRC(b8eee693) SHA1(12a7c50040ccbc14bac0beb2938d79322aa01a28) )
 	ROM_LOAD32_BYTE( "2.bin", 0x00001, 0x10000, CRC(e22618ef) SHA1(cf6a6ba37400a2b3f4235a02d70cfb6258d52a16) )

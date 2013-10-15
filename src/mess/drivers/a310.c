@@ -1,3 +1,5 @@
+// license:?
+// copyright-holders:Angelo Salese, R. Belmont, Juergen Bunchmueller
 /******************************************************************************
  *
  *  Acorn Archimedes 310
@@ -370,7 +372,7 @@ ROM_START( a3010 )
 	ROM_LOAD32_WORD( "0296,062-01.ic15", 0x000002, 0x100000, CRC(d42e196e) SHA1(64243d39d1bca38b10761f66a8042c883bde87a4))
 	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
 	ROM_REGION( 0x100, "i2cmem", ROMREGION_ERASE00 )
-	
+
 	ROM_REGION( 0x10000, "battery", ROMREGION_ERASE00 )
 	ROM_LOAD( "0296,063-2.ic40", 0x00000, 0x10000, CRC(9ca3a6be) SHA1(75905b031f49960605d55c3e7350d309559ed440))
 ROM_END

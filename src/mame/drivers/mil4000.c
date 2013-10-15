@@ -1,3 +1,5 @@
+// license:?
+// copyright-holders:Angelo Salese, Roberto Fresca,David Haywood
 /*******************************************************************************************
 
   Millennium Nuovo 4000 / Nuovo Millennium 4000

@@ -1,3 +1,5 @@
+// license:?
+// copyright-holders:Angelo Salese, Olivier Galibert, David Haywood, Samuele Zannoli, R. Belmont, ElSemi
 /*
 
   Sega Naomi / Naomi 2 / Atomiswave

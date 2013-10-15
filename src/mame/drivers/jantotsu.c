@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:David Haywood, Angelo Salese
 /*******************************************************************************************
 
 4nin-uchi Mahjong Jantotsu (c) 1983 Sanritsu

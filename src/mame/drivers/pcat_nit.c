@@ -1,3 +1,5 @@
+// license:?
+// copyright-holders:Angelo Salese, Mariusz Wojcieszek
 /********************************************************************************************************************
 
 Street Games (c) 1993 New Image Technologies

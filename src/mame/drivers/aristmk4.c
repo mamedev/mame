@@ -1,3 +1,5 @@
+// license:?
+// copyright-holders:Angelo Salese, Palindrome, FraSher
 /*
     Driver: aristmk4
 

@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Angelo Salese, hap
 /***************************************************************************
 
     30 Test (Remake) (c) 1997 Namco

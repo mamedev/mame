@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Angelo Salese
 /*******************************************************************************************************************
 
 Nichibutsu 1414M4 device emulation

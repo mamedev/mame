@@ -1,3 +1,5 @@
+// license:?
+// copyright-holders:Mirko Buffoni, David Haywood, Angelo Salese, Roberto Fresca
 /*************************************************************************************************
 
 High Video Tour 4000

@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Angelo Salese
 /***************************************************************************
 
     Fruit Dream (c) 1993 Nippon Data Kiki / Star Fish

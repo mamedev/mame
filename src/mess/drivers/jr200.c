@@ -1,3 +1,5 @@
+// license:?
+// copyright-holders:Angelo Salese, Roberto Zandona'
 /***************************************************************************
 
     JR-200 (c) 1982 National / Panasonic

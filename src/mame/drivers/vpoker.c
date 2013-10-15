@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Angelo Salese
 /**************************************************************************************************************
 
 Videotronics Poker (c) 198? Videotronics
