@@ -128,6 +128,18 @@
 		</part>
 	</software>
 
+	<software name="power">
+		<description>POWER</description>
+		<year>1981</year>
+		<publisher>Professional Software Inc.</publisher>
+
+		<part name="rom" interface="pet_9000_rom">
+			<dataarea name="rom" size="0x1000">
+				<rom name="power-9000.bin" size="0x1000" crc="76c4cc52" sha1="49be69cd2a00c5ae646f6ce7ea9106b0f58610e9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="spellmst">
 		<description>Spellmaster</description>
 		<year>198?</year>
