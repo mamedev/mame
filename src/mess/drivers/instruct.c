@@ -2,18 +2,10 @@
 
     Signetics Intructor 50
 
-    08/04/2010 Skeleton driver.
-    20/05/2012 Connected digits, system boots. [Robbbert]
-    20/05/2012 Connected keyboard, system mostly usable. [Robbbert]
-
-    The eprom and 128 bytes of ram are in a 2656 chip. There is no
-    useful info on this device on the net. It does appear though,
-    that it divides the 3.58MHz crystal by 4 for the CPU.
-
-    The system also has 512 bytes of ram in an ordinary ram chip.
-
-    There are no known schematics for this computer. There is a block
-    diagram which imparts little.
+    2010-04-08 Skeleton driver.
+    2012-05-20 Connected digits, system boots. [Robbbert]
+    2012-05-20 Connected keyboard, system mostly usable. [Robbbert]
+    2013-10-15 Fixed various regressions. [Robbbert]
 
     From looking at a blurry picture of it, this is what I can determine:
     - Left side: 8 toggle switches, with a round red led above each one.
@@ -39,11 +31,11 @@
       completion of a successful load, HELLO will be displayed.
 
     ToDO:
-    - Keys are mostly correct. It seems the SENS, INT, MON, RST keys are
+    - Keys are mostly correct. The SENS, INT, MON, RST keys are
       not in the matrix, but are connected to hardware directly. This needs
       to be emulated. (SENS key done)
     - Connect 10 toggle switches and 10 round red leds.
-    - Hook up the Interrupt Block unit (no info available).
+    - Hook up the Interrupt Block unit.
 
 ****************************************************************************/
 
@@ -58,11 +50,10 @@ class instruct_state : public driver_device
 {
 public:
 	instruct_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_p_loram(*this, "loram"),
-	m_p_hiram(*this, "hiram"),
-	m_cass(*this, "cassette")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_p_ram(*this, "mainram")
+		, m_cass(*this, "cassette")
 	{ }
 
 	DECLARE_READ8_MEMBER(portfc_r);
@@ -74,12 +65,12 @@ public:
 	DECLARE_WRITE8_MEMBER(portfa_w);
 	DECLARE_QUICKLOAD_LOAD_MEMBER( instruct );
 	INTERRUPT_GEN_MEMBER(t2l_int);
+private:
 	virtual void machine_reset();
 	UINT8 m_digit;
 	bool m_valid_digit;
 	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<UINT8> m_p_loram;
-	required_shared_ptr<UINT8> m_p_hiram;
+	required_shared_ptr<UINT8> m_p_ram;
 	required_device<cassette_image_device> m_cass;
 };
 
@@ -150,10 +141,8 @@ INTERRUPT_GEN_MEMBER( instruct_state::t2l_int )
 
 static ADDRESS_MAP_START( instruct_mem, AS_PROGRAM, 8, instruct_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x01ff) AM_RAM AM_SHARE("loram") // 512 bytes onboard ram
-	AM_RANGE(0x0200, 0x177f) AM_RAM // expansion ram needed by quickloads
-	AM_RANGE(0x1780, 0x17ff) AM_RAM // 128 bytes in s2656 chip
-	AM_RANGE(0x1800, 0x1fff) AM_RAM AM_SHARE("hiram")
+	AM_RANGE(0x0000, 0x17ff) AM_RAM AM_SHARE("mainram")
+	AM_RANGE(0x1800, 0x1fff) AM_ROM AM_REGION("roms",0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( instruct_io, AS_IO, 8, instruct_state )
@@ -221,22 +210,14 @@ INPUT_PORTS_END
 
 void instruct_state::machine_reset()
 {
-	UINT8* rom = memregion("user1")->base();
-	memcpy(m_p_loram, rom, 0x200);
-	memcpy(m_p_hiram, rom, 0x800);
-	m_maincpu->reset();
+	m_maincpu->set_state_int(S2650_PC, 0x1800);
 }
 
 QUICKLOAD_LOAD_MEMBER( instruct_state, instruct )
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	int i;
-	int quick_addr = 0x100;
-	int exec_addr;
-	int quick_length;
-	UINT8 *quick_data;
-	int read_;
+	UINT16 i, exec_addr, quick_length, quick_addr = 0x100, read_;
 	int result = IMAGE_INIT_FAIL;
+	UINT8 *quick_data;
 
 	quick_length = image.length();
 	if (quick_length < 0x0104)
@@ -282,13 +263,13 @@ QUICKLOAD_LOAD_MEMBER( instruct_state, instruct )
 				else
 				{
 					for (i = quick_addr; i < read_; i++)
-						space.write_byte(i, quick_data[i]);
+						m_p_ram[i] = quick_data[i];
 
 					/* display a message about the loaded quickload */
 					image.message(" Quickload: size=%04X : exec=%04X",quick_length,exec_addr);
 
 					// Start the quickload
-					m_maincpu->set_pc(exec_addr);
+					m_maincpu->set_state_int(S2650_PC, exec_addr);
 
 					result = IMAGE_INIT_PASS;
 				}
@@ -323,7 +304,7 @@ MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( instruct )
-	ROM_REGION( 0x0800, "user1", ROMREGION_ERASEFF )
+	ROM_REGION( 0x0800, "roms", 0 )
 	ROM_LOAD( "instruct.rom", 0x0000, 0x0800, CRC(131715a6) SHA1(4930b87d09046113ab172ba3fb31f5e455068ec7) )
 ROM_END
 
