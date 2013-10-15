@@ -1,3 +1,5 @@
+// license:mame|lgplv2.1+
+// copyright-holders:Miodrag Milanovic,Jonathan Gevaryahu
 /***************************************************************************
 
     Canon Cat, Model V777
