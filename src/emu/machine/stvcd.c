@@ -1,3 +1,5 @@
+// license:?
+// copyright-holders:Angelo Salese, R. Belmont
 /***************************************************************************
 
   machine/stvcd.c - Sega Saturn and ST-V CD-ROM handling
