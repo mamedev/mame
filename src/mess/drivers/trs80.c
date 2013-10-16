@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Robbbert and unknown others
 /***************************************************************************
 TRS80 memory map
 

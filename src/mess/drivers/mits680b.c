@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Miodrag Milanovic, Robbbert
 /***************************************************************************
 
         MITS Altair 680b

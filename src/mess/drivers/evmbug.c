@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Robbbert
 /***************************************************************************
 
         Stuart's Breadboard Project. TMS9995 evaluation kit TMAM6095.

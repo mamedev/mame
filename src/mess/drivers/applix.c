@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Robbbert
 /***************************************************************************
 
     Applix 1616 computer

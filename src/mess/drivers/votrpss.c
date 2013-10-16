@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Jonathan Gevaryahu, Robbbert
 /******************************************************************************
 *
 *  Votrax Personal Speech System Driver

@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Miodrag Milanovic
 /***************************************************************************
 
         UT88 driver by Miodrag Milanovic

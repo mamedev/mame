@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Robbbert
 /***************************************************************************
 
         Contel Codata Corporation Codata

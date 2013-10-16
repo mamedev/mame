@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Robbbert
 /*
 
     The Dream 6800 is a CHIP-8 computer roughly modelled on the Cosmac VIP.

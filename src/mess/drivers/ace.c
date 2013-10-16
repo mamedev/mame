@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Curt Coder, Robbbert, and unknown others
 /***************************************************************************
 Jupiter Ace memory map
 

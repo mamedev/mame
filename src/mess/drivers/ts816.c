@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Robbbert
 /***************************************************************************
 
     2013-09-10 Skeleton driver for Televideo ts816

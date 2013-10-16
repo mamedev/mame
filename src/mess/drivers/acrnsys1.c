@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Dirk Best, Robbbert
 /******************************************************************************
 
  Acorn System 1 (Microcomputer Kit)

@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Miodrag Milanovic
 /***************************************************************************
 
         Pecom driver by Miodrag Milanovic

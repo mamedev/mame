@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Robbbert
 /***************************************************************************
 
         Central Data cd2650

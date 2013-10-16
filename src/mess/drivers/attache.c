@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Barry Rodewald
 /*
  * attache.c
  *

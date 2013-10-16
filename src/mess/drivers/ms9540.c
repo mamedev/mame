@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Robbbert
 /***************************************************************************
 
 Millennium Systems 9520 and 9540 Software Development systems.

@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Miodrag Milanovic
 /***************************************************************************
 
         Brandt 8641

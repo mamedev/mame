@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Robbbert
 /***************************************************************************
 
         MCS BASIC 52 and MCS BASIC 31 board

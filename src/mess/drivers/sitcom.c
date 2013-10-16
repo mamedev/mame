@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Robbbert
 /***************************************************************************
 
     SITCOM (known as Sitcom, Sitcom85, Sitcom8085)

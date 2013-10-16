@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Robbbert
 /***************************************************************************
 
 2013-09-09 Skeleton of LFT computer system. A search on the net produces

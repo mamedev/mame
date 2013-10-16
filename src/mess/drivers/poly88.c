@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Miodrag Milanovic
 /***************************************************************************
 
         Poly-88 driver by Miodrag Milanovic

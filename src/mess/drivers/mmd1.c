@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Miodrag Milanovic, Robbbert
 /***************************************************************************
 
         MMD-1 & MMD-2 driver by Miodrag Milanovic

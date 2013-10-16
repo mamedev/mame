@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Robbbert
 /***************************************************************************
 
         Tesla PMI-80
@@ -39,14 +41,15 @@ class pmi80_state : public driver_device
 {
 public:
 	pmi80_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_ledready(0)
-	,
-		m_maincpu(*this, "maincpu") { }
+		: driver_device(mconfig, type, tag)
+		, m_ledready(0)
+		, m_maincpu(*this, "maincpu")
+	{ }
 
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_WRITE8_MEMBER(keyboard_w);
 	DECLARE_WRITE8_MEMBER(leds_w);
+private:
 	UINT8 m_keyrow;
 	bool m_ledready;
 	virtual void machine_reset();

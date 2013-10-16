@@ -1,8 +1,10 @@
+// license:MAME
+// copyright-holders:Juergen Buchmueller, Krzysztof Strzecha, Robbbert
 /***************************************************************************
     zx.c
 
     Original driver by:
-    Juergen Buchmueller <pullmoll@t-online.de>, Dec 1999
+    Juergen Buchmueller, Dec 1999
 
     Fixes and additions by Krzysztof Strzecha:
     07.06.2004 Tape loading added. Some cleanups of debug code.

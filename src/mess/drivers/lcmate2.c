@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Sandro Ronco, Robbbert
 /***************************************************************************
 
         Laser Compumate2

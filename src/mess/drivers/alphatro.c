@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Barry Rodewald, Robbbert
 /***************************************************************************
 
     Triumph-Adler's Alphatronic PC

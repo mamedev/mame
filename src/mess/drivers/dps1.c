@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Miodrag Milanovic, Robbbert
 #include "emu.h"
 #include "cpu/z80/z80.h"
 

@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Robbbert
 /*
 
 Super80.c written by Robbbert, 2005-2010.

@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Dirk Best
 /******************************************************************************
  Epson EX-800 Dot Matrix printer
 

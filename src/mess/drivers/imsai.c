@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Robbbert
 /***************************************************************************
 
     Imsai MPU-B. One of the earliest single-board computers on a S100 card.

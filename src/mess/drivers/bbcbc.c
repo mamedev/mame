@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Incog, Robbbert
 /***************************************************************************
 
   bbcbc.c

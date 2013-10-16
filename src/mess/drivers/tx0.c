@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Raphael Nabet
 /*
     TX-0
 

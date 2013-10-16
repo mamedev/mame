@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Miodrag Milanovic
 /***************************************************************************
 
         PP-01 driver by Miodrag Milanovic

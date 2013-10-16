@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Curt Coder, Robbbert
 /********************************************************************************************************************
 
 2013-07-31 Skeleton Driver [Curt Coder]

@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Miodrag Milanovic, Jonathan Gevaryahu, Robbbert
 /***************************************************************************
 
         Intel SDK-86

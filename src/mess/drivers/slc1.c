@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Robbbert
 /***************************************************************************
 
 2011-JUL-16 SLC1 skeleton driver [Robbbert]

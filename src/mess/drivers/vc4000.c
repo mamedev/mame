@@ -1,5 +1,7 @@
+// license:MAME
+// copyright-holders:Peter Trauner, Manfred Schneider, Robbbert
 /******************************************************************************
- Peter.Trauner@jk.uni-linz.ac.at May 2001
+ Peter Trauner May 2001
 
  Paul Robson's Emulator at www.classicgaming.com/studio2 made it possible
 ******************************************************************************/

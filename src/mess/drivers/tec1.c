@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Robbbert
 /***************************************************************************
 
     TEC-1 driver, written by Robbbert in April, 2009 for MESS.

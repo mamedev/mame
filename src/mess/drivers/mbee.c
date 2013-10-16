@@ -1,8 +1,10 @@
+// license:MAME
+// copyright-holders:Juergen Buchmueller, Robbbert
 /***************************************************************************
     microbee.c
 
     system driver
-    Juergen Buchmueller <pullmoll@t-online.de>, Jan 2000
+    Juergen Buchmueller, Jan 2000
 
     Brett Selwood, Andrew Davies (technical assistance)
 

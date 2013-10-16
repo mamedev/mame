@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Robbbert
 /***************************************************************************
 
 Hilger Analytical AB6089 Mk. 1 (LSI Octopus)

@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Robbbert
 /***************************************************************************
 
     Babbage-2nd skeleton driver (19/OCT/2011)

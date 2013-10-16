@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Micko? , Robbbert.
 /***************************************************************************
 
         Robotron Z9001 (KC85/1)

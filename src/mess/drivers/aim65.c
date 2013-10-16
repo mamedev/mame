@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Peter Trauner, Dan Boris, Dirk Best, Robbbert
 /******************************************************************************
  PeT mess@utanet.at Nov 2000pia6821_device
 Updated by Dan Boris, 3/4/2007

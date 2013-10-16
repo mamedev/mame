@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Robbbert
 /***************************************************************************
 
         SEL Z80 Trainer (LEHRSYSTEME)

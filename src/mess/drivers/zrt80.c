@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Robbbert
 /***************************************************************************
 
         DEC ZRT-80
@@ -31,29 +33,30 @@ public:
 	};
 
 	zrt80_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_crtc(*this, "crtc"),
-	m_8250(*this, "ins8250"),
-	m_beep(*this, "beeper"),
-	m_p_videoram(*this, "videoram"){ }
+		: driver_device(mconfig, type, tag)
+		, m_p_videoram(*this, "videoram")
+		, m_maincpu(*this, "maincpu")
+		, m_crtc(*this, "crtc")
+		, m_8250(*this, "ins8250")
+		, m_beep(*this, "beeper")
+	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<mc6845_device> m_crtc;
-	required_device<ins8250_device> m_8250;
-	required_device<beep_device> m_beep;
 	DECLARE_READ8_MEMBER(zrt80_10_r);
 	DECLARE_WRITE8_MEMBER(zrt80_30_w);
 	DECLARE_WRITE8_MEMBER(zrt80_38_w);
 	DECLARE_WRITE8_MEMBER(kbd_put);
-	UINT8 m_term_data;
-	required_shared_ptr<const UINT8> m_p_videoram;
 	const UINT8 *m_p_chargen;
-	virtual void machine_reset();
-	virtual void video_start();
-
+	required_shared_ptr<const UINT8> m_p_videoram;
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+private:
+	UINT8 m_term_data;
+	virtual void machine_reset();
+	virtual void video_start();
+	required_device<cpu_device> m_maincpu;
+	required_device<mc6845_device> m_crtc;
+	required_device<ins8250_device> m_8250;
+	required_device<beep_device> m_beep;
 };
 
 

@@ -1,5 +1,6 @@
 // license:MAME|LGPL-2.1+
 // copyright-holders:Jonathan Gevaryahu
+// Modernised by Robbbert. Portions of the code copyright Robbbert.
 /******************************************************************************
 *
 *  Self Contained zexall 'Z80 instruction exerciser' test driver
@@ -51,27 +52,28 @@ class zexall_state : public driver_device
 {
 public:
 	zexall_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_terminal(*this, TERMINAL_TAG)
-	,
-		m_main_ram(*this, "main_ram"){ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_terminal(*this, TERMINAL_TAG)
+		, m_main_ram(*this, "main_ram")
+	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<generic_terminal_device> m_terminal;
 	DECLARE_READ8_MEMBER( zexall_output_ack_r );
 	DECLARE_READ8_MEMBER( zexall_output_req_r );
 	DECLARE_READ8_MEMBER( zexall_output_data_r );
 	DECLARE_WRITE8_MEMBER( zexall_output_ack_w );
 	DECLARE_WRITE8_MEMBER( zexall_output_req_w );
 	DECLARE_WRITE8_MEMBER( zexall_output_data_w );
+	DECLARE_DRIVER_INIT(zexall);
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<generic_terminal_device> m_terminal;
 	required_shared_ptr<UINT8> m_main_ram;
 	UINT8 m_data[8]; // unused; to suppress the scalar initializer warning
 	UINT8 m_out_data; // byte written to 0xFFFF
 	UINT8 m_out_req; // byte written to 0xFFFE
 	UINT8 m_out_req_last; // old value at 0xFFFE before the most recent write
 	UINT8 m_out_ack; // byte written to 0xFFFC
-	DECLARE_DRIVER_INIT(zexall);
 	virtual void machine_reset();
 };
 

@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Robbbert
 /***************************************************************************
 
     CVICNY8080 - Practice-z80 - a homebrew from Czechoslavakia.

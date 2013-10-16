@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Robbbert
 /***************************************************************************
 
 Seattle Computer SCP-300F S100 card. It has sockets on the card for

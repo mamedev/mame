@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Robbbert
 /************************************************************************************************************
 
 Genrad Futuredata 2301 Network Control Processor

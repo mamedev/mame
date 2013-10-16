@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Robbbert
 /***************************************************************************
 
         Digital Microsystems ZSBC-3
@@ -41,18 +43,19 @@ class zsbc3_state : public driver_device
 {
 public:
 	zsbc3_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_terminal(*this, TERMINAL_TAG)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_terminal(*this, TERMINAL_TAG)
 	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<generic_terminal_device> m_terminal;
 	DECLARE_READ8_MEMBER(zsbc3_28_r);
 	DECLARE_READ8_MEMBER(zsbc3_2a_r);
 	DECLARE_WRITE8_MEMBER(kbd_put);
+private:
 	UINT8 m_term_data;
 	virtual void machine_reset();
+	required_device<cpu_device> m_maincpu;
+	required_device<generic_terminal_device> m_terminal;
 };
 
 
@@ -106,7 +109,6 @@ static MACHINE_CONFIG_START( zsbc3, zsbc3_state )
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_16MHz /4)
 	MCFG_CPU_PROGRAM_MAP(zsbc3_mem)
 	MCFG_CPU_IO_MAP(zsbc3_io)
-
 
 	/* video hardware */
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)

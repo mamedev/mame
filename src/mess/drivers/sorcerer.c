@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Kevin Thacker, Robbbert
 /******************************************************************************
 
   Exidy Sorcerer system driver
