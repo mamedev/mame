@@ -1,4 +1,4 @@
-// license:BSD-3-Clause
+// license:MAME
 // copyright-holders:Raphael Nabet
 /*
     This is the previous implementation of the TMS9900 using the common

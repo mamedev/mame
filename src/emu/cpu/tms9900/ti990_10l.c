@@ -1,4 +1,4 @@
-// license:BSD-3-Clause
+// license:MAME
 // copyright-holders:Raphael Nabet
 /*
     Generate the tms9900 emulator

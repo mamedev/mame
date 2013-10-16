@@ -1,4 +1,4 @@
-// license:BSD-3-Clause
+// license:MAME
 // copyright-holders:Raphael Nabet
 /*
     99xxcore.h : generic tms99xx emulation
