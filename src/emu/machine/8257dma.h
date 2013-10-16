@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Couriersud
 /***************************************************************************
 
     Intel 8257 Programmable DMA Controller emulation
