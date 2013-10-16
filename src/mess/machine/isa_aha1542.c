@@ -1,3 +1,5 @@
+// license:BSD-3-Clause or GPL
+// copyright-holders:Darkstar
 /**********************************************************************
  *
  *    Adaptec AHA-1542{,C,CF} SCSI Controller
