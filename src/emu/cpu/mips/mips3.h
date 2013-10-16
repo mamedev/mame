@@ -1,13 +1,11 @@
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles
 /***************************************************************************
 
     mips3.h
 
     Interface file for the universal machine language-based
     MIPS III/IV emulator.
-
-    Copyright Aaron Giles
-    Released for general non-commercial use under the MAME license
-    Visit http://mamedev.org for licensing and usage restrictions.
 
 ***************************************************************************/
 

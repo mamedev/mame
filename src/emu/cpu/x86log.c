@@ -1,12 +1,10 @@
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles
 /***************************************************************************
 
     x86log.c
 
     x86/x64 code logging helpers.
-
-    Copyright Aaron Giles
-    Released for general use under the MAME license
-    Visit http://mamedev.org for licensing and usage restrictions.
 
 ***************************************************************************/
 

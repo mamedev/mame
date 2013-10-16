@@ -1,12 +1,10 @@
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles
 /***************************************************************************
 
     vtlb.c
 
     Generic virtual TLB implementation.
-
-    Copyright Aaron Giles
-    Released for general non-commercial use under the MAME license
-    Visit http://mamedev.org for licensing and usage restrictions.
 
 ***************************************************************************/
 

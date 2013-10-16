@@ -1,12 +1,10 @@
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles
 /***************************************************************************
 
     drcumlsh.h
 
     Shorthand definitions for the universal machine language.
-
-    Copyright Aaron Giles
-    Released for general non-commercial use under the MAME license
-    Visit http://mamedev.org for licensing and usage restrictions.
 
 ***************************************************************************/
 

@@ -1,6 +1,6 @@
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles
 /*** t11: Portable DEC T-11 emulator ******************************************
-
-    Copyright Aaron Giles
 
     Opcode table plus function prototypes
 

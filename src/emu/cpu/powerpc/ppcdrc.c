@@ -1,12 +1,10 @@
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles
 /***************************************************************************
 
     ppcdrc.c
 
     Universal machine language-based PowerPC emulator.
-
-    Copyright Aaron Giles
-    Released for general non-commercial use under the MAME license
-    Visit http://mamedev.org for licensing and usage restrictions.
 
 ****************************************************************************
 

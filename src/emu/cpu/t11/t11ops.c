@@ -1,6 +1,6 @@
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles
 /*** t11: Portable DEC T-11 emulator ******************************************
-
-    Copyright Aaron Giles
 
     Actual opcode implementation.  Excuse the excessive use of macros, it
     was the only way I could bear to type all this in!
