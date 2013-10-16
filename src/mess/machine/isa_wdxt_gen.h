@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
 /**********************************************************************
 
     Western Digital WDXT-GEN ISA XT MFM Hard Disk Controller

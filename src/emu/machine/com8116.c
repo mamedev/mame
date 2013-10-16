@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
 /**********************************************************************
 
     COM8116 Dual Baud Rate Generator (Programmable Divider) emulation

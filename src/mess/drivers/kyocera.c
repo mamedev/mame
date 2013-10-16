@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
 /******************************************************************************************
 
     Kyocera Kyotronics 85 (and similar laptop computers)

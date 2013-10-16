@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
 /**********************************************************************
 
     Fairchild DM9368 7-Segment Decoder/Driver/Latch emulation

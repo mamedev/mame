@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
 /**********************************************************************
 
     RCA CDP1864C COS/MOS PAL Compatible Color TV Interface

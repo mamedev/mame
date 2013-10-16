@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
 /**********************************************************************
 
     NEC uPD1990AC Serial I/O Calendar & Clock emulation

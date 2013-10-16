@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
 /**********************************************************************
 
     Oxford Computer Systems Interpod IEC to IEEE interface emulation

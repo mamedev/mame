@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
 /**********************************************************************
 
     Commodore VIC-1111 16K RAM Expansion Cartridge emulation

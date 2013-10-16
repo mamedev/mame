@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
 /**********************************************************************
 
     Zilog Z8536 Counter/Timer and Parallel I/O emulation

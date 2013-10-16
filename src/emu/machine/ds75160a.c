@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
 /**********************************************************************
 
     National Semiconductor DS75160A IEEE-488 GPIB Transceiver emulation

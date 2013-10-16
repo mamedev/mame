@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
 /**********************************************************************
 
     Western Digital WD11C00-17 PC/XT Host Interface Logic Device

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
 /**********************************************************************
 
     RCA CDP1869/1870/1876 Video Interface System (VIS) emulation

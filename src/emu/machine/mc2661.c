@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
 /***************************************************************************
 
     Motorola MC2661/MC68661 Enhanced Programmable Communications Interface

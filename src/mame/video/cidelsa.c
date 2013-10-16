@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
 #include "emu.h"
 #include "cpu/cosmac/cosmac.h"
 #include "sound/cdp1869.h"

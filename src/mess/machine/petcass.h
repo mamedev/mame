@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
 /**********************************************************************
 
     Commodore PET/VIC-20/C64/Plus-4 Datassette Port emulation

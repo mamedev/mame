@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder, Olivier Galibert
 #include "includes/atarist.h"
 #include "video/atarist.h"
 

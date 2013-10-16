@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder, Olivier Galibert
 #pragma once
 
 #ifndef __ATARI_ST__

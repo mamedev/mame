@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
 #ifndef __TANDY2K__
 #define __TANDY2K__
 

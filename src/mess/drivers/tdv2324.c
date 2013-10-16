@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder,Lord Nightmare
 /*
 
     Tandberg TDV2324

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
 /***************************************************************************
 
     AMD AM9517A/8237A Multimode DMA Controller emulation

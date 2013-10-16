@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
 /**********************************************************************
 
     National Semiconductor ADC0808/ADC0809 8-Bit A/D Converter emulation

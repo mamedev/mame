@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
 /**********************************************************************
 
     SMC CRT9021 Video Attributes Controller (VAC) emulation

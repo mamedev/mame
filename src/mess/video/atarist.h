@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder, Olivier Galibert
 #ifndef _VIDEO_ATARIST_H_
 #define _VIDEO_ATARIST_H_
 

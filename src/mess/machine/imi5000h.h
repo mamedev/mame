@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
 /**********************************************************************
 
     IMI 5000H 5.25" Winchester Hard Disk Controller emulation

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
 /*
 
     PROF-80 (Prozessor RAM-Floppy Kontroller)

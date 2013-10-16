@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
 /*********************************************************************
 
     formats/d81_dsk.h

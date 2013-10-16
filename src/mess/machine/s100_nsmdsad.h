@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
 /**********************************************************************
 
     North Star MICRO-DISK System MDS-A-D (Double Density) emulation

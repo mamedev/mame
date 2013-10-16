@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
 /*********************************************************************
 
     formats/sf7000_dsk.h

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
 /***************************************************************************
 
     Mostek MK3801 Serial Timer Interrupt Controller (Z80-STI) emulation

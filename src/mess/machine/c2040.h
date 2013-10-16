@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
 /**********************************************************************
 
     Commodore 2040/3040/4040/8050/8250/SFD-1001 Disk Drive emulation

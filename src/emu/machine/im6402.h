@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
 /***************************************************************************
 
     Intersil IM6402 Universal Asynchronous Receiver/Transmitter emulation

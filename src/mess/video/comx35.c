@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
 #include "emu.h"
 #include "rendlay.h"
 #include "includes/comx35.h"

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
 /**********************************************************************
 
     The Digital Excess & Hitmen 4-Player Joystick adapter emulation

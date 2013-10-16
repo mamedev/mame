@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
 /*
 
     http://www2.odn.ne.jp/~haf09260/Pc80/EnrPc.htm

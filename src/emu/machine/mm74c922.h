@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
 /**********************************************************************
 
     MM74C922/MM74C923 16/20-Key Encoder emulation

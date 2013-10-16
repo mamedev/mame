@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
 /**********************************************************************
 
     Morrow Designs Disk Jockey 2D/B floppy controller board emulation

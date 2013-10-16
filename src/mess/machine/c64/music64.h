@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
 /**********************************************************************
 
     Wersi Wersiboard Music 64 / Siel CMK 49 Keyboard emulation

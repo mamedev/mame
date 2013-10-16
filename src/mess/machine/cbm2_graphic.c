@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
 /**********************************************************************
 
     CBM 500/600/700 High Resolution Graphics cartridge emulation

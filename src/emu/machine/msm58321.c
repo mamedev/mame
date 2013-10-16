@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
 /**********************************************************************
 
     OKI MSM58321RS Real Time Clock/Calendar emulation

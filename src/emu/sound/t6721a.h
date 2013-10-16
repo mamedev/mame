@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
 /**********************************************************************
 
     Toshiba T6721A C2MOS Voice Synthesizing LSI emulation

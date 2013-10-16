@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
 /**********************************************************************
 
     IBM Model F PC/AT 84-key / 3270PC 122-key keyboard emulation

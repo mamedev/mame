@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
 /**********************************************************************
 
     SpeedDOS / Burst Nibbler 1541/1571 Parallel Cable emulation

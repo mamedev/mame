@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
 /**********************************************************************
 
     Dallas DS1302 Trickle-Charge Timekeeping Chip emulation

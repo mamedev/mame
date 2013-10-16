@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
 /**********************************************************************
 
     Ricoh RP5C01(A) Real Time Clock With Internal RAM emulation

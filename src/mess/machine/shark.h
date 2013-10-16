@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
 /**********************************************************************
 
     Mator Systems SHARK Intelligent Winchester Disc Subsystem emulation

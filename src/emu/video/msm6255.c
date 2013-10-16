@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
 /**********************************************************************
 
     OKI MSM6255 Dot Matrix LCD Controller implementation

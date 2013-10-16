@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
 /**********************************************************************
 
     Western Digital WD1002A-WX1 Winchester Disk Controller emulation

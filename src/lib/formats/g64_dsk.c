@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Olivier Galibert
+// copyright-holders:Curt Coder
 /*********************************************************************
 
     formats/g64_dsk.c
