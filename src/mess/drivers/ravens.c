@@ -261,7 +261,7 @@ QUICKLOAD_LOAD_MEMBER( ravens_state, ravens )
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int i;
-	int quick_addr = 0x100;
+	int quick_addr = 0x900;
 	int exec_addr;
 	int quick_length;
 	UINT8 *quick_data;
@@ -302,7 +302,7 @@ QUICKLOAD_LOAD_MEMBER( ravens_state, ravens )
 			}
 			else
 			{
-				exec_addr = quick_data[1] * 256 + quick_data[2];
+				exec_addr = quick_data[2] * 256 + quick_data[3];
 
 				if (exec_addr >= quick_length)
 				{
@@ -318,7 +318,7 @@ QUICKLOAD_LOAD_MEMBER( ravens_state, ravens )
 					image.message(" Quickload: size=%04X : exec=%04X",quick_length,exec_addr);
 
 					// Start the quickload
-					m_maincpu->set_pc(exec_addr);
+					m_maincpu->set_state_int(S2650_PC, exec_addr);
 
 					result = IMAGE_INIT_PASS;
 				}
