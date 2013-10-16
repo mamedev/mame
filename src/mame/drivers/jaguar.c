@@ -1,4 +1,4 @@
-// license:BSD-3-Clause
+// license:MAME
 // copyright-holders:Aaron Giles,Nathan Woods,Angelo Salese
 /***************************************************************************
 
