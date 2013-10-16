@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Raphael Nabet
 /*
     generate the tms9980a/tms9981 emulator
 */

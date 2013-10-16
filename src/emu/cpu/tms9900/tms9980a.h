@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Michael Zapf
 /*
     TMS9980A.
 
@@ -51,4 +53,4 @@ protected:
 // device type definition
 extern const device_type TMS9980A;
 
-#endif /* __TMS9995_H__ */
+#endif /* __TMS9980A_H__ */

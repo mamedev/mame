@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Michael Zapf
 /*
     TMS9900 processor
     This is a re-implementation of the TMS9900 featuring a cycle-precise

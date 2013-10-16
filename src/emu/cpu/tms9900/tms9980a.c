@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Michael Zapf
 /*
     Cycle-precise implementation of the TMS9980A.
     Subclassed from tms99xx_device in tms9900.c.
