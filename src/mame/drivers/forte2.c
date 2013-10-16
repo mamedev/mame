@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:hap, Mariusz Wojcieszek
 /* Brazilian bootleg board from 1989. Forte II Games, Industria Brasileira.
 MAME driver by Mariusz Wojcieszek & hap, based on information from Alexandre.
 

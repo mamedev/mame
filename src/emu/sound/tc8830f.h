@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:hap
 /***************************************************************************
 
     tc8830f.h - Toshiba TC8830F, CMOS voice recording/reproducing LSI

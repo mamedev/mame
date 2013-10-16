@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:hap, Tomasz Slanina
 /***************************************************************************
 
   unknown Japanese horse gambling game

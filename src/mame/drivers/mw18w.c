@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:hap
 /* Midway's 18 Wheeler hardware, game number 653
 
 driver todo:

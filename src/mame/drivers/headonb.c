@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:hap
 /***************************************************************************
 
   Italian bootleg of Head On, by EFG Sanremo (late 70s to early 80s).

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:hap
 /**********************************************************************
 
     IDT7200 series 9-bit Asynchronous FIFO Emulation

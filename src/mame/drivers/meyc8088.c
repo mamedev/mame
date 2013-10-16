@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:hap, Roberto Fresca
 /****************************************************************
 
   Meyco 8088 based hardware
