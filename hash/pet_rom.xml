@@ -74,8 +74,8 @@
 		<publisher>Madison Computer</publisher>
 
 		<part name="rom" interface="pet_9000_rom">
-			<dataarea name="rom" size="0x1000">
-				<rom name="mcterm120-9000.bin" size="0x1000" crc="5bdde574" sha1="fe37ea20af85b7e128e3ce8e99cb141bcacecd13" offset="0" />
+			<dataarea name="rom" size="0x800">
+				<rom name="mcterm120-9000.bin" size="0x800" crc="5bdde574" sha1="fe37ea20af85b7e128e3ce8e99cb141bcacecd13" offset="0" />
 			</dataarea>
 		</part>
 	</software>
