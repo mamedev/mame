@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:hap, Angelo Salese, Roberto Fresca
 /***************************************************************************
 
 KUNG-FU ROUSHI
@@ -69,7 +71,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_adpcm1(*this, "adpcm1"),
-		m_adpcm2(*this, "adpcm2") { }
+		m_adpcm2(*this, "adpcm2")
+	{ }
 
 	UINT8 m_latch[3];
 	UINT8 m_control;
@@ -324,7 +327,6 @@ static MACHINE_CONFIG_START( kungfur, kungfur_state )
 
 	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_0_intf )
 	MCFG_I8255A_ADD( "ppi8255_1", ppi8255_1_intf )
-
 
 	/* no video! */
 
