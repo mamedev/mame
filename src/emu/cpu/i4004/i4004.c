@@ -1,10 +1,10 @@
+// license:BSD-3-Clause
+// copyright-holders:Miodrag Milanovic
 /*****************************************************************************
  *
  *   i4004.c
  *
  *   Intel 4004 CPU
- *
- *   Initial version by Miodrag Milanovic
  *
  *****************************************************************************/
 #include "emu.h"

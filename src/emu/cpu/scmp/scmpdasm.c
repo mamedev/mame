@@ -1,10 +1,10 @@
+// license:BSD-3-Clause
+// copyright-holders:Miodrag Milanovic
 /*****************************************************************************
  *
  *   scmpdasm.c
  *
  *   National Semiconductor SC/MP CPU Disassembly
- *
- *   Initial version by Miodrag Milanovic
  *
  *****************************************************************************/
 

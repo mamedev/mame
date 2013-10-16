@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Miodrag Milanovic
 #ifndef __PPS4_H__
 #define __PPS4_H__
 

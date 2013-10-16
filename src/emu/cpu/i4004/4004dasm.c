@@ -1,10 +1,10 @@
+// license:BSD-3-Clause
+// copyright-holders:Miodrag Milanovic
 /*****************************************************************************
  *
  *   4004dasm.c
  *
  *   Intel 4004 CPU Disassembly
- *
- *   Initial version by Miodrag Milanovic
  *
  *****************************************************************************/
 

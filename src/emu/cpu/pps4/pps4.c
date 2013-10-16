@@ -1,10 +1,10 @@
+// license:BSD-3-Clause
+// copyright-holders:Miodrag Milanovic
 /*****************************************************************************
  *
  *   pps4.c
  *
  *   Rockwell PPS-4 CPU
- *
- *   Initial version by Miodrag Milanovic
  *
  *****************************************************************************/
 #include "emu.h"

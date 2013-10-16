@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Miodrag Milanovic
 #ifndef __I8008_H__
 #define __I8008_H__
 

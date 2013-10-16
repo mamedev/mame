@@ -1,10 +1,10 @@
+// license:BSD-3-Clause
+// copyright-holders:Miodrag Milanovic
 /*****************************************************************************
  *
  *   pps4dasm.c
  *
  *   Rockwell PPS-4 CPU Disassembly
- *
- *   Initial version by Miodrag Milanovic
  *
  *****************************************************************************/
 

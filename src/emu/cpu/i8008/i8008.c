@@ -1,10 +1,10 @@
+// license:BSD-3-Clause
+// copyright-holders:Miodrag Milanovic
 /*****************************************************************************
  *
  *   i8008.c
  *
  *   Intel 8008 CPU
- *
- *   Initial version by Miodrag Milanovic
  *
  *****************************************************************************/
 #include "emu.h"

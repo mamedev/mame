@@ -1,10 +1,10 @@
+// license:BSD-3-Clause
+// copyright-holders:Miodrag Milanovic
 /*****************************************************************************
  *
  *   8008dasm.c
  *
  *   Intel 8008 CPU Disassembly
- *
- *   Initial version by Miodrag Milanovic
  *
  *****************************************************************************/
 

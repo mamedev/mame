@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Miodrag Milanovic
 #ifndef __I4004_H__
 #define __I4004_H__
 
