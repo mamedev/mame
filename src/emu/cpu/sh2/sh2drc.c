@@ -1,12 +1,10 @@
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont
 /***************************************************************************
 
     sh2drc.c
     Universal machine language-based SH-2 emulator.
-    By R. Belmont
-
-    Released for general non-commercial use under the MAME license
-    Visit http://mamedev.org for licensing and usage restrictions.
-
+ 
 ***************************************************************************/
 
 #include "emu.h"
