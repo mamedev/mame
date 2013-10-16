@@ -1,5 +1,5 @@
 // license:?
-// copyright-holders:Angelo Salese, Tomasz Slanina, Phil Bennett
+// copyright-holders:Angelo Salese, Tomasz Slanina, Phil Bennett, hap
 /***************************************************************************
 
     Midnight Landing

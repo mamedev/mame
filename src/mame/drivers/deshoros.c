@@ -1,5 +1,5 @@
 // license:MAME
-// copyright-holders:Angelo Salese
+// copyright-holders:Angelo Salese, hap
 /***************************************************************************
 
 Destiny (c) 1983 Data East Corporation
