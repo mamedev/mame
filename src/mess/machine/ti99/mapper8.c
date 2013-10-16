@@ -1,3 +1,5 @@
+// license:MAME|LGPL-2.1+
+// copyright-holders:Michael Zapf
 /***************************************************************************
 
     TI-99/8 Address decoder and mapper

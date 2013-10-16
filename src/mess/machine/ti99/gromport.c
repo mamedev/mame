@@ -1,3 +1,5 @@
+// license:MAME|LGPL-2.1+
+// copyright-holders:Michael Zapf
 /***************************************************************************
     GROM port - the cartridge port of the TI-99/4, TI-99/4A, and
     TI-99/8 console.

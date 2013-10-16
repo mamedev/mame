@@ -1,4 +1,6 @@
-/*
+// license:MAME|LGPL-2.1+
+// copyright-holders:Michael Zapf
+/******************************************************************************
     MESS Driver for the Myarc Geneve 9640.
 
     The Geneve has two operation modes.  One is compatible with the TI-99/4a,
@@ -198,7 +200,7 @@
     Original version 2003 by Raphael Nabet
 
     Rewritten 2012 by Michael Zapf
-*/
+******************************************************************************/
 
 
 #include "emu.h"

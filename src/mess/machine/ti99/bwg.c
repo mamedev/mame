@@ -1,3 +1,5 @@
+// license:MAME|LGPL-2.1+
+// copyright-holders:Michael Zapf
 /*******************************************************************************
     SNUG BwG Disk Controller
     Based on WD1773

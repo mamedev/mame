@@ -1,8 +1,8 @@
+// license:MAME|LGPL-2.1+
+// copyright-holders:Michael Zapf
 /****************************************************************************
 
     MESS Driver for TI-99/4 and TI-99/4A Home Computers.
-    Raphael Nabet, 1999-2003.
-
     TI99/4 info:
 
     Similar to TI99/4a, except for the following:
@@ -32,9 +32,9 @@
    |      |         (16 bit)
   Cass  joyport
 
-    Michael Zapf
-
-    February 2012: Rewritten as class
+  Raphael Nabet, 1999-2003.
+  Rewritten by Michael Zapf
+  February 2012: Rewritten as class
 
 *****************************************************************************/
 

@@ -1,3 +1,5 @@
+// license:MAME|LGPL-2.1+
+// copyright-holders:Michael Zapf
 /****************************************************************************
     SNUG Enhanced Video Processor Card (evpc)
     based on v9938 (may also be equipped with v9958)

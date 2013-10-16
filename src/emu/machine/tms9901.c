@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Michael Zapf
 /****************************************************************************
 
     TMS9901 Programmable System Interface
