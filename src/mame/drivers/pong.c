@@ -20,6 +20,7 @@ TODO:
 #include "machine/netlist.h"
 #include "machine/net_lib.h"
 #include "sound/dac.h"
+#include "video/fixfreq.h"
 #include "astring.h"
 
 /*
@@ -47,7 +48,7 @@ TODO:
  */
 
 #define MASTER_CLOCK    7159000
-#define V_TOTAL         (0x105+1)
+#define V_TOTAL         (0x105+1)		// 262
 #define H_TOTAL         (0x1C6+1)       // 454
 
 #define HBSTART                 (H_TOTAL)
@@ -55,7 +56,23 @@ TODO:
 #define VBSTART                 (V_TOTAL)
 #define VBEND                   (16)
 
-#define HRES_MULT                   (2)
+#define HRES_MULT                   (1)
+
+fixedfreq_interface fixedfreq_mode_pong = {
+	MASTER_CLOCK,
+	H_TOTAL-67,H_TOTAL-40,H_TOTAL-8,H_TOTAL,
+	V_TOTAL-22,V_TOTAL-19,V_TOTAL-16,V_TOTAL,
+	1,  /* interlaced */
+	0.3
+};
+
+fixedfreq_interface fixedfreq_mode_pongX2 = {
+	MASTER_CLOCK * 2,
+	(H_TOTAL-67) * 2, (H_TOTAL-40) * 2, (H_TOTAL-8) * 2, (H_TOTAL) * 2,
+	V_TOTAL-22,V_TOTAL-19,V_TOTAL-16,V_TOTAL,
+	1,  /* interlaced */
+	0.3
+};
 
 enum input_changed_enum
 {
@@ -479,6 +496,8 @@ public:
 	pong_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
+			m_video(*this, "fixfreq"),
+
 			m_dac(*this, "dac"),                /* just to have a sound device */
 			m_srst(*this, "maincpu", "SRST"),
 			m_p_V0(*this, "maincpu", "P1"),
@@ -492,6 +511,7 @@ public:
 
 	// devices
 	required_device<netlist_mame_device> m_maincpu;
+	required_device<fixedfreq_device> m_video;
 	required_device<dac_device> m_dac; /* just to have a sound device */
 
 	// sub devices
@@ -516,12 +536,7 @@ public:
 
 	void video_cb(double newval)
 	{
-		//printf("%f\n", newval);
-		if (newval != m_vid)
-		{
-			update_vid();
-			m_vid = newval;
-		}
+		m_video->update_vid(newval, m_maincpu->local_time());
 	}
 
 protected:
@@ -534,91 +549,10 @@ protected:
 
 private:
 
-	void update_vid()
-	{
-		const netlist_time clock_period = netlist_time::from_hz(NETLIST_CLOCK);
-		const netlist_time hsync_min_time = netlist_time::from_us(4);
-		const netlist_time vsync_min_time = netlist_time::from_us(50); /* usec */
-		const int vsync_min_pulses = 4;
-
-		bitmap_rgb32 *bm = m_bitmap[m_cur_bm];
-
-		UINT64 clocks = m_maincpu->total_cycles(); // m_maincpu->attotime_to_cycles(m_maincpu->local_time());
-		int pw = NETLIST_CLOCK / ((UINT64)MASTER_CLOCK) / HRES_MULT;
-		netlist_time time = clock_period * (clocks - m_last_clock);
-
-		//UINT64 clocks = m_maincpu->netlist().time().as_raw() >> 10; // m_maincpu->attotime_to_cycles(m_maincpu->local_time());
-		//int pw = (NETLIST_INTERNAL_CLOCK / ((UINT64)MASTER_CLOCK) / HRES_MULT) >> 8;
-
-		if (m_last_y < bm->height())
-		{
-			int colv = (int) (m_vid / 3.5 * 255.0);
-			rgb_t col = MAKE_RGB(colv, colv, colv);
-			int pixels = (clocks - m_line_clock) / pw;
-
-			while (pixels >= bm->width())
-			{
-				bm->plot_box(m_last_x, m_last_y, bm->width() - 1 - m_last_x, 1, col);
-				pixels -= bm->width();
-				m_last_x = 0;
-			}
-			bm->plot_box(m_last_x, m_last_y, pixels - m_last_x, 1, col);
-			m_last_x = pixels;
-		}
-		if (m_vid <= 0.34)
-		{
-			if (time >= vsync_min_time)
-			{
-				m_vsync_cnt++;
-				if (m_vsync_cnt >= vsync_min_pulses)
-				{
-					m_vsync_cnt = 0;
-					m_last_y = 0;
-					// toggle bitmap
-					m_cur_bm ^= 1;
-					attoseconds_t new_refresh = DOUBLE_TO_ATTOSECONDS((double) (clocks - m_vsync_clock) / (double) NETLIST_CLOCK);
-					if (new_refresh != m_refresh)
-					{
-						m_refresh = new_refresh;
-						rectangle visarea(0, H_TOTAL * HRES_MULT - 1, 0, V_TOTAL-1);
-						this->mconfig().first_screen()->configure(H_TOTAL * HRES_MULT, V_TOTAL, visarea, m_refresh);
-						m_vsync_clock = clocks;
-					}
-				}
-				m_last_y++;
-				m_last_x = 0;
-			}
-			else if (time >= hsync_min_time)
-			{
-				//printf("%d\n", m_last_x);
-				m_last_x = 0; // hsync
-				m_last_y++;
-				m_line_clock = clocks;
-			}
-		}
-		m_last_clock = clocks;
-	}
-
-	double m_vid;
-	int m_last_x;
-	int m_last_y;
-	UINT64 m_last_clock;
-	UINT64 m_line_clock;
-	UINT64 m_vsync_clock;
-	attoseconds_t m_refresh;
-	int m_vsync_cnt;
-	bitmap_rgb32 *m_bitmap[2];
-	int m_cur_bm;
 };
 
 void pong_state::machine_start()
 {
-	m_bitmap[0] = auto_bitmap_rgb32_alloc(machine(),H_TOTAL * HRES_MULT,V_TOTAL);
-	m_bitmap[1] = auto_bitmap_rgb32_alloc(machine(),H_TOTAL * HRES_MULT,V_TOTAL);
-	m_cur_bm = 0;
-
-	m_maincpu->setup().register_callback("sound_cb", net_output_delegate(&pong_state::sound_cb, "pong_state::sound_cb", this));
-	m_maincpu->setup().register_callback("video_cb", net_output_delegate(&pong_state::video_cb, "pong_state::video_cb", this));
 }
 
 void pong_state::machine_reset()
@@ -628,15 +562,8 @@ void pong_state::machine_reset()
 
 void pong_state::video_start()
 {
-	//FIXME: createtemporary bitmap
-}
-
-
-UINT32 pong_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
-{
-	copybitmap(bitmap, *m_bitmap[!m_cur_bm], 0, 0, 0, 0, cliprect);
-	//m_bitmap->fill(MAKE_RGB(0,0,0));
-	return 0;
+	m_maincpu->setup().register_callback("sound_cb", net_output_delegate(&pong_state::sound_cb, "pong_state::sound_cb", this));
+	m_maincpu->setup().register_callback("video_cb", net_output_delegate(&pong_state::video_cb, "pong_state::video_cb", this));
 }
 
 
@@ -722,9 +649,10 @@ static MACHINE_CONFIG_START( pong, pong_state )
 	MCFG_NETLIST_ADD("maincpu", pong)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK * HRES_MULT, H_TOTAL * HRES_MULT, HBEND * HRES_MULT, HBSTART * HRES_MULT, V_TOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(pong_state, screen_update)
+
+	//MCFG_FIXFREQ_ADD("fixfreq", "screen", fixedfreq_mode_ntsc720)
+	//MCFG_FIXFREQ_ADD("fixfreq", "screen", fixedfreq_mode_pongX2)
+	MCFG_FIXFREQ_ADD("fixfreq", "screen", fixedfreq_mode_pong)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -736,7 +664,6 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( pongf, pong )
 
 	/* basic machine hardware */
-	//MCFG_NETLIST_REPLACE("maincpu", MASTER_CLOCK, pong_fast, 100)
 	MCFG_NETLIST_REPLACE("maincpu", pong_fast)
 
 MACHINE_CONFIG_END

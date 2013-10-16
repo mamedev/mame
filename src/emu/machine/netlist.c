@@ -79,6 +79,42 @@
 #endif
 
 
+// ----------------------------------------------------------------------------------------
+// netlist_timed_queue
+// ----------------------------------------------------------------------------------------
+
+ATTR_HOT ATTR_ALIGN void netlist_timed_queue::push(const netlist_timed_queue::entry_t &e)
+{
+	const netlist_time &t = e.time();
+
+	if (is_empty() || (t <= item(m_end - 1).time()))
+	{
+		set_item(m_end,  e);
+		m_end++;
+		inc_stat(m_prof_end);
+	}
+	else if (t >= item(m_start).time())
+	{
+		m_start--;
+		set_item(m_start, e);
+		inc_stat(m_prof_start);
+	}
+	else
+	{
+		register UINT32 i = m_end;
+		m_end++;
+		while ((t > item(i-1).time()))
+		{
+			set_item(i, item(i-1));
+			inc_stat(m_prof_sortmove);
+			i--;
+		}
+		set_item(i, e);
+		inc_stat(m_prof_sort);
+	}
+}
+
+
 const netlist_time netlist_time::zero = netlist_time::from_raw(0);
 
 // ----------------------------------------------------------------------------------------
@@ -304,7 +340,7 @@ public:
 	netdev_a_to_d_proxy(netlist_setup_t &setup, const char *name, net_input_t &in_proxied)
 			: net_device_t(setup, name)
 	{
-		assert_always(in_proxied.object_type(SIGNAL_MASK) == SIGNAL_DIGITAL, "Digital signal expected");
+		assert(in_proxied.object_type(SIGNAL_MASK) == SIGNAL_DIGITAL);
 		m_I.m_high_thresh_V = in_proxied.m_high_thresh_V;
 		m_I.m_low_thresh_V = in_proxied.m_low_thresh_V;
 	}
@@ -395,7 +431,7 @@ ATTR_HOT ATTR_ALIGN inline void netlist_base_t::update_time(const netlist_time t
 		const netlist_time delta = t - m_time_ps;
 
 		m_time_ps = t;
-		atime -= (delta.as_raw() >> NETLIST_DIV_BITS);
+		atime -= delta.as_raw();
 	} else {
 		const netlist_time delta = t - m_time_ps + netlist_time::from_raw(m_rem);
 		m_time_ps = t;
@@ -746,8 +782,13 @@ void netlist_setup_t::print_stats()
 	{
 		for (netlist_setup_t::tagmap_devices_t::entry_t *entry = m_devices.first(); entry != NULL; entry = m_devices.next(entry))
 		{
+			//entry->object()->s
 			printf("Device %20s : %12d %15ld\n", entry->object()->name(), entry->object()->stat_count, (long int) entry->object()->total_time / (entry->object()->stat_count + 1));
 		}
+		printf("Queue Start %15d\n", m_netlist.m_queue.m_prof_start);
+		printf("Queue End   %15d\n", m_netlist.m_queue.m_prof_end);
+		printf("Queue Sort  %15d\n", m_netlist.m_queue.m_prof_sort);
+		printf("Queue Move  %15d\n", m_netlist.m_queue.m_prof_sortmove);
 	}
 }
 
@@ -866,7 +907,7 @@ ATTR_COLD void net_output_t::set_netdev(net_core_device_t *dev)
 
 ATTR_HOT inline void net_output_t::update_dev(const net_input_t &inp, const UINT8 mask)
 {
-	if ((inp.state() & mask) != 0)
+	if (((inp.state() & mask) != 0))
 	{
 		begin_timing(inp.netdev()->total_time);
 		inc_stat(inp.netdev()->stat_count);
@@ -881,11 +922,14 @@ ATTR_HOT inline void net_output_t::update_dev(const net_input_t &inp, const UINT
 
 ATTR_HOT inline void net_output_t::update_devs()
 {
+	assert(m_num_cons != 0);
 
 	const UINT8 masks[4] = { 1, 5, 3, 1 };
 	m_Q = m_new_Q;
 	m_Q_analog = m_new_Q_analog;
 
+	//if (m_last_Q == m_Q)
+		//printf("%s\n", m_netdev->name());
 	//UINT32 mask = 1 | ((m_last_Q & (m_Q ^ 1)) << 1) | (((m_last_Q ^ 1) & m_Q) << 2);
 	const UINT8 mask = masks[ (m_last_Q  << 1) | m_Q ];
 

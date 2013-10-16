@@ -670,11 +670,11 @@ NETLIB_UPDATE(nic7493)
 			m_QC.setTo(0, NLTIME_FROM_NS(40));
 			m_QD.setTo(0, NLTIME_FROM_NS(40));
 		}
-		//m_CLK.inactivate();
+		m_CLK.inactivate();
 	}
 	//else if (old_clk & !m_lastclk)
 	else {
-		//m_CLK.activate_hl();
+		m_CLK.activate_hl();
 		if (INPVAL_LAST(m_CLK) & !INPVAL(m_CLK))
 		{
 			m_cnt++;
@@ -694,9 +694,9 @@ NETLIB_FUNC_VOID(nic7493, update_outputs, (void))
 		switch (m_cnt)
 		{
 		case 0x00:
-			m_QB.setToNoCheck(0, NLTIME_FROM_NS(34));
-			m_QC.setToNoCheck(0, NLTIME_FROM_NS(48));
 			m_QD.setToNoCheck(0, NLTIME_FROM_NS(70));
+			m_QC.setToNoCheck(0, NLTIME_FROM_NS(48));
+			m_QB.setToNoCheck(0, NLTIME_FROM_NS(34));
 			break;
 		case 0x02:
 		case 0x06:
@@ -706,13 +706,13 @@ NETLIB_FUNC_VOID(nic7493, update_outputs, (void))
 			break;
 		case 0x04:
 		case 0x0C:
-			m_QB.setToNoCheck(0, NLTIME_FROM_NS(34));
 			m_QC.setToNoCheck(1, NLTIME_FROM_NS(48));
+			m_QB.setToNoCheck(0, NLTIME_FROM_NS(34));
 			break;
 		case 0x08:
-			m_QB.setToNoCheck(0, NLTIME_FROM_NS(34));
-			m_QC.setToNoCheck(0, NLTIME_FROM_NS(48));
 			m_QD.setToNoCheck(1, NLTIME_FROM_NS(70));
+			m_QC.setToNoCheck(0, NLTIME_FROM_NS(48));
+			m_QB.setToNoCheck(0, NLTIME_FROM_NS(34));
 			break;
 		}
 	}
@@ -898,7 +898,7 @@ NETLIB_FUNC_VOID(nic9316_sub, update_outputs_all, (void))
 NETLIB_FUNC_VOID(nic9316_sub, update_outputs, (void))
 {
 	const netlist_time out_delay = NLTIME_FROM_NS(20);
-#if 1
+#if 0
 	m_QA.setTo((m_cnt >> 0) & 1, out_delay);
 	m_QB.setTo((m_cnt >> 1) & 1, out_delay);
 	m_QC.setTo((m_cnt >> 2) & 1, out_delay);

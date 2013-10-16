@@ -64,15 +64,15 @@
 //#define NETLIST_INTERNAL_RES		(U64(1000000000))
 //#define NETLIST_DIV_BITS			(0)
 #define NETLIST_INTERNAL_RES		(U64(1000000000000))
-#define NETLIST_DIV_BITS			(12)
+#define NETLIST_DIV_BITS			(10)
 #define NETLIST_DIV					(U64(1) << NETLIST_DIV_BITS)
 #define NETLIST_MASK				(NETLIST_DIV-1)
 #define NETLIST_CLOCK              	(NETLIST_INTERNAL_RES / NETLIST_DIV)
 
-#define NLTIME_FROM_NS(_t)  netlist_time::from_ns(_t)
-#define NLTIME_FROM_US(_t)  netlist_time::from_us(_t)
-#define NLTIME_FROM_MS(_t)  netlist_time::from_ms(_t)
-#define NLTIME_IMMEDIATE    netlist_time::from_ns(0)
+#define NLTIME_FROM_NS(_t)  netlist_time::from_nsec(_t)
+#define NLTIME_FROM_US(_t)  netlist_time::from_usec(_t)
+#define NLTIME_FROM_MS(_t)  netlist_time::from_msec(_t)
+#define NLTIME_IMMEDIATE    netlist_time::from_nsec(0)
 
 #define NETLIST_HIGHIMP_V   (1.23456e20)        /* some voltage we should never see */
 
@@ -223,9 +223,9 @@ public:
 
 	ATTR_HOT inline const INTERNALTYPE as_raw() const { return m_time; }
 
-	ATTR_HOT static inline const netlist_time from_ns(const int ns) { return netlist_time((UINT64) ns * (RESOLUTION / U64(1000000000))); }
-	ATTR_HOT static inline const netlist_time from_us(const int us) { return netlist_time((UINT64) us * (RESOLUTION / U64(1000000))); }
-	ATTR_HOT static inline const netlist_time from_ms(const int ms) { return netlist_time((UINT64) ms * (RESOLUTION / U64(1000))); }
+	ATTR_HOT static inline const netlist_time from_nsec(const int ns) { return netlist_time((UINT64) ns * (RESOLUTION / U64(1000000000))); }
+	ATTR_HOT static inline const netlist_time from_usec(const int us) { return netlist_time((UINT64) us * (RESOLUTION / U64(1000000))); }
+	ATTR_HOT static inline const netlist_time from_msec(const int ms) { return netlist_time((UINT64) ms * (RESOLUTION / U64(1000))); }
 	ATTR_HOT static inline const netlist_time from_hz(const UINT64 hz) { return netlist_time(RESOLUTION / hz); }
 	ATTR_HOT static inline const netlist_time from_raw(const INTERNALTYPE raw) { return netlist_time(raw); }
 
@@ -305,25 +305,38 @@ private:
 	_ListClass *m_list;
 };
 
+// ----------------------------------------------------------------------------------------
+// forward definitions
+// ----------------------------------------------------------------------------------------
+
+class net_output_t;
+class net_core_device_t;
+class net_param_t;
+class netlist_setup_t;
+class netlist_base_t;
+
+// ----------------------------------------------------------------------------------------
+// timed queue
+// ----------------------------------------------------------------------------------------
+
 //#define SIZE ((1 << _Size) - 1)
 
-template <class _QC, int _Size>
 class netlist_timed_queue
 {
 public:
 
-	static const int SIZE = ((1 << _Size) - 1);
+	static const int SIZE = ((1 << 11) - 1);
 
 	struct entry_t
 	{
 	public:
 		inline entry_t() {}
-		inline entry_t(netlist_time atime, _QC elem) : m_time(atime), m_object(elem) {}
+		inline entry_t(netlist_time atime, net_output_t *elem) : m_time(atime), m_object(elem) {}
 		ATTR_HOT inline const netlist_time &time() const { return m_time; }
-		ATTR_HOT inline _QC object() const { return m_object; }
+		ATTR_HOT inline net_output_t * object() const { return m_object; }
 	private:
 		netlist_time m_time;
-		_QC m_object;
+		net_output_t *m_object;
 	};
 
 	netlist_timed_queue()
@@ -331,35 +344,15 @@ public:
 		clear();
 	}
 
+#if 1
+	ATTR_HOT bool is_empty() { return ((m_start ^ m_end) & SIZE) == 0; }
+	ATTR_HOT bool is_not_empty() { return ((m_start ^ m_end) & SIZE) != 0; }
+#else
 	ATTR_HOT bool is_empty() { return ((m_start & SIZE) == (m_end & SIZE)); }
 	ATTR_HOT bool is_not_empty() { return ((m_start & SIZE) != (m_end & SIZE)); }
+#endif
 
-	ATTR_HOT void push(const entry_t &e)
-	{
-		const netlist_time &t = e.time();
-
-		if (is_empty() || (t <= item(m_end - 1).time()))
-		{
-			set_item(m_end,  e);
-			m_end++;
-		}
-		else if (t >= item(m_start).time())
-		{
-			m_start--;
-			set_item(m_start, e);
-		}
-		else
-		{
-			register UINT32 i = m_end;
-			m_end++;
-			while ((t > item(i-1).time()))
-			{
-				set_item(i, item(i-1));
-				i--;
-			}
-			set_item(i, e);
-		}
-	}
+	ATTR_HOT ATTR_ALIGN void push(const entry_t &e);
 
 	ATTR_HOT entry_t &pop()
 	{
@@ -374,8 +367,14 @@ public:
 
 	ATTR_COLD void clear()
 	{
-		m_end = m_start = (1 << _Size) >> 1;
+		m_end = m_start = (SIZE + 1) >> 1;
 	}
+	// profiling
+
+	INT32  	m_prof_start;
+	INT32	m_prof_end;
+	INT32   m_prof_sortmove;
+	INT32   m_prof_sort;
 private:
 	ATTR_HOT inline entry_t &item(const UINT32 x) { return m_list[x & SIZE]; }
 	ATTR_HOT inline void set_item(const UINT32 x, const entry_t &aitem) { m_list[x & SIZE] = aitem; }
@@ -383,18 +382,8 @@ private:
 	UINT32 m_start;
 	UINT32 m_end;
 	entry_t m_list[SIZE + 1];
+
 };
-
-
-// ----------------------------------------------------------------------------------------
-// forward definitions
-// ----------------------------------------------------------------------------------------
-
-class net_output_t;
-class net_core_device_t;
-class net_param_t;
-class netlist_setup_t;
-class netlist_base_t;
 
 // ----------------------------------------------------------------------------------------
 // net_object_t
@@ -967,6 +956,7 @@ public:
 			else
 				m_i[0].inactivate();
 		} else {
+			m_i[1].activate();
 			if (INPVAL(m_i[1]) ^ _check)
 				m_i[1].inactivate();
 		}
@@ -1107,7 +1097,7 @@ class netlist_base_t
 {
 public:
 
-	typedef netlist_timed_queue<net_output_t *, 11> queue_t;
+	typedef netlist_timed_queue queue_t;
 
 	netlist_base_t();
 	virtual ~netlist_base_t();
@@ -1125,6 +1115,9 @@ public:
 
 	ATTR_COLD void set_mainclock_dev(netdev_mainclock *dev) { m_mainclock = dev; }
 
+	// FIXME: should'nt be public
+	queue_t m_queue;
+
 protected:
 	// performance
 	int m_perf_out_processed;
@@ -1137,7 +1130,6 @@ private:
 	UINT32   m_rem;
 	UINT32  m_div;
 
-	queue_t m_queue;
 
 	ATTR_HOT void update_time(const netlist_time t, INT32 &atime);
 
@@ -1521,6 +1513,5 @@ public:
 
 // device type definition
 extern const device_type NETLIST;
-
 
 #endif
