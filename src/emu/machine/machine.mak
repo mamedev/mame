@@ -1208,15 +1208,6 @@ endif
 
 #-------------------------------------------------
 #
-#@src/emu/machine/scudsp.h,MACHINES += SCUDSP
-#-------------------------------------------------
-
-ifneq ($(filter SCUDSP,$(MACHINES)),)
-MACHINEOBJS += $(MACHINEOBJ)/scudsp.o
-endif
-
-#-------------------------------------------------
-#
 #@src/emu/machine/seibu_cop.h,MACHINES += SEIBU_COP
 #-------------------------------------------------
 

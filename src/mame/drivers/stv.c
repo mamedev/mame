@@ -41,7 +41,6 @@
 #include "cpu/adsp2100/adsp2100.h"
 #include "cpu/scudsp/scudsp.h"
 #include "machine/eepromser.h"
-#include "machine/scudsp.h"
 #include "sound/scsp.h"
 #include "sound/cdda.h"
 #include "sound/dmadac.h"

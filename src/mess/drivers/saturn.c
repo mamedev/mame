@@ -40,7 +40,6 @@ test1f diagnostic hacks:
 #include "machine/eepromser.h"
 #include "cpu/sh2/sh2.h"
 #include "cpu/scudsp/scudsp.h"
-#include "machine/scudsp.h"
 #include "sound/scsp.h"
 #include "sound/cdda.h"
 #include "machine/smpc.h"

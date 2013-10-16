@@ -1,3 +1,5 @@
+// license:?
+// copyright-holders:Olivier Galibert, Angelo Salese, David Haywood, Tomasz Slanina
 /********************************************************************************************************
 
     Seibu Protected 1993-94 era hardware, V30 based (sequel to the 68k based hardware)

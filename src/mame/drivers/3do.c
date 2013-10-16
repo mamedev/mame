@@ -1,3 +1,5 @@
+// license:?
+// copyright-holders:Angelo Salese, Wilbert Pol
 /***************************************************************************
 
   3do.c

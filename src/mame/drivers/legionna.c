@@ -1,3 +1,5 @@
+// license:?
+// copyright-holders:David Graves, Angelo Salese, David Haywood, Tomasz Slanina
 /***************************************************************************
 
 Legionnaire (c) Tad 1992

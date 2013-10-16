@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles,Nathan Woods
+// copyright-holders:Aaron Giles,Nathan Woods,Angelo Salese
 /***************************************************************************
 
     Atari Jaguar (Home) & Atari CoJag (Arcade) hardware
