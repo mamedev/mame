@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    mcr.c
+    midway.c
 
     Functions to emulate general the various Midway sound cards.
 

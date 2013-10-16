@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles
 #include "machine/6821pia.h"
 #include "audio/midway.h"
 #include "audio/williams.h"

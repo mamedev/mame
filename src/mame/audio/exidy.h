@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles
 #include "machine/6532riot.h"
 #include "machine/6821pia.h"
 #include "sound/hc55516.h"

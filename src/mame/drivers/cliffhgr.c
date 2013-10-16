@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles,Ernesto Corvi
 /*********************************************************
 
     Stern Cliffhanger Laserdisc Hardware

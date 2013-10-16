@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles
 /* channel_data structure holds info about each 6844 DMA channel */
 struct m6844_channel_data
 {

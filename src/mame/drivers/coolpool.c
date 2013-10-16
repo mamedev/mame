@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles,Nicola Salmoria
 /***************************************************************************
 
     AmeriDarts      (c) 1989 Ameri Corporation

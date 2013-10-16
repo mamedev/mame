@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles
 #include "sound/upd7759.h"
 
 class rpunch_state : public driver_device

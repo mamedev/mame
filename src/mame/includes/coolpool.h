@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles,Nicola Salmoria
 #define NVRAM_UNLOCK_SEQ_LEN 10
 #include "sound/dac.h"
 
