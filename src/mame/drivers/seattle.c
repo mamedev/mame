@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles
 /*************************************************************************
 
     Driver for Atari/Midway Phoenix/Seattle/Flagstaff hardware games
