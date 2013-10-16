@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Angelo Salese
 /***************************************************************************
 
 Centipede / Millipede / Missile Command / Let's Go Bowling
