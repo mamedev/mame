@@ -1,5 +1,5 @@
 // license:MAME
-// copyright-holders:Angelo Salese
+// copyright-holders:Angelo Salese, Robbbert
 /***************************************************************************
 
 
@@ -8,13 +8,16 @@ NEC TK80BS
 TK-80BS (c) 1980 NEC
 
 Preliminary driver by Angelo Salese
+Various additions by Robbbert
 
 The TK80BS (Basic Station) has a plugin keyboard, BASIC in rom,
 and connected to a tv.
 
 TODO:
     - (try to) dump proper roms, the whole driver is based off fake roms;
-    - BASIC doesn't seem to work properly; (It does if you type NEW first)
+    - bios 0 BASIC doesn't seem to work properly; (It does if you type NEW first)
+    - bios 1 does not boot up because it runs off into the weeds
+    - bios 2 also does that, somehow it starts up anyway, but no commands work
 
 
 ****************************************************************************/
@@ -30,9 +33,9 @@ class tk80bs_state : public driver_device
 public:
 	tk80bs_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_p_videoram(*this, "videoram")
 		, m_maincpu(*this, "maincpu")
 		, m_ppi(*this, "ppi")
-		, m_p_videoram(*this, "videoram")
 	{ }
 
 	DECLARE_READ8_MEMBER(ppi_custom_r);
@@ -40,15 +43,16 @@ public:
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	DECLARE_READ8_MEMBER(port_a_r);
 	DECLARE_READ8_MEMBER(port_b_r);
+	UINT32 screen_update_tk80bs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_shared_ptr<UINT8> m_p_videoram;
+private:
 	UINT8 m_term_data;
 	UINT8 m_keyb_press;
 	UINT8 m_keyb_press_flag;
 	UINT8 m_shift_press_flag;
 	UINT8 m_ppi_portc;
-	UINT32 screen_update_tk80bs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi;
-	required_shared_ptr<UINT8> m_p_videoram;
 };
 
 
