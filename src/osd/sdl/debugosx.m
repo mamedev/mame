@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Vas Crabb
 //============================================================
 //
 //  debugosx.m - MacOS X Cocoa debug window handling

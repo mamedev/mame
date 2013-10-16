@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Vas Crabb
 //============================================================
 //
 //  osxutils.h - Mac OS X utilities for SDLMAME
