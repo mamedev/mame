@@ -281,7 +281,7 @@ QUICKLOAD_LOAD_MEMBER( binbug_state, binbug )
 					image.message(" Quickload: size=%04X : exec=%04X",quick_length,exec_addr);
 
 					// Start the quickload
-					m_maincpu->set_pc(exec_addr);
+					m_maincpu->set_state_int(S2650_PC, exec_addr);
 
 					result = IMAGE_INIT_PASS;
 				}
