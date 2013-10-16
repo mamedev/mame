@@ -1,3 +1,5 @@
+// license:?
+// copyright-holders:Angelo Salese, Miodrag Milanovic
 /**********************************************************************
 
     Intel 82720 Graphics Display Controller emulation

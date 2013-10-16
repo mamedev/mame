@@ -1,3 +1,5 @@
+// license:?
+// copyright-holders:Angelo Salese
 /***************************************************************************
 
     HD63484 ACRTC (rewrite in progress)

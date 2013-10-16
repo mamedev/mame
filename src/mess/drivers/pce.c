@@ -1,3 +1,5 @@
+// license:?
+// copyright-holders:Charles Mac Donald, Wilbert Pol, Angelo Salese
 /****************************************************************************
 
  PC-Engine / Turbo Grafx 16 driver

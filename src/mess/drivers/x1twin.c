@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Angelo Salese
 /************************************************************************************************
 
     Sharp X1Twin = Sharp X1 + NEC PC Engine All-in-One
