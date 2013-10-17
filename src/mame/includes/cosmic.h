@@ -40,6 +40,8 @@ public:
 
 	/* misc */
 	UINT32         m_pixel_clock;
+	int            m_ic_state;   // for 9980
+	DECLARE_READ8_MEMBER( interrupt_level );
 
 	/* devices */
 	optional_device<samples_device> m_samples;
@@ -67,6 +69,7 @@ public:
 	DECLARE_DRIVER_INIT(panic);
 	DECLARE_MACHINE_START(cosmic);
 	DECLARE_MACHINE_RESET(cosmic);
+	DECLARE_MACHINE_RESET(cosmicg);
 	DECLARE_PALETTE_INIT(cosmicg);
 	DECLARE_PALETTE_INIT(panic);
 	DECLARE_PALETTE_INIT(cosmica);
