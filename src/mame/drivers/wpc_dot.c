@@ -244,7 +244,7 @@ DRIVER_INIT_MEMBER(wpc_dot_state,wpc_dot)
 	m_dmdbank6->configure_entries(0, 16, &m_dmdram[0x0000],0x200);
 	m_dmdbank6->set_entry(5);
 	m_vblank_timer = timer_alloc(TIMER_VBLANK);
-	m_vblank_timer->adjust(attotime::from_hz(60),0,attotime::from_hz(60));
+	m_vblank_timer->adjust(attotime::from_hz(60),0,attotime::from_hz(60*4));
 	m_irq_timer = timer_alloc(TIMER_IRQ);
 	m_irq_timer->adjust(attotime::from_hz(976),0,attotime::from_hz(976));
 	m_bankmask = (memregion("code")->bytes() >> 14) - 1;

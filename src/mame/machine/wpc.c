@@ -150,6 +150,7 @@ WRITE8_MEMBER(wpc_device::write)
 		m_firq_cb(space,0);
 		m_dmd_irqsrc = false;
 		m_dmd_irqline = data;
+		if(LOG_WPC) logerror("WPC: DMD FIRQ line set to %i\n",data);
 		break;
 	case DMD_VISIBLEPAGE:
 		m_dmd_visiblepage = data;
