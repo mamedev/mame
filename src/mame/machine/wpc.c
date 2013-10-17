@@ -19,7 +19,8 @@ wpc_device::wpc_device(const machine_config &mconfig, const char *tag, device_t 
 	  m_soundctrl_r(*this),
 	  m_soundctrl_w(*this),
 	  m_sounds11_w(*this),
-	  m_bank_w(*this)
+	  m_bank_w(*this),
+	  m_dmdbank_w(*this)
 {
 }
 
@@ -35,6 +36,7 @@ void wpc_device::device_start()
 	m_soundctrl_w.resolve_safe();
 	m_sounds11_w.resolve_safe();
 	m_bank_w.resolve_safe();
+	m_dmdbank_w.resolve_safe();
 
 	m_zc_timer = timer_alloc(TIMER_ZEROCROSS);
 	m_zc_timer->adjust(attotime::from_hz(120),0,attotime::from_hz(120));
@@ -43,6 +45,8 @@ void wpc_device::device_start()
 void wpc_device::device_reset()
 {
 	m_memprotect = 0;
+	m_dmd_irqsrc = false;
+	m_snd_irqsrc = false;
 }
 
 void wpc_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -62,6 +66,10 @@ READ8_MEMBER(wpc_device::read)
 
 	switch(offset)
 	{
+	case DMD_FIRQLINE:
+		if(m_dmd_irqsrc)
+			ret |= 0x80;
+		break;
 	case WPC_WATCHDOG:
 		if(m_zerocross)
 		{
@@ -94,7 +102,8 @@ READ8_MEMBER(wpc_device::read)
 		ret = m_soundctrl_r(space,0);
 		break;
 	case WPC_FIRQSRC:
-		ret = 0x80;  // always 0x80 since there is no DMD
+		if(m_snd_irqsrc)
+			ret |= 0x80;
 		break;
 	case WPC_SHIFTADRH:
 		ret = m_shift_addr_high + ((m_shift_addr_low + (m_shift_bit1 >> 3)) >> 8);
@@ -119,6 +128,33 @@ WRITE8_MEMBER(wpc_device::write)
 {
 	switch(offset)
 	{
+	case DMD_PAGE3000:
+		m_dmdbank_w(space,0,data & 0x0f);
+		break;
+	case DMD_PAGE3200:
+		m_dmdbank_w(space,1,data & 0x0f);
+		break;
+	case DMD_PAGE3400:
+		m_dmdbank_w(space,2,data & 0x0f);
+		break;
+	case DMD_PAGE3600:
+		m_dmdbank_w(space,3,data & 0x0f);
+		break;
+	case DMD_PAGE3800:
+		m_dmdbank_w(space,4,data & 0x0f);
+		break;
+	case DMD_PAGE3A00:
+		m_dmdbank_w(space,5,data & 0x0f);
+		break;
+	case DMD_FIRQLINE:
+		m_firq_cb(space,0);
+		m_dmd_irqsrc = false;
+		m_dmd_irqline = data;
+		break;
+	case DMD_VISIBLEPAGE:
+		m_dmd_visiblepage = data;
+		if(LOG_WPC) logerror("WPC: DMD Visible page set to %i\n",data);
+		break;
 	case WPC_ROMBANK:
 		m_bank_w(space,0,data);
 		if(LOG_WPC) logerror("WPC: ROM bank set to %02x\n",data);
@@ -163,6 +199,7 @@ WRITE8_MEMBER(wpc_device::write)
 		break;
 	case WPC_FIRQSRC:
 		m_firq_cb(space,0);
+		m_snd_irqsrc = false;
 		break;
 	case WPC_PROTMEMCTRL:
 		if(m_memprotect == 0xb4)

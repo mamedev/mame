@@ -12,46 +12,6 @@
 
 #define LOG_WPC (1)
 
-/*                                  AMFDS9 */
-/* Printer board */
-#define WPC_PRINTBUSY     (0x10) /* xxxxx  R: Printer ready ??? */
-#define WPC_PRINTDATA     (0x11) /* xxxxx  W: send to printer */
-#define WPC_PRINTDATAX    (0x12) /* xxxxx  W: 0: Printer data available */
-/* Sound board */
-#define WPC_SOUNDS11      (0x21) /* xxx    RW: R: Sound data availble, W: Reset soundboard ? */
-#define WPC_SOUNDIF       (0x2c) /* xxx    RW: Sound board interface */
-#define WPC_SOUNDBACK     (0x2d) /* xxx    RW: R: Sound data availble, W: Reset soundboard ? */
-
-#define WPC_SOLENOID1     (0x30) /* xxxxxx W: Solenoid 25-28 */
-#define WPC_SOLENOID2     (0x31) /* xxxxxx W: Solenoid  1- 8 */
-#define WPC_SOLENOID3     (0x32) /* xxxxxx W: Solenoid 17-24 */
-#define WPC_SOLENOID4     (0x33) /* xxxxxx W: Solenoid  9-16 */
-#define WPC_LAMPROW       (0x34) /* xxxxxx W: Lamp row */
-#define WPC_LAMPCOLUMN    (0x35) /* xxxxxx W: Lamp column enable */
-#define WPC_GILAMPS       (0x36) /*        W: GI lights ?? */
-#define WPC_DIPSWITCH     (0x37) /* xxxxxx R: CPU board dip-switches */
-#define WPC_SWCOINDOOR    (0x38) /* xxxxxx W: Coin door switches */
-#define WPC_SWROWREAD     (0x39) /* xxxx   R: Switch row read */
-#define WPC_SWCOLSELECT   (0x3a) /* xxxx   W: Switch column enable */
-#define WPC_ALPHAPOS      (0x3b) /* x      W: Select alphanumeric position */
-#define WPC_ALPHA1LO      (0x3c) /* x      W: Display 1st row hi bits */
-#define WPC_ALPHA1HI      (0x3d) /* x      W: Display 1st row lo bits */
-#define WPC_ALPHA2LO      (0x3e) /* x      W: Display 2nd row hi bits */
-#define WPC_ALPHA2HI      (0x3f) /* x      W:           b 2nd row lo bits */
-#define WPC_LED           (0x42) /* xxxxxx W: CPU LED (bit 7) */
-#define WPC_IRQACK        (0x43) /*        W: IRQ Ack ??? */
-#define WPC_SHIFTADRH     (0x44) /* xxxxxx RW: See above */
-#define WPC_SHIFTADRL     (0x45) /* xxxxxx RW: See above */
-#define WPC_SHIFTBIT      (0x46) /* xxxxxx RW: See above */
-#define WPC_SHIFTBIT2     (0x47) /* xxxxxx RW: See above */
-#define WPC_FIRQSRC       (0x48) /*   xxxx R: bit 7 0=DMD, 1=SOUND? W: Clear FIRQ line */
-#define WPC_RTCHOUR       (0x4a) /* xxxxxx RW: Real time clock: hour */
-#define WPC_RTCMIN        (0x4b) /* xxxxxx RW: Real time clock: minute */
-#define WPC_ROMBANK       (0x4c) /* xxxxxx W: Rombank switch */
-#define WPC_PROTMEM       (0x4d) /* xxxxxx W: enabled/disable protected memory */
-#define WPC_PROTMEMCTRL   (0x4e) /* xxxxxx W: Set protected memory area */
-#define WPC_WATCHDOG      (0x4f) /* xxxxxx W: Watchdog */
-
 class wpc_an_state : public driver_device
 {
 public:
@@ -92,20 +52,10 @@ public:
 	DECLARE_WRITE8_MEMBER(wpc_sound_s11_w);
 	DECLARE_WRITE8_MEMBER(wpc_rombank_w);
 private:
-	UINT8 m_alpha_pos;  // selected LED position
-	UINT16 m_alpha_data[40];
 	UINT16 m_vblank_count;
 	UINT32 m_irq_count;
-	UINT8 m_switch_col;  // select switch column
 	UINT8 m_bankmask;
-	UINT8 m_switches[12];
-	UINT8 m_memprotect;
-	UINT16 m_memprotect_mask;
 	UINT8 m_ram[0x3000];
-	UINT8 m_shift_addr_high;
-	UINT8 m_shift_addr_low;
-	UINT8 m_shift_bit1;
-	UINT8 m_shift_bit2;
 	emu_timer* m_vblank_timer;
 	emu_timer* m_irq_timer;
 };
@@ -258,7 +208,6 @@ void wpc_an_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 WRITE8_MEMBER(wpc_an_state::wpc_rombank_w)
 {
 	m_cpubank->set_entry(data & m_bankmask);
-	logerror("WPC: masked ROM bank selected %02x\n",data & m_bankmask);
 }
 
 WRITE_LINE_MEMBER(wpc_an_state::wpcsnd_reply_w)

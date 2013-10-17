@@ -17,6 +17,15 @@
  * 9 = WPC-95
  */
 /*                                  AMFDS9 */
+/* DMD */
+#define DMD_PAGE3200      (0x08)
+#define DMD_PAGE3000      (0x09)
+#define DMD_PAGE3600      (0x0a)
+#define DMD_PAGE3400      (0x0b)
+#define DMD_PAGE3A00      (0x0c)
+#define DMD_FIRQLINE      (0x0d)
+#define DMD_PAGE3800      (0x0e)
+#define DMD_VISIBLEPAGE   (0x0f)
 /* Printer board */
 #define WPC_PRINTBUSY     (0x10) /* xxxxx  R: Printer ready ??? */
 #define WPC_PRINTDATA     (0x11) /* xxxxx  W: send to printer */
@@ -80,6 +89,9 @@
 #define MCFG_WPC_ROMBANK(_bank_w) \
 	downcast<wpc_device *>(device)->set_bank_write(DEVCB2_##_bank_w);
 
+#define MCFG_WPC_DMDBANK(_dmdbank_w) \
+	downcast<wpc_device *>(device)->set_dmdbank_write(DEVCB2_##_dmdbank_w);
+
 class wpc_device : public device_t
 {
 public:
@@ -92,6 +104,10 @@ public:
 	bool memprotect_active() { if(m_memprotect == 0xb4) return false; else return true; }
 	UINT16 get_alphanumeric(UINT8 offset) { if(offset < 40) return m_alpha_data[offset]; else return 0; }
 	void reset_alphanumeric() { memset(m_alpha_data,0,40*2); }
+	UINT8 get_visible_page() { return m_dmd_visiblepage; }
+	UINT8 get_dmd_firq_line() { return m_dmd_irqline; }
+	void set_dmd_firq() { m_dmd_irqsrc = true; }
+	void set_snd_firq() { m_snd_irqsrc = true; }
 
 	// callbacks
 	template<class _irq> void set_irq_callback(_irq irq) { m_irq_cb.set_callback(irq); }
@@ -102,6 +118,7 @@ public:
 	template<class _soundctrl_w> void set_sound_ctrl_write(_soundctrl_w soundctrl_w) { m_soundctrl_w.set_callback(soundctrl_w); }
 	template<class _sounds11> void set_sound_s11_write(_sounds11 sounds11) { m_sounds11_w.set_callback(sounds11); }
 	template<class _bank_w> void set_bank_write(_bank_w bank_w) { m_bank_w.set_callback(bank_w); }
+	template<class _dmdbank_w> void set_dmdbank_write(_dmdbank_w dmdbank_w) { m_dmdbank_w.set_callback(dmdbank_w); }
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	static const device_timer_id TIMER_IRQ = 1;
@@ -123,7 +140,10 @@ private:
 	UINT16 m_alpha_data[40];
 	bool m_zerocross;
 	UINT32 m_irq_count;
-	emu_timer* m_irq_timer;
+	UINT8 m_dmd_visiblepage;
+	bool m_dmd_irqsrc;
+	bool m_snd_irqsrc;
+	UINT8 m_dmd_irqline;
 	emu_timer* m_zc_timer;
 
 	devcb2_write_line m_irq_cb;
@@ -134,6 +154,7 @@ private:
 	devcb2_write8 m_soundctrl_w;
 	devcb2_write8 m_sounds11_w;
 	devcb2_write8 m_bank_w;
+	devcb2_write8 m_dmdbank_w;
 };
 
 extern const device_type WPCASIC;
