@@ -1,5 +1,5 @@
 // license:MAME
-// copyright-holders:Aaron Giles,Nathan Woods,Angelo Salese
+// copyright-holders:Aaron Giles,Nathan Woods,Angelo Salese, Robbbert
 /***************************************************************************
 
     Atari Jaguar (Home) & Atari CoJag (Arcade) hardware
