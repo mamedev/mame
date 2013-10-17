@@ -1,3 +1,5 @@
+// license:?
+// copyright-holders:Nathan Woods, Peter Trauner, Angelo Salese
 /***************************************************************************
 
     Video Graphics Adapter (VGA) section

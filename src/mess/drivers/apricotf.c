@@ -1,5 +1,5 @@
-// license:?
-// copyright-holders:Angelo Salese, Dirk Best
+// license:MAME
+// copyright-holders:Angelo Salese, Robbbert
 /***************************************************************************
 
     ACT Apricot F1 series
