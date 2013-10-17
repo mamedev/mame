@@ -1,7 +1,5 @@
 /*****************************************************************************
 
-Video Technology Laser 110-310 computers:
-
     Video Technology Laser 110
       Sanyo Laser 110
     Video Technology Laser 200
@@ -14,21 +12,8 @@ Video Technology Laser 110-310 computers:
     Video Technology Laser 310
       Dick Smith Electronics VZ-300
 
-System driver:
-
-    Juergen Buchmueller <pullmoll@t-online.de>, Dec 1999
-      - everything
-
-    Dirk Best <duke@redump.de>, May 2004
-      - clean up
-      - fixed parent/clone relationsips and memory size for the Laser 200
-      - fixed loading of the DOS ROM
-      - added BASIC V2.1
-      - added SHA1 checksums
-
-    Dirk Best <duke@redump.de>, March 2006
-      - 64KB memory expansion (banked)
-      - cartridge support
+	license: MAME
+	copyright-holders: Juergen Buchmueller, Dirk Best
 
 Thanks go to:
 
@@ -102,11 +87,11 @@ Todo:
       where not known (currently only a guess)
     - Lightpen support
     - Rewrite floppy and move to its own file
+    - Add support for the wordprocessor cartridge
 
 Notes:
 
-    - The only known dumped cartridge is the DOS ROM:
-      CRC(b6ed6084) SHA1(59d1cbcfa6c5e1906a32704fbf0d9670f0d1fd8b)
+    - DOS ROM: CRC(b6ed6084) SHA1(59d1cbcfa6c5e1906a32704fbf0d9670f0d1fd8b)
 
 
 ******************************************************************************/

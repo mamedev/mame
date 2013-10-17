@@ -1,19 +1,17 @@
 /**********************************************************************
 
-  machine/nascom1.c
+	Nascom 1 and Nascom 2
+
+	license: MAME
+	copyright-holders: (Original Author?), Dirk Best
 
 **********************************************************************/
 
-/* Core includes */
 #include "emu.h"
 #include "includes/nascom1.h"
-
-/* Components */
 #include "cpu/z80/z80.h"
 #include "machine/wd17xx.h"
 #include "machine/ay31015.h"
-
-/* Devices */
 #include "imagedev/snapquik.h"
 #include "imagedev/cassette.h"
 #include "imagedev/flopdrv.h"
@@ -21,16 +19,6 @@
 
 #define NASCOM1_KEY_RESET   0x02
 #define NASCOM1_KEY_INCR    0x01
-
-
-
-/*************************************
- *
- *  Global variables
- *
- *************************************/
-
-
 
 
 /*************************************

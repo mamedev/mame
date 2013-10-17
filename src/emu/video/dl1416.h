@@ -1,8 +1,9 @@
 /*****************************************************************************
  *
- * video/dl1416.h
+ *	DL1416
  *
- * DL1416
+ *	license: MAME, GPL-2.0+
+ *	copyright-holders: Dirk Best
  *
  * 4-Digit 16-Segment Alphanumeric Intelligent Display
  * with Memory/Decoder/Driver

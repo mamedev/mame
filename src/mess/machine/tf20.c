@@ -2,12 +2,12 @@
 
     EPSON TF-20
 
+	license: MAME, GPL-2.0+
+	copyright-holders: Dirk Best
+
     Dual 5.25" floppy drive with HX-20 factory option
 
     Status: Issues with new uPD765, missing uPD7201 emulation.
-
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
 
     http://fjkraan.home.xs4all.nl/comp/tf20/index.html
 

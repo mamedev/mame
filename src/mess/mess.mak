@@ -2076,7 +2076,6 @@ $(MESSOBJ)/svision.a:           \
 	$(MESS_AUDIO)/svision.o     \
 
 $(MESSOBJ)/synertec.a:          \
-	$(MESS_MACHINE)/sym1.o      \
 	$(MESS_DRIVERS)/sym1.o      \
 
 $(MESSOBJ)/tandberg.a:          \

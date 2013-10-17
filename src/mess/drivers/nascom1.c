@@ -1,5 +1,12 @@
 /************************************************************************
-Nascom Memory map
+
+	Nascom 1 and Nascom 2
+
+	license: MAME
+	copyright-holders: (Original Author?), Dirk Best
+
+
+	Memory map
 
     CPU: z80
         0000-03ff   ROM (Nascom1 Monitor)

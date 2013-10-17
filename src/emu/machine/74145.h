@@ -2,6 +2,9 @@
 
     TTL74145
 
+	license: MAME, GPL-2.0+
+	copyright-holders: Dirk Best
+
     BCD-to-Decimal decoder
 
 ***************************************************************************/

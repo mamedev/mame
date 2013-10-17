@@ -1,3 +1,12 @@
+/***************************************************************************
+
+	Tatung Einstein
+
+	license: MAME
+	copyright-holders: Kevin Thacker, Dirk Best, Phill Harvey-Smith
+
+***************************************************************************/
+
 #include "emu.h"
 #include "includes/einstein.h"
 

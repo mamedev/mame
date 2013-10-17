@@ -2,6 +2,9 @@
 
     Centronics printer interface
 
+	license: MAME, GPL-2.0+
+	copyright-holders: Dirk Best
+
 ***************************************************************************/
 
 #ifndef __CTRONICS_H__

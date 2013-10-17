@@ -1,9 +1,8 @@
 /******************************************************************************
  *  Sharp MZ700
  *
- *  variables and function prototypes
- *
- *  Juergen Buchmueller <pullmoll@t-online.de>, Jul 2000
+ *  license: MAME
+ *  copyright-holders: Juergen Buchmueller, Dirk Best
  *
  *  Reference: http://sharpmz.computingmuseum.com
  *

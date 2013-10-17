@@ -1,9 +1,10 @@
-// license:MAME
-// copyright-holders:Dirk Best
 /******************************************************************************
- Epson EX-800 Dot Matrix printer
 
- Written by Dirk Best, October 2007
+	Epson EX-800 Dot Matrix printer
+
+	license: MAME, GPL-2.0+
+	copyright-holders: Dirk Best
+
 
  --
 
@@ -124,7 +125,6 @@ TODO:  - The UPD7810 core is missing analog port emulation
        - Figure out the gate arrays (using trojan code?)
        - (much later) write an interface so that other drivers can hook
          into this one and use to print
-
 
 ******************************************************************************/
 

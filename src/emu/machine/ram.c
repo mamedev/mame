@@ -2,6 +2,9 @@
 
     RAM device
 
+	license: MAME, GPL-2.0+
+	copyright-holders: Dirk Best
+
     Provides a configurable amount of RAM to drivers
 
 **************************************************************************/

@@ -1,7 +1,9 @@
 /******************************************************************************
 
     Tatung Einstein
-    system driver
+
+	license: MAME
+	copyright-holders: Kevin Thacker, Dirk Best, Phill Harvey-Smith
 
 
     TMS9129 VDP Graphics

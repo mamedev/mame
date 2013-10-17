@@ -2,10 +2,10 @@
 
     EPSON TF-20
 
-    Dual 5.25" floppy drive with HX-20 factory option
+	license: MAME, GPL-2.0+
+	copyright-holders: Dirk Best
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
+    Dual 5.25" floppy drive with HX-20 factory option
 
 **********************************************************************/
 

@@ -1,8 +1,11 @@
 /*****************************************************************************
  *
- * machine/74145.c
+ *	TTL74145
  *
- * BCD-to-Decimal decoder
+ *	license: MAME, GPL-2.0+
+ *	copyright-holders: Dirk Best
+ *
+ *	BCD-to-Decimal decoder
  *
  *        __ __
  *     0-|  v  |-VCC

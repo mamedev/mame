@@ -1,4 +1,8 @@
 <?xml version="1.0"?>
+
+<!-- license: MAME, GPL-2.0+ -->
+<!-- copyright-holders: Dirk Best -->
+
 <mamelayout version="2">
 	<element name="background">
 		<rect>

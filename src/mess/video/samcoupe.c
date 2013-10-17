@@ -1,8 +1,9 @@
 /***************************************************************************
 
-    SAM Coupe
+    Miles Gordon Technology SAM Coupe
 
-    Functions to emulate the video hardware
+	license: MAME
+	copyright-holders: Lee Hammerton, Dirk Best
 
 ***************************************************************************/
 

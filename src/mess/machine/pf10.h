@@ -2,10 +2,10 @@
 
     EPSON PF-10
 
-    Battery operated portable 3.5" floppy drive
+	license: MAME, GPL-2.0+
+	copyright-holders: Dirk Best
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
+    Battery operated portable 3.5" floppy drive
 
 **********************************************************************/
 

@@ -1,10 +1,9 @@
 /***************************************************************************
 
-    mc10.c
-
     TRS-80 Radio Shack MicroColor Computer
 
-    Nate Woods
+	license: MAME
+	copyright-holders: Nathan Woods, Dirk Best
 
 ***************************************************************************/
 

@@ -2,6 +2,9 @@
 
     Chips & Technologies CS4031 chipset
 
+	license: MAME, GPL-2.0+
+	copyright-holders: Dirk Best
+
     Chipset for 486 based PC/AT compatible systems. Consists of two
     individual chips:
 

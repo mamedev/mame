@@ -1,11 +1,9 @@
 /***************************************************************************
 
-    SAM Coupe
+    Miles Gordon Technology SAM Coupe
 
-    Miles Gordon Technology, 1989
-
-    Driver by Lee Hammerton, Dirk Best
-
+	license: MAME
+	copyright-holders: Lee Hammerton, Dirk Best
 
     Notes:
     ------

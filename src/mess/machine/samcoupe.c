@@ -1,6 +1,9 @@
 /***************************************************************************
 
-    SAM Coupe Driver - Written By Lee Hammerton, Dirk Best
+    Miles Gordon Technology SAM Coupe
+
+	license: MAME
+	copyright-holders: Lee Hammerton, Dirk Best
 
 ***************************************************************************/
 
