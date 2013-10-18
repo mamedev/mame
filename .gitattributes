@@ -4734,6 +4734,7 @@ src/mame/includes/williams.h svneol=native#text/plain
 src/mame/includes/wiping.h svneol=native#text/plain
 src/mame/includes/wiz.h svneol=native#text/plain
 src/mame/includes/wolfpack.h svneol=native#text/plain
+src/mame/includes/wpc_pin.h svneol=native#text/plain
 src/mame/includes/wrally.h svneol=native#text/plain
 src/mame/includes/wwfsstar.h svneol=native#text/plain
 src/mame/includes/xain.h svneol=native#text/plain
