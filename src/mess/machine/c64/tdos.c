@@ -48,23 +48,45 @@ ROM    - Hitachi HN482764G 8Kx8 EPROM "TDOS 1.2"
 ULA    - Ferranti ULA5RB073E1 XZ-2085-1 40-pin custom ULA
 SSDA   - Motorola MC68A52P SSDA
 CN1    - C64 expansion connector (pass-thru)
-CN2,3  - 19x1 flat ribbon cable to other PCB
-CN4    - 9 wires to 3" drive
+CN2,3  - 18x1 flat ribbon cable to other PCB
+CN4    - 9 wire cable to Mitsumi Quick Disk 3" drive
 SW1    - cartridge on/off switch
+
+
+Flat ribbon cable pinout
+------------------------
+1   D7
+2   D6
+3   D5
+4   D4
+5   D3
+6   LS00 4Y -> LS367 _G1
+7   phi2
+8   LS00 3Y -> LS175 CP
+9   D2
+10  D1
+11  D0
+12  RESET
+13  A0
+14  R/_W
+15  GND
+16  +5V
+17  LS138 O2 -> LS367 _G1
+18  LS138 O0 -> SSDA _CS
 
 
 Drive cable pinout
 ------------------
-1    WP
-2    WD
-3    WG
-4    MO
-5    RD
-6    RY
-7    MS
-8    RS
-9    +5V
-10   GND
+1   WP      Write Protected
+2   WD      Write Data
+3   WG      Write Gate
+4   MO      Motor
+5   RD      Read Data
+6   RY      Ready
+7   MS      Media Set
+8   RS      Reset
+9   +5V
+10  GND
 
 
 ULA pinout
@@ -74,22 +96,39 @@ ULA pinout
          2 |             | 39  
          3 |             | 38  
          4 |             | 37  
-         5 |             | 36  
+         5 |             | 36  GND
          6 |             | 35  
     RD   7 |             | 34  
    _D5   8 |             | 33  
    RxC   9 |             | 32  
-   RxD  10 |             | 31  
+   RxD  10 |  XZ-2085-1  | 31  
         11 |             | 30  
     WD  12 |             | 29  
    TxC  13 |             | 28  
    TxD  14 |             | 27  
     D7  15 |             | 26  
     WG  16 |             | 25  +5V
-        17 |             | 24  
-        18 |             | 23  
-    RS  19 |             | 22  
+        17 |             | 24  XTAL2
+        18 |             | 23  XTAL1
+    RS  19 |             | 22  GND
         20 |_____________| 21  
+
+
+BASIC commands (SYS 32768 to activate)
+--------------------------------------
+@Dn
+@Format
+@Dir
+@Save
+@ASave
+@Write
+@Load
+@Run
+@Aload
+@Kill
+@Quit
+@ACopy
+@CassCopy
 
 */
 
@@ -229,9 +268,9 @@ UINT8 c64_tdos_cartridge_device::c64_cd_r(address_space &space, offs_t offset, U
 		data = m_roml[offset & 0x1fff];
 	}
 
-	if (m_enabled && !io2)
+	if (m_enabled && !io2 && sphi2)
 	{
-		switch ((offset >> 1) & 0x07)
+		switch ((offset >> 1) & 0x7f)
 		{
 		case 0:
 			data = m_ssda->read(space, offset & 0x01);
@@ -271,9 +310,9 @@ void c64_tdos_cartridge_device::c64_cd_w(address_space &space, offs_t offset, UI
 {
 	m_exp->cd_w(space, offset, data, sphi2, ba, roml, romh, io1, io2);
 
-	if (m_enabled && !io2)
+	if (m_enabled && !io2 && sphi2)
 	{
-		switch ((offset >> 1) & 0x07)
+		switch ((offset >> 1) & 0x7f)
 		{
 		case 0:
 			m_ssda->write(space, offset & 0x01, data);
