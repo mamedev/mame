@@ -614,13 +614,16 @@ file_error zippath_opendir(const char *path, zippath_directory **directory)
 	file_error err;
 
 	/* allocate a directory */
-	zippath_directory *result = new(std::nothrow) zippath_directory;
-	if (result == NULL)
+	zippath_directory *result = NULL;
+	try
+	{
+		result = new zippath_directory;
+	}
+	catch (std::bad_alloc &)
 	{
 		err = FILERR_OUT_OF_MEMORY;
 		goto done;
 	}
-
 	/* resolve the path */
 	osd_dir_entry_type entry_type;
 	err = zippath_resolve(path, entry_type, result->zipfile, result->zipprefix);
