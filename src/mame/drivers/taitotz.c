@@ -586,10 +586,6 @@ public:
 
 	UINT8 m_rtcdata[8];
 
-	UINT16 ide_cs0_latch_r;
-	UINT16 ide_cs0_latch_w;
-	UINT16 ide_cs1_latch_w;
-
 
 	UINT32 m_reg105;
 	UINT32 m_displist_addr;
