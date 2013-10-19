@@ -58,10 +58,10 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual ioport_constructor device_input_ports() const;
 
-	DECLARE_WRITE_LINE_MEMBER( dtr_w );
-	DECLARE_WRITE_LINE_MEMBER( si_w );
 	DECLARE_READ_LINE_MEMBER( so_r );
+	DECLARE_WRITE_LINE_MEMBER( si_w );
 
+	DECLARE_READ8_MEMBER( bus_r );
 	DECLARE_WRITE8_MEMBER( bus_w );
 	DECLARE_READ8_MEMBER( p1_r );
 	DECLARE_READ8_MEMBER( p2_r );
@@ -69,7 +69,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start();
-	virtual void device_reset();
 
 private:
 	enum
@@ -81,7 +80,6 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
-	required_ioport m_y0;
 	required_ioport m_y1;
 	required_ioport m_y2;
 	required_ioport m_y3;
@@ -95,7 +93,8 @@ private:
 
 	int m_so;
 
-	UINT16 m_keylatch;
+	UINT8 m_bus;
+	UINT8 m_keylatch;
 };
 
 
