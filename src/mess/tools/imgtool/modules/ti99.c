@@ -968,7 +968,7 @@ static imgtoolerr_t open_image_lvl1(imgtool_stream *file_handle, ti99_img_format
 {
 	imgtoolerr_t err;
 	int reply;
-	int totphysrecs;
+	UINT16 totphysrecs;
 
 
 	l1_img->img_format = img_format;
@@ -1030,7 +1030,7 @@ static imgtoolerr_t open_image_lvl1(imgtool_stream *file_handle, ti99_img_format
 				|| (totphysrecs < 2)
 				|| memcmp(vib->id, "DSK", 3) || (! strchr(" P", vib->protection))
 				|| (((img_format == if_mess) || (img_format == if_v9t9))
-					&& (stream_size(file_handle) != totphysrecs*256)))
+					&& (stream_size(file_handle) != totphysrecs*256U)))
 			return (imgtoolerr_t)IMGTOOLERR_CORRUPTIMAGE;
 
 		if ((img_format == if_pc99_fm) || (img_format == if_pc99_mfm))

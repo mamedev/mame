@@ -242,11 +242,18 @@ void fixedfreq_device::update_vid(double newval, attotime cur_time)
 		bm->plot_box(m_last_x, m_last_y + m_sig_field, pixels - m_last_x, 1, col);
 		m_last_x = pixels;
 	}
-	if (sync & 1) VERBOSE_OUT(("VSYNC %d %d\n", pixels, m_last_y + m_sig_field));
+	if (sync & 1)
+	{
+		VERBOSE_OUT(("VSYNC %d %d\n", pixels, m_last_y + m_sig_field));
+	}
 	if (sync & 2)
+	{
 		VERBOSE_OUT(("HSYNC up %d\n", pixels));
+	}
 	if (sync & 4)
+	{
 		VERBOSE_OUT(("HSYNC down %f %d %f\n", time.as_double()* 1e6, pixels, m_vid));
+	}
 	//VERBOSE_OUT(("%d\n", m_last_x);
 
 	if (sync & 1)

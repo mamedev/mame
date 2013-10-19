@@ -704,7 +704,6 @@ static imgtoolerr_t bml3_diskimage_writefile(imgtool_partition *partition, const
 	size_t i;
 	UINT64 sz, read_sz;
 	UINT64 freespace = 0;
-	unsigned char g;
 	unsigned char *gptr;
 	UINT8 granule_count;
 	UINT8 granule_map[MAX_GRANULEMAP_SIZE];
@@ -744,7 +743,8 @@ static imgtoolerr_t bml3_diskimage_writefile(imgtool_partition *partition, const
 	if (ferr)
 		return imgtool_floppy_error(ferr);
 
-	g = 0x00;
+	unsigned char g = 0x00;
+	UINT32 granule_bytes = info->granule_sectors * info->sector_size;
 
 	do
 	{
@@ -758,7 +758,7 @@ static imgtoolerr_t bml3_diskimage_writefile(imgtool_partition *partition, const
 		gptr = &granule_map[g];
 
 
-		i = MIN(read_sz, info->granule_sectors * info->sector_size);
+		i = MIN(read_sz, granule_bytes);
 		if (i > 0) {
 			err = transfer_to_granule(img, g, i, sourcef);
 			if (err)

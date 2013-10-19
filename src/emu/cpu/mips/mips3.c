@@ -1990,11 +1990,11 @@ CPU_EXECUTE( mips3 )
 					case 0x02:  /* BLTZL */     if ((INT64)RSVAL64 < 0) ADDPC(SIMMVAL); else mips3.core.pc += 4;        break;
 					case 0x03:  /* BGEZL */     if ((INT64)RSVAL64 >= 0) ADDPC(SIMMVAL); else mips3.core.pc += 4;   break;
 					case 0x08:  /* TGEI */      if ((INT64)RSVAL64 >= SIMMVAL) generate_exception(EXCEPTION_TRAP, 1);   break;
-					case 0x09:  /* TGEIU */     if (RSVAL64 >= SIMMVAL) generate_exception(EXCEPTION_TRAP, 1);  break;
+					case 0x09:  /* TGEIU */     if (RSVAL64 >= UIMMVAL) generate_exception(EXCEPTION_TRAP, 1);  break;
 					case 0x0a:  /* TLTI */      if ((INT64)RSVAL64 < SIMMVAL) generate_exception(EXCEPTION_TRAP, 1);    break;
-					case 0x0b:  /* TLTIU */     if (RSVAL64 >= SIMMVAL) generate_exception(EXCEPTION_TRAP, 1);  break;
-					case 0x0c:  /* TEQI */      if (RSVAL64 == SIMMVAL) generate_exception(EXCEPTION_TRAP, 1);  break;
-					case 0x0e:  /* TNEI */      if (RSVAL64 != SIMMVAL) generate_exception(EXCEPTION_TRAP, 1);  break;
+					case 0x0b:  /* TLTIU */     if (RSVAL64 >= UIMMVAL) generate_exception(EXCEPTION_TRAP, 1);  break;
+					case 0x0c:  /* TEQI */      if (RSVAL64 == UIMMVAL) generate_exception(EXCEPTION_TRAP, 1);  break;
+					case 0x0e:  /* TNEI */      if (RSVAL64 != UIMMVAL) generate_exception(EXCEPTION_TRAP, 1);  break;
 					case 0x10:  /* BLTZAL */    if ((INT64)RSVAL64 < 0) ADDPCL(SIMMVAL,31);                     break;
 					case 0x11:  /* BGEZAL */    if ((INT64)RSVAL64 >= 0) ADDPCL(SIMMVAL,31);                    break;
 					case 0x12:  /* BLTZALL */   if ((INT64)RSVAL64 < 0) ADDPCL(SIMMVAL,31) else mips3.core.pc += 4; break;
@@ -2029,7 +2029,7 @@ CPU_EXECUTE( mips3 )
 			case 0x16:  /* BLEZL */     if ((INT64)RSVAL64 <= 0) ADDPC(SIMMVAL); else mips3.core.pc += 4;           break;
 			case 0x17:  /* BGTZL */     if ((INT64)RSVAL64 > 0) ADDPC(SIMMVAL); else mips3.core.pc += 4;                break;
 			case 0x18:  /* DADDI */
-				if (ENABLE_OVERFLOWS && RSVAL64 > ~SIMMVAL) generate_exception(EXCEPTION_OVERFLOW, 1);
+				if (ENABLE_OVERFLOWS && (INT64)RSVAL64 > ~SIMMVAL) generate_exception(EXCEPTION_OVERFLOW, 1);
 				else if (RTREG) RTVAL64 = RSVAL64 + (INT64)SIMMVAL;
 				break;
 			case 0x19:  /* DADDIU */    if (RTREG) RTVAL64 = RSVAL64 + (UINT64)SIMMVAL;                         break;

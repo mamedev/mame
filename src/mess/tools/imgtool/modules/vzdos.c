@@ -498,7 +498,7 @@ static imgtoolerr_t vzdos_diskimage_readfile(imgtool_partition *partition, const
 		if (ret) return ret;
 
 		/* detect sectors pointing to themselfs */
-		if ((track == pick_integer_le(buffer, DATA_SIZE, 1)) && (sector == pick_integer_le(buffer, DATA_SIZE + 1, 1)))
+		if ((track == (int)pick_integer_le(buffer, DATA_SIZE, 1)) && (sector == (int)pick_integer_le(buffer, DATA_SIZE + 1, 1)))
 			return IMGTOOLERR_CORRUPTIMAGE;
 
 		/* load next track and sector values */
