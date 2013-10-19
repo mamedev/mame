@@ -778,7 +778,7 @@ static MACHINE_CONFIG_DERIVED( redline, leland )
 	MCFG_CPU_MODIFY("master")
 	MCFG_CPU_IO_MAP(master_redline_map_io)
 
-	MCFG_CPU_ADD("audiocpu", I80186, MCU_CLOCK/2)
+	MCFG_CPU_ADD("audiocpu", I80186, MCU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(leland_80186_map_program)
 	MCFG_CPU_IO_MAP(redline_80186_map_io)
 	MCFG_80186_CHIP_SELECT_CB(DEVWRITE16("custom", leland_80186_sound_device, peripheral_ctrl))

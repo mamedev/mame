@@ -282,7 +282,7 @@ void rmnimbus_state::palette_init()
 
 static MACHINE_CONFIG_START( nimbus, rmnimbus_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD(MAINCPU_TAG, I80186, 10000000)
+	MCFG_CPU_ADD(MAINCPU_TAG, I80186, 20000000)
 	MCFG_CPU_PROGRAM_MAP(nimbus_mem)
 	MCFG_CPU_IO_MAP(nimbus_io)
 	MCFG_80186_IRQ_SLAVE_ACK(DEVREAD8(DEVICE_SELF, rmnimbus_state, cascade_callback))

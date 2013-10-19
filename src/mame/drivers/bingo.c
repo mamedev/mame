@@ -125,7 +125,7 @@ DRIVER_INIT_MEMBER(splin_state,splin)
 
 static MACHINE_CONFIG_START( splin, splin_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80186, 8000000)
+	MCFG_CPU_ADD("maincpu", I80186, 16000000)
 	MCFG_CPU_PROGRAM_MAP(splin_map)
 MACHINE_CONFIG_END
 

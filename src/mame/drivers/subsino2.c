@@ -2186,7 +2186,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 static MACHINE_CONFIG_START( saklove, subsino2_state )
-	MCFG_CPU_ADD("maincpu", I80188, XTAL_20MHz )    // !! AMD AM188-EM !!
+	MCFG_CPU_ADD("maincpu", I80188, XTAL_20MHz*2 )    // !! AMD AM188-EM !!
 	MCFG_CPU_PROGRAM_MAP( saklove_map )
 	MCFG_CPU_IO_MAP( saklove_io )
 
@@ -2220,7 +2220,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 static MACHINE_CONFIG_START( xplan, subsino2_state )
-	MCFG_CPU_ADD("maincpu", I80188, XTAL_20MHz )    // !! AMD AM188-EM !!
+	MCFG_CPU_ADD("maincpu", I80188, XTAL_20MHz*2 )    // !! AMD AM188-EM !!
 	MCFG_CPU_PROGRAM_MAP( xplan_map )
 	MCFG_CPU_IO_MAP( xplan_io )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", subsino2_state,  am188em_int0_irq)

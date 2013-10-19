@@ -621,7 +621,7 @@ GFXDECODE_END
 
 
 static MACHINE_CONFIG_START( bingor, bingor_state )
-	MCFG_CPU_ADD("maincpu", I80186, 14000000 ) //?? Mhz
+	MCFG_CPU_ADD("maincpu", I80186, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(bingor_map)
 	MCFG_CPU_IO_MAP(bingor_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", bingor_state,  vblank_irq)

@@ -302,7 +302,7 @@ static MACHINE_CONFIG_START( ataxx, leland_state )
 	MCFG_CPU_PROGRAM_MAP(slave_map_program)
 	MCFG_CPU_IO_MAP(slave_map_io)
 
-	MCFG_CPU_ADD("audiocpu", I80186, XTAL_16MHz/2)
+	MCFG_CPU_ADD("audiocpu", I80186, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(leland_80186_map_program)
 	MCFG_CPU_IO_MAP(ataxx_80186_map_io)
 	MCFG_80186_CHIP_SELECT_CB(DEVWRITE16("custom", leland_80186_sound_device, peripheral_ctrl))

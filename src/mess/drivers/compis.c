@@ -325,7 +325,7 @@ ADDRESS_MAP_END
 
 static MACHINE_CONFIG_START( compis, compis_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80186, 8000000)    /* 8 MHz */
+	MCFG_CPU_ADD("maincpu", I80186, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(compis_mem)
 	MCFG_CPU_IO_MAP(compis_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", compis_state,  compis_vblank_int)
@@ -368,7 +368,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( compis2, compis_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80186, 8000000)    /* 8 MHz */
+	MCFG_CPU_ADD("maincpu", I80186, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(compis_mem)
 	MCFG_CPU_IO_MAP(compis_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", compis_state,  compis_vblank_int)

@@ -124,7 +124,7 @@ static ADDRESS_MAP_START(dectalk_dsp_map, AS_PROGRAM, 16, dectalk_isa_device)
 ADDRESS_MAP_END
 
 static MACHINE_CONFIG_FRAGMENT( dectalk_isa )
-	MCFG_CPU_ADD("dectalk_cpu", I80186, XTAL_20MHz/2)
+	MCFG_CPU_ADD("dectalk_cpu", I80186, XTAL_20MHz)
 	MCFG_CPU_IO_MAP(dectalk_cpu_io)
 	MCFG_CPU_PROGRAM_MAP(dectalk_cpu_map)
 	MCFG_80186_TMROUT0_HANDLER(WRITELINE(dectalk_isa_device, clock_w));

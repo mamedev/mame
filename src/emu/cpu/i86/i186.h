@@ -33,6 +33,9 @@ public:
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : NULL ); }
 
 protected:
+	// device_execute_interface overrides
+	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const { return (clocks / 2); }
+	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const { return (cycles * 2); }
 	virtual void execute_run();
 	virtual void device_start();
 	virtual void device_reset();

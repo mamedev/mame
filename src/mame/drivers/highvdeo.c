@@ -1139,7 +1139,7 @@ static MACHINE_CONFIG_DERIVED( ciclone, tv_tcf )
 
 	MCFG_DEVICE_REMOVE("maincpu")
 
-	MCFG_CPU_ADD("maincpu", I80186, 20000000/2 )    // ?
+	MCFG_CPU_ADD("maincpu", I80186, 20000000 )    // ?
 	MCFG_CPU_PROGRAM_MAP(tv_tcf_map)
 	MCFG_CPU_IO_MAP(tv_tcf_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", highvdeo_state,  vblank_irq_80186)

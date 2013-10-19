@@ -62,7 +62,7 @@ INPUT_PORTS_END
 
 
 static MACHINE_CONFIG_START( gambl186, gambl186_state )
-	MCFG_CPU_ADD("maincpu", I80186, 40000000/4 )
+	MCFG_CPU_ADD("maincpu", I80186, XTAL_40MHz/2)
 	MCFG_CPU_PROGRAM_MAP(gambl186_map)
 	MCFG_CPU_IO_MAP(gambl186_io)
 
