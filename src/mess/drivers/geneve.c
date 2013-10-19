@@ -550,7 +550,7 @@ WRITE_LINE_MEMBER( geneve_state::video_wait_states )
 WRITE8_MEMBER( geneve_state::tms9901_interrupt )
 {
 	/* INTREQ is connected to INT1. */
-	m_cpu->set_input_line(INPUT_LINE_99XX_INT1, data);
+	m_cpu->set_input_line(INT_9995_INT1, data);
 }
 
 /* tms9901 setup */
@@ -594,7 +594,7 @@ WRITE_LINE_MEMBER( geneve_state::inta )
 {
 	m_inta = (state!=0)? ASSERT_LINE : CLEAR_LINE;
 	m_tms9901->set_single_int(1, state);
-	m_cpu->set_input_line(INPUT_LINE_99XX_INT4, state);
+	m_cpu->set_input_line(INT_9995_INT4, state);
 }
 
 /*
@@ -767,8 +767,7 @@ void geneve_state::machine_reset()
 static MACHINE_CONFIG_START( geneve_60hz, geneve_state )
 	// basic machine hardware
 	// TMS9995 CPU @ 12.0 MHz
-	MCFG_TMS9995_ADD("maincpu", TMS9995, 12000000, memmap, crumap, geneve_processor_config)
-
+	MCFG_TMS99xx_ADD("maincpu", TMS9995, 12000000, memmap, crumap, geneve_processor_config)
 
 	// video hardware
 	// Although we should have a 60 Hz screen rate, we have to set it to 30 here.

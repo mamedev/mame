@@ -95,7 +95,7 @@ public:
 	DECLARE_READ8_MEMBER(video_joy_r);
 	DECLARE_WRITE8_MEMBER(video_joy_w);
 	int m_load_state;
-	int m_ic_state;
+
 	int m_digitsel;
 	int m_segment;
 	emu_timer *m_displayena_timer;
@@ -199,28 +199,19 @@ MACHINE_RESET_MEMBER(tm990189_state,tm990_189_v)
 }
 
 /*
-    Will be called back from the CPU when triggering an interrupt.
-*/
-READ8_MEMBER( tm990189_state::interrupt_level )
-{
-	return m_ic_state;
-}
-
-/*
     hold and debounce load line (emulation is inaccurate)
 */
 
 TIMER_CALLBACK_MEMBER(tm990189_state::clear_load)
 {
 	m_load_state = FALSE;
-	m_tms9980a->set_input_line(0, CLEAR_LINE);
+	m_tms9980a->set_input_line(INT_9980A_LOAD, CLEAR_LINE);
 }
 
 void tm990189_state::hold_load()
 {
 	m_load_state = TRUE;
-	m_ic_state = 2;     // LOAD interrupt
-	m_tms9980a->set_input_line(0, ASSERT_LINE);
+	m_tms9980a->set_input_line(INT_9980A_LOAD, ASSERT_LINE);
 	machine().scheduler().timer_set(attotime::from_msec(100), timer_expired_delegate(FUNC(tm990189_state::clear_load),this));
 }
 
@@ -277,10 +268,9 @@ WRITE8_MEMBER( tm990189_state::usr9901_interrupt_callback )
 {
 	// Triggered by internal timer (set by ROM to 1.6 ms cycle) on level 3
 	// or by keyboard interrupt (level 6)
-	m_ic_state = offset & 7;  // offset = IC0..IC2 (interrupt level)
 	if (!m_load_state)
 	{
-		m_tms9980a->set_input_line(0, ASSERT_LINE);
+		m_tms9980a->set_input_line(offset & 7, ASSERT_LINE);
 	}
 }
 
@@ -819,13 +809,11 @@ static ADDRESS_MAP_START( tm990_189_cru_map, AS_IO, 8, tm990189_state )
 	AM_RANGE(0x0400, 0x05ff) AM_DEVWRITE("tms9902", tms9902_device, cruwrite)   /* optional tms9902 */
 ADDRESS_MAP_END
 
-static TMS99xx_CONFIG( cpuconf )
+static TMS9980A_CONFIG( cpuconf )
 {
 	DEVCB_DRIVER_MEMBER(tm990189_state, external_operation),
-	DEVCB_DRIVER_MEMBER(tm990189_state, interrupt_level),
 	DEVCB_NULL,     // Instruction acquisition
 	DEVCB_NULL,     // Clock out
-	DEVCB_NULL,     // wait
 	DEVCB_NULL,      // Hold acknowledge
 	DEVCB_NULL      // DBIN
 };

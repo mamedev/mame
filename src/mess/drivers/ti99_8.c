@@ -680,7 +680,7 @@ WRITE_LINE_MEMBER( ti99_8_state::cassette_output )
 
 WRITE8_MEMBER( ti99_8_state::tms9901_interrupt )
 {
-	m_cpu->set_input_line(INPUT_LINE_99XX_INT1, data);
+	m_cpu->set_input_line(INT_9995_INT1, data);
 }
 
 const tms9901_interface tms9901_wiring_ti99_8 =
@@ -744,7 +744,7 @@ WRITE_LINE_MEMBER( ti99_8_state::console_reset )
 {
 	if (machine().phase() != MACHINE_PHASE_INIT)
 	{
-		m_cpu->set_input_line(INPUT_LINE_99XX_RESET, state);
+		m_cpu->set_input_line(INT_9995_RESET, state);
 		m_video->reset_vdp(state);
 	}
 }
@@ -978,8 +978,7 @@ void ti99_8_state::machine_reset()
 static MACHINE_CONFIG_START( ti99_8_60hz, ti99_8_state )
 	/* basic machine hardware */
 	/* TMS9995-MP9537 CPU @ 10.7 MHz */
-	MCFG_TMS9995_ADD("maincpu", TMS9995, 10738635, memmap, crumap, ti99_8_processor_config)
-
+	MCFG_TMS99xx_ADD("maincpu", TMS9995, 10738635, memmap, crumap, ti99_8_processor_config)
 
 	/* Video hardware */
 	MCFG_TI998_ADD_NTSC(VIDEO_SYSTEM_TAG, TMS9118, ti99_8_tms9118a_interface)
@@ -1022,7 +1021,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( ti99_8_50hz, ti99_8_state )
 	/* basic machine hardware */
 	/* TMS9995-MP9537 CPU @ 10.7 MHz */
-	MCFG_TMS9995_ADD("maincpu", TMS9995, 10738635, memmap, crumap, ti99_8_processor_config)
+	MCFG_TMS99xx_ADD("maincpu", TMS9995, 10738635, memmap, crumap, ti99_8_processor_config)
 
 	/* Video hardware */
 	MCFG_TI998_ADD_PAL(VIDEO_SYSTEM_TAG, TMS9129, ti99_8_tms9118a_interface)

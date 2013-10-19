@@ -584,7 +584,7 @@ WRITE8_MEMBER( ti99_4x_state::tms9901_interrupt )
 	// offset contains the interrupt level (0-15)
 	// However, the TI board just ignores that level and hardwires it to 1
 	// See below (interrupt_level)
-	m_cpu->set_input_line(INPUT_LINE_99XX_INTREQ, data);
+	m_cpu->set_input_line(INT_9900_INTREQ, data);
 }
 
 READ8_MEMBER( ti99_4x_state::interrupt_level )
@@ -636,11 +636,11 @@ WRITE_LINE_MEMBER( ti99_4x_state::set_tms9901_INT12)
 
 /*
     One of the common hardware mods was to add a switch to trigger a LOAD
-    interrupt (NMI)
+    interrupt
 */
 INPUT_CHANGED_MEMBER( ti99_4x_state::load_interrupt )
 {
-	m_cpu->set_input_line(INPUT_LINE_NMI, (newval==0)? ASSERT_LINE : CLEAR_LINE);
+	m_cpu->set_input_line(INT_9900_LOAD, (newval==0)? ASSERT_LINE : CLEAR_LINE);
 }
 
 /***********************************************************
@@ -677,7 +677,7 @@ WRITE_LINE_MEMBER( ti99_4x_state::console_reset )
 {
 	if (machine().phase() != MACHINE_PHASE_INIT)
 	{
-		m_cpu->set_input_line(INPUT_LINE_99XX_RESET, state);
+		m_cpu->set_input_line(INT_9900_RESET, state);
 		m_video->reset_vdp(state);
 	}
 }
