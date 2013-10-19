@@ -16,6 +16,7 @@
 
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"
+#include "sound/speaker.h"
 
 
 
@@ -24,6 +25,7 @@
 //**************************************************************************
 
 #define COMPIS_KEYBOARD_TAG "compiskb"
+#define SPEAKER_TAG			"speaker"
 
 
 
@@ -60,17 +62,40 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( si_w );
 	DECLARE_READ_LINE_MEMBER( so_r );
 
+	DECLARE_WRITE8_MEMBER( bus_w );
+	DECLARE_READ8_MEMBER( p1_r );
+	DECLARE_READ8_MEMBER( p2_r );
+
 protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
 
 private:
-	required_device<cpu_device> m_maincpu;
+	enum
+	{
+		LED_CAPS
+	};
 
 	devcb2_write_line   m_write_irq;
 
+	required_device<cpu_device> m_maincpu;
+	required_device<speaker_sound_device> m_speaker;
+	required_ioport m_y0;
+	required_ioport m_y1;
+	required_ioport m_y2;
+	required_ioport m_y3;
+	required_ioport m_y4;
+	required_ioport m_y5;
+	required_ioport m_y6;
+	required_ioport m_y7;
+	required_ioport m_y8;
+	required_ioport m_y9;
+	required_ioport m_special;
+
 	int m_so;
+
+	UINT16 m_keylatch;
 };
 
 
