@@ -461,6 +461,7 @@ sfmo 2a 63 1 n f
 
 sfmr 1  35 1 y
 	sfmr
+	macc = (macc & 0x8000000000000ULL) | ((macc >> 1) & 0x7ffffffffffffULL);
 
 slmh 2a 06 1 y
 	slmh %d
