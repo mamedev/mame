@@ -20,63 +20,8 @@
 
 #include "emu.h"
 #include "mc6846.h"
-#include "devlegcy.h"
 
 #define VERBOSE 0
-
-
-
-/******************* internal chip data structure ******************/
-
-
-struct mc6846_t
-{
-	const mc6846_interface* iface;
-
-	/* registers */
-	UINT8    csr;      /* 0,4: combination status register */
-	UINT8    pcr;      /* 1:   peripheral control register */
-	UINT8    ddr;      /* 2:   data direction register */
-	UINT8    pdr;      /* 3:   peripheral data register (last cpu write) */
-	UINT8    tcr;      /* 5:   timer control register */
-
-	/* lines */
-	UINT8 cp1;         /* 1-bit input */
-	UINT8 cp2;         /* 1-bit input/output: last external write */
-	UINT8 cp2_cpu;     /* last cpu write */
-	UINT8 cto;         /* 1-bit timer output (unmasked) */
-
-	/* internal state */
-	UINT8  time_MSB; /* MSB buffer register */
-	UINT8  csr0_to_be_cleared;
-	UINT8  csr1_to_be_cleared;
-	UINT8  csr2_to_be_cleared;
-	UINT16 latch;   /* timer latch */
-	UINT16 preset;  /* preset value */
-	UINT8  timer_started;
-
-	/* timers */
-	emu_timer *interval; /* interval programmable timer */
-	emu_timer *one_shot; /* 1-us x factor one-shot timer */
-
-	/* CPU write to the outside through chip */
-	devcb_resolved_write8 out_port;  /* 8-bit output */
-	devcb_resolved_write8 out_cp1;   /* 1-bit output */
-	devcb_resolved_write8 out_cp2;   /* 1-bit output */
-
-	/* CPU read from the outside through chip */
-	devcb_resolved_read8 in_port; /* 8-bit input */
-
-	/* asynchronous timer output to outside world */
-	devcb_resolved_write8 out_cto; /* 1-bit output */
-
-	/* timer interrupt */
-	devcb_resolved_write_line irq;
-
-	int old_cif;
-	int old_cto;
-};
-
 
 
 /******************* utility function and macros ********************/
@@ -84,95 +29,181 @@ struct mc6846_t
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 #define PORT                                \
-	((mc6846->pdr & mc6846->ddr) |                  \
-		((!mc6846->in_port.isnull() ? mc6846->in_port( 0 ) : 0) & \
-		~mc6846->ddr))
+	((m_pdr & m_ddr) |                  \
+		((!m_in_port_func.isnull() ? m_in_port_func( 0 ) : 0) & \
+		~m_ddr))
 
 #define CTO                             \
-	((MODE == 0x30 || (mc6846->tcr & 0x80)) ? mc6846->cto : 0)
+	((MODE == 0x30 || (m_tcr & 0x80)) ? m_cto : 0)
 
-#define MODE (mc6846->tcr & 0x38)
+#define MODE (m_tcr & 0x38)
 
-#define FACTOR ((mc6846->tcr & 4) ? 8 : 1)
+#define FACTOR ((m_tcr & 4) ? 8 : 1)
 
 
+const device_type MC6846 = &device_creator<mc6846_device>;
 
-INLINE mc6846_t* get_safe_token( device_t *device )
+mc6846_device::mc6846_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, MC6846, "Motorola MC6846 programmable timer", tag, owner, clock, "mc6846", __FILE__)
 {
-	assert( device != NULL );
-	assert( device->type() == MC6846 );
-	return (mc6846_t*) downcast<mc6846_device *>(device)->token();
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void mc6846_device::device_config_complete()
+{
+	// inherit a copy of the static data
+	const mc6846_interface *intf = reinterpret_cast<const mc6846_interface *>(static_config());
+	if (intf != NULL)
+		*static_cast<mc6846_interface *>(this) = *intf;
+
+	// or initialize to defaults if none provided
+	else
+	{
+		memset(&m_out_port_cb, 0, sizeof(m_out_port_cb));
+		memset(&m_out_cp1_cb, 0, sizeof(m_out_cp1_cb));
+		memset(&m_out_cp2_cb, 0, sizeof(m_out_cp2_cb));
+		memset(&m_in_port_cb, 0, sizeof(m_in_port_cb));
+		memset(&m_out_cto_cb, 0, sizeof(m_out_cto_cb));
+		memset(&m_irq_cb, 0, sizeof(m_irq_cb));
+	}
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void mc6846_device::device_start()
+{
+	m_interval = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mc6846_device::timer_expire), this));
+	m_one_shot = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mc6846_device::timer_one_shot), this));
+
+	m_out_port_func.resolve(m_out_port_cb, *this);  /* 8-bit output */
+	m_out_cp1_func.resolve(m_out_cp1_cb, *this);   /* 1-bit output */
+	m_out_cp2_func.resolve(m_out_cp2_cb, *this);   /* 1-bit output */
+
+	/* CPU read from the outside through chip */
+	m_in_port_func.resolve(m_in_port_cb, *this); /* 8-bit input */
+
+	/* asynchronous timer output to outside world */
+	m_out_cto_func.resolve(m_out_cto_cb, *this); /* 1-bit output */
+
+	/* timer interrupt */
+	m_irq_func.resolve(m_irq_cb, *this);
+
+	save_item(NAME(m_csr));
+	save_item(NAME(m_pcr));
+	save_item(NAME(m_ddr));
+	save_item(NAME(m_pdr));
+	save_item(NAME(m_tcr));
+	save_item(NAME(m_cp1));
+	save_item(NAME(m_cp2));
+	save_item(NAME(m_cp2_cpu));
+	save_item(NAME(m_cto));
+	save_item(NAME(m_time_MSB));
+	save_item(NAME(m_csr0_to_be_cleared));
+	save_item(NAME(m_csr1_to_be_cleared));
+	save_item(NAME(m_csr2_to_be_cleared));
+	save_item(NAME(m_latch));
+	save_item(NAME(m_preset));
+	save_item(NAME(m_timer_started));
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void mc6846_device::device_reset()
+{
+	m_cto   = 0;
+	m_csr   = 0;
+	m_pcr   = 0x80;
+	m_ddr   = 0;
+	m_pdr   = 0;
+	m_tcr   = 1;
+	m_cp1   = 0;
+	m_cp2   = 0;
+	m_cp2_cpu  = 0;
+	m_latch    = 0xffff;
+	m_preset   = 0xffff;
+	m_time_MSB = 0;
+	m_csr0_to_be_cleared = 0;
+	m_csr1_to_be_cleared = 0;
+	m_csr2_to_be_cleared = 0;
+	m_timer_started = 0;
+	m_interval->reset();
+	m_one_shot->reset();
 }
 
 
-INLINE UINT16 mc6846_counter( device_t *device )
+inline UINT16 mc6846_device::counter()
 {
-	mc6846_t* mc6846 = get_safe_token( device );
-	if ( mc6846->timer_started )
+	if ( m_timer_started )
 	{
-		attotime delay = mc6846->interval ->remaining( );
+		attotime delay = m_interval ->remaining( );
 		return delay.as_ticks(1000000) / FACTOR;
 	}
 	else
-		return mc6846->preset;
+		return m_preset;
 }
 
 
 
-INLINE void mc6846_update_irq( device_t *device )
+inline void mc6846_device::update_irq()
 {
-	mc6846_t* mc6846 = get_safe_token( device );
 	int cif = 0;
 	/* composite interrupt flag */
-	if ( ( (mc6846->csr & 1) && (mc6846->tcr & 0x40) ) ||
-			( (mc6846->csr & 2) && (mc6846->pcr & 1) ) ||
-			( (mc6846->csr & 4) && (mc6846->pcr & 8) && ! (mc6846->pcr & 0x20) ) )
+	if ( ( (m_csr & 1) && (m_tcr & 0x40) ) ||
+			( (m_csr & 2) && (m_pcr & 1) ) ||
+			( (m_csr & 4) && (m_pcr & 8) && ! (m_pcr & 0x20) ) )
 		cif = 1;
-	if ( mc6846->old_cif != cif )
+	if ( m_old_cif != cif )
 	{
 		LOG (( "%f: mc6846 interrupt %i (time=%i cp1=%i cp2=%i)\n",
-				device->machine().time().as_double(), cif,
-				mc6846->csr & 1, (mc6846->csr >> 1 ) & 1, (mc6846->csr >> 2 ) & 1 ));
-		mc6846->old_cif = cif;
+				machine().time().as_double(), cif,
+				m_csr & 1, (m_csr >> 1 ) & 1, (m_csr >> 2 ) & 1 ));
+		m_old_cif = cif;
 	}
 	if ( cif )
 	{
-		mc6846->csr |= 0x80;
-		if ( !mc6846->irq.isnull() )
-			mc6846->irq( 1 );
+		m_csr |= 0x80;
+		if ( !m_irq_func.isnull() )
+			m_irq_func( 1 );
 	}
 	else
 	{
-		mc6846->csr &= ~0x80;
-		if ( !mc6846->irq.isnull() )
-			mc6846->irq( 0 );
+		m_csr &= ~0x80;
+		if ( !m_irq_func.isnull() )
+			m_irq_func( 0 );
 	}
 }
 
 
 
-INLINE void mc6846_update_cto ( device_t *device )
+inline void mc6846_device::update_cto()
 {
-	mc6846_t* mc6846 = get_safe_token( device );
 	int cto = CTO;
-	if ( cto != mc6846->old_cto )
+	if ( cto != m_old_cto )
 	{
-		LOG (( "%f: mc6846 CTO set to %i\n", device->machine().time().as_double(), cto ));
-		mc6846->old_cto = cto;
+		LOG (( "%f: mc6846 CTO set to %i\n", machine().time().as_double(), cto ));
+		m_old_cto = cto;
 	}
-	if ( !mc6846->out_cto.isnull() )
-		mc6846->out_cto( 0, cto );
+	if ( !m_out_cto_func.isnull() )
+		m_out_cto_func( 0, cto );
 }
 
 
 
-INLINE void mc6846_timer_launch ( device_t *device )
+inline void mc6846_device::timer_launch()
 {
-	mc6846_t* mc6846 = get_safe_token( device );
-	int delay = FACTOR * (mc6846->preset+1);
-	LOG (( "%f: mc6846 timer launch called, mode=%i, preset=%i (x%i)\n", device->machine().time().as_double(), MODE, mc6846->preset, FACTOR ));
+	int delay = FACTOR * (m_preset+1);
+	LOG (( "%f: mc6846 timer launch called, mode=%i, preset=%i (x%i)\n", machine().time().as_double(), MODE, m_preset, FACTOR ));
 
-	if ( ! (mc6846->tcr & 2) )
+	if ( ! (m_tcr & 2) )
 	{
 		logerror( "mc6846 external clock CTC not implemented\n" );
 	}
@@ -181,12 +212,12 @@ INLINE void mc6846_timer_launch ( device_t *device )
 	{
 	case 0x00:
 	case 0x10: /* continuous */
-		mc6846->cto = 0;
+		m_cto = 0;
 		break;
 
 	case 0x20: /* single-shot */
-		mc6846->cto = 0;
-		mc6846->one_shot->reset( attotime::from_usec(FACTOR) );
+		m_cto = 0;
+		m_one_shot->reset( attotime::from_usec(FACTOR) );
 		break;
 
 	case 0x30:  /* cascaded single-shot */
@@ -194,77 +225,73 @@ INLINE void mc6846_timer_launch ( device_t *device )
 
 	default:
 		logerror( "mc6846 timer mode %i not implemented\n", MODE );
-		mc6846->interval->reset(  );
-		mc6846->timer_started = 0;
+		m_interval->reset();
+		m_timer_started = 0;
 		return;
 	}
 
-	mc6846->interval->reset( attotime::from_usec(delay) );
-	mc6846->timer_started = 1;
+	m_interval->reset( attotime::from_usec(delay) );
+	m_timer_started = 1;
 
-	mc6846->csr &= ~1;
-	mc6846_update_cto( device );
-	mc6846_update_irq( device );
+	m_csr &= ~1;
+	update_cto();
+	update_irq();
 }
 
 
 
 /******************* timer callbacks *********************************/
 
-static TIMER_CALLBACK( mc6846_timer_expire )
+TIMER_CALLBACK_MEMBER( mc6846_device::timer_expire )
 {
-	device_t* device = (device_t*) ptr;
-	mc6846_t* mc6846 = get_safe_token( device );
-	int delay = FACTOR * (mc6846->latch+1);
+	int delay = FACTOR * (m_latch+1);
 
-	LOG (( "%f: mc6846 timer expire called, mode=%i, latch=%i (x%i)\n", device->machine().time().as_double(), MODE, mc6846->latch, FACTOR ));
+	LOG (( "%f: mc6846 timer expire called, mode=%i, latch=%i (x%i)\n", machine().time().as_double(), MODE, m_latch, FACTOR ));
 
 	/* latch => counter */
-	mc6846->preset = mc6846->latch;
+	m_preset = m_latch;
 
-	if ( ! (mc6846->tcr & 2) )
+	if ( ! (m_tcr & 2) )
 		logerror( "mc6846 external clock CTC not implemented\n" );
 
 	switch ( MODE )
 	{
 	case 0x00:
 	case 0x10: /* continuous */
-		mc6846->cto = 1 ^ mc6846->cto;
+		m_cto = 1 ^ m_cto;
 		break;
 
 	case 0x20: /* single-shot */
-		mc6846->cto = 0;
+		m_cto = 0;
 		break;
 
 	case 0x30:  /* cascaded single-shot */
-		mc6846->cto = ( mc6846->tcr & 0x80 ) ? 1 : 0;
+		m_cto = ( m_tcr & 0x80 ) ? 1 : 0;
 		break;
 
 	default:
 		logerror( "mc6846 timer mode %i not implemented\n", MODE );
-		mc6846->interval->reset(  );
-		mc6846->timer_started = 0;
+		m_interval->reset(  );
+		m_timer_started = 0;
 		return;
 	}
 
-	mc6846->interval->reset( attotime::from_usec(delay) );
+	m_interval->reset( attotime::from_usec(delay) );
 
-	mc6846->csr |= 1;
-	mc6846_update_cto( device );
-	mc6846_update_irq( device );
+	m_csr |= 1;
+	update_cto();
+	update_irq();
 }
 
 
 
-static TIMER_CALLBACK( mc6846_timer_one_shot )
+TIMER_CALLBACK_MEMBER( mc6846_device::timer_one_shot )
 {
-	device_t* device = (device_t*) ptr;
-	mc6846_t* mc6846 = get_safe_token( device );
-	LOG (( "%f: mc6846 timer one shot called\n", device->machine().time().as_double() ));
+	LOG (( "%f: mc6846 timer one shot called\n", machine().time().as_double() ));
 
 	/* 1 micro second after one-shot launch, we put cto to high */
-	mc6846->cto = 1;
-	mc6846_update_cto( device );
+	m_cto = 1;
+	update_cto();
 }
 
 
@@ -272,67 +299,66 @@ static TIMER_CALLBACK( mc6846_timer_one_shot )
 /************************** CPU interface ****************************/
 
 
-READ8_DEVICE_HANDLER ( mc6846_r )
+READ8_MEMBER(mc6846_device::read)
 {
-	mc6846_t* mc6846 = get_safe_token( device );
 	switch ( offset )
 	{
 	case 0:
 	case 4:
 		LOG (( "$%04x %f: mc6846 CSR read $%02X intr=%i (timer=%i, cp1=%i, cp2=%i)\n",
 				space.machine().firstcpu->pcbase( ), space.machine().time().as_double(),
-				mc6846->csr, (mc6846->csr >> 7) & 1,
-				mc6846->csr & 1, (mc6846->csr >> 1) & 1, (mc6846->csr >> 2) & 1 ));
-		mc6846->csr0_to_be_cleared = mc6846->csr & 1;
-		mc6846->csr1_to_be_cleared = mc6846->csr & 2;
-		mc6846->csr2_to_be_cleared = mc6846->csr & 4;
-		return mc6846->csr;
+				m_csr, (m_csr >> 7) & 1,
+				m_csr & 1, (m_csr >> 1) & 1, (m_csr >> 2) & 1 ));
+		m_csr0_to_be_cleared = m_csr & 1;
+		m_csr1_to_be_cleared = m_csr & 2;
+		m_csr2_to_be_cleared = m_csr & 4;
+		return m_csr;
 
 	case 1:
-		LOG (( "$%04x %f: mc6846 PCR read $%02X\n", space.machine().firstcpu->pcbase( ), space.machine().time().as_double(), mc6846->pcr ));
-		return mc6846->pcr;
+		LOG (( "$%04x %f: mc6846 PCR read $%02X\n", space.machine().firstcpu->pcbase( ), space.machine().time().as_double(), m_pcr ));
+		return m_pcr;
 
 	case 2:
-		LOG (( "$%04x %f: mc6846 DDR read $%02X\n", space.machine().firstcpu->pcbase( ), space.machine().time().as_double(), mc6846->ddr ));
-		return mc6846->ddr;
+		LOG (( "$%04x %f: mc6846 DDR read $%02X\n", space.machine().firstcpu->pcbase( ), space.machine().time().as_double(), m_ddr ));
+		return m_ddr;
 
 	case 3:
 		LOG (( "$%04x %f: mc6846 PORT read $%02X\n", space.machine().firstcpu->pcbase( ), space.machine().time().as_double(), PORT ));
-		if ( ! (mc6846->pcr & 0x80) )
+		if ( ! (m_pcr & 0x80) )
 		{
-			if ( mc6846->csr1_to_be_cleared )
-				mc6846->csr &= ~2;
-			if ( mc6846->csr2_to_be_cleared )
-				mc6846->csr &= ~4;
-			mc6846_update_irq( device );
-			mc6846->csr1_to_be_cleared = 0;
-			mc6846->csr2_to_be_cleared = 0;
+			if ( m_csr1_to_be_cleared )
+				m_csr &= ~2;
+			if ( m_csr2_to_be_cleared )
+				m_csr &= ~4;
+			update_irq();
+			m_csr1_to_be_cleared = 0;
+			m_csr2_to_be_cleared = 0;
 		}
 		return PORT;
 
 	case 5:
-		LOG (( "$%04x %f: mc6846 TCR read $%02X\n",space.machine().firstcpu->pcbase( ), space.machine().time().as_double(), mc6846->tcr ));
-		return mc6846->tcr;
+		LOG (( "$%04x %f: mc6846 TCR read $%02X\n",space.machine().firstcpu->pcbase( ), space.machine().time().as_double(), m_tcr ));
+		return m_tcr;
 
 	case 6:
-		LOG (( "$%04x %f: mc6846 COUNTER hi read $%02X\n", space.machine().firstcpu->pcbase( ), space.machine().time().as_double(), mc6846_counter( device ) >> 8 ));
-		if ( mc6846->csr0_to_be_cleared )
+		LOG (( "$%04x %f: mc6846 COUNTER hi read $%02X\n", space.machine().firstcpu->pcbase( ), space.machine().time().as_double(), counter() >> 8 ));
+		if ( m_csr0_to_be_cleared )
 		{
-			mc6846->csr &= ~1;
-			mc6846_update_irq( device );
+			m_csr &= ~1;
+			update_irq();
 		}
-		mc6846->csr0_to_be_cleared = 0;
-		return mc6846_counter( device ) >> 8;
+		m_csr0_to_be_cleared = 0;
+		return counter() >> 8;
 
 	case 7:
-		LOG (( "$%04x %f: mc6846 COUNTER low read $%02X\n", space.machine().firstcpu->pcbase( ), space.machine().time().as_double(), mc6846_counter( device ) & 0xff ));
-		if ( mc6846->csr0_to_be_cleared )
+		LOG (( "$%04x %f: mc6846 COUNTER low read $%02X\n", space.machine().firstcpu->pcbase( ), space.machine().time().as_double(), counter() & 0xff ));
+		if ( m_csr0_to_be_cleared )
 		{
-			mc6846->csr &= ~1;
-			mc6846_update_irq( device );
+			m_csr &= ~1;
+			update_irq();
 		}
-		mc6846->csr0_to_be_cleared = 0;
-		return mc6846_counter( device ) & 0xff;
+		m_csr0_to_be_cleared = 0;
+		return counter() & 0xff;
 
 	default:
 		logerror( "$%04x mc6846 invalid read offset %i\n", space.machine().firstcpu->pcbase( ), offset );
@@ -342,9 +368,8 @@ READ8_DEVICE_HANDLER ( mc6846_r )
 
 
 
-WRITE8_DEVICE_HANDLER ( mc6846_w )
+WRITE8_MEMBER(mc6846_device::write)
 {
-	mc6846_t* mc6846 = get_safe_token( device );
 	switch ( offset )
 	{
 	case 0:
@@ -370,13 +395,13 @@ WRITE8_DEVICE_HANDLER ( mc6846_w )
 				(data >> 7) & 1, cp2[ (data >> 3) & 7 ], cp1[ data & 7 ] ));
 
 	}
-	mc6846->pcr = data;
+	m_pcr = data;
 	if ( data & 0x80 )
 	{      /* data reset */
-		mc6846->pdr = 0;
-		mc6846->ddr = 0;
-		mc6846->csr &= ~6;
-		mc6846_update_irq( device );
+		m_pdr = 0;
+		m_ddr = 0;
+		m_csr &= ~6;
+		update_irq();
 	}
 	if ( data & 4 )
 		logerror( "$%04x mc6846 CP1 latching not implemented\n", space.machine().firstcpu->pcbase( ) );
@@ -384,9 +409,9 @@ WRITE8_DEVICE_HANDLER ( mc6846_w )
 	{
 		if (data & 0x10)
 		{
-			mc6846->cp2_cpu = (data >> 3) & 1;
-			if ( !mc6846->out_cp2.isnull() )
-				mc6846->out_cp2( 0, mc6846->cp2_cpu );
+			m_cp2_cpu = (data >> 3) & 1;
+			if ( !m_out_cp2_func.isnull() )
+				m_out_cp2_func( 0, m_cp2_cpu );
 		}
 		else
 			logerror( "$%04x mc6846 acknowledge not implemented\n", space.machine().firstcpu->pcbase( ) );
@@ -395,34 +420,34 @@ WRITE8_DEVICE_HANDLER ( mc6846_w )
 
 	case 2:
 		LOG (( "$%04x %f: mc6846 DDR write $%02X\n", space.machine().firstcpu->pcbase( ), space.machine().time().as_double(), data ));
-		if ( ! (mc6846->pcr & 0x80) )
+		if ( ! (m_pcr & 0x80) )
 		{
-			mc6846->ddr = data;
-			if ( !mc6846->out_port.isnull() )
-				mc6846->out_port( 0, mc6846->pdr & mc6846->ddr );
+			m_ddr = data;
+			if ( !m_out_port_func.isnull() )
+				m_out_port_func( 0, m_pdr & m_ddr );
 		}
 		break;
 
 	case 3:
-		LOG (( "$%04x %f: mc6846 PORT write $%02X (mask=$%02X)\n", space.machine().firstcpu->pcbase( ), space.machine().time().as_double(), data,mc6846->ddr ));
-		if ( ! (mc6846->pcr & 0x80) )
+		LOG (( "$%04x %f: mc6846 PORT write $%02X (mask=$%02X)\n", space.machine().firstcpu->pcbase( ), space.machine().time().as_double(), data,m_ddr ));
+		if ( ! (m_pcr & 0x80) )
 		{
-			mc6846->pdr = data;
-			if ( !mc6846->out_port.isnull() )
-				mc6846->out_port( 0, mc6846->pdr & mc6846->ddr );
-			if ( mc6846->csr1_to_be_cleared && (mc6846->csr & 2) )
+			m_pdr = data;
+			if ( !m_out_port_func.isnull() )
+				m_out_port_func( 0, m_pdr & m_ddr );
+			if ( m_csr1_to_be_cleared && (m_csr & 2) )
 			{
-				mc6846->csr &= ~2;
+				m_csr &= ~2;
 				LOG (( "$%04x %f: mc6846 CP1 intr reset\n", space.machine().firstcpu->pcbase( ), space.machine().time().as_double() ));
 			}
-			if ( mc6846->csr2_to_be_cleared && (mc6846->csr & 4) )
+			if ( m_csr2_to_be_cleared && (m_csr & 4) )
 			{
-				mc6846->csr &= ~4;
+				m_csr &= ~4;
 				LOG (( "$%04x %f: mc6846 CP2 intr reset\n", space.machine().firstcpu->pcbase( ), space.machine().time().as_double() ));
 			}
-			mc6846->csr1_to_be_cleared = 0;
-			mc6846->csr2_to_be_cleared = 0;
-			mc6846_update_irq( device );
+			m_csr1_to_be_cleared = 0;
+			m_csr2_to_be_cleared = 0;
+			update_irq();
 		}
 		break;
 
@@ -439,47 +464,47 @@ WRITE8_DEVICE_HANDLER ( mc6846_w )
 				(data & 0x40) ? 1 : 8, mode[ (data >> 1) & 7 ],
 				(data & 1) ? "enabled" : "0" ));
 
-		mc6846->tcr = data;
-		if ( mc6846->tcr & 1 )
+		m_tcr = data;
+		if ( m_tcr & 1 )
 		{
 			/* timer preset = initialization without launch */
-			mc6846->preset = mc6846->latch;
-			mc6846->csr &= ~1;
+			m_preset = m_latch;
+			m_csr &= ~1;
 			if ( MODE != 0x30 )
-				mc6846->cto = 0;
-			mc6846_update_cto( device );
-			mc6846->interval->reset(  );
-			mc6846->one_shot->reset(  );
-			mc6846->timer_started = 0;
+				m_cto = 0;
+			update_cto();
+			m_interval->reset();
+			m_one_shot->reset();
+			m_timer_started = 0;
 		}
 		else
 		{
 			/* timer launch */
-			if ( ! mc6846->timer_started )
-				mc6846_timer_launch( device );
+			if ( ! m_timer_started )
+				timer_launch();
 		}
-		mc6846_update_irq( device );
+		update_irq();
 	}
 	break;
 
 	case 6:
-		mc6846->time_MSB = data;
+		m_time_MSB = data;
 		break;
 
 	case 7:
-		mc6846->latch = ( ((UINT16) mc6846->time_MSB) << 8 ) + data;
-		LOG (( "$%04x %f: mc6846 COUNT write %i\n", space.machine().firstcpu->pcbase( ), space.machine().time().as_double(), mc6846->latch  ));
-		if (!(mc6846->tcr & 0x38))
+		m_latch = ( ((UINT16) m_time_MSB) << 8 ) + data;
+		LOG (( "$%04x %f: mc6846 COUNT write %i\n", space.machine().firstcpu->pcbase( ), space.machine().time().as_double(), m_latch  ));
+		if (!(m_tcr & 0x38))
 		{
 			/* timer initialization */
-			mc6846->preset = mc6846->latch;
-			mc6846->csr &= ~1;
-			mc6846_update_irq( device );
-			mc6846->cto = 0;
-			mc6846_update_cto( device );
+			m_preset = m_latch;
+			m_csr &= ~1;
+			update_irq();
+			m_cto = 0;
+			update_cto();
 			/* launch only if started */
-			if (!(mc6846->tcr & 1))
-				mc6846_timer_launch( device );
+			if (!(m_tcr & 1))
+				timer_launch();
 		}
 		break;
 
@@ -494,35 +519,33 @@ WRITE8_DEVICE_HANDLER ( mc6846_w )
 
 
 
-void mc6846_set_input_cp1 ( device_t *device, int data )
+void mc6846_device::set_input_cp1(int data)
 {
-	mc6846_t* mc6846 = get_safe_token( device );
 	data = (data != 0 );
-	if ( data == mc6846->cp1 )
+	if ( data == m_cp1 )
 		return;
-	mc6846->cp1 = data;
-	LOG (( "%f: mc6846 input CP1 set to %i\n",  device->machine().time().as_double(), data ));
-	if (( data &&  (mc6846->pcr & 2)) || (!data && !(mc6846->pcr & 2)))
+	m_cp1 = data;
+	LOG (( "%f: mc6846 input CP1 set to %i\n",  machine().time().as_double(), data ));
+	if (( data &&  (m_pcr & 2)) || (!data && !(m_pcr & 2)))
 	{
-		mc6846->csr |= 2;
-		mc6846_update_irq( device );
+		m_csr |= 2;
+		update_irq();
 	}
 }
 
-void mc6846_set_input_cp2 ( device_t *device, int data )
+void mc6846_device::set_input_cp2(int data)
 {
-	mc6846_t* mc6846 = get_safe_token( device );
 	data = (data != 0 );
-	if ( data == mc6846->cp2 )
+	if ( data == m_cp2 )
 		return;
-	mc6846->cp2 = data;
-	LOG (( "%f: mc6846 input CP2 set to %i\n", device->machine().time().as_double(), data ));
-	if (mc6846->pcr & 0x20)
+	m_cp2 = data;
+	LOG (( "%f: mc6846 input CP2 set to %i\n", machine().time().as_double(), data ));
+	if (m_pcr & 0x20)
 	{
-		if (( data &&  (mc6846->pcr & 0x10)) || (!data && !(mc6846->pcr & 0x10)))
+		if (( data &&  (m_pcr & 0x10)) || (!data && !(m_pcr & 0x10)))
 		{
-			mc6846->csr |= 4;
-			mc6846_update_irq( device );
+			m_csr |= 4;
+			update_irq();
 		}
 	}
 }
@@ -533,140 +556,28 @@ void mc6846_set_input_cp2 ( device_t *device, int data )
 
 
 
-UINT8 mc6846_get_output_port ( device_t *device )
+UINT8 mc6846_device::get_output_port()
 {
-	mc6846_t* mc6846 = get_safe_token( device );
 	return PORT;
 }
 
 
 
-UINT8 mc6846_get_output_cto ( device_t *device )
+UINT8 mc6846_device::get_output_cto()
 {
-	mc6846_t* mc6846 = get_safe_token( device );
 	return CTO;
 }
 
 
 
-UINT8 mc6846_get_output_cp2 ( device_t *device )
+UINT8 mc6846_device::get_output_cp2()
 {
-	mc6846_t* mc6846 = get_safe_token( device );
-	return mc6846->cp2_cpu;
+	return m_cp2_cpu;
 }
 
 
 
-UINT16 mc6846_get_preset ( device_t *device )
+UINT16 mc6846_device::get_preset()
 {
-	mc6846_t* mc6846 = get_safe_token( device );
-	return mc6846->preset;
-}
-
-
-
-/************************ reset *****************************/
-
-
-static DEVICE_RESET( mc6846 )
-{
-	mc6846_t* mc6846 = get_safe_token( device );
-	LOG (( "mc6846_reset\n" ));
-	mc6846->cto   = 0;
-	mc6846->csr   = 0;
-	mc6846->pcr   = 0x80;
-	mc6846->ddr   = 0;
-	mc6846->pdr   = 0;
-	mc6846->tcr   = 1;
-	mc6846->cp1   = 0;
-	mc6846->cp2   = 0;
-	mc6846->cp2_cpu  = 0;
-	mc6846->latch    = 0xffff;
-	mc6846->preset   = 0xffff;
-	mc6846->time_MSB = 0;
-	mc6846->csr0_to_be_cleared = 0;
-	mc6846->csr1_to_be_cleared = 0;
-	mc6846->csr2_to_be_cleared = 0;
-	mc6846->timer_started = 0;
-	mc6846->interval->reset(  );
-	mc6846->one_shot->reset(  );
-}
-
-
-/************************ start *****************************/
-
-static DEVICE_START( mc6846 )
-{
-	mc6846_t* mc6846 = get_safe_token( device );
-
-	mc6846->iface = (const mc6846_interface*)device->static_config();
-	mc6846->interval = device->machine().scheduler().timer_alloc(FUNC(mc6846_timer_expire), (void*) device );
-	mc6846->one_shot = device->machine().scheduler().timer_alloc(FUNC(mc6846_timer_one_shot), (void*) device );
-
-	mc6846->out_port.resolve(mc6846->iface->out_port_func, *device);  /* 8-bit output */
-	mc6846->out_cp1.resolve(mc6846->iface->out_cp1_func, *device);   /* 1-bit output */
-	mc6846->out_cp2.resolve(mc6846->iface->out_cp2_func, *device);   /* 1-bit output */
-
-	/* CPU read from the outside through chip */
-	mc6846->in_port.resolve(mc6846->iface->in_port_func, *device); /* 8-bit input */
-
-	/* asynchronous timer output to outside world */
-	mc6846->out_cto.resolve(mc6846->iface->out_cto_func, *device); /* 1-bit output */
-
-	/* timer interrupt */
-	mc6846->irq.resolve(mc6846->iface->irq_func, *device);
-
-	state_save_register_item( device->machine(), "mc6846", device->tag(), 0, mc6846->csr );
-	state_save_register_item( device->machine(), "mc6846", device->tag(), 0, mc6846->pcr );
-	state_save_register_item( device->machine(), "mc6846", device->tag(), 0, mc6846->ddr );
-	state_save_register_item( device->machine(), "mc6846", device->tag(), 0, mc6846->pdr );
-	state_save_register_item( device->machine(), "mc6846", device->tag(), 0, mc6846->tcr );
-	state_save_register_item( device->machine(), "mc6846", device->tag(), 0, mc6846->cp1 );
-	state_save_register_item( device->machine(), "mc6846", device->tag(), 0, mc6846->cp2 );
-	state_save_register_item( device->machine(), "mc6846", device->tag(), 0, mc6846->cp2_cpu );
-	state_save_register_item( device->machine(), "mc6846", device->tag(), 0, mc6846->cto );
-	state_save_register_item( device->machine(), "mc6846", device->tag(), 0, mc6846->time_MSB );
-	state_save_register_item( device->machine(), "mc6846", device->tag(), 0, mc6846->csr0_to_be_cleared );
-	state_save_register_item( device->machine(), "mc6846", device->tag(), 0, mc6846->csr1_to_be_cleared );
-	state_save_register_item( device->machine(), "mc6846", device->tag(), 0, mc6846->csr2_to_be_cleared );
-	state_save_register_item( device->machine(), "mc6846", device->tag(), 0, mc6846->latch );
-	state_save_register_item( device->machine(), "mc6846", device->tag(), 0, mc6846->preset );
-	state_save_register_item( device->machine(), "mc6846", device->tag(), 0, mc6846->timer_started );
-}
-
-
-const device_type MC6846 = &device_creator<mc6846_device>;
-
-mc6846_device::mc6846_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MC6846, "Motorola MC6846 programmable timer", tag, owner, clock, "mc6846", __FILE__)
-{
-	m_token = global_alloc_clear(mc6846_t);
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void mc6846_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void mc6846_device::device_start()
-{
-	DEVICE_START_NAME( mc6846 )(this);
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void mc6846_device::device_reset()
-{
-	DEVICE_RESET_NAME( mc6846 )(this);
+	return m_preset;
 }

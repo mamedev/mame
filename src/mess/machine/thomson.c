@@ -2309,7 +2309,7 @@ void thomson_state::to9_update_cart_bank()
 {
 	address_space& space = m_maincpu->space(AS_PROGRAM);
 	int bank = 0;
-	int slot = ( mc6846_get_output_port(m_mc6846) >> 4 ) & 3; /* bits 4-5: ROM bank */
+	int slot = ( m_mc6846->get_output_port() >> 4 ) & 3; /* bits 4-5: ROM bank */
 
 	switch ( slot )
 	{
@@ -2394,7 +2394,7 @@ void thomson_state::to9_update_cart_bank_postload()
 /* write signal to 0000-1fff generates a bank switch */
 WRITE8_MEMBER( thomson_state::to9_cartridge_w )
 {
-	int slot = ( mc6846_get_output_port(m_mc6846) >> 4 ) & 3; /* bits 4-5: ROM bank */
+	int slot = ( m_mc6846->get_output_port() >> 4 ) & 3; /* bits 4-5: ROM bank */
 
 	if ( offset >= 0x2000 )
 		return;
@@ -2426,7 +2426,7 @@ READ8_MEMBER( thomson_state::to9_cartridge_r )
 void thomson_state::to9_update_ram_bank()
 {
 	address_space& space = m_maincpu->space(AS_PROGRAM);
-	UINT8 port = mc6846_get_output_port(m_mc6846);
+	UINT8 port = m_mc6846->get_output_port();
 	UINT8 portb = m_pia_sys->port_b_z_mask();
 	UINT8 disk = ((port >> 2) & 1) | ((port >> 5) & 2); /* bits 6,2: RAM bank */
 	int bank;
@@ -3242,8 +3242,8 @@ void thomson_state::to8_kbd_timer_func()
 		   (helps avoiding CPU lock)
 		*/
 		if ( ! m_to8_kbd_ack )
-			mc6846_set_input_cp1( m_mc6846, 0 );
-		mc6846_set_input_cp1( m_mc6846, 1 );
+			m_mc6846->set_input_cp1(0);
+		m_mc6846->set_input_cp1(1);
 
 		if ( k == -1 )
 			d = TO8_KBD_POLL_PERIOD;
@@ -3262,27 +3262,27 @@ void thomson_state::to8_kbd_timer_func()
 		m_to8_kbd_last_key = 0xff;
 		m_to8_kbd_key_count = 0;
 		m_to8_kbd_step = 0;
-		mc6846_set_input_cp1( m_mc6846, 1 );
+		m_mc6846->set_input_cp1(1);
 		d = TO8_KBD_POLL_PERIOD;
 	}
 	else if ( m_to8_kbd_step == 1 )
 	{
 		/* schedule timeout waiting for ack to go down */
-		mc6846_set_input_cp1( m_mc6846, 0 );
+		m_mc6846->set_input_cp1(0);
 		m_to8_kbd_step = 255;
 		d = TO8_KBD_TIMEOUT;
 	}
 	else if ( m_to8_kbd_step == 117 )
 	{
 		/* schedule timeout  waiting for ack to go up */
-		mc6846_set_input_cp1( m_mc6846, 0 );
+		m_mc6846->set_input_cp1(0);
 		m_to8_kbd_step = 255;
 		d = TO8_KBD_TIMEOUT;
 	}
 	else if ( m_to8_kbd_step & 1 )
 	{
 		/* send silence between bits */
-		mc6846_set_input_cp1( m_mc6846, 0 );
+		m_mc6846->set_input_cp1(0);
 		d = attotime::from_usec( 100 );
 		m_to8_kbd_step++;
 	}
@@ -3291,7 +3291,7 @@ void thomson_state::to8_kbd_timer_func()
 		/* send bit */
 		int bpos = 8 - ( (m_to8_kbd_step - 100) / 2);
 		int bit = (m_to8_kbd_data >> bpos) & 1;
-		mc6846_set_input_cp1( m_mc6846, 1 );
+		m_mc6846->set_input_cp1(1);
 		d = attotime::from_usec( bit ? 56 : 38 );
 		m_to8_kbd_step++;
 	}

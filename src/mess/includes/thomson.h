@@ -318,7 +318,7 @@ protected:
 	required_device<acia6850_device> m_acia;
 	required_device<mea8000_device> m_mea8000;
 	required_device<ram_device> m_ram;
-	optional_device<device_t> m_mc6846;
+	optional_device<mc6846_device> m_mc6846;
 
 	/* bank logging and optimisations */
 	int m_old_cart_bank;
