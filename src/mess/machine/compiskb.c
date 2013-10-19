@@ -9,14 +9,6 @@
 
 *********************************************************************/
 
-/*
-
-	TODO:
-
-	- serial clocks are out of sync
-
-*/
-
 #include "compiskb.h"
 
 

@@ -26,50 +26,6 @@
 #include "machine/compiskb.h"
 #include "formats/cpis_dsk.h"
 
-
-/* Keyboard */
-struct TYP_COMPIS_KEYBOARD
-{
-	UINT8 nationality;   /* Character set, keyboard layout (Swedish) */
-	UINT8 release_time;  /* Autorepeat release time (0.8)   */
-	UINT8 speed;         /* Transmission speed (14)     */
-	UINT8 roll_over;     /* Key roll-over (MKEY)        */
-	UINT8 click;         /* Key click (NO)          */
-	UINT8 break_nmi;     /* Keyboard break (NMI)        */
-	UINT8 beep_freq;     /* Beep frequency (low)        */
-	UINT8 beep_dura;     /* Beep duration (short)       */
-	UINT8 password[8];   /* Password            */
-	UINT8 owner[16];     /* Owner               */
-	UINT8 network_id;    /* Network workstation number (1)  */
-	UINT8 boot_order[4]; /* Boot device order (FD HD NW PD) */
-	UINT8 key_code;
-	UINT8 key_status;
-};
-
-/* USART 8251 */
-struct TYP_COMPIS_USART
-{
-	UINT8 status;
-	UINT8 bytes_sent;
-};
-
-/* Printer */
-struct TYP_COMPIS_PRINTER
-{
-	UINT8 data;
-	UINT8 strobe;
-};
-
-
-/* Main emulation */
-struct TYP_COMPIS
-{
-	TYP_COMPIS_PRINTER  printer;    /* Printer */
-	TYP_COMPIS_USART    usart;      /* USART 8251 */
-	TYP_COMPIS_KEYBOARD keyboard;   /* Keyboard  */
-};
-
-
 class compis_state : public driver_device
 {
 public:
@@ -97,33 +53,25 @@ public:
 	required_device<mm58274c_device> m_rtc;
 	required_device<i8272a_device> m_fdc;
 	required_device<upd7220_device> m_crtc;
-	DECLARE_READ8_MEMBER(compis_usart_r);
-	DECLARE_WRITE8_MEMBER(compis_usart_w);
 	DECLARE_WRITE8_MEMBER(vram_w);
 	DECLARE_READ8_MEMBER(compis_ppi_port_b_r);
 	DECLARE_WRITE8_MEMBER(compis_ppi_port_c_w);
-	DECLARE_READ16_MEMBER(compis_osp_pit_r);
-	DECLARE_WRITE16_MEMBER(compis_osp_pit_w);
-	TYP_COMPIS m_compis;
 	UINT8 *m_p_videoram;
 	void compis_fdc_tc(int state);
 	DECLARE_READ8_MEMBER(fdc_mon_r);
 	DECLARE_WRITE8_MEMBER(fdc_mon_w);
 	bool m_mon;
+	DECLARE_WRITE_LINE_MEMBER(tmr2_w);
 
 	void fdc_irq(bool state);
 	void fdc_drq(bool state);
 
 	required_shared_ptr<UINT8> m_video_ram;
-	DECLARE_DRIVER_INIT(compis);
 	virtual void machine_start();
 	virtual void machine_reset();
-	virtual void palette_init();
-	UINT32 screen_update_compis2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(compis_vblank_int);
 	DECLARE_READ8_MEMBER(compis_irq_callback);
-	void compis_keyb_update();
-	void compis_keyb_init();
 	void compis_fdc_reset();
 };
 
