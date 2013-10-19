@@ -306,7 +306,7 @@ inline void upd7220_device::queue(UINT8 data, int flag)
 	else
 	{
 		// TODO what happen? somebody set us up the bomb
-		printf("FIFO?\n");
+		logerror("FIFO?\n");
 	}
 }
 
@@ -561,7 +561,7 @@ inline void upd7220_device::write_vram(UINT8 type, UINT8 mod)
 
 	if (type == 1)
 	{
-		printf("uPD7220 invalid type 1 WDAT parameter\n");
+		logerror("uPD7220 invalid type 1 WDAT parameter\n");
 		return;
 	}
 
@@ -1021,7 +1021,7 @@ void upd7220_device::draw_char(int x, int y)
 			case 2: tile_data = BITSWAP8(m_ra[((yi) & 7) | 8],0,1,2,3,4,5,6,7); break;
 			case 6: tile_data = BITSWAP8(m_ra[((ysize-1-yi) & 7) | 8],7,6,5,4,3,2,1,0); break;
 			default: tile_data = BITSWAP8(m_ra[((yi) & 7) | 8],7,6,5,4,3,2,1,0);
-						printf("%d %d %d\n",m_figs.m_dir,xsize,ysize);
+						logerror("%d %d %d\n",m_figs.m_dir,xsize,ysize);
 						break;
 		}
 
@@ -1113,12 +1113,12 @@ void upd7220_device::process_fifo()
 	switch (translate_command(m_cr))
 	{
 	case COMMAND_INVALID:
-		printf("uPD7220 '%s' Invalid Command Byte %02x\n", tag(), m_cr);
+		logerror("uPD7220 '%s' Invalid Command Byte %02x\n", tag(), m_cr);
 		break;
 
 	case COMMAND_5A:
 		if (m_param_ptr == 4)
-			printf("uPD7220 '%s' Undocumented Command 0x5A Executed %02x %02x %02x\n", tag(),m_pr[1],m_pr[2],m_pr[3] );
+			logerror("uPD7220 '%s' Undocumented Command 0x5A Executed %02x %02x %02x\n", tag(),m_pr[1],m_pr[2],m_pr[3] );
 		break;
 
 	case COMMAND_RESET: /* reset */
@@ -1368,7 +1368,7 @@ void upd7220_device::process_fifo()
 		else if(m_figs.m_figure_type == 8)
 			draw_rectangle(((m_ead % m_pitch) << 4) | (m_dad & 0xf),(m_ead / m_pitch));
 		else
-			printf("uPD7220 '%s' Unimplemented command FIGD %02x\n", tag(),m_figs.m_figure_type);
+			logerror("uPD7220 '%s' Unimplemented command FIGD %02x\n", tag(),m_figs.m_figure_type);
 
 		reset_figs_param();
 		m_sr |= UPD7220_SR_DRAWING_IN_PROGRESS;
@@ -1378,7 +1378,7 @@ void upd7220_device::process_fifo()
 		if(m_figs.m_figure_type == 2)
 			draw_char(((m_ead % m_pitch) << 4) | (m_dad & 0xf),(m_ead / m_pitch));
 		else
-			printf("uPD7220 '%s' Unimplemented command GCHRD %02x\n", tag(),m_figs.m_figure_type);
+			logerror("uPD7220 '%s' Unimplemented command GCHRD %02x\n", tag(),m_figs.m_figure_type);
 
 		reset_figs_param();
 		m_sr |= UPD7220_SR_DRAWING_IN_PROGRESS;
@@ -1417,11 +1417,11 @@ void upd7220_device::process_fifo()
 		break;
 
 	case COMMAND_DMAR: /* DMA read request */
-		printf("uPD7220 '%s' Unimplemented command DMAR\n", tag());
+		logerror("uPD7220 '%s' Unimplemented command DMAR\n", tag());
 		break;
 
 	case COMMAND_DMAW: /* DMA write request */
-		printf("uPD7220 '%s' Unimplemented command DMAW\n", tag());
+		logerror("uPD7220 '%s' Unimplemented command DMAW\n", tag());
 		break;
 	}
 }
