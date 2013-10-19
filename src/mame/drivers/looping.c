@@ -53,7 +53,8 @@ L056-6    9A          "      "      VLI-8-4 7A         "
 */
 
 #include "emu.h"
-#include "cpu/tms9900/tms9900l.h"
+#include "cpu/tms9900/tms9995.h"
+#include "cpu/tms9900/tms9980a.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/tms5220.h"
@@ -119,6 +120,7 @@ public:
 	UINT8       m_sound[8];
 
 	int     m_last;
+
 	DECLARE_WRITE8_MEMBER(flip_screen_x_w);
 	DECLARE_WRITE8_MEMBER(flip_screen_y_w);
 	DECLARE_WRITE8_MEMBER(looping_videoram_w);
@@ -341,26 +343,28 @@ void looping_state::machine_start()
 
 INTERRUPT_GEN_MEMBER(looping_state::looping_interrupt)
 {
-	device.execute().set_input_line_and_vector(0, ASSERT_LINE, 4);
+	m_maincpu->set_input_line(INT_9995_INT1, ASSERT_LINE);
 }
 
 
 WRITE8_MEMBER(looping_state::level2_irq_set)
 {
+	logerror("Level 2 int = %d\n", data);
 	if (!(data & 1))
-		m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, 4);
+		m_maincpu->set_input_line(INT_9995_INT1, ASSERT_LINE);
 }
 
 
 WRITE8_MEMBER(looping_state::main_irq_ack_w)
 {
 	if (data == 0)
-		m_maincpu->set_input_line(0, CLEAR_LINE);
+		m_maincpu->set_input_line(INT_9995_INT1, CLEAR_LINE);
 }
 
 
 WRITE8_MEMBER(looping_state::looping_souint_clr)
 {
+	logerror("Soundint clr = %d\n", data);
 	if (data == 0)
 		m_audiocpu->set_input_line(0, CLEAR_LINE);
 }
@@ -368,17 +372,16 @@ WRITE8_MEMBER(looping_state::looping_souint_clr)
 
 WRITE_LINE_MEMBER(looping_state::looping_spcint)
 {
-	m_audiocpu->set_input_line_and_vector(0, !state, 6);
+	logerror("Speech /int = %d\n", state==ASSERT_LINE? 1:0);
+	m_audiocpu->set_input_line(INT_9980A_LEVEL4, state==ASSERT_LINE? CLEAR_LINE : ASSERT_LINE);
 }
 
 
 WRITE8_MEMBER(looping_state::looping_soundlatch_w)
 {
 	soundlatch_byte_w(space, offset, data);
-	m_audiocpu->set_input_line_and_vector(0, ASSERT_LINE, 4);
+	m_audiocpu->set_input_line(INT_9980A_LEVEL2, ASSERT_LINE);
 }
-
-
 
 /*************************************
  *
@@ -622,6 +625,31 @@ static const ay8910_interface ay8910_config =
 	DEVCB_NULL
 };
 
+/*************************************
+ *
+ *  CPU configs
+ *
+ *************************************/
+
+static TMS9980A_CONFIG( cpuconf80 )
+{
+	DEVCB_NULL,
+	DEVCB_NULL,     // Instruction acquisition
+	DEVCB_NULL,     // Clock out
+	DEVCB_NULL,      // Hold acknowledge
+	DEVCB_NULL      // DBIN
+};
+
+static TMS9995_CONFIG( cpuconf95 )
+{
+	DEVCB_NULL,         // external op
+	DEVCB_NULL,        // Instruction acquisition
+	DEVCB_NULL,         // clock out
+	DEVCB_NULL,        // HOLDA
+	DEVCB_NULL,         // DBIN
+	INTERNAL_RAM,      // use internal RAM
+	NO_OVERFLOW_INT    // The generally available versions of TMS9995 have a deactivated overflow interrupt
+};
 
 /*************************************
  *
@@ -632,21 +660,16 @@ static const ay8910_interface ay8910_config =
 static MACHINE_CONFIG_START( looping, looping_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS9995L, MAIN_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(looping_map)
-	MCFG_CPU_IO_MAP(looping_io_map)
+	MCFG_TMS99xx_ADD("maincpu", TMS9995, MAIN_CPU_CLOCK, looping_map, looping_io_map, cpuconf95)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", looping_state,  looping_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", TMS9980L, SOUND_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(looping_sound_map)
-	MCFG_CPU_IO_MAP(looping_sound_io_map)
+	MCFG_TMS99xx_ADD("audiocpu", TMS9980A,  SOUND_CLOCK/4, looping_sound_map, looping_sound_io_map, cpuconf80)
 
 	MCFG_CPU_ADD("mcu", COP420, COP_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(looping_cop_map)
 	MCFG_CPU_DATA_MAP(looping_cop_data_map)
 	MCFG_CPU_IO_MAP(looping_cop_io_map)
 	MCFG_COP400_CONFIG( COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, COP400_MICROBUS_DISABLED )
-
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -919,7 +942,7 @@ DRIVER_INIT_MEMBER(looping_state,looping)
  *
  *************************************/
 
-GAME( 1982, looping,   0,        looping, looping, looping_state, looping, ROT90, "Video Games GmbH", "Looping", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1982, loopingv,  looping,  looping, looping, looping_state, looping, ROT90, "Video Games GmbH (Venture Line license)", "Looping (Venture Line license, set 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1982, loopingva, looping,  looping, looping, looping_state, looping, ROT90, "Video Games GmbH (Venture Line license)", "Looping (Venture Line license, set 2)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1982, skybump,   0,        looping, skybump, looping_state, looping, ROT90, "Venture Line", "Sky Bumper", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1982, looping,   0,        looping, looping, looping_state, looping, ROT90, "Video Games GmbH", "Looping", GAME_IMPERFECT_SOUND /*| GAME_SUPPORTS_SAVE */)
+GAME( 1982, loopingv,  looping,  looping, looping, looping_state, looping, ROT90, "Video Games GmbH (Venture Line license)", "Looping (Venture Line license, set 1)", GAME_IMPERFECT_SOUND /* | GAME_SUPPORTS_SAVE */)
+GAME( 1982, loopingva, looping,  looping, looping, looping_state, looping, ROT90, "Video Games GmbH (Venture Line license)", "Looping (Venture Line license, set 2)", GAME_IMPERFECT_SOUND /* | GAME_SUPPORTS_SAVE */ )
+GAME( 1982, skybump,   0,        looping, skybump, looping_state, looping, ROT90, "Venture Line", "Sky Bumper", GAME_IMPERFECT_SOUND /* | GAME_SUPPORTS_SAVE  */)

@@ -17,7 +17,7 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "cpu/tms9900/tms9900l.h"
+#include "cpu/tms9900/tms9980a.h"
 
 class jpmsru_state : public driver_device
 {
@@ -33,6 +33,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 public:
 	DECLARE_DRIVER_INIT(jpmsru);
+	DECLARE_READ8_MEMBER( interrupt_level );
 };
 
 // blind guess
@@ -60,18 +61,21 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( jpmsru )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( jpmsru, jpmsru_state )
-	MCFG_CPU_ADD("maincpu", TMS9980L, MAIN_CLOCK)
+static TMS9980A_CONFIG( cpuconf )
+{
+	DEVCB_NULL,     // External operation
+	DEVCB_NULL,     // Instruction acquisition
+	DEVCB_NULL,     // Clock out
+	DEVCB_NULL,     // Hold acknowledge
+	DEVCB_NULL      // DBIN
+};
 
-	MCFG_CPU_PROGRAM_MAP(jpmsru_map)
-	MCFG_CPU_IO_MAP(jpmsru_io)
+static MACHINE_CONFIG_START( jpmsru, jpmsru_state )
+	MCFG_TMS99xx_ADD("maincpu", TMS9980A, MAIN_CLOCK, jpmsru_map, jpmsru_io, cpuconf)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( jpmsru_4, jpmsru_state )
-	MCFG_CPU_ADD("maincpu", TMS9980L, MAIN_CLOCK)
-
-	MCFG_CPU_PROGRAM_MAP(jpmsru_4_map)
-	MCFG_CPU_IO_MAP(jpmsru_io)
+	MCFG_TMS99xx_ADD("maincpu", TMS9980A, MAIN_CLOCK, jpmsru_4_map, jpmsru_io, cpuconf)
 MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(jpmsru_state,jpmsru)

@@ -86,7 +86,7 @@
 #define MASTER_CLOCK    XTAL_8MHz   /* guess */
 
 #include "emu.h"
-#include "cpu/tms9900/tms9900l.h"
+#include "cpu/tms9900/tms9980a.h"
 #include "video/mc6845.h"
 
 
@@ -157,7 +157,8 @@ void jubilee_state::palette_init()
 INTERRUPT_GEN_MEMBER(jubilee_state::jubileep_interrupt)
 {
 	/* doesn't seems to work properly. need to set level1 interrupts */
-	device.execute().set_input_line_and_vector(0, ASSERT_LINE, 3);//2=nmi  3,4,5,6
+	m_maincpu->set_input_line(INT_9980A_LEVEL1, ASSERT_LINE);
+	m_maincpu->set_input_line(INT_9980A_LEVEL1, CLEAR_LINE);
 }
 
 
@@ -409,6 +410,15 @@ static MC6845_INTERFACE( mc6845_intf )
 };
 
 
+static TMS9980A_CONFIG( cpuconf )
+{
+	DEVCB_NULL,
+	DEVCB_NULL,     // Instruction acquisition
+	DEVCB_NULL,     // Clock out
+	DEVCB_NULL,     // Hold acknowledge
+	DEVCB_NULL      // DBIN
+};
+
 /*************************
 *    Machine Drivers     *
 *************************/
@@ -416,9 +426,7 @@ static MC6845_INTERFACE( mc6845_intf )
 static MACHINE_CONFIG_START( jubileep, jubilee_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS9980L, MASTER_CLOCK/2)   /* guess */
-	MCFG_CPU_PROGRAM_MAP(jubileep_map)
-	MCFG_CPU_IO_MAP(jubileep_cru_map)
+	MCFG_TMS99xx_ADD("maincpu", TMS9980A, MASTER_CLOCK/2, jubileep_map, jubileep_cru_map, cpuconf)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", jubilee_state,  jubileep_interrupt)
 
 	/* video hardware */

@@ -528,8 +528,7 @@ INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER(cosmic_state::cosmicg_coin_inserted)
 {
-	m_ic_state = 6;
-	m_maincpu->set_input_line(0, newval? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(INT_9980A_LEVEL4, newval? ASSERT_LINE : CLEAR_LINE);
 }
 
 static INPUT_PORTS_START( cosmicg )
@@ -988,11 +987,8 @@ MACHINE_RESET_MEMBER(cosmic_state,cosmicg)
 	m_color_registers[0] = 0;
 	m_color_registers[1] = 0;
 	m_color_registers[2] = 0;
-
-	// For TMS 9980
-	m_ic_state = 0;  // RESET
-	m_maincpu->set_input_line(0, ASSERT_LINE);
-	m_ic_state = 7;  // CLEAR
+	m_maincpu->set_input_line(INT_9980A_RESET, ASSERT_LINE);
+	m_maincpu->set_input_line(INT_9980A_RESET, CLEAR_LINE);
 }
 
 static MACHINE_CONFIG_START( cosmic, cosmic_state )
@@ -1073,22 +1069,12 @@ static MACHINE_CONFIG_DERIVED( cosmica, cosmic )
 
 MACHINE_CONFIG_END
 
-/*
-    Will be called back from the CPU when triggering an interrupt.
-*/
-READ8_MEMBER( cosmic_state::interrupt_level )
+static TMS9980A_CONFIG( cpuconf )
 {
-	return m_ic_state;
-}
-
-static TMS99xx_CONFIG( cpuconf )
-{
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(cosmic_state, interrupt_level),
+	DEVCB_NULL,     // External operation
 	DEVCB_NULL,     // Instruction acquisition
 	DEVCB_NULL,     // Clock out
-	DEVCB_NULL,     // wait
-	DEVCB_NULL,      // Hold acknowledge
+	DEVCB_NULL,     // Hold acknowledge
 	DEVCB_NULL      // DBIN
 };
 
@@ -1599,8 +1585,8 @@ DRIVER_INIT_MEMBER(cosmic_state,panic)
 }
 
 
-GAME( 1979, cosmicg,  0,       cosmicg,  cosmicg, cosmic_state,  cosmicg, ROT270, "Universal", "Cosmic Guerilla", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL )
-GAME( 1979, cosmicgi, cosmicg, cosmicg,  cosmicg, cosmic_state,  cosmicg, ROT270, "bootleg (Inder)", "Cosmic Guerilla (Spanish bootleg)", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL )
+GAME( 1979, cosmicg,  0,       cosmicg,  cosmicg, cosmic_state,  cosmicg, ROT270, "Universal", "Cosmic Guerilla", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL /*| GAME_SUPPORTS_SAVE */)
+GAME( 1979, cosmicgi, cosmicg, cosmicg,  cosmicg, cosmic_state,  cosmicg, ROT270, "bootleg (Inder)", "Cosmic Guerilla (Spanish bootleg)", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL  /*| GAME_SUPPORTS_SAVE */)
 GAME( 1979, cosmica,  0,       cosmica,  cosmica, cosmic_state,  cosmica, ROT270, "Universal", "Cosmic Alien (version II)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1979, cosmica1, cosmica, cosmica,  cosmica, cosmic_state,  cosmica, ROT270, "Universal", "Cosmic Alien (first version)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1979, cosmica2, cosmica, cosmica,  cosmica, cosmic_state,  cosmica, ROT270, "Universal", "Cosmic Alien (early version II?)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
