@@ -163,23 +163,10 @@ enum
 
 void tms99xx_device::device_start()
 {
-	const tms99xx_config *conf = reinterpret_cast<const tms99xx_config *>(static_config());
-
-	assert (conf != NULL);
-
 	// TODO: Restore state save feature
-
-	m_prgspace = &space(AS_PROGRAM);                        // dimemory.h
+	resolve_lines();
+	m_prgspace = &space(AS_PROGRAM);
 	m_cru = &space(AS_IO);
-
-	// Resolve our external connections
-	m_external_operation.resolve(conf->external_callback, *this);
-	m_get_intlevel.resolve(conf->irq_level, *this);
-	m_iaq_line.resolve(conf->instruction_acquisition, *this);
-	m_clock_out_line.resolve(conf->clock_out, *this);
-	m_wait_line.resolve(conf->wait_line, *this);
-	m_holda_line.resolve(conf->holda_line, *this);
-	m_dbin_line.resolve(conf->dbin_line, *this);        // we need this for the set_address operation
 
 	// set our instruction counter
 	m_icountptr = &m_icount;
@@ -207,6 +194,24 @@ void tms99xx_device::device_stop()
 	int k = 0;
 	if (VERBOSE>3) LOG("tms99xx: Deleting lookup tables\n");
 	while (m_lotables[k]!=NULL) delete[] m_lotables[k++];
+}
+
+/*
+    External connections
+*/
+void tms99xx_device::resolve_lines()
+{
+	const tms99xx_config *conf = reinterpret_cast<const tms99xx_config *>(static_config());
+	assert (conf != NULL);
+
+	// Resolve our external connections
+	m_external_operation.resolve(conf->external_callback, *this);
+	m_get_intlevel.resolve(conf->irq_level, *this);
+	m_iaq_line.resolve(conf->instruction_acquisition, *this);
+	m_clock_out_line.resolve(conf->clock_out, *this);
+	m_wait_line.resolve(conf->wait_line, *this);
+	m_holda_line.resolve(conf->holda_line, *this);
+	m_dbin_line.resolve(conf->dbin_line, *this);        // we need this for the set_address operation
 }
 
 /*
@@ -1181,13 +1186,13 @@ void tms99xx_device::execute_run()
 */
 void tms99xx_device::execute_set_input(int irqline, int state)
 {
-	if (irqline==INPUT_LINE_99XX_RESET && state==ASSERT_LINE)
+	if (irqline==INT_9900_RESET && state==ASSERT_LINE)
 	{
 		m_reset = true;
 	}
 	else
 	{
-		if (irqline == INPUT_LINE_NMI)
+		if (irqline == INT_9900_LOAD)
 		{
 			m_load_state = (state==ASSERT_LINE);
 			m_irq_level = -1;

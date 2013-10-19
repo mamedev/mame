@@ -65,6 +65,22 @@ tms9980a_device::tms9980a_device(const machine_config &mconfig, const char *tag,
 {
 }
 
+/*
+    External connections
+*/
+void tms9980a_device::resolve_lines()
+{
+	const tms9980a_config *conf = reinterpret_cast<const tms9980a_config *>(static_config());
+	assert (conf != NULL);
+
+	// Resolve our external connections
+	m_external_operation.resolve(conf->external_callback, *this);
+	m_iaq_line.resolve(conf->instruction_acquisition, *this);
+	m_clock_out_line.resolve(conf->clock_out, *this);
+	m_holda_line.resolve(conf->holda_line, *this);
+	m_dbin_line.resolve(conf->dbin_line, *this);
+}
+
 UINT16 tms9980a_device::read_workspace_register_debug(int reg)
 {
 	int temp = m_icount;
@@ -91,9 +107,43 @@ void tms9980a_device::write_workspace_register_debug(int reg, UINT16 data)
 */
 void tms9980a_device::execute_set_input(int irqline, int state)
 {
-	m_irq_level = get_intlevel(state);
+	// We model the three lines IC0-IC2 as 8 separate input lines, although we
+	// cannot assert more than one at a time. The state value is not needed,
+	// as level 7 means to clean all interrupts, but we consider it for the
+	// sake of consistency.
 
-	if (m_irq_level != 7)
+	int level = irqline;
+
+	// Just to stay consistent.
+	if (state==CLEAR_LINE) level = INT_9980A_CLEAR;
+
+	switch (level)
+	{
+	case INT_9980A_RESET:
+	case 1:
+		level = RESET_INT;
+		m_reset = true;
+		break;
+	case INT_9980A_LOAD:
+		level = LOAD_INT;
+		break;
+	case INT_9980A_LEVEL1:
+	case INT_9980A_LEVEL2:
+	case INT_9980A_LEVEL3:
+	case INT_9980A_LEVEL4:
+		level = level - 2;
+		break;
+	case INT_9980A_CLEAR:
+		// Clear all interrupts
+		m_load_state = false;
+		m_irq_state = false;
+		if (VERBOSE>6) LOG("tms9980a: clear interrupts\n");
+		break;
+	}
+
+	m_irq_level = level;
+
+	if (m_irq_level != INT_9980A_CLEAR)
 	{
 		if (m_irq_level == LOAD_INT)
 		{
@@ -105,39 +155,6 @@ void tms9980a_device::execute_set_input(int irqline, int state)
 		else m_irq_state = true;
 		if (VERBOSE>6) LOG("tms9980a: interrupt level=%d, ST=%04x\n", m_irq_level, ST);
 	}
-}
-
-int tms9980a_device::get_intlevel(int state)
-{
-	int level = m_get_intlevel(0) & 0x0007;
-
-	// Just to stay consistent.
-	if (state==CLEAR_LINE) level = 7;
-
-	switch (level)
-	{
-	case 0:
-	case 1:
-		level = RESET_INT;
-		m_reset = true;
-		break;
-	case 2:
-		level = LOAD_INT;
-		break;
-	case 3:
-	case 4:
-	case 5:
-	case 6:
-		level = level - 2;
-		break;
-	case 7:
-		// Clear all interrupts
-		m_load_state = false;
-		m_irq_state = false;
-		if (VERBOSE>6) LOG("tms9980a: clear interrupts\n");
-		break;
-	}
-	return level;
 }
 
 /*****************************************************************************/
@@ -246,7 +263,7 @@ UINT32 tms9980a_device::execute_max_cycles() const
 
 UINT32 tms9980a_device::execute_input_lines() const
 {
-	return 1;
+	return 8;
 }
 
 // clocks to cycles, cycles to clocks = id

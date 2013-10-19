@@ -118,7 +118,7 @@ enum
 };
 
 #define LOG logerror
-#define VERBOSE 1
+#define VERBOSE 5
 
 /****************************************************************************
     Constructor
@@ -1172,7 +1172,7 @@ void tms9995_device::execute_run()
 */
 void tms9995_device::execute_set_input(int irqline, int state)
 {
-	if (irqline==INPUT_LINE_99XX_RESET && state==ASSERT_LINE)
+	if (irqline==INT_9995_RESET && state==ASSERT_LINE)
 	{
 		m_reset = true;
 	}
@@ -1185,14 +1185,14 @@ void tms9995_device::execute_set_input(int irqline, int state)
 		}
 		else
 		{
-			if (irqline == INPUT_LINE_99XX_INT1)
+			if (irqline == INT_9995_INT1)
 			{
 				m_int1_active = m_flag[2] = (state==ASSERT_LINE);
 				if (VERBOSE>3) LOG("tms9995: Line INT1 state=%d\n", state);
 			}
 			else
 			{
-				if (irqline == INPUT_LINE_99XX_INT4)
+				if (irqline == INT_9995_INT4)
 				{
 					if (VERBOSE>3) LOG("tms9995: Line INT4/EC state=%d\n", state);
 					if (m_flag[0]==false)
@@ -1218,7 +1218,7 @@ void tms9995_device::execute_set_input(int irqline, int state)
 /*
     Issue a pulse on the clock line.
 */
-inline void tms9995_device::pulse_clock(int count)
+void tms9995_device::pulse_clock(int count)
 {
 	for (int i=0; i < count; i++)
 	{
@@ -1335,7 +1335,6 @@ void tms9995_device::decode(UINT16 inst)
 */
 void tms9995_device::int_prefetch_and_decode()
 {
-	bool check_idle = false;
 	bool check_int = (m_instruction->command != XOP && m_instruction->command != BLWP);
 	int intmask = ST & 0x000f;
 
@@ -1364,7 +1363,7 @@ void tms9995_device::int_prefetch_and_decode()
 				if (m_idle_state)
 				{
 					m_idle_state = false;
-					if (VERBOSE>7) LOG("tms9995: Interrupt occured, terminate IDLE state\n");
+					if (VERBOSE>3) LOG("tms9995: Interrupt occured, terminate IDLE state\n");
 				}
 				PC = PC + 2;        // PC must be advanced (see flow chart), but no prefetch
 				if (VERBOSE>7) LOG("tms9995: Interrupts pending; no prefetch; advance PC to %04x\n", PC);
@@ -1374,7 +1373,7 @@ void tms9995_device::int_prefetch_and_decode()
 			{
 				if (VERBOSE>7) LOG("tms9995: Checking interrupts ... none pending\n");
 				// No pending interrupts
-				if (check_idle && m_idle_state)
+				if (m_idle_state)
 				{
 					if (VERBOSE>7) LOG("tms9995: IDLE state\n");
 					// We are IDLE, stay in the loop and do not advance the PC
@@ -1409,7 +1408,7 @@ void tms9995_device::prefetch_and_decode()
 		if (VERBOSE>5) LOG("tms9995: **** Prefetching new instruction at %04x ****\n", PC);
 	}
 
-	word_read();
+	word_read(); // changes m_mem_phase
 
 	if (m_mem_phase==1)
 	{
@@ -1501,6 +1500,7 @@ void tms9995_device::service_interrupt()
 		m_mem_phase = 1;
 		m_check_hold = false;
 		m_word_access = false;
+		m_int1_active = false;
 		m_int4_active = false;
 
 		m_pass = 0;
@@ -1679,18 +1679,20 @@ void tms9995_device::mem_read()
 			if (VERBOSE>7) LOG("tms9995: set address bus %04x\n", m_address & ~1);
 			m_prgspace->set_address(address);
 			m_request_auto_wait_state = m_auto_wait;
+			pulse_clock(1);
 			break;
 		case 2:
 			// Sample the value on the data bus (high byte)
 			if (m_word_access || !m_instruction->byteop) address &= 0xfffe;
 			value = m_prgspace->read_byte(address);
-			if (VERBOSE>7) LOG("tms9995: memory read byte %04x -> %02x\n", m_address & ~1, value);
+			if (VERBOSE>3) LOG("tms9995: memory read byte %04x -> %02x\n", m_address & ~1, value);
 			m_current_value = (value << 8) & 0xff00;
 			break;
 		case 3:
 			// Set address + 1 (unless byte command)
 			if (VERBOSE>7) LOG("tms9995: set address bus %04x\n", m_address | 1);
 			m_prgspace->set_address(m_address | 1);
+			pulse_clock(1);
 			break;
 		case 4:
 			// Read low byte
@@ -1706,7 +1708,6 @@ void tms9995_device::mem_read()
 		// Reset to 1 when we are done
 		if (m_pass==1) m_mem_phase = 1;
 	}
-	pulse_clock(1);
 }
 
 /*
@@ -1802,6 +1803,7 @@ void tms9995_device::mem_write()
 			m_prgspace->set_address(address);
 			if (VERBOSE>7) LOG("tms9995: memory write byte %04x <- %02x\n", address, (m_current_value >> 8)&0xff);
 			m_prgspace->write_byte(address, (m_current_value >> 8)&0xff);
+			pulse_clock(1);
 			break;
 
 		case 2:
@@ -1813,6 +1815,7 @@ void tms9995_device::mem_write()
 			m_prgspace->set_address(m_address | 1);
 			if (VERBOSE>7) LOG("tms9995: memory write byte %04x <- %02x\n", m_address | 1, m_current_value & 0xff);
 			m_prgspace->write_byte(m_address | 1, m_current_value & 0xff);
+			pulse_clock(1);
 			break;
 		case 4:
 			// no action here, just wait for READY
@@ -1825,7 +1828,6 @@ void tms9995_device::mem_write()
 		// Reset to 1 when we are done
 		if (m_pass==1) m_mem_phase = 1;
 	}
-	pulse_clock(1);
 }
 
 /*
@@ -2545,7 +2547,10 @@ void tms9995_device::alu_external()
 	// a reset from outside.
 
 	if (m_instruction->command == IDLE)
+	{
+		if (VERBOSE>4) LOG("tms9995: Entering IDLE state\n");
 		m_idle_state = true;
+	}
 
 	if (m_instruction->command == RSET)
 	{
@@ -2880,6 +2885,7 @@ void tms9995_device::alu_rtwp()
 	case 3:
 		WP = m_current_value & 0xfffe;
 		n = 1;
+		if (VERBOSE>4) LOG("tms9995: RTWP restored old context (WP=%04x, PC=%04x, ST=%04x)\n", WP, PC, ST);
 		break;
 	}
 	m_instruction->state++;

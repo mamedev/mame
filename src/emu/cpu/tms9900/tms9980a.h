@@ -2,7 +2,6 @@
 // copyright-holders:Michael Zapf
 /*
     TMS9980A.
-
     See tms9980a.c and tms9900.c for documentation
 */
 
@@ -13,15 +12,28 @@
 #include "debugger.h"
 #include "tms9900.h"
 
-#define MCFG_TMS9980A_ADD(_tag, _device, _clock, _prgmap, _iomap, _config)      \
-	MCFG_DEVICE_ADD(_tag, _device, _clock )     \
-	MCFG_DEVICE_PROGRAM_MAP(_prgmap)            \
-	MCFG_DEVICE_IO_MAP(_iomap)                  \
-	MCFG_DEVICE_CONFIG(_config)
+enum
+{
+	INT_9980A_RESET = 0,
+	INT_9980A_LOAD = 2,
+	INT_9980A_LEVEL1 = 3,
+	INT_9980A_LEVEL2 = 4,
+	INT_9980A_LEVEL3 = 5,
+	INT_9980A_LEVEL4 = 6,
+	INT_9980A_CLEAR= 7
+};
+
+struct tms9980a_config
+{
+	devcb_write8        external_callback;
+	devcb_write_line    instruction_acquisition;
+	devcb_write_line    clock_out;
+	devcb_write_line    holda_line;
+	devcb_write_line    dbin_line;
+};
 
 #define TMS9980A_CONFIG(name) \
-	const tms9900_config(name) =
-
+	const tms9980a_config(name) =
 
 class tms9980a_device : public tms99xx_device
 {
@@ -32,6 +44,8 @@ protected:
 	void        mem_read(void);
 	void        mem_write(void);
 	void        acquire_instruction(void);
+
+	void        resolve_lines();
 
 	UINT16      read_workspace_register_debug(int reg);
 	void        write_workspace_register_debug(int reg, UINT16 data);
@@ -46,8 +60,6 @@ protected:
 	offs_t      disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
 	address_space_config    m_program_config80;
 	address_space_config    m_io_config80;
-
-	int         get_intlevel(int state);
 };
 
 // device type definition
