@@ -34,6 +34,8 @@ public:
 	DECLARE_READ32_MEMBER(eeprom_r);
 	DECLARE_WRITE32_MEMBER(eeprom_w);
 	DECLARE_WRITE8_MEMBER(kongambl_ff_w);
+	DECLARE_READ32_MEMBER(test_r);
+	// DECLARE_READ32_MEMBER(rng_r);
 	DECLARE_DRIVER_INIT(kingtut);
 	DECLARE_VIDEO_START(kongambl);
 	UINT32 screen_update_kongambl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -133,13 +135,13 @@ WRITE32_MEMBER(kongambl_state::eeprom_w)
 	}
 }
 
-static READ32_HANDLER( test_r )
+READ32_MEMBER(kongambl_state::test_r)
 {
 	return -1;//space.machine().rand();
 }
 
 /*
- static READ32_HANDLER( rng_r )
+ READ32_MEMBER(kongambl_state::rng_r)
 {
     return space.machine().rand();
 }
@@ -188,21 +190,21 @@ static ADDRESS_MAP_START( kongambl_map, AS_PROGRAM, 32, kongambl_state )
 	AM_RANGE(0x4c801c, 0x4c801f) AM_WRITENOP
 	AM_RANGE(0x4cc01c, 0x4cc01f) AM_WRITENOP
 
-	AM_RANGE(0x4cc000, 0x4cc003) AM_READ_LEGACY(test_r) // ???
-	AM_RANGE(0x4cc004, 0x4cc007) AM_READ_LEGACY(test_r) // ???
-	AM_RANGE(0x4cc008, 0x4cc00b) AM_READ_LEGACY(test_r) // "2G"
-	AM_RANGE(0x4cc00c, 0x4cc00f) AM_READ_LEGACY(test_r) // obj ROM
+	AM_RANGE(0x4cc000, 0x4cc003) AM_READ(test_r) // ???
+	AM_RANGE(0x4cc004, 0x4cc007) AM_READ(test_r) // ???
+	AM_RANGE(0x4cc008, 0x4cc00b) AM_READ(test_r) // "2G"
+	AM_RANGE(0x4cc00c, 0x4cc00f) AM_READ(test_r) // obj ROM
 
 	AM_RANGE(0x4d0000, 0x4d0003) AM_WRITE8(kongambl_ff_w,0xff000000)
 
-	AM_RANGE(0x500380, 0x500383) AM_READ_LEGACY(test_r)
+	AM_RANGE(0x500380, 0x500383) AM_READ(test_r)
 	AM_RANGE(0x500000, 0x5007ff) AM_RAM
 //  AM_RANGE(0x500400, 0x500403) AM_NOP //dual port?
 //  AM_RANGE(0x500420, 0x500423) AM_NOP //dual port?
 //  AM_RANGE(0x500500, 0x500503) AM_NOP // reads sound ROM in here, polled from m68k?
-	AM_RANGE(0x580000, 0x580007) AM_READ_LEGACY(test_r)
+	AM_RANGE(0x580000, 0x580007) AM_READ(test_r)
 
-	AM_RANGE(0x600000, 0x60000f) AM_READ_LEGACY(test_r)
+	AM_RANGE(0x600000, 0x60000f) AM_READ(test_r)
 
 	AM_RANGE(0x700000, 0x700003) AM_READ(eeprom_r)
 	AM_RANGE(0x700004, 0x700007) AM_READ_PORT("IN1")
