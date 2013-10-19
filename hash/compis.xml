@@ -45,8 +45,8 @@
 		<publisher>Telenova</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="335909">
-				<rom name="msdos32.td0" size="335909" crc="90ac044f" sha1="74f4d42481447b38d2597a0016dc3e5e7fc1a1df" offset="0" />
+			<dataarea name="flop" size="557550">
+				<rom name="compismsdos.imd" size="557550" crc="5919305f" sha1="5cacb6344c96eba5c99a134e573cb4571751b892" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -57,8 +57,8 @@
 		<publisher>Telenova</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="408254">
-				<rom name="sysii.td0" size="408254" crc="c9c601e8" sha1="0d8186c4e0ed07ee315138b1c3639870e15a97a1" offset="0" />
+			<dataarea name="flop" size="671503">
+				<rom name="compissys2.imd" size="671503" crc="13ca7af8" sha1="c6c1e747d5e5899a31ceb2fc7f83b0ac6593bf08" offset="0" />
 			</dataarea>
 		</part>
 	</software>
