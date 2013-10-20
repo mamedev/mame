@@ -19,7 +19,7 @@
 
 */
 
-#include "wangpc_lvc.h"
+#include "lvc.h"
 
 
 

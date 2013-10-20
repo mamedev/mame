@@ -206,4 +206,19 @@ public:
 	device_wangpcbus_card_interface *m_next;
 };
 
+
+// slot devices
+#include "emb.h"
+#include "lic.h"
+#include "lvc.h"
+#include "mcc.h"
+#include "mvc.h"
+#include "rtc.h"
+#include "tig.h"
+#include "wdc.h"
+
+SLOT_INTERFACE_EXTERN( wangpc_cards );
+
+
+
 #endif

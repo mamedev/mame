@@ -32,6 +32,7 @@ OBJDIRS += \
 	$(EMUOBJ)/bus/ieee488 \
 	$(EMUOBJ)/bus/isbx \
 	$(EMUOBJ)/bus/s100 \
+	$(EMUOBJ)/bus/wangpc \
 	$(EMUOBJ)/drivers \
 	$(EMUOBJ)/machine \
 	$(EMUOBJ)/layout \

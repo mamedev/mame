@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-    Wang PC PM-001B Medium-Resolution Video Controller emulation
+    Wang PC-PM070 Local Interconnect option card emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -11,13 +11,11 @@
 
 #pragma once
 
-#ifndef __WANGPC_TIG__
-#define __WANGPC_TIG__
-
+#ifndef __WANGPC_LIC__
+#define __WANGPC_LIC__
 
 #include "emu.h"
-#include "machine/wangpcbus.h"
-#include "video/upd7220.h"
+#include "wangpc.h"
 
 
 
@@ -25,19 +23,18 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> wangpc_tig_device
+// ======================> wangpc_lic_device
 
-class wangpc_tig_device : public device_t,
-							public device_wangpcbus_card_interface
+class wangpc_lic_device : public device_t,
+								public device_wangpcbus_card_interface
 {
 public:
 	// construction/destruction
-	wangpc_tig_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	wangpc_lic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
 	// device-level overrides
@@ -45,25 +42,15 @@ protected:
 	virtual void device_reset();
 
 	// device_wangpcbus_card_interface overrides
+	virtual UINT16 wangpcbus_mrdc_r(address_space &space, offs_t offset, UINT16 mem_mask);
+	virtual void wangpcbus_amwc_w(address_space &space, offs_t offset, UINT16 mem_mask, UINT16 data);
 	virtual UINT16 wangpcbus_iorc_r(address_space &space, offs_t offset, UINT16 mem_mask);
 	virtual void wangpcbus_aiowc_w(address_space &space, offs_t offset, UINT16 mem_mask, UINT16 data);
-	virtual UINT8 wangpcbus_dack_r(address_space &space, int line);
-	virtual void wangpcbus_dack_w(address_space &space, int line, UINT8 data);
-	virtual bool wangpcbus_have_dack(int line);
-
-private:
-	// internal state
-	required_device<upd7220_device> m_hgdc0;
-	required_device<upd7220_device> m_hgdc1;
-
-	UINT8 m_option;
-	UINT8 m_attr[16];
-	UINT8 m_underline;
 };
 
 
 // device type definition
-extern const device_type WANGPC_TIG;
+extern const device_type WANGPC_LIC;
 
 
 #endif

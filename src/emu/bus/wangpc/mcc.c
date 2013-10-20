@@ -17,7 +17,7 @@
 
 */
 
-#include "wangpc_mcc.h"
+#include "mcc.h"
 
 
 

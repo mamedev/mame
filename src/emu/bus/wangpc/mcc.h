@@ -14,9 +14,8 @@
 #ifndef __WANGPC_MCC__
 #define __WANGPC_MCC__
 
-
 #include "emu.h"
-#include "machine/wangpcbus.h"
+#include "wangpc.h"
 #include "machine/z80dart.h"
 
 

@@ -17,7 +17,7 @@
 
 */
 
-#include "wangpc_tig.h"
+#include "tig.h"
 
 
 

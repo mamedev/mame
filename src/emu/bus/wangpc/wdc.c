@@ -9,7 +9,7 @@
 
 **********************************************************************/
 
-#include "wangpc_wdc.h"
+#include "wdc.h"
 #include "machine/scsihd.h"
 
 

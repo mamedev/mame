@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-    Wang PC PM-001B Medium-Resolution Video Controller emulation
+    Wang PC-PM040-B Remote Telecommunication controller emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -11,13 +11,15 @@
 
 #pragma once
 
-#ifndef __WANGPC_MVC__
-#define __WANGPC_MVC__
-
+#ifndef __WANGPC_RTC__
+#define __WANGPC_RTC__
 
 #include "emu.h"
-#include "machine/wangpcbus.h"
-#include "video/mc6845.h"
+#include "wangpc.h"
+#include "cpu/z80/z80.h"
+#include "machine/am9517a.h"
+#include "machine/z80ctc.h"
+#include "machine/z80dart.h"
 
 
 
@@ -25,21 +27,19 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> wangpc_mvc_device
+// ======================> wangpc_rtc_device
 
-class wangpc_mvc_device : public device_t,
+class wangpc_rtc_device : public device_t,
 							public device_wangpcbus_card_interface
 {
 public:
 	// construction/destruction
-	wangpc_mvc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	wangpc_rtc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
+	virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
-
-	// not really public
-	void crtc_update_row(mc6845_device *device, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param);
-	DECLARE_WRITE_LINE_MEMBER( vsync_w );
+	virtual ioport_constructor device_input_ports() const;
 
 protected:
 	// device-level overrides
@@ -53,20 +53,17 @@ protected:
 	virtual void wangpcbus_aiowc_w(address_space &space, offs_t offset, UINT16 mem_mask, UINT16 data);
 
 private:
-	inline void set_irq(int state);
-
-	required_device<mc6845_device> m_crtc;
-	optional_shared_ptr<UINT16> m_video_ram;
-	optional_shared_ptr<UINT16> m_char_ram;
-	optional_shared_ptr<UINT16> m_bitmap_ram;
-
-	UINT8 m_option;
-	int m_irq;
+	required_device<cpu_device> m_maincpu;
+	required_device<am9517a_device> m_dmac;
+	required_device<z80ctc_device> m_ctc0;
+	required_device<z80ctc_device> m_ctc1;
+	required_device<z80dart_device> m_sio;
+	optional_shared_ptr<UINT8> m_char_ram;
 };
 
 
 // device type definition
-extern const device_type WANGPC_MVC;
+extern const device_type WANGPC_RTC;
 
 
 #endif

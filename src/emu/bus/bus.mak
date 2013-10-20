@@ -76,3 +76,21 @@ BUSOBJS += $(BUSOBJ)/s100/nsmdsa.o
 BUSOBJS += $(BUSOBJ)/s100/nsmdsad.o
 BUSOBJS += $(BUSOBJ)/s100/wunderbus.o
 endif
+
+
+#-------------------------------------------------
+#
+#@src/emu/bus/wangpc/wangpc.h,BUSES += WANGPC
+#-------------------------------------------------
+
+ifneq ($(filter WANGPC,$(BUSES)),)
+BUSOBJS += $(BUSOBJ)/wangpc/wangpc.o
+BUSOBJS += $(BUSOBJ)/wangpc/emb.o
+BUSOBJS += $(BUSOBJ)/wangpc/lic.o
+BUSOBJS += $(BUSOBJ)/wangpc/lvc.o
+BUSOBJS += $(BUSOBJ)/wangpc/mcc.o
+BUSOBJS += $(BUSOBJ)/wangpc/mvc.o
+BUSOBJS += $(BUSOBJ)/wangpc/rtc.o
+BUSOBJS += $(BUSOBJ)/wangpc/tig.o
+BUSOBJS += $(BUSOBJ)/wangpc/wdc.o
+endif

@@ -480,6 +480,7 @@ BUSES += CBMIEC
 BUSES += IEEE488
 BUSES += ISBX
 BUSES += S100
+BUSES += WANGPC
 
 #-------------------------------------------------
 # this is the list of driver libraries that
@@ -2295,16 +2296,7 @@ $(MESSOBJ)/vtech.a:             \
 
 $(MESSOBJ)/wang.a:              \
 	$(MESS_DRIVERS)/wangpc.o    \
-	$(MESS_MACHINE)/wangpcbus.o \
 	$(MESS_MACHINE)/wangpckb.o  \
-	$(MESS_MACHINE)/wangpc_emb.o\
-	$(MESS_MACHINE)/wangpc_lic.o\
-	$(MESS_MACHINE)/wangpc_lvc.o\
-	$(MESS_MACHINE)/wangpc_mcc.o\
-	$(MESS_MACHINE)/wangpc_mvc.o\
-	$(MESS_MACHINE)/wangpc_rtc.o\
-	$(MESS_MACHINE)/wangpc_tig.o\
-	$(MESS_MACHINE)/wangpc_wdc.o\
 
 $(MESSOBJ)/wavemate.a:          \
 	$(MESS_DRIVERS)/bullet.o    \

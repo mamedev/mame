@@ -18,7 +18,7 @@
 
 */
 
-#include "wangpc_mvc.h"
+#include "mvc.h"
 
 
 
