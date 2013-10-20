@@ -77,4 +77,5 @@ void isbx_slot_device::device_start()
 //-------------------------------------------------
 
 SLOT_INTERFACE_START( isbx_cards )
+	SLOT_INTERFACE("fdc", COMPIS_FDC)
 SLOT_INTERFACE_END

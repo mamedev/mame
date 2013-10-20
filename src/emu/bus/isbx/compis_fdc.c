@@ -164,6 +164,16 @@ void compis_fdc_device::mdack_w(address_space &space, offs_t offset, UINT8 data)
 
 
 //-------------------------------------------------
+//  opt0_w - option 0 write
+//-------------------------------------------------
+
+void compis_fdc_device::opt0_w(int state)
+{
+	m_fdc->tc_w(state);
+}
+
+
+//-------------------------------------------------
 //  opt1_w - option 1 write
 //-------------------------------------------------
 
@@ -171,14 +181,4 @@ void compis_fdc_device::opt1_w(int state)
 {
 	m_floppy0->get_device()->mon_w(state);
 	m_floppy1->get_device()->mon_w(state);
-}
-
-
-//-------------------------------------------------
-//  tdma_w - terminate DMA write
-//-------------------------------------------------
-
-void compis_fdc_device::tdma_w(int state)
-{
-	m_fdc->tc_w(state);
 }

@@ -49,8 +49,8 @@ protected:
 	virtual void mcs0_w(address_space &space, offs_t offset, UINT8 data);
 	virtual UINT8 mdack_r(address_space &space, offs_t offset);
 	virtual void mdack_w(address_space &space, offs_t offset, UINT8 data);
+	virtual void opt0_w(int state);
 	virtual void opt1_w(int state);
-	virtual void tdma_w(int state);
 
 private:
 	required_device<i8272a_device> m_fdc;
