@@ -217,6 +217,26 @@ endif
 
 #-------------------------------------------------
 #
+#@src/emu/bus/vip/byteio.h,BUSES += VIP
+#@src/emu/bus/vip/exp.h,BUSES += VIP
+#-------------------------------------------------
+
+ifneq ($(filter VIP,$(BUSES)),)
+BUSOBJS += $(BUSOBJ)/vip/byteio.o
+BUSOBJS += $(BUSOBJ)/vip/vp620.o
+BUSOBJS += $(BUSOBJ)/vip/exp.o
+BUSOBJS += $(BUSOBJ)/vip/vp550.o
+BUSOBJS += $(BUSOBJ)/vip/vp570.o
+BUSOBJS += $(BUSOBJ)/vip/vp575.o
+BUSOBJS += $(BUSOBJ)/vip/vp585.o
+BUSOBJS += $(BUSOBJ)/vip/vp590.o
+BUSOBJS += $(BUSOBJ)/vip/vp595.o
+BUSOBJS += $(BUSOBJ)/vip/vp700.o
+endif
+
+
+#-------------------------------------------------
+#
 #@src/emu/bus/wangpc/wangpc.h,BUSES += WANGPC
 #-------------------------------------------------
 

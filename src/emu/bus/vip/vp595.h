@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-    RCA VIP Super Sound System VP550 emulation
+    RCA VIP Simple Sound Board VP595 emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -11,11 +11,11 @@
 
 #pragma once
 
-#ifndef __VP550__
-#define __VP550__
+#ifndef __VP595__
+#define __VP595__
 
 #include "emu.h"
-#include "machine/vip_exp.h"
+#include "exp.h"
 #include "sound/cdp1863.h"
 
 
@@ -24,46 +24,33 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> vp550_device
+// ======================> vp595_device
 
-class vp550_device : public device_t,
+class vp595_device : public device_t,
 						public device_vip_expansion_card_interface
 {
 public:
 	// construction/destruction
-	vp550_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	vp595_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
 
-	// not really public
-	DECLARE_WRITE8_MEMBER( octave_w );
-	DECLARE_WRITE8_MEMBER( vlmna_w );
-	DECLARE_WRITE8_MEMBER( vlmnb_w );
-	DECLARE_WRITE8_MEMBER( sync_w );
-
 protected:
 	// device-level overrides
 	virtual void device_start();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	// device_vip_expansion_card_interface overrides
-	virtual void vip_program_w(address_space &space, offs_t offset, UINT8 data, int cdef, int *minh);
-	virtual void vip_sc_w(int data);
+	virtual void vip_io_w(address_space &space, offs_t offset, UINT8 data);
 	virtual void vip_q_w(int state);
-	virtual void vip_run_w(int state);
 
 private:
-	required_device<cdp1863_device> m_pfg_a;
-	required_device<cdp1863_device> m_pfg_b;
-
-	// timers
-	emu_timer *m_sync_timer;
+	required_device<cdp1863_device> m_pfg;
 };
 
 
 // device type definition
-extern const device_type VP550;
+extern const device_type VP595;
 
 
 #endif

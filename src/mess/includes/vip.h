@@ -6,12 +6,12 @@
 #define __VIP__
 
 #include "emu.h"
+#include "bus/vip/byteio.h"
+#include "bus/vip/exp.h"
 #include "cpu/cosmac/cosmac.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
 #include "machine/ram.h"
-#include "machine/vip_byteio.h"
-#include "machine/vip_exp.h"
 #include "sound/discrete.h"
 #include "video/cdp1861.h"
 

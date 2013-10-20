@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-    RCA VIP Memory Expansion Board VP-570 emulation
+    RCA VIP Tiny BASIC VP-700 emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -11,11 +11,12 @@
 
 #pragma once
 
-#ifndef __VP570__
-#define __VP570__
+#ifndef __VP700__
+#define __VP700__
 
 #include "emu.h"
-#include "machine/vip_exp.h"
+#include "exp.h"
+#include "sound/cdp1863.h"
 
 
 
@@ -23,17 +24,17 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> vp570_device
+// ======================> vp700_device
 
-class vp570_device : public device_t,
+class vp700_device : public device_t,
 						public device_vip_expansion_card_interface
 {
 public:
 	// construction/destruction
-	vp570_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	vp700_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual ioport_constructor device_input_ports() const;
+	virtual const rom_entry *device_rom_region() const;
 
 protected:
 	// device-level overrides
@@ -41,17 +42,14 @@ protected:
 
 	// device_vip_expansion_card_interface overrides
 	virtual UINT8 vip_program_r(address_space &space, offs_t offset, int cs, int cdef, int *minh);
-	virtual void vip_program_w(address_space &space, offs_t offset, UINT8 data, int cdef, int *minh);
 
 private:
-	optional_shared_ptr<UINT8> m_ram;
-	required_ioport m_base;
-	required_ioport m_sw1;
+	required_memory_region m_rom;
 };
 
 
 // device type definition
-extern const device_type VP570;
+extern const device_type VP700;
 
 
 #endif

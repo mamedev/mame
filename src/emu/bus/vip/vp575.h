@@ -15,7 +15,7 @@
 #define __VP575__
 
 #include "emu.h"
-#include "machine/vip_exp.h"
+#include "exp.h"
 
 
 
