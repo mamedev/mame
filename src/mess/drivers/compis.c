@@ -258,6 +258,8 @@ static MACHINE_CONFIG_START( compis, compis_state )
 	MCFG_I8274_ADD(I8274_TAG, XTAL_16MHz/4, mpsc_intf)
 	MCFG_RS232_PORT_ADD(RS232_A_TAG, rs232a_intf, default_rs232_devices, NULL)
 	MCFG_RS232_PORT_ADD(RS232_B_TAG, rs232b_intf, default_rs232_devices, NULL)
+	MCFG_ISBX_SLOT_ADD(ISBX_0_TAG, isbx_cards, NULL)
+	MCFG_ISBX_SLOT_ADD(ISBX_1_TAG, isbx_cards, NULL)
 	MCFG_COMPIS_KEYBOARD_ADD(NULL)
 
 	/* software lists */
@@ -299,6 +301,8 @@ static MACHINE_CONFIG_START( compis2, compis_state )
 	MCFG_I8274_ADD(I8274_TAG, XTAL_16MHz/4, mpsc_intf)
 	MCFG_RS232_PORT_ADD(RS232_A_TAG, rs232a_intf, default_rs232_devices, NULL)
 	MCFG_RS232_PORT_ADD(RS232_B_TAG, rs232b_intf, default_rs232_devices, NULL)
+	MCFG_ISBX_SLOT_ADD(ISBX_0_TAG, isbx_cards, NULL)
+	MCFG_ISBX_SLOT_ADD(ISBX_1_TAG, isbx_cards, NULL)
 	MCFG_COMPIS_KEYBOARD_ADD(NULL)
 
 	/* software lists */

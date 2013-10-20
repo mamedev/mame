@@ -13,6 +13,7 @@
 #define COMPIS_H_
 
 #include "emu.h"
+#include "bus/isbx/isbx.h"
 #include "cpu/i86/i186.h"
 #include "cpu/mcs48/mcs48.h"
 #include "formats/cpis_dsk.h"
@@ -33,6 +34,8 @@
 #define RS232_A_TAG     "rs232a"
 #define RS232_B_TAG     "rs232b"
 #define CASSETTE_TAG    "cassette"
+#define ISBX_0_TAG		"isbx0"
+#define ISBX_1_TAG		"isbx1"
 
 class compis_state : public driver_device
 {
@@ -51,6 +54,8 @@ public:
 		  m_fdc(*this, "i8272a"),
 		  m_crtc(*this, "upd7220"),
 		  m_cassette(*this, CASSETTE_TAG),
+		  m_isbx0(*this, ISBX_0_TAG),
+		  m_isbx1(*this, ISBX_1_TAG),
 		  m_video_ram(*this, "video_ram")
 	{ }
 
@@ -66,6 +71,8 @@ public:
 	required_device<i8272a_device> m_fdc;
 	required_device<upd7220_device> m_crtc;
 	required_device<cassette_image_device> m_cassette;
+	required_device<isbx_slot_device> m_isbx0;
+	required_device<isbx_slot_device> m_isbx1;
 
 	DECLARE_WRITE8_MEMBER(vram_w);
 	DECLARE_READ8_MEMBER(compis_ppi_port_b_r);

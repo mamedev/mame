@@ -473,6 +473,12 @@ MACHINES += SECFLASH
 MACHINES += PCCARD
 
 #-------------------------------------------------
+# specify available bus cores
+#-------------------------------------------------
+
+BUSES += ISBX
+
+#-------------------------------------------------
 # this is the list of driver libraries that
 # comprise MESS plus messdriv.o which contains
 # the list of drivers

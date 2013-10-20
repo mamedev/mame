@@ -14,6 +14,7 @@ EMUSRC = $(SRC)/emu
 EMUOBJ = $(OBJ)/emu
 
 EMUAUDIO = $(EMUOBJ)/audio
+EMUBUS = $(EMUOBJ)/bus
 EMUDRIVERS = $(EMUOBJ)/drivers
 EMULAYOUT = $(EMUOBJ)/layout
 EMUMACHINE = $(EMUOBJ)/machine
@@ -26,6 +27,8 @@ OBJDIRS += \
 	$(EMUOBJ)/debug \
 	$(EMUOBJ)/debugint \
 	$(EMUOBJ)/audio \
+	$(EMUOBJ)/bus \
+	$(EMUOBJ)/bus/isbx \
 	$(EMUOBJ)/drivers \
 	$(EMUOBJ)/machine \
 	$(EMUOBJ)/layout \
@@ -210,10 +213,16 @@ include $(EMUSRC)/video/video.mak
 include $(EMUSRC)/machine/machine.mak
 
 #-------------------------------------------------
+# bus core objects
+#-------------------------------------------------
+
+include $(EMUSRC)/bus/bus.mak
+
+#-------------------------------------------------
 # core optional library
 #-------------------------------------------------
 
-$(LIBOPTIONAL): $(CPUOBJS) $(SOUNDOBJS) $(VIDEOOBJS) $(MACHINEOBJS)
+$(LIBOPTIONAL): $(CPUOBJS) $(SOUNDOBJS) $(VIDEOOBJS) $(MACHINEOBJS) $(BUSOBJS)
 
 #-------------------------------------------------
 # additional dependencies
