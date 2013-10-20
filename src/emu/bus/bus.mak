@@ -21,4 +21,5 @@ BUSOBJ = $(EMUOBJ)/bus
 
 ifneq ($(filter ISBX,$(BUSES)),)
 BUSOBJS += $(BUSOBJ)/isbx/isbx.o
+BUSOBJS += $(BUSOBJ)/isbx/compis_fdc.o
 endif
