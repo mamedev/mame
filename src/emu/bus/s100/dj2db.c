@@ -17,7 +17,7 @@
 
 */
 
-#include "s100_dj2db.h"
+#include "dj2db.h"
 
 
 

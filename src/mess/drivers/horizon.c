@@ -31,12 +31,10 @@
 */
 
 #include "emu.h"
+#include "bus/s100/s100.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8251.h"
 #include "machine/serial.h"
-#include "machine/s100.h"
-#include "machine/s100_nsmdsa.h"
-#include "machine/s100_nsmdsad.h"
 
 #define Z80_TAG         "z80"
 #define I8251_L_TAG     "3a"

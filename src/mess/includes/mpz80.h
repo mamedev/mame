@@ -5,15 +5,10 @@
 #ifndef __MPZ80__
 #define __MPZ80__
 
-
 #include "emu.h"
+#include "bus/s100/s100.h"
 #include "cpu/z80/z80.h"
 #include "machine/ram.h"
-#include "machine/s100.h"
-#include "machine/s100_dj2db.h"
-#include "machine/s100_djdma.h"
-#include "machine/s100_mm65k16s.h"
-#include "machine/s100_wunderbus.h"
 
 #define Z80_TAG         "17a"
 #define AM9512_TAG      "17d"

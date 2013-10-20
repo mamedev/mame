@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-    North Star MICRO-DISK System MDS-A (Single Density) emulation
+    Morrow Designs Disk Jockey/DMA floppy controller board emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -11,12 +11,12 @@
 
 #pragma once
 
-#ifndef __S100_MDS_A__
-#define __S100_MDS_A__
+#ifndef __S100_DJDMA__
+#define __S100_DJDMA__
 
 #include "emu.h"
-#include "imagedev/floppy.h"
-#include "machine/s100.h"
+#include "s100.h"
+#include "cpu/z80/z80.h"
 
 
 
@@ -24,38 +24,31 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> s100_mds_a_device
+// ======================> s100_djdma_device
 
-class s100_mds_a_device : public device_t,
+class s100_djdma_device : public device_t,
 							public device_s100_card_interface
 {
 public:
 	// construction/destruction
-	s100_mds_a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	s100_djdma_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual const rom_entry *device_rom_region() const;
 
 protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
 
-	// device_s100_card_interface overrides
-	virtual UINT8 s100_smemr_r(address_space &space, offs_t offset);
-
 private:
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
-	required_memory_region m_psel_rom;
-	required_memory_region m_pgm_rom;
+	// internal state
 };
 
 
 // device type definition
-extern const device_type S100_MDS_A;
-
+extern const device_type S100_DJDMA;
 
 
 #endif

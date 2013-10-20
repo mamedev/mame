@@ -477,6 +477,7 @@ MACHINES += PCCARD
 #-------------------------------------------------
 
 BUSES += ISBX
+BUSES += S100
 
 #-------------------------------------------------
 # this is the list of driver libraries that
@@ -780,7 +781,6 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/null_modem.o\
 	$(MESS_MACHINE)/pc_kbdc.o   \
 	$(MESS_MACHINE)/pc_lpt.o    \
-	$(MESS_MACHINE)/s100.o      \
 	$(MESS_MACHINE)/sa1403d.o   \
 	$(MESS_MACHINE)/sed1200.o   \
 	$(MESS_MACHINE)/serial.o    \
@@ -1630,10 +1630,6 @@ $(MESSOBJ)/mitsubishi.a:        \
 
 $(MESSOBJ)/morrow.a:            \
 	$(MESS_DRIVERS)/mpz80.o     \
-	$(MESS_MACHINE)/s100_dj2db.o\
-	$(MESS_MACHINE)/s100_djdma.o\
-	$(MESS_MACHINE)/s100_mm65k16s.o     \
-	$(MESS_MACHINE)/s100_wunderbus.o    \
 
 $(MESSOBJ)/mos.a:               \
 	$(MESS_DRIVERS)/kim1.o      \
@@ -1767,8 +1763,6 @@ $(MESSOBJ)/nokia.a:             \
 
 $(MESSOBJ)/northstar.a:         \
 	$(MESS_DRIVERS)/horizon.o   \
-	$(MESS_MACHINE)/s100_nsmdsa.o \
-	$(MESS_MACHINE)/s100_nsmdsad.o \
 
 $(MESSOBJ)/novag.a:             \
 	$(MESS_DRIVERS)/mk1.o       \

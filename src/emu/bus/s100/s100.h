@@ -273,4 +273,14 @@ public:
 	device_s100_card_interface *m_next;
 };
 
+
+// slot devices
+#include "dj2db.h"
+#include "djdma.h"
+#include "mm65k16s.h"
+#include "nsmdsa.h"
+#include "nsmdsad.h"
+#include "wunderbus.h"
+
+
 #endif

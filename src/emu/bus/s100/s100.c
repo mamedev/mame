@@ -11,7 +11,7 @@
 
 #include "emu.h"
 #include "emuopts.h"
-#include "machine/s100.h"
+#include "s100.h"
 
 
 //**************************************************************************

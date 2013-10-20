@@ -14,9 +14,8 @@
 #ifndef __S100_DJ2DB__
 #define __S100_DJ2DB__
 
-
 #include "emu.h"
-#include "machine/s100.h"
+#include "s100.h"
 #include "machine/com8116.h"
 #include "machine/wd_fdc.h"
 

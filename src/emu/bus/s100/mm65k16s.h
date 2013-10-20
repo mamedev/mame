@@ -15,7 +15,7 @@
 #define __S100_MM65K16S__
 
 #include "emu.h"
-#include "machine/s100.h"
+#include "s100.h"
 
 
 
