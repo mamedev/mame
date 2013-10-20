@@ -16,6 +16,21 @@ BUSOBJ = $(EMUOBJ)/bus
 
 #-------------------------------------------------
 #
+#@src/emu/bus/adamnet/adamnet.h,BUSES += ADAMNET
+#-------------------------------------------------
+
+ifneq ($(filter ADAMNET,$(BUSES)),)
+BUSOBJS += $(BUSOBJ)/adamnet/adamnet.o
+BUSOBJS += $(BUSOBJ)/adamnet/ddp.o
+BUSOBJS += $(BUSOBJ)/adamnet/fdc.o
+BUSOBJS += $(BUSOBJ)/adamnet/kb.o
+BUSOBJS += $(BUSOBJ)/adamnet/printer.o
+BUSOBJS += $(BUSOBJ)/adamnet/spi.o
+endif
+
+
+#-------------------------------------------------
+#
 #@src/emu/bus/cbmiec/cbmiec.h,BUSES += CBMIEC
 #-------------------------------------------------
 

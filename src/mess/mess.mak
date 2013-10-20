@@ -476,6 +476,7 @@ MACHINES += PCCARD
 # specify available bus cores
 #-------------------------------------------------
 
+BUSES += ADAMNET
 BUSES += CBMIEC
 BUSES += IEEE488
 BUSES += ISBX
@@ -1244,12 +1245,6 @@ $(MESSOBJ)/coleco.a:            \
 	$(MESS_MACHINE)/adamlink.o  \
 	$(MESS_MACHINE)/adam_ide.o  \
 	$(MESS_MACHINE)/adam_ram.o  \
-	$(MESS_MACHINE)/adamnet.o   \
-	$(MESS_MACHINE)/adam_ddp.o  \
-	$(MESS_MACHINE)/adam_fdc.o  \
-	$(MESS_MACHINE)/adam_kb.o   \
-	$(MESS_MACHINE)/adam_prn.o  \
-	$(MESS_MACHINE)/adam_spi.o  \
 
 $(MESSOBJ)/cromemco.a:          \
 	$(MESS_DRIVERS)/c10.o       \

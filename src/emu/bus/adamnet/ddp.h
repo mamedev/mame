@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-    Coleco Adam keyboard emulation
+    Coleco Adam Digital Data Pack emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -11,12 +11,14 @@
 
 #pragma once
 
-#ifndef __ADAM_KB__
-#define __ADAM_KB__
+#ifndef __ADAM_DDP__
+#define __ADAM_DDP__
 
 #include "emu.h"
+#include "adamnet.h"
 #include "cpu/m6800/m6800.h"
-#include "machine/adamnet.h"
+#include "formats/adam_cas.h"
+#include "imagedev/cassette.h"
 
 
 
@@ -24,28 +26,24 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> adam_keyboard_device
+// ======================> adam_digital_data_pack_device
 
-class adam_keyboard_device :  public device_t,
-								public device_adamnet_card_interface
+class adam_digital_data_pack_device :  public device_t,
+										public device_adamnet_card_interface
 {
 public:
 	// construction/destruction
-	adam_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	adam_digital_data_pack_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual ioport_constructor device_input_ports() const;
 
 	// not really public
-	DECLARE_READ8_MEMBER( p1_r );
+	DECLARE_WRITE8_MEMBER( p1_w );
 	DECLARE_READ8_MEMBER( p2_r );
 	DECLARE_WRITE8_MEMBER( p2_w );
-	DECLARE_READ8_MEMBER( p3_r );
-	DECLARE_WRITE8_MEMBER( p3_w );
 	DECLARE_READ8_MEMBER( p4_r );
-	DECLARE_WRITE8_MEMBER( p4_w );
 
 protected:
 	// device-level overrides
@@ -55,26 +53,17 @@ protected:
 	virtual void adamnet_reset_w(int state);
 
 	required_device<cpu_device> m_maincpu;
-	required_ioport m_y0;
-	required_ioport m_y1;
-	required_ioport m_y2;
-	required_ioport m_y3;
-	required_ioport m_y4;
-	required_ioport m_y5;
-	required_ioport m_y6;
-	required_ioport m_y7;
-	required_ioport m_y8;
-	required_ioport m_y9;
-	required_ioport m_y10;
-	required_ioport m_y11;
-	required_ioport m_y12;
+	required_device<cassette_image_device> m_ddp0;
+	required_device<cassette_image_device> m_ddp1;
 
-	UINT16 m_key_y;
+	int m_wr0;
+	int m_wr1;
+	int m_track;
 };
 
 
 // device type definition
-extern const device_type ADAM_KB;
+extern const device_type ADAM_DDP;
 
 
 

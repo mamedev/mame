@@ -128,11 +128,11 @@ extern const device_type ADAMNET_SLOT;
 
 
 // slot devices
-#include "machine/adam_ddp.h"
-#include "machine/adam_fdc.h"
-#include "machine/adam_kb.h"
-#include "machine/adam_prn.h"
-#include "machine/adam_spi.h"
+#include "ddp.h"
+#include "fdc.h"
+#include "kb.h"
+#include "printer.h"
+#include "spi.h"
 
 SLOT_INTERFACE_EXTERN( adamnet_devices );
 

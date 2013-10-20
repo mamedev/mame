@@ -15,9 +15,9 @@
 #define __ADAM_FDC__
 
 #include "emu.h"
+#include "adamnet.h"
 #include "cpu/m6800/m6800.h"
 #include "formats/adam_dsk.h"
-#include "machine/adamnet.h"
 #include "machine/wd_fdc.h"
 
 
