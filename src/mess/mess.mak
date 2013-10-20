@@ -481,6 +481,7 @@ BUSES += ABCBUS
 BUSES += ADAMNET
 BUSES += C64
 BUSES += CBMIEC
+BUSES += COMX35
 BUSES += IEEE488
 BUSES += ISBX
 BUSES += S100
@@ -1182,15 +1183,6 @@ $(MESSOBJ)/comx.a:              \
 	$(MESS_DRIVERS)/comx35.o    \
 	$(MESS_MACHINE)/comxpl80.o  \
 	$(MESS_VIDEO)/comx35.o      \
-	$(MESS_MACHINE)/comxexp.o   \
-	$(MESS_MACHINE)/comx_clm.o  \
-	$(MESS_MACHINE)/comx_eb.o   \
-	$(MESS_MACHINE)/comx_epr.o  \
-	$(MESS_MACHINE)/comx_fd.o   \
-	$(MESS_MACHINE)/comx_joy.o  \
-	$(MESS_MACHINE)/comx_prn.o  \
-	$(MESS_MACHINE)/comx_ram.o  \
-	$(MESS_MACHINE)/comx_thm.o  \
 
 $(MESSOBJ)/concept.a:           \
 	$(MESS_DRIVERS)/concept.o   \

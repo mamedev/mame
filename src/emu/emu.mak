@@ -32,6 +32,7 @@ OBJDIRS += \
 	$(EMUOBJ)/bus/adamnet \
 	$(EMUOBJ)/bus/c64 \
 	$(EMUOBJ)/bus/cbmiec \
+	$(EMUOBJ)/bus/comx35 \
 	$(EMUOBJ)/bus/ieee488 \
 	$(EMUOBJ)/bus/isbx \
 	$(EMUOBJ)/bus/s100 \

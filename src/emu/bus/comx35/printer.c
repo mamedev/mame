@@ -9,7 +9,7 @@
 
 **********************************************************************/
 
-#include "comx_prn.h"
+#include "printer.h"
 
 
 
@@ -58,7 +58,7 @@ const rom_entry *comx_prn_device::device_rom_region() const
 
 SLOT_INTERFACE_START(comx_centronics_printer)
 	SLOT_INTERFACE("printer", CENTRONICS_PRINTER)
-	SLOT_INTERFACE("pl80", COMX_PL80)
+	//SLOT_INTERFACE("pl80", COMX_PL80)
 SLOT_INTERFACE_END
 
 
@@ -67,7 +67,7 @@ SLOT_INTERFACE_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( comx_prn )
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics, comx_centronics_printer, "pl80")
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics, comx_centronics_printer, "printer")
 MACHINE_CONFIG_END
 
 

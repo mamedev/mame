@@ -11,7 +11,7 @@
 
 #include "emu.h"
 #include "emuopts.h"
-#include "machine/comxexp.h"
+#include "exp.h"
 
 
 //**************************************************************************
@@ -220,3 +220,19 @@ READ_LINE_MEMBER( comx_expansion_slot_device::ef4_r )
 WRITE_LINE_MEMBER( comx_expansion_slot_device::int_w ) { m_out_int_func(state); }
 WRITE_LINE_MEMBER( comx_expansion_slot_device::wait_w ) { m_out_wait_func(state); }
 WRITE_LINE_MEMBER( comx_expansion_slot_device::clear_w ) { m_out_clear_func(state); }
+
+
+//-------------------------------------------------
+//  SLOT_INTERFACE( comx_expansion_cards )
+//-------------------------------------------------
+
+SLOT_INTERFACE_START( comx_expansion_cards )
+	SLOT_INTERFACE("eb", COMX_EB)
+	SLOT_INTERFACE("fd", COMX_FD)
+	SLOT_INTERFACE("clm", COMX_CLM)
+	SLOT_INTERFACE("ram", COMX_RAM)
+	SLOT_INTERFACE("joy", COMX_JOY)
+	SLOT_INTERFACE("prn", COMX_PRN)
+	SLOT_INTERFACE("thm", COMX_THM)
+	SLOT_INTERFACE("epr", COMX_EPR)
+SLOT_INTERFACE_END

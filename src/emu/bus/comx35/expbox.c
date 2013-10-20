@@ -49,7 +49,7 @@ Notes:
 
 */
 
-#include "comx_eb.h"
+#include "expbox.h"
 
 
 
@@ -99,16 +99,6 @@ const rom_entry *comx_eb_device::device_rom_region() const
 //-------------------------------------------------
 //  COMX_EXPANSION_INTERFACE( expansion_intf )
 //-------------------------------------------------
-
-static SLOT_INTERFACE_START( comx_expansion_cards )
-	SLOT_INTERFACE("fd", COMX_FD)
-	SLOT_INTERFACE("clm", COMX_CLM)
-	SLOT_INTERFACE("ram", COMX_RAM)
-	SLOT_INTERFACE("joy", COMX_JOY)
-	SLOT_INTERFACE("prn", COMX_PRN)
-	SLOT_INTERFACE("thm", COMX_THM)
-	SLOT_INTERFACE("epr", COMX_EPR)
-SLOT_INTERFACE_END
 
 WRITE_LINE_DEVICE_HANDLER( int_w )
 {

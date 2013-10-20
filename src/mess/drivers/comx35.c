@@ -599,17 +599,6 @@ static COMX_EXPANSION_INTERFACE( expansion_intf )
 	DEVCB_NULL
 };
 
-static SLOT_INTERFACE_START( comx_expansion_cards )
-	SLOT_INTERFACE("eb", COMX_EB)
-	SLOT_INTERFACE("fd", COMX_FD)
-	SLOT_INTERFACE("clm", COMX_CLM)
-	SLOT_INTERFACE("ram", COMX_RAM)
-	SLOT_INTERFACE("joy", COMX_JOY)
-	SLOT_INTERFACE("prn", COMX_PRN)
-	SLOT_INTERFACE("thm", COMX_THM)
-	SLOT_INTERFACE("epr", COMX_EPR)
-SLOT_INTERFACE_END
-
 
 
 //**************************************************************************

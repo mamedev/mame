@@ -14,9 +14,8 @@
 #ifndef __COMX_CLM__
 #define __COMX_CLM__
 
-
 #include "emu.h"
-#include "machine/comxexp.h"
+#include "exp.h"
 #include "video/mc6845.h"
 
 

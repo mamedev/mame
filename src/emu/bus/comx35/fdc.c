@@ -52,7 +52,7 @@ Notes:
 
 */
 
-#include "comx_fd.h"
+#include "fdc.h"
 
 
 

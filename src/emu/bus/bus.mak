@@ -154,6 +154,24 @@ endif
 
 #-------------------------------------------------
 #
+#@src/emu/bus/comx35/exp.h,BUSES += COMX35
+#-------------------------------------------------
+
+ifneq ($(filter COMX35,$(BUSES)),)
+BUSOBJS += $(BUSOBJ)/comx35/exp.o
+BUSOBJS += $(BUSOBJ)/comx35/clm.o
+BUSOBJS += $(BUSOBJ)/comx35/expbox.o
+BUSOBJS += $(BUSOBJ)/comx35/eprom.o
+BUSOBJS += $(BUSOBJ)/comx35/fdc.o
+BUSOBJS += $(BUSOBJ)/comx35/joycard.o
+BUSOBJS += $(BUSOBJ)/comx35/printer.o
+BUSOBJS += $(BUSOBJ)/comx35/ram.o
+BUSOBJS += $(BUSOBJ)/comx35/thermal.o
+endif
+
+
+#-------------------------------------------------
+#
 #@src/emu/bus/ieee488/ieee488.h,BUSES += IEEE488
 #-------------------------------------------------
 

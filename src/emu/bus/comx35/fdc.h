@@ -14,10 +14,9 @@
 #ifndef __COMX_FD__
 #define __COMX_FD__
 
-
 #include "emu.h"
+#include "exp.h"
 #include "formats/comx35_dsk.h"
-#include "machine/comxexp.h"
 #include "machine/wd_fdc.h"
 
 

@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-    COMX-35 RAM Card emulation
+    COMX-35 F&M Joycard emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -11,12 +11,11 @@
 
 #pragma once
 
-#ifndef __COMX_RAM__
-#define __COMX_RAM__
-
+#ifndef __COMX_JOY__
+#define __COMX_JOY__
 
 #include "emu.h"
-#include "machine/comxexp.h"
+#include "exp.h"
 
 
 
@@ -24,14 +23,17 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> comx_ram_device
+// ======================> comx_joy_device
 
-class comx_ram_device : public device_t,
+class comx_joy_device : public device_t,
 						public device_comx_expansion_card_interface
 {
 public:
 	// construction/destruction
-	comx_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	comx_joy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// optional information overrides
+	virtual ioport_constructor device_input_ports() const;
 
 protected:
 	// device-level overrides
@@ -39,19 +41,16 @@ protected:
 	virtual void device_reset();
 
 	// device_comx_expansion_card_interface overrides
-	virtual UINT8 comx_mrd_r(address_space &space, offs_t offset, int *extrom);
-	virtual void comx_mwr_w(address_space &space, offs_t offset, UINT8 data);
-	virtual void comx_io_w(address_space &space, offs_t offset, UINT8 data);
+	virtual UINT8 comx_io_r(address_space &space, offs_t offset);
 
 private:
-	optional_shared_ptr<UINT8> m_ram;
-
-	int m_bank;
+	required_ioport m_joy1;
+	required_ioport m_joy2;
 };
 
 
 // device type definition
-extern const device_type COMX_RAM;
+extern const device_type COMX_JOY;
 
 
 #endif
