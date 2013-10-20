@@ -176,6 +176,18 @@
 		</part>
 	</software>
 
+	<software name="sorta000">
+		<description>SORT ($A000 version)</description>
+		<year>1981</year>
+		<publisher>Matrix Software</publisher>
+
+		<part name="rom" interface="pet_a000_rom">
+			<dataarea name="rom" size="0x800">
+				<rom name="sort-a000.bin" size="0x800" crc="d9e3be19" sha1="37886a296ee5de9888af6931aa869f8039ed14e5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="spellmst">
 		<description>Spellmaster</description>
 		<year>198?</year>
