@@ -103,9 +103,15 @@ READ8_MEMBER( compis_state::compis_ppi_port_b_r )
 	/* DIP switch - Test mode */
 	data = ioport("DSW0")->read();
 
+	// cassette
+	data |= (m_cassette->input() > 0.0) << 2;
+
 	/* Centronics busy */
 	data |= m_centronics->busy_r() << 5;
 	data |= m_centronics->vcc_r() << 6;
+
+	// TMR0
+	data |= m_tmr0 << 7;
 
 	return data;
 }
@@ -209,6 +215,20 @@ const i8251_interface compis_usart_interface=
 READ8_MEMBER(compis_state::compis_irq_callback)
 {
 	return m_8259m->inta_r();
+}
+
+WRITE_LINE_MEMBER( compis_state::tmr0_w )
+{
+	m_tmr0 = state;
+	
+	m_cassette->output(m_tmr0 ? -1 : 1);
+}
+
+WRITE8_MEMBER( compis_state::tape_mon_w )
+{
+	cassette_state state = BIT(data, 0) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED;
+
+	m_cassette->change_state(state, CASSETTE_MASK_MOTOR);
 }
 
 void compis_state::machine_start()

@@ -94,7 +94,7 @@ static ADDRESS_MAP_START( compis_io, AS_IO, 16, compis_state )
   //AM_RANGE(0x0200, 0x0201) /* PCS4 */ AM_MIRROR(0x7e)
 	AM_RANGE(0x0280, 0x0283) /* PCS5 */ AM_MIRROR(0x70) AM_DEVREADWRITE8("pic8259_master", pic8259_device, read, write, 0x00ff) /* 80150/80130 */
 	AM_RANGE(0x0288, 0x028f) /* PCS5 */ AM_MIRROR(0x70) AM_DEVREADWRITE8("pit8254", pit8254_device, read, write, 0x00ff) /* 80150/80130 */
-  //AM_RANGE(0x0300, 0x0301) /* PCS6:0 0x00ff */ AM_MIRROR(0xe) // cassette motor
+    AM_RANGE(0x0300, 0x0301) /* PCS6:0 */ AM_MIRROR(0xe) AM_WRITE8(tape_mon_w, 0x00ff)
   //AM_RANGE(0x0300, 0x0301) /* PCS6:1 0xff00 */ AM_MIRROR(0xe) // DMA-ACK graphics
   //AM_RANGE(0x0310, 0x0311) /* PCS6:2 0x00ff */ AM_MIRROR(0xe) // 8274 INTERRUPT ACKNOWLEDGE
 	AM_RANGE(0x0310, 0x0311) /* PCS6:3 */ AM_MIRROR(0xc) AM_DEVREADWRITE8("uart", i8251_device, data_r, data_w, 0xff00)
@@ -135,6 +135,20 @@ static const mm58274c_interface compis_mm58274c_interface =
 	1   /*  first day of week */
 };
 
+
+//-------------------------------------------------
+//  cassette_interface compis_cassette_interface
+//-------------------------------------------------
+
+static const cassette_interface compis_cassette_interface =
+{
+	cassette_default_formats,
+	NULL,
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED),
+	NULL,
+	NULL
+};
+
 const floppy_format_type compis_floppy_formats[] = {
 	FLOPPY_D88_FORMAT,
 	FLOPPY_DFI_FORMAT,
@@ -162,6 +176,7 @@ static MACHINE_CONFIG_START( compis, compis_state )
 	MCFG_CPU_IO_MAP(compis_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", compis_state,  compis_vblank_int)
 	MCFG_80186_IRQ_SLAVE_ACK(DEVREAD8(DEVICE_SELF, compis_state, compis_irq_callback))
+	MCFG_80186_TMROUT0_HANDLER(DEVWRITELINE(DEVICE_SELF, compis_state, tmr0_w))
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -184,6 +199,7 @@ static MACHINE_CONFIG_START( compis, compis_state )
 	MCFG_I8272A_ADD("i8272a", true)
 	MCFG_FLOPPY_DRIVE_ADD("i8272a:0", compis_floppies, "525qd", compis_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("i8272a:1", compis_floppies, "525qd", compis_floppy_formats)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, compis_cassette_interface)
 	MCFG_COMPIS_KEYBOARD_ADD(NULL)
 
 	/* software lists */
@@ -197,6 +213,7 @@ static MACHINE_CONFIG_START( compis2, compis_state )
 	MCFG_CPU_IO_MAP(compis_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", compis_state,  compis_vblank_int)
 	MCFG_80186_IRQ_SLAVE_ACK(DEVREAD8(DEVICE_SELF, compis_state, compis_irq_callback))
+	MCFG_80186_TMROUT0_HANDLER(DEVWRITELINE(DEVICE_SELF, compis_state, tmr0_w))
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -219,6 +236,7 @@ static MACHINE_CONFIG_START( compis2, compis_state )
 	MCFG_I8272A_ADD("i8272a", true)
 	MCFG_FLOPPY_DRIVE_ADD("i8272a:0", compis_floppies, "525qd", compis_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("i8272a:1", compis_floppies, "525qd", compis_floppy_formats)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, compis_cassette_interface)
 	MCFG_COMPIS_KEYBOARD_ADD(NULL)
 
 	/* software lists */
