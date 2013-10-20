@@ -1490,11 +1490,13 @@ m79amb          // (c) 1977 RamTek
 alieninv        // Margamatics
 alieninvp2      // bootleg
 tst_invd        // Test ROM
-sitv            // (c) 1978 Taito
-sitvo           // (c) 1978 Taito
-sicv            // (c) 1979 Taito
-sisv            // (c) 1978 Taito
+sisv1           // (c) 1978 Taito
 sisv2           // (c) 1978 Taito
+sisv3           // (c) 1978 Taito
+sisv            // (c) 1978 Taito
+sitv1           // (c) 1978 Taito
+sitv            // (c) 1978 Taito
+sicv            // (c) 1979 Taito
 spacerng        // bootleg
 spacewr3        // bootleg
 invaderl        // bootleg
