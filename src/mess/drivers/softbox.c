@@ -12,7 +12,7 @@
 
     The SoftBox can be used as a standalone computer with an RS-232 terminal,
     or as a PET/CBM peripheral.  This is an emulation of the standalone mode.
-    For the peripheral mode, see: src/mess/machine/softbox.c.
+    For the peripheral mode, see: src/emu/bus/ieee488/softbox.c.
 
 
     Using the Corvus hard disk
