@@ -1000,7 +1000,7 @@ void i80186_cpu_device::device_timer(emu_timer &timer, device_timer_id id, int p
 					count = t->maxA;
 
 				count = count ? count : 0x10000;
-				t->int_timer->adjust((attotime::from_hz(clock()/4) * count), which);
+				t->int_timer->adjust((attotime::from_hz(clock()/8) * count), which);
 				if (LOG_TIMER) logerror("  Repriming interrupt\n");
 			}
 			else
@@ -1168,7 +1168,7 @@ void i80186_cpu_device::internal_timer_update(int which,int new_count,int new_ma
 			int diff = t->maxA - t->count;
 			if (diff <= 0)
 				diff += 0x10000;
-			t->int_timer->adjust(attotime::from_hz(clock()/4) * diff, which);
+			t->int_timer->adjust(attotime::from_hz(clock()/8) * diff, which);
 			if (LOG_TIMER) logerror("Set interrupt timer for %d\n", which);
 		}
 		else
