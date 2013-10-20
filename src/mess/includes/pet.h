@@ -6,12 +6,12 @@
 #define __PET__
 
 #include "emu.h"
+#include "bus/ieee488/ieee488.h"
 #include "cpu/m6502/m6502.h"
 #include "imagedev/cartslot.h"
 #include "machine/6522via.h"
 #include "machine/6821pia.h"
 #include "machine/cbm_snqk.h"
-#include "machine/ieee488.h"
 #include "machine/petcass.h"
 #include "machine/petexp.h"
 #include "machine/petuser.h"

@@ -16,9 +16,9 @@
 
 
 #include "emu.h"
+#include "ieee488.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/6532riot.h"
-#include "machine/ieee488.h"
 #include "machine/wd_fdc.h"
 
 

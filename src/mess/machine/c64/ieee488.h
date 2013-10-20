@@ -14,12 +14,10 @@
 #ifndef __C64_IEEE488__
 #define __C64_IEEE488__
 
-
 #include "emu.h"
+#include "bus/ieee488/ieee488.h"
 #include "machine/6525tpi.h"
 #include "machine/c64/exp.h"
-#include "machine/ieee488.h"
-#include "video/mc6845.h"
 
 
 

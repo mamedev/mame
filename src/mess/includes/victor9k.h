@@ -21,7 +21,7 @@
 #include "machine/ram.h"
 #include "machine/ctronics.h"
 #include "machine/6522via.h"
-#include "machine/ieee488.h"
+#include "bus/ieee488/ieee488.h"
 #include "machine/mc6852.h"
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"

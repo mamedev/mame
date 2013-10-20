@@ -15,12 +15,12 @@
 #define __C2031__
 
 #include "emu.h"
+#include "ieee488.h"
 #include "cpu/m6502/m6502.h"
 #include "imagedev/flopdrv.h"
 #include "machine/64h156.h"
 #include "machine/6522via.h"
 #include "machine/c1541.h"
-#include "machine/ieee488.h"
 
 
 

@@ -476,6 +476,7 @@ MACHINES += PCCARD
 # specify available bus cores
 #-------------------------------------------------
 
+BUSES += IEEE488
 BUSES += ISBX
 BUSES += S100
 
@@ -753,15 +754,6 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/dp8390.o    \
 	$(MESS_MACHINE)/hd63450.o   \
 	$(MESS_MACHINE)/i8271.o     \
-	$(MESS_MACHINE)/ieee488.o   \
-	$(MESS_MACHINE)/c2031.o     \
-	$(MESS_MACHINE)/c2040.o     \
-	$(MESS_MACHINE)/c8280.o     \
-	$(MESS_MACHINE)/d9060.o     \
-	$(MESS_MACHINE)/d9060hd.o   \
-	$(MESS_MACHINE)/softbox.o   \
-	$(MESS_MACHINE)/hardbox.o   \
-	$(MESS_MACHINE)/shark.o     \
 	$(MESS_MACHINE)/imi5000h.o  \
 	$(MESS_MACHINE)/kb3600.o    \
 	$(MESS_MACHINE)/keyboard.o  \

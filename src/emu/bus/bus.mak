@@ -16,7 +16,25 @@ BUSOBJ = $(EMUOBJ)/bus
 
 #-------------------------------------------------
 #
-#@src/emu/bus/isbx.h,BUSES += ISBX
+#@src/emu/bus/ieee488/ieee488.h,BUSES += IEEE488
+#-------------------------------------------------
+
+ifneq ($(filter IEEE488,$(BUSES)),)
+BUSOBJS += $(BUSOBJ)/ieee488/ieee488.o
+BUSOBJS += $(BUSOBJ)/ieee488/c2031.o
+BUSOBJS += $(BUSOBJ)/ieee488/c2040.o
+BUSOBJS += $(BUSOBJ)/ieee488/c8280.o
+BUSOBJS += $(BUSOBJ)/ieee488/d9060.o
+BUSOBJS += $(BUSOBJ)/ieee488/d9060hd.o
+BUSOBJS += $(BUSOBJ)/ieee488/softbox.o
+BUSOBJS += $(BUSOBJ)/ieee488/hardbox.o
+BUSOBJS += $(BUSOBJ)/ieee488/shark.o
+endif
+
+
+#-------------------------------------------------
+#
+#@src/emu/bus/isbx/isbx.h,BUSES += ISBX
 #-------------------------------------------------
 
 ifneq ($(filter ISBX,$(BUSES)),)
@@ -27,7 +45,7 @@ endif
 
 #-------------------------------------------------
 #
-#@src/emu/bus/isbx.h,BUSES += S100
+#@src/emu/bus/s100/s100.h,BUSES += S100
 #-------------------------------------------------
 
 ifneq ($(filter S100,$(BUSES)),)

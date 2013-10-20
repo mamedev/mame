@@ -12,7 +12,7 @@
 #include "machine/com8116.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
-#include "machine/ieee488.h"
+#include "bus/ieee488/ieee488.h"
 #include "machine/imi5000h.h"
 #include "machine/serial.h"
 

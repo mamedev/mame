@@ -28,6 +28,7 @@ OBJDIRS += \
 	$(EMUOBJ)/debugint \
 	$(EMUOBJ)/audio \
 	$(EMUOBJ)/bus \
+	$(EMUOBJ)/bus/ieee488 \
 	$(EMUOBJ)/bus/isbx \
 	$(EMUOBJ)/bus/s100 \
 	$(EMUOBJ)/drivers \

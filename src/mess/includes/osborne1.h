@@ -13,7 +13,7 @@
 #include "sound/beep.h"
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"
-#include "machine/ieee488.h"
+#include "bus/ieee488/ieee488.h"
 #include "machine/ram.h"
 #include "machine/wd17xx.h"
 #include "imagedev/flopdrv.h"

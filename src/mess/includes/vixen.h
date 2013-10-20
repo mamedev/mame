@@ -7,7 +7,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/i8155.h"
 #include "machine/i8251.h"
-#include "machine/ieee488.h"
+#include "bus/ieee488/ieee488.h"
 #include "machine/ram.h"
 #include "machine/serial.h"
 #include "machine/wd_fdc.h"

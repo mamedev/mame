@@ -6,6 +6,7 @@
 #define __P500__
 
 #include "emu.h"
+#include "bus/ieee488/ieee488.h"
 #include "cpu/m6502/m6509.h"
 #include "cpu/i86/i86.h"
 #include "machine/cbm_snqk.h"
@@ -14,7 +15,6 @@
 #include "machine/cbm2user.h"
 #include "machine/ds75160a.h"
 #include "machine/ds75161a.h"
-#include "machine/ieee488.h"
 #include "machine/mos6526.h"
 #include "machine/mos6551.h"
 #include "machine/petcass.h"

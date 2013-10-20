@@ -12,7 +12,6 @@
 #include "imagedev/cartslot.h"
 #include "machine/6522via.h"
 #include "machine/cbmiec.h"
-#include "machine/ieee488.h"
 #include "machine/petcass.h"
 #include "machine/ram.h"
 #include "machine/vcsctrl.h"

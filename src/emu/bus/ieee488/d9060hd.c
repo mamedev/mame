@@ -4,7 +4,7 @@
  */
 
 #include "emu.h"
-#include "machine/d9060hd.h"
+#include "d9060hd.h"
 
 // device type definition
 const device_type D9060HD = &device_creator<d9060hd_device>;

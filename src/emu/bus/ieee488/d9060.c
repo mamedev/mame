@@ -10,9 +10,9 @@
 **********************************************************************/
 
 #include "d9060.h"
+#include "d9060hd.h"
 #include "machine/scsibus.h"
 #include "machine/scsicb.h"
-#include "machine/d9060hd.h"
 
 
 

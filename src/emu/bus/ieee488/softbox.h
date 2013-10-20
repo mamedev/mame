@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder, Mike Naberezny
 /**********************************************************************
 
-    SSE HardBox emulation
+    SSE SoftBox emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -11,15 +11,17 @@
 
 #pragma once
 
-#ifndef __PET_HARDBOX__
-#define __PET_HARDBOX__
+#ifndef __PET_SOFTBOX__
+#define __PET_SOFTBOX__
 
 #include "emu.h"
+#include "ieee488.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/harddriv.h"
 #include "includes/corvushd.h"
+#include "machine/com8116.h"
+#include "machine/i8251.h"
 #include "machine/i8255.h"
-#include "machine/ieee488.h"
 #include "machine/serial.h"
 
 
@@ -28,23 +30,24 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> hardbox_device
+// ======================> softbox_device
 
-class hardbox_device :  public device_t,
+class softbox_device :  public device_t,
 						public device_ieee488_interface
 {
 public:
 	// construction/destruction
-	hardbox_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	softbox_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual ioport_constructor device_input_ports() const;
 
+	DECLARE_WRITE8_MEMBER( dbrg_w );
+
 	DECLARE_READ8_MEMBER( ppi0_pa_r );
 	DECLARE_WRITE8_MEMBER( ppi0_pb_w );
-	DECLARE_READ8_MEMBER( ppi0_pc_r );
 
 	DECLARE_READ8_MEMBER( ppi1_pa_r );
 	DECLARE_WRITE8_MEMBER( ppi1_pb_w );
@@ -68,12 +71,14 @@ private:
 	};
 
 	required_device<cpu_device> m_maincpu;
+	required_device<com8116_device> m_dbrg;
 
 	int m_ifc;  // Tracks previous state of IEEE-488 IFC line
 };
 
+
 // device type definition
-extern const device_type HARDBOX;
+extern const device_type SOFTBOX;
 
 
 
