@@ -6,11 +6,11 @@
 #define __C128__
 
 #include "emu.h"
+#include "bus/cbmiec/cbmiec.h"
+#include "bus/c64/exp.h"
+#include "bus/c64/user.h"
 #include "machine/cbm_snqk.h"
 #include "cpu/m6502/m8502.h"
-#include "machine/c64/exp.h"
-#include "machine/c64/user.h"
-#include "bus/cbmiec/cbmiec.h"
 #include "machine/mos6526.h"
 #include "machine/mos8722.h"
 #include "machine/petcass.h"

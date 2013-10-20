@@ -471,12 +471,14 @@ MACHINES += Z80STI
 MACHINES += Z8536
 MACHINES += SECFLASH
 MACHINES += PCCARD
+MACHINES += MOS8726
 
 #-------------------------------------------------
 # specify available bus cores
 #-------------------------------------------------
 
 BUSES += ADAMNET
+BUSES += C64
 BUSES += CBMIEC
 BUSES += IEEE488
 BUSES += ISBX
@@ -1087,78 +1089,6 @@ $(MESSOBJ)/cbm.a:               \
 	$(MESS_MACHINE)/mos6702.o   \
 	$(MESS_DRIVERS)/c64.o       \
 	$(MESS_DRIVERS)/c64dtv.o    \
-	$(MESS_MACHINE)/c64/exp.o   \
-	$(MESS_MACHINE)/c64/user.o  \
-	$(MESS_MACHINE)/c64/4cga.o  \
-	$(MESS_MACHINE)/c64/4dxh.o  \
-	$(MESS_MACHINE)/c64/4ksa.o  \
-	$(MESS_MACHINE)/c64/4tba.o  \
-	$(MESS_MACHINE)/c64/16kb.o  \
-	$(MESS_MACHINE)/c64/bn1541.o\
-	$(MESS_MACHINE)/c64/comal80.o   \
-	$(MESS_MACHINE)/c64/cpm.o   \
-	$(MESS_MACHINE)/c64/currah_speech.o \
-	$(MESS_MACHINE)/c64/dela_ep256.o    \
-	$(MESS_MACHINE)/c64/dela_ep64.o \
-	$(MESS_MACHINE)/c64/dela_ep7x8.o    \
-	$(MESS_MACHINE)/c64/dinamic.o   \
-	$(MESS_MACHINE)/c64/dqbb.o  \
-	$(MESS_MACHINE)/c64/easy_calc_result.o  \
-	$(MESS_MACHINE)/c64/easyflash.o \
-	$(MESS_MACHINE)/c64/epyx_fast_load.o    \
-	$(MESS_MACHINE)/c64/exos.o  \
-	$(MESS_MACHINE)/c64/fcc.o   \
-	$(MESS_MACHINE)/c64/final.o \
-	$(MESS_MACHINE)/c64/final3.o\
-	$(MESS_MACHINE)/c64/fun_play.o  \
-	$(MESS_MACHINE)/c64/geocable.o  \
-	$(MESS_MACHINE)/c64/georam.o    \
-	$(MESS_MACHINE)/c64/ide64.o \
-	$(MESS_MACHINE)/c64/ieee488.o   \
-	$(MESS_MACHINE)/c64/kingsoft.o  \
-	$(MESS_MACHINE)/c64/mach5.o \
-	$(MESS_MACHINE)/c64/magic_desk.o    \
-	$(MESS_MACHINE)/c64/magic_formel.o  \
-	$(MESS_MACHINE)/c64/magic_voice.o    \
-	$(MESS_MACHINE)/c64/midi_maplin.o   \
-	$(MESS_MACHINE)/c64/midi_namesoft.o   \
-	$(MESS_MACHINE)/c64/midi_passport.o   \
-	$(MESS_MACHINE)/c64/midi_sci.o   \
-	$(MESS_MACHINE)/c64/midi_siel.o   \
-	$(MESS_MACHINE)/c64/mikro_assembler.o   \
-	$(MESS_MACHINE)/c64/multiscreen.o   \
-	$(MESS_MACHINE)/c64/music64.o   \
-	$(MESS_MACHINE)/c64/neoram.o\
-	$(MESS_MACHINE)/c64/ocean.o \
-	$(MESS_MACHINE)/c64/pagefox.o   \
-	$(MESS_MACHINE)/c64/partner.o   \
-	$(MESS_MACHINE)/c64/prophet64.o \
-	$(MESS_MACHINE)/c64/ps64.o  \
-	$(MESS_MACHINE)/c64/reu.o   \
-	$(MESS_MACHINE)/c64/rex.o   \
-	$(MESS_MACHINE)/c64/rex_ep256.o \
-	$(MESS_MACHINE)/c64/ross.o  \
-	$(MESS_MACHINE)/c64/sfx_sound_expander.o    \
-	$(MESS_MACHINE)/c64/silverrock.o    \
-	$(MESS_MACHINE)/c64/simons_basic.o  \
-	$(MESS_MACHINE)/c64/stardos.o   \
-	$(MESS_MACHINE)/c64/std.o   \
-	$(MESS_MACHINE)/c64/structured_basic.o  \
-	$(MESS_MACHINE)/c64/super_explode.o \
-	$(MESS_MACHINE)/c64/super_games.o   \
-	$(MESS_MACHINE)/c64/supercpu.o  \
-	$(MESS_MACHINE)/c64/sw8k.o  \
-	$(MESS_MACHINE)/c64/swiftlink.o   \
-	$(MESS_MACHINE)/c64/system3.o   \
-	$(MESS_MACHINE)/c64/tdos.o  \
-	$(MESS_MACHINE)/c64/turbo232.o  \
-	$(MESS_MACHINE)/c64/vic1011.o  \
-	$(MESS_MACHINE)/c64/vizastar.o  \
-	$(MESS_MACHINE)/c64/vw64.o  \
-	$(MESS_MACHINE)/c64/warp_speed.o    \
-	$(MESS_MACHINE)/c64/westermann.o    \
-	$(MESS_MACHINE)/c64/xl80.o  \
-	$(MESS_MACHINE)/c64/zaxxon.o\
 	$(MESS_DRIVERS)/vic10.o     \
 	$(MESS_MACHINE)/vic10exp.o  \
 	$(MESS_MACHINE)/vic10std.o  \
@@ -1190,12 +1120,10 @@ $(MESSOBJ)/cbm.a:               \
 	$(MESS_DRIVERS)/c65.o       \
 	$(MESS_MACHINE)/c65.o       \
 	$(MESS_DRIVERS)/c128.o      \
-	$(MESS_MACHINE)/c128_comal80.o      \
 	$(MESS_MACHINE)/c1551.o     \
 	$(MESS_DRIVERS)/clcd.o      \
 	$(MESS_MACHINE)/64h156.o    \
 	$(MESS_MACHINE)/mos8722.o   \
-	$(MESS_MACHINE)/mos8726.o   \
 	$(MESS_MACHINE)/c2n.o       \
 	$(MESS_VIDEO)/vic4567.o     \
 	$(MESS_VIDEO)/mos6566.o     \

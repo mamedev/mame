@@ -6,11 +6,11 @@
 #define __C64__
 
 #include "emu.h"
+#include "bus/cbmiec/cbmiec.h"
+#include "bus/c64/exp.h"
+#include "bus/c64/user.h"
 #include "cpu/m6502/m6510.h"
 #include "machine/cbm_snqk.h"
-#include "machine/c64/exp.h"
-#include "machine/c64/user.h"
-#include "bus/cbmiec/cbmiec.h"
 #include "machine/mos6526.h"
 #include "machine/petcass.h"
 #include "machine/pla.h"

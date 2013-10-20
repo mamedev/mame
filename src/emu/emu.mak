@@ -29,6 +29,7 @@ OBJDIRS += \
 	$(EMUOBJ)/audio \
 	$(EMUOBJ)/bus \
 	$(EMUOBJ)/bus/adamnet \
+	$(EMUOBJ)/bus/c64 \
 	$(EMUOBJ)/bus/cbmiec \
 	$(EMUOBJ)/bus/ieee488 \
 	$(EMUOBJ)/bus/isbx \

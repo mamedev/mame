@@ -16,6 +16,7 @@
 
 #include "emu.h"
 #include "cbmiec.h"
+#include "bus/c64/bn1541.h"
 #include "cpu/m6502/m6502.h"
 #include "imagedev/flopdrv.h"
 #include "formats/d64_dsk.h"
@@ -23,7 +24,6 @@
 #include "machine/64h156.h"
 #include "machine/6522via.h"
 #include "machine/6821pia.h"
-#include "machine/c64/bn1541.h"
 #include "machine/ctronics.h"
 
 

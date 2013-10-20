@@ -5,13 +5,12 @@
 #ifndef __VIC20__
 #define __VIC20__
 
-
 #include "emu.h"
-#include "machine/cbm_snqk.h"
+#include "bus/cbmiec/cbmiec.h"
 #include "cpu/m6502/m6510.h"
 #include "imagedev/cartslot.h"
 #include "machine/6522via.h"
-#include "bus/cbmiec/cbmiec.h"
+#include "machine/cbm_snqk.h"
 #include "machine/petcass.h"
 #include "machine/ram.h"
 #include "machine/vcsctrl.h"
