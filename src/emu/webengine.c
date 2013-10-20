@@ -337,7 +337,7 @@ static int begin_request_handler_static(struct mg_connection *conn)
 
 static int begin_http_error_handler_static(struct mg_connection *conn, int status)
 {
-	const struct mg_request_info *request_info = mg_get_request_info(conn);
+	//const struct mg_request_info *request_info = mg_get_request_info(conn);
 	if (status == 404) // 404 -- File Not Found
 	{
 		{
