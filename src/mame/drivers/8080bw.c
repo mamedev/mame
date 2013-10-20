@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Michael Strutts,Nicola Salmoria,Tormod Tjaberg,Mirko Buffoni,Lee Taylor,Valerio Verrando,Marco Cassili,Zsolt Vasvari,Aaron Giles,Jonathan Gevaryahu,MISSING_OTHERS
 /*****************************************************************************
 
     8080bw.c
@@ -89,16 +91,19 @@
            Came from factory with UV (2708) or PV (2716) romsets.
            Capable of running TV, SV, CV, UV or PV romsets.
 
-       * The following Romsets are known:
-         TV0H, TV02, TV03, TV04 (newer, w/bug fixes) - sitv
-         TV01, TV02, TV03, TV04 (older) - sitvo
-         SV0H, SV11, SV12, SV04, SV13, SV14 - undumped? roms called sv0h exist in mame...
-         SV01, SV11, SV12, SV04, SV13, SV14 - sisv2
-         SV01, SV02, SV10, SV04, SV09, SV06 - sisv
-         CV03, CV04, CV05, CV06 w/proms - undumped (but apparently the same as sisv with the roms combined to 2716 size)
-         CV17, CV18, CV19, CV20 w/proms- sicv
+       * The following Romsets are known, from oldest to newest:
+         (L-board refers to the old type SVN pcbsets, S board to the TVN and CVN and some PVN pcbsets, C board to the later PVN pcbsets)
+         SV01, SV02, SV03, SV04, SV05, SV06 - undumped (rev 1), this would be the very first japan release of space invaders (Andy W may call this 'SV0'?)
+         SV01, SV02, SV10, SV04, SV09, SV06 - sisv2 (rev 2) (Andy W calls this 'SV1', and the midway 'invaders' set is based on this romset)
+         SV01-1, SV02, SV10, SV04, SV09, SV06 - sisv3 (rev 3) (Andy W calls this 'SV2')
+         SV01-1, SV11, SV12, SV04, SV13, SV14 - sisv (rev 4, 5-digit scoring) (Andy W calls this 'SV3')
+         TV01, TV02, TV03, TV04 - sitv1 (rev 1)
+         TV01-1, TV02, TV03, TV04 - sitv (rev 2 with bug fixes)
+         CV03, CV04, CV05, CV06 w/proms - undumped (but apparently the same as one of the sisv sets with the roms combined to 2716 size)
+         CV17, CV18, CV19, CV20 w/proms - sicv
          UV1, UV2, UV3, UV4, UV5, UV6, UV7, UV8, UV9, UV10 w/proms - undumped (probably same as pvxx set just split differently)
          PV01, PV02, PV03, PV04, PV05 w/proms - invadpt2
+         Note: SV01-1 and TV01-1 were once listed as SV0H and TV0H due to improperly reading the label
 
     - Midway PCB sets: (cursory descripton)
       * All Midway Space Invaders games ([Space Invader Upright], [Space Invader Cocktail],
@@ -3272,10 +3277,10 @@ ROM_END
 
 ROM_START( spaceatt )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "h",            0x0000, 0x0400, CRC(d0c32d72) SHA1(b3bd950b1ba940fbeb5d95e55113ed8f4c311434) )
-	ROM_LOAD( "sv02.bin",     0x0400, 0x0400, CRC(0e159534) SHA1(94b2015a9d38ca738705b8d024a79fd2f9855b98) )
-	ROM_LOAD( "f",            0x0800, 0x0400, CRC(483e651e) SHA1(ae795ee3bc53ac3936f6cf2c72cca7a890783513) )
-	ROM_LOAD( "c",            0x1400, 0x0400, CRC(1293b826) SHA1(165cd5d08a19eadbe954145b12807f10df9e691a) )
+	ROM_LOAD( "h",            0x0000, 0x0400, CRC(d0c32d72) SHA1(b3bd950b1ba940fbeb5d95e55113ed8f4c311434) ) // == SV01
+	ROM_LOAD( "sv02.bin",     0x0400, 0x0400, CRC(0e159534) SHA1(94b2015a9d38ca738705b8d024a79fd2f9855b98) ) // == SV02
+	ROM_LOAD( "f",            0x0800, 0x0400, CRC(483e651e) SHA1(ae795ee3bc53ac3936f6cf2c72cca7a890783513) ) // == SV10
+	ROM_LOAD( "c",            0x1400, 0x0400, CRC(1293b826) SHA1(165cd5d08a19eadbe954145b12807f10df9e691a) ) // == SV04
 	ROM_LOAD( "b",            0x1800, 0x0400, CRC(6fc782aa) SHA1(0275adbeec455e146f4443b0b836b1171436b79b) )
 	ROM_LOAD( "a",            0x1c00, 0x0400, CRC(211ac4a3) SHA1(e08e90a4e77cfa30400626a484c9f37c87ea13f9) )
 ROM_END
@@ -3314,7 +3319,7 @@ ROM_END
 
 ROM_START( sinvemag )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "sv01.36",      0x0000, 0x0400, CRC(86bb8cb6) SHA1(a75648e7f2446c756d86624b15d387d25ce47b66) )
+	ROM_LOAD( "sv01.36",      0x0000, 0x0400, CRC(86bb8cb6) SHA1(a75648e7f2446c756d86624b15d387d25ce47b66) ) // == SV01-1
 	ROM_LOAD( "emag_si.b",    0x0400, 0x0400, CRC(febe6d1a) SHA1(e1c3a24b4fa5862107ada1f9d7249466e8c3f06a) )
 	ROM_LOAD( "emag_si.c",    0x0800, 0x0400, CRC(aafb24f7) SHA1(6718cdfae09f77d735be5145b9d202a73d8ed9db) )
 	ROM_LOAD( "emag_si.d",    0x1400, 0x0400, CRC(68c4b9da) SHA1(8953dc0427b09b71bd763e65caa7deaca09a15da) )
@@ -3346,7 +3351,7 @@ ROM_START( alieninvp2 )
 	ROM_LOAD( "1e.bin",       0x1800, 0x0800, CRC(0449cb52) SHA1(8adcb7cd4492fa6649d9ee81172d8dff56621d64) )
 ROM_END
 
-ROM_START( sitvo )
+ROM_START( sitv1 ) // rev 1
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "tv01.s1",      0x0000, 0x0800, CRC(9f37b146) SHA1(0b7ef79dbc3de3beeae3bf222d086b60249d429f) )
 	ROM_LOAD( "tv02.rp1",     0x0800, 0x0800, CRC(3c759a90) SHA1(d847d592dee592b1d3a575c21d89eaf3f7f6ae1b) )
@@ -3354,15 +3359,15 @@ ROM_START( sitvo )
 	ROM_LOAD( "tv04.m1",      0x1800, 0x0800, CRC(cd2c67f6) SHA1(60f9d8fe2d36ff589277b607f07c1edc917c755c) )
 ROM_END
 
-ROM_START( sitv ) // minor bug fixes of sitvo; delay when writing to sound latch 0x05, and another unknown change
+ROM_START( sitv ) // rev 2, minor bug fixes of sitv1; delay when writing to sound latch 0x05, and another unknown change
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "tv0h.s1",      0x0000, 0x0800, CRC(fef18aad) SHA1(043edeefe6a6d4934bd384eafea19326de1dbeec) )
+	ROM_LOAD( "tv01-1.s1",      0x0000, 0x0800, CRC(fef18aad) SHA1(043edeefe6a6d4934bd384eafea19326de1dbeec) )
 	ROM_LOAD( "tv02.rp1",     0x0800, 0x0800, CRC(3c759a90) SHA1(d847d592dee592b1d3a575c21d89eaf3f7f6ae1b) )
 	ROM_LOAD( "tv03.n1",      0x1000, 0x0800, CRC(0ad3657f) SHA1(a501f316535c50f7d7a20ef8e6dede1526a3f2a8) )
 	ROM_LOAD( "tv04.m1",      0x1800, 0x0800, CRC(cd2c67f6) SHA1(60f9d8fe2d36ff589277b607f07c1edc917c755c) )
 ROM_END
 
-ROM_START( sicv )
+ROM_START( sicv ) // likely not the first sicv version...
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cv17.36",     0x0000, 0x0800, CRC(3dfbe9e6) SHA1(26487df7fa0bbd0b9b7f74347c4b9318b0a73b89) )
 	ROM_LOAD( "cv18.35",     0x0800, 0x0800, CRC(bc3c82bf) SHA1(33e39fc97bd46699be1f9b9741a86f433efdc911) )
@@ -3374,32 +3379,44 @@ ROM_START( sicv )
 	ROM_LOAD( "cv02.2",      0x0400, 0x0400, CRC(8263da38) SHA1(2e7c769d129e6f8a1a31eba1e02777bb94ac32b2) )
 ROM_END
 
-ROM_START( sisv )
+ROM_START( sisv1 ) // rev 1
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "sv01.36",     0x0000, 0x0400, CRC(86bb8cb6) SHA1(a75648e7f2446c756d86624b15d387d25ce47b66) )
+	ROM_LOAD( "sv01.36",     0x0000, 0x0400, CRC(d0c32d72) SHA1(b3bd950b1ba940fbeb5d95e55113ed8f4c311434) )
+	ROM_LOAD( "sv02.35",     0x0400, 0x0400, CRC(0e159534) SHA1(94b2015a9d38ca738705b8d024a79fd2f9855b98) )
+	ROM_LOAD( "sv03.34",     0x0800, 0x0400, NO_DUMP )
+	ROM_LOAD( "sv04.31",     0x1400, 0x0400, CRC(1293b826) SHA1(165cd5d08a19eadbe954145b12807f10df9e691a) )
+	ROM_LOAD( "sv05.42",     0x1800, 0x0400, NO_DUMP )
+	ROM_LOAD( "sv06.41",     0x1c00, 0x0400, CRC(2c68e0b4) SHA1(a5e5357120102ad32792bf3ef6362f45b7ba7070) )
+ROM_END
+
+ROM_START( sisv2 ) // rev 2
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sv01.36",     0x0000, 0x0400, CRC(d0c32d72) SHA1(b3bd950b1ba940fbeb5d95e55113ed8f4c311434) )
 	ROM_LOAD( "sv02.35",     0x0400, 0x0400, CRC(0e159534) SHA1(94b2015a9d38ca738705b8d024a79fd2f9855b98) )
 	ROM_LOAD( "sv10.34",     0x0800, 0x0400, CRC(483e651e) SHA1(ae795ee3bc53ac3936f6cf2c72cca7a890783513) )
 	ROM_LOAD( "sv04.31",     0x1400, 0x0400, CRC(1293b826) SHA1(165cd5d08a19eadbe954145b12807f10df9e691a) )
 	ROM_LOAD( "sv09.42",     0x1800, 0x0400, CRC(cd80b13f) SHA1(0f4b9537b99fe3cdeebe525efb1869a1be0bc704) )
 	ROM_LOAD( "sv06.41",     0x1c00, 0x0400, CRC(2c68e0b4) SHA1(a5e5357120102ad32792bf3ef6362f45b7ba7070) )
-
-	ROM_REGION( 0x0800, "proms", 0 )        /* color maps player 1/player 2 */
-	ROM_LOAD( "cv01(__sisv).1",      0x0000, 0x0400, CRC(aac24f34) SHA1(ad110e776547fb48baac568bb50d61854537ca34) )
-	ROM_LOAD( "cv02(__sisv).2",      0x0400, 0x0400, CRC(2bdf83a0) SHA1(01ffbd43964c41987e7d44816271308f9a70802b) )
 ROM_END
 
-ROM_START( sisv2 )
+ROM_START( sisv3 ) // rev 3
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "sv01.36",     0x0000, 0x0400, CRC(86bb8cb6) SHA1(a75648e7f2446c756d86624b15d387d25ce47b66) )
+	ROM_LOAD( "sv01-1.36",   0x0000, 0x0400, CRC(86bb8cb6) SHA1(a75648e7f2446c756d86624b15d387d25ce47b66) )
+	ROM_LOAD( "sv02.35",     0x0400, 0x0400, CRC(0e159534) SHA1(94b2015a9d38ca738705b8d024a79fd2f9855b98) )
+	ROM_LOAD( "sv10.34",     0x0800, 0x0400, CRC(483e651e) SHA1(ae795ee3bc53ac3936f6cf2c72cca7a890783513) )
+	ROM_LOAD( "sv04.31",     0x1400, 0x0400, CRC(1293b826) SHA1(165cd5d08a19eadbe954145b12807f10df9e691a) )
+	ROM_LOAD( "sv09.42",     0x1800, 0x0400, CRC(cd80b13f) SHA1(0f4b9537b99fe3cdeebe525efb1869a1be0bc704) )
+	ROM_LOAD( "sv06.41",     0x1c00, 0x0400, CRC(2c68e0b4) SHA1(a5e5357120102ad32792bf3ef6362f45b7ba7070) )
+ROM_END
+
+ROM_START( sisv ) // rev 4, with 5-digit scoring
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sv01-1.36",   0x0000, 0x0400, CRC(86bb8cb6) SHA1(a75648e7f2446c756d86624b15d387d25ce47b66) )
 	ROM_LOAD( "sv11.35",     0x0400, 0x0400, CRC(febe6d1a) SHA1(e1c3a24b4fa5862107ada1f9d7249466e8c3f06a) )
 	ROM_LOAD( "sv12.34",     0x0800, 0x0400, CRC(a08e7202) SHA1(de9f7c851d1b894915e720cfc5d794cdb31752f6) )
 	ROM_LOAD( "sv04.31",     0x1400, 0x0400, CRC(1293b826) SHA1(165cd5d08a19eadbe954145b12807f10df9e691a) )
 	ROM_LOAD( "sv13.42",     0x1800, 0x0400, CRC(a9011634) SHA1(1f1369ecb02078042cfdf17a497b8dda6dd23793) )
 	ROM_LOAD( "sv14.41",     0x1c00, 0x0400, CRC(58730370) SHA1(13dc806bcecd2d6089a85dd710ac2869413f7475) )
-
-	ROM_REGION( 0x0800, "proms", 0 )        /* color maps player 1/player 2 */
-	ROM_LOAD( "cv01(__sisv).1",      0x0000, 0x0400, CRC(aac24f34) SHA1(ad110e776547fb48baac568bb50d61854537ca34) )
-	ROM_LOAD( "cv02(__sisv).2",      0x0400, 0x0400, CRC(2bdf83a0) SHA1(01ffbd43964c41987e7d44816271308f9a70802b) )
 ROM_END
 
 ROM_START( spacerng )
@@ -3411,8 +3428,9 @@ ROM_START( spacerng )
 
 	ROM_REGION( 0x0800, "proms", 0 )        /* color maps player 1/player 2 */
 	/* !! not dumped yet, these were taken from sisv */
-	ROM_LOAD( "cv01(__sisv).1",      0x0000, 0x0400, BAD_DUMP CRC(aac24f34) SHA1(ad110e776547fb48baac568bb50d61854537ca34) )
-	ROM_LOAD( "cv02(__sisv).2",      0x0400, 0x0400, BAD_DUMP CRC(2bdf83a0) SHA1(01ffbd43964c41987e7d44816271308f9a70802b) )
+	// NOTE: SISV (L-shaped boardset) was not supposed to HAVE color proms and hence they are removed. Maybe this is the correct set for these?
+	ROM_LOAD( "cv01(__spacerng).1",      0x0000, 0x0400, BAD_DUMP CRC(aac24f34) SHA1(ad110e776547fb48baac568bb50d61854537ca34) )
+	ROM_LOAD( "cv02(__spacerng).2",      0x0400, 0x0400, BAD_DUMP CRC(2bdf83a0) SHA1(01ffbd43964c41987e7d44816271308f9a70802b) )
 ROM_END
 
 ROM_START( spceking )
@@ -4550,11 +4568,13 @@ ROM_END
 /* board #  rom         parent    machine    inp        init              monitor, .. */
 
 // Taito games (+clones), starting with Space Invaders
-GAMEL(1978, sitv,       invaders, invaders,  sitv,      driver_device, 0, ROT270, "Taito", "Space Invaders (TV Version)", GAME_SUPPORTS_SAVE, layout_invaders )
-GAMEL(1978, sitvo,      invaders, invaders,  sitv,      driver_device, 0, ROT270, "Taito", "Space Invaders (TV Version, older)", GAME_SUPPORTS_SAVE, layout_invaders )
+GAME( 1978, sisv1,      invaders, invaders,  sitv,      driver_device, 0, ROT270, "Taito", "Space Invaders (SV Version rev 1)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1978, sisv2,      invaders, invaders,  sitv,      driver_device, 0, ROT270, "Taito", "Space Invaders (SV Version rev 2)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1978, sisv3,      invaders, invaders,  sitv,      driver_device, 0, ROT270, "Taito", "Space Invaders (SV Version rev 3)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1978, sisv,       invaders, invaders,  sitv,      driver_device, 0, ROT270, "Taito", "Space Invaders (SV Version rev 4)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAMEL(1978, sitv1,      invaders, invaders,  sitv,      driver_device, 0, ROT270, "Taito", "Space Invaders (TV Version rev 1)", GAME_SUPPORTS_SAVE, layout_invaders )
+GAMEL(1978, sitv,       invaders, invaders,  sitv,      driver_device, 0, ROT270, "Taito", "Space Invaders (TV Version rev 2)", GAME_SUPPORTS_SAVE, layout_invaders )
 GAME( 1979, sicv,       invaders, invadpt2,  sicv,      driver_device, 0, ROT270, "Taito", "Space Invaders (CV Version)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1978, sisv,       invaders, invadpt2,  sicv,      driver_device, 0, ROT270, "Taito", "Space Invaders (SV Version)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1978, sisv2,      invaders, invadpt2,  sicv,      driver_device, 0, ROT270, "Taito", "Space Invaders (SV Version 2)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAMEL(1978, invadrmr,   invaders, invaders,  invadrmr,  driver_device, 0, ROT270, "Taito / Model Racing", "Space Invaders (Model Racing)", GAME_SUPPORTS_SAVE, layout_invaders ) // unclassified, licensed or bootleg?
 GAMEL(1978, invaderl,   invaders, invaders,  sicv,      driver_device, 0, ROT270, "Taito / Logitec", "Space Invaders (Logitec)", GAME_SUPPORTS_SAVE, layout_invaders ) // unclassified, licensed or bootleg?
 GAMEL(1978, spcewars,   invaders, spcewars,  spcewars,  driver_device, 0, ROT270, "Taito / Sanritsu", "Space War (Sanritsu)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_invaders ) // unclassified, licensed or bootleg?
