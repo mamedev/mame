@@ -28,7 +28,7 @@
 
 
 #include "emu.h"
-#include "cpu/tms9900/tms9900l.h"
+#include "cpu/tms9900/tms9995.h"
 #include "sound/sn76496.h"
 #include "machine/i8255.h"
 #include "machine/tms9902.h"
@@ -136,7 +136,7 @@ WRITE8_MEMBER(jpmmps_state::jpmmps_psg_buf_w)
 WRITE8_MEMBER(jpmmps_state::jpmmps_ic22_portc_w)
 {
 	//Handle PSG
-	
+
 	if (m_psg_latch != (data & 0x04))
 	{
 		if (!m_psg_latch)//falling edge
@@ -217,12 +217,21 @@ MACHINE_START_MEMBER(jpmmps_state,jpmmps)
 
 }
 
+static TMS9995_CONFIG( cpuconf95 )
+{
+	DEVCB_NULL,         // external op
+	DEVCB_NULL,        // Instruction acquisition
+	DEVCB_NULL,         // clock out
+	DEVCB_NULL,        // HOLDA
+	DEVCB_NULL,         // DBIN
+	INTERNAL_RAM,      // use internal RAM
+	NO_OVERFLOW_INT    // The generally available versions of TMS9995 have a deactivated overflow interrupt
+};
+
 static MACHINE_CONFIG_START( jpmmps, jpmmps_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS9995L, MAIN_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(jpmmps_map)
-	MCFG_CPU_IO_MAP(jpmmps_io_map)
+	MCFG_TMS99xx_ADD("maincpu", TMS9995, MAIN_CLOCK, jpmmps_map, jpmmps_io_map, cpuconf95)
 
 	MCFG_I8255_ADD( "ppi8255_ic26", ppi8255_intf_ic26 )
 	MCFG_I8255_ADD( "ppi8255_ic21", ppi8255_intf_ic21 )

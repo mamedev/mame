@@ -22,7 +22,7 @@ System80 is based on the SRU platform, but with more outputs and finally a separ
 
 
 #include "emu.h"
-#include "cpu/tms9900/tms9900l.h"
+#include "cpu/tms9900/tms9995.h"
 #include "sound/ay8910.h"
 #include "machine/tms9902.h"
 
@@ -88,13 +88,20 @@ static const tms9902_interface tms9902_config =
 	DEVCB_NULL              /* called for setting interface parameters and line states */
 };
 
+static TMS9995_CONFIG( cpuconf95 )
+{
+	DEVCB_NULL,         // external op
+	DEVCB_NULL,        // Instruction acquisition
+	DEVCB_NULL,         // clock out
+	DEVCB_NULL,        // HOLDA
+	DEVCB_NULL,         // DBIN
+	INTERNAL_RAM,      // use internal RAM
+	NO_OVERFLOW_INT    // The generally available versions of TMS9995 have a deactivated overflow interrupt
+};
 
 static MACHINE_CONFIG_START( jpms80, jpms80_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS9995L, MAIN_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(jpms80_map)
-	MCFG_CPU_IO_MAP(jpms80_io_map)
-
+	MCFG_TMS99xx_ADD("maincpu", TMS9995, MAIN_CLOCK, jpms80_map, jpms80_io_map, cpuconf95)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_TMS9902_ADD("tms9902duart", tms9902_config,    DUART_CLOCK)

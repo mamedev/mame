@@ -16,7 +16,7 @@ ToDo:
 *********************************************************************************/
 
 #include "machine/genpin.h"
-#include "cpu/tms9900/tms9900l.h"
+#include "cpu/tms9900/tms9995.h"
 #include "sound/ay8910.h"
 #include "nsm.lh"
 
@@ -48,10 +48,8 @@ private:
 static ADDRESS_MAP_START( nsm_map, AS_PROGRAM, 8, nsm_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xe000, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xf0fb) AM_READ_LEGACY(tms9995_internal1_r)
 	AM_RANGE(0xffec, 0xffed) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
 	AM_RANGE(0xffee, 0xffef) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
-	AM_RANGE(0xfffc, 0xffff) AM_READ_LEGACY(tms9995_internal2_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nsm_io_map, AS_IO, 8, nsm_state )
@@ -110,6 +108,16 @@ WRITE8_MEMBER( nsm_state::cru_w )
 	}
 }
 
+static TMS9995_CONFIG( cpuconf95 )
+{
+	DEVCB_NULL,         // external op
+	DEVCB_NULL,        // Instruction acquisition
+	DEVCB_NULL,         // clock out
+	DEVCB_NULL,        // HOLDA
+	DEVCB_NULL,         // DBIN
+	INTERNAL_RAM,      // use internal RAM
+	NO_OVERFLOW_INT    // The generally available versions of TMS9995 have a deactivated overflow interrupt
+};
 
 void nsm_state::machine_reset()
 {
@@ -117,9 +125,7 @@ void nsm_state::machine_reset()
 
 static MACHINE_CONFIG_START( nsm, nsm_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS9995L, 11052000)
-	MCFG_CPU_PROGRAM_MAP(nsm_map)
-	MCFG_CPU_IO_MAP(nsm_io_map)
+	MCFG_TMS99xx_ADD("maincpu", TMS9995, 11052000, nsm_map, nsm_io_map, cpuconf95)
 
 	/* Video */
 	MCFG_DEFAULT_LAYOUT(layout_nsm)
