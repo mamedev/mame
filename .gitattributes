@@ -1,8 +1,6 @@
 * text=auto !eol
 artwork/aperture.png -text
 artwork/white.png -text
-/depend_emu.mak svneol=native#text/plain
-/depend_mess.mak svneol=native#text/plain
 docs/SDL.txt svneol=native#text/plain
 docs/config.txt svneol=native#text/plain
 docs/hlsl.txt svneol=native#text/plain
