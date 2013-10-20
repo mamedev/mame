@@ -429,7 +429,7 @@ INLINE void write_16_direct(spc700i_cpu *cpustate, uint address, uint value)
 #define OPER_16_XII(cpustate)   read_16_XI(EA_XII(cpustate))
 #define OPER_16_YI(cpustate)    read_16_YI(EA_YI(cpustate))
 
-/* Effective Address Caluclations */
+/* Effective Address Calculations */
 INLINE uint EA_IMM(spc700i_cpu *cpustate)   {return REG_PC++;}
 INLINE uint EA_IMM16(spc700i_cpu *cpustate) {REG_PC += 2; return REG_PC-2;}
 INLINE uint EA_ABS(spc700i_cpu *cpustate)   {return OPER_16_IMM(cpustate);}
