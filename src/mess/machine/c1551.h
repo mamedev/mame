@@ -22,7 +22,6 @@
 #include "formats/g64_dsk.h"
 #include "machine/64h156.h"
 #include "machine/6525tpi.h"
-#include "machine/c1541.h"
 #include "machine/pla.h"
 #include "machine/plus4exp.h"
 
@@ -35,7 +34,7 @@
 // ======================> c1551_device
 
 class c1551_device :  public device_t,
-						public device_plus4_expansion_card_interface
+					  public device_plus4_expansion_card_interface
 {
 public:
 	// construction/destruction

@@ -476,6 +476,7 @@ MACHINES += PCCARD
 # specify available bus cores
 #-------------------------------------------------
 
+BUSES += CBMIEC
 BUSES += IEEE488
 BUSES += ISBX
 BUSES += S100
@@ -1156,7 +1157,6 @@ $(MESSOBJ)/cbm.a:               \
 	$(MESS_MACHINE)/c64/westermann.o    \
 	$(MESS_MACHINE)/c64/xl80.o  \
 	$(MESS_MACHINE)/c64/zaxxon.o\
-	$(MESS_MACHINE)/interpod.o  \
 	$(MESS_DRIVERS)/vic10.o     \
 	$(MESS_MACHINE)/vic10exp.o  \
 	$(MESS_MACHINE)/vic10std.o  \
@@ -1177,7 +1177,6 @@ $(MESSOBJ)/cbm.a:               \
 	$(MESS_MACHINE)/plus4_sid.o \
 	$(MESS_MACHINE)/plus4_std.o \
 	$(MESS_MACHINE)/mos8706.o   \
-	$(MESS_MACHINE)/diag264_lb_iec.o    \
 	$(MESS_MACHINE)/diag264_lb_tape.o   \
 	$(MESS_MACHINE)/diag264_lb_user.o   \
 	$(MESS_DRIVERS)/cbm2.o      \
@@ -1190,15 +1189,7 @@ $(MESSOBJ)/cbm.a:               \
 	$(MESS_MACHINE)/c65.o       \
 	$(MESS_DRIVERS)/c128.o      \
 	$(MESS_MACHINE)/c128_comal80.o      \
-	$(MESS_MACHINE)/cbmiec.o    \
-	$(MESS_MACHINE)/c1541.o     \
 	$(MESS_MACHINE)/c1551.o     \
-	$(MESS_MACHINE)/c1571.o     \
-	$(MESS_MACHINE)/c1581.o     \
-	$(MESS_MACHINE)/serialbox.o \
-	$(MESS_MACHINE)/c64_nl10.o \
-	$(MESS_MACHINE)/cmdhd.o     \
-	$(MESS_MACHINE)/fd2000.o    \
 	$(MESS_DRIVERS)/clcd.o      \
 	$(MESS_MACHINE)/64h156.o    \
 	$(MESS_MACHINE)/mos8722.o   \

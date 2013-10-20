@@ -15,6 +15,7 @@
 #define __C1571__
 
 #include "emu.h"
+#include "cbmiec.h"
 #include "cpu/m6502/m6502.h"
 #include "imagedev/flopdrv.h"
 #include "formats/d64_dsk.h"
@@ -22,7 +23,6 @@
 #include "machine/64h156.h"
 #include "machine/6522via.h"
 #include "machine/c64/bn1541.h"
-#include "machine/cbmiec.h"
 #include "machine/isa.h"
 #include "machine/mos6526.h"
 #include "machine/wd_fdc.h"

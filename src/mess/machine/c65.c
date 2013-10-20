@@ -11,7 +11,7 @@
 #include "cpu/m6502/m4510.h"
 #include "sound/mos6581.h"
 #include "machine/6526cia.h"
-#include "machine/cbmiec.h"
+#include "bus/cbmiec/cbmiec.h"
 #include "machine/ram.h"
 #include "video/vic4567.h"
 #include "imagedev/cassette.h"

@@ -15,10 +15,10 @@
 #define __CMD_HD__
 
 #include "emu.h"
+#include "cbmiec.h"
 #include "cpu/m6502/m6502.h"
 #include "imagedev/harddriv.h"
 #include "machine/6522via.h"
-#include "machine/cbmiec.h"
 #include "machine/i8255.h"
 #include "machine/scsibus.h"
 #include "machine/scsicb.h"

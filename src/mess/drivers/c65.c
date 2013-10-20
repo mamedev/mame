@@ -57,7 +57,7 @@ bus serial (available in all modes), a Fast and a Burst serial bus
 #include "video/vic4567.h"
 #include "machine/cbm_snqk.h"
 #include "includes/c65.h"
-#include "machine/cbmiec.h"
+#include "bus/cbmiec/cbmiec.h"
 #include "machine/ram.h"
 
 static void cbm_c65_quick_sethiaddress( running_machine &machine, UINT16 hiaddress )

@@ -786,7 +786,7 @@ static C64H156_INTERFACE( ga_intf )
 //  LEGACY_FLOPPY_OPTIONS( c1541 )
 //-------------------------------------------------
 
-LEGACY_FLOPPY_OPTIONS_START( c1541 )
+static LEGACY_FLOPPY_OPTIONS_START( c1541 )
 	LEGACY_FLOPPY_OPTION( c1541, "g64", "Commodore 1541 GCR Disk Image", g64_dsk_identify, g64_dsk_construct, NULL, NULL )
 	LEGACY_FLOPPY_OPTION( c1541, "d64", "Commodore 1541 Disk Image", d64_dsk_identify, d64_dsk_construct, NULL, NULL )
 LEGACY_FLOPPY_OPTIONS_END
@@ -796,7 +796,7 @@ LEGACY_FLOPPY_OPTIONS_END
 //  floppy_interface c1541_floppy_interface
 //-------------------------------------------------
 
-const floppy_interface c1541_floppy_interface =
+static const floppy_interface c1541_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,

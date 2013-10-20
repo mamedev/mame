@@ -20,7 +20,6 @@
 #include "imagedev/flopdrv.h"
 #include "machine/64h156.h"
 #include "machine/6522via.h"
-#include "machine/c1541.h"
 
 
 
@@ -31,7 +30,7 @@
 // ======================> c2031_device
 
 class c2031_device :  public device_t,
-						public device_ieee488_interface
+					  public device_ieee488_interface
 {
 public:
 	// construction/destruction

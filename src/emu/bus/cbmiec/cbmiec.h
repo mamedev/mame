@@ -207,15 +207,15 @@ extern const device_type CBM_IEC_SLOT;
 
 
 // slot devices
-#include "machine/c1541.h"
-#include "machine/c1571.h"
-#include "machine/c1581.h"
-#include "machine/c64_nl10.h"
-#include "machine/cmdhd.h"
-#include "machine/diag264_lb_iec.h"
-#include "machine/fd2000.h"
-#include "machine/interpod.h"
-#include "machine/serialbox.h"
+#include "c1541.h"
+#include "c1571.h"
+#include "c1581.h"
+#include "c64_nl10.h"
+#include "cmdhd.h"
+#include "diag264_lb_iec.h"
+#include "fd2000.h"
+#include "interpod.h"
+#include "serialbox.h"
 
 SLOT_INTERFACE_EXTERN( cbm_iec_devices );
 

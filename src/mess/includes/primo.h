@@ -8,7 +8,7 @@
 #define PRIMO_H_
 
 #include "imagedev/snapquik.h"
-#include "machine/cbmiec.h"
+#include "bus/cbmiec/cbmiec.h"
 #include "sound/speaker.h"
 #include "imagedev/cassette.h"
 

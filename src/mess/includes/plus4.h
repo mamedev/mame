@@ -8,7 +8,7 @@
 #include "emu.h"
 #include "cpu/m6502/m7501.h"
 #include "machine/cbm_snqk.h"
-#include "machine/cbmiec.h"
+#include "bus/cbmiec/cbmiec.h"
 #include "machine/mos6529.h"
 #include "machine/mos6551.h"
 #include "machine/mos8706.h"

@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-    Star NL-10 Printer Interface Cartridge emulation
+    Serial Box 64K Serial Port Buffer emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -11,11 +11,20 @@
 
 #pragma once
 
-#ifndef __C64_NL10_INTERFACE__
-#define __C64_NL10_INTERFACE__
+#ifndef __SERIAL_BOX__
+#define __SERIAL_BOX__
 
 #include "emu.h"
-#include "machine/cbmiec.h"
+#include "cpu/m6502/m65c02.h"
+#include "bus/cbmiec/cbmiec.h"
+
+
+
+//**************************************************************************
+//  MACROS / CONSTANTS
+//**************************************************************************
+
+#define SERIAL_BOX_TAG          "serialbox"
 
 
 
@@ -23,17 +32,18 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> c64_nl10_interface_device
+// ======================> serial_box_device
 
-class c64_nl10_interface_device :  public device_t,
-									public device_cbm_iec_interface
+class serial_box_device :  public device_t,
+							public device_cbm_iec_interface
 {
 public:
 	// construction/destruction
-	c64_nl10_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	serial_box_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
+	virtual machine_config_constructor device_mconfig_additions() const;
 
 protected:
 	// device-level overrides
@@ -44,11 +54,14 @@ protected:
 	void cbm_iec_atn(int state);
 	void cbm_iec_data(int state);
 	void cbm_iec_reset(int state);
+
+private:
+	required_device<m65c02_device> m_maincpu;
 };
 
 
 // device type definition
-extern const device_type C64_NL10_INTERFACE;
+extern const device_type SERIAL_BOX;
 
 
 

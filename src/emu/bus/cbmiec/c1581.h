@@ -15,9 +15,9 @@
 #define __C1581__
 
 #include "emu.h"
+#include "cbmiec.h"
 #include "cpu/m6502/m6502.h"
 #include "formats/d81_dsk.h"
-#include "machine/cbmiec.h"
 #include "machine/mos6526.h"
 #include "machine/wd_fdc.h"
 

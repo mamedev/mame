@@ -15,6 +15,7 @@
 #define __C1541__
 
 #include "emu.h"
+#include "cbmiec.h"
 #include "cpu/m6502/m6502.h"
 #include "imagedev/flopdrv.h"
 #include "formats/d64_dsk.h"
@@ -23,7 +24,6 @@
 #include "machine/6522via.h"
 #include "machine/6821pia.h"
 #include "machine/c64/bn1541.h"
-#include "machine/cbmiec.h"
 #include "machine/ctronics.h"
 
 
@@ -271,11 +271,6 @@ extern const device_type CSD1;
 extern const device_type C1541_DOLPHIN_DOS;
 extern const device_type C1541_PROFESSIONAL_DOS_V1;
 extern const device_type C1541_PROLOGIC_DOS_CLASSIC;
-
-
-// floppy interface
-LEGACY_FLOPPY_OPTIONS_EXTERN( c1541 );
-extern const floppy_interface c1541_floppy_interface;
 
 
 

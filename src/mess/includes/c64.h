@@ -10,7 +10,7 @@
 #include "machine/cbm_snqk.h"
 #include "machine/c64/exp.h"
 #include "machine/c64/user.h"
-#include "machine/cbmiec.h"
+#include "bus/cbmiec/cbmiec.h"
 #include "machine/mos6526.h"
 #include "machine/petcass.h"
 #include "machine/pla.h"

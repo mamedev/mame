@@ -15,7 +15,7 @@
 
 /* Components */
 #include "cpu/z80/z80.h"
-#include "machine/cbmiec.h"
+#include "bus/cbmiec/cbmiec.h"
 #include "sound/speaker.h"
 
 /* Devices */

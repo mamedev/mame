@@ -15,10 +15,10 @@
 #define __FD2000__
 
 #include "emu.h"
+#include "cbmiec.h"
 #include "cpu/m6502/m65c02.h"
 #include "formats/d81_dsk.h"
 #include "machine/6522via.h"
-#include "machine/cbmiec.h"
 #include "machine/upd765.h"
 
 

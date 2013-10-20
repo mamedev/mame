@@ -15,12 +15,12 @@
 #define __INTERPOD__
 
 #include "emu.h"
+#include "cbmiec.h"
 #include "bus/ieee488/ieee488.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/6522via.h"
 #include "machine/6532riot.h"
 #include "machine/6850acia.h"
-#include "machine/cbmiec.h"
 
 
 

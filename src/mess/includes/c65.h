@@ -8,7 +8,7 @@
 #define C65_H_
 
 #include "machine/mos6526.h"
-#include "machine/cbmiec.h"
+#include "bus/cbmiec/cbmiec.h"
 #include "imagedev/cartslot.h"
 #include "imagedev/snapquik.h"
 #include "machine/ram.h"

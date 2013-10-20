@@ -16,6 +16,25 @@ BUSOBJ = $(EMUOBJ)/bus
 
 #-------------------------------------------------
 #
+#@src/emu/bus/cbmiec/cbmiec.h,BUSES += CBMIEC
+#-------------------------------------------------
+
+ifneq ($(filter CBMIEC,$(BUSES)),)
+BUSOBJS += $(BUSOBJ)/cbmiec/cbmiec.o
+BUSOBJS += $(BUSOBJ)/cbmiec/c1541.o
+BUSOBJS += $(BUSOBJ)/cbmiec/c1571.o
+BUSOBJS += $(BUSOBJ)/cbmiec/c1581.o
+BUSOBJS += $(BUSOBJ)/cbmiec/c64_nl10.o
+BUSOBJS += $(BUSOBJ)/cbmiec/cmdhd.o
+BUSOBJS += $(BUSOBJ)/cbmiec/diag264_lb_iec.o
+BUSOBJS += $(BUSOBJ)/cbmiec/fd2000.o
+BUSOBJS += $(BUSOBJ)/cbmiec/interpod.o
+BUSOBJS += $(BUSOBJ)/cbmiec/serialbox.o
+endif
+
+
+#-------------------------------------------------
+#
 #@src/emu/bus/ieee488/ieee488.h,BUSES += IEEE488
 #-------------------------------------------------
 

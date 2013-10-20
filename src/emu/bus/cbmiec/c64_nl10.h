@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-    Diag264 Serial Loop Back Connector emulation
+    Star NL-10 Printer Interface Cartridge emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -11,12 +11,11 @@
 
 #pragma once
 
-#ifndef __DIAG264_SERIAL_LOOPBACK__
-#define __DIAG264_SERIAL_LOOPBACK__
-
+#ifndef __C64_NL10_INTERFACE__
+#define __C64_NL10_INTERFACE__
 
 #include "emu.h"
-#include "machine/cbmiec.h"
+#include "cbmiec.h"
 
 
 
@@ -24,26 +23,32 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> diag264_serial_loopback_device
+// ======================> c64_nl10_interface_device
 
-class diag264_serial_loopback_device :  public device_t,
-										public device_cbm_iec_interface
+class c64_nl10_interface_device :  public device_t,
+									public device_cbm_iec_interface
 {
 public:
 	// construction/destruction
-	diag264_serial_loopback_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c64_nl10_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// optional information overrides
+	virtual const rom_entry *device_rom_region() const;
 
 protected:
 	// device-level overrides
 	virtual void device_start();
+	virtual void device_reset();
 
 	// device_cbm_iec_interface overrides
-	virtual void cbm_iec_atn(int state);
+	void cbm_iec_atn(int state);
+	void cbm_iec_data(int state);
+	void cbm_iec_reset(int state);
 };
 
 
 // device type definition
-extern const device_type DIAG264_SERIAL_LOOPBACK;
+extern const device_type C64_NL10_INTERFACE;
 
 
 

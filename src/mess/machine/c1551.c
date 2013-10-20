@@ -369,6 +369,34 @@ static C64H156_INTERFACE( ga_intf )
 
 
 //-------------------------------------------------
+//  LEGACY_FLOPPY_OPTIONS( c1541 )
+//-------------------------------------------------
+
+static LEGACY_FLOPPY_OPTIONS_START( c1541 )
+	LEGACY_FLOPPY_OPTION( c1541, "g64", "Commodore 1541 GCR Disk Image", g64_dsk_identify, g64_dsk_construct, NULL, NULL )
+	LEGACY_FLOPPY_OPTION( c1541, "d64", "Commodore 1541 Disk Image", d64_dsk_identify, d64_dsk_construct, NULL, NULL )
+LEGACY_FLOPPY_OPTIONS_END
+
+
+//-------------------------------------------------
+//  floppy_interface c1551_floppy_interface
+//-------------------------------------------------
+
+static const floppy_interface c1551_floppy_interface =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	FLOPPY_STANDARD_5_25_SSDD,
+	LEGACY_FLOPPY_OPTIONS_NAME(c1541),
+	"floppy_5_25",
+	NULL
+};
+
+
+//-------------------------------------------------
 //  MACHINE_DRIVER( c1551 )
 //-------------------------------------------------
 
@@ -382,7 +410,7 @@ static MACHINE_CONFIG_FRAGMENT( c1551 )
 	MCFG_TPI6525_ADD(M6523_0_TAG, tpi0_intf)
 	MCFG_TPI6525_ADD(M6523_1_TAG, tpi1_intf)
 
-	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, c1541_floppy_interface)
+	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, c1551_floppy_interface)
 	MCFG_64H156_ADD(C64H156_TAG, XTAL_16MHz, ga_intf)
 
 	MCFG_PLUS4_PASSTHRU_EXPANSION_SLOT_ADD()
