@@ -14,78 +14,8 @@
 
 #include "includes/compis.h"
 
-/*-------------------------------------------------------------------------*/
-/* Defines, constants, and global variables                                */
-/*-------------------------------------------------------------------------*/
-
-enum COMPIS_USART_STATES
-{
-	COMPIS_USART_STATUS_TX_READY = 0x01,
-	COMPIS_USART_STATUS_RX_READY = 0x02,
-	COMPIS_USART_STATUS_TX_EMPTY = 0x04
-};
-
-/* Compis interrupt handling */
-enum COMPIS_INTERRUPTS
-{
-	COMPIS_NMI_KEYB     = 0x00, /* Default not used */
-	COMPIS_INT_8251_TXRDY   = 0x01, /* Default not used */
-	COMPIS_INT_8274     = 0x03
-};
-
-enum COMPIS_INTERRUPT_REQUESTS
-{
-	COMPIS_IRQ_SBX0_INT1     = 0x00,
-	COMPIS_IRQ_SBX0_INT0     = 0x01, /* Default not used */
-	COMPIS_IRQ_8251_RXRDY    = 0x02,
-	COMPIS_IRQ_80150_SYSTICK = 0x03, /* Default not used */
-	COMPIS_IRQ_ACK_J7    = 0x04,
-	COMPIS_IRQ_SBX1_INT1     = 0x05, /* Default not used */
-	COMPIS_IRQ_SBX1_INT0     = 0x06, /* Default not used */
-	COMPIS_IRQ_80150_DELAY   = 0x07
-};
-
 /* Main emulation */
 
-/*-------------------------------------------------------------------------*/
-/*  FDC iSBX-218A                                                          */
-/*-------------------------------------------------------------------------*/
-void compis_state::compis_fdc_reset()
-{
-	m_fdc->reset();
-}
-
-void compis_state::compis_fdc_tc(int state)
-{
-	m_fdc->tc_w(state);
-}
-
-void compis_state::fdc_irq(bool state)
-{
-	m_8259m->ir0_w(state);
-}
-
-void compis_state::fdc_drq(bool state)
-{
-	/* DMA request if iSBX-218A has DMA enabled */
-	if (ioport("DSW1")->read() && state)
-	{
-		//compis_dma_drq(state, read);
-	}
-}
-
-WRITE8_MEMBER(compis_state::fdc_mon_w)
-{
-	m_mon = data & 1;
-
-	m_fdc->subdevice<floppy_connector>("0")->get_device()->mon_w(m_mon);
-	m_fdc->subdevice<floppy_connector>("1")->get_device()->mon_w(m_mon);
-}
-
-READ8_MEMBER(compis_state::fdc_mon_r)
-{
-	return m_mon;
-}
 /*-------------------------------------------------------------------------*/
 /* Bit 0: J5-4                                                             */
 /* Bit 1: J5-5                                                     */
@@ -128,15 +58,14 @@ READ8_MEMBER( compis_state::compis_ppi_port_b_r )
 /*-------------------------------------------------------------------------*/
 WRITE8_MEMBER( compis_state::compis_ppi_port_c_w )
 {
-	/* Centronics Strobe */
+	m_isbx0->opt1_w(BIT(data, 4));
+
 	m_centronics->strobe_w(BIT(data, 5));
 
-	/* FDC Reset */
 	if (BIT(data, 6))
-		compis_fdc_reset();
+		m_isbx0->reset();
 
-	/* FDC Terminal count */
-	compis_fdc_tc(BIT(data, 7));
+	m_isbx0->opt0_w(BIT(data, 7));
 }
 
 I8255A_INTERFACE( compis_ppi_interface )
@@ -253,24 +182,17 @@ TIMER_DEVICE_CALLBACK_MEMBER( compis_state::tape_tick )
 
 void compis_state::machine_start()
 {
-	m_fdc->setup_intrq_cb(i8272a_device::line_cb(FUNC(compis_state::fdc_irq), this));
-	m_mon = true;
 }
+
 /*-------------------------------------------------------------------------*/
 /* Name: compis                                                            */
 /* Desc: Machine - Init                                                    */
 /*-------------------------------------------------------------------------*/
 void compis_state::machine_reset()
 {
-	/* FDC */
-	compis_fdc_reset();
-}
-
-/*-------------------------------------------------------------------------*/
-/* Name: compis                                                            */
-/* Desc: Interrupt - Vertical Blanking Interrupt                           */
-/*-------------------------------------------------------------------------*/
-INTERRUPT_GEN_MEMBER(compis_state::compis_vblank_int)
-{
-//  compis_gdc_vblank_int();
+	m_uart->reset();
+	m_mpsc->reset();
+	m_8255->reset();
+	m_isbx0->reset();
+	m_isbx1->reset();
 }

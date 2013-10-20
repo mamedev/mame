@@ -16,7 +16,6 @@
 #include "bus/isbx/isbx.h"
 #include "cpu/i86/i186.h"
 #include "cpu/mcs48/mcs48.h"
-#include "formats/cpis_dsk.h"
 #include "imagedev/cassette.h"
 #include "machine/compiskb.h"
 #include "machine/ctronics.h"
@@ -26,7 +25,6 @@
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/serial.h"
-#include "machine/upd765.h"
 #include "machine/z80dart.h"
 #include "video/upd7220.h"
 
@@ -51,7 +49,6 @@ public:
 		  m_centronics(*this, "centronics"),
 		  m_uart(*this, "uart"),
 		  m_rtc(*this, "mm58274c"),
-		  m_fdc(*this, "i8272a"),
 		  m_crtc(*this, "upd7220"),
 		  m_cassette(*this, CASSETTE_TAG),
 		  m_isbx0(*this, ISBX_0_TAG),
@@ -68,20 +65,28 @@ public:
 	required_device<centronics_device> m_centronics;
 	required_device<i8251_device> m_uart;
 	required_device<mm58274c_device> m_rtc;
-	required_device<i8272a_device> m_fdc;
 	required_device<upd7220_device> m_crtc;
 	required_device<cassette_image_device> m_cassette;
 	required_device<isbx_slot_device> m_isbx0;
 	required_device<isbx_slot_device> m_isbx1;
 
+	DECLARE_READ16_MEMBER( isbx0_tdma_r );
+	DECLARE_WRITE16_MEMBER( isbx0_tdma_w );
+	DECLARE_READ16_MEMBER( isbx1_tdma_r );
+	DECLARE_WRITE16_MEMBER( isbx1_tdma_w );
+	DECLARE_READ16_MEMBER( isbx0_cs_r );
+	DECLARE_WRITE16_MEMBER( isbx0_cs_w );
+	DECLARE_READ16_MEMBER( isbx0_dack_r );
+	DECLARE_WRITE16_MEMBER( isbx0_dack_w );
+	DECLARE_READ16_MEMBER( isbx1_cs_r );
+	DECLARE_WRITE16_MEMBER( isbx1_cs_w );
+	DECLARE_READ16_MEMBER( isbx1_dack_r );
+	DECLARE_WRITE16_MEMBER( isbx1_dack_w );
+
 	DECLARE_WRITE8_MEMBER(vram_w);
 	DECLARE_READ8_MEMBER(compis_ppi_port_b_r);
 	DECLARE_WRITE8_MEMBER(compis_ppi_port_c_w);
 	UINT8 *m_p_videoram;
-	void compis_fdc_tc(int state);
-	DECLARE_READ8_MEMBER(fdc_mon_r);
-	DECLARE_WRITE8_MEMBER(fdc_mon_w);
-	bool m_mon;
 	DECLARE_WRITE_LINE_MEMBER(tmr0_w);
 	DECLARE_WRITE_LINE_MEMBER(tmr2_w);
 	DECLARE_WRITE_LINE_MEMBER(tmr3_w);
@@ -97,9 +102,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(compis_vblank_int);
 	DECLARE_READ8_MEMBER(compis_irq_callback);
-	void compis_fdc_reset();
 
 	int m_tmr0;
 };

@@ -614,6 +614,8 @@ class i8274_device :  public z80dart_device
 public:
 	// construction/destruction
 	i8274_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	DECLARE_READ8_MEMBER( inta_r ) { return m1_r(); };
 };
 
 

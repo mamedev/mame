@@ -70,6 +70,162 @@ static UPD7220_INTERFACE( hgdc_intf )
 	DEVCB_NULL
 };
 
+READ16_MEMBER( compis_state::isbx0_tdma_r )
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		return m_mpsc->cd_ba_r(space, offset & 0x03);
+	}
+	else
+	{
+		m_isbx0->tdma_w(0);
+		m_isbx0->tdma_w(1);
+
+		return 0xff;
+	}
+}
+
+WRITE16_MEMBER( compis_state::isbx0_tdma_w )
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		m_mpsc->cd_ba_w(space, offset & 0x03, data);
+	}
+	else
+	{
+		m_isbx0->tdma_w(0);
+		m_isbx0->tdma_w(1);
+	}
+}
+
+READ16_MEMBER( compis_state::isbx1_tdma_r )
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		if (offset < 2) 
+			return m_crtc->read(space, offset & 0x01);
+		else
+			return 0;
+	}
+	else
+	{
+		m_isbx1->tdma_w(0);
+		m_isbx1->tdma_w(1);
+
+		return 0xff;
+	}
+}
+
+WRITE16_MEMBER( compis_state::isbx1_tdma_w )
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		if (offset < 2) m_crtc->write(space, offset & 0x01, data);
+	}
+	else
+	{
+		m_isbx1->tdma_w(0);
+		m_isbx1->tdma_w(1);
+	}
+}
+
+READ16_MEMBER( compis_state::isbx0_cs_r )
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		return m_isbx0->mcs0_r(space, offset);
+	}
+	else
+	{
+		return m_isbx0->mcs1_r(space, offset) << 8;
+	}
+}
+
+WRITE16_MEMBER( compis_state::isbx0_cs_w )
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		m_isbx0->mcs0_w(space, offset, data);
+	}
+	else
+	{
+		m_isbx0->mcs1_w(space, offset, data >> 8);
+	}
+}
+
+READ16_MEMBER( compis_state::isbx0_dack_r )
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		return m_isbx0->mcs1_r(space, offset);
+	}
+	else
+	{
+		return m_isbx0->mdack_r(space, offset) << 8;
+	}
+}
+
+WRITE16_MEMBER( compis_state::isbx0_dack_w )
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		m_isbx0->mcs1_w(space, offset, data);
+	}
+	else
+	{
+		m_isbx0->mdack_w(space, offset, data >> 8);
+	}
+}
+
+READ16_MEMBER( compis_state::isbx1_cs_r )
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		return m_isbx1->mcs0_r(space, offset);
+	}
+	else
+	{
+		return m_isbx1->mcs1_r(space, offset) << 8;
+	}
+}
+
+WRITE16_MEMBER( compis_state::isbx1_cs_w )
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		m_isbx1->mcs0_w(space, offset, data);
+	}
+	else
+	{
+		m_isbx1->mcs1_w(space, offset, data >> 8);
+	}
+}
+
+READ16_MEMBER( compis_state::isbx1_dack_r )
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		return m_isbx1->mcs1_r(space, offset);
+	}
+	else
+	{
+		return m_isbx1->mdack_r(space, offset) << 8;
+	}
+}
+
+WRITE16_MEMBER( compis_state::isbx1_dack_w )
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		m_isbx1->mcs1_w(space, offset, data);
+	}
+	else
+	{
+		m_isbx1->mdack_w(space, offset, data >> 8);
+	}
+}
+
+
 /* TODO: why it writes to ROM region? */
 WRITE8_MEMBER( compis_state::vram_w )
 {
@@ -77,6 +233,7 @@ WRITE8_MEMBER( compis_state::vram_w )
 }
 
 static ADDRESS_MAP_START( compis_mem , AS_PROGRAM, 16, compis_state )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM
 	AM_RANGE(0x40000, 0x4ffff) AM_RAM
 	AM_RANGE(0x50000, 0x5ffff) AM_RAM
@@ -87,6 +244,7 @@ static ADDRESS_MAP_START( compis_mem , AS_PROGRAM, 16, compis_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( compis_io, AS_IO, 16, compis_state )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0007) /* PCS0 */ AM_MIRROR(0x78) AM_DEVREADWRITE8("ppi8255", i8255_device, read, write, 0xff00)
 	AM_RANGE(0x0080, 0x0087) /* PCS1 */ AM_MIRROR(0x78) AM_DEVREADWRITE8("pit8253", pit8253_device, read, write, 0x00ff)
 	AM_RANGE(0x0100, 0x011f) /* PCS2 */ AM_MIRROR(0x60) AM_DEVREADWRITE8("mm58274c", mm58274c_device, read, write, 0x00ff)
@@ -94,24 +252,31 @@ static ADDRESS_MAP_START( compis_io, AS_IO, 16, compis_state )
   //AM_RANGE(0x0200, 0x0201) /* PCS4 */ AM_MIRROR(0x7e)
 	AM_RANGE(0x0280, 0x0283) /* PCS5 */ AM_MIRROR(0x70) AM_DEVREADWRITE8("pic8259_master", pic8259_device, read, write, 0x00ff) /* 80150/80130 */
 	AM_RANGE(0x0288, 0x028f) /* PCS5 */ AM_MIRROR(0x70) AM_DEVREADWRITE8("pit8254", pit8254_device, read, write, 0x00ff) /* 80150/80130 */
-    AM_RANGE(0x0300, 0x0301) /* PCS6:0 */ AM_MIRROR(0xe) AM_WRITE8(tape_mon_w, 0x00ff)
-  //AM_RANGE(0x0300, 0x0301) /* PCS6:1 0xff00 */ AM_MIRROR(0xe) // DMA-ACK graphics
-  //AM_RANGE(0x0310, 0x0311) /* PCS6:2 0x00ff */ AM_MIRROR(0xe) // 8274 INTERRUPT ACKNOWLEDGE
+	AM_RANGE(0x0300, 0x0301) /* PCS6:0 */ AM_MIRROR(0xe) AM_WRITE8(tape_mon_w, 0x00ff)
 	AM_RANGE(0x0310, 0x0311) /* PCS6:3 */ AM_MIRROR(0xc) AM_DEVREADWRITE8("uart", i8251_device, data_r, data_w, 0xff00)
 	AM_RANGE(0x0312, 0x0313) /* PCS6:3 */ AM_MIRROR(0xc) AM_DEVREADWRITE8("uart", i8251_device, status_r, control_w, 0xff00)
-  	AM_RANGE(0x0320, 0x0323) /* PCS6:4 */ AM_MIRROR(0xc) AM_DEVREADWRITE8(I8274_TAG, z80dart_device, cd_ba_r, cd_ba_w, 0x00ff)
-  //AM_RANGE(0x0320, 0x0321) /* PCS6:5 0xff00 */ AM_MIRROR(0xe) // DMA-TERMINATE J8 (iSBX0)
+	AM_RANGE(0x0320, 0x032f) AM_READWRITE(isbx0_tdma_r, isbx0_tdma_w)
+	AM_RANGE(0x0330, 0x033f) AM_READWRITE(isbx1_tdma_r, isbx1_tdma_w)
+	AM_RANGE(0x0340, 0x034f) AM_READWRITE(isbx0_cs_r, isbx0_cs_w)
+	AM_RANGE(0x0350, 0x035f) AM_READWRITE(isbx0_dack_r, isbx0_dack_w)
+	AM_RANGE(0x0360, 0x036f) AM_READWRITE(isbx1_cs_r, isbx1_cs_w)
+	AM_RANGE(0x0370, 0x037f) AM_READWRITE(isbx1_dack_r, isbx1_dack_w)
+#ifdef NOT_SUPPORTED_BY_MAME_CORE
+	AM_RANGE(0x0300, 0x0301) /* PCS6:1 */ AM_MIRROR(0xe) AM_DEVREADWRITE8("upd7220", upd7220_device, dack_r, dack_w, 0xff00) // DMA-ACK graphics
+	AM_RANGE(0x0310, 0x0311) /* PCS6:2 */ AM_MIRROR(0xe) AM_DEVREAD8(I8274_TAG, i8274_device, inta_r, 0x00ff) // 8274 INTERRUPT ACKNOWLEDGE
+	AM_RANGE(0x0320, 0x0323) /* PCS6:4 */ AM_MIRROR(0xc) AM_DEVREADWRITE8(I8274_TAG, i8274_device, cd_ba_r, cd_ba_w, 0x00ff)
+	AM_RANGE(0x0320, 0x0321) /* PCS6:5 */ AM_MIRROR(0xe) AM_READWRITE8(isbx0_tdma_r, isbx0_tdma_w, 0xff00) // DMA-TERMINATE J8 (iSBX0)
 	AM_RANGE(0x0330, 0x0333) /* PCS6:6 */ AM_DEVREADWRITE8("upd7220", upd7220_device, read, write, 0x00ff)
-  //AM_RANGE(0x0330, 0x0331) /* PCS6:7 0xff00 */ AM_MIRROR(0xe) // DMA-TERMINATE J9 (iSBX1)
-	AM_RANGE(0x0340, 0x0343) /* PCS6:8 */ AM_DEVICE8("i8272a", i8272a_device, map, 0x00ff) // 8272 CS0 (8/16-bit) J8 (iSBX0)
-	AM_RANGE(0x034e, 0x034f) /* PCS6:8 */ AM_READWRITE8(fdc_mon_r, fdc_mon_w, 0x00ff) // 8272 CS0 (8/16-bit) J8 (iSBX0)
-  //AM_RANGE(0x0340, 0x0341) /* PCS6:9 0xff00 */ AM_MIRROR(0xe) // CS1 (16-bit) J8 (iSBX0)
-  //AM_RANGE(0x0350, 0x0351) /* PCS6:10 0x00ff */ AM_MIRROR(0xe) // CS1 (8-bit) J8 (iSBX0)
-	AM_RANGE(0x0350, 0x0351) /* PCS6:11 */ AM_MIRROR(0xe) AM_DEVREADWRITE8("i8272a", i8272a_device, mdma_r, mdma_w, 0xff00) // DMA-ACK J8 (iSBX0)
-  //AM_RANGE(0x0360, 0x0361) /* PCS6:13 0x00ff */ AM_MIRROR(0xe) // CS0 (8/16-bit) J9 (iSBX1)
-  //AM_RANGE(0x0360, 0x0361) /* PCS6:13 0xff00 */ AM_MIRROR(0xe) // CS1 (16-bit) J9 (iSBX1)
-  //AM_RANGE(0x0370, 0x0371) /* PCS6:14 0x00ff */ AM_MIRROR(0xe) // CS1 (8-bit) J9 (iSBX1)
-  //AM_RANGE(0x0370, 0x0371) /* PCS6:15 0xff00 */ AM_MIRROR(0xe) // DMA-ACK J9 (iSBX1)
+	AM_RANGE(0x0330, 0x0331) /* PCS6:7 */ AM_MIRROR(0xe) AM_READWRITE8(isbx1_tdma_r, isbx1_tdma_w, 0xff00) // DMA-TERMINATE J9 (iSBX1)
+	AM_RANGE(0x0340, 0x034f) /* PCS6:8 */ AM_DEVREADWRITE8(ISBX_0_TAG, isbx_slot_device, mcs0_r, mcs0_w, 0x00ff) // 8272 CS0 (8/16-bit) J8 (iSBX0)
+  	AM_RANGE(0x0340, 0x034f) /* PCS6:9 */ AM_DEVREADWRITE8(ISBX_0_TAG, isbx_slot_device, mcs1_r, mcs1_w, 0xff00) // CS1 (16-bit) J8 (iSBX0)
+	AM_RANGE(0x0350, 0x035f) /* PCS6:10 */ AM_DEVREADWRITE8(ISBX_0_TAG, isbx_slot_device, mcs1_r, mcs1_w, 0x00ff) // CS1 (8-bit) J8 (iSBX0)
+	AM_RANGE(0x0350, 0x035f) /* PCS6:11 */ AM_DEVREADWRITE8(ISBX_0_TAG, isbx_slot_device, mdack_r, mdack_w, 0xff00) // DMA-ACK J8 (iSBX0)
+	AM_RANGE(0x0360, 0x036f) /* PCS6:13 */ AM_DEVREADWRITE8(ISBX_1_TAG, isbx_slot_device, mcs0_r, mcs0_w, 0x00ff) // CS0 (8/16-bit) J9 (iSBX1)
+	AM_RANGE(0x0360, 0x036f) /* PCS6:13 */ AM_DEVREADWRITE8(ISBX_1_TAG, isbx_slot_device, mcs1_r, mcs1_w, 0xff00) // CS1 (16-bit) J9 (iSBX1)
+	AM_RANGE(0x0370, 0x037f) /* PCS6:14 */ AM_DEVREADWRITE8(ISBX_1_TAG, isbx_slot_device, mcs1_r, mcs1_w, 0x00ff) // CS1 (8-bit) J9 (iSBX1)
+	AM_RANGE(0x0370, 0x037f) /* PCS6:15 */ AM_DEVREADWRITE8(ISBX_1_TAG, isbx_slot_device, mdack_r, mdack_w, 0xff00) // DMA-ACK J9 (iSBX1)
+#endif
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START (compis)
@@ -203,21 +368,6 @@ static const rs232_port_interface rs232b_intf =
 	DEVCB_DEVICE_LINE_MEMBER(I8274_TAG, z80dart_device, ctsb_w)
 };
 
-const floppy_format_type compis_floppy_formats[] = {
-	FLOPPY_D88_FORMAT,
-	FLOPPY_DFI_FORMAT,
-	FLOPPY_IMD_FORMAT,
-	FLOPPY_IPF_FORMAT,
-	FLOPPY_MFI_FORMAT,
-	FLOPPY_MFM_FORMAT,
-	FLOPPY_TD0_FORMAT,
-	FLOPPY_CPIS_FORMAT,
-	NULL
-};
-static SLOT_INTERFACE_START( compis_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
-
 static ADDRESS_MAP_START( upd7220_map, AS_0, 8, compis_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3ffff)
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM AM_SHARE("video_ram")
@@ -228,7 +378,6 @@ static MACHINE_CONFIG_START( compis, compis_state )
 	MCFG_CPU_ADD("maincpu", I80186, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(compis_mem)
 	MCFG_CPU_IO_MAP(compis_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", compis_state,  compis_vblank_int)
 	MCFG_80186_IRQ_SLAVE_ACK(DEVREAD8(DEVICE_SELF, compis_state, compis_irq_callback))
 	MCFG_80186_TMROUT0_HANDLER(DEVWRITELINE(DEVICE_SELF, compis_state, tmr0_w))
 
@@ -250,15 +399,12 @@ static MACHINE_CONFIG_START( compis, compis_state )
 	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
 	MCFG_I8251_ADD("uart", compis_usart_interface)
 	MCFG_MM58274C_ADD("mm58274c", compis_mm58274c_interface)
-	MCFG_I8272A_ADD("i8272a", true)
-	MCFG_FLOPPY_DRIVE_ADD("i8272a:0", compis_floppies, "525qd", compis_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("i8272a:1", compis_floppies, "525qd", compis_floppy_formats)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, compis_cassette_interface)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("tape", compis_state, tape_tick, attotime::from_hz(44100))
 	MCFG_I8274_ADD(I8274_TAG, XTAL_16MHz/4, mpsc_intf)
 	MCFG_RS232_PORT_ADD(RS232_A_TAG, rs232a_intf, default_rs232_devices, NULL)
 	MCFG_RS232_PORT_ADD(RS232_B_TAG, rs232b_intf, default_rs232_devices, NULL)
-	MCFG_ISBX_SLOT_ADD(ISBX_0_TAG, 0, isbx_cards, NULL)
+	MCFG_ISBX_SLOT_ADD(ISBX_0_TAG, 0, isbx_cards, "fdc")
 	MCFG_ISBX_SLOT_MINTR0_CALLBACK(DEVWRITELINE("pic8259_master", pic8259_device, ir1_w))
 	MCFG_ISBX_SLOT_MINTR1_CALLBACK(DEVWRITELINE("pic8259_master", pic8259_device, ir0_w))
 	MCFG_ISBX_SLOT_MDRQT_CALLBACK(DEVWRITELINE("maincpu", i80186_cpu_device, drq0_w))
@@ -277,7 +423,6 @@ static MACHINE_CONFIG_START( compis2, compis_state )
 	MCFG_CPU_ADD("maincpu", I80186, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(compis_mem)
 	MCFG_CPU_IO_MAP(compis_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", compis_state,  compis_vblank_int)
 	MCFG_80186_IRQ_SLAVE_ACK(DEVREAD8(DEVICE_SELF, compis_state, compis_irq_callback))
 	MCFG_80186_TMROUT0_HANDLER(DEVWRITELINE(DEVICE_SELF, compis_state, tmr0_w))
 
@@ -299,15 +444,12 @@ static MACHINE_CONFIG_START( compis2, compis_state )
 	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
 	MCFG_I8251_ADD("uart", compis_usart_interface)
 	MCFG_MM58274C_ADD("mm58274c", compis_mm58274c_interface)
-	MCFG_I8272A_ADD("i8272a", true)
-	MCFG_FLOPPY_DRIVE_ADD("i8272a:0", compis_floppies, "525qd", compis_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("i8272a:1", compis_floppies, "525qd", compis_floppy_formats)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, compis_cassette_interface)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("tape", compis_state, tape_tick, attotime::from_hz(44100))
 	MCFG_I8274_ADD(I8274_TAG, XTAL_16MHz/4, mpsc_intf)
 	MCFG_RS232_PORT_ADD(RS232_A_TAG, rs232a_intf, default_rs232_devices, NULL)
 	MCFG_RS232_PORT_ADD(RS232_B_TAG, rs232b_intf, default_rs232_devices, NULL)
-	MCFG_ISBX_SLOT_ADD(ISBX_0_TAG, 0, isbx_cards, NULL)
+	MCFG_ISBX_SLOT_ADD(ISBX_0_TAG, 0, isbx_cards, "fdc")
 	MCFG_ISBX_SLOT_MINTR0_CALLBACK(DEVWRITELINE("pic8259_master", pic8259_device, ir1_w))
 	MCFG_ISBX_SLOT_MINTR1_CALLBACK(DEVWRITELINE("pic8259_master", pic8259_device, ir0_w))
 	MCFG_ISBX_SLOT_MDRQT_CALLBACK(DEVWRITELINE("maincpu", i80186_cpu_device, drq0_w))
