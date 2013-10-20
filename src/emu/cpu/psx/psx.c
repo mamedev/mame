@@ -190,14 +190,14 @@ static const UINT32 mtc0_writemask[]=
 
 READ32_MEMBER( psxcpu_device::berr_r )
 {
-	if (!space.debugger_access())
+	if( !space.debugger_access() )
 		m_berr = 1;
 	return 0;
 }
 
 WRITE32_MEMBER( psxcpu_device::berr_w )
 {
-	if (!space.debugger_access())
+	if( !space.debugger_access() )
 		m_berr = 1;
 }
 
@@ -1321,12 +1321,12 @@ void psxcpu_device::update_scratchpad()
 {
 	if( ( m_biu & BIU_RAM ) == 0 )
 	{
-		m_program->install_readwrite_handler( 0x1f800000, 0x1f8003ff, read32_delegate( FUNC(psxcpu_device::berr_r), this ), write32_delegate( FUNC(psxcpu_device::berr_w), this ) );
+		m_program->install_readwrite_handler( 0x1f800000, 0x1f8003ff, read32_delegate( FUNC( psxcpu_device::berr_r ), this ), write32_delegate( FUNC( psxcpu_device::berr_w ), this ) );
 	}
 	else if( ( m_biu & BIU_DS ) == 0 )
 	{
-		m_program->install_read_handler( 0x1f800000, 0x1f8003ff, read32_delegate( FUNC(psxcpu_device::berr_r), this ) );
-		m_program->nop_write( 0x1f800000, 0x1f8003ff);
+		m_program->install_read_handler( 0x1f800000, 0x1f8003ff, read32_delegate( FUNC( psxcpu_device::berr_r ), this ) );
+		m_program->nop_write( 0x1f800000, 0x1f8003ff );
 	}
 	else
 	{
@@ -1380,9 +1380,9 @@ void psxcpu_device::update_ram_config()
 		}
 	}
 
-	m_program->install_readwrite_handler( 0x00000000 + window_size, 0x1effffff, read32_delegate( FUNC(psxcpu_device::berr_r), this ), write32_delegate( FUNC(psxcpu_device::berr_w), this ) );
-	m_program->install_readwrite_handler( 0x80000000 + window_size, 0x9effffff, read32_delegate( FUNC(psxcpu_device::berr_r), this ), write32_delegate( FUNC(psxcpu_device::berr_w), this ) );
-	m_program->install_readwrite_handler( 0xa0000000 + window_size, 0xbeffffff, read32_delegate( FUNC(psxcpu_device::berr_r), this ), write32_delegate( FUNC(psxcpu_device::berr_w), this ) );
+	m_program->install_readwrite_handler( 0x00000000 + window_size, 0x1effffff, read32_delegate( FUNC( psxcpu_device::berr_r ), this ), write32_delegate( FUNC( psxcpu_device::berr_w ), this ) );
+	m_program->install_readwrite_handler( 0x80000000 + window_size, 0x9effffff, read32_delegate( FUNC( psxcpu_device::berr_r ), this ), write32_delegate( FUNC( psxcpu_device::berr_w ), this ) );
+	m_program->install_readwrite_handler( 0xa0000000 + window_size, 0xbeffffff, read32_delegate( FUNC( psxcpu_device::berr_r ), this ), write32_delegate( FUNC( psxcpu_device::berr_w ), this ) );
 }
 
 void psxcpu_device::update_rom_config()
@@ -1417,9 +1417,9 @@ void psxcpu_device::update_rom_config()
 
 	if( window_size < max_window_size )
 	{
-		m_program->install_readwrite_handler( 0x1fc00000 + window_size, 0x1fffffff, read32_delegate( FUNC(psxcpu_device::berr_r), this ), write32_delegate( FUNC(psxcpu_device::berr_w), this ) );
-		m_program->install_readwrite_handler( 0x9fc00000 + window_size, 0x9fffffff, read32_delegate( FUNC(psxcpu_device::berr_r), this ), write32_delegate( FUNC(psxcpu_device::berr_w), this ) );
-		m_program->install_readwrite_handler( 0xbfc00000 + window_size, 0xbfffffff, read32_delegate( FUNC(psxcpu_device::berr_r), this ), write32_delegate( FUNC(psxcpu_device::berr_w), this ) );
+		m_program->install_readwrite_handler( 0x1fc00000 + window_size, 0x1fffffff, read32_delegate( FUNC( psxcpu_device::berr_r ), this ), write32_delegate( FUNC( psxcpu_device::berr_w ), this ) );
+		m_program->install_readwrite_handler( 0x9fc00000 + window_size, 0x9fffffff, read32_delegate( FUNC( psxcpu_device::berr_r ), this ), write32_delegate( FUNC( psxcpu_device::berr_w ), this ) );
+		m_program->install_readwrite_handler( 0xbfc00000 + window_size, 0xbfffffff, read32_delegate( FUNC( psxcpu_device::berr_r ), this ), write32_delegate( FUNC( psxcpu_device::berr_w ), this ) );
 	}
 }
 
@@ -1702,36 +1702,36 @@ int psxcpu_device::store_data_address_breakpoint( UINT32 address )
 
 // On-board RAM and peripherals
 static ADDRESS_MAP_START( psxcpu_internal_map, AS_PROGRAM, 32, psxcpu_device )
-	AM_RANGE(0x1f800000, 0x1f8003ff) AM_NOP /* scratchpad */
-	AM_RANGE(0x1f800400, 0x1f800fff) AM_READWRITE( berr_r, berr_w )
-	AM_RANGE(0x1f801000, 0x1f801003) AM_READWRITE( exp_base_r, exp_base_w )
-	AM_RANGE(0x1f801004, 0x1f801007) AM_RAM
-	AM_RANGE(0x1f801008, 0x1f80100b) AM_READWRITE( exp_config_r, exp_config_w )
-	AM_RANGE(0x1f80100c, 0x1f80100f) AM_RAM
-	AM_RANGE(0x1f801010, 0x1f801013) AM_READWRITE( rom_config_r, rom_config_w )
-	AM_RANGE(0x1f801014, 0x1f80101f) AM_RAM
+	AM_RANGE( 0x1f800000, 0x1f8003ff ) AM_NOP /* scratchpad */
+	AM_RANGE( 0x1f800400, 0x1f800fff ) AM_READWRITE( berr_r, berr_w )
+	AM_RANGE( 0x1f801000, 0x1f801003 ) AM_READWRITE( exp_base_r, exp_base_w )
+	AM_RANGE( 0x1f801004, 0x1f801007 ) AM_RAM
+	AM_RANGE( 0x1f801008, 0x1f80100b ) AM_READWRITE( exp_config_r, exp_config_w )
+	AM_RANGE( 0x1f80100c, 0x1f80100f ) AM_RAM
+	AM_RANGE( 0x1f801010, 0x1f801013 ) AM_READWRITE( rom_config_r, rom_config_w )
+	AM_RANGE( 0x1f801014, 0x1f80101f ) AM_RAM
 	/* 1f801014 spu delay */
 	/* 1f801018 dv delay */
-	AM_RANGE(0x1f801020, 0x1f801023) AM_READWRITE( com_delay_r, com_delay_w )
-	AM_RANGE(0x1f801024, 0x1f80102f) AM_RAM
-	AM_RANGE(0x1f801040, 0x1f80104f) AM_DEVREADWRITE( "sio0", psxsio_device, read, write )
-	AM_RANGE(0x1f801050, 0x1f80105f) AM_DEVREADWRITE( "sio1", psxsio_device, read, write )
-	AM_RANGE(0x1f801060, 0x1f801063) AM_READWRITE( ram_config_r, ram_config_w )
-	AM_RANGE(0x1f801064, 0x1f80106f) AM_RAM
-	AM_RANGE(0x1f801070, 0x1f801077) AM_DEVREADWRITE( "irq", psxirq_device, read, write )
-	AM_RANGE(0x1f801080, 0x1f8010ff) AM_DEVREADWRITE( "dma", psxdma_device, read, write )
-	AM_RANGE(0x1f801100, 0x1f80112f) AM_DEVREADWRITE( "rcnt", psxrcnt_device, read, write )
-	AM_RANGE(0x1f801800, 0x1f801803) AM_READWRITE8( cd_r, cd_w, 0xffffffff )
-	AM_RANGE(0x1f801810, 0x1f801817) AM_READWRITE( gpu_r, gpu_w )
-	AM_RANGE(0x1f801820, 0x1f801827) AM_DEVREADWRITE( "mdec", psxmdec_device, read, write )
-	AM_RANGE(0x1f801c00, 0x1f801dff) AM_READWRITE16( spu_r, spu_w, 0xffffffff )
-	AM_RANGE(0x1f802020, 0x1f802033) AM_RAM /* ?? */
+	AM_RANGE( 0x1f801020, 0x1f801023 ) AM_READWRITE( com_delay_r, com_delay_w )
+	AM_RANGE( 0x1f801024, 0x1f80102f ) AM_RAM
+	AM_RANGE( 0x1f801040, 0x1f80104f ) AM_DEVREADWRITE( "sio0", psxsio_device, read, write )
+	AM_RANGE( 0x1f801050, 0x1f80105f ) AM_DEVREADWRITE( "sio1", psxsio_device, read, write )
+	AM_RANGE( 0x1f801060, 0x1f801063 ) AM_READWRITE( ram_config_r, ram_config_w )
+	AM_RANGE( 0x1f801064, 0x1f80106f ) AM_RAM
+	AM_RANGE( 0x1f801070, 0x1f801077 ) AM_DEVREADWRITE( "irq", psxirq_device, read, write )
+	AM_RANGE( 0x1f801080, 0x1f8010ff ) AM_DEVREADWRITE( "dma", psxdma_device, read, write )
+	AM_RANGE( 0x1f801100, 0x1f80112f ) AM_DEVREADWRITE( "rcnt", psxrcnt_device, read, write )
+	AM_RANGE( 0x1f801800, 0x1f801803 ) AM_READWRITE8( cd_r, cd_w, 0xffffffff )
+	AM_RANGE( 0x1f801810, 0x1f801817 ) AM_READWRITE( gpu_r, gpu_w )
+	AM_RANGE( 0x1f801820, 0x1f801827 ) AM_DEVREADWRITE( "mdec", psxmdec_device, read, write )
+	AM_RANGE( 0x1f801c00, 0x1f801dff ) AM_READWRITE16( spu_r, spu_w, 0xffffffff )
+	AM_RANGE( 0x1f802020, 0x1f802033 ) AM_RAM /* ?? */
 	/* 1f802030 int 2000 */
 	/* 1f802040 dip switches */
-	AM_RANGE(0x1f802040, 0x1f802043) AM_WRITENOP
-	AM_RANGE(0x20000000, 0x7fffffff) AM_READWRITE( berr_r, berr_w )
-	AM_RANGE(0xc0000000, 0xfffdffff) AM_READWRITE( berr_r, berr_w )
-	AM_RANGE(0xfffe0130, 0xfffe0133) AM_READWRITE( biu_r, biu_w )
+	AM_RANGE( 0x1f802040, 0x1f802043 ) AM_WRITENOP
+	AM_RANGE( 0x20000000, 0x7fffffff ) AM_READWRITE( berr_r, berr_w )
+	AM_RANGE( 0xc0000000, 0xfffdffff ) AM_READWRITE( berr_r, berr_w )
+	AM_RANGE( 0xfffe0130, 0xfffe0133 ) AM_READWRITE( biu_r, biu_w )
 ADDRESS_MAP_END
 
 
@@ -1743,46 +1743,46 @@ ADDRESS_MAP_END
 //  psxcpu_device - constructor
 //-------------------------------------------------
 
-psxcpu_device::psxcpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
-	cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
-	m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0, ADDRESS_MAP_NAME(psxcpu_internal_map)),
-	m_gpu_read_handler(*this),
-	m_gpu_write_handler(*this),
-	m_spu_read_handler(*this),
-	m_spu_write_handler(*this),
-	m_cd_read_handler(*this),
-	m_cd_write_handler(*this),
-	m_ram(*this, "ram")
+psxcpu_device::psxcpu_device( const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source ) :
+	cpu_device( mconfig, type, name, tag, owner, clock, shortname, source ),
+	m_program_config( "program", ENDIANNESS_LITTLE, 32, 32, 0, ADDRESS_MAP_NAME( psxcpu_internal_map ) ),
+	m_gpu_read_handler( *this ),
+	m_gpu_write_handler( *this ),
+	m_spu_read_handler( *this ),
+	m_spu_write_handler( *this ),
+	m_cd_read_handler( *this ),
+	m_cd_write_handler( *this ),
+	m_ram( *this, "ram" )
 {
 }
 
-cxd8530aq_device::cxd8530aq_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: psxcpu_device(mconfig, CXD8661R, "CXD8530AQ", tag, owner, clock, "cxd8530aq", __FILE__)
+cxd8530aq_device::cxd8530aq_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock )
+	: psxcpu_device( mconfig, CXD8661R, "CXD8530AQ", tag, owner, clock, "cxd8530aq", __FILE__ )
 {
 }
 
-cxd8530bq_device::cxd8530bq_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: psxcpu_device(mconfig, CXD8661R, "CXD8530BQ", tag, owner, clock, "cxd8530bq", __FILE__)
+cxd8530bq_device::cxd8530bq_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock )
+	: psxcpu_device( mconfig, CXD8661R, "CXD8530BQ", tag, owner, clock, "cxd8530bq", __FILE__ )
 {
 }
 
-cxd8530cq_device::cxd8530cq_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: psxcpu_device(mconfig, CXD8661R, "CXD8530CQ", tag, owner, clock, "cxd8530cq", __FILE__)
+cxd8530cq_device::cxd8530cq_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock )
+	: psxcpu_device( mconfig, CXD8661R, "CXD8530CQ", tag, owner, clock, "cxd8530cq", __FILE__ )
 {
 }
 
-cxd8661r_device::cxd8661r_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: psxcpu_device(mconfig, CXD8661R, "CXD8661R", tag, owner, clock, "cxd8661r", __FILE__)
+cxd8661r_device::cxd8661r_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock )
+	: psxcpu_device( mconfig, CXD8661R, "CXD8661R", tag, owner, clock, "cxd8661r", __FILE__ )
 {
 }
 
-cxd8606bq_device::cxd8606bq_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: psxcpu_device(mconfig, CXD8606BQ, "CXD8606BQ", tag, owner, clock, "cxd8606bq", __FILE__)
+cxd8606bq_device::cxd8606bq_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock )
+	: psxcpu_device( mconfig, CXD8606BQ, "CXD8606BQ", tag, owner, clock, "cxd8606bq", __FILE__ )
 {
 }
 
-cxd8606cq_device::cxd8606cq_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: psxcpu_device(mconfig, CXD8606CQ, "CXD8606CQ", tag, owner, clock, "cxd8606cq", __FILE__)
+cxd8606cq_device::cxd8606cq_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock )
+	: psxcpu_device( mconfig, CXD8606CQ, "CXD8606CQ", tag, owner, clock, "cxd8606cq", __FILE__ )
 {
 }
 
@@ -1793,26 +1793,26 @@ cxd8606cq_device::cxd8606cq_device(const machine_config &mconfig, const char *ta
 void psxcpu_device::device_start()
 {
 	// get our address spaces
-	m_program = &space(AS_PROGRAM);
+	m_program = &space( AS_PROGRAM );
 	m_direct = &m_program->direct();
 
-	save_item( NAME(m_op) );
-	save_item( NAME(m_pc) );
-	save_item( NAME(m_delayv) );
-	save_item( NAME(m_delayr) );
-	save_item( NAME(m_hi) );
-	save_item( NAME(m_lo) );
-	save_item( NAME(m_biu) );
-	save_item( NAME(m_r) );
-	save_item( NAME(m_cp0r) );
-	save_item( NAME(m_gte.m_cp2cr) );
-	save_item( NAME(m_gte.m_cp2dr) );
-	save_item( NAME(m_icacheTag) );
-	save_item( NAME(m_icache) );
-	save_item( NAME(m_dcache) );
-	save_item( NAME(m_multiplier_operation) );
-	save_item( NAME(m_multiplier_operand1) );
-	save_item( NAME(m_multiplier_operand2) );
+	save_item( NAME( m_op ) );
+	save_item( NAME( m_pc ) );
+	save_item( NAME( m_delayv ) );
+	save_item( NAME( m_delayr ) );
+	save_item( NAME( m_hi ) );
+	save_item( NAME( m_lo ) );
+	save_item( NAME( m_biu ) );
+	save_item( NAME( m_r ) );
+	save_item( NAME( m_cp0r ) );
+	save_item( NAME( m_gte.m_cp2cr ) );
+	save_item( NAME( m_gte.m_cp2dr ) );
+	save_item( NAME( m_icacheTag ) );
+	save_item( NAME( m_icache ) );
+	save_item( NAME( m_dcache ) );
+	save_item( NAME( m_multiplier_operation ) );
+	save_item( NAME( m_multiplier_operand1 ) );
+	save_item( NAME( m_multiplier_operand2 ) );
 
 	state_add( STATE_GENPC, "GENPC", m_pc ).noshow();
 	state_add( PSXCPU_PC, "pc", m_pc );
@@ -1937,11 +1937,11 @@ void psxcpu_device::device_start()
 	// set our instruction counter
 	m_icountptr = &m_icount;
 
-	m_gpu_read_handler.resolve_safe(0);
+	m_gpu_read_handler.resolve_safe( 0 );
 	m_gpu_write_handler.resolve_safe();
-	m_spu_read_handler.resolve_safe(0);
+	m_spu_read_handler.resolve_safe( 0 );
 	m_spu_write_handler.resolve_safe();
-	m_cd_read_handler.resolve_safe(0);
+	m_cd_read_handler.resolve_safe( 0 );
 	m_cd_write_handler.resolve_safe();
 
 	m_rom = memregion( "rom" );
@@ -1962,7 +1962,7 @@ void psxcpu_device::device_reset()
 
 	/// TODO: get dma to access ram through the memory map?
 	psxdma_device *psxdma = subdevice<psxdma_device>( "dma" );
-	psxdma->m_ram = (UINT32 *) m_ram->pointer();
+	psxdma->m_ram = (UINT32 *)m_ram->pointer();
 	psxdma->m_ramsize = m_ram->size();
 
 	m_delayr = 0;
@@ -2006,12 +2006,12 @@ void psxcpu_device::device_post_load()
 //  after it has been set
 //-------------------------------------------------
 
-void psxcpu_device::state_import(const device_state_entry &entry)
+void psxcpu_device::state_import( const device_state_entry &entry )
 {
-	switch (entry.index())
+	switch( entry.index() )
 	{
-	case PSXCPU_CP0R12:
-	case PSXCPU_CP0R13:
+	case PSXCPU_CP0R12: // SR
+	case PSXCPU_CP0R13: // CAUSE
 		update_cop0( entry.index() - PSXCPU_CP0R0 );
 		break;
 	}
@@ -2023,9 +2023,9 @@ void psxcpu_device::state_import(const device_state_entry &entry)
 //  for the debugger
 //-------------------------------------------------
 
-void psxcpu_device::state_string_export(const device_state_entry &entry, astring &string)
+void psxcpu_device::state_string_export( const device_state_entry &entry, astring &string )
 {
-	switch (entry.index())
+	switch( entry.index() )
 	{
 	case PSXCPU_DELAYR:
 		if( m_delayr <= PSXCPU_DELAYR_NOTPC )
@@ -2046,7 +2046,7 @@ void psxcpu_device::state_string_export(const device_state_entry &entry, astring
 //  helper function
 //-------------------------------------------------
 
-offs_t psxcpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t psxcpu_device::disasm_disassemble( char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options )
 {
 	DasmPSXCPU_state state;
 
@@ -2238,7 +2238,7 @@ void psxcpu_device::bc( int cop, int sr_cu, int condition )
 ***************************************************************************/
 
 
-void psxcpu_device::execute_set_input(int inputnum, int state)
+void psxcpu_device::execute_set_input( int inputnum, int state )
 {
 	UINT32 ip;
 
@@ -2291,7 +2291,7 @@ void psxcpu_device::execute_run()
 {
 	do
 	{
-		if (LOG_BIOSCALL) log_bioscall();
+		if( LOG_BIOSCALL ) log_bioscall();
 		debugger_instruction_hook( this,  m_pc );
 
 		m_op = m_direct->read_decrypted_dword( m_pc );
@@ -2344,7 +2344,7 @@ void psxcpu_device::execute_run()
 					break;
 
 				case FUNCT_SYSCALL:
-					if (LOG_BIOSCALL) log_syscall();
+					if( LOG_BIOSCALL ) log_syscall();
 					exception( EXC_SYS );
 					break;
 
@@ -3380,28 +3380,29 @@ WRITE8_HANDLER( psxcpu_device::cd_w )
 }
 
 static MACHINE_CONFIG_FRAGMENT( psx )
-	MCFG_DEVICE_ADD("irq", PSX_IRQ, 0)
-	MCFG_PSX_IRQ_HANDLER(INPUTLINE(DEVICE_SELF, PSXCPU_IRQ0))
+	MCFG_DEVICE_ADD( "irq", PSX_IRQ, 0 )
+	MCFG_PSX_IRQ_HANDLER( INPUTLINE( DEVICE_SELF, PSXCPU_IRQ0 ) )
 
-	MCFG_DEVICE_ADD("dma", PSX_DMA, 0)
-	MCFG_PSX_DMA_IRQ_HANDLER(DEVWRITELINE("irq", psxirq_device, intin3))
+	MCFG_DEVICE_ADD( "dma", PSX_DMA, 0 )
+	MCFG_PSX_DMA_IRQ_HANDLER( DEVWRITELINE("irq", psxirq_device, intin3 ) )
 
-	MCFG_DEVICE_ADD("mdec", PSX_MDEC, 0)
+	MCFG_DEVICE_ADD( "mdec", PSX_MDEC, 0 )
 	MCFG_PSX_DMA_CHANNEL_WRITE( DEVICE_SELF, 0, psx_dma_write_delegate( FUNC( psxmdec_device::dma_write ), (psxmdec_device *) device ) )
 	MCFG_PSX_DMA_CHANNEL_READ( DEVICE_SELF, 1, psx_dma_read_delegate( FUNC( psxmdec_device::dma_read ), (psxmdec_device *) device ) )
 
-	MCFG_DEVICE_ADD("rcnt", PSX_RCNT, 0)
-	MCFG_PSX_RCNT_IRQ0_HANDLER(DEVWRITELINE("irq", psxirq_device, intin4))
-	MCFG_PSX_RCNT_IRQ1_HANDLER(DEVWRITELINE("irq", psxirq_device, intin5))
-	MCFG_PSX_RCNT_IRQ2_HANDLER(DEVWRITELINE("irq", psxirq_device, intin6))
+	MCFG_DEVICE_ADD( "rcnt", PSX_RCNT, 0 )
+	MCFG_PSX_RCNT_IRQ0_HANDLER( DEVWRITELINE( "irq", psxirq_device, intin4 ) )
+	MCFG_PSX_RCNT_IRQ1_HANDLER( DEVWRITELINE( "irq", psxirq_device, intin5 ) )
+	MCFG_PSX_RCNT_IRQ2_HANDLER( DEVWRITELINE( "irq", psxirq_device, intin6 ) )
 
-	MCFG_DEVICE_ADD("sio0", PSX_SIO0, 0)
-	MCFG_PSX_SIO_IRQ_HANDLER(DEVWRITELINE("irq", psxirq_device, intin7))
+	MCFG_DEVICE_ADD( "sio0", PSX_SIO0, 0 )
+	MCFG_PSX_SIO_IRQ_HANDLER( DEVWRITELINE( "irq", psxirq_device, intin7 ) )
 
-	MCFG_DEVICE_ADD("sio1", PSX_SIO1, 0)
-	MCFG_PSX_SIO_IRQ_HANDLER(DEVWRITELINE("irq", psxirq_device, intin8))
+	MCFG_DEVICE_ADD( "sio1", PSX_SIO1, 0 )
+	MCFG_PSX_SIO_IRQ_HANDLER( DEVWRITELINE( "irq", psxirq_device, intin8 ) )
 
-	MCFG_RAM_ADD("ram")
+	MCFG_RAM_ADD( "ram" )
+	MCFG_RAM_DEFAULT_VALUE( 0x00 )
 MACHINE_CONFIG_END
 
 //-------------------------------------------------
