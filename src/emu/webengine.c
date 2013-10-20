@@ -335,6 +335,25 @@ static int begin_request_handler_static(struct mg_connection *conn)
 	return engine->begin_request_handler(conn);
 }
 
+static int begin_http_error_handler_static(struct mg_connection *conn, int status)
+{
+	const struct mg_request_info *request_info = mg_get_request_info(conn);
+	if (status == 404) // 404 -- File Not Found
+	{
+		{
+				mg_printf(conn,
+					"HTTP/1.1 404 Not Found\r\n"
+					"Content-Type: text/plain\r\n"
+					"Content-Length: 14\r\n"        // Always set Content-Length
+					"\r\n"
+					"Nothing to do.");
+		}
+	}
+	// Returning non-zero tells mongoose that our function has replied to
+	// the client, and mongoose should not send client any more data.
+	return 1;
+}
+
 static void *websocket_keepalive_static(void *thread_func_param)
 {
 	web_engine *engine = static_cast<web_engine *>(thread_func_param);
@@ -367,6 +386,7 @@ web_engine::web_engine(emu_options &options)
 	callbacks.begin_request = begin_request_handler_static;
 	callbacks.websocket_ready = websocket_ready_handler_static;
 	callbacks.websocket_data = websocket_data_handler_static;
+	callbacks.http_error = begin_http_error_handler_static;
 
 	// Start the web server.
 	if (m_options.http()) {

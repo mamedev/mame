@@ -31,6 +31,7 @@ public:
 	void websocket_ready_handler(struct mg_connection *conn);
 	int websocket_data_handler(struct mg_connection *conn, int flags, char *data, size_t data_len);
 	int begin_request_handler(struct mg_connection *conn);
+	int begin_http_error_handler(struct mg_connection *conn, int status);
 	void *websocket_keepalive();
 protected:
 	// getters
