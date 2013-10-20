@@ -118,7 +118,7 @@ enum
 };
 
 #define LOG logerror
-#define VERBOSE 5
+#define VERBOSE 1
 
 /****************************************************************************
     Constructor
@@ -1764,6 +1764,7 @@ void tms9995_device::mem_write()
 		{
 			m_starting_count_storage_register = m_decrementer_value = m_current_value;
 		}
+		if (VERBOSE>2) LOG("tms9995: Setting decrementer to %04x, PC=%04x\n", m_current_value, PC);
 		pulse_clock(1);
 		return;
 	}
@@ -1920,6 +1921,7 @@ void tms9995_device::cru_output_operation()
 		{
 			m_check_ready = false;
 			// FLAG2, FLAG3, and FLAG4 are read-only
+			if (VERBOSE>2) LOG("tms9995: set CRU address %04x to %d\n", m_cru_address, m_cru_value&1);
 			if ((m_cru_address != 0x1ee4) && (m_cru_address != 0x1ee6) && (m_cru_address != 0x1ee8))
 				m_flag[(m_cru_address>>1)&0x000f] = (m_cru_value & 0x01);
 		}
@@ -2046,10 +2048,11 @@ void tms9995_device::trigger_decrementer()
 		m_decrementer_value--;
 		if (m_decrementer_value==0)
 		{
-			if (VERBOSE>5) LOG("tms9995: decrementer reached 0\n");
+			if (VERBOSE>4) LOG("tms9995: decrementer reached 0\n");
 			m_decrementer_value = m_starting_count_storage_register;
 			if (m_flag[1]==true)
 			{
+				if (VERBOSE>4) LOG("tms9995: decrementer flags interrupt\n");
 				m_flag[3] = true;
 				m_int_decrementer = true;
 			}
@@ -2752,13 +2755,13 @@ void tms9995_device::alu_limi_lwpi()
 	if (m_instruction->command == LIMI)
 	{
 		ST = (ST & 0xfff0) | (m_current_value & 0x000f);
-		if (VERBOSE>7) LOG("tms9995: ST = %04x\n", ST);
+		if (VERBOSE>4) LOG("tms9995: LIMI sets ST = %04x\n", ST);
 		pulse_clock(1);     // needs one more than LWPI
 	}
 	else
 	{
 		WP = m_current_value & 0xfffe;
-		if (VERBOSE>7) LOG("tms9995: new WP = %04x\n", WP);
+		if (VERBOSE>4) LOG("tms9995: LWPI sets new WP = %04x\n", WP);
 	}
 }
 
