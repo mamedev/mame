@@ -209,7 +209,7 @@
 #define MASTER_CLOCK    XTAL_6MHz   /* confirmed */
 
 #include "emu.h"
-#include "cpu/tms9900/tms9900l.h"
+#include "cpu/tms9900/tms9980a.h"
 #include "video/mc6845.h"
 #include "sound/sn76477.h"
 
@@ -290,7 +290,8 @@ void tmspoker_state::palette_init()
 
 INTERRUPT_GEN_MEMBER(tmspoker_state::tmspoker_interrupt)
 {
-	device.execute().set_input_line_and_vector(0, ASSERT_LINE, 3);//2=nmi  3,4,5,6
+	m_maincpu->set_input_line(INT_9980A_LEVEL1, ASSERT_LINE); //_and_vector(0, ASSERT_LINE, 3);//2=nmi  3,4,5,6
+	m_maincpu->set_input_line(INT_9980A_LEVEL1, CLEAR_LINE);  // MZ: do we need this?
 }
 
 
@@ -560,6 +561,17 @@ static MC6845_INTERFACE( mc6845_intf )
 	NULL        /* update address callback */
 };
 
+/***********************
+*    CPU Interface    *
+************************/
+static TMS9980A_CONFIG( cpuconf )
+{
+	DEVCB_NULL,     // External operation
+	DEVCB_NULL,     // Instruction acquisition
+	DEVCB_NULL,     // Clock out
+	DEVCB_NULL,     // Hold acknowledge
+	DEVCB_NULL      // DBIN
+};
 
 /*************************
 *    Machine Drivers     *
@@ -568,9 +580,7 @@ static MC6845_INTERFACE( mc6845_intf )
 static MACHINE_CONFIG_START( tmspoker, tmspoker_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS9980L, MASTER_CLOCK/4)   /* guess */
-	MCFG_CPU_PROGRAM_MAP(tmspoker_map)
-	MCFG_CPU_IO_MAP(tmspoker_cru_map)
+	MCFG_TMS99xx_ADD("maincpu", TMS9980A, MASTER_CLOCK/4, tmspoker_map, tmspoker_cru_map, cpuconf)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", tmspoker_state,  tmspoker_interrupt)
 
 //  MCFG_NVRAM_HANDLER(generic_0fill)
@@ -599,6 +609,7 @@ MACHINE_CONFIG_END
 
 ROM_START( tmspoker )
 	ROM_REGION( 0x4000, "maincpu", 0 ) /* TMS9980 selectable code */
+
 	ROM_LOAD( "0.bin",  0x0000, 0x1000, CRC(a20ae6cb) SHA1(d47780119b4ebb16dc759a50dfc880ddbc6a1112) )  /* Program 1 */
 	ROM_LOAD( "8.bin",  0x1000, 0x1000, CRC(0c0a7159) SHA1(92cc3dc32a5bf4a7fa197e72c3931e583c96ef33) )  /* Program 2 */
 
@@ -617,14 +628,20 @@ ROM_END
 DRIVER_INIT_MEMBER(tmspoker_state,bus)
 {
 	/* decode the TMS9980 ROMs */
-	offs_t offs;
-	UINT8 *rom = memregion("maincpu")->base();
-	const size_t len = memregion("maincpu")->bytes();
 
-	for (offs = 0; offs < len; offs++)
-	{
-		rom[offs] = BITSWAP8(rom[offs],0,1,2,3,4,5,6,7);
-	}
+	// MZ: Does not make sense to swap the bit order, so I commented it out.
+	// Only when unswapped do the commands make sense; otherwise there is a lot
+	// of invalid opcodes, and the RESET vector at 0000 is invalid either.
+
+/*  offs_t offs;
+    UINT8 *rom = memregion("maincpu")->base();
+    const size_t len = memregion("maincpu")->bytes();
+
+    for (offs = 0; offs < len; offs++)
+    {
+        rom[offs] = BITSWAP8(rom[offs],0,1,2,3,4,5,6,7);
+    }
+*/
 
 	/* still need to decode the addressing lines */
 	/* text found in the ROM (A at 6, B at 8, etc: consistent with gfx rom byte offsets) suggests
