@@ -99,7 +99,7 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 	{
 		disposition = (!is_path_to_physical_drive(path) && (openflags & OPEN_FLAG_CREATE)) ? CREATE_ALWAYS : OPEN_EXISTING;
 		access = (openflags & OPEN_FLAG_READ) ? (GENERIC_READ | GENERIC_WRITE) : GENERIC_WRITE;
-		sharemode = 0;
+		sharemode = FILE_SHARE_READ;
 	}
 	else if (openflags & OPEN_FLAG_READ)
 	{
