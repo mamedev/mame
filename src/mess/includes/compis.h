@@ -24,10 +24,15 @@
 #include "machine/mm58274c.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
+#include "machine/serial.h"
 #include "machine/upd765.h"
+#include "machine/z80dart.h"
 #include "video/upd7220.h"
 
-#define CASSETTE_TAG "cassette"
+#define I8274_TAG       "ic65"
+#define RS232_A_TAG     "rs232a"
+#define RS232_B_TAG     "rs232b"
+#define CASSETTE_TAG    "cassette"
 
 class compis_state : public driver_device
 {
@@ -39,6 +44,7 @@ public:
 		  m_8254(*this, "pit8254"),
 		  m_8259m(*this, "pic8259_master"),
 		  m_8255(*this, "ppi8255"),
+		  m_mpsc(*this, I8274_TAG),
 		  m_centronics(*this, "centronics"),
 		  m_uart(*this, "uart"),
 		  m_rtc(*this, "mm58274c"),
@@ -48,11 +54,12 @@ public:
 		  m_video_ram(*this, "video_ram")
 	{ }
 
-	required_device<cpu_device> m_maincpu;
+	required_device<i80186_cpu_device> m_maincpu;
 	required_device<pit8253_device> m_8253;
 	required_device<pit8254_device> m_8254;
 	required_device<pic8259_device> m_8259m;
 	required_device<i8255_device> m_8255;
+	required_device<i8274_device> m_mpsc;
 	required_device<centronics_device> m_centronics;
 	required_device<i8251_device> m_uart;
 	required_device<mm58274c_device> m_rtc;
@@ -70,7 +77,11 @@ public:
 	bool m_mon;
 	DECLARE_WRITE_LINE_MEMBER(tmr0_w);
 	DECLARE_WRITE_LINE_MEMBER(tmr2_w);
+	DECLARE_WRITE_LINE_MEMBER(tmr3_w);
+	DECLARE_WRITE_LINE_MEMBER(tmr4_w);
+	DECLARE_WRITE_LINE_MEMBER(tmr5_w);
 	DECLARE_WRITE8_MEMBER(tape_mon_w);
+	TIMER_DEVICE_CALLBACK_MEMBER(tape_tick);
 
 	void fdc_irq(bool state);
 	void fdc_drq(bool state);

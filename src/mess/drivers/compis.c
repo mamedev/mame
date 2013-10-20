@@ -99,7 +99,7 @@ static ADDRESS_MAP_START( compis_io, AS_IO, 16, compis_state )
   //AM_RANGE(0x0310, 0x0311) /* PCS6:2 0x00ff */ AM_MIRROR(0xe) // 8274 INTERRUPT ACKNOWLEDGE
 	AM_RANGE(0x0310, 0x0311) /* PCS6:3 */ AM_MIRROR(0xc) AM_DEVREADWRITE8("uart", i8251_device, data_r, data_w, 0xff00)
 	AM_RANGE(0x0312, 0x0313) /* PCS6:3 */ AM_MIRROR(0xc) AM_DEVREADWRITE8("uart", i8251_device, status_r, control_w, 0xff00)
-  //AM_RANGE(0x0320, 0x0321) /* PCS6:4 0x00ff */ AM_MIRROR(0xe) // 8274
+  	AM_RANGE(0x0320, 0x0323) /* PCS6:4 */ AM_MIRROR(0xc) AM_DEVREADWRITE8(I8274_TAG, z80dart_device, cd_ba_r, cd_ba_w, 0x00ff)
   //AM_RANGE(0x0320, 0x0321) /* PCS6:5 0xff00 */ AM_MIRROR(0xe) // DMA-TERMINATE J8 (iSBX0)
 	AM_RANGE(0x0330, 0x0333) /* PCS6:6 */ AM_DEVREADWRITE8("upd7220", upd7220_device, read, write, 0x00ff)
   //AM_RANGE(0x0330, 0x0331) /* PCS6:7 0xff00 */ AM_MIRROR(0xe) // DMA-TERMINATE J9 (iSBX1)
@@ -147,6 +147,60 @@ static const cassette_interface compis_cassette_interface =
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED),
 	NULL,
 	NULL
+};
+
+
+//-------------------------------------------------
+//  I8274_INTERFACE( mpsc_intf )
+//-------------------------------------------------
+
+static I8274_INTERFACE( mpsc_intf )
+{
+	0, 0, 0, 0,
+
+	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, serial_port_device, rx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, serial_port_device, tx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, dtr_w),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, rts_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
+
+	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, serial_port_device, rx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, serial_port_device, tx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, dtr_w),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, rts_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
+
+	DEVCB_DEVICE_LINE_MEMBER("maincpu", i80186_cpu_device, int3_w)
+};
+
+
+//-------------------------------------------------
+//  rs232_port_interface rs232a_intf
+//-------------------------------------------------
+
+static const rs232_port_interface rs232a_intf =
+{
+	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER(I8274_TAG, z80dart_device, dcda_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER(I8274_TAG, z80dart_device, ctsa_w)
+};
+
+
+//-------------------------------------------------
+//  rs232_port_interface rs232b_intf
+//-------------------------------------------------
+
+static const rs232_port_interface rs232b_intf =
+{
+	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER(I8274_TAG, z80dart_device, dcdb_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER(I8274_TAG, z80dart_device, ctsb_w)
 };
 
 const floppy_format_type compis_floppy_formats[] = {
@@ -200,6 +254,10 @@ static MACHINE_CONFIG_START( compis, compis_state )
 	MCFG_FLOPPY_DRIVE_ADD("i8272a:0", compis_floppies, "525qd", compis_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("i8272a:1", compis_floppies, "525qd", compis_floppy_formats)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, compis_cassette_interface)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("tape", compis_state, tape_tick, attotime::from_hz(44100))
+	MCFG_I8274_ADD(I8274_TAG, XTAL_16MHz/4, mpsc_intf)
+	MCFG_RS232_PORT_ADD(RS232_A_TAG, rs232a_intf, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_B_TAG, rs232b_intf, default_rs232_devices, NULL)
 	MCFG_COMPIS_KEYBOARD_ADD(NULL)
 
 	/* software lists */
@@ -237,6 +295,10 @@ static MACHINE_CONFIG_START( compis2, compis_state )
 	MCFG_FLOPPY_DRIVE_ADD("i8272a:0", compis_floppies, "525qd", compis_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("i8272a:1", compis_floppies, "525qd", compis_floppy_formats)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, compis_cassette_interface)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("tape", compis_state, tape_tick, attotime::from_hz(44100))
+	MCFG_I8274_ADD(I8274_TAG, XTAL_16MHz/4, mpsc_intf)
+	MCFG_RS232_PORT_ADD(RS232_A_TAG, rs232a_intf, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_B_TAG, rs232b_intf, default_rs232_devices, NULL)
 	MCFG_COMPIS_KEYBOARD_ADD(NULL)
 
 	/* software lists */

@@ -154,15 +154,30 @@ I8255A_INTERFACE( compis_ppi_interface )
 /*  PIT 8253                                                               */
 /*-------------------------------------------------------------------------*/
 
+WRITE_LINE_MEMBER( compis_state::tmr3_w )
+{
+	m_mpsc->rxtxcb_w(state);
+}
+
+WRITE_LINE_MEMBER( compis_state::tmr4_w )
+{
+}
+
+WRITE_LINE_MEMBER( compis_state::tmr5_w )
+{
+	m_mpsc->rxca_w(state);
+	m_mpsc->txca_w(state);
+}
+
 const struct pit8253_interface compis_pit8253_config =
 {
 	{
 		/* Timer0 */
-		{XTAL_16MHz/8, DEVCB_LINE_VCC, DEVCB_NULL }, // TMR3
+		{XTAL_16MHz/8, DEVCB_LINE_VCC, DEVCB_DRIVER_LINE_MEMBER(compis_state, tmr3_w) },
 		/* Timer1 */
-		{XTAL_16MHz/8, DEVCB_LINE_VCC, DEVCB_NULL }, // TMR4
+		{XTAL_16MHz/8, DEVCB_LINE_VCC, DEVCB_DRIVER_LINE_MEMBER(compis_state, tmr4_w) },
 		/* Timer2 */
-		{XTAL_16MHz/8, DEVCB_LINE_VCC, DEVCB_NULL } // TMR5
+		{XTAL_16MHz/8, DEVCB_LINE_VCC, DEVCB_DRIVER_LINE_MEMBER(compis_state, tmr5_w) }
 	}
 };
 
@@ -229,6 +244,11 @@ WRITE8_MEMBER( compis_state::tape_mon_w )
 	cassette_state state = BIT(data, 0) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED;
 
 	m_cassette->change_state(state, CASSETTE_MASK_MOTOR);
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER( compis_state::tape_tick )
+{
+	m_maincpu->tmrin0_w(m_cassette->input() > 0.0);
 }
 
 void compis_state::machine_start()
