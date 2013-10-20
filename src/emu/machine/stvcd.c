@@ -1,4 +1,4 @@
-// license:?
+// license:MAME
 // copyright-holders:Angelo Salese, R. Belmont
 /***************************************************************************
 
@@ -97,6 +97,11 @@ int saturn_state::get_track_index(UINT32 fad)
 	return 1;
 }
 
+int saturn_state::sega_cdrom_get_adr_control(cdrom_file *file, int track)
+{
+	return BITSWAP8(cdrom_get_adr_control(file, cur_track),3,2,1,0,7,6,5,4);
+}
+
 void saturn_state::cr_standard_return(UINT16 cur_status)
 {
 	if ((cd_stat & 0x0f00) == CD_STAT_SEEK)
@@ -105,7 +110,7 @@ void saturn_state::cr_standard_return(UINT16 cur_status)
 		UINT8 seek_track = cdrom_get_track(cdrom, cd_fad_seek-150);
 
 		cr1 = cur_status | (playtype << 7) | 0x00 | (cdda_repeat_count & 0xf);
-		cr2 =  (seek_track == 0xff) ? 0xffff : ((cdrom_get_adr_control(cdrom, seek_track)<<8) | seek_track);
+		cr2 =  (seek_track == 0xff) ? 0xffff : ((sega_cdrom_get_adr_control(cdrom, seek_track)<<8) | seek_track);
 		cr3 = (get_track_index(cd_fad_seek)<<8) | (cd_fad_seek>>16); //index & 0xff00
 		cr4 = cd_fad_seek;
 	}
@@ -116,7 +121,7 @@ void saturn_state::cr_standard_return(UINT16 cur_status)
 		- Whizz: wpset 0x608f030,4,w,wpdata==0x100&&pc!=0x6040006
 		*/
 		cr1 = cur_status | (playtype << 7) | 0x00 | (cdda_repeat_count & 0xf); //options << 4 | repeat & 0xf
-		cr2 = (cur_track == 0xff) ? 0xffff : (cdrom_get_adr_control(cdrom, cur_track)<<8 | cur_track); // TODO: fix current track
+		cr2 = (cur_track == 0xff) ? 0xffff : ((sega_cdrom_get_adr_control(cdrom, cur_track)<<8) | (cdrom_get_track(cdrom, cd_curfad-150)+1));
 		cr3 = (get_track_index(cd_curfad)<<8) | (cd_curfad>>16); //index & 0xff00
 		cr4 = cd_curfad;
 	}
@@ -2287,7 +2292,7 @@ void saturn_state::cd_readTOC(void)
 	{
 		if (cdrom)
 		{
-			tocbuf[tocptr] = cdrom_get_adr_control(cdrom, i)<<4 | 0x01;
+			tocbuf[tocptr] = sega_cdrom_get_adr_control(cdrom, i);
 		}
 		else
 		{
