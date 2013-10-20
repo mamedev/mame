@@ -181,18 +181,18 @@ public:
 extern const device_type ABCBUS_SLOT;
 
 
-// ABC bus slot devices
-#include "machine/abc890.h"
-#include "machine/abc_dos.h"
-#include "machine/abc_fd2.h"
-#include "machine/abc_hdc.h"
-#include "machine/abc_uni800.h"
-#include "machine/abc_sio.h"
-#include "machine/abc_slutprov.h"
-#include "machine/abc_turbo.h"
-#include "machine/abc_xebec.h"
-#include "machine/lux10828.h"
-#include "machine/lux21046.h"
+// slot devices
+#include "abc890.h"
+#include "dos.h"
+#include "fd2.h"
+#include "hdc.h"
+#include "lux10828.h"
+#include "lux21046.h"
+#include "uni800.h"
+#include "sio.h"
+#include "slutprov.h"
+#include "turbo.h"
+#include "xebec.h"
 
 SLOT_INTERFACE_EXTERN( abcbus_cards );
 

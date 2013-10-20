@@ -16,6 +16,27 @@ BUSOBJ = $(EMUOBJ)/bus
 
 #-------------------------------------------------
 #
+#@src/emu/bus/abcbus/abcbus.h,BUSES += ABCBUS
+#-------------------------------------------------
+
+ifneq ($(filter ABCBUS,$(BUSES)),)
+BUSOBJS += $(BUSOBJ)/abcbus/abcbus.o
+BUSOBJS += $(BUSOBJ)/abcbus/abc890.o
+BUSOBJS += $(BUSOBJ)/abcbus/dos.o
+BUSOBJS += $(BUSOBJ)/abcbus/fd2.o
+BUSOBJS += $(BUSOBJ)/abcbus/hdc.o
+BUSOBJS += $(BUSOBJ)/abcbus/lux10828.o
+BUSOBJS += $(BUSOBJ)/abcbus/lux21046.o
+BUSOBJS += $(BUSOBJ)/abcbus/uni800.o
+BUSOBJS += $(BUSOBJ)/abcbus/sio.o
+BUSOBJS += $(BUSOBJ)/abcbus/slutprov.o
+BUSOBJS += $(BUSOBJ)/abcbus/turbo.o
+BUSOBJS += $(BUSOBJ)/abcbus/xebec.o
+endif
+
+
+#-------------------------------------------------
+#
 #@src/emu/bus/adamnet/adamnet.h,BUSES += ADAMNET
 #-------------------------------------------------
 

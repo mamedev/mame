@@ -14,11 +14,10 @@
 #ifndef __LUXOR_55_10828__
 #define __LUXOR_55_10828__
 
-
 #include "emu.h"
+#include "abcbus.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
-#include "machine/abcbus.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80pio.h"
 

@@ -9,16 +9,14 @@
 #ifndef __ABC80__
 #define __ABC80__
 
-
 #include "emu.h"
+#include "bus/abcbus/abcbus.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 #include "imagedev/flopdrv.h"
 #include "imagedev/printer.h"
 #include "imagedev/cassette.h"
-#include "machine/abcbus.h"
 #include "machine/abc80kb.h"
-#include "machine/abc830.h"
 #include "machine/keyboard.h"
 #include "machine/ram.h"
 #include "machine/serial.h"

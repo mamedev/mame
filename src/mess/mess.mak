@@ -477,6 +477,7 @@ MACHINES += MOS8726
 # specify available bus cores
 #-------------------------------------------------
 
+BUSES += ABCBUS
 BUSES += ADAMNET
 BUSES += C64
 BUSES += CBMIEC
@@ -1467,21 +1468,9 @@ $(MESSOBJ)/luxor.a:             \
 	$(MESS_MACHINE)/abc800kb.o  \
 	$(MESS_VIDEO)/abc802.o      \
 	$(MESS_VIDEO)/abc806.o      \
-	$(MESS_MACHINE)/abcbus.o    \
-	$(MESS_MACHINE)/abc_dos.o   \
-	$(MESS_MACHINE)/abc_fd2.o   \
-	$(MESS_MACHINE)/abc_hdc.o   \
-	$(MESS_MACHINE)/abc_uni800.o\
-	$(MESS_MACHINE)/abc_sio.o   \
-	$(MESS_MACHINE)/abc_slutprov.o  \
-	$(MESS_MACHINE)/abc_turbo.o \
-	$(MESS_MACHINE)/abc_xebec.o \
 	$(MESS_MACHINE)/abckb.o     \
 	$(MESS_MACHINE)/abc77.o     \
 	$(MESS_MACHINE)/abc99.o     \
-	$(MESS_MACHINE)/lux10828.o  \
-	$(MESS_MACHINE)/lux21046.o  \
-	$(MESS_MACHINE)/abc890.o    \
 	$(MESS_DRIVERS)/abc1600.o   \
 	$(MESS_MACHINE)/abc1600_bus.o   \
 	$(MESS_MACHINE)/abc1600mac.o   \

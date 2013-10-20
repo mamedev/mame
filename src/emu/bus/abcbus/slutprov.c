@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#include "abc_slutprov.h"
+#include "slutprov.h"
 
 
 
