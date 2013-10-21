@@ -204,7 +204,12 @@ device_a2bus_card_interface *a2bus_device::get_a2bus_card(int slot)
 		return NULL;
 	}
 
-	return m_device_list[slot];
+	if (m_device_list[slot])
+	{
+		return m_device_list[slot];
+	}
+
+	return NULL;
 }
 
 void a2bus_device::add_a2bus_card(int slot, device_a2bus_card_interface *card)

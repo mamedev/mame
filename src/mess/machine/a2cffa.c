@@ -33,6 +33,9 @@ const device_type A2BUS_CFFA2_6502 = &device_creator<a2bus_cffa2_6502_device>;
 
 MACHINE_CONFIG_FRAGMENT( cffa2 )
 	MCFG_ATA_INTERFACE_ADD(CFFA2_ATA_TAG, ata_devices, "hdd", NULL, false)
+
+// not yet, the core explodes
+//	MCFG_SOFTWARE_LIST_ADD("hdd_list", "apple2gs_hdd")
 MACHINE_CONFIG_END
 
 ROM_START( cffa2 )
@@ -109,8 +112,9 @@ void a2bus_cffa2000_device::device_start()
 	astring tempstring;
 	m_rom = device().machine().root_device().memregion(this->subtag(tempstring, CFFA2_ROM_REGION))->base();
 
-	// patch default setting so slave device is enabled
-	m_rom[0x801] = 4;
+	// patch default setting so slave device is enabled and up to 13 devices on both connectors
+	m_rom[0x800] = 13;
+	m_rom[0x801] = 13;
 
 	save_item(NAME(m_lastdata));
 	save_item(NAME(m_writeprotect));
