@@ -1353,10 +1353,13 @@ void tms9995_device::int_prefetch_and_decode()
 		{
 			m_int_pending = 0;
 
-			if (m_int1_active && intmask >= 1 && check_int) m_int_pending |= PENDING_LEVEL1;
-			if (m_int_overflow && intmask >= 2 && check_int) m_int_pending |= PENDING_OVERFLOW;
-			if (m_int_decrementer && intmask >= 3 && check_int) m_int_pending |= PENDING_DECR;
-			if (m_int4_active && intmask >= 4 && check_int) m_int_pending |= PENDING_LEVEL4;
+			if (check_int)
+			{
+				if (m_int1_active && intmask >= 1) m_int_pending |= PENDING_LEVEL1;
+				if (m_int_overflow && intmask >= 2) m_int_pending |= PENDING_OVERFLOW;
+				if (m_int_decrementer && intmask >= 3) m_int_pending |= PENDING_DECR;
+				if (m_int4_active && intmask >= 4) m_int_pending |= PENDING_LEVEL4;
+			}
 
 			if (m_int_pending!=0)
 			{
@@ -2057,6 +2060,7 @@ void tms9995_device::trigger_decrementer()
 				m_int_decrementer = true;
 			}
 		}
+		else m_int_decrementer = false;
 	}
 }
 
