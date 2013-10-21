@@ -164,6 +164,18 @@
 		</part>
 	</software>
 
+	<software name="pclip284">
+		<description>Paperclip 2.84</description>
+		<year>1982</year>
+		<publisher>Batteries Included</publisher>
+
+		<part name="rom" interface="pet_a000_rom">
+			<dataarea name="rom" size="0x1000">
+				<rom name="pclip284-a000.bin" size="0x1000" crc="8fb11d4b" sha1="1c0f883cd3b8ded42ec00d83f7e7f0887f91fec0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="power">
 		<description>POWER</description>
 		<year>1981</year>
