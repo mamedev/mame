@@ -1569,6 +1569,7 @@ void tms9995_device::service_interrupt()
 							m_intmask = 0x0002;
 							m_int_pending &= ~PENDING_DECR;
 							m_flag[3] = false;
+							m_int_decrementer = false;
 							if (VERBOSE>7) LOG("tms9995: ***** DECR pending\n");
 						}
 						else
@@ -2063,7 +2064,6 @@ void tms9995_device::trigger_decrementer()
 				m_int_decrementer = true;
 			}
 		}
-		else m_int_decrementer = false;
 	}
 }
 
