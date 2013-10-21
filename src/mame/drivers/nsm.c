@@ -121,6 +121,8 @@ static TMS9995_CONFIG( cpuconf95 )
 
 void nsm_state::machine_reset()
 {
+	// Disable auto wait state generation by raising the READY line on reset
+	static_cast<tms9995_device*>(machine().device("maincpu"))->set_ready(ASSERT_LINE);
 }
 
 static MACHINE_CONFIG_START( nsm, nsm_state )

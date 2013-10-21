@@ -45,6 +45,8 @@ public:
 	{ }
 	UINT8 m_sound_buffer;
 	UINT8 m_psg_latch;
+	virtual void machine_reset();
+
 protected:
 
 	// devices
@@ -227,6 +229,12 @@ static TMS9995_CONFIG( cpuconf95 )
 	INTERNAL_RAM,      // use internal RAM
 	NO_OVERFLOW_INT    // The generally available versions of TMS9995 have a deactivated overflow interrupt
 };
+
+void jpmmps_state::machine_reset()
+{
+	// Disable auto wait state generation by raising the READY line on reset
+	static_cast<tms9995_device*>(machine().device("maincpu"))->set_ready(ASSERT_LINE);
+}
 
 static MACHINE_CONFIG_START( jpmmps, jpmmps_state )
 

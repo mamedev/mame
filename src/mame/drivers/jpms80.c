@@ -33,6 +33,7 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu")
 	{ }
+	virtual void machine_reset();
 
 protected:
 
@@ -87,6 +88,12 @@ static const tms9902_interface tms9902_config =
 	DEVCB_NULL,             /* called when a character is transmitted */
 	DEVCB_NULL              /* called for setting interface parameters and line states */
 };
+
+void jpms80_state::machine_reset()
+{
+	// Disable auto wait state generation by raising the READY line on reset
+	static_cast<tms9995_device*>(machine().device("maincpu"))->set_ready(ASSERT_LINE);
+}
 
 static TMS9995_CONFIG( cpuconf95 )
 {

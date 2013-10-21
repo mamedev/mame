@@ -145,6 +145,7 @@ public:
 	DECLARE_DRIVER_INIT(looping);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void machine_start();
+	virtual void machine_reset();
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_looping(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -333,7 +334,11 @@ void looping_state::machine_start()
 	save_item(NAME(m_sound));
 }
 
-
+void looping_state::machine_reset()
+{
+	// Disable auto wait state generation by raising the READY line on reset
+	static_cast<tms9995_device*>(machine().device("maincpu"))->set_ready(ASSERT_LINE);
+}
 
 /*************************************
  *
