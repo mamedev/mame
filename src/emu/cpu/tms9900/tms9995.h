@@ -171,6 +171,7 @@ private:
 	bool    m_reset;
 	bool    m_from_reset;
 	bool    m_mid_flag;
+	bool    m_mid_active;
 
 	// Flag field
 	int     m_int_pending;

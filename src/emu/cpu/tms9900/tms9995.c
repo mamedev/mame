@@ -175,6 +175,7 @@ void tms9995_device::device_start()
 	m_int_pending = 0;
 
 	m_mid_flag = false;
+	m_mid_active = false;
 	m_nmi_active = false;
 	m_int_overflow = false;
 	m_int_decrementer = false;
@@ -1294,7 +1295,7 @@ void tms9995_device::decode(UINT16 inst)
 
 	int dindex = (m_instindex==0)? 1:0;
 
-	m_mid_flag = false;
+	m_mid_active = false;
 
 	while (!complete)
 	{
@@ -1437,6 +1438,7 @@ void tms9995_device::next_command()
 	if (m_decoded[next].command == MID)
 	{
 		m_mid_flag = true;
+		m_mid_active = true;
 		service_interrupt();
 	}
 	else
@@ -1523,12 +1525,13 @@ void tms9995_device::service_interrupt()
 	}
 	else
 	{
-		if (m_mid_flag)
+		if (m_mid_active)
 		{
 			vectorpos = 0x0008;
 			m_intmask = 0x0001;
 			PC = (PC + 2) & 0xfffe;
 			if (VERBOSE>7) LOG("tms9995: ***** MID pending\n");
+			m_mid_active = false;
 		}
 		else
 		{
@@ -1913,7 +1916,7 @@ void tms9995_device::cru_output_operation()
 
 	if (m_cru_address == 0x1fda)
 	{
-		// [1], section 2.3.3.2.2: "setting the MID to one with a CRU instruction
+		// [1], section 2.3.3.2.2: "setting the MID flag to one with a CRU instruction
 		// will not cause the MID interrupt to be requested."
 		m_check_ready = false;
 		m_mid_flag = (m_cru_value & 0x01);
@@ -3291,6 +3294,7 @@ void tms9995_device::alu_int()
 				m_from_reset = false;
 				ST &= 0x01ff;
 				m_mid_flag = false;
+				m_mid_active = false;
 				// FLAG0 and FLAG1 are also set to zero after RESET ([1], sect. 2.3.1.2.2)
 				for (int i=0; i < 5; i++) m_flag[i] = false;
 				m_check_hold = true;
