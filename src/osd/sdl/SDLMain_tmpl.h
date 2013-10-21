@@ -1,5 +1,5 @@
-// license:BSD-3-Clause
-// copyright-holders:Vas Crabb
+// license:Zlib|LGPL-2.1+
+// copyright-holders:http://libsdl.org/
 /*   SDLMain.m - main entry point for our Cocoa-ized SDL app
        Initial Version: Darrell Walisser <dwaliss1@purdue.edu>
        Non-NIB-Code & other changes: Max Horn <max@quendi.de>
