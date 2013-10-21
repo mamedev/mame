@@ -272,9 +272,21 @@
 		</part>
 	</software>
 
+	<software name="wordpro3">
+		<description>WordPro 3</description>
+		<year>1980</year>
+		<publisher>Professional Software Inc.</publisher>
+
+		<part name="rom" interface="pet_a000_rom">
+			<dataarea name="rom" size="0x1000">
+				<rom name="wordpro3-a000.bin" size="0x1000" crc="e445ad64" sha1="cb87a8d152813c6071652abd866efb25de247769" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="wordpro">
 		<description>WordPro 4 Plus</description>
-		<year>198?</year>
+		<year>1980</year>
 		<publisher>Professional Software Inc.</publisher>
 
 		<part name="rom" interface="pet_a000_rom">
