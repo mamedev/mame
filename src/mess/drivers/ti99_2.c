@@ -79,7 +79,7 @@ would just have taken three extra tracks on the main board and a OR gate in an A
 
 #include "emu.h"
 #include "machine/tms9901.h"
-#include "cpu/tms9900/tms9900l.h"
+#include "cpu/tms9900/tms9995.h"
 
 
 class ti99_2_state : public driver_device
@@ -131,11 +131,16 @@ void ti99_2_state::machine_reset()
 		membank("bank1")->set_base(memregion("maincpu")->base()+0x4000);
 	else
 		membank("bank1")->set_base((memregion("maincpu")->base()+0x4000));
+
+	// Configure CPU to insert 1 wait state for each external memory access
+	// by lowering the READY line on reset
+	// TODO: Check with specs
+	static_cast<tms9995_device*>(machine().device("maincpu"))->set_ready(CLEAR_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(ti99_2_state::ti99_2_vblank_interrupt)
 {
-	device.execute().set_input_line(1, m_irq_state);
+	m_maincpu->set_input_line(INT_9995_INT1, m_irq_state);
 	m_irq_state = (m_irq_state == ASSERT_LINE) ? CLEAR_LINE : ASSERT_LINE;
 }
 
@@ -364,26 +369,22 @@ static INPUT_PORTS_START(ti99_2)
 INPUT_PORTS_END
 
 
-static const struct tms9995reset_param ti99_2_processor_config =
+static TMS9995_CONFIG( cpuconf95 )
 {
-#if 0
-	"maincpu",/* region for processor RAM */
-	0xf000,     /* offset : this area is unused in our region, and matches the processor address */
-	0xf0fc,     /* offset for the LOAD vector */
-	NULL,       /* no IDLE callback */
-	1,          /* use fast IDLE */
-#endif
-	1           /* enable automatic wait state generation */
+	DEVCB_NULL,         // external op
+	DEVCB_NULL,        // Instruction acquisition
+	DEVCB_NULL,         // clock out
+	DEVCB_NULL,        // HOLDA
+	DEVCB_NULL,         // DBIN
+	INTERNAL_RAM,      // use internal RAM
+	NO_OVERFLOW_INT    // The generally available versions of TMS9995 have a deactivated overflow interrupt
 };
 
 static MACHINE_CONFIG_START( ti99_2, ti99_2_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS9995L, 10700000)
-	MCFG_CPU_CONFIG(ti99_2_processor_config)
-	MCFG_CPU_PROGRAM_MAP(ti99_2_memmap)
-	MCFG_CPU_IO_MAP(ti99_2_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", ti99_2_state,  ti99_2_vblank_interrupt)
+	MCFG_TMS99xx_ADD("maincpu", TMS9995, 10700000, ti99_2_memmap, ti99_2_io, cpuconf95)
 
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", ti99_2_state,  ti99_2_vblank_interrupt)
 
 	/* video hardware */
 	/*MCFG_TMS9928A( &tms9918_interface )*/

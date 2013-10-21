@@ -23,7 +23,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/tms9900/tms9900l.h"
+#include "cpu/tms9900/tms9995.h"
 #include "video/tms9928a.h"
 
 class cortex_state : public driver_device
@@ -71,14 +71,18 @@ void cortex_state::machine_reset()
 {
 	UINT8* ROM = memregion("maincpu")->base();
 	memcpy(m_p_ram, ROM, 0x6000);
-	m_maincpu->reset();
+	static_cast<tms9995_device*>(machine().device("maincpu"))->set_ready(ASSERT_LINE);
 }
 
-static const struct tms9995reset_param cortex_processor_config =
+static TMS9995_CONFIG( cpuconf95 )
 {
-	0,  /* disable automatic wait state generation */
-	0,  /* no IDLE callback */
-	0   /* no MP9537 mask */
+	DEVCB_NULL,         // external op
+	DEVCB_NULL,        // Instruction acquisition
+	DEVCB_NULL,         // clock out
+	DEVCB_NULL,        // HOLDA
+	DEVCB_NULL,         // DBIN
+	INTERNAL_RAM,      // use internal RAM
+	NO_OVERFLOW_INT    // The generally available versions of TMS9995 have a deactivated overflow interrupt
 };
 
 static TMS9928A_INTERFACE(cortex_tms9929a_interface)
@@ -90,10 +94,7 @@ static TMS9928A_INTERFACE(cortex_tms9929a_interface)
 static MACHINE_CONFIG_START( cortex, cortex_state )
 	/* basic machine hardware */
 	/* TMS9995 CPU @ 12.0 MHz */
-	MCFG_CPU_ADD("maincpu", TMS9995L, 12000000)
-	MCFG_CPU_CONFIG(cortex_processor_config)
-	MCFG_CPU_PROGRAM_MAP(cortex_mem)
-	MCFG_CPU_IO_MAP(cortex_io)
+	MCFG_TMS99xx_ADD("maincpu", TMS9995, 12000000, cortex_mem, cortex_io, cpuconf95)
 
 	/* video hardware */
 	MCFG_TMS9928A_ADD( "tms9928a", TMS9929A, cortex_tms9929a_interface )

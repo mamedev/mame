@@ -166,9 +166,14 @@ A=AMA, P=PRO, these keys don't exist, and so the games cannot be played.
 
 *********************************************************************************************************/
 
+#define MODERN 1
 
 #include "emu.h"
+#if MODERN
+#include "cpu/tms9900/tms9995.h"
+#else
 #include "cpu/tms9900/tms9900l.h"
+#endif
 #include "sound/wave.h"
 #include "video/tms9928a.h"
 #include "imagedev/cartslot.h"
@@ -262,6 +267,11 @@ void tutor_state::machine_reset()
 
 	m_printer_data = 0;
 	m_printer_strobe = 0;
+
+#if MODERN
+	// Disable auto wait states by lowering READY on reset
+	static_cast<tms9995_device*>(machine().device("maincpu"))->set_ready(CLEAR_LINE);
+#endif
 }
 
 /*
@@ -405,7 +415,11 @@ WRITE8_MEMBER( tutor_state::tutor_mapper_w )
 TIMER_CALLBACK_MEMBER(tutor_state::tape_interrupt_handler)
 {
 	//assert(m_tape_interrupt_enable);
+#if MODERN
+	m_maincpu->set_input_line(INT_9995_INT1, (m_cass->input() > 0.0) ? ASSERT_LINE : CLEAR_LINE);
+#else
 	m_maincpu->set_input_line(1, (m_cass->input() > 0.0) ? ASSERT_LINE : CLEAR_LINE);
+#endif
 }
 
 /* CRU handler */
@@ -441,7 +455,11 @@ WRITE8_MEMBER( tutor_state::tutor_cassette_w )
 				else
 				{
 					m_tape_interrupt_timer->adjust(attotime::never);
+#if MODERN
+					m_maincpu->set_input_line(INT_9995_INT1, CLEAR_LINE);
+#else
 					m_maincpu->set_input_line(1, CLEAR_LINE);
+#endif
 				}
 			}
 			break;
@@ -729,7 +747,27 @@ static INPUT_PORTS_START(pyuutajr)
 		PORT_BIT(0xff, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
+//-------------------------------------------------
+//  sn76496_config psg_intf
+//-------------------------------------------------
 
+static const sn76496_config psg_intf =
+{
+	DEVCB_NULL
+};
+
+#if MODERN
+static TMS9995_CONFIG( cpuconf95 )
+{
+	DEVCB_NULL,         // external op
+	DEVCB_NULL,        // Instruction acquisition
+	DEVCB_NULL,         // clock out
+	DEVCB_NULL,        // HOLDA
+	DEVCB_NULL,         // DBIN
+	INTERNAL_RAM,      // use internal RAM
+	NO_OVERFLOW_INT    // The generally available versions of TMS9995 have a deactivated overflow interrupt
+};
+#else
 static const struct tms9995reset_param tutor_processor_config =
 {
 #if 0
@@ -741,26 +779,19 @@ static const struct tms9995reset_param tutor_processor_config =
 	1,          /* enable automatic wait state generation */
 	NULL        /* no IDLE callback */
 };
-
-
-//-------------------------------------------------
-//  sn76496_config psg_intf
-//-------------------------------------------------
-
-static const sn76496_config psg_intf =
-{
-	DEVCB_NULL
-};
-
+#endif
 
 static MACHINE_CONFIG_START( tutor, tutor_state )
 	/* basic machine hardware */
 	/* TMS9995 CPU @ 10.7 MHz */
+#if MODERN
+	MCFG_TMS99xx_ADD("maincpu", TMS9995, 10700000, tutor_memmap, tutor_io, cpuconf95)
+#else
 	MCFG_CPU_ADD("maincpu", TMS9995L, 10700000)
 	MCFG_CPU_CONFIG(tutor_processor_config)
 	MCFG_CPU_PROGRAM_MAP(tutor_memmap)
 	MCFG_CPU_IO_MAP(tutor_io)
-
+#endif
 
 	/* video hardware */
 	MCFG_TMS9928A_ADD( "tms9928a", TMS9928A, tutor_tms9928a_interface )
