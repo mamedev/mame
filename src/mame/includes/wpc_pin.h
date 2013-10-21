@@ -36,7 +36,7 @@ protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
-	required_device<wpcsnd_device> m_wpcsnd;
+	optional_device<wpcsnd_device> m_wpcsnd;
 	required_device<wpc_device> m_wpc;
 	required_memory_bank m_cpubank;
 	required_memory_bank m_fixedbank;
@@ -98,6 +98,25 @@ public:
 	{ }
 public:
 	DECLARE_DRIVER_INIT(wpc_flip2);
+};
+
+class wpc_dcs_state : public wpc_flip2_state
+{
+public:
+	wpc_dcs_state(const machine_config &mconfig, device_type type, const char *tag)
+		: wpc_flip2_state(mconfig, type, tag)
+	{ }
+public:
+
+	DECLARE_DRIVER_INIT(wpc_dcs);
+	DECLARE_READ8_MEMBER(wpc_dcs_sound_ctrl_r);
+	DECLARE_WRITE8_MEMBER(wpc_dcs_sound_ctrl_w);
+	DECLARE_READ8_MEMBER(wpc_dcs_sound_data_r);
+	DECLARE_WRITE8_MEMBER(wpc_dcs_sound_data_w);
+
+private:
+	bool m_send;
+	UINT8 m_prev_data;
 };
 
 #endif /* WPC_PIN_H_ */

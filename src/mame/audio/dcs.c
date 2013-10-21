@@ -475,7 +475,24 @@ static ADDRESS_MAP_START( dcs_8k_data_map, AS_DATA, 16, driver_device )
 	AM_RANGE(0x3fe0, 0x3fff) AM_READWRITE_LEGACY(adsp_control_r, adsp_control_w)
 ADDRESS_MAP_END
 
+// to be removed once DCS is modernised
+#define AM_READWRITE16_LEGACY(_rhandler, _whandler, _unitmask) \
+	curentry->set_handler(_rhandler, #_rhandler, _whandler, #_whandler, _unitmask);
 
+/* Williams WPC DCS/Security Pinball */
+static ADDRESS_MAP_START( dcs_wpc_program_map, AS_PROGRAM, 32, driver_device )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("dcsint")
+	AM_RANGE(0x0800, 0x2fff) AM_RAM AM_SHARE("dcsext")
+	AM_RANGE(0x3000, 0x3001) AM_READWRITE16_LEGACY(input_latch_r, output_latch_w,0xffff)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( dcs_wpc_data_map, AS_DATA, 16, driver_device )
+	AM_RANGE(0x0000, 0x1fff) AM_READWRITE_LEGACY(dcs_dataram_r, dcs_dataram_w)
+	AM_RANGE(0x2000, 0x2fff) AM_ROMBANK("databank")
+	AM_RANGE(0x3000, 0x33ff) AM_WRITE_LEGACY(dcs_data_bank_select_w)
+	AM_RANGE(0x3800, 0x39ff) AM_RAM
+	AM_RANGE(0x3fe0, 0x3fff) AM_READWRITE_LEGACY(adsp_control_r, adsp_control_w)
+ADDRESS_MAP_END
 
 /*************************************
  *
@@ -638,6 +655,11 @@ MACHINE_CONFIG_DERIVED( dcs_audio_8k, dcs_audio_2k )
 	MCFG_CPU_DATA_MAP(dcs_8k_data_map)
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_DERIVED( dcs_audio_wpc, dcs_audio_2k )
+	MCFG_CPU_MODIFY("dcs")
+	MCFG_CPU_PROGRAM_MAP(dcs_wpc_program_map)
+	MCFG_CPU_DATA_MAP(dcs_wpc_data_map)
+MACHINE_CONFIG_END
 
 
 /*************************************
