@@ -47,10 +47,6 @@ public:
 	required_shared_ptr<UINT8> m_p_videoram;
 private:
 	UINT8 m_term_data;
-	UINT8 m_keyb_press;
-	UINT8 m_keyb_press_flag;
-	UINT8 m_shift_press_flag;
-	UINT8 m_ppi_portc;
 	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi;
 };

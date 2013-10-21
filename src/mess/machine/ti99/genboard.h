@@ -178,10 +178,6 @@ private:
 	bool    m_cartridge7_writable;
 	int     m_map[8];
 
-	int     m_mapdecode;
-
-	int     m_offset;
-	int     m_physaddr;
 	void    decode(address_space& space, offs_t offset, bool setwait, bool read_mode, decdata* dec);
 	decdata m_decoded;
 
