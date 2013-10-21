@@ -1,3 +1,5 @@
+// license:?
+// copyright-holders:David Haywood, Angelo Salese, Olivier Galibert, Mariusz Wojcieszek, R.Belmont
 /**************************************************************************************
 
     Sega Saturn (c) 1994 Sega

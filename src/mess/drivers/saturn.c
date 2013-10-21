@@ -1,5 +1,5 @@
 // license:?
-// copyright-holders:David Haywood, Angelo Salese, Olivier Galibert & Mariusz Wojcieszek, R.Belmont
+// copyright-holders:David Haywood, Angelo Salese, Olivier Galibert, Mariusz Wojcieszek, R.Belmont
 /**************************************************************************************************
 
     Sega Saturn & Sega ST-V (Sega Titan Video) HW (c) 1994 Sega

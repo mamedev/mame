@@ -1,3 +1,5 @@
+// license:?
+// copyright-holders:Tomasz Slanina, Angelo Salese, hap
 /* Cross Shooter (c) 1987 Seibu
 
  TS 01.05.2006:

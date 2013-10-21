@@ -1044,5 +1044,5 @@ GAME( 1986, empcityj, empcity, stfight, stfight, stfight_state, stfight, ROT0,  
 GAME( 1986, empcityi, empcity, stfight, stfight, stfight_state, stfight, ROT0,   "Seibu Kaihatsu (Eurobed license)",         "Empire City: 1931 (Italy)", GAME_IMPERFECT_SOUND )
 GAME( 1986, stfight,  empcity, stfight, stfight, stfight_state, stfight, ROT0,   "Seibu Kaihatsu (Tuning license)",          "Street Fight (Germany)", GAME_IMPERFECT_SOUND )
 GAME( 1986, stfighta, empcity, stfight, stfight, stfight_state, stfight, ROT0,   "Seibu Kaihatsu",                           "Street Fight (bootleg?)", GAME_IMPERFECT_SOUND )
-/* Cross Shooter runs on a slightly modified PCB, with a different text tilemap and gfx blobs (see also airraid.c) */
+/* Cross Shooter runs on a slightly modified PCB, with a different text tilemap and gfx blobs (see also cshooter.c) */
 GAME( 1987, cshooter,  0,      cshooter,cshooter, stfight_state, cshooter,ROT270,"Seibu Kaihatsu (Taito license)",           "Cross Shooter (not encrypted)", GAME_NOT_WORKING )
