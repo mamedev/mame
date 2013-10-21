@@ -260,6 +260,18 @@
 		</part>
 	</software>
 
+	<software name="wlstrbas">
+		<description>Waterloo Structured BASIC</description>
+		<year>1980</year>
+		<publisher>University of Waterloo</publisher>
+
+		<part name="rom" interface="pet_9000_rom">
+			<dataarea name="rom" size="0x800">
+				<rom name="wlstrbas-9000.bin" size="0x800" crc="d3f5b6e6" sha1="27e809138bc7a132a2a94ef8029ad8569d586cd6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="wordcrft">
 		<description>Wordcraft</description>
 		<year>198?</year>
