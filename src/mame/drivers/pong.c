@@ -620,7 +620,6 @@ INPUT_CHANGED_MEMBER(pong_state::input_changed)
 
 }
 
-
 static INPUT_PORTS_START( pong )
 	PORT_START( "PADDLE0" ) /* fake input port for player 1 paddle */
 	PORT_BIT( 0xff, 0x00, IPT_PADDLE ) PORT_SENSITIVITY(2) PORT_KEYDELTA(100) PORT_CENTERDELTA(0)   PORT_CHANGED_MEMBER(DEVICE_SELF, pong_state, input_changed,IC_PADDLE1)

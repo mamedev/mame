@@ -433,8 +433,40 @@ NETLIB_UPDATE(nic7450)
 {
 	UINT8 t1 = INPVAL(m_I0) & INPVAL(m_I1);
 	UINT8 t2 = INPVAL(m_I2) & INPVAL(m_I3);
+#if 0
 	UINT8 t =  (t1 | t2) ^ 1;
 	m_Q.setTo(t, t ? NLTIME_FROM_NS(22) : NLTIME_FROM_NS(15));
+#else
+	const netlist_time times[2] = { NLTIME_FROM_NS(22), NLTIME_FROM_NS(15) };
+
+	UINT8 res = 0;
+	m_I0.activate();
+	m_I1.activate();
+	if (t1 ^ 1)
+	{
+		m_I2.activate();
+		m_I3.activate();
+		if (t2 ^ 1)
+		{
+			res = 1;
+		}
+		else
+		{
+			m_I0.inactivate();
+			m_I1.inactivate();
+		}
+	} else {
+		m_I2.activate();
+		m_I3.activate();
+		if (t2 ^ 1)
+		{
+			m_I2.inactivate();
+			m_I3.inactivate();
+		}
+	}
+	m_Q.setTo(res, times[1 - res]);// ? 22000 : 15000);
+
+#endif
 }
 
 INLINE void nic7474_newstate(const UINT8 state, ttl_output_t &Q, ttl_output_t &QQ)
@@ -456,19 +488,24 @@ NETLIB_UPDATE(nic7474sub)
 
 NETLIB_UPDATE(nic7474)
 {
-	sub.m_nextD = INPVAL(m_D);
 	if (!INPVAL(m_preQ))
 	{
 		nic7474_newstate(1, sub.m_Q, sub.m_QQ);
 		sub.m_clk.inactivate();
+		m_D.inactivate();
 	}
 	else if (!INPVAL(m_clrQ))
 	{
 		nic7474_newstate(0, sub.m_Q, sub.m_QQ);
 		sub.m_clk.inactivate();
+		m_D.inactivate();
 	}
 	else
+	{
+		m_D.activate();
+		sub.m_nextD = INPVAL(m_D);
 		sub.m_clk.activate_lh();
+	}
 }
 
 NETLIB_CONSTRUCTOR(nic7474)
@@ -609,7 +646,7 @@ NETLIB_CONSTRUCTOR(nic7493)
 NETLIB_UPDATE(nic7493ff)
 {
 	//if INP_LAST(m_I) && !INP(m_I))
-		m_Q.setToNoCheck(!m_Q.new_Q(), NLTIME_FROM_NS(18));
+		m_Q.setTo(!m_Q.new_Q(), NLTIME_FROM_NS(18));
 }
 
 NETLIB_UPDATE(nic7493)
@@ -751,7 +788,8 @@ INLINE void nic74107A_newstate(UINT8 state, ttl_output_t &Q, ttl_output_t &QQ)
 NETLIB_UPDATE(nic74107Asub)
 {
 	{
-		nic74107A_newstate((!m_Q.new_Q() & m_Q1) | (m_Q.new_Q() & m_Q2) | m_F, m_Q, m_QQ);
+		net_sig_t t = m_Q.new_Q();
+		nic74107A_newstate((!t & m_Q1) | (t & m_Q2) | m_F, m_Q, m_QQ);
 		if (!m_Q1)
 			m_clk.inactivate();
 	}
@@ -867,15 +905,16 @@ NETLIB_UPDATE(nic9316)
 {
 	sub.m_loadq = INPVAL(m_LOADQ);
 	sub.m_ent = INPVAL(m_ENT);
+	const net_sig_t clrq = INPVAL(m_CLRQ);
 
-	if ((!sub.m_loadq || (sub.m_ent & INPVAL(m_ENP))) & INPVAL(m_CLRQ))
+	if ((!sub.m_loadq || (sub.m_ent & INPVAL(m_ENP))) & clrq)
 	{
 		sub.m_clk.activate_lh();
 	}
 	else
 	{
 		sub.m_clk.inactivate();
-		if (!INPVAL(m_CLRQ) & (sub.m_cnt>0))
+		if (!clrq & (sub.m_cnt>0))
 		{
 			sub.m_cnt = 0;
 			sub.update_outputs();

@@ -51,8 +51,7 @@
 #include "netlist.h"
 
 // this is a bad hack
-
-#define USE_OLD7493	(1)
+#define USE_OLD7493	(0)
 
 // ----------------------------------------------------------------------------------------
 // Special chips
