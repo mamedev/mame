@@ -60,7 +60,7 @@
 #define MASTER_CLOCK    XTAL_22_1184MHz
 
 #include "emu.h"
-#include "cpu/tms9900/tms9900l.h"
+#include "cpu/tms9900/tms9995.h"
 #include "sound/ay8910.h"
 
 
@@ -149,7 +149,9 @@ void nsmpoker_state::palette_init()
 
 INTERRUPT_GEN_MEMBER(nsmpoker_state::nsmpoker_interrupt)
 {
-	device.execute().set_input_line_and_vector(0, ASSERT_LINE, 3);//2=nmi  3,4,5,6
+	m_maincpu->set_input_line(INT_9995_INT1, ASSERT_LINE);
+	// need to clear the interrupt; maybe right here?
+	m_maincpu->set_input_line(INT_9995_INT1, CLEAR_LINE);
 }
 
 //WRITE8_MEMBER(nsmpoker_state::debug_w)
@@ -390,6 +392,17 @@ static GFXDECODE_START( nsmpoker )
 GFXDECODE_END
 
 
+static TMS9995_CONFIG( cpuconf95 )
+{
+	DEVCB_NULL,         // external op
+	DEVCB_NULL,        // Instruction acquisition
+	DEVCB_NULL,         // clock out
+	DEVCB_NULL,        // HOLDA
+	DEVCB_NULL,         // DBIN
+	INTERNAL_RAM,      // use internal RAM
+	NO_OVERFLOW_INT    // The generally available versions of TMS9995 have a deactivated overflow interrupt
+};
+
 /*************************
 *    Machine Drivers     *
 *************************/
@@ -397,9 +410,7 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( nsmpoker, nsmpoker_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS9995L, MASTER_CLOCK/2)   /* guess */
-	MCFG_CPU_PROGRAM_MAP(nsmpoker_map)
-	MCFG_CPU_IO_MAP(nsmpoker_portmap)
+	MCFG_TMS99xx_ADD("maincpu", TMS9995, MASTER_CLOCK/2, nsmpoker_map, nsmpoker_portmap, cpuconf95)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", nsmpoker_state,  nsmpoker_interrupt)
 
 	/* video hardware */

@@ -78,7 +78,7 @@ Stephh's notes (based on the game TMS9995 code and some tests) :
 ***********************************************************************************************************/
 
 #include "emu.h"
-#include "cpu/tms9900/tms9900l.h"
+#include "cpu/tms9900/tms9995.h"
 #include "video/tms9928a.h"
 #include "sound/msm5205.h"
 #include "sound/sn76496.h"
@@ -303,6 +303,10 @@ static const msm5205_interface msm5205_config =
 
 void pachifev_state::machine_reset()
 {
+	// Pulling down the line on RESET configures the CPU to insert one wait
+	// state on external memory accesses
+	static_cast<tms9995_device*>(machine().device("maincpu"))->set_ready(CLEAR_LINE);
+
 	m_power=0;
 	m_max_power=0;
 	m_input_power=0;
@@ -361,20 +365,22 @@ void pachifev_state::machine_start()
 	save_item(NAME(m_cnt));
 }
 
-static const struct tms9995reset_param pachifev_processor_config =
+static TMS9995_CONFIG( cpuconf95 )
 {
-	1,0,0
+	DEVCB_NULL,         // external op
+	DEVCB_NULL,        // Instruction acquisition
+	DEVCB_NULL,         // clock out
+	DEVCB_NULL,        // HOLDA
+	DEVCB_NULL,         // DBIN
+	INTERNAL_RAM,      // use internal RAM
+	NO_OVERFLOW_INT    // The generally available versions of TMS9995 have a deactivated overflow interrupt
 };
 
 static MACHINE_CONFIG_START( pachifev, pachifev_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS9995L, XTAL_12MHz)
-	MCFG_CPU_CONFIG(pachifev_processor_config)
-	MCFG_CPU_PROGRAM_MAP(pachifev_map)
-	MCFG_CPU_IO_MAP(pachifev_cru)
+	MCFG_TMS99xx_ADD("maincpu", TMS9995, XTAL_12MHz, pachifev_map, pachifev_cru, cpuconf95)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pachifev_state, pachifev_vblank_irq)
-
 
 	/* video hardware */
 	MCFG_TMS9928A_ADD( "tms9928a", TMS9928A, pachifev_tms9928a_interface )
