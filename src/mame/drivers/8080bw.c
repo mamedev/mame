@@ -1,11 +1,12 @@
 // license:MAME
-// copyright-holders:Michael Strutts,Nicola Salmoria,Tormod Tjaberg,Mirko Buffoni,Lee Taylor,Valerio Verrando,Marco Cassili,Zsolt Vasvari,Aaron Giles,Jonathan Gevaryahu,MISSING_OTHERS
+// copyright-holders:Michael Strutts,Nicola Salmoria,Tormod Tjaberg,Mirko Buffoni,Lee Taylor,Valerio Verrando,Marco Cassili,Zsolt Vasvari,Aaron Giles,Jonathan Gevaryahu,Andrew Welburn,MISSING_OTHERS
 /*****************************************************************************
 
     8080bw.c
 
     Michael Strutts, Nicola Salmoria, Tormod Tjaberg, Mirko Buffoni
-    Lee Taylor, Valerio Verrando, Marco Cassili, Zsolt Vasvari and others
+    Lee Taylor, Valerio Verrando, Marco Cassili, Zsolt Vasvari, Andy Welburn,
+    and others
 
 
     Notes:
@@ -68,51 +69,64 @@
          a paper sticker on the pcb; The code will be of the format mVNnnnnn where
          m is a letter and nnnnn is a number.
          Codes:
-         * SVNxxxxx? (L shaped pcbset) - B&W only, used on "Space Invaders" Upright
-           with 3-strip overlay.
+         * TVNxxxxx (3 layer pcbset) - B&W only, used on "T.T Space Invaders"
+           cocktail with 'blended' single-sheet gel color overlay.
+     ***TODO: this overlay is not supported yet!
+           Several revisions (at least 5 rom, 3 cpu, 3 audio) of each pcb exist
+           for this set.
+           Does support flipscreen.
+           Does not have the color overlay circuitry nor places for it on the pcbs.
+           (Later TVNxxxxx are actually rebadged CVNxxxxx, see below)   
+           Came from factory with one of the SV or TV romsets.
+           Capable of running TV, SV or CV romsets.
+           This pcb set is probably the oldest one and was designed at Taito. 
+         * SVNxxxxx? (L-shaped pcbset) - B&W only, used on "Space Invaders" Upright
+           with 3-separate-sheets-of-gel 'strips' color overlay.
+     ***TODO: this overlay might not be supported properly yet!
+           Does not support flipscreen. (to save on component costs?)  
            Audio PCB daughterboard has part number SVN00001 or SVN00003.
            Came from factory with one of the TV romsets ONLY?
            Capable of running TV, SV or CV romsets.
-         * TVNxxxxx (3 layer pcb) - B&W only, used on "T.T Space Invaders"
-           cocktail with blended single-sheet color gel overlay.
-        TODO: this overlay is not supported in MAME yet.
-           Several revisions (at least 5 rom, 3 cpu, 3 audio) of each pcb exist
-           for this set.
-           Came from factory with one of the SV or TV romsets.
-           Capable of running TV, SV or CV romsets.
-         * CVNxxxxx (3 layer pcb) - Color, used on "T.T Space Invaders Color"
-           cocktail with electronic overlay.
+           This is probably the second-oldest pcb set and may have been made to
+           allow closer physical interchangability with Midway's m8080bw hardware,
+           which had a similar board shape?
+         * CVNxxxxx (3 layer pcbset) - Color, used on "T.T Space Invaders Color"
+           cocktail with electronic color overlay.
+           Does support flipscreen.  
+           Note that later TVNxxxxx pcbsets are actually 'rebadged' CVNxxxxx
+           pcbsets with the color overlay circuitry unpopulated, and can be
+           'upgraded' to CVNxxxxx by adding a few components and proms.   
            Came from factory with one of the CV romsets.
            Capable of running TV, SV or CV romsets.
-         * PVNxxxxx (2&3 layer pcb) - Color, used on "T.T Space Invaders Part
-           II" cocktail with electronic overlay.
+         * PVNxxxxx (2&3 layer pcbsets) - Color, used on "T.T Space Invaders Part
+           II" cocktail with electronic color overlay.
            Several revisions (at least 3 rom, 1 cpu, 2 audio) of each pcb exist
            for this set.
            Came from factory with UV (2708) or PV (2716) romsets.
            Capable of running TV, SV, CV, UV or PV romsets.
 
-       * The following Romsets are known, from oldest to newest:
-         (L-board refers to the old type SVN pcbsets, S board to the TVN and CVN and some PVN pcbsets, C board to the later PVN pcbsets)
+       * The following Romsets are known, ROUGHLY from oldest to newest:
          SV01, SV02, SV03, SV04, SV05, SV06 - undumped (rev 1), this would be the very first japan release of space invaders (Andy W may call this 'SV0'?)
+         (SV01, SV02, SV08, SV04, SV07, SV06) - undumped, unknown if this version actually exists. 
          SV01, SV02, SV10, SV04, SV09, SV06 - sisv2 (rev 2) (Andy W calls this 'SV1', and the midway 'invaders' set is based on this romset)
-         SV01-1, SV02, SV10, SV04, SV09, SV06 - sisv3 (rev 3) (Andy W calls this 'SV2')
-         SV01-1, SV11, SV12, SV04, SV13, SV14 - sisv (rev 4, 5-digit scoring) (Andy W calls this 'SV3')
+         SV0H, SV02, SV10, SV04, SV09, SV06 - sisv3 (rev 3) (Andy W calls this 'SV2')
+         SV0H, SV11, SV12, SV04, SV13, SV14 - sisv (rev 4, 5-digit scoring) (Andy W calls this 'SV3') (this set is likely newer than the TV0x sets)
          TV01, TV02, TV03, TV04 - sitv1 (rev 1)
-         TV01-1, TV02, TV03, TV04 - sitv (rev 2 with bug fixes)
-         CV03, CV04, CV05, CV06 w/proms - undumped (but apparently the same as one of the sisv sets with the roms combined to 2716 size)
+         TV0H, TV02, TV03, TV04 - sitv (rev 2 with bug fixes) 
+         CV03, CV04, CV05, CV06 w/proms - undumped (but may be the same as one of the sisv sets with the roms combined to 2716 size)
          CV17, CV18, CV19, CV20 w/proms - sicv
          UV1, UV2, UV3, UV4, UV5, UV6, UV7, UV8, UV9, UV10 w/proms - undumped (probably same as pvxx set just split differently)
          PV01, PV02, PV03, PV04, PV05 w/proms - invadpt2
-         Note: SV01-1 and TV01-1 were once listed as SV0H and TV0H due to improperly reading the label
+         Note: SV0H and TV0H are called in taito documentation "SV01-1" and "TV01-1" most likely due to someone along the line mistaking the '1-1' for an H or vice versa when writing the documentation or creating the labels.
 
     - Midway PCB sets: (cursory descripton)
       * All Midway Space Invaders games ([Space Invader Upright], [Space Invader Cocktail],
         [Deluxe Space Invaders Upright], [Deluxe Space Invaders Cocktail], and [Space Invaders II])
-        use the same 8080 mainboard, with no emulation-relevant differences between revisions.
+        use the same m8080bw mainboard, with no emulation-relevant differences between revisions.
       * [Space Invaders II] from Midway (only produced as a cocktail) uses
         an extra sound board for the simultaneous 2 player head-to-head sounds.
 
-    - Taito-USA-made 'trimline' PCBS do not match the taito pcbs either.
+    - Taito-USA-made 'trimline' PCBS do not match the taito japan-made pcbs either.
 
 
     To Do:
@@ -3321,7 +3335,7 @@ ROM_END
 
 ROM_START( sinvemag )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "sv01.36",      0x0000, 0x0400, CRC(86bb8cb6) SHA1(a75648e7f2446c756d86624b15d387d25ce47b66) ) // == SV01-1
+	ROM_LOAD( "sv01.36",      0x0000, 0x0400, CRC(86bb8cb6) SHA1(a75648e7f2446c756d86624b15d387d25ce47b66) ) // == SV0H
 	ROM_LOAD( "emag_si.b",    0x0400, 0x0400, CRC(febe6d1a) SHA1(e1c3a24b4fa5862107ada1f9d7249466e8c3f06a) )
 	ROM_LOAD( "emag_si.c",    0x0800, 0x0400, CRC(aafb24f7) SHA1(6718cdfae09f77d735be5145b9d202a73d8ed9db) )
 	ROM_LOAD( "emag_si.d",    0x1400, 0x0400, CRC(68c4b9da) SHA1(8953dc0427b09b71bd763e65caa7deaca09a15da) )
@@ -3363,7 +3377,7 @@ ROM_END
 
 ROM_START( sitv ) // rev 2, minor bug fixes of sitv1; delay when writing to sound latch 0x05, and another unknown change
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "tv01-1.s1",      0x0000, 0x0800, CRC(fef18aad) SHA1(043edeefe6a6d4934bd384eafea19326de1dbeec) )
+	ROM_LOAD( "tv0h.s1",      0x0000, 0x0800, CRC(fef18aad) SHA1(043edeefe6a6d4934bd384eafea19326de1dbeec) )
 	ROM_LOAD( "tv02.rp1",     0x0800, 0x0800, CRC(3c759a90) SHA1(d847d592dee592b1d3a575c21d89eaf3f7f6ae1b) )
 	ROM_LOAD( "tv03.n1",      0x1000, 0x0800, CRC(0ad3657f) SHA1(a501f316535c50f7d7a20ef8e6dede1526a3f2a8) )
 	ROM_LOAD( "tv04.m1",      0x1800, 0x0800, CRC(cd2c67f6) SHA1(60f9d8fe2d36ff589277b607f07c1edc917c755c) )
@@ -3403,7 +3417,7 @@ ROM_END
 
 ROM_START( sisv3 ) // rev 3
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "sv01-1.36",   0x0000, 0x0400, CRC(86bb8cb6) SHA1(a75648e7f2446c756d86624b15d387d25ce47b66) )
+	ROM_LOAD( "sv0h.36",   0x0000, 0x0400, CRC(86bb8cb6) SHA1(a75648e7f2446c756d86624b15d387d25ce47b66) )
 	ROM_LOAD( "sv02.35",     0x0400, 0x0400, CRC(0e159534) SHA1(94b2015a9d38ca738705b8d024a79fd2f9855b98) )
 	ROM_LOAD( "sv10.34",     0x0800, 0x0400, CRC(483e651e) SHA1(ae795ee3bc53ac3936f6cf2c72cca7a890783513) )
 	ROM_LOAD( "sv04.31",     0x1400, 0x0400, CRC(1293b826) SHA1(165cd5d08a19eadbe954145b12807f10df9e691a) )
@@ -3413,7 +3427,7 @@ ROM_END
 
 ROM_START( sisv ) // rev 4, with 5-digit scoring
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "sv01-1.36",   0x0000, 0x0400, CRC(86bb8cb6) SHA1(a75648e7f2446c756d86624b15d387d25ce47b66) )
+	ROM_LOAD( "sv0h.36",   0x0000, 0x0400, CRC(86bb8cb6) SHA1(a75648e7f2446c756d86624b15d387d25ce47b66) )
 	ROM_LOAD( "sv11.35",     0x0400, 0x0400, CRC(febe6d1a) SHA1(e1c3a24b4fa5862107ada1f9d7249466e8c3f06a) )
 	ROM_LOAD( "sv12.34",     0x0800, 0x0400, CRC(a08e7202) SHA1(de9f7c851d1b894915e720cfc5d794cdb31752f6) )
 	ROM_LOAD( "sv04.31",     0x1400, 0x0400, CRC(1293b826) SHA1(165cd5d08a19eadbe954145b12807f10df9e691a) )
