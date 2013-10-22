@@ -83,7 +83,7 @@ NETLIB_CONSTRUCTOR(netdev_clock)
 	register_param("FREQ", m_freq, 7159000.0 * 5);
 	m_inc = netlist_time::from_hz(m_freq.Value()*2);
 
-	register_link_internal(m_feedback, m_Q);
+	register_link_internal(m_feedback, m_Q, net_input_t::INP_STATE_ACTIVE);
 
 }
 
@@ -223,7 +223,7 @@ NETLIB_CONSTRUCTOR(nicNE555N_MSTABLE)
 	register_param("VL", m_VL, 0.0 *5.0);
 
 	m_THRESHOLD_OUT.set_netdev(this);
-	register_link_internal(m_THRESHOLD, m_THRESHOLD_OUT);
+	register_link_internal(m_THRESHOLD, m_THRESHOLD_OUT, net_input_t::INP_STATE_ACTIVE);
 
 	m_Q.initial(5.0 * 0.4);
 	m_last = false;
@@ -471,7 +471,7 @@ NETLIB_UPDATE(nic7450)
 
 INLINE void nic7474_newstate(const UINT8 state, ttl_output_t &Q, ttl_output_t &QQ)
 {
-	const netlist_time delay[2] = { NLTIME_FROM_NS(25), NLTIME_FROM_NS(40) };
+	static const netlist_time delay[2] = { NLTIME_FROM_NS(25), NLTIME_FROM_NS(40) };
 	//printf("%s %d %d %d\n", "7474", state, Q.Q(), QQ.Q());
 	Q.setTo(state, delay[state]);
 	QQ.setTo(!state, delay[!state]);
@@ -638,14 +638,14 @@ NETLIB_CONSTRUCTOR(nic7493)
 	register_output(D, "QD", D.m_Q);
 
 	//B.register_link_internal(B.m_I, A.m_Q);
-	register_link_internal(C, C.m_I, B.m_Q);
-	register_link_internal(D, D.m_I, C.m_Q);
+	register_link_internal(C, C.m_I, B.m_Q, net_input_t::INP_STATE_HL);
+	register_link_internal(D, D.m_I, C.m_Q, net_input_t::INP_STATE_HL);
 
 }
 
 NETLIB_UPDATE(nic7493ff)
 {
-	//if INP_LAST(m_I) && !INP(m_I))
+	if (m_reset == 0)
 		m_Q.setTo(!m_Q.new_Q(), NLTIME_FROM_NS(18));
 }
 
@@ -656,10 +656,9 @@ NETLIB_UPDATE(nic7493)
 	if (r)
 	{
 		//printf("%s reset\n", name());
+		A.m_reset = B.m_reset = C.m_reset = D.m_reset = 1;
 		A.m_I.inactivate();
 		B.m_I.inactivate();
-		C.m_I.inactivate();
-		D.m_I.inactivate();
 		A.m_Q.setTo(0, NLTIME_FROM_NS(40));
 		B.m_Q.setTo(0, NLTIME_FROM_NS(40));
 		C.m_Q.setTo(0, NLTIME_FROM_NS(40));
@@ -667,10 +666,9 @@ NETLIB_UPDATE(nic7493)
 	}
 	else
 	{
+		A.m_reset = B.m_reset = C.m_reset = D.m_reset = 0;
 		A.m_I.activate_hl();
 		B.m_I.activate_hl();
-		C.m_I.activate_hl();
-		D.m_I.activate_hl();
 		//printf("%s enable\n", name());
 	}
 }

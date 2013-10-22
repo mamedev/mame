@@ -588,16 +588,15 @@ protected:
 	double m_Q_analog;
 	double m_new_Q_analog;
 
-	netlist_base_t *m_netlist;
-
 	int m_num_cons;
 
 	net_input_t *m_cons[48];
 
-	net_core_device_t *m_netdev;
 	double m_low_V;
 	double m_high_V;
 
+	net_core_device_t *m_netdev;
+	netlist_base_t *m_netlist;
 };
 
 class logic_output_t : public net_output_t
@@ -723,8 +722,8 @@ public:
 	ATTR_COLD void register_input(const char *name, net_input_t &in, net_input_t::net_input_state state = net_input_t::INP_STATE_ACTIVE);
 	ATTR_COLD void register_input(net_core_device_t &dev, const char *name, net_input_t &in, net_input_t::net_input_state state = net_input_t::INP_STATE_ACTIVE);
 
-	ATTR_COLD void register_link_internal(net_input_t &in, net_output_t &out);
-	ATTR_COLD void register_link_internal(net_core_device_t &dev, net_input_t &in, net_output_t &out);
+	ATTR_COLD void register_link_internal(net_input_t &in, net_output_t &out, net_input_t::net_input_state aState);
+	ATTR_COLD void register_link_internal(net_core_device_t &dev, net_input_t &in, net_output_t &out, net_input_t::net_input_state aState);
 
 	net_list_t<const char *, 20> m_inputs;
 

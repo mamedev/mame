@@ -489,14 +489,14 @@ ATTR_HOT ATTR_ALIGN void netlist_base_t::process_list(INT32 &atime)
 
 					m_mainclock->update();
 					mainclock_Q.update_devs();
+
 				}
 				const queue_t::entry_t &e = m_queue.pop();
 
 				update_time(e.time(), atime);
 
-				e.object().
+				e.object().update_devs();
 
-						update_devs();
 			} else {
 				update_time(mainclock_Q.time(), atime);
 
@@ -853,17 +853,17 @@ void net_device_t::register_input(const char *name, net_input_t &inp, net_input_
 	register_input(*this, name, inp, type);
 }
 
-void net_device_t::register_link_internal(net_core_device_t &dev, net_input_t &in, net_output_t &out)
+void net_device_t::register_link_internal(net_core_device_t &dev, net_input_t &in, net_output_t &out, net_input_t::net_input_state aState)
 {
 	in.set_output(GETINPPTR(out));
-	in.init(&dev);
+	in.init(&dev, aState);
 	//if (in.state() != net_input_t::INP_STATE_PASSIVE)
 		out.register_con(in);
 }
 
-void net_device_t::register_link_internal(net_input_t &in, net_output_t &out)
+void net_device_t::register_link_internal(net_input_t &in, net_output_t &out, net_input_t::net_input_state aState)
 {
-	register_link_internal(*this, in, out);
+	register_link_internal(*this, in, out, aState);
 }
 
 void net_device_t::register_param(net_core_device_t &dev, const char *name, net_param_t &param, double initialVal)
@@ -932,6 +932,7 @@ ATTR_HOT ATTR_ALIGN inline void net_output_t::update_dev(const net_input_t &inp,
 
 ATTR_HOT ATTR_ALIGN inline void net_output_t::update_devs()
 {
+
 	assert(m_num_cons != 0);
 
 	const UINT8 masks[4] = { 1, 5, 3, 1 };
@@ -960,6 +961,7 @@ ATTR_HOT ATTR_ALIGN inline void net_output_t::update_devs()
 	}
 
 	m_last_Q = m_Q;
+
 }
 
 ATTR_COLD void net_output_t::register_con(net_input_t &input)
