@@ -4,7 +4,7 @@
 
         Central Data cd2650
 
-        08/04/2010 Skeleton driver.
+        2010-04-08 Skeleton driver.
 
         No info available on this computer apart from a few newsletters.
         The system only uses 1000-14FF for videoram and 17F0-17FF for
@@ -17,9 +17,7 @@
         TODO
         - Lots, probably. The computer is a complete mystery. No pictures,
                 manuals or schematics exist.
-        - Using the terminal keyboard, as it is unknown if it has its own.
         - Cassette interface to be tested - no idea what the command syntax is for saving.
-        - Need the proper chargen rom.
 
 ****************************************************************************/
 
@@ -80,8 +78,6 @@ READ8_MEMBER( cd2650_state::cass_r )
 READ8_MEMBER( cd2650_state::keyin_r )
 {
 	UINT8 ret = m_term_data;
-	if ((ret > 0x5f) && (ret < 0x80))
-		ret -= 0x20; // upper case only
 	m_term_data = ret | 0x80;
 	return ret;
 }
@@ -90,8 +86,7 @@ static ADDRESS_MAP_START(cd2650_mem, AS_PROGRAM, 8, cd2650_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x03ff) AM_ROM
 	AM_RANGE( 0x0400, 0x0fff) AM_RAM
-	AM_RANGE( 0x1000, 0x17ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE( 0x1800, 0x7fff) AM_RAM // expansion ram needed by quickloads
+	AM_RANGE( 0x1000, 0x7fff) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cd2650_io, AS_IO, 8, cd2650_state)
@@ -255,12 +250,12 @@ QUICKLOAD_LOAD_MEMBER( cd2650_state, cd2650 )
 					for (i = quick_addr; i < read_; i++)
 						space.write_byte(i, quick_data[i]);
 
-					read_ = 0x1780;
-					if (quick_length < 0x1780)
+					read_ = 0x17e0;
+					if (quick_length < 0x17e0)
 						read_ = quick_length;
 
-					if (quick_length > 0x157f)
-						for (i = 0x1580; i < read_; i++)
+					if (quick_length > 0x14ff)
+						for (i = 0x1500; i < read_; i++)
 							space.write_byte(i, quick_data[i]);
 
 					if (quick_length > 0x17ff)
@@ -341,5 +336,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY        FULLNAME       FLAGS */
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   CLASS          INIT     COMPANY        FULLNAME       FLAGS */
 COMP( 1977, cd2650, 0,      0,       cd2650,    cd2650, driver_device,  0,   "Central Data",   "CD 2650", 0 )
