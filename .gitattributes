@@ -423,7 +423,6 @@ src/emu/bus/c64/bn1541.c svneol=native#text/plain
 src/emu/bus/c64/bn1541.h svneol=native#text/plain
 src/emu/bus/c64/c128_comal80.c svneol=native#text/plain
 src/emu/bus/c64/c128_comal80.h svneol=native#text/plain
-src/emu/bus/c64/cbm_crt.c svneol=native#text/plain
 src/emu/bus/c64/comal80.c svneol=native#text/plain
 src/emu/bus/c64/comal80.h svneol=native#text/plain
 src/emu/bus/c64/cpm.c svneol=native#text/plain
