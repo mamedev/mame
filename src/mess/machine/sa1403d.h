@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
 /**********************************************************************
 
     Shugart SA1403D Winchester Disk Controller emulation
