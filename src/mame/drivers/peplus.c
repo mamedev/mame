@@ -1445,7 +1445,7 @@ PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
 	ROM_LOAD( "pp0055_961-984.u68",   0x00000, 0x10000, CRC(c6b897cc) SHA1(9ba200652db58e602f388c21aaf9b3f837412385) ) /* Game Version: 961, Library Version: 984 */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg1215.u72",   0x00000, 0x8000, CRC(425f57be) SHA1(6d53ae86bec7189a35671a7f691e101a2ed4d8c4) )
+	ROM_LOAD( "mro-cg1215.u72",   0x00000, 0x8000, CRC(425f57be) SHA1(6d53ae86bec7189a35671a7f691e101a2ed4d8c4) ) /*  06/09/93   @ IGT  L93-1585  */
 	ROM_LOAD( "mgo-cg1215.u73",   0x08000, 0x8000, CRC(0f66cd94) SHA1(9ac0cd01aca87e045c4fd6045ed907a092d6b2ee) )
 	ROM_LOAD( "mbo-cg1215.u74",   0x10000, 0x8000, CRC(10f89e44) SHA1(cdc34970b0325a24cfd5c187a4b4dbf42be8fc93) )
 	ROM_LOAD( "mxo-cg1215.u75",   0x18000, 0x8000, CRC(73c24e43) SHA1(f09beaf374ad371db2701767ce6ac5bdb13c445a) )
@@ -1495,7 +1495,7 @@ PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
 	ROM_LOAD( "pp0126_961-984.u68",   0x00000, 0x10000, CRC(aadb62ef) SHA1(85979d5932ef254241c363414c2093cc943e88a5) ) /* Game Version: 961, Library Version: 984 */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg1215.u72",   0x00000, 0x8000, CRC(425f57be) SHA1(6d53ae86bec7189a35671a7f691e101a2ed4d8c4) )
+	ROM_LOAD( "mro-cg1215.u72",   0x00000, 0x8000, CRC(425f57be) SHA1(6d53ae86bec7189a35671a7f691e101a2ed4d8c4) ) /*  06/09/93   @ IGT  L93-1585  */
 	ROM_LOAD( "mgo-cg1215.u73",   0x08000, 0x8000, CRC(0f66cd94) SHA1(9ac0cd01aca87e045c4fd6045ed907a092d6b2ee) )
 	ROM_LOAD( "mbo-cg1215.u74",   0x10000, 0x8000, CRC(10f89e44) SHA1(cdc34970b0325a24cfd5c187a4b4dbf42be8fc93) )
 	ROM_LOAD( "mxo-cg1215.u75",   0x18000, 0x8000, CRC(73c24e43) SHA1(f09beaf374ad371db2701767ce6ac5bdb13c445a) )
@@ -1518,7 +1518,7 @@ PayTable   3K   STR  FL  FH  4K  SF  5K   RF    4D   RF   4D  (Bonus)
 	ROM_LOAD( "pp0127_a47-a76.u68",   0x00000, 0x10000, CRC(2997aaac) SHA1(b52525154f4ae39a341ecf829c33449f31a8ce07) ) /* Game Version: A47, Library Version: A76 */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg1215.u72",   0x00000, 0x8000, CRC(425f57be) SHA1(6d53ae86bec7189a35671a7f691e101a2ed4d8c4) )
+	ROM_LOAD( "mro-cg1215.u72",   0x00000, 0x8000, CRC(425f57be) SHA1(6d53ae86bec7189a35671a7f691e101a2ed4d8c4) ) /*  06/09/93   @ IGT  L93-1585  */
 	ROM_LOAD( "mgo-cg1215.u73",   0x08000, 0x8000, CRC(0f66cd94) SHA1(9ac0cd01aca87e045c4fd6045ed907a092d6b2ee) )
 	ROM_LOAD( "mbo-cg1215.u74",   0x10000, 0x8000, CRC(10f89e44) SHA1(cdc34970b0325a24cfd5c187a4b4dbf42be8fc93) )
 	ROM_LOAD( "mxo-cg1215.u75",   0x18000, 0x8000, CRC(73c24e43) SHA1(f09beaf374ad371db2701767ce6ac5bdb13c445a) )
@@ -1527,7 +1527,7 @@ PayTable   3K   STR  FL  FH  4K  SF  5K   RF    4D   RF   4D  (Bonus)
 	ROM_LOAD( "cap1215.u50", 0x0000, 0x0100, CRC(294b7b10) SHA1(a405a4b8547b713c5c02dacb19e7354095a7b584) )
 ROM_END
 
-ROM_START( pepp0158 ) /* Normal board : 4 of a Kind Bonus Poker (PP0158) */
+ROM_START( pepp0158 ) /* Normal board : 4 of a Kind Bonus Poker (PP0158) - 10/23/95   @ IGT  L95-2438 */
 /*
                                        5-K 2-4
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
@@ -1540,7 +1540,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
 	ROM_LOAD( "pp0158_a46-a75.u68",   0x00000, 0x10000, CRC(5976cd19) SHA1(6a461ea9ddf78dffa3cf8b65903ebf3127f23d45) ) /* Game Version: A46, Library Version: A75, Video Lib ver A0Y */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2003.u72",  0x00000, 0x8000, CRC(0d425f48) SHA1(b60aaf3f4bd76f75f72f6e8dda724bdf795cb521) )
+	ROM_LOAD( "mro-cg2003.u72",  0x00000, 0x8000, CRC(0d425f48) SHA1(b60aaf3f4bd76f75f72f6e8dda724bdf795cb521) ) /*  08/30/94   @ IGT  L95-0145  */
 	ROM_LOAD( "mgo-cg2003.u73",  0x08000, 0x8000, CRC(add0afc4) SHA1(0519bf2f36cb67140933b2c533e625544f27d16b) )
 	ROM_LOAD( "mbo-cg2003.u74",  0x10000, 0x8000, CRC(8649dec0) SHA1(0024d3a8fd85279552910b14b69b225bda93957f) )
 	ROM_LOAD( "mxo-cg2003.u75",  0x18000, 0x8000, CRC(904631cd) SHA1(d280a2f16b51a04b3f601db3535980a765c60e6f) )
@@ -1658,7 +1658,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) ) /* BPROM type DM74LS471 (compatible with N82S135N) verified */
 ROM_END
 
-ROM_START( pepp0197a ) /* Normal board : Standard Draw Poker (PP0197) */
+ROM_START( pepp0197a ) /* Normal board : Standard Draw Poker (PP0197) - 10/23/95   @ IGT  L95-2452 */
 /*
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 ----------------------------------------------------------
@@ -1693,7 +1693,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
 	ROM_LOAD( "pp0203_813-824.u68",   0x00000, 0x10000, CRC(49ea6fb9) SHA1(ca595e30d786d28397eeef10786a811af1a5c74d) ) /* Game Version: 813, Library Version: 824 */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2003.u72",  0x00000, 0x8000, CRC(0d425f48) SHA1(b60aaf3f4bd76f75f72f6e8dda724bdf795cb521) )
+	ROM_LOAD( "mro-cg2003.u72",  0x00000, 0x8000, CRC(0d425f48) SHA1(b60aaf3f4bd76f75f72f6e8dda724bdf795cb521) ) /*  08/30/94   @ IGT  L95-0145  */
 	ROM_LOAD( "mgo-cg2003.u73",  0x08000, 0x8000, CRC(add0afc4) SHA1(0519bf2f36cb67140933b2c533e625544f27d16b) )
 	ROM_LOAD( "mbo-cg2003.u74",  0x10000, 0x8000, CRC(8649dec0) SHA1(0024d3a8fd85279552910b14b69b225bda93957f) )
 	ROM_LOAD( "mxo-cg2003.u75",  0x18000, 0x8000, CRC(904631cd) SHA1(d280a2f16b51a04b3f601db3535980a765c60e6f) )
@@ -1715,7 +1715,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
 	ROM_LOAD( "pp0203_a46-a75.u68",   0x00000, 0x10000, CRC(2955eeb5) SHA1(ac2483dbb92de84ab64d0d7e55acff196966ea1b) ) /* Game Version: A46, Library Version: A75, Video Lib ver: A0Y */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2003.u72",  0x00000, 0x8000, CRC(0d425f48) SHA1(b60aaf3f4bd76f75f72f6e8dda724bdf795cb521) )
+	ROM_LOAD( "mro-cg2003.u72",  0x00000, 0x8000, CRC(0d425f48) SHA1(b60aaf3f4bd76f75f72f6e8dda724bdf795cb521) ) /*  08/30/94   @ IGT  L95-0145  */
 	ROM_LOAD( "mgo-cg2003.u73",  0x08000, 0x8000, CRC(add0afc4) SHA1(0519bf2f36cb67140933b2c533e625544f27d16b) )
 	ROM_LOAD( "mbo-cg2003.u74",  0x10000, 0x8000, CRC(8649dec0) SHA1(0024d3a8fd85279552910b14b69b225bda93957f) )
 	ROM_LOAD( "mxo-cg2003.u75",  0x18000, 0x8000, CRC(904631cd) SHA1(d280a2f16b51a04b3f601db3535980a765c60e6f) )
@@ -1759,7 +1759,7 @@ PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
 	ROM_LOAD( "pp0224_a47-a76.u68",   0x00000, 0x10000, CRC(5d6881ad) SHA1(38953ffadea04df614b14c70177736039495c408) ) /* Game Version: A47, Library Version: A76 */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg1215.u72",   0x00000, 0x8000, CRC(425f57be) SHA1(6d53ae86bec7189a35671a7f691e101a2ed4d8c4) )
+	ROM_LOAD( "mro-cg1215.u72",   0x00000, 0x8000, CRC(425f57be) SHA1(6d53ae86bec7189a35671a7f691e101a2ed4d8c4) ) /*  06/09/93   @ IGT  L93-1585  */
 	ROM_LOAD( "mgo-cg1215.u73",   0x08000, 0x8000, CRC(0f66cd94) SHA1(9ac0cd01aca87e045c4fd6045ed907a092d6b2ee) )
 	ROM_LOAD( "mbo-cg1215.u74",   0x10000, 0x8000, CRC(10f89e44) SHA1(cdc34970b0325a24cfd5c187a4b4dbf42be8fc93) )
 	ROM_LOAD( "mxo-cg1215.u75",   0x18000, 0x8000, CRC(73c24e43) SHA1(f09beaf374ad371db2701767ce6ac5bdb13c445a) )
@@ -1782,7 +1782,7 @@ PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
 	ROM_LOAD( "pp0224_961-984.u68",   0x00000, 0x10000, CRC(71d5e112) SHA1(528f06ad7ea7e1e297939c7b3ca0bb7faa8ce8c1) ) /* Game Version: 961, Library Version: 984 */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg1215.u72",   0x00000, 0x8000, CRC(425f57be) SHA1(6d53ae86bec7189a35671a7f691e101a2ed4d8c4) )
+	ROM_LOAD( "mro-cg1215.u72",   0x00000, 0x8000, CRC(425f57be) SHA1(6d53ae86bec7189a35671a7f691e101a2ed4d8c4) ) /*  06/09/93   @ IGT  L93-1585  */
 	ROM_LOAD( "mgo-cg1215.u73",   0x08000, 0x8000, CRC(0f66cd94) SHA1(9ac0cd01aca87e045c4fd6045ed907a092d6b2ee) )
 	ROM_LOAD( "mbo-cg1215.u74",   0x10000, 0x8000, CRC(10f89e44) SHA1(cdc34970b0325a24cfd5c187a4b4dbf42be8fc93) )
 	ROM_LOAD( "mxo-cg1215.u75",   0x18000, 0x8000, CRC(73c24e43) SHA1(f09beaf374ad371db2701767ce6ac5bdb13c445a) )
@@ -1810,7 +1810,7 @@ ROM_START( pepp0235 ) /* Normal board : 4 of a Kind Bonus Poker (PP0235) */
 	ROM_LOAD( "pp0235_a46-a75.u68",   0x00000, 0x10000, CRC(dccb5e2f) SHA1(4c1ff0f79d9441d0b7e8b31f95def1056945eb96) ) /* Game Version: A46, Library Version: A75, Video Lib ver A0Y */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2003.u72",  0x00000, 0x8000, CRC(0d425f48) SHA1(b60aaf3f4bd76f75f72f6e8dda724bdf795cb521) )
+	ROM_LOAD( "mro-cg2003.u72",  0x00000, 0x8000, CRC(0d425f48) SHA1(b60aaf3f4bd76f75f72f6e8dda724bdf795cb521) ) /*  08/30/94   @ IGT  L95-0145  */
 	ROM_LOAD( "mgo-cg2003.u73",  0x08000, 0x8000, CRC(add0afc4) SHA1(0519bf2f36cb67140933b2c533e625544f27d16b) )
 	ROM_LOAD( "mbo-cg2003.u74",  0x10000, 0x8000, CRC(8649dec0) SHA1(0024d3a8fd85279552910b14b69b225bda93957f) )
 	ROM_LOAD( "mxo-cg2003.u75",  0x18000, 0x8000, CRC(904631cd) SHA1(d280a2f16b51a04b3f601db3535980a765c60e6f) )
@@ -1851,7 +1851,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
 	ROM_LOAD( "pp0265_a0n-a23.u68",   0x00000, 0x10000, CRC(7dad6907) SHA1(890bdafb8bf272e513e94c8016c9866ab39f8fa2) ) /* Game Version: A0N, Library Version: A23, Viedo Lib ver: A0Y */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2003.u72",  0x00000, 0x8000, CRC(0d425f48) SHA1(b60aaf3f4bd76f75f72f6e8dda724bdf795cb521) )
+	ROM_LOAD( "mro-cg2003.u72",  0x00000, 0x8000, CRC(0d425f48) SHA1(b60aaf3f4bd76f75f72f6e8dda724bdf795cb521) ) /*  08/30/94   @ IGT  L95-0145  */
 	ROM_LOAD( "mgo-cg2003.u73",  0x08000, 0x8000, CRC(add0afc4) SHA1(0519bf2f36cb67140933b2c533e625544f27d16b) )
 	ROM_LOAD( "mbo-cg2003.u74",  0x10000, 0x8000, CRC(8649dec0) SHA1(0024d3a8fd85279552910b14b69b225bda93957f) )
 	ROM_LOAD( "mxo-cg2003.u75",  0x18000, 0x8000, CRC(904631cd) SHA1(d280a2f16b51a04b3f601db3535980a765c60e6f) )
@@ -1893,7 +1893,7 @@ PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
 	ROM_LOAD( "pp0290_a0v-a2d.u68",   0x00000, 0x10000, CRC(e2e6451c) SHA1(fa83b7a6d6c4ba1b3ee95b48ab6c3594477e536d) ) /* Game Version: A0V, Library Version: A2D */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg1215.u72",   0x00000, 0x8000, CRC(425f57be) SHA1(6d53ae86bec7189a35671a7f691e101a2ed4d8c4) )
+	ROM_LOAD( "mro-cg1215.u72",   0x00000, 0x8000, CRC(425f57be) SHA1(6d53ae86bec7189a35671a7f691e101a2ed4d8c4) ) /*  06/09/93   @ IGT  L93-1585  */
 	ROM_LOAD( "mgo-cg1215.u73",   0x08000, 0x8000, CRC(0f66cd94) SHA1(9ac0cd01aca87e045c4fd6045ed907a092d6b2ee) )
 	ROM_LOAD( "mbo-cg1215.u74",   0x10000, 0x8000, CRC(10f89e44) SHA1(cdc34970b0325a24cfd5c187a4b4dbf42be8fc93) )
 	ROM_LOAD( "mxo-cg1215.u75",   0x18000, 0x8000, CRC(73c24e43) SHA1(f09beaf374ad371db2701767ce6ac5bdb13c445a) )
@@ -1915,7 +1915,7 @@ PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
 	ROM_LOAD( "pp0291_a0v-a2d.u68",   0x00000, 0x10000, CRC(4eabac97) SHA1(dc849bca8ac90536c361cd576ee81c50afd7071b) ) /* Game Version: A0V, Library Version: A2D */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg1215.u72",   0x00000, 0x8000, CRC(425f57be) SHA1(6d53ae86bec7189a35671a7f691e101a2ed4d8c4) )
+	ROM_LOAD( "mro-cg1215.u72",   0x00000, 0x8000, CRC(425f57be) SHA1(6d53ae86bec7189a35671a7f691e101a2ed4d8c4) ) /*  06/09/93   @ IGT  L93-1585  */
 	ROM_LOAD( "mgo-cg1215.u73",   0x08000, 0x8000, CRC(0f66cd94) SHA1(9ac0cd01aca87e045c4fd6045ed907a092d6b2ee) )
 	ROM_LOAD( "mbo-cg1215.u74",   0x10000, 0x8000, CRC(10f89e44) SHA1(cdc34970b0325a24cfd5c187a4b4dbf42be8fc93) )
 	ROM_LOAD( "mxo-cg1215.u75",   0x18000, 0x8000, CRC(73c24e43) SHA1(f09beaf374ad371db2701767ce6ac5bdb13c445a) )
@@ -1937,7 +1937,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
 	ROM_LOAD( "pp0409_a45-a75.u68",   0x00000, 0x10000, CRC(a71fdad9) SHA1(a719787895ad035b2b930d2692930466a9bfb19d) ) /* Game Version: A46, Library Version: A75, Game Lib ver: A0Y */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2003.u72",  0x00000, 0x8000, CRC(0d425f48) SHA1(b60aaf3f4bd76f75f72f6e8dda724bdf795cb521) )
+	ROM_LOAD( "mro-cg2003.u72",  0x00000, 0x8000, CRC(0d425f48) SHA1(b60aaf3f4bd76f75f72f6e8dda724bdf795cb521) ) /*  08/30/94   @ IGT  L95-0145  */
 	ROM_LOAD( "mgo-cg2003.u73",  0x08000, 0x8000, CRC(add0afc4) SHA1(0519bf2f36cb67140933b2c533e625544f27d16b) )
 	ROM_LOAD( "mbo-cg2003.u74",  0x10000, 0x8000, CRC(8649dec0) SHA1(0024d3a8fd85279552910b14b69b225bda93957f) )
 	ROM_LOAD( "mxo-cg2003.u75",  0x18000, 0x8000, CRC(904631cd) SHA1(d280a2f16b51a04b3f601db3535980a765c60e6f) )
@@ -1959,7 +1959,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
 	ROM_LOAD( "pp0410_a0n-a23.u68",   0x00000, 0x10000, CRC(474f4809) SHA1(8d88647ab4719fdcf6ec0800386f32574b1da66d) ) /* Game Version: A0N, Library Version: A23, Game Lib ver: A0Y */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2003.u72",  0x00000, 0x8000, CRC(0d425f48) SHA1(b60aaf3f4bd76f75f72f6e8dda724bdf795cb521) )
+	ROM_LOAD( "mro-cg2003.u72",  0x00000, 0x8000, CRC(0d425f48) SHA1(b60aaf3f4bd76f75f72f6e8dda724bdf795cb521) ) /*  08/30/94   @ IGT  L95-0145  */
 	ROM_LOAD( "mgo-cg2003.u73",  0x08000, 0x8000, CRC(add0afc4) SHA1(0519bf2f36cb67140933b2c533e625544f27d16b) )
 	ROM_LOAD( "mbo-cg2003.u74",  0x10000, 0x8000, CRC(8649dec0) SHA1(0024d3a8fd85279552910b14b69b225bda93957f) )
 	ROM_LOAD( "mxo-cg2003.u75",  0x18000, 0x8000, CRC(904631cd) SHA1(d280a2f16b51a04b3f601db3535980a765c60e6f) )
@@ -1981,10 +1981,10 @@ PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
 	ROM_LOAD( "pp0417_961-984.u68",   0x00000, 0x10000, CRC(4a1e7899) SHA1(b6f243d275da70841482843e05c1be22fd80c25c) ) /* Game Version: 961, Library Version: 984 */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg1215.u72",   0x00000, 0x8000, CRC(425f57be) SHA1(6d53ae86bec7189a35671a7f691e101a2ed4d8c4) )
-	ROM_LOAD( "mgo-cg1215.u73",   0x08000, 0x8000, CRC(0f66cd94) SHA1(9ac0cd01aca87e045c4fd6045ed907a092d6b2ee) )
-	ROM_LOAD( "mbo-cg1215.u74",   0x10000, 0x8000, CRC(10f89e44) SHA1(cdc34970b0325a24cfd5c187a4b4dbf42be8fc93) )
-	ROM_LOAD( "mxo-cg1215.u75",   0x18000, 0x8000, CRC(73c24e43) SHA1(f09beaf374ad371db2701767ce6ac5bdb13c445a) )
+	ROM_LOAD( "mro-cg2133.u72",   0x00000, 0x8000, CRC(b21a789f) SHA1(c49f9b5f51c29bbc0e1392e86d6602bd44e46380) ) /*  02/02/95   @ IGT  L95-0276  */
+	ROM_LOAD( "mgo-cg2133.u73",   0x08000, 0x8000, CRC(2b7db148) SHA1(d5ff5dde3589d28937d13dc5c4c38caa1ebf2d56) )
+	ROM_LOAD( "mbo-cg2133.u74",   0x10000, 0x8000, CRC(6ed455b7) SHA1(e4f223606c19d09be501461f38520f423599e0a2) ) /* Supersedes CG1215 graphics set */
+	ROM_LOAD( "mxo-cg2133.u75",   0x18000, 0x8000, CRC(095ea26d) SHA1(9bdd8afe67da2370c4ca2d8418f3afdaf7b557ff) )
 
 	ROM_REGION( 0x100, "proms", 0 )
 	ROM_LOAD( "cap1215.u50", 0x0000, 0x0100, CRC(294b7b10) SHA1(a405a4b8547b713c5c02dacb19e7354095a7b584) )
@@ -2066,10 +2066,10 @@ PayTable   Ks+  2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
 	ROM_LOAD( "pp0426_979-a0c.u68",   0x00000, 0x10000, CRC(0dca4bf1) SHA1(f2cfe250e78fc0995dda653d231f75090ff5c394) ) /* Game Version: 979, Library Version: A0C */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg740.u72",   0x00000, 0x8000, CRC(72667f6c) SHA1(89843f472cc0329317cfc643c63bdfd11234b194) )
-	ROM_LOAD( "mgo-cg740.u73",   0x08000, 0x8000, CRC(7437254a) SHA1(bba166dece8af58da217796f81117d0b05752b87) )
-	ROM_LOAD( "mbo-cg740.u74",   0x10000, 0x8000, CRC(92e8c33e) SHA1(05344664d6fdd3f4205c50fa4ca76fc46c18cf8f) )
-	ROM_LOAD( "mxo-cg740.u75",   0x18000, 0x8000, CRC(ce4cbe0b) SHA1(4bafcd68be94a5deaae9661584fa0fc940b834bb) )
+	ROM_LOAD( "mro-cg2004.u72",  0x00000, 0x8000, CRC(e5e40ea5) SHA1(e0d9e50b30cc0c25c932b2bf444990df1fb2c38c) ) /*  08/31/94   @ IGT  L95-0146  */
+	ROM_LOAD( "mgo-cg2004.u73",  0x08000, 0x8000, CRC(12607f1e) SHA1(248e1ecee4e735f5943c50f8c350ca95b81509a7) )
+	ROM_LOAD( "mbo-cg2004.u74",  0x10000, 0x8000, CRC(78c3fb9f) SHA1(2b9847c511888de507a008dec981778ca4dbcd6c) ) /* Supersedes CG740 */
+	ROM_LOAD( "mxo-cg2004.u75",  0x18000, 0x8000, CRC(5aaa4480) SHA1(353c4ce566c944406fce21f2c5045c856ef7a609) )
 
 	ROM_REGION( 0x100, "proms", 0 )
 	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) ) /* BPROM type DM74LS471 (compatible with N82S135N) verified */
@@ -2088,10 +2088,10 @@ PayTable   Ks+  2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
 	ROM_LOAD( "pp0428_979-a0c.u68",   0x00000, 0x10000, CRC(a206a3bd) SHA1(48e1386027308684daee09370b5ee09d9eb645a8) ) /* Game Version: 979, Library Version: A0c */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg740.u72",   0x00000, 0x8000, CRC(72667f6c) SHA1(89843f472cc0329317cfc643c63bdfd11234b194) )
-	ROM_LOAD( "mgo-cg740.u73",   0x08000, 0x8000, CRC(7437254a) SHA1(bba166dece8af58da217796f81117d0b05752b87) )
-	ROM_LOAD( "mbo-cg740.u74",   0x10000, 0x8000, CRC(92e8c33e) SHA1(05344664d6fdd3f4205c50fa4ca76fc46c18cf8f) )
-	ROM_LOAD( "mxo-cg740.u75",   0x18000, 0x8000, CRC(ce4cbe0b) SHA1(4bafcd68be94a5deaae9661584fa0fc940b834bb) )
+	ROM_LOAD( "mro-cg2004.u72",  0x00000, 0x8000, CRC(e5e40ea5) SHA1(e0d9e50b30cc0c25c932b2bf444990df1fb2c38c) ) /*  08/31/94   @ IGT  L95-0146  */
+	ROM_LOAD( "mgo-cg2004.u73",  0x08000, 0x8000, CRC(12607f1e) SHA1(248e1ecee4e735f5943c50f8c350ca95b81509a7) )
+	ROM_LOAD( "mbo-cg2004.u74",  0x10000, 0x8000, CRC(78c3fb9f) SHA1(2b9847c511888de507a008dec981778ca4dbcd6c) ) /* Supersedes CG740 */
+	ROM_LOAD( "mxo-cg2004.u75",  0x18000, 0x8000, CRC(5aaa4480) SHA1(353c4ce566c944406fce21f2c5045c856ef7a609) )
 
 	ROM_REGION( 0x100, "proms", 0 )
 	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) ) /* BPROM type DM74LS471 (compatible with N82S135N) verified */
@@ -2110,10 +2110,10 @@ PayTable   Ks+  2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
 	ROM_LOAD( "pp0429_979-a0c.u68",   0x00000, 0x10000, CRC(453484e7) SHA1(6ba80b72cdd8b3bd43c656400591f4d543a9d94f) ) /* Game Version: 979, Library Version: A0C */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg740.u72",   0x00000, 0x8000, CRC(72667f6c) SHA1(89843f472cc0329317cfc643c63bdfd11234b194) )
-	ROM_LOAD( "mgo-cg740.u73",   0x08000, 0x8000, CRC(7437254a) SHA1(bba166dece8af58da217796f81117d0b05752b87) )
-	ROM_LOAD( "mbo-cg740.u74",   0x10000, 0x8000, CRC(92e8c33e) SHA1(05344664d6fdd3f4205c50fa4ca76fc46c18cf8f) )
-	ROM_LOAD( "mxo-cg740.u75",   0x18000, 0x8000, CRC(ce4cbe0b) SHA1(4bafcd68be94a5deaae9661584fa0fc940b834bb) )
+	ROM_LOAD( "mro-cg2004.u72",  0x00000, 0x8000, CRC(e5e40ea5) SHA1(e0d9e50b30cc0c25c932b2bf444990df1fb2c38c) ) /*  08/31/94   @ IGT  L95-0146  */
+	ROM_LOAD( "mgo-cg2004.u73",  0x08000, 0x8000, CRC(12607f1e) SHA1(248e1ecee4e735f5943c50f8c350ca95b81509a7) )
+	ROM_LOAD( "mbo-cg2004.u74",  0x10000, 0x8000, CRC(78c3fb9f) SHA1(2b9847c511888de507a008dec981778ca4dbcd6c) ) /* Supersedes CG740 */
+	ROM_LOAD( "mxo-cg2004.u75",  0x18000, 0x8000, CRC(5aaa4480) SHA1(353c4ce566c944406fce21f2c5045c856ef7a609) )
 
 	ROM_REGION( 0x100, "proms", 0 )
 	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) ) /* BPROM type DM74LS471 (compatible with N82S135N) verified */
@@ -2131,7 +2131,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 	ROM_LOAD( "pp0434_a45-a75.u68",   0x00000, 0x10000, CRC(e5c9ba19) SHA1(9a01457a54a0445a0f32affe2038366e681cada1) ) /* Game Version: A45, Library Version: A74 */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2003.u72",  0x00000, 0x8000, CRC(0d425f48) SHA1(b60aaf3f4bd76f75f72f6e8dda724bdf795cb521) )
+	ROM_LOAD( "mro-cg2003.u72",  0x00000, 0x8000, CRC(0d425f48) SHA1(b60aaf3f4bd76f75f72f6e8dda724bdf795cb521) ) /*  08/30/94   @ IGT  L95-0145  */
 	ROM_LOAD( "mgo-cg2003.u73",  0x08000, 0x8000, CRC(add0afc4) SHA1(0519bf2f36cb67140933b2c533e625544f27d16b) )
 	ROM_LOAD( "mbo-cg2003.u74",  0x10000, 0x8000, CRC(8649dec0) SHA1(0024d3a8fd85279552910b14b69b225bda93957f) )
 	ROM_LOAD( "mxo-cg2003.u75",  0x18000, 0x8000, CRC(904631cd) SHA1(d280a2f16b51a04b3f601db3535980a765c60e6f) )
@@ -2152,10 +2152,10 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  SF  RF  (Bonus)
 	ROM_LOAD( "pp0447_a45-a74.u68",   0x00000, 0x10000, CRC(0ef0bb6c) SHA1(d0ef7a83417054f05d32d0a93ed0d5d618f4dfb9) ) /* Game Version: A45, Library Version: A74 */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg740.u72",   0x00000, 0x8000, CRC(72667f6c) SHA1(89843f472cc0329317cfc643c63bdfd11234b194) )
-	ROM_LOAD( "mgo-cg740.u73",   0x08000, 0x8000, CRC(7437254a) SHA1(bba166dece8af58da217796f81117d0b05752b87) )
-	ROM_LOAD( "mbo-cg740.u74",   0x10000, 0x8000, CRC(92e8c33e) SHA1(05344664d6fdd3f4205c50fa4ca76fc46c18cf8f) )
-	ROM_LOAD( "mxo-cg740.u75",   0x18000, 0x8000, CRC(ce4cbe0b) SHA1(4bafcd68be94a5deaae9661584fa0fc940b834bb) )
+	ROM_LOAD( "mro-cg2004.u72",  0x00000, 0x8000, CRC(e5e40ea5) SHA1(e0d9e50b30cc0c25c932b2bf444990df1fb2c38c) ) /*  08/31/94   @ IGT  L95-0146  */
+	ROM_LOAD( "mgo-cg2004.u73",  0x08000, 0x8000, CRC(12607f1e) SHA1(248e1ecee4e735f5943c50f8c350ca95b81509a7) )
+	ROM_LOAD( "mbo-cg2004.u74",  0x10000, 0x8000, CRC(78c3fb9f) SHA1(2b9847c511888de507a008dec981778ca4dbcd6c) ) /* Supersedes CG740 */
+	ROM_LOAD( "mxo-cg2004.u75",  0x18000, 0x8000, CRC(5aaa4480) SHA1(353c4ce566c944406fce21f2c5045c856ef7a609) )
 
 	ROM_REGION( 0x100, "proms", 0 )
 	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) ) /* BPROM type DM74LS471 (compatible with N82S135N) verified */
@@ -2173,10 +2173,10 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  SF  RF  (Bonus)
 	ROM_LOAD( "pp0447_979-a0c.u68",   0x00000, 0x10000, CRC(a62748ea) SHA1(585049160f7983047dd13a1715d1edbf3b9778ea) ) /* Game Version: 979, Library Version: A0C */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg740.u72",   0x00000, 0x8000, CRC(72667f6c) SHA1(89843f472cc0329317cfc643c63bdfd11234b194) )
-	ROM_LOAD( "mgo-cg740.u73",   0x08000, 0x8000, CRC(7437254a) SHA1(bba166dece8af58da217796f81117d0b05752b87) )
-	ROM_LOAD( "mbo-cg740.u74",   0x10000, 0x8000, CRC(92e8c33e) SHA1(05344664d6fdd3f4205c50fa4ca76fc46c18cf8f) )
-	ROM_LOAD( "mxo-cg740.u75",   0x18000, 0x8000, CRC(ce4cbe0b) SHA1(4bafcd68be94a5deaae9661584fa0fc940b834bb) )
+	ROM_LOAD( "mro-cg2004.u72",  0x00000, 0x8000, CRC(e5e40ea5) SHA1(e0d9e50b30cc0c25c932b2bf444990df1fb2c38c) ) /*  08/31/94   @ IGT  L95-0146  */
+	ROM_LOAD( "mgo-cg2004.u73",  0x08000, 0x8000, CRC(12607f1e) SHA1(248e1ecee4e735f5943c50f8c350ca95b81509a7) )
+	ROM_LOAD( "mbo-cg2004.u74",  0x10000, 0x8000, CRC(78c3fb9f) SHA1(2b9847c511888de507a008dec981778ca4dbcd6c) ) /* Supersedes CG740 */
+	ROM_LOAD( "mxo-cg2004.u75",  0x18000, 0x8000, CRC(5aaa4480) SHA1(353c4ce566c944406fce21f2c5045c856ef7a609) )
 
 	ROM_REGION( 0x100, "proms", 0 )
 	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) ) /* BPROM type DM74LS471 (compatible with N82S135N) verified */
@@ -2194,10 +2194,10 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 	ROM_LOAD( "pp0449_a45-a74.u68",   0x00000, 0x10000, CRC(44699ad7) SHA1(89d9d3107384a6b474c51a34bd34936c36c4b3f5) ) /* Game Version: A45, Library Version: A75 */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg740.u72",   0x00000, 0x8000, CRC(72667f6c) SHA1(89843f472cc0329317cfc643c63bdfd11234b194) )
-	ROM_LOAD( "mgo-cg740.u73",   0x08000, 0x8000, CRC(7437254a) SHA1(bba166dece8af58da217796f81117d0b05752b87) )
-	ROM_LOAD( "mbo-cg740.u74",   0x10000, 0x8000, CRC(92e8c33e) SHA1(05344664d6fdd3f4205c50fa4ca76fc46c18cf8f) )
-	ROM_LOAD( "mxo-cg740.u75",   0x18000, 0x8000, CRC(ce4cbe0b) SHA1(4bafcd68be94a5deaae9661584fa0fc940b834bb) )
+	ROM_LOAD( "mro-cg2004.u72",  0x00000, 0x8000, CRC(e5e40ea5) SHA1(e0d9e50b30cc0c25c932b2bf444990df1fb2c38c) ) /*  08/31/94   @ IGT  L95-0146  */
+	ROM_LOAD( "mgo-cg2004.u73",  0x08000, 0x8000, CRC(12607f1e) SHA1(248e1ecee4e735f5943c50f8c350ca95b81509a7) )
+	ROM_LOAD( "mbo-cg2004.u74",  0x10000, 0x8000, CRC(78c3fb9f) SHA1(2b9847c511888de507a008dec981778ca4dbcd6c) ) /* Supersedes CG740 */
+	ROM_LOAD( "mxo-cg2004.u75",  0x18000, 0x8000, CRC(5aaa4480) SHA1(353c4ce566c944406fce21f2c5045c856ef7a609) )
 
 	ROM_REGION( 0x100, "proms", 0 )
 	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) ) /* BPROM type DM74LS471 (compatible with N82S135N) verified */
@@ -2237,7 +2237,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 	ROM_LOAD( "pp0454_a45-a75.u68",   0x00000, 0x10000, CRC(f15f751d) SHA1(6e73625bf3fe0461a171f72ab5478439207516b3) ) /* Game Version: A45, Library Version: A74 */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2003.u72",  0x00000, 0x8000, CRC(0d425f48) SHA1(b60aaf3f4bd76f75f72f6e8dda724bdf795cb521) )
+	ROM_LOAD( "mro-cg2003.u72",  0x00000, 0x8000, CRC(0d425f48) SHA1(b60aaf3f4bd76f75f72f6e8dda724bdf795cb521) ) /*  08/30/94   @ IGT  L95-0145  */
 	ROM_LOAD( "mgo-cg2003.u73",  0x08000, 0x8000, CRC(add0afc4) SHA1(0519bf2f36cb67140933b2c533e625544f27d16b) )
 	ROM_LOAD( "mbo-cg2003.u74",  0x10000, 0x8000, CRC(8649dec0) SHA1(0024d3a8fd85279552910b14b69b225bda93957f) )
 	ROM_LOAD( "mxo-cg2003.u75",  0x18000, 0x8000, CRC(904631cd) SHA1(d280a2f16b51a04b3f601db3535980a765c60e6f) )
@@ -2246,7 +2246,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 	ROM_LOAD( "cap904.u50", 0x0000, 0x0100, CRC(0eec8336) SHA1(a6585c978dbc2f4f3818e3a5b92f8c28be23c4c0) ) /* BPROM type N82S135N verified */
 ROM_END
 
-ROM_START( pepp0488 ) /* Normal board : Standard Draw Poker (PP0488) */
+ROM_START( pepp0488 ) /* Normal board : Standard Draw Poker (PP0488) - 01/12/95   @ IGT  L95-0175 */
 /*
 PayTable   Js+  TP  3K  STR  FL  FH  4K  SF  RF  (Bonus)
 --------------------------------------------------------
@@ -2258,13 +2258,13 @@ NOTE: Will work with the standard CG740 + CAP740 graphics for a non-localized ga
 	ROM_LOAD( "pp0488_a30-a4v.u68",   0x00000, 0x10000, CRC(99849f5d) SHA1(643a303beda1c4a4619803071df5e612ab922eb9) ) /* Game Version: A30, Library Version: A4V */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2135.u72",   0x00000, 0x8000, CRC(004c9c8e) SHA1(ec3fa9d2c658de59e722d9979513d6b0c71d5742) ) /* Custom Arizona Charlie's Casino graphics */
-	ROM_LOAD( "mgo-cg2135.u73",   0x08000, 0x8000, CRC(e6843b35) SHA1(2d5219a3cb054ce8b470797c0496c7e24e94ed81) )
-	ROM_LOAD( "mbo-cg2135.u74",   0x10000, 0x8000, CRC(e3e28611) SHA1(d040f1df6203dc0bd6a79a391fb90fb930f8dd1a) )
-	ROM_LOAD( "mxo-cg2135.u75",   0x18000, 0x8000, CRC(3ae44f7e) SHA1(00d625b60bffef6ce622cb50a3aa93b92131f578) )
+	ROM_LOAD( "mro-cg2153.u72",   0x00000, 0x8000, CRC(004c9c8e) SHA1(ec3fa9d2c658de59e722d9979513d6b0c71d5742) ) /*  05/01/95   @ IGT  L95-1123  */
+	ROM_LOAD( "mgo-cg2153.u73",   0x08000, 0x8000, CRC(e6843b35) SHA1(2d5219a3cb054ce8b470797c0496c7e24e94ed81) )
+	ROM_LOAD( "mbo-cg2153.u74",   0x10000, 0x8000, CRC(e3e28611) SHA1(d040f1df6203dc0bd6a79a391fb90fb930f8dd1a) ) /* Custom Arizona Charlie's Casino graphics */
+	ROM_LOAD( "mxo-cg2153.u75",   0x18000, 0x8000, CRC(3ae44f7e) SHA1(00d625b60bffef6ce622cb50a3aa93b92131f578) )
 
 	ROM_REGION( 0x100, "proms", 0 )
-	ROM_LOAD( "cap2135.u50", 0x0000, 0x0100, CRC(d02fca7e) SHA1(4384b4238d487b4c763983b27381f4c6c08eb605) ) /* BPROM type N82S135N verified */
+	ROM_LOAD( "cap2153.u50", 0x0000, 0x0100, CRC(d02fca7e) SHA1(4384b4238d487b4c763983b27381f4c6c08eb605) ) /* BPROM type N82S135N verified */
 ROM_END
 
 ROM_START( pepp0508 ) /* Normal board : Loose Deuce Poker (PP0508) */
@@ -2299,13 +2299,13 @@ PayTable   Js+  TP  3K  STR  FL  FH  4K  SF  RF  (Bonus)
 	ROM_LOAD( "pp0509_783-779.u68",   0x00000, 0x10000, CRC(a7c9b166) SHA1(3565070b9beba9aa50662253cafafa00f4f5abfa) ) /* Game Version: 782, Library Version: 779 */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg740.u72",   0x00000, 0x8000, CRC(72667f6c) SHA1(89843f472cc0329317cfc643c63bdfd11234b194) )
-	ROM_LOAD( "mgo-cg740.u73",   0x08000, 0x8000, CRC(7437254a) SHA1(bba166dece8af58da217796f81117d0b05752b87) )
-	ROM_LOAD( "mbo-cg740.u74",   0x10000, 0x8000, CRC(92e8c33e) SHA1(05344664d6fdd3f4205c50fa4ca76fc46c18cf8f) )
-	ROM_LOAD( "mxo-cg740.u75",   0x18000, 0x8000, CRC(ce4cbe0b) SHA1(4bafcd68be94a5deaae9661584fa0fc940b834bb) )
+	ROM_LOAD( "mro-cg2004.u72",  0x00000, 0x8000, CRC(e5e40ea5) SHA1(e0d9e50b30cc0c25c932b2bf444990df1fb2c38c) ) /*  08/31/94   @ IGT  L95-0146  */
+	ROM_LOAD( "mgo-cg2004.u73",  0x08000, 0x8000, CRC(12607f1e) SHA1(248e1ecee4e735f5943c50f8c350ca95b81509a7) )
+	ROM_LOAD( "mbo-cg2004.u74",  0x10000, 0x8000, CRC(78c3fb9f) SHA1(2b9847c511888de507a008dec981778ca4dbcd6c) ) /* Supersedes CG740 */
+	ROM_LOAD( "mxo-cg2004.u75",  0x18000, 0x8000, CRC(5aaa4480) SHA1(353c4ce566c944406fce21f2c5045c856ef7a609) )
 
 	ROM_REGION( 0x100, "proms", 0 )
-	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) ) /* BPROM type DM74LS471 (compatible with N82S135N) verified */
+	ROM_LOAD( "cap904.u50", 0x0000, 0x0100, CRC(0eec8336) SHA1(a6585c978dbc2f4f3818e3a5b92f8c28be23c4c0) ) /* BPROM type N82S135N verified */
 ROM_END
 
 ROM_START( pepp0514 ) /* Normal board : Double Bonus Poker (PP0514) */
@@ -2321,7 +2321,7 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
 	ROM_LOAD( "pp0514_a46-a75.u68",   0x00000, 0x10000, CRC(53ca68c7) SHA1(2c46c89c6347bb8cf80b0ff85daabd0e925c87ec) ) /* Game Version: A46, Library Version: A75, Video Lib ver: A0Y */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2003.u72",  0x00000, 0x8000, CRC(0d425f48) SHA1(b60aaf3f4bd76f75f72f6e8dda724bdf795cb521) )
+	ROM_LOAD( "mro-cg2003.u72",  0x00000, 0x8000, CRC(0d425f48) SHA1(b60aaf3f4bd76f75f72f6e8dda724bdf795cb521) ) /*  08/30/94   @ IGT  L95-0145  */
 	ROM_LOAD( "mgo-cg2003.u73",  0x08000, 0x8000, CRC(add0afc4) SHA1(0519bf2f36cb67140933b2c533e625544f27d16b) )
 	ROM_LOAD( "mbo-cg2003.u74",  0x10000, 0x8000, CRC(8649dec0) SHA1(0024d3a8fd85279552910b14b69b225bda93957f) )
 	ROM_LOAD( "mxo-cg2003.u75",  0x18000, 0x8000, CRC(904631cd) SHA1(d280a2f16b51a04b3f601db3535980a765c60e6f) )
@@ -2343,7 +2343,7 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
 	ROM_LOAD( "pp0514_a0n-a0y.u68",   0x00000, 0x10000, CRC(2d54260d) SHA1(cf891c5624331f9b2ef7fbb1e084cfc00f407691) ) /* Game Version: A0N, Library Version: A0Y */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2003.u72",  0x00000, 0x8000, CRC(0d425f48) SHA1(b60aaf3f4bd76f75f72f6e8dda724bdf795cb521) )
+	ROM_LOAD( "mro-cg2003.u72",  0x00000, 0x8000, CRC(0d425f48) SHA1(b60aaf3f4bd76f75f72f6e8dda724bdf795cb521) ) /*  08/30/94   @ IGT  L95-0145  */
 	ROM_LOAD( "mgo-cg2003.u73",  0x08000, 0x8000, CRC(add0afc4) SHA1(0519bf2f36cb67140933b2c533e625544f27d16b) )
 	ROM_LOAD( "mbo-cg2003.u74",  0x10000, 0x8000, CRC(8649dec0) SHA1(0024d3a8fd85279552910b14b69b225bda93957f) )
 	ROM_LOAD( "mxo-cg2003.u75",  0x18000, 0x8000, CRC(904631cd) SHA1(d280a2f16b51a04b3f601db3535980a765c60e6f) )
@@ -2365,7 +2365,7 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
 	ROM_LOAD( "pp0515_989-974.u68",   0x00000, 0x10000, CRC(bc9654ab) SHA1(ecf2401bfbfcfa22354cde517cf425a8db8ea961) ) /* Game Version: 989, Library Version: 974 */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2003.u72",  0x00000, 0x8000, CRC(0d425f48) SHA1(b60aaf3f4bd76f75f72f6e8dda724bdf795cb521) )
+	ROM_LOAD( "mro-cg2003.u72",  0x00000, 0x8000, CRC(0d425f48) SHA1(b60aaf3f4bd76f75f72f6e8dda724bdf795cb521) ) /*  08/30/94   @ IGT  L95-0145  */
 	ROM_LOAD( "mgo-cg2003.u73",  0x08000, 0x8000, CRC(add0afc4) SHA1(0519bf2f36cb67140933b2c533e625544f27d16b) )
 	ROM_LOAD( "mbo-cg2003.u74",  0x10000, 0x8000, CRC(8649dec0) SHA1(0024d3a8fd85279552910b14b69b225bda93957f) )
 	ROM_LOAD( "mxo-cg2003.u75",  0x18000, 0x8000, CRC(904631cd) SHA1(d280a2f16b51a04b3f601db3535980a765c60e6f) )
@@ -2387,7 +2387,7 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
 	ROM_LOAD( "pp0515_813-824.u68",   0x00000, 0x10000, CRC(6c06b0ea) SHA1(7907d10d7290080c33e46c9644f24d1d2fc6b3ff) ) /* Game Version: 813, Library Version: 824 */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2003.u72",  0x00000, 0x8000, CRC(0d425f48) SHA1(b60aaf3f4bd76f75f72f6e8dda724bdf795cb521) )
+	ROM_LOAD( "mro-cg2003.u72",  0x00000, 0x8000, CRC(0d425f48) SHA1(b60aaf3f4bd76f75f72f6e8dda724bdf795cb521) ) /*  08/30/94   @ IGT  L95-0145  */
 	ROM_LOAD( "mgo-cg2003.u73",  0x08000, 0x8000, CRC(add0afc4) SHA1(0519bf2f36cb67140933b2c533e625544f27d16b) )
 	ROM_LOAD( "mbo-cg2003.u74",  0x10000, 0x8000, CRC(8649dec0) SHA1(0024d3a8fd85279552910b14b69b225bda93957f) )
 	ROM_LOAD( "mxo-cg2003.u75",  0x18000, 0x8000, CRC(904631cd) SHA1(d280a2f16b51a04b3f601db3535980a765c60e6f) )
@@ -2409,7 +2409,7 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
 	ROM_LOAD( "pp0516_974-a0y.u68",   0x00000, 0x10000, CRC(d9da6e13) SHA1(421678d9cb42daaf5b21074cc3900db914dd26cf) ) /* Game Version: 974, Library Version: A0Y */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2003.u72",  0x00000, 0x8000, CRC(0d425f48) SHA1(b60aaf3f4bd76f75f72f6e8dda724bdf795cb521) )
+	ROM_LOAD( "mro-cg2003.u72",  0x00000, 0x8000, CRC(0d425f48) SHA1(b60aaf3f4bd76f75f72f6e8dda724bdf795cb521) ) /*  08/30/94   @ IGT  L95-0145  */
 	ROM_LOAD( "mgo-cg2003.u73",  0x08000, 0x8000, CRC(add0afc4) SHA1(0519bf2f36cb67140933b2c533e625544f27d16b) )
 	ROM_LOAD( "mbo-cg2003.u74",  0x10000, 0x8000, CRC(8649dec0) SHA1(0024d3a8fd85279552910b14b69b225bda93957f) )
 	ROM_LOAD( "mxo-cg2003.u75",  0x18000, 0x8000, CRC(904631cd) SHA1(d280a2f16b51a04b3f601db3535980a765c60e6f) )
@@ -2431,7 +2431,7 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
 	ROM_LOAD( "pp0516_a46-a75.u68",   0x00000, 0x10000, CRC(6e226711) SHA1(71930ec43c4b75ca50971242be79459976882546) ) /* Game Version: A46, Library Version: A75 */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2003.u72",  0x00000, 0x8000, CRC(0d425f48) SHA1(b60aaf3f4bd76f75f72f6e8dda724bdf795cb521) )
+	ROM_LOAD( "mro-cg2003.u72",  0x00000, 0x8000, CRC(0d425f48) SHA1(b60aaf3f4bd76f75f72f6e8dda724bdf795cb521) ) /*  08/30/94   @ IGT  L95-0145  */
 	ROM_LOAD( "mgo-cg2003.u73",  0x08000, 0x8000, CRC(add0afc4) SHA1(0519bf2f36cb67140933b2c533e625544f27d16b) )
 	ROM_LOAD( "mbo-cg2003.u74",  0x10000, 0x8000, CRC(8649dec0) SHA1(0024d3a8fd85279552910b14b69b225bda93957f) )
 	ROM_LOAD( "mxo-cg2003.u75",  0x18000, 0x8000, CRC(904631cd) SHA1(d280a2f16b51a04b3f601db3535980a765c60e6f) )
@@ -2453,7 +2453,7 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
 	ROM_LOAD( "pp0538_a46-a75.u68",   0x00000, 0x10000, CRC(f9e8dbe7) SHA1(dd745a48764f7da7314236016bf9c7fa67a78fad) ) /* Game Version: A46, Library Version: A75, Video Lib ver: A0Y */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2003.u72",  0x00000, 0x8000, CRC(0d425f48) SHA1(b60aaf3f4bd76f75f72f6e8dda724bdf795cb521) )
+	ROM_LOAD( "mro-cg2003.u72",  0x00000, 0x8000, CRC(0d425f48) SHA1(b60aaf3f4bd76f75f72f6e8dda724bdf795cb521) ) /*  08/30/94   @ IGT  L95-0145  */
 	ROM_LOAD( "mgo-cg2003.u73",  0x08000, 0x8000, CRC(add0afc4) SHA1(0519bf2f36cb67140933b2c533e625544f27d16b) )
 	ROM_LOAD( "mbo-cg2003.u74",  0x10000, 0x8000, CRC(8649dec0) SHA1(0024d3a8fd85279552910b14b69b225bda93957f) )
 	ROM_LOAD( "mxo-cg2003.u75",  0x18000, 0x8000, CRC(904631cd) SHA1(d280a2f16b51a04b3f601db3535980a765c60e6f) )
@@ -2475,7 +2475,7 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
 	ROM_LOAD( "pp0540_974-a0y.u68",   0x00000, 0x10000, CRC(b39e0c13) SHA1(a0dd05eb2927792efb1f432dbbd4a9a4fd6ad4c9) ) /* Game Version: 974, Library Version: A0Y */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2003.u72",  0x00000, 0x8000, CRC(0d425f48) SHA1(b60aaf3f4bd76f75f72f6e8dda724bdf795cb521) )
+	ROM_LOAD( "mro-cg2003.u72",  0x00000, 0x8000, CRC(0d425f48) SHA1(b60aaf3f4bd76f75f72f6e8dda724bdf795cb521) ) /*  08/30/94   @ IGT  L95-0145  */
 	ROM_LOAD( "mgo-cg2003.u73",  0x08000, 0x8000, CRC(add0afc4) SHA1(0519bf2f36cb67140933b2c533e625544f27d16b) )
 	ROM_LOAD( "mbo-cg2003.u74",  0x10000, 0x8000, CRC(8649dec0) SHA1(0024d3a8fd85279552910b14b69b225bda93957f) )
 	ROM_LOAD( "mxo-cg2003.u75",  0x18000, 0x8000, CRC(904631cd) SHA1(d280a2f16b51a04b3f601db3535980a765c60e6f) )
@@ -2518,13 +2518,13 @@ PayTable   Ks+  2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
 	ROM_LOAD( "pp0568_a45-a74.u68",   0x00000, 0x10000, CRC(a1015eef) SHA1(074dcd966a5da6867532c6e90e2bc98404c2247b) ) /* Game Version: A45, Library Version: A74 */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg740.u72",   0x00000, 0x8000, CRC(72667f6c) SHA1(89843f472cc0329317cfc643c63bdfd11234b194) )
-	ROM_LOAD( "mgo-cg740.u73",   0x08000, 0x8000, CRC(7437254a) SHA1(bba166dece8af58da217796f81117d0b05752b87) )
-	ROM_LOAD( "mbo-cg740.u74",   0x10000, 0x8000, CRC(92e8c33e) SHA1(05344664d6fdd3f4205c50fa4ca76fc46c18cf8f) )
-	ROM_LOAD( "mxo-cg740.u75",   0x18000, 0x8000, CRC(ce4cbe0b) SHA1(4bafcd68be94a5deaae9661584fa0fc940b834bb) )
+	ROM_LOAD( "mro-cg2004.u72",  0x00000, 0x8000, CRC(e5e40ea5) SHA1(e0d9e50b30cc0c25c932b2bf444990df1fb2c38c) ) /*  08/31/94   @ IGT  L95-0146  */
+	ROM_LOAD( "mgo-cg2004.u73",  0x08000, 0x8000, CRC(12607f1e) SHA1(248e1ecee4e735f5943c50f8c350ca95b81509a7) )
+	ROM_LOAD( "mbo-cg2004.u74",  0x10000, 0x8000, CRC(78c3fb9f) SHA1(2b9847c511888de507a008dec981778ca4dbcd6c) ) /* Supersedes CG740 */
+	ROM_LOAD( "mxo-cg2004.u75",  0x18000, 0x8000, CRC(5aaa4480) SHA1(353c4ce566c944406fce21f2c5045c856ef7a609) )
 
 	ROM_REGION( 0x100, "proms", 0 )
-	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) ) /* BPROM type DM74LS471 (compatible with N82S135N) verified */
+	ROM_LOAD( "cap904.u50", 0x0000, 0x0100, CRC(0eec8336) SHA1(a6585c978dbc2f4f3818e3a5b92f8c28be23c4c0) ) /* BPROM type N82S135N verified */
 ROM_END
 
 ROM_START( pepp0585 ) /* Normal board : Standard Draw Poker (No Double-up) (PP0585) */
@@ -2537,13 +2537,13 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 	ROM_LOAD( "pp0585_956-979.u68",   0x00000, 0x10000, CRC(419633df) SHA1(f755e7b6cdd95444a02d2172789d9d73f31f56c4) ) /* Game Version: 956, Library Version: 979 */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg740.u72",   0x00000, 0x8000, CRC(72667f6c) SHA1(89843f472cc0329317cfc643c63bdfd11234b194) )
-	ROM_LOAD( "mgo-cg740.u73",   0x08000, 0x8000, CRC(7437254a) SHA1(bba166dece8af58da217796f81117d0b05752b87) )
-	ROM_LOAD( "mbo-cg740.u74",   0x10000, 0x8000, CRC(92e8c33e) SHA1(05344664d6fdd3f4205c50fa4ca76fc46c18cf8f) )
-	ROM_LOAD( "mxo-cg740.u75",   0x18000, 0x8000, CRC(ce4cbe0b) SHA1(4bafcd68be94a5deaae9661584fa0fc940b834bb) )
+	ROM_LOAD( "mro-cg2004.u72",  0x00000, 0x8000, CRC(e5e40ea5) SHA1(e0d9e50b30cc0c25c932b2bf444990df1fb2c38c) ) /*  08/31/94   @ IGT  L95-0146  */
+	ROM_LOAD( "mgo-cg2004.u73",  0x08000, 0x8000, CRC(12607f1e) SHA1(248e1ecee4e735f5943c50f8c350ca95b81509a7) )
+	ROM_LOAD( "mbo-cg2004.u74",  0x10000, 0x8000, CRC(78c3fb9f) SHA1(2b9847c511888de507a008dec981778ca4dbcd6c) ) /* Supersedes CG740 */
+	ROM_LOAD( "mxo-cg2004.u75",  0x18000, 0x8000, CRC(5aaa4480) SHA1(353c4ce566c944406fce21f2c5045c856ef7a609) )
 
 	ROM_REGION( 0x100, "proms", 0 )
-	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) ) /* BPROM type DM74LS471 (compatible with N82S135N) verified */
+	ROM_LOAD( "cap904.u50", 0x0000, 0x0100, CRC(0eec8336) SHA1(a6585c978dbc2f4f3818e3a5b92f8c28be23c4c0) ) /* BPROM type N82S135N verified */
 ROM_END
 
 ROM_START( pepp0725 ) /* Normal board : Double Bonus Poker (PP0725) */
@@ -2559,7 +2559,7 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
 	ROM_LOAD( "pp0725_a46-a75.u68",   0x00000, 0x10000, CRC(6679f095) SHA1(4cca3103610a75c8e515957ebea0cd75052a1100) )/* Game Version: A46, Library Version: A75, Video Lib ver: A0Y */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2003.u72",  0x00000, 0x8000, CRC(0d425f48) SHA1(b60aaf3f4bd76f75f72f6e8dda724bdf795cb521) )
+	ROM_LOAD( "mro-cg2003.u72",  0x00000, 0x8000, CRC(0d425f48) SHA1(b60aaf3f4bd76f75f72f6e8dda724bdf795cb521) ) /*  08/30/94   @ IGT  L95-0145  */
 	ROM_LOAD( "mgo-cg2003.u73",  0x08000, 0x8000, CRC(add0afc4) SHA1(0519bf2f36cb67140933b2c533e625544f27d16b) )
 	ROM_LOAD( "mbo-cg2003.u74",  0x10000, 0x8000, CRC(8649dec0) SHA1(0024d3a8fd85279552910b14b69b225bda93957f) )
 	ROM_LOAD( "mxo-cg2003.u75",  0x18000, 0x8000, CRC(904631cd) SHA1(d280a2f16b51a04b3f601db3535980a765c60e6f) )
@@ -2568,7 +2568,7 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
 	ROM_LOAD( "cap904.u50", 0x0000, 0x0100, CRC(0eec8336) SHA1(a6585c978dbc2f4f3818e3a5b92f8c28be23c4c0) ) /* BPROM type N82S135N verified */
 ROM_END
 
-ROM_START( pepp0728 ) /* Normal board : Double Bonus Poker (PP0728) */
+ROM_START( pepp0728 ) /* Normal board : Double Bonus Poker (PP0728) - 11/30/95   @ IGT  L96-0247 */
 /*
                                       5-K 2-4
 PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
@@ -2581,7 +2581,7 @@ P437A/4K/5  1    1    3   4    5   6  50  80 160  50 250    800
 	ROM_LOAD( "pp0728_a46-a75.u68",   0x00000, 0x10000, CRC(ecfbdb77) SHA1(072dc5d59b6a705591045162612b5101e85e1b10) )/* Game Version: A46, Library Version: A75, Video Lib ver: A0Y */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2003.u72",  0x00000, 0x8000, CRC(0d425f48) SHA1(b60aaf3f4bd76f75f72f6e8dda724bdf795cb521) )
+	ROM_LOAD( "mro-cg2003.u72",  0x00000, 0x8000, CRC(0d425f48) SHA1(b60aaf3f4bd76f75f72f6e8dda724bdf795cb521) ) /*  08/30/94   @ IGT  L95-0145  */
 	ROM_LOAD( "mgo-cg2003.u73",  0x08000, 0x8000, CRC(add0afc4) SHA1(0519bf2f36cb67140933b2c533e625544f27d16b) )
 	ROM_LOAD( "mbo-cg2003.u74",  0x10000, 0x8000, CRC(8649dec0) SHA1(0024d3a8fd85279552910b14b69b225bda93957f) )
 	ROM_LOAD( "mxo-cg2003.u75",  0x18000, 0x8000, CRC(904631cd) SHA1(d280a2f16b51a04b3f601db3535980a765c60e6f) )
@@ -2622,7 +2622,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
 	ROM_LOAD( "pp0763_a46-a75.u68",   0x00000, 0x10000, CRC(8e329f30) SHA1(bf271164a4e90e11630a236fb55c70639bdb3e11) ) /* Game Version: A46, Library Version: A75, Game Lib ver: A0Y */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2003.u72",  0x00000, 0x8000, CRC(0d425f48) SHA1(b60aaf3f4bd76f75f72f6e8dda724bdf795cb521) )
+	ROM_LOAD( "mro-cg2003.u72",  0x00000, 0x8000, CRC(0d425f48) SHA1(b60aaf3f4bd76f75f72f6e8dda724bdf795cb521) ) /*  08/30/94   @ IGT  L95-0145  */
 	ROM_LOAD( "mgo-cg2003.u73",  0x08000, 0x8000, CRC(add0afc4) SHA1(0519bf2f36cb67140933b2c533e625544f27d16b) )
 	ROM_LOAD( "mbo-cg2003.u74",  0x10000, 0x8000, CRC(8649dec0) SHA1(0024d3a8fd85279552910b14b69b225bda93957f) )
 	ROM_LOAD( "mxo-cg2003.u75",  0x18000, 0x8000, CRC(904631cd) SHA1(d280a2f16b51a04b3f601db3535980a765c60e6f) )
@@ -2948,7 +2948,7 @@ PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
 	ROM_LOAD( "x000055p.u66",   0x00000, 0x010000, CRC(e06819df) SHA1(36590c4588b8036908e63714fbb3e77d23e60eae) ) /* Deuces Wild Poker */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) )
+	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) ) /*  07/10/95   @ IGT  L95-1506  */
 	ROM_LOAD( "mgo-cg2185.u78",  0x08000, 0x8000, CRC(d4127893) SHA1(75039c45ba6fd171a66876c91abc3191c7feddfc) )
 	ROM_LOAD( "mbo-cg2185.u79",  0x10000, 0x8000, CRC(17dba955) SHA1(5f77379c88839b3a04e235e4fb0120c77e17b60e) )
 	ROM_LOAD( "mxo-cg2185.u80",  0x18000, 0x8000, CRC(583eb3b1) SHA1(4a2952424969917fb1594698a779fe5a1e99bff5) )
@@ -2973,7 +2973,7 @@ PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
 	ROM_LOAD( "x000055p.u66",   0x00000, 0x010000, CRC(e06819df) SHA1(36590c4588b8036908e63714fbb3e77d23e60eae) ) /* Deuces Wild Poker */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) )
+	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) ) /*  07/10/95   @ IGT  L95-1506  */
 	ROM_LOAD( "mgo-cg2185.u78",  0x08000, 0x8000, CRC(d4127893) SHA1(75039c45ba6fd171a66876c91abc3191c7feddfc) )
 	ROM_LOAD( "mbo-cg2185.u79",  0x10000, 0x8000, CRC(17dba955) SHA1(5f77379c88839b3a04e235e4fb0120c77e17b60e) )
 	ROM_LOAD( "mxo-cg2185.u80",  0x18000, 0x8000, CRC(583eb3b1) SHA1(4a2952424969917fb1594698a779fe5a1e99bff5) )
@@ -2998,7 +2998,7 @@ PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
 	ROM_LOAD( "x000055p.u66",   0x00000, 0x010000, CRC(e06819df) SHA1(36590c4588b8036908e63714fbb3e77d23e60eae) ) /* Deuces Wild Poker */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) )
+	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) ) /*  07/10/95   @ IGT  L95-1506  */
 	ROM_LOAD( "mgo-cg2185.u78",  0x08000, 0x8000, CRC(d4127893) SHA1(75039c45ba6fd171a66876c91abc3191c7feddfc) )
 	ROM_LOAD( "mbo-cg2185.u79",  0x10000, 0x8000, CRC(17dba955) SHA1(5f77379c88839b3a04e235e4fb0120c77e17b60e) )
 	ROM_LOAD( "mxo-cg2185.u80",  0x18000, 0x8000, CRC(583eb3b1) SHA1(4a2952424969917fb1594698a779fe5a1e99bff5) )
@@ -3023,7 +3023,7 @@ PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
 	ROM_LOAD( "x000055p.u66",   0x00000, 0x010000, CRC(e06819df) SHA1(36590c4588b8036908e63714fbb3e77d23e60eae) ) /* Deuces Wild Poker */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) )
+	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) ) /*  07/10/95   @ IGT  L95-1506  */
 	ROM_LOAD( "mgo-cg2185.u78",  0x08000, 0x8000, CRC(d4127893) SHA1(75039c45ba6fd171a66876c91abc3191c7feddfc) )
 	ROM_LOAD( "mbo-cg2185.u79",  0x10000, 0x8000, CRC(17dba955) SHA1(5f77379c88839b3a04e235e4fb0120c77e17b60e) )
 	ROM_LOAD( "mxo-cg2185.u80",  0x18000, 0x8000, CRC(583eb3b1) SHA1(4a2952424969917fb1594698a779fe5a1e99bff5) )
@@ -3048,7 +3048,7 @@ PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
 	ROM_LOAD( "x000055p.u66",   0x00000, 0x010000, CRC(e06819df) SHA1(36590c4588b8036908e63714fbb3e77d23e60eae) ) /* Deuces Wild Poker */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) )
+	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) ) /*  07/10/95   @ IGT  L95-1506  */
 	ROM_LOAD( "mgo-cg2185.u78",  0x08000, 0x8000, CRC(d4127893) SHA1(75039c45ba6fd171a66876c91abc3191c7feddfc) )
 	ROM_LOAD( "mbo-cg2185.u79",  0x10000, 0x8000, CRC(17dba955) SHA1(5f77379c88839b3a04e235e4fb0120c77e17b60e) )
 	ROM_LOAD( "mxo-cg2185.u80",  0x18000, 0x8000, CRC(583eb3b1) SHA1(4a2952424969917fb1594698a779fe5a1e99bff5) )
@@ -3073,7 +3073,7 @@ PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
 	ROM_LOAD( "x000055p.u66",   0x00000, 0x010000, CRC(e06819df) SHA1(36590c4588b8036908e63714fbb3e77d23e60eae) ) /* Deuces Wild Poker */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) )
+	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) ) /*  07/10/95   @ IGT  L95-1506  */
 	ROM_LOAD( "mgo-cg2185.u78",  0x08000, 0x8000, CRC(d4127893) SHA1(75039c45ba6fd171a66876c91abc3191c7feddfc) )
 	ROM_LOAD( "mbo-cg2185.u79",  0x10000, 0x8000, CRC(17dba955) SHA1(5f77379c88839b3a04e235e4fb0120c77e17b60e) )
 	ROM_LOAD( "mxo-cg2185.u80",  0x18000, 0x8000, CRC(583eb3b1) SHA1(4a2952424969917fb1594698a779fe5a1e99bff5) )
@@ -3098,7 +3098,7 @@ PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
 	ROM_LOAD( "x000055p.u66",   0x00000, 0x010000, CRC(e06819df) SHA1(36590c4588b8036908e63714fbb3e77d23e60eae) ) /* Deuces Wild Poker */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) )
+	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) ) /*  07/10/95   @ IGT  L95-1506  */
 	ROM_LOAD( "mgo-cg2185.u78",  0x08000, 0x8000, CRC(d4127893) SHA1(75039c45ba6fd171a66876c91abc3191c7feddfc) )
 	ROM_LOAD( "mbo-cg2185.u79",  0x10000, 0x8000, CRC(17dba955) SHA1(5f77379c88839b3a04e235e4fb0120c77e17b60e) )
 	ROM_LOAD( "mxo-cg2185.u80",  0x18000, 0x8000, CRC(583eb3b1) SHA1(4a2952424969917fb1594698a779fe5a1e99bff5) )
@@ -3123,7 +3123,7 @@ PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
 	ROM_LOAD( "x000055p.u66",   0x00000, 0x010000, CRC(e06819df) SHA1(36590c4588b8036908e63714fbb3e77d23e60eae) ) /* Deuces Wild Poker */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) )
+	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) ) /*  07/10/95   @ IGT  L95-1506  */
 	ROM_LOAD( "mgo-cg2185.u78",  0x08000, 0x8000, CRC(d4127893) SHA1(75039c45ba6fd171a66876c91abc3191c7feddfc) )
 	ROM_LOAD( "mbo-cg2185.u79",  0x10000, 0x8000, CRC(17dba955) SHA1(5f77379c88839b3a04e235e4fb0120c77e17b60e) )
 	ROM_LOAD( "mxo-cg2185.u80",  0x18000, 0x8000, CRC(583eb3b1) SHA1(4a2952424969917fb1594698a779fe5a1e99bff5) )
@@ -3148,7 +3148,7 @@ PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
 	ROM_LOAD( "x000055p.u66",   0x00000, 0x010000, CRC(e06819df) SHA1(36590c4588b8036908e63714fbb3e77d23e60eae) ) /* Deuces Wild Poker */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) )
+	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) ) /*  07/10/95   @ IGT  L95-1506  */
 	ROM_LOAD( "mgo-cg2185.u78",  0x08000, 0x8000, CRC(d4127893) SHA1(75039c45ba6fd171a66876c91abc3191c7feddfc) )
 	ROM_LOAD( "mbo-cg2185.u79",  0x10000, 0x8000, CRC(17dba955) SHA1(5f77379c88839b3a04e235e4fb0120c77e17b60e) )
 	ROM_LOAD( "mxo-cg2185.u80",  0x18000, 0x8000, CRC(583eb3b1) SHA1(4a2952424969917fb1594698a779fe5a1e99bff5) )
@@ -3173,7 +3173,7 @@ PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
 	ROM_LOAD( "x000055p.u66",   0x00000, 0x010000, CRC(e06819df) SHA1(36590c4588b8036908e63714fbb3e77d23e60eae) ) /* Deuces Wild Poker */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) )
+	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) ) /*  07/10/95   @ IGT  L95-1506  */
 	ROM_LOAD( "mgo-cg2185.u78",  0x08000, 0x8000, CRC(d4127893) SHA1(75039c45ba6fd171a66876c91abc3191c7feddfc) )
 	ROM_LOAD( "mbo-cg2185.u79",  0x10000, 0x8000, CRC(17dba955) SHA1(5f77379c88839b3a04e235e4fb0120c77e17b60e) )
 	ROM_LOAD( "mxo-cg2185.u80",  0x18000, 0x8000, CRC(583eb3b1) SHA1(4a2952424969917fb1594698a779fe5a1e99bff5) )
@@ -3223,7 +3223,7 @@ PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
 	ROM_LOAD( "x000055p.u66",   0x00000, 0x010000, CRC(e06819df) SHA1(36590c4588b8036908e63714fbb3e77d23e60eae) ) /* Deuces Wild Poker */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) )
+	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) ) /*  07/10/95   @ IGT  L95-1506  */
 	ROM_LOAD( "mgo-cg2185.u78",  0x08000, 0x8000, CRC(d4127893) SHA1(75039c45ba6fd171a66876c91abc3191c7feddfc) )
 	ROM_LOAD( "mbo-cg2185.u79",  0x10000, 0x8000, CRC(17dba955) SHA1(5f77379c88839b3a04e235e4fb0120c77e17b60e) )
 	ROM_LOAD( "mxo-cg2185.u80",  0x18000, 0x8000, CRC(583eb3b1) SHA1(4a2952424969917fb1594698a779fe5a1e99bff5) )
@@ -3248,7 +3248,7 @@ PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
 	ROM_LOAD( "x000055p.u66",   0x00000, 0x010000, CRC(e06819df) SHA1(36590c4588b8036908e63714fbb3e77d23e60eae) ) /* Deuces Wild Poker */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) )
+	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) ) /*  07/10/95   @ IGT  L95-1506  */
 	ROM_LOAD( "mgo-cg2185.u78",  0x08000, 0x8000, CRC(d4127893) SHA1(75039c45ba6fd171a66876c91abc3191c7feddfc) )
 	ROM_LOAD( "mbo-cg2185.u79",  0x10000, 0x8000, CRC(17dba955) SHA1(5f77379c88839b3a04e235e4fb0120c77e17b60e) )
 	ROM_LOAD( "mxo-cg2185.u80",  0x18000, 0x8000, CRC(583eb3b1) SHA1(4a2952424969917fb1594698a779fe5a1e99bff5) )
@@ -3273,7 +3273,7 @@ PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
 	ROM_LOAD( "x000055p.u66",   0x00000, 0x010000, CRC(e06819df) SHA1(36590c4588b8036908e63714fbb3e77d23e60eae) ) /* Deuces Wild Poker */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) )
+	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) ) /*  07/10/95   @ IGT  L95-1506  */
 	ROM_LOAD( "mgo-cg2185.u78",  0x08000, 0x8000, CRC(d4127893) SHA1(75039c45ba6fd171a66876c91abc3191c7feddfc) )
 	ROM_LOAD( "mbo-cg2185.u79",  0x10000, 0x8000, CRC(17dba955) SHA1(5f77379c88839b3a04e235e4fb0120c77e17b60e) )
 	ROM_LOAD( "mxo-cg2185.u80",  0x18000, 0x8000, CRC(583eb3b1) SHA1(4a2952424969917fb1594698a779fe5a1e99bff5) )
@@ -3298,7 +3298,7 @@ PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
 	ROM_LOAD( "x000055p.u66",   0x00000, 0x010000, CRC(e06819df) SHA1(36590c4588b8036908e63714fbb3e77d23e60eae) ) /* Deuces Wild Poker */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) )
+	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) ) /*  07/10/95   @ IGT  L95-1506  */
 	ROM_LOAD( "mgo-cg2185.u78",  0x08000, 0x8000, CRC(d4127893) SHA1(75039c45ba6fd171a66876c91abc3191c7feddfc) )
 	ROM_LOAD( "mbo-cg2185.u79",  0x10000, 0x8000, CRC(17dba955) SHA1(5f77379c88839b3a04e235e4fb0120c77e17b60e) )
 	ROM_LOAD( "mxo-cg2185.u80",  0x18000, 0x8000, CRC(583eb3b1) SHA1(4a2952424969917fb1594698a779fe5a1e99bff5) )
@@ -3348,7 +3348,7 @@ PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
 	ROM_LOAD( "x000055p.u66",   0x00000, 0x010000, CRC(e06819df) SHA1(36590c4588b8036908e63714fbb3e77d23e60eae) ) /* Deuces Wild Poker */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) )
+	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) ) /*  07/10/95   @ IGT  L95-1506  */
 	ROM_LOAD( "mgo-cg2185.u78",  0x08000, 0x8000, CRC(d4127893) SHA1(75039c45ba6fd171a66876c91abc3191c7feddfc) )
 	ROM_LOAD( "mbo-cg2185.u79",  0x10000, 0x8000, CRC(17dba955) SHA1(5f77379c88839b3a04e235e4fb0120c77e17b60e) )
 	ROM_LOAD( "mxo-cg2185.u80",  0x18000, 0x8000, CRC(583eb3b1) SHA1(4a2952424969917fb1594698a779fe5a1e99bff5) )
@@ -3373,7 +3373,7 @@ PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
 	ROM_LOAD( "x000055p.u66",   0x00000, 0x010000, CRC(e06819df) SHA1(36590c4588b8036908e63714fbb3e77d23e60eae) ) /* Deuces Wild Poker */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) )
+	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) ) /*  07/10/95   @ IGT  L95-1506  */
 	ROM_LOAD( "mgo-cg2185.u78",  0x08000, 0x8000, CRC(d4127893) SHA1(75039c45ba6fd171a66876c91abc3191c7feddfc) )
 	ROM_LOAD( "mbo-cg2185.u79",  0x10000, 0x8000, CRC(17dba955) SHA1(5f77379c88839b3a04e235e4fb0120c77e17b60e) )
 	ROM_LOAD( "mxo-cg2185.u80",  0x18000, 0x8000, CRC(583eb3b1) SHA1(4a2952424969917fb1594698a779fe5a1e99bff5) )
@@ -3447,7 +3447,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 	ROM_LOAD( "x000188p.u66",   0x00000, 0x010000, CRC(3eb7580e) SHA1(86f2280542fb8a55767efd391d0fb04a12ed9408) ) /* Standard Draw Poker */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) )
+	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) ) /*  07/10/95   @ IGT  L95-1506  */
 	ROM_LOAD( "mgo-cg2185.u78",  0x08000, 0x8000, CRC(d4127893) SHA1(75039c45ba6fd171a66876c91abc3191c7feddfc) )
 	ROM_LOAD( "mbo-cg2185.u79",  0x10000, 0x8000, CRC(17dba955) SHA1(5f77379c88839b3a04e235e4fb0120c77e17b60e) )
 	ROM_LOAD( "mxo-cg2185.u80",  0x18000, 0x8000, CRC(583eb3b1) SHA1(4a2952424969917fb1594698a779fe5a1e99bff5) )
@@ -3472,7 +3472,7 @@ PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
 	ROM_LOAD( "x000190p.u66",   0x00000, 0x010000, CRC(17cc52f6) SHA1(90818df05c6bba3ffcbc2047c7eedea31abdc05a) ) /* Deuces Wild Poker */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) )
+	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) ) /*  07/10/95   @ IGT  L95-1506  */
 	ROM_LOAD( "mgo-cg2185.u78",  0x08000, 0x8000, CRC(d4127893) SHA1(75039c45ba6fd171a66876c91abc3191c7feddfc) )
 	ROM_LOAD( "mbo-cg2185.u79",  0x10000, 0x8000, CRC(17dba955) SHA1(5f77379c88839b3a04e235e4fb0120c77e17b60e) )
 	ROM_LOAD( "mxo-cg2185.u80",  0x18000, 0x8000, CRC(583eb3b1) SHA1(4a2952424969917fb1594698a779fe5a1e99bff5) )
@@ -3496,7 +3496,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 	ROM_LOAD( "x000197p.u66",   0x00000, 0x010000, CRC(13394826) SHA1(c9325b2ed47267b2918a3bf365b90338134ce9c7) ) /* Standard Draw Poker */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) )
+	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) ) /*  07/10/95   @ IGT  L95-1506  */
 	ROM_LOAD( "mgo-cg2185.u78",  0x08000, 0x8000, CRC(d4127893) SHA1(75039c45ba6fd171a66876c91abc3191c7feddfc) )
 	ROM_LOAD( "mbo-cg2185.u79",  0x10000, 0x8000, CRC(17dba955) SHA1(5f77379c88839b3a04e235e4fb0120c77e17b60e) )
 	ROM_LOAD( "mxo-cg2185.u80",  0x18000, 0x8000, CRC(583eb3b1) SHA1(4a2952424969917fb1594698a779fe5a1e99bff5) )
@@ -3572,7 +3572,7 @@ PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
 	ROM_LOAD( "x000291p.u66",   0x00000, 0x010000, CRC(7aa72bbd) SHA1(f754b85579720abd2efd57efa31091bca3c01425) ) /* Deuces Wild Poker */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) )
+	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) ) /*  07/10/95   @ IGT  L95-1506  */
 	ROM_LOAD( "mgo-cg2185.u78",  0x08000, 0x8000, CRC(d4127893) SHA1(75039c45ba6fd171a66876c91abc3191c7feddfc) )
 	ROM_LOAD( "mbo-cg2185.u79",  0x10000, 0x8000, CRC(17dba955) SHA1(5f77379c88839b3a04e235e4fb0120c77e17b60e) )
 	ROM_LOAD( "mxo-cg2185.u80",  0x18000, 0x8000, CRC(583eb3b1) SHA1(4a2952424969917fb1594698a779fe5a1e99bff5) )
@@ -3622,7 +3622,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 	ROM_LOAD( "x000434p.u66",   0x00000, 0x010000, CRC(5a3ad28b) SHA1(d4f103c7ce3c4f72728450ab015aca8ef10cd79c) ) /* Bonus Poker Deluxe */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) )
+	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) ) /*  07/10/95   @ IGT  L95-1506  */
 	ROM_LOAD( "mgo-cg2185.u78",  0x08000, 0x8000, CRC(d4127893) SHA1(75039c45ba6fd171a66876c91abc3191c7feddfc) )
 	ROM_LOAD( "mbo-cg2185.u79",  0x10000, 0x8000, CRC(17dba955) SHA1(5f77379c88839b3a04e235e4fb0120c77e17b60e) )
 	ROM_LOAD( "mxo-cg2185.u80",  0x18000, 0x8000, CRC(583eb3b1) SHA1(4a2952424969917fb1594698a779fe5a1e99bff5) )
@@ -3646,7 +3646,7 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  SF  RF  (Bonus)
 	ROM_LOAD( "x000447p.u66",   0x00000, 0x010000, CRC(4d3ab095) SHA1(337255658242816dc552432aee328fa52e556793) ) /* Standard Draw Poker */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) )
+	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) ) /*  07/10/95   @ IGT  L95-1506  */
 	ROM_LOAD( "mgo-cg2185.u78",  0x08000, 0x8000, CRC(d4127893) SHA1(75039c45ba6fd171a66876c91abc3191c7feddfc) )
 	ROM_LOAD( "mbo-cg2185.u79",  0x10000, 0x8000, CRC(17dba955) SHA1(5f77379c88839b3a04e235e4fb0120c77e17b60e) )
 	ROM_LOAD( "mxo-cg2185.u80",  0x18000, 0x8000, CRC(583eb3b1) SHA1(4a2952424969917fb1594698a779fe5a1e99bff5) )
@@ -3670,7 +3670,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 	ROM_LOAD( "x000449p.u66",   0x00000, 0x010000, CRC(6c22b0b3) SHA1(47cb1b8edb3e1d5d2055a7a31a1dfb46b4fd6391) ) /* Standard Draw Poker */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) )
+	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) ) /*  07/10/95   @ IGT  L95-1506  */
 	ROM_LOAD( "mgo-cg2185.u78",  0x08000, 0x8000, CRC(d4127893) SHA1(75039c45ba6fd171a66876c91abc3191c7feddfc) )
 	ROM_LOAD( "mbo-cg2185.u79",  0x10000, 0x8000, CRC(17dba955) SHA1(5f77379c88839b3a04e235e4fb0120c77e17b60e) )
 	ROM_LOAD( "mxo-cg2185.u80",  0x18000, 0x8000, CRC(583eb3b1) SHA1(4a2952424969917fb1594698a779fe5a1e99bff5) )
@@ -3694,7 +3694,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 	ROM_LOAD( "x000451p.u66",   0x00000, 0x010000, CRC(4f11e26c) SHA1(6cea3cbef530ef4ece2a4351cbd9ead5b66bb359) ) /* Bonus Poker Deluxe */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) )
+	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) ) /*  07/10/95   @ IGT  L95-1506  */
 	ROM_LOAD( "mgo-cg2185.u78",  0x08000, 0x8000, CRC(d4127893) SHA1(75039c45ba6fd171a66876c91abc3191c7feddfc) )
 	ROM_LOAD( "mbo-cg2185.u79",  0x10000, 0x8000, CRC(17dba955) SHA1(5f77379c88839b3a04e235e4fb0120c77e17b60e) )
 	ROM_LOAD( "mxo-cg2185.u80",  0x18000, 0x8000, CRC(583eb3b1) SHA1(4a2952424969917fb1594698a779fe5a1e99bff5) )
@@ -3719,7 +3719,7 @@ PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
 	ROM_LOAD( "x000452p.u66",   0x00000, 0x010000, CRC(a96c7a71) SHA1(6be1012e68035fbc9aa5e0e6ea3a6c54c1864b1b) ) /* Double Deuces Wild Poker */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) )
+	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) ) /*  07/10/95   @ IGT  L95-1506  */
 	ROM_LOAD( "mgo-cg2185.u78",  0x08000, 0x8000, CRC(d4127893) SHA1(75039c45ba6fd171a66876c91abc3191c7feddfc) )
 	ROM_LOAD( "mbo-cg2185.u79",  0x10000, 0x8000, CRC(17dba955) SHA1(5f77379c88839b3a04e235e4fb0120c77e17b60e) )
 	ROM_LOAD( "mxo-cg2185.u80",  0x18000, 0x8000, CRC(583eb3b1) SHA1(4a2952424969917fb1594698a779fe5a1e99bff5) )
@@ -3743,7 +3743,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 	ROM_LOAD( "x000454p.u66",   0x00000, 0x010000, CRC(93934ae4) SHA1(f243c66e23269e5509bf1306e9e37a579b08fda4) ) /* Bonus Poker Deluxe */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) )
+	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) ) /*  07/10/95   @ IGT  L95-1506  */
 	ROM_LOAD( "mgo-cg2185.u78",  0x08000, 0x8000, CRC(d4127893) SHA1(75039c45ba6fd171a66876c91abc3191c7feddfc) )
 	ROM_LOAD( "mbo-cg2185.u79",  0x10000, 0x8000, CRC(17dba955) SHA1(5f77379c88839b3a04e235e4fb0120c77e17b60e) )
 	ROM_LOAD( "mxo-cg2185.u80",  0x18000, 0x8000, CRC(583eb3b1) SHA1(4a2952424969917fb1594698a779fe5a1e99bff5) )
@@ -3768,7 +3768,7 @@ PayTable   Ks+  2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
 	ROM_LOAD( "x000458p.u66",   0x00000, 0x010000, CRC(dcd20558) SHA1(22c99a265431b0ef8199d3cb69fbbc4aff822dc0) ) /* Joker Poker */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) )
+	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) ) /*  07/10/95   @ IGT  L95-1506  */
 	ROM_LOAD( "mgo-cg2185.u78",  0x08000, 0x8000, CRC(d4127893) SHA1(75039c45ba6fd171a66876c91abc3191c7feddfc) )
 	ROM_LOAD( "mbo-cg2185.u79",  0x10000, 0x8000, CRC(17dba955) SHA1(5f77379c88839b3a04e235e4fb0120c77e17b60e) )
 	ROM_LOAD( "mxo-cg2185.u80",  0x18000, 0x8000, CRC(583eb3b1) SHA1(4a2952424969917fb1594698a779fe5a1e99bff5) )
@@ -3793,7 +3793,7 @@ PayTable   3K  STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
 	ROM_LOAD( "x000508p.u66",   0x00000, 0x010000, CRC(5efde4b4) SHA1(ead7448464aecc03748f04e4d6e9f346d262cd96) ) /* Loose Deuce Deuces Wild Poker */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) )
+	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) ) /*  07/10/95   @ IGT  L95-1506  */
 	ROM_LOAD( "mgo-cg2185.u78",  0x08000, 0x8000, CRC(d4127893) SHA1(75039c45ba6fd171a66876c91abc3191c7feddfc) )
 	ROM_LOAD( "mbo-cg2185.u79",  0x10000, 0x8000, CRC(17dba955) SHA1(5f77379c88839b3a04e235e4fb0120c77e17b60e) )
 	ROM_LOAD( "mxo-cg2185.u80",  0x18000, 0x8000, CRC(583eb3b1) SHA1(4a2952424969917fb1594698a779fe5a1e99bff5) )
@@ -3818,7 +3818,7 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
 	ROM_LOAD( "x000514p.u66",   0x00000, 0x010000, CRC(32cf8696) SHA1(83992695d3af4de10d0e53e01558faad18cdc221) ) /* Double Bonus Poker */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) )
+	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) ) /*  07/10/95   @ IGT  L95-1506  */
 	ROM_LOAD( "mgo-cg2185.u78",  0x08000, 0x8000, CRC(d4127893) SHA1(75039c45ba6fd171a66876c91abc3191c7feddfc) )
 	ROM_LOAD( "mbo-cg2185.u79",  0x10000, 0x8000, CRC(17dba955) SHA1(5f77379c88839b3a04e235e4fb0120c77e17b60e) )
 	ROM_LOAD( "mxo-cg2185.u80",  0x18000, 0x8000, CRC(583eb3b1) SHA1(4a2952424969917fb1594698a779fe5a1e99bff5) )
@@ -3843,7 +3843,7 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
 	ROM_LOAD( "x000515p.u66",   0x00000, 0x010000, CRC(4311224a) SHA1(69e6657dacd6e09c2d1514417994adc561f63a83) ) /* Double Bonus Poker */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) )
+	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) ) /*  07/10/95   @ IGT  L95-1506  */
 	ROM_LOAD( "mgo-cg2185.u78",  0x08000, 0x8000, CRC(d4127893) SHA1(75039c45ba6fd171a66876c91abc3191c7feddfc) )
 	ROM_LOAD( "mbo-cg2185.u79",  0x10000, 0x8000, CRC(17dba955) SHA1(5f77379c88839b3a04e235e4fb0120c77e17b60e) )
 	ROM_LOAD( "mxo-cg2185.u80",  0x18000, 0x8000, CRC(583eb3b1) SHA1(4a2952424969917fb1594698a779fe5a1e99bff5) )
@@ -3893,7 +3893,7 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
 	ROM_LOAD( "x000725p.u66",   0x00000, 0x010000, CRC(a56f3910) SHA1(06d0d4a8722e033ff1fbe0947135952ce8274725) ) /* Double Bonus Poker */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) )
+	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) ) /*  07/10/95   @ IGT  L95-1506  */
 	ROM_LOAD( "mgo-cg2185.u78",  0x08000, 0x8000, CRC(d4127893) SHA1(75039c45ba6fd171a66876c91abc3191c7feddfc) )
 	ROM_LOAD( "mbo-cg2185.u79",  0x10000, 0x8000, CRC(17dba955) SHA1(5f77379c88839b3a04e235e4fb0120c77e17b60e) )
 	ROM_LOAD( "mxo-cg2185.u80",  0x18000, 0x8000, CRC(583eb3b1) SHA1(4a2952424969917fb1594698a779fe5a1e99bff5) )
@@ -3918,7 +3918,7 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
 	ROM_LOAD( "x000726p.u66",   0x00000, 0x010000, CRC(800eb7e5) SHA1(cb4c2749d025ab093f26967909d5f366f1cc9cba) ) /* Double Bonus Poker */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) )
+	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) ) /*  07/10/95   @ IGT  L95-1506  */
 	ROM_LOAD( "mgo-cg2185.u78",  0x08000, 0x8000, CRC(d4127893) SHA1(75039c45ba6fd171a66876c91abc3191c7feddfc) )
 	ROM_LOAD( "mbo-cg2185.u79",  0x10000, 0x8000, CRC(17dba955) SHA1(5f77379c88839b3a04e235e4fb0120c77e17b60e) )
 	ROM_LOAD( "mxo-cg2185.u80",  0x18000, 0x8000, CRC(583eb3b1) SHA1(4a2952424969917fb1594698a779fe5a1e99bff5) )
@@ -3943,7 +3943,7 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
 	ROM_LOAD( "x000727p.u66",   0x00000, 0x010000, CRC(4828474c) SHA1(9836b76113a71802df30ca15f7c9a5790e6f1c5b) ) /* Double Bonus Poker */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) )
+	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) ) /*  07/10/95   @ IGT  L95-1506  */
 	ROM_LOAD( "mgo-cg2185.u78",  0x08000, 0x8000, CRC(d4127893) SHA1(75039c45ba6fd171a66876c91abc3191c7feddfc) )
 	ROM_LOAD( "mbo-cg2185.u79",  0x10000, 0x8000, CRC(17dba955) SHA1(5f77379c88839b3a04e235e4fb0120c77e17b60e) )
 	ROM_LOAD( "mxo-cg2185.u80",  0x18000, 0x8000, CRC(583eb3b1) SHA1(4a2952424969917fb1594698a779fe5a1e99bff5) )
@@ -4018,7 +4018,7 @@ PayTable   3K  STR  FL  FH  4K  SF  RF  5K  5K  5A  4D  4D  RF  (Bonus)
 	ROM_LOAD( "x002025p.u66",   0x00000, 0x10000, CRC(f3dac423) SHA1(e9394d330deb3b8a1001e57e72a506cd9098f161) ) /* Deuces Wild Bonus Poker */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) )
+	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) ) /*  07/10/95   @ IGT  L95-1506  */
 	ROM_LOAD( "mgo-cg2185.u78",  0x08000, 0x8000, CRC(d4127893) SHA1(75039c45ba6fd171a66876c91abc3191c7feddfc) )
 	ROM_LOAD( "mbo-cg2185.u79",  0x10000, 0x8000, CRC(17dba955) SHA1(5f77379c88839b3a04e235e4fb0120c77e17b60e) )
 	ROM_LOAD( "mxo-cg2185.u80",  0x18000, 0x8000, CRC(583eb3b1) SHA1(4a2952424969917fb1594698a779fe5a1e99bff5) )
@@ -4043,7 +4043,7 @@ PayTable   3K  STR  FL  FH  4K  SF  RF  5K  5K  5A  4D  4D  RF  (Bonus)
 	ROM_LOAD( "x002026p.u66",   0x00000, 0x10000, CRC(7fcbc10a) SHA1(5d50b356ae1a3461a5916b469f85b690b086e675) ) /* Deuces Wild Bonus Poker */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) )
+	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) ) /*  07/10/95   @ IGT  L95-1506  */
 	ROM_LOAD( "mgo-cg2185.u78",  0x08000, 0x8000, CRC(d4127893) SHA1(75039c45ba6fd171a66876c91abc3191c7feddfc) )
 	ROM_LOAD( "mbo-cg2185.u79",  0x10000, 0x8000, CRC(17dba955) SHA1(5f77379c88839b3a04e235e4fb0120c77e17b60e) )
 	ROM_LOAD( "mxo-cg2185.u80",  0x18000, 0x8000, CRC(583eb3b1) SHA1(4a2952424969917fb1594698a779fe5a1e99bff5) )
@@ -4068,7 +4068,7 @@ PayTable   3K  STR  FL  FH  4K  SF  RF  5K  5K  5A  4D  4D  RF  (Bonus)
 	ROM_LOAD( "x002027p.u66",   0x00000, 0x10000, CRC(40dbc35a) SHA1(56bf79738e35a22d1f23d76cd6197c8949eba3fb) ) /* Deuces Wild Bonus Poker */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) )
+	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) ) /*  07/10/95   @ IGT  L95-1506  */
 	ROM_LOAD( "mgo-cg2185.u78",  0x08000, 0x8000, CRC(d4127893) SHA1(75039c45ba6fd171a66876c91abc3191c7feddfc) )
 	ROM_LOAD( "mbo-cg2185.u79",  0x10000, 0x8000, CRC(17dba955) SHA1(5f77379c88839b3a04e235e4fb0120c77e17b60e) )
 	ROM_LOAD( "mxo-cg2185.u80",  0x18000, 0x8000, CRC(583eb3b1) SHA1(4a2952424969917fb1594698a779fe5a1e99bff5) )
@@ -4093,7 +4093,7 @@ PayTable   3K  STR  FL  FH  4K  SF  RF  5K  5K  5A  4D  4D  RF  (Bonus)
 	ROM_LOAD( "x002029p.u66",   0x00000, 0x10000, CRC(e2f6fb89) SHA1(4b60b580b00b4268d1cb9065ffe0d21f8fa6a931) ) /* Deuces Wild Bonus Poker */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) )
+	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) ) /*  07/10/95   @ IGT  L95-1506  */
 	ROM_LOAD( "mgo-cg2185.u78",  0x08000, 0x8000, CRC(d4127893) SHA1(75039c45ba6fd171a66876c91abc3191c7feddfc) )
 	ROM_LOAD( "mbo-cg2185.u79",  0x10000, 0x8000, CRC(17dba955) SHA1(5f77379c88839b3a04e235e4fb0120c77e17b60e) )
 	ROM_LOAD( "mxo-cg2185.u80",  0x18000, 0x8000, CRC(583eb3b1) SHA1(4a2952424969917fb1594698a779fe5a1e99bff5) )
@@ -4193,7 +4193,7 @@ PayTable   Js+  2PR  3K  3A  STR  FL  FH  4K  4A  SF  RF  (Bonus)
 	ROM_LOAD( "x002040p.u66",   0x00000, 0x010000, CRC(38acb477) SHA1(894f5861ac84323e50e8972602251f2873988e6c) ) /* Nevada Bonus Poker */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) )
+	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) ) /*  07/10/95   @ IGT  L95-1506  */
 	ROM_LOAD( "mgo-cg2185.u78",  0x08000, 0x8000, CRC(d4127893) SHA1(75039c45ba6fd171a66876c91abc3191c7feddfc) )
 	ROM_LOAD( "mbo-cg2185.u79",  0x10000, 0x8000, CRC(17dba955) SHA1(5f77379c88839b3a04e235e4fb0120c77e17b60e) )
 	ROM_LOAD( "mxo-cg2185.u80",  0x18000, 0x8000, CRC(583eb3b1) SHA1(4a2952424969917fb1594698a779fe5a1e99bff5) )
@@ -4270,7 +4270,7 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  A,2-4  2-4  SF  RF  (Bonus)
 	ROM_LOAD( "x002067p.u66",   0x00000, 0x010000, CRC(c62adf21) SHA1(25e037f91ef1860d1d45cae12f21bdd1c39ba264) ) /* Double Double Bonus Poker */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) )
+	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) ) /*  07/10/95   @ IGT  L95-1506  */
 	ROM_LOAD( "mgo-cg2185.u78",  0x08000, 0x8000, CRC(d4127893) SHA1(75039c45ba6fd171a66876c91abc3191c7feddfc) )
 	ROM_LOAD( "mbo-cg2185.u79",  0x10000, 0x8000, CRC(17dba955) SHA1(5f77379c88839b3a04e235e4fb0120c77e17b60e) )
 	ROM_LOAD( "mxo-cg2185.u80",  0x18000, 0x8000, CRC(583eb3b1) SHA1(4a2952424969917fb1594698a779fe5a1e99bff5) )
@@ -4296,7 +4296,7 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  with A  2-4  SF  RF  (Bonus)
 	ROM_LOAD( "x002068p.u66",   0x00000, 0x010000, CRC(a5e4279d) SHA1(c4dfd1e77a03a94d9911d1754b5874200bfe6c71) ) /* Double Double Bonus Poker */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) )
+	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) ) /*  07/10/95   @ IGT  L95-1506  */
 	ROM_LOAD( "mgo-cg2185.u78",  0x08000, 0x8000, CRC(d4127893) SHA1(75039c45ba6fd171a66876c91abc3191c7feddfc) )
 	ROM_LOAD( "mbo-cg2185.u79",  0x10000, 0x8000, CRC(17dba955) SHA1(5f77379c88839b3a04e235e4fb0120c77e17b60e) )
 	ROM_LOAD( "mxo-cg2185.u80",  0x18000, 0x8000, CRC(583eb3b1) SHA1(4a2952424969917fb1594698a779fe5a1e99bff5) )
@@ -4320,10 +4320,10 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  A,2-4  2-4  SF  RF  (Bonus)
 	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) )
 
 	ROM_REGION( 0x10000, "user1", 0 )
-	ROM_LOAD( "x002069p.u66",   0x00000, 0x10000, CRC(875ecfcf) SHA1(80472cb43b36e518216e60a9b4883a81163718a2) ) /* Double Double Bonus Poker */
+	ROM_LOAD( "x002069p.u66",   0x00000, 0x10000, CRC(875ecfcf) SHA1(80472cb43b36e518216e60a9b4883a81163718a2) ) /* Double Double Bonus Poker - 08/17/95   @ IGT  L95-2088 */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) )
+	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) ) /*  07/10/95   @ IGT  L95-1506  */
 	ROM_LOAD( "mgo-cg2185.u78",  0x08000, 0x8000, CRC(d4127893) SHA1(75039c45ba6fd171a66876c91abc3191c7feddfc) )
 	ROM_LOAD( "mbo-cg2185.u79",  0x10000, 0x8000, CRC(17dba955) SHA1(5f77379c88839b3a04e235e4fb0120c77e17b60e) )
 	ROM_LOAD( "mxo-cg2185.u80",  0x18000, 0x8000, CRC(583eb3b1) SHA1(4a2952424969917fb1594698a779fe5a1e99bff5) )
@@ -4350,7 +4350,7 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  A,2-4  2-4  SF  RF  (Bonus)
 	ROM_LOAD( "x002070p.u66",   0x00000, 0x010000, CRC(e7732ff9) SHA1(de1a68040d46e78831a6c806f26f253b4ab014b5) ) /* Double Double Bonus Poker */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) )
+	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) ) /*  07/10/95   @ IGT  L95-1506  */
 	ROM_LOAD( "mgo-cg2185.u78",  0x08000, 0x8000, CRC(d4127893) SHA1(75039c45ba6fd171a66876c91abc3191c7feddfc) )
 	ROM_LOAD( "mbo-cg2185.u79",  0x10000, 0x8000, CRC(17dba955) SHA1(5f77379c88839b3a04e235e4fb0120c77e17b60e) )
 	ROM_LOAD( "mxo-cg2185.u80",  0x18000, 0x8000, CRC(583eb3b1) SHA1(4a2952424969917fb1594698a779fe5a1e99bff5) )
@@ -4359,7 +4359,7 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  A,2-4  2-4  SF  RF  (Bonus)
 	ROM_LOAD( "capx1321.u43", 0x0000, 0x0200, CRC(4b57569f) SHA1(fa29c0f627e7ce79951ec6dadec114864144f37d) )
 ROM_END
 
-ROM_START( pex2172p ) /* Superboard : Double Ace$ Bonus Poker (X002172P+XP000112) */
+ROM_START( pex2172p ) /* Superboard : Ace$ Bonus Poker (X002172P+XP000112) */
 /*
                                       5-K 2-4
 PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
@@ -4372,12 +4372,12 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
 	ROM_LOAD( "xp000112.u67",   0x00000, 0x10000, CRC(c1ae96ad) SHA1(da109602f0fbe9b225cdcd60be0613fd41014864) )
 
 	ROM_REGION( 0x10000, "user1", 0 )
-	ROM_LOAD( "x002172p.u66",   0x00000, 0x010000, CRC(d4c44409) SHA1(8082b76a51fa131751b8c2c446cb29fb04f531dc) ) /* Double Ace$ Bonus Poker */
+	ROM_LOAD( "x002172p.u66",   0x00000, 0x010000, CRC(d4c44409) SHA1(8082b76a51fa131751b8c2c446cb29fb04f531dc) ) /* Ace$ Bonus Poker - 05/09/96   @ IGT  L96-1119 */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2172.u77",  0x00000, 0x8000, NO_DUMP ) /* Original version came with CG2172 + CAPX2172 */
+	ROM_LOAD( "mro-cg2172.u77",  0x00000, 0x8000, NO_DUMP ) /*  06/05/95   @ IGT  L95-1494  */
 	ROM_LOAD( "mgo-cg2172.u78",  0x08000, 0x8000, NO_DUMP )
-	ROM_LOAD( "mbo-cg2172.u79",  0x10000, 0x8000, NO_DUMP )
+	ROM_LOAD( "mbo-cg2172.u79",  0x10000, 0x8000, NO_DUMP ) /* Original version came with CG2172 + CAPX2172 */
 	ROM_LOAD( "mxo-cg2172.u80",  0x18000, 0x8000, NO_DUMP )
 	ROM_LOAD( "mro-cg2324.u77",  0x00000, 0x8000, CRC(6eceef42) SHA1(a2ddd2a3290c41e510f483c6b633fe0002694d0b) ) /* WRONG!! */
 	ROM_LOAD( "mgo-cg2324.u78",  0x08000, 0x8000, CRC(26d0acbe) SHA1(09a9127deb88185cd5b748bac657461eadb2f48f) )
@@ -4548,7 +4548,7 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  SF  RF  (Bonus)
 	ROM_LOAD( "x002302p.u66",   0x00000, 0x010000, CRC(8e52646e) SHA1(f6722778eb7e2981a00f8e4e5ea32f71a35e20e5) ) /* Bonus Poker Deluxe */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) )
+	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) ) /*  07/10/95   @ IGT  L95-1506  */
 	ROM_LOAD( "mgo-cg2185.u78",  0x08000, 0x8000, CRC(d4127893) SHA1(75039c45ba6fd171a66876c91abc3191c7feddfc) )
 	ROM_LOAD( "mbo-cg2185.u79",  0x10000, 0x8000, CRC(17dba955) SHA1(5f77379c88839b3a04e235e4fb0120c77e17b60e) )
 	ROM_LOAD( "mxo-cg2185.u80",  0x18000, 0x8000, CRC(583eb3b1) SHA1(4a2952424969917fb1594698a779fe5a1e99bff5) )
@@ -5030,7 +5030,7 @@ GAMEL(1995, pex2067p,  0,         peplus,  peplus_poker, peplus_state, peplussb,
 GAMEL(1995, pex2068p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (X002068P+XP000038) Double Double Bonus Poker", 0, layout_pe_poker )
 GAMEL(1995, pex2069p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (X002069P+XP000038) Double Double Bonus Poker", 0, layout_pe_poker )
 GAMEL(1995, pex2070p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (X002070P+XP000038) Double Double Bonus Poker", 0, layout_pe_poker )
-GAMEL(1995, pex2172p, 0,          peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (X002172P+XP000112) Double Ace$ Bonus Poker", GAME_IMPERFECT_GRAPHICS, layout_pe_poker ) /* Wrong CG graphics & CAP */
+GAMEL(1995, pex2172p, 0,          peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (X002172P+XP000112) Ace$ Bonus Poker", GAME_IMPERFECT_GRAPHICS, layout_pe_poker ) /* Wrong CG graphics & CAP */
 GAMEL(1995, pex2241p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (X002241P+XP000079) 4 of a Kind Bonus Poker", 0,layout_pe_poker )
 GAMEL(1995, pex2244p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (X002244P+XP000079) Double Bonus Poker", 0,layout_pe_poker )
 GAMEL(1995, pex2245p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (X002245P+XP000055) Standard Draw Poker", 0,layout_pe_poker )
