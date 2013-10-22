@@ -1,5 +1,5 @@
 // license:MAME
-// copyright-holders:Michael Strutts,Nicola Salmoria,Tormod Tjaberg,Mirko Buffoni,Lee Taylor,Valerio Verrando,Marco Cassili,Zsolt Vasvari,Aaron Giles,Jonathan Gevaryahu,Andrew Welburn,MISSING_OTHERS
+// copyright-holders:Michael Strutts,Nicola Salmoria,Tormod Tjaberg,Mirko Buffoni,Lee Taylor,Valerio Verrando,Marco Cassili,Zsolt Vasvari,Aaron Giles,Jonathan Gevaryahu,Andrew Welburn,hap,Robbbert,MISSING_OTHERS
 /*****************************************************************************
 
     8080bw.c
