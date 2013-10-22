@@ -201,15 +201,6 @@ typedef struct DIR {
 	struct dirent  result;
 } DIR;
 
-#ifndef HAVE_POLL
-struct pollfd {
-	int fd;
-	short events;
-	short revents;
-};
-#define POLLIN 1
-#endif
-
 
 // Mark required libraries
 #ifdef _MSC_VER
@@ -219,7 +210,9 @@ struct pollfd {
 #else    // UNIX  specific
 #include <sys/wait.h>
 #include <sys/socket.h>
+#ifdef HAVE_POLL
 #include <sys/poll.h>
+#endif
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <sys/time.h>
@@ -259,6 +252,20 @@ typedef int SOCKET;
 #define WINCDECL
 
 #endif // End of Windows and UNIX specific includes
+
+#ifdef __OS2__
+#define NO_SOCKLEN_T
+#define SHUT_WR 1
+#endif
+
+#ifndef HAVE_POLL
+struct pollfd {
+	int fd;
+	short events;
+	short revents;
+};
+#define POLLIN 1
+#endif
 
 #include "mongoose.h"
 
@@ -1243,37 +1250,6 @@ static struct dirent *readdir(DIR *dir) {
 	return result;
 }
 
-#ifndef HAVE_POLL
-static int poll(struct pollfd *pfd, int n, int milliseconds) {
-	struct timeval tv;
-	fd_set set;
-	int i, result, maxfd = 0;
-
-	tv.tv_sec = milliseconds / 1000;
-	tv.tv_usec = (milliseconds % 1000) * 1000;
-	FD_ZERO(&set);
-
-	for (i = 0; i < n; i++) {
-	FD_SET((SOCKET) pfd[i].fd, &set);
-	pfd[i].revents = 0;
-
-	if (pfd[i].fd > maxfd) {
-		maxfd = pfd[i].fd;
-	}
-	}
-
-	if ((result = select(maxfd + 1, &set, NULL, NULL, &tv)) > 0) {
-	for (i = 0; i < n; i++) {
-		if (FD_ISSET(pfd[i].fd, &set)) {
-		pfd[i].revents = POLLIN;
-		}
-	}
-	}
-
-	return result;
-}
-#endif // HAVE_POLL
-
 #define set_close_on_exec(x) // No FD_CLOEXEC on Windows
 
 int mg_start_thread(mg_thread_func_t f, void *p) {
@@ -1482,6 +1458,37 @@ static int set_non_blocking_mode(SOCKET sock) {
 	return 0;
 }
 #endif // _WIN32
+
+#ifndef HAVE_POLL
+static int poll(struct pollfd *pfd, int n, int milliseconds) {
+	struct timeval tv;
+	fd_set set;
+	int i, result, maxfd = 0;
+
+	tv.tv_sec = milliseconds / 1000;
+	tv.tv_usec = (milliseconds % 1000) * 1000;
+	FD_ZERO(&set);
+
+	for (i = 0; i < n; i++) {
+	FD_SET((SOCKET) pfd[i].fd, &set);
+	pfd[i].revents = 0;
+
+	if (pfd[i].fd > maxfd) {
+		maxfd = pfd[i].fd;
+	}
+	}
+
+	if ((result = select(maxfd + 1, &set, NULL, NULL, &tv)) > 0) {
+	for (i = 0; i < n; i++) {
+		if (FD_ISSET(pfd[i].fd, &set)) {
+		pfd[i].revents = POLLIN;
+		}
+	}
+	}
+
+	return result;
+}
+#endif // HAVE_POLL
 
 // Write data to the IO channel - opened file descriptor, socket or SSL
 // descriptor. Return number of bytes written.

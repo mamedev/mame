@@ -642,7 +642,7 @@ endif   # Win32
 ifeq ($(BASE_TARGETOS),os2)
 
 INCPATH += `sdl-config --cflags`
-LIBS += `sdl-config --libs`
+LIBS += `sdl-config --libs` -lpthread
 
 endif # OS2
 
