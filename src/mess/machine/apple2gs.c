@@ -128,7 +128,6 @@
 #include "sound/es5503.h"
 #include "machine/ram.h"
 #include "debugger.h"
-#include "machine/a2bus.h"
 
 #define LOG_C0XX            0
 #define LOG_ADB             0
