@@ -26,10 +26,15 @@
 #define DMD_FIRQLINE      (0x0d)
 #define DMD_PAGE3800      (0x0e)
 #define DMD_VISIBLEPAGE   (0x0f)
+
 /* Printer board */
 #define WPC_PRINTBUSY     (0x10) /* xxxxx  R: Printer ready ??? */
 #define WPC_PRINTDATA     (0x11) /* xxxxx  W: send to printer */
 #define WPC_PRINTDATAX    (0x12) /* xxxxx  W: 0: Printer data available */
+
+/* Fliptronics flippers */
+#define WPC_FLIPPERS      (0x24) /*   xxx  R: switches W: Solenoids */
+
 /* Sound board */
 #define WPC_SOUNDS11      (0x21) /* xxx    RW: R: Sound data availble, W: Reset soundboard ? */
 #define WPC_SOUNDIF       (0x2c) /* xxx    RW: Sound board interface */

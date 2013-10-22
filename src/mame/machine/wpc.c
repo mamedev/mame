@@ -6,7 +6,7 @@
 
 #include "wpc.h"
 
-#define LOG_WPC (1)
+#define LOG_WPC (0)
 
 const device_type WPCASIC = &device_creator<wpc_device>;
 
@@ -94,6 +94,12 @@ READ8_MEMBER(wpc_device::read)
 	case WPC_DIPSWITCH:
 		ret = ~ioport(":DIPS")->read();
 		//ret = m_switches[1];
+		break;
+	case WPC_FLIPPERS:
+		if(ioport(":FLIP"))  // just in case some non-fliptronics games tries to read here...
+			ret = ~ioport(":FLIP")->read();
+		else
+			ret = 0x00;
 		break;
 	case WPC_SOUNDIF:
 		ret = m_sounddata_r(space,0);
