@@ -51,6 +51,7 @@ OBJDIRS += \
 	$(EMUOBJ)/bus/vidbrain \
 	$(EMUOBJ)/bus/vip \
 	$(EMUOBJ)/bus/wangpc \
+	$(EMUOBJ)/bus/a2bus \
 	$(EMUOBJ)/drivers \
 	$(EMUOBJ)/machine \
 	$(EMUOBJ)/layout \

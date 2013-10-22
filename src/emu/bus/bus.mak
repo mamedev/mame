@@ -428,3 +428,39 @@ BUSOBJS += $(BUSOBJ)/wangpc/rtc.o
 BUSOBJS += $(BUSOBJ)/wangpc/tig.o
 BUSOBJS += $(BUSOBJ)/wangpc/wdc.o
 endif
+
+#-------------------------------------------------
+#
+#@src/emu/bus/a2bus/a2bus.h,BUSES += A2BUS
+#-------------------------------------------------
+
+ifneq ($(filter A2BUS,$(BUSES)),)
+BUSOBJS += $(BUSOBJ)/a2bus/a2bus.o
+BUSOBJS += $(BUSOBJ)/a2bus/a2lang.o
+BUSOBJS += $(BUSOBJ)/a2bus/a2diskii.o
+BUSOBJS += $(BUSOBJ)/a2bus/a2mockingboard.o
+BUSOBJS += $(BUSOBJ)/a2bus/a2cffa.o
+BUSOBJS += $(BUSOBJ)/a2bus/a2memexp.o
+BUSOBJS += $(BUSOBJ)/a2bus/a2scsi.o
+BUSOBJS += $(BUSOBJ)/a2bus/a2thunderclock.o
+BUSOBJS += $(BUSOBJ)/a2bus/a2softcard.o
+BUSOBJS += $(BUSOBJ)/a2bus/a2videoterm.o
+BUSOBJS += $(BUSOBJ)/a2bus/a2ssc.o
+BUSOBJS += $(BUSOBJ)/a2bus/a2swyft.o
+BUSOBJS += $(BUSOBJ)/a2bus/a2eauxslot.o
+BUSOBJS += $(BUSOBJ)/a2bus/a2themill.o
+BUSOBJS += $(BUSOBJ)/a2bus/a2sam.o
+BUSOBJS += $(BUSOBJ)/a2bus/a2alfam2.o
+BUSOBJS += $(BUSOBJ)/a2bus/laser128.o
+BUSOBJS += $(BUSOBJ)/a2bus/a2echoii.o
+BUSOBJS += $(BUSOBJ)/a2bus/a2arcadebd.o
+BUSOBJS += $(BUSOBJ)/a2bus/a2midi.o
+BUSOBJS += $(BUSOBJ)/a2bus/a2vulcan.o
+BUSOBJS += $(BUSOBJ)/a2bus/a2zipdrive.o
+BUSOBJS += $(BUSOBJ)/a2bus/a2applicard.o
+BUSOBJS += $(BUSOBJ)/a2bus/a2hsscsi.o
+BUSOBJS += $(BUSOBJ)/a2bus/a2estd80col.o
+BUSOBJS += $(BUSOBJ)/a2bus/a2eext80col.o
+BUSOBJS += $(BUSOBJ)/a2bus/a2eramworks3.o
+endif
+

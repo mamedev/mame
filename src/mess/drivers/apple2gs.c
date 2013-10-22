@@ -57,24 +57,25 @@
 #include "sound/speaker.h"
 #include "machine/ram.h"
 
-#include "machine/a2bus.h"
-#include "machine/a2lang.h"
-#include "machine/a2diskii.h"
-#include "machine/a2mockingboard.h"
-#include "machine/a2cffa.h"
-#include "machine/a2memexp.h"
-#include "machine/a2scsi.h"
-#include "machine/a2thunderclock.h"
-#include "machine/a2ssc.h"
-#include "machine/a2softcard.h"
-#include "machine/a2sam.h"
-#include "machine/a2alfam2.h"
-#include "machine/a2echoii.h"
-#include "machine/a2arcadebd.h"
-#include "machine/a2midi.h"
-#include "machine/a2vulcan.h"
-#include "machine/a2zipdrive.h"
-//#include "machine/a2udrive.h"
+#include "bus/a2bus/a2bus.h"
+#include "bus/a2bus/a2lang.h"
+#include "bus/a2bus/a2diskii.h"
+#include "bus/a2bus/a2mockingboard.h"
+#include "bus/a2bus/a2cffa.h"
+#include "bus/a2bus/a2memexp.h"
+#include "bus/a2bus/a2scsi.h"
+#include "bus/a2bus/a2thunderclock.h"
+#include "bus/a2bus/a2ssc.h"
+#include "bus/a2bus/a2softcard.h"
+#include "bus/a2bus/a2sam.h"
+#include "bus/a2bus/a2alfam2.h"
+#include "bus/a2bus/a2echoii.h"
+#include "bus/a2bus/a2arcadebd.h"
+#include "bus/a2bus/a2midi.h"
+#include "bus/a2bus/a2vulcan.h"
+#include "bus/a2bus/a2zipdrive.h"
+//#include "bus/a2bus/a2udrive.h"
+#include "bus/a2bus/a2hsscsi.h"
 
 static const gfx_layout apple2gs_text_layout =
 {
@@ -315,6 +316,7 @@ static SLOT_INTERFACE_START(apple2_cards)
 
 //    SLOT_INTERFACE("softcard", A2BUS_SOFTCARD)  /* Microsoft SoftCard */  // appears not to be IIgs compatible?
 	SLOT_INTERFACE("scsi", A2BUS_SCSI)  /* Apple II SCSI Card */
+	SLOT_INTERFACE("hsscsi", A2BUS_HSSCSI)  /* Apple II High-Speed SCSI Card */
 SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_START( apple2gs, apple2gs_state )

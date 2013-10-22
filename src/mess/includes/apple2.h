@@ -9,8 +9,8 @@
 #ifndef APPLE2_H_
 #define APPLE2_H_
 
-#include "machine/a2bus.h"
-#include "machine/a2eauxslot.h"
+#include "bus/a2bus/a2bus.h"
+#include "bus/a2bus/a2eauxslot.h"
 #include "machine/applefdc.h"
 #include "machine/ram.h"
 #include "imagedev/cassette.h"
@@ -80,7 +80,8 @@ enum machine_type_t
 	APPLE_IIEPLUS,      // Apple IIc/IIgs/IIc+ with permanent aux memory
 	TK2000,             // Microdigital TK2000
 	LASER128,           // Laser 128/128EX/128EX2
-	SPACE84             // "Space 84" with flipped text mode
+	SPACE84,            // "Space 84" with flipped text mode
+	LABA2P				// lab equipment (?) II Plus with flipped text mode
 };
 
 enum bank_disposition_t
@@ -327,6 +328,7 @@ public:
 	DECLARE_MACHINE_START(tk2000);
 	DECLARE_MACHINE_START(laser128);
 	DECLARE_MACHINE_START(space84);
+	DECLARE_MACHINE_START(laba2p);
 	UINT32 screen_update_apple2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(apple2_interrupt);
 	DECLARE_WRITE8_MEMBER(a2bus_irq_w);

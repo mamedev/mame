@@ -409,6 +409,7 @@ MACHINES += MOS8726
 MACHINES += MSM5832
 MACHINES += MSM58321
 MACHINES += MSM6242
+MACHINES += NCR5380N
 MACHINES += NCR539x
 MACHINES += NCR53C7XX
 MACHINES += NMC9306
@@ -504,6 +505,7 @@ BUSES += VIDBRAIN
 BUSES += VCS
 BUSES += VIP
 BUSES += WANGPC
+BUSES += A2BUS
 
 #-------------------------------------------------
 # this is the list of driver libraries that
@@ -791,7 +793,6 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/mpu401.o \
 	$(MESS_MACHINE)/msm6222b.o  \
 	$(MESS_MACHINE)/ncr5380.o   \
-	$(MESS_MACHINE)/ncr5380n.o  \
 	$(MESS_MACHINE)/ncr5390.o   \
 	$(MESS_MACHINE)/ne1000.o    \
 	$(MESS_MACHINE)/ne2000.o    \
@@ -934,33 +935,6 @@ $(MESSOBJ)/apple.a:             \
 	$(MESS_MACHINE)/apple2gs.o  \
 	$(MESS_DRIVERS)/apple2gs.o  \
 	$(MESS_MACHINE)/ay3600.o    \
-	$(MESS_MACHINE)/a2bus.o     \
-	$(MESS_MACHINE)/a2lang.o    \
-	$(MESS_MACHINE)/a2diskii.o  \
-	$(MESS_MACHINE)/a2mockingboard.o    \
-	$(MESS_MACHINE)/a2cffa.o    \
-	$(MESS_MACHINE)/a2memexp.o  \
-	$(MESS_MACHINE)/a2scsi.o    \
-	$(MESS_MACHINE)/a2thunderclock.o    \
-	$(MESS_MACHINE)/a2softcard.o \
-	$(MESS_MACHINE)/a2videoterm.o \
-	$(MESS_MACHINE)/a2ssc.o     \
-	$(MESS_MACHINE)/a2swyft.o   \
-	$(MESS_MACHINE)/a2eauxslot.o\
-	$(MESS_MACHINE)/a2themill.o \
-	$(MESS_MACHINE)/a2sam.o     \
-	$(MESS_MACHINE)/a2alfam2.o  \
-	$(MESS_MACHINE)/laser128.o  \
-	$(MESS_MACHINE)/a2echoii.o  \
-	$(MESS_MACHINE)/a2arcadebd.o\
-	$(MESS_MACHINE)/a2midi.o    \
-	$(MESS_MACHINE)/a2vulcan.o  \
-	$(MESS_MACHINE)/a2zipdrive.o\
-	$(MESS_MACHINE)/a2applicard.o \
-	$(MESS_MACHINE)/a2hsscsi.o    \
-	$(MESS_MACHINE)/a2estd80col.o \
-	$(MESS_MACHINE)/a2eext80col.o \
-	$(MESS_MACHINE)/a2eramworks3.o \
 	$(MESS_MACHINE)/lisa.o      \
 	$(MESS_DRIVERS)/lisa.o      \
 	$(MESS_MACHINE)/nubus.o     \

@@ -1576,3 +1576,12 @@ $(MACHINEOBJ)/s3c2400.o:    $(MACHINESRC)/s3c24xx.c
 $(MACHINEOBJ)/s3c2410.o:    $(MACHINESRC)/s3c24xx.c
 $(MACHINEOBJ)/s3c2440.o:    $(MACHINESRC)/s3c24xx.c
 
+#-------------------------------------------------
+#
+#@src/emu/machine/ncr5380n.h,MACHINES += NCR5380N
+#-------------------------------------------------
+
+ifneq ($(filter NCR5380N,$(MACHINES)),)
+MACHINEOBJS += $(MACHINEOBJ)/ncr5380n.o
+endif
+

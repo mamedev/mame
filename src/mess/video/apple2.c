@@ -114,7 +114,7 @@ inline void apple2_state::apple2_plot_text_character(bitmap_ind16 &bitmap, int x
 	chardata = &textgfx_data[(code * 8) % textgfx_datalen];
 
 	/* and finally, plot the character itself */
-	if (m_machinetype == SPACE84)
+	if ((m_machinetype == SPACE84) || (m_machinetype == LABA2P))
 	{
 		for (y = 0; y < 8; y++)
 		{

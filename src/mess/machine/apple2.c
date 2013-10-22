@@ -2226,6 +2226,26 @@ MACHINE_START_MEMBER(apple2_state,space84)
 	apple2_setup_memory(&mem_cfg);
 }
 
+MACHINE_START_MEMBER(apple2_state,laba2p)
+{
+	apple2_memmap_config mem_cfg;
+	void *apple2cp_ce00_ram = NULL;
+
+	// II and II+ have no internal ROM or internal slot 3 h/w, so don't allow these states
+	m_flags_mask = VAR_INTCXROM|VAR_SLOTC3ROM;
+
+	m_machinetype = LABA2P;
+
+	apple2_init_common();
+
+	/* setup memory */
+	memset(&mem_cfg, 0, sizeof(mem_cfg));
+	mem_cfg.first_bank = 1;
+	mem_cfg.memmap = apple2_memmap_entries;
+	mem_cfg.auxmem = (UINT8*)apple2cp_ce00_ram;
+	apple2_setup_memory(&mem_cfg);
+}
+
 MACHINE_START_MEMBER(apple2_state,tk2000)
 {
 	apple2_memmap_config mem_cfg;

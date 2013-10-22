@@ -193,30 +193,30 @@ Apple 3.5 and Apple 5.25 drives - up to three devices
 #include "sound/speaker.h"
 #include "machine/ram.h"
 
-#include "machine/a2bus.h"
-#include "machine/a2lang.h"
-#include "machine/a2diskii.h"
-#include "machine/a2mockingboard.h"
-#include "machine/a2cffa.h"
-#include "machine/a2memexp.h"
-#include "machine/a2scsi.h"
-#include "machine/a2thunderclock.h"
-#include "machine/a2softcard.h"
-#include "machine/a2videoterm.h"
-#include "machine/a2ssc.h"
-#include "machine/a2swyft.h"
-#include "machine/a2themill.h"
-#include "machine/a2sam.h"
-#include "machine/a2alfam2.h"
-#include "machine/laser128.h"
-#include "machine/a2echoii.h"
-#include "machine/a2arcadebd.h"
-#include "machine/a2midi.h"
-#include "machine/a2zipdrive.h"
-#include "machine/a2applicard.h"
-#include "machine/a2estd80col.h"
-#include "machine/a2eext80col.h"
-#include "machine/a2eramworks3.h"
+#include "bus/a2bus/a2bus.h"
+#include "bus/a2bus/a2lang.h"
+#include "bus/a2bus/a2diskii.h"
+#include "bus/a2bus/a2mockingboard.h"
+#include "bus/a2bus/a2cffa.h"
+#include "bus/a2bus/a2memexp.h"
+#include "bus/a2bus/a2scsi.h"
+#include "bus/a2bus/a2thunderclock.h"
+#include "bus/a2bus/a2softcard.h"
+#include "bus/a2bus/a2videoterm.h"
+#include "bus/a2bus/a2ssc.h"
+#include "bus/a2bus/a2swyft.h"
+#include "bus/a2bus/a2themill.h"
+#include "bus/a2bus/a2sam.h"
+#include "bus/a2bus/a2alfam2.h"
+#include "bus/a2bus/laser128.h"
+#include "bus/a2bus/a2echoii.h"
+#include "bus/a2bus/a2arcadebd.h"
+#include "bus/a2bus/a2midi.h"
+#include "bus/a2bus/a2zipdrive.h"
+#include "bus/a2bus/a2applicard.h"
+#include "bus/a2bus/a2estd80col.h"
+#include "bus/a2bus/a2eext80col.h"
+#include "bus/a2bus/a2eramworks3.h"
 
 /***************************************************************************
     PARAMETERS
@@ -835,8 +835,8 @@ static MACHINE_CONFIG_DERIVED( laba2p, apple2p )
 	MCFG_A2BUS_SLOT_REMOVE("sl3")
 	MCFG_A2BUS_SLOT_REMOVE("sl6")
 
-	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl3", A2BUS_LAB_80COL, NULL)
-	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl6", A2BUS_LAB_FDC, NULL)
+//	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl3", A2BUS_LAB_80COL, NULL)
+	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl6", A2BUS_IWM_FDC, NULL)
 
 MACHINE_CONFIG_END
 #endif
