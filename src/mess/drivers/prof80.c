@@ -509,15 +509,6 @@ static ECBBUS_INTERFACE( ecb_intf )
 	DEVCB_NULL
 };
 
-static SLOT_INTERFACE_START( prof80_ecb_cards )
-	SLOT_INTERFACE("grip21", ECB_GRIP21)
-/*  SLOT_INTERFACE("grip25", ECB_GRIP25)
-    SLOT_INTERFACE("grip26", ECB_GRIP26)
-    SLOT_INTERFACE("grip31", ECB_GRIP31)
-    SLOT_INTERFACE("grip562", ECB_GRIP562)
-    SLOT_INTERFACE("grips115", ECB_GRIPS115)*/
-SLOT_INTERFACE_END
-
 
 //-------------------------------------------------
 //  rs232_port_interface rs232_intf
@@ -610,11 +601,11 @@ static MACHINE_CONFIG_START( prof80, prof80_state )
 
 	// ECB bus
 	MCFG_ECBBUS_ADD(Z80_TAG, ecb_intf)
-	MCFG_ECBBUS_SLOT_ADD(1, "ecb_1", prof80_ecb_cards, "grip21")
-	MCFG_ECBBUS_SLOT_ADD(2, "ecb_2", prof80_ecb_cards, NULL)
-	MCFG_ECBBUS_SLOT_ADD(3, "ecb_3", prof80_ecb_cards, NULL)
-	MCFG_ECBBUS_SLOT_ADD(4, "ecb_4", prof80_ecb_cards, NULL)
-	MCFG_ECBBUS_SLOT_ADD(5, "ecb_5", prof80_ecb_cards, NULL)
+	MCFG_ECBBUS_SLOT_ADD(1, "ecb_1", ecbbus_cards, "grip21")
+	MCFG_ECBBUS_SLOT_ADD(2, "ecb_2", ecbbus_cards, NULL)
+	MCFG_ECBBUS_SLOT_ADD(3, "ecb_3", ecbbus_cards, NULL)
+	MCFG_ECBBUS_SLOT_ADD(4, "ecb_4", ecbbus_cards, NULL)
+	MCFG_ECBBUS_SLOT_ADD(5, "ecb_5", ecbbus_cards, NULL)
 
 	// V24
 	MCFG_RS232_PORT_ADD(RS232_A_TAG, rs232_intf, default_rs232_devices, NULL)

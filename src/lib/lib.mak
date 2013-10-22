@@ -113,6 +113,7 @@ FORMATSOBJS = \
 	$(LIBOBJ)/formats/atom_tap.o    \
 	$(LIBOBJ)/formats/bw2_dsk.o     \
 	$(LIBOBJ)/formats/bw12_dsk.o    \
+	$(LIBOBJ)/formats/cbm_crt.o     \
 	$(LIBOBJ)/formats/cbm_tap.o     \
 	$(LIBOBJ)/formats/cgen_cas.o    \
 	$(LIBOBJ)/formats/coco_cas.o    \

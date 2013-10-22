@@ -40,7 +40,7 @@
 #define __C64_EXPANSION_SLOT__
 
 #include "emu.h"
-#include "machine/cbm_crt.h"
+#include "formats/cbm_crt.h"
 
 
 

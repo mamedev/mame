@@ -28,14 +28,27 @@ OBJDIRS += \
 	$(EMUOBJ)/debugint \
 	$(EMUOBJ)/audio \
 	$(EMUOBJ)/bus \
+	$(EMUOBJ)/bus/abc1600 \
 	$(EMUOBJ)/bus/abcbus \
+	$(EMUOBJ)/bus/adam \
 	$(EMUOBJ)/bus/adamnet \
+	$(EMUOBJ)/bus/bw2 \
 	$(EMUOBJ)/bus/c64 \
+	$(EMUOBJ)/bus/cbm2 \
 	$(EMUOBJ)/bus/cbmiec \
 	$(EMUOBJ)/bus/comx35 \
+	$(EMUOBJ)/bus/ecbbus \
+	$(EMUOBJ)/bus/econet \
+	$(EMUOBJ)/bus/ep64 \
 	$(EMUOBJ)/bus/ieee488 \
 	$(EMUOBJ)/bus/isbx \
+	$(EMUOBJ)/bus/pet \
+	$(EMUOBJ)/bus/plus4 \
 	$(EMUOBJ)/bus/s100 \
+	$(EMUOBJ)/bus/vcs \
+	$(EMUOBJ)/bus/vic10 \
+	$(EMUOBJ)/bus/vic20 \
+	$(EMUOBJ)/bus/vidbrain \
 	$(EMUOBJ)/bus/vip \
 	$(EMUOBJ)/bus/wangpc \
 	$(EMUOBJ)/drivers \

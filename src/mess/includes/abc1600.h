@@ -6,13 +6,12 @@
 #define __ABC1600__
 
 #include "emu.h"
+#include "bus/abc1600/abc1600.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/8530scc.h"
 #include "machine/abckb.h"
-#include "machine/abc1600_bus.h"
 #include "machine/abc1600mac.h"
 #include "machine/e0516.h"
-#include "machine/lux4105.h"
 #include "machine/nmc9306.h"
 #include "machine/ram.h"
 #include "machine/serial.h"

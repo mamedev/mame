@@ -836,12 +836,6 @@ void abc1600_state::fdc_drq_w(bool state)
 //  ABC1600BUS_INTERFACE( abcbus_intf )
 //-------------------------------------------------
 
-static SLOT_INTERFACE_START( abc1600bus_cards )
-	SLOT_INTERFACE("4105", LUXOR_4105) // SASI interface
-//  SLOT_INTERFACE("4077", LUXOR_4077) // Winchester controller
-//  SLOT_INTERFACE("4004", LUXOR_4004) // ICOM I/O (Z80, Z80PIO, Z80SIO/2, Z80CTC, 2 Z80DMAs, 2 PROMs, 64KB RAM)
-SLOT_INTERFACE_END
-
 static ABC1600BUS_INTERFACE( bus0i_intf )
 {
 	DEVCB_DEVICE_LINE_MEMBER(Z8536B1_TAG, z8536_device, pa7_w), // really inverted but ASSERT_LINE takes care of that

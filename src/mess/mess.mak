@@ -311,27 +311,14 @@ VIDEOS += V9938
 # specify available machine cores
 #-------------------------------------------------
 
-MACHINES += CMOS40105
-MACHINES += NCR53C7XX
-MACHINES += LSI53C810
 MACHINES += 6522VIA
-MACHINES += TPI6525
 MACHINES += 6526CIA
-MACHINES += RIOT6532
 MACHINES += 6821PIA
 MACHINES += 6840PTM
-MACHINES += ACIA6850
 MACHINES += 68681
 MACHINES += 7200FIFO
-MACHINES += TTL74123
-MACHINES += TTL74145
-MACHINES += TTL74148
-MACHINES += TTL74153
-MACHINES += TTL74181
-MACHINES += TTL7474
-MACHINES += KBDC8042
-MACHINES += I8257
 MACHINES += AAKARTDEV
+MACHINES += ACIA6850
 MACHINES += ADC0808
 MACHINES += ADC083X
 MACHINES += ADC1038
@@ -348,6 +335,7 @@ MACHINES += AY31015
 MACHINES += BANKDEV
 MACHINES += CDP1852
 MACHINES += CDP1871
+MACHINES += CMOS40105
 MACHINES += COM8116
 MACHINES += CR589
 MACHINES += CTRONICS
@@ -369,6 +357,7 @@ MACHINES += I8214
 MACHINES += I8243
 MACHINES += I8251
 MACHINES += I8255
+MACHINES += I8257
 MACHINES += I8279
 MACHINES += I8355
 MACHINES += IDE
@@ -380,6 +369,7 @@ MACHINES += JVS
 MACHINES += K033906
 MACHINES += K053252
 MACHINES += K056230
+MACHINES += KBDC8042
 MACHINES += LATCH8
 MACHINES += LC89510
 MACHINES += LDPR8210
@@ -387,9 +377,10 @@ MACHINES += LDSTUB
 MACHINES += LDV1000
 MACHINES += LDVP931
 MACHINES += LINFLASH
-MACHINES += M6M80011AP
+MACHINES += LSI53C810
 MACHINES += M68307
 MACHINES += M68340
+MACHINES += M6M80011AP
 MACHINES += MATSUCD
 MACHINES += MB14241
 MACHINES += MB3773
@@ -405,18 +396,24 @@ MACHINES += MC68901
 MACHINES += MCCS1850
 MACHINES += MCF5206E
 MACHINES += MICROTOUCH
+MACHINES += MIOT6530
 MACHINES += MM58274C
 MACHINES += MM74C922
 MACHINES += MOS6526
 MACHINES += MOS6529
-MACHINES += MIOT6530
 MACHINES += MOS6551
+MACHINES += MOS6702
+MACHINES += MOS8706
+MACHINES += MOS8722
+MACHINES += MOS8726
 MACHINES += MSM5832
 MACHINES += MSM58321
 MACHINES += MSM6242
 MACHINES += NCR539x
+MACHINES += NCR53C7XX
 MACHINES += NMC9306
 MACHINES += NSCSI
+MACHINES += PCCARD
 MACHINES += PCF8593
 MACHINES += PCI
 MACHINES += PCKEYBRD
@@ -424,7 +421,9 @@ MACHINES += PD4990A_OLD
 MACHINES += PIC8259
 MACHINES += PIT8253
 MACHINES += PLA
+MACHINES += R64H156
 MACHINES += RF5C296
+MACHINES += RIOT6532
 MACHINES += ROC10937
 MACHINES += RP5C01
 MACHINES += RP5C15
@@ -439,6 +438,7 @@ MACHINES += S3C2440
 MACHINES += SATURN
 MACHINES += SCSI
 MACHINES += SCUDSP
+MACHINES += SECFLASH
 MACHINES += SEIBU_COP
 MACHINES += SMC91C9X
 MACHINES += SMPC
@@ -449,6 +449,13 @@ MACHINES += TMP68301
 MACHINES += TMS6100
 MACHINES += TMS9901
 MACHINES += TMS9902
+MACHINES += TPI6525
+MACHINES += TTL74123
+MACHINES += TTL74145
+MACHINES += TTL74148
+MACHINES += TTL74153
+MACHINES += TTL74181
+MACHINES += TTL7474
 MACHINES += UPD1990A
 MACHINES += UPD4701
 MACHINES += UPD7002
@@ -469,22 +476,32 @@ MACHINES += Z80PIO
 MACHINES += Z80SIO
 MACHINES += Z80STI
 MACHINES += Z8536
-MACHINES += SECFLASH
-MACHINES += PCCARD
-MACHINES += MOS8726
 
 #-------------------------------------------------
 # specify available bus cores
 #-------------------------------------------------
 
+BUSES += ABC1600
 BUSES += ABCBUS
+BUSES += ADAM
 BUSES += ADAMNET
+BUSES += BW2
 BUSES += C64
+BUSES += CBM2
 BUSES += CBMIEC
 BUSES += COMX35
+BUSES += ECBBUS
+BUSES += ECONET
+BUSES += EP64
 BUSES += IEEE488
 BUSES += ISBX
+BUSES += PET
+BUSES += PLUS4
 BUSES += S100
+BUSES += VIC10
+BUSES += VIC20
+BUSES += VIDBRAIN
+BUSES += VCS
 BUSES += VIP
 BUSES += WANGPC
 
@@ -781,6 +798,7 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/null_modem.o\
 	$(MESS_MACHINE)/pc_kbdc.o   \
 	$(MESS_MACHINE)/pc_lpt.o    \
+	$(MESS_MACHINE)/s1410.o     \
 	$(MESS_MACHINE)/sa1403d.o   \
 	$(MESS_MACHINE)/sed1200.o   \
 	$(MESS_MACHINE)/serial.o    \
@@ -789,13 +807,6 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/sonydriv.o  \
 	$(MESS_MACHINE)/teleprinter.o   \
 	$(MESS_MACHINE)/terminal.o  \
-	$(MESS_MACHINE)/vcs_joy.o   \
-	$(MESS_MACHINE)/vcs_joybooster.o\
-	$(MESS_MACHINE)/vcs_keypad.o    \
-	$(MESS_MACHINE)/vcs_lightpen.o  \
-	$(MESS_MACHINE)/vcs_paddles.o   \
-	$(MESS_MACHINE)/vcs_wheel.o \
-	$(MESS_MACHINE)/vcsctrl.o   \
 	$(MESS_MACHINE)/z80bin.o    \
 
 $(MESSOBJ)/isa.a: \
@@ -844,8 +855,6 @@ $(MESSOBJ)/acorn.a:             \
 	$(MESS_MACHINE)/bbc.o       \
 	$(MESS_DRIVERS)/bbc.o       \
 	$(MESS_DRIVERS)/bbcbc.o     \
-	$(MESS_MACHINE)/econet.o    \
-	$(MESS_MACHINE)/e01.o       \
 	$(MESS_VIDEO)/electron.o    \
 	$(MESS_MACHINE)/electron.o  \
 	$(MESS_DRIVERS)/electron.o  \
@@ -1055,8 +1064,6 @@ $(MESSOBJ)/bnpo.a:              \
 
 $(MESSOBJ)/bondwell.a:          \
 	$(MESS_DRIVERS)/bw2.o       \
-	$(MESS_MACHINE)/bw2exp.o    \
-	$(MESS_MACHINE)/bw2_ramcard.o   \
 	$(MESS_DRIVERS)/bw12.o      \
 
 $(MESSOBJ)/booth.a:             \
@@ -1084,55 +1091,20 @@ $(MESSOBJ)/casio.a:             \
 
 $(MESSOBJ)/cbm.a:               \
 	$(MESS_DRIVERS)/pet.o       \
-	$(MESS_MACHINE)/petcass.o   \
-	$(MESS_MACHINE)/petexp.o    \
-	$(MESS_MACHINE)/petuser.o   \
-	$(MESS_MACHINE)/pet_64k.o   \
-	$(MESS_MACHINE)/superpet.o  \
-	$(MESS_MACHINE)/mos6702.o   \
 	$(MESS_DRIVERS)/c64.o       \
 	$(MESS_DRIVERS)/c64dtv.o    \
 	$(MESS_DRIVERS)/vic10.o     \
-	$(MESS_MACHINE)/vic10exp.o  \
-	$(MESS_MACHINE)/vic10std.o  \
 	$(MESS_DRIVERS)/vic20.o     \
-	$(MESS_MACHINE)/vic20exp.o  \
-	$(MESS_MACHINE)/vic20std.o  \
-	$(MESS_MACHINE)/vic20user.o \
-	$(MESS_MACHINE)/vic20_megacart.o    \
-	$(MESS_MACHINE)/vic1010.o   \
-	$(MESS_MACHINE)/vic1011.o   \
-	$(MESS_MACHINE)/vic1110.o   \
-	$(MESS_MACHINE)/vic1111.o   \
-	$(MESS_MACHINE)/vic1112.o   \
-	$(MESS_MACHINE)/vic1210.o   \
 	$(MESS_DRIVERS)/plus4.o     \
-	$(MESS_MACHINE)/plus4exp.o  \
-	$(MESS_MACHINE)/plus4user.o \
-	$(MESS_MACHINE)/plus4_sid.o \
-	$(MESS_MACHINE)/plus4_std.o \
-	$(MESS_MACHINE)/mos8706.o   \
-	$(MESS_MACHINE)/diag264_lb_tape.o   \
-	$(MESS_MACHINE)/diag264_lb_user.o   \
 	$(MESS_DRIVERS)/cbm2.o      \
-	$(MESS_MACHINE)/cbm2exp.o   \
-	$(MESS_MACHINE)/cbm2_std.o  \
-	$(MESS_MACHINE)/cbm2_24k.o  \
-	$(MESS_MACHINE)/cbm2_graphic.o  \
-	$(MESS_MACHINE)/cbm2user.o  \
 	$(MESS_DRIVERS)/c65.o       \
 	$(MESS_MACHINE)/c65.o       \
 	$(MESS_DRIVERS)/c128.o      \
-	$(MESS_MACHINE)/c1551.o     \
 	$(MESS_DRIVERS)/clcd.o      \
-	$(MESS_MACHINE)/64h156.o    \
-	$(MESS_MACHINE)/mos8722.o   \
-	$(MESS_MACHINE)/c2n.o       \
 	$(MESS_VIDEO)/vic4567.o     \
 	$(MESS_VIDEO)/mos6566.o     \
 	$(MESS_DRIVERS)/c900.o      \
 	$(MESS_MACHINE)/cbm_snqk.o  \
-	$(MESS_MACHINE)/cbm_crt.o   \
 
 $(MESSOBJ)/cccp.a:              \
 	$(MESS_DRIVERS)/argo.o      \
@@ -1172,10 +1144,6 @@ $(MESSOBJ)/coleco.a:            \
 	$(MESS_DRIVERS)/coleco.o    \
 	$(MESS_MACHINE)/coleco.o    \
 	$(MESS_DRIVERS)/adam.o      \
-	$(MESS_MACHINE)/adamexp.o   \
-	$(MESS_MACHINE)/adamlink.o  \
-	$(MESS_MACHINE)/adam_ide.o  \
-	$(MESS_MACHINE)/adam_ram.o  \
 
 $(MESSOBJ)/cromemco.a:          \
 	$(MESS_DRIVERS)/c10.o       \
@@ -1193,8 +1161,6 @@ $(MESSOBJ)/concept.a:           \
 
 $(MESSOBJ)/conitec.a:           \
 	$(MESS_DRIVERS)/prof80.o    \
-	$(MESS_MACHINE)/ecbbus.o    \
-	$(MESS_MACHINE)/ecb_grip.o  \
 	$(MESS_DRIVERS)/prof180x.o  \
 
 $(MESSOBJ)/cybiko.a:            \
@@ -1425,8 +1391,6 @@ $(MESSOBJ)/intelgnt.a:          \
 	$(MESS_DRIVERS)/ep64.o      \
 	$(MESS_AUDIO)/dave.o        \
 	$(MESS_VIDEO)/nick.o        \
-	$(MESS_MACHINE)/ep64exp.o   \
-	$(MESS_MACHINE)/ep64_exdos.o\
 
 $(MESSOBJ)/interton.a:          \
 	$(MESS_AUDIO)/vc4000.o      \
@@ -1465,11 +1429,8 @@ $(MESSOBJ)/luxor.a:             \
 	$(MESS_MACHINE)/abc77.o     \
 	$(MESS_MACHINE)/abc99.o     \
 	$(MESS_DRIVERS)/abc1600.o   \
-	$(MESS_MACHINE)/abc1600_bus.o   \
-	$(MESS_MACHINE)/abc1600mac.o   \
-	$(MESS_MACHINE)/lux4105.o   \
+	$(MESS_MACHINE)/abc1600mac.o\
 	$(MESS_VIDEO)/abc1600.o     \
-	$(MESS_MACHINE)/s1410.o     \
 
 $(MESSOBJ)/magnavox.a:          \
 	$(MESS_DRIVERS)/odyssey2.o  \
@@ -2153,10 +2114,6 @@ $(MESSOBJ)/veb.a:               \
 
 $(MESSOBJ)/vidbrain.a:          \
 	$(MESS_DRIVERS)/vidbrain.o  \
-	$(MESS_MACHINE)/vidbrain_exp.o  \
-	$(MESS_MACHINE)/vb_std.o    \
-	$(MESS_MACHINE)/vb_money_minder.o   \
-	$(MESS_MACHINE)/vb_timeshare.o  \
 	$(MESS_VIDEO)/uv201.o       \
 
 $(MESSOBJ)/videoton.a:          \

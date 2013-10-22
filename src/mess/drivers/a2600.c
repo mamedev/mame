@@ -17,7 +17,7 @@ TODO:
 #include "imagedev/cassette.h"
 #include "formats/a26_cas.h"
 #include "video/tia.h"
-#include "machine/vcsctrl.h"
+#include "bus/vcs/ctrl.h"
 #include "hashfile.h"
 
 #define CONTROL1_TAG    "joyport1"

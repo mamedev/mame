@@ -921,6 +921,33 @@ endif
 
 #-------------------------------------------------
 #
+#@src/emu/machine/mos6702.h,MACHINES += MOS6702
+#-------------------------------------------------
+
+ifneq ($(filter MOS6702,$(MACHINES)),)
+MACHINEOBJS += $(MACHINEOBJ)/mos6702.o
+endif
+
+#-------------------------------------------------
+#
+#@src/emu/machine/mos8706.h,MACHINES += MOS8706
+#-------------------------------------------------
+
+ifneq ($(filter MOS8706,$(MACHINES)),)
+MACHINEOBJS += $(MACHINEOBJ)/mos8706.o
+endif
+
+#-------------------------------------------------
+#
+#@src/emu/machine/mos8722.h,MACHINES += MOS8722
+#-------------------------------------------------
+
+ifneq ($(filter MOS8722,$(MACHINES)),)
+MACHINEOBJS += $(MACHINEOBJ)/mos8722.o
+endif
+
+#-------------------------------------------------
+#
 #@src/emu/machine/mos8726.h,MACHINES += MOS8726
 #-------------------------------------------------
 
@@ -1112,6 +1139,15 @@ endif
 
 ifneq ($(filter RP5H01,$(MACHINES)),)
 MACHINEOBJS += $(MACHINEOBJ)/rp5h01.o
+endif
+
+#-------------------------------------------------
+#
+#@src/emu/machine/64h156.h,MACHINES += RP5C15
+#-------------------------------------------------
+
+ifneq ($(filter R64H156,$(MACHINES)),)
+MACHINEOBJS += $(MACHINEOBJ)/64h156.o
 endif
 
 #-------------------------------------------------

@@ -11,11 +11,10 @@
 ******************************************************************************/
 
 #include "emu.h"
+#include "bus/econet/econet.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6502/m65sc02.h"
 #include "machine/6522via.h"
-#include "machine/econet.h"
-#include "machine/e01.h"
 #include "machine/mc146818.h"
 #include "machine/mc6854.h"
 #include "machine/upd7002.h"
@@ -810,11 +809,6 @@ static ECONET_INTERFACE( econet_intf )
 	DEVCB_DRIVER_LINE_MEMBER(bbc_state,econet_clk_w),
 	DEVCB_NULL
 };
-
-static SLOT_INTERFACE_START( econet_devices )
-	SLOT_INTERFACE("e01", E01)
-	SLOT_INTERFACE("e01s", E01S)
-SLOT_INTERFACE_END
 
 static const rs232_port_interface rs232_intf =
 {

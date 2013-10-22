@@ -16,6 +16,17 @@ BUSOBJ = $(EMUOBJ)/bus
 
 #-------------------------------------------------
 #
+#@src/emu/bus/abc1600/abc1600.h,BUSES += ABC1600
+#-------------------------------------------------
+
+ifneq ($(filter ABC1600,$(BUSES)),)
+BUSOBJS += $(BUSOBJ)/abc1600/abc1600.o
+BUSOBJS += $(BUSOBJ)/abc1600/lux4105.o
+endif
+
+
+#-------------------------------------------------
+#
 #@src/emu/bus/abcbus/abcbus.h,BUSES += ABCBUS
 #-------------------------------------------------
 
@@ -37,6 +48,19 @@ endif
 
 #-------------------------------------------------
 #
+#@src/emu/bus/adam/exp.h,BUSES += ADAM
+#-------------------------------------------------
+
+ifneq ($(filter ADAM,$(BUSES)),)
+BUSOBJS += $(BUSOBJ)/adam/exp.o
+BUSOBJS += $(BUSOBJ)/adam/adamlink.o
+BUSOBJS += $(BUSOBJ)/adam/ide.o
+BUSOBJS += $(BUSOBJ)/adam/ram.o
+endif
+
+
+#-------------------------------------------------
+#
 #@src/emu/bus/adamnet/adamnet.h,BUSES += ADAMNET
 #-------------------------------------------------
 
@@ -47,6 +71,17 @@ BUSOBJS += $(BUSOBJ)/adamnet/fdc.o
 BUSOBJS += $(BUSOBJ)/adamnet/kb.o
 BUSOBJS += $(BUSOBJ)/adamnet/printer.o
 BUSOBJS += $(BUSOBJ)/adamnet/spi.o
+endif
+
+
+#-------------------------------------------------
+#
+#@src/emu/bus/bw2/exp.h,BUSES += BW2
+#-------------------------------------------------
+
+ifneq ($(filter BW2,$(BUSES)),)
+BUSOBJS += $(BUSOBJ)/bw2/exp.o
+BUSOBJS += $(BUSOBJ)/bw2/ramcard.o
 endif
 
 
@@ -135,6 +170,21 @@ endif
 
 #-------------------------------------------------
 #
+#@src/emu/bus/cbm2/exp.h,BUSES += CBM2
+#@src/emu/bus/cbm2/user.h,BUSES += CBM2
+#-------------------------------------------------
+
+ifneq ($(filter CBM2,$(BUSES)),)
+BUSOBJS += $(BUSOBJ)/cbm2/exp.o
+BUSOBJS += $(BUSOBJ)/cbm2/24k.o
+BUSOBJS += $(BUSOBJ)/cbm2/hrg.o
+BUSOBJS += $(BUSOBJ)/cbm2/std.o
+BUSOBJS += $(BUSOBJ)/cbm2/user.o
+endif
+
+
+#-------------------------------------------------
+#
 #@src/emu/bus/cbmiec/cbmiec.h,BUSES += CBMIEC
 #-------------------------------------------------
 
@@ -172,6 +222,39 @@ endif
 
 #-------------------------------------------------
 #
+#@src/emu/bus/ecbbus/ecbbus.h,BUSES += ECBBUS
+#-------------------------------------------------
+
+ifneq ($(filter ECBBUS,$(BUSES)),)
+BUSOBJS += $(BUSOBJ)/ecbbus/ecbbus.o
+BUSOBJS += $(BUSOBJ)/ecbbus/grip.o
+endif
+
+
+#-------------------------------------------------
+#
+#@src/emu/bus/econet/econet.h,BUSES += ECONET
+#-------------------------------------------------
+
+ifneq ($(filter ECONET,$(BUSES)),)
+BUSOBJS += $(BUSOBJ)/econet/econet.o
+BUSOBJS += $(BUSOBJ)/econet/e01.o
+endif
+
+
+#-------------------------------------------------
+#
+#@src/emu/bus/ep64/exp.h,BUSES += EP64
+#-------------------------------------------------
+
+ifneq ($(filter EP64,$(BUSES)),)
+BUSOBJS += $(BUSOBJ)/ep64/exp.o
+BUSOBJS += $(BUSOBJ)/ep64/exdos.o
+endif
+
+
+#-------------------------------------------------
+#
 #@src/emu/bus/ieee488/ieee488.h,BUSES += IEEE488
 #-------------------------------------------------
 
@@ -201,6 +284,40 @@ endif
 
 #-------------------------------------------------
 #
+#@src/emu/bus/pet/cass.h,BUSES += PET
+#@src/emu/bus/pet/exp.h,BUSES += PET
+#@src/emu/bus/pet/user.h,BUSES += PET
+#-------------------------------------------------
+
+ifneq ($(filter PET,$(BUSES)),)
+BUSOBJS += $(BUSOBJ)/pet/cass.o
+BUSOBJS += $(BUSOBJ)/pet/c2n.o
+BUSOBJS += $(BUSOBJ)/pet/diag264_lb_tape.o
+BUSOBJS += $(BUSOBJ)/pet/exp.o
+BUSOBJS += $(BUSOBJ)/pet/64k.o
+BUSOBJS += $(BUSOBJ)/pet/superpet.o
+BUSOBJS += $(BUSOBJ)/pet/user.o
+endif
+
+
+#-------------------------------------------------
+#
+#@src/emu/bus/plus4/exp.h,BUSES += PLUS4
+#@src/emu/bus/plus4/user.h,BUSES += PLUS4
+#-------------------------------------------------
+
+ifneq ($(filter PLUS4,$(BUSES)),)
+BUSOBJS += $(BUSOBJ)/plus4/exp.o
+BUSOBJS += $(BUSOBJ)/plus4/c1551.o
+BUSOBJS += $(BUSOBJ)/plus4/sid.o
+BUSOBJS += $(BUSOBJ)/plus4/std.o
+BUSOBJS += $(BUSOBJ)/plus4/user.o
+BUSOBJS += $(BUSOBJ)/plus4/diag264_lb_user.o
+endif
+
+
+#-------------------------------------------------
+#
 #@src/emu/bus/s100/s100.h,BUSES += S100
 #-------------------------------------------------
 
@@ -212,6 +329,66 @@ BUSOBJS += $(BUSOBJ)/s100/mm65k16s.o
 BUSOBJS += $(BUSOBJ)/s100/nsmdsa.o
 BUSOBJS += $(BUSOBJ)/s100/nsmdsad.o
 BUSOBJS += $(BUSOBJ)/s100/wunderbus.o
+endif
+
+
+#-------------------------------------------------
+#
+#@src/emu/bus/vcs/ctrl.h,BUSES += VCS
+#-------------------------------------------------
+
+ifneq ($(filter VCS,$(BUSES)),)
+BUSOBJS += $(BUSOBJ)/vcs/ctrl.o
+BUSOBJS += $(BUSOBJ)/vcs/joystick.o
+BUSOBJS += $(BUSOBJ)/vcs/joybooster.o
+BUSOBJS += $(BUSOBJ)/vcs/keypad.o
+BUSOBJS += $(BUSOBJ)/vcs/lightpen.o
+BUSOBJS += $(BUSOBJ)/vcs/paddles.o
+BUSOBJS += $(BUSOBJ)/vcs/wheel.o
+endif
+
+
+#-------------------------------------------------
+#
+#@src/emu/bus/vic10/exp.h,BUSES += VIC10
+#-------------------------------------------------
+
+ifneq ($(filter VIC10,$(BUSES)),)
+BUSOBJS += $(BUSOBJ)/vic10/exp.o
+BUSOBJS += $(BUSOBJ)/vic10/std.o
+endif
+
+
+#-------------------------------------------------
+#
+#@src/emu/bus/vic20/exp.h,BUSES += VIC20
+#@src/emu/bus/vic20/user.h,BUSES += VIC20
+#-------------------------------------------------
+
+ifneq ($(filter VIC20,$(BUSES)),)
+BUSOBJS += $(BUSOBJ)/vic20/exp.o
+BUSOBJS += $(BUSOBJ)/vic20/megacart.o
+BUSOBJS += $(BUSOBJ)/vic20/std.o
+BUSOBJS += $(BUSOBJ)/vic20/vic1010.o
+BUSOBJS += $(BUSOBJ)/vic20/vic1110.o
+BUSOBJS += $(BUSOBJ)/vic20/vic1111.o
+BUSOBJS += $(BUSOBJ)/vic20/vic1112.o
+BUSOBJS += $(BUSOBJ)/vic20/vic1210.o
+BUSOBJS += $(BUSOBJ)/vic20/user.o
+BUSOBJS += $(BUSOBJ)/vic20/vic1011.o
+endif
+
+
+#-------------------------------------------------
+#
+#@src/emu/bus/vidbrain/exp.h,BUSES += VIDBRAIN
+#-------------------------------------------------
+
+ifneq ($(filter VIDBRAIN,$(BUSES)),)
+BUSOBJS += $(BUSOBJ)/vidbrain/exp.o
+BUSOBJS += $(BUSOBJ)/vidbrain/std.o
+BUSOBJS += $(BUSOBJ)/vidbrain/money_minder.o
+BUSOBJS += $(BUSOBJ)/vidbrain/timeshare.o
 endif
 
 
