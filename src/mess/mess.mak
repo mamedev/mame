@@ -506,6 +506,7 @@ BUSES += VCS
 BUSES += VIP
 BUSES += WANGPC
 BUSES += A2BUS
+BUSES += NUBUS
 
 #-------------------------------------------------
 # this is the list of driver libraries that
@@ -937,7 +938,6 @@ $(MESSOBJ)/apple.a:             \
 	$(MESS_MACHINE)/ay3600.o    \
 	$(MESS_MACHINE)/lisa.o      \
 	$(MESS_DRIVERS)/lisa.o      \
-	$(MESS_MACHINE)/nubus.o     \
 	$(MESS_AUDIO)/mac.o         \
 	$(MESS_VIDEO)/mac.o         \
 	$(MESS_MACHINE)/mac.o       \
@@ -956,22 +956,6 @@ $(MESSOBJ)/apple.a:             \
 	$(MESS_MACHINE)/cuda.o      \
 	$(MESS_MACHINE)/mackbd.o    \
 	$(MESS_MACHINE)/swim.o      \
-	$(MESS_VIDEO)/nubus_48gc.o  \
-	$(MESS_VIDEO)/nubus_cb264.o \
-	$(MESS_VIDEO)/nubus_vikbw.o \
-	$(MESS_VIDEO)/nubus_specpdq.o \
-	$(MESS_VIDEO)/nubus_m2hires.o \
-	$(MESS_VIDEO)/nubus_spec8.o \
-	$(MESS_VIDEO)/nubus_radiustpd.o \
-	$(MESS_VIDEO)/nubus_m2video.o \
-	$(MESS_MACHINE)/nubus_asntmc3b.o \
-	$(MESS_MACHINE)/nubus_image.o \
-	$(MESS_VIDEO)/nubus_wsportrait.o \
-	$(MESS_VIDEO)/pds30_cb264.o \
-	$(MESS_VIDEO)/pds30_procolor816.o \
-	$(MESS_VIDEO)/pds30_sigmalview.o \
-	$(MESS_VIDEO)/pds30_30hr.o  \
-	$(MESS_VIDEO)/pds30_mc30.o  \
 	$(MESS_MACHINE)/macpds.o \
 	$(MESS_VIDEO)/pds_tpdfpd.o \
 

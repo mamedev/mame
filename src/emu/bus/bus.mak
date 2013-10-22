@@ -464,3 +464,28 @@ BUSOBJS += $(BUSOBJ)/a2bus/a2eext80col.o
 BUSOBJS += $(BUSOBJ)/a2bus/a2eramworks3.o
 endif
 
+#-------------------------------------------------
+#
+#@src/emu/bus/a2bus/nubus.h,BUSES += NUBUS
+#-------------------------------------------------
+
+ifneq ($(filter A2BUS,$(BUSES)),)
+BUSOBJS += $(BUSOBJ)/nubus/nubus.o
+BUSOBJS += $(BUSOBJ)/nubus/nubus_48gc.o
+BUSOBJS += $(BUSOBJ)/nubus/nubus_cb264.o
+BUSOBJS += $(BUSOBJ)/nubus/nubus_vikbw.o
+BUSOBJS += $(BUSOBJ)/nubus/nubus_specpdq.o
+BUSOBJS += $(BUSOBJ)/nubus/nubus_m2hires.o
+BUSOBJS += $(BUSOBJ)/nubus/nubus_spec8.o
+BUSOBJS += $(BUSOBJ)/nubus/nubus_radiustpd.o
+BUSOBJS += $(BUSOBJ)/nubus/nubus_m2video.o
+BUSOBJS += $(BUSOBJ)/nubus/nubus_asntmc3b.o
+BUSOBJS += $(BUSOBJ)/nubus/nubus_image.o
+BUSOBJS += $(BUSOBJ)/nubus/nubus_wsportrait.o
+BUSOBJS += $(BUSOBJ)/nubus/pds30_cb264.o
+BUSOBJS += $(BUSOBJ)/nubus/pds30_procolor816.o
+BUSOBJS += $(BUSOBJ)/nubus/pds30_sigmalview.o
+BUSOBJS += $(BUSOBJ)/nubus/pds30_30hr.o
+BUSOBJS += $(BUSOBJ)/nubus/pds30_mc30.o
+endif
+

@@ -56,27 +56,32 @@
 #include "machine/ram.h"
 #include "machine/scsibus.h"
 #include "machine/scsihd.h"
+#include "machine/scsicd.h"
 #include "sound/asc.h"
 #include "sound/awacs.h"
 #include "sound/cdda.h"
-#include "video/nubus_48gc.h"
-#include "video/nubus_cb264.h"
-#include "video/nubus_vikbw.h"
-#include "video/nubus_specpdq.h"
-#include "video/nubus_m2hires.h"
-#include "video/nubus_spec8.h"
-//#include "video/nubus_thundergx.h"
-#include "video/nubus_radiustpd.h"
-#include "video/nubus_wsportrait.h"
-#include "machine/nubus_asntmc3b.h"
-#include "machine/nubus_image.h"
-#include "video/nubus_m2video.h"
-#include "video/pds30_cb264.h"
-#include "video/pds30_procolor816.h"
-#include "video/pds30_sigmalview.h"
-#include "video/pds30_30hr.h"
-#include "video/pds30_mc30.h"
+
+// NuBus and 030/040 PDS cards
+#include "bus/nubus/nubus_48gc.h"
+#include "bus/nubus/nubus_cb264.h"
+#include "bus/nubus/nubus_vikbw.h"
+#include "bus/nubus/nubus_specpdq.h"
+#include "bus/nubus/nubus_m2hires.h"
+#include "bus/nubus/nubus_spec8.h"
+#include "bus/nubus/nubus_radiustpd.h"
+#include "bus/nubus/nubus_wsportrait.h"
+#include "bus/nubus/nubus_asntmc3b.h"
+#include "bus/nubus/nubus_image.h"
+#include "bus/nubus/nubus_m2video.h"
+#include "bus/nubus/pds30_cb264.h"
+#include "bus/nubus/pds30_procolor816.h"
+#include "bus/nubus/pds30_sigmalview.h"
+#include "bus/nubus/pds30_30hr.h"
+#include "bus/nubus/pds30_mc30.h"
+
+// 68000 PDS cards
 #include "video/pds_tpdfpd.h"
+
 #include "includes/mac.h"
 #include "mac.lh"
 
@@ -1105,6 +1110,7 @@ static MACHINE_CONFIG_START( macii, mac_state )
 	MCFG_SCSIBUS_ADD("scsi")
 	MCFG_SCSIDEV_ADD("scsi:harddisk1", SCSIHD, SCSI_ID_6)
 	MCFG_SCSIDEV_ADD("scsi:harddisk2", SCSIHD, SCSI_ID_5)
+	MCFG_SCSIDEV_ADD("scsi:cdrom1", SCSICD, SCSI_ID_4)
 	MCFG_NCR5380_ADD("scsi:ncr5380", C7M, macplus_5380intf)
 
 	MCFG_IWM_ADD("fdc", mac_iwm_interface)
@@ -1980,6 +1986,11 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
+ROM_START( mactw )
+	ROM_REGION16_BE(0x20000, "bootrom", 0)
+	ROM_LOAD( "rom4.3t_07-04-83.bin", 0x0000, 0x10000, CRC(d2c42f18) SHA1(f868c09ca70383a69751c37a5a3110a9597462a4) )
+ROM_END
+
 ROM_START( mac128k )
 	ROM_REGION16_BE(0x20000, "bootrom", 0)
 	ROM_LOAD16_WORD( "mac128k.rom",  0x00000, 0x10000, CRC(6d0c8a28) SHA1(9d86c883aa09f7ef5f086d9e32330ef85f1bc93b) )
@@ -2186,6 +2197,7 @@ ROM_START( maclc520 )
 ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT     COMPANY          FULLNAME */
+COMP( 1983, mactw,    0,        0,  mac128k,  macplus, mac_state,  mac128k512k,  "Apple Computer", "Macintosh (4.3T Prototype)",  GAME_NOT_WORKING )
 COMP( 1984, mac128k,  0,        0,  mac128k,  macplus, mac_state,  mac128k512k,  "Apple Computer", "Macintosh 128k",  GAME_NOT_WORKING )
 COMP( 1984, mac512k,  mac128k,  0,  mac512ke, macplus, mac_state,  mac128k512k,  "Apple Computer", "Macintosh 512k",  GAME_NOT_WORKING )
 COMP( 1986, mac512ke, macplus,  0,  mac512ke, macplus, mac_state,  mac512ke,      "Apple Computer", "Macintosh 512ke", 0 )
