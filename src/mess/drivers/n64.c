@@ -1,3 +1,5 @@
+// license:MAME|GPL-2.0+
+// copyright-holders:Ryan Holtz
 /*
     Nintendo 64
 
