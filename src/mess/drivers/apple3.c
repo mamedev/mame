@@ -18,7 +18,7 @@
 #include "formats/ap2_dsk.h"
 #include "machine/mos6551.h"
 #include "machine/6522via.h"
-#include "machine/a2bus.h"
+#include "bus/a2bus/a2bus.h"
 #include "machine/ram.h"
 #include "machine/appldriv.h"
 
