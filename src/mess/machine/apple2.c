@@ -12,7 +12,6 @@
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "includes/apple2.h"
-#include "machine/a2bus.h"
 #include "machine/ay3600.h"
 #include "machine/applefdc.h"
 #include "machine/sonydriv.h"
