@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
-#include "machine/ctronics.h"
+#include "bus/centronics/ctronics.h"
 #include "machine/8257dma.h"
 #include "machine/i8255.h"
 #include "machine/i8251.h"

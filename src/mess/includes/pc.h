@@ -20,7 +20,7 @@
 #include "machine/ram.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
-#include "machine/ctronics.h"
+#include "bus/centronics/ctronics.h"
 
 class pc_state : public driver_device
 {

@@ -9,7 +9,7 @@
 #include "cpu/m6800/m6800.h"
 #include "machine/am9517a.h"
 #include "machine/apricotkb.h"
-#include "machine/ctronics.h"
+#include "bus/centronics/ctronics.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/ram.h"

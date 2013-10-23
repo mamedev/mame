@@ -11,7 +11,7 @@
 #include "imagedev/snapquik.h"
 #include "machine/z80pio.h"
 #include "imagedev/cassette.h"
-#include "machine/ctronics.h"
+#include "bus/centronics/ctronics.h"
 #include "machine/mc146818.h"
 #include "video/mc6845.h"
 #include "sound/speaker.h"

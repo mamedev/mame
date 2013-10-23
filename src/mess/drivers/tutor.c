@@ -179,7 +179,7 @@ A=AMA, P=PRO, these keys don't exist, and so the games cannot be played.
 #include "imagedev/cartslot.h"
 #include "imagedev/cassette.h"
 #include "sound/sn76496.h"
-#include "machine/ctronics.h"
+#include "bus/centronics/ctronics.h"
 
 
 class tutor_state : public driver_device

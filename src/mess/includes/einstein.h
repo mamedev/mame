@@ -18,7 +18,7 @@
 #include "video/tms9928a.h"
 #include "machine/ram.h"
 #include "machine/i8251.h"
-#include "machine/ctronics.h"
+#include "bus/centronics/ctronics.h"
 
 /***************************************************************************
     CONSTANTS

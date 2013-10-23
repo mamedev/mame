@@ -10,7 +10,7 @@
 #include "formats/basicdsk.h"
 #include "imagedev/flopdrv.h"
 #include "machine/apricotkb.h"
-#include "machine/ctronics.h"
+#include "bus/centronics/ctronics.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80ctc.h"
 #include "machine/z80dart.h"

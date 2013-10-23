@@ -12,7 +12,7 @@
 #include "sound/speaker.h"
 #include "sound/wave.h"
 #include "machine/ay31015.h"
-#include "machine/ctronics.h"
+#include "bus/centronics/ctronics.h"
 #include "machine/wd17xx.h"
 #include "imagedev/cassette.h"
 #include "imagedev/flopdrv.h"

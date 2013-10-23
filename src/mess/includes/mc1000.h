@@ -10,7 +10,7 @@
 #include "video/mc6845.h"
 #include "video/mc6847.h"
 #include "sound/ay8910.h"
-#include "machine/ctronics.h"
+#include "bus/centronics/ctronics.h"
 #include "machine/rescap.h"
 #include "machine/ram.h"
 

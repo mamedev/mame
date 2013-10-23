@@ -19,7 +19,7 @@
 #include "cpu/mcs48/mcs48.h"
 #include "imagedev/floppy.h"
 #include "machine/ram.h"
-#include "machine/ctronics.h"
+#include "bus/centronics/ctronics.h"
 #include "machine/6522via.h"
 #include "bus/ieee488/ieee488.h"
 #include "machine/mc6852.h"

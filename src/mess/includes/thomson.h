@@ -17,7 +17,7 @@
 #include "machine/mos6551.h"
 #include "sound/dac.h"
 #include "audio/mea8000.h"
-#include "machine/ctronics.h"
+#include "bus/centronics/ctronics.h"
 #include "imagedev/cartslot.h"
 #include "imagedev/cassette.h"
 #include "machine/mc6843.h"

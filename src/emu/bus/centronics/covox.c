@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Miodrag Milanovic
 /***************************************************************************
 
     Covox Speech Thing
@@ -6,7 +8,7 @@
 
 #include "emu.h"
 #include "sound/dac.h"
-#include "cntr_covox.h"
+#include "covox.h"
 
 //**************************************************************************
 //  COVOX DEVICE

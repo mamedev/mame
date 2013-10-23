@@ -15,7 +15,7 @@
 #include "imagedev/cassette.h"
 #include "sound/dac.h"
 #include "machine/ram.h"
-#include "machine/ctronics.h"
+#include "bus/centronics/ctronics.h"
 
 
 struct SVI_318

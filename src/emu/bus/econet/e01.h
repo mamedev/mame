@@ -18,7 +18,7 @@
 #include "econet.h"
 #include "cpu/m6502/m65c02.h"
 #include "machine/6522via.h"
-#include "machine/ctronics.h"
+#include "bus/centronics/ctronics.h"
 #include "machine/mc146818.h"
 #include "machine/mc6854.h"
 #include "machine/ram.h"

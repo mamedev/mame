@@ -98,7 +98,7 @@ Some bugs left :
 #include "sound/ay8910.h"
 #include "sound/wave.h"
 #include "machine/mc146818.h"  /* Aleste RTC */
-#include "machine/ctronics.h"
+#include "bus/centronics/ctronics.h"
 
 /* Devices */
 #include "imagedev/snapquik.h"

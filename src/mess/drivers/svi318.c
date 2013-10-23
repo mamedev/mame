@@ -17,7 +17,7 @@
 #include "video/tms9928a.h"
 #include "machine/i8255.h"
 #include "machine/wd17xx.h"
-#include "machine/ctronics.h"
+#include "bus/centronics/ctronics.h"
 #include "imagedev/flopdrv.h"
 #include "formats/svi_dsk.h"
 #include "imagedev/cartslot.h"

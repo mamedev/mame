@@ -16,7 +16,7 @@
 
 #include "emu.h"
 #include "cpu/m6805/m6805.h"
-#include "machine/ctronics.h"
+#include "bus/centronics/ctronics.h"
 
 
 

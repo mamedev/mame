@@ -17,7 +17,7 @@
 
 #include "emu.h"
 #include "user.h"
-#include "machine/ctronics.h"
+#include "bus/centronics/ctronics.h"
 
 
 

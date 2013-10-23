@@ -19,7 +19,7 @@
 #include "machine/mface2.h"
 #include "machine/ram.h"
 #include "imagedev/cassette.h"
-#include "machine/ctronics.h"
+#include "bus/centronics/ctronics.h"
 
 /****************************
  * Gate Array data (CPC) -

@@ -8,8 +8,8 @@
 #define __PC_LPT_H__
 
 #include "isa.h"
-#include "machine/ctronics.h"
-#include "cntr_covox.h"
+#include "bus/centronics/ctronics.h"
+#include "bus/centronics/covox.h"
 
 
 /***************************************************************************

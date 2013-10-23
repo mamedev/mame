@@ -27,7 +27,7 @@
 #include "formats/sord_cas.h"
 #include "imagedev/cartslot.h"
 #include "imagedev/cassette.h"
-#include "machine/ctronics.h"
+#include "bus/centronics/ctronics.h"
 #include "machine/i8255.h"
 #include "machine/ram.h"
 #include "machine/upd765.h"

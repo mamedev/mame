@@ -40,7 +40,7 @@ This gives a total of 19968 NOPs per frame.
 #include "machine/i8255.h"
 #include "machine/mc146818.h"
 #include "machine/upd765.h"
-#include "machine/ctronics.h"
+#include "bus/centronics/ctronics.h"
 #include "machine/cpc_rom.h"
 #include "machine/mface2.h"
 #include "imagedev/cassette.h"

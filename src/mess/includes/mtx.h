@@ -12,7 +12,7 @@
 
 #include "imagedev/snapquik.h"
 #include "imagedev/cassette.h"
-#include "machine/ctronics.h"
+#include "bus/centronics/ctronics.h"
 #include "machine/z80dart.h"
 #include "machine/z80ctc.h"
 #include "sound/sn76496.h"

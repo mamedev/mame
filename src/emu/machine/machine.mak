@@ -383,15 +383,6 @@ endif
 
 #-------------------------------------------------
 #
-#@src/emu/machine/ctronics.h,MACHINES += CTRONICS
-#-------------------------------------------------
-
-ifneq ($(filter CTRONICS,$(MACHINES)),)
-MACHINEOBJS += $(MACHINEOBJ)/ctronics.o
-endif
-
-#-------------------------------------------------
-#
 #@src/emu/machine/ds1302.h,MACHINES += DS1302
 #-------------------------------------------------
 

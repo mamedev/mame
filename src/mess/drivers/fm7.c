@@ -48,7 +48,7 @@
 #include "formats/fm7_cas.h"
 #include "machine/wd17xx.h"
 #include "imagedev/flopdrv.h"
-#include "machine/ctronics.h"
+#include "bus/centronics/ctronics.h"
 
 #include "includes/fm7.h"
 

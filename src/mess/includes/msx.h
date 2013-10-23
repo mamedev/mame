@@ -12,7 +12,7 @@
 #include "machine/i8255.h"
 #include "machine/rp5c01.h"
 #include "machine/wd17xx.h"
-#include "machine/ctronics.h"
+#include "bus/centronics/ctronics.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/wave.h"

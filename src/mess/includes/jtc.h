@@ -7,7 +7,7 @@
 #include "emu.h"
 #include "cpu/z8/z8.h"
 #include "imagedev/cassette.h"
-#include "machine/ctronics.h"
+#include "bus/centronics/ctronics.h"
 #include "machine/ram.h"
 #include "sound/speaker.h"
 #include "sound/wave.h"

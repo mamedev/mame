@@ -18,7 +18,7 @@
 #include "machine/mc146818.h"
 #include "machine/mc6854.h"
 #include "machine/upd7002.h"
-#include "machine/ctronics.h"
+#include "bus/centronics/ctronics.h"
 #include "imagedev/flopdrv.h"
 #include "formats/basicdsk.h"
 #include "imagedev/cartslot.h"

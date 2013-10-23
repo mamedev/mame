@@ -20,7 +20,7 @@
 #include "cpu/z80/z80.h"
 #include "imagedev/cartslot.h"
 #include "imagedev/cassette.h"
-#include "machine/ctronics.h"
+#include "bus/centronics/ctronics.h"
 #include "machine/ram.h"
 #include "machine/serial.h"
 #include "video/nick.h"

@@ -11,7 +11,7 @@
 #include "formats/thom_dsk.h"
 #include "includes/thomson.h"
 #include "machine/6821pia.h"
-#include "machine/ctronics.h"
+#include "bus/centronics/ctronics.h"
 #include "machine/ram.h"
 
 #define VERBOSE       0

@@ -338,7 +338,6 @@ MACHINES += CDP1871
 MACHINES += CMOS40105
 MACHINES += COM8116
 MACHINES += CR589
-MACHINES += CTRONICS
 MACHINES += DS1302
 MACHINES += DS2401
 MACHINES += DS2404
@@ -507,6 +506,7 @@ BUSES += VIP
 BUSES += WANGPC
 BUSES += A2BUS
 BUSES += NUBUS
+BUSES += CENTRONICS
 
 #-------------------------------------------------
 # this is the list of driver libraries that
@@ -778,7 +778,6 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/8530scc.o   \
 	$(MESS_MACHINE)/appldriv.o  \
 	$(MESS_MACHINE)/applefdc.o  \
-	$(MESS_MACHINE)/cntr_covox.o\
 	$(MESS_MACHINE)/dp8390.o    \
 	$(MESS_MACHINE)/hd63450.o   \
 	$(MESS_MACHINE)/i8271.o     \

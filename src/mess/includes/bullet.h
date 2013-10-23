@@ -7,7 +7,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/ctronics.h"
+#include "bus/centronics/ctronics.h"
 #include "machine/ram.h"
 #include "machine/scsibus.h"
 #include "machine/scsicb.h"

@@ -10,7 +10,7 @@
 #include "cpu/mcs48/mcs48.h"
 #include "formats/pc_dsk.h"
 #include "machine/am9517a.h"
-#include "machine/ctronics.h"
+#include "bus/centronics/ctronics.h"
 #include "machine/ins8250.h"
 #include "machine/isa.h"
 #include "machine/isa_cards.h"

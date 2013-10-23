@@ -21,7 +21,7 @@
 #include "machine/i8271.h"
 #include "machine/mc146818.h"
 #include "machine/mc6854.h"
-#include "machine/ctronics.h"
+#include "bus/centronics/ctronics.h"
 #include "imagedev/cassette.h"
 
 

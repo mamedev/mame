@@ -77,7 +77,7 @@ ToDo:
 #include "cpu/z80/z80.h"
 #include "video/tms9928a.h"
 #include "sound/sn76496.h"
-#include "machine/ctronics.h"
+#include "bus/centronics/ctronics.h"
 //#include "imagedev/cartslot.h"
 #include "imagedev/cassette.h"
 #include "sound/wave.h"

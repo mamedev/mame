@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Miodrag Milanovic
 /***************************************************************************
 
     Covox Speech Thing
@@ -7,7 +9,7 @@
 #ifndef __CENTRONICS_COVOX_H__
 #define __CENTRONICS_COVOX_H__
 
-#include "machine/ctronics.h"
+#include "ctronics.h"
 #include "sound/dac.h"
 
 // ======================> centronics_covox_device

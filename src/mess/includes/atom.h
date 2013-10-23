@@ -14,7 +14,7 @@
 #include "formats/atom_tap.h"
 #include "formats/basicdsk.h"
 #include "formats/uef_cas.h"
-#include "machine/ctronics.h"
+#include "bus/centronics/ctronics.h"
 #include "machine/6522via.h"
 #include "machine/i8255.h"
 #include "machine/i8271.h"

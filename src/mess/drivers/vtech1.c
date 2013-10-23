@@ -100,7 +100,7 @@ Notes:
 #include "formats/imageutl.h"
 #include "cpu/z80/z80.h"
 #include "video/mc6847.h"
-#include "machine/ctronics.h"
+#include "bus/centronics/ctronics.h"
 #include "sound/wave.h"
 #include "sound/speaker.h"
 #include "imagedev/cartslot.h"

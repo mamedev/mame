@@ -12,7 +12,7 @@
 #include "sound/dac.h"
 #include "sound/wave.h"
 #include "machine/ay31015.h"
-#include "machine/ctronics.h"
+#include "bus/centronics/ctronics.h"
 #include "machine/ram.h"
 #include "imagedev/cartslot.h"
 #include "imagedev/cassette.h"

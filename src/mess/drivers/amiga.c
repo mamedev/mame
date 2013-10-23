@@ -61,7 +61,7 @@ very fussy with the state machine.
 #include "machine/amigacd.h"
 #include "machine/amigacrt.h"
 #include "machine/msm6242.h"
-#include "machine/ctronics.h"
+#include "bus/centronics/ctronics.h"
 #include "machine/nvram.h"
 #include "sound/cdda.h"
 #include "machine/i2cmem.h"

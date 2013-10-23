@@ -10,7 +10,7 @@
 #include "cpu/i8085/i8085.h"
 #include "imagedev/cartslot.h"
 #include "imagedev/cassette.h"
-#include "machine/ctronics.h"
+#include "bus/centronics/ctronics.h"
 #include "machine/i8155.h"
 #include "machine/i8251.h"
 #include "machine/im6402.h"

@@ -16,7 +16,7 @@
 
 #include "emu.h"
 #include "exp.h"
-#include "machine/ctronics.h"
+#include "bus/centronics/ctronics.h"
 #include "machine/ataintf.h"
 
 

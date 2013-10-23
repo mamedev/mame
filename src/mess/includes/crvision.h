@@ -9,7 +9,7 @@
 #include "imagedev/cartslot.h"
 #include "imagedev/cassette.h"
 #include "machine/6821pia.h"
-#include "machine/ctronics.h"
+#include "bus/centronics/ctronics.h"
 #include "machine/ram.h"
 #include "sound/sn76496.h"
 #include "sound/wave.h"

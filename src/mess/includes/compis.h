@@ -18,7 +18,7 @@
 #include "cpu/mcs48/mcs48.h"
 #include "imagedev/cassette.h"
 #include "machine/compiskb.h"
-#include "machine/ctronics.h"
+#include "bus/centronics/ctronics.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/mm58274c.h"

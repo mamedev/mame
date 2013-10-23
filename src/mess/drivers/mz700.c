@@ -69,7 +69,7 @@
 #include "machine/pit8253.h"
 #include "machine/z80pio.h"
 #include "machine/74145.h"
-#include "machine/ctronics.h"
+#include "bus/centronics/ctronics.h"
 #include "sound/sn76496.h"
 #include "sound/speaker.h"
 #include "sound/wave.h"

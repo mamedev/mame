@@ -47,7 +47,7 @@
 #include "machine/wd_fdc.h"
 #include "formats/applix_dsk.h"
 #include "imagedev/cassette.h"
-#include "machine/ctronics.h"
+#include "bus/centronics/ctronics.h"
 
 
 

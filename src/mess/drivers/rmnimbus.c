@@ -20,7 +20,7 @@
 #include "machine/s1410.h"
 #include "machine/acb4070.h"
 #include "machine/6522via.h"
-#include "machine/ctronics.h"
+#include "bus/centronics/ctronics.h"
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
 

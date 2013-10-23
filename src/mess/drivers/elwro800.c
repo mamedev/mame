@@ -21,7 +21,7 @@
 #include "machine/i8255.h"
 #include "sound/speaker.h"
 #include "sound/wave.h"
-#include "machine/ctronics.h"
+#include "bus/centronics/ctronics.h"
 #include "machine/i8251.h"
 
 /* Devices */

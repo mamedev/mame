@@ -489,3 +489,12 @@ BUSOBJS += $(BUSOBJ)/nubus/pds30_30hr.o
 BUSOBJS += $(BUSOBJ)/nubus/pds30_mc30.o
 endif
 
+#-------------------------------------------------
+#
+#@src/emu/bus/centronics/ctronics.h,BUSES += CENTRONICS
+#-------------------------------------------------
+
+ifneq ($(filter CENTRONICS,$(BUSES)),)
+BUSOBJS += $(BUSOBJ)/centronics/ctronics.o
+BUSOBJS += $(BUSOBJ)/centronics/covox.o
+endif

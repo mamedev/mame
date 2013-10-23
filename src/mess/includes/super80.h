@@ -6,7 +6,7 @@
 #include "imagedev/cartslot.h"
 #include "imagedev/cassette.h"
 #include "sound/speaker.h"
-#include "machine/ctronics.h"
+#include "bus/centronics/ctronics.h"
 #include "video/mc6845.h"
 #include "machine/z80pio.h"
 

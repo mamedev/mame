@@ -14,7 +14,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/ram.h"
 #include "machine/epson_sio.h"
-#include "machine/ctronics.h"
+#include "bus/centronics/ctronics.h"
 #include "imagedev/cartslot.h"
 #include "imagedev/cassette.h"
 #include "machine/ram.h"

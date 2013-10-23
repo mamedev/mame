@@ -13,7 +13,7 @@
 #include "sound/wave.h"
 #include "machine/6522via.h"
 #include "machine/mos6551.h"
-#include "machine/ctronics.h"
+#include "bus/centronics/ctronics.h"
 #include "machine/wd17xx.h"
 //#include <stdio.h>
 #include "machine/applefdc.h"

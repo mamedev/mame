@@ -15,7 +15,7 @@
 #include "machine/i8255.h"
 #include "machine/z80pio.h"
 #include "machine/74145.h"
-#include "machine/ctronics.h"
+#include "bus/centronics/ctronics.h"
 #include "sound/speaker.h"
 #include "imagedev/cassette.h"
 #include "machine/ram.h"

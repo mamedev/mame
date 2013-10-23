@@ -19,7 +19,7 @@
 #include "machine/pic8259.h"
 #include "machine/z80dart.h"
 #include "machine/serial.h"
-#include "machine/ctronics.h"
+#include "bus/centronics/ctronics.h"
 #include "machine/wd_fdc.h"
 #include "video/mc6845.h"
 #include "sound/sn76496.h"
