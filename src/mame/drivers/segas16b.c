@@ -4513,8 +4513,8 @@ ROM_END
 //*************************************************************************************************************************
 //*************************************************************************************************************************
 //*************************************************************************************************************************
-//  Dynamite Dux, Sega System 16B
-//  CPU: FD1094 (317-0096, version uses 317-0094 known to be exist)
+//  Dynamite Dux - Sega System16B System - Sega 1988
+//  CPU: FD1094 (317-0096)
 //  ROM Board type: 171-5521
 //
 //  Pos.   Silk        Type        Part         Pos.   Silk        Type        Part
@@ -4544,6 +4544,39 @@ ROM_START( ddux )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 )  // decryption key
 	ROM_LOAD( "317-0096.key", 0x0000, 0x2000, CRC(6fd7d26e) SHA1(6e8feaf14d0981e8b0fa8dcf4cc45aabb0a09f83) )
+
+	ROM_REGION( 0x30000, "gfx1", 0 ) // tiles
+	ROM_LOAD( "mpr-11917.a14", 0x00000, 0x10000, CRC(6f772190) SHA1(e68dc78785a1cb0da362efc8c4a088ccc580bd6e) )
+	ROM_LOAD( "mpr-11918.a15", 0x10000, 0x10000, CRC(c731db95) SHA1(b3b9cbd772f7bfd35355bcb2a7c0801b61eaf19f) )
+	ROM_LOAD( "mpr-11919.a16", 0x20000, 0x10000, CRC(64d5a491) SHA1(686151c9a58f524f786f52c03f086cdaa5728233) )
+
+	ROM_REGION16_BE( 0x100000, "sprites", 0 ) // sprites
+	ROM_LOAD16_BYTE( "mpr-11920.b1", 0x00001, 0x020000, CRC(e5d1e3cd) SHA1(d8c0f40dab00f1b09f6d018597fd45147f9ca3f6) )
+	ROM_LOAD16_BYTE( "mpr-11922.b5", 0x00000, 0x020000, CRC(70b0c4dd) SHA1(b67acab0c6a0f5051fc3fcda2476b8834f65b376) )
+	ROM_LOAD16_BYTE( "mpr-11921.b2", 0x40001, 0x020000, CRC(61d2358c) SHA1(216fd295ff9d56976f9b1c465a48806be843dd04) )
+	ROM_LOAD16_BYTE( "mpr-11923.b6", 0x40000, 0x020000, CRC(c9ffe47d) SHA1(fd6dc3781c6e7d1734a9f4a8e4a9c44cfc091e0a) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 ) // sound CPU
+	ROM_LOAD( "epr-11916.a10", 0x0000, 0x8000, CRC(7ab541cf) SHA1(feb88022ca1796d020e53e95ad345159bd415530) )
+ROM_END
+
+//*************************************************************************************************************************
+//  Dynamite Dux - Sega System16B System - Sega 1988
+//  CPU: FD1094 (317-0094)
+//  ROM Board type: 171-5521
+//
+//   Game Number 837-6768-01
+//   Rom Number  834-6767-01
+//
+ROM_START( dduxj )
+	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "epr-11914.a7", 0x000000, 0x20000, CRC(a3eedc3b) SHA1(10362696f5c388e216ec5fd436744aafd2dca08d) )
+	ROM_LOAD16_BYTE( "epr-11912.a5", 0x000001, 0x20000, CRC(05989323) SHA1(a18a70e93f97345d5559646a3d0aa78a85116e89) )
+	ROM_LOAD16_BYTE( "epr-11915.a8", 0x040000, 0x20000, CRC(d8ed3132) SHA1(a9d5ad8f79fb635cc234a99fad398688a5f15926) )
+	ROM_LOAD16_BYTE( "epr-11913.a6", 0x040001, 0x20000, CRC(30c6cb92) SHA1(2e17c74eeb37c9731fc2e365cc0114f7383c0106) )
+
+	ROM_REGION( 0x2000, "maincpu:key", 0 )  // decryption key
+	ROM_LOAD( "317-0094.key", 0x0000, 0x2000, CRC(db98f594) SHA1(85b37a973a9d059fb0c6af934c561c4a57fdc254) )
 
 	ROM_REGION( 0x30000, "gfx1", 0 ) // tiles
 	ROM_LOAD( "mpr-11917.a14", 0x00000, 0x10000, CRC(6f772190) SHA1(e68dc78785a1cb0da362efc8c4a088ccc580bd6e) )
@@ -4693,22 +4726,66 @@ ROM_START( eswatj )
 	ROM_LOAD( "mpr-12626.b13", 0x80000, 0x40000, CRC(3efca25c) SHA1(0d866bf53a16b52719f73081e933f4db27d72ece) )
 
 	ROM_REGION16_BE( 0x1c0000, "sprites", 0 ) // sprites
-	ROM_LOAD16_BYTE( "mpr-12618.b1", 0x000001, 0x20000, CRC(0d1530bf) SHA1(bb8626cd98761c1c20cee117d00315c85621ba6a) )
+	ROM_LOAD16_BYTE( "mpr-12618.b1", 0x000001, 0x20000, CRC(0d1530bf) SHA1(bb8626cd98761c1c20cee117d00315c85621ba6a) )//good
 	ROM_CONTINUE(                    0x100001, 0x20000 )
 	ROM_LOAD16_BYTE( "mpr-12621.b4", 0x000000, 0x20000, CRC(18ff0799) SHA1(5417223378aef16ee2b4f438d1f8f11a23fe7265) )
 	ROM_CONTINUE(                    0x100000, 0x20000 )
-	ROM_LOAD16_BYTE( "mpr-12619.b2", 0x040001, 0x20000, CRC(32069246) SHA1(4913009bc72bf4f8b171b14fe06457f5784cab15) )
+	ROM_LOAD16_BYTE( "mpr-12619.b2", 0x040001, 0x20000, CRC(32069246) SHA1(4913009bc72bf4f8b171b14fe06457f5784cab15) )//good
 	ROM_CONTINUE(                    0x140001, 0x20000 )
-	ROM_LOAD16_BYTE( "mpr-12622.b5", 0x040000, 0x20000, CRC(a3dfe436) SHA1(640ccc552114d403f35d441574d2f3e4f1d4a8f9) )
+	ROM_LOAD16_BYTE( "mpr-12622.b5", 0x040000, 0x20000, CRC(a3dfe436) SHA1(640ccc552114d403f35d441574d2f3e4f1d4a8f9) )//good
 	ROM_CONTINUE(                    0x140000, 0x20000 )
-	ROM_LOAD16_BYTE( "mpr-12620.b3", 0x080001, 0x20000, CRC(f6b096e0) SHA1(695ad1adbdc29f4d614645867e16de038cf92709) )
+	ROM_LOAD16_BYTE( "mpr-12620.b3", 0x080001, 0x20000, CRC(f6b096e0) SHA1(695ad1adbdc29f4d614645867e16de038cf92709) )//good
 	ROM_CONTINUE(                    0x180001, 0x20000 )
-	ROM_LOAD16_BYTE( "mpr-12623.b6", 0x080000, 0x20000, CRC(6773fef6) SHA1(91e646ea447be02254d060daf255d26afe0cc79e) )
+	ROM_LOAD16_BYTE( "mpr-12623.b6", 0x080000, 0x20000, CRC(6773fef6) SHA1(91e646ea447be02254d060daf255d26afe0cc79e) )//good
 	ROM_CONTINUE(                    0x180000, 0x20000 )
 
 	ROM_REGION( 0x90000, "soundcpu", 0 ) // sound CPU
-	ROM_LOAD( "epr-12617.a13", 0x00000, 0x08000, CRC(7efecf23) SHA1(2b87af7cfaab5942a3f7b38c987fcba01d3475ab) )
-	ROM_LOAD( "mpr-12616.a11", 0x10000, 0x40000, CRC(254347c2) SHA1(bf2d83a69a5be375c7e42e9f7d6e65c1095a354c) )
+	ROM_LOAD( "epr-12685.a13", 0x00000, 0x08000, CRC(7efecf23) SHA1(2b87af7cfaab5942a3f7b38c987fcba01d3475ab) )
+	ROM_LOAD( "mpr-12686.a11", 0x10000, 0x40000, CRC(254347c2) SHA1(bf2d83a69a5be375c7e42e9f7d6e65c1095a354c) )
+ROM_END
+
+//*************************************************************************************************************************
+//  E-Swat (Japan), Sega System 16B
+//  CPU: FD1094 (317-0131)
+//  ROM Board type: 171-5704
+//
+ROM_START( eswatj1 )
+	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "epr-12683.a7", 0x00000, 0x20000, CRC(33c34cfd) SHA1(1305f90d9144d49291eaf6588fc8040cd288e844) )
+	ROM_LOAD16_BYTE( "epr-12681.a5", 0x00001, 0x20000, CRC(6b2feb09) SHA1(f612267f6258e843591fd1a5a96c74323d0dfd0b) )
+	ROM_LOAD16_BYTE( "epr-12684.a8", 0x40000, 0x20000, CRC(2e5b866b) SHA1(c2dd0601914d1013bff98406c3c46a6b95ab4995) )
+	ROM_LOAD16_BYTE( "epr-12682.a6", 0x40001, 0x20000, CRC(8e1f57d2) SHA1(48567bf2b6bf667d5fb1b8b4d9fa53073ded316f) )
+
+	ROM_REGION( 0x2000, "maincpu:key", 0 )  // decryption key
+	ROM_LOAD( "317-0131.key", 0x0000, 0x2000,  CRC(8f71726d) SHA1(477f85f116b3370a73f0297d04775f5b117cefa7) )
+
+	ROM_REGION( 0xc0000, "gfx1", 0 ) // tiles
+	ROM_LOAD( "epr-12688.a14", 0x00000, 0x20000, CRC(12f898db) SHA1(f5848a52d75d6204c6b9687fa9146aaec2d56097) )
+	ROM_LOAD( "epr-12700.b14", 0x20000, 0x10000, CRC(37a721c7) SHA1(eb687a386d2edc2df0fe1225e70f81363e936a23) )
+	ROM_LOAD( "epr-12689.a15", 0x40000, 0x20000, CRC(339746d0) SHA1(084a567d5b747c2fc085c5033f56407d6b46faef) )
+	ROM_LOAD( "epr-12701.b15", 0x60000, 0x10000, CRC(703bf496) SHA1(0b4d9b7967b4c5704b60218b143a3d1b3ea5fb79) )
+	ROM_LOAD( "epr-12690.a16", 0x80000, 0x20000, CRC(33cf7a55) SHA1(405ed634c393f42544c1fe39c9cfd372f08c3fac) )
+	ROM_LOAD( "epr-12702.b16", 0xa0000, 0x10000, CRC(70b70211) SHA1(6192720031713920aa6ac4ff01d39fe148c12ff0) )
+
+	ROM_REGION16_BE( 0x200000, "sprites", 0 ) // sprites
+	ROM_LOAD16_BYTE( "epr-12694.b5", 0x000000, 0x20000, CRC(10a27526) SHA1(8299d4888d5d7530d864d7e33f264efe66272b44) )
+	ROM_LOAD16_BYTE( "epr-12691.b1", 0x000001, 0x20000, CRC(2ff5cb9e) SHA1(2468a928515640e1bdd651aaadcbc918661c3312) )
+	ROM_LOAD16_BYTE( "epr-12695.b6", 0x040000, 0x20000, CRC(ba3ba6fd) SHA1(799e9899630d417fc508af22e04c7c2526a88ee1) )
+	ROM_LOAD16_BYTE( "epr-12692.b2", 0x040001, 0x20000, CRC(01b2e832) SHA1(6b7aa350498c54a9fac54fee1e65fcada4284fd6) )
+	ROM_LOAD16_BYTE( "epr-12696.b7", 0x080000, 0x20000, CRC(54b51ca4) SHA1(2f477885500ac4c0875ae956d574334332e225b6) )
+	ROM_LOAD16_BYTE( "epr-12693.b3", 0x080001, 0x20000, CRC(d12ef57a) SHA1(e0d6d350ce20d84f12df3ab777b9aaa40b906339) )
+	ROM_LOAD16_BYTE( "epr-12678.a1", 0x100001, 0x20000, CRC(a8afd649) SHA1(f1474533b001f71a18a75bfeb65c6cf66505c63d) )
+	ROM_LOAD16_BYTE( "epr-12697.b10",0x100000, 0x20000, CRC(6ac4cbfb) SHA1(84b00eff7ee0d702d31850074d7107a2ab2d5c08) )
+	ROM_LOAD16_BYTE( "epr-12679.a2", 0x140001, 0x20000, CRC(b4c4a2ab) SHA1(7507204ac7dc6167da93d5e8645ca1ad87f88d3e) )
+	ROM_LOAD16_BYTE( "epr-12698.b11",0x140000, 0x20000, CRC(99784b36) SHA1(7ba41d4a4434f2157ce78a701cbe3d9584dd2ab6) )
+	ROM_LOAD16_BYTE( "epr-12680.a3", 0x180001, 0x20000, CRC(f321452c) SHA1(cdccd8facc2941745f05fba25ad7d76b445eb873) )
+	ROM_LOAD16_BYTE( "epr-12699.b12",0x180000, 0x20000, CRC(ac329586) SHA1(98994f41ee2f0fa5cd800f565b277ba21f2bb0c3) )
+
+
+	ROM_REGION( 0x90000, "soundcpu", 0 ) // sound CPU
+	ROM_LOAD( "epr-12685.a10", 0x00000, 0x08000, CRC(5d0c16d7) SHA1(7ab13376c2a1da0566689ccbc258f94d1f4de487) )
+	ROM_LOAD( "mpr-12686.a11", 0x10000, 0x20000, CRC(f451705e) SHA1(2b3d1b3ffbc6ba2285c4141e6fd3447252a31c8b) )
+	ROM_LOAD( "mpr-12687.a12", 0x30000, 0x20000, CRC(9e87571f) SHA1(3b2ce36fdd53cbd41e345a3914f07bcf0f1d72cb) )
 ROM_END
 
 
@@ -6685,14 +6762,16 @@ GAME( 1991, cottonu,    cotton,   system16b_fd1094,    cotton,   segas16b_state,
 GAME( 1991, cottonj,    cotton,   system16b_fd1094,    cotton,   segas16b_state,generic_5704,       ROT0,   "Success / Sega", "Cotton (set 2, Japan, Rev B, FD1094 317-0179b)", 0 )
 GAME( 1991, cottonja,   cotton,   system16b_fd1094,    cotton,   segas16b_state,generic_5704,       ROT0,   "Success / Sega", "Cotton (set 1, Japan, Rev A, FD1094 317-0179a)", 0 )
 
-GAME( 1988, ddux,       0,        system16b_fd1094,    ddux,     segas16b_state,generic_5521,       ROT0,   "Sega", "Dynamite Dux (set 2, FD1094 317-0096)", 0 )
+GAME( 1988, ddux,       0,        system16b_fd1094,    ddux,     segas16b_state,generic_5521,       ROT0,   "Sega", "Dynamite Dux (set 3, World, FD1094 317-0096)", 0 )
+GAME( 1988, dduxj,      ddux,     system16b_fd1094,    ddux,     segas16b_state,generic_5521,       ROT0,   "Sega", "Dynamite Dux (set 2, Japan, FD1094 317-0094)", 0 )
 GAME( 1988, ddux1,      ddux,     system16b_i8751,     ddux,     segas16b_state,ddux_5704,          ROT0,   "Sega", "Dynamite Dux (set 1, 8751 317-0095)", 0 )
 
 GAME( 1986, dunkshot,   0,        system16b_fd1089a,   dunkshot, segas16b_state,dunkshot_5358_small,ROT0,   "Sega", "Dunk Shot (FD1089A 317-0022)", 0 )
 
-GAME( 1989, eswat,      0,        system16b_fd1094_5797,eswat,   segas16b_state,generic_5797,       ROT0,   "Sega", "E-Swat - Cyber Police (set 3, World, FD1094 317-0130)", 0 )
-GAME( 1989, eswatu,     eswat,    system16b_fd1094_5797,eswat,   segas16b_state,generic_5797,       ROT0,   "Sega", "E-Swat - Cyber Police (set 2, US, FD1094 317-0129)", 0 )
-GAME( 1989, eswatj,     eswat,    system16b_fd1094_5797,eswat,   segas16b_state,generic_5797,       ROT0,   "Sega", "E-Swat - Cyber Police (set 1, Japan, FD1094 317-0128)", 0 )
+GAME( 1989, eswat,      0,        system16b_fd1094_5797,eswat,   segas16b_state,generic_5797,       ROT0,   "Sega", "E-Swat - Cyber Police (set 4, World, FD1094 317-0130)", 0 )
+GAME( 1989, eswatu,     eswat,    system16b_fd1094_5797,eswat,   segas16b_state,generic_5797,       ROT0,   "Sega", "E-Swat - Cyber Police (set 3, US, FD1094 317-0129)", 0 )
+GAME( 1989, eswatj,     eswat,    system16b_fd1094_5797,eswat,   segas16b_state,generic_5797,       ROT0,   "Sega", "E-Swat - Cyber Police (set 2, Japan, FD1094 317-0128)", 0 )
+GAME( 1989, eswatj1,    eswat,    system16b_fd1094,     eswat,   segas16b_state,generic_5704,       ROT0,   "Sega", "E-Swat - Cyber Police (set 1, Japan, FD1094 317-0131)", 0 )
 
 GAME( 1988, exctleag,   0,        system16b_fd1094,    exctleag, segas16b_state,exctleag_5358,      ROT0,   "Sega", "Excite League (FD1094 317-0079)", 0 )
 
@@ -6710,7 +6789,7 @@ GAME( 1987, hwchamp,    0,        system16b,           hwchamp,  segas16b_state,
 GAME( 1987, hwchampj,   hwchamp,  system16b_fd1094,    hwchamp,  segas16b_state,hwchamp_5521,       ROT0,   "Sega", "Heavyweight Champ (Japan, FD1094 317-0046)", 0 )
 
 GAME( 1989, mvp,        0,        system16b_fd1094_5797,mvp,     segas16b_state,generic_5797,       ROT0,   "Sega", "MVP (set 2, US, FD1094 317-0143)", 0 )
-GAME( 1989, mvpj,       mvp,      system16b_fd1094,    mvp,      segas16b_state,generic_5704,       ROT0,   "Sega", "MVP (set 1, Japan, FD1094 317-0142)", 0 )
+GAME( 1989, mvpj,       mvp,      system16b_fd1094,     mvp,     segas16b_state,generic_5704,       ROT0,   "Sega", "MVP (set 1, Japan, FD1094 317-0142)", 0 )
 
 GAME( 1988, passsht,    0,        system16b_fd1094,    passsht,  segas16b_state,generic_5358,       ROT270, "Sega", "Passing Shot (World, 2 Players, FD1094 317-0080)", 0 )
 GAME( 1988, passshta,   passsht,  system16b_fd1094,    passshtj, segas16b_state,passshtj_5358,      ROT270, "Sega", "Passing Shot (World, 4 Players, FD1094 317-0074)", 0 )
