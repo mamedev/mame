@@ -4740,8 +4740,8 @@ ROM_START( eswatj )
 	ROM_CONTINUE(                    0x180000, 0x20000 )
 
 	ROM_REGION( 0x90000, "soundcpu", 0 ) // sound CPU
-	ROM_LOAD( "epr-12685.a13", 0x00000, 0x08000, CRC(7efecf23) SHA1(2b87af7cfaab5942a3f7b38c987fcba01d3475ab) )
-	ROM_LOAD( "mpr-12686.a11", 0x10000, 0x40000, CRC(254347c2) SHA1(bf2d83a69a5be375c7e42e9f7d6e65c1095a354c) )
+	ROM_LOAD( "epr-12617.a13", 0x00000, 0x08000, CRC(7efecf23) SHA1(2b87af7cfaab5942a3f7b38c987fcba01d3475ab) )
+	ROM_LOAD( "mpr-12616.a11", 0x10000, 0x40000, CRC(254347c2) SHA1(bf2d83a69a5be375c7e42e9f7d6e65c1095a354c) )
 ROM_END
 
 //*************************************************************************************************************************
