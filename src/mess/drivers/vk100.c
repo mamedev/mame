@@ -1,3 +1,5 @@
+//license:MAME|LGPL-2.1+
+//copyright-holders:Jonathan Gevaryahu
 /***************************************************************************
 
         DEC VK100 'GIGI'
@@ -200,8 +202,8 @@ public:
 	UINT8 m_dir_a6; // latched a6 of dir rom
 	UINT8 m_cout; // carry out from vgERR adder
 	UINT8 m_vsync; // vsync pin of crtc
-	UINT16 m_vgX;
-	UINT16 m_vgY;
+	UINT16 m_vgX; // 12 bit X value for vector draw position
+	UINT16 m_vgY; // 12 bit Y value for vector draw position
 	UINT16 m_vgERR; // error register can cause carries which need to be caught
 	UINT8 m_vgSOPS;
 	UINT8 m_vgPAT;
@@ -360,7 +362,7 @@ TIMER_CALLBACK_MEMBER(vk100_state::execute_vg)
 	UINT8 thisNyb = vram_read(); // read in the nybble
 	// pattern rom addressing is a complex mess. see the pattern rom def later in this file.
 	UINT8 newNyb = m_pattern[((m_vgPAT&m_vgPAT_Mask)?0x200:0)|((VG_WOPS&7)<<6)|((m_vgX&3)<<4)|thisNyb]; // calculate new nybble based on pattern rom
-	// finally write the block back to ram depending on the VG_MODE (sort of a hack until we get the vector and synd and dir roms all hooked up)
+	// finally write the block back to ram depending on the VG_MODE (sort of a hack until we get the vector and sync and dir roms all hooked up)
 	// but only do it if the direction rom said so!
 	switch (m_VG_MODE)
 	{
