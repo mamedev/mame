@@ -1,12 +1,14 @@
 // license:MAME
-// copyright-holders:Michael Strutts,Nicola Salmoria,Tormod Tjaberg,Mirko Buffoni,Lee Taylor,Valerio Verrando,Marco Cassili,Zsolt Vasvari,Aaron Giles,Jonathan Gevaryahu,Andrew Welburn,hap,Robbbert,MISSING_OTHERS
+// copyright-holders:Michael Strutts,Nicola Salmoria,Tormod Tjaberg,Mirko Buffoni,Lee Taylor,Valerio Verrando,Marco Cassili,Zsolt Vasvari,Aaron Giles,Jonathan Gevaryahu,hap,Robbbert,MISSING_OTHERS
 /*****************************************************************************
 
     8080bw.c
 
     Michael Strutts, Nicola Salmoria, Tormod Tjaberg, Mirko Buffoni
-    Lee Taylor, Valerio Verrando, Marco Cassili, Zsolt Vasvari, Andy Welburn,
-    and others
+    Lee Taylor, Valerio Verrando, Marco Cassili, Zsolt Vasvari, and others
+
+    Much information about Space Invaders PCBs and other Taito and Midway 
+    sets and hardware contributed by Andrew Welburn
 
 
     Notes:
@@ -49,7 +51,7 @@
             - despite there being at least six versions of this pcb, the discrete
               audio section is identical in all of them.
           * Middle pcb: CPU/RAM/Color overlay pcb
-            - has SRAMS on it
+            - has DRAMS on it
             - has the 8080 CPU on it
             - has the two PROMS for color overlay on it (one for each player flip)
               (these are not populated on TVN pcbs and the related circuitry is not
@@ -83,9 +85,9 @@
          * SVNxxxxx? (L-shaped pcbset) - B&W only, used on "Space Invaders" Upright
            with 3-separate-sheets-of-gel 'strips' color overlay.
      ***TODO: this overlay might not be supported properly yet!
-           Does not support flipscreen. (to save on component costs?)  
+           Does not support flipscreen, was intended for upright cabinets only.
            Audio PCB daughterboard has part number SVN00001 or SVN00003.
-           Came from factory with one of the TV romsets ONLY?
+           Came from factory with one of the 6x 0x400 or 4x 0x800 romsets
            Capable of running TV, SV or CV romsets.
            This is probably the second-oldest pcb set and may have been made to
            allow closer physical interchangability with Midway's m8080bw hardware,
@@ -106,8 +108,7 @@
            Capable of running TV, SV, CV, UV or PV romsets.
 
        * The following Romsets are known, ROUGHLY from oldest to newest:
-         SV01, SV02, SV03, SV04, SV05, SV06 - undumped (rev 1), this would be the very first japan release of space invaders (Andy W may call this 'SV0'?)
-         (SV01, SV02, SV08, SV04, SV07, SV06) - undumped, unknown if this version actually exists. 
+         SV01, SV02, SV03, SV04, SV05, SV06 - undumped (rev 1), If this exists at all this would be the very first japan release of space invaders (Andy W may call this 'SV0'?)
          SV01, SV02, SV10, SV04, SV09, SV06 - sisv2 (rev 2) (Andy W calls this 'SV1', and the midway 'invaders' set is based on this romset)
          SV0H, SV02, SV10, SV04, SV09, SV06 - sisv3 (rev 3) (Andy W calls this 'SV2')
          SV0H, SV11, SV12, SV04, SV13, SV14 - sisv (rev 4, 5-digit scoring) (Andy W calls this 'SV3') (this set is likely newer than the TV0x sets)
@@ -3395,7 +3396,7 @@ ROM_START( sicv ) // likely not the first sicv version...
 	ROM_LOAD( "cv02.2",      0x0400, 0x0400, CRC(8263da38) SHA1(2e7c769d129e6f8a1a31eba1e02777bb94ac32b2) )
 ROM_END
 
-ROM_START( sisv1 ) // rev 1
+ROM_START( sisv1 ) // rev 1, this version may or may not really exist (may have been test/prototype only?)
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sv01.36",     0x0000, 0x0400, CRC(d0c32d72) SHA1(b3bd950b1ba940fbeb5d95e55113ed8f4c311434) )
 	ROM_LOAD( "sv02.35",     0x0400, 0x0400, CRC(0e159534) SHA1(94b2015a9d38ca738705b8d024a79fd2f9855b98) )
