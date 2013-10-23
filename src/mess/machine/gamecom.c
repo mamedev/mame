@@ -86,94 +86,102 @@ void gamecom_state::handle_stylus_press( int column )
 	}
 }
 
+void gamecom_state::handle_input_press(UINT16 mux_data)
+{
+	switch( mux_data )
+	{
+		case 0xFFFB:
+			/* column #0 */
+			/* P0 bit 0 cleared => 01 */
+			/* P0 bit 1 cleared => 0E */
+			/* P0 bit 2 cleared => 1B */
+			/* P0 bit 3 cleared => etc */
+			/* P0 bit 4 cleared => */
+			/* P0 bit 5 cleared => */
+			/* P0 bit 6 cleared => */
+			/* P0 bit 7 cleared => */
+			/* P1 bit 0 cleared => */
+			/* P1 bit 1 cleared => */
+			handle_stylus_press(0);
+			break;
+		case 0xFFF7:    /* column #1 */
+			handle_stylus_press(1);
+			break;
+		case 0xFFEF:    /* column #2 */
+			handle_stylus_press(2);
+			break;
+		case 0xFFDF:    /* column #3 */
+			handle_stylus_press(3);
+			break;
+		case 0xFFBF:    /* column #4 */
+			handle_stylus_press(4);
+			break;
+		case 0xFF7F:    /* column #5 */
+			handle_stylus_press(5);
+			break;
+		case 0xFEFF:    /* column #6 */
+			handle_stylus_press(6);
+			break;
+		case 0xFDFF:    /* column #7 */
+			handle_stylus_press(7);
+			break;
+		case 0xFBFF:    /* column #8 */
+			handle_stylus_press(8);
+			break;
+		case 0xF7FF:    /* column #9 */
+			handle_stylus_press(9);
+			break;
+		case 0xEFFF:    /* column #10 */
+			handle_stylus_press(10);
+			break;
+		case 0xDFFF:    /* column #11 */
+			handle_stylus_press(11);
+			break;
+		case 0xBFFF:    /* column #12 */
+			handle_stylus_press(12);
+			break;
+		case 0x7FFF:    /* keys #1 */
+			/* P0 bit 0 cleared => 83 (up) */
+			/* P0 bit 1 cleared => 84 (down) */
+			/* P0 bit 2 cleared => 85 (left) */
+			/* P0 bit 3 cleared => 86 (right) */
+			/* P0 bit 4 cleared => 87 (menu) */
+			/* P0 bit 5 cleared => 8A (pause) */
+			/* P0 bit 6 cleared => 89 (sound) */
+			/* P0 bit 7 cleared => 8B (button A) */
+			/* P1 bit 0 cleared => 8C (button B) */
+			/* P1 bit 1 cleared => 8D (button C) */
+			m_p_ram[SM8521_P0] = m_io_in0->read();
+			m_p_ram[SM8521_P1] = (m_p_ram[SM8521_P1] & 0xFC) | ( m_io_in1->read() & 3 );
+			break;
+		case 0xFFFF:    /* keys #2 */
+			/* P0 bit 0 cleared => 88 (power) */
+			/* P0 bit 1 cleared => 8E (button D) */
+			/* P0 bit 2 cleared => A0 */
+			/* P0 bit 3 cleared => A0 */
+			/* P0 bit 4 cleared => A0 */
+			/* P0 bit 5 cleared => A0 */
+			/* P0 bit 6 cleared => A0 */
+			/* P0 bit 7 cleared => A0 */
+			/* P1 bit 0 cleared => A0 */
+			/* P1 bit 1 cleared => A0 */
+			m_p_ram[SM8521_P0] = (m_p_ram[SM8521_P0] & 0xFC) | ( m_io_in2->read() & 3 );
+			m_p_ram[SM8521_P1] = 0xFF;
+			break;
+	}
+}
+
 WRITE8_MEMBER( gamecom_state::gamecom_pio_w )
 {
 	offset += 0x14;
 	m_p_ram[offset] = data;
 	switch( offset )
 	{
-	case SM8521_P2:     switch( ( m_p_ram[SM8521_P1] << 8 ) | data )
-				{
-				case 0xFBFF:    /* column #0 */
-						/* P0 bit 0 cleared => 01 */
-						/* P0 bit 1 cleared => 0E */
-						/* P0 bit 2 cleared => 1B */
-						/* P0 bit 3 cleared => etc */
-						/* P0 bit 4 cleared => */
-						/* P0 bit 5 cleared => */
-						/* P0 bit 6 cleared => */
-						/* P0 bit 7 cleared => */
-						/* P1 bit 0 cleared => */
-						/* P1 bit 1 cleared => */
-					handle_stylus_press(0);
-					break;
-				case 0xF7FF:    /* column #1 */
-					handle_stylus_press(1);
-					break;
-				case 0xEFFF:    /* column #2 */
-					handle_stylus_press(2);
-					break;
-				case 0xDFFF:    /* column #3 */
-					handle_stylus_press(3);
-					break;
-				case 0xBFFF:    /* column #4 */
-					handle_stylus_press(4);
-					break;
-				case 0x7FFF:    /* column #5 */
-					handle_stylus_press(5);
-					break;
-				case 0xFFFE:    /* column #6 */
-					handle_stylus_press(6);
-					break;
-				case 0xFFFD:    /* column #7 */
-					handle_stylus_press(7);
-					break;
-				case 0xFFFB:    /* column #8 */
-					handle_stylus_press(8);
-					break;
-				case 0xFFF7:    /* column #9 */
-					handle_stylus_press(9);
-					break;
-				case 0xFFEF:    /* column #10 */
-					handle_stylus_press(10);
-					break;
-				case 0xFFDF:    /* column #11 */
-					handle_stylus_press(11);
-					break;
-				case 0xFFBF:    /* column #12 */
-					handle_stylus_press(12);
-					break;
-				case 0xFF7F:    /* keys #1 */
-						/* P0 bit 0 cleared => 83 (up) */
-						/* P0 bit 1 cleared => 84 (down) */
-						/* P0 bit 2 cleared => 85 (left) */
-						/* P0 bit 3 cleared => 86 (right) */
-						/* P0 bit 4 cleared => 87 (menu) */
-						/* P0 bit 5 cleared => 8A (pause) */
-						/* P0 bit 6 cleared => 89 (sound) */
-						/* P0 bit 7 cleared => 8B (button A) */
-						/* P1 bit 0 cleared => 8C (button B) */
-						/* P1 bit 1 cleared => 8D (button C) */
-					m_p_ram[SM8521_P0] = m_io_in0->read();
-					m_p_ram[SM8521_P1] = (m_p_ram[SM8521_P1] & 0xFC) | ( m_io_in1->read() & 3 );
-					break;
-				case 0xFFFF:    /* keys #2 */
-						/* P0 bit 0 cleared => 88 (power) */
-						/* P0 bit 1 cleared => 8E (button D) */
-						/* P0 bit 2 cleared => A0 */
-						/* P0 bit 3 cleared => A0 */
-						/* P0 bit 4 cleared => A0 */
-						/* P0 bit 5 cleared => A0 */
-						/* P0 bit 6 cleared => A0 */
-						/* P0 bit 7 cleared => A0 */
-						/* P1 bit 0 cleared => A0 */
-						/* P1 bit 1 cleared => A0 */
-					m_p_ram[SM8521_P0] = (m_p_ram[SM8521_P0] & 0xFC) | ( m_io_in2->read() & 3 );
-					m_p_ram[SM8521_P1] = 0xFF;
-					break;
-				}
-				return;
-	case SM8521_P3:
+		case SM8521_P1:
+		case SM8521_P2:
+			handle_input_press(m_p_ram[SM8521_P1] | (m_p_ram[SM8521_P2] << 8));
+			break;
+		case SM8521_P3:
 				/* P3 bit7 clear, bit6 set -> enable cartridge port #0? */
 				/* P3 bit6 clear, bit7 set -> enable cartridge port #1? */
 				switch( data & 0xc0 )
