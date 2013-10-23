@@ -4513,7 +4513,7 @@ ROM_END
 //*************************************************************************************************************************
 //*************************************************************************************************************************
 //*************************************************************************************************************************
-//  Dynamite Dux - Sega System16B System - Sega 1988
+//  Dynamite Dux (World), Sega System 16B
 //  CPU: FD1094 (317-0096)
 //  ROM Board type: 171-5521
 //
@@ -4561,7 +4561,7 @@ ROM_START( ddux )
 ROM_END
 
 //*************************************************************************************************************************
-//  Dynamite Dux - Sega System16B System - Sega 1988
+//  Dynamite Dux (Japan), Sega System 16B
 //  CPU: FD1094 (317-0094)
 //  ROM Board type: 171-5521
 //
@@ -4594,7 +4594,7 @@ ROM_START( dduxj )
 ROM_END
 
 //*************************************************************************************************************************
-// Dynamite Dux (8751 version) - Sega System16B System - Sega 1988
+// Dynamite Dux (8751 version), Sega System 16B
 //
 //   Game Number 837-6768-09
 //   Rom Number  834-6767-09
@@ -4726,17 +4726,17 @@ ROM_START( eswatj )
 	ROM_LOAD( "mpr-12626.b13", 0x80000, 0x40000, CRC(3efca25c) SHA1(0d866bf53a16b52719f73081e933f4db27d72ece) )
 
 	ROM_REGION16_BE( 0x1c0000, "sprites", 0 ) // sprites
-	ROM_LOAD16_BYTE( "mpr-12618.b1", 0x000001, 0x20000, CRC(0d1530bf) SHA1(bb8626cd98761c1c20cee117d00315c85621ba6a) )//good
+	ROM_LOAD16_BYTE( "mpr-12618.b1", 0x000001, 0x20000, CRC(0d1530bf) SHA1(bb8626cd98761c1c20cee117d00315c85621ba6a) )
 	ROM_CONTINUE(                    0x100001, 0x20000 )
 	ROM_LOAD16_BYTE( "mpr-12621.b4", 0x000000, 0x20000, CRC(18ff0799) SHA1(5417223378aef16ee2b4f438d1f8f11a23fe7265) )
 	ROM_CONTINUE(                    0x100000, 0x20000 )
-	ROM_LOAD16_BYTE( "mpr-12619.b2", 0x040001, 0x20000, CRC(32069246) SHA1(4913009bc72bf4f8b171b14fe06457f5784cab15) )//good
+	ROM_LOAD16_BYTE( "mpr-12619.b2", 0x040001, 0x20000, CRC(32069246) SHA1(4913009bc72bf4f8b171b14fe06457f5784cab15) )
 	ROM_CONTINUE(                    0x140001, 0x20000 )
-	ROM_LOAD16_BYTE( "mpr-12622.b5", 0x040000, 0x20000, CRC(a3dfe436) SHA1(640ccc552114d403f35d441574d2f3e4f1d4a8f9) )//good
+	ROM_LOAD16_BYTE( "mpr-12622.b5", 0x040000, 0x20000, CRC(a3dfe436) SHA1(640ccc552114d403f35d441574d2f3e4f1d4a8f9) )
 	ROM_CONTINUE(                    0x140000, 0x20000 )
-	ROM_LOAD16_BYTE( "mpr-12620.b3", 0x080001, 0x20000, CRC(f6b096e0) SHA1(695ad1adbdc29f4d614645867e16de038cf92709) )//good
+	ROM_LOAD16_BYTE( "mpr-12620.b3", 0x080001, 0x20000, CRC(f6b096e0) SHA1(695ad1adbdc29f4d614645867e16de038cf92709) )
 	ROM_CONTINUE(                    0x180001, 0x20000 )
-	ROM_LOAD16_BYTE( "mpr-12623.b6", 0x080000, 0x20000, CRC(6773fef6) SHA1(91e646ea447be02254d060daf255d26afe0cc79e) )//good
+	ROM_LOAD16_BYTE( "mpr-12623.b6", 0x080000, 0x20000, CRC(6773fef6) SHA1(91e646ea447be02254d060daf255d26afe0cc79e) )
 	ROM_CONTINUE(                    0x180000, 0x20000 )
 
 	ROM_REGION( 0x90000, "soundcpu", 0 ) // sound CPU
