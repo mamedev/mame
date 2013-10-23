@@ -7651,7 +7651,6 @@ src/mess/machine/cococart.c svneol=native#text/plain
 src/mess/machine/cococart.h svneol=native#text/plain
 src/mess/machine/coleco.c svneol=native#text/plain
 src/mess/machine/coleco.h svneol=native#text/plain
-src/mess/machine/compis.c svneol=native#text/plain
 src/mess/machine/compiskb.c svneol=native#text/plain
 src/mess/machine/compiskb.h svneol=native#text/plain
 src/mess/machine/comxpl80.c svneol=native#text/plain

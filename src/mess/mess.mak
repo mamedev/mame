@@ -1900,7 +1900,6 @@ $(MESSOBJ)/tektroni.a:          \
 
 $(MESSOBJ)/telenova.a:          \
 	$(MESS_DRIVERS)/compis.o    \
-	$(MESS_MACHINE)/compis.o    \
 	$(MESS_MACHINE)/compiskb.o  \
 
 $(MESSOBJ)/telercas.a:          \
