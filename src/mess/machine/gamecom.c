@@ -22,6 +22,9 @@ void gamecom_state::machine_reset()
 	m_bank4->set_base( rom );
 
 	m_cartridge = NULL;
+	m_lch_reg = 0x07;
+	m_lcv_reg = 0x27;
+	m_lcdc_reg = 0xb0;
 }
 
 void gamecom_state::gamecom_set_mmu(UINT8 mmu, UINT8 data )
@@ -190,7 +193,40 @@ READ8_MEMBER( gamecom_state::gamecom_pio_r )
 
 READ8_MEMBER( gamecom_state::gamecom_internal_r )
 {
+	if(SM8521_LCV == offset + 0x20)
+		popmessage("Read from vblank bit, TODO");
+
 	return m_p_ram[offset + 0x20];
+}
+
+/* TODO: preliminary, proper formula not yet understood (and manual doesn't help much either) */
+void gamecom_state::recompute_lcd_params()
+{
+	int vblank_period,hblank_period;
+	int H_timing,V_timing;
+	int pixel_clock;
+	attoseconds_t refresh;
+
+	if(m_lch_reg != 7)
+		popmessage("LCH = %02x!",m_lch_reg);
+
+	if((m_lcdc_reg & 0xf) != 0)
+		popmessage("LCDC = %02x!",m_lcdc_reg);
+
+	if(m_lcv_reg != 0x27)
+		popmessage("LCV = %02x!",m_lcv_reg);
+
+	H_timing = ((m_lch_reg & 0x1f) + 1) * 200/4;
+	V_timing = (m_lcv_reg & 0x1f);
+	pixel_clock = (XTAL_11_0592MHz / 2); // TODO: divisor actually settable
+
+	rectangle visarea(0, 200-1, 0, 160-1); // TODO: check settings
+
+	vblank_period = (V_timing + 160);
+	hblank_period = (H_timing + 200);
+
+	refresh  = HZ_TO_ATTOSECONDS(pixel_clock) * (hblank_period) * vblank_period;
+	machine().primary_screen->configure((hblank_period), (vblank_period), visarea, refresh );
 }
 
 WRITE8_MEMBER( gamecom_state::gamecom_internal_w )
@@ -257,6 +293,30 @@ WRITE8_MEMBER( gamecom_state::gamecom_internal_w )
 			m_clock_timer->enable( 0 );
 			data &= 0xC0;
 		}
+		break;
+
+	case SM8521_LCDC:
+		m_lcdc_reg = data;
+		recompute_lcd_params();
+		break;
+
+	case SM8521_LCH:
+		/*
+		--x- ---- Horizontal DOT size (160 / 200)
+		---x xxxx H-Timing bits
+		*/
+		m_lch_reg = data;
+		recompute_lcd_params();
+		break;
+
+	case SM8521_LCV:
+		/*
+		x--- ---- V-blank bit (R)
+		-xx- ---- V-line size bits (100 / 160 / 200 / undef)
+		---x xxxx V-Blank width bits
+		*/
+		m_lcv_reg = data;
+		recompute_lcd_params();
 		break;
 
 	/* Sound */

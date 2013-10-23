@@ -248,6 +248,10 @@ public:
 	bitmap_ind16 m_bitmap;
 	void gamecom_set_mmu(UINT8 mmu, UINT8 data);
 	void handle_stylus_press(int column);
+	UINT8 m_lcdc_reg;
+	UINT8 m_lch_reg;
+	UINT8 m_lcv_reg;
+	void recompute_lcd_params();
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_DRIVER_INIT(gamecom);
