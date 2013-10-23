@@ -407,7 +407,7 @@ ROM_START( pdp11ub2 )
 	ROM_LOAD( "23-763a9.bin", 0x1600, 0x0200, NO_DUMP)                                                      // M9312 'CR' BOOT prom for CR11 card reader
 	ROM_LOAD( "23-764a9.bin", 0x1800, 0x0200, CRC(7c8b7ed4) SHA1(ba0c9f03027eb3dafcc0936e877637d3c9947f94)) // M9312 'MS' BOOT prom for TS11/TS04/TU80 compatible controller
 	ROM_LOAD( "23-765a9.bin", 0x1a00, 0x0200, CRC(702dfeb2) SHA1(0d37bdd3846de4b104b8968a0e83ed81abd7f9ae)) // M9312 'DD' BOOT prom for TU58 DECtapeII serial tape controller
-	ROM_LOAD( "23-767a9.bin", 0x1c00, 0x0200, CRC(4b94e3fa) SHA1(3cf92c2f64f95e8cc3abb8af2526cc65ce53ca8a)) // M9312 'DU' BOOT prom for MSCP compatible controller
+	ROM_LOAD( "23-767a9.bin", 0x1c00, 0x0200, CRC(4b94e3fa) SHA1(3cf92c2f64f95e8cc3abb8af2526cc65ce53ca8a)) // M9312 'DU' BOOT prom for MSCP compatible controller (UDA50/RA50/RC25/RAxx)
 	ROM_LOAD( "23-786a9.bin", 0x1e00, 0x0200, CRC(a5326664) SHA1(238f97fc5b2b540948ea1e27a4cd1dcf18255b21)) // M9312 'XX' Unknown 1/3
 	ROM_LOAD( "23-787a9.bin", 0x2000, 0x0200, CRC(025debf9) SHA1(8ea2faf2e2d78be0ad2f77e61bae0dfb9c3b4b01)) // M9312 'XX' Unknown 2/3
 	ROM_LOAD( "23-788a9.bin", 0x2200, 0x0200, CRC(3c7ed364) SHA1(519ffac2e4878490128e754a0473502c767a94e2)) // M9312 'XX' Unknown 3/3
