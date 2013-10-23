@@ -10,6 +10,12 @@
 # include "features.h"
 # include "value.h"
 #endif // if !defined(JSON_IS_AMALGAMATION)
+
+// this interferes with <iostream> on some versions of OS X
+#ifdef realloc
+#undef realloc
+#endif
+
 # include <deque>
 # include <stack>
 # include <string>
