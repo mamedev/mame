@@ -15,6 +15,7 @@
 #include "cpu/sm8500/sm8500.h"
 #include "imagedev/cartslot.h"
 #include "rendlay.h"
+#include "sound/dac.h"
 
 /* SM8521 register addresses */
 enum
@@ -211,6 +212,7 @@ public:
 	gamecom_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_dac(*this, "dac"),
 		m_p_nvram(*this,"p_nvram"),
 		m_p_videoram(*this,"p_videoram"),
 		m_bank1(*this, "bank1"),
@@ -223,9 +225,11 @@ public:
 		m_io_in1(*this, "IN1"),
 		m_io_in2(*this, "IN2"),
 		m_io_styx(*this, "STYX"),
-		m_io_styy(*this, "STYY") { }
+		m_io_styy(*this, "STYY")
+		{ }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<dac_device> m_dac;
 	DECLARE_READ8_MEMBER( gamecom_internal_r );
 	DECLARE_READ8_MEMBER( gamecom_pio_r );
 	DECLARE_WRITE8_MEMBER( gamecom_internal_w );

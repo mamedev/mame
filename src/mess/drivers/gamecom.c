@@ -117,13 +117,11 @@ static MACHINE_CONFIG_START( gamecom, gamecom_state )
 	MCFG_PALETTE_LENGTH(5)
 
 	/* sound hardware */
-#if 0
-	MCFG_SPEAKER_STANDARD_STEREO( "left", "right" )
-	/* MCFG_SOUND_ADD( "custom", CUSTOM, 0 ) */
-	/* MCFG_SOUND_CONFIG */
-	MCFG_SOUND_ROUTE( 0, "left", 0.50 )
-	MCFG_SOUND_ROUTE( 1, "right", 0.50 )
-#endif
+	MCFG_SPEAKER_STANDARD_STEREO( "lspeaker", "rspeaker" )
+	/* TODO: much more complex than this */
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
 
 	/* cartridge */
 	MCFG_CARTSLOT_ADD("cart1")

@@ -321,6 +321,13 @@ WRITE8_MEMBER( gamecom_state::gamecom_internal_w )
 
 	/* Sound */
 	case SM8521_SGC:
+		/*
+		x--- ---- enable sound output
+		---- x--- enable DAC
+		---- -x-- enable SG2
+		---- --x- enable SG1
+		---- ---x enable SG0
+		*/
 		m_sound.sgc = data;
 		break;
 	case SM8521_SG0L:
@@ -352,6 +359,8 @@ WRITE8_MEMBER( gamecom_state::gamecom_internal_w )
 		break;
 	case SM8521_SGDA:
 		m_sound.sgda = data;
+		if((m_sound.sgc & 0x88) == 0x88)
+			m_dac->write_unsigned8(data);
 		break;
 
 	case SM8521_SG0W0:
