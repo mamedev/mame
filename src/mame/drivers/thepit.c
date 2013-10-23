@@ -1084,19 +1084,19 @@ ROM_END
 
 ROM_START( funnymou )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "suprmous.x1",  0x0000, 0x1000, CRC(ad72b467) SHA1(98c79424bc98f2f1af79a04dabdd3985a71d761c) )
-	ROM_LOAD( "suprmous.x2",  0x1000, 0x1000, CRC(53f5be5e) SHA1(9ed0a04fb19f93336fa3a9882c6842062d841201) )
-	ROM_LOAD( "suprmous.x3",  0x2000, 0x1000, CRC(b5b8d34d) SHA1(e0edcdb7f070061f6f86991e22c0ea0808d4fbe4) )
-	ROM_LOAD( "suprmous.x4",  0x3000, 0x1000, CRC(603333df) SHA1(04723fbd912e3d8fabf88643742c3553f4bb603b) )
-	ROM_LOAD( "suprmous.x5",  0x4000, 0x1000, CRC(2ef9cbf1) SHA1(02323499ddcf4dcbbe432e2dbf5d305e5f9e15ad) )
+	ROM_LOAD( "fm.1",         0x0000, 0x1000, CRC(ad72b467) SHA1(98c79424bc98f2f1af79a04dabdd3985a71d761c) )
+	ROM_LOAD( "fm.2",         0x1000, 0x1000, CRC(53f5be5e) SHA1(9ed0a04fb19f93336fa3a9882c6842062d841201) )
+	ROM_LOAD( "fm.3",         0x2000, 0x1000, CRC(b5b8d34d) SHA1(e0edcdb7f070061f6f86991e22c0ea0808d4fbe4) )
+	ROM_LOAD( "fm.4",         0x3000, 0x1000, CRC(603333df) SHA1(04723fbd912e3d8fabf88643742c3553f4bb603b) )
+	ROM_LOAD( "fm.5",         0x4000, 0x1000, CRC(2ef9cbf1) SHA1(02323499ddcf4dcbbe432e2dbf5d305e5f9e15ad) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "sm.6",         0x0000, 0x1000, CRC(fba71785) SHA1(56537a64a1e6cffedb8a6bd77e3edfa8aca94822) )
+	ROM_LOAD( "fm.6",         0x0000, 0x1000, CRC(fba71785) SHA1(56537a64a1e6cffedb8a6bd77e3edfa8aca94822) )
 
 	ROM_REGION( 0x3000, "gfx1", 0 ) /* chars and sprites */
-	ROM_LOAD( "suprmous.x8",  0x0000, 0x1000, CRC(dbef9db8) SHA1(2bb070603f79e4acb7821cfa61ea1b4aed6d8e1f) )
-	ROM_LOAD( "suprmous.x9",  0x1000, 0x1000, CRC(700d996e) SHA1(31884ec80b5eb70dc8e96712b5541754997b0ca8) )
-	ROM_LOAD( "suprmous.x7",  0x2000, 0x1000, CRC(e9295071) SHA1(6034b7bc86bf070464af82bf1b9a55da81e864d9) )
+	ROM_LOAD( "fm.8",         0x0000, 0x1000, CRC(dbef9db8) SHA1(2bb070603f79e4acb7821cfa61ea1b4aed6d8e1f) )
+	ROM_LOAD( "fm.9",         0x1000, 0x1000, CRC(700d996e) SHA1(31884ec80b5eb70dc8e96712b5541754997b0ca8) )
+	ROM_LOAD( "fm.7",         0x2000, 0x1000, CRC(e9295071) SHA1(6034b7bc86bf070464af82bf1b9a55da81e864d9) )
 
 	ROM_REGION( 0x0040, "proms", 0 )
 	ROM_LOAD( "smouse2.clr",  0x0000, 0x0020, CRC(8c295553) SHA1(7b43a4f023a163c233f6d9cf13fa4beee95d19d6) )
@@ -1226,7 +1226,7 @@ GAME( 1982, thepitj,  thepit,   thepit,   thepit,   driver_device, 0,     ROT90,
 GAME( 1982, dockman,  0,        intrepid, dockman,  driver_device, 0,     ROT90, "Taito Corporation",                           "Dock Man", 0 )
 GAME( 1982, portman,  dockman,  intrepid, dockman,  driver_device, 0,     ROT90, "Taito Corporation (Nova Games Ltd. license)", "Port Man", 0 )
 GAME( 1982, suprmous, 0,        suprmous, suprmous, driver_device, 0,     ROT90, "Taito Corporation",                           "Super Mouse", 0 )
-GAME( 1982, funnymou, suprmous, suprmous, suprmous, driver_device, 0,     ROT90, "bootleg? (Chuo Co. Ltd)",                     "Funny Mouse", 0 )
+GAME( 1982, funnymou, suprmous, suprmous, suprmous, driver_device, 0,     ROT90, "Taito Corporation (Chuo Co. Ltd license)",    "Funny Mouse", 0 ) // Taito PCB
 GAME( 1982, machomou, 0,        suprmous, suprmous, driver_device, 0,     ROT90, "Techstar",                                    "Macho Mouse", 0 )
 GAME( 1982, desertdn, 0,        desertdn, desertdn, driver_device, 0,     ROT0,  "Video Optics",                                "Desert Dan", 0 )
 GAME( 1983, intrepid, 0,        intrepid, intrepid, driver_device, 0,     ROT90, "Nova Games Ltd.",                             "Intrepid (set 1)", 0 )
