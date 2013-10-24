@@ -1,3 +1,5 @@
+#include "audio/pleiads.h"
+
 class naughtyb_state : public driver_device
 {
 public:
@@ -6,15 +8,20 @@ public:
 		m_videoram(*this, "videoram"),
 		m_videoram2(*this, "videoram2"),
 		m_scrollreg(*this, "scrollreg"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_naughtyb_custom(*this, "naughtyb_custom"),
+		m_popflame_custom(*this, "popflame_custom") { }
 
 	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_videoram2;
+	required_shared_ptr<UINT8> m_scrollreg;
+	required_device<cpu_device> m_maincpu;
+	optional_device<naughtyb_sound_device> m_naughtyb_custom;
+	optional_device<popflame_sound_device> m_popflame_custom;
 	UINT8 m_popflame_prot_seed;
 	int m_r_index;
 	int m_prot_count;
 	int m_question_offset;
-	required_shared_ptr<UINT8> m_videoram2;
-	required_shared_ptr<UINT8> m_scrollreg;
 	int m_cocktail;
 	UINT8 m_palreg;
 	int m_bankreg;
@@ -33,5 +40,5 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_naughtyb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
+
 };

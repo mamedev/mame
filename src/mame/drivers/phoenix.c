@@ -33,7 +33,6 @@ Pleiads:
 #include "cpu/z80/z80.h"
 #include "cpu/i8085/i8085.h"
 #include "sound/ay8910.h"
-#include "audio/pleiads.h"
 #include "includes/phoenix.h"
 
 
@@ -53,8 +52,8 @@ static ADDRESS_MAP_START( pleiads_memory_map, AS_PROGRAM, 8, phoenix_state )
 	AM_RANGE(0x4000, 0x4fff) AM_READ_BANK("bank1") AM_WRITE(phoenix_videoram_w) /* 2 pages selected by bit 0 of the video register */
 	AM_RANGE(0x5000, 0x53ff) AM_WRITE(pleiads_videoreg_w)
 	AM_RANGE(0x5800, 0x5bff) AM_WRITE(phoenix_scroll_w)
-	AM_RANGE(0x6000, 0x63ff) AM_DEVWRITE_LEGACY("cust", pleiads_sound_control_a_w)
-	AM_RANGE(0x6800, 0x6bff) AM_DEVWRITE_LEGACY("cust", pleiads_sound_control_b_w)
+	AM_RANGE(0x6000, 0x63ff) AM_DEVWRITE("pleiads_custom", pleiads_sound_device, control_a_w)
+	AM_RANGE(0x6800, 0x6bff) AM_DEVWRITE("pleiads_custom", pleiads_sound_device, control_b_w)
 	AM_RANGE(0x7000, 0x73ff) AM_READ_PORT("IN0")                            /* IN0 or IN1 + protection */
 	AM_RANGE(0x7800, 0x7bff) AM_READ_PORT("DSW0")                           /* DSW */
 ADDRESS_MAP_END
@@ -500,7 +499,8 @@ static MACHINE_CONFIG_DERIVED( pleiads, phoenix )
 	MCFG_SOUND_CONFIG(pleiads_tms36xx_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	MCFG_SOUND_REPLACE("cust", PLEIADS, 0)
+	MCFG_DEVICE_REMOVE("cust")
+	MCFG_SOUND_ADD("pleiads_custom", PLEIADS, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_DEVICE_REMOVE("discrete")
