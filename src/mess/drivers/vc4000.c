@@ -577,7 +577,7 @@ QUICKLOAD_LOAD_MEMBER( vc4000_state,vc4000)
 					image.message(" Quickload: size=%04X : start=%04X : end=%04X : exec=%04X",quick_length-5,quick_addr,quick_addr+quick_length-5,exec_addr);
 
 					// Start the quickload
-					m_maincpu->set_pc(exec_addr);
+					m_maincpu->set_state_int(S2650_PC, exec_addr);
 					result = IMAGE_INIT_PASS;
 				}
 			}
@@ -621,7 +621,7 @@ QUICKLOAD_LOAD_MEMBER( vc4000_state,vc4000)
 						image.message(" Quickload: size=%04X : exec=%04X",quick_length,exec_addr);
 
 						// Start the quickload
-						m_maincpu->set_pc(exec_addr);
+						m_maincpu->set_state_int(S2650_PC, exec_addr);
 						result = IMAGE_INIT_PASS;
 					}
 				}
