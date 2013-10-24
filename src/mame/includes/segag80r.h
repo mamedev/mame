@@ -8,6 +8,7 @@
 #include "sound/samples.h"
 #include "machine/segag80.h"
 #include "sound/sn76496.h"
+#include "audio/segasnd.h"
 
 class segag80r_state : public driver_device
 {
@@ -25,13 +26,20 @@ public:
 		m_sn2(*this, "sn2"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_samples(*this, "samples") { }
+		m_samples(*this, "samples"),
+		m_speech(*this, "segaspeech"),
+		m_usbsnd(*this, "usbsnd") { }
 
 	required_shared_ptr<UINT8> m_mainram;
 	required_shared_ptr<UINT8> m_videoram;
 
 	optional_device<sn76496_device> m_sn1;
 	optional_device<sn76496_device> m_sn2;
+	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_audiocpu;
+	optional_device<samples_device> m_samples;
+	optional_device<speech_sound_device> m_speech;
+	optional_device<usb_sound_device> m_usbsnd;
 
 	UINT8 m_sound_state[2];
 	UINT8 m_sound_rate;
@@ -129,9 +137,6 @@ public:
 	offs_t decrypt_offset(address_space &space, offs_t offset);
 	inline UINT8 demangle(UINT8 d7d6, UINT8 d5d4, UINT8 d3d2, UINT8 d1d0);
 	void monsterb_expand_gfx(const char *region);
-	required_device<cpu_device> m_maincpu;
-	optional_device<cpu_device> m_audiocpu;
-	optional_device<samples_device> m_samples;
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
