@@ -253,7 +253,7 @@ static ADDRESS_MAP_START( compis_mem, AS_PROGRAM, 16, compis_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0x1ffff) AM_RAM
 	AM_RANGE(0x40000, 0x5ffff) AM_READWRITE8(vram_r, vram_w, 0xffff)
-	AM_RANGE(0x60000, 0x63fff) AM_MIRROR(0x1c000) AM_ROM AM_REGION(I80130_TAG, 0)
+	AM_RANGE(0x60000, 0x63fff) AM_MIRROR(0x1c000) AM_DEVICE(I80130_TAG, i80130_device, rom_map)
 	AM_RANGE(0xe0000, 0xeffff) AM_MIRROR(0x10000) AM_ROM AM_REGION(I80186_TAG, 0)
 ADDRESS_MAP_END
 
@@ -282,8 +282,7 @@ static ADDRESS_MAP_START( compis_io, AS_IO, 16, compis_state )
 	AM_RANGE(0x0100, 0x011f) /* PCS2 */ AM_MIRROR(0x60) AM_DEVREADWRITE8(MM58174A_TAG, mm58274c_device, read, write, 0x00ff)
   //AM_RANGE(0x0180, 0x0181) /* PCS3 */ AM_MIRROR(0x7e)
   //AM_RANGE(0x0200, 0x0201) /* PCS4 */ AM_MIRROR(0x7e)
-	AM_RANGE(0x0280, 0x0283) /* PCS5 */ AM_MIRROR(0x70) AM_DEVREADWRITE8("pic8259_master", pic8259_device, read, write, 0x00ff) /* 80130 */
-	AM_RANGE(0x0288, 0x028f) /* PCS5 */ AM_MIRROR(0x70) AM_DEVREADWRITE8("pit8254", pit8254_device, read, write, 0x00ff) /* 80130 */
+	AM_RANGE(0x0280, 0x028f) /* PCS5 */ AM_MIRROR(0x70) AM_DEVICE(I80130_TAG, i80130_device, io_map)
 	AM_RANGE(0x0300, 0x0301) /* PCS6:0 */ AM_MIRROR(0xe) AM_WRITE8(tape_mon_w, 0x00ff)
 	AM_RANGE(0x0310, 0x0311) /* PCS6:3 */ AM_MIRROR(0xc) AM_DEVREADWRITE8(I8251A_TAG, i8251_device, data_r, data_w, 0xff00)
 	AM_RANGE(0x0312, 0x0313) /* PCS6:3 */ AM_MIRROR(0xc) AM_DEVREADWRITE8(I8251A_TAG, i8251_device, status_r, control_w, 0xff00)
@@ -478,7 +477,7 @@ static UPD7220_INTERFACE( hgdc_intf )
 
 READ8_MEMBER( compis_state::compis_irq_callback )
 {
-	return m_8259m->inta_r();
+	return m_osp->inta_r();
 }
 
 WRITE_LINE_MEMBER( compis_state::tmr0_w )
@@ -508,15 +507,6 @@ WRITE_LINE_MEMBER( compis_state::tmr2_w )
 	m_uart->rxc_w(state);
 	m_uart->txc_w(state);
 }
-
-static const struct pit8253_interface osp_pit_intf =
-{
-	{
-		{ XTAL_16MHz/2, DEVCB_LINE_VCC, DEVCB_NULL /*DEVCB_DEVICE_LINE_MEMBER("pic8259_master", pic8259_device, ir3_w)*/ }, // SYSTICK
-		{ XTAL_16MHz/2, DEVCB_LINE_VCC, DEVCB_DEVICE_LINE_MEMBER("pic8259_master", pic8259_device, ir7_w) }, // DELAY
-		{ 7932659, DEVCB_LINE_VCC, DEVCB_DRIVER_LINE_MEMBER(compis_state, tmr2_w) } // BAUD
-	}
-};
 
 
 //-------------------------------------------------
@@ -559,7 +549,7 @@ static const i8251_interface usart_intf =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER("pic8259_master", pic8259_device, ir2_w),
+	DEVCB_DEVICE_LINE_MEMBER(I80130_TAG, i80130_device, ir2_w),
 	DEVCB_NULL, //DEVCB_DEVICE_LINE_MEMBER(I80186_TAG, i80186_cpu_device, int1_w),
 	DEVCB_NULL,
 	DEVCB_NULL
@@ -790,8 +780,10 @@ static MACHINE_CONFIG_START( compis, compis_state )
 	MCFG_UPD7220_ADD("upd7220", XTAL_4_433619MHz/2, hgdc_intf, upd7220_map) //unknown clock
 
 	// devices
-	MCFG_PIC8259_ADD("pic8259_master", DEVWRITELINE(I80186_TAG, i80186_cpu_device, int0_w), VCC, NULL ) // inside 80130
-	MCFG_PIT8254_ADD("pit8254", osp_pit_intf ) // inside 80130
+	MCFG_I80130_ADD(I80130_TAG, XTAL_16MHz/2, DEVWRITELINE(I80186_TAG, i80186_cpu_device, int0_w))
+	//MCFG_I80130_SYSTICK_CALLBACK(DEVWRITELINE(I80130_TAG, i80130_device, ir3_w))
+	MCFG_I80130_DELAY_CALLBACK(DEVWRITELINE(I80130_TAG, i80130_device, ir7_w))
+	MCFG_I80130_BAUD_CALLBACK(DEVWRITELINE(DEVICE_SELF, compis_state, tmr2_w))
 	MCFG_PIT8253_ADD(I8253_TAG, pit_intf )
 	MCFG_I8255_ADD(I8255_TAG, ppi_intf )
 	MCFG_I8251_ADD(I8251A_TAG, usart_intf)
@@ -803,12 +795,12 @@ static MACHINE_CONFIG_START( compis, compis_state )
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("tape", compis_state, tape_tick, attotime::from_hz(44100))
 	MCFG_ISBX_SLOT_ADD(ISBX_0_TAG, 0, isbx_cards, "fdc")
-	MCFG_ISBX_SLOT_MINTR0_CALLBACK(DEVWRITELINE("pic8259_master", pic8259_device, ir1_w))
-	MCFG_ISBX_SLOT_MINTR1_CALLBACK(DEVWRITELINE("pic8259_master", pic8259_device, ir0_w))
+	MCFG_ISBX_SLOT_MINTR0_CALLBACK(DEVWRITELINE(I80130_TAG, i80130_device, ir1_w))
+	MCFG_ISBX_SLOT_MINTR1_CALLBACK(DEVWRITELINE(I80130_TAG, i80130_device, ir0_w))
 	MCFG_ISBX_SLOT_MDRQT_CALLBACK(DEVWRITELINE(I80186_TAG, i80186_cpu_device, drq0_w))
 	MCFG_ISBX_SLOT_ADD(ISBX_1_TAG, 0, isbx_cards, NULL)
-	MCFG_ISBX_SLOT_MINTR0_CALLBACK(DEVWRITELINE("pic8259_master", pic8259_device, ir6_w))
-	MCFG_ISBX_SLOT_MINTR1_CALLBACK(DEVWRITELINE("pic8259_master", pic8259_device, ir5_w))
+	MCFG_ISBX_SLOT_MINTR0_CALLBACK(DEVWRITELINE(I80130_TAG, i80130_device, ir6_w))
+	MCFG_ISBX_SLOT_MINTR1_CALLBACK(DEVWRITELINE(I80130_TAG, i80130_device, ir5_w))
 	MCFG_ISBX_SLOT_MDRQT_CALLBACK(DEVWRITELINE(I80186_TAG, i80186_cpu_device, drq1_w))
 	MCFG_COMPIS_KEYBOARD_ADD(NULL)
 
@@ -867,9 +859,6 @@ ROM_START( compis )
 	ROM_SYSTEM_BIOS( 2, "v303", "Compis II v3.03 (1987-03-09)" )
 	ROMX_LOAD( "rysa094.u39", 0x0000, 0x8000, CRC(e7302bff) SHA1(44ea20ef4008849af036c1a945bc4f27431048fb), ROM_BIOS(3) | ROM_SKIP(1) )
 	ROMX_LOAD( "rysa094.u35", 0x0001, 0x8000, CRC(b0694026) SHA1(eb6b2e3cb0f42fd5ffdf44f70e652ecb9714ce30), ROM_BIOS(3) | ROM_SKIP(1) )
-
-	ROM_REGION16_LE( 0x4000, I80130_TAG, 0)
-	ROM_LOAD( "80130.ic15", 0x0000, 0x4000, NO_DUMP )
 ROM_END
 
 #define rom_compis2 rom_compis

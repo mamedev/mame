@@ -23,6 +23,7 @@
 #include "bus/centronics/ctronics.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
+#include "machine/i80130.h"
 #include "machine/mm58274c.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
@@ -52,9 +53,8 @@ public:
 	compis_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, I80186_TAG),
-		  m_8253(*this, I8253_TAG),
-		  m_8254(*this, "pit8254"),
-		  m_8259m(*this, "pic8259_master"),
+		  m_osp(*this, I80130_TAG),
+		  m_pit(*this, I8253_TAG),
 		  m_ppi(*this, I8255_TAG),
 		  m_mpsc(*this, I8274_TAG),
 		  m_centronics(*this, CENTRONICS_TAG),
@@ -70,9 +70,8 @@ public:
 	{ }
 
 	required_device<i80186_cpu_device> m_maincpu;
-	required_device<pit8253_device> m_8253;
-	required_device<pit8254_device> m_8254;
-	required_device<pic8259_device> m_8259m;
+	required_device<i80130_device> m_osp;
+	required_device<pit8253_device> m_pit;
 	required_device<i8255_device> m_ppi;
 	required_device<i8274_device> m_mpsc;
 	required_device<centronics_device> m_centronics;
