@@ -2090,7 +2090,6 @@ ROM_START( grobda3 )
 	ROM_LOAD( "gr1-3.3m",  0x0000, 0x0100, CRC(66eb1467) SHA1(02b99ced4afd9ac139f634739769f7bf353274f9) )
 ROM_END
 
-
 ROM_START( phozon )
 	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64k for code for the MAIN CPU  */
 	ROM_LOAD( "6e.rom", 0x8000, 0x2000, CRC(a6686af1) SHA1(87a948b289356675d0418c87c3c0ae36ceba3ee0) )
@@ -2123,6 +2122,37 @@ ROM_START( phozon )
 	ROM_LOAD( "sound.prm", 0x0000, 0x0100, CRC(ad43688f) SHA1(072f427453efb1dda8147da61804fff06e1bc4d5) )
 ROM_END
 
+ROM_START( phozons )
+	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64k for code for the MAIN CPU  */
+	ROM_LOAD( "6e.bin", 0x8000, 0x2000, CRC(ef822900) SHA1(3551a63bf7067dccee58690775cfec775bc2a472) )
+	ROM_LOAD( "6h.bin", 0xa000, 0x2000, CRC(acb7869e) SHA1(947bd12e4db03caa46315cea2ef330dc29bfabde) )
+	ROM_LOAD( "6c.bin", 0xc000, 0x2000, CRC(8ffa3e0e) SHA1(4962a60b55baf35d66b1039602def1f5bd15f9de) )
+	ROM_LOAD( "6d.bin", 0xe000, 0x2000, CRC(8e6800b3) SHA1(27fa22d4cad255a54ba93b308cef301c2488e057) )
+
+	ROM_REGION( 0x10000, "sub", 0 )     /* 64k for the SOUND CPU */
+	ROM_LOAD( "3b.rom", 0xe000, 0x2000, CRC(5a4b3a79) SHA1(2774681ea668403de31ea218d5df3ce64e3b9243) ) // 3b.bin
+
+	ROM_REGION( 0x10000, "sub2", 0 )     /* 64k for the SUB CPU */
+	ROM_LOAD( "9r.rom", 0xe000, 0x2000, CRC(5d9f0a28) SHA1(2caef680229180b237f8c4becf052f1a96592efd) ) // 9r.bin
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "7j.bin", 0x0000, 0x1000, CRC(312b3ece) SHA1(1d4d3371a42321644ec3669f95abcfe860020868) ) /* characters (set 1) */
+	ROM_LOAD( "8j.bin", 0x1000, 0x1000, CRC(d21422a2) SHA1(0268651628d66dc67a3b6bb8fb682b668e7ebbad) ) /* characters (set 2) */
+
+	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_LOAD( "5t.rom", 0x0000, 0x2000, CRC(d50f08f8) SHA1(4e9dda0d5ad1c1b8b3be7edb05b3060f5f63a9c7) ) /* sprites - 5t.bin */
+
+	ROM_REGION( 0x0520, "proms", 0 )
+	ROM_LOAD( "red.prm",     0x0000, 0x0100, CRC(a2880667) SHA1(b24d9b3354d20a7ecc02c428245669c6c86bfd61) ) /* red palette ROM (4 bits) */
+	ROM_LOAD( "green.prm",   0x0100, 0x0100, CRC(d6e08bef) SHA1(b0ca7f8a77b7208cf974a8cc565fc91b7f40f51f) ) /* green palette ROM (4 bits) */
+	ROM_LOAD( "blue.prm",    0x0200, 0x0100, CRC(b2d69c72) SHA1(e7b1ed698ab0e87872cb3a8f3ec102ca3a753259) ) /* blue palette ROM (4 bits) */
+	ROM_LOAD( "chr.prm",     0x0300, 0x0100, CRC(429e8fee) SHA1(7b1899ca3f33f4561b572de1f24d9ea9d7d84b59) ) /* characters */
+	ROM_LOAD( "sprite.prm",  0x0400, 0x0100, CRC(9061db07) SHA1(4305d37e613e1d15d37539b152c948648189c2cd) ) /* sprites */
+	ROM_LOAD( "palette.prm", 0x0500, 0x0020, CRC(60e856ed) SHA1(dcc9a2dfc728b9ca1ab895008de07e20ebed9da3) ) /* unused - timing? */
+
+	ROM_REGION( 0x0100, "namco", 0 )    /* sound PROMs */
+	ROM_LOAD( "sound.prm", 0x0000, 0x0100, CRC(ad43688f) SHA1(072f427453efb1dda8147da61804fff06e1bc4d5) )
+ROM_END
 
 ROM_START( mappy )
 	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64k for code for the first CPU  */
@@ -2393,6 +2423,7 @@ GAME( 1984, grobda3,  grobda,   grobda,   grobda, mappy_state,   grobda,   ROT90
 
 /* 3x6809, static tilemap, 2bpp sprites (Gaplus type) */
 GAME( 1983, phozon,   0,        phozon,   phozon, mappy_state,   phozon,        ROT90, "Namco", "Phozon (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1983, phozons,  phozon,   phozon,   phozon, mappy_state,   phozon,        ROT90, "bootleg? (Sidam)", "Phozon (Sidam)", GAME_SUPPORTS_SAVE )
 
 /* 2x6809, scroling tilemap, 4bpp sprites (Super Pacman type) */
 GAME( 1983, mappy,    0,        mappy,    mappy, mappy_state,   mappy,        ROT90, "Namco", "Mappy (US)", GAME_SUPPORTS_SAVE )
