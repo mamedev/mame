@@ -42,24 +42,15 @@
 
 #include "includes/compis.h"
 
-static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
-{
-	compis_state *state = device->machine().driver_data<compis_state>();
-	UINT8 i,gfx = state->m_video_ram[address];
 
-	for(i=0; i<8; i++)
-		bitmap.pix32(y, x + i) = RGB_MONOCHROME_GREEN_HIGHLIGHT[BIT(gfx,i )];
-}
 
-static UPD7220_INTERFACE( hgdc_intf )
-{
-	hgdc_display_pixels,
-	NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
+//**************************************************************************
+//  READ/WRITE HANDLERS
+//**************************************************************************
 
+//-------------------------------------------------
+//  tape_mon_w -
+//-------------------------------------------------
 
 WRITE8_MEMBER( compis_state::tape_mon_w )
 {
@@ -67,6 +58,11 @@ WRITE8_MEMBER( compis_state::tape_mon_w )
 
 	m_cassette->change_state(state, CASSETTE_MASK_MOTOR);
 }
+
+
+//-------------------------------------------------
+//  isbx
+//-------------------------------------------------
 
 READ16_MEMBER( compis_state::isbx0_tdma_r )
 {
@@ -224,11 +220,19 @@ WRITE16_MEMBER( compis_state::isbx1_dack_w )
 }
 
 
+//-------------------------------------------------
+//  vram_r -
+//-------------------------------------------------
+
 READ8_MEMBER( compis_state::vram_r )
 {
 	return m_video_ram[offset];
 }
 
+
+//-------------------------------------------------
+//  vram_w -
+//-------------------------------------------------
 
 WRITE8_MEMBER( compis_state::vram_w )
 {
@@ -315,18 +319,145 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static INPUT_PORTS_START( compis )
-	PORT_START("DSW0")
-	PORT_DIPNAME( 0x18, 0x00, "S8 Test mode")
-	PORT_DIPSETTING( 0x00, DEF_STR( Normal ) )
-	PORT_DIPSETTING( 0x08, "Remote" )
-	PORT_DIPSETTING( 0x10, "Stand alone" )
-	PORT_DIPSETTING( 0x18, "Reserved" )
+	PORT_START("S1")
+	PORT_CONFNAME( 0x01, 0x00, "S1 ROM Type")
+	PORT_CONFSETTING(    0x00, "27128" )
+	PORT_CONFSETTING(    0x01, "27256" )
+
+	PORT_START("S2")
+	PORT_CONFNAME( 0x01, 0x00, "S2 IC36/IC40")
+	PORT_CONFSETTING(    0x00, "ROM" )
+	PORT_CONFSETTING(    0x01, "RAM" )
+
+	PORT_START("S3")
+	PORT_CONFNAME( 0x03, 0x00, "S3 J4 RxC")
+	PORT_CONFSETTING(    0x00, "DCE" )
+	PORT_CONFSETTING(    0x01, "Tmr3" )
+	PORT_CONFSETTING(    0x02, "Tmr4" )
+
+	PORT_START("S4")
+	PORT_CONFNAME( 0x01, 0x01, "S4 iSBX0 Bus Width")
+	PORT_CONFSETTING(    0x00, "8 Bit" )
+	PORT_CONFSETTING(    0x01, "16 Bit" )
+
+	PORT_START("S5")
+	PORT_CONFNAME( 0x01, 0x01, "S5 iSBX1 Bus Width")
+	PORT_CONFSETTING(    0x00, "8 Bit" )
+	PORT_CONFSETTING(    0x01, "16 Bit" )
+
+	PORT_START("S6")
+	PORT_CONFNAME( 0x001, 0x001, "S6 INT 8274")
+	PORT_CONFSETTING(     0x000, DEF_STR( Off ) )
+	PORT_CONFSETTING(     0x001, DEF_STR( On ) )
+	PORT_CONFNAME( 0x002, 0x000, "S6 TxRDY 8251")
+	PORT_CONFSETTING(     0x000, DEF_STR( Off ) )
+	PORT_CONFSETTING(     0x002, DEF_STR( On ) )
+	PORT_CONFNAME( 0x004, 0x000, "S6 INT KB")
+	PORT_CONFSETTING(     0x000, DEF_STR( Off ) )
+	PORT_CONFSETTING(     0x004, DEF_STR( On ) )
+	PORT_CONFNAME( 0x008, 0x008, "S6 DELAY 80150")
+	PORT_CONFSETTING(     0x000, DEF_STR( Off ) )
+	PORT_CONFSETTING(     0x008, DEF_STR( On ) )
+	PORT_CONFNAME( 0x010, 0x000, "S6 INT0 iSBX1 (J9)")
+	PORT_CONFSETTING(     0x000, DEF_STR( Off ) )
+	PORT_CONFSETTING(     0x010, DEF_STR( On ) )
+	PORT_CONFNAME( 0x020, 0x000, "S6 INT1 iSBX1 (J9)")
+	PORT_CONFSETTING(     0x000, DEF_STR( Off ) )
+	PORT_CONFSETTING(     0x020, DEF_STR( On ) )
+	PORT_CONFNAME( 0x040, 0x040, "S6 ACK J7")
+	PORT_CONFSETTING(     0x000, DEF_STR( Off ) )
+	PORT_CONFSETTING(     0x040, DEF_STR( On ) )
+	PORT_CONFNAME( 0x080, 0x000, "S6 SYSTICK 80150")
+	PORT_CONFSETTING(     0x000, DEF_STR( Off ) )
+	PORT_CONFSETTING(     0x080, DEF_STR( On ) )
+	PORT_CONFNAME( 0x100, 0x100, "S6 RxRDY 8251")
+	PORT_CONFSETTING(     0x000, DEF_STR( Off ) )
+	PORT_CONFSETTING(     0x100, DEF_STR( On ) )
+	PORT_CONFNAME( 0x200, 0x000, "S6 INT0 iSBX0 (J8)")
+	PORT_CONFSETTING(     0x000, DEF_STR( Off ) )
+	PORT_CONFSETTING(     0x200, DEF_STR( On ) )
+	PORT_CONFNAME( 0x400, 0x400, "S6 INT1 iSBX0 (J8)")
+	PORT_CONFSETTING(     0x000, DEF_STR( Off ) )
+	PORT_CONFSETTING(     0x400, DEF_STR( On ) )
+
+	PORT_START("S7")
+	PORT_CONFNAME( 0x01, 0x00, "S7 ROM Type")
+	PORT_CONFSETTING(    0x00, "27128" )
+	PORT_CONFSETTING(    0x01, "27256" )
+
+	PORT_START("S8")
+	PORT_CONFNAME( 0x18, 0x00, "S8 Test Mode")
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x08, "Remote Test" )
+	PORT_CONFSETTING(    0x10, "Standalone Test" )
+	PORT_CONFSETTING(    0x18, "Reserved" )
+
+	PORT_START("S9")
+	PORT_CONFNAME( 0x03, 0x00, "S9 8274 TxCB")
+	PORT_CONFSETTING(    0x00, "DCE-Rxc (J4-11)" )
+	PORT_CONFSETTING(    0x01, "DCE-Txc (J4-13)" )
+	PORT_CONFSETTING(    0x02, "Tmr3" )
+
+	PORT_START("S10")
+	PORT_CONFNAME( 0x01, 0x01, "S10 8274 RxCA")
+	PORT_CONFSETTING(    0x00, "DCE (J2-11)" )
+	PORT_CONFSETTING(    0x01, "Tmr5" )
+
+	PORT_START("S11")
+	PORT_CONFNAME( 0x03, 0x01, "S11 8274 TxCA")
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x01, "DCE (J2-13)" )
+	PORT_CONFSETTING(    0x02, "Tmr5" )
+
+	PORT_START("S12")
+	PORT_CONFNAME( 0x01, 0x01, "S12 8274 TxDA")
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x01, "V24 (J2)" )
+
+	PORT_START("S13")
+	PORT_CONFNAME( 0x01, 0x01, "S13 8274 RxDA")
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x01, "V24 (J2)" )
+
+	PORT_START("S14")
+	PORT_CONFNAME( 0x01, 0x01, "S14 8274 TxCA")
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
+
+	PORT_START("S15")
+	PORT_CONFNAME( 0x01, 0x00, "S15 Network")
+	PORT_CONFSETTING(    0x00, "Server" )
+	PORT_CONFSETTING(    0x01, "Client" )
 INPUT_PORTS_END
+
 
 
 //**************************************************************************
 //  DEVICE CONFIGURATION
 //**************************************************************************
+
+//-------------------------------------------------
+//  UPD7220_INTERFACE( hgdc_intf )
+//-------------------------------------------------
+
+static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
+{
+	compis_state *state = device->machine().driver_data<compis_state>();
+	UINT8 i,gfx = state->m_video_ram[address];
+
+	for(i=0; i<8; i++)
+		bitmap.pix32(y, x + i) = RGB_MONOCHROME_GREEN_HIGHLIGHT[BIT(gfx, i)];
+}
+
+static UPD7220_INTERFACE( hgdc_intf )
+{
+	hgdc_display_pixels,
+	NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
 
 //-------------------------------------------------
 //  I80186_INTERFACE( cpu_intf )
@@ -342,6 +473,16 @@ WRITE_LINE_MEMBER( compis_state::tmr0_w )
 	m_tmr0 = state;
 	
 	m_cassette->output(m_tmr0 ? -1 : 1);
+
+	m_maincpu->tmrin0_w(state);
+}
+
+WRITE_LINE_MEMBER( compis_state::tmr1_w )
+{
+	m_isbx0->mclk_w(state);
+	m_isbx1->mclk_w(state);
+
+	m_maincpu->tmrin1_w(state);
 }
 
 
@@ -436,7 +577,7 @@ READ8_MEMBER( compis_state::ppi_pb_r )
 	UINT8 data = 0;
 
 	/* DIP switch - Test mode */
-	data = ioport("DSW0")->read();
+	data = m_s8->read();
 
 	// cassette
 	data |= (m_cassette->input() > 0.0) << 2;
@@ -623,6 +764,7 @@ static MACHINE_CONFIG_START( compis, compis_state )
 	MCFG_CPU_IO_MAP(compis_io)
 	MCFG_80186_IRQ_SLAVE_ACK(DEVREAD8(DEVICE_SELF, compis_state, compis_irq_callback))
 	MCFG_80186_TMROUT0_HANDLER(DEVWRITELINE(DEVICE_SELF, compis_state, tmr0_w))
+	MCFG_80186_TMROUT1_HANDLER(DEVWRITELINE(DEVICE_SELF, compis_state, tmr1_w))
 
 	// video hardware
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)

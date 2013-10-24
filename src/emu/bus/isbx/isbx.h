@@ -92,6 +92,7 @@ public:
 	virtual void opt0_w(int state) { }
 	virtual void opt1_w(int state) { }
 	virtual void tdma_w(int state) { }
+	virtual void mclk_w(int state) { }
 
 protected:
 	isbx_slot_device *m_slot;
@@ -123,6 +124,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( opt0_w ) { if (m_card) m_card->opt0_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( opt1_w ) { if (m_card) m_card->opt1_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( tdma_w ) { if (m_card) m_card->tdma_w(state); }
+	DECLARE_WRITE_LINE_MEMBER( mclk_w ) { if (m_card) m_card->mclk_w(state); }
 
 	// card interface
 	DECLARE_WRITE_LINE_MEMBER( mintr0_w ) { m_write_mintr0(state); }

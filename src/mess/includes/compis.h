@@ -65,7 +65,8 @@ public:
 		  m_isbx0(*this, ISBX_0_TAG),
 		  m_isbx1(*this, ISBX_1_TAG),
 		  m_ram(*this, RAM_TAG),
-		  m_video_ram(*this, "video_ram")
+		  m_video_ram(*this, "video_ram"),
+		  m_s8(*this, "S8")
 	{ }
 
 	required_device<i80186_cpu_device> m_maincpu;
@@ -83,6 +84,7 @@ public:
 	required_device<isbx_slot_device> m_isbx1;
 	required_device<ram_device> m_ram;
 	required_shared_ptr<UINT8> m_video_ram;
+	required_ioport m_s8;
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -109,8 +111,8 @@ public:
 	DECLARE_WRITE8_MEMBER( ppi_pc_w );
 
 	DECLARE_WRITE_LINE_MEMBER( tmr0_w );
+	DECLARE_WRITE_LINE_MEMBER( tmr1_w );
 	DECLARE_WRITE_LINE_MEMBER( tmr2_w );
-
 	DECLARE_WRITE_LINE_MEMBER( tmr3_w );
 	DECLARE_WRITE_LINE_MEMBER( tmr4_w );
 	DECLARE_WRITE_LINE_MEMBER( tmr5_w );
