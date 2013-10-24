@@ -55,6 +55,8 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_p_ram(*this, "mainram")
+		, m_p_smiram(*this, "smiram")
+		, m_p_extram(*this, "extram")
 		, m_cass(*this, "cassette")
 	{ }
 
@@ -71,17 +73,24 @@ private:
 	virtual void machine_reset();
 	UINT8 m_digit;
 	bool m_valid_digit;
+	bool m_cassin;
+	bool m_irqstate;
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT8> m_p_ram;
+	required_shared_ptr<UINT8> m_p_smiram;
+	required_shared_ptr<UINT8> m_p_extram;
 	required_device<cassette_image_device> m_cass;
 };
 
 // cassette port
-// when loading, bit 7 is continuously toggled
-// saving can use bits 3,4,5
 WRITE8_MEMBER( instruct_state::portf8_w )
 {
-	m_cass->output(BIT(data, 3) ? -1.0 : +1.0);
+	if BIT(data, 4)
+		m_cass->output(BIT(data, 3) ? -1.0 : +1.0);
+	else
+		m_cass->output(0.0);
+
+	m_cassin = BIT(data, 7);
 }
 
 // segment output
@@ -133,18 +142,25 @@ READ8_MEMBER( instruct_state::portfe_r )
 // Read cassette and SENS key
 READ8_MEMBER( instruct_state::sense_r )
 {
-	return ( (m_cass->input() > 0.03) ? 1 : 0) | (ioport("HW")->read() & 1);
+	if (m_cassin)
+		return (m_cass->input() > 0.03) ? 1 : 0;
+	else
+		return BIT(ioport("HW")->read(), 0);
 }
 
 INTERRUPT_GEN_MEMBER( instruct_state::t2l_int )
 {
-	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x2e); // unknown vector, guess
+	m_irqstate ^= 1;
+	//device.execute().set_input_line(0, m_irqstate);
+	device.execute().set_input_line_and_vector(0, m_irqstate, 0x87); // unknown vector, guess
 }
 
 static ADDRESS_MAP_START( instruct_mem, AS_PROGRAM, 8, instruct_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x17ff) AM_RAM AM_SHARE("mainram")
+	AM_RANGE(0x0000, 0x0ffe) AM_RAM AM_SHARE("mainram")
+	AM_RANGE(0x1780, 0x17ff) AM_RAM AM_SHARE("smiram")
 	AM_RANGE(0x1800, 0x1fff) AM_ROM AM_REGION("roms",0)
+	AM_RANGE(0x2000, 0x7fff) AM_RAM AM_SHARE("extram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( instruct_io, AS_IO, 8, instruct_state )
@@ -212,14 +228,14 @@ INPUT_PORTS_END
 
 void instruct_state::machine_reset()
 {
+	m_cassin = 0;
 	m_maincpu->set_state_int(S2650_PC, 0x1800);
 }
 
 QUICKLOAD_LOAD_MEMBER( instruct_state, instruct )
 {
-	UINT16 i, exec_addr, quick_length, quick_addr = 0x100, read_;
+	UINT16 i, exec_addr, quick_length, read_;
 	int result = IMAGE_INIT_FAIL;
-	UINT8 *quick_data;
 
 	quick_length = image.length();
 	if (quick_length < 0x0104)
@@ -227,14 +243,15 @@ QUICKLOAD_LOAD_MEMBER( instruct_state, instruct )
 		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too short");
 		image.message(" File too short");
 	}
-	else if (quick_length > 0x17c0)
+	else
+	if (quick_length > 0x8000)
 	{
 		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too long");
 		image.message(" File too long");
 	}
 	else
 	{
-		quick_data = (UINT8*)malloc(quick_length);
+		UINT8* quick_data = (UINT8*)malloc(quick_length);
 		if (!quick_data)
 		{
 			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot open file");
@@ -264,8 +281,25 @@ QUICKLOAD_LOAD_MEMBER( instruct_state, instruct )
 				}
 				else
 				{
-					for (i = quick_addr; i < read_; i++)
+					// load to 0000-0FFE (standard ram + extra)
+					read_ = 0xfff;
+					if (quick_length < 0xfff)
+						read_ = quick_length;
+					for (i = 0; i < read_; i++)
 						m_p_ram[i] = quick_data[i];
+
+					// load to 1780-17BF (spare ram inside 2656)
+					read_ = 0x17c0;
+					if (quick_length < 0x17c0)
+						read_ = quick_length;
+					if (quick_length > 0x1780)
+						for (i = 0x1780; i < read_; i++)
+							m_p_smiram[i-0x1780] = quick_data[i];
+
+					// load to 2000-7FFF (optional extra ram)
+					if (quick_length > 0x2000)
+						for (i = 0x2000; i < quick_length; i++)
+							m_p_extram[i-0x2000] = quick_data[i];
 
 					/* display a message about the loaded quickload */
 					image.message(" Quickload: size=%04X : exec=%04X",quick_length,exec_addr);
@@ -289,7 +323,7 @@ static MACHINE_CONFIG_START( instruct, instruct_state )
 	MCFG_CPU_ADD("maincpu",S2650, XTAL_3_579545MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(instruct_mem)
 	MCFG_CPU_IO_MAP(instruct_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(instruct_state, t2l_int, 50)
+	MCFG_CPU_PERIODIC_INT_DRIVER(instruct_state, t2l_int, 100)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_instruct)
