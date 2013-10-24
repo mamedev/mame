@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-    Unknown Xebec Winchester controller card emulation
+    Luxor 55 21056-00 Xebec Interface Host Adapter emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -28,19 +28,24 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> abc_xebec_device
+// ======================> luxor_55_21056_device
 
-class abc_xebec_device :  public device_t,
-						public device_abcbus_card_interface
+class luxor_55_21056_device :  public device_t,
+							   public device_abcbus_card_interface
 {
 public:
 	// construction/destruction
-	abc_xebec_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	luxor_55_21056_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
 
+	DECLARE_READ8_MEMBER(memory_read_byte);
+	DECLARE_WRITE8_MEMBER(memory_write_byte);
+	DECLARE_READ8_MEMBER(io_read_byte);
+	DECLARE_WRITE8_MEMBER(io_write_byte);
+	
 protected:
 	// device-level overrides
 	virtual void device_start();
@@ -56,7 +61,7 @@ private:
 
 
 // device type definition
-extern const device_type ABC_XEBEC;
+extern const device_type LUXOR_55_21056;
 
 
 

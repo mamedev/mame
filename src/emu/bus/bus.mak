@@ -38,11 +38,11 @@ BUSOBJS += $(BUSOBJ)/abcbus/fd2.o
 BUSOBJS += $(BUSOBJ)/abcbus/hdc.o
 BUSOBJS += $(BUSOBJ)/abcbus/lux10828.o
 BUSOBJS += $(BUSOBJ)/abcbus/lux21046.o
+BUSOBJS += $(BUSOBJ)/abcbus/lux21056.o
 BUSOBJS += $(BUSOBJ)/abcbus/uni800.o
 BUSOBJS += $(BUSOBJ)/abcbus/sio.o
 BUSOBJS += $(BUSOBJ)/abcbus/slutprov.o
 BUSOBJS += $(BUSOBJ)/abcbus/turbo.o
-BUSOBJS += $(BUSOBJ)/abcbus/xebec.o
 endif
 
 

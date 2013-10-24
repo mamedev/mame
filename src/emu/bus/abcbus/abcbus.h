@@ -188,11 +188,11 @@ extern const device_type ABCBUS_SLOT;
 #include "hdc.h"
 #include "lux10828.h"
 #include "lux21046.h"
+#include "lux21056.h"
 #include "uni800.h"
 #include "sio.h"
 #include "slutprov.h"
 #include "turbo.h"
-#include "xebec.h"
 
 SLOT_INTERFACE_EXTERN( abcbus_cards );
 
