@@ -549,6 +549,15 @@ endif
 
 #-------------------------------------------------
 #
+#@src/emu/machine/i80130.h,MACHINES += I80130
+#-------------------------------------------------
+
+ifneq ($(filter I80130,$(MACHINES)),)
+MACHINEOBJS += $(MACHINEOBJ)/i80130.o
+endif
+
+#-------------------------------------------------
+#
 #@src/emu/machine/atadev.h,MACHINES += IDE
 #@src/emu/machine/ataintf.h,MACHINES += IDE
 #-------------------------------------------------
