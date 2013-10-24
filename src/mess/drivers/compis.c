@@ -252,9 +252,18 @@ WRITE8_MEMBER( compis_state::vram_w )
 static ADDRESS_MAP_START( compis_mem, AS_PROGRAM, 16, compis_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0x1ffff) AM_RAM
-	AM_RANGE(0x40000, 0x5ffff) AM_RAM AM_READWRITE8(vram_r, vram_w, 0xffff)
-	AM_RANGE(0xe8000, 0xeffff) AM_ROM AM_REGION(I80186_TAG, 0)
-	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION(I80186_TAG, 0)
+	AM_RANGE(0xe0000, 0xeffff) AM_MIRROR(0x10000) AM_ROM AM_REGION(I80186_TAG, 0)
+ADDRESS_MAP_END
+
+
+//-------------------------------------------------
+//  ADDRESS_MAP( compis2_mem )
+//-------------------------------------------------
+
+static ADDRESS_MAP_START( compis2_mem, AS_PROGRAM, 16, compis_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x00000, 0xbffff) AM_RAM
+	AM_RANGE(0xe0000, 0xeffff) AM_MIRROR(0x10000) AM_ROM AM_REGION(I80186_TAG, 0)
 ADDRESS_MAP_END
 
 
@@ -269,8 +278,8 @@ static ADDRESS_MAP_START( compis_io, AS_IO, 16, compis_state )
 	AM_RANGE(0x0100, 0x011f) /* PCS2 */ AM_MIRROR(0x60) AM_DEVREADWRITE8(MM58174A_TAG, mm58274c_device, read, write, 0x00ff)
   //AM_RANGE(0x0180, 0x0181) /* PCS3 */ AM_MIRROR(0x7e)
   //AM_RANGE(0x0200, 0x0201) /* PCS4 */ AM_MIRROR(0x7e)
-	AM_RANGE(0x0280, 0x0283) /* PCS5 */ AM_MIRROR(0x70) AM_DEVREADWRITE8("pic8259_master", pic8259_device, read, write, 0x00ff) /* 80150/80130 */
-	AM_RANGE(0x0288, 0x028f) /* PCS5 */ AM_MIRROR(0x70) AM_DEVREADWRITE8("pit8254", pit8254_device, read, write, 0x00ff) /* 80150/80130 */
+	AM_RANGE(0x0280, 0x0283) /* PCS5 */ AM_MIRROR(0x70) AM_DEVREADWRITE8("pic8259_master", pic8259_device, read, write, 0x00ff) /* 80130 */
+	AM_RANGE(0x0288, 0x028f) /* PCS5 */ AM_MIRROR(0x70) AM_DEVREADWRITE8("pit8254", pit8254_device, read, write, 0x00ff) /* 80130 */
 	AM_RANGE(0x0300, 0x0301) /* PCS6:0 */ AM_MIRROR(0xe) AM_WRITE8(tape_mon_w, 0x00ff)
 	AM_RANGE(0x0310, 0x0311) /* PCS6:3 */ AM_MIRROR(0xc) AM_DEVREADWRITE8(I8251A_TAG, i8251_device, data_r, data_w, 0xff00)
 	AM_RANGE(0x0312, 0x0313) /* PCS6:3 */ AM_MIRROR(0xc) AM_DEVREADWRITE8(I8251A_TAG, i8251_device, status_r, control_w, 0xff00)
@@ -809,6 +818,25 @@ static MACHINE_CONFIG_START( compis, compis_state )
 MACHINE_CONFIG_END
 
 
+//-------------------------------------------------
+//  MACHINE_CONFIG( compis2 )
+//-------------------------------------------------
+
+static MACHINE_CONFIG_DERIVED( compis2, compis )
+	// basic machine hardware
+	MCFG_CPU_MODIFY(I80186_TAG)
+	MCFG_CPU_PROGRAM_MAP(compis2_mem)
+	// TODO 8087
+
+	// devices
+	// TODO 525hd drives
+
+	// internal ram
+	MCFG_RAM_MODIFY(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("768K")
+MACHINE_CONFIG_END
+
+
 
 //**************************************************************************
 //  ROMS
@@ -820,29 +848,24 @@ MACHINE_CONFIG_END
 
 ROM_START( compis )
 	ROM_REGION16_LE( 0x10000, I80186_TAG, 0 )
-	ROM_LOAD16_BYTE( "sa883003.u40", 0x0000, 0x4000, CRC(195ef6bf) SHA1(eaf8ae897e1a4b62d3038ff23777ce8741b766ef) )
-	ROM_LOAD16_BYTE( "sa883003.u36", 0x0001, 0x4000, CRC(7c918f56) SHA1(8ba33d206351c52f44f1aa76cc4d7f292dcef761) )
-	ROM_LOAD16_BYTE( "sa883003.u39", 0x8000, 0x4000, CRC(3cca66db) SHA1(cac36c9caa2f5bb42d7a6d5b84f419318628935f) )
-	ROM_LOAD16_BYTE( "sa883003.u35", 0x8001, 0x4000, CRC(43c38e76) SHA1(f32e43604107def2c2259898926d090f2ed62104) )
-ROM_END
-
-
-//-------------------------------------------------
-//  ROM( compis2 )
-//-------------------------------------------------
-
-ROM_START( compis2 )
-	ROM_REGION16_LE( 0x10000, I80186_TAG, 0 )
 	ROM_DEFAULT_BIOS( "v303" )
 
-	ROM_SYSTEM_BIOS( 0, "v302", "Compis II v3.02 (1986-09-09)" )
-	ROMX_LOAD( "comp302.u39", 0x0000, 0x8000, CRC(16a7651e) SHA1(4cbd4ba6c6c915c04dfc913ec49f87c1dd7344e3), ROM_BIOS(1) | ROM_SKIP(1) )
-	ROMX_LOAD( "comp302.u35", 0x0001, 0x8000, CRC(ae546bef) SHA1(572e45030de552bb1949a7facbc885b8bf033fc6), ROM_BIOS(1) | ROM_SKIP(1) )
+	ROM_SYSTEM_BIOS( 0, "v20", "Compis v2.0 (1985-05-15)" )
+	ROMX_LOAD( "sa883003.u40", 0x0000, 0x4000, CRC(195ef6bf) SHA1(eaf8ae897e1a4b62d3038ff23777ce8741b766ef), ROM_BIOS(1) | ROM_SKIP(1) )
+	ROMX_LOAD( "sa883003.u36", 0x0001, 0x4000, CRC(7c918f56) SHA1(8ba33d206351c52f44f1aa76cc4d7f292dcef761), ROM_BIOS(1) | ROM_SKIP(1) )
+	ROMX_LOAD( "sa883003.u39", 0x8000, 0x4000, CRC(3cca66db) SHA1(cac36c9caa2f5bb42d7a6d5b84f419318628935f), ROM_BIOS(1) | ROM_SKIP(1) )
+	ROMX_LOAD( "sa883003.u35", 0x8001, 0x4000, CRC(43c38e76) SHA1(f32e43604107def2c2259898926d090f2ed62104), ROM_BIOS(1) | ROM_SKIP(1) )
 
-	ROM_SYSTEM_BIOS( 1, "v303", "Compis II v3.03 (1987-03-09)" )
-	ROMX_LOAD( "rysa094.u39", 0x0000, 0x8000, CRC(e7302bff) SHA1(44ea20ef4008849af036c1a945bc4f27431048fb), ROM_BIOS(2) | ROM_SKIP(1) )
-	ROMX_LOAD( "rysa094.u35", 0x0001, 0x8000, CRC(b0694026) SHA1(eb6b2e3cb0f42fd5ffdf44f70e652ecb9714ce30), ROM_BIOS(2) | ROM_SKIP(1) )
+	ROM_SYSTEM_BIOS( 1, "v302", "Compis II v3.02 (1986-09-09)" )
+	ROMX_LOAD( "comp302.u39", 0x0000, 0x8000, CRC(16a7651e) SHA1(4cbd4ba6c6c915c04dfc913ec49f87c1dd7344e3), ROM_BIOS(2) | ROM_SKIP(1) )
+	ROMX_LOAD( "comp302.u35", 0x0001, 0x8000, CRC(ae546bef) SHA1(572e45030de552bb1949a7facbc885b8bf033fc6), ROM_BIOS(2) | ROM_SKIP(1) )
+
+	ROM_SYSTEM_BIOS( 2, "v303", "Compis II v3.03 (1987-03-09)" )
+	ROMX_LOAD( "rysa094.u39", 0x0000, 0x8000, CRC(e7302bff) SHA1(44ea20ef4008849af036c1a945bc4f27431048fb), ROM_BIOS(3) | ROM_SKIP(1) )
+	ROMX_LOAD( "rysa094.u35", 0x0001, 0x8000, CRC(b0694026) SHA1(eb6b2e3cb0f42fd5ffdf44f70e652ecb9714ce30), ROM_BIOS(3) | ROM_SKIP(1) )
 ROM_END
+
+#define rom_compis2 rom_compis
 
 
 
@@ -852,4 +875,4 @@ ROM_END
 
 //    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT                         COMPANY             FULLNAME        FLAGS
 COMP(1985,  compis,     0,      0,     compis,  compis, driver_device, 0, "Telenova", "Compis" , GAME_NOT_WORKING )
-COMP(1986,  compis2,    compis, 0,     compis, compis, driver_device, 0, "Telenova", "Compis II" , GAME_NOT_WORKING )
+COMP(1986,  compis2,    compis, 0,     compis2, compis, driver_device, 0, "Telenova", "Compis II" , GAME_NOT_WORKING )
