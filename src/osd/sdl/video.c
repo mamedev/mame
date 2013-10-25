@@ -49,7 +49,10 @@
 #include "video.h"
 #include "window.h"
 #include "input.h"
-#include "debugwin.h"
+
+#if !defined(NO_DEBUGGER)
+#include "debugqt.h"
+#endif
 
 #include "osdsdl.h"
 #include "sdlos.h"
@@ -341,8 +344,10 @@ void sdl_osd_interface::update(bool skip_redraw)
 	sdlinput_poll(machine());
 	check_osd_inputs(machine());
 
+#if !defined(NO_DEBUGGER)
 	if ((machine().debug_flags & DEBUG_FLAG_OSD_ENABLED) != 0)
 		debugwin_update_during_game(machine());
+#endif
 }
 
 

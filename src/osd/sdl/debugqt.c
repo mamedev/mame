@@ -35,6 +35,8 @@
 #include "debugqtmemorywindow.h"
 #include "debugqtbreakpointswindow.h"
 
+#include "debugqt.h"
+
 
 //============================================================
 //  "Global" variables to make QT happy
