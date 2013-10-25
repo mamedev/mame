@@ -215,7 +215,7 @@ void fixedfreq_device::update_vid(double newval, attotime cur_time)
 	int pixels = round((cur_time - m_line_time).as_double() / m_clock_period.as_double());
 	attotime time = (cur_time - m_last_time);
 
-	if ((newval == m_vid))
+	if (newval == m_vid)
 		return;
 
 	ATTR_UNUSED int sync = sync_separator(time, newval);
