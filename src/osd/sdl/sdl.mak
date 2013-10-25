@@ -69,10 +69,6 @@ USE_DISPATCH_GL = 1
 # SDL. Equivalent to the ./configure --prefix=<path>
 # SDL_INSTALL_ROOT = /usr/local/sdl13
 
-# uncomment and change the next line to build the gtk debugger for win32
-# Get what you need here: http://www.gtk.org/download-windows.html
-# GTK_INSTALL_ROOT = y:/couriersud/win/gtk-32
-
 # uncomment to disable the Qt debugger and fall back to a system default
 # NO_USE_QTDEBUG = 1
 
@@ -81,6 +77,9 @@ USE_DISPATCH_GL = 1
 
 # uncomment to disable implementations based on assembler code
 # NOASM = 1
+
+# change for custom OS X installations
+SDL_FRAMEWORK_PATH = /Library/Frameworks/
 
 ###########################################################################
 ##################   END USER-CONFIGURABLE OPTIONS   ######################
@@ -298,24 +297,10 @@ SDLMAIN = $(SDLOBJ)/main.o
 LDFLAGS += -Wl,--allow-multiple-definition
 SDL_NETWORK = pcap
 
-# do we have GTK ?
-ifndef GTK_INSTALL_ROOT
+# if no Qt, no debugger
 ifdef NO_USE_QTDEBUG
 NO_DEBUGGER = 1
 endif
-else
-ifdef NO_USE_QTDEBUG
-DEBUGOBJS = $(SDLOBJ)/debugwin.o $(SDLOBJ)/dview.o $(SDLOBJ)/debug-sup.o $(SDLOBJ)/debug-intf.o
-LIBS += -lgtk-win32-2.0 -lgdk-win32-2.0 -lgmodule-2.0 -lglib-2.0 -lgobject-2.0 \
-	-lpango-1.0 -latk-1.0 -lgdk_pixbuf-2.0
-CCOMFLAGS += -mms-bitfields
-INCPATH += -I$(GTK_INSTALL_ROOT)/include/gtk-2.0 -I$(GTK_INSTALL_ROOT)/include/glib-2.0 \
-	-I$(GTK_INSTALL_ROOT)/include/cairo -I$(GTK_INSTALL_ROOT)/include/pango-1.0 \
-	-I$(GTK_INSTALL_ROOT)/include/atk-1.0 \
-	-I$(GTK_INSTALL_ROOT)/lib/glib-2.0/include -I$(GTK_INSTALL_ROOT)/lib/gtk-2.0/include
-LDFLAGS += -L$(GTK_INSTALL_ROOT)/lib
-endif
-endif # GTK_INSTALL_ROOT
 
 # enable UNICODE
 DEFS += -Dmain=utf8_main -DUNICODE -D_UNICODE
@@ -492,11 +477,13 @@ SDLOS_TARGETOS = macosx
 
 ifndef MACOSX_USE_LIBSDL
 # Compile using framework (compile using libSDL is the exception)
-LIBS += -framework SDL -framework Cocoa -framework OpenGL -lpthread
+LIBS += -F$(SDL_FRAMEWORK_PATH) -framework SDL -framework Cocoa -framework OpenGL -lpthread
+INCPATH += -F$(SDL_FRAMEWORK_PATH)
 else
 # Compile using installed libSDL (Fink or MacPorts):
 #
 # Remove the "/SDL" component from the include path so that we can compile
+
 # files (header files are #include "SDL/something.h", so the extra "/SDL"
 # causes a significant problem)
 INCPATH += `sdl-config --cflags | sed 's:/SDL::'`
@@ -719,12 +706,6 @@ LIBS += -lX11 -lXinerama
 ifndef NO_USE_QTDEBUG
 INCPATH += `pkg-config QtGui --cflags`
 LIBS += `pkg-config QtGui --libs`
-else
-# the old-new debugger relies on GTK+ in addition to the base SDLMAME needs
-# Non-X11 builds can not use the debugger
-INCPATH += `pkg-config --cflags-only-I gtk+-2.0` `pkg-config --cflags-only-I gconf-2.0`
-CCOMFLAGS += `pkg-config --cflags-only-other gtk+-2.0` `pkg-config --cflags-only-other gconf-2.0`
-LIBS += `pkg-config --libs gtk+-2.0` `pkg-config --libs gconf-2.0`
 endif
 
 # some systems still put important things in a different prefix
