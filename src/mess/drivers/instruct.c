@@ -33,11 +33,10 @@
       completion of a successful load, HELLO will be displayed.
 
     ToDO:
-    - Keys are mostly correct. The SENS, INT, MON, RST keys are
-      not in the matrix, but are connected to hardware directly. This needs
-      to be emulated. (SENS key done)
     - Connect 10 toggle switches and 10 round red leds.
-    - Hook up the Interrupt Block unit.
+    - 2 proms
+    - Last Address Register
+    - Initial Jump Logic
 
 ****************************************************************************/
 
@@ -67,7 +66,7 @@ public:
 	DECLARE_WRITE8_MEMBER(portf8_w);
 	DECLARE_WRITE8_MEMBER(portf9_w);
 	DECLARE_WRITE8_MEMBER(portfa_w);
-	DECLARE_QUICKLOAD_LOAD_MEMBER( instruct );
+	DECLARE_QUICKLOAD_LOAD_MEMBER(instruct);
 	INTERRUPT_GEN_MEMBER(t2l_int);
 private:
 	virtual void machine_reset();
@@ -150,9 +149,38 @@ READ8_MEMBER( instruct_state::sense_r )
 
 INTERRUPT_GEN_MEMBER( instruct_state::t2l_int )
 {
-	m_irqstate ^= 1;
-	//device.execute().set_input_line(0, m_irqstate);
-	device.execute().set_input_line_and_vector(0, m_irqstate, 0x87); // unknown vector, guess
+	UINT8 hwkeys = ioport("HW")->read();
+
+	// check RST key
+	if BIT(hwkeys, 3)
+	{
+		m_maincpu->set_state_int(S2650_PC, 0);
+		return;
+	}
+	else
+	// check MON key
+	if BIT(hwkeys, 2)
+	{
+		m_maincpu->set_state_int(S2650_PC, 0x1800);
+		return;
+	}
+	else
+	{
+		UINT8 switches = ioport("SW")->read();
+
+		// Set vector from INDIRECT sw
+		UINT8 vector = BIT(switches, 0) ? 0x87 : 0x07;
+
+		// Check INT sw & key
+		if BIT(switches, 1)
+			device.execute().set_input_line_and_vector(0, BIT(hwkeys, 1) ? ASSERT_LINE : CLEAR_LINE, vector);
+		else
+		// process ac input
+		{
+			m_irqstate ^= 1;
+			device.execute().set_input_line_and_vector(0, m_irqstate ? ASSERT_LINE : CLEAR_LINE, vector);
+		}
+	}
 }
 
 static ADDRESS_MAP_START( instruct_mem, AS_PROGRAM, 8, instruct_state )
@@ -220,9 +248,17 @@ static INPUT_PORTS_START( instruct )
 
 	PORT_START("HW")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("SENS") PORT_CODE(KEYCODE_U) PORT_CHAR('U')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("INT") PORT_CODE(KEYCODE_I) PORT_CHAR('I')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("MON") PORT_CODE(KEYCODE_Q) PORT_CHAR('Q')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RST") PORT_CODE(KEYCODE_P) PORT_CHAR('P')
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("INT") PORT_CODE(KEYCODE_I) PORT_CHAR('I')
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("MON") PORT_CODE(KEYCODE_Q) PORT_CHAR('Q')
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RST") PORT_CODE(KEYCODE_P) PORT_CHAR('P')
+
+	PORT_START("SW")
+	PORT_DIPNAME( 0x01, 0x00, "INT") // Interrupt jumps to 0007 or *0007
+	PORT_DIPSETTING(    0x01, "Indirect")
+	PORT_DIPSETTING(    0x00, "Direct")
+	PORT_DIPNAME( 0x02, 0x00, "AC/INT") // Interrupt comes from INT key or from power supply
+	PORT_DIPSETTING(    0x02, "INT")
+	PORT_DIPSETTING(    0x00, "AC")
 INPUT_PORTS_END
 
 
@@ -323,7 +359,7 @@ static MACHINE_CONFIG_START( instruct, instruct_state )
 	MCFG_CPU_ADD("maincpu",S2650, XTAL_3_579545MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(instruct_mem)
 	MCFG_CPU_IO_MAP(instruct_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(instruct_state, t2l_int, 100)
+	MCFG_CPU_PERIODIC_INT_DRIVER(instruct_state, t2l_int, 120)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_instruct)
