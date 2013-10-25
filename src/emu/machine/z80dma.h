@@ -85,6 +85,8 @@ public:
 
 	UINT8 read();
 	void write(UINT8 data);
+	DECLARE_READ8_MEMBER( read ) { return read(); }
+	DECLARE_WRITE8_MEMBER( write ) { write(data); }
 
 	void rdy_w(int state);
 	void wait_w(int state);

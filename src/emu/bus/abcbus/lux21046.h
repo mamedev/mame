@@ -92,6 +92,7 @@ protected:
 	virtual UINT8 abcbus_stat();
 	virtual void abcbus_c1(UINT8 data);
 	virtual void abcbus_c3(UINT8 data);
+	virtual void abcbus_c4(UINT8 data);
 
 private:
 	required_device<cpu_device> m_maincpu;

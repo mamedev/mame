@@ -150,7 +150,7 @@ static ADDRESS_MAP_START( luxor_55_21046_io, AS_IO, 8, luxor_55_21046_device )
 	AM_RANGE(0x50, 0x50) AM_MIRROR(0xff0f) AM_MASK(0xff00) AM_READ(_9a_r)
 	AM_RANGE(0x60, 0x63) AM_MIRROR(0xff0c) AM_DEVREAD(SAB1793_TAG, fd1793_t, read)
 	AM_RANGE(0x70, 0x73) AM_MIRROR(0xff0c) AM_DEVWRITE(SAB1793_TAG, fd1793_t, write)
-	AM_RANGE(0x80, 0x80) AM_MIRROR(0xff0f) AM_DEVREADWRITE_LEGACY(Z80DMA_TAG, z80dma_r, z80dma_w)
+	AM_RANGE(0x80, 0x80) AM_MIRROR(0xff0f) AM_DEVREADWRITE(Z80DMA_TAG, z80dma_device, read, write)
 ADDRESS_MAP_END
 
 
@@ -544,6 +544,16 @@ void luxor_55_21046_device::abcbus_c3(UINT8 data)
 	{
 		m_maincpu->reset();
 	}
+}
+
+
+//-------------------------------------------------
+//  abcbus_c4 -
+//-------------------------------------------------
+
+void luxor_55_21046_device::abcbus_c4(UINT8 data)
+{
+	// TODO connected to PAL16R4 pin 2
 }
 
 

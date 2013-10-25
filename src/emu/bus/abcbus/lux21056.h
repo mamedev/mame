@@ -11,8 +11,8 @@
 
 #pragma once
 
-#ifndef __ABC_XEBEC__
-#define __ABC_XEBEC__
+#ifndef __LUXOR_55_21056__
+#define __LUXOR_55_21056__
 
 #include "emu.h"
 #include "abcbus.h"
@@ -21,6 +21,7 @@
 #include "machine/scsibus.h"
 #include "machine/scsicb.h"
 #include "machine/scsihd.h"
+#include "machine/z80dma.h"
 
 
 
@@ -41,10 +42,27 @@ public:
 	virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
 
-	DECLARE_READ8_MEMBER(memory_read_byte);
-	DECLARE_WRITE8_MEMBER(memory_write_byte);
-	DECLARE_READ8_MEMBER(io_read_byte);
-	DECLARE_WRITE8_MEMBER(io_write_byte);
+	DECLARE_READ8_MEMBER( sasi_status_r );
+	DECLARE_WRITE8_MEMBER( stat_w );
+	DECLARE_READ8_MEMBER( out_r );
+	DECLARE_WRITE8_MEMBER( inp_w );
+	DECLARE_READ8_MEMBER( sasi_data_r );
+	DECLARE_WRITE8_MEMBER( sasi_data_w );
+	DECLARE_READ8_MEMBER( rdy_reset_r );
+	DECLARE_WRITE8_MEMBER( rdy_reset_w );
+	DECLARE_READ8_MEMBER( sasi_sel_r );
+	DECLARE_WRITE8_MEMBER( sasi_sel_w );
+	DECLARE_READ8_MEMBER( sasi_rst_r );
+	DECLARE_WRITE8_MEMBER( sasi_rst_w );
+
+	DECLARE_READ8_MEMBER( memory_read_byte );
+	DECLARE_WRITE8_MEMBER( memory_write_byte );
+	DECLARE_READ8_MEMBER( io_read_byte );
+	DECLARE_WRITE8_MEMBER( io_write_byte );
+
+	DECLARE_WRITE_LINE_MEMBER( sasi_bsy_w );
+	DECLARE_WRITE_LINE_MEMBER( sasi_io_w );
+	DECLARE_WRITE_LINE_MEMBER( sasi_req_w );
 	
 protected:
 	// device-level overrides
@@ -53,10 +71,27 @@ protected:
 
 	// device_abcbus_interface overrides
 	virtual void abcbus_cs(UINT8 data);
+	virtual UINT8 abcbus_inp();
+	virtual void abcbus_utp(UINT8 data);
+	virtual UINT8 abcbus_stat();
+	virtual void abcbus_c1(UINT8 data);
+	virtual void abcbus_c3(UINT8 data);
 
 private:
+	void set_rdy(int state);
+
 	required_device<cpu_device> m_maincpu;
-	required_device<scsibus_device> m_sasibus;
+	required_device<z80dma_device> m_dma;
+	required_device<scsicb_device> m_sasibus;
+
+	int m_cs;
+	int m_rdy;
+	int m_req;
+
+	UINT8 m_inp;
+	UINT8 m_out;
+	UINT8 m_stat;
+	UINT8 m_sasi_data;
 };
 
 
