@@ -116,7 +116,7 @@ public:
 
 private:
 	bool m_send;
-	UINT8 m_prev_data;
+//	UINT8 m_prev_data;
 };
 
 #endif /* WPC_PIN_H_ */
