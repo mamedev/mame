@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Sandro Ronco
 
 // Special-form
 #define     GET_S_FUNC6(op)     ((op >>  1) & 0x3f)

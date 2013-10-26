@@ -1,3 +1,5 @@
+// license:?
+// copyright-holders:Kevin Horton,Jonathan Gevaryahu,Sandro Ronco
 /******************************************************************************
 *
 *  Fidelity Electronics Z80 based board driver

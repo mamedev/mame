@@ -1,3 +1,5 @@
+// license:?
+// copyright-holders:Wilbert Pol,Sandro Ronco
 /******************************************************************************
 
   Driver for the ES-2xx series electronic typewriters made by Nakajima.

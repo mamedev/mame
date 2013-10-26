@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Sandro Ronco
 #pragma once
 
 #ifndef __Z88_ROM_H__

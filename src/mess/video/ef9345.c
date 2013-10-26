@@ -1,3 +1,5 @@
+// license:?
+// copyright-holders:Daniel Coulom,Sandro Ronco
 /*********************************************************************
 
     ef9345.c

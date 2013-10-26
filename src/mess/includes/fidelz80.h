@@ -1,3 +1,5 @@
+// license:?
+// copyright-holders:Kevin Horton,Jonathan Gevaryahu,Sandro Ronco
 /***************************************************************************
 
         fidelz80.h

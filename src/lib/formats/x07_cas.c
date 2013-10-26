@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Sandro Ronco
 /********************************************************************
 
     Support for Canon X-07 cassette images

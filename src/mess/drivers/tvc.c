@@ -1,3 +1,5 @@
+// license:?
+// copyright-holders:Miodrag Milanovic,Sandro Ronco
 /***************************************************************************
 
         Videoton TVC 32/64 driver

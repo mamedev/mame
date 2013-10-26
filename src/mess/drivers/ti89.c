@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Sandro Ronco
 /***************************************************************************
 
     TI-89, TI-92, TI-92 plus, Voyage 200 PLT and TI-89 Titanium

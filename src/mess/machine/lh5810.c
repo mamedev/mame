@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Sandro Ronco
 /**********************************************************************
 
     LH5810/LH5811 Input/Output Port Controller

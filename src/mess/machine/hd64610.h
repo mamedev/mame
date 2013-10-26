@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Sandro Ronco
 /**********************************************************************
 
     Hitachi HD64610 Real Time Clock

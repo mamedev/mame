@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Sandro Ronco
 /********************************************************************
 
     Support for Videoton TVC .cas files

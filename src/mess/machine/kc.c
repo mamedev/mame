@@ -1,3 +1,5 @@
+// license:?
+// copyright-holders:Kevin Thacker,Sandro Ronco
 /* Core includes */
 #include "emu.h"
 #include "includes/kc.h"
