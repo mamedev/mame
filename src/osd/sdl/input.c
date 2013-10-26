@@ -720,7 +720,11 @@ static void sdlinput_register_joysticks(running_machine &machine)
 	mame_printf_verbose("Joystick: Start initialization\n");
 	for (physical_stick = 0; physical_stick < SDL_NumJoysticks(); physical_stick++)
 	{
-		char *joy_name = remove_spaces(machine, SDL_JoystickName(physical_stick));
+		char *joy_name; 
+
+		joy = SDL_JoystickOpen(physical_stick);
+		joy_name = remove_spaces(machine, SDL_JoystickName(joy));
+		SDL_JoystickClose(joy);
 
 		devmap_register(&joy_map, physical_stick, joy_name);
 	}
