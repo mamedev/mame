@@ -96,7 +96,7 @@ static NETLIST_START(pong_schematics)
 	TTL_74107(ic_f6a, xclk, high, high, high)
 	NET_ALIAS(clk, ic_f6a.Q)
 #else
-	/* abstracting this, performance increases by 80%
+	/* abstracting this, performance increases by 40%
 	 * No surprise, the clock is extremely expensive */
 	NETDEV_MAINCLOCK(clk)
 	//NETDEV_CLOCK(clk)
@@ -593,10 +593,10 @@ INPUT_CHANGED_MEMBER(pong_state::input_changed)
 		double pad = vA + (vB - vA)*PRE_R / (Req + PRE_R);
 		switch (numpad)
 		{
-		case IC_PADDLE1:    m_p_V0->setTo(pad, NLTIME_FROM_NS(0)); break;
-		case IC_PADDLE2:    m_p_V1->setTo(pad, NLTIME_FROM_NS(0)); break;
+		case IC_PADDLE1:    m_p_V0->set_Q(pad, NLTIME_FROM_NS(0)); break;
+		case IC_PADDLE2:    m_p_V1->set_Q(pad, NLTIME_FROM_NS(0)); break;
 		}
-		printf("%d %f\n", newval, (float) pad);
+		//printf("%d %f\n", newval, (float) pad);
 		break;
 	}
 	case IC_SWITCH:
@@ -604,7 +604,7 @@ INPUT_CHANGED_MEMBER(pong_state::input_changed)
 		m_sw1b->setTo(newval ? 1 : 0);
 		break;
 	case IC_COIN:
-		m_srst->setTo(newval & 1, NLTIME_FROM_US(500));
+		m_srst->set_Q(newval & 1, NLTIME_FROM_US(500));
 		break;
 	case IC_VR1:
 	case IC_VR2:

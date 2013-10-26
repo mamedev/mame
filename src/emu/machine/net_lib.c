@@ -72,7 +72,7 @@ NETLIB_CONSTRUCTOR(netdev_log)
 
 NETLIB_UPDATE(netdev_log)
 {
-	printf("%s: %d %d\n", name(), (UINT32) (netlist().time().as_raw() / 1000000), INPVAL(m_I));
+	printf("%s: %d %d\n", name(), (UINT32) (netlist().time().as_raw() / 1000000), INPLOGIC(m_I));
 }
 
 NETLIB_CONSTRUCTOR(netdev_clock)
@@ -94,18 +94,8 @@ NETLIB_UPDATE_PARAM(netdev_clock)
 
 NETLIB_UPDATE(netdev_clock)
 {
-	m_Q.setToNoCheck(!m_Q.new_Q(), m_inc  );
-}
-
-NETLIB_UPDATE_PARAM(netdev_mainclock)
-{
-	m_inc = netlist_time::from_hz(m_freq.Value()*2);
-}
-
-NETLIB_UPDATE(netdev_mainclock)
-{
-	*m_Q.new_Q_ptr() = !m_Q.new_Q();
-	m_Q.set_time(m_netlist.time() + m_inc);
+	//m_Q.setToNoCheck(!m_Q.new_Q(), m_inc  );
+	OUTLOGIC(m_Q, !m_Q.new_Q(), m_inc  );
 }
 
 NETLIB_CONSTRUCTOR(nicMultiSwitch)
@@ -120,7 +110,7 @@ NETLIB_CONSTRUCTOR(nicMultiSwitch)
 	{
 		register_input(sIN[i], m_I[i]);
 		//register_link_internal(m_I[i], m_low);
-		m_I[i].set_output( GETINPPTR(m_low));
+		m_I[i].set_output(m_low);
 	}
 	register_param("POS", m_POS);
 	register_output("Q", m_Q);
@@ -131,7 +121,7 @@ NETLIB_CONSTRUCTOR(nicMultiSwitch)
 NETLIB_UPDATE(nicMultiSwitch)
 {
 	assert(m_position<8);
-	m_Q.setTo(INPANALOG(m_I[m_position]), NLTIME_FROM_NS(1));
+	OUTANALOG(m_Q, INPANALOG(m_I[m_position]), NLTIME_FROM_NS(1));
 }
 
 NETLIB_UPDATE_PARAM(nicMultiSwitch)
@@ -151,7 +141,7 @@ NETLIB_CONSTRUCTOR(nicMixer8)
 	for (i=0; i<8; i++)
 	{
 		register_input(sI[i], m_I[i]);
-		m_I[i].set_output(GETINPPTR(m_low));
+		m_I[i].set_output(m_low);
 		register_param(sR[i], m_R[i], 1e12);
 	}
 	register_output("Q", m_Q);
@@ -168,7 +158,7 @@ NETLIB_UPDATE(nicMixer8)
 	{
 		r += m_w[i] * INPANALOG(m_I[i]);
 	}
-	m_Q.setTo(r, NLTIME_IMMEDIATE);
+	OUTANALOG(m_Q, r, NLTIME_IMMEDIATE);
 }
 
 NETLIB_UPDATE_PARAM(nicMixer8)
@@ -198,15 +188,15 @@ NETLIB_CONSTRUCTOR(nicRSFF)
 
 NETLIB_UPDATE(nicRSFF)
 {
-	if (INPVAL(m_S))
+	if (INPLOGIC(m_S))
 	{
-		m_Q.set();
-		m_QQ.clear();
+		OUTLOGIC(m_Q,  1, NLTIME_FROM_NS(10));
+		OUTLOGIC(m_QQ, 0, NLTIME_FROM_NS(10));
 	}
-	else if (INPVAL(m_R))
+	else if (INPLOGIC(m_R))
 	{
-		m_Q.clear();
-		m_QQ.set();
+		OUTLOGIC(m_Q,  0, NLTIME_FROM_NS(10));
+		OUTLOGIC(m_QQ, 1, NLTIME_FROM_NS(10));
 	}
 }
 
@@ -222,7 +212,7 @@ NETLIB_CONSTRUCTOR(nicNE555N_MSTABLE)
 	register_param("VS", m_VS, 5.0);
 	register_param("VL", m_VL, 0.0 *5.0);
 
-	m_THRESHOLD_OUT.set_netdev(this);
+	m_THRESHOLD_OUT.init_terminal(this);
 	register_link_internal(m_THRESHOLD, m_THRESHOLD_OUT, net_input_t::INP_STATE_ACTIVE);
 
 	m_Q.initial(5.0 * 0.4);
@@ -283,13 +273,13 @@ NETLIB_UPDATE(nicNE555N_MSTABLE)
 				time = 10.0;
 		}
 
-		m_Q.setToNoCheckPS(m_VS.Value() * 0.7, NLTIME_FROM_NS(100));
-		m_THRESHOLD_OUT.setTo(m_VS.Value(), NLTIME_FROM_US(time ));
+		OUTANALOG(m_Q, m_VS.Value() * 0.7, NLTIME_FROM_NS(100));
+		OUTANALOG(m_THRESHOLD_OUT, m_VS.Value(), NLTIME_FROM_US(time ));
 	}
 	else if (m_last && !out)
 	{
-		m_Q.setToNoCheckPS(0.25, NLTIME_FROM_NS(100));
-		m_THRESHOLD_OUT.setTo(0.0, NLTIME_FROM_NS(1));
+		OUTANALOG(m_Q, 0.25, NLTIME_FROM_NS(100));
+		OUTANALOG(m_THRESHOLD_OUT, 0.0, NLTIME_FROM_NS(1));
 	}
 	m_last = out;
 }
@@ -304,8 +294,8 @@ NETLIB_CONSTRUCTOR(nic7404)
 NETLIB_UPDATE(nic7404)
 {
 	static const netlist_time delay[2] = { NLTIME_FROM_NS(15), NLTIME_FROM_NS(22) };
-	UINT8 t = (INPVAL(m_I)) ^ 1;
-	m_Q.setTo(t, delay[t]);
+	UINT8 t = (INPLOGIC(m_I)) ^ 1;
+	OUTLOGIC(m_Q, t, delay[t]);
 }
 
 NETLIB_CONSTRUCTOR(nic7486)
@@ -318,8 +308,8 @@ NETLIB_CONSTRUCTOR(nic7486)
 NETLIB_UPDATE(nic7486)
 {
 	static const netlist_time delay[2] = { NLTIME_FROM_NS(15), NLTIME_FROM_NS(22) };
-	UINT8 t = INPVAL(m_I0) ^ INPVAL(m_I1);
-	m_Q.setTo(t, delay[t]);
+	UINT8 t = INPLOGIC(m_I0) ^ INPLOGIC(m_I1);
+	OUTLOGIC(m_Q, t, delay[t]);
 }
 
 NETLIB_CONSTRUCTOR(nic7448)
@@ -347,16 +337,16 @@ NETLIB_CONSTRUCTOR(nic7448)
 NETLIB_UPDATE(nic7448)
 {
 
-	if (INPVAL(m_BIQ) && !INPVAL(m_LTQ))
+	if (INPLOGIC(m_BIQ) && !INPLOGIC(m_LTQ))
 	{
 		sub.update_outputs(8);
 	}
-	else if (!INPVAL(m_BIQ))
+	else if (!INPLOGIC(m_BIQ))
 	{
 		sub.update_outputs(15);
 	}
 
-	if (!INPVAL(m_BIQ) || (INPVAL(m_BIQ) && !INPVAL(m_LTQ)))
+	if (!INPLOGIC(m_BIQ) || (INPLOGIC(m_BIQ) && !INPLOGIC(m_LTQ)))
 	{
 		sub.m_A0.inactivate();
 		sub.m_A1.inactivate();
@@ -378,8 +368,8 @@ NETLIB_UPDATE(nic7448_sub)
 {
 	UINT8 v;
 
-	v = (INPVAL(m_A0) << 0) | (INPVAL(m_A1) << 1) | (INPVAL(m_A2) << 2) | (INPVAL(m_A3) << 3);
-	if ((!INPVAL(m_RBIQ) && (v==0)))
+	v = (INPLOGIC(m_A0) << 0) | (INPLOGIC(m_A1) << 1) | (INPLOGIC(m_A2) << 2) | (INPLOGIC(m_A3) << 3);
+	if ((!INPLOGIC(m_RBIQ) && (v==0)))
 			v = 15;
 	update_outputs(v);
 }
@@ -389,13 +379,13 @@ NETLIB_FUNC_VOID(nic7448_sub, update_outputs, (UINT8 v))
 	assert(v<16);
 	if (v != m_state)
 	{
-		m_a.setTo(tab7448[v][0], NLTIME_FROM_NS(100));
-		m_b.setTo(tab7448[v][1], NLTIME_FROM_NS(100));
-		m_c.setTo(tab7448[v][2], NLTIME_FROM_NS(100));
-		m_d.setTo(tab7448[v][3], NLTIME_FROM_NS(100));
-		m_e.setTo(tab7448[v][4], NLTIME_FROM_NS(100));
-		m_f.setTo(tab7448[v][5], NLTIME_FROM_NS(100));
-		m_g.setTo(tab7448[v][6], NLTIME_FROM_NS(100));
+		OUTLOGIC(m_a, tab7448[v][0], NLTIME_FROM_NS(100));
+		OUTLOGIC(m_b, tab7448[v][1], NLTIME_FROM_NS(100));
+		OUTLOGIC(m_c, tab7448[v][2], NLTIME_FROM_NS(100));
+		OUTLOGIC(m_d, tab7448[v][3], NLTIME_FROM_NS(100));
+		OUTLOGIC(m_e, tab7448[v][4], NLTIME_FROM_NS(100));
+		OUTLOGIC(m_f, tab7448[v][5], NLTIME_FROM_NS(100));
+		OUTLOGIC(m_g, tab7448[v][6], NLTIME_FROM_NS(100));
 		m_state = v;
 	}
 }
@@ -431,11 +421,11 @@ NETLIB_CONSTRUCTOR(nic7450)
 
 NETLIB_UPDATE(nic7450)
 {
-	UINT8 t1 = INPVAL(m_I0) & INPVAL(m_I1);
-	UINT8 t2 = INPVAL(m_I2) & INPVAL(m_I3);
+	UINT8 t1 = INPLOGIC(m_I0) & INPLOGIC(m_I1);
+	UINT8 t2 = INPLOGIC(m_I2) & INPLOGIC(m_I3);
 #if 0
 	UINT8 t =  (t1 | t2) ^ 1;
-	m_Q.setTo(t, t ? NLTIME_FROM_NS(22) : NLTIME_FROM_NS(15));
+	OUTLOGIC(m_Q, t, t ? NLTIME_FROM_NS(22) : NLTIME_FROM_NS(15));
 #else
 	const netlist_time times[2] = { NLTIME_FROM_NS(22), NLTIME_FROM_NS(15) };
 
@@ -464,46 +454,46 @@ NETLIB_UPDATE(nic7450)
 			m_I3.inactivate();
 		}
 	}
-	m_Q.setTo(res, times[1 - res]);// ? 22000 : 15000);
+	OUTLOGIC(m_Q, res, times[1 - res]);// ? 22000 : 15000);
 
 #endif
 }
 
-INLINE void nic7474_newstate(const UINT8 state, ttl_output_t &Q, ttl_output_t &QQ)
+ATTR_HOT inline void nic7474sub::newstate(const UINT8 state)
 {
 	static const netlist_time delay[2] = { NLTIME_FROM_NS(25), NLTIME_FROM_NS(40) };
 	//printf("%s %d %d %d\n", "7474", state, Q.Q(), QQ.Q());
-	Q.setTo(state, delay[state]);
-	QQ.setTo(!state, delay[!state]);
+	OUTLOGIC(m_Q, state, delay[state]);
+	OUTLOGIC(m_QQ, !state, delay[!state]);
 }
 
 NETLIB_UPDATE(nic7474sub)
 {
 	//if (!INP_LAST(m_clk) & INP(m_clk))
 	{
-		nic7474_newstate(m_nextD, m_Q, m_QQ);
+		newstate(m_nextD);
 		m_clk.inactivate();
 	}
 }
 
 NETLIB_UPDATE(nic7474)
 {
-	if (!INPVAL(m_preQ))
+	if (!INPLOGIC(m_preQ))
 	{
-		nic7474_newstate(1, sub.m_Q, sub.m_QQ);
+		sub.newstate(1);
 		sub.m_clk.inactivate();
 		m_D.inactivate();
 	}
-	else if (!INPVAL(m_clrQ))
+	else if (!INPLOGIC(m_clrQ))
 	{
-		nic7474_newstate(0, sub.m_Q, sub.m_QQ);
+		sub.newstate(0);
 		sub.m_clk.inactivate();
 		m_D.inactivate();
 	}
 	else
 	{
 		m_D.activate();
-		sub.m_nextD = INPVAL(m_D);
+		sub.m_nextD = INPLOGIC(m_D);
 		sub.m_clk.activate_lh();
 	}
 }
@@ -547,19 +537,19 @@ NETLIB_CONSTRUCTOR(nic7483)
 
 NETLIB_UPDATE(nic7483)
 {
-	UINT8 a = (INPVAL(m_A1) << 0) | (INPVAL(m_A2) << 1) | (INPVAL(m_A3) << 2) | (INPVAL(m_A4) << 3);
-	UINT8 b = (INPVAL(m_B1) << 0) | (INPVAL(m_B2) << 1) | (INPVAL(m_B3) << 2) | (INPVAL(m_B4) << 3);
+	UINT8 a = (INPLOGIC(m_A1) << 0) | (INPLOGIC(m_A2) << 1) | (INPLOGIC(m_A3) << 2) | (INPLOGIC(m_A4) << 3);
+	UINT8 b = (INPLOGIC(m_B1) << 0) | (INPLOGIC(m_B2) << 1) | (INPLOGIC(m_B3) << 2) | (INPLOGIC(m_B4) << 3);
 
-	UINT8 r = a + b + INPVAL(m_CI);
+	UINT8 r = a + b + INPLOGIC(m_CI);
 
 	if (r != m_lastr)
 	{
 		m_lastr = r;
-		m_SA.setTo((r >> 0) & 1, NLTIME_FROM_NS(23));
-		m_SB.setTo((r >> 1) & 1, NLTIME_FROM_NS(23));
-		m_SC.setTo((r >> 2) & 1, NLTIME_FROM_NS(23));
-		m_SD.setTo((r >> 3) & 1, NLTIME_FROM_NS(23));
-		m_CO.setTo((r >> 4) & 1, NLTIME_FROM_NS(23));
+		OUTLOGIC(m_SA, (r >> 0) & 1, NLTIME_FROM_NS(23));
+		OUTLOGIC(m_SB, (r >> 1) & 1, NLTIME_FROM_NS(23));
+		OUTLOGIC(m_SC, (r >> 2) & 1, NLTIME_FROM_NS(23));
+		OUTLOGIC(m_SD, (r >> 3) & 1, NLTIME_FROM_NS(23));
+		OUTLOGIC(m_CO, (r >> 4) & 1, NLTIME_FROM_NS(23));
 	}
 }
 
@@ -581,17 +571,17 @@ NETLIB_CONSTRUCTOR(nic7490)
 
 NETLIB_UPDATE(nic7490)
 {
-	if (INPVAL(m_R91) & INPVAL(m_R92))
+	if (INPLOGIC(m_R91) & INPLOGIC(m_R92))
 	{
 		m_cnt = 9;
 		update_outputs();
 	}
-	else if (INPVAL(m_R1) & INPVAL(m_R2))
+	else if (INPLOGIC(m_R1) & INPLOGIC(m_R2))
 	{
 		m_cnt = 0;
 		update_outputs();
 	}
-	else if (INPVAL_LAST(m_clk) & !INPVAL(m_clk))
+	else if (INP_HL(m_clk))
 	{
 		m_cnt++;
 		if (m_cnt >= 10)
@@ -602,22 +592,17 @@ NETLIB_UPDATE(nic7490)
 #if 0
 NETLIB_FUNC_VOID(nic7490, update_outputs)
 {
-	m_QA.setTo((m_cnt >> 0) & 1, NLTIME_FROM_NS(18));
-	m_QB.setTo((m_cnt >> 1) & 1, NLTIME_FROM_NS(36));
-	m_QC.setTo((m_cnt >> 2) & 1, NLTIME_FROM_NS(54));
-	m_QD.setTo((m_cnt >> 3) & 1, NLTIME_FROM_NS(72));
+	OUTLOGIC(m_QA, (m_cnt >> 0) & 1, NLTIME_FROM_NS(18));
+	OUTLOGIC(m_QB, (m_cnt >> 1) & 1, NLTIME_FROM_NS(36));
+	OUTLOGIC(m_QC, (m_cnt >> 2) & 1, NLTIME_FROM_NS(54));
+	OUTLOGIC(m_QD, (m_cnt >> 3) & 1, NLTIME_FROM_NS(72));
 }
 #else
 NETLIB_FUNC_VOID(nic7490, update_outputs, (void))
 {
 	const netlist_time delay[4] = { NLTIME_FROM_NS(18), NLTIME_FROM_NS(36), NLTIME_FROM_NS(54), NLTIME_FROM_NS(72) };
 	for (int i=0; i<4; i++)
-		m_Q[i].setTo((m_cnt >> i) & 1, delay[i]);
-
-		//m_QA.setToPS((m_cnt >> 0) & 1, delay[0]);
-		//m_QB.setToPS((m_cnt >> 1) & 1, delay[1]);
-		//m_QC.setToPS((m_cnt >> 2) & 1, delay[2]);
-		//m_QD.setToPS((m_cnt >> 3) & 1, delay[3]);
+		OUTLOGIC(m_Q[i], (m_cnt >> i) & 1, delay[i]);
 }
 #endif
 #if !USE_OLD7493
@@ -646,12 +631,12 @@ NETLIB_CONSTRUCTOR(nic7493)
 NETLIB_UPDATE(nic7493ff)
 {
 	if (m_reset == 0)
-		m_Q.setTo(!m_Q.new_Q(), NLTIME_FROM_NS(18));
+		OUTLOGIC(m_Q, !m_Q.new_Q(), NLTIME_FROM_NS(18));
 }
 
 NETLIB_UPDATE(nic7493)
 {
-	net_sig_t r = INPVAL(m_R1) & INPVAL(m_R2);
+	net_sig_t r = INPLOGIC(m_R1) & INPLOGIC(m_R2);
 
 	if (r)
 	{
@@ -659,10 +644,10 @@ NETLIB_UPDATE(nic7493)
 		A.m_reset = B.m_reset = C.m_reset = D.m_reset = 1;
 		A.m_I.inactivate();
 		B.m_I.inactivate();
-		A.m_Q.setTo(0, NLTIME_FROM_NS(40));
-		B.m_Q.setTo(0, NLTIME_FROM_NS(40));
-		C.m_Q.setTo(0, NLTIME_FROM_NS(40));
-		D.m_Q.setTo(0, NLTIME_FROM_NS(40));
+		OUTLOGIC(A.m_Q, 0, NLTIME_FROM_NS(40));
+		OUTLOGIC(B.m_Q, 0, NLTIME_FROM_NS(40));
+		OUTLOGIC(C.m_Q, 0, NLTIME_FROM_NS(40));
+		OUTLOGIC(D.m_Q, 0, NLTIME_FROM_NS(40));
 	}
 	else
 	{
@@ -692,25 +677,25 @@ NETLIB_CONSTRUCTOR(nic7493)
 NETLIB_UPDATE(nic7493)
 {
 	//UINT8 old_clk = m_lastclk;
-	//m_lastclk = INPVAL(m_clk);
+	//m_lastclk = INPLOGIC(m_clk);
 
 	//printf("%s %d %d %d %d %d %d\n", name(), m_cnt, old_clk, m_QA.Q(), m_QB.Q(), m_QC.Q(), m_QD.Q());
-	if (INPVAL(m_R1) & INPVAL(m_R2))
+	if (INPLOGIC(m_R1) & INPLOGIC(m_R2))
 	{
 		if (m_cnt > 0)
 		{
 			m_cnt = 0;
-			m_QA.setTo(0, NLTIME_FROM_NS(40));
-			m_QB.setTo(0, NLTIME_FROM_NS(40));
-			m_QC.setTo(0, NLTIME_FROM_NS(40));
-			m_QD.setTo(0, NLTIME_FROM_NS(40));
+			OUTLOGIC(m_QA, 0, NLTIME_FROM_NS(40));
+			OUTLOGIC(m_QB, 0, NLTIME_FROM_NS(40));
+			OUTLOGIC(m_QC, 0, NLTIME_FROM_NS(40));
+			OUTLOGIC(m_QD, 0, NLTIME_FROM_NS(40));
 		}
 		m_CLK.inactivate();
 	}
 	//else if (old_clk & !m_lastclk)
 	else {
 		m_CLK.activate_hl();
-		if (INPVAL_LAST(m_CLK) & !INPVAL(m_CLK))
+		if (INP_HL(m_CLK))
 		{
 			m_cnt++;
 			m_cnt &= 0x0f;
@@ -722,32 +707,32 @@ NETLIB_UPDATE(nic7493)
 NETLIB_FUNC_VOID(nic7493, update_outputs, (void))
 {
 	if (m_cnt & 1)
-		m_QA.setToNoCheck(1, NLTIME_FROM_NS(16));
+		OUTLOGIC(m_QA, 1, NLTIME_FROM_NS(16));
 	else
 	{
-		m_QA.setToNoCheck(0, NLTIME_FROM_NS(16));
+		OUTLOGIC(m_QA, 0, NLTIME_FROM_NS(16));
 		switch (m_cnt)
 		{
 		case 0x00:
-			m_QD.setToNoCheck(0, NLTIME_FROM_NS(70));
-			m_QC.setToNoCheck(0, NLTIME_FROM_NS(48));
-			m_QB.setToNoCheck(0, NLTIME_FROM_NS(34));
+			OUTLOGIC(m_QD, 0, NLTIME_FROM_NS(70));
+			OUTLOGIC(m_QC, 0, NLTIME_FROM_NS(48));
+			OUTLOGIC(m_QB, 0, NLTIME_FROM_NS(34));
 			break;
 		case 0x02:
 		case 0x06:
 		case 0x0A:
 		case 0x0E:
-			m_QB.setToNoCheck(1, NLTIME_FROM_NS(34));
+			OUTLOGIC(m_QB, 1, NLTIME_FROM_NS(34));
 			break;
 		case 0x04:
 		case 0x0C:
-			m_QC.setToNoCheck(1, NLTIME_FROM_NS(48));
-			m_QB.setToNoCheck(0, NLTIME_FROM_NS(34));
+			OUTLOGIC(m_QC, 1, NLTIME_FROM_NS(48));
+			OUTLOGIC(m_QB, 0, NLTIME_FROM_NS(34));
 			break;
 		case 0x08:
-			m_QD.setToNoCheck(1, NLTIME_FROM_NS(70));
-			m_QC.setToNoCheck(0, NLTIME_FROM_NS(48));
-			m_QB.setToNoCheck(0, NLTIME_FROM_NS(34));
+			OUTLOGIC(m_QD, 1, NLTIME_FROM_NS(70));
+			OUTLOGIC(m_QC, 0, NLTIME_FROM_NS(48));
+			OUTLOGIC(m_QB, 0, NLTIME_FROM_NS(34));
 			break;
 		}
 	}
@@ -768,12 +753,12 @@ NETLIB_CONSTRUCTOR(nic74107A)
 	sub.m_QQ.initial(1);
 }
 
-INLINE void nic74107A_newstate(UINT8 state, ttl_output_t &Q, ttl_output_t &QQ)
+ATTR_HOT inline void nic74107Asub::newstate(const net_sig_t state)
 {
 	const netlist_time delay[2] = { NLTIME_FROM_NS(40), NLTIME_FROM_NS(25) };
 #if 1
-	Q.setTo(state, delay[1-state]);
-	QQ.setTo(1-state, delay[state]);
+	OUTLOGIC(m_Q, state, delay[state ^ 1]);
+	OUTLOGIC(m_QQ, state ^ 1, delay[state]);
 #else
 	if (state != Q.new_Q())
 	{
@@ -787,7 +772,7 @@ NETLIB_UPDATE(nic74107Asub)
 {
 	{
 		net_sig_t t = m_Q.new_Q();
-		nic74107A_newstate((!t & m_Q1) | (t & m_Q2) | m_F, m_Q, m_QQ);
+		newstate((!t & m_Q1) | (t & m_Q2) | m_F);
 		if (!m_Q1)
 			m_clk.inactivate();
 	}
@@ -795,19 +780,19 @@ NETLIB_UPDATE(nic74107Asub)
 
 NETLIB_UPDATE(nic74107A)
 {
-	if (INPVAL(m_J) & INPVAL(m_K))
+	if (INPLOGIC(m_J) & INPLOGIC(m_K))
 	{
 		sub.m_Q1 = 1;
 		sub.m_Q2 = 0;
 		sub.m_F  = 0;
 	}
-	else if (!INPVAL(m_J) & INPVAL(m_K))
+	else if (!INPLOGIC(m_J) & INPLOGIC(m_K))
 	{
 		sub.m_Q1 = 0;
 		sub.m_Q2 = 0;
 		sub.m_F  = 0;
 	}
-	else if (INPVAL(m_J) & !INPVAL(m_K))
+	else if (INPLOGIC(m_J) & !INPLOGIC(m_K))
 	{
 		sub.m_Q1 = 0;
 		sub.m_Q2 = 0;
@@ -820,13 +805,15 @@ NETLIB_UPDATE(nic74107A)
 		sub.m_F  = 0;
 		sub.m_clk.inactivate();
 	}
-	if (!INPVAL(m_clrQ))
+	if (!INPLOGIC(m_clrQ))
 	{
 		sub.m_clk.inactivate();
-		nic74107A_newstate(0, sub.m_Q, sub.m_QQ);
+		sub.newstate(0);
 	}
-	if (!sub.m_Q2 && INPVAL(m_clrQ))
+	else if (!sub.m_Q2)
 		sub.m_clk.activate_hl();
+	//if (!sub.m_Q2 & INPLOGIC(m_clrQ))
+	//	sub.m_clk.activate_hl();
 }
 
 NETLIB_CONSTRUCTOR(nic74153)
@@ -845,15 +832,15 @@ NETLIB_CONSTRUCTOR(nic74153)
 NETLIB_UPDATE(nic74153)
 {
 	const netlist_time delay[2] = { NLTIME_FROM_NS(23), NLTIME_FROM_NS(18) };
-	if (!INPVAL(m_GA))
+	if (!INPLOGIC(m_GA))
 	{
-		UINT8 chan = (INPVAL(m_A) | (INPVAL(m_B)<<1));
-		UINT8 t = INPVAL(m_I[chan]);
-		m_AY.setTo(t, delay[t] ); /* data to y only, FIXME */
+		UINT8 chan = (INPLOGIC(m_A) | (INPLOGIC(m_B)<<1));
+		UINT8 t = INPLOGIC(m_I[chan]);
+		OUTLOGIC(m_AY, t, delay[t] ); /* data to y only, FIXME */
 	}
 	else
 	{
-		m_AY.setTo(0, delay[0]);
+		OUTLOGIC(m_AY, 0, delay[0]);
 	}
 }
 
@@ -893,19 +880,19 @@ NETLIB_UPDATE(nic9316_sub)
 	}
 	else
 	{
-		m_cnt = (INPVAL_PASSIVE(m_D) << 3) | (INPVAL_PASSIVE(m_C) << 2) | (INPVAL_PASSIVE(m_B) << 1) | (INPVAL_PASSIVE(m_A) << 0);
+		m_cnt = (INPLOGIC_PASSIVE(m_D) << 3) | (INPLOGIC_PASSIVE(m_C) << 2) | (INPLOGIC_PASSIVE(m_B) << 1) | (INPLOGIC_PASSIVE(m_A) << 0);
 		update_outputs_all();
 	}
-	m_RC.setTo(m_ent & (m_cnt == 0x0f), NLTIME_FROM_NS(20));
+	OUTLOGIC(m_RC, m_ent & (m_cnt == 0x0f), NLTIME_FROM_NS(20));
 }
 
 NETLIB_UPDATE(nic9316)
 {
-	sub.m_loadq = INPVAL(m_LOADQ);
-	sub.m_ent = INPVAL(m_ENT);
-	const net_sig_t clrq = INPVAL(m_CLRQ);
+	sub.m_loadq = INPLOGIC(m_LOADQ);
+	sub.m_ent = INPLOGIC(m_ENT);
+	const net_sig_t clrq = INPLOGIC(m_CLRQ);
 
-	if ((!sub.m_loadq || (sub.m_ent & INPVAL(m_ENP))) & clrq)
+	if ((!sub.m_loadq || (sub.m_ent & INPLOGIC(m_ENP))) & clrq)
 	{
 		sub.m_clk.activate_lh();
 	}
@@ -916,58 +903,58 @@ NETLIB_UPDATE(nic9316)
 		{
 			sub.m_cnt = 0;
 			sub.update_outputs();
-			sub.m_RC.setTo(0, NLTIME_FROM_NS(20));
+			OUTLOGIC(sub.m_RC, 0, NLTIME_FROM_NS(20));
 			return;
 		}
 	}
-	sub.m_RC.setTo(sub.m_ent & (sub.m_cnt == 0x0f), NLTIME_FROM_NS(20));
+	OUTLOGIC(sub.m_RC, sub.m_ent & (sub.m_cnt == 0x0f), NLTIME_FROM_NS(20));
 }
 
 NETLIB_FUNC_VOID(nic9316_sub, update_outputs_all, (void))
 {
 	const netlist_time out_delay = NLTIME_FROM_NS(20);
-	m_QA.setTo((m_cnt >> 0) & 1, out_delay);
-	m_QB.setTo((m_cnt >> 1) & 1, out_delay);
-	m_QC.setTo((m_cnt >> 2) & 1, out_delay);
-	m_QD.setTo((m_cnt >> 3) & 1, out_delay);
+	OUTLOGIC(m_QA, (m_cnt >> 0) & 1, out_delay);
+	OUTLOGIC(m_QB, (m_cnt >> 1) & 1, out_delay);
+	OUTLOGIC(m_QC, (m_cnt >> 2) & 1, out_delay);
+	OUTLOGIC(m_QD, (m_cnt >> 3) & 1, out_delay);
 }
 
 NETLIB_FUNC_VOID(nic9316_sub, update_outputs, (void))
 {
 	const netlist_time out_delay = NLTIME_FROM_NS(20);
 #if 0
-	m_QA.setTo((m_cnt >> 0) & 1, out_delay);
-	m_QB.setTo((m_cnt >> 1) & 1, out_delay);
-	m_QC.setTo((m_cnt >> 2) & 1, out_delay);
-	m_QD.setTo((m_cnt >> 3) & 1, out_delay);
+	OUTLOGIC(m_QA, (m_cnt >> 0) & 1, out_delay);
+	OUTLOGIC(m_QB, (m_cnt >> 1) & 1, out_delay);
+	OUTLOGIC(m_QC, (m_cnt >> 2) & 1, out_delay);
+	OUTLOGIC(m_QD, (m_cnt >> 3) & 1, out_delay);
 #else
 	if ((m_cnt & 1) == 1)
-		m_QA.setToNoCheck(1, out_delay);
+		OUTLOGIC(m_QA, 1, out_delay);
 	else
 	{
-		m_QA.setToNoCheck(0, out_delay);
+		OUTLOGIC(m_QA, 0, out_delay);
 		switch (m_cnt)
 		{
 		case 0x00:
-			m_QB.setToNoCheck(0, out_delay);
-			m_QC.setToNoCheck(0, out_delay);
-			m_QD.setToNoCheck(0, out_delay);
+			OUTLOGIC(m_QB, 0, out_delay);
+			OUTLOGIC(m_QC, 0, out_delay);
+			OUTLOGIC(m_QD, 0, out_delay);
 			break;
 		case 0x02:
 		case 0x06:
 		case 0x0A:
 		case 0x0E:
-			m_QB.setToNoCheck(1, out_delay);
+			OUTLOGIC(m_QB, 1, out_delay);
 			break;
 		case 0x04:
 		case 0x0C:
-			m_QB.setToNoCheck(0, out_delay);
-			m_QC.setToNoCheck(1, out_delay);
+			OUTLOGIC(m_QB, 0, out_delay);
+			OUTLOGIC(m_QC, 1, out_delay);
 			break;
 		case 0x08:
-			m_QB.setToNoCheck(0, out_delay);
-			m_QC.setToNoCheck(0, out_delay);
-			m_QD.setToNoCheck(1, out_delay);
+			OUTLOGIC(m_QB, 0, out_delay);
+			OUTLOGIC(m_QC, 0, out_delay);
+			OUTLOGIC(m_QD, 1, out_delay);
 			break;
 		}
 
@@ -986,7 +973,7 @@ static const net_device_t_base_factory *netregistry[] =
 	ENTRY(netdev_log,		   	NETDEV_LOG)
 	ENTRY(netdev_clock,         NETDEV_CLOCK)
 	ENTRY(netdev_mainclock,     NETDEV_MAINCLOCK)
-	ENTRY(netdev_callback,      NETDEV_CALLBACK)
+	ENTRY(netdev_analog_callback,NETDEV_CALLBACK)
 	ENTRY(nicMultiSwitch,       NETDEV_SWITCH2)
 	ENTRY(nicRSFF,              NETDEV_RSFF)
 	ENTRY(nicMixer8,            NETDEV_MIXER)

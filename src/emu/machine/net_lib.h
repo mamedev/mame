@@ -66,7 +66,7 @@
 #define NETDEV_ANALOG_INPUT(_name)                                                  \
 		NET_REGISTER_DEV(netdev_analog_input, _name)
 #define NETDEV_CALLBACK(_name, _IN)                                                 \
-		NET_REGISTER_DEV(netdev_callback, _name)                                    \
+		NET_REGISTER_DEV(netdev_analog_callback, _name)                                    \
 		NET_CONNECT(_name, IN, _IN)
 #define NETDEV_SWITCH2(_name, _i1, _i2)                                             \
 		NET_REGISTER_DEV(nicMultiSwitch, _name)                                     \
@@ -333,6 +333,8 @@ NETLIB_SUBDEVICE(nic7474sub,
 	UINT8 m_nextD;
 	ttl_output_t m_Q;
 	ttl_output_t m_QQ;
+
+	ATTR_HOT inline void newstate(const UINT8 state);
 );
 
 NETLIB_DEVICE(nic7474,
@@ -357,12 +359,15 @@ NETLIB_DEVICE(nic7486,
 NETLIB_SUBDEVICE(nic74107Asub,
 	ttl_input_t m_clk;
 
-	UINT8 m_Q1;
-	UINT8 m_Q2;
-	UINT8 m_F;
-
 	ttl_output_t m_Q;
 	ttl_output_t m_QQ;
+
+
+	net_sig_t m_Q1;
+	net_sig_t m_Q2;
+	net_sig_t m_F;
+
+	ATTR_HOT void newstate(const net_sig_t state);
 
 );
 
