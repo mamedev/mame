@@ -60,7 +60,7 @@ USE_DISPATCH_GL = 1
 
 # uncomment the next line to compile and link against SDL2.0
 
-SDL_LIBVER = sdl2
+# SDL_LIBVER = sdl2
 
 # uncomment the next line to use couriersud's multi-keyboard patch for sdl2.0
 # SDL2_MULTIAPI = 1
