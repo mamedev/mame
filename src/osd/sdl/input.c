@@ -722,9 +722,13 @@ static void sdlinput_register_joysticks(running_machine &machine)
 	{
 		char *joy_name; 
 
+#if (SDLMAME_SDL2)
 		joy = SDL_JoystickOpen(physical_stick);
 		joy_name = remove_spaces(machine, SDL_JoystickName(joy));
 		SDL_JoystickClose(joy);
+#else
+		joy_name = remove_spaces(machine, SDL_JoystickName(physical_stick));
+#endif
 
 		devmap_register(&joy_map, physical_stick, joy_name);
 	}
