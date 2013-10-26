@@ -1078,6 +1078,7 @@ public:
 		INT32           delta;                  // for analog controls
 		INT32           centerdelta;            // for analog controls
 		bool            reverse;                // for analog controls
+		bool            toggle;                 // for non-analog controls
 	};
 	void get_user_settings(user_settings &settings);
 	void set_user_settings(const user_settings &settings);
