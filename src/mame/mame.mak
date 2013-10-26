@@ -1351,7 +1351,7 @@ $(MAMEOBJ)/namco.a: \
 	$(DRIVERS)/tankbatt.o $(VIDEO)/tankbatt.o \
 	$(DRIVERS)/tceptor.o $(VIDEO)/tceptor.o \
 	$(DRIVERS)/toypop.o $(VIDEO)/toypop.o \
-	$(DRIVERS)/turrett.o \
+	$(DRIVERS)/turrett.o $(AUDIO)/turrett.o $(VIDEO)/turrett.o \
 	$(DRIVERS)/warpwarp.o $(AUDIO)/geebee.o $(AUDIO)/warpwarp.o $(VIDEO)/warpwarp.o \
 	$(MACHINE)/namcoio.o \
 	$(MACHINE)/namco06.o \

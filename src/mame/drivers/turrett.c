@@ -1,138 +1,389 @@
-/*
+/***************************************************************************
 
-Turret Tower by Dell Electronics
+    Turret Tower by Dell Electronics
 
-PCB Info
-========
+    driver by Phil Bennett
 
-Silkscreened    Copyright (c) 2001 Dell Electroinics Labs, Ltd
-
-Samsung SV2001H Hard drive  stickered   (c)DELL V1.XX
-                        TOCAB0181
-                        TURRET TOWER
-
-IDT         79R3041-25J
-        XG0110P
-
-Xilinx Spartan  XCS30XL         x2
-        PQ208AKP0105
-        D1164035A
-        4c
-
-
-Xilinx      XC9572
-        PC84AEM0109
-        A1172748A
-        10C
-
-IDT     71124           x8
-        S12Y
-        N0048M
-
-COMPAQ      MT16LSDT1664AG-10CY5    SDRAM stick x2
-
-.u7 AM29F040B   stickered   U7 (c)DELL
-
-.u8 AM29F040B   stickered   U8 (c)DELL
-
-.u12    AM29F040B   stickered   U12 (c)DELL
-
-.u13    AM29F040B   stickered   U13 (c)DELL
-
-.u29            stickered   TTML(1) (c) DELL    Unmarked chip looks like 28 PIN DIP PLD
-
-
-CHDMAN info
-Version 0.128
-Input offset    511
-Cycliders   2438
-Heads       255
-Sectors     63
-Bytes/Sector    512
-Sectors/Hunk    8
-Logical size    20,053,232,640
-
-Windows showed a 5.94 gig partion empty and a 12.74 unallocated partition
-
-
-*/
-
+****************************************************************************/
 
 #include "emu.h"
 #include "cpu/mips/r3000.h"
+#include "machine/ataintf.h"
+#include "includes/turrett.h"
 
 
-class turrett_state : public driver_device
+
+/*************************************
+ *
+ *  Definitions
+ *
+ *************************************/
+
+#define R3041_CLOCK         XTAL_25MHz
+
+
+
+/*************************************
+ *
+ *  Machine initialization
+ *
+ *************************************/
+
+void turrett_state::machine_start()
 {
-public:
-	turrett_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")
-	{ }
+	// Allocate memory for the two 256kx16 banks of video RAM
+	m_video_ram[0] = (UINT16*)auto_alloc_array(machine(), UINT16, VRAM_BANK_WORDS);
+	m_video_ram[1] = (UINT16*)auto_alloc_array(machine(), UINT16, VRAM_BANK_WORDS);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	// Register our state for saving
+	save_pointer(NAME(m_video_ram[0]), VRAM_BANK_WORDS);
+	save_pointer(NAME(m_video_ram[1]), VRAM_BANK_WORDS);
+	save_item(NAME(m_inputs_active));
+	save_item(NAME(m_last_pixel));
+	save_item(NAME(m_video_ctrl));
+	save_item(NAME(m_video_fade));
+	save_item(NAME(m_x_pos));
+	save_item(NAME(m_x_start));
+	save_item(NAME(m_x_mod));
+	save_item(NAME(m_dx));
+	save_item(NAME(m_y_pos));
+	save_item(NAME(m_scale_cnt_y));
+	save_item(NAME(m_scale_cnt_x));
+	save_item(NAME(m_skip_x));
+	save_item(NAME(m_skip_y));
+	save_item(NAME(m_scale));
+	save_item(NAME(m_hotspot_x));
+	save_item(NAME(m_hotspot_y));
+	save_item(NAME(m_dma_idle));
+	save_item(NAME(m_dma_addr));
+	save_item(NAME(m_ipt_val));
+	save_item(NAME(m_frame));
+	save_item(NAME(m_adc));
 
-protected:
-
-	// devices
-	required_device<cpu_device> m_maincpu;
-
-	// driver_device overrides
-	virtual void video_start();
-};
-
-
-#define R3041_CLOCK     25000000
-
-
-void turrett_state::video_start()
-{
+	m_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(turrett_state::dma_complete), this));
 }
 
-UINT32 turrett_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+
+void turrett_state::machine_reset()
 {
-	return 0;
+	m_dma_idle = true;
+	m_frame = 0;
+	m_adc = 0;
+	m_inputs_active = 0;
 }
 
+
+
+/*************************************
+ *
+ *  Memory maps
+ *
+ *************************************/
 
 static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 32, turrett_state )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM
-	AM_RANGE(0x1fc00000, 0x1fdfffff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x02000010, 0x02000013) AM_RAM
 	AM_RANGE(0x02000040, 0x02000043) AM_RAM
 	AM_RANGE(0x02000050, 0x02000053) AM_RAM
 	AM_RANGE(0x02000060, 0x02000063) AM_RAM
-	AM_RANGE(0x02000070, 0x02000073) AM_RAM
-	AM_RANGE(0x04000100, 0x04000103) AM_RAM
-	AM_RANGE(0x08000000, 0x08000003) AM_RAM
-	AM_RANGE(0x08000004, 0x08000007) AM_RAM
-	AM_RANGE(0x08000008, 0x0800000b) AM_RAM
-	AM_RANGE(0x0800000c, 0x0800000f) AM_RAM
+	AM_RANGE(0x02000070, 0x02000073) AM_RAM // TODO: What are these?
+	AM_RANGE(0x04000000, 0x0400000f) AM_WRITE(dma_w)
+	AM_RANGE(0x04000100, 0x04000103) AM_READWRITE(int_r, int_w)
+	AM_RANGE(0x04000200, 0x040003ff) AM_DEVREADWRITE("ttsound", turrett_device, read, write)
+	AM_RANGE(0x08000000, 0x0800000f) AM_READWRITE(video_r, video_w)
+	AM_RANGE(0x08000200, 0x080003ff) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs0, write_cs0, 0xffffffff)
+	AM_RANGE(0x1fc00000, 0x1fdfffff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
 
+static ADDRESS_MAP_START( turrett_sound_map, AS_0, 16, turrett_state )
+	AM_RANGE(0x0000000, 0x7ffffff) AM_RAM AM_SHARE("bank_a")
+	AM_RANGE(0x8000000, 0xfffffff) AM_RAM AM_SHARE("bank_b")
+ADDRESS_MAP_END
+
+
+
+/*************************************
+ *
+ *  Port definitions
+ *
+ *************************************/
+
 static INPUT_PORTS_START( turrett )
+	PORT_START("PORT 0X")
+	PORT_BIT( 0x3f, 0x00, IPT_AD_STICK_Y ) PORT_MINMAX(0x20,0x1f) PORT_SENSITIVITY(60) PORT_KEYDELTA(2)
+
+	PORT_START("PORT 4X")
+	PORT_BIT( 0x3f, 0x00, IPT_AD_STICK_X ) PORT_MINMAX(0x20,0x1f) PORT_SENSITIVITY(60) PORT_KEYDELTA(2)
+
+	PORT_START("PORT CX")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )    PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, (void *)0x00000100)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )   PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, (void *)0x00000200)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BILL1 )      PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, (void *)0x00000400)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )    PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, (void *)0x00000800)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )      PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, (void *)0x00001000)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )      PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, (void *)0x00002000)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START )      PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, (void *)0x00004000)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, (void *)0x00008000)
+
+	PORT_START("PORT DX")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )    PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, (void *)0x00010000)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )    PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, (void *)0x00020000)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 )    PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, (void *)0x00040000)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )    PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, (void *)0x00080000)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )    PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, (void *)0x00100000)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )    PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, (void *)0x00200000)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )    PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, (void *)0x00400000)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, (void *)0x00800000)
+
+	PORT_START("PORT EX")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Floor mat")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Door Lock") PORT_TOGGLE
+
+	PORT_START("PORT FX")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Seat Belt") PORT_TOGGLE
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Home")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Emergency Stop") PORT_TOGGLE
 INPUT_PORTS_END
 
 
 
+/*************************************
+ *
+ *  I/O handling
+ *
+ *************************************/
+
+READ_LINE_MEMBER( turrett_state::sbrc2_r )
+{
+	return machine().primary_screen->vblank();
+}
+
+
+READ_LINE_MEMBER( turrett_state::sbrc3_r )
+{
+	return m_dma_idle;
+}
+
+
+READ32_MEMBER( turrett_state::int_r )
+{
+	return update_inputs() << 24;
+}
+
+
+WRITE32_MEMBER( turrett_state::int_w )
+{
+	// TODO
+	logerror("Output write: %08x\n", data);
+}
+
+
+UINT32 turrett_state::update_inputs(void)
+{
+	UINT32 val = 0;
+
+	// TODO: Prioritise?
+	if (m_inputs_active)
+	{
+		if (m_inputs_active & 0x00000001)
+		{
+			val = 0x00 | (ioport("PORT 0X")->read() & 0x3f);
+			m_inputs_active &= ~1;
+		}
+		else if (m_inputs_active & 0x00000002)
+		{
+			val = 0x40 | (ioport("PORT 4X")->read() & 0x3f);
+			m_inputs_active &= ~2;
+		}
+		else if (m_inputs_active & 0x0000ff00)
+		{
+			UINT32 data = ioport("PORT CX")->read();
+			UINT32 bits = m_inputs_active >> 8;
+
+			val = 0xc0;
+
+			for (int i = 0; i < 8; ++i)
+			{
+				if (bits & (1 << i))
+				{
+					val |= i << 1;
+					val |= (data >> i) & 1;
+					m_inputs_active &= ~(1 << (i + 8));
+					break;
+				}
+			}
+		}
+		else if (m_inputs_active & 0x00ff0000)
+		{
+			UINT32 data = ioport("PORT DX")->read();
+			UINT32 bits = m_inputs_active >> 16;
+
+			val = 0xd0;
+
+			for (int i = 0; i < 8; ++i)
+			{
+				if (bits & (1 << i))
+				{
+					val |= i << 1;
+					val |= (data >> i) & 1;
+					m_inputs_active &= ~(1 << (i + 16));
+					break;
+				}
+			}
+		}
+		else if (m_inputs_active & 0x01000000)
+		{
+			val = 0xe0 | ioport("PORT EX")->read();
+			m_inputs_active &= ~0x01000000;
+		}
+		else if (m_inputs_active & 0x02000000)
+		{
+			val = 0xf0 | ioport("PORT FX")->read();
+			m_inputs_active &= ~0x02000000;
+		}
+	}
+
+	// Update IRQ state
+	m_maincpu->set_input_line(R3000_IRQ1, m_inputs_active ? ASSERT_LINE : CLEAR_LINE);
+	return val;
+}
+
+
+INPUT_CHANGED_MEMBER( turrett_state::ipt_change )
+{
+	int p = (FPTR)param;
+
+	if (newval != oldval)
+	{
+		// TODO: Tidy this up
+		if (p & (0x02000000 | 0x00000200 | 0x00000400 | 0x00001000 | 0x00002000))
+		{
+			if (newval == 0)
+			{
+				m_inputs_active |= p;
+				m_maincpu->set_input_line(R3000_IRQ1, ASSERT_LINE);
+			}
+		}
+		else
+		{
+			m_inputs_active |= p;
+			m_maincpu->set_input_line(R3000_IRQ1, ASSERT_LINE);
+		}
+	}
+}
+
+
+
+/*************************************
+ *
+ *  Interrupts
+ *
+ *************************************/
+
+INTERRUPT_GEN_MEMBER( turrett_state::vblank )
+{
+	if (m_frame)
+		m_inputs_active |= 0x01000000;
+	else
+		m_inputs_active |= 0x02000000;
+
+	m_frame ^= 1;
+	m_maincpu->set_input_line(R3000_IRQ1, ASSERT_LINE);
+}
+
+
+INTERRUPT_GEN_MEMBER( turrett_state::adc )
+{
+	if (m_adc)
+		m_inputs_active |= 0x00000001;
+	else
+		m_inputs_active |= 0x00000002;
+
+	m_adc ^= 1;
+	m_maincpu->set_input_line(R3000_IRQ1, ASSERT_LINE);
+}
+
+/*************************************
+ *
+ *  Hard drive
+ *
+ *************************************/
+
+/// HACK: The game expects a different LBA mapping to the standard HDD.
+/// The reason for this is unknown.
+
+#include "machine/idehd.h"
+
+extern const device_type TURRETT_HARDDISK;
+
+class turrett_hdd : public ide_hdd_device
+{
+public:
+	turrett_hdd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+		: ide_hdd_device(mconfig, TURRETT_HARDDISK, "Turrett Tower HDD", tag, owner, clock, "turrett_hdd", __FILE__)
+	{
+	}
+
+	virtual UINT32 lba_address()
+	{
+		if (m_device_head & IDE_DEVICE_HEAD_L)
+			return (((m_device_head & IDE_DEVICE_HEAD_HS) << 24) | (m_cylinder_high << 16) | (m_cylinder_low << 8) | m_sector_number) - 63;
+
+		return ata_mass_storage_device::lba_address();
+	}
+};
+
+const device_type TURRETT_HARDDISK = &device_creator<turrett_hdd>;
+
+SLOT_INTERFACE_START(turrett_devices)
+	SLOT_INTERFACE("hdd", TURRETT_HARDDISK)
+SLOT_INTERFACE_END
+
+/*************************************
+ *
+ *  Machine driver
+ *
+ *************************************/
+
 static MACHINE_CONFIG_START( turrett, turrett_state )
+
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", R3041, R3041_CLOCK)
 	MCFG_R3000_ENDIANNESS(ENDIANNESS_BIG)
+	MCFG_R3000_BRCOND2_INPUT(READLINE(turrett_state, sbrc2_r))
+	MCFG_R3000_BRCOND3_INPUT(READLINE(turrett_state, sbrc3_r))
 	MCFG_CPU_PROGRAM_MAP(cpu_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", turrett_state, vblank)
+	MCFG_CPU_PERIODIC_INT_DRIVER(turrett_state, adc, 60)
+
+	MCFG_ATA_INTERFACE_ADD("ata", turrett_devices, "hdd", NULL, true)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	// TODO: Likely not correct. Refresh rate empirically determined
+	// to ensure in-sync streaming sound
+	MCFG_SCREEN_RAW_PARAMS(4000000, 512, 0, 336, 259, 0, 244)
 	MCFG_SCREEN_UPDATE_DRIVER(turrett_state, screen_update)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0*8, 32*8-1)
+	MCFG_PALETTE_LENGTH(32768)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, RRRRR_GGGGG_BBBBB)
 
-	MCFG_PALETTE_LENGTH(0x2000)
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_DEVICE_ADD("ttsound", TURRETT, R3041_CLOCK) // ?
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, turrett_sound_map)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
+
+
+	/*************************************
+	*
+	*  ROM definition
+	*
+	*************************************/
 
 ROM_START( turrett )
 	ROM_REGION( 0x200000, "maincpu", 0 )
@@ -141,9 +392,16 @@ ROM_START( turrett )
 	ROM_LOAD32_BYTE( "turret.u8",  0x000002, 0x080000, CRC(ddff4898) SHA1(a8f859a0dcab8ec83fbfe255d58b3e644933b923) )
 	ROM_LOAD32_BYTE( "turret.u7",  0x000003, 0x080000, CRC(fa8b5a5a) SHA1(658e9eeadc9c70185973470565d562c76f4fcdd7) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "turrett", 0, SHA1(b0c98c5876870dd8b3e37a38fe35846c9e011df4) )
 ROM_END
 
 
-GAME( 2001, turrett, 0, turrett, turrett, driver_device, 0, ROT0, "Dell Electronics (Namco license)", "Turret Tower", GAME_IS_SKELETON )
+
+/*************************************
+ *
+ *  Game driver
+ *
+ *************************************/
+
+GAME( 2001, turrett, 0, turrett, turrett, driver_device, 0, ROT0, "Dell Electronics (Namco license)", "Turret Tower", 0 )
