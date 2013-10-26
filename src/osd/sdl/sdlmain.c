@@ -553,9 +553,9 @@ static void osd_sdl_info(void)
 		int j;
 
 		mame_printf_verbose("\tDisplay #%d\n", i);
-		if (SDL_GetDesktopDisplayMode(i, &mode));
+		if (SDL_GetDesktopDisplayMode(i, &mode))
 			mame_printf_verbose("\t\tDesktop Mode:         %dx%d-%d@%d\n", mode.w, mode.h, SDL_BITSPERPIXEL(mode.format), mode.refresh_rate);
-		if (SDL_GetCurrentDisplayMode(i, &mode));
+		if (SDL_GetCurrentDisplayMode(i, &mode))
 			mame_printf_verbose("\t\tCurrent Display Mode: %dx%d-%d@%d\n", mode.w, mode.h, SDL_BITSPERPIXEL(mode.format), mode.refresh_rate);
 		mame_printf_verbose("\t\tRenderdrivers:\n");
 		for (j=0; j<SDL_GetNumRenderDrivers(); j++)
