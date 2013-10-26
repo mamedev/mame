@@ -360,7 +360,14 @@ CPU_DISASSEMBLE( spc700 )
 	else if (opcode->name == RET || opcode->name == RETI)
 		flags = DASMFLAG_STEP_OUT;
 
-	for(i=0;i<2;i++)
+	if (opcode->args[0] == DP && (opcode->args[1] == DP || opcode->args[1] == IMM))
+	{
+		int src = read_8_immediate();
+		int dst = read_8_immediate();
+		sprintf(ptr, "$%02x,%s$%02x", dst, (opcode->args[1] == IMM ? "#" : ""), src);
+		ptr += strlen(ptr);
+	}
+	else for(i=0;i<2;i++)
 	{
 		if(i == 1 && opcode->args[0] != IMP && opcode->args[1] != IMP)
 		{
