@@ -276,18 +276,16 @@ void jaguar_state::update_cpu_irq()
 }
 
 
-void jaguar_state::gpu_cpu_int(device_t *device)
+WRITE_LINE_MEMBER( jaguar_state::gpu_cpu_int )
 {
-	jaguar_state &state = *device->machine().driver_data<jaguar_state>();
-	state.m_cpu_irq_state |= 2;
-	state.update_cpu_irq();
+	m_cpu_irq_state |= 2;
+	update_cpu_irq();
 }
 
-void jaguar_state::dsp_cpu_int(device_t *device)
+WRITE_LINE_MEMBER( jaguar_state::dsp_cpu_int )
 {
-	jaguar_state &state = *device->machine().driver_data<jaguar_state>();
-	state.m_cpu_irq_state |= 16;
-	state.update_cpu_irq();
+	m_cpu_irq_state |= 16;
+	update_cpu_irq();
 }
 
 

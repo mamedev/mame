@@ -216,8 +216,8 @@ public:
 	DECLARE_READ32_MEMBER( cojag_gun_input_r );
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	static void gpu_cpu_int(device_t *device);
-	static void dsp_cpu_int(device_t *device);
+	DECLARE_WRITE_LINE_MEMBER( gpu_cpu_int );
+	DECLARE_WRITE_LINE_MEMBER( dsp_cpu_int );
 	DECLARE_WRITE_LINE_MEMBER( external_int );
 
 	int quickload(device_image_interface &image, const char *file_type, int quickload_size);

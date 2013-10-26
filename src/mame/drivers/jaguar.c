@@ -1530,17 +1530,6 @@ INPUT_PORTS_END
  *
  *************************************/
 
-	static const jaguar_cpu_config gpu_config =
-{
-	&jaguar_state::gpu_cpu_int
-};
-
-
-static const jaguar_cpu_config dsp_config =
-{
-	&jaguar_state::dsp_cpu_int
-};
-
 static MACHINE_CONFIG_START( cojagr3k, jaguar_state )
 
 	/* basic machine hardware */
@@ -1549,11 +1538,11 @@ static MACHINE_CONFIG_START( cojagr3k, jaguar_state )
 	MCFG_CPU_PROGRAM_MAP(r3000_map)
 
 	MCFG_CPU_ADD("gpu", JAGUARGPU, COJAG_CLOCK/2)
-	MCFG_CPU_CONFIG(gpu_config)
+	MCFG_JAGUAR_IRQ_HANDLER(WRITELINE(jaguar_state, gpu_cpu_int))
 	MCFG_CPU_PROGRAM_MAP(gpu_map)
 
 	MCFG_CPU_ADD("dsp", JAGUARDSP, COJAG_CLOCK/2)
-	MCFG_CPU_CONFIG(dsp_config)
+	MCFG_JAGUAR_IRQ_HANDLER(WRITELINE(jaguar_state, dsp_cpu_int))
 	MCFG_CPU_PROGRAM_MAP(dsp_map)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -1598,11 +1587,11 @@ static MACHINE_CONFIG_START( jaguar, jaguar_state )
 	MCFG_CPU_PROGRAM_MAP(jaguar_map)
 
 	MCFG_CPU_ADD("gpu", JAGUARGPU, JAGUAR_CLOCK)
-	MCFG_CPU_CONFIG(gpu_config)
+	MCFG_JAGUAR_IRQ_HANDLER(WRITELINE(jaguar_state, gpu_cpu_int))
 	MCFG_CPU_PROGRAM_MAP(jag_gpu_map)
 
 	MCFG_CPU_ADD("dsp", JAGUARDSP, JAGUAR_CLOCK)
-	MCFG_CPU_CONFIG(dsp_config)
+	MCFG_JAGUAR_IRQ_HANDLER(WRITELINE(jaguar_state, dsp_cpu_int))
 	MCFG_CPU_PROGRAM_MAP(jag_dsp_map)
 
 //  MCFG_NVRAM_HANDLER(jaguar)

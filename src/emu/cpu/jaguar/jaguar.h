@@ -70,17 +70,11 @@ enum
 
 
 /***************************************************************************
-    CONFIGURATION STRUCTURE
+    CONFIGURATION
 ***************************************************************************/
 
-typedef void (*jaguar_int_func)(device_t *device);
-
-
-struct jaguar_cpu_config
-{
-	jaguar_int_func     cpu_int_callback;
-};
-
+#define MCFG_JAGUAR_IRQ_HANDLER(_devcb) \
+	devcb = &jaguar_cpu_device::set_int_func(*device, DEVCB2_##_devcb);
 
 
 /***************************************************************************
