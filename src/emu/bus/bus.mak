@@ -273,12 +273,44 @@ endif
 
 #-------------------------------------------------
 #
+#@src/emu/bus/iq151/iq151.h,BUSES += IQ151
+#-------------------------------------------------
+
+ifneq ($(filter IQ151,$(BUSES)),)
+BUSOBJS += $(BUSOBJ)/iq151/iq151.o
+BUSOBJS += $(BUSOBJ)/iq151/disc2.o
+BUSOBJS += $(BUSOBJ)/iq151/grafik.o
+BUSOBJS += $(BUSOBJ)/iq151/minigraf.o
+BUSOBJS += $(BUSOBJ)/iq151/ms151a.o
+BUSOBJS += $(BUSOBJ)/iq151/rom.o
+BUSOBJS += $(BUSOBJ)/iq151/staper.o
+BUSOBJS += $(BUSOBJ)/iq151/video32.o
+BUSOBJS += $(BUSOBJ)/iq151/video64.o
+endif
+
+
+#-------------------------------------------------
+#
 #@src/emu/bus/isbx/isbx.h,BUSES += ISBX
 #-------------------------------------------------
 
 ifneq ($(filter ISBX,$(BUSES)),)
 BUSOBJS += $(BUSOBJ)/isbx/isbx.o
 BUSOBJS += $(BUSOBJ)/isbx/compis_fdc.o
+endif
+
+
+#-------------------------------------------------
+#
+#@src/emu/bus/kc/kc.h,BUSES += KC
+#-------------------------------------------------
+
+ifneq ($(filter KC,$(BUSES)),)
+BUSOBJS += $(BUSOBJ)/kc/kc.o
+BUSOBJS += $(BUSOBJ)/kc/d002.o
+BUSOBJS += $(BUSOBJ)/kc/d004.o
+BUSOBJS += $(BUSOBJ)/kc/ram.o
+BUSOBJS += $(BUSOBJ)/kc/rom.o
 endif
 
 
@@ -329,6 +361,17 @@ BUSOBJS += $(BUSOBJ)/s100/mm65k16s.o
 BUSOBJS += $(BUSOBJ)/s100/nsmdsa.o
 BUSOBJS += $(BUSOBJ)/s100/nsmdsad.o
 BUSOBJS += $(BUSOBJ)/s100/wunderbus.o
+endif
+
+
+#-------------------------------------------------
+#
+#@src/emu/bus/tvc/tvc.h,BUSES += TVC
+#-------------------------------------------------
+
+ifneq ($(filter TVC,$(BUSES)),)
+BUSOBJS += $(BUSOBJ)/tvc/tvc.o
+BUSOBJS += $(BUSOBJ)/tvc/hbf.o
 endif
 
 
@@ -427,6 +470,19 @@ BUSOBJS += $(BUSOBJ)/wangpc/mvc.o
 BUSOBJS += $(BUSOBJ)/wangpc/rtc.o
 BUSOBJS += $(BUSOBJ)/wangpc/tig.o
 BUSOBJS += $(BUSOBJ)/wangpc/wdc.o
+endif
+
+
+#-------------------------------------------------
+#
+#@src/emu/bus/z88/z88.h,BUSES += Z88
+#-------------------------------------------------
+
+ifneq ($(filter Z88,$(BUSES)),)
+BUSOBJS += $(BUSOBJ)/z88/z88.o
+BUSOBJS += $(BUSOBJ)/z88/flash.o
+BUSOBJS += $(BUSOBJ)/z88/ram.o
+BUSOBJS += $(BUSOBJ)/z88/rom.o
 endif
 
 #-------------------------------------------------

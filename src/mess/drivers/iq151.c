@@ -49,15 +49,15 @@ ToDo:
 #include "imagedev/cassette.h"
 
 // cartridge slot
-#include "machine/iq151cart.h"
-#include "machine/iq151_rom.h"
-#include "machine/iq151_disc2.h"
-#include "machine/iq151_minigraf.h"
-#include "machine/iq151_ms151a.h"
-#include "machine/iq151_staper.h"
-#include "video/iq151_grafik.h"
-#include "video/iq151_video32.h"
-#include "video/iq151_video64.h"
+#include "bus/iq151/iq151.h"
+#include "bus/iq151/rom.h"
+#include "bus/iq151/disc2.h"
+#include "bus/iq151/minigraf.h"
+#include "bus/iq151/ms151a.h"
+#include "bus/iq151/staper.h"
+#include "bus/iq151/grafik.h"
+#include "bus/iq151/video32.h"
+#include "bus/iq151/video64.h"
 
 
 

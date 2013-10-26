@@ -54,6 +54,10 @@ OBJDIRS += \
 	$(EMUOBJ)/bus/a2bus \
 	$(EMUOBJ)/bus/nubus \
 	$(EMUOBJ)/bus/centronics \
+	$(EMUOBJ)/bus/iq151 \
+	$(EMUOBJ)/bus/kc \
+	$(EMUOBJ)/bus/tvc \
+	$(EMUOBJ)/bus/z88 \
 	$(EMUOBJ)/drivers \
 	$(EMUOBJ)/machine \
 	$(EMUOBJ)/layout \

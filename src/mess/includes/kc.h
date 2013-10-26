@@ -31,11 +31,11 @@
 #include "formats/kc_cas.h"
 
 // Expansions
-#include "machine/kcexp.h"
-#include "machine/kc_ram.h"
-#include "machine/kc_rom.h"
-#include "machine/kc_d002.h"
-#include "machine/kc_d004.h"
+#include "bus/kc/kc.h"
+#include "bus/kc/ram.h"
+#include "bus/kc/rom.h"
+#include "bus/kc/d002.h"
+#include "bus/kc/d004.h"
 
 // from service manual
 #define KC85_3_CLOCK 1751938

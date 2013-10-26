@@ -508,6 +508,10 @@ BUSES += WANGPC
 BUSES += A2BUS
 BUSES += NUBUS
 BUSES += CENTRONICS
+BUSES += IQ151
+BUSES += KC
+BUSES += TVC
+BUSES += Z88
 
 #-------------------------------------------------
 # this is the list of driver libraries that
@@ -862,10 +866,6 @@ $(MESSOBJ)/acorn.a:             \
 	$(MESS_DRIVERS)/electron.o  \
 	$(MESS_DRIVERS)/z88.o       \
 	$(MESS_VIDEO)/z88.o         \
-	$(MESS_MACHINE)/z88cart.o   \
-	$(MESS_MACHINE)/z88_flash.o \
-	$(MESS_MACHINE)/z88_ram.o   \
-	$(MESS_MACHINE)/z88_rom.o   \
 	$(MESS_MACHINE)/upd65031.o  \
 
 $(MESSOBJ)/act.a:               \
@@ -2056,11 +2056,6 @@ $(MESSOBJ)/veb.a:               \
 	$(MESS_DRIVERS)/kc.o        \
 	$(MESS_MACHINE)/kc.o        \
 	$(MESS_MACHINE)/kc_keyb.o   \
-	$(MESS_MACHINE)/kcexp.o     \
-	$(MESS_MACHINE)/kc_ram.o    \
-	$(MESS_MACHINE)/kc_rom.o    \
-	$(MESS_MACHINE)/kc_d002.o   \
-	$(MESS_MACHINE)/kc_d004.o   \
 	$(MESS_DRIVERS)/lc80.o      \
 	$(MESS_DRIVERS)/mc80.o      \
 	$(MESS_VIDEO)/mc80.o        \
@@ -2076,8 +2071,6 @@ $(MESSOBJ)/vidbrain.a:          \
 $(MESSOBJ)/videoton.a:          \
 	$(MESS_DRIVERS)/tvc.o       \
 	$(MESS_AUDIO)/tvc.o         \
-	$(MESS_MACHINE)/tvcexp.o    \
-	$(MESS_MACHINE)/tvc_hbf.o   \
 
 $(MESSOBJ)/visual.a:            \
 	$(MESS_DRIVERS)/v1050.o     \
@@ -2120,15 +2113,6 @@ $(MESSOBJ)/yamaha.a:            \
 
 $(MESSOBJ)/zpa.a:               \
 	$(MESS_DRIVERS)/iq151.o     \
-	$(MESS_MACHINE)/iq151cart.o \
-	$(MESS_MACHINE)/iq151_rom.o \
-	$(MESS_MACHINE)/iq151_disc2.o   \
-	$(MESS_MACHINE)/iq151_minigraf.o\
-	$(MESS_MACHINE)/iq151_ms151a.o  \
-	$(MESS_MACHINE)/iq151_staper.o  \
-	$(MESS_VIDEO)/iq151_grafik.o    \
-	$(MESS_VIDEO)/iq151_video32.o   \
-	$(MESS_VIDEO)/iq151_video64.o   \
 
 $(MESSOBJ)/zvt.a:               \
 	$(MESS_DRIVERS)/pp01.o      \
