@@ -133,8 +133,6 @@ public:
 	inline void set_video_waitstates(bool wait) { m_video_waitstates = wait; }
 	inline void set_extra_waitstates(bool wait) { m_extra_waitstates = wait; }
 
-	void set_wait(int min);
-
 	DECLARE_READ8_MEMBER( readm );
 	DECLARE_WRITE8_MEMBER( writem );
 	DECLARE_SETOFFSET_MEMBER( setoffset );
@@ -157,10 +155,14 @@ private:
 	DECLARE_WRITE8_MEMBER( write_grom );
 
 	// wait states
+	void        set_wait(int min);
+	void        set_ext_wait(int min);
 	bool        m_video_waitstates;
 	bool        m_extra_waitstates;
 
 	bool        m_read_mode;
+
+	bool        m_debug_no_ws;
 
 	// Mapper function
 	typedef struct
@@ -178,7 +180,7 @@ private:
 	bool    m_cartridge7_writable;
 	int     m_map[8];
 
-	void    decode(address_space& space, offs_t offset, bool setwait, bool read_mode, decdata* dec);
+	void    decode(address_space& space, offs_t offset, bool read_mode, decdata* dec);
 	decdata m_decoded;
 
 	// Genmod modifications
@@ -194,6 +196,7 @@ private:
 
 	// Counter for the wait states.
 	int   m_waitcount;
+	int     m_ext_waitcount;
 
 	// Devices
 	mm58274c_device*        m_clock;
