@@ -50,6 +50,9 @@ TODO:
 - xexex sets up 0x20 as the VC? default value?
 - xexex layers are offsetted if you try to use the CCU
 - understand how to interpret the back / front porch values, and remove the offset x/y hack
+- dual screen support (for Konami GX types 3/4)
+- viostorm and dbz reads the VCT port, but their usage is a side effect to send an irq ack thru the same port:
+  i.e. first one uses move.b $26001d.l, $26001d.l, second one clr.b
 
 ***************************************************************************************************************************/
 
@@ -135,7 +138,17 @@ void k053252_device::device_reset()
 READ8_MEMBER( k053252_device::read )
 {
 	//TODO: debugger_access()
-	popmessage("Warning: k053252 read %02x, contact MAMEdev",offset);
+	switch(offset)
+	{
+		/* VCT read-back (TODO: values not extensively tested) */
+		case 0x0e:
+			return (m_screen->vpos() >> 8) & 1;
+		case 0x0f:
+			return m_screen->vpos() & 0xff;
+		default:
+			//popmessage("Warning: k053252 read %02x, contact MAMEdev",offset);
+			break;
+	}
 
 	return m_regs[offset];
 }
