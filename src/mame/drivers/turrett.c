@@ -393,7 +393,11 @@ ROM_START( turrett )
 	ROM_LOAD32_BYTE( "turret.u7",  0x000003, 0x080000, CRC(fa8b5a5a) SHA1(658e9eeadc9c70185973470565d562c76f4fcdd7) )
 
 	DISK_REGION( "ata:0:hdd:image" )
-	DISK_IMAGE( "turrett", 0, SHA1(b0c98c5876870dd8b3e37a38fe35846c9e011df4) )
+	/// According to http://personal.inet.fi/cool/lwgt/myoldvdr/V40ProductManual.pdf
+	/// The drive should have CYLS:38869, HEADS:16, SECS:63, Total Units:39,179,952
+	/// We are missing 13482 sectors and we have to adjust the LBA by 63 sectors for
+	/// the game to work.
+	DISK_IMAGE( "turrett", 0, BAD_DUMP SHA1(b0c98c5876870dd8b3e37a38fe35846c9e011df4) )
 ROM_END
 
 
