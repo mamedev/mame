@@ -218,3 +218,16 @@ ym2608_device::ym2608_device(const machine_config &mconfig, const char *tag, dev
 void ym2608_device::device_config_complete()
 {
 }
+
+ROM_START( ym2608 )
+	ROM_REGION( 0x2000, "ym2608", 0 ) // marked as bad dump because it was dumped by output analysis, not decap.  data order could be incorrect, see YM2608_ADPCM_ROM_addr table in fm.c for current sample offsets
+	ROM_LOAD16_WORD( "ym2608_adpcm_rom.bin", 0x0000, 0x2000, BAD_DUMP CRC(23c9e0d8) SHA1(50b6c3e288eaa12ad275d4f323267bb72b0445df) )
+ROM_END
+
+
+const rom_entry *ym2608_device::device_rom_region() const
+{
+	return ROM_NAME( ym2608 );
+}
+
+

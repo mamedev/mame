@@ -34,6 +34,7 @@ public:
 
 protected:
 	// device-level overrides
+	virtual const rom_entry *device_rom_region() const;
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_post_load();
