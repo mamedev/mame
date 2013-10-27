@@ -381,6 +381,12 @@ void jaguar_state::machine_reset()
 	{
 		memcpy(m_shared_ram, m_rom_base, 0x400);    // do not increase, or Doom breaks
 		m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+
+		/* hack until I understand */
+		if(m_is_jagcd)
+		{
+			m_shared_ram[0x4/4] = 0x00802000;
+		}
 	}
 
 	/* configure banks for gfx/sound ROMs */
@@ -1080,6 +1086,25 @@ static ADDRESS_MAP_START( jaguar_map, AS_PROGRAM, 16, jaguar_state )
 ADDRESS_MAP_END
 
 
+static ADDRESS_MAP_START( jaguarcd_map, AS_PROGRAM, 16, jaguar_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
+	AM_RANGE(0x000000, 0x1fffff) AM_MIRROR(0x200000) AM_READWRITE(shared_ram_r16, shared_ram_w16 );
+	AM_RANGE(0x800000, 0x83ffff) AM_ROM AM_REGION("cdbios", 0)
+	AM_RANGE(0xe00000, 0xe1ffff) AM_READWRITE(rom_base_r16, rom_base_w16 )
+	AM_RANGE(0xf00000, 0xf003ff) AM_READWRITE(tom_regs_r, tom_regs_w) // might be reversed endian of the others..
+	AM_RANGE(0xf00400, 0xf005ff) AM_MIRROR(0x000200) AM_READWRITE(gpu_clut_r16, gpu_clut_w16 )
+	AM_RANGE(0xf02100, 0xf021ff) AM_MIRROR(0x008000) AM_READWRITE(gpuctrl_r16, gpuctrl_w16)
+	AM_RANGE(0xf02200, 0xf022ff) AM_MIRROR(0x008000) AM_READWRITE(blitter_r16, blitter_w16)
+	AM_RANGE(0xf03000, 0xf03fff) AM_MIRROR(0x008000) AM_READWRITE(gpu_ram_r16, gpu_ram_w16 )
+	AM_RANGE(0xf10000, 0xf103ff) AM_READWRITE(jerry_regs_r, jerry_regs_w) // might be reversed endian of the others..
+	AM_RANGE(0xf14000, 0xf14003) AM_READWRITE(joystick_r16, joystick_w16)
+	AM_RANGE(0xf14800, 0xf14803) AM_READWRITE(eeprom_clk16,eeprom_w16)  // GPI00
+	AM_RANGE(0xf15000, 0xf15003) AM_READ(eeprom_cs16)               // GPI01
+	AM_RANGE(0xf1a100, 0xf1a13f) AM_READWRITE(dspctrl_r16, dspctrl_w16)
+	AM_RANGE(0xf1a140, 0xf1a17f) AM_READWRITE(serial_r16, serial_w16)
+	AM_RANGE(0xf1b000, 0xf1cfff) AM_READWRITE(dsp_ram_r16, dsp_ram_w16)
+	AM_RANGE(0xf1d000, 0xf1dfff) AM_READWRITE(wave_rom_r16, wave_rom_w16 )
+ADDRESS_MAP_END
 
 /*************************************
  *
@@ -1624,7 +1649,10 @@ static MACHINE_CONFIG_START( jaguar, jaguar_state )
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 MACHINE_CONFIG_END
 
-
+static MACHINE_CONFIG_DERIVED( jaguarcd, jaguar )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(jaguarcd_map)
+MACHINE_CONFIG_END
 
 /*************************************
  *
@@ -1656,6 +1684,25 @@ DRIVER_INIT_MEMBER(jaguar_state,jaguar)
 	m_hacks_enabled = false;
 	save_item(NAME(m_joystick_data));
 	cart_start();
+	m_is_jagcd = false;
+
+	for (int i=0;i<0x20000/4;i++) // the cd bios is bigger.. check
+	{
+		m_rom_base[i] = ((m_rom_base[i] & 0xffff0000)>>16) | ((m_rom_base[i] & 0x0000ffff)<<16);
+	}
+
+	for (int i=0;i<0x1000/4;i++)
+	{
+		m_wave_rom[i] = ((m_wave_rom[i] & 0xffff0000)>>16) | ((m_wave_rom[i] & 0x0000ffff)<<16);
+	}
+}
+
+DRIVER_INIT_MEMBER(jaguar_state,jaguarcd)
+{
+	m_hacks_enabled = false;
+	save_item(NAME(m_joystick_data));
+	cart_start();
+	m_is_jagcd = true;
 
 	for (int i=0;i<0x20000/4;i++) // the cd bios is bigger.. check
 	{
@@ -1814,11 +1861,14 @@ ROM_END
 
 ROM_START( jaguarcd )
 	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_WORD( "jagboot.rom", 0xe00000, 0x020000, CRC(fb731aaa) SHA1(f8991b0c385f4e5002fa2a7e2f5e61e8c5213356) )
+	ROM_CART_LOAD("cart", 0x800000, 0x600000, ROM_NOMIRROR) // TODO: needs to be removed (CD BIOS runs in the cart space)
+
+	ROM_REGION(0x40000, "cdbios", 0 )
 	ROM_SYSTEM_BIOS( 0, "default", "Jaguar CD" )
-	ROMX_LOAD( "jag_cd.bin", 0xe00000, 0x040000, CRC(687068d5) SHA1(73883e7a6e9b132452436f7ab1aeaeb0776428e5), ROM_BIOS(1) )
+	ROMX_LOAD( "jag_cd.bin", 0x00000, 0x040000, CRC(687068d5) SHA1(73883e7a6e9b132452436f7ab1aeaeb0776428e5), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "dev", "Jaguar Developer CD" )
-	ROMX_LOAD( "jagdevcd.bin", 0xe00000, 0x040000, CRC(55a0669c) SHA1(d61b7b5912118f114ef00cf44966a5ef62e455a5), ROM_BIOS(2) )
-	ROM_CART_LOAD("cart", 0x800000, 0x600000, ROM_NOMIRROR)
+	ROMX_LOAD( "jagdevcd.bin", 0x00000, 0x040000, CRC(55a0669c) SHA1(d61b7b5912118f114ef00cf44966a5ef62e455a5), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(2) )
 
 	ROM_REGION16_BE( 0x1000, "waverom", 0 )
 	ROM_LOAD16_WORD("jagwave.rom", 0x0000, 0x1000, CRC(7a25ee5b) SHA1(58117e11fd6478c521fbd3fdbe157f39567552f0) )
@@ -2219,6 +2269,7 @@ ROM_END
 void jaguar_state::cojag_common_init(UINT16 gpu_jump_offs, UINT16 spin_pc)
 {
 	m_is_cojag = true;
+	m_is_jagcd = false;
 
 	/* copy over the ROM */
 	m_is_r3000 = (m_maincpu->type() == R3041);
@@ -2365,7 +2416,7 @@ DRIVER_INIT_MEMBER(jaguar_state,vcircle)
 
 /*    YEAR   NAME      PARENT    COMPAT  MACHINE   INPUT     INIT      COMPANY    FULLNAME */
 CONS( 1993,  jaguar,   0,        0,      jaguar,   jaguar,   jaguar_state, jaguar,   "Atari",   "Jaguar", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-CONS( 1995,  jaguarcd, jaguar,   0,      jaguar,   jaguar,   jaguar_state, jaguar,   "Atari",   "Jaguar CD", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+CONS( 1995,  jaguarcd, jaguar,   0,      jaguarcd, jaguar,   jaguar_state, jaguarcd, "Atari",   "Jaguar CD", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 
 GAME( 1996, area51,    0,        cojagr3k,  area51, jaguar_state,   area51,   ROT0, "Atari Games", "Area 51 (R3000)", 0 )
 GAME( 1995, area51t,   area51,   cojag68k,  area51, jaguar_state,   area51a,  ROT0, "Atari Games (Time Warner license)", "Area 51 (Time Warner license)", 0 )

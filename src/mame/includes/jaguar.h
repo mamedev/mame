@@ -85,6 +85,7 @@ public:
 	bool m_hacks_enabled;
 	int m_pixel_clock;
 	bool m_using_cart;
+	bool m_is_jagcd;
 
 	UINT32 m_misc_control_data;
 	bool m_eeprom_enable;
@@ -187,6 +188,7 @@ public:
 	DECLARE_READ16_MEMBER(gpu_ram_r16);
 	DECLARE_WRITE16_MEMBER(gpu_ram_w16);
 	DECLARE_DRIVER_INIT(jaguar);
+	DECLARE_DRIVER_INIT(jaguarcd);
 	DECLARE_DRIVER_INIT(area51mx);
 	DECLARE_DRIVER_INIT(maxforce);
 	DECLARE_DRIVER_INIT(freezeat);
