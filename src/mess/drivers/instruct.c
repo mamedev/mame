@@ -34,7 +34,6 @@
 
     ToDO:
     - Connect 10 toggle switches and 10 round red leds.
-    - 2 proms
     - Last Address Register
     - Initial Jump Logic
 
@@ -59,10 +58,12 @@ public:
 		, m_cass(*this, "cassette")
 	{ }
 
+	DECLARE_READ8_MEMBER(port_r);
 	DECLARE_READ8_MEMBER(portfc_r);
 	DECLARE_READ8_MEMBER(portfd_r);
 	DECLARE_READ8_MEMBER(portfe_r);
 	DECLARE_READ8_MEMBER(sense_r);
+	DECLARE_WRITE8_MEMBER(port_w);
 	DECLARE_WRITE8_MEMBER(portf8_w);
 	DECLARE_WRITE8_MEMBER(portf9_w);
 	DECLARE_WRITE8_MEMBER(portfa_w);
@@ -70,6 +71,7 @@ public:
 	INTERRUPT_GEN_MEMBER(t2l_int);
 private:
 	virtual void machine_reset();
+	UINT16 m_lar;
 	UINT8 m_digit;
 	bool m_valid_digit;
 	bool m_cassin;
@@ -80,6 +82,17 @@ private:
 	required_shared_ptr<UINT8> m_p_extram;
 	required_device<cassette_image_device> m_cass;
 };
+
+// user port
+WRITE8_MEMBER( instruct_state::port_w )
+{
+	char ledname[8];
+	for (int i = 0; i < 8; i++)
+	{
+		sprintf(ledname,"led%d",i);
+		output_set_value(ledname, !BIT(data, i));
+	}
+}
 
 // cassette port
 WRITE8_MEMBER( instruct_state::portf8_w )
@@ -107,24 +120,27 @@ WRITE8_MEMBER( instruct_state::portfa_w )
 	m_valid_digit = true;
 }
 
-// unknown - copied to 17E9 at boot
-READ8_MEMBER( instruct_state::portfc_r )
+READ8_MEMBER( instruct_state::port_r )
 {
-	return 0x55;
+	return ioport("USW")->read();
 }
 
-// unknown - copied to 17E8 at boot
+// last address register A0-7 - copied to 17E9 at boot
+READ8_MEMBER( instruct_state::portfc_r )
+{
+	return m_lar;
+}
+
+// last address register A8-14 - copied to 17E8 at boot
 READ8_MEMBER( instruct_state::portfd_r )
 {
-	return 0xAA;
+	return (m_lar >> 8) & 0x7f;
 }
 
 // read keyboard
 READ8_MEMBER( instruct_state::portfe_r )
 {
-	UINT8 i;
-
-	for (i = 0; i < 6; i++)
+	for (UINT8 i = 0; i < 6; i++)
 	{
 		if (BIT(m_digit, i))
 		{
@@ -134,7 +150,7 @@ READ8_MEMBER( instruct_state::portfe_r )
 		}
 	}
 
-	return 0xff;
+	return 0xf;
 }
 
 
@@ -186,6 +202,7 @@ INTERRUPT_GEN_MEMBER( instruct_state::t2l_int )
 static ADDRESS_MAP_START( instruct_mem, AS_PROGRAM, 8, instruct_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0ffe) AM_RAM AM_SHARE("mainram")
+	AM_RANGE(0x0fff, 0x0fff) AM_READWRITE(port_r,port_w)
 	AM_RANGE(0x1780, 0x17ff) AM_RAM AM_SHARE("smiram")
 	AM_RANGE(0x1800, 0x1fff) AM_ROM AM_REGION("roms",0)
 	AM_RANGE(0x2000, 0x7fff) AM_RAM AM_SHARE("extram")
@@ -193,6 +210,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( instruct_io, AS_IO, 8, instruct_state )
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x07, 0x07) AM_READWRITE(port_r,port_w)
 	AM_RANGE(0xf8, 0xf8) AM_WRITE(portf8_w)
 	AM_RANGE(0xf9, 0xf9) AM_WRITE(portf9_w)
 	AM_RANGE(0xfa, 0xfa) AM_WRITE(portfa_w)
@@ -200,6 +218,7 @@ static ADDRESS_MAP_START( instruct_io, AS_IO, 8, instruct_state )
 	AM_RANGE(0xfd, 0xfd) AM_READ(portfd_r)
 	AM_RANGE(0xfe, 0xfe) AM_READ(portfe_r)
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(sense_r)
+	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READWRITE(port_r,port_w)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -209,42 +228,36 @@ static INPUT_PORTS_START( instruct )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4") PORT_CODE(KEYCODE_4) PORT_CHAR('4')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8") PORT_CODE(KEYCODE_8) PORT_CHAR('8')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C") PORT_CODE(KEYCODE_C) PORT_CHAR('C')
-	PORT_BIT(0xF0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("X1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1) PORT_CHAR('1')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5") PORT_CODE(KEYCODE_5) PORT_CHAR('5')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9") PORT_CODE(KEYCODE_9) PORT_CHAR('9')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D") PORT_CODE(KEYCODE_D) PORT_CHAR('D')
-	PORT_BIT(0xF0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("X2")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2") PORT_CODE(KEYCODE_2) PORT_CHAR('2')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6") PORT_CODE(KEYCODE_6) PORT_CHAR('6')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A") PORT_CODE(KEYCODE_A) PORT_CHAR('A')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("E") PORT_CODE(KEYCODE_E) PORT_CHAR('E')
-	PORT_BIT(0xF0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("X3")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3") PORT_CODE(KEYCODE_3) PORT_CHAR('3')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7") PORT_CODE(KEYCODE_7) PORT_CHAR('7')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("B") PORT_CODE(KEYCODE_B) PORT_CHAR('B')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F") PORT_CODE(KEYCODE_F) PORT_CHAR('F')
-	PORT_BIT(0xF0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("X4")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("WCAS") PORT_CODE(KEYCODE_S) PORT_CHAR('S')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RCAS") PORT_CODE(KEYCODE_L) PORT_CHAR('L')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("STEP") PORT_CODE(KEYCODE_H) PORT_CHAR('H')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RUN") PORT_CODE(KEYCODE_X) PORT_CHAR('X')
-	PORT_BIT(0xF0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("X5")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("BKPT") PORT_CODE(KEYCODE_J) PORT_CHAR('J')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("REG") PORT_CODE(KEYCODE_R) PORT_CHAR('R')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("MEM") PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ENT/NXT") PORT_CODE(KEYCODE_UP) PORT_CHAR('^')
-	PORT_BIT(0xF0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("HW")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("SENS") PORT_CODE(KEYCODE_U) PORT_CHAR('U')
@@ -259,12 +272,40 @@ static INPUT_PORTS_START( instruct )
 	PORT_DIPNAME( 0x02, 0x00, "AC/INT") // Interrupt comes from INT key or from power supply
 	PORT_DIPSETTING(    0x02, "INT")
 	PORT_DIPSETTING(    0x00, "AC")
+
+	PORT_START("USW")
+	PORT_DIPNAME( 0x01, 0x00, "Switch A") PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, DEF_STR(Off))
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPNAME( 0x02, 0x02, "Switch B") PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x02, DEF_STR(Off))
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPNAME( 0x04, 0x04, "Switch C") PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x04, DEF_STR(Off))
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPNAME( 0x08, 0x00, "Switch D") PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, DEF_STR(Off))
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPNAME( 0x10, 0x00, "Switch E") PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x10, DEF_STR(Off))
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPNAME( 0x20, 0x20, "Switch F") PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x20, DEF_STR(Off))
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPNAME( 0x40, 0x40, "Switch G") PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x40, DEF_STR(Off))
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPNAME( 0x80, 0x00, "Switch H") PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x80, DEF_STR(Off))
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
 INPUT_PORTS_END
 
 
 void instruct_state::machine_reset()
 {
 	m_cassin = 0;
+	address_space &space = m_maincpu->space(AS_IO);
+	port_w(space, 0, 0); // turn round leds off
 	m_maincpu->set_state_int(S2650_PC, 0x1800);
 }
 
@@ -274,7 +315,7 @@ QUICKLOAD_LOAD_MEMBER( instruct_state, instruct )
 	int result = IMAGE_INIT_FAIL;
 
 	quick_length = image.length();
-	if (quick_length < 0x0104)
+	if (quick_length < 0x0100)
 	{
 		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too short");
 		image.message(" File too short");
@@ -321,7 +362,8 @@ QUICKLOAD_LOAD_MEMBER( instruct_state, instruct )
 					read_ = 0xfff;
 					if (quick_length < 0xfff)
 						read_ = quick_length;
-					for (i = 0; i < read_; i++)
+					m_p_ram[0] = 0x1f;	// add jump for RST key
+					for (i = 1; i < read_; i++)
 						m_p_ram[i] = quick_data[i];
 
 					// load to 1780-17BF (spare ram inside 2656)
@@ -340,8 +382,8 @@ QUICKLOAD_LOAD_MEMBER( instruct_state, instruct )
 					/* display a message about the loaded quickload */
 					image.message(" Quickload: size=%04X : exec=%04X",quick_length,exec_addr);
 
-					// Start the quickload
-					m_maincpu->set_state_int(S2650_PC, exec_addr);
+					// Start the quickload - JP exec_addr
+					m_maincpu->set_state_int(S2650_PC, 0);
 
 					result = IMAGE_INIT_PASS;
 				}
@@ -378,6 +420,10 @@ MACHINE_CONFIG_END
 ROM_START( instruct )
 	ROM_REGION( 0x0800, "roms", 0 )
 	ROM_LOAD( "instruct.rom", 0x0000, 0x0800, CRC(131715a6) SHA1(4930b87d09046113ab172ba3fb31f5e455068ec7) )
+
+	ROM_REGION( 0x8020, "proms", 0 )
+	ROM_LOAD( "82s123.33",    0x0000, 0x0020, CRC(b7aecef0) SHA1(b39fb35e8b6ab67b31f8f310fd5d56304bcd4123) )
+	ROM_LOAD( "82s103.20",    0x0020, 0x8000, NO_DUMP )
 ROM_END
 
 /* Driver */

@@ -1,6 +1,7 @@
-<!-- acrnsys1.lay -->
+<!-- instruct.lay -->
 
 <!-- 2012-05-20: Initial version.  [Robbbert] -->
+<!-- 2013-09-28: Added round LEDs. [Robbbert] -->
 
 <mamelayout version="2">
 
@@ -8,6 +9,11 @@
 		<led7seg>
 			<color red="1.0" green="0.0" blue="0.0" />
 		</led7seg>
+	</element>
+	<element name="red_led">
+		<disk>
+			<color red="1.0" green="0.0" blue="0.0" />
+		</disk>
 	</element>
 
 	<element name="background">
@@ -21,7 +27,7 @@
 
 		<!-- Background -->
 		<backdrop element="background">
-			<bounds left="0" top="0" right="362" bottom="69" />
+			<bounds left="0" top="0" right="362" bottom="105" />
 		</backdrop>
 
 		<!-- LEDs -->
@@ -48,6 +54,30 @@
 		</bezel>
 		<bezel name="digit128" element="digit">
 			<bounds left="318" top="10" right="352" bottom="59" />
+		</bezel>
+		<bezel name="led0" element="red_led">
+			<bounds left="20" right="35" top="80" bottom="95" />
+		</bezel>
+		<bezel name="led1" element="red_led">
+			<bounds left="64" right="79" top="80" bottom="95" />
+		</bezel>
+		<bezel name="led2" element="red_led">
+			<bounds left="108" right="123" top="80" bottom="95" />
+		</bezel>
+		<bezel name="led3" element="red_led">
+			<bounds left="152" right="167" top="80" bottom="95" />
+		</bezel>
+		<bezel name="led4" element="red_led">
+			<bounds left="196" right="211" top="80" bottom="95" />
+		</bezel>
+		<bezel name="led5" element="red_led">
+			<bounds left="240" right="255" top="80" bottom="95" />
+		</bezel>
+		<bezel name="led6" element="red_led">
+			<bounds left="284" right="299" top="80" bottom="95" />
+		</bezel>
+		<bezel name="led7" element="red_led">
+			<bounds left="328" right="343" top="80" bottom="95" />
 		</bezel>
 	</view>
 </mamelayout>
