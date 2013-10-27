@@ -458,31 +458,12 @@ WRITE8_MEMBER(n8080_state::n8080_status_callback)
 	}
 }
 
-MACHINE_START_MEMBER(n8080_state,n8080)
+void n8080_state::machine_start()
 {
 	save_item(NAME(m_shift_data));
 	save_item(NAME(m_shift_bits));
 	save_item(NAME(m_inte));
 }
-
-MACHINE_START_MEMBER(n8080_state,spacefev)
-{
-	MACHINE_START_CALL_MEMBER(n8080);
-	MACHINE_START_CALL_MEMBER(spacefev_sound);
-}
-
-MACHINE_START_MEMBER(n8080_state,sheriff)
-{
-	MACHINE_START_CALL_MEMBER(n8080);
-	MACHINE_START_CALL_MEMBER(sheriff_sound);
-}
-
-MACHINE_START_MEMBER(n8080_state,helifire)
-{
-	MACHINE_START_CALL_MEMBER(n8080);
-	MACHINE_START_CALL_MEMBER(helifire_sound);
-}
-
 
 MACHINE_RESET_MEMBER(n8080_state,n8080)
 {
@@ -494,8 +475,7 @@ MACHINE_RESET_MEMBER(n8080_state,n8080)
 MACHINE_RESET_MEMBER(n8080_state,spacefev)
 {
 	MACHINE_RESET_CALL_MEMBER(n8080);
-	MACHINE_RESET_CALL_MEMBER(spacefev_sound);
-
+	
 	m_spacefev_red_screen = 0;
 	m_spacefev_red_cannon = 0;
 }
@@ -503,8 +483,7 @@ MACHINE_RESET_MEMBER(n8080_state,spacefev)
 MACHINE_RESET_MEMBER(n8080_state,sheriff)
 {
 	MACHINE_RESET_CALL_MEMBER(n8080);
-	MACHINE_RESET_CALL_MEMBER(sheriff_sound);
-
+	
 	m_sheriff_color_mode = 0;
 	m_sheriff_color_data = 0;
 }
@@ -512,8 +491,7 @@ MACHINE_RESET_MEMBER(n8080_state,sheriff)
 MACHINE_RESET_MEMBER(n8080_state,helifire)
 {
 	MACHINE_RESET_CALL_MEMBER(n8080);
-	MACHINE_RESET_CALL_MEMBER(helifire_sound);
-
+	
 	m_helifire_mv = 0;
 	m_helifire_sc = 0;
 	m_helifire_flash = 0;
@@ -529,7 +507,6 @@ static MACHINE_CONFIG_START( spacefev, n8080_state )
 	MCFG_CPU_PROGRAM_MAP(main_cpu_map)
 	MCFG_CPU_IO_MAP(main_io_map)
 
-	MCFG_MACHINE_START_OVERRIDE(n8080_state,spacefev)
 	MCFG_MACHINE_RESET_OVERRIDE(n8080_state,spacefev)
 
 	/* video hardware */
@@ -560,7 +537,6 @@ static MACHINE_CONFIG_START( sheriff, n8080_state )
 	MCFG_CPU_PROGRAM_MAP(main_cpu_map)
 	MCFG_CPU_IO_MAP(main_io_map)
 
-	MCFG_MACHINE_START_OVERRIDE(n8080_state,sheriff)
 	MCFG_MACHINE_RESET_OVERRIDE(n8080_state,sheriff)
 
 	/* video hardware */
@@ -603,7 +579,6 @@ static MACHINE_CONFIG_START( helifire, n8080_state )
 	MCFG_CPU_PROGRAM_MAP(helifire_main_cpu_map)
 	MCFG_CPU_IO_MAP(main_io_map)
 
-	MCFG_MACHINE_START_OVERRIDE(n8080_state,helifire)
 	MCFG_MACHINE_RESET_OVERRIDE(n8080_state,helifire)
 
 	/* video hardware */

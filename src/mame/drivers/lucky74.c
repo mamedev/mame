@@ -790,7 +790,6 @@
 #include "machine/nvram.h"
 #include "lucky74.lh"
 #include "includes/lucky74.h"
-#include "drivlgcy.h"
 
 
 /*****************************
@@ -1388,19 +1387,18 @@ GFXDECODE_END
 *    ADPCM sound system (09R81P + M5205)    *
 ********************************************/
 
-static SOUND_START( lucky74 )
+void lucky74_state::sound_start()
 {
-	lucky74_state *state = machine.driver_data<lucky74_state>();
 	/* cleaning all 09R81P registers */
 
 	UINT8 i;
 
 	for (i = 0; i < 6; i++)
 	{
-		state->m_adpcm_reg[i] = 0;
+		m_adpcm_reg[i] = 0;
 	}
 
-	state->m_adpcm_busy_line = 0x01;    /* free and ready */
+	m_adpcm_busy_line = 0x01;    /* free and ready */
 }
 
 WRITE_LINE_MEMBER(lucky74_state::lucky74_adpcm_int)
@@ -1541,8 +1539,6 @@ static MACHINE_CONFIG_START( lucky74, lucky74_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", lucky74_state,  nmi_interrupt) /* 60 Hz. measured */
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
-
-	MCFG_SOUND_START(lucky74)
 
 	/* 2x 82c255 (4x 8255) */
 	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_0_intf )

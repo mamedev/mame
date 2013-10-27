@@ -22,7 +22,6 @@
 #include "machine/6840ptm.h"
 #include "machine/z80ctc.h"
 #include "includes/cchasm.h"
-#include "drivlgcy.h"
 #include "scrlegcy.h"
 
 #define CCHASM_68K_CLOCK (XTAL_8MHz)
@@ -177,8 +176,7 @@ static MACHINE_CONFIG_START( cchasm, cchasm_state )
 
 
 	/* sound hardware */
-	MCFG_SOUND_START(cchasm)
-
+	
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ay1", AY8910, 1818182)

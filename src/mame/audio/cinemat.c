@@ -28,7 +28,6 @@
 #include "sound/ay8910.h"
 #include "drivlgcy.h"
 
-
 /*************************************
  *
  *  Macros
@@ -74,20 +73,19 @@ WRITE8_MEMBER(cinemat_state::cinemat_sound_control_w)
  *
  *************************************/
 
-static SOUND_START( generic )
+void cinemat_state::sound_start()
 {
-	cinemat_state *state = machine.driver_data<cinemat_state>();
 	/* register for save states */
-	state->save_item(NAME(state->m_sound_control));
-	state->save_item(NAME(state->m_current_shift));
-	state->save_item(NAME(state->m_last_shift));
-	state->save_item(NAME(state->m_last_shift2));
-	state->save_item(NAME(state->m_current_pitch));
-	state->save_item(NAME(state->m_last_frame));
-	state->save_item(NAME(state->m_sound_fifo));
-	state->save_item(NAME(state->m_sound_fifo_in));
-	state->save_item(NAME(state->m_sound_fifo_out));
-	state->save_item(NAME(state->m_last_portb_write));
+	save_item(NAME(m_sound_control));
+	save_item(NAME(m_current_shift));
+	save_item(NAME(m_last_shift));
+	save_item(NAME(m_last_shift2));
+	save_item(NAME(m_current_pitch));
+	save_item(NAME(m_last_frame));
+	save_item(NAME(m_sound_fifo));
+	save_item(NAME(m_sound_fifo_in));
+	save_item(NAME(m_sound_fifo_out));
+	save_item(NAME(m_last_portb_write));
 }
 
 
@@ -188,7 +186,6 @@ static SOUND_RESET( spacewar )
 }
 
 MACHINE_CONFIG_FRAGMENT( spacewar_sound )
-	MCFG_SOUND_START(generic)
 	MCFG_SOUND_RESET(spacewar)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -243,7 +240,6 @@ static SOUND_RESET( barrier )
 }
 
 MACHINE_CONFIG_FRAGMENT( barrier_sound )
-	MCFG_SOUND_START(generic)
 	MCFG_SOUND_RESET(barrier)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -304,7 +300,6 @@ static SOUND_RESET( speedfrk )
 }
 
 MACHINE_CONFIG_FRAGMENT( speedfrk_sound )
-	MCFG_SOUND_START(generic)
 	MCFG_SOUND_RESET(speedfrk)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -380,7 +375,6 @@ static SOUND_RESET( starhawk )
 }
 
 MACHINE_CONFIG_FRAGMENT( starhawk_sound )
-	MCFG_SOUND_START(generic)
 	MCFG_SOUND_RESET(starhawk)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -450,7 +444,6 @@ static SOUND_RESET( sundance )
 }
 
 MACHINE_CONFIG_FRAGMENT( sundance_sound )
-	MCFG_SOUND_START(generic)
 	MCFG_SOUND_RESET(sundance)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -540,7 +533,6 @@ static SOUND_RESET( tailg )
 }
 
 MACHINE_CONFIG_FRAGMENT( tailg_sound )
-	MCFG_SOUND_START(generic)
 	MCFG_SOUND_RESET(tailg)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -609,7 +601,6 @@ static SOUND_RESET( warrior )
 }
 
 MACHINE_CONFIG_FRAGMENT( warrior_sound )
-	MCFG_SOUND_START(generic)
 	MCFG_SOUND_RESET(warrior)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -705,7 +696,6 @@ static SOUND_RESET( armora )
 }
 
 MACHINE_CONFIG_FRAGMENT( armora_sound )
-	MCFG_SOUND_START(generic)
 	MCFG_SOUND_RESET(armora)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -798,7 +788,6 @@ static SOUND_RESET( ripoff )
 }
 
 MACHINE_CONFIG_FRAGMENT( ripoff_sound )
-	MCFG_SOUND_START(generic)
 	MCFG_SOUND_RESET(ripoff)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -912,7 +901,6 @@ static SOUND_RESET( starcas )
 }
 
 MACHINE_CONFIG_FRAGMENT( starcas_sound )
-	MCFG_SOUND_START(generic)
 	MCFG_SOUND_RESET(starcas)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1048,7 +1036,6 @@ static SOUND_RESET( solarq )
 }
 
 MACHINE_CONFIG_FRAGMENT( solarq_sound )
-	MCFG_SOUND_START(generic)
 	MCFG_SOUND_RESET(solarq)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1184,7 +1171,6 @@ static SOUND_RESET( boxingb )
 }
 
 MACHINE_CONFIG_FRAGMENT( boxingb_sound )
-	MCFG_SOUND_START(generic)
 	MCFG_SOUND_RESET(boxingb)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1298,7 +1284,6 @@ static SOUND_RESET( wotw )
 }
 
 MACHINE_CONFIG_FRAGMENT( wotw_sound )
-	MCFG_SOUND_START(generic)
 	MCFG_SOUND_RESET(wotw)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1454,7 +1439,6 @@ MACHINE_CONFIG_FRAGMENT( demon_sound )
 
 	MCFG_Z80CTC_ADD("ctc", 3579545 /* same as "audiocpu" */, demon_z80ctc_interface)
 
-	MCFG_SOUND_START(generic)
 	MCFG_SOUND_RESET(demon_sound)
 
 	/* sound hardware */

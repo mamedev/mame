@@ -124,12 +124,9 @@ Z80CTC_INTERFACE( cchasm_ctc_intf )
 	DEVCB_DRIVER_LINE_MEMBER(cchasm_state,ctc_timer_2_w)    /* ZC/TO2 callback */
 };
 
-SOUND_START( cchasm )
+void cchasm_state::sound_start()
 {
-	cchasm_state *state = machine.driver_data<cchasm_state>();
-	state->m_coin_flag = 0;
-	state->m_sound_flags = 0;
-	state->m_output[0] = 0; state->m_output[1] = 0;
-
-	state->m_ctc = machine.device<z80ctc_device>("ctc");
+	m_coin_flag = 0;
+	m_sound_flags = 0;
+	m_output[0] = 0; m_output[1] = 0;
 }

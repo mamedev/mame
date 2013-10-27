@@ -9,7 +9,6 @@
 #include "sound/sn76477.h"
 #include "sound/discrete.h"
 #include "includes/mw8080bw.h"
-#include "drivlgcy.h"
 
 
 /*************************************
@@ -18,13 +17,11 @@
  *
  *************************************/
 
-static SOUND_START( samples )
+SOUND_START_MEMBER( mw8080bw_state, samples )
 {
-	mw8080bw_state *state = machine.driver_data<mw8080bw_state>();
-
 	/* setup for save states */
-	state->save_item(NAME(state->m_port_1_last));
-	state->save_item(NAME(state->m_port_2_last));
+	save_item(NAME(m_port_1_last));
+	save_item(NAME(m_port_2_last));
 }
 
 
@@ -155,7 +152,7 @@ static const samples_interface seawolf_samples_interface =
 
 
 MACHINE_CONFIG_FRAGMENT( seawolf_audio )
-	MCFG_SOUND_START(samples)
+	MCFG_SOUND_START_OVERRIDE(mw8080bw_state, samples)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SAMPLES_ADD("samples", seawolf_samples_interface)
@@ -214,7 +211,7 @@ static const samples_interface gunfight_samples_interface =
 
 
 MACHINE_CONFIG_FRAGMENT( gunfight_audio )
-	MCFG_SOUND_START(samples)
+	MCFG_SOUND_START_OVERRIDE(mw8080bw_state, samples)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -1567,7 +1564,7 @@ static const samples_interface gmissile_samples_interface =
 
 
 MACHINE_CONFIG_FRAGMENT( gmissile_audio )
-	MCFG_SOUND_START(samples)
+	MCFG_SOUND_START_OVERRIDE(mw8080bw_state, samples)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -1663,7 +1660,7 @@ static const samples_interface m4_samples_interface =
 
 
 MACHINE_CONFIG_FRAGMENT( m4_audio )
-	MCFG_SOUND_START(samples)
+	MCFG_SOUND_START_OVERRIDE(mw8080bw_state, samples)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -1921,7 +1918,7 @@ static const samples_interface clowns_samples_interface =
 
 
 MACHINE_CONFIG_FRAGMENT( clowns_audio )
-	MCFG_SOUND_START(samples)
+	MCFG_SOUND_START_OVERRIDE(mw8080bw_state, samples)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -3316,7 +3313,7 @@ static const samples_interface phantom2_samples_interface =
 
 
 MACHINE_CONFIG_FRAGMENT( phantom2_audio )
-	MCFG_SOUND_START(samples)
+	MCFG_SOUND_START_OVERRIDE(mw8080bw_state, samples)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SAMPLES_ADD("samples", phantom2_samples_interface)
@@ -3595,7 +3592,7 @@ static const samples_interface invaders_samples_interface =
 
 /* left in for all games that hack into invaders samples for audio */
 MACHINE_CONFIG_FRAGMENT( invaders_samples_audio )
-	MCFG_SOUND_START(samples)
+	MCFG_SOUND_START_OVERRIDE(mw8080bw_state, samples)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

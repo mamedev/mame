@@ -15,7 +15,6 @@
 #include "machine/6821pia.h"
 #include "sound/ay8910.h"
 #include "includes/redalert.h"
-#include "drivlgcy.h"
 
 
 
@@ -138,11 +137,10 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static SOUND_START( redalert_audio )
+SOUND_START_MEMBER(redalert_state,redalert)
 {
-	redalert_state *state = machine.driver_data<redalert_state>();
-	state->save_item(NAME(state->m_ay8910_latch_1));
-	state->save_item(NAME(state->m_ay8910_latch_2));
+	save_item(NAME(m_ay8910_latch_1));
+	save_item(NAME(m_ay8910_latch_2));
 }
 
 
@@ -177,19 +175,6 @@ static ADDRESS_MAP_START( redalert_voice_map, AS_PROGRAM, 8, redalert_state )
 	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x3c00) AM_RAM
 	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x3fff) AM_READ(soundlatch2_byte_r) AM_WRITENOP
 ADDRESS_MAP_END
-
-
-
-/*************************************
- *
- *  Red Alert audio start
- *
- *************************************/
-
-static SOUND_START( redalert )
-{
-	SOUND_START_CALL(redalert_audio);
-}
 
 
 
@@ -243,7 +228,7 @@ MACHINE_CONFIG_FRAGMENT( redalert_audio )
 	MCFG_FRAGMENT_ADD( redalert_audio_m37b )
 	MCFG_FRAGMENT_ADD( redalert_audio_voice )
 
-	MCFG_SOUND_START( redalert )
+	MCFG_SOUND_START_OVERRIDE( redalert_state, redalert )
 
 MACHINE_CONFIG_END
 
@@ -259,7 +244,7 @@ MACHINE_CONFIG_FRAGMENT( ww3_audio )
 
 	MCFG_FRAGMENT_ADD( redalert_audio_m37b )
 
-	MCFG_SOUND_START( redalert_audio )
+	MCFG_SOUND_START_OVERRIDE( redalert_state, redalert )
 
 MACHINE_CONFIG_END
 
@@ -374,11 +359,10 @@ static const pia6821_interface demoneye_pia_intf =
  *
  *************************************/
 
-static SOUND_START( demoneye )
+SOUND_START_MEMBER( redalert_state, demoneye )
 {
-	redalert_state *state = machine.driver_data<redalert_state>();
-	state->save_item(NAME(state->m_ay8910_latch_1));
-	state->save_item(NAME(state->m_ay8910_latch_2));
+	save_item(NAME(m_ay8910_latch_1));
+	save_item(NAME(m_ay8910_latch_2));
 }
 
 
@@ -397,7 +381,7 @@ MACHINE_CONFIG_FRAGMENT( demoneye_audio )
 
 	MCFG_PIA6821_ADD("sndpia", demoneye_pia_intf)
 
-	MCFG_SOUND_START( demoneye )
+	MCFG_SOUND_START_OVERRIDE( redalert_state, demoneye )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

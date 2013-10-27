@@ -11,7 +11,6 @@
 #include "sound/tms5220.h"
 #include "sound/pokey.h"
 #include "includes/jedi.h"
-#include "drivlgcy.h"
 
 
 
@@ -21,14 +20,12 @@
  *
  *************************************/
 
-static SOUND_START( jedi )
+void jedi_state::sound_start()
 {
-	jedi_state *state = machine.driver_data<jedi_state>();
-
 	/* set up save state */
-	state->save_item(NAME(state->m_audio_latch));
-	state->save_item(NAME(state->m_audio_ack_latch));
-	state->save_item(NAME(state->m_speech_strobe_state));
+	save_item(NAME(m_audio_latch));
+	save_item(NAME(m_audio_ack_latch));
+	save_item(NAME(m_speech_strobe_state));
 }
 
 
@@ -39,16 +36,14 @@ static SOUND_START( jedi )
  *
  *************************************/
 
-static SOUND_RESET( jedi )
+void jedi_state::sound_reset()
 {
-	jedi_state *state = machine.driver_data<jedi_state>();
-
 	/* init globals */
-	state->m_audio_latch = 0;
-	state->m_audio_ack_latch = 0;
-	*state->m_audio_comm_stat = 0;
-	*state->m_speech_data = 0;
-	state->m_speech_strobe_state = 0;
+	m_audio_latch = 0;
+	m_audio_ack_latch = 0;
+	*m_audio_comm_stat = 0;
+	*m_speech_data = 0;
+	m_speech_strobe_state = 0;
 }
 
 
@@ -198,9 +193,6 @@ MACHINE_CONFIG_FRAGMENT( jedi_audio )
 
 	MCFG_CPU_ADD("audiocpu", M6502, JEDI_AUDIO_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(audio_map)
-
-	MCFG_SOUND_START(jedi)
-	MCFG_SOUND_RESET(jedi)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

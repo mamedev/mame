@@ -372,7 +372,6 @@ D                                                                               
 #include "sound/samples.h"
 #include "machine/nvram.h"
 #include "includes/equites.h"
-#include "drivlgcy.h"
 
 #define HVOLTAGE_DEBUG  0
 #define EASY_TEST_MODE  0
@@ -411,15 +410,6 @@ TIMER_CALLBACK_MEMBER(equites_state::equites_frq_adjuster_callback)
 	m_hihatvol *= 0.94f;
 
 	m_msm->set_output_gain(10, m_hihatvol + m_cymvol * (m_ay_port_b & 3) * 0.33);   /* NO from msm5232 */
-}
-
-static SOUND_START(equites)
-{
-	equites_state *state = machine.driver_data<equites_state>();
-	state->m_nmi_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(equites_state::equites_nmi_callback),state));
-
-	state->m_adjuster_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(equites_state::equites_frq_adjuster_callback),state));
-	state->m_adjuster_timer->adjust(attotime::from_hz(60), 0, attotime::from_hz(60));
 }
 
 WRITE8_MEMBER(equites_state::equites_c0f8_w)
@@ -1142,8 +1132,6 @@ static MACHINE_CONFIG_FRAGMENT( common_sound )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
 
-	MCFG_SOUND_START(equites)
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -1199,6 +1187,11 @@ MACHINE_START_MEMBER(equites_state,equites)
 	save_item(NAME(m_hihat));
 	save_item(NAME(m_cymbal));
 #endif
+
+	m_nmi_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(equites_state::equites_nmi_callback), this));
+
+	m_adjuster_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(equites_state::equites_frq_adjuster_callback), this));
+	m_adjuster_timer->adjust(attotime::from_hz(60), 0, attotime::from_hz(60));
 }
 
 MACHINE_RESET_MEMBER(equites_state,equites)
@@ -1891,7 +1884,7 @@ DRIVER_INIT_MEMBER(equites_state,hvoltage)
 	unpack_region("gfx3");
 
 #if HVOLTAGE_DEBUG
-	m_maincpu->space(AS_PROGRAM).install_legacy_read_handler(0x000038, 0x000039, read16_delegate(FUNC(equites_state::hvoltage_debug_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x000038, 0x000039, read16_delegate(FUNC(equites_state::hvoltage_debug_r),this));
 #endif
 }
 

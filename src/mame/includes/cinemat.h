@@ -63,6 +63,7 @@ public:
 	DECLARE_DRIVER_INIT(qb3);
 	virtual void machine_start();
 	virtual void machine_reset();
+	virtual void sound_start();
 	virtual void video_start();
 	DECLARE_VIDEO_START(cinemat_16level);
 	DECLARE_VIDEO_START(cinemat_64level);

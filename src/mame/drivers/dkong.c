@@ -409,7 +409,9 @@ MACHINE_START_MEMBER(dkong_state,dkong2b)
 {
 	dkong_init_device_driver_data();
 	m_hardware_type = HARDWARE_TKG04;
-
+	
+	m_snd_rom = memregion("soundcpu")->base();
+	
 	save_item(NAME(m_decrypt_counter));
 	save_item(NAME(m_dma_latch));
 }
@@ -3145,6 +3147,7 @@ DRIVER_INIT_MEMBER(dkong_state,dkingjr)
 		prom[i]^=0xff; // invert color data
 	}
 }
+
 
 
 /*************************************

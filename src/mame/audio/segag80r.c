@@ -18,7 +18,6 @@
 #include "sound/tms36xx.h"
 #include "sound/dac.h"
 #include "devlegcy.h"
-#include "drivlgcy.h"
 
 
 
@@ -96,8 +95,6 @@ void sega005_sound_device::sound_stream_update(sound_stream &stream, stream_samp
  *  Astro Blaster sound hardware
  *
  *************************************/
-
-static SOUND_START( astrob );
 
 /*
     Description of Astro Blaster sounds (in the hope of future discrete goodness):
@@ -244,28 +241,10 @@ static const samples_interface astrob_samples_interface =
 
 MACHINE_CONFIG_FRAGMENT( astrob_sound_board )
 
-	MCFG_SOUND_START(astrob)
-
 	/* sound hardware */
 	MCFG_SAMPLES_ADD("samples", astrob_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
-
-
-
-/*************************************
- *
- *  Startup configuration
- *
- *************************************/
-
-static SOUND_START( astrob )
-{
-	segag80r_state *state = machine.driver_data<segag80r_state>();
-	state->save_item(NAME(state->m_sound_state));
-	state->save_item(NAME(state->m_sound_rate));
-}
-
 
 
 /*************************************
@@ -376,7 +355,6 @@ WRITE8_MEMBER(segag80r_state::astrob_sound_w)
  *
  *************************************/
 
-static SOUND_START( sega005 );
 static STREAM_UPDATE( sega005_stream_update );
 static TIMER_CALLBACK( sega005_auto_timer );
 
@@ -472,33 +450,13 @@ MACHINE_CONFIG_FRAGMENT( 005_sound_board )
 	MCFG_I8255A_ADD( "ppi8255", ppi8255_005_intf )
 
 	/* sound hardware */
-	MCFG_SOUND_START(sega005)
-
+	
 	MCFG_SAMPLES_ADD("samples", sega005_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_SOUND_ADD("005", SEGA005, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
-
-
-
-/*************************************
- *
- *  Startup configuration
- *
- *************************************/
-
-static SOUND_START( sega005 )
-{
-	segag80r_state *state = machine.driver_data<segag80r_state>();
-	state->save_item(NAME(state->m_sound_state));
-	state->save_item(NAME(state->m_sound_addr));
-	state->save_item(NAME(state->m_sound_data));
-	state->save_item(NAME(state->m_square_state));
-	state->save_item(NAME(state->m_square_count));
-}
-
 
 
 /*************************************
@@ -666,8 +624,6 @@ static TIMER_CALLBACK( sega005_auto_timer )
  *
  *************************************/
 
-static SOUND_START( spaceod );
-
 static const char *const spaceod_sample_names[] =
 {
 	"*spaceod",
@@ -696,26 +652,10 @@ static const samples_interface spaceod_samples_interface =
 MACHINE_CONFIG_FRAGMENT( spaceod_sound_board )
 
 	/* sound hardware */
-	MCFG_SOUND_START(spaceod)
-
+	
 	MCFG_SAMPLES_ADD("samples", spaceod_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
-
-
-
-/*************************************
- *
- *  Startup configuration
- *
- *************************************/
-
-static SOUND_START( spaceod )
-{
-	segag80r_state *state = machine.driver_data<segag80r_state>();
-	state->save_item(NAME(state->m_sound_state));
-}
-
 
 
 /*************************************
@@ -778,8 +718,6 @@ WRITE8_MEMBER(segag80r_state::spaceod_sound_w)
  *  Monster Bash sound hardware
  *
  *************************************/
-
-static SOUND_START( monsterb );
 
 /*
     Monster Bash
@@ -861,8 +799,7 @@ MACHINE_CONFIG_FRAGMENT( monsterb_sound_board )
 	MCFG_I8243_ADD("audio_8243", NOOP, WRITE8(segag80r_state,n7751_rom_control_w))
 
 	/* sound hardware */
-	MCFG_SOUND_START(monsterb)
-
+	
 	MCFG_SAMPLES_ADD("samples", monsterb_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
@@ -873,24 +810,6 @@ MACHINE_CONFIG_FRAGMENT( monsterb_sound_board )
 	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
-
-
-
-/*************************************
- *
- *  Startup configuration
- *
- *************************************/
-
-static SOUND_START( monsterb )
-{
-	segag80r_state *state = machine.driver_data<segag80r_state>();
-	state->save_item(NAME(state->m_sound_state));
-	state->save_item(NAME(state->m_sound_addr));
-	state->save_item(NAME(state->m_n7751_command));
-	state->save_item(NAME(state->m_n7751_busy));
-}
-
 
 
 /*************************************

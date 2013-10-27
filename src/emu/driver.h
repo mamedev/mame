@@ -34,10 +34,10 @@
 
 // core sound callbacks
 #define MCFG_SOUND_START_OVERRIDE(_class, _func) \
-	driver_device::static_set_callback(config.root_device(), driver_device::CB_SOUND_START, driver_callback_delegate(&_class::_func, #_class "::" #_func, downcast<_class *>(owner)));
+	driver_device::static_set_callback(config.root_device(), driver_device::CB_SOUND_START, driver_callback_delegate(&_class::SOUND_START_NAME(_func), #_class "::sound_start_" #_func, downcast<_class *>(owner)));
 
 #define MCFG_SOUND_RESET_OVERRIDE(_class, _func) \
-	driver_device::static_set_callback(config.root_device(), driver_device::CB_SOUND_RESET, driver_callback_delegate(&_class::_func, #_class "::" #_func, downcast<_class *>(owner)));
+	driver_device::static_set_callback(config.root_device(), driver_device::CB_SOUND_RESET, driver_callback_delegate(&_class::SOUND_RESET_NAME(_func), #_class "::sound_reset_" #_func, downcast<_class *>(owner)));
 
 
 // core video callbacks
@@ -73,10 +73,14 @@
 #define SOUND_START_NAME(name)      sound_start_##name
 #define SOUND_START(name)           void SOUND_START_NAME(name)(running_machine &machine)
 #define SOUND_START_CALL(name)      SOUND_START_NAME(name)(machine)
+#define DECLARE_SOUND_START(name)   void SOUND_START_NAME(name)()
+#define SOUND_START_MEMBER(cls,name) void cls::SOUND_START_NAME(name)()
 
 #define SOUND_RESET_NAME(name)      sound_reset_##name
 #define SOUND_RESET(name)           void SOUND_RESET_NAME(name)(running_machine &machine)
 #define SOUND_RESET_CALL(name)      SOUND_RESET_NAME(name)(machine)
+#define DECLARE_SOUND_RESET(name)   void SOUND_RESET_NAME(name)()
+#define SOUND_RESET_MEMBER(cls,name) void cls::SOUND_RESET_NAME(name)()
 
 #define PALETTE_INIT_NAME(name)     palette_init_##name
 #define PALETTE_INIT(name)          void PALETTE_INIT_NAME(name)(running_machine &machine) // legacy

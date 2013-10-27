@@ -18,7 +18,6 @@
 #include "sound/tms5110.h"
 #include "sound/ay8910.h"
 #include "includes/scramble.h"
-#include "drivlgcy.h"
 
 #define AD2083_TMS5110_CLOCK        XTAL_640kHz
 
@@ -319,10 +318,6 @@ static ADDRESS_MAP_START( ad2083_sound_io_map, AS_IO, 8, driver_device )
 	AM_RANGE(0x80, 0x80) AM_DEVWRITE("ay2", ay8910_device, address_w)
 ADDRESS_MAP_END
 
-static SOUND_START( ad2083 )
-{
-}
-
 static const tmsprom_interface prom_intf =
 {
 	"5110ctrl",                     /* prom memory region - sound region is automatically assigned */
@@ -362,8 +357,6 @@ MACHINE_CONFIG_FRAGMENT( ad2083_audio )
 
 	MCFG_DEVICE_ADD("tmsprom", TMSPROM, AD2083_TMS5110_CLOCK / 2)  /* rom clock */
 	MCFG_DEVICE_CONFIG(prom_intf)
-
-	MCFG_SOUND_START(ad2083)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ay1", AY8910, 14318000/8)

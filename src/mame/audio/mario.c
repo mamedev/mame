@@ -5,7 +5,7 @@
 #include "sound/discrete.h"
 
 #include "includes/mario.h"
-#include "drivlgcy.h"
+
 
 /****************************************************************
  *
@@ -31,9 +31,9 @@
 #define I8035_P1_W(M,D) soundlatch3_byte_w(M,0,D)
 
 #if (USE_8039)
-#define I8035_P2_W(M,D) do { state->soundlatch4_byte_w(M,0,D); } while (0)
+#define I8035_P2_W(M,D) do { soundlatch4_byte_w(M,0,D); } while (0)
 #else
-#define I8035_P2_W(M,D) do { set_ea(M, ((D) & 0x20) ? 0 : 1);  state->soundlatch4_byte_w(M,0,D); } while (0)
+#define I8035_P2_W(M,D) do { set_ea(M, ((D) & 0x20) ? 0 : 1);  soundlatch4_byte_w(M,0,D); } while (0)
 #endif
 
 #define I8035_P1_W_AH(M,B,D) I8035_P1_W(M,ACTIVEHIGH_PORT_BIT(I8035_P1_R(M),B,(D)))
@@ -412,47 +412,45 @@ static void set_ea(address_space &space, int ea)
  *
  ****************************************************************/
 
-static SOUND_START( mario )
+void mario_state::sound_start()
 {
-	mario_state *state = machine.driver_data<mario_state>();
-	device_t *audiocpu = machine.device("audiocpu");
+	device_t *audiocpu = machine().device("audiocpu");
 #if USE_8039
-	UINT8 *SND = state->memregion("audiocpu")->base();
+	UINT8 *SND = memregion("audiocpu")->base();
 
 	SND[0x1001] = 0x01;
 #endif
 
-	state->m_eabank = NULL;
+	m_eabank = NULL;
 	if (audiocpu != NULL && audiocpu->type() != Z80)
 	{
-		state->m_eabank = "bank1";
+		m_eabank = "bank1";
 		audiocpu->memory().space(AS_PROGRAM).install_read_bank(0x000, 0x7ff, "bank1");
-		state->membank("bank1")->configure_entry(0, state->memregion("audiocpu")->base());
-		state->membank("bank1")->configure_entry(1, state->memregion("audiocpu")->base() + 0x1000);
+		membank("bank1")->configure_entry(0, memregion("audiocpu")->base());
+		membank("bank1")->configure_entry(1, memregion("audiocpu")->base() + 0x1000);
 	}
 
-	state->save_item(NAME(state->m_last));
-	state->save_item(NAME(state->m_portT));
+	save_item(NAME(m_last));
+	save_item(NAME(m_portT));
 }
 
-static SOUND_RESET( mario )
+void mario_state::sound_reset()
 {
-	mario_state *state = machine.driver_data<mario_state>();
-	address_space &space = machine.device("audiocpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("audiocpu")->memory().space(AS_PROGRAM);
 
 #if USE_8039
 	set_ea(machine, 1);
 #endif
 
 	/* FIXME: convert to latch8 */
-	state->soundlatch_clear_byte_w(space, 0, 0);
-	state->soundlatch2_clear_byte_w(space, 0, 0);
-	state->soundlatch3_clear_byte_w(space, 0, 0);
-	state->soundlatch4_clear_byte_w(space, 0, 0);
-	state->I8035_P1_W(space, 0x00); /* Input port */
+	soundlatch_clear_byte_w(space, 0, 0);
+	soundlatch2_clear_byte_w(space, 0, 0);
+	soundlatch3_clear_byte_w(space, 0, 0);
+	soundlatch4_clear_byte_w(space, 0, 0);
+	I8035_P1_W(space, 0x00); /* Input port */
 	I8035_P2_W(space, 0xff); /* Port is in high impedance state after reset */
 
-	state->m_last = 0;
+	m_last = 0;
 }
 
 /****************************************************************
@@ -505,7 +503,6 @@ WRITE8_MEMBER(mario_state::mario_sh_p1_w)
 
 WRITE8_MEMBER(mario_state::mario_sh_p2_w)
 {
-	mario_state *state = machine().driver_data<mario_state>();
 	I8035_P2_W(space, data);
 }
 
@@ -639,9 +636,6 @@ MACHINE_CONFIG_FRAGMENT( mario_audio )
 	MCFG_CPU_PROGRAM_MAP(mario_sound_map)
 	MCFG_CPU_IO_MAP(mario_sound_io_map)
 
-	MCFG_SOUND_START(mario)
-	MCFG_SOUND_RESET(mario)
-
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
 	MCFG_SOUND_CONFIG_DISCRETE(mario)
@@ -653,9 +647,6 @@ MACHINE_CONFIG_FRAGMENT( masao_audio )
 
 	MCFG_CPU_ADD("audiocpu", Z80, 24576000/16)  /* ???? */
 	MCFG_CPU_PROGRAM_MAP(masao_sound_map)
-
-	MCFG_SOUND_START(mario)
-	MCFG_SOUND_RESET(mario)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

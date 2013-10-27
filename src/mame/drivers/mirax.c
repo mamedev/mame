@@ -103,7 +103,6 @@ Stephh's notes (based on the games Z80 code and some tests) :
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-#include "drivlgcy.h"
 
 
 class mirax_state : public driver_device
@@ -134,6 +133,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ay2_sel);
 	DECLARE_DRIVER_INIT(mirax);
 	virtual void palette_init();
+	virtual void sound_start();
 	UINT32 screen_update_mirax(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(mirax_vblank_irq);
 	void draw_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 draw_flag);
@@ -237,10 +237,9 @@ UINT32 mirax_state::screen_update_mirax(screen_device &screen, bitmap_ind16 &bit
 }
 
 
-static SOUND_START(mirax)
+void mirax_state::sound_start()
 {
-	mirax_state *state = machine.driver_data<mirax_state>();
-	state->m_nAyCtrl = 0x00;
+	m_nAyCtrl = 0x00;
 }
 
 WRITE8_MEMBER(mirax_state::audio_w)
@@ -477,8 +476,6 @@ static MACHINE_CONFIG_START( mirax, mirax_state )
 
 	MCFG_PALETTE_LENGTH(0x40)
 	MCFG_GFXDECODE(mirax)
-
-	MCFG_SOUND_START(mirax)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ay1", AY8910, 12000000/4)

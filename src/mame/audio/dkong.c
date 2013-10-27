@@ -1108,20 +1108,6 @@ DISCRETE_SOUND_END
 
 /****************************************************************
  *
- * Initialization
- *
- ****************************************************************/
-
-static SOUND_START( dkong)
-{
-	dkong_state *state = machine.driver_data<dkong_state>();
-
-	state->m_snd_rom = state->memregion("soundcpu")->base();
-}
-
-
-/****************************************************************
- *
  * M58817 Speech
  *
  ****************************************************************/
@@ -1368,8 +1354,6 @@ const tms5110_interface tms_interface = {
  *************************************/
 
 MACHINE_CONFIG_FRAGMENT( dkong2b_audio )
-
-	MCFG_SOUND_START( dkong )
 
 	/* sound latches */
 

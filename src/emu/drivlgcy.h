@@ -23,9 +23,6 @@
 #define MCFG_MACHINE_RESET(_func) \
 	driver_device::static_set_callback(*owner, driver_device::CB_MACHINE_RESET, MACHINE_RESET_NAME(_func));
 
-#define MCFG_SOUND_START(_func) \
-	driver_device::static_set_callback(*owner, driver_device::CB_SOUND_START, SOUND_START_NAME(_func));
-
 #define MCFG_SOUND_RESET(_func) \
 	driver_device::static_set_callback(*owner, driver_device::CB_SOUND_RESET, SOUND_RESET_NAME(_func));
 

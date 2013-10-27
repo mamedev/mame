@@ -33,7 +33,7 @@ $c088-$c095 player tiles
 #include "sound/msm5205.h"
 #include "video/resnet.h"
 #include "machine/nvram.h"
-#include "drivlgcy.h"
+
 
 #define MASTER_CLOCK    XTAL_19_968MHz
 
@@ -908,16 +908,6 @@ static const msm5205_interface msm5205_config =
 	MSM5205_S96_4B
 };
 
-static SOUND_START( jangou )
-{
-	jangou_state *state = machine.driver_data<jangou_state>();
-
-	/* Create a timer to feed the CVSD DAC with sample bits */
-	state->m_cvsd_bit_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(jangou_state::cvsd_bit_timer_callback),state));
-	state->m_cvsd_bit_timer->adjust(attotime::from_hz(MASTER_CLOCK / 1024), 0, attotime::from_hz(MASTER_CLOCK / 1024));
-}
-
-
 /*************************************
  *
  *  Machine driver
@@ -937,6 +927,10 @@ void jangou_state::machine_start()
 
 	save_item(NAME(m_cvsd_shiftreg));
 	save_item(NAME(m_cvsd_shift_cnt));
+	
+	/* Create a timer to feed the CVSD DAC with sample bits */
+	m_cvsd_bit_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(jangou_state::cvsd_bit_timer_callback), this));
+	m_cvsd_bit_timer->adjust(attotime::from_hz(MASTER_CLOCK / 1024), 0, attotime::from_hz(MASTER_CLOCK / 1024));
 }
 
 MACHINE_START_MEMBER(jangou_state,jngolady)
@@ -1007,8 +1001,6 @@ static MACHINE_CONFIG_START( jangou, jangou_state )
 
 
 	/* sound hardware */
-	MCFG_SOUND_START(jangou)
-
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK / 16)
@@ -1037,7 +1029,6 @@ static MACHINE_CONFIG_DERIVED( jngolady, jangou )
 	MCFG_MACHINE_RESET_OVERRIDE(jangou_state,jngolady)
 
 	/* sound hardware */
-	MCFG_SOUND_START(0)
 	MCFG_DEVICE_REMOVE("cvsd")
 
 	MCFG_SOUND_ADD("msm", MSM5205, XTAL_400kHz)
@@ -1059,7 +1050,6 @@ static MACHINE_CONFIG_DERIVED( cntrygrl, jangou )
 	MCFG_MACHINE_RESET_OVERRIDE(jangou_state,common)
 
 	/* sound hardware */
-	MCFG_SOUND_START(0)
 	MCFG_DEVICE_REMOVE("cvsd")
 MACHINE_CONFIG_END
 
@@ -1079,7 +1069,6 @@ static MACHINE_CONFIG_DERIVED( roylcrdn, jangou )
 	MCFG_MACHINE_RESET_OVERRIDE(jangou_state,common)
 
 	/* sound hardware */
-	MCFG_SOUND_START(0)
 	MCFG_DEVICE_REMOVE("cvsd")
 MACHINE_CONFIG_END
 
