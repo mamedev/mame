@@ -1,5 +1,6 @@
 #include "machine/eepromser.h"
 #include "machine/deco146.h"
+#include "sound/ymz280b.h"
 
 class deco_mlc_state : public driver_device
 {
@@ -12,7 +13,9 @@ public:
 		m_mlc_clip_ram(*this, "mlc_clip_ram"),
 		m_mlc_vram(*this, "mlc_vram"),
 		m_maincpu(*this, "maincpu"),
-		m_eeprom(*this, "eeprom") { }
+		m_eeprom(*this, "eeprom"),
+		m_ymz(*this, "ymz")
+		{ }
 
 	optional_device<deco146_device> m_deco146;
 	required_shared_ptr<UINT32> m_mlc_ram;
@@ -63,6 +66,7 @@ public:
 	void descramble_sound(  );
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<ymz280b_device> m_ymz;
 
 	DECLARE_READ16_MEMBER( sh96_protection_region_0_146_r );
 	DECLARE_WRITE16_MEMBER( sh96_protection_region_0_146_w );

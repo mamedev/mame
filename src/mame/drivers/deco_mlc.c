@@ -100,7 +100,6 @@
 #include "emu.h"
 #include "includes/decocrpt.h"
 #include "machine/eepromser.h"
-#include "sound/ymz280b.h"
 #include "cpu/arm/arm.h"
 #include "cpu/sh2/sh2.h"
 #include "includes/deco_mlc.h"
@@ -179,7 +178,9 @@ WRITE32_MEMBER(deco_mlc_state::avengrs_eprom_w)
 //      }
 	}
 	else if (ACCESSING_BITS_0_7) {
-		//volume control todo
+		/* Master volume control (TODO: probably logaritmic) */
+		m_ymz->set_output_gain(0, (255.0 - data) / 255.0);
+		m_ymz->set_output_gain(1, (255.0 - data) / 255.0);
 	}
 	else
 		logerror("%s:  eprom_w %08x mask %08x\n",machine().describe_context(),data,mem_mask);
