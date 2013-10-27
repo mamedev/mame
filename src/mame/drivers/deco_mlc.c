@@ -211,7 +211,10 @@ WRITE32_MEMBER(deco_mlc_state::mlc_irq_w)
 		m_maincpu->set_input_line(m_mainCpuIsArm ? ARM_IRQ_LINE : 1, CLEAR_LINE);
 		return;
 	case 0x14: /* Prepare scanline interrupt */
-		m_raster_irq_timer->adjust(m_screen->time_until_pos(m_irq_ram[0x14/4]));
+		if(m_irq_ram[0x14/4] == -1) // TODO: likely to be anything that doesn't fit into the screen v-pos range.
+			m_raster_irq_timer->adjust(attotime::never);
+		else
+			m_raster_irq_timer->adjust(m_screen->time_until_pos(m_irq_ram[0x14/4]));
 		//logerror("prepare scanline to fire at %d (currently on %d)\n", m_irq_ram[0x14/4], m_screen->vpos());
 		return;
 
@@ -377,7 +380,7 @@ static INPUT_PORTS_START( mlc )
 	PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	
+
 	PORT_START("INPUTS3")
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_UNKNOWN )
