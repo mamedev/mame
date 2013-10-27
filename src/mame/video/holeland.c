@@ -18,19 +18,22 @@
 
 TILE_GET_INFO_MEMBER(holeland_state::holeland_get_tile_info)
 {
+	/*
+	--x- ---- priority?
+	xxxx ---- color
+	---- xx-- flip yx
+	---- --xx tile upper bits
+	*/
+
 	int attr = m_colorram[tile_index];
 	int tile_number = m_videoram[tile_index] | ((attr & 0x03) << 8);
 
-/*if (machine().input().code_pressed(KEYCODE_Q) && (attr & 0x10)) tile_number = rand(); */
-/*if (machine().input().code_pressed(KEYCODE_W) && (attr & 0x20)) tile_number = rand(); */
-/*if (machine().input().code_pressed(KEYCODE_E) && (attr & 0x40)) tile_number = rand(); */
-/*if (machine().input().code_pressed(KEYCODE_R) && (attr & 0x80)) tile_number = rand(); */
 	SET_TILE_INFO_MEMBER(
 			0,
 			tile_number,
 			m_palette_offset + ((attr >> 4) & 0x0f),
 			TILE_FLIPYX((attr >> 2) & 0x03));
-	tileinfo.group = (attr >> 4) & 1;
+	tileinfo.group = (attr >> 5) & 1;
 }
 
 TILE_GET_INFO_MEMBER(holeland_state::crzrally_get_tile_info)
@@ -43,7 +46,7 @@ TILE_GET_INFO_MEMBER(holeland_state::crzrally_get_tile_info)
 			tile_number,
 			m_palette_offset + ((attr >> 4) & 0x0f),
 			TILE_FLIPYX((attr >> 2) & 0x03));
-	tileinfo.group = (attr >> 4) & 1;
+	tileinfo.group = (attr >> 5) & 1;
 }
 
 /***************************************************************************
@@ -154,7 +157,7 @@ void holeland_state::crzrally_draw_sprites( bitmap_ind16 &bitmap,const rectangle
 		code = spriteram[offs + 1] + ((spriteram[offs + 3] & 0x01) << 8);
 		color = (spriteram[offs + 3] >> 4) + ((spriteram[offs + 3] & 0x01) << 4);
 
-		/* Bit 1 unknown */
+		/* Bit 1 unknown but somehow related to X offset (clipping range?) */
 		flipx = spriteram[offs + 3] & 0x04;
 		flipy = spriteram[offs + 3] & 0x08;
 
@@ -180,7 +183,6 @@ void holeland_state::crzrally_draw_sprites( bitmap_ind16 &bitmap,const rectangle
 
 UINT32 holeland_state::screen_update_holeland(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-/*m_bg_tilemap->mark_all_dirty(); */
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
 	holeland_draw_sprites(bitmap, cliprect);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
