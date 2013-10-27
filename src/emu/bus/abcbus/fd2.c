@@ -66,10 +66,10 @@ const device_type ABC_FD2 = &device_creator<abc_fd2_device>;
 
 ROM_START( abc_fd2 )
 	ROM_REGION( 0x400, Z80_TAG, 0 )
-	ROM_LOAD( "1.02.3f", 0x000, 0x400, NO_DUMP )
+	ROM_LOAD( "1.02.3f", 0x000, 0x400, CRC(a19fbdc2) SHA1(d500377c34ac6c679c155f4a5208e1c3e00cd920) )
 
-	ROM_REGION( 0x400, "abc80", 0 )
-	ROM_LOAD( "ami 8005saj.1a", 0x000, 0x400, NO_DUMP )
+	ROM_REGION( 0x800, "abc80", 0 )
+	ROM_LOAD( "ami 8005saj.1a", 0x000, 0x800, CRC(d865213f) SHA1(ae7399ede74520ccb2dd5be2e6bb13c33ee81bd0) )
 ROM_END
 
 
