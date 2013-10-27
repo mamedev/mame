@@ -383,6 +383,7 @@ static MACHINE_CONFIG_START( fstarfrc, tecmo16_state )
 
 	MCFG_GFXDECODE(tecmo16)
 	MCFG_PALETTE_LENGTH(4096)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, all_black)
 
 
 	/* sound hardware */
