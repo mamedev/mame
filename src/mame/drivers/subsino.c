@@ -1,4 +1,4 @@
-// license:?
+// license:MAME
 // copyright-holders:Luca Elia, David Haywood, Angelo Salese and Roberto Fresca.
 /***************************************************************************
 
@@ -1205,7 +1205,7 @@ static ADDRESS_MAP_START( mtrainnv_map, AS_PROGRAM, 8, subsino_state )
 	AM_RANGE( 0x0d004, 0x0d004 ) AM_READ_PORT( "SW4" )
 	AM_RANGE( 0x0d005, 0x0d005 ) AM_READ_PORT( "INB" )
 	AM_RANGE( 0x0d006, 0x0d006 ) AM_READ_PORT( "INA" )
-//  AM_RANGE( 0x0d008, 0x0d008 ) AM_READWRITE
+	AM_RANGE( 0x0d008, 0x0d008 ) AM_RAM AM_SHARE("stisub_out_c")
 //  AM_RANGE( 0x0d009, 0x0d009 ) AM_WRITE
 //  AM_RANGE( 0x0d00a, 0x0d00a ) AM_WRITE
 //  AM_RANGE( 0x0d00b, 0x0d00b ) AM_WRITE
@@ -3715,9 +3715,11 @@ ROM_START( mtrainnv )
 	ROM_LOAD( "mtrain_settings.bin", 0x00000, 0x10000, CRC(584af1b5) SHA1(91d966d282823dddfdc455bb03728fcdf3713dd7) )
 
 	ROM_REGION( 0x10000, "tilemap", 0 )
+	ROM_LOAD( "mtrain_tilemap.bin", 0x00000, 0x10000, NO_DUMP )
 	ROM_COPY( "maincpu", 0x0000, 0x00000, 0x10000 ) // just to show something
 
 	ROM_REGION( 0x10000, "reels", 0 )
+	ROM_LOAD( "mtrain_reels.bin", 0x00000, 0x10000, NO_DUMP )
 	ROM_COPY( "maincpu", 0x0000, 0x00000, 0x10000 ) // just to show something
 ROM_END
 
