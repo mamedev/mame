@@ -63,10 +63,6 @@ struct t_nimbus_brush
 	UINT16  save_colour;
 };
 
-#define SCREEN_WIDTH_PIXELS     640
-#define SCREEN_HEIGHT_LINES     250
-#define SCREEN_NO_COLOURS       16
-
 
 /* 80186 internal stuff */
 struct mem_state
