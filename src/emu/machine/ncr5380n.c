@@ -394,6 +394,7 @@ void ncr5380n_device::arbitrate()
 	state = (state & STATE_MASK) | (ARB_COMPLETE << SUB_SHIFT);
 	scsi_bus->data_w(scsi_refid, m_outdata);
 	scsi_bus->ctrl_w(scsi_refid, S_BSY, S_BSY);
+	m_icommand |= IC_BSY;	// make sure BSY shows in icommand (Zilog 5380 manual suggests this behavior, Apple II High-Speed SCSI Card firmware requires it)
 	delay(11);
 }
 
