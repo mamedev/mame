@@ -1,7 +1,14 @@
+// license:MAME
+// copyright-holders:Angelo Salese, Tomasz Slanina, David Haywood, Luca Elia
 /********************************************************************************************
 
     Gunpey (c) 2000 Banpresto
 
+	TODO:
+	- compression scheme used by the Axell video chip, game is playable but several gfxs are
+	  still broken.
+
+=============================================================================================
 ASM code study:
 0x84718 main code
 0x8472c call 0x81f34 reading of dip-switches
@@ -1506,4 +1513,4 @@ DRIVER_INIT_MEMBER(gunpey_state,gunpey)
 	// ...
 }
 
-GAME( 2000, gunpey, 0, gunpey, gunpey, gunpey_state, gunpey,    ROT0, "Banpresto", "Gunpey (Japan)",GAME_NOT_WORKING)
+GAME( 2000, gunpey, 0, gunpey, gunpey, gunpey_state, gunpey,    ROT0, "Banpresto", "Gunpey (Japan)",GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS)

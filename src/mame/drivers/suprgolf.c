@@ -1,4 +1,4 @@
-// license:?
+// license:MAME
 // copyright-holders:Angelo Salese, Tomasz Slanina
 /************************************************************************************
 
