@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:Angelo Salese
 /**********************************************************************
 
     CCBUS Slot interface for PC-98xx family
