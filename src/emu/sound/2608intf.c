@@ -220,8 +220,36 @@ void ym2608_device::device_config_complete()
 }
 
 ROM_START( ym2608 )
-	ROM_REGION( 0x2000, "ym2608", 0 ) // marked as bad dump because it was dumped by output analysis, not decap.  data order could be incorrect, see YM2608_ADPCM_ROM_addr table in fm.c for current sample offsets
-	ROM_LOAD16_WORD( "ym2608_adpcm_rom.bin", 0x0000, 0x2000, BAD_DUMP CRC(23c9e0d8) SHA1(50b6c3e288eaa12ad275d4f323267bb72b0445df) )
+	ROM_REGION( 0x2000, "ym2608", 0 )
+	/*
+	This data is derived from the chip's output - internal ROM can't be read.
+	It was verified, using real YM2608, that this ADPCM stream produces 100% correct output signal.
+	*/
+	// see YM2608_ADPCM_ROM_addr table in fm.c for current sample offsets
+	// original offset comments from Jarek: 
+	// offset 0:
+		/* Source: 01BD.ROM */
+		/* Length: 448 / 0x000001C0 */
+	// offset 0x1C0:
+		/* Source: 02SD.ROM */
+		/* Length: 640 / 0x00000280 */
+	// offset 0x440:
+		/* Source: 04TOP.ROM */
+		/* Length: 5952 / 0x00001740 */
+	// offset 0x1B80:
+		/* Source: 08HH.ROM */
+		/* Length: 384 / 0x00000180 */
+	// offset 0x1D00
+		/* Source: 10TOM.ROM */
+		/* Length: 640 / 0x00000280 */
+	// offset 0x1F80
+		/* Source: 20RIM.ROM */
+		/* Length: 128 / 0x00000080 */
+	/* while this rom was dumped by output analysis, not decap, it was tested
+	  by playing it back into the chip as an external adpcm sample and produced
+	  an identical dac result. a decap would be nice to verify things 100%,
+	  but there is currently no reason to think this rom dump is incorrect. */
+	ROM_LOAD16_WORD( "ym2608_adpcm_rom.bin", 0x0000, 0x2000, CRC(23c9e0d8) SHA1(50b6c3e288eaa12ad275d4f323267bb72b0445df) )
 ROM_END
 
 
