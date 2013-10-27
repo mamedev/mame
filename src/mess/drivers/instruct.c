@@ -11,12 +11,12 @@
 
     From looking at a blurry picture of it, this is what I can determine:
     - Left side: 8 toggle switches, with a round red led above each one.
-    - Below this is another toggle switch with choice of 'Extended' or 'I/O port 07'.
+    - Below this is the Port Address Switch with choice of 'Non-Extended', 'Extended' or 'Memory'.
     - To the right of this is another toggle switch labelled 'Interrupt', the
       choices are 'Direct' and 'Indirect'.
     - Above this switch are 2 more round red leds: FLAG and RUN.
     - Middle: a 4 down x3 across keypad containing the function keys. The
-      labels (from left to right, top to bottom) seem to be:
+      labels (from left to right, top to bottom) are:
       SENS, WCAS, BKPT, INT, RCAS, REG, MON, STEP, MEM, RST, RUN, ENT/NXT.
     - Right side: a 4x4 hexadecimal keypad. The keys are:
       C, D, E, F, 8, 9, A, B, 4, 5, 6, 7, 0, 1, 2, 3
@@ -28,14 +28,17 @@
     Quick usage:
     - Look at memory: Press minus key. Enter an address. Press UP key to see the next.
     - Look at registers: Press R. Press 0. Press UP key to see the next.
-    - Look at PC register: Press R. Press C.
+    - Set PC register: Press R. Press C. Type in new address, Press UP.
     - Load a tape: Press L, enter file number (1 digit), press UP. On
       completion of a successful load, HELLO will be displayed.
 
     ToDO:
-    - Connect 10 toggle switches and 10 round red leds.
+    - Connect round led for Run.
     - Last Address Register
     - Initial Jump Logic
+    - Single-step and Breakpoint don't stop execution because of the above.
+    - The "Port Address Switch" which selects which of the 3 sources will
+      be used for port_r and port_w. Currently all 3 are selected at once.
 
 ****************************************************************************/
 
@@ -63,6 +66,7 @@ public:
 	DECLARE_READ8_MEMBER(portfd_r);
 	DECLARE_READ8_MEMBER(portfe_r);
 	DECLARE_READ8_MEMBER(sense_r);
+	DECLARE_WRITE8_MEMBER(flag_w);
 	DECLARE_WRITE8_MEMBER(port_w);
 	DECLARE_WRITE8_MEMBER(portf8_w);
 	DECLARE_WRITE8_MEMBER(portf9_w);
@@ -82,6 +86,12 @@ private:
 	required_shared_ptr<UINT8> m_p_extram;
 	required_device<cassette_image_device> m_cass;
 };
+
+// flag led
+WRITE8_MEMBER( instruct_state::flag_w )
+{
+	output_set_value("led8", !BIT(data, 0));
+}
 
 // user port
 WRITE8_MEMBER( instruct_state::port_w )
@@ -120,18 +130,19 @@ WRITE8_MEMBER( instruct_state::portfa_w )
 	m_valid_digit = true;
 }
 
+// user switches
 READ8_MEMBER( instruct_state::port_r )
 {
 	return ioport("USW")->read();
 }
 
-// last address register A0-7 - copied to 17E9 at boot
+// last address register A0-7 copied to 17E9 at boot
 READ8_MEMBER( instruct_state::portfc_r )
 {
 	return m_lar;
 }
 
-// last address register A8-14 - copied to 17E8 at boot
+// last address register A8-14 copied to 17E8 at boot
 READ8_MEMBER( instruct_state::portfd_r )
 {
 	return (m_lar >> 8) & 0x7f;
@@ -217,8 +228,8 @@ static ADDRESS_MAP_START( instruct_io, AS_IO, 8, instruct_state )
 	AM_RANGE(0xfc, 0xfc) AM_READ(portfc_r)
 	AM_RANGE(0xfd, 0xfd) AM_READ(portfd_r)
 	AM_RANGE(0xfe, 0xfe) AM_READ(portfe_r)
-	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(sense_r)
 	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READWRITE(port_r,port_w)
+	AM_RANGE(S2650_SENSE_PORT, S2650_FO_PORT) AM_READWRITE(sense_r,flag_w)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -373,6 +384,10 @@ QUICKLOAD_LOAD_MEMBER( instruct_state, instruct )
 					if (quick_length > 0x1780)
 						for (i = 0x1780; i < read_; i++)
 							m_p_smiram[i-0x1780] = quick_data[i];
+
+					// put start address into PC so it can be debugged
+					m_p_smiram[0x68] = m_p_ram[1];
+					m_p_smiram[0x69] = m_p_ram[2];
 
 					// load to 2000-7FFF (optional extra ram)
 					if (quick_length > 0x2000)

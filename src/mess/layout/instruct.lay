@@ -27,7 +27,7 @@
 
 		<!-- Background -->
 		<backdrop element="background">
-			<bounds left="0" top="0" right="362" bottom="105" />
+			<bounds left="0" top="0" right="362" bottom="135" />
 		</backdrop>
 
 		<!-- LEDs -->
@@ -78,6 +78,9 @@
 		</bezel>
 		<bezel name="led7" element="red_led">
 			<bounds left="328" right="343" top="80" bottom="95" />
+		</bezel>
+		<bezel name="led8" element="red_led">
+			<bounds left="20" right="35" top="110" bottom="125" />
 		</bezel>
 	</view>
 </mamelayout>
