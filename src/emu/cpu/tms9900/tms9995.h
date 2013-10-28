@@ -173,6 +173,8 @@ private:
 	bool    m_mid_flag;
 	bool    m_mid_active;
 
+	int     m_decrementer_clkdiv;
+
 	// Flag field
 	int     m_int_pending;
 

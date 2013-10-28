@@ -1247,7 +1247,13 @@ void tms9995_device::pulse_clock(int count)
 			else LOG("tms9995: pulse_clock\n");
 		}
 		m_request_auto_wait_state = false;
-		if (m_flag[0] == false && m_flag[1] == true) trigger_decrementer();
+		if (m_flag[0] == false && m_flag[1] == true)
+		{
+			// Section 2.3.1.2.2: "by decreasing the count in the Decrementing
+			// Register by one for each fourth CLKOUT cycle"
+			m_decrementer_clkdiv = (m_decrementer_clkdiv+1)%4;
+			if (m_decrementer_clkdiv==0) trigger_decrementer();
+		}
 	}
 }
 
@@ -1521,6 +1527,7 @@ void tms9995_device::service_interrupt()
 		m_word_access = false;
 		m_int1_active = false;
 		m_int4_active = false;
+		m_decrementer_clkdiv = 0;
 
 		m_pass = 0;
 		m_instindex = 0;
