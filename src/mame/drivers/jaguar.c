@@ -344,6 +344,10 @@ Notes:
 #include "imagedev/snapquik.h"
 #include "sound/dac.h"
 #include "machine/eepromser.h"
+#include "sound/cdda.h"
+#include "cdrom.h"
+#include "imagedev/chd_cd.h"
+
 
 #define COJAG_CLOCK         XTAL_52MHz
 #define R3000_CLOCK         XTAL_40MHz
@@ -382,10 +386,13 @@ void jaguar_state::machine_reset()
 		memcpy(m_shared_ram, m_rom_base, 0x400);    // do not increase, or Doom breaks
 		m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 
-		/* hack until I understand */
 		if(m_is_jagcd)
 		{
-			m_shared_ram[0x4/4] = 0x00802000;
+			m_shared_ram[0x4/4] = 0x00802000; /* hack until I understand */
+
+			m_cd_file = m_cdrom->get_cdrom_file();
+			m_butch_cmd_index = 0;
+			m_butch_cmd_size = 1;
 		}
 	}
 
@@ -1161,7 +1168,8 @@ READ32_MEMBER(jaguar_state::butch_regs_r)
 	switch(offset*4)
 	{
 		case 8: //DS DATA
-			return m_butch_cmd_response;
+			//m_butch_regs[0] &= ~0x2000;
+			return m_butch_cmd_response[(m_butch_cmd_index++) % m_butch_cmd_size];
 	}
 
 	return m_butch_regs[offset];
@@ -1176,13 +1184,73 @@ WRITE32_MEMBER(jaguar_state::butch_regs_w)
 		case 8: //DS DATA
 			switch((m_butch_regs[offset] & 0xff00) >> 8)
 			{
+				case 0x03: // Read TOC
+					UINT32 msf;
+
+					if(m_butch_regs[offset] & 0xff) // Multi Session CD, TODO
+					{
+						m_butch_cmd_response[0] = 0x0029; // illegal value
+						m_butch_regs[0] |= 0x2000;
+						m_butch_cmd_index = 0;
+						m_butch_cmd_size = 1;
+						return;
+					}
+
+					msf = cdrom_get_track_start(m_cd_file, 0) + 150;
+
+					/* first track number */
+					m_butch_cmd_response[0] = 0x2000 | 1;
+					/* last track number */
+					m_butch_cmd_response[1] = 0x2100 | cdrom_get_last_track(m_cd_file);
+
+					/* start of first track minutes */
+					m_butch_cmd_response[2] = 0x2200 | ((msf / 60) / 60);
+					/* start of first track seconds */
+					m_butch_cmd_response[3] = 0x2300 | (msf / 60) % 60;
+					/* start of first track frame */
+					m_butch_cmd_response[4] = 0x2400 | (msf % 75);
+					m_butch_regs[0] |= 0x2000;
+					m_butch_cmd_index = 0;
+					m_butch_cmd_size = 5;
+					break;
+				case 0x14: // Read Long TOC
+					{
+						UINT32 msf;
+						int ntrks = cdrom_get_last_track(m_cd_file);
+
+						for(int i=0;i<ntrks;i++)
+						{
+							msf = cdrom_get_track_start(m_cd_file, i) + 150;
+
+							/* track number */
+							m_butch_cmd_response[i*5+0] = 0x6000 | (i+1);
+							/* attributes (?) */
+							m_butch_cmd_response[i*5+1] = 0x6100 | 0x00;
+
+							/* start of track minutes */
+							m_butch_cmd_response[i*5+2] = 0x6200 | ((msf / 60) / 60);
+							/* start of track seconds */
+							m_butch_cmd_response[i*5+3] = 0x6300 | (msf / 60) % 60;
+							/* start of track frame */
+							m_butch_cmd_response[i*5+4] = 0x6400 | (msf % 75);
+						}
+						m_butch_regs[0] |= 0x2000;
+						m_butch_cmd_index = 0;
+						m_butch_cmd_size = 5*ntrks;
+					}
+
+					break;
 				case 0x15: // Set Mode
 					m_butch_regs[0] |= 0x2000;
-					m_butch_cmd_response = 0x1700 | (m_butch_regs[offset] & 0xff);
+					m_butch_cmd_response[0] = 0x1700 | (m_butch_regs[offset] & 0xff);
+					m_butch_cmd_index = 0;
+					m_butch_cmd_size = 1;
 					break;
 				case 0x70: // Set DAC Mode
 					m_butch_regs[0] |= 0x2000;
-					m_butch_cmd_response = 0x7000 | (m_butch_regs[offset] & 0xff);
+					m_butch_cmd_response[0] = 0x7000 | (m_butch_regs[offset] & 0xff);
+					m_butch_cmd_index = 0;
+					m_butch_cmd_size = 1;
 					break;
 				default:
 					printf("%04x CMD\n",m_butch_regs[offset]);
@@ -1794,6 +1862,12 @@ static MACHINE_CONFIG_START( jaguar, jaguar_state )
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 MACHINE_CONFIG_END
 
+struct cdrom_interface jagcd_cdrom =
+{
+	"jag_cdrom",
+	NULL
+};
+
 static MACHINE_CONFIG_DERIVED( jaguarcd, jaguar )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(jaguarcd_map)
@@ -1805,6 +1879,8 @@ static MACHINE_CONFIG_DERIVED( jaguarcd, jaguar )
 	MCFG_CPU_MODIFY("dsp")
 	MCFG_JAGUAR_IRQ_HANDLER(WRITELINE(jaguar_state, dsp_cpu_int))
 	MCFG_CPU_PROGRAM_MAP(jagcd_dsp_map)
+
+	MCFG_CDROM_ADD( "cdrom",jagcd_cdrom )
 MACHINE_CONFIG_END
 
 /*************************************

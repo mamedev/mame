@@ -1,5 +1,5 @@
-// license:BSD-3-Clause
-// copyright-holders:Aaron Giles
+// license:MAME
+// copyright-holders:Aaron Giles,Nathan Woods,Angelo Salese, Robbbert
 /*************************************************************************
 
     Atari Jaguar hardware
@@ -12,6 +12,8 @@
 #include "machine/eepromser.h"
 #include "machine/vt83c461.h"
 #include "imagedev/snapquik.h"
+#include "cdrom.h"
+#include "imagedev/chd_cd.h"
 
 #ifndef ENABLE_SPEEDUP_HACKS
 #define ENABLE_SPEEDUP_HACKS 1
@@ -32,6 +34,7 @@ public:
 			m_dsp(*this, "dsp"),
 			m_dac1(*this, "dac1"),
 			m_dac2(*this, "dac2"),
+			m_cdrom(*this, "cdrom"),
 			m_nvram(*this, "nvram"),
 			m_rom_base(*this, "rom"),
 			m_cart_base(*this, "cart"),
@@ -68,6 +71,7 @@ public:
 	required_device<jaguardsp_cpu_device> m_dsp;
 	required_device<dac_device> m_dac1;
 	required_device<dac_device> m_dac2;
+	optional_device<cdrom_image_device> m_cdrom;
 
 	// memory
 	optional_shared_ptr<UINT32> m_nvram;        // not used on console
@@ -120,7 +124,11 @@ public:
 	UINT8 m_blend_y[65536];
 	UINT8 m_blend_cc[65536];
 	UINT32 m_butch_regs[0x40/4];
-	UINT32 m_butch_cmd_response;
+	UINT32 m_butch_cmd_response[0x102];
+	UINT8 m_butch_cmd_index;
+	UINT8 m_butch_cmd_size;
+	cdrom_file  *m_cd_file;
+	const cdrom_toc*    m_toc;
 
 	static void (jaguar_state::*const bitmap4[8])(UINT16 *, INT32, INT32, UINT32 *, INT32, UINT16 *);
 	static void (jaguar_state::*const bitmap8[8])(UINT16 *, INT32, INT32, UINT32 *, INT32, UINT16 *);
