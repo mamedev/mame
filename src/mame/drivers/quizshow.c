@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:hap
 /***************************************************************************
 
   Atari Quiz Show
@@ -37,18 +39,23 @@ class quizshow_state : public driver_device
 public:
 	quizshow_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_main_ram(*this, "main_ram"),
-		m_fo_state(*this, "fo_state"),
 		m_maincpu(*this, "maincpu"),
-		m_dac(*this, "dac") { }
+		m_dac(*this, "dac"),
+		m_main_ram(*this, "main_ram"),
+		m_fo_state(*this, "fo_state")
+	{ }
 
-	tilemap_t *m_tilemap;
+	required_device<cpu_device> m_maincpu;
+	required_device<dac_device> m_dac;
 	required_shared_ptr<UINT8> m_main_ram;
 	required_shared_ptr<UINT8> m_fo_state;
+
+	tilemap_t *m_tilemap;
 	UINT32 m_clocks;
 	int m_blink_state;
 	int m_category_enable;
 	int m_tape_head_pos;
+
 	DECLARE_WRITE8_MEMBER(quizshow_lamps1_w);
 	DECLARE_WRITE8_MEMBER(quizshow_lamps2_w);
 	DECLARE_WRITE8_MEMBER(quizshow_lamps3_w);
@@ -67,8 +74,6 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_quizshow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(quizshow_clock_timer_cb);
-	required_device<cpu_device> m_maincpu;
-	required_device<dac_device> m_dac;
 };
 
 
@@ -374,6 +379,7 @@ void quizshow_state::machine_reset()
 }
 
 static MACHINE_CONFIG_START( quizshow, quizshow_state )
+
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, MASTER_CLOCK / 16) // divider guessed
 	MCFG_CPU_PROGRAM_MAP(quizshow_mem_map)
@@ -388,7 +394,6 @@ static MACHINE_CONFIG_START( quizshow, quizshow_state )
 
 	MCFG_GFXDECODE(quizshow)
 	MCFG_PALETTE_LENGTH(8*2)
-
 
 	/* sound hardware (discrete) */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
