@@ -23500,6 +23500,18 @@
 
 <!-- Other Asian pirate carts -->
 
+	<software name="smw7" cloneof="advisln2">
+		<description>Super Mario World 7 (Chi, ripped from 18 in 1 multicart)</description>
+		<year>1998</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="262144">
+				<rom name="super mario world 7 (unlicensed) (multicart rip).bin" size="262144" crc="aad1226e" sha1="0ee89297e9d24c1b4247765c8561a2cc90e383c9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="rockman8">
 		<description>Rockman 8 (Chi)</description>
 		<year>1999</year>

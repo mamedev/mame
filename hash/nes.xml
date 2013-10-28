@@ -37479,6 +37479,40 @@
 		</part>
 	</software>
 
+	<software name="tecmosbwp" cloneof="tecmosbw">
+		<description>Tecmo Super Bowl (USA, Prototype)</description>
+		<year>1991</year>
+		<publisher>Tecmo</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<feature name="pcb" value="NES-TKEPROM" />
+			<feature name="mmc3_type" value="MMC3B" />
+			<feature name="pcb_model" value="NES-TKEPROM-02" />
+			<feature name="u1" value="PRG-ROM" />
+			<feature name="u2" value="PRG-ROM" />
+			<feature name="u3" value="PRG-ROM (EMPTY)" />
+			<feature name="u4" value="PRG-ROM (EMPTY)" />
+			<feature name="u5" value="CHR-ROM" />
+			<feature name="u6" value="CHR-ROM (EMPTY)" />
+			<feature name="u7" value="W-RAM" />
+			<feature name="u8" value="MMC3B" />
+			<feature name="u9" value="CIC (6113B1)" />
+			<feature name="u10" value="74HC139AP" />
+			<feature name="batt?" value="BATTERY" />
+			<dataarea name="prg" size="262144">
+			<!-- The PRG split ROMs have to be confirmed -->
+				<rom name="8-27 0 5-20.u1" size="131072" crc="06074289" sha1="7c5b4a7f51eb79458cbe7cb7e77aae4df6eac4f3" offset="0x00000" status="baddump" />	<!-- Actual label: 8/27 0 5:20 -->
+				<rom name="8-27 1 5-20.u2" size="131072" crc="937992d7" sha1="e335b4c2dc3fc21effaa8a12d47677090c8b30c4" offset="0x20000" status="baddump" />	<!-- Actual label: 8/27 1 5:20 -->
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="t.s.b. chr 8-27.u5" size="131072" crc="e5f74c77" sha1="3657693f08c66d2db84bcf62fdd4c439603778f5" offset="00000" />	<!-- Actual label: T.S.B. CHR 8/27 -->
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="tecmowcj" cloneof="tecmowc">
 		<description>Tecmo World Cup Soccer (Jpn)</description>
 		<year>1990</year>
@@ -43825,6 +43859,25 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
+	<software name="blockout">
+		<description>Block Out (USA, Prototype)</description>
+		<year>1990</year>
+		<publisher>California Dreams</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="prg" size="131072">
+				<rom name="block out.prg" size="131072" crc="cf992e34" sha1="2500b5492ece1cafb97881c5a384b0768313bf98" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="16384">
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bluemarlj" cloneof="bluemarl">
 		<description>The Blue Marlin (Jpn)</description>
 		<year>1991</year>
@@ -44701,6 +44754,25 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<dataarea name="chr" size="131072">
 				<rom name="nes-57-0 chr" size="131072" crc="0d4d1547" sha1="2d3bbe7d2e5915d2d8c858348871defba12665ad" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dinohcky">
+		<description>Dino Hockey (USA, Prototype)</description>
+		<year>1991?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="chr" size="131072">
+				<rom name="dino.chr" size="131072" crc="f0a6635b" sha1="0108a11222a27654d4833461572d4abf809dcc72" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="dino.prg" size="131072" crc="ca9362c3" sha1="651c5063365fcfc60b06ccc73b79e345805888ed" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -45729,6 +45801,25 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="gun-dec (japan).prg" size="131072" crc="14a01c70" sha1="ebd791cd948d6da3bb4d2cc31dad300497ade52c" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="harddriv" supported="partial">
+		<description>Hard Drivin' (USA, Prototype)</description>
+		<year>1988</year>
+		<publisher>Tengen</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="tengen_800032" />
+			<feature name="pcb" value="TENGEN-800032" />
+			<dataarea name="chr" size="262144">
+				<rom name="harddrivin.chr" size="262144" crc="5bf02f50" sha1="7450f5a44e685ccb31afee704f31928518a333e8" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="harddrivin.prg" size="131072" crc="2e9851f2" sha1="426b20ddbe846569905b15efe74710b5f3000be3" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -53926,6 +54017,27 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="hywz">
+		<description>Huo Yan Wen Zhang - Sheng Zhan De Xi Pu (Chi)</description>
+		<year>19??</year>
+		<publisher>Waixing</publisher>
+		<info name="serial" value="ES-1100"/>
+		<info name="alt_title" value="火炎纹章-圣战的系谱"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="fs304" />
+			<feature name="pcb" value="UNL-FS304" />
+			<dataarea name="prg" size="1048576">
+				<rom name="[es-1100] huo yan wen zhang - sheng zhan de xi pu (c).prg" size="1048576" crc="cf4adaad" sha1="24af90c5df097240ca4e0ad8e4ec69e360e13f34" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="16384">
+			</dataarea>
+			<!-- 8k BWRAM on cartridge -->
+			<dataarea name="bwram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="zhentian" supported="no">
 		<description>Zhen Tian Shi Yongshi (Chi)</description>
 		<year>19??</year>
@@ -53963,6 +54075,27 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<dataarea name="vram" size="8192">
 			</dataarea>
 			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shhz3">
+		<description>Sheng Huo Hui Zhang III (Chi)</description>
+		<year>19??</year>
+		<publisher>Waixing</publisher>
+		<info name="serial" value="ES-1107"/>
+		<info name="alt_title" value="圣火徽章Ⅲ"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="fs304" />
+			<feature name="pcb" value="UNL-FS304" />
+			<dataarea name="prg" size="1048576">
+				<rom name="[es-1107] sheng huo hui zhang iii (c).prg" size="1048576" crc="b2045e9c" sha1="ae0b687ee2335521a745dbe2f6ef5633d1845ee2" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="16384">
+			</dataarea>
+			<!-- 8k BWRAM on cartridge -->
 			<dataarea name="bwram" size="8192">
 			</dataarea>
 		</part>
@@ -54195,7 +54328,6 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-
 	<software name="ymzpearl">
 		<description>Ye Ming Zhu - Pearl (Chi)</description>
 		<year>19??</year>
@@ -54209,6 +54341,22 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="ye ming zhu (c).prg" size="131072" crc="0c537be3" sha1="97666ae8f856fe14b7a691c17272614f1d7fea49" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shumabb">
+		<description>Shu Ma Bao Bei (Chi)</description>
+		<year>19??</year>
+		<publisher>CoolBoy</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txc_commandos" />
+			<feature name="pcb" value="TXC-MXMDHTWO" />
+			<dataarea name="prg" size="1048576">
+				<rom name="shu ma bao bei (coolboy) (ch).prg" size="1048576" crc="aa23a44f" sha1="28c96e0fc60b7d1acd91cd83d6024fa8536c15a5" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -57036,6 +57184,31 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This was dumped by TSZone and should be good dump -->
+	<software name="firembca" cloneof="firemb" supported="no">
+		<description>Sheng Huo Hui Zhang II Dai (Chi, Alt?)</description>
+		<year>19??</year>
+		<publisher>Waixing</publisher>
+		<info name="serial" value="ES-1053"/>
+		<info name="alt_title" value="圣火徽章Ⅱ代"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="waixing_sh2" />
+			<feature name="pcb" value="WAIXING-SH2" />
+			<dataarea name="chr" size="131072">
+				<rom name="[es-1053] sheng huo hui zhang ii dai (c).chr" size="131072" crc="92876ff0" sha1="7f8e3e2af357ddb2a0190cc205e01f8586e323f2" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="524288">
+				<rom name="[es-1053] sheng huo hui zhang ii dai (c).prg" size="524288" crc="a99a094b" sha1="4ad14e576f557262ba5570698e8f92cce769e073" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+			<!-- 8k BWRAM on cartridge -->
+			<dataarea name="bwram" size="8192">
 			</dataarea>
 		</part>
 	</software>

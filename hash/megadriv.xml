@@ -70,7 +70,6 @@ Known undumped pirates
   * Tec Toy Mega Drive 3 (with 86 built in games)
   * Chinese Checkers (by RealTec)
   * Shizen Mahjong / Competition Mahjong (by Sachen, apparently dumped but hoarded)
-  * Thunderbolt II - 雷電伝説II
   * Magic 7 Block - 百変七巧板
   * Chinese Battle Chess (?) - 戦 棊
 
@@ -20740,6 +20739,17 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
+	<software name="pokemnii">
+		<description>Pokémon II</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="pokemon ii (unl).bin" size="2097152" crc="a5ef0b96" sha1="d5dc9facfec1f52a4cb036ce918003dd89474b5c" offset="0x000000" loadflag="load16_word_swap"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pokecd">
 		<description>Pokemon Crazy Drummer</description>
 		<year>199?</year>
@@ -29451,10 +29461,12 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-  <software name="tbolt2">
+<!-- Dump with CRC a2ef16de is hacked to bypass protection. If you found it on a real cart, please let us know. -->
+	<software name="tbolt2">
 		<description>Thunderbolt II (Unl)</description>
 		<year>199?</year>
 		<publisher>Sun Green</publisher>
+		<info name="alt_title" value="雷電伝説II"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_smouse"/>
 			<dataarea name="rom" size="524288">
@@ -29462,17 +29474,6 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 			</dataarea>
 		</part>
 	</software>
-    
-   <software name="tbolt2p" cloneof="tbolt2">
-		<description>Thunderbolt II (Unl, Cracked)</description>
-		<year>199?</year>
-		<publisher>Sun Green</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="thunderbolt ii (cracked).bin" size="524288" crc="a2ef16de" sha1="3c8a2a3324b7560d6e62e650bafc34a55af858ae" offset="0x000000" loadflag="load16_word_swap"/>
-			</dataarea>
-		</part>
-	</software> 
   
 	<software name="topfight">
 		<description>Top Fighter 2000 MK VIII</description>
@@ -30615,6 +30616,17 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1220816">
 				<rom name="star wars jedi (unl).bin" size="1220816" crc="48c5bf60" sha1="2720d3ca0fcdc4cca64654169c04b6ecf79c9fa8" offset="0x000000" loadflag="load16_word_swap"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sf3" cloneof="sf2">
+		<description>Street Fighter III 18 Person</description>
+		<year>200?</year>
+		<publisher>Glorysun</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="street fighter iii 18 person (street fighter ii' turbo hack).bin" size="2097152" crc="25ac8011" sha1="a8055ac832fa8341af5b458bef56544b788718fc" offset="0x000000" loadflag="load16_word_swap"/>
 			</dataarea>
 		</part>
 	</software>

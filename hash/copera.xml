@@ -1,24 +1,15 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
-	<!--
+<!--
 Games for the MIXT BOOK PLAYER COPERA
-
-* メロディランド - Melody Land (Yamaha - 199312xx - MMGS-1)
-* ドレミファ伝説 - Doremifa Densetsu (Yamaha - 199312xx - MMGS-2)
-* コペラのタイムマシン - Copera no Time Machine (Yamaha - ???? - MMGS-3)
-* おっとカタチッチ - Otto Katachicchi (Yamaha - ???? - MMGS-4)
-
-
-not dumped?
 
 * おしゃれの国のアリス - Oshare no Kuni no Alice (Yamaha - ???? - MMGS-8)
 * コペラのちきゅうだいすき - Copera no Chikyuu Daisuki (Yamaha - ???? - MMGS-9)
 * 冒険!メロリン島 - Bouken! Merorin Shima (Yamaha - ???? - MMGS-10)
+-->
 
-	-->
-
-	<softwarelist name="copera" description="Yamaha / Sega Copera cartridges">
+<softwarelist name="copera" description="Yamaha / Sega Copera cartridges">
 
 
 	<software name="melody">
@@ -26,9 +17,12 @@ not dumped?
 		<year>1993</year>
 		<publisher>Yamaha</publisher>
 		<info name="serial" value="MMGS-1"/>
+		<info name="alt_title" value="メロディランド"/>
 		<part name="cart" interface="copera_cart">
+			<feature name="pcb" value="171-6586A" />
+			<feature name="ic1" value="MPR-16163 J05" />
 			<dataarea name="rom" size="1048576">
-				<rom name="mpr-16163.ic1" size="1048576" crc="9b05acc9" sha1="cd4f3260309a1236f6f0d491f385d4dececa349e" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-16163 j05.ic1" size="1048576" crc="9b05acc9" sha1="cd4f3260309a1236f6f0d491f385d4dececa349e" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -38,9 +32,12 @@ not dumped?
 		<year>1993</year>
 		<publisher>Yamaha</publisher>
 		<info name="serial" value="MMGS-2"/>
+		<info name="alt_title" value="ドレミファ伝説"/>
 		<part name="cart" interface="copera_cart">
+			<feature name="pcb" value="171-6586A" />
+			<feature name="ic1" value="MPR-16164 J06" />
 			<dataarea name="rom" size="1048576">
-				<rom name="mp4-16164.ic1" size="1048576" crc="24aa1251" sha1="1a7d5156aa3f2ffba168bce1bbd9436cb0c11510" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-16164 j06.ic1" size="1048576" crc="24aa1251" sha1="1a7d5156aa3f2ffba168bce1bbd9436cb0c11510" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -50,9 +47,12 @@ not dumped?
 		<year>1993</year>
 		<publisher>Yamaha</publisher>
 		<info name="serial" value="MMGS-3"/>
+		<info name="alt_title" value="コペラのタイムマシン"/>
 		<part name="cart" interface="copera_cart">
+			<feature name="pcb" value="171-6586A" />
+			<feature name="ic1" value="MPR-16162 J04" />
 			<dataarea name="rom" size="1048576">
-				<rom name="mpr-16162.ic1" size="1048576" crc="a7d33072" sha1="081c61e35478ffdda6eda58f40be056732f35595" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-16162 j04.ic1" size="1048576" crc="a7d33072" sha1="081c61e35478ffdda6eda58f40be056732f35595" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -62,7 +62,10 @@ not dumped?
 		<year>1993</year>
 		<publisher>Yamaha</publisher>
 		<info name="serial" value="MMGS-4"/>
+		<info name="alt_title" value="おっとカタチッチ"/>
 		<part name="cart" interface="copera_cart">
+			<feature name="pcb" value="171-6586A" />
+			<feature name="ic1" value="MPR-16600 J07" />
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-16600.ic1" size="1048576" crc="d1aee834" sha1="93c825160286b483904428eece2b14e521c20d15" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -70,7 +73,7 @@ not dumped?
 	</software>
 
 	<software name="outacanv">
-		<description>Outa no Canvas (Jpn)</description>
+		<description>Outa no Canvas</description>
 		<year>1994</year>
 		<publisher>Yamaha</publisher>
 		<info name="serial" value="MMGS-5"/>
@@ -85,7 +88,7 @@ not dumped?
 	</software>
 
 	<software name="copekono">
-		<description>Copera no Kono Otonaani (Jpn)</description>
+		<description>Copera no Kono Otonaani</description>
 		<year>1994</year>
 		<publisher>Yamaha</publisher>
 		<info name="serial" value="MMGS-6"/>
@@ -100,7 +103,7 @@ not dumped?
 	</software>
 
 	<software name="mikeatmw">
-		<description>Mike to Asobou Tobidase Milky Way (Jpn)</description>
+		<description>Mike to Asobou Tobidase Milky Way</description>
 		<year>1994</year>
 		<publisher>Yamaha</publisher>
 		<info name="serial" value="MMGS-7"/>

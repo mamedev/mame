@@ -23696,6 +23696,40 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 
 <!-- Other Asian Pirate dumps to sort -->
 
+<!-- Pokemon Platinum? -->
+	<software name="pokeplat">
+		<description>Kou Dai Yao Guai - Bai Jin Ban (Chi)</description>
+		<year>2005</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="口袋妖怪-白金版"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sintax" />
+			<!-- cartridge ram -->
+			<dataarea name="rom" size="2097152">
+				<rom name="kou dai yao guai - bai jin ban (unlicensed, chinese) [raw dump].bin" size="2097152" crc="998ad382" sha1="f9013985d7c40eccfa863e2ba808e64deaa4b384" offset="000000" />
+			</dataarea>
+			<dataarea name="nvram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Metal Slug 3? -->
+	<software name="ynzy3">
+		<description>Yue Nan Zhan Yi 3 (Chi)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="越南戰役3"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sintax" />
+			<!-- cartridge ram -->
+			<dataarea name="rom" size="2097152">
+				<rom name="yue nan zhan yi 3 (unlicensed, chinese) [raw dump].bin" size="2097152" crc="9268bb9f" sha1="17ceb35582c89303f206eb7e93cbfe8a4c2b5aaa" offset="000000" />
+			</dataarea>
+			<dataarea name="nvram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
 <!-- TODO: study the menu and writes of this cart! -->
 	<software name="m_digi10" supported="no">
 		<description>Shu Ma Bao Long Zhuan Ji 10 in 1 (Chi)</description>
