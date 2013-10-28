@@ -159,6 +159,7 @@ private:
 	void        set_ext_wait(int min);
 	bool        m_video_waitstates;
 	bool        m_extra_waitstates;
+	bool        m_ready_asserted;
 
 	bool        m_read_mode;
 

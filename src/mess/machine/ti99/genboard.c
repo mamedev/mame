@@ -275,6 +275,7 @@ void geneve_mapper_device::set_wait(int min)
 	{
 		if (VERBOSE>7) LOG("genboard: Pulling down READY line for %d cycles\n", min);
 		m_ready(CLEAR_LINE);
+		m_ready_asserted = false;
 	}
 }
 
@@ -1064,32 +1065,64 @@ SETOFFSET_MEMBER( geneve_mapper_device::setoffset )
 /*
     The mapper is connected to the clock line in order to operate
     the wait state counter.
+    The wait counter is decremented on each rising clock edge; when 0, the
+    READY line is asserted. However, there is a second counter which is used for
+    video wait states.
+    The READY line must be asserted when the wait counter reaches 0, but must be
+    cleared immediately again if the video counter has not reached 0.
+    (See comments at the file header: The additional video wait states do not
+    affect the video access itself but become effective after the access; if
+    the code runs on the chip, these wait states are ignored.)
 */
 WRITE_LINE_MEMBER( geneve_mapper_device::clock_in )
 {
 	if (state==ASSERT_LINE)
 	{
-		if (m_waitcount!=0)
+		// Rising edge
+		if (!m_ready_asserted)
 		{
-			m_waitcount--;
-			if (m_waitcount==0)
+			if (m_waitcount > 0)
 			{
-				if (VERBOSE>5) LOG("genboard: clock, asserting READY again\n");
-				m_ready(ASSERT_LINE);
+				m_waitcount--;
+				if (m_waitcount == 0)
+				{
+					if (VERBOSE>5) LOG("genboard: clock, READY asserted\n");
+					m_ready(ASSERT_LINE);
+					m_ready_asserted = true;
+				}
+					else
+					{
+						if (VERBOSE>5) LOG("genboard: clock\n");
+					}
 			}
-			else if (VERBOSE>5) LOG("genboard: clock, still waiting %d cycle(s)\n", m_waitcount);
+			else
+			{
+				if (m_ext_waitcount > 0)
+				{
+					m_ext_waitcount--;
+					if (m_ext_waitcount == 0)
+					{
+						if (VERBOSE>5) LOG("genboard: clock, READY asserted after video\n");
+						m_ready(ASSERT_LINE);
+						m_ready_asserted = true;
+					}
+					else
+					{
+						if (VERBOSE>5) LOG("genboard: vclock, ew=%d\n", m_ext_waitcount);
+					}
+				}
+			}
 		}
-		else
+	}
+	else
+	{
+		// Falling edge
+		// Do we have video wait states? In that case, clear the line again
+		if ((m_waitcount == 0) && (m_ext_waitcount > 0) && m_ready_asserted)
 		{
-			// Now for the extra video wait states
-			// Notice that we let the READY line get asserted before.
-			if (m_ext_waitcount > 0)
-			{
-				if (VERBOSE>5) LOG("genboard: clock, going for %d extra waitstates.\n", m_ext_waitcount);
-				m_waitcount = m_ext_waitcount;
-				m_ext_waitcount = 0;
-				m_ready(CLEAR_LINE);
-			}
+			if (VERBOSE>5) LOG("genboard: clock, READY cleared for video\n");
+			m_ready(CLEAR_LINE);
+			m_ready_asserted = false;
 		}
 	}
 }
@@ -1135,6 +1168,7 @@ void geneve_mapper_device::device_reset()
 	m_read_mode = false;
 	m_waitcount = 0;
 	m_ext_waitcount = 0;
+	m_ready_asserted = true;
 
 	m_geneve_mode =false;
 	m_direct_mode = true;
