@@ -424,6 +424,12 @@ MACHINE_START_MEMBER(taito_f3_state,f3)
 	save_item(NAME(m_coin_word));
 }
 
+MACHINE_RESET_MEMBER(taito_f3_state,f3)
+{
+	/* start with sound m68k off, qtheater relies on it (otherwise main CPU tries to reset it while 68k is working with irq table vectors). */
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+}
+
 static MACHINE_CONFIG_START( f3, taito_f3_state )
 
 	/* basic machine hardware */
@@ -432,6 +438,7 @@ static MACHINE_CONFIG_START( f3, taito_f3_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taito_f3_state,  f3_interrupt2)
 
 	MCFG_MACHINE_START_OVERRIDE(taito_f3_state,f3)
+	MCFG_MACHINE_RESET_OVERRIDE(taito_f3_state,f3)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 

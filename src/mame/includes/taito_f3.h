@@ -279,6 +279,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info_vram);
 	TILE_GET_INFO_MEMBER(get_tile_info_pixel);
 	DECLARE_MACHINE_START(f3);
+	DECLARE_MACHINE_RESET(f3);
 	DECLARE_VIDEO_START(f3);
 	UINT32 screen_update_f3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_eof_f3(screen_device &screen, bool state);
