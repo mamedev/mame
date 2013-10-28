@@ -2111,8 +2111,8 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<part name="cart" interface="pico_cart">
 			<feature name="pcb" value="171-6882A" />
 			<feature name="ic1" value="MPR-17877-H" />
-			<dataarea name="rom" size="1048576">
-				<rom name="mpr-17877-h.ic1" size="1048576" crc="e3da2ace" sha1="006f5442ab0798cff18067ad948265a22595fe35" offset="000000" loadflag="load16_word_swap" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-17877-h.ic1" size="524288" crc="a26f6ceb" sha1="7a13953f214dc56caa2565317ce984ab6c302b37" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
