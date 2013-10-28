@@ -8559,6 +8559,7 @@ src/osd/sdl/debugqtview.c svneol=native#text/plain
 src/osd/sdl/debugqtview.h svneol=native#text/plain
 src/osd/sdl/debugqtwindow.c svneol=native#text/plain
 src/osd/sdl/debugqtwindow.h svneol=native#text/plain
+src/osd/sdl/debugwin.c svneol=native#text/plain
 src/osd/sdl/draw13.c svneol=native#text/plain
 src/osd/sdl/drawogl.c svneol=native#text/plain
 src/osd/sdl/drawsdl.c svneol=native#text/plain
