@@ -15,7 +15,7 @@ The PVI has 12 address line (A0-A11) which give him control over 4K. A11 of the 
 connected to A11 of the CPU, but connected to the cartridge slot. On the cartridge it is
 connected to A12 of the CPU which extends the addressable Range to 8K. This is also the
 maximum usable space, because A13 and A14 of the CPU are not used.
-With the above in mind address range will lock like this:
+With the above in mind address range will look like this:
 $0000 - $15FF  ROM, RAM
 $1600 - $167F  unused
 $1680 - $16FF  used for I/O Control on main PCB
@@ -171,8 +171,7 @@ static ADDRESS_MAP_START(elektor_mem, AS_PROGRAM, 8, vc4000_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
-	AM_RANGE(0x0800, 0x0fff) AM_RAM
-	//AM_RANGE(0x1000, 0x15ff) AM_RAM  ram extension area
+	AM_RANGE(0x0800, 0x15ff) AM_RAM
 	AM_RANGE(0x1d80, 0x1dff) AM_MIRROR(0x400) AM_READWRITE(elektor_cass_r,elektor_cass_w)
 	AM_RANGE(0x1e80, 0x1e8f) AM_MIRROR(0x800) AM_READWRITE(vc4000_key_r,vc4000_sound_ctl)
 	AM_RANGE(0x1f00, 0x1fff) AM_MIRROR(0x800) AM_READWRITE(vc4000_video_r, vc4000_video_w)
@@ -530,7 +529,6 @@ QUICKLOAD_LOAD_MEMBER( vc4000_state,vc4000)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int i;
-	int quick_addr = 0x08c0;
 	int exec_addr;
 	int quick_length;
 	UINT8 *quick_data;
@@ -563,22 +561,35 @@ QUICKLOAD_LOAD_MEMBER( vc4000_state,vc4000)
 				}
 				else
 				{
-					quick_addr = quick_data[1] * 256 + quick_data[2];
+					int quick_addr = quick_data[1] * 256 + quick_data[2];
 					exec_addr = quick_data[3] * 256 + quick_data[4];
 
-					space.write_byte(0x08be, quick_data[3]);
-					space.write_byte(0x08bf, quick_data[4]);
+					if (quick_length < 0x5)
+					{
+						image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too short");
+						image.message(" File too short");
+					}
+					else
+					if ((quick_length + quick_addr - 5) > 0x1600)
+					{
+						image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too long");
+						image.message(" File too long");
+					}
+					else
+					{
+						space.write_byte(0x08be, quick_data[3]);
+						space.write_byte(0x08bf, quick_data[4]);
 
-					for (i = 0; i < quick_length - 5; i++)
-						if ((quick_addr + i) < 0x1600)
-							space.write_byte(i + quick_addr, quick_data[i+5]);
+						for (i = 5; i < quick_length; i++)
+							space.write_byte(i - 5 + quick_addr, quick_data[i]);
 
-					/* display a message about the loaded quickload */
-					image.message(" Quickload: size=%04X : start=%04X : end=%04X : exec=%04X",quick_length-5,quick_addr,quick_addr+quick_length-5,exec_addr);
+						/* display a message about the loaded quickload */
+						image.message(" Quickload: size=%04X : start=%04X : end=%04X : exec=%04X",quick_length-5,quick_addr,quick_addr+quick_length-5,exec_addr);
 
-					// Start the quickload
-					m_maincpu->set_state_int(S2650_PC, exec_addr);
-					result = IMAGE_INIT_PASS;
+						// Start the quickload
+						m_maincpu->set_state_int(S2650_PC, exec_addr);
+						result = IMAGE_INIT_PASS;
+					}
 				}
 			}
 			else
@@ -605,17 +616,30 @@ QUICKLOAD_LOAD_MEMBER( vc4000_state,vc4000)
 						image.message(" File too short");
 					}
 					else
-					// some programs store data in PVI memory and other random places. This is not supported.
-					if (quick_length > 0x1600)
+					if (quick_length > 0x2000)
 					{
 						image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too long");
 						image.message(" File too long");
 					}
 					else
 					{
-						for (i = quick_addr; i < quick_length; i++)
-							if (i < 0x1600)
-								space.write_byte(i, quick_data[i]);
+						space.write_byte(0x08be, quick_data[1]);
+						space.write_byte(0x08bf, quick_data[2]);
+
+						// load to 08C0-15FF (standard ram + extra)
+						int read_ = 0x1600;
+						if (quick_length < 0x1600)
+							read_ = quick_length;
+						for (i = 0x8c0; i < read_; i++)
+							space.write_byte(i, quick_data[i]);
+
+						// load to 1F50-1FAF (PVI regs)
+						read_ = 0x1FB0;
+						if (quick_length < 0x1FB0)
+							read_ = quick_length;
+						if (quick_length > 0x1FC0)
+							for (i = 0x1F50; i < read_; i++)
+								vc4000_video_w(space, i-0x1f00, quick_data[i]);
 
 						/* display a message about the loaded quickload */
 						image.message(" Quickload: size=%04X : exec=%04X",quick_length,exec_addr);
