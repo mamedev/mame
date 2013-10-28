@@ -68,7 +68,7 @@
 		</part>
 	</software>
 
-	<software name="mcterm120">
+	<software name="mcterm120" cloneof="mcterm">
 		<description>McTerm 1.20</description>
 		<year>1981</year>
 		<publisher>Madison Computer</publisher>
@@ -80,7 +80,7 @@
 		</part>
 	</software>
 
-	<software name="mcterm121">
+	<software name="mcterm">
 		<description>McTerm 1.21</description>
 		<year>1981</year>
 		<publisher>Madison Computer</publisher>
