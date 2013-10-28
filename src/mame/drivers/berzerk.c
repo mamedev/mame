@@ -15,7 +15,6 @@
 #include "machine/nvram.h"
 #include "sound/s14001a.h"
 #include "video/resnet.h"
-#include "drivlgcy.h"
 
 
 class berzerk_state : public driver_device
@@ -70,6 +69,7 @@ public:
 	DECLARE_DRIVER_INIT(moonwarp);
 	virtual void machine_start();
 	virtual void machine_reset();
+	virtual void sound_reset();
 	virtual void video_start();
 	UINT32 screen_update_berzerk(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(irq_callback);
@@ -585,12 +585,11 @@ READ8_MEMBER(berzerk_state::berzerk_audio_r)
 
 
 
-static SOUND_RESET(berzerk)
+void berzerk_state::sound_reset()
 {
-	berzerk_state *state = machine.driver_data<berzerk_state>();
-	address_space &space = state->m_maincpu->space(AS_IO);
+	address_space &space = m_maincpu->space(AS_IO);
 	/* clears the flip-flop controlling the volume and freq on the speech chip */
-	state->berzerk_audio_w(space, 4, 0x40);
+	berzerk_audio_w(space, 4, 0x40);
 }
 
 
@@ -1104,11 +1103,8 @@ static MACHINE_CONFIG_START( berzerk, berzerk_state )
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_RESET(berzerk)
-
 	MCFG_SOUND_ADD("speech", S14001A, 0)    /* placeholder - the clock is software controllable */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
 	MCFG_SOUND_ADD("exidy", EXIDY, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
