@@ -77,7 +77,7 @@ machine_config_constructor abc894_device::device_mconfig_additions() const
 static MACHINE_CONFIG_FRAGMENT( abc850 )
 	MCFG_ABCBUS_SLOT_ADD("io1", abcbus_cards, "fast")
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("fast", abc850_fast)
-	MCFG_ABCBUS_SLOT_ADD("io2", abcbus_cards, "lux21056")
+	MCFG_ABCBUS_SLOT_ADD("io2", abcbus_cards, "xebec")
 	MCFG_ABCBUS_SLOT_ADD("io3", abcbus_cards, NULL)
 	MCFG_ABCBUS_SLOT_ADD("io4", abcbus_cards, NULL)
 	MCFG_ABCBUS_SLOT_ADD("io5", abcbus_cards, NULL)

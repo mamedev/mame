@@ -160,7 +160,7 @@ WRITE_LINE_MEMBER( luxor_55_21056_device::sasi_req_w )
 {
 	if (state)
 	{
-		m_req = 1;
+		m_req = 0;
 		m_sasibus->scsi_ack_w(!m_req);
 	}
 }
@@ -204,8 +204,23 @@ machine_config_constructor luxor_55_21056_device::device_mconfig_additions() con
 
 INPUT_PORTS_START( luxor_55_21056 )
 	PORT_START("S1")
-	PORT_DIPNAME( 0x7f, 0x2c, "Card Address" )
+	PORT_DIPNAME( 0x3f, 0x2c, "Card Address" )
+	PORT_DIPSETTING(    0x20, "32" )
+	PORT_DIPSETTING(    0x21, "33" )
+	PORT_DIPSETTING(    0x22, "34" )
+	PORT_DIPSETTING(    0x23, "35" )
+	PORT_DIPSETTING(    0x24, "36" )
+	PORT_DIPSETTING(    0x25, "37" )
+	PORT_DIPSETTING(    0x26, "38" )
+	PORT_DIPSETTING(    0x27, "39" )
+	PORT_DIPSETTING(    0x28, "40" )
+	PORT_DIPSETTING(    0x29, "41" )
+	PORT_DIPSETTING(    0x2a, "42" )
+	PORT_DIPSETTING(    0x2b, "43" )
 	PORT_DIPSETTING(    0x2c, "44 (ABC 850)" )
+	PORT_DIPSETTING(    0x2d, "45" )
+	PORT_DIPSETTING(    0x2e, "46" )
+	PORT_DIPSETTING(    0x2f, "47" )
 
 	PORT_START("S2")
 	PORT_DIPNAME( 0x01, 0x00, "PROM Size" )
@@ -247,7 +262,7 @@ luxor_55_21056_device::luxor_55_21056_device(const machine_config &mconfig, cons
 		m_s1(*this, "S1"),
 		m_cs(0),
 		m_rdy(0),
-		m_req(1),
+		m_req(0),
 		m_stat(0),
 		m_sasi_data(0)
 {
@@ -260,6 +275,14 @@ luxor_55_21056_device::luxor_55_21056_device(const machine_config &mconfig, cons
 
 void luxor_55_21056_device::device_start()
 {
+	// state saving
+	save_item(NAME(m_cs));
+	save_item(NAME(m_rdy));
+	save_item(NAME(m_req));
+	save_item(NAME(m_inp));
+	save_item(NAME(m_out));
+	save_item(NAME(m_stat));
+	save_item(NAME(m_sasi_data));
 }
 
 
@@ -270,6 +293,7 @@ void luxor_55_21056_device::device_start()
 void luxor_55_21056_device::device_reset()
 {
 	m_stat = 0;
+	m_sasi_data = 0;
 }
 
 
@@ -392,11 +416,11 @@ READ8_MEMBER( luxor_55_21056_device::sasi_status_r )
 
 	data |= m_rdy;
 
-	data |= (!m_req || !m_sasibus->scsi_req_r()) << 1;
-	data |= !m_sasibus->scsi_io_r() << 2;
-	data |= m_sasibus->scsi_cd_r() << 3;
-	data |= m_sasibus->scsi_msg_r() << 4;
-	data |= m_sasibus->scsi_bsy_r() << 5;
+	data |= (m_req || !m_sasibus->scsi_req_r()) << 1;
+	data |= m_sasibus->scsi_io_r() << 2;
+	data |= !m_sasibus->scsi_cd_r() << 3;
+	data |= !m_sasibus->scsi_msg_r() << 4;
+	data |= !m_sasibus->scsi_bsy_r() << 5;
 
 	return data ^ 0xff;
 }
@@ -511,7 +535,7 @@ READ8_MEMBER( luxor_55_21056_device::sasi_sel_r )
 
 WRITE8_MEMBER( luxor_55_21056_device::sasi_sel_w )
 {
-	m_sasibus->scsi_sel_w(m_sasibus->scsi_bsy_r());
+	m_sasibus->scsi_sel_w(!m_sasibus->scsi_bsy_r());
 }
 
 

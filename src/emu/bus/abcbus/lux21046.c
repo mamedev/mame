@@ -221,28 +221,24 @@ WRITE_LINE_MEMBER( luxor_55_21046_device::dma_int_w )
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, m_fdc_irq || m_dma_irq);
 }
 
-READ8_MEMBER(luxor_55_21046_device::memory_read_byte)
+READ8_MEMBER( luxor_55_21046_device::memory_read_byte )
 {
-	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
-	return prog_space.read_byte(offset);
+	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
 }
 
-WRITE8_MEMBER(luxor_55_21046_device::memory_write_byte)
+WRITE8_MEMBER( luxor_55_21046_device::memory_write_byte )
 {
-	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
-	return prog_space.write_byte(offset, data);
+	return m_maincpu->space(AS_PROGRAM).write_byte(offset, data);
 }
 
-READ8_MEMBER(luxor_55_21046_device::io_read_byte)
+READ8_MEMBER( luxor_55_21046_device::io_read_byte )
 {
-	address_space& prog_space = m_maincpu->space(AS_IO);
-	return prog_space.read_byte(offset);
+	return m_maincpu->space(AS_IO).read_byte(offset);
 }
 
-WRITE8_MEMBER(luxor_55_21046_device::io_write_byte)
+WRITE8_MEMBER( luxor_55_21046_device::io_write_byte )
 {
-	address_space& prog_space = m_maincpu->space(AS_IO);
-	return prog_space.write_byte(offset, data);
+	return m_maincpu->space(AS_IO).write_byte(offset, data);
 }
 
 static Z80DMA_INTERFACE( dma_intf )
@@ -366,17 +362,17 @@ INPUT_PORTS_START( luxor_55_21046 )
 	PORT_DIPSETTING(    0x2e, "46 (ABC 838)" )
 
 	PORT_START("S6")
-	PORT_DIPNAME( 0x01, 0x01, "RAM Size" ) PORT_DIPLOCATION("S6:1")
+	PORT_DIPNAME( 0x01, 0x01, "RAM Size" )
 	PORT_DIPSETTING(    0x00, "2 KB" )
 	PORT_DIPSETTING(    0x01, "8 KB" )
 
 	PORT_START("S8")
-	PORT_DIPNAME( 0x01, 0x01, "Drive Type" ) PORT_DIPLOCATION("S8:1")
+	PORT_DIPNAME( 0x01, 0x01, "Drive Type" )
 	PORT_DIPSETTING(    0x00, "8\"" )
 	PORT_DIPSETTING(    0x01, "5.25\"" )
 
 	PORT_START("S9")
-	PORT_DIPNAME( 0x01, 0x01, "RDY Pin" ) PORT_DIPLOCATION("S9:1")
+	PORT_DIPNAME( 0x01, 0x01, "RDY Pin" )
 	PORT_DIPSETTING(    0x00, "P2-6 (8\")" )
 	PORT_DIPSETTING(    0x01, "P2-34 (5.25\")" )
 INPUT_PORTS_END
