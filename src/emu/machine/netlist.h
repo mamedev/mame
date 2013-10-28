@@ -365,25 +365,45 @@ public:
 		clear();
 	}
 
-	ATTR_HOT inline bool is_empty() const { return (m_end == 0); }
-	ATTR_HOT inline bool is_not_empty() const { return (m_end != 0); }
+	ATTR_HOT inline bool is_empty() const { return (m_end == &m_list[0]); }
+	ATTR_HOT inline bool is_not_empty() const { return (m_end > &m_list[0]); }
 
-	ATTR_HOT ATTR_ALIGN void push(const entry_t &e);
-
-	ATTR_HOT inline const entry_t &pop()
+	ATTR_HOT ATTR_ALIGN inline void push(const entry_t &e)
 	{
-		m_end--;
-		return item(m_end);
+		if (is_empty() || (e.time() <= (m_end - 1)->time()))
+		{
+			*m_end = e;
+			m_end++;
+			//inc_stat(m_prof_end);
+		}
+		else
+		{
+			entry_t *i = m_end++;
+			while ((i>&m_list[0]) && (e.time() > (i-1)->time()) )
+			{
+				i--;
+				*(i+1) = *i;
+				//inc_stat(m_prof_sortmove);
+			}
+			*i = e;
+			//inc_stat(m_prof_sort);
+		}
 	}
 
-	ATTR_HOT inline const entry_t &peek() const
+	ATTR_HOT inline const entry_t pop()
 	{
-		return item(m_end-1);
+		m_end--;
+		return *m_end;
+	}
+
+	ATTR_HOT inline const entry_t peek() const
+	{
+		return *(m_end-1);
 	}
 
 	ATTR_COLD void clear()
 	{
-		m_end = 0;
+		m_end = &m_list[0];
 	}
 	// profiling
 
@@ -392,10 +412,8 @@ public:
 	INT32   m_prof_sortmove;
 	INT32   m_prof_sort;
 private:
-	ATTR_HOT inline const entry_t &item(const UINT32 x) const { return m_list[x]; }
-	ATTR_HOT inline void set_item(const UINT32 x, const entry_t &aitem) { m_list[x] = aitem; }
 
-	UINT32 m_end;
+	entry_t *m_end;
 	entry_t m_list[SIZE + 1];
 
 };
@@ -1188,7 +1206,7 @@ NETLIB_DEVICE_WITH_PARAMS(netdev_mainclock,
 	net_param_t m_freq;
 	netlist_time m_inc;
 
-	ATTR_HOT inline static void mc_update(net_output_t &Q, const netlist_time &curtime);
+	ATTR_HOT inline static void mc_update(net_output_t &Q, const netlist_time curtime);
 );
 
 // ----------------------------------------------------------------------------------------

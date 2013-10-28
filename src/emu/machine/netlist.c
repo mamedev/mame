@@ -295,38 +295,10 @@ private:
 
 
 // ----------------------------------------------------------------------------------------
-// netlist_timed_queue
-// ----------------------------------------------------------------------------------------
-
-ATTR_HOT ATTR_ALIGN void netlist_timed_queue::push(const entry_t &e)
-{
-	const netlist_time &t = e.time();
-	if (is_empty() || (t <= item(m_end - 1).time()))
-	{
-		set_item(m_end,  e);
-		m_end++;
-		inc_stat(m_prof_end);
-	}
-	else
-	{
-		int i = m_end;
-		m_end++;
-		while ((i>0) && (t > item(i-1).time()) )
-		{
-			set_item(i, item(i-1));
-			inc_stat(m_prof_sortmove);
-			i--;
-		}
-		set_item(i, e);
-		inc_stat(m_prof_sort);
-	}
-}
-
-// ----------------------------------------------------------------------------------------
 // netdev_mainclock
 // ----------------------------------------------------------------------------------------
 
-ATTR_HOT inline void netdev_mainclock::mc_update(net_output_t &Q, const netlist_time &curtime)
+ATTR_HOT inline void netdev_mainclock::mc_update(net_output_t &Q, const netlist_time curtime)
 {
 	Q.m_new_Q = !Q.m_new_Q;
 	Q.set_time(curtime);
@@ -336,7 +308,6 @@ ATTR_HOT inline void netdev_mainclock::mc_update(net_output_t &Q, const netlist_
 ATTR_COLD NETLIB_START(netdev_mainclock)
 {
 	register_output("Q", m_Q);
-	//register_input("FB", m_feedback);
 
 	register_param("FREQ", m_freq, 7159000.0 * 5);
 	m_inc = netlist_time::from_hz(m_freq.Value()*2);
@@ -520,7 +491,7 @@ ATTR_HOT ATTR_ALIGN void netlist_base_t::process_list(INT32 &atime)
 	{
 		while ( (atime > 0) && (m_queue.is_not_empty()))
 		{
-			const queue_t::entry_t &e = m_queue.pop();
+			const queue_t::entry_t e = m_queue.pop();
 			update_time(e.time(), atime);
 
 			if (FATAL_ERROR_AFTER_NS)
@@ -548,21 +519,21 @@ ATTR_HOT ATTR_ALIGN void netlist_base_t::process_list(INT32 &atime)
 		{
 			if (m_queue.is_not_empty())
 			{
-				while (m_queue.peek().time() > m_mainclock->m_Q.time())
+				while (m_queue.peek().time() > mcQ.time())
 				{
-					update_time(m_mainclock->m_Q.time(), atime);
+					update_time(mcQ.time(), atime);
 
 					netdev_mainclock::mc_update(mcQ, time() + inc);
 
 				}
-				const queue_t::entry_t &e = m_queue.pop();
+				const queue_t::entry_t e = m_queue.pop();
 
 				update_time(e.time(), atime);
 
 				e.object().update_devs();
 
 			} else {
-				update_time(m_mainclock->m_Q.time(), atime);
+				update_time(mcQ.time(), atime);
 
 				netdev_mainclock::mc_update(mcQ, time() + inc);
 			}
