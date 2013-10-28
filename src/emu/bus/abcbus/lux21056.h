@@ -41,6 +41,7 @@ public:
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual ioport_constructor device_input_ports() const;
 
 	DECLARE_READ8_MEMBER( sasi_status_r );
 	DECLARE_WRITE8_MEMBER( stat_w );
@@ -83,6 +84,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<z80dma_device> m_dma;
 	required_device<scsicb_device> m_sasibus;
+	required_ioport m_s1;
 
 	int m_cs;
 	int m_rdy;

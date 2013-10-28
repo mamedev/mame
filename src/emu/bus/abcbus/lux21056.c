@@ -38,11 +38,18 @@ const device_type LUXOR_55_21056 = &device_creator<luxor_55_21056_device>;
 //-------------------------------------------------
 
 ROM_START( luxor_55_21056 )
-	ROM_REGION( 0x800, Z80_TAG, 0 )
-	ROM_SYSTEM_BIOS( 0, "st4038", "Seagate ST4038 (CHS: 733,5,17,512)" )
-	ROMX_LOAD( "st4038.6c", 0x000, 0x800, CRC(4c803b87) SHA1(1141bb51ad9200fc32d92a749460843dc6af8953), ROM_BIOS(1) ) // Seagate ST4038 (http://stason.org/TULARC/pc/hard-drives-hdd/seagate/ST4038-1987-31MB-5-25-FH-MFM-ST412.html)
-	ROM_SYSTEM_BIOS( 1, "st225", "Seagate ST225 (CHS: 615,4,17,512)" )
-	ROMX_LOAD( "st225.6c",  0x000, 0x800, CRC(c9f68f81) SHA1(7ff8b2a19f71fe0279ab3e5a0a5fffcb6030360c), ROM_BIOS(2) ) // Seagate ST225 (http://stason.org/TULARC/pc/hard-drives-hdd/seagate/ST225-21MB-5-25-HH-MFM-ST412.html)
+	ROM_REGION( 0x2000, Z80_TAG, 0 )
+	// ABC 850
+	ROM_SYSTEM_BIOS( 0, "ro202", "Rodime RO202 (CHS: 321,4,17,512)" )
+	ROMX_LOAD( "rodi202.bin",  0x0000, 0x0800, CRC(337b4dcf) SHA1(791ebeb4521ddc11fb9742114018e161e1849bdf), ROM_BIOS(1) ) // Rodime RO202 (http://stason.org/TULARC/pc/hard-drives-hdd/rodime/RO202-11MB-5-25-FH-MFM-ST506.html)
+	ROM_SYSTEM_BIOS( 1, "basf6185", "BASF 6185 (CHS: 440,6,32,256)" )
+	ROMX_LOAD( "basf6185.bin", 0x0000, 0x0800, CRC(06f8fe2e) SHA1(e81f2a47c854e0dbb096bee3428d79e63591059d), ROM_BIOS(2) ) // BASF 6185 (http://stason.org/TULARC/pc/hard-drives-hdd/basf-magnetics/6185-22MB-5-25-FH-MFM-ST412.html)
+	// ABC 852
+	ROM_SYSTEM_BIOS( 2, "nec5126", "NEC 5126 (CHS: 615,4,17,512)" )
+	ROMX_LOAD( "nec5126.bin",  0x0000, 0x1000, CRC(17c247e7) SHA1(7339738b87751655cb4d6414422593272fe72f5d), ROM_BIOS(3) ) // NEC 5126 (http://stason.org/TULARC/pc/hard-drives-hdd/nec/D5126-20MB-5-25-HH-MFM-ST506.html)
+	// ABC 856
+	ROM_SYSTEM_BIOS( 3, "micr1325", "Micropolis 1325 (CHS: 1024,8,33,256)" )
+	ROMX_LOAD( "micr1325.bin", 0x0000, 0x0800, CRC(084af409) SHA1(342b8e214a8c4c2b014604e53c45ef1bd1c69ea3), ROM_BIOS(4) ) // Micropolis 1325 (http://stason.org/TULARC/pc/hard-drives-hdd/micropolis/1325-69MB-5-25-FH-MFM-ST506.html)
 ROM_END
 
 
@@ -64,7 +71,7 @@ static ADDRESS_MAP_START( luxor_55_21056_mem, AS_PROGRAM, 8, luxor_55_21056_devi
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_ROM AM_REGION(Z80_TAG, 0)
-	AM_RANGE(0x2000, 0x3fff) AM_RAM
+	AM_RANGE(0x2000, 0x27ff) AM_MIRROR(0x1800) AM_RAM
 ADDRESS_MAP_END
 
 
@@ -191,6 +198,37 @@ machine_config_constructor luxor_55_21056_device::device_mconfig_additions() con
 }
 
 
+//-------------------------------------------------
+//  INPUT_PORTS( luxor_55_21046 )
+//-------------------------------------------------
+
+INPUT_PORTS_START( luxor_55_21056 )
+	PORT_START("S1")
+	PORT_DIPNAME( 0x7f, 0x2c, "Card Address" )
+	PORT_DIPSETTING(    0x2c, "44 (ABC 850)" )
+
+	PORT_START("S2")
+	PORT_DIPNAME( 0x01, 0x00, "PROM Size" )
+	PORT_DIPSETTING(    0x00, "2 KB" )
+	PORT_DIPSETTING(    0x01, "8 KB" )
+
+	PORT_START("S3")
+	PORT_DIPNAME( 0x01, 0x00, "RAM Size" )
+	PORT_DIPSETTING(    0x00, "2 KB" )
+	PORT_DIPSETTING(    0x01, "8 KB" )
+INPUT_PORTS_END
+
+
+//-------------------------------------------------
+//  input_ports - device-specific input ports
+//-------------------------------------------------
+
+ioport_constructor luxor_55_21056_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( luxor_55_21056 );
+}
+
+
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -206,6 +244,7 @@ luxor_55_21056_device::luxor_55_21056_device(const machine_config &mconfig, cons
 		m_maincpu(*this, Z80_TAG),
 		m_dma(*this, Z80DMA_TAG),
 		m_sasibus(*this, SASIBUS_TAG ":host"),
+		m_s1(*this, "S1"),
 		m_cs(0),
 		m_rdy(0),
 		m_req(1),
@@ -245,6 +284,7 @@ void luxor_55_21056_device::device_reset()
 
 void luxor_55_21056_device::abcbus_cs(UINT8 data)
 {
+	m_cs = (data == m_s1->read());
 }
 
 

@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-    Luxor ABC 850 Winchester controller card emulation
+    Luxor XEBEC Winchester controller card emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
