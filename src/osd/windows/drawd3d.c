@@ -785,19 +785,6 @@ mtlog_add("drawd3d_window_draw: begin_scene");
 
 void renderer::process_primitives()
 {
-	for (render_primitive *prim = m_window->primlist->first(); prim != NULL; prim = prim->next())
-	{
-		if (prim->type == render_primitive::QUAD)
-		{
-			if (PRIMFLAG_GET_SCREENTEX(prim->flags) || PRIMFLAG_GET_VECTORBUF(prim->flags))
-			{
-				draw_quad(prim);
-			}
-		}
-	}
-
-	batch_vectors();
-
 	// Rotating index for vector time offsets
 	for (render_primitive *prim = m_window->primlist->first(); prim != NULL; prim = prim->next())
 	{
@@ -815,16 +802,15 @@ void renderer::process_primitives()
 				break;
 
 			case render_primitive::QUAD:
-				if (!PRIMFLAG_GET_SCREENTEX(prim->flags) && !PRIMFLAG_GET_VECTORBUF(prim->flags))
-				{
-					draw_quad(prim);
-				}
+				draw_quad(prim);
 				break;
 
 			default:
 				throw emu_fatalerror("Unexpected render_primitive type");
 		}
 	}
+
+	batch_vectors();
 }
 
 void renderer::end_frame()
