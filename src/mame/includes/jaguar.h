@@ -119,6 +119,8 @@ public:
 	pen_t m_pen_table[65536];
 	UINT8 m_blend_y[65536];
 	UINT8 m_blend_cc[65536];
+	UINT32 m_butch_regs[0x40/4];
+	UINT32 m_butch_cmd_response;
 
 	static void (jaguar_state::*const bitmap4[8])(UINT16 *, INT32, INT32, UINT32 *, INT32, UINT16 *);
 	static void (jaguar_state::*const bitmap8[8])(UINT16 *, INT32, INT32, UINT32 *, INT32, UINT16 *);
@@ -187,6 +189,10 @@ public:
 	DECLARE_WRITE16_MEMBER(gpu_clut_w16);
 	DECLARE_READ16_MEMBER(gpu_ram_r16);
 	DECLARE_WRITE16_MEMBER(gpu_ram_w16);
+	DECLARE_READ16_MEMBER(butch_regs_r16);
+	DECLARE_WRITE16_MEMBER(butch_regs_w16);
+	DECLARE_READ32_MEMBER(butch_regs_r);
+	DECLARE_WRITE32_MEMBER(butch_regs_w);
 	DECLARE_DRIVER_INIT(jaguar);
 	DECLARE_DRIVER_INIT(jaguarcd);
 	DECLARE_DRIVER_INIT(area51mx);

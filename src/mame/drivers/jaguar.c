@@ -1085,11 +1085,118 @@ static ADDRESS_MAP_START( jaguar_map, AS_PROGRAM, 16, jaguar_state )
 	AM_RANGE(0xf1d000, 0xf1dfff) AM_READWRITE(wave_rom_r16, wave_rom_w16 )
 ADDRESS_MAP_END
 
+/*
+CD-Rom emulation, chip codename Butch (the HW engineer was definitely obsessed with T&J somehow ...)
+TODO: this needs to be device-ized, of course ...
+
+[0x00]: irq register
+(R)
+-x-- ---- ---- ---- CD uncorrectable data error pending
+--x- ---- ---- ---- Response from CD drive pending
+---x ---- ---- ---- Command to CD drive pending
+---- x--- ---- ---- Subcode data pending
+---- -x-- ---- ---- Frame pending
+---- --x- ---- ---- CD data FIFO half-full flag pending
+(W)
+---- ---- -x-- ---- CIRC failure irq
+---- ---- --x- ---- CD module command RX buffer full irq
+---- ---- ---x ---- CD module command TX buffer empty irq
+---- ---- ---- x--- Enable pre-set subcode time-match found irq
+---- ---- ---- -x-- Enable CD subcode frame-time irq
+---- ---- ---- --x- Enable CD data FIFO half full irq
+---- ---- ---- ---x set to enable irq
+[0x04]: DSA control register
+[0x0a]: DSA TX/RX data (sends commands with this)
+	0x01 Play Title (?)
+	0x02 Stop
+	0x03 Read TOC
+	0x04 Pause
+	0x05 Unpause
+	0x09 Get Title Len
+	0x0a Open Tray
+	0x0b Close Tray
+	0x0d Get Comp Time
+	0x10 Goto ABS Min
+	0x11 Goto ABS Sec
+	0x12 Goto ABS Frame
+	0x14 Read Long TOC
+	0x15 Set Mode
+	0x16 Get Error
+	0x17 Clear Error
+	0x18 Spin Up
+	0x20 Play AB Min
+	0x21 Play AB Sec
+	0x22 Play AB Frame
+	0x23 Stop AB Min
+	0x24 Stop AB Sec
+	0x25 Stop AB Frame
+	0x26 AB Release
+	0x50 Get Disc Status
+	0x51 Set Volume
+	0x54 Get Maxsession
+	0x70 Set DAC mode (?)
+	0xa0-0xaf User Define (???)
+	0xf0 Service
+	0xf1 Sledge
+	0xf2 Focus
+	0xf3 Turntable
+	0xf4 Radial
+
+[0x10]: I2S bus control register
+[0x14]: CD subcode control register
+[0x18]: Subcode data register A
+[0x1C]: Subcode data register B
+[0x20]: Subcode time and compare enable
+[0x24]: I2S FIFO data
+[0x28]: I2S FIFO data (old)
+[0x2c]: ? (used at start-up)
+
+*/
+
+READ16_MEMBER(jaguar_state::butch_regs_r16){ if (!(offset&1)) { return butch_regs_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return butch_regs_r(space, offset>>1, mem_mask); } }
+WRITE16_MEMBER(jaguar_state::butch_regs_w16){ if (!(offset&1)) { butch_regs_w(space, offset>>1, data << 16, mem_mask << 16); } else { butch_regs_w(space, offset>>1, data, mem_mask); } }
+
+READ32_MEMBER(jaguar_state::butch_regs_r)
+{
+	switch(offset*4)
+	{
+		case 8: //DS DATA
+			return m_butch_cmd_response;
+	}
+
+	return m_butch_regs[offset];
+}
+
+WRITE32_MEMBER(jaguar_state::butch_regs_w)
+{
+	COMBINE_DATA(&m_butch_regs[offset]);
+
+	switch(offset*4)
+	{
+		case 8: //DS DATA
+			switch((m_butch_regs[offset] & 0xff00) >> 8)
+			{
+				case 0x15: // Set Mode
+					m_butch_regs[0] |= 0x2000;
+					m_butch_cmd_response = 0x1700 | (m_butch_regs[offset] & 0xff);
+					break;
+				case 0x70: // Set DAC Mode
+					m_butch_regs[0] |= 0x2000;
+					m_butch_cmd_response = 0x7000 | (m_butch_regs[offset] & 0xff);
+					break;
+				default:
+					printf("%04x CMD\n",m_butch_regs[offset]);
+					break;
+			}
+			break;
+	}
+}
 
 static ADDRESS_MAP_START( jaguarcd_map, AS_PROGRAM, 16, jaguar_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
 	AM_RANGE(0x000000, 0x1fffff) AM_MIRROR(0x200000) AM_READWRITE(shared_ram_r16, shared_ram_w16 );
 	AM_RANGE(0x800000, 0x83ffff) AM_ROM AM_REGION("cdbios", 0)
+	AM_RANGE(0xdfff00, 0xdfff3f) AM_READWRITE(butch_regs_r16,butch_regs_w16 )
 	AM_RANGE(0xe00000, 0xe1ffff) AM_READWRITE(rom_base_r16, rom_base_w16 )
 	AM_RANGE(0xf00000, 0xf003ff) AM_READWRITE(tom_regs_r, tom_regs_w) // might be reversed endian of the others..
 	AM_RANGE(0xf00400, 0xf005ff) AM_MIRROR(0x000200) AM_READWRITE(gpu_clut_r16, gpu_clut_w16 )
@@ -1236,6 +1343,44 @@ static ADDRESS_MAP_START( jag_dsp_map, AS_PROGRAM, 32, jaguar_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
 	AM_RANGE(0x000000, 0x1fffff) AM_MIRROR(0x200000) AM_RAM AM_SHARE("sharedram") AM_REGION("maincpu", 0)
 	AM_RANGE(0x800000, 0xdfffff) AM_ROM AM_SHARE("cart") AM_REGION("maincpu", 0x800000)
+	AM_RANGE(0xe00000, 0xe1ffff) AM_ROM AM_SHARE("rom") AM_REGION("maincpu", 0xe00000)
+	AM_RANGE(0xf00000, 0xf003ff) AM_READWRITE16(tom_regs_r, tom_regs_w, 0xffffffff)
+	AM_RANGE(0xf00400, 0xf005ff) AM_MIRROR(0x000200) AM_RAM AM_SHARE("gpuclut")
+	AM_RANGE(0xf02100, 0xf021ff) AM_MIRROR(0x008000) AM_READWRITE(gpuctrl_r, gpuctrl_w)
+	AM_RANGE(0xf02200, 0xf022ff) AM_MIRROR(0x008000) AM_READWRITE(blitter_r, blitter_w)
+	AM_RANGE(0xf03000, 0xf03fff) AM_MIRROR(0x008000) AM_RAM AM_SHARE("gpuram")
+	AM_RANGE(0xf10000, 0xf103ff) AM_READWRITE16(jerry_regs_r, jerry_regs_w, 0xffffffff)
+	AM_RANGE(0xf14000, 0xf14003) AM_READWRITE(joystick_r, joystick_w)
+	AM_RANGE(0xf1a100, 0xf1a13f) AM_READWRITE(dspctrl_r, dspctrl_w)
+	AM_RANGE(0xf1a140, 0xf1a17f) AM_READWRITE(serial_r, serial_w)
+	AM_RANGE(0xf1b000, 0xf1cfff) AM_RAM AM_SHARE("dspram")
+	AM_RANGE(0xf1d000, 0xf1dfff) AM_ROM AM_REGION("waverom", 0)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( jagcd_gpu_map, AS_PROGRAM, 32, jaguar_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
+	AM_RANGE(0x000000, 0x1fffff) AM_RAM AM_MIRROR(0x200000)  AM_SHARE("sharedram") AM_REGION("maincpu", 0)
+	AM_RANGE(0x800000, 0x83ffff) AM_ROM AM_REGION("cdbios", 0)
+	AM_RANGE(0xdfff00, 0xdfff3f) AM_READWRITE(butch_regs_r,butch_regs_w )
+	AM_RANGE(0xe00000, 0xe1ffff) AM_ROM AM_SHARE("rom") AM_REGION("maincpu", 0xe00000)
+	AM_RANGE(0xf00000, 0xf003ff) AM_READWRITE16(tom_regs_r, tom_regs_w, 0xffffffff)
+	AM_RANGE(0xf00400, 0xf005ff) AM_MIRROR(0x000200) AM_RAM AM_SHARE("gpuclut")
+	AM_RANGE(0xf02100, 0xf021ff) AM_MIRROR(0x008000) AM_READWRITE(gpuctrl_r, gpuctrl_w)
+	AM_RANGE(0xf02200, 0xf022ff) AM_MIRROR(0x008000) AM_READWRITE(blitter_r, blitter_w)
+	AM_RANGE(0xf03000, 0xf03fff) AM_MIRROR(0x008000) AM_RAM AM_SHARE("gpuram")
+	AM_RANGE(0xf10000, 0xf103ff) AM_READWRITE16(jerry_regs_r, jerry_regs_w, 0xffffffff)
+	AM_RANGE(0xf14000, 0xf14003) AM_READWRITE(joystick_r, joystick_w)
+	AM_RANGE(0xf1a100, 0xf1a13f) AM_READWRITE(dspctrl_r, dspctrl_w)
+	AM_RANGE(0xf1a140, 0xf1a17f) AM_READWRITE(serial_r, serial_w)
+	AM_RANGE(0xf1b000, 0xf1cfff) AM_RAM AM_SHARE("dspram")
+	AM_RANGE(0xf1d000, 0xf1dfff) AM_ROM AM_SHARE("waverom") AM_REGION("waverom", 0)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( jagcd_dsp_map, AS_PROGRAM, 32, jaguar_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
+	AM_RANGE(0x000000, 0x1fffff) AM_MIRROR(0x200000) AM_RAM AM_SHARE("sharedram") AM_REGION("maincpu", 0)
+	AM_RANGE(0x800000, 0x83ffff) AM_ROM AM_REGION("cdbios", 0)
+	AM_RANGE(0xdfff00, 0xdfff3f) AM_READWRITE(butch_regs_r,butch_regs_w )
 	AM_RANGE(0xe00000, 0xe1ffff) AM_ROM AM_SHARE("rom") AM_REGION("maincpu", 0xe00000)
 	AM_RANGE(0xf00000, 0xf003ff) AM_READWRITE16(tom_regs_r, tom_regs_w, 0xffffffff)
 	AM_RANGE(0xf00400, 0xf005ff) AM_MIRROR(0x000200) AM_RAM AM_SHARE("gpuclut")
@@ -1652,6 +1797,14 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( jaguarcd, jaguar )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(jaguarcd_map)
+
+	MCFG_CPU_MODIFY("gpu")
+	MCFG_JAGUAR_IRQ_HANDLER(WRITELINE(jaguar_state, gpu_cpu_int))
+	MCFG_CPU_PROGRAM_MAP(jagcd_gpu_map)
+
+	MCFG_CPU_MODIFY("dsp")
+	MCFG_JAGUAR_IRQ_HANDLER(WRITELINE(jaguar_state, dsp_cpu_int))
+	MCFG_CPU_PROGRAM_MAP(jagcd_dsp_map)
 MACHINE_CONFIG_END
 
 /*************************************
@@ -1701,7 +1854,7 @@ DRIVER_INIT_MEMBER(jaguar_state,jaguarcd)
 {
 	m_hacks_enabled = false;
 	save_item(NAME(m_joystick_data));
-	cart_start();
+//	cart_start();
 	m_is_jagcd = true;
 
 	for (int i=0;i<0x20000/4;i++) // the cd bios is bigger.. check
