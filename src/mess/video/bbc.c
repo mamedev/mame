@@ -96,7 +96,7 @@ static const int pixels_per_byte_set[8]={ 2,4,8,16,1,2,4,8 };
 static const int width_of_cursor_set[8]={ 0,0,1,2,1,0,2,4 };
 
 /* this is a quick lookup array that puts bits 0,2,4,6 into bits 0,1,2,3
-   this is used by the pallette lookup in the video ULA */
+   this is used by the palette lookup in the video ULA */
 void bbc_state::set_pixel_lookup()
 {
 	int i;

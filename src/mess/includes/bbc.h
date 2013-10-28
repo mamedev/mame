@@ -13,12 +13,14 @@
 
 #include "machine/6522via.h"
 #include "machine/6850acia.h"
+#include "machine/ram.h"
 #include "machine/i8271.h"
 #include "machine/wd17xx.h"
 #include "machine/upd7002.h"
 #include "video/mc6845.h"
 #include "video/saa5050.h"
 #include "sound/sn76496.h"
+#include "sound/tms5220.h"
 #include "imagedev/cassette.h"
 #include "machine/serial.h"
 
@@ -30,9 +32,11 @@ public:
 	bbc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_ram(*this, RAM_TAG),
 		m_mc6845(*this, "mc6845"),
 		m_sn(*this, "sn76489"),
-		m_trom(*this, "saa505x"),
+		m_trom(*this, "saa5050"),
+		m_tms(*this, "tms5220"),
 		m_cassette(*this, "cassette"),
 		m_acia(*this, "acia6850"),
 		m_rs232(*this, RS232_TAG),
@@ -53,28 +57,30 @@ public:
 		m_bank8(*this, "bank8") { }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<ram_device> m_ram;
 	required_device<mc6845_device> m_mc6845;
 	optional_device<sn76489_device> m_sn;
 	required_device<saa5050_device> m_trom;
-	required_device<cassette_image_device> m_cassette;
-	required_device<acia6850_device> m_acia;
-	required_device<rs232_port_device> m_rs232;
+	optional_device<tms5220_device> m_tms;
+	optional_device<cassette_image_device> m_cassette;
+	optional_device<acia6850_device> m_acia;
+	optional_device<rs232_port_device> m_rs232;
 
 	void check_interrupts();
 
-	int m_RAMSize;          // BBC Memory Size
 	int m_DFSType;          // this stores the DIP switch setting for the DFS type being used
 	int m_SWRAMtype;        // this stores the DIP switch setting for the SWRAM type being used
+	int m_Speech;           // this stores the CONF setting for Speech enabled/disabled
 	int m_Master;           // if 0 then we are emulating a BBC B style machine
-							// if 1 then we are emulating a BBC Master style machine
+                          // if 1 then we are emulating a BBC Master style machine
 
-	int m_ACCCON_IRR;       //  IRQ inputs
+	int m_ACCCON_IRR;       // IRQ inputs
 
 	int m_rombank;          // This is the latch that holds the sideways ROM bank to read
 
 	int m_userport;         // This stores the sideways RAM latch type.
-							// Acorn and others use the bbc_rombank latch to select the write bank to be used.(type 0)
-							// Solidisc use the BBC's userport to select the write bank to be used (type 1)
+                          // Acorn and others use the bbc_rombank latch to select the write bank to be used.(type 0)
+                          // Solidisc use the BBC's userport to select the write bank to be used (type 1)
 
 	int m_pagedRAM;         // BBC B+ memory handling
 	int m_vdusel;           // BBC B+ memory handling
@@ -183,11 +189,10 @@ public:
 
 	int m_previous_i8271_int_state; // 8271 interupt status
 
-
-
 							/**************************************
 							   WD1770 disc control
 							***************************************/
+
 	int m_drive_control;
 	int m_wd177x_irq_state;
 	int m_wd177x_drq_state;
@@ -197,9 +202,8 @@ public:
 							/**************************************
 							   Opus Challenger Disc control
 							***************************************/
+
 	int m_opusbank;
-
-
 
 							/**************************************
 							   Video Code
@@ -229,7 +233,6 @@ public:
 	int m_BBC_VSync;
 
 
-
 	int m_Teletext_Latch;
 	int m_VideoULA_CR;
 	int m_VideoULA_CR_counter;
@@ -240,7 +243,6 @@ public:
 	int m_videoULA_characters_per_line;
 	int m_videoULA_teletext_normal_select;
 	int m_videoULA_flash_colour_select;
-
 
 
 	int m_pixels_per_byte;
@@ -302,16 +304,16 @@ public:
 	DECLARE_MACHINE_START(bbca);
 	DECLARE_MACHINE_RESET(bbca);
 	DECLARE_VIDEO_START(bbca);
-	DECLARE_PALETTE_INIT(bbc);
-	DECLARE_MACHINE_START(bbcm);
-	DECLARE_MACHINE_RESET(bbcm);
-	DECLARE_VIDEO_START(bbcm);
 	DECLARE_MACHINE_START(bbcb);
 	DECLARE_MACHINE_RESET(bbcb);
 	DECLARE_VIDEO_START(bbcb);
 	DECLARE_MACHINE_START(bbcbp);
 	DECLARE_MACHINE_RESET(bbcbp);
 	DECLARE_VIDEO_START(bbcbp);
+	DECLARE_MACHINE_START(bbcm);
+	DECLARE_MACHINE_RESET(bbcm);
+	DECLARE_VIDEO_START(bbcm);
+	DECLARE_PALETTE_INIT(bbc);
 	UINT32 screen_update_bbc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(bbcb_vsync);
 	INTERRUPT_GEN_MEMBER(bbcb_keyscan);
@@ -340,8 +342,10 @@ public:
 	DECLARE_READ_LINE_MEMBER(bbc_cts_r);
 	DECLARE_WRITE_LINE_MEMBER(bbc_rts_w);
 	DECLARE_WRITE_LINE_MEMBER(bbc_txd_w);
+	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( bbcb_cart );
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( bbcm_cart );
 
 protected:
 	required_memory_region m_region_maincpu;
@@ -384,17 +388,16 @@ public:
 
 /*----------- defined in machine/bbc.c -----------*/
 
-
 extern const mc6845_interface bbc_mc6845_intf;
-
 
 extern const via6522_interface bbcb_system_via;
 extern const via6522_interface bbcb_user_via;
+
+extern const i8271_interface bbc_i8271_interface;
 extern const wd17xx_interface bbc_wd17xx_interface;
 
 /* tape support */
 
-extern const i8271_interface bbc_i8271_interface;
 extern const uPD7002_interface bbc_uPD7002;
 
 #endif /* BBC_H_ */

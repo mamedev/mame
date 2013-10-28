@@ -351,15 +351,24 @@ d110
 // Acorn
 acrnsys1  // 1979 Acorn System 1 (Microcomputer Kit)
 atom      // 1979 Acorn Atom
-atomeb  // 1979 Acorn Atom
-atombb  // 1979 Acorn Atom
+atomeb    // 1979 Acorn Atom
+atombb    // 1979 Acorn Atom
 bbca      // 1981 BBC Micro Model A
 bbcb      // 1981 BBC Micro Model B
-bbcbp    // 198? BBC Micro Model B+ 64K
-bbcbp128  // 198? BBC Micro Model B+ 128K
-bbcm       // 198? BBC Master
-bbcbc    // 1985 BBC Bridge Companion
+bbcb_de   // 1981 BBC Micro Model B (German)
+bbcb_us   // 1981 BBC Micro Model B (US)
 electron  // 1983 Acorn Electron
+bbcbp     // 1985 BBC Micro Model B+ 64K
+bbcbp128  // 1985 BBC Micro Model B+ 128K
+bbcm      // 1986 BBC Master 128
+bbcmt     // 1986 BBC Master Turbo
+bbcmaiv   // 1986 BBC Master AIV
+bbcmet    // 1986 BBC Master ET
+bbcm512   // 1986 BBC Master 512
+bbcmarm   // 1986 ARM Evaluation System
+bbcmc     // 1986 BBC Master Compact
+bbcmc_ar  // 1986 BBC Master Comapact (Arabic)
+bbcbc     // 1985 BBC Bridge Companion
 a310      // 1988 Acorn Archimedes 310
 a3010     // 1988 Acorn Archimedes 3010
 a3020     // 1988 Acorn Archimedes 3020

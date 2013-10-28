@@ -4,7 +4,7 @@
 
     Implementation of the MC146818 chip
 
-    Real time clock chip with battery buffered ram (or CMOS)
+    Real time clock chip with battery backed ram (or CMOS)
     Used in IBM PC/AT, several PC clones, Amstrad NC200, Apollo workstations
 
     Nathan Woods  (npwoods@mess.org)
@@ -92,12 +92,14 @@
 
 #define HOURS_24    (m_data[0xb]&2)
 #define BCD_MODE    !(m_data[0xb]&4) // book has other description!
-#define CENTURY     m_data[100]
+#define CENTURY     m_data[72]
 #define YEAR        m_data[9]
 #define MONTH       m_data[8]
 #define DAY         m_data[7]
 #define WEEK_DAY    m_data[6]
-
+#define HOUR        m_data[4]
+#define MINUTE      m_data[2]
+#define SECOND      m_data[0]
 
 
 //**************************************************************************
@@ -175,19 +177,19 @@ void mc146818_device::device_timer(emu_timer &timer, device_timer_id id, int par
 
 	if (BCD_MODE)
 	{
-		m_data[0]=bcd_adjust(m_data[0]+1);
-		if (m_data[0]>=0x60)
+		SECOND=bcd_adjust(SECOND+1);
+		if (SECOND>=0x60)
 		{
-			m_data[0]=0;
-			m_data[2]=bcd_adjust(m_data[2]+1);
-			if (m_data[2]>=0x60)
+			SECOND=0;
+			MINUTE=bcd_adjust(MINUTE+1);
+			if (MINUTE>=0x60)
 			{
-				m_data[2]=0;
-				m_data[4]=bcd_adjust(m_data[4]+1);
+				MINUTE=0;
+				HOUR=bcd_adjust(HOUR+1);
 				// different handling of hours
-				if (m_data[4]>=0x24)
+				if (HOUR>=0x24)
 				{
-					m_data[4]=0;
+					HOUR=0;
 					WEEK_DAY=bcd_adjust(WEEK_DAY+1)%7;
 					DAY=bcd_adjust(DAY+1);
 					//month=bcd_2_dec(MONTH);
@@ -218,17 +220,17 @@ void mc146818_device::device_timer(emu_timer &timer, device_timer_id id, int par
 	}
 	else
 	{
-		m_data[0]=m_data[0]+1;
-		if (m_data[0]>=60)
+		SECOND=SECOND+1;
+		if (SECOND>=60)
 		{
-			m_data[0]=0;
-			m_data[2]=m_data[2]+1;
-			if (m_data[2]>=60) {
-				m_data[2]=0;
-				m_data[4]=m_data[4]+1;
+			SECOND=0;
+			MINUTE=MINUTE+1;
+			if (MINUTE>=60) {
+				MINUTE=0;
+				HOUR=HOUR+1;
 				// different handling of hours //?
-				if (m_data[4]>=24) {
-					m_data[4]=0;
+				if (HOUR>=24) {
+					HOUR=0;
 					WEEK_DAY=(WEEK_DAY+1)%7;
 					year=YEAR;
 					if (m_type!=MC146818_IGNORE_CENTURY) year+=CENTURY*100;
@@ -250,9 +252,9 @@ void mc146818_device::device_timer(emu_timer &timer, device_timer_id id, int par
 		}
 	}
 
-	if (m_data[1] == m_data[0] && //
-		m_data[3] == m_data[2] && //
-		m_data[5] == m_data[4]) {
+	if (m_data[1] == SECOND && //
+		m_data[3] == MINUTE && //
+		m_data[5] == HOUR) {
 		// set the alarm interrupt flag AF
 		m_data[0x0c] |= 0x20;
 	} else {
@@ -287,13 +289,13 @@ void mc146818_device::device_timer(emu_timer &timer, device_timer_id id, int par
 
 void mc146818_device::rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second)
 {
-	YEAR = year;
-	MONTH = month;
-	DAY = day;
+	YEAR     = year;
+	MONTH    = month;
+	DAY      = day;
 	WEEK_DAY = day_of_week;
-	m_data[4] = hour;
-	m_data[2] = minute;
-	m_data[0] = second;
+	HOUR     = hour;
+	MINUTE   = minute;
+	SECOND   = second;
 }
 
 
@@ -304,6 +306,16 @@ void mc146818_device::rtc_clock_updated(int year, int month, int day, int day_of
 
 void mc146818_device::nvram_default()
 {
+	// populate from a memory region if present
+	if (m_region != NULL)
+	{
+		UINT32 bytes = m_region->bytes();
+		
+		if (bytes > sizeof(m_data))
+			bytes = sizeof(m_data);
+
+		memcpy(m_data, m_region->base(), bytes);
+	}
 	set_base_datetime();
 }
 
@@ -361,18 +373,18 @@ void mc146818_device::set_base_datetime()
 //          current_time.hour,current_time.minute, current_time.second);
 
 	if (HOURS_24 || (current_time.hour < 12))
-		m_data[4] = dec_2_local(current_time.hour);
+		HOUR = dec_2_local(current_time.hour);
 	else
-		m_data[4] = dec_2_local(current_time.hour - 12) | 0x80;
+		HOUR = dec_2_local(current_time.hour - 12) | 0x80;
 
 	if (m_type != MC146818_IGNORE_CENTURY)
 		CENTURY = dec_2_local(current_time.year /100);
 
-	m_data[0]   = dec_2_local(current_time.second);
-	m_data[2]   = dec_2_local(current_time.minute);
-	DAY                 = dec_2_local(current_time.mday);
-	MONTH               = dec_2_local(current_time.month + 1);
-	YEAR                = dec_2_local(current_time.year % 100);
+	SECOND = dec_2_local(current_time.second);
+	MINUTE = dec_2_local(current_time.minute);
+	DAY    = dec_2_local(current_time.mday);
+	MONTH  = dec_2_local(current_time.month + 1);
+	YEAR   = dec_2_local(current_time.year % 100);
 
 	WEEK_DAY = current_time.weekday;
 	if (current_time.is_dst)

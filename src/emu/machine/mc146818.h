@@ -4,7 +4,7 @@
 
     Implementation of the MC146818 chip
 
-    Real time clock chip with batteru buffered ram
+    Real time clock chip with battery backed ram
     Used in IBM PC/AT, several PC clones, Amstrad NC200
 
     Peter Trauner (peter.trauner@jk.uni-linz.ac.at)
