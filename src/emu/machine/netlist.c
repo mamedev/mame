@@ -323,18 +323,60 @@ ATTR_HOT ATTR_ALIGN void netlist_timed_queue::push(const entry_t &e)
 }
 
 // ----------------------------------------------------------------------------------------
+// netdev_mainclock
+// ----------------------------------------------------------------------------------------
+
+ATTR_HOT inline void netdev_mainclock::mc_update(net_output_t &Q, const netlist_time &curtime)
+{
+	Q.m_new_Q = !Q.m_new_Q;
+	Q.set_time(curtime);
+	Q.update_devs();
+}
+
+ATTR_COLD NETLIB_START(netdev_mainclock)
+{
+	register_output("Q", m_Q);
+	//register_input("FB", m_feedback);
+
+	register_param("FREQ", m_freq, 7159000.0 * 5);
+	m_inc = netlist_time::from_hz(m_freq.Value()*2);
+
+}
+
+ATTR_HOT NETLIB_UPDATE_PARAM(netdev_mainclock)
+{
+	m_inc = netlist_time::from_hz(m_freq.Value()*2);
+}
+
+ATTR_HOT NETLIB_UPDATE(netdev_mainclock)
+{
+	// this is only called during setup ...
+	m_Q.m_new_Q = !m_Q.m_new_Q;
+	m_Q.set_time(m_netlist->time() + m_inc);
+}
+
+
+// ----------------------------------------------------------------------------------------
 // netdev_a_to_d
 // ----------------------------------------------------------------------------------------
 
 class netdev_a_to_d_proxy : public net_device_t
 {
 public:
-	netdev_a_to_d_proxy(netlist_setup_t &setup, const char *name, net_input_t &in_proxied)
-			: net_device_t(setup, name)
+	netdev_a_to_d_proxy(net_input_t &in_proxied)
+			: net_device_t()
 	{
 		assert(in_proxied.object_type(SIGNAL_MASK) == SIGNAL_DIGITAL);
 		m_I.m_high_thresh_V = in_proxied.m_high_thresh_V;
 		m_I.m_low_thresh_V = in_proxied.m_low_thresh_V;
+	}
+
+	analog_input_t m_I;
+	ttl_output_t m_Q;
+
+protected:
+	void start()
+	{
 		m_I.init_input(this);
 
 		m_Q.init_terminal(this);
@@ -349,8 +391,6 @@ public:
 			OUTLOGIC(m_Q, 0, NLTIME_FROM_NS(1));
 	}
 
-	analog_input_t m_I;
-	ttl_output_t m_Q;
 };
 
 // ----------------------------------------------------------------------------------------
@@ -360,12 +400,20 @@ public:
 class netdev_d_to_a_proxy : public net_device_t
 {
 public:
-	netdev_d_to_a_proxy(netlist_setup_t &setup, const char *name, net_output_t &out_proxied)
-			: net_device_t(setup, name)
+	netdev_d_to_a_proxy(net_output_t &out_proxied)
+			: net_device_t()
 	{
+		assert(out_proxied.object_type(SIGNAL_MASK) == SIGNAL_DIGITAL);
 		m_low_V = out_proxied.m_low_V;
 		m_high_V = out_proxied.m_high_V;
-		assert(out_proxied.object_type(SIGNAL_MASK) == SIGNAL_DIGITAL);
+	}
+
+	ttl_input_t m_I;
+	analog_output_t m_Q;
+
+protected:
+	void start()
+	{
 		m_I.init_input(this);
 		m_Q.init_terminal(this);
 		m_Q.initial(0);
@@ -376,9 +424,6 @@ public:
 		OUTANALOG(m_Q, INPLOGIC(m_I) ? m_high_V : m_low_V, NLTIME_FROM_NS(1));
 	}
 
-	ttl_input_t m_I;
-	analog_output_t m_Q;
-
 private:
 	double m_low_V;
 	double m_high_V;
@@ -388,7 +433,7 @@ private:
 // netdev_const
 // ----------------------------------------------------------------------------------------
 
-NETLIB_CONSTRUCTOR(netdev_ttl_const)
+NETLIB_START(netdev_ttl_const)
 {
 	register_output("Q", m_Q);
 	register_param("CONST", m_const, 0.0);
@@ -403,7 +448,7 @@ NETLIB_UPDATE_PARAM(netdev_ttl_const)
 	OUTLOGIC(m_Q, m_const.ValueInt(), NLTIME_IMMEDIATE);
 }
 
-NETLIB_CONSTRUCTOR(netdev_analog_const)
+NETLIB_START(netdev_analog_const)
 {
 	register_output("Q", m_Q);
 	register_param("CONST", m_const, 0.0);
@@ -496,6 +541,9 @@ ATTR_HOT ATTR_ALIGN void netlist_base_t::process_list(INT32 &atime)
 			atime = 0;
 		}
 	} else {
+		net_output_t &mcQ = m_mainclock->m_Q;
+		const netlist_time inc = m_mainclock->m_inc;
+
 		while (atime > 0)
 		{
 			if (m_queue.is_not_empty())
@@ -504,8 +552,7 @@ ATTR_HOT ATTR_ALIGN void netlist_base_t::process_list(INT32 &atime)
 				{
 					update_time(m_mainclock->m_Q.time(), atime);
 
-					m_mainclock->update();
-					m_mainclock->m_Q.update_devs();
+					netdev_mainclock::mc_update(mcQ, time() + inc);
 
 				}
 				const queue_t::entry_t &e = m_queue.pop();
@@ -517,8 +564,7 @@ ATTR_HOT ATTR_ALIGN void netlist_base_t::process_list(INT32 &atime)
 			} else {
 				update_time(m_mainclock->m_Q.time(), atime);
 
-				m_mainclock->update();
-				m_mainclock->m_Q.update_devs();
+				netdev_mainclock::mc_update(mcQ, time() + inc);
 			}
 			if (FATAL_ERROR_AFTER_NS)
 				if (time() > NLTIME_FROM_NS(FATAL_ERROR_AFTER_NS))
@@ -721,8 +767,9 @@ void netlist_setup_t::resolve_inputs(void)
 		if (out.object_type(net_output_t::SIGNAL_MASK) == net_output_t::SIGNAL_ANALOG
 				&& in->object_type(net_output_t::SIGNAL_MASK) == net_output_t::SIGNAL_DIGITAL)
 		{
-			netdev_a_to_d_proxy *proxy = new netdev_a_to_d_proxy(*this, "abc", *in);
+			netdev_a_to_d_proxy *proxy = new netdev_a_to_d_proxy(*in);
 
+			proxy->setup(*this, "abc");
 			in->set_output(proxy->m_Q);
 			proxy->m_Q.register_con(*in);
 			proxy->m_I.set_output(out);
@@ -733,8 +780,9 @@ void netlist_setup_t::resolve_inputs(void)
 				&& in->object_type(net_output_t::SIGNAL_MASK) == net_output_t::SIGNAL_ANALOG)
 		{
 			//printf("here 1\n");
-			netdev_d_to_a_proxy *proxy = new netdev_d_to_a_proxy(*this, "abc", out);
+			netdev_d_to_a_proxy *proxy = new netdev_d_to_a_proxy(out);
 
+			proxy->setup(*this, "abc");
 			in->set_output(proxy->m_Q);
 			proxy->m_Q.register_con(*in);
 			proxy->m_I.set_output(out);
@@ -768,7 +816,7 @@ void netlist_setup_t::resolve_inputs(void)
 	for (tagmap_devices_t::entry_t *entry = m_devices.first(); entry != NULL; entry = m_devices.next(entry))
 	{
 		net_device_t *dev = entry->object();
-		dev->update();
+		dev->update_dev();
 	}
 
 #else
@@ -824,12 +872,35 @@ void netlist_setup_t::print_stats()
 // net_core_device_t
 // ----------------------------------------------------------------------------------------
 
-net_core_device_t::net_core_device_t(netlist_setup_t &setup, const char *name)
+net_core_device_t::net_core_device_t()
 : net_object_t(DEVICE)
-, m_netlist(setup.netlist())
-, m_name(name)
 {
 }
+
+ATTR_COLD void net_core_device_t::setup(netlist_setup_t &setup, const char *name)
+{
+	m_netlist = &setup.netlist();
+	m_name = name;
+
+#if USE_DELEGATES
+#if USE_PMFDELEGATES
+	void (net_core_device_t::* pFunc)() = &net_core_device_t::update;
+	static_update = reinterpret_cast<net_update_delegate>((this->*pFunc));
+#else
+	static_update = net_update_delegate(&net_core_device_t::update, "update", this);
+	// get the pointer to the member function
+#endif
+#endif
+
+}
+
+ATTR_COLD void net_device_t::setup(netlist_setup_t &setup, const char *name)
+{
+	net_core_device_t::setup(setup, name);
+	m_setup = &setup;
+	start();
+}
+
 
 net_core_device_t::~net_core_device_t()
 {
@@ -854,9 +925,8 @@ ATTR_HOT ATTR_ALIGN const net_sig_t net_core_device_t::INPLOGIC_PASSIVE(logic_in
 	return ret;
 }
 
-net_device_t::net_device_t(netlist_setup_t &setup, const char *name)
-	: net_core_device_t(setup, name),
-	  m_setup(setup),
+net_device_t::net_device_t()
+	: net_core_device_t(),
 	  m_variable_input_count(false)
 {
 }
@@ -865,19 +935,24 @@ net_device_t::~net_device_t()
 {
 }
 
+ATTR_COLD void net_device_t::register_sub(net_core_device_t &dev, const char *name)
+{
+	dev.setup(*m_setup, name);
+}
+
 void net_device_t::register_output(net_core_device_t &dev, const char *name, net_output_t &port)
 {
-	m_setup.register_output(*this, dev, name, port);
+	m_setup->register_output(*this, dev, name, port);
 }
 
 void net_device_t::register_output(const char *name, net_output_t &port)
 {
-	m_setup.register_output(*this,*this,name, port);
+	m_setup->register_output(*this,*this,name, port);
 }
 
 void net_device_t::register_input(net_core_device_t &dev, const char *name, net_input_t &inp, net_input_t::net_input_state type)
 {
-	m_setup.register_input(*this, dev, name, inp, type);
+	m_setup->register_input(*this, dev, name, inp, type);
 }
 
 void net_device_t::register_input(const char *name, net_input_t &inp, net_input_t::net_input_state type)
@@ -902,7 +977,7 @@ void net_device_t::register_param(net_core_device_t &dev, const char *name, net_
 {
 	param.set_netdev(dev);
 	param.initial(initialVal);
-	m_setup.register_param(name, &param);
+	m_setup->register_param(name, &param);
 }
 
 void net_device_t::register_param(const char *name, net_param_t &param, double initialVal)
@@ -917,7 +992,7 @@ void net_device_t::register_param(const char *name, net_param_t &param, double i
 ATTR_COLD void net_terminal_t::init_terminal(net_core_device_t *dev)
 {
 	m_netdev = dev;
-	m_netlist = &dev->netlist();
+	m_netlist = dev->netlist();
 }
 
 // ----------------------------------------------------------------------------------------
@@ -928,9 +1003,6 @@ ATTR_COLD void net_input_t::init_input(net_core_device_t *dev, net_input_state a
 {
 	init_terminal(dev);
 	m_state = astate;
-#if USE_DELEGATES
-	h = net_update_delegate(&net_core_device_t::update, "update", dev);
-#endif
 }
 
 // ----------------------------------------------------------------------------------------
@@ -958,11 +1030,7 @@ ATTR_HOT inline void net_output_t::update_dev(const net_input_t *inp, const UINT
 		ATTR_UNUSED net_core_device_t *netdev = inp->netdev();
 		begin_timing(netdev->total_time);
 		inc_stat(netdev->stat_count);
-#if USE_DELEGATES
-		inp->h();
-#else
-		netdev->update();
-#endif
+		netdev->update_dev();
 		end_timing(netdev()->total_time);
 	}
 }

@@ -47,7 +47,7 @@
 
 #include "net_lib.h"
 
-NETLIB_CONSTRUCTOR(netdev_logic_input)
+NETLIB_START(netdev_logic_input)
 {
 	register_output("Q", m_Q);
 }
@@ -56,7 +56,7 @@ NETLIB_UPDATE(netdev_logic_input)
 {
 }
 
-NETLIB_CONSTRUCTOR(netdev_analog_input)
+NETLIB_START(netdev_analog_input)
 {
 	register_output("Q", m_Q);
 }
@@ -65,17 +65,17 @@ NETLIB_UPDATE(netdev_analog_input)
 {
 }
 
-NETLIB_CONSTRUCTOR(netdev_log)
+NETLIB_START(netdev_log)
 {
 	register_input("I", m_I);
 }
 
 NETLIB_UPDATE(netdev_log)
 {
-	printf("%s: %d %d\n", name(), (UINT32) (netlist().time().as_raw() / 1000000), INPLOGIC(m_I));
+	printf("%s: %d %d\n", name(), (UINT32) (netlist()->time().as_raw() / 1000000), INPLOGIC(m_I));
 }
 
-NETLIB_CONSTRUCTOR(netdev_clock)
+NETLIB_START(netdev_clock)
 {
 	register_output("Q", m_Q);
 	//register_input("FB", m_feedback);
@@ -98,7 +98,7 @@ NETLIB_UPDATE(netdev_clock)
 	OUTLOGIC(m_Q, !m_Q.new_Q(), m_inc  );
 }
 
-NETLIB_CONSTRUCTOR(nicMultiSwitch)
+NETLIB_START(nicMultiSwitch)
 {
 	static const char *sIN[8] = { "i1", "i2", "i3", "i4", "i5", "i6", "i7", "i8" };
 	int i;
@@ -130,7 +130,7 @@ NETLIB_UPDATE_PARAM(nicMultiSwitch)
 	update();
 }
 
-NETLIB_CONSTRUCTOR(nicMixer8)
+NETLIB_START(nicMixer8)
 {
 	static const char *sI[8] = { "I1", "I2", "I3", "I4", "I5", "I6", "I7", "I8" };
 	static const char *sR[8] = { "R1", "R2", "R3", "R4", "R5", "R6", "R7", "R8" };
@@ -176,7 +176,7 @@ NETLIB_UPDATE_PARAM(nicMixer8)
 
 
 
-NETLIB_CONSTRUCTOR(nicRSFF)
+NETLIB_START(nicRSFF)
 {
 	register_input("S", m_S);
 	register_input("R", m_R);
@@ -201,7 +201,7 @@ NETLIB_UPDATE(nicRSFF)
 }
 
 
-NETLIB_CONSTRUCTOR(nicNE555N_MSTABLE)
+NETLIB_START(nicNE555N_MSTABLE)
 {
 	register_input("TRIG", m_trigger);
 	register_input("CV", m_CV);
@@ -284,7 +284,7 @@ NETLIB_UPDATE(nicNE555N_MSTABLE)
 	m_last = out;
 }
 
-NETLIB_CONSTRUCTOR(nic7404)
+NETLIB_START(nic7404)
 {
 	register_input("I1", m_I);
 	register_output("Q", m_Q);
@@ -298,7 +298,7 @@ NETLIB_UPDATE(nic7404)
 	OUTLOGIC(m_Q, t, delay[t]);
 }
 
-NETLIB_CONSTRUCTOR(nic7486)
+NETLIB_START(nic7486)
 {
 	register_input("I1", m_I0);
 	register_input("I2", m_I1);
@@ -312,9 +312,10 @@ NETLIB_UPDATE(nic7486)
 	OUTLOGIC(m_Q, t, delay[t]);
 }
 
-NETLIB_CONSTRUCTOR(nic7448)
-, sub(setup, "sub")
+NETLIB_START(nic7448)
 {
+	register_sub(sub, "sub");
+
 	sub.m_state = 0;
 
 	register_input(sub, "A0", sub.m_A0);
@@ -410,7 +411,7 @@ const UINT8 nic7448_sub::tab7448[16][7] =
 		{   0, 0, 0, 0, 0, 0, 0 },  /* 15 */
 };
 
-NETLIB_CONSTRUCTOR(nic7450)
+NETLIB_START(nic7450)
 {
 	register_input("I1", m_I0);
 	register_input("I2", m_I1);
@@ -498,10 +499,10 @@ NETLIB_UPDATE(nic7474)
 	}
 }
 
-NETLIB_CONSTRUCTOR(nic7474)
-, sub(setup, "sub")
+NETLIB_START(nic7474)
 {
 
+	register_sub(sub, "sub");
 	register_input(sub, "CLK",  sub.m_clk, net_input_t::INP_STATE_LH);
 	register_input("D",    m_D);
 	register_input("CLRQ", m_clrQ);
@@ -514,7 +515,7 @@ NETLIB_CONSTRUCTOR(nic7474)
 	sub.m_QQ.initial(0);
 }
 
-NETLIB_CONSTRUCTOR(nic7483)
+NETLIB_START(nic7483)
 {
 	m_lastr = 0;
 
@@ -553,7 +554,7 @@ NETLIB_UPDATE(nic7483)
 	}
 }
 
-NETLIB_CONSTRUCTOR(nic7490)
+NETLIB_START(nic7490)
 {
 	m_cnt = 0;
 
@@ -606,12 +607,13 @@ NETLIB_FUNC_VOID(nic7490, update_outputs, (void))
 }
 #endif
 #if !USE_OLD7493
-NETLIB_CONSTRUCTOR(nic7493)
-, A(setup, "A")
-, B(setup, "B")
-, C(setup, "C")
-, D(setup, "D")
+NETLIB_START(nic7493)
 {
+	register_sub(A, "A");
+	register_sub(B, "B");
+	register_sub(C, "C");
+	register_sub(D, "D");
+
 	register_input(A, "CLKA", A.m_I, net_input_t::INP_STATE_HL);
 	register_input(B, "CLKB", B.m_I, net_input_t::INP_STATE_HL);
 	register_input("R1",  m_R1);
@@ -659,7 +661,7 @@ NETLIB_UPDATE(nic7493)
 }
 #else
 
-NETLIB_CONSTRUCTOR(nic7493)
+NETLIB_START(nic7493)
 {
 	m_cnt = 0;
 
@@ -739,9 +741,10 @@ NETLIB_FUNC_VOID(nic7493, update_outputs, (void))
 }
 #endif
 
-NETLIB_CONSTRUCTOR(nic74107A)
-, sub(setup, "sub")
+NETLIB_START(nic74107A)
 {
+	register_sub(sub, "sub");
+
 	register_input(sub, "CLK", sub.m_clk, net_input_t::INP_STATE_HL);
 	register_input("J", m_J);
 	register_input("K", m_K);
@@ -816,7 +819,7 @@ NETLIB_UPDATE(nic74107A)
 	//	sub.m_clk.activate_hl();
 }
 
-NETLIB_CONSTRUCTOR(nic74153)
+NETLIB_START(nic74153)
 {
 	register_input("A1", m_I[0]);
 	register_input("A2", m_I[1]);
@@ -844,9 +847,10 @@ NETLIB_UPDATE(nic74153)
 	}
 }
 
-NETLIB_CONSTRUCTOR(nic9316)
-, sub(setup, "sub")
+NETLIB_START(nic9316)
 {
+	register_sub(sub, "sub");
+
 	sub.m_cnt = 0;
 	sub.m_loadq = 1;
 	sub.m_ent = 1;
@@ -1006,7 +1010,11 @@ net_device_t *net_create_device_by_classname(const char *classname, netlist_setu
 	while (p != NULL)
 	{
 		if (strcmp((*p)->classname(), classname) == 0)
-			return (*p)->Create(setup, icname);
+		{
+			net_device_t *ret = (*p)->Create();
+			ret->setup(setup, icname);
+			return ret;
+		}
 		p++;
 	}
 	fatalerror("Class %s required for IC %s not found!\n", classname, icname);
@@ -1019,7 +1027,11 @@ net_device_t *net_create_device_by_name(const char *name, netlist_setup_t &setup
 	while (p != NULL)
 	{
 		if (strcmp((*p)->name(), name) == 0)
-			return (*p)->Create(setup, icname);
+		{
+			net_device_t *ret = (*p)->Create();
+			ret->setup(setup, icname);
+			return ret;
+		}
 		p++;
 	}
 	fatalerror("Class %s required for IC %s not found!\n", name, icname);
