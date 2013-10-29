@@ -37,6 +37,35 @@ Memo:
 
 - Communication between MAIN CPU and SUB CPU can be wrong.
 
+Notes:
+
+idolmj tries to read at 0x9e89 (happened to me when I've declared rii'chi),
+with the following code:
+
+790A: 3A 89 9E      ld   a,($9E89)
+790D: BB            cp   e
+790E: 20 01         jr   nz,$7911
+7910: 0C            inc  c
+7911: 7B            ld   a,e
+7912: FD 6E 07      ld   l,(iy+$07)
+7915: FD 66 08      ld   h,(iy+$08)
+7918: 11 80 03      ld   de,$0380
+791B: 19            add  hl,de
+791C: C5            push bc
+791D: 46            ld   b,(hl)
+791E: 23            inc  hl
+791F: BE            cp   (hl)
+7920: 20 01         jr   nz,$7923
+7922: 0C            inc  c
+7923: 10 F9         djnz $791E
+7925: 79            ld   a,c
+7926: C1            pop  bc
+7927: 4F            ld   c,a
+7928: E1            pop  hl
+7929: 10 D3         djnz $78FE
+792B: FD 71 33      ld   (iy+$33),c
+792E: C9            ret
+
 ******************************************************************************/
 
 #include "emu.h"

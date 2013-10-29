@@ -81,6 +81,34 @@ TO DO:
 
 - add sound to Mazer Blazer - Speech processor is unknown chip
 
+====
+
+Mazer Blazer DASM notes:
+master z80
+[0x0000]: clear 0x4c-0x4f i/o ports (ls670)
+[0x0792]: z80 regs check
+[0x0924]: z80 SP reg check
+(following two happens quite often, basically after every POST test)
+	[0x08e1]: writes 0xaa to led i/o port
+	[0x08d2]: writes 0x02 to A, then 0 to led i/o port
+[0x07d7]: checks ROM 0x0000-0x1fff
+[0x07ee]: checks ROM 0x2000-0x3fff
+[0x0805]: checks ROM 0x4000-0x5fff
+[0x081c]: checks ROM 0x6000-0x7fff
+[0x0833]: checks RAM 0xe800-0xefff, with a bit-wise pattern (1-2-4-8-0x10-0x20-0x40-0x80)
+[0x0844]: transfers RAM 0xe000-0xe7ff to RAM 0xe800-0xefff
+[0x0850]: checks RAM 0xe000-0xe7ff, with a bit-wise pattern (1-2-4-8-0x10-0x20-0x40-0x80)
+[0x085a]: transfers RAM 0xe800-0xefff to RAM 0xe000-0xe7ff
+[0x086b]: Puts some values to ls670 ports, reads back afterwards, does this twice (with different values)
+[0x088b]: shared RAM check, values at 0xc000-0xc7ff must be 0x55 (otherwise wait until they are)
+[0x089c]: writes 0xaa to shared RAM 0xc000-0xc7ff
+[0x08ab]: shared RAM check, values at 0xc000-0xc7ff must be 0x00 (otherwise wait until they are)
+[0x08c2]: writes 0 to shared RAM
+[0x000d]: clears RAM 0xe0fb, 0xe0fd, 0xe0fe (word)
+	[0x2138]: puts a 1 to 0xe0fb
+[0x0021]: clears i/o at 0x6a (lamps), clears 0xe563, 0xe004, 0xe000, 0xe001, 0xe007, 0xe002, 0xe003, 0xe005,
+          0xc04f, 0xe572, enables IM 2, clears 0xe581 / 0xe583 (word), puts default initials (0x2274->0xe058)
+
 
 ****************************************************************************/
 
@@ -362,17 +390,16 @@ UINT32 mazerbla_state::screen_update_mazerbla(screen_device &screen, bitmap_ind1
 {
 //  UINT32 color_base = 0;
 
-	if (m_game_id == MAZERBLA)
+//	if (m_game_id == MAZERBLA)
 //      color_base = 0x80;  /* 0x80 constant: matches Mazer Blazer movie */
 
 //  if (m_game_id == GREATGUN)
 //      color_base = 0x00;
+	bitmap.fill(get_black_pen(machine()), cliprect);
 
-	//  bitmap.fill(0);
-
-	copybitmap(bitmap, m_tmpbitmaps[3], 0, 0, 0, 0, cliprect);
-	copybitmap_trans(bitmap, m_tmpbitmaps[2], 0, 0, 0, 0, cliprect, 0);
-	copybitmap_trans(bitmap, m_tmpbitmaps[1], 0, 0, 0, 0, cliprect, 0);
+	//copybitmap_trans(bitmap, m_tmpbitmaps[3], 0, 0, 0, 0, cliprect, 0);
+	//copybitmap_trans(bitmap, m_tmpbitmaps[2], 0, 0, 0, 0, cliprect, 0);
+	//copybitmap_trans(bitmap, m_tmpbitmaps[1], 0, 0, 0, 0, cliprect, 0);
 	copybitmap_trans(bitmap, m_tmpbitmaps[0], 0, 0, 0, 0, cliprect, 0);
 	return 0;
 }
@@ -481,22 +508,23 @@ READ8_MEMBER(mazerbla_state::vcu_set_gfx_addr_r)
 
 	if (m_game_id == GREATGUN)
 		color_base = 0x00;  /* 0x00 - good for Great Guns: (both in game and CRT test mode) */
+
+//    if ((mode <= 0x07) || (mode >= 0x10))
 /*
-    if ((mode <= 0x07) || (mode >= 0x10))
     {
-        logerror("paradr=");
-        logerror("%3x ", m_vcu_gfx_param_addr );
+        printf("paradr=");
+        printf("%3x ", m_vcu_gfx_param_addr );
 
-        logerror("%02x ", m_cfb_ram[vcu_gfx_param_addr + 0] );
-        logerror("x=%04x ", m_xpos );                 //1,2
-        logerror("y=%04x ", m_ypos );                 //3,4
-        logerror("color1=%02x ", m_color1);             //5
-        logerror("color2=%02x ", m_color2);           //6
-        logerror("mode=%02x ", m_mode );              //7
-        logerror("xpix=%02x ", m_pix_xsize );         //8
-        logerror("ypix=%02x ", m_pix_ysize );         //9
+        printf("%02x ", m_cfb_ram[m_vcu_gfx_param_addr + 0] );
+        printf("x=%04x ", m_xpos );                 //1,2
+        printf("y=%04x ", m_ypos );                 //3,4
+        printf("color1=%02x ", m_color1);             //5
+        printf("color2=%02x ", m_color2);           //6
+        printf("mode=%02x ", m_mode );              //7
+        printf("xpix=%02x ", m_pix_xsize );         //8
+        printf("ypix=%02x ", m_pix_ysize );         //9
 
-        logerror("addr=%4i bank=%1i\n", offset, m_gfx_rom_bank);
+        printf("addr=%4i bank=%1i\n", offset, m_gfx_rom_bank);
     }
 */
 
@@ -504,6 +532,28 @@ READ8_MEMBER(mazerbla_state::vcu_set_gfx_addr_r)
 
 	/* draw */
 	offs = m_vcu_gfx_addr;
+
+	if(0)
+	{
+		for (y = 0; y <= m_pix_ysize; y++)
+		{
+			for (x = 0; x <= m_pix_xsize; x++)
+			{
+				if(machine().input().code_pressed(KEYCODE_Z))
+				{
+					if (((m_xpos + x) < 256) && ((m_ypos + y) < 256) )
+						m_tmpbitmaps[0].pix16(m_ypos + y, m_xpos + x) = m_plane | 0x10;
+				}
+				else
+				{
+					if (((m_xpos + x) < 256) && ((m_ypos + y) < 256) )
+						m_tmpbitmaps[m_plane].pix16(m_ypos + y, m_xpos + x) = m_mode | 0x10;
+				}
+			}
+		}
+
+		return 0;
+	}
 
 	switch(m_mode)
 	{
@@ -541,7 +591,7 @@ READ8_MEMBER(mazerbla_state::vcu_set_gfx_addr_r)
 					}
 
 					if (((m_xpos + x) < 256) && ((m_ypos + y) < 256) )
-						m_tmpbitmaps[m_plane].pix16(m_ypos + y, m_xpos + x) = col;
+						m_tmpbitmaps[0].pix16(m_ypos + y, m_xpos + x) = col;
 
 					bits += 2;
 				}
@@ -569,7 +619,7 @@ READ8_MEMBER(mazerbla_state::vcu_set_gfx_addr_r)
 					/* color = 4 MSB = front PEN, 4 LSB = background PEN */
 
 					if (((m_xpos + x) < 256) && ((m_ypos + y) < 256))
-						m_tmpbitmaps[m_plane].pix16(m_ypos + y, m_xpos + x) = data ? color_base | ((m_color1 & 0xf0) >> 4): color_base | ((m_color1 & 0x0f));
+						m_tmpbitmaps[0].pix16(m_ypos + y, m_xpos + x) = data ? color_base | ((m_color1 & 0xf0) >> 4): color_base | ((m_color1 & 0x0f));
 
 					bits += 1;
 				}
@@ -597,7 +647,7 @@ READ8_MEMBER(mazerbla_state::vcu_set_gfx_addr_r)
 					col = color_base | data;
 
 					if (((m_xpos + x) < 256) && ((m_ypos + y) < 256))
-						m_tmpbitmaps[m_plane].pix16(m_ypos + y, m_xpos + x) = col;
+						m_tmpbitmaps[0].pix16(m_ypos + y, m_xpos + x) = col;
 
 					bits += 4;
 				}
