@@ -25,8 +25,7 @@
 #include "machine/z80ctc.h"
 #include "includes/cinemat.h"
 #include "sound/samples.h"
-#include "sound/ay8910.h"
-#include "drivlgcy.h"
+
 
 /*************************************
  *
@@ -180,13 +179,13 @@ static void spacewar_sound_w(running_machine &machine, UINT8 sound_val, UINT8 bi
 	}
 }
 
-static SOUND_RESET( spacewar )
+SOUND_RESET_MEMBER( cinemat_state, spacewar )
 {
-	generic_init(machine, spacewar_sound_w);
+	generic_init(machine(), spacewar_sound_w);
 }
 
 MACHINE_CONFIG_FRAGMENT( spacewar_sound )
-	MCFG_SOUND_RESET(spacewar)
+	MCFG_SOUND_RESET_OVERRIDE(cinemat_state, spacewar)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -234,13 +233,13 @@ static void barrier_sound_w(running_machine &machine, UINT8 sound_val, UINT8 bit
 		samples->start(2, 2);
 }
 
-static SOUND_RESET( barrier )
+SOUND_RESET_MEMBER( cinemat_state, barrier )
 {
-	generic_init(machine, barrier_sound_w);
+	generic_init(machine(), barrier_sound_w);
 }
 
 MACHINE_CONFIG_FRAGMENT( barrier_sound )
-	MCFG_SOUND_RESET(barrier)
+	MCFG_SOUND_RESET_OVERRIDE(cinemat_state, barrier)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -294,13 +293,13 @@ static void speedfrk_sound_w(running_machine &machine, UINT8 sound_val, UINT8 bi
 	set_led_status(machine, 0, ~sound_val & 0x02);
 }
 
-static SOUND_RESET( speedfrk )
+SOUND_RESET_MEMBER( cinemat_state, speedfrk )
 {
-	generic_init(machine, speedfrk_sound_w);
+	generic_init(machine(), speedfrk_sound_w);
 }
 
 MACHINE_CONFIG_FRAGMENT( speedfrk_sound )
-	MCFG_SOUND_RESET(speedfrk)
+	MCFG_SOUND_RESET_OVERRIDE(cinemat_state, speedfrk)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -369,13 +368,13 @@ static void starhawk_sound_w(running_machine &machine, UINT8 sound_val, UINT8 bi
 		samples->stop(3);
 }
 
-static SOUND_RESET( starhawk )
+SOUND_RESET_MEMBER( cinemat_state, starhawk )
 {
-	generic_init(machine, starhawk_sound_w);
+	generic_init(machine(), starhawk_sound_w);
 }
 
 MACHINE_CONFIG_FRAGMENT( starhawk_sound )
-	MCFG_SOUND_RESET(starhawk)
+	MCFG_SOUND_RESET_OVERRIDE(cinemat_state, starhawk)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -438,13 +437,13 @@ static void sundance_sound_w(running_machine &machine, UINT8 sound_val, UINT8 bi
 		samples->start(5, 5);
 }
 
-static SOUND_RESET( sundance )
+SOUND_RESET_MEMBER( cinemat_state, sundance )
 {
-	generic_init(machine, sundance_sound_w);
+	generic_init(machine(), sundance_sound_w);
 }
 
 MACHINE_CONFIG_FRAGMENT( sundance_sound )
-	MCFG_SOUND_RESET(sundance)
+	MCFG_SOUND_RESET_OVERRIDE(cinemat_state, sundance)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -527,13 +526,13 @@ static void tailg_sound_w(running_machine &machine, UINT8 sound_val, UINT8 bits_
 	}
 }
 
-static SOUND_RESET( tailg )
+SOUND_RESET_MEMBER( cinemat_state, tailg )
 {
-	generic_init(machine, tailg_sound_w);
+	generic_init(machine(), tailg_sound_w);
 }
 
 MACHINE_CONFIG_FRAGMENT( tailg_sound )
-	MCFG_SOUND_RESET(tailg)
+	MCFG_SOUND_RESET_OVERRIDE(cinemat_state, tailg)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -595,13 +594,13 @@ static void warrior_sound_w(running_machine &machine, UINT8 sound_val, UINT8 bit
 		samples->start(4, 4);
 }
 
-static SOUND_RESET( warrior )
+SOUND_RESET_MEMBER( cinemat_state, warrior )
 {
-	generic_init(machine, warrior_sound_w);
+	generic_init(machine(), warrior_sound_w);
 }
 
 MACHINE_CONFIG_FRAGMENT( warrior_sound )
-	MCFG_SOUND_RESET(warrior)
+	MCFG_SOUND_RESET_OVERRIDE(cinemat_state, warrior)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -690,13 +689,13 @@ static void armora_sound_w(running_machine &machine, UINT8 sound_val, UINT8 bits
 		samples->stop(6);
 }
 
-static SOUND_RESET( armora )
+SOUND_RESET_MEMBER( cinemat_state, armora )
 {
-	generic_init(machine, armora_sound_w);
+	generic_init(machine(), armora_sound_w);
 }
 
 MACHINE_CONFIG_FRAGMENT( armora_sound )
-	MCFG_SOUND_RESET(armora)
+	MCFG_SOUND_RESET_OVERRIDE(cinemat_state, armora)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -782,13 +781,13 @@ static void ripoff_sound_w(running_machine &machine, UINT8 sound_val, UINT8 bits
 		samples->start(4, 4);
 }
 
-static SOUND_RESET( ripoff )
+SOUND_RESET_MEMBER( cinemat_state, ripoff )
 {
-	generic_init(machine, ripoff_sound_w);
+	generic_init(machine(), ripoff_sound_w);
 }
 
 MACHINE_CONFIG_FRAGMENT( ripoff_sound )
-	MCFG_SOUND_RESET(ripoff)
+	MCFG_SOUND_RESET_OVERRIDE(cinemat_state, ripoff)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -895,13 +894,13 @@ static void starcas_sound_w(running_machine &machine, UINT8 sound_val, UINT8 bit
 		samples->start(7, 7);
 }
 
-static SOUND_RESET( starcas )
+SOUND_RESET_MEMBER( cinemat_state, starcas )
 {
-	generic_init(machine, starcas_sound_w);
+	generic_init(machine(), starcas_sound_w);
 }
 
 MACHINE_CONFIG_FRAGMENT( starcas_sound )
-	MCFG_SOUND_RESET(starcas)
+	MCFG_SOUND_RESET_OVERRIDE(cinemat_state, starcas)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -1030,13 +1029,13 @@ static void solarq_sound_w(running_machine &machine, UINT8 sound_val, UINT8 bits
 	}
 }
 
-static SOUND_RESET( solarq )
+SOUND_RESET_MEMBER( cinemat_state, solarq )
 {
-	generic_init(machine, solarq_sound_w);
+	generic_init(machine(), solarq_sound_w);
 }
 
 MACHINE_CONFIG_FRAGMENT( solarq_sound )
-	MCFG_SOUND_RESET(solarq)
+	MCFG_SOUND_RESET_OVERRIDE(cinemat_state, solarq)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -1165,13 +1164,13 @@ static void boxingb_sound_w(running_machine &machine, UINT8 sound_val, UINT8 bit
 		samples->start(11, 11);
 }
 
-static SOUND_RESET( boxingb )
+SOUND_RESET_MEMBER( cinemat_state, boxingb )
 {
-	generic_init(machine, boxingb_sound_w);
+	generic_init(machine(), boxingb_sound_w);
 }
 
 MACHINE_CONFIG_FRAGMENT( boxingb_sound )
-	MCFG_SOUND_RESET(boxingb)
+	MCFG_SOUND_RESET_OVERRIDE(cinemat_state, boxingb)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -1278,13 +1277,13 @@ static void wotw_sound_w(running_machine &machine, UINT8 sound_val, UINT8 bits_c
 		samples->start(7, 7);
 }
 
-static SOUND_RESET( wotw )
+SOUND_RESET_MEMBER( cinemat_state, wotw )
 {
-	generic_init(machine, wotw_sound_w);
+	generic_init(machine(), wotw_sound_w);
 }
 
 MACHINE_CONFIG_FRAGMENT( wotw_sound )
-	MCFG_SOUND_RESET(wotw)
+	MCFG_SOUND_RESET_OVERRIDE(cinemat_state, wotw)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -1387,18 +1386,17 @@ static Z80CTC_INTERFACE( demon_z80ctc_interface )
 };
 
 
-static SOUND_RESET( demon_sound )
+SOUND_RESET_MEMBER( cinemat_state, demon )
 {
-	cinemat_state *state = machine.driver_data<cinemat_state>();
 	/* generic init */
-	generic_init(machine, demon_sound_w);
+	generic_init(machine(), demon_sound_w);
 
 	/* reset the FIFO */
-	state->m_sound_fifo_in = state->m_sound_fifo_out = 0;
-	state->m_last_portb_write = 0xff;
+	m_sound_fifo_in = m_sound_fifo_out = 0;
+	m_last_portb_write = 0xff;
 
 	/* turn off channel A on AY8910 #0 because it is used as a low-pass filter */
-	machine.device<ay8910_device>("ay1")->set_volume(0, 0);
+	m_ay1->set_volume(0, 0);
 }
 
 
@@ -1439,7 +1437,7 @@ MACHINE_CONFIG_FRAGMENT( demon_sound )
 
 	MCFG_Z80CTC_ADD("ctc", 3579545 /* same as "audiocpu" */, demon_z80ctc_interface)
 
-	MCFG_SOUND_RESET(demon_sound)
+	MCFG_SOUND_RESET_OVERRIDE(cinemat_state, demon)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1471,18 +1469,17 @@ WRITE8_MEMBER(cinemat_state::qb3_sound_w)
 }
 
 
-static SOUND_RESET( qb3_sound )
+SOUND_RESET_MEMBER( cinemat_state, qb3 )
 {
-	cinemat_state *state = machine.driver_data<cinemat_state>();
-	SOUND_RESET_CALL(demon_sound);
-	machine.device("maincpu")->memory().space(AS_IO).install_write_handler(0x04, 0x04, write8_delegate(FUNC(cinemat_state::qb3_sound_w),state));
+	SOUND_RESET_CALL_MEMBER(demon);
+	m_maincpu->space(AS_IO).install_write_handler(0x04, 0x04, write8_delegate(FUNC(cinemat_state::qb3_sound_w),this));
 
 	/* this patch prevents the sound ROM from eating itself when command $0A is sent */
 	/* on a cube rotate */
-	state->memregion("audiocpu")->base()[0x11dc] = 0x09;
+	memregion("audiocpu")->base()[0x11dc] = 0x09;
 }
 
 
 MACHINE_CONFIG_DERIVED( qb3_sound, demon_sound )
-	MCFG_SOUND_RESET(qb3_sound)
+	MCFG_SOUND_RESET_OVERRIDE(cinemat_state, qb3)
 MACHINE_CONFIG_END

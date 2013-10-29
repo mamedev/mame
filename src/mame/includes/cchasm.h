@@ -60,4 +60,3 @@ protected:
 /*----------- defined in audio/cchasm.c -----------*/
 
 extern const z80ctc_interface cchasm_ctc_intf;
-SOUND_START( cchasm );

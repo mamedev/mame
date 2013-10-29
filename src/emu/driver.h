@@ -71,14 +71,11 @@
 #define MACHINE_RESET_MEMBER(cls,name) void cls::MACHINE_RESET_NAME(name)()
 
 #define SOUND_START_NAME(name)      sound_start_##name
-#define SOUND_START(name)           void SOUND_START_NAME(name)(running_machine &machine)
-#define SOUND_START_CALL(name)      SOUND_START_NAME(name)(machine)
 #define DECLARE_SOUND_START(name)   void SOUND_START_NAME(name)()
 #define SOUND_START_MEMBER(cls,name) void cls::SOUND_START_NAME(name)()
 
 #define SOUND_RESET_NAME(name)      sound_reset_##name
-#define SOUND_RESET(name)           void SOUND_RESET_NAME(name)(running_machine &machine)
-#define SOUND_RESET_CALL(name)      SOUND_RESET_NAME(name)(machine)
+#define SOUND_RESET_CALL_MEMBER(name) SOUND_RESET_NAME(name)()
 #define DECLARE_SOUND_RESET(name)   void SOUND_RESET_NAME(name)()
 #define SOUND_RESET_MEMBER(cls,name) void cls::SOUND_RESET_NAME(name)()
 
