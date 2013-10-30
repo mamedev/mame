@@ -160,7 +160,7 @@ DRIVER_INIT_MEMBER(wpc_dot_state,wpc_dot)
 {
 	UINT8 *fixed = memregion("code")->base();
 	UINT32 codeoff = memregion("code")->bytes() - 0x8000;
-	m_cpubank->configure_entries(0, 32, &fixed[0], 0x4000);
+	m_cpubank->configure_entries(0, 64, &fixed[0], 0x4000);
 	m_cpubank->set_entry(0);
 	m_fixedbank->configure_entries(0, 1, &fixed[codeoff],0x8000);
 	m_fixedbank->set_entry(0);
