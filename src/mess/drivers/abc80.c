@@ -186,7 +186,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( abc80_io, AS_IO, 8, abc80_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x17)
-	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE(ABCBUS_TAG, abcbus_slot_device, inp_r, utp_w)
+	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE(ABCBUS_TAG, abcbus_slot_device, inp_r, out_w)
 	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(ABCBUS_TAG, abcbus_slot_device, stat_r, cs_w)
 	AM_RANGE(0x02, 0x02) AM_DEVWRITE(ABCBUS_TAG, abcbus_slot_device, c1_w)
 	AM_RANGE(0x03, 0x03) AM_DEVWRITE(ABCBUS_TAG, abcbus_slot_device, c2_w)

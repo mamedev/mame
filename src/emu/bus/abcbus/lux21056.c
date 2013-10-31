@@ -350,10 +350,10 @@ UINT8 luxor_55_21056_device::abcbus_inp()
 
 
 //-------------------------------------------------
-//  abcbus_utp -
+//  abcbus_out -
 //-------------------------------------------------
 
-void luxor_55_21056_device::abcbus_utp(UINT8 data)
+void luxor_55_21056_device::abcbus_out(UINT8 data)
 {
 	if (m_cs)
 	{

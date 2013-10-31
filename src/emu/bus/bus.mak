@@ -16,17 +16,6 @@ BUSOBJ = $(EMUOBJ)/bus
 
 #-------------------------------------------------
 #
-#@src/emu/bus/abc1600/abc1600.h,BUSES += ABC1600
-#-------------------------------------------------
-
-ifneq ($(filter ABC1600,$(BUSES)),)
-BUSOBJS += $(BUSOBJ)/abc1600/abc1600.o
-BUSOBJS += $(BUSOBJ)/abc1600/lux4105.o
-endif
-
-
-#-------------------------------------------------
-#
 #@src/emu/bus/abcbus/abcbus.h,BUSES += ABCBUS
 #-------------------------------------------------
 
@@ -39,6 +28,7 @@ BUSOBJS += $(BUSOBJ)/abcbus/hdc.o
 BUSOBJS += $(BUSOBJ)/abcbus/lux10828.o
 BUSOBJS += $(BUSOBJ)/abcbus/lux21046.o
 BUSOBJS += $(BUSOBJ)/abcbus/lux21056.o
+BUSOBJS += $(BUSOBJ)/abcbus/lux4105.o
 BUSOBJS += $(BUSOBJ)/abcbus/uni800.o
 BUSOBJS += $(BUSOBJ)/abcbus/sio.o
 BUSOBJS += $(BUSOBJ)/abcbus/slutprov.o

@@ -137,11 +137,11 @@ inline void luxor_4105_device::update_trrq_int()
 
 	if (BIT(m_dma, 5))
 	{
-		m_slot->int_w(trrq ? CLEAR_LINE : ASSERT_LINE);
+		m_slot->irq_w(trrq ? CLEAR_LINE : ASSERT_LINE);
 	}
 	else
 	{
-		m_slot->int_w(CLEAR_LINE);
+		m_slot->irq_w(CLEAR_LINE);
 	}
 
 	if (BIT(m_dma, 6))
@@ -155,6 +155,7 @@ inline void luxor_4105_device::update_trrq_int()
 }
 
 
+
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -164,8 +165,8 @@ inline void luxor_4105_device::update_trrq_int()
 //-------------------------------------------------
 
 luxor_4105_device::luxor_4105_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, LUXOR_4105, "Luxor 4105", tag, owner, clock, "luxor_4105", __FILE__),
-		device_abc1600bus_card_interface(mconfig, *this),
+	: device_t(mconfig, LUXOR_4105, "Luxor 4105", tag, owner, clock, "lux4105", __FILE__),
+		device_abcbus_card_interface(mconfig, *this),
 		m_sasibus(*this, SASIBUS_TAG ":host"),
 		m_1e(*this, "1E"),
 		m_5e(*this, "5E")
@@ -179,8 +180,6 @@ luxor_4105_device::luxor_4105_device(const machine_config &mconfig, const char *
 
 void luxor_4105_device::device_start()
 {
-	m_slot = dynamic_cast<abc1600bus_slot_device *>(owner());
-
 	// state saving
 	save_item(NAME(m_cs));
 	save_item(NAME(m_data));
@@ -205,46 +204,31 @@ void luxor_4105_device::device_reset()
 }
 
 
-
-//**************************************************************************
-//  ABC 1600 BUS INTERFACE
-//**************************************************************************
-
 //-------------------------------------------------
-//  abc1600bus_cs -
+//  abcbus_cs -
 //-------------------------------------------------
 
-void luxor_4105_device::abc1600bus_cs(UINT8 data)
+void luxor_4105_device::abcbus_cs(UINT8 data)
 {
 	m_cs = (data == m_5e->read());
 }
 
 
 //-------------------------------------------------
-//  abc1600bus_csb -
+//  abcbus_csb -
 //-------------------------------------------------
 
-int luxor_4105_device::abc1600bus_csb()
+int luxor_4105_device::abcbus_csb()
 {
 	return !m_cs;
 }
 
 
 //-------------------------------------------------
-//  abc1600bus_rst -
+//  abcbus_stat -
 //-------------------------------------------------
 
-void luxor_4105_device::abc1600bus_brst()
-{
-	device_reset();
-}
-
-
-//-------------------------------------------------
-//  abc1600bus_stat -
-//-------------------------------------------------
-
-UINT8 luxor_4105_device::abc1600bus_stat()
+UINT8 luxor_4105_device::abcbus_stat()
 {
 	UINT8 data = 0xff;
 
@@ -276,10 +260,10 @@ UINT8 luxor_4105_device::abc1600bus_stat()
 
 
 //-------------------------------------------------
-//  abc1600bus_inp -
+//  abcbus_inp -
 //-------------------------------------------------
 
-UINT8 luxor_4105_device::abc1600bus_inp()
+UINT8 luxor_4105_device::abcbus_inp()
 {
 	UINT8 data = 0xff;
 
@@ -308,10 +292,10 @@ UINT8 luxor_4105_device::abc1600bus_inp()
 
 
 //-------------------------------------------------
-//  abc1600bus_utp -
+//  abcbus_utp -
 //-------------------------------------------------
 
-void luxor_4105_device::abc1600bus_out(UINT8 data)
+void luxor_4105_device::abcbus_out(UINT8 data)
 {
 	if (m_cs)
 	{
@@ -331,10 +315,10 @@ void luxor_4105_device::abc1600bus_out(UINT8 data)
 
 
 //-------------------------------------------------
-//  abc1600bus_c1 -
+//  abcbus_c1 -
 //-------------------------------------------------
 
-void luxor_4105_device::abc1600bus_c1(UINT8 data)
+void luxor_4105_device::abcbus_c1(UINT8 data)
 {
 	if (m_cs)
 	{
@@ -344,10 +328,10 @@ void luxor_4105_device::abc1600bus_c1(UINT8 data)
 
 
 //-------------------------------------------------
-//  abc1600bus_c3 -
+//  abcbus_c3 -
 //-------------------------------------------------
 
-void luxor_4105_device::abc1600bus_c3(UINT8 data)
+void luxor_4105_device::abcbus_c3(UINT8 data)
 {
 	if (m_cs)
 	{
@@ -361,10 +345,10 @@ void luxor_4105_device::abc1600bus_c3(UINT8 data)
 
 
 //-------------------------------------------------
-//  abc1600bus_c4 -
+//  abcbus_c4 -
 //-------------------------------------------------
 
-void luxor_4105_device::abc1600bus_c4(UINT8 data)
+void luxor_4105_device::abcbus_c4(UINT8 data)
 {
 	if (m_cs)
 	{

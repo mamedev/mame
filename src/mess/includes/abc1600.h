@@ -6,7 +6,7 @@
 #define __ABC1600__
 
 #include "emu.h"
-#include "bus/abc1600/abc1600.h"
+#include "bus/abcbus/abcbus.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/8530scc.h"
 #include "machine/abckb.h"
@@ -93,10 +93,10 @@ public:
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_device<floppy_connector> m_floppy2;
-	required_device<abc1600bus_slot_device> m_bus0i;
-	required_device<abc1600bus_slot_device> m_bus0x;
-	required_device<abc1600bus_slot_device> m_bus1;
-	required_device<abc1600bus_slot_device> m_bus2;
+	required_device<abcbus_slot_device> m_bus0i;
+	required_device<abcbus_slot_device> m_bus0x;
+	required_device<abcbus_slot_device> m_bus1;
+	required_device<abcbus_slot_device> m_bus2;
 
 	virtual void machine_start();
 	virtual void machine_reset();

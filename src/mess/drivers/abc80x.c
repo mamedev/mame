@@ -432,7 +432,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( abc800c_io, AS_IO, 8, abc800_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x18) AM_DEVREADWRITE(ABCBUS_TAG, abcbus_slot_device, inp_r, utp_w)
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0x18) AM_DEVREADWRITE(ABCBUS_TAG, abcbus_slot_device, inp_r, out_w)
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x18) AM_DEVREADWRITE(ABCBUS_TAG, abcbus_slot_device, stat_r, cs_w)
 	AM_RANGE(0x02, 0x02) AM_MIRROR(0x18) AM_DEVWRITE(ABCBUS_TAG, abcbus_slot_device, c1_w)
 	AM_RANGE(0x03, 0x03) AM_MIRROR(0x18) AM_DEVWRITE(ABCBUS_TAG, abcbus_slot_device, c2_w)
@@ -491,7 +491,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( abc802_io, AS_IO, 8, abc802_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x18) AM_DEVREADWRITE(ABCBUS_TAG, abcbus_slot_device, inp_r, utp_w)
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0x18) AM_DEVREADWRITE(ABCBUS_TAG, abcbus_slot_device, inp_r, out_w)
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x18) AM_DEVREADWRITE(ABCBUS_TAG, abcbus_slot_device, stat_r, cs_w)
 	AM_RANGE(0x02, 0x02) AM_MIRROR(0x18) AM_DEVWRITE(ABCBUS_TAG, abcbus_slot_device, c1_w)
 	AM_RANGE(0x03, 0x03) AM_MIRROR(0x18) AM_DEVWRITE(ABCBUS_TAG, abcbus_slot_device, c2_w)
@@ -539,7 +539,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( abc806_io, AS_IO, 8, abc806_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff18) AM_DEVREADWRITE(ABCBUS_TAG, abcbus_slot_device, inp_r, utp_w)
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff18) AM_DEVREADWRITE(ABCBUS_TAG, abcbus_slot_device, inp_r, out_w)
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0xff18) AM_DEVREADWRITE(ABCBUS_TAG, abcbus_slot_device, stat_r, cs_w)
 	AM_RANGE(0x02, 0x02) AM_MIRROR(0xff18) AM_DEVWRITE(ABCBUS_TAG, abcbus_slot_device, c1_w)
 	AM_RANGE(0x03, 0x03) AM_MIRROR(0xff18) AM_DEVWRITE(ABCBUS_TAG, abcbus_slot_device, c2_w)

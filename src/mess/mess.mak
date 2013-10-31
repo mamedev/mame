@@ -482,7 +482,6 @@ MACHINES += Z8536
 # specify available bus cores
 #-------------------------------------------------
 
-BUSES += ABC1600
 BUSES += ABCBUS
 BUSES += ADAM
 BUSES += ADAMNET

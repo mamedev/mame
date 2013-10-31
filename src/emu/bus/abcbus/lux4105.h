@@ -16,7 +16,7 @@
 
 
 #include "emu.h"
-#include "abc1600.h"
+#include "abcbus.h"
 #include "machine/scsicb.h"
 
 
@@ -36,7 +36,7 @@
 // ======================> luxor_4105_device
 
 class luxor_4105_device :  public device_t,
-							public device_abc1600bus_card_interface
+							public device_abcbus_card_interface
 {
 public:
 	// construction/destruction
@@ -56,21 +56,18 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 
-	// device_abc1600bus_interface overrides
-	virtual void abc1600bus_cs(UINT8 data);
-	virtual int abc1600bus_csb();
-	virtual void abc1600bus_brst();
-	virtual UINT8 abc1600bus_inp();
-	virtual void abc1600bus_out(UINT8 data);
-	virtual UINT8 abc1600bus_stat();
-	virtual void abc1600bus_c1(UINT8 data);
-	virtual void abc1600bus_c3(UINT8 data);
-	virtual void abc1600bus_c4(UINT8 data);
+	// device_abcbus_interface overrides
+	virtual void abcbus_cs(UINT8 data);
+	virtual int abcbus_csb();
+	virtual UINT8 abcbus_inp();
+	virtual void abcbus_out(UINT8 data);
+	virtual UINT8 abcbus_stat();
+	virtual void abcbus_c1(UINT8 data);
+	virtual void abcbus_c3(UINT8 data);
+	virtual void abcbus_c4(UINT8 data);
 
 private:
 	inline void update_trrq_int();
-
-	abc1600bus_slot_device *m_slot;
 
 	required_device<scsicb_device> m_sasibus;
 	required_ioport m_1e;

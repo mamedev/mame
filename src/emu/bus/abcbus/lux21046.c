@@ -41,18 +41,19 @@ PCB Layout
 |                                   |
 |   LS10    LS266   S5      LS374   |
 |                   S3              |
-|                   S1      LS240   |
+|   PAL*            S1      LS240   |
 |                                   |
-|           LS244   SW3     DM8131  |
+|   LS125*  LS244   SW3     DM8131  |
 |                                   |
 |                                   |
 |--|-----------------------------|--|
    |------------CON1-------------|
 
 Notes:
-    All IC's shown.
+    All IC's shown. (* only stocked when used with the ABC 1600 computer)
 
     ROM     - Toshiba TMM27128D-20 16Kx8 EPROM "CNTR 1.07 6490318-07"
+    PAL     - PAL16R4
     TC5565  - Toshiba TC5565PL-15 8Kx8 bit Static RAM
     Z80     - Zilog Z8400APS Z80A CPU
     Z80DMA  - Zilog Z8410APS Z80A DMA
@@ -65,9 +66,9 @@ Notes:
     SW1     - Disk drive type (SS/DS, SD/DD)
     SW2     - Disk drive model
     SW3     - ABC bus address
-    S1      - Interface type (A:? B:ABCBUS)
-    S3      - Interface type (A:? B:ABCBUS)
-    S5      - Interface type (A:? B:ABCBUS)
+    S1      - Interface type (A:ABC1600 B:ABCBUS)
+    S3      - Interface type (A:ABC1600 B:ABCBUS)
+    S5      - Interface type (A:ABC1600 B:ABCBUS)
     S6      - Amount of RAM installed (A:2KB, B:8KB)
     S7      - Number of drives connected (0:3, 1:2) *located on solder side
     S8      - Disk drive type (0:8", 1:5.25")
@@ -111,6 +112,9 @@ ROM_START( luxor_55_21046 )
 	ROMX_LOAD( "cntr 108.6cd", 0x2000, 0x2000, CRC(229764cb) SHA1(a2e2f6f49c31b827efc62f894de9a770b65d109d), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 2, "v207", "DiAB v2.07 (1987-06-24)" )
 	ROMX_LOAD( "diab 207.6cd", 0x2000, 0x2000, CRC(86622f52) SHA1(61ad271de53152c1640c0b364fce46d1b0b4c7e2), ROM_BIOS(3) )
+
+	ROM_REGION( 0x104, "plds", 0 )
+	ROM_LOAD( "pal16r4.2a", 0x000, 0x104, NO_DUMP)
 ROM_END
 
 
@@ -467,6 +471,16 @@ void luxor_55_21046_device::abcbus_cs(UINT8 data)
 
 
 //-------------------------------------------------
+//  abcbus_csb -
+//-------------------------------------------------
+
+int luxor_55_21046_device::abcbus_csb()
+{
+	return m_cs ? 0 : 1;
+}
+
+
+//-------------------------------------------------
 //  abcbus_stat -
 //-------------------------------------------------
 
@@ -503,10 +517,10 @@ UINT8 luxor_55_21046_device::abcbus_inp()
 
 
 //-------------------------------------------------
-//  abcbus_utp -
+//  abcbus_out -
 //-------------------------------------------------
 
-void luxor_55_21046_device::abcbus_utp(UINT8 data)
+void luxor_55_21046_device::abcbus_out(UINT8 data)
 {
 	if (m_cs)
 	{

@@ -52,7 +52,7 @@
 // ======================> luxor_55_10828_device
 
 class luxor_55_10828_device :  public device_t,
-								public device_abcbus_card_interface
+							   public device_abcbus_card_interface
 {
 public:
 	// construction/destruction
@@ -84,7 +84,7 @@ protected:
 	// device_abcbus_interface overrides
 	virtual void abcbus_cs(UINT8 data);
 	virtual UINT8 abcbus_inp();
-	virtual void abcbus_utp(UINT8 data);
+	virtual void abcbus_out(UINT8 data);
 	virtual UINT8 abcbus_stat();
 	virtual void abcbus_c1(UINT8 data);
 	virtual void abcbus_c3(UINT8 data);

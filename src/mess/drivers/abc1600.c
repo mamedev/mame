@@ -687,14 +687,14 @@ READ8_MEMBER( abc1600_state::cio_pa_r )
 
 	UINT8 data = 0;
 
-	data |= m_bus2->int_r();
-	data |= m_bus1->int_r() << 1;
+	data |= m_bus2->irq_r();
+	data |= m_bus1->irq_r() << 1;
 	data |= m_bus0x->xint2_r() << 2;
 	data |= m_bus0x->xint3_r() << 3;
 	data |= m_bus0x->xint4_r() << 4;
 	data |= m_bus0x->xint5_r() << 5;
-	data |= m_bus0x->int_r() << 6;
-	data |= m_bus0i->int_r() << 7;
+	data |= m_bus0x->irq_r() << 6;
+	data |= m_bus0i->irq_r() << 7;
 
 	return data;
 }
@@ -836,13 +836,6 @@ void abc1600_state::fdc_drq_w(bool state)
 //  ABC1600BUS_INTERFACE( abcbus_intf )
 //-------------------------------------------------
 
-static ABC1600BUS_INTERFACE( bus0i_intf )
-{
-	DEVCB_DEVICE_LINE_MEMBER(Z8536B1_TAG, z8536_device, pa7_w), // really inverted but ASSERT_LINE takes care of that
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 WRITE_LINE_MEMBER( abc1600_state::nmi_w )
 {
 	if (state == ASSERT_LINE)
@@ -850,32 +843,6 @@ WRITE_LINE_MEMBER( abc1600_state::nmi_w )
 		m_maincpu->set_input_line(M68K_IRQ_7, ASSERT_LINE);
 	}
 }
-
-static ABC1600BUS_INTERFACE( bus0x_intf )
-{
-	DEVCB_DEVICE_LINE_MEMBER(Z8536B1_TAG, z8536_device, pa6_w), // really inverted but ASSERT_LINE takes care of that
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(abc1600_state, nmi_w),
-	DEVCB_DEVICE_LINE_MEMBER(Z8536B1_TAG, z8536_device, pa2_w), // really inverted but ASSERT_LINE takes care of that
-	DEVCB_DEVICE_LINE_MEMBER(Z8536B1_TAG, z8536_device, pa3_w), // really inverted but ASSERT_LINE takes care of that
-	DEVCB_DEVICE_LINE_MEMBER(Z8536B1_TAG, z8536_device, pa4_w), // really inverted but ASSERT_LINE takes care of that
-	DEVCB_DEVICE_LINE_MEMBER(Z8536B1_TAG, z8536_device, pa5_w) // really inverted but ASSERT_LINE takes care of that
-};
-
-static ABC1600BUS_INTERFACE( bus1_intf )
-{
-	DEVCB_DEVICE_LINE_MEMBER(Z8536B1_TAG, z8536_device, pa1_w), // really inverted but ASSERT_LINE takes care of that
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-static ABC1600BUS_INTERFACE( bus2_intf )
-{
-	DEVCB_DEVICE_LINE_MEMBER(Z8536B1_TAG, z8536_device, pa0_w), // really inverted but ASSERT_LINE takes care of that
-	DEVCB_NULL, // DEVCB_DEVICE_LINE_MEMBER(Z8410AB1_2_TAG, z80dma_device, iei_w) inverted
-	DEVCB_DEVICE_LINE_MEMBER(Z8410AB1_2_TAG, z80dma_device, rdy_w)
-};
 
 
 //-------------------------------------------------
@@ -1016,10 +983,21 @@ static MACHINE_CONFIG_START( abc1600, abc1600_state )
 	MCFG_RS232_PORT_ADD(RS232_A_TAG, rs232a_intf, default_rs232_devices, NULL)
 	MCFG_RS232_PORT_ADD(RS232_B_TAG, rs232b_intf, default_rs232_devices, NULL)
 	MCFG_ABC_KEYBOARD_PORT_ADD("abc99", DEVWRITELINE(Z8470AB1_TAG, z80dart_device, rxtxcb_w), DEVWRITELINE(Z8470AB1_TAG, z80dart_device, dcdb_w))
-	MCFG_ABC1600BUS_SLOT_ADD("bus0i", bus0i_intf, abc1600bus_cards, NULL)
-	MCFG_ABC1600BUS_SLOT_ADD("bus0x", bus0x_intf, abc1600bus_cards, NULL)
-	MCFG_ABC1600BUS_SLOT_ADD("bus1", bus1_intf, abc1600bus_cards, NULL)
-	MCFG_ABC1600BUS_SLOT_ADD("bus2", bus2_intf, abc1600bus_cards, "4105")
+	MCFG_ABCBUS_SLOT_ADD("bus0i", abc1600bus_cards, NULL)
+	MCFG_ABCBUS_SLOT_IRQ_CALLBACK(DEVWRITELINE(Z8536B1_TAG, z8536_device, pa7_w))
+	MCFG_ABCBUS_SLOT_ADD("bus0x", abc1600bus_cards, NULL)
+	MCFG_ABCBUS_SLOT_IRQ_CALLBACK(DEVWRITELINE(Z8536B1_TAG, z8536_device, pa6_w))
+	MCFG_ABCBUS_SLOT_NMI_CALLBACK(DEVWRITELINE(DEVICE_SELF, abc1600_state, nmi_w))
+	MCFG_ABCBUS_SLOT_XINT2_CALLBACK(DEVWRITELINE(Z8536B1_TAG, z8536_device, pa2_w))
+	MCFG_ABCBUS_SLOT_XINT3_CALLBACK(DEVWRITELINE(Z8536B1_TAG, z8536_device, pa3_w))
+	MCFG_ABCBUS_SLOT_XINT4_CALLBACK(DEVWRITELINE(Z8536B1_TAG, z8536_device, pa4_w))
+	MCFG_ABCBUS_SLOT_XINT5_CALLBACK(DEVWRITELINE(Z8536B1_TAG, z8536_device, pa5_w))
+	MCFG_ABCBUS_SLOT_ADD("bus1", abc1600bus_cards, NULL)
+	MCFG_ABCBUS_SLOT_IRQ_CALLBACK(DEVWRITELINE(Z8536B1_TAG, z8536_device, pa1_w))
+	MCFG_ABCBUS_SLOT_ADD("bus2", abc1600bus_cards, "4105")
+	MCFG_ABCBUS_SLOT_IRQ_CALLBACK(DEVWRITELINE(Z8536B1_TAG, z8536_device, pa0_w))
+	//MCFG_ABCBUS_SLOT_PREN_CALLBACK(DEVWRITELINE(Z8410AB1_2_TAG, z80dma_device, iei_w))
+	MCFG_ABCBUS_SLOT_TRRQ_CALLBACK(DEVWRITELINE(Z8410AB1_2_TAG, z80dma_device, rdy_w))
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

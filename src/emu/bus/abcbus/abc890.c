@@ -207,11 +207,11 @@ UINT8 abc890_device::abcbus_inp()
 	return data;
 }
 
-void abc890_device::abcbus_utp(UINT8 data)
+void abc890_device::abcbus_out(UINT8 data)
 {
 	for (int i = 0; i < m_slots; i++)
 	{
-		m_expansion_slot[i]->utp_w(data);
+		m_expansion_slot[i]->out_w(data);
 	}
 }
 
