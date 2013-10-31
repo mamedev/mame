@@ -109,6 +109,9 @@ master z80
 [0x0021]: clears i/o at 0x6a (lamps), clears 0xe563, 0xe004, 0xe000, 0xe001, 0xe007, 0xe002, 0xe003, 0xe005,
           0xc04f, 0xe572, enables IM 2, clears 0xe581 / 0xe583 (word), puts default initials (0x2274->0xe058)
 
+video z80
+[0x535]:
+[0x03c]: start of proper code
 
 ****************************************************************************/
 
@@ -491,7 +494,7 @@ READ8_MEMBER(mazerbla_state::vcu_set_cmd_param_r)
 
 	m_plane = m_mode & 3;
 
-	return 0;
+	return machine().rand();
 }
 
 
@@ -503,11 +506,7 @@ READ8_MEMBER(mazerbla_state::vcu_set_gfx_addr_r)
 	int bits = 0;
 	UINT8 color_base = 0;
 
-	if (m_game_id == MAZERBLA)
-		color_base = 0x80;  /* 0x80 - good for Mazer Blazer: (only in game, CRT test mode is bad) */
-
-	if (m_game_id == GREATGUN)
-		color_base = 0x00;  /* 0x00 - good for Great Guns: (both in game and CRT test mode) */
+	color_base = m_vcu_video_reg[1] << 4;
 
 //    if ((mode <= 0x07) || (mode >= 0x10))
 /*
@@ -660,7 +659,7 @@ READ8_MEMBER(mazerbla_state::vcu_set_gfx_addr_r)
 		break;
 	}
 
-	return 0;
+	return machine().rand();
 }
 
 READ8_MEMBER(mazerbla_state::vcu_set_clr_addr_r)
@@ -853,7 +852,7 @@ READ8_MEMBER(mazerbla_state::vcu_set_clr_addr_r)
 		break;
 	}
 
-	return 0;
+	return machine().rand();
 }
 
 /*************************************
