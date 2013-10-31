@@ -76,12 +76,9 @@ class isbx_slot_device;
 
 class device_isbx_card_interface : public device_slot_card_interface
 {
-	friend class isbx_slot_device;
-
 public:
 	// construction/destruction
 	device_isbx_card_interface(const machine_config &mconfig, device_t &device);
-	virtual ~device_isbx_card_interface() { };
 
 	virtual UINT8 mcs0_r(address_space &space, offs_t offset) { return 0xff; }
 	virtual void mcs0_w(address_space &space, offs_t offset, UINT8 data) { }

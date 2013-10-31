@@ -90,70 +90,12 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> abcbus_slot_device
-
-class device_abcbus_card_interface;
-
-class abcbus_slot_device : public device_t,
-							public device_slot_interface
-{
-public:
-	// construction/destruction
-	abcbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	// computer interface
-	void cs_w(UINT8 data);
-	UINT8 rst_r();
-	UINT8 inp_r();
-	void utp_w(UINT8 data);
-	UINT8 stat_r();
-	void c1_w(UINT8 data);
-	void c2_w(UINT8 data);
-	void c3_w(UINT8 data);
-	void c4_w(UINT8 data);
-	UINT8 xmemfl_r(offs_t offset);
-	void xmemw_w(offs_t offset, UINT8 data);
-
-	DECLARE_WRITE8_MEMBER( cs_w );
-	DECLARE_READ8_MEMBER( rst_r );
-	DECLARE_READ8_MEMBER( inp_r );
-	DECLARE_WRITE8_MEMBER( utp_w );
-	DECLARE_READ8_MEMBER( stat_r );
-	DECLARE_WRITE8_MEMBER( c1_w );
-	DECLARE_WRITE8_MEMBER( c2_w );
-	DECLARE_WRITE8_MEMBER( c3_w );
-	DECLARE_WRITE8_MEMBER( c4_w );
-	DECLARE_READ8_MEMBER( xmemfl_r );
-	DECLARE_WRITE8_MEMBER( xmemw_w );
-
-	// peripheral interface
-	DECLARE_WRITE_LINE_MEMBER( int_w ) { m_write_int(state); }
-	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_write_nmi(state); }
-	DECLARE_WRITE_LINE_MEMBER( rdy_w ) { m_write_rdy(state); }
-	DECLARE_WRITE_LINE_MEMBER( resin_w ) { m_write_resin(state); }
-
-protected:
-	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-
-private:
-	devcb2_write_line   m_write_int;
-	devcb2_write_line   m_write_nmi;
-	devcb2_write_line   m_write_rdy;
-	devcb2_write_line   m_write_resin;
-
-	device_abcbus_card_interface *m_card;
-};
-
-
 // ======================> device_abcbus_card_interface
 
-// class representing interface-specific live abcbus card
+class abcbus_slot_device;
+
 class device_abcbus_card_interface : public device_slot_card_interface
 {
-	friend class abcbus_slot_device;
-
 public:
 	// construction/destruction
 	device_abcbus_card_interface(const machine_config &mconfig, device_t &device);
@@ -174,6 +116,61 @@ public:
 
 public:
 	abcbus_slot_device  *m_slot;
+};
+
+
+// ======================> abcbus_slot_device
+
+class abcbus_slot_device : public device_t,
+						   public device_slot_interface
+{
+public:
+	// construction/destruction
+	abcbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// computer interface
+	void cs_w(UINT8 data) { if (m_card) m_card->abcbus_cs(data); }
+	UINT8 rst_r() { device_reset(); return 0xff; }
+	UINT8 inp_r() { return m_card ? m_card->abcbus_inp() : 0xff; }
+	void utp_w(UINT8 data) { if (m_card) m_card->abcbus_utp(data); }
+	UINT8 stat_r() { return m_card ? m_card->abcbus_stat() : 0xff; }
+	void c1_w(UINT8 data) { if (m_card) m_card->abcbus_c1(data); }
+	void c2_w(UINT8 data) { if (m_card) m_card->abcbus_c2(data); }
+	void c3_w(UINT8 data) { if (m_card) m_card->abcbus_c3(data); }
+	void c4_w(UINT8 data) { if (m_card) m_card->abcbus_c4(data); }
+	UINT8 xmemfl_r(offs_t offset) { return m_card ? m_card->abcbus_xmemfl(offset) : 0xff; }
+	void xmemw_w(offs_t offset, UINT8 data) { if (m_card) m_card->abcbus_xmemw(offset, data); }
+
+	DECLARE_WRITE8_MEMBER( cs_w ) { cs_w(data); }
+	DECLARE_READ8_MEMBER( rst_r ) { return rst_r(); }
+	DECLARE_READ8_MEMBER( inp_r ) { return inp_r(); }
+	DECLARE_WRITE8_MEMBER( utp_w ) { utp_w(data); }
+	DECLARE_READ8_MEMBER( stat_r ) { return stat_r(); }
+	DECLARE_WRITE8_MEMBER( c1_w ) { c1_w(data); }
+	DECLARE_WRITE8_MEMBER( c2_w ) { c2_w(data); }
+	DECLARE_WRITE8_MEMBER( c3_w ) { c3_w(data); }
+	DECLARE_WRITE8_MEMBER( c4_w ) { c4_w(data); }
+	DECLARE_READ8_MEMBER( xmemfl_r ) { return xmemfl_r(offset); }
+	DECLARE_WRITE8_MEMBER( xmemw_w ) { xmemw_w(offset, data); }
+
+	// peripheral interface
+	DECLARE_WRITE_LINE_MEMBER( int_w ) { m_write_int(state); }
+	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_write_nmi(state); }
+	DECLARE_WRITE_LINE_MEMBER( rdy_w ) { m_write_rdy(state); }
+	DECLARE_WRITE_LINE_MEMBER( resin_w ) { m_write_resin(state); }
+
+protected:
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset() { if (m_card) get_card_device()->reset(); }
+
+private:
+	devcb2_write_line   m_write_int;
+	devcb2_write_line   m_write_nmi;
+	devcb2_write_line   m_write_rdy;
+	devcb2_write_line   m_write_resin;
+
+	device_abcbus_card_interface *m_card;
 };
 
 

@@ -55,6 +55,7 @@
 #include "emu.h"
 
 
+
 //**************************************************************************
 //  CONSTANTS
 //**************************************************************************
@@ -106,19 +107,15 @@ class abc1600bus_slot_device;
 // class representing interface-specific live abc1600bus card
 class device_abc1600bus_card_interface : public device_slot_card_interface
 {
-	friend class abc1600bus_slot_device;
-
 public:
 	// construction/destruction
 	device_abc1600bus_card_interface(const machine_config &mconfig, device_t &device);
-	virtual ~device_abc1600bus_card_interface();
 
 	// required operation overrides
 	virtual void abc1600bus_cs(UINT8 data) = 0;
 	virtual int abc1600bus_csb() = 0;
 
 	// optional operation overrides
-	virtual void abc1600bus_brst() { };
 	virtual UINT8 abc1600bus_inp() { return 0xff; };
 	virtual void abc1600bus_out(UINT8 data) { };
 	virtual UINT8 abc1600bus_stat() { return 0xff; };
@@ -136,15 +133,15 @@ public:
 	virtual int abc1600bus_xcsb5() { return 1; };
 
 public:
-	abc1600bus_slot_device  *m_bus;
+	abc1600bus_slot_device  *m_slot;
 };
 
 
 // ======================> abc1600bus_slot_device
 
 class abc1600bus_slot_device : public device_t,
-								public device_slot_interface,
-								public abc1600bus_interface
+							   public device_slot_interface,
+							   public abc1600bus_interface
 {
 public:
 	// construction/destruction
@@ -154,42 +151,43 @@ public:
 	virtual void device_start();
 	virtual void device_config_complete();
 
-	void cs_w(UINT8 data);
-	DECLARE_READ_LINE_MEMBER( csb_r );
-	void brst_w();
-	UINT8 inp_r();
-	void out_w(UINT8 data);
-	UINT8 stat_r();
-	UINT8 ops_r();
-	void c1_w(UINT8 data);
-	void c2_w(UINT8 data);
-	void c3_w(UINT8 data);
-	void c4_w(UINT8 data);
-	UINT8 exp_r();
-	DECLARE_READ_LINE_MEMBER( xcsb2_r );
-	DECLARE_READ_LINE_MEMBER( xcsb3_r );
-	DECLARE_READ_LINE_MEMBER( xcsb4_r );
-	DECLARE_READ_LINE_MEMBER( xcsb5_r );
-	DECLARE_WRITE_LINE_MEMBER( tren_w );
-	DECLARE_WRITE_LINE_MEMBER( prac_w );
+	// computer interface
+	void cs_w(UINT8 data) { if (m_card) m_card->abc1600bus_cs(data); }
+	DECLARE_READ_LINE_MEMBER( csb_r ) { return m_card ? m_card->abc1600bus_csb() : 1; }
+	void brst_w() { device_reset(); }
+	UINT8 inp_r() { return m_card ? m_card->abc1600bus_inp() : 0xff; }
+	void out_w(UINT8 data) { if (m_card) m_card->abc1600bus_out(data); }
+	UINT8 stat_r() { return m_card ? m_card->abc1600bus_stat() : 0xff; }
+	UINT8 ops_r() { return m_card ? m_card->abc1600bus_ops() : 0xff; }
+	void c1_w(UINT8 data) { if (m_card) m_card->abc1600bus_c1(data); }
+	void c2_w(UINT8 data) { if (m_card) m_card->abc1600bus_c2(data); }
+	void c3_w(UINT8 data) { if (m_card) m_card->abc1600bus_c3(data); }
+	void c4_w(UINT8 data) { if (m_card) m_card->abc1600bus_c4(data); }
+	UINT8 exp_r() { return m_card ? m_card->abc1600bus_exp() : 0xff; }
+	DECLARE_READ_LINE_MEMBER( xcsb2_r ) { return m_card ? m_card->abc1600bus_xcsb2() : 1; }
+	DECLARE_READ_LINE_MEMBER( xcsb3_r ) { return m_card ? m_card->abc1600bus_xcsb3() : 1; }
+	DECLARE_READ_LINE_MEMBER( xcsb4_r ) { return m_card ? m_card->abc1600bus_xcsb4() : 1; }
+	DECLARE_READ_LINE_MEMBER( xcsb5_r ) { return m_card ? m_card->abc1600bus_xcsb5() : 1; }
+	DECLARE_WRITE_LINE_MEMBER( tren_w ) { if (m_card) m_card->abc1600bus_tren(state); }
+	DECLARE_WRITE_LINE_MEMBER( prac_w ) { if (m_card) m_card->abc1600bus_prac(state); }
+	DECLARE_READ_LINE_MEMBER( int_r ) { return m_int; }
+	DECLARE_READ_LINE_MEMBER( pren_r ) { return m_pren; }
+	DECLARE_READ_LINE_MEMBER( trrq_r ) { return m_trrq; }
+	DECLARE_READ_LINE_MEMBER( nmi_r ) { return m_nmi; }
+	DECLARE_READ_LINE_MEMBER( xint2_r ) { return m_xint2; }
+	DECLARE_READ_LINE_MEMBER( xint3_r ) { return m_xint3; }
+	DECLARE_READ_LINE_MEMBER( xint4_r ) { return m_xint4; }
+	DECLARE_READ_LINE_MEMBER( xint5_r ) { return m_xint5; }
 
-	DECLARE_WRITE_LINE_MEMBER( int_w );
-	DECLARE_WRITE_LINE_MEMBER( pren_w );
-	DECLARE_WRITE_LINE_MEMBER( trrq_w );
-	DECLARE_WRITE_LINE_MEMBER( nmi_w );
-	DECLARE_WRITE_LINE_MEMBER( xint2_w );
-	DECLARE_WRITE_LINE_MEMBER( xint3_w );
-	DECLARE_WRITE_LINE_MEMBER( xint4_w );
-	DECLARE_WRITE_LINE_MEMBER( xint5_w );
-
-	DECLARE_READ_LINE_MEMBER( int_r );
-	DECLARE_READ_LINE_MEMBER( pren_r );
-	DECLARE_READ_LINE_MEMBER( trrq_r );
-	DECLARE_READ_LINE_MEMBER( nmi_r );
-	DECLARE_READ_LINE_MEMBER( xint2_r );
-	DECLARE_READ_LINE_MEMBER( xint3_r );
-	DECLARE_READ_LINE_MEMBER( xint4_r );
-	DECLARE_READ_LINE_MEMBER( xint5_r );
+	// card interface
+	DECLARE_WRITE_LINE_MEMBER( int_w ) { m_int = state; m_out_int_func(state); }
+	DECLARE_WRITE_LINE_MEMBER( pren_w ) { m_pren = state; m_out_pren_func(state); }
+	DECLARE_WRITE_LINE_MEMBER( trrq_w ) { m_trrq = state; m_out_trrq_func(state); }
+	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_nmi = state; m_out_nmi_func(state); }
+	DECLARE_WRITE_LINE_MEMBER( xint2_w ) { m_xint2 = state; m_out_xint2_func(state); }
+	DECLARE_WRITE_LINE_MEMBER( xint3_w ) { m_xint3 = state; m_out_xint3_func(state); }
+	DECLARE_WRITE_LINE_MEMBER( xint4_w ) { m_xint4 = state; m_out_xint4_func(state); }
+	DECLARE_WRITE_LINE_MEMBER( xint5_w ) { m_xint5 = state; m_out_xint5_func(state); }
 
 private:
 	devcb_resolved_write_line   m_out_int_func;
@@ -220,6 +218,7 @@ extern const device_type ABC1600BUS_SLOT;
 
 // slot devices
 #include "lux4105.h"
+#include "bus/abcbus/lux21046.h"
 
 SLOT_INTERFACE_EXTERN( abc1600bus_cards );
 

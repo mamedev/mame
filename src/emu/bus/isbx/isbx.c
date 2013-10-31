@@ -22,7 +22,7 @@ const device_type ISBX_SLOT = &device_creator<isbx_slot_device>;
 
 
 //**************************************************************************
-//  DEVICE ISBX_EXPANSION CARD INTERFACE
+//  LIVE DEVICE
 //**************************************************************************
 
 //-------------------------------------------------
@@ -35,11 +35,6 @@ device_isbx_card_interface::device_isbx_card_interface(const machine_config &mco
 	m_slot = dynamic_cast<isbx_slot_device *>(device.owner());
 }
 
-
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
 
 //-------------------------------------------------
 //  isbx_slot_device - constructor
