@@ -1,3 +1,5 @@
+// license:MAME|GPL-2.0+
+// copyright-holders:James Wallace,'Re-Animator'
 /****************************************************************************************
 
     bfm_sc2.c
