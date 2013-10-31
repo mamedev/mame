@@ -18,6 +18,43 @@ Device for Mazer Blazer/Great Guns custom Video Controller Unit
 // device type definition
 const device_type MB_VCU = &device_creator<mb_vcu_device>;
 
+static ADDRESS_MAP_START( mb_vcu_vram, AS_0, 16, mb_vcu_device )
+//	AM_RANGE() internal ROM space (shared with 0x4000 - 0x5fff)
+//	AM_RANGE() RAM space (shared with 0x6000 - 0x67ff)
+//	AM_RANGE() fb area
+ADDRESS_MAP_END
+
+//-------------------------------------------------
+//  memory_space_config - return a description of
+//  any address spaces owned by this device
+//-------------------------------------------------
+
+const address_space_config *mb_vcu_device::memory_space_config(address_spacenum spacenum) const
+{
+	return (spacenum == AS_0) ? &m_space_config : NULL;
+}
+
+//**************************************************************************
+//  INLINE HELPERS
+//**************************************************************************
+
+//-------------------------------------------------
+//  read_byte - read a byte at the given address
+//-------------------------------------------------
+
+inline UINT16 mb_vcu_device::read_byte(offs_t address)
+{
+	return space().read_byte(address);
+}
+
+//-------------------------------------------------
+//  write_word - write a word at the given address
+//-------------------------------------------------
+
+inline void mb_vcu_device::write_byte(offs_t address, UINT8 data)
+{
+	space().write_byte(address, data);
+}
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -29,7 +66,9 @@ const device_type MB_VCU = &device_creator<mb_vcu_device>;
 
 mb_vcu_device::mb_vcu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MB_VCU, "Mazer Blazer custom VCU", tag, owner, clock, "mb_vcu", __FILE__),
-	  device_video_interface(mconfig, *this)
+	  device_memory_interface(mconfig, *this),
+	  device_video_interface(mconfig, *this),
+	  m_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, NULL, *ADDRESS_MAP_NAME(mb_vcu_vram))
 {
 }
 
@@ -51,7 +90,7 @@ void mb_vcu_device::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-		m_cpu_tag = NULL;
+		//m_screen_tag = NULL;
 	}
 }
 
@@ -71,15 +110,7 @@ void mb_vcu_device::device_validity_check(validity_checker &valid) const
 
 void mb_vcu_device::device_start()
 {
-	if(m_cpu_tag)
-	{
-		m_cpu = machine().device(m_cpu_tag);
-	}
-	else
-	{
-		m_cpu = NULL;
-	}
-
+	// TODO: m_screen_tag
 }
 
 
@@ -96,12 +127,44 @@ void mb_vcu_device::device_reset()
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-READ8_MEMBER( mb_vcu_device::read )
+READ8_MEMBER( mb_vcu_device::read_ram )
 {
 	return 0;
 }
 
-WRITE8_MEMBER( mb_vcu_device::write )
+WRITE8_MEMBER( mb_vcu_device::write_ram )
+{
+}
+
+WRITE8_MEMBER( mb_vcu_device::write_vregs )
+{
+}
+
+READ8_MEMBER( mb_vcu_device::load_params )
+{
+	return 0;
+}
+
+READ8_MEMBER( mb_vcu_device::load_gfx )
+{
+	return 0;
+}
+
+READ8_MEMBER( mb_vcu_device::load_clr )
+{
+	return 0;
+}
+
+WRITE8_MEMBER( mb_vcu_device::background_color_w )
+{
+}
+
+READ8_MEMBER( mb_vcu_device::status_r )
+{
+	return 0;
+}
+
+WRITE8_MEMBER( mb_vcu_device::vbank_w )
 {
 }
 

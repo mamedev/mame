@@ -29,12 +29,13 @@ Template for skeleton device
 
 struct mb_vcu_interface
 {
-	const char         *m_cpu_tag;
+	const char         *m_screen_tag;
 };
 
 // ======================> mb_vcu_device
 
 class mb_vcu_device : public device_t,
+ 					  public device_memory_interface,
 					  public device_video_interface,
 					  public mb_vcu_interface
 {
@@ -43,8 +44,15 @@ public:
 	mb_vcu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// I/O operations
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write_vregs );
+	DECLARE_READ8_MEMBER( read_ram );
+	DECLARE_WRITE8_MEMBER( write_ram );
+	DECLARE_READ8_MEMBER( load_params );
+	DECLARE_READ8_MEMBER( load_gfx );
+	DECLARE_READ8_MEMBER( load_clr );
+	DECLARE_WRITE8_MEMBER( background_color_w );
+	DECLARE_READ8_MEMBER( status_r );
+	DECLARE_WRITE8_MEMBER( vbank_w );
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -54,9 +62,12 @@ protected:
 	virtual void device_validity_check(validity_checker &valid) const;
 	virtual void device_start();
 	virtual void device_reset();
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
 private:
+	inline UINT16 read_byte(offs_t address);
+	inline void write_byte(offs_t address, UINT8 data);
 
-	device_t *m_cpu;
+	const address_space_config      m_space_config;
 };
 
 
