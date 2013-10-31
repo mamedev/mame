@@ -486,7 +486,7 @@ void t10mmc::ReadData( UINT8 *data, int dataLength )
 						}
 					}
 
-					if (command[1] & 0x40)
+					if (command[2] & 0x40)
 					{
 						data[2] = 0;
 						data[3] = 12;       // data length
