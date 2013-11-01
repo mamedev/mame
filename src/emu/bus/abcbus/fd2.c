@@ -89,6 +89,7 @@ const rom_entry *abc_fd2_device::device_rom_region() const
 
 static ADDRESS_MAP_START( abc_fd2_mem, AS_PROGRAM, 8, abc_fd2_device )
 	AM_RANGE(0x0000, 0x03ff) AM_ROM AM_REGION(Z80_TAG, 0)
+	AM_RANGE(0x0800, 0x0bff) AM_RAM
 ADDRESS_MAP_END
 
 
@@ -97,6 +98,9 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( abc_fd2_io, AS_IO, 8, abc_fd2_device )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0xb0, 0xb3) AM_DEVREADWRITE(Z80PIO_TAG, z80pio_device, read_alt, write_alt)
+	AM_RANGE(0xd0, 0xd3) AM_DEVREADWRITE(FD1771_TAG, fd1771_t, read, write)
 ADDRESS_MAP_END
 
 
@@ -141,13 +145,13 @@ SLOT_INTERFACE_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( abc_fd2 )
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_4MHz/2) // ?
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(abc_fd2_mem)
 	MCFG_CPU_IO_MAP(abc_fd2_io)
 	MCFG_CPU_CONFIG(daisy_chain)
 
-	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_4MHz/2, pio_intf) // ?
-	MCFG_FD1771x_ADD(FD1771_TAG, XTAL_4MHz/2) // ?
+	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_4MHz, pio_intf)
+	MCFG_FD1771x_ADD(FD1771_TAG, XTAL_4MHz/2)
 
 	MCFG_FLOPPY_DRIVE_ADD(FD1771_TAG":0", abc_fd2_floppies, "525sssd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1771_TAG":1", abc_fd2_floppies, "525sssd", floppy_image_device::default_floppy_formats)
@@ -182,7 +186,7 @@ abc_fd2_device::abc_fd2_device(const machine_config &mconfig, const char *tag, d
 		m_fdc(*this, FD1771_TAG),
 		m_floppy0(*this, FD1771_TAG":0"),
 		m_floppy1(*this, FD1771_TAG":1"),
-		m_rom(*this, "dos")
+		m_rom(*this, "abc80")
 {
 }
 

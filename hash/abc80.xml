@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<softwarelist name="abc80" description="Luxor ABC 80 disk images">
+<softwarelist name="abc80" description="Luxor ABC 80 diskettes">
 	<software name="demo">
 		<description>Demo</description>
 		<year>19??</year>

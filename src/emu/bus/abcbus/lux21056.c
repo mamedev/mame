@@ -260,7 +260,7 @@ luxor_55_21056_device::luxor_55_21056_device(const machine_config &mconfig, cons
 		m_dma(*this, Z80DMA_TAG),
 		m_sasibus(*this, SASIBUS_TAG ":host"),
 		m_s1(*this, "S1"),
-		m_cs(0),
+		m_cs(false),
 		m_rdy(0),
 		m_req(0),
 		m_stat(0),
@@ -292,6 +292,7 @@ void luxor_55_21056_device::device_start()
 
 void luxor_55_21056_device::device_reset()
 {
+	m_cs = false;
 	m_stat = 0;
 	m_sasi_data = 0;
 }
