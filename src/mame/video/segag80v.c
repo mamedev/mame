@@ -7,9 +7,7 @@
 *************************************************************************/
 
 #include "emu.h"
-#include "video/vector.h"
 #include "includes/segag80v.h"
-#include "scrlegcy.h"
 
 #define VECTOR_CLOCK        15468480            /* master clock */
 #define U34_CLOCK           (VECTOR_CLOCK/3)    /* clock for interrupt chain */
@@ -117,7 +115,7 @@ void segag80v_state::sega_generate_vector_list()
 	UINT16 symaddr = 0;
 	UINT8 *vectorram = m_vectorram;
 
-	vector_clear_list();
+	m_vector->clear_list();
 
 	/* Loop until we run out of time. */
 	while (total_time > 0)
@@ -180,7 +178,7 @@ void segag80v_state::sega_generate_vector_list()
 			/* Add a starting point to the vector list. */
 			clipped = adjust_xy(curx, cury, &adjx, &adjy);
 			if (!clipped)
-				vector_add_point(machine(), adjx, adjy, 0, 0);
+				m_vector->add_point(adjx, adjy, 0, 0);
 
 			/* Loop until we run out of time. */
 			while (total_time > 0)
@@ -288,11 +286,11 @@ void segag80v_state::sega_generate_vector_list()
 					{
 						/* if we're just becoming unclipped, add an empty point */
 						if (!newclip)
-							vector_add_point(machine(), adjx, adjy, 0, 0);
+							m_vector->add_point(adjx, adjy, 0, 0);
 
 						/* otherwise, add a colored point */
 						else
-							vector_add_point(machine(), adjx, adjy, color, intensity);
+							m_vector->add_point(adjx, adjy, color, intensity);
 					}
 					clipped = newclip;
 
@@ -302,7 +300,7 @@ void segag80v_state::sega_generate_vector_list()
 
 				/* We're done; if we are not clipped, add a final point. */
 				if (!clipped)
-					vector_add_point(machine(), adjx, adjy, color, intensity);
+					m_vector->add_point(adjx, adjy, color, intensity);
 
 				/* if the high bit of the attribute is set, we break out of   */
 				/* this loop and fetch another symbol */
@@ -331,14 +329,12 @@ void segag80v_state::video_start()
 
 	m_min_x =m_screen->visible_area().min_x;
 	m_min_y =m_screen->visible_area().min_y;
-
-	VIDEO_START_CALL_LEGACY(vector);
 }
 
 
 UINT32 segag80v_state::screen_update_segag80v(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	sega_generate_vector_list();
-	SCREEN_UPDATE32_CALL(vector);
+	m_vector->screen_update(screen, bitmap, cliprect);
 	return 0;
 }

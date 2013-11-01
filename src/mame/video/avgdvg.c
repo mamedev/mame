@@ -16,7 +16,6 @@
 #include "video/vector.h"
 #include "drivlgcy.h"
 
-
 /*************************************
  *
  *  Global variables
@@ -178,15 +177,15 @@ static void vg_flush (running_machine &machine)
 
 	while (vectbuf[i].status == VGCLIP)
 		i++;
-	vector_add_point(machine, vectbuf[i].x, vectbuf[i].y, vectbuf[i].color, 0);
+	machine.device<vector_device>("vector")->add_point(vectbuf[i].x, vectbuf[i].y, vectbuf[i].color, 0);
 
 	for (i = 0; i < nvect; i++)
 	{
 		if (vectbuf[i].status == VGVECTOR)
-			vector_add_point(machine, vectbuf[i].x, vectbuf[i].y, vectbuf[i].color, vectbuf[i].intensity);
+			machine.device<vector_device>("vector")->add_point(vectbuf[i].x, vectbuf[i].y, vectbuf[i].color, vectbuf[i].intensity);
 
 		if (vectbuf[i].status == VGCLIP)
-			vector_add_clip(vectbuf[i].x, vectbuf[i].y, vectbuf[i].arg1, vectbuf[i].arg2);
+			machine.device<vector_device>("vector")->add_clip(vectbuf[i].x, vectbuf[i].y, vectbuf[i].arg1, vectbuf[i].arg2);
 	}
 
 	nvect=0;
@@ -757,7 +756,7 @@ static int avg_common_strobe2(vgdata *vg)
 				 * 'frames'.
 				 */
 
-				vector_clear_list();
+				vg->machine().device<vector_device>("vector")->clear_list();
 				vg_flush(vg->machine());
 			}
 		}
@@ -1255,7 +1254,7 @@ WRITE8_HANDLER( avgdvg_go_w )
 		 * sometimes sets VGGO after a very short vector list. That's
 		 * why we ignore frames with less than 10 vectors.
 		 */
-		vector_clear_list();
+		space.machine().device<vector_device>("vector")->clear_list();
 	}
 	vg_flush(space.machine());
 
@@ -1521,7 +1520,7 @@ static VIDEO_START( avg_common )
 	vg->ydac_xor = 0x200;
 
 	register_state (machine);
-	VIDEO_START_CALL(vector);
+	machine.device<vector_device>("vector")->device_start();
 }
 
 VIDEO_START( dvg )
@@ -1545,7 +1544,7 @@ VIDEO_START( dvg )
 
 	register_state (machine);
 
-	VIDEO_START_CALL(vector);
+	machine.device<vector_device>("vector")->device_start();
 }
 
 VIDEO_START( avg )

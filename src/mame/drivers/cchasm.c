@@ -18,11 +18,9 @@
 #include "cpu/m68000/m68000.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "video/vector.h"
 #include "machine/6840ptm.h"
 #include "machine/z80ctc.h"
 #include "includes/cchasm.h"
-#include "scrlegcy.h"
 
 #define CCHASM_68K_CLOCK (XTAL_8MHz)
 
@@ -168,11 +166,12 @@ static MACHINE_CONFIG_START( cchasm, cchasm_state )
 	MCFG_Z80CTC_ADD("ctc", 3584229 /* same as "audiocpu" */, cchasm_ctc_intf)
 
 	/* video hardware */
+	MCFG_VECTOR_ADD("vector")
 	MCFG_SCREEN_ADD("screen", VECTOR)
 	MCFG_SCREEN_REFRESH_RATE(40)
 	MCFG_SCREEN_SIZE(400, 300)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 768-1)
-	MCFG_SCREEN_UPDATE_STATIC(vector)
+	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
 
 
 	/* sound hardware */

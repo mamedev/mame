@@ -901,12 +901,14 @@ static MACHINE_CONFIG_START( g80v_base, segag80v_state )
 
 
 	/* video hardware */
+	
 	MCFG_SCREEN_ADD("screen", VECTOR)
 	MCFG_SCREEN_REFRESH_RATE(40)
 	MCFG_SCREEN_SIZE(400, 300)
 	MCFG_SCREEN_VISIBLE_AREA(512, 1536, 640-32, 1408+32)
 	MCFG_SCREEN_UPDATE_DRIVER(segag80v_state, screen_update_segag80v)
-
+	
+	MCFG_VECTOR_ADD("vector")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

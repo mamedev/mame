@@ -33,7 +33,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/vector.h"
 #include "cpu/ccpu/ccpu.h"
 #include "includes/cinemat.h"
 
@@ -980,6 +979,7 @@ static MACHINE_CONFIG_START( cinemat_nojmi_4k, cinemat_state )
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 
+	MCFG_VECTOR_ADD("vector")
 	MCFG_SCREEN_ADD("screen", VECTOR)
 	MCFG_SCREEN_REFRESH_RATE(MASTER_CLOCK/4/16/16/16/16/2)
 	MCFG_SCREEN_SIZE(1024, 768)

@@ -634,11 +634,12 @@ static MACHINE_CONFIG_START( asteroid, asteroid_state )
 
 
 	/* video hardware */
+	MCFG_VECTOR_ADD("vector")
 	MCFG_SCREEN_ADD("screen", VECTOR)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(400,300)
 	MCFG_SCREEN_VISIBLE_AREA(522, 1566, 394, 1182)
-	MCFG_SCREEN_UPDATE_STATIC(vector)
+	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
 
 	MCFG_VIDEO_START(dvg)
 
@@ -690,7 +691,7 @@ static MACHINE_CONFIG_DERIVED( llander, asteroid )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(40)
 	MCFG_SCREEN_VISIBLE_AREA(522, 1566, 270, 1070)
-	MCFG_SCREEN_UPDATE_STATIC(vector)
+	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
 
 	MCFG_VIDEO_START(dvg)
 

@@ -26,8 +26,6 @@
 
 
 #include "includes/tek405x.h"
-#include "scrlegcy.h"
-
 
 
 //**************************************************************************
@@ -1180,12 +1178,13 @@ static MACHINE_CONFIG_START( tek4051, tek4051_state )
 	MCFG_CPU_PROGRAM_MAP(tek4051_mem)
 
 	// video hardware
+	MCFG_VECTOR_ADD("vector")
 	MCFG_SCREEN_ADD(SCREEN_TAG, VECTOR)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
 	MCFG_SCREEN_SIZE(1024, 780)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 780-1)
-	MCFG_SCREEN_UPDATE_STATIC(vector)
+	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
 
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, monochrome_green)
 	MCFG_PALETTE_LENGTH(2)
@@ -1232,12 +1231,13 @@ static MACHINE_CONFIG_START( tek4052, tek4052_state )
 	MCFG_CPU_PROGRAM_MAP(tek4052_mem)
 
 	// video hardware
+	MCFG_VECTOR_ADD("vector")
 	MCFG_SCREEN_ADD(SCREEN_TAG, VECTOR)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
 	MCFG_SCREEN_SIZE(1024, 780)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 780-1)
-	MCFG_SCREEN_UPDATE_STATIC(vector)
+	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
 
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, monochrome_green)
 	MCFG_PALETTE_LENGTH(2)

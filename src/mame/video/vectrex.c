@@ -1,9 +1,7 @@
 #include <math.h>
 #include "emu.h"
 #include "includes/vectrex.h"
-#include "video/vector.h"
 #include "cpu/m6809/m6809.h"
-#include "scrlegcy.h"
 
 
 #define ANALOG_DELAY 7800
@@ -145,23 +143,21 @@ UINT32 vectrex_state::screen_update_vectrex(screen_device &screen, bitmap_rgb32 
 	vectrex_configuration();
 
 	/* start black */
-	vector_add_point(machine(),
-						m_points[m_display_start].x,
+	m_vector->add_point(m_points[m_display_start].x,
 						m_points[m_display_start].y,
 						m_points[m_display_start].col,
 						0);
 
 	for (i = m_display_start; i != m_display_end; i = (i + 1) % NVECT)
 	{
-		vector_add_point(machine(),
-							m_points[i].x,
+		m_vector->add_point(m_points[i].x,
 							m_points[i].y,
 							m_points[i].col,
 							m_points[i].intensity);
 	}
 
-	SCREEN_UPDATE32_CALL(vector);
-	vector_clear_list();
+	m_vector->screen_update(screen, bitmap, cliprect);
+	m_vector->clear_list();
 	return 0;
 }
 
@@ -271,8 +267,6 @@ void vectrex_state::video_start()
 	m_lp_t = timer_alloc(TIMER_LIGHTPEN_TRIGGER);
 
 	m_refresh = timer_alloc(TIMER_VECTREX_REFRESH);
-
-	VIDEO_START_CALL_LEGACY(vector);
 }
 
 
@@ -457,6 +451,4 @@ VIDEO_START_MEMBER(vectrex_state,raaspec)
 
 	vector_add_point_function = &vectrex_state::vectrex_add_point;
 	m_refresh = timer_alloc(TIMER_VECTREX_REFRESH);
-
-	VIDEO_START_CALL_LEGACY(vector);
 }

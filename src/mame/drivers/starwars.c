@@ -341,11 +341,12 @@ static MACHINE_CONFIG_START( starwars, starwars_state )
 	MCFG_X2212_ADD_AUTOSAVE("x2212") /* nvram */
 
 	/* video hardware */
+	MCFG_VECTOR_ADD("vector")
 	MCFG_SCREEN_ADD("screen", VECTOR)
 	MCFG_SCREEN_REFRESH_RATE(40)
 	MCFG_SCREEN_SIZE(400, 300)
 	MCFG_SCREEN_VISIBLE_AREA(0, 250, 0, 280)
-	MCFG_SCREEN_UPDATE_STATIC(vector)
+	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
 
 	MCFG_VIDEO_START(avg_starwars)
 

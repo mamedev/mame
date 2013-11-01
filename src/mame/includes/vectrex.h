@@ -10,6 +10,7 @@
 #include "machine/6522via.h"
 #include "sound/dac.h"
 #include "sound/ay8910.h"
+#include "video/vector.h"
 
 
 #define NVECT 10000
@@ -42,6 +43,7 @@ public:
 		m_via6522_0(*this, "via6522_0"),
 		m_dac(*this, "dac"),
 		m_ay8912(*this, "ay8912"),
+		m_vector(*this, "vector"),
 		m_io_contr1x(*this, "CONTR1X"),
 		m_io_contr1y(*this, "CONTR1Y"),
 		m_io_contr2x(*this, "CONTR2X"),
@@ -122,6 +124,7 @@ protected:
 	required_device<via6522_device> m_via6522_0;
 	required_device<dac_device> m_dac;
 	required_device<ay8910_device> m_ay8912;
+	required_device<vector_device> m_vector;
 	optional_ioport m_io_contr1x;
 	optional_ioport m_io_contr1y;
 	optional_ioport m_io_contr2x;

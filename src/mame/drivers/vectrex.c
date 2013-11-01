@@ -102,6 +102,7 @@ static MACHINE_CONFIG_START( vectrex, vectrex_state )
 	MCFG_CPU_PROGRAM_MAP(vectrex_map)
 
 	/* video hardware */
+	MCFG_VECTOR_ADD("vector")
 	MCFG_SCREEN_ADD("screen", VECTOR)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(400, 300)

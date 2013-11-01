@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "sound/ay8910.h"
+#include "video/vector.h"
 
 class cinemat_state : public driver_device
 {
@@ -15,10 +16,12 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ay1(*this, "ay1"),
+		m_vector(*this, "vector"),
 		m_rambase(*this, "rambase") { }
 
 	required_device<ccpu_cpu_device> m_maincpu;
 	optional_device<ay8910_device> m_ay1;
+	required_device<vector_device> m_vector;
 	optional_shared_ptr<UINT16> m_rambase;
 	
 	UINT8 m_sound_control;

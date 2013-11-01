@@ -126,63 +126,58 @@ static render_texture *get_vector_texture(float dx, float dy, float intensity)
 #define VDIRTY  1
 #define VCLIP   2
 
-/* The vertices are buffered here */
-struct point
+// device type definition
+const device_type VECTOR = &device_creator<vector_device>;
+
+vector_device::vector_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+	  device_video_interface(mconfig, *this)
 {
-	int x; int y;
-	rgb_t col;
-	int intensity;
-	int arg1; int arg2; /* start/end in pixel array or clipping info */
-	int status;         /* for dirty and clipping handling */
-};
-
-
-
-static int flicker;                              /* beam flicker value     */
-static float flicker_correction = 0.0f;
-
-static float beam_width;
-
-static point *vector_list;
-static int vector_index;
-
-
-void vector_set_flicker(float _flicker)
-{
-	flicker_correction = _flicker;
-	flicker = (int)(flicker_correction * 2.55);
 }
 
-float vector_get_flicker(void)
+vector_device::vector_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, VECTOR, "VECTOR", tag, owner, clock, "vector", __FILE__),
+	  device_video_interface(mconfig, *this)
 {
-	return flicker_correction;
 }
 
-void vector_set_beam(float _beam)
-{
-	beam_width = _beam;
-}
+float vector_device::m_flicker_correction = 0.0f;
+float vector_device::m_beam_width = 0.0f;
+int vector_device::m_flicker;
+int vector_device::m_vector_index;
 
-float vector_get_beam(void)
+void vector_device::device_start()
 {
-	return beam_width;
-}
-
-/*
- * Initializes vector game video emulation
- */
-
-VIDEO_START( vector )
-{
-	beam_width = machine.options().beam();
+	m_beam_width = machine().options().beam();
 
 	/* Grab the settings for this session */
-	vector_set_flicker(machine.options().flicker());
+	set_flicker(machine().options().flicker());
 
-	vector_index = 0;
+	m_vector_index = 0;
 
 	/* allocate memory for tables */
-	vector_list = auto_alloc_array(machine, point, MAX_POINTS);
+	m_vector_list = auto_alloc_array_clear(machine(), point, MAX_POINTS);
+}
+
+void vector_device::set_flicker(float _flicker)
+{
+	m_flicker_correction = _flicker;
+	m_flicker = (int)(m_flicker_correction * 2.55);
+}
+
+float vector_device::get_flicker()
+{
+	return m_flicker_correction;
+}
+
+void vector_device::set_beam(float _beam)
+{
+	m_beam_width = _beam;
+}
+
+float vector_device::get_beam()
+{
+	return m_beam_width;
 }
 
 
@@ -190,32 +185,32 @@ VIDEO_START( vector )
  * Adds a line end point to the vertices list. The vector processor emulation
  * needs to call this.
  */
-void vector_add_point (running_machine &machine, int x, int y, rgb_t color, int intensity)
+void vector_device::add_point (int x, int y, rgb_t color, int intensity)
 {
 	point *newpoint;
 
 	if (intensity > 0xff)
 		intensity = 0xff;
 
-	if (flicker && (intensity > 0))
+	if (m_flicker && (intensity > 0))
 	{
-		intensity += (intensity * (0x80-(machine.rand()&0xff)) * flicker)>>16;
+		intensity += (intensity * (0x80-(machine().rand()&0xff)) * m_flicker)>>16;
 		if (intensity < 0)
 			intensity = 0;
 		if (intensity > 0xff)
 			intensity = 0xff;
 	}
-	newpoint = &vector_list[vector_index];
+	newpoint = &m_vector_list[m_vector_index];
 	newpoint->x = x;
 	newpoint->y = y;
 	newpoint->col = color;
 	newpoint->intensity = intensity;
 	newpoint->status = VDIRTY; /* mark identical lines as clean later */
 
-	vector_index++;
-	if (vector_index >= MAX_POINTS)
+	m_vector_index++;
+	if (m_vector_index >= MAX_POINTS)
 	{
-		vector_index--;
+		m_vector_index--;
 		logerror("*** Warning! Vector list overflow!\n");
 	}
 }
@@ -223,21 +218,21 @@ void vector_add_point (running_machine &machine, int x, int y, rgb_t color, int 
 /*
  * Add new clipping info to the list
  */
-void vector_add_clip (int x1, int yy1, int x2, int y2)
+void vector_device::add_clip (int x1, int yy1, int x2, int y2)
 {
 	point *newpoint;
 
-	newpoint = &vector_list[vector_index];
+	newpoint = &m_vector_list[m_vector_index];
 	newpoint->x = x1;
 	newpoint->y = yy1;
 	newpoint->arg1 = x2;
 	newpoint->arg2 = y2;
 	newpoint->status = VCLIP;
 
-	vector_index++;
-	if (vector_index >= MAX_POINTS)
+	m_vector_index++;
+	if (m_vector_index >= MAX_POINTS)
 	{
-		vector_index--;
+		m_vector_index--;
 		logerror("*** Warning! Vector list overflow!\n");
 	}
 }
@@ -247,13 +242,13 @@ void vector_add_clip (int x1, int yy1, int x2, int y2)
  * The vector CPU creates a new display list. We save the old display list,
  * but only once per refresh.
  */
-void vector_clear_list (void)
+void vector_device::clear_list (void)
 {
-	vector_index = 0;
+	m_vector_index = 0;
 }
 
 
-SCREEN_UPDATE_RGB32( vector )
+UINT32 vector_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	UINT32 flags = PRIMFLAG_ANTIALIAS(screen.machine().options().antialias() ? 1 : 0) | PRIMFLAG_BLENDMODE(BLENDMODE_ADD) | PRIMFLAG_VECTOR(1);
 	const rectangle &visarea = screen.visible_area();
@@ -266,7 +261,7 @@ SCREEN_UPDATE_RGB32( vector )
 	int lastx = 0, lasty = 0;
 	int i;
 
-	curpoint = vector_list;
+	curpoint = m_vector_list;
 
 	screen.container().empty();
 	screen.container().add_rect(0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(0xff,0x00,0x00,0x00), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_VECTORBUF(1));
@@ -274,7 +269,7 @@ SCREEN_UPDATE_RGB32( vector )
 	clip.x0 = clip.y0 = 0.0f;
 	clip.x1 = clip.y1 = 1.0f;
 
-	for (i = 0; i < vector_index; i++)
+	for (i = 0; i < m_vector_index; i++)
 	{
 		render_bounds coords;
 
@@ -300,7 +295,7 @@ SCREEN_UPDATE_RGB32( vector )
 			if (curpoint->intensity != 0)
 				if (!render_clip_line(&coords, &clip))
 					screen.container().add_line(coords.x0, coords.y0, coords.x1, coords.y1,
-							beam_width * (1.0f / (float)VECTOR_WIDTH_DENOM),
+							m_beam_width * (1.0f / (float)VECTOR_WIDTH_DENOM),
 							(curpoint->intensity << 24) | (curpoint->col & 0xffffff),
 							flags);
 

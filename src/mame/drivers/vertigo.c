@@ -12,12 +12,9 @@
 #include "emu.h"
 #include "cpu/m6805/m6805.h"
 #include "cpu/m68000/m68000.h"
-#include "video/vector.h"
 #include "machine/pit8253.h"
 #include "machine/nvram.h"
 #include "includes/vertigo.h"
-#include "drivlgcy.h"
-#include "scrlegcy.h"
 
 
 
@@ -137,13 +134,12 @@ static MACHINE_CONFIG_START( vertigo, vertigo_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
+	MCFG_VECTOR_ADD("vector")
 	MCFG_SCREEN_ADD("screen", VECTOR)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(400, 300)
 	MCFG_SCREEN_VISIBLE_AREA(0, 510, 0, 400)
-	MCFG_SCREEN_UPDATE_STATIC(vector)
-
-	MCFG_VIDEO_START(vector)
+	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
 MACHINE_CONFIG_END
 
 

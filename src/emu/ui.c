@@ -2214,13 +2214,13 @@ static INT32 slider_overyoffset(running_machine &machine, void *arg, astring *st
 
 static INT32 slider_flicker(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
+	vector_device *vector = NULL;
 	if (newval != SLIDER_NOCHANGE)
-		vector_set_flicker((float)newval * 0.1f);
+		vector->set_flicker((float)newval * 0.1f);
 	if (string != NULL)
-		string->printf("%1.2f", vector_get_flicker());
-	return floor(vector_get_flicker() * 10.0f + 0.5f);
+		string->printf("%1.2f", vector->get_flicker());
+	return floor(vector->get_flicker() * 10.0f + 0.5f);
 }
-
 
 /*-------------------------------------------------
     slider_beam - vector beam width slider
@@ -2229,11 +2229,12 @@ static INT32 slider_flicker(running_machine &machine, void *arg, astring *string
 
 static INT32 slider_beam(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
+	vector_device *vector = NULL;
 	if (newval != SLIDER_NOCHANGE)
-		vector_set_beam((float)newval * 0.01f);
+		vector->set_beam((float)newval * 0.01f);
 	if (string != NULL)
-		string->printf("%1.2f", vector_get_beam());
-	return floor(vector_get_beam() * 100.0f + 0.5f);
+		string->printf("%1.2f", vector->get_beam());
+	return floor(vector->get_beam() * 100.0f + 0.5f);
 }
 
 

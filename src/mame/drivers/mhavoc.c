@@ -511,11 +511,12 @@ static MACHINE_CONFIG_START( mhavoc, mhavoc_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("5k_timer", mhavoc_state, mhavoc_cpu_irq_clock, attotime::from_hz(MHAVOC_CLOCK_5K))
 
 	/* video hardware */
+	MCFG_VECTOR_ADD("vector")
 	MCFG_SCREEN_ADD("screen", VECTOR)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_SIZE(400, 300)
 	MCFG_SCREEN_VISIBLE_AREA(0, 300, 0, 260)
-	MCFG_SCREEN_UPDATE_STATIC(vector)
+	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
 
 	MCFG_VIDEO_START(avg_mhavoc)
 

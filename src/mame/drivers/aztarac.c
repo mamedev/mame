@@ -16,11 +16,9 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
-#include "video/vector.h"
 #include "includes/aztarac.h"
 #include "sound/ay8910.h"
 #include "machine/nvram.h"
-#include "scrlegcy.h"
 
 
 
@@ -159,11 +157,12 @@ static MACHINE_CONFIG_START( aztarac, aztarac_state )
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	/* video hardware */
+	MCFG_VECTOR_ADD("vector")
 	MCFG_SCREEN_ADD("screen", VECTOR)
 	MCFG_SCREEN_REFRESH_RATE(40)
 	MCFG_SCREEN_SIZE(400, 300)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 768-1)
-	MCFG_SCREEN_UPDATE_STATIC(vector)
+	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
 
 
 	/* sound hardware */

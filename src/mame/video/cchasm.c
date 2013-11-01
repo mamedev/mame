@@ -5,7 +5,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/vector.h"
 #include "includes/cchasm.h"
 
 #define HALT   0
@@ -42,7 +41,7 @@ void cchasm_state::cchasm_refresh ()
 	int total_length = 1;   /* length of all lines drawn in a frame */
 	int move = 0;
 
-	vector_clear_list();
+	m_vector->clear_list();
 
 	while (!done)
 	{
@@ -83,7 +82,7 @@ void cchasm_state::cchasm_refresh ()
 		case LENGTH:
 			if (move)
 			{
-				vector_add_point (machine(), currentx, currenty, 0, 0);
+				m_vector->add_point (currentx, currenty, 0, 0);
 				move = 0;
 			}
 
@@ -93,7 +92,7 @@ void cchasm_state::cchasm_refresh ()
 			total_length += abs(data);
 
 			if (color)
-				vector_add_point (machine(), currentx, currenty, color, 0xff);
+				m_vector->add_point (currentx, currenty, color, 0xff);
 			else
 				move = 1;
 			break;
@@ -130,6 +129,4 @@ void cchasm_state::video_start()
 
 	m_xcenter=visarea.xcenter() << 16;
 	m_ycenter=visarea.ycenter() << 16;
-
-	VIDEO_START_CALL_LEGACY(vector);
 }

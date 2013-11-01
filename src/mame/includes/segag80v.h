@@ -8,6 +8,7 @@
 #include "sound/samples.h"
 #include "machine/segag80.h"
 #include "audio/segasnd.h"
+#include "video/vector.h"
 
 class segag80v_state : public driver_device
 {
@@ -19,7 +20,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_samples(*this, "samples"),
 		m_speech(*this, "segaspeech"),
-		m_usb(*this, "usbsnd") { }
+		m_usb(*this, "usbsnd"),
+		m_vector(*this, "vector") { }
 
 	required_shared_ptr<UINT8> m_mainram;
 	required_shared_ptr<UINT8> m_vectorram;
@@ -28,6 +30,7 @@ public:
 	optional_device<samples_device> m_samples;
 	optional_device<speech_sound_device> m_speech;
 	optional_device<usb_sound_device> m_usb;
+	required_device<vector_device> m_vector;
 	
 	UINT8 m_mult_data[2];
 	UINT16 m_mult_result;

@@ -7,10 +7,8 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/vector.h"
 #include "cpu/ccpu/ccpu.h"
 #include "includes/cinemat.h"
-#include "scrlegcy.h"
 
 
 /*************************************
@@ -53,10 +51,10 @@ void cinemat_state::cinemat_vector_callback(INT16 sx, INT16 sy, INT16 ex, INT16 
 
 	/* move to the starting position if we're not there already */
 	if (sx != m_lastx || sy != m_lasty)
-		vector_add_point(machine(), sx << 16, sy << 16, 0, 0);
+		m_vector->add_point(sx << 16, sy << 16, 0, 0);
 
 	/* draw the vector */
-	vector_add_point(machine(), ex << 16, ey << 16, m_vector_color, intensity);
+	m_vector->add_point(ex << 16, ey << 16, m_vector_color, intensity);
 
 	/* remember the last point */
 	m_lastx = ex;
@@ -170,35 +168,30 @@ WRITE8_MEMBER(cinemat_state::cinemat_vector_control_w)
 void cinemat_state::video_start()
 {
 	m_color_mode = COLOR_BILEVEL;
-	VIDEO_START_CALL_LEGACY(vector);
 }
 
 
 VIDEO_START_MEMBER(cinemat_state,cinemat_16level)
 {
 	m_color_mode = COLOR_16LEVEL;
-	VIDEO_START_CALL_LEGACY(vector);
 }
 
 
 VIDEO_START_MEMBER(cinemat_state,cinemat_64level)
 {
 	m_color_mode = COLOR_64LEVEL;
-	VIDEO_START_CALL_LEGACY(vector);
 }
 
 
 VIDEO_START_MEMBER(cinemat_state,cinemat_color)
 {
 	m_color_mode = COLOR_RGB;
-	VIDEO_START_CALL_LEGACY(vector);
 }
 
 
 VIDEO_START_MEMBER(cinemat_state,cinemat_qb3color)
 {
 	m_color_mode = COLOR_QB3;
-	VIDEO_START_CALL_LEGACY(vector);
 }
 
 
@@ -211,8 +204,8 @@ VIDEO_START_MEMBER(cinemat_state,cinemat_qb3color)
 
 UINT32 cinemat_state::screen_update_cinemat(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	SCREEN_UPDATE32_CALL(vector);
-	vector_clear_list();
+	m_vector->screen_update(screen, bitmap, cliprect);
+	m_vector->clear_list();
 
 	m_maincpu->wdt_timer_trigger();
 

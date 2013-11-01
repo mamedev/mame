@@ -44,7 +44,6 @@
 *************************************************************************/
 
 #include "emu.h"
-#include "video/vector.h"
 #include "includes/vertigo.h"
 
 
@@ -54,8 +53,8 @@
  *
  *************************************/
 
-#define V_ADDPOINT(m,h,v,c,i) \
-	vector_add_point (m, ((h) & 0x7ff) << 14, (0x6ff - ((v) & 0x7ff)) << 14, VECTOR_COLOR444(c), (i))
+#define V_ADDPOINT(h,v,c,i) \
+	m_vector->add_point (((h) & 0x7ff) << 14, (0x6ff - ((v) & 0x7ff)) << 14, VECTOR_COLOR444(c), (i))
 
 #define ADD(r,s,c)  (((r)  + (s) + (c)) & 0xffff)
 #define SUBR(r,s,c) ((~(r) + (s) + (c)) & 0xffff)
@@ -368,9 +367,9 @@ void vertigo_state::vertigo_vgen (vector_generator *vg)
 	if (vg->brez ^ vg->ven)
 	{
 		if (vg->brez)
-		V_ADDPOINT (vg->machine(), vg->c_h, vg->c_v, 0, 0);
+		V_ADDPOINT (vg->c_h, vg->c_v, 0, 0);
 		else
-			V_ADDPOINT (vg->machine(), vg->c_h, vg->c_v, vg->color, vg->intensity);
+			V_ADDPOINT (vg->c_h, vg->c_v, vg->color, vg->intensity);
 		vg->ven = vg->brez;
 	}
 }
@@ -386,7 +385,7 @@ void vertigo_state::vertigo_vproc(int cycles, int irq4)
 	int jcond;
 	microcode *cmc;
 
-	if (irq4) vector_clear_list();
+	if (irq4) m_vector->clear_list();
 
 	g_profiler.start(PROFILER_USER1);
 

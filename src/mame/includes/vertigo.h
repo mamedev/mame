@@ -7,6 +7,7 @@
 #include "audio/exidy440.h"
 #include "machine/pit8253.h"
 #include "machine/74148.h"
+#include "video/vector.h"
 
 /*************************************
  *
@@ -95,6 +96,7 @@ public:
 			m_pit(*this, "pit8254"),
 			m_custom(*this, "custom"),
 			m_ttl74148(*this, "74148"),
+			m_vector(*this, "vector"),
 			m_vectorram(*this, "vectorram")
 	{ }
 
@@ -103,6 +105,7 @@ public:
 	required_device<pit8254_device> m_pit;
 	required_device<exidy440_sound_device> m_custom;
 	required_device<ttl74148_device> m_ttl74148;
+	required_device<vector_device> m_vector;
 	required_shared_ptr<UINT16> m_vectorram;
 	attotime m_irq4_time;
 	UINT8 m_irq_state;

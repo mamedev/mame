@@ -5,11 +5,10 @@
 *************************************************************************/
 
 #include "emu.h"
-#include "video/vector.h"
 #include "includes/aztarac.h"
 
-#define AVECTOR(m, x, y, color, intensity) \
-vector_add_point (m, m_xcenter + ((x) << 16), m_ycenter - ((y) << 16), color, intensity)
+#define AVECTOR(x, y, color, intensity) \
+m_vector->add_point (m_xcenter + ((x) << 16), m_ycenter - ((y) << 16), color, intensity)
 
 
 
@@ -30,7 +29,7 @@ WRITE16_MEMBER(aztarac_state::aztarac_ubr_w)
 
 	if (data) /* data is the global intensity (always 0xff in Aztarac). */
 	{
-		vector_clear_list();
+		m_vector->clear_list();
 
 		while (1)
 		{
@@ -43,7 +42,7 @@ WRITE16_MEMBER(aztarac_state::aztarac_ubr_w)
 			if ((c & 0x2000) == 0)
 			{
 				defaddr = (c >> 1) & 0x7ff;
-				AVECTOR (machine(), xoffset, yoffset, 0, 0);
+				AVECTOR (xoffset, yoffset, 0, 0);
 
 				read_vectorram(vectorram, defaddr, &x, &ndefs, &c);
 				ndefs++;
@@ -58,9 +57,9 @@ WRITE16_MEMBER(aztarac_state::aztarac_ubr_w)
 						defaddr++;
 						read_vectorram(vectorram, defaddr, &x, &y, &c);
 						if ((c & 0xff00) == 0)
-							AVECTOR (machine(), x + xoffset, y + yoffset, 0, 0);
+							AVECTOR (x + xoffset, y + yoffset, 0, 0);
 						else
-							AVECTOR (machine(), x + xoffset, y + yoffset, color, intensity);
+							AVECTOR (x + xoffset, y + yoffset, color, intensity);
 					}
 				}
 				else
@@ -71,7 +70,7 @@ WRITE16_MEMBER(aztarac_state::aztarac_ubr_w)
 						defaddr++;
 						read_vectorram(vectorram, defaddr, &x, &y, &c);
 						color = VECTOR_COLOR222(c & 0x3f);
-						AVECTOR (machine(), x + xoffset, y + yoffset, color, c >> 8);
+						AVECTOR (x + xoffset, y + yoffset, color, c >> 8);
 					}
 				}
 			}
@@ -91,6 +90,4 @@ void aztarac_state::video_start()
 
 	m_xcenter=((xmax + xmin) / 2) << 16;
 	m_ycenter=((ymax + ymin) / 2) << 16;
-
-	VIDEO_START_CALL_LEGACY(vector);
 }
