@@ -79,20 +79,6 @@
     to detect AMD=0, AME=1. Otherwise these cards, although completely decoding the
     19-bit address, would reappear at 512 KiB distances.
 
-    For the page numbers we get:
-    Standard:
-    00-3f are internal (DRAM)
-    40-7f are internal expansion, never used
-    80-bf are the P-Box address space (optional Memex and peripheral cards at that location)
-    c0-ff are internal (SRAM, EPROM)
-
-    Genmod:
-    00-3f are the P-Box address space (expect Memex at that location)
-    40-7f are the P-Box address space (expect Memex at that location)
-    80-bf are the P-Box address space (expect Memex at that location)
-    c0-ef are the P-Box address space (expect Memex at that location)
-    f0-ff are internal (EPROM)
-
     Genmod's double switch box is also emulated. There are two switches:
     - Turbo mode: Activates or deactivates the wait state logic on the Geneve
       board. This switch may be changed at any time.
@@ -101,26 +87,50 @@
       triggers a reset when changed.
 
 
+    ===================
     Mapping
-    -------
+    ===================
 
-    Geneve mode
-    -----------
-    Video:    f100 / f102 (mirror f108 / f10a) (read)
-    Mapper:   f110 - f117
-    Keyboard: f118
-    Clock:    f130 - f13f
-    Sound:    f120
+    Logical address space: 64 KiB
 
-    TI mode
-    -------
+    Geneve mode:
+
+    Video:    F100, F102, F104, F106 (mirror: +8)
+    Mapper:   F110 - F117
+    Keyboard: F118
+    Clock:    F130 - F13F
+    Sound:    F120
+
+    TI mode:
+
+    Video:    8800, 8802, 8804, 8806
     Mapper:   8000 - 8007
-    Keyboard: 8008 - 800f
-    Clock:    8010 - 801f
-    Video:    8800 / 8802
+    Keyboard: 8008 - 800F
+    Clock:    8010 - 801F
     Speech:   9000 / 9400
     Grom:     9800 / 9802
 
+    Physical address space: 2 MiB
+
+    Start    End      Banks
+    000000 - 07FFFF   00-3F   512 KiB DRAM on-board
+    080000 - 0FFFFF   40-7F   512 KiB on-board expansion (never used)
+    100000 - 16FFFF   80-B7   448 KiB P-Box space (special cards, like MEMEX)
+    170000 - 17FFFF   B8-BF    64 KiB P-Box space (current cards)
+    180000 - 1DFFFF   C0-EF   384 KiB SRAM space on-board; stock Geneve comes with 32 KiB
+    1E0000 - 1FFFFF   F0-FF   128 KiB EPROM space; 16 KiB actually used, 8 mirrors
+
+
+    GenMod modification:
+
+    TI mode
+    000000 - 07FFFF   00-3F   512 KiB DRAM on-board
+    080000 - 1DFFFF   40-EF  1408 KiB P-Box space
+    1E0000 - 1FFFFF   F0-FF   128 KiB EPROM space; 16 KiB actually used, 8 mirrors
+
+    Non-TI mode
+    000000 - 1DFFFF   00-EF  1920 KiB P-Box space
+    1E0000 - 1FFFFF   F0-FF   128 KiB EPROM space; 16 KiB actually used, 8 mirrors
 
     Waitstate handling
     ------------------
@@ -137,7 +147,7 @@
     - memory-mapped devices (mapper, clock, keyboard): 1 WS
     - accesses to the peripheral expansion box: 1 WS
     - accesses to on-board DRAM: 1 WS
-    - accesses to video: 14 WS
+    - accesses to video: 15 WS
     - accesses to sound: ~25 WS
     - accesses to SRAM: 0 WS
 
@@ -154,6 +164,11 @@
     Wait states are not effective when the execution is running in on-chip
     RAM. Additional wait states are requested by m_video_waitstates = true.
     Without additional wait states, the video access takes the usual 1 or 2 WS.
+
+    Waitstate behavior (Nov 2013)
+       Almost perfect. Only video read access from code in DRAM is too fast by one WS
+
+
 
     Michael Zapf, October 2011
     February 2012: rewritten as class, restructured
@@ -269,6 +284,11 @@ void geneve_mapper_device::set_wait(int min)
 {
 	if (m_debug_no_ws) return;
 	if (m_extra_waitstates && min < 2) min = 2;
+
+	// if we still have video wait states, do not set this counter
+	// (or it will assert READY when expiring)
+	if (m_ext_waitcount > min) return;
+
 	// need one more pass so that READY will be asserted again
 	m_waitcount = min + 1;
 	if (m_waitcount > 1)
@@ -352,7 +372,7 @@ READ8_MEMBER( geneve_mapper_device::readm )
 		if (VERBOSE>7) LOG("genboard: Read video %04x -> %02x\n", dec->offset, value);
 		// Video wait states are created *after* the access
 		// Accordingly, they have no effect when execution is in onchip RAM
-		if (m_video_waitstates) set_ext_wait(16);
+		if (m_video_waitstates) set_ext_wait(15);
 		break;
 
 	case MLGMAPPER:
@@ -408,7 +428,7 @@ READ8_MEMBER( geneve_mapper_device::readm )
 		m_video->readz(space, dec->offset, &value, 0xff);
 		if (VERBOSE>7) LOG("genboard: Read video %04x -> %02x\n", dec->offset, value);
 		// See above
-		if (m_video_waitstates) set_ext_wait(16);
+		if (m_video_waitstates) set_ext_wait(15);
 		break;
 
 	case MLTSPEECH:
@@ -521,7 +541,7 @@ WRITE8_MEMBER( geneve_mapper_device::writem )
 		m_video->write(space, dec->offset, data, 0xff);
 		if (VERBOSE>7) LOG("genboard: Write video %04x <- %02x\n", offset, data);
 		// See above
-		if (m_video_waitstates) set_ext_wait(16);
+		if (m_video_waitstates) set_ext_wait(15);
 		break;
 
 	case MLGMAPPER:
@@ -564,7 +584,7 @@ WRITE8_MEMBER( geneve_mapper_device::writem )
 		m_video->write(space, dec->offset, data, 0xff);
 		if (VERBOSE>7) LOG("genboard: Write video %04x <- %02x\n", offset, data);
 		// See above
-		if (m_video_waitstates) set_ext_wait(16);
+		if (m_video_waitstates) set_ext_wait(15);
 		break;
 
 	case MLTSPEECH:
