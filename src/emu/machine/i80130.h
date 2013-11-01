@@ -87,6 +87,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( delay_w ) { m_write_delay(state); }
 	DECLARE_WRITE_LINE_MEMBER( baud_w ) { m_write_baud(state); }
 
+	DECLARE_READ16_MEMBER( io_r );
+	DECLARE_WRITE16_MEMBER( io_w );
+
 protected:
 	// device-level overrides
 	virtual void device_start();

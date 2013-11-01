@@ -22,13 +22,58 @@ const device_type I80130 = &device_creator<i80130_device>;
 
 
 DEVICE_ADDRESS_MAP_START( rom_map, 16, i80130_device )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("rom", 0)
+	//AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("rom", 0)
 ADDRESS_MAP_END
 
 DEVICE_ADDRESS_MAP_START( io_map, 16, i80130_device )
-	AM_RANGE(0x00, 0x01) AM_MIRROR(0x2) AM_DEVREADWRITE8("pic", pic8259_device, read, write, 0x00ff)
-	AM_RANGE(0x08, 0x0f) AM_DEVREADWRITE8("pit", pit8254_device, read, write, 0x00ff)
+	AM_RANGE(0x00, 0x0f) AM_READWRITE(io_r, io_w)
+	//AM_RANGE(0x00, 0x01) AM_MIRROR(0x2) AM_DEVREADWRITE8("pic", pic8259_device, read, write, 0x00ff)
+	//AM_RANGE(0x08, 0x0f) AM_DEVREADWRITE8("pit", pit8254_device, read, write, 0x00ff)
 ADDRESS_MAP_END
+
+READ16_MEMBER( i80130_device::io_r )
+{
+	UINT16 data = 0;
+
+	switch (offset)
+	{
+	case 0: case 1:
+		if (ACCESSING_BITS_0_7)
+		{
+			data = m_pic->read(space, offset & 0x01);
+		}
+		break;
+
+	case 4: case 5: case 6: case 7:
+		if (ACCESSING_BITS_0_7)
+		{
+			data = m_pit->read(space, offset & 0x03);
+		}
+		break;
+	}
+
+	return data;
+}
+
+WRITE16_MEMBER( i80130_device::io_w )
+{
+	switch (offset)
+	{
+	case 0: case 1:
+		if (ACCESSING_BITS_0_7)
+		{
+			m_pic->write(space, offset & 0x01, data & 0xff);
+		}
+		break;
+
+	case 4: case 5: case 6: case 7:
+		if (ACCESSING_BITS_0_7)
+		{
+			m_pit->write(space, offset & 0x03, data & 0xff);
+		}
+		break;
+	}
+}
 
 
 //-------------------------------------------------
