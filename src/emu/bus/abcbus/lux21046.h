@@ -63,8 +63,8 @@ public:
 	virtual ioport_constructor device_input_ports() const;
 
 	// not really public
-	DECLARE_READ8_MEMBER( _3d_r );
-	DECLARE_WRITE8_MEMBER( _4d_w );
+	DECLARE_READ8_MEMBER( out_r );
+	DECLARE_WRITE8_MEMBER( inp_w );
 	DECLARE_WRITE8_MEMBER( _4b_w );
 	DECLARE_WRITE8_MEMBER( _9b_w );
 	DECLARE_WRITE8_MEMBER( _8a_w );
@@ -108,8 +108,8 @@ private:
 
 	bool m_cs;                  // card selected
 	UINT8 m_status;             // ABC BUS status
-	UINT8 m_data_in;            // ABC BUS data in
-	UINT8 m_data_out;           // ABC BUS data out
+	UINT8 m_out;                // ABC BUS data in
+	UINT8 m_inp;                // ABC BUS data out
 	bool m_fdc_irq;             // FDC interrupt
 	int m_dma_irq;              // DMA interrupt
 	int m_busy;                 // busy bit

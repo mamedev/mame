@@ -104,7 +104,7 @@ const device_type LUXOR_55_21046 = &device_creator<luxor_55_21046_device>;
 //-------------------------------------------------
 
 ROM_START( luxor_55_21046 )
-	ROM_REGION( 0x4000, Z80_TAG, 0 ) // A13 is always high, thus loading at 0x2000
+	ROM_REGION( 0x4000, Z80_TAG, 0 )
 	ROM_DEFAULT_BIOS( "v107" )
 	ROM_SYSTEM_BIOS( 0, "v107", "Luxor v1.07 (1985-07-03)" )
 	ROMX_LOAD( "cntr 1.07 6490318-07.6cd", 0x0000, 0x4000, CRC(db8c1c0e) SHA1(8bccd5bc72124984de529ee058df779f06d2c1d5), ROM_BIOS(1) )
@@ -135,7 +135,7 @@ const rom_entry *luxor_55_21046_device::device_rom_region() const
 static ADDRESS_MAP_START( luxor_55_21046_mem, AS_PROGRAM, 8, luxor_55_21046_device )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION(Z80_TAG, 0x2000)
+	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION(Z80_TAG, 0x2000) // A13 pull-up
 	AM_RANGE(0x2000, 0x3fff) AM_RAM
 ADDRESS_MAP_END
 
@@ -146,15 +146,15 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( luxor_55_21046_io, AS_IO, 8, luxor_55_21046_device )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff0f) AM_READ(_3d_r)
-	AM_RANGE(0x10, 0x10) AM_MIRROR(0xff0f) AM_WRITE(_4d_w)
-	AM_RANGE(0x20, 0x20) AM_MIRROR(0xff0f) AM_WRITE(_4b_w)
-	AM_RANGE(0x30, 0x30) AM_MIRROR(0xff0f) AM_WRITE(_9b_w)
-	AM_RANGE(0x40, 0x40) AM_MIRROR(0xff0f) AM_WRITE(_8a_w)
-	AM_RANGE(0x50, 0x50) AM_MIRROR(0xff0f) AM_MASK(0xff00) AM_READ(_9a_r)
-	AM_RANGE(0x60, 0x63) AM_MIRROR(0xff0c) AM_DEVREAD(SAB1793_TAG, fd1793_t, read)
-	AM_RANGE(0x70, 0x73) AM_MIRROR(0xff0c) AM_DEVWRITE(SAB1793_TAG, fd1793_t, write)
-	AM_RANGE(0x80, 0x80) AM_MIRROR(0xff0f) AM_DEVREADWRITE(Z80DMA_TAG, z80dma_device, read, write)
+	AM_RANGE(0x08, 0x08) AM_MIRROR(0xff07) AM_READ(out_r)
+	AM_RANGE(0x18, 0x18) AM_MIRROR(0xff07) AM_WRITE(inp_w)
+	AM_RANGE(0x28, 0x28) AM_MIRROR(0xff07) AM_WRITE(_4b_w)
+	AM_RANGE(0x38, 0x38) AM_MIRROR(0xff07) AM_WRITE(_9b_w)
+	AM_RANGE(0x48, 0x48) AM_MIRROR(0xff07) AM_WRITE(_8a_w)
+	AM_RANGE(0x58, 0x58) AM_MIRROR(0xff07) AM_MASK(0xff00) AM_READ(_9a_r)
+	AM_RANGE(0x68, 0x6b) AM_MIRROR(0xff04) AM_DEVREAD(SAB1793_TAG, fd1793_t, read)
+	AM_RANGE(0x78, 0x7b) AM_MIRROR(0xff04) AM_DEVWRITE(SAB1793_TAG, fd1793_t, write)
+	AM_RANGE(0x80, 0x80) AM_MIRROR(0xff77) AM_DEVREADWRITE(Z80DMA_TAG, z80dma_device, read, write)
 ADDRESS_MAP_END
 
 
@@ -293,7 +293,7 @@ static MACHINE_CONFIG_FRAGMENT( luxor_55_21046 )
 	MCFG_CPU_IO_MAP(luxor_55_21046_io)
 
 	MCFG_Z80DMA_ADD(Z80DMA_TAG, XTAL_16MHz/4, dma_intf)
-	MCFG_FD1793x_ADD(SAB1793_TAG, XTAL_16MHz/8)
+	MCFG_FD1793x_ADD(SAB1793_TAG, XTAL_16MHz/16)
 
 	MCFG_FLOPPY_DRIVE_ADD(SAB1793_TAG":0", abc_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(SAB1793_TAG":1", abc_floppies, "525dd", floppy_image_device::default_floppy_formats)
@@ -321,10 +321,10 @@ INPUT_PORTS_START( luxor_55_21046 )
 	PORT_DIPNAME( 0x0f, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW1:1,2,3,4") PORT_CONDITION("SW3", 0x7f, EQUALS, 0x2e)
 	PORT_DIPSETTING(    0x00, DEF_STR( Unused ) ) PORT_CONDITION("SW3", 0x7f, EQUALS, 0x2e)
 	// ABC 830
-	PORT_DIPNAME( 0x01, 0x00, "Drive 0 Sided" ) PORT_DIPLOCATION("SW1:1") PORT_CONDITION("SW3", 0x7f, EQUALS, 0x2d)
+	PORT_DIPNAME( 0x01, 0x00, "Drive 0 Sides" ) PORT_DIPLOCATION("SW1:1") PORT_CONDITION("SW3", 0x7f, EQUALS, 0x2d)
 	PORT_DIPSETTING(    0x00, DEF_STR( Single ) )
 	PORT_DIPSETTING(    0x01, "Double" )
-	PORT_DIPNAME( 0x02, 0x00, "Drive 1 Sided" ) PORT_DIPLOCATION("SW1:2") PORT_CONDITION("SW3", 0x7f, EQUALS, 0x2d)
+	PORT_DIPNAME( 0x02, 0x00, "Drive 1 Sides" ) PORT_DIPLOCATION("SW1:2") PORT_CONDITION("SW3", 0x7f, EQUALS, 0x2d)
 	PORT_DIPSETTING(    0x00, DEF_STR( Single ) )
 	PORT_DIPSETTING(    0x02, "Double" )
 	PORT_DIPNAME( 0x04, 0x00, "Drive 0 Density" ) PORT_DIPLOCATION("SW1:3") PORT_CONDITION("SW3", 0x7f, EQUALS, 0x2d)
@@ -334,10 +334,10 @@ INPUT_PORTS_START( luxor_55_21046 )
 	PORT_DIPSETTING(    0x00, DEF_STR( Single ) )
 	PORT_DIPSETTING(    0x08, "Double" )
 	// ABC 832/834/850
-	PORT_DIPNAME( 0x01, 0x01, "Drive 0 Sided" ) PORT_DIPLOCATION("SW1:1") PORT_CONDITION("SW3", 0x7f, EQUALS, 0x2c)
+	PORT_DIPNAME( 0x01, 0x01, "Drive 0 Sides" ) PORT_DIPLOCATION("SW1:1") PORT_CONDITION("SW3", 0x7f, EQUALS, 0x2c)
 	PORT_DIPSETTING(    0x00, DEF_STR( Single ) )
 	PORT_DIPSETTING(    0x01, "Double" )
-	PORT_DIPNAME( 0x02, 0x02, "Drive 1 Sided" ) PORT_DIPLOCATION("SW1:2") PORT_CONDITION("SW3", 0x7f, EQUALS, 0x2c)
+	PORT_DIPNAME( 0x02, 0x02, "Drive 1 Sides" ) PORT_DIPLOCATION("SW1:2") PORT_CONDITION("SW3", 0x7f, EQUALS, 0x2c)
 	PORT_DIPSETTING(    0x00, DEF_STR( Single ) )
 	PORT_DIPSETTING(    0x02, "Double" )
 	PORT_DIPNAME( 0x04, 0x00, "Drive 0 Tracks" ) PORT_DIPLOCATION("SW1:3") PORT_CONDITION("SW3", 0x7f, EQUALS, 0x2c)
@@ -364,6 +364,11 @@ INPUT_PORTS_START( luxor_55_21046 )
 	PORT_DIPSETTING(    0x2c, "44 (ABC 832/834/850)" )
 	PORT_DIPSETTING(    0x2d, "45 (ABC 830)" )
 	PORT_DIPSETTING(    0x2e, "46 (ABC 838)" )
+
+	PORT_START("S1") // also S3,S5
+	PORT_DIPNAME( 0x01, 0x01, "Interface Type" )
+	PORT_DIPSETTING(    0x00, "ABC 1600" )
+	PORT_DIPSETTING(    0x01, "ABC 80/800/802/806" )
 
 	PORT_START("S6")
 	PORT_DIPNAME( 0x01, 0x01, "RAM Size" )
@@ -435,8 +440,8 @@ void luxor_55_21046_device::device_start()
 	// state saving
 	save_item(NAME(m_cs));
 	save_item(NAME(m_status));
-	save_item(NAME(m_data_in));
-	save_item(NAME(m_data_out));
+	save_item(NAME(m_out));
+	save_item(NAME(m_inp));
 	save_item(NAME(m_fdc_irq));
 	save_item(NAME(m_dma_irq));
 	save_item(NAME(m_busy));
@@ -451,7 +456,12 @@ void luxor_55_21046_device::device_start()
 void luxor_55_21046_device::device_reset()
 {
 	m_cs = false;
-	m_data_in = 0;
+	m_out = 0;
+
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	_4b_w(space, 0, 0);
+	_9b_w(space, 0, 0);
+	_8a_w(space, 0, 0);
 }
 
 
@@ -486,11 +496,26 @@ int luxor_55_21046_device::abcbus_csb()
 
 UINT8 luxor_55_21046_device::abcbus_stat()
 {
+	/*
+	
+	    bit     description
+	
+	    0       3A pin 8
+	    1       4B Q1
+	    2       4B Q2
+	    3       4B Q3
+	    4       1
+	    5       PAL16R4 pin 17
+	    6       S1/A: PREN*, S1/B: 4B Q6
+	    7       S5/A: PAL16R4 pin 16 inverted, S5/B: 4B Q7
+	
+	*/
+
 	UINT8 data = 0;
 
 	if (m_cs)
 	{
-		data = (m_status & 0xce) | m_busy;
+		data = 0x30 | (m_status & 0xce) | m_busy;
 	}
 
 	// LS240 inverts the data
@@ -508,7 +533,7 @@ UINT8 luxor_55_21046_device::abcbus_inp()
 
 	if (m_cs)
 	{
-		data = m_data_out;
+		data = m_inp;
 		m_busy = 1;
 	}
 
@@ -524,7 +549,7 @@ void luxor_55_21046_device::abcbus_out(UINT8 data)
 {
 	if (m_cs)
 	{
-		m_data_in = data;
+		m_out = data;
 		m_busy = 1;
 	}
 }
@@ -576,14 +601,14 @@ void luxor_55_21046_device::abcbus_c4(UINT8 data)
 //  3d_r -
 //-------------------------------------------------
 
-READ8_MEMBER( luxor_55_21046_device::_3d_r )
+READ8_MEMBER( luxor_55_21046_device::out_r )
 {
-	if (BIT(m_status, 0))
+	if (m_busy)
 	{
 		m_busy = 0;
 	}
 
-	return m_data_in;
+	return m_out;
 }
 
 
@@ -591,14 +616,14 @@ READ8_MEMBER( luxor_55_21046_device::_3d_r )
 //  4d_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( luxor_55_21046_device::_4d_w )
+WRITE8_MEMBER( luxor_55_21046_device::inp_w )
 {
-	if (BIT(m_status, 0))
+	if (m_busy)
 	{
 		m_busy = 0;
 	}
 
-	m_data_out = data;
+	m_inp = data;
 }
 
 
@@ -623,10 +648,10 @@ WRITE8_MEMBER( luxor_55_21046_device::_4b_w )
 
 	*/
 
-	m_status = data;
+	m_status = data & 0xce;
 
 	// busy
-	if (!BIT(m_status, 0))
+	if (!BIT(data, 0))
 	{
 		m_busy = 1;
 	}
@@ -657,8 +682,8 @@ WRITE8_MEMBER( luxor_55_21046_device::_9b_w )
 	// drive select
 	m_floppy = NULL;
 
-	if (!BIT(data, 0)) m_floppy = m_floppy0->get_device();
-	if (!BIT(data, 1)) m_floppy = m_floppy1->get_device();
+	if (BIT(data, 0)) m_floppy = m_floppy0->get_device();
+	if (BIT(data, 1)) m_floppy = m_floppy1->get_device();
 
 	m_fdc->set_floppy(m_floppy);
 
@@ -686,9 +711,9 @@ WRITE8_MEMBER( luxor_55_21046_device::_8a_w )
 	    0       FD1793 _MR                      FDC master reset
 	    1       FD1793 _DDEN, FDC9229 DENS      density select
 	    2       FDC9229 MINI
-	    3       READY signal polarity           (0=inverted)
+	    3       FDC9229 P1
 	    4       FDC9229 P2
-	    5       FDC9229 P1
+	    5       READY signal polarity           (0=inverted)
 	    6
 	    7
 
@@ -701,6 +726,17 @@ WRITE8_MEMBER( luxor_55_21046_device::_8a_w )
 
 	// density select
 	m_fdc->dden_w(BIT(data, 1));
+
+	/*
+	if (BIT(data, 2))
+	{
+		m_fdc->set_unscaled_clock(XTAL_16MHz/16);
+	}
+	else
+	{
+		m_fdc->set_unscaled_clock(XTAL_16MHz/8);
+	}
+	*/
 }
 
 
@@ -712,13 +748,13 @@ READ8_MEMBER( luxor_55_21046_device::_9a_r )
 {
 	/*
 
-	    bit     signal      description
+	    bit     description
 
-	    0       busy        controller busy
-	    1       _FD2S       double-sided disk
+	    0       busy
+	    1       _FD2S
 	    2       SW2
-	    3       _DCG        disk changed
-	    4       SW1-1
+	    3       S1/A: PAL16R4 pin 15, S1/B: GND
+	    4       SW1-1 or DCG
 	    5       SW1-2
 	    6       SW1-3
 	    7       SW1-4
@@ -732,17 +768,16 @@ READ8_MEMBER( luxor_55_21046_device::_9a_r )
 
 	// floppy
 	data |= (m_floppy ? m_floppy->twosid_r() : 1) << 1;
-	data |= (m_floppy ? m_floppy->dskchg_r() : 1) << 3;
+	//data |= (m_floppy ? m_floppy->dskchg_r() : 1) << 4;
 
 	// SW2
 	UINT8 sw2 = m_sw2->read() & 0x0f;
 
-	// TTL inputs float high so DIP switch in off position equals 1
 	int sw2_1 = BIT(sw2, 0) ? 1 : BIT(offset, 8);
 	int sw2_2 = BIT(sw2, 1) ? 1 : BIT(offset, 9);
 	int sw2_3 = BIT(sw2, 2) ? 1 : BIT(offset, 10);
 	int sw2_4 = BIT(sw2, 3) ? 1 : BIT(offset, 11);
-	int sw2_data = !(sw2_1 & sw2_2 & !(sw2_3 ^ sw2_4));
+	int sw2_data = !(sw2_1 && sw2_2 && !(sw2_3 ^ sw2_4));
 
 	data |= sw2_data << 2;
 
@@ -751,6 +786,7 @@ READ8_MEMBER( luxor_55_21046_device::_9a_r )
 
 	return data ^ 0xff;
 }
+
 
 
 //**************************************************************************
