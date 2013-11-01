@@ -233,7 +233,7 @@ static MACHINE_CONFIG_START( bebox, bebox_state )
 	MCFG_SMC37C78_ADD("smc37c78")
 	MCFG_FLOPPY_DRIVE_ADD("smc37c78:0", bebox_floppies, "35hd", bebox_state::floppy_formats)
 
-	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
+	MCFG_MC146818_ADD( "rtc", XTAL_32_768kHz )
 
 	MCFG_KBDC8042_ADD("kbdc", bebox_8042_interface)
 	/* internal ram */

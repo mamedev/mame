@@ -872,7 +872,7 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* rtc and cmos */
-	MCFG_MC146818_ADD( "rtc", MC146818_IGNORE_CENTURY )
+	MCFG_MC146818_ADD( "rtc", XTAL_32_768kHz )
 
 	/* printer */
 	MCFG_CENTRONICS_PRINTER_ADD("centronics", bbcb_centronics_config)

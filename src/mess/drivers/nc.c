@@ -1644,7 +1644,7 @@ static MACHINE_CONFIG_DERIVED( nc200, nc100 )
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", ibmpc_floppies, "525dd", ibmpc_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", ibmpc_floppies, "525dd", ibmpc_floppy_formats)
 
-	MCFG_MC146818_ADD( "mc", MC146818_STANDARD )
+	MCFG_MC146818_ADD( "mc", XTAL_4_194304Mhz )
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)

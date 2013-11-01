@@ -372,7 +372,7 @@ static MACHINE_CONFIG_START( ppc512, amstrad_pc_state )
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "525dd", ibmpc_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ibmpc_floppies, "525dd", ibmpc_floppy_formats)
 
-	MCFG_MC146818_ADD( "rtc", MC146818_IGNORE_CENTURY )
+	MCFG_MC146818_ADD( "rtc", XTAL_32_768kHz )
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

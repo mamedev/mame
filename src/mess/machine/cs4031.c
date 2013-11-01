@@ -170,7 +170,9 @@ static MACHINE_CONFIG_FRAGMENT( cs4031 )
 	MCFG_PIC8259_ADD("intc1", WRITELINE(cs4031_device, intc1_int_w), VCC, READ8(cs4031_device, intc1_slave_ack_r))
 	MCFG_PIC8259_ADD("intc2", DEVWRITELINE("intc1", pic8259_device, ir2_w), GND, NULL)
 	MCFG_PIT8254_ADD("ctc", cs4031_pit_config)
-	MCFG_MC146818_IRQ_ADD("rtc", MC146818_STANDARD, WRITELINE(cs4031_device, rtc_irq_w))
+	MCFG_MC146818_ADD("rtc", XTAL_32_768kHz)
+	MCFG_MC146818_IRQ_HANDLER(WRITELINE(cs4031_device, rtc_irq_w))
+	MCFG_MC146818_CENTURY_INDEX(0x32)
 MACHINE_CONFIG_END
 
 machine_config_constructor cs4031_device::device_mconfig_additions() const
@@ -317,8 +319,7 @@ void cs4031_device::device_start()
 	m_space_io->install_readwrite_handler(0x0060, 0x0063, read8_delegate(FUNC(cs4031_device::keyb_data_r), this), write8_delegate(FUNC(cs4031_device::keyb_data_w), this), 0x000000ff);
 	m_space_io->install_readwrite_handler(0x0060, 0x0063, read8_delegate(FUNC(cs4031_device::portb_r), this), write8_delegate(FUNC(cs4031_device::portb_w), this), 0x0000ff00);
 	m_space_io->install_readwrite_handler(0x0064, 0x0067, read8_delegate(FUNC(cs4031_device::keyb_status_r), this), write8_delegate(FUNC(cs4031_device::keyb_command_w), this), 0x000000ff);
-	m_space_io->install_write_handler(0x0070, 0x0073, write8_delegate(FUNC(cs4031_device::rtc_w), this), 0x000000ff);
-	m_space_io->install_readwrite_handler(0x0070, 0x0073, read8_delegate(FUNC(mc146818_device::data_r), &(*m_rtc)), write8_delegate(FUNC(mc146818_device::data_w), &(*m_rtc)), 0x0000ff00);
+	m_space_io->install_readwrite_handler(0x0070, 0x0073, read8_delegate(FUNC(mc146818_device::read), &(*m_rtc)), write8_delegate(FUNC(cs4031_device::rtc_w), this), 0x0000ffff);
 	m_space_io->install_readwrite_handler(0x0080, 0x008f, read8_delegate(FUNC(cs4031_device::dma_page_r), this), write8_delegate(FUNC(cs4031_device::dma_page_w), this), 0xffffffff);
 	m_space_io->install_readwrite_handler(0x0090, 0x0093, read8_delegate(FUNC(cs4031_device::sysctrl_r), this), write8_delegate(FUNC(cs4031_device::sysctrl_w), this), 0x00ff0000);
 	m_space_io->install_readwrite_handler(0x00a0, 0x00a3, read8_delegate(FUNC(pic8259_device::read), &(*m_intc2)), write8_delegate(FUNC(pic8259_device::write), &(*m_intc2)), 0x0000ffff);
@@ -993,6 +994,11 @@ WRITE8_MEMBER( cs4031_device::rtc_w )
 	if (0)
 		logerror("cs4031_device::rtc_w: %02x\n", data);
 
-	m_nmi_mask = !BIT(data, 7);
-	m_rtc->address_w(space, 0, data & 0x7f);
+	if (offset == 0)
+	{
+		m_nmi_mask = !BIT(data, 7);
+		data &= 0x7f;
+	}
+
+	m_rtc->write(space, offset, data);
 }

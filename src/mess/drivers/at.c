@@ -339,7 +339,9 @@ static MACHINE_CONFIG_FRAGMENT( at_motherboard )
 	MCFG_AT_KEYBOARD_CONTROLLER_ADD("keybc", XTAL_12MHz, keyboard_controller_intf)
 	MCFG_PC_KBDC_ADD("pc_kbdc", pc_kbdc_intf)
 
-	MCFG_MC146818_IRQ_ADD( "rtc", MC146818_STANDARD, WRITELINE(at_state, at_mc146818_irq))
+	MCFG_MC146818_ADD( "rtc", XTAL_32_768kHz )
+	MCFG_MC146818_IRQ_HANDLER(WRITELINE(at_state, at_mc146818_irq))
+	MCFG_MC146818_CENTURY_INDEX(0x32)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

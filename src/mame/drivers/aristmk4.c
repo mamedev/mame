@@ -1709,7 +1709,7 @@ static MACHINE_CONFIG_START( aristmk4, aristmk4_state )
 	MCFG_VIA6522_ADD("via6522_0", 0, via_interface) /* 1 MHz.(only 1 or 2 MHz.are valid) */
 	MCFG_PIA6821_ADD("pia6821_0", aristmk4_pia1_intf)
 	MCFG_MC6845_ADD("crtc", C6545_1, "screen", MAIN_CLOCK/8, mc6845_intf) // TODO: type is unknown
-	MCFG_MC146818_ADD("rtc", MC146818_IGNORE_CENTURY)
+	MCFG_MC146818_ADD( "rtc", XTAL_4_194304Mhz )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

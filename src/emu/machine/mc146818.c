@@ -4,74 +4,11 @@
 
     Implementation of the MC146818 chip
 
-    Real time clock chip with battery backed ram (or CMOS)
+    Real time clock chip with CMOS battery backed ram
     Used in IBM PC/AT, several PC clones, Amstrad NC200, Apollo workstations
-
-    Nathan Woods  (npwoods@mess.org)
-    Peter Trauner (peter.trauner@jk.uni-linz.ac.at)
-
-    PC CMOS info (based on info from Padgett Peterson):
-
-    Clock Related:
-        0x00 Seconds       (BCD 00-59, Hex 00-3B) Note: Bit 7 is read only
-        0x01 Second Alarm  (BCD 00-59, Hex 00-3B; "don't care" if C0-FF)
-        0x02 Minutes       (BCD 00-59, Hex 00-3B)
-        0x03 Minute Alarm  (BCD 00-59, Hex 00-3B; "don't care" if C0-FF))
-        0x04 Hours         (BCD 00-23, Hex 00-17 if 24 hr mode)
-                        (BCD 01-12, Hex 01-0C if 12 hr am)
-                        (BCD 81-92. Hex 81-8C if 12 hr pm)
-        0x05 Hour Alarm    (same as hours; "don't care" if C0-FF))
-        0x06 Day of Week   (01-07 Sunday=1)
-        0x07 Date of Month (BCD 01-31, Hex 01-1F)
-        0x08 Month         (BCD 01-12, Hex 01-0C)
-        0x09 Year          (BCD 00-99, Hex 00-63)
-        0x0B Status Register B (read/write)
-            Bit 7 - 1 enables cycle update, 0 disables
-            Bit 6 - 1 enables periodic interrupt
-            Bit 5 - 1 enables alarm interrupt
-            Bit 4 - 1 enables update-ended interrupt
-            Bit 3 - 1 enables square wave output
-            Bit 2 - Data Mode - 0: BCD, 1: Binary
-            Bit 1 - 24/12 hour selection - 1 enables 24 hour mode
-            Bit 0 - Daylight Savings Enable - 1 enables
-        0x0C Status Register C (Read only)
-            Bit 7 - Interrupt request flag - 1 when any or all of bits 6-4 are
-                        1 and appropriate enables (Register B) are set to 1. Generates
-                        IRQ 8 when triggered.
-            Bit 6 - Periodic Interrupt flag
-            Bit 5 - Alarm Interrupt flag
-            Bit 4 - Update-Ended Interrupt Flag
-            Bit 3-0 ???
-        0x0D Status Register D (read only)
-            Bit 7 - Valid RAM - 1 indicates batery power good, 0 if dead or
-                        disconnected.
-            Bit 6-0 ???
-
-    Non-clock related:
-        0x0E (PS/2) Diagnostic Status Byte
-            Bit 7 - When set (1) indicates clock has lost power
-            Bit 6 - (1) indicates incorrect checksum
-            Bit 5 - (1) indicates that equipment configuration is incorrect
-                            power-on check requires that atleast one floppy be installed
-            Bit 4 - (1) indicates error in memory size
-            Bit 3 - (1) indicates that controller or disk drive failed initialization
-            Bit 2 - (1) indicates that time is invalid
-            Bit 1 - (1) indicates installed adaptors do not match configuration
-            Bit 0 - (1) indicates a time-out while reading adaptor ID
-        0x0E (AMSTRAD) 6  BYTEs time and date machine last used
-        0x0F Reset Code (IBM PS/2 "Shutdown Status Byte")
-            0x00-0x03   perform power-on reset
-            0x04        INT 19h reboot
-            0x05        flush keyboard and jump via 0040:0067
-            0x06-0x07   reserved
-            0x08        used by POST during protected-mode RAM test
-            0x09        used for INT 15/87h (block move) support
-            0x0A        jump via 0040:0067
-            0x0B-0xFF   perform power-on reset
 
 *********************************************************************/
 
-#include "emu.h"
 #include "coreutil.h"
 #include "machine/mc146818.h"
 
@@ -84,28 +21,6 @@
 
 
 
-//**************************************************************************
-//  MACROS
-//**************************************************************************
-
-#define USE_UTC     1
-
-#define HOURS_24    (m_data[0xb]&2)
-#define BCD_MODE    !(m_data[0xb]&4) // book has other description!
-#define CENTURY     m_data[72]
-#define YEAR        m_data[9]
-#define MONTH       m_data[8]
-#define DAY         m_data[7]
-#define WEEK_DAY    m_data[6]
-#define HOUR        m_data[4]
-#define MINUTE      m_data[2]
-#define SECOND      m_data[0]
-
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
 // device type definition
 const device_type MC146818 = &device_creator<mc146818_device>;
 
@@ -115,26 +30,13 @@ const device_type MC146818 = &device_creator<mc146818_device>;
 
 mc146818_device::mc146818_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MC146818, "MC146818", tag, owner, clock, "mc146818", __FILE__),
-		device_rtc_interface(mconfig, *this),
 		device_nvram_interface(mconfig, *this),
-		m_write_irq(*this),
-		m_type(MC146818_STANDARD),
 		m_index(0),
-		m_eindex(0),
-		m_updated(false),
-		m_last_refresh(attotime::zero)
+		m_last_refresh(attotime::zero),
+		m_write_irq(*this),
+		m_century_index(-1),
+		m_use_utc(false)
 {
-}
-
-
-//-------------------------------------------------
-//  static_set_interface - configuration helper
-//  to set the interface
-//-------------------------------------------------
-
-void mc146818_device::static_set_type(device_t &device, mc146818_type type)
-{
-	downcast<mc146818_device &>(device).m_type = type;
 }
 
 
@@ -148,18 +50,19 @@ void mc146818_device::device_start()
 	m_clock_timer = timer_alloc(TIMER_CLOCK);
 	m_periodic_timer = timer_alloc(TIMER_PERIODIC);
 
-	memset(m_data, 0, sizeof(m_data));
-
-	m_clock_timer->adjust(attotime::from_hz(1), 0, attotime::from_hz(1));
-
-	m_periodic_timer->adjust(attotime::never);
-	m_period = attotime::never;
-
-	set_base_datetime();
-
 	m_write_irq.resolve_safe();
 }
 
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void mc146818_device::device_reset()
+{
+	m_data[REG_B] &= ~(REG_B_UIE | REG_B_AIE | REG_B_PIE | REG_B_SQWE);
+	m_data[REG_C] = 0;
+}
 
 //-------------------------------------------------
 //  device_timer - handler timer events
@@ -167,135 +70,95 @@ void mc146818_device::device_start()
 
 void mc146818_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	int year/*, month*/;
-
-	if (id == TIMER_PERIODIC) {
-		m_data[0x0c] |= 0xc0;
-		m_write_irq(CLEAR_LINE);
-		return;
-	}
-
-	if (BCD_MODE)
+	switch (id)
 	{
-		SECOND=bcd_adjust(SECOND+1);
-		if (SECOND>=0x60)
+	case TIMER_PERIODIC:
+		m_data[REG_C] |= REG_C_PF;
+		update_irq();
+		break;
+
+	case TIMER_CLOCK:
+		if (!(m_data[REG_B] & REG_B_SET))
 		{
-			SECOND=0;
-			MINUTE=bcd_adjust(MINUTE+1);
-			if (MINUTE>=0x60)
+			/// TODO: find out how the real chip deals with updates when binary/bcd values are already outside the normal range
+			int seconds = get_seconds() + 1;
+			if (seconds < 60)
 			{
-				MINUTE=0;
-				HOUR=bcd_adjust(HOUR+1);
-				// different handling of hours
-				if (HOUR>=0x24)
+				set_seconds(seconds);
+			}
+			else
+			{
+				set_seconds(0);
+
+				int minutes = get_minutes() + 1;
+				if (minutes < 60)
 				{
-					HOUR=0;
-					WEEK_DAY=bcd_adjust(WEEK_DAY+1)%7;
-					DAY=bcd_adjust(DAY+1);
-					//month=bcd_2_dec(MONTH);
-					year=bcd_2_dec(YEAR);
-					if (m_type!=MC146818_IGNORE_CENTURY) year+=bcd_2_dec(CENTURY)*100;
-					else year+=2000; // save for julian_days_in_month calculation
-					DAY=bcd_adjust(DAY+1);
-					if (DAY>gregorian_days_in_month(MONTH, year))
+					set_minutes(minutes);
+				}
+				else
+				{
+					set_minutes(0);
+
+					int hours = get_hours() + 1;
+					if (hours < 24)
 					{
-						DAY=1;
-						MONTH=bcd_adjust(MONTH+1);
-						if (MONTH>0x12)
+						set_hours(hours);
+					}
+					else
+					{
+						set_hours(0);
+
+						int dayofweek = get_dayofweek() + 1;
+						if (dayofweek <= 7)
 						{
-							MONTH=1;
-							YEAR=year=bcd_adjust(YEAR+1);
-							if (m_type!=MC146818_IGNORE_CENTURY)
+							set_dayofweek(dayofweek);
+						}
+						else
+						{
+							set_dayofweek(1);
+						}
+
+						int dayofmonth = get_dayofmonth() + 1;
+						if (dayofmonth <= gregorian_days_in_month(get_month(), get_year() + 2000))
+						{
+							set_dayofmonth(dayofmonth);
+						}
+						else
+						{
+							set_dayofmonth(1);
+
+							int month = get_month() + 1;
+							if (month <= 12)
 							{
-								if (year>=0x100)
-								{
-									CENTURY=bcd_adjust(CENTURY+1);
-								}
+								set_month(month);
+							}
+							else
+							{
+								set_month(1);
+
+								set_year((get_year() + 1) % 100);
 							}
 						}
 					}
 				}
 			}
-		}
-	}
-	else
-	{
-		SECOND=SECOND+1;
-		if (SECOND>=60)
-		{
-			SECOND=0;
-			MINUTE=MINUTE+1;
-			if (MINUTE>=60) {
-				MINUTE=0;
-				HOUR=HOUR+1;
-				// different handling of hours //?
-				if (HOUR>=24) {
-					HOUR=0;
-					WEEK_DAY=(WEEK_DAY+1)%7;
-					year=YEAR;
-					if (m_type!=MC146818_IGNORE_CENTURY) year+=CENTURY*100;
-					else year+=2000; // save for julian_days_in_month calculation
-					if (++DAY>gregorian_days_in_month(MONTH, year)) {
-						DAY=1;
-						if (++MONTH>12) {
-							MONTH=1;
-							YEAR++;
-							if (m_type!=MC146818_IGNORE_CENTURY) {
-								if (YEAR>=100) { CENTURY++;YEAR=0; }
-							} else {
-								YEAR%=100;
-							}
-						}
-					}
-				}
+
+			if ((m_data[REG_ALARM_SECONDS] == m_data[REG_SECONDS] || (m_data[REG_ALARM_SECONDS] & ALARM_DONTCARE) == ALARM_DONTCARE) &&
+				(m_data[REG_ALARM_MINUTES] == m_data[REG_MINUTES] || (m_data[REG_ALARM_MINUTES] & ALARM_DONTCARE) == ALARM_DONTCARE) &&
+				(m_data[REG_ALARM_HOURS] == m_data[REG_HOURS] || (m_data[REG_ALARM_HOURS] & ALARM_DONTCARE) == ALARM_DONTCARE))
+			{
+				// set the alarm interrupt flag AF
+				m_data[REG_C] |= REG_C_AF;
 			}
+
+			// set the update-ended interrupt Flag UF
+			m_data[REG_C] |=  REG_C_UF;
+			update_irq();
+
+			m_last_refresh = machine().time();
 		}
+		break;
 	}
-
-	if (m_data[1] == SECOND && //
-		m_data[3] == MINUTE && //
-		m_data[5] == HOUR) {
-		// set the alarm interrupt flag AF
-		m_data[0x0c] |= 0x20;
-	} else {
-		// clear the alarm interrupt flag AF
-		m_data[0x0c] &= ~0x20;
-		if ((m_data[0x0c] & 0x70) == 0) {
-			// clear IRQF
-			m_data[0x0c] &= ~0x80;
-		}
-	}
-
-	// set the update-ended interrupt Flag UF
-	m_data[0x0c] |=  0x10;
-
-	// set the interrupt request flag IRQF
-	// FIXME: should throw IRQ line as well
-	if ((m_data[0x0b] & m_data[0x0c] & 0x30) != 0) {
-		m_data[0x0c] |=  0x80;
-	}
-
-	// IRQ line is active low
-	m_write_irq((m_data[0x0c] & 0x80) ? CLEAR_LINE : ASSERT_LINE);
-
-	m_updated = true;  /* clock has been updated */
-	m_last_refresh = machine().time();
-}
-
-
-//-------------------------------------------------
-//  rtc_clock_updated -
-//-------------------------------------------------
-
-void mc146818_device::rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second)
-{
-	YEAR     = year;
-	MONTH    = month;
-	DAY      = day;
-	WEEK_DAY = day_of_week;
-	HOUR     = hour;
-	MINUTE   = minute;
-	SECOND   = second;
 }
 
 
@@ -316,7 +179,14 @@ void mc146818_device::nvram_default()
 
 		memcpy(m_data, m_region->base(), bytes);
 	}
+	else
+	{
+		memset(m_data, 0, sizeof(m_data));
+	}
+
 	set_base_datetime();
+	update_timer();
+	update_irq();
 }
 
 
@@ -328,7 +198,10 @@ void mc146818_device::nvram_default()
 void mc146818_device::nvram_read(emu_file &file)
 {
 	file.read(m_data, sizeof(m_data));
+
 	set_base_datetime();
+	update_timer();
+	update_irq();
 }
 
 
@@ -344,19 +217,144 @@ void mc146818_device::nvram_write(emu_file &file)
 
 
 //-------------------------------------------------
-//  dec_2_local - convert from decimal to BCD if
-//  necessary
+//  to_ram - convert value to current ram format
 //-------------------------------------------------
 
-inline int mc146818_device::dec_2_local(int a)
+int mc146818_device::to_ram(int a)
 {
-	return BCD_MODE ? dec_2_bcd(a) : a;
+	if (!(m_data[REG_B] & REG_B_DM))
+		return dec_2_bcd(a);
+	
+	return a;
 }
 
 
 //-------------------------------------------------
-//  dec_2_local - convert from decimal to BCD if
-//  necessary
+//  from_ram - convert value from current ram format
+//-------------------------------------------------
+
+int mc146818_device::from_ram(int a)
+{
+	if (!(m_data[REG_B] & REG_B_DM))
+		return bcd_2_dec(a);
+	
+	return a;
+}
+
+
+int mc146818_device::get_seconds()
+{
+	return from_ram(m_data[REG_SECONDS]);
+}
+
+void mc146818_device::set_seconds(int seconds)
+{
+	m_data[REG_SECONDS] = to_ram(seconds);
+}
+
+int mc146818_device::get_minutes()
+{
+	return from_ram(m_data[REG_MINUTES]);
+}
+
+void mc146818_device::set_minutes(int minutes)
+{
+	m_data[REG_MINUTES] = to_ram(minutes);
+}
+
+int mc146818_device::get_hours()
+{
+	if (!(m_data[REG_B] & REG_B_24_12))
+	{
+		int hours = from_ram(m_data[REG_HOURS] & ~HOURS_PM);
+
+		if (hours == 12)
+		{
+			hours = 0;
+		}
+
+		if (m_data[REG_HOURS] & HOURS_PM)
+		{
+			hours += 12;
+		}
+
+		return hours;
+	}
+	else
+	{
+		return from_ram(m_data[REG_HOURS]);
+	}
+}
+
+void mc146818_device::set_hours(int hours)
+{
+	if (!(m_data[REG_B] & REG_B_24_12))
+	{
+		int pm = 0;
+
+		if (hours >= 12)
+		{
+			hours -= 12;
+			pm = HOURS_PM;
+		}
+
+		if (hours == 0)
+		{
+			hours = 12;
+		}
+
+		m_data[REG_HOURS] = to_ram(hours) | pm;
+	}
+	else
+	{
+		m_data[REG_HOURS] = to_ram(hours);
+	}
+}
+
+int mc146818_device::get_dayofweek()
+{
+	return from_ram(m_data[REG_DAYOFWEEK]);
+}
+
+void mc146818_device::set_dayofweek(int dayofweek)
+{
+	m_data[REG_DAYOFWEEK] = to_ram(dayofweek);
+}
+
+int mc146818_device::get_dayofmonth()
+{
+	return from_ram(m_data[REG_DAYOFMONTH]);
+}
+
+void mc146818_device::set_dayofmonth(int dayofmonth)
+{
+	m_data[REG_DAYOFMONTH] = to_ram(dayofmonth);
+}
+
+int mc146818_device::get_month()
+{
+	return from_ram(m_data[REG_MONTH]);
+}
+
+void mc146818_device::set_month(int month)
+{
+	m_data[REG_MONTH] = to_ram(month);
+}
+
+int mc146818_device::get_year()
+{
+	return from_ram(m_data[REG_YEAR]);
+}
+
+void mc146818_device::set_year(int year)
+{
+	m_data[REG_YEAR] = to_ram(year);
+}
+
+
+
+//-------------------------------------------------
+//  set_base_datetime - update clock with real time
 //-------------------------------------------------
 
 void mc146818_device::set_base_datetime()
@@ -366,32 +364,115 @@ void mc146818_device::set_base_datetime()
 
 	machine().base_datetime(systime);
 
-	current_time = (m_type == MC146818_UTC) ? systime.utc_time: systime.local_time;
+	current_time = (m_use_utc) ? systime.utc_time: systime.local_time;
 
 //  logerror("mc146818_set_base_datetime %02d/%02d/%02d %02d:%02d:%02d\n",
 //          current_time.year % 100, current_time.month + 1, current_time.mday,
 //          current_time.hour,current_time.minute, current_time.second);
 
-	if (HOURS_24 || (current_time.hour < 12))
-		HOUR = dec_2_local(current_time.hour);
-	else
-		HOUR = dec_2_local(current_time.hour - 12) | 0x80;
+	set_seconds(current_time.second);
+	set_minutes(current_time.minute);
+	set_hours(current_time.hour);
+	set_dayofweek(current_time.weekday + 1);
+	set_dayofmonth(current_time.mday);
+	set_month(current_time.month + 1);
+	set_year(current_time.year % 100);
 
-	if (m_type != MC146818_IGNORE_CENTURY)
-		CENTURY = dec_2_local(current_time.year /100);
-
-	SECOND = dec_2_local(current_time.second);
-	MINUTE = dec_2_local(current_time.minute);
-	DAY    = dec_2_local(current_time.mday);
-	MONTH  = dec_2_local(current_time.month + 1);
-	YEAR   = dec_2_local(current_time.year % 100);
-
-	WEEK_DAY = current_time.weekday;
-	if (current_time.is_dst)
-		m_data[0xb] |= 1;
-	else
-		m_data[0xb] &= ~1;
+	if (m_century_index >= 0)
+		m_data[m_century_index] = to_ram(current_time.year / 100);
 }
+
+
+//-------------------------------------------------
+//  update_timer - update timer based on A register
+//-------------------------------------------------
+
+void mc146818_device::update_timer()
+{
+	int bypass;
+
+	switch (m_data[REG_A] & (REG_A_DV2 | REG_A_DV1 | REG_A_DV0))
+	{
+	case 0:
+		bypass = 0;
+		break;
+
+	case REG_A_DV0:
+		bypass = 2;
+		break;
+
+	case REG_A_DV1:
+		bypass = 7;
+		break;
+
+	case REG_A_DV2 | REG_A_DV1:
+	case REG_A_DV2 | REG_A_DV1 | REG_A_DV0:
+		bypass = 22;
+		break;
+
+	default:
+		// TODO: other combinations of divider bits are used for test purposes only
+		bypass = 22;
+		break;
+	}
+
+
+	attotime update_period = attotime::never;
+	attotime update_interval = attotime::never;
+	attotime periodic_period = attotime::never;
+	attotime periodic_interval = attotime::never;
+
+	if (bypass < 22)
+	{
+		int shift = 22 - bypass;
+
+		double update_hz = (double) clock() / (1 << shift);
+
+		// TODO: take the time since last timer into account
+		update_period = attotime::from_hz(update_hz * 2);
+		update_interval = attotime::from_hz(update_hz);
+
+		int rate_select = m_data[REG_A] & (REG_A_RS3 | REG_A_RS2 | REG_A_RS1 | REG_A_RS0);
+		if (rate_select != 0)
+		{
+			shift = (rate_select + 6) - bypass;
+			if (shift <= 1)
+				shift += 7;
+
+			double periodic_hz = (double) clock() / (1 << shift);
+
+			// TODO: take the time since last timer into account
+			periodic_period = attotime::from_hz(periodic_hz * 2);
+			periodic_interval = attotime::from_hz(periodic_hz);
+		}
+	}
+
+	m_clock_timer->adjust(update_period, 0, update_interval);
+	m_periodic_timer->adjust(periodic_period, 0, periodic_interval);
+}
+
+
+//-------------------------------------------------
+//  update_irq - Update irq based on B & C register
+//-------------------------------------------------
+
+void mc146818_device::update_irq()
+{
+	// IRQ line is active low
+	if (((m_data[REG_C] & REG_C_UF) && (m_data[REG_B] & REG_B_UIE)) ||
+		((m_data[REG_C] & REG_C_AF) && (m_data[REG_B] & REG_B_AIE)) ||
+		((m_data[REG_C] & REG_C_PF) && (m_data[REG_B] & REG_B_PIE)))
+	{
+		m_data[REG_C] |= REG_C_IRQF;
+		m_write_irq(CLEAR_LINE);
+	}
+	else
+	{
+		m_data[REG_C] &= REG_C_IRQF;
+		m_write_irq(ASSERT_LINE);
+	}
+}
+
 
 
 //-------------------------------------------------
@@ -401,42 +482,38 @@ void mc146818_device::set_base_datetime()
 READ8_MEMBER( mc146818_device::read )
 {
 	UINT8 data = 0;
-	switch (offset) {
+	switch (offset)
+	{
 	case 0:
 		data = m_index;
 		break;
 
 	case 1:
-		switch (m_index % MC146818_DATA_SIZE) {
-		case 0xa:
-			data = m_data[m_index  % MC146818_DATA_SIZE];
+		switch (m_index)
+		{
+		case REG_A:
+			data = m_data[REG_A];
 			// Update In Progress (UIP) time for 32768 Hz is 244+1984usec
+			/// TODO: support other dividers
 			if ((space.machine().time() - m_last_refresh) < attotime::from_usec(244+1984))
-				data |= 0x80;
-#if 0
-			/* for pc1512 bios realtime clock test */
-			m_data[m_index % MC146818_DATA_SIZE] ^= 0x80; /* 0x80 update in progress */
-#endif
+				data |= REG_A_UIP;
 			break;
 
-		case 0xc:
-//          if(m_updated) /* the clock has been updated */
-//              data = 0x10;
-//          else
-//              data = 0x00;
+		case REG_C:
 			// the unused bits b0 ... b3 are always read as 0
-			data = m_data[m_index % MC146818_DATA_SIZE] & 0xf0;
+			data = m_data[REG_C] & (REG_C_IRQF | REG_C_PF | REG_C_AF | REG_C_UF);
 			// read 0x0c will clear all IRQ flags in register 0x0c
-			m_data[m_index % MC146818_DATA_SIZE] &= 0x0f;
-			m_write_irq(ASSERT_LINE);
+			m_data[REG_C] &= ~(REG_C_IRQF | REG_C_PF | REG_C_AF | REG_C_UF);
+			update_irq();
 			break;
-		case 0xd:
+
+		case REG_D:
 			/* battery ok */
-			data = m_data[m_index % MC146818_DATA_SIZE] | 0x80;
+			data = m_data[REG_D] | REG_D_VRT;
 			break;
 
 		default:
-			data = m_data[m_index % MC146818_DATA_SIZE];
+			data = m_data[m_index];
 			break;
 		}
 		break;
@@ -444,6 +521,7 @@ READ8_MEMBER( mc146818_device::read )
 
 	if (LOG_MC146818)
 		logerror("mc146818_port_r(): index=0x%02x data=0x%02x\n", m_index, data);
+
 	return data;
 }
 
@@ -454,51 +532,45 @@ READ8_MEMBER( mc146818_device::read )
 
 WRITE8_MEMBER( mc146818_device::write )
 {
-	attotime rate;
 	if (LOG_MC146818)
 		logerror("mc146818_port_w(): index=0x%02x data=0x%02x\n", m_index, data);
 
-	switch (offset) {
+	switch (offset)
+	{
 	case 0:
-		m_index = data;
+		m_index = data % MC146818_DATA_SIZE;
 		break;
 
 	case 1:
-		switch(m_index % MC146818_DATA_SIZE)
+		switch (m_index)
 		{
-		case 0x0a:
-			// fixme: allow different time base
-			data &= 0x0f;
-			if (data > 2)
-				m_period = attotime::from_hz(32768 >> (data - 1));
-			else if (data > 0)
-				m_period = attotime::from_hz(32768 >> (data + 6));
-			else m_period = attotime::never;
+		case REG_SECONDS:
+			// top bit of SECONDS is read only
+			m_data[REG_SECONDS] = data & ~0x80;
+			break;
 
-			if(m_data[0x0b] & 0x40)
-					rate = attotime::zero;
-			else rate = attotime::never;
+		case REG_A:
+			// top bit of A is read only
+			m_data[REG_A] = data & ~REG_A_UIP;
+			update_timer();
+			break;
 
-			m_periodic_timer->adjust(rate, 0, m_period);
-			data |= m_data[m_index % MC146818_DATA_SIZE] & 0xf0;
-			m_data[m_index % MC146818_DATA_SIZE] = data;
+		case REG_B:
+			if ((data & REG_B_SET) && !(m_data[REG_B] & REG_B_SET))
+				data &= ~REG_B_UIE;
+
+			m_data[REG_B] = data;
+			update_irq();
 			break;
-		case 0x0b:
-			if(data & 0x80)
-				m_updated = false;
-			// this probably isn't right but otherwise
-			// you'll be making a lot of unnecessary callbacks
-			if (data & 0x40)
-				m_periodic_timer->adjust(attotime::zero, 0, m_period);
-			else
-				m_periodic_timer->adjust(attotime::never);
-			m_data[m_index % MC146818_DATA_SIZE] = data;
+
+		case REG_C:
+		case REG_D:
+			// register C & D is readonly
 			break;
-		case 0x0c:
-			// register 0x0c is readonly
-			break;
+
 		default:
-			m_data[m_index % MC146818_DATA_SIZE] = data;
+			m_data[m_index] = data;
+			break;
 		}
 		break;
 	}
