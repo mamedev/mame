@@ -2587,24 +2587,24 @@ ROM_END
 
 ROM_START( vsbball )
 	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
-	ROM_LOAD( "mds-ba e-1.1d",  0x08000, 0x02000, CRC(0cc5225f) SHA1(a8eb3153ce3f1282901c305177347112df0fb3b2) )
-	ROM_LOAD( "mds-ba e-1.1c",  0x0a000, 0x02000, CRC(9856ac60) SHA1(f033171c3dea6af63f1f328fee74e695c67adc92) )
-	ROM_LOAD( "mds-ba e-1.1b",  0x0c000, 0x02000, CRC(d1312e63) SHA1(0fc46a4ef0fb8a304320f8b3cac3edd1cd9ed286) )
-	ROM_LOAD( "mds-ba e-1.1a",  0x0e000, 0x02000, CRC(28199b4d) SHA1(e63d69662d3b70b883028d3103c8f65de8f5edda) )
+	ROM_LOAD( "mds-ba__1d_e-1.1d",  0x08000, 0x02000, CRC(7ec792bc) SHA1(92d1f8809db89a8d99f7ea1d2ba3f9be69195866) )
+	ROM_LOAD( "mds-ba__1c_e-1.1c",  0x0a000, 0x02000, CRC(b631f8aa) SHA1(0ee8a8def9512552037fdac1a14a3ea9393bb943) )
+	ROM_LOAD( "mds-ba__1b_e-1.1b",  0x0c000, 0x02000, CRC(c856b45a) SHA1(7f15613120d72859ea1ed647c9eee3074f63f0b9) )
+	ROM_LOAD( "mds-ba__1a_e-1.1a",  0x0e000, 0x02000, CRC(06b74c18) SHA1(9a61161b4856b88e40eee6edb39e0a608748cf0b) )
 
 	ROM_REGION( 0x4000,"gfx1", 0 ) /* PPU memory */
-	ROM_LOAD( "mds-ba e.2b",  0x0000, 0x2000, CRC(3ff8bec3) SHA1(28c1bf89ed1046243ca8cf122cefa0752c242577) ) /* Only had "e" not "e-1" */
-	ROM_LOAD( "mds-ba.2a",    0x2000, 0x2000, CRC(13b20cfd) SHA1(cb333cbea09557a9d2bdc351fabc61fc7760c35d) ) /* Did not have any red letter stamped */
+	ROM_LOAD( "mds-ba__2b_e.2b",  0x0000, 0x2000, CRC(3ff8bec3) SHA1(28c1bf89ed1046243ca8cf122cefa0752c242577) )
+	ROM_LOAD( "mds-ba__2a_e.2a",  0x2000, 0x2000, CRC(13b20cfd) SHA1(cb333cbea09557a9d2bdc351fabc61fc7760c35d) )
 
-	ROM_REGION( 0x10000,"sub",0 ) /* 6502 memory */
-	ROM_LOAD( "mds-ba e-1.6d",  0x08000, 0x02000, CRC(7ec792bc) SHA1(92d1f8809db89a8d99f7ea1d2ba3f9be69195866) )
-	ROM_LOAD( "mds-ba e-1.6c",  0x0a000, 0x02000, CRC(b631f8aa) SHA1(0ee8a8def9512552037fdac1a14a3ea9393bb943) )
-	ROM_LOAD( "mds-ba e-1.6b",  0x0c000, 0x02000, CRC(c856b45a) SHA1(7f15613120d72859ea1ed647c9eee3074f63f0b9) )
-	ROM_LOAD( "mds-ba e-1.6a",  0x0e000, 0x02000, CRC(06b74c18) SHA1(9a61161b4856b88e40eee6edb39e0a608748cf0b) )
+	ROM_REGION( 0x10000,"sub",0 ) /* 6502 memory, these need redump/verify */
+	ROM_LOAD( "mds-ba__6d_e-1.6d",  0x08000, 0x02000, CRC(0cc5225f) SHA1(a8eb3153ce3f1282901c305177347112df0fb3b2) )
+	ROM_LOAD( "mds-ba__6c_e-1.6c",  0x0a000, 0x02000, CRC(9856ac60) SHA1(f033171c3dea6af63f1f328fee74e695c67adc92) )
+	ROM_LOAD( "mds-ba__6b_e-1.6b",  0x0c000, 0x02000, CRC(d1312e63) SHA1(0fc46a4ef0fb8a304320f8b3cac3edd1cd9ed286) )
+	ROM_LOAD( "mds-ba__6a_e-1.6a",  0x0e000, 0x02000, CRC(28199b4d) SHA1(e63d69662d3b70b883028d3103c8f65de8f5edda) )
 
-	ROM_REGION( 0x4000,"gfx2", 0 ) /* PPU memory */
-	ROM_LOAD( "mds-ba e.8b",  0x0000, 0x2000, CRC(3ff8bec3) SHA1(28c1bf89ed1046243ca8cf122cefa0752c242577) ) /* Only had "e" not "e-1" */
-	ROM_LOAD( "mds-ba.8a",    0x2000, 0x2000, CRC(13b20cfd) SHA1(cb333cbea09557a9d2bdc351fabc61fc7760c35d) ) /* Did not have any red letter stamped */
+	ROM_REGION( 0x4000,"gfx2", 0 ) /* PPU memory, these need redump/verify */
+	ROM_LOAD( "mds-ba__8b_e.8b",  0x0000, 0x2000, CRC(3ff8bec3) SHA1(28c1bf89ed1046243ca8cf122cefa0752c242577) )
+	ROM_LOAD( "mds-ba__8e_e.8a",  0x2000, 0x2000, CRC(13b20cfd) SHA1(cb333cbea09557a9d2bdc351fabc61fc7760c35d) )
 
 	PALETTE_2C04_0001
 ROM_END
