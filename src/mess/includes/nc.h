@@ -49,7 +49,6 @@ public:
 	int m_irq_latch;
 	int m_irq_latch_mask;
 	int m_sound_channel_periods[2];
-	emu_file *m_file;
 	int m_previous_inputport_10_state;
 	int m_previous_alarm_state;
 	UINT8 m_nc200_uart_interrupt_irq;
@@ -104,8 +103,6 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( nc_pcmcia_card );
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( nc_pcmcia_card );
 
-	void nc100_machine_stop();
-	void nc200_machine_stop();
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<beep_device> m_beeper1;
@@ -119,11 +116,6 @@ public:
 	void nc_update_interrupts();
 	void nc_refresh_memory_bank_config(int bank);
 	void nc_refresh_memory_config();
-	void nc_common_restore_memory_from_stream();
-	void nc_common_store_memory_to_stream();
-	void nc_common_open_stream_for_reading();
-	void nc_common_open_stream_for_writing();
-	void nc_common_close_stream();
 	void nc_common_init_machine();
 	void nc_sound_update(int channel);
 	void nc_printer_update(UINT8 data);
