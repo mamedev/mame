@@ -1762,35 +1762,35 @@ static int ppc4xx_get_irq_line(powerpc_state *ppc, UINT32 bitmask)
 
 static void ppc4xx_dma_update_irq_states(powerpc_state *ppc)
 {
-	int dmachan;
-
 	/* update the IRQ state for each DMA channel */
-	for (dmachan = 0; dmachan < 4; dmachan++)
+	for (int dmachan = 0; dmachan < 4; dmachan++)
 	{
-		if ((ppc->dcr[DCR4XX_DMACR0 + 8 * dmachan] & PPC4XX_DMACR_CIE) && (ppc->dcr[DCR4XX_DMASR] & (0x11 << (27 - dmachan))))
-			ppc4xx_set_irq_line(ppc, PPC4XX_IRQ_BIT_DMA(dmachan), ASSERT_LINE);
-		else
-			ppc4xx_set_irq_line(ppc, PPC4XX_IRQ_BIT_DMA(dmachan), CLEAR_LINE);
+		bool irq_pending = false;
 
-		// DMA chaining interrupts
-		switch (dmachan)
+		// Channel interrupt enabled?
+		if ((ppc->dcr[DCR4XX_DMACR0 + 8 * dmachan] & PPC4XX_DMACR_CIE))
 		{
-			case 0:
-				if ((ppc->dcr[DCR4XX_DMACR0 + 8 * dmachan] & PPC4XX_DMACR_CIE) && (ppc->dcr[DCR4XX_DMASR] & 0x80000))
-					ppc4xx_set_irq_line(ppc, PPC4XX_IRQ_BIT_DMA(dmachan), ASSERT_LINE);
-				else
-					ppc4xx_set_irq_line(ppc, PPC4XX_IRQ_BIT_DMA(dmachan), CLEAR_LINE);
-				break;
+			// Terminal count and end-of-transfer status bits
+			int bitmask = 0x11 << (27 - dmachan);
 
-			case 1:
-			case 2:
-			case 3:
-				if ((ppc->dcr[DCR4XX_DMACR0 + 8 * dmachan] & PPC4XX_DMACR_CIE) && (ppc->dcr[DCR4XX_DMASR] & (1 << (7 - dmachan))))
-					ppc4xx_set_irq_line(ppc, PPC4XX_IRQ_BIT_DMA(dmachan), ASSERT_LINE);
-				else
-					ppc4xx_set_irq_line(ppc, PPC4XX_IRQ_BIT_DMA(dmachan), CLEAR_LINE);
-				break;
+			// Chained transfer status bit
+			switch (dmachan)
+			{
+				case 0:
+					bitmask |= 0x00080000;
+					break;
+
+				case 1:
+				case 2:
+				case 3:
+					bitmask |= 1 << (7 - dmachan);
+					break;
+			}
+
+			irq_pending = (ppc->dcr[DCR4XX_DMASR] & bitmask) != 0;
 		}
+
+		ppc4xx_set_irq_line(ppc, PPC4XX_IRQ_BIT_DMA(dmachan), irq_pending ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 

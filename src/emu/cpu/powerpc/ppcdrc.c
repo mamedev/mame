@@ -922,7 +922,7 @@ static void code_compile_block(powerpc_state *ppc, UINT8 mode, offs_t pc)
 	const opcode_desc *desclist;
 	int override = FALSE;
 	drcuml_block *block;
-logerror("Compile %08X\n", pc);
+
 	g_profiler.start(PROFILER_DRC_COMPILE);
 
 	/* get a description of this sequence */
