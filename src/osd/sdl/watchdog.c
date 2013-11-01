@@ -11,7 +11,11 @@
 
 #include "osdcomm.h"
 #include "osdcore.h"
+#ifdef SDLMAME_NOASM
+#include "eminline.h"
+#else
 #include "osinline.h"
+#endif
 
 #include "watchdog.h"
 

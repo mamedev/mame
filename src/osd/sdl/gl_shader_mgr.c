@@ -1,3 +1,5 @@
+#include <stdio.h>   /* snprintf */
+#include <stdlib.h>  /* malloc */
 
 #include "sdlinc.h"
 
