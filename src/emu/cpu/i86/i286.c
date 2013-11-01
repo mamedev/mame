@@ -515,7 +515,7 @@ void i80286_cpu_device::switch_task(UINT16 ntask, int type)
 	UINT8 r, lr;
 	UINT32 naddr, oaddr, ldtaddr;
 	int i;
-	logerror("This program uses TSSs, how rare. Please report this to the developers.\n");
+	logerror("i286: %06x This program uses TSSs, how rare. Please report this to the developers.\n", pc());
 
 	if(TBL(ntask))
 		throw TRAP(FAULT_TS, IDXTBL(ntask));
@@ -539,9 +539,6 @@ void i80286_cpu_device::switch_task(UINT16 ntask, int type)
 	if(LIMIT(ndesc) < 43)
 		throw TRAP(FAULT_TS, IDXTBL(ntask));
 
-	for (i = 0; i < 44; i += 2)
-		ntss[i / 2] = read_word(BASE(ndesc) + i);
-
 	flags = CompressFlags();
 
 	if(type == NT_CALL)
@@ -564,10 +561,12 @@ void i80286_cpu_device::switch_task(UINT16 ntask, int type)
 	otss[TSS_CS] = m_sregs[CS];
 	otss[TSS_SS] = m_sregs[SS];
 	otss[TSS_DS] = m_sregs[DS];
-	otss[TSS_LDT] = m_ldtr.sel;
 
-	for (i = 14; i < 44; i += 2)
+	for (i = 14; i < 42; i += 2)
 		write_word(m_tr.base + i, otss[i / 2]);
+
+	for (i = 0; i < 44; i += 2)
+		ntss[i / 2] = read_word(BASE(ndesc) + i);
 
 	// jmp does both
 	if(type != NT_CALL)
@@ -635,7 +634,7 @@ void i80286_cpu_device::switch_task(UINT16 ntask, int type)
 	m_msw |= 8;
 	// Docs explicitly say SS is loaded first.  Why?  Because the DPL
 	// of the TSS is compared to the DPL of SS which is CPL
-	data_descriptor(SS, ntss[TSS_SS], DPL(r), TRAP(FAULT_TS, IDXTBL(ntss[TSS_SS])));
+	data_descriptor(SS, ntss[TSS_SS], RPL(ntss[TSS_CS]), TRAP(FAULT_TS, IDXTBL(ntss[TSS_SS])));
 
 	try
 	{
@@ -1213,7 +1212,9 @@ void i80286_cpu_device::execute_run()
 							{
 								desc[2] = read_word(addr + 4);
 								r = RIGHTS(desc);
-								if(DPL(r) >= PMAX(RPL(tmp),CPL) || (SEGDESC(r) && CODE(r) && CONF(r)))
+								if(!SEGDESC(r) && ((GATE(r) > TRAPGATE) || !GATE(r)))
+									m_ZeroVal = 1;
+								else if(DPL(r) >= PMAX(RPL(tmp),CPL) || (SEGDESC(r) && CODE(r) && CONF(r)))
 								{
 									m_ZeroVal = 0;
 									// rights are expected to be in upper byte
@@ -1234,7 +1235,7 @@ void i80286_cpu_device::execute_run()
 							{
 								desc[2] = read_word(addr + 4);
 								r = RIGHTS(desc);
-								if(!SEGDESC(r) && (GATE(r) >= CALLGATE))
+								if(!SEGDESC(r) && ((GATE(r) >= CALLGATE) || !GATE(r)))
 									m_ZeroVal = 1; // not valid for gates
 								else if(DPL(r) >= PMAX(RPL(tmp),CPL) || (SEGDESC(r) && CODE(r) && CONF(r)))
 								{
