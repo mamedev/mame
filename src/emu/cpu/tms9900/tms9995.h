@@ -174,6 +174,7 @@ private:
 	bool    m_mid_active;
 
 	int     m_decrementer_clkdiv;
+	bool    m_servicing_interrupt;
 
 	// Flag field
 	int     m_int_pending;
