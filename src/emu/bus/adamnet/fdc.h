@@ -29,7 +29,7 @@
 // ======================> adam_fdc_device
 
 class adam_fdc_device :  public device_t,
-							public device_adamnet_card_interface
+						 public device_adamnet_card_interface
 {
 public:
 	// construction/destruction
@@ -41,6 +41,7 @@ public:
 	virtual ioport_constructor device_input_ports() const;
 
 	// not really public
+	DECLARE_READ8_MEMBER( data_r );
 	DECLARE_READ8_MEMBER( p1_r );
 	DECLARE_WRITE8_MEMBER( p1_w );
 	DECLARE_READ8_MEMBER( p2_r );

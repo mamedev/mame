@@ -73,15 +73,16 @@ static ADDRESS_MAP_START( adam_fdc_mem, AS_PROGRAM, 8, adam_fdc_device )
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE(M6801_TAG, m6801_cpu_device, m6801_io_r, m6801_io_w)
 	AM_RANGE(0x0080, 0x00ff) AM_RAM
 	AM_RANGE(0x0400, 0x07ff) AM_RAM AM_WRITEONLY AM_SHARE("ram")
-	AM_RANGE(0x0800, 0x0800) AM_MIRROR(0x7ff) AM_DEVREAD(WD2793_TAG, wd2793_t, status_r)
+	AM_RANGE(0x0800, 0x0800) AM_MIRROR(0x3ff) AM_DEVREAD(WD2793_TAG, wd2793_t, status_r)
 	AM_RANGE(0x1400, 0x17ff) AM_RAM AM_READONLY AM_SHARE("ram")
-	AM_RANGE(0x1800, 0x1800) AM_MIRROR(0x7ff) AM_DEVWRITE(WD2793_TAG, wd2793_t, cmd_w)
-	AM_RANGE(0x2800, 0x2800) AM_MIRROR(0x7ff) AM_DEVREAD(WD2793_TAG, wd2793_t, track_r)
-	AM_RANGE(0x3800, 0x3800) AM_MIRROR(0x7ff) AM_DEVWRITE(WD2793_TAG, wd2793_t, track_w)
-	AM_RANGE(0x4800, 0x4800) AM_MIRROR(0x7ff) AM_DEVREAD(WD2793_TAG, wd2793_t, sector_r)
-	AM_RANGE(0x5800, 0x5800) AM_MIRROR(0x7ff) AM_DEVWRITE(WD2793_TAG, wd2793_t, sector_w)
-	AM_RANGE(0x6800, 0x6800) AM_MIRROR(0x7ff) AM_DEVREAD(WD2793_TAG, wd2793_t, data_r)
-	AM_RANGE(0x7800, 0x7800) AM_MIRROR(0x7ff) AM_DEVWRITE(WD2793_TAG, wd2793_t, data_w)
+	AM_RANGE(0x1800, 0x1800) AM_MIRROR(0x3ff) AM_DEVWRITE(WD2793_TAG, wd2793_t, cmd_w)
+	AM_RANGE(0x2800, 0x2800) AM_MIRROR(0x3ff) AM_DEVREAD(WD2793_TAG, wd2793_t, track_r)
+	AM_RANGE(0x3800, 0x3800) AM_MIRROR(0x3ff) AM_DEVWRITE(WD2793_TAG, wd2793_t, track_w)
+	AM_RANGE(0x4800, 0x4800) AM_MIRROR(0x3ff) AM_DEVREAD(WD2793_TAG, wd2793_t, sector_r)
+	AM_RANGE(0x5800, 0x5800) AM_MIRROR(0x3ff) AM_DEVWRITE(WD2793_TAG, wd2793_t, sector_w)
+	AM_RANGE(0x6800, 0x6800) AM_MIRROR(0x3ff) AM_DEVREAD(WD2793_TAG, wd2793_t, data_r)
+	AM_RANGE(0x6c00, 0x6fff) AM_READ(data_r)
+	AM_RANGE(0x7800, 0x7800) AM_MIRROR(0x3ff) AM_DEVWRITE(WD2793_TAG, wd2793_t, data_w)
 	AM_RANGE(0x8000, 0x8fff) AM_MIRROR(0x7000) AM_ROM AM_REGION(M6801_TAG, 0)
 ADDRESS_MAP_END
 
@@ -205,6 +206,20 @@ void adam_fdc_device::adamnet_reset_w(int state)
 	m_maincpu->set_input_line(INPUT_LINE_RESET, state);
 
 	if (state == ASSERT_LINE) m_fdc->reset();
+}
+
+
+//-------------------------------------------------
+//  data_r -
+//-------------------------------------------------
+
+READ8_MEMBER( adam_fdc_device::data_r )
+{
+	UINT8 data = m_fdc->data_r();
+
+	m_ram[offset & 0x3ff] = data;
+
+	return data;
 }
 
 
