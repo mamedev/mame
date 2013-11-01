@@ -586,7 +586,7 @@ void i80286_cpu_device::switch_task(UINT16 ntask, int type)
 	m_tr.base = BASE(ndesc);
 	m_tr.rights = RIGHTS(ndesc);
 
-	ExpandFlags(ntss[TSS_FLAG]);
+	load_flags(ntss[TSS_FLAG], 0);
 	m_regs.w[AX] = ntss[TSS_AX];
 	m_regs.w[CX] = ntss[TSS_CX];
 	m_regs.w[DX] = ntss[TSS_DX];
@@ -1847,6 +1847,9 @@ void i80286_cpu_device::load_flags(UINT16 flags, int cpl)
 	else if(!PM)
 		(flags &= ~0xf000);
 	ExpandFlags(flags);
+
+	if(m_TF)
+		m_fire_trap = 1;
 }
 
 UINT16 i80286_cpu_device::far_return(int iret, int bytes)
