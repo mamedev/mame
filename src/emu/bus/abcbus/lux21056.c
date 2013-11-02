@@ -9,6 +9,49 @@
 
 *********************************************************************/
 
+/*
+
+	Use the CHDMAN utility to create a 5MB image for ABC 850:
+
+	$ chdman createhd -o /path/to/rodime202.chd -chs 321,4,17 -ss 512
+	$ chdman createhd -o /path/to/basf6185.chd -chs 440,6,32 -ss 256
+
+	or a 10MB image for ABC 852:
+
+	$ chdman createhd -o /path/to/nec5126.chd -chs 615,4,17 -ss 512
+
+	or a 20MB image for ABC 856:
+
+	$ chdman createhd -o /path/to/micropolis1325.chd -chs 1024,8,33 -ss 256
+
+	Start the abc800 emulator with the ABC 850 attached on the ABC bus,
+	with the new CHD and a UFD-DOS floppy mounted:
+
+	$ mess abc800m -bus hdd -flop1 ufd631 -hard rodime202.chd
+
+	Configure the floppy controller for use with an ABC 850:
+
+	- Drive 0 Sides: Double
+	- Drive 1 Sides: Double
+	- Drive 0 Tracks: 40 or 80 depending on the UFD DOS image used
+	- Drive 1 Tracks: 40 or 80 depending on the UFD DOS image used
+	- Card Address: 44 (ABC 832/834/850)
+
+	Reset the emulated machine by pressing F3.
+
+	You should now see the following text at the top of the screen:
+
+	DOS är UFD-DOS ver. 19
+	DR_: motsvarar MF_:
+
+	Enter "BYE" to get into the UFD-DOS command prompt.
+	Enter "DOSGEN,F HD0:" to start the formatting utility.
+	Enter "J", and enter "J" to confirm the formatting.
+
+	To Be Continued...
+
+*/
+
 #include "lux21056.h"
 
 
@@ -204,7 +247,7 @@ machine_config_constructor luxor_55_21056_device::device_mconfig_additions() con
 
 INPUT_PORTS_START( luxor_55_21056 )
 	PORT_START("S1")
-	PORT_DIPNAME( 0x3f, 0x2c, "Card Address" )
+	PORT_DIPNAME( 0x3f, 0x2b, "Card Address" )
 	PORT_DIPSETTING(    0x20, "32" )
 	PORT_DIPSETTING(    0x21, "33" )
 	PORT_DIPSETTING(    0x22, "34" )
@@ -216,8 +259,8 @@ INPUT_PORTS_START( luxor_55_21056 )
 	PORT_DIPSETTING(    0x28, "40" )
 	PORT_DIPSETTING(    0x29, "41" )
 	PORT_DIPSETTING(    0x2a, "42" )
-	PORT_DIPSETTING(    0x2b, "43" )
-	PORT_DIPSETTING(    0x2c, "44 (ABC 850)" )
+	PORT_DIPSETTING(    0x2b, "43 (ABC 850)" )
+	PORT_DIPSETTING(    0x2c, "44" )
 	PORT_DIPSETTING(    0x2d, "45" )
 	PORT_DIPSETTING(    0x2e, "46" )
 	PORT_DIPSETTING(    0x2f, "47" )
