@@ -806,7 +806,7 @@ void dkong_state::radarscp_step(int line_cnt)
 
 }
 
-void dkong_state::radarscp_draw_background(dkong_state *state, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void dkong_state::radarscp_draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	const UINT8     *htable = NULL;
 	int             x,y;
@@ -837,9 +837,9 @@ void dkong_state::radarscp_draw_background(dkong_state *state, bitmap_ind16 &bit
 void dkong_state::radarscp_scanline(int scanline)
 {
 	const UINT8 *table = m_gfx3;
-	int         table_len = m_gfx3_len;
-	int             x,y,offset;
-	UINT16          *pixel;
+	int 		table_len = m_gfx3_len;
+	int 			x,y,offset;
+	UINT16			*pixel;
 	const rectangle &visarea = m_screen->visible_area();
 
 	y = scanline;
@@ -853,9 +853,9 @@ void dkong_state::radarscp_scanline(int scanline)
 		pixel = &m_bg_bits.pix16(y, x);
 		if ((m_counter < table_len) && (x == 4 * (table[m_counter|offset] & 0x7f)))
 		{
-			if ( m_star_ff && (table[m_counter|offset] & 0x80) )  /* star */
+			if ( m_star_ff && (table[m_counter|offset] & 0x80) )	/* star */
 				*pixel = RADARSCP_STAR_COL;
-			else if (m_grid_sig && !(table[m_counter|offset] & 0x80))         /* radar */
+			else if (m_grid_sig && !(table[m_counter|offset] & 0x80))			/* radar */
 				*pixel = RADARSCP_GRID_COL_OFFSET+m_grid_col;
 			else
 				*pixel = RADARSCP_BCK_COL_OFFSET + m_blue_level;
@@ -980,7 +980,7 @@ UINT32 dkong_state::screen_update_dkong(screen_device &screen, bitmap_ind16 &bit
 		case HARDWARE_TRS02:
 			m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 			draw_sprites(bitmap, cliprect, 0x40, 1);
-			radarscp_draw_background(this, bitmap, cliprect);
+			radarscp_draw_background(bitmap, cliprect);
 			break;
 		default:
 			fatalerror("Invalid hardware type in dkong_video_update\n");

@@ -346,7 +346,7 @@ READ8_MEMBER(dkong_state::memory_read_byte)
 WRITE8_MEMBER(dkong_state::memory_write_byte)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
-	return prog_space.write_byte(offset, data);
+	prog_space.write_byte(offset, data);
 }
 
 static Z80DMA_INTERFACE( dk3_dma )
@@ -401,8 +401,14 @@ INTERRUPT_GEN_MEMBER(dkong_state::s2650_interrupt)
 
 void dkong_state::dkong_init_device_driver_data(  )
 {
-	m_dev_6h = machine().device("ls259.6h");
-	m_dev_vp2 = machine().device("virtual_p2");
+#if 0
+	dkong_state *state = machine.driver_data<dkong_state>();
+
+	state->m_dev_n2a03a = machine.device("n2a03a");
+	state->m_dev_n2a03b = machine.device("n2a03b");
+	state->m_dev_6h = machine.device("ls259.6h");
+	state->m_dev_vp2 = machine.device("virtual_p2");
+#endif
 }
 
 MACHINE_START_MEMBER(dkong_state,dkong2b)
