@@ -56,13 +56,13 @@
 //  SETUP
 //============================================================
 
-#define USE_DELEGATES			(1)
+#define USE_DELEGATES			(0)
 /*
  * The next options needs -Wno-pmf-conversions to compile and gcc
  * This is intended for non-mame usage.
  *
  */
-#define USE_PMFDELEGATES		(1)
+#define USE_PMFDELEGATES		(0)
 
 // Next if enabled adds 20% performance ... but is not guaranteed to be absolutely timing correct.
 #define USE_DEACTIVE_DEVICE		(0)

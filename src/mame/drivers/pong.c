@@ -18,7 +18,7 @@ TODO:
 
 #include "machine/rescap.h"
 #include "machine/netlist.h"
-#include "machine/net_lib.h"
+#include "netlist/net_lib.h"
 #include "sound/dac.h"
 #include "video/fixfreq.h"
 #include "astring.h"

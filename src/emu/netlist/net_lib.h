@@ -48,7 +48,7 @@
 #ifndef NET_LIB_H
 #define NET_LIB_H
 
-#include "netlist.h"
+#include "machine/netlist.h"
 
 // this is a bad hack
 #define USE_OLD7493	(0)
