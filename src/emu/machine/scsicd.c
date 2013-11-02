@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:smf
 /***************************************************************************
 
  scsicd.c - Implementation of a SCSI CD-ROM device

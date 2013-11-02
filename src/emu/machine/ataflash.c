@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:smf
 #include "ataflash.h"
 
 #define IDE_COMMAND_TAITO_GNET_UNLOCK_1     0xfe

@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:smf
 #include "atapicdr.h"
 
 // device type definition

@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:smf
 /***************************************************************************
 
  scsihd.c - Implementation of a SCSI hard disk drive

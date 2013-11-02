@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:smf
 #include "atahle.h"
 
 #define VERBOSE                     0
