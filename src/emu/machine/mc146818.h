@@ -44,6 +44,7 @@ class mc146818_device : public device_t,
 public:
 	// construction/destruction
 	mc146818_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mc146818_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// callbacks
 	template<class _irq> void set_irq_callback(_irq irq) { m_write_irq.set_callback(irq); }
@@ -67,6 +68,8 @@ protected:
 
 	static const unsigned char ALARM_DONTCARE = 0xc0;
 	static const unsigned char HOURS_PM = 0x80;
+
+	virtual int data_size() { return 64; }
 
 private:
 	enum
@@ -148,13 +151,8 @@ private:
 
 	// internal state
 
-	// TODO: MC146818 only has 64 bytes, but semi-compatible chips have more.
-	// drivers are using this device when the actual hardware uses a different
-	// chip (which in most cases also has additional functionality).
-	static const int MC146818_DATA_SIZE = 128;
-
 	UINT8           m_index;
-	UINT8           m_data[MC146818_DATA_SIZE];
+	UINT8          *m_data;
 
 	attotime        m_last_refresh;
 
@@ -173,5 +171,5 @@ private:
 // device type definition
 extern const device_type MC146818;
 
-
+	
 #endif /* __MC146818_H__ */

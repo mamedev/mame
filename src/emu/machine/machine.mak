@@ -773,7 +773,7 @@ endif
 #-------------------------------------------------
 
 ifneq ($(filter MC146818,$(MACHINES)),)
-MACHINEOBJS += $(MACHINEOBJ)/mc146818.o
+MACHINEOBJS += $(MACHINEOBJ)/mc146818.o $(MACHINEOBJ)/ds128x.o
 endif
 
 #-------------------------------------------------

@@ -39,6 +39,16 @@ mc146818_device::mc146818_device(const machine_config &mconfig, const char *tag,
 {
 }
 
+mc146818_device::mc146818_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+		device_nvram_interface(mconfig, *this),
+		m_index(0),
+		m_last_refresh(attotime::zero),
+		m_write_irq(*this),
+		m_century_index(-1),
+		m_use_utc(false)
+{
+}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -46,6 +56,7 @@ mc146818_device::mc146818_device(const machine_config &mconfig, const char *tag,
 
 void mc146818_device::device_start()
 {
+	m_data= auto_alloc_array(machine(), UINT8, data_size());
 	m_last_refresh = machine().time();
 	m_clock_timer = timer_alloc(TIMER_CLOCK);
 	m_periodic_timer = timer_alloc(TIMER_PERIODIC);
@@ -174,14 +185,14 @@ void mc146818_device::nvram_default()
 	{
 		UINT32 bytes = m_region->bytes();
 		
-		if (bytes > sizeof(m_data))
-			bytes = sizeof(m_data);
+		if (bytes > data_size())
+			bytes = data_size();
 
 		memcpy(m_data, m_region->base(), bytes);
 	}
 	else
 	{
-		memset(m_data, 0, sizeof(m_data));
+		memset(m_data, 0, data_size());
 	}
 
 	set_base_datetime();
@@ -197,7 +208,7 @@ void mc146818_device::nvram_default()
 
 void mc146818_device::nvram_read(emu_file &file)
 {
-	file.read(m_data, sizeof(m_data));
+	file.read(m_data, data_size());
 
 	set_base_datetime();
 	update_timer();
@@ -212,7 +223,7 @@ void mc146818_device::nvram_read(emu_file &file)
 
 void mc146818_device::nvram_write(emu_file &file)
 {
-	file.write(m_data, sizeof(m_data));
+	file.write(m_data, data_size());
 }
 
 
@@ -495,6 +506,7 @@ READ8_MEMBER( mc146818_device::read )
 			data = m_data[REG_A];
 			// Update In Progress (UIP) time for 32768 Hz is 244+1984usec
 			/// TODO: support other dividers
+			/// TODO: don't set this if update is stopped
 			if ((space.machine().time() - m_last_refresh) < attotime::from_usec(244+1984))
 				data |= REG_A_UIP;
 			break;
@@ -538,7 +550,7 @@ WRITE8_MEMBER( mc146818_device::write )
 	switch (offset)
 	{
 	case 0:
-		m_index = data % MC146818_DATA_SIZE;
+		m_index = data % data_size();
 		break;
 
 	case 1:
