@@ -13,7 +13,7 @@
 
 	Use the CHDMAN utility to create a 5MB image for ABC 850:
 
-	$ chdman createhd -o /path/to/rodime202.chd -chs 321,4,17 -ss 512
+	$ chdman createhd -o /path/to/ro202.chd -chs 321,4,17 -ss 512
 	$ chdman createhd -o /path/to/basf6185.chd -chs 440,6,32 -ss 256
 
 	or a 10MB image for ABC 852:
@@ -22,12 +22,15 @@
 
 	or a 20MB image for ABC 856:
 
-	$ chdman createhd -o /path/to/micropolis1325.chd -chs 1024,8,33 -ss 256
+	$ chdman createhd -o /path/to/micr1325.chd -chs 1024,8,33 -ss 256
 
 	Start the abc800 emulator with the ABC 850 attached on the ABC bus,
 	with the new CHD and a UFD-DOS floppy mounted:
-
-	$ mess abc800m -bus hdd -flop1 ufd631 -hard rodime202.chd
+	
+	$ mess abc800m -bus hdd -bus:hdd:io2 xebec,bios=ro202 -flop1 ufd631 -hard ro202.chd
+	$ mess abc800m -bus hdd -bus:hdd:io2 xebec,bios=basf6185 -flop1 ufd631 -hard basf6185.chd
+	$ mess abc800m -bus hdd -bus:hdd:io2 xebec,bios=nec5126 -flop1 ufd631 -hard nec5126.chd
+	$ mess abc800m -bus hdd -bus:hdd:io2 xebec,bios=micr1325 -flop1 ufd631 -hard micr1325.chd
 
 	Configure the floppy controller for use with an ABC 850:
 
