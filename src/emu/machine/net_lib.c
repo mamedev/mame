@@ -72,7 +72,7 @@ NETLIB_START(netdev_log)
 
 NETLIB_UPDATE(netdev_log)
 {
-	printf("%s: %d %d\n", name(), (UINT32) (netlist()->time().as_raw() / 1000000), INPLOGIC(m_I));
+	printf("%s: %d %d\n", name().cstr(), (UINT32) (netlist()->time().as_raw() / 1000000), INPLOGIC(m_I));
 }
 
 NETLIB_START(netdev_clock)
@@ -127,7 +127,7 @@ NETLIB_UPDATE(nicMultiSwitch)
 NETLIB_UPDATE_PARAM(nicMultiSwitch)
 {
 	m_position = m_POS.ValueInt();
-	update();
+	//update();
 }
 
 NETLIB_START(nicMixer8)
@@ -422,6 +422,10 @@ NETLIB_START(nic7450)
 
 NETLIB_UPDATE(nic7450)
 {
+	m_I0.activate();
+	m_I1.activate();
+	m_I2.activate();
+	m_I3.activate();
 	UINT8 t1 = INPLOGIC(m_I0) & INPLOGIC(m_I1);
 	UINT8 t2 = INPLOGIC(m_I2) & INPLOGIC(m_I3);
 #if 0
@@ -431,12 +435,8 @@ NETLIB_UPDATE(nic7450)
 	const netlist_time times[2] = { NLTIME_FROM_NS(22), NLTIME_FROM_NS(15) };
 
 	UINT8 res = 0;
-	m_I0.activate();
-	m_I1.activate();
 	if (t1 ^ 1)
 	{
-		m_I2.activate();
-		m_I3.activate();
 		if (t2 ^ 1)
 		{
 			res = 1;
@@ -447,8 +447,6 @@ NETLIB_UPDATE(nic7450)
 			m_I1.inactivate();
 		}
 	} else {
-		m_I2.activate();
-		m_I3.activate();
 		if (t2 ^ 1)
 		{
 			m_I2.inactivate();
@@ -1004,7 +1002,7 @@ static const net_device_t_base_factory *netregistry[] =
 	NULL
 };
 
-net_device_t *net_create_device_by_classname(const char *classname, netlist_setup_t &setup, const char *icname)
+net_device_t *net_create_device_by_classname(const astring &classname, netlist_setup_t &setup, const astring &icname)
 {
 	const net_device_t_base_factory **p = &netregistry[0];
 	while (p != NULL)
@@ -1012,16 +1010,16 @@ net_device_t *net_create_device_by_classname(const char *classname, netlist_setu
 		if (strcmp((*p)->classname(), classname) == 0)
 		{
 			net_device_t *ret = (*p)->Create();
-			ret->setup(setup, icname);
+			ret->init(setup, icname);
 			return ret;
 		}
 		p++;
 	}
-	fatalerror("Class %s required for IC %s not found!\n", classname, icname);
+	fatalerror("Class %s required for IC %s not found!\n", classname.cstr(), icname.cstr());
 	return NULL; // appease code analysis
 }
 
-net_device_t *net_create_device_by_name(const char *name, netlist_setup_t &setup, const char *icname)
+net_device_t *net_create_device_by_name(const astring &name, netlist_setup_t &setup, const astring &icname)
 {
 	const net_device_t_base_factory **p = &netregistry[0];
 	while (p != NULL)
@@ -1029,11 +1027,11 @@ net_device_t *net_create_device_by_name(const char *name, netlist_setup_t &setup
 		if (strcmp((*p)->name(), name) == 0)
 		{
 			net_device_t *ret = (*p)->Create();
-			ret->setup(setup, icname);
+			ret->init(setup, icname);
 			return ret;
 		}
 		p++;
 	}
-	fatalerror("Class %s required for IC %s not found!\n", name, icname);
+	fatalerror("Class %s required for IC %s not found!\n", name.cstr(), icname.cstr());
 	return NULL; // appease code analysis
 }

@@ -56,10 +56,9 @@
 #define FATAL_ERROR_AFTER_NS	 (0) //(1000)
 
 #if (VERBOSE)
-
-#define VERBOSE_OUT(x)      printf x
+	#define VERBOSE_OUT(x)      printf x
 #else
-#define VERBOSE_OUT(x)
+	#define VERBOSE_OUT(x)
 #endif
 
 //============================================================
@@ -95,16 +94,16 @@ public:
 		m_p = buf;
 		while (*m_p)
 		{
-			char *n;
+			astring n;
 			skipws();
 			if (!*m_p) break;
 			n = getname('(');
-			VERBOSE_OUT(("Parser: Device: %s\n", n));
-			if (strcmp(n,"NET_ALIAS") == 0)
+			VERBOSE_OUT(("Parser: Device: %s\n", n.cstr()));
+			if (n == "NET_ALIAS")
 				net_alias();
-			else if (strcmp(n,"NETDEV_PARAM") == 0)
+			else if (n == "NETDEV_PARAM")
 				netdev_param();
-			else if ((strcmp(n,"NETDEV_TTL_CONST") == 0) || (strcmp(n,"NETDEV_ANALOG_CONST") == 0))
+			else if ((n == "NETDEV_TTL_CONST") || (n == "NETDEV_ANALOG_CONST"))
 				netdev_const(n);
 			else
 				netdev_device(n);
@@ -113,52 +112,52 @@ public:
 
 	void net_alias()
 	{
-		char *alias;
-		char *out;
+		astring alias;
+		astring out;
 		skipws();
 		alias = getname(',');
 		skipws();
 		out = getname(')');
-		VERBOSE_OUT(("Parser: Alias: %s %s\n", alias, out));
+		VERBOSE_OUT(("Parser: Alias: %s %s\n", alias.cstr(), out.cstr()));
 		m_setup.register_alias(alias, out);
 	}
 
 	void netdev_param()
 	{
-		char *param;
+		astring param;
 		double val;
 		skipws();
 		param = getname(',');
 		skipws();
 		val = eval_param();
-		VERBOSE_OUT(("Parser: Param: %s %f\n", param, val));
+		VERBOSE_OUT(("Parser: Param: %s %f\n", param.cstr(), val));
 		m_setup.find_param(param).initial(val);
 		check_char(')');
 	}
 
-	void netdev_const(const char *dev_name)
+	void netdev_const(const astring &dev_name)
 	{
-		char *devname;
+		astring name;
 		net_device_t *dev;
-		char paramfq[300];
+		astring paramfq;
 		double val;
 
 		skipws();
-		devname = getname(',');
-		dev = net_create_device_by_name(dev_name, m_setup, devname);
+		name = getname(',');
+		dev = net_create_device_by_name(dev_name, m_setup, name);
 		m_setup.register_dev(dev);
 		skipws();
 		val = eval_param();
 		check_char(')');
-		strcpy(paramfq, devname);
-		strcat(paramfq, ".CONST");
-		VERBOSE_OUT(("Parser: Const: %s %f\n", devname, val));
+		paramfq = name;
+		paramfq.cat(".CONST");
+		VERBOSE_OUT(("Parser: Const: %s %f\n", name.cstr(), val));
 		m_setup.find_param(paramfq).initial(val);
 	}
 
-	void netdev_device(const char *dev_type)
+	void netdev_device(const astring &dev_type)
 	{
-		char *devname;
+		astring devname;
 		net_device_t *dev;
 		int cnt;
 
@@ -167,33 +166,28 @@ public:
 		dev = net_create_device_by_name(dev_type, m_setup, devname);
 		m_setup.register_dev(dev);
 		skipws();
-		VERBOSE_OUT(("Parser: IC: %s\n", devname));
+		VERBOSE_OUT(("Parser: IC: %s\n", devname.cstr()));
 		cnt = 0;
 		while (*m_p != ')')
 		{
 			m_p++;
 			skipws();
-			char *output_name = getname2(',', ')');
-			VERBOSE_OUT(("Parser: ID: %s %s\n", output_name, dev->m_inputs.item(cnt)));
-			m_setup.register_link(dev->m_inputs.item(cnt), output_name);
+			astring output_name = getname2(',', ')');
+			VERBOSE_OUT(("Parser: ID: %s %s\n", output_name.cstr(), dev->m_inputs.item(cnt)->cstr()));
+			m_setup.register_link(*dev->m_inputs.item(cnt), output_name);
 			skipws();
 			cnt++;
 		}
 		if (cnt != dev->m_inputs.count() && !dev->variable_input_count())
-			fatalerror("netlist: input count mismatch for %s - expected %d found %d\n", devname, dev->m_inputs.count(), cnt);
+			fatalerror("netlist: input count mismatch for %s - expected %d found %d\n", devname.cstr(), dev->m_inputs.count(), cnt);
 		if (dev->variable_input_count())
 		{
-			VERBOSE_OUT(("variable inputs %s: %d\n", dev->name(), cnt));
+			VERBOSE_OUT(("variable inputs %s: %d\n", dev->name().cstr(), cnt));
 		}
 		check_char(')');
 	}
 
 private:
-
-	char *cdup(const char *s)
-	{
-		return core_strdup(s);
-	}
 
 	void skipeol()
 	{
@@ -232,7 +226,7 @@ private:
 		}
 	}
 
-	char *getname(char sep)
+	astring getname(char sep)
 	{
 		char buf[300];
 		char *p1 = buf;
@@ -241,10 +235,10 @@ private:
 			*p1++ = *m_p++;
 		*p1 = 0;
 		m_p++;
-		return cdup(buf);
+		return astring(buf);
 	}
 
-	char *getname2(char sep1, char sep2)
+	astring getname2(char sep1, char sep2)
 	{
 		char buf[300];
 		char *p1 = buf;
@@ -252,7 +246,7 @@ private:
 		while ((*m_p != sep1) && (*m_p != sep2))
 			*p1++ = *m_p++;
 		*p1 = 0;
-		return cdup(buf);
+		return astring(buf);
 	}
 
 	void check_char(char ctocheck)
@@ -342,6 +336,8 @@ public:
 		m_I.m_low_thresh_V = in_proxied.m_low_thresh_V;
 	}
 
+	virtual ~netdev_a_to_d_proxy() {}
+
 	analog_input_t m_I;
 	ttl_output_t m_Q;
 
@@ -378,6 +374,8 @@ public:
 		m_low_V = out_proxied.m_low_V;
 		m_high_V = out_proxied.m_high_V;
 	}
+
+	virtual ~netdev_d_to_a_proxy() {}
 
 	ttl_input_t m_I;
 	analog_output_t m_Q;
@@ -448,7 +446,7 @@ NETLIB_UPDATE(netdev_analog_callback)
 
 netlist_base_t::netlist_base_t()
 	: m_mainclock(NULL),
-	  m_time_ps(NLTIME_FROM_MS(0)),
+	  m_time_ps(netlist_time::zero),
 	  m_rem(0),
 	  m_div(NETLIST_DIV)
 {
@@ -457,6 +455,21 @@ netlist_base_t::netlist_base_t()
 netlist_base_t::~netlist_base_t()
 {
 }
+
+ATTR_COLD void netlist_base_t::set_mainclock_dev(netdev_mainclock *dev)
+{
+	m_mainclock = dev;
+}
+
+ATTR_COLD void netlist_base_t::reset()
+{
+	  m_time_ps = netlist_time::zero;
+	  m_rem = 0;
+	  m_queue.clear();
+	  if (m_mainclock != NULL)
+		  m_mainclock->m_Q.set_time(netlist_time::zero);
+}
+
 
 void netlist_base_t::set_clock_freq(UINT64 clockfreq)
 {
@@ -471,7 +484,6 @@ ATTR_HOT ATTR_ALIGN inline void netlist_base_t::update_time(const netlist_time t
 	if (NETLIST_DIV_BITS == 0)
 	{
 		const netlist_time delta = t - m_time_ps;
-
 		m_time_ps = t;
 		atime -= delta.as_raw();
 	} else {
@@ -495,7 +507,7 @@ ATTR_HOT ATTR_ALIGN void netlist_base_t::process_list(INT32 &atime)
 			update_time(e.time(), atime);
 
 			if (FATAL_ERROR_AFTER_NS)
-				printf("%s\n", e.object().netdev()->name());
+				printf("%s\n", e.object().netdev()->name().cstr());
 
 			e.object().update_devs();
 
@@ -573,19 +585,29 @@ netlist_setup_t::netlist_setup_t(netlist_base_t &netlist)
 	NETLIST_NAME(base)(*this);
 }
 
+template <class T>
+static void tagmap_free_entries(T &tm)
+{
+	for (typename T::entry_t *entry = tm.first(); entry != NULL; entry = tm.next(entry))
+	{
+		delete entry->object();
+	}
+	tm.reset();
+}
+
 netlist_setup_t::~netlist_setup_t()
 {
-	for (tagmap_devices_t::entry_t *entry = m_devices.first(); entry != NULL; entry = m_devices.next(entry))
-	{
-		net_device_t *dev = entry->object();
-		global_free(dev);
-	}
+	tagmap_free_entries<tagmap_devices_t>(m_devices);
+	tagmap_free_entries<tagmap_astring_t>(m_links);
+	tagmap_free_entries<tagmap_astring_t>(m_alias);
+	m_params.reset();
+	m_terminals.reset();
 }
 
 net_device_t *netlist_setup_t::register_dev(net_device_t *dev)
 {
 	if (!(m_devices.add(dev->name(), dev, false)==TMERR_NONE))
-		fatalerror("Error adding %s to device list\n", dev->name());
+		fatalerror("Error adding %s to device list\n", dev->name().cstr());
 	return dev;
 }
 
@@ -605,12 +627,12 @@ static void remove_start_with(T &hm, astring &sw)
 	}
 }
 
-void netlist_setup_t::remove_dev(const char *name)
+void netlist_setup_t::remove_dev(const astring &name)
 {
 	net_device_t *dev = m_devices.find(name);
 	astring temp = name;
 	if (dev == NULL)
-		fatalerror("Device %s does not exist\n", name);
+		fatalerror("Device %s does not exist\n", name.cstr());
 
 	temp.cat(".");
 
@@ -621,78 +643,79 @@ void netlist_setup_t::remove_dev(const char *name)
 	m_devices.remove(name);
 }
 
-void netlist_setup_t::register_callback(const char *devname, net_output_delegate delegate)
+void netlist_setup_t::register_callback(const astring &devname, net_output_delegate delegate)
 {
 	netdev_analog_callback *dev = (netdev_analog_callback *) m_devices.find(devname);
 	if (dev == NULL)
-		fatalerror("did not find device %s\n", devname);
+		fatalerror("did not find device %s\n", devname.cstr());
 	dev->register_callback(delegate);
 }
 
-void netlist_setup_t::register_alias(const char *alias, const char *out)
+void netlist_setup_t::register_alias(const astring &alias, const astring &out)
 {
 	if (!(m_alias.add(alias, new astring(out), false)==TMERR_NONE))
-		fatalerror("Error adding alias %s to alias list\n", alias);
+		fatalerror("Error adding alias %s to alias list\n", alias.cstr());
 }
 
-void netlist_setup_t::register_output(net_core_device_t &dev, net_core_device_t &upd_dev, const char *name, net_output_t &out)
+void netlist_setup_t::register_output(net_core_device_t &dev, net_core_device_t &upd_dev, const astring &name, net_output_t &out)
 {
-	VERBOSE_OUT(("out %s\n", name));
+	VERBOSE_OUT(("out %s\n", name.cstr()));
 	astring temp = dev.name();
 	temp.cat(".");
 	temp.cat(name);
 	out.init_terminal(&upd_dev);
 	if (!(m_terminals.add(temp, &out, false)==TMERR_NONE))
-		fatalerror("Error adding output %s to output list\n", name);
+		fatalerror("Error adding output %s to output list\n", name.cstr());
 }
 
-void netlist_setup_t::register_input(net_device_t &dev, net_core_device_t &upd_dev, const char *name, net_input_t &inp, net_input_t::net_input_state type)
+void netlist_setup_t::register_input(net_device_t &dev, net_core_device_t &upd_dev, const astring &name, net_input_t &inp, net_input_t::net_input_state type)
 {
-	VERBOSE_OUT(("input %s\n", name));
+	VERBOSE_OUT(("input %s\n", name.cstr()));
 	astring temp = dev.name();
 	temp.cat(".");
 	temp.cat(name);
 	inp.init_input(&upd_dev, type);
-	dev.m_inputs.add(core_strdup(temp.cstr()));
+	dev.m_inputs.add(temp);
 	if (!(m_terminals.add(temp, &inp, false) == TMERR_NONE))
-		fatalerror("Error adding input %s to input list\n", name);
+		fatalerror("Error adding input %s to input list\n", name.cstr());
 }
 
-void netlist_setup_t::register_link(const char *sin, const char *sout)
+void netlist_setup_t::register_link(const astring &sin, const astring &sout)
 {
-	VERBOSE_OUT(("link %s <== %s\n", sin, sout));
-	if (!(m_links.add(sin, new astring(sout), false)==TMERR_NONE))
-		fatalerror("Error adding link %s<==%s to link list\n", sin, sout);
+	const astring *temp = new astring(sout);
+	VERBOSE_OUT(("link %s <== %s\n", sin.cstr(), sout.cstr()));
+	if (!(m_links.add(sin, temp, false)==TMERR_NONE))
+		fatalerror("Error adding link %s<==%s to link list\n", sin.cstr(), sout.cstr());
 }
 
 
-void netlist_setup_t::register_param(const char *sname, net_param_t *param)
+void netlist_setup_t::register_param(const astring &name, net_param_t *param)
 {
 	astring temp = param->netdev().name();
 	temp.cat(".");
-	temp.cat(sname);
+	temp.cat(name);
 	if (!(m_params.add(temp, param, false)==TMERR_NONE))
-		fatalerror("Error adding parameter %s to parameter list\n", sname);
+		fatalerror("Error adding parameter %s to parameter list\n", name.cstr());
 }
 
 
-const char *netlist_setup_t::resolve_alias(const char *name) const
+const astring &netlist_setup_t::resolve_alias(const astring &name) const
 {
 	const astring *ret = m_alias.find(name);
 	if (ret != NULL)
-		return ret->cstr();
+		return *ret;
 	return name;
 }
 
-net_output_t *netlist_setup_t::find_output_exact(const char *outname_in)
+net_output_t *netlist_setup_t::find_output_exact(const astring &outname_in)
 {
 	net_terminal_t *term = m_terminals.find(outname_in);
 	return dynamic_cast<net_output_t *>(term);
 }
 
-net_output_t &netlist_setup_t::find_output(const char *outname_in)
+net_output_t &netlist_setup_t::find_output(const astring &outname_in)
 {
-	const char *outname = resolve_alias(outname_in);
+	const astring &outname = resolve_alias(outname_in);
 	net_output_t *ret;
 
 	ret = find_output_exact(outname);
@@ -705,26 +728,27 @@ net_output_t &netlist_setup_t::find_output(const char *outname_in)
 		ret = find_output_exact(s);
 	}
 	if (ret == NULL)
-		fatalerror("output %s(%s) not found!\n", outname_in, outname);
-	VERBOSE_OUT(("Found input %s\n", outname));
+		fatalerror("output %s(%s) not found!\n", outname_in.cstr(), outname.cstr());
+	VERBOSE_OUT(("Found input %s\n", outname.cstr()));
 	return *ret;
 }
 
-net_param_t &netlist_setup_t::find_param(const char *param_in)
+net_param_t &netlist_setup_t::find_param(const astring &param_in)
 {
-	const char *outname = resolve_alias(param_in);
+	const astring &outname = resolve_alias(param_in);
 	net_param_t *ret;
 
 	ret = m_params.find(outname);
 	if (ret == NULL)
-		fatalerror("parameter %s(%s) not found!\n", param_in, outname);
-	VERBOSE_OUT(("Found parameter %s\n", outname));
+		fatalerror("parameter %s(%s) not found!\n", param_in.cstr(), outname.cstr());
+	VERBOSE_OUT(("Found parameter %s\n", outname.cstr()));
 	return *ret;
 }
 
 void netlist_setup_t::resolve_inputs(void)
 {
 	VERBOSE_OUT(("Resolving ...\n"));
+	int proxy_cnt = 0;
 	for (tagmap_astring_t::entry_t *entry = m_links.first(); entry != NULL; entry = m_links.next(entry))
 	{
 		const astring *sout = entry->object();
@@ -739,8 +763,12 @@ void netlist_setup_t::resolve_inputs(void)
 				&& in->object_type(net_output_t::SIGNAL_MASK) == net_output_t::SIGNAL_DIGITAL)
 		{
 			netdev_a_to_d_proxy *proxy = new netdev_a_to_d_proxy(*in);
+			astring x = "";
+			x.printf("proxy_ad_%d", proxy_cnt++);
 
-			proxy->setup(*this, "abc");
+			proxy->init(*this, x.cstr());
+			register_dev(proxy);
+
 			in->set_output(proxy->m_Q);
 			proxy->m_Q.register_con(*in);
 			proxy->m_I.set_output(out);
@@ -752,8 +780,11 @@ void netlist_setup_t::resolve_inputs(void)
 		{
 			//printf("here 1\n");
 			netdev_d_to_a_proxy *proxy = new netdev_d_to_a_proxy(out);
+			astring x = "";
+			x.printf("proxy_da_%d", proxy_cnt++);
+			proxy->init(*this, x.cstr());
+			register_dev(proxy);
 
-			proxy->setup(*this, "abc");
 			in->set_output(proxy->m_Q);
 			proxy->m_Q.register_con(*in);
 			proxy->m_I.set_output(out);
@@ -767,12 +798,6 @@ void netlist_setup_t::resolve_inputs(void)
 		}
 	}
 
-	/* make sure params are set now .. */
-	for (tagmap_param_t::entry_t *entry = m_params.first(); entry != NULL; entry = m_params.next(entry))
-	{
-		entry->object()->netdev().update_param();
-	}
-
 	/* find the main clock ... */
 	for (tagmap_devices_t::entry_t *entry = m_devices.first(); entry != NULL; entry = m_devices.next(entry))
 	{
@@ -784,11 +809,6 @@ void netlist_setup_t::resolve_inputs(void)
 	}
 
 #if 1
-	for (tagmap_devices_t::entry_t *entry = m_devices.first(); entry != NULL; entry = m_devices.next(entry))
-	{
-		net_device_t *dev = entry->object();
-		dev->update_dev();
-	}
 
 #else
 	/* make sure all outputs are triggered once */
@@ -809,12 +829,28 @@ void netlist_setup_t::resolve_inputs(void)
 	for (tagmap_terminal_t::entry_t *entry = m_terminals.first(); entry != NULL; entry = m_terminals.next(entry))
 	{
 		ATTR_UNUSED net_output_t *out = dynamic_cast<net_output_t *>(entry->object());
-		if (out != NULL)
-			VERBOSE_OUT(("%s %d\n", out->netdev()->name(), *out->Q_ptr()));
+		//if (out != NULL)
+			//VERBOSE_OUT(("%s %d\n", out->netdev()->name(), *out->Q_ptr()));
 	}
 
 
 }
+
+void netlist_setup_t::step_devices_once(void)
+{
+	/* make sure params are set now .. */
+	for (tagmap_param_t::entry_t *entry = m_params.first(); entry != NULL; entry = m_params.next(entry))
+	{
+		entry->object()->netdev().update_param();
+	}
+
+	for (tagmap_devices_t::entry_t *entry = m_devices.first(); entry != NULL; entry = m_devices.next(entry))
+	{
+		net_device_t *dev = entry->object();
+		dev->update_dev();
+	}
+}
+
 
 void netlist_setup_t::parse(char *buf)
 {
@@ -829,7 +865,7 @@ void netlist_setup_t::print_stats()
 		for (netlist_setup_t::tagmap_devices_t::entry_t *entry = m_devices.first(); entry != NULL; entry = m_devices.next(entry))
 		{
 			//entry->object()->s
-			printf("Device %20s : %12d %15ld\n", entry->object()->name(), entry->object()->stat_count, (long int) entry->object()->total_time / (entry->object()->stat_count + 1));
+			printf("Device %20s : %12d %15ld\n", entry->object()->name().cstr(), entry->object()->stat_count, (long int) entry->object()->total_time / (entry->object()->stat_count + 1));
 		}
 		printf("Queue Start %15d\n", m_netlist.m_queue.m_prof_start);
 		printf("Queue End   %15d\n", m_netlist.m_queue.m_prof_end);
@@ -848,7 +884,7 @@ net_core_device_t::net_core_device_t()
 {
 }
 
-ATTR_COLD void net_core_device_t::setup(netlist_setup_t &setup, const char *name)
+ATTR_COLD void net_core_device_t::init(netlist_setup_t &setup, const astring &name)
 {
 	m_netlist = &setup.netlist();
 	m_name = name;
@@ -865,9 +901,9 @@ ATTR_COLD void net_core_device_t::setup(netlist_setup_t &setup, const char *name
 
 }
 
-ATTR_COLD void net_device_t::setup(netlist_setup_t &setup, const char *name)
+ATTR_COLD void net_device_t::init(netlist_setup_t &setup, const astring &name)
 {
-	net_core_device_t::setup(setup, name);
+	net_core_device_t::init(setup, name);
 	m_setup = &setup;
 	start();
 }
@@ -883,50 +919,51 @@ net_core_device_t::~net_core_device_t()
 
 ATTR_HOT ATTR_ALIGN const net_sig_t net_core_device_t::INPLOGIC_PASSIVE(logic_input_t &inp)
 {
-	net_sig_t ret;
 	if (inp.state() == net_input_t::INP_STATE_PASSIVE)
 	{
 		inp.activate();
-		ret = inp.Q();
+		const net_sig_t ret = inp.Q();
 		inp.inactivate();
+		return ret;
 	}
 	else
-		ret = inp.Q();
+		return inp.Q();
 
-	return ret;
 }
 
 net_device_t::net_device_t()
 	: net_core_device_t(),
+	  m_setup(NULL),
 	  m_variable_input_count(false)
 {
 }
 
 net_device_t::~net_device_t()
 {
+	//printf("~net_device_t\n");
 }
 
-ATTR_COLD void net_device_t::register_sub(net_core_device_t &dev, const char *name)
+ATTR_COLD void net_device_t::register_sub(net_core_device_t &dev, const astring &name)
 {
-	dev.setup(*m_setup, name);
+	dev.init(*m_setup, name);
 }
 
-void net_device_t::register_output(net_core_device_t &dev, const char *name, net_output_t &port)
+void net_device_t::register_output(net_core_device_t &dev, const astring &name, net_output_t &port)
 {
 	m_setup->register_output(*this, dev, name, port);
 }
 
-void net_device_t::register_output(const char *name, net_output_t &port)
+void net_device_t::register_output(const astring &name, net_output_t &port)
 {
 	m_setup->register_output(*this,*this,name, port);
 }
 
-void net_device_t::register_input(net_core_device_t &dev, const char *name, net_input_t &inp, net_input_t::net_input_state type)
+void net_device_t::register_input(net_core_device_t &dev, const astring &name, net_input_t &inp, net_input_t::net_input_state type)
 {
 	m_setup->register_input(*this, dev, name, inp, type);
 }
 
-void net_device_t::register_input(const char *name, net_input_t &inp, net_input_t::net_input_state type)
+void net_device_t::register_input(const astring &name, net_input_t &inp, net_input_t::net_input_state type)
 {
 	register_input(*this, name, inp, type);
 }
@@ -944,14 +981,14 @@ void net_device_t::register_link_internal(net_input_t &in, net_output_t &out, ne
 	register_link_internal(*this, in, out, aState);
 }
 
-void net_device_t::register_param(net_core_device_t &dev, const char *name, net_param_t &param, double initialVal)
+void net_device_t::register_param(net_core_device_t &dev, const astring &name, net_param_t &param, double initialVal)
 {
 	param.set_netdev(dev);
 	param.initial(initialVal);
 	m_setup->register_param(name, &param);
 }
 
-void net_device_t::register_param(const char *name, net_param_t &param, double initialVal)
+void net_device_t::register_param(const astring &name, net_param_t &param, double initialVal)
 {
 	register_param(*this,name, param, initialVal);
 }
@@ -982,15 +1019,18 @@ ATTR_COLD void net_input_t::init_input(net_core_device_t *dev, net_input_state a
 
 net_output_t::net_output_t(int atype)
 	: net_terminal_t(atype)
+	, m_low_V(0.0)
+	, m_high_V(0.0)
+	, m_last_Q(0)
+	, m_Q(0)
+	, m_new_Q(0)
+	, m_Q_analog(0.0)
+	, m_new_Q_analog(0.0)
+	, m_num_cons(0)
+	, m_time(netlist_time::zero)
+	, m_active(0)
+	, m_in_queue(2)
 {
-	m_last_Q = 0;
-	m_Q = 0;
-	m_new_Q = m_Q;
-	m_active = 0;
-	m_in_queue = 2;
-	m_num_cons = 0;
-	m_Q_analog = 0.0;
-	m_new_Q_analog = 0.0;
 	//m_cons = global_alloc_array(net_input_t *, OUTPUT_MAX_CONNECTIONS);
 }
 
@@ -1040,7 +1080,7 @@ ATTR_COLD void net_output_t::register_con(net_input_t &input)
 {
 	int i;
 	if (m_num_cons >= OUTPUT_MAX_CONNECTIONS)
-		fatalerror("Connections exceeded for %s\n", netdev()->name());
+		fatalerror("Connections exceeded for %s\n", netdev()->name().cstr());
 
 	/* keep similar devices together */
 	for (i = 0; i < m_num_cons; i++)
@@ -1106,6 +1146,8 @@ void netlist_mame_device::device_start()
 
 void netlist_mame_device::device_reset()
 {
+	m_netlist->reset();
+	m_setup->step_devices_once();
 }
 
 void netlist_mame_device::device_stop()

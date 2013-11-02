@@ -51,18 +51,18 @@
 #include "emu.h"
 #include "tagmap.h"
 
+
 //============================================================
 //  SETUP
 //============================================================
 
-#define USE_DELEGATES			(0)
-
+#define USE_DELEGATES			(1)
 /*
  * The next options needs -Wno-pmf-conversions to compile and gcc
  * This is intended for non-mame usage.
  *
  */
-#define USE_PMFDELEGATES		(0)
+#define USE_PMFDELEGATES		(1)
 
 // Next if enabled adds 20% performance ... but is not guaranteed to be absolutely timing correct.
 #define USE_DEACTIVE_DEVICE		(0)
@@ -70,10 +70,10 @@
 #define OUTPUT_MAX_CONNECTIONS	(48)
 
 // Use nano-second resolution - Sufficient for now
-//#define NETLIST_INTERNAL_RES		(U64(1000000000))
-//#define NETLIST_DIV_BITS			(0)
-#define NETLIST_INTERNAL_RES		(U64(1000000000000))
-#define NETLIST_DIV_BITS			(10)
+#define NETLIST_INTERNAL_RES		(U64(1000000000))
+#define NETLIST_DIV_BITS			(0)
+//#define NETLIST_INTERNAL_RES		(U64(1000000000000))
+//#define NETLIST_DIV_BITS			(10)
 #define NETLIST_DIV					(U64(1) << NETLIST_DIV_BITS)
 #define NETLIST_MASK				(NETLIST_DIV-1)
 #define NETLIST_CLOCK              	(NETLIST_INTERNAL_RES / NETLIST_DIV)
@@ -231,7 +231,7 @@ public:
 
 	friend inline const netlist_time operator-(const netlist_time &left, const netlist_time &right);
 	friend inline const netlist_time operator+(const netlist_time &left, const netlist_time &right);
-	friend inline const netlist_time operator*(const netlist_time &left, const UINT64 factor);
+	friend inline const netlist_time operator*(const netlist_time &left, const UINT32 factor);
 	friend inline bool operator>(const netlist_time &left, const netlist_time &right);
 	friend inline bool operator<(const netlist_time &left, const netlist_time &right);
 	friend inline bool operator>=(const netlist_time &left, const netlist_time &right);
@@ -262,7 +262,7 @@ ATTR_HOT inline const netlist_time operator-(const netlist_time &left, const net
 	return netlist_time::from_raw(left.m_time - right.m_time);
 }
 
-ATTR_HOT inline const netlist_time operator*(const netlist_time &left, const UINT64 factor)
+ATTR_HOT inline const netlist_time operator*(const netlist_time &left, const UINT32 factor)
 {
 	return netlist_time::from_raw(left.m_time * factor);
 }
@@ -312,16 +312,16 @@ public:
 
 		*(++m_ptr) = elem;
 	}
-	ATTR_HOT inline _ListClass *first() const { return m_list; }
-	ATTR_HOT inline _ListClass *last() const  { return m_ptr; }
-	ATTR_HOT inline _ListClass item(int i) const { return m_list[i]; }
+	ATTR_HOT inline _ListClass *first() { return &m_list[0]; }
+	ATTR_HOT inline _ListClass *last()  { return m_ptr; }
+	ATTR_HOT inline _ListClass *item(int i) { return &m_list[i]; }
 	inline int count() const { return m_ptr - m_list + 1; }
-	ATTR_HOT inline bool empty() const { return (m_ptr < m_list); }
+	ATTR_HOT inline bool empty() { return (m_ptr < m_list); }
 	ATTR_HOT inline void clear() { m_ptr = m_list - 1; }
 private:
 	_ListClass * m_ptr;
+	_ListClass * m_list;
 	//_ListClass m_list[_NumElements];
-	_ListClass *m_list;
 };
 
 // ----------------------------------------------------------------------------------------
@@ -351,7 +351,8 @@ public:
 	struct entry_t
 	{
 	public:
-		inline entry_t() {}
+		inline entry_t()
+		: m_time(netlist_time::zero), m_object(NULL) {}
 		inline entry_t(const netlist_time atime, element_t &elem) : m_time(atime), m_object(&elem) {}
 		ATTR_HOT inline const netlist_time &time() const { return m_time; }
 		ATTR_HOT inline element_t & object() const { return *m_object; }
@@ -362,6 +363,7 @@ public:
 
 	netlist_timed_queue()
 	{
+		//m_list = global_alloc_array(entry_t, SIZE);
 		clear();
 	}
 
@@ -372,13 +374,12 @@ public:
 	{
 		if (is_empty() || (e.time() <= (m_end - 1)->time()))
 		{
-			*m_end = e;
-			m_end++;
+			*m_end++ = e;
 			//inc_stat(m_prof_end);
 		}
 		else
 		{
-			entry_t *i = m_end++;
+			entry_t * RESTRICT i = m_end++;
 			while ((i>&m_list[0]) && (e.time() > (i-1)->time()) )
 			{
 				i--;
@@ -388,12 +389,12 @@ public:
 			*i = e;
 			//inc_stat(m_prof_sort);
 		}
+		assert(m_end - m_list < SIZE);
 	}
 
 	ATTR_HOT inline const entry_t pop()
 	{
-		m_end--;
-		return *m_end;
+		return *--m_end;
 	}
 
 	ATTR_HOT inline const entry_t peek() const
@@ -413,7 +414,8 @@ public:
 	INT32   m_prof_sort;
 private:
 
-	entry_t *m_end;
+	entry_t * RESTRICT m_end;
+	//entry_t *m_list;
 	entry_t m_list[SIZE + 1];
 
 };
@@ -459,7 +461,11 @@ class net_terminal_t : public net_object_t
 {
 public:
 
-	net_terminal_t(const int atype) : net_object_t(atype) {}
+	net_terminal_t(const int atype)
+	: net_object_t(atype)
+	, m_netdev(NULL)
+	, m_netlist(NULL)
+	{}
 
 	ATTR_COLD void init_terminal(net_core_device_t *dev);
 	ATTR_HOT inline net_core_device_t * RESTRICT netdev() const { return m_netdev; }
@@ -488,7 +494,10 @@ public:
 
 	ATTR_COLD net_input_t(const int atype)
 		: net_terminal_t(atype)
+		, m_low_thresh_V(0)
+		, m_high_thresh_V(0)
 		, m_state(INP_STATE_ACTIVE)
+		, m_output(NULL)
 	{}
 
 	ATTR_COLD void init_input(net_core_device_t *dev, net_input_state astate = INP_STATE_ACTIVE);
@@ -620,7 +629,7 @@ private:
 
 	UINT32 m_in_queue;    /* 0: not in queue, 1: in queue, 2: last was taken */
 
-	net_input_t *m_cons[OUTPUT_MAX_CONNECTIONS];
+	net_input_t *  RESTRICT m_cons[OUTPUT_MAX_CONNECTIONS];
 };
 
 
@@ -697,9 +706,9 @@ public:
 
 	virtual ~net_core_device_t();
 
-	ATTR_COLD virtual void setup(netlist_setup_t &setup, const char *name);
+	ATTR_COLD virtual void init(netlist_setup_t &setup, const astring &name);
 
-	ATTR_COLD const char *name() const { return m_name; }
+	ATTR_COLD const astring &name() const { return m_name; }
 
 	ATTR_HOT virtual void update_param() {}
 
@@ -765,11 +774,11 @@ protected:
 	ATTR_HOT virtual void update() { }
 	ATTR_HOT virtual void start() { }
 
-	netlist_base_t *m_netlist;
+	netlist_base_t *  RESTRICT m_netlist;
 
 private:
 
-	const char *m_name;
+	astring m_name;
 };
 
 
@@ -781,32 +790,32 @@ public:
 
 	virtual ~net_device_t();
 
-	ATTR_COLD void setup(netlist_setup_t &setup, const char *name);
+	ATTR_COLD virtual void init(netlist_setup_t &setup, const astring &name);
 
 	ATTR_COLD const netlist_setup_t *setup() const { return m_setup; }
 
 	ATTR_COLD bool variable_input_count() { return m_variable_input_count; }
 
-	ATTR_COLD void register_sub(net_core_device_t &dev, const char *name);
+	ATTR_COLD void register_sub(net_core_device_t &dev, const astring &name);
 
-	ATTR_COLD void register_output(const char *name, net_output_t &out);
-	ATTR_COLD void register_output(net_core_device_t &dev, const char *name, net_output_t &out);
+	ATTR_COLD void register_output(const astring &name, net_output_t &out);
+	ATTR_COLD void register_output(net_core_device_t &dev, const astring &name, net_output_t &out);
 
-	ATTR_COLD void register_input(const char *name, net_input_t &in, net_input_t::net_input_state state = net_input_t::INP_STATE_ACTIVE);
-	ATTR_COLD void register_input(net_core_device_t &dev, const char *name, net_input_t &in, net_input_t::net_input_state state = net_input_t::INP_STATE_ACTIVE);
+	ATTR_COLD void register_input(const astring &name, net_input_t &in, net_input_t::net_input_state state = net_input_t::INP_STATE_ACTIVE);
+	ATTR_COLD void register_input(net_core_device_t &dev, const astring &name, net_input_t &in, net_input_t::net_input_state state = net_input_t::INP_STATE_ACTIVE);
 
 	ATTR_COLD void register_link_internal(net_input_t &in, net_output_t &out, net_input_t::net_input_state aState);
 	ATTR_COLD void register_link_internal(net_core_device_t &dev, net_input_t &in, net_output_t &out, net_input_t::net_input_state aState);
 
-	net_list_t<const char *, 20> m_inputs;
+	net_list_t<astring, 20> m_inputs;
 
 protected:
 
 	virtual void update() { }
 	ATTR_HOT virtual void start() { }
 
-	ATTR_COLD void register_param(const char *sname, net_param_t &param, const double initialVal = 0.0);
-	ATTR_COLD void register_param(net_core_device_t &dev, const char *sname, net_param_t &param, const double initialVal = 0.0);
+	ATTR_COLD void register_param(const astring &sname, net_param_t &param, const double initialVal = 0.0);
+	ATTR_COLD void register_param(net_core_device_t &dev, const astring &sname, net_param_t &param, const double initialVal = 0.0);
 
 	netlist_setup_t *m_setup;
 	bool m_variable_input_count;
@@ -817,7 +826,10 @@ private:
 class net_param_t
 {
 public:
-	net_param_t() { m_param = 0.0; }
+	net_param_t()
+	: m_param(0.0)
+	, m_netdev(NULL)
+	{  }
 
 	inline void setTo(const double param) { m_param = param; m_netdev->update_param(); }
 	inline void setTo(const int param) { m_param = param; m_netdev->update_param(); }
@@ -887,7 +899,7 @@ public:
 };
 
 
-template <int _numdev, UINT8 _check, UINT8 _invert>
+template <int _numdev, int _check, int _invert>
 class net_signal_t : public net_device_t
 {
 public:
@@ -958,7 +970,7 @@ public:
 };
 
 #if 1
-template <UINT8 _check, UINT8 _invert>
+template <int _check, int _invert>
 class xx_net_signal_t: public net_device_t
 {
 public:
@@ -1003,11 +1015,11 @@ public:
 	{
 		const netlist_time times[2] = { NLTIME_FROM_NS(22), NLTIME_FROM_NS(15) };
 
-		UINT8 res = _invert ^ 1 ^_check;
+		int res = _invert ^ 1 ^_check;
 		m_i[0].activate();
+		m_i[1].activate();
 		if (INPLOGIC(m_i[0]) ^ _check)
 		{
-			m_i[1].activate();
 			if (INPLOGIC(m_i[1]) ^ _check)
 			{
 				res = _invert ^ _check;
@@ -1015,11 +1027,10 @@ public:
 			else
 				m_i[0].inactivate();
 		} else {
-			m_i[1].activate();
 			if (INPLOGIC(m_i[1]) ^ _check)
 				m_i[1].inactivate();
 		}
-		OUTLOGIC(m_Q, res, times[1 - res]);// ? 22000 : 15000);
+		OUTLOGIC(m_Q, res, times[(res & 1) ^ 1]);// ? 22000 : 15000);
 	}
 
 public:
@@ -1029,7 +1040,7 @@ public:
 
 };
 
-template <UINT8 _check, UINT8 _invert>
+template <int _check, int _invert>
 class net_signal_t<2, _check, _invert> : public xx_net_signal_t<_check, _invert>
 {
 public:
@@ -1039,13 +1050,23 @@ public:
 
 // The following did not improve performance
 #if 0
+
 template <UINT8 _check, UINT8 _invert>
-class net_signal_t<3, _check, _invert> : public net_signal_base_t<3>
+class net_signal_t<3, _check, _invert> : public net_device_t
 {
 public:
-	net_signal_t(netlist_setup_t &setup, const char *name)
-	: net_signal_base_t<3>(setup, name)
+	net_signal_t() : net_device_t(), m_active(1) { }
+
+	ATTR_COLD void start()
 	{
+		const char *sIN[3] = { "I1", "I2", "I3" };
+
+		register_output("Q", m_Q);
+		for (int i=0; i < 3; i++)
+		{
+			register_input(sIN[i], m_i[i], net_input_t::INP_STATE_ACTIVE);
+		}
+		m_Q.initial(1);
 	}
 
 	ATTR_HOT ATTR_ALIGN void update()
@@ -1080,10 +1101,15 @@ public:
 			if (INPLOGIC(m_i[1]) ^ _check)
 				m_i[1].inactivate();
 		}
-		m_Q.setTo(res, times[1 - res]);// ? 22000 : 15000);
+		OUTLOGIC(m_Q, res, times[1 - res]);// ? 22000 : 15000);
 	}
+public:
+	ttl_input_t m_i[3];
+	ttl_output_t m_Q;
+	INT8 m_active;
 
 };
+
 #endif
 #endif
 
@@ -1096,12 +1122,9 @@ class netlist_setup_t
 public:
 
 	typedef tagmap_t<net_device_t *, 393> tagmap_devices_t;
-	typedef tagmap_t<astring *, 393> tagmap_astring_t;
+	typedef tagmap_t<const astring *, 393> tagmap_astring_t;
 	typedef tagmap_t<net_param_t *, 393> tagmap_param_t;
 	typedef tagmap_t<net_terminal_t *, 393> tagmap_terminal_t;
-
-	//typedef tagmap_t<net_output_t *, 393> tagmap_output_t;
-	//typedef tagmap_t<net_input_t *, 393> tagmap_input_t;
 
 	netlist_setup_t(netlist_base_t &netlist);
 	~netlist_setup_t();
@@ -1109,23 +1132,24 @@ public:
 	netlist_base_t &netlist() { return m_netlist; }
 
 	net_device_t *register_dev(net_device_t *dev);
-	void remove_dev(const char *name);
+	void remove_dev(const astring &name);
 
-	void register_output(net_core_device_t &dev, net_core_device_t &upd_dev, const char *name, net_output_t &out);
-	void register_input(net_device_t &dev, net_core_device_t &upd_dev, const char *name, net_input_t &inp, net_input_t::net_input_state type);
-	void register_alias(const char *alias, const char *out);
-	void register_param(const char *sname, net_param_t *param);
+	void register_output(net_core_device_t &dev, net_core_device_t &upd_dev, const astring &name, net_output_t &out);
+	void register_input(net_device_t &dev, net_core_device_t &upd_dev, const astring &name, net_input_t &inp, net_input_t::net_input_state type);
+	void register_alias(const astring &alias, const astring &out);
+	void register_param(const astring &sname, net_param_t *param);
 
-	void register_link(const char *sin, const char *sout);
+	void register_link(const astring &sin, const astring &sout);
 
-	net_output_t &find_output(const char *outname_in);
-	net_param_t &find_param(const char *param_in);
+	net_output_t &find_output(const astring &outname_in);
+	net_param_t &find_param(const astring &param_in);
 
-	void register_callback(const char *devname, net_output_delegate delegate);
+	void register_callback(const astring &devname, net_output_delegate delegate);
 
 	void parse(char *buf);
 
 	void resolve_inputs(void);
+	void step_devices_once(void);
 
 	/* not ideal, but needed for save_state */
 	tagmap_terminal_t  m_terminals;
@@ -1144,8 +1168,8 @@ private:
 	tagmap_param_t  m_params;
 	tagmap_astring_t  m_links;
 
-	net_output_t *find_output_exact(const char *outname_in);
-	const char *resolve_alias(const char *name) const;
+	net_output_t *find_output_exact(const astring &outname_in);
+	const astring &resolve_alias(const astring &name) const;
 };
 
 class netdev_mainclock;
@@ -1174,7 +1198,9 @@ public:
 
 	ATTR_HOT inline const netlist_time &time() const { return m_time_ps; }
 
-	ATTR_COLD void set_mainclock_dev(netdev_mainclock *dev) { m_mainclock = dev; }
+	ATTR_COLD void set_mainclock_dev(netdev_mainclock *dev);
+
+	ATTR_COLD void reset();
 
 	// FIXME: should'nt be public
 	queue_t m_queue;
@@ -1301,6 +1327,7 @@ ATTR_HOT inline void net_input_t::activate_lh()
 
 ATTR_HOT inline void net_output_t::push_to_queue(const netlist_time &delay)
 {
+	// if (m_in_queue == 1) return; FIXME: check this at some time
 	m_time = netlist()->time() + delay;
 	m_in_queue = (m_active > 0) ? 1 : 0;     /* queued ? */
 	if (m_in_queue)
@@ -1381,28 +1408,28 @@ public:
 	virtual ~net_device_t_base_factory() {}
 	virtual net_device_t *Create() const = 0;
 
-	const char *name() const { return m_name; }
-	const char *classname() const { return m_classname; }
+	const astring &name() const { return m_name; }
+	const astring &classname() const { return m_classname; }
 protected:
-	const char *m_name;                             /* device name */
-	const char *m_classname;                        /* device class name */
+	astring m_name;                             /* device name */
+	astring m_classname;                        /* device class name */
 };
 
 template <class C>
 class net_device_t_factory : public net_device_t_base_factory
 {
 public:
-	net_device_t_factory(const char *name, const char *classname) { m_name = name; m_classname = classname; }
+	net_device_t_factory(const astring &name, const astring &classname) { m_name = name; m_classname = classname; }
 	net_device_t *Create() const
 	{
-		net_device_t *r = global_alloc_clear(C());
+		net_device_t *r = new C();
 		//r->init(setup, name);
 		return r;
 	}
 };
 
-net_device_t *net_create_device_by_classname(const char *classname, netlist_setup_t &setup, const char *icname);
-net_device_t *net_create_device_by_name(const char *name, netlist_setup_t &setup, const char *icname);
+net_device_t *net_create_device_by_classname(const astring &classname, netlist_setup_t &setup, const astring &icname);
+net_device_t *net_create_device_by_name(const astring &name, netlist_setup_t &setup, const astring &icname);
 
 // ----------------------------------------------------------------------------------------
 // MAME glue classes
