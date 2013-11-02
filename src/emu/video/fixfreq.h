@@ -81,6 +81,7 @@ private:
 	int m_last_x;
 	int m_last_y;
 	attotime m_last_time;
+	attotime m_line_time;
 	attotime m_last_hsync_time;
 	attotime m_last_vsync_time;
 	attotime m_refresh;

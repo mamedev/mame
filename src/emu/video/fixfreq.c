@@ -85,27 +85,44 @@ void fixedfreq_device::device_config_complete()
 
 void fixedfreq_device::device_start()
 {
-	m_cur_bm = 0;
+
+	m_htotal = 0;
+	m_vtotal = 0;
+
 	m_vid = 0.0;
-	m_vint = 0.0;
 	m_last_x = 0;
 	m_last_y = 0;
-	m_refresh = attotime::zero;
-	m_bitmap[0] = NULL;
-	m_bitmap[1] = NULL;
 	m_last_time = attotime::zero;
+	m_line_time = attotime::zero;
 	m_last_hsync_time = attotime::zero;
 	m_last_vsync_time = attotime::zero;
-	//m_vblank_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vga_device::vblank_timer_cb),this));
-	recompute_parameters(false);
+	m_refresh = attotime::zero;
+	m_clock_period = attotime::zero;
+	//bitmap_rgb32 *m_bitmap[2];
+	m_cur_bm = 0;
+
+	/* sync separator */
+	m_vint = 0.0;
+	m_int_trig = 0.0;
+	m_mult = 0.0;
 
 	m_sig_vsync = 0;
 	m_sig_composite = 0;
 	m_sig_field = 0;
+
+	m_bitmap[0] = NULL;
+	m_bitmap[1] = NULL;
+	//m_vblank_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vga_device::vblank_timer_cb),this));
+	recompute_parameters(false);
 }
 
 void fixedfreq_device::device_reset()
 {
+	m_last_time = attotime::zero;
+	m_line_time = attotime::zero;
+	m_last_hsync_time = attotime::zero;
+	m_last_vsync_time = attotime::zero;
+	m_vint = 0;
 }
 
 
@@ -205,10 +222,6 @@ UINT32 fixedfreq_device::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 
 void fixedfreq_device::update_vid(double newval, attotime cur_time)
 {
-
-	static attotime m_last_time = attotime(0,0);
-	static attotime m_line_time = attotime(0,0);
-
 
 	bitmap_rgb32 *bm = m_bitmap[m_cur_bm];
 
