@@ -320,7 +320,7 @@ static void determine_bios_rom(romload_private *romdata, device_t *device,const 
 		if (specbios[0] != 0 && strcmp(specbios, "default") != 0 && romdata != NULL)
 		{
 			romdata->errorstring.catprintf("%s: invalid bios\n", specbios);
-			romdata->warnings++;
+			romdata->errors++;
 		}
 
 		/* set to default */
