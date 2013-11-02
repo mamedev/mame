@@ -341,7 +341,7 @@ DRIVER_INIT_MEMBER(at_state,atvga)
 	init_at_common();
 }
 
-DRIVER_INIT_MEMBER(at_state,at586)
+DRIVER_INIT_MEMBER(at586_state,at586)
 {
 	m_type = TYPE_586;
 	m_at_offset1 = 0xff;

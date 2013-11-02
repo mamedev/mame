@@ -50,6 +50,16 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") { }
 	required_device<cpu_device> m_maincpu;
+	
+	DECLARE_DRIVER_INIT(at586);
+	
+	UINT8 m_at_offset1;
+	
+	enum {
+		TYPE_586
+	};
+
+	int m_type;
 };
 
 class at_state : public driver_device
@@ -156,7 +166,6 @@ public:
 
 	DECLARE_DRIVER_INIT(atcga);
 	DECLARE_DRIVER_INIT(atvga);
-	DECLARE_DRIVER_INIT(at586);
 	DECLARE_MACHINE_START(at);
 	DECLARE_MACHINE_RESET(at);
 	void pc_set_dma_channel(int channel, int state);
@@ -168,7 +177,6 @@ public:
 		TYPE_286,
 		TYPE_386,
 		TYPE_486,
-		TYPE_586
 	};
 
 	int m_type;
