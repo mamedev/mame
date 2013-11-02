@@ -222,6 +222,7 @@ osd_work_queue *osd_work_queue_alloc(int flags)
 	int numprocs = effective_num_processors();
 	osd_work_queue *queue;
 	int threadnum;
+	TCHAR *osdworkqueuemaxthreads = _tgetenv(_T("OSDWORKQUEUEMAXTHREADS"));
 
 	// allocate a new queue
 	queue = (osd_work_queue *)malloc(sizeof(*queue));
@@ -249,6 +250,9 @@ osd_work_queue *osd_work_queue_alloc(int flags)
 	// on an n-CPU system, create n threads for multi queues, and 1 thread for everything else
 	else
 		queue->threads = (flags & WORK_QUEUE_FLAG_MULTI) ? numprocs : 1;
+
+	if (osdworkqueuemaxthreads != NULL && _stscanf(osdworkqueuemaxthreads, _T("%d"), &threadnum) == 1 && queue->threads > threadnum)
+		queue->threads = threadnum;
 
 	// multi-queues with high frequency items should top out at 4 for now
 	// since we have scaling problems above that
