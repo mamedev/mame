@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:smf
 /*
  * PSXCPU disassembler for the MAME project written by smf
  *

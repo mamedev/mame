@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:smf
 #include "sio.h"
 #include "siodev.h"
 

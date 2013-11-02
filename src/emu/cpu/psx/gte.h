@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:smf
 /*
  * PlayStation Geometry Transformation Engine emulator
  *

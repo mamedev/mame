@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:smf
 /*
  * PlayStation Motion Decoder emulator
  *
