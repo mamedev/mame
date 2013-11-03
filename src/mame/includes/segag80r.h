@@ -10,6 +10,9 @@
 #include "sound/sn76496.h"
 #include "audio/segasnd.h"
 
+
+class sega005_sound_device;
+
 class segag80r_state : public driver_device
 {
 public:
@@ -28,7 +31,8 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_samples(*this, "samples"),
 		m_speech(*this, "segaspeech"),
-		m_usbsnd(*this, "usbsnd") { }
+		m_usbsnd(*this, "usbsnd"),
+		m_005snd(*this, "005") { }
 
 	required_shared_ptr<UINT8> m_mainram;
 	required_shared_ptr<UINT8> m_videoram;
@@ -40,6 +44,7 @@ public:
 	optional_device<samples_device> m_samples;
 	optional_device<speech_sound_device> m_speech;
 	optional_device<usb_sound_device> m_usbsnd;
+	optional_device<sega005_sound_device> m_005snd;
 
 	UINT8 m_sound_state[2];
 	UINT8 m_sound_rate;
@@ -47,8 +52,6 @@ public:
 	UINT8 m_sound_data;
 	UINT8 m_square_state;
 	UINT8 m_square_count;
-	emu_timer *m_sega005_sound_timer;
-	sound_stream *m_sega005_stream;
 	UINT8 m_n7751_command;
 	UINT8 m_n7751_busy;
 	segag80_decrypt_func m_decrypt;
@@ -121,6 +124,7 @@ public:
 	INTERRUPT_GEN_MEMBER(sindbadm_vblank_start);
 	DECLARE_WRITE8_MEMBER(sega005_sound_a_w);
 	DECLARE_WRITE8_MEMBER(sega005_sound_b_w);
+	inline void sega005_update_sound_data();
 	DECLARE_WRITE8_MEMBER(monsterb_sound_a_w);
 	DECLARE_WRITE8_MEMBER(monsterb_sound_b_w);
 	DECLARE_READ8_MEMBER(n7751_status_r);
@@ -144,6 +148,32 @@ protected:
 
 
 /*----------- defined in audio/segag80r.c -----------*/
+
+
+class sega005_sound_device : public device_t,
+									public device_sound_interface
+{
+public:
+	sega005_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	
+	emu_timer *m_sega005_sound_timer;
+	sound_stream *m_sega005_stream;
+	
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+
+private:
+	// internal state
+	TIMER_CALLBACK_MEMBER( sega005_auto_timer );
+};
+
+extern const device_type SEGA005;
+
 
 MACHINE_CONFIG_EXTERN( astrob_sound_board );
 MACHINE_CONFIG_EXTERN( 005_sound_board );
