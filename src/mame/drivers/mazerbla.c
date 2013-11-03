@@ -744,11 +744,9 @@ WRITE8_MEMBER(mazerbla_state::cfb_zpu_int_req_set_w)
 
 READ8_MEMBER(mazerbla_state::cfb_zpu_int_req_clr)
 {
-	m_zpu_int_vector |= 2;
-
-	/* clear the INT line when there are no more interrupt requests */
-	if (m_zpu_int_vector == 0xff)
-		m_maincpu->set_input_line(0, CLEAR_LINE);
+	// this clears all interrupts
+	m_zpu_int_vector = 0xff;
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 
 	return 0;
 }
@@ -1364,9 +1362,9 @@ IRQ_CALLBACK_MEMBER(mazerbla_state::irq_callback)
 	/* D2 is set to GND when INT comes from ZPU board - from 6850 on schematics (RS232 controller) */
 
 	/* resulting vectors:
-	1111 11000 (0xf8)
-	1111 11010 (0xfa)
-	1111 11100 (0xfc)
+	1111 11000 (0xf8) - results in same as 0xfc
+	1111 11010 (0xfa) - does nothing
+	1111 11100 (0xfc) - calls several routines
 
 	note:
 	1111 11110 (0xfe) - cannot happen and is not handled by game */
