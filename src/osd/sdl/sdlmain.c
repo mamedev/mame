@@ -11,7 +11,7 @@
 
 
 #ifdef SDLMAME_UNIX
-#ifndef SDLMAME_MACOSX
+#if (!defined(SDLMAME_MACOSX)) && (!defined(SDLMAME_EMSCRIPTEN))
 #if (SDLMAME_SDL2)
 //#include <SDL2/SDL_ttf.h>
 #else
@@ -337,7 +337,7 @@ int main(int argc, char *argv[])
 
 	#ifdef SDLMAME_UNIX
 	sdl_entered_debugger = 0;
-	#if (!defined(SDLMAME_MACOSX)) && (!defined(SDLMAME_HAIKU))
+	#if (!defined(SDLMAME_MACOSX)) && (!defined(SDLMAME_HAIKU)) && (!defined(SDLMAME_EMSCRIPTEN))
 #if !(SDLMAME_SDL2)
 	if (TTF_Init() == -1)
 	{
@@ -391,7 +391,7 @@ int main(int argc, char *argv[])
 	//SDL_Quit();
 
 	#ifdef SDLMAME_UNIX
-	#if (!defined(SDLMAME_MACOSX)) && (!defined(SDLMAME_HAIKU))
+	#if (!defined(SDLMAME_MACOSX)) && (!defined(SDLMAME_HAIKU)) && (!defined(SDLMAME_EMSCRIPTEN))
 #if !(SDLMAME_SDL2)
 	TTF_Quit();
 #endif
@@ -720,7 +720,7 @@ void sdl_osd_interface::init(running_machine &machine)
 #endif
 }
 
-#ifdef SDLMAME_UNIX
+#if defined(SDLMAME_UNIX) && (!defined(SDLMAME_EMSCRIPTEN))
 #define POINT_SIZE 144.0
 
 #ifdef SDLMAME_MACOSX

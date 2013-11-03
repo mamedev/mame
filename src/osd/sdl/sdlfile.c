@@ -103,7 +103,7 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 	UINT32 access;
 	const char *src;
 	char *dst;
-	#if defined(SDLMAME_DARWIN) || defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_BSD) || defined(SDLMAME_OS2) || defined(SDLMAME_HAIKU)
+	#if defined(SDLMAME_DARWIN) || defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_BSD) || defined(SDLMAME_OS2) || defined(SDLMAME_HAIKU) || defined(SDLMAME_EMSCRIPTEN)
 	struct stat st;
 	#else
 	struct stat64 st;
@@ -203,7 +203,7 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 	#endif
 
 	// attempt to open the file
-	#if defined(SDLMAME_DARWIN) || defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_BSD) || defined(SDLMAME_OS2) || defined(SDLMAME_HAIKU)
+	#if defined(SDLMAME_DARWIN) || defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_BSD) || defined(SDLMAME_OS2) || defined(SDLMAME_HAIKU) || defined(SDLMAME_EMSCRIPTEN)
 	(*file)->handle = open(tmpstr, access, 0666);
 	#else
 	(*file)->handle = open64(tmpstr, access, 0666);
@@ -226,7 +226,7 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 				// attempt to reopen the file
 				if (error == NO_ERROR)
 				{
-					#if defined(SDLMAME_DARWIN) || defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_BSD) || defined(SDLMAME_OS2) || defined(SDLMAME_HAIKU)
+					#if defined(SDLMAME_DARWIN) || defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_BSD) || defined(SDLMAME_OS2) || defined(SDLMAME_HAIKU) || defined(SDLMAME_EMSCRIPTEN)
 					(*file)->handle = open(tmpstr, access, 0666);
 					#else
 					(*file)->handle = open64(tmpstr, access, 0666);
@@ -246,6 +246,21 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 	}
 
 	// get the file size
+	#ifdef SDLMAME_EMSCRIPTEN
+	//the fstat approach does not work on emscripten, work around for now
+	FILE *fileptr;
+	fileptr = fdopen((*file)->handle,"rb");
+	if (fileptr == NULL)
+	{
+		*filesize = 0;
+	}
+	else
+	{
+		fseek(fileptr, 0, SEEK_END);
+		*filesize = ftell(fileptr);
+		fseek(fileptr, 0, SEEK_SET);
+	}
+	#else
 	#if defined(SDLMAME_DARWIN) || defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_BSD) || defined(SDLMAME_OS2) || defined(SDLMAME_HAIKU)
 	fstat((*file)->handle, &st);
 	#else
@@ -253,6 +268,7 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 	#endif
 
 	*filesize = (UINT64)st.st_size;
+	#endif
 
 
 error:
@@ -279,7 +295,7 @@ file_error osd_read(osd_file *file, void *buffer, UINT64 offset, UINT32 count, U
 	switch (file->type)
 	{
 		case SDLFILE_FILE:
-#if defined(SDLMAME_DARWIN) || defined(SDLMAME_BSD)
+#if defined(SDLMAME_DARWIN) || defined(SDLMAME_BSD) || defined(SDLMAME_EMSCRIPTEN)
 			result = pread(file->handle, buffer, count, offset);
 			if (result < 0)
 #elif defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_OS2)
@@ -325,7 +341,7 @@ file_error osd_write(osd_file *file, const void *buffer, UINT64 offset, UINT32 c
 	switch (file->type)
 	{
 		case SDLFILE_FILE:
-#if defined(SDLMAME_DARWIN) || defined(SDLMAME_BSD)
+#if defined(SDLMAME_DARWIN) || defined(SDLMAME_BSD) || defined(SDLMAME_EMSCRIPTEN)
 			result = pwrite(file->handle, buffer, count, offset);
 			if (!result)
 #elif defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_OS2)

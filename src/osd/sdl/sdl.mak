@@ -337,6 +337,12 @@ NO_USE_QTDEBUG = 1
 NO_OPENGL = 1
 endif
 
+ifeq ($(TARGETOS),emscripten)
+DEFS += -DSDLMAME_EMSCRIPTEN
+BASE_TARGETOS = unix
+SYNC_IMPLEMENTATION = mini
+endif
+
 #-------------------------------------------------
 # Sanity checks
 #-------------------------------------------------
@@ -409,9 +415,12 @@ INCPATH += -Isrc/debug
 MOCINCPATH := $(INCPATH)
 
 # add the prefix file
+# Don't pull in the system includes if we are compiling for Emscripten, which has its own headers
+ifneq ($(TARGETOS),emscripten)
 INCPATH += -include $(SDLSRC)/sdlprefix.h
 INCPATH += -I/work/src/m/sdl
 MOCINCPATH += -I/work/src/m/sdl
+endif
 
 
 #-------------------------------------------------
@@ -530,7 +539,9 @@ ifeq ($(NO_X11),1)
 NO_DEBUGGER = 1
 endif
 
+ifneq ($(TARGETOS),emscripten)
 INCPATH += `$(SDL_CONFIG) --cflags  | sed -e 's:/SDL[2]*::' -e 's:\(-D[^ ]*\)::g'`
+endif
 CCOMFLAGS += `$(SDL_CONFIG) --cflags  | sed -e 's:/SDL[2]*::' -e 's:\(-I[^ ]*\)::g'`
 
 LIBS += `$(SDL_CONFIG) --libs`
@@ -542,7 +553,9 @@ INCPATH += -I$(SDL_INSTALL_ROOT)/include/directfb
 endif
 endif
 
+ifneq ($(TARGETOS),emscripten)
 INCPATH += `pkg-config --cflags fontconfig`
+endif
 LIBS += `pkg-config --libs fontconfig`
 
 ifeq ($(SDL_LIBVER),sdl2)
@@ -597,7 +610,9 @@ ifeq ($(BASE_TARGETOS),win32)
 OSDCOREOBJS += $(SDLMAIN)
 
 ifdef SDL_INSTALL_ROOT
+ifneq ($(TARGETOS),emscripten)
 INCPATH += -I$(SDL_INSTALL_ROOT)/include
+endif
 LIBS += -L$(SDL_INSTALL_ROOT)/lib
 #-Wl,-rpath,$(SDL_INSTALL_ROOT)/lib
 endif
@@ -713,6 +728,11 @@ LIBS += -L/usr/X11/lib -L/usr/X11R6/lib -L/usr/openwin/lib
 # make sure we can find X headers
 INCPATH += -I/usr/X11/include -I/usr/X11R6/include -I/usr/openwin/include
 endif # NO_X11
+
+# can't use native libs with emscripten
+ifeq ($(TARGETOS),emscripten)
+LIBS =
+endif
 
 #-------------------------------------------------
 # XInput

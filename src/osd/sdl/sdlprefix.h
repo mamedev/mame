@@ -64,6 +64,10 @@
 #define SDLMAME_NO64BITIO 1
 #endif
 
+#if defined(EMSCRIPTEN)
+#define SDLMAME_NO64BITIO 1
+#endif
+
 // fix for Ubuntu 8.10
 #ifdef _FORTIFY_SOURCE
 #undef _FORTIFY_SOURCE

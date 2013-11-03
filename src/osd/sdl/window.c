@@ -88,7 +88,7 @@ static sdl_window_info **last_window_ptr;
 static int multithreading_enabled;
 static osd_work_queue *work_queue;
 
-#if !(SDLMAME_SDL2)
+#if !(SDLMAME_SDL2) && (!defined(SDLMAME_EMSCRIPTEN))
 typedef int SDL_threadID;
 #endif
 

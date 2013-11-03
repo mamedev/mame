@@ -96,6 +96,28 @@ static char giant_string_buffer[65536] = { 0 };
 
 
 //**************************************************************************
+//  JAVASCRIPT PORT-SPECIFIC
+//**************************************************************************
+
+#ifdef SDLMAME_EMSCRIPTEN
+#include <emscripten.h>
+
+static device_scheduler * scheduler;
+
+void js_main_loop() {
+	attotime stoptime = scheduler->time() + attotime(0,HZ_TO_ATTOSECONDS(60));
+	while (scheduler->time() < stoptime) {
+		scheduler->timeslice();
+	}
+}
+
+void js_set_main_loop(device_scheduler &sched) {
+	scheduler = &sched;
+	emscripten_set_main_loop(&js_main_loop, 0, 1);
+}
+#endif
+
+//**************************************************************************
 //  RUNNING MACHINE
 //**************************************************************************
 
@@ -380,6 +402,11 @@ int running_machine::run(bool firstrun)
 		while ((!m_hard_reset_pending && !m_exit_pending) || m_saveload_schedule != SLS_NONE)
 		{
 			g_profiler.start(PROFILER_EXTRA);
+
+			#ifdef SDLMAME_EMSCRIPTEN
+			//break out to our async javascript loop and halt
+			js_set_main_loop(m_scheduler);
+			#endif
 
 			// execute CPUs if not paused
 			if (!m_paused)

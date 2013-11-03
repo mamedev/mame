@@ -8626,6 +8626,7 @@ src/osd/sdl/sdlptty_unix.c svneol=native#text/plain
 src/osd/sdl/sdlptty_win32.c svneol=native#text/plain
 src/osd/sdl/sdlsocket.c svneol=native#text/plain
 src/osd/sdl/sdlsync.h svneol=native#text/plain
+src/osd/sdl/sdlsync_mini.c svneol=native#text/plain
 src/osd/sdl/sdlsync_ntc.c svneol=native#text/plain
 src/osd/sdl/sdlsync_os2.c svneol=native#text/plain
 src/osd/sdl/sdlsync_sdl.c svneol=native#text/plain

@@ -109,7 +109,7 @@ file_error sdl_open_socket(const char *path, UINT32 openflags, osd_file **file, 
 
 file_error sdl_read_socket(osd_file *file, void *buffer, UINT64 offset, UINT32 count, UINT32 *actual)
 {
-#ifndef SDLMAME_WIN32
+#if (!defined(SDLMAME_WIN32)) && (!defined(SDLMAME_EMSCRIPTEN))
 	ssize_t result;
 	char line[80];
 	struct timeval timeout;

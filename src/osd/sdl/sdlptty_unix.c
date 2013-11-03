@@ -22,7 +22,7 @@
 #elif defined(SDLMAME_OPENBSD)
 # include <termios.h>
 # include <util.h>
-#elif defined(SDLMAME_LINUX)
+#elif defined(SDLMAME_LINUX) || defined(SDLMAME_EMSCRIPTEN)
 # include <pty.h>
 #elif defined(SDLMAME_HAIKU)
 # include <bsd/pty.h>

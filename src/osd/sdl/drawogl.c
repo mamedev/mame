@@ -594,7 +594,7 @@ static int drawogl_window_create(sdl_window_info *window, int width, int height)
 	sdl->extra_flags |= SDL_OPENGL | SDL_DOUBLEBUF;
 
 	SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
-	#if (SDL_VERSION_ATLEAST(1,2,10))
+	#if (SDL_VERSION_ATLEAST(1,2,10)) && (!defined(SDLMAME_EMSCRIPTEN))
 	SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, video_config.waitvsync ? 1 : 0);
 	#endif
 
