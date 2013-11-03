@@ -128,4 +128,23 @@ $(VERINFO_TARGET): $(VERINFOOBJS) $(LIBOCORE)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
 
-endif
+else
+#-------------------------------------------------
+# It's a CROSS_BUILD. Ensure the targets exist.
+#-------------------------------------------------
+$(FILE2STR_TARGET):
+	@echo $@ should be built natively. Nothing to do.
+
+$(MAKEDEP_TARGET):
+	@echo $@ should be built natively. Nothing to do.
+
+$(MAKELIST_TARGET):
+	@echo $@ should be built natively. Nothing to do.
+
+$(PNG2BDC_TARGET):
+	@echo $@ should be built natively. Nothing to do.
+
+$(VERINFO_TARGET):
+	@echo $@ should be built natively. Nothing to do.
+
+endif # CROSS_BUILD
