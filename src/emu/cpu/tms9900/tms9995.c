@@ -161,6 +161,9 @@ void tms9995_device::device_start()
 
 	assert (conf != NULL);
 
+	// Allocate onchip memory
+	m_onchip_memory = auto_alloc_array(machine(), UINT8, 256);
+
 	// TODO: Restore save state suport
 
 	m_prgspace = &space(AS_PROGRAM);                        // dimemory.h
@@ -331,9 +334,8 @@ UINT16 tms9995_device::read_workspace_register_debug(int reg)
 	UINT16 value;
 
 	int addrb = (WP + (reg << 1)) & 0xfffe;
-	bool onchip = (((addrb & 0xff00)==0xf000 && (addrb < 0xf0fc)) || ((addrb & 0xfffc)==0xfffc)) && !m_mp9537;
 
-	if (onchip)
+	if (is_onchip(addrb))
 	{
 		value = (m_onchip_memory[addrb & 0x00fe]<<8) | m_onchip_memory[(addrb & 0x00fe) + 1];
 	}
@@ -353,9 +355,7 @@ void tms9995_device::write_workspace_register_debug(int reg, UINT16 data)
 	int temp = m_icount;
 	int addrb = (WP + (reg << 1)) & 0xfffe;
 
-	bool onchip = (((addrb & 0xff00)==0xf000 && (addrb < 0xf0fc)) || ((addrb & 0xfffc)==0xfffc)) && !m_mp9537;
-
-	if (onchip)
+	if (is_onchip(addrb))
 	{
 		m_onchip_memory[addrb & 0x00fe] = (data >> 8) & 0xff;
 		m_onchip_memory[(addrb & 0x00fe) + 1] = data & 0xff;
@@ -1687,9 +1687,7 @@ void tms9995_device::mem_read()
 		return;
 	}
 
-	bool onchip = (((m_address & 0xff00)==0xf000 && (m_address < 0xf0fc)) || ((m_address & 0xfffc)==0xfffc)) && !m_mp9537;
-
-	if (onchip)
+	if (is_onchip(m_address))
 	{
 		if (VERBOSE>5) LOG("tms9995: read onchip memory (single pass, address %04x)\n", m_address);
 
@@ -1818,9 +1816,8 @@ void tms9995_device::mem_write()
 		pulse_clock(1);
 		return;
 	}
-	bool onchip = (((m_address & 0xff00)==0xf000 && (m_address < 0xf0fc)) || ((m_address & 0xfffc)==0xfffc)) && !m_mp9537;
 
-	if (onchip)
+	if (is_onchip(m_address))
 	{
 		if (VERBOSE>3) LOG("tms9995: write to onchip memory (single pass, address %04x, value=%04x)\n", m_address, m_current_value);
 		m_check_ready = false;

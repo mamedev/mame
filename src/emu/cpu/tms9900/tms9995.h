@@ -63,6 +63,10 @@ public:
 	// is acknowledged by the HOLDA output line.
 	void set_hold(int state);
 
+	// For debugger access
+	UINT8 debug_read_onchip_memory(offs_t addr) { return m_onchip_memory[addr & 0xff]; };
+	bool is_onchip(offs_t addrb) { return (((addrb & 0xff00)==0xf000 && (addrb < 0xf0fc)) || ((addrb & 0xfffc)==0xfffc)) && !m_mp9537; }
+
 protected:
 	// device-level overrides
 	virtual void        device_start();
@@ -106,7 +110,7 @@ private:
 	UINT16  PC_debug;
 
 	// 256 bytes of onchip memory
-	UINT8   m_onchip_memory[256];
+	UINT8*   m_onchip_memory;
 
 	const address_space_config      m_program_config;
 	const address_space_config      m_io_config;
