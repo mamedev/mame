@@ -46,6 +46,8 @@ void ttl74181_device::device_start()
 	save_item(NAME(m_s));
 	save_item(NAME(m_m));
 	save_item(NAME(m_c));
+	
+	update();
 }
 
 //-------------------------------------------------
@@ -118,7 +120,7 @@ void ttl74181_device::input_b_w(UINT8 data)
 
 void ttl74181_device::select_w(UINT8 data)
 {
-	m_s &= data & 0x0f;
+	data &= 0x0f;
 
 	if (m_s != data)
 	{
