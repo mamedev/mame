@@ -166,7 +166,7 @@ A=AMA, P=PRO, these keys don't exist, and so the games cannot be played.
 
 *********************************************************************************************************/
 
-#define MODERN 1
+#define MODERN 0
 
 #include "emu.h"
 #if MODERN
@@ -192,7 +192,11 @@ public:
 	m_centronics(*this, "centronics")
 	{ }
 
+#if MODERN
 	required_device<tms9995_device> m_maincpu;
+#else
+	required_device<cpu_device> m_maincpu;
+#endif
 	optional_device<cassette_image_device> m_cass;
 	optional_device<centronics_device> m_centronics;
 	DECLARE_READ8_MEMBER(key_r);
@@ -397,7 +401,9 @@ WRITE8_MEMBER( tutor_state::tutor_mapper_w )
 
 READ8_MEMBER( tutor_state::tutor_highmem_r )
 {
+#if MODERN
 	if (m_maincpu->is_onchip(offset | 0xf000)) return m_maincpu->debug_read_onchip_memory(offset&0xff);
+#endif
 	return 0;
 }
 
