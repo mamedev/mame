@@ -1541,6 +1541,34 @@ ROM_START( btime2 )
 	ROM_LOAD( "ab03.6b",      0x0000, 0x0800, CRC(d26bc1f3) SHA1(737af6e264183a1f151f277a07cf250d6abb3fd8) )
 ROM_END
 
+ROM_START( btime3 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ab05a-3.12b",  0xb000, 0x1000, CRC(12e9f58c) SHA1(c1a933c83255af431643451b4eb68dc755bf0f61) )
+	ROM_LOAD( "ab04-3.9b",    0xc000, 0x1000, CRC(5d90c696) SHA1(7b1674e7b6249a2d806d81abd967adeeb51111be) )
+	ROM_LOAD( "ab06-3.13b",   0xd000, 0x1000, CRC(e0b993ad) SHA1(42674cc399a8281a9a6c6cdbe38f7e5a4b3e6cb9) )
+	ROM_LOAD( "ab05-3.10b",   0xe000, 0x1000, CRC(c2b44b7f) SHA1(03c972f4ca0a31a2689d2f2d4064d82732fb19b9) )
+	ROM_LOAD( "ab07-3.15b",   0xf000, 0x1000, CRC(91986594) SHA1(f163eb7b27b602ce61a2dee1ae221a6e1f84c43d) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "ab14-1.12h",   0xe000, 0x1000, CRC(f55e5211) SHA1(27940026d0c6212d1138d2fd88880df697218627) )
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_LOAD( "ab12-1.7k",    0x0000, 0x1000, BAD_DUMP CRC(6c79f79f) SHA1(338009199b5889621693833d88c35abb8e9e38a2) )    /* charset #1 */
+	ROM_LOAD( "ab13-1.9k",    0x1000, 0x1000, BAD_DUMP CRC(ac01042f) SHA1(e64b6381a9298eaf74e79fa5f1ea8e9596c58a49) )
+	ROM_LOAD( "ab10-1.10k",   0x2000, 0x1000, CRC(854a872a) SHA1(3d2ecfd54a5a9d68b53cf4b4ee1f2daa6aef2123) )
+	ROM_LOAD( "ab11-1.12k",   0x3000, 0x1000, CRC(d4848014) SHA1(0a55b091cd4e7f317c35defe13d5051b26042eee) )
+	ROM_LOAD( "ab8-1.13k",    0x4000, 0x1000, BAD_DUMP CRC(70b35bbe) SHA1(ee8d70d6792ac4b8fe3de90c665457fedb94a7ba) )
+	ROM_LOAD( "ab9-1.15k",    0x5000, 0x1000, BAD_DUMP CRC(8dec15e6) SHA1(b72633de6268ce16742bba4dcba835df860d6c2f) )
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "ab00-1.1b",    0x0000, 0x0800, CRC(c7a14485) SHA1(6a0a8e6b7860859f22daa33634e34fbf91387659) )
+	ROM_LOAD( "ab01-1.3b",    0x0800, 0x0800, BAD_DUMP CRC(25b49078) SHA1(4abdcbd4f3362c3e4463a1274731289f1a72d2e6) )
+	ROM_LOAD( "ab02-1.4b",    0x1000, 0x0800, CRC(b8ef56c3) SHA1(4a03bf011dc1fb2902f42587b1174b880cf06df1) )
+
+	ROM_REGION( 0x0800, "bg_map", 0 )   /* background tilemaps */
+	ROM_LOAD( "ab03-3.6b",    0x0000, 0x0800, CRC(f699d797) SHA1(c09ba5e652f26683d90b6a5637e41adecc4f1afa) )
+ROM_END
+
 ROM_START( btimem )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ab05a1.12b",   0xb000, 0x1000, CRC(0a98b230) SHA1(aeee4f6f0aaa27575b80261d03c5453cc6ebd646) )
@@ -2031,6 +2059,7 @@ DRIVER_INIT_MEMBER(btime_state,sdtennis)
 
 GAME( 1982, btime,    0,       btime,    btime, btime_state,    btime,    ROT270, "Data East Corporation", "Burger Time (Data East set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1982, btime2,   btime,   btime,    btime, btime_state,    btime,    ROT270, "Data East Corporation", "Burger Time (Data East set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1982, btime3,   btime,   btime,    btime, btime_state,    btime,    ROT270, "Data East Corporation", "Burger Time (Data East set 3)", GAME_SUPPORTS_SAVE )
 GAME( 1982, btimem,   btime,   btime,    btime, btime_state,    btime,    ROT270, "Data East (Bally Midway license)", "Burger Time (Midway)", GAME_SUPPORTS_SAVE )
 GAME( 1982, cookrace, btime,   cookrace, cookrace, btime_state, cookrace, ROT270, "bootleg", "Cook Race", GAME_SUPPORTS_SAVE )
 GAME( 1981, tisland,  0,       tisland,  btime, btime_state,    tisland,  ROT270, "Data East Corporation", "Treasure Island", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
