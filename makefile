@@ -329,9 +329,11 @@ BUILD_EXE = $(EXE)
 endif
 
 # compiler, linker and utilities
+ifneq ($(TARGETOS),emscripten)
 AR = @ar
 CC = @gcc
 LD = @g++
+endif
 MD = -mkdir$(EXE)
 RM = @rm -f
 OBJDUMP = @objdump
@@ -396,6 +398,11 @@ SRC = src
 # build the targets in different object dirs, so they can co-exist
 OBJ = obj/$(PREFIX)$(OSD)$(SUFFIX)$(SUFFIX64)$(SUFFIXDEBUG)$(SUFFIXPROFILE)
 
+ifeq ($(CROSS_BUILD),1)
+ifndef NATIVE_OBJ
+NATIVE_OBJ = OBJ
+endif # NATIVE_OBJ
+endif # CROSS_BUILD
 
 
 #-------------------------------------------------
@@ -597,6 +604,9 @@ ifeq ($(COMMAND_MODE),"legacy")
 ARFLAGS = -crs
 endif
 endif
+ifeq ($(TARGETOS),emscripten)
+ARFLAGS = cr
+endif
 
 
 #-------------------------------------------------
@@ -765,6 +775,9 @@ BUILDSRC = $(SRC)/build
 BUILDOBJ = $(OBJ)/build
 BUILDOUT = $(BUILDOBJ)
 
+ifdef NATIVE_OBJ
+BUILDOUT = $(NATIVE_OBJ)/build
+endif # NATIVE_OBJ
 
 
 #-------------------------------------------------
