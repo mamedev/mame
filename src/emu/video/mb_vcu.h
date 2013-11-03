@@ -55,6 +55,7 @@ public:
 	DECLARE_WRITE8_MEMBER( vbank_w );
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void screen_eof(void);
 
 protected:
 	// device-level overrides
@@ -79,6 +80,7 @@ private:
 	UINT16 m_pix_xsize, m_pix_ysize;
 	UINT8 m_vregs[4];
 	UINT8 m_bk_color;
+	UINT8 m_vbank;
 
 	double m_weights_r[2];
 	double m_weights_g[3];

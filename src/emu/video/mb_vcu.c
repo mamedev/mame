@@ -19,7 +19,7 @@ Device for Mazer Blazer/Great Guns custom Video Controller Unit
 const device_type MB_VCU = &device_creator<mb_vcu_device>;
 
 static ADDRESS_MAP_START( mb_vcu_vram, AS_0, 8, mb_vcu_device )
-	AM_RANGE(0x00000,0x1ffff) AM_RAM // enough for a 256x256x4 x 2 pages of framebuffer (TODO: doubled for simplicity)
+	AM_RANGE(0x00000,0x7ffff) AM_RAM // enough for a 256x256x4 x 2 pages of framebuffer with 4 layers (TODO: doubled for simplicity)
 ADDRESS_MAP_END
 
 //-------------------------------------------------
@@ -66,7 +66,7 @@ mb_vcu_device::mb_vcu_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, MB_VCU, "Mazer Blazer custom VCU", tag, owner, clock, "mb_vcu", __FILE__),
 	  device_memory_interface(mconfig, *this),
 	  device_video_interface(mconfig, *this),
-	  m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, NULL, *ADDRESS_MAP_NAME(mb_vcu_vram))
+	  m_space_config("videoram", ENDIANNESS_LITTLE, 8, 19, 0, NULL, *ADDRESS_MAP_NAME(mb_vcu_vram))
 {
 }
 
@@ -133,6 +133,11 @@ void mb_vcu_device::device_start()
 void mb_vcu_device::device_reset()
 {
 	m_status = 1;
+
+	for(int i=0;i<0x80000;i++)
+	{
+		write_byte(i,0x0f);
+	}
 }
 
 
@@ -191,6 +196,10 @@ READ8_MEMBER( mb_vcu_device::load_gfx )
 	int dstx,dsty;
 	UINT8 dot;
 	int bits = 0;
+	UINT8 pen;
+	UINT8 cur_layer;
+
+	cur_layer = 0;//(m_mode & 0x3) << 16;
 
 	switch(m_mode >> 2)
 	{
@@ -207,8 +216,8 @@ READ8_MEMBER( mb_vcu_device::load_gfx )
 						dot = m_cpu->space(AS_PROGRAM).read_byte(((offset + (bits >> 3)) & 0x1fff) + 0x4000) >> (4-(bits & 7));
 						dot&= 0xf;
 
-						write_byte(dstx|dsty<<8, dot);
-
+						//if(dot != 0xf)
+							write_byte(dstx|dsty<<8|cur_layer<<16|m_vbank<<18, dot);
 					}
 					bits += 4;
 				}
@@ -228,7 +237,9 @@ READ8_MEMBER( mb_vcu_device::load_gfx )
 						dot = m_cpu->space(AS_PROGRAM).read_byte(((offset + (bits >> 3)) & 0x1fff) + 0x4000) >> (7-(bits & 7));
 						dot&= 1;
 
-						write_byte(dstx|dsty<<8, dot ? (m_color1 >> 4) : (m_color1 & 0xf));
+						pen = dot ? (m_color1 >> 4) : (m_color1 & 0xf);
+						//if(pen != 0xf)
+							write_byte(dstx|dsty<<8|cur_layer|m_vbank<<18, pen);
 					}
 					bits++;
 				}
@@ -250,18 +261,22 @@ READ8_MEMBER( mb_vcu_device::load_gfx )
 						switch(dot)
 						{
 							case 0:
-								write_byte(dstx|dsty<<8, m_color1 & 0xf);
+								pen = m_color1 & 0xf;
 								break;
 							case 1:
-								write_byte(dstx|dsty<<8, m_color1 >> 4);
+								pen = m_color1 >> 4;
 								break;
 							case 2:
-								write_byte(dstx|dsty<<8, m_color2 & 0xf);
+								pen = m_color2 & 0xf;
 								break;
 							case 3:
-								write_byte(dstx|dsty<<8, m_color2 >> 4);
+								pen = m_color2 >> 4;
 								break;
 						}
+
+						//if(pen != 0xf)
+							write_byte(dstx|dsty<<8|cur_layer|m_vbank<<18, pen);
+
 					}
 
 					bits+=2;
@@ -279,7 +294,11 @@ READ8_MEMBER( mb_vcu_device::load_gfx )
 
 READ8_MEMBER( mb_vcu_device::load_set_clr )
 {
-	if(0)
+	int xi,yi;
+	int dstx,dsty;
+//	UINT8 dot;
+	int bits = 0;
+	if(m_mode == 0x13 || m_mode == 0x03)
 	{
 		printf("[0] %02x ",m_ram[m_param_offset_latch]);
 		printf("X: %04x ",m_xpos);
@@ -289,11 +308,52 @@ READ8_MEMBER( mb_vcu_device::load_set_clr )
 		printf("M :%02x ",m_mode);
 		printf("XS:%02x ",m_pix_xsize);
 		printf("YS:%02x ",m_pix_ysize);
+		printf("VB:%02x ",m_vbank);
 		printf("\n");
 	}
 
 	switch(m_mode)
 	{
+		case 0x13:
+		case 0x03:
+			for (yi = 0; yi < m_pix_ysize; yi++)
+			{
+				for (xi = 0; xi < m_pix_xsize; xi++)
+				{
+					dstx = (m_xpos + xi);
+					dsty = (m_ypos + yi);
+
+					if(dstx < 256 && dsty < 256)
+					{
+						#if 0
+						dot = m_cpu->space(AS_PROGRAM).read_byte(((offset + (bits >> 3)) & 0x1fff) + 0x4000) >> (6-(bits & 7));
+						dot&= 3;
+
+						switch(dot)
+						{
+							case 0:
+								write_byte(dstx|dsty<<8, m_color1 & 0xf);
+								break;
+							case 1:
+								write_byte(dstx|dsty<<8, m_color1 >> 4);
+								break;
+							case 2:
+								write_byte(dstx|dsty<<8, m_color2 & 0xf);
+								break;
+							case 3:
+								write_byte(dstx|dsty<<8, m_color2 >> 4);
+								break;
+						}
+						#endif
+
+						//write_byte(dstx|dsty<<8, m_mode >> 4);
+					}
+
+					bits+=2;
+				}
+			}
+			break;
+
 		case 0x07:
 			switch(m_ypos)
 			{
@@ -366,6 +426,7 @@ READ8_MEMBER( mb_vcu_device::status_r )
 
 WRITE8_MEMBER( mb_vcu_device::vbank_w )
 {
+	m_vbank = (data & 0x40) >> 6;
 }
 
 //-------------------------------------------------
@@ -383,7 +444,7 @@ UINT32 mb_vcu_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	{
 		for(x=0;x<256;x++)
 		{
-			dot = read_byte((x >> 0)|(y<<8));
+			dot = read_byte((x >> 0)|(y<<8)|0<<16|(m_vbank ^ 1)<<18);
 			//if(dot != 0xf)
 			{
 				dot|= m_vregs[1] << 4;
@@ -393,5 +454,62 @@ UINT32 mb_vcu_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 		}
 	}
 
+	#if 0
+	for(y=0;y<256;y++)
+	{
+		for(x=0;x<256;x++)
+		{
+			dot = read_byte((x >> 0)|(y<<8)|3<<16);
+
+			if(dot != 0xf)
+			{
+				dot|= m_vregs[1] << 4;
+
+				bitmap.pix32(y,x) = machine().pens[dot];
+			}
+		}
+	}
+
+	for(y=0;y<256;y++)
+	{
+		for(x=0;x<256;x++)
+		{
+			dot = read_byte((x >> 0)|(y<<8)|0<<16);
+
+			if(dot != 0xf)
+			{
+				dot|= m_vregs[1] << 4;
+
+				bitmap.pix32(y,x) = machine().pens[dot];
+			}
+		}
+	}
+
+	for(y=0;y<256;y++)
+	{
+		for(x=0;x<256;x++)
+		{
+			dot = read_byte((x >> 0)|(y<<8)|1<<16);
+
+			if(dot != 0xf)
+			{
+				dot|= m_vregs[1] << 4;
+
+				bitmap.pix32(y,x) = machine().pens[dot];
+			}
+		}
+	}
+	#endif
+
 	return 0;
+}
+
+void mb_vcu_device::screen_eof(void)
+{
+	for(int i=0;i<0x10000;i++)
+	{
+		//write_byte(i|0x00000|m_vbank<<18,0x0f);
+		//write_byte(i|0x10000|m_vbank<<18,0x0f);
+		//write_byte(i|0x30000|m_vbank<<18,0x0f);
+	}
 }

@@ -223,6 +223,7 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_mazerbla(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void screen_eof(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(sound_interrupt);
 	TIMER_CALLBACK_MEMBER(deferred_ls670_0_w);
 	TIMER_CALLBACK_MEMBER(deferred_ls670_1_w);
@@ -290,6 +291,15 @@ UINT32 mazerbla_state::screen_update_mazerbla(screen_device &screen, bitmap_rgb3
 	m_vcu->screen_update(screen,bitmap,cliprect);
 	return 0;
 }
+
+void mazerbla_state::screen_eof(screen_device &screen, bool state)
+{
+	if (state)
+	{
+		m_vcu->screen_eof();
+	}
+}
+
 
 /* reference */
 #if 0
@@ -1154,8 +1164,8 @@ static INPUT_PORTS_START( mazerbla )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("BUTTONS")   /* Strobe 5: coin1&2, start1&2, fire */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -1527,6 +1537,7 @@ static MACHINE_CONFIG_START( greatgun, mazerbla_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mazerbla_state, screen_update_mazerbla)
+	MCFG_SCREEN_VBLANK_DRIVER(mazerbla_state, screen_eof)
 
 	MCFG_PALETTE_LENGTH(256+1)
 
