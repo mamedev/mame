@@ -344,6 +344,7 @@ public:
 	pgm_arm_type3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pgm_state(mconfig, type, tag),
 			m_arm_ram(*this, "arm_ram"),
+			m_arm_ram2(*this, "arm_ram2"),
 			m_prot(*this, "prot") {
 	}
 	// svg
@@ -353,6 +354,7 @@ public:
 	UINT32        m_svg_latchdata_68k_w;
 	UINT32        m_svg_latchdata_arm_w;
 	required_shared_ptr<UINT32> m_arm_ram;
+	required_shared_ptr<UINT32> m_arm_ram2;
 
 	optional_device<cpu_device> m_prot;
 
@@ -379,6 +381,7 @@ public:
 	void svg_latch_init();
 	DECLARE_READ32_MEMBER( dmnfrnt_speedup_r );
 	DECLARE_READ16_MEMBER( dmnfrnt_main_speedup_r );
+	DECLARE_READ32_MEMBER( killbldp_speedup_r );
 };
 
 

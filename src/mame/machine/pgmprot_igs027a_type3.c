@@ -132,7 +132,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( 55857G_arm7_map, AS_PROGRAM, 32, pgm_arm_type3_state )
 	AM_RANGE(0x00000000, 0x00003fff) AM_ROM
 	AM_RANGE(0x08000000, 0x087fffff) AM_ROM AM_REGION("user1", 0)
-	AM_RANGE(0x10000000, 0x100003ff) AM_RAM
+	AM_RANGE(0x10000000, 0x100003ff) AM_RAM AM_SHARE("arm_ram2")
 	AM_RANGE(0x18000000, 0x1803ffff) AM_RAM AM_SHARE("arm_ram")
 	AM_RANGE(0x38000000, 0x3801ffff) AM_READWRITE(svg_arm7_shareram_r, svg_arm7_shareram_w)
 	AM_RANGE(0x48000000, 0x48000003) AM_READWRITE(svg_latch_arm_r, svg_latch_arm_w) /* 68k Latch */
@@ -238,11 +238,23 @@ DRIVER_INIT_MEMBER(pgm_arm_type3_state,svgpcb)
 	pgm_create_dummy_internal_arm_region();
 }
 
+
+READ32_MEMBER(pgm_arm_type3_state::killbldp_speedup_r )
+{
+	int pc = space.device().safe_pc();
+	if (pc == 0x7d8) space.device().execute().eat_cycles(500);
+  //else printf("killbldp_speedup_r %08x\n", pc);
+	return m_arm_ram2[0x00c/4];
+}
+
 DRIVER_INIT_MEMBER(pgm_arm_type3_state,killbldp)
 {
 	svg_basic_init();
 	pgm_killbldp_decrypt(machine());
 	svg_latch_init();
+
+	machine().device("prot")->memory().space(AS_PROGRAM).install_read_handler(0x1000000c, 0x1000000f, read32_delegate(FUNC(pgm_arm_type3_state::killbldp_speedup_r),this));
+
 }
 
 READ32_MEMBER(pgm_arm_type3_state::dmnfrnt_speedup_r )
