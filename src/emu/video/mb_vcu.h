@@ -29,7 +29,7 @@ Template for skeleton device
 
 struct mb_vcu_interface
 {
-	const char         *m_screen_tag;
+	const char         *m_cpu_tag;
 };
 
 // ======================> mb_vcu_device
@@ -49,12 +49,12 @@ public:
 	DECLARE_WRITE8_MEMBER( write_ram );
 	DECLARE_READ8_MEMBER( load_params );
 	DECLARE_READ8_MEMBER( load_gfx );
-	DECLARE_READ8_MEMBER( load_clr );
+	DECLARE_READ8_MEMBER( load_set_clr );
 	DECLARE_WRITE8_MEMBER( background_color_w );
 	DECLARE_READ8_MEMBER( status_r );
 	DECLARE_WRITE8_MEMBER( vbank_w );
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
 	// device-level overrides
@@ -68,6 +68,21 @@ private:
 	inline void write_byte(offs_t address, UINT8 data);
 
 	const address_space_config      m_space_config;
+	UINT8 m_status;
+	UINT8 *m_ram;
+	cpu_device *m_cpu;
+	UINT16 m_param_offset_latch;
+
+	UINT16 m_xpos, m_ypos;
+	UINT8 m_color1, m_color2;
+	UINT8 m_mode;
+	UINT16 m_pix_xsize, m_pix_ysize;
+	UINT8 m_vregs[4];
+	UINT8 m_bk_color;
+
+	double m_weights_r[2];
+	double m_weights_g[3];
+	double m_weights_b[3];
 };
 
 
