@@ -114,7 +114,7 @@ PROGRAM#    Program Version      Program Differences
   Megatouch IV Tournament Edition (c)1996
   Super Megatouch IV (c) 1996  (rom labels 9255-41-0x, see below)
   Super Megatouch IV Tournament Edition (c) 1996
-  *The Real Broadway (c) 1996 (single rom at U38 + DS1204 security key)
+  *The Real Broadway (c) 1996 (single rom at U38 + DS1204 security key (likely 9131-20-00 U38-R0A))
   Megatouch 5 (c)1997
   Megatouch 5 Tournament Edition (c)1997
   Megatouch 6 (c)1998
