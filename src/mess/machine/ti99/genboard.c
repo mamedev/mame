@@ -354,6 +354,7 @@ READ8_MEMBER( geneve_mapper_device::readm )
 	// For the debugger, do the decoding here with no wait states
 	if (space.debugger_access())
 	{
+		if (m_cpu->is_onchip(offset)) return m_cpu->debug_read_onchip_memory(offset&0xff);
 		dec = &debug;
 		m_debug_no_ws = true;
 		decode(space, offset, true, dec);
@@ -1174,6 +1175,7 @@ void geneve_mapper_device::device_start()
 
 	m_sram = machine().root_device().memregion(SRAM_TAG)->base();
 	m_dram = machine().root_device().memregion(DRAM_TAG)->base();
+	m_cpu = static_cast<tms9995_device*>(machine().device("maincpu"));
 
 	m_geneve_mode = false;
 	m_direct_mode = true;

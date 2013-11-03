@@ -17,6 +17,7 @@
 #include "ti99defs.h"
 #include "machine/mm58274c.h"
 #include "video/v9938.h"
+#include "cpu/tms9900/tms9995.h"
 
 extern const device_type GENEVE_MOUSE;
 extern const device_type GENEVE_KEYBOARD;
@@ -201,6 +202,8 @@ private:
 
 	// Devices
 	mm58274c_device*        m_clock;
+	tms9995_device*         m_cpu;
+
 	geneve_keyboard_device* m_keyboard;
 	bus8z_device*           m_video;
 	bus8z_device*           m_peribox;
