@@ -415,12 +415,7 @@ INCPATH += -Isrc/debug
 MOCINCPATH := $(INCPATH)
 
 # add the prefix file
-# Don't pull in the system includes if we are compiling for Emscripten, which has its own headers
-ifneq ($(TARGETOS),emscripten)
 INCPATH += -include $(SDLSRC)/sdlprefix.h
-INCPATH += -I/work/src/m/sdl
-MOCINCPATH += -I/work/src/m/sdl
-endif
 
 
 #-------------------------------------------------
@@ -539,6 +534,7 @@ ifeq ($(NO_X11),1)
 NO_DEBUGGER = 1
 endif
 
+# Don't pull in the system includes if we are compiling for Emscripten, which has its own headers
 ifneq ($(TARGETOS),emscripten)
 INCPATH += `$(SDL_CONFIG) --cflags  | sed -e 's:/SDL[2]*::' -e 's:\(-D[^ ]*\)::g'`
 endif
