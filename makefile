@@ -66,7 +66,7 @@ ifeq ($(OS),Windows_NT)
 TARGETOS = win32
 else
 
-ifneq ($(CROSSBUILD),1)
+ifneq ($(CROSS_BUILD),1)
 
 ifneq ($(OS2_SHELL),)
 TARGETOS = os2
