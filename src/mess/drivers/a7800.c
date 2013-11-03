@@ -64,7 +64,9 @@
     2013/10/16 Robert Tuccitto  Added Phase Shifts 24.7, 25.2, 26.2, 27.2.
                Phase Shifts 24.7 through 27.7 degrees with 0.5 degree 
                increments documented. Phase Shift 26.2 degrees made active.
-               Fixed typo under 26.7 7$.   
+               Fixed typo under 26.7 7$.
+
+    2013/10/27 Robert Tuccitto  Modernized screen parameters for NTSC & PAL.  
 ***************************************************************************/
 
 #include "emu.h"
@@ -94,15 +96,15 @@ static ADDRESS_MAP_START( a7800_mem, AS_PROGRAM, 8, a7800_state )
 	AM_RANGE(0x0460, 0x046f) /* XBOARD POKEY2 */
 	AM_RANGE(0x0470, 0x047f) /* XBOARD CTRL */
 	AM_RANGE(0x0480, 0x04ff) AM_MIRROR(0x100) AM_RAM    /* RIOT RAM */
-        AM_RANGE(0x1000, 0x17ff) AM_RAM /* hs SRAM */
+       AM_RANGE(0x1000, 0x17ff) AM_RAM /* hs SRAM */
 	AM_RANGE(0x1800, 0x27ff) AM_RAM
 	AM_RANGE(0x2800, 0x2fff) AM_RAMBANK("bank7")    /* MAINRAM */
 	AM_RANGE(0x3000, 0x37ff) AM_RAMBANK("bank7")    /* MAINRAM */
 	AM_RANGE(0x3800, 0x3fff) AM_RAMBANK("bank7")    /* MAINRAM */
-        AM_RANGE(0x3000, 0x3fff) AM_ROM  /* hs ROM space */
+       AM_RANGE(0x3000, 0x3fff) AM_ROM  /* hs ROM space */
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")                        /* f18 hornet */
 	AM_RANGE(0x4000, 0xffff) AM_WRITE(a7800_cart_w) /* XBOARD SRAM */
-        AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank2")                        /* sc */
+       AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank2")                        /* sc */
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank3")                        /* sc + ac */
 	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank4")                        /* ac */
 	AM_RANGE(0xe000, 0xffff) AM_ROM	
@@ -925,10 +927,7 @@ static MACHINE_CONFIG_START( a7800_ntsc, a7800_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(640,262)
-	MCFG_SCREEN_VISIBLE_AREA(0,319,25,45+204)
+       MCFG_SCREEN_RAW_PARAMS( 7159090, 456, 0, 320, 262, 26, 26 + 192 + 30 )
 	MCFG_SCREEN_UPDATE_DRIVER(a7800_state, screen_update_a7800)
 
 	MCFG_PALETTE_LENGTH(ARRAY_LENGTH(a7800_palette))
@@ -965,9 +964,7 @@ static MACHINE_CONFIG_DERIVED( a7800_pal, a7800_ntsc )
 //  MCFG_TIMER_ADD_SCANLINE("scantimer", a7800_interrupt, "screen", 0, 1)
 
 	MCFG_SCREEN_MODIFY( "screen" )
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(640,312)
-	MCFG_SCREEN_VISIBLE_AREA(0,319,50,50+225)
+       MCFG_SCREEN_RAW_PARAMS( 7093788, 456, 0, 320, 312, 34, 34 + 228 + 30 )
 	MCFG_PALETTE_INIT_OVERRIDE(a7800_state, a7800p )
 
 	/* sound hardware */
