@@ -192,7 +192,7 @@ public:
 	m_centronics(*this, "centronics")
 	{ }
 
-	required_device<cpu_device> m_maincpu;
+	required_device<tms9995_device> m_maincpu;
 	optional_device<cassette_image_device> m_cass;
 	optional_device<centronics_device> m_centronics;
 	DECLARE_READ8_MEMBER(key_r);
@@ -202,6 +202,8 @@ public:
 	DECLARE_WRITE8_MEMBER(tutor_cassette_w);
 	DECLARE_READ8_MEMBER(tutor_printer_r);
 	DECLARE_WRITE8_MEMBER(tutor_printer_w);
+
+	DECLARE_READ8_MEMBER(tutor_highmem_r);
 	char m_cartridge_enable;
 	char m_tape_interrupt_enable;
 	emu_timer *m_tape_interrupt_timer;
@@ -393,6 +395,12 @@ WRITE8_MEMBER( tutor_state::tutor_mapper_w )
 	}
 }
 
+READ8_MEMBER( tutor_state::tutor_highmem_r )
+{
+	if (m_maincpu->is_onchip(offset | 0xf000)) return m_maincpu->debug_read_onchip_memory(offset&0xff);
+	return 0;
+}
+
 /*
     Cassette interface:
 
@@ -416,7 +424,7 @@ TIMER_CALLBACK_MEMBER(tutor_state::tape_interrupt_handler)
 {
 	//assert(m_tape_interrupt_enable);
 #if MODERN
-	m_maincpu->set_input_line(INT_9995_INT1, (m_cass->input() > 0.0) ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(INT_9995_INT4, (m_cass->input() > 0.0) ? ASSERT_LINE : CLEAR_LINE);
 #else
 	m_maincpu->set_input_line(1, (m_cass->input() > 0.0) ? ASSERT_LINE : CLEAR_LINE);
 #endif
@@ -456,7 +464,7 @@ WRITE8_MEMBER( tutor_state::tutor_cassette_w )
 				{
 					m_tape_interrupt_timer->adjust(attotime::never);
 #if MODERN
-					m_maincpu->set_input_line(INT_9995_INT1, CLEAR_LINE);
+					m_maincpu->set_input_line(INT_9995_INT4, CLEAR_LINE);
 #else
 					m_maincpu->set_input_line(1, CLEAR_LINE);
 #endif
@@ -575,7 +583,7 @@ static ADDRESS_MAP_START(tutor_memmap, AS_PROGRAM, 8, tutor_state)
 	AM_RANGE(0xe800, 0xe8ff) AM_READWRITE(tutor_printer_r, tutor_printer_w) /*printer*/
 	AM_RANGE(0xee00, 0xeeff) AM_READNOP AM_WRITE( tutor_cassette_w)     /*cassette interface*/
 
-	AM_RANGE(0xf000, 0xffff) AM_NOP /*free for expansion (and internal processor RAM)*/
+	AM_RANGE(0xf000, 0xffff) AM_READ(tutor_highmem_r) AM_WRITENOP /*free for expansion (and internal processor RAM)*/
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(pyuutajr_mem, AS_PROGRAM, 8, tutor_state)
@@ -590,7 +598,7 @@ static ADDRESS_MAP_START(pyuutajr_mem, AS_PROGRAM, 8, tutor_state)
 	AM_RANGE(0xea00, 0xea00) AM_READ_PORT("LINE1")
 	AM_RANGE(0xec00, 0xec00) AM_READ_PORT("LINE2")
 	AM_RANGE(0xee00, 0xee00) AM_READ_PORT("LINE3")
-	AM_RANGE(0xf000, 0xffff) AM_NOP /*free for expansion (and internal processor RAM)*/
+	AM_RANGE(0xf000, 0xffff) AM_READ(tutor_highmem_r) AM_WRITENOP /*free for expansion (and internal processor RAM)*/
 ADDRESS_MAP_END
 
 /*
