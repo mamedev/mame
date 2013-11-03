@@ -4,8 +4,9 @@
 
         Dolphin
 
-        08/04/2010 Skeleton driver.
-        20/05/2012 Fixed keyboard, added notes & speaker [Robbbert]
+        2010-04-08 Skeleton driver.
+        2012-05-20 Fixed keyboard, added notes & speaker [Robbbert]
+        2013-11-03 Added cassette [Robbbert]
 
     Minimal Setup:
         0000-00FF ROM "MO" (74S471)
@@ -72,6 +73,7 @@
         TODO:
         - Find missing roms
         - Add optional hardware listed above
+        - Cassette is added, but no idea how to operate it.
 
         Thanks to Amigan site for various documents.
 
@@ -81,6 +83,8 @@
 #include "emu.h"
 #include "cpu/s2650/s2650.h"
 #include "sound/speaker.h"
+#include "imagedev/cassette.h"
+#include "sound/wave.h"
 #include "dolphunk.lh"
 
 
@@ -88,19 +92,37 @@ class dolphunk_state : public driver_device
 {
 public:
 	dolphunk_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_speaker(*this, "speaker")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_speaker(*this, "speaker")
+		, m_cass(*this, "cassette")
 	{ }
 
+	DECLARE_READ8_MEMBER(cass_r);
+	DECLARE_WRITE8_MEMBER(cass_w);
 	DECLARE_READ8_MEMBER(port07_r);
 	DECLARE_WRITE8_MEMBER(port00_w);
 	DECLARE_WRITE8_MEMBER(port06_w);
+	TIMER_DEVICE_CALLBACK_MEMBER(dolphin_c);
+private:
+	UINT8 m_cass_data;
 	UINT8 m_last_key;
+	bool m_cass_state;
 	bool m_speaker_state;
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
+	required_device<cassette_image_device> m_cass;
 };
+
+READ8_MEMBER( dolphunk_state::cass_r )
+{
+	return (m_cass->input() > 0.03) ? 1 : 0;
+}
+
+WRITE8_MEMBER( dolphunk_state::cass_w )
+{
+	m_cass_state = BIT(data, 0); // get flag bit
+}
 
 WRITE8_MEMBER( dolphunk_state::port00_w )
 {
@@ -139,6 +161,16 @@ READ8_MEMBER( dolphunk_state::port07_r )
 	return data;
 }
 
+TIMER_DEVICE_CALLBACK_MEMBER(dolphunk_state::dolphin_c)
+{
+	m_cass_data++;
+
+	if (m_cass_state)
+		m_cass->output(BIT(m_cass_data, 1) ? -1.0 : +1.0); // 1000Hz
+	else
+		m_cass->output(BIT(m_cass_data, 0) ? -1.0 : +1.0); // 2000Hz
+}
+
 static ADDRESS_MAP_START( dolphunk_mem, AS_PROGRAM, 8, dolphunk_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x01ff) AM_ROM
@@ -151,7 +183,7 @@ static ADDRESS_MAP_START( dolphunk_io, AS_IO, 8, dolphunk_state )
 	AM_RANGE(0x00, 0x03) AM_WRITE(port00_w) // 4-led display
 	AM_RANGE(0x06, 0x06) AM_WRITE(port06_w)  // speaker (NOT a keyclick)
 	AM_RANGE(0x07, 0x07) AM_READ(port07_r) // pushbuttons
-	//AM_RANGE(S2650_SENSE_PORT, S2650_FO_PORT) AM_READWRITE(dolphunk_cass_in,dolphunk_cass_out)
+	AM_RANGE(S2650_SENSE_PORT, S2650_FO_PORT) AM_READWRITE(cass_r,cass_w)
 	AM_RANGE(0x102, 0x103) AM_NOP // stops error log filling up while using debug
 ADDRESS_MAP_END
 
@@ -196,6 +228,12 @@ static MACHINE_CONFIG_START( dolphunk, dolphunk_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
+	/* cassette */
+	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("dolphin_c", dolphunk_state, dolphin_c, attotime::from_hz(4000))
 MACHINE_CONFIG_END
 
 /* ROM definition */
