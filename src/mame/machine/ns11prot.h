@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:smf
 /*
  * Namco System 11 Protection
  *

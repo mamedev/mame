@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:smf
 #include "zndip.h"
 
 const device_type ZNDIP = &device_creator<zndip_device>;

@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:smf
 #include "bankdev.h"
 
 // device type definition

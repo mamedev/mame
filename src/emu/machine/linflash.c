@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:smf
 #include "linflash.h"
 
 linear_flash_pccard_device::linear_flash_pccard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock,const char *shortname, const char *source) :

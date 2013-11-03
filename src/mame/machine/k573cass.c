@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:smf
 /*
  * Konami 573 Security Cassette
  *

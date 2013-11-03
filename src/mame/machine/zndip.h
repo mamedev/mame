@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:smf
 #pragma once
 
 #ifndef __ZNDIP_H__
