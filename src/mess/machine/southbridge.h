@@ -6,7 +6,7 @@
 #include "emu.h"
 
 #include "machine/ins8250.h"
-#include "machine/mc146818.h"
+#include "machine/ds128x.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 
@@ -61,7 +61,7 @@ public:
 		required_device<at_keyboard_controller_device> m_keybc;
 		required_device<isa16_device> m_isabus;
 		required_device<speaker_sound_device> m_speaker;
-		required_device<mc146818_device> m_mc146818;
+		required_device<ds12885_device> m_ds12885;
 		required_device<pc_kbdc_device> m_pc_kbdc;
 		required_device<bus_master_ide_controller_device> m_ide;
 		required_device<bus_master_ide_controller_device> m_ide2;

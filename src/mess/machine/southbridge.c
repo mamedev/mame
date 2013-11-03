@@ -114,7 +114,7 @@ static MACHINE_CONFIG_FRAGMENT( southbridge )
 	MCFG_PC_KBDC_ADD("pc_kbdc", pc_kbdc_intf)
 	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL)
 
-	MCFG_MC146818_ADD("rtc", XTAL_32_768kHz)
+	MCFG_DS12885_ADD("rtc")
 	MCFG_MC146818_IRQ_HANDLER(DEVWRITELINE("pic8259_slave", pic8259_device, ir0_w))
 	MCFG_MC146818_CENTURY_INDEX(0x32)
 
@@ -159,7 +159,7 @@ southbridge_device::southbridge_device(const machine_config &mconfig, device_typ
 	m_keybc(*this, "keybc"),
 	m_isabus(*this, "isabus"),
 	m_speaker(*this, "speaker"),
-	m_mc146818(*this, "rtc"),
+	m_ds12885(*this, "rtc"),
 	m_pc_kbdc(*this, "pc_kbdc"),
 	m_ide(*this, "ide"),
 	m_ide2(*this, "ide2")
@@ -189,7 +189,7 @@ void southbridge_device::device_start()
 	spaceio.install_readwrite_handler(0x0040, 0x005f, read8_delegate(FUNC(pit8254_device::read),&(*m_pit8254)), write8_delegate(FUNC(pit8254_device::write),&(*m_pit8254)), 0xffffffff);
 	spaceio.install_readwrite_handler(0x0060, 0x0063, read8_delegate(FUNC(southbridge_device::at_keybc_r),this), write8_delegate(FUNC(southbridge_device::at_keybc_w),this), 0xffffffff);
 	spaceio.install_readwrite_handler(0x0064, 0x0067, read8_delegate(FUNC(at_keyboard_controller_device::status_r),&(*m_keybc)), write8_delegate(FUNC(at_keyboard_controller_device::command_w),&(*m_keybc)), 0xffffffff);
-	spaceio.install_readwrite_handler(0x0070, 0x007f, read8_delegate(FUNC(mc146818_device::read),&(*m_mc146818)), write8_delegate(FUNC(mc146818_device::write),&(*m_mc146818)), 0xffffffff);
+	spaceio.install_readwrite_handler(0x0070, 0x007f, read8_delegate(FUNC(ds12885_device::read),&(*m_ds12885)), write8_delegate(FUNC(ds12885_device::write),&(*m_ds12885)), 0xffffffff);
 	spaceio.install_readwrite_handler(0x0080, 0x009f, read8_delegate(FUNC(southbridge_device::at_page8_r),this), write8_delegate(FUNC(southbridge_device::at_page8_w),this), 0xffffffff);
 	spaceio.install_readwrite_handler(0x00a0, 0x00bf, read8_delegate(FUNC(pic8259_device::read),&(*m_pic8259_slave)), write8_delegate(FUNC(pic8259_device::write),&(*m_pic8259_slave)), 0xffffffff);
 	spaceio.install_readwrite_handler(0x00c0, 0x00df, read8_delegate(FUNC(southbridge_device::at_dma8237_2_r),this), write8_delegate(FUNC(southbridge_device::at_dma8237_2_w),this), 0xffffffff);
@@ -489,9 +489,9 @@ WRITE8_MEMBER( southbridge_device::write_rtc )
 	if (offset==0) {
 		m_nmi_enabled = BIT(data,7);
 		m_isabus->set_nmi_state((m_nmi_enabled==0) && (m_channel_check==0));
-		m_mc146818->write(space,0,data);
+		m_ds12885->write(space,0,data);
 	}
 	else {
-		m_mc146818->write(space,offset,data);
+		m_ds12885->write(space,offset,data);
 	}
 }
