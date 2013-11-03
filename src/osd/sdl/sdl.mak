@@ -240,6 +240,16 @@ NO_USE_QTDEBUG = 1
 LIBS += -lnetwork -lbsd
 endif
 
+ifeq ($(TARGETOS),emscripten)
+BASE_TARGETOS = unix
+SYNC_IMPLEMENTATION = mini
+NO_DEBUGGER = 1
+NO_X11 = 1
+NO_USE_XINPUT = 1
+NO_USE_MIDI = 1
+NO_USE_QTDEBUG = 1
+endif
+
 ifeq ($(TARGETOS),macosx)
 NO_USE_QTDEBUG = 1
 BASE_TARGETOS = unix
@@ -335,12 +345,6 @@ NO_USE_MIDI = 1
 NO_USE_QTDEBUG = 1
 # OS/2 can't have OpenGL (aww)
 NO_OPENGL = 1
-endif
-
-ifeq ($(TARGETOS),emscripten)
-DEFS += -DSDLMAME_EMSCRIPTEN
-BASE_TARGETOS = unix
-SYNC_IMPLEMENTATION = mini
 endif
 
 #-------------------------------------------------

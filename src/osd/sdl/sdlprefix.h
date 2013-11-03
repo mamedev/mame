@@ -65,7 +65,11 @@
 #endif
 
 #if defined(EMSCRIPTEN)
+#define SDLMAME_EMSCRIPTEN 1
 #define SDLMAME_NO64BITIO 1
+#define NOASM 1
+#define SDLMAME_NOASM 1
+struct _IO_FILE {};  //_IO_FILE is an opaque type in the emscripten libc which makes clang cranky
 #endif
 
 // fix for Ubuntu 8.10
