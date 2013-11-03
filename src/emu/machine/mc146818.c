@@ -73,6 +73,8 @@ void mc146818_device::device_reset()
 {
 	m_data[REG_B] &= ~(REG_B_UIE | REG_B_AIE | REG_B_PIE | REG_B_SQWE);
 	m_data[REG_C] = 0;
+
+	update_irq();
 }
 
 //-------------------------------------------------
