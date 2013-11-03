@@ -1361,10 +1361,11 @@ IRQ_CALLBACK_MEMBER(mazerbla_state::irq_callback)
 	/* D1 is set to GND when INT comes from CFB */
 	/* D2 is set to GND when INT comes from ZPU board - from 6850 on schematics (RS232 controller) */
 
-	/* resulting vectors:
-	1111 11000 (0xf8) - results in same as 0xfc
-	1111 11010 (0xfa) - does nothing
-	1111 11100 (0xfc) - calls several routines
+	/* resulting vectors:    - effect according to disasm:
+	--------------------------------------------------------
+	1111 11000 (0xf8)        - results in same as 0xfc
+	1111 11010 (0xfa)        - does nothing, assume it was used for debugging
+	1111 11100 (0xfc)        - calls several routines
 
 	note:
 	1111 11110 (0xfe) - cannot happen and is not handled by game */
