@@ -429,15 +429,6 @@ static TMS9980A_CONFIG( cpuconf )
 };
 #endif
 
-static TMS9980A_CONFIG( cpuconf )
-{
-	DEVCB_NULL,
-	DEVCB_NULL,     // Instruction acquisition
-	DEVCB_NULL,     // Clock out
-	DEVCB_NULL,     // Hold acknowledge
-	DEVCB_NULL      // DBIN
-};
-
 /*************************
 *    Machine Drivers     *
 *************************/
