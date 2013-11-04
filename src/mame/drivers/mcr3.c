@@ -1325,10 +1325,10 @@ ROM_START( powerdrv )
 	ROM_FILL(                 0x0e000, 0x2000, 0xff )   /* upper 8k is not mapped on monoboard */
 
 	ROM_REGION( 0x40000, "sg:cpu", 0 )  /* 256k for the Sounds Good board */
-	ROM_LOAD16_BYTE( "pdsndu7.bin",  0x00000, 0x8000, CRC(78713e78) SHA1(11382c024536f743e051ba208ae02d0f5e07cf5e) )
-	ROM_LOAD16_BYTE( "pdsndu17.bin", 0x00001, 0x8000, CRC(c41de6e4) SHA1(0391afd96ee80dd1d4a34e661e5df1e01fbbd57a) )
-	ROM_LOAD16_BYTE( "pdsndu8.bin",  0x10000, 0x8000, CRC(15714036) SHA1(77ca5f703eb7f146e13d9c01f4427f6aaa31df39) )
-	ROM_LOAD16_BYTE( "pdsndu18.bin", 0x10001, 0x8000, CRC(cae14c70) SHA1(04e92f1f144cc8ff13a09a3d38aa65ac05c41c0b) )
+	ROM_LOAD16_BYTE( "power_drive_snd_u7.u7",   0x00000, 0x8000, CRC(78713e78) SHA1(11382c024536f743e051ba208ae02d0f5e07cf5e) ) /* Dated 11/21/86 */
+	ROM_LOAD16_BYTE( "power_drive_snd_u17.u17", 0x00001, 0x8000, CRC(c41de6e4) SHA1(0391afd96ee80dd1d4a34e661e5df1e01fbbd57a) )
+	ROM_LOAD16_BYTE( "power_drive_snd_u8.u8",   0x10000, 0x8000, CRC(15714036) SHA1(77ca5f703eb7f146e13d9c01f4427f6aaa31df39) )
+	ROM_LOAD16_BYTE( "power_drive_snd_u18.u18", 0x10001, 0x8000, CRC(cae14c70) SHA1(04e92f1f144cc8ff13a09a3d38aa65ac05c41c0b) )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_INVERT )
 	ROM_LOAD( "pdrv15a.bin",  0x00000, 0x04000, CRC(b858b5a8) SHA1(da622bde13c7156a826d658e176feccf18f33a4b) )
