@@ -22,6 +22,12 @@
 				<rom name="keydos.bin" size="0x8000" crc="79d84d04" sha1="ccda467d8f6c23928127e5a2fdaae964fcc946d4" offset="0" />
 			</dataarea>
 		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="KeyDOS ROM Support Utilities and Demonstrations"/>
+			<dataarea name="flop" size="174848">
+				<rom name="keydos.d64" size="174848" crc="adc716d5" sha1="48c2820669b7cb5dfff7a006db18dfb39b3ef9a0" offset="0" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="ramdos">
