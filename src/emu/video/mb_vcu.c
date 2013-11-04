@@ -211,7 +211,7 @@ READ8_MEMBER( mb_vcu_device::load_gfx )
 					dstx = (m_xpos + xi);
 					dsty = (m_ypos + yi);
 
-					if(dstx < 256 && dsty < 256)
+					if(dstx >= 0 && dsty >= 0 && dstx < 256 && dsty < 256)
 					{
 						dot = m_cpu->space(AS_PROGRAM).read_byte(((offset + (bits >> 3)) & 0x1fff) + 0x4000) >> (4-(bits & 7));
 						dot&= 0xf;
@@ -232,7 +232,7 @@ READ8_MEMBER( mb_vcu_device::load_gfx )
 					dstx = (m_xpos + xi);
 					dsty = (m_ypos + yi);
 
-					if(dstx < 256 && dsty < 256)
+					if(dstx >= 0 && dsty >= 0 && dstx < 256 && dsty < 256)
 					{
 						dot = m_cpu->space(AS_PROGRAM).read_byte(((offset + (bits >> 3)) & 0x1fff) + 0x4000) >> (7-(bits & 7));
 						dot&= 1;
@@ -253,7 +253,7 @@ READ8_MEMBER( mb_vcu_device::load_gfx )
 					dstx = (m_xpos + xi);
 					dsty = (m_ypos + yi);
 
-					if(dstx < 256 && dsty < 256)
+					if(dstx >= 0 && dsty >= 0 && dstx < 256 && dsty < 256)
 					{
 						dot = m_cpu->space(AS_PROGRAM).read_byte(((offset + (bits >> 3)) & 0x1fff) + 0x4000) >> (6-(bits & 7));
 						dot&= 3;

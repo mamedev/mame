@@ -74,7 +74,7 @@ private:
 	cpu_device *m_cpu;
 	UINT16 m_param_offset_latch;
 
-	UINT16 m_xpos, m_ypos;
+	INT16 m_xpos, m_ypos;
 	UINT8 m_color1, m_color2;
 	UINT8 m_mode;
 	UINT16 m_pix_xsize, m_pix_ysize;
