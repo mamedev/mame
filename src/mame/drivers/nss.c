@@ -861,7 +861,9 @@ MACHINE_CONFIG_END
 	ROM_SYSTEM_BIOS( 0, "single", "Nintendo Super System (Single Cart BIOS)" ) \
 	ROMX_LOAD("nss-ic14.02", 0x00000, 0x8000, CRC(e06cb58f) SHA1(62f507e91a2797919a78d627af53f029c7d81477), ROM_BIOS(1) )   /* bios */ \
 	ROM_SYSTEM_BIOS( 1, "multi", "Nintendo Super System (Multi Cart BIOS)" ) \
-	ROMX_LOAD("nss-c.dat"  , 0x00000, 0x8000, CRC(a8e202b3) SHA1(b7afcfe4f5cf15df53452dc04be81929ced1efb2), ROM_BIOS(2) )   /* bios */
+	ROMX_LOAD("nss-c.dat"  , 0x00000, 0x8000, CRC(a8e202b3) SHA1(b7afcfe4f5cf15df53452dc04be81929ced1efb2), ROM_BIOS(2) )   /* bios */ \
+	ROM_SYSTEM_BIOS( 2, "single3", "Nintendo Super System (Single Cart BIOS v3)" ) \
+	ROMX_LOAD("nss-v3.rom" , 0x00000, 0x8000, CRC(ac385b53) SHA1(e3942f9d508c3c8074c3c3941376c37ca68b8e54), ROM_BIOS(3) )   /* bios */
 
 
 ROM_START( nss )
