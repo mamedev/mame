@@ -8,7 +8,7 @@
   - Documentation and redump (significant contributors):
   - - d4s (extremely rare material)
   - - Yakushi~Kabuto (~1160 carts)
-  - - byuu (210 carts)
+  - - byuu (220 carts)
   - - badinsults (~350 carts)
   - - JohnDie (~180 carts)
   - - Zidanax (~130 carts)
@@ -357,19 +357,19 @@ SHVC-042 : Super Game Boy 2 cartridge, only released in Japan
 -->
 
 <!--
-The software list will be divided in the following categories:
-1. Documented non retail cartridges: Dumps from confirmed non retail cartridges
-2. Pirates cartridges
-3. No confirmed cartridge: roms which are not confirmed to exist on a cartridge at this time
-4. Bad dumps: Known bad dumps, need redumps
-5. Perfect retail dumps: Matching dumps from two different retail cartridges
-6. Verified retail dumps: Dumps from a single confirmed retail cartridge
-7. Unconfirmed retail dumps: Retail cartridge roms which are not confirmed and/or not documented
+The software list will be divided into the following categories:
+[L01] Documented prototype and demo cartridges : images from confirmed non-retail cartridges
+[L02] Unconfirmed prototype and demo cartridges : roms not confirmed to exist on a non-retail cartridge at this time
+[L03] Documented unlicensed cartridges : images from a confirmed unlicensed cartridges
+[L04] Unconfirmed unlicensed cartridges : roms not confirmed to exist on an unlicensed cartridge at this time
+[L05] Bad dumps : known bad dumps, redump needed
+[L06] Perfect retail images : matching images from two or more different retail cartridges
+[L07] Verified retail images : images from a single documented retail cartridge
+[L08] Unconfirmed retail images : images which are not confirmed and/or not documented
 Beyond that last category are the roms waiting to be classified.
 -->
 
 <softwarelist name="snes" description="Nintendo SNES cartridges">
-
 
 <!-- Pending
 
@@ -575,7 +575,7 @@ Beyond that last category are the roms waiting to be classified.
 
 <!--
 
-List of documented non retail cartridges
+[L01] List of documented prototype and demo cartridges
 
 -->
 
@@ -2920,6 +2920,33 @@ List of documented non retail cartridges
     </software>
 -->
 
+	<software name="superunop" cloneof="superuno">
+		<!-- snescentral.com -->
+		<description>Super Uno (Jpn, Prototype)</description>
+		<year>1993</year>
+		<publisher>Tomy</publisher>
+		<info name="alt_title" value="スーパーUNO" />
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-2P3B-01" />
+			<feature name="u1" value="U1 EPROM(J)" />
+			<feature name="u2" value="U2 EPROM(J)" />
+			<feature name="u3" value="U3 SRAM" />
+			<feature name="u4" value="U4 74F139" />
+			<feature name="u5" value="U5 CIC" />
+			<feature name="lockout" value="D411A 9304 BA" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="" />
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="u1" size="524288" crc="47e394aa" sha1="edc9083e6b5a30c1e5f78f8dc4c8c35a57aa4591" offset="0x000000" />
+				<rom name="u2" size="524288" crc="63709618" sha1="4fe8b15cd971b1f7fa4614c56d2f8f33cc5f9e0b" offset="0x080000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sylvestr1" cloneof="sylvestr">
 		<!-- pending: awaiting documentation -->
 		<description>Sylvester and Tweety (USA, Prototype 19931215)</description>
@@ -3141,456 +3168,13 @@ List of documented non retail cartridges
 
 <!--
 
-End of documented non retail cartridges
+[/L01] End of documented prototype and demo cartridges : images from confirmed non-retail cartridges
 
 -->
 
 <!--
 
-List of pirate cartridges
-
--->
-
-<!-- most common copy protection devices used in pirate cartridges,
-     thanks to d4s for these infos:
-
-     Device A: the game program checks for the expected values after writing to this device and refuses to work if they don`t match up,
-     a byte-sized value is written to $88:xxxx (or mirror thereof), then read back a byte from $80:xxxx (again, mirrored to some other places),
-     the bits in the byte written are swapped around a bit, in the following order: 76543210 becomes 06712345
-     - Aladdin 2000
-     - Bananas de Pijamas
-     - A Bug's Life
-     - Digimon Adventure
-     - King of Fighters 2000
-     - Pocket Monster
-     - Pokemon Gold Silver
-     - Pokemon Stadium
-     - Soul Edge Vs Samurai
-     - Street Fighter EX Plus Alpha
-     - X-Men vs. Street Fighter
-
-     Device B: the game program checks for the expected values after writing to this device and refuses to work if they don`t match up,
-     a byte-sized constant value is written to $88:xxxx (or mirror thereof), then read back a byte from $80:xxxx (again, mirrored to some other places),
-     - Soul Blade
-
-     Device C: the game program checks for the expected values after writing to this device and refuses to work if they don`t match up,
-     it seems to contain some kind of microcontroller and expects write sequences
-     details of the algorithm unknown at this time, all the values the game needs were bruteforced
-     - Tekken 2
--->
-
-	<software name="aladdi2k">
-	<!-- Protection notes: write latch byte to 88xxxx, then reads back BITSWAP8(latch,0,6,7,1,2,3,4,5) from 80xxxx -->
-		<!-- single cartridge source: d4s -->
-		<description>Aladdin 2000 (Bra, Mega Drive Bootleg)</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="snes_cart">
-			<feature name="pcb" value="CF1647" /> <!-- custom board, 2 epoxy chips and one surface mounted cic clone labaled D1B -->
-			<feature name="cart_model" value="SNS-006" />
-			<feature name="slot" value="lorom_poke" />
-			<dataarea name="rom" size="2097152">
-				<rom name="u1" size="2097152" crc="752a25d3" sha1="a8585b3e61c610af18a077dd1a2ea3d0aa25dda8" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- This is temporarily included for reference, until we fix emulation of the good dump -->
-	<software name="aladdi2kh" cloneof="aladdi2k">
-		<description>Aladdin 2000 (Bra, Mega Drive Bootleg, Cracked)</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="snes_cart">
-			<feature name="slot" value="lorom" />
-			<dataarea name="rom" size="2097152">
-				<rom name="aladdin 2000 (mega drive bootleg) (cracked).sfc" size="2097152" crc="a818cfd5" sha1="1de9a68980cac63346e3cda14a5aa0d6cea8b739" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-<!--
-protection actually seems more similar to tekken 2 than to pokemon
-the game writes (low) a lot of time to [ff00-ffff] range and reads (high) to ffcc/ffcd/ffce
-more investigation needed...
--->
-	<software name="banpija" cloneof="chester" supported="no"> <!-- unemulated additional hardware -->
-		<!-- single cartridge source: d4s -->
-		<description>Bananas de Pijamas (Asia)</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="snes_cart">
-			<feature name="slot" value="lorom_pija" />
-			<dataarea name="rom" size="1048576">
-				<rom name="bananas de pijamas (unl) [!].sfc" size="1048576" crc="52b0d84b" sha1="149e916dfd4058f8de97d7bc8f74d5e630853ffb" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Notes: this is temporarily included for reference, until we fix emulation of the good dump -->
-	<software name="banpijah" cloneof="chester" supported="no">
-		<description>Bananas de Pijamas (Asia, Cracked)</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="snes_cart">
-			<feature name="slot" value="lorom" />
-			<dataarea name="rom" size="1048576">
-				<rom name="bananas de pijamas (cracked).sfc" size="1048576" crc="4260d94e" sha1="9442b414b5238f207b2d02bc7ee0ff83541dbc16" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-<!--
-protection actually seems more similar to tekken 2 than to pokemon
-the game writes (high) a lot of time to [ff00-ffff] range, but it does not seem to read back (possibly it reads from the same range where it reads rom from...)
-more investigation needed...
--->
-	<software name="bugslife" supported="no"> <!-- unemulated additional hardware -->
-		<!-- single cartridge source: d4s -->
-		<!-- Notes: highly similar to the game boy color version, this could be based on a prototype -->
-		<description>A Bug's Life (Bra)</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="snes_cart">
-			<feature name="pcb" value="890409C" /> <!-- custom board, three epoxy chips -->
-			<feature name="cart_model" value="SNS-006" />
-			<feature name="slot" value="lorom_bugs" />
-			<dataarea name="rom" size="2097152">
-				<rom name="u2" size="2097152" crc="014f0fcf" sha1="930ab53fded53a65824690b394d6e8c6565c083b" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!--Notes: this is temporarily included for reference, until we fix emulation of the good dump -->
-	<software name="bugslifeh" cloneof="bugslife">
-		<description>A Bug's Life (Bra, Cracked)</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="snes_cart">
-			<feature name="slot" value="lorom" />
-			<dataarea name="rom" size="2097152">
-				<rom name="a bug's life (cracked).sfc" size="2097152" crc="1683518d" sha1="b90bffd1f9ee459f3df57545916fb66e23de8a4d" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="digimon"> <!-- TODO: source -->
-	<!-- Protection notes: write latch byte to 88xxxx, then reads back BITSWAP8(latch,0,6,7,1,2,3,4,5) from 80xxxx -->
-		<description>Digimon Adventure</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="snes_cart">
-			<feature name="slot" value="lorom_poke" />
-			<dataarea name="rom" size="2097152">
-				<rom name="digimon adventure.sfc" size="2097152" crc="4f660972" sha1="82a8406ba79971ac62d4e79971a4169c4461725e" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Notes: this is temporarily included for reference, until we fix emulation of the good dump -->
-	<software name="digimonh" cloneof="digimon">
-		<description>Digimon Adventure (Cracked)</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="snes_cart">
-			<feature name="slot" value="lorom" />
-			<dataarea name="rom" size="2097152">
-				<rom name="digimon adventure (cracked).sfc" size="2097152" crc="aea5e0ba" sha1="d00689883bbf5504996490088250a479647f94a3" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="kof2000">
-	<!-- Protection notes: write latch byte to 88xxxx, then reads back BITSWAP8(latch,0,6,7,1,2,3,4,5) from 80xxxx -->
-		<!-- single cartridge source: d4s -->
-		<description>The King of Fighters 2000 (Bra)</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="snes_cart">
-			<feature name="slot" value="lorom_poke" />
-			<dataarea name="rom" size="3145728">
-				<rom name="the king of fighters 2000 (brazil) (unl).sfc" size="3145728" crc="a7813943" sha1="7a7dc960d8c5946d249d715c9595257f65801db4" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Notes: this is temporarily included for reference, until we fix emulation of the good dump -->
-	<software name="kof2000h" cloneof="kof2000">
-		<description>The King of Fighters 2000 (Bra, Cracked)</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="snes_cart">
-			<feature name="slot" value="lorom" />
-			<dataarea name="rom" size="3145728">
-				<rom name="the king of fighters 2000 (cracked).sfc"  size="3145728" crc="ee339f08" sha1="ac7a8d84635240e1fe7e8ef4199db823c63b7d9a" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="pokemon">
-	<!-- Protection notes: write latch byte to 88xxxx, then reads back BITSWAP8(latch,0,6,7,1,2,3,4,5) from 80xxxx -->
-		<!-- single cartridge source: d4s -->
-		<description>Pocket Monster (Asia)</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="snes_cart">
-			<feature name="slot" value="lorom_poke" />
-			<dataarea name="rom" size="2097152">
-				<rom name="pocket monster (world) (unl).sfc" size="2097152" crc="892c6765" sha1="bf4ba0eea04c777c97a2d622d939597e7c0b340b" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Notes: this is temporarily included for reference, until we fix emulation of the good dump -->
-	<software name="pokemonh" cloneof="pokemon">
-		<description>Pocket Monster (Asia, Cracked)</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="snes_cart">
-			<feature name="slot" value="lorom" />
-			<dataarea name="rom" size="2097152">
-				<rom name="pocket monster (world) (cracked alt).sfc" size="2097152" crc="53a72516" sha1="9fe9e5be596548576698c4c038343976db1f31d9" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="pokegs"> <!-- TODO: source -->
-	<!-- Protection notes: write latch byte to 80xxxx, then reads back BITSWAP8(latch,0,6,7,1,2,3,4,5) from 90xxxx -->
-		<description>Pokemon Gold Silver (Asia)</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="snes_cart">
-			<feature name="slot" value="lorom_poke" />
-			<dataarea name="rom" size="2097152">
-				<rom name="pokemon gold silver.sfc" size="2097152" crc="7c0b798d" sha1="40aef565230d70b833a73197adac73549b152f67" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Notes: this is temporarily included for reference, until we fix emulation of the good dump -->
-	<software name="pokegsh" cloneof="pokegs">
-		<description>Pokemon Gold Silver (Asia, Cracked)</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="snes_cart">
-			<feature name="slot" value="lorom" />
-			<dataarea name="rom" size="2097152">
-				<rom name="pokemon gold silver (cracked).sfc" size="2097152" crc="e6bafeee" sha1="9f5d1f64aa012f33f85f87a69f5d07f86dc2295c" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="pokestad">
-	<!-- Protection notes: write latch byte to 88xxxx/98xxxx, then reads back BITSWAP8(latch,0,6,7,1,2,3,4,5) from 80xxxx/98xxxx -->
-		<!-- single cartridge source: d4s -->
-		<description>Pokemon Stadium (Asia)</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="snes_cart">
-			<feature name="slot" value="lorom_poke" />
-			<dataarea name="rom" size="2097152">
-				<rom name="pokemon stadium (world) (unl).sfc" size="2097152" crc="f863c642" sha1="b4a015e2366bdd1ba62b33cf334383d54fb59ce7" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Notes: this is temporarily included for reference, until we fix emulation of the good dump -->
-	<software name="pokestadh" cloneof="pokestad">
-		<description>Pokemon Stadium (Asia, Cracked)</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="snes_cart">
-			<feature name="slot" value="lorom" />
-			<dataarea name="rom" size="2097152">
-				<rom name="pokemon stadium (world, cracked) (unl).sfc" size="2097152" crc="a8142249" sha1="b9825faf488c2106d46c45ba10b0402a04cd1e4c" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="soulblad" supported="partial">
-		<!-- single cartridge source: d4s -->
-		<description>Soul Blade (Asia)</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="snes_cart">
-			<feature name="pcb" value="not identified" />
-			<feature name="chip" value="not identified" /> <!-- 3 epoxy chips, no info printed -->
-			<feature name="cart_model" value="SNS-006" />
-			<feature name="cart_back_label" value="n/a" />
-			<feature name="slot" value="lorom_sbld" />
-			<dataarea name="rom" size="3145728">
-				<rom name="soul blade (world) (unl).sfc" size="3145728" crc="c97d1d7b" sha1="f7501045b5326255f3bde0543eb0a541b62588a9" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Notes: this is temporarily included for reference, until we fix emulation of the good dump -->
-	<software name="soulbladh" cloneof="soulblad">
-		<description>Soul Blade (Asia, Cracked)</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="snes_cart">
-			<feature name="slot" value="lorom" />
-			<dataarea name="rom" size="3145728">
-				<rom name="soul blade (cracked).sfc" size="3145728" crc="2feefcc3" sha1="3d9cc86c8be01e8e6c93bdc3f056de50b0512214" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="souledge"> <!-- TODO: source -->
-	<!-- Protection notes: write latch byte to 88xxxx, then reads back BITSWAP8(latch,0,6,7,1,2,3,4,5) from 80xxxx -->
-		<description>Soul Edge Vs Samurai (Asia)</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="snes_cart">
-			<feature name="slot" value="lorom_poke" />
-			<dataarea name="rom" size="2097152">
-				<rom name="soul edge vs samurai.sfc" size="2097152" crc="5e4ada04" sha1="fa48972ae8406b7ef17b3b0096bed6b858d36939" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Notes: this is temporarily included for reference, until we fix emulation of the good dump -->
-	<software name="souledgeh" cloneof="souledge">
-		<description>Soul Edge Vs Samurai (Asia, Cracked)</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="snes_cart">
-			<feature name="slot" value="lorom" />
-			<dataarea name="rom" size="2097152">
-				<rom name="soul edge vs samurai (cracked).sfc" size="2097152" crc="61abc296" sha1="0a7ec981306b58911e152d9dc17f8cd04896d532" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sfex">
-		<!-- single cartridge source: d4s -->
-		<description>Street Fighter EX Plus α (Asia)</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="snes_cart">
-			<feature name="slot" value="lorom_tekken2" />
-			<dataarea name="rom" size="2097152">
-				<rom name="street fighter ex plus alpha (world) (unl).sfc" size="2097152" crc="dad59b9f" sha1="22f864b4a8728f08513b979d2a960eb3083b2c83" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Notes: this is temporarily included for reference, until we fix emulation of the good dump -->
-	<software name="sfexh" cloneof="sfex">
-		<description>Street Fighter EX Plus α (Asia, Cracked)</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="snes_cart">
-			<feature name="slot" value="lorom" />
-			<dataarea name="rom" size="2097152">
-				<rom name="street fighter ex plus alpha (cracked).sfc" size="2097152" crc="bf3fa644" sha1="46c7604737c2a16d0cc85d96df431487e4ddb79f" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sfiiisv">
-		<!-- single cartridge source: d4s -->
-		<description>Street Fighter III - Super Version (Asia)</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="snes_cart">
-			<feature name="pcb" value="" />
-			<feature name="u1" value="" /> <!-- ROM -->
-			<feature name="u2" value="" /> <!-- ROM -->
-			<feature name="u3" value="" /> <!-- 74LS139 -->
-			<feature name="u4" value="" /> <!-- CIC -->
-			<feature name="cart_model" value="n/a" /> <!-- similar to SHVC-006 -->
-			<feature name="cart_back_label" value="n/a" />
-			<feature name="slot" value="lorom" />
-			<dataarea name="rom" size="2097152">
-				<rom name="zf3103a.u1" size="1048576" crc="0a667f6f" sha1="0b58cf0d1fddb7adda096c9b701f291965b478fa" offset="0x000000" />
-				<rom name="zf3103b.u2" size="1048576" crc="e94aa33b" sha1="0b25656e0bd0245d7f3816409fafb0122a0d325f" offset="0x100000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sup20hab" supported="partial">
-		<!-- single cartridge source: d4s -->
-		<description>Super 20 Hab (Kor)</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<info name="alt_title" value="슈퍼20합" />
-		<part name="cart" interface="snes_cart">
-			<feature name="pcb" value="C20" /> <!-- custom board, four surface mounted chips, forth is laballed CIVIC (CIC clone?) -->
-			<feature name="slot" value="lorom_20col" />
-			<dataarea name="rom" size="1048576">
-				<rom name="c20h" size="1048576" crc="ac19b8f4" sha1="3a64c817ff3fc3819f2fd726868b6f27eb4523df" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="tekken2">
-		<!-- single cartridge source: d4s -->
-		<description>Tekken 2 (Asia)</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="snes_cart">
-			<feature name="slot" value="lorom_tekken2" />
-			<dataarea name="rom" size="2097152">
-				<rom name="tekken 2 (world) (unl).sfc" size="2097152" crc="066687ca" sha1="8aa2ee03fe40f289e30723a1c8cd4564481bdfdf" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Notes: this is temporarily included for reference, until we fix emulation of the good dump -->
-	<software name="tekken2h" cloneof="tekken2">
-		<description>Tekken 2 (Asia, Cracked)</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="snes_cart">
-			<feature name="slot" value="lorom" />
-			<dataarea name="rom" size="2097152">
-				<rom name="tekken 2 (world, cracked) (unl).sfc" size="2097152" crc="5ba13729" sha1="ff60b9179154c5fe39b8ddc74724884fd3c8290c" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="xmensf">
-	<!-- Protection notes: write latch byte to 88xxxx, then reads back BITSWAP8(latch,0,6,7,1,2,3,4,5) from 80xxxx -->
-		<!-- single cartridge source: d4s -->
-		<description>X-Men vs. Street Fighter (Asia)</description>
-		<year>1996</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="snes_cart">
-			<feature name="pcb" value="" /> <!-- custom board very similar to legitimate ones for untrained eyes -->
-			<feature name="u1" value="" /> <!-- ROM -->
-			<feature name="u2" value="" /> <!-- real Nintendo CIC, probably scraped from licensed cartridges -->
-			<feature name="lockout" value="D411A 9409 CB" />
-			<feature name="cart_model" value="n/a" /> <!-- similar to SHVC-006 -->
-			<feature name="slot" value="lorom_poke" />
-			<dataarea name="rom" size="2097152">
-				<rom name="x-men.u1" size="2097152" crc="40242231" sha1="7ea216437c77e1ac20f9a00eb53b283d269aa15a" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Notes: this is temporarily included for reference, until we fix emulation of the good dump -->
-	<software name="xmensfh" cloneof="xmensf">
-		<description>X-Men vs. Street Fighter (Asia, Cracked)</description>
-		<year>1996</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="snes_cart">
-			<feature name="slot" value="lorom" />
-			<dataarea name="rom" size="2097152">
-				<rom name="x-men vs. street fighter (world, cracked) (unl).sfc" size="2097152" crc="7eedf7da" sha1="58909736b9c56933c2a8f5cae5c99cf6e3774b75" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-<!--
-
-End of pirate cartridges
-
--->
-
-<!--
-
-List of roms which are not confirmed to exist on a cartridge at this time
+[L02] List of unconfirmed prototype and demo cartridges
 
 -->
 
@@ -4231,7 +3815,7 @@ List of roms which are not confirmed to exist on a cartridge at this time
 
 	<software name="wizapp" cloneof="wizap">
 		<!-- Notes: there were two versions in goodsnes differing only on two header bytes,
-		            one of them is probably hacked, the other is included but commented out untilk a redump is issued -->
+		            one of them is probably hacked, the other is included but commented out until a redump is issued -->
 		<description>Wizap! - Ankoku no Ou (Jpn, Prototype, Hacked?)</description>
 		<year>1994</year>
 		<publisher>ASCII Entertainment</publisher>
@@ -4247,6 +3831,461 @@ List of roms which are not confirmed to exist on a cartridge at this time
 			</dataarea>
 		</part>
 	</software>
+
+<!--
+
+[/L02] End of unconfirmed prototype and demo cartridges
+
+-->
+
+<!--
+
+[L03] List of documented unlicensed cartridges
+
+-->
+
+<!-- most common copy protection devices used in pirate cartridges,
+     thanks to d4s for these infos:
+
+     Device A: the game program checks for the expected values after writing to this device and refuses to work if they don`t match up,
+     a byte-sized value is written to $88:xxxx (or mirror thereof), then read back a byte from $80:xxxx (again, mirrored to some other places),
+     the bits in the byte written are swapped around a bit, in the following order: 76543210 becomes 06712345
+     - Aladdin 2000
+     - Bananas de Pijamas
+     - A Bug's Life
+     - Digimon Adventure
+     - King of Fighters 2000
+     - Pocket Monster
+     - Pokemon Gold Silver
+     - Pokemon Stadium
+     - Soul Edge Vs Samurai
+     - Street Fighter EX Plus Alpha
+     - X-Men vs. Street Fighter
+
+     Device B: the game program checks for the expected values after writing to this device and refuses to work if they don`t match up,
+     a byte-sized constant value is written to $88:xxxx (or mirror thereof), then read back a byte from $80:xxxx (again, mirrored to some other places),
+     - Soul Blade
+
+     Device C: the game program checks for the expected values after writing to this device and refuses to work if they don`t match up,
+     it seems to contain some kind of microcontroller and expects write sequences
+     details of the algorithm unknown at this time, all the values the game needs were bruteforced
+     - Tekken 2
+-->
+
+	<software name="aladdi2k">
+	<!-- Protection notes: write latch byte to 88xxxx, then reads back BITSWAP8(latch,0,6,7,1,2,3,4,5) from 80xxxx -->
+		<!-- single cartridge source: d4s -->
+		<description>Aladdin 2000 (Bra, Mega Drive Bootleg)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="CF1647" /> <!-- custom board, 2 epoxy chips and one surface mounted cic clone labaled D1B -->
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="slot" value="lorom_poke" />
+			<dataarea name="rom" size="2097152">
+				<rom name="u1" size="2097152" crc="752a25d3" sha1="a8585b3e61c610af18a077dd1a2ea3d0aa25dda8" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- This is temporarily included for reference, until we fix emulation of the good dump -->
+	<software name="aladdi2kh" cloneof="aladdi2k">
+		<description>Aladdin 2000 (Bra, Mega Drive Bootleg, Cracked)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="aladdin 2000 (mega drive bootleg) (cracked).sfc" size="2097152" crc="a818cfd5" sha1="1de9a68980cac63346e3cda14a5aa0d6cea8b739" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+protection actually seems more similar to tekken 2 than to pokemon
+the game writes (low) a lot of time to [ff00-ffff] range and reads (high) to ffcc/ffcd/ffce
+more investigation needed...
+-->
+	<software name="banpija" cloneof="chester" supported="no"> <!-- unemulated additional hardware -->
+		<!-- single cartridge source: d4s -->
+		<description>Bananas de Pijamas (Asia)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom_pija" />
+			<dataarea name="rom" size="1048576">
+				<rom name="bananas de pijamas (unl) [!].sfc" size="1048576" crc="52b0d84b" sha1="149e916dfd4058f8de97d7bc8f74d5e630853ffb" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Notes: this is temporarily included for reference, until we fix emulation of the good dump -->
+	<software name="banpijah" cloneof="chester" supported="no">
+		<description>Bananas de Pijamas (Asia, Cracked)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="bananas de pijamas (cracked).sfc" size="1048576" crc="4260d94e" sha1="9442b414b5238f207b2d02bc7ee0ff83541dbc16" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+protection actually seems more similar to tekken 2 than to pokemon
+the game writes (high) a lot of time to [ff00-ffff] range, but it does not seem to read back (possibly it reads from the same range where it reads rom from...)
+more investigation needed...
+-->
+	<software name="bugslife" supported="no"> <!-- unemulated additional hardware -->
+		<!-- single cartridge source: d4s -->
+		<!-- Notes: highly similar to the game boy color version, this could be based on a prototype -->
+		<description>A Bug's Life (Bra)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="890409C" /> <!-- custom board, three epoxy chips -->
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="slot" value="lorom_bugs" />
+			<dataarea name="rom" size="2097152">
+				<rom name="u2" size="2097152" crc="014f0fcf" sha1="930ab53fded53a65824690b394d6e8c6565c083b" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!--Notes: this is temporarily included for reference, until we fix emulation of the good dump -->
+	<software name="bugslifeh" cloneof="bugslife">
+		<description>A Bug's Life (Bra, Cracked)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="a bug's life (cracked).sfc" size="2097152" crc="1683518d" sha1="b90bffd1f9ee459f3df57545916fb66e23de8a4d" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="digimon"> <!-- TODO: source -->
+	<!-- Protection notes: write latch byte to 88xxxx, then reads back BITSWAP8(latch,0,6,7,1,2,3,4,5) from 80xxxx -->
+		<description>Digimon Adventure</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom_poke" />
+			<dataarea name="rom" size="2097152">
+				<rom name="digimon adventure.sfc" size="2097152" crc="4f660972" sha1="82a8406ba79971ac62d4e79971a4169c4461725e" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Notes: this is temporarily included for reference, until we fix emulation of the good dump -->
+	<software name="digimonh" cloneof="digimon">
+		<description>Digimon Adventure (Cracked)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="digimon adventure (cracked).sfc" size="2097152" crc="aea5e0ba" sha1="d00689883bbf5504996490088250a479647f94a3" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kof2000">
+	<!-- Protection notes: write latch byte to 88xxxx, then reads back BITSWAP8(latch,0,6,7,1,2,3,4,5) from 80xxxx -->
+		<!-- single cartridge source: d4s -->
+		<description>The King of Fighters 2000 (Bra)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom_poke" />
+			<dataarea name="rom" size="3145728">
+				<rom name="the king of fighters 2000 (brazil) (unl).sfc" size="3145728" crc="a7813943" sha1="7a7dc960d8c5946d249d715c9595257f65801db4" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Notes: this is temporarily included for reference, until we fix emulation of the good dump -->
+	<software name="kof2000h" cloneof="kof2000">
+		<description>The King of Fighters 2000 (Bra, Cracked)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="3145728">
+				<rom name="the king of fighters 2000 (cracked).sfc"  size="3145728" crc="ee339f08" sha1="ac7a8d84635240e1fe7e8ef4199db823c63b7d9a" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pokemon">
+	<!-- Protection notes: write latch byte to 88xxxx, then reads back BITSWAP8(latch,0,6,7,1,2,3,4,5) from 80xxxx -->
+		<!-- single cartridge source: d4s -->
+		<description>Pocket Monster (Asia)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom_poke" />
+			<dataarea name="rom" size="2097152">
+				<rom name="pocket monster (world) (unl).sfc" size="2097152" crc="892c6765" sha1="bf4ba0eea04c777c97a2d622d939597e7c0b340b" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Notes: this is temporarily included for reference, until we fix emulation of the good dump -->
+	<software name="pokemonh" cloneof="pokemon">
+		<description>Pocket Monster (Asia, Cracked)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="pocket monster (world) (cracked alt).sfc" size="2097152" crc="53a72516" sha1="9fe9e5be596548576698c4c038343976db1f31d9" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pokegs"> <!-- TODO: source -->
+	<!-- Protection notes: write latch byte to 80xxxx, then reads back BITSWAP8(latch,0,6,7,1,2,3,4,5) from 90xxxx -->
+		<description>Pokemon Gold Silver (Asia)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom_poke" />
+			<dataarea name="rom" size="2097152">
+				<rom name="pokemon gold silver.sfc" size="2097152" crc="7c0b798d" sha1="40aef565230d70b833a73197adac73549b152f67" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Notes: this is temporarily included for reference, until we fix emulation of the good dump -->
+	<software name="pokegsh" cloneof="pokegs">
+		<description>Pokemon Gold Silver (Asia, Cracked)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="pokemon gold silver (cracked).sfc" size="2097152" crc="e6bafeee" sha1="9f5d1f64aa012f33f85f87a69f5d07f86dc2295c" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pokestad">
+	<!-- Protection notes: write latch byte to 88xxxx/98xxxx, then reads back BITSWAP8(latch,0,6,7,1,2,3,4,5) from 80xxxx/98xxxx -->
+		<!-- single cartridge source: d4s -->
+		<description>Pokemon Stadium (Asia)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom_poke" />
+			<dataarea name="rom" size="2097152">
+				<rom name="pokemon stadium (world) (unl).sfc" size="2097152" crc="f863c642" sha1="b4a015e2366bdd1ba62b33cf334383d54fb59ce7" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Notes: this is temporarily included for reference, until we fix emulation of the good dump -->
+	<software name="pokestadh" cloneof="pokestad">
+		<description>Pokemon Stadium (Asia, Cracked)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="pokemon stadium (world, cracked) (unl).sfc" size="2097152" crc="a8142249" sha1="b9825faf488c2106d46c45ba10b0402a04cd1e4c" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="soulblad" supported="partial">
+		<!-- single cartridge source: d4s -->
+		<description>Soul Blade (Asia)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="not identified" />
+			<feature name="chip" value="not identified" /> <!-- 3 epoxy chips, no info printed -->
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="n/a" />
+			<feature name="slot" value="lorom_sbld" />
+			<dataarea name="rom" size="3145728">
+				<rom name="soul blade (world) (unl).sfc" size="3145728" crc="c97d1d7b" sha1="f7501045b5326255f3bde0543eb0a541b62588a9" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Notes: this is temporarily included for reference, until we fix emulation of the good dump -->
+	<software name="soulbladh" cloneof="soulblad">
+		<description>Soul Blade (Asia, Cracked)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="3145728">
+				<rom name="soul blade (cracked).sfc" size="3145728" crc="2feefcc3" sha1="3d9cc86c8be01e8e6c93bdc3f056de50b0512214" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="souledge"> <!-- TODO: source -->
+	<!-- Protection notes: write latch byte to 88xxxx, then reads back BITSWAP8(latch,0,6,7,1,2,3,4,5) from 80xxxx -->
+		<description>Soul Edge Vs Samurai (Asia)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom_poke" />
+			<dataarea name="rom" size="2097152">
+				<rom name="soul edge vs samurai.sfc" size="2097152" crc="5e4ada04" sha1="fa48972ae8406b7ef17b3b0096bed6b858d36939" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Notes: this is temporarily included for reference, until we fix emulation of the good dump -->
+	<software name="souledgeh" cloneof="souledge">
+		<description>Soul Edge Vs Samurai (Asia, Cracked)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="soul edge vs samurai (cracked).sfc" size="2097152" crc="61abc296" sha1="0a7ec981306b58911e152d9dc17f8cd04896d532" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sfex">
+		<!-- single cartridge source: d4s -->
+		<description>Street Fighter EX Plus α (Asia)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom_tekken2" />
+			<dataarea name="rom" size="2097152">
+				<rom name="street fighter ex plus alpha (world) (unl).sfc" size="2097152" crc="dad59b9f" sha1="22f864b4a8728f08513b979d2a960eb3083b2c83" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Notes: this is temporarily included for reference, until we fix emulation of the good dump -->
+	<software name="sfexh" cloneof="sfex">
+		<description>Street Fighter EX Plus α (Asia, Cracked)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="street fighter ex plus alpha (cracked).sfc" size="2097152" crc="bf3fa644" sha1="46c7604737c2a16d0cc85d96df431487e4ddb79f" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sfiiisv">
+		<!-- single cartridge source: d4s -->
+		<description>Street Fighter III - Super Version (Asia)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="" />
+			<feature name="u1" value="" /> <!-- ROM -->
+			<feature name="u2" value="" /> <!-- ROM -->
+			<feature name="u3" value="" /> <!-- 74LS139 -->
+			<feature name="u4" value="" /> <!-- CIC -->
+			<feature name="cart_model" value="n/a" /> <!-- similar to SHVC-006 -->
+			<feature name="cart_back_label" value="n/a" />
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="zf3103a.u1" size="1048576" crc="0a667f6f" sha1="0b58cf0d1fddb7adda096c9b701f291965b478fa" offset="0x000000" />
+				<rom name="zf3103b.u2" size="1048576" crc="e94aa33b" sha1="0b25656e0bd0245d7f3816409fafb0122a0d325f" offset="0x100000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sup20hab" supported="partial">
+		<!-- single cartridge source: d4s -->
+		<description>Super 20 Hab (Kor)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<info name="alt_title" value="슈퍼20합" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="C20" /> <!-- custom board, four surface mounted chips, forth is laballed CIVIC (CIC clone?) -->
+			<feature name="slot" value="lorom_20col" />
+			<dataarea name="rom" size="1048576">
+				<rom name="c20h" size="1048576" crc="ac19b8f4" sha1="3a64c817ff3fc3819f2fd726868b6f27eb4523df" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tekken2">
+		<!-- single cartridge source: d4s -->
+		<description>Tekken 2 (Asia)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom_tekken2" />
+			<dataarea name="rom" size="2097152">
+				<rom name="tekken 2 (world) (unl).sfc" size="2097152" crc="066687ca" sha1="8aa2ee03fe40f289e30723a1c8cd4564481bdfdf" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Notes: this is temporarily included for reference, until we fix emulation of the good dump -->
+	<software name="tekken2h" cloneof="tekken2">
+		<description>Tekken 2 (Asia, Cracked)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="tekken 2 (world, cracked) (unl).sfc" size="2097152" crc="5ba13729" sha1="ff60b9179154c5fe39b8ddc74724884fd3c8290c" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmensf">
+	<!-- Protection notes: write latch byte to 88xxxx, then reads back BITSWAP8(latch,0,6,7,1,2,3,4,5) from 80xxxx -->
+		<!-- single cartridge source: d4s -->
+		<description>X-Men vs. Street Fighter (Asia)</description>
+		<year>1996</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="" /> <!-- custom board very similar to legitimate ones for untrained eyes -->
+			<feature name="u1" value="" /> <!-- ROM -->
+			<feature name="u2" value="" /> <!-- real Nintendo CIC, probably scraped from licensed cartridges -->
+			<feature name="lockout" value="D411A 9409 CB" />
+			<feature name="cart_model" value="n/a" /> <!-- similar to SHVC-006 -->
+			<feature name="slot" value="lorom_poke" />
+			<dataarea name="rom" size="2097152">
+				<rom name="x-men.u1" size="2097152" crc="40242231" sha1="7ea216437c77e1ac20f9a00eb53b283d269aa15a" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Notes: this is temporarily included for reference, until we fix emulation of the good dump -->
+	<software name="xmensfh" cloneof="xmensf">
+		<description>X-Men vs. Street Fighter (Asia, Cracked)</description>
+		<year>1996</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="x-men vs. street fighter (world, cracked) (unl).sfc" size="2097152" crc="7eedf7da" sha1="58909736b9c56933c2a8f5cae5c99cf6e3774b75" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+
+[/L03] End of documented unlicensed cartridges
+
+-->
+
+<!--
+
+[L04] List of unconfirmed unlicensed cartridges
+
+-->
 
 	<software name="futbras" cloneof="issdx">
 		<description>Futebol Brasileiro '96</description>
@@ -4424,14 +4463,13 @@ List of roms which are not confirmed to exist on a cartridge at this time
 
 <!--
 
-End of roms which are not confirmed to exist on a cartridge
+[/L04] End of unconfirmed unlicensed cartridges
 
 -->
 
 <!--
 
-List of bad dumps
-Known bad dumps, redump needed
+[L05] List of bad dumps
 
 -->
 
@@ -4843,14 +4881,13 @@ Known bad dumps, redump needed
 
 <!--
 
-End of bad dumps
+[/L05] List of bad dumps
 
 -->
 
-
 <!--
 
-List of perfect retail cartridges rom dumps
+[L06] List of perfect retail images
 
 -->
 
@@ -9473,6 +9510,46 @@ List of perfect retail cartridges rom dumps
 		</part>
 	</software>
 
+	<software name="coolspotu" cloneof="coolspot">
+		<description>Cool Spot (USA)</description>
+		<year>1993</year>
+		<publisher>Virgin Interactive</publisher>
+		<info name="serial" value="SNS-C8-USA" />
+		<info name="release" value="199309xx" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-20" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="lockout" value="D411A 9304 BA" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="sns-c8-0.u1" size="1048576" crc="44e60e58" sha1="f5ef9d9367191c4fcdb84c4d11a322a9d03f89d2" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="coolwrld">
+		<description>Cool World (USA)</description>
+		<year>1993</year>
+		<publisher>Ocean</publisher>
+		<info name="serial" value="SNS-CD-USA" />
+		<info name="release" value="199302xx" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-10" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="lockout" value="D411A 9303 AA" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="sns-cd-0.u1" size="1048576" crc="0730c37c" sha1="a477c7c8fff0591792fbc7e4731bb7e7988d0617" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="crayon">
 		<description>Crayon Shin-chan - Arashi o Yobu Enji (Jpn)</description>
 		<year>1993</year>
@@ -9547,6 +9624,26 @@ List of perfect retail cartridges rom dumps
 		</part>
 	</software>
 
+	<software name="cutthru" cloneof="cutthr">
+		<description>Cutthroat Island (USA)</description>
+		<year>1996</year>
+		<publisher>Acclaim Entertainment</publisher>
+		<info name="serial" value="M/SNS-AC8E-USA" />
+		<info name="release" value="199603xx" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-30" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="lockout" value="D411B 9522 C" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="sns-ac8e-0.u1" size="2097152" crc="19ea457b" sha1="40965e6c9d6aec698b7a0d3106241fef7f2e6ee8" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cyknight">
 		<description>Cyber Knight (Jpn)</description>
 		<year>1992</year>
@@ -9573,6 +9670,26 @@ List of perfect retail cartridges rom dumps
 		</part>
 	</software>
 
+	<software name="cybrspin">
+		<description>Cyber Spin (USA)</description>
+		<year>1992</year>
+		<publisher>Takara</publisher>
+		<info name="serial" value="SNS-CF-USA" />
+		<info name="release" value="199211xx" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-10" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="lockout" value="D411A 9241 AA" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="524288">
+				<rom name="sns-cf-0.u1" size="524288" crc="44018650" sha1="1b6a1b0332a8301cbec0d6c9171e8fd0bfc0fc57" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cybernat">
 		<description>Cybernator (Euro)</description>
 		<year>1993</year>
@@ -9591,7 +9708,47 @@ List of perfect retail cartridges rom dumps
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="cybernatu" cloneof="cybernat">
+		<description>Cybernator (USA)</description>
+		<year>1993</year>
+		<publisher>Konami</publisher>
+		<info name="serial" value="SNS-AV-USA" />
+		<info name="release" value="199304xx" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-10" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="lockout" value="D411A 9309 BA" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="sns-av-0.u1" size="1048576" crc="4dfa05b3" sha1="f629deea9d7cf6903ba8a4b81da96624c0b056ab" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
 <!-- wip-d -->
+	<software name="dforce">
+		<description>D-Force (USA)</description>
+		<year>1991</year>
+		<publisher>Asmik</publisher>
+		<info name="serial" value="SNS-DF-USA" />
+		<info name="release" value="199112xx" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-01" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="lockout" value="D411 9146 CA" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="sns-df-0.u1" size="1048576" crc="24230807" sha1="444a4001511c80f99d9cd52866828ccc668724d2" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="daffy">
 		<description>Daffy Duck - The Marvin Missions (Euro)</description>
 		<year>1993</year>
@@ -9994,6 +10151,70 @@ List of perfect retail cartridges rom dumps
 		</part>
 	</software>
 
+	<software name="demomanu" cloneof="demoman">
+		<description>Demolition Man (USA)</description>
+		<year>1995</year>
+		<publisher>Acclaim Entertainment</publisher>
+		<info name="serial" value="SNS-AD6E-USA" />
+		<info name="release" value="199508xx" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-30" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="lockout" value="D411B 9529 B" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="sns-ad6e-0.u1" size="2097152" crc="8afe2f91" sha1="b55fac176b1dc86d7aca2e080086184349960c16" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="demoncrtu" cloneof="demoncrt">
+		<description>Demon's Crest (USA)</description>
+		<year>1994</year>
+		<publisher>Capcom</publisher>
+		<info name="serial" value="SNS-3Z-USA" />
+		<info name="release" value="199411xx" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-20" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="lockout" value="D411A 9443 CB" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="sns-3z-0.u1" size="2097152" crc="e8236ad2" sha1="743d60ee1536b0c7c24dbb8ba39d14ed5937c0d5" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dennisu" cloneof="dennis">
+		<description>Dennis the Menace (USA)</description>
+		<year>1993</year>
+		<publisher>Ocean</publisher>
+		<info name="serial" value="SNS-4D-USA" />
+		<info name="release" value="199312xx" />
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-YA0N-01" />
+			<feature name="u1" value="U1 P0" />
+			<feature name="u2" value="U2 P1" />
+			<feature name="u3" value="U3 74LS00" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="lockout" value="D411A 9350 CA" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="sns-4d-0 p0.u1" size="524288" crc="1b453eaf" sha1="86ca9e3492cf00b62cc349bdfad49b4cf6f05b68" offset="0x000000" />
+				<rom name="sns-4d-0 p1.u2" size="524288" crc="c3c72418" sha1="959bf506462f0eb7580dcaa41cc019af0778202c" offset="0x080000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="langrissa" cloneof="langriss">
 		<description>Der Langrisser (Jpn)</description>
 		<year>1995</year>
@@ -10233,6 +10454,26 @@ List of perfect retail cartridges rom dumps
 				<rom name="shvc-ad3j-3.u1" size="3145728" crc="36768b55" sha1="01fa5a26c3521fe73eb687f9731a044dd3022287" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dstrikeu" cloneof="dstrike">
+		<description>Desert Strike - Return to the Gulf (USA)</description>
+		<year>1992</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="serial" value="SNS-RG-USA" />
+		<info name="release" value="199210xx" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-20" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="lockout" value="D411A 9238 CA" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="sns-rg-0.u1" size="1048576" crc="4ce26787" sha1="b9f0e2cfac1ee39140cd495c8e9de99bc6d9d3e1" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -18186,7 +18427,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="u2" value="U2 P1" />
 			<feature name="u3" value="U3 LS00" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="lockout" value="" />
+			<feature name="lockout" value="D411A 9403 BA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<feature name="slot" value="hirom" />
@@ -22543,7 +22784,7 @@ List of perfect retail cartridges rom dumps
 		</part>
 	</software>
 
-	<software name="shinmomo">
+	<software name="shinmomoa" cloneof="shinmomo">
 		<!-- Notes: Also re-released through Nintendo Power -->
 		<description>Shin Momotarou Densetsu (Jpn)</description>
 		<year>1992</year>
@@ -22570,7 +22811,7 @@ List of perfect retail cartridges rom dumps
 		</part>
 	</software>
 
-	<software name="shinmomo1" cloneof="shinmomo">
+	<software name="shinmomoa1" cloneof="shinmomo">
 		<!-- Notes: Also re-released through Nintendo Power -->
 		<description>Shin Momotarou Densetsu (Jpn, Alt)</description>
 		<year>1992</year>
@@ -24016,6 +24257,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="u4" value="U4 LS139" />
 			<feature name="u5" value="U5 CIC" />
 			<feature name="lockout" value="D411A 9316 AA" />
+			<!-- also found with D411A 9316 A -->
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<feature name="slot" value="hirom" />
@@ -28574,7 +28816,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="swordwl2">
+	<software name="swordwl2a" cloneof="swordwl2">
 		<!-- Notes: Revision A (firmware update? initial cart unknown) -->
 		<description>Sword World SFC 2 - Inishie no Kyojin Densetsu (Jpn)</description>
 		<year>1994</year>
@@ -30106,7 +30348,7 @@ Alternate board (XL-1)
 			<feature name="pcb" value="SHVC-1J0N-20" />
 			<feature name="u1" value="U1 MASKROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="" />
+			<feature name="lockout" value="D411B 9607 CB" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="SNS-USA/CAN-1" />
 			<feature name="slot" value="hirom" />
@@ -31876,13 +32118,13 @@ Alternate board (XL-1)
 
 <!--
 
-End of perfect retail cartridges rom dumps
+[/L06] End of perfect retail images
 
 -->
 
 <!--
 
-List of verified retail cartridges rom dumps
+[L07] List of verified retail images
 
 -->
 
@@ -33050,15 +33292,32 @@ List of verified retail cartridges rom dumps
 
 <!--
 
-End of verified retail cartridges rom dumps
+[/L07] End of verified retail images
 
 -->
 
 <!--
 
-List of unconfirmed retail cartridge roms
+[L08] List of unconfirmed retail images
 
 -->
+
+	<software name="granhist">
+		<description>Granhistoria - Genshi Sekaiki (Jpn, Rev. A)</description>
+		<year>1995</year>
+		<publisher>Banpresto</publisher>
+		<info name="serial" value="SHVC-AIRJ-JPN" />
+		<info name="release" value="19950630" />
+		<info name="alt_title" value="グランヒストリア~幻史世界記~" />
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="granhistoria - genshi sekaiki (japan) (rev 1).sfc" size="2097152" crc="27eb2cf0" sha1="d75bf1b46b8ac90e773ddf20e3e8abd38f0d4dc5" offset="0x000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="mechwarri" cloneof="mechwarr">
 		<description>MechWarrior (Ita)</description>
@@ -33070,6 +33329,24 @@ List of unconfirmed retail cartridge roms
 				<rom name="mechwarrior (italy).sfc" size="1048576" crc="9136dce8" sha1="d85e61b4fa00172a7bd2e7f1fd06f939752b6238" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="2048">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shinmomo">
+		<!-- Notes: Also re-released through Nintendo Power -->
+		<description>Shin Momotarou Densetsu (Jpn, Rev. A)</description>
+		<year>1992</year>
+		<publisher>Hudson</publisher>
+		<info name="serial" value="SHVC-M5" />
+		<info name="release" value="19931224" />
+		<info name="alt_title" value="新 桃太郎伝説" />
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="hirom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="shin momotarou densetsu (japan) (rev 1).sfc" size="2097152" crc="4a653411" sha1="a9e0b5e6b0479871792f8b44f032b71fdb8f12b4" offset="0x000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -33102,9 +33379,27 @@ List of unconfirmed retail cartridge roms
 		</part>
 	</software>
 
+	<software name="swordwl2">
+		<description>Sword World SFC 2 - Inishie no Kyojin Densetsu (Jpn, Rev. A)</description>
+		<year>1994</year>
+		<publisher>T&amp;E Soft</publisher>
+		<info name="serial" value="SHVC-7M" />
+		<info name="release" value="19940715" />
+		<info name="alt_title" value="ソードワールドSFC2 いにし えの巨人伝説" />
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="sword world sfc 2 - inishie no kyojin densetsu (japan) (rev 1).sfc" size="2097152" crc="cb148365" sha1="a90412a32828fdf02968bf7b1f2efd57453ef031" offset="0x000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 <!--
 
-End of unconfirmed retail cartridge roms
+[/L08] End of unconfirmed retail images
 
 -->
 
@@ -36138,19 +36433,6 @@ List of unclassified roms
 		</part>
 	</software>
 
-	<software name="coolspotu" cloneof="coolspot">
-		<description>Cool Spot (USA)</description>
-		<year>1993</year>
-		<publisher>Virgin Interactive</publisher>
-		<info name="release" value="199309xx" />
-		<part name="cart" interface="snes_cart">
-			<feature name="slot" value="lorom" />
-			<dataarea name="rom" size="1048576">
-				<rom name="cool spot (usa).sfc" size="1048576" crc="44e60e58" sha1="f5ef9d9367191c4fcdb84c4d11a322a9d03f89d2" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="coolwrlds" cloneof="coolwrld">
 		<description>Cool World (Spa)</description>
 		<year>1993</year>
@@ -36159,19 +36441,6 @@ List of unclassified roms
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
 				<rom name="cool world (spain).sfc" size="1048576" crc="bc2e1304" sha1="9efab99ab1b778aca3023a71479e634206ac3507" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="coolwrld">
-		<description>Cool World (USA)</description>
-		<year>1993</year>
-		<publisher>Ocean</publisher>
-		<info name="release" value="199302xx" />
-		<part name="cart" interface="snes_cart">
-			<feature name="slot" value="lorom" />
-			<dataarea name="rom" size="1048576">
-				<rom name="cool world (usa).sfc" size="1048576" crc="0730c37c" sha1="a477c7c8fff0591792fbc7e4731bb7e7988d0617" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -36280,19 +36549,6 @@ List of unclassified roms
 		</part>
 	</software>
 
-	<software name="cutthru" cloneof="cutthr">
-		<description>Cutthroat Island (USA)</description>
-		<year>1996</year>
-		<publisher>Acclaim Entertainment</publisher>
-		<info name="release" value="199603xx" />
-		<part name="cart" interface="snes_cart">
-			<feature name="slot" value="lorom" />
-			<dataarea name="rom" size="2097152">
-				<rom name="cutthroat island (usa).sfc" size="2097152" crc="19ea457b" sha1="40965e6c9d6aec698b7a0d3106241fef7f2e6ee8" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="cyknigh2">
 		<description>Cyber Knight II - Chikyuu Teikoku no Yabou (Jpn)</description>
 		<year>1994</year>
@@ -36307,32 +36563,6 @@ List of unclassified roms
 				<rom name="cyber knight ii - chikyuu teikoku no yabou (japan).sfc" size="2097152" crc="ed8bcbf4" sha1="2faff9f7082f458d1c9f4f2f1514520f872ff1a1" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="cybrspin">
-		<description>Cyber Spin (USA)</description>
-		<year>1992</year>
-		<publisher>Takara</publisher>
-		<info name="release" value="199211xx" />
-		<part name="cart" interface="snes_cart">
-			<feature name="slot" value="lorom" />
-			<dataarea name="rom" size="524288">
-				<rom name="cyber spin (usa).sfc" size="524288" crc="44018650" sha1="1b6a1b0332a8301cbec0d6c9171e8fd0bfc0fc57" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="cybernatu" cloneof="cybernat">
-		<description>Cybernator (USA)</description>
-		<year>1993</year>
-		<publisher>Konami</publisher>
-		<info name="release" value="199304xx" />
-		<part name="cart" interface="snes_cart">
-			<feature name="slot" value="lorom" />
-			<dataarea name="rom" size="1048576">
-				<rom name="cybernator (usa).sfc" size="1048576" crc="4dfa05b3" sha1="f629deea9d7cf6903ba8a4b81da96624c0b056ab" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -36360,19 +36590,6 @@ List of unclassified roms
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
 				<rom name="cyborg 009 (japan).sfc" size="1048576" crc="4a5263db" sha1="5ab41e2c6ccce1f40fb9813e8e07a49c785d88c5" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="dforce">
-		<description>D-Force (USA)</description>
-		<year>1991</year>
-		<publisher>Asmik</publisher>
-		<info name="release" value="199112xx" />
-		<part name="cart" interface="snes_cart">
-			<feature name="slot" value="lorom" />
-			<dataarea name="rom" size="1048576">
-				<rom name="d-force (usa).sfc" size="1048576" crc="24230807" sha1="444a4001511c80f99d9cd52866828ccc668724d2" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -36690,19 +36907,6 @@ List of unclassified roms
 		</part>
 	</software>
 
-	<software name="demomanu" cloneof="demoman">
-		<description>Demolition Man (USA)</description>
-		<year>1995</year>
-		<publisher>Acclaim Entertainment</publisher>
-		<info name="release" value="199508xx" />
-		<part name="cart" interface="snes_cart">
-			<feature name="slot" value="lorom" />
-			<dataarea name="rom" size="2097152">
-				<rom name="demolition man (usa).sfc" size="2097152" crc="8afe2f91" sha1="b55fac176b1dc86d7aca2e080086184349960c16" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="demonblz" cloneof="demoncrt">
 		<description>Demon's Blazon - Makaimura Monshou Hen (Jpn)</description>
 		<year>1994</year>
@@ -36730,19 +36934,6 @@ List of unclassified roms
 		</part>
 	</software>
 
-	<software name="demoncrtu" cloneof="demoncrt">
-		<description>Demon's Crest (USA)</description>
-		<year>1994</year>
-		<publisher>Capcom</publisher>
-		<info name="release" value="199411xx" />
-		<part name="cart" interface="snes_cart">
-			<feature name="slot" value="lorom" />
-			<dataarea name="rom" size="2097152">
-				<rom name="demon's crest (usa).sfc" size="2097152" crc="e8236ad2" sha1="743d60ee1536b0c7c24dbb8ba39d14ed5937c0d5" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="dennis">
 		<description>Dennis (Euro)</description>
 		<year>1994</year>
@@ -36751,20 +36942,6 @@ List of unclassified roms
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
 				<rom name="dennis (europe).sfc" size="1048576" crc="ccda70a8" sha1="78d2408818b3a953eb9ffe3c5813b6b5c370ada0" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="dennisu" cloneof="dennis">
-		<description>Dennis the Menace (USA)</description>
-		<year>1993</year>
-		<publisher>Ocean</publisher>
-		<info name="release" value="199312xx" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<part name="cart" interface="snes_cart">
-			<feature name="slot" value="lorom" />
-			<dataarea name="rom" size="1048576">
-				<rom name="dennis the menace (usa).sfc" size="1048576" crc="8ee7faa5" sha1="e7403a677e26134f4d5c1d10908d5f138e9c2b44" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -36906,19 +37083,6 @@ List of unclassified roms
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
 				<rom name="desert strike - return to the gulf (europe).sfc" size="1048576" crc="8eed024a" sha1="4333d7bdbde75857835d9cd242454f479c6c1600" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="dstrikeu" cloneof="dstrike">
-		<description>Desert Strike - Return to the Gulf (USA)</description>
-		<year>1992</year>
-		<publisher>Electronic Arts</publisher>
-		<info name="release" value="199210xx" />
-		<part name="cart" interface="snes_cart">
-			<feature name="slot" value="lorom" />
-			<dataarea name="rom" size="1048576">
-				<rom name="desert strike - return to the gulf (usa).sfc" size="1048576" crc="4ce26787" sha1="b9f0e2cfac1ee39140cd495c8e9de99bc6d9d3e1" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -40508,7 +40672,7 @@ List of unclassified roms
 		</part>
 	</software>
 
-	<software name="granhist">
+	<software name="granhista" cloneof="granhist">
 		<description>Granhistoria - Genshi Sekaiki (Jpn)</description>
 		<year>1995</year>
 		<publisher>Banpresto</publisher>
