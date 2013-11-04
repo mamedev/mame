@@ -26,6 +26,16 @@
     Currently, a handful of games run, but some die due to odd hardware
     issues.
 
+To start a game:
+- Wait for the set-date screen to appear
+- Press down arrow
+- set date with arrows (optional)
+- Press Ctrl, wait a sec, press ctrl, press right arrow, game starts
+
+It doesn't save the date so you have to go through this procedure every time.
+
+If you do nothing for about 20 secs, it turns itself off (screen goes white).
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -901,7 +911,7 @@ void pockstat_state::machine_start()
 
 void pockstat_state::machine_reset()
 {
-	m_maincpu->set_pc(0x4000000);
+	m_maincpu->set_state_int(ARM7_R15, 0x4000000);
 
 	m_ps_flash_write_enable_count = 0;
 	m_ps_flash_write_count = 0;
