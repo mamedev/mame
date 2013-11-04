@@ -142,4 +142,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   CLASS         INIT    COMPANY          FULLNAME       FLAGS */
-COMP( 198?, wicat, 0,       0,     wicat, wicat, driver_device, 0, "Millennium Systems", "wicat", GAME_NOT_WORKING | GAME_NO_SOUND_HW )
+COMP( 198?, wicat, 0,       0,     wicat, wicat, driver_device, 0, "Millennium Systems", "Wicat", GAME_NOT_WORKING | GAME_NO_SOUND_HW )
