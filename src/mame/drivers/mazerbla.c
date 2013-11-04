@@ -11,7 +11,7 @@ Added notes by Lord Nightmare
 Notes:
 ======
 Mazer blazer consists of four boards in a cage:
-ZPU-2000 - main cpu board
+ZPU-2000 - main cpu board (Zentral (sic) Processor Unit)
  - this board has the main cpu on it and four roms (seven sockets for roms, three empty)
    - roms in sockets "ROM0"@H1 "ROM1"@H2 "ROM2"@H3 "ROM3"@H4
    - "ROM4"@H5 "ROM5"@H6 "ROM6"@H7 are empty
@@ -21,7 +21,7 @@ ZPU-2000 - main cpu board
  - one 4Mhz xtal @A1
  - this same board is shared with cliff hanger (clifhgr.c)
 
-CFB-1000 - video/subcpu board
+CFB-1000 - video/subcpu board (Color Frame Board)
  - this board has a sub-cpu on it and four roms (six sockets for roms, two empty)
    - the roms go in sockets "ROM0"@G8, "ROM2"@K8, "ROM3"@K10, "ROM4"@K11
    - "ROM1"@G6 and "ROM5"@K12 are empty
@@ -35,7 +35,7 @@ CFB-1000 - video/subcpu board
  - 8 dipswitches in 2 banks of 4, @B5 and @B7
  - LED @B7
 
-VSB-2000 - sound/speech/subcpu board
+VSB-2000 - sound/speech/subcpu board (Voice and Sound Board)
  - this board has a sub-cpu on it, a digitalker speech chip, 4 roms (2 dumped, 2 undumped) and 4 PROMs (all dumped)
  - Z80 CPU @E6
    - Roms at "ROM0"@D2, "ROM1"@D4
