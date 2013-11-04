@@ -18,7 +18,7 @@ TODO:
 
 #include "machine/rescap.h"
 #include "machine/netlist.h"
-#include "netlist/net_lib.h"
+#include "netlist/devices/net_lib.h"
 #include "sound/dac.h"
 #include "video/fixfreq.h"
 #include "astring.h"
@@ -562,8 +562,8 @@ void pong_state::machine_reset()
 
 void pong_state::video_start()
 {
-	m_maincpu->setup().register_callback("sound_cb", net_output_delegate(&pong_state::sound_cb, "pong_state::sound_cb", this));
-	m_maincpu->setup().register_callback("video_cb", net_output_delegate(&pong_state::video_cb, "pong_state::video_cb", this));
+	m_maincpu->setup().register_callback("sound_cb", netlist_output_delegate(&pong_state::sound_cb, "pong_state::sound_cb", this));
+	m_maincpu->setup().register_callback("video_cb", netlist_output_delegate(&pong_state::video_cb, "pong_state::video_cb", this));
 }
 
 

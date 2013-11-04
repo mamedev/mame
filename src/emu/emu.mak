@@ -60,6 +60,7 @@ OBJDIRS += \
 	$(EMUOBJ)/drivers \
 	$(EMUOBJ)/machine \
 	$(EMUOBJ)/netlist \
+	$(EMUOBJ)/netlist/devices \
 	$(EMUOBJ)/layout \
 	$(EMUOBJ)/imagedev \
 	$(EMUOBJ)/video \

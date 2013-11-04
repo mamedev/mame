@@ -17,5 +17,9 @@ NETLISTOBJ = $(EMUOBJ)/netlist
 #  Core files
 #-------------------------------------------------
 
-NETLISTOBJS+= $(NETLISTOBJ)/net_lib.o
-
+NETLISTOBJS+= \
+	$(NETLISTOBJ)/nl_setup.o \
+	$(NETLISTOBJ)/nl_base.o \
+	$(NETLISTOBJ)/nl_parser.o \
+	$(NETLISTOBJ)/devices/net_lib.o \
+	

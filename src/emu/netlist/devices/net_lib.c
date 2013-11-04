@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Couriersud
 /***************************************************************************
 
     netlib.c
@@ -46,6 +48,7 @@
 ****************************************************************************/
 
 #include "net_lib.h"
+#include "nld_system.h"
 
 NETLIB_START(netdev_logic_input)
 {
@@ -219,12 +222,12 @@ NETLIB_START(nicNE555N_MSTABLE)
 	m_last = false;
 }
 
-INLINE double nicNE555N_cv(nicNE555N_MSTABLE &dev)
+INLINE double nicNE555N_cv(NETLIB_NAME(nicNE555N_MSTABLE) &dev)
 {
 	return (dev.m_CV.is_highz() ? 0.67 * dev.m_VS.Value() : dev.INPANALOG(dev.m_CV));
 }
 
-INLINE double nicNE555N_clamp(nicNE555N_MSTABLE &dev, const double v, const double a, const double b)
+INLINE double nicNE555N_clamp(NETLIB_NAME(nicNE555N_MSTABLE) &dev, const double v, const double a, const double b)
 {
 	double ret = v;
 	if (ret >  dev.m_VS.Value() - a)
@@ -391,7 +394,7 @@ NETLIB_FUNC_VOID(nic7448_sub, update_outputs, (UINT8 v))
 	}
 }
 
-const UINT8 nic7448_sub::tab7448[16][7] =
+const UINT8 NETLIB_NAME(nic7448_sub)::tab7448[16][7] =
 {
 		{   1, 1, 1, 1, 1, 1, 0 },  /* 00 - not blanked ! */
 		{   0, 1, 1, 0, 0, 0, 0 },  /* 01 */
@@ -458,7 +461,7 @@ NETLIB_UPDATE(nic7450)
 #endif
 }
 
-ATTR_HOT inline void nic7474sub::newstate(const UINT8 state)
+ATTR_HOT inline void NETLIB_NAME(nic7474sub)::newstate(const UINT8 state)
 {
 	static const netlist_time delay[2] = { NLTIME_FROM_NS(25), NLTIME_FROM_NS(40) };
 	//printf("%s %d %d %d\n", "7474", state, Q.Q(), QQ.Q());
@@ -636,7 +639,7 @@ NETLIB_UPDATE(nic7493ff)
 
 NETLIB_UPDATE(nic7493)
 {
-	net_sig_t r = INPLOGIC(m_R1) & INPLOGIC(m_R2);
+	netlist_sig_t r = INPLOGIC(m_R1) & INPLOGIC(m_R2);
 
 	if (r)
 	{
@@ -754,7 +757,7 @@ NETLIB_START(nic74107A)
 	sub.m_QQ.initial(1);
 }
 
-ATTR_HOT inline void nic74107Asub::newstate(const net_sig_t state)
+ATTR_HOT inline void NETLIB_NAME(nic74107Asub)::newstate(const netlist_sig_t state)
 {
 	const netlist_time delay[2] = { NLTIME_FROM_NS(40), NLTIME_FROM_NS(25) };
 #if 1
@@ -772,7 +775,7 @@ ATTR_HOT inline void nic74107Asub::newstate(const net_sig_t state)
 NETLIB_UPDATE(nic74107Asub)
 {
 	{
-		net_sig_t t = m_Q.new_Q();
+		netlist_sig_t t = m_Q.new_Q();
 		newstate((!t & m_Q1) | (t & m_Q2) | m_F);
 		if (!m_Q1)
 			m_clk.inactivate();
@@ -892,7 +895,7 @@ NETLIB_UPDATE(nic9316)
 {
 	sub.m_loadq = INPLOGIC(m_LOADQ);
 	sub.m_ent = INPLOGIC(m_ENT);
-	const net_sig_t clrq = INPLOGIC(m_CLRQ);
+	const netlist_sig_t clrq = INPLOGIC(m_CLRQ);
 
 	if ((!sub.m_loadq || (sub.m_ent & INPLOGIC(m_ENP))) & clrq)
 	{
@@ -964,7 +967,9 @@ NETLIB_FUNC_VOID(nic9316_sub, update_outputs, (void))
 #endif
 }
 
-#define ENTRY(_nic, _name) new net_device_t_factory< _nic >( # _name, # _nic ),
+#define xstr(s) # s
+#define ENTRY1(_nic, _name) new net_device_t_factory< _nic >( # _name, xstr(_nic) ),
+#define ENTRY(_nic, _name) ENTRY1(NETLIB_NAME(_nic), _name)
 
 static const net_device_t_base_factory *netregistry[] =
 {
@@ -979,7 +984,7 @@ static const net_device_t_base_factory *netregistry[] =
 	ENTRY(nicMultiSwitch,       NETDEV_SWITCH2)
 	ENTRY(nicRSFF,              NETDEV_RSFF)
 	ENTRY(nicMixer8,            NETDEV_MIXER)
-	ENTRY(nic7400,              TTL_7400_NAND)
+	ENTRY(7400,                 TTL_7400_NAND)
 	ENTRY(nic7402,              TTL_7402_NOR)
 	ENTRY(nic7404,              TTL_7404_INVERT)
 	ENTRY(nic7410,              TTL_7410_NAND)
@@ -1005,7 +1010,7 @@ static const net_device_t_base_factory *netregistry[] =
 net_device_t *net_create_device_by_classname(const astring &classname, netlist_setup_t &setup, const astring &icname)
 {
 	const net_device_t_base_factory **p = &netregistry[0];
-	while (p != NULL)
+	while (*p != NULL)
 	{
 		if (strcmp((*p)->classname(), classname) == 0)
 		{
@@ -1022,7 +1027,7 @@ net_device_t *net_create_device_by_classname(const astring &classname, netlist_s
 net_device_t *net_create_device_by_name(const astring &name, netlist_setup_t &setup, const astring &icname)
 {
 	const net_device_t_base_factory **p = &netregistry[0];
-	while (p != NULL)
+	while (*p != NULL)
 	{
 		if (strcmp((*p)->name(), name) == 0)
 		{
@@ -1035,3 +1040,4 @@ net_device_t *net_create_device_by_name(const astring &name, netlist_setup_t &se
 	fatalerror("Class %s required for IC %s not found!\n", name.cstr(), icname.cstr());
 	return NULL; // appease code analysis
 }
+

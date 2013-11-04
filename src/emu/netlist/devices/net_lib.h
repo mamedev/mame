@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Couriersud
 /***************************************************************************
 
     net_lib.h
@@ -48,7 +50,11 @@
 #ifndef NET_LIB_H
 #define NET_LIB_H
 
-#include "machine/netlist.h"
+#include "../nl_base.h"
+#include "nld_signal.h"
+#include "nld_system.h"
+
+#include "nld_7400.h"
 
 // this is a bad hack
 #define USE_OLD7493	(0)
@@ -66,7 +72,7 @@
 #define NETDEV_ANALOG_INPUT(_name)                                                  \
 		NET_REGISTER_DEV(netdev_analog_input, _name)
 #define NETDEV_CALLBACK(_name, _IN)                                                 \
-		NET_REGISTER_DEV(netdev_analog_callback, _name)                                    \
+		NET_REGISTER_DEV(netdev_analog_callback, _name)                             \
 		NET_CONNECT(_name, IN, _IN)
 #define NETDEV_SWITCH2(_name, _i1, _i2)                                             \
 		NET_REGISTER_DEV(nicMultiSwitch, _name)                                     \
@@ -90,15 +96,10 @@
 // TTL Logic chips
 // ----------------------------------------------------------------------------------------
 
-#define TTL_7400_NAND(_name, _I1, _I2)                                              \
-		NET_REGISTER_DEV(nic7400, _name)                                            \
-		NET_CONNECT(_name, I1, _I1)                                                 \
-		NET_CONNECT(_name, I2, _I2)
-
 #define TTL_7402_NOR(_name, _I1, _I2)                                               \
 		NET_REGISTER_DEV(nic7402, _name)                                            \
-		NET_CONNECT(_name, I1, _I1)                                                 \
-		NET_CONNECT(_name, I2, _I2)
+		NET_CONNECT(_name, A, _I1)                                                  \
+		NET_CONNECT(_name, B, _I2)
 
 #define TTL_7404_INVERT(_name, _I1)                                                 \
 		NET_REGISTER_DEV(nic7404, _name)                                            \
@@ -106,40 +107,40 @@
 
 #define TTL_7410_NAND(_name, _I1, _I2, _I3)                                         \
 		NET_REGISTER_DEV(nic7410, _name)                                            \
-		NET_CONNECT(_name, I1, _I1)                                                 \
-		NET_CONNECT(_name, I2, _I2)                                                 \
-		NET_CONNECT(_name, I3, _I3)
+		NET_CONNECT(_name, A, _I1)                                                  \
+		NET_CONNECT(_name, B, _I2)                                                  \
+		NET_CONNECT(_name, C, _I3)
 
 #define TTL_7420_NAND(_name, _I1, _I2, _I3, _I4)                                    \
 		NET_REGISTER_DEV(nic7420, _name)                                            \
-		NET_CONNECT(_name, I1, _I1)                                                 \
-		NET_CONNECT(_name, I2, _I2)                                                 \
-		NET_CONNECT(_name, I3, _I3)                                                 \
-		NET_CONNECT(_name, I4, _I4)
+		NET_CONNECT(_name, A, _I1)                                                  \
+		NET_CONNECT(_name, B, _I2)                                                  \
+		NET_CONNECT(_name, C, _I3)                                                  \
+		NET_CONNECT(_name, D, _I4)
 
 #define TTL_7425_NOR(_name, _I1, _I2, _I3, _I4)                                     \
 		NET_REGISTER_DEV(nic7425, _name)                                            \
-		NET_CONNECT(_name, I1, _I1)                                                 \
-		NET_CONNECT(_name, I2, _I2)                                                 \
-		NET_CONNECT(_name, I3, _I3)                                                 \
-		NET_CONNECT(_name, I4, _I4)
+		NET_CONNECT(_name, A, _I1)                                                  \
+		NET_CONNECT(_name, B, _I2)                                                  \
+		NET_CONNECT(_name, C, _I3)                                                  \
+		NET_CONNECT(_name, D, _I4)
 
 #define TTL_7427_NOR(_name, _I1, _I2, _I3)                                          \
 		NET_REGISTER_DEV(nic7427, _name)                                            \
-		NET_CONNECT(_name, I1, _I1)                                                 \
-		NET_CONNECT(_name, I2, _I2)                                                 \
-		NET_CONNECT(_name, I3, _I3)
+		NET_CONNECT(_name, A, _I1)                                                  \
+		NET_CONNECT(_name, B, _I2)                                                  \
+		NET_CONNECT(_name, C, _I3)
 
 #define TTL_7430_NAND(_name, _I1, _I2, _I3, _I4, _I5, _I6, _I7, _I8)                \
 		NET_REGISTER_DEV(nic7430, _name)                                            \
-		NET_CONNECT(_name, I1, _I1)                                                 \
-		NET_CONNECT(_name, I2, _I2)                                                 \
-		NET_CONNECT(_name, I3, _I3)                                                 \
-		NET_CONNECT(_name, I4, _I4)                                                 \
-		NET_CONNECT(_name, I5, _I5)                                                 \
-		NET_CONNECT(_name, I6, _I6)                                                 \
-		NET_CONNECT(_name, I7, _I7)                                                 \
-		NET_CONNECT(_name, I8, _I8)
+		NET_CONNECT(_name, A, _I1)                                                  \
+		NET_CONNECT(_name, B, _I2)                                                  \
+		NET_CONNECT(_name, C, _I3)                                                  \
+		NET_CONNECT(_name, D, _I4)                                                  \
+		NET_CONNECT(_name, E, _I5)                                                  \
+		NET_CONNECT(_name, F, _I6)                                                  \
+		NET_CONNECT(_name, G, _I7)                                                  \
+		NET_CONNECT(_name, H, _I8)
 
 #define TTL_7450_ANDORINVERT(_name, _I1, _I2, _I3, _I4)                             \
 		NET_REGISTER_DEV(nic7450, _name)                                            \
@@ -324,13 +325,12 @@ NETLIB_DEVICE_WITH_PARAMS(nicNE555N_MSTABLE,
 	net_param_t m_VL;
 );
 
-NETLIB_SIGNAL(nic7400, 2, 0, 0)
-NETLIB_SIGNAL(nic7402, 2, 1, 0)
-NETLIB_SIGNAL(nic7410, 3, 0, 0)
-NETLIB_SIGNAL(nic7420, 4, 0, 0)
-NETLIB_SIGNAL(nic7425, 4, 1, 0)
-NETLIB_SIGNAL(nic7427, 3, 1, 0)
-NETLIB_SIGNAL(nic7430, 8, 0, 0)
+NETLIB_SIGNAL(nic7402, 2, 1, 0);
+NETLIB_SIGNAL(nic7410, 3, 0, 0);
+NETLIB_SIGNAL(nic7420, 4, 0, 0);
+NETLIB_SIGNAL(nic7425, 4, 1, 0);
+NETLIB_SIGNAL(nic7427, 3, 1, 0);
+NETLIB_SIGNAL(nic7430, 8, 0, 0);
 
 NETLIB_DEVICE(nic7404,
 	ttl_input_t m_I;
@@ -356,7 +356,7 @@ NETLIB_SUBDEVICE(nic7474sub,
 );
 
 NETLIB_DEVICE(nic7474,
-	nic7474sub sub;
+    NETLIB_NAME(nic7474sub) sub;
 
 	ttl_input_t m_D;
 	ttl_input_t m_clrQ;
@@ -380,17 +380,16 @@ NETLIB_SUBDEVICE(nic74107Asub,
 	ttl_output_t m_Q;
 	ttl_output_t m_QQ;
 
+	netlist_sig_t m_Q1;
+	netlist_sig_t m_Q2;
+	netlist_sig_t m_F;
 
-	net_sig_t m_Q1;
-	net_sig_t m_Q2;
-	net_sig_t m_F;
-
-	ATTR_HOT void newstate(const net_sig_t state);
+	ATTR_HOT void newstate(const netlist_sig_t state);
 
 );
 
 NETLIB_DEVICE(nic74107A,
-	nic74107Asub sub;
+    NETLIB_NAME(nic74107Asub) sub;
 
 	ttl_input_t m_J;
 	ttl_input_t m_K;
@@ -398,11 +397,11 @@ NETLIB_DEVICE(nic74107A,
 
 );
 
-class nic74107 : public nic74107A
+class NETLIB_NAME(nic74107) : public NETLIB_NAME(nic74107A)
 {
 public:
-	nic74107()
-	:   nic74107A() {}
+    NETLIB_NAME(nic74107) ()
+	:   NETLIB_NAME(nic74107A) () {}
 
 };
 
@@ -419,11 +418,12 @@ NETLIB_DEVICE(nic7493,
 	ttl_input_t m_R1;
 	ttl_input_t m_R2;
 
-	nic7493ff A;
-	nic7493ff B;
-	nic7493ff C;
-	nic7493ff D;
+	NETLIB_NAME(nic7493ff) A;
+	NETLIB_NAME(nic7493ff) B;
+	NETLIB_NAME(nic7493ff) C;
+	NETLIB_NAME(nic7493ff) D;
 );
+
 #else
 NETLIB_DEVICE(nic7493,
 	ttl_input_t m_CLK;
@@ -469,8 +469,8 @@ NETLIB_SUBDEVICE(nic9316_sub,
 	ttl_input_t m_D;
 
 	UINT8 m_cnt;
-	net_sig_t m_loadq;
-	net_sig_t m_ent;
+	netlist_sig_t m_loadq;
+	netlist_sig_t m_ent;
 
 	ttl_output_t m_QA;
 	ttl_output_t m_QB;
@@ -480,7 +480,7 @@ NETLIB_SUBDEVICE(nic9316_sub,
 );
 
 NETLIB_DEVICE(nic9316,
-	nic9316_sub sub;
+    NETLIB_NAME(nic9316_sub) sub;
 	ttl_input_t m_ENP;
 	ttl_input_t m_ENT;
 	ttl_input_t m_CLRQ;
@@ -543,7 +543,7 @@ NETLIB_SUBDEVICE(nic7448_sub,
 
 NETLIB_DEVICE(nic7448,
 
-	nic7448_sub sub;
+    NETLIB_NAME(nic7448_sub) sub;
 
 	ttl_input_t m_LTQ;
 	ttl_input_t m_BIQ;
