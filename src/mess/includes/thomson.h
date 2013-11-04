@@ -98,6 +98,7 @@ class thomson_state : public driver_device
 public:
 	thomson_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_mc6854(*this, "mc6854"),
 		m_maincpu(*this, "maincpu"),
 		m_cassette(*this, "cassette"),
 		m_buzzer(*this, "buzzer"),
@@ -114,7 +115,9 @@ public:
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( to7_cartridge );
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( mo5_cartridge );
-
+	
+	optional_device<mc6854_device> m_mc6854;
+	
 	DECLARE_WRITE8_MEMBER( to7_set_cassette_motor );
 	DECLARE_WRITE8_MEMBER( mo5_set_cassette_motor );
 	DECLARE_WRITE_LINE_MEMBER( thom_dev_irq_0 );
@@ -319,7 +322,7 @@ protected:
 	required_device<mea8000_device> m_mea8000;
 	required_device<ram_device> m_ram;
 	optional_device<mc6846_device> m_mc6846;
-
+	
 	/* bank logging and optimisations */
 	int m_old_cart_bank;
 	int m_old_cart_bank_was_read_only;

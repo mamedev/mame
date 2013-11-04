@@ -78,7 +78,7 @@ static ADDRESS_MAP_START(poly_mem, AS_PROGRAM, 8, poly_state)
 	//AM_RANGE(0xe006, 0xe006) // baud rate controller (0=9600,2=4800,4=2400,6=1200,8=600,A=300)
 	AM_RANGE(0xe00c,0xe00f) AM_DEVREADWRITE("pia1", pia6821_device, read, write) //keyboard PIA 6821
 	AM_RANGE(0xe020,0xe027) AM_DEVREADWRITE("ptm", ptm6840_device, read, write) //timer 6840
-	AM_RANGE(0xe030,0xe037) AM_DEVREADWRITE_LEGACY("adlc", mc6854_r, mc6854_w) //Data Link Controller 6854
+	AM_RANGE(0xe030,0xe037) AM_DEVREADWRITE("adlc", mc6854_device, read, write) //Data Link Controller 6854
 	AM_RANGE(0xe040,0xe040) AM_NOP //Set protect flip-flop after 1 E-cycle
 	AM_RANGE(0xe050,0xe05f) AM_RAM //Dynamic Address Translater (arranges memory banks)
 	// AM_RANGE(0xe060,0xe060) Select Map 1

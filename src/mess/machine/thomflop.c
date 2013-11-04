@@ -1592,27 +1592,27 @@ void thomson_state::thmfc_floppy_init()
 TIMER_CALLBACK_MEMBER( thomson_state::ans4 )
 {
 	LOG(( "%f ans4\n", machine().time().as_double() ));
-	mc6854_set_cts( machine().device("mc6854"), 0 );
+	m_mc6854->set_cts( 0 );
 }
 
 TIMER_CALLBACK_MEMBER( thomson_state::ans3 )
 {
 	LOG(( "%f ans3\n", machine().time().as_double() ));
-	mc6854_set_cts( machine().device("mc6854"), 1 );
+	m_mc6854->set_cts( 1 );
 	machine().scheduler().timer_set( attotime::from_usec( 100 ), timer_expired_delegate(FUNC(thomson_state::ans4),this));
 }
 
 TIMER_CALLBACK_MEMBER( thomson_state::ans2 )
 {
 	LOG(( "%f ans2\n", machine().time().as_double() ));
-	mc6854_set_cts( machine().device("mc6854"), 0 );
+	m_mc6854->set_cts( 0 );
 	machine().scheduler().timer_set( attotime::from_usec( 100 ), timer_expired_delegate(FUNC(thomson_state::ans3),this));
 }
 
 TIMER_CALLBACK_MEMBER( thomson_state::ans )
 {
 	LOG(( "%f ans\n", machine().time().as_double() ));
-	mc6854_set_cts( machine().device("mc6854"), 1 );
+	m_mc6854->set_cts( 1 );
 	machine().scheduler().timer_set( attotime::from_usec( 100 ), timer_expired_delegate(FUNC(thomson_state::ans2),this));
 }
 /* consigne DKBOOT
@@ -1657,7 +1657,7 @@ static void to7_network_got_frame( device_t *device, UINT8* data, int length )
 		thomson_state *state = device->machine().driver_data<thomson_state>();
 		LOG(( "to7_network_got_frame: %i phones %i\n", data[2], data[0] ));
 		device->machine().scheduler().timer_set( attotime::from_usec( 100 ), timer_expired_delegate(FUNC(thomson_state::ans),state));
-		mc6854_set_cts( device, 0 );
+		state->m_mc6854->set_cts( 0 );
 	}
 	else if ( ! data[1] )
 	{
@@ -1673,13 +1673,18 @@ static void to7_network_got_frame( device_t *device, UINT8* data, int length )
 				(data[10] == 0) ? "TO7" : (data[10] == 1) ? "MO5" :
 				(data[10] == 2) ? "TO7/70" : "?", name ));
 	}
-
 }
 
 
-
-const mc6854_interface to7_network_iface = { DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, to7_network_got_frame, DEVCB_NULL, DEVCB_NULL };
-
+const mc6854_interface to7_network_iface =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	to7_network_got_frame,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
 
 
 void thomson_state::to7_network_init()
@@ -1693,8 +1698,8 @@ void thomson_state::to7_network_init()
 void thomson_state::to7_network_reset()
 {
 	LOG(( "to7_network_reset: NR 07-005 network extension\n" ));
-	mc6854_set_cts( machine().device("mc6854"), 0 );
-	mc6854_set_cts( machine().device("mc6854"), 1 );
+	m_mc6854->set_cts( 0 );
+	m_mc6854->set_cts( 1 );
 }
 
 
@@ -1702,7 +1707,7 @@ void thomson_state::to7_network_reset()
 READ8_MEMBER( thomson_state::to7_network_r )
 {
 	if ( offset < 4 )
-		return mc6854_r( machine().device("mc6854"), space, offset );
+		return m_mc6854->read( space, offset );
 
 	if ( offset == 8 )
 	{
@@ -1721,7 +1726,7 @@ READ8_MEMBER( thomson_state::to7_network_r )
 WRITE8_MEMBER( thomson_state::to7_network_w )
 {
 	if ( offset < 4 )
-		mc6854_w( machine().device("mc6854"), space, offset, data );
+		m_mc6854->write( space, offset, data );
 	else
 	{
 		logerror( "%f $%04x to7_network_w: invalid write offset %i (data=$%02X)\n",

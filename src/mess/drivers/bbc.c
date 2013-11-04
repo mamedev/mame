@@ -46,11 +46,9 @@
 #include "cpu/m6502/m65sc02.h"
 #include "machine/6522via.h"
 #include "machine/mc146818.h"		/* RTC & CMOS RAM */
-#include "machine/mc6854.h"
 #include "machine/upd7002.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/econet/econet.h"
-#include "sound/sn76496.h"			/* Sound */
 #include "sound/tms5220.h"			/* Speech */
 #include "video/saa5050.h"			/* Teletext */
 
@@ -621,9 +619,8 @@ static const sn76496_config psg_intf =
 
 WRITE_LINE_MEMBER(bbc_state::econet_clk_w)
 {
-	device_t *device = machine().device("mc6854");
-	mc6854_rxc_w(device, state);
-	mc6854_txc_w(device, state);
+	m_adlc->rxc_w(state);
+	m_adlc->txc_w(state);
 }
 
 static ECONET_INTERFACE( econet_intf )

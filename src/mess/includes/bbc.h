@@ -13,6 +13,7 @@
 
 #include "machine/6522via.h"
 #include "machine/6850acia.h"
+#include "machine/mc6854.h"
 #include "machine/ram.h"
 #include "machine/i8271.h"
 #include "machine/wd17xx.h"
@@ -34,6 +35,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, RAM_TAG),
 		m_mc6845(*this, "mc6845"),
+		m_adlc(*this, "mc6854"),
 		m_sn(*this, "sn76489"),
 		m_trom(*this, "saa5050"),
 		m_tms(*this, "tms5220"),
@@ -59,6 +61,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<mc6845_device> m_mc6845;
+	optional_device<mc6854_device> m_adlc;
 	optional_device<sn76489_device> m_sn;
 	required_device<saa5050_device> m_trom;
 	optional_device<tms5220_device> m_tms;

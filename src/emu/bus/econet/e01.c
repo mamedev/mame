@@ -276,7 +276,7 @@ static ADDRESS_MAP_START( e01_mem, AS_PROGRAM, 8, e01_device )
 	AM_RANGE(0xfc08, 0xfc08) AM_MIRROR(0x00c0) AM_READ(ram_select_r) AM_WRITE(floppy_w)
 	AM_RANGE(0xfc0c, 0xfc0f) AM_MIRROR(0x00c0) AM_DEVREADWRITE(WD2793_TAG, wd2793_t, read, write)
 	AM_RANGE(0xfc10, 0xfc1f) AM_MIRROR(0x00c0) AM_DEVREADWRITE(R6522_TAG, via6522_device, read, write)
-	AM_RANGE(0xfc20, 0xfc23) AM_MIRROR(0x00c0) AM_DEVREADWRITE_LEGACY(MC6854_TAG, mc6854_r, mc6854_w)
+	AM_RANGE(0xfc20, 0xfc23) AM_MIRROR(0x00c0) AM_DEVREADWRITE(MC6854_TAG, mc6854_device, read, write)
 	AM_RANGE(0xfc24, 0xfc24) AM_MIRROR(0x00c3) AM_READWRITE(network_irq_disable_r, network_irq_disable_w)
 	AM_RANGE(0xfc28, 0xfc28) AM_MIRROR(0x00c3) AM_READWRITE(network_irq_enable_r, network_irq_enable_w)
 	AM_RANGE(0xfc2c, 0xfc2c) AM_MIRROR(0x00c3) AM_READ_PORT("FLAP")
@@ -769,6 +769,6 @@ WRITE8_MEMBER( e01_device::rtc_data_w )
 
 void e01_device::econet_clk(int state)
 {
-	mc6854_rxc_w(m_adlc, state);
-	mc6854_txc_w(m_adlc, state);
+	m_adlc->rxc_w(state);
+	m_adlc->txc_w(state);
 }
