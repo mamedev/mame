@@ -126,7 +126,8 @@ enum
 // Log addresses of executed opcodes
 #define TRACE_EXEC 0
 
-// old debugging approach; going to be replaced
+// This is the previous debugging approach which will be replaced by the
+// specific switches above
 // VERBOSE = 0 ... 9
 #define VERBOSE 1
 
@@ -1689,6 +1690,11 @@ void tms9995_device::mem_read()
 
 	if (is_onchip(m_address))
 	{
+		// If we have a word access, we have to align the address
+		// This is the case for word operations and for certain phases of
+		// byte operations (e.g. when retrieving the index register)
+		if (m_word_access || !m_instruction->byteop) m_address &= 0xfffe;
+
 		if (VERBOSE>5) LOG("tms9995: read onchip memory (single pass, address %04x)\n", m_address);
 
 		// Ignore the READY state
@@ -1819,6 +1825,11 @@ void tms9995_device::mem_write()
 
 	if (is_onchip(m_address))
 	{
+		// If we have a word access, we have to align the address
+		// This is the case for word operations and for certain phases of
+		// byte operations (e.g. when retrieving the index register)
+		if (m_word_access || !m_instruction->byteop) m_address &= 0xfffe;
+
 		if (VERBOSE>3) LOG("tms9995: write to onchip memory (single pass, address %04x, value=%04x)\n", m_address, m_current_value);
 		m_check_ready = false;
 		m_onchip_memory[m_address & 0x00ff] = (m_current_value >> 8) & 0xff;
