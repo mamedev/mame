@@ -166,14 +166,8 @@ A=AMA, P=PRO, these keys don't exist, and so the games cannot be played.
 
 *********************************************************************************************************/
 
-#define MODERN 0
-
 #include "emu.h"
-#if MODERN
 #include "cpu/tms9900/tms9995.h"
-#else
-#include "cpu/tms9900/tms9900l.h"
-#endif
 #include "sound/wave.h"
 #include "video/tms9928a.h"
 #include "imagedev/cartslot.h"
@@ -192,11 +186,7 @@ public:
 	m_centronics(*this, "centronics")
 	{ }
 
-#if MODERN
 	required_device<tms9995_device> m_maincpu;
-#else
-	required_device<cpu_device> m_maincpu;
-#endif
 	optional_device<cassette_image_device> m_cass;
 	optional_device<centronics_device> m_centronics;
 	DECLARE_READ8_MEMBER(key_r);
@@ -274,10 +264,8 @@ void tutor_state::machine_reset()
 	m_printer_data = 0;
 	m_printer_strobe = 0;
 
-#if MODERN
-	// Disable auto wait states by lowering READY on reset
-	static_cast<tms9995_device*>(machine().device("maincpu"))->set_ready(CLEAR_LINE);
-#endif
+	// Enable auto wait states by lowering READY during reset
+	m_maincpu->set_ready(CLEAR_LINE);
 }
 
 /*
@@ -399,11 +387,13 @@ WRITE8_MEMBER( tutor_state::tutor_mapper_w )
 	}
 }
 
+/*
+    This is only called from the debugger; the on-chip memory is handled
+    within the CPU itself.
+*/
 READ8_MEMBER( tutor_state::tutor_highmem_r )
 {
-#if MODERN
 	if (m_maincpu->is_onchip(offset | 0xf000)) return m_maincpu->debug_read_onchip_memory(offset&0xff);
-#endif
 	return 0;
 }
 
@@ -429,11 +419,7 @@ READ8_MEMBER( tutor_state::tutor_highmem_r )
 TIMER_CALLBACK_MEMBER(tutor_state::tape_interrupt_handler)
 {
 	//assert(m_tape_interrupt_enable);
-#if MODERN
 	m_maincpu->set_input_line(INT_9995_INT4, (m_cass->input() > 0.0) ? ASSERT_LINE : CLEAR_LINE);
-#else
-	m_maincpu->set_input_line(1, (m_cass->input() > 0.0) ? ASSERT_LINE : CLEAR_LINE);
-#endif
 }
 
 /* CRU handler */
@@ -469,11 +455,7 @@ WRITE8_MEMBER( tutor_state::tutor_cassette_w )
 				else
 				{
 					m_tape_interrupt_timer->adjust(attotime::never);
-#if MODERN
 					m_maincpu->set_input_line(INT_9995_INT4, CLEAR_LINE);
-#else
-					m_maincpu->set_input_line(1, CLEAR_LINE);
-#endif
 				}
 			}
 			break;
@@ -770,42 +752,21 @@ static const sn76496_config psg_intf =
 	DEVCB_NULL
 };
 
-#if MODERN
 static TMS9995_CONFIG( cpuconf95 )
 {
-	DEVCB_NULL,         // external op
+	DEVCB_NULL,        // external op
 	DEVCB_NULL,        // Instruction acquisition
-	DEVCB_NULL,         // clock out
+	DEVCB_NULL,        // clock out
 	DEVCB_NULL,        // HOLDA
-	DEVCB_NULL,         // DBIN
+	DEVCB_NULL,        // DBIN
 	INTERNAL_RAM,      // use internal RAM
 	NO_OVERFLOW_INT    // The generally available versions of TMS9995 have a deactivated overflow interrupt
 };
-#else
-static const struct tms9995reset_param tutor_processor_config =
-{
-#if 0
-	"maincpu",/* region for processor RAM */
-	0xf000,     /* offset : this area is unused in our region, and matches the processor address */
-	0xf0fc,     /* offset for the LOAD vector */
-	1,          /* use fast IDLE */
-#endif
-	1,          /* enable automatic wait state generation */
-	NULL        /* no IDLE callback */
-};
-#endif
 
 static MACHINE_CONFIG_START( tutor, tutor_state )
 	/* basic machine hardware */
 	/* TMS9995 CPU @ 10.7 MHz */
-#if MODERN
 	MCFG_TMS99xx_ADD("maincpu", TMS9995, 10700000, tutor_memmap, tutor_io, cpuconf95)
-#else
-	MCFG_CPU_ADD("maincpu", TMS9995L, 10700000)
-	MCFG_CPU_CONFIG(tutor_processor_config)
-	MCFG_CPU_PROGRAM_MAP(tutor_memmap)
-	MCFG_CPU_IO_MAP(tutor_io)
-#endif
 
 	/* video hardware */
 	MCFG_TMS9928A_ADD( "tms9928a", TMS9928A, tutor_tms9928a_interface )
