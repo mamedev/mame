@@ -1083,7 +1083,9 @@ void info_xml_creator::output_switches(const ioport_list &portlist, const char *
 				newtag.substr(newtag.find(oldtag.cat(root_tag)) + oldtag.len());
 
 				// output the switch name information
-				output.catprintf("\t\t<%s name=\"%s\" tag=\"%s\" mask=\"%u\">\n", outertag, xml_normalize_string(field->name()), xml_normalize_string(newtag), field->mask());
+				astring normalized_field_name(xml_normalize_string(field->name()));
+				astring normalized_newtag(xml_normalize_string(newtag));
+				output.catprintf("\t\t<%s name=\"%s\" tag=\"%s\" mask=\"%u\">\n", outertag, normalized_field_name.cstr(), normalized_newtag.cstr(), field->mask());
 
 				// loop over settings
 				for (ioport_setting *setting = field->first_setting(); setting != NULL; setting = setting->next())

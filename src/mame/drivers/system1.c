@@ -3858,16 +3858,16 @@ Serial number of the pcb is 257
 There are 2 piggyback boards:
 
 The first is marked "SEGA 834-5764"  and it is placed on the socket of the sega sys1 protection chip and on a eprom socket.
-there are IC2 and IC3 eproms (I can't read the codes because the stickers are damaged)
-There is also a 40 pin socket in which they have put an unknown 42 NEC cpu (they have scratched the codes) with pin 21 and 22 cut!
+there are IC1 and IC2 eproms (triple checked - can be easy to mis-read).  There is also a 40 pin socket in which they have
+put an unknown 42 NEC cpu (they have scratched the codes) with pin 21 and 22 cut!
 
 The second piggyback is marked "SEGA 834-5755" and it contains proms and some logic.
 */
 
 ROM_START( wboy4 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ic2.bin",    0x0000, 0x8000, CRC(48b2c006) SHA1(35492330dae71d410712380466b4c09b81df8559) ) /* encrypted */
-	ROM_LOAD( "ic3.bin",    0x8000, 0x8000, CRC(466cae31) SHA1(e47e9084c83796a0a0dfeaa1f8f868cadd5f32c7) )
+	ROM_LOAD( "epr7622.ic1",    0x0000, 0x8000, CRC(48b2c006) SHA1(35492330dae71d410712380466b4c09b81df8559) ) /* encrypted */
+	ROM_LOAD( "epr7621.ic2",    0x8000, 0x8000, CRC(466cae31) SHA1(e47e9084c83796a0a0dfeaa1f8f868cadd5f32c7) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "7583.126", 0x0000, 0x8000, CRC(99334b3c) SHA1(dfc09f63082b7666fa2152e22810c0455a7e5051) )    // epr7583.ic120
