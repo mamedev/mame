@@ -383,7 +383,7 @@ READ8_MEMBER(southbridge_device::pc_dma_read_word)
 	if(m_dma_channel == -1)
 		return 0xff;
 	UINT16 result;
-	offs_t page_offset = (((offs_t) m_dma_offset[1][m_dma_channel & 3]) << 16) & 0xFF0000;
+	offs_t page_offset = (((offs_t) m_dma_offset[1][m_dma_channel & 3]) << 16) & 0xFE0000;
 
 	result = prog_space.read_word(page_offset + ( offset << 1 ) );
 	m_dma_high_byte = result & 0xFF00;
@@ -397,7 +397,7 @@ WRITE8_MEMBER(southbridge_device::pc_dma_write_word)
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM); // get the right address space
 	if(m_dma_channel == -1)
 		return;
-	offs_t page_offset = (((offs_t) m_dma_offset[1][m_dma_channel & 3]) << 16) & 0xFF0000;
+	offs_t page_offset = (((offs_t) m_dma_offset[1][m_dma_channel & 3]) << 16) & 0xFE0000;
 
 	prog_space.write_word(page_offset + ( offset << 1 ), m_dma_high_byte | data);
 }
@@ -459,7 +459,7 @@ READ8_MEMBER( southbridge_device::at_portb_r )
 	/* This needs fixing/updating not sure what this is meant to fix */
 	if ( --m_poll_delay < 0 )
 	{
-		m_poll_delay = 3;
+		m_poll_delay = 20;
 		m_at_offset1 ^= 0x10;
 	}
 	data = (data & ~0x10) | ( m_at_offset1 & 0x10 );
