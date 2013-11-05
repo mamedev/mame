@@ -459,7 +459,7 @@ READ8_MEMBER( southbridge_device::at_portb_r )
 	/* This needs fixing/updating not sure what this is meant to fix */
 	if ( --m_poll_delay < 0 )
 	{
-		m_poll_delay = 20;
+		m_poll_delay = 25;
 		m_at_offset1 ^= 0x10;
 	}
 	data = (data & ~0x10) | ( m_at_offset1 & 0x10 );
