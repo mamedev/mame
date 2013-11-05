@@ -9,8 +9,6 @@
 #include "machine/pc_fdc.h"
 #include "imagedev/flopdrv.h"
 #include "formats/pc_dsk.h"
-#include "machine/ataintf.h"
-#include "formats/pc_dsk.h"
 #include "formats/mfi_dsk.h"
 
 
