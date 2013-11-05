@@ -59,7 +59,6 @@ WRITE8_MEMBER(usgames_state::lamps2_w)
 }
 
 
-
 static ADDRESS_MAP_START( usgames_map, AS_PROGRAM, 8, usgames_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("DSW")
@@ -197,7 +196,6 @@ static INPUT_PORTS_START( usg83 )
 INPUT_PORTS_END
 
 
-
 static const gfx_layout charlayout =
 {
 	8,8,
@@ -265,7 +263,6 @@ static MACHINE_CONFIG_DERIVED( usg185, usg32 )
 MACHINE_CONFIG_END
 
 
-
 ROM_START( usg32 )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "usg32-0.bin", 0x08000, 0x08000, CRC(bc313387) SHA1(8df2e2736f14e965303993ae4105176bdd59f49d) )
@@ -274,7 +271,6 @@ ROM_START( usg32 )
 	ROM_LOAD( "usg32-2.bin", 0x28000, 0x08000, CRC(d73d7f48) SHA1(a76582b80acd38abbb6f0f61d27b2920a3128516) )
 	ROM_LOAD( "usg32-3.bin", 0x38000, 0x08000, CRC(22747804) SHA1(b86af1db1733ddd0629843e44da9bc8d6b102eb6) )
 ROM_END
-
 
 ROM_START( superten ) /*  Version 8.3 - You can't change the status of "Sexy Triv I" and "Sexy Triv II" */
 	ROM_REGION( 0x80000, "maincpu", 0 )
@@ -345,7 +341,7 @@ The first screen that comes up reports:
 +--------------+-----------------------------+
 |SPECIAL THANKS| ROM0  V18.5  315D5C  ****** |
 |MARGARET+JAMIE+-----------------------------+
-|FOR EVERYTHING| ROM1  V18.5       0  2CB91D |
+|FOR EVERYTHING| ROM1  V18.5  2CB91D  2CB91D |
 |TESTSWITCH:OK!+-----------------------------+
 |SYSTEM RAM:OK!| ROM2  V18.5  4957A2  8973C0 |
 |CHARAC RAM:OK!+-----------------------------+
@@ -354,7 +350,7 @@ The first screen that comes up reports:
 |+12 VOLTS :OK!| ROM4  V18.5  53125B  90B95E |
 +--------------+-----------------------------+
 
-This show corresponding version number and checksums as listed on the labels.
+This shows corresponding version number and checksums as listed on the labels.
 
 Versions 18.3 and 18.6 confirmed to exist, just not currently dumped.
 
@@ -401,7 +397,7 @@ ROM_START( usg185 ) /* Version 18.5 */
 	ROM_LOAD( "version_18.5_rom4_cs=90b95e.u36", 0x10000, 0x10000, CRC(b104744d) SHA1(fa2128c39a135b119ef625eed447afa523f912c0) )
 	ROM_LOAD( "version_18.5_rom3_cs=76aebf.u35", 0x20000, 0x10000, CRC(795e71c8) SHA1(852dceab906f79d05da67a81f855c71738662430) )
 	ROM_LOAD( "version_18.5_rom2_cs=8973c0.u28", 0x30000, 0x10000, CRC(c6ba8a81) SHA1(e826492626707e30782d4d2f42419357970d67b3) )
-	ROM_LOAD( "version_18.5_rom1_cs=2cb91d.u18", 0x40000, 0x08000, CRC(bd384e5a) SHA1(1a09e2485471aa22f4260e6993f4636f7310e0b5) )
+	ROM_LOAD( "version_18.5_rom1_cs=2cb91d.u18", 0x48000, 0x08000, CRC(bd384e5a) SHA1(1a09e2485471aa22f4260e6993f4636f7310e0b5) )
 ROM_END
 
 
