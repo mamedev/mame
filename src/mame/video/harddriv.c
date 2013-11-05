@@ -178,21 +178,19 @@ static void update_palette_bank(running_machine &machine, int newbank)
  *
  *************************************/
 
-READ16_HANDLER( hdgsp_control_lo_r )
+READ16_MEMBER( harddriv_state::hdgsp_control_lo_r )
 {
-	harddriv_state *state = space.machine().driver_data<harddriv_state>();
-	return state->m_gsp_control_lo[offset];
+	return m_gsp_control_lo[offset];
 }
 
 
-WRITE16_HANDLER( hdgsp_control_lo_w )
+WRITE16_MEMBER( harddriv_state::hdgsp_control_lo_w )
 {
-	harddriv_state *state = space.machine().driver_data<harddriv_state>();
-	int oldword = state->m_gsp_control_lo[offset];
+	int oldword = m_gsp_control_lo[offset];
 	int newword;
 
-	COMBINE_DATA(&state->m_gsp_control_lo[offset]);
-	newword = state->m_gsp_control_lo[offset];
+	COMBINE_DATA(&m_gsp_control_lo[offset]);
+	newword = m_gsp_control_lo[offset];
 
 	if (oldword != newword && offset != 0)
 		logerror("GSP:gsp_control_lo(%X)=%04X\n", offset, newword);
@@ -206,47 +204,45 @@ WRITE16_HANDLER( hdgsp_control_lo_w )
  *
  *************************************/
 
-READ16_HANDLER( hdgsp_control_hi_r )
+READ16_MEMBER( harddriv_state::hdgsp_control_hi_r )
 {
-	harddriv_state *state = space.machine().driver_data<harddriv_state>();
-	return state->m_gsp_control_hi[offset];
+	return m_gsp_control_hi[offset];
 }
 
 
-WRITE16_HANDLER( hdgsp_control_hi_w )
+WRITE16_MEMBER( harddriv_state::hdgsp_control_hi_w )
 {
-	harddriv_state *state = space.machine().driver_data<harddriv_state>();
 	int val = (offset >> 3) & 1;
 
-	int oldword = state->m_gsp_control_hi[offset];
+	int oldword = m_gsp_control_hi[offset];
 	int newword;
 
-	COMBINE_DATA(&state->m_gsp_control_hi[offset]);
-	newword = state->m_gsp_control_hi[offset];
+	COMBINE_DATA(&m_gsp_control_hi[offset]);
+	newword = m_gsp_control_hi[offset];
 
 	switch (offset & 7)
 	{
 		case 0x00:
-			state->m_shiftreg_enable = val;
+			m_shiftreg_enable = val;
 			break;
 
 		case 0x01:
-			data = data & (15 >> state->m_gsp_multisync);
-			state->m_screen->update_partial(state->m_screen->vpos() - 1);
-			state->m_gfx_finescroll = data;
+			data = data & (15 >> m_gsp_multisync);
+			m_screen->update_partial(m_screen->vpos() - 1);
+			m_gfx_finescroll = data;
 			break;
 
 		case 0x02:
-			update_palette_bank(space.machine(), (state->m_gfx_palettebank & ~1) | val);
+			update_palette_bank(space.machine(), (m_gfx_palettebank & ~1) | val);
 			break;
 
 		case 0x03:
-			update_palette_bank(space.machine(), (state->m_gfx_palettebank & ~2) | (val << 1));
+			update_palette_bank(space.machine(), (m_gfx_palettebank & ~2) | (val << 1));
 			break;
 
 		case 0x04:
 			if (space.machine().total_colors() >= 256 * 8)
-				update_palette_bank(space.machine(), (state->m_gfx_palettebank & ~4) | (val << 2));
+				update_palette_bank(space.machine(), (m_gfx_palettebank & ~4) | (val << 2));
 			break;
 
 		case 0x07:
@@ -268,18 +264,17 @@ WRITE16_HANDLER( hdgsp_control_hi_w )
  *
  *************************************/
 
-READ16_HANDLER( hdgsp_vram_2bpp_r )
+READ16_MEMBER( harddriv_state::hdgsp_vram_2bpp_r )
 {
 	return 0;
 }
 
 
-WRITE16_HANDLER( hdgsp_vram_1bpp_w )
+WRITE16_MEMBER( harddriv_state::hdgsp_vram_1bpp_w )
 {
-	harddriv_state *state = space.machine().driver_data<harddriv_state>();
-	UINT32 *dest = (UINT32 *)&state->m_gsp_vram[offset * 16];
-	UINT32 *mask = &state->m_mask_table[data * 4];
-	UINT32 color = state->m_gsp_control_lo[0] & 0xff;
+	UINT32 *dest = (UINT32 *)&m_gsp_vram[offset * 16];
+	UINT32 *mask = &m_mask_table[data * 4];
+	UINT32 color = m_gsp_control_lo[0] & 0xff;
 	UINT32 curmask;
 
 	color |= color << 8;
@@ -303,12 +298,11 @@ WRITE16_HANDLER( hdgsp_vram_1bpp_w )
 }
 
 
-WRITE16_HANDLER( hdgsp_vram_2bpp_w )
+WRITE16_MEMBER( harddriv_state::hdgsp_vram_2bpp_w )
 {
-	harddriv_state *state = space.machine().driver_data<harddriv_state>();
-	UINT32 *dest = (UINT32 *)&state->m_gsp_vram[offset * 8];
-	UINT32 *mask = &state->m_mask_table[data * 2];
-	UINT32 color = state->m_gsp_control_lo[0];
+	UINT32 *dest = (UINT32 *)&m_gsp_vram[offset * 8];
+	UINT32 *mask = &m_mask_table[data * 2];
+	UINT32 color = m_gsp_control_lo[0];
 	UINT32 curmask;
 
 	color |= color << 16;
@@ -340,27 +334,23 @@ INLINE void gsp_palette_change(running_machine &machine, int offset)
 }
 
 
-READ16_HANDLER( hdgsp_paletteram_lo_r )
+READ16_MEMBER( harddriv_state::hdgsp_paletteram_lo_r )
 {
-	harddriv_state *state = space.machine().driver_data<harddriv_state>();
-
 	/* note that the palette is only accessed via the first 256 entries */
 	/* others are selected via the palette bank */
-	offset = state->m_gfx_palettebank * 0x100 + (offset & 0xff);
+	offset = m_gfx_palettebank * 0x100 + (offset & 0xff);
 
-	return state->m_gsp_paletteram_lo[offset];
+	return m_gsp_paletteram_lo[offset];
 }
 
 
-WRITE16_HANDLER( hdgsp_paletteram_lo_w )
+WRITE16_MEMBER( harddriv_state::hdgsp_paletteram_lo_w )
 {
-	harddriv_state *state = space.machine().driver_data<harddriv_state>();
-
 	/* note that the palette is only accessed via the first 256 entries */
 	/* others are selected via the palette bank */
-	offset = state->m_gfx_palettebank * 0x100 + (offset & 0xff);
+	offset = m_gfx_palettebank * 0x100 + (offset & 0xff);
 
-	COMBINE_DATA(&state->m_gsp_paletteram_lo[offset]);
+	COMBINE_DATA(&m_gsp_paletteram_lo[offset]);
 	gsp_palette_change(space.machine(), offset);
 }
 
@@ -372,27 +362,23 @@ WRITE16_HANDLER( hdgsp_paletteram_lo_w )
  *
  *************************************/
 
-READ16_HANDLER( hdgsp_paletteram_hi_r )
+READ16_MEMBER( harddriv_state::hdgsp_paletteram_hi_r )
 {
-	harddriv_state *state = space.machine().driver_data<harddriv_state>();
-
 	/* note that the palette is only accessed via the first 256 entries */
 	/* others are selected via the palette bank */
-	offset = state->m_gfx_palettebank * 0x100 + (offset & 0xff);
+	offset = m_gfx_palettebank * 0x100 + (offset & 0xff);
 
-	return state->m_gsp_paletteram_hi[offset];
+	return m_gsp_paletteram_hi[offset];
 }
 
 
-WRITE16_HANDLER( hdgsp_paletteram_hi_w )
+WRITE16_MEMBER( harddriv_state::hdgsp_paletteram_hi_w )
 {
-	harddriv_state *state = space.machine().driver_data<harddriv_state>();
-
 	/* note that the palette is only accessed via the first 256 entries */
 	/* others are selected via the palette bank */
-	offset = state->m_gfx_palettebank * 0x100 + (offset & 0xff);
+	offset = m_gfx_palettebank * 0x100 + (offset & 0xff);
 
-	COMBINE_DATA(&state->m_gsp_paletteram_hi[offset]);
+	COMBINE_DATA(&m_gsp_paletteram_hi[offset]);
 	gsp_palette_change(space.machine(), offset);
 }
 

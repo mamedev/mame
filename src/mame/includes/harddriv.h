@@ -273,62 +273,153 @@ public:
 	optional_device<dac_device> m_dac;
 	required_device<duartn68681_device> m_duart;
 	DECLARE_WRITE_LINE_MEMBER(harddriv_duart_irq_handler);
+	
+	/*----------- defined in machine/harddriv.c -----------*/
+
+	/* Driver/Multisync board */
+	DECLARE_WRITE16_MEMBER( hd68k_irq_ack_w );
+
+	DECLARE_READ16_MEMBER( hd68k_gsp_io_r );
+	DECLARE_WRITE16_MEMBER( hd68k_gsp_io_w );
+
+	DECLARE_READ16_MEMBER( hd68k_msp_io_r );
+	DECLARE_WRITE16_MEMBER( hd68k_msp_io_w );
+
+	DECLARE_READ16_MEMBER( hd68k_port0_r );
+	DECLARE_READ16_MEMBER( hd68k_adc8_r );
+	DECLARE_READ16_MEMBER( hd68k_adc12_r );
+	DECLARE_READ16_MEMBER( hdc68k_port1_r );
+	DECLARE_READ16_MEMBER( hda68k_port1_r );
+	DECLARE_READ16_MEMBER( hdc68k_wheel_r );
+	DECLARE_READ16_MEMBER( hd68k_sound_reset_r );
+
+	DECLARE_WRITE16_MEMBER( hd68k_adc_control_w );
+	DECLARE_WRITE16_MEMBER( hd68k_wr0_write );
+	DECLARE_WRITE16_MEMBER( hd68k_wr1_write );
+	DECLARE_WRITE16_MEMBER( hd68k_wr2_write );
+	DECLARE_WRITE16_MEMBER( hd68k_nwr_w );
+	DECLARE_WRITE16_MEMBER( hdc68k_wheel_edge_reset_w );
+
+	DECLARE_READ16_MEMBER( hd68k_zram_r );
+	DECLARE_WRITE16_MEMBER( hd68k_zram_w );
+
+	DECLARE_WRITE16_MEMBER( hdgsp_io_w );
+
+	DECLARE_WRITE16_MEMBER( hdgsp_protection_w );
+	
+	/* ADSP board */
+	DECLARE_READ16_MEMBER( hd68k_adsp_program_r );
+	DECLARE_WRITE16_MEMBER( hd68k_adsp_program_w );
+
+	DECLARE_READ16_MEMBER( hd68k_adsp_data_r );
+	DECLARE_WRITE16_MEMBER( hd68k_adsp_data_w );
+
+	DECLARE_READ16_MEMBER( hd68k_adsp_buffer_r );
+	DECLARE_WRITE16_MEMBER( hd68k_adsp_buffer_w );
+
+	DECLARE_WRITE16_MEMBER( hd68k_adsp_control_w );
+	DECLARE_WRITE16_MEMBER( hd68k_adsp_irq_clear_w );
+	DECLARE_READ16_MEMBER( hd68k_adsp_irq_state_r );
+
+	DECLARE_READ16_MEMBER( hdadsp_special_r );
+	DECLARE_WRITE16_MEMBER( hdadsp_special_w );
+	
+	/* DS III/IV board */
+	void update_ds3_irq();
+	void update_ds3_sirq();
+	
+	DECLARE_WRITE16_MEMBER( hd68k_ds3_control_w );
+	DECLARE_READ16_MEMBER( hd68k_ds3_girq_state_r );
+
+	DECLARE_READ16_MEMBER( hd68k_ds3_gdata_r );
+	DECLARE_WRITE16_MEMBER( hd68k_ds3_gdata_w );
+
+	DECLARE_READ16_MEMBER( hdds3_special_r );
+	DECLARE_WRITE16_MEMBER( hdds3_special_w );
+	DECLARE_READ16_MEMBER( hdds3_control_r );
+	DECLARE_WRITE16_MEMBER( hdds3_control_w );
+
+	DECLARE_READ16_MEMBER( hd68k_ds3_program_r );
+	DECLARE_WRITE16_MEMBER( hd68k_ds3_program_w );
+
+	DECLARE_READ16_MEMBER( hd68k_ds3_sdata_r );
+	DECLARE_WRITE16_MEMBER( hd68k_ds3_sdata_w );
+	DECLARE_WRITE16_MEMBER( hd68k_ds3_sirq_clear_w );
+	DECLARE_READ16_MEMBER( hd68k_ds3_sirq_state_r );
+
+	DECLARE_READ16_MEMBER( hdds3_sdsp_special_r );
+	DECLARE_WRITE16_MEMBER( hdds3_sdsp_special_w );
+
+	DECLARE_READ16_MEMBER( hdds3_sdsp_control_r );
+	DECLARE_WRITE16_MEMBER( hdds3_sdsp_control_w );
+	DECLARE_READ16_MEMBER( hdds3_xdsp_control_r );
+	DECLARE_WRITE16_MEMBER( hdds3_xdsp_control_w );
+	
+	/* DSK board */
+	DECLARE_WRITE16_MEMBER( hd68k_dsk_control_w );
+	DECLARE_READ16_MEMBER( hd68k_dsk_ram_r );
+	DECLARE_WRITE16_MEMBER( hd68k_dsk_ram_w );
+	DECLARE_READ16_MEMBER( hd68k_dsk_zram_r );
+	DECLARE_WRITE16_MEMBER( hd68k_dsk_zram_w );
+	DECLARE_READ16_MEMBER( hd68k_dsk_small_rom_r );
+	DECLARE_READ16_MEMBER( hd68k_dsk_rom_r );
+	DECLARE_WRITE16_MEMBER( hd68k_dsk_dsp32_w );
+	DECLARE_READ16_MEMBER( hd68k_dsk_dsp32_r );
+	DECLARE_WRITE32_MEMBER( rddsp32_sync0_w );
+	DECLARE_WRITE32_MEMBER( rddsp32_sync1_w );
+
+	/* DSPCOM board */
+	DECLARE_WRITE16_MEMBER( hddspcom_control_w );
+
+	DECLARE_WRITE16_MEMBER( rd68k_slapstic_w );
+	DECLARE_READ16_MEMBER( rd68k_slapstic_r );
+
+	/* Game-specific protection */
+	int st68k_sloop_tweak(offs_t offset);
+	DECLARE_WRITE16_MEMBER( st68k_sloop_w );
+	DECLARE_READ16_MEMBER( st68k_sloop_r );
+	DECLARE_READ16_MEMBER( st68k_sloop_alt_r );
+	int st68k_protosloop_tweak(offs_t offset);
+	DECLARE_WRITE16_MEMBER( st68k_protosloop_w );
+	DECLARE_READ16_MEMBER( st68k_protosloop_r );
+
+	/* GSP optimizations */
+	DECLARE_READ16_MEMBER( hdgsp_speedup_r );
+	DECLARE_WRITE16_MEMBER( hdgsp_speedup1_w );
+	DECLARE_WRITE16_MEMBER( hdgsp_speedup2_w );
+	DECLARE_READ16_MEMBER( rdgsp_speedup1_r );
+	DECLARE_WRITE16_MEMBER( rdgsp_speedup1_w );
+
+	/* MSP optimizations */
+	DECLARE_READ16_MEMBER( hdmsp_speedup_r );
+	DECLARE_WRITE16_MEMBER( hdmsp_speedup_w );
+
+	/* ADSP optimizations */
+	DECLARE_READ16_MEMBER( hdadsp_speedup_r );
+	DECLARE_READ16_MEMBER( hdds3_speedup_r );
+	
+	/*----------- defined in video/harddriv.c -----------*/
+	DECLARE_READ16_MEMBER( hdgsp_control_lo_r );
+	DECLARE_WRITE16_MEMBER( hdgsp_control_lo_w );
+	DECLARE_READ16_MEMBER( hdgsp_control_hi_r );
+	DECLARE_WRITE16_MEMBER( hdgsp_control_hi_w );
+
+	DECLARE_READ16_MEMBER( hdgsp_vram_2bpp_r );
+	DECLARE_WRITE16_MEMBER( hdgsp_vram_1bpp_w );
+	DECLARE_WRITE16_MEMBER( hdgsp_vram_2bpp_w );
+
+	DECLARE_READ16_MEMBER( hdgsp_paletteram_lo_r );
+	DECLARE_WRITE16_MEMBER( hdgsp_paletteram_lo_w );
+	DECLARE_READ16_MEMBER( hdgsp_paletteram_hi_r );
+	DECLARE_WRITE16_MEMBER( hdgsp_paletteram_hi_w );
 };
 
 
 /*----------- defined in machine/harddriv.c -----------*/
 
 /* Driver/Multisync board */
-
-DECLARE_WRITE16_HANDLER( hd68k_irq_ack_w );
 void hdgsp_irq_gen(device_t *device, int state);
 void hdmsp_irq_gen(device_t *device, int state);
-
-DECLARE_READ16_HANDLER( hd68k_gsp_io_r );
-DECLARE_WRITE16_HANDLER( hd68k_gsp_io_w );
-
-DECLARE_READ16_HANDLER( hd68k_msp_io_r );
-DECLARE_WRITE16_HANDLER( hd68k_msp_io_w );
-
-DECLARE_READ16_HANDLER( hd68k_port0_r );
-DECLARE_READ16_HANDLER( hd68k_adc8_r );
-DECLARE_READ16_HANDLER( hd68k_adc12_r );
-DECLARE_READ16_HANDLER( hdc68k_port1_r );
-DECLARE_READ16_HANDLER( hda68k_port1_r );
-DECLARE_READ16_HANDLER( hdc68k_wheel_r );
-DECLARE_READ16_HANDLER( hd68k_sound_reset_r );
-
-DECLARE_WRITE16_HANDLER( hd68k_adc_control_w );
-DECLARE_WRITE16_HANDLER( hd68k_wr0_write );
-DECLARE_WRITE16_HANDLER( hd68k_wr1_write );
-DECLARE_WRITE16_HANDLER( hd68k_wr2_write );
-DECLARE_WRITE16_HANDLER( hd68k_nwr_w );
-DECLARE_WRITE16_HANDLER( hdc68k_wheel_edge_reset_w );
-
-DECLARE_READ16_HANDLER( hd68k_zram_r );
-DECLARE_WRITE16_HANDLER( hd68k_zram_w );
-
-DECLARE_WRITE16_HANDLER( hdgsp_io_w );
-
-DECLARE_WRITE16_HANDLER( hdgsp_protection_w );
-
-
-/* ADSP board */
-DECLARE_READ16_HANDLER( hd68k_adsp_program_r );
-DECLARE_WRITE16_HANDLER( hd68k_adsp_program_w );
-
-DECLARE_READ16_HANDLER( hd68k_adsp_data_r );
-DECLARE_WRITE16_HANDLER( hd68k_adsp_data_w );
-
-DECLARE_READ16_HANDLER( hd68k_adsp_buffer_r );
-DECLARE_WRITE16_HANDLER( hd68k_adsp_buffer_w );
-
-DECLARE_WRITE16_HANDLER( hd68k_adsp_control_w );
-DECLARE_WRITE16_HANDLER( hd68k_adsp_irq_clear_w );
-DECLARE_READ16_HANDLER( hd68k_adsp_irq_state_r );
-
-DECLARE_READ16_HANDLER( hdadsp_special_r );
-DECLARE_WRITE16_HANDLER( hdadsp_special_w );
 
 /* DS III/IV board */
 TIMER_DEVICE_CALLBACK( ds3sdsp_internal_timer_callback );
@@ -343,77 +434,8 @@ void hdds3xdsp_timer_enable_callback(adsp21xx_device &device, int enable);
 void hdds3xdsp_serial_tx_callback(adsp21xx_device &device, int port, INT32 data);
 INT32 hdds3xdsp_serial_rx_callback(adsp21xx_device &device, int port);
 
-WRITE16_HANDLER( hd68k_ds3_control_w );
-READ16_HANDLER( hd68k_ds3_girq_state_r );
-
-READ16_HANDLER( hd68k_ds3_gdata_r );
-WRITE16_HANDLER( hd68k_ds3_gdata_w );
-
-READ16_HANDLER( hdds3_special_r );
-WRITE16_HANDLER( hdds3_special_w );
-READ16_HANDLER( hdds3_control_r );
-WRITE16_HANDLER( hdds3_control_w );
-
-READ16_HANDLER( hd68k_ds3_program_r );
-WRITE16_HANDLER( hd68k_ds3_program_w );
-
-
-READ16_HANDLER( hd68k_ds3_sdata_r );
-WRITE16_HANDLER( hd68k_ds3_sdata_w );
-WRITE16_HANDLER( hd68k_ds3_sirq_clear_w );
-READ16_HANDLER( hd68k_ds3_sirq_state_r );
-
-READ16_HANDLER( hdds3_sdsp_special_r );
-WRITE16_HANDLER( hdds3_sdsp_special_w );
-
-READ16_HANDLER( hdds3_sdsp_control_r );
-WRITE16_HANDLER( hdds3_sdsp_control_w );
-READ16_HANDLER( hdds3_xdsp_control_r );
-WRITE16_HANDLER( hdds3_xdsp_control_w );
-
-
 /* DSK board */
 void hddsk_update_pif(dsp32c_device &device, UINT32 pins);
-DECLARE_WRITE16_HANDLER( hd68k_dsk_control_w );
-DECLARE_READ16_HANDLER( hd68k_dsk_ram_r );
-DECLARE_WRITE16_HANDLER( hd68k_dsk_ram_w );
-DECLARE_READ16_HANDLER( hd68k_dsk_zram_r );
-DECLARE_WRITE16_HANDLER( hd68k_dsk_zram_w );
-DECLARE_READ16_HANDLER( hd68k_dsk_small_rom_r );
-DECLARE_READ16_HANDLER( hd68k_dsk_rom_r );
-DECLARE_WRITE16_HANDLER( hd68k_dsk_dsp32_w );
-DECLARE_READ16_HANDLER( hd68k_dsk_dsp32_r );
-DECLARE_WRITE32_HANDLER( rddsp32_sync0_w );
-DECLARE_WRITE32_HANDLER( rddsp32_sync1_w );
-
-/* DSPCOM board */
-DECLARE_WRITE16_HANDLER( hddspcom_control_w );
-
-DECLARE_WRITE16_HANDLER( rd68k_slapstic_w );
-DECLARE_READ16_HANDLER( rd68k_slapstic_r );
-
-/* Game-specific protection */
-DECLARE_WRITE16_HANDLER( st68k_sloop_w );
-DECLARE_READ16_HANDLER( st68k_sloop_r );
-DECLARE_READ16_HANDLER( st68k_sloop_alt_r );
-DECLARE_WRITE16_HANDLER( st68k_protosloop_w );
-DECLARE_READ16_HANDLER( st68k_protosloop_r );
-
-/* GSP optimizations */
-DECLARE_READ16_HANDLER( hdgsp_speedup_r );
-DECLARE_WRITE16_HANDLER( hdgsp_speedup1_w );
-DECLARE_WRITE16_HANDLER( hdgsp_speedup2_w );
-DECLARE_READ16_HANDLER( rdgsp_speedup1_r );
-DECLARE_WRITE16_HANDLER( rdgsp_speedup1_w );
-
-/* MSP optimizations */
-DECLARE_READ16_HANDLER( hdmsp_speedup_r );
-DECLARE_WRITE16_HANDLER( hdmsp_speedup_w );
-
-/* ADSP optimizations */
-DECLARE_READ16_HANDLER( hdadsp_speedup_r );
-DECLARE_READ16_HANDLER( hdds3_speedup_r );
-
 
 /*----------- defined in audio/harddriv.c -----------*/
 
@@ -421,23 +443,8 @@ void hdsnd_init(running_machine &machine);
 
 /*----------- defined in video/harddriv.c -----------*/
 
-
 void hdgsp_write_to_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg);
 void hdgsp_read_from_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg);
-
-DECLARE_READ16_HANDLER( hdgsp_control_lo_r );
-DECLARE_WRITE16_HANDLER( hdgsp_control_lo_w );
-DECLARE_READ16_HANDLER( hdgsp_control_hi_r );
-DECLARE_WRITE16_HANDLER( hdgsp_control_hi_w );
-
-DECLARE_READ16_HANDLER( hdgsp_vram_2bpp_r );
-DECLARE_WRITE16_HANDLER( hdgsp_vram_1bpp_w );
-DECLARE_WRITE16_HANDLER( hdgsp_vram_2bpp_w );
-
-DECLARE_READ16_HANDLER( hdgsp_paletteram_lo_r );
-DECLARE_WRITE16_HANDLER( hdgsp_paletteram_lo_w );
-DECLARE_READ16_HANDLER( hdgsp_paletteram_hi_r );
-DECLARE_WRITE16_HANDLER( hdgsp_paletteram_hi_w );
 
 void harddriv_scanline_driver(screen_device &screen, bitmap_ind16 &bitmap, int scanline, const tms34010_display_params *params);
 void harddriv_scanline_multisync(screen_device &screen, bitmap_ind16 &bitmap, int scanline, const tms34010_display_params *params);
