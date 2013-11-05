@@ -53,7 +53,7 @@ Versions:
 Mazer blazer's zpu-2000 roms are known to exist in at least the following versions:
 RA3
 and probably exist in versions RA1 and RA2 as well.
-It is currently unknown what versions the two sets correspond to.
+It is currently unknown what versions the two sets in MAME correspond to.
 The other roms are likely always version RA1, as the RA3-zpu-2000 board has RA1
 roms for all roms except the zpu-2000 board.
 
