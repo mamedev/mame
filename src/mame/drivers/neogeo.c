@@ -1094,15 +1094,20 @@ DEVICE_IMAGE_LOAD_MEMBER( neogeo_state, neo_cartridge )
 		size = image.get_software_region_length("maincpu");
 		machine().memory().region_free(":maincpu");
 		machine().memory().region_alloc(":maincpu",size, 2, ENDIANNESS_BIG);
-		memcpy(memregion("maincpu")->base(),image.get_software_region("maincpu"),size);
 		// Reset the reference to the region
 		m_region_maincpu.findit();
-		// for whatever reason (intentional, or design flaw) software loaded via software lists is swapped in endianess vs. the standard ROM loading, regardless of the above.  Swap it to keep consistency
-		for (int i=0; i<size/2;i++)
+
+#ifdef LSB_FIRST
+		// software list ROM loading currently does not fix up endianness for us, so we need to do it by hand
+		UINT16 *src = (UINT16 *)image.get_software_region("maincpu");
+		UINT16 *dst = (UINT16 *)memregion("maincpu")->base();
+		for (int i=0; i<size/2; i++)
 		{
-			UINT16* ROM = (UINT16*)memregion("maincpu")->base();
-			ROM[i] = ((ROM[i]&0xff00)>>8) | ((ROM[i]&0x00ff)<<8);
+			dst[i] = FLIPENDIAN_INT16(src[i]);
 		}
+#else
+		memcpy(memregion("maincpu")->base(),image.get_software_region("maincpu"),size);
+#endif
 
 		size = image.get_software_region_length("fixed");
 		machine().memory().region_free(":fixed");
